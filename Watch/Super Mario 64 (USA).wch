@@ -1,4 +1,28 @@
 Domain RDRAM
 SystemID N64
+32D594	b	u	1	RDRAM	Sound display enabled
+32D598	b	u	1	RDRAM	Debug display enabled
+32D5E4	d	h	1	RDRAM	1P Controller pointer
+32D5E8	d	h	1	RDRAM	2P Controller pointer
+32DB30	w	u	1	RDRAM	Screen width (credits)
+32DB32	w	u	1	RDRAM	Screen height (credits)
+32DB38	w	u	1	RDRAM	Screen X (credits)
+32DB3A	w	u	1	RDRAM	Screen Y (credits)
+32DDE0	d	h	1	RDRAM	Unused screen area color (credits)
 32DDF8	w	u	1	RDRAM	Map
+330E94	b	u	1	RDRAM	Debug 2 display type
+33B1AC	d	f	1	RDRAM	X Position
+33B1B0	d	f	1	RDRAM	Y Position
+33B1B4	d	f	1	RDRAM	Z Position
+33B1C4	d	f	1	RDRAM	Velocity
+33B1F8	d	h	1	RDRAM	Mario object pointer
+33B21A	w	u	1	RDRAM	Star count
+33B21D	b	u	1	RDRAM	Lives
+33B21E	w	u	1	RDRAM	Health
+33B944	w	u	1	RDRAM	Music
+33D260	d	u	1	RDRAM	Debug 2 display enabled
+33D2DE	w	u	1	RDRAM	Spawn debug mode enabled
+33D480	d	h	1	RDRAM	Behavior update enabled
+361160	d	h	1	RDRAM	Current object pointer
+38BE28	d	h	1	RDRAM	Current level command pointer
 
