@@ -1,34 +1,37 @@
 -- PAL 0x7fbf10
 -- JP 0x7fc460
-pointer_list = 0x7fbff0;
-object_pointers = {};
-object_index = 1;
-max_objects = 0xff;
+local pointer_list = 0x7fbff0;
+local object_pointers = {};
+local object_index = 1;
+local max_objects = 0xff;
+
+local radius = 100;
+local shade_byte = 0x16D;
 
 -- camera_pointer = 0x7f5d10;
-camera_pointer = 0x7fb968;
-camera_focus_pointer = 0x178;
-visibility = 0x63; -- 127 = visible
+local camera_pointer = 0x7fb968;
+local camera_focus_pointer = 0x178;
+local visibility = 0x63; -- 127 = visible
 
-kong_pointer = 0x7fbb4c;
-grab_pointer = 0x32c;
-model_pointer = 0x00;
+local kong_pointer = 0x7fbb4c;
+local grab_pointer = 0x32c;
+local model_pointer = 0x00;
 
-grab_script_mode = "Grab";
+local grab_script_mode = "Grab";
 
 -- Keybinds
 -- For full list go here http://slimdx.org/docs/html/T_SlimDX_DirectInput_Key.htm
-decrease_object_index_key = "B";
-increase_object_index_key = "N";
-grab_object_key = "V";
-switch_grab_script_mode_key = "C";
+local decrease_object_index_key = "B";
+local increase_object_index_key = "N";
+local grab_object_key = "V";
+local switch_grab_script_mode_key = "C";
 
-decrease_object_index_pressed = false;
-increase_object_index_pressed = false;
-grab_object_pressed = false;
-switch_mode_pressed = false;
+local decrease_object_index_pressed = false;
+local increase_object_index_pressed = false;
+local grab_object_pressed = false;
+local switch_mode_pressed = false;
 
-function switch_grab_script_mode()
+local function switch_grab_script_mode()
 	if grab_script_mode == "Grab" then
 		grab_script_mode = "Camera";
 	else
@@ -36,7 +39,41 @@ function switch_grab_script_mode()
 	end
 end
 
-function process_input ()
+local function grab_object ()
+	if grab_script_mode == "Grab" then
+		local kong_object = mainmemory.read_u24_be(kong_pointer + 1);
+		if object_index <= #object_pointers then
+			mainmemory.writebyte(kong_object + grab_pointer, 0x80);
+			mainmemory.write_u24_be(kong_object + grab_pointer + 1, object_pointers[object_index]);
+			mainmemory.writebyte(kong_object + grab_pointer + 4, 0x80);
+			mainmemory.write_u24_be(kong_object + grab_pointer + 4 + 1, object_pointers[object_index]);
+		end
+	elseif grab_script_mode == "Camera" then
+		local camera_object = mainmemory.read_u24_be(camera_pointer + 1);
+		if object_index <= #object_pointers then
+			mainmemory.writebyte(camera_object + camera_focus_pointer, 0x80);
+			mainmemory.write_u24_be(camera_object + camera_focus_pointer + 1, object_pointers[object_index]);
+		end
+	end
+end
+
+local function encircle_kong(kong_x, kong_y, kong_z)
+	local i, x, z;
+
+	for i=1,#object_pointers do
+		x = kong_x + radius;
+		z = kong_z + radius;
+
+		x = kong_x + math.cos(math.pi * 2 * i / #object_pointers) * radius;
+		z = kong_z + math.sin(math.pi * 2 * i / #object_pointers) * radius;
+
+		mainmemory.writefloat(object_pointers[i] + x_pos, x, true);
+		mainmemory.writefloat(object_pointers[i] + y_pos, kong_y, true);
+		mainmemory.writefloat(object_pointers[i] + z_pos, z, true);
+	end
+end
+
+local function process_input ()
 	input_table = input.get();
 
 	-- Hold down key prevention
@@ -78,33 +115,15 @@ function process_input ()
 	end
 end
 
-function grab_object ()
-	if grab_script_mode == "Grab" then
-		kong_object = mainmemory.read_u24_be(kong_pointer + 1);
-		if object_index <= #object_pointers then
-			mainmemory.writebyte(kong_object + grab_pointer, 0x80);
-			mainmemory.write_u24_be(kong_object + grab_pointer + 1, object_pointers[object_index]);
-			mainmemory.writebyte(kong_object + grab_pointer + 4, 0x80);
-			mainmemory.write_u24_be(kong_object + grab_pointer + 4 + 1, object_pointers[object_index]);
-		end
-	elseif grab_script_mode == "Camera" then
-		camera_object = mainmemory.read_u24_be(camera_pointer + 1);
-		if object_index <= #object_pointers then
-			mainmemory.writebyte(camera_object + camera_focus_pointer, 0x80);
-			mainmemory.write_u24_be(camera_object + camera_focus_pointer + 1, object_pointers[object_index]);
-		end
-	end
-end
-
-function pull_objects ()
+local function pull_objects ()
 	object_pointers = {};
 	object_found = true;
-	object_no = 0;
-	kong_object = mainmemory.read_u24_be(kong_pointer + 1);
-	camera_object = mainmemory.read_u24_be(camera_pointer + 1);
+	local object_no = 0;
+	local kong_object = mainmemory.read_u24_be(kong_pointer + 1);
+	local camera_object = mainmemory.read_u24_be(camera_pointer + 1);
 
 	while object_found do
-		pointer = mainmemory.read_u24_be(pointer_list + (object_no * 4) + 1);
+		local pointer = mainmemory.read_u24_be(pointer_list + (object_no * 4) + 1);
 		object_found = (pointer ~= 0xffffff) and (pointer ~= 0x000000) and (object_no <= max_objects);
 
 		if object_found then
@@ -120,10 +139,10 @@ function pull_objects ()
 
 	object_index = math.min(object_index, math.max(1, #object_pointers));
 
-	gui_x = 32;
-	gui_y = 32;
-	row = 0;
-	height = 16;
+	local gui_x = 32;
+	local gui_y = 32;
+	local row = 0;
+	local height = 16;
 
 	gui.text(gui_x, gui_y + height * row, "Index: "..object_index.."/"..#object_pointers, null, null, 'bottomright');
 	row = row + 1;
