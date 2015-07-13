@@ -1,4 +1,16 @@
 Domain RDRAM
 SystemID N64
+37C5A0	d	f	1	RDRAM	X Position
+37C5A4	d	f	1	RDRAM	Y Position
+37C5A8	d	f	1	RDRAM	Z Position
 37E8F5	b	h	1	RDRAM	Map
+385F63	b	u	1	RDRAM	Notes - TODO: Does this work?
+385F67	b	u	1	RDRAM	Eggs
+385F6F	b	u	1	RDRAM	Red Feathers
+385F73	b	u	1	RDRAM	Gold Feathers
+385F83	b	u	1	RDRAM	Health
+385F8B	b	u	1	RDRAM	Lives
+385F8E	b	u	1	RDRAM	Air
+385FC7	b	u	1	RDRAM	Mumbo Tokens
+385FCB	b	u	1	RDRAM	Jiggies
 
