@@ -92,8 +92,6 @@ key_offsets = {
 	0x2c
 };
 
-
-
 function keyGet(number)
 	current_file = mainmemory.readbyte(file);
 	if current_file >= 0 and current_file <= 2 then

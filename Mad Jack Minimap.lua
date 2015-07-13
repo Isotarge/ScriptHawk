@@ -9,6 +9,7 @@ mrf = mainmemory.readfloat;
 mwf = mainmemory.writefloat;
 
 MJ_state_pointer = 0x7fdc91;
+script_root = "Lua/ScriptHawk";
 
 -- Mad Jack state
 MJ_time_until_next_action = 0x2d;
@@ -139,28 +140,28 @@ end
 function MJ_get_arrow_image (current, new)
 	if new.row > current.row then
 		if new.col > current.col then
-			return "Lua/ScriptHawk/Images/up_right.png";
+			return script_root.."/Images/up_right.png";
 		elseif new.col == current.col then
-			return "Lua/ScriptHawk/Images/up.png";
+			return script_root.."/Images/up.png";
 		elseif new.col < current.col then
-			return "Lua/ScriptHawk/Images/up_left.png";
+			return script_root.."/Images/up_left.png";
 		end
 	elseif new.row == current.row then
 		if new.col > current.col then
-			return "Lua/ScriptHawk/Images/right.png";
+			return script_root.."/Images/right.png";
 		elseif new.col < current.col then
-			return "Lua/ScriptHawk/Images/left.png";
+			return script_root.."/Images/left.png";
 		end
 	elseif new.row < current.row then
 		if new.col > current.col then
-			return "Lua/ScriptHawk/Images/down_right.png";
+			return script_root.."/Images/down_right.png";
 		elseif new.col == current.col then
-			return "Lua/ScriptHawk/Images/down.png";
+			return script_root.."/Images/down.png";
 		elseif new.col < current.col then
-			return "Lua/ScriptHawk/Images/down_left.png";
+			return script_root.."/Images/down_left.png";
 		end
 	end
-	return "Lua/ScriptHawk/Images/question-mark.png";
+	return script_root.."/Images/question-mark.png";
 end
 
 function MJ_parse_position (position)
@@ -210,19 +211,19 @@ function draw_mj_minimap ()
 
 			if switches_active then
 				if (white_pos.row == row and white_pos.col == col) or (blue_pos.row == row and blue_pos.col == col) then
-					gui.drawImage("Lua/ScriptHawk/Images/switch.png", x, y, MJ_minimap_width, MJ_minimap_height);
+					gui.drawImage(script_root.."/Images/switch.png", x, y, MJ_minimap_width, MJ_minimap_height);
 				end
 			end
 
 			if cur_pos.row == row and cur_pos.col == col then
-				gui.drawImage("Lua/ScriptHawk/Images/jack_icon.png", x, y, MJ_minimap_width, MJ_minimap_height);
+				gui.drawImage(script_root.."/Images/jack_icon.png", x, y, MJ_minimap_width, MJ_minimap_height);
 			elseif next_pos.row == row and next_pos.col == col then
 				gui.drawImage(MJ_get_arrow_image(cur_pos, next_pos), x, y, MJ_minimap_width, MJ_minimap_height);
 			end
 
 			if kong_position.row == row and kong_position.col == col then
 				--gui.drawText(x, y, "K");
-				gui.drawImage("Lua/ScriptHawk/Images/TinyFaceEdited.png", x, y, MJ_minimap_width, MJ_minimap_height);
+				gui.drawImage(script_root.."/Images/TinyFaceEdited.png", x, y, MJ_minimap_width, MJ_minimap_height);
 			end
 		end
 	end
