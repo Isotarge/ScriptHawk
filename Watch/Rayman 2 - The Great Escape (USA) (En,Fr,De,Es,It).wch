@@ -1,0 +1,9 @@
+Domain RDRAM
+SystemID N64
+1BC64C	w	u	1	RDRAM	Health
+1C6B34	d	f	1	RDRAM	X Position
+1C6B3C	d	f	1	RDRAM	Y Position
+1C6B38	d	f	1	RDRAM	Z Position
+1C69BC	d	f	1	RDRAM	Rot?
+1C69C0	d	f	1	RDRAM	Rot?
+

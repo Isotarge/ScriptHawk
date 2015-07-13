@@ -1,0 +1,23 @@
+Domain 68K RAM
+SystemID GEN
+14DE	w	u	0	68K RAM	Credits
+13E6	w	u	0	68K RAM	Lives
+1470	b	u	0	68K RAM	Health
+146C	w	u	0	68K RAM	Coins
+1474	w	u	0	68K RAM	Armour Type
+147C	b	u	0	68K RAM	Sword Type
+146A	w	u	0	68K RAM	Bombs
+1429	b	u	0	68K RAM	Got Key
+14D8	b	h	0	68K RAM	Control Type
+14E2	w	u	0	68K RAM	Difficulty
+14EA	b	h	0	68K RAM	Music Test
+14EC	b	h	0	68K RAM	FX Test
+14EE	b	h	0	68K RAM	Lives (Menu)
+13E0	w	h	0	68K RAM	Score 1&2
+13E2	w	h	0	68K RAM	Score 3&4
+13E4	w	h	0	68K RAM	Score 5&6
+251C	w	u	0	68K RAM	Cart 1 X
+2560	w	u	0	68K RAM	Cart 2 X
+2658	b	u	0	68K RAM	1-3 Dragon HP
+13FD	b	u	0	68K RAM	Sword Charge
+

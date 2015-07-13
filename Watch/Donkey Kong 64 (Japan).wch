@@ -1,0 +1,6 @@
+Domain RDRAM
+SystemID N64
+746088	b	u	1	RDRAM	File
+7FBFD3	b	h	1	RDRAM	TB Void Byte
+743DA7	b	u	1	RDRAM	Map
+

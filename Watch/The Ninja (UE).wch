@@ -1,0 +1,32 @@
+Domain Main RAM
+SystemID SMS
+0DC4	b	u	0	Main RAM	Hits
+0DC6	w	u	0	Main RAM	Shots
+0EAF	b	u	0	Main RAM	Y Position
+0EB2	w	u	0	Main RAM	X Position
+0000	S	_	0		
+0EC2	b	h	0	Main RAM	Projectile
+0EE3	b	h	0	Main RAM	Projectile
+0F04	b	h	0	Main RAM	Projectile
+0000	S	_	0		
+0F25	b	h	0	Main RAM	Boss
+0F43	b	u	0	Main RAM	Boss Health
+0000	S	_	0		
+0F46	b	h	0	Main RAM	Enemy
+0F67	b	h	0	Main RAM	Enemy
+0F88	b	h	0	Main RAM	Enemy
+0FA9	b	h	0	Main RAM	Enemy
+0FCA	b	h	0	Main RAM	Enemy
+0FEB	b	h	0	Main RAM	Enemy
+100C	b	h	0	Main RAM	Enemy
+0000	S	_	0		
+102D	b	h	0	Main RAM	Projectile
+104E	b	h	0	Main RAM	Projectile
+106F	b	h	0	Main RAM	Projectile
+1090	b	h	0	Main RAM	Projectile
+10B1	b	h	0	Main RAM	Projectile
+10D2	b	h	0	Main RAM	Projectile
+10F3	b	h	0	Main RAM	Projectile
+1114	b	h	0	Main RAM	Projectile
+11B6	b	u	0	Main RAM	Statue Health
+

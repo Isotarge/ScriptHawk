@@ -1,0 +1,17 @@
+Domain RDRAM
+SystemID N64
+0466FC	d	h	1	RDRAM	P1 Pointer
+046784	d	h	1	RDRAM	P2 Pointer? - Likely
+04692C	d	h	1	RDRAM	P2 Pointer?
+0A4BFB	b	u	1	RDRAM	P2 DMG?
+0F2C04	w	h	1	RDRAM	Display Character Hitboxes (2400 = yes)
+13159B	b	u	1	RDRAM	P1 DMG (UI)
+131607	b	u	1	RDRAM	P2 DMG (UI)
+131673	b	u	1	RDRAM	P3 DMG (UI)
+1316DF	b	u	1	RDRAM	P4 DMG (UI)
+1317C8	d	h	1	RDRAM	Timer
+1317CC	b	u	1	RDRAM	P1 Stock (UI)
+167578	w	h	1	RDRAM	Display Projectile Hitboxes (2400 = yes)
+32E8AC	b	u	1	RDRAM	P1 Direction
+282028	b	u	1	RDRAM	P1 Jump Counter
+

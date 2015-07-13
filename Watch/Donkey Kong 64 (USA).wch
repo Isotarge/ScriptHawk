@@ -1,0 +1,94 @@
+Domain RDRAM
+SystemID N64
+46E680	b	u	1	RDRAM	Key 8 enabled
+47F005	b	u	1	RDRAM	Dogadon 2 health
+4B210A	b	h	1	RDRAM	Main menu screen?
+4B210F	b	u	1	RDRAM	Main menu position
+4B2904	b	h	1	RDRAM	FF for voidout on main menu?!?
+4D9254	d	h	1	RDRAM	Angle (Test room)
+7444E7	b	u	1	RDRAM	Map
+744519	b	u	1	RDRAM	Rambi Arena Score
+74452C	b	u	1	RDRAM	Story skip
+744548	w	s	1	RDRAM	Rambi Score 1
+74454A	d	h	1	RDRAM	Rambi Score 1 Name
+74454E	w	u	1	RDRAM	Rambi Score 2
+744550	d	h	1	RDRAM	Rambi Score 2 Name
+744554	w	s	1	RDRAM	Rambi Score 3
+744556	d	h	1	RDRAM	Rambi Score 3 Name
+74455A	w	s	1	RDRAM	Rambi Score 4
+74455C	d	h	1	RDRAM	Rambi Score 4 Name
+744560	w	s	1	RDRAM	Rambi Score 5
+744562	d	h	1	RDRAM	Rambi Score 5 Name
+74583C	b	u	1	RDRAM	SFX Volume
+745840	b	u	1	RDRAM	Music Volume
+745844	b	u	1	RDRAM	Sound mode
+7467C8	b	u	1	RDRAM	File
+7476F5	b	u	1	RDRAM	Cutscene
+7480DC	d	f	1	RDRAM	Stored Y?
+74E77C	b	u	1	RDRAM	Character
+7552E0	b	h	1	RDRAM	Security?!?!?
+755314	b	h	1	RDRAM	Mode
+755318	b	h	1	RDRAM	Mode
+75534A	w	u	1	RDRAM	Helm Timer
+75C41B	b	h	1	RDRAM	DK Model
+75C42B	b	h	1	RDRAM	Diddy Model
+75C43B	b	h	1	RDRAM	Lanky Model
+75C44B	b	h	1	RDRAM	Tiny Model
+75C45B	b	h	1	RDRAM	Chunky Model
+75C46B	b	h	1	RDRAM	Krusha Model
+75C47B	b	h	1	RDRAM	Rambi Model
+75C48B	b	h	1	RDRAM	Enguarde Model
+75C49B	b	h	1	RDRAM	Squawks Model
+75C4AB	b	h	1	RDRAM	Squawks Model
+76A0AB	b	h	1	RDRAM	Background?
+76A0CD	b	u	1	RDRAM	Adventure
+76A0DA	b	h	1	RDRAM	Mystery Menu
+7ECED7	b	u	1	RDRAM	KeysCoinsCollected
+7ECEF3	b	u	1	RDRAM	Fairies
+7ED0B4	b	h	1	RDRAM	Helm BoM off (Bitflag?)
+7ED0B6	b	h	1	RDRAM	Helm First Time Cutscene (Bitflag?)
+7ED558	b	h	1	RDRAM	Mystery menu enabled
+7ED559	b	h	1	RDRAM	Extra cutscenes & Rambi unlocked
+7ED55B	b	h	1	RDRAM	Mystery menu bosses enabled (up to galleon)
+7F5D10	d	h	1	RDRAM	Camera pointer?
+7F5D14	b	h	1	RDRAM	ISG Fadeout
+7F948C	d	f	1	RDRAM	Stored Y?
+7F94B8	d	h	1	RDRAM	Slope object pointer?
+7F94E8	d	f	1	RDRAM	Stored Y?
+7F94F8	d	f	1	RDRAM	Stored Y?
+7FB968	d	h	1	RDRAM	Camera pointer?
+7FBB4C	d	h	1	RDRAM	Kong Object Pointer
+7FBFF8	d	h	1	RDRAM	Camera pointer?
+7FC950	b	u	1	RDRAM	DK Moves
+7FC951	b	u	1	RDRAM	DK Sim Slam
+7FC952	b	b	1	RDRAM	DK Weapon (bitfield xxxxxshw)
+7FC954	b	b	1	RDRAM	DK Instrument (bitfield xxxx321i)
+7FC957	b	u	1	RDRAM	DK Coins
+7FC959	b	h	1	RDRAM	DK Instrument energy
+7FC95B	b	u	1	RDRAM	DK Japes CBs
+7FC993	b	u	1	RDRAM	DK Japes GBs
+7FC9AE	b	u	1	RDRAM	Diddy Moves
+7FC9AF	b	u	1	RDRAM	Diddy Sim Slam
+7FC9B0	b	b	1	RDRAM	Diddy Weapon (bitfield xxxxxshw)
+7FC9B5	b	u	1	RDRAM	Diddy Coins
+7FCA0C	b	u	1	RDRAM	Lanky Moves
+7FCA0D	b	u	1	RDRAM	Lanky Sim Slam
+7FCA0E	b	b	1	RDRAM	Lanky Weapon (bitfield xxxxxshw)
+7FCA13	b	u	1	RDRAM	Lanky Coins
+7FCA6A	b	u	1	RDRAM	Tiny Moves
+7FCA6B	b	u	1	RDRAM	Tiny Sim Slam
+7FCA6C	b	b	1	RDRAM	Tiny Weapon (bitfield xxxxxshw)
+7FCA71	b	u	1	RDRAM	Tiny Coins
+7FCAC8	b	u	1	RDRAM	Chunky Moves
+7FCAC9	b	u	1	RDRAM	Chunky Sim Slam
+7FCACA	b	b	1	RDRAM	Chunky Weapon (bitfield xxxxxshw)
+7FCACF	b	u	1	RDRAM	Chunky Coins
+7FCC41	b	u	1	RDRAM	Standard Ammo
+7FCC43	b	u	1	RDRAM	Homing Ammo
+7FCC45	b	u	1	RDRAM	Oranges
+7FCC49	b	u	1	RDRAM	Film
+7FCC4B	b	u	1	RDRAM	Health
+7FCC4C	b	u	1	RDRAM	Melons
+7FD580	d	h	1	RDRAM	Slope object pointer?
+7FDC90	d	h	1	RDRAM	Mad Jack pointer
+
