@@ -66,7 +66,7 @@ local function switch_grab_script_mode()
 	end
 end
 
-local function grab_object ()
+local function grab_object()
 	if grab_script_mode == "Grab" then
 		local kong_object = mainmemory.read_u24_be(kong_model_pointer);
 		if object_index <= #object_pointers then

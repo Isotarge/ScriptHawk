@@ -122,6 +122,33 @@ end
 
 event.onframestart(unlock_menus, "Unlock Menus");
 
+
+------------------------------------
+-- Never Slip                     --
+-- Written by Isotarge, 2014-2015 --
+------------------------------------
+
+-- Pointers
+local slope_object_pointer = 0x7f94b9;
+local slope_object_pointer_2 = 0x7fd581;
+
+-- Relative to slope object
+local slope_timer = 0xc3;
+
+-- Relative to kong object
+local slope_byte = 0xDE;
+
+local function neverSlip()
+	-- Patch the slope timer
+	local slope_object = mainmemory.read_u24_be(slope_object_pointer);
+	mainmemory.write_u8(slope_object + slope_timer, 0);
+	
+	-- Patch the Kong object
+	local kong_model = mainmemory.read_u24_be(kong_model_pointer);
+	local slope_value = mainmemory.read_u8(kong_model + slope_byte);
+	mainmemory.write_u8(kong_model + slope_byte, math.max(3, slope_value));
+end
+
 ----------------------------------
 -- Refill Consumables           --
 -- Based on research by Exchord --
@@ -255,40 +282,40 @@ precision = 3;
 local mode = "Position";
 local moon_mode = "None";
 
-function decrease_precision ()
+local function decrease_precision()
 	precision = math.max(0, precision - 1);
 	updateUIReadouts_moonjump();
 end
 
-function increase_precision ()
+local function increase_precision()
 	precision = math.min(5, precision + 1);
 	updateUIReadouts_moonjump();
 end
 
-function decrease_speedy_speed ()
+local function decrease_speedy_speed()
 	speedy_index = math.max(1, speedy_index - 1);
 	updateUIReadouts_moonjump();
 end
 
-function increase_speedy_speed ()
+local function increase_speedy_speed()
 	speedy_index = math.min(#speedy_speeds, speedy_index + 1);
 	updateUIReadouts_moonjump();
 end
 
-function invisify ()
+local function invisify()
 	local kong_model = mainmemory.read_u24_be(kong_model_pointer);
 	mainmemory.writebyte(kong_model + visibility, 0x00);
 	updateUIReadouts_moonjump();
 end
 
-function visify ()
+local function visify()
 	local kong_model = mainmemory.read_u24_be(kong_model_pointer);
 	mainmemory.writebyte(kong_model + visibility, 0x7f);
 	updateUIReadouts_moonjump();
 end
 
 local current_invisify = "Invisify";
-function toggle_invisify ()
+local function toggle_invisify()
 	if current_invisify == "Invisify" then
 		invisify();
 		current_invisify = "Visify";
@@ -299,16 +326,16 @@ function toggle_invisify ()
 	updateUIReadouts_moonjump();
 end
 
-function clear_tb_void ()
+local function clear_tb_void()
 	tb_void_byte_val = mainmemory.readbyte(tb_void_byte);
 	mainmemory.writebyte(tb_void_byte, bit.bor(tb_void_byte_val, 0x30));
 end
 
-function force_pause ()
+local function force_pause()
 	mainmemory.writebyte(tb_void_byte, 0x31);
 end
 
-function toggle_mode ()
+local function toggle_mode()
 	if mode == 'Position' then
 		mode = 'Rotation';
 	else
@@ -317,7 +344,7 @@ function toggle_mode ()
 	updateUIReadouts_moonjump();
 end
 
-function toggle_moonmode ()
+local function toggle_moonmode()
 	if moon_mode == 'None' then
 		moon_mode = 'Kick';
 	elseif moon_mode == 'Kick' then
@@ -328,25 +355,25 @@ function toggle_moonmode ()
 	updateUIReadouts_moonjump();
 end
 
-function round (num, idp)
+local function round(num, idp)
 	return tonumber(string.format("%." .. (idp or 0) .. "f", (num or 0)));
 end
 
-function null_check (value)
+local function null_check(value)
 	return value ~= nil and (value > 0) ~= (value <= 0);
 end
 
-function rotation_to_degrees (num)
+local function rotation_to_degrees(num)
 	return ((num % 4096) / 4096) * 360;
 end
 
 two_pi = math.pi * 2;
-function rotation_to_radians (num)
+local function rotation_to_radians(num)
 	return ((num % 4096) / 4096) * two_pi;
 end
 
 local rotation_units = "Degrees";
-function toggle_rotation_units()
+local function toggle_rotation_units()
 	if rotation_units == "Degrees" then
 		rotation_units = "Radians";
 	elseif rotation_units == "Radians" then
@@ -357,7 +384,7 @@ function toggle_rotation_units()
 	updateUIReadouts_moonjump();
 end
 
-function formatRotation(num)
+local function formatRotation(num)
 	if rotation_units == "Degrees" then
 		return round(rotation_to_degrees(num), precision).."°";
 	elseif rotation_units == "Radians" then
@@ -376,11 +403,11 @@ local label_offset = 4;
 local long_label_width = 140;
 local button_height = 24;
 
-function row (row_num)
+local function row(row_num)
 	return round(form_padding + button_height * row_num, 0);
 end
 
-function col (col_num)
+local function col(col_num)
 	return row(col_num);
 end
 
@@ -405,18 +432,18 @@ local options_decrease_speedy_speed_button = forms.button(options_form,   "-",  
 local options_increase_speedy_speed_button = forms.button(options_form,   "+",                increase_speedy_speed,     col(5) - 32, row(3),                button_height,    button_height);
 local options_speedy_speed_value_label =     forms.label(options_form,    speedy_speeds[speedy_index],                   col(5),      row(3) + label_offset, 54,               14);
 
-local options_toggle_infinites =             forms.checkbox(options_form, "Infinites",                                   col(0),      row(4));
-local options_toggle_homing_ammo =           forms.checkbox(options_form, "Homing Ammo",                                 col(0),      row(5));
-local options_toggle_tbarrels =              forms.checkbox(options_form, "Training Barrels",                            col(0),      row(6));
-
-local options_unlock_moves_button =          forms.button(options_form,   "Unlock Moves",     unlock_moves,              col(0),      row(7),                col(4) + 8,       button_height);
+local options_toggle_neverslip =             forms.checkbox(options_form, "Never Slip",                                  col(0),      row(4));
+local options_toggle_infinites =             forms.checkbox(options_form, "Infinites",                                   col(0),      row(5));
+local options_toggle_homing_ammo =           forms.checkbox(options_form, "Homing Ammo",                                 col(0),      row(6));
+local options_toggle_tbarrels =              forms.checkbox(options_form, "Training Barrels",                            col(0),      row(7));
 
 local options_rot_units_label =              forms.label(options_form,    "Units:",                                      col(5),      row(0) + label_offset, 48,               14);
 local options_toggle_rot_units_button =      forms.button(options_form,   rotation_units,     toggle_rotation_units,     col(7),      row(0),                64,               button_height);
 
-local options_toggle_invisify_button =       forms.button(options_form,   "Invisify",         toggle_invisify,           col(5),      row(5),                col(4) + 8,       button_height);
-local options_clear_tb_void_button =         forms.button(options_form,   "Clear TB void",    clear_tb_void,             col(5),      row(6),                col(4) + 8,       button_height);
-local options_force_pause_button =           forms.button(options_form,   "Force Pause",      force_pause,               col(5),      row(7),                col(4) + 8,       button_height);
+local options_toggle_invisify_button =       forms.button(options_form,   "Invisify",         toggle_invisify,           col(5),      row(4),                col(4) + 8,       button_height);
+local options_clear_tb_void_button =         forms.button(options_form,   "Clear TB void",    clear_tb_void,             col(5),      row(5),                col(4) + 8,       button_height);
+local options_force_pause_button =           forms.button(options_form,   "Force Pause",      force_pause,               col(5),      row(6),                col(4) + 8,       button_height);
+local options_unlock_moves_button =          forms.button(options_form,   "Unlock Moves",     unlock_moves,              col(5),      row(7),                col(4) + 8,       button_height);
 
 local options_get_key1_button =              forms.button(options_form,   "Get Key 1",        function() keyGet(1) end,  col(10),     row(0),                64,               button_height);
 local options_lose_key1_button =             forms.button(options_form,   "Lose Key",         function() keyLose(1) end, col(13),     row(0),                64,               button_height);
@@ -435,7 +462,7 @@ local options_lose_key7_button =             forms.button(options_form,   "Lose 
 local options_get_key8_button =              forms.button(options_form,   "Get Key 8",        function() keyGet(8) end,  col(10),     row(7),                64,               button_height);
 local options_lose_key8_button =             forms.button(options_form,   "Lose Key",         function() keyLose(8) end, col(13),     row(7),                64,               button_height);
 
-function updateUIReadouts_moonjump()
+local function updateUIReadouts_moonjump()
 	forms.settext(options_speedy_speed_value_label, speedy_speeds[speedy_index]);
 	forms.settext(options_precision_value_label, precision);
 	forms.settext(options_mode_button, mode);
@@ -444,19 +471,19 @@ function updateUIReadouts_moonjump()
 	forms.settext(options_toggle_invisify_button, current_invisify);
 end
 
-function gofast (rel_pointer, speed)
+local function gofast(rel_pointer, speed)
 	local kong_model = mainmemory.read_u24_be(kong_model_pointer);
 	local pos = mainmemory.readfloat(kong_model + rel_pointer, true);
 	mainmemory.writefloat(kong_model + rel_pointer, pos + speed, true);
 end
 
-function rotate (axis, amount)
+local function rotate(axis, amount)
 	local kong_model = mainmemory.read_u24_be(kong_model_pointer);
 	local current_value = mainmemory.read_u16_be(kong_model + angle + axis * 2);
 	mainmemory.write_u16_be(kong_model + angle + axis * 2, (current_value + amount) % 4096);
 end
 
-function mainloop ()
+local function mainloop()
 	if not emu.islagged() then
 		joypad_pressed = joypad.getimmediate();
 		if joypad_pressed["P1 L"] then
@@ -519,10 +546,14 @@ function mainloop ()
 		if forms.ischecked(options_toggle_tbarrels) then
 			mainmemory.write_u8(training_barrel, 0xff);
 		end
+		
+		if forms.ischecked(options_toggle_neverslip) then
+			neverSlip();
+		end
 	end
 end
 
-function handle_input ()
+function handle_input()
 	input_table = input.get();
 
 	-- Hold down key prevention
@@ -576,7 +607,7 @@ function handle_input ()
 	end
 end
 
-function plot_pos ()
+local function plot_pos()
 	local kong_model = mainmemory.read_u24_be(kong_model_pointer);
 
 	x       = mainmemory.readfloat(kong_model + x_pos, true);

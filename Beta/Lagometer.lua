@@ -19,27 +19,27 @@ local maxTrackedPeriods = 50;
 local trackedPeriods = 10;
 local previous = {};
 
-function null_check (value)
+local function null_check (value)
 	return value ~= nil and (value > 0) ~= (value <= 0);
 end
 
-function shufflePrevious()
-	temp = {};
+local function shufflePrevious()
+	local temp = {};
 	for i=2,#previous do
 		temp[i - 1] = previous[i];
 	end
 	previous = temp;
 end
 
-function getHighestLagCount()
-	highest = 0;
+local function getHighestLagCount()
+	local highest = 0;
 	for i=1,#previous do
 		highest = math.max(highest, previous[i].lag);
 	end
 	return highest;
 end
 
-function recalculateRatios()
+local function recalculateRatios()
 	for i=1,#previous do
 		if previous[i].mode == "vframe" then
 			previous[i].ratio = math.min(1, math.max(0, previous[i].lag - 1) / math.max(1, redzone));
@@ -47,7 +47,7 @@ function recalculateRatios()
 	end
 end
 
-function round (num, idp)
+local function round(num, idp)
 	return tonumber(string.format("%." .. (idp or 0) .. "f", (num or 0)));
 end
 
@@ -56,15 +56,15 @@ end
 -- 0.5 = 7F FF FF 00 = Yellow
 -- 1.0 = 7F FF 00 00 = Red
 
-function getColour(ratio)
+local function getColour(ratio)
+	local green = 255;
+	local red = 255;
+
 	if ratio > 0.5 then
 		green = 255 - round(((ratio - 0.5) * 2) * 255);
 		red = 255;
 	elseif ratio < 0.5 then
 		red = round((ratio * 2) * 255);
-		green = 255;
-	else
-		red = 255;
 		green = 255;
 	end
 
@@ -75,63 +75,63 @@ end
 -- GUI Callbacks --
 -------------------
 
-function increaseResolution()
+local function increaseResolution()
 	resolution = math.min(maxResolution, resolution + 1);
 	updateUIReadouts_lagometer();
 end
 
-function decreaseResolution()
+local function decreaseResolution()
 	resolution = math.max(1, resolution - 1);
 	ignore = math.min(resolution, ignore);
 	updateUIReadouts_lagometer();
 end
 
-function increaseIgnore()
+local function increaseIgnore()
 	ignore = math.min(resolution, ignore + 1);
 	updateUIReadouts_lagometer();
 end
 
-function decreaseIgnore()
+local function decreaseIgnore()
 	ignore = math.max(0, ignore - 1);
 	updateUIReadouts_lagometer();
 end
 
-function increaseRedzone()
+local function increaseRedzone()
 	redzone = math.min(maxRedzone, redzone + 1);
 	updateUIReadouts_lagometer();
 end
 
-function decreaseRedzone()
+local function decreaseRedzone()
 	redzone = math.max(1, redzone - 1);
 	updateUIReadouts_lagometer();
 end
 
-function increaseWidth()
+local function increaseWidth()
 	width = math.min(maxWidth, width + 1);
 	updateUIReadouts_lagometer();
 end
 
-function decreaseWidth()
+local function decreaseWidth()
 	width = math.max(minWidth, width - 1);
 	updateUIReadouts_lagometer();
 end
 
-function increaseHeight()
+local function increaseHeight()
 	height = math.min(maxHeight, height + 1);
 	updateUIReadouts_lagometer();
 end
 
-function decreaseHeight()
+local function decreaseHeight()
 	height = math.max(minHeight, height - 1);
 	updateUIReadouts_lagometer();
 end
 
-function increaseTrackedPeriods()
+local function increaseTrackedPeriods()
 	trackedPeriods = math.min(maxTrackedPeriods, trackedPeriods + 1);
 	updateUIReadouts_lagometer();
 end
 
-function decreaseTrackedPeriods()
+local function decreaseTrackedPeriods()
 	trackedPeriods = math.max(0, trackedPeriods - 1);
 	while #previous > trackedPeriods do
 		shufflePrevious();
@@ -149,11 +149,11 @@ local long_label_width = 140;
 local button_height = 24;
 local label_width = 64;
 
-function row (row_num)
+local function row(row_num)
 	return round(form_padding + button_height * row_num, 0);
 end
 
-function col (col_num)
+local function col(col_num)
 	return row(col_num);
 end
 
@@ -204,9 +204,9 @@ function updateUIReadouts_lagometer()
 end
 
 local function drawGraphicalRepresentation()
-	gui_x = 8;
-	gui_y = 8;
-	column = 0;
+	local gui_x = 8;
+	local gui_y = 8;
+	local column = 0;
 
 	for i=#previous,1,-1 do
 		if previous[i].mode == "vframe" then

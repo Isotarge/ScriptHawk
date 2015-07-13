@@ -1,5 +1,4 @@
-romName = gameinfo.getromname();
-
+local romName = gameinfo.getromname();
 local Game = require "games.blank";
 
 if bizstring.contains(romName, "Donkey Kong 64") then
@@ -12,6 +11,9 @@ elseif bizstring.contains(romName, "Super Mario 64") then
 	Game = require "games.sm64";
 elseif bizstring.contains(romName, "Toy Story 2") then
 	Game = require "games.ts2";
+else
+	console.log("This game is not currently supported.");
+	return;
 end
 
 Game.detectVersion(romName);
@@ -67,44 +69,44 @@ max_d  = 0.0;
 -- Rounding precision
 precision = 3;
 
-function decrease_precision()
+local function decrease_precision()
 	precision = math.max(0, precision - 1);
 	updateUIReadouts_moonjumpGameAgnostic();
 end
 
-function increase_precision()
+local function increase_precision()
 	precision = math.min(5, precision + 1);
 	updateUIReadouts_moonjumpGameAgnostic();
 end
 
-function decrease_speedy_speed()
+local function decrease_speedy_speed()
 	Game.speedy_index = math.max(1, Game.speedy_index - 1);
 	updateUIReadouts_moonjumpGameAgnostic();
 end
 
-function increase_speedy_speed()
+local function increase_speedy_speed()
 	Game.speedy_index = math.min(#Game.speedy_speeds, Game.speedy_index + 1);
 	updateUIReadouts_moonjumpGameAgnostic();
 end
 
-function round(num, idp)
+local function round(num, idp)
 	return tonumber(string.format("%." .. (idp or 0) .. "f", (num or 0)));
 end
 
-function null_check(value)
+local function null_check(value)
 	return (value > 0) ~= (value <= 0);
 end
 
-function rotation_to_degrees(num)
+local function rotation_to_degrees(num)
 	return ((num % Game.max_rot_units) / Game.max_rot_units) * 360;
 end
 
 two_pi = math.pi * 2;
-function rotation_to_radians(num)
+local function rotation_to_radians(num)
 	return ((num % Game.max_rot_units) / Game.max_rot_units) * two_pi;
 end
 
-function toggle_rotation_units()
+local function toggle_rotation_units()
 	if rotation_units == "Degrees" then
 		rotation_units = "Radians";
 	elseif rotation_units == "Radians" then
@@ -115,7 +117,7 @@ function toggle_rotation_units()
 	updateUIReadouts_moonjumpGameAgnostic();
 end
 
-function formatRotation(num)
+local function formatRotation(num)
 	if rotation_units == "Degrees" then
 		return round(rotation_to_degrees(num), precision).."°";
 	elseif rotation_units == "Radians" then
@@ -125,7 +127,7 @@ function formatRotation(num)
 	end
 end
 
-function toggle_mode()
+local function toggle_mode()
 	if mode == 'Position' then
 		mode = 'Rotation';
 	else
@@ -177,7 +179,7 @@ local options_toggle_rot_units_button =      forms.button(options_form,   rotati
 local options_map_dropdown = forms.dropdown(options_form, Game.maps, col(0), row(4), col(11), button_height);
 local options_map_checkbox = forms.checkbox(options_form, "Take me there", col(0), row(5));
 
-function findMapValue()
+local function findMapValue()
 	for i=1,#Game.maps do
 		if Game.maps[i] == previous_map then
 			return i;
