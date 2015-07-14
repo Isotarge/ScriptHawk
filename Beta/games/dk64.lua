@@ -307,6 +307,61 @@ local kick_freeze_value = 0xc020;
 
 local kong_model;
 
+---------------
+-- Key stuff --
+---------------
+
+-- USA Defaults
+local key_base;
+local key_collected_bitmasks;
+local key_offsets = {
+	0x00,
+	0x06,
+	0x0e,
+	0x12,
+	0x1a,
+	0x21,
+	0x24,
+	0x2c
+};
+
+local function keyGet(number)
+	local current_file = mainmemory.readbyte(file);
+	if current_file >= 0 and current_file <= 2 then
+		local current_value = mainmemory.readbyte(key_base[current_file] + key_offsets[number]);
+		local new_value = bit.bor(current_value, key_collected_bitmasks[number]);
+		mainmemory.write_u8(key_base[current_file] + key_offsets[number], new_value);
+	end
+end
+
+local function keyLose(number)
+	local current_file = mainmemory.readbyte(file);
+	if current_file >= 0 and current_file <= 2 then
+		local current_value = mainmemory.readbyte(key_base[current_file] + key_offsets[number]);
+		local new_value = bit.bnot(bit.band(current_value, key_collected_bitmasks[number]));
+		mainmemory.write_u8(key_base[current_file] + key_offsets[number], new_value);
+	end
+end
+
+local function initKeyGUI(form_handle, col, row, button_height)
+	local options_get_key1_button =  forms.button(form_handle, "Get Key 1", function() keyGet(1) end,  col(10), row(0), 64, button_height);
+	local options_lose_key1_button = forms.button(form_handle, "Lose Key",  function() keyLose(1) end, col(13), row(0), 64, button_height);
+	local options_get_key2_button =  forms.button(form_handle, "Get Key 2", function() keyGet(2) end,  col(10), row(1), 64, button_height);
+	local options_lose_key2_button = forms.button(form_handle, "Lose Key",  function() keyLose(2) end, col(13), row(1), 64, button_height);
+	local options_get_key3_button =  forms.button(form_handle, "Get Key 3", function() keyGet(3) end,  col(10), row(2), 64, button_height);
+	local options_lose_key3_button = forms.button(form_handle, "Lose Key",  function() keyLose(3) end, col(13), row(2), 64, button_height);
+	local options_get_key4_button =  forms.button(form_handle, "Get Key 4", function() keyGet(4) end,  col(10), row(3), 64, button_height);
+	local options_lose_key4_button = forms.button(form_handle, "Lose Key",  function() keyLose(4) end, col(13), row(3), 64, button_height);
+	local options_get_key5_button =  forms.button(form_handle, "Get Key 5", function() keyGet(5) end,  col(10), row(4), 64, button_height);
+	local options_lose_key5_button = forms.button(form_handle, "Lose Key",  function() keyLose(5) end, col(13), row(4), 64, button_height);
+	local options_get_key6_button =  forms.button(form_handle, "Get Key 6", function() keyGet(6) end,  col(10), row(5), 64, button_height);
+	local options_lose_key6_button = forms.button(form_handle, "Lose Key",  function() keyLose(6) end, col(13), row(5), 64, button_height);
+	local options_get_key7_button =  forms.button(form_handle, "Get Key 7", function() keyGet(7) end,  col(10), row(6), 64, button_height);
+	local options_lose_key7_button = forms.button(form_handle, "Lose Key",  function() keyLose(7) end, col(13), row(6), 64, button_height);
+	local options_get_key8_button =  forms.button(form_handle, "Get Key 8", function() keyGet(8) end,  col(10), row(7), 64, button_height);
+	local options_lose_key8_button = forms.button(form_handle, "Lose Key",  function() keyLose(8) end, col(13), row(7), 64, button_height);
+end
+
 --------------------
 -- Region/Version --
 --------------------
@@ -322,6 +377,23 @@ function Game.detectVersion(romName)
 		pointer_list       = 0x7fbff0;
 		kongbase           = 0x7fc950;
 		global_base        = 0x7fcc41;
+
+		key_base = {
+			[0] = 0x7ed3af,
+			[1] = 0x7ed057,
+			[2] = 0x7ed3af
+		};
+
+		key_collected_bitmasks = {
+			0x04,
+			0x04,
+			0x04,
+			0x01,
+			0x10,
+			0x10,
+			0x20,
+			0x10
+		};
 	elseif bizstring.contains(romName, "Europe") then
 		map                = 0x73EC37;
 		file               = 0x740F18;
@@ -332,6 +404,8 @@ function Game.detectVersion(romName)
 		pointer_list       = 0x7fbf10;
 		kongbase           = 0x7fc890;
 		global_base        = 0x7fcb81;
+
+		-- TODO: Keys
 	elseif bizstring.contains(romName, "Japan") then
 		map                = 0x743DA7;
 		file               = 0x746088;
@@ -342,16 +416,35 @@ function Game.detectVersion(romName)
 		pointer_list       = 0x7fc460;
 		kongbase           = 0x7fcde0;
 		global_base        = 0x7fd0d1;
+
+		key_base = {
+			[0] = 0x7ED4C7,
+			[1] = 0x7ED31B,
+			[2] = 0x7ED673
+		};
+
+		key_collected_bitmasks = { -- TODO
+			0xFF,
+			0xFF,
+			0xFF,
+			0xFF,
+			0xFF,
+			0xFF,
+			0xFF,
+			0xFF
+		};
 	elseif bizstring.contains(romName, "Kiosk") then
-		file               = 0x7467c8; -- TODO
+		file               = 0x7467c8; -- TODO?
 		map                = 0x7444E7; -- TODO
-		training_barrel    = 0x7ed150; -- TODO
-		menu_flags         = 0x7ed558; -- TODO
+		training_barrel    = 0x7ed150; -- TODO?
+		menu_flags         = 0x7ed558; -- TODO?
 		kong_model_pointer = 0x7b5afd;
-		tb_void_byte       = 0x7fbb63; -- TODO
+		tb_void_byte       = 0x7fbb63; -- TODO?
 		pointer_list       = 0x7b5e58;
 		kongbase           = 0x7fc950; -- TODO
 		global_base        = 0x7fcc41; -- TODO
+
+		-- TODO: Keys?
 	end
 end
 
@@ -433,6 +526,10 @@ function Game.setMap(value)
 	if value >= 1 and value <= #Game.maps then
 		mainmemory.writebyte(map, value - 1);
 	end
+end
+
+function Game.initUI(form_handle, col, row, button_height)
+	initKeyGUI(form_handle, col, row, button_height);
 end
 
 function Game.eachFrame()

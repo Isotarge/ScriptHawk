@@ -102,6 +102,10 @@ function Game.setMap(value)
 	
 end
 
+function Game.initUI(form_handle, col, row, button_height)
+	
+end
+
 function Game.eachFrame()
 	
 end

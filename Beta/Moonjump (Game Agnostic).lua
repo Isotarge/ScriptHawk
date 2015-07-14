@@ -141,7 +141,8 @@ end
 --------------
 
 local form_padding = 8;
-local label_offset = 4;
+local label_offset = 5;
+local dropdown_offset = 1;
 local long_label_width = 140;
 local button_height = 24;
 
@@ -153,31 +154,33 @@ local function col(col_num)
 	return row(col_num);
 end
 
-local options_form = forms.newform(col(13), row(9), "Moonjump Options");
+local options_form = forms.newform(col(17), row(10), "Moonjump Options");
 
------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
--- Handle                              Type                         Caption             Callback               X position   Y position             Width             Height      --
------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
-local options_mode_label =                   forms.label(options_form,    "Mode:",                                   col(0),      row(0) + label_offset, 48,               button_height);
-local options_mode_button =                  forms.button(options_form,   mode,               toggle_mode,           col(2),      row(0),                64,               button_height);
+--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+-- Handle                              Type                         Caption             Callback                     X position   Y position                Width             Height      --
+--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+local options_mode_label =                   forms.label(options_form,    "Mode:",                                   col(0),      row(0) + label_offset,    48,               button_height);
+local options_mode_button =                  forms.button(options_form,   mode,               toggle_mode,           col(2),      row(0),                   64,               button_height);
 
-local options_precision_label =              forms.label(options_form,    "Precision:",                              col(0),      row(1) + label_offset, 54,               14);
-local options_decrease_precision_button =    forms.button(options_form,   "-",                decrease_precision,    col(4) - 32, row(1),                button_height,    button_height);
-local options_increase_precision_button =    forms.button(options_form,   "+",                increase_precision,    col(5) - 32, row(1),                button_height,    button_height);
-local options_precision_value_label =        forms.label(options_form,    precision,                                 col(5),      row(1) + label_offset, 54,               14);
+local options_precision_label =              forms.label(options_form,    "Precision:",                              col(0),      row(1) + label_offset,    54,               14);
+local options_decrease_precision_button =    forms.button(options_form,   "-",                decrease_precision,    col(4) - 32, row(1),                   button_height,    button_height);
+local options_increase_precision_button =    forms.button(options_form,   "+",                increase_precision,    col(5) - 32, row(1),                   button_height,    button_height);
+local options_precision_value_label =        forms.label(options_form,    precision,                                 col(5),      row(1) + label_offset,    54,               14);
 
-local options_speedy_speed_label =           forms.label(options_form,    "Speed:",                                  col(0),      row(2) + label_offset, 54,               14);
-local options_decrease_speedy_speed_button = forms.button(options_form,   "-",                decrease_speedy_speed, col(4) - 32, row(2),                button_height,    button_height);
-local options_increase_speedy_speed_button = forms.button(options_form,   "+",                increase_speedy_speed, col(5) - 32, row(2),                button_height,    button_height);
-local options_speedy_speed_value_label =     forms.label(options_form,    "0",                                       col(5),      row(2) + label_offset, 54,               14);
+local options_speedy_speed_label =           forms.label(options_form,    "Speed:",                                  col(0),      row(2) + label_offset,    54,               14);
+local options_decrease_speedy_speed_button = forms.button(options_form,   "-",                decrease_speedy_speed, col(4) - 32, row(2),                   button_height,    button_height);
+local options_increase_speedy_speed_button = forms.button(options_form,   "+",                increase_speedy_speed, col(5) - 32, row(2),                   button_height,    button_height);
+local options_speedy_speed_value_label =     forms.label(options_form,    "0",                                       col(5),      row(2) + label_offset,    54,               14);
 
-local options_toggle_infinites =             forms.checkbox(options_form, "Infinites",                               col(0),      row(3));
+local options_map_dropdown =                 forms.dropdown(options_form, Game.maps,                                 col(0),      row(3) + dropdown_offset, col(9) + 7,       button_height);
+local options_map_checkbox =                 forms.checkbox(options_form, "Take me there",                           col(0),      row(4));
+local options_toggle_infinites =             forms.checkbox(options_form, "Infinites",                               col(0),      row(5));
 
-local options_rot_units_label =              forms.label(options_form,    "Units:",                                  col(5),      row(0) + label_offset, 48,               14);
-local options_toggle_rot_units_button =      forms.button(options_form,   rotation_units,     toggle_rotation_units, col(7),      row(0),                64,               button_height);
+local options_rot_units_label =              forms.label(options_form,    "Units:",                                  col(5),      row(0) + label_offset,    48,               14);
+local options_toggle_rot_units_button =      forms.button(options_form,   rotation_units,     toggle_rotation_units, col(7),      row(0),                   64,               button_height);
 
-local options_map_dropdown = forms.dropdown(options_form, Game.maps, col(0), row(4), col(11), button_height);
-local options_map_checkbox = forms.checkbox(options_form, "Take me there", col(0), row(5));
+-- Init any custom UI that the game module uses
+Game.initUI(options_form, col, row, button_height);
 
 local function findMapValue()
 	for i=1,#Game.maps do
