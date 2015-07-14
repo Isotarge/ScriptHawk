@@ -5,6 +5,15 @@ local map;
 local kong_model_pointer;
 local MJ_state_pointer;
 
+-- Mad Jack state
+local MJ_time_until_next_action;
+local MJ_actions_remaining;
+local MJ_action_type;
+local MJ_current_pos;
+local MJ_next_pos;
+local MJ_white_switch_pos;
+local MJ_blue_switch_pos;
+
 local romName = gameinfo.getromname();
 
 if bizstring.contains(romName, "Donkey Kong 64") then
@@ -12,14 +21,41 @@ if bizstring.contains(romName, "Donkey Kong 64") then
 		map                = 0x7444E7;
 		kong_model_pointer = 0x7fbb4d;
 		MJ_state_pointer   = 0x7fdc91;
+
+		-- Mad Jack state
+		MJ_time_until_next_action = 0x2d;
+		MJ_actions_remaining      = 0x58;
+		MJ_action_type            = 0x59;
+		MJ_current_pos            = 0x60;
+		MJ_next_pos               = 0x61;
+		MJ_white_switch_pos       = 0x64;
+		MJ_blue_switch_pos        = 0x65;
 	elseif bizstring.contains(romName, "Europe") then
 		map                = 0x73EC37;
 		kong_model_pointer = 0x7fba6d;
-		MJ_state_pointer   = 0x7fdc91; -- TODO: Find
+		MJ_state_pointer   = 0x7FDBD1;
+
+		-- Mad Jack state
+		MJ_time_until_next_action = 0x25;
+		MJ_actions_remaining      = 0x60;
+		MJ_action_type            = 0x61;
+		MJ_current_pos            = 0x68;
+		MJ_next_pos               = 0x69;
+		MJ_white_switch_pos       = 0x6C;
+		MJ_blue_switch_pos        = 0x6D;
 	elseif bizstring.contains(romName, "Japan") then
 		map                = 0x743DA7;
 		kong_model_pointer = 0x7fbfbd;
-		MJ_state_pointer   = 0x7fdc91; -- TODO: Find
+		MJ_state_pointer   = 0x7fe121;
+
+		-- Mad Jack state
+		MJ_time_until_next_action = 0x25;
+		MJ_actions_remaining      = 0x60;
+		MJ_action_type            = 0x61;
+		MJ_current_pos            = 0x68;
+		MJ_next_pos               = 0x69;
+		MJ_white_switch_pos       = 0x6C;
+		MJ_blue_switch_pos        = 0x6D;
 	elseif bizstring.contains(romName, "Kiosk") then
 		console.log("The kiosk version is not supported.");
 		return;
@@ -31,15 +67,6 @@ end
 
 local script_root = "Lua/ScriptHawk";
 local correct_map = 154;
-
--- Mad Jack state
-local MJ_time_until_next_action = 0x2d;
-local MJ_actions_remaining      = 0x58;
-local MJ_action_type            = 0x59;
-local MJ_current_pos            = 0x60;
-local MJ_next_pos               = 0x61;
-local MJ_white_switch_pos       = 0x64;
-local MJ_blue_switch_pos        = 0x65;
 
 -- Colors
 local MJ_blue         = 0x7f00a2e8;
