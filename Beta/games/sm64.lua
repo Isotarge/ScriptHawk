@@ -156,12 +156,16 @@ function Game.setMap(value)
 	end
 end
 
+function Game.applyInfinites()
+	-- TODO
+end
+
 function Game.initUI(form_handle, col, row, button_height)
-	
+	-- TODO
 end
 
 function Game.eachFrame()
-	
+	-- TODO
 end
 
 return Game;

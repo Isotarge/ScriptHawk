@@ -262,6 +262,7 @@ local max_homing_ammo    = 50;
 local standard_ammo = 0;
 local homing_ammo   = 2;
 local oranges       = 4;
+local crystals      = 5;
 local film          = 8;
 local health        = 10;
 local melons        = 11;
@@ -280,6 +281,20 @@ local weapon     = 2;
 local instrument = 4;
 local coins      = 7;
 local lives      = 9; -- This is used as instrument ammo in single player
+
+local function unlock_moves()
+	local kong;
+	for kong=DK,Chunky do
+		local base = kongbase + kong * 0x5e;
+		mainmemory.write_u8(base + moves,      3);
+		mainmemory.write_u8(base + sim_slam,   3);
+		mainmemory.write_u8(base + weapon,     7);
+		mainmemory.write_u8(base + instrument, 15);
+	end
+
+	-- Training barrels
+	mainmemory.write_u8(training_barrel, 0xff);
+end
 
 ------------------------------------
 -- Moonjump BizHawk Lua port      --
@@ -518,6 +533,77 @@ function Game.setZRotation(value)
 	mainmemory.write_u16_be(kong_model + angle + 4, value);
 end
 
+--------------------
+-- Misc functions --
+--------------------
+
+local function invisify()
+	kong_model = mainmemory.read_u24_be(kong_model_pointer);
+	mainmemory.writebyte(kong_model + visibility, 0x00);
+	-- TODO: We only really need to update UI here, can we include a Game.updateUI method in the module interface?
+	Game.eachFrame();
+end
+
+local function visify()
+	kong_model = mainmemory.read_u24_be(kong_model_pointer);
+	mainmemory.writebyte(kong_model + visibility, 0x7f);
+	-- TODO: We only really need to update UI here, can we include a Game.updateUI method in the module interface?
+	Game.eachFrame();
+end
+
+local current_invisify = "Invisify";
+local function toggle_invisify()
+	if current_invisify == "Invisify" then
+		invisify();
+		current_invisify = "Visify";
+	else
+		visify();
+		current_invisify = "Invisify";
+	end
+
+	-- TODO: We only really need to update UI here, can we include a Game.updateUI method in the module interface?
+	Game.eachFrame();
+end
+
+local function clear_tb_void()
+	local tb_void_byte_val = mainmemory.readbyte(tb_void_byte);
+	mainmemory.writebyte(tb_void_byte, bit.bor(tb_void_byte_val, 0x30));
+end
+
+local function force_pause()
+	mainmemory.writebyte(tb_void_byte, 0x31);
+end
+
+local function force_zipper()
+	-- TODO: ik you can do this with tb_void_byte
+end
+
+------------------------------------
+-- Never Slip                     --
+-- Written by Isotarge, 2014-2015 --
+------------------------------------
+
+-- Pointers
+local slope_object_pointer = 0x7f94b9;
+local slope_object_pointer_2 = 0x7fd581;
+
+-- Relative to slope object
+local slope_timer = 0xc3;
+
+-- Relative to kong object
+local slope_byte = 0xDE;
+
+local function neverSlip()
+	-- Patch the slope timer
+	local slope_object = mainmemory.read_u24_be(slope_object_pointer);
+	mainmemory.write_u8(slope_object + slope_timer, 0);
+
+	-- Patch the Kong object
+	local kong_model = mainmemory.read_u24_be(kong_model_pointer);
+	local slope_value = mainmemory.read_u8(kong_model + slope_byte);
+	mainmemory.write_u8(kong_model + slope_byte, math.max(3, slope_value));
+end
+
 ------------
 -- Events --
 ------------
@@ -528,13 +614,57 @@ function Game.setMap(value)
 	end
 end
 
+local options_toggle_invisify_button;
+local options_clear_tb_void_button;
+local options_force_pause_button;
+local options_unlock_moves_button;
+
+local options_toggle_homing_ammo;
+local options_toggle_neverslip;
+
 function Game.initUI(form_handle, col, row, button_height)
 	initKeyGUI(form_handle, col, row, button_height);
+
+	-- Buttons
+	options_toggle_invisify_button = forms.button(form_handle, "Invisify",      toggle_invisify, col(5), row(4), col(4) + 8, button_height);
+	options_clear_tb_void_button =   forms.button(form_handle, "Clear TB void", clear_tb_void,   col(5), row(5), col(4) + 8, button_height);
+	options_force_pause_button =     forms.button(form_handle, "Force Pause",   force_pause,     col(5), row(6), col(4) + 8, button_height);
+	options_unlock_moves_button =    forms.button(form_handle, "Unlock Moves",  unlock_moves,    col(5), row(7), col(4) + 8, button_height);
+
+	-- Checkboxes
+	options_toggle_neverslip =       forms.checkbox(form_handle, "Never Slip",                  col(0), row(6));
+	options_toggle_homing_ammo =     forms.checkbox(form_handle, "Homing Ammo",                 col(0), row(7));
+end
+
+function Game.applyInfinites()
+	mainmemory.write_u8(global_base + standard_ammo, max_standard_ammo);
+	if forms.ischecked(options_toggle_homing_ammo) then
+		mainmemory.write_u8(global_base + homing_ammo, max_homing_ammo);
+	else
+		mainmemory.write_u8(global_base + homing_ammo, 0);
+	end
+	mainmemory.write_u8(global_base + oranges,  max_oranges);
+	mainmemory.write_u16_be(global_base + crystals, max_crystals * 150);
+	mainmemory.write_u8(global_base + film,     max_film);
+	mainmemory.write_u8(global_base + health,   max_health);
+	mainmemory.write_u8(global_base + melons,   max_melons);
+	local kong;
+	for kong=DK,Chunky do
+		local base = kongbase + kong * 0x5e;
+		mainmemory.write_u8(base + coins, max_coins);
+		mainmemory.write_u8(base + lives, max_musical_energy);
+	end
 end
 
 function Game.eachFrame()
 	kong_model = mainmemory.read_u24_be(kong_model_pointer);
 	Game.unlock_menus();
+
+	if forms.ischecked(options_toggle_neverslip) then
+		neverSlip();
+	end
+
+	forms.settext(options_toggle_invisify_button, current_invisify);
 end
 
 return Game;

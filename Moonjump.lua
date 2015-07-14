@@ -1,29 +1,5 @@
 -- USA Defaults
-file               = 0x7467c8;
-training_barrel    = 0x7ed230;
-menu_flags         = 0x7ed558;
 kong_model_pointer = 0x7fbb4d;
-tb_void_byte       = 0x7fbb63;
-pointer_list       = 0x7fbff0;
-kongbase           = 0x7fc950;
-global_base        = 0x7fcc41;
-
-key_base = {
-	[0] = 0x7ed3af,
-	[1] = 0x7ed057,
-	[2] = 0x7ed3af
-};
-
-key_collected_bitmasks = {
-	0x04,
-	0x04,
-	0x04,
-	0x01,
-	0x10,
-	0x10,
-	0x20,
-	0x10
-};
 
 ----------------------
 -- Region Detection --
@@ -32,172 +8,11 @@ key_collected_bitmasks = {
 romName = gameinfo.getromname();
 
 if bizstring.contains(romName, "Europe") then
-	file               = 0x740F18;
-	training_barrel    = 0x7ed150;
-	menu_flags         = 0x7ed478;
 	kong_model_pointer = 0x7fba6d;
-	tb_void_byte       = 0x7FBA83;
-	pointer_list       = 0x7fbf10;
-	kongbase           = 0x7fc890;
-	global_base        = 0x7fcb81;
 elseif bizstring.contains(romName, "Japan") then
-	file               = 0x746088;
-	training_barrel    = 0x7ed84c;
-	menu_flags         = 0x7ed9c8;
 	kong_model_pointer = 0x7fbfbd;
-	tb_void_byte       = 0x7FBFD3;
-	pointer_list       = 0x7fc460;
-	kongbase           = 0x7fcde0;
-	global_base        = 0x7fd0d1;
-
-	key_base = {
-		[0] = 0x7ED4C7,
-		[1] = 0x7ED31B,
-		[2] = 0x7ED673
-	};
-	
-	key_collected_bitmasks = { -- TODO
-		0xFF,
-		0xFF,
-		0xFF,
-		0xFF,
-		0xFF,
-		0xFF,
-		0xFF,
-		0xFF
-	};
 elseif bizstring.contains(romName, "Kiosk") then
-	file               = 0x7467c8; -- TODO
-	training_barrel    = 0x7ed150; -- TODO
-	menu_flags         = 0x7ed558; -- TODO
 	kong_model_pointer = 0x7b5afd;
-	tb_void_byte       = 0x7fbb63; -- TODO
-	pointer_list       = 0x7f5e58;
-	kongbase           = 0x7fc950; -- TODO
-	global_base        = 0x7fcc41; -- TODO
-end
-
----------------
--- Key stuff --
----------------
-
-key_offsets = {
-	0x00,
-	0x06,
-	0x0e,
-	0x12,
-	0x1a,
-	0x21,
-	0x24,
-	0x2c
-};
-
-function keyGet(number)
-	current_file = mainmemory.readbyte(file);
-	if current_file >= 0 and current_file <= 2 then
-		current_value = mainmemory.readbyte(key_base[current_file] + key_offsets[number]);
-		new_value = bit.bor(current_value, key_collected_bitmasks[number]);
-		mainmemory.write_u8(key_base[current_file] + key_offsets[number], new_value);
-	end
-end
-
-function keyLose(number)
-	current_file = mainmemory.readbyte(file);
-	if current_file >= 0 and current_file <= 2 then
-		current_value = mainmemory.readbyte(key_base[current_file] + key_offsets[number]);
-		new_value = bit.bnot(bit.band(current_value, key_collected_bitmasks[number]));
-		mainmemory.write_u8(key_base[current_file] + key_offsets[number], new_value);
-	end
-end
-
-------------------
--- Unlock menus --
-------------------
-
-function unlock_menus ()
-	for byte=0,7 do
-		mainmemory.write_u8(menu_flags + byte, 0xff);
-	end
-end
-
-event.onframestart(unlock_menus, "Unlock Menus");
-
-
-------------------------------------
--- Never Slip                     --
--- Written by Isotarge, 2014-2015 --
-------------------------------------
-
--- Pointers
-local slope_object_pointer = 0x7f94b9;
-local slope_object_pointer_2 = 0x7fd581;
-
--- Relative to slope object
-local slope_timer = 0xc3;
-
--- Relative to kong object
-local slope_byte = 0xDE;
-
-local function neverSlip()
-	-- Patch the slope timer
-	local slope_object = mainmemory.read_u24_be(slope_object_pointer);
-	mainmemory.write_u8(slope_object + slope_timer, 0);
-	
-	-- Patch the Kong object
-	local kong_model = mainmemory.read_u24_be(kong_model_pointer);
-	local slope_value = mainmemory.read_u8(kong_model + slope_byte);
-	mainmemory.write_u8(kong_model + slope_byte, math.max(3, slope_value));
-end
-
-----------------------------------
--- Refill Consumables           --
--- Based on research by Exchord --
-----------------------------------
-
--- Maximum values
-max_melons = 3;
-max_health = max_melons * 4;
-
-max_coins          = 50;
-max_crystals       = 20;
-max_film           = 10;
-max_oranges        = 20;
-max_musical_energy = 10;
-max_standard_ammo  = 50;
-max_homing_ammo    = 50;
-
--- Relative to global_base
-standard_ammo = 0;
-homing_ammo   = 2;
-oranges       = 4;
-crystals      = 5;
-film          = 8;
-health        = 10;
-melons        = 11;
-
--- Kong index
-DK     = 0;
-Diddy  = 1;
-Lanky  = 2;
-Tiny   = 3;
-Chunky = 4;
-
--- Pointers relative to Kong base
-moves      = 0;
-sim_slam   = 1;
-weapon     = 2;
-instrument = 4;
-coins      = 7;
-lives      = 9; -- This is used as instrument ammo in single player
-
-function unlock_moves ()
-	for kong=DK,Chunky do
-		local base = kongbase + kong * 0x5e;
-		mainmemory.write_u8(base + moves,      3);
-		mainmemory.write_u8(base + sim_slam,   3);
-		mainmemory.write_u8(base + weapon,     7);
-		mainmemory.write_u8(base + instrument, 15);
-	end
 end
 
 ------------------------------------
@@ -302,39 +117,6 @@ local function increase_speedy_speed()
 	updateUIReadouts_moonjump();
 end
 
-local function invisify()
-	local kong_model = mainmemory.read_u24_be(kong_model_pointer);
-	mainmemory.writebyte(kong_model + visibility, 0x00);
-	updateUIReadouts_moonjump();
-end
-
-local function visify()
-	local kong_model = mainmemory.read_u24_be(kong_model_pointer);
-	mainmemory.writebyte(kong_model + visibility, 0x7f);
-	updateUIReadouts_moonjump();
-end
-
-local current_invisify = "Invisify";
-local function toggle_invisify()
-	if current_invisify == "Invisify" then
-		invisify();
-		current_invisify = "Visify";
-	else
-		visify();
-		current_invisify = "Invisify";
-	end
-	updateUIReadouts_moonjump();
-end
-
-local function clear_tb_void()
-	tb_void_byte_val = mainmemory.readbyte(tb_void_byte);
-	mainmemory.writebyte(tb_void_byte, bit.bor(tb_void_byte_val, 0x30));
-end
-
-local function force_pause()
-	mainmemory.writebyte(tb_void_byte, 0x31);
-end
-
 local function toggle_mode()
 	if mode == 'Position' then
 		mode = 'Rotation';
@@ -432,35 +214,8 @@ local options_decrease_speedy_speed_button = forms.button(options_form,   "-",  
 local options_increase_speedy_speed_button = forms.button(options_form,   "+",                increase_speedy_speed,     col(5) - 32, row(3),                button_height,    button_height);
 local options_speedy_speed_value_label =     forms.label(options_form,    speedy_speeds[speedy_index],                   col(5),      row(3) + label_offset, 54,               14);
 
-local options_toggle_neverslip =             forms.checkbox(options_form, "Never Slip",                                  col(0),      row(4));
-local options_toggle_infinites =             forms.checkbox(options_form, "Infinites",                                   col(0),      row(5));
-local options_toggle_homing_ammo =           forms.checkbox(options_form, "Homing Ammo",                                 col(0),      row(6));
-local options_toggle_tbarrels =              forms.checkbox(options_form, "Training Barrels",                            col(0),      row(7));
-
 local options_rot_units_label =              forms.label(options_form,    "Units:",                                      col(5),      row(0) + label_offset, 48,               14);
 local options_toggle_rot_units_button =      forms.button(options_form,   rotation_units,     toggle_rotation_units,     col(7),      row(0),                64,               button_height);
-
-local options_toggle_invisify_button =       forms.button(options_form,   "Invisify",         toggle_invisify,           col(5),      row(4),                col(4) + 8,       button_height);
-local options_clear_tb_void_button =         forms.button(options_form,   "Clear TB void",    clear_tb_void,             col(5),      row(5),                col(4) + 8,       button_height);
-local options_force_pause_button =           forms.button(options_form,   "Force Pause",      force_pause,               col(5),      row(6),                col(4) + 8,       button_height);
-local options_unlock_moves_button =          forms.button(options_form,   "Unlock Moves",     unlock_moves,              col(5),      row(7),                col(4) + 8,       button_height);
-
-local options_get_key1_button =              forms.button(options_form,   "Get Key 1",        function() keyGet(1) end,  col(10),     row(0),                64,               button_height);
-local options_lose_key1_button =             forms.button(options_form,   "Lose Key",         function() keyLose(1) end, col(13),     row(0),                64,               button_height);
-local options_get_key2_button =              forms.button(options_form,   "Get Key 2",        function() keyGet(2) end,  col(10),     row(1),                64,               button_height);
-local options_lose_key2_button =             forms.button(options_form,   "Lose Key",         function() keyLose(2) end, col(13),     row(1),                64,               button_height);
-local options_get_key3_button =              forms.button(options_form,   "Get Key 3",        function() keyGet(3) end,  col(10),     row(2),                64,               button_height);
-local options_lose_key3_button =             forms.button(options_form,   "Lose Key",         function() keyLose(3) end, col(13),     row(2),                64,               button_height);
-local options_get_key4_button =              forms.button(options_form,   "Get Key 4",        function() keyGet(4) end,  col(10),     row(3),                64,               button_height);
-local options_lose_key4_button =             forms.button(options_form,   "Lose Key",         function() keyLose(4) end, col(13),     row(3),                64,               button_height);
-local options_get_key5_button =              forms.button(options_form,   "Get Key 5",        function() keyGet(5) end,  col(10),     row(4),                64,               button_height);
-local options_lose_key5_button =             forms.button(options_form,   "Lose Key",         function() keyLose(5) end, col(13),     row(4),                64,               button_height);
-local options_get_key6_button =              forms.button(options_form,   "Get Key 6",        function() keyGet(6) end,  col(10),     row(5),                64,               button_height);
-local options_lose_key6_button =             forms.button(options_form,   "Lose Key",         function() keyLose(6) end, col(13),     row(5),                64,               button_height);
-local options_get_key7_button =              forms.button(options_form,   "Get Key 7",        function() keyGet(7) end,  col(10),     row(6),                64,               button_height);
-local options_lose_key7_button =             forms.button(options_form,   "Lose Key",         function() keyLose(7) end, col(13),     row(6),                64,               button_height);
-local options_get_key8_button =              forms.button(options_form,   "Get Key 8",        function() keyGet(8) end,  col(10),     row(7),                64,               button_height);
-local options_lose_key8_button =             forms.button(options_form,   "Lose Key",         function() keyLose(8) end, col(13),     row(7),                64,               button_height);
 
 local function updateUIReadouts_moonjump()
 	forms.settext(options_speedy_speed_value_label, speedy_speeds[speedy_index]);
@@ -468,7 +223,6 @@ local function updateUIReadouts_moonjump()
 	forms.settext(options_mode_button, mode);
 	forms.settext(options_moon_mode_button, moon_mode);
 	forms.settext(options_toggle_rot_units_button, rotation_units);
-	forms.settext(options_toggle_invisify_button, current_invisify);
 end
 
 local function gofast(rel_pointer, speed)
@@ -521,34 +275,6 @@ local function mainloop()
 			if joypad_pressed["P1 DPad R"] then
 				rotate(2, rot_speed);
 			end
-		end
-
-		-- Moves, Consumables
-		if forms.ischecked(options_toggle_infinites) then
-			mainmemory.write_u8(global_base + standard_ammo, max_standard_ammo);
-			if forms.ischecked(options_toggle_homing_ammo) then
-				mainmemory.write_u8(global_base + homing_ammo, max_homing_ammo);
-			else
-				mainmemory.write_u8(global_base + homing_ammo, 0);
-			end
-			mainmemory.write_u8(global_base + oranges,  max_oranges);
-			mainmemory.write_u16_be(global_base + crystals, max_crystals * 150);
-			mainmemory.write_u8(global_base + film,     max_film);
-			mainmemory.write_u8(global_base + health,   max_health);
-			mainmemory.write_u8(global_base + melons,   max_melons);
-			for kong=DK,Chunky do
-				local base = kongbase + kong * 0x5e;
-				mainmemory.write_u8(base + coins, max_coins);
-				mainmemory.write_u8(base + lives, max_musical_energy);
-			end
-		end
-
-		if forms.ischecked(options_toggle_tbarrels) then
-			mainmemory.write_u8(training_barrel, 0xff);
-		end
-		
-		if forms.ischecked(options_toggle_neverslip) then
-			neverSlip();
 		end
 	end
 end

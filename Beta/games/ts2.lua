@@ -99,15 +99,19 @@ end
 ------------
 
 function Game.setMap(value)
-	
+	-- TODO
+end
+
+function Game.applyInfinites()
+	-- TODO
 end
 
 function Game.initUI(form_handle, col, row, button_height)
-	
+	-- TODO
 end
 
 function Game.eachFrame()
-	
+	-- TODO
 end
 
 return Game;

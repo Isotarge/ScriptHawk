@@ -51,6 +51,8 @@ previous_map_value = 0;
 x = 0.0;
 y = 0.0;
 z = 0.0;
+-- TODO
+-- floor_y = 0.0
 
 dx = 0.0;
 dy = 0.0;
@@ -154,7 +156,7 @@ local function col(col_num)
 	return row(col_num);
 end
 
-local options_form = forms.newform(col(17), row(10), "Moonjump Options");
+local options_form = forms.newform(col(17), row(10), "ScriptHawk Options");
 
 --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 -- Handle                              Type                         Caption             Callback                     X position   Y position                Width             Height      --
@@ -261,6 +263,10 @@ local function mainloop()
 				rotate("z", Game.rot_speed);
 			end
 		end
+	end
+
+	if forms.ischecked(options_toggle_infinites) then
+		Game.applyInfinites();
 	end
 
 	if forms.ischecked(options_map_checkbox) then

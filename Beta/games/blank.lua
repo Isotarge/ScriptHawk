@@ -71,27 +71,30 @@ end
 --------------
 
 function Game.getXRotation()
+	-- TODO
 	return 0;
 end
 
 function Game.getYRotation()
+	-- TODO
 	return 0;
 end
 
 function Game.getZRotation()
+	-- TODO
 	return 0;
 end
 
 function Game.setXRotation(value)
-	
+	-- TODO
 end
 
 function Game.setYRotation(value)
-	
+	-- TODO
 end
 
 function Game.setZRotation(value)
-	
+	-- TODO
 end
 
 ------------
@@ -99,15 +102,19 @@ end
 ------------
 
 function Game.setMap(value)
-	
+	-- TODO
+end
+
+function Game.applyInfinites()
+	-- TODO
 end
 
 function Game.initUI(form_handle, col, row, button_height)
-	
+	-- TODO
 end
 
 function Game.eachFrame()
-	
+	-- TODO
 end
 
 return Game;
