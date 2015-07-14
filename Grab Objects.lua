@@ -1,22 +1,28 @@
 local pointer_list;
 local kong_model_pointer;
--- camera_pointer = 0x7f5d10; -- TODO: What is this value?
-local camera_pointer = 0x7fb968; -- TODO: Find on all versions of the game
+local camera_pointer;
+
+local camera_focus_pointer = 0x178; -- TODO: Verify for all versions
+local grab_pointer = 0x32c; -- TODO: Verify for all versions
 
 local romName = gameinfo.getromname();
 
 if bizstring.contains(romName, "Donkey Kong 64") then
-	if bizstring.contains(romName, "USA") then
+	if bizstring.contains(romName, "USA") and not bizstring.contains(romName, "Kiosk") then
 		pointer_list = 0x7fbff0;
+		camera_pointer = 0x7fb968
 		kong_model_pointer = 0x7fbb4d;
 	elseif bizstring.contains(romName, "Europe") then
 		pointer_list = 0x7fbf10;
+		camera_pointer = 0x7fb888;
 		kong_model_pointer = 0x7fba6d;
 	elseif bizstring.contains(romName, "Japan") then
 		pointer_list = 0x7fc460;
+		camera_pointer = 0x7fbdd8;
 		kong_model_pointer = 0x7fbfbd;
 	elseif bizstring.contains(romName, "Kiosk") then
-		pointer_list = 0x7f5e58;
+		pointer_list = 0x7b5e58;
+		camera_pointer = 0x7b5918; -- TODO: Does this work?
 		kong_model_pointer = 0x7b5afd;
 	end
 else
@@ -29,18 +35,13 @@ local object_index = 1;
 local max_objects = 0xff;
 
 local radius = 100;
-local shade_byte = 0x16D;
 
+local model_pointer = 0x00;
 local x_pos = 0x7c;
 local y_pos = 0x80;
 local z_pos = 0x84;
 local shade_byte = 0x16D;
-
-local camera_focus_pointer = 0x178;
 local visibility = 0x63; -- 127 = visible
-
-local grab_pointer = 0x32c;
-local model_pointer = 0x00;
 
 local grab_script_mode = "Grab";
 

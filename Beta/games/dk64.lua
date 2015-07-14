@@ -312,7 +312,7 @@ local kong_model;
 --------------------
 
 function Game.detectVersion(romName)
-	if bizstring.contains(romName, "USA") then
+	if bizstring.contains(romName, "USA") and not bizstring.contains(romName, "Kiosk") then
 		map                = 0x7444E7;
 		file               = 0x7467c8;
 		training_barrel    = 0x7ed230;
@@ -349,7 +349,7 @@ function Game.detectVersion(romName)
 		menu_flags         = 0x7ed558; -- TODO
 		kong_model_pointer = 0x7b5afd;
 		tb_void_byte       = 0x7fbb63; -- TODO
-		pointer_list       = 0x7f5e58;
+		pointer_list       = 0x7b5e58;
 		kongbase           = 0x7fc950; -- TODO
 		global_base        = 0x7fcc41; -- TODO
 	end

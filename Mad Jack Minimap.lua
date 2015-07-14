@@ -17,7 +17,7 @@ local MJ_blue_switch_pos;
 local romName = gameinfo.getromname();
 
 if bizstring.contains(romName, "Donkey Kong 64") then
-	if bizstring.contains(romName, "USA") then
+	if bizstring.contains(romName, "USA") and not bizstring.contains(romName, "Kiosk") then
 		map                = 0x7444E7;
 		kong_model_pointer = 0x7fbb4d;
 		MJ_state_pointer   = 0x7fdc91;

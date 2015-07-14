@@ -6,7 +6,7 @@ local map;
 local romName = gameinfo.getromname();
 
 if bizstring.contains(romName, "Donkey Kong 64") then
-	if bizstring.contains(romName, "USA") then
+	if bizstring.contains(romName, "USA") and not bizstring.contains(romName, "Kiosk") then
 		map = 0x7444E7;
 	elseif bizstring.contains(romName, "Europe") then
 		map = 0x73EC37;
