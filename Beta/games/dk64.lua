@@ -4,7 +4,7 @@ local Game = {};
 -- DK64 specific state --
 -------------------------
 
-local kong_model_pointer;
+local kong_object_pointer;
 local training_barrel;
 local pointer_list;
 local global_base;
@@ -302,7 +302,7 @@ end
 ------------------------------------
 -- http://www.therwp.com/forums/showthread.php?t=7238
 
--- Relative to kong_model_pointer
+-- Relative to kong_object_pointer
 local visibility = 0x63; -- 127 = visible
 
 local x_pos = 0x7c;
@@ -320,7 +320,7 @@ local kick_animation_value = 0x29;
 local kick_freeze = 0xc4;
 local kick_freeze_value = 0xc020;
 
-local kong_model;
+local kong_object;
 
 ---------------
 -- Key stuff --
@@ -328,53 +328,54 @@ local kong_model;
 
 -- USA Defaults
 local key_base;
-local key_collected_bitmasks;
+local key_collected_bitmasks = {
+	0x04,
+	0x04,
+	0x04,
+	0x01,
+	0x10,
+	0x10,
+	0x20,
+	0x10
+};
+local key_flag_pointer;
 local key_offsets = {
-	0x00,
-	0x06,
-	0x0e,
-	0x12,
-	0x1a,
-	0x21,
+	0x03,
+	0x09,
+	0x11,
+	0x15,
+	0x1d,
 	0x24,
-	0x2c
+	0x27,
+	0x2f
 };
 
-local function keyGet(number)
-	local current_file = mainmemory.readbyte(file);
-	if current_file >= 0 and current_file <= 2 then
-		local current_value = mainmemory.readbyte(key_base[current_file] + key_offsets[number]);
-		local new_value = bit.bor(current_value, key_collected_bitmasks[number]);
-		mainmemory.write_u8(key_base[current_file] + key_offsets[number], new_value);
+local options_key_dropdown;
+local options_get_key_button;
+local options_lose_key_button;
+
+local function keyGet()
+	local key = forms.getproperty(options_key_dropdown, "SelectedIndex") + 1;
+	local key_flags = mainmemory.read_u24_be(key_flag_pointer + 1);
+	if key_flags > 0x700000 and key > 0 and key < 9 then
+		local current_value = mainmemory.readbyte(key_flags + key_offsets[key]);
+		local new_value = bit.bor(current_value, key_collected_bitmasks[key]);
+		mainmemory.write_u8(key_flags + key_offsets[key], new_value);
+	else
+		console.log("Key get failed to execute.");
 	end
 end
 
-local function keyLose(number)
-	local current_file = mainmemory.readbyte(file);
-	if current_file >= 0 and current_file <= 2 then
-		local current_value = mainmemory.readbyte(key_base[current_file] + key_offsets[number]);
-		local new_value = bit.bnot(bit.band(current_value, key_collected_bitmasks[number]));
-		mainmemory.write_u8(key_base[current_file] + key_offsets[number], new_value);
+local function keyLose()
+	local key = forms.getproperty(options_key_dropdown, "SelectedIndex") + 1;
+	local key_flags = mainmemory.read_u24_be(key_flag_pointer + 1);
+	if key_flags > 0x700000 and key > 0 and key < 9 then
+		local current_value = mainmemory.readbyte(key_flags + key_offsets[key]);
+		local new_value = bit.bnot(bit.band(current_value, key_collected_bitmasks[key]));
+		mainmemory.write_u8(key_flags + key_offsets[key], new_value);
+	else
+		console.log("Key lose failed to execute.");
 	end
-end
-
-local function initKeyGUI(form_handle, col, row, button_height)
-	local options_get_key1_button =  forms.button(form_handle, "Get Key 1", function() keyGet(1) end,  col(10), row(0), 64, button_height);
-	local options_lose_key1_button = forms.button(form_handle, "Lose Key",  function() keyLose(1) end, col(13), row(0), 64, button_height);
-	local options_get_key2_button =  forms.button(form_handle, "Get Key 2", function() keyGet(2) end,  col(10), row(1), 64, button_height);
-	local options_lose_key2_button = forms.button(form_handle, "Lose Key",  function() keyLose(2) end, col(13), row(1), 64, button_height);
-	local options_get_key3_button =  forms.button(form_handle, "Get Key 3", function() keyGet(3) end,  col(10), row(2), 64, button_height);
-	local options_lose_key3_button = forms.button(form_handle, "Lose Key",  function() keyLose(3) end, col(13), row(2), 64, button_height);
-	local options_get_key4_button =  forms.button(form_handle, "Get Key 4", function() keyGet(4) end,  col(10), row(3), 64, button_height);
-	local options_lose_key4_button = forms.button(form_handle, "Lose Key",  function() keyLose(4) end, col(13), row(3), 64, button_height);
-	local options_get_key5_button =  forms.button(form_handle, "Get Key 5", function() keyGet(5) end,  col(10), row(4), 64, button_height);
-	local options_lose_key5_button = forms.button(form_handle, "Lose Key",  function() keyLose(5) end, col(13), row(4), 64, button_height);
-	local options_get_key6_button =  forms.button(form_handle, "Get Key 6", function() keyGet(6) end,  col(10), row(5), 64, button_height);
-	local options_lose_key6_button = forms.button(form_handle, "Lose Key",  function() keyLose(6) end, col(13), row(5), 64, button_height);
-	local options_get_key7_button =  forms.button(form_handle, "Get Key 7", function() keyGet(7) end,  col(10), row(6), 64, button_height);
-	local options_lose_key7_button = forms.button(form_handle, "Lose Key",  function() keyLose(7) end, col(13), row(6), 64, button_height);
-	local options_get_key8_button =  forms.button(form_handle, "Get Key 8", function() keyGet(8) end,  col(10), row(7), 64, button_height);
-	local options_lose_key8_button = forms.button(form_handle, "Lose Key",  function() keyLose(8) end, col(13), row(7), 64, button_height);
 end
 
 --------------------
@@ -383,22 +384,17 @@ end
 
 function Game.detectVersion(romName)
 	if bizstring.contains(romName, "USA") and not bizstring.contains(romName, "Kiosk") then
-		map                = 0x7444E7;
-		file               = 0x7467c8;
-		training_barrel    = 0x7ed230;
-		menu_flags         = 0x7ed558;
-		kong_model_pointer = 0x7fbb4d;
-		tb_void_byte       = 0x7fbb63;
-		pointer_list       = 0x7fbff0;
-		kongbase           = 0x7fc950;
-		global_base        = 0x7fcc41;
+		map                 = 0x7444E7;
+		file                = 0x7467c8;
+		training_barrel     = 0x7ed230;
+		menu_flags          = 0x7ed558;
+		kong_object_pointer = 0x7fbb4d;
+		tb_void_byte        = 0x7fbb63;
+		pointer_list        = 0x7fbff0;
+		kongbase            = 0x7fc950;
+		global_base         = 0x7fcc41;
 
-		key_base = {
-			[0] = 0x7ed3af,
-			[1] = 0x7ed057,
-			[2] = 0x7ed3af
-		};
-
+		key_flag_pointer = 0x7654F4;
 		key_collected_bitmasks = {
 			0x04,
 			0x04,
@@ -410,54 +406,39 @@ function Game.detectVersion(romName)
 			0x10
 		};
 	elseif bizstring.contains(romName, "Europe") then
-		map                = 0x73EC37;
-		file               = 0x740F18;
-		training_barrel    = 0x7ed150;
-		menu_flags         = 0x7ed478;
-		kong_model_pointer = 0x7fba6d;
-		tb_void_byte       = 0x7FBA83;
-		pointer_list       = 0x7fbf10;
-		kongbase           = 0x7fc890;
-		global_base        = 0x7fcb81;
+		map                 = 0x73EC37;
+		file                = 0x740F18;
+		training_barrel     = 0x7ed150;
+		menu_flags          = 0x7ed478;
+		kong_object_pointer = 0x7fba6d;
+		tb_void_byte        = 0x7FBA83;
+		pointer_list        = 0x7fbf10;
+		kongbase            = 0x7fc890;
+		global_base         = 0x7fcb81;
 
-		-- TODO: Keys
+		key_flag_pointer = 0x760014;
 	elseif bizstring.contains(romName, "Japan") then
-		map                = 0x743DA7;
-		file               = 0x746088;
-		training_barrel    = 0x7ed84c;
-		menu_flags         = 0x7ed9c8;
-		kong_model_pointer = 0x7fbfbd;
-		tb_void_byte       = 0x7FBFD3;
-		pointer_list       = 0x7fc460;
-		kongbase           = 0x7fcde0;
-		global_base        = 0x7fd0d1;
+		map                 = 0x743DA7;
+		file                = 0x746088;
+		training_barrel     = 0x7ed84c;
+		menu_flags          = 0x7ed9c8;
+		kong_object_pointer = 0x7fbfbd;
+		tb_void_byte        = 0x7FBFD3;
+		pointer_list        = 0x7fc460;
+		kongbase            = 0x7fcde0;
+		global_base         = 0x7fd0d1;
 
-		key_base = {
-			[0] = 0x7ED4C7,
-			[1] = 0x7ED31B,
-			[2] = 0x7ED673
-		};
-
-		key_collected_bitmasks = { -- TODO
-			0xFF,
-			0xFF,
-			0xFF,
-			0xFF,
-			0xFF,
-			0xFF,
-			0xFF,
-			0xFF
-		};
+		key_flag_pointer = 0x7656E4;
 	elseif bizstring.contains(romName, "Kiosk") then
-		file               = 0x7467c8; -- TODO?
-		map                = 0x7444E7; -- TODO
-		training_barrel    = 0x7ed150; -- TODO?
-		menu_flags         = 0x7ed558; -- TODO?
-		kong_model_pointer = 0x7b5afd;
-		tb_void_byte       = 0x7fbb63; -- TODO?
-		pointer_list       = 0x7b5e58;
-		kongbase           = 0x7fc950; -- TODO
-		global_base        = 0x7fcc41; -- TODO
+		file                = 0x7467c8; -- TODO?
+		map                 = 0x7444E7; -- TODO
+		training_barrel     = 0x7ed150; -- TODO?
+		menu_flags          = 0x7ed558; -- TODO?
+		kong_object_pointer = 0x7b5afd;
+		tb_void_byte        = 0x7fbb63; -- TODO?
+		pointer_list        = 0x7b5e58;
+		kongbase            = 0x7fc950; -- TODO
+		global_base         = 0x7fcc41; -- TODO
 
 		-- TODO: Keys?
 	end
@@ -482,27 +463,27 @@ end
 --------------
 
 function Game.getXPosition()
-	return mainmemory.readfloat(kong_model + x_pos, true);
+	return mainmemory.readfloat(kong_object + x_pos, true);
 end
 
 function Game.getYPosition()
-	return mainmemory.readfloat(kong_model + y_pos, true);
+	return mainmemory.readfloat(kong_object + y_pos, true);
 end
 
 function Game.getZPosition()
-	return mainmemory.readfloat(kong_model + z_pos, true);
+	return mainmemory.readfloat(kong_object + z_pos, true);
 end
 
 function Game.setXPosition(value)
-	mainmemory.writefloat(kong_model + x_pos, value, true);
+	mainmemory.writefloat(kong_object + x_pos, value, true);
 end
 
 function Game.setYPosition(value)
-	mainmemory.writefloat(kong_model + y_pos, value, true);
+	mainmemory.writefloat(kong_object + y_pos, value, true);
 end
 
 function Game.setZPosition(value)
-	mainmemory.writefloat(kong_model + z_pos, value, true);
+	mainmemory.writefloat(kong_object + z_pos, value, true);
 end
 
 --------------
@@ -510,27 +491,27 @@ end
 --------------
 
 function Game.getXRotation()
-	return mainmemory.read_u16_be(kong_model + angle + 0);
+	return mainmemory.read_u16_be(kong_object + angle + 0);
 end
 
 function Game.getYRotation()
-	return mainmemory.read_u16_be(kong_model + angle + 2);
+	return mainmemory.read_u16_be(kong_object + angle + 2);
 end
 
 function Game.getZRotation()
-	return mainmemory.read_u16_be(kong_model + angle + 4);
+	return mainmemory.read_u16_be(kong_object + angle + 4);
 end
 
 function Game.setXRotation(value)
-	mainmemory.write_u16_be(kong_model + angle + 0, value);
+	mainmemory.write_u16_be(kong_object + angle + 0, value);
 end
 
 function Game.setYRotation(value)
-	mainmemory.write_u16_be(kong_model + angle + 2, value);
+	mainmemory.write_u16_be(kong_object + angle + 2, value);
 end
 
 function Game.setZRotation(value)
-	mainmemory.write_u16_be(kong_model + angle + 4, value);
+	mainmemory.write_u16_be(kong_object + angle + 4, value);
 end
 
 --------------------
@@ -538,15 +519,15 @@ end
 --------------------
 
 local function invisify()
-	kong_model = mainmemory.read_u24_be(kong_model_pointer);
-	mainmemory.writebyte(kong_model + visibility, 0x00);
+	kong_object = mainmemory.read_u24_be(kong_object_pointer);
+	mainmemory.writebyte(kong_object + visibility, 0x00);
 	-- TODO: We only really need to update UI here, can we include a Game.updateUI method in the module interface?
 	Game.eachFrame();
 end
 
 local function visify()
-	kong_model = mainmemory.read_u24_be(kong_model_pointer);
-	mainmemory.writebyte(kong_model + visibility, 0x7f);
+	kong_object = mainmemory.read_u24_be(kong_object_pointer);
+	mainmemory.writebyte(kong_object + visibility, 0x7f);
 	-- TODO: We only really need to update UI here, can we include a Game.updateUI method in the module interface?
 	Game.eachFrame();
 end
@@ -599,9 +580,9 @@ local function neverSlip()
 	mainmemory.write_u8(slope_object + slope_timer, 0);
 
 	-- Patch the Kong object
-	local kong_model = mainmemory.read_u24_be(kong_model_pointer);
-	local slope_value = mainmemory.read_u8(kong_model + slope_byte);
-	mainmemory.write_u8(kong_model + slope_byte, math.max(3, slope_value));
+	local kong_object = mainmemory.read_u24_be(kong_object_pointer);
+	local slope_value = mainmemory.read_u8(kong_object + slope_byte);
+	mainmemory.write_u8(kong_object + slope_byte, math.max(3, slope_value));
 end
 
 ------------
@@ -622,8 +603,11 @@ local options_unlock_moves_button;
 local options_toggle_homing_ammo;
 local options_toggle_neverslip;
 
-function Game.initUI(form_handle, col, row, button_height)
-	initKeyGUI(form_handle, col, row, button_height);
+function Game.initUI(form_handle, col, row, button_height, label_offset, dropdown_offset)
+	-- Key stuff
+	options_key_dropdown = forms.dropdown(form_handle, { "Key 1", "Key 2", "Key 3", "Key 4", "Key 5", "Key 6", "Key 7", "Key 8" }, col(10) + dropdown_offset, row(0) + dropdown_offset);
+	options_get_key_button = forms.button(form_handle, "Get", keyGet, col(10), row(1), 59, button_height);
+	options_lose_key_button = forms.button(form_handle, "Lose", keyLose, col(13) - 8, row(1), 59, button_height);
 
 	-- Buttons
 	options_toggle_invisify_button = forms.button(form_handle, "Invisify",      toggle_invisify, col(5), row(4), col(4) + 8, button_height);
@@ -632,8 +616,8 @@ function Game.initUI(form_handle, col, row, button_height)
 	options_unlock_moves_button =    forms.button(form_handle, "Unlock Moves",  unlock_moves,    col(5), row(7), col(4) + 8, button_height);
 
 	-- Checkboxes
-	options_toggle_neverslip =       forms.checkbox(form_handle, "Never Slip",                  col(0), row(6));
-	options_toggle_homing_ammo =     forms.checkbox(form_handle, "Homing Ammo",                 col(0), row(7));
+	options_toggle_neverslip =       forms.checkbox(form_handle, "Never Slip",                   col(0), row(6));
+	options_toggle_homing_ammo =     forms.checkbox(form_handle, "Homing Ammo",                  col(0), row(7));
 end
 
 function Game.applyInfinites()
@@ -657,7 +641,7 @@ function Game.applyInfinites()
 end
 
 function Game.eachFrame()
-	kong_model = mainmemory.read_u24_be(kong_model_pointer);
+	kong_object = mainmemory.read_u24_be(kong_object_pointer);
 	Game.unlock_menus();
 
 	if forms.ischecked(options_toggle_neverslip) then

@@ -40,6 +40,7 @@ SystemID N64
 75C48B	b	h	1	RDRAM	Enguarde Model
 75C49B	b	h	1	RDRAM	Squawks Model
 75C4AB	b	h	1	RDRAM	Squawks Model
+7654F4	d	h	1	RDRAM	Key flags pointer?
 76A0AB	b	h	1	RDRAM	Background?
 76A0CD	b	u	1	RDRAM	Adventure
 76A0DA	b	h	1	RDRAM	Mystery Menu

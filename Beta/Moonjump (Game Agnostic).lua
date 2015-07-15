@@ -182,7 +182,7 @@ local options_rot_units_label =              forms.label(options_form,    "Units
 local options_toggle_rot_units_button =      forms.button(options_form,   rotation_units,     toggle_rotation_units, col(7),      row(0),                   64,               button_height);
 
 -- Init any custom UI that the game module uses
-Game.initUI(options_form, col, row, button_height);
+Game.initUI(options_form, col, row, button_height, label_offset, dropdown_offset);
 
 local function findMapValue()
 	for i=1,#Game.maps do

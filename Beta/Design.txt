@@ -24,6 +24,7 @@ Game
 	function Game.setYRotation(value)
 	function Game.setZRotation(value)
 
+	function Game.initUI(options_form, col, row, button_height, label_offset, dropdown_offset)
 	function Game.applyInfinites()
 	function Game.eachFrame()
 	function Game.setMap(value)
