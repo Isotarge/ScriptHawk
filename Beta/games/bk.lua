@@ -24,6 +24,32 @@ local air;
 local mumbo_tokens;
 local jiggies;
 
+local max_notes = 100;
+local max_eggs = 200;
+local max_red_feathers = 50;
+local max_gold_feathers = 10;
+local max_health = 69;
+local max_lives = 9;
+local max_air = 14;
+local max_mumbo_tokens = 99;
+local max_jiggies = 100;
+
+local eep_checksum_offsets = {
+	0x74,
+	0xEC,
+	0x164,
+	0x1DC,
+	0x1FC
+};
+
+local eep_checksum_values = {
+	0x00000000,
+	0x00000000,
+	0x00000000,
+	0x00000000,
+	0x00000000
+}
+
 Game.maps = {
 	"Spiral Mountain",
 	"Mumbo's Mountain",
@@ -91,10 +117,10 @@ Game.maps = {
 	"CCW - Start",
 	"FP - Boggy's Igloo",
 	"Unknown 0x42",
-	"CCW - Spring)",
-	"CCW - Summer)",
-	"CCW - Autumn)",
-	"CCW - Winter)",
+	"CCW - Spring",
+	"CCW - Summer",
+	"CCW - Autumn",
+	"CCW - Winter",
 	"BGS - Mumbo's Skull",
 	"FP - Mumbo's Skull",
 	"Unknown 0x49",
@@ -180,7 +206,7 @@ Game.maps = {
 	"Intro - Grunty Threat 2"
 }
 
-function Game.detectVersion(rom)
+function Game.detectVersion(romName)
 	if bizstring.contains(romName, "Europe") then
 		x_pos = 0x37cf70;
 		x_rot = 0x37d064;
@@ -235,6 +261,15 @@ function Game.detectVersion(rom)
 	z_pos = y_pos + 4;
 	y_rot = x_rot;
 	z_rot = x_rot;
+
+	-- Read EEPROM checksums
+	if memory.usememorydomain("EEPROM") then
+		local i;
+		for i=1,#eep_checksum_offsets do
+			eep_checksum_values[i] = memory.read_u32_be(eep_checksum_offsets[i]);
+		end
+	end
+	memory.usememorydomain("RDRAM");
 end
 
 -------------------
@@ -321,7 +356,15 @@ function Game.setMap(value)
 end
 
 function Game.applyInfinites()
-	-- TODO
+	mainmemory.writebyte(notes, max_notes);
+	mainmemory.writebyte(eggs, max_eggs);
+	mainmemory.writebyte(red_feathers, max_red_feathers);
+	mainmemory.writebyte(gold_feathers, max_gold_feathers);
+	mainmemory.writebyte(health, max_health);
+	mainmemory.writebyte(lives, max_lives);
+	mainmemory.writebyte(air, max_air);
+	mainmemory.writebyte(mumbo_tokens, max_mumbo_tokens);
+	mainmemory.writebyte(jiggies, max_jiggies);
 end
 
 function Game.initUI(form_handle, col, row, button_height, label_offset, dropdown_offset)
@@ -329,7 +372,18 @@ function Game.initUI(form_handle, col, row, button_height, label_offset, dropdow
 end
 
 function Game.eachFrame()
-	-- TODO
+	-- Check EEPROM checksums
+	if memory.usememorydomain("EEPROM") then
+		local i, checksum_value;
+		for i=1,#eep_checksum_offsets do
+			checksum_value = memory.read_u32_be(eep_checksum_offsets[i]);
+			if eep_checksum_values[i] ~= checksum_value then
+				console.log("Wrote slot "..i.." old checksum: "..bizstring.hex(eep_checksum_values[i]).." new checksum: "..bizstring.hex(checksum_value));
+				eep_checksum_values[i] = checksum_value;
+			end
+		end
+	end
+	memory.usememorydomain("RDRAM");
 end
 
 return Game;

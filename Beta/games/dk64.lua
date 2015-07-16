@@ -12,6 +12,22 @@ local kongbase;
 local tb_void_byte;
 local menu_flags;
 
+local eep_checksum_offsets = {
+	0x1A8,
+	0x354,
+	0x500,
+	0x6AC,
+	0x6EC
+};
+
+local eep_checksum_values = {
+	0x00000000,
+	0x00000000,
+	0x00000000,
+	0x00000000,
+	0x00000000
+}
+
 Game.maps = {
 	"Test Map",
 	"Funky's Store",
@@ -442,6 +458,15 @@ function Game.detectVersion(romName)
 
 		-- TODO: Keys?
 	end
+
+	-- Read EEPROM checksums
+	if memory.usememorydomain("EEPROM") then
+		local i;
+		for i=1,#eep_checksum_offsets do
+			eep_checksum_values[i] = memory.read_u32_be(eep_checksum_offsets[i]);
+		end
+	end
+	memory.usememorydomain("RDRAM");
 end
 
 -------------------
@@ -648,6 +673,23 @@ function Game.eachFrame()
 		neverSlip();
 	end
 
+	-- Check EEPROM checksums
+	if memory.usememorydomain("EEPROM") then
+		local i, checksum_value;
+		for i=1,#eep_checksum_offsets do
+			checksum_value = memory.read_u32_be(eep_checksum_offsets[i]);
+			if eep_checksum_values[i] ~= checksum_value then
+				if i == 5 then
+					console.log("Wrote global flags "..i.." old checksum: "..bizstring.hex(eep_checksum_values[i]).." new checksum: "..bizstring.hex(checksum_value));
+				else
+					console.log("Wrote file slot "..i.." old checksum: "..bizstring.hex(eep_checksum_values[i]).." new checksum: "..bizstring.hex(checksum_value));
+				end
+				eep_checksum_values[i] = checksum_value;
+			end
+		end
+	end
+	memory.usememorydomain("RDRAM");
+	
 	forms.settext(options_toggle_invisify_button, current_invisify);
 end
 
