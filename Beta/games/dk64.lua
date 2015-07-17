@@ -320,15 +320,29 @@ end
 
 -- Relative to kong_object_pointer
 local model_pointer = 0x00;
+
 local hand_state = 0x47; -- Bitfield
 local visibility = 0x63; -- 127 = visible
+
 local specular_highlight = 0x6D;
+
 local shadow_width = 0x6E;
 local shadow_height = 0x6F;
 
--- 0x3d8f20 Base
--- 0x3d8fec -> Light stuff? values 0x00->0x14
--- 0x3d8fec -> More light stuff? values 0x00->0x14
+local x_pos = 0x7c;
+local y_pos = 0x80;
+local z_pos = 0x84;
+
+local floor = 0xa4;
+
+local kick_freeze = 0xc4;
+local kick_freeze_value = 0xc020;
+
+local light_thing = 0xcc; -- Values 0x00->0x14
+
+local x_rot = 0xe4;
+local y_rot = 0xe6;
+local z_rot = 0xe8;
 
 -- State byte
 -- 0x02 First person camera
@@ -348,25 +362,10 @@ local shadow_height = 0x6F;
 -- 0x4F Underwater
 local object_state_byte = 0x154;
 
--- 0x3d908D -> Coloured highlight
-
-local x_pos = 0x7c;
-local y_pos = 0x80;
-local z_pos = 0x84;
-
-local floor = 0xa4;
-
-local x_rot = 0xe4;
-local y_rot = 0xe6;
-local z_rot = 0xe8;
-
 local camera_focus_pointer = 0x178;
 
 local kick_animation = 0x181;
 local kick_animation_value = 0x29;
-
-local kick_freeze = 0xc4;
-local kick_freeze_value = 0xc020;
 
 local kong_object;
 
@@ -434,6 +433,7 @@ function Game.detectVersion(romName)
 	if bizstring.contains(romName, "USA") and not bizstring.contains(romName, "Kiosk") then
 		map                 = 0x7444E7;
 		file                = 0x7467c8;
+		key_flag_pointer    = 0x7654F4;
 		training_barrel     = 0x7ed230;
 		menu_flags          = 0x7ed558;
 		kong_object_pointer = 0x7fbb4d;
@@ -441,21 +441,10 @@ function Game.detectVersion(romName)
 		pointer_list        = 0x7fbff0;
 		kongbase            = 0x7fc950;
 		global_base         = 0x7fcc41;
-
-		key_flag_pointer = 0x7654F4;
-		key_collected_bitmasks = {
-			0x04,
-			0x04,
-			0x04,
-			0x01,
-			0x10,
-			0x10,
-			0x20,
-			0x10
-		};
 	elseif bizstring.contains(romName, "Europe") then
 		map                 = 0x73EC37;
 		file                = 0x740F18;
+		key_flag_pointer    = 0x760014;
 		training_barrel     = 0x7ed150;
 		menu_flags          = 0x7ed478;
 		kong_object_pointer = 0x7fba6d;
@@ -463,11 +452,10 @@ function Game.detectVersion(romName)
 		pointer_list        = 0x7fbf10;
 		kongbase            = 0x7fc890;
 		global_base         = 0x7fcb81;
-
-		key_flag_pointer = 0x760014;
 	elseif bizstring.contains(romName, "Japan") then
 		map                 = 0x743DA7;
 		file                = 0x746088;
+		key_flag_pointer    = 0x7656E4;
 		training_barrel     = 0x7ed84c;
 		menu_flags          = 0x7ed9c8;
 		kong_object_pointer = 0x7fbfbd;
@@ -475,8 +463,6 @@ function Game.detectVersion(romName)
 		pointer_list        = 0x7fc460;
 		kongbase            = 0x7fcde0;
 		global_base         = 0x7fd0d1;
-
-		key_flag_pointer = 0x7656E4;
 	elseif bizstring.contains(romName, "Kiosk") then
 		file                = 0x7467c8; -- TODO?
 		map                 = 0x7444E7; -- TODO
@@ -578,15 +564,11 @@ end
 local function invisify()
 	kong_object = mainmemory.read_u24_be(kong_object_pointer);
 	mainmemory.writebyte(kong_object + visibility, 0x00);
-	-- TODO: We only really need to update UI here, can we include a Game.updateUI method in the module interface?
-	Game.eachFrame();
 end
 
 local function visify()
 	kong_object = mainmemory.read_u24_be(kong_object_pointer);
 	mainmemory.writebyte(kong_object + visibility, 0x7f);
-	-- TODO: We only really need to update UI here, can we include a Game.updateUI method in the module interface?
-	Game.eachFrame();
 end
 
 local current_invisify = "Invisify";
@@ -599,8 +581,7 @@ local function toggle_invisify()
 		current_invisify = "Invisify";
 	end
 
-	-- TODO: We only really need to update UI here, can we include a Game.updateUI method in the module interface?
-	Game.eachFrame();
+	forms.settext(options_toggle_invisify_button, current_invisify);
 end
 
 local function clear_tb_void()
@@ -642,6 +623,22 @@ local function neverSlip()
 	mainmemory.write_u8(kong_object + slope_byte, math.max(3, slope_value));
 end
 
+----------------
+-- Moon stuff --
+----------------
+
+local moon_mode = "None";
+local function toggle_moonmode()
+	if moon_mode == 'None' then
+		moon_mode = 'Kick';
+	elseif moon_mode == 'Kick' then
+		moon_mode = 'All';
+	elseif moon_mode == 'All' then
+		moon_mode = 'None';
+	end
+	Game.eachFrame();
+end
+
 ------------
 -- Events --
 ------------
@@ -651,6 +648,9 @@ function Game.setMap(value)
 		mainmemory.writebyte(map, value - 1);
 	end
 end
+
+local options_moon_mode_label;
+local options_moon_mode_button;
 
 local options_toggle_invisify_button;
 local options_clear_tb_void_button;
@@ -665,6 +665,10 @@ function Game.initUI(form_handle, col, row, button_height, label_offset, dropdow
 	options_key_dropdown = forms.dropdown(form_handle, { "Key 1", "Key 2", "Key 3", "Key 4", "Key 5", "Key 6", "Key 7", "Key 8" }, col(10) + dropdown_offset, row(0) + dropdown_offset);
 	options_get_key_button = forms.button(form_handle, "Get", keyGet, col(10), row(1), 59, button_height);
 	options_lose_key_button = forms.button(form_handle, "Lose", keyLose, col(13) - 8, row(1), 59, button_height);
+
+	-- Moon stuff
+	options_moon_mode_label =  forms.label(form_handle,  "Moon:",                    col(10), row(2) + label_offset, 48, button_height);
+	options_moon_mode_button = forms.button(form_handle, moon_mode, toggle_moonmode, col(12), row(2),                64, button_height);
 
 	-- Buttons
 	options_toggle_invisify_button = forms.button(form_handle, "Invisify",      toggle_invisify, col(5), row(4), col(4) + 8, button_height);
@@ -705,6 +709,11 @@ function Game.eachFrame()
 		neverSlip();
 	end
 
+	-- Moonkick
+	if moon_mode == 'All' or (moon_mode == 'Kick' and mainmemory.readbyte(kong_object + kick_animation) == kick_animation_value) then
+		mainmemory.write_u16_be(kong_object + kick_freeze, kick_freeze_value);
+	end
+
 	-- Check EEPROM checksums
 	if memory.usememorydomain("EEPROM") then
 		local i, checksum_value;
@@ -721,8 +730,9 @@ function Game.eachFrame()
 		end
 	end
 	memory.usememorydomain("RDRAM");
-	
+
 	forms.settext(options_toggle_invisify_button, current_invisify);
+	forms.settext(options_moon_mode_button, moon_mode);
 end
 
 return Game;

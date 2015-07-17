@@ -368,6 +368,8 @@ local function plot_pos()
 		row = row + 1;
 		gui.text(gui_x, gui_y + height * row, "Z: "..round(z, precision));
 		row = row + 2;
+		--gui.text(gui_x, gui_y + height * row, "Floor: "..round(floor_y, precision));
+		--row = row + 2;
 	end
 
 	if null_check(dy) and null_check(d) then
@@ -391,6 +393,8 @@ local function plot_pos()
 		row = row + 1;
 		gui.text(gui_x, gui_y + height * row, "Rot Z: "..formatRotation(rot_z));
 		row = row + 1;
+		--gui.text(gui_x, gui_y + height * row, "Rot L: "..formatRotation(rot_l));
+		--row = row + 2;
 	end
 
 	updateUIReadouts_moonjumpGameAgnostic();
