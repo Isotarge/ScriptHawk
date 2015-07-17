@@ -319,14 +319,46 @@ end
 -- http://www.therwp.com/forums/showthread.php?t=7238
 
 -- Relative to kong_object_pointer
+local model_pointer = 0x00;
+local hand_state = 0x47; -- Bitfield
 local visibility = 0x63; -- 127 = visible
+local specular_highlight = 0x6D;
+local shadow_width = 0x6E;
+local shadow_height = 0x6F;
+
+-- 0x3d8f20 Base
+-- 0x3d8fec -> Light stuff? values 0x00->0x14
+-- 0x3d8fec -> More light stuff? values 0x00->0x14
+
+-- State byte
+-- 0x02 First person camera
+-- 0x04 Fairy camera
+-- 0x0C standing normally
+-- 0x0e Skid
+-- 0x18 Moonrise?
+-- 0x20 Splat
+-- 0x24 Sparkles
+-- 0x2C Crouch?
+-- 0x39 Shrinking
+-- 0x31 ESS
+-- 0x36 Backwalk into loading zone?
+-- 0x39 Shrink
+-- 0x3E Camera zooms out
+-- 0x4E Surface swimming
+-- 0x4F Underwater
+local object_state_byte = 0x154;
+
+-- 0x3d908D -> Coloured highlight
 
 local x_pos = 0x7c;
 local y_pos = 0x80;
 local z_pos = 0x84;
 
 local floor = 0xa4;
-local angle = 0xe4;
+
+local x_rot = 0xe4;
+local y_rot = 0xe6;
+local z_rot = 0xe8;
 
 local camera_focus_pointer = 0x178;
 
@@ -516,27 +548,27 @@ end
 --------------
 
 function Game.getXRotation()
-	return mainmemory.read_u16_be(kong_object + angle + 0);
+	return mainmemory.read_u16_be(kong_object + x_rot);
 end
 
 function Game.getYRotation()
-	return mainmemory.read_u16_be(kong_object + angle + 2);
+	return mainmemory.read_u16_be(kong_object + y_rot);
 end
 
 function Game.getZRotation()
-	return mainmemory.read_u16_be(kong_object + angle + 4);
+	return mainmemory.read_u16_be(kong_object + z_rot);
 end
 
 function Game.setXRotation(value)
-	mainmemory.write_u16_be(kong_object + angle + 0, value);
+	mainmemory.write_u16_be(kong_object + x_rot, value);
 end
 
 function Game.setYRotation(value)
-	mainmemory.write_u16_be(kong_object + angle + 2, value);
+	mainmemory.write_u16_be(kong_object + y_rot, value);
 end
 
 function Game.setZRotation(value)
-	mainmemory.write_u16_be(kong_object + angle + 4, value);
+	mainmemory.write_u16_be(kong_object + z_rot, value);
 end
 
 --------------------
