@@ -3,7 +3,7 @@ local kong_model_pointer;
 local camera_pointer;
 
 local camera_focus_pointer = 0x178; -- TODO: Verify for all versions
-local grab_pointer = 0x32c; -- TODO: Verify for all versions
+local grab_pointer = 0x32c;
 
 local romName = gameinfo.getromname();
 
@@ -24,6 +24,7 @@ if bizstring.contains(romName, "Donkey Kong 64") then
 		pointer_list = 0x7b5e58;
 		camera_pointer = 0x7b5918; -- TODO: Does this work?
 		kong_model_pointer = 0x7b5afd;
+		grab_pointer = 0x2F4;
 	end
 else
 	console.log("This game is not supported.");

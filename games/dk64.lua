@@ -465,7 +465,7 @@ function Game.detectVersion(romName)
 		global_base         = 0x7fd0d1;
 	elseif bizstring.contains(romName, "Kiosk") then
 		file                = 0x7467c8; -- TODO?
-		map                 = 0x7444E7; -- TODO
+		map                 = 0x72CDE7;
 		training_barrel     = 0x7ed150; -- TODO?
 		menu_flags          = 0x7ed558; -- TODO?
 		kong_object_pointer = 0x7b5afd;
@@ -475,6 +475,39 @@ function Game.detectVersion(romName)
 		global_base         = 0x7fcc41; -- TODO
 
 		-- TODO: Keys?
+
+		x_rot = 0xD8;
+		y_rot = 0xDA;
+		z_rot = 0xDC;
+
+		-- Kiosk version maps
+		--0 Crash
+		--1 Crash
+		--2 Crash
+		--3 Dogadon (2?) fight (Crash??!?!?!)
+		--4 Crash
+		--5 Crash
+		--6 Minecart
+		--7 Crash
+		--8 Armydillo fight -> crash?
+		--9-39 Crash
+		--40 N+R logo
+		--41-75 Crash
+		--76 DK Rap
+		--77 Crash
+		--78 Crash
+		--79 Crash
+		--80 Title screen
+		--81 "Thanks for playing" or Test Map
+		--82 Crash?
+		--83 Partially loads, then crashes
+		--84-214 Crash
+		--215 Partially loads (kong position changes), then crashes
+		--216-228 Crash
+		--229 Partially loads (kong position changes), then crashes
+		--230-240 Crash
+		--241 Partially loads (kong position changes), then crashes
+		--242-255 Crash
 	end
 
 	-- Read EEPROM checksums

@@ -1,54 +1,54 @@
 -- DK64 C-Upless ledge clip angle/position finder
 -- Written by Isotarge, 2015
 
-kong_model_pointer = 0x7fbb4d;
+local kong_object_pointer = 0x7fbb4d;
 
--- Relative to kong model
-x_pos = 0x7c;
-y_pos = 0x80;
-z_pos = 0x84;
-angle = 0xe4;
+-- Relative to kong object
+local x_pos = 0x7c;
+local y_pos = 0x80;
+local z_pos = 0x84;
+local angle = 0xe4;
 
-x = 0.0;
-y = 0.0;
-z = 0.0;
+local x = 0.0;
+local y = 0.0;
+local z = 0.0;
 
 ledgegrab_angles = {{140, 1910}, {2180, 3950}};
 
-start_x = 179.999;
-x_increments = -0.002;
+local start_x = 179.999;
+local x_increments = -0.002;
 -- > this means success, < this means failure
-end_x = 176.5;
-current_x = start_x;
+local end_x = 176.5;
+local current_x = start_x;
 
-currentAngle = 0x0000;
-maxAngle = 0x0fff;
-angle_increments = 1;
+local currentAngle = 0x0000;
+local maxAngle = 0x0fff;
+local angle_increments = 1;
 
-running = true;
+local running = true;
 
-ground = 20.0;
+local ground = 20.0;
 
-frames_since_set = 0;
-max_frames_since_set = 150;
+local frames_since_set = 0;
+local max_frames_since_set = 150;
 
 function round (num, idp)
 	return tonumber(string.format("%." .. (idp or 0) .. "f", num));
 end
 
-function rotate (axis, amount)
-	local kong_model = mainmemory.read_u24_be(kong_model_pointer);
-	local current_value = mainmemory.read_u16_be(kong_model + angle + axis * 2);
-	mainmemory.write_u16_be(kong_model + angle + axis * 2, current_value + amount);
+local function rotate (axis, amount)
+	local kong_object = mainmemory.read_u24_be(kong_object_pointer);
+	local current_value = mainmemory.read_u16_be(kong_object + angle + axis * 2);
+	mainmemory.write_u16_be(kong_object + angle + axis * 2, current_value + amount);
 end
 
-function plot_pos ()
+local function plot_pos ()
 	if running then
-		local kong_model = mainmemory.read_u24_be(kong_model_pointer);
+		local kong_object = mainmemory.read_u24_be(kong_object_pointer);
 
-		x = mainmemory.readfloat(kong_model + x_pos, true);
-		y = mainmemory.readfloat(kong_model + y_pos, true);
-		z = mainmemory.readfloat(kong_model + z_pos, true);
+		x = mainmemory.readfloat(kong_object + x_pos, true);
+		y = mainmemory.readfloat(kong_object + y_pos, true);
+		z = mainmemory.readfloat(kong_object + z_pos, true);
 
 		if frames_since_set == 0 then
 			savestate.loadslot(0);
@@ -59,7 +59,7 @@ function plot_pos ()
 
 			-- Set angle and position
 			rotate(1 , currentAngle);
-			memory.writefloat(kong_model + x_pos, current_x, true);
+			memory.writefloat(kong_object + x_pos, current_x, true);
 
 			-- Update angle and position for next test
 			currentAngle = currentAngle + angle_increments;
