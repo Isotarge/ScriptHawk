@@ -594,7 +594,7 @@ local function force_pause()
 end
 
 local function force_zipper()
-	-- TODO: ik you can do this with tb_void_byte
+	mainmemory.writebyte(tb_void_byte - 1, 0x01);
 end
 
 ------------------------------------
@@ -667,18 +667,20 @@ function Game.initUI(form_handle, col, row, button_height, label_offset, dropdow
 	options_lose_key_button = forms.button(form_handle, "Lose", keyLose, col(13) - 8, row(1), 59, button_height);
 
 	-- Moon stuff
-	options_moon_mode_label =  forms.label(form_handle,  "Moon:",                    col(10), row(2) + label_offset, 48, button_height);
-	options_moon_mode_button = forms.button(form_handle, moon_mode, toggle_moonmode, col(12), row(2),                64, button_height);
+	options_moon_mode_label =  forms.label(form_handle,  "Moon:",                    col(10),     row(2) + label_offset, 48, button_height);
+	options_moon_mode_button = forms.button(form_handle, moon_mode, toggle_moonmode, col(13) - 8, row(2),                59, button_height);
 
 	-- Buttons
 	options_toggle_invisify_button = forms.button(form_handle, "Invisify",      toggle_invisify, col(5), row(4), col(4) + 8, button_height);
 	options_clear_tb_void_button =   forms.button(form_handle, "Clear TB void", clear_tb_void,   col(5), row(5), col(4) + 8, button_height);
-	options_force_pause_button =     forms.button(form_handle, "Force Pause",   force_pause,     col(5), row(6), col(4) + 8, button_height);
-	options_unlock_moves_button =    forms.button(form_handle, "Unlock Moves",  unlock_moves,    col(5), row(7), col(4) + 8, button_height);
+	options_unlock_moves_button =    forms.button(form_handle, "Unlock Moves",  unlock_moves,    col(5), row(6), col(4) + 8, button_height);
+
+	options_force_pause_button =  forms.button(form_handle, "Force Pause",   force_pause,  col(10), row(4), col(4) + 8, button_height);
+	options_force_zipper_button = forms.button(form_handle, "Force Zipper",  force_zipper, col(10), row(5), col(4) + 8, button_height);
 
 	-- Checkboxes
-	options_toggle_neverslip =       forms.checkbox(form_handle, "Never Slip",                   col(0), row(6));
-	options_toggle_homing_ammo =     forms.checkbox(form_handle, "Homing Ammo",                  col(0), row(7));
+	options_toggle_homing_ammo =     forms.checkbox(form_handle, "Homing Ammo", col(0), row(6));
+	options_toggle_neverslip =       forms.checkbox(form_handle, "Never Slip",  col(0), row(7));
 end
 
 function Game.applyInfinites()
