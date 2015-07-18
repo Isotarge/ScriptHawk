@@ -534,6 +534,11 @@ function Game.isPhysicsFrame()
 	return not emu.islagged();
 end
 
+function isInSubGame()
+	local map_value = mainmemory.readbyte(map);
+	return map_value == 2 or map_value == 9;
+end
+
 --------------
 -- Position --
 --------------
@@ -551,15 +556,21 @@ function Game.getZPosition()
 end
 
 function Game.setXPosition(value)
-	mainmemory.writefloat(kong_object + x_pos, value, true);
+	if not isInSubGame() then
+		mainmemory.writefloat(kong_object + x_pos, value, true);
+	end
 end
 
 function Game.setYPosition(value)
-	mainmemory.writefloat(kong_object + y_pos, value, true);
+	if not isInSubGame() then
+		mainmemory.writefloat(kong_object + y_pos, value, true);
+	end
 end
 
 function Game.setZPosition(value)
-	mainmemory.writefloat(kong_object + z_pos, value, true);
+	if not isInSubGame() then
+		mainmemory.writefloat(kong_object + z_pos, value, true);
+	end
 end
 
 --------------
@@ -579,15 +590,21 @@ function Game.getZRotation()
 end
 
 function Game.setXRotation(value)
-	mainmemory.write_u16_be(kong_object + x_rot, value);
+	if not isInSubGame() then
+		mainmemory.write_u16_be(kong_object + x_rot, value);
+	end
 end
 
 function Game.setYRotation(value)
-	mainmemory.write_u16_be(kong_object + y_rot, value);
+	if not isInSubGame() then
+		mainmemory.write_u16_be(kong_object + y_rot, value);
+	end
 end
 
 function Game.setZRotation(value)
-	mainmemory.write_u16_be(kong_object + z_rot, value);
+	if not isInSubGame() then
+		mainmemory.write_u16_be(kong_object + z_rot, value);
+	end
 end
 
 --------------------

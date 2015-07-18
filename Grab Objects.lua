@@ -38,11 +38,33 @@ local max_objects = 0xff;
 local radius = 100;
 
 local model_pointer = 0x00;
+
+local hand_state = 0x47; -- Bitfield
+local visibility = 0x63; -- 127 = visible
+
+local specular_highlight = 0x6D;
+
+local shadow_width = 0x6E;
+local shadow_height = 0x6F;
+
 local x_pos = 0x7c;
 local y_pos = 0x80;
 local z_pos = 0x84;
-local shade_byte = 0x16D;
+
 local visibility = 0x63; -- 127 = visible
+
+local floor = 0xa4;
+
+local kick_freeze = 0xc4;
+local kick_freeze_value = 0xc020;
+
+local light_thing = 0xcc; -- Values 0x00->0x14
+
+local x_rot = 0xe4;
+local y_rot = 0xe6;
+local z_rot = 0xe8;
+
+local shade_byte = 0x16D;
 
 local grab_script_mode = "Grab";
 
@@ -62,6 +84,8 @@ local function switch_grab_script_mode()
 	if grab_script_mode == 'Grab' then
 		grab_script_mode = 'Camera';
 	elseif grab_script_mode == 'Camera' then
+		grab_script_mode = 'Examine';
+	elseif grab_script_mode == 'Examine' then
 		grab_script_mode = 'Encircle';
 	elseif grab_script_mode == 'Encircle' then
 		grab_script_mode = 'Grab';
@@ -104,6 +128,31 @@ local function encircle_kong()
 	end
 end
 
+local function getExamineData(pointer)
+	local examine_data = {};
+
+	table.insert(examine_data, { "X", mainmemory.readfloat(pointer + x_pos, true) });
+	table.insert(examine_data, { "Y", mainmemory.readfloat(pointer + y_pos, true) });
+	table.insert(examine_data, { "Z", mainmemory.readfloat(pointer + z_pos, true) });
+
+	table.insert(examine_data, { "Rot X", mainmemory.read_u16_be(pointer + x_rot) });
+	table.insert(examine_data, { "Rot Y", mainmemory.read_u16_be(pointer + y_rot) });
+	table.insert(examine_data, { "Rot Z", mainmemory.read_u16_be(pointer + z_rot) });
+
+	table.insert(examine_data, { "Hand state", mainmemory.readbyte(pointer + hand_state) });
+	table.insert(examine_data, { "Specular highlight", mainmemory.readbyte(pointer + specular_highlight) });
+
+	table.insert(examine_data, { "Shadow width", mainmemory.readbyte(pointer + shadow_width) });
+	table.insert(examine_data, { "Shadow height", mainmemory.readbyte(pointer + shadow_height) });
+
+	table.insert(examine_data, { "Shade byte", mainmemory.readbyte(pointer + shade_byte) });
+	table.insert(examine_data, { "Visibility", mainmemory.readbyte(pointer + visibility) });
+
+	table.insert(examine_data, { "Grab Pointer", string.format("0x%08x", mainmemory.read_u32_be(pointer + grab_pointer)) });
+
+	return examine_data;
+end
+
 local function process_input()
 	input_table = input.get();
 
@@ -132,6 +181,7 @@ local function process_input()
 
 	if input_table[increase_object_index_key] == true and increase_object_index_pressed == false then
 		object_index = math.min(#object_pointers, object_index + 1);
+		object_index = math.max(1, object_index);
 		increase_object_index_pressed = true;
 	end
 
@@ -163,14 +213,40 @@ local function draw_gui()
 		gui.text(gui_x, gui_y + height * row, string.format("Focused object:  0x%06x", mainmemory.read_u24_be(camera_object + camera_focus_pointer + 1)), null, null, 'bottomright');
 		row = row + 1;
 	end
-	if (#object_pointers > 0) then
+	
+	if #object_pointers > 0 and object_index <= #object_pointers then
 		gui.text(gui_x, gui_y + height * row, string.format("Selected object: 0x%06x", object_pointers[object_index] or 0), null, null, 'bottomright');
 		row = row + 1;
 		gui.text(gui_x, gui_y + height * row, string.format("Model pointer: 0x%06x", mainmemory.read_u24_be(object_pointers[object_index] + model_pointer + 1)), null, null, 'bottomright');
 		row = row + 1;
+
+		if grab_script_mode == "Examine" then
+			local examine_data = getExamineData(object_pointers[object_index]);
+			local i;
+			for i=1,#examine_data do
+				gui.text(gui_x, gui_y + height * row, examine_data[i][1]..": "..examine_data[i][2], null, null, 'bottomright');
+				row = row + 1;
+			end
+		end
 	end
 	gui.text(gui_x, gui_y + height * row, "Mode: "..grab_script_mode, null, null, 'bottomright');
 	row = row + 1;
+end
+
+local function isValidObject(pointer, kong_object, camera_object)
+	if grab_script_mode == "Examine" then
+		return true;
+	end
+
+	if grab_script_mode == "Camera" and pointer ~= camera_object then
+		return true;
+	end
+
+	if grab_object_mode == "Grab" or grab_object_mode == "Encircle" then
+		if pointer ~= kong_object then
+			return true;
+		end
+	end
 end
 
 local function pull_objects()
@@ -185,7 +261,7 @@ local function pull_objects()
 		object_found = (pointer ~= 0xffffff) and (pointer ~= 0x000000) and (object_no <= max_objects);
 
 		if object_found then
-			if ((grab_script_mode == "Grab" or grab_script_mode == "Encircle") and (pointer ~= kong_object)) or (grab_script_mode == "Camera" and (pointer ~= camera_object)) then
+			if isValidObject(pointer, kong_object, camera_object) then
 				local object_model_pointer = mainmemory.read_u24_be(pointer + model_pointer + 1);
 				if object_model_pointer ~= 0x000000 then
 					table.insert(object_pointers, pointer);
