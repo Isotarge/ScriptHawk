@@ -11,6 +11,8 @@ elseif bizstring.contains(romName, "Super Mario 64") then
 	Game = require "games.sm64";
 elseif bizstring.contains(romName, "Toy Story 2") then
 	Game = require "games.ts2";
+elseif bizstring.contains(romName, "Ocarina of Time") then
+	Game = require "games.oot";
 else
 	console.log("This game is not currently supported.");
 	return;
