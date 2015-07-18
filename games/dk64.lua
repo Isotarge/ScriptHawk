@@ -695,13 +695,8 @@ end
 -- DK64 - Mad Jack Minimap
 -- Written by Isotarge, 2014-2015
 -----------------------------------
-if bizstring.contains(romName, "Kiosk") then
-	console.log("The kiosk version is not supported.");
-	return;
-end
-
 local script_root = "Lua/ScriptHawk";
-local correct_map = 154;
+local mad_jack_map = 154;
 
 -- Colors
 local MJ_blue         = 0x7f00a2e8;
@@ -728,10 +723,6 @@ local MJ_kong_col_y                  = MJ_kong_row_y + MJ_minimap_height;
 local function round(x)
 	return x + 0.5 - (x + 0.5) % 1;
 end
-
--- Relative to kong model
-local x_pos = 0x7c;
-local z_pos = 0x84;
 
 local function position_to_rowcol(pos)
 	if pos < 450 then
@@ -854,7 +845,7 @@ end
 
 local function draw_mj_minimap()
 	-- Only draw minimap if the player is in the Mad Jack fight
-	if mainmemory.readbyte(map) == correct_map then
+	if mainmemory.readbyte(map) == mad_jack_map then
 		local MJ_state  = mainmemory.read_u24_be(MJ_state_pointer);
 
 		local cur_pos   = MJ_parse_position(mainmemory.readbyte(MJ_state + MJ_current_pos));
@@ -927,8 +918,6 @@ local function draw_mj_minimap()
 		end
 	end
 end
-
-
 
 ------------------------------------
 -- Never Slip                     --
@@ -1049,7 +1038,7 @@ function Game.eachFrame()
 		neverSlip();
 	end
 	
-	--Mad Jack
+	-- Mad Jack
 	if forms.ischecked(options_toggle_madjack) then
 		draw_mj_minimap();
 	end
