@@ -29,10 +29,18 @@ Game
 	function Game.eachFrame()
 	function Game.setMap(value)
 
+TODO:
+
+- Rework input/keybinds, multiple profiles like wasd/arrow keys
+- 2D game support
+- More OOT/MM version support
+- Rayman 2 rotation stuff
+- Toy story 2 stuff
+- Never slip enhancements, can't roll/kick on slopes
+- Integrate Grab Objects.lua into the DK64 module
+
 Wishlist:
 
-OOT
-MM
 Conker
 DKR
 BT
@@ -40,7 +48,6 @@ Gex
 Wave Race
 THPS 1/2/3
 Space station silicon valley
-Rayman 2
 Pokemon snap
 Monster truck madness
 
