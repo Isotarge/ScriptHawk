@@ -94,4 +94,5 @@ SystemID N64
 7FCC4C	b	u	1	RDRAM	Melons
 7FD580	d	h	1	RDRAM	Slope object pointer?
 7FDC90	d	h	1	RDRAM	Mad Jack pointer
+7E9AFE	w	u	1	RDRAM	Weird sound control?
 
