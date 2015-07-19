@@ -711,12 +711,13 @@ local function timer ()
 		timer_started = true;
 	end
 	prev_map = map_value;
-
+	
+	local temp = timer_value;
 	if timer_started then
 		timer_value = emu.framecount() - timer_start_frame;
 	end
 
-	if timer_value / 60 > 270 or timer_value < 0 then
+	if timer_value / 60 > 270 or timer_value < 0  or  timer_value - temp > 1 then
 		timer_value = 0;
 		timer_start_frame = 0;
 		timer_started = false;
@@ -1092,8 +1093,6 @@ function Game.eachFrame()
 	-- ISG Timer
 	if forms.ischecked(options_toggle_isg_timer) then
 		timer();
-	else
-		timer_started = false;
 	end
 		
 	-- Moonkick
