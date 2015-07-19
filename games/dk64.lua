@@ -1016,13 +1016,13 @@ local options_moon_mode_button;
 local options_toggle_invisify_button;
 local options_clear_tb_void_button;
 local options_force_pause_button;
+local options_force_zipper_button;
 local options_unlock_moves_button;
 
 local options_toggle_homing_ammo;
 local options_toggle_neverslip;
 
 local options_toggle_madjack;
-
 local options_toggle_isg_timer;
 
 function Game.initUI(form_handle, col, row, button_height, label_offset, dropdown_offset)
@@ -1037,10 +1037,10 @@ function Game.initUI(form_handle, col, row, button_height, label_offset, dropdow
 
 	-- Mad Jack stuff
 	options_toggle_madjack = 	 forms.checkbox(form_handle, "MJ Minimap", 		col(5), 	row(7));
-	
+
 	-- ISG Timer
 	options_toggle_isg_timer = forms.checkbox(form_handle, "ISG Timer", 		col(10), 	row(7));
-	
+
 	-- Buttons
 	options_toggle_invisify_button = forms.button(form_handle, "Invisify",      toggle_invisify, col(5), row(4), col(4) + 8, button_height);
 	options_clear_tb_void_button =   forms.button(form_handle, "Clear TB void", clear_tb_void,   col(5), row(5), col(4) + 8, button_height);
