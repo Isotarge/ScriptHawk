@@ -1,6 +1,6 @@
 local Game = {};
 
-local elmo_pointer = 0x106888;
+local elmo_pointer;
 
 -- Relative to elmo object
 local x_pos = 0x24;
@@ -16,12 +16,24 @@ Game.maps = { "Not Implemented" };
 --------------------
 
 function Game.detectVersion(romName)
-	if bizstring.contains(romName, "Europe") then
-		-- TODO
-	elseif bizstring.contains(romName, "Japan") then
-		-- TODO
-	elseif bizstring.contains(romName, "USA") then
-		-- TODO
+	if bizstring.contains(romName, "Number Journey") then
+		if bizstring.contains(romName, "Europe") then
+			-- TODO
+		elseif bizstring.contains(romName, "Japan") then
+			-- TODO
+		elseif bizstring.contains(romName, "USA") then
+			elmo_pointer = 0x106C84;
+		end
+	end
+
+	if bizstring.contains(romName, "Letter Adventure") then
+		if bizstring.contains(romName, "Europe") then
+			-- TODO
+		elseif bizstring.contains(romName, "Japan") then
+			-- TODO
+		elseif bizstring.contains(romName, "USA") then
+			elmo_pointer = 0x106888;
+		end
 	end
 end
 

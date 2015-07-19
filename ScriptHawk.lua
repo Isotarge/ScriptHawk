@@ -15,7 +15,7 @@ elseif bizstring.contains(romName, "Ocarina of Time") then
 	Game = require "games.oot";
 elseif bizstring.contains(romName, "Majora's Mask") then
 	Game = require "games.mm";
-elseif bizstring.contains(romName, "Elmo's Letter Adventure") then
+elseif bizstring.contains(romName, "Elmo's Letter Adventure") or bizstring.contains(romName, "Elmo's Number Journey") then
 	Game = require "games.elmo";
 else
 	console.log("This game is not currently supported.");
