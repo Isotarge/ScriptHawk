@@ -692,6 +692,45 @@ local function force_zipper()
 end
 
 -----------------------------------
+-- DK64 - ISG Timer
+-- Written by Isotarge, 2015
+-- Based on research by Exchord
+-----------------------------------
+
+local prev_map = 0;
+local timer_value = 0;
+local timer_start_frame = 0;
+local timer_started = false;
+
+local function timer ()
+	local map_value = mainmemory.readbyte(map);
+	if map_value == 153 and prev_map ~= 153 then
+		timer_value = 0;
+		timer_start_frame = emu.framecount();
+		timer_started = true;
+	end
+	prev_map = map_value;
+
+	if timer_started then
+		timer_value = emu.framecount() - timer_start_frame;
+	end
+
+	if timer_value / 60 > 270 or timer_value < 0 then
+		timer_value = 0;
+		timer_start_frame = 0;
+		timer_started = false;
+	end
+
+	if timer_started then
+		local s = timer_value / 60;
+		local timer_string = string.format("%.2d:%05.2f", s / 60 % 60, s % 60);
+		gui.text(16, 16, "ISG Timer: "..timer_string, null, null, 'topright');
+	else
+		gui.text(16, 16, "Waiting for ISG", null, null, 'topright');
+	end
+end
+
+-----------------------------------
 -- DK64 - Mad Jack Minimap
 -- Written by Isotarge, 2014-2015
 -----------------------------------
@@ -984,6 +1023,8 @@ local options_toggle_neverslip;
 
 local options_toggle_madjack;
 
+local options_toggle_isg_timer;
+
 function Game.initUI(form_handle, col, row, button_height, label_offset, dropdown_offset)
 	-- Key stuff
 	options_key_dropdown = forms.dropdown(form_handle, { "Key 1", "Key 2", "Key 3", "Key 4", "Key 5", "Key 6", "Key 7", "Key 8" }, col(10) + dropdown_offset, row(0) + dropdown_offset);
@@ -996,6 +1037,9 @@ function Game.initUI(form_handle, col, row, button_height, label_offset, dropdow
 
 	-- Mad Jack stuff
 	options_toggle_madjack = 	 forms.checkbox(form_handle, "MJ Minimap", 		col(5), 	row(7));
+	
+	-- ISG Timer
+	options_toggle_isg_timer = forms.checkbox(form_handle, "ISG Timer", 		col(10), 	row(7));
 	
 	-- Buttons
 	options_toggle_invisify_button = forms.button(form_handle, "Invisify",      toggle_invisify, col(5), row(4), col(4) + 8, button_height);
@@ -1043,6 +1087,10 @@ function Game.eachFrame()
 		draw_mj_minimap();
 	end
 	
+	-- ISG Timer
+	if forms.ischecked(options_toggle_isg_timer) then
+		timer();
+	end
 	-- Moonkick
 	if moon_mode == 'All' or (moon_mode == 'Kick' and mainmemory.readbyte(kong_object + kick_animation) == kick_animation_value) then
 		mainmemory.write_u16_be(kong_object + kick_freeze, kick_freeze_value);
