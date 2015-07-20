@@ -382,25 +382,26 @@ local camera_focus_pointer = 0x178;
 local kick_animation = 0x181;
 local kick_animation_value = 0x29;
 
+-- Bitfield?
+local effect_byte = 0x372;
+
 local kong_object;
 
 ---------------
 -- Key stuff --
 ---------------
 
--- USA Defaults
-local key_base;
-local key_collected_bitmasks = {
-	0x04,
-	0x04,
-	0x04,
-	0x01,
-	0x10,
-	0x10,
-	0x20,
-	0x10
-};
 local key_flag_pointer;
+local key_collected_bitmasks = {
+	2,
+	2,
+	2,
+	0,
+	4,
+	4,
+	5,
+	4
+};
 local key_offsets = {
 	0x03,
 	0x09,
@@ -421,8 +422,7 @@ local function keyGet()
 	local key_flags = mainmemory.read_u24_be(key_flag_pointer + 1);
 	if key_flags > 0x700000 and key > 0 and key < 9 then
 		local current_value = mainmemory.readbyte(key_flags + key_offsets[key]);
-		local new_value = bit.bor(current_value, key_collected_bitmasks[key]);
-		mainmemory.write_u8(key_flags + key_offsets[key], new_value);
+		mainmemory.write_u8(key_flags + key_offsets[key], set_bit(current_value, key_collected_bitmasks[key]));
 	else
 		console.log("Key get failed to execute.");
 	end
@@ -433,8 +433,7 @@ local function keyLose()
 	local key_flags = mainmemory.read_u24_be(key_flag_pointer + 1);
 	if key_flags > 0x700000 and key > 0 and key < 9 then
 		local current_value = mainmemory.readbyte(key_flags + key_offsets[key]);
-		local new_value = bit.bnot(bit.band(current_value, key_collected_bitmasks[key]));
-		mainmemory.write_u8(key_flags + key_offsets[key], new_value);
+		mainmemory.write_u8(key_flags + key_offsets[key], clear_bit(current_value, key_collected_bitmasks[key]));
 	else
 		console.log("Key lose failed to execute.");
 	end
@@ -1002,6 +1001,17 @@ local function toggle_moonmode()
 	Game.eachFrame();
 end
 
+-----------------------
+-- Effect byte stuff --
+-----------------------
+
+local function random_effect()
+	local kong_object = mainmemory.read_u24_be(kong_object_pointer);
+	local randomEffect = math.random(0, 0xffff);
+	mainmemory.write_u16_be(kong_object + effect_byte, randomEffect);
+	console.log("Activated effect: "..bizstring.binary(randomEffect));
+end
+
 ------------
 -- Events --
 ------------
@@ -1019,6 +1029,7 @@ local options_toggle_invisify_button;
 local options_clear_tb_void_button;
 local options_force_pause_button;
 local options_force_zipper_button;
+local options_random_effect_button;
 local options_unlock_moves_button;
 
 local options_toggle_homing_ammo;
@@ -1050,6 +1061,7 @@ function Game.initUI(form_handle, col, row, button_height, label_offset, dropdow
 
 	options_force_pause_button =  forms.button(form_handle, "Force Pause",   force_pause,  col(10), row(4), col(4) + 8, button_height);
 	options_force_zipper_button = forms.button(form_handle, "Force Zipper",  force_zipper, col(10), row(5), col(4) + 8, button_height);
+	options_random_effect_button = forms.button(form_handle, "Random effect", random_effect, col(10), row(6), col(4) + 8, button_height);
 
 	-- Checkboxes
 	options_toggle_homing_ammo =     forms.checkbox(form_handle, "Homing Ammo", col(0), row(6));

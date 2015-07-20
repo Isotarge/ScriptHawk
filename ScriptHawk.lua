@@ -97,6 +97,38 @@ local function increase_speedy_speed()
 	updateUIReadouts_moonjumpGameAgnostic();
 end
 
+--------------------------------
+-- Bit manipulation functions --
+--------------------------------
+
+function get_bit(field, index)
+	if index < 32 then
+		local bitmask = math.pow(2, index);
+		return bit.band(bitmask, field) == bitmask;
+	end
+	return false;
+end
+
+function set_bit(field, index)
+	if index < 32 then
+		local bitmask = math.pow(2, index);
+		return bit.bor(bitmask, field);
+	end
+	return field;
+end
+
+function clear_bit(field, index)
+	if index < 32 then
+		local bitmask = math.pow(2, index);
+		return bit.bnot(bit.band(field, bitmask));
+	end
+	return field;
+end
+
+----------------------------
+-- Other helper functions --
+----------------------------
+
 local function round(num, idp)
 	return tonumber(string.format("%." .. (idp or 0) .. "f", (num or 0)));
 end
