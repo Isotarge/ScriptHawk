@@ -1,18 +1,6 @@
-max_boolean_inputs = 2;
-booleanInputsReference = {
-	"C Down",
-	"C Left",
-	"C Right",
-	"C Up",
-	"L",
-	"R",
-	"A",
-	"B",
-	"Z"
-}
-
-function pickRandomUniqueIndex(reference, alreadyChosen)
-	indexFound = false;
+local function pickRandomUniqueIndex(reference, alreadyChosen)
+	local indexFound = false;
+	local index;
 	while not indexFound do
 		index = math.random(#reference);
 		indexFound = true;
@@ -26,14 +14,54 @@ function pickRandomUniqueIndex(reference, alreadyChosen)
 	return index;
 end
 
-function generateBooleanInputs()
-	numInputs = math.random(0, max_boolean_inputs);
-	indexes = {};
+------------
+-- Analog --
+------------
+
+local function getRandomAnalog()
+	return math.random(-127, 128);
+end
+
+local x = getRandomAnalog();
+local y = getRandomAnalog();
+
+local function generateAnalogInputs()
+	return {
+		["X Axis"] = x,
+		["Y Axis"] = y
+	};
+end
+
+local analogCounter = 0;
+local analogMaxMax = 200;
+local analogMax = math.random(1, analogMaxMax);
+
+-------------
+-- Boolean --
+-------------
+
+local max_boolean_inputs = 2;
+local booleanInputsReference = {
+	"C Down",
+	"C Left",
+	"C Right",
+	"C Up",
+	"L",
+	"R",
+	"A",
+	"B",
+	"Z"
+}
+
+local function generateBooleanInputs()
+	local numInputs = math.random(0, max_boolean_inputs);
+	local indexes = {};
 	while #indexes < numInputs do
 		table.insert(indexes, pickRandomUniqueIndex(booleanInputsReference, indexes));
 	end
 
-	chosenInputs = {};
+	local chosenInputs = {};
+	local i;
 	for i=0,#booleanInputsReference - 1 do
 		chosenInputs[booleanInputsReference[i + 1]] = false;
 		for j=0,#indexes do
@@ -45,30 +73,12 @@ function generateBooleanInputs()
 	return chosenInputs;
 end
 
-function generateAnalogInputs()
-	return {
-		["X Axis"] = x,
-		["Y Axis"] = y
-	};
-end
+local booleanInputs = generateBooleanInputs();
+local booleanCounter = 0;
+local booleanMaxMax = 59;
+local booleanMax = math.random(1, booleanMaxMax);
 
-function getRandomAnalog()
-	return math.random(-127, 128);
-end
-
-x = getRandomAnalog();
-y = getRandomAnalog();
-
-analogCounter = 0;
-analogMaxMax = 200;
-analogMax = math.random(1, analogMaxMax);
-
-booleanInputs = generateBooleanInputs();
-booleanCounter = 0;
-booleanMaxMax = 59;
-booleanMax = math.random(1, booleanMaxMax);
-
-function randomPress()
+local function randomPress()
 	if not emu.islagged() then
 		analogCounter = analogCounter + 1;
 		if analogCounter >= analogMax then
