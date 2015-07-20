@@ -395,24 +395,12 @@ local kong_object;
 
 local key_flag_pointer;
 local key_collected_bitmasks = {
-	2,
-	2,
-	2,
-	0,
-	4,
-	4,
-	5,
-	4
+	2, 2, 2, 0,
+	4, 4, 5, 4
 };
 local key_offsets = {
-	0x03,
-	0x09,
-	0x11,
-	0x15,
-	0x1d,
-	0x24,
-	0x27,
-	0x2f
+	0x03, 0x09, 0x11, 0x15,
+	0x1d, 0x24, 0x27, 0x2f
 };
 
 local options_key_dropdown;
