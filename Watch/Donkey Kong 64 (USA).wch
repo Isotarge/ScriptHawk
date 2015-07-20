@@ -44,6 +44,7 @@ SystemID N64
 76A0AB	b	h	1	RDRAM	Background?
 76A0CD	b	u	1	RDRAM	Adventure
 76A0DA	b	h	1	RDRAM	Mystery Menu
+7E9AFE	w	u	1	RDRAM	Weird sound control?
 7ECED7	b	u	1	RDRAM	KeysCoinsCollected
 7ECEF3	b	u	1	RDRAM	Fairies
 7ED0B4	b	h	1	RDRAM	Helm BoM off (Bitflag?)
@@ -94,5 +95,4 @@ SystemID N64
 7FCC4C	b	u	1	RDRAM	Melons
 7FD580	d	h	1	RDRAM	Slope object pointer?
 7FDC90	d	h	1	RDRAM	Mad Jack pointer
-7E9AFE	w	u	1	RDRAM	Weird sound control?
 

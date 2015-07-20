@@ -457,9 +457,9 @@ function Game.detectVersion(romName)
 		pointer_list        = 0x7fbff0;
 		kongbase            = 0x7fc950;
 		global_base         = 0x7fcc41;
+
 		--Mad Jack
 		MJ_state_pointer   = 0x7fdc91;
-		-- Mad Jack state
 		MJ_time_until_next_action = 0x2d;
 		MJ_actions_remaining      = 0x58;
 		MJ_action_type            = 0x59;
@@ -478,9 +478,9 @@ function Game.detectVersion(romName)
 		pointer_list        = 0x7fbf10;
 		kongbase            = 0x7fc890;
 		global_base         = 0x7fcb81;
+
 		--Mad Jack
 		MJ_state_pointer   = 0x7FDBD1;
-		-- Mad Jack state
 		MJ_time_until_next_action = 0x25;
 		MJ_actions_remaining      = 0x60;
 		MJ_action_type            = 0x61;
@@ -499,9 +499,9 @@ function Game.detectVersion(romName)
 		pointer_list        = 0x7fc460;
 		kongbase            = 0x7fcde0;
 		global_base         = 0x7fd0d1;
+
 		--Mad Jack
 		MJ_state_pointer   = 0x7fe121;
-		-- Mad Jack state
 		MJ_time_until_next_action = 0x25;
 		MJ_actions_remaining      = 0x60;
 		MJ_action_type            = 0x61;
@@ -519,7 +519,7 @@ function Game.detectVersion(romName)
 		pointer_list        = 0x7b5e58;
 		kongbase            = 0x7fc950; -- TODO
 		global_base         = 0x7fcc41; -- TODO
-		
+
 		-- TODO: Keys?
 
 		x_rot = 0xD8;
