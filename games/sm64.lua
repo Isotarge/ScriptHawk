@@ -2,12 +2,12 @@ local Game = {};
 
 -- USA Defaults
 local x_pos = 0x33b1ac;
-local y_pos;
-local z_pos;
+local y_pos = x_pos + 4;
+local z_pos = y_pos + 4;
 
 local x_rot = 0x33b19c;
-local y_rot;
-local z_rot;
+local y_rot = x_rot;
+local z_rot = y_rot;
 
 local map = 0x32DDF8;
 
@@ -61,14 +61,14 @@ function Game.detectVersion(romName)
 		x_rot = 0x30945c;
 		x_pos = 0x30946c;
 		map = 0x2F9FC8;
-	elseif bizstring.contains(romName, "Japan") and not bizstring.contains(romName, "Shindou Edition") then
-		x_rot = 0x339e2c;
-		x_pos = 0x339e3c;
-		map = 0x32CE98;
 	elseif bizstring.contains(romName, "Japan") and bizstring.contains(romName, "Shindou Edition") then
 		x_rot = 0x31d9ec;
 		x_pos = 0x31d9fc;
 		map = 0x30D528;
+	elseif bizstring.contains(romName, "Japan") then
+		x_rot = 0x339e2c;
+		x_pos = 0x339e3c;
+		map = 0x32CE98;
 	end
 	y_pos = x_pos + 4;
 	z_pos = y_pos + 4;

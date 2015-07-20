@@ -355,6 +355,8 @@ local kick_freeze_value = 0xc020;
 
 local light_thing = 0xcc; -- Values 0x00->0x14
 
+local slope_byte = 0xDE;
+
 local x_rot = 0xe4;
 local y_rot = 0xe6;
 local z_rot = 0xe8;
@@ -964,14 +966,11 @@ end
 ------------------------------------
 
 -- Pointers
+-- TODO - Find this in other versions
 local slope_object_pointer = 0x7f94b9;
-local slope_object_pointer_2 = 0x7fd581;
 
 -- Relative to slope object
 local slope_timer = 0xc3;
-
--- Relative to kong object
-local slope_byte = 0xDE;
 
 local function neverSlip()
 	-- Patch the slope timer
