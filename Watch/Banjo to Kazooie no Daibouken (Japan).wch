@@ -1,4 +1,7 @@
 Domain RDRAM
 SystemID N64
+37CFBC	w	1	1	RDRAM	Y Velocity
 37F405	b	h	1	RDRAM	Map
+386AA3	b	u	1	RDRAM	Notes (On hand)
+386B31	b	u	1	RDRAM	Notes (Total)
 

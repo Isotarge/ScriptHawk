@@ -1,16 +1,29 @@
 Domain RDRAM
 SystemID N64
+36C4EC	w	u	1	RDRAM	Menu item 1 Y Position
+36C4EE	b	u	1	RDRAM	Menu Item 1 Portrait
+36C4FC	w	u	1	RDRAM	Menu Item 2 Y Position
+36C4FE	b	u	1	RDRAM	Menu Item 2 Portrait
+36C50C	w	u	1	RDRAM	Menu Item 3 Y Position
+36C50E	b	u	1	RDRAM	Menu Item 3 Portrait
+36C51C	w	u	1	RDRAM	Menu Item 4 Y Position
+36C51E	b	u	1	RDRAM	Menu Item 4 Portrait
+37C4BC	w	1	1	RDRAM	Y Velocity
 37C5A0	d	f	1	RDRAM	X Position
 37C5A4	d	f	1	RDRAM	Y Position
 37C5A8	d	f	1	RDRAM	Z Position
 37E8F5	b	h	1	RDRAM	Map
-385F63	b	u	1	RDRAM	Notes - TODO: Does this work?
-385F67	b	u	1	RDRAM	Eggs
+383012	b	h	1	RDRAM	Current Pause Menu Item
+385F63	b	u	1	RDRAM	Notes (on hand)
+385F64	d	u	1	RDRAM	Eggs
 385F6F	b	u	1	RDRAM	Red Feathers
 385F73	b	u	1	RDRAM	Gold Feathers
 385F83	b	u	1	RDRAM	Health
-385F8B	b	u	1	RDRAM	Lives
+385F84	d	s	1	RDRAM	Health Containers
+385F88	d	s	1	RDRAM	Lives
 385F8E	b	u	1	RDRAM	Air
-385FC7	b	u	1	RDRAM	Mumbo Tokens
-385FCB	b	u	1	RDRAM	Jiggies
+385F8F	b	u	1	RDRAM	Air Timer
+385FC4	d	u	1	RDRAM	Mumbo Tokens
+385FCB	b	u	1	RDRAM	Jiggies (on hand)
+386018	d	f	1	RDRAM	Game Time (Current Level)
 

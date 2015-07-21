@@ -1,12 +1,10 @@
 local Game = {};
 
-local x_pos = 0x0bb070;
-local y_pos = 0x0bb074;
-local z_pos = 0x0bb078;
+local x_pos;
+local y_pos;
+local z_pos;
 
-local x_rot = 0x0bb0b8;
-local y_rot = x_rot;
-local z_rot = y_rot;
+local facing_angle;
 
 Game.maps = { "Not Implemented" };
 
@@ -17,11 +15,21 @@ Game.maps = { "Not Implemented" };
 function Game.detectVersion(romName)
 	if bizstring.contains(romName, "Europe") then
 		-- TODO
+		return false;
 	elseif bizstring.contains(romName, "Japan") then
 		-- TODO
+		return false;
 	elseif bizstring.contains(romName, "USA") then
-		-- TODO
+		x_pos = 0x0bb070;
+		y_pos = 0x0bb074;
+		z_pos = 0x0bb078;
+
+		facing_angle = 0x0bb0b8;
+	else
+		return false;
 	end
+
+	return true;
 end
 
 -------------------
@@ -71,27 +79,27 @@ end
 --------------
 
 function Game.getXRotation()
-	return mainmemory.read_u16_be(x_rot);
+	return mainmemory.read_u16_be(facing_angle);
 end
 
 function Game.getYRotation()
-	return mainmemory.read_u16_be(y_rot);
+	return mainmemory.read_u16_be(facing_angle);
 end
 
 function Game.getZRotation()
-	return mainmemory.read_u16_be(z_rot);
+	return mainmemory.read_u16_be(facing_angle);
 end
 
 function Game.setXRotation(value)
-	mainmemory.write_u16_be(x_rot, value);
+	mainmemory.write_u16_be(facing_angle, value);
 end
 
 function Game.setYRotation(value)
-	mainmemory.write_u16_be(y_rot, value);
+	mainmemory.write_u16_be(facing_angle, value);
 end
 
 function Game.setZRotation(value)
-	mainmemory.write_u16_be(z_rot, value);
+	mainmemory.write_u16_be(facing_angle, value);
 end
 
 ------------

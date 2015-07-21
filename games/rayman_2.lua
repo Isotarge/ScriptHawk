@@ -1,12 +1,12 @@
 local Game = {};
 
-local x_pos = 0x1C6B34;
-local y_pos = 0x1C6B3C;
-local z_pos = 0x1C6B38;
+local x_pos;
+local y_pos;
+local z_pos;
 
-local x_rot = 0x1C69BC; -- TODO
-local y_rot = 0; -- TODO
-local z_rot = 0x1C69C0; -- TODO
+local x_rot;
+local y_rot;
+local z_rot;
 
 Game.maps = { "Not Implemented" };
 
@@ -17,11 +17,24 @@ Game.maps = { "Not Implemented" };
 function Game.detectVersion(romName)
 	if bizstring.contains(romName, "Europe") then
 		-- TODO
+		return false;
 	elseif bizstring.contains(romName, "Japan") then
 		-- TODO
+		return false;
 	elseif bizstring.contains(romName, "USA") then
 		-- TODO
+		x_pos = 0x1C6B34;
+		y_pos = 0x1C6B3C;
+		z_pos = 0x1C6B38;
+
+		x_rot = 0x1C69BC; -- TODO
+		y_rot = 0; -- TODO
+		z_rot = 0x1C69C0; -- TODO
+	else
+		return false;
 	end
+
+	return true;
 end
 
 -------------------

@@ -15,25 +15,32 @@ Extra Lua scripts and RAM watches for the [BizHawk](https://github.com/TASVideos
 ##Supported Games
 ###Donkey Kong 64
 - Europe
-- USA
 - Japan
 - Kiosk Demo
+- USA
 
 ###Banjo Kazooie
 - Europe
-- USA 1.0 and 1.1
 - Japan
+- USA 1.0 and 1.1
 
 ###Super Mario 64
 - Europe
+- Japan 1.0 and Shindou Edition
 - USA
-- Japan
-- Shindou Edition
+
+###The Legend of Zelda: Majora's Mask
+- Europe 1.0 and 1.1
+- Japan 1.0 and 1.1
+- USA 1.0
+
+###The Legend of Zelda: Ocarina of Time
+- Europe 1.0, 1.1 and Master Quest
+- Japan 1.0, 1.1 and 1.2
+- USA 1.0, 1.1 and 1.2
 
 ##Partially Supported Games
-- Elmo's Number Journey (N64)
-- Elmo's Letter Adventure (N64)
-- Toy Story 2: Buzz Lightyear to the Rescue (N64)
-- Rayman 2 (N64)
-- The Legend of Zelda: Ocarina of Time
-- The Legend of Zelda: Majora's Mask
+- Elmo's Number Journey (N64 only)
+- Elmo's Letter Adventure (N64 only)
+- Rayman 2 (N64 USA only)
+- Toy Story 2: Buzz Lightyear to the Rescue (N64 USA only)

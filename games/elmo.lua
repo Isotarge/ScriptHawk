@@ -16,25 +16,19 @@ Game.maps = { "Not Implemented" };
 --------------------
 
 function Game.detectVersion(romName)
-	if bizstring.contains(romName, "Number Journey") then
-		if bizstring.contains(romName, "Europe") then
-			-- TODO
-		elseif bizstring.contains(romName, "Japan") then
-			-- TODO
-		elseif bizstring.contains(romName, "USA") then
+	if emu.getsystemid() == "N64" then
+		if bizstring.contains(romName, "Number Journey") and bizstring.contains(romName, "USA") then
 			elmo_pointer = 0x106C84;
+			return true;
+		end
+
+		if bizstring.contains(romName, "Letter Adventure") and bizstring.contains(romName, "USA") then
+			elmo_pointer = 0x106888;
+			return true;
 		end
 	end
 
-	if bizstring.contains(romName, "Letter Adventure") then
-		if bizstring.contains(romName, "Europe") then
-			-- TODO
-		elseif bizstring.contains(romName, "Japan") then
-			-- TODO
-		elseif bizstring.contains(romName, "USA") then
-			elmo_pointer = 0x106888;
-		end
-	end
+	return false;
 end
 
 -------------------
@@ -105,15 +99,18 @@ function Game.getZRotation()
 end
 
 function Game.setXRotation(value)
-	-- TODO
+	local elmo_object = mainmemory.read_u24_be(elmo_pointer + 1);
+	return mainmemory.writefloat(elmo_object + facing_angle, value - 1, true);
 end
 
 function Game.setYRotation(value)
-	-- TODO
+	local elmo_object = mainmemory.read_u24_be(elmo_pointer + 1);
+	return mainmemory.writefloat(elmo_object + facing_angle, value - 1, true);
 end
 
 function Game.setZRotation(value)
-	-- TODO
+	local elmo_object = mainmemory.read_u24_be(elmo_pointer + 1);
+	return mainmemory.writefloat(elmo_object + facing_angle, value - 1, true);
 end
 
 ------------

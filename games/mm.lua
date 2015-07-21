@@ -4,7 +4,9 @@ local x_pos;
 local y_pos;
 local z_pos;
 
+local x_rot;
 local facing_angle;
+local y_rot;
 
 Game.maps = { "Not Implemented" };
 
@@ -14,26 +16,45 @@ Game.maps = { "Not Implemented" };
 
 function Game.detectVersion(romName)
 	if bizstring.contains(romName, "Europe") or bizstring.contains(romName, "(E)") then
-		x_pos = 0x3F7274;
-		facing_angle = 0x3F730E;
+		if bizstring.contains(romName, "Rev A") then
+			x_pos = 0x3F7614;
+			facing_angle = 0x3F76AE;
+		else
+			x_pos = 0x3F7274;
+			facing_angle = 0x3F730E;
+		end
 	elseif bizstring.contains(romName, "Japan") then
-		-- TODO
+		if bizstring.contains(romName, "Rev A") then
+			x_pos = 0x400284;
+			facing_angle = 0x40031E;
+		else
+			x_pos = 0x3FFFC4;
+			facing_angle = 0x40005E;
+		end
 	elseif bizstring.contains(romName, "USA") then
 		x_pos = 0x3FFDD4;
 		facing_angle = 0x3FFE6E;
+	else
+		return false;
 	end
+
 	y_pos = x_pos + 4;
 	z_pos = y_pos + 4;
+
+	x_rot = facing_angle - 2;
+	z_rot = facing_angle + 2;
+
+	return true;
 end
 
 -------------------
 -- Physics/Scale --
 -------------------
 
-Game.speedy_speeds = { .001, .01, .1, 1, 5, 10, };
-Game.speedy_index = 4;
+Game.speedy_speeds = { 1, 5, 10 };
+Game.speedy_index = 2;
 
-Game.rot_speed = 10;
+Game.rot_speed = 64;
 Game.max_rot_units = 0xffff;
 
 function Game.isPhysicsFrame()
@@ -73,7 +94,7 @@ end
 --------------
 
 function Game.getXRotation()
-	return mainmemory.read_u16_be(facing_angle);
+	return mainmemory.read_u16_be(x_rot);
 end
 
 function Game.getYRotation()
@@ -81,11 +102,11 @@ function Game.getYRotation()
 end
 
 function Game.getZRotation()
-	return mainmemory.read_u16_be(facing_angle);
+	return mainmemory.read_u16_be(z_rot);
 end
 
 function Game.setXRotation(value)
-	mainmemory.write_u16_be(facing_angle, value);
+	mainmemory.write_u16_be(x_rot, value);
 end
 
 function Game.setYRotation(value)
@@ -93,7 +114,7 @@ function Game.setYRotation(value)
 end
 
 function Game.setZRotation(value)
-	mainmemory.write_u16_be(facing_angle, value);
+	mainmemory.write_u16_be(z_rot, value);
 end
 
 ------------

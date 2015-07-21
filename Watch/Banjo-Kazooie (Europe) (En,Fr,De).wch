@@ -1,4 +1,21 @@
 Domain RDRAM
 SystemID N64
+37CE8C	w	1	1	RDRAM	Y Velocity
+37CF70	d	f	1	RDRAM	X Position
+37CF74	d	f	1	RDRAM	Y Position
+37CF78	d	f	1	RDRAM	Z Position
+37D064	d	f	1	RDRAM	Facing angle
 37F2C5	b	h	1	RDRAM	Map
+386943	b	u	1	RDRAM	Notes (on hand)
+386947	b	u	1	RDRAM	Eggs
+38694F	b	u	1	RDRAM	Red Feathers
+386953	b	u	1	RDRAM	Gold Feathers
+386963	b	u	1	RDRAM	Health
+386967	b	u	1	RDRAM	Health Containers
+38696B	b	u	1	RDRAM	Lives
+38696E	b	u	1	RDRAM	Air
+38696F	b	u	1	RDRAM	Air timer
+386980	d	u	1	RDRAM	Mumbo Tokens
+3869A8	d	s	1	RDRAM	Jiggies (on hand)
+386A0C	d	f	1	RDRAM	Game Time (seconds)
 

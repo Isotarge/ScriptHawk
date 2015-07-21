@@ -542,6 +542,8 @@ function Game.detectVersion(romName)
 		--230-240 Crash
 		--241 Partially loads (kong position changes), then crashes
 		--242-255 Crash
+	else
+		return false;
 	end
 
 	-- Read EEPROM checksums
@@ -552,6 +554,8 @@ function Game.detectVersion(romName)
 		end
 	end
 	memory.usememorydomain("RDRAM");
+
+	return true;
 end
 
 -------------------

@@ -1,5 +1,6 @@
 Domain RDRAM
 SystemID N64
+37B6BC	w	1	1	RDRAM	Y Velocity
 37B7A0	d	f	1	RDRAM	X Position
 37B7A4	d	f	1	RDRAM	Y Position
 37B7A8	d	f	1	RDRAM	Z Position

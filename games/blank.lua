@@ -5,7 +5,7 @@ local y_pos = 0;
 local z_pos = 0;
 
 local x_rot = 0;
-local y_rot = 0;
+local facing_angle = 0;
 local z_rot = 0;
 
 Game.maps = { "Not Implemented" };
@@ -21,7 +21,11 @@ function Game.detectVersion(romName)
 		-- TODO
 	elseif bizstring.contains(romName, "USA") then
 		-- TODO
+	else
+		return false;
 	end
+
+	return true;
 end
 
 -------------------

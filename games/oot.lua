@@ -4,7 +4,9 @@ local x_pos;
 local y_pos;
 local z_pos;
 
+local x_rot;
 local facing_angle;
+local z_rot;
 
 Game.maps = { "Not Implemented" };
 
@@ -15,7 +17,8 @@ Game.maps = { "Not Implemented" };
 function Game.detectVersion(romName)
 	if bizstring.contains(romName, "Europe") or bizstring.contains(romName, "(E)") then
 		if bizstring.contains(romName, "Rev A") then
-			-- TODO
+			x_pos = 0x1D8AD4;
+			facing_angle = 0x1D8B66;
 		elseif bizstring.contains(romName, "Master Quest") then
 			x_pos = 0x1D9394;
 			facing_angle = 0x1D9426;
@@ -24,29 +27,48 @@ function Game.detectVersion(romName)
 			facing_angle = 0x1D8B26;
 		end
 	elseif bizstring.contains(romName, "Japan") then
-		-- TODO
-	elseif bizstring.contains(romName, "USA") then
 		if bizstring.contains(romName, "Rev A") then
-			-- TODO
+			x_pos = 0x1DAC14;
+			facing_angle = 0x1DACA6;
 		elseif bizstring.contains(romName, "Rev B") then
 			x_pos = 0x1DB314;
 			facing_angle = 0x1DB3A6;
 		else
-			-- TODO
+			x_pos = 0x1DAA54;
+			facing_angle = 0x1DAAE6;
 		end
+	elseif bizstring.contains(romName, "USA") then
+		if bizstring.contains(romName, "Rev A") then
+			x_pos = 0x1DAC14;
+			facing_angle = 0x1DACA6;
+		elseif bizstring.contains(romName, "Rev B") then
+			x_pos = 0x1DB314;
+			facing_angle = 0x1DB3A6;
+		else
+			x_pos = 0x1DAA54;
+			facing_angle = 0x1DAAE6;
+		end
+	else
+		return false;
 	end
+
 	y_pos = x_pos + 4;
 	z_pos = y_pos + 4;
+
+	x_rot = facing_angle - 2;
+	z_rot = facing_angle + 2;
+
+	return true;
 end
 
 -------------------
 -- Physics/Scale --
 -------------------
 
-Game.speedy_speeds = { .001, .01, .1, 1, 5, 10, };
-Game.speedy_index = 4;
+Game.speedy_speeds = { 1, 5, 10 };
+Game.speedy_index = 2;
 
-Game.rot_speed = 10;
+Game.rot_speed = 64;
 Game.max_rot_units = 0xffff;
 
 function Game.isPhysicsFrame()
@@ -86,7 +108,7 @@ end
 --------------
 
 function Game.getXRotation()
-	return mainmemory.read_u16_be(facing_angle);
+	return mainmemory.read_u16_be(x_rot);
 end
 
 function Game.getYRotation()
@@ -94,11 +116,11 @@ function Game.getYRotation()
 end
 
 function Game.getZRotation()
-	return mainmemory.read_u16_be(facing_angle);
+	return mainmemory.read_u16_be(z_rot);
 end
 
 function Game.setXRotation(value)
-	mainmemory.write_u16_be(facing_angle, value);
+	mainmemory.write_u16_be(x_rot, value);
 end
 
 function Game.setYRotation(value)
@@ -106,7 +128,7 @@ function Game.setYRotation(value)
 end
 
 function Game.setZRotation(value)
-	mainmemory.write_u16_be(facing_angle, value);
+	mainmemory.write_u16_be(z_rot, value);
 end
 
 ------------

@@ -11,9 +11,9 @@ elseif bizstring.contains(romName, "Super Mario 64") then
 	Game = require "games.sm64";
 elseif bizstring.contains(romName, "Toy Story 2") then
 	Game = require "games.ts2";
-elseif bizstring.contains(romName, "Ocarina of Time") then
+elseif bizstring.contains(romName, "Ocarina of Time") or bizstring.contains(romName, "Toki no Ocarina") then
 	Game = require "games.oot";
-elseif bizstring.contains(romName, "Majora's Mask") then
+elseif bizstring.contains(romName, "Majora's Mask") or bizstring.contains(romName, "Mujura no Kamen") then
 	Game = require "games.mm";
 elseif bizstring.contains(romName, "Elmo's Letter Adventure") or bizstring.contains(romName, "Elmo's Number Journey") then
 	Game = require "games.elmo";
@@ -22,7 +22,10 @@ else
 	return;
 end
 
-Game.detectVersion(romName);
+if not Game.detectVersion(romName) then
+	console.log("This version of the game is not currently supported.");
+	return;
+end
 
 --------------
 -- Keybinds --

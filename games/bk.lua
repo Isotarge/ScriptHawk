@@ -4,6 +4,8 @@ local Game = {};
 -- Region/Version --
 --------------------
 
+local y_vel;
+
 local x_pos;
 local y_pos;
 local z_pos;
@@ -15,20 +17,25 @@ local z_rot;
 local map;
 
 local notes;
-local eggs;
-local red_feathers;
-local gold_feathers;
-local health;
-local lives;
-local air;
-local mumbo_tokens;
-local jiggies;
+
+-- Relative to notes
+local eggs = 4;
+local red_feathers = 12;
+local gold_feathers = 16;
+local health = 32;
+local health_containers = 36;
+local lives = 40;
+local air = 43;
+local air_timer = 44;
+local mumbo_tokens = 100;
+local jiggies = 104;
 
 local max_notes = 100;
 local max_eggs = 200;
 local max_red_feathers = 50;
 local max_gold_feathers = 10;
-local max_health = 69;
+local max_health = 16;
+local max_health_containers = 16;
 local max_lives = 9;
 local max_air = 14;
 local max_mumbo_tokens = 99;
@@ -208,53 +215,31 @@ Game.maps = {
 
 function Game.detectVersion(romName)
 	if bizstring.contains(romName, "Europe") then
+		y_vel = 0x37CE8C;
 		x_pos = 0x37cf70;
 		x_rot = 0x37d064;
 		map = 0x37F2C5;
-
-		notes         = 0x386943;
-		eggs          = 0x386947;
-		red_feathers  = 0x38694F;
-		gold_feathers = 0x386953;
-		health        = 0x386963;
-		lives         = 0x38696B;
-		air           = 0x38696E;
-		mumbo_tokens  = 0x3869A7;
-		jiggies       = 0x3869AB;
+		notes = 0x386943;
 	elseif bizstring.contains(romName, "Japan") then
+		y_vel = 0x37CFBC;
 		x_pos = 0x37d0a0;
 		x_rot = 0x37d194;
 		map = 0x37F405;
-		
-		-- TODO - Collectables
-	elseif bizstring.contains(romName, "USA") and not bizstring.contains(romName, "Rev A") then
-		x_pos = 0x37c5a0;
-		x_rot = 0x37c694;
-		map = 0x37E8F5;
-
-		notes         = 0x385F63;
-		eggs          = 0x385F67;
-		red_feathers  = 0x385F6F;
-		gold_feathers = 0x385F73;
-		health        = 0x385F83;
-		lives         = 0x385F8B;
-		air           = 0x385F8E;
-		mumbo_tokens  = 0x385FC7;
-		jiggies       = 0x385FCB;
+		notes = 0x386AA3;
 	elseif bizstring.contains(romName, "USA") and bizstring.contains(romName, "Rev A") then
+		y_vel = 0x37B6BC;
 		x_pos = 0x37b7a0;
 		x_rot = 0x37b894;
 		map = 0x37DAF5;
-
-		notes         = 0x385183;
-		eggs          = 0x385187;
-		red_feathers  = 0x38518F;
-		gold_feathers = 0x385193;
-		health        = 0x3851A3;
-		lives         = 0x3851AB;
-		air           = 0x3851AE;
-		mumbo_tokens  = 0x3851E7;
-		jiggies       = 0x3851EB;
+		notes = 0x385183;
+	elseif bizstring.contains(romName, "USA") then
+		y_vel = 0x37C4BC;
+		x_pos = 0x37c5a0;
+		x_rot = 0x37c694;
+		map = 0x37E8F5;
+		notes = 0x385F63;
+	else
+		return false;
 	end
 
 	y_pos = x_pos + 4;
@@ -270,6 +255,8 @@ function Game.detectVersion(romName)
 		end
 	end
 	memory.usememorydomain("RDRAM");
+
+	return true;
 end
 
 -------------------
@@ -310,6 +297,9 @@ end
 function Game.setYPosition(value)
 	mainmemory.writefloat(y_pos, value, true);
 	mainmemory.writefloat(y_pos + 0x10, value, true);
+
+	-- Nullify gravity when setting Y position
+	mainmemory.write_u16_be(y_vel, 17376);
 end
 
 function Game.setZPosition(value)
@@ -357,14 +347,14 @@ end
 
 function Game.applyInfinites()
 	mainmemory.writebyte(notes, max_notes);
-	mainmemory.writebyte(eggs, max_eggs);
-	mainmemory.writebyte(red_feathers, max_red_feathers);
-	mainmemory.writebyte(gold_feathers, max_gold_feathers);
-	mainmemory.writebyte(health, max_health);
-	mainmemory.writebyte(lives, max_lives);
-	mainmemory.writebyte(air, max_air);
-	mainmemory.writebyte(mumbo_tokens, max_mumbo_tokens);
-	mainmemory.writebyte(jiggies, max_jiggies);
+	mainmemory.writebyte(notes + eggs, max_eggs);
+	mainmemory.writebyte(notes + red_feathers, max_red_feathers);
+	mainmemory.writebyte(notes + gold_feathers, max_gold_feathers);
+	mainmemory.writebyte(notes + health, max_health);
+	mainmemory.writebyte(notes + lives, max_lives);
+	mainmemory.writebyte(notes + air, max_air);
+	mainmemory.writebyte(notes + mumbo_tokens, max_mumbo_tokens);
+	mainmemory.writebyte(notes + jiggies, max_jiggies);
 end
 
 function Game.initUI(form_handle, col, row, button_height, label_offset, dropdown_offset)
