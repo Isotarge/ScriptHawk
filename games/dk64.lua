@@ -384,6 +384,10 @@ local camera_focus_pointer = 0x178;
 local kick_animation = 0x181;
 local kick_animation_value = 0x29;
 
+local scale = {
+	0x344, 0x348, 0x34C, 0x350, 0x354
+}
+
 -- Bitfield?
 local effect_byte = 0x372;
 
@@ -996,10 +1000,23 @@ end
 -- Effect byte stuff --
 -----------------------
 
+local function applyScale(desired_scale)
+	local kong_object = mainmemory.read_u24_be(kong_object_pointer);
+	local i;
+	for i=1,#scale do
+		mainmemory.writefloat(kong_object + scale[i], desired_scale, true);
+	end
+end
+
 local function random_effect()
+	-- Randomly manipulate the effect byte
 	local kong_object = mainmemory.read_u24_be(kong_object_pointer);
 	local randomEffect = math.random(0, 0xffff);
 	mainmemory.write_u16_be(kong_object + effect_byte, randomEffect);
+
+	-- Randomly resize the kong
+	applyScale(0.01 + math.random() * 0.49);
+
 	console.log("Activated effect: "..bizstring.binary(randomEffect));
 end
 
