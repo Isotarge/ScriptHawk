@@ -4,6 +4,9 @@ local Game = {};
 -- Region/Version --
 --------------------
 
+-- Only patch US 1.0
+local allowFurnaceFunPatch = false;
+
 local y_vel;
 
 local x_pos;
@@ -11,7 +14,7 @@ local y_pos;
 local z_pos;
 
 local x_rot;
-local y_rot;
+local facing_angle;
 local z_rot;
 
 local map;
@@ -233,6 +236,7 @@ function Game.detectVersion(romName)
 		map = 0x37DAF5;
 		notes = 0x385183;
 	elseif bizstring.contains(romName, "USA") then
+		allowFurnaceFunPatch = true;
 		y_vel = 0x37C4BC;
 		x_pos = 0x37c5a0;
 		x_rot = 0x37c694;
@@ -244,7 +248,7 @@ function Game.detectVersion(romName)
 
 	y_pos = x_pos + 4;
 	z_pos = y_pos + 4;
-	y_rot = x_rot;
+	facing_angle = x_rot;
 	z_rot = x_rot;
 
 	-- Read EEPROM checksums
@@ -257,6 +261,25 @@ function Game.detectVersion(romName)
 	memory.usememorydomain("RDRAM");
 
 	return true;
+end
+
+-----------------------
+-- Furnace fun stuff --
+-----------------------
+
+local function applyFurnaceFunPatch()
+	if allowFurnaceFunPatch then
+		mainmemory.write_u16_be(0x320064, 0x080a);
+		mainmemory.write_u16_be(0x320066, 0x1840);
+
+		mainmemory.write_u16_be(0x286100, 0xac86);
+		mainmemory.write_u16_be(0x286102, 0x2dc8);
+		mainmemory.write_u16_be(0x286104, 0x0c0c);
+		mainmemory.write_u16_be(0x286106, 0x8072);
+
+		mainmemory.write_u16_be(0x28610C, 0x080c);
+		mainmemory.write_u16_be(0x28610E, 0x801b);
+	end
 end
 
 -------------------
@@ -316,7 +339,7 @@ function Game.getXRotation()
 end
 
 function Game.getYRotation()
-	return mainmemory.readfloat(y_rot, true);
+	return mainmemory.readfloat(facing_angle, true);
 end
 
 function Game.getZRotation()
@@ -328,7 +351,7 @@ function Game.setXRotation(value)
 end
 
 function Game.setYRotation(value)
-	mainmemory.writefloat(y_rot, value, true);
+	mainmemory.writefloat(facing_angle, value, true);
 end
 
 function Game.setZRotation(value)
@@ -362,6 +385,9 @@ function Game.initUI(form_handle, col, row, button_height, label_offset, dropdow
 end
 
 function Game.eachFrame()
+	-- Furnace fun patch
+	applyFurnaceFunPatch();
+
 	-- Check EEPROM checksums
 	if memory.usememorydomain("EEPROM") then
 		local i, checksum_value;
