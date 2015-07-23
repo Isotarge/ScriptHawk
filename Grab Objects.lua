@@ -204,6 +204,7 @@ local function draw_gui()
 
 	gui.text(gui_x, gui_y + height * row, "Index: "..object_index.."/"..#object_pointers, null, null, 'bottomright');
 	row = row + 1;
+
 	if grab_script_mode == "Grab" then
 		local kong_object = mainmemory.read_u24_be(kong_model_pointer);
 		gui.text(gui_x, gui_y + height * row, string.format("Grabbed object:  0x%06x", mainmemory.read_u24_be(kong_object + grab_pointer + 1)), null, null, 'bottomright');
@@ -213,7 +214,7 @@ local function draw_gui()
 		gui.text(gui_x, gui_y + height * row, string.format("Focused object:  0x%06x", mainmemory.read_u24_be(camera_object + camera_focus_pointer + 1)), null, null, 'bottomright');
 		row = row + 1;
 	end
-	
+
 	if #object_pointers > 0 and object_index <= #object_pointers then
 		gui.text(gui_x, gui_y + height * row, string.format("Selected object: 0x%06x", object_pointers[object_index] or 0), null, null, 'bottomright');
 		row = row + 1;
@@ -242,7 +243,7 @@ local function isValidObject(pointer, kong_object, camera_object)
 		return true;
 	end
 
-	if grab_object_mode == "Grab" or grab_object_mode == "Encircle" then
+	if grab_script_mode == "Grab" or grab_script_mode == "Encircle" then
 		if pointer ~= kong_object then
 			return true;
 		end

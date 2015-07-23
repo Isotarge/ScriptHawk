@@ -439,3 +439,65 @@ PAL/JP MJ state object layout
 5 xxxxxxxx xxxxxxxx xxxxxxxx xxxxxxxx
 6 RRAAxxxx xxxxxxxx PPNNxxxx W?B?xxxx
 7 xxxxxxxx xxxxxxxx xxxxxxxx xxxxxxxx
+
+------------------------
+-- Quick kill science --
+------------------------
+
+ff ff ff ff
+^
+Switches work
+      ^
+      Boss object deals damage
+
+Fight controller object?
+
+00 Player has been hit (switch)
+
+20 Starting fight?
+	0c ???
+
+23 In jump phase
+	01 Calculate next jump?
+	02 In the air
+	03 Landing?
+
+25 waiting for hit
+	00 Spawn switches
+	01 Throw fireballs/lasers
+
+27 Been hit
+
+28 Play laser cutscene
+
+29 Turning invisible
+
+2B Waiting for tiny to get back on stage (phase reset?)
+
+37 End fight
+	00 Play boss end cutscene (key spawn not required)
+	01 Quick kill (play boss cutscene and spawn key)
+	04 Spawn key
+	>04 Don't spawn key
+
+40 Destroy boss object?
+	05 Destroy boss object?
+
+Aztec controller object
+
+Freezing certain bytes in Aztec fight controller causes Barrel and Diddy to flash when Diddy takes damage
+Could this be part of the quick kill?
+
+FD0 Start controller object
+04C Barrel X
+050 Barrel Y
+054 Barrel Z
+
+Relative to dogadon object
+b10
+
+0x144 - Freezing causes quick kill to fail
+0x145 - ??
+
+0x154 - Freezing causes key not to spawn
+0x155 - Freezing causes key not to spawn

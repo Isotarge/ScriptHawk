@@ -13,7 +13,7 @@ local x = 0.0;
 local y = 0.0;
 local z = 0.0;
 
-ledgegrab_angles = {{140, 1910}, {2180, 3950}};
+local ledgegrab_angles = {{140, 1910}, {2180, 3950}};
 
 local start_x = 179.999;
 local x_increments = -0.002;
@@ -32,17 +32,17 @@ local ground = 20.0;
 local frames_since_set = 0;
 local max_frames_since_set = 150;
 
-function round (num, idp)
+function round(num, idp)
 	return tonumber(string.format("%." .. (idp or 0) .. "f", num));
 end
 
-local function rotate (axis, amount)
+local function rotate(axis, amount)
 	local kong_object = mainmemory.read_u24_be(kong_object_pointer);
 	local current_value = mainmemory.read_u16_be(kong_object + angle + axis * 2);
 	mainmemory.write_u16_be(kong_object + angle + axis * 2, current_value + amount);
 end
 
-local function plot_pos ()
+local function plot_pos()
 	if running then
 		local kong_object = mainmemory.read_u24_be(kong_object_pointer);
 
@@ -69,8 +69,9 @@ local function plot_pos ()
 				current_x = current_x + x_increments;
 				console.log('testing new: x='..current_x);
 			end
-			
-			for i=1,table.getn(ledgegrab_angles) do
+
+			-- Check to see if the ledge was grabbed
+			for i=1,#ledgegrab_angles do
 				if currentAngle >= ledgegrab_angles[i][1] and currentAngle < ledgegrab_angles[i][2] then
 					currentAngle = ledgegrab_angles[i][2];
 				end
