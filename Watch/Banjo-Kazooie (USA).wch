@@ -12,6 +12,8 @@ SystemID N64
 37C5A0	d	f	1	RDRAM	X Position
 37C5A4	d	f	1	RDRAM	Y Position
 37C5A8	d	f	1	RDRAM	Z Position
+37C694	d	f	1	RDRAM	Facing Angle
+37DDB4	d	u	1	RDRAM	Jiggy Spawn Angle
 37E8F5	b	h	1	RDRAM	Map
 383012	b	h	1	RDRAM	Current Pause Menu Item
 385F63	b	u	1	RDRAM	Notes (on hand)
