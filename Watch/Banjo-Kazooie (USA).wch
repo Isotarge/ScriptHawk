@@ -28,5 +28,15 @@ SystemID N64
 385F8F	b	u	1	RDRAM	Air Timer
 385FC4	d	u	1	RDRAM	Mumbo Tokens
 385FCB	b	u	1	RDRAM	Jiggies (on hand)
-386018	d	f	1	RDRAM	Game Time (Current Level)
+386004	d	f	1	RDRAM	Game Time (MM)
+386008	d	f	1	RDRAM	Game Time (TTC)
+38600C	d	f	1	RDRAM	Game Time (CC)
+386010	d	f	1	RDRAM	Game Time (BGS)
+386014	d	f	1	RDRAM	Game Time (FP)
+386018	d	f	1	RDRAM	Game Time (GL)
+38601C	d	f	1	RDRAM	Game Time (GV)
+386020	d	f	1	RDRAM	Game Time (CCW)
+386024	d	f	1	RDRAM	Game Time (RBB)
+386028	d	f	1	RDRAM	Game Time (MMM)
+38602C	d	f	1	RDRAM	Game Time (SM)
 
