@@ -1,5 +1,10 @@
 Domain RDRAM
 SystemID N64
+000074	d	h	0	EEPROM	EEPROM Checksum 1
+0000EC	d	h	0	EEPROM	EEPROM Checksum 2
+000164	d	h	0	EEPROM	EEPROM Checksum 3
+0001DC	d	h	0	EEPROM	EEPROM Checksum 4
+0001FC	d	h	0	EEPROM	EEPROM Checksum 5
 36C4EC	w	u	1	RDRAM	Menu item 1 Y Position
 36C4EE	b	u	1	RDRAM	Menu Item 1 Portrait
 36C4FC	w	u	1	RDRAM	Menu Item 2 Y Position
@@ -8,6 +13,7 @@ SystemID N64
 36C50E	b	u	1	RDRAM	Menu Item 3 Portrait
 36C51C	w	u	1	RDRAM	Menu Item 4 Y Position
 36C51E	b	u	1	RDRAM	Menu Item 4 Portrait
+37C2E4	d	f	1	RDRAM	Slope Timer
 37C4BC	w	1	1	RDRAM	Y Velocity
 37C5A0	d	f	1	RDRAM	X Position
 37C5A4	d	f	1	RDRAM	Y Position

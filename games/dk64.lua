@@ -1103,7 +1103,7 @@ function Game.eachFrame()
 	if forms.ischecked(options_toggle_neverslip) then
 		neverSlip();
 	end
-	
+
 	-- Mad Jack
 	if forms.ischecked(options_toggle_madjack) then
 		draw_mj_minimap();

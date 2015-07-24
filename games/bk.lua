@@ -7,6 +7,7 @@ local Game = {};
 -- Only patch US 1.0
 local allowFurnaceFunPatch = false;
 
+local slope_timer;
 local y_vel;
 
 local x_pos;
@@ -18,6 +19,7 @@ local facing_angle;
 local z_rot;
 
 local map;
+local gameTimeBase;
 
 local notes;
 
@@ -218,30 +220,38 @@ Game.maps = {
 
 function Game.detectVersion(romName)
 	if bizstring.contains(romName, "Europe") then
+		slope_timer = 0x37CCB4;
 		y_vel = 0x37CE8C;
 		x_pos = 0x37cf70;
 		x_rot = 0x37d064;
 		map = 0x37F2C5;
 		notes = 0x386943;
+		gameTimeBase = 0x3869E4;
 	elseif bizstring.contains(romName, "Japan") then
+		slope_timer = 0x37CDE4;
 		y_vel = 0x37CFBC;
 		x_pos = 0x37d0a0;
 		x_rot = 0x37d194;
 		map = 0x37F405;
 		notes = 0x386AA3;
+		gameTimeBase = 0x386B44;
 	elseif bizstring.contains(romName, "USA") and bizstring.contains(romName, "Rev A") then
+		slope_timer = 0x37B4E4;
 		y_vel = 0x37B6BC;
 		x_pos = 0x37b7a0;
 		x_rot = 0x37b894;
 		map = 0x37DAF5;
 		notes = 0x385183;
+		gameTimeBase = 0x385224;
 	elseif bizstring.contains(romName, "USA") then
 		allowFurnaceFunPatch = true;
+		slope_timer = 0x37C2E4;
 		y_vel = 0x37C4BC;
 		x_pos = 0x37c5a0;
 		x_rot = 0x37c694;
 		map = 0x37E8F5;
 		notes = 0x385F63;
+		gameTimeBase = 0x386004;
 	else
 		return false;
 	end
@@ -261,6 +271,36 @@ function Game.detectVersion(romName)
 	memory.usememorydomain("RDRAM");
 
 	return true;
+end
+
+local function neverSlip()
+	mainmemory.writefloat(slope_timer, 0.0, true);
+end
+
+---------------------
+-- Game time stuff --
+---------------------
+
+local previousGameTime = {0,0,0,0,0,0,0,0,0,0};
+local gameTime = {0,0,0,0,0,0,0,0,0,0};
+
+local function checkGameTime()
+	previousGameTime = gameTime;	
+	gameTime = {};
+
+	local i;
+	for i=0,10 do
+		gameTime[i + 1] = mainmemory.readfloat(gameTimeBase + (i * 4), true);
+	end
+end
+
+local function gameTimeHasChanged()
+	for i=1,#gameTime do
+		if previousGameTime[i] ~= gameTime[i] then
+			return true;
+		end
+	end
+	return false;
 end
 
 -----------------------
@@ -293,7 +333,7 @@ Game.rot_speed = 10;
 Game.max_rot_units = 360;
 
 function Game.isPhysicsFrame()
-	return not emu.islagged();
+	return (not emu.islagged()) and gameTimeHasChanged();
 end
 
 --------------
@@ -380,13 +420,21 @@ function Game.applyInfinites()
 	mainmemory.writebyte(notes + jiggies, max_jiggies);
 end
 
+local options_toggle_neverslip;
+
 function Game.initUI(form_handle, col, row, button_height, label_offset, dropdown_offset)
-	-- TODO
+	options_toggle_neverslip = forms.checkbox(form_handle, "Never Slip", col(0), row(6));
 end
 
 function Game.eachFrame()
 	-- Furnace fun patch
 	applyFurnaceFunPatch();
+
+	checkGameTime();
+
+	if forms.ischecked(options_toggle_neverslip) then
+		neverSlip();
+	end
 
 	-- Check EEPROM checksums
 	if memory.usememorydomain("EEPROM") then

@@ -1,7 +1,30 @@
 Domain RDRAM
 SystemID N64
+000074	d	h	0	EEPROM	EEPROM Checksum 1
+0000EC	d	h	0	EEPROM	EEPROM Checksum 2
+000164	d	h	0	EEPROM	EEPROM Checksum 3
+0001DC	d	h	0	EEPROM	EEPROM Checksum 4
+0001FC	d	h	0	EEPROM	EEPROM Checksum 5
+37CDE4	d	f	1	RDRAM	Slope timer
 37CFBC	w	1	1	RDRAM	Y Velocity
+37D0A0	d	f	1	RDRAM	X Position
+37D0A4	d	f	1	RDRAM	Y Position
+37D0A8	d	f	1	RDRAM	Z Position
+37D190	d	f	1	RDRAM	Facing Angle
+37D194	d	f	1	RDRAM	Moving Angle
+37E8C4	d	u	1	RDRAM	Jiggy Spawn Angle
 37F405	b	h	1	RDRAM	Map
 386AA3	b	u	1	RDRAM	Notes (On hand)
 386B31	b	u	1	RDRAM	Notes (Total)
+386B44	d	f	1	RDRAM	Game Time (MM)
+386B48	d	f	1	RDRAM	Game Time (TTC)
+386B4C	d	f	1	RDRAM	Game Time (CC)
+386B50	d	f	1	RDRAM	Game Time (BGS)
+386B54	d	f	1	RDRAM	Game Time (FP)
+386B58	d	f	1	RDRAM	Game Time (GL)
+386B5C	d	f	1	RDRAM	Game Time (GV)
+386B60	d	f	1	RDRAM	Game Time (CCW)
+386B64	d	f	1	RDRAM	Game Time (RBB)
+386B68	d	f	1	RDRAM	Game Time (MMM)
+386B6C	d	f	1	RDRAM	Game Time (SM)
 

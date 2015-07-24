@@ -1,10 +1,17 @@
 Domain RDRAM
 SystemID N64
+000074	d	h	0	EEPROM	EEPROM Checksum 1
+0000EC	d	h	0	EEPROM	EEPROM Checksum 2
+000164	d	h	0	EEPROM	EEPROM Checksum 3
+0001DC	d	h	0	EEPROM	EEPROM Checksum 4
+0001FC	d	h	0	EEPROM	EEPROM Checksum 5
+37CCB4	d	f	1	RDRAM	Slope Timer
 37CE8C	w	1	1	RDRAM	Y Velocity
 37CF70	d	f	1	RDRAM	X Position
 37CF74	d	f	1	RDRAM	Y Position
 37CF78	d	f	1	RDRAM	Z Position
 37D064	d	f	1	RDRAM	Facing angle
+37E784	d	u	1	RDRAM	Jiggy Spawn Angle
 37F2C5	b	h	1	RDRAM	Map
 386943	b	u	1	RDRAM	Notes (on hand)
 386947	b	u	1	RDRAM	Eggs
@@ -17,5 +24,15 @@ SystemID N64
 38696F	b	u	1	RDRAM	Air timer
 386980	d	u	1	RDRAM	Mumbo Tokens
 3869A8	d	s	1	RDRAM	Jiggies (on hand)
-386A0C	d	f	1	RDRAM	Game Time (seconds)
+3869E4	d	f	1	RDRAM	Game Time (MM)
+3869E8	d	f	1	RDRAM	Game Time (TTC)
+3869EC	d	f	1	RDRAM	Game Time (CC)
+3869F0	d	f	1	RDRAM	Game Time (BGS)
+3869F4	d	f	1	RDRAM	Game Time (FP)
+3869F8	d	f	1	RDRAM	Game Time (GL)
+3869FC	d	f	1	RDRAM	Game Time (GV)
+386A00	d	f	1	RDRAM	Game Time (CCW)
+386A04	d	f	1	RDRAM	Game Time (RBB)
+386A08	d	f	1	RDRAM	Game Time (MMM)
+386A0C	d	f	1	RDRAM	Game Time (SM)
 
