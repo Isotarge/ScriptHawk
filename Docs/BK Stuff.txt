@@ -40,3 +40,42 @@ assuming you stay in the main area of the level
 if you enter a loading zone it resets to the initial position by the jinxy paw
 but the game keeps track of how many rings you have gone through
 until you leave the level entirely
+
+----------------------
+-- Vile state stuff --
+----------------------
+
+Pointer at 0x36E560 to Vile state object
+
+Slots are 0x180 bytes long in memory
+
+Addresses below are relative to vile state object
+
+0x90 Game type? (also changes winning/losing message)
+	Blank Banjo text shows up sometimes
+		- Can cancel with A
+		- Stays on screen after cancel
+	Soggy text shows up sometimes
+		- Crashes after 3 characters (ooo)
+0x91 Previous game type (unsigned char)
+0x92 Player Score (unsigned char)
+0x93 Vile Score (unsigned char)
+0x94 Something idk (float)
+
+0x318 Slot state
+	- 00000 0x00 disabled
+	- 00100 0x04 idle
+	- 01000 0x08 rising
+	- 01100 0x0c alive
+	- 10000 0x10 falling (no eat)
+	- 10100 0x14 eaten
+
+Falling state (no eat)
+0x0c -> 0x10 -> 0x04
+
+Falling state (eat)
+0x0c -> 0x14 -> 0x04
+
+0x384 Amount "popped out" (0-1, float)
+0x388 Yumbly/Grumbly (0x00 yum, 0x01 grum)
+0x38C Slot timer (0-15? float)

@@ -5,6 +5,34 @@ SystemID N64
 000164	d	h	0	EEPROM	EEPROM Checksum 3
 0001DC	d	h	0	EEPROM	EEPROM Checksum 4
 0001FC	d	h	0	EEPROM	EEPROM Checksum 5
+111028	b	h	1	RDRAM	Slot State
+111094	d	f	1	RDRAM	Amount popped out (0-1)
+11109C	d	f	1	RDRAM	Vile Slot Timer
+11121C	d	f	1	RDRAM	Vile Slot Timer
+11139C	d	f	1	RDRAM	Vile Slot Timer
+11151C	d	f	1	RDRAM	Vile Slot Timer
+11169C	d	f	1	RDRAM	Vile Slot Timer
+11181C	d	f	1	RDRAM	Vile Slot Timer
+11199C	d	f	1	RDRAM	Vile Slot Timer
+111B1C	d	f	1	RDRAM	Vile Slot Timer
+111C9C	d	f	1	RDRAM	Vile Slot Timer
+111E1C	d	f	1	RDRAM	Vile Slot Timer
+111F9C	d	f	1	RDRAM	Vile Slot Timer
+11229C	d	f	1	RDRAM	Vile Slot Timer
+11241C	d	f	1	RDRAM	Vile Slot Timer
+11259C	d	f	1	RDRAM	Vile Slot Timer
+11271C	d	f	1	RDRAM	Vile Slot Timer
+11289C	d	f	1	RDRAM	Vile Slot Timer
+112A1C	d	f	1	RDRAM	Vile Slot Timer
+112B9C	d	f	1	RDRAM	Vile Slot Timer
+112D1C	d	f	1	RDRAM	Vile Slot Timer
+112E9C	d	f	1	RDRAM	Vile Slot Timer
+11301C	d	f	1	RDRAM	Vile Slot Timer
+11319C	d	f	1	RDRAM	Vile Slot Timer
+11331C	d	f	1	RDRAM	Vile Slot Timer
+11349C	d	f	1	RDRAM	Vile Slot Timer
+113614	d	f	1	RDRAM	Amount popped out (0-1)
+11361C	d	f	1	RDRAM	Vile Slot Timer
 36C4EC	w	u	1	RDRAM	Menu item 1 Y Position
 36C4EE	b	u	1	RDRAM	Menu Item 1 Portrait
 36C4FC	w	u	1	RDRAM	Menu Item 2 Y Position
@@ -13,6 +41,8 @@ SystemID N64
 36C50E	b	u	1	RDRAM	Menu Item 3 Portrait
 36C51C	w	u	1	RDRAM	Menu Item 4 Y Position
 36C51E	b	u	1	RDRAM	Menu Item 4 Portrait
+36E560	d	h	1	RDRAM	Vile State Pointer
+37C2D3	b	u	1	RDRAM	Mumbo Transformation
 37C2E4	d	f	1	RDRAM	Slope Timer
 37C4BC	w	1	1	RDRAM	Y Velocity
 37C5A0	d	f	1	RDRAM	X Position
@@ -32,7 +62,8 @@ SystemID N64
 385F88	d	s	1	RDRAM	Lives
 385F8E	b	u	1	RDRAM	Air
 385F8F	b	u	1	RDRAM	Air Timer
-385FC4	d	u	1	RDRAM	Mumbo Tokens
+385FA0	d	s	1	RDRAM	Mumbo Tokens (On hand)
+385FC4	d	s	1	RDRAM	Mumbo Tokens (Pause menu)
 385FCB	b	u	1	RDRAM	Jiggies (on hand)
 386004	d	f	1	RDRAM	Game Time (MM)
 386008	d	f	1	RDRAM	Game Time (TTC)
