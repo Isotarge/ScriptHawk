@@ -1,0 +1,21 @@
+BK Science TODO
+
+Explain "Object Teleportation" https://www.youtube.com/watch?v=wJODJbpZYq8
+
+Boggy/Vile rubberband science
+
+Figure out RNG
+
+RNG examples:
+
+GV Rings
+Turtle patterns
+Yumblies/Grumblies
+
+enemy placement
+the direction and velocity that the purple guy spawns out of the hut in mumbos mountain
+conga beating his chest
+chimpy jumping up and down (can delay text)
+MAYBE the way he throws an extra orange when jumping off the tree (sometimes seemingly randomly lands on the final pad and saves a bit of time, but could be changed by banjo's movement)
+which way the honeycombs spawn out of the beehives
+jinjo waving
