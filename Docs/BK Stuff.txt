@@ -19,3 +19,24 @@ chimpy jumping up and down (can delay text)
 MAYBE the way he throws an extra orange when jumping off the tree (sometimes seemingly randomly lands on the final pad and saves a bit of time, but could be changed by banjo's movement)
 which way the honeycombs spawn out of the beehives
 jinjo waving
+
+i thought camera angle affected enemy movement but I don't think it does
+i spent a while trying to manipulate the colliwobble and had no luck
+my only other idea was to move banjo closer to the wall in hopes of "spawning" the colliwobble earlier so his movement cycles earlier
+but whenever i had ideal movement, he was far away from where i wanted to go
+what I'm stuck on right now is trying to get the termite in MM closer to the 4 notes on the little hill before bottles talon trot, but going through the loading zone on different frames doesnt seem to change anything unless I wait a REALLY long time then he BOLTS over to the 4 notes
+
+would it also be possible with a calculation of some sort to figure out if a certain jump is possible
+You could probably do some math with DY and DXZ
+theres a jump thats like one frame away from being possible with my knowledge and if it is it would save 20 seconds
+
+gobi's valley ring RNG is determined upon the frame you enter the level
+usually anything that is random is determined when you enter the area that it occurs
+like in BT klungo potions are done the same way
+BUT an exception to this is i think enemies have certain set patterns because when I was doing my RBB TAS, the enemies would always move in a certain pattern when I enter the room for the first time
+same thing happens on console
+it can't return to the initial position so when you go through it, it can spawn in 4 different places for the next one, then 3, then 2, then 1
+assuming you stay in the main area of the level
+if you enter a loading zone it resets to the initial position by the jinxy paw
+but the game keeps track of how many rings you have gone through
+until you leave the level entirely
