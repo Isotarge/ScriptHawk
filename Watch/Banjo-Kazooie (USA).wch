@@ -16,8 +16,12 @@ SystemID N64
 36C51C	w	u	1	RDRAM	Menu Item 4 Y Position
 36C51E	b	u	1	RDRAM	Menu Item 4 Portrait
 36E560	d	h	1	RDRAM	Vile State Pointer
+37C0EC	d	f	1	RDRAM	Banjo Scale
+37C1D1	b	u	1	RDRAM	Standing on fly Pad
+37C1D2	b	u	1	RDRAM	Standing on shock spring pad
 37C2D3	b	u	1	RDRAM	Mumbo Transformation
 37C2E4	d	f	1	RDRAM	Slope Timer
+37C3A0	d	h	1	RDRAM	Moves unlocked (bitfield)
 37C4BC	w	1	1	RDRAM	Y Velocity
 37C5A0	d	f	1	RDRAM	X Position
 37C5A4	d	f	1	RDRAM	Y Position
@@ -52,6 +56,7 @@ SystemID N64
 37DDB4	d	u	1	RDRAM	Jiggy Spawn Angle
 37E8F5	b	h	1	RDRAM	Map
 383012	b	h	1	RDRAM	Current Pause Menu Item
+383384	d	f	1	RDRAM	Mysterious (Text?) Timer
 385F63	b	u	1	RDRAM	Notes (on hand)
 385F64	d	u	1	RDRAM	Eggs
 385F6F	b	u	1	RDRAM	Red Feathers

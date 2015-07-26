@@ -93,3 +93,43 @@ Falling state (eaten)
 	- Round 6 varies from 200 to 450
 	- Vile chasing you varies from 100 to 500
 	- Vile running from you varies from 300 to 400
+
+----------------
+-- Misc state --
+----------------
+
+Moves unlocked = 0x37c3a0-4
+It's a bitfield, 4 bytes
+
+8- -- -- -- ??
+4- -- -- -- ??
+2- -- -- -- ??
+1- -- -- -- ??
+-8 -- -- -- ??
+-4 -- -- -- ??
+-2 -- -- -- ??
+-1 -- -- -- ??
+-- 8- -- -- ??
+-- 4- -- -- ??
+-- 2- -- -- ??
+-- 1- -- -- ??
+-- -8 -- -- ??
+-- -4 -- -- Wonderwing
+-- -2 -- -- ??
+-- -1 -- -- Talon Trot
+-- -- 8- -- Dive
+-- -- 4- -- ??
+-- -- 2- -- ??
+-- -- 1- -- Roll
+-- -- -8 -- Rat-a-tat rap
+-- -- -4 -- ??
+-- -- -2 -- ??
+-- -- -1 -- Flap Flip
+-- -- -- 8- Feathery FLap
+-- -- -- 4- Eggs
+-- -- -- 2- Climb Trees
+-- -- -- 1- Bear Punch
+-- -- -- -8 Seen camera controls tutorial
+-- -- -- -4 Beak Buster
+-- -- -- -2 ??
+-- -- -- -1 Beak Barge

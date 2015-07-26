@@ -1,5 +1,7 @@
 TODO stuff:
 
+Find movement angle (ie what direction are you currently moving, not necessarily facing)
+
 sound addresses
 0x79126e to 0x7e0000
 
