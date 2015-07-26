@@ -5,6 +5,7 @@ SystemID N64
 000164	d	h	0	EEPROM	EEPROM Checksum 3
 0001DC	d	h	0	EEPROM	EEPROM Checksum 4
 0001FC	d	h	0	EEPROM	EEPROM Checksum 5
+36D760	d	h	1	RDRAM	Vile State pointer
 37B4E4	d	f	1	RDRAM	Slope Timer
 37B6BC	w	1	1	RDRAM	Y Velocity
 37B7A0	d	f	1	RDRAM	X Position

@@ -228,7 +228,7 @@ function Game.detectVersion(romName)
 		map = 0x37F2C5;
 		notes = 0x386943;
 		gameTimeBase = 0x3869E4;
-		vile_state_pointer = 0x36E560; -- TODO: Find
+		vile_state_pointer = 0x36EAE0;
 	elseif bizstring.contains(romName, "Japan") then
 		slope_timer = 0x37CDE4;
 		y_vel = 0x37CFBC;
@@ -237,7 +237,7 @@ function Game.detectVersion(romName)
 		map = 0x37F405;
 		notes = 0x386AA3;
 		gameTimeBase = 0x386B44;
-		vile_state_pointer = 0x36E560; -- TODO: Find
+		vile_state_pointer = 0x36F260;
 	elseif bizstring.contains(romName, "USA") and bizstring.contains(romName, "Rev A") then
 		slope_timer = 0x37B4E4;
 		y_vel = 0x37B6BC;
@@ -246,7 +246,7 @@ function Game.detectVersion(romName)
 		map = 0x37DAF5;
 		notes = 0x385183;
 		gameTimeBase = 0x385224;
-		vile_state_pointer = 0x36E560; -- TODO: Find
+		vile_state_pointer = 0x36D760;
 	elseif bizstring.contains(romName, "USA") then
 		allowFurnaceFunPatch = true;
 		slope_timer = 0x37C2E4;
@@ -312,8 +312,10 @@ end
 -- Furnace fun stuff --
 -----------------------
 
+local options_allow_ff_patch;
+
 local function applyFurnaceFunPatch()
-	if allowFurnaceFunPatch then
+	if allowFurnaceFunPatch and forms.ischecked(options_allow_ff_patch) then
 		mainmemory.write_u16_be(0x320064, 0x080a);
 		mainmemory.write_u16_be(0x320066, 0x1840);
 
@@ -334,6 +336,7 @@ end
 -- Wave UI
 local options_wave_button;
 local options_heart_button;
+local options_fire_all_button;
 
 local game_type = 0x90;
 
@@ -341,7 +344,7 @@ local previous_game_type = 0x91
 local player_score = 0x92;
 local vile_score = 0x93;
 
-local mysterious_float = 0x94; -- Todo: Figure out what this does
+local minigame_timer = 0x94;
 
 local number_of_slots = 25;
 local slot_base = 0x318;
@@ -374,7 +377,6 @@ local function getSlotBase(index)
 end
 
 local function fireSlot(vile_state, index, slotType)
-	console.log("Firing slot: "..index);
 	current_slot_base = getSlotBase(index);
 	mainmemory.writebyte(vile_state + current_slot_base + slot_state, 0x08);
 	mainmemory.writebyte(vile_state + current_slot_base + slot_type, slotType);
@@ -457,6 +459,16 @@ local function doHeart()
 
 	for i=1,#heart do
 		fireSlot(vile_state, getSlotIndex(heart[i][1], heart[i][2]), 0);
+	end
+end
+
+local function fireAllSlots()
+	local vile_state = mainmemory.read_u24_be(vile_state_pointer + 1);
+	local i;
+
+	local colour = math.random(0, 1);
+	for i=1,number_of_slots do
+		fireSlot(vile_state, i, colour);
 	end
 end
 
@@ -562,8 +574,10 @@ local options_toggle_neverslip;
 
 function Game.initUI(form_handle, col, row, button_height, label_offset, dropdown_offset)
 	options_toggle_neverslip = forms.checkbox(form_handle, "Never Slip", col(0), row(6));
-	options_wave_button = forms.button(form_handle, "Wave", initWave, col(10), row(6), col(4) + 8, button_height);
-	options_heart_button = forms.button(form_handle, "Heart", doHeart, col(10), row(7), col(4) + 8, button_height);
+	options_allow_ff_patch = forms.checkbox(form_handle, "Allow FF patch", col(0), row(7));
+	options_wave_button = forms.button(form_handle, "Wave", initWave, col(5), row(4), col(4) + 8, button_height);
+	options_heart_button = forms.button(form_handle, "Heart", doHeart, col(5), row(5), col(4) + 8, button_height);
+	options_fire_all_button = forms.button(form_handle, "Fire all", fireAllSlots, col(5), row(6), col(4) + 8, button_height);
 end
 
 function Game.eachFrame()
