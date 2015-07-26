@@ -101,6 +101,11 @@ Falling state (eaten)
 Moves unlocked = 0x37c3a0-4
 It's a bitfield, 4 bytes
 
+Common states
+
+00 00 9D B9 - SM 100%
+FF FF FF FF - Used during demos
+
 8- -- -- -- ??
 4- -- -- -- ??
 2- -- -- -- ??
@@ -115,21 +120,21 @@ It's a bitfield, 4 bytes
 -- 1- -- -- ??
 -- -8 -- -- ??
 -- -4 -- -- Wonderwing
--- -2 -- -- ??
+-- -2 -- -- Turbo Trainers
 -- -1 -- -- Talon Trot
 -- -- 8- -- Dive
--- -- 4- -- ??
--- -- 2- -- ??
+-- -- 4- -- Wading Boots
+-- -- 2- -- Shock Spring Jump
 -- -- 1- -- Roll
 -- -- -8 -- Rat-a-tat rap
--- -- -4 -- ??
--- -- -2 -- ??
+-- -- -4 -- Hold A to Jump higher
+-- -- -2 -- Fly
 -- -- -1 -- Flap Flip
--- -- -- 8- Feathery FLap
+-- -- -- 8- Feathery Flap
 -- -- -- 4- Eggs
 -- -- -- 2- Climb Trees
 -- -- -- 1- Bear Punch
--- -- -- -8 Seen camera controls tutorial
+-- -- -- -8 Seen camera controls tutorial? Also set after talking to high bottles
 -- -- -- -4 Beak Buster
--- -- -- -2 ??
+-- -- -- -2 Beak Bomb
 -- -- -- -1 Beak Barge
