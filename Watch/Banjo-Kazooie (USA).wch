@@ -5,34 +5,6 @@ SystemID N64
 000164	d	h	0	EEPROM	EEPROM Checksum 3
 0001DC	d	h	0	EEPROM	EEPROM Checksum 4
 0001FC	d	h	0	EEPROM	EEPROM Checksum 5
-111028	b	h	1	RDRAM	Slot State
-111094	d	f	1	RDRAM	Amount popped out (0-1)
-11109C	d	f	1	RDRAM	Vile Slot Timer
-11121C	d	f	1	RDRAM	Vile Slot Timer
-11139C	d	f	1	RDRAM	Vile Slot Timer
-11151C	d	f	1	RDRAM	Vile Slot Timer
-11169C	d	f	1	RDRAM	Vile Slot Timer
-11181C	d	f	1	RDRAM	Vile Slot Timer
-11199C	d	f	1	RDRAM	Vile Slot Timer
-111B1C	d	f	1	RDRAM	Vile Slot Timer
-111C9C	d	f	1	RDRAM	Vile Slot Timer
-111E1C	d	f	1	RDRAM	Vile Slot Timer
-111F9C	d	f	1	RDRAM	Vile Slot Timer
-11229C	d	f	1	RDRAM	Vile Slot Timer
-11241C	d	f	1	RDRAM	Vile Slot Timer
-11259C	d	f	1	RDRAM	Vile Slot Timer
-11271C	d	f	1	RDRAM	Vile Slot Timer
-11289C	d	f	1	RDRAM	Vile Slot Timer
-112A1C	d	f	1	RDRAM	Vile Slot Timer
-112B9C	d	f	1	RDRAM	Vile Slot Timer
-112D1C	d	f	1	RDRAM	Vile Slot Timer
-112E9C	d	f	1	RDRAM	Vile Slot Timer
-11301C	d	f	1	RDRAM	Vile Slot Timer
-11319C	d	f	1	RDRAM	Vile Slot Timer
-11331C	d	f	1	RDRAM	Vile Slot Timer
-11349C	d	f	1	RDRAM	Vile Slot Timer
-113614	d	f	1	RDRAM	Amount popped out (0-1)
-11361C	d	f	1	RDRAM	Vile Slot Timer
 36C4EC	w	u	1	RDRAM	Menu item 1 Y Position
 36C4EE	b	u	1	RDRAM	Menu Item 1 Portrait
 36C4FC	w	u	1	RDRAM	Menu Item 2 Y Position
@@ -50,6 +22,31 @@ SystemID N64
 37C5A8	d	f	1	RDRAM	Z Position
 37C690	d	f	1	RDRAM	Facing angle
 37C694	d	f	1	RDRAM	Moving angle
+37D958	d	f	1	RDRAM	Camera X Position
+37D95C	d	f	1	RDRAM	Camera Y position
+37D960	d	f	1	RDRAM	Camera Z Position
+37D968	d	f	1	RDRAM	Rot?
+37D96C	d	f	1	RDRAM	Rot?
+37D970	d	f	1	RDRAM	Viewport roll (degrees)
+37D974	d	f	1	RDRAM	Camera something?
+37D97C	d	f	1	RDRAM	Camera something?
+37D980	d	f	1	RDRAM	Camera something?
+37D984	d	f	1	RDRAM	Camera something?
+37D988	d	f	1	RDRAM	Camera something?
+37D98C	d	f	1	RDRAM	Camera something?
+37D990	d	f	1	RDRAM	Camera something?
+37D9A4	d	f	1	RDRAM	Camera something?
+37D9B4	d	f	1	RDRAM	Camera something?
+37D9B8	d	f	1	RDRAM	Camera something?
+37D9BC	d	f	1	RDRAM	Camera something?
+37D9C0	d	f	1	RDRAM	Camera something?
+37D9C4	d	f	1	RDRAM	Camera something?
+37D9C8	d	f	1	RDRAM	Camera something?
+37D9CC	d	f	1	RDRAM	Camera something?
+37D9E0	d	f	1	RDRAM	Camera X vel?
+37D9E4	d	f	1	RDRAM	Camera Y vel?
+37D9E8	d	f	1	RDRAM	Camera Z vel?
+37DC70	d	f	1	RDRAM	C-Up camera angle?
 37DDB4	d	u	1	RDRAM	Jiggy Spawn Angle
 37E8F5	b	h	1	RDRAM	Map
 383012	b	h	1	RDRAM	Current Pause Menu Item

@@ -20,6 +20,7 @@ local z_rot;
 
 local map;
 local gameTimeBase;
+local vile_state_pointer;
 
 local notes;
 
@@ -227,6 +228,7 @@ function Game.detectVersion(romName)
 		map = 0x37F2C5;
 		notes = 0x386943;
 		gameTimeBase = 0x3869E4;
+		vile_state_pointer = 0x36E560; -- TODO: Find
 	elseif bizstring.contains(romName, "Japan") then
 		slope_timer = 0x37CDE4;
 		y_vel = 0x37CFBC;
@@ -235,6 +237,7 @@ function Game.detectVersion(romName)
 		map = 0x37F405;
 		notes = 0x386AA3;
 		gameTimeBase = 0x386B44;
+		vile_state_pointer = 0x36E560; -- TODO: Find
 	elseif bizstring.contains(romName, "USA") and bizstring.contains(romName, "Rev A") then
 		slope_timer = 0x37B4E4;
 		y_vel = 0x37B6BC;
@@ -243,6 +246,7 @@ function Game.detectVersion(romName)
 		map = 0x37DAF5;
 		notes = 0x385183;
 		gameTimeBase = 0x385224;
+		vile_state_pointer = 0x36E560; -- TODO: Find
 	elseif bizstring.contains(romName, "USA") then
 		allowFurnaceFunPatch = true;
 		slope_timer = 0x37C2E4;
@@ -252,6 +256,7 @@ function Game.detectVersion(romName)
 		map = 0x37E8F5;
 		notes = 0x385F63;
 		gameTimeBase = 0x386004;
+		vile_state_pointer = 0x36E560;
 	else
 		return false;
 	end
@@ -319,6 +324,139 @@ local function applyFurnaceFunPatch()
 
 		mainmemory.write_u16_be(0x28610C, 0x080c);
 		mainmemory.write_u16_be(0x28610E, 0x801b);
+	end
+end
+
+----------------------
+-- Vile state stuff --
+----------------------
+
+-- Wave UI
+local options_wave_button;
+local options_heart_button;
+
+local game_type = 0x90;
+
+local previous_game_type = 0x91
+local player_score = 0x92;
+local vile_score = 0x93;
+
+local mysterious_float = 0x94; -- Todo: Figure out what this does
+
+local number_of_slots = 25;
+local slot_base = 0x318;
+local slot_size = 0x180;
+
+-- Relative to slot base + (slot number * slot size)
+
+-- 00000 0x00 disabled
+-- 00100 0x04 idle
+-- 01000 0x08 rising
+-- 01100 0x0c alive
+-- 10000 0x10 falling (no eat)
+-- 10100 0x14 eaten
+local slot_state = 0x00;
+
+-- Float 0-1
+local popped_amount = 0x6c;
+
+-- 0x00 = yum, > 0x00 = grum
+local slot_type = 0x70;
+
+-- Float 0-15?
+local slot_timer = 0x74;
+
+local function getSlotBase(index)
+	if index < 12 then
+		return slot_base + (index - 1) * slot_size;
+	end
+	return slot_base + index * slot_size;
+end
+
+local function fireSlot(vile_state, index, slotType)
+	console.log("Firing slot: "..index);
+	current_slot_base = getSlotBase(index);
+	mainmemory.writebyte(vile_state + current_slot_base + slot_state, 0x08);
+	mainmemory.writebyte(vile_state + current_slot_base + slot_type, slotType);
+	mainmemory.writefloat(vile_state + current_slot_base + popped_amount, 1.0, true);
+	mainmemory.writefloat(vile_state + current_slot_base + slot_timer, 0.0, true);
+end
+
+local vileMap = {
+	{ 22, 24, 16 },
+	{ 21, 23, 14, 15 },
+	{ 20, 19, 17, 13, 12 },
+	{ 9,  18, 11, 4 },
+	{ 10, 7,  8,  2,  1  },
+	{ 6,  5,  3,  0 }
+};
+
+local heart = {
+	{2, 2}, {2, 3},
+	{3, 2}, {3, 3}, {3, 4},
+	{4, 2}, {4, 3},
+	{5, 3}
+};
+
+local waveFrames = {
+	{ {3, 1}, {5, 1} },
+	{ {2, 1}, {4, 1}, {6, 1} },
+	{ {1, 1}, {3, 2}, {5, 2} },
+	{ {2, 2}, {4, 2}, {6, 2} },
+	{ {1, 2}, {3, 3}, {5, 3} },
+	{ {2, 3}, {4, 3}, {6, 3} },
+	{ {1, 3}, {3, 4}, {5, 4} },
+	{ {2, 4}, {4, 4}, {6, 4} },
+	{ {3, 5}, {5, 5} }
+}
+
+function getSlotIndex(row, col)
+	row = math.max(row, 1);
+	if row <= #vileMap then
+		col = math.max(col, 1);
+		col = math.min(col, #vileMap[row]);
+		return vileMap[row][col] + 1;
+	end
+	return 1;
+end
+
+local waving = false;
+local wave_counter = 0;
+local wave_delay = 10;
+local wave_frame = 1;
+local wave_colour = 0;
+
+local function initWave()
+	waving = true;
+	wave_frame = 1;
+	wave_counter = 0;
+	wave_colour = math.random(0, 1);
+end
+
+local function updateWave()
+	if waving then
+		wave_counter = wave_counter + 1;
+		if wave_counter == wave_delay then
+			local i;
+			local vile_state = mainmemory.read_u24_be(vile_state_pointer + 1);
+			for i=1,#waveFrames[wave_frame] do
+				fireSlot(vile_state, getSlotIndex(waveFrames[wave_frame][i][1], waveFrames[wave_frame][i][2]), wave_colour);
+			end
+			wave_counter = 0;
+			wave_frame = wave_frame + 1;
+		end
+		if wave_frame > #waveFrames then
+			waving = false;
+		end
+	end
+end
+
+local function doHeart()
+	local vile_state = mainmemory.read_u24_be(vile_state_pointer + 1);
+	local i;
+
+	for i=1,#heart do
+		fireSlot(vile_state, getSlotIndex(heart[i][1], heart[i][2]), 0);
 	end
 end
 
@@ -424,6 +562,8 @@ local options_toggle_neverslip;
 
 function Game.initUI(form_handle, col, row, button_height, label_offset, dropdown_offset)
 	options_toggle_neverslip = forms.checkbox(form_handle, "Never Slip", col(0), row(6));
+	options_wave_button = forms.button(form_handle, "Wave", initWave, col(10), row(6), col(4) + 8, button_height);
+	options_heart_button = forms.button(form_handle, "Heart", doHeart, col(10), row(7), col(4) + 8, button_height);
 end
 
 function Game.eachFrame()
@@ -431,6 +571,7 @@ function Game.eachFrame()
 	applyFurnaceFunPatch();
 
 	checkGameTime();
+	updateWave();
 
 	if forms.ischecked(options_toggle_neverslip) then
 		neverSlip();

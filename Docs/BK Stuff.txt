@@ -2,7 +2,7 @@ BK Science TODO
 
 Explain "Object Teleportation" https://www.youtube.com/watch?v=wJODJbpZYq8
 
-Boggy/Vile rubberband science
+Boggy rubberband science
 
 Figure out RNG
 
@@ -45,9 +45,7 @@ until you leave the level entirely
 -- Vile state stuff --
 ----------------------
 
-Pointer at 0x36E560 to Vile state object
-
-Slots are 0x180 bytes long in memory
+Pointer at 0x36E560 to Vile state object (0x12EA50, save slot 6)
 
 Addresses below are relative to vile state object
 
@@ -60,7 +58,9 @@ Addresses below are relative to vile state object
 0x91 Previous game type (unsigned char)
 0x92 Player Score (unsigned char)
 0x93 Vile Score (unsigned char)
-0x94 Something idk (float)
+0x94 Minigame timer (float)
+
+25 slots each 0x180 bytes long in memory starting at 0x318
 
 0x318 Slot state
 	- 00000 0x00 disabled
@@ -70,12 +70,26 @@ Addresses below are relative to vile state object
 	- 10000 0x10 falling (no eat)
 	- 10100 0x14 eaten
 
-Falling state (no eat)
+Falling state (not eaten)
 0x0c -> 0x10 -> 0x04
 
-Falling state (eat)
+Falling state (eaten)
 0x0c -> 0x14 -> 0x04
 
 0x384 Amount "popped out" (0-1, float)
 0x388 Yumbly/Grumbly (0x00 yum, 0x01 grum)
 0x38C Slot timer (0-15? float)
+
+0x2A0C Vile X Position
+0x2A14 Vile Z Position
+0x2A58 Vile Rotation
+0x2AA8 Vile Speed
+	- Used for rubberbanding purposes
+	- Round 1 varies from 160 to 360
+	- Round 2 varies from 180 to 405
+	- Round 3 varies from 200 to 450
+	- Round 4 varies from 180 to 405
+	- Round 5 varies from 190 to 427.5
+	- Round 6 varies from 200 to 450
+	- Vile chasing you varies from 100 to 500
+	- Vile running from you varies from 300 to 400
