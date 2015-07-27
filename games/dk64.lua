@@ -566,8 +566,8 @@ end
 -- Physics/Scale --
 -------------------
 
-Game.speedy_speeds = { .001, .01, .1, 1, 5, 10, 20, 50, 100 };
-Game.speedy_index = 7;
+Game.speedy_speeds = { .001, .01, .1, 1, 5, 10, 15, 20, 35, 50, 100 };
+Game.speedy_index = 8;
 
 Game.rot_speed = 10;
 Game.max_rot_units = 4096;
@@ -663,6 +663,7 @@ local function visify()
 	mainmemory.writebyte(kong_object + visibility, 0x7f);
 end
 
+local options_toggle_invisify_button;
 local current_invisify = "Invisify";
 local function toggle_invisify()
 	if current_invisify == "Invisify" then
@@ -1033,7 +1034,6 @@ end
 local options_moon_mode_label;
 local options_moon_mode_button;
 
-local options_toggle_invisify_button;
 local options_clear_tb_void_button;
 local options_force_pause_button;
 local options_force_zipper_button;
