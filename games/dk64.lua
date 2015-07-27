@@ -1050,17 +1050,17 @@ function Game.initUI(form_handle, col, row, button_height, label_offset, dropdow
 	-- Key stuff
 	options_key_dropdown = forms.dropdown(form_handle, { "Key 1", "Key 2", "Key 3", "Key 4", "Key 5", "Key 6", "Key 7", "Key 8" }, col(10) + dropdown_offset, row(0) + dropdown_offset);
 	options_get_key_button = forms.button(form_handle, "Get", keyGet, col(10), row(1), 59, button_height);
-	options_lose_key_button = forms.button(form_handle, "Lose", keyLose, col(13) - 8, row(1), 59, button_height);
+	options_lose_key_button = forms.button(form_handle, "Lose", keyLose, col(13) - 5, row(1), 59, button_height);
 
 	-- Moon stuff
 	options_moon_mode_label =  forms.label(form_handle,  "Moon:",                    col(10),     row(2) + label_offset, 48, button_height);
-	options_moon_mode_button = forms.button(form_handle, moon_mode, toggle_moonmode, col(13) - 8, row(2),                59, button_height);
+	options_moon_mode_button = forms.button(form_handle, moon_mode, toggle_moonmode, col(13) - 5, row(2),                59, button_height);
 
 	-- Mad Jack stuff
-	options_toggle_madjack = 	 forms.checkbox(form_handle, "MJ Minimap", 		col(5), 	row(7));
+	options_toggle_madjack = forms.checkbox(form_handle, "MJ Minimap", col(5) + dropdown_offset, row(7) + dropdown_offset);
 
 	-- ISG Timer
-	options_toggle_isg_timer = forms.checkbox(form_handle, "ISG Timer", 		col(10), 	row(7));
+	options_toggle_isg_timer = forms.checkbox(form_handle, "ISG Timer", col(10) + dropdown_offset, row(7) + dropdown_offset);
 
 	-- Buttons
 	options_toggle_invisify_button = forms.button(form_handle, "Invisify",      toggle_invisify, col(5), row(4), col(4) + 8, button_height);
@@ -1072,8 +1072,8 @@ function Game.initUI(form_handle, col, row, button_height, label_offset, dropdow
 	options_random_effect_button = forms.button(form_handle, "Random effect", random_effect, col(10), row(6), col(4) + 8, button_height);
 
 	-- Checkboxes
-	options_toggle_homing_ammo =     forms.checkbox(form_handle, "Homing Ammo", col(0), row(6));
-	options_toggle_neverslip =       forms.checkbox(form_handle, "Never Slip",  col(0), row(7));
+	options_toggle_homing_ammo = forms.checkbox(form_handle, "Homing Ammo", col(0) + dropdown_offset, row(6) + dropdown_offset);
+	options_toggle_neverslip =   forms.checkbox(form_handle, "Never Slip",  col(0) + dropdown_offset, row(7) + dropdown_offset);
 end
 
 function Game.applyInfinites()
@@ -1128,9 +1128,9 @@ function Game.eachFrame()
 			checksum_value = memory.read_u32_be(eep_checksum_offsets[i]);
 			if eep_checksum_values[i] ~= checksum_value then
 				if i == 5 then
-					console.log("Wrote global flags "..i.." old checksum: "..bizstring.hex(eep_checksum_values[i]).." new checksum: "..bizstring.hex(checksum_value));
+					console.log("Global flags "..i.." Checksum: "..bizstring.hex(eep_checksum_values[i]).." -> "..bizstring.hex(checksum_value));
 				else
-					console.log("Wrote file slot "..i.." old checksum: "..bizstring.hex(eep_checksum_values[i]).." new checksum: "..bizstring.hex(checksum_value));
+					console.log("Slot "..i.." Checksum: "..bizstring.hex(eep_checksum_values[i]).." -> "..bizstring.hex(checksum_value));
 				end
 				eep_checksum_values[i] = checksum_value;
 			end

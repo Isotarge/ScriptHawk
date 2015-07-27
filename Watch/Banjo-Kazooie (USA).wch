@@ -22,7 +22,7 @@ SystemID N64
 37C2D3	b	u	1	RDRAM	Mumbo Transformation
 37C2E4	d	f	1	RDRAM	Slope Timer
 37C3A0	d	h	1	RDRAM	Moves unlocked (bitfield)
-37C4BC	w	1	1	RDRAM	Y Velocity
+37C4BC	d	f	1	RDRAM	Y Velocity
 37C5A0	d	f	1	RDRAM	X Position
 37C5A4	d	f	1	RDRAM	Y Position
 37C5A8	d	f	1	RDRAM	Z Position
@@ -47,13 +47,14 @@ SystemID N64
 37D9BC	d	f	1	RDRAM	Camera something?
 37D9C0	d	f	1	RDRAM	Camera something?
 37D9C4	d	f	1	RDRAM	Camera something?
-37D9C8	d	f	1	RDRAM	Camera something?
-37D9CC	d	f	1	RDRAM	Camera something?
+37D9C8	d	f	1	RDRAM	Camera Pitch Velocity
+37D9CC	d	f	1	RDRAM	Camera Yaw Velocity
 37D9E0	d	f	1	RDRAM	Camera X vel?
 37D9E4	d	f	1	RDRAM	Camera Y vel?
 37D9E8	d	f	1	RDRAM	Camera Z vel?
 37DC70	d	f	1	RDRAM	C-Up camera angle?
-37DDB4	d	u	1	RDRAM	Jiggy Spawn Angle
+37DDB4	d	f	1	RDRAM	Jiggy Spawn Angle
+37DDB8	d	f	1	RDRAM	Jiggy spawn velocity
 37E8F5	b	h	1	RDRAM	Map
 383012	b	h	1	RDRAM	Current Pause Menu Item
 383384	d	f	1	RDRAM	Mysterious (Text?) Timer

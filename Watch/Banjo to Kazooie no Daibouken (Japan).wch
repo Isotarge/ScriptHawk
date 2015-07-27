@@ -7,13 +7,15 @@ SystemID N64
 0001FC	d	h	0	EEPROM	EEPROM Checksum 5
 36F260	d	h	1	RDRAM	Vile State Pointer
 37CDE4	d	f	1	RDRAM	Slope timer
-37CFBC	w	1	1	RDRAM	Y Velocity
+37CEA0	d	h	1	RDRAM	Moves Unlocked (Bitfield)
+37CFBC	d	f	1	RDRAM	Y Velocity
 37D0A0	d	f	1	RDRAM	X Position
 37D0A4	d	f	1	RDRAM	Y Position
 37D0A8	d	f	1	RDRAM	Z Position
 37D190	d	f	1	RDRAM	Facing Angle
 37D194	d	f	1	RDRAM	Moving Angle
-37E8C4	d	u	1	RDRAM	Jiggy Spawn Angle
+37E8C4	d	f	1	RDRAM	Jiggy Spawn Angle
+37E8C8	d	f	1	RDRAM	Jiggy Spawn Velocity
 37F405	b	h	1	RDRAM	Map
 386AA3	b	u	1	RDRAM	Notes (On hand)
 386B31	b	u	1	RDRAM	Notes (Total)

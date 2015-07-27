@@ -103,7 +103,9 @@ It's a bitfield, 4 bytes
 
 Common states
 
+00 00 00 00 - No Moves
 00 00 9D B9 - SM 100%
+00 7F FF FF - Legit 100%
 FF FF FF FF - Used during demos
 
 8- -- -- -- ??
