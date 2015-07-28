@@ -7,6 +7,8 @@ SystemID N64
 0001C2	w	u	1	EEPROM	FF RNG Byte
 0001DC	d	h	0	EEPROM	EEPROM Checksum 4
 0001FC	d	h	0	EEPROM	EEPROM Checksum 5
+2986BA	w	h	1	RDRAM	Banjo Model Replacement
+2986BE	w	h	1	RDRAM	Banjo Model Replacement
 36C4EC	w	u	1	RDRAM	Menu item 1 Y Position
 36C4EE	b	u	1	RDRAM	Menu Item 1 Portrait
 36C4FC	w	u	1	RDRAM	Menu Item 2 Y Position
@@ -16,6 +18,8 @@ SystemID N64
 36C51C	w	u	1	RDRAM	Menu Item 4 Y Position
 36C51E	b	u	1	RDRAM	Menu Item 4 Portrait
 36E560	d	h	1	RDRAM	Vile State Pointer
+37C0E0	d	h	1	RDRAM	Banjo Model Pointer?
+37C0E6	b	u	1	RDRAM	Banjo Transparancy
 37C0EC	d	f	1	RDRAM	Banjo Scale
 37C1D1	b	u	1	RDRAM	Standing on fly Pad
 37C1D2	b	u	1	RDRAM	Standing on shock spring pad
@@ -81,6 +85,4 @@ SystemID N64
 386024	d	f	1	RDRAM	Game Time (RBB)
 386028	d	f	1	RDRAM	Game Time (MMM)
 38602C	d	f	1	RDRAM	Game Time (SM)
-37C0F8	d	h	1	RDRAM	
-37C0E4	d	u	1	RDRAM	Banjo Visibility
 

@@ -140,3 +140,889 @@ FF FF FF FF - Used during demos
 -- -- -- -4 Beak Buster
 -- -- -- -2 Beak Bomb
 -- -- -- -1 Beak Barge
+
+---------------------------------
+-- Pause menu portrait indices --
+---------------------------------
+
+0x00 Crash -> Grunty
+0x01 Crash -> Vile
+0x02 Crash -> Vile
+0x03 Crash -> Vile
+0x04 Banjo
+0x05 Grunty
+0x06 Jiggy
+0x07 Tooty
+0x08 Crash -> Note
+0x09 Jiggy
+0x0A Crash -> Empty Honeycomb
+0x0B Clock
+0x0C Crash -> Banjo
+0x0D Crash -> Kazooie
+0x0E Crash -> Kazooie
+0x0F Crash -> Bottles
+
+0x10 Crash -> Mumbo
+0x11 Crash -> Chimpy
+0x12 Crash -> Conga
+0x13 Crash -> Blubber
+0x14 Crash -> Nipper
+0x15 Crash -> Clanker
+0x16 Crash -> Snippet
+0x17 Crash -> Vile
+0x18 Crash -> Tiptup
+0x19 Crash -> Turtle
+0x1A Crash -> BGS frog thing what the heck are they called?
+0x1B Crash -> Trunker
+0x1C Crash -> GV Snake charmer guy
+0x1D Crash -> Gobi
+0x1E Crash -> Slappa
+0x1F Crash -> MMM Nappa?
+
+0x20 Crash -> Yellow Jinjo
+0x21 Crash -> Green Jinjo
+0x22 Crash -> Blue Jinjo
+0x23 Crash -> Pink/Purple Jinjo (it's pink shut up)
+0x24 Crash -> Orange Jinjo
+0x25 Crash -> Note
+0x26 Crash -> Mumbo Token
+0x27 Crash -> Egg
+0x28 Crash -> Red Feather
+0x29 Crash -> Gold Feather
+0x2A Crash -> Chimpy's Orange
+0x2B Crash -> Blubber's Gold
+0x2C Crash -> Full Honeycomb
+0x2D Crash -> Empty Honeycomb
+0x2E Crash -> Extra Life
+0x2F Crash -> Jiggy
+
+0x30 Crash -> Beehive
+0x31 Crash -> Turbo Trainers
+0x32 Crash -> Wading Boots (idk if that's the right name)
+0x33 Crash -> Pirhana (how 2 spel?)
+0x34 Crash -> Termite
+0x35 Crash -> Ju-Ju
+0x36 Crash -> Clam
+0x37 Crash -> Treasure Chest (pound the X)
+0x38 Crash -> Leaky
+0x39 Crash -> Gloop
+0x3A Crash -> Tiptup?
+0x3B Crash -> Snacker
+0x3C Crash -> Jinxy? whatever the sphinx is called
+0x3D Crash -> Worm doodad
+0x3E Crash -> RBB Dolphin?
+0x3F Crash -> Jinxy's ring dudes?
+
+0x40 Crash -> BGS Croc (green eye)
+0x41 Crash -> Grunty
+0x42 Crash -> Tooty
+0x43 Crash -> Boggy
+0x44 Crash -> Wozza
+0x45 Crash -> Mozhand
+0x46 Crash -> Tumblar?
+0x47 Crash -> GV Mummy bloke?
+0x48 Crash -> Blue Present
+0x49 Crash -> Green slug thing? WTF is this??
+0x4A Crash -> FP Ice (water)
+0x4B Crash -> Blue Twinkly
+0x4C Crash -> Twinkly Eater?
+0x4D Crash -> Gnawty
+0x4E Crash -> (Boss?) Boom Box
+0x4F Crash -> Zubba?
+
+0x50 Crash -> Nabnut? (whatever the squirrel is called)
+0x51 Crash -> Soggy? (one of Boggy's kids)
+0x52 Crash -> Some bird dude
+0x53 Crash -> Some bird dude
+0x54 Crash -> Some bird dude
+0x55 Crash -> Eeryie (how 2 spel?)
+0x56 Crash -> Cauldron (grey)
+0x57 Crash -> Brentilda
+0x58 Crash -> Tooty
+0x59 Crash -> red'n'black crab dude (what's his name?)
+0x5A Crash -> Loggo
+0x5B Crash -> Cheato
+0x5C Crash -> Green Present
+0x5D Crash -> Red Present
+0x5E Crash -> Klungo
+0x5F Crash -> Sexy Grunty
+
+0x60 Crash -> Ugly Tooty
+0x61 Crash -> Banjo
+0x62 Crash -> Kazooie
+0x63 Crash -> Tooty
+0x64 Crash -> Dingpot
+0x65 Crash -> Crocodile (Banjo)
+0x66 Crash -> Grunty
+0x67 Crash -> Treasure Chest
+0x68 Completely crashed BizHawk
+0x69 Completely froze BizHawk
+0x6A Crash
+0x6B Crash -> Empty
+0x6C Crash 
+0x6D Crash
+0x6E Completely froze BizHawk
+0x6F Crash
+
+0x70 Crash (menu partially opened)
+0x71 Completely froze BizHawk
+0x72 
+0x73 
+0x74 
+0x75 
+0x76 
+0x77 
+0x78 
+0x79 
+0x7A 
+0x7B 
+0x7C 
+0x7D 
+0x7E 
+0x7F 
+
+0x80 
+0x81 
+0x82 
+0x83 
+0x84 
+0x85 
+0x86 
+0x87 
+0x88 
+0x89 
+0x8A 
+0x8B 
+0x8C 
+0x8D 
+0x8E 
+0x8F 
+
+0x90 
+0x91 
+0x92 
+0x93 
+0x94 
+0x95 
+0x96 
+0x97 
+0x98 
+0x99 
+0x9A 
+0x9B 
+0x9C 
+0x9D 
+0x9E 
+0x9F 
+
+0xA0 
+0xA1 
+0xA2 
+0xA3 
+0xA4 
+0xA5 
+0xA6 
+0xA7 
+0xA8 
+0xA9 
+0xAA 
+0xAB 
+0xAC 
+0xAD 
+0xAE 
+0xAF 
+
+0xB0 
+0xB1 
+0xB2 
+0xB3 
+0xB4 
+0xB5 
+0xB6 
+0xB7 
+0xB8 
+0xB9 
+0xBA 
+0xBB 
+0xBC 
+0xBD 
+0xBE 
+0xBF 
+
+0xC0 
+0xC1 
+0xC2 
+0xC3 
+0xC4 
+0xC5 
+0xC6 
+0xC7 
+0xC8 
+0xC9 
+0xCA 
+0xCB 
+0xCC 
+0xCD 
+0xCE 
+0xCF 
+
+0xD0 
+0xD1 
+0xD2 
+0xD3 
+0xD4 
+0xD5 
+0xD6 
+0xD7 
+0xD8 
+0xD9 
+0xDA 
+0xDB 
+0xDC 
+0xDD 
+0xDE 
+0xDF 
+
+0xE0 
+0xE1 
+0xE2 
+0xE3 
+0xE4 
+0xE5 
+0xE6 
+0xE7 
+0xE8 
+0xE9 
+0xEA 
+0xEB 
+0xEC 
+0xED 
+0xEE 
+0xEF 
+
+0xF0 
+0xF1 
+0xF2 
+0xF3 
+0xF4 
+0xF5 
+0xF6 
+0xF7 
+0xF8 
+0xF9 
+0xFA 
+0xFB 
+0xFC 
+0xFD 
+0xFE 
+0xFF 
+
+-----------------------
+-- Model replacement --
+-----------------------
+
+0000-0329 Untested
+
+032A --CRASH--
+032B --CRASH--
+032C --CRASH--
+032D Hexagonal shadow
+032E Bar of soap?
+032F Corner web texture
+
+0330 Banjo's chair
+0331 Towel hook + blue and red towels
+0332 BGS grassy floating plank
+0333 Blue vase + red flower
+0334 Palm tree
+0335 BGS climbable posts
+0336 Open chest of draws
+0337 Banjo's kitchen
+0338 Radio + table
+0339 Dark brown tree (not sure where it's from)
+033A Green wall torch
+033B Umbrella (beach map)
+033C GV Histup's pot
+033D GV gold coffin
+033E GV boulder to free Gobi?
+033F GV boulder to free Gobi?
+
+0340 Grunty's sexifying machine
+0341 Control panel with lever (game over? intro?)
+0342 Hexagonal pillar
+0343 Tooty picture
+0344 Textured brown polygon
+0345 Shiny gold polygon
+0346 Barely visible grey texture thing
+0347 Grunty room door
+0348 Dark brown bush/leaf texture
+0349 ????
+034A Web (FP lobby room?)
+034B Bed
+034C Furnace Fun -> Grunty's podium
+034D Banjo
+034E Banjo
+034F Termite (Banjo)
+
+0350 Termite
+0351 Clam
+0352 Sled
+0353 Bigbutt
+0354 Brown Bigbutt (actualy small)
+0355 Banjo (Intro sequence)
+0356 Washing Machine
+0357 --CRASH--
+0358 Crab
+0359 Walrus (Banjo)
+035A Tooty (Intro sequence)
+035B Tooty
+035C Conga
+035D Chimpy
+035E Jiggy (Banjo's hand?)
+035F Jiggy
+
+0360 Egg shard
+0361 Empty honeycomb piece
+0362 Bee (Banjo)
+0363 Full honeycomb piece
+0364 Beehive
+0365 --CRASH--
+0366 Wading boots
+0367 Turbo trainers
+0368 --CRASH--
+0369 Green thing? what the heck is this?
+036A --CRASH--
+036B Yellow chompy fish, wtf is it called?
+036C --CRASH--
+036D --CRASH--
+036E --CRASH--
+036F Pumpkin (Banjo)
+
+0370 Blubber
+0371 Slappa
+0372 Gloop
+0373 Mr. Vile
+0374 Crocodile (Banjo)
+0375 BGS red frog (what is it called?)
+0376 Slappa (redder than the last one)
+0377 Sir Slush
+0378 Snowball
+0379 Sir Slush's hat
+037A Snowball
+037B Snow(ball?) fragment
+037C Clam (top)
+037D Eyeball (brown iris)
+037E Clam fragment
+037F White circle texture
+
+0380 ???
+0381 ???
+0382 ???
+0383 ???
+0384 ???
+0385 BGS yellow frog (what's he called?)
+0386 --CRASH--
+0387 Bottles
+0388 Molehill
+0389 Severed finger? wtf is this?
+038A Boggy
+038B ???
+038C Crab claw
+038D Crab leg?
+038E Crab head
+038F CC Crab (what are they called? snippits? snippets?)
+
+0390 CC Crab head
+0391 CC Crab leg?
+0392 CC Crab claw
+0393 Termite leg?
+0394 Termite mouth
+0395 Termite abdomen
+0396 Termite? Eye (brown iris)
+0397 BGS Crocodile head
+0398 Red spider
+0399 --CRASH--
+039A --CRASH--
+039B --CRASH--
+039C --CRASH--
+039D --CRASH--
+039E --CRASH--
+039F --CRASH--
+
+03A0 --CRASH--
+03A1 --CRASH--
+03A2 --CRASH--
+03A3 --CRASH--
+03A4 --CRASH--
+03A5 --CRASH--
+03A6 N64 Logo
+03A7 Rare Logo
+03A8 Mysterious triangle (illuminati obv)
+03A9 Palm tree
+03AA --CRASH--
+03AB --CRASH--
+03AC --CRASH--
+03AD Fire/explosion/sun texture? (where is this from?)
+03AE MMM Pot
+03AF Green wood plank
+
+03B0 Snacker
+03B1 Mumbo (intro)
+03B2 2 Transparant green stalacthings?
+03B3 Mumbo's Skull
+03B4 --CRASH--
+03B5 --CRASH--
+03B6 TTC stairs
+03B7 TTC stairs
+03B8 --CRASH--
+03B9 --CRASH--
+03BA --CRASH--
+
+03BB-03CF Untested
+
+03D0 MMM Gate
+03D1 MMM Gate
+03D2 Wood texture (box? door?)
+03D3 Church door
+03D4 Treasure chest
+03D5 Nipper's shell
+03D6 Lighthouse door
+03D7 Star pad (where's this from?) (GV matching game?)
+03D8 Pyramid door? (Banjo face)
+03D9 Pyramid door? (Kazooie face)
+03DA Pyramid door? (Circle pattern)
+03DB Pyramid door? (Star, is this the one that opens downward?)
+03DC Flying carpet
+03DD Snake charmer guy (what's his name?)
+03DE Snake charmer guy's snake (what's hiss name?)
+03DF Trunker
+
+03E0 Gobi
+03E1 Red thing with yellow spiral pattern (where is this from?)
+03E2 GV Kazooie Beak Bomb target
+03E3 Rope?
+03E4 Boulder trapping Gobi
+03E5 Grabba shadow?
+03E6 Sphinx (Egg shots)
+03E7 Flying carpet shadow
+03E8 GV ring dude (what's his name?)
+03E9 Red arrow (TTC game)
+03EA Red X (TTC game)
+03EB Red ? (TTC game)
+03EC Mine enemy (water, what's his name?)
+03ED Dragonfly enemy (what's his name?)
+03EE BGS Tutrle (overworld)
+03EF BGS Turtle foot
+03F0 BGS Turtle foot
+03F1 BGS Turtle foot
+03F2 BGS Turtle foot
+03F3 Blue straw? (what is this lol)
+03F4 --CRASH--
+03F5 BGS Jiggy pound pad
+03F6 Yumbly
+03F7 Grumbly
+03F8 Tiptup
+03F9 Choir turtle
+03FA --CRASH--
+03FB --CRASH--
+03FC --CRASH--
+03FD --CRASH--
+03FE --CRASH--
+03FF Pyramid door (circle pattern)
+
+0400 GV Circle pattern pound pad
+0401 RBB Life preserver (floaty thing, what's this called?)
+0402 Green sphere
+0403 RBB Propeller
+0404 RBB Propeller pad (green)
+0405 RBB Propeller pad (grey)
+0406 Long pipe (wat)
+0407 Long pipe (wat)
+0408 Long pipe (wat)
+0409 Engine room gear (small)
+040A Engine room gear (medium)
+040B Engine room gear (large)
+040C Engine room piece (rotates)
+040D Engine room piece (rotates)
+040E Engine room piece (rotates)
+040F Engine room propeller
+
+0410 Engine room propeller
+0411 Engine room propeller
+0412 RBB Propeller pad (grey)
+0413 RBB 1 Pad
+0414 RBB 2 Pad
+0415 RBB 3 Pad
+0416 RBB gold whistle
+0417 RBB gold whistle
+0418 RBB silver whistle
+0419 RBB pipe enemy (what's his name?)
+041A --CRASH--
+041B RBB anchor pad
+041C RBB dolphin (what's his name?)
+041D RBB anchor
+041E RBB rare flag
+041F Grey translucent sphere (wtf is this?)
+
+0420 --CRASH--
+0421 ???
+0422 GV Sphinx (what's his name?)
+0423 --CRASH--
+0424 GV Cactus (what's his name?)
+0425 BGS Croc (what's his name?)
+0426 ???
+0427 Brown plank of wood
+0428 ???
+0429 Clanker's Key
+042A --CRASH--
+042B Orange triangular prism (wats this?)
+042C Treasure chest
+042D Boulder dude (SM?)
+042E Boulder dude (SM?)
+042F RBB Honeycomb pad
+
+0430 CC Grill enemy (wats it called?)
+0431 Mysterious grill (wat?)
+0432 CC version of whiplash (wats it called?)
+0433 --CRASH--
+0434 That pet thing in GV
+0435 Green grill (horizontal)
+0436 Blue/green grill (horizontal)
+0437 Green/yellow grill (vertical)
+0438 (GV?) Honeycomb pad
+0439 ???
+043A CC wonderwing blade
+043B RBB yellow Jinjo platform
+043C RBB lifeboat
+043D MMM clock pad
+043E MMM gate
+043F Star texture (MMM?)
+
+0440 Bear Snare (CCW)
+0441 White sphere (eyeball?)
+0442 Twinklies' box
+0443 Zubba's Jiggy honey
+0444 Zubba's honeycomb texture
+0445 Zubba's hive texture?
+0446 Zubba
+0447 CCW Flower
+0448 ???
+0449 ???
+044A ???
+044B ???
+044C Soggy? (little blue shorts kid)
+044D Boggy's green kid
+044E Boggy's pink kid
+044F Big green dank shit
+
+0450 Dingpot
+0451 Grunty
+0452 Grunty's arms (for some reason)
+0453 Dingpot (cutscene version?)
+0454 Tootie picture (in Dingpot)
+0455 Skeleton (what's his name?)
+0456 Grunty's broom
+0457 Grunty on broom
+0458 Banjo (cutscene version, with hands!)
+0459 Bed
+045A --CRASH--
+045B Kazooie (I'm lost for words here, some cutscene thing on a stand with hook)
+045C Curtains (Banjo's house cutscene)
+045D ???
+045E Banjo's house door
+045F Lava/fire ball?
+
+0460 Fire texture?
+0461 Smaller green dank shit
+0462 Albino squirrel with no legs
+0463 Banjo's bedsheets?
+0464 Bed
+0465 Bear Snare (winter)
+0466 --CRASH--
+0467 Puzzle
+0468 ???
+0469 Ugly Tooty
+046A Klungo
+046B Green bars (sexification/uglification cutscene)
+046C Puzzle
+046D Weird ass grey texture that follows the camera
+046E Goldfish in bowl
+046F Cuckoo clock
+
+0470 Banjo's fireplace
+0471 Banjo's house puzzle frame
+0472 Banjo's house puzzle
+0473 Chef Mumbo
+0474 Mumbo's BBQ (goldfish & steaks included)
+0475 --CRASH--
+0476 --CRASH--
+0477 --CRASH--
+0478 Mysterious yellow circle texture that follows the camera
+0479 Melon babe
+047A Coconut?
+047B Grunty squash boulder
+047C --CRASH--
+047D --CRASH--
+047E --CRASH--
+047F Blue present
+
+0480 Green Present
+0481 Red Present
+0482 Brown circle thing idk
+0483 ???
+0484 Baby Eeryeyeyeyery (how u spel?)
+0485 Catterpillaer
+0486 ???
+0487 eeryieyeiey
+0488 FP Xmas tree
+0489 Shock Spring Pad
+048A Fly Pad
+048B Jiggy Pad
+048C TNT Box guy man boom you know
+048D Nabnut
+048E Acorn
+048F Gnawty
+
+0490 Gnawty boulder
+0491 Note door
+0492 Regular door
+0493 Engine room door
+0494 Wozza
+0495 Jiggy
+0496 Twinkly gobble dude guy man eat thing wats his name
+0497 Shiny blue triangle
+0498 Shiny yellow triangle
+0499 Shiny green triangle
+049A Shiny orange triangle
+049B Shiny pank triangle
+049C Green & Red box? wtf
+049D RBB green enemy bloke (what's his name?)
+049E Beehive Bee texture?
+049F Firefly texture (wtf)
+
+04A0 --CRASH--
+04A1 Bricks (Gobi's Lobby?)
+04A2 MM Door
+04A3 TTC lobby chest lid
+04A4 Clanker's lobby pipe
+04A5 Clanker's lobby pipe
+04A6 Clanker's lobby pipe (shorty)
+04A7 Clanker's lobby bars
+04A8 Clanker's lobby puzzle room grate
+04A9 Clanker's lobby blue pipe switch
+04AA Clanker's lobby green pipe switch
+04AB Clanker's lobby green grate switch
+04AC More bars
+04AD Grunty statue hat top
+04AE BGS Door
+04AF Freezeezezy cheato ice ball blocker thing
+
+04B0 Water level switch (3)
+04B1 Water chamber grate
+04B2 Water level switch (2)
+04B3 RBB lobby rare box
+04B4 RBB door
+04B5 Water level switch (1)
+04B6 Grate (MMM puzzle room?)
+04B7 Grate (RBB puzzle room?)
+04B8 CCW lobby Jiggy spawn switch
+04B9 RBB frame
+04BA RBB ship window
+04BB RBB ship window
+04BC Gobi's door
+04BD Grunty face eye thing FP lobby grunty switch beak bomb doodad k
+04BE MMM entry door
+04BF Yellow web
+
+04C0 MMM window
+04C1 MMM window
+04C2 MMM window
+04C3 FP house
+04C4 FP Mumbo's skull
+04C5 FP present stack
+04C6 FP bridge
+04C7 Mummy dude (wats his name?)
+04C8 Mummy dude's arm?
+04C9 Mummy dude's leg
+04CA Mummy dude's head
+04CB Mummy dude's detached misc all purpose body part
+04CC Skeleton
+04CD Skeleton's arm
+04CE Skeleton's leg
+04CF Skeleton's head
+
+04D0 Skeleton's detached misc all purpose body part
+04D1 --CRASH--
+04D2 FP Xmas tree jiggy stopper blocker ice thing blocker thing ice
+04D3 FP more ice
+04D4 Triangle that changes colour depending on which angle you look at it from
+04D5 More yellow web (vertical)
+04D6 CCW door?
+04D7 FP door (left side)
+04D8 FP door (right side)
+04D9 FP facade door
+04DA an wooden door
+04DB RBB lifeboat (with support)
+04DC Grunty switch
+04DD Mumbo pad
+04DE RBB lifeboat (with support)
+04DF Grey cauldron
+
+04E0 An nother wooden door
+04E1 MMM lobby crypt coffin
+04E2 RBB shed window
+04E3 CCW flower (winter)
+04E4 Gold letter Z that tracks your viewing angle
+04E5 Sexy pank crystals (Wozza's cave)
+04E6 Sexy blue crystals (Wozza's cave)
+04E7 Sexy green crystals (Wozza's cave)
+04E8 Sexy blue crystal
+04E9 Slightly smaller but still sexy blue crystal
+04EA Finish line (FP races)
+04EB Start line (FP races)
+04EC FP race podium
+04ED An carrot
+04EE Colliwobble
+04EF The onion one (less memorable clearly)
+
+04F0 Leaf or some shit
+04F1 Slightly lighter leaf
+04F2 Slightly biger leaf
+04F3 More leaf
+04F4 Colliwobble piece?
+04F5 CCW Spring switch
+04F6 CCW Summer switch
+04F7 CCW Autumn switch "Fall" is a fake name shut up
+04F8 CCW Winter switch
+04F9 CCW Breakable window
+04FA CCW Breakable window
+04FB CCW Breakable window
+04FC CCW Breakable window
+04FD Whiplash
+04FE Misc plant thing, prolly ccw flower sprouting
+04FF An nother misc plant thing
+
+0500 An nother misc plant thing
+0501 CCW leaf pile
+0502 Nabnut
+0503 Fat Nabnut
+0504 Ice cube
+0505 Misc ice
+0506 Bear snare (winter)
+0507 TTC Puzzle room Grunty eye
+0508 TTC Puzzle room an nother Grunty eye
+0509 GV lobby coffin thing?
+050A ???
+050B MMM SnS room door
+050C Ice Key
+050D ???
+050E Green translucent triangle
+050F Translucent triangle
+
+0510 Same
+0511 ???
+0512 Blue clear door (Ice key wozza's cave?)
+0513 Blue clear door (Ice key wozza's cave?)
+0514 Browny skull texture?
+0515 Golden switch
+0516 Dark brown plank
+0517 MMM gate
+0518 An wooden door (with window!)
+0519 Loggo
+051A Leaky
+051B Bug idiot enemy from GV
+051C Bug idiot enemy from GV head
+051D Some kind of tear texture? idk
+051E Bug asshole's side body part thing eye face body arm leg thing yeah?
+051F Bug asshole's body
+
+0520 Bug asshole's detached leg or something idk
+0521 Wall hole enemy skeleton guy 
+0522 ???
+0523 Wall hole guy jaw
+0524 Some head idk
+0525 tail?
+0526 ???
+0527 ???
+0528 ???
+0529 ???
+052A ???
+052B ???
+052C That robin hood asshole from CCW
+052D Said asshole's hat
+052E An wooden door
+052F Banjo's Chair (sprung)
+
+0530 Banjo's bed (Sprung)
+0531 Inside Gnawty's house
+0532 Big Banjo
+0533 Sexy ass door
+0534 FP Lobby Fly pad switch
+0535 Blue triangle
+0536 Red triangle
+0537 Yellow Triangle
+0538 Jiggy podium
+0539 Brentilda
+053A An eye
+053B An teeth?
+053C An clanker panel?
+053D Big Grunty
+053E Gnawty's bed
+053F Gnawty's shelfsfs
+
+0540 Shock Spring Pad switch (GV Lobby)
+0541 Yellow/Red sphere (idk)
+0542 Splat floor texture
+0543 Jinjo statue base
+0544 Jinjonator base
+0545 Jinjo statue
+0546 Grunty spell aura
+0547 8xx door powerup pillow
+0548 8xx door powerup pillow
+0549 8xx door powerup pillow
+054A Red lair minion
+054B Biger Yellow/Red sphere (idk)
+054C "GAME OVER" text
+054D "BANJO-KAZOOIE" text
+054E ???
+054F Cheato
+
+0550 DoG
+0551 Jinjonator
+0552 Broom head
+0553 Broom bits
+0554 Broom bits
+0555 Broom eye
+0556 Yellow aura (Grunty spell?)
+0557 Red aura (Grunty spell?)
+0558 Green aura (Grunty spell?)
+0559 Pank aura (Grunty spell?)
+055A BK Pad
+055B Boggy's igloo
+055C "PRESS START" text
+055D "NO CONTROLLER" text
+055E Spoopy ass ghost
+055F FF Prize (pot thing washing tumble machine drier)
+
+0560 FF Prize (Grunty doll)
+0561 Blue lair minion
+0562 Brown lair minion
+0563 ???
+0564 Purple ghost asshole
+0565 Banjo's hand (bonus puzzle)
+0566 Sandcastle crab
+0567 Sandcastle crab's head
+0568 Sandcastle crab part
+0569 Sandcastle crab claw
+056A FP house chimney
+056B GV Pyramid
+056C "THE END" text
+056D Mumbo's hand (With picture)
+056E Beach map
+056F --CRASH--
+
+0570 --CRASH--
+0571 --CRASH--
+
+-- TODO: wtf does this byte do?
+8128189A 0057
