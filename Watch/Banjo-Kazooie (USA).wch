@@ -7,6 +7,15 @@ SystemID N64
 0001C2	w	u	1	EEPROM	FF RNG Byte
 0001DC	d	h	0	EEPROM	EEPROM Checksum 4
 0001FC	d	h	0	EEPROM	EEPROM Checksum 5
+1F4618	d	h	1	RDRAM	Slot Start
+1F4798	d	h	1	RDRAM	Slot Start
+1F47C4	d	f	1	RDRAM	
+1F4874	d	f	1	RDRAM	
+1F4890	d	f	1	RDRAM	
+1F4894	d	f	1	RDRAM	
+1F4898	d	f	1	RDRAM	
+1F48A0	d	f	1	RDRAM	
+1F94EC	d	h	1	RDRAM	Boggy start
 2986BA	w	h	1	RDRAM	Banjo Model Replacement
 2986BE	w	h	1	RDRAM	Banjo Model Replacement
 36C4EC	w	u	1	RDRAM	Menu item 1 Y Position
@@ -17,7 +26,7 @@ SystemID N64
 36C50E	b	u	1	RDRAM	Menu Item 3 Portrait
 36C51C	w	u	1	RDRAM	Menu Item 4 Y Position
 36C51E	b	u	1	RDRAM	Menu Item 4 Portrait
-36E560	d	h	1	RDRAM	Vile State Pointer
+36E560	d	h	1	RDRAM	Vile/Boggy race State Pointer
 37C0E0	d	h	1	RDRAM	Banjo Model Pointer?
 37C0E6	b	u	1	RDRAM	Banjo Transparancy
 37C0EC	d	f	1	RDRAM	Banjo Scale
@@ -85,4 +94,12 @@ SystemID N64
 386024	d	f	1	RDRAM	Game Time (RBB)
 386028	d	f	1	RDRAM	Game Time (MMM)
 38602C	d	f	1	RDRAM	Game Time (SM)
+3935B0	d	s	1	RDRAM	Boggy race flags completed (Player)
+3935B4	d	s	1	RDRAM	Boggy race flags completed (Boggy)
+3935C0	b	u	1	RDRAM	Boggy is 1 flag ahead of player
+3935C1	b	u	1	RDRAM	Boggy is 2 flags ahead of player
+3935C2	b	u	1	RDRAM	Boggy is 3 flags ahead of player
+3935D0	d	f	1	RDRAM	Banjo X Position Copy
+3935D4	d	f	1	RDRAM	Banjo Y Position Copy
+3935D8	d	f	1	RDRAM	Banjo Z Position Copy
 

@@ -7,7 +7,7 @@ SystemID N64
 0001FC	d	h	0	EEPROM	EEPROM Checksum 5
 36EAE0	d	h	1	RDRAM	Vile State pointer
 37CCB4	d	f	1	RDRAM	Slope Timer
-37CD70	d	h	1	RDRAM	Moves Unlocked Bitfield
+37CD70	d	h	1	RDRAM	Moves Unlocked (Bitfield)
 37CE8C	d	f	1	RDRAM	Y Velocity
 37CF70	d	f	1	RDRAM	X Position
 37CF74	d	f	1	RDRAM	Y Position

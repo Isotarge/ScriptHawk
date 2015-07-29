@@ -12,9 +12,9 @@ SystemID N64
 37B7A0	d	f	1	RDRAM	X Position
 37B7A4	d	f	1	RDRAM	Y Position
 37B7A8	d	f	1	RDRAM	Z Position
-37B894	d	f	1	RDRAM	Rotation
-37CFB4	d	f	1	RDRAM	Jiggy Spawn angle
-37CFB8	d	f	1	RDRAM	Jiggy Spawn velocity
+37B894	d	f	1	RDRAM	Facing Angle
+37CFB4	d	f	1	RDRAM	Jiggy Spawn Angle
+37CFB8	d	f	1	RDRAM	Jiggy Spawn Velocity
 37DAF5	b	h	1	RDRAM	Map
 385183	b	u	1	RDRAM	Notes - TODO: Does this work?
 385187	b	u	1	RDRAM	Eggs

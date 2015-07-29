@@ -41,11 +41,76 @@ if you enter a loading zone it resets to the initial position by the jinxy paw
 but the game keeps track of how many rings you have gone through
 until you leave the level entirely
 
+----------------------------
+-- Boggy race state stuff --
+----------------------------
+
+Pointer at 0x36E560 to Boggy Race state object
+
+X Flag slots each 0x180 bytes long in memory starting at 0x28
+
+Relative Type    Observed values
+---------------------------------------
+
+0x1C     ???     0x00200000, 0x00000040
+
+0x24     ???     0x00127FF4, 0x00D5BFF4
+
+0x2C     Float   0-100
+0x30     Float   0-100
+
+0x38     ???     0x00000005
+
+0x44     Float   0-100
+
+0x58     ???     0x00000824, 0x000009AC
+
+0xD4     Byte    0x02, 0x10
+0xD5     Byte    0x00, 0x20
+0xD6     Byte    0x00
+0xD7     Byte    0x32
+
+0xDC     Float   1
+
+0xF8     Float   -4450
+0xFC     Float   0-1597
+0x100    Float   -7407
+
+0x104    Byte    0x00
+0x105    Byte    0x0F
+0x106    Byte    0xF1
+0x107    Byte    0xC1
+
+0x108    Float   0.8-1.4
+0x10C    Pointer 0x80392904
+
+0x118    Point?  0x80092000
+
+0x134    ???     0x005E0000
+
+0x140    Pointer 0x8032B5C0
+
+0x144    ???     0x63636380
+
+0x14C    ???     0x007263D0
+
+0x150    Float   -10
+0x154    Float   434
+0x158    Float   788
+
+0x160    Pointer 0x80128BD0
+
+0x164    Float   -4450
+0x168    Float   1591
+0x16C    Float   -7407
+
+0x170    ???     0x0000000E
+
 ----------------------
 -- Vile state stuff --
 ----------------------
 
-Pointer at 0x36E560 to Vile state object (0x12EA50, save slot 6)
+Pointer at 0x36E560 to Vile state object
 
 Addresses below are relative to vile state object
 
