@@ -3,60 +3,60 @@ boggy_pointer = 0x36E560;
 -- Slot data
 slot_base = 0x28;
 slot_size = 0x180;
-number_of_slots = 100;
+number_of_slots = 96; -- 0x60
 
 -- Relative to slot start
 slot_variables = {
-	0x1C = "4_Unknown",
-	0x24 = "4_Unknown",
+	[0x1C] = "4_Unknown",
+	[0x24] = "4_Unknown",
 
-	0x2C = "Float",
-	0x30 = "Float",
+	[0x2C] = "Float",
+	[0x30] = "Float",
 
-	0x38 = "4_Unknown",
+	[0x38] = "4_Unknown",
 
-	0x44 = "Float",
+	[0x44] = "Float",
 
-	0x58 = "4_Unknown",
+	[0x58] = "4_Unknown",
 
-	0xD4 = "Byte",
-	0xD5 = "Byte",
-	0xD6 = "Byte",
-	0xD7 = "Byte",
+	[0xD4] = "Byte",
+	[0xD5] = "Byte",
+	[0xD6] = "Byte",
+	[0xD7] = "Byte",
 
-	0xDC = "Float",
+	[0xDC] = "Float",
 
-	0xF8 = "Float",
-	0xFC = "Float",
-	0x100 = "Float",
+	[0xF8] = "Float",
+	[0xFC] = "Float",
+	[0x100] = "Float",
 
-	0x104 = "Byte",
-	0x105 = "Byte",
-	0x106 = "Byte",
-	0x107 = "Byte",
+	[0x104] = "Byte",
+	[0x105] = "Byte",
+	[0x106] = "Byte",
+	[0x107] = "Byte",
 
-	0x108 = "Float",
-	0x10C = "Pointer",
+	[0x108] = "Float",
+	[0x10C] = "Pointer",
 
-	0x118 = "4_Unknown",
-	0x134 = "4_Unknown",
+	[0x118] = "4_Unknown",
+	[0x134] = "4_Unknown",
 
-	0x140 = "Pointer",
+	[0x140] = "Pointer",
 
-	0x144 = "4_Unknown",
-	0x14C = "4_Unknown",
+	[0x144] = "4_Unknown",
+	[0x14C] = "4_Unknown",
 
-	0x150 = "Float",
-	0x154 = "Float",
-	0x158 = "Float",
+	[0x150] = "Float",
+	[0x154] = "Float",
+	[0x158] = "Float",
 
-	0x160 = "Pointer",
+	[0x160] = "Pointer",
 
-	0x164 = "Float",
-	0x168 = "Float",
-	0x16C = "Float",
+	[0x164] = "Float",
+	[0x168] = "Float",
+	[0x16C] = "Float",
 
-	0x170 = "4_Unknown"
+	[0x170] = "4_Unknown"
 };
 
 slot_data = {};
@@ -89,6 +89,23 @@ function get_maximum_value(variable)
 	return 0;
 end
 
+function output_slot(index)
+	if index > 0 and index < #slot_data then
+		local k, v;
+		local current_slot = slot_data[index];
+		console.log("Starting output of slot "..index);
+		for k, v in pairs(slot_variables) do
+			if v == "Byte" then
+				console.log(""..v.." "..bizstring.hex(k)..": "..bizstring.hex(current_slot[k]));
+			elseif v == "4_Unknown" or v == "Pointer" then
+				console.log(""..v.." "..bizstring.hex(k)..": "..bizstring.hex(current_slot[k]));
+			elseif v == "Float" then
+				console.log(""..v.." "..bizstring.hex(k)..": "..current_slot[k]);
+			end
+		end
+	end
+end
+
 function process_slot(slot_base)
 	local current_slot_variables = {};
 	local k, v;
@@ -101,6 +118,7 @@ function process_slot(slot_base)
 			current_slot_variables[k] = mainmemory.readfloat(slot_base + k, true);
 		end
 	end
+	return current_slot_variables;
 end
 
 function parse_slot_data()
