@@ -149,6 +149,18 @@ local function rotation_to_radians(num)
 	return ((num % Game.max_rot_units) / Game.max_rot_units) * two_pi;
 end
 
+local function array_contains(array, value)
+	local i;
+	if #array > 0 then
+		for i=1,#array do
+			if array[i] == value then
+				return true;
+			end
+		end
+	end
+	return false;
+end
+
 local function toggle_rotation_units()
 	if rotation_units == "Degrees" then
 		rotation_units = "Radians";
