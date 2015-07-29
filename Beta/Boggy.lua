@@ -70,6 +70,9 @@ function get_minimum_value(variable)
 				min = slot_data[i][variable];
 			end
 		end
+		if slot_variables[variable] == "Byte" or slot_variables[variable] == "Pointer" or slot_variables[variable] == "4_Unknown" then
+			return "0x"..bizstring.hex(min);
+		end
 		return min;
 	end
 	return 0;
@@ -84,6 +87,9 @@ function get_maximum_value(variable)
 				max = slot_data[i][variable];
 			end
 		end
+		if slot_variables[variable] == "Byte" or slot_variables[variable] == "Pointer" or slot_variables[variable] == "4_Unknown" then
+			return "0x"..bizstring.hex(max);
+		end
 		return max;
 	end
 	return 0;
@@ -96,12 +102,28 @@ function output_slot(index)
 		console.log("Starting output of slot "..index);
 		for k, v in pairs(slot_variables) do
 			if v == "Byte" then
-				console.log(""..v.." "..bizstring.hex(k)..": "..bizstring.hex(current_slot[k]));
+				console.log(""..bizstring.hex(k).." "..v..": "..bizstring.hex(current_slot[k]));
 			elseif v == "4_Unknown" or v == "Pointer" then
-				console.log(""..v.." "..bizstring.hex(k)..": "..bizstring.hex(current_slot[k]));
+				console.log(""..bizstring.hex(k).." "..v..": "..bizstring.hex(current_slot[k]));
 			elseif v == "Float" then
-				console.log(""..v.." "..bizstring.hex(k)..": "..current_slot[k]);
+				console.log(""..bizstring.hex(k).." "..v..": "..current_slot[k]);
 			end
+		end
+	end
+end
+
+function output_stats()
+	console.log("------------------------------");
+	console.log("-- Starting output of stats --");
+	console.log("------------------------------");
+	console.log("");
+	local i;
+	for i=0,slot_size do
+		if slot_variables[i] ~= nil then
+			if i % 0x10 == 0 then
+				console.log("");
+			end
+			console.log("0x"..bizstring.hex(i).." "..slot_variables[i]..": "..get_minimum_value(i).. " to "..get_maximum_value(i));
 		end
 	end
 end
@@ -123,8 +145,7 @@ end
 
 function parse_slot_data()
 	local boggy_state = mainmemory.read_u24_be(boggy_pointer + 1);
-	local i;
-	local current_slot_base;
+	local i, current_slot_base;
 
 	-- Clear out old data
 	slot_data = {};
@@ -133,4 +154,6 @@ function parse_slot_data()
 		current_slot_base = boggy_state + slot_base + i * slot_size;
 		table.insert(slot_data, process_slot(current_slot_base));
 	end
+
+	output_stats();
 end
