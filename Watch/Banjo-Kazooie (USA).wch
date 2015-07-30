@@ -7,15 +7,18 @@ SystemID N64
 0001C2	w	u	1	EEPROM	FF RNG Byte
 0001DC	d	h	0	EEPROM	EEPROM Checksum 4
 0001FC	d	h	0	EEPROM	EEPROM Checksum 5
-1F4618	d	h	1	RDRAM	Slot Start
-1F4798	d	h	1	RDRAM	Slot Start
-1F47C4	d	f	1	RDRAM	
-1F4874	d	f	1	RDRAM	
-1F4890	d	f	1	RDRAM	
-1F4894	d	f	1	RDRAM	
-1F4898	d	f	1	RDRAM	
-1F48A0	d	f	1	RDRAM	
-1F94EC	d	h	1	RDRAM	Boggy start
+1F9598	d	h	1	RDRAM	Boggy Start
+1F95C0	d	f	1	RDRAM	Progression along race path
+1F95C4	d	f	1	RDRAM	Speed
+1F95C8	d	f	1	RDRAM	Facing Angle
+1F95FC	d	f	1	RDRAM	
+1F9600	d	f	1	RDRAM	
+1F9604	d	f	1	RDRAM	
+1F968C	d	f	1	RDRAM	0xF4
+1F9690	d	f	1	RDRAM	
+1F9694	d	f	1	RDRAM	
+1F9698	d	f	1	RDRAM	
+1F9718	d	h	1	RDRAM	Next Slot Start
 2986BA	w	h	1	RDRAM	Banjo Model Replacement
 2986BE	w	h	1	RDRAM	Banjo Model Replacement
 36C4EC	w	u	1	RDRAM	Menu item 1 Y Position

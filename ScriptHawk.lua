@@ -136,10 +136,6 @@ local function round(num, idp)
 	return tonumber(string.format("%." .. (idp or 0) .. "f", (num or 0)));
 end
 
-local function null_check(value)
-	return (value > 0) ~= (value <= 0);
-end
-
 local function rotation_to_degrees(num)
 	return ((num % Game.max_rot_units) / Game.max_rot_units) * 360;
 end
@@ -283,7 +279,7 @@ local function mainloop()
 		if joypad_pressed["P1 L"] then
 			gofast("y", Game.speedy_speeds[Game.speedy_index]);
 		end
-		if mode == 'Position' and null_check(rot_y) then
+		if mode == 'Position' and type(rot_y) ~= "nil" then
 			rot_rad = rotation_to_radians(rot_y);
 			if joypad_pressed["P1 DPad U"] then
 				gofast("x", Game.speedy_speeds[Game.speedy_index] * math.sin(rot_rad));
@@ -414,7 +410,7 @@ local function plot_pos()
 	local row = 0;
 	local height = 16;
 
-	if null_check(x) and null_check(y) and null_check(z) then
+	if type(x) ~= "nil" and type(y) ~= "nil" and type(z) ~= "nil" then
 		gui.text(gui_x, gui_y + height * row, "X: "..round(x, precision));
 		row = row + 1;
 		gui.text(gui_x, gui_y + height * row, "Y: "..round(y, precision));
@@ -425,21 +421,21 @@ local function plot_pos()
 		--row = row + 2;
 	end
 
-	if null_check(dy) and null_check(d) then
+	if type(dy) ~= "nil" and type(d) ~= "nil" then
 		gui.text(gui_x, gui_y + height * row, "dY:  "..round(dy, precision));
 		row = row + 1;
 		gui.text(gui_x, gui_y + height * row, "dXZ: "..round(d, precision));
 		row = row + 2;
 	end
 
-	if null_check(max_dy) and null_check(max_d) then
+	if type(max_dy) ~= "nil" and type(max_d) ~= "nil" then
 		gui.text(gui_x, gui_y + height * row, "Max dY:  "..round(max_dy, precision));
 		row = row + 1;
 		gui.text(gui_x, gui_y + height * row, "Max dXZ: "..round(max_d, precision));
 		row = row + 2;
 	end
 
-	if null_check(rot_x) and null_check(rot_y) and null_check(rot_z) then
+	if type(rot_x) ~= "nil" and type(rot_y) ~= "nil" and type(rot_z) ~= "nil" then
 		gui.text(gui_x, gui_y + height * row, "Rot X: "..formatRotation(rot_x));
 		row = row + 1;
 		gui.text(gui_x, gui_y + height * row, "Rot Y: "..formatRotation(rot_y));

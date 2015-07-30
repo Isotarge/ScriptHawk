@@ -19,10 +19,6 @@ local maxTrackedPeriods = 50;
 local trackedPeriods = 10;
 local previous = {};
 
-local function null_check (value)
-	return value ~= nil and (value > 0) ~= (value <= 0);
-end
-
 local function shufflePrevious()
 	local temp = {};
 	for i=2,#previous do
@@ -214,8 +210,8 @@ local function drawGraphicalRepresentation()
 		else
 			gui.drawText(gui_x + width * column, gui_y, previous[i].lag - ignore);
 		end
-		if null_check(previous[i].dxz) then
-			if null_check(precision) then
+		if type(previous[i].dxz) ~= "nil" then
+			if type(precision) ~= "nil" then
 				gui.drawText(gui_x + width * column, gui_y + 16, round(previous[i].dxz, precision));
 			else
 				gui.drawText(gui_x + width * column, gui_y + 16, round(previous[i].dxz));
@@ -235,7 +231,7 @@ local function mainloop()
 		else
 			ratio = math.min(1, math.max(0, lagCount - 1) / math.max(1, redzone));
 			table.insert(previous, {['lag']=lagCount, ['ratio']=ratio, ['mode']="vframe"});
-			if null_check(d) then
+			if type(d) ~= "nil" then
 				previous[#previous].dxz = d;
 			end
 			if #previous > trackedPeriods then
@@ -254,7 +250,7 @@ local function mainloop()
 		if frameCount >= resolution then
 			ratio = (lagCount - ignore) / (frameCount - ignore);
 			table.insert(previous, {['lag']=lagCount, ['frames']=frameCount, ['ratio']=ratio, ['mode']="normal"});
-			if null_check(d) then
+			if type(d) ~= "nil" then
 				previous[#previous].dxz = d;
 			end
 			if #previous > trackedPeriods then
