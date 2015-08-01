@@ -1,5 +1,5 @@
 local romName = gameinfo.getromname();
-local Game = require "games.blank";
+local Game;
 
 if bizstring.contains(romName, "Donkey Kong 64") then
 	Game = require "games.dk64";
@@ -26,6 +26,12 @@ if not Game.detectVersion(romName) then
 	console.log("This version of the game is not currently supported.");
 	return;
 end
+
+-----------------------
+-- Load JSON library --
+-----------------------
+
+JSON = require "lib.JSON";
 
 --------------
 -- Keybinds --
@@ -97,6 +103,22 @@ end
 
 local function increase_speedy_speed()
 	Game.speedy_index = math.min(#Game.speedy_speeds, Game.speedy_index + 1);
+	updateUIReadouts_moonjumpGameAgnostic();
+end
+
+-------------------------
+-- Practice mode stuff --
+-------------------------
+
+local practice_save_slot = 1;
+
+local function decrease_save_slot()
+	practice_save_slot = math.max(1, practice_save_slot - 1);
+	updateUIReadouts_moonjumpGameAgnostic();
+end
+
+local function increase_save_slot()
+	practice_save_slot = math.min(9, practice_save_slot + 1);
 	updateUIReadouts_moonjumpGameAgnostic();
 end
 
@@ -181,6 +203,8 @@ end
 local function toggle_mode()
 	if mode == 'Position' then
 		mode = 'Rotation';
+	elseif mode == 'Rotation' then
+		mode = 'Practice';
 	else
 		mode = 'Position';
 	end
@@ -207,28 +231,28 @@ end
 
 local options_form = forms.newform(col(17), row(10), "ScriptHawk Options");
 
---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
--- Handle                              Type                         Caption             Callback                     X position   Y position                Width             Height      --
---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
-local options_mode_label =                   forms.label(options_form,    "Mode:",                                   col(0),      row(0) + label_offset,    44,               button_height);
-local options_mode_button =                  forms.button(options_form,   mode,               toggle_mode,           col(2),      row(0),                   64,               button_height);
+-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+-- Handle                                    Type                         Caption          Callback               X position   Y position                Width             Height      --
+-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+local options_mode_label =                   forms.label(options_form,    "Mode:",                                col(0),      row(0) + label_offset,    44,               button_height);
+local options_mode_button =                  forms.button(options_form,   mode,            toggle_mode,           col(2),      row(0),                   64,               button_height);
 
-local options_precision_label =              forms.label(options_form,    "Precision:",                              col(0),      row(1) + label_offset,    54,               14);
-local options_decrease_precision_button =    forms.button(options_form,   "-",                decrease_precision,    col(4) - 28, row(1),                   button_height,    button_height);
-local options_increase_precision_button =    forms.button(options_form,   "+",                increase_precision,    col(5) - 28, row(1),                   button_height,    button_height);
-local options_precision_value_label =        forms.label(options_form,    precision,                                 col(5),      row(1) + label_offset,    54,               14);
+local options_precision_label =              forms.label(options_form,    "Precision:",                           col(0),      row(1) + label_offset,    54,               14);
+local options_decrease_precision_button =    forms.button(options_form,   "-",             decrease_precision,    col(4) - 28, row(1),                   button_height,    button_height);
+local options_increase_precision_button =    forms.button(options_form,   "+",             increase_precision,    col(5) - 28, row(1),                   button_height,    button_height);
+local options_precision_value_label =        forms.label(options_form,    precision,                              col(5),      row(1) + label_offset,    54,               14);
 
-local options_speedy_speed_label =           forms.label(options_form,    "Speed:",                                  col(0),      row(2) + label_offset,    54,               14);
-local options_decrease_speedy_speed_button = forms.button(options_form,   "-",                decrease_speedy_speed, col(4) - 28, row(2),                   button_height,    button_height);
-local options_increase_speedy_speed_button = forms.button(options_form,   "+",                increase_speedy_speed, col(5) - 28, row(2),                   button_height,    button_height);
-local options_speedy_speed_value_label =     forms.label(options_form,    "0",                                       col(5),      row(2) + label_offset,    54,               14);
+local options_speedy_speed_label =           forms.label(options_form,    "Speed:",                               col(0),      row(2) + label_offset,    54,               14);
+local options_decrease_speedy_speed_button = forms.button(options_form,   "-",             decrease_speedy_speed, col(4) - 28, row(2),                   button_height,    button_height);
+local options_increase_speedy_speed_button = forms.button(options_form,   "+",             increase_speedy_speed, col(5) - 28, row(2),                   button_height,    button_height);
+local options_speedy_speed_value_label =     forms.label(options_form,    "0",                                    col(5),      row(2) + label_offset,    54,               14);
 
-local options_map_dropdown =                 forms.dropdown(options_form, Game.maps,                                 col(0),      row(3) + dropdown_offset, col(9) + 7,       button_height);
-local options_map_checkbox =                 forms.checkbox(options_form, "Take me there",              col(0) + dropdown_offset, row(4) + dropdown_offset);
-local options_toggle_infinites =             forms.checkbox(options_form, "Infinites",                  col(0) + dropdown_offset, row(5) + dropdown_offset);
+local options_map_dropdown =                 forms.dropdown(options_form, Game.maps,                              col(0),      row(3) + dropdown_offset, col(9) + 7,       button_height);
+local options_map_checkbox =                 forms.checkbox(options_form, "Take me there",           col(0) + dropdown_offset, row(4) + dropdown_offset);
+local options_toggle_infinites =             forms.checkbox(options_form, "Infinites",               col(0) + dropdown_offset, row(5) + dropdown_offset);
 
-local options_rot_units_label =              forms.label(options_form,    "Units:",                                  col(5),      row(0) + label_offset,    44,               14);
-local options_toggle_rot_units_button =      forms.button(options_form,   rotation_units,     toggle_rotation_units, col(7),      row(0),                   64,               button_height);
+local options_rot_units_label =              forms.label(options_form,    "Units:",                               col(5),      row(0) + label_offset,    44,               14);
+local options_toggle_rot_units_button =      forms.button(options_form,   rotation_units,  toggle_rotation_units, col(7),      row(0),                   64,               button_height);
 
 -- Init any custom UI that the game module uses
 Game.initUI(options_form, col, row, button_height, label_offset, dropdown_offset);
@@ -274,11 +298,9 @@ local function rotate(axis, amount)
 end
 
 local function mainloop()
+	joypad_pressed = joypad.getimmediate();
+
 	if Game.isPhysicsFrame() then
-		joypad_pressed = joypad.getimmediate();
-		if joypad_pressed["P1 L"] then
-			gofast("y", Game.speedy_speeds[Game.speedy_index]);
-		end
 		if mode == 'Position' and type(rot_y) ~= "nil" then
 			rot_rad = rotation_to_radians(rot_y);
 			if joypad_pressed["P1 DPad U"] then
@@ -297,6 +319,9 @@ local function mainloop()
 				gofast("x", -1.0 * (Game.speedy_speeds[Game.speedy_index] * math.cos(rot_rad)));
 				gofast("z", Game.speedy_speeds[Game.speedy_index] * math.sin(rot_rad));
 			end
+			if joypad_pressed["P1 L"] then
+				gofast("y", Game.speedy_speeds[Game.speedy_index]);
+			end
 		end
 		if mode == 'Rotation' then
 			if joypad_pressed["P1 DPad U"] then
@@ -311,6 +336,25 @@ local function mainloop()
 			if joypad_pressed["P1 DPad R"] then
 				rotate("z", Game.rot_speed);
 			end
+			if joypad_pressed["P1 L"] then
+				-- TODO: Scale up I guess?
+				gofast("y", Game.speedy_speeds[Game.speedy_index]);
+			end
+		end
+	end
+
+	if mode == 'Practice' then
+		if joypad_pressed["P1 DPad U"] then
+			savestate.saveslot(practice_save_slot);
+		end
+		if joypad_pressed["P1 DPad D"] or joypad_pressed["P1 L"] then
+			savestate.loadslot(practice_save_slot);
+		end
+		if joypad_pressed["P1 DPad L"] then
+			decrease_save_slot();
+		end
+		if joypad_pressed["P1 DPad R"] then
+			increase_save_slot();
 		end
 	end
 
