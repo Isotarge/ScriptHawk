@@ -578,8 +578,80 @@ FF FF FF FF - Used during demos
 -- Model replacement --
 -----------------------
 
-0000-0329 Untested
+0000-02E5 Untested
 
+02E6 Ju-Ju
+02E7 RBB misc plank
+02E8 Fly pad
+02E9 Conga orange splat
+02EA --CRASH--
+02EB Conga orange pad
+02EC --CRASH--
+02ED Trashcan
+02EE "ON VACATION" sign
+02EF --CRASH--
+
+02F0 --CRASH--
+02F1 Tumblar
+02F2 --CRASH--
+02F3 --CRASH--
+02F4 Autumn leaf
+02F5 Green BK Flag
+02F6 Blue BK Flag
+02F7 CCW leaf bud thing
+02F8 RIP
+02F9 Red BK Flag I've never seen before
+02FA --CRASH--
+02FB CCW Lobby leaf?
+02FC MMM Grave
+02FD --CRASH--
+02FE --CRASH--
+02FF SM Tree
+
+0300 GV egg wall shot thing shot thing mkay
+0301 5 Mumbo token sign
+0302 10 Mumbo token sign
+0303 15 Mumbo token sign
+0304 20 Mumbo token sign
+0305 25 Mumbo token sign
+0306 Orange top grey platform
+0307 --CRASH--
+0308 ???
+0309 Gold triangle
+030A Gold triangle
+030B --CRASH--
+030C --CRASH--
+030D BGS Leaf
+030E Brown/Green wooden thing (chair leg or something?)
+030F --CRASH--
+
+0310 --CRASH--
+0311 Corn cob
+0312 Picnic basket?
+0313 --CRASH--
+0314 --CRASH--
+0315 --CRASH--
+0316 --CRASH--
+0317 --CRASH--
+0318 Melon
+0319 --CRASH--
+031A --CRASH--
+031B --CRASH--
+031C --CRASH--
+031D --CRASH--
+031E --CRASH--
+031F --CRASH--
+
+0320 --CRASH--
+0321 --CRASH--
+0322 Big blue present
+0323 Blue present
+0324 Santa present (red feathers)
+0325 Big blue triangle somethingo
+0326 Blue triangle somethingo
+0327 --CRASH--
+0328 --CRASH--
+0329 Stack of presents in FP
 032A --CRASH--
 032B --CRASH--
 032C --CRASH--
@@ -735,7 +807,21 @@ FF FF FF FF - Used during demos
 03B9 --CRASH--
 03BA --CRASH--
 
-03BB-03CF Untested
+03BB-03C2 Untested
+
+03C3 --CRASH--
+03C4 --CRASH--
+03C5 Purple enemy (Mumbo's)
+03C6 Mumbo
+03C7 Blubber's treasure
+03C8 Wooden stump (with green leaves/moss)
+03C9 ???
+03CA Purple bat (cute as fuck)
+03CB Green ghost
+03CC 1881 door
+03CD Another door
+03CE MMM (front?) door
+03CF MMM destructable green gate
 
 03D0 MMM Gate
 03D1 MMM Gate
@@ -816,7 +902,7 @@ FF FF FF FF - Used during demos
 0419 RBB pipe enemy (what's his name?)
 041A --CRASH--
 041B RBB anchor pad
-041C RBB dolphin (what's his name?)
+041C RBB dolphin (Snorkel)
 041D RBB anchor
 041E RBB rare flag
 041F Grey translucent sphere (wtf is this?)
