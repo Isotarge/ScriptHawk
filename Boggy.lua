@@ -1,3 +1,11 @@
+-----------------------
+-- Load JSON library --
+-----------------------
+
+JSON = require "lib.JSON";
+
+-----------------------
+
 boggy_pointer = 0x36E560;
 
 -- Slot data
@@ -25,14 +33,14 @@ slot_variables = {
 	[0x1F] = {["Type"] = "Byte"},
 
 	[0x24] = {["Type"] = "4_Unknown"},
-	[0x28] = {["Type"] = "Float", ["Name"] = "Progression along race path"}, 
-	[0x2C] = {["Type"] = "Float", ["Name"] = "Speed (used for rubberbanding)"}, 
+	[0x28] = {["Type"] = "Float", ["Name"] = "Race path progression"}, 
+	[0x2C] = {["Type"] = "Float", ["Name"] = "Speed (rubberband)"}, 
 
 	[0x30] = {["Type"] = "Float", ["Name"] = "Facing Angle"},
 	[0x38] = {["Type"] = "4_Unknown"},
 
-	[0x44] = {["Type"] = "Float", ["Name"] = "Angle?"},
-	[0x48] = {["Type"] = "Float", ["Name"] = "Angle?"},
+	[0x44] = {["Type"] = "Float", ["Name"] = "Angle"},
+	[0x48] = {["Type"] = "Float", ["Name"] = "Angle"},
 	[0x4C] = {["Type"] = "Float"},
 
 	[0x54] = {["Type"] = "Float"},
@@ -69,7 +77,7 @@ slot_variables = {
 	[0xE0] = {["Type"] = "Pointer"},
 	[0xE4] = {["Type"] = "Pointer"},
 
-	[0xF4] = {["Type"] = "Float", ["Name"] = "Varies between 0 and 1"},
+	[0xF4] = {["Type"] = "Float", ["Name"] = "Between 0 and 1"},
 	[0xF8] = {["Type"] = "Float"},
 	[0xFC] = {["Type"] = "Float"},
 
@@ -152,6 +160,12 @@ function format_for_output(var_type, value)
 	return ""..value;
 end
 
+function is_interesting(variable)
+	local min = get_minimum_value(variable);
+	local max = get_maximum_value(variable);
+	return slot_variables[variable].Type ~= "Z4_Unknown" or min ~= max;
+end
+
 ------------
 -- Output --
 ------------
@@ -160,8 +174,8 @@ function output_slot(index)
 	if index > 0 and index < #slot_data then
 		local i;
 		local previous_type = "";
-		local current_slot = slot_data[index];
-		console.log("Starting output of slot "..index);
+		local current_slot = slot_data[index + 1];
+		console.log("Starting output of slot "..index + 1);
 		for i=0,slot_size do
 			if type(slot_variables[i]) == "table" then
 				if slot_variables[i].Type ~= "Z4_Unknown" then
@@ -169,7 +183,11 @@ function output_slot(index)
 						previous_type = slot_variables[i].Type;
 						console.log("");
 					end
-					console.log("0x"..bizstring.hex(i).." "..(slot_variables[i].Type)..": "..format_for_output(slot_variables[i].Type, current_slot[i]));
+					if type(slot_variables[i].Name) == "string" then
+						console.log("0x"..bizstring.hex(i).." "..(slot_variables[i].Name).." ("..(slot_variables[i].Type).."): "..format_for_output(slot_variables[i].Type, current_slot[i]));
+					else
+						console.log("0x"..bizstring.hex(i).." "..(slot_variables[i].Type)..": "..format_for_output(slot_variables[i].Type, current_slot[i]));
+					end
 				else
 					--console.log("0x"..bizstring.hex(i).." Nothing interesting.");
 				end
@@ -186,9 +204,9 @@ function output_stats()
 	local previous_type = "";
 	for i=0,slot_size do
 		if type(slot_variables[i]) == "table" then
-			min = get_minimum_value(i);
-			max = get_maximum_value(i);
-			if slot_variables[i].Type ~= "Z4_Unknown" or min ~= max then
+			if is_interesting(i) then
+				min = get_minimum_value(i);
+				max = get_maximum_value(i);
 				if slot_variables[i].Type ~= previous_type then
 					previous_type = slot_variables[i].Type;
 					console.log("");
@@ -203,6 +221,38 @@ function output_stats()
 			end
 		end
 	end
+end
+
+function format_slot_data()
+	local formatted_data = {};
+	local i;
+	local relative_address, variable_data;
+	for i=1,#slot_data do
+		formatted_data[i] = {};
+		for relative_address, variable_data in pairs(slot_variables) do
+			if type(variable_data) == "table" and is_interesting(relative_address) then
+				if type(variable_data.Name) ~= "nil" then
+					formatted_data[i]["0x"..bizstring.hex(relative_address).." "..variable_data.Name] = {
+						["Type"] = variable_data.Type,
+						["Value"] = format_for_output(variable_data.Type, slot_data[i][relative_address])
+					};
+				else
+					formatted_data[i]["0x"..bizstring.hex(relative_address).." "..variable_data.Type] = {
+						["Value"] = format_for_output(variable_data.Type, slot_data[i][relative_address])
+					};
+				end
+			end
+		end
+	end
+	return formatted_data;
+end
+
+function json_slots()
+	local json_data = JSON:encode_pretty(format_slot_data());
+	local file = io.open("Lua/ScriptHawk/Boggy.json", "w+");
+	io.output(file);
+	io.write(json_data);
+	io.close(file);
 end
 
 --------------
@@ -265,10 +315,21 @@ function get_all_unique(variable)
 		variable = resolve_variable_name(variable);
 	end
 	if type(slot_variables[variable]) == "table" then
-		console.log("Starting output of variable 0x"..bizstring.hex(variable));
-		local i;
+		local unique_values = {};
+		local i, value, count;
 		for i=1,#slot_data do
-			console.log("Slot "..i..": "..format_for_output(slot_variables[variable].Type, slot_data[i][variable]));
+			value = format_for_output(slot_variables[variable].Type, slot_data[i][variable]);
+			if type(unique_values[value]) ~= "nil" then
+				unique_values[value] = unique_values[value] + 1;
+			else
+				unique_values[value] = 1;
+			end
+		end
+
+		-- Output the findings
+		console.log("Starting output of variable 0x"..bizstring.hex(variable));
+		for value, count in pairs(unique_values) do
+			console.log(""..value.." appears "..count.." times");
 		end
 	end
 end
@@ -338,6 +399,11 @@ end
 -- Data acquisition --
 ----------------------
 
+function get_slot_base(index)
+	local boggy_state = mainmemory.read_u24_be(boggy_pointer + 1);
+	return bizstring.hex(boggy_state + slot_base + index * slot_size);
+end
+
 function process_slot(slot_base)
 	local current_slot_variables = {};
 	local relative_address, variable_data;
@@ -367,5 +433,5 @@ function parse_slot_data()
 		table.insert(slot_data, process_slot(current_slot_base));
 	end
 
-	output_stats();
+	--output_stats();
 end

@@ -110,10 +110,14 @@ end
 -- Practice mode stuff --
 -------------------------
 
-local practice_save_slot = 1;
+local practice_save_slot = 0;
+local practice_decrease_slot_pressed = false;
+local practice_increase_slot_pressed = false;
+local practice_load_slot_pressed = false;
+local practice_save_slot_pressed = false;
 
 local function decrease_save_slot()
-	practice_save_slot = math.max(1, practice_save_slot - 1);
+	practice_save_slot = math.max(0, practice_save_slot - 1);
 	updateUIReadouts_moonjumpGameAgnostic();
 end
 
@@ -344,17 +348,37 @@ local function mainloop()
 	end
 
 	if mode == 'Practice' then
-		if joypad_pressed["P1 DPad U"] then
+		-- Hold down prevention
+		if not joypad_pressed["P1 DPad L"] then
+			practice_decrease_slot_pressed = false;
+		end
+		if not joypad_pressed["P1 DPad R"] then
+			practice_increase_slot_pressed = false;
+		end
+		if not joypad_pressed["P1 DPad U"] then
+			practice_save_slot_pressed = false;
+		end
+		if not joypad_pressed["P1 DPad D"] and not joypad_pressed["P1 L"] then
+			practice_load_slot_pressed = false;
+		end
+
+		if joypad_pressed["P1 DPad U"] and not practice_save_slot_pressed then
 			savestate.saveslot(practice_save_slot);
+			practice_save_slot_pressed = true;
 		end
-		if joypad_pressed["P1 DPad D"] or joypad_pressed["P1 L"] then
+		if (joypad_pressed["P1 DPad D"] or joypad_pressed["P1 L"]) and not practice_load_slot_pressed then
 			savestate.loadslot(practice_save_slot);
+			practice_load_slot_pressed = true;
 		end
-		if joypad_pressed["P1 DPad L"] then
+		if joypad_pressed["P1 DPad L"] and not practice_decrease_slot_pressed then
 			decrease_save_slot();
+			gui.addmessage("Switched to save slot "..practice_save_slot);
+			practice_decrease_slot_pressed = true;
 		end
-		if joypad_pressed["P1 DPad R"] then
+		if joypad_pressed["P1 DPad R"] and not practice_increase_slot_pressed then
 			increase_save_slot();
+			gui.addmessage("Switched to save slot "..practice_save_slot);
+			practice_increase_slot_pressed = true;
 		end
 	end
 

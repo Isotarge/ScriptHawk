@@ -1,0 +1,288 @@
+DK64 Model Replacement Codes
+By Isotarge, based on research by Subdrag
+
+DK Modifier       8075C41B 00??
+Diddy Modifier    8075C42B 00??
+Lanky Modifier    8075C43B 00??
+Tiny Modifier     8075C44B 00??
+Chunky Modifier   8075C45B 00??
+
+Krusha Modifier   8075C46B 00??
+Rambi Modifier    8075C47B 00??
+Enguarde Modifier 8075C48B 00??
+Squawks Modifier  8075C49B 00??
+Squawks Modifier  8075C4AB 00??
+
+Replace ?? with any of the following values:
+
+00 - Crash
+01 - Diddy
+02 - Diddy (with instrument)
+03 - Diddy (with gun)
+04 - DK!?!?!?!?!?!?!?
+05 - DK?!?!??!?!?!??!!?!?!!?!?!?!!?!?!
+06 - Lanky
+07 - Lanky (with instrument)
+08 - Lanky
+09 - Tiny
+0A - Tiny (with instrument)
+0B - Tiny
+0C - Chunky
+0D - Chunky (with instrument)
+0E - Disco Chunky
+0F - Chunky
+
+10 - Invisible Chunky
+11 - Cranky
+12 - Funky
+13 - Candy
+14 - Rambi
+15 - Snake man thing (reTweetering Turtles)
+16 - Turtle man thing (Teetering Turtles)
+17 - Seal
+18 - Enguarde
+19 - Beaver
+1A - Beaver
+1B - Beaver
+1C - Zinger
+1D - Squawks
+1E - Barrelloom (?!?)
+1F - Our boy Snide
+
+20 - Kaboom
+21 - Klaptrap
+22 - Purple Klaptrap
+23 - Red Klaptrap
+24 - Klaptrap Denture thing (?)
+25 - Mad Jack
+26 - Krash (minecart club guy)
+27 - Troff
+28 - Nothing?
+29 - Sir Domino
+2A - Red dice thing
+2B - Shape puzzle enemy thing toy thing enemy
+2C - Krembot
+2D - Scoff
+2E - Beetle
+2F - Klaptrap bones
+
+30 - N logo
+31 - Kremling
+32 - Kremling (Red)
+33 - Kremling
+34 - Mechanical Fish
+35 - Toy Car
+36 - Clam
+37 - Kasplat
+38 - Armydillo (With shell)
+39 - Mr. Dice
+3A - Klump
+3B - Pufftoss
+3C - Dogadon
+3D - Banana Fairy
+3E - Llama
+3F - Security guard (stealthy snoop)
+
+40 - Mecha-Zinger
+41 - Cranky's turntable
+42 - Krossbones
+43 - Starfish
+44 - Gimpfish
+45 - K. Lumsy
+46 - Spider
+47 - Rabbit
+48 - Beanstalk
+49 - K. Rool
+4A - Fireball from Chunky 5DI
+4B - Skeleton head (DK minecart)
+4C - Skeleton hand (DK minecart)
+4D - Vulture
+4E - Vulture
+4F - Bat
+
+50 - Skull from DK minecart
+51 - Tomato
+52 - Kritter-in-a-sheet (aka spoopy ghost)
+53 - Fly
+54 - Fly swatter
+55 - Fly swatter
+56 - Owl
+57 - Book (library in castle)
+58 - RIGHT RIGHT.... LEFT LEFT....
+59 - Spotlight fish (what the hell is his name?)
+5A - Pufferfish
+5B - Mermaid
+5C - Mushroom
+5D - Shockwave (Mad Jack)
+5E - Squawks
+5F - Worm (apple)
+
+60 - Cuckoo clock bird (Fungi day night thing)
+61 - Kosha
+62 - Ice tomato man? (wtf is his name)
+63 - Armydillo (no shell)
+64 - Boombox
+65 - B. Locker
+66 - K. Rool's ship (cutscene version)
+67 - Armydillo's cannon
+68 - K. Rool (No head?)
+69 - Gold Banana
+6A - Shockwave
+6B - K. Rool's glove
+6C - K. Rool's foot
+6D - K. Rool's toe
+6E - K. Rool's toe
+6F - K. Rool's toe
+
+70 - Flicky (microphone)
+71 - "Saved by the bell" desk
+72 - Bell
+73 - NEXT
+74 - Cannon
+75 - Barrel?
+76 - Bonus barrel
+77 - Hunky chunky barrel
+78 - Mini monkey barrel
+79 - Barrel?
+7A - Box?
+7B - Barrel pad (boss fights)
+7C - Cannon
+7D - TNT barrel
+7E - Rambi transform box
+7F - Enguarde transform box
+
+80 - Swinging chains (Diddy castle?)
+81 - Swinging light (lobby roof)
+82 - Minecart
+83 - Barrel (there's too many fucking barrels in this game)
+84 - Castle bridge (level entry)
+85 - Castle bridge/climb??????!?!?!?!
+86 - Feather
+87 - Laser (castle boss)
+88 - big banana (rareware? no logo?)
+89 - Rocketbarrel barrel
+8A - Strong Kong barrel
+8B - Orangstand sprint barrel
+8C - Diddy's jetpack
+8D - Photo
+8E - Minecart with TNT barrel
+8F - Weird glitch texture (computer screen?)
+
+90 - batty barrel bandit slot thing
+91 - batty barrel bandit slot thing again
+92 - batty barrel bandit slot thing again again
+93 - this is getting ridiculous
+94 - batty barrel bandit lever
+95 - Tiny's car
+96 - Missile (car race)
+97 - Swinging light (green)
+98 - Bananaporter zipper
+99 - Boulder
+9A - Vase (O)
+9B - Vase (:)
+9C - Vase (illuminati)
+9D - Vase (+)
+9E - Toy box
+9F - Boat
+
+A0 - Troff and Scoff lock
+A1 - Cannonball
+A2 - Vine (Aztec)
+A3 - Vine
+A4 - 3 2 1 thing?!?? never seen it
+A5 - Key
+A6 - Bongos
+A7 - An star
+A8 - Spotlight
+A9 - Seasick chunky cannon
+AA - K. Lumsy cutscene boulder debris?
+AB - Web
+AC - Keg
+AD - Shockwave
+AE - An nother shockwave
+AF - Crown (battle pad collectable)
+
+B0 - Buoy
+B1 - Buoy (green)
+B2 - Nothing?
+B3 - DK banana counter??
+B4 - Diddy banana counter??
+B5 - Tiny banana counter??
+B6 - Lanky banana counter??
+B7 - Chunky banana counter??
+B8 - Shockwave (green)
+B9 - Potion
+BA - Caves boss missile
+BB - Shockwave (red)
+BC - Ice wall in caves? Too thick? Texture on wall armydillo 2?
+BD - Rare logo
+BE - Stalactits
+BF - Rock wall somewhere? similar to ice wall?
+
+C0 - Laser from when dogadon explodes?
+C1 - Tag barrel
+C2 - Castle minecart thing
+C3 - Gorilla grab lever
+C4 - K. Lumsy's Kage
+C5 - Freeze attack from multiplayer battle arena
+C6 - Diddy 5DI 1 Pad
+C7 - Diddy 5DI 2 Pad
+C8 - Diddy 5DI 3 Pad
+C9 - Diddy 5DI 4 Pad
+CA - Diddy 5DI 5 Pad
+CB - Diddy 5DI 6 Pad
+CC - Rabbit race checkpoint
+CD - K. Lumsy lock with key
+CE - Rabbit race finish line
+CF - Shockwave (green)
+
+D0 - Shockwave (blue)
+D1 - Shockwave (purple)
+D2 - Tag barrel question mark (wacky wobbler)
+D3 - Flower from tiny's instrument cutscene
+D4 - DK
+D5 - an big gb
+D6 - Apple
+D7 - an nother barrel
+D8 - arrow flag (castle car race?)
+D9 - other arrow flag (castle car race?)
+DA - boat
+DB - Krusha (with gun)
+DC - King Kut Out (just body?)
+DD - King Kut Out Head
+DE - King Kut Out Arm
+DF - King Kut Out Arm
+
+E0 - Rainbow Coin patch
+E1 - Rope (K. Rool fight)
+E2 - nfi
+E3 - Light (K. Rool fight)
+E4 - K. Rool barrel (helm)
+E5 - Banana (Lanky phase)
+E6 - Banana Barrel (Lanky phase)
+E7 - Training barrel
+E8 - Weird pirate photo thing yarr
+E9 - Butterfly
+EA - ANOTHER FUCKING BARREL ARRRRRRRGHHHH!!!
+EB - Funky's gun? (K. Rool cutscene?)
+EC - Boot (K. Rool fight cutscene)
+ED - Crash?
+EE - Crash?
+EF - Crash?
+
+F0 - Crash?
+F1 - Crash?
+F2 - Crash?
+F3 - Crash?
+F4 - Crash?
+F5 - Crash?
+F6 - Crash?
+F7 - Crash?
+F8 - Crash?
+F9 - Crash?
+FA - Crash?
+FB - Crash?
+FC - Crash?
+FD - Crash?
+FE - Crash?
+FF - Crash?
