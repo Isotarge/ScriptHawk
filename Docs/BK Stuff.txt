@@ -3,8 +3,26 @@ BK Science TODO
 Explain "Object Teleportation" https://www.youtube.com/watch?v=wJODJbpZYq8
 
 Boggy rubberband science
+	- First race speeds range between 575 and 780
+	- Second race speed is fixed at 1200
 
 Figure out RNG
+	- RNG Bytes at:
+		3860E0 - Changes every physics frame
+			- FF Question Portraits
+			- Enemy Movement
+		3860E4 - Changes every physics frame
+			- FF Question Portraits
+			- Enemy Movement
+		3860E8 - Changes every physics frame
+			- FF Question Portraits
+			- Enemy Movement
+		3860EC
+		3860F0
+		3860F4
+
+When 3860E4 is 0x00, permit termite action
+When 3860E9 is 0x4C, force termite blink
 
 RNG examples:
 
@@ -47,7 +65,7 @@ until you leave the level entirely
 
 Pointer at 0x36E560 to Boggy Race state object
 
-X Flag slots each 0x180 bytes long in memory starting at 0x28
+0x60 Flag slots each 0x180 bytes long in memory starting at 0x28
 
 Relative Type    Observed values
 ---------------------------------------

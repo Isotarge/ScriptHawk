@@ -742,8 +742,10 @@
 0573 --CRASH--
 0574 --CRASH--
 0575 --CRASH--
+0576 --CRASH--
+0577 --CRASH--
 
-0572-0FFF Untested
+0578-0FFF Untested
 
 -- TODO: wtf does this byte do?
 8128189A 0057
