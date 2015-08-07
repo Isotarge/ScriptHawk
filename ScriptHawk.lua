@@ -3,7 +3,9 @@ local Game;
 
 if bizstring.contains(romName, "Donkey Kong 64") then
 	Game = require "games.dk64";
-elseif bizstring.contains(romName, "Banjo-Kazooie") or (bizstring.contains(romName, "Banjo to Kazooie no Daibouken") and not bizstring.contains(romName, "2")) then
+elseif bizstring.contains(romName, "Banjo-Tooie") or bizstring.contains(romName, "Banjo to Kazooie no Daibouken 2") then
+	Game = require "games.bt";
+elseif bizstring.contains(romName, "Banjo-Kazooie") or bizstring.contains(romName, "Banjo to Kazooie no Daibouken") then
 	Game = require "games.bk";
 elseif bizstring.contains(romName, "Rayman 2 - The Great Escape") then
 	Game = require "games.rayman_2";

@@ -1,4 +1,6 @@
 Domain RDRAM
 SystemID N64
 32CE98	w	u	1	RDRAM	Map
+339E54	d	f	1	RDRAM	Horizontal Speed
+339E6C	d	f	1	RDRAM	Ceiling Height
 

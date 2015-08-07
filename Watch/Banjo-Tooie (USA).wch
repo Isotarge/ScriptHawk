@@ -1,0 +1,22 @@
+Domain RDRAM
+SystemID N64
+11B069	b	u	1	RDRAM	Health (HUD)
+11B081	b	u	1	RDRAM	Eggs (HUD)
+11B644	b	u	1	RDRAM	BK Health
+11B645	b	u	1	RDRAM	BK Max Health
+11B65F	b	u	1	RDRAM	Banjo Health
+11B660	b	u	1	RDRAM	Banjo Max Health
+11B662	b	u	1	RDRAM	Kazooie Health
+11B663	b	u	1	RDRAM	Kazooie Max Health
+11B668	b	u	1	RDRAM	Mumbo Health
+11B669	b	u	1	RDRAM	Mumbo Max Health
+11B66E	b	u	1	RDRAM	Detonator Health
+11B66F	b	u	1	RDRAM	Detonator Max Health
+11B677	b	u	1	RDRAM	Something Health
+11B678	b	u	1	RDRAM	Something Max Health
+12B050	d	f	1	RDRAM	Air (Real)
+12B054	d	f	1	RDRAM	Air
+12C7A8	d	f	1	RDRAM	Game Time (MT)
+12C7B4	d	f	1	RDRAM	Game Time (Spiral Mountain)
+12C7D0	d	f	1	RDRAM	Game Time (Isle'o'Hags)
+
