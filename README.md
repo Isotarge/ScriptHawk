@@ -24,6 +24,12 @@ Extra Lua scripts and RAM watches for the [BizHawk](https://github.com/TASVideos
 - Japan
 - USA 1.0 and 1.1
 
+###Banjo Tooie
+- Australia
+- Europe
+- Japan
+- USA
+
 ###Super Mario 64
 - Europe
 - Japan 1.0 and Shindou Edition

@@ -309,12 +309,18 @@ local map;
 local map_trigger;
 
 function Game.detectVersion(romName)
-	if bizstring.contains(romName, "Europe") then
-		-- TODO
-		return false;
+	if bizstring.contains(romName, "Australia") then
+		linked_list_root = 0x13C380;
+		map = 0x127640; -- TODO
+		map_trigger = 0x127642; -- TODO
+	elseif bizstring.contains(romName, "Europe") then
+		linked_list_root = 0x13C680;
+		map = 0x127640; -- TODO
+		map_trigger = 0x127642; -- TODO
 	elseif bizstring.contains(romName, "Japan") then
-		-- TODO
-		return false;
+		linked_list_root = 0x131850;
+		map = 0x127640; -- TODO
+		map_trigger = 0x127642; -- TODO
 	elseif bizstring.contains(romName, "USA") then
 		linked_list_root = 0x137800;
 		map = 0x127640;
@@ -324,6 +330,13 @@ function Game.detectVersion(romName)
 	end
 
 	return true;
+end
+
+local function find_root(object)
+	while object > 0 do
+		console.log(bizstring.hex(object));
+		object = mainmemory.read_u24_be(object + 1);
+	end
 end
 
 -------------------
