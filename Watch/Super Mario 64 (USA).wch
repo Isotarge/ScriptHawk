@@ -14,13 +14,14 @@ SystemID N64
 32DDE0	d	h	1	RDRAM	Unused screen area color (credits)
 32DDF8	w	u	1	RDRAM	Map
 330E94	b	u	1	RDRAM	Debug 2 display type
-33B174	d	u	1	RDRAM	Hat State
-33B194	w	1	1	RDRAM	Mario Angle (Movement)
-33B19C	d	3	1	RDRAM	Mario Angle (Facing)
+33B174	d	h	1	RDRAM	Hat State
+33B194	w	u	1	RDRAM	Mario Angle (Movement)
+33B19E	w	u	1	RDRAM	Mario Angle (Facing)
 33B1AC	d	f	1	RDRAM	Mario X Position
 33B1B0	d	f	1	RDRAM	Mario Y Position
 33B1B4	d	f	1	RDRAM	Mario Z Position
-33B1C4	d	f	1	RDRAM	Mario Velocity
+33B1BC	d	f	1	RDRAM	Mario Vertical Velocity
+33B1C4	d	f	1	RDRAM	Mario Horizontal Velocity
 33B1F8	d	h	1	RDRAM	Mario object pointer
 33B218	w	u	1	RDRAM	Coins
 33B21A	w	u	1	RDRAM	Stars
