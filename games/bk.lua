@@ -329,6 +329,7 @@ local function checkGameTime()
 end
 
 local function gameTimeHasChanged()
+	local i;
 	for i=1,#gameTime do
 		if previousGameTime[i] ~= gameTime[i] then
 			return true;

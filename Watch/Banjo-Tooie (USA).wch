@@ -16,7 +16,17 @@ SystemID N64
 11B678	b	u	1	RDRAM	Something Max Health
 12B050	d	f	1	RDRAM	Air (Real)
 12B054	d	f	1	RDRAM	Air
+12C7A4	d	f	1	RDRAM	Game Time (GGM)
 12C7A8	d	f	1	RDRAM	Game Time (MT)
+12C7B0	d	f	1	RDRAM	Game Time (WW)
 12C7B4	d	f	1	RDRAM	Game Time (Spiral Mountain)
+12C7B8	d	f	1	RDRAM	Game Time (JRL)
+12C7BC	d	f	1	RDRAM	Game Time (TDL)
+12C7C0	d	f	1	RDRAM	Game Time (GI)
+12C7C4	d	f	1	RDRAM	Game Time (HP)
+12C7C8	d	f	1	RDRAM	Game Time (CCL)
+12C7CC	d	f	1	RDRAM	Game Time (CK)
 12C7D0	d	f	1	RDRAM	Game Time (Isle'o'Hags)
+12C7F0	d	h	1	RDRAM	RNG?
+12C7F4	d	h	1	RDRAM	RNG?
 

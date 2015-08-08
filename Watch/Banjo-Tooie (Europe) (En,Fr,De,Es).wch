@@ -1,0 +1,18 @@
+Domain RDRAM
+SystemID N64
+1317B4	d	f	1	RDRAM	Game Time (GGM)
+1317B8	d	f	1	RDRAM	Game Time (MT)
+1317C0	d	f	1	RDRAM	Game Time (WW)
+1317C4	d	f	1	RDRAM	Game Time (Spiral Mountain)
+1317C8	d	f	1	RDRAM	Game Time (JRL)
+1317CC	d	f	1	RDRAM	Game Time (TDL)
+1317D0	d	f	1	RDRAM	Game Time (GI)
+1317D4	d	f	1	RDRAM	Game Time (HP)
+1317D8	d	f	1	RDRAM	Game Time (CCL)
+1317DC	d	f	1	RDRAM	Game Time (CK)
+1317E0	d	f	1	RDRAM	Game Time (Isle'o'Hags)
+131800	d	h	1	RDRAM	RNG?
+131804	d	h	1	RDRAM	RNG?
+131808	d	h	1	RDRAM	RNG?
+13180C	d	h	1	RDRAM	RNG?
+

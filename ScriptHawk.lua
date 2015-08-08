@@ -198,12 +198,11 @@ end
 
 local function formatRotation(num)
 	if rotation_units == "Degrees" then
-		return round(rotation_to_degrees(num), precision).."°";
+		return ""..round(rotation_to_degrees(num), precision).."°";
 	elseif rotation_units == "Radians" then
 		return round(rotation_to_radians(num), precision);
-	else
-		return num;
 	end
+	return num;
 end
 
 local function toggle_mode()

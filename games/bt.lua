@@ -1,7 +1,7 @@
 local Game = {};
 
 Game.maps = {
-	                  "Unknown 0x0001", "Unknown 0x0002", "Unknown 0x0003", "Unknown 0x0004", "Unknown 0x0005", "Unknown 0x0006", "Unknown 0x0007", "Unknown 0x0008", "Unknown 0x0009", "Unknown 0x000A", "Unknown 0x000B", "Unknown 0x000C", "Unknown 0x000D", "Unknown 0x000E", "Unknown 0x000F",
+	"Unknown 0x0001", "Unknown 0x0002", "Unknown 0x0003", "Unknown 0x0004", "Unknown 0x0005", "Unknown 0x0006", "Unknown 0x0007", "Unknown 0x0008", "Unknown 0x0009", "Unknown 0x000A", "Unknown 0x000B", "Unknown 0x000C", "Unknown 0x000D", "Unknown 0x000E", "Unknown 0x000F",
 	"Unknown 0x0010", "Unknown 0x0011", "Unknown 0x0012", "Unknown 0x0013", "Unknown 0x0014", "Unknown 0x0015", "Unknown 0x0016", "Unknown 0x0017", "Unknown 0x0018", "Unknown 0x0019", "Unknown 0x001A", "Unknown 0x001B", "Unknown 0x001C", "Unknown 0x001D", "Unknown 0x001E", "Unknown 0x001F",
 	"Unknown 0x0020", "Unknown 0x0021", "Unknown 0x0022", "Unknown 0x0023", "Unknown 0x0024", "Unknown 0x0025", "Unknown 0x0026", "Unknown 0x0027", "Unknown 0x0028", "Unknown 0x0029", "Unknown 0x002A", "Unknown 0x002B", "Unknown 0x002C", "Unknown 0x002D", "Unknown 0x002E", "Unknown 0x002F",
 	"Unknown 0x0030", "Unknown 0x0031", "Unknown 0x0032", "Unknown 0x0033", "Unknown 0x0034", "Unknown 0x0035", "Unknown 0x0036", "Unknown 0x0037", "Unknown 0x0038", "Unknown 0x0039", "Unknown 0x003A", "Unknown 0x003B", "Unknown 0x003C", "Unknown 0x003D", "Unknown 0x003E", "Unknown 0x003F",
@@ -17,10 +17,10 @@ Game.maps = {
 	"SM - Behind the waterfall",
 	"SM - Spiral Mountain",
 
-	"Crash 0x00B0", "Crash 0x00B1", "Unknown 0x00B2",	"Crash 0x00B3", "Unknown 0x00B4", "Crash 0x00B5", 
+	"Crash 0x00B0", "Crash 0x00B1", "Unknown 0x00B2", "Crash 0x00B3", "Unknown 0x00B4", "Crash 0x00B5", 
 
-	"MT - Humba's wigwam",
-	"MT - Mumbo's skull",
+	"MT - Humba's Wigwam",
+	"MT - Mumbo's Skull",
 	"MT - Mayahem Temple",
 	"MT - Prison Compound",
 
@@ -34,26 +34,28 @@ Game.maps = {
 	"MT - Jade snake grove",
 	"MT - Treasure chamber",
 	"MT - Kickball arena",
-	"0x00C7 - GGM",
+	"GGM",
 	"MT - Kickball arena",
 	"MT - Kickball arena",
-	"0x00CA - GGM - Fuel depot",
-	"0x00CB - GGM - Crushing shed",
-	"0x00CC - GGM - Flooded caves",
-	"0x00CD - GGM - Water storage",
-	"0x00CE - GGM - Waterfall cavern",
-	"0x00CF - GGM - Power hut basement",
 
+	"GGM - Fuel depot",
+	"GGM - Crushing shed",
+	"GGM - Flooded caves",
+	"GGM - Water storage",
+	"GGM - Waterfall cavern",
+	"GGM - Power hut basement",
 	"GGM - Chuffy's cab",
 	"GGM - Inside Chuffy's boiler",
 	"GGM - Gloomy caverns",
 	"GGM - Generator caverns",
 	"GGM - Power hut",
-	"GGM - Humba's wigwam",
+	"GGM - Humba's Wigwam",
+
 	"WW - Witchy World",
+
 	"GGM - Train station",
 	"GGM - Prospectors hut",
-	"GGM - Mumbo's skull",
+	"GGM - Mumbo's Skull",
 	"GGM - Toxic gas cave",
 	"GGM - Canary cave",
 	"GGM - Ordnance storage",
@@ -72,21 +74,25 @@ Game.maps = {
 
 	"Crash 0x00E8",
 
-	"GGM - Humba's wigwam",
+	"GGM - Humba's Wigwam",
 	"WW - cave of horrors",
 	"WW - haunted cavern",
-	"WW - train station",
+	"WW - Train station",
 	"JRL - Jolly's",
 	"JRL - Pawno's emporium",
-	"JRL - Mumbo's skull",
+	"JRL - Mumbo's Skull",
 
-	"Crash 0x00F0", "Unknown 0x00F1", "Unknown 0x00F2", "Crash 0x00F3",
+	"Crash 0x00F0",
+
+	"HP - Inside the UFO",
+
+	"Unknown 0x00F2", "Crash 0x00F3",
 
 	"JRL - Ancient Swimming Baths",
 
 	"Crash 0x00F5",
 
-	"JRL - Electric Eels lair",
+	"JRL - Electric Eel's lair",
 	"JRL - Seaweed Sanctum",
 	"JRL - Inside the big fish",
 	"WW - Mr Patch",
@@ -119,25 +125,25 @@ Game.maps = {
 	"GI - Basement (repair depot)",
 	"GI - Basement (waste disposal)",
 
-	"TL - Overworld",
-	"TL - Terry's nest",
-	"TL - train station",
-	"TL - Oogle Boogles cave",
-	"TL - Inside the mountain",
-	"TL - River passage",
-	"TL - Styracosaurus family cave",
-	"TL - Unga Bunga's cave",
-	"TL - Stomping plains",
-	"TL - Bonfire caverns",
+	"TDL - Overworld",
+	"TDL - Terry's nest",
+	"TDL - Train station",
+	"TDL - Oogle Boogles cave",
+	"TDL - Inside the mountain",
+	"TDL - River passage",
+	"TDL - Styracosaurus family cave",
+	"TDL - Unga Bunga's cave",
+	"TDL - Stomping plains",
+	"TDL - Bonfire cavern",
 
 	"Crash 0x011C", "Crash 0x011D",
 
-	"TL - Humba's Wigwam",
+	"TDL - Humba's Wigwam",
 	"GI - Wide angle Humba's Wigwam",
 	"JRL - Wide angle Humba's Wigwam",
 	"GGM - Inside Chuffy's wagon",
-	"0x0122 - ??? - Wide angle Humba's Wigwam",
-	"TL - Inside Chompa's belly",
+	"TDL - Wide angle Humba's Wigwam",
+	"TDL - Inside Chompa's belly",
 	"WW - Saucer of Peril",
 	"GI - Water supply pipe",
 	"GGM - Water supply pipe",
@@ -148,31 +154,31 @@ Game.maps = {
 	"HP - Ice train station",
 	"HP - Chilli Billi",
 	"HP - Chilly Willy",
-	"HP - colosseum kickball stadium lobby",
-	"HP - colosseum kickball stadium - wide angle",
-	"HP - colosseum kickball stadium - wide angle",
-	"HP - colosseum kickball stadium - wide angle",
+	"HP - Colosseum kickball stadium lobby",
+	"HP - Colosseum kickball stadium - wide angle",
+	"HP - Colosseum kickball stadium - wide angle",
+	"HP - Colosseum kickball stadium - wide angle",
 	"HP - Boggy's igloo",
 	"HP - Icicle grotto",
 	"HP - Inside the volcano",
 	"HP - Mumbo's Skull",
-	"HP - Humba's wigwam",
+	"HP - Humba's Wigwam",
 
 	"CCL - Cloud Cuckoo Land",
 	"CCL - Inside the trashcan",
 	"CCL - Inside the cheesewedge",
 	"CCL - Zubba's nest",
-	"CCL - central cavern",
+	"CCL - Central cavern",
 
-	"WW - Crazy castle stockade (sop)",
-	"WW - Star spinner (sop)",
+	"WW - Crazy castle stockade (Saucer)",
+	"WW - Star spinner (Saucer)",
 
 	"CCL - Inside the pot'o'gold",
-	"CCL - Mumbo's skull",
-	"CCL - Mingy Jongo's skull",
-	"CCL - Humba's wigwam",
+	"CCL - Mumbo's Skull",
+	"CCL - Mingy Jongo's Skull",
+	"CCL - Humba's Wigwam",
 
-	"0x0141 - Inside the digger tunnel (SM?)",
+	"SM - Inside the digger tunnel",
 
 	"JV - Jinjo Village",
 	"JV - Bottles house",
@@ -208,12 +214,12 @@ Game.maps = {
 	"Inside another digger tunnel",
 	"Quagmire",
 
-	"CC - Cauldron Keep",
-	"CC - The gatehouse",
-	"CC - Tower of Tragedy",
-	"CC - Gun chamber",
+	"CK - Cauldron Keep",
+	"CK - The gatehouse",
+	"CK - Tower of Tragedy",
+	"CK - Gun chamber",
 
-	"0x0161 - CCL",
+	"CCL",
 
 	"GI - Floor 4 - Clinker's cavern",
 
@@ -221,25 +227,25 @@ Game.maps = {
 	"GGM - Ordnance Storage ",
 	"GGM - Ordnance Storage (multiplayer)",
 
-	"MT - (multiplayer)",
+	"MT - Targitzan's temple (multiplayer)",
 	"MT - (still)",
 	"HP - Icy side (still)",
 	"JV - Bottles' house (still)",
-	"CC - Cauldron Keep - Gun room (still)",
+	"CK - Gun room (still)",
 
 	"Crash 0x016B", "Crash 0x016C", "Crash 0x016D", "Crash 0x016E",
 
 	"GGM - Testing",
 	"GGM - Testing",
-	"GGM - Mumbo's skull",
+	"GGM - Mumbo's Skull",
 
-	"GI - Mumbo's skull",
+	"GI - Mumbo's Skull",
 
 	"SM - Banjo's house",
 
 	"Crash 0x0174", "Crash 0x0175",
 
-	"WW - Mumbo's skull",
+	"WW - Mumbo's Skull",
 
 	"MT - Targitzan's slighty sacred temple",
 	"MT - Inside Targitzan's temple",
@@ -255,37 +261,39 @@ Game.maps = {
 	"Colosseum kickball arena",
 	"JRL - Sea bottom cavern",
 	"JRL - Submarine (multiplayer)",
-	"TL - Chompa's belly (multiplayer)",
+	"TDL - Chompa's belly (multiplayer)",
 
 	"Crash 0x0184",
 
 	"CCL - Trash can mini",
 	"WW - Dodgems",
-	"GI - sewer entrance",
+	"GI - Sewer entrance",
 	"CCL - Zubba's nest (multiplayer)",
 
 	"Crash 0x0189",
 
-	"0x018A - Inside HAG1",
+	"CK - Inside HAG1",
 	"0x018B - Intro screen",
 
 	"Crash 0x018C",
 
-	"0x018D - Jingaling zapped [Cutscene]",
-	"0x018E - Meanwhile....Jingaling zapping [Cutscene]",
-	"0x018F - B.O.B preparing to fire [cutscene]",
-	"0x0190 - Jingaling getting zapped [cutscene]",
-	"0x0191 - Sad Party at Bottles [cutscene]",
-	"0x0192 - Bottles eating burnt food [cutscene]",
-	"0x0193 - Bottle's energy restoring [cutscene]",
-	"0x0194 - Banjo and Kazooie running into Gun Chamber [cutscene]",
-	"0x0195 - Banjo and Kazooie at B.O.B's controls [cutscene]",
-	"0x0196 - Kick about [cutscene]",
-	"0x0197 - `I wonder what we'll hit...` Kazooie [cutscene]",
-	"0x0198 - Jingaling restoring [cutscene]",
-	"0x0199 - All Jinjos happy again [cutscene]",
-	"0x019A - HAG1 - Final Boss",
-	"0x019B - Jingaling's Zombified Palace",
+	"Cutscene - Jingaling zapped",
+	"Cutscene - Meanwhile....Jingaling zapping",
+	"Cutscene - B.O.B preparing to fire",
+	"Cutscene - Jingaling getting zapped",
+	"Cutscene - Sad Party at Bottles",
+	"Cutscene - Bottles eating burnt food",
+	"Cutscene - Bottle's energy restoring",
+	"Cutscene - Banjo and Kazooie running into Gun Chamber",
+	"Cutscene - Banjo and Kazooie at B.O.B's controls",
+	"Cutscene - Kick about",
+	"Cutscene - `I wonder what we'll hit...` Kazooie",
+	"Cutscene - Jingaling restoring",
+	"Cutscene - All Jinjos happy again",
+
+	"CK - HAG1",
+	"JV - Jingaling's Zombified Palace",
+
 	"0x019C - Roll the credits",
 	"0x019D - End of credits",
 
@@ -304,24 +312,29 @@ Game.maps = {
 -- Region/Version --
 --------------------
 
+local game_time_base;
 local linked_list_root;
 local map;
 local map_trigger;
 
 function Game.detectVersion(romName)
 	if bizstring.contains(romName, "Australia") then
+		game_time_base = 0x131520;
 		linked_list_root = 0x13C380;
 		map = 0x127640; -- TODO
 		map_trigger = 0x127642; -- TODO
 	elseif bizstring.contains(romName, "Europe") then
+		game_time_base = 0x1317B0;
 		linked_list_root = 0x13C680;
 		map = 0x127640; -- TODO
 		map_trigger = 0x127642; -- TODO
 	elseif bizstring.contains(romName, "Japan") then
+		game_time_base = 0x126970;
 		linked_list_root = 0x131850;
 		map = 0x127640; -- TODO
 		map_trigger = 0x127642; -- TODO
 	elseif bizstring.contains(romName, "USA") then
+		game_time_base = 0x12C7A0;
 		linked_list_root = 0x137800;
 		map = 0x127640;
 		map_trigger = 0x127642;
@@ -339,6 +352,33 @@ local function find_root(object)
 	end
 end
 
+---------------------
+-- Game time stuff --
+---------------------
+
+local previousGameTime = {0,0,0,0,0,0,0,0,0,0,0,0,0,0,0};
+local gameTime = {0,0,0,0,0,0,0,0,0,0,0,0,0,0,0};
+
+local function checkGameTime()
+	previousGameTime = gameTime;	
+	gameTime = {};
+
+	local i;
+	for i=0,15 do
+		gameTime[i + 1] = mainmemory.readfloat(game_time_base + (i * 4), true);
+	end
+end
+
+local function gameTimeHasChanged()
+	local i;
+	for i=1,#gameTime do
+		if previousGameTime[i] ~= gameTime[i] then
+			return true;
+		end
+	end
+	return false;
+end
+
 -------------------
 -- Physics/Scale --
 -------------------
@@ -350,7 +390,7 @@ Game.rot_speed = 10;
 Game.max_rot_units = 360;
 
 function Game.isPhysicsFrame()
-	return not emu.islagged();
+	return gameTimeHasChanged() and not emu.islagged();
 end
 
 --------------------------
@@ -358,13 +398,18 @@ end
 --------------------------
 
 -- Update this each frame
-local BK_Object_Base = 0x00;
+BK_Position_Object_Base = nil;
+BK_Velocity_Object_base = nil;
 
+-- Relative to Position object
 local x_pos = 0x00;
 local y_pos = 0x04;
 local z_pos = 0x08;
 
 local facing_angle = 0xd8;
+
+-- Relative to Velocity object
+local vertical_velocity = 0x14;
 
 ----------------------
 -- Linked List shit --
@@ -377,11 +422,12 @@ end
 -- Relative to object base
 local previous_item = 0x00;
 local next_item = 0x04;
-local bk_pos_pointer = 61 * 4;
+local bk_position_pointer = 61 * 4;
+local bk_velocity_pointer = 54 * 4;
 
 local function get_bk_address()
 	local BK_Found = false;
-	local bk_pointer, i;
+	local bk_pos_pointer, bk_vel_pointer, i;
 
 	-- Get first object in linked list
 	local object_base = mainmemory.read_u24_be(linked_list_root + next_item + 1);
@@ -389,13 +435,15 @@ local function get_bk_address()
 	-- Iterate through linked list looking for pointer list, including pointer to BK Position
 	while not BK_Found and object_base > 0 do
 		-- Check if current linked list object has a pointer in the correct spot
-		bk_pointer = mainmemory.read_u32_be(object_base + bk_pos_pointer);
-		if is_pointer(bk_pointer) then
+		bk_pos_pointer = mainmemory.read_u32_be(object_base + bk_position_pointer);
+		bk_vel_pointer = mainmemory.read_u32_be(object_base + bk_velocity_pointer);
+
+		if is_pointer(bk_pos_pointer) and is_pointer(bk_vel_pointer) then
 			BK_Found = true;
 
 			-- Check for pointers near BK pointer to make sure
-			for i=0,27 do
-				if not is_pointer(mainmemory.read_u32_be(object_base + bk_pos_pointer + (i * 4))) then
+			for i=1,27 do
+				if not is_pointer(mainmemory.read_u32_be(object_base + bk_position_pointer + (i * 4))) then
 					BK_Found = false;
 				end
 			end
@@ -406,7 +454,11 @@ local function get_bk_address()
 	end
 
 	if BK_Found then
-		return bk_pointer - 0x80000000;
+		BK_Position_Object_Base = bk_pos_pointer - 0x80000000;
+		BK_Velocity_Object_Base = bk_vel_pointer - 0x80000000;
+	else
+		BK_Position_Object_Base = nil;
+		BK_Velocity_Object_Base = nil;
 	end
 end
 
@@ -415,41 +467,50 @@ end
 --------------
 
 function Game.getXPosition()
-	if type(BK_object_base) ~= "nil" then
-		return mainmemory.readfloat(BK_object_base + x_pos, true);
+	if type(BK_Position_Object_Base) ~= "nil" then
+		return mainmemory.readfloat(BK_Position_Object_Base + x_pos, true);
 	end
 	return 0;
 end
 
 function Game.getYPosition()
-	if type(BK_object_base) ~= "nil" then
-		return mainmemory.readfloat(BK_object_base + y_pos, true);
+	if type(BK_Position_Object_Base) ~= "nil" then
+		return mainmemory.readfloat(BK_Position_Object_Base + y_pos, true);
 	end
 	return 0;
 end
 
 function Game.getZPosition()
-	if type(BK_object_base) ~= "nil" then
-		return mainmemory.readfloat(BK_object_base + z_pos, true);
+	if type(BK_Position_Object_Base) ~= "nil" then
+		return mainmemory.readfloat(BK_Position_Object_Base + z_pos, true);
 	end
 	return 0;
 end
 
 function Game.setXPosition(value)
-	if type(BK_object_base) ~= "nil" then
-		mainmemory.writefloat(BK_object_base + x_pos, value, true);
+	if type(BK_Position_Object_Base) ~= "nil" then
+		mainmemory.writefloat(BK_Position_Object_Base + x_pos, value, true);
+		mainmemory.writefloat(BK_Position_Object_Base + x_pos + 12, value, true);
+		mainmemory.writefloat(BK_Position_Object_Base + x_pos + 24, value, true);
 	end
 end
 
 function Game.setYPosition(value)
-	if type(BK_object_base) ~= "nil" then
-		mainmemory.writefloat(BK_object_base + y_pos, value, true);
+	if type(BK_Position_Object_Base) ~= "nil" and type(BK_Velocity_Object_Base) ~= "nil" then
+		mainmemory.writefloat(BK_Position_Object_Base + y_pos, value, true);
+		mainmemory.writefloat(BK_Position_Object_Base + y_pos + 12, value, true);
+		mainmemory.writefloat(BK_Position_Object_Base + y_pos + 24, value, true);
+
+		-- Nullify vertical velocity
+		mainmemory.writefloat(BK_Velocity_Object_Base + vertical_velocity, 0, true);
 	end
 end
 
 function Game.setZPosition(value)
-	if type(BK_object_base) ~= "nil" then
-		mainmemory.writefloat(BK_object_base + z_pos, value, true);
+	if type(BK_Position_Object_Base) ~= "nil" then
+		mainmemory.writefloat(BK_Position_Object_Base + z_pos, value, true);
+		mainmemory.writefloat(BK_Position_Object_Base + z_pos + 12, value, true);
+		mainmemory.writefloat(BK_Position_Object_Base + z_pos + 24, value, true);
 	end
 end
 
@@ -458,41 +519,41 @@ end
 --------------
 
 function Game.getXRotation()
-	if type(BK_object_base) ~= "nil" then
-		return mainmemory.readfloat(BK_object_base + facing_angle, true);
+	if type(BK_Position_Object_Base) ~= "nil" then
+		return mainmemory.readfloat(BK_Position_Object_Base + facing_angle, true);
 	end
 	return 0;
 end
 
 function Game.getYRotation()
-	if type(BK_object_base) ~= "nil" then
-		return mainmemory.readfloat(BK_object_base + facing_angle, true);
+	if type(BK_Position_Object_Base) ~= "nil" then
+		return mainmemory.readfloat(BK_Position_Object_Base + facing_angle, true);
 	end
 	return 0;
 end
 
 function Game.getZRotation()
-	if type(BK_object_base) ~= "nil" then
-		return mainmemory.readfloat(BK_object_base + facing_angle, true);
+	if type(BK_Position_Object_Base) ~= "nil" then
+		return mainmemory.readfloat(BK_Position_Object_Base + facing_angle, true);
 	end
 	return 0;
 end
 
 function Game.setXRotation(value)
-	if type(BK_object_base) ~= "nil" then
-		mainmemory.writefloat(BK_object_base + facing_angle, value, true);
+	if type(BK_Position_Object_Base) ~= "nil" then
+		mainmemory.writefloat(BK_Position_Object_Base + facing_angle, value, true);
 	end
 end
 
 function Game.setYRotation(value)
-	if type(BK_object_base) ~= "nil" then
-		mainmemory.writefloat(BK_object_base + facing_angle, value, true);
+	if type(BK_Position_Object_Base) ~= "nil" then
+		mainmemory.writefloat(BK_Position_Object_Base + facing_angle, value, true);
 	end
 end
 
 function Game.setZRotation(value)
-	if type(BK_object_base) ~= "nil" then
-		mainmemory.writefloat(BK_object_base + facing_angle, value, true);
+	if type(BK_Position_Object_Base) ~= "nil" then
+		mainmemory.writefloat(BK_Position_Object_Base + facing_angle, value, true);
 	end
 end
 
@@ -518,7 +579,8 @@ function Game.initUI(form_handle, col, row, button_height, label_offset, dropdow
 end
 
 function Game.eachFrame()
-	BK_object_base = get_bk_address();
+	get_bk_address();
+	checkGameTime();
 end
 
 return Game;
