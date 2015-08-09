@@ -398,18 +398,34 @@ end
 --------------------------
 
 -- Update this each frame
-BK_Position_Object_Base = nil;
-BK_Velocity_Object_base = nil;
+BK_Pointer_List = nil;
+BK_Slip_Object = nil;
+BK_Position_Object = nil;
+BK_Velocity_Object = nil;
+
+function output_objects()
+	if type(BK_Pointer_List) ~= "nil" then
+		console.log("Pointer List: 0x"..bizstring.hex(BK_Pointer_List));
+		console.log("Position object: 0x"..bizstring.hex(BK_Position_Object));
+		console.log("Velocity object: 0x"..bizstring.hex(BK_Velocity_Object));
+		console.log("Slip object: 0x"..bizstring.hex(BK_Slip_Object));
+	else
+		console.log("Can't get a read...");
+	end
+end
 
 -- Relative to Position object
 local x_pos = 0x00;
 local y_pos = 0x04;
 local z_pos = 0x08;
 
-local facing_angle = 0xd8;
+local facing_angle = 0xD8;
 
 -- Relative to Velocity object
 local vertical_velocity = 0x14;
+
+-- Relative to Slip object
+local slope_timer = 0x38;
 
 ----------------------
 -- Linked List shit --
@@ -422,12 +438,13 @@ end
 -- Relative to object base
 local previous_item = 0x00;
 local next_item = 0x04;
-local bk_position_pointer = 61 * 4;
-local bk_velocity_pointer = 54 * 4;
+local bk_slip_pointer_index = 44 * 4;
+local bk_position_pointer_index = 61 * 4;
+local bk_velocity_pointer_index = 54 * 4;
 
 local function get_bk_address()
 	local BK_Found = false;
-	local bk_pos_pointer, bk_vel_pointer, i;
+	local bk_pos_pointer, bk_vel_pointer, bk_slip_pointer, i;
 
 	-- Get first object in linked list
 	local object_base = mainmemory.read_u24_be(linked_list_root + next_item + 1);
@@ -435,30 +452,37 @@ local function get_bk_address()
 	-- Iterate through linked list looking for pointer list, including pointer to BK Position
 	while not BK_Found and object_base > 0 do
 		-- Check if current linked list object has a pointer in the correct spot
-		bk_pos_pointer = mainmemory.read_u32_be(object_base + bk_position_pointer);
-		bk_vel_pointer = mainmemory.read_u32_be(object_base + bk_velocity_pointer);
+		bk_slip_pointer = mainmemory.read_u32_be(object_base + bk_slip_pointer_index);
+		bk_pos_pointer = mainmemory.read_u32_be(object_base + bk_position_pointer_index);
+		bk_vel_pointer = mainmemory.read_u32_be(object_base + bk_velocity_pointer_index);
 
 		if is_pointer(bk_pos_pointer) and is_pointer(bk_vel_pointer) then
 			BK_Found = true;
 
 			-- Check for pointers near BK pointer to make sure
 			for i=1,27 do
-				if not is_pointer(mainmemory.read_u32_be(object_base + bk_position_pointer + (i * 4))) then
+				if not is_pointer(mainmemory.read_u32_be(object_base + bk_position_pointer_index + (i * 4))) then
 					BK_Found = false;
 				end
 			end
 		end
 
 		-- Get next object in linked list
-		object_base = mainmemory.read_u24_be(object_base + next_item + 1);
+		if not BK_Found then
+			object_base = mainmemory.read_u24_be(object_base + next_item + 1);
+		end
 	end
 
 	if BK_Found then
-		BK_Position_Object_Base = bk_pos_pointer - 0x80000000;
-		BK_Velocity_Object_Base = bk_vel_pointer - 0x80000000;
+		BK_Pointer_List = object_base;
+		BK_Slip_Object = bk_slip_pointer - 0x80000000;
+		BK_Position_Object = bk_pos_pointer - 0x80000000;
+		BK_Velocity_Object = bk_vel_pointer - 0x80000000;
 	else
-		BK_Position_Object_Base = nil;
-		BK_Velocity_Object_Base = nil;
+		BK_Pointer_List = nil;
+		BK_Slip_Object = nil;
+		BK_Position_Object = nil;
+		BK_Velocity_Object = nil;
 	end
 end
 
@@ -467,50 +491,50 @@ end
 --------------
 
 function Game.getXPosition()
-	if type(BK_Position_Object_Base) ~= "nil" then
-		return mainmemory.readfloat(BK_Position_Object_Base + x_pos, true);
+	if type(BK_Position_Object) ~= "nil" then
+		return mainmemory.readfloat(BK_Position_Object + x_pos, true);
 	end
 	return 0;
 end
 
 function Game.getYPosition()
-	if type(BK_Position_Object_Base) ~= "nil" then
-		return mainmemory.readfloat(BK_Position_Object_Base + y_pos, true);
+	if type(BK_Position_Object) ~= "nil" then
+		return mainmemory.readfloat(BK_Position_Object + y_pos, true);
 	end
 	return 0;
 end
 
 function Game.getZPosition()
-	if type(BK_Position_Object_Base) ~= "nil" then
-		return mainmemory.readfloat(BK_Position_Object_Base + z_pos, true);
+	if type(BK_Position_Object) ~= "nil" then
+		return mainmemory.readfloat(BK_Position_Object + z_pos, true);
 	end
 	return 0;
 end
 
 function Game.setXPosition(value)
-	if type(BK_Position_Object_Base) ~= "nil" then
-		mainmemory.writefloat(BK_Position_Object_Base + x_pos, value, true);
-		mainmemory.writefloat(BK_Position_Object_Base + x_pos + 12, value, true);
-		mainmemory.writefloat(BK_Position_Object_Base + x_pos + 24, value, true);
+	if type(BK_Position_Object) ~= "nil" then
+		mainmemory.writefloat(BK_Position_Object + x_pos, value, true);
+		mainmemory.writefloat(BK_Position_Object + x_pos + 12, value, true);
+		mainmemory.writefloat(BK_Position_Object + x_pos + 24, value, true);
 	end
 end
 
 function Game.setYPosition(value)
-	if type(BK_Position_Object_Base) ~= "nil" and type(BK_Velocity_Object_Base) ~= "nil" then
-		mainmemory.writefloat(BK_Position_Object_Base + y_pos, value, true);
-		mainmemory.writefloat(BK_Position_Object_Base + y_pos + 12, value, true);
-		mainmemory.writefloat(BK_Position_Object_Base + y_pos + 24, value, true);
+	if type(BK_Position_Object) ~= "nil" and type(BK_Velocity_Object) ~= "nil" then
+		mainmemory.writefloat(BK_Position_Object + y_pos, value, true);
+		mainmemory.writefloat(BK_Position_Object + y_pos + 12, value, true);
+		mainmemory.writefloat(BK_Position_Object + y_pos + 24, value, true);
 
 		-- Nullify vertical velocity
-		mainmemory.writefloat(BK_Velocity_Object_Base + vertical_velocity, 0, true);
+		mainmemory.writefloat(BK_Velocity_Object + vertical_velocity, 0, true);
 	end
 end
 
 function Game.setZPosition(value)
-	if type(BK_Position_Object_Base) ~= "nil" then
-		mainmemory.writefloat(BK_Position_Object_Base + z_pos, value, true);
-		mainmemory.writefloat(BK_Position_Object_Base + z_pos + 12, value, true);
-		mainmemory.writefloat(BK_Position_Object_Base + z_pos + 24, value, true);
+	if type(BK_Position_Object) ~= "nil" then
+		mainmemory.writefloat(BK_Position_Object + z_pos, value, true);
+		mainmemory.writefloat(BK_Position_Object + z_pos + 12, value, true);
+		mainmemory.writefloat(BK_Position_Object + z_pos + 24, value, true);
 	end
 end
 
@@ -519,41 +543,53 @@ end
 --------------
 
 function Game.getXRotation()
-	if type(BK_Position_Object_Base) ~= "nil" then
-		return mainmemory.readfloat(BK_Position_Object_Base + facing_angle, true);
+	if type(BK_Position_Object) ~= "nil" then
+		return mainmemory.readfloat(BK_Position_Object + facing_angle, true);
 	end
 	return 0;
 end
 
 function Game.getYRotation()
-	if type(BK_Position_Object_Base) ~= "nil" then
-		return mainmemory.readfloat(BK_Position_Object_Base + facing_angle, true);
+	if type(BK_Position_Object) ~= "nil" then
+		return mainmemory.readfloat(BK_Position_Object + facing_angle, true);
 	end
 	return 0;
 end
 
 function Game.getZRotation()
-	if type(BK_Position_Object_Base) ~= "nil" then
-		return mainmemory.readfloat(BK_Position_Object_Base + facing_angle, true);
+	if type(BK_Position_Object) ~= "nil" then
+		return mainmemory.readfloat(BK_Position_Object + facing_angle, true);
 	end
 	return 0;
 end
 
 function Game.setXRotation(value)
-	if type(BK_Position_Object_Base) ~= "nil" then
-		mainmemory.writefloat(BK_Position_Object_Base + facing_angle, value, true);
+	if type(BK_Position_Object) ~= "nil" then
+		mainmemory.writefloat(BK_Position_Object + facing_angle, value, true);
 	end
 end
 
 function Game.setYRotation(value)
-	if type(BK_Position_Object_Base) ~= "nil" then
-		mainmemory.writefloat(BK_Position_Object_Base + facing_angle, value, true);
+	if type(BK_Position_Object) ~= "nil" then
+		mainmemory.writefloat(BK_Position_Object + facing_angle, value, true);
 	end
 end
 
 function Game.setZRotation(value)
-	if type(BK_Position_Object_Base) ~= "nil" then
-		mainmemory.writefloat(BK_Position_Object_Base + facing_angle, value, true);
+	if type(BK_Position_Object) ~= "nil" then
+		mainmemory.writefloat(BK_Position_Object + facing_angle, value, true);
+	end
+end
+
+----------------
+-- Never Slip --
+----------------
+
+local options_toggle_neverslip;
+
+local function neverSlip()
+	if type(BK_Slip_Object) ~= "nil" then
+		mainmemory.writefloat(BK_Slip_Object + slope_timer, 0.0, true);
 	end
 end
 
@@ -575,12 +611,16 @@ function Game.applyInfinites()
 end
 
 function Game.initUI(form_handle, col, row, button_height, label_offset, dropdown_offset)
-	-- TODO
+	options_toggle_neverslip = forms.checkbox(form_handle, "Never Slip", col(0) + dropdown_offset, row(6) + dropdown_offset);
 end
 
 function Game.eachFrame()
 	get_bk_address();
 	checkGameTime();
+
+	if forms.ischecked(options_toggle_neverslip) then
+		neverSlip();
+	end
 end
 
 return Game;

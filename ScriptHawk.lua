@@ -160,8 +160,9 @@ end
 -- Other helper functions --
 ----------------------------
 
-local function round(num, idp)
-	return tonumber(string.format("%." .. (idp or 0) .. "f", (num or 0)));
+function round(num, idp)
+	--return tonumber(string.format("%." .. (idp or 0) .. "f", (num or 0)));
+	return math.floor(num * math.pow(10,idp)) / math.pow(10,idp);
 end
 
 local function rotation_to_degrees(num)

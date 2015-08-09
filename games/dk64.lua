@@ -13,12 +13,30 @@ local tb_void_byte;
 local menu_flags;
 local map;
 
---------------------------
--- Mad Jack
---------------------------
+---------------------------
+-- Arcade specific state --
+---------------------------
+
+local arcade_map = 2;
+local jumpman_x_position = 0x04BD70; -- TODO - Find in all versions
+local jumpman_y_position = 0x04BD74; -- TODO - Find in all versions
+
+---------------------------
+-- Jetpac specific state --
+---------------------------
+
+local jetpac_map = 9;
+local jetman_x_position = 0x02F050; -- TODO - Find in all versions
+local jetman_y_position = 0x02F054; -- TODO - Find in all versions
+
+--------------
+-- Mad Jack --
+--------------
+
+local mad_jack_map = 154;
 local MJ_state_pointer;
 
--- Mad Jack state
+-- Relative to MJ state object
 local MJ_time_until_next_action;
 local MJ_actions_remaining;
 local MJ_action_type;
@@ -26,6 +44,10 @@ local MJ_current_pos;
 local MJ_next_pos;
 local MJ_white_switch_pos;
 local MJ_blue_switch_pos;
+
+-----------------
+-- Other state --
+-----------------
 
 local eep_checksum_offsets = {
 	0x1A8,
@@ -393,6 +415,9 @@ local effect_byte = 0x372;
 
 local kong_object;
 
+local prev_map = 0;
+local map_value = 0;
+
 ---------------
 -- Key stuff --
 ---------------
@@ -459,6 +484,12 @@ function Game.detectVersion(romName)
 		MJ_next_pos               = 0x61;
 		MJ_white_switch_pos       = 0x64;
 		MJ_blue_switch_pos        = 0x65;
+
+		--Subgames
+		jumpman_x_position = 0x04BD70;
+		jumpman_y_position = 0x04BD74;
+		jetman_x_position = 0x02F050;
+		jetman_y_position = 0x02F054;
 	elseif bizstring.contains(romName, "Europe") then
 		map                 = 0x73EC37;
 		file                = 0x740F18;
@@ -480,6 +511,12 @@ function Game.detectVersion(romName)
 		MJ_next_pos               = 0x69;
 		MJ_white_switch_pos       = 0x6C;
 		MJ_blue_switch_pos        = 0x6D;
+
+		--Subgames
+		jumpman_x_position = 0x03ECD0;
+		jumpman_y_position = 0x03ECD4;
+		jetman_x_position = 0x022100;
+		jetman_y_position = 0x022104;
 	elseif bizstring.contains(romName, "Japan") then
 		map                 = 0x743DA7;
 		file                = 0x746088;
@@ -501,6 +538,12 @@ function Game.detectVersion(romName)
 		MJ_next_pos               = 0x69;
 		MJ_white_switch_pos       = 0x6C;
 		MJ_blue_switch_pos        = 0x6D;
+
+		--Subgames
+		jumpman_x_position = 0x03EB00;
+		jumpman_y_position = 0x03EB04;
+		jetman_x_position = 0x022060;
+		jetman_y_position = 0x022064;
 	elseif bizstring.contains(romName, "Kiosk") then
 		file                = 0x7467c8; -- TODO?
 		map                 = 0x72CDE7;
@@ -577,8 +620,7 @@ function Game.isPhysicsFrame()
 end
 
 function isInSubGame()
-	local map_value = mainmemory.readbyte(map);
-	return map_value == 2 or map_value == 9;
+	return map_value == arcade_map or map_value == jetpac_map;
 end
 
 --------------
@@ -586,25 +628,46 @@ end
 --------------
 
 function Game.getXPosition()
+	if map_value == arcade_map then
+		return mainmemory.readfloat(jumpman_x_position, true);
+	elseif map_value == jetpac_map then
+		return mainmemory.readfloat(jetman_x_position, true);
+	end
 	return mainmemory.readfloat(kong_object + x_pos, true);
 end
 
 function Game.getYPosition()
+	if map_value == arcade_map then
+		return mainmemory.readfloat(jumpman_y_position, true);
+	elseif map_value == jetpac_map then
+		return mainmemory.readfloat(jetman_y_position, true);
+	end
 	return mainmemory.readfloat(kong_object + y_pos, true);
 end
 
 function Game.getZPosition()
-	return mainmemory.readfloat(kong_object + z_pos, true);
+	if not isInSubGame() then
+		return mainmemory.readfloat(kong_object + z_pos, true);
+	end
+	return 0;
 end
 
 function Game.setXPosition(value)
-	if not isInSubGame() then
+	if map_value == arcade_map then
+		--mainmemory.writefloat(jumpman_x_position, value, true);
+	elseif map_value == jetpac_map then
+		--mainmemory.writefloat(jetman_x_position, value, true);
+	else
 		mainmemory.writefloat(kong_object + x_pos, value, true);
 	end
 end
 
 function Game.setYPosition(value)
-	if not isInSubGame() then
+	if map_value == arcade_map then
+		--mainmemory.writefloat(jumpman_y_position, value, true);
+	elseif map_value == jetpac_map then
+		--mainmemory.writefloat(jetman_y_position, value, true);
+	else
 		mainmemory.writefloat(kong_object + y_pos, value, true);
 	end
 end
@@ -620,15 +683,24 @@ end
 --------------
 
 function Game.getXRotation()
-	return mainmemory.read_u16_be(kong_object + x_rot);
+	if not isInSubGame() then
+		return mainmemory.read_u16_be(kong_object + x_rot);
+	end
+	return 0;
 end
 
 function Game.getYRotation()
-	return mainmemory.read_u16_be(kong_object + y_rot);
+	if not isInSubGame() then
+		return mainmemory.read_u16_be(kong_object + y_rot);
+	end
+	return 0;
 end
 
 function Game.getZRotation()
-	return mainmemory.read_u16_be(kong_object + z_rot);
+	if not isInSubGame() then
+		return mainmemory.read_u16_be(kong_object + z_rot);
+	end
+	return 0;
 end
 
 function Game.setXRotation(value)
@@ -696,12 +768,11 @@ end
 -- Based on research by Exchord
 -----------------------------------
 
-local prev_map = 0;
 local timer_value = 0;
 local timer_start_frame = 0;
 local timer_started = false;
 
-local function timer ()
+local function timer()
 	local map_value = mainmemory.readbyte(map);
 	if map_value == 153 and prev_map ~= 153 then
 		timer_value = 0;
@@ -734,7 +805,6 @@ end
 -- Written by Isotarge, 2014-2015
 -----------------------------------
 local script_root = "Lua/ScriptHawk";
-local mad_jack_map = 154;
 
 -- Colors
 local MJ_blue         = 0x7f00a2e8;
@@ -1098,6 +1168,8 @@ end
 
 function Game.eachFrame()
 	kong_object = mainmemory.read_u24_be(kong_object_pointer);
+	map_value = mainmemory.readbyte(map);
+
 	Game.unlock_menus();
 
 	if forms.ischecked(options_toggle_neverslip) then

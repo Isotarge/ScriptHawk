@@ -1,5 +1,9 @@
 Domain RDRAM
 SystemID N64
+02F050	d	f	1	RDRAM	Jetman X Position
+02F054	d	f	1	RDRAM	Jetman Y Position
+04BD70	d	f	1	RDRAM	Jumpman X Position
+04BD74	d	f	1	RDRAM	Jumpman Y Position
 46E680	b	u	1	RDRAM	Key 8 enabled
 47F005	b	u	1	RDRAM	Dogadon 2 health
 4B210A	b	h	1	RDRAM	Main menu screen?
