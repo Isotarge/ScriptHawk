@@ -18,16 +18,16 @@ local map;
 ---------------------------
 
 local arcade_map = 2;
-local jumpman_x_position = 0x04BD70; -- TODO - Find in all versions
-local jumpman_y_position = 0x04BD74; -- TODO - Find in all versions
+local jumpman_x_position;
+local jumpman_y_position;
 
 ---------------------------
 -- Jetpac specific state --
 ---------------------------
 
 local jetpac_map = 9;
-local jetman_x_position = 0x02F050; -- TODO - Find in all versions
-local jetman_y_position = 0x02F054; -- TODO - Find in all versions
+local jetman_x_position;
+local jetman_y_position;
 
 --------------
 -- Mad Jack --

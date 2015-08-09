@@ -2,14 +2,19 @@ Domain RDRAM
 SystemID N64
 02F050	d	f	1	RDRAM	Jetman X Position
 02F054	d	f	1	RDRAM	Jetman Y Position
+04BD10	d	f	1	RDRAM	"Help" message X Position
+04BD14	d	f	1	RDRAM	"Help" message Y Position
 04BD70	d	f	1	RDRAM	Jumpman X Position
 04BD74	d	f	1	RDRAM	Jumpman Y Position
+04BD78	d	f	1	RDRAM	Jumpman X Velocity
+04BD7C	d	f	1	RDRAM	Jumpman Y Velocity
+04C710	d	u	1	RDRAM	Jumpman Hammer Timer
+04C71B	b	u	1	RDRAM	Jumpman Lives (Real)
+04C71C	b	u	1	RDRAM	Jumpman Lives (HUD)
 46E680	b	u	1	RDRAM	Key 8 enabled
-47F005	b	u	1	RDRAM	Dogadon 2 health
 4B210A	b	h	1	RDRAM	Main menu screen?
 4B210F	b	u	1	RDRAM	Main menu position
 4B2904	b	h	1	RDRAM	FF for voidout on main menu?!?
-4D9254	d	h	1	RDRAM	Angle (Test room)
 7444E7	b	u	1	RDRAM	Map
 744519	b	u	1	RDRAM	Rambi Arena Score
 74452C	b	u	1	RDRAM	Story skip
