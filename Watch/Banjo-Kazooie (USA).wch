@@ -43,6 +43,8 @@ SystemID N64
 37C694	d	f	1	RDRAM	Moving angle
 37D163	b	h	1	RDRAM	Previous Movement State
 37D167	b	h	1	RDRAM	Current Movement State
+37D260	d	f	1	RDRAM	Icy Water Damage Timer
+37D280	d	f	1	RDRAM	Icy Water Damage Timer (Copy)
 37D958	d	f	1	RDRAM	Camera X Position
 37D95C	d	f	1	RDRAM	Camera Y position
 37D960	d	f	1	RDRAM	Camera Z Position
@@ -71,6 +73,9 @@ SystemID N64
 37DDB4	d	f	1	RDRAM	Jiggy Spawn Angle
 37DDB8	d	f	1	RDRAM	Jiggy Spawn Velocity
 37E8F5	b	h	1	RDRAM	Map
+380944	d	f	1	RDRAM	Water something?
+380950	d	f	1	RDRAM	Water Something?
+380974	d	f	1	RDRAM	Water Something?
 3810B8	d	f	1	RDRAM	FF Answer Timer
 382F20	d	h	1	RDRAM	Textbox object pointer
 383012	b	h	1	RDRAM	Current Pause Menu Item
