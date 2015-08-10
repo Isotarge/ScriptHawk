@@ -421,7 +421,7 @@ Falling state (eaten)
 -- Misc state --
 ----------------
 
-Moves unlocked = 0x37c3a0-4
+Moves unlocked = 0x37c3a0-4 (US 1.0)
 It's a bitfield, 4 bytes
 
 Common states
@@ -463,6 +463,103 @@ FF FF FF FF - Used during demos
 -- -- -- -4 Beak Buster
 -- -- -- -2 Beak Bomb
 -- -- -- -1 Beak Barge
+
+--------------------
+-- Movement state --
+--------------------
+
+Current Movement state  0x37D167
+Previous Movement state 0x37D163
+
+0x00 ???
+0x01 Idle
+0x02 Slow walking
+0x03 Walking
+0x04 Fast walking
+
+0x05 Jumping
+0x06 Bear punch
+0x07 Crouching
+0x08 Jumping (Talon Trot)
+0x0C Skidding
+0x0E Taking damage
+0x0F Beak Buster
+0x10 Feathery Flap
+0x11 Rat-a-tat rap
+0x12 Backflip (Flap Flip)
+0x13 Beak Barge
+
+0x14 Entering Talon Trot
+0x15 Talon Trot Idle
+0x16 Talon Trot Moving
+0x17 Leaving Talon Trot
+
+0x1A Entering Wonderwing
+0x1B Idle (Wonderwing)
+0x1C Moving (Wonderwing)
+0x1D Jumping (Wonderwing)
+0x1E Leaving Wonderwing
+
+0x1F Creeping
+0x20 Landing (after jump)
+
+0x25 Entering Wading Boots
+0x26 Idle (Wading Boots)
+0x27 Moving (Wading Boots)
+0x28 Jumping (Wading Boots)
+0x29 Leaving Wading Boots
+
+0x2F Landing with peck?
+
+0x31 Rolling
+
+0x32 Slipping down slope
+0x45 Slipping down slope (Talon Trot)
+0x55 Slipping down slope (Wading Boots)
+
+0x5A Loading zone?
+
+0x5E Idle (Croc)
+0x5F Moving (Croc)
+0x60 Jumping (Croc)
+0x6E Biting (Croc)
+
+0x73 "Locked" Cutscene?
+0x74 "Locked" Jiggy pad, Mumbo transformation, bottles
+0x8D "Locked" Mumbo transformation
+0x94 "Locked" Mumbo transformation
+0x98 "Locked" Loading zone, Mumbo transformation
+
+-----------------------
+-- Stop'N'Swop state --
+-----------------------
+
+Located at 0x283400 (US 1.0)
+2 bytes, bitfield
+
+Common states:
+
+All locked    0x0000
+All available 0xFE00
+All collected 0xFFFC
+
+Bit 1 Yellow egg available
+Bit 2 Red egg available
+Bit 3 Green egg available
+Bit 4 Blue egg available
+Bit 5 Sharkfood island raised (Pink egg available)
+Bit 6 Cyan egg available
+Bit 7 Ice Key available
+
+Bit 8 Yellow egg collected
+Bit 9 Red egg collected
+Bit 10 Green egg collected
+Bit 11 Blue egg collected
+Bit 12 Pink egg collected
+Bit 13 Cyan egg collected
+Bit 14 Ice Key collected
+Bit 15 ???
+Bit 16 ???
 
 ---------------------------------
 -- Pause menu portrait indices --
