@@ -1,6 +1,14 @@
 TODO stuff:
 
 Find movement angle (ie what direction are you currently moving, not necessarily facing)
+More info about the camera:
+
+TJ Blakely: Tiffanyfruit: I believe the camera has a set amount of time to reach your kong and its speed adjusts according to the distance
+Tiffanyfruit: in that respect, it explains why N64 camera follows through STVW
+Tiffanyfruit: and VC does not
+TJ Blakely: I kind of just thought of that randomly
+TJ Blakely: it makes sense to me
+TJ Blakely: but is there anything in memory that would indicate the correct or incorrectness of that statement?
 
 sound addresses
 0x79126e to 0x7e0000

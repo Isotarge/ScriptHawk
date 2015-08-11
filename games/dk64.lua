@@ -1071,8 +1071,30 @@ end
 -- Effect byte stuff --
 -----------------------
 
+local max_objects = 0xff;
+
+local function everythingiskong()
+	local object_found = true;
+	local object_no = 0;
+	local kong_model_pointer = mainmemory.read_u24_be(kong_object + 1);
+	local object_model_pointer;
+	local pointer;
+
+	while object_found do
+		pointer = mainmemory.read_u24_be(pointer_list + (object_no * 4) + 1);
+		object_found = (pointer ~= 0xffffff) and (pointer ~= 0x000000) and (object_no <= max_objects);
+
+		if object_found then
+			object_model_pointer = mainmemory.read_u24_be(pointer + model_pointer + 1);
+			if object_model_pointer ~= 0x000000 then
+				mainmemory.write_u24_be(pointer + model_pointer + 1, kong_model_pointer);
+			end
+			object_no = object_no + 1;
+		end
+	end
+end
+
 local function applyScale(desired_scale)
-	local kong_object = mainmemory.read_u24_be(kong_object_pointer);
 	local i;
 	for i=1,#scale do
 		mainmemory.writefloat(kong_object + scale[i], desired_scale, true);
@@ -1081,7 +1103,6 @@ end
 
 local function random_effect()
 	-- Randomly manipulate the effect byte
-	local kong_object = mainmemory.read_u24_be(kong_object_pointer);
 	local randomEffect = math.random(0, 0xffff);
 	mainmemory.write_u16_be(kong_object + effect_byte, randomEffect);
 
@@ -1105,6 +1126,7 @@ local options_moon_mode_label;
 local options_moon_mode_button;
 
 local options_clear_tb_void_button;
+local options_kong_button;
 local options_force_pause_button;
 local options_force_zipper_button;
 local options_random_effect_button;
@@ -1137,6 +1159,7 @@ function Game.initUI(form_handle, col, row, button_height, label_offset, dropdow
 	options_clear_tb_void_button =   forms.button(form_handle, "Clear TB void", clear_tb_void,   col(5), row(5), col(4) + 8, button_height);
 	options_unlock_moves_button =    forms.button(form_handle, "Unlock Moves",  unlock_moves,    col(5), row(6), col(4) + 8, button_height);
 
+	--options_kong_button        =  forms.button(form_handle, "Kong",   everythingiskong,  col(10), row(3), col(4) + 8, button_height);
 	options_force_pause_button =  forms.button(form_handle, "Force Pause",   force_pause,  col(10), row(4), col(4) + 8, button_height);
 	options_force_zipper_button = forms.button(form_handle, "Force Zipper",  force_zipper, col(10), row(5), col(4) + 8, button_height);
 	options_random_effect_button = forms.button(form_handle, "Random effect", random_effect, col(10), row(6), col(4) + 8, button_height);
