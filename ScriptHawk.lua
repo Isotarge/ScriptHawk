@@ -165,12 +165,12 @@ function round(num, idp)
 	return math.floor(num * math.pow(10,idp)) / math.pow(10,idp);
 end
 
-local function rotation_to_degrees(num)
+function rotation_to_degrees(num)
 	return ((num % Game.max_rot_units) / Game.max_rot_units) * 360;
 end
 
 two_pi = math.pi * 2;
-local function rotation_to_radians(num)
+function rotation_to_radians(num)
 	return ((num % Game.max_rot_units) / Game.max_rot_units) * two_pi;
 end
 

@@ -1047,7 +1047,7 @@ local function neverSlip()
 	-- Patch the Kong object
 	local kong_object = mainmemory.read_u24_be(kong_object_pointer);
 	local slope_value = mainmemory.read_u8(kong_object + slope_byte);
-	mainmemory.write_u8(kong_object + slope_byte, math.max(3, slope_value));
+	--mainmemory.write_u8(kong_object + slope_byte, math.max(3, slope_value));
 	mainmemory.write_u8(kong_object + slope_byte + 1, 0xFE);
 end
 
