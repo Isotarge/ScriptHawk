@@ -15,10 +15,12 @@ SystemID SMS
 0411	b	s	0	Main RAM	Player Y Velocity
 0421	b	u	0	Main RAM	Player Facing Direction
 0422	b	u	0	Main RAM	Player is in air
-0524	b	h	0	Main RAM	Boss Flash Timer
-0534	b	h	0	Main RAM	Boss Health
-05B4	b	h	0	Main RAM	Boss Minion Health
-0CA0	b	h	0	Main RAM	Book is burnable
+050A	b	u	0	Main RAM	Boss X Position (Screen)
+0511	b	s	0	Main RAM	Boss Y Velocity
+0524	b	u	0	Main RAM	Boss Flash Timer
+0534	b	u	0	Main RAM	Boss Health
+05B4	b	u	0	Main RAM	Boss Minion Health
+0CA0	b	u	0	Main RAM	Book is burnable
 0CA8	b	u	0	Main RAM	Sword damage
 0CA9	b	u	0	Main RAM	Bow damage
 0CAE	b	h	0	Main RAM	Continue Warp Byte

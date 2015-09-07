@@ -66,6 +66,8 @@ local z_rot = 0xe8;
 
 local shade_byte = 0x16D;
 
+local tb_kickout_timer = 0x1b4;
+
 local grab_script_mode = "Grab";
 
 -- Keybinds
@@ -148,7 +150,9 @@ local function getExamineData(pointer)
 	table.insert(examine_data, { "Shade byte", mainmemory.readbyte(pointer + shade_byte) });
 	table.insert(examine_data, { "Visibility", mainmemory.readbyte(pointer + visibility) });
 
-	table.insert(examine_data, { "Grab Pointer", string.format("0x%08x", mainmemory.read_u32_be(pointer + grab_pointer)) });
+	table.insert(examine_data, { "Grab pointer", string.format("0x%08x", mainmemory.read_u32_be(pointer + grab_pointer)) });
+
+	table.insert(examine_data, { "TB kickout timer", mainmemory.read_u32_be(pointer + tb_kickout_timer) });
 
 	return examine_data;
 end
