@@ -15,8 +15,11 @@ SystemID SMS
 0411	b	s	0	Main RAM	Player Y Velocity
 0421	b	u	0	Main RAM	Player Facing Direction
 0422	b	u	0	Main RAM	Player is in air
+044A	b	u	0	Main RAM	Arrow X Position (Screen)
+0507	b	u	0	Main RAM	Boss Y Position (Screen)
 050A	b	u	0	Main RAM	Boss X Position (Screen)
 0511	b	s	0	Main RAM	Boss Y Velocity
+0522	b	u	0	Main RAM	Boss Teleport Timer
 0524	b	u	0	Main RAM	Boss Flash Timer
 0534	b	u	0	Main RAM	Boss Health
 05B4	b	u	0	Main RAM	Boss Minion Health
