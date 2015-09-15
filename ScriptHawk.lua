@@ -61,6 +61,8 @@ local rotation_units = "Degrees";
 
 -- Stops garbage min/max dx/dy/dz values
 local firstframe = true;
+previous_frame = emu.framecount();
+current_frame = emu.framecount();
 
 previous_map = "";
 previous_map_value = 0;
@@ -441,6 +443,9 @@ end
 local function plot_pos()
 	Game.eachFrame();
 
+	previous_frame = current_frame;
+	current_frame=emu.framecount();
+	
 	x = Game.getXPosition();
 	y = Game.getYPosition();
 	z = Game.getZPosition();
@@ -461,12 +466,21 @@ local function plot_pos()
 		dx = x - prev_x;
 		dy = y - prev_y;
 		dz = z - prev_z;
+		if math.abs(current_frame-previous_frame) > 1 then
+			dx=0;
+			dy=0;
+			dz=0;
+		end
 		d = math.sqrt(dx*dx + dz*dz);
 
 		if (max_dx ~= nil and max_dy ~= nil and max_dz ~= nil and max_d ~= nil) and (dx ~= nil and dy ~= nil and dz ~= nil and d ~= nil) then
 			if math.abs(dx) > max_dx then max_dx = math.abs(dx) end
 			if math.abs(dy) > max_dy then max_dy = math.abs(dy) end
 			if math.abs(dz) > max_dz then max_dz = math.abs(dz) end
+			if math.abs(current_frame-previous_frame) > 1 then
+				max_dx=0; max_dy=0; max_dz=0;
+				max_d=0;
+			end
 			if d > max_d then max_d = d end
 		end
 
