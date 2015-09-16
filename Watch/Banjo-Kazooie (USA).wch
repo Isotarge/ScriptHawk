@@ -19,7 +19,7 @@ SystemID N64
 36C50E	b	u	1	RDRAM	Pause Menu Item 3 Portrait
 36C51C	w	u	1	RDRAM	Pause Menu Item 4 Y Position
 36C51E	b	u	1	RDRAM	Pause Menu Item 4 Portrait
-36E560	d	h	1	RDRAM	Vile/Boggy State Pointer
+36E560	d	h	1	RDRAM	Minigame Array State Pointer
 37C0B0	d	f	1	RDRAM	Wading Boots Timer
 37C0B4	d	f	1	RDRAM	Wading Boots Timer (copy)
 37C0B8	d	f	1	RDRAM	Turbo Trainers Timer
