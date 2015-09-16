@@ -383,6 +383,8 @@ local x_rot = 0xe4;
 local y_rot = 0xe6;
 local z_rot = 0xe8;
 
+local locked_to_pad = 0x110;
+
 -- State byte
 -- 0x02 First person camera
 -- 0x04 Fairy camera
@@ -659,6 +661,7 @@ function Game.setXPosition(value)
 		--mainmemory.writefloat(jetman_x_position, value, true);
 	else
 		mainmemory.writefloat(kong_object + x_pos, value, true);
+		mainmemory.writebyte(kong_object + locked_to_pad, 0x00);
 	end
 end
 
@@ -669,12 +672,14 @@ function Game.setYPosition(value)
 		--mainmemory.writefloat(jetman_y_position, value, true);
 	else
 		mainmemory.writefloat(kong_object + y_pos, value, true);
+		mainmemory.writebyte(kong_object + locked_to_pad, 0x00);
 	end
 end
 
 function Game.setZPosition(value)
 	if not isInSubGame() then
 		mainmemory.writefloat(kong_object + z_pos, value, true);
+		mainmemory.writebyte(kong_object + locked_to_pad, 0x00);
 	end
 end
 
