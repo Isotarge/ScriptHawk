@@ -1,5 +1,4 @@
 local romName = gameinfo.getromname();
-local Game;
 
 if bizstring.contains(romName, "Donkey Kong 64") then
 	Game = require "games.dk64";

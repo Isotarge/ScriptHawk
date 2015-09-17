@@ -224,9 +224,16 @@ local function drawGraphicalRepresentation()
 	updateUIReadouts_lagometer();
 end
 
+local function islagged()
+	if type(Game) ~= "nil" then
+		return not Game.isPhysicsFrame();
+	end
+	return emu.islagged();
+end
+
 local function mainloop()
 	if forms.ischecked(options_toggle_vframe_mode) then
-		if emu.islagged() then
+		if islagged() then
 			lagCount = lagCount + 1;
 		else
 			ratio = math.min(1, math.max(0, lagCount - 1) / math.max(1, redzone));
@@ -242,7 +249,7 @@ local function mainloop()
 			frameCount = 0;
 		end
 	else
-		if emu.islagged() then
+		if islagged() then
 			lagCount = lagCount + 1;
 		end
 		frameCount = frameCount + 1;
