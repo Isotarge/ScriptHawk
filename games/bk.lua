@@ -24,7 +24,7 @@ local camera_rot = 0x37D96C;
 
 local map;
 local game_time_base;
-local vile_state_pointer;
+local minigame_array_pointer;
 
 local notes;
 
@@ -235,7 +235,7 @@ function Game.detectVersion(romName)
 		map = 0x37F2C5;
 		notes = 0x386943;
 		game_time_base = 0x3869E4;
-		vile_state_pointer = 0x36EAE0;
+		minigame_array_pointer = 0x36EAE0;
 	elseif bizstring.contains(romName, "Japan") then
 		slope_timer = 0x37CDE4;
 		moves_bitfield = 0x37CEA0;
@@ -245,7 +245,7 @@ function Game.detectVersion(romName)
 		map = 0x37F405;
 		notes = 0x386AA3;
 		game_time_base = 0x386B44;
-		vile_state_pointer = 0x36F260;
+		minigame_array_pointer = 0x36F260;
 	elseif bizstring.contains(romName, "USA") and bizstring.contains(romName, "Rev A") then
 		slope_timer = 0x37B4E4;
 		moves_bitfield = 0x37B5A0;
@@ -255,7 +255,7 @@ function Game.detectVersion(romName)
 		map = 0x37DAF5;
 		notes = 0x385183;
 		game_time_base = 0x385224;
-		vile_state_pointer = 0x36D760;
+		minigame_array_pointer = 0x36D760;
 	elseif bizstring.contains(romName, "USA") then
 		allowFurnaceFunPatch = true;
 		slope_timer = 0x37C2E4;
@@ -266,7 +266,7 @@ function Game.detectVersion(romName)
 		map = 0x37E8F5;
 		notes = 0x385F63;
 		game_time_base = 0x386004;
-		vile_state_pointer = 0x36E560;
+		minigame_array_pointer = 0x36E560;
 	else
 		return false;
 	end
@@ -472,7 +472,7 @@ local function updateWave()
 		wave_counter = wave_counter + 1;
 		if wave_counter == wave_delay then
 			local i;
-			local vile_state = mainmemory.read_u24_be(vile_state_pointer + 1);
+			local vile_state = mainmemory.read_u24_be(minigame_array_pointer + 1);
 			for i=1,#waveFrames[wave_frame] do
 				fireSlot(vile_state, getSlotIndex(waveFrames[wave_frame][i][1], waveFrames[wave_frame][i][2]), wave_colour);
 			end
@@ -486,7 +486,7 @@ local function updateWave()
 end
 
 local function doHeart()
-	local vile_state = mainmemory.read_u24_be(vile_state_pointer + 1);
+	local vile_state = mainmemory.read_u24_be(minigame_array_pointer + 1);
 	local i;
 
 	for i=1,#heart do
@@ -495,7 +495,7 @@ local function doHeart()
 end
 
 local function fireAllSlots()
-	local vile_state = mainmemory.read_u24_be(vile_state_pointer + 1);
+	local vile_state = mainmemory.read_u24_be(minigame_array_pointer + 1);
 	local i;
 
 	local colour = math.random(0, 1);
@@ -532,8 +532,6 @@ end
 --              Conga.lua    --
 -- written by Isotarge, 2015 -- 
 -------------------------------
-
-local minigame_array_pointer = 0x36E560;
 
 local slot_size = 0x80;
 local throw_slot = 0x77;
@@ -676,7 +674,7 @@ function Game.eachFrame()
 	
 	if forms.ischecked(options_toggle_neverslip) then
 		neverSlip();
-		--RF_step();
+		RF_step();
 	end
 
 	-- Check EEPROM checksums
