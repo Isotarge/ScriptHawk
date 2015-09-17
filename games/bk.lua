@@ -528,6 +528,28 @@ local function RF_step()
 	joypad.setanalog({['X Axis'] = analog_x, ['Y Axis'] = analog_y}, 1);
 end
 
+-------------------------------
+--              Conga.lua    --
+-- written by Isotarge, 2015 -- 
+-------------------------------
+
+local minigame_array_pointer = 0x36E560;
+
+local slot_size = 0x80;
+local throw_slot = 0x77;
+local orange_timer = 0x1C;
+
+local orange_timer_value = 0.5;
+
+function set_orange_timer()
+	joypad_pressed = input.get();
+	if joypad_pressed["C"] then
+		local minigame_array_object = mainmemory.read_u24_be(minigame_array_pointer + 1);
+		mainmemory.writefloat(minigame_array_object + throw_slot * slot_size + orange_timer, orange_timer_value, true);
+		--console.log(bizstring.hex(boggy_object + throw_slot * slot_size + orange_timer));
+	end
+end
+
 -------------------
 -- Physics/Scale --
 -------------------
@@ -650,6 +672,8 @@ function Game.eachFrame()
 	checkGameTime();
 	updateWave();
 
+	set_orange_timer();
+	
 	if forms.ischecked(options_toggle_neverslip) then
 		neverSlip();
 		--RF_step();
