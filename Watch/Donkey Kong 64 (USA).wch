@@ -56,6 +56,7 @@ SystemID N64
 76A0AB	b	h	1	RDRAM	Background?
 76A0CD	b	u	1	RDRAM	Adventure
 76A0DA	b	h	1	RDRAM	Mystery Menu
+76FDF8	d	h	1	RDRAM	Sound pointer thing
 7E9AFE	w	u	1	RDRAM	Weird sound control?
 7ECED7	b	u	1	RDRAM	KeysCoinsCollected
 7ECEF3	b	u	1	RDRAM	Fairies

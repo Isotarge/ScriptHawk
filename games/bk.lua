@@ -20,6 +20,8 @@ local x_rot;
 local facing_angle;
 local z_rot;
 
+local camera_rot = 0x37D96C;
+
 local map;
 local game_time_base;
 local vile_state_pointer;
@@ -502,6 +504,30 @@ local function fireAllSlots()
 	end
 end
 
+------------------------
+-- Roll Flutter stuff --
+------------------------
+
+RF_absolute_target_angle = 180;
+
+local RF_max_analog = 127;
+
+function set_angle(num)
+	RF_absolute_target_angle = num;
+end
+
+local function RF_step()
+	local current_camera_rot = mainmemory.readfloat(camera_rot, true) % 360;
+	local analog_angle = rotation_to_radians(math.abs(RF_absolute_target_angle - current_camera_rot) % 360);
+	local analog_x = math.sin(analog_angle) * RF_max_analog;
+	local analog_y = -1 * math.cos(analog_angle) * RF_max_analog;
+	--console.log("camera rot: "..current_camera_rot);
+	--console.log("analog angle: "..analog_angle);
+	--console.log("raw sincos: "..math.sin(analog_angle)..","..math.cos(analog_angle));
+	--console.log("analog inputs: "..analog_x..","..analog_y);
+	joypad.setanalog({['X Axis'] = analog_x, ['Y Axis'] = analog_y}, 1);
+end
+
 -------------------
 -- Physics/Scale --
 -------------------
@@ -626,6 +652,7 @@ function Game.eachFrame()
 
 	if forms.ischecked(options_toggle_neverslip) then
 		neverSlip();
+		--RF_step();
 	end
 
 	-- Check EEPROM checksums
