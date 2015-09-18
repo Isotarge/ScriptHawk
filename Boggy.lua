@@ -11,7 +11,7 @@ boggy_pointer = 0x36E560;
 -- Slot data
 slot_base = 0x28;
 slot_size = 0x180;
-number_of_slots = 0x60;
+number_of_slots = 0x100;
 
 -- Relative to slot start
 slot_variables = {
@@ -111,9 +111,9 @@ slot_variables = {
 	[0x158] = {["Type"] = "Float"},
 
 	[0x160] = {["Type"] = "Pointer"},
-	[0x164] = {["Type"] = "Float"},
-	[0x168] = {["Type"] = "Float"},
-	[0x16C] = {["Type"] = "Float"},
+	[0x164] = {["Type"] = "Float", ["Name"] = "X Position"},
+	[0x168] = {["Type"] = "Float", ["Name"] = "Y Position"},
+	[0x16C] = {["Type"] = "Float", ["Name"] = "Z Position"},
 
 	[0x170] = {["Type"] = "4_Unknown"},
 	[0x174] = {["Type"] = "Pointer"},
