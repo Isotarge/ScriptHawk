@@ -6,12 +6,12 @@ JSON = require "lib.JSON";
 
 -----------------------
 
-boggy_pointer = 0x36E560;
+local level_object_array_pointer = 0x36E560;
 
 -- Slot data
-slot_base = 0x28;
-slot_size = 0x180;
-number_of_slots = 0x100;
+local slot_base = 0x28;
+local slot_size = 0x180;
+local max_slots = 0x100;
 
 -- Relative to slot start
 slot_variables = {
@@ -36,11 +36,11 @@ slot_variables = {
 	[0x28] = {["Type"] = "Float", ["Name"] = "Race path progression"}, 
 	[0x2C] = {["Type"] = "Float", ["Name"] = "Speed (rubberband)"}, 
 
-	[0x30] = {["Type"] = "Float", ["Name"] = "Facing Angle"},
+	[0x30] = {["Type"] = "Float", ["Name"] = "Rotation Y"},
 	[0x38] = {["Type"] = "4_Unknown"},
 
 	[0x44] = {["Type"] = "Float", ["Name"] = "Angle"},
-	[0x48] = {["Type"] = "Float", ["Name"] = "Angle"},
+	[0x48] = {["Type"] = "Float", ["Name"] = "Rotation X"},
 	[0x4C] = {["Type"] = "Float"},
 
 	[0x54] = {["Type"] = "Float"},
@@ -86,7 +86,7 @@ slot_variables = {
 	[0x105] = {["Type"] = "Byte"},
 	[0x106] = {["Type"] = "Byte"},
 	[0x107] = {["Type"] = "Byte"},
-	[0x108] = {["Type"] = "Float"},
+	[0x108] = {["Type"] = "Float", ["Name"] = "Scale"},
 	[0x10C] = {["Type"] = "Pointer"},
 
 	[0x110] = {["Type"] = "Pointer"},
@@ -133,7 +133,7 @@ end
 
 fill_blank_variable_slots();
 
-slot_data = {};
+local slot_data = {};
 
 --------------------
 -- Output Helpers --
@@ -249,7 +249,7 @@ end
 
 function json_slots()
 	local json_data = JSON:encode_pretty(format_slot_data());
-	local file = io.open("Lua/ScriptHawk/Boggy.json", "w+");
+	local file = io.open("Lua/ScriptHawk/Level_Object_Array.json", "w+");
 	io.output(file);
 	io.write(json_data);
 	io.close(file);
@@ -334,6 +334,31 @@ function get_all_unique(variable)
 	end
 end
 
+function set_all(variable, value)
+	if type(variable) == "string" then
+		variable = resolve_variable_name(variable);
+	end
+	if type(slot_variables[variable]) == "table" then
+		local level_object_array = mainmemory.read_u24_be(level_object_array_pointer + 1);
+		local num_slots = math.min(max_slots, mainmemory.read_u32_be(level_object_array));
+
+		local i, current_slot_base;
+		for i=0,num_slots - 1 do
+			current_slot_base = get_slot_base(level_object_array, i);
+			if slot_variables[variable].Type == "Float" then
+				console.log("writing float to slot "..i);
+				mainmemory.writefloat(current_slot_base + variable, value, true);
+			elseif is_hex(slot_variables[variable].Type) then
+				console.log("writing u32_be to slot "..i);
+				mainmemory.write_u32_be(current_slot_base + variable, value);
+			else
+				console.log("writing byte to slot "..i);
+				mainmemory.writebyte(current_slot_base + variable, value);
+			end
+		end
+	end
+end
+
 -------------------
 -- More analysis --
 -------------------
@@ -399,9 +424,8 @@ end
 -- Data acquisition --
 ----------------------
 
-function get_slot_base(index)
-	local boggy_state = mainmemory.read_u24_be(boggy_pointer + 1);
-	return bizstring.hex(boggy_state + slot_base + index * slot_size);
+function get_slot_base(object_array, index)
+	return object_array + slot_base + index * slot_size;
 end
 
 function process_slot(slot_base)
@@ -422,16 +446,17 @@ function process_slot(slot_base)
 end
 
 function parse_slot_data()
-	local boggy_state = mainmemory.read_u24_be(boggy_pointer + 1);
-	local i, current_slot_base;
+	local level_object_array = mainmemory.read_u24_be(level_object_array_pointer + 1);
+	local num_slots = math.min(max_slots, mainmemory.read_u32_be(level_object_array));
 
 	-- Clear out old data
 	slot_data = {};
 
-	for i=0,number_of_slots do
-		current_slot_base = boggy_state + slot_base + i * slot_size;
+	local i, current_slot_base;
+	for i=0,num_slots - 1 do
+		current_slot_base = get_slot_base(level_object_array, i);
 		table.insert(slot_data, process_slot(current_slot_base));
 	end
 
-	--output_stats();
+	output_stats();
 end
