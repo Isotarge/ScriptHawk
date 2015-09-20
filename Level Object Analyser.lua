@@ -64,6 +64,16 @@ slot_variables = {
 	[0xA8] = {["Type"] = "Float"},
 	[0xAC] = {["Type"] = "Float"},
 
+	[0xB0] = {["Type"] = "Float"},
+	[0xB4] = {["Type"] = "Float"},
+	[0xB8] = {["Type"] = "Float"},
+
+	[0xC0] = {["Type"] = "Float"},
+	[0xC4] = {["Type"] = "Float"},
+	[0xC8] = {["Type"] = "Byte"},
+	[0xC9] = {["Type"] = "Byte"},
+	[0xCA] = {["Type"] = "Byte"},
+	[0xCB] = {["Type"] = "Byte"},
 	[0xCC] = {["Type"] = "Float"},
 
 	[0xD0] = {["Type"] = "Float"},
@@ -346,13 +356,13 @@ function set_all(variable, value)
 		for i=0,num_slots - 1 do
 			current_slot_base = get_slot_base(level_object_array, i);
 			if slot_variables[variable].Type == "Float" then
-				console.log("writing float to slot "..i);
+				--console.log("writing float to slot "..i);
 				mainmemory.writefloat(current_slot_base + variable, value, true);
 			elseif is_hex(slot_variables[variable].Type) then
-				console.log("writing u32_be to slot "..i);
+				--console.log("writing u32_be to slot "..i);
 				mainmemory.write_u32_be(current_slot_base + variable, value);
 			else
-				console.log("writing byte to slot "..i);
+				--console.log("writing byte to slot "..i);
 				mainmemory.writebyte(current_slot_base + variable, value);
 			end
 		end
