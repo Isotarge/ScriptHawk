@@ -260,9 +260,13 @@ end
 function json_slots()
 	local json_data = JSON:encode_pretty(format_slot_data());
 	local file = io.open("Lua/ScriptHawk/Level_Object_Array.json", "w+");
-	io.output(file);
-	io.write(json_data);
-	io.close(file);
+	if type(file) ~= "nil" then
+		io.output(file);
+		io.write(json_data);
+		io.close(file);
+	else
+		console.log("Error writing to file =(");
+	end
 end
 
 --------------

@@ -1208,14 +1208,14 @@ function Game.eachFrame()
 	if forms.ischecked(options_toggle_madjack) then
 		draw_mj_minimap();
 	end
-	
+
 	-- ISG Timer
 	if forms.ischecked(options_toggle_isg_timer) then
 		timer();
 	else
 		timer_started = false;
 	end
-		
+
 	-- Moonkick
 	if moon_mode == 'All' or (moon_mode == 'Kick' and mainmemory.readbyte(kong_object + kick_animation) == kick_animation_value) then
 		mainmemory.write_u16_be(kong_object + kick_freeze, kick_freeze_value);

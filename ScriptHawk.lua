@@ -91,22 +91,22 @@ precision = 3;
 
 local function decrease_precision()
 	precision = math.max(0, precision - 1);
-	updateUIReadouts_moonjumpGameAgnostic();
+	updateUIReadouts_ScriptHawk();
 end
 
 local function increase_precision()
 	precision = math.min(5, precision + 1);
-	updateUIReadouts_moonjumpGameAgnostic();
+	updateUIReadouts_ScriptHawk();
 end
 
 local function decrease_speedy_speed()
 	Game.speedy_index = math.max(1, Game.speedy_index - 1);
-	updateUIReadouts_moonjumpGameAgnostic();
+	updateUIReadouts_ScriptHawk();
 end
 
 local function increase_speedy_speed()
 	Game.speedy_index = math.min(#Game.speedy_speeds, Game.speedy_index + 1);
-	updateUIReadouts_moonjumpGameAgnostic();
+	updateUIReadouts_ScriptHawk();
 end
 
 -------------------------
@@ -121,12 +121,12 @@ local practice_save_slot_pressed = false;
 
 local function decrease_save_slot()
 	practice_save_slot = math.max(0, practice_save_slot - 1);
-	updateUIReadouts_moonjumpGameAgnostic();
+	updateUIReadouts_ScriptHawk();
 end
 
 local function increase_save_slot()
 	practice_save_slot = math.min(9, practice_save_slot + 1);
-	updateUIReadouts_moonjumpGameAgnostic();
+	updateUIReadouts_ScriptHawk();
 end
 
 --------------------------------
@@ -195,7 +195,7 @@ local function toggle_rotation_units()
 	else
 		rotation_units = "Degrees";
 	end
-	updateUIReadouts_moonjumpGameAgnostic();
+	updateUIReadouts_ScriptHawk();
 end
 
 local function formatRotation(num)
@@ -215,7 +215,59 @@ local function toggle_mode()
 	else
 		mode = 'Position';
 	end
-	updateUIReadouts_moonjumpGameAgnostic();
+	updateUIReadouts_ScriptHawk();
+end
+
+---------------
+-- Telemetry --
+---------------
+
+local telemetryData = {};
+local collecting_telemetry = false;
+local options_toggle_telemetry_button;
+
+-- Outputs telemetry data as CSV to the console
+local function output_telemetry()
+	local i = 1;
+	console.log("Time (Frames),X Position,Y Position,Z Position,Dxz,Dy,Rotation X,Rotation Y,Rotation Z,");
+	for i=1,#telemetryData do
+		console.log(i..","..telemetryData[i]["X Position"]..","..telemetryData[i]["Y Position"]..","..telemetryData[i]["Z Position"]..","..telemetryData[i]["Dxz"]..","..telemetryData[i]["Dy"]..","..telemetryData[i]["Rotation X"]..","..telemetryData[i]["Rotation Y"]..","..telemetryData[i]["Rotation Z"]..",");
+	end
+end
+
+local function start_telemetry()
+	collecting_telemetry = true;
+	forms.settext(options_toggle_telemetry_button, "Stop Telemetry");
+	telemetryData = {};
+end
+
+local function stop_telemetry()
+	collecting_telemetry = false;
+	forms.settext(options_toggle_telemetry_button, "Start Telemetry");
+
+	output_telemetry();
+	return;
+
+	-- Output to file
+	-- Output data to JSON
+	--local json_data = JSON:encode_pretty(telemetryData);
+	--local file = io.open("Lua/ScriptHawk/DK64_Y_Data.json", "w+");
+	--if type(file) ~= "nil" then
+		--io.output(file);
+		--io.write(json_data);
+		--io.close(file);
+	--else
+		--console.log("Error writing to file =(");
+		--output_telemetry();
+	--end
+end
+
+local function toggle_telemetry()
+	if collecting_telemetry then
+		stop_telemetry();
+	else
+		start_telemetry();
+	end
 end
 
 --------------
@@ -227,6 +279,11 @@ local label_offset = 5;
 local dropdown_offset = 1;
 local long_label_width = 140;
 local button_height = 23;
+
+-- OSD
+local gui_x_offset = 32;
+local gui_y_offset = 32;
+local row_height = 16;
 
 local function row(row_num)
 	return round(form_padding + button_height * row_num, 0);
@@ -255,6 +312,7 @@ local options_increase_speedy_speed_button = forms.button(options_form,   "+",  
 local options_speedy_speed_value_label =     forms.label(options_form,    "0",                                    col(5),      row(2) + label_offset,    54,               14);
 
 local options_map_dropdown =                 forms.dropdown(options_form, Game.maps,                              col(0),      row(3) + dropdown_offset, col(9) + 7,       button_height);
+options_toggle_telemetry_button =            forms.button(options_form,   "Start Telemetry", toggle_telemetry,    col(10),     row(3),                   col(4) + 8,       button_height);
 local options_map_checkbox =                 forms.checkbox(options_form, "Take me there",           col(0) + dropdown_offset, row(4) + dropdown_offset);
 local options_toggle_infinites =             forms.checkbox(options_form, "Infinites",               col(0) + dropdown_offset, row(5) + dropdown_offset);
 
@@ -273,7 +331,8 @@ local function findMapValue()
 	return 0;
 end
 
-function updateUIReadouts_moonjumpGameAgnostic()
+function updateUIReadouts_ScriptHawk()
+	-- Update form buttons etc
 	forms.settext(options_speedy_speed_value_label, Game.speedy_speeds[Game.speedy_index]);
 	forms.settext(options_precision_value_label, precision);
 	forms.settext(options_mode_button, mode);
@@ -281,6 +340,46 @@ function updateUIReadouts_moonjumpGameAgnostic()
 	if previous_map ~= forms.gettext(options_map_dropdown) then
 		previous_map = forms.gettext(options_map_dropdown);
 		previous_map_value = findMapValue();
+	end
+
+	-- Draw OSD
+	local row = 0;
+	gui.cleartext();
+
+	if type(x) ~= "nil" and type(y) ~= "nil" and type(z) ~= "nil" then
+		gui.text(gui_x_offset, gui_y_offset + row_height * row, "X: "..round(x, precision));
+		row = row + 1;
+		gui.text(gui_x_offset, gui_y_offset + row_height * row, "Y: "..round(y, precision));
+		row = row + 1;
+		gui.text(gui_x_offset, gui_y_offset + row_height * row, "Z: "..round(z, precision));
+		row = row + 2;
+		--gui.text(gui_x_offset, gui_y_offset + row_height * row, "Floor: "..round(floor_y, precision));
+		--row = row + 2;
+	end
+
+	if type(dy) ~= "nil" and type(d) ~= "nil" then
+		gui.text(gui_x_offset, gui_y_offset + row_height * row, "dY:  "..round(dy, precision));
+		row = row + 1;
+		gui.text(gui_x_offset, gui_y_offset + row_height * row, "dXZ: "..round(d, precision));
+		row = row + 2;
+	end
+
+	if type(max_dy) ~= "nil" and type(max_d) ~= "nil" then
+		gui.text(gui_x_offset, gui_y_offset + row_height * row, "Max dY:  "..round(max_dy, precision));
+		row = row + 1;
+		gui.text(gui_x_offset, gui_y_offset + row_height * row, "Max dXZ: "..round(max_d, precision));
+		row = row + 2;
+	end
+
+	if type(rot_x) ~= "nil" and type(rot_y) ~= "nil" and type(rot_z) ~= "nil" then
+		gui.text(gui_x_offset, gui_y_offset + row_height * row, "Rot X: "..formatRotation(rot_x));
+		row = row + 1;
+		gui.text(gui_x_offset, gui_y_offset + row_height * row, "Rot Y: "..formatRotation(rot_y));
+		row = row + 1;
+		gui.text(gui_x_offset, gui_y_offset + row_height * row, "Rot Z: "..formatRotation(rot_z));
+		row = row + 1;
+		--gui.text(gui_x_offset, gui_y_offset + row_height * row, "Rot L: "..formatRotation(rot_l));
+		--row = row + 2;
 	end
 end
 
@@ -486,50 +585,24 @@ local function plot_pos()
 		prev_x = x;
 		prev_y = y;
 		prev_z = z;
+		
+		-- Telemetry
+		if collecting_telemetry then
+			local temp_telemetry_data = {
+				["X Position"] = x,
+				["Y Position"] = y,
+				["Z Position"] = z,
+				["Dxz"] = d,
+				["Dy"] = dy,
+				["Rotation X"] = rot_x,
+				["Rotation Y"] = rot_y,
+				["Rotation Z"] = rot_z
+			}
+			table.insert(telemetryData, temp_telemetry_data);
+		end
 	end
 
-	local gui_x = 32;
-	local gui_y = 32;
-	local row = 0;
-	local height = 16;
-
-	if type(x) ~= "nil" and type(y) ~= "nil" and type(z) ~= "nil" then
-		gui.text(gui_x, gui_y + height * row, "X: "..round(x, precision));
-		row = row + 1;
-		gui.text(gui_x, gui_y + height * row, "Y: "..round(y, precision));
-		row = row + 1;
-		gui.text(gui_x, gui_y + height * row, "Z: "..round(z, precision));
-		row = row + 2;
-		--gui.text(gui_x, gui_y + height * row, "Floor: "..round(floor_y, precision));
-		--row = row + 2;
-	end
-
-	if type(dy) ~= "nil" and type(d) ~= "nil" then
-		gui.text(gui_x, gui_y + height * row, "dY:  "..round(dy, precision));
-		row = row + 1;
-		gui.text(gui_x, gui_y + height * row, "dXZ: "..round(d, precision));
-		row = row + 2;
-	end
-
-	if type(max_dy) ~= "nil" and type(max_d) ~= "nil" then
-		gui.text(gui_x, gui_y + height * row, "Max dY:  "..round(max_dy, precision));
-		row = row + 1;
-		gui.text(gui_x, gui_y + height * row, "Max dXZ: "..round(max_d, precision));
-		row = row + 2;
-	end
-
-	if type(rot_x) ~= "nil" and type(rot_y) ~= "nil" and type(rot_z) ~= "nil" then
-		gui.text(gui_x, gui_y + height * row, "Rot X: "..formatRotation(rot_x));
-		row = row + 1;
-		gui.text(gui_x, gui_y + height * row, "Rot Y: "..formatRotation(rot_y));
-		row = row + 1;
-		gui.text(gui_x, gui_y + height * row, "Rot Z: "..formatRotation(rot_z));
-		row = row + 1;
-		--gui.text(gui_x, gui_y + height * row, "Rot L: "..formatRotation(rot_l));
-		--row = row + 2;
-	end
-
-	updateUIReadouts_moonjumpGameAgnostic();
+	updateUIReadouts_ScriptHawk();
 end
 
 event.onframestart(handle_input, "Keyboard input handler");

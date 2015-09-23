@@ -12,6 +12,7 @@ SystemID N64
 04C71B	b	u	1	RDRAM	Jumpman Lives (Real)
 04C71C	b	u	1	RDRAM	Jumpman Lives (HUD)
 46E680	b	u	1	RDRAM	Key 8 enabled
+4B1EB0	d	h	1	RDRAM	Start of interesting spiking block
 4B210A	b	h	1	RDRAM	Main menu screen?
 4B210F	b	u	1	RDRAM	Main menu position
 4B2904	b	h	1	RDRAM	FF for voidout on main menu?!?
@@ -32,6 +33,8 @@ SystemID N64
 745840	b	u	1	RDRAM	Music Volume
 745844	b	u	1	RDRAM	Sound mode
 7467C8	b	u	1	RDRAM	File
+746820	d	h	1	RDRAM	Related to geometry spiking
+746824	d	h	1	RDRAM	Related to geometry spiking
 7476F5	b	u	1	RDRAM	Cutscene
 7480DC	d	f	1	RDRAM	Stored Y?
 74E77C	b	u	1	RDRAM	Character
