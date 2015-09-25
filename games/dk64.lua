@@ -1066,14 +1066,14 @@ local geometry_spike_pointer = 0x76FDF8;
 
 local function fix_geometry_spiking()
 	spiking_fix = true;
-	freeze_value = mainmemory.read_u32_be(geometry_spike_pointer);
+	--freeze_value = mainmemory.read_u32_be(geometry_spike_pointer);
 end
 
 local function break_geometry_spiking()
 	spiking_fix = false;
 end
 
-event.onloadstate(break_geometry_spiking, "Break spiking =(");
+event.onloadstate(break_geometry_spiking, "Break spiking");
 
 local function apply_spiking_fix()
 	mainmemory.write_u32_be(geometry_spike_pointer, freeze_value);

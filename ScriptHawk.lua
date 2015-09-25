@@ -91,21 +91,25 @@ precision = 3;
 
 local function decrease_precision()
 	precision = math.max(0, precision - 1);
+	gui.cleartext();
 	updateUIReadouts_ScriptHawk();
 end
 
 local function increase_precision()
 	precision = math.min(5, precision + 1);
+	gui.cleartext();
 	updateUIReadouts_ScriptHawk();
 end
 
 local function decrease_speedy_speed()
 	Game.speedy_index = math.max(1, Game.speedy_index - 1);
+	gui.cleartext();
 	updateUIReadouts_ScriptHawk();
 end
 
 local function increase_speedy_speed()
 	Game.speedy_index = math.min(#Game.speedy_speeds, Game.speedy_index + 1);
+	gui.cleartext();
 	updateUIReadouts_ScriptHawk();
 end
 
@@ -121,11 +125,13 @@ local practice_save_slot_pressed = false;
 
 local function decrease_save_slot()
 	practice_save_slot = math.max(0, practice_save_slot - 1);
+	gui.cleartext();
 	updateUIReadouts_ScriptHawk();
 end
 
 local function increase_save_slot()
 	practice_save_slot = math.min(9, practice_save_slot + 1);
+	gui.cleartext();
 	updateUIReadouts_ScriptHawk();
 end
 
@@ -195,6 +201,7 @@ local function toggle_rotation_units()
 	else
 		rotation_units = "Degrees";
 	end
+	gui.cleartext();
 	updateUIReadouts_ScriptHawk();
 end
 
@@ -215,6 +222,7 @@ local function toggle_mode()
 	else
 		mode = 'Position';
 	end
+	gui.cleartext();
 	updateUIReadouts_ScriptHawk();
 end
 
@@ -344,7 +352,6 @@ function updateUIReadouts_ScriptHawk()
 
 	-- Draw OSD
 	local row = 0;
-	gui.cleartext();
 
 	if type(x) ~= "nil" and type(y) ~= "nil" and type(z) ~= "nil" then
 		gui.text(gui_x_offset, gui_y_offset + row_height * row, "X: "..round(x, precision));
