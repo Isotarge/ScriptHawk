@@ -1056,6 +1056,29 @@ local function neverSlip()
 	mainmemory.write_u8(kong_object + slope_byte + 1, 0xFE);
 end
 
+----------------------
+-- Geometry Spiking --
+----------------------
+
+local spiking_fix = false;
+local freeze_value = 0;
+local geometry_spike_pointer = 0x76FDF8;
+
+local function fix_geometry_spiking()
+	spiking_fix = true;
+	freeze_value = mainmemory.read_u32_be(geometry_spike_pointer);
+end
+
+local function break_geometry_spiking()
+	spiking_fix = false;
+end
+
+event.onloadstate(break_geometry_spiking, "Break spiking =(");
+
+local function apply_spiking_fix()
+	mainmemory.write_u32_be(geometry_spike_pointer, freeze_value);
+end
+
 ----------------
 -- Moon stuff --
 ----------------
@@ -1166,7 +1189,8 @@ function Game.initUI(form_handle, col, row, button_height, label_offset, dropdow
 
 	--options_kong_button        =  forms.button(form_handle, "Kong",   everythingiskong,  col(10), row(3), col(4) + 8, button_height);
 	options_force_pause_button =  forms.button(form_handle, "Force Pause",   force_pause,  col(10), row(4), col(4) + 8, button_height);
-	options_force_zipper_button = forms.button(form_handle, "Force Zipper",  force_zipper, col(10), row(5), col(4) + 8, button_height);
+	--options_force_zipper_button = forms.button(form_handle, "Force Zipper",  force_zipper, col(10), row(5), col(4) + 8, button_height);
+	options_fix_geometry_spiking = forms.button(form_handle, "Fix Spiking", fix_geometry_spiking, col(10), row(5), col(4) + 8, button_height);
 	options_random_effect_button = forms.button(form_handle, "Random effect", random_effect, col(10), row(6), col(4) + 8, button_height);
 
 	-- Checkboxes
@@ -1214,6 +1238,11 @@ function Game.eachFrame()
 		timer();
 	else
 		timer_started = false;
+	end
+
+	-- Spiking fix
+	if spiking_fix then
+		apply_spiking_fix();
 	end
 
 	-- Moonkick
