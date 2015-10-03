@@ -10,7 +10,7 @@ local romName = gameinfo.getromname();
 if bizstring.contains(romName, "Donkey Kong 64") then
 	if bizstring.contains(romName, "USA") and not bizstring.contains(romName, "Kiosk") then
 		pointer_list = 0x7fbff0;
-		camera_pointer = 0x7fb968
+		camera_pointer = 0x7fb968;
 		kong_model_pointer = 0x7fbb4d;
 	elseif bizstring.contains(romName, "Europe") then
 		pointer_list = 0x7fbf10;

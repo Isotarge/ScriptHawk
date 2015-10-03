@@ -5,6 +5,7 @@ local Game = {};
 -------------------------
 
 local kong_object_pointer;
+local camera_pointer;
 local training_barrel;
 local pointer_list;
 local global_base;
@@ -460,6 +461,10 @@ local function keyLose()
 	end
 end
 
+function getFlagPointer()
+	return bizstring.hex(mainmemory.read_u24_be(key_flag_pointer + 1));
+end
+
 --------------------
 -- Region/Version --
 --------------------
@@ -472,6 +477,7 @@ function Game.detectVersion(romName)
 		training_barrel     = 0x7ed230;
 		menu_flags          = 0x7ed558;
 		kong_object_pointer = 0x7fbb4d;
+		camera_pointer      = 0x7fb968;
 		tb_void_byte        = 0x7fbb63;
 		pointer_list        = 0x7fbff0;
 		kongbase            = 0x7fc950;
@@ -499,6 +505,7 @@ function Game.detectVersion(romName)
 		training_barrel     = 0x7ed150;
 		menu_flags          = 0x7ed478;
 		kong_object_pointer = 0x7fba6d;
+		camera_pointer      = 0x7fb888;
 		tb_void_byte        = 0x7FBA83;
 		pointer_list        = 0x7fbf10;
 		kongbase            = 0x7fc890;
@@ -526,6 +533,7 @@ function Game.detectVersion(romName)
 		training_barrel     = 0x7ed84c;
 		menu_flags          = 0x7ed9c8;
 		kong_object_pointer = 0x7fbfbd;
+		camera_pointer      = 0x7fbdd8;
 		tb_void_byte        = 0x7FBFD3;
 		pointer_list        = 0x7fc460;
 		kongbase            = 0x7fcde0;
@@ -1101,21 +1109,24 @@ end
 
 local max_objects = 0xff;
 
-local function everythingiskong()
+function everythingiskong()
 	local object_found = true;
 	local object_no = 0;
 	local kong_model_pointer = mainmemory.read_u24_be(kong_object + 1);
 	local object_model_pointer;
 	local pointer;
+	local camera_object = mainmemory.read_u24_be(camera_pointer + 1); 
 
 	while object_found do
 		pointer = mainmemory.read_u24_be(pointer_list + (object_no * 4) + 1);
-		object_found = (pointer ~= 0xffffff) and (pointer ~= 0x000000) and (object_no <= max_objects);
+		object_found = (pointer ~= 0xffffff) and (pointer ~= 0x000000) and (pointer ~= camera_object) and (object_no <= max_objects);
 
 		if object_found then
 			object_model_pointer = mainmemory.read_u24_be(pointer + model_pointer + 1);
 			if object_model_pointer ~= 0x000000 then
+				mainmemory.writebyte(pointer + model_pointer, 0x80);
 				mainmemory.write_u24_be(pointer + model_pointer + 1, kong_model_pointer);
+				console.log("wrote: "..bizstring.hex(pointer));
 			end
 			object_no = object_no + 1;
 		end

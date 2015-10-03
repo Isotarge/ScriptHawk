@@ -2,6 +2,13 @@ Domain RDRAM
 SystemID N64
 02F050	d	f	1	RDRAM	Jetman X Position
 02F054	d	f	1	RDRAM	Jetman Y Position
+0337E0	d	h	1	RDRAM	Diddy ? colour (Main Menu)
+0337E4	d	h	1	RDRAM	Lanky ? colour (Main Menu)
+0337E8	d	h	1	RDRAM	Tiny ? colour (Main Menu)
+0337EC	d	h	1	RDRAM	Chunky ? colour (Main Menu)
+03380C	d	s	1	RDRAM	GB counter (Main Menu)
+033810	d	s	1	RDRAM	IGT hours (Main Menu)
+033814	d	s	1	RDRAM	IGT minutes (Main Menu)
 04BD10	d	f	1	RDRAM	"Help" message X Position
 04BD14	d	f	1	RDRAM	"Help" message Y Position
 04BD70	d	f	1	RDRAM	Jumpman X Position
