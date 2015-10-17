@@ -688,3 +688,26 @@ Bit 16 ???
 0x71 Completely froze BizHawk
 
 0x72 - 0xFF Untested
+
+------------------------
+-- Roll Flutter stuff --
+------------------------
+
+"down"  0, -1 = camera rot
+"right" 1, 0 = (camera rot + 90) % 360
+"up"    0, 1 = (camera rot + 180) % 360
+"left" -1, 0 = (camera rot + 270) % 360
+
+         Up 180
+Left 270        Right 90
+         Down 0
+
+
+Camera = 90
+Target = 180
+
+"hold right"
+
+1, 0
+
+(270 - 90) % 360 = 180
