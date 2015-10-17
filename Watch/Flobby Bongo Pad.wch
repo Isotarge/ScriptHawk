@@ -1,0 +1,12 @@
+Domain RDRAM
+SystemID N64
+48F251	b	u	1	RDRAM	
+48F280	d	f	1	RDRAM	X
+48F284	d	f	1	RDRAM	Y
+48F288	d	f	1	RDRAM	Z
+48F28C	b	u	1	RDRAM	
+48F28D	b	u	1	RDRAM	
+48F28E	b	u	1	RDRAM	Will Play Cutscene if set to 2
+48F290	b	u	1	RDRAM	Locked to pad & Won't use ammo
+7FBB4C	d	h	1	RDRAM	Kong Model Pointer
+

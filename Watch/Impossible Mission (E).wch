@@ -1,41 +1,5 @@
 Domain Main RAM
 SystemID SMS
-00B5	b	u	0	Main RAM	Lift Resets
-00B6	b	u	0	Main RAM	Snoozes
-00CA	b	h	0	Main RAM	Hours
-00CB	b	h	0	Main RAM	Minutes
-00CC	b	h	0	Main RAM	Seconds
-00CD	b	u	0	Main RAM	Centiseconds
-00B7	b	u	0	Main RAM	Snooze cooldown timer
-00C7	b	u	0	Main RAM	Tile Arrow Selected
-00C8	b	u	0	Main RAM	Tile Arrow Selected
-00A5	b	u	0	Main RAM	Memory Selected
-0099	w	u	0	Main RAM	Elevator Y
-0180	b	u	0	Main RAM	Player X
-0181	b	u	0	Main RAM	Player Y
-0186	b	u	0	Main RAM	Player Facing Direction
-040C	b	u	0	Main RAM	Search timer 1
-040D	b	u	0	Main RAM	Search timer 2
-040E	b	u	0	Main RAM	Search timer 3
-040F	b	u	0	Main RAM	Search timer 4
-1B12	d	h	1	Main RAM	Puzzle Memory 0-3 Rotation & Colour
-1B16	d	h	1	Main RAM	Puzzle Memory 4-7 Rotation & Colour
-1B1A	d	h	1	Main RAM	Puzzle Memory 8-11 Rotation & Colour
-1B1E	d	h	1	Main RAM	Puzzle Memory 12-15 Rotation & Colour
-1B22	d	h	1	Main RAM	Puzzle Memory 16-19 Rotation & Colour
-1B26	d	h	1	Main RAM	Puzzle Memory 20-23 Rotation & Colour
-1B2A	d	h	1	Main RAM	Puzzle Memory 24-27 Rotation & Colour
-1B2E	d	h	1	Main RAM	Puzzle Memory 28-31 Rotation & Colour
-1B32	d	h	1	Main RAM	Puzzle Memory 32-35 Rotation & Colour
-1B36	d	h	1	Main RAM	Puzzle Memory 0-3 Piece
-1B3A	d	h	1	Main RAM	Puzzle Memory 4-7 Piece
-1B3E	d	h	1	Main RAM	Puzzle Memory 8-11 Piece
-1B42	d	h	1	Main RAM	Puzzle Memory 12-15 Piece
-1B46	d	h	1	Main RAM	Puzzle Memory 16-19 Piece
-1B4A	d	h	1	Main RAM	Puzzle Memory 20-23 Piece
-1B4E	d	h	1	Main RAM	Puzzle Memory 24-27 Piece
-1B52	d	h	1	Main RAM	Puzzle Memory 28-31 Piece
-1B56	d	h	1	Main RAM	Puzzle Memory 32-35 Piece
 0010	b	h	0	Main RAM	Score 0 - Digit 1
 0011	w	h	1	Main RAM	Score 0 - Digits 2 & 3
 0013	b	h	1	Main RAM	Score 0 - Name 1
@@ -96,4 +60,41 @@ SystemID SMS
 0065	w	h	1	Main RAM	Score 14 - Digits 2 & 3
 0067	b	h	1	Main RAM	Score 14 - Name 1
 0068	w	h	1	Main RAM	Score 14 - Name 2 & 3
+0099	w	u	0	Main RAM	Elevator Y
+00A5	b	u	0	Main RAM	Memory Selected
+00B5	b	u	0	Main RAM	Lift Resets
+00B6	b	u	0	Main RAM	Snoozes
+00B7	b	u	0	Main RAM	Snooze cooldown timer
+00C7	b	u	0	Main RAM	Tile Arrow Selected
+00C8	b	u	0	Main RAM	Tile Arrow Selected
+00CA	b	h	0	Main RAM	Hours
+00CB	b	h	0	Main RAM	Minutes
+00CC	b	h	0	Main RAM	Seconds
+00CD	b	u	0	Main RAM	Centiseconds
+0180	b	u	0	Main RAM	Player X
+0181	b	u	0	Main RAM	Player Y
+0186	b	u	0	Main RAM	Player Facing Direction
+040C	b	u	0	Main RAM	Search timer 1
+040D	b	u	0	Main RAM	Search timer 2
+040E	b	u	0	Main RAM	Search timer 3
+040F	b	u	0	Main RAM	Search timer 4
+1B12	d	h	1	Main RAM	Puzzle Memory 0-3 Rotation & Colour
+1B16	d	h	1	Main RAM	Puzzle Memory 4-7 Rotation & Colour
+1B1A	d	h	1	Main RAM	Puzzle Memory 8-11 Rotation & Colour
+1B1E	d	h	1	Main RAM	Puzzle Memory 12-15 Rotation & Colour
+1B22	d	h	1	Main RAM	Puzzle Memory 16-19 Rotation & Colour
+1B26	d	h	1	Main RAM	Puzzle Memory 20-23 Rotation & Colour
+1B2A	d	h	1	Main RAM	Puzzle Memory 24-27 Rotation & Colour
+1B2E	d	h	1	Main RAM	Puzzle Memory 28-31 Rotation & Colour
+1B32	d	h	1	Main RAM	Puzzle Memory 32-35 Rotation & Colour
+1B36	d	h	1	Main RAM	Puzzle Memory 0-3 Piece
+1B3A	d	h	1	Main RAM	Puzzle Memory 4-7 Piece
+1B3E	d	h	1	Main RAM	Puzzle Memory 8-11 Piece
+1B42	d	h	1	Main RAM	Puzzle Memory 12-15 Piece
+1B46	d	h	1	Main RAM	Puzzle Memory 16-19 Piece
+1B4A	d	h	1	Main RAM	Puzzle Memory 20-23 Piece
+1B4E	d	h	1	Main RAM	Puzzle Memory 24-27 Piece
+1B52	d	h	1	Main RAM	Puzzle Memory 28-31 Piece
+1B56	d	h	1	Main RAM	Puzzle Memory 32-35 Piece
+1237	b	h	0	Main RAM	
 

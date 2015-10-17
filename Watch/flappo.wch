@@ -1,0 +1,6 @@
+Domain Main RAM
+SystemID A26
+00	b	u	0	Main RAM	X Position
+5E	b	s	0	Main RAM	Y Velocity
+70	b	h	0	Main RAM	Game Mode
+

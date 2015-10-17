@@ -13,6 +13,8 @@ SystemID SMS
 0407	b	u	0	Main RAM	Player Y Location (Screen)
 040A	b	u	0	Main RAM	Player X Position (Screen)
 0411	b	s	0	Main RAM	Player Y Velocity
+0413	w	s	0	Main RAM	Player X Velocity
+0414	b	s	0	Main RAM	Chain Length (Roughly)
 0421	b	u	0	Main RAM	Player Facing Direction
 0422	b	u	0	Main RAM	Player is in air
 044A	b	u	0	Main RAM	Arrow X Position (Screen)
@@ -22,6 +24,7 @@ SystemID SMS
 0522	b	u	0	Main RAM	Boss Teleport Timer
 0524	b	u	0	Main RAM	Boss Flash Timer
 0534	b	u	0	Main RAM	Boss Health
+0591	b	s	0	Main RAM	Skeleton Y Velocity
 05B4	b	u	0	Main RAM	Boss Minion Health
 0CA0	b	u	0	Main RAM	Book is burnable
 0CA8	b	u	0	Main RAM	Sword damage
