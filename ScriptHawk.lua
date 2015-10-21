@@ -39,17 +39,17 @@ JSON = require "lib.JSON";
 --------------
 -- For full list go here http://slimdx.org/docs/html/T_SlimDX_DirectInput_Key.htm
 
-local decrease_precision_key = "Comma";
-local decrease_precision_pressed = false;
+--local decrease_precision_key = "Comma";
+--local decrease_precision_pressed = false;
 
-local increase_precision_key = "Period";
-local increase_precision_pressed = false;
+--local increase_precision_key = "Period";
+--local increase_precision_pressed = false;
 
 local reset_max_key = "Slash";
 local reset_max_pressed = false;
 
-local switch_mode_key = "M";
-local switch_mode_pressed = false;
+--local switch_mode_key = "M";
+--local switch_mode_pressed = false;
 
 -----------
 -- State --
@@ -503,32 +503,32 @@ local function handle_input()
 	input_table = input.get();
 
 	-- Hold down key prevention
-	if input_table[decrease_precision_key] == nil then
-		decrease_precision_pressed = false;
-	end
+	--if input_table[decrease_precision_key] == nil then
+	--	decrease_precision_pressed = false;
+	--end
 
-	if input_table[increase_precision_key] == nil then
-		increase_precision_pressed = false;
-	end
+	--if input_table[increase_precision_key] == nil then
+	--	increase_precision_pressed = false;
+	--end
 
 	if input_table[reset_max_key] == nil then
 		reset_max_pressed = false;
 	end
 
-	if input_table[switch_mode_key] == nil then
-		switch_mode_pressed = false;
-	end
+	--if input_table[switch_mode_key] == nil then
+	--	switch_mode_pressed = false;
+	--end
 
 	-- Check for key presses
-	if input_table[decrease_precision_key] == true and decrease_precision_pressed == false then
-		decrease_precision();
-		decrease_precision_pressed = true;
-	end
+	--if input_table[decrease_precision_key] == true and decrease_precision_pressed == false then
+	--	decrease_precision();
+	--	decrease_precision_pressed = true;
+	--end
 
-	if input_table[increase_precision_key] == true and increase_precision_pressed == false then
-		increase_precision();
-		increase_precision_pressed = true;
-	end
+	--if input_table[increase_precision_key] == true and increase_precision_pressed == false then
+	--	increase_precision();
+	--	increase_precision_pressed = true;
+	--end
 
 	if input_table[reset_max_key] == true and reset_max_pressed == false then
 		max_dx = 0.0;
@@ -538,10 +538,10 @@ local function handle_input()
 		reset_max_pressed = true;
 	end
 
-	if input_table[switch_mode_key] == true and switch_mode_pressed == false then
-		toggle_mode();
-		switch_mode_pressed = true;
-	end
+	--if input_table[switch_mode_key] == true and switch_mode_pressed == false then
+	--	toggle_mode();
+	--	switch_mode_pressed = true;
+	--end
 end
 
 local function plot_pos()
