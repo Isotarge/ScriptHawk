@@ -1,12 +1,12 @@
-Domain RDRAM
+Domain EEPROM
 SystemID N64
-000074	d	h	0	EEPROM	EEPROM Checksum 1
-0000EC	d	h	0	EEPROM	EEPROM Checksum 2
-00014A	w	u	1	EEPROM	FF RNG
-000164	d	h	0	EEPROM	EEPROM Checksum 3
-0001C2	w	u	1	EEPROM	FF RNG
-0001DC	d	h	0	EEPROM	EEPROM Checksum 4
-0001FC	d	h	0	EEPROM	EEPROM Checksum 5 (Global flags?)
+0074	d	h	0	EEPROM	EEPROM Checksum 1
+00EC	d	h	0	EEPROM	EEPROM Checksum 2
+014A	w	u	1	EEPROM	FF RNG
+0164	d	h	0	EEPROM	EEPROM Checksum 3
+01C2	w	u	1	EEPROM	FF RNG
+01DC	d	h	0	EEPROM	EEPROM Checksum 4
+01FC	d	h	0	EEPROM	EEPROM Checksum 5 (Global flags?)
 283400	w	b	1	RDRAM	Stop'N'Swop Items
 2986BA	w	h	1	RDRAM	Banjo Model Replacement
 2986BE	w	h	1	RDRAM	Banjo Model Replacement
@@ -92,6 +92,15 @@ SystemID N64
 385FA0	d	s	1	RDRAM	Mumbo Tokens (On hand)
 385FC4	d	s	1	RDRAM	Mumbo Tokens (Pause menu)
 385FCB	b	u	1	RDRAM	Jiggies (on hand)
+385FF1	b	u	1	RDRAM	Note Score (MM)
+385FF2	b	u	1	RDRAM	Note Score (TTC)
+385FF3	b	u	1	RDRAM	Note Score (CC)
+385FF4	b	u	1	RDRAM	Note Score (BGS)
+385FF5	b	u	1	RDRAM	Note Score (FP)
+385FF7	b	u	1	RDRAM	Note Score (GV)
+385FF8	b	u	1	RDRAM	Note Score (CCW)
+385FF9	b	u	1	RDRAM	Note Score (RBB)
+385FFA	b	u	1	RDRAM	Note Score (MMM)
 386004	d	f	1	RDRAM	Game Time (MM)
 386008	d	f	1	RDRAM	Game Time (TTC)
 38600C	d	f	1	RDRAM	Game Time (CC)
