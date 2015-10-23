@@ -711,3 +711,38 @@ Target = 180
 1, 0
 
 (270 - 90) % 360 = 180
+
+------------------------
+-- EEPROM Save format --
+------------------------
+
+----------+----------------------+-------------------------
+Range     | Description          | Data Type
+----------+----------------------+-------------------------
+0x00-0x01 | Slot in use?         | 16 bit unsigned int
+0x02-0x0E | Unknown              | Unknown
+0x0F-0x11 | Honeycombs collected | 24 bit bitfield
+0x22-0x29 | Note Scores          | 7  bit unsigned int * 9
+0x2A-0x3F | Game time            | 16 bit unsigned int * 11
+0x3E-0x63 | Unknown              | Unknown
+0x64      | Mumbo Tokens on hand | 8  bit unsigned int
+0x65-0x67 | Unknown              | Unknown
+0x68      | Jiggies on hand      | 8  bit unsigned int
+0x69-0x6C | Moves learned        | 32 bit bitfield
+0x6D-0x73 | Unknown              | Unknown
+0x74-0x77 | Checksum             | 32 bit unsigned int
+
+Honeycombs collected bitfield layout
+
+S=SM
+m=Mumbo's
+T=TTC
+c=Clanker's
+B=BGS
+F=FP
+G=GV
+M=MMM
+R=RBB
+C=CCW
+
+00000000 BccTTmmB RCCGGFFR SSSSSMMS

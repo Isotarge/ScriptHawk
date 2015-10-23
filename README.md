@@ -50,3 +50,6 @@ Extra Lua scripts and RAM watches for the [BizHawk](https://github.com/TASVideos
 - Elmo's Letter Adventure (N64 only)
 - Rayman 2 (N64 USA only)
 - Toy Story 2: Buzz Lightyear to the Rescue (N64 USA only)
+
+##Support me
+If you like my work, consider donating [here](https://streamtip.com/t/isotarge)

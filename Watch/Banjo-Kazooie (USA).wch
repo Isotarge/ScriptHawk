@@ -123,4 +123,5 @@ SystemID N64
 3935C0	b	u	1	RDRAM	Boggy is 1 flag ahead of player
 3935C1	b	u	1	RDRAM	Boggy is 2 flags ahead of player
 3935C2	b	u	1	RDRAM	Boggy is 3 flags ahead of player
+3832E0	d	h	1	RDRAM	Honeycomb Bitfield
 
