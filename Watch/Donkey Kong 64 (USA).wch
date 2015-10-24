@@ -66,6 +66,7 @@ SystemID N64
 76A0AB	b	h	1	RDRAM	Background?
 76A0CD	b	u	1	RDRAM	Adventure
 76A0DA	b	h	1	RDRAM	Mystery Menu
+76AF10	d	u	1	RDRAM	Frame (Lag)
 76FDF8	d	h	1	RDRAM	Sound pointer thing
 7E9AFE	w	u	1	RDRAM	Weird sound control?
 7ECED7	b	u	1	RDRAM	KeysCoinsCollected
@@ -75,6 +76,7 @@ SystemID N64
 7ED558	b	h	1	RDRAM	Mystery menu enabled
 7ED559	b	h	1	RDRAM	Extra cutscenes & Rambi unlocked
 7ED55B	b	h	1	RDRAM	Mystery menu bosses enabled (up to galleon)
+7F0560	d	u	1	RDRAM	Frames (Real)
 7F5D10	d	h	1	RDRAM	Camera pointer?
 7F5D14	b	h	1	RDRAM	ISG Fadeout
 7F948C	d	f	1	RDRAM	Stored Y?
