@@ -291,7 +291,7 @@ Game.maps = {
 
 function Game.unlock_menus()
 	for byte=0,7 do
-		mainmemory.write_u8(menu_flags + byte, 0xff);
+		mainmemory.write_u8(menu_flags + byte, 0xFF);
 	end
 end
 
@@ -339,7 +339,7 @@ local lives      = 9; -- This is used as instrument ammo in single player
 local function unlock_moves()
 	local kong;
 	for kong=DK,Chunky do
-		local base = kongbase + kong * 0x5e;
+		local base = kongbase + kong * 0x5E;
 		mainmemory.write_u8(base + moves,      3);
 		mainmemory.write_u8(base + sim_slam,   3);
 		mainmemory.write_u8(base + weapon,     7);
@@ -347,7 +347,7 @@ local function unlock_moves()
 	end
 
 	-- Training barrels
-	mainmemory.write_u8(training_barrel, 0xff);
+	mainmemory.write_u8(training_barrel, 0xFF);
 end
 
 ------------------------------------
@@ -367,22 +367,22 @@ local specular_highlight = 0x6D;
 local shadow_width = 0x6E;
 local shadow_height = 0x6F;
 
-local x_pos = 0x7c;
+local x_pos = 0x7C;
 local y_pos = 0x80;
 local z_pos = 0x84;
 
 local floor = 0xa4;
 
-local kick_freeze = 0xc4;
-local kick_freeze_value = 0xc020;
+local kick_freeze = 0xC4;
+local kick_freeze_value = 0xC020;
 
-local light_thing = 0xcc; -- Values 0x00->0x14
+local light_thing = 0xCC; -- Values 0x00->0x14
 
 local slope_byte = 0xDE;
 
-local x_rot = 0xe4;
-local y_rot = 0xe6;
-local z_rot = 0xe8;
+local x_rot = 0xE4;
+local y_rot = 0xE6;
+local z_rot = 0xE8;
 
 local locked_to_pad = 0x110;
 
@@ -421,48 +421,79 @@ local kong_object;
 local prev_map = 0;
 local map_value = 0;
 
----------------
--- Key stuff --
----------------
+----------------
+-- Flag stuff --
+----------------
 
-local key_flag_pointer;
-local key_collected_bitmasks = {
-	2, 2, 2, 0,
-	4, 4, 5, 4
-};
-local key_offsets = {
-	0x03, 0x09, 0x11, 0x15,
-	0x1d, 0x24, 0x27, 0x2f
-};
+local flag_pointer;
 
-local options_key_dropdown;
-local options_get_key_button;
-local options_lose_key_button;
+local flag_block_size = 0x80;
 
-local function keyGet()
-	local key = forms.getproperty(options_key_dropdown, "SelectedIndex") + 1;
-	local key_flags = mainmemory.read_u24_be(key_flag_pointer + 1);
-	if key_flags > 0x700000 and key > 0 and key < 9 then
-		local current_value = mainmemory.readbyte(key_flags + key_offsets[key]);
-		mainmemory.write_u8(key_flags + key_offsets[key], set_bit(current_value, key_collected_bitmasks[key]));
-	else
-		console.log("Key get failed to execute.");
+local flag_array = {};
+local flag_names = {};
+
+flag_array[1] = {["byte"] = 0x03, ["bit"] = 2, ["name"] = "Key 1"};
+flag_array[2] = {["byte"] = 0x09, ["bit"] = 2, ["name"] = "Key 2"};
+flag_array[3] = {["byte"] = 0x11, ["bit"] = 2, ["name"] = "Key 3"};
+flag_array[4] = {["byte"] = 0x15, ["bit"] = 0, ["name"] = "Key 4"};
+flag_array[5] = {["byte"] = 0x1D, ["bit"] = 4, ["name"] = "Key 5"};
+flag_array[6] = {["byte"] = 0x24, ["bit"] = 4, ["name"] = "Key 6"};
+flag_array[7] = {["byte"] = 0x27, ["bit"] = 5, ["name"] = "Key 7"};
+flag_array[8] = {["byte"] = 0x2F, ["bit"] = 4, ["name"] = "Key 8"};
+
+local function fill_flag_names()
+	local i;
+	for i=1,#flag_array do
+		flag_names[i] = flag_array[i]["name"];
 	end
 end
 
-local function keyLose()
-	local key = forms.getproperty(options_key_dropdown, "SelectedIndex") + 1;
-	local key_flags = mainmemory.read_u24_be(key_flag_pointer + 1);
-	if key_flags > 0x700000 and key > 0 and key < 9 then
-		local current_value = mainmemory.readbyte(key_flags + key_offsets[key]);
-		mainmemory.write_u8(key_flags + key_offsets[key], clear_bit(current_value, key_collected_bitmasks[key]));
-	else
-		console.log("Key lose failed to execute.");
+fill_flag_names();
+console.log(flag_names);
+
+local function getFlagFromName(flagName)
+	local i;
+	for i=1,#flag_array do
+		if flagName == flag_array[i]["name"] then
+			return flag_array[i];
+		end
+	end
+end
+
+local options_flag_dropdown;
+local options_set_flag_button;
+local options_unset_flag_button;
+
+local function flagSet()
+	local flag = getFlagFromName(forms.getproperty(options_flag_dropdown, "SelectedItem"));
+	console.log(flag);
+	if type(flag) == "table" then
+		local flags = mainmemory.read_u24_be(flag_pointer + 1);
+		if flags > 0x700000 then
+			local current_value = mainmemory.readbyte(flags + flag["byte"]);
+			mainmemory.write_u8(flags + flag["byte"], set_bit(current_value, flag["bit"]));
+		else
+			console.log("Set flag failed to execute, try again.");
+		end
+	end
+end
+
+local function flagUnset()
+	local flag = getFlagFromName(forms.getproperty(options_flag_dropdown, "SelectedItem"));
+	console.log(flag);
+	if type(flag) == "table" then
+		local flags = mainmemory.read_u24_be(flag_pointer + 1);
+		if flags > 0x700000 then
+			local current_value = mainmemory.readbyte(flags + flag["byte"]);
+			mainmemory.write_u8(flags + flag["byte"], clear_bit(current_value, flag["bit"]));
+		else
+			console.log("Unset flag failed to execute, try again.");
+		end
 	end
 end
 
 function getFlagPointer()
-	return bizstring.hex(mainmemory.read_u24_be(key_flag_pointer + 1));
+	return bizstring.hex(mainmemory.read_u24_be(flag_pointer + 1));
 end
 
 --------------------
@@ -473,7 +504,7 @@ function Game.detectVersion(romName)
 	if bizstring.contains(romName, "USA") and not bizstring.contains(romName, "Kiosk") then
 		map                 = 0x7444E7;
 		file                = 0x7467c8;
-		key_flag_pointer    = 0x7654F4;
+		flag_pointer        = 0x7654F4;
 		training_barrel     = 0x7ed230;
 		menu_flags          = 0x7ed558;
 		kong_object_pointer = 0x7fbb4d;
@@ -484,7 +515,7 @@ function Game.detectVersion(romName)
 		global_base         = 0x7fcc41;
 
 		--Mad Jack
-		MJ_state_pointer   = 0x7fdc91;
+		MJ_state_pointer      = 0x7fdc91;
 		MJ_time_until_next_action = 0x2d;
 		MJ_actions_remaining      = 0x58;
 		MJ_action_type            = 0x59;
@@ -496,12 +527,12 @@ function Game.detectVersion(romName)
 		--Subgames
 		jumpman_x_position = 0x04BD70;
 		jumpman_y_position = 0x04BD74;
-		jetman_x_position = 0x02F050;
-		jetman_y_position = 0x02F054;
+		jetman_x_position  = 0x02F050;
+		jetman_y_position  = 0x02F054;
 	elseif bizstring.contains(romName, "Europe") then
 		map                 = 0x73EC37;
 		file                = 0x740F18;
-		key_flag_pointer    = 0x760014;
+		flag_pointer        = 0x760014;
 		training_barrel     = 0x7ed150;
 		menu_flags          = 0x7ed478;
 		kong_object_pointer = 0x7fba6d;
@@ -512,7 +543,7 @@ function Game.detectVersion(romName)
 		global_base         = 0x7fcb81;
 
 		--Mad Jack
-		MJ_state_pointer   = 0x7FDBD1;
+		MJ_state_pointer      = 0x7FDBD1;
 		MJ_time_until_next_action = 0x25;
 		MJ_actions_remaining      = 0x60;
 		MJ_action_type            = 0x61;
@@ -524,12 +555,12 @@ function Game.detectVersion(romName)
 		--Subgames
 		jumpman_x_position = 0x03ECD0;
 		jumpman_y_position = 0x03ECD4;
-		jetman_x_position = 0x022100;
-		jetman_y_position = 0x022104;
+		jetman_x_position  = 0x022100;
+		jetman_y_position  = 0x022104;
 	elseif bizstring.contains(romName, "Japan") then
 		map                 = 0x743DA7;
 		file                = 0x746088;
-		key_flag_pointer    = 0x7656E4;
+		flag_pointer        = 0x7656E4;
 		training_barrel     = 0x7ed84c;
 		menu_flags          = 0x7ed9c8;
 		kong_object_pointer = 0x7fbfbd;
@@ -540,7 +571,7 @@ function Game.detectVersion(romName)
 		global_base         = 0x7fd0d1;
 
 		--Mad Jack
-		MJ_state_pointer   = 0x7fe121;
+		MJ_state_pointer      = 0x7fe121;
 		MJ_time_until_next_action = 0x25;
 		MJ_actions_remaining      = 0x60;
 		MJ_action_type            = 0x61;
@@ -552,8 +583,8 @@ function Game.detectVersion(romName)
 		--Subgames
 		jumpman_x_position = 0x03EB00;
 		jumpman_y_position = 0x03EB04;
-		jetman_x_position = 0x022060;
-		jetman_y_position = 0x022064;
+		jetman_x_position  = 0x022060;
+		jetman_y_position  = 0x022064;
 	elseif bizstring.contains(romName, "Kiosk") then
 		file                = 0x7467c8; -- TODO?
 		map                 = 0x72CDE7;
@@ -841,10 +872,6 @@ local MJ_time_until_next_action_y    = MJ_minimap_actions_remaining_y + MJ_minim
 local MJ_kong_row_y                  = MJ_time_until_next_action_y + MJ_minimap_height;
 local MJ_kong_col_y                  = MJ_kong_row_y + MJ_minimap_height;
 
-local function round(x)
-	return x + 0.5 - (x + 0.5) % 1;
-end
-
 local function position_to_rowcol(pos)
 	if pos < 450 then
 		return 0;
@@ -1087,6 +1114,34 @@ local function apply_spiking_fix()
 	mainmemory.write_u32_be(geometry_spike_pointer, freeze_value);
 end
 
+-----------------------
+-- Lag configuration --
+-----------------------
+
+local options_toggle_lag_fix;
+local options_decrease_lag_factor_button;
+local options_increase_lag_factor_button;
+local options_lag_factor_value_label;
+
+local lag_factor = 1;
+
+-- TODO: Find for other versions
+local frames_real = 0x7F0560;
+local frames_lag = 0x76AF10;
+
+local function increase_lag_factor()
+	lag_factor = lag_factor + 1;
+end
+
+local function decrease_lag_factor()
+	lag_factor = lag_factor - 1;
+end
+
+local function fix_lag()
+	local frames_real_value = mainmemory.read_u32_be(frames_real);
+	mainmemory.write_u32_be(frames_lag, frames_real_value - lag_factor);
+end
+
 ----------------
 -- Moon stuff --
 ----------------
@@ -1179,9 +1234,9 @@ local options_toggle_isg_timer;
 
 function Game.initUI(form_handle, col, row, button_height, label_offset, dropdown_offset)
 	-- Key stuff
-	options_key_dropdown = forms.dropdown(form_handle, { "Key 1", "Key 2", "Key 3", "Key 4", "Key 5", "Key 6", "Key 7", "Key 8" }, col(10) + dropdown_offset, row(0) + dropdown_offset);
-	options_get_key_button = forms.button(form_handle, "Get", keyGet, col(10), row(1), 59, button_height);
-	options_lose_key_button = forms.button(form_handle, "Lose", keyLose, col(13) - 5, row(1), 59, button_height);
+	options_flag_dropdown =     forms.dropdown(form_handle, flag_names, col(10) + dropdown_offset, row(0) + dropdown_offset);
+	options_set_flag_button =   forms.button(form_handle, "Get", flagSet,    col(10),     row(1), 59, button_height);
+	options_unset_flag_button = forms.button(form_handle, "Lose", flagUnset, col(13) - 5, row(1), 59, button_height);
 
 	-- Moon stuff
 	options_moon_mode_label =  forms.label(form_handle,  "Moon:",                    col(10),     row(2) + label_offset, 48, button_height);
@@ -1199,11 +1254,17 @@ function Game.initUI(form_handle, col, row, button_height, label_offset, dropdow
 	options_unlock_moves_button =    forms.button(form_handle, "Unlock Moves",  unlock_moves,    col(5), row(6), col(4) + 8, button_height);
 
 	--options_kong_button        =  forms.button(form_handle, "Kong",   everythingiskong,  col(10), row(3), col(4) + 8, button_height);
-	options_force_pause_button =  forms.button(form_handle, "Force Pause",   force_pause,  col(10), row(4), col(4) + 8, button_height);
-	--options_force_zipper_button = forms.button(form_handle, "Force Zipper",  force_zipper, col(10), row(5), col(4) + 8, button_height);
-	options_fix_geometry_spiking = forms.button(form_handle, "Fix Spiking", fix_geometry_spiking, col(10), row(5), col(4) + 8, button_height);
-	options_random_effect_button = forms.button(form_handle, "Random effect", random_effect, col(10), row(6), col(4) + 8, button_height);
+	--options_force_pause_button =  forms.button(form_handle, "Force Pause",   force_pause,  col(10), row(4), col(4) + 8, button_height);
+	options_force_zipper_button =  forms.button(form_handle, "Force Zipper",  force_zipper,         col(10), row(4), col(4) + 8, button_height);
+	options_fix_geometry_spiking = forms.button(form_handle, "Fix Spiking",   fix_geometry_spiking, col(10), row(5), col(4) + 8, button_height);
+	--options_random_effect_button = forms.button(form_handle, "Random effect", random_effect,        col(10), row(6), col(4) + 8, button_height);
 
+	-- Lag fix
+	options_decrease_lag_factor_button = forms.button(form_handle,  "-",       decrease_lag_factor, col(13) - 7,                  row(6),                   button_height, button_height);
+	options_increase_lag_factor_button = forms.button(form_handle,  "+",       increase_lag_factor, col(13) + button_height - 7,  row(6),                   button_height, button_height);
+	options_lag_factor_value_label =     forms.label(form_handle,   "0",                            col(13) + button_height + 21, row(6) + label_offset,    54,            14);
+	options_toggle_lag_fix =             forms.checkbox(form_handle, "Lag fix",                     col(10) + dropdown_offset,    row(6) + dropdown_offset);
+	
 	-- Checkboxes
 	options_toggle_homing_ammo = forms.checkbox(form_handle, "Homing Ammo", col(0) + dropdown_offset, row(6) + dropdown_offset);
 	options_toggle_neverslip =   forms.checkbox(form_handle, "Never Slip",  col(0) + dropdown_offset, row(7) + dropdown_offset);
@@ -1234,6 +1295,12 @@ function Game.eachFrame()
 	map_value = mainmemory.readbyte(map);
 
 	Game.unlock_menus();
+
+	-- Lag fix
+	forms.settext(options_lag_factor_value_label, lag_factor);
+	if forms.ischecked(options_toggle_lag_fix) then
+		fix_lag();
+	end
 
 	if forms.ischecked(options_toggle_neverslip) then
 		neverSlip();
