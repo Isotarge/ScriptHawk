@@ -503,11 +503,11 @@ flag_array = {
 	{["byte"] = 0x4B, ["bit"] = 6, ["name"] = "Isles: Fairy: Tree"}, -- TODO: Test this
 	{["byte"] = 0x4B, ["bit"] = 7, ["name"] = "Isles: Fairy: High"}, -- TODO: Test this
 	
-	{["byte"] = 0x2E, ["bit"] = 1, ["name"] = "Isles: Tiny: Galleon Lobby GB?"}, -- TODO: Which one actually set it
+	{["byte"] = 0x2E, ["bit"] = 1, ["name"] = "Galleon Lobby: Tiny GB?"}, -- TODO: Which one actually set it
 	{["byte"] = 0x2F, ["bit"] = 1, ["name"] = "Flobby fairy?"}, -- TODO: Test this
 	{["byte"] = 0x4A, ["bit"] = 1, ["name"] = "Flobby fairy?"}, -- TODO: Test this
 	
-	{["byte"] = 0x32, ["bit"] = 3, ["name"] = "Isles: Tiny: Galleon Lobby GB?"}, -- TODO: Which one actually set it
+	{["byte"] = 0x32, ["bit"] = 3, ["name"] = "Galleon Lobby: Tiny GB?"}, -- TODO: Which one actually set it
 	{["byte"] = 0x32, ["bit"] = 4, ["name"] = "Isles: DK: Factory lobby GB"}, -- TODO: Test this
 	
 	{["byte"] = 0x35, ["bit"] = 1, ["name"] = "Isles: Tiny: High instrument pad GB"}, -- TODO: Test this
