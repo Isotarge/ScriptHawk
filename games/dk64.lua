@@ -434,21 +434,41 @@ local flag_names = {};
 
 flag_array = {
 	{["byte"] = 0x00, ["bit"] = 6, ["name"] = "Kong: Diddy unlocked"},
-	{["byte"] = 0x08, ["bit"] = 6, ["name"] = "Kong: Lanky unlocked"},
-	{["byte"] = 0x08, ["bit"] = 2, ["name"] = "Kong: Tiny unlocked"},
 	{["byte"] = 0x03, ["bit"] = 2, ["name"] = "Key 1"},
+
+	{["byte"] = 0x08, ["bit"] = 2, ["name"] = "Kong: Tiny unlocked"},
+	{["byte"] = 0x08, ["bit"] = 6, ["name"] = "Kong: Lanky unlocked"},
 	{["byte"] = 0x09, ["bit"] = 2, ["name"] = "Key 2"},
+
+	{["byte"] = 0x0E, ["bit"] = 5, ["name"] = "Kong: Chunky unlocked"},
 	{["byte"] = 0x11, ["bit"] = 2, ["name"] = "Key 3"},
+	{["byte"] = 0x11, ["bit"] = 6, ["name"] = "Factory: Storage Room W1"},
+
 	{["byte"] = 0x15, ["bit"] = 0, ["name"] = "Key 4"},
+
+	{["byte"] = 0x19, ["bit"] = 7, ["name"] = "Fungi: Green Tunnel (Feather Side)"},
+	{["byte"] = 0x1A, ["bit"] = 2, ["name"] = "Fungi: Brown Tunnel Open"},
+	{["byte"] = 0x1C, ["bit"] = 5, ["name"] = "Fungi: Mushroom Cannons"},
+	{["byte"] = 0x1C, ["bit"] = 6, ["name"] = "Fungi: Mushroom Coconut Switch"},
+	{["byte"] = 0x1C, ["bit"] = 7, ["name"] = "Fungi: Mushroom Grape Switch"},
+	{["byte"] = 0x1D, ["bit"] = 0, ["name"] = "Fungi: Mushroom Feather Switch"},
+	{["byte"] = 0x1D, ["bit"] = 1, ["name"] = "Fungi: Mushroom Peanut Switch"},
+	{["byte"] = 0x1D, ["bit"] = 2, ["name"] = "Fungi: Mushroom Pineapple Switch"},
 	{["byte"] = 0x1D, ["bit"] = 4, ["name"] = "Key 5"},
+	{["byte"] = 0x1E, ["bit"] = 1, ["name"] = "Fungi: Tree W3"},
+	{["byte"] = 0x1E, ["bit"] = 2, ["name"] = "Fungi: Mushroom W3"},
+	{["byte"] = 0x1E, ["bit"] = 3, ["name"] = "Fungi: Tree W4"},
+	{["byte"] = 0x1E, ["bit"] = 5, ["name"] = "Fungi: Low W5"},
+
 	{["byte"] = 0x24, ["bit"] = 4, ["name"] = "Key 6"},
+
 	{["byte"] = 0x27, ["bit"] = 5, ["name"] = "Key 7"},
 	
 	{["byte"] = 0x2D, ["bit"] = 0, ["name"] = "Mini Monkey FTT?"},
 	{["byte"] = 0x2D, ["bit"] = 1, ["name"] = "Hunky Chunky FTT"}, -- TODO: Test this
 	{["byte"] = 0x2D, ["bit"] = 3, ["name"] = "Strong Kong FTT"}, -- TODO: Test this
 	{["byte"] = 0x2D, ["bit"] = 7, ["name"] = "Diddy Caves Lobby GB, more like FTT of some sort"}, -- TODO: Test this
-	{["byte"] = 0x2E, ["bit"] = 0, ["name"] = "Lanky something?? FTT"}, -- TODO: Test this
+	{["byte"] = 0x2E, ["bit"] = 0, ["name"] = "Lanky FTT"},
 	{["byte"] = 0x2F, ["bit"] = 0, ["name"] = "Wrinkly FTT"}, -- TODO: Test this
 
 	{["byte"] = 0x2F, ["bit"] = 1, ["name"] = "Camera/Shockwave"}, -- TODO: Test this
