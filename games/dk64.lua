@@ -432,9 +432,57 @@ local flag_block_size = 0x80;
 local flag_array = {};
 local flag_names = {};
 
-flag_array = {
+flag_array = {	
+	---------------------------
+	-- Needs further testing --
+	---------------------------
+
+	{["byte"] = 0x03, ["bit"] = 3, ["name"] = "? Entered Japes"}, -- TODO: Test this
+	{["byte"] = 0x38, ["bit"] = 5, ["name"] = "? Entered Japes"}, -- TODO: Test this
+	{["byte"] = 0x61, ["bit"] = 3, ["name"] = "? Entered Japes"}, -- TODO: Test this
+
+	{["byte"] = 0x31, ["bit"] = 3, ["name"] = "? Japes W3 Right CB Bunch"}, -- TODO: Test this
+	{["byte"] = 0x64, ["bit"] = 7, ["name"] = "? Japes W3 Right CB Bunch"}, -- TODO: Test this
+	{["byte"] = 0x2E, ["bit"] = 3, ["name"] = "? Orange Barrel Completed?"}, -- TODO: Test this
+
+	{["byte"] = 0x2C, ["bit"] = 7, ["name"] = "? T&S FTT (entered in Japes)"}, -- TODO: Test this
+	{["byte"] = 0x62, ["bit"] = 1, ["name"] = "? T&S FTT (entered in Japes)"}, -- TODO: Test this
+
+	-----------
+	-- Known --
+	-----------
+
+	{["byte"] = 0x00, ["bit"] = 0, ["name"] = "Japes: DK Switch by enterance"}, -- TODO: Test this
+	{["byte"] = 0x00, ["bit"] = 4, ["name"] = "Japes: DK: GB in front of Diddy's cage"}, -- TODO: Test this
+	{["byte"] = 0x00, ["bit"] = 5, ["name"] = "Japes: DK: GB in Diddy's cage"}, -- TODO: Test this
 	{["byte"] = 0x00, ["bit"] = 6, ["name"] = "Kong: Diddy unlocked"},
+
+	{["byte"] = 0x01, ["bit"] = 4, ["name"] = "Japes: Chunky: Underground GB"},
+	{["byte"] = 0x01, ["bit"] = 5, ["name"] = "Japes: Hut Smashed (Diddy)"},
+	{["byte"] = 0x01, ["bit"] = 6, ["name"] = "Japes: Hut Smashed (Lanky)"},
+	{["byte"] = 0x01, ["bit"] = 7, ["name"] = "Japes: Hut Smashed (DK)"},
+	{["byte"] = 0x02, ["bit"] = 0, ["name"] = "Japes: Hut Smashed (Tiny)"},
+	{["byte"] = 0x02, ["bit"] = 2, ["name"] = "Japes: Diddy Caged GB"},
+	{["byte"] = 0x02, ["bit"] = 3, ["name"] = "Japes: Lanky Caged GB"},
+	{["byte"] = 0x02, ["bit"] = 4, ["name"] = "Japes: DK Caged GB"},
+	{["byte"] = 0x02, ["bit"] = 5, ["name"] = "Japes: Tiny Caged GB"},
+	{["byte"] = 0x02, ["bit"] = 6, ["name"] = "Japes: Chunky Caged GB"},
+
+	{["byte"] = 0x03, ["bit"] = 1, ["name"] = "Japes: Chunky: Boulder GB"},
 	{["byte"] = 0x03, ["bit"] = 2, ["name"] = "Key 1"},
+
+	{["byte"] = 0x04, ["bit"] = 0, ["name"] = "Japes: W1 (Portal)"}, -- TODO: Test this
+	{["byte"] = 0x04, ["bit"] = 1, ["name"] = "Japes: W1 (Far)"}, -- TODO: Test this
+	{["byte"] = 0x04, ["bit"] = 2, ["name"] = "Japes: W2 (High)"}, -- TODO: Test this
+	{["byte"] = 0x04, ["bit"] = 3, ["name"] = "Japes: W2 (Low)"}, -- TODO: Test this
+	{["byte"] = 0x04, ["bit"] = 4, ["name"] = "Japes: W3 (Right)"}, -- TODO: Test this
+	{["byte"] = 0x04, ["bit"] = 5, ["name"] = "Japes: W3 (Left)"}, -- TODO: Test this
+	{["byte"] = 0x05, ["bit"] = 0, ["name"] = "Japes: W4 (Close)"}, -- TODO: Test this
+	{["byte"] = 0x05, ["bit"] = 1, ["name"] = "Japes: W4 (Cranky)"}, -- TODO: Test this
+
+	{["byte"] = 0x05, ["bit"] = 2, ["name"] = "Japes: Cutscene by far W1 played"}, -- TODO: Test this
+	{["byte"] = 0x05, ["bit"] = 3, ["name"] = "Japes: Rambi Door Smashed"}, -- TODO: Test this
+	{["byte"] = 0x05, ["bit"] = 6, ["name"] = "Japes: T&S Despawned"}, -- TODO: Test this
 
 	{["byte"] = 0x08, ["bit"] = 2, ["name"] = "Kong: Tiny unlocked"},
 	{["byte"] = 0x08, ["bit"] = 6, ["name"] = "Kong: Lanky unlocked"},
@@ -455,63 +503,130 @@ flag_array = {
 	{["byte"] = 0x1D, ["bit"] = 1, ["name"] = "Fungi: Mushroom Peanut Switch"},
 	{["byte"] = 0x1D, ["bit"] = 2, ["name"] = "Fungi: Mushroom Pineapple Switch"},
 	{["byte"] = 0x1D, ["bit"] = 4, ["name"] = "Key 5"},
-	{["byte"] = 0x1E, ["bit"] = 1, ["name"] = "Fungi: Tree W3"},
-	{["byte"] = 0x1E, ["bit"] = 2, ["name"] = "Fungi: Mushroom W3"},
-	{["byte"] = 0x1E, ["bit"] = 3, ["name"] = "Fungi: Tree W4"},
-	{["byte"] = 0x1E, ["bit"] = 5, ["name"] = "Fungi: Low W5"},
+	{["byte"] = 0x1E, ["bit"] = 1, ["name"] = "Fungi: W3 (Tree)"},
+	{["byte"] = 0x1E, ["bit"] = 2, ["name"] = "Fungi: W3 (Mushroom)"},
+	{["byte"] = 0x1E, ["bit"] = 3, ["name"] = "Fungi: W4 (Tree)"},
+	{["byte"] = 0x1E, ["bit"] = 5, ["name"] = "Fungi: W5 (Low)"},
 
 	{["byte"] = 0x24, ["bit"] = 4, ["name"] = "Key 6"},
-
 	{["byte"] = 0x27, ["bit"] = 5, ["name"] = "Key 7"},
-	
+
+	{["byte"] = 0x2C, ["bit"] = 3, ["name"] = "Warp pad FTT"},
+	{["byte"] = 0x2C, ["bit"] = 6, ["name"] = "Crown pad FTT"},
+
 	{["byte"] = 0x2D, ["bit"] = 0, ["name"] = "Mini Monkey FTT?"},
 	{["byte"] = 0x2D, ["bit"] = 1, ["name"] = "Hunky Chunky FTT"}, -- TODO: Test this
 	{["byte"] = 0x2D, ["bit"] = 3, ["name"] = "Strong Kong FTT"}, -- TODO: Test this
 	{["byte"] = 0x2D, ["bit"] = 7, ["name"] = "Diddy Caves Lobby GB, more like FTT of some sort"}, -- TODO: Test this
-	{["byte"] = 0x2E, ["bit"] = 0, ["name"] = "Lanky FTT"},
+	
+	{["byte"] = 0x2D, ["bit"] = 4, ["name"] = "Rainbow Coin FTT"}, -- TODO: Test this
+	{["byte"] = 0x2D, ["bit"] = 5, ["name"] = "Rambi FTT"}, -- TODO: Test this
+	
+	{["byte"] = 0x2E, ["bit"] = 0, ["name"] = "Lanky FT GB"},
+	{["byte"] = 0x2E, ["bit"] = 1, ["name"] = "Tiny FT GB"},
+	{["byte"] = 0x2E, ["bit"] = 2, ["name"] = "Chunky FT GB"},
+
 	{["byte"] = 0x2F, ["bit"] = 0, ["name"] = "Wrinkly FTT"}, -- TODO: Test this
+	{["byte"] = 0x2F, ["bit"] = 1, ["name"] = "? Isles: Flobby fairy or Fairy FTT?"}, -- TODO: Test this
 
 	{["byte"] = 0x2F, ["bit"] = 1, ["name"] = "Camera/Shockwave"}, -- TODO: Test this
 	{["byte"] = 0x2F, ["bit"] = 4, ["name"] = "Key 8"},
 	{["byte"] = 0x2F, ["bit"] = 5, ["name"] = "Isles: DK: Japes boulder GB"},
 	{["byte"] = 0x2F, ["bit"] = 6, ["name"] = "B.Locker FTT"},
-	
+
+	{["byte"] = 0x2F, ["bit"] = 7, ["name"] = "Training barrels spwaned?"}, -- TODO: Test this
+	{["byte"] = 0x61, ["bit"] = 1, ["name"] = "Training barrels spawned?"}, -- TODO: Test this
+
+	{["byte"] = 0x30, ["bit"] = 1, ["name"] = "Kong: DK Freed"}, -- TODO: Test this
+	{["byte"] = 0x30, ["bit"] = 2, ["name"] = "Dive Barrel Completed"}, -- TODO: Test this
+	{["byte"] = 0x30, ["bit"] = 4, ["name"] = "Orange Barrel Completed?"}, -- TODO: Test this
+	{["byte"] = 0x30, ["bit"] = 5, ["name"] = "Barrel Barrel Completed"}, -- TODO: Test this
+
+	{["byte"] = 0x30, ["bit"] = 6, ["name"] = "Isles: Escape FTT"}, -- TODO: Test this
+	{["byte"] = 0x30, ["bit"] = 7, ["name"] = "Vine Barrel Completed?"}, -- TODO: Test this
+
 	{["byte"] = 0x31, ["bit"] = 5, ["name"] = "Factory Lobby: Lever pulled"}, -- TODO: Test this
 	{["byte"] = 0x31, ["bit"] = 6, ["name"] = "Japes Lobby: Lanky GB??"}, -- TODO: Test this
 	{["byte"] = 0x31, ["bit"] = 7, ["name"] = "Aztec Lobby: Side room open"}, -- TODO: Test this
-	
+
 	{["byte"] = 0x32, ["bit"] = 0, ["name"] = "Aztec Lobby: Chunky Wrinkly flipped"}, -- TODO: Test this
 	{["byte"] = 0x32, ["bit"] = 1, ["name"] = "Galleon Lobby: Chunky Switch"}, -- TODO: Test this
 	
+	{["byte"] = 0x32, ["bit"] = 3, ["name"] = "? Galleon Lobby: Tiny GB?"}, -- TODO: Which one actually set it
+	{["byte"] = 0x32, ["bit"] = 4, ["name"] = "Factory Lobby: DK GB"}, -- TODO: Test this
+
 	{["byte"] = 0x33, ["bit"] = 0, ["name"] = "Caves Lobby: Ice wall BP room"}, -- TODO: Test this
 	{["byte"] = 0x33, ["bit"] = 1, ["name"] = "Caves Lobby: Ice wall GB room"}, -- TODO: Test this
 
 	{["byte"] = 0x33, ["bit"] = 2, ["name"] = "Caves Lobby: Diddy GB"}, -- TODO: Test this
 	{["byte"] = 0x33, ["bit"] = 3, ["name"] = "Caves Lobby: DK GB"}, -- TODO: Test this
 	{["byte"] = 0x33, ["bit"] = 5, ["name"] = "Caves Lobby: Boulder on pad"}, -- TODO: Test this
-	
-	{["byte"] = 0x34, ["bit"] = 3, ["name"] = "Isles: DK: Caged GB"},
-	{["byte"] = 0x37, ["bit"] = 3, ["name"] = "Isles: Japes boulder smashed"}, -- TODO: Test this
-	
-	{["byte"] = 0x39, ["bit"] = 5, ["name"] = "Japes Lobby: B. Locker Cleared"}, -- TODO: Test this
-	
-	{["byte"] = 0x3F, ["bit"] = 0, ["name"] = "Isles: DK Blueprint"}, -- TODO: Test this
-	{["byte"] = 0x3F, ["bit"] = 2, ["name"] = "Isles: Lanky Blueprint"}, -- TODO: Test this
-	{["byte"] = 0x3F, ["bit"] = 3, ["name"] = "Isles: Tiny Bluprint"}, -- TODO: Test this
-	{["byte"] = 0x3F, ["bit"] = 4, ["name"] = "Isles: Chunky Blueprint"}, -- TODO: Test this
-	
-	{["byte"] = 0x4B, ["bit"] = 6, ["name"] = "Isles: Fairy: Tree"}, -- TODO: Test this
-	{["byte"] = 0x4B, ["bit"] = 7, ["name"] = "Isles: Fairy: High"}, -- TODO: Test this
-	
-	{["byte"] = 0x2E, ["bit"] = 1, ["name"] = "Galleon Lobby: Tiny GB?"}, -- TODO: Which one actually set it
-	{["byte"] = 0x2F, ["bit"] = 1, ["name"] = "Flobby fairy?"}, -- TODO: Test this
-	{["byte"] = 0x4A, ["bit"] = 1, ["name"] = "Flobby fairy?"}, -- TODO: Test this
-	
-	{["byte"] = 0x32, ["bit"] = 3, ["name"] = "Galleon Lobby: Tiny GB?"}, -- TODO: Which one actually set it
-	{["byte"] = 0x32, ["bit"] = 4, ["name"] = "Isles: DK: Factory lobby GB"}, -- TODO: Test this
-	
+
+	{["byte"] = 0x34, ["bit"] = 3, ["name"] = "Isles: DK Caged GB"},
+	{["byte"] = 0x34, ["bit"] = 4, ["name"] = "Isles: Tiny Caged GB"},
+	{["byte"] = 0x34, ["bit"] = 5, ["name"] = "Isles: Lanky Caged GB"},
+	{["byte"] = 0x34, ["bit"] = 6, ["name"] = "Isles: Chunky Caged GB"},
+	{["byte"] = 0x34, ["bit"] = 7, ["name"] = "Isles: Diddy Caged GB"},
+	{["byte"] = 0x35, ["bit"] = 5, ["name"] = "Isles: Lanky Sprint GB"}, -- TODO: Test this
+
 	{["byte"] = 0x35, ["bit"] = 1, ["name"] = "Isles: Tiny: High instrument pad GB"}, -- TODO: Test this
 	{["byte"] = 0x35, ["bit"] = 3, ["name"] = "Isles: Tiny: High instrument pad played"}, -- TODO: Test this
+
+	{["byte"] = 0x36, ["bit"] = 1, ["name"] = "Isles: W1 (Ring)"},
+	{["byte"] = 0x36, ["bit"] = 2, ["name"] = "Isles: W1 (Far)"},
+	{["byte"] = 0x36, ["bit"] = 3, ["name"] = "Isles: W2 (Ring)"},
+	{["byte"] = 0x36, ["bit"] = 4, ["name"] = "Isles: W2 (High)"},
+	{["byte"] = 0x36, ["bit"] = 5, ["name"] = "Isles: W3 (Ring)"},
+	{["byte"] = 0x36, ["bit"] = 6, ["name"] = "Isles: W3 (Far)"},
+	{["byte"] = 0x36, ["bit"] = 7, ["name"] = "Isles: W4 (Ring)"},
+	{["byte"] = 0x37, ["bit"] = 0, ["name"] = "Isles: W4 (High)"},
+	{["byte"] = 0x37, ["bit"] = 1, ["name"] = "Isles: W5 (Far)"},
+	{["byte"] = 0x37, ["bit"] = 2, ["name"] = "Isles: W5 (Ring)"},
+
+	{["byte"] = 0x37, ["bit"] = 3, ["name"] = "Isles: Japes boulder smashed"},
+
+	{["byte"] = 0x39, ["bit"] = 5, ["name"] = "Japes Lobby: B. Locker Cleared"},
+	{["byte"] = 0x39, ["bit"] = 6, ["name"] = "Aztec Lobby: B. Locker Cleared"},
+
+	{["byte"] = 0x3A, ["bit"] = 5, ["name"] = "Japes: Blueprint - DK"},
+	{["byte"] = 0x3A, ["bit"] = 6, ["name"] = "Japes: Blueprint - Diddy"},
+	{["byte"] = 0x3A, ["bit"] = 7, ["name"] = "Japes: Blueprint - Lanky"},
+	{["byte"] = 0x3B, ["bit"] = 0, ["name"] = "Japes: Blueprint - Tiny"},
+	{["byte"] = 0x3B, ["bit"] = 1, ["name"] = "Japes: Blueprint - Chunky"},
+
+	{["byte"] = 0x3F, ["bit"] = 0, ["name"] = "Isles: Blueprint - DK"},
+	{["byte"] = 0x3F, ["bit"] = 1, ["name"] = "Isles: Blueprint - Diddy"},
+	{["byte"] = 0x3F, ["bit"] = 2, ["name"] = "Isles: Blueprint - Lanky"},
+	{["byte"] = 0x3F, ["bit"] = 3, ["name"] = "Isles: Blueprint - Tiny"},
+	{["byte"] = 0x3F, ["bit"] = 4, ["name"] = "Isles: Blueprint - Chunky"},
+
+	{["byte"] = 0x44, ["bit"] = 5, ["name"] = "? Japes: DK CB: Balloon by Underground or Banana Medal"}, -- TODO: Test this
+	{["byte"] = 0x4E, ["bit"] = 3, ["name"] = "? Japes: DK CB: Balloon by Underground or Banana Medal"}, -- TODO: Test this
+
+	{["byte"] = 0x4A, ["bit"] = 1, ["name"] = "? Isles: Flobby fairy?"}, -- TODO: Test this
+	{["byte"] = 0x4B, ["bit"] = 6, ["name"] = "Isles: Fairy (Tree)"},
+	{["byte"] = 0x4B, ["bit"] = 7, ["name"] = "Isles: Fairy (High)"},
+
+	{["byte"] = 0x4D, ["bit"] = 7, ["name"] = "Japes: DK CB: Balloon by Snide"},
+	{["byte"] = 0x4E, ["bit"] = 4, ["name"] = "Japes: DK CB: Balloon by Cranky"},
+	{["byte"] = 0x4F, ["bit"] = 1, ["name"] = "Japes: Lanky CB: Balloon by his BP"},
+
+	{["byte"] = 0x54, ["bit"] = 4, ["name"] = "Isles: Rainbow Coin (Fungi Lobby Enterance)?"},
+	{["byte"] = 0x54, ["bit"] = 5, ["name"] = "Isles: Rainbow Coin (Slope leading to Aztec Lobby)"},
+	{["byte"] = 0x54, ["bit"] = 6, ["name"] = "Isles: Rainbow Coin (Aztec Lobby Roof)"},
+	{["byte"] = 0x59, ["bit"] = 6, ["name"] = "Isles: Rainbow Coin (K. Lumsy)"},
+
+	{["byte"] = 0x65, ["bit"] = 2, ["name"] = "Japes: DK CB: Bunch on left W3"}, -- TODO: Test this
+
+	{["byte"] = 0x69, ["bit"] = 7, ["name"] = "Japes: DK CB: Bunch under hut"},
+	{["byte"] = 0x6C, ["bit"] = 6, ["name"] = "Japes: DK CB: Bunch by Funky (tree)"}, -- TODO: Test this
+
+	{["byte"] = 0x6B, ["bit"] = 4, ["name"] = "Japes: DK Coin by enterance"},
+	{["byte"] = 0x6D, ["bit"] = 7, ["name"] = "Japes: DK Coin by enterance"},
+	{["byte"] = 0x6F, ["bit"] = 2, ["name"] = "Japes: Diddy Coin by his BP"},
+	{["byte"] = 0x6F, ["bit"] = 7, ["name"] = "Japes: DK Coin by enterance"},
+	{["byte"] = 0x72, ["bit"] = 4, ["name"] = "Japes: Diddy Coin by his BP"},
+	{["byte"] = 0x7B, ["bit"] = 3, ["name"] = "Japes: Diddy Coin by his BP"},
 }
 
 local function fill_flag_names()
@@ -537,25 +652,46 @@ local options_flag_dropdown;
 local options_set_flag_button;
 local options_unset_flag_button;
 
+function isFound(byte, bit)
+	for i=1,#flag_array do
+		if byte == flag_array[i]["byte"] and bit == flag_array[i]["bit"] then
+			return true;
+		end
+	end
+	return false;
+end
+
 flag_block = {};
 function checkFlags()
 	local flags = mainmemory.read_u24_be(flag_pointer + 1);
 	local i, temp_value;
-	if flags > 0x700000 then
+	local flag_found = false;
+	local known_flags_found = 0;
+	if flags > 0x700000 and flags < 0x7fffff - flag_block_size then
 		if #flag_block > 0 then
 			for i=0,#flag_block do
 				temp_value = mainmemory.readbyte(flags + i);
 				if flag_block[i] ~= temp_value then
-					--console.log("Byte 0x"..bizstring.hex(i).." changed from "..bizstring.binary(flag_block[i]).." to "..bizstring.binary(temp_value));
-					--console.log("Bit "..bizstring.binary(bit.bxor(flag_block[i], temp_value)));
-					
 					-- Calculate which bit was set
 					local bit = math.log10(bit.bxor(flag_block[i], temp_value)) / math.log10(2);
-					console.log("{[\"byte\"] = 0x"..bizstring.hex(i)..", [\"bit\"] = "..bit..", [\"name\"] = \"Name\"}, -- TODO: Test this");
+					
+					-- Output debug info if the flag isn't known
+					if not isFound(i, bit) then
+						flag_found = true;
+						console.log("{[\"byte\"] = 0x"..bizstring.hex(i)..", [\"bit\"] = "..bit..", [\"name\"] = \"Name\"},");
+					else
+						known_flags_found = known_flags_found + 1;
+					end
 					
 					-- Update entry in array
 					flag_block[i] = temp_value;
 				end
+			end
+			if known_flags_found > 0 then
+				console.log(known_flags_found.." Known flags skipped.")
+			end
+			if not flag_found then
+				console.log("No unknown flags were changed.")
 			end
 		else
 			-- Populate flag block
@@ -574,7 +710,7 @@ local function flagSet()
 	console.log(flag);
 	if type(flag) == "table" then
 		local flags = mainmemory.read_u24_be(flag_pointer + 1);
-		if flags > 0x700000 then
+		if flags > 0x700000 and flags < 0x7fffff - flag_block_size then
 			local current_value = mainmemory.readbyte(flags + flag["byte"]);
 			mainmemory.write_u8(flags + flag["byte"], set_bit(current_value, flag["bit"]));
 		else
@@ -588,7 +724,7 @@ local function flagUnset()
 	console.log(flag);
 	if type(flag) == "table" then
 		local flags = mainmemory.read_u24_be(flag_pointer + 1);
-		if flags > 0x700000 then
+		if flags > 0x700000 and flags < 0x7fffff - flag_block_size then
 			local current_value = mainmemory.readbyte(flags + flag["byte"]);
 			mainmemory.write_u8(flags + flag["byte"], clear_bit(current_value, flag["bit"]));
 		else
