@@ -1,7 +1,0 @@
-Domain RDRAM
-SystemID N64
-3F7274	d	f	1	RDRAM	X Position
-3F7278	d	f	1	RDRAM	Y Position
-3F727C	d	f	1	RDRAM	Z Position
-3F730E	w	u	1	RDRAM	Facing angle
-
