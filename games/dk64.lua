@@ -448,6 +448,10 @@ flag_array = {
 	{["byte"] = 0x2C, ["bit"] = 7, ["name"] = "? T&S FTT (entered in Japes)"}, -- TODO: Test this
 	{["byte"] = 0x62, ["bit"] = 1, ["name"] = "? T&S FTT (entered in Japes)"}, -- TODO: Test this
 
+	{["byte"] = 0x20, ["bit"] = 6, ["name"] = "Fungi: First time Day/Night CS?"},
+
+	{["byte"] = 0x31, ["bit"] = 4, ["name"] = "Fungi: DK coin near BBlast or First Time Coin?"},
+
 	-----------
 	-- Known --
 	-----------
@@ -494,8 +498,11 @@ flag_array = {
 
 	{["byte"] = 0x15, ["bit"] = 0, ["name"] = "Key 4"},
 
+	{["byte"] = 0x19, ["bit"] = 6, ["name"] = "Fungi: Make Nighttime"},
 	{["byte"] = 0x19, ["bit"] = 7, ["name"] = "Fungi: Green Tunnel (Feather Side)"},
 	{["byte"] = 0x1A, ["bit"] = 2, ["name"] = "Fungi: Brown Tunnel Open"},
+	{["byte"] = 0x1B, ["bit"] = 2, ["name"] = "Fungi: DK Mill Box"},
+	{["byte"] = 0x1B, ["bit"] = 4, ["name"] = "Fungi: DK Mill GB Outside"},
 	{["byte"] = 0x1C, ["bit"] = 5, ["name"] = "Fungi: Mushroom Cannons"},
 	{["byte"] = 0x1C, ["bit"] = 6, ["name"] = "Fungi: Mushroom Coconut Switch"},
 	{["byte"] = 0x1C, ["bit"] = 7, ["name"] = "Fungi: Mushroom Grape Switch"},
@@ -503,6 +510,8 @@ flag_array = {
 	{["byte"] = 0x1D, ["bit"] = 1, ["name"] = "Fungi: Mushroom Peanut Switch"},
 	{["byte"] = 0x1D, ["bit"] = 2, ["name"] = "Fungi: Mushroom Pineapple Switch"},
 	{["byte"] = 0x1D, ["bit"] = 4, ["name"] = "Key 5"},
+	{["byte"] = 0x1D, ["bit"] = 5, ["name"] = "Fungi: W1 (Mill)"},
+	{["byte"] = 0x1D, ["bit"] = 6, ["name"] = "Fungi: W1 (Tree)"},
 	{["byte"] = 0x1E, ["bit"] = 1, ["name"] = "Fungi: W3 (Tree)"},
 	{["byte"] = 0x1E, ["bit"] = 2, ["name"] = "Fungi: W3 (Mushroom)"},
 	{["byte"] = 0x1E, ["bit"] = 3, ["name"] = "Fungi: W4 (Tree)"},
@@ -594,6 +603,8 @@ flag_array = {
 	{["byte"] = 0x3B, ["bit"] = 0, ["name"] = "Japes: Blueprint - Tiny"},
 	{["byte"] = 0x3B, ["bit"] = 1, ["name"] = "Japes: Blueprint - Chunky"},
 
+	{["byte"] = 0x3C, ["bit"] = 2, ["name"] = "Factory: Blueprint - Tiny"},
+
 	{["byte"] = 0x3F, ["bit"] = 0, ["name"] = "Isles: Blueprint - DK"},
 	{["byte"] = 0x3F, ["bit"] = 1, ["name"] = "Isles: Blueprint - Diddy"},
 	{["byte"] = 0x3F, ["bit"] = 2, ["name"] = "Isles: Blueprint - Lanky"},
@@ -614,6 +625,8 @@ flag_array = {
 	{["byte"] = 0x54, ["bit"] = 4, ["name"] = "Isles: Rainbow Coin (Fungi Lobby Enterance)?"},
 	{["byte"] = 0x54, ["bit"] = 5, ["name"] = "Isles: Rainbow Coin (Slope leading to Aztec Lobby)"},
 	{["byte"] = 0x54, ["bit"] = 6, ["name"] = "Isles: Rainbow Coin (Aztec Lobby Roof)"},
+	{["byte"] = 0x57, ["bit"] = 0, ["name"] = "Fungi: Balloon - DK Mill"},
+	{["byte"] = 0x57, ["bit"] = 2, ["name"] = "Fungi: Balloon - Lanky Lower Mushroom"},
 	{["byte"] = 0x59, ["bit"] = 6, ["name"] = "Isles: Rainbow Coin (K. Lumsy)"},
 
 	{["byte"] = 0x65, ["bit"] = 2, ["name"] = "Japes: DK CB: Bunch on left W3"}, -- TODO: Test this

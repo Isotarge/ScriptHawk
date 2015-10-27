@@ -1,9 +1,0 @@
-Domain RDRAM
-SystemID N64
-3F7614	d	f	1	RDRAM	X Position
-3F7618	d	f	1	RDRAM	Y Position
-3F761C	d	f	1	RDRAM	Z Position
-3F76AC	w	u	1	RDRAM	X Rotation
-3F76AE	w	u	1	RDRAM	Facing angle
-3F76B0	w	u	1	RDRAM	Z Rotation
-
