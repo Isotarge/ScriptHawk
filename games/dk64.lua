@@ -1541,10 +1541,11 @@ function do_brb()
 	if is_brb then
 		mainmemory.writebyte(security_byte, 0x01);
 		local i;
-		for i=1,math.min(string.len(brb_message), brb_message_max_length) do
+		local message_length = math.min(string.len(brb_message), brb_message_max_length);
+		for i=1,message_length do
 			mainmemory.writebyte(security_message + i - 1, string.byte(brb_message, i));
 		end
-		mainmemory.writebyte(security_message + string.len(brb_message), 0x00);
+		mainmemory.writebyte(security_message + message_length, 0x00);
 	end
 end
 
