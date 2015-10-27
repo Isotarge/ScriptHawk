@@ -1,6 +1,5 @@
 TODO:
 
-- Queued flag set, if DK64.lua fails to find the flag block the first time add the flag set to a queue that is evaluated every frame after that
 - Rework input/keybinds, multiple profiles like wasd/arrow keys
 - 2D game support
 - Rayman 2 rotation stuff

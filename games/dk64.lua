@@ -425,14 +425,19 @@ local map_value = 0;
 -- Flag stuff --
 ----------------
 
+local options_flag_dropdown;
+local options_set_flag_button;
+local options_Clear_flag_button;
+
 local flag_pointer;
 
 local flag_block_size = 0x80;
 
-local flag_array = {};
+local flag_action_queue = {};
 local flag_names = {};
+flag_block = {};
 
-flag_array = {	
+local flag_array = {	
 	---------------------------
 	-- Needs further testing --
 	---------------------------
@@ -598,6 +603,7 @@ flag_array = {
 	{["byte"] = 0x35, ["bit"] = 6, ["name"] = "Isles: Chunky: Pound the X"},
 	{["byte"] = 0x35, ["bit"] = 7, ["name"] = "Isles: Chunky: Pound the X GB"},
 
+	{["byte"] = 0x36, ["bit"] = 0, ["name"] = "K. Rool Defeated"},
 	{["byte"] = 0x36, ["bit"] = 1, ["name"] = "Isles: W1 (Ring)"},
 	{["byte"] = 0x36, ["bit"] = 2, ["name"] = "Isles: W1 (Far)"},
 	{["byte"] = 0x36, ["bit"] = 3, ["name"] = "Isles: W2 (Ring)"},
@@ -610,6 +616,14 @@ flag_array = {
 	{["byte"] = 0x37, ["bit"] = 2, ["name"] = "Isles: W5 (Ring)"},
 
 	{["byte"] = 0x37, ["bit"] = 3, ["name"] = "Isles: Japes boulder smashed"},
+	{["byte"] = 0x37, ["bit"] = 4, ["name"] = "Key 1 Turned"},
+	{["byte"] = 0x37, ["bit"] = 5, ["name"] = "Key 2 Turned"},
+	{["byte"] = 0x37, ["bit"] = 6, ["name"] = "Key 3 Turned"},
+	{["byte"] = 0x37, ["bit"] = 7, ["name"] = "Key 4 Turned"},
+	{["byte"] = 0x38, ["bit"] = 0, ["name"] = "Key 5 Turned"},
+	{["byte"] = 0x38, ["bit"] = 1, ["name"] = "Key 6 Turned"},
+	{["byte"] = 0x38, ["bit"] = 2, ["name"] = "Key 7 Turned"},
+	{["byte"] = 0x38, ["bit"] = 3, ["name"] = "Key 8 Turned"},
 
 	{["byte"] = 0x39, ["bit"] = 5, ["name"] = "Japes Lobby: B. Locker Cleared"},
 	{["byte"] = 0x39, ["bit"] = 6, ["name"] = "Aztec Lobby: B. Locker Cleared"},
@@ -634,7 +648,8 @@ flag_array = {
 	{["byte"] = 0x49, ["bit"] = 5, ["name"] = "Japes: Fairy (Water room)"},
 	{["byte"] = 0x49, ["bit"] = 6, ["name"] = "Japes: Fairy (Painting room)"},
 	
-	{["byte"] = 0x4A, ["bit"] = 1, ["name"] = "? Isles: Flobby fairy?"}, -- TODO: Test this
+	{["byte"] = 0x4A, ["bit"] = 1, ["name"] = "Isles: Fairy (Factory Lobby)"},
+	{["byte"] = 0x4A, ["bit"] = 2, ["name"] = "Isles: Fairy (Fungi Lobby)"},
 	{["byte"] = 0x4A, ["bit"] = 6, ["name"] = "Helm: Fairy (1)"},
 	{["byte"] = 0x4A, ["bit"] = 7, ["name"] = "Helm: Fairy (2)"},
 	{["byte"] = 0x4B, ["bit"] = 6, ["name"] = "Isles: Fairy (Tree)"},
@@ -643,6 +658,7 @@ flag_array = {
 	{["byte"] = 0x4C, ["bit"] = 1, ["name"] = "Japes: Crown"},
 	{["byte"] = 0x4C, ["bit"] = 6, ["name"] = "Isles: Crown (Fungi Lobby)"},
 	{["byte"] = 0x4C, ["bit"] = 7, ["name"] = "Isles: Crown (Snide's)"},
+	{["byte"] = 0x4D, ["bit"] = 2, ["name"] = "Helm: Crown"},
 	
 	{["byte"] = 0x4D, ["bit"] = 5, ["name"] = "Japes: Rainbow Coin (Slope by painting room)"},
 	{["byte"] = 0x4D, ["bit"] = 6, ["name"] = "Japes: Diddy CB: Balloon in cave"},
@@ -710,9 +726,7 @@ local function fill_flag_names()
 		flag_names[i] = flag_array[i]["name"];
 	end
 end
-
 fill_flag_names();
-console.log(flag_names);
 
 local function getFlagFromName(flagName)
 	local i;
@@ -723,11 +737,8 @@ local function getFlagFromName(flagName)
 	end
 end
 
-local options_flag_dropdown;
-local options_set_flag_button;
-local options_unset_flag_button;
-
 function isFound(byte, bit)
+	local i;
 	for i=1,#flag_array do
 		if byte == flag_array[i]["byte"] and bit == flag_array[i]["bit"] then
 			return true;
@@ -736,7 +747,6 @@ function isFound(byte, bit)
 	return false;
 end
 
-flag_block = {};
 function checkFlags()
 	local flags = mainmemory.read_u24_be(flag_pointer + 1);
 	local i, bit, temp_value;
@@ -777,7 +787,8 @@ function checkFlags()
 			console.log("Populated flag array.")
 		end
 	else
-		console.log("Failed to execute, try again.");
+		console.log("Failed to find flag block on this frame, adding to queue. Will be checked next time block is found.");
+		table.insert(flag_action_queue, {["type"]="check"});
 	end
 end
 
@@ -788,23 +799,52 @@ local function flagSet()
 		local flags = mainmemory.read_u24_be(flag_pointer + 1);
 		if flags > 0x700000 and flags < 0x7fffff - flag_block_size then
 			local current_value = mainmemory.readbyte(flags + flag["byte"]);
-			mainmemory.write_u8(flags + flag["byte"], set_bit(current_value, flag["bit"]));
+			mainmemory.writebyte(flags + flag["byte"], set_bit(current_value, flag["bit"]));
 		else
-			console.log("Set flag failed to execute, try again.");
+			console.log("Failed to find flag block on this frame, adding to queue. Will be cleared next time block is found.");
+			table.insert(flag_action_queue, {["type"]="set", ["byte"]=flag["byte"], ["bit"]=flag["bit"]});
 		end
 	end
 end
 
-local function flagUnset()
+local function flagClear()
 	local flag = getFlagFromName(forms.getproperty(options_flag_dropdown, "SelectedItem"));
 	console.log(flag);
 	if type(flag) == "table" then
 		local flags = mainmemory.read_u24_be(flag_pointer + 1);
 		if flags > 0x700000 and flags < 0x7fffff - flag_block_size then
 			local current_value = mainmemory.readbyte(flags + flag["byte"]);
-			mainmemory.write_u8(flags + flag["byte"], clear_bit(current_value, flag["bit"]));
+			mainmemory.writebyte(flags + flag["byte"], clear_bit(current_value, flag["bit"]));
 		else
-			console.log("Unset flag failed to execute, try again.");
+			console.log("Failed to find flag block on this frame, adding to queue. Will be cleared next time block is found.");
+			table.insert(flag_action_queue, {["type"]="clear", ["byte"]=flag["byte"], ["bit"]=flag["bit"]});
+		end
+	end
+end
+
+local function process_flag_queue()
+	if #flag_action_queue > 0 then
+		local flags = mainmemory.read_u24_be(flag_pointer + 1);
+		if flags > 0x700000 and flags < 0x7fffff - flag_block_size then
+			local i, queue_item, current_value;
+			for i=1,#flag_action_queue do
+				queue_item = flag_action_queue[i];
+				if type(queue_item) == "table" then
+					if queue_item["type"] == "set" then
+						current_value = mainmemory.readbyte(flags + queue_item["byte"]);
+						mainmemory.writebyte(flags + queue_item["byte"], set_bit(current_value, queue_item["bit"]));
+						console.log("Successfully set flag at 0x"..bizstring.hex(queue_item["byte"]).." bit "..queue_item["bit"]);
+					elseif queue_item["type"] == "clear" then
+						current_value = mainmemory.readbyte(flags + queue_item["byte"]);
+						mainmemory.writebyte(flags + queue_item["byte"], clear_bit(current_value, queue_item["bit"]));
+						console.log("Successfully cleared flag at 0x"..bizstring.hex(queue_item["byte"]).." bit "..queue_item["bit"]);
+					elseif queue_item["type"] == "check" then
+						checkFlags();
+					end
+				end
+			end
+			-- Clear queue if we found the block that frame
+			flag_action_queue = {};
 		end
 	end
 end
@@ -1578,8 +1618,8 @@ local options_toggle_isg_timer;
 function Game.initUI(form_handle, col, row, button_height, label_offset, dropdown_offset)
 	-- Key stuff
 	options_flag_dropdown =     forms.dropdown(form_handle, flag_names, col(10) + dropdown_offset, row(0) + dropdown_offset);
-	options_set_flag_button =   forms.button(form_handle, "Get", flagSet,    col(10),     row(1), 59, button_height);
-	options_unset_flag_button = forms.button(form_handle, "Lose", flagUnset, col(13) - 5, row(1), 59, button_height);
+	options_set_flag_button =   forms.button(form_handle, "Set", flagSet,    col(10),     row(1), 59, button_height);
+	options_Clear_flag_button = forms.button(form_handle, "Clear", flagClear, col(13) - 5, row(1), 59, button_height);
 
 	-- Moon stuff
 	options_moon_mode_label =  forms.label(form_handle,  "Moon:",                    col(10),     row(2) + label_offset, 48, button_height);
@@ -1667,6 +1707,7 @@ function Game.eachFrame()
 	end
 
 	do_brb();
+	process_flag_queue();
 
 	-- Moonkick
 	if moon_mode == 'All' or (moon_mode == 'Kick' and mainmemory.readbyte(kong_object + kick_animation) == kick_animation_value) then

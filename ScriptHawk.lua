@@ -352,32 +352,32 @@ function updateUIReadouts_ScriptHawk()
 	-- Draw OSD
 	local row = 0;
 
-	if type(x) ~= "nil" and type(y) ~= "nil" and type(z) ~= "nil" then
-		gui.text(gui_x_offset, gui_y_offset + row_height * row, "X: "..round(x, precision));
+	if type(x) == "number" and type(y) == "number" and type(z) == "number" then
+		gui.text(gui_x_offset, gui_y_offset + row_height * row, "X: "..(round(x, precision) or 0));
 		row = row + 1;
-		gui.text(gui_x_offset, gui_y_offset + row_height * row, "Y: "..round(y, precision));
+		gui.text(gui_x_offset, gui_y_offset + row_height * row, "Y: "..(round(y, precision) or 0));
 		row = row + 1;
-		gui.text(gui_x_offset, gui_y_offset + row_height * row, "Z: "..round(z, precision));
+		gui.text(gui_x_offset, gui_y_offset + row_height * row, "Z: "..(round(z, precision) or 0));
 		row = row + 2;
 		--gui.text(gui_x_offset, gui_y_offset + row_height * row, "Floor: "..round(floor_y, precision));
 		--row = row + 2;
 	end
 
-	if type(dy) ~= "nil" and type(d) ~= "nil" then
-		gui.text(gui_x_offset, gui_y_offset + row_height * row, "dY:  "..round(dy, precision));
+	if type(dy) == "number" and type(d) == "number" then
+		gui.text(gui_x_offset, gui_y_offset + row_height * row, "dY:  "..(round(dy, precision) or 0));
 		row = row + 1;
-		gui.text(gui_x_offset, gui_y_offset + row_height * row, "dXZ: "..round(d, precision));
+		gui.text(gui_x_offset, gui_y_offset + row_height * row, "dXZ: "..(round(d, precision) or 0));
 		row = row + 2;
 	end
 
-	if type(max_dy) ~= "nil" and type(max_d) ~= "nil" then
-		gui.text(gui_x_offset, gui_y_offset + row_height * row, "Max dY:  "..round(max_dy, precision));
+	if type(max_dy) == "number" and type(max_d) == "number" then
+		gui.text(gui_x_offset, gui_y_offset + row_height * row, "Max dY:  "..(round(max_dy, precision) or 0));
 		row = row + 1;
-		gui.text(gui_x_offset, gui_y_offset + row_height * row, "Max dXZ: "..round(max_d, precision));
+		gui.text(gui_x_offset, gui_y_offset + row_height * row, "Max dXZ: "..(round(max_d, precision) or 0));
 		row = row + 2;
 	end
 
-	if type(rot_x) ~= "nil" and type(rot_y) ~= "nil" and type(rot_z) ~= "nil" then
+	if type(rot_x) == "number" and type(rot_y) == "number" and type(rot_z) == "number" then
 		gui.text(gui_x_offset, gui_y_offset + row_height * row, "Rot X: "..formatRotation(rot_x));
 		row = row + 1;
 		gui.text(gui_x_offset, gui_y_offset + row_height * row, "Rot Y: "..formatRotation(rot_y));
