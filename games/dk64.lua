@@ -932,36 +932,6 @@ function checkFlags()
 	end
 end
 
-local function flagSet()
-	local flag = getFlagFromName(forms.getproperty(options_flag_dropdown, "SelectedItem"));
-	console.log(flag);
-	if type(flag) == "table" then
-		local flags = mainmemory.read_u24_be(flag_pointer + 1);
-		if flags > 0x700000 and flags < 0x7fffff - flag_block_size then
-			local current_value = mainmemory.readbyte(flags + flag["byte"]);
-			mainmemory.writebyte(flags + flag["byte"], set_bit(current_value, flag["bit"]));
-		else
-			console.log("Failed to find flag block on this frame, adding to queue. Will be cleared next time block is found.");
-			table.insert(flag_action_queue, {["type"]="set", ["byte"]=flag["byte"], ["bit"]=flag["bit"]});
-		end
-	end
-end
-
-local function flagClear()
-	local flag = getFlagFromName(forms.getproperty(options_flag_dropdown, "SelectedItem"));
-	console.log(flag);
-	if type(flag) == "table" then
-		local flags = mainmemory.read_u24_be(flag_pointer + 1);
-		if flags > 0x700000 and flags < 0x7fffff - flag_block_size then
-			local current_value = mainmemory.readbyte(flags + flag["byte"]);
-			mainmemory.writebyte(flags + flag["byte"], clear_bit(current_value, flag["bit"]));
-		else
-			console.log("Failed to find flag block on this frame, adding to queue. Will be cleared next time block is found.");
-			table.insert(flag_action_queue, {["type"]="clear", ["byte"]=flag["byte"], ["bit"]=flag["bit"]});
-		end
-	end
-end
-
 local function process_flag_queue()
 	if #flag_action_queue > 0 then
 		local flags = mainmemory.read_u24_be(flag_pointer + 1);
@@ -973,11 +943,11 @@ local function process_flag_queue()
 					if queue_item["type"] == "set" then
 						current_value = mainmemory.readbyte(flags + queue_item["byte"]);
 						mainmemory.writebyte(flags + queue_item["byte"], set_bit(current_value, queue_item["bit"]));
-						console.log("Successfully set flag at 0x"..bizstring.hex(queue_item["byte"]).." bit "..queue_item["bit"]);
+						console.log("Set \""..queue_item["name"].."\" at 0x"..bizstring.hex(queue_item["byte"]).." bit "..queue_item["bit"]);
 					elseif queue_item["type"] == "clear" then
 						current_value = mainmemory.readbyte(flags + queue_item["byte"]);
 						mainmemory.writebyte(flags + queue_item["byte"], clear_bit(current_value, queue_item["bit"]));
-						console.log("Successfully cleared flag at 0x"..bizstring.hex(queue_item["byte"]).." bit "..queue_item["bit"]);
+						console.log("Cleared \""..queue_item["name"].."\" at 0x"..bizstring.hex(queue_item["byte"]).." bit "..queue_item["bit"]);
 					elseif queue_item["type"] == "check" then
 						checkFlags();
 					end
@@ -987,6 +957,28 @@ local function process_flag_queue()
 			flag_action_queue = {};
 		end
 	end
+end
+
+local function flagSet()
+	local flag = getFlagFromName(forms.getproperty(options_flag_dropdown, "SelectedItem"));
+	if type(flag) == "table" then
+		table.insert(flag_action_queue, {["type"]="set", ["byte"]=flag["byte"], ["bit"]=flag["bit"], ["name"]=flag["name"]});
+		process_flag_queue();
+	end
+end
+
+local function flagClear()
+	local flag = getFlagFromName(forms.getproperty(options_flag_dropdown, "SelectedItem"));
+	if type(flag) == "table" then
+		table.insert(flag_action_queue, {["type"]="clear", ["byte"]=flag["byte"], ["bit"]=flag["bit"], ["name"]=flag["name"]});
+		process_flag_queue();
+	end
+end
+
+function flagStats()
+	local knownFlags = #flag_array;
+	local totalFlags = flag_block_size * 8;
+	console.log("Flags known: "..knownFlags.."/"..totalFlags.." or "..round(knownFlags/totalFlags * 100,2).."%");
 end
 
 --------------------
