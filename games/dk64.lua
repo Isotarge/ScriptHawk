@@ -1068,7 +1068,7 @@ function Game.detectVersion(romName)
 		kongbase            = 0x7fc950;
 		global_base         = 0x7fcc41;
 		security_byte       = 0x7552E0;
-		security_message    = 0x75E5DC; -- TODO: Find on PAL & JP
+		security_message    = 0x75E5DC;
 
 		--Mad Jack
 		MJ_state_pointer      = 0x7fdc91;
@@ -1126,7 +1126,7 @@ function Game.detectVersion(romName)
 		kongbase            = 0x7fcde0;
 		global_base         = 0x7fd0d1;
 		security_byte       = 0x7553A0;
-		security_message    = 0x75E5DC; -- TODO: Find
+		security_message    = 0x75E790;
 
 		--Mad Jack
 		MJ_state_pointer      = 0x7fe121;
