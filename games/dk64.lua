@@ -440,7 +440,6 @@ local flag_array = {
 	{["byte"] = 0x2E, ["bit"] = 3, ["name"] = "? Orange Barrel Completed?"}, -- TODO: Test this
 
 	{["byte"] = 0x2C, ["bit"] = 7, ["name"] = "? T&S FTT (entered in Japes)"}, -- TODO: Test this
-	{["byte"] = 0x62, ["bit"] = 1, ["name"] = "?? T&S FTT (entered in Japes)"}, -- TODO: Test this
 
 	{["byte"] = 0x20, ["bit"] = 0, ["name"] = "Fungi: Day/Night First Time CS"}, -- TODO: Test this
 
@@ -448,6 +447,9 @@ local flag_array = {
 
 	{["byte"] = 0x39, ["bit"] = 4, ["name"] = "? Enter Helm/W1"},
 
+	{["byte"] = 0x18, ["bit"] = 2, ["name"] = "? Galleon first time cutscene"},
+	{["byte"] = 0x39, ["bit"] = 0, ["name"] = "?? Galleon first time cutscene"},
+	
 	-----------
 	-- Known --
 	-----------
@@ -530,6 +532,7 @@ local flag_array = {
 	-- TODO W5
 
 	{["byte"] = 0x13, ["bit"] = 0, ["name"] = "Factory: T&S Cleared"},
+	{["byte"] = 0x13, ["bit"] = 1, ["name"] = "Galleon: Cannon game room open"},
 	
 	{["byte"] = 0x15, ["bit"] = 0, ["name"] = "Key 4"},
 
@@ -663,6 +666,12 @@ local flag_array = {
 	{["byte"] = 0x3C, ["bit"] = 2, ["name"] = "Factory: Blueprint - Tiny"},
 	-- TODO: Chunky
 
+	-- TODO: DK
+	-- TODO: Diddy
+	{["byte"] = 0x3C, ["bit"] = 6, ["name"] = "Galleon: Blueprint - Lanky"},
+	-- TODO: Tiny
+	-- TODO: Chunky
+	
 	{["byte"] = 0x3F, ["bit"] = 0, ["name"] = "Isles: Blueprint - DK"},
 	{["byte"] = 0x3F, ["bit"] = 1, ["name"] = "Isles: Blueprint - Diddy"},
 	{["byte"] = 0x3F, ["bit"] = 2, ["name"] = "Isles: Blueprint - Lanky"},
@@ -687,12 +696,18 @@ local flag_array = {
 	{["byte"] = 0x41, ["bit"] = 2, ["name"] = "Snide's: Tiny BP Turned (Factory)"},
 	-- TODO: Chunky BP
 
+	-- TODO: DK BP
+	-- TODO: Diddy BP
+	{["byte"] = 0x41, ["bit"] = 6, ["name"] = "Snide's: Lanky BP Turned (Galleon)"},
+	-- TODO: Tiny BP
+	-- TODO: Chunky BP
+
 	{["byte"] = 0x44, ["bit"] = 0, ["name"] = "Snide's: DK BP Turned (Isles)"},
 	{["byte"] = 0x44, ["bit"] = 1, ["name"] = "Snide's: Diddy BP Turned (Isles)"},
 	{["byte"] = 0x44, ["bit"] = 2, ["name"] = "Snide's: Lanky BP Turned (Isles)"},
 	{["byte"] = 0x44, ["bit"] = 3, ["name"] = "Snide's: Tiny BP Turned (Isles)"},
 	{["byte"] = 0x44, ["bit"] = 4, ["name"] = "Snide's: Chunky BP Turned (Isles)"},
-	
+
 	{["byte"] = 0x44, ["bit"] = 5, ["name"] = "? Japes: DK CB: Balloon by Underground or Banana Medal"}, -- TODO: Test this
 	{["byte"] = 0x44, ["bit"] = 7, ["name"] = "Japes: Lanky Banana Medal"},
 
@@ -701,7 +716,7 @@ local flag_array = {
 
 	{["byte"] = 0x49, ["bit"] = 5, ["name"] = "Japes: Fairy (Water room)"},
 	{["byte"] = 0x49, ["bit"] = 6, ["name"] = "Japes: Fairy (Painting room)"},
-	
+
 	{["byte"] = 0x4A, ["bit"] = 1, ["name"] = "Isles: Fairy (Factory Lobby)"},
 	{["byte"] = 0x4A, ["bit"] = 2, ["name"] = "Isles: Fairy (Fungi Lobby)"},
 	{["byte"] = 0x4A, ["bit"] = 6, ["name"] = "Helm: Fairy (1)"},
@@ -744,6 +759,7 @@ local flag_array = {
 	{["byte"] = 0x60, ["bit"] = 6, ["name"] = "Helm: W1 (Far)"},
 
 	{["byte"] = 0x61, ["bit"] = 3, ["name"] = "Japes: FTT"},
+	{["byte"] = 0x62, ["bit"] = 1, ["name"] = "T&S FTT"},
 	{["byte"] = 0x62, ["bit"] = 2, ["name"] = "Helm: FTT"},
 	{["byte"] = 0x62, ["bit"] = 3, ["name"] = "Aztec: FTT"},
 
@@ -1033,6 +1049,7 @@ function flagStats()
 	local totalFlags = flag_block_size * 8;
 	console.log("Flags known: "..knownFlags.."/"..totalFlags.." or "..round(knownFlags/totalFlags * 100,2).."%");
 end
+flagStats();
 
 --------------------
 -- Region/Version --

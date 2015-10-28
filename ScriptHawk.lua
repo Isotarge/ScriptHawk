@@ -1,3 +1,39 @@
+----------------------
+-- Helper functions --
+----------------------
+
+function round(num, idp)
+	return tonumber(string.format("%." .. (idp or 0) .. "f", num));
+end
+
+function get_bit(field, index)
+	if index < 32 then
+		local bitmask = math.pow(2, index);
+		return bit.band(bitmask, field) == bitmask;
+	end
+	return false;
+end
+
+function set_bit(field, index)
+	if index < 32 then
+		local bitmask = math.pow(2, index);
+		return bit.bor(bitmask, field);
+	end
+	return field;
+end
+
+function clear_bit(field, index)
+	if index < 32 then
+		local bitmask = math.pow(2, index);
+		return bit.band(field, bit.bnot(bitmask));
+	end
+	return field;
+end
+
+-----------------
+-- Game checks --
+-----------------
+
 local romName = gameinfo.getromname();
 
 if bizstring.contains(romName, "Donkey Kong 64") then
@@ -135,41 +171,9 @@ local function increase_save_slot()
 	updateUIReadouts_ScriptHawk();
 end
 
---------------------------------
--- Bit manipulation functions --
---------------------------------
-
-function get_bit(field, index)
-	if index < 32 then
-		local bitmask = math.pow(2, index);
-		return bit.band(bitmask, field) == bitmask;
-	end
-	return false;
-end
-
-function set_bit(field, index)
-	if index < 32 then
-		local bitmask = math.pow(2, index);
-		return bit.bor(bitmask, field);
-	end
-	return field;
-end
-
-function clear_bit(field, index)
-	if index < 32 then
-		local bitmask = math.pow(2, index);
-		return bit.band(field, bit.bnot(bitmask));
-	end
-	return field;
-end
-
 ----------------------------
 -- Other helper functions --
 ----------------------------
-
-function round(num, idp)
-	return tonumber(string.format("%." .. (idp or 0) .. "f", num));
-end
 
 function rotation_to_degrees(num)
 	return ((num % Game.max_rot_units) / Game.max_rot_units) * 360;
