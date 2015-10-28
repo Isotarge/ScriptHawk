@@ -42,6 +42,7 @@ SystemID N64
 7467C8	b	u	1	RDRAM	File
 746820	d	h	1	RDRAM	Related to geometry spiking
 746824	d	h	1	RDRAM	Related to geometry spiking
+746A40	d	h	1	RDRAM	Particle RNG?
 7476F5	b	u	1	RDRAM	Cutscene
 7480DC	d	f	1	RDRAM	Stored Y?
 74E77C	b	u	1	RDRAM	Character
@@ -63,6 +64,8 @@ SystemID N64
 75C49B	b	h	1	RDRAM	Squawks Model
 75C4AB	b	h	1	RDRAM	Squawks Model
 7654F4	d	h	1	RDRAM	Key flags pointer?
+767CC6	w	u	1	RDRAM	Freeze to freeze main thread
+76A066	w	1	1	RDRAM	Main object timer?
 76A0AB	b	h	1	RDRAM	Background?
 76A0CD	b	u	1	RDRAM	Adventure
 76A0DA	b	h	1	RDRAM	Mystery Menu
