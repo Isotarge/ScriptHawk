@@ -6,6 +6,9 @@ SystemID N64
 03ECD4	d	f	1	RDRAM	Jumpman Y Position
 73EC37	b	u	1	RDRAM	Map
 740F18	b	u	1	RDRAM	File
-7FBA83	b	h	1	RDRAM	TB Void Byte
 74FB60	b	h	1	RDRAM	Security Byte
+76A918	d	h	1	RDRAM	Geometry Spiking Pointer
+7FBA83	b	h	1	RDRAM	TB Void Byte
+765A30	d	u	1	RDRAM	Frames (Lag)
+7F0480	d	u	1	RDRAM	Frames (Real)
 

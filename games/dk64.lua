@@ -14,6 +14,9 @@ local menu_flags;
 local map;
 local security_byte;
 local security_message;
+local geometry_spike_pointer;
+local frames_real;
+local frames_lag;
 
 ---------------------------
 -- Arcade specific state --
@@ -313,6 +316,14 @@ local max_musical_energy = 10;
 local max_standard_ammo  = 50;
 local max_homing_ammo    = 50;
 
+local max_blueprints = 40 * 2;
+local max_fairies = 20;
+local max_crowns = 10;
+local max_medals = 40;
+local max_cb = 3511;
+local max_gb = 201;
+local max_warps = (5 * 2 * 7) + 4 + 2 + 2 + 6;
+	
 -- Relative to global_base
 local standard_ammo = 0;
 local homing_ammo   = 2;
@@ -435,15 +446,15 @@ local flag_array = {
 
 	{["byte"] = 0x38, ["bit"] = 5, ["name"] = "Japes: Entered Japes (1)"}, -- TODO: Test this
 
-	{["byte"] = 0x31, ["bit"] = 3, ["name"] = "? Japes W3 Right CB Bunch"}, -- TODO: Test this
-	{["byte"] = 0x64, ["bit"] = 7, ["name"] = "? Japes W3 Right CB Bunch"}, -- TODO: Test this
+	{["byte"] = 0x31, ["bit"] = 3, ["name"] = "? Japes W3 Right CB Bunch", ["type"] = "Bunch"}, -- TODO: Test this
+	{["byte"] = 0x64, ["bit"] = 7, ["name"] = "? Japes W3 Right CB Bunch", ["type"] = "Bunch"}, -- TODO: Test this
 	{["byte"] = 0x2E, ["bit"] = 3, ["name"] = "? Orange Barrel Completed?"}, -- TODO: Test this
 
 	{["byte"] = 0x2C, ["bit"] = 7, ["name"] = "? T&S FTT (entered in Japes)"}, -- TODO: Test this
 
 	{["byte"] = 0x20, ["bit"] = 0, ["name"] = "Fungi: Day/Night First Time CS"}, -- TODO: Test this
 
-	{["byte"] = 0x31, ["bit"] = 4, ["name"] = "Fungi: DK Coin by BBlast or First Coin?"}, -- TODO: Test this
+	{["byte"] = 0x31, ["bit"] = 4, ["name"] = "Fungi: DK Coin by BBlast or First Coin?", ["type"] = "Coin"}, -- TODO: Test this
 
 	{["byte"] = 0x39, ["bit"] = 4, ["name"] = "? Enter Helm/W1"},
 
@@ -455,48 +466,48 @@ local flag_array = {
 	-----------
 
 	{["byte"] = 0x00, ["bit"] = 0, ["name"] = "Japes: DK Switch by enterance"}, -- TODO: Test this
-	{["byte"] = 0x00, ["bit"] = 1, ["name"] = "Japes: Lanky: Mad Maze Maul GB"},
-	{["byte"] = 0x00, ["bit"] = 2, ["name"] = "Japes: Tiny: Splish-Splash Salvage GB"},
-	{["byte"] = 0x00, ["bit"] = 3, ["name"] = "Japes: DK: Babboon blast GB"},
-	{["byte"] = 0x00, ["bit"] = 4, ["name"] = "Japes: DK: GB in front of Diddy's cage"}, -- TODO: Test this
-	{["byte"] = 0x00, ["bit"] = 5, ["name"] = "Japes: DK: GB in Diddy's cage"}, -- TODO: Test this
+	{["byte"] = 0x00, ["bit"] = 1, ["name"] = "Japes: Lanky: Mad Maze Maul GB", ["type"] = "GB"},
+	{["byte"] = 0x00, ["bit"] = 2, ["name"] = "Japes: Tiny: Splish-Splash Salvage GB", ["type"] = "GB"},
+	{["byte"] = 0x00, ["bit"] = 3, ["name"] = "Japes: DK: Babboon blast GB", ["type"] = "GB"},
+	{["byte"] = 0x00, ["bit"] = 4, ["name"] = "Japes: DK: GB in front of Diddy's cage", ["type"] = "GB"}, -- TODO: Test this
+	{["byte"] = 0x00, ["bit"] = 5, ["name"] = "Japes: DK: GB in Diddy's cage", ["type"] = "GB"}, -- TODO: Test this
 	{["byte"] = 0x00, ["bit"] = 6, ["name"] = "Kong Unlocked: Diddy"},
 	{["byte"] = 0x00, ["bit"] = 7, ["name"] = "Japes: Feather gate open"},
 
-	{["byte"] = 0x01, ["bit"] = 0, ["name"] = "Japes: Tiny: Stump GB"},
-	{["byte"] = 0x01, ["bit"] = 1, ["name"] = "Japes: Tiny: Shellhive GB"},
-	{["byte"] = 0x01, ["bit"] = 2, ["name"] = "Japes: Lanky: Painting room GB"},
-	{["byte"] = 0x01, ["bit"] = 3, ["name"] = "Japes: Lanky: Speedy Swing Sortie GB"},
-	{["byte"] = 0x01, ["bit"] = 4, ["name"] = "Japes: Chunky: Underground GB"},
+	{["byte"] = 0x01, ["bit"] = 0, ["name"] = "Japes: Tiny: Stump GB", ["type"] = "GB"},
+	{["byte"] = 0x01, ["bit"] = 1, ["name"] = "Japes: Tiny: Shellhive GB", ["type"] = "GB"},
+	{["byte"] = 0x01, ["bit"] = 2, ["name"] = "Japes: Lanky: Painting room GB", ["type"] = "GB"},
+	{["byte"] = 0x01, ["bit"] = 3, ["name"] = "Japes: Lanky: Speedy Swing Sortie GB", ["type"] = "GB"},
+	{["byte"] = 0x01, ["bit"] = 4, ["name"] = "Japes: Chunky: Underground GB", ["type"] = "GB"},
 	{["byte"] = 0x01, ["bit"] = 5, ["name"] = "Japes: Hut Smashed (Diddy)"},
 	{["byte"] = 0x01, ["bit"] = 6, ["name"] = "Japes: Hut Smashed (Lanky)"},
 	{["byte"] = 0x01, ["bit"] = 7, ["name"] = "Japes: Hut Smashed (DK)"},
 	{["byte"] = 0x02, ["bit"] = 0, ["name"] = "Japes: Hut Smashed (Tiny)"},
-	{["byte"] = 0x02, ["bit"] = 2, ["name"] = "Japes: Diddy Caged GB"},
-	{["byte"] = 0x02, ["bit"] = 3, ["name"] = "Japes: Lanky Caged GB"},
-	{["byte"] = 0x02, ["bit"] = 4, ["name"] = "Japes: DK Caged GB"},
-	{["byte"] = 0x02, ["bit"] = 5, ["name"] = "Japes: Tiny Caged GB"},
-	{["byte"] = 0x02, ["bit"] = 6, ["name"] = "Japes: Chunky Caged GB"},
-	{["byte"] = 0x02, ["bit"] = 7, ["name"] = "Japes: Diddy mountain top GB (W5)"},
+	{["byte"] = 0x02, ["bit"] = 2, ["name"] = "Japes: Diddy Caged GB", ["type"] = "GB"},
+	{["byte"] = 0x02, ["bit"] = 3, ["name"] = "Japes: Lanky Caged GB", ["type"] = "GB"},
+	{["byte"] = 0x02, ["bit"] = 4, ["name"] = "Japes: DK Caged GB", ["type"] = "GB"},
+	{["byte"] = 0x02, ["bit"] = 5, ["name"] = "Japes: Tiny Caged GB", ["type"] = "GB"},
+	{["byte"] = 0x02, ["bit"] = 6, ["name"] = "Japes: Chunky Caged GB", ["type"] = "GB"},
+	{["byte"] = 0x02, ["bit"] = 7, ["name"] = "Japes: Diddy mountain top GB (W5)", ["type"] = "GB"},
 
-	{["byte"] = 0x03, ["bit"] = 0, ["name"] = "Japes: Diddy: Minecart GB"},
-	{["byte"] = 0x03, ["bit"] = 1, ["name"] = "Japes: Chunky: Boulder GB"},
-	{["byte"] = 0x03, ["bit"] = 2, ["name"] = "Key 1"},
+	{["byte"] = 0x03, ["bit"] = 0, ["name"] = "Japes: Diddy: Minecart GB", ["type"] = "GB"},
+	{["byte"] = 0x03, ["bit"] = 1, ["name"] = "Japes: Chunky: Boulder GB", ["type"] = "GB"},
+	{["byte"] = 0x03, ["bit"] = 2, ["name"] = "Key 1", ["type"] = "Key"},
 	{["byte"] = 0x03, ["bit"] = 3, ["name"] = "Japes: Cutscene at the start played"},
-	{["byte"] = 0x03, ["bit"] = 4, ["name"] = "Japes: Chunky: Bonus barrel GB (Shellhive)"},
+	{["byte"] = 0x03, ["bit"] = 4, ["name"] = "Japes: Chunky: Bonus barrel GB (Shellhive)", ["type"] = "GB"},
 	{["byte"] = 0x03, ["bit"] = 6, ["name"] = "Japes: Painting room opened"},
-	{["byte"] = 0x03, ["bit"] = 7, ["name"] = "Japes: Diddy: Cave GB"},
+	{["byte"] = 0x03, ["bit"] = 7, ["name"] = "Japes: Diddy: Cave GB", ["type"] = "GB"},
 
-	{["byte"] = 0x04, ["bit"] = 0, ["name"] = "Japes: W1 (Portal)"}, -- TODO: Test this
-	{["byte"] = 0x04, ["bit"] = 1, ["name"] = "Japes: W1 (Far)"}, -- TODO: Test this
-	{["byte"] = 0x04, ["bit"] = 2, ["name"] = "Japes: W2 (High)"}, -- TODO: Test this
-	{["byte"] = 0x04, ["bit"] = 3, ["name"] = "Japes: W2 (Low)"}, -- TODO: Test this
-	{["byte"] = 0x04, ["bit"] = 4, ["name"] = "Japes: W3 (Right)"}, -- TODO: Test this
-	{["byte"] = 0x04, ["bit"] = 5, ["name"] = "Japes: W3 (Left)"}, -- TODO: Test this
-	{["byte"] = 0x04, ["bit"] = 6, ["name"] = "Japes: W5 (Shellhive area)"},
-	{["byte"] = 0x04, ["bit"] = 7, ["name"] = "Japes: W5 (Top)"},
-	{["byte"] = 0x05, ["bit"] = 0, ["name"] = "Japes: W4 (Close)"}, -- TODO: Test this
-	{["byte"] = 0x05, ["bit"] = 1, ["name"] = "Japes: W4 (Cranky)"}, -- TODO: Test this
+	{["byte"] = 0x04, ["bit"] = 0, ["name"] = "Japes: W1 (Portal)", ["type"] = "Warp"}, -- TODO: Test this
+	{["byte"] = 0x04, ["bit"] = 1, ["name"] = "Japes: W1 (Far)", ["type"] = "Warp"}, -- TODO: Test this
+	{["byte"] = 0x04, ["bit"] = 2, ["name"] = "Japes: W2 (High)", ["type"] = "Warp"}, -- TODO: Test this
+	{["byte"] = 0x04, ["bit"] = 3, ["name"] = "Japes: W2 (Low)", ["type"] = "Warp"}, -- TODO: Test this
+	{["byte"] = 0x04, ["bit"] = 4, ["name"] = "Japes: W3 (Right)", ["type"] = "Warp"}, -- TODO: Test this
+	{["byte"] = 0x04, ["bit"] = 5, ["name"] = "Japes: W3 (Left)", ["type"] = "Warp"}, -- TODO: Test this
+	{["byte"] = 0x04, ["bit"] = 6, ["name"] = "Japes: W5 (Shellhive area)", ["type"] = "Warp"},
+	{["byte"] = 0x04, ["bit"] = 7, ["name"] = "Japes: W5 (Top)", ["type"] = "Warp"},
+	{["byte"] = 0x05, ["bit"] = 0, ["name"] = "Japes: W4 (Close)", ["type"] = "Warp"}, -- TODO: Test this
+	{["byte"] = 0x05, ["bit"] = 1, ["name"] = "Japes: W4 (Cranky)", ["type"] = "Warp"}, -- TODO: Test this
 
 	{["byte"] = 0x05, ["bit"] = 2, ["name"] = "Japes: Cutscene by far W1 played"}, -- TODO: Test this
 	{["byte"] = 0x05, ["bit"] = 3, ["name"] = "Japes: Rambi Door Smashed"}, -- TODO: Test this
@@ -506,7 +517,7 @@ local flag_array = {
 
 	{["byte"] = 0x08, ["bit"] = 2, ["name"] = "Kong Unlocked: Tiny"},
 	{["byte"] = 0x08, ["bit"] = 6, ["name"] = "Kong Unlocked: Lanky"},
-	{["byte"] = 0x09, ["bit"] = 2, ["name"] = "Key 2"},
+	{["byte"] = 0x09, ["bit"] = 2, ["name"] = "Key 2", ["type"] = "Key"},
 
 	{["byte"] = 0x0B, ["bit"] = 4, ["name"] = "Aztec: Llama Cutscene"}, -- TODO: Bananas in this hallway were skipped with block size 0x80
 	{["byte"] = 0x0B, ["bit"] = 5, ["name"] = "Aztec: Lanky's help me cutscene"},
@@ -516,25 +527,25 @@ local flag_array = {
 	{["byte"] = 0x0D, ["bit"] = 6, ["name"] = "? Factory: Storage room switch pressed"},
 	
 	{["byte"] = 0x0E, ["bit"] = 5, ["name"] = "Kong Unlocked: Chunky"},
-	{["byte"] = 0x0E, ["bit"] = 6, ["name"] = "Factory: Lanky GB: Free Chunky"},
-	{["byte"] = 0x11, ["bit"] = 2, ["name"] = "Key 3"},
+	{["byte"] = 0x0E, ["bit"] = 6, ["name"] = "Factory: Lanky GB: Free Chunky", ["type"] = "GB"},
+	{["byte"] = 0x11, ["bit"] = 2, ["name"] = "Key 3", ["type"] = "Key"},
 	{["byte"] = 0x11, ["bit"] = 4, ["name"] = "Factory: Chunky's help me cutscene"},
 	
-	{["byte"] = 0x11, ["bit"] = 5, ["name"] = "Factory: W1 (Foyer)"},
-	{["byte"] = 0x11, ["bit"] = 6, ["name"] = "Factory: W1 (Storage Room)"},
-	{["byte"] = 0x11, ["bit"] = 7, ["name"] = "Factory: W2 (Foyer)"},
+	{["byte"] = 0x11, ["bit"] = 5, ["name"] = "Factory: W1 (Foyer)", ["type"] = "Warp"},
+	{["byte"] = 0x11, ["bit"] = 6, ["name"] = "Factory: W1 (Storage Room)", ["type"] = "Warp"},
+	{["byte"] = 0x11, ["bit"] = 7, ["name"] = "Factory: W2 (Foyer)", ["type"] = "Warp"},
 	-- TODO W2
-	{["byte"] = 0x12, ["bit"] = 1, ["name"] = "Factory: W3 (Foyer)"},
-	{["byte"] = 0x12, ["bit"] = 2, ["name"] = "Factory: W3 (Snide's)"},
-	{["byte"] = 0x12, ["bit"] = 3, ["name"] = "Factory: W4 (Top)"},
-	{["byte"] = 0x12, ["bit"] = 4, ["name"] = "Factory: W4 (Bottom)"},
+	{["byte"] = 0x12, ["bit"] = 1, ["name"] = "Factory: W3 (Foyer)", ["type"] = "Warp"},
+	{["byte"] = 0x12, ["bit"] = 2, ["name"] = "Factory: W3 (Snide's)", ["type"] = "Warp"},
+	{["byte"] = 0x12, ["bit"] = 3, ["name"] = "Factory: W4 (Top)", ["type"] = "Warp"},
+	{["byte"] = 0x12, ["bit"] = 4, ["name"] = "Factory: W4 (Bottom)", ["type"] = "Warp"},
 	-- TODO W5
 	-- TODO W5
 
 	{["byte"] = 0x13, ["bit"] = 0, ["name"] = "Factory: T&S Cleared"},
 	{["byte"] = 0x13, ["bit"] = 1, ["name"] = "Galleon: Cannon game room open"},
 	
-	{["byte"] = 0x15, ["bit"] = 0, ["name"] = "Key 4"},
+	{["byte"] = 0x15, ["bit"] = 0, ["name"] = "Key 4", ["type"] = "Key"},
 
 	{["byte"] = 0x19, ["bit"] = 6, ["name"] = "Fungi: Nighttime"},
 	{["byte"] = 0x19, ["bit"] = 7, ["name"] = "Fungi: Green Tunnel (Feather Side)"},
@@ -545,16 +556,16 @@ local flag_array = {
 	{["byte"] = 0x1D, ["bit"] = 0, ["name"] = "Fungi: Mushroom Feather Switch"},
 	{["byte"] = 0x1D, ["bit"] = 1, ["name"] = "Fungi: Mushroom Peanut Switch"},
 	{["byte"] = 0x1D, ["bit"] = 2, ["name"] = "Fungi: Mushroom Pineapple Switch"},
-	{["byte"] = 0x1D, ["bit"] = 4, ["name"] = "Key 5"},
-	{["byte"] = 0x1D, ["bit"] = 5, ["name"] = "Fungi: W1 (Mill)"},
-	{["byte"] = 0x1D, ["bit"] = 6, ["name"] = "Fungi: W1 (Tree)"},
-	{["byte"] = 0x1E, ["bit"] = 1, ["name"] = "Fungi: W3 (Tree)"},
-	{["byte"] = 0x1E, ["bit"] = 2, ["name"] = "Fungi: W3 (Mushroom)"},
-	{["byte"] = 0x1E, ["bit"] = 3, ["name"] = "Fungi: W4 (Tree)"},
-	{["byte"] = 0x1E, ["bit"] = 5, ["name"] = "Fungi: W5 (Low)"},
+	{["byte"] = 0x1D, ["bit"] = 4, ["name"] = "Key 5", ["type"] = "Key"},
+	{["byte"] = 0x1D, ["bit"] = 5, ["name"] = "Fungi: W1 (Mill)", ["type"] = "Warp"},
+	{["byte"] = 0x1D, ["bit"] = 6, ["name"] = "Fungi: W1 (Tree)", ["type"] = "Warp"},
+	{["byte"] = 0x1E, ["bit"] = 1, ["name"] = "Fungi: W3 (Tree)", ["type"] = "Warp"},
+	{["byte"] = 0x1E, ["bit"] = 2, ["name"] = "Fungi: W3 (Mushroom)", ["type"] = "Warp"},
+	{["byte"] = 0x1E, ["bit"] = 3, ["name"] = "Fungi: W4 (Tree)", ["type"] = "Warp"},
+	{["byte"] = 0x1E, ["bit"] = 5, ["name"] = "Fungi: W5 (Low)", ["type"] = "Warp"},
 
-	{["byte"] = 0x24, ["bit"] = 4, ["name"] = "Key 6"},
-	{["byte"] = 0x27, ["bit"] = 5, ["name"] = "Key 7"},
+	{["byte"] = 0x24, ["bit"] = 4, ["name"] = "Key 6", ["type"] = "Key"},
+	{["byte"] = 0x27, ["bit"] = 5, ["name"] = "Key 7", ["type"] = "Key"},
 
 	{["byte"] = 0x2C, ["bit"] = 3, ["name"] = "Warp pad FTT"},
 	{["byte"] = 0x2C, ["bit"] = 6, ["name"] = "Crown pad FTT"},
@@ -564,17 +575,17 @@ local flag_array = {
 	{["byte"] = 0x2D, ["bit"] = 7, ["name"] = "Diddy Caves Lobby GB, more like FTT of some sort"}, -- TODO: Test this
 	{["byte"] = 0x2D, ["bit"] = 4, ["name"] = "Rainbow Coin FTT"}, -- TODO: Test this
 	{["byte"] = 0x2D, ["bit"] = 5, ["name"] = "Rambi FTT"}, -- TODO: Test this
-	{["byte"] = 0x2E, ["bit"] = 0, ["name"] = "Lanky FT GB"},
-	{["byte"] = 0x2E, ["bit"] = 1, ["name"] = "Tiny FT GB"},
-	{["byte"] = 0x2E, ["bit"] = 2, ["name"] = "Chunky FT GB"},
+	{["byte"] = 0x2E, ["bit"] = 0, ["name"] = "Lanky FT GB", ["type"] = "GB"},
+	{["byte"] = 0x2E, ["bit"] = 1, ["name"] = "Tiny FT GB", ["type"] = "GB"},
+	{["byte"] = 0x2E, ["bit"] = 2, ["name"] = "Chunky FT GB", ["type"] = "GB"},
 	{["byte"] = 0x2E, ["bit"] = 4, ["name"] = "Snide's FTT"},
 	{["byte"] = 0x2F, ["bit"] = 0, ["name"] = "Wrinkly FTT"}, -- TODO: Test this
 	{["byte"] = 0x2F, ["bit"] = 1, ["name"] = "? Isles: Flobby fairy or Fairy FTT?"}, -- TODO: Test this
 
 	{["byte"] = 0x2F, ["bit"] = 1, ["name"] = "Camera/Shockwave"},
 	{["byte"] = 0x2F, ["bit"] = 2, ["name"] = "Training Grounds: Treehouse Squawk Cutscene"},
-	{["byte"] = 0x2F, ["bit"] = 4, ["name"] = "Key 8"},
-	{["byte"] = 0x2F, ["bit"] = 5, ["name"] = "Isles: DK: Japes boulder GB"},
+	{["byte"] = 0x2F, ["bit"] = 4, ["name"] = "Key 8", ["type"] = "Key"},
+	{["byte"] = 0x2F, ["bit"] = 5, ["name"] = "Isles: Japes boulder GB", ["type"] = "GB"},
 	{["byte"] = 0x2F, ["bit"] = 6, ["name"] = "B.Locker FTT"},
 	{["byte"] = 0x2F, ["bit"] = 7, ["name"] = "Training Grounds: Barrels spwaned"}, -- TODO: Test this
 
@@ -587,174 +598,178 @@ local flag_array = {
 	{["byte"] = 0x30, ["bit"] = 6, ["name"] = "Isles: Escape FTT"}, -- TODO: Test this
 
 	{["byte"] = 0x31, ["bit"] = 5, ["name"] = "Factory Lobby: Lever pulled"}, -- TODO: Test this
-	{["byte"] = 0x31, ["bit"] = 6, ["name"] = "Japes Lobby: Lanky GB??"}, -- TODO: Test this
+	{["byte"] = 0x31, ["bit"] = 6, ["name"] = "? Japes Lobby: Lanky GB", ["type"] = "GB"}, -- TODO: Test this
 	{["byte"] = 0x31, ["bit"] = 7, ["name"] = "Aztec Lobby: Side room open"}, -- TODO: Test this
 
 	{["byte"] = 0x32, ["bit"] = 0, ["name"] = "Aztec Lobby: Chunky Wrinkly flipped"}, -- TODO: Test this
 	{["byte"] = 0x32, ["bit"] = 1, ["name"] = "Galleon Lobby: Chunky Switch"}, -- TODO: Test this
 
-	{["byte"] = 0x32, ["bit"] = 3, ["name"] = "? Galleon Lobby: Tiny GB?"}, -- TODO: Which one actually set it
-	{["byte"] = 0x32, ["bit"] = 4, ["name"] = "Factory Lobby: DK GB"}, -- TODO: Test this
-	{["byte"] = 0x32, ["bit"] = 6, ["name"] = "Helm Lobby: Kremling Kosh GB"},
+	{["byte"] = 0x32, ["bit"] = 3, ["name"] = "? Galleon Lobby: Tiny GB?", ["type"] = "GB"}, -- TODO: Which one actually set it
+	{["byte"] = 0x32, ["bit"] = 4, ["name"] = "Factory Lobby: DK GB", ["type"] = "GB"}, -- TODO: Test this
+	{["byte"] = 0x32, ["bit"] = 6, ["name"] = "Helm Lobby: Kremling Kosh GB", ["type"] = "GB"},
 	{["byte"] = 0x32, ["bit"] = 7, ["name"] = "Helm Lobby: Bridge Spawned"},
 
 	{["byte"] = 0x33, ["bit"] = 0, ["name"] = "Caves Lobby: Ice wall BP room"}, -- TODO: Test this
 	{["byte"] = 0x33, ["bit"] = 1, ["name"] = "Caves Lobby: Ice wall GB room"}, -- TODO: Test this
-	{["byte"] = 0x33, ["bit"] = 2, ["name"] = "Caves Lobby: Diddy GB"}, -- TODO: Test this
-	{["byte"] = 0x33, ["bit"] = 3, ["name"] = "Caves Lobby: DK GB"}, -- TODO: Test this
+	{["byte"] = 0x33, ["bit"] = 2, ["name"] = "Caves Lobby: Diddy GB", ["type"] = "GB"}, -- TODO: Test this
+	{["byte"] = 0x33, ["bit"] = 3, ["name"] = "Caves Lobby: DK GB", ["type"] = "GB"}, -- TODO: Test this
 	{["byte"] = 0x33, ["bit"] = 5, ["name"] = "Caves Lobby: Boulder on pad"}, -- TODO: Test this
 
-	{["byte"] = 0x33, ["bit"] = 7, ["name"] = "Castle Lobby: Searchlight seek GB"},
+	{["byte"] = 0x33, ["bit"] = 7, ["name"] = "Castle Lobby: Searchlight seek GB", ["type"] = "GB"},
 
-	{["byte"] = 0x34, ["bit"] = 1, ["name"] = "Helm Lobby: W1 (Enterance)"},
-	{["byte"] = 0x34, ["bit"] = 2, ["name"] = "Helm Lobby: W1 (Far)"},
-	{["byte"] = 0x34, ["bit"] = 3, ["name"] = "Isles: DK Caged GB"},
-	{["byte"] = 0x34, ["bit"] = 4, ["name"] = "Isles: Tiny Caged GB"},
-	{["byte"] = 0x34, ["bit"] = 5, ["name"] = "Isles: Lanky Caged GB"},
-	{["byte"] = 0x34, ["bit"] = 6, ["name"] = "Isles: Chunky Caged GB"},
-	{["byte"] = 0x34, ["bit"] = 7, ["name"] = "Isles: Diddy Caged GB"},
+	{["byte"] = 0x34, ["bit"] = 1, ["name"] = "Helm Lobby: W1 (Enterance)", ["type"] = "Warp"},
+	{["byte"] = 0x34, ["bit"] = 2, ["name"] = "Helm Lobby: W1 (Far)", ["type"] = "Warp"},
+	{["byte"] = 0x34, ["bit"] = 3, ["name"] = "Isles: DK Caged GB", ["type"] = "GB"},
+	{["byte"] = 0x34, ["bit"] = 4, ["name"] = "Isles: Tiny Caged GB", ["type"] = "GB"},
+	{["byte"] = 0x34, ["bit"] = 5, ["name"] = "Isles: Lanky Caged GB", ["type"] = "GB"},
+	{["byte"] = 0x34, ["bit"] = 6, ["name"] = "Isles: Chunky Caged GB", ["type"] = "GB"},
+	{["byte"] = 0x34, ["bit"] = 7, ["name"] = "Isles: Diddy Caged GB", ["type"] = "GB"},
 
-	{["byte"] = 0x35, ["bit"] = 1, ["name"] = "Isles: Tiny: High instrument pad GB"}, -- TODO: Test this
+	{["byte"] = 0x35, ["bit"] = 0, ["name"] = "Isles: Chunky instrument pad GB", ["type"] = "GB"},
+	{["byte"] = 0x35, ["bit"] = 1, ["name"] = "Isles: Tiny: High instrument pad GB", ["type"] = "GB"}, -- TODO: Test this
+	{["byte"] = 0x35, ["bit"] = 2, ["name"] = "Isles: Lanky instrument pad played"},
 	{["byte"] = 0x35, ["bit"] = 3, ["name"] = "Isles: Tiny: High instrument pad played"}, -- TODO: Test this
 	{["byte"] = 0x35, ["bit"] = 4, ["name"] = "Isles: Diddy: Summit Bonus Barrel"},
-	{["byte"] = 0x35, ["bit"] = 5, ["name"] = "Isles: Lanky Sprint GB"}, -- TODO: Test this
+	{["byte"] = 0x35, ["bit"] = 5, ["name"] = "Isles: Lanky Sprint GB", ["type"] = "GB"}, -- TODO: Test this
 	{["byte"] = 0x35, ["bit"] = 6, ["name"] = "Isles: Chunky: Pound the X"},
-	{["byte"] = 0x35, ["bit"] = 7, ["name"] = "Isles: Chunky: Pound the X GB"},
+	{["byte"] = 0x35, ["bit"] = 7, ["name"] = "Isles: Chunky: Pound the X GB", ["type"] = "GB"},
 
-	{["byte"] = 0x36, ["bit"] = 0, ["name"] = "K. Rool Defeated"},
-	{["byte"] = 0x36, ["bit"] = 1, ["name"] = "Isles: W1 (Ring)"},
-	{["byte"] = 0x36, ["bit"] = 2, ["name"] = "Isles: W1 (Far)"},
-	{["byte"] = 0x36, ["bit"] = 3, ["name"] = "Isles: W2 (Ring)"},
-	{["byte"] = 0x36, ["bit"] = 4, ["name"] = "Isles: W2 (High)"},
-	{["byte"] = 0x36, ["bit"] = 5, ["name"] = "Isles: W3 (Ring)"},
-	{["byte"] = 0x36, ["bit"] = 6, ["name"] = "Isles: W3 (Far)"},
-	{["byte"] = 0x36, ["bit"] = 7, ["name"] = "Isles: W4 (Ring)"},
-	{["byte"] = 0x37, ["bit"] = 0, ["name"] = "Isles: W4 (High)"},
-	{["byte"] = 0x37, ["bit"] = 1, ["name"] = "Isles: W5 (Far)"},
-	{["byte"] = 0x37, ["bit"] = 2, ["name"] = "Isles: W5 (Ring)"},
+	{["byte"] = 0x36, ["bit"] = 0, ["name"] = "K. Rool Defeated", ["type"] = "Warp"},
+	{["byte"] = 0x36, ["bit"] = 1, ["name"] = "Isles: W1 (Ring)", ["type"] = "Warp"},
+	{["byte"] = 0x36, ["bit"] = 2, ["name"] = "Isles: W1 (Far)", ["type"] = "Warp"},
+	{["byte"] = 0x36, ["bit"] = 3, ["name"] = "Isles: W2 (Ring)", ["type"] = "Warp"},
+	{["byte"] = 0x36, ["bit"] = 4, ["name"] = "Isles: W2 (High)", ["type"] = "Warp"},
+	{["byte"] = 0x36, ["bit"] = 5, ["name"] = "Isles: W3 (Ring)", ["type"] = "Warp"},
+	{["byte"] = 0x36, ["bit"] = 6, ["name"] = "Isles: W3 (Far)", ["type"] = "Warp"},
+	{["byte"] = 0x36, ["bit"] = 7, ["name"] = "Isles: W4 (Ring)", ["type"] = "Warp"},
+	{["byte"] = 0x37, ["bit"] = 0, ["name"] = "Isles: W4 (High)", ["type"] = "Warp"},
+	{["byte"] = 0x37, ["bit"] = 1, ["name"] = "Isles: W5 (Far)", ["type"] = "Warp"},
+	{["byte"] = 0x37, ["bit"] = 2, ["name"] = "Isles: W5 (Ring)", ["type"] = "Warp"},
 
 	{["byte"] = 0x37, ["bit"] = 3, ["name"] = "Isles: Japes boulder smashed"},
-	{["byte"] = 0x37, ["bit"] = 4, ["name"] = "Key 1 Turned"},
-	{["byte"] = 0x37, ["bit"] = 5, ["name"] = "Key 2 Turned"},
-	{["byte"] = 0x37, ["bit"] = 6, ["name"] = "Key 3 Turned"},
-	{["byte"] = 0x37, ["bit"] = 7, ["name"] = "Key 4 Turned"},
-	{["byte"] = 0x38, ["bit"] = 0, ["name"] = "Key 5 Turned"},
-	{["byte"] = 0x38, ["bit"] = 1, ["name"] = "Key 6 Turned"},
-	{["byte"] = 0x38, ["bit"] = 2, ["name"] = "Key 7 Turned"},
-	{["byte"] = 0x38, ["bit"] = 3, ["name"] = "Key 8 Turned"},
+	{["byte"] = 0x37, ["bit"] = 4, ["name"] = "Key 1 Turned", ["type"] = "Key"},
+	{["byte"] = 0x37, ["bit"] = 5, ["name"] = "Key 2 Turned", ["type"] = "Key"},
+	{["byte"] = 0x37, ["bit"] = 6, ["name"] = "Key 3 Turned", ["type"] = "Key"},
+	{["byte"] = 0x37, ["bit"] = 7, ["name"] = "Key 4 Turned", ["type"] = "Key"},
+	{["byte"] = 0x38, ["bit"] = 0, ["name"] = "Key 5 Turned", ["type"] = "Key"},
+	{["byte"] = 0x38, ["bit"] = 1, ["name"] = "Key 6 Turned", ["type"] = "Key"},
+	{["byte"] = 0x38, ["bit"] = 2, ["name"] = "Key 7 Turned", ["type"] = "Key"},
+	{["byte"] = 0x38, ["bit"] = 3, ["name"] = "Key 8 Turned", ["type"] = "Key"},
 
 	{["byte"] = 0x39, ["bit"] = 5, ["name"] = "Japes Lobby: B. Locker Cleared"},
 	{["byte"] = 0x39, ["bit"] = 6, ["name"] = "Aztec Lobby: B. Locker Cleared"},
 	{["byte"] = 0x39, ["bit"] = 7, ["name"] = "Factory Lobby: B. Locker Cleared"},
 	{["byte"] = 0x3A, ["bit"] = 0, ["name"] = "Galleon Lobby: B. Locker Cleared"},
 
-	{["byte"] = 0x3A, ["bit"] = 5, ["name"] = "Japes: Blueprint - DK"},
-	{["byte"] = 0x3A, ["bit"] = 6, ["name"] = "Japes: Blueprint - Diddy"},
-	{["byte"] = 0x3A, ["bit"] = 7, ["name"] = "Japes: Blueprint - Lanky"},
-	{["byte"] = 0x3B, ["bit"] = 0, ["name"] = "Japes: Blueprint - Tiny"},
-	{["byte"] = 0x3B, ["bit"] = 1, ["name"] = "Japes: Blueprint - Chunky"},
+	{["byte"] = 0x3A, ["bit"] = 5, ["name"] = "Japes: Blueprint - DK", ["type"] = "Blueprint"},
+	{["byte"] = 0x3A, ["bit"] = 6, ["name"] = "Japes: Blueprint - Diddy", ["type"] = "Blueprint"},
+	{["byte"] = 0x3A, ["bit"] = 7, ["name"] = "Japes: Blueprint - Lanky", ["type"] = "Blueprint"},
+	{["byte"] = 0x3B, ["bit"] = 0, ["name"] = "Japes: Blueprint - Tiny", ["type"] = "Blueprint"},
+	{["byte"] = 0x3B, ["bit"] = 1, ["name"] = "Japes: Blueprint - Chunky", ["type"] = "Blueprint"},
 
-	{["byte"] = 0x3B, ["bit"] = 2, ["name"] = "Aztec: Blueprint - DK"},
-	{["byte"] = 0x3B, ["bit"] = 3, ["name"] = "Aztec: Blueprint - Diddy"},
-	{["byte"] = 0x3B, ["bit"] = 4, ["name"] = "Aztec: Blueprint - Lanky"},
-	{["byte"] = 0x3B, ["bit"] = 5, ["name"] = "Aztec: Blueprint - Tiny"},
-	{["byte"] = 0x3B, ["bit"] = 6, ["name"] = "Aztec: Blueprint - Chunky"},
+	{["byte"] = 0x3B, ["bit"] = 2, ["name"] = "Aztec: Blueprint - DK", ["type"] = "Blueprint"},
+	{["byte"] = 0x3B, ["bit"] = 3, ["name"] = "Aztec: Blueprint - Diddy", ["type"] = "Blueprint"},
+	{["byte"] = 0x3B, ["bit"] = 4, ["name"] = "Aztec: Blueprint - Lanky", ["type"] = "Blueprint"},
+	{["byte"] = 0x3B, ["bit"] = 5, ["name"] = "Aztec: Blueprint - Tiny", ["type"] = "Blueprint"},
+	{["byte"] = 0x3B, ["bit"] = 6, ["name"] = "Aztec: Blueprint - Chunky", ["type"] = "Blueprint"},
 
-	{["byte"] = 0x3B, ["bit"] = 7, ["name"] = "Factory: Blueprint - DK"},
+	{["byte"] = 0x3B, ["bit"] = 7, ["name"] = "Factory: Blueprint - DK", ["type"] = "Blueprint"},
 	-- TODO: Diddy
 	-- TODO: Lanky
-	{["byte"] = 0x3C, ["bit"] = 2, ["name"] = "Factory: Blueprint - Tiny"},
+	{["byte"] = 0x3C, ["bit"] = 2, ["name"] = "Factory: Blueprint - Tiny", ["type"] = "Blueprint"},
 	-- TODO: Chunky
 
 	-- TODO: DK
 	-- TODO: Diddy
-	{["byte"] = 0x3C, ["bit"] = 6, ["name"] = "Galleon: Blueprint - Lanky"},
+	{["byte"] = 0x3C, ["bit"] = 6, ["name"] = "Galleon: Blueprint - Lanky", ["type"] = "Blueprint"},
 	-- TODO: Tiny
 	-- TODO: Chunky
 	
-	{["byte"] = 0x3F, ["bit"] = 0, ["name"] = "Isles: Blueprint - DK"},
-	{["byte"] = 0x3F, ["bit"] = 1, ["name"] = "Isles: Blueprint - Diddy"},
-	{["byte"] = 0x3F, ["bit"] = 2, ["name"] = "Isles: Blueprint - Lanky"},
-	{["byte"] = 0x3F, ["bit"] = 3, ["name"] = "Isles: Blueprint - Tiny"},
-	{["byte"] = 0x3F, ["bit"] = 4, ["name"] = "Isles: Blueprint - Chunky"},
+	{["byte"] = 0x3F, ["bit"] = 0, ["name"] = "Isles: Blueprint - DK", ["type"] = "Blueprint"},
+	{["byte"] = 0x3F, ["bit"] = 1, ["name"] = "Isles: Blueprint - Diddy", ["type"] = "Blueprint"},
+	{["byte"] = 0x3F, ["bit"] = 2, ["name"] = "Isles: Blueprint - Lanky", ["type"] = "Blueprint"},
+	{["byte"] = 0x3F, ["bit"] = 3, ["name"] = "Isles: Blueprint - Tiny", ["type"] = "Blueprint"},
+	{["byte"] = 0x3F, ["bit"] = 4, ["name"] = "Isles: Blueprint - Chunky", ["type"] = "Blueprint"},
 
-	{["byte"] = 0x3F, ["bit"] = 5, ["name"] = "Snide's: DK BP Turned (Japes)"},
-	{["byte"] = 0x3F, ["bit"] = 6, ["name"] = "Snide's: Diddy BP Turned (Japes)"},
-	{["byte"] = 0x3F, ["bit"] = 7, ["name"] = "Snide's: Lanky BP Turned (Japes)"},
-	{["byte"] = 0x40, ["bit"] = 0, ["name"] = "Snide's: Tiny BP Turned (Japes)"},
-	{["byte"] = 0x40, ["bit"] = 1, ["name"] = "Snide's: Chunky BP Turned (Japes)"},
+	{["byte"] = 0x3F, ["bit"] = 5, ["name"] = "Snide's: DK BP Turned (Japes)", ["type"] = "Blueprint"},
+	{["byte"] = 0x3F, ["bit"] = 6, ["name"] = "Snide's: Diddy BP Turned (Japes)", ["type"] = "Blueprint"},
+	{["byte"] = 0x3F, ["bit"] = 7, ["name"] = "Snide's: Lanky BP Turned (Japes)", ["type"] = "Blueprint"},
+	{["byte"] = 0x40, ["bit"] = 0, ["name"] = "Snide's: Tiny BP Turned (Japes)", ["type"] = "Blueprint"},
+	{["byte"] = 0x40, ["bit"] = 1, ["name"] = "Snide's: Chunky BP Turned (Japes)", ["type"] = "Blueprint"},
 
-	{["byte"] = 0x40, ["bit"] = 2, ["name"] = "Snide's: DK BP Turned (Aztec)"},
-	{["byte"] = 0x40, ["bit"] = 3, ["name"] = "Snide's: Diddy BP Turned (Aztec)"},
-	{["byte"] = 0x40, ["bit"] = 4, ["name"] = "Snide's: Lanky BP Turned (Aztec)"},
-	{["byte"] = 0x40, ["bit"] = 5, ["name"] = "Snide's: Tiny BP Turned (Aztec)"},
-	{["byte"] = 0x40, ["bit"] = 6, ["name"] = "Snide's: Chunky BP Turned (Aztec)"},
+	{["byte"] = 0x40, ["bit"] = 2, ["name"] = "Snide's: DK BP Turned (Aztec)", ["type"] = "Blueprint"},
+	{["byte"] = 0x40, ["bit"] = 3, ["name"] = "Snide's: Diddy BP Turned (Aztec)", ["type"] = "Blueprint"},
+	{["byte"] = 0x40, ["bit"] = 4, ["name"] = "Snide's: Lanky BP Turned (Aztec)", ["type"] = "Blueprint"},
+	{["byte"] = 0x40, ["bit"] = 5, ["name"] = "Snide's: Tiny BP Turned (Aztec)", ["type"] = "Blueprint"},
+	{["byte"] = 0x40, ["bit"] = 6, ["name"] = "Snide's: Chunky BP Turned (Aztec)", ["type"] = "Blueprint"},
 
-	{["byte"] = 0x40, ["bit"] = 7, ["name"] = "Snide's: DK BP Turned (Factory)"},
+	{["byte"] = 0x40, ["bit"] = 7, ["name"] = "Snide's: DK BP Turned (Factory)", ["type"] = "Blueprint"},
 	-- TODO: Diddy BP
 	-- TODO: Lanky BP
-	{["byte"] = 0x41, ["bit"] = 2, ["name"] = "Snide's: Tiny BP Turned (Factory)"},
+	{["byte"] = 0x41, ["bit"] = 2, ["name"] = "Snide's: Tiny BP Turned (Factory)", ["type"] = "Blueprint"},
 	-- TODO: Chunky BP
 
 	-- TODO: DK BP
 	-- TODO: Diddy BP
-	{["byte"] = 0x41, ["bit"] = 6, ["name"] = "Snide's: Lanky BP Turned (Galleon)"},
+	{["byte"] = 0x41, ["bit"] = 6, ["name"] = "Snide's: Lanky BP Turned (Galleon)", ["type"] = "Blueprint"},
 	-- TODO: Tiny BP
 	-- TODO: Chunky BP
 
-	{["byte"] = 0x44, ["bit"] = 0, ["name"] = "Snide's: DK BP Turned (Isles)"},
-	{["byte"] = 0x44, ["bit"] = 1, ["name"] = "Snide's: Diddy BP Turned (Isles)"},
-	{["byte"] = 0x44, ["bit"] = 2, ["name"] = "Snide's: Lanky BP Turned (Isles)"},
-	{["byte"] = 0x44, ["bit"] = 3, ["name"] = "Snide's: Tiny BP Turned (Isles)"},
-	{["byte"] = 0x44, ["bit"] = 4, ["name"] = "Snide's: Chunky BP Turned (Isles)"},
+	{["byte"] = 0x44, ["bit"] = 0, ["name"] = "Snide's: DK BP Turned (Isles)", ["type"] = "Blueprint"},
+	{["byte"] = 0x44, ["bit"] = 1, ["name"] = "Snide's: Diddy BP Turned (Isles)", ["type"] = "Blueprint"},
+	{["byte"] = 0x44, ["bit"] = 2, ["name"] = "Snide's: Lanky BP Turned (Isles)", ["type"] = "Blueprint"},
+	{["byte"] = 0x44, ["bit"] = 3, ["name"] = "Snide's: Tiny BP Turned (Isles)", ["type"] = "Blueprint"},
+	{["byte"] = 0x44, ["bit"] = 4, ["name"] = "Snide's: Chunky BP Turned (Isles)", ["type"] = "Blueprint"},
 
-	{["byte"] = 0x44, ["bit"] = 5, ["name"] = "? Japes: DK CB: Balloon by Underground or Banana Medal"}, -- TODO: Test this
+	{["byte"] = 0x44, ["bit"] = 5, ["name"] = "? Japes: DK CB: Balloon by Underground or Banana Medal", ["type"] = "Balloon"}, -- TODO: Test this
 	{["byte"] = 0x44, ["bit"] = 7, ["name"] = "Japes: Lanky Banana Medal"},
-
 	{["byte"] = 0x45, ["bit"] = 1, ["name"] = "Japes: Chunky Banana Medal"},
-	{["byte"] = 0x4E, ["bit"] = 3, ["name"] = "?? Japes: DK CB: Balloon by Underground or Banana Medal"}, -- TODO: Test this
 
-	{["byte"] = 0x49, ["bit"] = 5, ["name"] = "Japes: Fairy (Water room)"},
-	{["byte"] = 0x49, ["bit"] = 6, ["name"] = "Japes: Fairy (Painting room)"},
+	{["byte"] = 0x4E, ["bit"] = 3, ["name"] = "?? Japes: DK CB: Balloon by Underground or Banana Medal", ["type"] = "Balloon"}, -- TODO: Test this
 
-	{["byte"] = 0x4A, ["bit"] = 1, ["name"] = "Isles: Fairy (Factory Lobby)"},
-	{["byte"] = 0x4A, ["bit"] = 2, ["name"] = "Isles: Fairy (Fungi Lobby)"},
-	{["byte"] = 0x4A, ["bit"] = 6, ["name"] = "Helm: Fairy (1)"},
-	{["byte"] = 0x4A, ["bit"] = 7, ["name"] = "Helm: Fairy (2)"},
-	{["byte"] = 0x4B, ["bit"] = 6, ["name"] = "Isles: Fairy (Tree)"},
-	{["byte"] = 0x4B, ["bit"] = 7, ["name"] = "Isles: Fairy (High)"},
+	{["byte"] = 0x49, ["bit"] = 5, ["name"] = "Japes: Fairy (Water room)", ["type"] = "Fairy"},
+	{["byte"] = 0x49, ["bit"] = 6, ["name"] = "Japes: Fairy (Painting room)", ["type"] = "Fairy"},
 
-	{["byte"] = 0x4C, ["bit"] = 1, ["name"] = "Japes: Crown"},
-	{["byte"] = 0x4C, ["bit"] = 6, ["name"] = "Isles: Crown (Fungi Lobby)"},
-	{["byte"] = 0x4C, ["bit"] = 7, ["name"] = "Isles: Crown (Snide's)"},
-	{["byte"] = 0x4D, ["bit"] = 2, ["name"] = "Helm: Crown"},
-	
+	{["byte"] = 0x4A, ["bit"] = 1, ["name"] = "Isles: Fairy (Factory Lobby)", ["type"] = "Fairy"},
+	{["byte"] = 0x4A, ["bit"] = 2, ["name"] = "Isles: Fairy (Fungi Lobby)", ["type"] = "Fairy"},
+	{["byte"] = 0x4A, ["bit"] = 6, ["name"] = "Helm: Fairy (1)", ["type"] = "Fairy"},
+	{["byte"] = 0x4A, ["bit"] = 7, ["name"] = "Helm: Fairy (2)", ["type"] = "Fairy"},
+	{["byte"] = 0x4B, ["bit"] = 6, ["name"] = "Isles: Fairy (Tree)", ["type"] = "Fairy"},
+	{["byte"] = 0x4B, ["bit"] = 7, ["name"] = "Isles: Fairy (High)", ["type"] = "Fairy"},
+
+	{["byte"] = 0x4C, ["bit"] = 1, ["name"] = "Japes: Crown", ["type"] = "Crown"},
+	{["byte"] = 0x4C, ["bit"] = 6, ["name"] = "Isles: Crown (Fungi Lobby)", ["type"] = "Crown"},
+	{["byte"] = 0x4C, ["bit"] = 7, ["name"] = "Isles: Crown (Snide's)", ["type"] = "Crown"},
+	{["byte"] = 0x4D, ["bit"] = 2, ["name"] = "Helm: Crown", ["type"] = "Crown"},
+
 	{["byte"] = 0x4D, ["bit"] = 5, ["name"] = "Japes: Rainbow Coin (Slope by painting room)"},
-	{["byte"] = 0x4D, ["bit"] = 6, ["name"] = "Japes: Diddy CB: Balloon in cave"},
-	{["byte"] = 0x4D, ["bit"] = 7, ["name"] = "Japes: DK CB: Balloon by Snide"},
-	{["byte"] = 0x4E, ["bit"] = 0, ["name"] = "Japes: Chunky CB: Balloon in cave (1)"},
-	{["byte"] = 0x4E, ["bit"] = 1, ["name"] = "Japes: Lanky CB: Balloon by hut"},
-	{["byte"] = 0x4E, ["bit"] = 2, ["name"] = "Japes: Diddy CB: Balloon by W5"},
-	{["byte"] = 0x4E, ["bit"] = 4, ["name"] = "Japes: DK CB: Balloon by Cranky"},
-	{["byte"] = 0x4E, ["bit"] = 5, ["name"] = "Japes: Tiny CB: Balloon by hut"},
-	{["byte"] = 0x4E, ["bit"] = 6, ["name"] = "Japes: Tiny CB: Balloon in Fairy room"},
+	{["byte"] = 0x4D, ["bit"] = 6, ["name"] = "Japes: Diddy CB: Balloon in cave", ["type"] = "Balloon"},
+	{["byte"] = 0x4D, ["bit"] = 7, ["name"] = "Japes: DK CB: Balloon by Snide", ["type"] = "Balloon"},
+	{["byte"] = 0x4E, ["bit"] = 0, ["name"] = "Japes: Chunky CB: Balloon in cave (1)", ["type"] = "Balloon"},
+	{["byte"] = 0x4E, ["bit"] = 1, ["name"] = "Japes: Lanky CB: Balloon by hut", ["type"] = "Balloon"},
+	{["byte"] = 0x4E, ["bit"] = 2, ["name"] = "Japes: Diddy CB: Balloon by W5", ["type"] = "Balloon"},
+	{["byte"] = 0x4E, ["bit"] = 4, ["name"] = "Japes: DK CB: Balloon by Cranky", ["type"] = "Balloon"},
+	{["byte"] = 0x4E, ["bit"] = 5, ["name"] = "Japes: Tiny CB: Balloon by hut", ["type"] = "Balloon"},
+	{["byte"] = 0x4E, ["bit"] = 6, ["name"] = "Japes: Tiny CB: Balloon in Fairy room", ["type"] = "Balloon"},
 	
-	{["byte"] = 0x4E, ["bit"] = 7, ["name"] = "Japes: Chunky CB: Balloon in cave (2)"},
-	{["byte"] = 0x4F, ["bit"] = 0, ["name"] = "Japes: Chunky CB: Balloon in cave (3)"},
+	{["byte"] = 0x4E, ["bit"] = 7, ["name"] = "Japes: Chunky CB: Balloon in cave (2)", ["type"] = "Balloon"},
+	{["byte"] = 0x4F, ["bit"] = 0, ["name"] = "Japes: Chunky CB: Balloon in cave (3)", ["type"] = "Balloon"},
 
-	{["byte"] = 0x4F, ["bit"] = 1, ["name"] = "Japes: Lanky CB: Balloon by his BP"},
-	{["byte"] = 0x4F, ["bit"] = 2, ["name"] = "Japes: Tiny CB: Balloon in shellhive"},
-	{["byte"] = 0x4F, ["bit"] = 3, ["name"] = "Japes: Lanky CB: Balloon in painting room)"},
+	{["byte"] = 0x4F, ["bit"] = 1, ["name"] = "Japes: Lanky CB: Balloon by his BP", ["type"] = "Balloon"},
+	{["byte"] = 0x4F, ["bit"] = 2, ["name"] = "Japes: Tiny CB: Balloon in shellhive", ["type"] = "Balloon"},
+	{["byte"] = 0x4F, ["bit"] = 3, ["name"] = "Japes: Lanky CB: Balloon in painting room)", ["type"] = "Balloon"},
 
 	{["byte"] = 0x54, ["bit"] = 4, ["name"] = "Isles: Rainbow Coin (Fungi Lobby Enterance)?"},
 	{["byte"] = 0x54, ["bit"] = 5, ["name"] = "Isles: Rainbow Coin (Slope leading to Aztec Lobby)"},
 	{["byte"] = 0x54, ["bit"] = 6, ["name"] = "Isles: Rainbow Coin (Aztec Lobby Roof)"},
-	{["byte"] = 0x57, ["bit"] = 0, ["name"] = "Fungi: Balloon - DK Mill"},
-	{["byte"] = 0x57, ["bit"] = 2, ["name"] = "Fungi: Balloon - Lanky Lower Mushroom"},
+	{["byte"] = 0x57, ["bit"] = 0, ["name"] = "Fungi: Balloon - DK Mill", ["type"] = "Balloon"},
+	{["byte"] = 0x57, ["bit"] = 2, ["name"] = "Fungi: Balloon - Lanky Lower Mushroom", ["type"] = "Balloon"},
 	{["byte"] = 0x59, ["bit"] = 6, ["name"] = "Isles: Rainbow Coin (K. Lumsy)"},
 
 	{["byte"] = 0x5C, ["bit"] = 3, ["name"] = "Castle Lobby: Rainbow Coin"},
 
+	{["byte"] = 0x60, ["bit"] = 2, ["name"] = "Helm: BoM off"},
+	{["byte"] = 0x60, ["bit"] = 4, ["name"] = "Helm: Crown door open"},
 	{["byte"] = 0x60, ["bit"] = 5, ["name"] = "Helm: W1 (Enterance)"},
 	{["byte"] = 0x60, ["bit"] = 6, ["name"] = "Helm: W1 (Far)"},
 
@@ -763,162 +778,162 @@ local flag_array = {
 	{["byte"] = 0x62, ["bit"] = 2, ["name"] = "Helm: FTT"},
 	{["byte"] = 0x62, ["bit"] = 3, ["name"] = "Aztec: FTT"},
 
-	{["byte"] = 0x64, ["bit"] = 0, ["name"] = "Japes: Chunky Coin: By portal (1)"},
-	{["byte"] = 0x64, ["bit"] = 1, ["name"] = "Japes: Chunky Coin: In water (1)"},
-	{["byte"] = 0x64, ["bit"] = 2, ["name"] = "Japes: Tiny CB: Tunnel to main area (1)"},
-	{["byte"] = 0x64, ["bit"] = 3, ["name"] = "Japes: Tiny CB: Tunnel to main area (2)"},
-	{["byte"] = 0x64, ["bit"] = 4, ["name"] = "Japes: Tiny CB: Tunnel to main area (3)"},
-	{["byte"] = 0x64, ["bit"] = 5, ["name"] = "Japes: Chunky CB: Shellhive tunnel (1)"},
-	{["byte"] = 0x64, ["bit"] = 6, ["name"] = "Japes: Tiny CB: Tunnel to main area (4)"},
-	{["byte"] = 0x65, ["bit"] = 2, ["name"] = "Japes: DK CB: Bunch on left W3"}, -- TODO: Test this
-	{["byte"] = 0x65, ["bit"] = 7, ["name"] = "Japes: Lanky CB: Bunch on tree by Cranky's"},
-	{["byte"] = 0x66, ["bit"] = 3, ["name"] = "Japes: Diddy CB: 101st banana"},
-	{["byte"] = 0x66, ["bit"] = 5, ["name"] = "Japes: DK CB: By enterance (1)"}, -- TODO: There were 5 of these flags, only 3 set inside 0x80 range
-	{["byte"] = 0x66, ["bit"] = 6, ["name"] = "Japes: DK CB: By enterance (2)"},
-	{["byte"] = 0x66, ["bit"] = 7, ["name"] = "Japes: DK CB: By enterance (3)"},
-	{["byte"] = 0x68, ["bit"] = 0, ["name"] = "Japes: Chunky Coin: By portal (2)"},
-	{["byte"] = 0x68, ["bit"] = 1, ["name"] = "Japes: Lanky CB: Bonus Barrel Room (1)"},
-	{["byte"] = 0x68, ["bit"] = 2, ["name"] = "Japes: Chunky Coin: In water (2)"},
-	{["byte"] = 0x68, ["bit"] = 3, ["name"] = "Japes: Chunky Coin: In water (3)"},
-	{["byte"] = 0x68, ["bit"] = 4, ["name"] = "Japes: Diddy CB: Bunch under hut"},
-	{["byte"] = 0x68, ["bit"] = 5, ["name"] = "Japes: Lanky CB: Bonus Barrel Room (2)"},
-	{["byte"] = 0x68, ["bit"] = 7, ["name"] = "Japes: Lanky Coin: Cave near enterance (1)"},
-	{["byte"] = 0x69, ["bit"] = 6, ["name"] = "Japes: Lanky CB: Bunch under hut"},
-	{["byte"] = 0x69, ["bit"] = 7, ["name"] = "Japes: DK CB: Bunch under hut"},
-	{["byte"] = 0x6A, ["bit"] = 1, ["name"] = "Japes: Lanky CB: Bunch under bonus barrel"},
-	{["byte"] = 0x6A, ["bit"] = 5, ["name"] = "Japes: Diddy CB: In right tunnel (1)"},
-	{["byte"] = 0x6B, ["bit"] = 0, ["name"] = "Japes: DK Coin by babboon blast pad (1)"},
-	{["byte"] = 0x6B, ["bit"] = 4, ["name"] = "Japes: DK Coin by enterance"},
-	{["byte"] = 0x6B, ["bit"] = 5, ["name"] = "Japes: Chunky CB: Shellhive tunnel (2)"},
-	{["byte"] = 0x6C, ["bit"] = 0, ["name"] = "Japes: Chunky CB: Shellhive tunnel (3)"},
-	{["byte"] = 0x6C, ["bit"] = 6, ["name"] = "Japes: DK CB: Bunch by Funky (tree)"}, -- TODO: Test this
-	{["byte"] = 0x6D, ["bit"] = 0, ["name"] = "Japes: Chunky CB: Bunch in Shellhive area (1)"},
-	{["byte"] = 0x6D, ["bit"] = 1, ["name"] = "Japes: Tiny Coin: Fairy cave (1)"},
-	{["byte"] = 0x6D, ["bit"] = 3, ["name"] = "Japes: Diddy CB: In right tunnel (2)"},
-	{["byte"] = 0x6D, ["bit"] = 4, ["name"] = "Japes: Diddy CB: In right tunnel (3)"},
-	{["byte"] = 0x6D, ["bit"] = 6, ["name"] = "Japes: DK Coin by babboon blast pad (2)"},
-	{["byte"] = 0x6D, ["bit"] = 7, ["name"] = "Japes: DK Coin by enterance"},
-	{["byte"] = 0x6E, ["bit"] = 0, ["name"] = "Japes: Tiny CB: Bunch under hut"},
-	{["byte"] = 0x6E, ["bit"] = 3, ["name"] = "Japes: DK Coin by his BP (1)"},
-	{["byte"] = 0x6E, ["bit"] = 4, ["name"] = "Japes: Tiny Coin by her BP (1)"},
-	{["byte"] = 0x6E, ["bit"] = 5, ["name"] = "Japes: Diddy CB: Bunch on tree (Middle Left)"},
-	{["byte"] = 0x6E, ["bit"] = 6, ["name"] = "Japes: Diddy CB: Bunch on tree (Left)"},
-	{["byte"] = 0x6F, ["bit"] = 0, ["name"] = "Japes: Lanky Coin: Cave near enterance (2)"},
-	{["byte"] = 0x6F, ["bit"] = 1, ["name"] = "Japes: Lanky Coin: Cave near enterance (3)"},
-	{["byte"] = 0x6F, ["bit"] = 2, ["name"] = "Japes: Diddy Coin by his BP"},
-	{["byte"] = 0x6F, ["bit"] = 3, ["name"] = "Japes: Chunky CB: Shellhive tunnel (4)"},
-	{["byte"] = 0x6F, ["bit"] = 5, ["name"] = "Japes: Diddy CB: By enterance (1)"},
-	{["byte"] = 0x6F, ["bit"] = 6, ["name"] = "Japes: Tiny Coin by her BP (2)"},
-	{["byte"] = 0x6F, ["bit"] = 7, ["name"] = "Japes: DK Coin by enterance"},
+	{["byte"] = 0x64, ["bit"] = 0, ["name"] = "Japes: Chunky Coin: By portal (1)", ["type"] = "Coin"},
+	{["byte"] = 0x64, ["bit"] = 1, ["name"] = "Japes: Chunky Coin: In water (1)", ["type"] = "Coin"},
+	{["byte"] = 0x64, ["bit"] = 2, ["name"] = "Japes: Tiny CB: Tunnel to main area (1)", ["type"] = "CB"},
+	{["byte"] = 0x64, ["bit"] = 3, ["name"] = "Japes: Tiny CB: Tunnel to main area (2)", ["type"] = "CB"},
+	{["byte"] = 0x64, ["bit"] = 4, ["name"] = "Japes: Tiny CB: Tunnel to main area (3)", ["type"] = "CB"},
+	{["byte"] = 0x64, ["bit"] = 5, ["name"] = "Japes: Chunky CB: Shellhive tunnel (1)", ["type"] = "CB"},
+	{["byte"] = 0x64, ["bit"] = 6, ["name"] = "Japes: Tiny CB: Tunnel to main area (4)", ["type"] = "CB"},
+	{["byte"] = 0x65, ["bit"] = 2, ["name"] = "Japes: DK CB: Bunch on left W3", ["type"] = "Bunch"}, -- TODO: Test this
+	{["byte"] = 0x65, ["bit"] = 7, ["name"] = "Japes: Lanky CB: Bunch on tree by Cranky's", ["type"] = "Bunch"},
+	{["byte"] = 0x66, ["bit"] = 3, ["name"] = "Japes: Diddy CB: 101st banana", ["type"] = "CB"},
+	{["byte"] = 0x66, ["bit"] = 5, ["name"] = "Japes: DK CB: By enterance (1)", ["type"] = "CB"}, -- TODO: There were 5 of these flags, only 3 set inside 0x80 range
+	{["byte"] = 0x66, ["bit"] = 6, ["name"] = "Japes: DK CB: By enterance (2)", ["type"] = "CB"},
+	{["byte"] = 0x66, ["bit"] = 7, ["name"] = "Japes: DK CB: By enterance (3)", ["type"] = "CB"},
+	{["byte"] = 0x68, ["bit"] = 0, ["name"] = "Japes: Chunky Coin: By portal (2)", ["type"] = "Coin"},
+	{["byte"] = 0x68, ["bit"] = 1, ["name"] = "Japes: Lanky CB: Bonus Barrel Room (1)", ["type"] = "CB"},
+	{["byte"] = 0x68, ["bit"] = 2, ["name"] = "Japes: Chunky Coin: In water (2)", ["type"] = "Coin"},
+	{["byte"] = 0x68, ["bit"] = 3, ["name"] = "Japes: Chunky Coin: In water (3)", ["type"] = "Coin"},
+	{["byte"] = 0x68, ["bit"] = 4, ["name"] = "Japes: Diddy CB: Bunch under hut", ["type"] = "Bunch"},
+	{["byte"] = 0x68, ["bit"] = 5, ["name"] = "Japes: Lanky CB: Bonus Barrel Room (2)", ["type"] = "CB"},
+	{["byte"] = 0x68, ["bit"] = 7, ["name"] = "Japes: Lanky Coin: Cave near enterance (1)", ["type"] = "Coin"},
+	{["byte"] = 0x69, ["bit"] = 6, ["name"] = "Japes: Lanky CB: Bunch under hut", ["type"] = "Bunch"},
+	{["byte"] = 0x69, ["bit"] = 7, ["name"] = "Japes: DK CB: Bunch under hut", ["type"] = "Bunch"},
+	{["byte"] = 0x6A, ["bit"] = 1, ["name"] = "Japes: Lanky CB: Bunch under bonus barrel", ["type"] = "Bunch"},
+	{["byte"] = 0x6A, ["bit"] = 5, ["name"] = "Japes: Diddy CB: In right tunnel (1)", ["type"] = "CB"},
+	{["byte"] = 0x6B, ["bit"] = 0, ["name"] = "Japes: DK Coin by babboon blast pad (1)", ["type"] = "Coin"},
+	{["byte"] = 0x6B, ["bit"] = 4, ["name"] = "Japes: DK Coin by enterance", ["type"] = "Coin"},
+	{["byte"] = 0x6B, ["bit"] = 5, ["name"] = "Japes: Chunky CB: Shellhive tunnel (2)", ["type"] = "CB"},
+	{["byte"] = 0x6C, ["bit"] = 0, ["name"] = "Japes: Chunky CB: Shellhive tunnel (3)", ["type"] = "CB"},
+	{["byte"] = 0x6C, ["bit"] = 6, ["name"] = "Japes: DK CB: Bunch by Funky (tree)", ["type"] = "Bunch"}, -- TODO: Test this
+	{["byte"] = 0x6D, ["bit"] = 0, ["name"] = "Japes: Chunky CB: Bunch in Shellhive area (1)", ["type"] = "Bunch"},
+	{["byte"] = 0x6D, ["bit"] = 1, ["name"] = "Japes: Tiny Coin: Fairy cave (1)", ["type"] = "Coin"},
+	{["byte"] = 0x6D, ["bit"] = 3, ["name"] = "Japes: Diddy CB: In right tunnel (2)", ["type"] = "CB"},
+	{["byte"] = 0x6D, ["bit"] = 4, ["name"] = "Japes: Diddy CB: In right tunnel (3)", ["type"] = "CB"},
+	{["byte"] = 0x6D, ["bit"] = 6, ["name"] = "Japes: DK Coin by babboon blast pad (2)", ["type"] = "Coin"},
+	{["byte"] = 0x6D, ["bit"] = 7, ["name"] = "Japes: DK Coin by enterance", ["type"] = "Coin"},
+	{["byte"] = 0x6E, ["bit"] = 0, ["name"] = "Japes: Tiny CB: Bunch under hut", ["type"] = "Bunch"},
+	{["byte"] = 0x6E, ["bit"] = 3, ["name"] = "Japes: DK Coin by his BP (1)", ["type"] = "Coin"},
+	{["byte"] = 0x6E, ["bit"] = 4, ["name"] = "Japes: Tiny Coin by her BP (1)", ["type"] = "Coin"},
+	{["byte"] = 0x6E, ["bit"] = 5, ["name"] = "Japes: Diddy CB: Bunch on tree (Middle Left)", ["type"] = "Bunch"},
+	{["byte"] = 0x6E, ["bit"] = 6, ["name"] = "Japes: Diddy CB: Bunch on tree (Left)", ["type"] = "Bunch"},
+	{["byte"] = 0x6F, ["bit"] = 0, ["name"] = "Japes: Lanky Coin: Cave near enterance (2)", ["type"] = "Coin"},
+	{["byte"] = 0x6F, ["bit"] = 1, ["name"] = "Japes: Lanky Coin: Cave near enterance (3)", ["type"] = "Coin"},
+	{["byte"] = 0x6F, ["bit"] = 2, ["name"] = "Japes: Diddy Coin by his BP", ["type"] = "Coin"},
+	{["byte"] = 0x6F, ["bit"] = 3, ["name"] = "Japes: Chunky CB: Shellhive tunnel (4)", ["type"] = "CB"},
+	{["byte"] = 0x6F, ["bit"] = 5, ["name"] = "Japes: Diddy CB: By enterance (1)", ["type"] = "CB"},
+	{["byte"] = 0x6F, ["bit"] = 6, ["name"] = "Japes: Tiny Coin by her BP (2)", ["type"] = "Coin"},
+	{["byte"] = 0x6F, ["bit"] = 7, ["name"] = "Japes: DK Coin by enterance", ["type"] = "Coin"},
 	
-	{["byte"] = 0x70, ["bit"] = 3, ["name"] = "Japes: Tiny CB: Bunch in log (1)"},
-	{["byte"] = 0x70, ["bit"] = 4, ["name"] = "Japes: Tiny CB: Bunch in log (2)"},
-	{["byte"] = 0x70, ["bit"] = 5, ["name"] = "Japes: Tiny CB: Bunch in log (3)"},
-	{["byte"] = 0x70, ["bit"] = 7, ["name"] = "Japes: Tiny CB: Bunch infront of Shellhive"},
-	{["byte"] = 0x71, ["bit"] = 3, ["name"] = "Japes: Chunky CB: Shellhive tunnel (5)"},
-	{["byte"] = 0x71, ["bit"] = 4, ["name"] = "Japes: Chunky CB: Shellhive tunnel (6)"},
-	{["byte"] = 0x71, ["bit"] = 5, ["name"] = "Japes: Chunky CB: Shellhive tunnel (7)"},
-	{["byte"] = 0x71, ["bit"] = 6, ["name"] = "Japes: Chunky CB: Shellhive tunnel (8)"},
-	{["byte"] = 0x71, ["bit"] = 7, ["name"] = "Japes: Chunky CB: Shellhive tunnel (9)"},
-	{["byte"] = 0x72, ["bit"] = 0, ["name"] = "Japes: Diddy CB: Bunch in water (Left)"},
-	{["byte"] = 0x72, ["bit"] = 2, ["name"] = "Japes: Diddy CB: Bunch in water (Right)"},
-	{["byte"] = 0x72, ["bit"] = 3, ["name"] = "Japes: Diddy CB: Bunch on tree (Right)"},
-	{["byte"] = 0x72, ["bit"] = 4, ["name"] = "Japes: Diddy Coin by his BP"},
-	{["byte"] = 0x72, ["bit"] = 5, ["name"] = "Japes: Diddy CB: Bunch on tree (Middle Right)"},
-	{["byte"] = 0x73, ["bit"] = 0, ["name"] = "Japes: Tiny CB: Tunnel to main area (5)"},
-	{["byte"] = 0x73, ["bit"] = 1, ["name"] = "Japes: DK Coin by babboon blast pad (3)"},
-	{["byte"] = 0x73, ["bit"] = 2, ["name"] = "Japes: Chunky Coin: By portal (3)"},
-	{["byte"] = 0x73, ["bit"] = 3, ["name"] = "Japes: Tiny CB: Fairy cave (1)"},
-	{["byte"] = 0x73, ["bit"] = 4, ["name"] = "Japes: Tiny CB: Fairy cave (2)"},
-	{["byte"] = 0x73, ["bit"] = 5, ["name"] = "Japes: Lanky Coin: In water (Left) (1)"},
-	{["byte"] = 0x73, ["bit"] = 6, ["name"] = "Japes: Lanky Coin: In water (Left) (2)"},
-	{["byte"] = 0x73, ["bit"] = 7, ["name"] = "Japes: Tiny CB: Fairy cave (3)"},
-	{["byte"] = 0x74, ["bit"] = 0, ["name"] = "Japes: Lanky CB: Bonus Barrel Room (3)"},
-	{["byte"] = 0x74, ["bit"] = 1, ["name"] = "Japes: Lanky CB: Fairy cave (1)"},
-	{["byte"] = 0x74, ["bit"] = 2, ["name"] = "Japes: Lanky CB: Fairy cave (2)"},
-	{["byte"] = 0x74, ["bit"] = 3, ["name"] = "Japes: Lanky CB: Fairy cave (3)"},
-	{["byte"] = 0x74, ["bit"] = 5, ["name"] = "Japes: Chunky CB: Bunch on Funky (Left)"}, -- TODO: Right side missing with block size 0x80
-	{["byte"] = 0x74, ["bit"] = 6, ["name"] = "Japes: Diddy CB: By enterance (2)"},
+	{["byte"] = 0x70, ["bit"] = 3, ["name"] = "Japes: Tiny CB: Bunch in log (1)", ["type"] = "Bunch"},
+	{["byte"] = 0x70, ["bit"] = 4, ["name"] = "Japes: Tiny CB: Bunch in log (2)", ["type"] = "Bunch"},
+	{["byte"] = 0x70, ["bit"] = 5, ["name"] = "Japes: Tiny CB: Bunch in log (3)", ["type"] = "Bunch"},
+	{["byte"] = 0x70, ["bit"] = 7, ["name"] = "Japes: Tiny CB: Bunch infront of Shellhive", ["type"] = "Bunch"},
+	{["byte"] = 0x71, ["bit"] = 3, ["name"] = "Japes: Chunky CB: Shellhive tunnel (5)", ["type"] = "CB"},
+	{["byte"] = 0x71, ["bit"] = 4, ["name"] = "Japes: Chunky CB: Shellhive tunnel (6)", ["type"] = "CB"},
+	{["byte"] = 0x71, ["bit"] = 5, ["name"] = "Japes: Chunky CB: Shellhive tunnel (7)", ["type"] = "CB"},
+	{["byte"] = 0x71, ["bit"] = 6, ["name"] = "Japes: Chunky CB: Shellhive tunnel (8)", ["type"] = "CB"},
+	{["byte"] = 0x71, ["bit"] = 7, ["name"] = "Japes: Chunky CB: Shellhive tunnel (9)", ["type"] = "CB"},
+	{["byte"] = 0x72, ["bit"] = 0, ["name"] = "Japes: Diddy CB: Bunch in water (Left)", ["type"] = "Bunch"},
+	{["byte"] = 0x72, ["bit"] = 2, ["name"] = "Japes: Diddy CB: Bunch in water (Right)", ["type"] = "Bunch"},
+	{["byte"] = 0x72, ["bit"] = 3, ["name"] = "Japes: Diddy CB: Bunch on tree (Right)", ["type"] = "Bunch"},
+	{["byte"] = 0x72, ["bit"] = 4, ["name"] = "Japes: Diddy Coin by his BP", ["type"] = "Coin"},
+	{["byte"] = 0x72, ["bit"] = 5, ["name"] = "Japes: Diddy CB: Bunch on tree (Middle Right)", ["type"] = "Bunch"},
+	{["byte"] = 0x73, ["bit"] = 0, ["name"] = "Japes: Tiny CB: Tunnel to main area (5)", ["type"] = "CB"},
+	{["byte"] = 0x73, ["bit"] = 1, ["name"] = "Japes: DK Coin by babboon blast pad (3)", ["type"] = "Coin"},
+	{["byte"] = 0x73, ["bit"] = 2, ["name"] = "Japes: Chunky Coin: By portal (3)", ["type"] = "Coin"},
+	{["byte"] = 0x73, ["bit"] = 3, ["name"] = "Japes: Tiny CB: Fairy cave (1)", ["type"] = "CB"},
+	{["byte"] = 0x73, ["bit"] = 4, ["name"] = "Japes: Tiny CB: Fairy cave (2)", ["type"] = "CB"},
+	{["byte"] = 0x73, ["bit"] = 5, ["name"] = "Japes: Lanky Coin: In water (Left) (1)", ["type"] = "Coin"},
+	{["byte"] = 0x73, ["bit"] = 6, ["name"] = "Japes: Lanky Coin: In water (Left) (2)", ["type"] = "Coin"},
+	{["byte"] = 0x73, ["bit"] = 7, ["name"] = "Japes: Tiny CB: Fairy cave (3)", ["type"] = "CB"},
+	{["byte"] = 0x74, ["bit"] = 0, ["name"] = "Japes: Lanky CB: Bonus Barrel Room (3)", ["type"] = "CB"},
+	{["byte"] = 0x74, ["bit"] = 1, ["name"] = "Japes: Lanky CB: Fairy cave (1)", ["type"] = "CB"},
+	{["byte"] = 0x74, ["bit"] = 2, ["name"] = "Japes: Lanky CB: Fairy cave (2)", ["type"] = "CB"},
+	{["byte"] = 0x74, ["bit"] = 3, ["name"] = "Japes: Lanky CB: Fairy cave (3)", ["type"] = "CB"},
+	{["byte"] = 0x74, ["bit"] = 5, ["name"] = "Japes: Chunky CB: Bunch on Funky (Left)", ["type"] = "Bunch"}, -- TODO: Right side missing with block size 0x80
+	{["byte"] = 0x74, ["bit"] = 6, ["name"] = "Japes: Diddy CB: By enterance (2)", ["type"] = "CB"},
 	{["byte"] = 0x74, ["bit"] = 7, ["name"] = "Japes: Lanky Coin: Bonus Barrel Room (1)"}, -- TODO: Flags missing in this room with block size 0x80
-	{["byte"] = 0x75, ["bit"] = 0, ["name"] = "Japes: Lanky CB: Painting room slope (1)"},
-	{["byte"] = 0x75, ["bit"] = 1, ["name"] = "Japes: Lanky CB: Painting room slope (2)"},
-	{["byte"] = 0x75, ["bit"] = 2, ["name"] = "Japes: Lanky CB: In water (1)"},
-	{["byte"] = 0x75, ["bit"] = 3, ["name"] = "Japes: Lanky CB: In water (2)"},
-	{["byte"] = 0x75, ["bit"] = 4, ["name"] = "Japes: Lanky CB: In water (3)"},
-	{["byte"] = 0x75, ["bit"] = 5, ["name"] = "Japes: Lanky CB: In water (4)"},
-	{["byte"] = 0x75, ["bit"] = 6, ["name"] = "Japes: Lanky CB: In water (5)"},
-	{["byte"] = 0x75, ["bit"] = 7, ["name"] = "Japes: Lanky CB: Fairy cave (4)"},
-	{["byte"] = 0x76, ["bit"] = 2, ["name"] = "Japes: Lanky CB: Bonus Barrel Room (4)"},
-	{["byte"] = 0x76, ["bit"] = 3, ["name"] = "Japes: Lanky CB: Bonus Barrel Room (5)"},
-	{["byte"] = 0x76, ["bit"] = 4, ["name"] = "Japes: Lanky CB: Bonus Barrel Room (6)"},
-	{["byte"] = 0x76, ["bit"] = 5, ["name"] = "Japes: Lanky CB: Fairy cave (5)"},
-	{["byte"] = 0x76, ["bit"] = 6, ["name"] = "Japes: Lanky CB: Bonus Barrel Room (7)"},
-	{["byte"] = 0x76, ["bit"] = 7, ["name"] = "Japes: Lanky CB: Painting room slope (3)"},
+	{["byte"] = 0x75, ["bit"] = 0, ["name"] = "Japes: Lanky CB: Painting room slope (1)", ["type"] = "CB"},
+	{["byte"] = 0x75, ["bit"] = 1, ["name"] = "Japes: Lanky CB: Painting room slope (2)", ["type"] = "CB"},
+	{["byte"] = 0x75, ["bit"] = 2, ["name"] = "Japes: Lanky CB: In water (1)", ["type"] = "CB"},
+	{["byte"] = 0x75, ["bit"] = 3, ["name"] = "Japes: Lanky CB: In water (2)", ["type"] = "CB"},
+	{["byte"] = 0x75, ["bit"] = 4, ["name"] = "Japes: Lanky CB: In water (3)", ["type"] = "CB"},
+	{["byte"] = 0x75, ["bit"] = 5, ["name"] = "Japes: Lanky CB: In water (4)", ["type"] = "CB"},
+	{["byte"] = 0x75, ["bit"] = 6, ["name"] = "Japes: Lanky CB: In water (5)", ["type"] = "CB"},
+	{["byte"] = 0x75, ["bit"] = 7, ["name"] = "Japes: Lanky CB: Fairy cave (4)", ["type"] = "CB"},
+	{["byte"] = 0x76, ["bit"] = 2, ["name"] = "Japes: Lanky CB: Bonus Barrel Room (4)", ["type"] = "CB"},
+	{["byte"] = 0x76, ["bit"] = 3, ["name"] = "Japes: Lanky CB: Bonus Barrel Room (5)", ["type"] = "CB"},
+	{["byte"] = 0x76, ["bit"] = 4, ["name"] = "Japes: Lanky CB: Bonus Barrel Room (6)", ["type"] = "CB"},
+	{["byte"] = 0x76, ["bit"] = 5, ["name"] = "Japes: Lanky CB: Fairy cave (5)", ["type"] = "CB"},
+	{["byte"] = 0x76, ["bit"] = 6, ["name"] = "Japes: Lanky CB: Bonus Barrel Room (7)", ["type"] = "CB"},
+	{["byte"] = 0x76, ["bit"] = 7, ["name"] = "Japes: Lanky CB: Painting room slope (3)", ["type"] = "CB"},
 
-	{["byte"] = 0x77, ["bit"] = 0, ["name"] = "Japes: Tiny CB: Bunch on tree by Cranky's"},
-	{["byte"] = 0x77, ["bit"] = 1, ["name"] = "Japes: Tiny CB: Bunch under bonus barrel"},
-	{["byte"] = 0x77, ["bit"] = 2, ["name"] = "Japes: Diddy Coin: In water (Left) (1)"},
-	{["byte"] = 0x77, ["bit"] = 3, ["name"] = "Japes: Chunky CB: Shellhive tunnel (10)"},
-	{["byte"] = 0x77, ["bit"] = 4, ["name"] = "Japes: Diddy Coin: In water (Left) (2)"},
-	{["byte"] = 0x77, ["bit"] = 5, ["name"] = "Japes: Diddy Coin: In water (Left) (3)"},	
-	{["byte"] = 0x77, ["bit"] = 6, ["name"] = "Japes: Chunky Coin behind stump (1)"},
-	{["byte"] = 0x77, ["bit"] = 7, ["name"] = "Japes: Chunky Coin behind stump (2)"},
+	{["byte"] = 0x77, ["bit"] = 0, ["name"] = "Japes: Tiny CB: Bunch on tree by Cranky's", ["type"] = "Bunch"},
+	{["byte"] = 0x77, ["bit"] = 1, ["name"] = "Japes: Tiny CB: Bunch under bonus barrel", ["type"] = "Bunch"},
+	{["byte"] = 0x77, ["bit"] = 2, ["name"] = "Japes: Diddy Coin: In water (Left) (1)", ["type"] = "Coin"},
+	{["byte"] = 0x77, ["bit"] = 3, ["name"] = "Japes: Chunky CB: Shellhive tunnel (10)", ["type"] = "CB"},
+	{["byte"] = 0x77, ["bit"] = 4, ["name"] = "Japes: Diddy Coin: In water (Left) (2)", ["type"] = "Coin"},
+	{["byte"] = 0x77, ["bit"] = 5, ["name"] = "Japes: Diddy Coin: In water (Left) (3)", ["type"] = "Coin"},	
+	{["byte"] = 0x77, ["bit"] = 6, ["name"] = "Japes: Chunky Coin behind stump (1)", ["type"] = "Coin"},
+	{["byte"] = 0x77, ["bit"] = 7, ["name"] = "Japes: Chunky Coin behind stump (2)", ["type"] = "Coin"},
 
-	{["byte"] = 0x78, ["bit"] = 0, ["name"] = "Japes: Chunky CB: By underground (1)"},
-	{["byte"] = 0x78, ["bit"] = 1, ["name"] = "Japes: Chunky CB: Bunch on top of Cranky's"},
-	{["byte"] = 0x78, ["bit"] = 2, ["name"] = "Japes: Lanky Coin: By Snide's (1)"},
-	{["byte"] = 0x78, ["bit"] = 3, ["name"] = "Japes: Lanky CB: Bunch by Snide's"},
-	{["byte"] = 0x78, ["bit"] = 4, ["name"] = "Japes: Lanky Coin: By Snide's (2)"},
-	{["byte"] = 0x78, ["bit"] = 5, ["name"] = "Japes: Lanky Coin: By Snide's (3)"},
-	{["byte"] = 0x78, ["bit"] = 6, ["name"] = "Japes: DK Coin by his BP (2)"},
-	{["byte"] = 0x78, ["bit"] = 7, ["name"] = "Japes: Tiny Coin by her BP (3)"},
+	{["byte"] = 0x78, ["bit"] = 0, ["name"] = "Japes: Chunky CB: By underground (1)", ["type"] = "CB"},
+	{["byte"] = 0x78, ["bit"] = 1, ["name"] = "Japes: Chunky CB: Bunch on top of Cranky's", ["type"] = "Bunch"},
+	{["byte"] = 0x78, ["bit"] = 2, ["name"] = "Japes: Lanky Coin: By Snide's (1)", ["type"] = "Coin"},
+	{["byte"] = 0x78, ["bit"] = 3, ["name"] = "Japes: Lanky CB: Bunch by Snide's", ["type"] = "Bunch"},
+	{["byte"] = 0x78, ["bit"] = 4, ["name"] = "Japes: Lanky Coin: By Snide's (2)", ["type"] = "Coin"},
+	{["byte"] = 0x78, ["bit"] = 5, ["name"] = "Japes: Lanky Coin: By Snide's (3)", ["type"] = "Coin"},
+	{["byte"] = 0x78, ["bit"] = 6, ["name"] = "Japes: DK Coin by his BP (2)", ["type"] = "Coin"},
+	{["byte"] = 0x78, ["bit"] = 7, ["name"] = "Japes: Tiny Coin by her BP (3)", ["type"] = "Coin"},
 	
-	{["byte"] = 0x79, ["bit"] = 0, ["name"] = "Japes: Tiny CB: Fairy cave (4)"},
-	{["byte"] = 0x79, ["bit"] = 1, ["name"] = "Japes: Tiny CB: Fairy cave (5)"},
-	{["byte"] = 0x79, ["bit"] = 2, ["name"] = "Japes: Tiny CB: Fairy cave (6)"},
-	{["byte"] = 0x79, ["bit"] = 4, ["name"] = "Japes: Chunky CB: By underground (2)"},
-	{["byte"] = 0x79, ["bit"] = 5, ["name"] = "Japes: Chunky CB: By underground (3)"},
-	{["byte"] = 0x79, ["bit"] = 6, ["name"] = "Japes: Chunky CB: By underground (4)"},
-	{["byte"] = 0x79, ["bit"] = 7, ["name"] = "Japes: Chunky CB: By underground (5)"},
+	{["byte"] = 0x79, ["bit"] = 0, ["name"] = "Japes: Tiny CB: Fairy cave (4)", ["type"] = "CB"},
+	{["byte"] = 0x79, ["bit"] = 1, ["name"] = "Japes: Tiny CB: Fairy cave (5)", ["type"] = "CB"},
+	{["byte"] = 0x79, ["bit"] = 2, ["name"] = "Japes: Tiny CB: Fairy cave (6)", ["type"] = "CB"},
+	{["byte"] = 0x79, ["bit"] = 4, ["name"] = "Japes: Chunky CB: By underground (2)", ["type"] = "CB"},
+	{["byte"] = 0x79, ["bit"] = 5, ["name"] = "Japes: Chunky CB: By underground (3)", ["type"] = "CB"},
+	{["byte"] = 0x79, ["bit"] = 6, ["name"] = "Japes: Chunky CB: By underground (4)", ["type"] = "CB"},
+	{["byte"] = 0x79, ["bit"] = 7, ["name"] = "Japes: Chunky CB: By underground (5)", ["type"] = "CB"},
 	
-	{["byte"] = 0x7A, ["bit"] = 2, ["name"] = "Japes: Tiny Coin: Fairy cave (2)"},
-	{["byte"] = 0x7A, ["bit"] = 3, ["name"] = "Japes: Tiny Coin: Fairy cave (3)"},
-	{["byte"] = 0x7A, ["bit"] = 4, ["name"] = "Japes: Tiny Coin: Fairy cave (4)"},
-	{["byte"] = 0x7A, ["bit"] = 5, ["name"] = "Japes: Chunky CB: Bunch in Shellhive area (2)"},
-	{["byte"] = 0x7A, ["bit"] = 6, ["name"] = "Japes: Chunky CB: Bunch in Shellhive area (3)"},
-	{["byte"] = 0x7A, ["bit"] = 7, ["name"] = "Japes: Tiny CB: Fairy cave (7)"},
+	{["byte"] = 0x7A, ["bit"] = 2, ["name"] = "Japes: Tiny Coin: Fairy cave (2)", ["type"] = "Coin"},
+	{["byte"] = 0x7A, ["bit"] = 3, ["name"] = "Japes: Tiny Coin: Fairy cave (3)", ["type"] = "Coin"},
+	{["byte"] = 0x7A, ["bit"] = 4, ["name"] = "Japes: Tiny Coin: Fairy cave (4)", ["type"] = "Coin"},
+	{["byte"] = 0x7A, ["bit"] = 5, ["name"] = "Japes: Chunky CB: Bunch in Shellhive area (2)", ["type"] = "Bunch"},
+	{["byte"] = 0x7A, ["bit"] = 6, ["name"] = "Japes: Chunky CB: Bunch in Shellhive area (3)", ["type"] = "Bunch"},
+	{["byte"] = 0x7A, ["bit"] = 7, ["name"] = "Japes: Tiny CB: Fairy cave (7)", ["type"] = "CB"},
 	
 	{["byte"] = 0x7B, ["bit"] = 0, ["name"] = "Japes: Lanky Coin: Bonus Barrel Room (2)"}, -- TODO: Flags missing in this room with block size 0x80
-	{["byte"] = 0x7B, ["bit"] = 1, ["name"] = "Japes: Chunky CB: Bunch in Shellhive area (4)"},
-	{["byte"] = 0x7B, ["bit"] = 2, ["name"] = "Japes: Chunky Coin behind stump (3)"},
-	{["byte"] = 0x7B, ["bit"] = 3, ["name"] = "Japes: Diddy Coin by his BP"},
-	{["byte"] = 0x7B, ["bit"] = 4, ["name"] = "Japes: Lanky Coin: By Snide's (4)"},
-	{["byte"] = 0x7B, ["bit"] = 5, ["name"] = "Japes: Lanky Coin: By Snide's (5)"},
+	{["byte"] = 0x7B, ["bit"] = 1, ["name"] = "Japes: Chunky CB: Bunch in Shellhive area (4)", ["type"] = "Bunch"},
+	{["byte"] = 0x7B, ["bit"] = 2, ["name"] = "Japes: Chunky Coin behind stump (3)", ["type"] = "Coin"},
+	{["byte"] = 0x7B, ["bit"] = 3, ["name"] = "Japes: Diddy Coin by his BP", ["type"] = "Coin"},
+	{["byte"] = 0x7B, ["bit"] = 4, ["name"] = "Japes: Lanky Coin: By Snide's (4)", ["type"] = "Coin"},
+	{["byte"] = 0x7B, ["bit"] = 5, ["name"] = "Japes: Lanky Coin: By Snide's (5)", ["type"] = "Coin"},
 
-	{["byte"] = 0x7C, ["bit"] = 0, ["name"] = "Japes: Tiny Coin: Underground (1)"},
-	{["byte"] = 0x7C, ["bit"] = 3, ["name"] = "Japes: Tiny Coin: Underground (2)"},
-	{["byte"] = 0x7C, ["bit"] = 6, ["name"] = "Japes: DK CB: Bunch in Babboon blast (1)"},  -- TODO: Flags missing in this room with block size 0x80
-	{["byte"] = 0x7C, ["bit"] = 7, ["name"] = "Japes: DK Coin: Babboon blast (1)"},  -- TODO: Flags missing in this room with block size 0x80
-	{["byte"] = 0x7D, ["bit"] = 0, ["name"] = "Japes: Lanky CB: Bunch in painting room (Left)"},
-	{["byte"] = 0x7D, ["bit"] = 1, ["name"] = "Japes: Tiny Coin: Underground (3)"},
+	{["byte"] = 0x7C, ["bit"] = 0, ["name"] = "Japes: Tiny Coin: Underground (1)", ["type"] = "Coin"},
+	{["byte"] = 0x7C, ["bit"] = 3, ["name"] = "Japes: Tiny Coin: Underground (2)", ["type"] = "Coin"},
+	{["byte"] = 0x7C, ["bit"] = 6, ["name"] = "Japes: DK CB: Bunch in Babboon blast (1)", ["type"] = "Bunch"},  -- TODO: Flags missing in this room with block size 0x80
+	{["byte"] = 0x7C, ["bit"] = 7, ["name"] = "Japes: DK Coin: Babboon blast (1)", ["type"] = "Coin"},  -- TODO: Flags missing in this room with block size 0x80
+	{["byte"] = 0x7D, ["bit"] = 0, ["name"] = "Japes: Lanky CB: Bunch in painting room (Left)", ["type"] = "Bunch"},
+	{["byte"] = 0x7D, ["bit"] = 1, ["name"] = "Japes: Tiny Coin: Underground (3)", ["type"] = "Coin"},
 	
-	{["byte"] = 0x7E, ["bit"] = 0, ["name"] = "Japes: Tiny CB: Inside shellhive (1)"},
-	{["byte"] = 0x7E, ["bit"] = 1, ["name"] = "Japes: Tiny CB: Inside shellhive (2)"},
-	{["byte"] = 0x7E, ["bit"] = 2, ["name"] = "Japes: Tiny CB: Inside shellhive (3)"},
-	{["byte"] = 0x7E, ["bit"] = 3, ["name"] = "Japes: Lanky CB: Bunch in painting room (Right)"},
-	{["byte"] = 0x7E, ["bit"] = 4, ["name"] = "Japes: Lanky CB: Bunch in painting room (1)"},
-	{["byte"] = 0x7E, ["bit"] = 5, ["name"] = "Japes: Lanky Coin: In painting room (Left)"},
-	{["byte"] = 0x7E, ["bit"] = 6, ["name"] = "Japes: Lanky Coin: In painting room (Right)"},
-	{["byte"] = 0x7E, ["bit"] = 7, ["name"] = "Japes: Lanky CB: Bunch in painting room (2)"},
+	{["byte"] = 0x7E, ["bit"] = 0, ["name"] = "Japes: Tiny CB: Inside shellhive (1)", ["type"] = "CB"},
+	{["byte"] = 0x7E, ["bit"] = 1, ["name"] = "Japes: Tiny CB: Inside shellhive (2)", ["type"] = "CB"},
+	{["byte"] = 0x7E, ["bit"] = 2, ["name"] = "Japes: Tiny CB: Inside shellhive (3)", ["type"] = "CB"},
+	{["byte"] = 0x7E, ["bit"] = 3, ["name"] = "Japes: Lanky CB: Bunch in painting room (Right)", ["type"] = "Bunch"},
+	{["byte"] = 0x7E, ["bit"] = 4, ["name"] = "Japes: Lanky CB: Bunch in painting room (1)", ["type"] = "Bunch"},
+	{["byte"] = 0x7E, ["bit"] = 5, ["name"] = "Japes: Lanky Coin: In painting room (Left)", ["type"] = "Coin"},
+	{["byte"] = 0x7E, ["bit"] = 6, ["name"] = "Japes: Lanky Coin: In painting room (Right)", ["type"] = "Coin"},
+	{["byte"] = 0x7E, ["bit"] = 7, ["name"] = "Japes: Lanky CB: Bunch in painting room (2)", ["type"] = "Bunch"},
 	
-	{["byte"] = 0x7F, ["bit"] = 0, ["name"] = "Japes: DK Coin by his BP (3)"},
-	{["byte"] = 0x7F, ["bit"] = 1, ["name"] = "Japes: Tiny Coin: Inside shellhive (1)"},
-	{["byte"] = 0x7F, ["bit"] = 2, ["name"] = "Japes: Tiny Coin: Inside shellhive (2)"},
-	{["byte"] = 0x7F, ["bit"] = 3, ["name"] = "Japes: Tiny CB: Inside shellhive (4)"},
-	{["byte"] = 0x7F, ["bit"] = 4, ["name"] = "Japes: Tiny CB: Inside shellhive (5)"},
-	{["byte"] = 0x7F, ["bit"] = 5, ["name"] = "Japes: Tiny CB: Inside shellhive (6)"},
-	{["byte"] = 0x7F, ["bit"] = 6, ["name"] = "Japes: Tiny CB: Inside shellhive (7)"},
-	{["byte"] = 0x7F, ["bit"] = 7, ["name"] = "Japes: Tiny CB: Inside shellhive (8)"},
+	{["byte"] = 0x7F, ["bit"] = 0, ["name"] = "Japes: DK Coin by his BP (3)", ["type"] = "Coin"},
+	{["byte"] = 0x7F, ["bit"] = 1, ["name"] = "Japes: Tiny Coin: Inside shellhive (1)", ["type"] = "Coin"},
+	{["byte"] = 0x7F, ["bit"] = 2, ["name"] = "Japes: Tiny Coin: Inside shellhive (2)", ["type"] = "Coin"},
+	{["byte"] = 0x7F, ["bit"] = 3, ["name"] = "Japes: Tiny CB: Inside shellhive (4)", ["type"] = "CB"},
+	{["byte"] = 0x7F, ["bit"] = 4, ["name"] = "Japes: Tiny CB: Inside shellhive (5)", ["type"] = "CB"},
+	{["byte"] = 0x7F, ["bit"] = 5, ["name"] = "Japes: Tiny CB: Inside shellhive (6)", ["type"] = "CB"},
+	{["byte"] = 0x7F, ["bit"] = 6, ["name"] = "Japes: Tiny CB: Inside shellhive (7)", ["type"] = "CB"},
+	{["byte"] = 0x7F, ["bit"] = 7, ["name"] = "Japes: Tiny CB: Inside shellhive (8)", ["type"] = "CB"},
 }
 
 local function fill_flag_names()
@@ -954,7 +969,7 @@ function checkFlags()
 							-- Output debug info if the flag isn't known
 							if not isFound(i, bit) then
 								flag_found = true;
-								console.log("{[\"byte\"] = 0x"..bizstring.hex(i)..", [\"bit\"] = "..bit..", [\"name\"] = \"Name\"},");
+								console.log("{[\"byte\"] = 0x"..bizstring.hex(i)..", [\"bit\"] = "..bit..", [\"name\"] = \"Name\", [\"type\"] = \"Type\"},");
 							else
 								known_flags_found = known_flags_found + 1;
 							end
@@ -1023,7 +1038,7 @@ end
 local function setFlagByName(name)
 	local flag = getFlagByName(name);
 	if type(flag) == "table" then
-		table.insert(flag_action_queue, {["type"]="set", ["byte"]=flag["byte"], ["bit"]=flag["bit"], ["name"]=name});
+		table.insert(flag_action_queue, {["type"]="set", ["byte"]=flag["byte"], ["bit"]=flag["bit"], ["name"]=name, ["type"]=flag["type"]});
 		process_flag_queue();
 	end
 end
@@ -1031,7 +1046,7 @@ end
 local function clearFlagByName(name)
 	local flag = getFlagByName(name);
 	if type(flag) == "table" then
-		table.insert(flag_action_queue, {["type"]="clear", ["byte"]=flag["byte"], ["bit"]=flag["bit"], ["name"]=name});
+		table.insert(flag_action_queue, {["type"]="clear", ["byte"]=flag["byte"], ["bit"]=flag["bit"], ["name"]=name, ["type"]=flag["type"]});
 		process_flag_queue();
 	end
 end	
@@ -1044,10 +1059,68 @@ local function flagClearButtonHandler()
 	clearFlagByName(forms.getproperty(options_flag_dropdown, "SelectedItem"));
 end
 
+local function formatOutputString(caption, value, max)
+	console.log(caption..value.."/"..max.." or "..round(value/max * 100,2).."%");
+end
+
 function flagStats()
+	local fairies_known = 0;
+	local blueprints_known = 0;
+	local warps_known = 0;
+	local cb_known = 0;
+	local gb_known = 0;
+	local crowns_known = 0;
+	local coins_known = 0;
+	
+	local i, flag, name;
+	for i=1,#flag_array do
+		flag = flag_array[i];
+		name = flag["name"];
+		_type = flag["type"];
+		if _type == "Fairy" then
+			fairies_known = fairies_known + 1;
+		end
+		if _type == "Blueprint" then
+			blueprints_known = blueprints_known + 1;
+			if bizstring.contains(_type, "Turned") then
+				gb_known = gb_known + 1;
+			end
+		end
+		if _type == "Warp" then
+			warps_known = warps_known + 1;
+		end
+		if _type == "GB" then
+			gb_known = gb_known + 1;
+		end
+		if _type == "CB" then
+			cb_known = cb_known + 1;
+		end
+		if _type == "Bunch" then
+			cb_known = cb_known + 5;
+		end
+		if _type == "Balloon" then
+			cb_known = cb_known + 10;
+		end
+		if _type == "Crown" then
+			crowns_known = crowns_known + 1;
+		end
+		if _type == "Coin" then
+			coins_known = coins_known + 1;
+		end
+	end
+
 	local knownFlags = #flag_array;
 	local totalFlags = flag_block_size * 8;
-	console.log("Flags known: "..knownFlags.."/"..totalFlags.." or "..round(knownFlags/totalFlags * 100,2).."%");
+
+	formatOutputString("Flags known: ", knownFlags, totalFlags);
+	console.log();
+	formatOutputString("Fairies: ", fairies_known, max_fairies);
+	formatOutputString("Blueprints: ", blueprints_known, max_blueprints);
+	formatOutputString("Crowns: ", crowns_known, max_crowns);
+	formatOutputString("Warps: ", warps_known, max_warps);
+	formatOutputString("CB: ", cb_known, max_cb);
+	formatOutputString("GB: ", gb_known, max_gb);
+	console.log("Coins: "..coins_known);
 end
 flagStats();
 
@@ -1057,18 +1130,21 @@ flagStats();
 
 function Game.detectVersion(romName)
 	if bizstring.contains(romName, "USA") and not bizstring.contains(romName, "Kiosk") then
-		map                 = 0x7444E7;
-		file                = 0x7467c8;
-		flag_pointer        = 0x7654F4;
-		menu_flags          = 0x7ed558;
-		kong_object_pointer = 0x7fbb4d;
-		camera_pointer      = 0x7fb968;
-		tb_void_byte        = 0x7fbb63;
-		pointer_list        = 0x7fbff0;
-		kongbase            = 0x7fc950;
-		global_base         = 0x7fcc41;
-		security_byte       = 0x7552E0;
-		security_message    = 0x75E5DC;
+		map                    = 0x7444E7;
+		file                   = 0x7467c8;
+		flag_pointer           = 0x7654F4;
+		menu_flags             = 0x7ed558;
+		kong_object_pointer    = 0x7fbb4d;
+		camera_pointer         = 0x7fb968;
+		tb_void_byte           = 0x7fbb63;
+		pointer_list           = 0x7fbff0;
+		kongbase               = 0x7fc950;
+		global_base            = 0x7fcc41;
+		security_byte          = 0x7552E0;
+		security_message       = 0x75E5DC;
+		frames_lag             = 0x76AF10;
+		frames_real            = 0x7F0560;
+		geometry_spike_pointer = 0x76FDF8;
 
 		--Mad Jack
 		MJ_state_pointer      = 0x7fdc91;
@@ -1086,18 +1162,21 @@ function Game.detectVersion(romName)
 		jetman_x_position  = 0x02F050;
 		jetman_y_position  = 0x02F054;
 	elseif bizstring.contains(romName, "Europe") then
-		map                 = 0x73EC37;
-		file                = 0x740F18;
-		flag_pointer        = 0x760014;
-		menu_flags          = 0x7ed478;
-		kong_object_pointer = 0x7fba6d;
-		camera_pointer      = 0x7fb888;
-		tb_void_byte        = 0x7FBA83;
-		pointer_list        = 0x7fbf10;
-		kongbase            = 0x7fc890;
-		global_base         = 0x7fcb81;
-		security_byte       = 0x74FB60;
-		security_message    = 0x7590F0;
+		map                    = 0x73EC37;
+		file                   = 0x740F18;
+		flag_pointer           = 0x760014;
+		menu_flags             = 0x7ed478;
+		kong_object_pointer    = 0x7fba6d;
+		camera_pointer         = 0x7fb888;
+		tb_void_byte           = 0x7FBA83;
+		pointer_list           = 0x7fbf10;
+		kongbase               = 0x7fc890;
+		global_base            = 0x7fcb81;
+		security_byte          = 0x74FB60;
+		security_message       = 0x7590F0;
+		frames_lag             = 0x765A30;
+		frames_real            = 0x7F0480;
+		geometry_spike_pointer = 0x76A918;
 
 		--Mad Jack
 		MJ_state_pointer      = 0x7FDBD1;
@@ -1115,18 +1194,21 @@ function Game.detectVersion(romName)
 		jetman_x_position  = 0x022100;
 		jetman_y_position  = 0x022104;
 	elseif bizstring.contains(romName, "Japan") then
-		map                 = 0x743DA7;
-		file                = 0x746088;
-		flag_pointer        = 0x7656E4;
-		menu_flags          = 0x7ed9c8;
-		kong_object_pointer = 0x7fbfbd;
-		camera_pointer      = 0x7fbdd8;
-		tb_void_byte        = 0x7FBFD3;
-		pointer_list        = 0x7fc460;
-		kongbase            = 0x7fcde0;
-		global_base         = 0x7fd0d1;
-		security_byte       = 0x7553A0;
-		security_message    = 0x75E790;
+		map                    = 0x743DA7;
+		file                   = 0x746088;
+		flag_pointer           = 0x7656E4;
+		menu_flags             = 0x7ed9c8;
+		kong_object_pointer    = 0x7fbfbd;
+		camera_pointer         = 0x7fbdd8;
+		tb_void_byte           = 0x7FBFD3;
+		pointer_list           = 0x7fc460;
+		kongbase               = 0x7fcde0;
+		global_base            = 0x7fd0d1;
+		security_byte          = 0x7553A0;
+		security_message       = 0x75E790;
+		frames_lag             = 0x76B100;
+		frames_real            = 0x7F09D0;
+		geometry_spike_pointer = 0x76FFE8;
 
 		--Mad Jack
 		MJ_state_pointer      = 0x7fe121;
@@ -1653,7 +1735,6 @@ end
 
 local spiking_fix = false;
 local freeze_value = 0;
-local geometry_spike_pointer = 0x76FDF8; -- TODO: Find on PAL & JP
 
 local function fix_geometry_spiking()
 	spiking_fix = true;
@@ -1680,10 +1761,6 @@ local options_increase_lag_factor_button;
 local options_lag_factor_value_label;
 
 local lag_factor = 1;
-
--- TODO: Find for other versions
-local frames_real = 0x7F0560;
-local frames_lag = 0x76AF10;
 
 local function increase_lag_factor()
 	lag_factor = lag_factor + 1;
