@@ -12,6 +12,8 @@ local kongbase;
 local tb_void_byte;
 local menu_flags;
 local map;
+local security_byte;
+local security_message;
 
 ---------------------------
 -- Arcade specific state --
@@ -428,11 +430,10 @@ local flag_array = {
 	---------------------------
 
 	{["byte"] = 0x30, ["bit"] = 7, ["name"] = "? All training barrels comeplete cutscene ?"}, -- TODO: Test this
-	
+
 	{["byte"] = 0x61, ["bit"] = 1, ["name"] = "?? Training barrels spawned?"}, -- TODO: Test this
-	
+
 	{["byte"] = 0x38, ["bit"] = 5, ["name"] = "Japes: Entered Japes (1)"}, -- TODO: Test this
-	{["byte"] = 0x61, ["bit"] = 3, ["name"] = "Japes: Entered Japes (2)"}, -- TODO: Test this
 
 	{["byte"] = 0x31, ["bit"] = 3, ["name"] = "? Japes W3 Right CB Bunch"}, -- TODO: Test this
 	{["byte"] = 0x64, ["bit"] = 7, ["name"] = "? Japes W3 Right CB Bunch"}, -- TODO: Test this
@@ -444,9 +445,8 @@ local flag_array = {
 	{["byte"] = 0x20, ["bit"] = 0, ["name"] = "Fungi: Day/Night First Time CS"}, -- TODO: Test this
 
 	{["byte"] = 0x31, ["bit"] = 4, ["name"] = "Fungi: DK Coin by BBlast or First Coin?"}, -- TODO: Test this
-	
+
 	{["byte"] = 0x39, ["bit"] = 4, ["name"] = "? Enter Helm/W1"},
-	{["byte"] = 0x62, ["bit"] = 2, ["name"] = "??? Enter Helm/W1"},
 
 	-----------
 	-- Known --
@@ -500,14 +500,37 @@ local flag_array = {
 	{["byte"] = 0x05, ["bit"] = 3, ["name"] = "Japes: Rambi Door Smashed"}, -- TODO: Test this
 	{["byte"] = 0x05, ["bit"] = 6, ["name"] = "Japes: T&S Despawned"}, -- TODO: Test this
 
+	{["byte"] = 0x06, ["bit"] = 0, ["name"] = "Aztec: DK Blueprint room open"},
+
 	{["byte"] = 0x08, ["bit"] = 2, ["name"] = "Kong Unlocked: Tiny"},
 	{["byte"] = 0x08, ["bit"] = 6, ["name"] = "Kong Unlocked: Lanky"},
 	{["byte"] = 0x09, ["bit"] = 2, ["name"] = "Key 2"},
 
+	{["byte"] = 0x0B, ["bit"] = 4, ["name"] = "Aztec: Llama Cutscene"}, -- TODO: Bananas in this hallway were skipped with block size 0x80
+	{["byte"] = 0x0B, ["bit"] = 5, ["name"] = "Aztec: Lanky's help me cutscene"},
+	{["byte"] = 0x0B, ["bit"] = 7, ["name"] = "Aztec: FT Cutscene"},
+	
+	{["byte"] = 0x0D, ["bit"] = 5, ["name"] = "Factory: Hatch opened"},
+	{["byte"] = 0x0D, ["bit"] = 6, ["name"] = "? Factory: Storage room switch pressed"},
+	
 	{["byte"] = 0x0E, ["bit"] = 5, ["name"] = "Kong Unlocked: Chunky"},
+	{["byte"] = 0x0E, ["bit"] = 6, ["name"] = "Factory: Lanky GB: Free Chunky"},
 	{["byte"] = 0x11, ["bit"] = 2, ["name"] = "Key 3"},
-	{["byte"] = 0x11, ["bit"] = 6, ["name"] = "Factory: Storage Room W1"},
+	{["byte"] = 0x11, ["bit"] = 4, ["name"] = "Factory: Chunky's help me cutscene"},
+	
+	{["byte"] = 0x11, ["bit"] = 5, ["name"] = "Factory: W1 (Foyer)"},
+	{["byte"] = 0x11, ["bit"] = 6, ["name"] = "Factory: W1 (Storage Room)"},
+	{["byte"] = 0x11, ["bit"] = 7, ["name"] = "Factory: W2 (Foyer)"},
+	-- TODO W2
+	{["byte"] = 0x12, ["bit"] = 1, ["name"] = "Factory: W3 (Foyer)"},
+	{["byte"] = 0x12, ["bit"] = 2, ["name"] = "Factory: W3 (Snide's)"},
+	{["byte"] = 0x12, ["bit"] = 3, ["name"] = "Factory: W4 (Top)"},
+	{["byte"] = 0x12, ["bit"] = 4, ["name"] = "Factory: W4 (Bottom)"},
+	-- TODO W5
+	-- TODO W5
 
+	{["byte"] = 0x13, ["bit"] = 0, ["name"] = "Factory: T&S Cleared"},
+	
 	{["byte"] = 0x15, ["bit"] = 0, ["name"] = "Key 4"},
 
 	{["byte"] = 0x19, ["bit"] = 6, ["name"] = "Fungi: Nighttime"},
@@ -566,7 +589,7 @@ local flag_array = {
 
 	{["byte"] = 0x32, ["bit"] = 0, ["name"] = "Aztec Lobby: Chunky Wrinkly flipped"}, -- TODO: Test this
 	{["byte"] = 0x32, ["bit"] = 1, ["name"] = "Galleon Lobby: Chunky Switch"}, -- TODO: Test this
-	
+
 	{["byte"] = 0x32, ["bit"] = 3, ["name"] = "? Galleon Lobby: Tiny GB?"}, -- TODO: Which one actually set it
 	{["byte"] = 0x32, ["bit"] = 4, ["name"] = "Factory Lobby: DK GB"}, -- TODO: Test this
 	{["byte"] = 0x32, ["bit"] = 6, ["name"] = "Helm Lobby: Kremling Kosh GB"},
@@ -577,6 +600,8 @@ local flag_array = {
 	{["byte"] = 0x33, ["bit"] = 2, ["name"] = "Caves Lobby: Diddy GB"}, -- TODO: Test this
 	{["byte"] = 0x33, ["bit"] = 3, ["name"] = "Caves Lobby: DK GB"}, -- TODO: Test this
 	{["byte"] = 0x33, ["bit"] = 5, ["name"] = "Caves Lobby: Boulder on pad"}, -- TODO: Test this
+
+	{["byte"] = 0x33, ["bit"] = 7, ["name"] = "Castle Lobby: Searchlight seek GB"},
 
 	{["byte"] = 0x34, ["bit"] = 1, ["name"] = "Helm Lobby: W1 (Enterance)"},
 	{["byte"] = 0x34, ["bit"] = 2, ["name"] = "Helm Lobby: W1 (Far)"},
@@ -626,19 +651,47 @@ local flag_array = {
 	{["byte"] = 0x3B, ["bit"] = 0, ["name"] = "Japes: Blueprint - Tiny"},
 	{["byte"] = 0x3B, ["bit"] = 1, ["name"] = "Japes: Blueprint - Chunky"},
 
+	{["byte"] = 0x3B, ["bit"] = 2, ["name"] = "Aztec: Blueprint - DK"},
+	{["byte"] = 0x3B, ["bit"] = 3, ["name"] = "Aztec: Blueprint - Diddy"},
+	{["byte"] = 0x3B, ["bit"] = 4, ["name"] = "Aztec: Blueprint - Lanky"},
+	{["byte"] = 0x3B, ["bit"] = 5, ["name"] = "Aztec: Blueprint - Tiny"},
+	{["byte"] = 0x3B, ["bit"] = 6, ["name"] = "Aztec: Blueprint - Chunky"},
+
+	{["byte"] = 0x3B, ["bit"] = 7, ["name"] = "Factory: Blueprint - DK"},
+	-- TODO: Diddy
+	-- TODO: Lanky
 	{["byte"] = 0x3C, ["bit"] = 2, ["name"] = "Factory: Blueprint - Tiny"},
+	-- TODO: Chunky
 
 	{["byte"] = 0x3F, ["bit"] = 0, ["name"] = "Isles: Blueprint - DK"},
 	{["byte"] = 0x3F, ["bit"] = 1, ["name"] = "Isles: Blueprint - Diddy"},
 	{["byte"] = 0x3F, ["bit"] = 2, ["name"] = "Isles: Blueprint - Lanky"},
 	{["byte"] = 0x3F, ["bit"] = 3, ["name"] = "Isles: Blueprint - Tiny"},
 	{["byte"] = 0x3F, ["bit"] = 4, ["name"] = "Isles: Blueprint - Chunky"},
-	
+
 	{["byte"] = 0x3F, ["bit"] = 5, ["name"] = "Snide's: DK BP Turned (Japes)"},
 	{["byte"] = 0x3F, ["bit"] = 6, ["name"] = "Snide's: Diddy BP Turned (Japes)"},
 	{["byte"] = 0x3F, ["bit"] = 7, ["name"] = "Snide's: Lanky BP Turned (Japes)"},
 	{["byte"] = 0x40, ["bit"] = 0, ["name"] = "Snide's: Tiny BP Turned (Japes)"},
 	{["byte"] = 0x40, ["bit"] = 1, ["name"] = "Snide's: Chunky BP Turned (Japes)"},
+
+	{["byte"] = 0x40, ["bit"] = 2, ["name"] = "Snide's: DK BP Turned (Aztec)"},
+	{["byte"] = 0x40, ["bit"] = 3, ["name"] = "Snide's: Diddy BP Turned (Aztec)"},
+	{["byte"] = 0x40, ["bit"] = 4, ["name"] = "Snide's: Lanky BP Turned (Aztec)"},
+	{["byte"] = 0x40, ["bit"] = 5, ["name"] = "Snide's: Tiny BP Turned (Aztec)"},
+	{["byte"] = 0x40, ["bit"] = 6, ["name"] = "Snide's: Chunky BP Turned (Aztec)"},
+
+	{["byte"] = 0x40, ["bit"] = 7, ["name"] = "Snide's: DK BP Turned (Factory)"},
+	-- TODO: Diddy BP
+	-- TODO: Lanky BP
+	{["byte"] = 0x41, ["bit"] = 2, ["name"] = "Snide's: Tiny BP Turned (Factory)"},
+	-- TODO: Chunky BP
+
+	{["byte"] = 0x44, ["bit"] = 0, ["name"] = "Snide's: DK BP Turned (Isles)"},
+	{["byte"] = 0x44, ["bit"] = 1, ["name"] = "Snide's: Diddy BP Turned (Isles)"},
+	{["byte"] = 0x44, ["bit"] = 2, ["name"] = "Snide's: Lanky BP Turned (Isles)"},
+	{["byte"] = 0x44, ["bit"] = 3, ["name"] = "Snide's: Tiny BP Turned (Isles)"},
+	{["byte"] = 0x44, ["bit"] = 4, ["name"] = "Snide's: Chunky BP Turned (Isles)"},
 	
 	{["byte"] = 0x44, ["bit"] = 5, ["name"] = "? Japes: DK CB: Balloon by Underground or Banana Medal"}, -- TODO: Test this
 	{["byte"] = 0x44, ["bit"] = 7, ["name"] = "Japes: Lanky Banana Medal"},
@@ -686,10 +739,14 @@ local flag_array = {
 	{["byte"] = 0x59, ["bit"] = 6, ["name"] = "Isles: Rainbow Coin (K. Lumsy)"},
 
 	{["byte"] = 0x5C, ["bit"] = 3, ["name"] = "Castle Lobby: Rainbow Coin"},
-	
+
 	{["byte"] = 0x60, ["bit"] = 5, ["name"] = "Helm: W1 (Enterance)"},
 	{["byte"] = 0x60, ["bit"] = 6, ["name"] = "Helm: W1 (Far)"},
-	
+
+	{["byte"] = 0x61, ["bit"] = 3, ["name"] = "Japes: FTT"},
+	{["byte"] = 0x62, ["bit"] = 2, ["name"] = "Helm: FTT"},
+	{["byte"] = 0x62, ["bit"] = 3, ["name"] = "Aztec: FTT"},
+
 	{["byte"] = 0x64, ["bit"] = 0, ["name"] = "Japes: Chunky Coin: By portal (1)"},
 	{["byte"] = 0x64, ["bit"] = 1, ["name"] = "Japes: Chunky Coin: In water (1)"},
 	{["byte"] = 0x64, ["bit"] = 2, ["name"] = "Japes: Tiny CB: Tunnel to main area (1)"},
@@ -993,6 +1050,8 @@ function Game.detectVersion(romName)
 		pointer_list        = 0x7fbff0;
 		kongbase            = 0x7fc950;
 		global_base         = 0x7fcc41;
+		security_byte       = 0x7552E0;
+		security_message    = 0x75E5DC; -- TODO: Find on PAL & JP
 
 		--Mad Jack
 		MJ_state_pointer      = 0x7fdc91;
@@ -1020,6 +1079,8 @@ function Game.detectVersion(romName)
 		pointer_list        = 0x7fbf10;
 		kongbase            = 0x7fc890;
 		global_base         = 0x7fcb81;
+		security_byte       = 0x74FB60;
+		security_message    = 0x7590F0;
 
 		--Mad Jack
 		MJ_state_pointer      = 0x7FDBD1;
@@ -1047,6 +1108,8 @@ function Game.detectVersion(romName)
 		pointer_list        = 0x7fc460;
 		kongbase            = 0x7fcde0;
 		global_base         = 0x7fd0d1;
+		security_byte       = 0x7553A0;
+		security_message    = 0x75E5DC; -- TODO: Find
 
 		--Mad Jack
 		MJ_state_pointer      = 0x7fe121;
@@ -1689,12 +1752,10 @@ end
 brb_message = "BRB";
 brb = false;
 
-local security_byte = 0x7552E0; -- TODO: Find on PAL & JP
-local security_message = 0x75E5DC; -- TODO: Find on PAL & JP
 local brb_message_max_length = 79;
 
 local function do_brb()
-	if is_brb then
+	if brb then
 		mainmemory.writebyte(security_byte, 0x01);
 		local i;
 		local message_length = math.min(string.len(brb_message), brb_message_max_length);

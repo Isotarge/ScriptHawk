@@ -7,4 +7,5 @@ SystemID N64
 743DA7	b	u	1	RDRAM	Map
 746088	b	u	1	RDRAM	File
 7FBFD3	b	h	1	RDRAM	TB Void Byte
+7553A0	b	h	1	RDRAM	Security Byte
 
