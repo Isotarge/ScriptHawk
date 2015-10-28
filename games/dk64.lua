@@ -6,7 +6,6 @@ local Game = {};
 
 local kong_object_pointer;
 local camera_pointer;
-local training_barrel;
 local pointer_list;
 local global_base;
 local kongbase;
@@ -291,7 +290,7 @@ Game.maps = {
 
 function Game.unlock_menus()
 	for byte=0,7 do
-		mainmemory.write_u8(menu_flags + byte, 0xFF);
+		mainmemory.writebyte(menu_flags + byte, 0xFF);
 	end
 end
 
@@ -335,20 +334,6 @@ local weapon     = 2;
 local instrument = 4;
 local coins      = 7;
 local lives      = 9; -- This is used as instrument ammo in single player
-
-local function unlock_moves()
-	local kong;
-	for kong=DK,Chunky do
-		local base = kongbase + kong * 0x5E;
-		mainmemory.write_u8(base + moves,      3);
-		mainmemory.write_u8(base + sim_slam,   3);
-		mainmemory.write_u8(base + weapon,     7);
-		mainmemory.write_u8(base + instrument, 15);
-	end
-
-	-- Training barrels
-	mainmemory.write_u8(training_barrel, 0xFF);
-end
 
 ------------------------------------
 -- Moonjump BizHawk Lua port      --
@@ -441,8 +426,9 @@ local flag_array = {
 	---------------------------
 	-- Needs further testing --
 	---------------------------
+
+	{["byte"] = 0x30, ["bit"] = 7, ["name"] = "? All training barrels comeplete cutscene ?"}, -- TODO: Test this
 	
-	{["byte"] = 0x2F, ["bit"] = 7, ["name"] = "? Training barrels spwaned?"}, -- TODO: Test this
 	{["byte"] = 0x61, ["bit"] = 1, ["name"] = "?? Training barrels spawned?"}, -- TODO: Test this
 	
 	{["byte"] = 0x38, ["bit"] = 5, ["name"] = "Japes: Entered Japes (1)"}, -- TODO: Test this
@@ -472,7 +458,7 @@ local flag_array = {
 	{["byte"] = 0x00, ["bit"] = 3, ["name"] = "Japes: DK: Babboon blast GB"},
 	{["byte"] = 0x00, ["bit"] = 4, ["name"] = "Japes: DK: GB in front of Diddy's cage"}, -- TODO: Test this
 	{["byte"] = 0x00, ["bit"] = 5, ["name"] = "Japes: DK: GB in Diddy's cage"}, -- TODO: Test this
-	{["byte"] = 0x00, ["bit"] = 6, ["name"] = "Kong: Diddy unlocked"},
+	{["byte"] = 0x00, ["bit"] = 6, ["name"] = "Kong Unlocked: Diddy"},
 	{["byte"] = 0x00, ["bit"] = 7, ["name"] = "Japes: Feather gate open"},
 
 	{["byte"] = 0x01, ["bit"] = 0, ["name"] = "Japes: Tiny: Stump GB"},
@@ -514,11 +500,11 @@ local flag_array = {
 	{["byte"] = 0x05, ["bit"] = 3, ["name"] = "Japes: Rambi Door Smashed"}, -- TODO: Test this
 	{["byte"] = 0x05, ["bit"] = 6, ["name"] = "Japes: T&S Despawned"}, -- TODO: Test this
 
-	{["byte"] = 0x08, ["bit"] = 2, ["name"] = "Kong: Tiny unlocked"},
-	{["byte"] = 0x08, ["bit"] = 6, ["name"] = "Kong: Lanky unlocked"},
+	{["byte"] = 0x08, ["bit"] = 2, ["name"] = "Kong Unlocked: Tiny"},
+	{["byte"] = 0x08, ["bit"] = 6, ["name"] = "Kong Unlocked: Lanky"},
 	{["byte"] = 0x09, ["bit"] = 2, ["name"] = "Key 2"},
 
-	{["byte"] = 0x0E, ["bit"] = 5, ["name"] = "Kong: Chunky unlocked"},
+	{["byte"] = 0x0E, ["bit"] = 5, ["name"] = "Kong Unlocked: Chunky"},
 	{["byte"] = 0x11, ["bit"] = 2, ["name"] = "Key 3"},
 	{["byte"] = 0x11, ["bit"] = 6, ["name"] = "Factory: Storage Room W1"},
 
@@ -559,18 +545,20 @@ local flag_array = {
 	{["byte"] = 0x2F, ["bit"] = 0, ["name"] = "Wrinkly FTT"}, -- TODO: Test this
 	{["byte"] = 0x2F, ["bit"] = 1, ["name"] = "? Isles: Flobby fairy or Fairy FTT?"}, -- TODO: Test this
 
-	{["byte"] = 0x2F, ["bit"] = 1, ["name"] = "Camera/Shockwave"}, -- TODO: Test this
+	{["byte"] = 0x2F, ["bit"] = 1, ["name"] = "Camera/Shockwave"},
+	{["byte"] = 0x2F, ["bit"] = 2, ["name"] = "Training Grounds: Treehouse Squawk Cutscene"},
 	{["byte"] = 0x2F, ["bit"] = 4, ["name"] = "Key 8"},
 	{["byte"] = 0x2F, ["bit"] = 5, ["name"] = "Isles: DK: Japes boulder GB"},
 	{["byte"] = 0x2F, ["bit"] = 6, ["name"] = "B.Locker FTT"},
+	{["byte"] = 0x2F, ["bit"] = 7, ["name"] = "Training Grounds: Barrels spwaned"}, -- TODO: Test this
 
-	{["byte"] = 0x30, ["bit"] = 1, ["name"] = "Kong: DK Freed"}, -- TODO: Test this
-	{["byte"] = 0x30, ["bit"] = 2, ["name"] = "Dive Barrel Completed"}, -- TODO: Test this
-	{["byte"] = 0x30, ["bit"] = 4, ["name"] = "Orange Barrel Completed?"}, -- TODO: Test this
-	{["byte"] = 0x30, ["bit"] = 5, ["name"] = "Barrel Barrel Completed"}, -- TODO: Test this
+	{["byte"] = 0x30, ["bit"] = 1, ["name"] = "Kong Unlocked: DK"},
+	{["byte"] = 0x30, ["bit"] = 2, ["name"] = "Training Grounds: Dive Barrel Completed"},
+	{["byte"] = 0x30, ["bit"] = 3, ["name"] = "Training Grounds: Vine Barrel Completed"},
+	{["byte"] = 0x30, ["bit"] = 4, ["name"] = "Training Grounds: Orange Barrel Completed"}, -- TODO: Test this
+	{["byte"] = 0x30, ["bit"] = 5, ["name"] = "Training Grounds: Barrel Barrel Completed"}, -- TODO: Test this
 
 	{["byte"] = 0x30, ["bit"] = 6, ["name"] = "Isles: Escape FTT"}, -- TODO: Test this
-	{["byte"] = 0x30, ["bit"] = 7, ["name"] = "Vine Barrel Completed?"}, -- TODO: Test this
 
 	{["byte"] = 0x31, ["bit"] = 5, ["name"] = "Factory Lobby: Lever pulled"}, -- TODO: Test this
 	{["byte"] = 0x31, ["bit"] = 6, ["name"] = "Japes Lobby: Lanky GB??"}, -- TODO: Test this
@@ -868,15 +856,6 @@ local function fill_flag_names()
 end
 fill_flag_names();
 
-local function getFlagFromName(flagName)
-	local i;
-	for i=1,#flag_array do
-		if flagName == flag_array[i]["name"] then
-			return flag_array[i];
-		end
-	end
-end
-
 function isFound(byte, bit)
 	local i;
 	for i=1,#flag_array do
@@ -959,20 +938,37 @@ local function process_flag_queue()
 	end
 end
 
-local function flagSet()
-	local flag = getFlagFromName(forms.getproperty(options_flag_dropdown, "SelectedItem"));
+local function getFlagByName(flagName)
+	local i;
+	for i=1,#flag_array do
+		if flagName == flag_array[i]["name"] then
+			return flag_array[i];
+		end
+	end
+end
+
+local function setFlagByName(name)
+	local flag = getFlagByName(name);
 	if type(flag) == "table" then
-		table.insert(flag_action_queue, {["type"]="set", ["byte"]=flag["byte"], ["bit"]=flag["bit"], ["name"]=flag["name"]});
+		table.insert(flag_action_queue, {["type"]="set", ["byte"]=flag["byte"], ["bit"]=flag["bit"], ["name"]=name});
 		process_flag_queue();
 	end
 end
 
-local function flagClear()
-	local flag = getFlagFromName(forms.getproperty(options_flag_dropdown, "SelectedItem"));
+local function clearFlagByName(name)
+	local flag = getFlagByName(name);
 	if type(flag) == "table" then
-		table.insert(flag_action_queue, {["type"]="clear", ["byte"]=flag["byte"], ["bit"]=flag["bit"], ["name"]=flag["name"]});
+		table.insert(flag_action_queue, {["type"]="clear", ["byte"]=flag["byte"], ["bit"]=flag["bit"], ["name"]=name});
 		process_flag_queue();
 	end
+end	
+
+local function flagSetButtonHandler()
+	setFlagByName(forms.getproperty(options_flag_dropdown, "SelectedItem"));
+end
+
+local function flagClearButtonHandler()
+	clearFlagByName(forms.getproperty(options_flag_dropdown, "SelectedItem"));
 end
 
 function flagStats()
@@ -990,7 +986,6 @@ function Game.detectVersion(romName)
 		map                 = 0x7444E7;
 		file                = 0x7467c8;
 		flag_pointer        = 0x7654F4;
-		training_barrel     = 0x7ed230;
 		menu_flags          = 0x7ed558;
 		kong_object_pointer = 0x7fbb4d;
 		camera_pointer      = 0x7fb968;
@@ -1018,7 +1013,6 @@ function Game.detectVersion(romName)
 		map                 = 0x73EC37;
 		file                = 0x740F18;
 		flag_pointer        = 0x760014;
-		training_barrel     = 0x7ed150;
 		menu_flags          = 0x7ed478;
 		kong_object_pointer = 0x7fba6d;
 		camera_pointer      = 0x7fb888;
@@ -1046,7 +1040,6 @@ function Game.detectVersion(romName)
 		map                 = 0x743DA7;
 		file                = 0x746088;
 		flag_pointer        = 0x7656E4;
-		training_barrel     = 0x7ed84c;
 		menu_flags          = 0x7ed9c8;
 		kong_object_pointer = 0x7fbfbd;
 		camera_pointer      = 0x7fbdd8;
@@ -1073,7 +1066,6 @@ function Game.detectVersion(romName)
 	elseif bizstring.contains(romName, "Kiosk") then
 		file                = 0x7467c8; -- TODO?
 		map                 = 0x72CDE7;
-		training_barrel     = 0x7ed150; -- TODO?
 		menu_flags          = 0x7ed558; -- TODO?
 		kong_object_pointer = 0x7b5afd;
 		tb_void_byte        = 0x7fbb63; -- TODO?
@@ -1558,8 +1550,7 @@ end
 ------------------------------------
 
 -- Pointers
--- TODO - Find this in other versions
-local slope_object_pointer = 0x7f94b9;
+local slope_object_pointer = 0x7f94b9; -- TODO - Find on PAL & JP
 
 -- Relative to slope object
 local slope_timer = 0xc3;
@@ -1567,13 +1558,13 @@ local slope_timer = 0xc3;
 local function neverSlip()
 	-- Patch the slope timer
 	local slope_object = mainmemory.read_u24_be(slope_object_pointer);
-	mainmemory.write_u8(slope_object + slope_timer, 0);
+	mainmemory.writebyte(slope_object + slope_timer, 0);
 
 	-- Patch the Kong object
 	local kong_object = mainmemory.read_u24_be(kong_object_pointer);
 	local slope_value = mainmemory.read_u8(kong_object + slope_byte);
-	--mainmemory.write_u8(kong_object + slope_byte, math.max(3, slope_value));
-	mainmemory.write_u8(kong_object + slope_byte + 1, 0xFE);
+	--mainmemory.writebyte(kong_object + slope_byte, math.max(3, slope_value));
+	mainmemory.writebyte(kong_object + slope_byte + 1, 0xFE);
 end
 
 ----------------------
@@ -1582,7 +1573,7 @@ end
 
 local spiking_fix = false;
 local freeze_value = 0;
-local geometry_spike_pointer = 0x76FDF8;
+local geometry_spike_pointer = 0x76FDF8; -- TODO: Find on PAL & JP
 
 local function fix_geometry_spiking()
 	spiking_fix = true;
@@ -1695,21 +1686,14 @@ end
 -- BRB Stuff --
 ---------------
 
-local security_byte = 0x7552E0;
-local security_message = 0x75E5DC;
 brb_message = "BRB";
+brb = false;
+
+local security_byte = 0x7552E0; -- TODO: Find on PAL & JP
+local security_message = 0x75E5DC; -- TODO: Find on PAL & JP
 local brb_message_max_length = 79;
-local is_brb = false;
 
-function brb()
-	is_brb = true;
-end
-
-function back()
-	is_brb = false;
-end
-
-function do_brb()
+local function do_brb()
 	if is_brb then
 		mainmemory.writebyte(security_byte, 0x01);
 		local i;
@@ -1724,6 +1708,31 @@ end
 ------------
 -- Events --
 ------------
+
+local function unlock_moves()
+	local kong;
+	for kong=DK,Chunky do
+		local base = kongbase + kong * 0x5E;
+		mainmemory.writebyte(base + moves,      3);
+		mainmemory.writebyte(base + sim_slam,   3);
+		mainmemory.writebyte(base + weapon,     7);
+		mainmemory.writebyte(base + instrument, 15);
+	end
+
+	-- Training barrels
+	setFlagByName("Camera/Shockwave");
+	setFlagByName("Training Grounds: Dive Barrel Completed");
+	setFlagByName("Training Grounds: Orange Barrel Completed");
+	setFlagByName("Training Grounds: Barrel Barrel Completed");
+	setFlagByName("Training Grounds: Vine Barrel Completed");
+	
+	-- Kongs
+	setFlagByName("Kong Unlocked: DK");
+	setFlagByName("Kong Unlocked: Diddy");
+	setFlagByName("Kong Unlocked: Lanky");
+	setFlagByName("Kong Unlocked: Tiny");
+	setFlagByName("Kong Unlocked: Chunky");
+end
 
 function Game.setMap(value)
 	if value >= 1 and value <= #Game.maps then
@@ -1750,8 +1759,8 @@ local options_toggle_isg_timer;
 function Game.initUI(form_handle, col, row, button_height, label_offset, dropdown_offset)
 	-- Key stuff
 	options_flag_dropdown =     forms.dropdown(form_handle, flag_names, col(10) + dropdown_offset, row(0) + dropdown_offset);
-	options_set_flag_button =   forms.button(form_handle, "Set", flagSet,    col(10),     row(1), 59, button_height);
-	options_Clear_flag_button = forms.button(form_handle, "Clear", flagClear, col(13) - 5, row(1), 59, button_height);
+	options_set_flag_button =   forms.button(form_handle, "Set", flagSetButtonHandler,    col(10),     row(1), 59, button_height);
+	options_Clear_flag_button = forms.button(form_handle, "Clear", flagClearButtonHandler, col(13) - 5, row(1), 59, button_height);
 
 	-- Moon stuff
 	options_moon_mode_label =  forms.label(form_handle,  "Moon:",                    col(10),     row(2) + label_offset, 48, button_height);
@@ -1786,22 +1795,22 @@ function Game.initUI(form_handle, col, row, button_height, label_offset, dropdow
 end
 
 function Game.applyInfinites()
-	mainmemory.write_u8(global_base + standard_ammo, max_standard_ammo);
+	mainmemory.writebyte(global_base + standard_ammo, max_standard_ammo);
 	if forms.ischecked(options_toggle_homing_ammo) then
-		mainmemory.write_u8(global_base + homing_ammo, max_homing_ammo);
+		mainmemory.writebyte(global_base + homing_ammo, max_homing_ammo);
 	else
-		mainmemory.write_u8(global_base + homing_ammo, 0);
+		mainmemory.writebyte(global_base + homing_ammo, 0);
 	end
-	mainmemory.write_u8(global_base + oranges,  max_oranges);
+	mainmemory.writebyte(global_base + oranges,  max_oranges);
 	mainmemory.write_u16_be(global_base + crystals, max_crystals * 150);
-	mainmemory.write_u8(global_base + film,     max_film);
-	mainmemory.write_u8(global_base + health,   max_health);
-	mainmemory.write_u8(global_base + melons,   max_melons);
+	mainmemory.writebyte(global_base + film,     max_film);
+	mainmemory.writebyte(global_base + health,   max_health);
+	mainmemory.writebyte(global_base + melons,   max_melons);
 	local kong;
 	for kong=DK,Chunky do
 		local base = kongbase + kong * 0x5e;
-		mainmemory.write_u8(base + coins, max_coins);
-		mainmemory.write_u8(base + lives, max_musical_energy);
+		mainmemory.writebyte(base + coins, max_coins);
+		mainmemory.writebyte(base + lives, max_musical_energy);
 	end
 end
 

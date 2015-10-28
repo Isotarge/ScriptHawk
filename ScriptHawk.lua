@@ -150,7 +150,6 @@ end
 function set_bit(field, index)
 	if index < 32 then
 		local bitmask = math.pow(2, index);
-		console.log("Before: "..bizstring.binary(field).." After: "..bizstring.binary(bit.bor(bitmask, field)));
 		return bit.bor(bitmask, field);
 	end
 	return field;
