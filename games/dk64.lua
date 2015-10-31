@@ -589,16 +589,11 @@ local flag_array = {
 	{["byte"] = 0x22, ["bit"] = 4, ["name"] = "Caves: DK Rotating room GB", ["type"] = "GB"},
 	{["byte"] = 0x22, ["bit"] = 7, ["name"] = "Caves: Tiny Igloo GB", ["type"] = "GB"},
 
-	-- TODO: W1
 	{["byte"] = 0x23, ["bit"] = 4, ["name"] = "Caves: W1 (Enterance)", ["type"] = "Warp"},
 	{["byte"] = 0x23, ["bit"] = 5, ["name"] = "Caves: W2 (Enterance)", ["type"] = "Warp"},
 	{["byte"] = 0x23, ["bit"] = 6, ["name"] = "Caves: W2 (Far)", ["type"] = "Warp"},
-	-- TODO: W3
-	-- TODO: W3
-	-- TODO: W4
-	-- TODO: W4
+	{["byte"] = 0x23, ["bit"] = 7, ["name"] = "Caves: W4 (Far)", ["type"] = "Warp"},
 	{["byte"] = 0x24, ["bit"] = 2, ["name"] = "Caves: W5 (Lanky BP))", ["type"] = "Warp"},
-	-- TODO: W5
 
 	{["byte"] = 0x24, ["bit"] = 4, ["name"] = "Key 6", ["type"] = "Key"},
 	{["byte"] = 0x24, ["bit"] = 5, ["name"] = "Caves: Diddy Cabin GB (Upper)", ["type"] = "GB"},
@@ -626,7 +621,7 @@ local flag_array = {
 	{["byte"] = 0x2A, ["bit"] = 5, ["name"] = "Castle: W3 (Crypt, close)", ["type"] = "Warp"},
 	{["byte"] = 0x2A, ["bit"] = 6, ["name"] = "Castle: W3 (Crypt, far)", ["type"] = "Warp"},
 
-	{["byte"] = 0x2B, ["bit"] = 5, ["name"] = "Castle: First time cutscene", ["type"] = "Type"},
+	{["byte"] = 0x2B, ["bit"] = 5, ["name"] = "Castle: First time cutscene"},
 	
 	{["byte"] = 0x2C, ["bit"] = 3, ["name"] = "Warp pad FTT"},
 	{["byte"] = 0x2C, ["bit"] = 6, ["name"] = "Crown pad FTT"},
@@ -746,17 +741,23 @@ local flag_array = {
 	{["byte"] = 0x3C, ["bit"] = 7, ["name"] = "Galleon: Blueprint - Tiny", ["type"] = "Blueprint"},
 	{["byte"] = 0x3D, ["bit"] = 0, ["name"] = "Galleon: Blueprint - Chunky", ["type"] = "Blueprint"},
 
-	-- TODO: DK
-	-- TODO: Diddy
+	{["byte"] = 0x3D, ["bit"] = 1, ["name"] = "Fungi: Blueprint - DK", ["type"] = "Blueprint"},
+	{["byte"] = 0x3D, ["bit"] = 2, ["name"] = "Fungi: Blueprint - Diddy", ["type"] = "Blueprint"},
+	{["byte"] = 0x3D, ["bit"] = 3, ["name"] = "Fungi: Blueprint - Lanky", ["type"] = "Blueprint"},
+	{["byte"] = 0x3D, ["bit"] = 4, ["name"] = "Fungi: Blueprint - Tiny", ["type"] = "Blueprint"},
+	{["byte"] = 0x3D, ["bit"] = 5, ["name"] = "Fungi: Blueprint - Chunky", ["type"] = "Blueprint"},
+
+	{["byte"] = 0x3D, ["bit"] = 6, ["name"] = "Caves: Blueprint - DK", ["type"] = "Blueprint"},
+	{["byte"] = 0x3D, ["bit"] = 7, ["name"] = "Caves: Blueprint - Diddy", ["type"] = "Blueprint"},
 	{["byte"] = 0x3E, ["bit"] = 0, ["name"] = "Caves: Blueprint - Lanky", ["type"] = "Blueprint"},
 	{["byte"] = 0x3E, ["bit"] = 1, ["name"] = "Caves: Blueprint - Tiny", ["type"] = "Blueprint"},
 	{["byte"] = 0x3E, ["bit"] = 2, ["name"] = "Caves: Blueprint - Chunky", ["type"] = "Blueprint"},
 
-	-- TODO: DK
-	-- TODO: Diddy
+	{["byte"] = 0x3E, ["bit"] = 3, ["name"] = "Castle: Blueprint - DK", ["type"] = "Blueprint"},
+	{["byte"] = 0x3E, ["bit"] = 4, ["name"] = "Castle: Blueprint - Diddy", ["type"] = "Blueprint"},
 	{["byte"] = 0x3E, ["bit"] = 5, ["name"] = "Castle: Blueprint - Lanky", ["type"] = "Blueprint"},
 	{["byte"] = 0x3E, ["bit"] = 6, ["name"] = "Castle: Blueprint - Tiny", ["type"] = "Blueprint"},
-	-- TODO: Chunky
+	{["byte"] = 0x3E, ["bit"] = 7, ["name"] = "Castle: Blueprint - Chunky", ["type"] = "Blueprint"},
 
 	{["byte"] = 0x3F, ["bit"] = 0, ["name"] = "Isles: Blueprint - DK", ["type"] = "Blueprint"},
 	{["byte"] = 0x3F, ["bit"] = 1, ["name"] = "Isles: Blueprint - Diddy", ["type"] = "Blueprint"},
@@ -788,6 +789,18 @@ local flag_array = {
 	{["byte"] = 0x41, ["bit"] = 7, ["name"] = "Snide's: Tiny BP Turned (Galleon)", ["type"] = "Blueprint"},
 	{["byte"] = 0x42, ["bit"] = 0, ["name"] = "Snide's: Chunky BP Turned (Galleon)", ["type"] = "Blueprint"},
 
+	{["byte"] = 0x42, ["bit"] = 1, ["name"] = "Snide's: DK BP Turned (Fungi)", ["type"] = "Blueprint"},
+	-- TODO: Diddy
+	-- TODO: Lanky
+	-- TODO: Tiny
+	-- TODO: Chunky
+	
+	{["byte"] = 0x42, ["bit"] = 6, ["name"] = "Snide's: DK BP Turned (Caves)", ["type"] = "Blueprint"},
+	{["byte"] = 0x42, ["bit"] = 7, ["name"] = "Snide's: Diddy BP Turned (Caves)", ["type"] = "Blueprint"},
+	{["byte"] = 0x43, ["bit"] = 0, ["name"] = "Snide's: Lanky BP Turned (Caves)", ["type"] = "Blueprint"},
+	{["byte"] = 0x43, ["bit"] = 1, ["name"] = "Snide's: Tiny BP Turned (Caves)", ["type"] = "Blueprint"},
+	{["byte"] = 0x43, ["bit"] = 2, ["name"] = "Snide's: Chunky BP Turned (Caves)", ["type"] = "Blueprint"},
+	
 	{["byte"] = 0x44, ["bit"] = 0, ["name"] = "Snide's: DK BP Turned (Isles)", ["type"] = "Blueprint"},
 	{["byte"] = 0x44, ["bit"] = 1, ["name"] = "Snide's: Diddy BP Turned (Isles)", ["type"] = "Blueprint"},
 	{["byte"] = 0x44, ["bit"] = 2, ["name"] = "Snide's: Lanky BP Turned (Isles)", ["type"] = "Blueprint"},
@@ -854,6 +867,7 @@ local flag_array = {
 	{["byte"] = 0x54, ["bit"] = 4, ["name"] = "Isles: Rainbow Coin (Fungi Lobby Enterance)?", ["type"] = "Rainbow Coin"},
 	{["byte"] = 0x54, ["bit"] = 5, ["name"] = "Isles: Rainbow Coin (Slope leading to Aztec Lobby)", ["type"] = "Rainbow Coin"},
 	{["byte"] = 0x54, ["bit"] = 6, ["name"] = "Isles: Rainbow Coin (Aztec Lobby Roof)", ["type"] = "Rainbow Coin"},
+	{["byte"] = 0x56, ["bit"] = 2, ["name"] = "Fungi: Rainbow Coin", ["type"] = "Rainbow Coin"},
 	{["byte"] = 0x57, ["bit"] = 0, ["name"] = "Fungi: Balloon - DK Mill", ["type"] = "Balloon"},
 	{["byte"] = 0x57, ["bit"] = 2, ["name"] = "Fungi: Balloon - Lanky Lower Mushroom", ["type"] = "Balloon"},
 	{["byte"] = 0x59, ["bit"] = 1, ["name"] = "Castle: Rainbow Coin (Snide's)", ["type"] = "Rainbow Coin"},
@@ -867,6 +881,7 @@ local flag_array = {
 	{["byte"] = 0x60, ["bit"] = 6, ["name"] = "Helm: W1 (Far)"},
 
 	{["byte"] = 0x61, ["bit"] = 3, ["name"] = "Japes: FTT"},
+	{["byte"] = 0x62, ["bit"] = 0, ["name"] = "Castle: FTT"},
 	{["byte"] = 0x62, ["bit"] = 1, ["name"] = "T&S FTT"},
 	{["byte"] = 0x62, ["bit"] = 2, ["name"] = "Helm: FTT"},
 	{["byte"] = 0x62, ["bit"] = 3, ["name"] = "Aztec: FTT"},
@@ -1047,6 +1062,31 @@ local flag_array = {
 	{["byte"] = 0xD1, ["bit"] = 5, ["name"] = "Galleon: Chunky coin around BP (3)", ["type"] = "Coin"},
 	{["byte"] = 0xD1, ["bit"] = 6, ["name"] = "Galleon: Chunky coin around BP (4)", ["type"] = "Coin"},
 	{["byte"] = 0xD1, ["bit"] = 7, ["name"] = "Galleon: Chunky coin around BP (5)", ["type"] = "Coin"},
+
+	{["byte"] = 0xDC, ["bit"] = 0, ["name"] = "Fungi: DK CB: Blue tunnel (1)", ["type"] = "CB"},
+	{["byte"] = 0xDC, ["bit"] = 1, ["name"] = "Fungi: DK CB: Blue tunnel (2)", ["type"] = "CB"},
+	{["byte"] = 0xDC, ["bit"] = 2, ["name"] = "Fungi: DK CB: Blue tunnel (3)", ["type"] = "CB"},
+	{["byte"] = 0xDC, ["bit"] = 3, ["name"] = "Fungi: DK CB: Blue tunnel (4)", ["type"] = "CB"},
+	{["byte"] = 0xDC, ["bit"] = 4, ["name"] = "Fungi: DK CB: Blue tunnel (5)", ["type"] = "CB"},
+
+	{["byte"] = 0xDD, ["bit"] = 3, ["name"] = "Fungi: DK CB: Pink tunnel (1)", ["type"] = "CB"},
+	{["byte"] = 0xDD, ["bit"] = 4, ["name"] = "Fungi: DK CB: Pink tunnel (2)", ["type"] = "CB"},
+	{["byte"] = 0xDD, ["bit"] = 5, ["name"] = "Fungi: DK CB: Pink tunnel (3)", ["type"] = "CB"},
+	{["byte"] = 0xDD, ["bit"] = 6, ["name"] = "Fungi: DK CB: Pink tunnel (4)", ["type"] = "CB"},
+	{["byte"] = 0xDD, ["bit"] = 7, ["name"] = "Fungi: DK CB: Pink tunnel (5)", ["type"] = "CB"},
+
+	{["byte"] = 0xEA, ["bit"] = 0, ["name"] = "Fungi: Lanky CB: Gold tunnel (1)", ["type"] = "CB"},
+	{["byte"] = 0xEA, ["bit"] = 1, ["name"] = "Fungi: Lanky CB: Gold tunnel (2)", ["type"] = "CB"},
+	{["byte"] = 0xEA, ["bit"] = 2, ["name"] = "Fungi: Lanky CB: Gold tunnel (3)", ["type"] = "CB"},
+	{["byte"] = 0xEA, ["bit"] = 3, ["name"] = "Fungi: Lanky CB: Gold tunnel (4)", ["type"] = "CB"},
+	{["byte"] = 0xEA, ["bit"] = 4, ["name"] = "Fungi: Lanky CB: Gold tunnel (5)", ["type"] = "CB"},
+	{["byte"] = 0xEA, ["bit"] = 5, ["name"] = "Fungi: Lanky CB: Gold tunnel (6)", ["type"] = "CB"},
+	{["byte"] = 0xEA, ["bit"] = 6, ["name"] = "Fungi: Lanky CB: Gold tunnel (7)", ["type"] = "CB"},
+	{["byte"] = 0xEA, ["bit"] = 7, ["name"] = "Fungi: Lanky CB: Gold tunnel (8)", ["type"] = "CB"},
+	{["byte"] = 0xEB, ["bit"] = 6, ["name"] = "Fungi: Lanky CB: Gold tunnel (9)", ["type"] = "CB"},
+	{["byte"] = 0xEB, ["bit"] = 7, ["name"] = "Fungi: Lanky CB: Gold tunnel (10)", ["type"] = "CB"},
+
+	{["byte"] = 0x106, ["bit"] = 1, ["name"] = "Caves: Diddy CB: Bunch on W4 (far)", ["type"] = "Bunch"},
 
 	{["byte"] = 0x11A, ["bit"] = 0, ["name"] = "Castle: DK bridge CB (1)", ["type"] = "CB"},
 	{["byte"] = 0x11B, ["bit"] = 5, ["name"] = "Castle: DK bridge CB (2)", ["type"] = "CB"},
