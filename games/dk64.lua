@@ -790,28 +790,32 @@ local flag_array = {
 	{["byte"] = 0x42, ["bit"] = 0, ["name"] = "Snide's: Chunky BP Turned (Galleon)", ["type"] = "Blueprint"},
 
 	{["byte"] = 0x42, ["bit"] = 1, ["name"] = "Snide's: DK BP Turned (Fungi)", ["type"] = "Blueprint"},
-	-- TODO: Diddy
-	-- TODO: Lanky
-	-- TODO: Tiny
-	-- TODO: Chunky
-	
+	{["byte"] = 0x42, ["bit"] = 2, ["name"] = "Snide's: Diddy BP Turned (Fungi)", ["type"] = "Blueprint"},
+	{["byte"] = 0x42, ["bit"] = 3, ["name"] = "Snide's: Lanky BP Turned (Fungi)", ["type"] = "Blueprint"},
+	{["byte"] = 0x42, ["bit"] = 4, ["name"] = "Snide's: Tiny BP Turned (Fungi)", ["type"] = "Blueprint"},
+	{["byte"] = 0x42, ["bit"] = 5, ["name"] = "Snide's: Chunky BP Turned (Fungi)", ["type"] = "Blueprint"},
+
 	{["byte"] = 0x42, ["bit"] = 6, ["name"] = "Snide's: DK BP Turned (Caves)", ["type"] = "Blueprint"},
 	{["byte"] = 0x42, ["bit"] = 7, ["name"] = "Snide's: Diddy BP Turned (Caves)", ["type"] = "Blueprint"},
 	{["byte"] = 0x43, ["bit"] = 0, ["name"] = "Snide's: Lanky BP Turned (Caves)", ["type"] = "Blueprint"},
 	{["byte"] = 0x43, ["bit"] = 1, ["name"] = "Snide's: Tiny BP Turned (Caves)", ["type"] = "Blueprint"},
 	{["byte"] = 0x43, ["bit"] = 2, ["name"] = "Snide's: Chunky BP Turned (Caves)", ["type"] = "Blueprint"},
-	
+
+	{["byte"] = 0x43, ["bit"] = 3, ["name"] = "Snide's: DK BP Turned (Castle)", ["type"] = "Blueprint"},
+	{["byte"] = 0x43, ["bit"] = 4, ["name"] = "Snide's: Diddy BP Turned (Castle)", ["type"] = "Blueprint"},
+	{["byte"] = 0x43, ["bit"] = 5, ["name"] = "Snide's: Lanky BP Turned (Castle)", ["type"] = "Blueprint"},
+	{["byte"] = 0x43, ["bit"] = 6, ["name"] = "Snide's: Tiny BP Turned (Castle)", ["type"] = "Blueprint"},
+	{["byte"] = 0x43, ["bit"] = 7, ["name"] = "Snide's: Chunky BP Turned (Castle)", ["type"] = "Blueprint"},
+
 	{["byte"] = 0x44, ["bit"] = 0, ["name"] = "Snide's: DK BP Turned (Isles)", ["type"] = "Blueprint"},
 	{["byte"] = 0x44, ["bit"] = 1, ["name"] = "Snide's: Diddy BP Turned (Isles)", ["type"] = "Blueprint"},
 	{["byte"] = 0x44, ["bit"] = 2, ["name"] = "Snide's: Lanky BP Turned (Isles)", ["type"] = "Blueprint"},
 	{["byte"] = 0x44, ["bit"] = 3, ["name"] = "Snide's: Tiny BP Turned (Isles)", ["type"] = "Blueprint"},
 	{["byte"] = 0x44, ["bit"] = 4, ["name"] = "Snide's: Chunky BP Turned (Isles)", ["type"] = "Blueprint"},
 
-	{["byte"] = 0x44, ["bit"] = 5, ["name"] = "? Japes: DK CB: Balloon by Underground or Banana Medal", ["type"] = "Balloon"}, -- TODO: Test this
+	{["byte"] = 0x44, ["bit"] = 5, ["name"] = "Japes: DK Banana Medal",},
 	{["byte"] = 0x44, ["bit"] = 7, ["name"] = "Japes: Lanky Banana Medal"},
 	{["byte"] = 0x45, ["bit"] = 1, ["name"] = "Japes: Chunky Banana Medal"},
-
-	{["byte"] = 0x4E, ["bit"] = 3, ["name"] = "?? Japes: DK CB: Balloon by Underground or Banana Medal", ["type"] = "Balloon"}, -- TODO: Test this
 
 	{["byte"] = 0x49, ["bit"] = 5, ["name"] = "Japes: Fairy (Water room)", ["type"] = "Fairy"},
 	{["byte"] = 0x49, ["bit"] = 6, ["name"] = "Japes: Fairy (Painting room)", ["type"] = "Fairy"},
@@ -853,6 +857,7 @@ local flag_array = {
 	{["byte"] = 0x4E, ["bit"] = 0, ["name"] = "Japes: Chunky CB: Balloon in cave (1)", ["type"] = "Balloon"},
 	{["byte"] = 0x4E, ["bit"] = 1, ["name"] = "Japes: Lanky CB: Balloon by hut", ["type"] = "Balloon"},
 	{["byte"] = 0x4E, ["bit"] = 2, ["name"] = "Japes: Diddy CB: Balloon by W5", ["type"] = "Balloon"},
+	{["byte"] = 0x4E, ["bit"] = 3, ["name"] = "Japes: DK CB: Balloon by Underground", ["type"] = "Balloon"},
 	{["byte"] = 0x4E, ["bit"] = 4, ["name"] = "Japes: DK CB: Balloon by Cranky", ["type"] = "Balloon"},
 	{["byte"] = 0x4E, ["bit"] = 5, ["name"] = "Japes: Tiny CB: Balloon by hut", ["type"] = "Balloon"},
 	{["byte"] = 0x4E, ["bit"] = 6, ["name"] = "Japes: Tiny CB: Balloon in Fairy room", ["type"] = "Balloon"},
@@ -1241,7 +1246,7 @@ function flagStats()
 		end
 		if _type == "Blueprint" then
 			blueprints_known = blueprints_known + 1;
-			if bizstring.contains(_type, "Turned") then
+			if bizstring.contains(name, "Turned") then
 				gb_known = gb_known + 1;
 			end
 		end
@@ -1279,8 +1284,8 @@ function flagStats()
 	console.log();
 	formatOutputString("Crowns: ", crowns_known, max_crowns);
 	formatOutputString("Fairies: ", fairies_known, max_fairies);
-	console.log();
 	formatOutputString("Blueprints: ", blueprints_known, max_blueprints);
+	console.log();
 	formatOutputString("Warps: ", warps_known, max_warps);
 	formatOutputString("CB: ", cb_known, max_cb);
 	formatOutputString("GB: ", gb_known, max_gb);
