@@ -793,7 +793,7 @@ local flag_array = {
 	{["byte"] = 0x4C, ["bit"] = 5, ["name"] = "Fungi: Crown", ["type"] = "Crown"},
 	{["byte"] = 0x4C, ["bit"] = 6, ["name"] = "Isles: Crown (Fungi Lobby)", ["type"] = "Crown"},
 	{["byte"] = 0x4C, ["bit"] = 7, ["name"] = "Isles: Crown (Snide's)", ["type"] = "Crown"},
-	{["byte"] = 0x4D, ["bit"] = 0, ["name"] = "Castle: Crown", ["type"] = "Crown"},
+	{["byte"] = 0x4D, ["bit"] = 0, ["name"] = "Caves: Crown", ["type"] = "Crown"},
 	{["byte"] = 0x4D, ["bit"] = 1, ["name"] = "Castle: Crown", ["type"] = "Crown"},
 	{["byte"] = 0x4D, ["bit"] = 2, ["name"] = "Helm: Crown", ["type"] = "Crown"},
 
@@ -1062,7 +1062,7 @@ function checkFlags()
 		end
 	else
 		console.log("Failed to find flag block on this frame, adding to queue. Will be checked next time block is found.");
-		table.insert(flag_action_queue, {["type"]="check"});
+		table.insert(flag_action_queue, {["action_type"]="check"});
 	end
 end
 
@@ -1074,15 +1074,15 @@ local function process_flag_queue()
 			for i=1,#flag_action_queue do
 				queue_item = flag_action_queue[i];
 				if type(queue_item) == "table" then
-					if queue_item["type"] == "set" then
+					if queue_item["action_type"] == "set" then
 						current_value = mainmemory.readbyte(flags + queue_item["byte"]);
 						mainmemory.writebyte(flags + queue_item["byte"], set_bit(current_value, queue_item["bit"]));
 						console.log("Set \""..queue_item["name"].."\" at 0x"..bizstring.hex(queue_item["byte"]).." bit "..queue_item["bit"]);
-					elseif queue_item["type"] == "clear" then
+					elseif queue_item["action_type"] == "clear" then
 						current_value = mainmemory.readbyte(flags + queue_item["byte"]);
 						mainmemory.writebyte(flags + queue_item["byte"], clear_bit(current_value, queue_item["bit"]));
 						console.log("Cleared \""..queue_item["name"].."\" at 0x"..bizstring.hex(queue_item["byte"]).." bit "..queue_item["bit"]);
-					elseif queue_item["type"] == "check" then
+					elseif queue_item["action_type"] == "check" then
 						checkFlags();
 					end
 				end
@@ -1105,7 +1105,7 @@ end
 function setFlagByName(name)
 	local flag = getFlagByName(name);
 	if type(flag) == "table" then
-		table.insert(flag_action_queue, {["type"]="set", ["byte"]=flag["byte"], ["bit"]=flag["bit"], ["name"]=name, ["type"]=flag["type"]});
+		table.insert(flag_action_queue, {["action_type"]="set", ["byte"]=flag["byte"], ["bit"]=flag["bit"], ["name"]=name, ["type"]=flag["type"]});
 		process_flag_queue();
 	end
 end
@@ -1113,7 +1113,7 @@ end
 function clearFlagByName(name)
 	local flag = getFlagByName(name);
 	if type(flag) == "table" then
-		table.insert(flag_action_queue, {["type"]="clear", ["byte"]=flag["byte"], ["bit"]=flag["bit"], ["name"]=name, ["type"]=flag["type"]});
+		table.insert(flag_action_queue, {["action_type"]="clear", ["byte"]=flag["byte"], ["bit"]=flag["bit"], ["name"]=name, ["type"]=flag["type"]});
 		process_flag_queue();
 	end
 end	
