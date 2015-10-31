@@ -315,7 +315,7 @@ local options_mode_button =                  forms.button(options_form,   mode, 
 local options_precision_label =              forms.label(options_form,    "Precision:",                           col(0),      row(1) + label_offset,    54,               14);
 local options_decrease_precision_button =    forms.button(options_form,   "-",             decrease_precision,    col(4) - 28, row(1),                   button_height,    button_height);
 local options_increase_precision_button =    forms.button(options_form,   "+",             increase_precision,    col(5) - 28, row(1),                   button_height,    button_height);
-local options_precision_value_label =        forms.label(options_form,    precision,                              col(5),      row(1) + label_offset,    54,               14);
+local options_precision_value_label =        forms.label(options_form,    precision,                              col(5),      row(1) + label_offset,    44,               14);
 
 local options_speedy_speed_label =           forms.label(options_form,    "Speed:",                               col(0),      row(2) + label_offset,    54,               14);
 local options_decrease_speedy_speed_button = forms.button(options_form,   "-",             decrease_speedy_speed, col(4) - 28, row(2),                   button_height,    button_height);

@@ -539,10 +539,13 @@ local flag_array = {
 
 	{["byte"] = 0x0D, ["bit"] = 5, ["name"] = "Factory: Hatch opened"},
 	{["byte"] = 0x0D, ["bit"] = 6, ["name"] = "? Factory: Storage room switch pressed"},
-
+	{["byte"] = 0x0D, ["bit"] = 7, ["name"] = "Factory: Power shed activated"},
+	{["byte"] = 0x0E, ["bit"] = 0, ["name"] = "Factory: Power shed GB", ["type"] = "GB"},
+	
 	{["byte"] = 0x0E, ["bit"] = 5, ["name"] = "Kong Unlocked: Chunky"},
 	{["byte"] = 0x0E, ["bit"] = 6, ["name"] = "Factory: Lanky GB: Free Chunky", ["type"] = "GB"},
 	{["byte"] = 0x0F, ["bit"] = 4, ["name"] = "Factory: Tiny GB: Bad hit detection wheel", ["type"] = "GB"},
+	{["byte"] = 0x10, ["bit"] = 0, ["name"] = "Factory: DK GB: Crusher room", ["type"] = "GB"},
 	{["byte"] = 0x11, ["bit"] = 2, ["name"] = "Key 3", ["type"] = "Key"},
 	{["byte"] = 0x11, ["bit"] = 4, ["name"] = "Factory: Chunky's help me cutscene"},
 
@@ -582,16 +585,40 @@ local flag_array = {
 	{["byte"] = 0x1E, ["bit"] = 5, ["name"] = "Fungi: W5 (Low)", ["type"] = "Warp"},
 
 	{["byte"] = 0x20, ["bit"] = 1, ["name"] = "Fungi: First time cutscene"},
-	
+
 	{["byte"] = 0x22, ["bit"] = 4, ["name"] = "Caves: DK Rotating room GB", ["type"] = "GB"},
 	{["byte"] = 0x22, ["bit"] = 7, ["name"] = "Caves: Tiny Igloo GB", ["type"] = "GB"},
 
+	-- TODO: W1
+	{["byte"] = 0x23, ["bit"] = 4, ["name"] = "Caves: W1 (Enterance)", ["type"] = "Warp"},
+	{["byte"] = 0x23, ["bit"] = 5, ["name"] = "Caves: W2 (Enterance)", ["type"] = "Warp"},
+	{["byte"] = 0x23, ["bit"] = 6, ["name"] = "Caves: W2 (Far)", ["type"] = "Warp"},
+	-- TODO: W3
+	-- TODO: W3
+	-- TODO: W4
+	-- TODO: W4
+	{["byte"] = 0x24, ["bit"] = 2, ["name"] = "Caves: W5 (Lanky BP))", ["type"] = "Warp"},
+	-- TODO: W5
+
 	{["byte"] = 0x24, ["bit"] = 4, ["name"] = "Key 6", ["type"] = "Key"},
 	{["byte"] = 0x24, ["bit"] = 5, ["name"] = "Caves: Diddy Cabin GB (Upper)", ["type"] = "GB"},
+	
+	{["byte"] = 0x25, ["bit"] = 3, ["name"] = "Caves: Giant Kosha cutscene"},
+	
 	{["byte"] = 0x27, ["bit"] = 5, ["name"] = "Key 7", ["type"] = "Key"},
 
 	{["byte"] = 0x28, ["bit"] = 3, ["name"] = "Castle: Lanky: Greenhouse GB", ["type"] = "GB"},
 
+	{["byte"] = 0x28, ["bit"] = 7, ["name"] = "Castle: W1 (Hub)", ["type"] = "Warp"},
+	{["byte"] = 0x29, ["bit"] = 0, ["name"] = "Castle: W1 (Far)", ["type"] = "Warp"},
+	{["byte"] = 0x29, ["bit"] = 1, ["name"] = "Castle: W2 (Hub)", ["type"] = "Warp"},
+	-- TODO: W2
+	{["byte"] = 0x29, ["bit"] = 3, ["name"] = "Castle: W3 (Hub)", ["type"] = "Warp"},
+	-- TODO: W3
+	{["byte"] = 0x29, ["bit"] = 5, ["name"] = "Castle: W4 (Hub)", ["type"] = "Warp"},
+	-- TODO: W4
+	{["byte"] = 0x29, ["bit"] = 7, ["name"] = "Castle: W5 (Hub)", ["type"] = "Warp"},
+	-- TODO: W5
 	{["byte"] = 0x2A, ["bit"] = 1, ["name"] = "Castle: W1 (Crypt, close)", ["type"] = "Warp"},
 	{["byte"] = 0x2A, ["bit"] = 2, ["name"] = "Castle: W1 (Crypt, far)", ["type"] = "Warp"},
 	{["byte"] = 0x2A, ["bit"] = 3, ["name"] = "Castle: W2 (Crypt, close)", ["type"] = "Warp"},
@@ -599,6 +626,8 @@ local flag_array = {
 	{["byte"] = 0x2A, ["bit"] = 5, ["name"] = "Castle: W3 (Crypt, close)", ["type"] = "Warp"},
 	{["byte"] = 0x2A, ["bit"] = 6, ["name"] = "Castle: W3 (Crypt, far)", ["type"] = "Warp"},
 
+	{["byte"] = 0x2B, ["bit"] = 5, ["name"] = "Castle: First time cutscene", ["type"] = "Type"},
+	
 	{["byte"] = 0x2C, ["bit"] = 3, ["name"] = "Warp pad FTT"},
 	{["byte"] = 0x2C, ["bit"] = 6, ["name"] = "Crown pad FTT"},
 	{["byte"] = 0x2D, ["bit"] = 0, ["name"] = "Mini Monkey FTT?"},
@@ -711,17 +740,23 @@ local flag_array = {
 	{["byte"] = 0x3C, ["bit"] = 2, ["name"] = "Factory: Blueprint - Tiny", ["type"] = "Blueprint"},
 	{["byte"] = 0x3C, ["bit"] = 3, ["name"] = "Factory: Blueprint - Chunky", ["type"] = "Blueprint"},
 
-	-- TODO: DK
-	-- TODO: Diddy
+	{["byte"] = 0x3C, ["bit"] = 4, ["name"] = "Galleon: Blueprint - DK", ["type"] = "Blueprint"},
+	{["byte"] = 0x3C, ["bit"] = 5, ["name"] = "Galleon: Blueprint - Diddy", ["type"] = "Blueprint"},
 	{["byte"] = 0x3C, ["bit"] = 6, ["name"] = "Galleon: Blueprint - Lanky", ["type"] = "Blueprint"},
-	-- TODO: Tiny
-	-- TODO: Chunky
+	{["byte"] = 0x3C, ["bit"] = 7, ["name"] = "Galleon: Blueprint - Tiny", ["type"] = "Blueprint"},
+	{["byte"] = 0x3D, ["bit"] = 0, ["name"] = "Galleon: Blueprint - Chunky", ["type"] = "Blueprint"},
 
 	-- TODO: DK
 	-- TODO: Diddy
-	-- TODO: Lanky
-	-- TODO: Tiny
+	{["byte"] = 0x3E, ["bit"] = 0, ["name"] = "Caves: Blueprint - Lanky", ["type"] = "Blueprint"},
+	{["byte"] = 0x3E, ["bit"] = 1, ["name"] = "Caves: Blueprint - Tiny", ["type"] = "Blueprint"},
 	{["byte"] = 0x3E, ["bit"] = 2, ["name"] = "Caves: Blueprint - Chunky", ["type"] = "Blueprint"},
+
+	-- TODO: DK
+	-- TODO: Diddy
+	{["byte"] = 0x3E, ["bit"] = 5, ["name"] = "Castle: Blueprint - Lanky", ["type"] = "Blueprint"},
+	{["byte"] = 0x3E, ["bit"] = 6, ["name"] = "Castle: Blueprint - Tiny", ["type"] = "Blueprint"},
+	-- TODO: Chunky
 
 	{["byte"] = 0x3F, ["bit"] = 0, ["name"] = "Isles: Blueprint - DK", ["type"] = "Blueprint"},
 	{["byte"] = 0x3F, ["bit"] = 1, ["name"] = "Isles: Blueprint - Diddy", ["type"] = "Blueprint"},
@@ -742,16 +777,16 @@ local flag_array = {
 	{["byte"] = 0x40, ["bit"] = 6, ["name"] = "Snide's: Chunky BP Turned (Aztec)", ["type"] = "Blueprint"},
 
 	{["byte"] = 0x40, ["bit"] = 7, ["name"] = "Snide's: DK BP Turned (Factory)", ["type"] = "Blueprint"},
-	-- TODO: Diddy BP
-	-- TODO: Lanky BP
+	{["byte"] = 0x41, ["bit"] = 0, ["name"] = "Snide's: Diddy BP Turned (Factory)", ["type"] = "Blueprint"},
+	{["byte"] = 0x41, ["bit"] = 1, ["name"] = "Snide's: Lanky BP Turned (Factory)", ["type"] = "Blueprint"},
 	{["byte"] = 0x41, ["bit"] = 2, ["name"] = "Snide's: Tiny BP Turned (Factory)", ["type"] = "Blueprint"},
-	-- TODO: Chunky BP
+	{["byte"] = 0x41, ["bit"] = 3, ["name"] = "Snide's: Chunky BP Turned (Factory)", ["type"] = "Blueprint"},
 
-	-- TODO: DK BP
-	-- TODO: Diddy BP
+	{["byte"] = 0x41, ["bit"] = 4, ["name"] = "Snide's: DK BP Turned (Galleon)", ["type"] = "Blueprint"},
+	{["byte"] = 0x41, ["bit"] = 5, ["name"] = "Snide's: Diddy BP Turned (Galleon)", ["type"] = "Blueprint"},
 	{["byte"] = 0x41, ["bit"] = 6, ["name"] = "Snide's: Lanky BP Turned (Galleon)", ["type"] = "Blueprint"},
-	-- TODO: Tiny BP
-	-- TODO: Chunky BP
+	{["byte"] = 0x41, ["bit"] = 7, ["name"] = "Snide's: Tiny BP Turned (Galleon)", ["type"] = "Blueprint"},
+	{["byte"] = 0x42, ["bit"] = 0, ["name"] = "Snide's: Chunky BP Turned (Galleon)", ["type"] = "Blueprint"},
 
 	{["byte"] = 0x44, ["bit"] = 0, ["name"] = "Snide's: DK BP Turned (Isles)", ["type"] = "Blueprint"},
 	{["byte"] = 0x44, ["bit"] = 1, ["name"] = "Snide's: Diddy BP Turned (Isles)", ["type"] = "Blueprint"},
@@ -816,14 +851,15 @@ local flag_array = {
 	{["byte"] = 0x4F, ["bit"] = 2, ["name"] = "Japes: Tiny CB: Balloon in shellhive", ["type"] = "Balloon"},
 	{["byte"] = 0x4F, ["bit"] = 3, ["name"] = "Japes: Lanky CB: Balloon in painting room)", ["type"] = "Balloon"},
 
-	{["byte"] = 0x54, ["bit"] = 4, ["name"] = "Isles: Rainbow Coin (Fungi Lobby Enterance)?"},
-	{["byte"] = 0x54, ["bit"] = 5, ["name"] = "Isles: Rainbow Coin (Slope leading to Aztec Lobby)"},
-	{["byte"] = 0x54, ["bit"] = 6, ["name"] = "Isles: Rainbow Coin (Aztec Lobby Roof)"},
+	{["byte"] = 0x54, ["bit"] = 4, ["name"] = "Isles: Rainbow Coin (Fungi Lobby Enterance)?", ["type"] = "Rainbow Coin"},
+	{["byte"] = 0x54, ["bit"] = 5, ["name"] = "Isles: Rainbow Coin (Slope leading to Aztec Lobby)", ["type"] = "Rainbow Coin"},
+	{["byte"] = 0x54, ["bit"] = 6, ["name"] = "Isles: Rainbow Coin (Aztec Lobby Roof)", ["type"] = "Rainbow Coin"},
 	{["byte"] = 0x57, ["bit"] = 0, ["name"] = "Fungi: Balloon - DK Mill", ["type"] = "Balloon"},
 	{["byte"] = 0x57, ["bit"] = 2, ["name"] = "Fungi: Balloon - Lanky Lower Mushroom", ["type"] = "Balloon"},
-	{["byte"] = 0x59, ["bit"] = 6, ["name"] = "Isles: Rainbow Coin (K. Lumsy)"},
+	{["byte"] = 0x59, ["bit"] = 1, ["name"] = "Castle: Rainbow Coin (Snide's)", ["type"] = "Rainbow Coin"},
+	{["byte"] = 0x59, ["bit"] = 6, ["name"] = "Isles: Rainbow Coin (K. Lumsy)", ["type"] = "Rainbow Coin"},
 
-	{["byte"] = 0x5C, ["bit"] = 3, ["name"] = "Castle Lobby: Rainbow Coin"},
+	{["byte"] = 0x5C, ["bit"] = 3, ["name"] = "Castle Lobby: Rainbow Coin", ["type"] = "Rainbow Coin"},
 
 	{["byte"] = 0x60, ["bit"] = 2, ["name"] = "Helm: BoM off"},
 	{["byte"] = 0x60, ["bit"] = 4, ["name"] = "Helm: Crown door open"},
@@ -842,12 +878,15 @@ local flag_array = {
 	{["byte"] = 0x64, ["bit"] = 4, ["name"] = "Japes: Tiny CB: Tunnel to main area (3)", ["type"] = "CB"},
 	{["byte"] = 0x64, ["bit"] = 5, ["name"] = "Japes: Chunky CB: Shellhive tunnel (1)", ["type"] = "CB"},
 	{["byte"] = 0x64, ["bit"] = 6, ["name"] = "Japes: Tiny CB: Tunnel to main area (4)", ["type"] = "CB"},
+	{["byte"] = 0x65, ["bit"] = 0, ["name"] = "Japes: DK CB: By enterance (1)", ["type"] = "CB"},
 	{["byte"] = 0x65, ["bit"] = 2, ["name"] = "Japes: DK CB: Bunch on left W3", ["type"] = "Bunch"}, -- TODO: Test this
+	{["byte"] = 0x65, ["bit"] = 4, ["name"] = "Japes: DK CB: By enterance (2)", ["type"] = "CB"},
+	{["byte"] = 0x65, ["bit"] = 6, ["name"] = "Japes: Chunky CB: Bunch on Funky's (Right)", ["type"] = "Bunch"},
 	{["byte"] = 0x65, ["bit"] = 7, ["name"] = "Japes: Lanky CB: Bunch on tree by Cranky's", ["type"] = "Bunch"},
 	{["byte"] = 0x66, ["bit"] = 3, ["name"] = "Japes: Diddy CB: 101st banana", ["type"] = "CB"},
-	{["byte"] = 0x66, ["bit"] = 5, ["name"] = "Japes: DK CB: By enterance (1)", ["type"] = "CB"}, -- TODO: There were 5 of these flags, only 3 set inside 0x80 range
-	{["byte"] = 0x66, ["bit"] = 6, ["name"] = "Japes: DK CB: By enterance (2)", ["type"] = "CB"},
-	{["byte"] = 0x66, ["bit"] = 7, ["name"] = "Japes: DK CB: By enterance (3)", ["type"] = "CB"},
+	{["byte"] = 0x66, ["bit"] = 5, ["name"] = "Japes: DK CB: By enterance (3)", ["type"] = "CB"},
+	{["byte"] = 0x66, ["bit"] = 6, ["name"] = "Japes: DK CB: By enterance (4)", ["type"] = "CB"},
+	{["byte"] = 0x66, ["bit"] = 7, ["name"] = "Japes: DK CB: By enterance (5)", ["type"] = "CB"},
 	{["byte"] = 0x68, ["bit"] = 0, ["name"] = "Japes: Chunky Coin: By portal (2)", ["type"] = "Coin"},
 	{["byte"] = 0x68, ["bit"] = 1, ["name"] = "Japes: Lanky CB: Bonus Barrel Room (1)", ["type"] = "CB"},
 	{["byte"] = 0x68, ["bit"] = 2, ["name"] = "Japes: Chunky Coin: In water (2)", ["type"] = "Coin"},
@@ -863,7 +902,7 @@ local flag_array = {
 	{["byte"] = 0x6B, ["bit"] = 4, ["name"] = "Japes: DK Coin by enterance", ["type"] = "Coin"},
 	{["byte"] = 0x6B, ["bit"] = 5, ["name"] = "Japes: Chunky CB: Shellhive tunnel (2)", ["type"] = "CB"},
 	{["byte"] = 0x6C, ["bit"] = 0, ["name"] = "Japes: Chunky CB: Shellhive tunnel (3)", ["type"] = "CB"},
-	{["byte"] = 0x6C, ["bit"] = 6, ["name"] = "Japes: DK CB: Bunch by Funky (tree)", ["type"] = "Bunch"}, -- TODO: Test this
+	{["byte"] = 0x6C, ["bit"] = 6, ["name"] = "Japes: DK CB: Bunch by Funky's (tree)", ["type"] = "Bunch"}, -- TODO: Test this
 	{["byte"] = 0x6D, ["bit"] = 0, ["name"] = "Japes: Chunky CB: Bunch in Shellhive area (1)", ["type"] = "Bunch"},
 	{["byte"] = 0x6D, ["bit"] = 1, ["name"] = "Japes: Tiny Coin: Fairy cave (1)", ["type"] = "Coin"},
 	{["byte"] = 0x6D, ["bit"] = 3, ["name"] = "Japes: Diddy CB: In right tunnel (2)", ["type"] = "CB"},
@@ -909,7 +948,7 @@ local flag_array = {
 	{["byte"] = 0x74, ["bit"] = 1, ["name"] = "Japes: Lanky CB: Fairy cave (1)", ["type"] = "CB"},
 	{["byte"] = 0x74, ["bit"] = 2, ["name"] = "Japes: Lanky CB: Fairy cave (2)", ["type"] = "CB"},
 	{["byte"] = 0x74, ["bit"] = 3, ["name"] = "Japes: Lanky CB: Fairy cave (3)", ["type"] = "CB"},
-	{["byte"] = 0x74, ["bit"] = 5, ["name"] = "Japes: Chunky CB: Bunch on Funky (Left)", ["type"] = "Bunch"}, -- TODO: Right side missing with block size 0x80
+	{["byte"] = 0x74, ["bit"] = 5, ["name"] = "Japes: Chunky CB: Bunch on Funky's (Left)", ["type"] = "Bunch"},
 	{["byte"] = 0x74, ["bit"] = 6, ["name"] = "Japes: Diddy CB: By enterance (2)", ["type"] = "CB"},
 	{["byte"] = 0x74, ["bit"] = 7, ["name"] = "Japes: Lanky Coin: Bonus Barrel Room (1)"}, -- TODO: Flags missing in this room with block size 0x80
 	{["byte"] = 0x75, ["bit"] = 0, ["name"] = "Japes: Lanky CB: Painting room slope (1)", ["type"] = "CB"},
@@ -993,9 +1032,22 @@ local flag_array = {
 	{["byte"] = 0x7F, ["bit"] = 7, ["name"] = "Japes: Tiny CB: Inside shellhive (8)", ["type"] = "CB"},
 
 	{["byte"] = 0x81, ["bit"] = 3, ["name"] = "Aztec: Lanky CB: Bunch on Tiny temple switch", ["type"] = "Bunch"},
-	
+
 	{["byte"] = 0x82, ["bit"] = 6, ["name"] = "Aztec: Diddy Coin: Instrument pad (Tiny temple)", ["type"] = "Coin"},
-	
+
+	{["byte"] = 0xBD, ["bit"] = 0, ["name"] = "Factory: DK CB: Bunch in power shed (GB)", ["type"] = "Bunch"},
+	{["byte"] = 0xBD, ["bit"] = 1, ["name"] = "Factory: DK CB: Bunch in power shed (Left)", ["type"] = "Bunch"},
+	{["byte"] = 0xBD, ["bit"] = 2, ["name"] = "Factory: DK CB: Bunch in power shed (Right)", ["type"] = "Bunch"},
+	{["byte"] = 0xBD, ["bit"] = 4, ["name"] = "Factory: DK CB: Bunch in crusher room (1)", ["type"] = "Bunch"},
+	{["byte"] = 0xBD, ["bit"] = 5, ["name"] = "Factory: DK CB: Bunch in crusher room (2)", ["type"] = "Bunch"},
+	{["byte"] = 0xBD, ["bit"] = 6, ["name"] = "Factory: DK CB: Bunch in crusher room (3)", ["type"] = "Bunch"},
+
+	{["byte"] = 0xD0, ["bit"] = 0, ["name"] = "Galleon: Chunky coin around BP (1)", ["type"] = "Coin"},
+	{["byte"] = 0xD1, ["bit"] = 4, ["name"] = "Galleon: Chunky coin around BP (2)", ["type"] = "Coin"},
+	{["byte"] = 0xD1, ["bit"] = 5, ["name"] = "Galleon: Chunky coin around BP (3)", ["type"] = "Coin"},
+	{["byte"] = 0xD1, ["bit"] = 6, ["name"] = "Galleon: Chunky coin around BP (4)", ["type"] = "Coin"},
+	{["byte"] = 0xD1, ["bit"] = 7, ["name"] = "Galleon: Chunky coin around BP (5)", ["type"] = "Coin"},
+
 	{["byte"] = 0x11A, ["bit"] = 0, ["name"] = "Castle: DK bridge CB (1)", ["type"] = "CB"},
 	{["byte"] = 0x11B, ["bit"] = 5, ["name"] = "Castle: DK bridge CB (2)", ["type"] = "CB"},
 	{["byte"] = 0x11B, ["bit"] = 4, ["name"] = "Castle: DK bridge CB (3)", ["type"] = "CB"},
@@ -1173,6 +1225,9 @@ function flagStats()
 		end
 		if _type == "Coin" then
 			coins_known = coins_known + 1;
+		end
+		if _type == "Rainbow Coin" then
+			coins_known = coins_known + 25;
 		end
 	end
 
@@ -1974,7 +2029,7 @@ brb_message = "BRB";
 is_brb = false;
 
 function brb(value)
-	local message = value;
+	local message = value or "BRB";
 	if version == "JP" then
 		message = toJPString(message);
 	else
@@ -2057,29 +2112,29 @@ local options_toggle_isg_timer;
 
 function Game.initUI(form_handle, col, row, button_height, label_offset, dropdown_offset)
 	-- Key stuff
-	options_flag_dropdown =     forms.dropdown(form_handle, flag_names, col(10) + dropdown_offset, row(0) + dropdown_offset);
-	options_set_flag_button =   forms.button(form_handle, "Set", flagSetButtonHandler,    col(10),     row(1), 59, button_height);
-	options_Clear_flag_button = forms.button(form_handle, "Clear", flagClearButtonHandler, col(13) - 5, row(1), 59, button_height);
+	options_flag_dropdown =     forms.dropdown(form_handle, flag_names, col(0) + dropdown_offset, row(7) + dropdown_offset, col(9) + 7, button_height);
+	options_set_flag_button =   forms.button(form_handle, "Set", flagSetButtonHandler,    col(10),     row(7), 59, button_height);
+	options_Clear_flag_button = forms.button(form_handle, "Clear", flagClearButtonHandler, col(13) - 5, row(7), 59, button_height);
 
 	-- Moon stuff
 	options_moon_mode_label =  forms.label(form_handle,  "Moon:",                    col(10),     row(2) + label_offset, 48, button_height);
-	options_moon_mode_button = forms.button(form_handle, moon_mode, toggle_moonmode, col(13) - 5, row(2),                59, button_height);
+	options_moon_mode_button = forms.button(form_handle, moon_mode, toggle_moonmode, col(13) - 20, row(2),                59, button_height);
 
 	-- Mad Jack stuff
-	options_toggle_madjack = forms.checkbox(form_handle, "MJ Minimap", col(5) + dropdown_offset, row(7) + dropdown_offset);
+	options_toggle_madjack = forms.checkbox(form_handle, "MJ Minimap", col(5) + dropdown_offset, row(6) + dropdown_offset);
 
 	-- ISG Timer
-	options_toggle_isg_timer = forms.checkbox(form_handle, "ISG Timer", col(10) + dropdown_offset, row(7) + dropdown_offset);
+	options_toggle_isg_timer = forms.checkbox(form_handle, "ISG Timer", col(5) + dropdown_offset, row(5) + dropdown_offset);
 
 	-- Buttons
-	options_toggle_invisify_button = forms.button(form_handle, "Invisify",      toggle_invisify, col(5), row(4), col(4) + 8, button_height);
-	options_clear_tb_void_button =   forms.button(form_handle, "Clear TB void", clear_tb_void,   col(5), row(5), col(4) + 8, button_height);
-	options_unlock_moves_button =    forms.button(form_handle, "Unlock Moves",  unlock_moves,    col(5), row(6), col(4) + 8, button_height);
+	options_toggle_invisify_button = forms.button(form_handle, "Invisify",      toggle_invisify, col(7), row(1), 64,         button_height);
+	options_clear_tb_void_button =   forms.button(form_handle, "Clear TB void", clear_tb_void,   col(10), row(1), col(4) + 8, button_height);
+	options_unlock_moves_button =    forms.button(form_handle, "Unlock Moves",  unlock_moves,    col(10), row(4), col(4) + 8, button_height);
 
 	--options_kong_button        =  forms.button(form_handle, "Kong",   everythingiskong,  col(10), row(3), col(4) + 8, button_height);
 	--options_force_pause_button =  forms.button(form_handle, "Force Pause",   force_pause,  col(10), row(4), col(4) + 8, button_height);
-	options_force_zipper_button =  forms.button(form_handle, "Force Zipper",  force_zipper,         col(10), row(4), col(4) + 8, button_height);
-	options_fix_geometry_spiking = forms.button(form_handle, "Fix Spiking",   fix_geometry_spiking, col(10), row(5), col(4) + 8, button_height);
+	options_force_zipper_button =  forms.button(form_handle, "Force Zipper",  force_zipper,         col(5), row(4), col(4) + 8, button_height);
+	options_fix_geometry_spiking = forms.button(form_handle, "Fix Spiking",   fix_geometry_spiking, col(10), row(0), col(4) + 8, button_height);
 	--options_random_effect_button = forms.button(form_handle, "Random effect", random_effect,        col(10), row(6), col(4) + 8, button_height);
 
 	-- Lag fix
@@ -2090,7 +2145,7 @@ function Game.initUI(form_handle, col, row, button_height, label_offset, dropdow
 	
 	-- Checkboxes
 	options_toggle_homing_ammo = forms.checkbox(form_handle, "Homing Ammo", col(0) + dropdown_offset, row(6) + dropdown_offset);
-	options_toggle_neverslip =   forms.checkbox(form_handle, "Never Slip",  col(0) + dropdown_offset, row(7) + dropdown_offset);
+	options_toggle_neverslip =   forms.checkbox(form_handle, "Never Slip",  col(10) + dropdown_offset, row(5) + dropdown_offset);
 end
 
 function Game.applyInfinites()
