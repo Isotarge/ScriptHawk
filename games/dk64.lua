@@ -384,6 +384,7 @@ local y_rot = 0xE6;
 local z_rot = 0xE8;
 
 local locked_to_pad = 0x110;
+local locked_to_rainbow_coin_pointer = 0x13C;
 
 -- State byte
 -- 0x02 First person camera
@@ -451,17 +452,17 @@ local flag_array = {
 
 	{["byte"] = 0x61, ["bit"] = 1, ["name"] = "?? Training barrels spawned?"}, -- TODO: Test this
 
-	{["byte"] = 0x38, ["bit"] = 5, ["name"] = "Japes: Entered Japes (1)"}, -- TODO: Test this
+	{["byte"] = 0x38, ["bit"] = 5, ["name"] = "?? Japes: Entered Japes (1)"}, -- TODO: Test this
 
 	{["byte"] = 0x31, ["bit"] = 3, ["name"] = "? Japes W3 Right CB Bunch", ["type"] = "Bunch"}, -- TODO: Test this
 	{["byte"] = 0x64, ["bit"] = 7, ["name"] = "? Japes W3 Right CB Bunch", ["type"] = "Bunch"}, -- TODO: Test this
 	{["byte"] = 0x2E, ["bit"] = 3, ["name"] = "? Orange Barrel Completed?"}, -- TODO: Test this
 
-	{["byte"] = 0x2C, ["bit"] = 7, ["name"] = "? T&S FTT (entered in Japes)"}, -- TODO: Test this
+	{["byte"] = 0x2C, ["bit"] = 7, ["name"] = "? T&S FTT (entered in Japes)", ["type"] = "FTT"}, -- TODO: Test this
 
-	{["byte"] = 0x20, ["bit"] = 0, ["name"] = "Fungi: Day/Night First Time CS"}, -- TODO: Test this
+	{["byte"] = 0x20, ["bit"] = 0, ["name"] = "? Fungi: Day/Night First Time CS"}, -- TODO: Test this
 
-	{["byte"] = 0x31, ["bit"] = 4, ["name"] = "Fungi: DK Coin by BBlast or First Coin?", ["type"] = "Coin"}, -- TODO: Test this
+	{["byte"] = 0x31, ["bit"] = 4, ["name"] = "? Fungi: DK Coin by BBlast or First Coin?", ["type"] = "Coin"}, -- TODO: Test this
 
 	{["byte"] = 0x39, ["bit"] = 4, ["name"] = "? Enter Helm/W1"},
 
@@ -518,7 +519,7 @@ local flag_array = {
 
 	{["byte"] = 0x05, ["bit"] = 2, ["name"] = "Japes: Cutscene by far W1 played"}, -- TODO: Test this
 	{["byte"] = 0x05, ["bit"] = 3, ["name"] = "Japes: Rambi Door Smashed"}, -- TODO: Test this
-	{["byte"] = 0x05, ["bit"] = 6, ["name"] = "Japes: T&S Despawned"}, -- TODO: Test this
+	{["byte"] = 0x05, ["bit"] = 6, ["name"] = "Japes: T&S Cleared"},
 
 	{["byte"] = 0x06, ["bit"] = 0, ["name"] = "Aztec: DK Blueprint room open"},
 
@@ -542,6 +543,7 @@ local flag_array = {
 	{["byte"] = 0x0B, ["bit"] = 5, ["name"] = "Aztec: Lanky's help me cutscene"},
 	{["byte"] = 0x0B, ["bit"] = 6, ["name"] = "Aztec: W2 (Tiny temple)", ["type"] = "Warp"},
 	{["byte"] = 0x0B, ["bit"] = 7, ["name"] = "Aztec: FT Cutscene"},
+	{["byte"] = 0x0D, ["bit"] = 4, ["name"] = "Aztec: T&S Cleared"},
 
 	{["byte"] = 0x0D, ["bit"] = 5, ["name"] = "Factory: Hatch opened"},
 	{["byte"] = 0x0D, ["bit"] = 6, ["name"] = "? Factory: Storage room switch pressed"},
@@ -570,6 +572,7 @@ local flag_array = {
 	{["byte"] = 0x13, ["bit"] = 1, ["name"] = "Galleon: Cannon game room open"},
 
 	{["byte"] = 0x15, ["bit"] = 0, ["name"] = "Key 4", ["type"] = "Key"},
+	{["byte"] = 0x19, ["bit"] = 3, ["name"] = "Galleon: T&S Cleared"},
 
 	{["byte"] = 0x19, ["bit"] = 6, ["name"] = "Fungi: Nighttime"},
 	{["byte"] = 0x19, ["bit"] = 7, ["name"] = "Fungi: Green Tunnel (Feather Side)"},
@@ -591,6 +594,7 @@ local flag_array = {
 	{["byte"] = 0x1E, ["bit"] = 5, ["name"] = "Fungi: W5 (Low)", ["type"] = "Warp"},
 
 	{["byte"] = 0x20, ["bit"] = 1, ["name"] = "Fungi: First time cutscene"},
+	{["byte"] = 0x20, ["bit"] = 2, ["name"] = "Fungi: T&S Cleared"},
 
 	{["byte"] = 0x22, ["bit"] = 4, ["name"] = "Caves: DK Rotating room GB", ["type"] = "GB"},
 	{["byte"] = 0x22, ["bit"] = 7, ["name"] = "Caves: Tiny Igloo GB", ["type"] = "GB"},
@@ -605,6 +609,8 @@ local flag_array = {
 	{["byte"] = 0x24, ["bit"] = 5, ["name"] = "Caves: Diddy Cabin GB (Upper)", ["type"] = "GB"},
 
 	{["byte"] = 0x25, ["bit"] = 3, ["name"] = "Caves: Giant Kosha cutscene"},
+	{["byte"] = 0x25, ["bit"] = 5, ["name"] = "Isles: Tiny GB: Rareware GB", ["type"] = "GB"},
+	{["byte"] = 0x25, ["bit"] = 6, ["name"] = "Caves: T&S Cleared"},
 
 	{["byte"] = 0x27, ["bit"] = 5, ["name"] = "Key 7", ["type"] = "Key"},
 
@@ -617,7 +623,7 @@ local flag_array = {
 	{["byte"] = 0x29, ["bit"] = 3, ["name"] = "Castle: W3 (Hub)", ["type"] = "Warp"},
 	-- TODO: W3
 	{["byte"] = 0x29, ["bit"] = 5, ["name"] = "Castle: W4 (Hub)", ["type"] = "Warp"},
-	-- TODO: W4
+	{["byte"] = 0x29, ["bit"] = 6, ["name"] = "Castle: W4 (High)", ["type"] = "Warp"},
 	{["byte"] = 0x29, ["bit"] = 7, ["name"] = "Castle: W5 (Hub)", ["type"] = "Warp"},
 	-- TODO: W5
 	{["byte"] = 0x2A, ["bit"] = 1, ["name"] = "Castle: W1 (Crypt, close)", ["type"] = "Warp"},
@@ -628,27 +634,28 @@ local flag_array = {
 	{["byte"] = 0x2A, ["bit"] = 6, ["name"] = "Castle: W3 (Crypt, far)", ["type"] = "Warp"},
 
 	{["byte"] = 0x2B, ["bit"] = 5, ["name"] = "Castle: First time cutscene"},
+	{["byte"] = 0x2C, ["bit"] = 0, ["name"] = "Castle: T&S Cleared"},
 
-	{["byte"] = 0x2C, ["bit"] = 3, ["name"] = "Warp pad FTT"},
-	{["byte"] = 0x2C, ["bit"] = 6, ["name"] = "Crown pad FTT"},
-	{["byte"] = 0x2D, ["bit"] = 0, ["name"] = "Mini Monkey FTT?"},
-	{["byte"] = 0x2D, ["bit"] = 1, ["name"] = "Hunky Chunky FTT"}, -- TODO: Test this
-	{["byte"] = 0x2D, ["bit"] = 3, ["name"] = "Strong Kong FTT"}, -- TODO: Test this
-	{["byte"] = 0x2D, ["bit"] = 7, ["name"] = "Diddy Caves Lobby GB, more like FTT of some sort"}, -- TODO: Test this
-	{["byte"] = 0x2D, ["bit"] = 4, ["name"] = "Rainbow Coin FTT"}, -- TODO: Test this
-	{["byte"] = 0x2D, ["bit"] = 5, ["name"] = "Rambi FTT"}, -- TODO: Test this
-	{["byte"] = 0x2E, ["bit"] = 0, ["name"] = "Lanky FT GB", ["type"] = "GB"},
-	{["byte"] = 0x2E, ["bit"] = 1, ["name"] = "Tiny FT GB", ["type"] = "GB"},
-	{["byte"] = 0x2E, ["bit"] = 2, ["name"] = "Chunky FT GB", ["type"] = "GB"},
-	{["byte"] = 0x2E, ["bit"] = 4, ["name"] = "Snide's FTT"},
-	{["byte"] = 0x2F, ["bit"] = 0, ["name"] = "Wrinkly FTT"}, -- TODO: Test this
-	{["byte"] = 0x2F, ["bit"] = 1, ["name"] = "? Fairy FTT"}, -- TODO: Test this
+	{["byte"] = 0x2C, ["bit"] = 3, ["name"] = "Warp pad FTT", ["type"] = "FTT"},
+	{["byte"] = 0x2C, ["bit"] = 6, ["name"] = "Crown pad FTT", ["type"] = "FTT"},
+	{["byte"] = 0x2D, ["bit"] = 0, ["name"] = "Mini Monkey FTT?", ["type"] = "FTT"},
+	{["byte"] = 0x2D, ["bit"] = 1, ["name"] = "Hunky Chunky FTT", ["type"] = "FTT"}, -- TODO: Test this
+	{["byte"] = 0x2D, ["bit"] = 3, ["name"] = "Strong Kong FTT", ["type"] = "FTT"}, -- TODO: Test this
+	{["byte"] = 0x2D, ["bit"] = 7, ["name"] = "? Caves Lobby: Diddy GB, more like FTT of some sort", ["type"] = "FTT"}, -- TODO: Test this
+	{["byte"] = 0x2D, ["bit"] = 4, ["name"] = "Rainbow Coin FTT", ["type"] = "FTT"}, -- TODO: Test this
+	{["byte"] = 0x2D, ["bit"] = 5, ["name"] = "Rambi FTT", ["type"] = "FTT"}, -- TODO: Test this
+	{["byte"] = 0x2E, ["bit"] = 0, ["name"] = "Lanky FT GB", ["type"] = "FTT"},
+	{["byte"] = 0x2E, ["bit"] = 1, ["name"] = "Tiny FT GB", ["type"] = "FTT"},
+	{["byte"] = 0x2E, ["bit"] = 2, ["name"] = "Chunky FT GB", ["type"] = "FTT"},
+	{["byte"] = 0x2E, ["bit"] = 4, ["name"] = "Snide's FTT", ["type"] = "FTT"},
+	{["byte"] = 0x2F, ["bit"] = 0, ["name"] = "Wrinkly FTT", ["type"] = "FTT"}, -- TODO: Test this
+	{["byte"] = 0x2F, ["bit"] = 1, ["name"] = "? Fairy FTT", ["type"] = "FTT"}, -- TODO: Test this
 
 	{["byte"] = 0x2F, ["bit"] = 1, ["name"] = "Camera/Shockwave"},
 	{["byte"] = 0x2F, ["bit"] = 2, ["name"] = "Training Grounds: Treehouse Squawk Cutscene"},
 	{["byte"] = 0x2F, ["bit"] = 4, ["name"] = "Key 8", ["type"] = "Key"},
 	{["byte"] = 0x2F, ["bit"] = 5, ["name"] = "Isles: Japes boulder GB", ["type"] = "GB"},
-	{["byte"] = 0x2F, ["bit"] = 6, ["name"] = "B.Locker FTT"},
+	{["byte"] = 0x2F, ["bit"] = 6, ["name"] = "B.Locker FTT", ["type"] = "FTT"},
 	{["byte"] = 0x2F, ["bit"] = 7, ["name"] = "Training Grounds: Barrels spwaned"}, -- TODO: Test this
 
 	{["byte"] = 0x30, ["bit"] = 1, ["name"] = "Kong Unlocked: DK"},
@@ -657,8 +664,10 @@ local flag_array = {
 	{["byte"] = 0x30, ["bit"] = 4, ["name"] = "Training Grounds: Orange Barrel Completed"}, -- TODO: Test this
 	{["byte"] = 0x30, ["bit"] = 5, ["name"] = "Training Grounds: Barrel Barrel Completed"}, -- TODO: Test this
 
-	{["byte"] = 0x30, ["bit"] = 6, ["name"] = "Isles: Escape FTT"}, -- TODO: Test this
+	{["byte"] = 0x30, ["bit"] = 6, ["name"] = "Isles: Escape FTT", ["type"] = "FTT"}, -- TODO: Test this
+	{["byte"] = 0x31, ["bit"] = 0, ["name"] = "?? T&S FTT ?", ["type"] = "FTT"},
 
+	{["byte"] = 0x31, ["bit"] = 1, ["name"] = "Isles: Rareware GB room open"},
 	{["byte"] = 0x31, ["bit"] = 5, ["name"] = "Factory Lobby: Lever pulled"}, -- TODO: Test this
 	{["byte"] = 0x31, ["bit"] = 6, ["name"] = "? Japes Lobby: Lanky GB", ["type"] = "GB"}, -- TODO: Test this
 	{["byte"] = 0x31, ["bit"] = 7, ["name"] = "Aztec Lobby: Side room open"}, -- TODO: Test this
@@ -898,11 +907,14 @@ local flag_array = {
 	{["byte"] = 0x60, ["bit"] = 5, ["name"] = "Helm: W1 (Enterance)"},
 	{["byte"] = 0x60, ["bit"] = 6, ["name"] = "Helm: W1 (Far)"},
 
-	{["byte"] = 0x61, ["bit"] = 3, ["name"] = "Japes: FTT"},
-	{["byte"] = 0x62, ["bit"] = 0, ["name"] = "Castle: FTT"},
-	{["byte"] = 0x62, ["bit"] = 1, ["name"] = "T&S FTT"},
-	{["byte"] = 0x62, ["bit"] = 2, ["name"] = "Helm: FTT"},
-	{["byte"] = 0x62, ["bit"] = 3, ["name"] = "Aztec: FTT"},
+	{["byte"] = 0x61, ["bit"] = 3, ["name"] = "Japes: FTT", ["type"] = "FTT"},
+	{["byte"] = 0x61, ["bit"] = 5, ["name"] = "Galleon: FTT", ["type"] = "FTT"},
+	{["byte"] = 0x61, ["bit"] = 6, ["name"] = "Fungi: FTT", ["type"] = "FTT"},
+	{["byte"] = 0x61, ["bit"] = 7, ["name"] = "Caves: FTT", ["type"] = "FTT"},
+	{["byte"] = 0x62, ["bit"] = 0, ["name"] = "Castle: FTT", ["type"] = "FTT"},
+	{["byte"] = 0x62, ["bit"] = 1, ["name"] = "T&S FTT", ["type"] = "FTT"},
+	{["byte"] = 0x62, ["bit"] = 2, ["name"] = "Helm: FTT", ["type"] = "FTT"},
+	{["byte"] = 0x62, ["bit"] = 3, ["name"] = "Aztec: FTT", ["type"] = "FTT"},
 
 	{["byte"] = 0x64, ["bit"] = 0, ["name"] = "Japes: Chunky Coin: By portal (1)", ["type"] = "Coin"},
 	{["byte"] = 0x64, ["bit"] = 1, ["name"] = "Japes: Chunky Coin: In water (1)", ["type"] = "Coin"},
@@ -1187,11 +1199,19 @@ local function process_flag_queue()
 					if queue_item["action_type"] == "set" then
 						current_value = mainmemory.readbyte(flags + queue_item["byte"]);
 						mainmemory.writebyte(flags + queue_item["byte"], set_bit(current_value, queue_item["bit"]));
-						console.log("Set \""..queue_item["name"].."\" at 0x"..bizstring.hex(queue_item["byte"]).." bit "..queue_item["bit"]);
+						if type(queue_item["name"]) == "string" then
+							console.log("Set \""..queue_item["name"].."\" at 0x"..bizstring.hex(queue_item["byte"]).." bit "..queue_item["bit"]);
+						else
+							console.log("Set flag at 0x"..bizstring.hex(queue_item["byte"]).." bit "..queue_item["bit"]);
+						end
 					elseif queue_item["action_type"] == "clear" then
 						current_value = mainmemory.readbyte(flags + queue_item["byte"]);
 						mainmemory.writebyte(flags + queue_item["byte"], clear_bit(current_value, queue_item["bit"]));
-						console.log("Cleared \""..queue_item["name"].."\" at 0x"..bizstring.hex(queue_item["byte"]).." bit "..queue_item["bit"]);
+						if type(queue_item["name"]) == "string" then
+							console.log("Cleared \""..queue_item["name"].."\" at 0x"..bizstring.hex(queue_item["byte"]).." bit "..queue_item["bit"]);
+						else
+							console.log("Cleared flag at 0x"..bizstring.hex(queue_item["byte"]).." bit "..queue_item["bit"]);
+						end
 					elseif queue_item["action_type"] == "check" then
 						checkFlags();
 					end
@@ -1212,10 +1232,76 @@ local function getFlagByName(flagName)
 	end
 end
 
+------------------------
+-- Set flag functions --
+------------------------
+
+function setFlag(byte, bit)
+	if type(byte) == "number" and type(bit) == "number" and bit >= 0 and bit <= 7 then
+		table.insert(flag_action_queue, {["action_type"]="set", ["byte"]=byte, ["bit"]=bit});
+		process_flag_queue();
+	end
+end
+
 function setFlagByName(name)
 	local flag = getFlagByName(name);
 	if type(flag) == "table" then
-		table.insert(flag_action_queue, {["action_type"]="set", ["byte"]=flag["byte"], ["bit"]=flag["bit"], ["name"]=name, ["type"]=flag["type"]});
+		flag["action_type"] = "set";
+		table.insert(flag_action_queue, flag);
+		process_flag_queue();
+	end
+end
+
+function setFlagByType(_type)
+	local num_set = 0;
+	if type(_type) == "string" then
+		local i, flag;
+		for i=1,#flag_array do
+			if flag_array[i]["type"] == _type then
+				flag = flag_array[i];
+				flag["action_type"] = "set";
+				table.insert(flag_action_queue, flag);
+				num_set = num_set + 1;
+			end
+		end
+	end
+	if num_set > 0 then
+		process_flag_queue();
+		console.log("Set "..num_set.." flags of type '".._type.."'");
+	else
+		console.log("No flags found for specified type.");
+	end
+end
+
+function setFlagsByType(_type)
+	setFlagByType(_type);
+end
+
+function setAllFlags()
+	local byte, bit;
+	for byte=0,flag_block_size do
+		for bit=0,7 do
+			setFlag(byte, bit);
+		end
+	end
+end
+
+function clearAllFlags()
+	local byte, bit;
+	for byte=0,flag_block_size do
+		for bit=0,7 do
+			clearFlag(byte, bit);
+		end
+	end
+end
+
+--------------------------
+-- Clear flag functions --
+--------------------------
+
+function clearFlag(byte, bit)
+	if type(byte) == "number" and type(bit) == "number" and bit >= 0 and bit <= 7 then
+		table.insert(flag_action_queue, {["action_type"]="clear", ["byte"]=byte, ["bit"]=bit});
 		process_flag_queue();
 	end
 end
@@ -1223,10 +1309,40 @@ end
 function clearFlagByName(name)
 	local flag = getFlagByName(name);
 	if type(flag) == "table" then
-		table.insert(flag_action_queue, {["action_type"]="clear", ["byte"]=flag["byte"], ["bit"]=flag["bit"], ["name"]=name, ["type"]=flag["type"]});
+		flag["action_type"] = "clear";
+		table.insert(flag_action_queue, flag);
 		process_flag_queue();
 	end
 end	
+
+function clearFlagByType(_type)
+	local num_cleared = 0;
+	if type(_type) == "string" then
+		local i, flag;
+		for i=1,#flag_array do
+			if flag_array[i]["type"] == _type then
+				flag = flag_array[i];
+				flag["action_type"] = "clear";
+				table.insert(flag_action_queue, flag);
+				num_cleared = num_cleared + 1;
+			end
+		end
+	end
+	if num_cleared > 0 then
+		process_flag_queue();
+		console.log("Cleared "..num_cleared.." flags of type '".._type.."'");
+	else
+		console.log("No flags found for specified type.");
+	end
+end
+
+function clearFlagsByType(_type)
+	clearFlagByType(_type);
+end
+
+--------------------------
+-- Other flag functions --
+--------------------------
 
 local function flagSetButtonHandler()
 	setFlagByName(forms.getproperty(options_flag_dropdown, "SelectedItem"));
@@ -1527,6 +1643,7 @@ function Game.setXPosition(value)
 	else
 		mainmemory.writefloat(kong_object + x_pos, value, true);
 		mainmemory.writebyte(kong_object + locked_to_pad, 0x00);
+		mainmemory.write_u32_be(kong_object + locked_to_rainbow_coin_pointer, 0x00);
 	end
 end
 
@@ -1545,6 +1662,7 @@ function Game.setZPosition(value)
 	if not isInSubGame() then
 		mainmemory.writefloat(kong_object + z_pos, value, true);
 		mainmemory.writebyte(kong_object + locked_to_pad, 0x00);
+		mainmemory.write_u32_be(kong_object + locked_to_rainbow_coin_pointer, 0x00);
 	end
 end
 
