@@ -98,24 +98,69 @@ SystemID N64
 7FC954	b	b	1	RDRAM	DK Instrument (bitfield xxxx321i)
 7FC957	b	u	1	RDRAM	DK Coins
 7FC959	b	h	1	RDRAM	DK Instrument energy
-7FC95B	b	u	1	RDRAM	DK Japes CBs
-7FC993	b	u	1	RDRAM	DK Japes GBs
+7FC95A	w	u	1	RDRAM	DK Japes CBs
+7FC95C	w	u	1	RDRAM	DK Aztec CBs
+7FC95E	w	u	1	RDRAM	DK Factory CBs
+7FC960	w	u	1	RDRAM	DK Galleon CBs
+7FC962	w	u	1	RDRAM	DK Fungi CBs
+7FC964	w	u	1	RDRAM	DK Caves CBs
+7FC966	w	u	1	RDRAM	DK Castle CBs
+7FC992	w	s	1	RDRAM	DK Japes GBs
+7FC994	w	s	1	RDRAM	DK Aztec GBs
+7FC996	w	s	1	RDRAM	DK Factory GBs
+7FC998	w	s	1	RDRAM	DK Galleon GBs
+7FC99A	w	s	1	RDRAM	DK Fungi GBs
+7FC99C	w	s	1	RDRAM	DK Caves GBs
+7FC99E	w	s	1	RDRAM	DK Castle GBs
+7FC9A0	w	s	1	RDRAM	DK Isles GBs
 7FC9AE	b	u	1	RDRAM	Diddy Moves
 7FC9AF	b	u	1	RDRAM	Diddy Sim Slam
 7FC9B0	b	b	1	RDRAM	Diddy Weapon (bitfield xxxxxshw)
 7FC9B5	b	u	1	RDRAM	Diddy Coins
+7FC9F0	w	s	1	RDRAM	Diddy Japes GBs
+7FC9F2	w	s	1	RDRAM	Diddy Aztec GBs
+7FC9F4	w	s	1	RDRAM	Diddy Factory GBs
+7FC9F6	w	s	1	RDRAM	Diddy Galleon GBs
+7FC9F8	w	s	1	RDRAM	Diddy Fungi GBs
+7FC9FA	w	s	1	RDRAM	Diddy Caves GBs
+7FC9FC	w	s	1	RDRAM	Diddy Castle GBs
+7FC9FE	w	s	1	RDRAM	Diddy Isles GBs
 7FCA0C	b	u	1	RDRAM	Lanky Moves
 7FCA0D	b	u	1	RDRAM	Lanky Sim Slam
 7FCA0E	b	b	1	RDRAM	Lanky Weapon (bitfield xxxxxshw)
 7FCA13	b	u	1	RDRAM	Lanky Coins
+7FCA4E	w	s	1	RDRAM	Lanky Japes GBs
+7FCA50	w	s	1	RDRAM	Lanky Aztec GBs
+7FCA52	w	s	1	RDRAM	Lanky Factory GBs
+7FCA54	w	s	1	RDRAM	Lanky Galleon GBs
+7FCA56	w	s	1	RDRAM	Lanky Fungi GBs
+7FCA58	w	s	1	RDRAM	Lanky Caves GBs
+7FCA5A	w	s	1	RDRAM	Lanky Castle GBs
+7FCA5C	w	s	1	RDRAM	Lanky Isles GBs
 7FCA6A	b	u	1	RDRAM	Tiny Moves
 7FCA6B	b	u	1	RDRAM	Tiny Sim Slam
 7FCA6C	b	b	1	RDRAM	Tiny Weapon (bitfield xxxxxshw)
 7FCA71	b	u	1	RDRAM	Tiny Coins
+7FCAAC	w	s	1	RDRAM	Tiny Japes GBs
+7FCAAE	w	s	1	RDRAM	Tiny Aztec GBs
+7FCAB0	w	s	1	RDRAM	Tiny Factory GBs
+7FCAB2	w	s	1	RDRAM	Tiny Galleon GBs
+7FCAB4	w	s	1	RDRAM	Tiny Fungi GBs
+7FCAB6	w	s	1	RDRAM	Tiny Caves GBs
+7FCAB8	w	s	1	RDRAM	Tiny Castle GBs
+7FCABA	w	s	1	RDRAM	Tiny Isles GBs
 7FCAC8	b	u	1	RDRAM	Chunky Moves
 7FCAC9	b	u	1	RDRAM	Chunky Sim Slam
 7FCACA	b	b	1	RDRAM	Chunky Weapon (bitfield xxxxxshw)
 7FCACF	b	u	1	RDRAM	Chunky Coins
+7FCB0A	w	s	1	RDRAM	Chunky Japes GBs
+7FCB0C	w	s	1	RDRAM	Chunky Aztec GBs
+7FCB0E	w	s	1	RDRAM	Chunky Factory GBs
+7FCB10	w	s	1	RDRAM	Chunky Galleon GBs
+7FCB12	w	s	1	RDRAM	Chunky Fungi GBs
+7FCB14	w	s	1	RDRAM	Chunky Caves GBs
+7FCB16	w	s	1	RDRAM	Chunky Castle GBs
+7FCB18	w	s	1	RDRAM	Chunky Isles GBs
 7FCC41	b	u	1	RDRAM	Standard Ammo
 7FCC43	b	u	1	RDRAM	Homing Ammo
 7FCC45	b	u	1	RDRAM	Oranges
