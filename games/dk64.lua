@@ -442,7 +442,7 @@ function adjustBlockSize(value)
 	checkFlags();
 end
 
-local flag_array = {	
+local flag_array = {
 	---------------------------
 	-- Needs further testing --
 	---------------------------
@@ -522,11 +522,16 @@ local flag_array = {
 
 	{["byte"] = 0x06, ["bit"] = 0, ["name"] = "Aztec: DK Blueprint room open"},
 
+	{["byte"] = 0x08, ["bit"] = 1, ["name"] = "Aztec: Tiny GB: Tiny temple", ["type"] = "GB"},
 	{["byte"] = 0x08, ["bit"] = 2, ["name"] = "Kong Unlocked: Tiny"},
 	{["byte"] = 0x08, ["bit"] = 4, ["name"] = "Aztec: Lanky: Vulture GB", ["type"] = "GB"},
 	{["byte"] = 0x08, ["bit"] = 5, ["name"] = "Aztec: Tiny Temple ice melted"},
 	{["byte"] = 0x08, ["bit"] = 6, ["name"] = "Kong Unlocked: Lanky"},
 	{["byte"] = 0x09, ["bit"] = 2, ["name"] = "Key 2", ["type"] = "Key"},
+
+	{["byte"] = 0x0A, ["bit"] = 2, ["name"] = "Aztec: W2 (Totem Pole)", ["type"] = "Warp"},
+	{["byte"] = 0x0A, ["bit"] = 4, ["name"] = "Aztec: W3 (Totem Pole)", ["type"] = "Warp"},
+	{["byte"] = 0x0A, ["bit"] = 7, ["name"] = "Aztec: W5 (Totem Pole)", ["type"] = "Warp"},
 
 	{["byte"] = 0x0B, ["bit"] = 0, ["name"] = "Aztec: W1 (Llama temple, high)", ["type"] = "Warp"},
 	{["byte"] = 0x0B, ["bit"] = 1, ["name"] = "Aztec: W1 (Llama temple, low)", ["type"] = "Warp"},
@@ -535,13 +540,14 @@ local flag_array = {
 
 	{["byte"] = 0x0B, ["bit"] = 4, ["name"] = "Aztec: Llama Cutscene"}, -- TODO: Bananas in this hallway were skipped with block size 0x80
 	{["byte"] = 0x0B, ["bit"] = 5, ["name"] = "Aztec: Lanky's help me cutscene"},
+	{["byte"] = 0x0B, ["bit"] = 6, ["name"] = "Aztec: W2 (Tiny temple)", ["type"] = "Warp"},
 	{["byte"] = 0x0B, ["bit"] = 7, ["name"] = "Aztec: FT Cutscene"},
 
 	{["byte"] = 0x0D, ["bit"] = 5, ["name"] = "Factory: Hatch opened"},
 	{["byte"] = 0x0D, ["bit"] = 6, ["name"] = "? Factory: Storage room switch pressed"},
 	{["byte"] = 0x0D, ["bit"] = 7, ["name"] = "Factory: Power shed activated"},
 	{["byte"] = 0x0E, ["bit"] = 0, ["name"] = "Factory: Power shed GB", ["type"] = "GB"},
-	
+
 	{["byte"] = 0x0E, ["bit"] = 5, ["name"] = "Kong Unlocked: Chunky"},
 	{["byte"] = 0x0E, ["bit"] = 6, ["name"] = "Factory: Lanky GB: Free Chunky", ["type"] = "GB"},
 	{["byte"] = 0x0F, ["bit"] = 4, ["name"] = "Factory: Tiny GB: Bad hit detection wheel", ["type"] = "GB"},
@@ -597,9 +603,9 @@ local flag_array = {
 
 	{["byte"] = 0x24, ["bit"] = 4, ["name"] = "Key 6", ["type"] = "Key"},
 	{["byte"] = 0x24, ["bit"] = 5, ["name"] = "Caves: Diddy Cabin GB (Upper)", ["type"] = "GB"},
-	
+
 	{["byte"] = 0x25, ["bit"] = 3, ["name"] = "Caves: Giant Kosha cutscene"},
-	
+
 	{["byte"] = 0x27, ["bit"] = 5, ["name"] = "Key 7", ["type"] = "Key"},
 
 	{["byte"] = 0x28, ["bit"] = 3, ["name"] = "Castle: Lanky: Greenhouse GB", ["type"] = "GB"},
@@ -622,7 +628,7 @@ local flag_array = {
 	{["byte"] = 0x2A, ["bit"] = 6, ["name"] = "Castle: W3 (Crypt, far)", ["type"] = "Warp"},
 
 	{["byte"] = 0x2B, ["bit"] = 5, ["name"] = "Castle: First time cutscene"},
-	
+
 	{["byte"] = 0x2C, ["bit"] = 3, ["name"] = "Warp pad FTT"},
 	{["byte"] = 0x2C, ["bit"] = 6, ["name"] = "Crown pad FTT"},
 	{["byte"] = 0x2D, ["bit"] = 0, ["name"] = "Mini Monkey FTT?"},
@@ -711,6 +717,8 @@ local flag_array = {
 	{["byte"] = 0x38, ["bit"] = 1, ["name"] = "Key 6 Turned", ["type"] = "Key"},
 	{["byte"] = 0x38, ["bit"] = 2, ["name"] = "Key 7 Turned", ["type"] = "Key"},
 	{["byte"] = 0x38, ["bit"] = 3, ["name"] = "Key 8 Turned", ["type"] = "Key"},
+
+	{["byte"] = 0x38, ["bit"] = 6, ["name"] = "Aztec: Tiny Coin: Near Rainbow Coin", ["type"] = "Coin"},
 
 	{["byte"] = 0x39, ["bit"] = 5, ["name"] = "Japes Lobby: B. Locker Cleared"},
 	{["byte"] = 0x39, ["bit"] = 6, ["name"] = "Aztec Lobby: B. Locker Cleared"},
@@ -813,9 +821,11 @@ local flag_array = {
 	{["byte"] = 0x44, ["bit"] = 3, ["name"] = "Snide's: Tiny BP Turned (Isles)", ["type"] = "Blueprint"},
 	{["byte"] = 0x44, ["bit"] = 4, ["name"] = "Snide's: Chunky BP Turned (Isles)", ["type"] = "Blueprint"},
 
-	{["byte"] = 0x44, ["bit"] = 5, ["name"] = "Japes: DK Banana Medal",},
-	{["byte"] = 0x44, ["bit"] = 7, ["name"] = "Japes: Lanky Banana Medal"},
-	{["byte"] = 0x45, ["bit"] = 1, ["name"] = "Japes: Chunky Banana Medal"},
+	{["byte"] = 0x44, ["bit"] = 5, ["name"] = "Japes: DK Banana Medal", ["type"] = "Medal"},
+	{["byte"] = 0x44, ["bit"] = 6, ["name"] = "Japes: Diddy Banana Medal", ["type"] = "Medal"},
+	{["byte"] = 0x44, ["bit"] = 7, ["name"] = "Japes: Lanky Banana Medal", ["type"] = "Medal"},
+	{["byte"] = 0x45, ["bit"] = 0, ["name"] = "Japes: Tiny Banana Medal", ["type"] = "Medal"},
+	{["byte"] = 0x45, ["bit"] = 1, ["name"] = "Japes: Chunky Banana Medal", ["type"] = "Medal"},
 
 	{["byte"] = 0x49, ["bit"] = 5, ["name"] = "Japes: Fairy (Water room)", ["type"] = "Fairy"},
 	{["byte"] = 0x49, ["bit"] = 6, ["name"] = "Japes: Fairy (Painting room)", ["type"] = "Fairy"},
@@ -868,10 +878,13 @@ local flag_array = {
 	{["byte"] = 0x4F, ["bit"] = 1, ["name"] = "Japes: Lanky CB: Balloon by his BP", ["type"] = "Balloon"},
 	{["byte"] = 0x4F, ["bit"] = 2, ["name"] = "Japes: Tiny CB: Balloon in shellhive", ["type"] = "Balloon"},
 	{["byte"] = 0x4F, ["bit"] = 3, ["name"] = "Japes: Lanky CB: Balloon in painting room)", ["type"] = "Balloon"},
+	{["byte"] = 0x4F, ["bit"] = 4, ["name"] = "Aztec: Tiny CB: Balloon in free Tiny Room (1)", ["type"] = "Balloon"},
+	{["byte"] = 0x4F, ["bit"] = 5, ["name"] = "Aztec: Tiny CB: Balloon in free Tiny Room (2)", ["type"] = "Balloon"},
 
 	{["byte"] = 0x54, ["bit"] = 4, ["name"] = "Isles: Rainbow Coin (Fungi Lobby Enterance)?", ["type"] = "Rainbow Coin"},
 	{["byte"] = 0x54, ["bit"] = 5, ["name"] = "Isles: Rainbow Coin (Slope leading to Aztec Lobby)", ["type"] = "Rainbow Coin"},
 	{["byte"] = 0x54, ["bit"] = 6, ["name"] = "Isles: Rainbow Coin (Aztec Lobby Roof)", ["type"] = "Rainbow Coin"},
+	{["byte"] = 0x55, ["bit"] = 5, ["name"] = "Aztec: Rainbow Coin", ["type"] = "Rainbow Coin"},
 	{["byte"] = 0x56, ["bit"] = 2, ["name"] = "Fungi: Rainbow Coin", ["type"] = "Rainbow Coin"},
 	{["byte"] = 0x57, ["bit"] = 0, ["name"] = "Fungi: Balloon - DK Mill", ["type"] = "Balloon"},
 	{["byte"] = 0x57, ["bit"] = 2, ["name"] = "Fungi: Balloon - Lanky Lower Mushroom", ["type"] = "Balloon"},
