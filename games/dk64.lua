@@ -430,7 +430,7 @@ local options_Clear_flag_button;
 
 local flag_pointer;
 
-local flag_block_size = 0x120;
+local flag_block_size = 0x13B;
 
 local flag_action_queue = {};
 local flag_names = {};
@@ -659,6 +659,9 @@ local flag_array = {
 	
 	{["byte"] = 0x5C, ["bit"] = 0, ["name"] = "Training Grounds: Waterfall Rainbow Coin", ["type"] = "Rainbow Coin"},
 	{["byte"] = 0x5B, ["bit"] = 7, ["name"] = "Training Grounds: Tunnel Rainbow Coin", ["type"] = "Rainbow Coin"},
+	{["byte"] = 0x13B, ["bit"] = 3, ["name"] = "Training Grounds: Left Tunnel Coin", ["type"] = "Coin"},
+	{["byte"] = 0x13B, ["bit"] = 2, ["name"] = "Training Grounds: Center Tunnel Coin", ["type"] = "Coin"},
+	{["byte"] = 0x13B, ["bit"] = 1, ["name"] = "Training Grounds: Right Tunnel Coin", ["type"] = "Coin"},
 
 	{["byte"] = 0x30, ["bit"] = 6, ["name"] = "Isles: Escape FTT"}, -- TODO: Test this
 
@@ -1114,6 +1117,9 @@ local flag_array = {
 	{["byte"] = 0x11B, ["bit"] = 4, ["name"] = "Castle: DK bridge CB (3)", ["type"] = "CB"},
 	{["byte"] = 0x11B, ["bit"] = 6, ["name"] = "Castle: DK bridge CB (4)", ["type"] = "CB"},
 	{["byte"] = 0x11B, ["bit"] = 7, ["name"] = "Castle: DK bridge CB (5)", ["type"] = "CB"},
+	
+	{["byte"] = 0x56, ["bit"] = 6, ["name"] = "Galleon: Lighthouse Rainbow Coin", ["type"] = "Rainbow Coin"}
+
 }
 
 local function fill_flag_names()
