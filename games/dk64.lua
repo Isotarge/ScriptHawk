@@ -649,13 +649,16 @@ local flag_array = {
 	{["byte"] = 0x2F, ["bit"] = 4, ["name"] = "Key 8", ["type"] = "Key"},
 	{["byte"] = 0x2F, ["bit"] = 5, ["name"] = "Isles: Japes boulder GB", ["type"] = "GB"},
 	{["byte"] = 0x2F, ["bit"] = 6, ["name"] = "B.Locker FTT"},
-	{["byte"] = 0x2F, ["bit"] = 7, ["name"] = "Training Grounds: Barrels spwaned"}, -- TODO: Test this
+	{["byte"] = 0x2F, ["bit"] = 7, ["name"] = "Training Grounds: Barrels spawned"}, -- TODO: Test this
 
 	{["byte"] = 0x30, ["bit"] = 1, ["name"] = "Kong Unlocked: DK"},
 	{["byte"] = 0x30, ["bit"] = 2, ["name"] = "Training Grounds: Dive Barrel Completed"},
 	{["byte"] = 0x30, ["bit"] = 3, ["name"] = "Training Grounds: Vine Barrel Completed"},
 	{["byte"] = 0x30, ["bit"] = 4, ["name"] = "Training Grounds: Orange Barrel Completed"}, -- TODO: Test this
 	{["byte"] = 0x30, ["bit"] = 5, ["name"] = "Training Grounds: Barrel Barrel Completed"}, -- TODO: Test this
+	
+	{["byte"] = 0x5C, ["bit"] = 0, ["name"] = "Training Grounds: Waterfall Rainbow Coin", ["type"] = "Rainbow Coin"},
+	{["byte"] = 0x5B, ["bit"] = 7, ["name"] = "Training Grounds: Tunnel Rainbow Coin", ["type"] = "Rainbow Coin"},
 
 	{["byte"] = 0x30, ["bit"] = 6, ["name"] = "Isles: Escape FTT"}, -- TODO: Test this
 
