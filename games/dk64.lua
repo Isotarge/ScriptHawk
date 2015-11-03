@@ -658,13 +658,8 @@ local flag_array = {
 	{["byte"] = 0x2F, ["bit"] = 2, ["name"] = "Training Grounds: Treehouse Squawk Cutscene"},
 	{["byte"] = 0x2F, ["bit"] = 4, ["name"] = "Key 8", ["type"] = "Key"},
 	{["byte"] = 0x2F, ["bit"] = 5, ["name"] = "Isles: Japes boulder GB", ["type"] = "GB"},
-
-	{["byte"] = 0x2F, ["bit"] = 6, ["name"] = "B.Locker FTT"},
-	{["byte"] = 0x2F, ["bit"] = 7, ["name"] = "Training Grounds: Barrels spawned"}, -- TODO: Test this
-
 	{["byte"] = 0x2F, ["bit"] = 6, ["name"] = "B.Locker FTT", ["type"] = "FTT"},
 	{["byte"] = 0x2F, ["bit"] = 7, ["name"] = "Training Grounds: Barrels spwaned"}, -- TODO: Test this
-
 
 	{["byte"] = 0x30, ["bit"] = 1, ["name"] = "Kong Unlocked: DK"},
 	{["byte"] = 0x30, ["bit"] = 2, ["name"] = "Training Grounds: Dive Barrel Completed"},
