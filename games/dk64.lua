@@ -555,7 +555,7 @@ local flag_array = {
 	{["byte"] = 0x0F, ["bit"] = 4, ["name"] = "Factory: Tiny GB: Bad hit detection wheel", ["type"] = "GB"},
 
 	{["byte"] = 0x10, ["bit"] = 0, ["name"] = "Factory: DK GB: Crusher room", ["type"] = "GB"},
-	{["byte"] = 0x10, ["bit"] = 1, ["name"] = "Factory: Arcade Lever", 
+	{["byte"] = 0x10, ["bit"] = 1, ["name"] = "Factory: Arcade Lever"}, 
 
 	{["byte"] = 0x11, ["bit"] = 2, ["name"] = "Key 3", ["type"] = "Key"},
 	{["byte"] = 0x11, ["bit"] = 4, ["name"] = "Factory: Chunky's help me cutscene"},
@@ -909,7 +909,7 @@ local flag_array = {
 
 	{["byte"] = 0x55, ["bit"] = 5, ["name"] = "Aztec: Rainbow Coin", ["type"] = "Rainbow Coin"},
 
-	{["byte"] = 0x56, ["bit"] = 6, ["name"] = "Galleon: Rainbow Coin (Lighthouse)", ["type"] = "Rainbow Coin"}
+	{["byte"] = 0x56, ["bit"] = 6, ["name"] = "Galleon: Rainbow Coin (Lighthouse)", ["type"] = "Rainbow Coin"},
 	{["byte"] = 0x56, ["bit"] = 2, ["name"] = "Fungi: Rainbow Coin", ["type"] = "Rainbow Coin"},
 
 	{["byte"] = 0x57, ["bit"] = 0, ["name"] = "Fungi: DK CB: Balloon in Mill", ["type"] = "Balloon"},
@@ -1176,7 +1176,7 @@ local flag_array = {
 	{["byte"] = 0x118, ["bit"] = 4, ["name"] = "Castle: DK CB: Lower Path from Tunnel (5)", ["type"] = "CB"},
 	{["byte"] = 0x118, ["bit"] = 5, ["name"] = "Castle: DK CB: Lower Path from Tunnel (6)", ["type"] = "CB"},
 	{["byte"] = 0x118, ["bit"] = 6, ["name"] = "Castle: DK CB: Lower Ladder", ["type"] = "CB"},
-	{["byte"] = 0x118, ["bit"] = 7, ["name"] = "Castle: DK CB: Lower Path from Tunnel (7)"", ["type"] = "CB"},
+	{["byte"] = 0x118, ["bit"] = 7, ["name"] = "Castle: DK CB: Lower Path from Tunnel (7)", ["type"] = "CB"},
 
 	{["byte"] = 0x11A, ["bit"] = 0, ["name"] = "Castle: DK CB: Bridge (1)", ["type"] = "CB"},
 
@@ -1198,7 +1198,7 @@ local flag_array = {
 	{["byte"] = 0x11D, ["bit"] = 1, ["name"] = "Castle: DK CB: Upper Path to W2 (2)", ["type"] = "CB"},
 	{["byte"] = 0x11D, ["bit"] = 2, ["name"] = "Castle: DK CB: Upper Path to W2 (3)", ["type"] = "CB"},
 	{["byte"] = 0x11D, ["bit"] = 3, ["name"] = "Castle: DK CB: Upper Path to W2 (4)", ["type"] = "CB"},
-	{["byte"] = 0x11D, ["bit"] = 4, ["name"] = "Castle: DK CB: Lower Path from Tunnel (8)"", ["type"] = "CB"},
+	{["byte"] = 0x11D, ["bit"] = 4, ["name"] = "Castle: DK CB: Lower Path from Tunnel (8)", ["type"] = "CB"},
 	{["byte"] = 0x11D, ["bit"] = 5, ["name"] = "Castle: DK CB: Upper Path to W2 (5)", ["type"] = "CB"},
 	{["byte"] = 0x11D, ["bit"] = 6, ["name"] = "Castle: Tiny CB: Path (9)", ["type"] = "CB"},
 	{["byte"] = 0x11D, ["bit"] = 7, ["name"] = "Castle: Tiny CB: Path (10)", ["type"] = "CB"},
@@ -1230,9 +1230,8 @@ local flag_array = {
 	{["byte"] = 0x127, ["bit"] = 4, ["name"] = "Castle: DK Coin: Tiny BP (1)", ["type"] = "Coin"},
 	{["byte"] = 0x127, ["bit"] = 5, ["name"] = "Castle: DK Coin: Tiny BP (2)", ["type"] = "Coin"},
 	{["byte"] = 0x127, ["bit"] = 6, ["name"] = "Castle: DK Coin: Tiny BP (3)", ["type"] = "Coin"},
-	{["byte"] = 0x127, ["bit"] = 7, ["name"] = "Castle: DK Coin: W2 (3)", ["type"] = "Coin"},
-
-}
+	{["byte"] = 0x127, ["bit"] = 7, ["name"] = "Castle: DK Coin: W2 (3)", ["type"] = "Coin"}
+};
 
 local function fill_flag_names()
 	local i;
