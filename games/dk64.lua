@@ -546,9 +546,8 @@ local flag_array = {
 	{["byte"] = 0x0B, ["bit"] = 7, ["name"] = "Aztec: FT Cutscene"},
 
 	{["byte"] = 0x0D, ["bit"] = 4, ["name"] = "Aztec: T&S Cleared"},
-
 	{["byte"] = 0x0D, ["bit"] = 5, ["name"] = "Factory: Hatch opened"},
-	{["byte"] = 0x0D, ["bit"] = 6, ["name"] = "? Factory: Storage room switch pressed"},
+	{["byte"] = 0x0D, ["bit"] = 6, ["name"] = "Factory: Storage Room Neutral Switch"},
 	{["byte"] = 0x0D, ["bit"] = 7, ["name"] = "Factory: Power shed activated"},
 
 	{["byte"] = 0x0E, ["bit"] = 0, ["name"] = "Factory: Power shed GB", ["type"] = "GB"},
@@ -556,12 +555,21 @@ local flag_array = {
 	{["byte"] = 0x0E, ["bit"] = 6, ["name"] = "Factory: Lanky GB: Free Chunky", ["type"] = "GB"},
 	{["byte"] = 0x0E, ["bit"] = 7, ["name"] = "Factory: Dark Room Gate"},
 
+	{["byte"] = 0x0F, ["bit"] = 0, ["name"] = "Factory: Dark Room Box"},
+	{["byte"] = 0x0F, ["bit"] = 1, ["name"] = "Factory: Chunky GB: Dark Room", ["type"] = "GB"},
+	{["byte"] = 0x0F, ["bit"] = 2, ["name"] = "Factory: DK GB: Numbers Game", ["type"] = "GB"}, 
+	{["byte"] = 0x0F, ["bit"] = 3, ["name"] = "Factory: Tiny GB: Arcade Room", ["type"] = "GB"},
 	{["byte"] = 0x0F, ["bit"] = 4, ["name"] = "Factory: Tiny GB: Bad hit detection wheel", ["type"] = "GB"},
+	{["byte"] = 0x0F, ["bit"] = 5, ["name"] = "Factory: Lanky GB: R&D", ["type"] = "GB"},
 
 	{["byte"] = 0x10, ["bit"] = 0, ["name"] = "Factory: DK GB: Crusher room", ["type"] = "GB"},
-	{["byte"] = 0x10, ["bit"] = 1, ["name"] = "Factory: Arcade Lever"}, 
+	{["byte"] = 0x10, ["bit"] = 1, ["name"] = "Factory: Arcade Lever"},
+	{["byte"] = 0x10, ["bit"] = 7, ["name"] = "Factory: Diddy GB: Block Tower", ["type"] = "GB"},
 
+	{["byte"] = 0x11, ["bit"] = 0, ["name"] = "Factory: Chunky GB: Stash Snatch", ["type"] = "GB"},
+	{["byte"] = 0x11, ["bit"] = 1, ["name"] = "Factory: Lanky GB: Batty Barrel Bandit", ["type"] = "GB"},
 	{["byte"] = 0x11, ["bit"] = 2, ["name"] = "Key 3", ["type"] = "Key"},
+	{["byte"] = 0x11, ["bit"] = 3, ["name"] = "Factory: Tiny GB: Car Race", ["type"] = "GB"}, 
 	{["byte"] = 0x11, ["bit"] = 4, ["name"] = "Factory: Chunky's help me cutscene"},
 	{["byte"] = 0x11, ["bit"] = 5, ["name"] = "Factory: W1 (Foyer)", ["type"] = "Warp"},
 	{["byte"] = 0x11, ["bit"] = 6, ["name"] = "Factory: W1 (Storage Room)", ["type"] = "Warp"},
@@ -574,6 +582,7 @@ local flag_array = {
 	{["byte"] = 0x12, ["bit"] = 4, ["name"] = "Factory: W4 (Bottom)", ["type"] = "Warp"},
 	{["byte"] = 0x12, ["bit"] = 5, ["name"] = "Factory: W5 (Funky's)", ["type"] = "Warp"},
 	{["byte"] = 0x12, ["bit"] = 6, ["name"] = "Factory: W5 (Arcade room)", ["type"] = "Warp"},
+	{["byte"] = 0x12, ["bit"] = 7, ["name"] = "Factory: R&D Lever"},
 
 	{["byte"] = 0x13, ["bit"] = 0, ["name"] = "Factory: T&S Cleared"},
 	{["byte"] = 0x13, ["bit"] = 1, ["name"] = "Galleon: Cannon game room open"},
@@ -899,8 +908,13 @@ local flag_array = {
 	{["byte"] = 0x4F, ["bit"] = 4, ["name"] = "Aztec: Tiny CB: Balloon in free Tiny Room (1)", ["type"] = "Balloon"},
 	{["byte"] = 0x4F, ["bit"] = 5, ["name"] = "Aztec: Tiny CB: Balloon in free Tiny Room (2)", ["type"] = "Balloon"},
 
+	{["byte"] = 0x51, ["bit"] = 0, ["name"] = "Factory: Chunky CB: Balloon above Snide", ["type"] = "Balloon"},
+	{["byte"] = 0x51, ["bit"] = 1, ["name"] = "Factory: Lanky CB: Balloon by F Key", ["type"] = "Balloon"},
+	{["byte"] = 0x51, ["bit"] = 2, ["name"] = "Factory: Tiny CB: Balloon by Snide", ["type"] = "Balloon"},
 	{["byte"] = 0x51, ["bit"] = 6, ["name"] = "Factory: DK CB: Balloon in Cranky and Candy Area ", ["type"] = "Balloon"},
+	{["byte"] = 0x51, ["bit"] = 7, ["name"] = "Factory: DK CB: Balloon by Numbers Game", ["type"] = "Balloon"},
 
+	{["byte"] = 0x52, ["bit"] = 2, ["name"] = "Factory: Tiny CB: Balloon by Funky", ["type"] = "Balloon"},
 	{["byte"] = 0x52, ["bit"] = 5, ["name"] = "Factory: Rainbow Coin", ["type"] = "Rainbow Coin"},
 
 	{["byte"] = 0x54, ["bit"] = 4, ["name"] = "Isles: Rainbow Coin (Fungi Lobby Enterance)?", ["type"] = "Rainbow Coin"},
@@ -929,6 +943,7 @@ local flag_array = {
 	{["byte"] = 0x60, ["bit"] = 6, ["name"] = "Helm: W1 (Far)"},
 
 	{["byte"] = 0x61, ["bit"] = 3, ["name"] = "Japes: FTT", ["type"] = "FTT"},
+	{["byte"] = 0x61, ["bit"] = 4, ["name"] = "? Factory: FTT", ["type"] = "FTT"},
 	{["byte"] = 0x61, ["bit"] = 5, ["name"] = "Galleon: FTT", ["type"] = "FTT"},
 	{["byte"] = 0x61, ["bit"] = 6, ["name"] = "Fungi: FTT", ["type"] = "FTT"},
 	{["byte"] = 0x61, ["bit"] = 7, ["name"] = "Caves: FTT", ["type"] = "FTT"},
@@ -1118,6 +1133,94 @@ local flag_array = {
 
 	{["byte"] = 0x82, ["bit"] = 6, ["name"] = "Aztec: Diddy Coin: Instrument pad (Tiny temple)", ["type"] = "Coin"},
 
+	{["byte"] = 0xA0, ["bit"] = 6, ["name"] = "Factory: DK CB: Numbers Tunnel (1)", ["type"] = "CB"},
+	{["byte"] = 0xA0, ["bit"] = 7, ["name"] = "Factory: DK CB: Numbers Tunnel (2)", ["type"] = "CB"},
+
+	{["byte"] = 0xA1, ["bit"] = 0, ["name"] = "Factory: DK Coin: R&D Lever (1)", ["type"] = "Coin"},
+	{["byte"] = 0xA1, ["bit"] = 1, ["name"] = "Factory: DK Coin: R&D Lever (2)", ["type"] = "Coin"},
+	{["byte"] = 0xA1, ["bit"] = 3, ["name"] = "Factory: Chunky CB: Dark Room Bunch (1)", ["type"] = "CB"},
+	{["byte"] = 0xA1, ["bit"] = 4, ["name"] = "Factory: Chunky CB: Dark Room Bunch (2)", ["type"] = "CB"},
+
+	{["byte"] = 0xA2, ["bit"] = 3, ["name"] = "Factory: Chunky Coin: Snide's (1)", ["type"] = "Coin"},
+	{["byte"] = 0xA2, ["bit"] = 5, ["name"] = "Factory: DK Coin: Testing Room Stairs (1)", ["type"] = "Coin"},
+	{["byte"] = 0xA2, ["bit"] = 6, ["name"] = "Factory: DK Coin: Testing Room Stairs (2)", ["type"] = "Coin"},
+	{["byte"] = 0xA2, ["bit"] = 7, ["name"] = "Factory: DK Coin: R&D Lever (3)", ["type"] = "Coin"},
+
+	{["byte"] = 0xA4, ["bit"] = 7, ["name"] = "Factory: Diddy CB: Arcade Tunnel (1)", ["type"] = "CB"},
+
+	{["byte"] = 0xA5, ["bit"] = 0, ["name"] = "Factory: DK CB: Numbers Tunnel (3)", ["type"] = "CB"},
+	{["byte"] = 0xA5, ["bit"] = 2, ["name"] = "Factory: Chunky Coin: W1 (Storage Room) (1)", ["type"] = "Coin"},
+	{["byte"] = 0xA5, ["bit"] = 5, ["name"] = "Factory: Chunky Coin: W1 (Storage Room) (2)", ["type"] = "Coin"},
+	
+	{["byte"] = 0xA6, ["bit"] = 0, ["name"] = "Factory: DK CB: Numbers Tunnel (4)", ["type"] = "CB"},
+	{["byte"] = 0xA6, ["bit"] = 1, ["name"] = "Factory: Diddy CB: Arcade Tunnel (2)", ["type"] = "CB"},
+	{["byte"] = 0xA6, ["bit"] = 2, ["name"] = "Factory: Diddy CB: Arcade Tunnel (3)", ["type"] = "CB"},
+	{["byte"] = 0xA6, ["bit"] = 3, ["name"] = "Factory: Diddy CB: Arcade Tunnel (4)", ["type"] = "CB"},
+	{["byte"] = 0xA6, ["bit"] = 4, ["name"] = "Factory: Chunky Coin: W1 (Storage Room) (3)", ["type"] = "Coin"},
+	{["byte"] = 0xA6, ["bit"] = 5, ["name"] = "Factory: Chunky Coin: W1 (Storage Room) (4)", ["type"] = "Coin"},
+	{["byte"] = 0xA6, ["bit"] = 7, ["name"] = "Factory: DK Coin: Testing Room Stairs (3)", ["type"] = "Coin"},
+
+	{["byte"] = 0xA7, ["bit"] = 5, ["name"] = "Factory: Diddy CB: Arcade Tunnel (5)", ["type"] = "CB"},
+	{["byte"] = 0xA7, ["bit"] = 7, ["name"] = "Factory: DK CB: Numbers Tunnel (5)", ["type"] = "CB"},
+
+	{["byte"] = 0xA8, ["bit"] = 0, ["name"] = "Factory: Tiny Coin: BP (1)", ["type"] = "Coin"},
+	{["byte"] = 0xA8, ["bit"] = 1, ["name"] = "Factory: Tiny Coin: BP (2)", ["type"] = "Coin"},
+	{["byte"] = 0xA8, ["bit"] = 4, ["name"] = "Factory: Lanky CB: R&D (1)", ["type"] = "CB"},
+	{["byte"] = 0xA8, ["bit"] = 5, ["name"] = "Factory: Tiny CB: Foyer Tunnel (1)", ["type"] = "CB"},
+	{["byte"] = 0xA8, ["bit"] = 6, ["name"] = "Factory: Tiny CB: Foyer Tunnel (2)", ["type"] = "CB"},
+	{["byte"] = 0xA8, ["bit"] = 7, ["name"] = "Factory: Tiny CB: Foyer Tunnel (3)", ["type"] = "CB"},
+
+	{["byte"] = 0xA9, ["bit"] = 2, ["name"] = "Factory: Tiny Coin: BP (3)", ["type"] = "Coin"},
+	{["byte"] = 0xA9, ["bit"] = 3, ["name"] = "Factory: Tiny Coin: BP (4)", ["type"] = "Coin"},
+	{["byte"] = 0xA9, ["bit"] = 4, ["name"] = "Factory: Lanky CB: R&D (2)", ["type"] = "CB"},
+	{["byte"] = 0xA9, ["bit"] = 5, ["name"] = "Factory: Tiny Coin: Zinger Pole (1)", ["type"] = "Coin"},
+	{["byte"] = 0xA9, ["bit"] = 6, ["name"] = "Factory: Lanky CB: R&D (3)", ["type"] = "CB"},
+	{["byte"] = 0xA9, ["bit"] = 7, ["name"] = "Factory: Tiny Coin: Zinger Pole (2)", ["type"] = "Coin"},
+
+	{["byte"] = 0xAA, ["bit"] = 0, ["name"] = "Factory: Diddy CB: Blocker Tower Bunch (1)", ["type"] = "CB"},
+	{["byte"] = 0xAA, ["bit"] = 1, ["name"] = "Factory: Diddy CB: W5 Bunch (Arcade)", ["type"] = "CB"},
+	{["byte"] = 0xAA, ["bit"] = 2, ["name"] = "Factory: Diddy CB: W5 Bunch (Funky)", ["type"] = "CB"},
+
+	{["byte"] = 0xAB, ["bit"] = 0, ["name"] = "Factory: Diddy CB: Funky Tunnel (1)", ["type"] = "CB"},
+	{["byte"] = 0xAB, ["bit"] = 1, ["name"] = "Factory: Diddy CB: Funky Tunnel (2)", ["type"] = "CB"},
+	{["byte"] = 0xAB, ["bit"] = 2, ["name"] = "Factory: Diddy CB: Funky Tunnel (3)", ["type"] = "CB"},
+	{["byte"] = 0xAB, ["bit"] = 4, ["name"] = "Factory: Diddy CB: Blocker Tower Bunch (2)", ["type"] = "CB"},
+	{["byte"] = 0xAB, ["bit"] = 5, ["name"] = "Factory: Diddy CB: Blocker Tower Bunch (3)", ["type"] = "CB"},
+	{["byte"] = 0xAB, ["bit"] = 6, ["name"] = "Factory: Diddy CB: Blocker Tower Bunch (4)", ["type"] = "CB"},
+	{["byte"] = 0xAB, ["bit"] = 7, ["name"] = "Factory: Diddy CB: Blocker Tower Bunch (5)", ["type"] = "CB"},
+
+	{["byte"] = 0xAC, ["bit"] = 0, ["name"] = "Factory: Tiny CB: Bad Hit Detection Wheel Bunch (1)", ["type"] = "CB"},
+	{["byte"] = 0xAC, ["bit"] = 1, ["name"] = "Factory: Tiny CB: Window Bunch (Left)", ["type"] = "CB"},
+	{["byte"] = 0xAC, ["bit"] = 2, ["name"] = "Factory: Tiny CB: Window Bunch (Right)", ["type"] = "CB"},
+	{["byte"] = 0xAC, ["bit"] = 3, ["name"] = "Factory: Tiny Coin: Zinger Pole (3)", ["type"] = "Coin"},
+	{["byte"] = 0xAC, ["bit"] = 4, ["name"] = "Factory: Tiny Coin: Zinger Pole (4)", ["type"] = "Coin"},
+	{["byte"] = 0xAC, ["bit"] = 5, ["name"] = "Factory: Lanky CB: R&D (4)", ["type"] = "CB"},
+	{["byte"] = 0xAC, ["bit"] = 6, ["name"] = "Factory: Lanky CB: R&D (5)", ["type"] = "CB"},
+	{["byte"] = 0xAC, ["bit"] = 7, ["name"] = "Factory: Tiny Coin: Zinger Pole (5)", ["type"] = "Coin"},
+
+	{["byte"] = 0xAD, ["bit"] = 0, ["name"] = "Factory: Tiny CB: R&D Tunnel (1)", ["type"] = "CB"},
+	{["byte"] = 0xAD, ["bit"] = 1, ["name"] = "Factory: Tiny CB: Bad Hit Detection Wheel Bunch (2)", ["type"] = "CB"},
+	{["byte"] = 0xAD, ["bit"] = 7, ["name"] = "Factory: Tiny CB: Arcade Bunch", ["type"] = "CB"},
+
+	{["byte"] = 0xAE, ["bit"] = 0, ["name"] = "Factory: Tiny CB: R&D Tunnel (2)", ["type"] = "CB"},
+	{["byte"] = 0xAE, ["bit"] = 1, ["name"] = "Factory: Tiny CB: R&D Tunnel (3)", ["type"] = "CB"},
+	{["byte"] = 0xAE, ["bit"] = 2, ["name"] = "Factory: Tiny CB: R&D Tunnel (4)", ["type"] = "CB"},
+	{["byte"] = 0xAE, ["bit"] = 3, ["name"] = "Factory: Tiny CB: R&D Tunnel (5)", ["type"] = "CB"},
+	{["byte"] = 0xAE, ["bit"] = 4, ["name"] = "Factory: Tiny CB: R&D Tunnel (6)", ["type"] = "CB"},
+	{["byte"] = 0xAE, ["bit"] = 5, ["name"] = "Factory: Tiny CB: R&D Tunnel (7)", ["type"] = "CB"},
+	{["byte"] = 0xAE, ["bit"] = 6, ["name"] = "Factory: Tiny CB: R&D Tunnel (8)", ["type"] = "CB"},
+	{["byte"] = 0xAE, ["bit"] = 7, ["name"] = "Factory: Tiny CB: R&D Tunnel (9)", ["type"] = "CB"},
+
+	{["byte"] = 0xAF, ["bit"] = 0, ["name"] = "Factory: Tiny CB: Testing Room Tunnel (1)", ["type"] = "CB"},
+	{["byte"] = 0xAF, ["bit"] = 1, ["name"] = "Factory: Tiny CB: Testing Room Tunnel (2)", ["type"] = "CB"},
+	{["byte"] = 0xAF, ["bit"] = 2, ["name"] = "Factory: Tiny CB: Testing Room Tunnel (3)", ["type"] = "CB"},
+	{["byte"] = 0xAF, ["bit"] = 3, ["name"] = "Factory: Tiny CB: Testing Room Tunnel (4)", ["type"] = "CB"},
+	{["byte"] = 0xAF, ["bit"] = 4, ["name"] = "Factory: Tiny CB: Testing Room Tunnel (5)", ["type"] = "CB"},
+	{["byte"] = 0xAF, ["bit"] = 5, ["name"] = "Factory: Tiny CB: Testing Room Tunnel (6)", ["type"] = "CB"},
+	{["byte"] = 0xAF, ["bit"] = 6, ["name"] = "Factory: Tiny CB: Testing Room Tunnel (7)", ["type"] = "CB"},
+	{["byte"] = 0xAF, ["bit"] = 7, ["name"] = "Factory: Tiny CB: R&D Tunnel (10)", ["type"] = "CB"},
+
+	{["byte"] = 0xB0, ["bit"] = 0, ["name"] = "Factory: Lanky Coin: R&D Pole (1)", ["type"] = "Coin"},
 	{["byte"] = 0xB0, ["bit"] = 1, ["name"] = "Factory: Lanky CB: Cranky and Candy Area (1)", ["type"] = "CB"},
 	{["byte"] = 0xB0, ["bit"] = 2, ["name"] = "Factory: Lanky CB: Cranky and Candy Area (2)", ["type"] = "CB"},
 	{["byte"] = 0xB0, ["bit"] = 3, ["name"] = "Factory: Lanky CB: Cranky and Candy Area (3)", ["type"] = "CB"},
@@ -1125,11 +1228,52 @@ local flag_array = {
 	{["byte"] = 0xB0, ["bit"] = 5, ["name"] = "Factory: Lanky CB: Cranky and Candy Area (5)", ["type"] = "CB"},
 	{["byte"] = 0xB0, ["bit"] = 6, ["name"] = "Factory: Lanky CB: Storage Room Pipe (1)", ["type"] = "CB"},
 	{["byte"] = 0xB0, ["bit"] = 7, ["name"] = "Factory: Lanky CB: Storage Room Pipe (2)", ["type"] = "CB"},
+
+	{["byte"] = 0xB1, ["bit"] = 0, ["name"] = "Factory: Tiny Coin: BP (5)", ["type"] = "Coin"},
+	{["byte"] = 0xB1, ["bit"] = 1, ["name"] = "Factory: Diddy Coin: R&D Pole (1)", ["type"] = "Coin"},
+	{["byte"] = 0xB1, ["bit"] = 2, ["name"] = "Factory: Diddy Coin: R&D Pole (2)", ["type"] = "Coin"},
+	{["byte"] = 0xB1, ["bit"] = 3, ["name"] = "Factory: Diddy Coin: R&D Pole (3)", ["type"] = "Coin"},
+	{["byte"] = 0xB1, ["bit"] = 4, ["name"] = "Factory: Lanky Coin: R&D Pole (2)", ["type"] = "Coin"},
+	{["byte"] = 0xB1, ["bit"] = 5, ["name"] = "Factory: Lanky Coin: R&D Pole (3)", ["type"] = "Coin"},
+	{["byte"] = 0xB1, ["bit"] = 6, ["name"] = "Factory: Lanky Coin: R&D Pole (4)", ["type"] = "Coin"},
+	{["byte"] = 0xB1, ["bit"] = 7, ["name"] = "Factory: Lanky Coin: R&D Pole (5)", ["type"] = "Coin"},
+
+	{["byte"] = 0xB2, ["bit"] = 2, ["name"] = "Factory: Lanky CB: R&D (6)", ["type"] = "CB"},
+	{["byte"] = 0xB2, ["bit"] = 3, ["name"] = "Factory: Lanky CB: R&D (7)", ["type"] = "CB"},
+	{["byte"] = 0xB2, ["bit"] = 4, ["name"] = "Factory: Lanky CB: R&D (8)", ["type"] = "CB"},
+	{["byte"] = 0xB2, ["bit"] = 5, ["name"] = "Factory: Lanky CB: R&D (9)", ["type"] = "CB"},
+	{["byte"] = 0xB2, ["bit"] = 6, ["name"] = "Factory: Lanky CB: R&D (10)", ["type"] = "CB"},
+	{["byte"] = 0xB2, ["bit"] = 7, ["name"] = "Factory: Diddy Coin: R&D Pole (4)", ["type"] = "Coin"},
+
+	{["byte"] = 0xB3, ["bit"] = 0, ["name"] = "Factory: Diddy Coin: Pole Above Snide's (1)", ["type"] = "Coin"},
+	{["byte"] = 0xB3, ["bit"] = 1, ["name"] = "Factory: Diddy Coin: Pole Above Snide's (2)", ["type"] = "Coin"},
+	{["byte"] = 0xB3, ["bit"] = 2, ["name"] = "Factory: Diddy Coin: Pole Above Snide's (3)", ["type"] = "Coin"},
+	{["byte"] = 0xB3, ["bit"] = 3, ["name"] = "Factory: Diddy Coin: Pole Above Snide's (4)", ["type"] = "Coin"},
+	{["byte"] = 0xB3, ["bit"] = 4, ["name"] = "Factory: Diddy Coin: Pole Above Snide's (5)", ["type"] = "Coin"},
+
+	{["byte"] = 0xB5, ["bit"] = 0, ["name"] = "Factory: Lanky Coin: Testing Room Boxes (1)", ["type"] = "Coin"},
+	{["byte"] = 0xB5, ["bit"] = 2, ["name"] = "Factory: Lanky Coin: Testing Room Boxes (2)", ["type"] = "Coin"},
+	{["byte"] = 0xB5, ["bit"] = 3, ["name"] = "Factory: Lanky Coin: Testing Room Boxes (3)", ["type"] = "Coin"},
+
 	{["byte"] = 0xB6, ["bit"] = 3, ["name"] = "Factory: Lanky CB: W2 Bunch", ["type"] = "CB"},
+	{["byte"] = 0xB6, ["bit"] = 4, ["name"] = "Factory: Lanky CB: R&D Bunch", ["type"] = "CB"},
 
 	{["byte"] = 0xB7, ["bit"] = 0, ["name"] = "Factory: Lanky CB: Storage Room Pipe (3)", ["type"] = "CB"},
 	{["byte"] = 0xB7, ["bit"] = 1, ["name"] = "Factory: Lanky CB: Storage Room Pipe (4)", ["type"] = "CB"},
 	{["byte"] = 0xB7, ["bit"] = 2, ["name"] = "Factory: Lanky CB: Storage Room Pipe (5)", ["type"] = "CB"},
+
+	{["byte"] = 0xB8, ["bit"] = 4, ["name"] = "Factory: Chunky Coin: W1 (Storage Room) (5)", ["type"] = "Coin"},
+
+	{["byte"] = 0xB9, ["bit"] = 0, ["name"] = "Factory: Chunky Coin: Snide's (2)", ["type"] = "Coin"},
+	{["byte"] = 0xB9, ["bit"] = 1, ["name"] = "Factory: Chunky CB: W3 by Snide's Bunch", ["type"] = "CB"},
+
+	{["byte"] = 0xBA, ["bit"] = 0, ["name"] = "Factory: Chunk Coin: Testing Room Alcove (1)", ["type"] = "Coin"},
+	{["byte"] = 0xBA, ["bit"] = 1, ["name"] = "Factory: Chunk Coin: Testing Room Alcove (2)", ["type"] = "Coin"},
+	{["byte"] = 0xBA, ["bit"] = 2, ["name"] = "Factory: Chunk Coin: Testing Room Alcove (3)", ["type"] = "Coin"},
+	{["byte"] = 0xBA, ["bit"] = 3, ["name"] = "Factory: Chunk Coin: Testing Room Alcove (4)", ["type"] = "Coin"},
+	{["byte"] = 0xBA, ["bit"] = 5, ["name"] = "Factory: Chunky CB: Storage Room W1 Bunch", ["type"] = "CB"},
+	{["byte"] = 0xBA, ["bit"] = 6, ["name"] = "Factory: Chunky CB: Dark Room Bunch (3)", ["type"] = "CB"},
+	{["byte"] = 0xBA, ["bit"] = 7, ["name"] = "Factory: Chunky Coin: Snide's (3)", ["type"] = "Coin"},
 
 	{["byte"] = 0xBC, ["bit"] = 2, ["name"] = "Factory: DK CB: Bunch in Baboon Blast (1)", ["type"] = "CB"},
 	{["byte"] = 0xBC, ["bit"] = 3, ["name"] = "Factory: DK CB: Bunch in Baboon Blast (2)", ["type"] = "CB"},
@@ -1142,7 +1286,12 @@ local flag_array = {
 	{["byte"] = 0xBD, ["bit"] = 4, ["name"] = "Factory: DK CB: Bunch in crusher room (1)", ["type"] = "Bunch"},
 	{["byte"] = 0xBD, ["bit"] = 5, ["name"] = "Factory: DK CB: Bunch in crusher room (2)", ["type"] = "Bunch"},
 	{["byte"] = 0xBD, ["bit"] = 6, ["name"] = "Factory: DK CB: Bunch in crusher room (3)", ["type"] = "Bunch"},
+	
+	{["byte"] = 0xBE, ["bit"] = 7, ["name"] = "Factory: Diddy Coin: R&D Pole (5)", ["type"] = "Coin"},
 
+	{["byte"] = 0xBF, ["bit"] = 0, ["name"] = "Factory: Chunky Coin: Stash Snatch Area (1)", ["type"] = "Coin"},
+	{["byte"] = 0xBF, ["bit"] = 1, ["name"] = "Factory: Chunky Coin: Stash Snatch Area (2)", ["type"] = "Coin"},
+	{["byte"] = 0xBF, ["bit"] = 2, ["name"] = "Factory: Chunky Coin: Stash Snatch Area (3)", ["type"] = "Coin"},
 	{["byte"] = 0xBF, ["bit"] = 3, ["name"] = "Factory: Lanky Coin: Storage Room Box (1)", ["type"] = "Coin"},
 	{["byte"] = 0xBF, ["bit"] = 4, ["name"] = "Factory: Lanky Coin: Storage Room Box (2)", ["type"] = "Coin"},
 	{["byte"] = 0xBF, ["bit"] = 5, ["name"] = "Factory: Lanky Coin: Storage Room Box (3)", ["type"] = "Coin"},
