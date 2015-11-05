@@ -1028,8 +1028,8 @@ local flag_array = {
 
 	{["byte"] = 0x60, ["bit"] = 2, ["name"] = "Helm: BoM off"},
 	{["byte"] = 0x60, ["bit"] = 4, ["name"] = "Helm: Crown door open"},
-	{["byte"] = 0x60, ["bit"] = 5, ["name"] = "Helm: W1 (Enterance)"},
-	{["byte"] = 0x60, ["bit"] = 6, ["name"] = "Helm: W1 (Far)"},
+	{["byte"] = 0x60, ["bit"] = 5, ["name"] = "Helm: W1 (Enterance)", ["type"] = "Warp"},
+	{["byte"] = 0x60, ["bit"] = 6, ["name"] = "Helm: W1 (Far)", ["type"] = "Warp"},
 	{["byte"] = 0x60, ["bit"] = 7, ["name"] = "FT Funky CS"},
 
 	{["byte"] = 0x61, ["bit"] = 2, ["name"] = "FT Candy CS"},
@@ -2099,12 +2099,16 @@ function flagStats()
 	local gb_known = 0;
 	local crowns_known = 0;
 	local coins_known = 0;
+	local untypedFlags = 0;
 
 	local i, flag, name;
 	for i=1,#flag_array do
 		flag = flag_array[i];
 		name = flag["name"];
 		_type = flag["type"];
+		if _type == nil then
+			untypedFlags = untypedFlags + 1;
+		end
 		if _type == "Fairy" then
 			fairies_known = fairies_known + 1;
 		end
@@ -2145,6 +2149,7 @@ function flagStats()
 
 	console.log("Block size: 0x"..bizstring.hex(flag_block_size));
 	formatOutputString("Flags known: ", knownFlags, totalFlags);
+	formatOutputString("Flags without types: ", untypedFlags, knownFlags);
 	console.log();
 	formatOutputString("Crowns: ", crowns_known, max_crowns);
 	formatOutputString("Fairies: ", fairies_known, max_fairies);
