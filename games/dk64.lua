@@ -775,8 +775,8 @@ local flag_array = {
 	{["byte"] = 0x35, ["bit"] = 1, ["name"] = "Isles: Tiny: High instrument pad GB", ["type"] = "GB"}, -- TODO: Test this
 	{["byte"] = 0x35, ["bit"] = 2, ["name"] = "Isles: Lanky instrument pad played"},
 	{["byte"] = 0x35, ["bit"] = 3, ["name"] = "Isles: Tiny: High instrument pad played"}, -- TODO: Test this
-	{["byte"] = 0x35, ["bit"] = 4, ["name"] = "Isles: Diddy: Summit Bonus Barrel"},
-	{["byte"] = 0x35, ["bit"] = 5, ["name"] = "Isles: Lanky Sprint GB", ["type"] = "GB"}, -- TODO: Test this
+	{["byte"] = 0x35, ["bit"] = 4, ["name"] = "Isles: Diddy: Summit Bonus Barrel GB", ["type"] = "GB"},
+	{["byte"] = 0x35, ["bit"] = 5, ["name"] = "Isles: Lanky: Sprint GB", ["type"] = "GB"}, -- TODO: Test this
 	{["byte"] = 0x35, ["bit"] = 6, ["name"] = "Isles: Chunky: Pound the X"},
 	{["byte"] = 0x35, ["bit"] = 7, ["name"] = "Isles: Chunky: Pound the X GB", ["type"] = "GB"},
 
@@ -954,7 +954,7 @@ local flag_array = {
 	{["byte"] = 0x4D, ["bit"] = 1, ["name"] = "Castle: Crown", ["type"] = "Crown"},
 	{["byte"] = 0x4D, ["bit"] = 2, ["name"] = "Helm: Crown", ["type"] = "Crown"},
 	{["byte"] = 0x4D, ["bit"] = 3, ["name"] = "Test Room: Balloon", ["type"] = "Balloon"},
-	{["byte"] = 0x4D, ["bit"] = 5, ["name"] = "Japes: Rainbow Coin (Slope by painting room)"},
+	{["byte"] = 0x4D, ["bit"] = 5, ["name"] = "Japes: Rainbow Coin (Slope by painting room)", ["type"] = "Rainbow Coin"},
 	{["byte"] = 0x4D, ["bit"] = 6, ["name"] = "Japes: Diddy CB: Balloon in cave", ["type"] = "Balloon"},
 	{["byte"] = 0x4D, ["bit"] = 7, ["name"] = "Japes: DK CB: Balloon by Snide", ["type"] = "Balloon"},
 
@@ -1137,7 +1137,7 @@ local flag_array = {
 	{["byte"] = 0x74, ["bit"] = 3, ["name"] = "Japes: Lanky CB: Fairy cave (3)", ["type"] = "CB"},
 	{["byte"] = 0x74, ["bit"] = 5, ["name"] = "Japes: Chunky CB: Bunch on Funky's (Left)", ["type"] = "Bunch"},
 	{["byte"] = 0x74, ["bit"] = 6, ["name"] = "Japes: Diddy CB: By enterance (2)", ["type"] = "CB"},
-	{["byte"] = 0x74, ["bit"] = 7, ["name"] = "Japes: Lanky Coin: Bonus Barrel Room (1)"}, -- TODO: Flags missing in this room with block size 0x80
+	{["byte"] = 0x74, ["bit"] = 7, ["name"] = "Japes: Lanky Coin: Bonus Barrel Room (1)", ["type"] = "Coin"}, -- TODO: Flags missing in this room with block size 0x80
 
 	{["byte"] = 0x75, ["bit"] = 0, ["name"] = "Japes: Lanky CB: Painting room slope (1)", ["type"] = "CB"},
 	{["byte"] = 0x75, ["bit"] = 1, ["name"] = "Japes: Lanky CB: Painting room slope (2)", ["type"] = "CB"},
@@ -1188,7 +1188,7 @@ local flag_array = {
 	{["byte"] = 0x7A, ["bit"] = 6, ["name"] = "Japes: Chunky CB: Bunch in Shellhive area (3)", ["type"] = "Bunch"},
 	{["byte"] = 0x7A, ["bit"] = 7, ["name"] = "Japes: Tiny CB: Fairy cave (7)", ["type"] = "CB"},
 
-	{["byte"] = 0x7B, ["bit"] = 0, ["name"] = "Japes: Lanky Coin: Bonus Barrel Room (2)"}, -- TODO: Flags missing in this room with block size 0x80
+	{["byte"] = 0x7B, ["bit"] = 0, ["name"] = "Japes: Lanky Coin: Bonus Barrel Room (2)", ["type"] = "Coin"}, -- TODO: Flags missing in this room with block size 0x80
 	{["byte"] = 0x7B, ["bit"] = 1, ["name"] = "Japes: Chunky CB: Bunch in Shellhive area (4)", ["type"] = "Bunch"},
 	{["byte"] = 0x7B, ["bit"] = 2, ["name"] = "Japes: Chunky Coin: Stump (3)", ["type"] = "Coin"},
 	{["byte"] = 0x7B, ["bit"] = 3, ["name"] = "Japes: Diddy Coin: BP (3)", ["type"] = "Coin"},
@@ -2091,7 +2091,7 @@ local function formatOutputString(caption, value, max)
 	console.log(caption..value.."/"..max.." or "..round(value/max * 100,2).."%");
 end
 
-function flagStats()
+function flagStats(verbose)
 	local fairies_known = 0;
 	local blueprints_known = 0;
 	local warps_known = 0;
@@ -2101,6 +2101,8 @@ function flagStats()
 	local coins_known = 0;
 	local untypedFlags = 0;
 
+	verbose = verbose or false;
+
 	local i, flag, name;
 	for i=1,#flag_array do
 		flag = flag_array[i];
@@ -2108,6 +2110,9 @@ function flagStats()
 		_type = flag["type"];
 		if _type == nil then
 			untypedFlags = untypedFlags + 1;
+			if verbose then
+				console.log("Warning: Flag without type detected at 0x"..bizstring.hex(flag["byte"]).." bit "..flag["bit"].." with name: \""..flag["name"].."\"");
+			end
 		end
 		if _type == "Fairy" then
 			fairies_known = fairies_known + 1;
