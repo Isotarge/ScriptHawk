@@ -1,6 +1,15 @@
 Domain Main RAM
 SystemID SMS
+0020	b	h	0	Main RAM	Score (3)
+0021	b	h	0	Main RAM	Score (2)
+0022	b	h	0	Main RAM	Score (1)
+0025	b	h	0	Main RAM	Lives
 0030	w	h	0	Main RAM	Money
+007E	w	u	0	Main RAM	Game Over Timer
+00BE	w	u	0	Main RAM	Screen Position (Y)
+030C	b	u	0	Main RAM	X Position (Screen)
+030E	b	h	0	Main RAM	Y Position (Screen)
 0310	b	s	0	Main RAM	X Velocity
 0312	b	s	0	Main RAM	Y Velocity
+0319	b	u	0	Main RAM	Punch Timer
 
