@@ -1,0 +1,15 @@
+Domain Main RAM
+SystemID SMS
+010B	b	u	0	Main RAM	Round
+0113	b	h	0	Main RAM	Movement State
+0119	b	u	0	Main RAM	Egg Lives
+011C	w	u	0	Main RAM	Level timer (precise)
+011D	b	u	0	Main RAM	Level timer (on screen value)
+0170	b	h	0	Main RAM	Death transition timer
+0181	w	u	0	Main RAM	Bird spawn timer
+02A7	b	h	0	Main RAM	> 0x00 for Smoking penguin and reversed controls?
+0406	b	u	0	Main RAM	Penguin Y Position (Screen)
+0408	b	u	0	Main RAM	Penguin X Position (Screen)
+0446	b	h	0	Main RAM	Egg Y Position (Screen)
+0448	b	u	0	Main RAM	Egg X Position (Screen)
+
