@@ -1,0 +1,6 @@
+Domain Main RAM
+SystemID SMS
+0030	w	h	0	Main RAM	Money
+0310	b	s	0	Main RAM	X Velocity
+0312	b	s	0	Main RAM	Y Velocity
+
