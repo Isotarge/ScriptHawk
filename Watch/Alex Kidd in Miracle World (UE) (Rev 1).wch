@@ -15,4 +15,9 @@ SystemID SMS
 0310	b	s	0	Main RAM	X Velocity
 0312	b	s	0	Main RAM	Y Velocity
 0319	b	u	0	Main RAM	Punch Timer
+0F8C	b	u	0	Main RAM	Pause arrow position (X)
+0F8E	b	h	0	Main RAM	Pause arrow position (Y)
+0F90	b	s	0	Main RAM	Pause arrow velocity?
+0FAC	b	u	0	Main RAM	Pause arrow map position (X)
+0FAE	b	u	0	Main RAM	Pause arrow map position (Y)
 
