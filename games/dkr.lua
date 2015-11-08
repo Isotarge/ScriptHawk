@@ -122,6 +122,10 @@ Game.maps = {
 	"0x5F - ",
 };
 
+local function is_pointer(number)
+	return number >= 0x80000000 and number <= 0x803FFFFF;
+end
+
 --------------------
 -- Region/Version --
 --------------------
@@ -134,6 +138,9 @@ function Game.detectVersion(romName)
 		map_freeze_values = {
 			0x11C91B, 0x122BD7, 0x122CC2, 0x124F67, 0x1FD4A5, 0x1FD52B, 0x1FE729
 		};
+	elseif bizstring.contains(romName, "USA") and bizstring.contains(romName, "Rev A") then
+		player_object_pointer = 0x3FFFC0;
+		map_freeze_values = {};
 	elseif bizstring.contains(romName, "USA") then
 		-- TODO
 	else
@@ -147,7 +154,7 @@ end
 -- Physics/Scale --
 -------------------
 
-Game.speedy_speeds = { -.001, -.01, -.1, -1, -5, -10, -20, -50, -100 };
+Game.speedy_speeds = { .001, .01, .1, 1, 5, 10, 20, 50, 100 };
 Game.speedy_index = 7;
 
 Game.rot_speed = 100;
@@ -158,8 +165,12 @@ function Game.isPhysicsFrame()
 end
 
 function Game.getVelocity()
-	local player_object = mainmemory.read_u32_be(player_object_pointer) - 0x80000000;
-	return mainmemory.readfloat(player_object + velocity, true);
+	local player_object = mainmemory.read_u32_be(player_object_pointer);
+	if is_pointer(player_object) then
+		player_object = player_object - 0x80000000;
+		return mainmemory.readfloat(player_object + velocity, true);
+	end
+	return 0;
 end
 
 --------------
@@ -167,34 +178,55 @@ end
 --------------
 
 function Game.getXPosition()
-	local player_object = mainmemory.read_u32_be(player_object_pointer) - 0x80000000;
-	return mainmemory.readfloat(player_object + x_pos, true);
+	local player_object = mainmemory.read_u32_be(player_object_pointer);
+	if is_pointer(player_object) then
+		player_object = player_object - 0x80000000;
+		return -1 * mainmemory.readfloat(player_object + x_pos, true);
+	end
+	return 0;
 end
 
 function Game.getYPosition()
-	local player_object = mainmemory.read_u32_be(player_object_pointer) - 0x80000000;
-	return mainmemory.readfloat(player_object + y_pos, true);
+	local player_object = mainmemory.read_u32_be(player_object_pointer);
+	if is_pointer(player_object) then
+		player_object = player_object - 0x80000000;
+		return mainmemory.readfloat(player_object + y_pos, true);
+	end
+	return 0;
 end
 
 function Game.getZPosition()
-	local player_object = mainmemory.read_u32_be(player_object_pointer) - 0x80000000;
-	return mainmemory.readfloat(player_object + z_pos, true);
+	local player_object = mainmemory.read_u32_be(player_object_pointer);
+	if is_pointer(player_object) then
+		player_object = player_object - 0x80000000;
+		return -1 * mainmemory.readfloat(player_object + z_pos, true);
+	end
+	return 0;
 end
 
 function Game.setXPosition(value)
-	local player_object = mainmemory.read_u32_be(player_object_pointer) - 0x80000000;
-	mainmemory.writefloat(player_object + x_pos, value, true);
+	local player_object = mainmemory.read_u32_be(player_object_pointer);
+	if is_pointer(player_object) then
+		player_object = player_object - 0x80000000;
+		mainmemory.writefloat(player_object + x_pos, -1 * value, true);
+	end
 end
 
 function Game.setYPosition(value)
-	local player_object = mainmemory.read_u32_be(player_object_pointer) - 0x80000000;
-	mainmemory.writefloat(player_object + y_velocity, 0, true);
-	mainmemory.writefloat(player_object + y_pos, value, true);
+	local player_object = mainmemory.read_u32_be(player_object_pointer);
+	if is_pointer(player_object) then
+		player_object = player_object - 0x80000000;
+		mainmemory.writefloat(player_object + y_velocity, 0, true);
+		mainmemory.writefloat(player_object + y_pos, value, true);
+	end
 end
 
 function Game.setZPosition(value)
-	local player_object = mainmemory.read_u32_be(player_object_pointer) - 0x80000000;
-	mainmemory.writefloat(player_object + z_pos, value, true);
+	local player_object = mainmemory.read_u32_be(player_object_pointer);
+	if is_pointer(player_object) then
+		player_object = player_object - 0x80000000;
+		mainmemory.writefloat(player_object + z_pos, - 1 * value, true);
+	end
 end
 
 --------------
@@ -202,33 +234,54 @@ end
 --------------
 
 function Game.getXRotation()
-	local player_object = mainmemory.read_u32_be(player_object_pointer) - 0x80000000;
-	return mainmemory.read_u16_be(player_object + facing_angle); -- TODO
+	local player_object = mainmemory.read_u32_be(player_object_pointer);
+	if is_pointer(player_object) then
+		player_object = player_object - 0x80000000;
+		return mainmemory.read_u16_be(player_object + x_rot); -- TODO
+	end
+	return 0;
 end
 
 function Game.getYRotation()
-	local player_object = mainmemory.read_u32_be(player_object_pointer) - 0x80000000;
-	return mainmemory.read_u16_be(player_object + facing_angle);
+	local player_object = mainmemory.read_u32_be(player_object_pointer);
+	if is_pointer(player_object) then
+		player_object = player_object - 0x80000000;
+		return mainmemory.read_u16_be(player_object + facing_angle);
+	end
+	return 0;
 end
 
 function Game.getZRotation()
-	local player_object = mainmemory.read_u32_be(player_object_pointer) - 0x80000000;
-	return mainmemory.read_u16_be(player_object + facing_angle); -- TODO
+	local player_object = mainmemory.read_u32_be(player_object_pointer);
+	if is_pointer(player_object) then
+		player_object = player_object - 0x80000000;
+		return mainmemory.read_u16_be(player_object + z_rot); -- TODO
+	end
+	return 0;
 end
 
 function Game.setXRotation(value)
-	local player_object = mainmemory.read_u32_be(player_object_pointer) - 0x80000000;
-	return mainmemory.write_u16_be(player_object + facing_angle, value);
+	local player_object = mainmemory.read_u32_be(player_object_pointer);
+	if is_pointer(player_object) then
+		player_object = player_object - 0x80000000;
+		mainmemory.write_u16_be(player_object + x_rot, value);
+	end
 end
 
 function Game.setYRotation(value)
-	local player_object = mainmemory.read_u32_be(player_object_pointer) - 0x80000000;
-	return mainmemory.write_u16_be(player_object + facing_angle, value);
+	local player_object = mainmemory.read_u32_be(player_object_pointer);
+	if is_pointer(player_object) then
+		player_object = player_object - 0x80000000;
+		mainmemory.write_u16_be(player_object + facing_angle, value);
+	end
 end
 
 function Game.setZRotation(value)
-	local player_object = mainmemory.read_u32_be(player_object_pointer) - 0x80000000;
-	return mainmemory.write_u16_be(player_object + facing_angle, value);
+	local player_object = mainmemory.read_u32_be(player_object_pointer);
+	if is_pointer(player_object) then
+		player_object = player_object - 0x80000000;
+		mainmemory.write_u16_be(player_object + z_rot, value);
+	end
 end
 
 -----------------------------
