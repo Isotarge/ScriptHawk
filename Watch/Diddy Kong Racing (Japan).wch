@@ -1,0 +1,5 @@
+Domain RDRAM
+SystemID N64
+1F1AE0	d	h	1	RDRAM	Player object pointer
+3FFFC0	d	h	1	RDRAM	Player object pointer
+

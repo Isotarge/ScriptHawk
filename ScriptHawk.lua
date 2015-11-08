@@ -50,6 +50,8 @@ elseif bizstring.contains(romName, "Banjo-Tooie") or bizstring.contains(romName,
 	Game = require "games.bt";
 elseif bizstring.contains(romName, "Banjo-Kazooie") or bizstring.contains(romName, "Banjo to Kazooie no Daibouken") then
 	Game = require "games.bk";
+elseif bizstring.contains(romName, "Diddy Kong Racing") then
+	Game = require "games.dkr";
 elseif bizstring.contains(romName, "Rayman 2 - The Great Escape") then
 	Game = require "games.rayman_2";
 elseif bizstring.contains(romName, "Super Mario 64") then
