@@ -144,10 +144,12 @@ local function enableOptimalTap()
 	local otap_startFrame = emu.framecount();
 	local otap_startLag = emu.lagcount();
 	otap_enabled = true;
+	console.log("Auto tapper (by Faschz) enabled.");
 end
 
 local function disableOptimalTap()
 	otap_enabled = false;
+	console.log("Auto tapper disabled.");
 end
 
 local function optimalTap()
@@ -190,7 +192,7 @@ function Game.applyInfinites()
 end
 
 function Game.initUI(form_handle, col, row, button_height, label_offset, dropdown_offset)
-	otap_checkbox = forms.checkbox(form_handle, "Auto tapper (by Faschz)", col(5) + dropdown_offset, row(6) + dropdown_offset);
+	otap_checkbox = forms.checkbox(form_handle, "Auto tapper", col(0) + dropdown_offset, row(6) + dropdown_offset);
 end
 
 function Game.eachFrame()
