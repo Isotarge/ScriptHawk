@@ -6,6 +6,14 @@ function round(num, idp)
 	return tonumber(string.format("%." .. (idp or 0) .. "f", num));
 end
 
+function toHexString(value)
+	value = string.format("%X", value or 0);
+	if string.len(value) % 2 ~= 0 then
+		value = "0"..value;
+	end
+	return "0x"..value;
+end
+
 function get_bit(field, index)
 	if index < 32 then
 		local bitmask = math.pow(2, index);

@@ -157,6 +157,14 @@ function is_hex(var_type)
 	return var_type == "Pointer" or var_type == "4_Unknown" or var_type == "Z4_Unknown";
 end
 
+function toHexString(value)
+	value = string.format("%X", value or 0);
+	if string.len(value) % 2 ~= 0 then
+		value = "0"..value;
+	end
+	return "0x"..value;
+end
+
 function format_for_output(var_type, value)
 	if is_binary(var_type) then
 		local binstring = bizstring.binary(value);
@@ -165,7 +173,7 @@ function format_for_output(var_type, value)
 		end
 		return "0";
 	elseif is_hex(var_type) then
-		return "0x"..bizstring.hex(value);
+		return toHexString(value);
 	end
 	return ""..value;
 end
@@ -194,12 +202,12 @@ function output_slot(index)
 						console.log("");
 					end
 					if type(slot_variables[i].Name) == "string" then
-						console.log("0x"..bizstring.hex(i).." "..(slot_variables[i].Name).." ("..(slot_variables[i].Type).."): "..format_for_output(slot_variables[i].Type, current_slot[i]));
+						console.log(toHexString(i).." "..(slot_variables[i].Name).." ("..(slot_variables[i].Type).."): "..format_for_output(slot_variables[i].Type, current_slot[i]));
 					else
-						console.log("0x"..bizstring.hex(i).." "..(slot_variables[i].Type)..": "..format_for_output(slot_variables[i].Type, current_slot[i]));
+						console.log(toHexString(i).." "..(slot_variables[i].Type)..": "..format_for_output(slot_variables[i].Type, current_slot[i]));
 					end
 				else
-					--console.log("0x"..bizstring.hex(i).." Nothing interesting.");
+					--console.log(toHexString(i).." Nothing interesting.");
 				end
 			end
 		end
@@ -222,12 +230,12 @@ function output_stats()
 					console.log("");
 				end
 				if type(slot_variables[i].Name) ~= "nil" then
-					console.log("0x"..bizstring.hex(i).." "..(slot_variables[i].Type)..": "..format_for_output(slot_variables[i].Type, min).. " to "..format_for_output(slot_variables[i].Type, max).." - "..(slot_variables[i].Name));
+					console.log(toHexString(i).." "..(slot_variables[i].Type)..": "..format_for_output(slot_variables[i].Type, min).. " to "..format_for_output(slot_variables[i].Type, max).." - "..(slot_variables[i].Name));
 				else
-					console.log("0x"..bizstring.hex(i).." "..(slot_variables[i].Type)..": "..format_for_output(slot_variables[i].Type, min).. " to "..format_for_output(slot_variables[i].Type, max));
+					console.log(toHexString(i).." "..(slot_variables[i].Type)..": "..format_for_output(slot_variables[i].Type, min).. " to "..format_for_output(slot_variables[i].Type, max));
 				end
 			else
-				--console.log("0x"..bizstring.hex(i).." Nothing interesting.");
+				--console.log(toHexString(i).." Nothing interesting.");
 			end
 		end
 	end
@@ -241,13 +249,13 @@ function format_slot_data()
 		formatted_data[i] = {};
 		for relative_address, variable_data in pairs(slot_variables) do
 			if type(variable_data) == "table" and is_interesting(relative_address) then
-				if type(variable_data.Name) ~= "nil" then
-					formatted_data[i]["0x"..bizstring.hex(relative_address).." "..variable_data.Name] = {
+				if type(variable_data.Name) == "string" then
+					formatted_data[i][toHexString(relative_address).." "..variable_data.Name] = {
 						["Type"] = variable_data.Type,
 						["Value"] = format_for_output(variable_data.Type, slot_data[i][relative_address])
 					};
 				else
-					formatted_data[i]["0x"..bizstring.hex(relative_address).." "..variable_data.Type] = {
+					formatted_data[i][toHexString(relative_address).." "..variable_data.Type] = {
 						["Value"] = format_for_output(variable_data.Type, slot_data[i][relative_address])
 					};
 				end
@@ -341,7 +349,7 @@ function get_all_unique(variable)
 		end
 
 		-- Output the findings
-		console.log("Starting output of variable 0x"..bizstring.hex(variable));
+		console.log("Starting output of variable "..toHexString(variable));
 		for value, count in pairs(unique_values) do
 			console.log(""..value.." appears "..count.." times");
 		end

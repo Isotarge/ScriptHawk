@@ -347,7 +347,7 @@ end
 
 local function find_root(object)
 	while object > 0 do
-		console.log(bizstring.hex(object));
+		console.log(toHexString(object));
 		object = mainmemory.read_u24_be(object + 1);
 	end
 end
@@ -405,10 +405,10 @@ BK_Velocity_Object = nil;
 
 function output_objects()
 	if type(BK_Pointer_List) ~= "nil" then
-		console.log("Pointer List: 0x"..bizstring.hex(BK_Pointer_List));
-		console.log("Position object: 0x"..bizstring.hex(BK_Position_Object));
-		console.log("Velocity object: 0x"..bizstring.hex(BK_Velocity_Object));
-		console.log("Slip object: 0x"..bizstring.hex(BK_Slip_Object));
+		console.log("Pointer List: "..toHexString(BK_Pointer_List));
+		console.log("Position object: "..toHexString(BK_Position_Object));
+		console.log("Velocity object: "..toHexString(BK_Velocity_Object));
+		console.log("Slip object: "..toHexString(BK_Slip_Object));
 	else
 		console.log("Can't get a read...");
 	end

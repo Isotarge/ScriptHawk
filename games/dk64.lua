@@ -1893,7 +1893,7 @@ function checkFlags()
 							-- Output debug info if the flag isn't known
 							if not isFound(i, bit) then
 								flag_found = true;
-								console.log("{[\"byte\"] = 0x"..bizstring.hex(i)..", [\"bit\"] = "..bit..", [\"name\"] = \"Name\", [\"type\"] = \"Type\"},");
+								console.log("{[\"byte\"] = "..toHexString(i)..", [\"bit\"] = "..bit..", [\"name\"] = \"Name\", [\"type\"] = \"Type\"},");
 							else
 								known_flags_found = known_flags_found + 1;
 							end
@@ -1935,17 +1935,17 @@ local function process_flag_queue()
 						current_value = mainmemory.readbyte(flags + queue_item["byte"]);
 						mainmemory.writebyte(flags + queue_item["byte"], set_bit(current_value, queue_item["bit"]));
 						if type(queue_item["name"]) == "string" then
-							console.log("Set \""..queue_item["name"].."\" at 0x"..bizstring.hex(queue_item["byte"]).." bit "..queue_item["bit"]);
+							console.log("Set \""..queue_item["name"].."\" at "..toHexString(queue_item["byte"]).." bit "..queue_item["bit"]);
 						else
-							console.log("Set flag at 0x"..bizstring.hex(queue_item["byte"]).." bit "..queue_item["bit"]);
+							console.log("Set flag at "..toHexString(queue_item["byte"]).." bit "..queue_item["bit"]);
 						end
 					elseif queue_item["action_type"] == "clear" then
 						current_value = mainmemory.readbyte(flags + queue_item["byte"]);
 						mainmemory.writebyte(flags + queue_item["byte"], clear_bit(current_value, queue_item["bit"]));
 						if type(queue_item["name"]) == "string" then
-							console.log("Cleared \""..queue_item["name"].."\" at 0x"..bizstring.hex(queue_item["byte"]).." bit "..queue_item["bit"]);
+							console.log("Cleared \""..queue_item["name"].."\" at "..toHexString(queue_item["byte"]).." bit "..queue_item["bit"]);
 						else
-							console.log("Cleared flag at 0x"..bizstring.hex(queue_item["byte"]).." bit "..queue_item["bit"]);
+							console.log("Cleared flag at "..toHexString(queue_item["byte"]).." bit "..queue_item["bit"]);
 						end
 					elseif queue_item["action_type"] == "check" then
 						checkFlags();
@@ -2111,7 +2111,7 @@ function flagStats(verbose)
 		if _type == nil then
 			untypedFlags = untypedFlags + 1;
 			if verbose then
-				console.log("Warning: Flag without type detected at 0x"..bizstring.hex(flag["byte"]).." bit "..flag["bit"].." with name: \""..flag["name"].."\"");
+				console.log("Warning: Flag without type detected at "..toHexString(flag["byte"]).." bit "..flag["bit"].." with name: \""..flag["name"].."\"");
 			end
 		end
 		if _type == "Fairy" then
@@ -2152,7 +2152,7 @@ function flagStats(verbose)
 	local knownFlags = #flag_array;
 	local totalFlags = flag_block_size * 8;
 
-	console.log("Block size: 0x"..bizstring.hex(flag_block_size));
+	console.log("Block size: "..toHexString(flag_block_size));
 	formatOutputString("Flags known: ", knownFlags, totalFlags);
 	formatOutputString("Flags without types: ", untypedFlags, knownFlags);
 	console.log();
@@ -2864,7 +2864,7 @@ function everythingiskong()
 			if object_model_pointer ~= 0x000000 then
 				mainmemory.writebyte(pointer + model_pointer, 0x80);
 				mainmemory.write_u24_be(pointer + model_pointer + 1, kong_model_pointer);
-				console.log("wrote: "..bizstring.hex(pointer));
+				console.log("wrote: "..toHexString(pointer));
 			end
 			object_no = object_no + 1;
 		end
@@ -3137,9 +3137,9 @@ function Game.eachFrame()
 			checksum_value = memory.read_u32_be(eep_checksum_offsets[i]);
 			if eep_checksum_values[i] ~= checksum_value then
 				if i == 5 then
-					console.log("Global flags "..i.." Checksum: "..bizstring.hex(eep_checksum_values[i]).." -> "..bizstring.hex(checksum_value));
+					console.log("Global flags "..i.." Checksum: "..toHexString(eep_checksum_values[i]).." -> "..toHexString(checksum_value));
 				else
-					console.log("Slot "..i.." Checksum: "..bizstring.hex(eep_checksum_values[i]).." -> "..bizstring.hex(checksum_value));
+					console.log("Slot "..i.." Checksum: "..toHexString(eep_checksum_values[i]).." -> "..toHexString(checksum_value));
 				end
 				eep_checksum_values[i] = checksum_value;
 			end

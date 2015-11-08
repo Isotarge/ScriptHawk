@@ -544,7 +544,7 @@ function set_orange_timer()
 	if joypad_pressed["C"] then
 		local minigame_array_object = mainmemory.read_u24_be(minigame_array_pointer + 1);
 		mainmemory.writefloat(minigame_array_object + throw_slot * slot_size + orange_timer, orange_timer_value, true);
-		--console.log(bizstring.hex(boggy_object + throw_slot * slot_size + orange_timer));
+		--console.log(toHexString(boggy_object + throw_slot * slot_size + orange_timer));
 	end
 end
 
@@ -683,7 +683,7 @@ function Game.eachFrame()
 		for i=1,#eep_checksum_offsets do
 			checksum_value = memory.read_u32_be(eep_checksum_offsets[i]);
 			if eep_checksum_values[i] ~= checksum_value then
-				console.log("Slot "..i.." Checksum: "..bizstring.hex(eep_checksum_values[i]).." -> "..bizstring.hex(checksum_value));
+				console.log("Slot "..i.." Checksum: "..toHexString(eep_checksum_values[i]).." -> "..toHexString(checksum_value));
 				eep_checksum_values[i] = checksum_value;
 			end
 		end
