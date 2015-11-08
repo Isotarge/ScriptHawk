@@ -11,6 +11,21 @@ local velocity = 0xC4;
 
 local camera_zoom = 0x12C;
 
+-- Max 0x0A=10
+local powerup_quantity = 0x20B;
+
+-- Values:
+--	0x00 Blue 1
+--	0x01 Blue 2
+-- 	0x02 Blue 3
+--	0x03 Red 1
+--	0x04 Red 2
+--	0x05 Red 3
+--	0x06 Green 1
+--	0x07 Green 2
+--	0x08 Green 3
+local powerup_type = 0x20C;
+
 local bananas = 0x21D;
 local max_bananas = 10;
 
