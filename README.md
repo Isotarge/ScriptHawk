@@ -30,6 +30,11 @@ Extra Lua scripts and RAM watches for the [BizHawk](https://github.com/TASVideos
 - Japan
 - USA
 
+###Diddy Kong Racing
+- Europe 1.0 and 1.1
+- Japan
+- USA 1.0 and 1.1
+
 ###Super Mario 64
 - Europe
 - Japan 1.0 and Shindou Edition
