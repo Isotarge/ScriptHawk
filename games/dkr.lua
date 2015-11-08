@@ -1,6 +1,6 @@
 local Game = {};
 
-local player_object_pointer = 0x3FFFC0; -- TODO: Does this work for all versions?
+local player_object_pointer = 0x3FFFC0;
 
 local x_pos = 0x0C;
 local y_pos = 0x10;
@@ -11,10 +11,11 @@ local velocity = 0xC4;
 
 local camera_zoom = 0x12C;
 
-local x_rot = 0x238; -- TODO
-local facing_angle = 0x238;
-local y_rot = facing_angle;
-local z_rot = 0x238; -- TODO
+local x_rot = 0x23A;
+local y_rot = 0x238;
+local z_rot = 0x23C;
+
+local facing_angle = y_rot;
 
 local map_freeze_values = {};
 
@@ -70,7 +71,7 @@ Game.maps = {
 	"0x2E - Dino 2",
 	"0x2F - Toufool",
 	
-	"0x30 - Snoufool",
+	"0x30 - Snowfool",
 	"0x31 - Toufool again",
 	"0x32 - Toufool again again",
 	"0x33 - Toufool in space",
@@ -131,18 +132,26 @@ end
 --------------------
 
 function Game.detectVersion(romName)
-	if bizstring.contains(romName, "Europe") then
-		-- TODO
-	elseif bizstring.contains(romName, "Japan") then
-		player_object_pointer = 0x3FFFC0;
+	if bizstring.contains(romName, "Europe") and bizstring.contains(romName, "Rev A") then
 		map_freeze_values = {
-			0x11C91B, 0x122BD7, 0x122CC2, 0x124F67, 0x1FD4A5, 0x1FD52B, 0x1FE729
+			0x121777, 0x123B07, 0x208699, 0x2549C2 -- TODO: Double check these
+		}
+	elseif bizstring.contains(romName, "Europe") then
+		map_freeze_values = {
+			0x11AF3B, 0x1211F7, 0x1212E2, 0x123587, 0x206BB5, 0x206C3B, 0x207EA9 -- TODO: Double check these
+		};
+	elseif bizstring.contains(romName, "Japan") then
+		map_freeze_values = {
+			0x11C91B, 0x122BD7, 0x122CC2, 0x124F67, 0x1FD4A5, 0x1FD52B, 0x1FE729 -- TODO: Double check these
 		};
 	elseif bizstring.contains(romName, "USA") and bizstring.contains(romName, "Rev A") then
-		player_object_pointer = 0x3FFFC0;
-		map_freeze_values = {};
+		map_freeze_values = {
+			0x1216E7, 0x123A77, 0x1FD209, 0x249532 -- TODO: Double check these
+		};
 	elseif bizstring.contains(romName, "USA") then
-		-- TODO
+		map_freeze_values = {
+			0x121167, 0x121252, 0x1234F7, 0x1FCA19, 0x248942 -- TODO: Double check these
+		};
 	else
 		return false;
 	end

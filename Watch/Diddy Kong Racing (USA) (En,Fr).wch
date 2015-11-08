@@ -1,4 +1,11 @@
 Domain RDRAM
 SystemID N64
 0DF4C7	b	h	1	RDRAM	Track List Map Modifier
+3FFFC0	d	h	1	RDRAM	Player Object Pointer
+1FCBEC	w	u	1	RDRAM	Balloons
+121167	b	h	1	RDRAM	Map
+121252	b	h	1	RDRAM	Map
+1234F7	b	h	1	RDRAM	Map
+1FCA19	b	h	1	RDRAM	Map
+248942	b	h	1	RDRAM	Map
 
