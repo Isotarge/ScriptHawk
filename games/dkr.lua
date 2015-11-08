@@ -3,14 +3,18 @@ local Game = {};
 local player_object_pointer = 0x3FFFC0; -- TODO: Does this work for all versions?
 
 local x_pos = 0x0C;
-local y_pos = x_pos + 4;
-local z_pos = y_pos + 4;
+local y_pos = 0x10;
+local z_pos = 0x14;
 
-local velocity = 0xC0;
+local y_velocity = 0xC0;
+local velocity = 0xC4;
 
-local x_rot = 0;
-local facing_angle = 0;
-local z_rot = 0;
+local camera_zoom = 0x12C;
+
+local x_rot = 0x238; -- TODO
+local facing_angle = 0x238;
+local y_rot = facing_angle;
+local z_rot = 0x238; -- TODO
 
 Game.maps = { "Not Implemented" };
 
@@ -36,14 +40,19 @@ end
 -- Physics/Scale --
 -------------------
 
-Game.speedy_speeds = { .001, .01, .1, 1, 5, 10, 20, 50, 100 };
+Game.speedy_speeds = { -.001, -.01, -.1, -1, -5, -10, -20, -50, -100 };
 Game.speedy_index = 7;
 
-Game.rot_speed = 10;
-Game.max_rot_units = 360;
+Game.rot_speed = 100;
+Game.max_rot_units = 65535;
 
 function Game.isPhysicsFrame()
 	return not emu.islagged();
+end
+
+function Game.getVelocity()
+	local player_object = mainmemory.read_u32_be(player_object_pointer) - 0x80000000;
+	return mainmemory.readfloat(player_object + velocity, true);
 end
 
 --------------
@@ -72,6 +81,7 @@ end
 
 function Game.setYPosition(value)
 	local player_object = mainmemory.read_u32_be(player_object_pointer) - 0x80000000;
+	mainmemory.writefloat(player_object + y_velocity, 0, true);
 	mainmemory.writefloat(player_object + y_pos, value, true);
 end
 
@@ -85,30 +95,86 @@ end
 --------------
 
 function Game.getXRotation()
-	-- TODO
-	return 0;
+	local player_object = mainmemory.read_u32_be(player_object_pointer) - 0x80000000;
+	return mainmemory.read_u16_be(player_object + facing_angle); -- TODO
 end
 
 function Game.getYRotation()
-	-- TODO
-	return 0;
+	local player_object = mainmemory.read_u32_be(player_object_pointer) - 0x80000000;
+	return mainmemory.read_u16_be(player_object + facing_angle);
 end
 
 function Game.getZRotation()
-	-- TODO
-	return 0;
+	local player_object = mainmemory.read_u32_be(player_object_pointer) - 0x80000000;
+	return mainmemory.read_u16_be(player_object + facing_angle); -- TODO
 end
 
 function Game.setXRotation(value)
-	-- TODO
+	local player_object = mainmemory.read_u32_be(player_object_pointer) - 0x80000000;
+	return mainmemory.write_u16_be(player_object + facing_angle, value);
 end
 
 function Game.setYRotation(value)
-	-- TODO
+	local player_object = mainmemory.read_u32_be(player_object_pointer) - 0x80000000;
+	return mainmemory.write_u16_be(player_object + facing_angle, value);
 end
 
 function Game.setZRotation(value)
-	-- TODO
+	local player_object = mainmemory.read_u32_be(player_object_pointer) - 0x80000000;
+	return mainmemory.write_u16_be(player_object + facing_angle, value);
+end
+
+-----------------------------
+-- Optimal tapping script  --
+-- Written by Faschz, 2015 --
+-----------------------------
+
+local otap_checkbox;
+local otap_enabled = false;
+
+local otap_startFrame = emu.framecount();
+local otap_startLag = emu.lagcount();
+
+-- Numbers optimized for TT with 0 bananas
+local velocity_min = -9.212730408;
+local velocity_med = -12.34942532;
+local velocity_max = -14.22209072;
+
+local function enableOptimalTap()
+	local otap_startFrame = emu.framecount();
+	local otap_startLag = emu.lagcount();
+	otap_enabled = true;
+end
+
+local function disableOptimalTap()
+	otap_enabled = false;
+end
+
+local function optimalTap()
+	local _velocity = Game.getVelocity();
+	local frame = emu.framecount();
+
+	if _velocity >= velocity_min then
+		joypad.set({["A"] = true}, 1);
+	elseif _velocity >= velocity_med and _velocity < velocity_min then
+		if (frame - (otap_startFrame + (emu.lagcount() - otap_startLag))) % 2 == 0 then
+			joypad.set({["A"] = true}, 1);
+		else
+			joypad.set({["A"] = false}, 1);
+		end
+	elseif _velocity >= velocity_max and _velocity < velocity_med then
+		if (frame - (otap_startFrame + (emu.lagcount() - otap_startLag))) % 3 == 0 then
+			joypad.set({["A"] = true}, 1);
+		else
+			joypad.set({["A"] = false}, 1);
+		end
+	elseif _velocity < velocity_max then
+		if (frame - (otap_startFrame + (emu.lagcount() - otap_startLag))) % 4 == 0 then
+			joypad.set({["A"] = true}, 1);
+		else
+			joypad.set({["A"] = false}, 1);
+		end
+	end
 end
 
 ------------
@@ -124,11 +190,21 @@ function Game.applyInfinites()
 end
 
 function Game.initUI(form_handle, col, row, button_height, label_offset, dropdown_offset)
-	-- TODO
+	otap_checkbox = forms.checkbox(form_handle, "Auto tapper (by Faschz)", col(5) + dropdown_offset, row(6) + dropdown_offset);
 end
 
 function Game.eachFrame()
-	-- TODO
+	if not otap_enabled and forms.ischecked(otap_checkbox) then
+		enableOptimalTap();
+	end
+
+	if otap_enabled and not forms.ischecked(otap_checkbox) then
+		disableOptimalTap();
+	end
+
+	if otap_enabled then
+		optimalTap();
+	end
 end
 
 return Game;

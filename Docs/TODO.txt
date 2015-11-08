@@ -12,7 +12,6 @@ TODO:
 Game support wishlist:
 
 Conker
-DKR
 Gex
 Wave Race
 THPS 1/2/3
