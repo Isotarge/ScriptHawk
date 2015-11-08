@@ -1,8 +1,6 @@
 Domain RDRAM
 SystemID N64
 127F18	b	h	1	RDRAM	Character select screen cursor position
-1E4F7D	b	u	1	RDRAM	Bananas (Ancient Lake)
-1E611D	b	u	1	RDRAM	Bananas (Jungle Falls)
 1F1AE0	d	h	1	RDRAM	Player object pointer
 1FE6E8	w	b	1	RDRAM	Keys Collected
 1FE6ED	b	b	1	RDRAM	Bosses Beaten
