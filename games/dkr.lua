@@ -16,7 +16,111 @@ local facing_angle = 0x238;
 local y_rot = facing_angle;
 local z_rot = 0x238; -- TODO
 
-Game.maps = { "Not Implemented" };
+local map_freeze_values = {};
+
+Game.maps = { 
+	"0x00 - Overworld",
+	"0x01 - Bluey 1",
+	"0x02 - Dragon Forest (Hub)",
+	"0x03 - Fossil Canyon",
+	"0x04 - Pirate Lagoon",
+	"0x05 - Ancient lake",
+	"0x06 - Walrus Cove",
+	"0x07 - Hot Top Volcano",
+	"0x08 - Whale Bay",
+	"0x09 - Snowball Valley",
+	"0x0A - Crescent Island",
+	"0x0B - Fire Mountain",
+	"0x0C - Dino Domain (Hub)",
+	"0x0D - Everfrost Peak",
+	"0x0E - Sherbert Island (Hub)",
+	"0x0F - Spaceport Alpha",
+	
+	"0x10 - Horseshoe Gulch (Unused)",
+	"0x11 - Spacedust Alley",
+	"0x12 - Greenwood Village",
+	"0x13 - Boulder Canyon",
+	"0x14 - Windmill Plains",
+	"0x15 - Intro",
+	"0x16 - Character Select",
+	"0x17 - Title Screen",
+	"0x18 - Snowflake Mountain",
+	"0x19 - Smokey Castle",
+	"0x1A - Darkwater Beach",
+	"0x1B - Icicle Pyramid",
+	"0x1C - Frosty Village",
+	"0x1D - Jungle Falls",
+	"0x1E - Treasure Caves",
+	"0x1F - Haunted Woods",
+	
+	"0x20 - Darkmoon Caverns",
+	"0x21 - Star City",
+	"0x22 - Trophy Race Results Screen",
+	"0x23 - Future Fun Land (Hub)",
+	"0x24 - Overworld (Opening Cutscene)",
+	"0x25 - Wizpig 1",
+	"0x26 - Dino 1",
+	"0x27 - Menu Screen",
+	"0x28 - Bubbler 1",
+	"0x29 - Smokey 1",
+	"0x2A - Overworld (Wizpig 1 opening cutscene)",
+	"0x2B - Wizpig amulet cutscene",
+	"0x2C - TT amulet cutscene",
+	"0x2D - Overworld (FFL opening cutscene)",
+	"0x2E - Dino 2",
+	"0x2F - Toufool",
+	
+	"0x30 - Snoufool",
+	"0x31 - Toufool again",
+	"0x32 - Toufool again again",
+	"0x33 - Toufool in space",
+	"0x34 - Bluey 2",
+	"0x35 - Bubbler 2",
+	"0x36 - Smokey 2",
+	"0x37 - Wizpig 2",
+	"0x38 - Overworld (Fake credits)",
+	"0x39 - Tricky's map (cutscene version)",
+	"0x3A - Smokey's map (cutscene version)",
+	"0x3B - Bluey's map (cutscene version)",
+	"0x3C - Wizpig 1 cutscene",
+	"0x3D - Bubbler's map (cutscene version)",
+	"0x3E - Wizpig 2 cutscene",
+	"0x3F - Overworld (Credits 1)",
+	
+	"0x40 - Overworld (Credits 2)",
+	"0x41 - Overworld (misc cutscene 1)",
+	"0x42 - Overworld (misc cutscene 2)",
+	"0x43 - Overworld (misc cutscene 3)",
+	"0x44 - Overworld (misc cutscene 4)",
+	"0x45 - Overworld (misc cutscene 5)",
+	"0x46 - ...",
+	"0x47 - ...",
+	"0x48 - ...",
+	"0x49 - ...",
+	"0x4A - ...",
+	"0x4B - ...",
+	"0x4C - ...",
+	"0x4D - ",
+	"0x4E - ",
+	"0x4F - ",
+	
+	"0x50 - ",
+	"0x51 - ",
+	"0x52 - ",
+	"0x53 - ",
+	"0x54 - ",
+	"0x55 - ",
+	"0x56 - ",
+	"0x57 - ",
+	"0x58 - ",
+	"0x59 - ",
+	"0x5A - ",
+	"0x5B - ",
+	"0x5C - ",
+	"0x5D - ",
+	"0x5E - ",
+	"0x5F - ",
+};
 
 --------------------
 -- Region/Version --
@@ -27,6 +131,9 @@ function Game.detectVersion(romName)
 		-- TODO
 	elseif bizstring.contains(romName, "Japan") then
 		player_object_pointer = 0x3FFFC0;
+		map_freeze_values = {
+			0x11C91B, 0x122BD7, 0x122CC2, 0x124F67, 0x1FD4A5, 0x1FD52B, 0x1FE729
+		};
 	elseif bizstring.contains(romName, "USA") then
 		-- TODO
 	else
@@ -184,7 +291,11 @@ end
 ------------
 
 function Game.setMap(value)
-	-- TODO
+	local i;
+	value = value - 1;
+	for i=1,#map_freeze_values do
+		mainmemory.writebyte(map_freeze_values[i], value);
+	end
 end
 
 function Game.applyInfinites()
