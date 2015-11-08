@@ -11,6 +11,9 @@ local velocity = 0xC4;
 
 local camera_zoom = 0x12C;
 
+local bananas = 0x21D;
+local max_bananas = 10;
+
 local x_rot = 0x23A;
 local y_rot = 0x238;
 local z_rot = 0x23C;
@@ -246,7 +249,7 @@ function Game.getXRotation()
 	local player_object = mainmemory.read_u32_be(player_object_pointer);
 	if is_pointer(player_object) then
 		player_object = player_object - 0x80000000;
-		return mainmemory.read_u16_be(player_object + x_rot); -- TODO
+		return mainmemory.read_u16_be(player_object + x_rot);
 	end
 	return 0;
 end
@@ -264,7 +267,7 @@ function Game.getZRotation()
 	local player_object = mainmemory.read_u32_be(player_object_pointer);
 	if is_pointer(player_object) then
 		player_object = player_object - 0x80000000;
-		return mainmemory.read_u16_be(player_object + z_rot); -- TODO
+		return mainmemory.read_u16_be(player_object + z_rot);
 	end
 	return 0;
 end
@@ -361,7 +364,11 @@ function Game.setMap(value)
 end
 
 function Game.applyInfinites()
-	-- TODO
+	local player_object = mainmemory.read_u32_be(player_object_pointer);
+	if is_pointer(player_object) then
+		player_object = player_object - 0x80000000;
+		mainmemory.writebyte(player_object + bananas, max_bananas);
+	end
 end
 
 function Game.initUI(form_handle, col, row, button_height, label_offset, dropdown_offset)
