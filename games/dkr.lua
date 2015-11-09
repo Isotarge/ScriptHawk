@@ -5,9 +5,9 @@ local player_object_pointer = 0x3FFFC0;
 local is_paused;
 local get_ready;
 
-local get_ready_yellow_max = 37;
+local get_ready_yellow_max = 36;
 local get_ready_yellow_min = 20;
-local get_ready_blue_max = 19;
+local get_ready_blue_max = 18;
 local get_ready_blue_min = 6;
 
 local x_pos = 0x0C;

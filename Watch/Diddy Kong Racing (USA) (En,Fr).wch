@@ -10,4 +10,7 @@ SystemID N64
 248942	b	h	1	RDRAM	Map
 123514	w	u	1	RDRAM	Is Paused
 11ADB3	b	u	1	RDRAM	Get Ready
+1263E8	b	u	1	RDRAM	Character
+1269C0	b	u	1	RDRAM	Vehicle
+0DFD9C	d	h	1	RDRAM	Cheat Menu
 

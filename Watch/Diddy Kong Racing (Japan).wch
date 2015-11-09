@@ -1,27 +1,28 @@
 Domain RDRAM
 SystemID N64
+0DEDD4	d	h	1	RDRAM	Particle RNG
+11C823	b	u	1	RDRAM	Get Ready (real)
+11C91B	b	u	1	RDRAM	Map (actual?)
+122BD7	b	u	1	RDRAM	Map
+122CC2	b	u	1	RDRAM	Map
+124F60	b	u	1	RDRAM	Map?
+124F67	b	u	1	RDRAM	Map
+124F85	b	u	1	RDRAM	Is Paused
+127EF0	b	u	1	RDRAM	Character?
+127EF8	b	u	1	RDRAM	Character?
 127F18	b	h	1	RDRAM	Character select screen cursor position
+127F20	b	u	1	RDRAM	Character?
+127F22	b	u	1	RDRAM	Character?
+130D1A	b	u	1	RDRAM	Character?
 1F1AE0	d	h	1	RDRAM	Player object pointer
+1FD4A5	b	u	1	RDRAM	Map
+1FD52B	b	u	1	RDRAM	Map
 1FE6E8	w	b	1	RDRAM	Keys Collected
 1FE6ED	b	b	1	RDRAM	Bosses Beaten
 1FE6EE	w	b	1	RDRAM	Trophies Collected
 1FE6F6	b	h	1	RDRAM	TT Amulet Pieces
 1FE6F7	b	h	1	RDRAM	Wizpig Amulet Pieces
+1FE729	b	u	1	RDRAM	Map (Menu)
 1FE8FC	w	u	1	RDRAM	Balloons
 3FFFC0	d	h	1	RDRAM	Player object pointer
-11C91B	b	u	1	RDRAM	Map (actual?)
-122BD7	b	u	1	RDRAM	Map
-122CC2	b	u	1	RDRAM	Map
-124F67	b	u	1	RDRAM	Map
-1FD4A5	b	u	1	RDRAM	Map
-1FD52B	b	u	1	RDRAM	Map
-1FE729	b	u	1	RDRAM	Map (Menu)
-127EF0	b	u	1	RDRAM	Character?
-127EF8	b	u	1	RDRAM	Character?
-127F20	b	u	1	RDRAM	Character?
-127F22	b	u	1	RDRAM	Character?
-130D1A	b	u	1	RDRAM	Character?
-11C823	b	u	1	RDRAM	Get Ready (real)
-124F85	b	u	1	RDRAM	Is Paused
-0DEDD4	d	h	1	RDRAM	Particle RNG
 
