@@ -361,7 +361,16 @@ end
 
 local function optimalTap()
 	local _velocity = Game.getVelocity();
+	local _bananas = Game.getBananas();
+	local _boost = Game.getBoost();
+
 	local frame = emu.framecount();
+
+	-- Don't press A if we're boosting
+	if _boost ~= 0 then
+		joypad.set({["A"] = false}, 1);
+		return;
+	end
 
 	if _velocity >= velocity_min then
 		joypad.set({["A"] = true}, 1);
