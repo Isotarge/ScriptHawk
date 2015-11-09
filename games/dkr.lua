@@ -2,6 +2,14 @@ local Game = {};
 
 local player_object_pointer = 0x3FFFC0;
 
+local is_paused;
+local get_ready;
+
+local get_ready_yellow_max = 37;
+local get_ready_yellow_min = 20;
+local get_ready_blue_max = 19;
+local get_ready_blue_min = 6;
+
 local x_pos = 0x0C;
 local y_pos = 0x10;
 local z_pos = 0x14;
@@ -154,24 +162,34 @@ end
 function Game.detectVersion(romName)
 	if bizstring.contains(romName, "Europe") and bizstring.contains(romName, "Rev A") then
 		map_freeze_values = {
-			0x121777, 0x123B07, 0x208699, 0x2549C2 -- TODO: Double check these
+			0x121777, 0x123B07, 0x208699 -- TODO: Double check these
 		}
+		is_paused = 0x123B24;
+		get_ready = 0x11B3C3;
 	elseif bizstring.contains(romName, "Europe") then
 		map_freeze_values = {
 			0x11AF3B, 0x1211F7, 0x1212E2, 0x123587, 0x206BB5, 0x206C3B, 0x207EA9 -- TODO: Double check these
 		};
+		is_paused = 0x1235A4;
+		get_ready = 0x11AE43;
 	elseif bizstring.contains(romName, "Japan") then
 		map_freeze_values = {
 			0x11C91B, 0x122BD7, 0x122CC2, 0x124F67, 0x1FD4A5, 0x1FD52B, 0x1FE729 -- TODO: Double check these
 		};
+		is_paused = 0x124F84;
+		get_ready = 0x11C823;
 	elseif bizstring.contains(romName, "USA") and bizstring.contains(romName, "Rev A") then
 		map_freeze_values = {
-			0x1216E7, 0x123A77, 0x1FD209, 0x249532 -- TODO: Double check these
+			0x1216E7, 0x123A77, 0x1FD209 -- TODO: Double check these
 		};
+		is_paused = 0x123A94;
+		get_ready = 0x11B333;
 	elseif bizstring.contains(romName, "USA") then
 		map_freeze_values = {
-			0x121167, 0x121252, 0x1234F7, 0x1FCA19, 0x248942 -- TODO: Double check these
+			0x121167, 0x121252, 0x1234F7, 0x1FCA19 -- TODO: Double check these
 		};
+		is_paused = 0x123514;
+		get_ready = 0x11ADB3;
 	else
 		return false;
 	end
@@ -206,7 +224,7 @@ function Game.getBoost()
 	local player_object = mainmemory.read_u32_be(player_object_pointer);
 	if is_pointer(player_object) then
 		player_object = player_object - 0x80000000;
-		return mainmemory.readbyte(player_object + boost_timer);
+		return mainmemory.read_s8(player_object + boost_timer);
 	end
 	return 0;
 end
@@ -337,6 +355,7 @@ end
 -----------------------------
 
 local otap_checkbox;
+local otap_boost_dropdown;
 local otap_enabled = false;
 
 local otap_startFrame = emu.framecount();
@@ -356,19 +375,51 @@ end
 
 local function disableOptimalTap()
 	otap_enabled = false;
-	console.log("Auto tapper disabled.");
+	console.log("Auto tapper (by Faschz) disabled.");
 end
 
 local function optimalTap()
 	local _velocity = Game.getVelocity();
 	local _bananas = Game.getBananas();
 	local _boost = Game.getBoost();
+	local _getReady = mainmemory.readbyte(get_ready);
+	local _isPaused = mainmemory.read_u16_be(is_paused);
 
 	local frame = emu.framecount();
+	local boostType = forms.getproperty(otap_boost_dropdown, "SelectedItem");
+
+	-- Don't press A if we're paused
+	if _isPaused ~= 0 then
+		--console.log("Don't press A, we're paused.");
+		joypad.set({["A"] = false}, 1);
+		return;
+	end
 
 	-- Don't press A if we're boosting
-	if _boost ~= 0 then
+	if _boost > 0 then
 		joypad.set({["A"] = false}, 1);
+		return;
+	end
+
+	-- Get a zipper at the start of the race
+	if _getReady ~= 0 and boostType ~= "None" then
+		local boostMin = 0;
+		local boostMax = 0;
+
+		if boostType == "Blue" then
+			boostMin = get_ready_blue_min;
+			boostMax = get_ready_blue_max;
+		elseif boostType == "Yellow" then
+			boostMin = get_ready_yellow_min;
+			boostMax = get_ready_yellow_max;
+		end
+
+		if _getReady >= boostMin and _getReady <= boostMax and _boost == 0 then
+			console.log("Got "..boostType.." boost at value: ".._getReady);
+			joypad.set({["A"] = true}, 1);
+		else
+			joypad.set({["A"] = false}, 1);
+		end
 		return;
 	end
 
@@ -400,11 +451,13 @@ end
 --------------------
 
 local boostFrames = 0;
+local output_boost_stats_checkbox;
 
 local function outputBoostStats()
-	if Game.isPhysicsFrame() then
+	if Game.isPhysicsFrame() and forms.ischecked(output_boost_stats_checkbox) then
 		local _boost = Game.getBoost();
-		if _boost > 0 then
+		local _getReady = mainmemory.readbyte(get_ready);
+		if _boost > 0 and _getReady == 0 then
 			local aPressed = joypad.getimmediate()["P1 A"];
 			if aPressed then
 				console.log("Frame: "..boostFrames.." Boost: ".._boost.." (A Pressed)");
@@ -419,6 +472,72 @@ local function outputBoostStats()
 			boostFrames = 0;
 		end
 	end
+end
+
+--------------------
+-- Get ready jank --
+--------------------
+
+-- Blue UI
+local options_get_ready_blue_max_label;
+local options_decrease_get_ready_blue_max_button;
+local options_increase_get_ready_blue_max_button;
+local options_get_ready_blue_max_value_label;
+
+local options_get_ready_blue_min_label;
+local options_decrease_get_ready_blue_min_button;
+local options_increase_get_ready_blue_min_button;
+local options_get_ready_blue_min_value_label;
+
+local function increase_get_ready_blue_max()
+	get_ready_blue_max = math.min(80, get_ready_blue_max + 1);
+	forms.settext(options_get_ready_blue_max_value_label, get_ready_blue_max);
+end
+
+local function decrease_get_ready_blue_max()
+	get_ready_blue_max = math.max(0, get_ready_blue_max - 1);
+	forms.settext(options_get_ready_blue_max_value_label, get_ready_blue_max);
+end
+
+local function increase_get_ready_blue_min()
+	get_ready_blue_min = math.min(80, get_ready_blue_min + 1);
+	forms.settext(options_get_ready_blue_min_value_label, get_ready_blue_min);
+end
+
+local function decrease_get_ready_blue_min()
+	get_ready_blue_min = math.max(0, get_ready_blue_min - 1);
+	forms.settext(options_get_ready_blue_min_value_label, get_ready_blue_min);
+end
+
+-- Yellow UI
+local options_get_ready_yellow_max_label;
+local options_decrease_get_ready_yellow_max_button;
+local options_increase_get_ready_yellow_max_button;
+local options_get_ready_yellow_max_value_label;
+
+local options_get_ready_yellow_min_label;
+local options_decrease_get_ready_yellow_min_button;
+local options_increase_get_ready_yellow_min_button;
+local options_get_ready_yellow_min_value_label;
+
+local function increase_get_ready_yellow_max()
+	get_ready_yellow_max = math.min(80, get_ready_yellow_max + 1);
+	forms.settext(options_get_ready_yellow_max_value_label, get_ready_yellow_max);
+end
+
+local function decrease_get_ready_yellow_max()
+	get_ready_yellow_max = math.max(0, get_ready_yellow_max - 1);
+	forms.settext(options_get_ready_yellow_max_value_label, get_ready_yellow_max);
+end
+
+local function increase_get_ready_yellow_min()
+	get_ready_yellow_min = math.min(80, get_ready_yellow_min + 1);
+	forms.settext(options_get_ready_yellow_min_value_label, get_ready_yellow_min);
+end
+
+local function decrease_get_ready_yellow_min()
+	get_ready_yellow_min = math.max(0, get_ready_yellow_min - 1);
+	forms.settext(options_get_ready_yellow_min_value_label, get_ready_yellow_min);
 end
 
 ------------
@@ -439,12 +558,42 @@ function Game.applyInfinites()
 		player_object = player_object - 0x80000000;
 		mainmemory.writebyte(player_object + bananas, max_bananas);
 		mainmemory.writebyte(player_object + powerup_quantity, 1);
-		--mainmemory.writebyte(player_object + boost_timer, 0x02);
+		--mainmemory.write_s8(player_object + boost_timer, 1);
 	end
 end
 
 function Game.initUI(form_handle, col, row, button_height, label_offset, dropdown_offset)
+	output_boost_stats_checkbox = forms.checkbox(form_handle, "Boost info", col(5) + dropdown_offset, row(4) + dropdown_offset);
+
 	otap_checkbox = forms.checkbox(form_handle, "Auto tapper", col(0) + dropdown_offset, row(6) + dropdown_offset);
+	otap_boost_dropdown = forms.dropdown(form_handle, {"Yellow", "Blue", "None"}, col(0) + dropdown_offset, row(7) + dropdown_offset, col(4), button_height);
+
+	local blue_col_base = 5;
+	local yellow_col_base = 11;
+
+	-- Get ready paramater, blue min
+	options_get_ready_blue_min_label = forms.label(form_handle, "BMin:", col(blue_col_base), row(6) + label_offset, 40, 14);
+	options_decrease_get_ready_blue_min_button = forms.button(form_handle, "-", decrease_get_ready_blue_min, col(blue_col_base + 3) - 28, row(6), button_height, button_height);
+	options_increase_get_ready_blue_min_button = forms.button(form_handle, "+", increase_get_ready_blue_min, col(blue_col_base + 4) - 28, row(6), button_height, button_height);
+	options_get_ready_blue_min_value_label = forms.label(form_handle, get_ready_blue_min, col(blue_col_base + 4), row(6) + label_offset, 32, 14);
+
+	-- Get ready paramater, blue max
+	options_get_ready_blue_max_label = forms.label(form_handle, "BMax:", col(blue_col_base), row(7) + label_offset, 40, 14);
+	options_decrease_get_ready_blue_max_button = forms.button(form_handle, "-", decrease_get_ready_blue_max, col(blue_col_base + 3) - 28, row(7), button_height, button_height);
+	options_increase_get_ready_blue_max_button = forms.button(form_handle, "+", increase_get_ready_blue_max, col(blue_col_base + 4) - 28, row(7), button_height, button_height);
+	options_get_ready_blue_max_value_label = forms.label(form_handle, get_ready_blue_max, col(blue_col_base + 4), row(7) + label_offset, 32, 14);
+
+	-- Get ready paramater, yellow min
+	options_get_ready_yellow_min_label = forms.label(form_handle, "YMin:", col(yellow_col_base), row(6) + label_offset, 40, 14);
+	options_decrease_get_ready_yellow_min_button = forms.button(form_handle, "-", decrease_get_ready_yellow_min, col(yellow_col_base + 3) - 28, row(6), button_height, button_height);
+	options_increase_get_ready_yellow_min_button = forms.button(form_handle, "+", increase_get_ready_yellow_min, col(yellow_col_base + 4) - 28, row(6), button_height, button_height);
+	options_get_ready_yellow_min_value_label = forms.label(form_handle, get_ready_yellow_min, col(yellow_col_base + 4), row(6) + label_offset, 32, 14);
+
+	-- Get ready paramater, yellow max
+	options_get_ready_yellow_max_label = forms.label(form_handle, "YMax:", col(yellow_col_base), row(7) + label_offset, 40, 14);
+	options_decrease_get_ready_yellow_max_button = forms.button(form_handle, "-", decrease_get_ready_yellow_max, col(yellow_col_base + 3) - 28, row(7), button_height, button_height);
+	options_increase_get_ready_yellow_max_button = forms.button(form_handle, "+", increase_get_ready_yellow_max, col(yellow_col_base + 4) - 28, row(7), button_height, button_height);
+	options_get_ready_yellow_max_value_label = forms.label(form_handle, get_ready_yellow_max, col(yellow_col_base + 4), row(7) + label_offset, 32, 14);
 end
 
 function Game.eachFrame()

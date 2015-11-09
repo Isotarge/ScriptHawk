@@ -16,4 +16,12 @@ SystemID N64
 1FD4A5	b	u	1	RDRAM	Map
 1FD52B	b	u	1	RDRAM	Map
 1FE729	b	u	1	RDRAM	Map (Menu)
+127EF0	b	u	1	RDRAM	Character?
+127EF8	b	u	1	RDRAM	Character?
+127F20	b	u	1	RDRAM	Character?
+127F22	b	u	1	RDRAM	Character?
+130D1A	b	u	1	RDRAM	Character?
+11C823	b	u	1	RDRAM	Get Ready (real)
+124F85	b	u	1	RDRAM	Is Paused
+0DEDD4	d	h	1	RDRAM	Particle RNG
 

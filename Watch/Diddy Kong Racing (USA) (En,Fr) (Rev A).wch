@@ -4,5 +4,6 @@ SystemID N64
 1216E7	b	h	1	RDRAM	Map
 123A77	b	h	1	RDRAM	Map
 1FD209	b	h	1	RDRAM	Map
-249532	b	h	1	RDRAM	Map
+123A94	w	u	1	RDRAM	Is Paused
+11B333	b	u	1	RDRAM	Get Ready
 

@@ -1,11 +1,13 @@
 Domain RDRAM
 SystemID N64
-20807C	w	u	1	RDRAM	Balloons
+11AE43	b	u	1	RDRAM	Get Ready
 11AF3B	b	u	1	RDRAM	Map
 1211F7	b	u	1	RDRAM	Map
 1212E2	b	u	1	RDRAM	Map
 123587	b	u	1	RDRAM	Map
+1235A4	w	u	1	RDRAM	Is Paused
 206BB5	b	u	1	RDRAM	Map
 206C3B	b	u	1	RDRAM	Map
 207EA9	b	u	1	RDRAM	Map
+20807C	w	u	1	RDRAM	Balloons
 
