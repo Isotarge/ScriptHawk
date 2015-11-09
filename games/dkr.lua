@@ -35,6 +35,8 @@ local z_rot = 0x23C;
 
 local facing_angle = y_rot;
 
+local boost_timer = 0x26B;
+
 local map_freeze_values = {};
 
 Game.maps = { 
@@ -196,6 +198,24 @@ function Game.getVelocity()
 	if is_pointer(player_object) then
 		player_object = player_object - 0x80000000;
 		return mainmemory.readfloat(player_object + velocity, true);
+	end
+	return 0;
+end
+
+function Game.getBoost()
+	local player_object = mainmemory.read_u32_be(player_object_pointer);
+	if is_pointer(player_object) then
+		player_object = player_object - 0x80000000;
+		return mainmemory.readbyte(player_object + boost_timer);
+	end
+	return 0;
+end
+
+function Game.getBananas()
+	local player_object = mainmemory.read_u32_be(player_object_pointer);
+	if is_pointer(player_object) then
+		player_object = player_object - 0x80000000;
+		return mainmemory.readbyte(player_object + bananas);
 	end
 	return 0;
 end
@@ -366,6 +386,32 @@ local function optimalTap()
 	end
 end
 
+--------------------
+-- Boost analysis --
+--------------------
+
+local boostFrames = 0;
+
+local function outputBoostStats()
+	if Game.isPhysicsFrame() then
+		local _boost = Game.getBoost();
+		if _boost > 0 then
+			local aPressed = joypad.getimmediate()["P1 A"];
+			if aPressed then
+				console.log("Frame: "..boostFrames.." Boost: ".._boost.." (A Pressed)");
+			else
+				console.log("Frame: "..boostFrames.." Boost: ".._boost);
+			end
+			boostFrames = boostFrames + 1;
+		else
+			if boostFrames > 0 then
+				console.log("Boost ended");
+			end
+			boostFrames = 0;
+		end
+	end
+end
+
 ------------
 -- Events --
 ------------
@@ -383,6 +429,8 @@ function Game.applyInfinites()
 	if is_pointer(player_object) then
 		player_object = player_object - 0x80000000;
 		mainmemory.writebyte(player_object + bananas, max_bananas);
+		mainmemory.writebyte(player_object + powerup_quantity, 1);
+		--mainmemory.writebyte(player_object + boost_timer, 0x02);
 	end
 end
 
@@ -402,6 +450,8 @@ function Game.eachFrame()
 	if otap_enabled then
 		optimalTap();
 	end
+
+	outputBoostStats();
 end
 
 return Game;
