@@ -1,0 +1,9 @@
+Search string
+
+FFFFFFEB8543334468BFFFFFFFFFFFFF
+
+Confirmed texture locations for "DK" logo:
+
+0x1E67A0
+0x3A6A30
+0x4406B0

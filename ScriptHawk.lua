@@ -115,8 +115,6 @@ previous_map_value = 0;
 x = 0.0;
 y = 0.0;
 z = 0.0;
--- TODO
--- floor_y = 0.0
 
 dx = 0.0;
 dy = 0.0;
@@ -373,15 +371,30 @@ function updateUIReadouts_ScriptHawk()
 		row = row + 1;
 		gui.text(gui_x_offset, gui_y_offset + row_height * row, "Z: "..(round(z, precision) or 0));
 		row = row + 2;
-		--gui.text(gui_x_offset, gui_y_offset + row_height * row, "Floor: "..round(floor_y, precision));
-		--row = row + 2;
+		if type(Game.getFloor) == "function" then
+			gui.text(gui_x_offset, gui_y_offset + row_height * row, "Floor: "..round(Game.getFloor(), precision));
+			row = row + 2;
+		end
 	end
 
 	if type(dy) == "number" and type(d) == "number" then
 		gui.text(gui_x_offset, gui_y_offset + row_height * row, "dY:  "..(round(dy, precision) or 0));
 		row = row + 1;
 		gui.text(gui_x_offset, gui_y_offset + row_height * row, "dXZ: "..(round(d, precision) or 0));
-		row = row + 2;
+		row = row + 1;
+		if type(Game.getVelocity) == "function" then
+			gui.text(gui_x_offset, gui_y_offset + row_height * row, "Velocity: "..round(Game.getVelocity(), precision));
+			row = row + 1;
+		end
+		if type(Game.getYVelocity) == "function" then
+			gui.text(gui_x_offset, gui_y_offset + row_height * row, "Y Velocity: "..round(Game.getYVelocity(), precision));
+			row = row + 1;
+		end
+		if type(Game.getZVelocity) == "function" then
+			gui.text(gui_x_offset, gui_y_offset + row_height * row, "Z Velocity: "..round(Game.getZVelocity(), precision));
+			row = row + 1;
+		end
+		row = row + 1;
 	end
 
 	if type(max_dy) == "number" and type(max_d) == "number" then

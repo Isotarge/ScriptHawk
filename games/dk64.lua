@@ -2351,6 +2351,10 @@ function isInSubGame()
 	return map_value == arcade_map or map_value == jetpac_map;
 end
 
+function Game.getFloor()
+	return mainmemory.readfloat(kong_object + floor, true);
+end
+
 --------------
 -- Position --
 --------------

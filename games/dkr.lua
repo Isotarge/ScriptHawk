@@ -15,8 +15,8 @@ local x_pos = 0x0C;
 local y_pos = 0x10;
 local z_pos = 0x14;
 
-local y_velocity = 0xC0;
 local velocity = 0xC4;
+local z_velocity = 0xC8;
 
 local camera_zoom = 0x12C;
 
@@ -226,6 +226,31 @@ function Game.getVelocity()
 		return mainmemory.readfloat(player_object + velocity, true);
 	end
 	return 0;
+end
+
+function Game.setVelocity(value)
+	local player_object = mainmemory.read_u32_be(player_object_pointer);
+	if is_pointer(player_object) then
+		player_object = player_object - 0x80000000;
+		mainmemory.writefloat(player_object + velocity, value, true);
+	end
+end
+
+function Game.getZVelocity()
+	local player_object = mainmemory.read_u32_be(player_object_pointer);
+	if is_pointer(player_object) then
+		player_object = player_object - 0x80000000;
+		return mainmemory.readfloat(player_object + z_velocity, true);
+	end
+	return 0;
+end
+
+function Game.setZVelocity(value)
+	local player_object = mainmemory.read_u32_be(player_object_pointer);
+	if is_pointer(player_object) then
+		player_object = player_object - 0x80000000;
+		mainmemory.writefloat(player_object + z_velocity, value, true);
+	end
 end
 
 function Game.getBoost()
