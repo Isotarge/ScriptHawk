@@ -1,6 +1,7 @@
 local Game = {};
 
 local player_object_pointer = 0x3FFFC0;
+local cheat_menu;
 
 local is_paused;
 local get_ready;
@@ -44,6 +45,7 @@ local z_rot = 0x23C;
 local facing_angle = y_rot;
 
 local boost_timer = 0x26B;
+local silver_coins = 0x29A;
 
 local map_freeze_values = {};
 
@@ -166,30 +168,35 @@ function Game.detectVersion(romName)
 		}
 		is_paused = 0x123B24;
 		get_ready = 0x11B3C3;
+		cheat_menu = 0x0E03AC;
 	elseif bizstring.contains(romName, "Europe") then
 		map_freeze_values = {
 			0x11AF3B, 0x1211F7, 0x1212E2, 0x123587, 0x206BB5, 0x206C3B, 0x207EA9 -- TODO: Double check these
 		};
 		is_paused = 0x1235A4;
 		get_ready = 0x11AE43;
+		cheat_menu = 0x0DFE2C;
 	elseif bizstring.contains(romName, "Japan") then
 		map_freeze_values = {
 			0x11C91B, 0x122BD7, 0x122CC2, 0x124F67, 0x1FD4A5, 0x1FD52B, 0x1FE729 -- TODO: Double check these
 		};
 		is_paused = 0x124F84;
 		get_ready = 0x11C823;
+		cheat_menu = 0x0E17FC;
 	elseif bizstring.contains(romName, "USA") and bizstring.contains(romName, "Rev A") then
 		map_freeze_values = {
 			0x1216E7, 0x123A77, 0x1FD209 -- TODO: Double check these
 		};
 		is_paused = 0x123A94;
 		get_ready = 0x11B333;
+		cheat_menu = 0x0E031C;
 	elseif bizstring.contains(romName, "USA") then
 		map_freeze_values = {
 			0x121167, 0x121252, 0x1234F7, 0x1FCA19 -- TODO: Double check these
 		};
 		is_paused = 0x123514;
 		get_ready = 0x11ADB3;
+		cheat_menu = 0x0DFD9C;
 	else
 		return false;
 	end
@@ -202,6 +209,7 @@ end
 -------------------
 
 Game.speedy_speeds = { .001, .01, .1, 1, 5, 10, 20, 50, 100 };
+Game.speedy_invert_XZ = true;
 Game.speedy_index = 7;
 
 Game.rot_speed = 100;
@@ -246,7 +254,7 @@ function Game.getXPosition()
 	local player_object = mainmemory.read_u32_be(player_object_pointer);
 	if is_pointer(player_object) then
 		player_object = player_object - 0x80000000;
-		return -1 * mainmemory.readfloat(player_object + x_pos, true);
+		return mainmemory.readfloat(player_object + x_pos, true);
 	end
 	return 0;
 end
@@ -264,7 +272,7 @@ function Game.getZPosition()
 	local player_object = mainmemory.read_u32_be(player_object_pointer);
 	if is_pointer(player_object) then
 		player_object = player_object - 0x80000000;
-		return -1 * mainmemory.readfloat(player_object + z_pos, true);
+		return mainmemory.readfloat(player_object + z_pos, true);
 	end
 	return 0;
 end
@@ -273,7 +281,7 @@ function Game.setXPosition(value)
 	local player_object = mainmemory.read_u32_be(player_object_pointer);
 	if is_pointer(player_object) then
 		player_object = player_object - 0x80000000;
-		mainmemory.writefloat(player_object + x_pos, -1 * value, true);
+		mainmemory.writefloat(player_object + x_pos, value, true);
 	end
 end
 
@@ -290,7 +298,7 @@ function Game.setZPosition(value)
 	local player_object = mainmemory.read_u32_be(player_object_pointer);
 	if is_pointer(player_object) then
 		player_object = player_object - 0x80000000;
-		mainmemory.writefloat(player_object + z_pos, - 1 * value, true);
+		mainmemory.writefloat(player_object + z_pos, value, true);
 	end
 end
 
@@ -553,12 +561,17 @@ function Game.setMap(value)
 end
 
 function Game.applyInfinites()
+	-- Unlock cheat menu
+	mainmemory.write_u32_be(cheat_menu, 0xFFFFFFFF);
+
+	-- Player object bizzo
 	local player_object = mainmemory.read_u32_be(player_object_pointer);
 	if is_pointer(player_object) then
 		player_object = player_object - 0x80000000;
 		mainmemory.writebyte(player_object + bananas, max_bananas);
 		mainmemory.writebyte(player_object + powerup_quantity, 1);
 		--mainmemory.write_s8(player_object + boost_timer, 1);
+		mainmemory.writebyte(player_object + silver_coins, 8);
 	end
 end
 

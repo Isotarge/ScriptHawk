@@ -1,9 +1,10 @@
 Domain RDRAM
 SystemID N64
+0E03AC	d	h	1	RDRAM	Cheat Menu
+11B3C3	b	u	1	RDRAM	Get Ready
 121777	b	h	1	RDRAM	Map
 123B07	b	h	1	RDRAM	Map
 123B24	w	u	1	RDRAM	Is Paused
 208699	b	h	1	RDRAM	Map
 20886C	w	u	1	RDRAM	Balloons
-11B3C3	b	u	1	RDRAM	Get Ready
 

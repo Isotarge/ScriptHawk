@@ -1,6 +1,7 @@
 Domain RDRAM
 SystemID N64
 0DEDD4	d	h	1	RDRAM	Particle RNG
+0E17FC	d	h	1	RDRAM	Cheat Menu
 11C823	b	u	1	RDRAM	Get Ready (real)
 11C91B	b	u	1	RDRAM	Map (actual?)
 122BD7	b	u	1	RDRAM	Map

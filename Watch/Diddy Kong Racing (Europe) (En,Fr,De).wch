@@ -1,5 +1,6 @@
 Domain RDRAM
 SystemID N64
+0DFE2C	d	h	1	RDRAM	Cheat Menu
 11AE43	b	u	1	RDRAM	Get Ready
 11AF3B	b	u	1	RDRAM	Map
 1211F7	b	u	1	RDRAM	Map

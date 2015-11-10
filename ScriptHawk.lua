@@ -429,24 +429,32 @@ local function mainloop()
 	if Game.isPhysicsFrame() then
 		if mode == 'Position' and type(rot_y) ~= "nil" then
 			rot_rad = rotation_to_radians(rot_y);
+			local speedy_speed_XZ = Game.speedy_speeds[Game.speedy_index];
+			local speedy_speed_Y = Game.speedy_speeds[Game.speedy_index];
+			if Game.speedy_invert_XZ then
+				speedy_speed_XZ = speedy_speed_XZ * -1;
+			end
+			if Game.speedy_invert_Y then
+				speedy_speed_Y = speedy_speed_Y * -1;
+			end
 			if joypad_pressed["P1 DPad U"] then
-				gofast("x", Game.speedy_speeds[Game.speedy_index] * math.sin(rot_rad));
-				gofast("z", Game.speedy_speeds[Game.speedy_index] * math.cos(rot_rad));
+				gofast("x", speedy_speed_XZ * math.sin(rot_rad));
+				gofast("z", speedy_speed_XZ * math.cos(rot_rad));
 			end
 			if joypad_pressed["P1 DPad D"] then
-				gofast("x", -1.0 * (Game.speedy_speeds[Game.speedy_index] * math.sin(rot_rad)));
-				gofast("z", -1.0 * (Game.speedy_speeds[Game.speedy_index] * math.cos(rot_rad)));
+				gofast("x", -1.0 * (speedy_speed_XZ * math.sin(rot_rad)));
+				gofast("z", -1.0 * (speedy_speed_XZ * math.cos(rot_rad)));
 			end
 			if joypad_pressed["P1 DPad L"] then
-				gofast("x", Game.speedy_speeds[Game.speedy_index] * math.cos(rot_rad));
-				gofast("z", -1.0 * (Game.speedy_speeds[Game.speedy_index] * math.sin(rot_rad)));
+				gofast("x", speedy_speed_XZ * math.cos(rot_rad));
+				gofast("z", -1.0 * (speedy_speed_XZ * math.sin(rot_rad)));
 			end
 			if joypad_pressed["P1 DPad R"] then
-				gofast("x", -1.0 * (Game.speedy_speeds[Game.speedy_index] * math.cos(rot_rad)));
-				gofast("z", Game.speedy_speeds[Game.speedy_index] * math.sin(rot_rad));
+				gofast("x", -1.0 * (speedy_speed_XZ * math.cos(rot_rad)));
+				gofast("z", speedy_speed_XZ * math.sin(rot_rad));
 			end
 			if joypad_pressed["P1 L"] then
-				gofast("y", Game.speedy_speeds[Game.speedy_index]);
+				gofast("y", speedy_speed_Y);
 			end
 		end
 		if mode == 'Rotation' then
@@ -464,7 +472,7 @@ local function mainloop()
 			end
 			if joypad_pressed["P1 L"] then
 				-- TODO: Scale up I guess?
-				gofast("y", Game.speedy_speeds[Game.speedy_index]);
+				gofast("y", speedy_speed_Y);
 			end
 		end
 	end

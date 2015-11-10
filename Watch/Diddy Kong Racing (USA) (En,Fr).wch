@@ -7,7 +7,6 @@ SystemID N64
 121252	b	h	1	RDRAM	Map
 1234F7	b	h	1	RDRAM	Map
 1FCA19	b	h	1	RDRAM	Map
-248942	b	h	1	RDRAM	Map
 123514	w	u	1	RDRAM	Is Paused
 11ADB3	b	u	1	RDRAM	Get Ready
 1263E8	b	u	1	RDRAM	Character
