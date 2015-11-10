@@ -395,13 +395,13 @@ local otap_startFrame = emu.framecount();
 local otap_startLag = emu.lagcount();
 
 -- Numbers optimized for TT with 0 bananas
-local velocity_min = -9.212730408;
-local velocity_med = -12.34942532;
-local velocity_max = -14.22209072;
+velocity_min = -9.212730408;
+velocity_med = -12.34942532;
+velocity_max = -14.22209072;
 
 local function enableOptimalTap()
-	local otap_startFrame = emu.framecount();
-	local otap_startLag = emu.lagcount();
+	otap_startFrame = emu.framecount();
+	otap_startLag = emu.lagcount();
 	otap_enabled = true;
 	console.log("Auto tapper (by Faschz) enabled.");
 end

@@ -26,4 +26,8 @@ SystemID N64
 1FE729	b	u	1	RDRAM	Map (Menu)
 1FE8FC	w	u	1	RDRAM	Balloons
 3FFFC0	d	h	1	RDRAM	Player object pointer
+1E4C0C	d	f	1	RDRAM	X (Ancient Lake)
+1E4C10	d	f	1	RDRAM	Y (Ancient Lake)
+1E4C14	d	f	1	RDRAM	Z (Ancient Lake)
+1E4E1D	b	h	1	RDRAM	Bananas (Ancient Lake)
 
