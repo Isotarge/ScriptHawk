@@ -394,6 +394,9 @@ local otap_enabled = false;
 local otap_startFrame = emu.framecount();
 local otap_startLag = emu.lagcount();
 
+-- TODO: Adjust velocity based on Z Velocity
+-- TODO: Adjust velocity based on bananas
+-- TODO: Adjust velocity based on character
 -- Numbers optimized for TT with 0 bananas
 velocity_min = -9.212730408;
 velocity_med = -12.34942532;
@@ -418,7 +421,6 @@ local function optimalTap()
 	local _getReady = mainmemory.readbyte(get_ready);
 	local _isPaused = mainmemory.read_u16_be(is_paused);
 
-	local frame = emu.framecount();
 	local boostType = forms.getproperty(otap_boost_dropdown, "SelectedItem");
 
 	-- Don't press A if we're paused
@@ -456,27 +458,21 @@ local function optimalTap()
 		return;
 	end
 
+	-- Bot taps A every modulo frames
+	local modulo = 1;
+
 	if _velocity >= velocity_min then
-		joypad.set({["A"] = true}, 1);
+		modulo = 1;
 	elseif _velocity >= velocity_med and _velocity < velocity_min then
-		if (frame - (otap_startFrame + (emu.lagcount() - otap_startLag))) % 2 == 0 then
-			joypad.set({["A"] = true}, 1);
-		else
-			joypad.set({["A"] = false}, 1);
-		end
+		modulo = 2;
 	elseif _velocity >= velocity_max and _velocity < velocity_med then
-		if (frame - (otap_startFrame + (emu.lagcount() - otap_startLag))) % 3 == 0 then
-			joypad.set({["A"] = true}, 1);
-		else
-			joypad.set({["A"] = false}, 1);
-		end
+		modulo = 3;
 	elseif _velocity < velocity_max then
-		if (frame - (otap_startFrame + (emu.lagcount() - otap_startLag))) % 4 == 0 then
-			joypad.set({["A"] = true}, 1);
-		else
-			joypad.set({["A"] = false}, 1);
-		end
+		modulo = 4;
 	end
+
+	local shouldWeTap = (emu.framecount() - (otap_startFrame + (emu.lagcount() - otap_startLag))) % modulo == 0;
+	joypad.set({["A"] = shouldWeTap}, 1);
 end
 
 --------------------
