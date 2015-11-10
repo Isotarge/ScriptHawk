@@ -24,7 +24,7 @@ local camera_rot = 0x37D96C;
 
 local map;
 local game_time_base;
-local minigame_array_pointer;
+local level_object_array_pointer;
 
 local notes;
 
@@ -235,7 +235,7 @@ function Game.detectVersion(romName)
 		map = 0x37F2C5;
 		notes = 0x386943;
 		game_time_base = 0x3869E4;
-		minigame_array_pointer = 0x36EAE0;
+		level_object_array_pointer = 0x36EAE0;
 	elseif bizstring.contains(romName, "Japan") then
 		slope_timer = 0x37CDE4;
 		moves_bitfield = 0x37CEA0;
@@ -245,7 +245,7 @@ function Game.detectVersion(romName)
 		map = 0x37F405;
 		notes = 0x386AA3;
 		game_time_base = 0x386B44;
-		minigame_array_pointer = 0x36F260;
+		level_object_array_pointer = 0x36F260;
 	elseif bizstring.contains(romName, "USA") and bizstring.contains(romName, "Rev A") then
 		slope_timer = 0x37B4E4;
 		moves_bitfield = 0x37B5A0;
@@ -255,7 +255,7 @@ function Game.detectVersion(romName)
 		map = 0x37DAF5;
 		notes = 0x385183;
 		game_time_base = 0x385224;
-		minigame_array_pointer = 0x36D760;
+		level_object_array_pointer = 0x36D760;
 	elseif bizstring.contains(romName, "USA") then
 		allowFurnaceFunPatch = true;
 		slope_timer = 0x37C2E4;
@@ -266,7 +266,7 @@ function Game.detectVersion(romName)
 		map = 0x37E8F5;
 		notes = 0x385F63;
 		game_time_base = 0x386004;
-		minigame_array_pointer = 0x36E560;
+		level_object_array_pointer = 0x36E560;
 	else
 		return false;
 	end
@@ -379,6 +379,8 @@ local vile_score = 0x93;
 local minigame_timer = 0x94;
 
 local number_of_slots = 25;
+-- TODO: Figure out object type for vile slots
+local first_slot_base = 0x28;
 local slot_base = 0x318;
 local slot_size = 0x180;
 
@@ -472,7 +474,7 @@ local function updateWave()
 		wave_counter = wave_counter + 1;
 		if wave_counter == wave_delay then
 			local i;
-			local vile_state = mainmemory.read_u24_be(minigame_array_pointer + 1);
+			local vile_state = mainmemory.read_u24_be(level_object_array_pointer + 1);
 			for i=1,#waveFrames[wave_frame] do
 				fireSlot(vile_state, getSlotIndex(waveFrames[wave_frame][i][1], waveFrames[wave_frame][i][2]), wave_colour);
 			end
@@ -486,7 +488,7 @@ local function updateWave()
 end
 
 local function doHeart()
-	local vile_state = mainmemory.read_u24_be(minigame_array_pointer + 1);
+	local vile_state = mainmemory.read_u24_be(level_object_array_pointer + 1);
 	local i;
 
 	for i=1,#heart do
@@ -495,7 +497,7 @@ local function doHeart()
 end
 
 local function fireAllSlots()
-	local vile_state = mainmemory.read_u24_be(minigame_array_pointer + 1);
+	local vile_state = mainmemory.read_u24_be(level_object_array_pointer + 1);
 	local i;
 
 	local colour = math.random(0, 1);
@@ -533,7 +535,7 @@ end
 -- written by Isotarge, 2015 -- 
 -------------------------------
 
-local slot_size = 0x80;
+local conga_slot_size = 0x80;
 local throw_slot = 0x77;
 local orange_timer = 0x1C;
 
@@ -542,9 +544,69 @@ local orange_timer_value = 0.5;
 function set_orange_timer()
 	joypad_pressed = input.get();
 	if joypad_pressed["C"] then
-		local minigame_array_object = mainmemory.read_u24_be(minigame_array_pointer + 1);
-		mainmemory.writefloat(minigame_array_object + throw_slot * slot_size + orange_timer, orange_timer_value, true);
-		--console.log(toHexString(boggy_object + throw_slot * slot_size + orange_timer));
+		local level_object_array_base = mainmemory.read_u24_be(level_object_array_pointer + 1);
+		mainmemory.writefloat(level_object_array_base + throw_slot * conga_slot_size + orange_timer, orange_timer_value, true);
+		--console.log(toHexString(level_object_array_base + throw_slot * conga_slot_size + orange_timer));
+	end
+end
+
+--------------
+-- Encircle --
+--------------
+
+local encircle_checkbox;
+local dynamic_radius_checkbox;
+local dynamic_radius_factor = 15;
+
+-- Relative to level_object_array
+local max_slots = 0x100;
+local radius = 1000;
+
+-- Relative to slot
+local slot_x_pos = 0x164;
+local slot_y_pos = 0x168;
+local slot_z_pos = 0x16C;
+
+local function get_num_slots()
+	local level_object_array_state = mainmemory.read_u24_be(level_object_array_pointer + 1);
+	return math.min(max_slots, mainmemory.read_u32_be(level_object_array_state));
+end
+
+local function get_slot_base(index)
+	local level_object_array_state = mainmemory.read_u24_be(level_object_array_pointer + 1);
+	return level_object_array_state + first_slot_base + index * slot_size;
+end
+
+local function encircle_banjo()
+	local i, x, z;
+
+	local current_banjo_x = Game.getXPosition();
+	local current_banjo_y = Game.getYPosition();
+	local current_banjo_z = Game.getZPosition();
+	local currentPointers = {};
+
+	num_slots = get_num_slots();
+
+	if forms.ischecked(dynamic_radius_checkbox) then
+		radius = num_slots * dynamic_radius_factor;
+	else
+		radius = 1000;
+	end
+
+	-- Fill and sort pointer list
+	for i=0,num_slots - 1 do
+		table.insert(currentPointers, get_slot_base(i));
+	end
+	table.sort(currentPointers);
+
+	-- Iterate and set position
+	for i=1,#currentPointers do
+		x = current_banjo_x + math.cos(math.pi * 2 * i / #currentPointers) * radius;
+		z = current_banjo_z + math.sin(math.pi * 2 * i / #currentPointers) * radius;
+
+		mainmemory.writefloat(currentPointers[i] + slot_x_pos, x, true);
+		mainmemory.writefloat(currentPointers[i] + slot_y_pos, current_banjo_y, true);
+		mainmemory.writefloat(currentPointers[i] + slot_z_pos, z, true);
 	end
 end
 
@@ -653,10 +715,13 @@ function Game.initUI(form_handle, col, row, button_height, label_offset, dropdow
 	options_toggle_neverslip = forms.checkbox(form_handle, "Never Slip", col(0) + dropdown_offset, row(6) + dropdown_offset);
 	options_allow_ff_patch = forms.checkbox(form_handle, "Allow FF patch", col(0) + dropdown_offset, row(7) + dropdown_offset);
 
+	encircle_checkbox = forms.checkbox(form_handle, "Encircle (Beta)", col(5) + dropdown_offset, row(4) + dropdown_offset);
+	dynamic_radius_checkbox = forms.checkbox(form_handle, "Dynamic Radius", col(5) + dropdown_offset, row(5) + dropdown_offset);
+
 	-- Vile
-	options_wave_button =     forms.button(form_handle, "Wave", initWave,         col(5), row(4), col(4) + 8, button_height);
-	options_heart_button =    forms.button(form_handle, "Heart", doHeart,         col(5), row(5), col(4) + 8, button_height);
-	options_fire_all_button = forms.button(form_handle, "Fire all", fireAllSlots, col(5), row(6), col(4) + 8, button_height);
+	options_wave_button =     forms.button(form_handle, "Wave", initWave,         col(10), row(4), col(4) + 8, button_height);
+	options_heart_button =    forms.button(form_handle, "Heart", doHeart,         col(10), row(5), col(4) + 8, button_height);
+	options_fire_all_button = forms.button(form_handle, "Fire all", fireAllSlots, col(10), row(6), col(4) + 8, button_height);
 
 	-- Moves
 	options_moves_dropdown = forms.dropdown(form_handle, { "0. None", "1. Spiral Mountain 100%", "2. All", "3. Demo" }, col(10) + dropdown_offset, row(7) + dropdown_offset);
@@ -675,6 +740,10 @@ function Game.eachFrame()
 	if forms.ischecked(options_toggle_neverslip) then
 		neverSlip();
 		RF_step();
+	end
+
+	if forms.ischecked(encircle_checkbox) then
+		encircle_banjo();
 	end
 
 	-- Check EEPROM checksums

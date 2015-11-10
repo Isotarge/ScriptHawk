@@ -1,15 +1,15 @@
 Domain RDRAM
 SystemID N64
 0DF4C7	b	h	1	RDRAM	Track List Map Modifier
-3FFFC0	d	h	1	RDRAM	Player Object Pointer
-1FCBEC	w	u	1	RDRAM	Balloons
+0DFD9C	d	h	1	RDRAM	Cheat Menu
+11ADB3	b	u	1	RDRAM	Get Ready
 121167	b	h	1	RDRAM	Map
 121252	b	h	1	RDRAM	Map
 1234F7	b	h	1	RDRAM	Map
-1FCA19	b	h	1	RDRAM	Map
 123514	w	u	1	RDRAM	Is Paused
-11ADB3	b	u	1	RDRAM	Get Ready
 1263E8	b	u	1	RDRAM	Character
 1269C0	b	u	1	RDRAM	Vehicle
-0DFD9C	d	h	1	RDRAM	Cheat Menu
+1FCA19	b	h	1	RDRAM	Map
+1FCBEC	w	u	1	RDRAM	Balloons
+3FFFC0	d	h	1	RDRAM	Player Object Pointer
 

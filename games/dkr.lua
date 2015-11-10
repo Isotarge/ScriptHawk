@@ -548,6 +548,59 @@ local function decrease_get_ready_yellow_min()
 	forms.settext(options_get_ready_yellow_min_value_label, get_ready_yellow_min);
 end
 
+--------------
+-- Encircle --
+--------------
+
+local encircle_checkbox;
+
+--pointer_list = 0x3ffe00;
+pointer_list = 0x3fff70;
+
+-- Relative to object
+local radius = 1000;
+
+local function get_num_slots()
+	local i = 0;
+	local isPointer = true;
+	while isPointer do
+		isPointer = is_pointer(mainmemory.read_u32_be(pointer_list + i * 4));
+		i = i + 1;
+	end
+	return i;
+end
+
+local function get_slot_base(index)
+	return mainmemory.read_u24_be(pointer_list + (index * 4) + 1);
+end
+
+local function encircle_player()
+	local current_player_x = Game.getXPosition();
+	local current_player_y = Game.getYPosition();
+	local current_player_z = Game.getZPosition();
+	local slot_base, i, x, z;
+	local _currentPointers = {};
+
+	num_slots = get_num_slots();
+	--radius = num_slots * 15;
+
+	-- Populate and sort pointer list
+	for i=0,num_slots - 1 do
+		table.insert(_currentPointers, get_slot_base(i));
+	end
+	table.sort(_currentPointers);
+
+	-- Iterate and set position
+	for i=1,#_currentPointers do
+		x = current_player_x + math.cos(math.pi * 2 * i / #_currentPointers) * radius;
+		z = current_player_z + math.sin(math.pi * 2 * i / #_currentPointers) * radius;
+
+		mainmemory.writefloat(_currentPointers[i] + x_pos, x, true);
+		mainmemory.writefloat(_currentPointers[i] + y_pos, current_player_y, true);
+		mainmemory.writefloat(_currentPointers[i] + z_pos, z, true);
+	end
+end
+
 ------------
 -- Events --
 ------------
@@ -577,6 +630,7 @@ end
 
 function Game.initUI(form_handle, col, row, button_height, label_offset, dropdown_offset)
 	output_boost_stats_checkbox = forms.checkbox(form_handle, "Boost info", col(5) + dropdown_offset, row(4) + dropdown_offset);
+	encircle_checkbox = forms.checkbox(form_handle, "Encircle (beta)", col(5) + dropdown_offset, row(5) + dropdown_offset);
 
 	otap_checkbox = forms.checkbox(form_handle, "Auto tapper", col(0) + dropdown_offset, row(6) + dropdown_offset);
 	otap_boost_dropdown = forms.dropdown(form_handle, {"Yellow", "Blue", "None"}, col(0) + dropdown_offset, row(7) + dropdown_offset, col(4), button_height);
@@ -620,6 +674,10 @@ function Game.eachFrame()
 
 	if otap_enabled then
 		optimalTap();
+	end
+
+	if forms.ischecked(encircle_checkbox) then
+		encircle_player();
 	end
 
 	outputBoostStats();
