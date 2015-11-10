@@ -314,7 +314,7 @@ function Game.setYPosition(value)
 	local player_object = mainmemory.read_u32_be(player_object_pointer);
 	if is_pointer(player_object) then
 		player_object = player_object - 0x80000000;
-		mainmemory.writefloat(player_object + y_velocity, 0, true);
+		--mainmemory.writefloat(player_object + y_velocity, 0, true);
 		mainmemory.writefloat(player_object + y_pos, value, true);
 	end
 end
