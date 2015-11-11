@@ -290,6 +290,10 @@ Game.maps = {
 	"K. Rool's Arena"
 };
 
+local function isPointer(value)
+	return value > 0x80000000 and value < 0x807FFFFF;
+end
+
 ------------------
 -- Unlock menus --
 ------------------
@@ -357,6 +361,7 @@ local lives      = 9; -- This is used as instrument ammo in single player
 
 -- Relative to kong_object_pointer
 local model_pointer = 0x00;
+local bone_array_pointer = 0x04;
 
 local hand_state = 0x47; -- Bitfield
 local visibility = 0x63; -- 127 = visible
@@ -409,6 +414,12 @@ local camera_focus_pointer = 0x178;
 local kick_animation = 0x181;
 local kick_animation_value = 0x29;
 
+local misc_accelleration_float = 0x1AC;
+local horizontal_acceleration = 0x1B0; -- Set to a negative number to go fast
+local misc_accelleration_float_2 = 0x1B4;
+local misc_accelleration_float_3 = 0x1B8;
+
+-- TODO: Properly document these
 local scale = {
 	0x344, 0x348, 0x34C, 0x350, 0x354
 }
@@ -420,6 +431,11 @@ local kong_object;
 
 local prev_map = 0;
 local map_value = 0;
+
+-- Relative to bone array
+local scale_x = 0x34;
+local scale_y = 0x38;
+local scale_z = 0x3C;
 
 ----------------
 -- Flag stuff --
@@ -2851,24 +2867,28 @@ end
 
 local max_objects = 0xff;
 
-function everythingiskong()
-	local object_found = true;
-	local object_no = 0;
-	local kong_model_pointer = mainmemory.read_u24_be(kong_object + 1);
-	local object_model_pointer;
-	local pointer;
-	local camera_object = mainmemory.read_u24_be(camera_pointer + 1); 
+function everythingIsKong()
+	local kong_model_pointer = mainmemory.read_u32_be(kong_object + model_pointer);
+	local kong_bones_pointer = mainmemory.read_u32_be(kong_object + bone_array_pointer)
 
-	while object_found do
-		pointer = mainmemory.read_u24_be(pointer_list + (object_no * 4) + 1);
-		object_found = (pointer ~= 0xffffff) and (pointer ~= 0x000000) and (pointer ~= camera_object) and (object_no <= max_objects);
+	if isPointer(kong_model_pointer) and isPointer(kong_bones_pointer) then
+		local camera_object = mainmemory.read_u24_be(camera_pointer + 1);
+		local pointer;
+		local object_model_pointer;
+		local object_no = 0;
+		local object_found = true;
 
-		if object_found then
-			object_model_pointer = mainmemory.read_u24_be(pointer + model_pointer + 1);
-			if object_model_pointer ~= 0x000000 then
-				mainmemory.writebyte(pointer + model_pointer, 0x80);
-				mainmemory.write_u24_be(pointer + model_pointer + 1, kong_model_pointer);
-				print("wrote: "..toHexString(pointer));
+		while object_found do
+			pointer = mainmemory.read_u24_be(pointer_list + (object_no * 4) + 1);
+			object_found = (pointer > 0x000000) and (pointer < 0x7fffff) and (object_no <= max_objects);
+
+			if object_found and (pointer ~= camera_object) then
+				object_model_pointer = mainmemory.read_u24_be(pointer + model_pointer + 1);
+				if object_model_pointer > 0x000000 and object_model_pointer < 0x7fffff then
+					mainmemory.write_u32_be(pointer + model_pointer, kong_model_pointer);
+					--mainmemory.write_u32_be(pointer + bone_array_pointer, kong_bones_pointer);
+					print("wrote: "..toHexString(pointer));
+				end
 			end
 			object_no = object_no + 1;
 		end
@@ -2882,15 +2902,42 @@ local function applyScale(desired_scale)
 	end
 end
 
-local function random_effect()
+function Game.randomEffect()
 	-- Randomly manipulate the effect byte
-	local randomEffect = math.random(0, 0xffff);
-	mainmemory.write_u16_be(kong_object + effect_byte, randomEffect);
+	local _randomEffect = math.random(0, 0xffff);
+	mainmemory.write_u16_be(kong_object + effect_byte, _randomEffect);
 
 	-- Randomly resize the kong
 	applyScale(0.01 + math.random() * 0.49);
 
-	print("Activated effect: "..bizstring.binary(randomEffect));
+	print("Activated effect: "..bizstring.binary(_randomEffect));
+end
+
+----------------
+-- Paper Mode --
+----------------
+
+local options_toggle_paper_mode;
+paper_thickness = 0.015;
+
+function paperMode()
+	local object_found = true;
+	local object_no = 0;
+	local object_bone_array;
+	local pointer;
+
+	while object_found do
+		pointer = mainmemory.read_u24_be(pointer_list + (object_no * 4) + 1);
+		object_found = (pointer < 0x7fffff) and (pointer > 0x000000) and (object_no <= max_objects);
+
+		if object_found then
+			object_bone_array = mainmemory.read_u24_be(pointer + bone_array_pointer + 1);
+			if object_bone_array > 0x000000 and object_bone_array < 0x7fffff then
+				mainmemory.writefloat(object_bone_array + scale_z, paper_thickness, true);
+			end
+		end
+		object_no = object_no + 1;
+	end
 end
 
 ---------------
@@ -3056,7 +3103,7 @@ function Game.initUI(form_handle, col, row, button_height, label_offset, dropdow
 	options_clear_tb_void_button =   forms.button(form_handle, "Clear TB void", clear_tb_void,   col(10), row(1), col(4) + 8, button_height);
 	options_unlock_moves_button =    forms.button(form_handle, "Unlock Moves",  unlock_moves,    col(10), row(4), col(4) + 8, button_height);
 
-	--options_kong_button        =  forms.button(form_handle, "Kong",   everythingiskong,  col(10), row(3), col(4) + 8, button_height);
+	--options_kong_button        =  forms.button(form_handle, "Kong",   everythingIsKong,  col(10), row(3), col(4) + 8, button_height);
 	--options_force_pause_button =  forms.button(form_handle, "Force Pause",   force_pause,  col(10), row(4), col(4) + 8, button_height);
 	options_force_zipper_button =  forms.button(form_handle, "Force Zipper",  force_zipper,         col(5), row(4), col(4) + 8, button_height);
 	options_fix_geometry_spiking = forms.button(form_handle, "Fix Spiking",   fix_geometry_spiking, col(10), row(0), col(4) + 8, button_height);
@@ -3070,7 +3117,8 @@ function Game.initUI(form_handle, col, row, button_height, label_offset, dropdow
 
 	-- Checkboxes
 	options_toggle_homing_ammo = forms.checkbox(form_handle, "Homing Ammo", col(0) + dropdown_offset, row(6) + dropdown_offset);
-	options_toggle_neverslip =   forms.checkbox(form_handle, "Never Slip",  col(10) + dropdown_offset, row(5) + dropdown_offset);
+	--options_toggle_neverslip =   forms.checkbox(form_handle, "Never Slip",  col(10) + dropdown_offset, row(5) + dropdown_offset);
+	options_toggle_paper_mode =   forms.checkbox(form_handle, "Paper Mode",  col(10) + dropdown_offset, row(5) + dropdown_offset);
 end
 
 function Game.applyInfinites()
@@ -3105,8 +3153,12 @@ function Game.eachFrame()
 		fix_lag();
 	end
 
-	if forms.ischecked(options_toggle_neverslip) then
-		neverSlip();
+	--if forms.ischecked(options_toggle_neverslip) then
+	--	neverSlip();
+	--end
+
+	if forms.ischecked(options_toggle_paper_mode) then
+		paperMode();
 	end
 
 	-- Mad Jack

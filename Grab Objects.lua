@@ -272,8 +272,8 @@ local function pull_objects()
 					table.insert(object_pointers, pointer);
 				end
 			end
-			object_no = object_no + 1;
 		end
+		object_no = object_no + 1;
 	end
 
 	-- Clamp index
