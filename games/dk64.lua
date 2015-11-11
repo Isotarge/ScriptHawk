@@ -414,10 +414,10 @@ local camera_focus_pointer = 0x178;
 local kick_animation = 0x181;
 local kick_animation_value = 0x29;
 
-local misc_accelleration_float = 0x1AC;
+local misc_acceleration_float = 0x1AC;
 local horizontal_acceleration = 0x1B0; -- Set to a negative number to go fast
-local misc_accelleration_float_2 = 0x1B4;
-local misc_accelleration_float_3 = 0x1B8;
+local misc_acceleration_float_2 = 0x1B4;
+local misc_acceleration_float_3 = 0x1B8;
 
 -- TODO: Properly document these
 local scale = {
