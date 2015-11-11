@@ -2925,12 +2925,13 @@ function paperMode()
 	local object_no = 0;
 	local object_bone_array;
 	local pointer;
+	local camera_object = mainmemory.read_u24_be(camera_pointer + 1);
 
 	while object_found do
 		pointer = mainmemory.read_u24_be(pointer_list + (object_no * 4) + 1);
 		object_found = (pointer < 0x7fffff) and (pointer > 0x000000) and (object_no <= max_objects);
 
-		if object_found then
+		if object_found and pointer ~= camera_object then
 			object_bone_array = mainmemory.read_u24_be(pointer + bone_array_pointer + 1);
 			if object_bone_array > 0x000000 and object_bone_array < 0x7fffff then
 				mainmemory.writefloat(object_bone_array + scale_z, paper_thickness, true);
