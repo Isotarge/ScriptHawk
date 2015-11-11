@@ -347,7 +347,7 @@ end
 
 local function find_root(object)
 	while object > 0 do
-		console.log(toHexString(object));
+		print(toHexString(object));
 		object = mainmemory.read_u24_be(object + 1);
 	end
 end
@@ -405,12 +405,12 @@ BK_Velocity_Object = nil;
 
 function output_objects()
 	if type(BK_Pointer_List) ~= "nil" then
-		console.log("Pointer List: "..toHexString(BK_Pointer_List));
-		console.log("Position object: "..toHexString(BK_Position_Object));
-		console.log("Velocity object: "..toHexString(BK_Velocity_Object));
-		console.log("Slip object: "..toHexString(BK_Slip_Object));
+		print("Pointer List: "..toHexString(BK_Pointer_List));
+		print("Position object: "..toHexString(BK_Position_Object));
+		print("Velocity object: "..toHexString(BK_Velocity_Object));
+		print("Slip object: "..toHexString(BK_Slip_Object));
 	else
-		console.log("Can't get a read...");
+		print("Can't get a read...");
 	end
 end
 
@@ -600,7 +600,7 @@ end
 function Game.setMap(value)
 	local trigger_value = mainmemory.read_u16_be(map_trigger);
 	if trigger_value == 0 then
-		console.log("Travelling to "..value);
+		print("Travelling to "..value);
 		mainmemory.write_u16_be(map, value);
 		mainmemory.write_u16_be(map_trigger, 0x0101);
 	end

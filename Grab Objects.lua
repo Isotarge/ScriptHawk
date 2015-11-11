@@ -27,7 +27,7 @@ if bizstring.contains(romName, "Donkey Kong 64") then
 		grab_pointer = 0x2F4;
 	end
 else
-	console.log("This game is not supported.");
+	print("This game is not supported.");
 	return;
 end
 

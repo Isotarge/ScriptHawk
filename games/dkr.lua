@@ -406,12 +406,12 @@ local function enableOptimalTap()
 	otap_startFrame = emu.framecount();
 	otap_startLag = emu.lagcount();
 	otap_enabled = true;
-	console.log("Auto tapper (by Faschz) enabled.");
+	print("Auto tapper (by Faschz) enabled.");
 end
 
 local function disableOptimalTap()
 	otap_enabled = false;
-	console.log("Auto tapper (by Faschz) disabled.");
+	print("Auto tapper (by Faschz) disabled.");
 end
 
 local function optimalTap()
@@ -425,14 +425,12 @@ local function optimalTap()
 
 	-- Don't press A if we're paused
 	if _isPaused ~= 0 then
-		--console.log("Don't press A, we're paused.");
-		joypad.set({["A"] = false}, 1);
+		--print("Don't press A, we're paused.");
 		return;
 	end
 
 	-- Don't press A if we're boosting
 	if _boost > 0 then
-		joypad.set({["A"] = false}, 1);
 		return;
 	end
 
@@ -450,7 +448,7 @@ local function optimalTap()
 		end
 
 		if _getReady >= boostMin and _getReady <= boostMax and _boost == 0 then
-			console.log("Got "..boostType.." boost at value: ".._getReady);
+			print("Got "..boostType.." boost at value: ".._getReady);
 			joypad.set({["A"] = true}, 1);
 		else
 			joypad.set({["A"] = false}, 1);
@@ -489,14 +487,14 @@ local function outputBoostStats()
 		if _boost > 0 and _getReady == 0 then
 			local aPressed = joypad.getimmediate()["P1 A"];
 			if aPressed then
-				console.log("Frame: "..boostFrames.." Boost: ".._boost.." (A Pressed)");
+				print("Frame: "..boostFrames.." Boost: ".._boost.." (A Pressed)");
 			else
-				console.log("Frame: "..boostFrames.." Boost: ".._boost);
+				print("Frame: "..boostFrames.." Boost: ".._boost);
 			end
 			boostFrames = boostFrames + 1;
 		else
 			if boostFrames > 0 then
-				console.log("Boost ended");
+				print("Boost ended");
 			end
 			boostFrames = 0;
 		end

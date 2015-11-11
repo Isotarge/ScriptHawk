@@ -54,7 +54,7 @@ local function plot_pos()
 			savestate.loadslot(0);
 
 			if currentAngle % 10 == 0 then
-				console.log('testing angle='..currentAngle);
+				print('testing angle='..currentAngle);
 			end
 
 			-- Set angle and position
@@ -67,7 +67,7 @@ local function plot_pos()
 			if currentAngle >= maxAngle then
 				currentAngle = 0;
 				current_x = current_x + x_increments;
-				console.log('testing new: x='..current_x);
+				print('testing new: x='..current_x);
 			end
 
 			-- Check to see if the ledge was grabbed
@@ -81,16 +81,16 @@ local function plot_pos()
 		if y <= ground then
 			if x >= end_x then
 				running = false;
-				console.log('found solution: angle='..currentAngle..' x='..current_x);
+				print('found solution: angle='..currentAngle..' x='..current_x);
 			else
 				frames_since_set = 0;
 			end
 		elseif frames_since_set > max_frames_since_set then
 			if x >= end_x then
 				running = false;
-				console.log('found solution: angle='..currentAngle..' x='..current_x);
+				print('found solution: angle='..currentAngle..' x='..current_x);
 			else
-				console.log('probably grabbed ledge...');
+				print('probably grabbed ledge...');
 				frames_since_set = 0;
 			end
 		else

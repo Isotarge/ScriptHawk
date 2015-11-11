@@ -2,11 +2,11 @@ local mmv_filename = forms.openfile(nil, nil, "Dega Movie Files (*.mmv)|*.mmv|Al
 
 console.clear()
 if mmv_filename == "" then
-	console.log("No movie selected. Exiting.");
+	print("No movie selected. Exiting.");
 	return;
 end
 
-console.log("Opening movie for playback: "..mmv_filename);
+print("Opening movie for playback: "..mmv_filename);
 
 -- Open the file and read past the header data
 local input_file = assert(io.open(mmv_filename, "rb"))
@@ -50,5 +50,5 @@ while getNextFrame() do
 	emu.frameadvance();
 end
 
-console.log("Done.");
+print("Done.");
 client.pause();

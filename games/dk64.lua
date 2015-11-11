@@ -1893,7 +1893,7 @@ function checkFlags()
 							-- Output debug info if the flag isn't known
 							if not isFound(i, bit) then
 								flag_found = true;
-								console.log("{[\"byte\"] = "..toHexString(i)..", [\"bit\"] = "..bit..", [\"name\"] = \"Name\", [\"type\"] = \"Type\"},");
+								print("{[\"byte\"] = "..toHexString(i)..", [\"bit\"] = "..bit..", [\"name\"] = \"Name\", [\"type\"] = \"Type\"},");
 							else
 								known_flags_found = known_flags_found + 1;
 							end
@@ -1905,20 +1905,20 @@ function checkFlags()
 				end
 			end
 			if known_flags_found > 0 then
-				console.log(known_flags_found.." Known flags skipped.")
+				print(known_flags_found.." Known flags skipped.")
 			end
 			if not flag_found then
-				console.log("No unknown flags were changed.")
+				print("No unknown flags were changed.")
 			end
 		else
 			-- Populate flag block
 			for i=0,flag_block_size do
 				flag_block[i] = mainmemory.readbyte(flags + i);
 			end
-			console.log("Populated flag array.")
+			print("Populated flag array.")
 		end
 	else
-		console.log("Failed to find flag block on this frame, adding to queue. Will be checked next time block is found.");
+		print("Failed to find flag block on this frame, adding to queue. Will be checked next time block is found.");
 		table.insert(flag_action_queue, {["action_type"]="check"});
 	end
 end
@@ -1935,17 +1935,17 @@ local function process_flag_queue()
 						current_value = mainmemory.readbyte(flags + queue_item["byte"]);
 						mainmemory.writebyte(flags + queue_item["byte"], set_bit(current_value, queue_item["bit"]));
 						if type(queue_item["name"]) == "string" then
-							console.log("Set \""..queue_item["name"].."\" at "..toHexString(queue_item["byte"]).." bit "..queue_item["bit"]);
+							print("Set \""..queue_item["name"].."\" at "..toHexString(queue_item["byte"]).." bit "..queue_item["bit"]);
 						else
-							console.log("Set flag at "..toHexString(queue_item["byte"]).." bit "..queue_item["bit"]);
+							print("Set flag at "..toHexString(queue_item["byte"]).." bit "..queue_item["bit"]);
 						end
 					elseif queue_item["action_type"] == "clear" then
 						current_value = mainmemory.readbyte(flags + queue_item["byte"]);
 						mainmemory.writebyte(flags + queue_item["byte"], clear_bit(current_value, queue_item["bit"]));
 						if type(queue_item["name"]) == "string" then
-							console.log("Cleared \""..queue_item["name"].."\" at "..toHexString(queue_item["byte"]).." bit "..queue_item["bit"]);
+							print("Cleared \""..queue_item["name"].."\" at "..toHexString(queue_item["byte"]).." bit "..queue_item["bit"]);
 						else
-							console.log("Cleared flag at "..toHexString(queue_item["byte"]).." bit "..queue_item["bit"]);
+							print("Cleared flag at "..toHexString(queue_item["byte"]).." bit "..queue_item["bit"]);
 						end
 					elseif queue_item["action_type"] == "check" then
 						checkFlags();
@@ -2002,9 +2002,9 @@ function setFlagByType(_type)
 	end
 	if num_set > 0 then
 		process_flag_queue();
-		console.log("Set "..num_set.." flags of type '".._type.."'");
+		print("Set "..num_set.." flags of type '".._type.."'");
 	else
-		console.log("No flags found for specified type.");
+		print("No flags found for specified type.");
 	end
 end
 
@@ -2065,9 +2065,9 @@ function clearFlagByType(_type)
 	end
 	if num_cleared > 0 then
 		process_flag_queue();
-		console.log("Cleared "..num_cleared.." flags of type '".._type.."'");
+		print("Cleared "..num_cleared.." flags of type '".._type.."'");
 	else
-		console.log("No flags found for specified type.");
+		print("No flags found for specified type.");
 	end
 end
 
@@ -2088,7 +2088,7 @@ local function flagClearButtonHandler()
 end
 
 local function formatOutputString(caption, value, max)
-	console.log(caption..value.."/"..max.." or "..round(value/max * 100,2).."%");
+	print(caption..value.."/"..max.." or "..round(value/max * 100,2).."%");
 end
 
 function flagStats(verbose)
@@ -2111,7 +2111,7 @@ function flagStats(verbose)
 		if _type == nil then
 			untypedFlags = untypedFlags + 1;
 			if verbose then
-				console.log("Warning: Flag without type detected at "..toHexString(flag["byte"]).." bit "..flag["bit"].." with name: \""..flag["name"].."\"");
+				print("Warning: Flag without type detected at "..toHexString(flag["byte"]).." bit "..flag["bit"].." with name: \""..flag["name"].."\"");
 			end
 		end
 		if _type == "Fairy" then
@@ -2152,19 +2152,19 @@ function flagStats(verbose)
 	local knownFlags = #flag_array;
 	local totalFlags = flag_block_size * 8;
 
-	console.log("Block size: "..toHexString(flag_block_size));
+	print("Block size: "..toHexString(flag_block_size));
 	formatOutputString("Flags known: ", knownFlags, totalFlags);
 	formatOutputString("Flags without types: ", untypedFlags, knownFlags);
-	console.log();
+	print();
 	formatOutputString("Crowns: ", crowns_known, max_crowns);
 	formatOutputString("Fairies: ", fairies_known, max_fairies);
 	formatOutputString("Blueprints: ", blueprints_known, max_blueprints);
-	console.log();
+	print();
 	formatOutputString("Warps: ", warps_known, max_warps);
 	formatOutputString("CB: ", cb_known, max_cb);
 	formatOutputString("GB: ", gb_known, max_gb);
-	console.log("Coins: "..coins_known);
-	console.log();
+	print("Coins: "..coins_known);
+	print();
 end
 flagStats();
 
@@ -2868,7 +2868,7 @@ function everythingiskong()
 			if object_model_pointer ~= 0x000000 then
 				mainmemory.writebyte(pointer + model_pointer, 0x80);
 				mainmemory.write_u24_be(pointer + model_pointer + 1, kong_model_pointer);
-				console.log("wrote: "..toHexString(pointer));
+				print("wrote: "..toHexString(pointer));
 			end
 			object_no = object_no + 1;
 		end
@@ -2890,7 +2890,7 @@ local function random_effect()
 	-- Randomly resize the kong
 	applyScale(0.01 + math.random() * 0.49);
 
-	console.log("Activated effect: "..bizstring.binary(randomEffect));
+	print("Activated effect: "..bizstring.binary(randomEffect));
 end
 
 ---------------
@@ -2943,7 +2943,7 @@ local function toJPString(value)
 			end
 		end
 		if charFound == false then
-			console.log("JP String parse warning: Didn't find character for '"..char..'\'');
+			print("JP String parse warning: Didn't find character for '"..char..'\'');
 		end
 	end
 	return tempString;
@@ -2964,7 +2964,7 @@ function brb(value)
 		brb_message = message;
 		is_brb = true;
 	else
-		console.log("Not supported in this version.");
+		print("Not supported in this version.");
 	end
 end
 
@@ -3141,9 +3141,9 @@ function Game.eachFrame()
 			checksum_value = memory.read_u32_be(eep_checksum_offsets[i]);
 			if eep_checksum_values[i] ~= checksum_value then
 				if i == 5 then
-					console.log("Global flags "..i.." Checksum: "..toHexString(eep_checksum_values[i]).." -> "..toHexString(checksum_value));
+					print("Global flags "..i.." Checksum: "..toHexString(eep_checksum_values[i]).." -> "..toHexString(checksum_value));
 				else
-					console.log("Slot "..i.." Checksum: "..toHexString(eep_checksum_values[i]).." -> "..toHexString(checksum_value));
+					print("Slot "..i.." Checksum: "..toHexString(eep_checksum_values[i]).." -> "..toHexString(checksum_value));
 				end
 				eep_checksum_values[i] = checksum_value;
 			end

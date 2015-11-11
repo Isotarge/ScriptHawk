@@ -65,12 +65,12 @@ elseif bizstring.contains(romName, "Majora's Mask") or bizstring.contains(romNam
 elseif bizstring.contains(romName, "Elmo's Letter Adventure") or bizstring.contains(romName, "Elmo's Number Journey") then
 	Game = require "games.elmo";
 else
-	console.log("This game is not currently supported.");
+	print("This game is not currently supported.");
 	return;
 end
 
 if not Game.detectVersion(romName) then
-	console.log("This version of the game is not currently supported.");
+	print("This version of the game is not currently supported.");
 	return;
 end
 
@@ -248,9 +248,9 @@ local options_toggle_telemetry_button;
 -- Outputs telemetry data as CSV to the console
 local function output_telemetry()
 	local i = 1;
-	console.log("Time (Frames),X Position,Y Position,Z Position,Dxz,Dy,Rotation X,Rotation Y,Rotation Z,");
+	print("Time (Frames),X Position,Y Position,Z Position,Dxz,Dy,Rotation X,Rotation Y,Rotation Z,");
 	for i=1,#telemetryData do
-		console.log(i..","..telemetryData[i]["X Position"]..","..telemetryData[i]["Y Position"]..","..telemetryData[i]["Z Position"]..","..telemetryData[i]["Dxz"]..","..telemetryData[i]["Dy"]..","..telemetryData[i]["Rotation X"]..","..telemetryData[i]["Rotation Y"]..","..telemetryData[i]["Rotation Z"]..",");
+		print(i..","..telemetryData[i]["X Position"]..","..telemetryData[i]["Y Position"]..","..telemetryData[i]["Z Position"]..","..telemetryData[i]["Dxz"]..","..telemetryData[i]["Dy"]..","..telemetryData[i]["Rotation X"]..","..telemetryData[i]["Rotation Y"]..","..telemetryData[i]["Rotation Z"]..",");
 	end
 end
 
@@ -276,7 +276,7 @@ local function stop_telemetry()
 		--io.write(json_data);
 		--io.close(file);
 	--else
-		--console.log("Error writing to file =(");
+		--print("Error writing to file =(");
 		--output_telemetry();
 	--end
 end

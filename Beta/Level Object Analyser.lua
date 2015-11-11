@@ -193,21 +193,21 @@ function output_slot(index)
 		local i;
 		local previous_type = "";
 		local current_slot = slot_data[index + 1];
-		console.log("Starting output of slot "..index + 1);
+		print("Starting output of slot "..index + 1);
 		for i=0,slot_size do
 			if type(slot_variables[i]) == "table" then
 				if slot_variables[i].Type ~= "Z4_Unknown" then
 					if slot_variables[i].Type ~= previous_type then
 						previous_type = slot_variables[i].Type;
-						console.log("");
+						print("");
 					end
 					if type(slot_variables[i].Name) == "string" then
-						console.log(toHexString(i).." "..(slot_variables[i].Name).." ("..(slot_variables[i].Type).."): "..format_for_output(slot_variables[i].Type, current_slot[i]));
+						print(toHexString(i).." "..(slot_variables[i].Name).." ("..(slot_variables[i].Type).."): "..format_for_output(slot_variables[i].Type, current_slot[i]));
 					else
-						console.log(toHexString(i).." "..(slot_variables[i].Type)..": "..format_for_output(slot_variables[i].Type, current_slot[i]));
+						print(toHexString(i).." "..(slot_variables[i].Type)..": "..format_for_output(slot_variables[i].Type, current_slot[i]));
 					end
 				else
-					--console.log(toHexString(i).." Nothing interesting.");
+					--print(toHexString(i).." Nothing interesting.");
 				end
 			end
 		end
@@ -215,9 +215,9 @@ function output_slot(index)
 end
 
 function output_stats()
-	console.log("------------------------------");
-	console.log("-- Starting output of stats --");
-	console.log("------------------------------");
+	print("------------------------------");
+	print("-- Starting output of stats --");
+	print("------------------------------");
 	local i, min, max;
 	local previous_type = "";
 	for i=0,slot_size do
@@ -227,15 +227,15 @@ function output_stats()
 				max = get_maximum_value(i);
 				if slot_variables[i].Type ~= previous_type then
 					previous_type = slot_variables[i].Type;
-					console.log("");
+					print("");
 				end
 				if type(slot_variables[i].Name) ~= "nil" then
-					console.log(toHexString(i).." "..(slot_variables[i].Type)..": "..format_for_output(slot_variables[i].Type, min).. " to "..format_for_output(slot_variables[i].Type, max).." - "..(slot_variables[i].Name));
+					print(toHexString(i).." "..(slot_variables[i].Type)..": "..format_for_output(slot_variables[i].Type, min).. " to "..format_for_output(slot_variables[i].Type, max).." - "..(slot_variables[i].Name));
 				else
-					console.log(toHexString(i).." "..(slot_variables[i].Type)..": "..format_for_output(slot_variables[i].Type, min).. " to "..format_for_output(slot_variables[i].Type, max));
+					print(toHexString(i).." "..(slot_variables[i].Type)..": "..format_for_output(slot_variables[i].Type, min).. " to "..format_for_output(slot_variables[i].Type, max));
 				end
 			else
-				--console.log(toHexString(i).." Nothing interesting.");
+				--print(toHexString(i).." Nothing interesting.");
 			end
 		end
 	end
@@ -273,7 +273,7 @@ function json_slots()
 		io.write(json_data);
 		io.close(file);
 	else
-		console.log("Error writing to file =(");
+		print("Error writing to file =(");
 	end
 end
 
@@ -294,7 +294,7 @@ function resolve_variable_name(name)
 	end
 
 	-- Default + Error
-	console.log("Variable name: '"..name.."' not found =(");
+	print("Variable name: '"..name.."' not found =(");
 	return 0x00;
 end
 
@@ -349,9 +349,9 @@ function get_all_unique(variable)
 		end
 
 		-- Output the findings
-		console.log("Starting output of variable "..toHexString(variable));
+		print("Starting output of variable "..toHexString(variable));
 		for value, count in pairs(unique_values) do
-			console.log(""..value.." appears "..count.." times");
+			print(""..value.." appears "..count.." times");
 		end
 	end
 end
@@ -368,13 +368,13 @@ function set_all(variable, value)
 		for i=0,num_slots - 1 do
 			current_slot_base = get_slot_base(level_object_array, i);
 			if slot_variables[variable].Type == "Float" then
-				--console.log("writing float to slot "..i);
+				--print("writing float to slot "..i);
 				mainmemory.writefloat(current_slot_base + variable, value, true);
 			elseif is_hex(slot_variables[variable].Type) then
-				--console.log("writing u32_be to slot "..i);
+				--print("writing u32_be to slot "..i);
 				mainmemory.write_u32_be(current_slot_base + variable, value);
 			else
-				--console.log("writing byte to slot "..i);
+				--print("writing byte to slot "..i);
 				mainmemory.writebyte(current_slot_base + variable, value);
 			end
 		end

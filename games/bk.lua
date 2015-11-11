@@ -523,10 +523,10 @@ local function RF_step()
 	local analog_angle = rotation_to_radians(math.abs(RF_absolute_target_angle - current_camera_rot) % 360);
 	local analog_x = math.sin(analog_angle) * RF_max_analog;
 	local analog_y = -1 * math.cos(analog_angle) * RF_max_analog;
-	--console.log("camera rot: "..current_camera_rot);
-	--console.log("analog angle: "..analog_angle);
-	--console.log("raw sincos: "..math.sin(analog_angle)..","..math.cos(analog_angle));
-	--console.log("analog inputs: "..analog_x..","..analog_y);
+	--print("camera rot: "..current_camera_rot);
+	--print("analog angle: "..analog_angle);
+	--print("raw sincos: "..math.sin(analog_angle)..","..math.cos(analog_angle));
+	--print("analog inputs: "..analog_x..","..analog_y);
 	joypad.setanalog({['X Axis'] = analog_x, ['Y Axis'] = analog_y}, 1);
 end
 
@@ -546,7 +546,7 @@ function set_orange_timer()
 	if joypad_pressed["C"] then
 		local level_object_array_base = mainmemory.read_u24_be(level_object_array_pointer + 1);
 		mainmemory.writefloat(level_object_array_base + throw_slot * conga_slot_size + orange_timer, orange_timer_value, true);
-		--console.log(toHexString(level_object_array_base + throw_slot * conga_slot_size + orange_timer));
+		--print(toHexString(level_object_array_base + throw_slot * conga_slot_size + orange_timer));
 	end
 end
 
@@ -752,7 +752,7 @@ function Game.eachFrame()
 		for i=1,#eep_checksum_offsets do
 			checksum_value = memory.read_u32_be(eep_checksum_offsets[i]);
 			if eep_checksum_values[i] ~= checksum_value then
-				console.log("Slot "..i.." Checksum: "..toHexString(eep_checksum_values[i]).." -> "..toHexString(checksum_value));
+				print("Slot "..i.." Checksum: "..toHexString(eep_checksum_values[i]).." -> "..toHexString(checksum_value));
 				eep_checksum_values[i] = checksum_value;
 			end
 		end
