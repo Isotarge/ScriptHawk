@@ -9,7 +9,7 @@ end
 print("Opening movie for playback: "..mmv_filename);
 
 -- Open the file and read past the header data
-local input_file = assert(io.open(mmv_filename, "rb"))
+local input_file = assert(io.open(mmv_filename, "rb"));
 local header = input_file:read(0xF3);
 
 -- Skip frames that have already happened
@@ -49,6 +49,7 @@ end
 while getNextFrame() do
 	emu.frameadvance();
 end
+input_file:close();
 
 print("Done.");
 client.pause();

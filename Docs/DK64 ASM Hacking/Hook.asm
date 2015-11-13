@@ -5,14 +5,16 @@
 // Executes every frame (including lag frames) after controller data is set
 
 // Put the hook at 0x80007494 on the system bus
-// Put your code at 0x807FFF00 on the system bus
+// Put your code at 0x807FF500 on the system bus
+[JumpAddress]: 0x807FF500
+
 // JR to to 0x800074A0 when finished
 // Assemble with CajeASM
 
-// Assembled: 3C08807F3508FF000100000800000000
+// Assembled: 3C08807F3508F5000100000800000000
 
 // .org 0x80007494
-LUI     t0, 0x807F
-ORI     t0, t0, 0xFF00	
+LUI     t0, @JumpAddress
+ORI     t0, t0, @JumpAddress	
 JR      t0
 NOP

@@ -359,7 +359,7 @@ local lives      = 9; -- This is used as instrument ammo in single player
 ------------------------------------
 -- http://www.therwp.com/forums/showthread.php?t=7238
 
--- Relative to kong_object_pointer
+-- Relative to Kong Object
 local model_pointer = 0x00;
 local bone_array_pointer = 0x04;
 
