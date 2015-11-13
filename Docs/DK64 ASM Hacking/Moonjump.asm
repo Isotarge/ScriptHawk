@@ -7,7 +7,6 @@
 [L_Button]: 0x0020
 
 //.org 0x807FF500
-LW      t1, 0x0000(t0)
 LUI     t2, @ControllerInput
 ORI		t2, t2, @ControllerInput
 LH      t2, 0x0000(t2)
