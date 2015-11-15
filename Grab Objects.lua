@@ -1,6 +1,7 @@
 local pointer_list;
 local kong_model_pointer;
 local camera_pointer;
+safeMode = true;
 
 local camera_focus_pointer = 0x178; -- TODO: Verify for all versions
 local grab_pointer = 0x32c;
@@ -239,6 +240,10 @@ local function draw_gui()
 end
 
 local function isValidObject(pointer, kong_object, camera_object)
+	if not safeMode then
+		return true;
+	end
+
 	if grab_script_mode == "Examine" then
 		return true;
 	end
@@ -268,7 +273,7 @@ local function pull_objects()
 		if object_found then
 			if isValidObject(pointer, kong_object, camera_object) then
 				local object_model_pointer = mainmemory.read_u24_be(pointer + model_pointer + 1);
-				if object_model_pointer ~= 0x000000 then
+				if object_model_pointer ~= 0x000000 or not safeMode then
 					table.insert(object_pointers, pointer);
 				end
 			end

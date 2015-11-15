@@ -2817,8 +2817,27 @@ end
 
 event.onloadstate(break_geometry_spiking, "Break spiking");
 
+local stored_y_addresses = {
+	0x7480DC,
+	0x7F948C,
+	0x7F94F8,
+	0x7F94E8
+};
+
 local function apply_spiking_fix()
+	-- Old fix basically crashes sound thread, seems to work well but... no sound.
 	mainmemory.write_u32_be(geometry_spike_pointer, freeze_value);
+	--return;
+
+	--local xPos = Game.getXPosition();
+	--local yPos = Game.getYPosition();
+	--local zPos = Game.getZPosition();
+	
+	-- TODO: Set every stored position to these values
+	--local i;
+	--for i=1,#stored_y_addresses do
+	--	mainmemory.writefloat(stored_y_addresses[i], yPos, true);
+	--end
 end
 
 -----------------------
@@ -2895,10 +2914,10 @@ function everythingIsKong()
 	end
 end
 
-local function applyScale(desired_scale)
+function Game.setScale(value)
 	local i;
 	for i=1,#scale do
-		mainmemory.writefloat(kong_object + scale[i], desired_scale, true);
+		mainmemory.writefloat(kong_object + scale[i], value, true);
 	end
 end
 
@@ -2908,9 +2927,10 @@ function Game.randomEffect()
 	mainmemory.write_u16_be(kong_object + effect_byte, _randomEffect);
 
 	-- Randomly resize the kong
-	applyScale(0.01 + math.random() * 0.49);
+	local scaleValue = 0.01 + math.random() * 0.49;
+	Game.setScale(scaleValue);
 
-	print("Activated effect: "..bizstring.binary(_randomEffect));
+	print("Activated effect: "..bizstring.binary(_randomEffect).." with scale "..scaleValue);
 end
 
 ----------------
