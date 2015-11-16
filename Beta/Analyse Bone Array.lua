@@ -97,7 +97,7 @@ local function calculateZeroRatio(boneArray, startBone, endBone)
 	-- The main event
 	local numberOfZeroes = 0;
 	local i;
-	for i=1 + (startBone * bone_size), 1 + (endBone * bone_size) do
+	for i = startBone * bone_size + 1, endBone * bone_size + 1 do
 		if boneArray[i] == 0x00 then
 			numberOfZeroes = numberOfZeroes + 1;
 		end
@@ -105,11 +105,10 @@ local function calculateZeroRatio(boneArray, startBone, endBone)
 	return numberOfZeroes / #boneArray;
 end
 
-local function calculateCompleteBones(boneArray)
-	local numberOfBones = math.floor(#boneArray / bone_size);
+local function calculateCompleteBones(boneArray, numberOfBones)
 	local numberOfCompletedBones = 0;
 	local epsilon = 2 / bone_size;
-	local currentBone = 0;
+	local currentBone;
 	for currentBone = 0, numberOfBones do
 		local zeroRatio = calculateZeroRatio(boneArray, currentBone, currentBone + 1);
 		if zeroRatio < epsilon then
@@ -132,7 +131,7 @@ local function processObject(objectPointer)
 
 		-- Dump the bone array
 		local currentBoneArray = mainmemory.readbyterange(currentBoneArrayBase, blockSize);
-		local completedBones = calculateCompleteBones(currentBoneArray);
+		local completedBones = calculateCompleteBones(currentBoneArray, numberOfBones);
 
 		if completedBones < numberOfBones then
 			print(toHexString(objectPointer).." updated "..completedBones.."/"..numberOfBones.." bones.");
