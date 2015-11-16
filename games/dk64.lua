@@ -361,7 +361,8 @@ local lives      = 9; -- This is used as instrument ammo in single player
 
 -- Relative to Kong Object
 local model_pointer = 0x00;
-local bone_array_pointer = 0x04;
+local rendering_parameters_pointer = 0x04;
+local current_bone_array_pointer = 0x08;
 
 local hand_state = 0x47; -- Bitfield
 local visibility = 0x63; -- 127 = visible
@@ -2888,9 +2889,9 @@ local max_objects = 0xff;
 
 function everythingIsKong()
 	local kong_model_pointer = mainmemory.read_u32_be(kong_object + model_pointer);
-	local kong_bones_pointer = mainmemory.read_u32_be(kong_object + bone_array_pointer)
+	local kong_rendering_parameters_pointer = mainmemory.read_u32_be(kong_object + rendering_parameters_pointer)
 
-	if isPointer(kong_model_pointer) and isPointer(kong_bones_pointer) then
+	if isPointer(kong_model_pointer) and isPointer(kong_rendering_parameters_pointer) then
 		local camera_object = mainmemory.read_u24_be(camera_pointer + 1);
 		local pointer;
 		local object_model_pointer;
@@ -2905,7 +2906,7 @@ function everythingIsKong()
 				object_model_pointer = mainmemory.read_u24_be(pointer + model_pointer + 1);
 				if object_model_pointer > 0x000000 and object_model_pointer < 0x7fffff then
 					mainmemory.write_u32_be(pointer + model_pointer, kong_model_pointer);
-					--mainmemory.write_u32_be(pointer + bone_array_pointer, kong_bones_pointer);
+					--mainmemory.write_u32_be(pointer + rendering_parameters_pointer, kong_rendering_parameters_pointer);
 					print("wrote: "..toHexString(pointer));
 				end
 			end
@@ -2952,7 +2953,7 @@ function paperMode()
 		object_found = (pointer < 0x7fffff) and (pointer > 0x000000) and (object_no <= max_objects);
 
 		if object_found and pointer ~= camera_object then
-			object_bone_array = mainmemory.read_u24_be(pointer + bone_array_pointer + 1);
+			object_bone_array = mainmemory.read_u24_be(pointer + rendering_parameters_pointer + 1);
 			if object_bone_array > 0x000000 and object_bone_array < 0x7fffff then
 				mainmemory.writefloat(object_bone_array + scale_z, paper_thickness, true);
 			end
