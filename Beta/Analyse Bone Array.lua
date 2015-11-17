@@ -138,11 +138,11 @@ local function getBoneInfo(baseAddress)
 end
 
 local function outputBones(boneArrayBase, numBones)
-	dprint("X,Y,Z,ScaleX,ScaleY,ScaleZ,");
+	dprint("Bone,X,Y,Z,ScaleX,ScaleY,ScaleZ,");
 	local i;
 	for i=0,numBones - 1 do
 		local boneInfo = getBoneInfo(boneArrayBase + i * bone_size);
-		dprint(boneInfo["positionX"]..","..boneInfo["positionY"]..","..boneInfo["positionZ"]..","..boneInfo["scaleX"]..","..boneInfo["scaleY"]..","..boneInfo["scaleZ"]..",");
+		dprint(i..","..boneInfo["positionX"]..","..boneInfo["positionY"]..","..boneInfo["positionZ"]..","..boneInfo["scaleX"]..","..boneInfo["scaleY"]..","..boneInfo["scaleZ"]..",");
 	end
 	print_deferred();
 end
@@ -166,33 +166,31 @@ local function outputDifferences(oldBones, newBones)
 	return numberOfDifferences;
 end
 
-local function calculateZeroRatio(boneArray, startBone, endBone)
-	-- Handle parameters
-	startBone = startBone or 0;
-	endBone = endBone or math.floor(#boneArray / bone_size);
-
-	-- The main event
-	local numberOfZeroes = 0;
-	local i;
-	for i = startBone * bone_size + 1, endBone * bone_size + 1 do
-		if boneArray[i] == 0x00 then
-			numberOfZeroes = numberOfZeroes + 1;
-		end
-	end
-	return numberOfZeroes / #boneArray;
-end
-
-local function calculateCompleteBones(boneArray, numberOfBones)
-	local numberOfCompletedBones = 0;
-	local epsilon = 2 / bone_size;
+local function calculateCompleteBones(boneArrayBase, numberOfBones)
+	local numberOfCompletedBones = numberOfBones;
 	local currentBone;
 	for currentBone = 0, numberOfBones - 1 do
-		local zeroRatio = calculateZeroRatio(boneArray, currentBone, currentBone + 1);
-		if zeroRatio < epsilon then
-			numberOfCompletedBones = numberOfCompletedBones + 1;
+		-- Get all known information about the current bone
+		local boneInfo = getBoneInfo(boneArrayBase + currentBone * bone_size);
+		local boneDisplaced = false;
+
+		-- Detect basic zeroing, the bone displacement method method currently detailed in the document
+		if boneInfo["positionX"] == 0 and boneInfo["positionY"] == 0 and boneInfo["positionZ"] == 0 then
+			if boneInfo["scaleX"] == 0 and boneInfo["scaleY"] == 0 and boneInfo["scaleZ"] == 0 then
+				boneDisplaced = true;
+			end
+		end
+
+		-- Detect position being set to -32768
+		if boneInfo["positionX"] == -32768 and boneInfo["positionY"] == -32768 and boneInfo["positionZ"] == -32768 then
+			boneDisplaced = true;
+		end
+
+		if boneDisplaced then
+			numberOfCompletedBones = numberOfCompletedBones - 1;
 		end
 	end
-	return numberOfCompletedBones;
+	return math.max(0, numberOfCompletedBones);
 end
 
 local function processObject(objectPointer)
@@ -203,12 +201,10 @@ local function processObject(objectPointer)
 		if stupidShit then
 			setNumberOfBones(currentModelBase);
 		end
-		local numberOfBones = mainmemory.readbyte(currentModelBase + num_bones);
-		local blockSize = numberOfBones * bone_size;
 
-		-- Dump the bone array
-		local currentBoneArray = mainmemory.readbyterange(currentBoneArrayBase, blockSize);
-		local completedBones = calculateCompleteBones(currentBoneArray, numberOfBones);
+		-- Calculate how many bones were correctly processed this frame
+		local numberOfBones = mainmemory.readbyte(currentModelBase + num_bones);
+		local completedBones = calculateCompleteBones(currentBoneArrayBase, numberOfBones);
 
 		if completedBones < numberOfBones then
 			print(toHexString(objectPointer).." updated "..completedBones.."/"..numberOfBones.." bones.");
