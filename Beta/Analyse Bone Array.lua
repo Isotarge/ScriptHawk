@@ -1,5 +1,6 @@
 local pointer_list = 0x7FBFF0;
 local max_objects = 0xFF;
+local precision = 5;
 
 -- Relative to Object
 local model_pointer = 0x00;
@@ -21,6 +22,15 @@ local num_bones = 0x20;
 
 local bone_size = 0x40;
 
+-- Relative to objects in bone array
+local bone_position_x = 0x18;
+local bone_position_y = 0x1A;
+local bone_position_z = 0x1C;
+
+local bone_scale_x = 0x20;
+local bone_scale_y = 0x2A;
+local bone_scale_z = 0x34;
+
 ----------------------
 -- Helper functions --
 ----------------------
@@ -37,12 +47,58 @@ function toHexString(value)
 	return "0x"..value;
 end
 
-local function formatOutputString(caption, value, max)
-	return caption..value.."/"..max.." ("..round(value/max * 100,20).."%)";
-end
-
+-- Checks whether a value falls within N64 RDRAM
 local function isPointer(value)
 	return value > 0x000000 and value < 0x7FFFFF;
+end
+
+-- Reads a signed, fixed point (16.16) big endian value from memory
+function read_signed_fixed1616_be(address)
+	local wholePart = mainmemory.read_s16_be(address);
+	local fractionalPart = mainmemory.read_u16_be(address + 2) / 65536.0;
+	return wholePart + fractionalPart;
+end
+
+-- Reads an unsigned, fixed point (16.16) big endian value from memory
+function read_unsigned_fixed1616_be(address)
+	local wholePart = mainmemory.read_u16_be(address);
+	local fractionalPart = mainmemory.read_u16_be(address + 2) / 65536.0;
+	return wholePart + fractionalPart;
+end
+
+--------------------
+-- Deferred print --
+--------------------
+
+local __dprinted = {};
+
+function dprint(...) -- defer print
+	-- helps with lag from printing directly to Bizhawk's console
+	table.insert(__dprinted, {...})
+end
+
+function dprintf(fmt, ...)
+	table.insert(__dprinted, fmt:format(...))
+end
+
+function print_deferred()
+	local buff = ''
+	for i, t in ipairs(__dprinted) do
+		if type(t) == 'string' then
+			buff = buff..t..'\n'
+		elseif type(t) == 'table' then
+			local s = ''
+			for j, v in ipairs(t) do
+				s = s..tostring(v)
+				if j ~= #t then s = s..'\t' end
+			end
+			buff = buff..s..'\n'
+		end
+	end
+	if #buff > 0 then
+		print(buff:sub(1, #buff - 1))
+	end
+	__dprinted = {}
 end
 
 -----------------
@@ -69,6 +125,27 @@ end
 --------------------
 -- The main event --
 --------------------
+
+local function getBoneInfo(baseAddress)
+	local boneInfo = {};
+	boneInfo["positionX"] = mainmemory.read_s16_be(baseAddress + bone_position_x);
+	boneInfo["positionY"] = mainmemory.read_s16_be(baseAddress + bone_position_y);
+	boneInfo["positionZ"] = mainmemory.read_s16_be(baseAddress + bone_position_z);
+	boneInfo["scaleX"] = mainmemory.read_u16_be(baseAddress + bone_scale_x);
+	boneInfo["scaleY"] = mainmemory.read_u16_be(baseAddress + bone_scale_y);
+	boneInfo["scaleZ"] = mainmemory.read_u16_be(baseAddress + bone_scale_z);
+	return boneInfo;
+end
+
+local function outputBones(boneArrayBase, numBones)
+	dprint("X,Y,Z,ScaleX,ScaleY,ScaleZ,");
+	local i;
+	for i=0,numBones - 1 do
+		local boneInfo = getBoneInfo(boneArrayBase + i * bone_size);
+		dprint(boneInfo["positionX"]..","..boneInfo["positionY"]..","..boneInfo["positionZ"]..","..boneInfo["scaleX"]..","..boneInfo["scaleY"]..","..boneInfo["scaleZ"]..",");
+	end
+	print_deferred();
+end
 
 local function outputDifferences(oldBones, newBones)
 	-- Check for and output differences
@@ -109,7 +186,7 @@ local function calculateCompleteBones(boneArray, numberOfBones)
 	local numberOfCompletedBones = 0;
 	local epsilon = 2 / bone_size;
 	local currentBone;
-	for currentBone = 0, numberOfBones do
+	for currentBone = 0, numberOfBones - 1 do
 		local zeroRatio = calculateZeroRatio(boneArray, currentBone, currentBone + 1);
 		if zeroRatio < epsilon then
 			numberOfCompletedBones = numberOfCompletedBones + 1;
@@ -135,6 +212,7 @@ local function processObject(objectPointer)
 
 		if completedBones < numberOfBones then
 			print(toHexString(objectPointer).." updated "..completedBones.."/"..numberOfBones.." bones.");
+			outputBones(currentBoneArrayBase, numberOfBones);
 		end
 	end
 end
