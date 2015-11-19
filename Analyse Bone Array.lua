@@ -1,27 +1,33 @@
-local pointer_list = 0x7FBFF0;
+local pointer_list;
 local max_objects = 0xFF;
-local precision = 5;
+local precision = 5 or precision;
+local bone_size = 0x40;
 print_every_frame = false;
 
--- Relative to Object
+local romName = gameinfo.getromname();
+
+if bizstring.contains(romName, "Donkey Kong 64") then
+	if bizstring.contains(romName, "USA") and not bizstring.contains(romName, "Kiosk") then
+		pointer_list = 0x7fbff0;
+	elseif bizstring.contains(romName, "Europe") then
+		pointer_list = 0x7fbf10;
+	elseif bizstring.contains(romName, "Japan") then
+		pointer_list = 0x7fc460;
+	elseif bizstring.contains(romName, "Kiosk") then
+		pointer_list = 0x7b5e58;
+	end
+else
+	print("This game is not supported.");
+	return;
+end
+
+-- Relative to objects in pointer list
 local model_pointer = 0x00;
 local rendering_parameters_pointer = 0x04;
 local current_bone_array_pointer = 0x08;
 
-local x_pos = 0x7C;
-local y_pos = 0x80;
-local z_pos = 0x84;
-
-local floor = 0xA4;
-
-local x_rot = 0xE4;
-local y_rot = 0xE6;
-local z_rot = 0xE8;
-
--- Relative to model object
+-- Relative to shared model object
 local num_bones = 0x20;
-
-local bone_size = 0x40;
 
 -- Relative to objects in bone array
 local bone_position_x = 0x18;
@@ -31,6 +37,10 @@ local bone_position_z = 0x1C;
 local bone_scale_x = 0x20;
 local bone_scale_y = 0x2A;
 local bone_scale_z = 0x34;
+
+--------------------
+-- Load Libraries --
+--------------------
 
 Stats = require "lib.Stats";
 require "lib.DPrint";
@@ -52,8 +62,13 @@ function toHexString(value)
 end
 
 -- Checks whether a value falls within N64 RDRAM
+local function isRDRAM(value)
+	return type(value) == "number" and value > 0x000000 and value < 0x7FFFFF;
+end
+
+-- Checks whether a value is a pointer
 local function isPointer(value)
-	return value > 0x000000 and value < 0x7FFFFF;
+	return type(value) == "number" and isRDRAM(value - 0x80000000);
 end
 
 -- Reads a signed, fixed point (16.16) big endian value from memory
@@ -77,7 +92,7 @@ end
 local safeBoneNumbers = {};
 
 local function setNumberOfBones(modelBasePointer)
-	if isPointer(modelBasePointer) then
+	if isRDRAM(modelBasePointer) then
 		if safeBoneNumbers[modelBasePointer] == nil then
 			safeBoneNumbers[modelBasePointer] = mainmemory.readbyte(modelBasePointer + num_bones);
 		end
@@ -179,7 +194,7 @@ local function processObject(objectPointer)
 	local currentModelBase = mainmemory.read_u24_be(objectPointer + model_pointer + 1);
 	local currentBoneArrayBase = mainmemory.read_u24_be(objectPointer + current_bone_array_pointer + 1);
 
-	if isPointer(currentModelBase) and isPointer(currentBoneArrayBase) then
+	if isRDRAM(currentModelBase) and isRDRAM(currentBoneArrayBase) then
 		-- Stupid shit
 		setNumberOfBones(currentModelBase);
 
@@ -203,11 +218,11 @@ local function mainLoop()
 		repeat
 			objectPointer = mainmemory.read_u24_be(pointer_list + (objectIndex * 4) + 1);
 			objectIndex = objectIndex + 1;
-			if isPointer(objectPointer) then
+			if isRDRAM(objectPointer) then
 				processObject(objectPointer);
 			end
-		until not isPointer(objectPointer) or objectIndex >= max_objects;
+		until not isRDRAM(objectPointer) or objectIndex >= max_objects;
 	end
 end
 
-event.onframestart(mainLoop);
+event.onframestart(mainLoop, "Analyse Bone Array");
