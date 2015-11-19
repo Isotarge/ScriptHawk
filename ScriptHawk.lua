@@ -74,11 +74,13 @@ if not Game.detectVersion(romName) then
 	return;
 end
 
------------------------
--- Load JSON library --
------------------------
+--------------------
+-- Load libraries --
+--------------------
 
 JSON = require "lib.JSON";
+Stats = require "lib.Stats";
+require "lib.DPrint";
 
 --------------
 -- Keybinds --
@@ -248,10 +250,11 @@ local options_toggle_telemetry_button;
 -- Outputs telemetry data as CSV to the console
 local function output_telemetry()
 	local i = 1;
-	print("Time (Frames),X Position,Y Position,Z Position,Dxz,Dy,Rotation X,Rotation Y,Rotation Z,");
+	dprint("Time (Frames),X Position,Y Position,Z Position,Dxz,Dy,Rotation X,Rotation Y,Rotation Z,");
 	for i=1,#telemetryData do
-		print(i..","..telemetryData[i]["X Position"]..","..telemetryData[i]["Y Position"]..","..telemetryData[i]["Z Position"]..","..telemetryData[i]["Dxz"]..","..telemetryData[i]["Dy"]..","..telemetryData[i]["Rotation X"]..","..telemetryData[i]["Rotation Y"]..","..telemetryData[i]["Rotation Z"]..",");
+		dprint(i..","..telemetryData[i]["X Position"]..","..telemetryData[i]["Y Position"]..","..telemetryData[i]["Z Position"]..","..telemetryData[i]["Dxz"]..","..telemetryData[i]["Dy"]..","..telemetryData[i]["Rotation X"]..","..telemetryData[i]["Rotation Y"]..","..telemetryData[i]["Rotation Z"]..",");
 	end
+	print_deferred();
 end
 
 local function start_telemetry()

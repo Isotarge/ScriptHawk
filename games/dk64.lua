@@ -1910,7 +1910,7 @@ function checkFlags()
 							-- Output debug info if the flag isn't known
 							if not isFound(i, bit) then
 								flag_found = true;
-								print("{[\"byte\"] = "..toHexString(i)..", [\"bit\"] = "..bit..", [\"name\"] = \"Name\", [\"type\"] = \"Type\"},");
+								dprint("{[\"byte\"] = "..toHexString(i)..", [\"bit\"] = "..bit..", [\"name\"] = \"Name\", [\"type\"] = \"Type\"},");
 							else
 								known_flags_found = known_flags_found + 1;
 							end
@@ -1922,22 +1922,23 @@ function checkFlags()
 				end
 			end
 			if known_flags_found > 0 then
-				print(known_flags_found.." Known flags skipped.")
+				dprint(known_flags_found.." Known flags skipped.")
 			end
 			if not flag_found then
-				print("No unknown flags were changed.")
+				dprint("No unknown flags were changed.")
 			end
 		else
 			-- Populate flag block
 			for i=0,flag_block_size do
 				flag_block[i] = mainmemory.readbyte(flags + i);
 			end
-			print("Populated flag array.")
+			dprint("Populated flag array.")
 		end
 	else
-		print("Failed to find flag block on this frame, adding to queue. Will be checked next time block is found.");
+		dprint("Failed to find flag block on this frame, adding to queue. Will be checked next time block is found.");
 		table.insert(flag_action_queue, {["action_type"]="check"});
 	end
+	print_deferred();
 end
 
 local function process_flag_queue()
@@ -1952,23 +1953,25 @@ local function process_flag_queue()
 						current_value = mainmemory.readbyte(flags + queue_item["byte"]);
 						mainmemory.writebyte(flags + queue_item["byte"], set_bit(current_value, queue_item["bit"]));
 						if type(queue_item["name"]) == "string" then
-							print("Set \""..queue_item["name"].."\" at "..toHexString(queue_item["byte"]).." bit "..queue_item["bit"]);
+							dprint("Set \""..queue_item["name"].."\" at "..toHexString(queue_item["byte"]).." bit "..queue_item["bit"]);
 						else
-							print("Set flag at "..toHexString(queue_item["byte"]).." bit "..queue_item["bit"]);
+							dprint("Set flag at "..toHexString(queue_item["byte"]).." bit "..queue_item["bit"]);
 						end
 					elseif queue_item["action_type"] == "clear" then
 						current_value = mainmemory.readbyte(flags + queue_item["byte"]);
 						mainmemory.writebyte(flags + queue_item["byte"], clear_bit(current_value, queue_item["bit"]));
 						if type(queue_item["name"]) == "string" then
-							print("Cleared \""..queue_item["name"].."\" at "..toHexString(queue_item["byte"]).." bit "..queue_item["bit"]);
+							dprint("Cleared \""..queue_item["name"].."\" at "..toHexString(queue_item["byte"]).." bit "..queue_item["bit"]);
 						else
-							print("Cleared flag at "..toHexString(queue_item["byte"]).." bit "..queue_item["bit"]);
+							dprint("Cleared flag at "..toHexString(queue_item["byte"]).." bit "..queue_item["bit"]);
 						end
 					elseif queue_item["action_type"] == "check" then
 						checkFlags();
 					end
 				end
 			end
+			-- Speed up output by printing everything in one call to print
+			print_deferred();
 			-- Clear queue if we found the block that frame
 			flag_action_queue = {};
 		end
@@ -2105,7 +2108,7 @@ local function flagClearButtonHandler()
 end
 
 local function formatOutputString(caption, value, max)
-	print(caption..value.."/"..max.." or "..round(value/max * 100,2).."%");
+	return caption..value.."/"..max.." or "..round(value/max * 100,2).."%";
 end
 
 function flagStats(verbose)
@@ -2118,50 +2121,51 @@ function flagStats(verbose)
 	local coins_known = 0;
 	local untypedFlags = 0;
 
+	-- Setting this to true warns the user of flags without types
 	verbose = verbose or false;
 
-	local i, flag, name;
+	local i, flag, name, flagType;
 	for i=1,#flag_array do
 		flag = flag_array[i];
 		name = flag["name"];
-		_type = flag["type"];
-		if _type == nil then
+		flagType = flag["type"];
+		if flagType == nil then
 			untypedFlags = untypedFlags + 1;
 			if verbose then
-				print("Warning: Flag without type detected at "..toHexString(flag["byte"]).." bit "..flag["bit"].." with name: \""..flag["name"].."\"");
+				dprint("Warning: Flag without type detected at "..toHexString(flag["byte"]).." bit "..flag["bit"].." with name: \""..flag["name"].."\"");
 			end
 		end
-		if _type == "Fairy" then
+		if flagType == "Fairy" then
 			fairies_known = fairies_known + 1;
 		end
-		if _type == "Blueprint" then
+		if flagType == "Blueprint" then
 			blueprints_known = blueprints_known + 1;
 			if bizstring.contains(name, "Turned") then
 				gb_known = gb_known + 1;
 			end
 		end
-		if _type == "Warp" then
+		if flagType == "Warp" then
 			warps_known = warps_known + 1;
 		end
-		if _type == "GB" then
+		if flagType == "GB" then
 			gb_known = gb_known + 1;
 		end
-		if _type == "CB" then
+		if flagType == "CB" then
 			cb_known = cb_known + 1;
 		end
-		if _type == "Bunch" then
+		if flagType == "Bunch" then
 			cb_known = cb_known + 5;
 		end
-		if _type == "Balloon" then
+		if flagType == "Balloon" then
 			cb_known = cb_known + 10;
 		end
-		if _type == "Crown" then
+		if flagType == "Crown" then
 			crowns_known = crowns_known + 1;
 		end
-		if _type == "Coin" then
+		if flagType == "Coin" then
 			coins_known = coins_known + 1;
 		end
-		if _type == "Rainbow Coin" then
+		if flagType == "Rainbow Coin" then
 			coins_known = coins_known + 25;
 		end
 	end
@@ -2169,21 +2173,21 @@ function flagStats(verbose)
 	local knownFlags = #flag_array;
 	local totalFlags = flag_block_size * 8;
 
-	print("Block size: "..toHexString(flag_block_size));
-	formatOutputString("Flags known: ", knownFlags, totalFlags);
-	formatOutputString("Flags without types: ", untypedFlags, knownFlags);
-	print();
-	formatOutputString("Crowns: ", crowns_known, max_crowns);
-	formatOutputString("Fairies: ", fairies_known, max_fairies);
-	formatOutputString("Blueprints: ", blueprints_known, max_blueprints);
-	print();
-	formatOutputString("Warps: ", warps_known, max_warps);
-	formatOutputString("CB: ", cb_known, max_cb);
-	formatOutputString("GB: ", gb_known, max_gb);
-	print("Coins: "..coins_known);
-	print();
+	dprint("Block size: "..toHexString(flag_block_size));
+	dprint(formatOutputString("Flags known: ", knownFlags, totalFlags));
+	dprint(formatOutputString("Flags without types: ", untypedFlags, knownFlags));
+	dprint("");
+	dprint(formatOutputString("Crowns: ", crowns_known, max_crowns));
+	dprint(formatOutputString("Fairies: ", fairies_known, max_fairies));
+	dprint(formatOutputString("Blueprints: ", blueprints_known, max_blueprints));
+	dprint("");
+	dprint(formatOutputString("Warps: ", warps_known, max_warps));
+	dprint(formatOutputString("CB: ", cb_known, max_cb));
+	dprint(formatOutputString("GB: ", gb_known, max_gb));
+	dprint("Coins: "..coins_known);
+	dprint("");
+	print_deferred();
 end
-flagStats();
 
 --------------------
 -- Region/Version --
@@ -3141,6 +3145,9 @@ function Game.initUI(form_handle, col, row, button_height, label_offset, dropdow
 	options_toggle_homing_ammo = forms.checkbox(form_handle, "Homing Ammo", col(0) + dropdown_offset, row(6) + dropdown_offset);
 	--options_toggle_neverslip =   forms.checkbox(form_handle, "Never Slip",  col(10) + dropdown_offset, row(5) + dropdown_offset);
 	options_toggle_paper_mode =   forms.checkbox(form_handle, "Paper Mode",  col(10) + dropdown_offset, row(5) + dropdown_offset);
+
+	-- Output flag statistics
+	flagStats();
 end
 
 function Game.applyInfinites()
@@ -3215,13 +3222,14 @@ function Game.eachFrame()
 			checksum_value = memory.read_u32_be(eep_checksum_offsets[i]);
 			if eep_checksum_values[i] ~= checksum_value then
 				if i == 5 then
-					print("Global flags "..i.." Checksum: "..toHexString(eep_checksum_values[i]).." -> "..toHexString(checksum_value));
+					dprint("Global flags "..i.." Checksum: "..toHexString(eep_checksum_values[i]).." -> "..toHexString(checksum_value));
 				else
-					print("Slot "..i.." Checksum: "..toHexString(eep_checksum_values[i]).." -> "..toHexString(checksum_value));
+					dprint("Slot "..i.." Checksum: "..toHexString(eep_checksum_values[i]).." -> "..toHexString(checksum_value));
 				end
 				eep_checksum_values[i] = checksum_value;
 			end
 		end
+		print_deferred();
 	end
 	memory.usememorydomain("RDRAM");
 
