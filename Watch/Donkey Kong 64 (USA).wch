@@ -1,8 +1,11 @@
 Domain RDRAM
 SystemID N64
-014DC4	d	h	1	RDRAM	Controller Input
-014DC6	b	s	1	RDRAM	Joystick X
-014DC7	b	s	1	RDRAM	Joystick Y
+014DC4	d	h	1	RDRAM	Controller Input P1
+014DC6	b	s	1	RDRAM	Joystick X (P1)
+014DC7	b	s	1	RDRAM	Joystick Y (P1)
+014DCC	d	h	1	RDRAM	Controller Input P2
+014DCE	b	s	1	RDRAM	Joystick X (P2)
+014DCF	b	s	1	RDRAM	Joystick Y (P2)
 02F050	d	f	1	RDRAM	Jetman X Position
 02F054	d	f	1	RDRAM	Jetman Y Position
 0337E0	d	h	1	RDRAM	Diddy ? colour (Main Menu)
