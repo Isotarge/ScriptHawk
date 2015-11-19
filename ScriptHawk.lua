@@ -439,17 +439,19 @@ end
 local function mainloop()
 	joypad_pressed = joypad.getimmediate();
 
+	-- Calculate speed for D-Pad and L button
+	local speedy_speed_XZ = Game.speedy_speeds[Game.speedy_index];
+	local speedy_speed_Y = Game.speedy_speeds[Game.speedy_index];
+	if Game.speedy_invert_XZ then
+		speedy_speed_XZ = speedy_speed_XZ * -1;
+	end
+	if Game.speedy_invert_Y then
+		speedy_speed_Y = speedy_speed_Y * -1;
+	end
+
 	if Game.isPhysicsFrame() then
 		if mode == 'Position' and type(rot_y) ~= "nil" then
 			rot_rad = rotation_to_radians(rot_y);
-			local speedy_speed_XZ = Game.speedy_speeds[Game.speedy_index];
-			local speedy_speed_Y = Game.speedy_speeds[Game.speedy_index];
-			if Game.speedy_invert_XZ then
-				speedy_speed_XZ = speedy_speed_XZ * -1;
-			end
-			if Game.speedy_invert_Y then
-				speedy_speed_Y = speedy_speed_Y * -1;
-			end
 			if joypad_pressed["P1 DPad U"] then
 				gofast("x", speedy_speed_XZ * math.sin(rot_rad));
 				gofast("z", speedy_speed_XZ * math.cos(rot_rad));
