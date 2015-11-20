@@ -433,7 +433,7 @@ local kong_object;
 local prev_map = 0;
 local map_value = 0;
 
--- Relative to bone array
+-- Relative to rendering parameters
 local scale_x = 0x34;
 local scale_y = 0x38;
 local scale_z = 0x3C;
@@ -2948,7 +2948,7 @@ paper_thickness = 0.015;
 function paperMode()
 	local object_found = true;
 	local object_no = 0;
-	local object_bone_array;
+	local objectRenderingParameters;
 	local pointer;
 	local camera_object = mainmemory.read_u24_be(camera_pointer + 1);
 
@@ -2957,9 +2957,9 @@ function paperMode()
 		object_found = (pointer < 0x7fffff) and (pointer > 0x000000) and (object_no <= max_objects);
 
 		if object_found and pointer ~= camera_object then
-			object_bone_array = mainmemory.read_u24_be(pointer + rendering_parameters_pointer + 1);
-			if object_bone_array > 0x000000 and object_bone_array < 0x7fffff then
-				mainmemory.writefloat(object_bone_array + scale_z, paper_thickness, true);
+			objectRenderingParameters = mainmemory.read_u24_be(pointer + rendering_parameters_pointer + 1);
+			if objectRenderingParameters > 0x000000 and objectRenderingParameters < 0x7fffff then
+				mainmemory.writefloat(objectRenderingParameters + scale_z, paper_thickness, true);
 			end
 		end
 		object_no = object_no + 1;
