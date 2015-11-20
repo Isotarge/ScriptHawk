@@ -62,7 +62,6 @@ function outputGamesharkCode(bytes, base, skipZeroes)
 			end
 		end
 	end
-	print_deferred();
 	return skippedZeroes;
 end
 
@@ -101,13 +100,22 @@ while codeByte and i <= maxCodeSize do
 end
 input_file:close();
 
+
 -- Patch the hook
 for i=1,#hook do
 	mainmemory.writebyte(hookBase + (i - 1), hook[i]);
 end
 
+------------
+-- Output --
+------------
+
+dprint("Patched code ("..#code.." bytes)");
+dprint("Patched hook ("..#hook.." bytes)");
+dprint();
+
 outputGamesharkCode(hook, hookBase);
-print();
+dprint();
 local skippedZeroes = outputGamesharkCode(code, codeBase, true);
 dprint();
 if skippedZeroes > 0 then
