@@ -1,11 +1,11 @@
--- i've lost control of my life
+-- lips.lua
 
 -- instructions: https://github.com/mikeryan/n64dev/tree/master/docs/n64ops
 -- lexer and parser are somewhat based on http://chunkbake.luaforge.net/
 
 local assembler = {
     _DESCRIPTION = 'Assembles MIPS assembly files for the R4300i CPU.',
-    _URL = 'https://github.com/notwa/mm/blob/master/Lua/inject/assembler.lua',
+    _URL = 'https://github.com/notwa/lips/',
     _LICENSE = [[
         Copyright (C) 2015 Connor Olding
 
@@ -35,7 +35,7 @@ local registers = {
     'R0', 'AT', 'V0', 'V1', 'A0', 'A1', 'A2', 'A3',
     'T0', 'T1', 'T2', 'T3', 'T4', 'T5', 'T6', 'T7',
     'S0', 'S1', 'S2', 'S3', 'S4', 'S5', 'S6', 'S7',
-    'T8', 'T9', 'K0', 'K1', 'GP', 'SP', 'S8', 'RA',
+    'T8', 'T9', 'K0', 'K1', 'GP', 'SP', 'FP', 'RA',
 }
 
 local fpu_registers = {
@@ -78,6 +78,8 @@ revtable(all_directives)
 
 registers['ZERO'] = 0
 all_registers['ZERO'] = 0
+registers['S8'] = 30
+all_registers['S8'] = 30
 
 for i=0, 31 do
     local r = 'REG'..tostring(i)
@@ -90,7 +92,50 @@ local fmt_double = 17
 local fmt_word = 20
 local fmt_long = 21
 
-local instruction_handlers = {
+local instructions = {
+    --[[
+    data guide:
+    --INSTRUCTION_NAME = {opcode, infmt, outfmt, const, fmtconst},
+    underscores are translated to dots later.
+    opcode: the first 6 bits of the instruction.
+    infmt: the input format; one character per argument.
+    outfmt: the output format: R-, I-, and J-types are inferred by length.
+    const: (optional) the number to replace 'C' with in outfmt.
+    fmtconst: (optional) the number to replace 'F' with in outfmt.
+
+    input format guide:
+        such and such: expects a...
+        d:  register for rd
+        s:  register for rs
+        t:  register for rt
+        D:  floating point register for fd
+        S:  floating point register for fs
+        T:  floating point register for ft
+        o:  constant for offset (uses lower halfword)
+        b:  register to dereference for base
+        r:  relative constant or label (uses lower halfword)
+        i:  immediate (must fit in a halfword)
+        I:  constant or label for index (long jump)
+        j:  immediate (uses lower halfword)
+        J:  immediate (uses upper halfword)
+        k:  immediate to negate (must fit in a halfword)
+
+    output format guide:
+        such and such: writes ... at this position
+        0:  zero (sometimes used to refer to R0)
+        d:  rd
+        s:  rs
+        t:  rt
+        D:  fd
+        S:  fs
+        T:  ft
+        o:  offset
+        b:  base
+        i:  immediate (infmt 'i', 'j', 'J', and 'k' all write to here)
+        C:  constant (given in argument immediately after)
+        F:  format constant (given in argument after constant)
+    --]]
+
     J       = {2, 'I', 'I'},
     JAL     = {3, 'I', 'I'},
 
@@ -144,12 +189,6 @@ local instruction_handlers = {
     SLTIU   = {11, 'tsj', 'sti'},
     XORI    = {14, 'tsj', 'sti'},
 
-    --         first 6 bits of instruction
-    --         |  input format
-    --         |  |      output format
-    --         |  |      |        const (only if used in output)
-    --         |  |      |        |   format-const (only if used in output)
-    --         |  |____  |______  |_  |_
     ADD     = {0, 'dst', 'std0C', 32},
     ADDU    = {0, 'dst', 'std0C', 33},
     AND     = {0, 'dst', 'std0C', 36},
@@ -392,7 +431,7 @@ local instruction_handlers = {
 
 local all_instructions = {}
 local i = 1
-for k, v in pairs(instruction_handlers) do
+for k, v in pairs(instructions) do
     all_instructions[k:gsub('_', '.')] = i
     i = i + 1
 end
@@ -867,15 +906,15 @@ end
 
 function Parser:instruction()
     local name = self.tok
-    local h = instruction_handlers[name]
+    local h = instructions[name]
     self:advance()
 
     if h == nil then
         self:error('undefined instruction')
     elseif h == 'LI' or h == 'LA' then
-        local lui = instruction_handlers['LUI']
-        local addi = instruction_handlers['ADDI']
-        local ori = instruction_handlers['ORI']
+        local lui = instructions['LUI']
+        local addi = instructions['ADDI']
+        local ori = instructions['ORI']
         local args = {}
         args.rt = self:register()
         self:optional_comma()
@@ -899,7 +938,7 @@ function Parser:instruction()
             self:format_out(addi[3], addi[1], args, addi[4], addi[5])
         end
     elseif h[2] == 'tob' then -- or h[2] == 'Tob' then
-        local lui = instruction_handlers['LUI']
+        local lui = instructions['LUI']
         local args = {}
         args.rt = self:register()
         self:optional_comma()
@@ -977,6 +1016,7 @@ function Parser:tokenize()
             t.tt = 'NUM'
             t.tok = self.defines[t.tok]
             if t.tok == nil then
+                self.line = t.line
                 self:error('undefined define') -- uhhh nice wording
             end
         end
@@ -1039,9 +1079,6 @@ end
 
 function Dumper:add_instruction_r(o, s, t, d, f, c)
     self:push_instruction{o, s, t, d, f, c}
-end
-
-function Dumper:define(name, number)
 end
 
 function Dumper:add_label(name)
@@ -1259,9 +1296,9 @@ function Dumper:dump()
 end
 
 local function assemble(fn_or_asm, writer)
-    -- assemble MIPS R4300i assembly code
-    -- if fn_or_asm contains a newline; treat as assembly, otherwise load file
-    -- returns error message on error, or nil on success
+    -- assemble MIPS R4300i assembly code.
+    -- if fn_or_asm contains a newline; treat as assembly, otherwise load file.
+    -- returns error message on error, or nil on success.
     fn_or_asm = tostring(fn_or_asm)
     writer = writer or io.write
 
@@ -1300,6 +1337,7 @@ return setmetatable(assembler, {
     registers = registers,
     fpu_registers = fpu_registers,
     all_registers = all_registers,
+    instructions = instructions,
     all_instructions = all_instructions,
     all_directives = all_directives,
 })
