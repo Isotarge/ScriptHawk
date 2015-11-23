@@ -20,7 +20,7 @@
 [Frames_Real]: 0x807F0560
 
 // Kong Object stuff
-[KongObjectPointer]: 0x8080BB4C
+[KongObjectPointer]: 0x807FBB4C
 
 [ModelPointer]: 0x00
 [BoneArrayPointer]: 0x04
@@ -45,26 +45,25 @@ LUI     t1, @Speed
 MTC1    t1, F10
 
 // Get controller input
-LUI     t2, @ControllerInput
-LH      t2, @ControllerInput(t2)
+LH      t2, @ControllerInput
 
 // Defererence Kong Object pointer
-LUI     t0, @KongObjectPointer
-LW      t0, @KongObjectPointer(t0)
+LW      t0, @KongObjectPointer
 
 // Check for L button
-ADDIU   t3, r0, @L_Button
+LI      t3, @L_Button
+// or BNEI t2, @L_Button
 BNE     t2, t3, Up
 
 // Y Position += Speed
 LWC1    F8, @Y_Position(t0)
 ADD.S   F8, F8, F10
 SWC1    F8, @Y_Position(t0)
-NOP
 
 // U +, +
 Up:
-ADDIU   t3, r0, @DPAD_Up
+LI      t3, @DPAD_Up
+// or BNEI t2, @DPAD_Up
 BNE     t2, t3, Down
 
 // X Position += Speed
@@ -76,11 +75,11 @@ SWC1    F8, @X_Position(t0)
 LWC1    F8, @Z_Position(t0)
 ADD.S   F8, F8, F10
 SWC1    F8, @Z_Position(t0)
-NOP
 
 // D -, -
 Down:
-ADDIU   t3, r0, @DPAD_Down
+LI      t3, @DPAD_Down
+// or BNEI t2, @DPAD_Down
 BNE     t2, t3, Left
 
 // X Position -= Speed
@@ -92,11 +91,11 @@ SWC1    F8, @X_Position(t0)
 LWC1    F8, @Z_Position(t0)
 SUB.S   F8, F8, F10
 SWC1    F8, @Z_Position(t0)
-NOP
 
 // L +, -
 Left:
-ADDIU   t3, r0, @DPAD_Left
+LI      t3, @DPAD_Left
+// or BNEI t2, @DPAD_Left
 BNE     t2, t3, Right
 
 // X Position += Speed
@@ -108,11 +107,11 @@ SWC1    F8, @X_Position(t0)
 LWC1    F8, @Z_Position(t0)
 SUB.S   F8, F8, F10
 SWC1    F8, @Z_Position(t0)
-NOP
 
 // R -, +
 Right:
-ADDIU   t3, r0, @DPAD_Right
+LI      t3, @DPAD_Right
+// or BNEI t2, @DPAD_Right
 BNE     t2, t3, Return
 
 // X Position -= Speed
@@ -124,13 +123,11 @@ SWC1    F8, @X_Position(t0)
 LWC1    F8, @Z_Position(t0)
 ADD.S   F8, F8, F10
 SWC1    F8, @Z_Position(t0)
-NOP
 
 Return:
 // Restore RA register
 //OR      RA, t7, r0
 
 // Return to hooked function
-LUI     t3, @ReturnAddress
-ORI     t3, t3, @ReturnAddress
-JR      t3
+J       @ReturnAddress
+NOP

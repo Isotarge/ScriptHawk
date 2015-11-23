@@ -80,6 +80,7 @@ end
 
 JSON = require "lib.JSON";
 Stats = require "lib.Stats";
+Lips = require "lib.lips.lips";
 require "lib.DPrint";
 
 --------------

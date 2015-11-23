@@ -9,7 +9,8 @@
 [JumpAddress]: 0x807FF500
 
 // JR to to 0x800074A0 when finished
-// Assemble with CajeASM
+// Assemble with Lips
+// https://github.com/notwa/lips
 
 // Assembled: 3C08807F3508F5000100000800000000
 

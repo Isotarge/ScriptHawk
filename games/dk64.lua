@@ -3057,6 +3057,74 @@ local function do_brb()
 	end
 end
 
+----------------
+-- ASM Loader --
+----------------
+
+-- Output gameshark code
+function outputGamesharkCode(bytes, base, skipZeroes)
+	skipZeroes = skipZeroes or false;
+	skippedZeroes = 0;
+	if type(bytes) == "table" and #bytes > 0 and #bytes % 2 == 0 then
+		for i=1,#bytes,2 do
+			if not (skipZeroes and bytes[i] == 0x00 and bytes[i + 1] == 0x00) then
+				dprint("81"..toHexString(base + i - 1, 6).." "..toHexString(bytes[i], 2)..toHexString(bytes[i + 1], 2));
+			else
+				skippedZeroes = skippedZeroes + 1;
+			end
+		end
+	end
+	return skippedZeroes;
+end
+
+local hookBase = 0x7494;
+local codeBase = 0x7FF500;
+local maxCodeSize = 0xAFF;
+
+local hook = {
+	0x3C, 0x08, 0x80, 0x7F, 0x35, 0x08, 0xF5, 0x00,
+	0x01, 0x00, 0x00, 0x08, 0x00, 0x00, 0x00, 0x00
+};
+local code = {};
+
+function codeWriter(...)
+	table.insert(code, arg[1]);
+end
+
+function loadASMPatch()
+	local code_filename = forms.openfile(nil, nil, "R4300i Assembly Code|*.asm|All Files (*.*)|*.*");
+	if code_filename == "" then
+		return;
+	end
+
+	-- Open the file and assemble the code
+	code = {};
+	local result = Lips(code_filename, codeWriter);
+
+	if #code == 0 then
+		print(result);
+		print("The code did not compile correctly, check for errors in your source.");
+		return;
+	end
+
+	local i = 0;
+
+	-- Patch the code
+	for i=1,#code do
+		mainmemory.write_u32_be(codeBase + ((i - 1) * 4), tonumber(code[i], 16));
+	end
+
+	-- Patch the hook
+	for i=1,#hook do
+		mainmemory.writebyte(hookBase + (i - 1), hook[i]);
+	end
+
+	dprint("Patched code ("..(#code * 4).." bytes)");
+	dprint("Patched hook ("..#hook.." bytes)");
+	dprint("Done!");
+	print_deferred();
+end
+
 ------------
 -- Events --
 ------------
