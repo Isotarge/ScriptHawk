@@ -1,0 +1,13 @@
+Domain Main RAM
+SystemID SMS
+000F	b	u	0	Main RAM	P1 Input
+0105	b	u	0	Main RAM	L Meter
+0106	b	u	0	Main RAM	P Meter
+0110	w	s	0	Main RAM	Velocity (Base, Ground)
+0112	b	s	1	Main RAM	Velocity (Ground)
+0113	b	s	1	Main RAM	Velocity
+0120	w	u	0	Main RAM	X Position
+0141	b	h	0	Main RAM	Jump Height
+0126	w	u	0	Main RAM	
+0122	w	u	0	Main RAM	Floor Height
+
