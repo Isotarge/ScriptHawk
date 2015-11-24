@@ -746,3 +746,21 @@ R=RBB
 C=CCW
 
 00000000 BccTTmmB RCCGGFFR SSSSSMMS
+
+--------------------------
+-- Cauldron stuff (PAL) --
+--------------------------
+
+0x383B91
+.4.. .... - Red CCW Lobby
+..2. .... - Red near CC Lobby
+
+0x383B92
+.... .4.. - 810 room
+.... ..2. - FF room
+
+80383B91 0060
+80383B92 0004
+
+Lives:
+8038696B 0007

@@ -46,4 +46,5 @@ SystemID N64
 386ACC	d	h	1	RDRAM	RNG
 386AD0	d	h	1	RDRAM	RNG
 386AD4	d	h	1	RDRAM	RNG
+383B91	w	h	1	RDRAM	Cauldron state
 
