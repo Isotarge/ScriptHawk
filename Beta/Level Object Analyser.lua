@@ -2,7 +2,7 @@
 -- Load JSON library --
 -----------------------
 
-JSON = require "lib.JSON";
+--JSON = require "lib.JSON";
 
 -----------------------
 

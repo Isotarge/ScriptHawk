@@ -5,6 +5,7 @@ SystemID N64
 000164	d	h	0	EEPROM	EEPROM Checksum 3
 0001DC	d	h	0	EEPROM	EEPROM Checksum 4
 0001FC	d	h	0	EEPROM	EEPROM Checksum 5
+283220	w	h	1	RDRAM	Stop'N'Swop Items
 2984FA	w	h	1	RDRAM	Banjo Model Replacement
 2984FE	w	h	1	RDRAM	Banjo Model Replacement
 36EAE0	d	h	1	RDRAM	Vile State pointer
@@ -18,6 +19,7 @@ SystemID N64
 37E784	d	f	1	RDRAM	Jiggy Spawn Angle
 37E788	d	f	1	RDRAM	Jiggy Spawn Velocity
 37F2C5	b	h	1	RDRAM	Map
+383B91	w	h	1	RDRAM	Cauldron state
 386943	b	u	1	RDRAM	Notes (on hand)
 386947	b	u	1	RDRAM	Eggs
 38694F	b	u	1	RDRAM	Red Feathers
@@ -46,5 +48,4 @@ SystemID N64
 386ACC	d	h	1	RDRAM	RNG
 386AD0	d	h	1	RDRAM	RNG
 386AD4	d	h	1	RDRAM	RNG
-383B91	w	h	1	RDRAM	Cauldron state
 

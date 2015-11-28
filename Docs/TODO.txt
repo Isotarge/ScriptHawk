@@ -6,6 +6,8 @@ TODO:
 - Toy story 2 stuff
 - Never slip enhancements, can't roll/kick on slopes
 - Integrate Grab Objects.lua into the DK64 module
+- Integrate Loader.lua into the DK64 Module
+- Integrate Level Object Analyser.lua into the BK module
 - UI framework cleanup, reduce number of parameters passed to Game.initUI(), probably just pass in a key->value table
 - BT map support for versions other than US
 
