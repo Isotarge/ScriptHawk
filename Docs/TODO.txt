@@ -10,6 +10,8 @@ TODO:
 - Integrate Level Object Analyser.lua into the BK module
 - UI framework cleanup, reduce number of parameters passed to Game.initUI(), probably just pass in a key->value table
 - BT map support for versions other than US
+- BT Jinjo Manip memory analysis
+- Support both BizHawk and m64p https://github.com/notwa/mm/commit/90d30e218f3128fb130e54bd8662527bdd73f40f
 
 Game support wishlist:
 
