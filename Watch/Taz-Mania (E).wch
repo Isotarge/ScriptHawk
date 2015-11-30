@@ -1,13 +1,22 @@
 Domain Main RAM
 SystemID SMS
 000F	b	u	0	Main RAM	P1 Input
+0100	b	s	0	Main RAM	Lives
 0105	b	u	0	Main RAM	L Meter
 0106	b	u	0	Main RAM	P Meter
 0110	w	s	0	Main RAM	Velocity (Base, Ground)
 0112	b	s	1	Main RAM	Velocity (Ground)
 0113	b	s	1	Main RAM	Velocity
 0120	w	u	0	Main RAM	X Position
-0141	b	h	0	Main RAM	Jump Height
-0126	w	u	0	Main RAM	
 0122	w	u	0	Main RAM	Floor Height
+0126	w	u	0	Main RAM	
+0141	b	h	0	Main RAM	Jump Height
+0189	b	u	0	Main RAM	Related to current Level
+01A0	w	u	0	Main RAM	Score
+01A2	w	u	0	Main RAM	Score
+01A4	w	u	0	Main RAM	Game time (Level)
+0F00	b	u	0	Main RAM	Related to current Level
+0F02	b	u	0	Main RAM	Related to current Level
+0F03	b	u	0	Main RAM	Related to current Level
+1103	b	u	0	Main RAM	Related to current Level
 
