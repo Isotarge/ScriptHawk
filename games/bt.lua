@@ -200,19 +200,19 @@ Game.maps = {
 	"WH - Heggy's egg shed",
 	"WH - Jiggywiggy's temple",
 
-	"Plateau",
-	"Plateau - Honey B's Hive",
-	"Pine Grove",
-	"Cliff top",
-	"Cliff top - Mumbo's Skull",
-	"Pine Grove - Humba's Wigwam",
+	"IoH - Plateau",
+	"IoH - Plateau - Honey B's Hive",
+	"IoH - Pine Grove",
+	"IoH - Cliff top",
+	"IoH - Cliff top - Mumbo's Skull",
+	"IoH - Pine Grove - Humba's Wigwam",
 
 	"Game select screen",
 	"Opening cutscene",
 
-	"Wasteland",
-	"Inside another digger tunnel",
-	"Quagmire",
+	"IoH - Wasteland",
+	"IoH - Inside another digger tunnel",
+	"IoH - Quagmire",
 
 	"CK - Cauldron Keep",
 	"CK - The gatehouse",
@@ -450,7 +450,7 @@ local function get_bk_address()
 	local object_base = mainmemory.read_u24_be(linked_list_root + next_item + 1);
 
 	-- Iterate through linked list looking for pointer list, including pointer to BK Position
-	while not BK_Found and object_base > 0 do
+	while not BK_Found and object_base > 0 and object_base < 0x7FFFFF do
 		-- Check if current linked list object has a pointer in the correct spot
 		bk_slip_pointer = mainmemory.read_u32_be(object_base + bk_slip_pointer_index);
 		bk_pos_pointer = mainmemory.read_u32_be(object_base + bk_position_pointer_index);
@@ -591,6 +591,46 @@ local function neverSlip()
 	if type(BK_Slip_Object) ~= "nil" then
 		mainmemory.writefloat(BK_Slip_Object + slope_timer, 0.0, true);
 	end
+end
+
+
+------------
+-- Health --
+------------
+
+local iconAddress = 0x11B065;
+local healthAddresses = {
+	[0x01] = {0x11B644, 0x11B645}, -- BK
+	[0x10] = {0x11B65F, 0x11B660}, -- Banjo
+	[0x11] = {0x11B668, 0x11B669}, -- Mumbo
+	[0x2D] = {0x11B659, 0x11B65A}, -- Stony
+	[0x2E] = {0x11B66E, 0x11B66F}, -- Detonator
+	[0x2F] = {0x11B665, 0x11B666}, -- Submarine
+	[0x30] = {0x11B677, 0x11B678}, -- Dinosaur
+	[0x31] = {0x11B653, 0x11B654}, -- Bee
+	[0x32] = {0x11B647, 0x11B648}, -- Snowball
+	[0x36] = {0x11B656, 0x11B657}, -- Washing Machine
+	[0x5F] = {0x11B662, 0x11B663} -- Kazooie
+}
+
+function Game.getCurrentHealth()
+	local currentTransformation = mainmemory.readbyte(iconAddress);
+	if type(healthAddresses[currentTransformation]) == 'table' then
+		return mainmemory.read_u8(healthAddresses[currentTransformation][1]);
+	end
+	return 1;
+end
+
+function Game.getMaxHealth()
+	local currentTransformation = mainmemory.readbyte(iconAddress);
+	if type(healthAddresses[currentTransformation]) == 'table' then
+		return mainmemory.read_u8(healthAddresses[currentTransformation][2]);
+	end
+	return 1;
+end
+
+function outputHealth()
+	print("Health: "..Game.getCurrentHealth().."/"..Game.getMaxHealth());
 end
 
 ------------
