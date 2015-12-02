@@ -1,5 +1,50 @@
 Domain RDRAM
 SystemID N64
+11AB41	b	u	1	RDRAM	Jinjo: MT: Jade Snake Grove
+11AB44	b	u	1	RDRAM	Jinjo: MT: Roof of Stadium
+11AB47	b	u	1	RDRAM	Jinjo: MT: Targitzan's Temple
+11AB4A	b	u	1	RDRAM	Jinjo: MT: Pool of Water
+11AB4D	b	u	1	RDRAM	Jinjo: MT: Bridge
+11AB50	b	u	1	RDRAM	Jinjo: GGM: Water Storage
+11AB53	b	u	1	RDRAM	Jinjo: GGM: Jail
+11AB56	b	u	1	RDRAM	Jinjo: GGM: Toxic Gas Cave
+11AB59	b	u	1	RDRAM	Jinjo: GGM: Boulder
+11AB5C	b	u	1	RDRAM	Jinjo: GGM: Mine Tracks
+11AB5F	b	u	1	RDRAM	Jinjo: WW: Tent
+11AB62	b	u	1	RDRAM	Jinjo: WW: Cave of Horrors
+11AB65	b	u	1	RDRAM	Jinjo: WW: Van Door
+11AB68	b	u	1	RDRAM	Jinjo: WW: Dodgem Dome
+11AB6B	b	u	1	RDRAM	Jinjo: WW: Cactus of Strength
+11AB6E	b	u	1	RDRAM	Jinjo: JRL: Lagoon Alcove
+11AB71	b	u	1	RDRAM	Jinjo: JRL: Blubber
+11AB74	b	u	1	RDRAM	Jinjo: JRL: Big Fish
+11AB77	b	u	1	RDRAM	Jinjo: JRL: Seaweed Sanctum
+11AB7A	b	u	1	RDRAM	Jinjo: JRL: Sunken Ship
+11AB7D	b	u	1	RDRAM	Jinjo: TDL: Talon Torpedo
+11AB80	b	u	1	RDRAM	Jinjo: TDL: Cutscene Skip
+11AB83	b	u	1	RDRAM	Jinjo: TDL: Beside Rocknut
+11AB86	b	u	1	RDRAM	Jinjo: TDL: Big T-Rex Skip
+11AB89	b	u	1	RDRAM	Jinjo: TDL: Stomping Plains
+11AB8C	b	u	1	RDRAM	Jinjo: GI: Floor 5
+11AB8F	b	u	1	RDRAM	Jinjo: GI: Leg Spring
+11AB92	b	u	1	RDRAM	Jinjo: GI: Toxic Waste
+11AB95	b	u	1	RDRAM	Jinjo: GI: Boiler Plant
+11AB98	b	u	1	RDRAM	Jinjo: GI: Outside
+11AB9B	b	u	1	RDRAM	Jinjo: HFP: Lava Waterfall
+11AB9E	b	u	1	RDRAM	Jinjo: HFP: Boiling Hot Pool
+11ABA1	b	u	1	RDRAM	Jinjo: HFP: Windy Hole
+11ABA4	b	u	1	RDRAM	Jinjo: HFP: Icicle Grotto
+11ABA7	b	u	1	RDRAM	Jinjo: HFP: Mildred Ice Cube
+11ABAA	b	u	1	RDRAM	Jinjo: CCL: Trash Can
+11ABAD	b	u	1	RDRAM	Jinjo: CCL: Cheese Wedge
+11ABB0	b	u	1	RDRAM	Jinjo: CCL: Central Cavern
+11ABB3	b	u	1	RDRAM	Jinjo: CCL: Minjo Jongo
+11ABB6	b	u	1	RDRAM	Jinjo: CCL: Wumba's
+11ABB9	b	u	1	RDRAM	Jinjo: IoH: Wooded Hollow
+11ABBC	b	u	1	RDRAM	Jinjo: IoH: Wasteland
+11ABBF	b	u	1	RDRAM	Jinjo: IoH: Cliff Top
+11ABC2	b	u	1	RDRAM	Jinjo: IoH: Plateau
+11ABC5	b	u	1	RDRAM	Jinjo: IoH: Spiral Mountain
 11B069	b	u	1	RDRAM	Health (HUD)
 11B081	b	u	1	RDRAM	Eggs (HUD)
 11B644	b	u	1	RDRAM	BK Health
