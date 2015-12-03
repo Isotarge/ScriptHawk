@@ -135,4 +135,6 @@ SystemID N64
 12C7D0	d	f	1	RDRAM	Game Time (Isle'o'Hags)
 12C7F0	d	h	1	RDRAM	RNG?
 12C7F4	d	h	1	RDRAM	RNG?
+0799E0	d	u	1	RDRAM	Counter: A Button Pressed
+079AC0	d	u	1	RDRAM	Counter: A Button Pressed
 
