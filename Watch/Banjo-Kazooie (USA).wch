@@ -10,7 +10,15 @@ SystemID N64
 283400	w	b	1	RDRAM	Stop'N'Swop Items
 2986BA	w	h	1	RDRAM	Banjo Model Replacement
 2986BE	w	h	1	RDRAM	Banjo Model Replacement
+3649A0	d	f	1	RDRAM	Ground Pound Height
+3649A4	d	f	1	RDRAM	Ground Pound Gravity
 364A20	d	f	1	RDRAM	Backflip Height
+364A24	d	f	1	RDRAM	Backflip Gravity (Up)
+364A28	d	f	1	RDRAM	Backflip Gravity (Down)
+364A60	d	f	1	RDRAM	Rat-A-Tat Rap Gravity
+364A64	d	f	1	RDRAM	Rat-A-Tat Rap Height
+364ABC	d	f	1	RDRAM	Talon Trot Jump Height
+364AC0	d	f	1	RDRAM	Talon Trot Jump Gravity
 36C4EC	w	u	1	RDRAM	Pause Menu Item 1 Y Position
 36C4EE	b	u	1	RDRAM	Pause Menu Item 1 Portrait
 36C4FC	w	u	1	RDRAM	Pause Menu Item 2 Y Position
@@ -79,6 +87,7 @@ SystemID N64
 3810B8	d	f	1	RDRAM	FF Answer Timer
 382F20	d	h	1	RDRAM	Textbox object pointer
 383012	b	h	1	RDRAM	Current Pause Menu Item
+3832E0	d	h	1	RDRAM	Honeycomb Bitfield
 383384	d	f	1	RDRAM	Mysterious (Text?) Timer
 385F63	b	u	1	RDRAM	Notes (on hand)
 385F64	d	u	1	RDRAM	Eggs
@@ -123,5 +132,4 @@ SystemID N64
 3935C0	b	u	1	RDRAM	Boggy is 1 flag ahead of player
 3935C1	b	u	1	RDRAM	Boggy is 2 flags ahead of player
 3935C2	b	u	1	RDRAM	Boggy is 3 flags ahead of player
-3832E0	d	h	1	RDRAM	Honeycomb Bitfield
 
