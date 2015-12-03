@@ -10,15 +10,35 @@ SystemID N64
 283400	w	b	1	RDRAM	Stop'N'Swop Items
 2986BA	w	h	1	RDRAM	Banjo Model Replacement
 2986BE	w	h	1	RDRAM	Banjo Model Replacement
+364964	d	f	1	RDRAM	Termite Movement Speed
+364968	d	f	1	RDRAM	Termite Animation Duration
+36496C	d	f	1	RDRAM	Termite Animation Duration
+364970	d	f	1	RDRAM	Termite Jump Height
+364974	d	f	1	RDRAM	Termite Jump Gravity
 3649A0	d	f	1	RDRAM	Ground Pound Height
 3649A4	d	f	1	RDRAM	Ground Pound Gravity
+3649A8	d	f	1	RDRAM	Ground Pound Gravity
+364A10	d	f	1	RDRAM	Flutter Height
+364A14	d	f	1	RDRAM	Flutter Gravity
+364A18	d	f	1	RDRAM	Flutter Gravity
 364A20	d	f	1	RDRAM	Backflip Height
 364A24	d	f	1	RDRAM	Backflip Gravity (Up)
 364A28	d	f	1	RDRAM	Backflip Gravity (Down)
+364A44	d	f	1	RDRAM	Wading Boots Movement Speed
+364A48	d	f	1	RDRAM	Wading Boots Animation Speed
+364A4C	d	f	1	RDRAM	Wading Boots Animation Speed
+364A50	d	f	1	RDRAM	Wading Boots Jump Height
+364A54	d	f	1	RDRAM	Wading Boots Jump Gravity
 364A60	d	f	1	RDRAM	Rat-A-Tat Rap Gravity
 364A64	d	f	1	RDRAM	Rat-A-Tat Rap Height
+364A94	d	f	1	RDRAM	Talon Trot Speed
+364A9C	d	f	1	RDRAM	Turbo Trainers Speed
+364AA8	d	f	1	RDRAM	Talon Trot Animation Duration
 364ABC	d	f	1	RDRAM	Talon Trot Jump Height
 364AC0	d	f	1	RDRAM	Talon Trot Jump Gravity
+364AD4	d	f	1	RDRAM	Wonderwing Movement Speed
+364AE0	d	f	1	RDRAM	Wonderwing Jump Height
+364AE4	d	f	1	RDRAM	Wonderwing Jump Gravity
 36C4EC	w	u	1	RDRAM	Pause Menu Item 1 Y Position
 36C4EE	b	u	1	RDRAM	Pause Menu Item 1 Portrait
 36C4FC	w	u	1	RDRAM	Pause Menu Item 2 Y Position
@@ -56,8 +76,8 @@ SystemID N64
 37D958	d	f	1	RDRAM	Camera X Position
 37D95C	d	f	1	RDRAM	Camera Y position
 37D960	d	f	1	RDRAM	Camera Z Position
-37D968	d	f	1	RDRAM	Rot?
-37D96C	d	f	1	RDRAM	Rot?
+37D968	d	f	1	RDRAM	Camera Vertical Rotation
+37D96C	d	f	1	RDRAM	Camera Horizontal Rotation
 37D970	d	f	1	RDRAM	Viewport roll (degrees)
 37D974	d	f	1	RDRAM	Camera tracking offset?
 37D97C	d	f	1	RDRAM	Camera tracking offset?
