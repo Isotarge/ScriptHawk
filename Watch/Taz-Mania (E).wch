@@ -10,7 +10,7 @@ SystemID SMS
 0120	w	u	0	Main RAM	X Position
 0122	w	u	0	Main RAM	Floor Height
 0126	w	u	0	Main RAM	
-0141	b	h	0	Main RAM	Jump Height
+0141	b	u	0	Main RAM	Jump Height
 0189	b	u	0	Main RAM	Related to current Level
 01A0	w	u	0	Main RAM	Score
 01A2	w	u	0	Main RAM	Score
