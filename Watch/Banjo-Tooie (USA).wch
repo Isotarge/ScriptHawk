@@ -47,10 +47,10 @@ SystemID N64
 11ABC5	b	u	1	RDRAM	Jinjo: IoH: Spiral Mountain
 11B065	b	h	1	RDRAM	Health Icon (HUD)
 11B069	b	u	1	RDRAM	Health (HUD)
-11B074	w	u	1	RDRAM	Notes (HUD)
+11B074	w	s	1	RDRAM	Notes (HUD)
 11B078	d	f	1	RDRAM	Notes (HUD)
-11B081	b	u	1	RDRAM	Eggs (HUD)
-11B084	d	f	1	RDRAM	Eggs (HUD)
+11B080	w	s	1	RDRAM	Blue Eggs (HUD)
+11B084	d	f	1	RDRAM	Blue Eggs (HUD)
 11B0C8	w	s	1	RDRAM	Red Feathers (HUD)
 11B0CC	d	f	1	RDRAM	Red Feathers (HUD)
 11B0D4	w	s	1	RDRAM	Gold Feathers (HUD)
