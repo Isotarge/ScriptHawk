@@ -48,7 +48,13 @@ SystemID N64
 11B065	b	h	1	RDRAM	Health Icon (HUD)
 11B069	b	u	1	RDRAM	Health (HUD)
 11B074	w	u	1	RDRAM	Notes (HUD)
+11B078	d	f	1	RDRAM	Notes (HUD)
 11B081	b	u	1	RDRAM	Eggs (HUD)
+11B084	d	f	1	RDRAM	Eggs (HUD)
+11B0C8	w	s	1	RDRAM	Red Feathers (HUD)
+11B0CC	d	f	1	RDRAM	Red Feathers (HUD)
+11B0D4	w	s	1	RDRAM	Gold Feathers (HUD)
+11B0D8	d	f	1	RDRAM	Gold Feathers (HUD)
 11B643	b	h	1	RDRAM	BK: Health Icon
 11B644	b	u	1	RDRAM	BK: Current Health
 11B645	b	u	1	RDRAM	BK: Max Health
@@ -83,6 +89,22 @@ SystemID N64
 11B677	b	u	1	RDRAM	Dinosaur: Current Health
 11B678	b	u	1	RDRAM	Dinosaur: Max Health
 1254B0	d	f	1	RDRAM	Banjo Brightness Doodad
+12A990	d	f	1	RDRAM	Unknown Float
+12A994	d	f	1	RDRAM	Unknown Float
+12A9F0	d	f	1	RDRAM	Unknown Float
+12A9F4	d	f	1	RDRAM	Unknown Float
+12A9F8	d	f	1	RDRAM	Unknown Float
+12A9FC	d	f	1	RDRAM	Unknown Float
+12AA00	d	f	1	RDRAM	Unknown Float
+12AA04	d	f	1	RDRAM	Draw Distance
+12AA08	d	f	1	RDRAM	Unknown Float
+12AA0C	d	f	1	RDRAM	Unknown Float
+12AA10	d	f	1	RDRAM	Unknown Float
+12AA14	d	f	1	RDRAM	Unknown Float
+12AB2C	d	f	1	RDRAM	Unknown Float - Something todo with BK's lighting
+12AB30	d	f	1	RDRAM	Unknown Float - Something todo with BK's lighting
+12AB64	d	f	1	RDRAM	Unknown Float
+12B010	d	f	1	RDRAM	Frameskip Factor?
 12B050	d	f	1	RDRAM	Air (Real)
 12B054	d	f	1	RDRAM	Air
 12C7A4	d	f	1	RDRAM	Game Time (GGM)
