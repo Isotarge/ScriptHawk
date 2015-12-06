@@ -46,6 +46,9 @@ function drawUI()
 	local x,y;
 	for x=1,grid_width do
 		drawGridText(x,0,x);
+		if verbose then
+			drawGridText(x,1,getColumnHeight(x));
+		end
 	end
 	for y=1,grid_height do
 		drawGridText(0,y,y);
@@ -68,7 +71,10 @@ end
 
 function getGridAddress(x, y)
 	x = x - 2;
-	if x == -1 then x = 7 end;
+	if x == -1 then
+		x = 7;
+		y = y - 1;
+	end;
 	y = (y - 1) * 0x10;
 	return grid_base + y + (x * 2);
 end
@@ -79,6 +85,16 @@ end
 
 function getStatus(x, y)
 	return mainmemory.readbyte(getGridAddress(x, y) + 1);
+end
+
+function getColumnHeight(x)
+	local y;
+	for y=1,grid_height do
+		if getColor(x, y) ~= 0x00 then
+			return grid_height - y + 1;
+		end
+	end
+	return 0;
 end
 
 local previousFrameA = false;
@@ -166,7 +182,7 @@ function checkVertical3(x,y)
 	
 	-- Check top row
 	if (tl == mr and mr == br) or (tr == ml and ml == bl) then
-		if tl ~= 0 and tr ~= 0 then
+		if tl ~= 0 and tr ~= 0 and tl ~= tr then
 			if verbose then
 				print("found top row");
 			end
@@ -176,7 +192,7 @@ function checkVertical3(x,y)
 
 	-- Check middle row
 	if (tl == bl and mr == tl) or (tr == br and ml == tr) then
-		if ml ~= 0 and mr ~= 0 then
+		if ml ~= 0 and mr ~= 0 and ml ~= mr then
 			if verbose then
 				print("found middle row");
 			end
@@ -186,7 +202,7 @@ function checkVertical3(x,y)
 
 	-- Check bottom row
 	if (tl == ml and br == ml) or (tr == mr and bl == mr) then
-		if bl ~= 0 and br ~= 0 then
+		if bl ~= 0 and br ~= 0 and bl ~= br then
 			if verbose then
 				print("found bottom row");
 			end
