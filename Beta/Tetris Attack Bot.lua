@@ -24,6 +24,8 @@ colors = {
 -- 0x01 Stopped?
 -- 0x02 Shaking
 -- 0x03 Stopped?
+-- 0x04 Red Block (can't move)
+-- 0x08 Grey Block (can't move)
 -- 0x40 Popping
 
 -----------------
@@ -155,13 +157,15 @@ function checkVertical3(x,y)
 	local bls = getStatus(x    , y + 2);
 	local brs = getStatus(x + 1, y + 2);
 
+	local redBlock = 0x04;
+	local greyBlock = 0x08;
 	local popping = 0x40;
 	local statusArray = {tls, trs, mls, mrs, bls, brs};
 	local i;
 	for i=1,#statusArray do
-		if statusArray[i] == popping then
+		if statusArray[i] == popping or statusArray[i] == redBlock or statusArray[i] == greyBlock then
 			if verbose then
-				print("a block was popping, skipping check at "..x..","..y);
+				print("a block was unmovable, skipping check at "..x..","..y);
 			end
 			return;
 		end
