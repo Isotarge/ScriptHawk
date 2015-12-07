@@ -175,12 +175,12 @@ function findMoveSimpleSort()
 				local right = getColor(x + 1, y);
 
 				-- Move <= to the left side of the screen
-				--if left > 0 and left < 4 then
-				--	left = left * -1;
-				--end
-				--if right > 0 and right < 4 then
-				--	right = right * -1;
-				--end
+				if left > 0 and left < 4 then
+					left = left * -1;
+				end
+				if right > 0 and right < 4 then
+					right = right * -1;
+				end
 
 				if left > right and isMoveable(x, y) and isMoveable(x + 1, y) then
 					table.insert(moveQueue, {["x"]=x,["y"]=y,["type"]="sort"});
@@ -224,8 +224,10 @@ function pickRandomMove()
 		y = math.random(1, grid_height);
 		local left = getColor(x, y);
 		local right = getColor(x + 1, y);
+		local leftMoveable = isMoveable(x, y);
+		local rightMoveable = isMoveable(x + 1, y);
 		timeout = timeout + 1;
-	until left ~= 0x00 or right ~= 0x00 or timeout > 100;
+	until (leftMoveable and rightMoveable and (left ~= 0x00 or right ~= 0x00) and left ~= right) or timeout > 100;
 
 	if timeout <= 100 then
 		table.insert(moveQueue, {["x"]=x,["y"]=y,["type"]="random"});
@@ -366,6 +368,7 @@ function moveAt(x, y)
 end
 
 local movePickFunctions = {findMoveSimpleSort, findMoveGreedy, pickRandomMove};
+--local movePickFunctions = {findMoveSimpleSort, findMoveGreedy, pickRandomMove};
 --local movePickFunctions = {findMoveSimpleSort};
 --local movePickFunctions = {findMoveDeltaSort};
 --local movePickFunctions = {pickRandomMove};
@@ -381,7 +384,7 @@ function movePickFunction()
 end
 
 function mainLoop()
-	drawUI();
+	--drawUI();
 	if #moveQueue > 0 then
 		local currentMove = moveQueue[1];
 		local cL = getColor(currentMove["x"], currentMove["y"]);
