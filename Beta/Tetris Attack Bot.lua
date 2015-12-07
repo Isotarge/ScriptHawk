@@ -219,6 +219,17 @@ function findMoveDeltaSort()
 	return false;
 end
 
+function pickRandomMove()
+	moveQueue = {};
+	local x = math.random(1, grid_width -1);
+	local y = math.random(1, grid_height);
+	local left = getColor(x, y);
+	local right = getColor(x + 1, y);
+	if left ~= 0x00 or right ~= 0x00 then
+		table.insert(moveQueue, {["x"]=x,["y"]=y,["type"]="random"});
+	end
+end
+
 -------------
 -- The bot --
 -------------
@@ -252,6 +263,10 @@ function moveAt(x, y)
 	return false;
 end
 
+local movePickFunction = findMoveSimpleSort;
+--local movePickFunction = findMoveDeltaSort;
+--local movePickFunction = pickRandomMove;
+
 function mainLoop()
 	drawUI();
 	if #moveQueue > 0 then
@@ -269,13 +284,13 @@ function mainLoop()
 			if verbose then
 				print("Both squares were empty, finding new move");
 			end
-			findMoveSimpleSort();
+			movePickFunction();
 		end
 	else
 		if verbose then
 			print("No moves in queue, finding new move");
 		end
-		findMoveSimpleSort();
+		movePickFunction();
 
 		-- Make things more exciting
 		if #moveQueue == 0 and speedUp and not verbose then
