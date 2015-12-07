@@ -1,11 +1,11 @@
 Domain WRAM
 SystemID SNES
-0003A4	b	u	0	WRAM	Cursor Left X
-0003A8	b	u	0	WRAM	Cursor Left Y
-0003AC	b	u	0	WRAM	Cursor Right X
-0003B0	b	u	0	WRAM	Cursor Right Y
-001046	b	u	0	WRAM	
-001048	b	u	0	WRAM	
-001846	b	u	0	WRAM	
-001848	b	u	0	WRAM	
+0003A4	b	u	0	WRAM	P1 Cursor Left X
+0003A6	b	u	0	WRAM	P2 Cursor Left X
+0003A8	b	u	0	WRAM	P1 Cursor Left Y
+0003AA	b	u	0	WRAM	P2 Cursor Left Y
+0003AC	b	u	0	WRAM	P1 Cursor Right X
+0003AE	b	u	0	WRAM	P2 Cursor Right X
+0003B0	b	u	0	WRAM	P1 Cursor Right Y
+0003B2	b	u	0	WRAM	P2 Cursor Right Y
 

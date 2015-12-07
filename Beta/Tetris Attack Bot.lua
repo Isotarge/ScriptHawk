@@ -1,9 +1,9 @@
-local cursor_left_x = 0x3A4;
-local cursor_left_y = 0x3A8;
-local cursor_right_x = 0x3AC
-local cursor_right_y = 0x3B0;
+local cursor_left_x = {0x3A4, 0x3A6};
+local cursor_left_y = {0x3A8, 0x3AA};
+local cursor_right_x = {0x3AC, 0x3AE};
+local cursor_right_y = {0x3B0, 0x3B2};
 
-local grid_base = 0xFAE;
+local grid_base = {0xFAE, 0x10AE};
 
 local grid_height = 12;
 local grid_width = 6;
@@ -33,7 +33,7 @@ local unmoveableStates = {
 
 speedUp = false;
 verbose = false;
-moveQueue = {};
+moveQueue = {{},{}};
 
 -----------------
 -- UI Bollocks --
@@ -51,7 +51,7 @@ function drawGridText(x, y, string)
 	gui.drawText(drawX, drawY, string);
 end
 
-function drawUI()
+function drawUI(player)
 	local x,y;
 	for x=1,grid_width do
 		drawGridText(x,0,x);
@@ -65,8 +65,8 @@ function drawUI()
 
 	-- Output current move to the screen
 	drawGridText(UI_HUD_LEFT_X_OFFSET,3,"Move");
-	if #moveQueue > 0 then
-		local currentMove = moveQueue[1];
+	if #moveQueue[player] > 0 then
+		local currentMove = moveQueue[player][1];
 		drawGridText(UI_HUD_LEFT_X_OFFSET, 4, currentMove["x"]..","..currentMove["y"]);
 		drawGridText(UI_HUD_LEFT_X_OFFSET, 5, currentMove["type"]);
 	else
@@ -78,28 +78,28 @@ end
 -- The good stuff --
 --------------------
 
-function getCursorPosition()
-	local cursorLeftX = mainmemory.readbyte(cursor_left_x);
-	local cursorLeftY = mainmemory.readbyte(cursor_left_y) - 2;
+function getCursorPosition(player)
+	local cursorLeftX = mainmemory.readbyte(cursor_left_x[player]);
+	local cursorLeftY = mainmemory.readbyte(cursor_left_y[player]) - 2;
 	return {["x"]=cursorLeftX, ["y"]=cursorLeftY};
 end
 
-function getGridAddress(x, y)
+function getGridAddress(x, y, player)
 	x = x - 1;
 	y = (y - 1) * 0x10;
-	return grid_base + y + (x * 2);
+	return grid_base[player] + y + (x * 2);
 end
 
-function getColor(x, y)
-	return mainmemory.readbyte(getGridAddress(x, y));
+function getColor(x, y, player)
+	return mainmemory.readbyte(getGridAddress(x, y, player));
 end
 
-function getStatus(x, y)
-	return mainmemory.readbyte(getGridAddress(x, y) + 1);
+function getStatus(x, y, player)
+	return mainmemory.readbyte(getGridAddress(x, y, player) + 1);
 end
 
-function isMoveable(x, y)
-	local status = getStatus(x, y);
+function isMoveable(x, y, player)
+	local status = getStatus(x, y, player);
 	local i;
 	for i=1,#unmoveableStates do
 		if status == unmoveableStates[i] then
@@ -109,40 +109,45 @@ function isMoveable(x, y)
 	return true;
 end
 
-function getColumnHeight(x)
+function getMaxColumnHeight(player)
+	-- TODO
+	return 10;
+end
+
+function getColumnHeight(x, player)
 	local y;
 	for y=1,grid_height do
-		if getColor(x, y) ~= 0x00 then
+		if getColor(x, y, player) ~= 0x00 then
 			return grid_height - y + 1;
 		end
 	end
 	return 0;
 end
 
-function isEmpty(y)
+function isEmpty(y, player)
 	local x;
 	for x=1,grid_width do
-		if getColor(x,y) > 0x00 and isMoveable(x, y) then
+		if getColor(x, y, player) > 0x00 and isMoveable(x, y, player) then
 			return false;
 		end
 	end
 	return true;
 end
 
-function rowContains(y, color)
+function rowContains(y, color, player)
 	local x;
 	for x=1,grid_width do
-		if getColor(x,y) == color then
+		if getColor(x, y, player) == color then
 			return true;
 		end
 	end
 	return false;
 end
 
-function getColorAtCursor()
-	local cursorPosition = getCursorPosition();
-	local leftColor = getColor(cursorPosition["x"], cursorPosition["y"]);
-	local rightColor = getColor(cursorPosition["x"] + 1, cursorPosition["y"]);
+function getColorAtCursor(player)
+	local cursorPosition = getCursorPosition(player);
+	local leftColor = getColor(cursorPosition["x"], cursorPosition["y"], player);
+	local rightColor = getColor(cursorPosition["x"] + 1, cursorPosition["y"], player);
 	return {leftColor, rightColor};
 end
 
@@ -150,11 +155,11 @@ end
 -- Hilariously simple method to find next move --
 -------------------------------------------------
 
-function isSorted(y)
+function isSorted(y, player)
 	local current = -1;
 	for x = 1, grid_width do
-		if getColor(x, y) >= current then
-			current = getColor(x, y);
+		if getColor(x, y, player) >= current then
+			current = getColor(x, y, player);
 		else
 			return false;
 		end
@@ -162,17 +167,17 @@ function isSorted(y)
 	return true;
 end
 
-function findMoveSimpleSort()
-	moveQueue = {};
+function findMoveSimpleSort(player)
+	moveQueue[player] = {};
 	local x, y;
 	-- Work from the bottom up
 	for y = grid_height, 1, -1 do
-		if not isSorted(y) then
+		if not isSorted(y, player) then
 			-- Work from left to right
 			local current = -1;
 			for x = 1, grid_width - 1 do
-				local left = getColor(x, y);
-				local right = getColor(x + 1, y);
+				local left = getColor(x, y, player);
+				local right = getColor(x + 1, y, player);
 
 				-- Move <= to the left side of the screen
 				if left > 0 and left < 4 then
@@ -182,8 +187,8 @@ function findMoveSimpleSort()
 					right = right * -1;
 				end
 
-				if left > right and isMoveable(x, y) and isMoveable(x + 1, y) then
-					table.insert(moveQueue, {["x"]=x,["y"]=y,["type"]="sort"});
+				if left > right and isMoveable(x, y, player) and isMoveable(x + 1, y, player) then
+					table.insert(moveQueue[player], {["x"]=x,["y"]=y,["type"]="sort"});
 					return true;
 				end
 			end
@@ -192,21 +197,21 @@ function findMoveSimpleSort()
 	return false;
 end
 
-function findMoveDeltaSort()
-	moveQueue = {};
+function findMoveDeltaSort(player)
+	moveQueue[player] = {};
 	local x, y;
 	-- Work from the bottom up
 	for y = grid_height, 1, -1 do
-		if not isSorted(y) then
+		if not isSorted(y, player) then
 			-- Work from left to right
 			local current = -1;
 			for x = 1, grid_width - 1 do
-				local left = getColor(x, y);
-				local right = getColor(x + 1, y);
+				local left = getColor(x, y, player);
+				local right = getColor(x + 1, y, player);
 				local dxl = math.abs(x - left);
 				local dxr = math.abs(x - right)
 				if dxr > dxl then
-					table.insert(moveQueue, {["x"]=x,["y"]=y,["type"]="sort2"});
+					table.insert(moveQueue[player], {["x"]=x,["y"]=y,["type"]="sort2"});
 					return true;
 				end
 			end
@@ -215,22 +220,22 @@ function findMoveDeltaSort()
 	return false;
 end
 
-function pickRandomMove()
-	moveQueue = {};
+function pickRandomMove(player)
+	moveQueue[player] = {};
 	local timeout = 0;
 	local x,y;
 	repeat
 		x = math.random(1, grid_width -1);
 		y = math.random(1, grid_height);
-		local left = getColor(x, y);
-		local right = getColor(x + 1, y);
-		local leftMoveable = isMoveable(x, y);
-		local rightMoveable = isMoveable(x + 1, y);
+		local left = getColor(x, y, player);
+		local right = getColor(x + 1, y, player);
+		local leftMoveable = isMoveable(x, y, player);
+		local rightMoveable = isMoveable(x + 1, y, player);
 		timeout = timeout + 1;
 	until (leftMoveable and rightMoveable and (left ~= 0x00 or right ~= 0x00) and left ~= right) or timeout > 100;
 
 	if timeout <= 100 then
-		table.insert(moveQueue, {["x"]=x,["y"]=y,["type"]="random"});
+		table.insert(moveQueue[player], {["x"]=x,["y"]=y,["type"]="random"});
 		return true;
 	else
 		return false;
@@ -241,17 +246,17 @@ end
 -- Hilariously complicated method to find the next move --
 ----------------------------------------------------------
 
-function checkVertical3(x,y)
+function checkVertical3(x, y, player)
 	if verbose then
 		print("Checking vertical 3 at "..x..","..y);
 	end
 
-	local tlm = isMoveable(x,     y);
-	local trm = isMoveable(x + 1, y);
-	local mlm = isMoveable(x,     y + 1);
-	local mrm = isMoveable(x + 1, y + 1);
-	local blm = isMoveable(x    , y + 2);
-	local brm = isMoveable(x + 1, y + 2);
+	local tlm = isMoveable(x,     y, player);
+	local trm = isMoveable(x + 1, y, player);
+	local mlm = isMoveable(x,     y + 1, player);
+	local mrm = isMoveable(x + 1, y + 1, player);
+	local blm = isMoveable(x    , y + 2, player);
+	local brm = isMoveable(x + 1, y + 2, player);
 
 	local moveableArray = {tlm, trm, mlm, mrm, blm, brm};
 	local i;
@@ -264,12 +269,12 @@ function checkVertical3(x,y)
 		end
 	end
 
-	local tl = getColor(x,     y);
-	local tr = getColor(x + 1, y);
-	local ml = getColor(x,     y + 1);
-	local mr = getColor(x + 1, y + 1);
-	local bl = getColor(x    , y + 2);
-	local br = getColor(x + 1, y + 2);
+	local tl = getColor(x,     y, player);
+	local tr = getColor(x + 1, y, player);
+	local ml = getColor(x,     y + 1, player);
+	local mr = getColor(x + 1, y + 1, player);
+	local bl = getColor(x    , y + 2, player);
+	local br = getColor(x + 1, y + 2, player);
 
 	if verbose then
 		local colorArray = {tl, tr, ml, mr, bl, br};
@@ -283,7 +288,7 @@ function checkVertical3(x,y)
 			if verbose then
 				print("found top row");
 			end
-			table.insert(moveQueue, {["x"]=x,["y"]=y,["type"]="top"});
+			table.insert(moveQueue[player], {["x"]=x,["y"]=y,["type"]="top"});
 			return true;
 		end
 	end
@@ -294,7 +299,7 @@ function checkVertical3(x,y)
 			if verbose then
 				print("found middle row");
 			end
-			table.insert(moveQueue, {["x"]=x,["y"]=y+1,["type"]="middle"});
+			table.insert(moveQueue[player], {["x"]=x,["y"]=y+1,["type"]="middle"});
 			return true;
 		end
 	end
@@ -305,7 +310,7 @@ function checkVertical3(x,y)
 			if verbose then
 				print("found bottom row");
 			end
-			table.insert(moveQueue, {["x"]=x,["y"]=y+2,["type"]="bottom"});
+			table.insert(moveQueue[player], {["x"]=x,["y"]=y+2,["type"]="bottom"});
 			return true;
 		end
 	end
@@ -314,16 +319,19 @@ function checkVertical3(x,y)
 	return false;
 end
 
-function findMoveGreedy()
-	moveQueue = {};
+function findMoveGreedy(player)
+	if verbose then
+		print("Running find move greedy for player"..player);
+	end
+	moveQueue[player] = {};
 	local x, y;
 	-- Work from the bottom up
 	for y = grid_height - 2, 1, -1 do
 		-- TODO: Allow moveable blocks on top of unmoveable rows to be processed
-		if not isEmpty(y) then
+		if not isEmpty(y, player) then
 			-- Work from left to right
 			for x = 1, grid_width - 1 do
-				if checkVertical3(x,y) then
+				if checkVertical3(x, y, player) then
 					return true;
 				end
 			end
@@ -338,29 +346,29 @@ end
 -- The bot --
 -------------
 
-local previousFrameA = false;
-function moveAt(x, y)
-	local cursorPosition = getCursorPosition();
+local previousFrameA = {false, false};
+function moveAt(x, y, player)
+	local cursorPosition = getCursorPosition(player);
 
 	if cursorPosition["x"] < x then
-		joypad.set({["Right"]=true},1);
-		previousFrameA = false;
+		joypad.set({["Right"]=true}, player);
+		previousFrameA[player] = false;
 	elseif cursorPosition["x"] > x then
-		joypad.set({["Left"]=true},1);
-		previousFrameA = false;
+		joypad.set({["Left"]=true}, player);
+		previousFrameA[player] = false;
 	end
 
 	if cursorPosition["y"] < y then
-		joypad.set({["Down"]=true},1);
-		previousFrameA = false;
+		joypad.set({["Down"]=true}, player);
+		previousFrameA[player] = false;
 	elseif cursorPosition["y"] > y then
-		joypad.set({["Up"]=true},1);
-		previousFrameA = false;
+		joypad.set({["Up"]=true}, player);
+		previousFrameA[player] = false;
 	end
 
 	if cursorPosition["x"] == x and cursorPosition["y"] == y then
-		previousFrameA = not previousFrameA;
-		joypad.set({["A"]=previousFrameA},1);
+		previousFrameA[player] = not previousFrameA[player];
+		joypad.set({["A"]=previousFrameA[player]}, player);
 		return true;
 	end
 
@@ -373,10 +381,10 @@ local movePickFunctions = {findMoveSimpleSort, findMoveGreedy, pickRandomMove};
 --local movePickFunctions = {findMoveDeltaSort};
 --local movePickFunctions = {pickRandomMove};
 
-function movePickFunction()
+function movePickFunction(player)
 	local i;
 	for i=1,#movePickFunctions do
-		if movePickFunctions[i]() then
+		if movePickFunctions[i](player) then
 			return true;
 		end
 	end
@@ -384,33 +392,36 @@ function movePickFunction()
 end
 
 function mainLoop()
-	--drawUI();
-	if #moveQueue > 0 then
-		local currentMove = moveQueue[1];
-		local cL = getColor(currentMove["x"], currentMove["y"]);
-		local cR = getColor(currentMove["x"] + 1, currentMove["y"]);
-		if cL ~= 0 or cR ~= 0 then
-			if moveAt(currentMove["x"], currentMove["y"]) then
-				if verbose then
-					print("Move completed!");
+	local player;
+	for player = 1, 2 do
+		--drawUI(player);
+		if #moveQueue[player] > 0 then
+			local currentMove = moveQueue[player][1];
+			local cL = getColor(currentMove["x"], currentMove["y"], player);
+			local cR = getColor(currentMove["x"] + 1, currentMove["y"], player);
+			if cL ~= 0 or cR ~= 0 then
+				if moveAt(currentMove["x"], currentMove["y"], player) then
+					if verbose then
+						print("Move completed!");
+					end
+					table.remove(moveQueue[player]);
 				end
-				table.remove(moveQueue);
+			else
+				if verbose then
+					print("Both squares were empty, finding new move");
+				end
+				movePickFunction(player);
 			end
 		else
 			if verbose then
-				print("Both squares were empty, finding new move");
+				print("No moves in queue, finding new move");
 			end
-			movePickFunction();
-		end
-	else
-		if verbose then
-			print("No moves in queue, finding new move");
-		end
-		movePickFunction();
+			movePickFunction(player);
 
-		-- Make things more exciting
-		if #moveQueue == 0 and speedUp and not verbose then
-			joypad.set({["L"]=true},1);
+			-- Make things more exciting
+			if #moveQueue == 0 and speedUp and not verbose then
+				joypad.set({["L"]=true},player);
+			end
 		end
 	end
 end
