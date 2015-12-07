@@ -221,12 +221,21 @@ end
 
 function pickRandomMove()
 	moveQueue = {};
-	local x = math.random(1, grid_width -1);
-	local y = math.random(1, grid_height);
-	local left = getColor(x, y);
-	local right = getColor(x + 1, y);
-	if left ~= 0x00 or right ~= 0x00 then
+	local timeout = 0;
+	local x,y;
+	repeat
+		x = math.random(1, grid_width -1);
+		y = math.random(1, grid_height);
+		local left = getColor(x, y);
+		local right = getColor(x + 1, y);
+		timeout = timeout + 1;
+	until left ~= 0x00 or right ~= 0x00 or timeout > 100;
+
+	if timeout <= 100 then
 		table.insert(moveQueue, {["x"]=x,["y"]=y,["type"]="random"});
+		return true;
+	else
+		return false;
 	end
 end
 
@@ -263,9 +272,20 @@ function moveAt(x, y)
 	return false;
 end
 
-local movePickFunction = findMoveSimpleSort;
---local movePickFunction = findMoveDeltaSort;
---local movePickFunction = pickRandomMove;
+local movePickFunctions = {findMoveSimpleSort, pickRandomMove};
+--local movePickFunctions = {findMoveSimpleSort};
+--local movePickFunctions = {findMoveDeltaSort};
+--local movePickFunctions = {pickRandomMove};
+
+function movePickFunction()
+	local i;
+	for i=1,#movePickFunctions do
+		if movePickFunctions[i]() then
+			return true;
+		end
+	end
+	return false;
+end
 
 function mainLoop()
 	drawUI();
