@@ -31,6 +31,10 @@ local unmoveableStates = {
 	0x04, 0x08, 0x40
 }
 
+speedUp = true;
+verbose = false;
+moveQueue = {};
+
 -----------------
 -- UI Bollocks --
 -----------------
@@ -77,8 +81,6 @@ end
 function getCursorPosition()
 	local cursorLeftX = mainmemory.readbyte(cursor_left_x);
 	local cursorLeftY = mainmemory.readbyte(cursor_left_y) - 2;
-	--local cursorRightX = mainmemory.readbyte(cursor_right_x);
-	--local cursorRightY = mainmemory.readbyte(cursor_right_y) - 2;
 	return {["x"]=cursorLeftX, ["y"]=cursorLeftY};
 end
 
@@ -140,39 +142,6 @@ function rowContains(y, color)
 	end
 	return false;
 end
-
-local previousFrameA = false;
-function moveAt(x, y)
-	local cursorPosition = getCursorPosition();
-
-	if cursorPosition["x"] < x then
-		joypad.set({["Right"]=true},1);
-		previousFrameA = false;
-	elseif cursorPosition["x"] > x then
-		joypad.set({["Left"]=true},1);
-		previousFrameA = false;
-	end
-
-	if cursorPosition["y"] < y then
-		joypad.set({["Down"]=true},1);
-		previousFrameA = false;
-	elseif cursorPosition["y"] > y then
-		joypad.set({["Up"]=true},1);
-		previousFrameA = false;
-	end
-
-	if cursorPosition["x"] == x and cursorPosition["y"] == y then
-		previousFrameA = not previousFrameA;
-		joypad.set({["A"]=previousFrameA},1);
-		return true;
-	end
-
-	return false;
-end
-
-speedUp = true;
-verbose = false;
-moveQueue = {};
 
 function getColorAtCursor()
 	local cursorPosition = getCursorPosition();
@@ -273,6 +242,76 @@ function findMoveGreedy()
 	end
 end
 
+-------------------------------
+-- Hilariously simple method --
+-------------------------------
+
+function isSorted(y)
+	local current = -1;
+	for x = 1, grid_width do
+		if getColor(x, y) >= current then
+			current = getColor(x, y);
+		else
+			return false;
+		end
+	end
+	return true;
+end
+
+function findMoveSimpleSort()
+	moveQueue = {};
+	local x, y;
+	-- Work from the bottom up
+	for y = grid_height, 1, -1 do
+		if not isSorted(y) then
+			-- Work from left to right
+			local current = -1;
+			for x = 1, grid_width - 1 do
+				local left = getColor(x, y);
+				local right = getColor(x + 1, y);
+				if left > right then
+					table.insert(moveQueue, {["x"]=x,["y"]=y,["type"]="sort"});
+					return true;
+				end
+			end
+		end
+	end
+	return false;
+end
+
+-------------
+-- The bot --
+-------------
+
+local previousFrameA = false;
+function moveAt(x, y)
+	local cursorPosition = getCursorPosition();
+
+	if cursorPosition["x"] < x then
+		joypad.set({["Right"]=true},1);
+		previousFrameA = false;
+	elseif cursorPosition["x"] > x then
+		joypad.set({["Left"]=true},1);
+		previousFrameA = false;
+	end
+
+	if cursorPosition["y"] < y then
+		joypad.set({["Down"]=true},1);
+		previousFrameA = false;
+	elseif cursorPosition["y"] > y then
+		joypad.set({["Up"]=true},1);
+		previousFrameA = false;
+	end
+
+	if cursorPosition["x"] == x and cursorPosition["y"] == y then
+		previousFrameA = not previousFrameA;
+		joypad.set({["A"]=previousFrameA},1);
+		return true;
+	end
+
+	return false;
+end
+
 function mainLoop()
 	drawUI();
 	if #moveQueue > 0 then
@@ -290,13 +329,14 @@ function mainLoop()
 			if verbose then
 				print("Both squares were empty, finding new move");
 			end
-			findMoveGreedy();
+			--findMoveGreedy();
+			findMoveSimpleSort();
 		end
 	else
 		if verbose then
 			print("No moves in queue, finding new move");
 		end
-		findMoveGreedy();
+		findMoveSimpleSort();
 
 		-- Make things more exciting
 		if #moveQueue == 0 and speedUp and not verbose then
