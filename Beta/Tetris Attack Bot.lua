@@ -177,6 +177,7 @@ function findMoveSimpleSort()
 			for x = 1, grid_width - 1 do
 				local left = getColor(x, y);
 				local right = getColor(x + 1, y);
+
 				-- Move <= to the left side of the screen
 				--if left > 0 and left < 4 then
 				--	left = left * -1;
@@ -184,7 +185,8 @@ function findMoveSimpleSort()
 				--if right > 0 and right < 4 then
 				--	right = right * -1;
 				--end
-				if left > right then
+
+				if left > right and isMoveable(x, y) and isMoveable(x + 1, y) then
 					table.insert(moveQueue, {["x"]=x,["y"]=y,["type"]="sort"});
 					return true;
 				end
