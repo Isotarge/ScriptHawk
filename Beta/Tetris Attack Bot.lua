@@ -224,6 +224,7 @@ function checkVertical3(x,y)
 				print("found top row");
 			end
 			table.insert(moveQueue, {["x"]=x,["y"]=y,["type"]="top"});
+			return;
 		end
 	end
 
@@ -234,6 +235,7 @@ function checkVertical3(x,y)
 				print("found middle row");
 			end
 			table.insert(moveQueue, {["x"]=x,["y"]=y+1,["type"]="middle"});
+			return;
 		end
 	end
 
@@ -244,6 +246,7 @@ function checkVertical3(x,y)
 				print("found bottom row");
 			end
 			table.insert(moveQueue, {["x"]=x,["y"]=y+2,["type"]="bottom"});
+			return;
 		end
 	end
 end
