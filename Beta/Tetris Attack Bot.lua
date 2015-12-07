@@ -3,7 +3,7 @@ local cursor_left_y = 0x3A8;
 local cursor_right_x = 0x3AC
 local cursor_right_y = 0x3B0;
 
-local grid_base = 0xFB0;
+local grid_base = 0xFAE;
 
 local grid_height = 12;
 local grid_width = 6;
@@ -85,11 +85,7 @@ function getCursorPosition()
 end
 
 function getGridAddress(x, y)
-	x = x - 2;
-	if x == -1 then
-		x = 7;
-		y = y - 1;
-	end;
+	x = x - 1;
 	y = (y - 1) * 0x10;
 	return grid_base + y + (x * 2);
 end
