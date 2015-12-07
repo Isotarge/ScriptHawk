@@ -177,8 +177,38 @@ function findMoveSimpleSort()
 			for x = 1, grid_width - 1 do
 				local left = getColor(x, y);
 				local right = getColor(x + 1, y);
+				-- Move <= to the left side of the screen
+				--if left > 0 and left < 4 then
+				--	left = left * -1;
+				--end
+				--if right > 0 and right < 4 then
+				--	right = right * -1;
+				--end
 				if left > right then
 					table.insert(moveQueue, {["x"]=x,["y"]=y,["type"]="sort"});
+					return true;
+				end
+			end
+		end
+	end
+	return false;
+end
+
+function findMoveDeltaSort()
+	moveQueue = {};
+	local x, y;
+	-- Work from the bottom up
+	for y = grid_height, 1, -1 do
+		if not isSorted(y) then
+			-- Work from left to right
+			local current = -1;
+			for x = 1, grid_width - 1 do
+				local left = getColor(x, y);
+				local right = getColor(x + 1, y);
+				local dxl = math.abs(x - left);
+				local dxr = math.abs(x - right)
+				if dxr > dxl then
+					table.insert(moveQueue, {["x"]=x,["y"]=y,["type"]="sort2"});
 					return true;
 				end
 			end
