@@ -200,7 +200,7 @@ function checkVertical3(x,y)
 			if verbose then
 				print("A block was unmovable, skipping check at "..x..","..y);
 			end
-			return;
+			return false;
 		end
 	end
 
@@ -224,7 +224,7 @@ function checkVertical3(x,y)
 				print("found top row");
 			end
 			table.insert(moveQueue, {["x"]=x,["y"]=y,["type"]="top"});
-			return;
+			return true;
 		end
 	end
 
@@ -235,7 +235,7 @@ function checkVertical3(x,y)
 				print("found middle row");
 			end
 			table.insert(moveQueue, {["x"]=x,["y"]=y+1,["type"]="middle"});
-			return;
+			return true;
 		end
 	end
 
@@ -246,9 +246,12 @@ function checkVertical3(x,y)
 				print("found bottom row");
 			end
 			table.insert(moveQueue, {["x"]=x,["y"]=y+2,["type"]="bottom"});
-			return;
+			return true;
 		end
 	end
+
+	-- No move found =(
+	return false;
 end
 
 function findMoveGreedy()
@@ -260,7 +263,9 @@ function findMoveGreedy()
 		if not isEmpty(y) then
 			-- Work from left to right
 			for x = 1, grid_width - 1 do
-				checkVertical3(x,y);
+				if checkVertical3(x,y) then
+					return;
+				end
 			end
 		else
 			break;
