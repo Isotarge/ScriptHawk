@@ -124,7 +124,7 @@ end
 function isEmpty(y)
 	local x;
 	for x=1,grid_width do
-		if getColor(x,y) > 0x00 and not isUnmoveable(x, y) then
+		if getColor(x,y) > 0x00 and isMoveable(x, y) then
 			return false;
 		end
 	end
@@ -256,9 +256,14 @@ function findMoveGreedy()
 	local x, y;
 	-- Work from the bottom up
 	for y = grid_height - 2, 1, -1 do
-		-- Work from left to right
-		for x = 1, grid_width - 1 do
-			checkVertical3(x,y);
+		-- TODO: Allow moveable blocks on top of unmoveable rows to be processed
+		if not isEmpty(y) then
+			-- Work from left to right
+			for x = 1, grid_width - 1 do
+				checkVertical3(x,y);
+			end
+		else
+			break;
 		end
 	end
 end
