@@ -8,7 +8,7 @@ local grid_base = 0xFB0;
 local grid_height = 12;
 local grid_width = 6;
 
-colors = {
+local colors = {
 	[0x00] = "Empty",
 	[0x01] = "Red",
 	[0x02] = "Green",
@@ -121,6 +121,16 @@ function getColumnHeight(x)
 	return 0;
 end
 
+function isEmpty(y)
+	local x;
+	for x=1,grid_width do
+		if getColor(x,y) > 0x00 and not isUnmoveable(x, y) then
+			return false;
+		end
+	end
+	return true;
+end
+
 function rowContains(y, color)
 	local x;
 	for x=1,grid_width do
@@ -160,6 +170,7 @@ function moveAt(x, y)
 	return false;
 end
 
+speedUp = true;
 verbose = false;
 moveQueue = {};
 
@@ -240,7 +251,9 @@ end
 function findMoveGreedy()
 	moveQueue = {};
 	local x, y;
-	for y = 1, grid_height - 2 do
+	-- Work from the bottom up
+	for y = grid_height - 2, 1, -1 do
+		-- Work from left to right
 		for x = 1, grid_width - 1 do
 			checkVertical3(x,y);
 		end
@@ -258,7 +271,7 @@ function mainLoop()
 				if verbose then
 					print("Move completed!");
 				end
-				findMoveGreedy();
+				table.remove(moveQueue);
 			end
 		else
 			if verbose then
@@ -271,6 +284,11 @@ function mainLoop()
 			print("No moves in queue, finding new move");
 		end
 		findMoveGreedy();
+
+		-- Make things more exciting
+		if #moveQueue == 0 and speedUp and not verbose then
+			joypad.set({["L"]=true},1);
+		end
 	end
 end
 
