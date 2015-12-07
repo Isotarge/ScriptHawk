@@ -31,7 +31,7 @@ local unmoveableStates = {
 	0x04, 0x08, 0x40
 }
 
-speedUp = true;
+speedUp = false;
 verbose = false;
 moveQueue = {};
 
