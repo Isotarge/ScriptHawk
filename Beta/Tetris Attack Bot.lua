@@ -235,6 +235,103 @@ function pickRandomMove()
 	end
 end
 
+----------------------------------------------------------
+-- Hilariously complicated method to find the next move --
+----------------------------------------------------------
+
+function checkVertical3(x,y)
+	if verbose then
+		print("Checking vertical 3 at "..x..","..y);
+	end
+
+	local tlm = isMoveable(x,     y);
+	local trm = isMoveable(x + 1, y);
+	local mlm = isMoveable(x,     y + 1);
+	local mrm = isMoveable(x + 1, y + 1);
+	local blm = isMoveable(x    , y + 2);
+	local brm = isMoveable(x + 1, y + 2);
+
+	local moveableArray = {tlm, trm, mlm, mrm, blm, brm};
+	local i;
+	for i=1,#moveableArray do
+		if moveableArray[i] == false then
+			if verbose then
+				print("A block was unmovable, skipping check at "..x..","..y);
+			end
+			return false;
+		end
+	end
+
+	local tl = getColor(x,     y);
+	local tr = getColor(x + 1, y);
+	local ml = getColor(x,     y + 1);
+	local mr = getColor(x + 1, y + 1);
+	local bl = getColor(x    , y + 2);
+	local br = getColor(x + 1, y + 2);
+
+	if verbose then
+		local colorArray = {tl, tr, ml, mr, bl, br};
+		local colorArrayFriendly = {colors[tl], colors[tr], colors[ml], colors[mr], colors[bl], colors[br]};
+		print(colorArrayFriendly);
+	end
+
+	-- Check top row
+	if (tl == mr and mr == br) or (tr == ml and ml == bl) then
+		if tl ~= 0 and tr ~= 0 and tl ~= tr then
+			if verbose then
+				print("found top row");
+			end
+			table.insert(moveQueue, {["x"]=x,["y"]=y,["type"]="top"});
+			return true;
+		end
+	end
+
+	-- Check middle row
+	if (tl == bl and mr == tl) or (tr == br and ml == tr) then
+		if ml ~= 0 and mr ~= 0 and ml ~= mr then
+			if verbose then
+				print("found middle row");
+			end
+			table.insert(moveQueue, {["x"]=x,["y"]=y+1,["type"]="middle"});
+			return true;
+		end
+	end
+
+	-- Check bottom row
+	if (tl == ml and br == ml) or (tr == mr and bl == mr) then
+		if bl ~= 0 and br ~= 0 and bl ~= br then
+			if verbose then
+				print("found bottom row");
+			end
+			table.insert(moveQueue, {["x"]=x,["y"]=y+2,["type"]="bottom"});
+			return true;
+		end
+	end
+
+	-- No move found =(
+	return false;
+end
+
+function findMoveGreedy()
+	moveQueue = {};
+	local x, y;
+	-- Work from the bottom up
+	for y = grid_height - 2, 1, -1 do
+		-- TODO: Allow moveable blocks on top of unmoveable rows to be processed
+		if not isEmpty(y) then
+			-- Work from left to right
+			for x = 1, grid_width - 1 do
+				if checkVertical3(x,y) then
+					return true;
+				end
+			end
+		else
+			break;
+		end
+	end
+	return false;
+end
+
 -------------
 -- The bot --
 -------------
@@ -268,7 +365,7 @@ function moveAt(x, y)
 	return false;
 end
 
-local movePickFunctions = {findMoveSimpleSort, pickRandomMove};
+local movePickFunctions = {findMoveSimpleSort, findMoveGreedy, pickRandomMove};
 --local movePickFunctions = {findMoveSimpleSort};
 --local movePickFunctions = {findMoveDeltaSort};
 --local movePickFunctions = {pickRandomMove};
