@@ -283,10 +283,10 @@ function checkVertical3(x, y, player)
 	end
 
 	-- Check top row
-	if (tl == mr and mr == br) or (tr == ml and ml == bl) then
-		if tl ~= 0 and tr ~= 0 and tl ~= tr then
+	if (tl == mr and mr == br and tl ~= 0) or (tr == ml and ml == bl and tr ~= 0) then
+		if tl ~= tr then
 			if verbose then
-				print("found top row");
+				print("Found top row");
 			end
 			table.insert(moveQueue[player], {["x"]=x,["y"]=y,["type"]="top"});
 			return true;
@@ -297,7 +297,7 @@ function checkVertical3(x, y, player)
 	if (tl == bl and mr == tl) or (tr == br and ml == tr) then
 		if ml ~= 0 and mr ~= 0 and ml ~= mr then
 			if verbose then
-				print("found middle row");
+				print("Found middle row");
 			end
 			table.insert(moveQueue[player], {["x"]=x,["y"]=y+1,["type"]="middle"});
 			return true;
@@ -308,7 +308,7 @@ function checkVertical3(x, y, player)
 	if (tl == ml and br == ml) or (tr == mr and bl == mr) then
 		if bl ~= 0 and br ~= 0 and bl ~= br then
 			if verbose then
-				print("found bottom row");
+				print("Found bottom row");
 			end
 			table.insert(moveQueue[player], {["x"]=x,["y"]=y+2,["type"]="bottom"});
 			return true;
@@ -321,7 +321,7 @@ end
 
 function findMoveGreedy(player)
 	if verbose then
-		print("Running find move greedy for player"..player);
+		print("Running find move greedy for player "..player);
 	end
 	moveQueue[player] = {};
 	local x, y;
@@ -346,30 +346,48 @@ end
 -- The bot --
 -------------
 
+numMoves = {0, 0};
+frameSum = {0, 0};
+
 local previousFrameA = {false, false};
+local previousFrameDirection = {false, false};
+
+function getAverageMoveLength()
+	print("avg: "..frameSum[1]/numMoves[1]);
+	print("avg: "..frameSum[2]/numMoves[2]);
+end
+
 function moveAt(x, y, player)
 	local cursorPosition = getCursorPosition(player);
-
-	if cursorPosition["x"] < x then
-		joypad.set({["Right"]=true}, player);
-		previousFrameA[player] = false;
-	elseif cursorPosition["x"] > x then
-		joypad.set({["Left"]=true}, player);
-		previousFrameA[player] = false;
-	end
-
-	if cursorPosition["y"] < y then
-		joypad.set({["Down"]=true}, player);
-		previousFrameA[player] = false;
-	elseif cursorPosition["y"] > y then
-		joypad.set({["Up"]=true}, player);
-		previousFrameA[player] = false;
-	end
 
 	if cursorPosition["x"] == x and cursorPosition["y"] == y then
 		previousFrameA[player] = not previousFrameA[player];
 		joypad.set({["A"]=previousFrameA[player]}, player);
 		return true;
+	end
+
+	if not previousFrameDirection[player] then
+		if cursorPosition["x"] < x then
+			joypad.set({["Right"]=true}, player);
+			previousFrameA[player] = false;
+			previousFrameDirection[player] = true;
+		elseif cursorPosition["x"] > x then
+			joypad.set({["Left"]=true}, player);
+			previousFrameA[player] = false;
+			previousFrameDirection[player] = true;
+		end
+
+		if cursorPosition["y"] < y then
+			joypad.set({["Down"]=true}, player);
+			previousFrameA[player] = false;
+			previousFrameDirection[player] = true;
+		elseif cursorPosition["y"] > y then
+			joypad.set({["Up"]=true}, player);
+			previousFrameA[player] = false;
+			previousFrameDirection[player] = true;
+		end
+	else
+		previousFrameDirection[player] = false;
 	end
 
 	return false;
@@ -392,19 +410,32 @@ function movePickFunction(player)
 end
 
 function mainLoop()
+	if emu.islagged() then
+		return;
+	end
+
 	local player;
 	for player = 1, 2 do
 		--drawUI(player);
 		if #moveQueue[player] > 0 then
 			local currentMove = moveQueue[player][1];
+			if currentMove["framesNeeded"] == nil then
+				currentMove["framesNeeded"] = 0;
+			end
 			local cL = getColor(currentMove["x"], currentMove["y"], player);
 			local cR = getColor(currentMove["x"] + 1, currentMove["y"], player);
 			if cL ~= 0 or cR ~= 0 then
 				if moveAt(currentMove["x"], currentMove["y"], player) then
 					if verbose then
-						print("Move completed!");
+						print("Move completed in "..currentMove["framesNeeded"].." frames.");
+					end
+					if currentMove["framesNeeded"] > 1 then
+						frameSum[player] = frameSum[player] + currentMove["framesNeeded"];
+						numMoves[player] = numMoves[player] + 1;
 					end
 					table.remove(moveQueue[player]);
+				else
+					currentMove["framesNeeded"] = currentMove["framesNeeded"] + 1;
 				end
 			else
 				if verbose then
@@ -419,7 +450,8 @@ function mainLoop()
 			movePickFunction(player);
 
 			-- Make things more exciting
-			if #moveQueue == 0 and speedUp and not verbose then
+			-- TODO: Restrict this so that it doesn't fire for too long
+			if #moveQueue[player] == 0 and speedUp and not verbose then
 				joypad.set({["L"]=true},player);
 			end
 		end
