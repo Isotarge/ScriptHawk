@@ -168,7 +168,6 @@ function isSorted(y, player)
 end
 
 function findMoveSimpleSort(player)
-	moveQueue[player] = {};
 	local x, y;
 	-- Work from the bottom up
 	for y = grid_height, 1, -1 do
@@ -188,6 +187,7 @@ function findMoveSimpleSort(player)
 				end
 
 				if left > right and isMoveable(x, y, player) and isMoveable(x + 1, y, player) then
+					moveQueue[player] = {};
 					table.insert(moveQueue[player], {["x"]=x,["y"]=y,["type"]="sort"});
 					return true;
 				end
@@ -198,7 +198,6 @@ function findMoveSimpleSort(player)
 end
 
 function findMoveDeltaSort(player)
-	moveQueue[player] = {};
 	local x, y;
 	-- Work from the bottom up
 	for y = grid_height, 1, -1 do
@@ -211,6 +210,7 @@ function findMoveDeltaSort(player)
 				local dxl = math.abs(x - left);
 				local dxr = math.abs(x - right)
 				if dxr > dxl then
+					moveQueue[player] = {};
 					table.insert(moveQueue[player], {["x"]=x,["y"]=y,["type"]="sort2"});
 					return true;
 				end
@@ -221,7 +221,6 @@ function findMoveDeltaSort(player)
 end
 
 function pickRandomMove(player)
-	moveQueue[player] = {};
 	local timeout = 0;
 	local x,y;
 	repeat
@@ -235,6 +234,7 @@ function pickRandomMove(player)
 	until (leftMoveable and rightMoveable and (left ~= 0x00 or right ~= 0x00) and left ~= right) or timeout > 100;
 
 	if timeout <= 100 then
+		moveQueue[player] = {};
 		table.insert(moveQueue[player], {["x"]=x,["y"]=y,["type"]="random"});
 		return true;
 	else
@@ -288,6 +288,7 @@ function checkVertical3(x, y, player)
 			if verbose then
 				print("Found top row");
 			end
+			moveQueue[player] = {};
 			table.insert(moveQueue[player], {["x"]=x,["y"]=y,["type"]="top"});
 			return true;
 		end
@@ -299,6 +300,7 @@ function checkVertical3(x, y, player)
 			if verbose then
 				print("Found middle row");
 			end
+			moveQueue[player] = {};
 			table.insert(moveQueue[player], {["x"]=x,["y"]=y+1,["type"]="middle"});
 			return true;
 		end
@@ -310,6 +312,7 @@ function checkVertical3(x, y, player)
 			if verbose then
 				print("Found bottom row");
 			end
+			moveQueue[player] = {};
 			table.insert(moveQueue[player], {["x"]=x,["y"]=y+2,["type"]="bottom"});
 			return true;
 		end
@@ -323,7 +326,6 @@ function findMoveGreedy(player)
 	if verbose then
 		print("Running find move greedy for player "..player);
 	end
-	moveQueue[player] = {};
 	local x, y;
 	-- Work from the bottom up
 	for y = grid_height - 2, 1, -1 do
