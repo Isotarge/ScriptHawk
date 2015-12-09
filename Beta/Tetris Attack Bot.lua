@@ -236,14 +236,21 @@ function pickRandomMove(player)
 	local maxColumnHeight = getMaxColumnHeight(player);
 	local currentColumnHeight = -1;
 	repeat
-		x = math.random(1, grid_width -1);
+		x = math.random(1, grid_width);
 		y = math.random(1, grid_height);
+
+		currentColumnHeight = getColumnHeight(x, player);
+
+		if x == grid_width then
+			x = x - 1;
+		end
+
 		left = getColor(x, y, player);
 		right = getColor(x + 1, y, player);
 		leftMoveable = isMoveable(x, y, player);
 		rightMoveable = isMoveable(x + 1, y, player);
+
 		timeout = timeout + 1;
-		currentColumnHeight = getColumnHeight(x, player);
 	until (currentColumnHeight == maxColumnHeight or math.random(1,2) == 1) and (leftMoveable and rightMoveable and (left ~= 0x00 or right ~= 0x00) and left ~= right) or timeout > 100;
 
 	if timeout <= 100 then
