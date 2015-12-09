@@ -21,19 +21,20 @@ local colors = {
 
 -- Status
 -- 0x00 Normal
--- 0x01 Stopped?
+-- 0x01 Switching left or right
 -- 0x02 Shaking
 -- 0x03 Stopped?
 -- 0x04 Red Block (can't move)
 -- 0x08 Grey Block (can't move)
 -- 0x40 Popping
 local unmoveableStates = {
-	0x04, 0x08, 0x40
+	0x01, 0x04, 0x08, 0x40
 }
 
+num_players = 2;
 speedUp = false;
 verbose = false;
-moveQueue = {{},{}};
+local moveQueue = {};
 
 -----------------
 -- UI Bollocks --
@@ -81,7 +82,7 @@ end
 function getCursorPosition(player)
 	local cursorLeftX = mainmemory.readbyte(cursor_left_x[player]);
 	local cursorLeftY = mainmemory.readbyte(cursor_left_y[player]) - 2;
-	return {["x"]=cursorLeftX, ["y"]=cursorLeftY};
+	return {["x"] = cursorLeftX, ["y"] = cursorLeftY};
 end
 
 function getGridAddress(x, y, player)
@@ -110,8 +111,12 @@ function isMoveable(x, y, player)
 end
 
 function getMaxColumnHeight(player)
-	-- TODO
-	return 10;
+	local x;
+	local maxHeight = 0;
+	for x=1,grid_width do
+		maxHeight = math.max(getColumnHeight(x, player), maxHeight);
+	end
+	return maxHeight;
 end
 
 function getColumnHeight(x, player)
@@ -124,7 +129,11 @@ function getColumnHeight(x, player)
 	return 0;
 end
 
-function isEmpty(y, player)
+function columnIsEmpty(x, player)
+	return getColumnHeight(x, player) == 0;
+end
+
+function rowIsEmpty(y, player)
 	local x;
 	for x=1,grid_width do
 		if getColor(x, y, player) > 0x00 and isMoveable(x, y, player) then
@@ -211,7 +220,7 @@ function findMoveDeltaSort(player)
 				local dxr = math.abs(x - right)
 				if dxr > dxl then
 					moveQueue[player] = {};
-					table.insert(moveQueue[player], {["x"]=x,["y"]=y,["type"]="sort2"});
+					table.insert(moveQueue[player], {["x"] = x,["y"] = y,["type"] = "deltasort"});
 					return true;
 				end
 			end
@@ -222,16 +231,20 @@ end
 
 function pickRandomMove(player)
 	local timeout = 0;
-	local x,y;
+	local x,y, left, right, leftMoveable, rightMoveable;
+	-- TODO: Make sure this doesn't take into account unmoveable blocks
+	local maxColumnHeight = getMaxColumnHeight(player);
+	local currentColumnHeight = -1;
 	repeat
 		x = math.random(1, grid_width -1);
 		y = math.random(1, grid_height);
-		local left = getColor(x, y, player);
-		local right = getColor(x + 1, y, player);
-		local leftMoveable = isMoveable(x, y, player);
-		local rightMoveable = isMoveable(x + 1, y, player);
+		left = getColor(x, y, player);
+		right = getColor(x + 1, y, player);
+		leftMoveable = isMoveable(x, y, player);
+		rightMoveable = isMoveable(x + 1, y, player);
 		timeout = timeout + 1;
-	until (leftMoveable and rightMoveable and (left ~= 0x00 or right ~= 0x00) and left ~= right) or timeout > 100;
+		currentColumnHeight = getColumnHeight(x, player);
+	until (currentColumnHeight == maxColumnHeight or math.random(1,2) == 1) and (leftMoveable and rightMoveable and (left ~= 0x00 or right ~= 0x00) and left ~= right) or timeout > 100;
 
 	if timeout <= 100 then
 		moveQueue[player] = {};
@@ -246,7 +259,12 @@ end
 -- Hilariously complicated method to find the next move --
 ----------------------------------------------------------
 
-function checkVertical3(x, y, player)
+function check2By3(x, y, player)
+	-- Skip this check for the right of the screen
+	if x == grid_width then
+		return false;
+	end
+
 	if verbose then
 		print("Checking vertical 3 at "..x..","..y);
 	end
@@ -289,7 +307,7 @@ function checkVertical3(x, y, player)
 				print("Found top row");
 			end
 			moveQueue[player] = {};
-			table.insert(moveQueue[player], {["x"]=x,["y"]=y,["type"]="top"});
+			table.insert(moveQueue[player], {["x"] = x, ["y"] = y, ["type"] = "top"});
 			return true;
 		end
 	end
@@ -301,7 +319,7 @@ function checkVertical3(x, y, player)
 				print("Found middle row");
 			end
 			moveQueue[player] = {};
-			table.insert(moveQueue[player], {["x"]=x,["y"]=y+1,["type"]="middle"});
+			table.insert(moveQueue[player], {["x"] = x, ["y"] = y + 1, ["type"] = "middle"});
 			return true;
 		end
 	end
@@ -313,12 +331,58 @@ function checkVertical3(x, y, player)
 				print("Found bottom row");
 			end
 			moveQueue[player] = {};
-			table.insert(moveQueue[player], {["x"]=x,["y"]=y+2,["type"]="bottom"});
+			table.insert(moveQueue[player], {["x"] = x, ["y"] = y + 2, ["type"] = "bottom"});
 			return true;
 		end
 	end
 
 	-- No move found =(
+	return false;
+end
+
+function checkVertical3(x, y, player)
+	-- Skip this check for the bottom of the screen
+	if y > grid_height - 4 then
+		return false;
+	end
+
+	local canMoveRight = x < grid_width;
+	local canMoveLeft = x > 1;
+	local columnColors = {};
+	local currentColor, i, j;
+
+	for i=0,4 do
+		table.insert(columnColors, getColor(x, y + i, player));
+		if not isMoveable(x, y + i, player) then
+			return false;
+		end
+	end
+
+	for currentColor=1,#colors do
+		if currentColor ~= 0 then
+			local currentColorCount = 0;
+			for j=1,#columnColors do
+				if columnColors[j] == currentColor then
+					currentColorCount = currentColorCount + 1;
+				end
+			end
+			if currentColorCount == 3 then
+				for j=#columnColors,1,-1 do
+					if columnColors[j] ~= currentColor then
+						if canMoveRight and getColor(x + 1, y + j - 1, player) == 0 then
+							table.insert(moveQueue[player], {["x"] = x, ["y"] = y + j - 1, ["type"] = "v3r"});
+							return true;
+						end
+						if canMoveLeft and getColor(x - 1, y + j - 1, player) == 0 then
+							table.insert(moveQueue[player], {["x"] = x - 1, ["y"] = y + j - 1, ["type"] = "v3l"});
+							return true;
+						end
+					end
+				end
+			end
+		end
+	end
+
 	return false;
 end
 
@@ -330,10 +394,10 @@ function findMoveGreedy(player)
 	-- Work from the bottom up
 	for y = grid_height - 2, 1, -1 do
 		-- TODO: Allow moveable blocks on top of unmoveable rows to be processed
-		if not isEmpty(y, player) then
+		if not rowIsEmpty(y, player) then
 			-- Work from left to right
-			for x = 1, grid_width - 1 do
-				if checkVertical3(x, y, player) then
+			for x = 1, grid_width do
+				if check2By3(x, y, player) or checkVertical3(x, y, player) then
 					return true;
 				end
 			end
@@ -348,15 +412,42 @@ end
 -- The bot --
 -------------
 
-numMoves = {0, 0};
-frameSum = {0, 0};
+local numMoves = {};
+local frameSum = {};
 
-local previousFrameA = {false, false};
-local previousFrameDirection = {false, false};
+local previousFrameA = {};
+local previousFrameDirection = {};
+
+function resetBotState()
+	if verbose then
+		print("Starting bot...");
+	end
+
+	moveQueue = {};
+	numMoves = {};
+	frameSum = {};
+	previousFrameA = {};
+	previousFrameDirection = {};
+
+	local currentPlayer;
+	for currentPlayer=1,num_players do
+		table.insert(moveQueue, {});
+		table.insert(numMoves, 0);
+		table.insert(frameSum, 0);
+		table.insert(previousFrameA, false);
+		table.insert(previousFrameDirection, false);
+		if verbose then
+			print("Started bot for player "..currentPlayer.."!");
+		end
+	end
+end
+resetBotState();
 
 function getAverageMoveLength()
-	print("avg: "..frameSum[1]/numMoves[1]);
-	print("avg: "..frameSum[2]/numMoves[2]);
+	local currentPlayer;
+	for currentPlayer=1,num_players do
+		print("Avarage move length: "..(frameSum[currentPlayer] / numMoves[currentPlayer]));
+	end
 end
 
 function moveAt(x, y, player)
@@ -373,20 +464,24 @@ function moveAt(x, y, player)
 			joypad.set({["Right"]=true}, player);
 			previousFrameA[player] = false;
 			previousFrameDirection[player] = true;
+			return false;
 		elseif cursorPosition["x"] > x then
 			joypad.set({["Left"]=true}, player);
 			previousFrameA[player] = false;
 			previousFrameDirection[player] = true;
+			return false;
 		end
 
 		if cursorPosition["y"] < y then
 			joypad.set({["Down"]=true}, player);
 			previousFrameA[player] = false;
 			previousFrameDirection[player] = true;
+			return false;
 		elseif cursorPosition["y"] > y then
 			joypad.set({["Up"]=true}, player);
 			previousFrameA[player] = false;
 			previousFrameDirection[player] = true;
+			return false;
 		end
 	else
 		previousFrameDirection[player] = false;
@@ -395,30 +490,32 @@ function moveAt(x, y, player)
 	return false;
 end
 
-local movePickFunctions = {findMoveSimpleSort, findMoveGreedy, pickRandomMove};
---local movePickFunctions = {findMoveSimpleSort, findMoveGreedy, pickRandomMove};
---local movePickFunctions = {findMoveSimpleSort};
---local movePickFunctions = {findMoveDeltaSort};
---local movePickFunctions = {pickRandomMove};
-
 function movePickFunction(player)
-	local i;
-	for i=1,#movePickFunctions do
-		if movePickFunctions[i](player) then
+	if getMaxColumnHeight(player) < grid_height - 3 then
+		-- Calm and collected
+		if findMoveSimpleSort(player) or findMoveGreedy(player) then
+			return true;
+		end
+	else
+		-- Panic mode
+		if findMoveGreedy(player) or findMoveSimpleSort(player) then
 			return true;
 		end
 	end
-	return false;
+
+	-- Last resort
+	return pickRandomMove(player);
 end
 
 function mainLoop()
+	--drawUI(1);
+
 	if emu.islagged() then
 		return;
 	end
 
 	local player;
-	for player = 1, 2 do
-		--drawUI(player);
+	for player = 1, num_players do
 		if #moveQueue[player] > 0 then
 			local currentMove = moveQueue[player][1];
 			if currentMove["framesNeeded"] == nil then
@@ -443,21 +540,27 @@ function mainLoop()
 				if verbose then
 					print("Both squares were empty, finding new move");
 				end
+				table.remove(moveQueue[player]);
 				movePickFunction(player);
 			end
-		else
+		end
+
+		if #moveQueue[player] == 0 then
 			if verbose then
 				print("No moves in queue, finding new move");
 			end
 			movePickFunction(player);
+		end
 
-			-- Make things more exciting
-			-- TODO: Restrict this so that it doesn't fire for too long
-			if #moveQueue[player] == 0 and speedUp and not verbose then
-				joypad.set({["L"]=true},player);
-			end
+		-- Make things more exciting
+		local maxColumnHeight = getMaxColumnHeight(player);
+		if speedUp and maxColumnHeight > 0 and maxColumnHeight < grid_height / 2 and not verbose then
+			joypad.set({["L"]=true},player);
 		end
 	end
 end
 
 event.onframestart(mainLoop, "Bot");
+
+-- Invalidate bot state when a state is loaded
+event.onloadstate(resetBotState, "Reset player state");
