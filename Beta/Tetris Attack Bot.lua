@@ -32,9 +32,13 @@ local unmoveableStates = {
 }
 
 num_players = 2;
-speedUp = false;
+panic_threshold = grid_height - 3;
+speed_threshold = grid_height - 4;
+draw_grid = false;
+speedUp = true;
 verbose = false;
-local moveQueue = {};
+warnings = false;
+moveQueue = {};
 
 -----------------
 -- UI Bollocks --
@@ -53,15 +57,19 @@ function drawGridText(x, y, string)
 end
 
 function drawUI(player)
-	local x,y;
-	for x=1,grid_width do
-		drawGridText(x,0,x);
+	if verbose then
+		print("Drawing grid UI for player "..player);
+	end
+
+	local x, y;
+	for x = 1, grid_width do
+		drawGridText(x, 0, x);
 		if verbose then
-			drawGridText(x,1,getColumnHeight(x));
+			drawGridText(x, 1, getColumnHeight(x, player));
 		end
 	end
-	for y=1,grid_height do
-		drawGridText(0,y,y);
+	for y = 1, grid_height do
+		drawGridText(0, y, y);
 	end
 
 	-- Output current move to the screen
@@ -70,6 +78,11 @@ function drawUI(player)
 		local currentMove = moveQueue[player][1];
 		drawGridText(UI_HUD_LEFT_X_OFFSET, 4, currentMove["x"]..","..currentMove["y"]);
 		drawGridText(UI_HUD_LEFT_X_OFFSET, 5, currentMove["type"]);
+
+		if warnings or verbose then
+			drawGridText(currentMove["x"], currentMove["y"], "L");
+			drawGridText(currentMove["x"] + 1, currentMove["y"], "R");
+		end
 	else
 		drawGridText(UI_HUD_LEFT_X_OFFSET, 4, "None");
 	end
@@ -86,17 +99,42 @@ function getCursorPosition(player)
 end
 
 function getGridAddress(x, y, player)
+	if (warnings or verbose) and (x <= 0 or x > grid_width or y <= 0 or y > grid_height) then
+		print("Warning: getGridAddress("..x..","..y..","..player..") was called with out of bounds X or Y.");
+	end
 	x = x - 1;
 	y = (y - 1) * 0x10;
 	return grid_base[player] + y + (x * 2);
 end
 
+colorCache = {};
 function getColor(x, y, player)
-	return mainmemory.readbyte(getGridAddress(x, y, player));
+	if type(colorCache[player][x][y]) ~= "nil" then
+		return colorCache[player][x][y];
+	end
+	colorCache[player][x][y] = mainmemory.readbyte(getGridAddress(x, y, player));
+	return colorCache[player][x][y];
 end
 
+statusCache = {};
 function getStatus(x, y, player)
-	return mainmemory.readbyte(getGridAddress(x, y, player) + 1);
+	if type(statusCache[player][x][y]) ~= "nil" then
+		return statusCache[player][x][y];
+	end
+	statusCache[player][x][y] = mainmemory.readbyte(getGridAddress(x, y, player) + 1);
+	return statusCache[player][x][y];
+end
+
+function invalidateGridCache(player)
+	-- Invalidate state caches
+	colorCache[player] = {};
+	statusCache[player] = {};
+
+	local x;
+	for x=1,grid_width do
+		colorCache[player][x] = {};
+		statusCache[player][x] = {};
+	end
 end
 
 function isMoveable(x, y, player)
@@ -182,7 +220,6 @@ function findMoveSimpleSort(player)
 	for y = grid_height, 1, -1 do
 		if not isSorted(y, player) then
 			-- Work from left to right
-			local current = -1;
 			for x = 1, grid_width - 1 do
 				local left = getColor(x, y, player);
 				local right = getColor(x + 1, y, player);
@@ -197,7 +234,7 @@ function findMoveSimpleSort(player)
 
 				if left > right and isMoveable(x, y, player) and isMoveable(x + 1, y, player) then
 					moveQueue[player] = {};
-					table.insert(moveQueue[player], {["x"]=x,["y"]=y,["type"]="sort"});
+					table.insert(moveQueue[player], {["x"] = x, ["y"] = y, ["type"] = "sort"});
 					return true;
 				end
 			end
@@ -212,7 +249,6 @@ function findMoveDeltaSort(player)
 	for y = grid_height, 1, -1 do
 		if not isSorted(y, player) then
 			-- Work from left to right
-			local current = -1;
 			for x = 1, grid_width - 1 do
 				local left = getColor(x, y, player);
 				local right = getColor(x + 1, y, player);
@@ -220,7 +256,7 @@ function findMoveDeltaSort(player)
 				local dxr = math.abs(x - right)
 				if dxr > dxl then
 					moveQueue[player] = {};
-					table.insert(moveQueue[player], {["x"] = x,["y"] = y,["type"] = "deltasort"});
+					table.insert(moveQueue[player], {["x"] = x, ["y"] = y, ["type"] = "deltasort"});
 					return true;
 				end
 			end
@@ -255,7 +291,7 @@ function pickRandomMove(player)
 
 	if timeout <= 100 then
 		moveQueue[player] = {};
-		table.insert(moveQueue[player], {["x"]=x,["y"]=y,["type"]="random"});
+		table.insert(moveQueue[player], {["x"] = x, ["y"] = y, ["type"] = "random"});
 		return true;
 	else
 		return false;
@@ -272,10 +308,6 @@ function check2By3(x, y, player)
 		return false;
 	end
 
-	if verbose then
-		print("Checking vertical 3 at "..x..","..y);
-	end
-
 	local tlm = isMoveable(x,     y, player);
 	local trm = isMoveable(x + 1, y, player);
 	local mlm = isMoveable(x,     y + 1, player);
@@ -288,7 +320,7 @@ function check2By3(x, y, player)
 	for i=1,#moveableArray do
 		if moveableArray[i] == false then
 			if verbose then
-				print("A block was unmovable, skipping check at "..x..","..y);
+				print("A block was unmovable, skipping 2x3 check at "..x..","..y.." for player "..player);
 			end
 			return false;
 		end
@@ -301,10 +333,15 @@ function check2By3(x, y, player)
 	local bl = getColor(x    , y + 2, player);
 	local br = getColor(x + 1, y + 2, player);
 
+	if (tl == 0 and tr == 0) or (ml == 0 or mr == 0) and (bl == 0 or br == 0) then
+		return false;
+	end
+
 	if verbose then
-		local colorArray = {tl, tr, ml, mr, bl, br};
-		local colorArrayFriendly = {colors[tl], colors[tr], colors[ml], colors[mr], colors[bl], colors[br]};
-		print(colorArrayFriendly);
+		print("Checking 2x3 at "..x..","..y.." for player "..player);
+		--local colorArray = {tl, tr, ml, mr, bl, br};
+		--local colorArrayFriendly = {colors[tl], colors[tr], colors[ml], colors[mr], colors[bl], colors[br]};
+		--print(colorArrayFriendly);
 	end
 
 	-- Check top row
@@ -321,7 +358,7 @@ function check2By3(x, y, player)
 
 	-- Check middle row
 	if (tl == bl and mr == tl) or (tr == br and ml == tr) then
-		if ml ~= 0 and mr ~= 0 and ml ~= mr then
+		if ml ~= mr then
 			if verbose then
 				print("Found middle row");
 			end
@@ -333,7 +370,7 @@ function check2By3(x, y, player)
 
 	-- Check bottom row
 	if (tl == ml and br == ml) or (tr == mr and bl == mr) then
-		if bl ~= 0 and br ~= 0 and bl ~= br then
+		if bl ~= br then
 			if verbose then
 				print("Found bottom row");
 			end
@@ -358,7 +395,7 @@ function checkVertical3(x, y, player)
 	local columnColors = {};
 	local currentColor, i, j;
 
-	for i=0,4 do
+	for i=1,4 do
 		table.insert(columnColors, getColor(x, y + i, player));
 		if not isMoveable(x, y + i, player) then
 			return false;
@@ -377,10 +414,18 @@ function checkVertical3(x, y, player)
 				for j=#columnColors,1,-1 do
 					if columnColors[j] ~= currentColor then
 						if canMoveRight and getColor(x + 1, y + j - 1, player) == 0 then
+							if verbose then
+								print("Moving block right to make vertical 3 of color "..colors[currentColor]);
+								--print(columnColors);
+							end
 							table.insert(moveQueue[player], {["x"] = x, ["y"] = y + j - 1, ["type"] = "v3r"});
 							return true;
 						end
 						if canMoveLeft and getColor(x - 1, y + j - 1, player) == 0 then
+							if verbose then
+								print("Moving block left to make vertical 3 of color "..colors[currentColor]);
+								--print(columnColors);
+							end
 							table.insert(moveQueue[player], {["x"] = x - 1, ["y"] = y + j - 1, ["type"] = "v3l"});
 							return true;
 						end
@@ -458,47 +503,73 @@ function getAverageMoveLength()
 end
 
 function moveAt(x, y, player)
+	if x <= 0 or x >= grid_width or y <= 0 or y > grid_height then
+		if warnings or verbose then
+			print("Warning: moveAt("..x..","..y..","..player..","..moveQueue[player][1]["type"]..") was called with out of bounds X or Y.");
+		end
+		return true;
+	end
+
+	if not isMoveable(x, y, player) or not isMoveable(x + 1, y, player) then
+		if warnings or verbose then
+			print("Warning: moveAt("..x..","..y..","..player..","..moveQueue[player][1]["type"]..") was called with unmoveable blocks.");
+		end
+		return true;
+	end
+
+	if not getColor(x, y, player) == 0 and getColor(x + 1, y, player) == 0 then
+		if warnings or verbose then
+			print("Warning: moveAt("..x..","..y..","..player..","..moveQueue[player][1]["type"]..") was called with both L and R squares empty.");
+		end
+		return true;
+	end
+
 	local cursorPosition = getCursorPosition(player);
 
 	if cursorPosition["x"] == x and cursorPosition["y"] == y then
 		previousFrameA[player] = not previousFrameA[player];
-		joypad.set({["A"]=previousFrameA[player]}, player);
+		joypad.set({["A"] = previousFrameA[player]}, player);
 		return true;
 	end
 
 	if not previousFrameDirection[player] then
 		if cursorPosition["x"] < x then
-			joypad.set({["Right"]=true}, player);
+			joypad.set({["Right"] = true}, player);
 			previousFrameA[player] = false;
 			previousFrameDirection[player] = true;
 			return false;
 		elseif cursorPosition["x"] > x then
-			joypad.set({["Left"]=true}, player);
+			joypad.set({["Left"] = true}, player);
 			previousFrameA[player] = false;
 			previousFrameDirection[player] = true;
 			return false;
 		end
 
 		if cursorPosition["y"] < y then
-			joypad.set({["Down"]=true}, player);
+			joypad.set({["Down"] = true}, player);
 			previousFrameA[player] = false;
 			previousFrameDirection[player] = true;
 			return false;
 		elseif cursorPosition["y"] > y then
-			joypad.set({["Up"]=true}, player);
+			joypad.set({["Up"] = true}, player);
 			previousFrameA[player] = false;
 			previousFrameDirection[player] = true;
 			return false;
 		end
 	else
 		previousFrameDirection[player] = false;
+		return false;
+	end
+
+	if warnings or verbose then
+		print("Warning: Made it to the end of moveAt("..x..","..y..","..player..","..moveQueue[player][1]["type"]..") this shouldn't happen.");
 	end
 
 	return false;
 end
 
 function movePickFunction(player)
-	if getMaxColumnHeight(player) < grid_height - 3 then
+	if getMaxColumnHeight(player) < panic_threshold then
 		-- Calm and collected
 		if findMoveSimpleSort(player) or findMoveGreedy(player) then
 			return true;
@@ -515,14 +586,18 @@ function movePickFunction(player)
 end
 
 function mainLoop()
-	--drawUI(1);
-
 	if emu.islagged() then
 		return;
 	end
 
 	local player;
 	for player = 1, num_players do
+		invalidateGridCache(player)
+
+		if draw_grid then
+			drawUI(player);
+		end
+
 		if #moveQueue[player] > 0 then
 			local currentMove = moveQueue[player][1];
 			if currentMove["framesNeeded"] == nil then
@@ -561,8 +636,8 @@ function mainLoop()
 
 		-- Make things more exciting
 		local maxColumnHeight = getMaxColumnHeight(player);
-		if speedUp and maxColumnHeight > 0 and maxColumnHeight < grid_height / 2 and not verbose then
-			joypad.set({["L"]=true},player);
+		if speedUp and maxColumnHeight > 0 and maxColumnHeight < speed_threshold and not verbose then
+			joypad.set({["L"] = true}, player);
 		end
 	end
 end
