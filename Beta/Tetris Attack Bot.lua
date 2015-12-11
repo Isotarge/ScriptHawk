@@ -2,6 +2,7 @@ local cursor_left_x = {0x3A4, 0x3A6};
 local cursor_left_y = {0x3A8, 0x3AA};
 local cursor_right_x = {0x3AC, 0x3AE};
 local cursor_right_y = {0x3B0, 0x3B2};
+local row_height_tickers = {0x404, 0x406}
 
 local grid_base = {0xFAE, 0x10AE};
 
@@ -39,6 +40,7 @@ speedUp = true;
 verbose = false;
 warnings = false;
 moveQueue = {};
+previousHeightTickerValues = {};
 
 -----------------
 -- UI Bollocks --
@@ -460,6 +462,17 @@ function findMoveGreedy(player)
 	return false;
 end
 
+------------------
+-- Ticker stuff --
+------------------
+
+function gridHasChangedHeight(player)
+	local currentHeightTickerValue = mainmemory.readbyte(row_height_tickers[player]);
+	local hasChangedHeight = currentHeightTickerValue < previousHeightTickerValues[player];
+	previousHeightTickerValues[player] = currentHeightTickerValue;
+	return hasChangedHeight;
+end
+
 -------------
 -- The bot --
 -------------
@@ -480,6 +493,7 @@ function resetBotState()
 	frameSum = {};
 	previousFrameA = {};
 	previousFrameDirection = {};
+	previousHeightTickerValues = {};
 
 	local currentPlayer;
 	for currentPlayer=1,num_players do
@@ -488,6 +502,7 @@ function resetBotState()
 		table.insert(frameSum, 0);
 		table.insert(previousFrameA, false);
 		table.insert(previousFrameDirection, false);
+		table.insert(previousHeightTickerValues, -1);
 		if verbose then
 			print("Started bot for player "..currentPlayer.."!");
 		end
@@ -603,6 +618,14 @@ function mainLoop()
 			if currentMove["framesNeeded"] == nil then
 				currentMove["framesNeeded"] = 0;
 			end
+
+			if gridHasChangedHeight(player) then
+				if verbose then
+					print("Player "..player.." grid has changed height, adjusting current move accordingly.");
+				end
+				currentMove["y"] = math.max(1, currentMove["y"] - 1);
+			end
+
 			local cL = getColor(currentMove["x"], currentMove["y"], player);
 			local cR = getColor(currentMove["x"] + 1, currentMove["y"], player);
 			if cL ~= 0 or cR ~= 0 then
