@@ -1,10 +1,30 @@
-local cursor_left_x = {0x3A4, 0x3A6};
-local cursor_left_y = {0x3A8, 0x3AA};
-local cursor_right_x = {0x3AC, 0x3AE};
-local cursor_right_y = {0x3B0, 0x3B2};
-local row_height_tickers = {0x404, 0x406}
+local romName = gameinfo.getromname();
 
-local grid_base = {0xFAE, 0x10AE};
+local cursor_left_x;
+local cursor_left_y;
+local cursor_right_x;
+local cursor_right_y;
+local row_height_tickers;
+local grid_base;
+
+if romName == "Panel de Pon (Japan)" then
+	cursor_left_x = {0x3A6, 0x3A8};
+	cursor_left_y = {0x3AA, 0x3AC};
+	cursor_right_x = {0x3AE, 0x3B0};
+	cursor_right_y = {0x3B2, 0x3B4};
+	row_height_tickers = {0x406, 0x408};
+	grid_base = {0x17B0, 0x18B0};
+elseif romName == "Tetris Attack (USA) (En,Ja)" then
+	cursor_left_x = {0x3A4, 0x3A6};
+	cursor_left_y = {0x3A8, 0x3AA};
+	cursor_right_x = {0x3AC, 0x3AE};
+	cursor_right_y = {0x3B0, 0x3B2};
+	row_height_tickers = {0x404, 0x406};
+	grid_base = {0xFAE, 0x10AE};
+else
+	print("This game is not currently supported.");
+	return;
+end
 
 local grid_height = 12;
 local grid_width = 6;
@@ -335,6 +355,7 @@ function findMoveSimpleSort(player)
 				end
 
 				if left > right and isMoveable(x, y, player) and isMoveable(x + 1, y, player) then
+					-- TODO: Pick closest move to cursor
 					moveQueue[player] = {};
 					table.insert(moveQueue[player], {["x"] = x, ["y"] = y, ["type"] = "sort"});
 					return true;
