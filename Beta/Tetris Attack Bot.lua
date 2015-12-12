@@ -67,7 +67,7 @@ function drawUI(player)
 	for x = 1, grid_width do
 		drawGridText(x, 0, x);
 		if verbose then
-			drawGridText(x, 1, getColumnHeight(x, player));
+			drawGridText(x, 1, getColumnHeight(x, player, true));
 		end
 	end
 	for y = 1, grid_height do
@@ -150,27 +150,34 @@ function isMoveable(x, y, player)
 	return true;
 end
 
-function getMaxColumnHeight(player)
+function getMaxColumnHeight(player, includeUnmoveable)
 	local x;
 	local maxHeight = 0;
 	for x=1,grid_width do
-		maxHeight = math.max(getColumnHeight(x, player), maxHeight);
+		maxHeight = math.max(getColumnHeight(x, player, includeUnmoveable), maxHeight);
 	end
 	return maxHeight;
 end
 
-function getColumnHeight(x, player)
+function getColumnHeight(x, player, includeUnmoveable)
 	local y;
+	local height = 0;
 	for y=1,grid_height do
-		if getColor(x, y, player) ~= 0x00 then
-			return grid_height - y + 1;
+		if includeUnmoveable then
+			if getColor(x, y, player) ~= 0x00 then
+				height = height + 1;
+			end
+		else
+			if getColor(x, y, player) ~= 0x00 and isMoveable(x, y, player) then
+				height = height + 1;
+			end
 		end
 	end
-	return 0;
+	return height;
 end
 
-function columnIsEmpty(x, player)
-	return getColumnHeight(x, player) == 0;
+function columnIsEmpty(x, player, includeUnmoveable)
+	return getColumnHeight(x, player, includeUnmoveable) == 0;
 end
 
 function rowIsEmpty(y, player)
@@ -193,11 +200,103 @@ function rowContains(y, color, player)
 	return false;
 end
 
+function countColorInColumn(x, color, player)
+	local y;
+	local count = 0;
+	for y=1,grid_height do
+		if getColor(x, y, player) == color then
+			count = count + 1;
+		end
+	end
+	return count;
+end
+
+function getMostCommonColumn(color, player)
+	local x;
+	local mostCommonX = 0;
+	local mostCommonAmount = -1;
+	for x=1, grid_width do
+		local currentAmount = countColorInColumn(x, color, player);
+		if currentAmount > mostCommonAmount then
+			mostCommonX = x;
+			mostCommonAmount = currentAmount;
+		end
+	end
+	return mostCommonX;
+end
+
 function getColorAtCursor(player)
 	local cursorPosition = getCursorPosition(player);
 	local leftColor = getColor(cursorPosition["x"], cursorPosition["y"], player);
 	local rightColor = getColor(cursorPosition["x"] + 1, cursorPosition["y"], player);
 	return {leftColor, rightColor};
+end
+
+------------------------
+-- Mode based sorting --
+------------------------
+
+function isSortedMode(y, player)
+	local mostCommonColumns = {
+		[0] = getMostCommonColumn(0, player),
+		getMostCommonColumn(1, player),
+		getMostCommonColumn(2, player),
+		getMostCommonColumn(3, player),
+		getMostCommonColumn(4, player),
+		getMostCommonColumn(5, player),
+		getMostCommonColumn(6, player),
+		getMostCommonColumn(7, player)
+	};
+
+	local currentColor = -1;
+	local x;
+	for x = 1, grid_width do
+		currentColor = getColor(x, y, player);
+		
+		-- TODO: improve this
+		if not isMoveable(x, y, player) then
+			return true;
+		end
+		
+		if currentColor ~= 0 then
+			if x ~= mostCommonColumns[currentColor] then
+				return false;
+			end
+		end
+	end
+	return true;
+end
+
+function findMoveModeSort(player)
+	local x, y;
+	local mostCommonColumns = {
+		[0] = getMostCommonColumn(0, player),
+		getMostCommonColumn(1, player),
+		getMostCommonColumn(2, player),
+		getMostCommonColumn(3, player),
+		getMostCommonColumn(4, player),
+		getMostCommonColumn(5, player),
+		getMostCommonColumn(6, player),
+		getMostCommonColumn(7, player)
+	};
+
+	-- Work from the bottom up
+	for y = grid_height, 1, -1 do
+		if not isSortedMode(y, player) then
+			-- Work from left to right
+			for x = 1, grid_width - 1 do
+				local left = getColor(x, y, player);
+				local right = getColor(x + 1, y, player);
+
+				if left ~= right and mostCommonColumns[left] > mostCommonColumns[right] and isMoveable(x, y, player) and isMoveable(x + 1, y, player) then
+					moveQueue[player] = {};
+					table.insert(moveQueue[player], {["x"] = x, ["y"] = y, ["type"] = "sort"});
+					return true;
+				end
+			end
+		end
+	end
+	return false;
 end
 
 -------------------------------------------------
@@ -206,6 +305,7 @@ end
 
 function isSorted(y, player)
 	local current = -1;
+	local x;
 	for x = 1, grid_width do
 		if getColor(x, y, player) >= current then
 			current = getColor(x, y, player);
@@ -245,33 +345,10 @@ function findMoveSimpleSort(player)
 	return false;
 end
 
-function findMoveDeltaSort(player)
-	local x, y;
-	-- Work from the bottom up
-	for y = grid_height, 1, -1 do
-		if not isSorted(y, player) then
-			-- Work from left to right
-			for x = 1, grid_width - 1 do
-				local left = getColor(x, y, player);
-				local right = getColor(x + 1, y, player);
-				local dxl = math.abs(x - left);
-				local dxr = math.abs(x - right)
-				if dxr > dxl then
-					moveQueue[player] = {};
-					table.insert(moveQueue[player], {["x"] = x, ["y"] = y, ["type"] = "deltasort"});
-					return true;
-				end
-			end
-		end
-	end
-	return false;
-end
-
 function pickRandomMove(player)
 	local timeout = 0;
 	local x,y, left, right, leftMoveable, rightMoveable;
-	-- TODO: Make sure this doesn't take into account unmoveable blocks
-	local maxColumnHeight = getMaxColumnHeight(player);
+	local maxColumnHeight = getMaxColumnHeight(player, false);
 	local currentColumnHeight = -1;
 	repeat
 		x = math.random(1, grid_width);
@@ -584,14 +661,16 @@ function moveAt(x, y, player)
 end
 
 function movePickFunction(player)
-	if getMaxColumnHeight(player) < panic_threshold then
+	if getMaxColumnHeight(player, true) < panic_threshold then
 		-- Calm and collected
 		if findMoveSimpleSort(player) or findMoveGreedy(player) then
+		--if findMoveModeSort(player) or findMoveGreedy(player) then
 			return true;
 		end
 	else
 		-- Panic mode
 		if findMoveGreedy(player) or findMoveSimpleSort(player) then
+		--if findMoveGreedy(player) or findMoveModeSort(player) then
 			return true;
 		end
 	end
@@ -658,7 +737,7 @@ function mainLoop()
 		end
 
 		-- Make things more exciting
-		local maxColumnHeight = getMaxColumnHeight(player);
+		local maxColumnHeight = getMaxColumnHeight(player, true);
 		if speedUp and maxColumnHeight > 0 and maxColumnHeight < speed_threshold and not verbose then
 			joypad.set({["L"] = true}, player);
 		end
