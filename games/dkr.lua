@@ -394,9 +394,9 @@ local otap_enabled = false;
 local otap_startFrame = emu.framecount();
 local otap_startLag = emu.lagcount();
 
--- TODO: Adjust velocity based on Z Velocity
--- TODO: Adjust velocity based on bananas
--- TODO: Adjust velocity based on character
+-- TODO: Adjust velocity thresholds based on lateral velocity
+-- TODO: Adjust velocity thresholds based on bananas
+-- TODO: Adjust velocity thresholds based on character
 -- Numbers optimized for TT with 0 bananas
 velocity_min = -9.212730408;
 velocity_med = -12.34942532;

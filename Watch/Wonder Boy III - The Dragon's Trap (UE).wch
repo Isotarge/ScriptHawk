@@ -1,0 +1,8 @@
+Domain Main RAM
+SystemID SMS
+0243	w	u	0	Main RAM	X Position
+0246	w	u	0	Main RAM	Y Position
+0248	w	s	0	Main RAM	X Velocity
+024B	b	s	0	Main RAM	Y Velocity
+0F52	w	u	0	Main RAM	Health
+
