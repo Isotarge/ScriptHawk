@@ -36,9 +36,12 @@ SystemID SMS
 0F3B	b	h	0	Main RAM	Armor State - Dragon
 0F3C	b	h	0	Main RAM	Armor State - Prince
 0F3D	b	h	0	Main RAM	Armor State - Hades
-0F40	b	u	0	Main RAM	Arrows
-0F41	b	u	0	Main RAM	Boomerangs
+0F3E	b	u	0	Main RAM	Fire Ball
+0F3F	b	u	0	Main RAM	Tornado
+0F40	b	u	0	Main RAM	Arrow
+0F41	b	u	0	Main RAM	Boomerang
 0F42	b	u	0	Main RAM	Thunder
+0F48	b	u	0	Main RAM	Stone
 0F4A	b	u	0	Main RAM	Lives
 0F52	w	1	0	Main RAM	Health
 0F55	b	u	0	Main RAM	Gold (Ones)
@@ -48,9 +51,11 @@ SystemID SMS
 0F59	b	u	0	Main RAM	Gold (Ten Thousands)
 0F5A	b	u	0	Main RAM	Gold (Hundred Thousands)
 0F5B	b	u	0	Main RAM	Maximum Transformation Unlocked
+0F69	b	h	0	Main RAM	Selected Power Up
 0F86	b	h	0	Main RAM	Pause Menu Init
 111C	b	u	0	Main RAM	Menu Index
 111E	b	u	0	Main RAM	Lives Hud Digit (Ones)
 111F	b	u	0	Main RAM	Lives Hud Digit (Tens)
 116A	w	1	0	Main RAM	Boss Health
+1150	w	1	0	Main RAM	Boss X Position
 
