@@ -4,5 +4,42 @@ SystemID SMS
 0246	w	u	0	Main RAM	Y Position
 0248	w	s	0	Main RAM	X Velocity
 024B	b	s	0	Main RAM	Y Velocity
+026F	b	u	0	Main RAM	Door Timer
+0F20	b	h	0	Main RAM	Sword State - Legendary
+0F21	b	h	0	Main RAM	Sword State - Ivory
+0F22	b	h	0	Main RAM	Sword State - Mithril
+0F23	b	h	0	Main RAM	Sword State - Shogun
+0F24	b	h	0	Main RAM	Sword State - Crystal
+0F25	b	h	0	Main RAM	Sword State - Thunder
+0F26	b	h	0	Main RAM	Sword State - Magical
+0F27	b	h	0	Main RAM	Sword State - Lucky
+0F28	b	h	0	Main RAM	Sword State - Muramasa
+0F29	b	h	0	Main RAM	Sword State - Tasmanian
+0F2A	b	h	0	Main RAM	Shield State - Legendary
+0F2B	b	h	0	Main RAM	Shield State - Ivory
+0F2C	b	h	0	Main RAM	Shield State - Mithril
+0F2D	b	h	0	Main RAM	Shield State - Shogun
+0F2E	b	h	0	Main RAM	Shield State - Crystal
+0F2F	b	h	0	Main RAM	Shield State - Knight
+0F30	b	h	0	Main RAM	Shield State - Dancing
+0F31	b	h	0	Main RAM	Shield State - Aqua
+0F32	b	h	0	Main RAM	Shield State - Master
+0F33	b	h	0	Main RAM	Shield State - Heavenly
+0F34	b	h	0	Main RAM	Armor State - Legendary
+0F35	b	h	0	Main RAM	Armor State - Ivory
+0F36	b	h	0	Main RAM	Armor State - Mithril
+0F37	b	h	0	Main RAM	Armor State - Shogun
+0F38	b	h	0	Main RAM	Armor State - Crystal
+0F39	b	h	0	Main RAM	Armor State - Goblin
+0F3A	b	h	0	Main RAM	Armor State - Samurai
+0F3B	b	h	0	Main RAM	Armor State - Dragon
+0F3C	b	h	0	Main RAM	Armor State - Prince
+0F3D	b	h	0	Main RAM	Armor State - Hades
 0F52	w	u	0	Main RAM	Health
+0F55	b	u	0	Main RAM	Gold (Ones)
+0F56	b	u	0	Main RAM	Gold (Tens)
+0F57	b	u	0	Main RAM	Gold (Hundreds)
+0F58	b	u	0	Main RAM	Gold (Thousands)
+0F59	b	u	0	Main RAM	Gold (Ten Thousands)
+111C	b	u	0	Main RAM	Menu Index
 
