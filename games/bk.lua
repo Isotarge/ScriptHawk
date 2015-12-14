@@ -10,7 +10,10 @@ local allowFurnaceFunPatch = false;
 
 local slope_timer;
 local moves_bitfield;
+
+local x_vel;
 local y_vel;
+local z_vel;
 
 local x_pos;
 local y_pos;
@@ -18,13 +21,14 @@ local z_pos;
 
 local x_rot;
 local facing_angle;
+local moving_angle;
 local z_rot;
 
 local camera_rot = 0x37D96C;
 
 local map;
 local game_time_base;
-local level_object_array_pointer;
+local object_array_pointer;
 
 local notes;
 
@@ -70,45 +74,45 @@ local eep_checksum_values = {
 }
 
 Game.maps = {
-	"Spiral Mountain",
-	"Mumbo's Mountain",
+	"SM - Spiral Mountain",
+	"MM - Mumbo's Mountain",
 	"Unknown 0x03",
 	"Unknown 0x04",
 	"TTC - Blubber's Ship",
 	"TTC - Nipper's Shell",
-	"Treasure Trove Cove",
+	"TTC - Treasure Trove Cove",
 	"Unknown 0x08",
 	"Unknown 0x09",
 	"TTC - Sandcastle",
-	"Clanker's Cavern",
+	"CC - Clanker's Cavern",
 	"MM - Termite Mound",
-	"Bubblegloop Swamp",
+	"BGS - Bubblegloop Swamp",
 	"Mumbo's Skull (MM)",
 	"Unknown 0x0F",
-	"Bubblegloop - Mr. Vile",
-	"Bubblegloop - Tiptup",
-	"Gobi's Valley",
-	"Gobi's - Matching Game",
-	"Gobi's - Maze",
-	"Gobi's - Water",
-	"Gobi's - Snake",
+	"BGS - Mr. Vile",
+	"BGS - Tiptup",
+	"GV - Gobi's Valley",
+	"GV - Matching Game",
+	"GV - Maze",
+	"GV - Water",
+	"GV - Snake",
 	"Unknown 0x17",
 	"Unknown 0x18",
 	"Unknown 0x19",
-	"Gobi's - Sphinx",
-	"Mad Monster Mansion",
+	"GV - Sphinx",
+	"MMM - Mad Monster Mansion",
 	"MMM - Church",
 	"MMM - Cellar",
 	"Intro - Start - Nintendo",
 	"Intro - Start - Rareware",
 	"Intro - End Scene 2: Not 100",
-	"Clanker's - Inside A",
-	"Clanker's - Inside B",
-	"Clanker's - Gold Feather Room",
+	"CC - Inside A",
+	"CC - Inside B",
+	"CC - Gold Feather Room",
 	"MMM - Tumblar's Shed",
 	"MMM - Well",
 	"MMM - Dining Room",
-	"Freezeezy Peak",
+	"FP - Freezeezy Peak",
 	"MMM - Room 1",
 	"MMM - Room 2",
 	"MMM - Room 3: Fireplace",
@@ -118,23 +122,23 @@ Game.maps = {
 	"MMM - Room 6: Floorboards",
 	"MMM - Barrel",
 	"Mumbo's Skull (MMM)",
-	"Rusty Bucket Bay",
+	"RBB - Rusty Bucket Bay",
 	"Unknown 0x32",
 	"Unknown 0x33",
-	"Rusty - Engine Room",
-	"Rusty - Warehouse 1",
-	"Rusty - Warehouse 2",
-	"Rusty - Container 1",
-	"Rusty - Container 3",
-	"Rusty - Crew Cabin",
-	"Rusty - Boss Boom Box",
-	"Rusty - Store Room",
-	"Rusty - Kitchen",
-	"Rusty - Navigation Room",
-	"Rusty - Container 2",
-	"Rusty - Captain's Cabin",
+	"RBB - Engine Room",
+	"RBB - Warehouse 1",
+	"RBB - Warehouse 2",
+	"RBB - Container 1",
+	"RBB - Container 3",
+	"RBB - Crew Cabin",
+	"RBB - Boss Boom Box",
+	"RBB - Store Room",
+	"RBB - Kitchen",
+	"RBB - Navigation Room",
+	"RBB - Container 2",
+	"RBB - Captain's Cabin",
 	"CCW - Start",
-	"Freezeezy - Boggy's Igloo",
+	"FP - Boggy's Igloo",
 	"Unknown 0x42",
 	"CCW - Spring",
 	"CCW - Summer",
@@ -152,7 +156,7 @@ Game.maps = {
 	"Unknown 0x50",
 	"Unknown 0x51",
 	"Unknown 0x52",
-	"Freezeezy - Inside Xmas Tree",
+	"FP - Inside Xmas Tree",
 	"Unknown 0x54",
 	"Unknown 0x55",
 	"Unknown 0x56",
@@ -196,7 +200,7 @@ Game.maps = {
 	"Intro - Inside Banjo's Cave 1 - Scenes 3,7",
 	"Intro - Spiral 'A' - Scenes 2,4",
 	"Intro - Spiral 'B' - Scenes 5,6",
-	"Freezeezy - Wozza's Cave",
+	"FP - Wozza's Cave",
 	"Lair - Flr 3, Area 4a",
 	"Intro - Grunties Lair 2",
 	"Intro - Grunties Lair 3 - Machine 1",
@@ -208,14 +212,14 @@ Game.maps = {
 	"Intro - Spiral 'F'",
 	"Intro - Inside Banjo's Cave 2",
 	"Intro - Inside Banjo's Cave 3",
-	"Rusty - Anchor room",
+	"RBB - Anchor room",
 	"SM - Banjo's House",
 	"MMM - Inside Loggo",
 	"Lair - Furnace Fun",
 	"TTC - Sharkfood Island",
 	"Lair - Battlements",
 	"File Select Screen",
-	"Gobi's - Secret Chamber",
+	"GV - Secret Chamber",
 	"Lair - Flr 5, Area 1: Grunty's rooms",
 	"Intro - Spiral 'G'",
 	"Intro - End Scene 3: All 100",
@@ -229,52 +233,63 @@ function Game.detectVersion(romName)
 	if bizstring.contains(romName, "Europe") then
 		slope_timer = 0x37CCB4;
 		moves_bitfield = 0x37CD70;
-		y_vel = 0x37CE8C;
-		x_pos = 0x37cf70;
-		x_rot = 0x37d064;
+		x_vel = 0x37CE88;
+		x_pos = 0x37CF70;
+		x_rot = 0x37CF10;
+		moving_angle = 0x37D064;
+		z_rot = 0x37D050;
 		map = 0x37F2C5;
 		notes = 0x386943;
 		game_time_base = 0x3869E4;
-		level_object_array_pointer = 0x36EAE0;
+		object_array_pointer = 0x36EAE0;
 	elseif bizstring.contains(romName, "Japan") then
 		slope_timer = 0x37CDE4;
 		moves_bitfield = 0x37CEA0;
-		y_vel = 0x37CFBC;
-		x_pos = 0x37d0a0;
-		x_rot = 0x37d194;
+		x_vel = 0x37CFB8;
+		x_pos = 0x37D0A0;
+		x_rot = 0x37D040;
+		moving_angle = 0x37D194;
+		z_rot = 0x37D180;
 		map = 0x37F405;
 		notes = 0x386AA3;
 		game_time_base = 0x386B44;
-		level_object_array_pointer = 0x36F260;
+		object_array_pointer = 0x36F260;
 	elseif bizstring.contains(romName, "USA") and bizstring.contains(romName, "Rev A") then
 		slope_timer = 0x37B4E4;
 		moves_bitfield = 0x37B5A0;
-		y_vel = 0x37B6BC;
-		x_pos = 0x37b7a0;
-		x_rot = 0x37b894;
+		x_vel = 0x37B6B8;
+		x_pos = 0x37B7A0;
+		x_rot = 0x37B740;
+		moving_angle = 0x37B894;
+		z_rot = 0x37B880;
 		map = 0x37DAF5;
 		notes = 0x385183;
 		game_time_base = 0x385224;
-		level_object_array_pointer = 0x36D760;
+		object_array_pointer = 0x36D760;
 	elseif bizstring.contains(romName, "USA") then
 		allowFurnaceFunPatch = true;
 		slope_timer = 0x37C2E4;
 		moves_bitfield = 0x37C3A0;
-		y_vel = 0x37C4BC;
-		x_pos = 0x37c5a0;
-		x_rot = 0x37c694;
+		x_vel = 0x37C4B8;
+		x_pos = 0x37C5A0;
+		x_rot = 0x37C540;
+		moving_angle = 0x37C694;
+		z_rot = 0x37C680;
 		map = 0x37E8F5;
 		notes = 0x385F63;
 		game_time_base = 0x386004;
-		level_object_array_pointer = 0x36E560;
+		object_array_pointer = 0x36E560;
 	else
 		return false;
 	end
 
 	y_pos = x_pos + 4;
 	z_pos = y_pos + 4;
-	facing_angle = x_rot;
-	z_rot = x_rot;
+
+	y_vel = x_vel + 4;
+	z_vel = y_vel + 4;
+
+	facing_angle = moving_angle - 4;
 
 	-- Read EEPROM checksums
 	if memory.usememorydomain("EEPROM") then
@@ -474,7 +489,7 @@ local function updateWave()
 		wave_counter = wave_counter + 1;
 		if wave_counter == wave_delay then
 			local i;
-			local vile_state = mainmemory.read_u24_be(level_object_array_pointer + 1);
+			local vile_state = mainmemory.read_u24_be(object_array_pointer + 1);
 			for i=1,#waveFrames[wave_frame] do
 				fireSlot(vile_state, getSlotIndex(waveFrames[wave_frame][i][1], waveFrames[wave_frame][i][2]), wave_colour);
 			end
@@ -488,7 +503,7 @@ local function updateWave()
 end
 
 local function doHeart()
-	local vile_state = mainmemory.read_u24_be(level_object_array_pointer + 1);
+	local vile_state = mainmemory.read_u24_be(object_array_pointer + 1);
 	local i;
 
 	for i=1,#heart do
@@ -497,7 +512,7 @@ local function doHeart()
 end
 
 local function fireAllSlots()
-	local vile_state = mainmemory.read_u24_be(level_object_array_pointer + 1);
+	local vile_state = mainmemory.read_u24_be(object_array_pointer + 1);
 	local i;
 
 	local colour = math.random(0, 1);
@@ -544,7 +559,7 @@ local orange_timer_value = 0.5;
 function set_orange_timer()
 	joypad_pressed = input.get();
 	if joypad_pressed["C"] then
-		local level_object_array_base = mainmemory.read_u24_be(level_object_array_pointer + 1);
+		local level_object_array_base = mainmemory.read_u24_be(object_array_pointer + 1);
 		mainmemory.writefloat(level_object_array_base + throw_slot * conga_slot_size + orange_timer, orange_timer_value, true);
 		--print(toHexString(level_object_array_base + throw_slot * conga_slot_size + orange_timer));
 	end
@@ -568,12 +583,12 @@ local slot_y_pos = 0x168;
 local slot_z_pos = 0x16C;
 
 local function get_num_slots()
-	local level_object_array_state = mainmemory.read_u24_be(level_object_array_pointer + 1);
+	local level_object_array_state = mainmemory.read_u24_be(object_array_pointer + 1);
 	return math.min(max_slots, mainmemory.read_u32_be(level_object_array_state));
 end
 
 local function get_slot_base(index)
-	local level_object_array_state = mainmemory.read_u24_be(level_object_array_pointer + 1);
+	local level_object_array_state = mainmemory.read_u24_be(object_array_pointer + 1);
 	return level_object_array_state + first_slot_base + index * slot_size;
 end
 
@@ -667,7 +682,7 @@ function Game.getXRotation()
 end
 
 function Game.getYRotation()
-	return mainmemory.readfloat(facing_angle, true);
+	return mainmemory.readfloat(moving_angle, true);
 end
 
 function Game.getZRotation()
@@ -676,14 +691,21 @@ end
 
 function Game.setXRotation(value)
 	mainmemory.writefloat(x_rot, value, true);
+
+	-- Also set the target
+	mainmemory.writefloat(x_rot + 4, value, true);
 end
 
 function Game.setYRotation(value)
+	mainmemory.writefloat(moving_angle, value, true);
 	mainmemory.writefloat(facing_angle, value, true);
 end
 
 function Game.setZRotation(value)
 	mainmemory.writefloat(z_rot, value, true);
+
+	-- Also set the target
+	mainmemory.writefloat(z_rot + 4, value, true);
 end
 
 ------------

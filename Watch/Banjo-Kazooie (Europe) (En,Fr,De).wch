@@ -1,35 +1,43 @@
 Domain RDRAM
 SystemID N64
-000074	d	h	0	EEPROM	EEPROM Checksum 1
-0000EC	d	h	0	EEPROM	EEPROM Checksum 2
-000164	d	h	0	EEPROM	EEPROM Checksum 3
-0001DC	d	h	0	EEPROM	EEPROM Checksum 4
-0001FC	d	h	0	EEPROM	EEPROM Checksum 5
-283220	w	h	1	RDRAM	Stop'N'Swop Items
+283220	w	b	1	RDRAM	Stop'N'Swop Items
 2984FA	w	h	1	RDRAM	Banjo Model Replacement
 2984FE	w	h	1	RDRAM	Banjo Model Replacement
-36EAE0	d	h	1	RDRAM	Vile State pointer
+36EAE0	d	h	1	RDRAM	Object Array Pointer
 37CCB4	d	f	1	RDRAM	Slope Timer
 37CD70	d	h	1	RDRAM	Moves Unlocked (Bitfield)
+37CE88	d	f	1	RDRAM	X Velocity
 37CE8C	d	f	1	RDRAM	Y Velocity
+37CE90	d	f	1	RDRAM	Z Velocity
+37CF10	d	f	1	RDRAM	X Rotation - Current
+37CF14	d	f	1	RDRAM	X Rotation - Moving to
+37CF18	d	f	1	RDRAM	X Rotation - Update speed
 37CF70	d	f	1	RDRAM	X Position
 37CF74	d	f	1	RDRAM	Y Position
 37CF78	d	f	1	RDRAM	Z Position
-37D064	d	f	1	RDRAM	Facing angle
+37D050	d	f	1	RDRAM	Z Rotation - Current
+37D054	d	f	1	RDRAM	Z Rotation - Moving to
+37D058	d	f	1	RDRAM	Z Rotation - Update speed
+37D060	d	f	1	RDRAM	Facing Angle
+37D064	d	f	1	RDRAM	Moving angle
 37E784	d	f	1	RDRAM	Jiggy Spawn Angle
 37E788	d	f	1	RDRAM	Jiggy Spawn Velocity
-37F2C5	b	h	1	RDRAM	Map
+37F2C5	b	u	1	RDRAM	Map
 383B91	w	h	1	RDRAM	Cauldron state
-386943	b	u	1	RDRAM	Notes (on hand)
-386947	b	u	1	RDRAM	Eggs
-38694F	b	u	1	RDRAM	Red Feathers
-386953	b	u	1	RDRAM	Gold Feathers
-386963	b	u	1	RDRAM	Health
-386967	b	u	1	RDRAM	Health Containers
-38696B	b	u	1	RDRAM	Lives
+38691C	d	s	1	RDRAM	RBB Fan timer value
+386934	d	s	1	RDRAM	RBB Fan timer shown
+38693C	d	f	1	RDRAM	FP Tree timer shown
+386940	d	s	1	RDRAM	Notes (on hand)
+386944	d	s	1	RDRAM	Eggs
+38694C	d	s	1	RDRAM	Red Feathers
+386950	d	s	1	RDRAM	Gold Feathers
+386960	d	s	1	RDRAM	Health
+386964	d	s	1	RDRAM	Health Containers
+386968	d	s	1	RDRAM	Lives
 38696E	b	u	1	RDRAM	Air
 38696F	b	u	1	RDRAM	Air timer
-386980	d	u	1	RDRAM	Mumbo Tokens
+386980	d	s	1	RDRAM	Mumbo Tokens
+3869A4	d	s	1	RDRAM	Mumbo Tokens (on hand)
 3869A8	d	s	1	RDRAM	Jiggies (on hand)
 3869E4	d	f	1	RDRAM	Game Time (MM)
 3869E8	d	f	1	RDRAM	Game Time (TTC)

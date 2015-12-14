@@ -543,6 +543,7 @@ All locked    0x0000
 All available 0xFE00
 All collected 0xFFFC
 
+(Left to right)
 Bit 1 Yellow egg available
 Bit 2 Red egg available
 Bit 3 Green egg available
@@ -560,6 +561,8 @@ Bit 13 Cyan egg collected
 Bit 14 Ice Key collected
 Bit 15 ???
 Bit 16 ???
+
+0010 -> Pink egg collected
 
 ---------------------------------
 -- Pause menu portrait indices --
@@ -764,3 +767,9 @@ C=CCW
 
 Lives:
 8038696B 0007
+
+--------------------
+-- Jinjo bitfield --
+--------------------
+
+???Y POGB

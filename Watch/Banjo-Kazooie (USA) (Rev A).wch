@@ -1,30 +1,43 @@
 Domain RDRAM
 SystemID N64
-000074	d	h	0	EEPROM	EEPROM Checksum 1
-0000EC	d	h	0	EEPROM	EEPROM Checksum 2
-000164	d	h	0	EEPROM	EEPROM Checksum 3
-0001DC	d	h	0	EEPROM	EEPROM Checksum 4
-0001FC	d	h	0	EEPROM	EEPROM Checksum 5
-36D760	d	h	1	RDRAM	Vile State pointer
+36D760	d	h	1	RDRAM	Object Array pointer
 37B4E4	d	f	1	RDRAM	Slope Timer
 37B5A0	d	h	1	RDRAM	Moves Unlocked (Bitfield)
+37B5D0	d	f	1	RDRAM	Unknown Float
+37B5D4	d	f	1	RDRAM	Unknown Float
+37B6B8	d	f	1	RDRAM	X Velocity
 37B6BC	d	f	1	RDRAM	Y Velocity
+37B6C0	d	f	1	RDRAM	Z Velocity
+37B740	d	f	1	RDRAM	X Rotation - Current
+37B744	d	f	1	RDRAM	X Rotation - Target
+37B748	d	f	1	RDRAM	X Rotation - Update speed
+37B74C	d	f	1	RDRAM	X Rotation - Unknown
 37B7A0	d	f	1	RDRAM	X Position
 37B7A4	d	f	1	RDRAM	Y Position
 37B7A8	d	f	1	RDRAM	Z Position
-37B894	d	f	1	RDRAM	Facing Angle
+37B7B0	d	f	1	RDRAM	X Position (OOB Detection)
+37B7B4	d	f	1	RDRAM	Y Position (OOB Detection)
+37B7B8	d	f	1	RDRAM	Z Position (OOB Detection)
+37B880	d	f	1	RDRAM	Z Rotation - Current
+37B884	d	f	1	RDRAM	Z Rotation - Target
+37B888	d	f	1	RDRAM	Z Rotation - Update speed
+37B88C	d	f	1	RDRAM	Z Rotation - Unknown
+37B890	d	f	1	RDRAM	Facing Angle
+37B894	d	f	1	RDRAM	Moving Angle
 37CFB4	d	f	1	RDRAM	Jiggy Spawn Angle
 37CFB8	d	f	1	RDRAM	Jiggy Spawn Velocity
-37DAF5	b	h	1	RDRAM	Map
-385183	b	u	1	RDRAM	Notes - TODO: Does this work?
-385187	b	u	1	RDRAM	Eggs
-38518F	b	u	1	RDRAM	Red Feathers
-385193	b	u	1	RDRAM	Gold Feathers
-3851A3	b	u	1	RDRAM	Health
-3851AB	b	u	1	RDRAM	Lives
+37DAF5	b	u	1	RDRAM	Map
+385180	d	s	1	RDRAM	Notes (on hand)
+385184	d	s	1	RDRAM	Eggs
+38518C	d	s	1	RDRAM	Red Feathers
+385190	d	s	1	RDRAM	Gold Feathers
+3851A0	d	s	1	RDRAM	Health
+3851A4	d	s	1	RDRAM	Health Containers
+3851A8	d	s	1	RDRAM	Lives
 3851AE	b	u	1	RDRAM	Air
-3851E7	b	u	1	RDRAM	Mumbo Tokens
-3851EB	b	u	1	RDRAM	Jiggies
+3851AF	b	u	1	RDRAM	Air Timer
+3851E4	d	s	1	RDRAM	Mumbo Tokens
+3851E8	d	s	1	RDRAM	Jiggies (on hand)
 385224	d	f	1	RDRAM	Game Time (MM)
 385228	d	f	1	RDRAM	Game Time (TTC)
 38522C	d	f	1	RDRAM	Game Time (CC)

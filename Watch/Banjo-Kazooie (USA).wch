@@ -1,12 +1,5 @@
 Domain EEPROM
 SystemID N64
-0074	d	h	0	EEPROM	EEPROM Checksum 1
-00EC	d	h	0	EEPROM	EEPROM Checksum 2
-014A	w	u	1	EEPROM	FF RNG
-0164	d	h	0	EEPROM	EEPROM Checksum 3
-01C2	w	u	1	EEPROM	FF RNG
-01DC	d	h	0	EEPROM	EEPROM Checksum 4
-01FC	d	h	0	EEPROM	EEPROM Checksum 5 (Global flags?)
 283400	w	b	1	RDRAM	Stop'N'Swop Items
 2986BA	w	h	1	RDRAM	Banjo Model Replacement
 2986BE	w	h	1	RDRAM	Banjo Model Replacement
@@ -47,7 +40,8 @@ SystemID N64
 36C50E	b	u	1	RDRAM	Pause Menu Item 3 Portrait
 36C51C	w	u	1	RDRAM	Pause Menu Item 4 Y Position
 36C51E	b	u	1	RDRAM	Pause Menu Item 4 Portrait
-36E560	d	h	1	RDRAM	Minigame Array State Pointer
+36E560	d	h	1	RDRAM	Object Array pointer
+37C004	d	f	1	RDRAM	Unknown Float
 37C0B0	d	f	1	RDRAM	Wading Boots Timer
 37C0B4	d	f	1	RDRAM	Wading Boots Timer (copy)
 37C0B8	d	f	1	RDRAM	Turbo Trainers Timer
@@ -64,21 +58,35 @@ SystemID N64
 37C4B8	d	f	1	RDRAM	X Velocity
 37C4BC	d	f	1	RDRAM	Y Velocity
 37C4C0	d	f	1	RDRAM	Z Velocity
+37C540	d	f	1	RDRAM	X Rotation - Current
+37C544	d	f	1	RDRAM	X Rotation - Moving to
+37C548	d	f	1	RDRAM	X Rotation - Update Speed
 37C5A0	d	f	1	RDRAM	X Position
 37C5A4	d	f	1	RDRAM	Y Position
 37C5A8	d	f	1	RDRAM	Z Position
+37C5B0	d	f	1	RDRAM	X Position (OOB Detection)
+37C5B4	d	f	1	RDRAM	Y Position (OOB Detection)
+37C5B8	d	f	1	RDRAM	Z Position (OOB Detection)
+37C680	d	f	1	RDRAM	Z Rotation - Current
+37C684	d	f	1	RDRAM	Z Rotation - Moving to
+37C688	d	f	1	RDRAM	Z Rotation - Update Speed
 37C690	d	f	1	RDRAM	Facing angle
 37C694	d	f	1	RDRAM	Moving angle
+37C6F4	d	f	1	RDRAM	Unknown Float
+37C6F8	d	f	1	RDRAM	Unknown Float
+37C6FC	d	f	1	RDRAM	Unknown Float
 37D163	b	h	1	RDRAM	Previous Movement State
 37D167	b	h	1	RDRAM	Current Movement State
-37D260	d	f	1	RDRAM	Icy Water Damage Timer
-37D280	d	f	1	RDRAM	Icy Water Damage Timer (Copy)
+37D23C	d	f	1	RDRAM	Eye State
+37D240	d	f	1	RDRAM	Eye State
+37D260	d	f	1	RDRAM	Ground Damage Timer
+37D280	d	f	1	RDRAM	Ground Damage Timer (Copy)
 37D958	d	f	1	RDRAM	Camera X Position
 37D95C	d	f	1	RDRAM	Camera Y position
 37D960	d	f	1	RDRAM	Camera Z Position
 37D968	d	f	1	RDRAM	Camera Vertical Rotation
 37D96C	d	f	1	RDRAM	Camera Horizontal Rotation
-37D970	d	f	1	RDRAM	Viewport roll (degrees)
+37D970	d	f	1	RDRAM	Viewport Roll
 37D974	d	f	1	RDRAM	Camera tracking offset?
 37D97C	d	f	1	RDRAM	Camera tracking offset?
 37D980	d	f	1	RDRAM	Camera something?
@@ -101,26 +109,27 @@ SystemID N64
 37DDB4	d	f	1	RDRAM	Jiggy Spawn Angle
 37DDB8	d	f	1	RDRAM	Jiggy Spawn Velocity
 37E8F5	b	h	1	RDRAM	Map
-380944	d	f	1	RDRAM	Water something?
+380944	d	f	1	RDRAM	Water Something?
 380950	d	f	1	RDRAM	Water Something?
 380974	d	f	1	RDRAM	Water Something?
 3810B8	d	f	1	RDRAM	FF Answer Timer
 382F20	d	h	1	RDRAM	Textbox object pointer
-383012	b	h	1	RDRAM	Current Pause Menu Item
+383012	b	u	1	RDRAM	Current Pause Menu Item
 3832E0	d	h	1	RDRAM	Honeycomb Bitfield
-383384	d	f	1	RDRAM	Mysterious (Text?) Timer
-385F63	b	u	1	RDRAM	Notes (on hand)
-385F64	d	u	1	RDRAM	Eggs
-385F6F	b	u	1	RDRAM	Red Feathers
+383384	d	f	1	RDRAM	Text Timer
+385F60	d	s	1	RDRAM	Notes (on hand)
+385F64	d	s	1	RDRAM	Eggs
+385F6C	d	s	1	RDRAM	Red Feathers
 385F70	d	s	1	RDRAM	Gold Feathers
+385F7B	b	b	1	RDRAM	Jinjos
 385F80	d	s	1	RDRAM	Health
 385F84	d	s	1	RDRAM	Health Containers
 385F88	d	s	1	RDRAM	Lives
 385F8E	b	u	1	RDRAM	Air
 385F8F	b	u	1	RDRAM	Air Timer
-385FA0	d	s	1	RDRAM	Mumbo Tokens (On hand)
-385FC4	d	s	1	RDRAM	Mumbo Tokens (Pause menu)
-385FCB	b	u	1	RDRAM	Jiggies (on hand)
+385FA0	d	s	1	RDRAM	Mumbo Tokens (on hand)
+385FC4	d	s	1	RDRAM	Mumbo Tokens
+385FC8	d	s	1	RDRAM	Jiggies (on hand)
 385FF1	b	u	1	RDRAM	Note Score (MM)
 385FF2	b	u	1	RDRAM	Note Score (TTC)
 385FF3	b	u	1	RDRAM	Note Score (CC)
