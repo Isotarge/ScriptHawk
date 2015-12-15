@@ -28,6 +28,7 @@ local camera_rot = 0x37D96C;
 
 local map;
 local game_time_base;
+local RNG_base;
 local object_array_pointer;
 
 local notes;
@@ -291,6 +292,8 @@ function Game.detectVersion(romName)
 
 	facing_angle = moving_angle - 4;
 
+	RNG_base = game_time_base + 0xDC;
+
 	-- Read EEPROM checksums
 	if memory.usememorydomain("EEPROM") then
 		local i;
@@ -332,8 +335,21 @@ end
 -- Game time stuff --
 ---------------------
 
-local previousGameTime = {0,0,0,0,0,0,0,0,0,0};
-local gameTime = {0,0,0,0,0,0,0,0,0,0};
+local previousGameTime = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
+gameTime = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
+
+local previousRNG = {0, 0, 0, 0, 0, 0}
+RNG = {0, 0, 0, 0, 0, 0};
+
+local function checkRNG()
+	previousRNG = RNG;	
+	RNG = {};
+
+	local i;
+	for i=0,5 do
+		table.insert(RNG, mainmemory.read_u32_be(RNG_base + (i * 4)))
+	end
+end
 
 local function checkGameTime()
 	previousGameTime = gameTime;	
@@ -341,18 +357,16 @@ local function checkGameTime()
 
 	local i;
 	for i=0,10 do
-		gameTime[i + 1] = mainmemory.readfloat(game_time_base + (i * 4), true);
+		table.insert(gameTime, mainmemory.readfloat(game_time_base + (i * 4), true));
 	end
 end
 
 local function gameTimeHasChanged()
-	local i;
-	for i=1,#gameTime do
-		if previousGameTime[i] ~= gameTime[i] then
-			return true;
-		end
-	end
-	return false;
+	return deepcompare(previousGameTime, gameTime, true);
+end
+
+local function RNGHasChanged()
+	return deepcompare(previousRNG, RNG, true);
 end
 
 -----------------------
@@ -636,7 +650,7 @@ Game.rot_speed = 5;
 Game.max_rot_units = 360;
 
 function Game.isPhysicsFrame()
-	return gameTimeHasChanged() and not emu.islagged();
+	return (gameTimeHasChanged() or RNGHasChanged()) and not emu.islagged();
 end
 
 --------------
@@ -754,6 +768,7 @@ function Game.eachFrame()
 	-- Furnace fun patch
 	applyFurnaceFunPatch();
 
+	checkRNG();
 	checkGameTime();
 	updateWave();
 
