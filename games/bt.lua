@@ -356,8 +356,8 @@ end
 -- Game time stuff --
 ---------------------
 
-local previousGameTime = {0,0,0,0,0,0,0,0,0,0,0,0,0,0,0};
-local gameTime = {0,0,0,0,0,0,0,0,0,0,0,0,0,0,0};
+local previousGameTime = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
+local gameTime = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
 
 local function checkGameTime()
 	previousGameTime = gameTime;	
@@ -370,13 +370,7 @@ local function checkGameTime()
 end
 
 local function gameTimeHasChanged()
-	local i;
-	for i=1,#gameTime do
-		if previousGameTime[i] ~= gameTime[i] then
-			return true;
-		end
-	end
-	return false;
+	return deepcompare(previousGameTime, gameTime, true);
 end
 
 -------------------
@@ -592,7 +586,6 @@ local function neverSlip()
 		mainmemory.writefloat(BK_Slip_Object + slope_timer, 0.0, true);
 	end
 end
-
 
 ------------
 -- Health --

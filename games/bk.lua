@@ -336,10 +336,10 @@ end
 ---------------------
 
 local previousGameTime = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
-gameTime = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
+local gameTime = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
 
 local previousRNG = {0, 0, 0, 0, 0, 0}
-RNG = {0, 0, 0, 0, 0, 0};
+local RNG = {0, 0, 0, 0, 0, 0};
 
 local function checkRNG()
 	previousRNG = RNG;	
