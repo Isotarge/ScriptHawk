@@ -6,12 +6,16 @@ function round(num, idp)
 	return tonumber(string.format("%." .. (idp or 0) .. "f", num));
 end
 
-function toHexString(value)
+function isnan(x) return x ~= x end
+
+function toHexString(value, desiredLength, prefix)
 	value = string.format("%X", value or 0);
-	if string.len(value) % 2 ~= 0 then
+	prefix = prefix or "0x";
+	desiredLength = desiredLength or string.len(value);
+	while string.len(value) < desiredLength do
 		value = "0"..value;
 	end
-	return "0x"..value;
+	return prefix..value;
 end
 
 function get_bit(field, index)
@@ -216,8 +220,8 @@ function rotation_to_radians(num)
 end
 
 local function array_contains(array, value)
-	local i;
-	if #array > 0 then
+	if type(array) == "table" and #array > 0 then
+		local i;
 		for i=1,#array do
 			if array[i] == value then
 				return true;
@@ -240,6 +244,10 @@ local function toggle_rotation_units()
 end
 
 local function formatRotation(num)
+	num = num or 0;
+	if isnan(num) then
+		num = 0;
+	end
 	if rotation_units == "Degrees" then
 		return ""..round(rotation_to_degrees(num), precision).."°";
 	elseif rotation_units == "Radians" then

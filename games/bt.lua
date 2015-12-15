@@ -312,6 +312,7 @@ Game.maps = {
 -- Region/Version --
 --------------------
 
+local air;
 local game_time_base;
 local linked_list_root;
 local map;
@@ -319,21 +320,25 @@ local map_trigger;
 
 function Game.detectVersion(romName)
 	if bizstring.contains(romName, "Australia") then
+		air = 0x12B050; -- TODO
 		game_time_base = 0x131520;
 		linked_list_root = 0x13C380;
 		map = 0x127640; -- TODO
 		map_trigger = 0x127642; -- TODO
 	elseif bizstring.contains(romName, "Europe") then
+		air = 0x12B050; -- TODO
 		game_time_base = 0x1317B0;
 		linked_list_root = 0x13C680;
 		map = 0x127640; -- TODO
 		map_trigger = 0x127642; -- TODO
 	elseif bizstring.contains(romName, "Japan") then
+		air = 0x12B050; -- TODO
 		game_time_base = 0x126970;
 		linked_list_root = 0x131850;
 		map = 0x127640; -- TODO
 		map_trigger = 0x127642; -- TODO
 	elseif bizstring.contains(romName, "USA") then
+		air = 0x12B050;
 		game_time_base = 0x12C7A0;
 		linked_list_root = 0x137800;
 		map = 0x127640;
@@ -343,6 +348,16 @@ function Game.detectVersion(romName)
 	end
 
 	return true;
+end
+
+local function isPointer(number)
+	return number >= 0x000000 and number <= 0x3FFFFF;
+end
+
+function resolvePointer(base, index)
+	if isPointer(base) then
+		return mainmemory.read_u32_be(base + index) - 0x80000000;
+	end
 end
 
 local function find_root(object)
@@ -356,20 +371,20 @@ end
 -- Game time stuff --
 ---------------------
 
-local previousGameTime = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
-local gameTime = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
+previousGameTime = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
+gameTime = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
 
 local function checkGameTime()
 	previousGameTime = gameTime;	
 	gameTime = {};
 
 	local i;
-	for i=0,15 do
-		gameTime[i + 1] = mainmemory.readfloat(game_time_base + (i * 4), true);
+	for i=1,15 do
+		table.insert(gameTime, mainmemory.readfloat(game_time_base + (i * 4), true))
 	end
 end
 
-local function gameTimeHasChanged()
+function gameTimeHasChanged()
 	return deepcompare(previousGameTime, gameTime, true);
 end
 
@@ -387,96 +402,99 @@ function Game.isPhysicsFrame()
 	return gameTimeHasChanged() and not emu.islagged();
 end
 
---------------------------
--- Position object shit --
---------------------------
+------------------------
+-- Player object shit --
+------------------------
 
 -- Update this each frame
-BK_Pointer_List = nil;
-BK_Slip_Object = nil;
-BK_Position_Object = nil;
-BK_Velocity_Object = nil;
+playerObject = nil;
 
-function output_objects()
-	if type(BK_Pointer_List) ~= "nil" then
-		print("Pointer List: "..toHexString(BK_Pointer_List));
-		print("Position object: "..toHexString(BK_Position_Object));
-		print("Velocity object: "..toHexString(BK_Velocity_Object));
-		print("Slip object: "..toHexString(BK_Slip_Object));
-	else
-		print("Can't get a read...");
-	end
-end
+-- Relative to objects in linked list, including player
+local previous_item = 0x00;
+local next_item = 0x04;
+
+local slope_pointer_index = 44 * 4;
+local velocity_pointer_index = 54 * 4;
+local rot_x_pointer_index = 59 * 4;
+local position_pointer_index = 61 * 4;
+local rot_z_pointer_index = 65 * 4;
+local rot_y_pointer_index = 66 * 4;
 
 -- Relative to Position object
 local x_pos = 0x00;
-local y_pos = 0x04;
-local z_pos = 0x08;
+local y_pos = x_pos + 4;
+local z_pos = y_pos + 4;
 
-local facing_angle = 0xD8;
+-- Relative to Rot X object
+local x_rot_current = 0x00;
+local x_rot_target = x_rot_current + 4;
 
--- Relative to Velocity object
-local vertical_velocity = 0x14;
+-- Relative to Rot Y object
+local facing_angle = 0x00;
+local moving_angle = facing_angle + 4;
+local y_rot_current = facing_angle;
+local y_rot_target = moving_angle;
 
--- Relative to Slip object
+-- Relative to Rot Z object
+local z_rot_current = 0x00;
+local z_rot_target = z_rot_current + 4;
+
+-- Relative to Slope object
 local slope_timer = 0x38;
 
-----------------------
--- Linked List shit --
-----------------------
+-- Relative to Velocity object
+local y_velocity = 0x14;
 
-local function is_pointer(number)
-	return number >= 0x80000000 and number <= 0x803FFFFF;
-end
-
--- Relative to object base
-local previous_item = 0x00;
-local next_item = 0x04;
-local bk_slip_pointer_index = 44 * 4;
-local bk_position_pointer_index = 61 * 4;
-local bk_velocity_pointer_index = 54 * 4;
-
-local function get_bk_address()
-	local BK_Found = false;
-	local bk_pos_pointer, bk_vel_pointer, bk_slip_pointer, i;
+local function getPlayerObject()
+	local playerFound = false;
+	local i;
 
 	-- Get first object in linked list
-	local object_base = mainmemory.read_u24_be(linked_list_root + next_item + 1);
+	local objectBase = resolvePointer(linked_list_root, next_item);
 
-	-- Iterate through linked list looking for pointer list, including pointer to BK Position
-	while not BK_Found and object_base > 0 and object_base < 0x7FFFFF do
-		-- Check if current linked list object has a pointer in the correct spot
-		bk_slip_pointer = mainmemory.read_u32_be(object_base + bk_slip_pointer_index);
-		bk_pos_pointer = mainmemory.read_u32_be(object_base + bk_position_pointer_index);
-		bk_vel_pointer = mainmemory.read_u32_be(object_base + bk_velocity_pointer_index);
+	-- Iterate through linked list looking for pointer list that matches a known template
+	while not playerFound and isPointer(objectBase) do
+		-- Check if current linked list object has pointers in the correct spots
+		local slopeObjectPointer = resolvePointer(objectBase, slope_pointer_index);
+		local positionObjectPointer = resolvePointer(objectBase, position_pointer_index);
+		local rotXObjectPointer = resolvePointer(objectBase, rot_x_pointer_index);
+		local rotYObjectPointer = resolvePointer(objectBase, rot_y_pointer_index);
+		local rotZObjectPointer = resolvePointer(objectBase, rot_z_pointer_index);
+		local velocityObjectPointer = resolvePointer(objectBase, velocity_pointer_index);
 
-		if is_pointer(bk_pos_pointer) and is_pointer(bk_vel_pointer) then
-			BK_Found = true;
+		if isPointer(positionObjectPointer) and isPointer(rotXObjectPointer) and isPointer(rotYObjectPointer) and isPointer(rotZObjectPointer) and isPointer(velocityObjectPointer) and isPointer(slopeObjectPointer) then
+			playerFound = true;
 
-			-- Check for pointers near BK pointer to make sure
-			for i=1,27 do
-				if not is_pointer(mainmemory.read_u32_be(object_base + bk_position_pointer_index + (i * 4))) then
-					BK_Found = false;
+			-- Check for pointers near player pointer to make sure
+			for i=4,89 do
+				if not isPointer(resolvePointer(objectBase, i * 4)) then
+					playerFound = false;
 				end
 			end
 		end
 
 		-- Get next object in linked list
-		if not BK_Found then
-			object_base = mainmemory.read_u24_be(object_base + next_item + 1);
+		if not playerFound then
+			objectBase = resolvePointer(objectBase, next_item);
 		end
 	end
 
-	if BK_Found then
-		BK_Pointer_List = object_base;
-		BK_Slip_Object = bk_slip_pointer - 0x80000000;
-		BK_Position_Object = bk_pos_pointer - 0x80000000;
-		BK_Velocity_Object = bk_vel_pointer - 0x80000000;
+	if playerFound then
+		return objectBase;
+	end
+end
+
+function output_objects()
+	if type(playerObject) ~= "nil" then
+		print("Player: "..toHexString(playerObject, nil, ""));
+		print("Position: "..toHexString(resolvePointer(playerObject, position_pointer_index), nil, ""));
+		print("Rot X: "..toHexString(resolvePointer(playerObject, rot_x_pointer_index), nil, ""));
+		print("Rot Y: "..toHexString(resolvePointer(playerObject, rot_y_pointer_index), nil, ""));
+		print("Rot Z: "..toHexString(resolvePointer(playerObject, rot_z_pointer_index), nil, ""));
+		print("Slope: "..toHexString(resolvePointer(playerObject, slope_pointer_index), nil, ""));
+		print("Velocity: "..toHexString(resolvePointer(playerObject, velocity_pointer_index), nil, ""));
 	else
-		BK_Pointer_List = nil;
-		BK_Slip_Object = nil;
-		BK_Position_Object = nil;
-		BK_Velocity_Object = nil;
+		print("Can't get a read...");
 	end
 end
 
@@ -485,50 +503,54 @@ end
 --------------
 
 function Game.getXPosition()
-	if type(BK_Position_Object) ~= "nil" then
-		return mainmemory.readfloat(BK_Position_Object + x_pos, true);
+	if type(playerObject) ~= "nil" then
+		return mainmemory.readfloat(resolvePointer(playerObject, position_pointer_index) + x_pos, true);
 	end
 	return 0;
 end
 
 function Game.getYPosition()
-	if type(BK_Position_Object) ~= "nil" then
-		return mainmemory.readfloat(BK_Position_Object + y_pos, true);
+	if type(playerObject) ~= "nil" then
+		return mainmemory.readfloat(resolvePointer(playerObject, position_pointer_index) + y_pos, true);
 	end
 	return 0;
 end
 
 function Game.getZPosition()
-	if type(BK_Position_Object) ~= "nil" then
-		return mainmemory.readfloat(BK_Position_Object + z_pos, true);
+	if type(playerObject) ~= "nil" then
+		return mainmemory.readfloat(resolvePointer(playerObject, position_pointer_index) + z_pos, true);
 	end
 	return 0;
 end
 
 function Game.setXPosition(value)
-	if type(BK_Position_Object) ~= "nil" then
-		mainmemory.writefloat(BK_Position_Object + x_pos, value, true);
-		mainmemory.writefloat(BK_Position_Object + x_pos + 12, value, true);
-		mainmemory.writefloat(BK_Position_Object + x_pos + 24, value, true);
+	if type(playerObject) ~= "nil" then
+		local playerPositionObject = resolvePointer(playerObject, position_pointer_index);
+		mainmemory.writefloat(playerPositionObject + x_pos, value, true);
+		mainmemory.writefloat(playerPositionObject + x_pos + 12, value, true);
+		mainmemory.writefloat(playerPositionObject + x_pos + 24, value, true);
 	end
 end
 
 function Game.setYPosition(value)
-	if type(BK_Position_Object) ~= "nil" and type(BK_Velocity_Object) ~= "nil" then
-		mainmemory.writefloat(BK_Position_Object + y_pos, value, true);
-		mainmemory.writefloat(BK_Position_Object + y_pos + 12, value, true);
-		mainmemory.writefloat(BK_Position_Object + y_pos + 24, value, true);
+	if type(playerObject) ~= "nil" then
+		local playerPositionObject = resolvePointer(playerObject, position_pointer_index);
 
-		-- Nullify vertical velocity
-		mainmemory.writefloat(BK_Velocity_Object + vertical_velocity, 0, true);
+		mainmemory.writefloat(playerPositionObject + y_pos, value, true);
+		mainmemory.writefloat(playerPositionObject + y_pos + 12, value, true);
+		mainmemory.writefloat(playerPositionObject + y_pos + 24, value, true);
+
+		-- Nullify Y velocity
+		mainmemory.writefloat(resolvePointer(playerObject, velocity_pointer_index) + y_velocity, 0, true);
 	end
 end
 
 function Game.setZPosition(value)
-	if type(BK_Position_Object) ~= "nil" then
-		mainmemory.writefloat(BK_Position_Object + z_pos, value, true);
-		mainmemory.writefloat(BK_Position_Object + z_pos + 12, value, true);
-		mainmemory.writefloat(BK_Position_Object + z_pos + 24, value, true);
+	if type(playerObject) ~= "nil" then
+		local playerPositionObject = resolvePointer(playerObject, position_pointer_index);
+		mainmemory.writefloat(playerPositionObject + z_pos, value, true);
+		mainmemory.writefloat(playerPositionObject + z_pos + 12, value, true);
+		mainmemory.writefloat(playerPositionObject + z_pos + 24, value, true);
 	end
 end
 
@@ -537,41 +559,47 @@ end
 --------------
 
 function Game.getXRotation()
-	if type(BK_Position_Object) ~= "nil" then
-		return mainmemory.readfloat(BK_Position_Object + facing_angle, true);
+	if type(playerObject) ~= "nil" and isPointer(playerObject) then
+		return mainmemory.readfloat(resolvePointer(playerObject, rot_x_pointer_index) + x_rot_current, true);
 	end
 	return 0;
 end
 
 function Game.getYRotation()
-	if type(BK_Position_Object) ~= "nil" then
-		return mainmemory.readfloat(BK_Position_Object + facing_angle, true);
+	if type(playerObject) ~= "nil" and isPointer(playerObject) then
+		return mainmemory.readfloat(resolvePointer(playerObject, rot_y_pointer_index) + facing_angle, true);
 	end
 	return 0;
 end
 
 function Game.getZRotation()
-	if type(BK_Position_Object) ~= "nil" then
-		return mainmemory.readfloat(BK_Position_Object + facing_angle, true);
+	if type(playerObject) ~= "nil" and isPointer(playerObject) then
+		return mainmemory.readfloat(resolvePointer(playerObject, rot_z_pointer_index) + z_rot_current, true);
 	end
 	return 0;
 end
 
 function Game.setXRotation(value)
-	if type(BK_Position_Object) ~= "nil" then
-		mainmemory.writefloat(BK_Position_Object + facing_angle, value, true);
+	if type(playerObject) ~= "nil" then
+		local rotXObject = resolvePointer(playerObject, rot_x_pointer_index);
+		mainmemory.writefloat(rotXObject + x_rot_current, value, true);
+		mainmemory.writefloat(rotXObject + x_rot_target, value, true);
 	end
 end
 
 function Game.setYRotation(value)
-	if type(BK_Position_Object) ~= "nil" then
-		mainmemory.writefloat(BK_Position_Object + facing_angle, value, true);
+	if type(playerObject) ~= "nil" then
+		local rotYObject = resolvePointer(playerObject, rot_y_pointer_index);
+		mainmemory.writefloat(rotYObject + facing_angle, value, true);
+		mainmemory.writefloat(rotYObject + moving_angle, value, true);
 	end
 end
 
 function Game.setZRotation(value)
-	if type(BK_Position_Object) ~= "nil" then
-		mainmemory.writefloat(BK_Position_Object + facing_angle, value, true);
+	if type(playerObject) ~= "nil" then
+		local rotZObject = resolvePointer(playerObject, rot_z_pointer_index);
+		mainmemory.writefloat(rotZObject + z_rot_current, value, true);
+		mainmemory.writefloat(rotZObject + z_rot_target, value, true);
 	end
 end
 
@@ -582,8 +610,8 @@ end
 local options_toggle_neverslip;
 
 local function neverSlip()
-	if type(BK_Slip_Object) ~= "nil" then
-		mainmemory.writefloat(BK_Slip_Object + slope_timer, 0.0, true);
+	if type(playerObject) ~= "nil" then
+		mainmemory.writefloat(resolvePointer(playerObject, slope_pointer_index) + slope_timer, 0.0, true);
 	end
 end
 
@@ -594,7 +622,7 @@ end
 local iconAddress = 0x11B065;
 local healthAddresses = {
 	[0x01] = {0x11B644, 0x11B645}, -- BK
-	[0x10] = {0x11B65F, 0x11B660}, -- Banjo
+	[0x10] = {0x11B65F, 0x11B660}, -- Banjo (Solo)
 	[0x11] = {0x11B668, 0x11B669}, -- Mumbo
 	[0x2D] = {0x11B659, 0x11B65A}, -- Stony
 	[0x2E] = {0x11B66E, 0x11B66F}, -- Detonator
@@ -603,7 +631,7 @@ local healthAddresses = {
 	[0x31] = {0x11B653, 0x11B654}, -- Bee
 	[0x32] = {0x11B647, 0x11B648}, -- Snowball
 	[0x36] = {0x11B656, 0x11B657}, -- Washing Machine
-	[0x5F] = {0x11B662, 0x11B663} -- Kazooie
+	[0x5F] = {0x11B662, 0x11B663} -- Kazooie (Solo)
 }
 
 function Game.getCurrentHealth()
@@ -614,12 +642,32 @@ function Game.getCurrentHealth()
 	return 1;
 end
 
+function Game.setCurrentHealth(value)
+	local currentTransformation = mainmemory.readbyte(iconAddress);
+	if type(healthAddresses[currentTransformation]) == 'table' then
+		value = value or 0;
+		value = math.max(0x00, value);
+		value = math.min(0xFF, value);
+		return mainmemory.write_u8(healthAddresses[currentTransformation][1], value);
+	end
+end
+
 function Game.getMaxHealth()
 	local currentTransformation = mainmemory.readbyte(iconAddress);
 	if type(healthAddresses[currentTransformation]) == 'table' then
 		return mainmemory.read_u8(healthAddresses[currentTransformation][2]);
 	end
 	return 1;
+end
+
+function Game.setMaxHealth(value)
+	local currentTransformation = mainmemory.readbyte(iconAddress);
+	if type(healthAddresses[currentTransformation]) == 'table' then
+		value = value or 0;
+		value = math.max(0x00, value);
+		value = math.min(0xFF, value);
+		return mainmemory.write_u8(healthAddresses[currentTransformation][2], value);
+	end
 end
 
 function outputHealth()
@@ -639,8 +687,13 @@ function Game.setMap(value)
 	end
 end
 
+local max_air = 60;
+
 function Game.applyInfinites()
 	-- TODO
+	local maxHealth = Game.getMaxHealth();
+	Game.setCurrentHealth(maxHealth);
+	mainmemory.writefloat(air, max_air, true);
 end
 
 function Game.initUI(form_handle, col, row, button_height, label_offset, dropdown_offset)
@@ -648,7 +701,7 @@ function Game.initUI(form_handle, col, row, button_height, label_offset, dropdow
 end
 
 function Game.eachFrame()
-	get_bk_address();
+	playerObject = getPlayerObject();
 	checkGameTime();
 
 	if forms.ischecked(options_toggle_neverslip) then
