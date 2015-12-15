@@ -24,9 +24,17 @@ SystemID N64
 37E788	d	f	1	RDRAM	Jiggy Spawn Velocity
 37F2C5	b	u	1	RDRAM	Map
 383B91	w	h	1	RDRAM	Cauldron state
-38691C	d	s	1	RDRAM	RBB Fan timer value
-386934	d	s	1	RDRAM	RBB Fan timer shown
-38693C	d	f	1	RDRAM	FP Tree timer shown
+386910	d	s	1	RDRAM	Hourglass timer Value
+386914	d	s	1	RDRAM	Evil hourglass timer Value
+386918	d	s	1	RDRAM	Unknown timer Value
+38691C	d	s	1	RDRAM	RBB Fan timer Value
+386920	d	s	1	RDRAM	Unknown timer Value
+386928	d	s	1	RDRAM	Hourglass Active
+38692C	d	s	1	RDRAM	Evil hourglass Active
+386930	d	s	1	RDRAM	Unknown timer Active
+386934	d	s	1	RDRAM	RBB Fan timer Active
+386938	d	s	1	RDRAM	Unknown timer Active
+38693C	d	s	1	RDRAM	FP Tree timer Active (crashes)
 386940	d	s	1	RDRAM	Notes (on hand)
 386944	d	s	1	RDRAM	Eggs
 38694C	d	s	1	RDRAM	Red Feathers
