@@ -4,6 +4,8 @@ local Game = {};
 -- DK64 specific state --
 -------------------------
 
+local form_controls = {};
+
 local version;
 local kong_object_pointer;
 local camera_pointer;
@@ -415,10 +417,14 @@ local camera_focus_pointer = 0x178;
 local kick_animation = 0x181;
 local kick_animation_value = 0x29;
 
+local velocity_uncrouch_aerial = 0x1A4;
+
 local misc_acceleration_float = 0x1AC;
 local horizontal_acceleration = 0x1B0; -- Set to a negative number to go fast
 local misc_acceleration_float_2 = 0x1B4;
 local misc_acceleration_float_3 = 0x1B8;
+
+local velocity_ground = 0x1C0;
 
 -- TODO: Properly document these
 local scale = {
@@ -442,12 +448,7 @@ local scale_z = 0x3C;
 -- Flag stuff --
 ----------------
 
-local options_flag_dropdown;
-local options_set_flag_button;
-local options_Clear_flag_button;
-
 local flag_pointer;
-
 local flag_block_size = 0x13B;
 
 local flag_action_queue = {};
@@ -1321,8 +1322,8 @@ local flag_array = {
 
 	{["byte"] = 0x7C, ["bit"] = 0, ["name"] = "Japes: Tiny Coin: Underground (1)", ["type"] = "Coin"},
 	{["byte"] = 0x7C, ["bit"] = 3, ["name"] = "Japes: Tiny Coin: Underground (2)", ["type"] = "Coin"},
-	{["byte"] = 0x7C, ["bit"] = 6, ["name"] = "Japes: DK CB: Bunch in Babboon blast (1)", ["type"] = "Bunch"},  -- TODO: Flags missing in this room with block size 0x80
-	{["byte"] = 0x7C, ["bit"] = 7, ["name"] = "Japes: DK Coin: Babboon blast (1)", ["type"] = "Coin"},  -- TODO: Flags missing in this room with block size 0x80
+	{["byte"] = 0x7C, ["bit"] = 6, ["name"] = "Japes: DK CB: Bunch in Babboon blast (1)", ["type"] = "Bunch"}, -- TODO: Flags missing in this room with block size 0x80
+	{["byte"] = 0x7C, ["bit"] = 7, ["name"] = "Japes: DK Coin: Babboon blast (1)", ["type"] = "Coin"}, -- TODO: Flags missing in this room with block size 0x80
 	{["byte"] = 0x7D, ["bit"] = 0, ["name"] = "Japes: Lanky CB: Bunch in painting room (Left)", ["type"] = "Bunch"},
 	{["byte"] = 0x7D, ["bit"] = 1, ["name"] = "Japes: Tiny Coin: Underground (3)", ["type"] = "Coin"},
 
@@ -2630,11 +2631,11 @@ end
 --------------------------
 
 local function flagSetButtonHandler()
-	setFlagByName(forms.getproperty(options_flag_dropdown, "SelectedItem"));
+	setFlagByName(forms.getproperty(form_controls["Flag Dropdown"], "SelectedItem"));
 end
 
 local function flagClearButtonHandler()
-	clearFlagByName(forms.getproperty(options_flag_dropdown, "SelectedItem"));
+	clearFlagByName(forms.getproperty(form_controls["Flag Dropdown"], "SelectedItem"));
 end
 
 local function formatOutputString(caption, value, max)
@@ -2753,10 +2754,8 @@ function Game.detectVersion(romName)
 		MJ_blue_switch_pos        = 0x65;
 
 		--Subgames
-		jumpman_x_position = 0x04BD70;
-		jumpman_y_position = 0x04BD74;
-		jetman_x_position  = 0x02F050;
-		jetman_y_position  = 0x02F054;
+		jumpman_position = {0x04BD70, 0x04BD74};
+		jetman_position  = {0x02F050, 0x02F054};
 	elseif bizstring.contains(romName, "Europe") then
 		version = "PAL";
 		map                    = 0x73EC37;
@@ -2786,10 +2785,8 @@ function Game.detectVersion(romName)
 		MJ_blue_switch_pos        = 0x6D;
 
 		--Subgames
-		jumpman_x_position = 0x03ECD0;
-		jumpman_y_position = 0x03ECD4;
-		jetman_x_position  = 0x022100;
-		jetman_y_position  = 0x022104;
+		jumpman_position = {0x03ECD0, 0x03ECD4};
+		jetman_position  = {0x022100, 0x022104};
 	elseif bizstring.contains(romName, "Japan") then
 		version = "JP";
 		map                    = 0x743DA7;
@@ -2819,10 +2816,8 @@ function Game.detectVersion(romName)
 		MJ_blue_switch_pos        = 0x6D;
 
 		--Subgames
-		jumpman_x_position = 0x03EB00;
-		jumpman_y_position = 0x03EB04;
-		jetman_x_position  = 0x022060;
-		jetman_y_position  = 0x022064;
+		jumpman_position = {0x03EB00, 0x03EB04};
+		jetman_position  = {0x022060, 0x022064};
 	elseif bizstring.contains(romName, "Kiosk") then
 		version = "Kiosk";
 		file                = 0x7467c8; -- TODO?
@@ -2912,18 +2907,18 @@ end
 
 function Game.getXPosition()
 	if map_value == arcade_map then
-		return mainmemory.readfloat(jumpman_x_position, true);
+		return mainmemory.readfloat(jumpman_position[1], true);
 	elseif map_value == jetpac_map then
-		return mainmemory.readfloat(jetman_x_position, true);
+		return mainmemory.readfloat(jetman_position[1], true);
 	end
 	return mainmemory.readfloat(kong_object + x_pos, true);
 end
 
 function Game.getYPosition()
 	if map_value == arcade_map then
-		return mainmemory.readfloat(jumpman_y_position, true);
+		return mainmemory.readfloat(jumpman_position[2], true);
 	elseif map_value == jetpac_map then
-		return mainmemory.readfloat(jetman_y_position, true);
+		return mainmemory.readfloat(jetman_position[2], true);
 	end
 	return mainmemory.readfloat(kong_object + y_pos, true);
 end
@@ -2937,9 +2932,9 @@ end
 
 function Game.setXPosition(value)
 	if map_value == arcade_map then
-		--mainmemory.writefloat(jumpman_x_position, value, true);
+		--mainmemory.writefloat(jumpman_position[1], value, true);
 	elseif map_value == jetpac_map then
-		--mainmemory.writefloat(jetman_x_position, value, true);
+		--mainmemory.writefloat(jetman_position[1], value, true);
 	else
 		mainmemory.writefloat(kong_object + x_pos, value, true);
 		mainmemory.writebyte(kong_object + locked_to_pad, 0x00);
@@ -2949,9 +2944,9 @@ end
 
 function Game.setYPosition(value)
 	if map_value == arcade_map then
-		--mainmemory.writefloat(jumpman_y_position, value, true);
+		--mainmemory.writefloat(jumpman_position[2], value, true);
 	elseif map_value == jetpac_map then
-		--mainmemory.writefloat(jetman_y_position, value, true);
+		--mainmemory.writefloat(jetman_position[2], value, true);
 	else
 		mainmemory.writefloat(kong_object + y_pos, value, true);
 		mainmemory.writebyte(kong_object + locked_to_pad, 0x00);
@@ -3023,7 +3018,6 @@ local function visify()
 	mainmemory.writebyte(kong_object + visibility, 0x7f);
 end
 
-local options_toggle_invisify_button;
 local current_invisify = "Invisify";
 local function toggle_invisify()
 	if current_invisify == "Invisify" then
@@ -3034,7 +3028,7 @@ local function toggle_invisify()
 		current_invisify = "Invisify";
 	end
 
-	forms.settext(options_toggle_invisify_button, current_invisify);
+	forms.settext(form_controls["Toggle Invisify Button"], current_invisify);
 end
 
 local function clear_tb_void()
@@ -3110,7 +3104,7 @@ local MJ_minimap_text_x = MJ_minimap_x_offset + 4.5 * MJ_minimap_width;
 local MJ_minimap_text_y = MJ_minimap_y_offset;
 
 local MJ_minimap_phase_number_y      = MJ_minimap_text_y;
-local MJ_minimap_actions_remaining_y = MJ_minimap_phase_number_y      + MJ_minimap_height;
+local MJ_minimap_actions_remaining_y = MJ_minimap_phase_number_y + MJ_minimap_height;
 local MJ_time_until_next_action_y    = MJ_minimap_actions_remaining_y + MJ_minimap_height;
 
 local MJ_kong_row_y                  = MJ_time_until_next_action_y + MJ_minimap_height;
@@ -3238,13 +3232,13 @@ end
 local function draw_mj_minimap()
 	-- Only draw minimap if the player is in the Mad Jack fight
 	if mainmemory.readbyte(map) == mad_jack_map then
-		local MJ_state  = mainmemory.read_u24_be(MJ_state_pointer);
+		local MJ_state = mainmemory.read_u24_be(MJ_state_pointer);
 
-		local cur_pos   = MJ_parse_position(mainmemory.readbyte(MJ_state + MJ_current_pos));
-		local next_pos  = MJ_parse_position(mainmemory.readbyte(MJ_state + MJ_next_pos));
+		local cur_pos = MJ_parse_position(mainmemory.readbyte(MJ_state + MJ_current_pos));
+		local next_pos = MJ_parse_position(mainmemory.readbyte(MJ_state + MJ_next_pos));
 
 		local white_pos = MJ_parse_position(mainmemory.readbyte(MJ_state + MJ_white_switch_pos));
-		local blue_pos  = MJ_parse_position(mainmemory.readbyte(MJ_state + MJ_blue_switch_pos));
+		local blue_pos = MJ_parse_position(mainmemory.readbyte(MJ_state + MJ_blue_switch_pos));
 
 		local switches_active = white_pos.active or blue_pos.active;
 
@@ -3303,10 +3297,10 @@ local function draw_mj_minimap()
 		gui.drawText(MJ_minimap_text_x, MJ_minimap_actions_remaining_y, actions_remaining.." "..action_type.."s remaining");
 
 		if action_type ~= "Jump" then
-			gui.drawText(MJ_minimap_text_x, MJ_minimap_phase_number_y  , "Phase "..phase.." (switch)");
+			gui.drawText(MJ_minimap_text_x, MJ_minimap_phase_number_y , "Phase "..phase.." (switch)");
 			gui.drawText(MJ_minimap_text_x, MJ_time_until_next_action_y, time_until_next_action.." ticks until next "..action_type);
 		else
-			gui.drawText(MJ_minimap_text_x, MJ_minimap_phase_number_y  , "Phase "..phase);
+			gui.drawText(MJ_minimap_text_x, MJ_minimap_phase_number_y , "Phase "..phase);
 		end
 	end
 end
@@ -3379,13 +3373,9 @@ end
 -- Lag configuration --
 -----------------------
 
-local options_toggle_lag_fix;
-local options_decrease_lag_factor_button;
-local options_increase_lag_factor_button;
-local options_lag_factor_value_label;
-
 local lag_factor = 1;
 
+-- TODO: Clamp this
 local function increase_lag_factor()
 	lag_factor = lag_factor + 1;
 end
@@ -3472,7 +3462,6 @@ end
 -- Paper Mode --
 ----------------
 
-local options_toggle_paper_mode;
 paper_thickness = 0.015;
 
 function paperMode()
@@ -3663,9 +3652,9 @@ local function unlock_moves()
 	local kong;
 	for kong=DK,Chunky do
 		local base = kongbase + kong * 0x5E;
-		mainmemory.writebyte(base + moves,      3);
-		mainmemory.writebyte(base + sim_slam,   3);
-		mainmemory.writebyte(base + weapon,     7);
+		mainmemory.writebyte(base + moves, 3);
+		mainmemory.writebyte(base + sim_slam, 3);
+		mainmemory.writebyte(base + weapon, 7);
 		mainmemory.writebyte(base + instrument, 15);
 	end
 
@@ -3690,59 +3679,40 @@ function Game.setMap(value)
 	end
 end
 
-local options_moon_mode_label;
-local options_moon_mode_button;
-
-local options_clear_tb_void_button;
-local options_kong_button;
-local options_force_pause_button;
-local options_force_zipper_button;
-local options_random_effect_button;
-local options_unlock_moves_button;
-
-local options_toggle_homing_ammo;
-local options_toggle_neverslip;
-
-local options_toggle_madjack;
-local options_toggle_isg_timer;
-
 function Game.initUI(form_handle, col, row, button_height, label_offset, dropdown_offset)
-	-- Key stuff
-	options_flag_dropdown =     forms.dropdown(form_handle, flag_names, col(0) + dropdown_offset, row(7) + dropdown_offset, col(9) + 7, button_height);
-	options_set_flag_button =   forms.button(form_handle, "Set", flagSetButtonHandler,    col(10),     row(7), 59, button_height);
-	options_Clear_flag_button = forms.button(form_handle, "Clear", flagClearButtonHandler, col(13) - 5, row(7), 59, button_height);
+	-- Flag stuff
+	form_controls["Flag Dropdown"] = forms.dropdown(form_handle, flag_names, col(0) + dropdown_offset, row(7) + dropdown_offset, col(9) + 7, button_height);
+	form_controls["Set Flag Button"] = forms.button(form_handle, "Set", flagSetButtonHandler, col(10), row(7), 59, button_height);
+	form_controls["Clear Flag Button"] = forms.button(form_handle, "Clear", flagClearButtonHandler, col(13) - 5, row(7), 59, button_height);
 
 	-- Moon stuff
-	options_moon_mode_label =  forms.label(form_handle,  "Moon:",                    col(10),     row(2) + label_offset, 48, button_height);
-	options_moon_mode_button = forms.button(form_handle, moon_mode, toggle_moonmode, col(13) - 20, row(2),                59, button_height);
+	form_controls["Moon Mode Label"] = forms.label(form_handle, "Moon:", col(10), row(2) + label_offset, 48, button_height);
+	form_controls["Moon Mode Button"] = forms.button(form_handle, moon_mode, toggle_moonmode, col(13) - 20, row(2), 59, button_height);
 
-	-- Mad Jack stuff
-	options_toggle_madjack = forms.checkbox(form_handle, "MJ Minimap", col(5) + dropdown_offset, row(6) + dropdown_offset);
-
-	-- ISG Timer
-	options_toggle_isg_timer = forms.checkbox(form_handle, "ISG Timer", col(5) + dropdown_offset, row(5) + dropdown_offset);
+	form_controls["Toggle MJ Minimap"] = forms.checkbox(form_handle, "MJ Minimap", col(5) + dropdown_offset, row(6) + dropdown_offset);
+	form_controls["Toggle ISG Timer"] = forms.checkbox(form_handle, "ISG Timer", col(5) + dropdown_offset, row(5) + dropdown_offset);
 
 	-- Buttons
-	options_toggle_invisify_button = forms.button(form_handle, "Invisify",      toggle_invisify, col(7), row(1), 64,         button_height);
-	options_clear_tb_void_button =   forms.button(form_handle, "Clear TB void", clear_tb_void,   col(10), row(1), col(4) + 8, button_height);
-	options_unlock_moves_button =    forms.button(form_handle, "Unlock Moves",  unlock_moves,    col(10), row(4), col(4) + 8, button_height);
+	form_controls["Toggle Invisify Button"] = forms.button(form_handle, "Invisify", toggle_invisify, col(7), row(1), 64, button_height);
+	form_controls["Clear TB Void Button"] = forms.button(form_handle, "Clear TB void", clear_tb_void, col(10), row(1), col(4) + 8, button_height);
+	form_controls["Unlock Moves Button"] = forms.button(form_handle, "Unlock Moves", unlock_moves, col(10), row(4), col(4) + 8, button_height);
 
-	--options_kong_button        =  forms.button(form_handle, "Kong",   everythingIsKong,  col(10), row(3), col(4) + 8, button_height);
-	--options_force_pause_button =  forms.button(form_handle, "Force Pause",   force_pause,  col(10), row(4), col(4) + 8, button_height);
-	options_force_zipper_button =  forms.button(form_handle, "Force Zipper",  force_zipper,         col(5), row(4), col(4) + 8, button_height);
-	options_fix_geometry_spiking = forms.button(form_handle, "Fix Spiking",   fix_geometry_spiking, col(10), row(0), col(4) + 8, button_height);
-	--options_random_effect_button = forms.button(form_handle, "Random effect", random_effect,        col(10), row(6), col(4) + 8, button_height);
+	--form_controls["Everything is Kong Button"] = forms.button(form_handle, "Kong", everythingIsKong, col(10), row(3), col(4) + 8, button_height);
+	--form_controls["Force Pause Button"] = forms.button(form_handle, "Force Pause", force_pause, col(10), row(4), col(4) + 8, button_height);
+	form_controls["Force Zipper Button"] = forms.button(form_handle, "Force Zipper", force_zipper, col(5), row(4), col(4) + 8, button_height);
+	form_controls["Fix Geometry Spiking Button"] = forms.button(form_handle, "Fix Spiking", fix_geometry_spiking, col(10), row(0), col(4) + 8, button_height);
+	--form_controls["Random Effect Button"] = forms.button(form_handle, "Random effect", random_effect, col(10), row(6), col(4) + 8, button_height);
 
 	-- Lag fix
-	options_decrease_lag_factor_button = forms.button(form_handle,  "-",       decrease_lag_factor, col(13) - 7,                  row(6),                   button_height, button_height);
-	options_increase_lag_factor_button = forms.button(form_handle,  "+",       increase_lag_factor, col(13) + button_height - 7,  row(6),                   button_height, button_height);
-	options_lag_factor_value_label =     forms.label(form_handle,   "0",                            col(13) + button_height + 21, row(6) + label_offset,    54,            14);
-	options_toggle_lag_fix =             forms.checkbox(form_handle, "Lag fix",                     col(10) + dropdown_offset,    row(6) + dropdown_offset);
+	form_controls["Decrease Lag Factor Button"] = forms.button(form_handle, "-", decrease_lag_factor, col(13) - 7, row(6), button_height, button_height);
+	form_controls["Increase Lag Factor Button"] = forms.button(form_handle, "+", increase_lag_factor, col(13) + button_height - 7, row(6),button_height, button_height);
+	form_controls["Lag Factor Value Label"] = forms.label(form_handle, "0", col(13) + button_height + 21, row(6) + label_offset, 54, 14);
+	form_controls["Toggle Lag Fix Checkbox"] = forms.checkbox(form_handle, "Lag fix", col(10) + dropdown_offset, row(6) + dropdown_offset);
 
 	-- Checkboxes
-	options_toggle_homing_ammo = forms.checkbox(form_handle, "Homing Ammo", col(0) + dropdown_offset, row(6) + dropdown_offset);
-	--options_toggle_neverslip =   forms.checkbox(form_handle, "Never Slip",  col(10) + dropdown_offset, row(5) + dropdown_offset);
-	options_toggle_paper_mode =   forms.checkbox(form_handle, "Paper Mode",  col(10) + dropdown_offset, row(5) + dropdown_offset);
+	form_controls["Toggle Homing Ammo Checkbox"] = forms.checkbox(form_handle, "Homing Ammo", col(0) + dropdown_offset, row(6) + dropdown_offset);
+	--form_controls["Toggle Neverslip Checkbox"] = forms.checkbox(form_handle, "Never Slip", col(10) + dropdown_offset, row(5) + dropdown_offset);
+	form_controls["Toggle Paper Mode Checkbox"] = forms.checkbox(form_handle, "Paper Mode", col(10) + dropdown_offset, row(5) + dropdown_offset);
 
 	-- Output flag statistics
 	flagStats();
@@ -3750,16 +3720,16 @@ end
 
 function Game.applyInfinites()
 	mainmemory.writebyte(global_base + standard_ammo, max_standard_ammo);
-	if forms.ischecked(options_toggle_homing_ammo) then
+	if forms.ischecked(form_controls["Toggle Homing Ammo Checkbox"]) then
 		mainmemory.writebyte(global_base + homing_ammo, max_homing_ammo);
 	else
 		mainmemory.writebyte(global_base + homing_ammo, 0);
 	end
-	mainmemory.writebyte(global_base + oranges,  max_oranges);
+	mainmemory.writebyte(global_base + oranges, max_oranges);
 	mainmemory.write_u16_be(global_base + crystals, max_crystals * 150);
-	mainmemory.writebyte(global_base + film,     max_film);
-	mainmemory.writebyte(global_base + health,   max_health);
-	mainmemory.writebyte(global_base + melons,   max_melons);
+	mainmemory.writebyte(global_base + film, max_film);
+	mainmemory.writebyte(global_base + health, max_health);
+	mainmemory.writebyte(global_base + melons, max_melons);
 	local kong;
 	for kong=DK,Chunky do
 		local base = kongbase + kong * 0x5e;
@@ -3775,26 +3745,26 @@ function Game.eachFrame()
 	Game.unlock_menus();
 
 	-- Lag fix
-	forms.settext(options_lag_factor_value_label, lag_factor);
-	if forms.ischecked(options_toggle_lag_fix) then
+	forms.settext(form_controls["Lag Factor Value Label"], lag_factor);
+	if forms.ischecked(form_controls["Toggle Lag Fix Checkbox"]) then
 		fix_lag();
 	end
 
-	--if forms.ischecked(options_toggle_neverslip) then
+	--if forms.ischecked(form_controls["Toggle Neverslip Checkbox"]) then
 	--	neverSlip();
 	--end
 
-	if forms.ischecked(options_toggle_paper_mode) then
+	if forms.ischecked(form_controls["Toggle Paper Mode Checkbox"]) then
 		paperMode();
 	end
 
 	-- Mad Jack
-	if forms.ischecked(options_toggle_madjack) then
+	if forms.ischecked(form_controls["Toggle MJ Minimap"]) then
 		draw_mj_minimap();
 	end
 
 	-- ISG Timer
-	if forms.ischecked(options_toggle_isg_timer) then
+	if forms.ischecked(form_controls["Toggle ISG Timer"]) then
 		timer();
 	else
 		timer_started = false;
@@ -3831,8 +3801,8 @@ function Game.eachFrame()
 	end
 	memory.usememorydomain("RDRAM");
 
-	forms.settext(options_toggle_invisify_button, current_invisify);
-	forms.settext(options_moon_mode_button, moon_mode);
+	forms.settext(form_controls["Toggle Invisify Button"], current_invisify);
+	forms.settext(form_controls["Moon Mode Button"], moon_mode);
 end
 
 return Game;
