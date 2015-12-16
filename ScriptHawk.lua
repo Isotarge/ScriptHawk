@@ -414,6 +414,11 @@ function updateUIReadouts_ScriptHawk()
 		row = row + 1;
 		gui.text(gui_x_offset, gui_y_offset + row_height * row, "dXZ: "..(round(d, precision) or 0));
 		row = row + 1;
+		if type(Game.getBoost) == "function" then
+			row = row + 1;
+			gui.text(gui_x_offset, gui_y_offset + row_height * row, "Boost: "..round(Game.getBoost(), precision));
+			row = row + 1;
+		end
 		if type(Game.getVelocity) == "function" then
 			gui.text(gui_x_offset, gui_y_offset + row_height * row, "Velocity: "..round(Game.getVelocity(), precision));
 			row = row + 1;
