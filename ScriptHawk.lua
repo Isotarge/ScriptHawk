@@ -8,6 +8,25 @@ end
 
 function isnan(x) return x ~= x end
 
+function esc(str)
+	return (str:gsub('%%', '%%%%')
+		:gsub('%^', '%%%^')
+		:gsub('%$', '%%%$')
+		:gsub('%(', '%%%(')
+		:gsub('%)', '%%%)')
+		:gsub('%.', '%%%.')
+		:gsub('%[', '%%%[')
+		:gsub('%]', '%%%]')
+		:gsub('%*', '%%%*')
+		:gsub('%+', '%%%+')
+		:gsub('%-', '%%%-')
+		:gsub('%?', '%%%?'));
+end
+
+function stringContains(haystack, needle)
+	return type(string.find(haystack, esc(needle))) == "number";
+end
+
 function toHexString(value, desiredLength, prefix)
 	value = string.format("%X", value or 0);
 	prefix = prefix or "0x";
@@ -68,25 +87,25 @@ end
 
 local romName = gameinfo.getromname();
 
-if bizstring.contains(romName, "Donkey Kong 64") then
+if stringContains(romName, "Donkey Kong 64") then
 	Game = require "games.dk64";
-elseif bizstring.contains(romName, "Banjo-Tooie") or bizstring.contains(romName, "Banjo to Kazooie no Daibouken 2") then
+elseif stringContains(romName, "Banjo-Tooie") or stringContains(romName, "Banjo to Kazooie no Daibouken 2") then
 	Game = require "games.bt";
-elseif bizstring.contains(romName, "Banjo-Kazooie") or bizstring.contains(romName, "Banjo to Kazooie no Daibouken") then
+elseif stringContains(romName, "Banjo-Kazooie") or stringContains(romName, "Banjo to Kazooie no Daibouken") then
 	Game = require "games.bk";
-elseif bizstring.contains(romName, "Diddy Kong Racing") then
+elseif stringContains(romName, "Diddy Kong Racing") then
 	Game = require "games.dkr";
-elseif bizstring.contains(romName, "Rayman 2 - The Great Escape") then
+elseif stringContains(romName, "Rayman 2 - The Great Escape") then
 	Game = require "games.rayman_2";
-elseif bizstring.contains(romName, "Super Mario 64") then
+elseif stringContains(romName, "Super Mario 64") then
 	Game = require "games.sm64";
-elseif bizstring.contains(romName, "Toy Story 2") then
+elseif stringContains(romName, "Toy Story 2") then
 	Game = require "games.ts2";
-elseif bizstring.contains(romName, "Ocarina of Time") or bizstring.contains(romName, "Toki no Ocarina") then
+elseif stringContains(romName, "Ocarina of Time") or stringContains(romName, "Toki no Ocarina") then
 	Game = require "games.oot";
-elseif bizstring.contains(romName, "Majora's Mask") or bizstring.contains(romName, "Mujura no Kamen") then
+elseif stringContains(romName, "Majora's Mask") or stringContains(romName, "Mujura no Kamen") then
 	Game = require "games.mm";
-elseif bizstring.contains(romName, "Elmo's Letter Adventure") or bizstring.contains(romName, "Elmo's Number Journey") then
+elseif stringContains(romName, "Elmo's Letter Adventure") or stringContains(romName, "Elmo's Number Journey") then
 	Game = require "games.elmo";
 else
 	print("This game is not currently supported.");
@@ -128,6 +147,7 @@ local reset_max_pressed = false;
 -- State --
 -----------
 
+local form_controls = {};
 local mode = "Position";
 local rotation_units = "Degrees";
 
@@ -160,25 +180,25 @@ max_d  = 0.0;
 -- Rounding precision
 precision = 3;
 
-local function decrease_precision()
+local function decreasePrecision()
 	precision = math.max(0, precision - 1);
 	gui.cleartext();
 	updateUIReadouts_ScriptHawk();
 end
 
-local function increase_precision()
+local function increasePrecision()
 	precision = math.min(5, precision + 1);
 	gui.cleartext();
 	updateUIReadouts_ScriptHawk();
 end
 
-local function decrease_speedy_speed()
+local function decreaseSpeed()
 	Game.speedy_index = math.max(1, Game.speedy_index - 1);
 	gui.cleartext();
 	updateUIReadouts_ScriptHawk();
 end
 
-local function increase_speedy_speed()
+local function increaseSpeed()
 	Game.speedy_index = math.min(#Game.speedy_speeds, Game.speedy_index + 1);
 	gui.cleartext();
 	updateUIReadouts_ScriptHawk();
@@ -194,13 +214,13 @@ local practice_increase_slot_pressed = false;
 local practice_load_slot_pressed = false;
 local practice_save_slot_pressed = false;
 
-local function decrease_save_slot()
+local function decreaseSaveSlot()
 	practice_save_slot = math.max(0, practice_save_slot - 1);
 	gui.cleartext();
 	updateUIReadouts_ScriptHawk();
 end
 
-local function increase_save_slot()
+local function increaseSaveSlot()
 	practice_save_slot = math.min(9, practice_save_slot + 1);
 	gui.cleartext();
 	updateUIReadouts_ScriptHawk();
@@ -231,7 +251,7 @@ local function array_contains(array, value)
 	return false;
 end
 
-local function toggle_rotation_units()
+local function toggleRotationUnits()
 	if rotation_units == "Degrees" then
 		rotation_units = "Radians";
 	elseif rotation_units == "Radians" then
@@ -256,7 +276,7 @@ local function formatRotation(num)
 	return num;
 end
 
-local function toggle_mode()
+local function toggleMode()
 	if mode == 'Position' then
 		mode = 'Rotation';
 	elseif mode == 'Rotation' then
@@ -274,10 +294,9 @@ end
 
 local telemetryData = {};
 local collecting_telemetry = false;
-local options_toggle_telemetry_button;
 
 -- Outputs telemetry data as CSV to the console
-local function output_telemetry()
+local function outputTelemetry()
 	local i = 1;
 	dprint("Time (Frames),X Position,Y Position,Z Position,Dxz,Dy,Rotation X,Rotation Y,Rotation Z,");
 	for i=1,#telemetryData do
@@ -286,17 +305,17 @@ local function output_telemetry()
 	print_deferred();
 end
 
-local function start_telemetry()
+local function startTelemetry()
 	collecting_telemetry = true;
-	forms.settext(options_toggle_telemetry_button, "Stop Telemetry");
+	forms.settext(form_controls["Toggle Telemetry Button"], "Stop Telemetry");
 	telemetryData = {};
 end
 
-local function stop_telemetry()
+local function stopTelemetry()
 	collecting_telemetry = false;
-	forms.settext(options_toggle_telemetry_button, "Start Telemetry");
+	forms.settext(form_controls["Toggle Telemetry Button"], "Start Telemetry");
 
-	output_telemetry();
+	outputTelemetry();
 	return;
 
 	-- Output to file
@@ -304,20 +323,20 @@ local function stop_telemetry()
 	--local json_data = JSON:encode_pretty(telemetryData);
 	--local file = io.open("Lua/ScriptHawk/DK64_Y_Data.json", "w+");
 	--if type(file) ~= "nil" then
-		--io.output(file);
-		--io.write(json_data);
-		--io.close(file);
+	--io.output(file);
+	--io.write(json_data);
+	--io.close(file);
 	--else
-		--print("Error writing to file =(");
-		--output_telemetry();
+	--print("Error writing to file =(");
+	--outputTelemetry();
 	--end
 end
 
-local function toggle_telemetry()
+local function toggleTelemetry()
 	if collecting_telemetry then
-		stop_telemetry();
+		stopTelemetry();
 	else
-		start_telemetry();
+		startTelemetry();
 	end
 end
 
@@ -346,29 +365,29 @@ end
 
 local options_form = forms.newform(col(17), row(10), "ScriptHawk Options");
 
------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
--- Handle                                    Type                         Caption          Callback               X position   Y position                Width             Height      --
------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
-local options_mode_label =                   forms.label(options_form,    "Mode:",                                col(0),      row(0) + label_offset,    44,               button_height);
-local options_mode_button =                  forms.button(options_form,   mode,            toggle_mode,           col(2),      row(0),                   64,               button_height);
+-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+-- Handle                                    Type                         Caption          Callback              X position   Y position                Width          Height      --
+-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+form_controls["Mode Label"] =                forms.label(options_form,    "Mode:",                               col(0),      row(0) + label_offset,    44,            button_height);
+form_controls["Mode Button"] =               forms.button(options_form,   mode,            toggleMode,           col(2),      row(0),                   64,            button_height);
 
-local options_precision_label =              forms.label(options_form,    "Precision:",                           col(0),      row(1) + label_offset,    54,               14);
-local options_decrease_precision_button =    forms.button(options_form,   "-",             decrease_precision,    col(4) - 28, row(1),                   button_height,    button_height);
-local options_increase_precision_button =    forms.button(options_form,   "+",             increase_precision,    col(5) - 28, row(1),                   button_height,    button_height);
-local options_precision_value_label =        forms.label(options_form,    precision,                              col(5),      row(1) + label_offset,    44,               14);
+form_controls["Precision Label"] =           forms.label(options_form,    "Precision:",                          col(0),      row(1) + label_offset,    54,            14);
+form_controls["Decrease Precision Button"] = forms.button(options_form,   "-",             decreasePrecision,    col(4) - 28, row(1),                   button_height, button_height);
+form_controls["Increase Precision Button"] = forms.button(options_form,   "+",             increasePrecision,    col(5) - 28, row(1),                   button_height, button_height);
+form_controls["Precision Value Label"] =     forms.label(options_form,    precision,                             col(5),      row(1) + label_offset,    44,            14);
 
-local options_speedy_speed_label =           forms.label(options_form,    "Speed:",                               col(0),      row(2) + label_offset,    54,               14);
-local options_decrease_speedy_speed_button = forms.button(options_form,   "-",             decrease_speedy_speed, col(4) - 28, row(2),                   button_height,    button_height);
-local options_increase_speedy_speed_button = forms.button(options_form,   "+",             increase_speedy_speed, col(5) - 28, row(2),                   button_height,    button_height);
-local options_speedy_speed_value_label =     forms.label(options_form,    "0",                                    col(5),      row(2) + label_offset,    54,               14);
+form_controls["Speed Label"] =               forms.label(options_form,    "Speed:",                              col(0),      row(2) + label_offset,    54,            14);
+form_controls["Decrease Speed Button"] =     forms.button(options_form,   "-",             decreaseSpeed,        col(4) - 28, row(2),                   button_height, button_height);
+form_controls["Increase Speed Button"] =     forms.button(options_form,   "+",             increaseSpeed,        col(5) - 28, row(2),                   button_height, button_height);
+form_controls["Speed Value Label"] =         forms.label(options_form,    "0",                                   col(5),      row(2) + label_offset,    54,            14);
 
-local options_map_dropdown =                 forms.dropdown(options_form, Game.maps,                              col(0),      row(3) + dropdown_offset, col(9) + 7,       button_height);
-options_toggle_telemetry_button =            forms.button(options_form,   "Start Telemetry", toggle_telemetry,    col(10),     row(3),                   col(4) + 8,       button_height);
-local options_map_checkbox =                 forms.checkbox(options_form, "Take me there",           col(0) + dropdown_offset, row(4) + dropdown_offset);
-local options_toggle_infinites =             forms.checkbox(options_form, "Infinites",               col(0) + dropdown_offset, row(5) + dropdown_offset);
+form_controls["Map Dropdown"] =              forms.dropdown(options_form, Game.maps,                             col(0),      row(3) + dropdown_offset, col(9) + 7,    button_height);
+form_controls["Toggle Telemetry Button"] =   forms.button(options_form, "Start Telemetry", toggleTelemetry,      col(10),     row(3),                   col(4) + 8,    button_height);
+form_controls["Map Checkbox"] =              forms.checkbox(options_form, "Take me there",                       col(0) + dropdown_offset, row(4) + dropdown_offset);
+form_controls["Toggle Infinites Checkbox"] = forms.checkbox(options_form, "Infinites",                           col(0) + dropdown_offset, row(5) + dropdown_offset);
 
-local options_rot_units_label =              forms.label(options_form,    "Units:",                               col(5),      row(0) + label_offset,    44,               14);
-local options_toggle_rot_units_button =      forms.button(options_form,   rotation_units,  toggle_rotation_units, col(7),      row(0),                   64,               button_height);
+form_controls["Rotation Units Label"] =      forms.label(options_form,    "Units:",                              col(5),      row(0) + label_offset,    44,            14);
+form_controls["Toggle Rotation Units Button"] = forms.button(options_form, rotation_units,  toggleRotationUnits, col(7),      row(0),                   64,            button_height);
 
 -- Init any custom UI that the game module uses
 Game.initUI(options_form, col, row, button_height, label_offset, dropdown_offset);
@@ -384,12 +403,12 @@ end
 
 function updateUIReadouts_ScriptHawk()
 	-- Update form buttons etc
-	forms.settext(options_speedy_speed_value_label, Game.speedy_speeds[Game.speedy_index]);
-	forms.settext(options_precision_value_label, precision);
-	forms.settext(options_mode_button, mode);
-	forms.settext(options_toggle_rot_units_button, rotation_units);
-	if previous_map ~= forms.gettext(options_map_dropdown) then
-		previous_map = forms.gettext(options_map_dropdown);
+	forms.settext(form_controls["Speed Value Label"], Game.speedy_speeds[Game.speedy_index]);
+	forms.settext(form_controls["Precision Value Label"], precision);
+	forms.settext(form_controls["Mode Button"], mode);
+	forms.settext(form_controls["Toggle Rotation Units Button"], rotation_units);
+	if previous_map ~= forms.gettext(form_controls["Map Dropdown"]) then
+		previous_map = forms.gettext(form_controls["Map Dropdown"]);
 		previous_map_value = findMapValue();
 	end
 
@@ -452,6 +471,10 @@ function updateUIReadouts_ScriptHawk()
 		--row = row + 2;
 	end
 end
+
+--------------------
+-- Core functions --
+--------------------
 
 local function gofast(axis, speed)
 	if axis == "x" then
@@ -553,27 +576,27 @@ local function mainloop()
 			practice_load_slot_pressed = true;
 		end
 		if joypad_pressed["P1 DPad L"] and not practice_decrease_slot_pressed then
-			decrease_save_slot();
+			decreaseSaveSlot();
 			gui.addmessage("Switched to save slot "..practice_save_slot);
 			practice_decrease_slot_pressed = true;
 		end
 		if joypad_pressed["P1 DPad R"] and not practice_increase_slot_pressed then
-			increase_save_slot();
+			increaseSaveSlot();
 			gui.addmessage("Switched to save slot "..practice_save_slot);
 			practice_increase_slot_pressed = true;
 		end
 	end
 
-	if forms.ischecked(options_toggle_infinites) then
+	if forms.ischecked(form_controls["Toggle Infinites Checkbox"]) then
 		Game.applyInfinites();
 	end
 
-	if forms.ischecked(options_map_checkbox) then
+	if forms.ischecked(form_controls["Map Checkbox"]) then
 		Game.setMap(previous_map_value);
 	end
 end
 
-local function handle_input()
+local function handleInput()
 	input_table = input.get();
 
 	-- Hold down key prevention
@@ -595,12 +618,12 @@ local function handle_input()
 
 	-- Check for key presses
 	--if input_table[decrease_precision_key] == true and decrease_precision_pressed == false then
-	--	decrease_precision();
+	--	decreasePrecision();
 	--	decrease_precision_pressed = true;
 	--end
 
 	--if input_table[increase_precision_key] == true and increase_precision_pressed == false then
-	--	increase_precision();
+	--	increasePrecision();
 	--	increase_precision_pressed = true;
 	--end
 
@@ -613,7 +636,7 @@ local function handle_input()
 	end
 
 	--if input_table[switch_mode_key] == true and switch_mode_pressed == false then
-	--	toggle_mode();
+	--	toggleMode();
 	--	switch_mode_pressed = true;
 	--end
 end
@@ -622,8 +645,8 @@ local function plot_pos()
 	Game.eachFrame();
 
 	previous_frame = current_frame;
-	current_frame=emu.framecount();
-	
+	current_frame = emu.framecount();
+
 	x = Game.getXPosition();
 	y = Game.getYPosition();
 	z = Game.getZPosition();
@@ -641,14 +664,20 @@ local function plot_pos()
 	end
 
 	if Game.isPhysicsFrame() then
-		dx = x - prev_x;
-		dy = y - prev_y;
-		dz = z - prev_z;
-		if math.abs(current_frame-previous_frame) > 1 then
-			dx=0;
-			dy=0;
-			dz=0;
+		if math.abs(current_frame - previous_frame) > 1 then
+			dx = 0;
+			dy = 0;
+			dz = 0;
+			max_dx = 0.0;
+			max_dy = 0.0;
+			max_dz = 0.0;
+			max_d = 0.0;
+		else
+			dx = x - prev_x;
+			dy = y - prev_y;
+			dz = z - prev_z;
 		end
+
 		d = math.sqrt(dx*dx + dz*dz);
 
 		if (max_dx ~= nil and max_dy ~= nil and max_dz ~= nil and max_d ~= nil) and (dx ~= nil and dy ~= nil and dz ~= nil and d ~= nil) then
@@ -665,7 +694,7 @@ local function plot_pos()
 		prev_x = x;
 		prev_y = y;
 		prev_z = z;
-		
+
 		-- Telemetry
 		if collecting_telemetry then
 			local temp_telemetry_data = {
@@ -685,6 +714,7 @@ local function plot_pos()
 	updateUIReadouts_ScriptHawk();
 end
 
-event.onframestart(handle_input, "Keyboard input handler");
-event.onframestart(plot_pos, "Plot position");
-event.onframestart(mainloop, "Moonjump");
+event.onframestart(handleInput, "ScriptHawk - Keyboard input handler");
+event.onframestart(mainloop, "ScriptHawk - Controller input handler");
+event.onframestart(plot_pos, "ScriptHawk - Update position each frame");
+event.onloadstate(plot_pos, "ScriptHawk - Update position on load state");
