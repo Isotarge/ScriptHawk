@@ -21,6 +21,13 @@ elseif romName == "Tetris Attack (USA) (En,Ja)" then
 	cursor_right_y = {0x3B0, 0x3B2};
 	row_height_tickers = {0x404, 0x406};
 	grid_base = {0xFAE, 0x10AE};
+elseif romName == "Tetris Attack (Europe) (En,Ja)" then
+	cursor_left_x = {0x3A6, 0x3A8};
+	cursor_left_y = {0x3AA, 0x3AC};
+	cursor_right_x = {0x3AE, 0x3B0};
+	cursor_right_y = {0x3B2, 0x3B4};
+	row_height_tickers = {0x406, 0x408};
+	grid_base = {0xFB0, 0x10B0};
 else
 	print("This game is not currently supported.");
 	return;
