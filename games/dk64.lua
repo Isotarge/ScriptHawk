@@ -3054,8 +3054,9 @@ function Game.setVelocity(value)
 		mainmemory.writefloat(jumpman_velocity[1], value, true);
 	elseif map_value == jetpac_map then
 		mainmemory.writefloat(jetman_velocity[1], value, true);
+	else
+		mainmemory.writefloat(kong_object + velocity, value, true);
 	end
-	mainmemory.writefloat(kong_object + velocity, value, true);
 end
 
 --function Game.getAcceleration()
@@ -3079,8 +3080,9 @@ function Game.setYVelocity(value)
 		mainmemory.writefloat(jumpman_velocity[2], value, true);
 	elseif map_value == jetpac_map then
 		mainmemory.writefloat(jetman_velocity[2], value, true);
+	else
+		mainmemory.writefloat(kong_object + y_velocity, value, true);
 	end
-	mainmemory.writefloat(kong_object + y_velocity, value, true);
 end
 
 function Game.getYAcceleration()
