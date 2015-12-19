@@ -2726,6 +2726,22 @@ function flagStats(verbose)
 	print_deferred();
 end
 
+------------------
+-- TBS Nonsense --
+------------------
+
+--force_tbs = false;
+function forceTBS()
+	if force_tbs then
+		local pointer = mainmemory.read_u32_be(kong_object + locked_to_rainbow_coin_pointer);
+		if pointer > 0x80000000 and pointer < 0x807FFFFF then
+			print("Forcing TBS");
+			mainmemory.write_u32_be(kong_object + locked_to_rainbow_coin_pointer, 0x00000000);
+		end
+	end
+end
+event.onframestart(forceTBS, "ScriptHawk - Force TBS");
+
 --------------------
 -- Region/Version --
 --------------------
@@ -2909,7 +2925,7 @@ function isInSubGame()
 	return map_value == arcade_map or map_value == jetpac_map;
 end
 
-function Game.getFloor()
+function Game.getFloor() -- TODO: Got errors with this when exiting tiny temple
 	return mainmemory.readfloat(kong_object + floor, true);
 end
 
@@ -3033,6 +3049,15 @@ function Game.getVelocity()
 	return mainmemory.readfloat(kong_object + velocity, true);
 end
 
+function Game.setVelocity(value)
+	if map_value == arcade_map then
+		mainmemory.writefloat(jumpman_velocity[1], value, true);
+	elseif map_value == jetpac_map then
+		mainmemory.writefloat(jetman_velocity[1], value, true);
+	end
+	mainmemory.writefloat(kong_object + velocity, value, true);
+end
+
 --function Game.getAcceleration()
 --	if not isInSubGame() then
 --		return mainmemory.readfloat(kong_object + acceleration, true);
@@ -3047,6 +3072,15 @@ function Game.getYVelocity()
 		return mainmemory.readfloat(jetman_velocity[2], true);
 	end
 	return mainmemory.readfloat(kong_object + y_velocity, true);
+end
+
+function Game.setYVelocity(value)
+	if map_value == arcade_map then
+		mainmemory.writefloat(jumpman_velocity[2], value, true);
+	elseif map_value == jetpac_map then
+		mainmemory.writefloat(jetman_velocity[2], value, true);
+	end
+	mainmemory.writefloat(kong_object + y_velocity, value, true);
 end
 
 function Game.getYAcceleration()

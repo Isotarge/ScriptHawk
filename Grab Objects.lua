@@ -34,12 +34,100 @@ local object_index = 1;
 local max_objects = 0xFF;
 local radius = 100;
 
+local actor_types = {
+	[2] = "DK",
+	[3] = "Diddy",
+	[4] = "Lanky",
+	[5] = "Tiny",
+	[6] = "Chunky",
+	[7] = "Krusha",
+	[8] = "Rambi",
+	[9] = "Enguarde",
+	[18] = "Rambi Box",
+	[26] = "TNT Barrel",
+	[27] = "TNT Barrel Spawner (Armydillo)",
+	[28] = "Bonus Barrel", -- TODO: all types?
+	[32] = "Swinging Light",
+	[33] = "Vine (Brown)",
+	[36] = "Peanut",
+	[40] = "Mini Monkey barrel",
+	[42] = "Grape",
+	[43] = "Feather",
+	[48] = "Coconut",
+	[49] = "Rocketbarrel",
+	[57] = "Strong Kong Barrel",
+	[58] = "Swinging Light",
+	[61] = "Boulder",
+	[63] = "Vase (O)",
+	[64] = "Vase (:)",
+	[65] = "Vase (Triangle)",
+	[66] = "Vase (+)",
+	[69] = "Vine (Green)",
+	[72] = "Boss Key",
+	[85] = "Steel Keg",
+	[98] = "Tag Barrel",
+	[97] = "TNT Barrel Spawner (Dogadon)",
+	[114] = "DK Balloon", -- TODO: Verify
+	[115] = "K. Lumsy's Cage", -- TODO: Also rabbit race finish line?
+	[130] = "Apple (Fungi)",
+	[133] = "Barrel",
+	[134] = "Training Barrel",
+	[136] = "Tag Barrel",
+	[138] = "B. Locker",
+	[139] = "Rainbow Coin Patch",
+	[163] = "Banana Fairy (BFI)",
+	[167] = "Cannon",
+	[176] = "Timer", -- Training barrel
+	[178] = "Beaver (Blue)",
+	[182] = "Barrel Enemy (Normal)",
+	[183] = "Zinger",
+	[184] = "Snide",
+	[185] = "Armydillo",
+	[187] = "Klump",
+	[188] = "Camera",
+	[189] = "Cranky",
+	[190] = "Funky",
+	[191] = "Candy",
+	[197] = "Trapped Diddy",
+	[199] = "Trapped Tiny",
+	[201] = "Llama",
+	[203] = "Padlock (T&S)",
+	[204] = "Mad Jack",
+	[205] = "Klaptrap (Green)",
+	[206] = "Zinger",
+	[212] = "Beaver (Gold)",
+	[216] = "Pufftoss",
+	[224] = "Mushroom Enemy",
+	[226] = "Troff",
+	[235] = "Robo-Kremling",
+	[234] = "Scoff",
+	[236] = "Dogadon",
+	[238] = "Kremling",
+	[241] = "Kasplat (DK)",
+	[242] = "Kasplat (Diddy)",
+	[243] = "Kasplat (Lanky)",
+	[244] = "Kasplat (Tiny)",
+	[245] = "Kasplat (Chunky)",
+	[248] = "Banana Fairy",
+	[252] = "Rabbit (Fungi)",
+	[254] = "Fake DK", -- TODO: Also used on main menu & DK Rap?
+	[261] = "Robo-Zinger",
+	[264] = "Squawks",
+	[270] = "Domino Enemy",
+	[271] = "Dice Enemy",
+	[275] = "K. Lumsy",
+	[291] = "Kosha",
+	[333] = "Unknown on main menu",
+	[334] = "Padlock (K. Lumsy)",
+}
+
 -- Relative to objects found in the pointer list
 local model_pointer = 0x00;
 local rendering_parameters_pointer = 0x04;
 local current_bone_array_pointer = 0x08;
 
 local hand_state = 0x47; -- Bitfield
+local actor_type = 0x58; -- TODO: Document values for this
 local visibility = 0x63; -- 127 = visible
 
 local specular_highlight = 0x6D;
@@ -156,7 +244,12 @@ local function getExamineData(pointer)
 	table.insert(examine_data, { "Y Velocity", mainmemory.readfloat(pointer + y_velocity, true) });
 	table.insert(examine_data, { "Y Accel", mainmemory.readfloat(pointer + y_acceleration, true) });
 	table.insert(examine_data, { "Separator", 1 });
-	
+
+	local currentActorType = mainmemory.read_u32_be(pointer + actor_type);
+	if type(actor_types[currentActorType]) ~= "nil" then
+		currentActorType = actor_types[currentActorType];
+	end
+	table.insert(examine_data, { "Actor type", currentActorType });
 	table.insert(examine_data, { "Hand state", mainmemory.readbyte(pointer + hand_state) });
 	table.insert(examine_data, { "Specular highlight", mainmemory.readbyte(pointer + specular_highlight) });
 	table.insert(examine_data, { "Separator", 1 });
@@ -245,7 +338,7 @@ local function draw_gui()
 		gui.text(gui_x, gui_y + height * row, string.format("Model pointer: 0x%06x", mainmemory.read_u24_be(object_pointers[object_index] + model_pointer + 1)), null, null, 'bottomright');
 		row = row + 1;
 
-		if grab_script_mode == "Examine" then
+		if grab_script_mode == "Examine" or not safeMode or true then
 			local examine_data = getExamineData(object_pointers[object_index]);
 			local i;
 			for i=#examine_data,1,-1 do
