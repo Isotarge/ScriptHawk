@@ -237,7 +237,7 @@ function Game.setVelocity(value)
 	end
 end
 
-function Game.getZVelocity()
+function Game.getLateralVelocity()
 	local player_object = mainmemory.read_u32_be(player_object_pointer);
 	if is_pointer(player_object) then
 		player_object = player_object - 0x80000000;
@@ -246,7 +246,7 @@ function Game.getZVelocity()
 	return 0;
 end
 
-function Game.setZVelocity(value)
+function Game.setLateralVelocity(value)
 	local player_object = mainmemory.read_u32_be(player_object_pointer);
 	if is_pointer(player_object) then
 		player_object = player_object - 0x80000000;

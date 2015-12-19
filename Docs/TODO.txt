@@ -12,6 +12,7 @@ TODO:
 - BT map support for versions other than US
 - BT Jinjo Manip memory analysis
 - Support both BizHawk and m64p https://github.com/notwa/mm/commit/90d30e218f3128fb130e54bd8662527bdd73f40f
+- Port Tetris Attack bot to Pokémon Puzzle League (once it boots in mupen ofc)
 
 Game support wishlist:
 

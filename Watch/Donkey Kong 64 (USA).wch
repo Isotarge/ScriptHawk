@@ -8,6 +8,8 @@ SystemID N64
 014DCF	b	s	1	RDRAM	Joystick Y (P2)
 02F050	d	f	1	RDRAM	Jetman X Position
 02F054	d	f	1	RDRAM	Jetman Y Position
+02F058	d	f	1	RDRAM	Jetman X Velocity
+02F05C	d	f	1	RDRAM	Jetman Y Velocity
 0337E0	d	h	1	RDRAM	Diddy ? colour (Main Menu)
 0337E4	d	h	1	RDRAM	Lanky ? colour (Main Menu)
 0337E8	d	h	1	RDRAM	Tiny ? colour (Main Menu)
@@ -69,7 +71,7 @@ SystemID N64
 75C48B	b	h	1	RDRAM	Enguarde Model
 75C49B	b	h	1	RDRAM	Squawks Model
 75C4AB	b	h	1	RDRAM	Squawks Model
-7654F4	d	h	1	RDRAM	Key flags pointer?
+7654F4	d	h	1	RDRAM	Flag Block Pointer
 767CC6	w	u	1	RDRAM	Freeze to freeze main thread
 76A066	w	1	1	RDRAM	Main object timer?
 76A0AB	b	h	1	RDRAM	Background?

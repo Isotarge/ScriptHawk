@@ -679,7 +679,7 @@ function Game.setYPosition(value)
 	mainmemory.writefloat(y_pos + 0x10, value, true);
 
 	-- Nullify gravity when setting Y position
-	mainmemory.writefloat(y_vel, 0, true);
+	Game.setYVelocity(0);
 end
 
 function Game.setZPosition(value)
@@ -720,6 +720,34 @@ function Game.setZRotation(value)
 
 	-- Also set the target
 	mainmemory.writefloat(z_rot + 4, value, true);
+end
+
+--------------
+-- Velocity --
+--------------
+
+function Game.getXVelocity()
+	return mainmemory.readfloat(x_vel, true);
+end
+
+function Game.getYVelocity()
+	return mainmemory.readfloat(y_vel, true);
+end
+
+function Game.getZVelocity()
+	return mainmemory.readfloat(z_vel, true);
+end
+
+function Game.setXVelocity(value)
+	return mainmemory.writefloat(x_vel, value, true);
+end
+
+function Game.setYVelocity(value)
+	return mainmemory.writefloat(y_vel, value, true);
+end
+
+function Game.setZVelocity(value)
+	return mainmemory.writefloat(z_vel, value, true);
 end
 
 ------------

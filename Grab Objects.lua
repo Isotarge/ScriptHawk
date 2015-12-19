@@ -3,9 +3,6 @@ local kong_model_pointer;
 local camera_pointer;
 safeMode = true;
 
-local camera_focus_pointer = 0x178; -- TODO: Verify for all versions
-local grab_pointer = 0x32c;
-
 local romName = gameinfo.getromname();
 
 if bizstring.contains(romName, "Donkey Kong 64") then
@@ -34,11 +31,13 @@ end
 
 local object_pointers = {};
 local object_index = 1;
-local max_objects = 0xff;
-
+local max_objects = 0xFF;
 local radius = 100;
 
+-- Relative to objects found in the pointer list
 local model_pointer = 0x00;
+local rendering_parameters_pointer = 0x04;
+local current_bone_array_pointer = 0x08;
 
 local hand_state = 0x47; -- Bitfield
 local visibility = 0x63; -- 127 = visible
@@ -48,26 +47,35 @@ local specular_highlight = 0x6D;
 local shadow_width = 0x6E;
 local shadow_height = 0x6F;
 
-local x_pos = 0x7c;
+local x_pos = 0x7C;
 local y_pos = 0x80;
 local z_pos = 0x84;
 
 local visibility = 0x63; -- 127 = visible
 
-local floor = 0xa4;
+local floor = 0xA4;
+local distance_from_floor = 0xB4;
 
-local kick_freeze = 0xc4;
-local kick_freeze_value = 0xc020;
+local velocity = 0xB8;
+local acceleration = 0xBC; -- Seems wrong
 
-local light_thing = 0xcc; -- Values 0x00->0x14
+local y_velocity = 0xC0;
+local y_acceleration = 0xC4;
 
-local x_rot = 0xe4;
-local y_rot = 0xe6;
-local z_rot = 0xe8;
+local gravity_strength = 0xC8;
+
+local light_thing = 0xCC; -- Values 0x00->0x14
+
+local x_rot = 0xE4;
+local y_rot = 0xE6;
+local z_rot = 0xE8;
 
 local shade_byte = 0x16D;
 
-local tb_kickout_timer = 0x1b4;
+local tb_kickout_timer = 0x1B4;
+
+local camera_focus_pointer = 0x178; -- TODO: Verify for all versions
+local grab_pointer = 0x32c;
 
 local grab_script_mode = "Grab";
 
@@ -137,21 +145,32 @@ local function getExamineData(pointer)
 	table.insert(examine_data, { "X", mainmemory.readfloat(pointer + x_pos, true) });
 	table.insert(examine_data, { "Y", mainmemory.readfloat(pointer + y_pos, true) });
 	table.insert(examine_data, { "Z", mainmemory.readfloat(pointer + z_pos, true) });
+	table.insert(examine_data, { "Separator", 1 });
 
 	table.insert(examine_data, { "Rot X", mainmemory.read_u16_be(pointer + x_rot) });
 	table.insert(examine_data, { "Rot Y", mainmemory.read_u16_be(pointer + y_rot) });
 	table.insert(examine_data, { "Rot Z", mainmemory.read_u16_be(pointer + z_rot) });
+	table.insert(examine_data, { "Separator", 1 });
 
+	table.insert(examine_data, { "Velocity", mainmemory.readfloat(pointer + velocity, true) });
+	table.insert(examine_data, { "Y Velocity", mainmemory.readfloat(pointer + y_velocity, true) });
+	table.insert(examine_data, { "Y Accel", mainmemory.readfloat(pointer + y_acceleration, true) });
+	table.insert(examine_data, { "Separator", 1 });
+	
 	table.insert(examine_data, { "Hand state", mainmemory.readbyte(pointer + hand_state) });
 	table.insert(examine_data, { "Specular highlight", mainmemory.readbyte(pointer + specular_highlight) });
+	table.insert(examine_data, { "Separator", 1 });
 
 	table.insert(examine_data, { "Shadow width", mainmemory.readbyte(pointer + shadow_width) });
 	table.insert(examine_data, { "Shadow height", mainmemory.readbyte(pointer + shadow_height) });
+	table.insert(examine_data, { "Separator", 1 });
 
 	table.insert(examine_data, { "Shade byte", mainmemory.readbyte(pointer + shade_byte) });
 	table.insert(examine_data, { "Visibility", mainmemory.readbyte(pointer + visibility) });
+	table.insert(examine_data, { "Separator", 1 });
 
 	table.insert(examine_data, { "Grab pointer", string.format("0x%08x", mainmemory.read_u32_be(pointer + grab_pointer)) });
+	table.insert(examine_data, { "Separator", 1 });
 
 	table.insert(examine_data, { "TB kickout timer", mainmemory.read_u32_be(pointer + tb_kickout_timer) });
 
@@ -229,9 +248,13 @@ local function draw_gui()
 		if grab_script_mode == "Examine" then
 			local examine_data = getExamineData(object_pointers[object_index]);
 			local i;
-			for i=1,#examine_data do
-				gui.text(gui_x, gui_y + height * row, examine_data[i][1]..": "..examine_data[i][2], null, null, 'bottomright');
-				row = row + 1;
+			for i=#examine_data,1,-1 do
+				if examine_data[i][1] ~= "Separator" then
+					gui.text(gui_x, gui_y + height * row, examine_data[i][1]..": "..examine_data[i][2], null, null, 'bottomright');
+					row = row + 1;
+				else
+					row = row + examine_data[i][2];
+				end
 			end
 		end
 	end

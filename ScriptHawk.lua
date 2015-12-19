@@ -401,6 +401,10 @@ local function findMapValue()
 	return 0;
 end
 
+-- TODO: More dynamic OSD code, maybe have the game module set it up rather than this mess
+-- OSDFunctions table
+-- OSDLabels table
+-- Separator etc
 function updateUIReadouts_ScriptHawk()
 	-- Update form buttons etc
 	forms.settext(form_controls["Speed Value Label"], Game.speedy_speeds[Game.speedy_index]);
@@ -442,12 +446,40 @@ function updateUIReadouts_ScriptHawk()
 			gui.text(gui_x_offset, gui_y_offset + row_height * row, "Velocity: "..round(Game.getVelocity(), precision));
 			row = row + 1;
 		end
+		if type(Game.getAcceleration) == "function" then
+			gui.text(gui_x_offset, gui_y_offset + row_height * row, "Accel: "..round(Game.getAcceleration(), precision));
+			row = row + 1;
+		end
+		if type(Game.getXVelocity) == "function" then
+			gui.text(gui_x_offset, gui_y_offset + row_height * row, "X Velocity: "..round(Game.getXVelocity(), precision));
+			row = row + 1;
+		end
+		if type(Game.getXAcceleration) == "function" then
+			gui.text(gui_x_offset, gui_y_offset + row_height * row, "X Accel: "..round(Game.getXAcceleration(), precision));
+			row = row + 1;
+		end
 		if type(Game.getYVelocity) == "function" then
 			gui.text(gui_x_offset, gui_y_offset + row_height * row, "Y Velocity: "..round(Game.getYVelocity(), precision));
 			row = row + 1;
 		end
+		if type(Game.getYAcceleration) == "function" then
+			gui.text(gui_x_offset, gui_y_offset + row_height * row, "Y Accel: "..round(Game.getYAcceleration(), precision));
+			row = row + 1;
+		end
 		if type(Game.getZVelocity) == "function" then
 			gui.text(gui_x_offset, gui_y_offset + row_height * row, "Z Velocity: "..round(Game.getZVelocity(), precision));
+			row = row + 1;
+		end
+		if type(Game.getZAcceleration) == "function" then
+			gui.text(gui_x_offset, gui_y_offset + row_height * row, "Z Accel: "..round(Game.getZAcceleration(), precision));
+			row = row + 1;
+		end
+		if type(Game.getLateralVelocity) == "function" then
+			gui.text(gui_x_offset, gui_y_offset + row_height * row, "Lateral Velocity: "..round(Game.getLateralVelocity(), precision));
+			row = row + 1;
+		end
+		if type(Game.getLateralAcceleration) == "function" then
+			gui.text(gui_x_offset, gui_y_offset + row_height * row, "Lateral Accel: "..round(Game.getLateralAcceleration(), precision));
 			row = row + 1;
 		end
 		row = row + 1;
@@ -467,8 +499,6 @@ function updateUIReadouts_ScriptHawk()
 		row = row + 1;
 		gui.text(gui_x_offset, gui_y_offset + row_height * row, "Rot Z: "..formatRotation(rot_z));
 		row = row + 1;
-		--gui.text(gui_x_offset, gui_y_offset + row_height * row, "Rot L: "..formatRotation(rot_l));
-		--row = row + 2;
 	end
 end
 

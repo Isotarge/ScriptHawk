@@ -378,10 +378,16 @@ local x_pos = 0x7C;
 local y_pos = 0x80;
 local z_pos = 0x84;
 
-local floor = 0xa4;
+local floor = 0xA4;
+local distance_from_floor = 0xB4;
 
-local kick_freeze = 0xC4;
-local kick_freeze_value = 0xC020;
+local velocity = 0xB8;
+local acceleration = 0xBC; -- Seems wrong
+
+local y_velocity = 0xC0;
+local y_acceleration = 0xC4;
+
+local gravity_strength = 0xC8;
 
 local light_thing = 0xCC; -- Values 0x00->0x14
 
@@ -2755,7 +2761,9 @@ function Game.detectVersion(romName)
 
 		--Subgames
 		jumpman_position = {0x04BD70, 0x04BD74};
+		jumpman_velocity = {0x04BD78, 0x04BD7C};
 		jetman_position  = {0x02F050, 0x02F054};
+		jetman_velocity =  {0x02F058, 0x02F05C};
 	elseif bizstring.contains(romName, "Europe") then
 		version = "PAL";
 		map                    = 0x73EC37;
@@ -2786,7 +2794,9 @@ function Game.detectVersion(romName)
 
 		--Subgames
 		jumpman_position = {0x03ECD0, 0x03ECD4};
+		jumpman_velocity = {0x03ECD8, 0x03ECDC};
 		jetman_position  = {0x022100, 0x022104};
+		jetman_velocity  = {0x022108, 0x02210C};
 	elseif bizstring.contains(romName, "Japan") then
 		version = "JP";
 		map                    = 0x743DA7;
@@ -2817,7 +2827,9 @@ function Game.detectVersion(romName)
 
 		--Subgames
 		jumpman_position = {0x03EB00, 0x03EB04};
+		jumpman_velocity = {0x03EB00, 0x03EB04};
 		jetman_position  = {0x022060, 0x022064};
+		jetman_velocity  = {0x022068, 0x02206C};
 	elseif bizstring.contains(romName, "Kiosk") then
 		version = "Kiosk";
 		file                = 0x7467c8; -- TODO?
@@ -2829,7 +2841,7 @@ function Game.detectVersion(romName)
 		kongbase            = 0x7fc950; -- TODO
 		global_base         = 0x7fcc41; -- TODO
 
-		-- TODO: Keys?
+		-- TODO: Flags?
 
 		x_rot = 0xD8;
 		y_rot = 0xDA;
@@ -2899,6 +2911,10 @@ end
 
 function Game.getFloor()
 	return mainmemory.readfloat(kong_object + floor, true);
+end
+
+function Game.getDistanceFromFloor()
+	return mainmemory.readfloat(kong_object + distance_from_floor, true);
 end
 
 --------------
@@ -3002,6 +3018,42 @@ function Game.setZRotation(value)
 	if not isInSubGame() then
 		mainmemory.write_u16_be(kong_object + z_rot, value);
 	end
+end
+
+-----------------------------
+-- Velocity & Acceleration --
+-----------------------------
+
+function Game.getVelocity()
+	if map_value == arcade_map then
+		return mainmemory.readfloat(jumpman_velocity[1], true);
+	elseif map_value == jetpac_map then
+		return mainmemory.readfloat(jetman_velocity[1], true);
+	end
+	return mainmemory.readfloat(kong_object + velocity, true);
+end
+
+--function Game.getAcceleration()
+--	if not isInSubGame() then
+--		return mainmemory.readfloat(kong_object + acceleration, true);
+--	end
+--	return 0;
+--end
+
+function Game.getYVelocity()
+	if map_value == arcade_map then
+		return mainmemory.readfloat(jumpman_velocity[2], true);
+	elseif map_value == jetpac_map then
+		return mainmemory.readfloat(jetman_velocity[2], true);
+	end
+	return mainmemory.readfloat(kong_object + y_velocity, true);
+end
+
+function Game.getYAcceleration()
+	if not isInSubGame() then
+		return mainmemory.readfloat(kong_object + y_acceleration, true);
+	end
+	return 0;
 end
 
 --------------------
@@ -3780,7 +3832,7 @@ function Game.eachFrame()
 
 	-- Moonkick
 	if moon_mode == 'All' or (moon_mode == 'Kick' and mainmemory.readbyte(kong_object + kick_animation) == kick_animation_value) then
-		mainmemory.write_u16_be(kong_object + kick_freeze, kick_freeze_value);
+		mainmemory.writefloat(kong_object + y_acceleration, -2.5, true);
 	end
 
 	-- Check EEPROM checksums
