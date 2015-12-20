@@ -366,7 +366,6 @@ local model_pointer = 0x00;
 local rendering_parameters_pointer = 0x04;
 local current_bone_array_pointer = 0x08;
 
-local hand_state = 0x47; -- Bitfield
 local visibility = 0x63; -- 127 = visible
 
 local specular_highlight = 0x6D;
@@ -375,14 +374,14 @@ local shadow_width = 0x6E;
 local shadow_height = 0x6F;
 
 local x_pos = 0x7C;
-local y_pos = 0x80;
-local z_pos = 0x84;
+local y_pos = x_pos + 4;
+local z_pos = y_pos + 4;
 
 local floor = 0xA4;
 local distance_from_floor = 0xB4;
 
 local velocity = 0xB8;
-local acceleration = 0xBC; -- Seems wrong
+--local acceleration = 0xBC; -- Seems wrong
 
 local y_velocity = 0xC0;
 local y_acceleration = 0xC4;
@@ -399,6 +398,7 @@ local z_rot = 0xE8;
 
 local locked_to_pad = 0x110;
 local locked_to_rainbow_coin_pointer = 0x13C;
+local hand_state = 0x147; -- Bitfield
 
 -- State byte
 -- 0x02 First person camera
@@ -432,6 +432,8 @@ local misc_acceleration_float_3 = 0x1B8;
 
 local velocity_ground = 0x1C0;
 
+local grabbed_vine_pointer = 0x2B0;
+
 -- TODO: Properly document these
 local scale = {
 	0x344, 0x348, 0x34C, 0x350, 0x354
@@ -447,8 +449,8 @@ local map_value = 0;
 
 -- Relative to rendering parameters
 local scale_x = 0x34;
-local scale_y = 0x38;
-local scale_z = 0x3C;
+local scale_y = scale_x + 4;
+local scale_z = scale_y + 4;
 
 ----------------
 -- Flag stuff --
