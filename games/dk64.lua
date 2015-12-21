@@ -361,11 +361,15 @@ local lives      = 9; -- This is used as instrument ammo in single player
 ------------------------------------
 -- http://www.therwp.com/forums/showthread.php?t=7238
 
+-- Relative to shared model object (model_pointer)
+local num_bones = 0x20;
+
 -- Relative to Kong Object
 local model_pointer = 0x00;
 local rendering_parameters_pointer = 0x04;
 local current_bone_array_pointer = 0x08;
 
+local actor_type = 0x58; -- TODO: Document values for this
 local visibility = 0x63; -- 127 = visible
 
 local specular_highlight = 0x6D;
@@ -3502,29 +3506,38 @@ end
 local max_objects = 0xff;
 
 function everythingIsKong()
-	local kong_model_pointer = mainmemory.read_u32_be(kong_object + model_pointer);
-	local kong_rendering_parameters_pointer = mainmemory.read_u32_be(kong_object + rendering_parameters_pointer)
+	local kongSharedModel = mainmemory.read_u32_be(kong_object + model_pointer);
 
-	if isPointer(kong_model_pointer) and isPointer(kong_rendering_parameters_pointer) then
-		local camera_object = mainmemory.read_u24_be(camera_pointer + 1);
-		local pointer;
-		local object_model_pointer;
-		local object_no = 0;
-		local object_found = true;
+	if not isPointer(kongSharedModel) then
+		print("This ain't gonna work...");
+		return;
+	end
 
-		while object_found do
-			pointer = mainmemory.read_u24_be(pointer_list + (object_no * 4) + 1);
-			object_found = (pointer > 0x000000) and (pointer < 0x7fffff) and (object_no <= max_objects);
+	local kongNumBones = mainmemory.readbyte(kongSharedModel - 0x80000000 + num_bones);
 
-			if object_found and (pointer ~= camera_object) then
-				object_model_pointer = mainmemory.read_u24_be(pointer + model_pointer + 1);
-				if object_model_pointer > 0x000000 and object_model_pointer < 0x7fffff then
-					mainmemory.write_u32_be(pointer + model_pointer, kong_model_pointer);
-					--mainmemory.write_u32_be(pointer + rendering_parameters_pointer, kong_rendering_parameters_pointer);
-					print("wrote: "..toHexString(pointer));
+	local cameraObject = mainmemory.read_u24_be(camera_pointer + 1);
+	local actorListIndex = 0;
+
+	for actorListIndex = 0, max_objects do
+		local pointer = mainmemory.read_u24_be(pointer_list + (actorListIndex * 4) + 1);
+		local objectFound = pointer > 0x000000 and pointer < 0x7FFFFF;
+
+		if objectFound and (pointer ~= cameraObject) then
+			local modelPointer = mainmemory.read_u24_be(pointer + model_pointer + 1);
+			local hasModel = modelPointer > 0x000000 and modelPointer < 0x7FFFFF;
+
+			local actorType = mainmemory.read_u32_be(pointer + actor_type);
+			--if type(actor_types[actorType]) ~= nil then
+			--	actorType = actor_types[actorType];
+			--end
+
+			if hasModel then
+				local numBones = mainmemory.readbyte(modelPointer + num_bones);
+				if numBones <= kongNumBones then
+					mainmemory.write_u32_be(pointer + model_pointer, kongSharedModel);
+					print("Wrote: "..toHexString(pointer).." Bones: "..numBones.." Type: "..actorType);
 				end
 			end
-			object_no = object_no + 1;
 		end
 	end
 end
@@ -3555,23 +3568,19 @@ end
 paper_thickness = 0.015;
 
 function paperMode()
-	local object_found = true;
-	local object_no = 0;
-	local objectRenderingParameters;
-	local pointer;
-	local camera_object = mainmemory.read_u24_be(camera_pointer + 1);
+	local actorListIndex = 0;
+	local cameraObject = mainmemory.read_u24_be(camera_pointer + 1);
 
-	while object_found do
-		pointer = mainmemory.read_u24_be(pointer_list + (object_no * 4) + 1);
-		object_found = (pointer < 0x7fffff) and (pointer > 0x000000) and (object_no <= max_objects);
+	for actorListIndex = 0, max_objects do
+		local pointer = mainmemory.read_u24_be(pointer_list + (actorListIndex * 4) + 1);
+		local objectFound = pointer < 0x7fffff and pointer > 0x000000;
 
-		if object_found and pointer ~= camera_object then
-			objectRenderingParameters = mainmemory.read_u24_be(pointer + rendering_parameters_pointer + 1);
+		if objectFound and pointer ~= cameraObject then
+			local objectRenderingParameters = mainmemory.read_u24_be(pointer + rendering_parameters_pointer + 1);
 			if objectRenderingParameters > 0x000000 and objectRenderingParameters < 0x7fffff then
 				mainmemory.writefloat(objectRenderingParameters + scale_z, paper_thickness, true);
 			end
 		end
-		object_no = object_no + 1;
 	end
 end
 

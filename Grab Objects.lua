@@ -29,6 +29,10 @@ else
 	return;
 end
 
+local function isPointer(value)
+	return value > 0x80000000 and value < 0x807FFFFF;
+end
+
 local object_pointers = {};
 local object_index = 1;
 local max_objects = 0xFF;
@@ -109,6 +113,7 @@ local actor_types = {
 	[113] = "Balloon (Lanky)",
 	[114] = "Balloon (DK)",
 	[115] = "K. Lumsy's Cage", -- TODO: Also rabbit race finish line?
+	[116] = "Chain",
 	[124] = "Peril Path Panic Controller?", -- TODO: Verify, used anywhere else?
 	[126] = "Fly Swatter",
 	[128] = "Headphones",
@@ -160,6 +165,9 @@ local actor_types = {
 	[216] = "Pufftoss",
 	[224] = "Mushroom Enemy",
 	[226] = "Troff",
+	[228] = "Bad Hit Detection Man",
+	[230] = "Ruler Enemy",
+	[231] = "Toy Box",
 	[232] = "Text Overlay",
 	[234] = "Scoff",
 	[235] = "Robo-Kremling",
@@ -173,6 +181,7 @@ local actor_types = {
 	[245] = "Kasplat (Chunky)",
 	[247] = "Seal",
 	[248] = "Banana Fairy",
+	[249] = "Squawks w/spotlight",
 	[252] = "Rabbit (Fungi)",
 	[254] = "Static Object", -- Fake DK, wheel in Helm, something in DK Rap
 	[255] = "Shockwave",
@@ -185,8 +194,8 @@ local actor_types = {
 	[265] = "Yellow Ray (Dogadon)", -- TODO: Used anywhere else?
 	[267] = "Starfish Enemy",
 	[268] = "Gimpfish Enemy",
-	[270] = "Domino Enemy",
-	[271] = "Dice Enemy",
+	[270] = "Sir Domino",
+	[271] = "Mr. Dice",
 	[275] = "K. Lumsy",
 	[281] = "K. Rool (DK Phase)",
 	[285] = "Bat",
@@ -202,7 +211,7 @@ local actor_types = {
 	[305] = "Missile (Car Race)",
 	[310] = "Spotlight", -- Tag barrel, instrument etc.
 	[311] = "Checkpoint (Seal Race)",
-	[313] = "Fly (Idle Anim.)",
+	[313] = "Particle (Idle Anim.)",
 	[316] = "Kong (Tag Barrel)",
 	[317] = "Locked Kong (Tag Barrel)",
 	--[315] = "Sim Slam Shockwave", TODO: uhhhhh idk
@@ -271,8 +280,20 @@ local camera_focus_pointer = 0x178; -- TODO: Verify for all versions
 local text_shown = 0x1EE; -- 16 bit uint
 local grabbed_vine_pointer = 0x2B0;
 local grab_pointer = 0x32c;
+local fairy_active = 0x36c;
 
-local grab_script_mode = "Grab";
+grab_script_mode = "Grab";
+
+-- Relative to rendering params
+local scale_x = 0x34;
+local scale_y = scale_x + 4;
+local scale_z = scale_y + 4;
+
+local anim_timer1 = 0x94;
+local anim_timer2 = 0x98;
+
+local anim_timer3 = 0x104;
+local anim_timer4 = 0x108;
 
 -- Keybinds
 -- For full list go here http://slimdx.org/docs/html/T_SlimDX_DirectInput_Key.htm
@@ -292,7 +313,8 @@ local function switch_grab_script_mode()
 	elseif grab_script_mode == 'Camera' then
 		grab_script_mode = 'Examine';
 	elseif grab_script_mode == 'Examine' then
-		grab_script_mode = 'Encircle';
+		--grab_script_mode = 'Encircle';
+		grab_script_mode = 'List';
 	elseif grab_script_mode == 'Encircle' then
 		grab_script_mode = 'List';
 	elseif grab_script_mode == 'List' then
@@ -368,6 +390,7 @@ local function getExamineData(pointer)
 	table.insert(examine_data, { "Shadow height", mainmemory.readbyte(pointer + shadow_height) });
 	table.insert(examine_data, { "Separator", 1 });
 
+	table.insert(examine_data, { "Fairy Active", mainmemory.readbyte(pointer + fairy_active) });
 	table.insert(examine_data, { "Shade byte", mainmemory.readbyte(pointer + shade_byte) });
 	table.insert(examine_data, { "Visibility", mainmemory.readbyte(pointer + visibility) });
 	table.insert(examine_data, { "Separator", 1 });
@@ -489,52 +512,54 @@ local function draw_gui()
 end
 
 local function isValidObject(pointer, kong_object, camera_object)
-	if not safeMode then
+	if grab_script_mode == "Examine" or grab_script_mode == "List" or not safeMode then
 		return true;
 	end
 
-	if grab_script_mode == "Examine" or grab_script_mode == "List" then
-		return true;
-	end
+	local modelPointer = mainmemory.read_u32_be(pointer + model_pointer);
+	local hasModel = isPointer(modelPointer);
 
 	if grab_script_mode == "Camera" and pointer ~= camera_object then
-		return true;
+		return hasModel;
 	end
 
 	if grab_script_mode == "Grab" or grab_script_mode == "Encircle" then
 		if pointer ~= kong_object then
-			return true;
+			return hasModel;
 		end
 	end
 end
 
 local function pull_objects()
-	object_pointers = {};
-	local object_found = true;
 	local object_no = 0;
 	local kong_object = mainmemory.read_u24_be(kong_model_pointer);
 	local camera_object = mainmemory.read_u24_be(camera_pointer + 1);
 
-	while object_found do
+	object_pointers = {};
+	for object_no = 0, max_objects do
 		local pointer = mainmemory.read_u24_be(pointer_list + (object_no * 4) + 1);
-		object_found = (pointer ~= 0xffffff) and (pointer ~= 0x000000) and (object_no <= max_objects);
+		local object_found = pointer >= 0x000000 and pointer <= 0x7FFFFF;
 
-		if object_found then
-			if isValidObject(pointer, kong_object, camera_object) then
-				local object_model_pointer = mainmemory.read_u24_be(pointer + model_pointer + 1);
-				if object_model_pointer ~= 0x000000 or not safeMode then
-					table.insert(object_pointers, pointer);
-				end
-			end
+		if object_found and isValidObject(pointer, kong_object, camera_object) then
+			table.insert(object_pointers, pointer);
 		end
-		object_no = object_no + 1;
 	end
 
 	-- Clamp index
 	object_index = math.min(object_index, math.max(1, #object_pointers));
 
 	if grab_script_mode == "Encircle" then
-		encircle_kong();
+		--encircle_kong();
+		local renderingParams = mainmemory.read_u24_be(kong_object + rendering_parameters_pointer + 1);
+		if renderingParams > 0x000000 and renderingParams < 0x7FFFFF then
+			if math.random() > 0.9 then
+				local timerValue = math.random() * 50;
+				mainmemory.writefloat(renderingParams + anim_timer1, timerValue, true);
+				mainmemory.writefloat(renderingParams + anim_timer2, timerValue, true);
+				mainmemory.writefloat(renderingParams + anim_timer3, timerValue, true);
+				mainmemory.writefloat(renderingParams + anim_timer4, timerValue, true);
+			end
+		end
 	end
 
 	draw_gui();

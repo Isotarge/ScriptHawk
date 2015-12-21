@@ -99,6 +99,7 @@ SystemID N64
 7FBB4C	d	h	1	RDRAM	Kong Object Pointer
 7FBB62	b	h	1	RDRAM	Zipper byte
 7FBB63	b	h	1	RDRAM	TB Void Byte
+7FBB66	b	h	1	RDRAM	Long Distance Enemy Spawn
 7FBFF8	d	h	1	RDRAM	Camera pointer?
 7FC950	b	u	1	RDRAM	DK Moves
 7FC951	b	u	1	RDRAM	DK Sim Slam
