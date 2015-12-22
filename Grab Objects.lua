@@ -1,5 +1,5 @@
 local pointer_list;
-local kong_model_pointer;
+local kong_pointer;
 local camera_pointer;
 safeMode = true;
 
@@ -9,19 +9,19 @@ if bizstring.contains(romName, "Donkey Kong 64") then
 	if bizstring.contains(romName, "USA") and not bizstring.contains(romName, "Kiosk") then
 		pointer_list = 0x7fbff0;
 		camera_pointer = 0x7fb968;
-		kong_model_pointer = 0x7fbb4d;
+		kong_pointer = 0x7fbb4d;
 	elseif bizstring.contains(romName, "Europe") then
 		pointer_list = 0x7fbf10;
 		camera_pointer = 0x7fb888;
-		kong_model_pointer = 0x7fba6d;
+		kong_pointer = 0x7fba6d;
 	elseif bizstring.contains(romName, "Japan") then
 		pointer_list = 0x7fc460;
 		camera_pointer = 0x7fbdd8;
-		kong_model_pointer = 0x7fbfbd;
+		kong_pointer = 0x7fbfbd;
 	elseif bizstring.contains(romName, "Kiosk") then
 		pointer_list = 0x7b5e58;
 		camera_pointer = 0x7b5918; -- TODO: Does this work?
-		kong_model_pointer = 0x7b5afd;
+		kong_pointer = 0x7b5afd;
 		grab_pointer = 0x2F4;
 	end
 else
@@ -30,7 +30,15 @@ else
 end
 
 local function isPointer(value)
-	return value > 0x80000000 and value < 0x807FFFFF;
+	return value >= 0x80000000 and value <= 0x807FFFFF;
+end
+
+function get_bit(field, index)
+	if index < 32 then
+		local bitmask = math.pow(2, index);
+		return bit.band(bitmask, field) == bitmask;
+	end
+	return false;
 end
 
 local object_pointers = {};
@@ -59,7 +67,7 @@ local actor_types = {
 	[31] = "Bridge (Castle)",
 	[32] = "Swinging Light",
 	[33] = "Vine (Brown)",
-	[34] = "Kremling Kosh Controller?", -- TODO: Verify
+	[34] = "Kremling Kosh Controller",
 	[35] = "Melon (Projectile)",
 	[36] = "Peanut",
 	[38] = "Pineapple",
@@ -212,9 +220,9 @@ local actor_types = {
 	[310] = "Spotlight", -- Tag barrel, instrument etc.
 	[311] = "Checkpoint (Seal Race)",
 	[313] = "Particle (Idle Anim.)",
+	--[315] = "Sim Slam Shockwave", TODO: uhhhhh idk
 	[316] = "Kong (Tag Barrel)",
 	[317] = "Locked Kong (Tag Barrel)",
-	--[315] = "Sim Slam Shockwave", TODO: uhhhhh idk
 	[325] = "Sim Slam Shockwave",
 	[328] = "Klaptrap (Peril Path Panic)",
 	[329] = "Fairy (Peril Path Panic)",
@@ -262,22 +270,47 @@ local gravity_strength = 0xC8;
 local light_thing = 0xCC; -- Values 0x00->0x14
 
 local x_rot = 0xE4;
-local y_rot = 0xE6;
-local z_rot = 0xE8;
+local y_rot = x_rot + 2;
+local z_rot = y_rot + 2;
 
 local health = 0x135;
+local takes_enemy_damage = 0x13B;
 
 local hand_state = 0x147; -- Bitfield
 
-local shade_byte = 0x16D;
+local shade_byte = 0x16D; -- TODO: Global?
 
+-- Relative to tag barrel
 local tb_scroll_timer = 0x17D;
 local tb_current_index = 0x17E;
 local tb_previous_index = 0x17F;
 local tb_kickout_timer = 0x1B4;
 
-local camera_focus_pointer = 0x178; -- TODO: Verify for all versions
+-- Relative to camera
+-- TODO: Verify for all versions
+local camera_focus_pointer = 0x178;
+
+local camera_viewport_x_position = 0x1FC;
+local camera_viewport_y_position = camera_viewport_x_position + 4;
+local camera_viewport_z_position = camera_viewport_y_position + 4;
+
+local camera_tracking_distance = 0x21C;
+local camera_viewport_y_rotation = 0x22A;
+local camera_tracking_angle = 0x230;
+
+local camera_zoom_level_c_down = 0x266;
+local camera_zoom_level_current = 0x267;
+local camera_zoom_level_after_c_up = 0x268;
+
+local camera_state_switch_timer_1 = 0x269;
+local camera_state_switch_timer_2 = 0x26E;
+
+local camera_state_type = 0x26B;
+
+-- Relative to text overlay
 local text_shown = 0x1EE; -- 16 bit uint
+
+-- Relative to player
 local grabbed_vine_pointer = 0x2B0;
 local grab_pointer = 0x32c;
 local fairy_active = 0x36c;
@@ -294,6 +327,121 @@ local anim_timer2 = 0x98;
 
 local anim_timer3 = 0x104;
 local anim_timer4 = 0x108;
+
+-----------------------
+-- Kremling Kosh Bot --
+-----------------------
+
+-- Relative to Kremling Kosh controller
+local slot_location = 0x1A2;
+local melons_remaining = 0x1A3;
+local slot_pointer_base = 0x1A8;
+
+local kremling_kosh_joypad_angles = {
+	[0] = {["X Axis"] = 0,    ["Y Axis"] = 0},
+	[1] = {["X Axis"] = -128, ["Y Axis"] = 0},
+	[2] = {["X Axis"] = -128, ["Y Axis"] = -128},
+	[3] = {["X Axis"] = 0,    ["Y Axis"] = -128},
+	[4] = {["X Axis"] = 127,  ["Y Axis"] = -128},
+	[5] = {["X Axis"] = 127,  ["Y Axis"] = 0},
+	[6] = {["X Axis"] = 127,  ["Y Axis"] = 127},
+	[7] = {["X Axis"] = 0,    ["Y Axis"] = 127},
+	[8] = {["X Axis"] = -128, ["Y Axis"] = 127},
+};
+
+function getKoshController()
+	local i;
+	for i=1,#object_pointers do
+		local currentActorType = mainmemory.read_u32_be(object_pointers[i] + actor_type);
+		if type(actor_types[currentActorType]) ~= "nil" then
+			currentActorType = actor_types[currentActorType];
+		end
+		if currentActorType == "Kremling Kosh Controller" then
+			return object_pointers[i];
+		end
+	end
+end
+
+function countMelonProjectiles()
+	local i;
+	local melonCount = 0;
+	for i=1,#object_pointers do
+		local currentActorType = mainmemory.read_u32_be(object_pointers[i] + actor_type);
+		if type(actor_types[currentActorType]) ~= "nil" then
+			currentActorType = actor_types[currentActorType];
+		end
+		if currentActorType == "Melon (Projectile)" then
+			melonCount = melonCount + 1;
+		end
+	end
+	return melonCount;
+end
+
+function getSlotPointer(koshController, slotIndex)
+	return mainmemory.read_u32_be(koshController + slot_pointer_base + (slotIndex - 1) * 4);
+end
+
+function getCurrentSlot()
+	local koshController = getKoshController();
+	if type(koshController) ~= "nil" then
+		return mainmemory.readbyte(koshController + slot_location);
+	end
+end
+
+local shots_fired = {
+	0, 0, 0, 0, 0, 0, 0, 0
+};
+
+function getDesiredSlot()
+	local koshController = getKoshController();
+	if type(koshController) ~= "nil" then
+		local currentSlot = mainmemory.readbyte(koshController + slot_location);
+		local melonsRemaining = mainmemory.readbyte(koshController + melons_remaining);
+		if melonsRemaining == 0 then
+			return 0;
+		end
+
+		-- Check for kremlings
+		local slotIndex = 0;
+		local desiredSlot = 0;
+		for slotIndex = 1,8 do
+			local slotPointer = getSlotPointer(koshController, slotIndex)
+			if slotPointer > 0 and slotPointer ~= shots_fired[slotIndex] then
+				desiredSlot = slotIndex;
+			end
+			if slotPointer == 0 then
+				shots_fired[slotIndex] = 0;
+			end
+		end
+
+		if desiredSlot > 0 then
+			return desiredSlot;
+		end
+	end
+end
+
+local previousFrameB = false;
+function koshBotLoop()
+	if not emu.islagged() then
+		local currentSlot = getCurrentSlot();
+		local desiredSlot = getDesiredSlot();
+		if type(desiredSlot) ~= "nil" then
+			joypad.setanalog(kremling_kosh_joypad_angles[desiredSlot], 1);
+			--print("Moving to slot "..desiredSlot);
+			if currentSlot == desiredSlot then
+				if desiredSlot > 0 then
+					local koshController = getKoshController();
+					shots_fired[desiredSlot] = getSlotPointer(koshController, desiredSlot);
+				end
+				previousFrameB = not previousFrameB;
+				joypad.set({["B"] = true}, 1);
+				print("Firing!");
+			end
+		end
+	end
+end
+
+--event.onframestart(koshBotLoop, "Kremling Kosh Bot");
 
 -- Keybinds
 -- For full list go here http://slimdx.org/docs/html/T_SlimDX_DirectInput_Key.htm
@@ -324,12 +472,12 @@ end
 
 local function grab_object()
 	if grab_script_mode == "Grab" then
-		local kong_object = mainmemory.read_u24_be(kong_model_pointer);
+		local kongObject = mainmemory.read_u24_be(kong_pointer);
 		if object_index <= #object_pointers then
-			mainmemory.writebyte(kong_object + grab_pointer, 0x80);
-			mainmemory.write_u24_be(kong_object + grab_pointer + 1, object_pointers[object_index]);
-			mainmemory.writebyte(kong_object + grab_pointer + 4, 0x80);
-			mainmemory.write_u24_be(kong_object + grab_pointer + 4 + 1, object_pointers[object_index]);
+			mainmemory.writebyte(kongObject + grab_pointer, 0x80);
+			mainmemory.write_u24_be(kongObject + grab_pointer + 1, object_pointers[object_index]);
+			mainmemory.writebyte(kongObject + grab_pointer + 4, 0x80);
+			mainmemory.write_u24_be(kongObject + grab_pointer + 4 + 1, object_pointers[object_index]);
 		end
 	elseif grab_script_mode == "Camera" then
 		local camera_object = mainmemory.read_u24_be(camera_pointer + 1);
@@ -343,10 +491,10 @@ end
 local function encircle_kong()
 	local i, x, z;
 
-	local kong_object = mainmemory.read_u24_be(kong_model_pointer);
-	local kong_x = mainmemory.readfloat(kong_object + x_pos, true);
-	local kong_y = mainmemory.readfloat(kong_object + y_pos, true);
-	local kong_z = mainmemory.readfloat(kong_object + z_pos, true);
+	local kongObject = mainmemory.read_u24_be(kong_pointer);
+	local kong_x = mainmemory.readfloat(kongObject + x_pos, true);
+	local kong_y = mainmemory.readfloat(kongObject + y_pos, true);
+	local kong_z = mainmemory.readfloat(kongObject + z_pos, true);
 
 	for i=1,#object_pointers do
 		x = kong_x + math.cos(math.pi * 2 * i / #object_pointers) * radius;
@@ -361,26 +509,47 @@ end
 local function getExamineData(pointer)
 	local examine_data = {};
 
-	table.insert(examine_data, { "X", mainmemory.readfloat(pointer + x_pos, true) });
-	table.insert(examine_data, { "Y", mainmemory.readfloat(pointer + y_pos, true) });
-	table.insert(examine_data, { "Z", mainmemory.readfloat(pointer + z_pos, true) });
-	table.insert(examine_data, { "Separator", 1 });
+	local modelPointer = mainmemory.read_u32_be(pointer + model_pointer);
+	local renderingParametersPointer = mainmemory.read_u32_be(pointer + rendering_parameters_pointer);
+	local boneArrayPointer = mainmemory.read_u32_be(pointer + current_bone_array_pointer);
+	local hasModel = isPointer(modelPointer) or isPointer(renderingParametersPointer) or isPointer(boneArrayPointer);
 
-	table.insert(examine_data, { "Rot X", mainmemory.read_u16_be(pointer + x_rot) });
-	table.insert(examine_data, { "Rot Y", mainmemory.read_u16_be(pointer + y_rot) });
-	table.insert(examine_data, { "Rot Z", mainmemory.read_u16_be(pointer + z_rot) });
-	table.insert(examine_data, { "Separator", 1 });
-
-	table.insert(examine_data, { "Velocity", mainmemory.readfloat(pointer + velocity, true) });
-	table.insert(examine_data, { "Y Velocity", mainmemory.readfloat(pointer + y_velocity, true) });
-	table.insert(examine_data, { "Y Accel", mainmemory.readfloat(pointer + y_acceleration, true) });
-	table.insert(examine_data, { "Separator", 1 });
+	local xPos = mainmemory.readfloat(pointer + x_pos, true);
+	local yPos = mainmemory.readfloat(pointer + y_pos, true);
+	local zPos = mainmemory.readfloat(pointer + z_pos, true);
+	local hasPosition = xPos ~= 0 or yPos ~= 0 or zPos ~= 0 or hasModel;
 
 	local currentActorType = mainmemory.read_u32_be(pointer + actor_type);
 	if type(actor_types[currentActorType]) ~= "nil" then
 		currentActorType = actor_types[currentActorType];
 	end
 	table.insert(examine_data, { "Actor type", currentActorType });
+	table.insert(examine_data, { "Separator", 1 });
+
+	if hasModel then
+		table.insert(examine_data, { "Model", string.format("0x%08x", modelPointer) });
+		table.insert(examine_data, { "Rendering Params", string.format("0x%08x", renderingParametersPointer) });
+		table.insert(examine_data, { "Bone Array", string.format("0x%08x", boneArrayPointer) });
+		table.insert(examine_data, { "Separator", 1 });
+	end
+
+	if hasPosition then
+		table.insert(examine_data, { "X", mainmemory.readfloat(pointer + x_pos, true) });
+		table.insert(examine_data, { "Y", mainmemory.readfloat(pointer + y_pos, true) });
+		table.insert(examine_data, { "Z", mainmemory.readfloat(pointer + z_pos, true) });
+		table.insert(examine_data, { "Separator", 1 });
+
+		table.insert(examine_data, { "Rot X", mainmemory.read_u16_be(pointer + x_rot) });
+		table.insert(examine_data, { "Rot Y", mainmemory.read_u16_be(pointer + y_rot) });
+		table.insert(examine_data, { "Rot Z", mainmemory.read_u16_be(pointer + z_rot) });
+		table.insert(examine_data, { "Separator", 1 });
+
+		table.insert(examine_data, { "Velocity", mainmemory.readfloat(pointer + velocity, true) });
+		table.insert(examine_data, { "Y Velocity", mainmemory.readfloat(pointer + y_velocity, true) });
+		table.insert(examine_data, { "Y Accel", mainmemory.readfloat(pointer + y_acceleration, true) });
+		table.insert(examine_data, { "Separator", 1 });
+	end
+
 	table.insert(examine_data, { "Health", mainmemory.readbyte(pointer + health) });
 	table.insert(examine_data, { "Hand state", mainmemory.readbyte(pointer + hand_state) });
 	table.insert(examine_data, { "Specular highlight", mainmemory.readbyte(pointer + specular_highlight) });
@@ -391,19 +560,76 @@ local function getExamineData(pointer)
 	table.insert(examine_data, { "Separator", 1 });
 
 	table.insert(examine_data, { "Fairy Active", mainmemory.readbyte(pointer + fairy_active) });
-	table.insert(examine_data, { "Shade byte", mainmemory.readbyte(pointer + shade_byte) });
-	table.insert(examine_data, { "Visibility", mainmemory.readbyte(pointer + visibility) });
+	table.insert(examine_data, { "Brightness", mainmemory.readbyte(pointer + shade_byte) });
 	table.insert(examine_data, { "Separator", 1 });
 
-	table.insert(examine_data, { "Grabbed Vine Pointer", string.format("0x%08x", mainmemory.read_u32_be(pointer + grabbed_vine_pointer)) });
-	table.insert(examine_data, { "Grab pointer", string.format("0x%08x", mainmemory.read_u32_be(pointer + grab_pointer)) });
+	local visibilityValue = mainmemory.readbyte(pointer + visibility);
+	table.insert(examine_data, { "Visibility", bizstring.binary(visibilityValue) });
+	table.insert(examine_data, { "Visible", tostring(get_bit(visibilityValue, 2)) });
+	table.insert(examine_data, { "Collides with terrain", tostring(get_bit(visibilityValue, 4)) });
+	table.insert(examine_data, { "In water", tostring(not get_bit(visibilityValue, 0)) });
 	table.insert(examine_data, { "Separator", 1 });
+
+	if currentActorType ~= "Camera" then
+		table.insert(examine_data, { "Grabbed Vine Pointer", string.format("0x%08x", mainmemory.read_u32_be(pointer + grabbed_vine_pointer)) });
+		table.insert(examine_data, { "Grab pointer", string.format("0x%08x", mainmemory.read_u32_be(pointer + grab_pointer)) });
+		table.insert(examine_data, { "Separator", 1 });
+	end
+
+	if currentActorType == "Camera" then
+		local focusedActor = mainmemory.read_u24_be(pointer + camera_focus_pointer + 1);
+		local focusedActorType;
+
+		if focusedActor > 0x000000 and focusedActor < 0x7FFFFF then
+			focusedActorType = mainmemory.read_u32_be(focusedActor + actor_type);
+			if type(actor_types[focusedActorType]) ~= "nil" then
+				focusedActorType = actor_types[focusedActorType];
+			end
+		end
+
+		table.insert(examine_data, { "Focused Actor: ", string.format("0x%06x", focusedActor) });
+		if type(focusedActorType) ~= "nil" then
+			table.insert(examine_data, { "Focused Actor Type", focusedActorType });
+		end
+		table.insert(examine_data, { "Separator", 1 });
+
+		table.insert(examine_data, { "Viewport X Pos", mainmemory.readfloat(pointer + camera_viewport_x_position, true) });
+		table.insert(examine_data, { "Viewport Y Pos", mainmemory.readfloat(pointer + camera_viewport_y_position, true) });
+		table.insert(examine_data, { "Viewport Z Pos", mainmemory.readfloat(pointer + camera_viewport_z_position, true) });
+		table.insert(examine_data, { "Separator", 1 });
+
+		table.insert(examine_data, { "Viewport Y Rot", mainmemory.read_u16_be(pointer + camera_viewport_y_rotation) });
+		table.insert(examine_data, { "Separator", 1 });
+
+		table.insert(examine_data, { "Tracking Distance", mainmemory.readfloat(pointer + camera_tracking_distance, true) });
+		table.insert(examine_data, { "Tracking Angle", mainmemory.readfloat(pointer + camera_tracking_angle, true) });
+		table.insert(examine_data, { "Separator", 1 });
+
+		table.insert(examine_data, { "Camera State Type", mainmemory.readbyte(pointer + camera_state_type) });
+		table.insert(examine_data, { "C-Down Zoom Level", mainmemory.readbyte(pointer + camera_zoom_level_c_down) });
+		table.insert(examine_data, { "Current Zoom Level", mainmemory.readbyte(pointer + camera_zoom_level_current) });
+		table.insert(examine_data, { "Zoom Level After C-Up", mainmemory.readbyte(pointer + camera_zoom_level_after_c_up) });
+		table.insert(examine_data, { "Zoom Level Timer 1", mainmemory.readbyte(pointer + camera_state_switch_timer_1) });
+		table.insert(examine_data, { "Zoom Level Timer 2", mainmemory.readbyte(pointer + camera_state_switch_timer_2) });
+		table.insert(examine_data, { "Separator", 1 });
+	end
 
 	if currentActorType == "Tag Barrel" then
 		table.insert(examine_data, { "TB scroll timer", mainmemory.readbyte(pointer + tb_scroll_timer) });
 		table.insert(examine_data, { "TB current index", mainmemory.readbyte(pointer + tb_current_index) });
 		table.insert(examine_data, { "TB previous index", mainmemory.readbyte(pointer + tb_previous_index) });
 		table.insert(examine_data, { "TB kickout timer", mainmemory.read_u32_be(pointer + tb_kickout_timer) });
+		table.insert(examine_data, { "Separator", 1 });
+	end
+
+	if currentActorType == "Kremling Kosh Controller" then
+		table.insert(examine_data, { "Current Slot", mainmemory.readbyte(pointer + slot_location) });
+		table.insert(examine_data, { "Melons Remaining", mainmemory.readbyte(pointer + melons_remaining) });
+		local i;
+		for i=1,8 do
+			table.insert(examine_data, { "Slot "..i.." pointer", string.format("0x%08x", mainmemory.read_u32_be(pointer + slot_pointer_base + (i - 1) * 4)) });
+		end
+		table.insert(examine_data, { "Separator", 1 });
 	end
 
 	return examine_data;
@@ -462,8 +688,8 @@ local function draw_gui()
 	row = row + 1;
 
 	if grab_script_mode == "Grab" then
-		local kong_object = mainmemory.read_u24_be(kong_model_pointer);
-		gui.text(gui_x, gui_y + height * row, string.format("Grabbed object:  0x%06x", mainmemory.read_u24_be(kong_object + grab_pointer + 1)), null, null, 'bottomright');
+		local kongObject = mainmemory.read_u24_be(kong_pointer);
+		gui.text(gui_x, gui_y + height * row, string.format("Grabbed object:  0x%06x", mainmemory.read_u24_be(kongObject + grab_pointer + 1)), null, null, 'bottomright');
 		row = row + 1;
 	elseif grab_script_mode == "Camera" then
 		local camera_object = mainmemory.read_u24_be(camera_pointer + 1);
@@ -477,8 +703,6 @@ local function draw_gui()
 			currentActorType = actor_types[currentActorType];
 		end
 		gui.text(gui_x, gui_y + height * row, string.format("Selected object: 0x%06x: ", object_pointers[object_index] or 0)..currentActorType, null, null, 'bottomright');
-		row = row + 1;
-		gui.text(gui_x, gui_y + height * row, string.format("Model pointer: 0x%06x", mainmemory.read_u24_be(object_pointers[object_index] + model_pointer + 1)), null, null, 'bottomright');
 		row = row + 1;
 
 		if grab_script_mode == "Examine" then
@@ -511,7 +735,7 @@ local function draw_gui()
 	row = row + 1;
 end
 
-local function isValidObject(pointer, kong_object, camera_object)
+local function isValidObject(pointer, kongObject, camera_object)
 	if grab_script_mode == "Examine" or grab_script_mode == "List" or not safeMode then
 		return true;
 	end
@@ -524,7 +748,7 @@ local function isValidObject(pointer, kong_object, camera_object)
 	end
 
 	if grab_script_mode == "Grab" or grab_script_mode == "Encircle" then
-		if pointer ~= kong_object then
+		if pointer ~= kongObject then
 			return hasModel;
 		end
 	end
@@ -532,15 +756,15 @@ end
 
 local function pull_objects()
 	local object_no = 0;
-	local kong_object = mainmemory.read_u24_be(kong_model_pointer);
+	local kongObject = mainmemory.read_u24_be(kong_pointer);
 	local camera_object = mainmemory.read_u24_be(camera_pointer + 1);
 
 	object_pointers = {};
 	for object_no = 0, max_objects do
 		local pointer = mainmemory.read_u24_be(pointer_list + (object_no * 4) + 1);
-		local object_found = pointer >= 0x000000 and pointer <= 0x7FFFFF;
+		local object_found = pointer > 0x000000 and pointer <= 0x7FFFFF;
 
-		if object_found and isValidObject(pointer, kong_object, camera_object) then
+		if object_found and isValidObject(pointer, kongObject, camera_object) then
 			table.insert(object_pointers, pointer);
 		end
 	end
@@ -550,7 +774,7 @@ local function pull_objects()
 
 	if grab_script_mode == "Encircle" then
 		--encircle_kong();
-		local renderingParams = mainmemory.read_u24_be(kong_object + rendering_parameters_pointer + 1);
+		local renderingParams = mainmemory.read_u24_be(kongObject + rendering_parameters_pointer + 1);
 		if renderingParams > 0x000000 and renderingParams < 0x7FFFFF then
 			if math.random() > 0.9 then
 				local timerValue = math.random() * 50;

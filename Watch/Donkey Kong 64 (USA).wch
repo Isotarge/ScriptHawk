@@ -31,7 +31,7 @@ SystemID N64
 4B210A	b	h	1	RDRAM	Main menu screen?
 4B210F	b	u	1	RDRAM	Main menu position
 4B2904	b	h	1	RDRAM	FF for voidout on main menu?!?
-7444E7	b	u	1	RDRAM	Map
+7444E7	b	h	1	RDRAM	Map
 744519	b	u	1	RDRAM	Rambi Arena Score
 74452C	b	u	1	RDRAM	Story skip
 744548	w	s	1	RDRAM	Rambi Score 1
@@ -90,17 +90,21 @@ SystemID N64
 7F0560	d	u	1	RDRAM	Frames (Real)
 7F5D10	d	h	1	RDRAM	Camera pointer?
 7F5D14	b	h	1	RDRAM	ISG Fadeout
+7F8E88	b	u	1	RDRAM	Object Count?
 7F948C	d	f	1	RDRAM	Stored Y?
 7F94B8	d	h	1	RDRAM	Slope object pointer?
 7F94E8	d	f	1	RDRAM	Stored Y?
 7F94F8	d	f	1	RDRAM	Stored Y?
 7FB968	d	h	1	RDRAM	Camera pointer?
 7FB970	d	h	1	RDRAM	Boss fight controller pointer
+7FBB35	b	u	1	RDRAM	Object Count?
+7FBB3D	b	u	1	RDRAM	Object Count?
 7FBB4C	d	h	1	RDRAM	Kong Object Pointer
 7FBB62	b	h	1	RDRAM	Zipper byte
 7FBB63	b	h	1	RDRAM	TB Void Byte
 7FBB66	b	h	1	RDRAM	Long Distance Enemy Spawn
 7FBFF8	d	h	1	RDRAM	Camera pointer?
+7FC3F1	b	u	1	RDRAM	Object Count?
 7FC950	b	u	1	RDRAM	DK Moves
 7FC951	b	u	1	RDRAM	DK Sim Slam
 7FC952	b	b	1	RDRAM	DK Weapon (bitfield xxxxxshw)
