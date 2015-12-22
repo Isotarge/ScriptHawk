@@ -273,7 +273,7 @@ local x_rot = 0xE4;
 local y_rot = x_rot + 2;
 local z_rot = y_rot + 2;
 
-local health = 0x135;
+local health = 0x134; -- Signed int 2 byte
 local takes_enemy_damage = 0x13B;
 
 local hand_state = 0x147; -- Bitfield
@@ -550,7 +550,7 @@ local function getExamineData(pointer)
 		table.insert(examine_data, { "Separator", 1 });
 	end
 
-	table.insert(examine_data, { "Health", mainmemory.readbyte(pointer + health) });
+	table.insert(examine_data, { "Health", mainmemory.read_s16_be(pointer + health) });
 	table.insert(examine_data, { "Hand state", mainmemory.readbyte(pointer + hand_state) });
 	table.insert(examine_data, { "Specular highlight", mainmemory.readbyte(pointer + specular_highlight) });
 	table.insert(examine_data, { "Separator", 1 });
