@@ -26,16 +26,16 @@ local frames_lag;
 ---------------------------
 
 local arcade_map = 2;
-local jumpman_x_position;
-local jumpman_y_position;
+local jumpman_position;
+local jumpman_velocity;
 
 ---------------------------
 -- Jetpac specific state --
 ---------------------------
 
 local jetpac_map = 9;
-local jetman_x_position;
-local jetman_y_position;
+local jetman_position;
+local jetman_velocity;
 
 --------------
 -- Mad Jack --
@@ -296,16 +296,6 @@ local function isPointer(value)
 	return value > 0x80000000 and value < 0x807FFFFF;
 end
 
-------------------
--- Unlock menus --
-------------------
-
-function Game.unlock_menus()
-	for byte=0,7 do
-		mainmemory.writebyte(menu_flags + byte, 0xFF);
-	end
-end
-
 ----------------------------------
 -- Refill Consumables           --
 -- Based on research by Exchord --
@@ -370,7 +360,7 @@ local rendering_parameters_pointer = 0x04;
 local current_bone_array_pointer = 0x08;
 
 local actor_type = 0x58; -- TODO: Document values for this
-local visibility = 0x63; -- 127 = visible
+local visibility = 0x63; -- Bitfield, also contains whether the actor collides with terrain and whether they are in water
 
 local specular_highlight = 0x6D;
 
@@ -397,8 +387,8 @@ local light_thing = 0xCC; -- Values 0x00->0x14
 local slope_byte = 0xDE;
 
 local x_rot = 0xE4;
-local y_rot = 0xE6;
-local z_rot = 0xE8;
+local y_rot = x_rot + 2;
+local z_rot = y_rot + 2;
 
 local locked_to_pad = 0x110;
 local locked_to_rainbow_coin_pointer = 0x13C;
@@ -443,8 +433,7 @@ local scale = {
 	0x344, 0x348, 0x34C, 0x350, 0x354
 }
 
--- Bitfield?
-local effect_byte = 0x372;
+local effect_byte = 0x372; -- Bitfield, TODO: Document bits
 
 local kong_object;
 
@@ -478,24 +467,16 @@ local flag_array = {
 	-- Needs further testing --
 	---------------------------
 
-	{["byte"] = 0x30, ["bit"] = 7, ["name"] = "? All training barrels comeplete cutscene ?"}, -- TODO: Test this
-
-	{["byte"] = 0x61, ["bit"] = 1, ["name"] = "?? Training barrels spawned?"}, -- TODO: Test this
-
-	{["byte"] = 0x38, ["bit"] = 5, ["name"] = "?? Japes: Entered Japes (1)"}, -- TODO: Test this
-
-	{["byte"] = 0x31, ["bit"] = 3, ["name"] = "? Japes W3 Right CB Bunch", ["type"] = "Bunch"}, -- TODO: Test this
-	{["byte"] = 0x64, ["bit"] = 7, ["name"] = "? Japes W3 Right CB Bunch", ["type"] = "Bunch"}, -- TODO: Test this
-	{["byte"] = 0x2E, ["bit"] = 3, ["name"] = "? Orange Barrel Completed?"}, -- TODO: Test this
-
-	{["byte"] = 0x2C, ["bit"] = 7, ["name"] = "? T&S FTT (entered in Japes)", ["type"] = "FTT"}, -- TODO: Test this
-
-	{["byte"] = 0x20, ["bit"] = 0, ["name"] = "? Fungi: Day/Night First Time CS"}, -- TODO: Test this
-
-	{["byte"] = 0x31, ["bit"] = 4, ["name"] = "? Fungi: DK Coin by BBlast or First Coin?", ["type"] = "Coin"}, -- TODO: Test this
-
 	{["byte"] = 0x18, ["bit"] = 2, ["name"] = "? Galleon first time cutscene"},
-	{["byte"] = 0x39, ["bit"] = 0, ["name"] = "?? Galleon first time cutscene"},
+	{["byte"] = 0x20, ["bit"] = 0, ["name"] = "? Fungi: Day/Night First Time CS"}, -- TODO: Test this
+	{["byte"] = 0x2C, ["bit"] = 7, ["name"] = "? T&S FTT (entered in Japes)", ["type"] = "FTT"}, -- TODO: Test this
+	{["byte"] = 0x2E, ["bit"] = 3, ["name"] = "? Orange Barrel Completed"}, -- TODO: Test this
+	{["byte"] = 0x30, ["bit"] = 7, ["name"] = "? All training barrels comeplete cutscene ?"}, -- TODO: Test this
+	{["byte"] = 0x31, ["bit"] = 3, ["name"] = "? Japes W3 Right CB Bunch", ["type"] = "Bunch"}, -- TODO: Test this
+	{["byte"] = 0x31, ["bit"] = 4, ["name"] = "? Fungi: DK Coin by BBlast or First Coin?", ["type"] = "Coin"}, -- TODO: Test this
+	{["byte"] = 0x38, ["bit"] = 5, ["name"] = "? Japes: Entered Japes (1)"}, -- TODO: Test this
+	{["byte"] = 0x61, ["bit"] = 1, ["name"] = "? Training barrels spawned"}, -- TODO: Test this
+	{["byte"] = 0x64, ["bit"] = 7, ["name"] = "? Japes W3 Right CB Bunch", ["type"] = "Bunch"}, -- TODO: Test this
 
 	-----------
 	-- Known --
@@ -890,7 +871,7 @@ local flag_array = {
 	{["byte"] = 0x38, ["bit"] = 6, ["name"] = "Story: Aztec Intro"},
 	{["byte"] = 0x38, ["bit"] = 7, ["name"] = "Story: Factory Intro"},
 
-	{["byte"] = 0x39, ["bit"] = 0, ["name"] = "? Story: Galleon Intro"},
+	{["byte"] = 0x39, ["bit"] = 0, ["name"] = "Story: Galleon Intro"},
 	{["byte"] = 0x39, ["bit"] = 1, ["name"] = "Story: Fungi Intro"},
 	{["byte"] = 0x39, ["bit"] = 2, ["name"] = "Story: Caves Intro"},
 	{["byte"] = 0x39, ["bit"] = 3, ["name"] = "Story: Castle Intro"},
@@ -2866,8 +2847,8 @@ function Game.detectVersion(romName)
 		-- TODO: Flags?
 
 		x_rot = 0xD8;
-		y_rot = 0xDA;
-		z_rot = 0xDC;
+		y_rot = x_rot + 2;
+		z_rot = y_rot + 2;
 
 		-- Kiosk version maps
 		--0 Crash
@@ -3467,15 +3448,16 @@ end
 -- Lag configuration --
 -----------------------
 
+local min_lag_factor = -30;
+local max_lag_factor = 20;
 local lag_factor = 1;
 
--- TODO: Clamp this
 local function increase_lag_factor()
-	lag_factor = lag_factor + 1;
+	lag_factor = math.min(max_lag_factor, lag_factor + 1);
 end
 
 local function decrease_lag_factor()
-	lag_factor = lag_factor - 1;
+	lag_factor = math.max(min_lag_factor, lag_factor - 1);
 end
 
 local function fix_lag()
@@ -3634,9 +3616,10 @@ local function toJPString(value)
 			end
 		end
 		if charFound == false then
-			print("JP String parse warning: Didn't find character for '"..char..'\'');
+			dprint("JP String parse warning: Didn't find character for '"..char..'\'');
 		end
 	end
+	print_deferred();
 	return tempString;
 end
 
@@ -3728,12 +3711,12 @@ function loadASMPatch()
 	local i = 0;
 
 	-- Patch the code
-	for i=1,#code do
+	for i = 1, #code do
 		mainmemory.write_u32_be(codeBase + ((i - 1) * 4), tonumber(code[i], 16));
 	end
 
 	-- Patch the hook
-	for i=1,#hook do
+	for i = 1, #hook do
 		mainmemory.writebyte(hookBase + (i - 1), hook[i]);
 	end
 
@@ -3817,6 +3800,11 @@ function Game.initUI(form_handle, col, row, button_height, label_offset, dropdow
 	flagStats();
 end
 
+function Game.unlock_menus()
+	mainmemory.write_u32_be(menu_flags + 0, 0xFFFFFFFF);
+	mainmemory.write_u32_be(menu_flags + 4, 0xFFFFFFFF);
+end
+
 function Game.applyInfinites()
 	mainmemory.writebyte(global_base + standard_ammo, max_standard_ammo);
 	if forms.ischecked(form_controls["Toggle Homing Ammo Checkbox"]) then
@@ -3869,7 +3857,6 @@ function Game.eachFrame()
 		timer_started = false;
 	end
 
-	-- Spiking fix
 	if spiking_fix then
 		apply_spiking_fix();
 	end

@@ -32,6 +32,7 @@ SystemID N64
 4B210F	b	u	1	RDRAM	Main menu position
 4B2904	b	h	1	RDRAM	FF for voidout on main menu?!?
 7444E7	b	h	1	RDRAM	Map
+7444EB	b	h	1	RDRAM	Exit
 744519	b	u	1	RDRAM	Rambi Arena Score
 74452C	b	u	1	RDRAM	Story skip
 744548	w	s	1	RDRAM	Rambi Score 1
@@ -48,8 +49,8 @@ SystemID N64
 745840	b	u	1	RDRAM	Music Volume
 745844	b	u	1	RDRAM	Sound mode
 7467C8	b	u	1	RDRAM	File
-746820	d	h	1	RDRAM	Related to geometry spiking
-746824	d	h	1	RDRAM	Related to geometry spiking
+746820	d	u	1	RDRAM	Related to geometry spiking
+746824	d	u	1	RDRAM	Related to geometry spiking
 746A40	d	h	1	RDRAM	Particle RNG?
 7476F5	b	u	1	RDRAM	Cutscene
 7480DC	d	f	1	RDRAM	Stored Y?
@@ -77,13 +78,12 @@ SystemID N64
 76A0AB	b	h	1	RDRAM	Background?
 76A0CD	b	u	1	RDRAM	Adventure
 76A0DA	b	h	1	RDRAM	Mystery Menu
+76AEF3	b	h	1	RDRAM	Previous Map
 76AF10	d	u	1	RDRAM	Frame (Lag)
 76FDF8	d	h	1	RDRAM	Sound pointer thing
 7E9AFE	w	u	1	RDRAM	Weird sound control?
 7ECED7	b	u	1	RDRAM	KeysCoinsCollected
 7ECEF3	b	u	1	RDRAM	Fairies
-7ED0B4	b	h	1	RDRAM	Helm BoM off (Bitflag?)
-7ED0B6	b	h	1	RDRAM	Helm First Time Cutscene (Bitflag?)
 7ED558	b	h	1	RDRAM	Mystery menu enabled
 7ED559	b	h	1	RDRAM	Extra cutscenes & Rambi unlocked
 7ED55B	b	h	1	RDRAM	Mystery menu bosses enabled (up to galleon)
