@@ -3151,9 +3151,9 @@ local function timer()
 	if timer_started then
 		local s = timer_value / 60;
 		local timer_string = string.format("%.2d:%05.2f", s / 60 % 60, s % 60);
-		gui.text(16, 16, "ISG Timer: "..timer_string, null, null, 'topright');
+		gui.text(16, 16, "ISG Timer: "..timer_string, nil, nil, 'topright');
 	else
-		gui.text(16, 16, "Waiting for ISG", null, null, 'topright');
+		gui.text(16, 16, "Waiting for ISG", nil, nil, 'topright');
 	end
 end
 

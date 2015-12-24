@@ -458,6 +458,7 @@ local focus_object_pressed = false;
 local switch_mode_pressed = false;
 
 local green_highlight = 0xFF00FF00;
+local yellow_highlight = 0xFFFFFF00;
 
 local function switch_grab_script_mode()
 	if grab_script_mode == 'Examine' then
@@ -690,10 +691,10 @@ local function draw_gui()
 	local row = 0;
 	local height = 16;
 
-	gui.text(gui_x, gui_y + height * row, "Mode: "..grab_script_mode, null, null, 'bottomright');
+	gui.text(gui_x, gui_y + height * row, "Mode: "..grab_script_mode, nil, nil, 'bottomright');
 	row = row + 1;
 
-	gui.text(gui_x, gui_y + height * row, "Index: "..object_index.."/"..#object_pointers, null, null, 'bottomright');
+	gui.text(gui_x, gui_y + height * row, "Index: "..object_index.."/"..#object_pointers, nil, nil, 'bottomright');
 	row = row + 1;
 
 	if #object_pointers > 0 and object_index <= #object_pointers then
@@ -701,18 +702,18 @@ local function draw_gui()
 		if type(actor_types[currentActorType]) ~= "nil" then
 			currentActorType = actor_types[currentActorType];
 		end
-		gui.text(gui_x, gui_y + height * row, string.format("Selected object: 0x%06x: ", object_pointers[object_index] or 0)..currentActorType, null, null, 'bottomright');
+		gui.text(gui_x, gui_y + height * row, string.format("Selected object: 0x%06x: ", object_pointers[object_index] or 0)..currentActorType, nil, nil, 'bottomright');
 		row = row + 1;
 	end
 
 	-- Display which object is grabbed
 	local kongObject = mainmemory.read_u24_be(kong_pointer);
-	gui.text(gui_x, gui_y + height * row, string.format("Grabbed object:  0x%06x", mainmemory.read_u24_be(kongObject + grab_pointer + 1)), null, null, 'bottomright');
+	gui.text(gui_x, gui_y + height * row, string.format("Grabbed object:  0x%06x", mainmemory.read_u24_be(kongObject + grab_pointer + 1)), nil, nil, 'bottomright');
 	row = row + 1;
 
 	-- Display which object the camera is currently focusing on
 	local camera_object = mainmemory.read_u24_be(camera_pointer + 1);
-	gui.text(gui_x, gui_y + height * row, string.format("Focused object:  0x%06x", mainmemory.read_u24_be(camera_object + camera_focus_pointer + 1)), null, null, 'bottomright');
+	gui.text(gui_x, gui_y + height * row, string.format("Focused object:  0x%06x", mainmemory.read_u24_be(camera_object + camera_focus_pointer + 1)), nil, nil, 'bottomright');
 	row = row + 1;
 	row = row + 1;
 
@@ -722,7 +723,7 @@ local function draw_gui()
 			local i;
 			for i=#examine_data,1,-1 do
 				if examine_data[i][1] ~= "Separator" then
-					gui.text(gui_x, gui_y + height * row, examine_data[i][1]..": "..examine_data[i][2], null, null, 'bottomright');
+					gui.text(gui_x, gui_y + height * row, examine_data[i][1]..": "..examine_data[i][2], nil, nil, 'bottomright');
 					row = row + 1;
 				else
 					row = row + examine_data[i][2];
@@ -738,9 +739,13 @@ local function draw_gui()
 					currentActorType = actor_types[currentActorType];
 				end
 				if object_index == i then
-					gui.text(gui_x, gui_y + height * row, i..": "..string.format("0x%06x: ", object_pointers[i] or 0)..currentActorType, green_highlight, null, 'bottomright');
+					gui.text(gui_x, gui_y + height * row, i..": "..string.format("0x%06x: ", object_pointers[i] or 0)..currentActorType, green_highlight, nil, 'bottomright');
 				else
-					gui.text(gui_x, gui_y + height * row, i..": "..string.format("0x%06x: ", object_pointers[i] or 0)..currentActorType, null, null, 'bottomright');
+					if object_pointers[i] == kongObject then
+						gui.text(gui_x, gui_y + height * row, i..": "..string.format("0x%06x: ", object_pointers[i] or 0)..currentActorType, yellow_highlight, nil, 'bottomright');
+					else
+						gui.text(gui_x, gui_y + height * row, i..": "..string.format("0x%06x: ", object_pointers[i] or 0)..currentActorType, nil, nil, 'bottomright');
+					end
 				end
 				row = row + 1;
 			end
