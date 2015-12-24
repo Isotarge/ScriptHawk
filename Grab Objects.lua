@@ -315,7 +315,7 @@ local grabbed_vine_pointer = 0x2B0;
 local grab_pointer = 0x32c;
 local fairy_active = 0x36c;
 
-grab_script_mode = "Grab";
+grab_script_mode = "Examine";
 
 -- Relative to rendering params
 local scale_x = 0x34;
@@ -445,46 +445,43 @@ end
 
 -- Keybinds
 -- For full list go here http://slimdx.org/docs/html/T_SlimDX_DirectInput_Key.htm
-local decrease_object_index_key = "B";
-local increase_object_index_key = "N";
+local decrease_object_index_key = "N";
+local increase_object_index_key = "M";
 local grab_object_key = "V";
+local focus_object_key = "B";
 local switch_grab_script_mode_key = "C";
 
 local decrease_object_index_pressed = false;
 local increase_object_index_pressed = false;
 local grab_object_pressed = false;
+local focus_object_pressed = false;
 local switch_mode_pressed = false;
 
+local green_highlight = 0xFF00FF00;
+
 local function switch_grab_script_mode()
-	if grab_script_mode == 'Grab' then
-		grab_script_mode = 'Camera';
-	elseif grab_script_mode == 'Camera' then
+	if grab_script_mode == 'Examine' then
+		grab_script_mode = 'List';
+	else
 		grab_script_mode = 'Examine';
-	elseif grab_script_mode == 'Examine' then
-		--grab_script_mode = 'Encircle';
-		grab_script_mode = 'List';
-	elseif grab_script_mode == 'Encircle' then
-		grab_script_mode = 'List';
-	elseif grab_script_mode == 'List' then
-		grab_script_mode = 'Grab';
 	end
 end
 
-local function grab_object()
-	if grab_script_mode == "Grab" then
-		local kongObject = mainmemory.read_u24_be(kong_pointer);
-		if object_index <= #object_pointers then
-			mainmemory.writebyte(kongObject + grab_pointer, 0x80);
-			mainmemory.write_u24_be(kongObject + grab_pointer + 1, object_pointers[object_index]);
-			mainmemory.writebyte(kongObject + grab_pointer + 4, 0x80);
-			mainmemory.write_u24_be(kongObject + grab_pointer + 4 + 1, object_pointers[object_index]);
-		end
-	elseif grab_script_mode == "Camera" then
-		local camera_object = mainmemory.read_u24_be(camera_pointer + 1);
-		if object_index <= #object_pointers then
-			mainmemory.writebyte(camera_object + camera_focus_pointer, 0x80);
-			mainmemory.write_u24_be(camera_object + camera_focus_pointer + 1, object_pointers[object_index]);
-		end
+local function grab_object(pointer)
+	local kongObject = mainmemory.read_u24_be(kong_pointer);
+	if kongObject > 0x000000 and kongObject < 0x7FFFFF then
+		mainmemory.writebyte(kongObject + grab_pointer, 0x80);
+		mainmemory.write_u24_be(kongObject + grab_pointer + 1, pointer);
+		mainmemory.writebyte(kongObject + grab_pointer + 4, 0x80);
+		mainmemory.write_u24_be(kongObject + grab_pointer + 4 + 1, pointer);
+	end
+end
+
+local function focus_object(pointer)
+	local camera_object = mainmemory.read_u24_be(camera_pointer + 1);
+	if camera_object > 0x000000 and camera_object < 0x7FFFFF then
+		mainmemory.writebyte(camera_object + camera_focus_pointer, 0x80);
+		mainmemory.write_u24_be(camera_object + camera_focus_pointer + 1, pointer);
 	end
 end
 
@@ -651,6 +648,10 @@ local function process_input()
 		grab_object_pressed = false;
 	end
 
+	if input_table[focus_object_key] == nil then
+		focus_object_pressed = false;
+	end
+
 	if input_table[switch_grab_script_mode_key] == nil then
 		switch_grab_script_mode_pressed = false;
 	end
@@ -668,8 +669,13 @@ local function process_input()
 	end
 
 	if input_table[grab_object_key] == true and grab_object_pressed == false then
-		grab_object();
+		grab_object(object_pointers[object_index]);
 		grab_object_pressed = true;
+	end
+
+	if input_table[focus_object_key] == true and focus_object_pressed == false then
+		focus_object(object_pointers[object_index]);
+		focus_object_pressed = true;
 	end
 
 	if input_table[switch_grab_script_mode_key] == true and switch_grab_script_mode_pressed == false then
@@ -684,27 +690,33 @@ local function draw_gui()
 	local row = 0;
 	local height = 16;
 
+	gui.text(gui_x, gui_y + height * row, "Mode: "..grab_script_mode, null, null, 'bottomright');
+	row = row + 1;
+
 	gui.text(gui_x, gui_y + height * row, "Index: "..object_index.."/"..#object_pointers, null, null, 'bottomright');
 	row = row + 1;
 
-	if grab_script_mode == "Grab" then
-		local kongObject = mainmemory.read_u24_be(kong_pointer);
-		gui.text(gui_x, gui_y + height * row, string.format("Grabbed object:  0x%06x", mainmemory.read_u24_be(kongObject + grab_pointer + 1)), null, null, 'bottomright');
-		row = row + 1;
-	elseif grab_script_mode == "Camera" then
-		local camera_object = mainmemory.read_u24_be(camera_pointer + 1);
-		gui.text(gui_x, gui_y + height * row, string.format("Focused object:  0x%06x", mainmemory.read_u24_be(camera_object + camera_focus_pointer + 1)), null, null, 'bottomright');
-		row = row + 1;
-	end
-
-	if #object_pointers > 0 and object_index <= #object_pointers and grab_script_mode ~= "List" then
+	if #object_pointers > 0 and object_index <= #object_pointers then
 		local currentActorType = mainmemory.read_u32_be((object_pointers[object_index] or 0) + actor_type);
 		if type(actor_types[currentActorType]) ~= "nil" then
 			currentActorType = actor_types[currentActorType];
 		end
 		gui.text(gui_x, gui_y + height * row, string.format("Selected object: 0x%06x: ", object_pointers[object_index] or 0)..currentActorType, null, null, 'bottomright');
 		row = row + 1;
+	end
 
+	-- Display which object is grabbed
+	local kongObject = mainmemory.read_u24_be(kong_pointer);
+	gui.text(gui_x, gui_y + height * row, string.format("Grabbed object:  0x%06x", mainmemory.read_u24_be(kongObject + grab_pointer + 1)), null, null, 'bottomright');
+	row = row + 1;
+
+	-- Display which object the camera is currently focusing on
+	local camera_object = mainmemory.read_u24_be(camera_pointer + 1);
+	gui.text(gui_x, gui_y + height * row, string.format("Focused object:  0x%06x", mainmemory.read_u24_be(camera_object + camera_focus_pointer + 1)), null, null, 'bottomright');
+	row = row + 1;
+	row = row + 1;
+
+	if #object_pointers > 0 and object_index <= #object_pointers then
 		if grab_script_mode == "Examine" then
 			local examine_data = getExamineData(object_pointers[object_index]);
 			local i;
@@ -717,22 +729,23 @@ local function draw_gui()
 				end
 			end
 		end
-	end
 
-	if #object_pointers > 0 and object_index <= #object_pointers and grab_script_mode == "List" then
-		local i;
-		for i=#object_pointers,1,-1 do
-			local currentActorType = mainmemory.read_u32_be(object_pointers[i] + actor_type);
-			if type(actor_types[currentActorType]) ~= "nil" then
-				currentActorType = actor_types[currentActorType];
+		if grab_script_mode == "List" then
+			local i;
+			for i=#object_pointers,1,-1 do
+				local currentActorType = mainmemory.read_u32_be(object_pointers[i] + actor_type);
+				if type(actor_types[currentActorType]) ~= "nil" then
+					currentActorType = actor_types[currentActorType];
+				end
+				if object_index == i then
+					gui.text(gui_x, gui_y + height * row, i..": "..string.format("0x%06x: ", object_pointers[i] or 0)..currentActorType, green_highlight, null, 'bottomright');
+				else
+					gui.text(gui_x, gui_y + height * row, i..": "..string.format("0x%06x: ", object_pointers[i] or 0)..currentActorType, null, null, 'bottomright');
+				end
+				row = row + 1;
 			end
-			gui.text(gui_x, gui_y + height * row, i..": "..string.format("0x%06x: ", object_pointers[i] or 0)..currentActorType, null, null, 'bottomright');
-			row = row + 1;
 		end
 	end
-
-	gui.text(gui_x, gui_y + height * row, "Mode: "..grab_script_mode, null, null, 'bottomright');
-	row = row + 1;
 end
 
 local function isValidObject(pointer, kongObject, camera_object)

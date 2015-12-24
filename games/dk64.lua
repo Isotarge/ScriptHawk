@@ -3163,7 +3163,7 @@ end
 -----------------------------------
 local script_root = "Lua/ScriptHawk";
 
--- Colors
+-- Colors (ARGB)
 local MJ_blue         = 0x7f00a2e8;
 local MJ_blue_switch  = 0xff00a2e8;
 local MJ_white        = 0x7fffffff;
