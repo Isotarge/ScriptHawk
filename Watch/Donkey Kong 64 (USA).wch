@@ -60,6 +60,10 @@ SystemID N64
 755310	b	h	1	RDRAM	Movement speed?
 755314	b	h	1	RDRAM	Mode
 755318	b	h	1	RDRAM	Mode
+75531C	w	u	1	RDRAM	Demo fadeout timer
+755320	d	u	1	RDRAM	Frames in current map
+755328	b	u	1	RDRAM	DK TV Counter
+75532C	b	u	1	RDRAM	DK Rap Fadeout Counter
 75534A	w	u	1	RDRAM	Helm Timer
 755350	b	h	1	RDRAM	Helm Timer Enabled
 75C41B	b	h	1	RDRAM	DK Model
