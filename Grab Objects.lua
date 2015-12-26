@@ -60,6 +60,7 @@ local actor_types = {
 	[19] = "Barrel (Diddy 5DI)",
 	[18] = "Rambi Box",
 	[23] = "Cannon",
+	[25] = "Hunky Chunky Barrel",
 	[26] = "TNT Barrel",
 	[27] = "TNT Barrel Spawner (Armydillo)",
 	[28] = "Bonus Barrel",
@@ -195,6 +196,7 @@ local actor_types = {
 	[255] = "Shockwave",
 	[258] = "Shockwave (Boss)",
 	[259] = "Guard (Stealthy Snoop)",
+	[260] = "Text Overlay (K. Rool fight)",
 	[261] = "Robo-Zinger",
 	[262] = "Krossbones",
 	[263] = "Fire Shockwave (Dogadon)",
@@ -218,7 +220,7 @@ local actor_types = {
 	[299] = "Textbox",
 	[305] = "Missile (Car Race)",
 	[310] = "Spotlight", -- Tag barrel, instrument etc.
-	[311] = "Checkpoint (Seal Race)",
+	[311] = "Checkpoint (Race)", -- Seal race & Castle car race
 	[313] = "Particle (Idle Anim.)",
 	--[315] = "Sim Slam Shockwave", TODO: uhhhhh idk
 	[316] = "Kong (Tag Barrel)",
@@ -517,6 +519,7 @@ local function getExamineData(pointer)
 	local zPos = mainmemory.readfloat(pointer + z_pos, true);
 	local hasPosition = xPos ~= 0 or yPos ~= 0 or zPos ~= 0 or hasModel;
 
+	table.insert(examine_data, { "Actor base", string.format("0x%06x", pointer) });
 	local currentActorType = mainmemory.read_u32_be(pointer + actor_type);
 	if type(actor_types[currentActorType]) ~= "nil" then
 		currentActorType = actor_types[currentActorType];
@@ -585,7 +588,7 @@ local function getExamineData(pointer)
 			end
 		end
 
-		table.insert(examine_data, { "Focused Actor: ", string.format("0x%06x", focusedActor) });
+		table.insert(examine_data, { "Focused Actor", string.format("0x%06x", focusedActor) });
 		if type(focusedActorType) ~= "nil" then
 			table.insert(examine_data, { "Focused Actor Type", focusedActorType });
 		end
@@ -618,9 +621,7 @@ local function getExamineData(pointer)
 		table.insert(examine_data, { "TB previous index", mainmemory.readbyte(pointer + tb_previous_index) });
 		table.insert(examine_data, { "TB kickout timer", mainmemory.read_u32_be(pointer + tb_kickout_timer) });
 		table.insert(examine_data, { "Separator", 1 });
-	end
-
-	if currentActorType == "Kremling Kosh Controller" then
+	elseif currentActorType == "Kremling Kosh Controller" then
 		table.insert(examine_data, { "Current Slot", mainmemory.readbyte(pointer + slot_location) });
 		table.insert(examine_data, { "Melons Remaining", mainmemory.readbyte(pointer + melons_remaining) });
 		local i;
@@ -697,23 +698,14 @@ local function draw_gui()
 	gui.text(gui_x, gui_y + height * row, "Index: "..object_index.."/"..#object_pointers, nil, nil, 'bottomright');
 	row = row + 1;
 
-	if #object_pointers > 0 and object_index <= #object_pointers then
-		local currentActorType = mainmemory.read_u32_be((object_pointers[object_index] or 0) + actor_type);
-		if type(actor_types[currentActorType]) ~= "nil" then
-			currentActorType = actor_types[currentActorType];
-		end
-		gui.text(gui_x, gui_y + height * row, string.format("Selected object: 0x%06x: ", object_pointers[object_index] or 0)..currentActorType, nil, nil, 'bottomright');
-		row = row + 1;
-	end
-
 	-- Display which object is grabbed
 	local kongObject = mainmemory.read_u24_be(kong_pointer);
-	gui.text(gui_x, gui_y + height * row, string.format("Grabbed object:  0x%06x", mainmemory.read_u24_be(kongObject + grab_pointer + 1)), nil, nil, 'bottomright');
+	gui.text(gui_x, gui_y + height * row, string.format("Grabbed object: 0x%06x", mainmemory.read_u24_be(kongObject + grab_pointer + 1)), nil, nil, 'bottomright');
 	row = row + 1;
 
 	-- Display which object the camera is currently focusing on
 	local camera_object = mainmemory.read_u24_be(camera_pointer + 1);
-	gui.text(gui_x, gui_y + height * row, string.format("Focused object:  0x%06x", mainmemory.read_u24_be(camera_object + camera_focus_pointer + 1)), nil, nil, 'bottomright');
+	gui.text(gui_x, gui_y + height * row, string.format("Focused object: 0x%06x", mainmemory.read_u24_be(camera_object + camera_focus_pointer + 1)), nil, nil, 'bottomright');
 	row = row + 1;
 	row = row + 1;
 
