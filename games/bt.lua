@@ -555,6 +555,18 @@ function Game.setZPosition(value)
 end
 
 --------------
+-- Velocity --
+--------------
+
+function Game.getYVelocity()
+	if type(playerObject) ~= "nil" then
+		local playerVelocityObject = resolvePointer(playerObject, velocity_pointer_index);
+		return mainmemory.readfloat(playerVelocityObject + y_velocity, true);
+	end
+	return 0;
+end
+
+--------------
 -- Rotation --
 --------------
 
