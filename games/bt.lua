@@ -540,8 +540,7 @@ function Game.setYPosition(value)
 		mainmemory.writefloat(playerPositionObject + y_pos + 12, value, true);
 		mainmemory.writefloat(playerPositionObject + y_pos + 24, value, true);
 
-		-- Nullify Y velocity
-		mainmemory.writefloat(resolvePointer(playerObject, velocity_pointer_index) + y_velocity, 0, true);
+		Game.setYVelocity(0);
 	end
 end
 
@@ -564,6 +563,13 @@ function Game.getYVelocity()
 		return mainmemory.readfloat(playerVelocityObject + y_velocity, true);
 	end
 	return 0;
+end
+
+function Game.setYVelocity(value)
+	if type(playerObject) ~= "nil" then
+		local playerVelocityObject = resolvePointer(playerObject, velocity_pointer_index);
+		mainmemory.writefloat(playerVelocityObject + y_velocity, value, true);
+	end
 end
 
 --------------
