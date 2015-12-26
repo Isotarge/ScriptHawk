@@ -230,6 +230,20 @@ end
 -- Other helper functions --
 ----------------------------
 
+function searchPointers(base, range)
+	local address = 0;
+	local foundPointers = {};
+	for address = 0x000000, 0x7FFFFC do
+		local value = mainmemory.read_u32_be(address);
+		if value >= base - range and value <= base + range then
+			table.insert(foundPointers, {["Address"] = toHexString(address), ["Value"] = toHexString(value)});
+			dprint(toHexString(address).." -> "..toHexString(value));
+		end
+	end
+	print_deferred();
+	return foundPointers;
+end
+
 function rotation_to_degrees(num)
 	return ((num % Game.max_rot_units) / Game.max_rot_units) * 360;
 end
