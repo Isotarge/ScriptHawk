@@ -24,6 +24,7 @@ SystemID N64
 37E788	d	f	1	RDRAM	Jiggy Spawn Velocity
 37F2C5	b	u	1	RDRAM	Map
 383B91	w	h	1	RDRAM	Cauldron state
+383D08	b	h	1	RDRAM	Sandcastle Water State
 386910	d	s	1	RDRAM	Hourglass timer Value
 386914	d	s	1	RDRAM	Evil hourglass timer Value
 386918	d	s	1	RDRAM	Unknown timer Value
