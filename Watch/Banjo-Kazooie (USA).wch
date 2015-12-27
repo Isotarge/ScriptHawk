@@ -1,7 +1,7 @@
 Domain EEPROM
 SystemID N64
-2808DB	b	u	1	RDRAM	Frame timer
-2808DF	b	u	1	RDRAM	Frameskip
+2808D8	d	s	1	RDRAM	Frame timer
+2808DC	d	s	1	RDRAM	Frameskip
 283400	w	b	1	RDRAM	Stop'N'Swop Items
 2986BA	w	h	1	RDRAM	Banjo Model Replacement
 2986BE	w	h	1	RDRAM	Banjo Model Replacement
