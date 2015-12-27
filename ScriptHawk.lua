@@ -230,14 +230,22 @@ end
 -- Other helper functions --
 ----------------------------
 
-function searchPointers(base, range)
+function searchPointers(base, range, allowLater)
 	local address = 0;
 	local foundPointers = {};
+	allowLater = allowLater or false;
 	for address = 0x000000, 0x7FFFFC do
 		local value = mainmemory.read_u32_be(address);
-		if value >= base - range and value <= base + range then
-			table.insert(foundPointers, {["Address"] = toHexString(address), ["Value"] = toHexString(value)});
-			dprint(toHexString(address).." -> "..toHexString(value));
+		if allowLater then
+			if value >= base - range and value <= base + range then
+				table.insert(foundPointers, {["Address"] = toHexString(address), ["Value"] = toHexString(value)});
+				dprint(toHexString(address).." -> "..toHexString(value));
+			end
+		else
+			if value >= base - range and value <= base then
+				table.insert(foundPointers, {["Address"] = toHexString(address), ["Value"] = toHexString(value)});
+				dprint(toHexString(address).." -> "..toHexString(value));
+			end
 		end
 	end
 	print_deferred();
@@ -451,9 +459,13 @@ function updateUIReadouts_ScriptHawk()
 		row = row + 1;
 		gui.text(gui_x_offset, gui_y_offset + row_height * row, "dXZ: "..(round(d, precision) or 0));
 		row = row + 1;
-		if type(Game.getBoost) == "function" then
+		if type(Game.getSpinTimer) == "function" then
 			row = row + 1;
-			gui.text(gui_x_offset, gui_y_offset + row_height * row, "Boost: "..round(Game.getBoost(), precision));
+			gui.text(gui_x_offset, gui_y_offset + row_height * row, "Spin Timer: "..Game.getSpinTimer());
+			row = row + 1;
+		end
+		if type(Game.getBoost) == "function" then
+			gui.text(gui_x_offset, gui_y_offset + row_height * row, "Boost: "..Game.getBoost());
 			row = row + 1;
 		end
 		if type(Game.getVelocity) == "function" then

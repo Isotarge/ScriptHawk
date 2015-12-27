@@ -21,6 +21,8 @@ local lateral_velocity = 0xC8;
 
 local camera_zoom = 0x12C;
 
+local spin_timer = 0x206; -- Signed 2 byte
+
 -- Max 0x0A=10
 local powerup_quantity = 0x20B;
 
@@ -252,6 +254,15 @@ function Game.setLateralVelocity(value)
 		player_object = player_object - 0x80000000;
 		mainmemory.writefloat(player_object + lateral_velocity, value, true);
 	end
+end
+
+function Game.getSpinTimer()
+	local player_object = mainmemory.read_u32_be(player_object_pointer);
+	if is_pointer(player_object) then
+		player_object = player_object - 0x80000000;
+		return mainmemory.read_s16_be(player_object + spin_timer);
+	end
+	return 0;
 end
 
 function Game.getYVelocity()
