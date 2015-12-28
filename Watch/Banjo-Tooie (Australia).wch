@@ -1,5 +1,7 @@
 Domain RDRAM
 SystemID N64
+083550	d	s	1	RDRAM	Frame timer
+083554	d	s	1	RDRAM	Frameskip
 131524	d	f	1	RDRAM	Game Time (GGM)
 131528	d	f	1	RDRAM	Game Time (MT)
 131530	d	f	1	RDRAM	Game Time (WW)
