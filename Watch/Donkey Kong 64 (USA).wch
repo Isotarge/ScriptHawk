@@ -31,10 +31,13 @@ SystemID N64
 4B210A	b	h	1	RDRAM	Main menu screen?
 4B210F	b	u	1	RDRAM	Main menu position
 4B2904	b	h	1	RDRAM	FF for voidout on main menu?!?
+7444C0	b	u	1	RDRAM	Screen Size
 7444E7	b	h	1	RDRAM	Map
 7444EB	b	h	1	RDRAM	Exit
 744519	b	u	1	RDRAM	Rambi Arena Score
 74452C	b	u	1	RDRAM	Story skip
+744530	b	u	1	RDRAM	Chimpy Cam
+744538	b	u	1	RDRAM	Monkey Smash Map
 744548	w	s	1	RDRAM	Rambi Score 1
 74454A	d	h	1	RDRAM	Rambi Score 1 Name
 74454E	w	u	1	RDRAM	Rambi Score 2
@@ -58,8 +61,8 @@ SystemID N64
 7552E0	b	h	1	RDRAM	Security?!?!?
 75530C	b	h	1	RDRAM	Movement speed?
 755310	b	h	1	RDRAM	Movement speed?
-755314	b	h	1	RDRAM	Mode
-755318	b	h	1	RDRAM	Mode
+755314	b	u	1	RDRAM	Mode
+755318	b	u	1	RDRAM	Mode
 75531C	w	u	1	RDRAM	Demo fadeout timer
 755320	d	u	1	RDRAM	Frames in current map
 755328	b	u	1	RDRAM	DK TV Counter
@@ -77,7 +80,7 @@ SystemID N64
 75C49B	b	h	1	RDRAM	Squawks Model
 75C4AB	b	h	1	RDRAM	Squawks Model
 7654F4	d	h	1	RDRAM	Flag Block Pointer
-767CC6	w	u	1	RDRAM	Freeze to freeze main thread
+767CC4	d	u	1	RDRAM	Freeze to freeze main thread
 76A066	w	1	1	RDRAM	Main object timer?
 76A0AB	b	h	1	RDRAM	Background?
 76A0CD	b	u	1	RDRAM	Adventure

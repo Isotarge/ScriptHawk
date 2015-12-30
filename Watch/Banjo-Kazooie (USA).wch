@@ -2,6 +2,37 @@ Domain EEPROM
 SystemID N64
 2808D8	d	s	1	RDRAM	Frame timer
 2808DC	d	s	1	RDRAM	Frameskip
+281138	d	u	1	RDRAM	P1 A Button Held Timer
+28113C	d	u	1	RDRAM	P1 B Button Held Timer
+281140	d	u	1	RDRAM	P1 C Left Held Timer
+281144	d	u	1	RDRAM	P1 C Down Held Timer
+281148	d	u	1	RDRAM	P1 C Up Held Timer
+28114C	d	u	1	RDRAM	P1 C Right Held Timer
+281150	d	u	1	RDRAM	P1 Z Button Held Timer
+281154	d	u	1	RDRAM	P1 L Button Held Timer
+281158	d	u	1	RDRAM	P1 R Button Held Timer
+28115C	d	u	1	RDRAM	P1 Dpad Up Held Timer
+281160	d	u	1	RDRAM	P1 Dpad Down Held Timer
+281164	d	u	1	RDRAM	P1 Dpad Left Held Timer
+281168	d	u	1	RDRAM	P1 Dpad Right Held Timer
+28116C	d	u	1	RDRAM	P1 Start Held Timer
+281218	d	u	1	RDRAM	P1 A Button Held Timer
+28121C	d	u	1	RDRAM	P1 B Button Held Timer
+281220	d	u	1	RDRAM	P1 C Left Held Timer
+281224	d	u	1	RDRAM	P1 C Down Held Timer
+281228	d	u	1	RDRAM	P1 C Up Held Timer
+28122C	d	u	1	RDRAM	P1 C Right Held Timer
+281230	d	u	1	RDRAM	P1 Z Button Held Timer
+281234	d	u	1	RDRAM	P1 L Button Held Timer
+281238	d	u	1	RDRAM	P1 R Button Held Timer
+28123C	d	u	1	RDRAM	P1 Dpad Up Held Timer
+281240	d	u	1	RDRAM	P1 Dpad Down Held Timer
+281244	d	u	1	RDRAM	P1 Dpad Left Held Timer
+281248	d	u	1	RDRAM	P1 Dpad Right Held Timer
+28124C	d	u	1	RDRAM	P1 Start Held Timer
+2812B8	w	b	1	RDRAM	P1 Controller Input
+2812BA	b	s	1	RDRAM	P1 Joystick X Axis
+2812BB	b	s	1	RDRAM	P1 Joystick Y Axis
 283400	w	b	1	RDRAM	Stop'N'Swop Items
 2986BA	w	h	1	RDRAM	Banjo Model Replacement
 2986BE	w	h	1	RDRAM	Banjo Model Replacement
@@ -48,6 +79,8 @@ SystemID N64
 37C0B4	d	f	1	RDRAM	Wading Boots Timer (copy)
 37C0B8	d	f	1	RDRAM	Turbo Trainers Timer
 37C0BC	d	f	1	RDRAM	Turbo Trainers Timer (copy)
+37C0C0	d	f	1	RDRAM	Unknown Float (Beak Buster?)
+37C0C4	d	f	1	RDRAM	Unknown Float (Beak Buster?)
 37C0E0	d	h	1	RDRAM	Banjo Model Pointer?
 37C0E6	b	u	1	RDRAM	Banjo Transparancy
 37C0EC	d	f	1	RDRAM	Banjo Scale
