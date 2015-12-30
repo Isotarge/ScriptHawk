@@ -143,7 +143,11 @@ SystemID N64
 37DC70	d	f	1	RDRAM	C-Up camera angle
 37DDB4	d	f	1	RDRAM	Jiggy Spawn Angle
 37DDB8	d	f	1	RDRAM	Jiggy Spawn Velocity
+37E8E8	d	f	1	RDRAM	Game run time
+37E8F0	d	f	1	RDRAM	Map run time
+37E8F4	b	h	1	RDRAM	Map Load State
 37E8F5	b	h	1	RDRAM	Map
+37E8F6	b	h	1	RDRAM	Exit
 380944	d	f	1	RDRAM	Water Something?
 380950	d	f	1	RDRAM	Water Something?
 380974	d	f	1	RDRAM	Water Something?
