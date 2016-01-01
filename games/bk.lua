@@ -24,7 +24,7 @@ local facing_angle;
 local moving_angle;
 local z_rot;
 
-local camera_rot = 0x37D96C; -- TODO: Port to other versions
+local camera_rot; -- TODO: JP/PAL
 
 local map;
 local frame_timer;
@@ -33,6 +33,8 @@ local object_array_pointer;
 local notes;
 
 -- Relative to notes
+-- TODO: Redo with correct datatypes
+-- TODO: Add jinjos
 local eggs = 4;
 local red_feathers = 12;
 local gold_feathers = 16;
@@ -238,6 +240,7 @@ function Game.detectVersion(romName)
 		x_pos = 0x37CF70;
 		x_rot = 0x37CF10;
 		moving_angle = 0x37D064;
+		camera_rot = 0x37D96C; -- TODO
 		z_rot = 0x37D050;
 		map = 0x37F2C5;
 		notes = 0x386943;
@@ -250,6 +253,7 @@ function Game.detectVersion(romName)
 		x_pos = 0x37D0A0;
 		x_rot = 0x37D040;
 		moving_angle = 0x37D194;
+		camera_rot = 0x37D96C; -- TODO
 		z_rot = 0x37D180;
 		map = 0x37F405;
 		notes = 0x386AA3;
@@ -262,6 +266,7 @@ function Game.detectVersion(romName)
 		x_pos = 0x37B7A0;
 		x_rot = 0x37B740;
 		moving_angle = 0x37B894;
+		camera_rot = 0x37CDA8;
 		z_rot = 0x37B880;
 		map = 0x37DAF5;
 		notes = 0x385183;
@@ -275,6 +280,7 @@ function Game.detectVersion(romName)
 		x_pos = 0x37C5A0;
 		x_rot = 0x37C540;
 		moving_angle = 0x37C694;
+		camera_rot = 0x37D96C;
 		z_rot = 0x37C680;
 		map = 0x37E8F5;
 		notes = 0x385F63;

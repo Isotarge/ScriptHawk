@@ -4,6 +4,8 @@ SystemID N64
 07913C	d	s	1	RDRAM	Frameskip
 0799E0	d	u	1	RDRAM	Counter: A Button Pressed
 079AC0	d	u	1	RDRAM	Counter: A Button Pressed
+117DDA	w	h	1	RDRAM	Player Model Modifier
+117DEA	w	h	1	RDRAM	Player Model Modifier
 11AB41	b	u	1	RDRAM	Jinjo: MT: Jade Snake Grove
 11AB44	b	u	1	RDRAM	Jinjo: MT: Roof of Stadium
 11AB47	b	u	1	RDRAM	Jinjo: MT: Targitzan's Temple
