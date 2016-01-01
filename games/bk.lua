@@ -322,7 +322,8 @@ local options_moves_button;
 local move_levels = {
 	["0. None"]                 = 0x00000000,
 	["1. Spiral Mountain 100%"] = 0x00009DB9,
-	["2. All"]                  = 0x007FFFFF,
+	["2. FFM Setup"]            = 0x007FFDBF,
+	["3. All"]                  = 0x007FFFFF,
 	["3. Demo"]                 = 0xFFFFFFFF
 };
 
@@ -330,6 +331,73 @@ local function unlock_moves()
 	local level = forms.gettext(options_moves_dropdown);
 	mainmemory.write_u32_be(moves_bitfield, move_levels[level]);
 end
+
+--------------------
+-- Movement state --
+--------------------
+
+-- Current Movement state  0x37D167 (US 1.0)
+-- Previous Movement state 0x37D163 (US 1.0)
+
+local movementStates = {
+	[0x01] = "Idle",
+	[0x02] = "Slow walking",
+	[0x03] = "Walking",
+	[0x04] = "Fast walking",
+
+	[0x05] = "Jumping",
+	[0x06] = "Bear punch",
+	[0x07] = "Crouching",
+	[0x08] = "Jumping (Talon Trot)",
+	[0x0C] = "Skidding",
+	[0x0E] = "Taking damage",
+	[0x0F] = "Beak Buster",
+	[0x10] = "Feathery Flap",
+	[0x11] = "Rat-a-tat rap",
+	[0x12] = "Backflip (Flap Flip)",
+	[0x13] = "Beak Barge",
+
+	[0x14] = "Entering Talon Trot",
+	[0x15] = "Talon Trot Idle",
+	[0x16] = "Talon Trot Moving",
+	[0x17] = "Leaving Talon Trot",
+
+	[0x1A] = "Entering Wonderwing",
+	[0x1B] = "Idle (Wonderwing)",
+	[0x1C] = "Moving (Wonderwing)",
+	[0x1D] = "Jumping (Wonderwing)",
+	[0x1E] = "Leaving Wonderwing",
+
+	[0x1F] = "Creeping",
+	[0x20] = "Landing (after jump)",
+
+	[0x25] = "Entering Wading Boots",
+	[0x26] = "Idle (Wading Boots)",
+	[0x27] = "Moving (Wading Boots)",
+	[0x28] = "Jumping (Wading Boots)",
+	[0x29] = "Leaving Wading Boots",
+
+	[0x2F] = "Landing (with peck?)",
+
+	[0x31] = "Rolling",
+
+	[0x32] = "Slipping down slope",
+	[0x45] = "Slipping down slope (Talon Trot)",
+	[0x55] = "Slipping down slope (Wading Boots)",
+
+	[0x5A] = "Loading zone?",
+
+	[0x5E] = "Idle (Croc)",
+	[0x5F] = "Moving (Croc)",
+	[0x60] = "Jumping (Croc)",
+	[0x6E] = "Biting (Croc)",
+
+	[0x73] = "Locked - Cutscene?",
+	[0x74] = "Locked - Jiggy pad, Mumbo transformation, bottles",
+	[0x8D] = "Locked - Mumbo transformation",
+	[0x94] = "Locked - Mumbo transformation",
+	[0x98] = "Locked - Loading zone, Mumbo transformation",
+};
 
 -------------------------------
 -- Sandcastle string decoder --
@@ -841,7 +909,7 @@ function Game.initUI(form_handle, col, row, button_height, label_offset, dropdow
 	options_fire_all_button = forms.button(form_handle, "Fire all", fireAllSlots, col(10), row(6), col(4) + 8, button_height);
 
 	-- Moves
-	options_moves_dropdown = forms.dropdown(form_handle, { "0. None", "1. Spiral Mountain 100%", "2. All", "3. Demo" }, col(10) + dropdown_offset, row(7) + dropdown_offset);
+	options_moves_dropdown = forms.dropdown(form_handle, { "0. None", "1. Spiral Mountain 100%", "2. FFM Setup", "3. All", "3. Demo" }, col(10) + dropdown_offset, row(7) + dropdown_offset);
 	options_moves_button = forms.button(form_handle, "Unlock Moves", unlock_moves, col(5), row(7), col(4) + 8, button_height);
 end
 

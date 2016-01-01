@@ -7,22 +7,22 @@ Boggy rubberband science
 	- Second race speed is fixed at 1200
 
 Figure out RNG
-	- RNG Bytes at:
-		3860E0 - Changes every physics frame
+	- RNG Values (4 bytes each) at (US 1.0):
+		0x3860E0 - Changes every physics frame
 			- FF Question Portraits
 			- Enemy Movement
-		3860E4 - Changes every physics frame
+		0x3860E4 - Changes every physics frame
 			- FF Question Portraits
 			- Enemy Movement
-		3860E8 - Changes every physics frame
+		0x3860E8 - Changes every physics frame
 			- FF Question Portraits
 			- Enemy Movement
-		3860EC
-		3860F0
-		3860F4
+		0x3860EC
+		0x3860F0
+		0x3860F4
 
-When 3860E4 is 0x00, permit termite action
-When 3860E9 is 0x4C, force termite blink
+When 0x3860E4 is 0x00, permit termite action
+When 0x3860E9 is 0x4C, force termite blink
 
 RNG examples:
 
@@ -369,9 +369,10 @@ Relative Type    Observed values
 -- Vile state stuff --
 ----------------------
 
-Pointer at 0x36E560 to Vile state object
+Follow Pointer at 0x36E560 to the current map's object array
 
-Addresses below are relative to vile state object
+Addresses below are relative to this array
+TODO: Improve detection for object types in this array
 
 0x90 Game type? (also changes winning/losing message)
 	Blank Banjo text shows up sometimes
@@ -390,15 +391,15 @@ Addresses below are relative to vile state object
 	- 00000 0x00 disabled
 	- 00100 0x04 idle
 	- 01000 0x08 rising
-	- 01100 0x0c alive
+	- 01100 0x0C alive
 	- 10000 0x10 falling (no eat)
 	- 10100 0x14 eaten
 
 Falling state (not eaten)
-0x0c -> 0x10 -> 0x04
+0x0C -> 0x10 -> 0x04
 
 Falling state (eaten)
-0x0c -> 0x14 -> 0x04
+0x0C -> 0x14 -> 0x04
 
 0x384 Amount "popped out" (0-1, float)
 0x388 Yumbly/Grumbly (0x00 yum, 0x01 grum)
@@ -421,13 +422,21 @@ Falling state (eaten)
 -- Misc state --
 ----------------
 
-Moves unlocked = 0x37c3a0-4 (US 1.0)
+Moves unlocked:
+
+0x37CEA0 (JP)
+0x37CD70 (PAL)
+0x37C3A0 (US 1.0)
+0x37B5A0 (US 1.1)
+
 It's a bitfield, 4 bytes
+TODO: Do the unused bytes save in EEPROM?
 
 Common states
 
 00 00 00 00 - No Moves
 00 00 9D B9 - SM 100%
+00 7F FD BF - FFM Setup
 00 7F FF FF - Legit 100%
 FF FF FF FF - Used during demos
 
@@ -464,105 +473,48 @@ FF FF FF FF - Used during demos
 -- -- -- -2 Beak Bomb
 -- -- -- -1 Beak Barge
 
---------------------
--- Movement state --
---------------------
-
-Current Movement state  0x37D167
-Previous Movement state 0x37D163
-
-0x00 ???
-0x01 Idle
-0x02 Slow walking
-0x03 Walking
-0x04 Fast walking
-
-0x05 Jumping
-0x06 Bear punch
-0x07 Crouching
-0x08 Jumping (Talon Trot)
-0x0C Skidding
-0x0E Taking damage
-0x0F Beak Buster
-0x10 Feathery Flap
-0x11 Rat-a-tat rap
-0x12 Backflip (Flap Flip)
-0x13 Beak Barge
-
-0x14 Entering Talon Trot
-0x15 Talon Trot Idle
-0x16 Talon Trot Moving
-0x17 Leaving Talon Trot
-
-0x1A Entering Wonderwing
-0x1B Idle (Wonderwing)
-0x1C Moving (Wonderwing)
-0x1D Jumping (Wonderwing)
-0x1E Leaving Wonderwing
-
-0x1F Creeping
-0x20 Landing (after jump)
-
-0x25 Entering Wading Boots
-0x26 Idle (Wading Boots)
-0x27 Moving (Wading Boots)
-0x28 Jumping (Wading Boots)
-0x29 Leaving Wading Boots
-
-0x2F Landing with peck?
-
-0x31 Rolling
-
-0x32 Slipping down slope
-0x45 Slipping down slope (Talon Trot)
-0x55 Slipping down slope (Wading Boots)
-
-0x5A Loading zone?
-
-0x5E Idle (Croc)
-0x5F Moving (Croc)
-0x60 Jumping (Croc)
-0x6E Biting (Croc)
-
-0x73 "Locked" Cutscene?
-0x74 "Locked" Jiggy pad, Mumbo transformation, bottles
-0x8D "Locked" Mumbo transformation
-0x94 "Locked" Mumbo transformation
-0x98 "Locked" Loading zone, Mumbo transformation
-
 -----------------------
 -- Stop'N'Swop state --
 -----------------------
 
-Located at 0x283400 (US 1.0)
+Located at:
+
+0x282240 (JP)
+0x283220 (PAL)
+0x283400 (US 1.0)
+0x282240 (US 1.1)
+
 2 bytes, bitfield
+
+Bitfield layout:
+
+0x00     0x01
+yrgbpciY RGBPCI??
+
+y = Yellow egg available
+r = Red egg available
+g = Green egg available
+b = Blue egg available
+p = Sharkfood island raised (Pink egg available)
+c = Cyan egg available
+i = Ice Key available
+Y = Yellow egg collected
+
+R = Red egg collected
+G = Green egg collected
+B = Blue egg collected
+P = Pink egg collected
+C = Cyan egg collected
+I = Ice Key collected
+
+Last 2 bits are currently unknown
+TODO: Are they saved to EEPROM?
 
 Common states:
 
 All locked    0x0000
 All available 0xFE00
 All collected 0xFFFC
-
-(Left to right)
-Bit 1 Yellow egg available
-Bit 2 Red egg available
-Bit 3 Green egg available
-Bit 4 Blue egg available
-Bit 5 Sharkfood island raised (Pink egg available)
-Bit 6 Cyan egg available
-Bit 7 Ice Key available
-
-Bit 8 Yellow egg collected
-Bit 9 Red egg collected
-Bit 10 Green egg collected
-Bit 11 Blue egg collected
-Bit 12 Pink egg collected
-Bit 13 Cyan egg collected
-Bit 14 Ice Key collected
-Bit 15 ???
-Bit 16 ???
-
-0010 -> Pink egg collected
 
 ---------------------------------
 -- Pause menu portrait indices --
@@ -737,6 +689,8 @@ Range     | Description          | Data Type
 
 Honeycombs collected bitfield layout
 
+........ BccTTmmB RCCGGFFR SSSSSMMS
+
 S=SM
 m=Mumbo's
 T=TTC
@@ -747,8 +701,6 @@ G=GV
 M=MMM
 R=RBB
 C=CCW
-
-00000000 BccTTmmB RCCGGFFR SSSSSMMS
 
 --------------------------
 -- Cauldron stuff (PAL) --
@@ -773,3 +725,9 @@ Lives:
 --------------------
 
 ???Y POGB
+
+B = Blue collected
+G = Green collected
+O = Oranged collected
+P = Pink/Purple collected
+Y = Yellow collected
