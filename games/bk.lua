@@ -24,10 +24,11 @@ local facing_angle;
 local moving_angle;
 local z_rot;
 
-local camera_rot = 0x37D96C;
+local camera_rot = 0x37D96C; -- TODO: Port to other versions
 
 local map;
 local game_time_base;
+local frame_timer;
 local RNG_base;
 local object_array_pointer;
 
@@ -232,6 +233,7 @@ Game.maps = {
 
 function Game.detectVersion(romName)
 	if bizstring.contains(romName, "Europe") then
+		frame_timer = 0x280700;
 		slope_timer = 0x37CCB4;
 		moves_bitfield = 0x37CD70;
 		x_vel = 0x37CE88;
@@ -244,6 +246,7 @@ function Game.detectVersion(romName)
 		game_time_base = 0x3869E4;
 		object_array_pointer = 0x36EAE0;
 	elseif bizstring.contains(romName, "Japan") then
+		frame_timer = 0x27F718;
 		slope_timer = 0x37CDE4;
 		moves_bitfield = 0x37CEA0;
 		x_vel = 0x37CFB8;
@@ -256,6 +259,7 @@ function Game.detectVersion(romName)
 		game_time_base = 0x386B44;
 		object_array_pointer = 0x36F260;
 	elseif bizstring.contains(romName, "USA") and bizstring.contains(romName, "Rev A") then
+		frame_timer = 0x27F718;
 		slope_timer = 0x37B4E4;
 		moves_bitfield = 0x37B5A0;
 		x_vel = 0x37B6B8;
@@ -268,6 +272,7 @@ function Game.detectVersion(romName)
 		game_time_base = 0x385224;
 		object_array_pointer = 0x36D760;
 	elseif bizstring.contains(romName, "USA") then
+		frame_timer = 0x2808D8;
 		allowFurnaceFunPatch = true;
 		slope_timer = 0x37C2E4;
 		moves_bitfield = 0x37C3A0;
@@ -450,44 +455,6 @@ function decodeSandcastleString(base, length, nullTerminate)
 		end
 	end
 	print(builtString);
-end
-
----------------------
--- Game time stuff --
----------------------
-
-local previousGameTime = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
-local gameTime = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
-
-local previousRNG = {0, 0, 0, 0, 0, 0}
-local RNG = {0, 0, 0, 0, 0, 0};
-
-local function checkRNG()
-	previousRNG = RNG;	
-	RNG = {};
-
-	local i;
-	for i=0,5 do
-		table.insert(RNG, mainmemory.read_u32_be(RNG_base + (i * 4)))
-	end
-end
-
-local function checkGameTime()
-	previousGameTime = gameTime;	
-	gameTime = {};
-
-	local i;
-	for i=0,10 do
-		table.insert(gameTime, mainmemory.readfloat(game_time_base + (i * 4), true));
-	end
-end
-
-local function gameTimeHasChanged()
-	return deepcompare(previousGameTime, gameTime, true);
-end
-
-local function RNGHasChanged()
-	return deepcompare(previousRNG, RNG, true);
 end
 
 -----------------------
@@ -771,7 +738,8 @@ Game.rot_speed = 5;
 Game.max_rot_units = 360;
 
 function Game.isPhysicsFrame()
-	return (gameTimeHasChanged() or RNGHasChanged()) and not emu.islagged();
+	local frameTimerValue = mainmemory.read_s32_be(frame_timer);
+	return frameTimerValue <= 0 and not emu.islagged();
 end
 
 --------------
@@ -917,8 +885,6 @@ function Game.eachFrame()
 	-- Furnace fun patch
 	applyFurnaceFunPatch();
 
-	checkRNG();
-	checkGameTime();
 	updateWave();
 
 	set_orange_timer();
