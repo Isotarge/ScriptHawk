@@ -331,6 +331,59 @@ local function unlock_moves()
 	mainmemory.write_u32_be(moves_bitfield, move_levels[level]);
 end
 
+-------------------------------
+-- Sandcastle string decoder --
+-------------------------------
+
+local sandcastleStringConversionTable = {
+	[0x00] = " ",
+	[0x30] = "C",
+	[0x31] = "M",
+	[0x32] = "S",
+	[0x33] = "Z",
+	[0x34] = "I",
+	[0x35] = "G",
+	[0x36] = "O",
+	[0x37] = "W",
+	[0x38] = "K",
+	[0x39] = "R",
+	[0x61] = "V",
+	[0x62] = "L",
+	[0x63] = "F",
+	[0x64] = "T",
+	[0x65] = "Y",
+	[0x67] = "U",
+	[0x68] = "X",
+	[0x69] = "N",
+	[0x6A] = "E",
+	[0x6B] = "B",
+	[0x6C] = "D",
+	[0x6D] = "H",
+	[0x6E] = "A",
+	[0x70] = "J",
+	[0x72] = "P",
+};
+
+function decodeSandcastleString(base, length, nullTerminate)
+	nullTerminate = nullTerminate or false;
+	local i;
+	local builtString = "";
+	for i = base, base + length do
+		local byte = mainmemory.readbyte(i);
+
+		if byte == 0 and nullTerminate then
+			break;
+		end
+
+		if type(sandcastleStringConversionTable[byte]) ~= "nil" then
+			builtString = builtString..sandcastleStringConversionTable[byte];
+		else
+			builtString = builtString.."?".."("..bizstring.hex(byte).." = "..string.char(byte)..")";
+		end
+	end
+	print(builtString);
+end
+
 ---------------------
 -- Game time stuff --
 ---------------------
