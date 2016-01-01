@@ -24,7 +24,10 @@ SystemID N64
 37D064	d	f	1	RDRAM	Moving angle
 37E784	d	f	1	RDRAM	Jiggy Spawn Angle
 37E788	d	f	1	RDRAM	Jiggy Spawn Velocity
+37F2B8	d	f	1	RDRAM	Game Time
+37F2C0	d	f	1	RDRAM	Map Time
 37F2C5	b	u	1	RDRAM	Map
+37F2C6	b	u	1	RDRAM	Exit
 383B91	w	h	1	RDRAM	Cauldron state
 383D08	b	h	1	RDRAM	Sandcastle Water State
 386910	d	s	1	RDRAM	Hourglass timer Value

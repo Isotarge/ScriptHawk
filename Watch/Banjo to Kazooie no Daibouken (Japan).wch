@@ -42,8 +42,8 @@ SystemID N64
 37D1FC	d	f	1	RDRAM	Unknown Float
 37DC63	b	h	1	RDRAM	Current Movement State
 37DC67	b	h	1	RDRAM	Previous Movement State
-37DD3C	d	f	1	RDRAM	Eye State
-37DD40	d	f	1	RDRAM	Eye State
+37DD3C	d	f	1	RDRAM	Eye State (Left)
+37DD40	d	f	1	RDRAM	Eye State (Right)
 37DD60	d	f	1	RDRAM	Ground Damage Timer
 37DD80	d	f	1	RDRAM	Ground Damage Timer (Copy)
 37E8C4	d	f	1	RDRAM	Jiggy Spawn Angle

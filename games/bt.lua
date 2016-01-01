@@ -313,7 +313,7 @@ Game.maps = {
 --------------------
 
 local air;
-local game_time_base;
+local frame_timer;
 local linked_list_root;
 local map;
 local map_trigger;
@@ -321,25 +321,25 @@ local map_trigger;
 function Game.detectVersion(romName)
 	if bizstring.contains(romName, "Australia") then
 		air = 0x12B050; -- TODO
-		game_time_base = 0x131520;
+		frame_timer = 0x083550;
 		linked_list_root = 0x13C380;
 		map = 0x127640; -- TODO
 		map_trigger = 0x127642; -- TODO
 	elseif bizstring.contains(romName, "Europe") then
 		air = 0x12B050; -- TODO
-		game_time_base = 0x1317B0;
+		frame_timer = 0x083550;
 		linked_list_root = 0x13C680;
 		map = 0x127640; -- TODO
 		map_trigger = 0x127642; -- TODO
 	elseif bizstring.contains(romName, "Japan") then
 		air = 0x12B050; -- TODO
-		game_time_base = 0x126970;
+		frame_timer = 0x0788F8;
 		linked_list_root = 0x131850;
 		map = 0x127640; -- TODO
 		map_trigger = 0x127642; -- TODO
 	elseif bizstring.contains(romName, "USA") then
 		air = 0x12B050;
-		game_time_base = 0x12C7A0;
+		frame_timer = 0x079138;
 		linked_list_root = 0x137800;
 		map = 0x127640;
 		map_trigger = 0x127642;
@@ -367,27 +367,6 @@ local function find_root(object)
 	end
 end
 
----------------------
--- Game time stuff --
----------------------
-
-previousGameTime = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
-gameTime = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
-
-local function checkGameTime()
-	previousGameTime = gameTime;	
-	gameTime = {};
-
-	local i;
-	for i=1,15 do
-		table.insert(gameTime, mainmemory.readfloat(game_time_base + (i * 4), true))
-	end
-end
-
-function gameTimeHasChanged()
-	return deepcompare(previousGameTime, gameTime, true);
-end
-
 -------------------
 -- Physics/Scale --
 -------------------
@@ -399,7 +378,8 @@ Game.rot_speed = 10;
 Game.max_rot_units = 360;
 
 function Game.isPhysicsFrame()
-	return gameTimeHasChanged() and not emu.islagged();
+	local frameTimerValue = mainmemory.read_s32_be(frame_timer);
+	return frameTimerValue <= 0 and not emu.islagged();
 end
 
 ------------------------
@@ -637,6 +617,8 @@ end
 -- Health --
 ------------
 
+-- TODO: Port these addresses to other versions
+-- Probably best to use a base + offset dealeo
 local iconAddress = 0x11B065;
 local healthAddresses = {
 	[0x01] = {0x11B644, 0x11B645}, -- BK
@@ -650,7 +632,7 @@ local healthAddresses = {
 	[0x32] = {0x11B647, 0x11B648}, -- Snowball
 	[0x36] = {0x11B656, 0x11B657}, -- Washing Machine
 	[0x5F] = {0x11B662, 0x11B663} -- Kazooie (Solo)
-}
+};
 
 function Game.getCurrentHealth()
 	local currentTransformation = mainmemory.readbyte(iconAddress);
@@ -720,7 +702,6 @@ end
 
 function Game.eachFrame()
 	playerObject = getPlayerObject();
-	checkGameTime();
 
 	if forms.ischecked(options_toggle_neverslip) then
 		neverSlip();

@@ -65,6 +65,7 @@ SystemID N64
 364AD4	d	f	1	RDRAM	Wonderwing Movement Speed
 364AE0	d	f	1	RDRAM	Wonderwing Jump Height
 364AE4	d	f	1	RDRAM	Wonderwing Jump Gravity
+36A9B4	d	h	1	RDRAM	Pointer to linked list? of pointers
 36C4EC	w	u	1	RDRAM	Pause Menu Item 1 Y Position
 36C4EE	b	u	1	RDRAM	Pause Menu Item 1 Portrait
 36C4FC	w	u	1	RDRAM	Pause Menu Item 2 Y Position
@@ -143,8 +144,8 @@ SystemID N64
 37DC70	d	f	1	RDRAM	C-Up camera angle
 37DDB4	d	f	1	RDRAM	Jiggy Spawn Angle
 37DDB8	d	f	1	RDRAM	Jiggy Spawn Velocity
-37E8E8	d	f	1	RDRAM	Game run time
-37E8F0	d	f	1	RDRAM	Map run time
+37E8E8	d	f	1	RDRAM	Game runtime
+37E8F0	d	f	1	RDRAM	Map runtime
 37E8F4	b	h	1	RDRAM	Map Load State
 37E8F5	b	h	1	RDRAM	Map
 37E8F6	b	h	1	RDRAM	Exit
@@ -154,6 +155,9 @@ SystemID N64
 3810B8	d	f	1	RDRAM	FF Answer Timer
 382F20	d	h	1	RDRAM	Textbox object pointer
 383012	b	u	1	RDRAM	Current Pause Menu Item
+3831E7	b	u	1	RDRAM	BB Active (EEPROM)
+3831EA	b	u	1	RDRAM	BB Active (EEPROM)
+3831EB	b	b	1	RDRAM	BB Type (EEPROM)
 3832E0	d	h	1	RDRAM	Honeycomb Bitfield
 383328	b	h	1	RDRAM	Sandcastle Water State
 383384	d	f	1	RDRAM	Text Timer
@@ -196,6 +200,12 @@ SystemID N64
 3860EC	d	h	1	RDRAM	RNG
 3860F0	d	h	1	RDRAM	RNG
 3860F4	d	h	1	RDRAM	RNG
+38CA90	w	b	1	RDRAM	BOTTLESBONUSONE Cheat bitmask
+38CA92	w	u	1	RDRAM	BOTTLESBONUSONE Cheat progress
+38CAC8	w	b	1	RDRAM	NOBONUS Cheat bitmask
+38CACA	w	u	1	RDRAM	NOBONUS Cheat progress
+38CADC	b	u	1	RDRAM	CHEAT Index
+38CB8C	b	u	1	RDRAM	BANJOBEGSFORPLENTYOFEGGS Index
 3935B0	d	s	1	RDRAM	Boggy race flags completed (Player)
 3935B4	d	s	1	RDRAM	Boggy race flags completed (Boggy)
 3935C0	b	u	1	RDRAM	Boggy is 1 flag ahead of player

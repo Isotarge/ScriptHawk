@@ -27,9 +27,7 @@ local z_rot;
 local camera_rot = 0x37D96C; -- TODO: Port to other versions
 
 local map;
-local game_time_base;
 local frame_timer;
-local RNG_base;
 local object_array_pointer;
 
 local notes;
@@ -243,7 +241,6 @@ function Game.detectVersion(romName)
 		z_rot = 0x37D050;
 		map = 0x37F2C5;
 		notes = 0x386943;
-		game_time_base = 0x3869E4;
 		object_array_pointer = 0x36EAE0;
 	elseif bizstring.contains(romName, "Japan") then
 		frame_timer = 0x27F718;
@@ -256,7 +253,6 @@ function Game.detectVersion(romName)
 		z_rot = 0x37D180;
 		map = 0x37F405;
 		notes = 0x386AA3;
-		game_time_base = 0x386B44;
 		object_array_pointer = 0x36F260;
 	elseif bizstring.contains(romName, "USA") and bizstring.contains(romName, "Rev A") then
 		frame_timer = 0x27F718;
@@ -269,7 +265,6 @@ function Game.detectVersion(romName)
 		z_rot = 0x37B880;
 		map = 0x37DAF5;
 		notes = 0x385183;
-		game_time_base = 0x385224;
 		object_array_pointer = 0x36D760;
 	elseif bizstring.contains(romName, "USA") then
 		frame_timer = 0x2808D8;
@@ -283,7 +278,6 @@ function Game.detectVersion(romName)
 		z_rot = 0x37C680;
 		map = 0x37E8F5;
 		notes = 0x385F63;
-		game_time_base = 0x386004;
 		object_array_pointer = 0x36E560;
 	else
 		return false;
@@ -296,8 +290,6 @@ function Game.detectVersion(romName)
 	z_vel = y_vel + 4;
 
 	facing_angle = moving_angle - 4;
-
-	RNG_base = game_time_base + 0xDC;
 
 	-- Read EEPROM checksums
 	if memory.usememorydomain("EEPROM") then

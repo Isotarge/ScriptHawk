@@ -1,6 +1,6 @@
 Domain RDRAM
 SystemID N64
-079138	d	s	1	RDRAM	Frame Timer
+079138	d	s	1	RDRAM	Frame timer
 07913C	d	s	1	RDRAM	Frameskip
 0799E0	d	u	1	RDRAM	Counter: A Button Pressed
 079AC0	d	u	1	RDRAM	Counter: A Button Pressed
