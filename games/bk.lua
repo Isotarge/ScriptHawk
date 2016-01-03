@@ -402,6 +402,48 @@ local movementStates = {
 	[0x98] = "Locked - Loading zone, Mumbo transformation",
 };
 
+--------------------------
+-- Sandcastle positions --
+--------------------------
+
+local sandcastlePositions = {
+	["A"] = {180, -700},
+	["B"] = {0, 540},
+	["C"] = {360, -540},
+	["D"] = {-360, -180},
+	["E"] = {0, -540},
+	["F"] = {360, 180},
+	["G"] = {-180, -700},
+	["H"] = {-360, 540},
+	["I"] = {540, 0},
+	["J"] = {-540, -700},
+	["K"] = {360, 540},
+	["L"] = {540, -700},
+	["M"] = {-540, -360},
+	["N"] = {-180, -360},
+	["O"] = {0, -180},
+	["P"] = {540, -360},
+	-- There's no Q in the sandcastle
+	["R"] = {180, -360},
+	["S"] = {360, -180},
+	["T"] = {0, 180},
+	["U"] = {-180, 0},
+	["V"] = {-360, -540},
+	["W"] = {180, 360},
+	["X"] = {-360, 180},
+	["Y"] = {180, 0},
+	["Z"] = {-540, 0},
+};
+
+function gotoSandcastleLetter(letter)
+	if type(sandcastlePositions[letter]) == "table" then
+		Game.setXPosition(sandcastlePositions[letter][1]);
+		Game.setZPosition(sandcastlePositions[letter][2]);
+	else
+		print("Letter not found.");
+	end
+end
+
 -------------------------------
 -- Sandcastle string decoder --
 -------------------------------
