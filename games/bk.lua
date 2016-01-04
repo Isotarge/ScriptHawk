@@ -24,7 +24,7 @@ local facing_angle;
 local moving_angle;
 local z_rot;
 
-local camera_rot; -- TODO: JP/PAL
+local camera_rot;
 
 local map;
 local frame_timer;
@@ -240,7 +240,7 @@ function Game.detectVersion(romName)
 		x_pos = 0x37CF70;
 		x_rot = 0x37CF10;
 		moving_angle = 0x37D064;
-		camera_rot = 0x37D96C; -- TODO
+		camera_rot = 0x37E578;
 		z_rot = 0x37D050;
 		map = 0x37F2C5;
 		notes = 0x386943;
@@ -253,7 +253,7 @@ function Game.detectVersion(romName)
 		x_pos = 0x37D0A0;
 		x_rot = 0x37D040;
 		moving_angle = 0x37D194;
-		camera_rot = 0x37D96C; -- TODO
+		camera_rot = 0x37E6A8;
 		z_rot = 0x37D180;
 		map = 0x37F405;
 		notes = 0x386AA3;

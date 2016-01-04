@@ -22,6 +22,7 @@ SystemID N64
 37D058	d	f	1	RDRAM	Z Rotation - Update speed
 37D060	d	f	1	RDRAM	Facing Angle
 37D064	d	f	1	RDRAM	Moving angle
+37E578	d	f	1	RDRAM	Camera Y Rotation
 37E784	d	f	1	RDRAM	Jiggy Spawn Angle
 37E788	d	f	1	RDRAM	Jiggy Spawn Velocity
 37F2B8	d	f	1	RDRAM	Game Time

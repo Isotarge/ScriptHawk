@@ -46,6 +46,7 @@ SystemID N64
 37DD40	d	f	1	RDRAM	Eye State (Right)
 37DD60	d	f	1	RDRAM	Ground Damage Timer
 37DD80	d	f	1	RDRAM	Ground Damage Timer (Copy)
+37E6A8	d	f	1	RDRAM	Camera Y Rotation
 37E8C4	d	f	1	RDRAM	Jiggy Spawn Angle
 37E8C8	d	f	1	RDRAM	Jiggy Spawn Velocity
 37F405	b	u	1	RDRAM	Map
