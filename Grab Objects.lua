@@ -660,13 +660,18 @@ local function process_input()
 
 	-- Check for key presses
 	if input_table[decrease_object_index_key] == true and decrease_object_index_pressed == false then
-		object_index = math.max(1, object_index - 1);
+		object_index = object_index - 1;
+		if object_index <= 0 then
+			object_index = #object_pointers;
+		end
 		decrease_object_index_pressed = true;
 	end
 
 	if input_table[increase_object_index_key] == true and increase_object_index_pressed == false then
-		object_index = math.min(#object_pointers, object_index + 1);
-		object_index = math.max(1, object_index);
+		object_index = object_index + 1;
+		if object_index > #object_pointers then
+			object_index = 1;
+		end
 		increase_object_index_pressed = true;
 	end
 
