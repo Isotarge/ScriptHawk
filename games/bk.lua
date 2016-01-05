@@ -325,8 +325,8 @@ local options_moves_button;
 local move_levels = {
 	["0. None"]                 = 0x00000000,
 	["1. Spiral Mountain 100%"] = 0x00009DB9,
-	["2. FFM Setup"]            = 0x0003FDBF,
-	["3. All"]                  = 0x0007FFFF,
+	["2. FFM Setup"]            = 0x000BFDBF,
+	["3. All"]                  = 0x000FFFFF,
 	["3. Demo"]                 = 0xFFFFFFFF
 };
 

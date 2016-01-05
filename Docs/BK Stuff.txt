@@ -436,8 +436,8 @@ Common states
 
 00 00 00 00 - No Moves
 00 00 9D B9 - SM 100%
-00 03 FD BF - FFM Setup (no eggs, no red feathers, no gold feathers)
-00 07 FF FF - Legit 100%
+00 0B FD BF - FFM Setup (no eggs, no red feathers, no gold feathers)
+00 0F FF FF - Legit 100%
 FF FF FF FF - Used during demos
 
 8- -- -- -- ??
@@ -452,7 +452,7 @@ FF FF FF FF - Used during demos
 -- 4- -- -- ??
 -- 2- -- -- ??
 -- 1- -- -- ??
--- -8 -- -- ??
+-- -8 -- -- First time note door molehill seen
 -- -4 -- -- Wonderwing
 -- -2 -- -- Turbo Trainers
 -- -1 -- -- Talon Trot
