@@ -43,8 +43,8 @@ local health_containers = 36;
 local lives = 40;
 local air = 43;
 local air_timer = 44;
-local mumbo_tokens_on_hand = 61;
-local mumbo_tokens = 97;
+local mumbo_tokens_on_hand = 64;
+local mumbo_tokens = 100;
 local jiggies = 104;
 
 local max_notes = 100;
@@ -243,7 +243,7 @@ function Game.detectVersion(romName)
 		camera_rot = 0x37E578;
 		z_rot = 0x37D050;
 		map = 0x37F2C5;
-		notes = 0x386943;
+		notes = 0x386940;
 		object_array_pointer = 0x36EAE0;
 	elseif bizstring.contains(romName, "Japan") then
 		frame_timer = 0x27F718;
@@ -256,7 +256,7 @@ function Game.detectVersion(romName)
 		camera_rot = 0x37E6A8;
 		z_rot = 0x37D180;
 		map = 0x37F405;
-		notes = 0x386AA3;
+		notes = 0x386AA0;
 		object_array_pointer = 0x36F260;
 	elseif bizstring.contains(romName, "USA") and bizstring.contains(romName, "Rev A") then
 		frame_timer = 0x27F718;
@@ -269,7 +269,7 @@ function Game.detectVersion(romName)
 		camera_rot = 0x37CDA8;
 		z_rot = 0x37B880;
 		map = 0x37DAF5;
-		notes = 0x385183;
+		notes = 0x385180;
 		object_array_pointer = 0x36D760;
 	elseif bizstring.contains(romName, "USA") then
 		frame_timer = 0x2808D8;
@@ -283,7 +283,7 @@ function Game.detectVersion(romName)
 		camera_rot = 0x37D96C;
 		z_rot = 0x37C680;
 		map = 0x37E8F5;
-		notes = 0x385F63;
+		notes = 0x385F60;
 		object_array_pointer = 0x36E560;
 	else
 		return false;
@@ -325,8 +325,8 @@ local options_moves_button;
 local move_levels = {
 	["0. None"]                 = 0x00000000,
 	["1. Spiral Mountain 100%"] = 0x00009DB9,
-	["2. FFM Setup"]            = 0x007FFDBF,
-	["3. All"]                  = 0x007FFFFF,
+	["2. FFM Setup"]            = 0x0003FDBF,
+	["3. All"]                  = 0x0007FFFF,
 	["3. Demo"]                 = 0xFFFFFFFF
 };
 
@@ -890,18 +890,20 @@ function Game.setMap(value)
 end
 
 function Game.applyInfinites()
-	mainmemory.writebyte(notes, max_notes);
-	mainmemory.writebyte(notes + eggs, max_eggs);
-	mainmemory.writebyte(notes + red_feathers, max_red_feathers);
-	mainmemory.writebyte(notes + gold_feathers, max_gold_feathers);
-	mainmemory.writebyte(notes + health, max_health);
-	mainmemory.writebyte(notes + health_containers, max_health_containers);
-	mainmemory.writebyte(notes + lives, max_lives);
+	-- TODO: Double check these datatypes
+	-- We don't apply infinite notes since it messes up note routing
+	--mainmemory.write_s32_be(notes, max_notes);
+	mainmemory.write_s32_be(notes + eggs, max_eggs);
+	mainmemory.write_s32_be(notes + red_feathers, max_red_feathers);
+	mainmemory.write_s32_be(notes + gold_feathers, max_gold_feathers);
+	mainmemory.write_s32_be(notes + health, max_health);
+	mainmemory.write_s32_be(notes + health_containers, max_health_containers);
+	mainmemory.write_s32_be(notes + lives, max_lives);
 	mainmemory.writebyte(notes + air, max_air);
 	mainmemory.writebyte(notes + air_timer, max_air_timer);
-	mainmemory.write_u32_be(notes + mumbo_tokens, max_mumbo_tokens);
-	mainmemory.write_u32_be(notes + mumbo_tokens_on_hand, max_mumbo_tokens);
-	mainmemory.writebyte(notes + jiggies, max_jiggies);
+	mainmemory.write_s32_be(notes + mumbo_tokens, max_mumbo_tokens);
+	mainmemory.write_s32_be(notes + mumbo_tokens_on_hand, max_mumbo_tokens);
+	mainmemory.write_s32_be(notes + jiggies, max_jiggies);
 end
 
 function Game.initUI(form_handle, col, row, button_height, label_offset, dropdown_offset)

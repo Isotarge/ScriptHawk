@@ -436,8 +436,8 @@ Common states
 
 00 00 00 00 - No Moves
 00 00 9D B9 - SM 100%
-00 7F FD BF - FFM Setup
-00 7F FF FF - Legit 100%
+00 03 FD BF - FFM Setup (no eggs, no red feathers, no gold feathers)
+00 07 FF FF - Legit 100%
 FF FF FF FF - Used during demos
 
 8- -- -- -- ??
