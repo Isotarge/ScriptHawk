@@ -4,12 +4,13 @@ SystemID GEN
 0568	w	s	1	68K RAM	Screen Y Position
 058A	b	s	1	68K RAM	Screen X Velocity
 058B	b	s	1	68K RAM	Screen Y Velocity
+0F41	b	u	1	68K RAM	Player is in cave
 0F43	b	s	1	68K RAM	Player X Velocity
 0F44	b	s	1	68K RAM	Player Y Velocity
 0F4F	b	h	1	68K RAM	Player is on moving platform?
-13E0	w	h	0	68K RAM	Score 1&2
-13E2	w	h	0	68K RAM	Score 3&4
-13E4	w	h	0	68K RAM	Score 5&6
+13E0	w	h	0	68K RAM	Score 1 & 2
+13E2	w	h	0	68K RAM	Score 3 & 4
+13E4	w	h	0	68K RAM	Score 5 & 6
 13E6	w	u	1	68K RAM	Lives
 13FB	b	h	1	68K RAM	Charge 1
 13FC	b	h	1	68K RAM	Charge 2
@@ -27,7 +28,17 @@ SystemID GEN
 14EA	w	u	1	68K RAM	Music Test
 14EC	w	u	1	68K RAM	FX Test
 14EE	w	u	1	68K RAM	Lives (Menu)
+1520	w	u	1	68K RAM	Object y
+22E5	b	u	1	68K RAM	Wizard HP
+2505	b	u	1	68K RAM	Otter 1 HP
 251C	w	u	0	68K RAM	Cart 1 X
+2549	b	u	1	68K RAM	Otter 2 HP
 2560	w	u	0	68K RAM	Cart 2 X
 2658	b	u	0	68K RAM	1-3 Dragon HP
+26FA	w	h	1	68K RAM	Barrel Y (Level 1)
+2720	w	h	1	68K RAM	Object type
+28BD	b	u	1	68K RAM	Dragon 3 HP
+2B65	b	u	1	68K RAM	Spider 2 HP
+2BA9	b	u	1	68K RAM	Dragon 2 HP
+2CFD	b	u	1	68K RAM	Spider 1 HP
 
