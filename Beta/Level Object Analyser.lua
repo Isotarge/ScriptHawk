@@ -6,7 +6,7 @@
 
 -----------------------
 
-local level_object_array_pointer = 0x36E560;
+local level_object_array_pointer = 0x36E560; -- TODO: Port to other versions
 
 -- Slot data
 local slot_base = 0x28;
@@ -101,6 +101,7 @@ slot_variables = {
 
 	[0x110] = {["Type"] = "Pointer"},
 	[0x118] = {["Type"] = "4_Unknown"},
+	[0x11C] = {["Type"] = "Float"},
 
 	[0x120] = {["Type"] = "Float"},
 	[0x124] = {["Type"] = "Float"},
@@ -119,6 +120,7 @@ slot_variables = {
 	[0x150] = {["Type"] = "Float"},
 	[0x154] = {["Type"] = "Float"},
 	[0x158] = {["Type"] = "Float"},
+	[0x15C] = {["Type"] = "Float"},
 
 	[0x160] = {["Type"] = "Pointer"},
 	[0x164] = {["Type"] = "Float", ["Name"] = "X Position"},
@@ -280,6 +282,15 @@ end
 --------------
 -- Analysis --
 --------------
+
+function find_root(object)
+	local count = 0;
+	while object > 0 do
+		print(count..": .."..toHexString(object));
+		object = mainmemory.read_u24_be(object + 1);
+		count = count + 1;
+	end
+end
 
 function resolve_variable_name(name)
 	-- Make sure comparisons are case insensitive
