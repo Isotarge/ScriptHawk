@@ -1,13 +1,6 @@
 Domain EEPROM
 SystemID N64
 02D500	d	h	1	RDRAM	Huge linked list root, investigate further
-0B7F73	b	h	1	RDRAM	FF Answer Selected
-0B7F7D	b	h	1	RDRAM	FF Correct Answer
-0B8023	b	h	1	RDRAM	FF Answer selected
-0B802D	b	h	1	RDRAM	FF Correct Answer
-0B8038	d	h	1	RDRAM	FF Answer Text Pointer
-0B803C	d	h	1	RDRAM	FF Answer Text Pointer
-0B8040	d	h	1	RDRAM	FF Answer Text Pointer
 2808D8	d	s	1	RDRAM	Frame timer
 2808DC	d	s	1	RDRAM	Frameskip
 281138	d	u	1	RDRAM	P1 A Button Held Timer
@@ -161,9 +154,11 @@ SystemID N64
 380950	d	f	1	RDRAM	Water Something?
 380974	d	f	1	RDRAM	Water Something?
 3810B8	d	f	1	RDRAM	FF Answer Timer
+38214B	b	u	1	RDRAM	Standing on water level 2 switch
 382F20	d	h	1	RDRAM	Textbox object pointer
 383012	b	u	1	RDRAM	Current Pause Menu Item
 3830E0	d	h	1	RDRAM	FF question object pointer
+3831AC	b	h	1	RDRAM	Lair Water Level
 3831E7	b	u	1	RDRAM	BB Active (EEPROM)
 3831EA	b	u	1	RDRAM	BB Active (EEPROM)
 3831EB	b	b	1	RDRAM	BB Type (EEPROM)

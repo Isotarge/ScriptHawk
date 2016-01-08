@@ -243,6 +243,7 @@ function Game.detectVersion(romName)
 		camera_rot = 0x37E578;
 		z_rot = 0x37D050;
 		map = 0x37F2C5;
+		ff_question_pointer = 0x3830E0; -- TODO: Find
 		notes = 0x386940;
 		object_array_pointer = 0x36EAE0;
 	elseif bizstring.contains(romName, "Japan") then
@@ -256,6 +257,7 @@ function Game.detectVersion(romName)
 		camera_rot = 0x37E6A8;
 		z_rot = 0x37D180;
 		map = 0x37F405;
+		ff_question_pointer = 0x3830E0; -- TODO: Find
 		notes = 0x386AA0;
 		object_array_pointer = 0x36F260;
 	elseif bizstring.contains(romName, "USA") and bizstring.contains(romName, "Rev A") then
@@ -269,11 +271,11 @@ function Game.detectVersion(romName)
 		camera_rot = 0x37CDA8;
 		z_rot = 0x37B880;
 		map = 0x37DAF5;
+		ff_question_pointer = 0x3830E0; -- TODO: Find
 		notes = 0x385180;
 		object_array_pointer = 0x36D760;
 	elseif bizstring.contains(romName, "USA") then
 		frame_timer = 0x2808D8;
-		allowFurnaceFunPatch = true;
 		slope_timer = 0x37C2E4;
 		moves_bitfield = 0x37C3A0;
 		x_vel = 0x37C4B8;
@@ -283,6 +285,8 @@ function Game.detectVersion(romName)
 		camera_rot = 0x37D96C;
 		z_rot = 0x37C680;
 		map = 0x37E8F5;
+		allowFurnaceFunPatch = true;
+		ff_question_pointer = 0x3830E0;
 		notes = 0x385F60;
 		object_array_pointer = 0x36E560;
 	else
@@ -517,6 +521,15 @@ local function applyFurnaceFunPatch()
 		mainmemory.write_u16_be(0x28610E, 0x801b);
 	end
 end
+
+-- Relative to question object
+local ff_current_answer = 0x13;
+local ff_correct_answer = 0x1D;
+
+local ff_question_text_pointer = 0x34;
+local ff_answer1_text_pointer = 0x64;
+local ff_answer2_text_pointer = 0x54;
+local ff_answer3_text_pointer = 0x44;
 
 ----------------------
 -- Vile state stuff --
