@@ -3111,11 +3111,11 @@ local function clear_tb_void()
 	mainmemory.writebyte(tb_void_byte, bit.bor(tb_void_byte_val, 0x30));
 end
 
-local function force_pause()
+function force_pause()
 	mainmemory.writebyte(tb_void_byte, 0x31);
 end
 
-local function force_zipper()
+function force_zipper()
 	mainmemory.writebyte(tb_void_byte - 1, 0x01);
 end
 
