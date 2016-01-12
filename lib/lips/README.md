@@ -2,48 +2,55 @@
 
 An assembler for the MIPS R4300i architecture, written in Lua.
 
-Not for production. Much of the code is untested and likely to change.
+This is not a 'true' assembler; it won't produce executable binary files.
+This was intended to assist in hacking N64 games.
+It does little more than output hex.
+
+Not for production. Much of the code and syntax is untested and likely to change.
 Even this README is incomplete.
 
 ## Syntax
 
-TODO
+(TODO)
+
+A derivative of [CajeASM's][caje] syntax.
+
+[caje]: https://github.com/Tarek701/CajeASM/
 
 ## Instructions
 
-[refer to these instruction documents.][instrdocs]
+Instructions were primarily referenced from [the N64 Toolkit: Opcodes.][n64op]
 
-[instrdocs]: https://github.com/mikeryan/n64dev/tree/master/docs/n64ops
+An in-depth look at instructions for MIPS IV processors
+is given by [the MIPS IV Instruction Set manual.][mipsiv]
+Most of this applies to our MIPS III architecture.
+
+[The MIPS64 Instruction Set manual][mips64] is sometimes useful.
+Much of it doesn't apply to our older MIPS III architecture,
+but it's a little cleaner than the older manual.
+
+There's also a brief and incomplete [overview of MIPS instructions.][overview]
+First-time writers of MIPS assembly may find this the most useful.
+
+[n64op]: https://github.com/mikeryan/n64dev/tree/master/docs/n64ops
+[mipsiv]: http://www.cs.cmu.edu/afs/cs/academic/class/15740-f97/public/doc/mips-isa.pdf
+[mips64]: http://scc.ustc.edu.cn/zlsc/lxwycj/200910/W020100308600769158777.pdf
+[overview]: http://www.mrc.uidaho.edu/mrc/people/jff/digital/MIPSir.html
 
 ### Unimplemented
 
-* CACHE
-
-* ERET
-
-* TLBP, TLBR, TLBWI, TLBWR
-
-* BC1F, BC1FL, BC1T, BC1TL
+As far as I know, all native R4300i instructions have been implemented.
+Whether or not they output the proper machine code is another thing.
 
 ### Unimplemented Pseudo-Instructions
 
-Besides implied arguments for existing instructions, there are:
+Besides implicit arguments for existing instructions, there are:
 
 * ABS, MUL, DIV, REM
 
-* NAND, NANDI, NORI, ROL, ROR
+* BGE, BLE, BLT, BGT
 
-* SEQ, SEQI, SEQIU, SEQU
-
-* SGE, SGEI, SGEIU, SGEU
-
-* SGT, SGTI, SGTIU, SGTU
-
-* SLE, SLEI, SLEIU, SLEU
-
-* SNE, SNEI, SNEIU, SNEU
-
-* BEQI, BNEI, BGE, BGEI, BLE, BLEI, BLT, BLTI, BGT, BGTI
+* any Set (Condition) \[Immediate\] \[Unsigned\] pseudo-instructions
 
 ## Registers
 
@@ -77,43 +84,68 @@ In order of numerical value, with intended usage:
 * REG#: whereas # is a decimal number from 0 to 31.
 aliased to the appropriate register. eg: REG0 is R0, REG1 is at, REG2 is V0.
 
-* f#: coproccesor 1 registers, whereas # is a decimal number from 0 to 31.
+* F#: coprocessor 1 registers, whereas # is a decimal number from 0 to 31.
 
-### Unimplemented
-
-all coprocessor 0 registers:
+* coprocessor 0 (system) registers are as follows:
 
 ```
-Index,     Random,    EntryLo0,     EntryLo1,
-Context,   PageMask,  Wired,        RESERVED,
-BadVAddr,  Count,     EntryHi,      Compare,
-Status,    Cause,     ExceptionPC,  PRId,
-Config,    LLAddr,    WatchLo,      WatchHi,
-XContext,  RESERVED,  RESERVED,     RESERVED,
-RESERVED,  RESERVED,  RESERVED,     CacheErr,
-TagLo,     TagHi,     ErrorEPC,     RESERVED
+Index     Random    EntryLo0  EntryLo1
+Context   PageMask  Wired     Reserved0
+BadVAddr  Count     EntryHi   Compare
+Status    Cause     EPC       PRevID
+Config    LLAddr    WatchLo   WatchHi
+XContext  Reserved1 Reserved2 Reserved3
+Reserved4 Reserved5 PErr      CacheErr
+TagLo     TagHi     ErrorEPC  Reserved6
 ```
 
 ## Directives
 
-* BYTE: writes a list of 8-bit numbers until end-of-line.
+* `.byte {numbers...}`  
+writes a series of 8-bit numbers until end-of-line.
 be wary of potential alignment issues.
 
-* HALFWORD: writes a list of 16-bit numbers until end-of-line.
+* `.halfword {numbers...}`  
+writes a series of 16-bit numbers until end-of-line.
 be wary of potential alignment issues.
 
-* WORD: writes a list of 32-bit numbers until end-of-line.
+* `.word {numbers...}`  
+writes a series of 32-bit numbers until end-of-line.
 
-* SKIP: takes one or two arguments.
+* `.align [n] [fill]`  
+aligns the next datum to a `n*2` boundary using `fill` for spacing.
+if `n` is not given, 2 is implied.
+if `fill` is not given, 0 is implied.
 
-* ORG: change the current address for writing to; seeking.
-for now, this is untested and likely to cause performance issues.
+* `.skip {n} [fill]`  
+skips the next `n` bytes using `fill` for spacing.
+if `fill` is not given, no bytes are overwritten,
+and only the position is changed.
+
+* `.org {address}`  
+set the current address for writing to; seek.
+until lips is a little more optimized,
+be cautious of seeking to large addresses.
+
+* `HEX { ... }`  
+write a series of bytes given in hexadecimal.
+all numbers must be given in hex — no prefix is required.
+```
+butts:  HEX {
+    F0 0D
+    DE AD BE EF
+}
+.align
+```
+
+* `.inc {filename}`  
+`.incasm {filename}`  
+`.include {filename}`  
+include an external assembly file as-is at this position.
+lips will look for the included file
+in the directory of the file using the directive.
 
 ### Unimplemented
-
-* ALIGN: takes one or two arguments.
-unlike some other assemblers,
-ALIGN only affects the first immediately following datum.
 
 * FLOAT: writes a list of 32-bit floating point numbers until end-of-line.
 this may not get implemented due to a lack of aliasing in vanilla Lua,
@@ -122,7 +154,5 @@ and thus accuracy issues.
 * ASCII: writes a string using its characters' ASCII values.
 
 * ASCIIZ: same as ASCII, but with a null byte added to the end.
-
-* INC, INCASM, INCLUDE: include an external assembly file as-is at this position.
 
 * INCBIN: write an external binary file as-is at this position.

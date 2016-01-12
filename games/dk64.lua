@@ -3669,7 +3669,7 @@ function outputGamesharkCode(bytes, base, skipZeroes)
 	if type(bytes) == "table" and #bytes > 0 and #bytes % 2 == 0 then
 		for i=1,#bytes,2 do
 			if not (skipZeroes and bytes[i] == 0x00 and bytes[i + 1] == 0x00) then
-				dprint("81"..toHexString(base + i - 1, 6).." "..toHexString(bytes[i], 2)..toHexString(bytes[i + 1], 2));
+				dprint("81"..toHexString(base + i - 1, 6, "").." "..toHexString(bytes[i], 2, "")..toHexString(bytes[i + 1], 2, ""));
 			else
 				skippedZeroes = skippedZeroes + 1;
 			end
@@ -3689,12 +3689,13 @@ local hook = {
 local code = {};
 
 function codeWriter(...)
-	table.insert(code, arg[1]);
+	table.insert(code, tonumber(arg[2], 16));
 end
 
 function loadASMPatch()
 	local code_filename = forms.openfile(nil, nil, "R4300i Assembly Code|*.asm|All Files (*.*)|*.*");
 	if code_filename == "" then
+		print("No code loaded, aborting mission...");
 		return;
 	end
 
@@ -3712,13 +3713,16 @@ function loadASMPatch()
 
 	-- Patch the code
 	for i = 1, #code do
-		mainmemory.write_u32_be(codeBase + ((i - 1) * 4), tonumber(code[i], 16));
+		mainmemory.writebyte(codeBase + (i - 1), code[i]);
 	end
 
 	-- Patch the hook
 	for i = 1, #hook do
 		mainmemory.writebyte(hookBase + (i - 1), hook[i]);
 	end
+
+	outputGamesharkCode(hook, hookBase, false);
+	outputGamesharkCode(code, codeBase, false);
 
 	dprint("Patched code ("..(#code * 4).." bytes)");
 	dprint("Patched hook ("..#hook.." bytes)");
