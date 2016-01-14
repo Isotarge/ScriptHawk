@@ -30,9 +30,15 @@ SystemID N64
 37CDA8	d	f	1	RDRAM	Camera Rot Y
 37CFB4	d	f	1	RDRAM	Jiggy Spawn Angle
 37CFB8	d	f	1	RDRAM	Jiggy Spawn Velocity
+37DAE8	d	f	1	RDRAM	Game runtime
+37DAF0	d	f	1	RDRAM	Map runtime
+37DAF4	b	u	1	RDRAM	Map Load State
 37DAF5	b	u	1	RDRAM	Map
+37DAF6	b	u	1	RDRAM	Exit
 382300	d	h	1	RDRAM	FF Question Pointer
+382500	d	h	1	RDRAM	Honeycomb Bitfield
 382548	b	h	1	RDRAM	Sandcastle Water State
+3825A4	d	f	1	RDRAM	Text Timer
 385180	d	s	1	RDRAM	Notes (on hand)
 385184	d	s	1	RDRAM	Eggs
 38518C	d	s	1	RDRAM	Red Feathers

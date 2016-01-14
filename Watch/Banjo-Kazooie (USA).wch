@@ -114,8 +114,8 @@ SystemID N64
 37C6FC	d	f	1	RDRAM	Unknown Float
 37D163	b	h	1	RDRAM	Previous Movement State
 37D167	b	h	1	RDRAM	Current Movement State
-37D23C	d	f	1	RDRAM	Eye State
-37D240	d	f	1	RDRAM	Eye State
+37D23C	d	f	1	RDRAM	Eye State (Left)
+37D240	d	f	1	RDRAM	Eye State (Right)
 37D260	d	f	1	RDRAM	Ground Damage Timer
 37D280	d	f	1	RDRAM	Ground Damage Timer (Copy)
 37D958	d	f	1	RDRAM	Camera X Position
