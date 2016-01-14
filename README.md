@@ -50,6 +50,11 @@ Extra Lua scripts and RAM watches for the [BizHawk](https://github.com/TASVideos
 - Japan 1.0, 1.1 and 1.2
 - USA 1.0, 1.1 and 1.2
 
+###Regarding Zelda
+While ScriptHawk does have basic support for OOT/MM there are people who are much more dedicated to these games than I will ever be. Check out the great work at the following GitHub repos for more comprehensive support:  
+- [notwa/mm](https://github.com/notwa/mm/tree/master/Lua)  
+- [RainingChain/Z64LuaHooks](https://github.com/RainingChain/Z64LuaHooks)  
+
 ##Partially Supported Games
 - Elmo's Number Journey (N64 only)
 - Elmo's Letter Adventure (N64 only)
