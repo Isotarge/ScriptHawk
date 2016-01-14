@@ -167,6 +167,7 @@ dx = 0.0;
 dy = 0.0;
 dz = 0.0;
 d  = 0.0;
+odometer = 0.0;
 
 prev_x = 0.0;
 prev_y = 0.0;
@@ -515,6 +516,8 @@ function updateUIReadouts_ScriptHawk()
 		gui.text(gui_x_offset, gui_y_offset + row_height * row, "Max dY:  "..(round(max_dy, precision) or 0));
 		row = row + 1;
 		gui.text(gui_x_offset, gui_y_offset + row_height * row, "Max dXZ: "..(round(max_d, precision) or 0));
+		row = row + 1;
+		gui.text(gui_x_offset, gui_y_offset + row_height * row, "Odometer: "..(round(odometer, precision) or 0));
 		row = row + 2;
 	end
 
@@ -688,6 +691,7 @@ local function handleInput()
 		max_dy = 0.0;
 		max_dz = 0.0;
 		max_d = 0.0;
+		odometer = 0.0;
 		reset_max_pressed = true;
 	end
 
@@ -735,6 +739,7 @@ local function plot_pos()
 		end
 
 		d = math.sqrt(dx*dx + dz*dz);
+		odometer = odometer + d;
 
 		if (max_dx ~= nil and max_dy ~= nil and max_dz ~= nil and max_d ~= nil) and (dx ~= nil and dy ~= nil and dz ~= nil and d ~= nil) then
 			if math.abs(dx) > max_dx then max_dx = math.abs(dx) end

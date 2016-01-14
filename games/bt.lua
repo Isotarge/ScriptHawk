@@ -320,29 +320,33 @@ local map_trigger;
 
 function Game.detectVersion(romName)
 	if bizstring.contains(romName, "Australia") then
-		air = 0x12B050; -- TODO
+		air = 0x12FDC0;
 		frame_timer = 0x083550;
 		linked_list_root = 0x13C380;
 		map = 0x127640; -- TODO
 		map_trigger = 0x127642; -- TODO
+		moves_pointer = 0x1314F0;
 	elseif bizstring.contains(romName, "Europe") then
-		air = 0x12B050; -- TODO
+		air = 0x12FFD0;
 		frame_timer = 0x083550;
 		linked_list_root = 0x13C680;
 		map = 0x127640; -- TODO
 		map_trigger = 0x127642; -- TODO
+		moves_pointer = 0x131780;
 	elseif bizstring.contains(romName, "Japan") then
-		air = 0x12B050; -- TODO
+		air = 0x125220;
 		frame_timer = 0x0788F8;
 		linked_list_root = 0x131850;
 		map = 0x127640; -- TODO
 		map_trigger = 0x127642; -- TODO
+		moves_pointer = 0x126940;
 	elseif bizstring.contains(romName, "USA") then
 		air = 0x12B050;
 		frame_timer = 0x079138;
 		linked_list_root = 0x137800;
 		map = 0x127640;
 		map_trigger = 0x127642;
+		moves_pointer = 0x12C770;
 	else
 		return false;
 	end
@@ -613,6 +617,27 @@ local function neverSlip()
 	end
 end
 
+-----------------
+-- Moves stuff --
+-----------------
+
+local options_moves_dropdown;
+local options_moves_button;
+
+local move_levels = {
+	["0. None"] = {0xE0FFFF01, 0x00004000},
+	["1. All"]  = {0xFFFFFFFF, 0xFFFFFFFF},
+};
+
+local function unlock_moves()
+	local level = forms.gettext(options_moves_dropdown);
+	local movesObject = mainmemory.read_u24_be(moves_pointer + 1);
+	if isPointer(movesObject) then
+		mainmemory.write_u32_be(movesObject + 0x18, move_levels[level][1]);
+		mainmemory.write_u32_be(movesObject + 0x1C, move_levels[level][2]);
+	end
+end
+
 ------------
 -- Health --
 ------------
@@ -681,8 +706,9 @@ end
 function Game.setMap(value)
 	local trigger_value = mainmemory.read_u16_be(map_trigger);
 	if trigger_value == 0 then
-		print("Travelling to "..value);
 		mainmemory.write_u16_be(map, value);
+
+		-- Force game to reload with desired map
 		mainmemory.write_u16_be(map_trigger, 0x0101);
 	end
 end
@@ -690,7 +716,7 @@ end
 local max_air = 60;
 
 function Game.applyInfinites()
-	-- TODO
+	-- TODO: Eggs, feathers, glowbos etc
 	local maxHealth = Game.getMaxHealth();
 	Game.setCurrentHealth(maxHealth);
 	mainmemory.writefloat(air, max_air, true);
@@ -698,6 +724,10 @@ end
 
 function Game.initUI(form_handle, col, row, button_height, label_offset, dropdown_offset)
 	options_toggle_neverslip = forms.checkbox(form_handle, "Never Slip", col(0) + dropdown_offset, row(6) + dropdown_offset);
+
+	-- Moves
+	options_moves_dropdown = forms.dropdown(form_handle, { "0. None", "1. All" }, col(10) + dropdown_offset, row(7) + dropdown_offset);
+	options_moves_button = forms.button(form_handle, "Unlock Moves", unlock_moves, col(5), row(7), col(4) + 8, button_height);
 end
 
 function Game.eachFrame()

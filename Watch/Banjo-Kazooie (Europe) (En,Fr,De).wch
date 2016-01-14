@@ -52,8 +52,7 @@ SystemID N64
 386960	d	s	1	RDRAM	Health
 386964	d	s	1	RDRAM	Health Containers
 386968	d	s	1	RDRAM	Lives
-38696E	b	u	1	RDRAM	Air
-38696F	b	u	1	RDRAM	Air timer
+38696C	d	s	1	RDRAM	Air
 386980	d	s	1	RDRAM	Mumbo Tokens
 3869A4	d	s	1	RDRAM	Mumbo Tokens (on hand)
 3869A8	d	s	1	RDRAM	Jiggies (on hand)

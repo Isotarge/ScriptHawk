@@ -355,7 +355,7 @@ local kremling_kosh_joypad_angles = {
 
 function getKoshController()
 	local i;
-	for i=1,#object_pointers do
+	for i = 1, #object_pointers do
 		local currentActorType = mainmemory.read_u32_be(object_pointers[i] + actor_type);
 		if type(actor_types[currentActorType]) ~= "nil" then
 			currentActorType = actor_types[currentActorType];
@@ -369,7 +369,7 @@ end
 function countMelonProjectiles()
 	local i;
 	local melonCount = 0;
-	for i=1,#object_pointers do
+	for i = 1, #object_pointers do
 		local currentActorType = mainmemory.read_u32_be(object_pointers[i] + actor_type);
 		if type(actor_types[currentActorType]) ~= "nil" then
 			currentActorType = actor_types[currentActorType];
@@ -498,7 +498,7 @@ local function encircle_kong()
 	local kong_y = mainmemory.readfloat(kongObject + y_pos, true);
 	local kong_z = mainmemory.readfloat(kongObject + z_pos, true);
 
-	for i=1,#object_pointers do
+	for i = 1, #object_pointers do
 		x = kong_x + math.cos(math.pi * 2 * i / #object_pointers) * radius;
 		z = kong_z + math.sin(math.pi * 2 * i / #object_pointers) * radius;
 
@@ -627,7 +627,7 @@ local function getExamineData(pointer)
 		table.insert(examine_data, { "Current Slot", mainmemory.readbyte(pointer + slot_location) });
 		table.insert(examine_data, { "Melons Remaining", mainmemory.readbyte(pointer + melons_remaining) });
 		local i;
-		for i=1,8 do
+		for i = 1, 8 do
 			table.insert(examine_data, { "Slot "..i.." pointer", string.format("0x%08x", mainmemory.read_u32_be(pointer + slot_pointer_base + (i - 1) * 4)) });
 		end
 		table.insert(examine_data, { "Separator", 1 });
@@ -720,7 +720,7 @@ local function draw_gui()
 		if grab_script_mode == "Examine" then
 			local examine_data = getExamineData(object_pointers[object_index]);
 			local i;
-			for i=#examine_data,1,-1 do
+			for i = #examine_data, 1, -1 do
 				if examine_data[i][1] ~= "Separator" then
 					gui.text(gui_x, gui_y + height * row, examine_data[i][1]..": "..examine_data[i][2], nil, nil, 'bottomright');
 					row = row + 1;
@@ -732,7 +732,7 @@ local function draw_gui()
 
 		if grab_script_mode == "List" then
 			local i;
-			for i=#object_pointers,1,-1 do
+			for i = #object_pointers, 1, -1 do
 				local currentActorType = mainmemory.read_u32_be(object_pointers[i] + actor_type);
 				if type(actor_types[currentActorType]) ~= "nil" then
 					currentActorType = actor_types[currentActorType];

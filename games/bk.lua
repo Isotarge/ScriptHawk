@@ -29,11 +29,11 @@ local camera_rot;
 local map;
 local frame_timer;
 local object_array_pointer;
+local ff_question_pointer;
 
 local notes;
 
 -- Relative to notes
--- TODO: Redo with correct datatypes
 -- TODO: Add jinjos
 local eggs = 4;
 local red_feathers = 12;
@@ -41,8 +41,7 @@ local gold_feathers = 16;
 local health = 32;
 local health_containers = 36;
 local lives = 40;
-local air = 43;
-local air_timer = 44;
+local air = 44;
 local mumbo_tokens_on_hand = 64;
 local mumbo_tokens = 100;
 local jiggies = 104;
@@ -54,8 +53,7 @@ local max_gold_feathers = 10;
 local max_health = 16;
 local max_health_containers = 16;
 local max_lives = 9;
-local max_air = 0x0E;
-local max_air_timer = 0x10;
+local max_air = 3600;
 local max_mumbo_tokens = 99;
 local max_jiggies = 100;
 
@@ -531,6 +529,33 @@ local ff_answer1_text_pointer = 0x64;
 local ff_answer2_text_pointer = 0x54;
 local ff_answer3_text_pointer = 0x44;
 
+function getSelectedFFAnswer()
+	local ff_question_object = mainmemory.read_u24_be(ff_question_pointer + 1);
+	if ff_question_object > 0x000000 and ff_question_object < 0x3FFFFF then
+		return mainmemory.readbyte(ff_question_object + ff_current_answer);
+	end
+end
+
+function getCorrectFFAnswer()
+	local ff_question_object = mainmemory.read_u24_be(ff_question_pointer + 1);
+	if ff_question_object > 0x000000 and ff_question_object < 0x3FFFFF then
+		return mainmemory.readbyte(ff_question_object + ff_correct_answer);
+	end
+end
+
+ui_ff_x = 100;
+ui_ff_y_base = 100;
+ui_ff_answer_height = 16;
+
+function doFFHelp()
+	local selectedAnswer = getSelectedFFAnswer();
+	local correctAnswer = getCorrectFFAnswer();
+	if type(correctAnswer) == "number" and correctAnswer >= 0 and correctAnswer <= 3 then
+		gui.drawText(ui_ff_x, ui_ff_y_base + ui_ff_answer_height * correctAnswer, "ya"..correctAnswer);
+	end
+end
+--event.onframestart(doFFHelp, "FF Helper");
+
 ----------------------
 -- Vile state stuff --
 ----------------------
@@ -899,6 +924,9 @@ end
 function Game.setMap(value)
 	if value >= 1 and value <= #Game.maps then
 		mainmemory.writebyte(map, value);
+
+		-- Force the game to load the map instantly
+		mainmemory.writebyte(map - 1, 0x01);
 	end
 end
 
@@ -912,8 +940,7 @@ function Game.applyInfinites()
 	mainmemory.write_s32_be(notes + health, max_health);
 	mainmemory.write_s32_be(notes + health_containers, max_health_containers);
 	mainmemory.write_s32_be(notes + lives, max_lives);
-	mainmemory.writebyte(notes + air, max_air);
-	mainmemory.writebyte(notes + air_timer, max_air_timer);
+	mainmemory.write_s32_be(notes + air, max_air);
 	mainmemory.write_s32_be(notes + mumbo_tokens, max_mumbo_tokens);
 	mainmemory.write_s32_be(notes + mumbo_tokens_on_hand, max_mumbo_tokens);
 	mainmemory.write_s32_be(notes + jiggies, max_jiggies);
@@ -937,16 +964,13 @@ function Game.initUI(form_handle, col, row, button_height, label_offset, dropdow
 end
 
 function Game.eachFrame()
-	-- Furnace fun patch
 	applyFurnaceFunPatch();
-
 	updateWave();
-
 	set_orange_timer();
 	
 	if forms.ischecked(options_toggle_neverslip) then
 		neverSlip();
-		RF_step();
+		--RF_step();
 	end
 
 	if forms.ischecked(encircle_checkbox) then
