@@ -32,6 +32,7 @@ SystemID N64
 37F2C0	d	f	1	RDRAM	Map Time
 37F2C5	b	u	1	RDRAM	Map
 37F2C6	b	u	1	RDRAM	Exit
+383AC0	d	h	1	RDRAM	FF Question Pointer
 383B91	w	h	1	RDRAM	Cauldron state
 383D08	b	h	1	RDRAM	Sandcastle Water State
 386910	d	s	1	RDRAM	Hourglass timer Value

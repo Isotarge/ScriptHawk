@@ -50,6 +50,7 @@ SystemID N64
 37E8C4	d	f	1	RDRAM	Jiggy Spawn Angle
 37E8C8	d	f	1	RDRAM	Jiggy Spawn Velocity
 37F405	b	u	1	RDRAM	Map
+383C20	d	h	1	RDRAM	FF Question Pointer
 383E20	d	h	1	RDRAM	Honeycomb Bitfield
 383E68	b	h	1	RDRAM	Sandcastle Water State
 386AA0	d	s	1	RDRAM	Notes (On hand)
