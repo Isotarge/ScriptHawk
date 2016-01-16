@@ -9,6 +9,8 @@ SystemID N64
 2984FA	w	h	1	RDRAM	Banjo Model Replacement
 2984FE	w	h	1	RDRAM	Banjo Model Replacement
 36EAE0	d	h	1	RDRAM	Object Array Pointer
+37CBA1	b	u	1	RDRAM	Standing on Fly Pad
+37CBA2	b	u	1	RDRAM	Standing on Shock Spring Pad
 37CCB4	d	f	1	RDRAM	Slope Timer
 37CD70	d	h	1	RDRAM	Moves Unlocked (Bitfield)
 37CE88	d	f	1	RDRAM	X Velocity
