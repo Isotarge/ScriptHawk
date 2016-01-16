@@ -931,7 +931,6 @@ function Game.setMap(value)
 end
 
 function Game.applyInfinites()
-	-- TODO: Double check these datatypes
 	-- We don't apply infinite notes since it messes up note routing
 	--mainmemory.write_s32_be(notes, max_notes);
 	mainmemory.write_s32_be(notes + eggs, max_eggs);

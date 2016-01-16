@@ -323,33 +323,31 @@ function Game.detectVersion(romName)
 		air = 0x12FDC0;
 		frame_timer = 0x083550;
 		linked_list_root = 0x13C380;
-		map = 0x127640; -- TODO
-		map_trigger = 0x127642; -- TODO
+		map = 0x12C390;
 		moves_pointer = 0x1314F0;
 	elseif bizstring.contains(romName, "Europe") then
 		air = 0x12FFD0;
 		frame_timer = 0x083550;
 		linked_list_root = 0x13C680;
-		map = 0x127640; -- TODO
-		map_trigger = 0x127642; -- TODO
+		map = 0x12C5A0;
 		moves_pointer = 0x131780;
 	elseif bizstring.contains(romName, "Japan") then
 		air = 0x125220;
 		frame_timer = 0x0788F8;
 		linked_list_root = 0x131850;
 		map = 0x127640; -- TODO
-		map_trigger = 0x127642; -- TODO
 		moves_pointer = 0x126940;
 	elseif bizstring.contains(romName, "USA") then
 		air = 0x12B050;
 		frame_timer = 0x079138;
 		linked_list_root = 0x137800;
 		map = 0x127640;
-		map_trigger = 0x127642;
 		moves_pointer = 0x12C770;
 	else
 		return false;
 	end
+
+	map_trigger = map + 2;
 
 	return true;
 end

@@ -2,6 +2,8 @@ Domain RDRAM
 SystemID N64
 083550	d	s	1	RDRAM	Frame timer
 083554	d	s	1	RDRAM	Frameskip
+12C5A0	w	h	1	RDRAM	Map
+12C5A2	w	h	1	RDRAM	Map Load Trigger
 12FFD0	d	f	1	RDRAM	Air (Real)
 12FFD4	d	f	1	RDRAM	Air
 131780	d	h	1	RDRAM	Moves Pointer
