@@ -5,7 +5,9 @@
 
 local speed = 0x02;
 local max_speed = 0x20;
-local buttons = 0;
+
+local horizontal_velocity = 0x1404; -- signed integer 16 bit little endian
+local vertical_velocity = 0x1407; -- signed integer 16 bit little endian
 
 local function getButton()
 	local bT = joypad.get();
@@ -57,38 +59,30 @@ local function debug()
 		local buttons = getButton();
 
 		mainmemory.write_s8(0x1403,0x00);
-		mainmemory.write_s8(0x1404,0x00);
-		mainmemory.write_u8(0x1405,0x00);
+		mainmemory.write_s16_le(horizontal_velocity, 0);
 		mainmemory.write_s8(0x1406,0x00);
-		mainmemory.write_s8(0x1407,0x00);
-		mainmemory.write_u8(0x1408,0x00);
+		mainmemory.write_s16_le(vertical_velocity, 0);
 
 		if buttons == 1 then -- Up
-			mainmemory.write_s8(0x1407,0x00 - speed);
-			mainmemory.write_u8(0x1408,0xFF);
+			mainmemory.write_s16_le(vertical_velocity, -speed);
 		elseif buttons == 2 then -- Up + Right
-			mainmemory.write_s8(0x1407,0x00 - speed);
-			mainmemory.write_u8(0x1408,0xFF);
-			mainmemory.write_s8(0x1404,0x00 + speed);
+			mainmemory.write_s16_le(horizontal_velocity, speed);
+			mainmemory.write_s16_le(vertical_velocity, -speed);
 		elseif buttons == 3 then -- Right
-			mainmemory.write_s8(0x1404,0x00 + speed);
+			mainmemory.write_s16_le(horizontal_velocity, speed);
 		elseif buttons == 4 then -- Down + Right
-			mainmemory.write_s8(0x1404,0x00 + speed);
-			mainmemory.write_s8(0x1407,0x00 + speed);
+			mainmemory.write_s16_le(horizontal_velocity, speed);
+			mainmemory.write_s16_le(vertical_velocity, speed);
 		elseif buttons == 5 then -- Down
-			mainmemory.write_s8(0x1407,0x00 + speed);
+			mainmemory.write_s16_le(vertical_velocity, speed);
 		elseif buttons == 6 then -- Down + Left
-			mainmemory.write_s8(0x1404,0x00 - speed);
-			mainmemory.write_u8(0x1405,0xFF);
-			mainmemory.write_s8(0x1407,0x00 + speed);
+			mainmemory.write_s16_le(horizontal_velocity, -speed);
+			mainmemory.write_s16_le(vertical_velocity, speed);
 		elseif buttons == 7 then -- Left
-			mainmemory.write_s8(0x1404,0x00 - speed);
-			mainmemory.write_u8(0x1405,0xFF);
+			mainmemory.write_s16_le(horizontal_velocity, -speed);
 		elseif buttons == 8 then -- Up + Left
-			mainmemory.write_s8(0x1404,0x00 - speed);
-			mainmemory.write_u8(0x1405,0xFF);
-			mainmemory.write_s8(0x1407,0x00 - speed);
-			mainmemory.write_u8(0x1408,0xFF);
+			mainmemory.write_s16_le(horizontal_velocity, -speed);
+			mainmemory.write_s16_le(vertical_velocity, -speed);
 		end
 	end
 end
