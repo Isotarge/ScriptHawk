@@ -328,6 +328,7 @@
 03ED Dragonfly enemy (what's his name?)
 03EE BGS Tutrle (overworld)
 03EF BGS Turtle foot
+
 03F0 BGS Turtle foot
 03F1 BGS Turtle foot
 03F2 BGS Turtle foot
@@ -745,7 +746,4 @@
 0576 --CRASH--
 0577 --CRASH--
 
-0578-0FFF Untested
-
--- TODO: wtf does this byte do?
-8128189A 0057
+0578-FFFF Untested

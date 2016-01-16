@@ -34,6 +34,7 @@ SystemID N64
 2812B8	w	b	1	RDRAM	P1 Controller Input
 2812BA	b	s	1	RDRAM	P1 Joystick X Axis
 2812BB	b	s	1	RDRAM	P1 Joystick Y Axis
+28189A	w	h	1	RDRAM	Music Track
 283400	w	b	1	RDRAM	Stop'N'Swop Items
 2986BA	w	h	1	RDRAM	Banjo Model Replacement
 2986BE	w	h	1	RDRAM	Banjo Model Replacement
