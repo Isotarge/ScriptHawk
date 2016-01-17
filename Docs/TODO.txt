@@ -1,27 +1,34 @@
 ﻿TODO:
+	- General: Base game detection on ROM hash rather than name
+	- General: Rework input/keybinds, multiple profiles like wasd/arrow keys
+	- General: 2D game support
+	- General: UI framework cleanup, reduce number of parameters passed to Game.initUI(), probably just pass in a key->value table
+	- Rayman 2 rotation stuff
+	- Toy story 2 stuff
+	- DK64: Finish flag documentation
+		- Complete documentation for US
+		- Figure out how the 101% credits are triggered
+		- Start documentation for other versions
+	- DK64: Neverslip enhancements, can't roll/kick on slopes
+	- DK64: Fix dpad for boats/cars/fly swatter etc
+	- DK64: Integrate Grab Objects.lua
+	- DK64: Finish integrating Loader.lua
+		- Just needs a UI, it can currently be called via the lua console
+	- BK: Integrate Level Object Analyser.lua
+	- BT: Take me there support for JP
+	- BT: Jinjo Manip memory analysis
 
-- Rework input/keybinds, multiple profiles like wasd/arrow keys
-- 2D game support
-- Rayman 2 rotation stuff
-- Toy story 2 stuff
-- Never slip enhancements, can't roll/kick on slopes
-- Fix dpad for boats/cars/fly swatter etc for DK64
-- Integrate Grab Objects.lua into the DK64 module
-- Integrate Loader.lua into the DK64 Module
-- Integrate Level Object Analyser.lua into the BK module
-- UI framework cleanup, reduce number of parameters passed to Game.initUI(), probably just pass in a key->value table
-- BT map support for versions other than US
-- BT Jinjo Manip memory analysis
-- Support both BizHawk and m64p https://github.com/notwa/mm/commit/90d30e218f3128fb130e54bd8662527bdd73f40f
-- Port Tetris Attack bot to Pokémon Puzzle League (once it boots in mupen ofc)
+Low priority, recurring, or waiting on other people:
+	- Port Tetris Attack bot to Pokémon Puzzle League (once it boots in mupen ofc)
+	- Keep LIPS up to date
+	- Support both BizHawk and m64p https://github.com/notwa/mm/commit/90d30e218f3128fb130e54bd8662527bdd73f40f
 
 Game support wishlist:
-
-Conker
-Gex
-Wave Race
-THPS 1/2/3
-Space station silicon valley
-Pokemon snap
-Doubutsu no Mori (Animal Crossing)
-Monster truck madness
+	- Conker
+	- Gex
+	- Wave Race
+	- THPS 1/2/3
+	- Space station silicon valley
+	- Pokemon snap
+	- Doubutsu no Mori (Animal Crossing)
+	- Monster truck madness
