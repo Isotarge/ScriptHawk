@@ -6,7 +6,25 @@
 
 -----------------------
 
-local level_object_array_pointer = 0x36E560; -- TODO: Port to other versions
+local level_object_array_pointer;
+local romName = gameinfo.getromname();
+
+if not bizstring.contains(romName, "Banjo-Kazooie") and not bizstring.contains(romName, "Banjo to Kazooie no Daibouken") then
+	print("This game is not currently supported.");
+end
+
+if bizstring.contains(romName, "Europe") then
+	level_object_array_pointer = 0x36EAE0;
+elseif bizstring.contains(romName, "Japan") then
+	level_object_array_pointer = 0x36F260;
+elseif bizstring.contains(romName, "USA") and bizstring.contains(romName, "Rev A") then
+	level_object_array_pointer = 0x36D760;
+elseif bizstring.contains(romName, "USA") then
+	level_object_array_pointer = 0x36E560;
+else
+	print("This version of the game is not currently supported.");
+	return false;
+end
 
 -- Slot data
 local slot_base = 0x28;
