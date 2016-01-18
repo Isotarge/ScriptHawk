@@ -29,6 +29,7 @@ SystemID N64
 37B890	d	f	1	RDRAM	Facing Angle
 37B894	d	f	1	RDRAM	Moving Angle
 37CDA8	d	f	1	RDRAM	Camera Rot Y
+37CEB3	b	u	1	RDRAM	MM Hut index
 37CFB4	d	f	1	RDRAM	Jiggy Spawn Angle
 37CFB8	d	f	1	RDRAM	Jiggy Spawn Velocity
 37DAE8	d	f	1	RDRAM	Game runtime

@@ -144,6 +144,7 @@ SystemID N64
 37D9E4	d	f	1	RDRAM	Camera Y vel?
 37D9E8	d	f	1	RDRAM	Camera Z vel?
 37DC70	d	f	1	RDRAM	C-Up camera angle
+37DCB3	b	u	1	RDRAM	MM Hut index
 37DDB4	d	f	1	RDRAM	Jiggy Spawn Angle
 37DDB8	d	f	1	RDRAM	Jiggy Spawn Velocity
 37E8E8	d	f	1	RDRAM	Game runtime
