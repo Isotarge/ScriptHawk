@@ -2,6 +2,7 @@ Domain RDRAM
 SystemID N64
 280700	d	s	1	RDRAM	Frame timer
 280704	d	s	1	RDRAM	Frameskip
+2816BA	w	h	1	RDRAM	Music Track
 283220	w	b	1	RDRAM	Stop'N'Swop Items
 285734	w	b	1	RDRAM	P1 Controller Buttons
 285736	b	s	1	RDRAM	P1 Joystick X

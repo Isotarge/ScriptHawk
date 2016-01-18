@@ -1,6 +1,8 @@
 -- Level Music Modifier
-8128189A xxxx (USA 1.0 Version)
--- TODO: Find in other versions
+812806DA xxxx (JP)
+812816BA xxxx (PAL Version)
+8128189A xxxx (USA 1.0)
+812806DA xxxx (USA 1.1)
 
 -- Source http://bsfree.shadowflareindustries.com/index.php?s=18&d=8&g=9647&c=32795#note11
 This changes all levels, but when you go to areas where the music changes, only certain instrument play, giving you cool remixes.
