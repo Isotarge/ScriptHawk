@@ -758,7 +758,7 @@ local function plot_pos()
 
 		-- Telemetry
 		if collecting_telemetry then
-			local temp_telemetry_data = {
+			local tempTelemetryData = {
 				["X Position"] = x,
 				["Y Position"] = y,
 				["Z Position"] = z,
@@ -768,7 +768,7 @@ local function plot_pos()
 				["Rotation Y"] = rot_y,
 				["Rotation Z"] = rot_z
 			}
-			table.insert(telemetryData, temp_telemetry_data);
+			table.insert(telemetryData, tempTelemetryData);
 		end
 	end
 

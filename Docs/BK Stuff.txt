@@ -361,6 +361,8 @@ Relative Type    Observed values
 0x16C Float: 7816
 
 0x170 4_Unknown: 0x428A00E
+0x170 Byte: 0x10, Standing on podium (Jiggy podium)
+
 0x174 Pointer: 0x8015CB60
 0x178 Pointer: 0x80372B50
 0x17C Float: 0

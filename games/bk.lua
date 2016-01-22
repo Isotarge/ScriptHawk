@@ -15,6 +15,9 @@ local x_vel;
 local y_vel;
 local z_vel;
 
+-- Velocity required to clip on the Y axis
+local clip_vel = -3500;
+
 local x_pos;
 local y_pos;
 local z_pos;
@@ -235,6 +238,7 @@ function Game.detectVersion(romName)
 		slope_timer = 0x37CCB4;
 		moves_bitfield = 0x37CD70;
 		x_vel = 0x37CE88;
+		clip_vel = -2900;
 		x_pos = 0x37CF70;
 		x_rot = 0x37CF10;
 		moving_angle = 0x37D064;
@@ -917,6 +921,54 @@ function Game.setZVelocity(value)
 	return mainmemory.writefloat(z_vel, value, true);
 end
 
+------------------
+-- CC Early bot --
+------------------
+
+CCBotRunning = false;
+local bestVelocity = 0;
+local requiredVelocity = -2900;
+
+local xParams = {["min"] = 10, ["max"] = 127};
+local yParams = {["min"] = 10, ["max"] = 127};
+
+function setRandomJoystick()
+	joypad.setanalog({['X Axis'] = math.random(xParams.min, xParams.max), ['Y Axis'] = math.random(yParams.min, yParams.max)}, 1);
+end
+
+function CCBot()
+	if CCBotRunning then
+		savestate.loadslot(0);
+		setRandomJoystick();
+		emu.frameadvance();
+		emu.frameadvance();
+		emu.frameadvance();
+		emu.frameadvance();
+		emu.frameadvance();
+		emu.frameadvance();
+
+		local currentVelocity = Game.getYVelocity();
+		if currentVelocity <= bestVelocity then
+			bestVelocity = currentVelocity;
+			savestate.saveslot(0);
+		end
+	end
+end
+
+--event.onframestart(CCBot, "CCBot");
+
+local options_pulse_clip_velocity;
+local pulseClipVelocityCounter = 0;
+pulseClipVelocityInterval = 20;
+
+function pulseClipVelocity()
+	pulseClipVelocityCounter = pulseClipVelocityCounter + 1;
+	if forms.ischecked(options_pulse_clip_velocity) and pulseClipVelocityCounter >= pulseClipVelocityInterval and y >= 0 then
+		Game.setYVelocity(clip_vel);
+		pulseClipVelocityCounter = 0;
+	end
+end
+
 ------------
 -- Events --
 ------------
@@ -951,11 +1003,12 @@ function Game.initUI(form_handle, col, row, button_height, label_offset, dropdow
 
 	encircle_checkbox = forms.checkbox(form_handle, "Encircle (Beta)", col(5) + dropdown_offset, row(4) + dropdown_offset);
 	dynamic_radius_checkbox = forms.checkbox(form_handle, "Dynamic Radius", col(5) + dropdown_offset, row(5) + dropdown_offset);
+	options_pulse_clip_velocity = forms.checkbox(form_handle, "Pulse Clip Vel.", col(5) + dropdown_offset, row(6) + dropdown_offset);
 
 	-- Vile
-	options_wave_button =     forms.button(form_handle, "Wave", initWave,         col(10), row(4), col(4) + 8, button_height);
-	options_heart_button =    forms.button(form_handle, "Heart", doHeart,         col(10), row(5), col(4) + 8, button_height);
-	options_fire_all_button = forms.button(form_handle, "Fire all", fireAllSlots, col(10), row(6), col(4) + 8, button_height);
+	options_wave_button =     forms.button(form_handle, "Wave", initWave,         col(10), row(4), col(2), button_height);
+	options_heart_button =    forms.button(form_handle, "Heart", doHeart,         col(12) + 8, row(4), col(2), button_height);
+	options_fire_all_button = forms.button(form_handle, "Fire all", fireAllSlots, col(10), row(5), col(4) + 8, button_height);
 
 	-- Moves
 	options_moves_dropdown = forms.dropdown(form_handle, { "0. None", "1. Spiral Mountain 100%", "2. FFM Setup", "3. All", "3. Demo" }, col(10) + dropdown_offset, row(7) + dropdown_offset);
@@ -966,6 +1019,7 @@ function Game.eachFrame()
 	applyFurnaceFunPatch();
 	updateWave();
 	set_orange_timer();
+	pulseClipVelocity();
 	
 	if forms.ischecked(options_toggle_neverslip) then
 		neverSlip();

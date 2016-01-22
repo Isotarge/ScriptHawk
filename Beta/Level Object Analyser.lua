@@ -479,6 +479,15 @@ function get_slot_base(object_array, index)
 	return object_array + slot_base + index * slot_size;
 end
 
+function address_to_slot(address)
+	local level_object_array = mainmemory.read_u24_be(level_object_array_pointer + 1);
+	local num_slots = math.min(max_slots, mainmemory.read_u32_be(level_object_array));
+	local position = address - level_object_array - slot_base;
+	local relative_to_object = position % slot_size;
+	local object_no = math.floor(position / slot_size);
+	print("Object number "..object_no.." address relative "..toHexString(relative_to_object));
+end
+
 function process_slot(slot_base)
 	local current_slot_variables = {};
 	local relative_address, variable_data;

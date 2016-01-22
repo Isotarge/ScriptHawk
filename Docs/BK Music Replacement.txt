@@ -1,6 +1,6 @@
 -- Level Music Modifier
 812806DA xxxx (JP)
-812816BA xxxx (PAL Version)
+812816BA xxxx (PAL)
 8128189A xxxx (USA 1.0)
 812806DA xxxx (USA 1.1)
 

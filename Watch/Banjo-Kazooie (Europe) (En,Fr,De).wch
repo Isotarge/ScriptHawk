@@ -17,8 +17,16 @@ SystemID N64
 368AA4	w	h	1	RDRAM	Snacker Model Replacement
 36EAE0	d	h	1	RDRAM	Object Array Pointer
 3734D4	w	h	1	RDRAM	Ticker Model Replacement
+37C930	b	u	1	RDRAM	Player is on ground
 37C931	b	u	1	RDRAM	Player is Swimming
 37CABC	d	f	1	RDRAM	Player Scale
+37CAF0	d	f	1	RDRAM	X Disjoint Amount
+37CAF4	d	f	1	RDRAM	Y Disjoint Amount
+37CAF8	d	f	1	RDRAM	Z Disjoint Amount
+37CB04	d	f	1	RDRAM	Unknown Float (Rat-A-Tat Rap)
+37CB08	d	f	1	RDRAM	Unknown Float (Rat-A-Tat Rap)
+37CB14	d	f	1	RDRAM	Unknown Float (Rat-A-Tat Rap)
+37CB18	d	f	1	RDRAM	Unknown Float (Rat-A-Tat Rap)
 37CBA1	b	u	1	RDRAM	Standing on Fly Pad
 37CBA2	b	u	1	RDRAM	Standing on Shock Spring Pad
 37CBB3	b	u	1	RDRAM	Standing on Damaging Ground?
@@ -33,6 +41,9 @@ SystemID N64
 37CF70	d	f	1	RDRAM	X Position
 37CF74	d	f	1	RDRAM	Y Position
 37CF78	d	f	1	RDRAM	Z Position
+37CF80	d	f	1	RDRAM	X Position (OOB Detection)
+37CF84	d	f	1	RDRAM	Y Position (OOB Detection)
+37CF88	d	f	1	RDRAM	Z Position (OOB Detection)
 37D040	b	u	1	RDRAM	Player Control Locked
 37D050	d	f	1	RDRAM	Z Rotation - Current
 37D054	d	f	1	RDRAM	Z Rotation - Moving to
