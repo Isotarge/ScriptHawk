@@ -50,8 +50,8 @@ SystemID N64
 37D058	d	f	1	RDRAM	Z Rotation - Update speed
 37D060	d	f	1	RDRAM	Facing Angle
 37D064	d	f	1	RDRAM	Moving Angle
-37DB30	d	h	1	RDRAM	Previous Movement State
-37DB34	d	h	1	RDRAM	Current Movement State
+37DB30	d	u	1	RDRAM	Previous Movement State
+37DB34	d	u	1	RDRAM	Current Movement State
 37DC06	b	u	1	RDRAM	Kazooie's Legs Visible
 37DC07	b	u	1	RDRAM	Kazooie has Turbo Trainers
 37DC08	b	u	1	RDRAM	Kazooie's Head Visible

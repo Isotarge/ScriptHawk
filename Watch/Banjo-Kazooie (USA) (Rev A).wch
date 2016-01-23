@@ -28,6 +28,8 @@ SystemID N64
 37B88C	d	f	1	RDRAM	Z Rotation - Unknown
 37B890	d	f	1	RDRAM	Facing Angle
 37B894	d	f	1	RDRAM	Moving Angle
+37C360	d	u	1	RDRAM	Previous Movement State
+37C364	d	u	1	RDRAM	Current Movement State
 37CDA8	d	f	1	RDRAM	Camera Rot Y
 37CEB3	b	u	1	RDRAM	MM Hut index
 37CFB4	d	f	1	RDRAM	Jiggy Spawn Angle

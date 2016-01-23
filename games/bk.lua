@@ -23,6 +23,7 @@ local y_pos;
 local z_pos;
 
 local x_rot;
+local y_rot;
 local facing_angle;
 local moving_angle;
 local z_rot;
@@ -50,15 +51,16 @@ local mumbo_tokens = 100;
 local jiggies = 104;
 
 local max_notes = 100;
-local max_eggs = 200;
-local max_red_feathers = 50;
-local max_gold_feathers = 10;
-local max_health = 16;
-local max_health_containers = 16;
+local max_eggs = 200; -- TODO: How do you get this information out of the game?
+local max_red_feathers = 50; -- TODO: How do you get this information out of the game?
+local max_gold_feathers = 10; -- TODO: How do you get this information out of the game?
 local max_lives = 9;
-local max_air = 3600;
+local max_air = 6 * 600;
 local max_mumbo_tokens = 99;
 local max_jiggies = 100;
+
+local previous_movement_state;
+local current_movement_state;
 
 local eep_checksum_offsets = {
 	0x74,
@@ -88,7 +90,7 @@ Game.maps = {
 	"Unknown 0x09",
 	"TTC - Sandcastle",
 	"CC - Clanker's Cavern",
-	"MM - Termite Mound",
+	"MM - Ticker's Tower",
 	"BGS - Bubblegloop Swamp",
 	"Mumbo's Skull (MM)",
 	"Unknown 0x0F",
@@ -106,15 +108,16 @@ Game.maps = {
 	"MMM - Mad Monster Mansion",
 	"MMM - Church",
 	"MMM - Cellar",
-	"Intro - Start - Nintendo",
-	"Intro - Start - Rareware",
-	"Intro - End Scene 2: Not 100",
-	"CC - Inside A",
-	"CC - Inside B",
+	"Start - Nintendo",
+	"Start - Rareware",
+	"End Scene 2: Not 100",
+	"End Scene 2: Not 100",
+	"CC - Witch Switch Room",
+	"CC - Inside Clanker",
 	"CC - Gold Feather Room",
 	"MMM - Tumblar's Shed",
 	"MMM - Well",
-	"MMM - Dining Room",
+	"MMM - Dining Room (Napper)",
 	"FP - Freezeezy Peak",
 	"MMM - Room 1",
 	"MMM - Room 2",
@@ -181,40 +184,40 @@ Game.maps = {
 	"CCW - Top (Summer)",
 	"CCW - Top (Autumn)",
 	"CCW - Top (Winter)",
-	"Lair - Flr 1, Area 1: Mumbo",
-	"Lair - Flr 1, Area 2",
-	"Lair - Flr 1, Area 3",
-	"Lair - Flr 1, Area 3a: Cauldron",
-	"Lair - Flr 1, Area 4: TTC Lobby",
-	"Lair - Flr 2, Area 1: GV Lobby",
-	"Lair - Flr 2, Area 2: MMM/FP",
-	"Lair - Flr 1, Area 5: Pipes room",
-	"Lair - Flr 1, Area 6: Lair statue",
-	"Lair - Flr 1, Area 7: BGS Lobby",
+	"Lair - MM Lobby",
+	"Lair - TTC/CC Puzzle",
+	"Lair - CCW Puzzle & 180 Note Door",
+	"Lair - Red Cauldron Room",
+	"Lair - TTC Lobby",
+	"Lair - GV Lobby",
+	"Lair - FP Lobby",
+	"Lair - CC Lobby",
+	"Lair - Statue",
+	"Lair - BGS Lobby",
 	"Unknown 0x73",
-	"Lair - Flr 2, Area 4: GV Puzzle",
-	"Lair - Flr 2, Area 5: MMM Lobby",
-	"Lair - Flr 3, Area 1",
-	"Lair - Flr 3, Area 2: RBB Lobby",
-	"Lair - Flr 3, Area 3",
-	"Lair - Flr 3, Area 4: CCW trunks",
+	"Lair - GV Puzzle",
+	"Lair - MMM Lobby",
+	"Lair - 640 Note Door Room",
+	"Lair - RBB Lobby",
+	"Lair - RBB Puzzle",
+	"Lair - CCW Lobby",
 	"Lair - Flr 2, Area 5a: Crypt inside",
-	"Intro - Grunties Lair 1 - Scene 1",
-	"Intro - Inside Banjo's Cave 1 - Scenes 3,7",
+	"Intro - Lair 1 - Scene 1",
+	"Intro - Banjo's House 1 - Scenes 3,7",
 	"Intro - Spiral 'A' - Scenes 2,4",
 	"Intro - Spiral 'B' - Scenes 5,6",
 	"FP - Wozza's Cave",
 	"Lair - Flr 3, Area 4a",
-	"Intro - Grunties Lair 2",
-	"Intro - Grunties Lair 3 - Machine 1",
-	"Intro - Grunties Lair 4 - Game Over",
-	"Intro - Grunties Lair 5",
+	"Intro - Lair 2",
+	"Intro - Lair 3 - Machine 1",
+	"Intro - Lair 4 - Game Over",
+	"Intro - Lair 5",
 	"Intro - Spiral 'C'",
 	"Intro - Spiral 'D'",
 	"Intro - Spiral 'E'",
 	"Intro - Spiral 'F'",
-	"Intro - Inside Banjo's Cave 2",
-	"Intro - Inside Banjo's Cave 3",
+	"Intro - Banjo's House 2",
+	"Intro - Banjo's House 3",
 	"RBB - Anchor room",
 	"SM - Banjo's House",
 	"MMM - Inside Loggo",
@@ -223,11 +226,11 @@ Game.maps = {
 	"Lair - Battlements",
 	"File Select Screen",
 	"GV - Secret Chamber",
-	"Lair - Flr 5, Area 1: Grunty's rooms",
+	"Lair - Dingpot",
 	"Intro - Spiral 'G'",
-	"Intro - End Scene 3: All 100",
-	"Intro - End Scene",
-	"Intro - End Scene 4",
+	"End Scene 3: All 100",
+	"End Scene",
+	"End Scene 4",
 	"Intro - Grunty Threat 1",
 	"Intro - Grunty Threat 2"
 }
@@ -244,7 +247,9 @@ function Game.detectVersion(romName)
 		moving_angle = 0x37D064;
 		camera_rot = 0x37E578;
 		z_rot = 0x37D050;
+		current_movement_state = 0x37DB34;
 		map = 0x37F2C5;
+		allowFurnaceFunPatch = false;
 		ff_question_pointer = 0x383AC0;
 		notes = 0x386940;
 		object_array_pointer = 0x36EAE0;
@@ -258,7 +263,9 @@ function Game.detectVersion(romName)
 		moving_angle = 0x37D194;
 		camera_rot = 0x37E6A8;
 		z_rot = 0x37D180;
+		current_movement_state = 0x37DC64;
 		map = 0x37F405;
+		allowFurnaceFunPatch = false;
 		ff_question_pointer = 0x383C20;
 		notes = 0x386AA0;
 		object_array_pointer = 0x36F260;
@@ -272,7 +279,9 @@ function Game.detectVersion(romName)
 		moving_angle = 0x37B894;
 		camera_rot = 0x37CDA8;
 		z_rot = 0x37B880;
+		current_movement_state = 0x37C364;
 		map = 0x37DAF5;
+		allowFurnaceFunPatch = false;
 		ff_question_pointer = 0x382300;
 		notes = 0x385180;
 		object_array_pointer = 0x36D760;
@@ -286,6 +295,7 @@ function Game.detectVersion(romName)
 		moving_angle = 0x37C694;
 		camera_rot = 0x37D96C;
 		z_rot = 0x37C680;
+		current_movement_state = 0x37D164;
 		map = 0x37E8F5;
 		allowFurnaceFunPatch = true;
 		ff_question_pointer = 0x3830E0;
@@ -302,11 +312,14 @@ function Game.detectVersion(romName)
 	z_vel = y_vel + 4;
 
 	facing_angle = moving_angle - 4;
+	y_rot = moving_angle;
+
+	previous_movement_state = current_movement_state - 4;
 
 	-- Read EEPROM checksums
 	if memory.usememorydomain("EEPROM") then
 		local i;
-		for i=1,#eep_checksum_offsets do
+		for i = 1, #eep_checksum_offsets do
 			eep_checksum_values[i] = memory.read_u32_be(eep_checksum_offsets[i]);
 		end
 	end
@@ -345,109 +358,126 @@ end
 -- Movement state --
 --------------------
 
--- Current Movement state  0x37D167 (US 1.0)
--- Previous Movement state 0x37D163 (US 1.0)
-
 local movementStates = {
-	[0x01] = "Idle",
-	[0x02] = "Slow walking",
-	[0x03] = "Walking",
-	[0x04] = "Fast walking",
+	[1] = "Idle",
+	[2] = "Walking", -- Slow
+	[3] = "Walking",
+	[4] = "Walking", -- Fast
 
-	[0x05] = "Jumping",
-	[0x06] = "Bear punch",
-	[0x07] = "Crouching",
-	[0x08] = "Jumping (Talon Trot)",
-	[0x0C] = "Skidding",
-	[0x0E] = "Taking damage",
-	[0x0F] = "Beak Buster",
-	[0x10] = "Feathery Flap",
-	[0x11] = "Rat-a-tat rap",
-	[0x12] = "Backflip (Flap Flip)",
-	[0x13] = "Beak Barge",
+	[5] = "Jumping",
+	[6] = "Bear punch",
+	[7] = "Crouching",
+	[8] = "Jumping", -- Talon Trot
 
-	[0x14] = "Entering Talon Trot",
-	[0x15] = "Talon Trot Idle",
-	[0x16] = "Talon Trot Moving",
-	[0x17] = "Leaving Talon Trot",
+	[12] = "Skidding",
 
-	[0x1A] = "Entering Wonderwing",
-	[0x1B] = "Idle (Wonderwing)",
-	[0x1C] = "Moving (Wonderwing)",
-	[0x1D] = "Jumping (Wonderwing)",
-	[0x1E] = "Leaving Wonderwing",
+	[14] = "Knockback",
+	[15] = "Beak Buster",
+	[16] = "Feathery Flap",
+	[17] = "Rat-a-tat rap",
+	[18] = "Backflip", -- Flap Flip
+	[19] = "Beak Barge",
 
-	[0x1F] = "Creeping",
-	[0x20] = "Landing (after jump)",
+	[20] = "Entering Talon Trot",
+	[21] = "Idle", -- Talon Trot
+	[22] = "Moving", -- Talon Trot
+	[23] = "Leaving Talon Trot",
 
-	[0x25] = "Entering Wading Boots",
-	[0x26] = "Idle (Wading Boots)",
-	[0x27] = "Moving (Wading Boots)",
-	[0x28] = "Jumping (Wading Boots)",
-	[0x29] = "Leaving Wading Boots",
+	[26] = "Entering Wonderwing",
+	[27] = "Idle", -- Wonderwing
+	[28] = "Moving", -- Wonderwing
+	[29] = "Jumping", -- Wonderwing
+	[30] = "Leaving Wonderwing",
 
-	[0x2F] = "Landing (with peck?)",
+	[31] = "Creeping",
+	[32] = "Landing", -- After Jump
 
-	[0x31] = "Rolling",
+	[37] = "Entering Wading Boots",
+	[38] = "Idle", -- Wading Boots
+	[39] = "Moving", -- Wading Boots
+	[40] = "Jumping", -- Wading Boots
+	[41] = "Leaving Wading Boots",
 
-	[0x32] = "Slipping down slope",
-	[0x45] = "Slipping down slope (Talon Trot)",
-	[0x55] = "Slipping down slope (Wading Boots)",
+	[47] = "Landing", -- With peck? -- TODO
 
-	[0x5A] = "Loading zone?",
+	[49] = "Rolling",
 
-	[0x5E] = "Idle (Croc)",
-	[0x5F] = "Moving (Croc)",
-	[0x60] = "Jumping (Croc)",
-	[0x6E] = "Biting (Croc)",
+	[50] = "Slipping",
+	[69] = "Slipping", -- Talon Trot
+	[85] = "Slipping", -- Wading Boots
 
-	[0x73] = "Locked - Cutscene?",
-	[0x74] = "Locked - Jiggy pad, Mumbo transformation, Bottles",
-	[0x8D] = "Locked - Mumbo transformation",
-	[0x94] = "Locked - Mumbo transformation",
-	[0x98] = "Locked - Loading zone, Mumbo transformation",
+	[90] = "Loading zone?", -- TODO
+
+	[94] = "Idle", -- Croc
+	[95] = "Moving", -- Croc
+	[96] = "Jumping", -- Croc
+	[97] = "Falling", -- Croc -- TODO: Verify
+	[99] = "Knockback", -- Croc
+	[110] = "Biting", -- Croc
+
+	[115] = "Locked", -- Cutscene? -- TODO
+	[116] = "Locked", -- Jiggy pad, Mumbo transformation, Bottles
+	[141] = "Locked", -- Mumbo transformation, Mr. Vile
+	[148] = "Locked", -- Mumbo transformation
+	[152] = "Locked", -- Loading zone, Mumbo transformation
 };
+
+function getCurrentMovementState()
+	local currentMovementState = mainmemory.read_u32_be(current_movement_state);
+	if type(movementStates[currentMovementState]) ~= "nil" then
+		return movementStates[currentMovementState];
+	end
+	return "Unknown ("..currentMovementState..")";
+end
 
 --------------------------
 -- Sandcastle positions --
 --------------------------
 
+local sandcastle_square_size = 90;
 local sandcastlePositions = {
-	["A"] = {180, -700},
-	["B"] = {0, 540},
-	["C"] = {360, -540},
-	["D"] = {-360, -180},
-	["E"] = {0, -540},
-	["F"] = {360, 180},
-	["G"] = {-180, -700},
-	["H"] = {-360, 540},
-	["I"] = {540, 0},
-	["J"] = {-540, -700},
-	["K"] = {360, 540},
-	["L"] = {540, -700},
-	["M"] = {-540, -360},
-	["N"] = {-180, -360},
-	["O"] = {0, -180},
-	["P"] = {540, -360},
+	["A"] = {2, -8},
+	["B"] = {0, 6},
+	["C"] = {4, -6},
+	["D"] = {-4, -2},
+	["E"] = {0, -6},
+	["F"] = {4, 2},
+	["G"] = {-2, -8},
+	["H"] = {-4, 6},
+	["I"] = {6, 0},
+	["J"] = {-6, -8},
+	["K"] = {4, 6},
+	["L"] = {6, -8},
+	["M"] = {-6, -4},
+	["N"] = {-2, -4},
+	["O"] = {0, -2},
+	["P"] = {6, -4},
 	-- There's no Q in the sandcastle
-	["R"] = {180, -360},
-	["S"] = {360, -180},
-	["T"] = {0, 180},
-	["U"] = {-180, 0},
-	["V"] = {-360, -540},
-	["W"] = {180, 360},
-	["X"] = {-360, 180},
-	["Y"] = {180, 0},
-	["Z"] = {-540, 0},
+	["R"] = {2, -4},
+	["S"] = {4, -2},
+	["T"] = {0, 2},
+	["U"] = {-2, 0},
+	["V"] = {-4, -6},
+	["W"] = {2, 4},
+	["X"] = {-4, 2},
+	["Y"] = {2, 0},
+	["Z"] = {-6, 0},
 };
 
 function gotoSandcastleLetter(letter)
-	if type(sandcastlePositions[letter]) == "table" then
-		Game.setXPosition(sandcastlePositions[letter][1]);
-		Game.setZPosition(sandcastlePositions[letter][2]);
-	else
+	if type(letter) ~= "string" then
+		print("Letter not a string.");
+	end
+
+	-- Convert the letter to uppercase
+	letter = string.upper(letter);
+
+	if type(sandcastlePositions[letter]) ~= "table" then
 		print("Letter not found.");
 	end
+
+	Game.setXPosition(sandcastlePositions[letter][1] * sandcastle_square_size);
+	Game.setZPosition(sandcastlePositions[letter][2] * sandcastle_square_size);
 end
 
 -------------------------------
@@ -511,16 +541,16 @@ local options_allow_ff_patch;
 
 local function applyFurnaceFunPatch()
 	if allowFurnaceFunPatch and forms.ischecked(options_allow_ff_patch) then
-		mainmemory.write_u16_be(0x320064, 0x080a);
+		mainmemory.write_u16_be(0x320064, 0x080A);
 		mainmemory.write_u16_be(0x320066, 0x1840);
 
-		mainmemory.write_u16_be(0x286100, 0xac86);
-		mainmemory.write_u16_be(0x286102, 0x2dc8);
-		mainmemory.write_u16_be(0x286104, 0x0c0c);
+		mainmemory.write_u16_be(0x286100, 0xAC86);
+		mainmemory.write_u16_be(0x286102, 0x2DC8);
+		mainmemory.write_u16_be(0x286104, 0x0C0C);
 		mainmemory.write_u16_be(0x286106, 0x8072);
 
-		mainmemory.write_u16_be(0x28610C, 0x080c);
-		mainmemory.write_u16_be(0x28610E, 0x801b);
+		mainmemory.write_u16_be(0x28610C, 0x080C);
+		mainmemory.write_u16_be(0x28610E, 0x801B);
 	end
 end
 
@@ -551,6 +581,7 @@ ui_ff_x = 100;
 ui_ff_y_base = 100;
 ui_ff_answer_height = 16;
 
+-- TODO: Finish this
 function doFFHelp()
 	local selectedAnswer = getSelectedFFAnswer();
 	local correctAnswer = getCorrectFFAnswer();
@@ -585,12 +616,12 @@ local slot_size = 0x180;
 
 -- Relative to slot base + (slot number * slot size)
 
--- 00000 0x00 disabled
--- 00100 0x04 idle
--- 01000 0x08 rising
--- 01100 0x0c alive
--- 10000 0x10 falling (no eat)
--- 10100 0x14 eaten
+-- 00000 0x00 Disabled
+-- 00100 0x04 Idle
+-- 01000 0x08 Rising
+-- 01100 0x0c Alive
+-- 10000 0x10 Falling (not eaten)
+-- 10100 0x14 Eaten
 local slot_state = 0x00;
 
 -- Float 0-1
@@ -690,8 +721,9 @@ local function doHeart()
 	local vile_state = mainmemory.read_u24_be(object_array_pointer + 1);
 	local i;
 
+	local colour = math.random(0, 1);
 	for i=1,#heart do
-		fireSlot(vile_state, getSlotIndex(heart[i][1], heart[i][2]), 0);
+		fireSlot(vile_state, getSlotIndex(heart[i][1], heart[i][2]), colour);
 	end
 end
 
@@ -730,8 +762,8 @@ local function RF_step()
 end
 
 -------------------------------
---              Conga.lua    --
--- written by Isotarge, 2015 -- 
+-- Conga.lua                 --
+-- Written by Isotarge, 2015 -- 
 -------------------------------
 
 local conga_slot_size = 0x80;
@@ -740,12 +772,11 @@ local orange_timer = 0x1C;
 
 local orange_timer_value = 0.5;
 
-function set_orange_timer()
-	joypad_pressed = input.get();
-	if joypad_pressed["C"] then
+function throwOrange()
+	local keyboard_pressed = input.get();
+	if keyboard_pressed["C"] then
 		local level_object_array_base = mainmemory.read_u24_be(object_array_pointer + 1);
 		mainmemory.writefloat(level_object_array_base + throw_slot * conga_slot_size + orange_timer, orange_timer_value, true);
-		--print(toHexString(level_object_array_base + throw_slot * conga_slot_size + orange_timer));
 	end
 end
 
@@ -793,13 +824,13 @@ local function encircle_banjo()
 	end
 
 	-- Fill and sort pointer list
-	for i=0,num_slots - 1 do
+	for i = 0, num_slots - 1 do
 		table.insert(currentPointers, get_slot_base(i));
 	end
 	table.sort(currentPointers);
 
 	-- Iterate and set position
-	for i=1,#currentPointers do
+	for i = 1, #currentPointers do
 		x = current_banjo_x + math.cos(math.pi * 2 * i / #currentPointers) * radius;
 		z = current_banjo_z + math.sin(math.pi * 2 * i / #currentPointers) * radius;
 
@@ -989,8 +1020,7 @@ function Game.applyInfinites()
 	mainmemory.write_s32_be(notes + eggs, max_eggs);
 	mainmemory.write_s32_be(notes + red_feathers, max_red_feathers);
 	mainmemory.write_s32_be(notes + gold_feathers, max_gold_feathers);
-	mainmemory.write_s32_be(notes + health, max_health);
-	mainmemory.write_s32_be(notes + health_containers, max_health_containers);
+	mainmemory.write_s32_be(notes + health, mainmemory.read_s32_be(notes + health_containers));
 	mainmemory.write_s32_be(notes + lives, max_lives);
 	mainmemory.write_s32_be(notes + air, max_air);
 	mainmemory.write_s32_be(notes + mumbo_tokens, max_mumbo_tokens);
@@ -1000,7 +1030,9 @@ end
 
 function Game.initUI(form_handle, col, row, button_height, label_offset, dropdown_offset)
 	options_toggle_neverslip = forms.checkbox(form_handle, "Never Slip", col(0) + dropdown_offset, row(6) + dropdown_offset);
-	options_allow_ff_patch = forms.checkbox(form_handle, "Allow FF patch", col(0) + dropdown_offset, row(7) + dropdown_offset);
+	if allowFurnaceFunPatch then
+		options_allow_ff_patch = forms.checkbox(form_handle, "Allow FF patch", col(0) + dropdown_offset, row(7) + dropdown_offset);
+	end
 
 	encircle_checkbox = forms.checkbox(form_handle, "Encircle (Beta)", col(5) + dropdown_offset, row(4) + dropdown_offset);
 	dynamic_radius_checkbox = forms.checkbox(form_handle, "Dynamic Radius", col(5) + dropdown_offset, row(5) + dropdown_offset);
@@ -1019,9 +1051,9 @@ end
 function Game.eachFrame()
 	applyFurnaceFunPatch();
 	updateWave();
-	set_orange_timer();
+	throwOrange();
 	pulseClipVelocity();
-	
+
 	if forms.ischecked(options_toggle_neverslip) then
 		neverSlip();
 		--RF_step();
