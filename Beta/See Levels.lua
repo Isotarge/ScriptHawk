@@ -1,7 +1,10 @@
-local map_base = 0x1b5a;
+-- Script to fill the minimap in Impossible Mission (SMS)
+-- Written by Isotarge, 2015
+
+local map_base = 0x1B5A;
 local num_maps = 10 * 10;
 
-local function see_maps()
+local function fillMinimap()
 	local value;
 	for i = 0, num_maps do
 		value = mainmemory.readbyte(map_base + i);
@@ -9,4 +12,4 @@ local function see_maps()
 	end
 end
 
-event.onframestart(see_maps, "See maps");
+event.onframestart(fillMinimap, "Fill Minimap");
