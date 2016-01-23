@@ -434,10 +434,13 @@ local movementStates = {
 	[79] = "Idle", -- Holding tree, pole, etc.
 
 	[80] = "Climbing", -- Tree, pole, etc.
+	[81] = "Leaving Climb",
 
+	[84] = "Death", -- Drowning
 	[85] = "Slipping", -- Wading Boots
 	[86] = "Knockback", -- Successful enemy damage
 	[87] = "Beak Bomb", -- Ending
+	[89] = "Damaged", -- Beak Bomb
 
 	[90] = "Loading Zone",
 
@@ -464,6 +467,7 @@ local movementStates = {
 	[121] = "Locked", -- Holding Jiggy, Talon Trot
 	[122] = "Creeping", -- In damaging water etc
 	[123] = "Knockback", -- Talon Trot
+	[127] = "Damaged", -- Swimming
 
 	[133] = "Idle", -- Bee
 	[134] = "Walking", -- Bee
@@ -479,7 +483,11 @@ local movementStates = {
 	[148] = "Locked", -- Mumbo transformation
 	[149] = "Locked", -- Walrus?
 
+	[150] = "Locked", -- Paddling
+	[151] = "Locked", -- Swimming
 	[152] = "Locked", -- Loading zone, Mumbo transformation
+	[153] = "Locked", -- Flying
+	[154] = "Locked", -- Talon Trot
 	[157] = "Locked", -- Bee?
 	[159] = "Knockback", -- Termite, not damaged
 	[160] = "Knockback", -- Pumpkin, not damaged
