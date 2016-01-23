@@ -370,7 +370,7 @@ local movementStates = {
 	[10] = "Pooping Egg",
 
 	[12] = "Skidding",
-	[14] = "Knockback",
+	[14] = "Damaged",
 	[15] = "Beak Buster",
 	[16] = "Feathery Flap",
 	[17] = "Rat-a-tat rap",
@@ -418,7 +418,7 @@ local movementStates = {
 	[56] = "Falling", -- Termite
 	[57] = "Swimming (A)",
 
-	[62] = "Knockback", -- Termite
+	[62] = "Damaged", -- Termite
 
 	[65] = "Death",
 	[68] = "Jiggy Jig",
@@ -429,7 +429,7 @@ local movementStates = {
 	[74] = "Jumping", -- Pumpkin
 	[75] = "Falling", -- Pumpkin
 	[76] = "Landing", -- In water
-	[77] = "Damaged" -- Pumpkin
+	[77] = "Damaged", -- Pumpkin
 	[78] = "Death", -- Pumpkin
 	[79] = "Idle", -- Holding tree, pole, etc.
 
@@ -445,7 +445,8 @@ local movementStates = {
 	[95] = "Walking", -- Croc
 	[96] = "Jumping", -- Croc
 	[97] = "Falling", -- Croc
-	[99] = "Knockback", -- Croc TODO: Damage? if so rename to damaged
+	[99] = "Damaged", -- Croc
+	[100] = "Death", -- Croc
 
 	[103] = "Idle", -- Walrus
 	[104] = "Walking", -- Walrus
@@ -461,6 +462,7 @@ local movementStates = {
 	[116] = "Locked", -- Jiggy pad, Mumbo transformation, Bottles
 
 	[121] = "Locked", -- Holding Jiggy, Talon Trot
+	[122] = "Creeping", -- In damaging water etc
 	[123] = "Knockback", -- Talon Trot
 
 	[133] = "Idle", -- Bee
@@ -479,7 +481,9 @@ local movementStates = {
 
 	[152] = "Locked", -- Loading zone, Mumbo transformation
 	[157] = "Locked", -- Bee?
+	[159] = "Knockback", -- Termite, not damaged
 	[160] = "Knockback", -- Pumpkin, not damaged
+	[161] = "Knockback", -- Croc, not damaged
 	[162] = "Knockback", -- Walrus, not damaged
 	[163] = "Knockback", -- Bee, not damaged
 };
