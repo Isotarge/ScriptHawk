@@ -402,7 +402,7 @@ local movementStates = {
 	[0x6E] = "Biting (Croc)",
 
 	[0x73] = "Locked - Cutscene?",
-	[0x74] = "Locked - Jiggy pad, Mumbo transformation, bottles",
+	[0x74] = "Locked - Jiggy pad, Mumbo transformation, Bottles",
 	[0x8D] = "Locked - Mumbo transformation",
 	[0x94] = "Locked - Mumbo transformation",
 	[0x98] = "Locked - Loading zone, Mumbo transformation",
@@ -959,11 +959,12 @@ end
 
 local options_pulse_clip_velocity;
 local pulseClipVelocityCounter = 0;
-pulseClipVelocityInterval = 20;
+pulseClipVelocityInterval = 5;
 
 function pulseClipVelocity()
 	pulseClipVelocityCounter = pulseClipVelocityCounter + 1;
-	if forms.ischecked(options_pulse_clip_velocity) and pulseClipVelocityCounter >= pulseClipVelocityInterval and y >= 0 then
+	local currentVelocity = Game.getYVelocity();
+	if forms.ischecked(options_pulse_clip_velocity) and pulseClipVelocityCounter >= pulseClipVelocityInterval and y >= 5 and currentVelocity > clip_vel then
 		Game.setYVelocity(clip_vel);
 		pulseClipVelocityCounter = 0;
 	end
