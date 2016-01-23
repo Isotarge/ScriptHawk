@@ -458,13 +458,23 @@ local movementStates = {
 	[121] = "Locked", -- Holding Jiggy, Talon Trot
 	[123] = "Knockback", -- Talon Trot
 
+	[133] = "Idle", -- Bee
+	[134] = "Walking", -- Bee
+	[135] = "Jumping", -- Bee
+	[136] = "Falling", -- Bee
+	[137] = "Damaged", -- Bee
+	[138] = "Death", -- Bee
+
+	[140] = "Flying", -- Bee
 	[141] = "Locked", -- Mumbo transformation, Mr. Vile
 	[142] = "Locked", -- Jiggy podium, Bottles' text outside Mumbo's
 	[148] = "Locked", -- Mumbo transformation
 	[149] = "Locked", -- Walrus?
 
 	[152] = "Locked", -- Loading zone, Mumbo transformation
-	[162] = "Knockback", -- Walrus
+	[157] = "Locked", -- Bee?
+	[162] = "Knockback", -- Walrus, not damaged
+	[163] = "Knockback", -- Bee, not damaged
 };
 
 function getCurrentMovementState()
