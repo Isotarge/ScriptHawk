@@ -264,8 +264,7 @@ end
 
 local function array_contains(array, value)
 	if type(array) == "table" and #array > 0 then
-		local i;
-		for i=1,#array do
+		for i = 1, #array do
 			if array[i] == value then
 				return true;
 			end
@@ -320,9 +319,8 @@ local collecting_telemetry = false;
 
 -- Outputs telemetry data as CSV to the console
 local function outputTelemetry()
-	local i = 1;
 	dprint("Time (Frames),X Position,Y Position,Z Position,Dxz,Dy,Rotation X,Rotation Y,Rotation Z,");
-	for i=1,#telemetryData do
+	for i = 1, #telemetryData do
 		dprint(i..","..telemetryData[i]["X Position"]..","..telemetryData[i]["Y Position"]..","..telemetryData[i]["Z Position"]..","..telemetryData[i]["Dxz"]..","..telemetryData[i]["Dy"]..","..telemetryData[i]["Rotation X"]..","..telemetryData[i]["Rotation Y"]..","..telemetryData[i]["Rotation Z"]..",");
 	end
 	print_deferred();

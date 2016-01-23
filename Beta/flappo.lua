@@ -15,8 +15,7 @@ ideal_height = { 39, 55, 37, 69, 37 };
 function do_flappo()
 	x = ideal_height[mainmemory.read_u8(screen_type)+1];
 	--joypad.set({["P1 Button"]= mainmemory.read_u8(game_mode) == 4 or mainmemory.read_u8(unknown) - x >= mainmemory.read_u8(y_velocity)});
-	local i;
-	for i=1,#y_position do
+	for i = 1, #y_position do
 		mainmemory.writebyte(y_position[i], x);
 	end
 end

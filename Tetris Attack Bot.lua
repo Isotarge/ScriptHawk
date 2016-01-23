@@ -159,8 +159,7 @@ function invalidateGridCache(player)
 	colorCache[player] = {};
 	statusCache[player] = {};
 
-	local x;
-	for x=1,grid_width do
+	for x = 1, grid_width do
 		colorCache[player][x] = {};
 		statusCache[player][x] = {};
 	end
@@ -168,8 +167,7 @@ end
 
 function isMoveable(x, y, player)
 	local status = getStatus(x, y, player);
-	local i;
-	for i=1,#unmoveableStates do
+	for i = 1, #unmoveableStates do
 		if status == unmoveableStates[i] then
 			return false;
 		end
@@ -178,18 +176,16 @@ function isMoveable(x, y, player)
 end
 
 function getMaxColumnHeight(player, includeUnmoveable)
-	local x;
 	local maxHeight = 0;
-	for x=1,grid_width do
+	for x = 1, grid_width do
 		maxHeight = math.max(getColumnHeight(x, player, includeUnmoveable), maxHeight);
 	end
 	return maxHeight;
 end
 
 function getColumnHeight(x, player, includeUnmoveable)
-	local y;
 	local height = 0;
-	for y=1,grid_height do
+	for y = 1, grid_height do
 		if includeUnmoveable then
 			if getColor(x, y, player) ~= 0x00 then
 				height = height + 1;
@@ -208,8 +204,7 @@ function columnIsEmpty(x, player, includeUnmoveable)
 end
 
 function rowIsEmpty(y, player)
-	local x;
-	for x=1,grid_width do
+	for x = 1, grid_width do
 		if getColor(x, y, player) > 0x00 and isMoveable(x, y, player) then
 			return false;
 		end
@@ -228,9 +223,8 @@ function rowContains(y, color, player)
 end
 
 function countColorInColumn(x, color, player)
-	local y;
 	local count = 0;
-	for y=1,grid_height do
+	for y = 1, grid_height do
 		if getColor(x, y, player) == color then
 			count = count + 1;
 		end
@@ -239,10 +233,9 @@ function countColorInColumn(x, color, player)
 end
 
 function getMostCommonColumn(color, player)
-	local x;
 	local mostCommonX = 0;
 	local mostCommonAmount = -1;
-	for x=1, grid_width do
+	for x = 1, grid_width do
 		local currentAmount = countColorInColumn(x, color, player);
 		if currentAmount > mostCommonAmount then
 			mostCommonX = x;
@@ -276,7 +269,6 @@ function isSortedMode(y, player)
 	};
 
 	local currentColor = -1;
-	local x;
 	for x = 1, grid_width do
 		currentColor = getColor(x, y, player);
 		
@@ -295,7 +287,6 @@ function isSortedMode(y, player)
 end
 
 function findMoveModeSort(player)
-	local x, y;
 	local mostCommonColumns = {
 		[0] = getMostCommonColumn(0, player),
 		getMostCommonColumn(1, player),
@@ -332,7 +323,6 @@ end
 
 function isSorted(y, player)
 	local current = -1;
-	local x;
 	for x = 1, grid_width do
 		if getColor(x, y, player) >= current then
 			current = getColor(x, y, player);
@@ -344,7 +334,6 @@ function isSorted(y, player)
 end
 
 function findMoveSimpleSort(player)
-	local x, y;
 	-- Work from the bottom up
 	for y = grid_height, 1, -1 do
 		if not isSorted(y, player) then
@@ -423,8 +412,8 @@ function check2By3(x, y, player)
 	local brm = isMoveable(x + 1, y + 2, player);
 
 	local moveableArray = {tlm, trm, mlm, mrm, blm, brm};
-	local i;
-	for i=1,#moveableArray do
+
+	for i = 1, #moveableArray do
 		if moveableArray[i] == false then
 			if verbose then
 				print("A block was unmovable, skipping 2x3 check at "..x..","..y.." for player "..player);

@@ -129,9 +129,8 @@ end
 
 local function outputBones(boneArrayBase, numBones)
 	dprint("Bone,X,Y,Z,ScaleX,ScaleY,ScaleZ,");
-	local i;
 	local boneInfoTables = {};
-	for i=0,numBones - 1 do
+	for i = 0, numBones - 1 do
 		local boneInfo = getBoneInfo(boneArrayBase + i * bone_size);
 		table.insert(boneInfoTables, boneInfo);
 		dprint(i..","..boneInfo["positionX"]..","..boneInfo["positionY"]..","..boneInfo["positionZ"]..","..boneInfo["scaleX"]..","..boneInfo["scaleY"]..","..boneInfo["scaleZ"]..",");
@@ -142,7 +141,6 @@ end
 
 local function calculateCompleteBones(boneArrayBase, numberOfBones)
 	local numberOfCompletedBones = numberOfBones;
-	local currentBone;
 	local statisticallySignificantX = {};
 	local statisticallySignificantZ = {};
 	for currentBone = 0, numberOfBones - 1 do
@@ -178,7 +176,7 @@ local function calculateCompleteBones(boneArrayBase, numberOfBones)
 	local stdZ = Stats.standardDeviation(statisticallySignificantZ) * 2.5;
 
 	-- Check for outliers
-	for currentBone = 1,#statisticallySignificantX do
+	for currentBone = 1, #statisticallySignificantX do
 		local diffX = math.abs(meanX - statisticallySignificantX[currentBone]);
 		local diffZ = math.abs(meanZ - statisticallySignificantZ[currentBone]);
 		if diffX > stdX and diffZ > stdZ then

@@ -354,7 +354,6 @@ local kremling_kosh_joypad_angles = {
 };
 
 function getKoshController()
-	local i;
 	for i = 1, #object_pointers do
 		local currentActorType = mainmemory.read_u32_be(object_pointers[i] + actor_type);
 		if type(actor_types[currentActorType]) ~= "nil" then
@@ -367,7 +366,6 @@ function getKoshController()
 end
 
 function countMelonProjectiles()
-	local i;
 	local melonCount = 0;
 	for i = 1, #object_pointers do
 		local currentActorType = mainmemory.read_u32_be(object_pointers[i] + actor_type);
@@ -441,6 +439,8 @@ function koshBotLoop()
 				joypad.set({["B"] = true}, 1);
 				print("Firing!");
 			end
+		else
+			joypad.setanalog({["X Axis"] = false, ["Y Axis"] = false}, 1);
 		end
 	end
 end
@@ -491,7 +491,7 @@ local function focus_object(pointer)
 end
 
 local function encircle_kong()
-	local i, x, z;
+	local x, z;
 
 	local kongObject = mainmemory.read_u24_be(kong_pointer);
 	local kong_x = mainmemory.readfloat(kongObject + x_pos, true);
@@ -626,7 +626,6 @@ local function getExamineData(pointer)
 	elseif currentActorType == "Kremling Kosh Controller" then
 		table.insert(examine_data, { "Current Slot", mainmemory.readbyte(pointer + slot_location) });
 		table.insert(examine_data, { "Melons Remaining", mainmemory.readbyte(pointer + melons_remaining) });
-		local i;
 		for i = 1, 8 do
 			table.insert(examine_data, { "Slot "..i.." pointer", string.format("0x%08x", mainmemory.read_u32_be(pointer + slot_pointer_base + (i - 1) * 4)) });
 		end
@@ -719,7 +718,6 @@ local function draw_gui()
 	if #object_pointers > 0 and object_index <= #object_pointers then
 		if grab_script_mode == "Examine" then
 			local examine_data = getExamineData(object_pointers[object_index]);
-			local i;
 			for i = #examine_data, 1, -1 do
 				if examine_data[i][1] ~= "Separator" then
 					gui.text(gui_x, gui_y + height * row, examine_data[i][1]..": "..examine_data[i][2], nil, nil, 'bottomright');
@@ -731,7 +729,6 @@ local function draw_gui()
 		end
 
 		if grab_script_mode == "List" then
-			local i;
 			for i = #object_pointers, 1, -1 do
 				local currentActorType = mainmemory.read_u32_be(object_pointers[i] + actor_type);
 				if type(actor_types[currentActorType]) ~= "nil" then

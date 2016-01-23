@@ -626,14 +626,14 @@ local function encircle_player()
 	local current_player_x = Game.getXPosition();
 	local current_player_y = Game.getYPosition();
 	local current_player_z = Game.getZPosition();
-	local slot_base, i, x, z;
+	local x, z;
 	local _currentPointers = {};
 
-	num_slots = get_num_slots();
+	local num_slots = get_num_slots();
 	--radius = num_slots * 15;
 
 	-- Populate and sort pointer list
-	for i=0,num_slots - 1 do
+	for i = 0, num_slots - 1 do
 		table.insert(_currentPointers, get_slot_base(i));
 	end
 	table.sort(_currentPointers);
@@ -654,9 +654,8 @@ end
 ------------
 
 function Game.setMap(value)
-	local i;
 	value = value - 1;
-	for i=1,#map_freeze_values do
+	for i = 1, #map_freeze_values do
 		mainmemory.writebyte(map_freeze_values[i], value);
 	end
 end

@@ -2402,16 +2402,14 @@ local flag_array = {
 }
 
 local function fill_flag_names()
-	local i;
-	for i=1,#flag_array do
+	for i = 1, #flag_array do
 		flag_names[i] = flag_array[i]["name"];
 	end
 end
 fill_flag_names();
 
 function isFound(byte, bit)
-	local i;
-	for i=1,#flag_array do
+	for i = 1, #flag_array do
 		if byte == flag_array[i]["byte"] and bit == flag_array[i]["bit"] then
 			return true;
 		end
@@ -2421,15 +2419,15 @@ end
 
 function checkFlags()
 	local flags = mainmemory.read_u24_be(flag_pointer + 1);
-	local i, bit, temp_value;
+	local temp_value;
 	local flag_found = false;
 	local known_flags_found = 0;
 	if flags > 0x700000 and flags < 0x7fffff - flag_block_size then
 		if #flag_block > 0 then
-			for i=0,#flag_block do
+			for i = 0, #flag_block do
 				temp_value = mainmemory.readbyte(flags + i);
 				if flag_block[i] ~= temp_value then
-					for bit=0,7 do
+					for bit = 0, 7 do
 						if get_bit(temp_value, bit) and not get_bit(flag_block[i], bit) then
 							-- Output debug info if the flag isn't known
 							if not isFound(i, bit) then
@@ -2469,8 +2467,8 @@ local function process_flag_queue()
 	if #flag_action_queue > 0 then
 		local flags = mainmemory.read_u24_be(flag_pointer + 1);
 		if flags > 0x700000 and flags < 0x7fffff - flag_block_size then
-			local i, queue_item, current_value;
-			for i=1,#flag_action_queue do
+			local queue_item, current_value;
+			for i = 1, #flag_action_queue do
 				queue_item = flag_action_queue[i];
 				if type(queue_item) == "table" then
 					if queue_item["action_type"] == "set" then
@@ -2503,8 +2501,7 @@ local function process_flag_queue()
 end
 
 local function getFlagByName(flagName)
-	local i;
-	for i=1,#flag_array do
+	for i = 1, #flag_array do
 		if flagName == flag_array[i]["name"] then
 			return flag_array[i];
 		end
@@ -2534,8 +2531,8 @@ end
 function setFlagByType(_type)
 	local num_set = 0;
 	if type(_type) == "string" then
-		local i, flag;
-		for i=1,#flag_array do
+		local flag;
+		for i = 1, #flag_array do
 			if flag_array[i]["type"] == _type then
 				flag = flag_array[i];
 				flag["action_type"] = "set";
@@ -2597,8 +2594,8 @@ end
 function clearFlagByType(_type)
 	local num_cleared = 0;
 	if type(_type) == "string" then
-		local i, flag;
-		for i=1,#flag_array do
+		local flag;
+		for i = 1, #flag_array do
 			if flag_array[i]["type"] == _type then
 				flag = flag_array[i];
 				flag["action_type"] = "clear";
@@ -2648,8 +2645,8 @@ function flagStats(verbose)
 	-- Setting this to true warns the user of flags without types
 	verbose = verbose or false;
 
-	local i, flag, name, flagType;
-	for i=1,#flag_array do
+	local flag, name, flagType;
+	for i = 1, #flag_array do
 		flag = flag_array[i];
 		name = flag["name"];
 		flagType = flag["type"];
@@ -2884,8 +2881,7 @@ function Game.detectVersion(romName)
 
 	-- Read EEPROM checksums
 	if memory.usememorydomain("EEPROM") then
-		local i;
-		for i=1,#eep_checksum_offsets do
+		for i = 1, #eep_checksum_offsets do
 			eep_checksum_values[i] = memory.read_u32_be(eep_checksum_offsets[i]);
 		end
 	end
@@ -3438,8 +3434,7 @@ local function apply_spiking_fix()
 	--local zPos = Game.getZPosition();
 	
 	-- TODO: Set every stored position to these values
-	--local i;
-	--for i=1,#stored_y_addresses do
+	--for i = 1, #stored_y_addresses do
 	--	mainmemory.writefloat(stored_y_addresses[i], yPos, true);
 	--end
 end
@@ -3525,22 +3520,21 @@ function everythingIsKong()
 end
 
 function Game.setScale(value)
-	local i;
-	for i=1,#scale do
+	for i = 1, #scale do
 		mainmemory.writefloat(kong_object + scale[i], value, true);
 	end
 end
 
 function Game.randomEffect()
 	-- Randomly manipulate the effect byte
-	local _randomEffect = math.random(0, 0xffff);
-	mainmemory.write_u16_be(kong_object + effect_byte, _randomEffect);
+	local randomEffect = math.random(0, 0xffff);
+	mainmemory.write_u16_be(kong_object + effect_byte, randomEffect);
 
 	-- Randomly resize the kong
 	local scaleValue = 0.01 + math.random() * 0.49;
 	Game.setScale(scaleValue);
 
-	print("Activated effect: "..bizstring.binary(_randomEffect).." with scale "..scaleValue);
+	print("Activated effect: "..bizstring.binary(randomEffect).." with scale "..scaleValue);
 end
 
 ----------------
@@ -3603,12 +3597,12 @@ local jp_charset = {
 local function toJPString(value)
 	local length = string.len(value);
 	local tempString = "";
-	local i, j, char;
+	local char;
 	local charFound = false;
-	for i=1,length do
+	for i = 1, length do
 		char = bizstring.substring(value, i - 1, 1);
 		charFound = false;
-		for j=1,#jp_charset do
+		for j = 1, #jp_charset do
 			if jp_charset[j] == char then
 				tempString = tempString..string.char(j - 1);
 				charFound = true;
@@ -3649,12 +3643,11 @@ end
 local function do_brb()
 	if is_brb then
 		mainmemory.writebyte(security_byte, 0x01);
-		local i;
-		local message_length = math.min(string.len(brb_message), brb_message_max_length);
-		for i=1,message_length do
+		local messageLength = math.min(string.len(brb_message), brb_message_max_length);
+		for i = 1, messageLength do
 			mainmemory.writebyte(security_message + i - 1, string.byte(brb_message, i));
 		end
-		mainmemory.writebyte(security_message + message_length, 0x00);
+		mainmemory.writebyte(security_message + messageLength, 0x00);
 	end
 end
 
@@ -3667,7 +3660,7 @@ function outputGamesharkCode(bytes, base, skipZeroes)
 	skipZeroes = skipZeroes or false;
 	skippedZeroes = 0;
 	if type(bytes) == "table" and #bytes > 0 and #bytes % 2 == 0 then
-		for i=1,#bytes,2 do
+		for i = 1, #bytes, 2 do
 			if not (skipZeroes and bytes[i] == 0x00 and bytes[i + 1] == 0x00) then
 				dprint("81"..toHexString(base + i - 1, 6, "").." "..toHexString(bytes[i], 2, "")..toHexString(bytes[i + 1], 2, ""));
 			else
@@ -3708,8 +3701,6 @@ function loadASMPatch()
 		print("The code did not compile correctly, check for errors in your source.");
 		return;
 	end
-
-	local i = 0;
 
 	-- Patch the code
 	for i = 1, #code do
@@ -3875,8 +3866,8 @@ function Game.eachFrame()
 
 	-- Check EEPROM checksums
 	if memory.usememorydomain("EEPROM") then
-		local i, checksum_value;
-		for i=1,#eep_checksum_offsets do
+		local checksum_value;
+		for i = 1, #eep_checksum_offsets do
 			checksum_value = memory.read_u32_be(eep_checksum_offsets[i]);
 			if eep_checksum_values[i] ~= checksum_value then
 				if i == 5 then

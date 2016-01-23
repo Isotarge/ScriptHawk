@@ -61,10 +61,9 @@ local function generateBooleanInputs()
 	end
 
 	local chosenInputs = {};
-	local i;
-	for i=0,#booleanInputsReference - 1 do
+	for i = 0,#booleanInputsReference - 1 do
 		chosenInputs[booleanInputsReference[i + 1]] = false;
-		for j=0,#indexes do
+		for j = 0,#indexes do
 			if indexes[j] == i then
 				chosenInputs[booleanInputsReference[i + 1]] = true;
 			end

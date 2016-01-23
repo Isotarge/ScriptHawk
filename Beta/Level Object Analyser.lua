@@ -151,17 +151,15 @@ slot_variables = {
 	[0x17C] = {["Type"] = "Float"}
 };
 
-function fill_blank_variable_slots()
-	local i;
+local function fillBlankVariableSlots()
 	local data_size = 0x04;
-	for i=0, slot_size - data_size, data_size do
+	for i = 0, slot_size - data_size, data_size do
 		if type(slot_variables[i]) == "nil" then
 			slot_variables[i] = {["Type"] = "Z4_Unknown"};
 		end
 	end
 end
-
-fill_blank_variable_slots();
+fillBlankVariableSlots();
 
 local slot_data = {};
 
@@ -172,10 +170,12 @@ local slot_data = {};
 function is_binary(var_type)
 	return var_type == "Byte";
 end
+isBinary = is_binary;
 
 function is_hex(var_type)
 	return var_type == "Pointer" or var_type == "4_Unknown" or var_type == "Z4_Unknown";
 end
+isHex = is_hex;
 
 function toHexString(value)
 	value = string.format("%X", value or 0);
@@ -197,12 +197,14 @@ function format_for_output(var_type, value)
 	end
 	return ""..value;
 end
+formatForOutput = format_for_output;
 
 function is_interesting(variable)
 	local min = get_minimum_value(variable);
 	local max = get_maximum_value(variable);
 	return slot_variables[variable].Type ~= "Z4_Unknown" or min ~= max;
 end
+isInteresting = is_interesting;
 
 ------------
 -- Output --
@@ -210,11 +212,10 @@ end
 
 function output_slot(index)
 	if index > 0 and index < #slot_data then
-		local i;
 		local previous_type = "";
 		local current_slot = slot_data[index + 1];
 		print("Starting output of slot "..index + 1);
-		for i=0,slot_size do
+		for i = 0, slot_size do
 			if type(slot_variables[i]) == "table" then
 				if slot_variables[i].Type ~= "Z4_Unknown" then
 					if slot_variables[i].Type ~= previous_type then
@@ -233,14 +234,15 @@ function output_slot(index)
 		end
 	end
 end
+outputSlot = output_slot;
 
 function output_stats()
 	print("------------------------------");
 	print("-- Starting output of stats --");
 	print("------------------------------");
-	local i, min, max;
+	local min, max;
 	local previous_type = "";
-	for i=0,slot_size do
+	for i = 0, slot_size do
 		if type(slot_variables[i]) == "table" then
 			if is_interesting(i) then
 				min = get_minimum_value(i);
@@ -260,12 +262,12 @@ function output_stats()
 		end
 	end
 end
+outputStats = output_stats;
 
 function format_slot_data()
 	local formatted_data = {};
-	local i;
 	local relative_address, variable_data;
-	for i=1,#slot_data do
+	for i = 1, #slot_data do
 		formatted_data[i] = {};
 		for relative_address, variable_data in pairs(slot_variables) do
 			if type(variable_data) == "table" and is_interesting(relative_address) then
@@ -284,6 +286,7 @@ function format_slot_data()
 	end
 	return formatted_data;
 end
+formatSlotData = format_slot_data;
 
 function json_slots()
 	local json_data = JSON:encode_pretty(format_slot_data());
@@ -296,6 +299,7 @@ function json_slots()
 		print("Error writing to file =(");
 	end
 end
+jsonSlots = json_slots;
 
 --------------
 -- Analysis --
@@ -309,6 +313,7 @@ function find_root(object)
 		count = count + 1;
 	end
 end
+findRoot = find_root;
 
 function resolve_variable_name(name)
 	-- Make sure comparisons are case insensitive
@@ -326,15 +331,15 @@ function resolve_variable_name(name)
 	print("Variable name: '"..name.."' not found =(");
 	return 0x00;
 end
+resolveVariableName = resolve_variable_name;
 
 function get_minimum_value(variable)
 	if type(variable) == "string" then
 		variable = resolve_variable_name(variable);
 	end
 	if type(slot_variables[variable]) == "table" then
-		local i;
 		local min = slot_data[1][variable];
-		for i=1,#slot_data do
+		for i = 1, #slot_data do
 			if slot_data[i][variable] < min then
 				min = slot_data[i][variable];
 			end
@@ -343,15 +348,15 @@ function get_minimum_value(variable)
 	end
 	return 0;
 end
+getMinimumValue = get_minimum_value;
 
 function get_maximum_value(variable)
 	if type(variable) == "string" then
 		variable = resolve_variable_name(variable);
 	end
 	if type(slot_variables[variable]) == "table" then
-		local i;
 		local max = slot_data[1][variable];
-		for i=1,#slot_data do
+		for i = 1, #slot_data do
 			if slot_data[i][variable] > max then
 				max = slot_data[i][variable];
 			end
@@ -360,6 +365,7 @@ function get_maximum_value(variable)
 	end
 	return 0;
 end
+getMaximumValue = get_maximum_value;
 
 function get_all_unique(variable)
 	if type(variable) == "string" then
@@ -367,8 +373,8 @@ function get_all_unique(variable)
 	end
 	if type(slot_variables[variable]) == "table" then
 		local unique_values = {};
-		local i, value, count;
-		for i=1,#slot_data do
+		local value, count;
+		for i = 1, #slot_data do
 			value = format_for_output(slot_variables[variable].Type, slot_data[i][variable]);
 			if type(unique_values[value]) ~= "nil" then
 				unique_values[value] = unique_values[value] + 1;
@@ -384,6 +390,7 @@ function get_all_unique(variable)
 		end
 	end
 end
+getAllUnique = get_all_unique;
 
 function set_all(variable, value)
 	if type(variable) == "string" then
@@ -391,24 +398,25 @@ function set_all(variable, value)
 	end
 	if type(slot_variables[variable]) == "table" then
 		local level_object_array = mainmemory.read_u24_be(level_object_array_pointer + 1);
-		local num_slots = math.min(max_slots, mainmemory.read_u32_be(level_object_array));
+		local numSlots = math.min(max_slots, mainmemory.read_u32_be(level_object_array));
 
-		local i, current_slot_base;
-		for i=0,num_slots - 1 do
-			current_slot_base = get_slot_base(level_object_array, i);
+		local currentSlotBase;
+		for i = 0, numSlots - 1 do
+			currentSlotBase = get_slot_base(level_object_array, i);
 			if slot_variables[variable].Type == "Float" then
 				--print("writing float to slot "..i);
-				mainmemory.writefloat(current_slot_base + variable, value, true);
+				mainmemory.writefloat(currentSlotBase + variable, value, true);
 			elseif is_hex(slot_variables[variable].Type) then
 				--print("writing u32_be to slot "..i);
-				mainmemory.write_u32_be(current_slot_base + variable, value);
+				mainmemory.write_u32_be(currentSlotBase + variable, value);
 			else
 				--print("writing byte to slot "..i);
-				mainmemory.writebyte(current_slot_base + variable, value);
+				mainmemory.writebyte(currentSlotBase + variable, value);
 			end
 		end
 	end
 end
+setAll = set_all;
 
 -------------------
 -- More analysis --
@@ -423,11 +431,10 @@ end
 --get_variables({0x28, 0x2C, 0x30}, condition);
 
 function db_select(variables, slots)
-	local i, j;
 	local current_slot, value;
 	local pulled_data = {};
-	for i=1,#variables do
-		for j=1,#slots do
+	for i = 1, #variables do
+		for j = 1, #slots do
 			current_slot = slot_data[slots[j]];
 			value = current_slot[variables[i]];
 			if pulled_data[variables[i]] == nil then
@@ -438,38 +445,40 @@ function db_select(variables, slots)
 	end
 	return pulled_data;
 end
+dbSelect = db_select;
 
 function db_not(slots)
-	local i, j, slot_found;
-	local matched_slots = {};
-	for i=1,#slot_data do
+	local slot_found;
+	local matchedSlots = {};
+	for i = 1, #slot_data do
 		slot_found = false;
 		if #slots > 0 then
-			for j=1,#slots do
+			for j = 1, #slots do
 				if i == slots[j] then
 					slot_found = true;
 				end
 			end
 		end
 		if not slot_found then
-			table.insert(matched_slots, i);
+			table.insert(matchedSlots, i);
 		end
 	end
-	return matched_slots;
+	return matchedSlots;
 end
+dbNot = db_not;
 
 function db_where(condition)
-	local matched_slots = {};
+	local matchedSlots = {};
 	if condition ~= nil then
-		local i;
-		for i=1,#slot_data do
+		for i = 1, #slot_data do
 			if condition(slot_data[i]) then
-				table.insert(matched_slots, i);
+				table.insert(matchedSlots, i);
 			end
 		end
 	end
-	return matched_slots;
+	return matchedSlots;
 end
+dbWhere = db_where;
 
 ----------------------
 -- Data acquisition --
@@ -478,15 +487,17 @@ end
 function get_slot_base(object_array, index)
 	return object_array + slot_base + index * slot_size;
 end
+getSlotBase = get_slot_base;
 
 function address_to_slot(address)
 	local level_object_array = mainmemory.read_u24_be(level_object_array_pointer + 1);
-	local num_slots = math.min(max_slots, mainmemory.read_u32_be(level_object_array));
+	local numSlots = math.min(max_slots, mainmemory.read_u32_be(level_object_array));
 	local position = address - level_object_array - slot_base;
-	local relative_to_object = position % slot_size;
-	local object_no = math.floor(position / slot_size);
-	print("Object number "..object_no.." address relative "..toHexString(relative_to_object));
+	local relativeToObject = position % slot_size;
+	local objectNumber = math.floor(position / slot_size);
+	print("Object number "..objectNumber.." address relative "..toHexString(relativeToObject));
 end
+addressToSlot = address_to_slot;
 
 function process_slot(slot_base)
 	local current_slot_variables = {};
@@ -504,19 +515,21 @@ function process_slot(slot_base)
 	end
 	return current_slot_variables;
 end
+processSlot = process_slot;
 
 function parse_slot_data()
 	local level_object_array = mainmemory.read_u24_be(level_object_array_pointer + 1);
-	local num_slots = math.min(max_slots, mainmemory.read_u32_be(level_object_array));
+	local numSlots = math.min(max_slots, mainmemory.read_u32_be(level_object_array));
 
 	-- Clear out old data
 	slot_data = {};
 
-	local i, current_slot_base;
-	for i=0,num_slots - 1 do
-		current_slot_base = get_slot_base(level_object_array, i);
-		table.insert(slot_data, process_slot(current_slot_base));
+	local currentSlotBase;
+	for i = 0, numSlots - 1 do
+		currentSlotBase = get_slot_base(level_object_array, i);
+		table.insert(slot_data, process_slot(currentSlotBase));
 	end
 
 	output_stats();
 end
+parseSlotData = parse_slot_data;

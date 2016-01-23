@@ -318,7 +318,6 @@ function Game.detectVersion(romName)
 
 	-- Read EEPROM checksums
 	if memory.usememorydomain("EEPROM") then
-		local i;
 		for i = 1, #eep_checksum_offsets do
 			eep_checksum_values[i] = memory.read_u32_be(eep_checksum_offsets[i]);
 		end
@@ -562,7 +561,6 @@ local sandcastleStringConversionTable = {
 
 function decodeSandcastleString(base, length, nullTerminate)
 	nullTerminate = nullTerminate or false;
-	local i;
 	local builtString = "";
 	for i = base, base + length do
 		local byte = mainmemory.readbyte(i);
@@ -750,9 +748,8 @@ local function updateWave()
 	if waving then
 		wave_counter = wave_counter + 1;
 		if wave_counter == wave_delay then
-			local i;
 			local vile_state = mainmemory.read_u24_be(object_array_pointer + 1);
-			for i=1,#waveFrames[wave_frame] do
+			for i = 1, #waveFrames[wave_frame] do
 				fireSlot(vile_state, getSlotIndex(waveFrames[wave_frame][i][1], waveFrames[wave_frame][i][2]), wave_colour);
 			end
 			wave_counter = 0;
@@ -766,20 +763,16 @@ end
 
 local function doHeart()
 	local vile_state = mainmemory.read_u24_be(object_array_pointer + 1);
-	local i;
-
 	local colour = math.random(0, 1);
-	for i=1,#heart do
+	for i = 1, #heart do
 		fireSlot(vile_state, getSlotIndex(heart[i][1], heart[i][2]), colour);
 	end
 end
 
 local function fireAllSlots()
 	local vile_state = mainmemory.read_u24_be(object_array_pointer + 1);
-	local i;
-
 	local colour = math.random(0, 1);
-	for i=1,number_of_slots do
+	for i = 1, number_of_slots do
 		fireSlot(vile_state, i, colour);
 	end
 end
@@ -855,8 +848,6 @@ local function get_slot_base(index)
 end
 
 local function encircle_banjo()
-	local i, x, z;
-
 	local current_banjo_x = Game.getXPosition();
 	local current_banjo_y = Game.getYPosition();
 	local current_banjo_z = Game.getZPosition();
@@ -877,6 +868,7 @@ local function encircle_banjo()
 	table.sort(currentPointers);
 
 	-- Iterate and set position
+	local x, z;
 	for i = 1, #currentPointers do
 		x = current_banjo_x + math.cos(math.pi * 2 * i / #currentPointers) * radius;
 		z = current_banjo_z + math.sin(math.pi * 2 * i / #currentPointers) * radius;
@@ -1112,7 +1104,7 @@ function Game.eachFrame()
 
 	-- Check EEPROM checksums
 	if memory.usememorydomain("EEPROM") then
-		local i, checksum_value;
+		local checksum_value;
 		for i=1,#eep_checksum_offsets do
 			checksum_value = memory.read_u32_be(eep_checksum_offsets[i]);
 			if eep_checksum_values[i] ~= checksum_value then

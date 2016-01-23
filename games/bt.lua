@@ -428,13 +428,11 @@ local slope_timer = 0x38;
 local y_velocity = 0x14;
 
 local function getPlayerObject()
-	local playerFound = false;
-	local i;
-
 	-- Get first object in linked list
 	local objectBase = resolvePointer(linked_list_root, next_item);
 
 	-- Iterate through linked list looking for pointer list that matches a known template
+	local playerFound = false;
 	while not playerFound and isPointer(objectBase) do
 		-- Check if current linked list object has pointers in the correct spots
 		local slopeObjectPointer = resolvePointer(objectBase, slope_pointer_index);
