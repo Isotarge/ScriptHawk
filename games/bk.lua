@@ -424,9 +424,15 @@ local movementStates = {
 	[68] = "Jiggy Jig",
 	[69] = "Slipping", -- Talon Trot
 
+	[72] = "Idle", -- Pumpkin
+	[73] = "Walking", -- Pumpkin
+	[74] = "Jumping", -- Pumpkin
+	[75] = "Falling", -- Pumpkin
 	[76] = "Landing", -- In water
-
+	[77] = "Damaged" -- Pumpkin
+	[78] = "Death", -- Pumpkin
 	[79] = "Idle", -- Holding tree, pole, etc.
+
 	[80] = "Climbing", -- Tree, pole, etc.
 
 	[85] = "Slipping", -- Wading Boots
@@ -439,7 +445,7 @@ local movementStates = {
 	[95] = "Walking", -- Croc
 	[96] = "Jumping", -- Croc
 	[97] = "Falling", -- Croc
-	[99] = "Knockback", -- Croc
+	[99] = "Knockback", -- Croc TODO: Damage? if so rename to damaged
 
 	[103] = "Idle", -- Walrus
 	[104] = "Walking", -- Walrus
@@ -447,7 +453,6 @@ local movementStates = {
 	[106] = "Falling", -- Walrus
 	[108] = "Knockback", -- Walrus
 	[109] = "Death", -- Walrus
-
 	[110] = "Biting", -- Croc
 
 	[113] = "Falling", -- Talon Trot
@@ -468,11 +473,13 @@ local movementStates = {
 	[140] = "Flying", -- Bee
 	[141] = "Locked", -- Mumbo transformation, Mr. Vile
 	[142] = "Locked", -- Jiggy podium, Bottles' text outside Mumbo's
+	[147] = "Locked", -- Pumpkin?
 	[148] = "Locked", -- Mumbo transformation
 	[149] = "Locked", -- Walrus?
 
 	[152] = "Locked", -- Loading zone, Mumbo transformation
 	[157] = "Locked", -- Bee?
+	[160] = "Knockback", -- Pumpkin, not damaged
 	[162] = "Knockback", -- Walrus, not damaged
 	[163] = "Knockback", -- Bee, not damaged
 };
