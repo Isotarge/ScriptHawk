@@ -78,7 +78,7 @@ local eep_checksum_values = {
 	0x00000000
 }
 
-Game.maps = {
+Game.maps = { -- TODO: These values don't work properly in some places for PAL, likely other versions too
 	"SM - Spiral Mountain",
 	"MM - Mumbo's Mountain",
 	"Unknown 0x03",
@@ -359,18 +359,19 @@ end
 --------------------
 
 local movementStates = {
+	[0] = "Null",
 	[1] = "Idle",
 	[2] = "Walking", -- Slow
 	[3] = "Walking",
 	[4] = "Walking", -- Fast
-
 	[5] = "Jumping",
 	[6] = "Bear punch",
 	[7] = "Crouching",
 	[8] = "Jumping", -- Talon Trot
+	[9] = "Shooting Egg",
+	[10] = "Pooping Egg",
 
 	[12] = "Skidding",
-
 	[14] = "Knockback",
 	[15] = "Beak Buster",
 	[16] = "Feathery Flap",
@@ -380,46 +381,92 @@ local movementStates = {
 
 	[20] = "Entering Talon Trot",
 	[21] = "Idle", -- Talon Trot
-	[22] = "Moving", -- Talon Trot
+	[22] = "Walking", -- Talon Trot
 	[23] = "Leaving Talon Trot",
 
 	[26] = "Entering Wonderwing",
 	[27] = "Idle", -- Wonderwing
-	[28] = "Moving", -- Wonderwing
+	[28] = "Walking", -- Wonderwing
 	[29] = "Jumping", -- Wonderwing
 	[30] = "Leaving Wonderwing",
 
 	[31] = "Creeping",
 	[32] = "Landing", -- After Jump
-
+	[33] = "Charging Shock Spring Jump",
+	[34] = "Shock Spring Jump",
+	[35] = "Taking Flight",
+	[36] = "Flying",
 	[37] = "Entering Wading Boots",
 	[38] = "Idle", -- Wading Boots
-	[39] = "Moving", -- Wading Boots
+	[39] = "Walking", -- Wading Boots
+
 	[40] = "Jumping", -- Wading Boots
 	[41] = "Leaving Wading Boots",
+	[42] = "Beak Bomb",
+	[43] = "Idle", -- Underwater
+	[44] = "Swimming (B)",
+	[45] = "Idle", -- Treading water
+	[46] = "Paddling",
 
-	[47] = "Landing", -- With peck? -- TODO
+	[47] = "Falling", -- After pecking
+	[48] = "Diving",
 
 	[49] = "Rolling",
-
 	[50] = "Slipping",
-	[69] = "Slipping", -- Talon Trot
-	[85] = "Slipping", -- Wading Boots
 
-	[90] = "Loading zone?", -- TODO
+	[53] = "Idle", -- Termite
+	[54] = "Walking", -- Termite
+	[55] = "Jumping", -- Termite
+	[56] = "Falling", -- Termite
+	[57] = "Swimming (A)",
+
+	[62] = "Knockback", -- Termite
+
+	[65] = "Death",
+	[68] = "Jiggy Jig",
+	[69] = "Slipping", -- Talon Trot
+
+	[76] = "Landing", -- In water
+
+	[79] = "Idle", -- Holding tree, pole, etc.
+	[80] = "Climbing", -- Tree, pole, etc.
+
+	[85] = "Slipping", -- Wading Boots
+	[86] = "Knockback", -- Successful enemy damage
+	[87] = "Beak Bomb", -- Ending
+
+	[90] = "Loading Zone",
 
 	[94] = "Idle", -- Croc
-	[95] = "Moving", -- Croc
+	[95] = "Walking", -- Croc
 	[96] = "Jumping", -- Croc
-	[97] = "Falling", -- Croc -- TODO: Verify
+	[97] = "Falling", -- Croc
 	[99] = "Knockback", -- Croc
+
+	[103] = "Idle", -- Walrus
+	[104] = "Walking", -- Walrus
+	[105] = "Jumping", -- Walrus
+	[106] = "Falling", -- Walrus
+	[108] = "Knockback", -- Walrus
+	[109] = "Death", -- Walrus
+
 	[110] = "Biting", -- Croc
 
+	[113] = "Falling", -- Talon Trot
+	[114] = "Recovering", -- Getting up after taking damage, eg. fall famage
 	[115] = "Locked", -- Cutscene? -- TODO
 	[116] = "Locked", -- Jiggy pad, Mumbo transformation, Bottles
+
+	[121] = "Locked", -- Holding Jiggy, Talon Trot
+	[123] = "Knockback", -- Talon Trot
+
 	[141] = "Locked", -- Mumbo transformation, Mr. Vile
+	[142] = "Locked", -- Jiggy podium, Bottles' text outside Mumbo's
 	[148] = "Locked", -- Mumbo transformation
+	[149] = "Locked", -- Walrus?
+
 	[152] = "Locked", -- Loading zone, Mumbo transformation
+	[162] = "Knockback", -- Walrus
 };
 
 function getCurrentMovementState()

@@ -84,8 +84,8 @@ SystemID N64
 37C0BC	d	f	1	RDRAM	Turbo Trainers Timer (copy)
 37C0C0	d	f	1	RDRAM	Unknown Float (Beak Buster?)
 37C0C4	d	f	1	RDRAM	Unknown Float (Beak Buster?)
-37C0E0	d	h	1	RDRAM	Banjo Model Pointer?
-37C0E6	b	u	1	RDRAM	Banjo Transparancy
+37C0E0	d	h	1	RDRAM	Player Model Pointer?
+37C0E6	b	u	1	RDRAM	Player Transparancy
 37C0EC	d	f	1	RDRAM	Player Scale
 37C1D1	b	u	1	RDRAM	Standing on Fly Pad
 37C1D2	b	u	1	RDRAM	Standing on Shock Spring Pad

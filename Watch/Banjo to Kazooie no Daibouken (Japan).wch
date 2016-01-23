@@ -9,8 +9,8 @@ SystemID N64
 37CBB4	d	f	1	RDRAM	Wading Boots Timer (copy)
 37CBB8	d	f	1	RDRAM	Turbo Trainers Timer
 37CBBC	d	f	1	RDRAM	Turbo Trainers Timer (copy)
-37CBE6	b	u	1	RDRAM	Banjo Transparancy
-37CBEC	d	f	1	RDRAM	Banjo Scale
+37CBE6	b	u	1	RDRAM	Player Transparancy
+37CBEC	d	f	1	RDRAM	Player Scale
 37CCD1	b	u	1	RDRAM	Standing on Fly Pad
 37CCD2	b	u	1	RDRAM	Standing on Shock Spring Pad
 37CCD3	b	u	1	RDRAM	Mumbo Transformation
