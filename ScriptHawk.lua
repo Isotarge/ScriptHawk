@@ -527,7 +527,12 @@ function updateUIReadouts_ScriptHawk()
 		gui.text(gui_x_offset, gui_y_offset + row_height * row, "Rot Y: "..formatRotation(rot_y));
 		row = row + 1;
 		gui.text(gui_x_offset, gui_y_offset + row_height * row, "Rot Z: "..formatRotation(rot_z));
-		row = row + 1;
+		row = row + 2;
+	end
+
+	if type(getCurrentMovementState) == "function" then -- Currently used by BK
+		gui.text(gui_x_offset, gui_y_offset + row_height * row, "Movement: "..getCurrentMovementState());
+		row = row + 2;
 	end
 end
 
