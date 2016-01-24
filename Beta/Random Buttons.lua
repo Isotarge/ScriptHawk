@@ -4,7 +4,7 @@ local function pickRandomUniqueIndex(reference, alreadyChosen)
 	while not indexFound do
 		index = math.random(#reference);
 		indexFound = true;
-		for i=0,#alreadyChosen do
+		for i = 0, #alreadyChosen do
 			if index == alreadyChosen[i] then
 				indexFound = false;
 				break;

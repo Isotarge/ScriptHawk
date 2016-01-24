@@ -418,6 +418,7 @@ local movementStates = {
 	[56] = "Falling", -- Termite
 	[57] = "Swimming (A)",
 
+	[61] = "Falling", -- Tumbling, will take damage
 	[62] = "Damaged", -- Termite
 
 	[65] = "Death",
@@ -463,6 +464,7 @@ local movementStates = {
 	[114] = "Recovering", -- Getting up after taking damage, eg. fall famage
 	[115] = "Locked", -- Cutscene? -- TODO
 	[116] = "Locked", -- Jiggy pad, Mumbo transformation, Bottles
+	[117] = "Locked", -- Bottles
 
 	[121] = "Locked", -- Holding Jiggy, Talon Trot
 	[122] = "Creeping", -- In damaging water etc
@@ -503,6 +505,18 @@ function getCurrentMovementState()
 	end
 	return "Unknown ("..currentMovementState..")";
 end
+
+local options_autopound_checkbox;
+function autoPound()
+	if forms.ischecked(options_autopound_checkbox) then
+		local currentMovementState = mainmemory.read_u32_be(current_movement_state);
+		local YVelocity = Game.getYVelocity();
+		if currentMovementState == 17 and YVelocity == -272 and not Game.isPhysicsFrame() then
+			joypad.set({["Z"] = true}, 1);
+		end
+	end
+end
+event.onframestart(autoPound, "ScriptHawk - Auto Pound");
 
 --------------------------
 -- Sandcastle positions --
@@ -1104,6 +1118,7 @@ function Game.initUI(form_handle, col, row, button_height, label_offset, dropdow
 	encircle_checkbox = forms.checkbox(form_handle, "Encircle (Beta)", col(5) + dropdown_offset, row(4) + dropdown_offset);
 	dynamic_radius_checkbox = forms.checkbox(form_handle, "Dynamic Radius", col(5) + dropdown_offset, row(5) + dropdown_offset);
 	options_pulse_clip_velocity = forms.checkbox(form_handle, "Pulse Clip Vel.", col(5) + dropdown_offset, row(6) + dropdown_offset);
+	options_autopound_checkbox = forms.checkbox(form_handle, "Auto Pound", col(10) + dropdown_offset, row(6) + dropdown_offset);
 
 	-- Vile
 	options_wave_button =     forms.button(form_handle, "Wave", initWave,         col(10), row(4), col(2), button_height);
