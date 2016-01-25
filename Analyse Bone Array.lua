@@ -223,4 +223,4 @@ local function mainLoop()
 	end
 end
 
-event.onframestart(mainLoop, "Analyse Bone Array");
+event.onframestart(mainLoop, "ScriptHawk - Analyse bone array");

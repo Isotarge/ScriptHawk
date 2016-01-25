@@ -99,4 +99,4 @@ local function randomPress()
 	end
 end
 
-event.onframestart(randomPress, "Random press");
+event.onframestart(randomPress, "ScriptHawk - Random button presser");

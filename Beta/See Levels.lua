@@ -12,4 +12,4 @@ local function fillMinimap()
 	end
 end
 
-event.onframestart(fillMinimap, "Fill Minimap");
+event.onframestart(fillMinimap, "ScriptHawk - Fill minimap");

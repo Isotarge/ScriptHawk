@@ -445,7 +445,7 @@ function koshBotLoop()
 	end
 end
 
---event.onframestart(koshBotLoop, "Kremling Kosh Bot");
+--event.onframestart(koshBotLoop, "ScriptHawk - Kremling Kosh Bot");
 
 -- Keybinds
 -- For full list go here http://slimdx.org/docs/html/T_SlimDX_DirectInput_Key.htm
@@ -803,5 +803,5 @@ local function pull_objects()
 	draw_gui();
 end
 
-event.onframestart(pull_objects, "Evaluate Object Pointer List");
-event.onframestart(process_input, "Grab Object Keybinds");
+event.onframestart(pull_objects, "ScriptHawk - Evaluate actor list");
+event.onframestart(process_input, "ScriptHawk - Actor list keybinds");

@@ -66,4 +66,4 @@ local function checkForMovementErrors()
 	previousXPosition = currentXPosition;
 end
 
-event.onframestart(checkForMovementErrors, "Check for movement errors");
+event.onframestart(checkForMovementErrors, "ScriptHawk - Check for movement errors");

@@ -1,5 +1,8 @@
+-- Plays around on the Lord of the Sword (UE) (SMS) menu
+-- Written by Isotarge, 2015
+
 local titleScreenLength = mainmemory.read_u16_le(0x104);
-local mapStatus = mainmemory.readbyte(0xa0);
+local mapStatus = mainmemory.readbyte(0xA0);
 
 local frame = 0;
 local distance = 1;
@@ -8,7 +11,7 @@ local input = true;
 
 local function isOnTitleScreen()
 	titleScreenLength = mainmemory.read_u16_le(0x104);
-	mapStatus = mainmemory.readbyte(0xa0);
+	mapStatus = mainmemory.readbyte(0xA0);
 	return mapStatus == 0x03 and titleScreenLength > 0 and not emu.islagged();
 end
 
@@ -29,4 +32,4 @@ local function do_menu()
 	end
 end
 
-event.onframeend(do_menu, "menu");
+event.onframeend(do_menu, "ScriptHawk - LOTS menu");

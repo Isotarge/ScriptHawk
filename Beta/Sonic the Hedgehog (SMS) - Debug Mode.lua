@@ -54,4 +54,4 @@ debugCheck = forms.checkbox(formhandle, "Debug On", 50, 50);
 button_increment_speed = forms.button(formhandle, "+", increment_speed, 50, 70, 20, 20);
 button_decrement_speed = forms.button(formhandle, "-", decrement_speed, 150, 70, 20, 20);
 
-event.onframestart(debug, "Debug Mode");
+event.onframestart(debug, "ScriptHawk - Debug Mode");

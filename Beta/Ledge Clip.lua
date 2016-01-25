@@ -1,7 +1,7 @@
 -- DK64 C-Upless ledge clip angle/position finder
 -- Written by Isotarge, 2015
 
-local kong_object_pointer = 0x7fbb4d;
+local kong_object_pointer = 0x7fbb4d; -- TODO: Port to other versions
 
 -- Relative to kong object
 local x_pos = 0x7c;
@@ -71,7 +71,7 @@ local function plot_pos()
 			end
 
 			-- Check to see if the ledge was grabbed
-			for i=1,#ledgegrab_angles do
+			for i = 1, #ledgegrab_angles do
 				if currentAngle >= ledgegrab_angles[i][1] and currentAngle < ledgegrab_angles[i][2] then
 					currentAngle = ledgegrab_angles[i][2];
 				end
@@ -99,4 +99,4 @@ local function plot_pos()
 	end
 end
 
-event.onframestart(plot_pos, "Ledge Clip");
+event.onframestart(plot_pos, "ScriptHawk - Ledge clip finder");

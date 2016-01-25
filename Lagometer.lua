@@ -21,7 +21,7 @@ local previous = {};
 
 local function shufflePrevious()
 	local temp = {};
-	for i=2,#previous do
+	for i = 2, #previous do
 		temp[i - 1] = previous[i];
 	end
 	previous = temp;
@@ -29,14 +29,14 @@ end
 
 local function getHighestLagCount()
 	local highest = 0;
-	for i=1,#previous do
+	for i = 1, #previous do
 		highest = math.max(highest, previous[i].lag);
 	end
 	return highest;
 end
 
 local function recalculateRatios()
-	for i=1,#previous do
+	for i = 1, #previous do
 		if previous[i].mode == "vframe" then
 			previous[i].ratio = math.min(1, math.max(0, previous[i].lag - 1) / math.max(1, redzone));
 		end
@@ -204,7 +204,7 @@ local function drawGraphicalRepresentation()
 	local gui_y = 8;
 	local column = 0;
 
-	for i=#previous,1,-1 do
+	for i = #previous, 1, -1 do
 		if previous[i].mode == "vframe" then
 			gui.drawText(gui_x + width * column, gui_y, previous[i].lag - 1);
 		else
@@ -271,4 +271,4 @@ local function mainloop()
 	drawGraphicalRepresentation();
 end
 
-event.onframestart(mainloop, "Lagometer");
+event.onframestart(mainloop, "ScriptHawk - Lagometer");
