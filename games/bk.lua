@@ -15,8 +15,7 @@ local x_vel;
 local y_vel;
 local z_vel;
 
--- Velocity required to clip on the Y axis
-local clip_vel = -3500;
+local clip_vel = -3500; -- Velocity required to clip on the Y axis
 
 local x_pos;
 local y_pos;
@@ -418,6 +417,8 @@ local movementStates = {
 	[56] = "Falling", -- Termite
 	[57] = "Swimming (A)",
 
+	[58] = "Idle", -- Carrying object (eg. Orange)
+	[59] = "Walking", -- Carrying object (eg. Orange)
 	[61] = "Falling", -- Tumbling, will take damage
 	[62] = "Damaged", -- Termite
 
@@ -436,6 +437,7 @@ local movementStates = {
 
 	[80] = "Climbing", -- Tree, pole, etc.
 	[81] = "Leaving Climb",
+	[83] = "Tumblar", -- Standing on Tumblar
 
 	[84] = "Death", -- Drowning
 	[85] = "Slipping", -- Wading Boots
@@ -444,6 +446,7 @@ local movementStates = {
 	[89] = "Damaged", -- Beak Bomb
 
 	[90] = "Loading Zone",
+	[91] = "Throwing", -- Throwing object (eg. Orange)
 
 	[94] = "Idle", -- Croc
 	[95] = "Walking", -- Croc
@@ -468,7 +471,7 @@ local movementStates = {
 
 	[121] = "Locked", -- Holding Jiggy, Talon Trot
 	[122] = "Creeping", -- In damaging water etc
-	[123] = "Knockback", -- Talon Trot
+	[123] = "Damaged", -- Talon Trot
 	[127] = "Damaged", -- Swimming
 
 	[133] = "Idle", -- Bee
@@ -498,12 +501,24 @@ local movementStates = {
 	[163] = "Knockback", -- Bee, not damaged
 };
 
-function getCurrentMovementState()
+function Game.getCurrentMovementState()
 	local currentMovementState = mainmemory.read_u32_be(current_movement_state);
 	if type(movementStates[currentMovementState]) ~= "nil" then
 		return movementStates[currentMovementState];
 	end
 	return "Unknown ("..currentMovementState..")";
+end
+
+function Game.colorCurrentMovementState()
+	local currentMovementState = mainmemory.read_u32_be(current_movement_state);
+	local stringMovementState = Game.getCurrentMovementState();
+	if stringMovementState == "Slipping" or stringMovementState == "Skidding" or stringMovementState == "Recovering" or stringMovementState == "Knockback" then
+		return 0xFFFFFF00; -- Yellow
+	end
+	if stringMovementState == "Damaged" or stringMovementState == "Death" then
+		return 0xFFFF0000; -- Red
+	end
+	return 0xFFFFFFFF; -- White
 end
 
 local options_autopound_checkbox;
@@ -676,7 +691,7 @@ function doFFHelp()
 		gui.drawText(ui_ff_x, ui_ff_y_base + ui_ff_answer_height * correctAnswer, "ya"..correctAnswer);
 	end
 end
---event.onframestart(doFFHelp, "FF Helper");
+--event.onframestart(doFFHelp, "ScriptHawk - Furnace Fun helper");
 
 ----------------------
 -- Vile state stuff --
@@ -982,6 +997,10 @@ function Game.getYRotation()
 	return mainmemory.readfloat(moving_angle, true);
 end
 
+function Game.getFacingAngle()
+	return mainmemory.readfloat(facing_angle, true);
+end
+
 function Game.getZRotation()
 	return mainmemory.readfloat(z_rot, true);
 end
@@ -1015,6 +1034,13 @@ end
 
 function Game.getYVelocity()
 	return mainmemory.readfloat(y_vel, true);
+end
+
+function Game.colorYVelocity()
+	if Game.getYVelocity() <= clip_vel then
+		return 0xFF00FF00; -- Green
+	end
+	return 0xFFFFFFFF; -- White
 end
 
 function Game.getZVelocity()
@@ -1067,7 +1093,11 @@ function CCBot()
 	end
 end
 
---event.onframestart(CCBot, "CCBot");
+--event.onframestart(CCBot, "ScriptHawk - Clanker's Cavern early bot");
+
+-------------------------
+-- Pulse Clip Velocity --
+-------------------------
 
 local options_pulse_clip_velocity;
 local pulseClipVelocityCounter = 0;
@@ -1076,7 +1106,7 @@ pulseClipVelocityInterval = 5;
 function pulseClipVelocity()
 	pulseClipVelocityCounter = pulseClipVelocityCounter + 1;
 	local currentVelocity = Game.getYVelocity();
-	if forms.ischecked(options_pulse_clip_velocity) and pulseClipVelocityCounter >= pulseClipVelocityInterval and y >= 5 and currentVelocity > clip_vel then
+	if forms.ischecked(options_pulse_clip_velocity) and pulseClipVelocityCounter >= pulseClipVelocityInterval and Game.getYPosition() >= 5 and currentVelocity > clip_vel then
 		Game.setYVelocity(clip_vel);
 		pulseClipVelocityCounter = 0;
 	end
@@ -1148,7 +1178,7 @@ function Game.eachFrame()
 	-- Check EEPROM checksums
 	if memory.usememorydomain("EEPROM") then
 		local checksum_value;
-		for i=1,#eep_checksum_offsets do
+		for i = 1, #eep_checksum_offsets do
 			checksum_value = memory.read_u32_be(eep_checksum_offsets[i]);
 			if eep_checksum_values[i] ~= checksum_value then
 				print("Slot "..i.." Checksum: "..toHexString(eep_checksum_values[i]).." -> "..toHexString(checksum_value));
@@ -1158,5 +1188,29 @@ function Game.eachFrame()
 	end
 	memory.usememorydomain("RDRAM");
 end
+
+Game.OSDPosition = {2, 70}
+Game.OSD = {
+	{"X", Game.getXPosition},
+	{"Y", Game.getYPosition},
+	{"Z", Game.getZPosition},
+	{"Separator", 1},
+	{"dY"},
+	{"dXZ"},
+	{"X Velocity", Game.getXVelocity},
+	{"Y Velocity", Game.getYVelocity, Game.colorYVelocity},
+	{"Z Velocity", Game.getZVelocity},
+	{"Separator", 1},
+	{"Max dY"},
+	{"Max dXZ"},
+	{"Odometer"},
+	{"Separator", 1},
+	{"Facing", Game.getFacingAngle},
+	{"Moving", Game.getYRotation},
+	{"Rot. X", Game.getXRotation},
+	{"Rot. Z", Game.getZRotation},
+	{"Separator", 1},
+	{"Movement", Game.getCurrentMovementState, Game.colorCurrentMovementState},
+};
 
 return Game;

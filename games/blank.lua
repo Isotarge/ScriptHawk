@@ -121,4 +121,22 @@ function Game.eachFrame()
 	-- TODO
 end
 
+Game.OSDPosition = {2, 70}
+Game.OSD = {
+	{"X", Game.getXPosition},
+	{"Y", Game.getYPosition},
+	{"Z", Game.getZPosition},
+	{"Separator", 1},
+	{"dY"},
+	{"dXZ"},
+	{"Separator", 1},
+	{"Max dY"},
+	{"Max dXZ"},
+	{"Odometer"},
+	{"Separator", 1},
+	{"Rot. X", Game.getXRotation},
+	{"Facing", Game.getYRotation},
+	{"Rot. Z", Game.getZRotation},
+};
+
 return Game;

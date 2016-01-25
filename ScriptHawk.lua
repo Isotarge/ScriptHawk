@@ -159,10 +159,6 @@ current_frame = emu.framecount();
 previous_map = "";
 previous_map_value = 0;
 
-x = 0.0;
-y = 0.0;
-z = 0.0;
-
 dx = 0.0;
 dy = 0.0;
 dz = 0.0;
@@ -371,11 +367,6 @@ local dropdown_offset = 1;
 local long_label_width = 140;
 local button_height = 23;
 
--- OSD
-local gui_x_offset = 32;
-local gui_y_offset = 32;
-local row_height = 16;
-
 local function row(row_num)
 	return round(form_padding + button_height * row_num, 0);
 end
@@ -414,7 +405,7 @@ form_controls["Toggle Rotation Units Button"] = forms.button(options_form, rotat
 Game.initUI(options_form, col, row, button_height, label_offset, dropdown_offset);
 
 local function findMapValue()
-	for i=1,#Game.maps do
+	for i = 1, #Game.maps do
 		if Game.maps[i] == previous_map then
 			return i;
 		end
@@ -422,10 +413,41 @@ local function findMapValue()
 	return 0;
 end
 
--- TODO: More dynamic OSD code, maybe have the game module set it up rather than this mess
--- OSDFunctions table
--- OSDLabels table
--- Separator etc
+-- Check for missing OSD definitions
+if type(Game.OSD) ~= "table" then
+	Game.OSD = {
+		{"X", Game.getXPosition},
+		{"Y", Game.getYPosition},
+		{"Z", Game.getZPosition},
+		{"Separator", 1},
+		{"dY"},
+		{"dXZ"},
+		{"Separator", 1},
+		{"Max dY"},
+		{"Max dXZ"},
+		{"Odometer"},
+		{"Separator", 1},
+		{"Rot. X", Game.getXRotation},
+		{"Facing", Game.getYRotation},
+		{"Rot. Z", Game.getZRotation},
+	};
+end
+
+if type(Game.OSDPosition) ~= "table" then
+	Game.OSDPosition = {2, 70};
+end
+
+if type(Game.OSDRowHeight) ~= "number" then
+	Game.OSDRowHeight = 16;
+end
+
+local angleKeywords = {
+	"Rot X", "Rot Y", "Rot Z", "Rot",
+	"Rot. X", "Rot. Y", "Rot. Z", "Rot.",
+	"Rotation X", "Rotation Y", "Rotation Z", "Rotation",
+	"Facing", "Moving", "Angle"
+};
+
 function updateUIReadouts_ScriptHawk()
 	-- Update form buttons etc
 	forms.settext(form_controls["Speed Value Label"], Game.speedy_speeds[Game.speedy_index]);
@@ -439,98 +461,61 @@ function updateUIReadouts_ScriptHawk()
 
 	-- Draw OSD
 	local row = 0;
+	local OSDX = Game.OSDPosition[1];
+	local OSDY = Game.OSDPosition[2];
 
-	if type(x) == "number" and type(y) == "number" and type(z) == "number" then
-		gui.text(gui_x_offset, gui_y_offset + row_height * row, "X: "..(round(x, precision) or 0));
-		row = row + 1;
-		gui.text(gui_x_offset, gui_y_offset + row_height * row, "Y: "..(round(y, precision) or 0));
-		row = row + 1;
-		gui.text(gui_x_offset, gui_y_offset + row_height * row, "Z: "..(round(z, precision) or 0));
-		row = row + 2;
-		if type(Game.getFloor) == "function" then
-			gui.text(gui_x_offset, gui_y_offset + row_height * row, "Floor: "..round(Game.getFloor(), precision));
-			row = row + 2;
-		end
-	end
+	for i = 1, #Game.OSD do
+		local label = Game.OSD[i][1];
+		local value = Game.OSD[i][2];
+		local color = Game.OSD[i][3];
 
-	if type(dy) == "number" and type(d) == "number" then
-		gui.text(gui_x_offset, gui_y_offset + row_height * row, "dY:  "..(round(dy, precision) or 0));
-		row = row + 1;
-		gui.text(gui_x_offset, gui_y_offset + row_height * row, "dXZ: "..(round(d, precision) or 0));
-		row = row + 1;
-		if type(Game.getSpinTimer) == "function" then
-			row = row + 1;
-			gui.text(gui_x_offset, gui_y_offset + row_height * row, "Spin Timer: "..Game.getSpinTimer());
-			row = row + 1;
+		-- Detect special keywords
+		if label == "dY" or label == "DY" then
+			value = dy or 0;
 		end
-		if type(Game.getBoost) == "function" then
-			gui.text(gui_x_offset, gui_y_offset + row_height * row, "Boost: "..Game.getBoost());
-			row = row + 1;
+		if label == "dXZ" or label == "DXZ" then
+			value = d or 0;
 		end
-		if type(Game.getVelocity) == "function" then
-			gui.text(gui_x_offset, gui_y_offset + row_height * row, "Velocity: "..round(Game.getVelocity(), precision));
-			row = row + 1;
-		end
-		if type(Game.getAcceleration) == "function" then
-			gui.text(gui_x_offset, gui_y_offset + row_height * row, "Accel: "..round(Game.getAcceleration(), precision));
-			row = row + 1;
-		end
-		if type(Game.getXVelocity) == "function" then
-			gui.text(gui_x_offset, gui_y_offset + row_height * row, "X Velocity: "..round(Game.getXVelocity(), precision));
-			row = row + 1;
-		end
-		if type(Game.getXAcceleration) == "function" then
-			gui.text(gui_x_offset, gui_y_offset + row_height * row, "X Accel: "..round(Game.getXAcceleration(), precision));
-			row = row + 1;
-		end
-		if type(Game.getYVelocity) == "function" then
-			gui.text(gui_x_offset, gui_y_offset + row_height * row, "Y Velocity: "..round(Game.getYVelocity(), precision));
-			row = row + 1;
-		end
-		if type(Game.getYAcceleration) == "function" then
-			gui.text(gui_x_offset, gui_y_offset + row_height * row, "Y Accel: "..round(Game.getYAcceleration(), precision));
-			row = row + 1;
-		end
-		if type(Game.getZVelocity) == "function" then
-			gui.text(gui_x_offset, gui_y_offset + row_height * row, "Z Velocity: "..round(Game.getZVelocity(), precision));
-			row = row + 1;
-		end
-		if type(Game.getZAcceleration) == "function" then
-			gui.text(gui_x_offset, gui_y_offset + row_height * row, "Z Accel: "..round(Game.getZAcceleration(), precision));
-			row = row + 1;
-		end
-		if type(Game.getLateralVelocity) == "function" then
-			gui.text(gui_x_offset, gui_y_offset + row_height * row, "Lateral Velocity: "..round(Game.getLateralVelocity(), precision));
-			row = row + 1;
-		end
-		if type(Game.getLateralAcceleration) == "function" then
-			gui.text(gui_x_offset, gui_y_offset + row_height * row, "Lateral Accel: "..round(Game.getLateralAcceleration(), precision));
-			row = row + 1;
-		end
-		row = row + 1;
-	end
 
-	if type(max_dy) == "number" and type(max_d) == "number" then
-		gui.text(gui_x_offset, gui_y_offset + row_height * row, "Max dY:  "..(round(max_dy, precision) or 0));
-		row = row + 1;
-		gui.text(gui_x_offset, gui_y_offset + row_height * row, "Max dXZ: "..(round(max_d, precision) or 0));
-		row = row + 1;
-		gui.text(gui_x_offset, gui_y_offset + row_height * row, "Odometer: "..(round(odometer, precision) or 0));
-		row = row + 2;
-	end
+		if label == "Max dY" or label == "Max DY" then
+			value = max_dy or 0;
+		end
+		if label == "Max dXZ" or label == "Max DXZ" then
+			value = max_d or 0;
+		end
+		if label == "Odometer" then
+			value = odometer or 0;
+		end
 
-	if type(rot_x) == "number" and type(rot_y) == "number" and type(rot_z) == "number" then
-		gui.text(gui_x_offset, gui_y_offset + row_height * row, "Rot X: "..formatRotation(rot_x));
-		row = row + 1;
-		gui.text(gui_x_offset, gui_y_offset + row_height * row, "Rot Y: "..formatRotation(rot_y));
-		row = row + 1;
-		gui.text(gui_x_offset, gui_y_offset + row_height * row, "Rot Z: "..formatRotation(rot_z));
-		row = row + 2;
-	end
+		-- Get the value
+		if type(value) == "function" then
+			value = value();
+		end
 
-	if type(getCurrentMovementState) == "function" then -- Currently used by BK
-		gui.text(gui_x_offset, gui_y_offset + row_height * row, "Movement: "..getCurrentMovementState());
-		row = row + 2;
+		-- Round the value
+		if type(value) == "number" and label ~= "Separator" then
+			value = round(value, precision);
+		end
+
+		-- Detect and format rotation based on a keyword search
+		for j = 1, #angleKeywords do
+			if label == angleKeywords[j] then
+				value = formatRotation(value);
+			end
+		end
+
+		if type(color) == "function" then
+			color = color();
+		end
+
+		if label ~= "Separator" then
+			gui.text(OSDX, OSDY + Game.OSDRowHeight * row, label..": "..value, color);
+		else
+			if type(value) == "number" and value > 1 then
+				row = row + value - 1;
+			end
+		end
+		row = row + 1;
 	end
 end
 
@@ -572,8 +557,8 @@ local function mainloop()
 	end
 
 	if Game.isPhysicsFrame() then
-		if mode == 'Position' and type(rot_y) ~= "nil" then
-			rot_rad = rotation_to_radians(rot_y);
+		if mode == 'Position' then
+			rot_rad = rotation_to_radians(Game.getYRotation());
 			if joypad_pressed["P1 DPad U"] then
 				gofast("x", speedy_speed_XZ * math.sin(rot_rad));
 				gofast("z", speedy_speed_XZ * math.cos(rot_rad));
@@ -710,13 +695,9 @@ local function plot_pos()
 	previous_frame = current_frame;
 	current_frame = emu.framecount();
 
-	x = Game.getXPosition();
-	y = Game.getYPosition();
-	z = Game.getZPosition();
-
-	rot_x = Game.getXRotation();
-	rot_y = Game.getYRotation();
-	rot_z = Game.getZRotation();
+	local x = Game.getXPosition();
+	local y = Game.getYPosition();
+	local z = Game.getZPosition();
 
 	if firstframe then
 		prev_x = x;
@@ -749,8 +730,8 @@ local function plot_pos()
 			if math.abs(dy) > max_dy then max_dy = math.abs(dy) end
 			if math.abs(dz) > max_dz then max_dz = math.abs(dz) end
 			if math.abs(current_frame-previous_frame) > 1 then
-				max_dx=0; max_dy=0; max_dz=0;
-				max_d=0;
+				max_dx = 0; max_dy = 0; max_dz = 0;
+				max_d = 0;
 			end
 			if d > max_d then max_d = d end
 		end
@@ -767,10 +748,10 @@ local function plot_pos()
 				["Z Position"] = z,
 				["Dxz"] = d,
 				["Dy"] = dy,
-				["Rotation X"] = rot_x,
-				["Rotation Y"] = rot_y,
-				["Rotation Z"] = rot_z
-			}
+				["Rotation X"] = Game.getXRotation(),
+				["Rotation Y"] = Game.getYRotation(),
+				["Rotation Z"] = Game.getZRotation(),
+			};
 			table.insert(telemetryData, tempTelemetryData);
 		end
 	end

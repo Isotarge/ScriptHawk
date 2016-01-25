@@ -2451,7 +2451,7 @@ function checkFlags()
 			end
 		else
 			-- Populate flag block
-			for i=0,flag_block_size do
+			for i = 0, flag_block_size do
 				flag_block[i] = mainmemory.readbyte(flags + i);
 			end
 			dprint("Populated flag array.")
@@ -3415,7 +3415,7 @@ local function break_geometry_spiking()
 	spiking_fix = false;
 end
 
-event.onloadstate(break_geometry_spiking, "Break spiking");
+event.onloadstate(break_geometry_spiking, "ScriptHawk - Break spiking");
 
 local stored_y_addresses = {
 	0x7480DC,
@@ -3885,5 +3885,30 @@ function Game.eachFrame()
 	forms.settext(form_controls["Toggle Invisify Button"], current_invisify);
 	forms.settext(form_controls["Moon Mode Button"], moon_mode);
 end
+
+Game.OSDPosition = {32, 70}
+Game.OSD = {
+	{"X", Game.getXPosition},
+	{"Y", Game.getYPosition},
+	{"Z", Game.getZPosition},
+	{"Separator", 1},
+	{"Floor", Game.getFloor},
+	{"Separator", 1},
+	{"dY"},
+	{"dXZ"},
+	{"Velocity", Game.getVelocity},
+	--{"Accel", Game.getAcceleration}, -- TODO
+	{"Y Velocity", Game.getYVelocity},
+	{"Y Accel", Game.getYAcceleration},
+	{"Separator", 1},
+	{"Max dY"},
+	{"Max dXZ"},
+	{"Odometer"},
+	{"Separator", 1},
+	{"Rot. X", Game.getXRotation},
+	{"Facing", Game.getYRotation},
+	--{"Moving", Game.getMovingRotation}, -- TODO
+	{"Rot. Z", Game.getZRotation},
+};
 
 return Game;

@@ -69,7 +69,7 @@ Game.maps = {
 	"0x0D - Everfrost Peak",
 	"0x0E - Sherbert Island (Hub)",
 	"0x0F - Spaceport Alpha",
-	
+
 	"0x10 - Horseshoe Gulch (Unused)",
 	"0x11 - Spacedust Alley",
 	"0x12 - Greenwood Village",
@@ -86,7 +86,7 @@ Game.maps = {
 	"0x1D - Jungle Falls",
 	"0x1E - Treasure Caves",
 	"0x1F - Haunted Woods",
-	
+
 	"0x20 - Darkmoon Caverns",
 	"0x21 - Star City",
 	"0x22 - Trophy Race Results Screen",
@@ -103,7 +103,7 @@ Game.maps = {
 	"0x2D - Overworld (FFL opening cutscene)",
 	"0x2E - Dino 2",
 	"0x2F - Toufool",
-	
+
 	"0x30 - Snowfool",
 	"0x31 - Toufool again",
 	"0x32 - Toufool again again",
@@ -120,7 +120,7 @@ Game.maps = {
 	"0x3D - Bubbler's map (cutscene version)",
 	"0x3E - Wizpig 2 cutscene",
 	"0x3F - Overworld (Credits 1)",
-	
+
 	"0x40 - Overworld (Credits 2)",
 	"0x41 - Overworld (misc cutscene 1)",
 	"0x42 - Overworld (misc cutscene 2)",
@@ -137,7 +137,7 @@ Game.maps = {
 	"0x4D - ",
 	"0x4E - ",
 	"0x4F - ",
-	
+
 	"0x50 - ",
 	"0x51 - ",
 	"0x52 - ",
@@ -639,7 +639,7 @@ local function encircle_player()
 	table.sort(_currentPointers);
 
 	-- Iterate and set position
-	for i=1,#_currentPointers do
+	for i = 1, #_currentPointers do
 		x = current_player_x + math.cos(math.pi * 2 * i / #_currentPointers) * radius;
 		z = current_player_z + math.sin(math.pi * 2 * i / #_currentPointers) * radius;
 
@@ -729,5 +729,32 @@ function Game.eachFrame()
 
 	outputBoostStats();
 end
+
+Game.OSDPosition = {2, 70}
+Game.OSD = {
+	{"X", Game.getXPosition},
+	{"Y", Game.getYPosition},
+	{"Z", Game.getZPosition},
+	{"Separator", 1},
+	{"dY"},
+	{"dXZ"},
+	{"Separator", 1},
+	{"Spin Timer", Game.getSpinTimer},
+	{"Boost", Game.getBoost},
+	{"Velocity", Game.getVelocity},
+	{"Y Velocity", Game.getYVelocity},
+	{"Lateral Velocity", Game.getLateralVelocity},
+	--{"Lateral Velocity", Game.getLateralAcceleration}, -- TODO: Is this a thing?
+	--{"Throttle", Game.getThrottle}, -- TODO
+	{"Separator", 1},
+	{"Max dY"},
+	{"Max dXZ"},
+	{"Odometer"},
+	{"Separator", 1},
+	{"Rot. X", Game.getXRotation},
+	{"Facing", Game.getYRotation},
+	--{"Moving", Game.getMovingRotation}, -- TODO
+	{"Rot. Z", Game.getZRotation},
+};
 
 return Game;

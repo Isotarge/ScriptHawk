@@ -446,7 +446,8 @@ local function getPlayerObject()
 			playerFound = true;
 
 			-- Check for pointers near player pointer to make sure
-			for i=4,89 do
+			-- TODO: Find a better method to do this
+			for i = 4, 89 do
 				if not isPointer(resolvePointer(objectBase, i * 4)) then
 					playerFound = false;
 				end
@@ -733,5 +734,29 @@ function Game.eachFrame()
 		neverSlip();
 	end
 end
+
+Game.OSDPosition = {2, 70}
+Game.OSD = {
+	{"X", Game.getXPosition},
+	{"Y", Game.getYPosition},
+	{"Z", Game.getZPosition},
+	{"Separator", 1},
+	{"dY"},
+	{"dXZ"},
+	--{"X Velocity", Game.getXVelocity}, -- TODO
+	{"Y Velocity", Game.getYVelocity},
+	--{"Z Velocity", Game.getZVelocity}, -- TODO
+	{"Separator", 1},
+	{"Max dY"},
+	{"Max dXZ"},
+	{"Odometer"},
+	{"Separator", 1},
+	{"Rot. X", Game.getXRotation},
+	{"Facing", Game.getYRotation},
+	--{"Moving", Game.getMovingAngle}, -- TODO
+	{"Rot. Z", Game.getZRotation},
+	{"Separator", 1},
+	--{"Movement", Game.getCurrentMovementState}, TODO
+};
 
 return Game;
