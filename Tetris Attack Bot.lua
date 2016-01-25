@@ -37,14 +37,14 @@ local grid_height = 12;
 local grid_width = 6;
 
 local colors = {
-	[0x00] = "Empty",
-	[0x01] = "Red",
-	[0x02] = "Green",
-	[0x03] = "Light Blue",
-	[0x04] = "Yellow",
-	[0x05] = "Purple",
-	[0x06] = "Dark Blue",
-	[0x07] = "!"
+	[0] = "Empty",
+	[1] = "Red",
+	[2] = "Green",
+	[3] = "Light Blue",
+	[4] = "Yellow",
+	[5] = "Purple",
+	[6] = "Dark Blue",
+	[7] = "!"
 };
 
 -- Status
@@ -69,65 +69,17 @@ warnings = false;
 moveQueue = {};
 previousHeightTickerValues = {};
 
------------------
--- UI Bollocks --
------------------
-
-UI_GRID_BASE_X = 72;
-UI_GRID_BASE_Y = 8;
-UI_ROW_HEIGHT = 16;
-UI_ROW_WIDTH = 16;
-UI_HUD_LEFT_X_OFFSET = -4;
-
-function drawGridText(x, y, string)
-	local drawX = UI_GRID_BASE_X + x * UI_ROW_WIDTH;
-	local drawY = UI_GRID_BASE_Y + y * UI_ROW_HEIGHT;
-	gui.drawText(drawX, drawY, string);
-end
-
-function drawUI(player)
-	if verbose then
-		print("Drawing grid UI for player "..player);
-	end
-
-	local x, y;
-	for x = 1, grid_width do
-		drawGridText(x, 0, x);
-		if verbose then
-			drawGridText(x, 1, getColumnHeight(x, player, true));
-		end
-	end
-	for y = 1, grid_height do
-		drawGridText(0, y, y);
-	end
-
-	-- Output current move to the screen
-	drawGridText(UI_HUD_LEFT_X_OFFSET,3,"Move");
-	if #moveQueue[player] > 0 then
-		local currentMove = moveQueue[player][1];
-		drawGridText(UI_HUD_LEFT_X_OFFSET, 4, currentMove["x"]..","..currentMove["y"]);
-		drawGridText(UI_HUD_LEFT_X_OFFSET, 5, currentMove["type"]);
-
-		if warnings or verbose then
-			drawGridText(currentMove["x"], currentMove["y"], "L");
-			drawGridText(currentMove["x"] + 1, currentMove["y"], "R");
-		end
-	else
-		drawGridText(UI_HUD_LEFT_X_OFFSET, 4, "None");
-	end
-end
-
 --------------------
 -- The good stuff --
 --------------------
 
-function getCursorPosition(player)
+local function getCursorPosition(player)
 	local cursorLeftX = mainmemory.readbyte(cursor_left_x[player]);
 	local cursorLeftY = mainmemory.readbyte(cursor_left_y[player]) - 2;
 	return {["x"] = cursorLeftX, ["y"] = cursorLeftY};
 end
 
-function getGridAddress(x, y, player)
+local function getGridAddress(x, y, player)
 	if (warnings or verbose) and (x <= 0 or x > grid_width or y <= 0 or y > grid_height) then
 		print("Warning: getGridAddress("..x..","..y..","..player..") was called with out of bounds X or Y.");
 	end
@@ -136,8 +88,8 @@ function getGridAddress(x, y, player)
 	return grid_base[player] + y + (x * 2);
 end
 
-colorCache = {};
-function getColor(x, y, player)
+local colorCache = {};
+local function getColor(x, y, player)
 	if type(colorCache[player][x][y]) ~= "nil" then
 		return colorCache[player][x][y];
 	end
@@ -145,8 +97,8 @@ function getColor(x, y, player)
 	return colorCache[player][x][y];
 end
 
-statusCache = {};
-function getStatus(x, y, player)
+local statusCache = {};
+local function getStatus(x, y, player)
 	if type(statusCache[player][x][y]) ~= "nil" then
 		return statusCache[player][x][y];
 	end
@@ -154,7 +106,7 @@ function getStatus(x, y, player)
 	return statusCache[player][x][y];
 end
 
-function invalidateGridCache(player)
+local function invalidateGridCache(player)
 	-- Invalidate state caches
 	colorCache[player] = {};
 	statusCache[player] = {};
@@ -165,7 +117,7 @@ function invalidateGridCache(player)
 	end
 end
 
-function isMoveable(x, y, player)
+local function isMoveable(x, y, player)
 	local status = getStatus(x, y, player);
 	for i = 1, #unmoveableStates do
 		if status == unmoveableStates[i] then
@@ -175,15 +127,7 @@ function isMoveable(x, y, player)
 	return true;
 end
 
-function getMaxColumnHeight(player, includeUnmoveable)
-	local maxHeight = 0;
-	for x = 1, grid_width do
-		maxHeight = math.max(getColumnHeight(x, player, includeUnmoveable), maxHeight);
-	end
-	return maxHeight;
-end
-
-function getColumnHeight(x, player, includeUnmoveable)
+local function getColumnHeight(x, player, includeUnmoveable)
 	local height = 0;
 	for y = 1, grid_height do
 		if includeUnmoveable then
@@ -199,11 +143,19 @@ function getColumnHeight(x, player, includeUnmoveable)
 	return height;
 end
 
-function columnIsEmpty(x, player, includeUnmoveable)
+local function getMaxColumnHeight(player, includeUnmoveable)
+	local maxHeight = 0;
+	for x = 1, grid_width do
+		maxHeight = math.max(getColumnHeight(x, player, includeUnmoveable), maxHeight);
+	end
+	return maxHeight;
+end
+
+local function columnIsEmpty(x, player, includeUnmoveable)
 	return getColumnHeight(x, player, includeUnmoveable) == 0;
 end
 
-function rowIsEmpty(y, player)
+local function rowIsEmpty(y, player)
 	for x = 1, grid_width do
 		if getColor(x, y, player) > 0x00 and isMoveable(x, y, player) then
 			return false;
@@ -212,9 +164,9 @@ function rowIsEmpty(y, player)
 	return true;
 end
 
-function rowContains(y, color, player)
+local function rowContains(y, color, player)
 	local x;
-	for x=1,grid_width do
+	for x = 1, grid_width do
 		if getColor(x, y, player) == color then
 			return true;
 		end
@@ -222,7 +174,7 @@ function rowContains(y, color, player)
 	return false;
 end
 
-function countColorInColumn(x, color, player)
+local function countColorInColumn(x, color, player)
 	local count = 0;
 	for y = 1, grid_height do
 		if getColor(x, y, player) == color then
@@ -232,7 +184,7 @@ function countColorInColumn(x, color, player)
 	return count;
 end
 
-function getMostCommonColumn(color, player)
+local function getMostCommonColumn(color, player)
 	local mostCommonX = 0;
 	local mostCommonAmount = -1;
 	for x = 1, grid_width do
@@ -245,7 +197,7 @@ function getMostCommonColumn(color, player)
 	return mostCommonX;
 end
 
-function getColorAtCursor(player)
+local function getColorAtCursor(player)
 	local cursorPosition = getCursorPosition(player);
 	local leftColor = getColor(cursorPosition["x"], cursorPosition["y"], player);
 	local rightColor = getColor(cursorPosition["x"] + 1, cursorPosition["y"], player);
@@ -256,7 +208,7 @@ end
 -- Mode based sorting --
 ------------------------
 
-function isSortedMode(y, player)
+local function isSortedMode(y, player)
 	local mostCommonColumns = {
 		[0] = getMostCommonColumn(0, player),
 		getMostCommonColumn(1, player),
@@ -271,12 +223,12 @@ function isSortedMode(y, player)
 	local currentColor = -1;
 	for x = 1, grid_width do
 		currentColor = getColor(x, y, player);
-		
+
 		-- TODO: improve this
 		if not isMoveable(x, y, player) then
 			return true;
 		end
-		
+
 		if currentColor ~= 0 then
 			if x ~= mostCommonColumns[currentColor] then
 				return false;
@@ -286,7 +238,7 @@ function isSortedMode(y, player)
 	return true;
 end
 
-function findMoveModeSort(player)
+local function findMoveModeSort(player)
 	local mostCommonColumns = {
 		[0] = getMostCommonColumn(0, player),
 		getMostCommonColumn(1, player),
@@ -321,7 +273,7 @@ end
 -- Hilariously simple method to find next move --
 -------------------------------------------------
 
-function isSorted(y, player)
+local function isSorted(y, player)
 	local current = -1;
 	for x = 1, grid_width do
 		if getColor(x, y, player) >= current then
@@ -333,7 +285,7 @@ function isSorted(y, player)
 	return true;
 end
 
-function findMoveSimpleSort(player)
+local function findMoveSimpleSort(player)
 	-- Work from the bottom up
 	for y = grid_height, 1, -1 do
 		if not isSorted(y, player) then
@@ -362,9 +314,9 @@ function findMoveSimpleSort(player)
 	return false;
 end
 
-function pickRandomMove(player)
+local function pickRandomMove(player)
 	local timeout = 0;
-	local x,y, left, right, leftMoveable, rightMoveable;
+	local x, y, left, right, leftMoveable, rightMoveable;
 	local maxColumnHeight = getMaxColumnHeight(player, false);
 	local currentColumnHeight = -1;
 	repeat
@@ -398,7 +350,7 @@ end
 -- Hilariously complicated method to find the next move --
 ----------------------------------------------------------
 
-function check2By3(x, y, player)
+local function check2By3(x, y, player)
 	-- Skip this check for the right of the screen
 	if x == grid_width then
 		return false;
@@ -480,7 +432,7 @@ function check2By3(x, y, player)
 	return false;
 end
 
-function checkVertical3(x, y, player)
+local function checkVertical3(x, y, player)
 	-- Skip this check for the bottom of the screen
 	if y > grid_height - 4 then
 		return false;
@@ -491,23 +443,23 @@ function checkVertical3(x, y, player)
 	local columnColors = {};
 	local currentColor, i, j;
 
-	for i=1,4 do
+	for i = 1, 4 do
 		table.insert(columnColors, getColor(x, y + i, player));
 		if not isMoveable(x, y + i, player) then
 			return false;
 		end
 	end
 
-	for currentColor=1,#colors do
+	for currentColor = 1, #colors do
 		if currentColor ~= 0 then
 			local currentColorCount = 0;
-			for j=1,#columnColors do
+			for j = 1, #columnColors do
 				if columnColors[j] == currentColor then
 					currentColorCount = currentColorCount + 1;
 				end
 			end
 			if currentColorCount == 3 then
-				for j=#columnColors,1,-1 do
+				for j = #columnColors, 1, -1 do
 					if columnColors[j] ~= currentColor then
 						if canMoveRight and getColor(x + 1, y + j - 1, player) == 0 then
 							if verbose then
@@ -534,7 +486,7 @@ function checkVertical3(x, y, player)
 	return false;
 end
 
-function findMoveGreedy(player)
+local function findMoveGreedy(player)
 	if verbose then
 		print("Running find move greedy for player "..player);
 	end
@@ -560,11 +512,59 @@ end
 -- Ticker stuff --
 ------------------
 
-function gridHasChangedHeight(player)
+local function gridHasChangedHeight(player)
 	local currentHeightTickerValue = mainmemory.readbyte(row_height_tickers[player]);
 	local hasChangedHeight = currentHeightTickerValue < previousHeightTickerValues[player];
 	previousHeightTickerValues[player] = currentHeightTickerValue;
 	return hasChangedHeight;
+end
+
+-----------------
+-- UI Bollocks --
+-----------------
+
+UI_GRID_BASE_X = 72;
+UI_GRID_BASE_Y = 8;
+UI_ROW_HEIGHT = 16;
+UI_ROW_WIDTH = 16;
+UI_HUD_LEFT_X_OFFSET = -4;
+
+local function drawGridText(x, y, string)
+	local drawX = UI_GRID_BASE_X + x * UI_ROW_WIDTH;
+	local drawY = UI_GRID_BASE_Y + y * UI_ROW_HEIGHT;
+	gui.drawText(drawX, drawY, string);
+end
+
+local function drawUI(player)
+	if verbose then
+		print("Drawing grid UI for player "..player);
+	end
+
+	local x, y;
+	for x = 1, grid_width do
+		drawGridText(x, 0, x);
+		if verbose then
+			drawGridText(x, 1, getColumnHeight(x, player, true));
+		end
+	end
+	for y = 1, grid_height do
+		drawGridText(0, y, y);
+	end
+
+	-- Output current move to the screen
+	drawGridText(UI_HUD_LEFT_X_OFFSET,3,"Move");
+	if #moveQueue[player] > 0 then
+		local currentMove = moveQueue[player][1];
+		drawGridText(UI_HUD_LEFT_X_OFFSET, 4, currentMove["x"]..","..currentMove["y"]);
+		drawGridText(UI_HUD_LEFT_X_OFFSET, 5, currentMove["type"]);
+
+		if warnings or verbose then
+			drawGridText(currentMove["x"], currentMove["y"], "L");
+			drawGridText(currentMove["x"] + 1, currentMove["y"], "R");
+		end
+	else
+		drawGridText(UI_HUD_LEFT_X_OFFSET, 4, "None");
+	end
 end
 
 -------------
@@ -577,7 +577,7 @@ local frameSum = {};
 local previousFrameA = {};
 local previousFrameDirection = {};
 
-function resetBotState()
+local function resetBotState()
 	if verbose then
 		print("Starting bot...");
 	end
@@ -590,7 +590,7 @@ function resetBotState()
 	previousHeightTickerValues = {};
 
 	local currentPlayer;
-	for currentPlayer=1,num_players do
+	for currentPlayer = 1, num_players do
 		table.insert(moveQueue, {});
 		table.insert(numMoves, 0);
 		table.insert(frameSum, 0);
@@ -604,14 +604,14 @@ function resetBotState()
 end
 resetBotState();
 
-function getAverageMoveLength()
+local function getAverageMoveLength()
 	local currentPlayer;
 	for currentPlayer=1,num_players do
 		print("Avarage move length: "..(frameSum[currentPlayer] / numMoves[currentPlayer]));
 	end
 end
 
-function moveAt(x, y, player)
+local function moveAt(x, y, player)
 	if x <= 0 or x >= grid_width or y <= 0 or y > grid_height then
 		if warnings or verbose then
 			print("Warning: moveAt("..x..","..y..","..player..","..moveQueue[player][1]["type"]..") was called with out of bounds X or Y.");
@@ -677,7 +677,7 @@ function moveAt(x, y, player)
 	return false;
 end
 
-function movePickFunction(player)
+local function movePickFunction(player)
 	if getMaxColumnHeight(player, true) < panic_threshold then
 		-- Calm and collected
 		if findMoveSimpleSort(player) or findMoveGreedy(player) then
@@ -696,7 +696,7 @@ function movePickFunction(player)
 	return pickRandomMove(player);
 end
 
-function mainLoop()
+local function mainLoop()
 	if emu.islagged() then
 		return;
 	end
@@ -761,7 +761,5 @@ function mainLoop()
 	end
 end
 
-event.onframestart(mainLoop, "Bot");
-
--- Invalidate bot state when a state is loaded
-event.onloadstate(resetBotState, "Reset player state");
+event.onframestart(mainLoop, "ScriptHawk - Tetris Attack bot");
+event.onloadstate(resetBotState, "ScriptHawk - Reset bot state"); -- Invalidate bot state when a state is loaded

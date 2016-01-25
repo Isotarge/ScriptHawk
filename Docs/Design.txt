@@ -57,3 +57,4 @@ Game -- Table containing all information and functions about a game that are vis
 
 	Game.OSDPosition -- Table containing the X, Y position of the OSD
 	Game.OSD -- Table containing labels and functions that populate the OSD
+	Game.OSDRowHeight -- The height of a single OSD row (passed to gui.text)
