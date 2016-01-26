@@ -27,128 +27,42 @@ else
 end
 
 -- Slot data
-local slot_base = 0x28;
+local slot_base = 0x08;
 local slot_size = 0x180;
 local max_slots = 0x100;
 
 -- Relative to slot start
 slot_variables = {
-	[0x00] = {["Type"] = "Float"},
-	[0x04] = {["Type"] = "Float"},
-	[0x08] = {["Type"] = "Float"},
-	[0x0C] = {["Type"] = "Float"},
+	[0x00] = {["Type"] = "Pointer"}, -- TODO: Does this have anything to do with that huge linked list?
+	[0x04] = {["Type"] = "Float", ["Name"] = "X Position"},
+	[0x08] = {["Type"] = "Float", ["Name"] = "Y Position"},
+	[0x0C] = {["Type"] = "Float", ["Name"] = "Z Position"},
 
-	[0x10] = {["Type"] = "Float"},
-	[0x14] = {["Type"] = "Float"},
+	[0x14] = {["Type"] = "Pointer"},
+	[0x18] = {["Type"] = "Pointer"},
 
-	[0x18] = {["Type"] = "Byte"},
-	[0x19] = {["Type"] = "Byte"},
-	[0x1A] = {["Type"] = "Byte"},
-	[0x1B] = {["Type"] = "Byte"},
-	[0x1C] = {["Type"] = "Byte"},
-	[0x1D] = {["Type"] = "Byte"},
-	[0x1E] = {["Type"] = "Byte"},
-	[0x1F] = {["Type"] = "Byte"},
+	[0x28] = {["Type"] = "Float"}, -- TODO: Velocity?
 
-	[0x24] = {["Type"] = "4_Unknown"},
-	[0x28] = {["Type"] = "Float", ["Name"] = "Race path progression"}, 
-	[0x2C] = {["Type"] = "Float", ["Name"] = "Speed (rubberband)"}, 
+	[0x48] = {["Type"] = "Float", ["Name"] = "Race path progression"}, 
+	[0x4C] = {["Type"] = "Float", ["Name"] = "Speed (rubberband)"}, 
 
-	[0x30] = {["Type"] = "Float", ["Name"] = "Rotation Y"},
-	[0x38] = {["Type"] = "4_Unknown"},
+	[0x50] = {["Type"] = "Float", ["Name"] = "Facing"},
 
-	[0x44] = {["Type"] = "Float", ["Name"] = "Angle"},
-	[0x48] = {["Type"] = "Float", ["Name"] = "Rotation X"},
-	[0x4C] = {["Type"] = "Float"},
+	[0x60] = {["Type"] = "Float", ["Name"] = "Recovery Timer"}, -- TTC Crab
+	[0x64] = {["Type"] = "Float", ["Name"] = "Unknown Angle"},
+	[0x68] = {["Type"] = "Float", ["Name"] = "Rotation X"},
 
-	[0x54] = {["Type"] = "Float"},
-	[0x58] = {["Type"] = "4_Unknown"},
+	[0x8C] = {["Type"] = "Float", ["Name"] = "Countdown timer?"},
+	[0xE8] = {["Type"] = "Byte", ["Name"] = "Damages Player"},
 
-	[0x6C] = {["Type"] = "Float", ["Name"] = "Countdown timer?"},
-
-	[0x70] = {["Type"] = "Float"},
-	[0x74] = {["Type"] = "Byte"},
-	[0x75] = {["Type"] = "Byte"},
-	[0x76] = {["Type"] = "Byte"},
-	[0x77] = {["Type"] = "Byte"},
-	[0x78] = {["Type"] = "Float"},
-
-	[0x80] = {["Type"] = "Float"},
-	[0x84] = {["Type"] = "Float"},
-	[0x88] = {["Type"] = "Float"},
-	[0x8C] = {["Type"] = "4_Unknown"},
-
-	[0xA4] = {["Type"] = "Float"},
-	[0xA8] = {["Type"] = "Float"},
-	[0xAC] = {["Type"] = "Float"},
-
-	[0xB0] = {["Type"] = "Float"},
-	[0xB4] = {["Type"] = "Float"},
-	[0xB8] = {["Type"] = "Float"},
-
-	[0xC0] = {["Type"] = "Float"},
-	[0xC4] = {["Type"] = "Float"},
-	[0xC8] = {["Type"] = "Byte"},
-	[0xC9] = {["Type"] = "Byte"},
-	[0xCA] = {["Type"] = "Byte"},
-	[0xCB] = {["Type"] = "Byte"},
-	[0xCC] = {["Type"] = "Float"},
-
-	[0xD0] = {["Type"] = "Float"},
-	[0xD4] = {["Type"] = "Byte"},
-	[0xD5] = {["Type"] = "Byte"},
-	[0xD6] = {["Type"] = "Byte"},
-	[0xD7] = {["Type"] = "Byte"},
-	[0xD8] = {["Type"] = "Float"},
-	[0xDC] = {["Type"] = "Float"},
-
-	[0xE0] = {["Type"] = "Pointer"},
-	[0xE4] = {["Type"] = "Pointer"},
-
-	[0xF4] = {["Type"] = "Float", ["Name"] = "Between 0 and 1"},
-	[0xF8] = {["Type"] = "Float"},
-	[0xFC] = {["Type"] = "Float"},
-
-	[0x100] = {["Type"] = "Float"},
-	[0x104] = {["Type"] = "Byte"},
-	[0x105] = {["Type"] = "Byte"},
-	[0x106] = {["Type"] = "Byte"},
-	[0x107] = {["Type"] = "Byte"},
-	[0x108] = {["Type"] = "Float", ["Name"] = "Scale"},
-	[0x10C] = {["Type"] = "Pointer"},
-
-	[0x110] = {["Type"] = "Pointer"},
-	[0x118] = {["Type"] = "4_Unknown"},
+	[0x114] = {["Type"] = "Float", ["Name"] = "Sound timer?"},
+	[0x118] = {["Type"] = "Float"},
 	[0x11C] = {["Type"] = "Float"},
-
 	[0x120] = {["Type"] = "Float"},
-	[0x124] = {["Type"] = "Float"},
-	[0x12C] = {["Type"] = "Pointer"},
 
-	[0x130] = {["Type"] = "Pointer"},
-	[0x134] = {["Type"] = "4_Unknown"},
-
-	[0x140] = {["Type"] = "Pointer"},
-	[0x144] = {["Type"] = "Byte"},
-	[0x145] = {["Type"] = "Byte"},
-	[0x146] = {["Type"] = "Byte"},
-	[0x147] = {["Type"] = "Byte"},
-	[0x14C] = {["Type"] = "4_Unknown"},
-
-	[0x150] = {["Type"] = "Float"},
-	[0x154] = {["Type"] = "Float"},
-	[0x158] = {["Type"] = "Float"},
-	[0x15C] = {["Type"] = "Float"},
-
-	[0x160] = {["Type"] = "Pointer"},
-	[0x164] = {["Type"] = "Float", ["Name"] = "X Position"},
-	[0x168] = {["Type"] = "Float", ["Name"] = "Y Position"},
-	[0x16C] = {["Type"] = "Float", ["Name"] = "Z Position"},
-
-	[0x170] = {["Type"] = "4_Unknown"},
-	[0x174] = {["Type"] = "Pointer"},
-	[0x178] = {["Type"] = "Pointer"},
-	[0x17C] = {["Type"] = "Float"}
+	[0x125] = {["Type"] = "Byte", ["Name"] = "Transparancy"},
+	[0x127] = {["Type"] = "Byte", ["Name"] = "Eye State"},
+	[0x128] = {["Type"] = "Float", ["Name"] = "Scale"},
 };
 
 local function fillBlankVariableSlots()
@@ -237,6 +151,10 @@ end
 outputSlot = output_slot;
 
 function output_stats()
+	if #slot_data == 0 then
+		print("Error: Slot data is empty, please run parseSlotData()");
+		return;
+	end
 	print("------------------------------");
 	print("-- Starting output of stats --");
 	print("------------------------------");
@@ -374,6 +292,9 @@ function get_all_unique(variable)
 	if type(slot_variables[variable]) == "table" then
 		local unique_values = {};
 		local value, count;
+		if #slot_data == 0 then
+			parseSlotData();
+		end
 		for i = 1, #slot_data do
 			value = format_for_output(slot_variables[variable].Type, slot_data[i][variable]);
 			if type(unique_values[value]) ~= "nil" then

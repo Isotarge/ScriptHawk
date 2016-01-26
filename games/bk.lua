@@ -542,7 +542,7 @@ function autoPound()
 		if currentMovementState == 21 and mainmemory.readbyte(player_grounded) == 0 or holdingAPostJump then
 			holdingAPostJump = true;
 			if holdingAPostJump then
-				holdingAPostJump = holdingAPostJump and (currentMovementState == 21 or Game.getYVelocity() > 0);
+				holdingAPostJump = holdingAPostJump and (currentMovementState == 21 or Game.getYVelocity() > 0); -- TODO: Better method for detecting end of a jump, velocity > 0 is janky
 			end
 			joypad.set({["A"] = true}, 1);
 		end
@@ -719,19 +719,16 @@ local options_wave_button;
 local options_heart_button;
 local options_fire_all_button;
 
-local game_type = 0x90;
-
-local previous_game_type = 0x91
+local game_type = 0x90; -- TODO: Verify these
+local previous_game_type = 0x91;
 local player_score = 0x92;
 local vile_score = 0x93;
-
 local minigame_timer = 0x94;
 
 local number_of_slots = 25;
--- TODO: Figure out object type for vile slots
-local first_slot_base = 0x28;
-local slot_base = 0x318;
+local first_slot_base = 0x08;
 local slot_size = 0x180;
+local slot_base = first_slot_base + 2 * slot_size;
 
 -- Relative to slot base + (slot number * slot size)
 
@@ -744,7 +741,7 @@ local slot_size = 0x180;
 local slot_state = 0x00;
 
 -- Float 0-1
-local popped_amount = 0x6c;
+local popped_amount = 0x6C;
 
 -- 0x00 = yum, > 0x00 = grum
 local slot_type = 0x70;
@@ -908,9 +905,9 @@ local max_slots = 0x100;
 local radius = 1000;
 
 -- Relative to slot
-local slot_x_pos = 0x164;
-local slot_y_pos = 0x168;
-local slot_z_pos = 0x16C;
+local slot_x_pos = 0x04;
+local slot_y_pos = 0x08;
+local slot_z_pos = 0x0C;
 
 local function get_num_slots()
 	local level_object_array_state = mainmemory.read_u24_be(object_array_pointer + 1);
