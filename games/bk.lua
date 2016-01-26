@@ -1119,9 +1119,13 @@ local pulseClipVelocityCounter = 0;
 pulseClipVelocityInterval = 5;
 
 function pulseClipVelocity()
+	if not forms.ischecked(options_pulse_clip_velocity) or joypad.getimmediate()["P1 L"] then
+		return;
+	end
+
 	pulseClipVelocityCounter = pulseClipVelocityCounter + 1;
 	local currentVelocity = Game.getYVelocity();
-	if forms.ischecked(options_pulse_clip_velocity) and pulseClipVelocityCounter >= pulseClipVelocityInterval and Game.getYPosition() >= 5 and currentVelocity > clip_vel then
+	if pulseClipVelocityCounter >= pulseClipVelocityInterval and Game.getYPosition() >= 5 and currentVelocity > clip_vel then
 		Game.setYVelocity(clip_vel);
 		pulseClipVelocityCounter = 0;
 	end
