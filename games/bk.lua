@@ -8,6 +8,7 @@ local Game = {};
 -- TODO - Figure out how to patch other versions
 local allowFurnaceFunPatch = false;
 
+local player_grounded;
 local slope_timer;
 local moves_bitfield;
 
@@ -77,7 +78,7 @@ local eep_checksum_values = {
 	0x00000000
 }
 
-Game.maps = { -- TODO: These values don't work properly in some places for PAL, likely other versions too
+Game.maps = {
 	"SM - Spiral Mountain",
 	"MM - Mumbo's Mountain",
 	"Unknown 0x03",
@@ -237,6 +238,7 @@ function Game.detectVersion(romName)
 	if bizstring.contains(romName, "Europe") then
 		frame_timer = 0x280700;
 		slope_timer = 0x37CCB4;
+		player_grounded = 0x37C930;
 		moves_bitfield = 0x37CD70;
 		x_vel = 0x37CE88;
 		clip_vel = -2900;
@@ -254,6 +256,7 @@ function Game.detectVersion(romName)
 	elseif bizstring.contains(romName, "Japan") then
 		frame_timer = 0x27F718;
 		slope_timer = 0x37CDE4;
+		player_grounded = 0x37CA60;
 		moves_bitfield = 0x37CEA0;
 		x_vel = 0x37CFB8;
 		x_pos = 0x37D0A0;
@@ -270,6 +273,7 @@ function Game.detectVersion(romName)
 	elseif bizstring.contains(romName, "USA") and bizstring.contains(romName, "Rev A") then
 		frame_timer = 0x27F718;
 		slope_timer = 0x37B4E4;
+		player_grounded = 0x37B160;
 		moves_bitfield = 0x37B5A0;
 		x_vel = 0x37B6B8;
 		x_pos = 0x37B7A0;
@@ -286,6 +290,7 @@ function Game.detectVersion(romName)
 	elseif bizstring.contains(romName, "USA") then
 		frame_timer = 0x2808D8;
 		slope_timer = 0x37C2E4;
+		player_grounded = 0x37BF60;
 		moves_bitfield = 0x37C3A0;
 		x_vel = 0x37C4B8;
 		x_pos = 0x37C5A0;
@@ -465,7 +470,7 @@ local movementStates = {
 
 	[113] = "Falling", -- Talon Trot
 	[114] = "Recovering", -- Getting up after taking damage, eg. fall famage
-	[115] = "Locked", -- Cutscene? -- TODO
+	[115] = "Locked", -- Cutscene
 	[116] = "Locked", -- Jiggy pad, Mumbo transformation, Bottles
 	[117] = "Locked", -- Bottles
 
@@ -522,12 +527,24 @@ function Game.colorCurrentMovementState()
 end
 
 local options_autopound_checkbox;
+local holdingAPostJump = false;
 function autoPound()
 	if forms.ischecked(options_autopound_checkbox) then
 		local currentMovementState = mainmemory.read_u32_be(current_movement_state);
 		local YVelocity = Game.getYVelocity();
-		if currentMovementState == 17 and YVelocity == -272 and not Game.isPhysicsFrame() then
+
+		-- First frame pound out of peck
+		if currentMovementState == 17 and YVelocity == -272 and not Game.isPhysicsFrame() then -- TODO: YVelocity == -272 doesn't work for all versions
 			joypad.set({["Z"] = true}, 1);
+		end
+
+		-- Frame perfect mid air talon trot slide jump
+		if currentMovementState == 21 and mainmemory.readbyte(player_grounded) == 0 or holdingAPostJump then
+			holdingAPostJump = true;
+			if holdingAPostJump then
+				holdingAPostJump = holdingAPostJump and (currentMovementState == 21 or Game.getYVelocity() > 0);
+			end
+			joypad.set({["A"] = true}, 1);
 		end
 	end
 end
@@ -884,6 +901,7 @@ end
 local encircle_checkbox;
 local dynamic_radius_checkbox;
 local dynamic_radius_factor = 15;
+y_stagger_amount = 10;
 
 -- Relative to level_object_array
 local max_slots = 0x100;
@@ -931,7 +949,7 @@ local function encircle_banjo()
 		z = current_banjo_z + math.sin(math.pi * 2 * i / #currentPointers) * radius;
 
 		mainmemory.writefloat(currentPointers[i] + slot_x_pos, x, true);
-		mainmemory.writefloat(currentPointers[i] + slot_y_pos, current_banjo_y, true);
+		mainmemory.writefloat(currentPointers[i] + slot_y_pos, current_banjo_y + i * y_stagger_amount, true);
 		mainmemory.writefloat(currentPointers[i] + slot_z_pos, z, true);
 	end
 end

@@ -77,6 +77,8 @@ SystemID N64
 36C51C	w	u	1	RDRAM	Pause Menu Item 4 Y Position
 36C51E	b	u	1	RDRAM	Pause Menu Item 4 Portrait
 36E560	d	h	1	RDRAM	Object Array pointer
+37BF60	b	u	1	RDRAM	Player is on ground
+37BF61	b	u	1	RDRAM	Player is swimming
 37C004	d	f	1	RDRAM	Unknown Float
 37C0B0	d	f	1	RDRAM	Wading Boots Timer
 37C0B4	d	f	1	RDRAM	Wading Boots Timer (copy)
@@ -119,6 +121,7 @@ SystemID N64
 37D240	d	f	1	RDRAM	Eye State (Right)
 37D260	d	f	1	RDRAM	Ground Damage Timer
 37D280	d	f	1	RDRAM	Ground Damage Timer (Copy)
+37D3A4	b	u	1	RDRAM	Talon Trot Skid State
 37D958	d	f	1	RDRAM	Camera X Position
 37D95C	d	f	1	RDRAM	Camera Y position
 37D960	d	f	1	RDRAM	Camera Z Position

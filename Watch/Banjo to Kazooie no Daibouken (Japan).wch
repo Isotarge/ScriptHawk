@@ -5,6 +5,8 @@ SystemID N64
 2806DA	w	h	1	RDRAM	Music Track
 282240	w	b	1	RDRAM	Stop'N'Swop Items
 36F260	d	h	1	RDRAM	Object Array pointer
+37CA60	b	u	1	RDRAM	Player is on ground
+37CA61	b	u	1	RDRAM	Player is swimming
 37CBB0	d	f	1	RDRAM	Wading Boots Timer
 37CBB4	d	f	1	RDRAM	Wading Boots Timer (copy)
 37CBB8	d	f	1	RDRAM	Turbo Trainers Timer

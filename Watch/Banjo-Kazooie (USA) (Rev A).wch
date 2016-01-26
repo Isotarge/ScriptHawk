@@ -5,6 +5,10 @@ SystemID N64
 2806DA	w	h	1	RDRAM	Music Track
 282240	w	h	1	RDRAM	Stop'N'Swop Items
 36D760	d	h	1	RDRAM	Object Array pointer
+37B160	b	u	1	RDRAM	Player is on ground
+37B161	b	u	1	RDRAM	Player is swimming
+37B3D1	b	u	1	RDRAM	Standing on Fly Pad
+37B3D2	b	u	1	RDRAM	Standing on Shock Spring Pad
 37B4E4	d	f	1	RDRAM	Slope Timer
 37B5A0	d	h	1	RDRAM	Moves Unlocked (Bitfield)
 37B5D0	d	f	1	RDRAM	Unknown Float
