@@ -64,7 +64,7 @@ local function getColour(ratio)
 		green = 255;
 	end
 
-	return 0x7f000000 + (red * 0x00010000) + (green * 0x00000100);
+	return 0x7F000000 + (red * 0x00010000) + (green * 0x00000100);
 end
 
 -------------------

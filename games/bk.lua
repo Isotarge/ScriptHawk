@@ -336,6 +336,21 @@ local function neverSlip()
 	mainmemory.writefloat(slope_timer, 0.0, true);
 end
 
+function Game.getSlopeTimer()
+	return mainmemory.readfloat(slope_timer, true);
+end
+
+function Game.colorSlopeTimer()
+	if forms.ischecked(options_toggle_neverslip) then
+		return 0xFF00FFFF; -- Light blue
+	end
+	local slopeTimer = Game.getSlopeTimer();
+		if slopeTimer >= 0.75 then
+		return getColor(slopeTimer);
+	end
+	return 0xFFFFFFFF; -- White
+end
+
 -----------------
 -- Moves stuff --
 -----------------
@@ -528,18 +543,20 @@ end
 
 local options_autopound_checkbox;
 local holdingAPostJump = false;
+allowPound = false;
+allowTTrotJump = true;
 function autoPound()
 	if forms.ischecked(options_autopound_checkbox) then
 		local currentMovementState = mainmemory.read_u32_be(current_movement_state);
 		local YVelocity = Game.getYVelocity();
 
 		-- First frame pound out of peck
-		if currentMovementState == 17 and YVelocity == -272 and not Game.isPhysicsFrame() then -- TODO: YVelocity == -272 doesn't work for all versions
+		if allowPound and currentMovementState == 17 and YVelocity == -272 and not Game.isPhysicsFrame() then -- TODO: YVelocity == -272 doesn't work for all versions
 			joypad.set({["Z"] = true}, 1);
 		end
 
 		-- Frame perfect mid air talon trot slide jump
-		if currentMovementState == 21 and mainmemory.readbyte(player_grounded) == 0 or holdingAPostJump then
+		if allowTTrotJump and (currentMovementState == 21 and mainmemory.readbyte(player_grounded) == 0 or holdingAPostJump) then
 			holdingAPostJump = true;
 			if holdingAPostJump then
 				holdingAPostJump = holdingAPostJump and (currentMovementState == 21 or Game.getYVelocity() > 0); -- TODO: Better method for detecting end of a jump, velocity > 0 is janky
@@ -1229,6 +1246,7 @@ Game.OSD = {
 	{"Rot. Z", Game.getZRotation},
 	{"Separator", 1},
 	{"Movement", Game.getCurrentMovementState, Game.colorCurrentMovementState},
+	{"Slope Timer", Game.getSlopeTimer, Game.colorSlopeTimer},
 };
 
 return Game;

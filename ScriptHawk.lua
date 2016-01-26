@@ -81,6 +81,27 @@ function deepcompare(t1, t2, ignore_mt)
 	return true;
 end
 
+--       a  r  g  b
+-- 0.0 = 7F 00 FF 00 = Green
+-- 0.5 = 7F FF FF 00 = Yellow
+-- 1.0 = 7F FF 00 00 = Red
+function getColour(ratio, alpha)
+	local green = 255;
+	local red = 255;
+	alpha = alpha or 255;
+
+	if ratio > 0.5 then
+		green = 255 - round(((ratio - 0.5) * 2) * 255);
+		red = 255;
+	elseif ratio < 0.5 then
+		red = round((ratio * 2) * 255);
+		green = 255;
+	end
+
+	return (alpha * 0x01000000) + (red * 0x00010000) + (green * 0x00000100);
+end
+getColor = getColour; -- To speak Americano
+
 -----------------
 -- Game checks --
 -----------------
@@ -593,7 +614,6 @@ local function mainloop()
 				rotate("z", Game.rot_speed);
 			end
 			if joypad_pressed["P1 L"] then
-				-- TODO: Scale up I guess?
 				gofast("y", speedy_speed_Y);
 			end
 		end

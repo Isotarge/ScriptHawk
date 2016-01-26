@@ -34,23 +34,27 @@ local max_slots = 0x100;
 -- Relative to slot start
 slot_variables = {
 	[0x00] = {["Type"] = "Pointer"}, -- TODO: Does this have anything to do with that huge linked list?
-	[0x04] = {["Type"] = "Float", ["Name"] = "X Position"},
-	[0x08] = {["Type"] = "Float", ["Name"] = "Y Position"},
-	[0x0C] = {["Type"] = "Float", ["Name"] = "Z Position"},
+	[0x04] = {["Type"] = "Float", ["Name"] = {"X", "X Pos", "X Position"}},
+	[0x08] = {["Type"] = "Float", ["Name"] = {"Y", "Y Pos", "Y Position"}},
+	[0x0C] = {["Type"] = "Float", ["Name"] = {"Z", "Z Pos", "Z Position"}},
 
 	[0x14] = {["Type"] = "Pointer"},
 	[0x18] = {["Type"] = "Pointer"},
 
 	[0x28] = {["Type"] = "Float"}, -- TODO: Velocity?
 
+	[0x38] = {["Type"] = "u16_be", ["Name"] = "Movement Timer"},
+	[0x3B] = {["Type"] = "Byte", ["Name"] = "Movement State"},
+
 	[0x48] = {["Type"] = "Float", ["Name"] = "Race path progression"}, 
 	[0x4C] = {["Type"] = "Float", ["Name"] = "Speed (rubberband)"}, 
 
-	[0x50] = {["Type"] = "Float", ["Name"] = "Facing"},
+	[0x50] = {["Type"] = "Float", ["Name"] = {"Facing Angle", "Facing", "Rot Y", "Rot. Y", "Y Rotation"}},
 
 	[0x60] = {["Type"] = "Float", ["Name"] = "Recovery Timer"}, -- TTC Crab
-	[0x64] = {["Type"] = "Float", ["Name"] = "Unknown Angle"},
-	[0x68] = {["Type"] = "Float", ["Name"] = "Rotation X"},
+
+	[0x64] = {["Type"] = "Float", ["Name"] = {"Moving Angle", "Moving", "Rot Y", "Rot. Y", "Y Rotation"}},
+	[0x68] = {["Type"] = "Float", ["Name"] = {"Rot X", "Rot. X", "X Rotation"}},
 
 	[0x8C] = {["Type"] = "Float", ["Name"] = "Countdown timer?"},
 	[0xE8] = {["Type"] = "Byte", ["Name"] = "Damages Player"},
@@ -81,15 +85,13 @@ local slot_data = {};
 -- Output Helpers --
 --------------------
 
-function is_binary(var_type)
-	return var_type == "Byte";
+function isBinary(var_type)
+	return var_type == "Binary" or var_type == "Bitfield" or var_type == "Byte" or var_type == "Flag" or var_type == "Boolean";
 end
-isBinary = is_binary;
 
-function is_hex(var_type)
-	return var_type == "Pointer" or var_type == "4_Unknown" or var_type == "Z4_Unknown";
+function isHex(var_type)
+	return var_type == "Hex" or var_type == "Pointer" or var_type == "Z4_Unknown";
 end
-isHex = is_hex;
 
 function toHexString(value)
 	value = string.format("%X", value or 0);
@@ -99,26 +101,37 @@ function toHexString(value)
 	return "0x"..value;
 end
 
-function format_for_output(var_type, value)
-	if is_binary(var_type) then
+function formatForOutput(var_type, value)
+	if isBinary(var_type) then
 		local binstring = bizstring.binary(value);
 		if binstring ~= "" then
 			return binstring;
 		end
 		return "0";
-	elseif is_hex(var_type) then
+	elseif isHex(var_type) then
 		return toHexString(value);
 	end
 	return ""..value;
 end
-formatForOutput = format_for_output;
 
-function is_interesting(variable)
+function isInteresting(variable)
 	local min = get_minimum_value(variable);
 	local max = get_maximum_value(variable);
 	return slot_variables[variable].Type ~= "Z4_Unknown" or min ~= max;
 end
-isInteresting = is_interesting;
+
+function getVariableName(address)
+	local variable = slot_variables[address];
+	local nameType = type(variable.Name);
+
+	if nameType == "string" then
+		return variable.Name;
+	elseif nameType == "table" then
+		return variable.Name[1];
+	end
+
+	return variable.Type;
+end
 
 ------------
 -- Output --
@@ -136,13 +149,8 @@ function output_slot(index)
 						previous_type = slot_variables[i].Type;
 						print("");
 					end
-					if type(slot_variables[i].Name) == "string" then
-						print(toHexString(i).." "..(slot_variables[i].Name).." ("..(slot_variables[i].Type).."): "..format_for_output(slot_variables[i].Type, current_slot[i]));
-					else
-						print(toHexString(i).." "..(slot_variables[i].Type)..": "..format_for_output(slot_variables[i].Type, current_slot[i]));
-					end
-				else
-					--print(toHexString(i).." Nothing interesting.");
+					local variableName = getVariableName(i);
+					print(toHexString(i).." "..variableName.." ("..(slot_variables[i].Type).."): "..formatForOutput(slot_variables[i].Type, current_slot[i]));
 				end
 			end
 		end
@@ -162,20 +170,15 @@ function output_stats()
 	local previous_type = "";
 	for i = 0, slot_size do
 		if type(slot_variables[i]) == "table" then
-			if is_interesting(i) then
+			if isInteresting(i) then
 				min = get_minimum_value(i);
 				max = get_maximum_value(i);
 				if slot_variables[i].Type ~= previous_type then
 					previous_type = slot_variables[i].Type;
 					print("");
 				end
-				if type(slot_variables[i].Name) ~= "nil" then
-					print(toHexString(i).." "..(slot_variables[i].Type)..": "..format_for_output(slot_variables[i].Type, min).. " to "..format_for_output(slot_variables[i].Type, max).." - "..(slot_variables[i].Name));
-				else
-					print(toHexString(i).." "..(slot_variables[i].Type)..": "..format_for_output(slot_variables[i].Type, min).. " to "..format_for_output(slot_variables[i].Type, max));
-				end
-			else
-				--print(toHexString(i).." Nothing interesting.");
+				local variableName = getVariableName(i);
+				print(toHexString(i).." "..(slot_variables[i].Type)..": "..formatForOutput(slot_variables[i].Type, min).. " to "..formatForOutput(slot_variables[i].Type, max).." - "..variableName);
 			end
 		end
 	end
@@ -188,17 +191,12 @@ function format_slot_data()
 	for i = 1, #slot_data do
 		formatted_data[i] = {};
 		for relative_address, variable_data in pairs(slot_variables) do
-			if type(variable_data) == "table" and is_interesting(relative_address) then
-				if type(variable_data.Name) == "string" then
-					formatted_data[i][toHexString(relative_address).." "..variable_data.Name] = {
-						["Type"] = variable_data.Type,
-						["Value"] = format_for_output(variable_data.Type, slot_data[i][relative_address])
-					};
-				else
-					formatted_data[i][toHexString(relative_address).." "..variable_data.Type] = {
-						["Value"] = format_for_output(variable_data.Type, slot_data[i][relative_address])
-					};
-				end
+			if type(variable_data) == "table" and isInteresting(relative_address) then
+				local variableName = getVariableName(relative_address);
+				formatted_data[i][toHexString(relative_address).." "..variableName] = {
+					["Type"] = variable_data.Type,
+					["Value"] = formatForOutput(variable_data.Type, slot_data[i][relative_address])
+				};
 			end
 		end
 	end
@@ -235,13 +233,21 @@ findRoot = find_root;
 
 function resolve_variable_name(name)
 	-- Make sure comparisons are case insensitive
-	name = bizstring.toupper(name);
+	name = string.upper(name);
 
 	-- Comparison loop
 	local relative_address, variable_data;
 	for relative_address, variable_data in pairs(slot_variables) do
-		if type(variable_data) == "table" and type(variable_data.Name) ~= "nil" and bizstring.toupper(variable_data.Name) == name then
-			return relative_address;
+		if type(variable_data) == "table"
+			if type(variable_data.Name) == "string" and string.upper(variable_data.Name) == name then
+				return relative_address;
+			elseif type(variable_data.Name) == "table" then
+				for i = 1, #variable_data.Name do
+					if type(variable_data.Name[i]) == "string" and string.upper(variable_data.Name[i]) == name then
+						return relative_address;
+					end
+				end
+			end
 		end
 	end
 
@@ -296,7 +302,7 @@ function get_all_unique(variable)
 			parseSlotData();
 		end
 		for i = 1, #slot_data do
-			value = format_for_output(slot_variables[variable].Type, slot_data[i][variable]);
+			value = formatForOutput(slot_variables[variable].Type, slot_data[i][variable]);
 			if type(unique_values[value]) ~= "nil" then
 				unique_values[value] = unique_values[value] + 1;
 			else
@@ -327,9 +333,11 @@ function set_all(variable, value)
 			if slot_variables[variable].Type == "Float" then
 				--print("writing float to slot "..i);
 				mainmemory.writefloat(currentSlotBase + variable, value, true);
-			elseif is_hex(slot_variables[variable].Type) then
+			elseif isHex(slot_variables[variable].Type) then
 				--print("writing u32_be to slot "..i);
 				mainmemory.write_u32_be(currentSlotBase + variable, value);
+			elseif slot_variables[variable].Type == "u16_be" then
+				mainmemory.write_u16_be(currentSlotBase + variable, value);
 			else
 				--print("writing byte to slot "..i);
 				mainmemory.writebyte(currentSlotBase + variable, value);
@@ -411,12 +419,21 @@ end
 getSlotBase = get_slot_base;
 
 function address_to_slot(address)
+	address = address or 0;
+	if address < 0x000000 or address > 0x7FFFFF then
+		print("Address: "..toHexString(address).." is out of RDRAM range.");
+	end
+
 	local level_object_array = mainmemory.read_u24_be(level_object_array_pointer + 1);
 	local numSlots = math.min(max_slots, mainmemory.read_u32_be(level_object_array));
 	local position = address - level_object_array - slot_base;
 	local relativeToObject = position % slot_size;
 	local objectNumber = math.floor(position / slot_size);
-	print("Object number "..objectNumber.." address relative "..toHexString(relativeToObject));
+	if objectNumber >= 0 and objectNumber <= numSlots then
+		print("Object number "..objectNumber.." address relative "..toHexString(relativeToObject));
+	else
+		print("Address: "..toHexString(address).." is out of range of the object array.");
+	end
 end
 addressToSlot = address_to_slot;
 
@@ -427,7 +444,9 @@ function process_slot(slot_base)
 		if type(variable_data) == "table" then
 			if variable_data.Type == "Byte" then
 				current_slot_variables[relative_address] = mainmemory.readbyte(slot_base + relative_address);
-			elseif variable_data.Type == "4_Unknown" or variable_data.Type == "Z4_Unknown" or variable_data.Type == "Pointer" then
+			elseif variable_data.Type == "u16_be" then
+				current_slot_variables[relative_address] = mainmemory.read_u16_be(slot_base + relative_address);
+			elseif variable_data.Type == "Z4_Unknown" or variable_data.Type == "Pointer" then
 				current_slot_variables[relative_address] = mainmemory.read_u32_be(slot_base + relative_address);
 			elseif variable_data.Type == "Float" then
 				current_slot_variables[relative_address] = mainmemory.readfloat(slot_base + relative_address, true);
