@@ -17,24 +17,20 @@ sound addresses
 -- Maps --
 ----------
 
---------------------
--- DK64 Map stuff --
---------------------
-
 Game.levels = {
-"DK Isles",
-"Jungle Japes",
-"Angry Aztec",
-"Frantic Factory",
-"Gloomy Galleon",
-"Fungi Forest",
-"Crystal Caves",
-"Creepy Castle",
-"Hideout Helm",
-"Cutscenes",
-"Bonus Barrels",
-"Kong Battle",
-"Other"
+	"DK Isles",
+	"Jungle Japes",
+	"Angry Aztec",
+	"Frantic Factory",
+	"Gloomy Galleon",
+	"Fungi Forest",
+	"Crystal Caves",
+	"Creepy Castle",
+	"Hideout Helm",
+	"Cutscenes",
+	"Bonus Barrels",
+	"Kong Battle",
+	"Other"
 };
 
 Game.maps = {
