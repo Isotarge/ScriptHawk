@@ -55,7 +55,7 @@ slot_variables = {
 	[0x8C] = {["Type"] = "Float", ["Name"] = "Countdown timer?"},
 	[0xE8] = {["Type"] = "Byte", ["Name"] = "Damages Player"},
 
-	[0x114] = {["Type"] = "Float", ["Name"] = "Sound timer?"},
+	[0x114] = {["Type"] = "Float", ["Name"] = "Sound timer?"}, -- Also used by Conga to decide when to throw orange
 	[0x118] = {["Type"] = "Float"},
 	[0x11C] = {["Type"] = "Float"},
 	[0x120] = {["Type"] = "Float"},

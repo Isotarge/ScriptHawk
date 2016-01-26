@@ -877,9 +877,8 @@ end
 -- Written by Isotarge, 2015 -- 
 -------------------------------
 
-local conga_slot_size = 0x80;
-local throw_slot = 0x77;
-local orange_timer = 0x1C;
+local throw_slot = 39; -- TODO: Detect conga object dynamically
+local orange_timer = 0x114;
 
 local orange_timer_value = 0.5;
 
@@ -887,7 +886,7 @@ function throwOrange()
 	local keyboard_pressed = input.get();
 	if keyboard_pressed["C"] then
 		local level_object_array_base = mainmemory.read_u24_be(object_array_pointer + 1);
-		mainmemory.writefloat(level_object_array_base + throw_slot * conga_slot_size + orange_timer, orange_timer_value, true);
+		mainmemory.writefloat(level_object_array_base + first_slot_base + throw_slot * slot_size + orange_timer, orange_timer_value, true); 
 	end
 end
 
