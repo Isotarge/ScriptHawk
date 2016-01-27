@@ -70,11 +70,11 @@ function deepcompare(t1, t2, ignore_mt)
 	-- as well as tables which have the metamethod __eq
 	local mt = getmetatable(t1);
 	if not ignore_mt and mt and mt.__eq then return t1 == t2 end
-	for k1,v1 in pairs(t1) do
+	for k1, v1 in pairs(t1) do
 		local v2 = t2[k1];
 		if v2 == nil or not deepcompare(v1,v2) then return false end
 	end
-	for k2,v2 in pairs(t2) do
+	for k2, v2 in pairs(t2) do
 		local v1 = t1[k2];
 		if v1 == nil or not deepcompare(v1,v2) then return false end
 	end
@@ -101,6 +101,30 @@ function getColour(ratio, alpha)
 	return (alpha * 0x01000000) + (red * 0x00010000) + (green * 0x00000100);
 end
 getColor = getColour; -- To speak Americano
+
+-- Finds the root of a linked list
+function find_root(object)
+	local count = 0;
+	while object > 0 do
+		dprint(count..": "..toHexString(object));
+		object = mainmemory.read_u24_be(object + 1);
+		count = count + 1;
+	end
+	print_deferred();
+end
+findRoot = find_root;
+
+-- Finds the root of a linked list, outputting object size
+function find_root_size(object)
+	local count = 0;
+	while object > 0 do
+		dprint(count..": "..toHexString(object).." Size: "..toHexString(mainmemory.read_u32_be(object + 4)));
+		object = mainmemory.read_u24_be(object + 1);
+		count = count + 1;
+	end
+	print_deferred();
+end
+findRootSize = find_root_size;
 
 -----------------
 -- Game checks --
@@ -249,7 +273,6 @@ end
 ----------------------------
 
 function searchPointers(base, range, allowLater)
-	local address = 0;
 	local foundPointers = {};
 	allowLater = allowLater or false;
 	for address = 0x000000, 0x7FFFFC do
