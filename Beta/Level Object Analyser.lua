@@ -41,6 +41,10 @@ slot_variables = {
 	[0x14] = {["Type"] = "Pointer"},
 	[0x18] = {["Type"] = "Pointer"},
 
+	[0x1C] = {["Type"] = "Float"},
+	[0x20] = {["Type"] = "Float"},
+	[0x24] = {["Type"] = "Float"},
+
 	[0x28] = {["Type"] = "Float"}, -- TODO: Velocity?
 	[0x2C] = {["Type"] = "Float"},
 	[0x30] = {["Type"] = "Float"},
@@ -72,8 +76,11 @@ slot_variables = {
 	[0x125] = {["Type"] = "Byte", ["Name"] = "Transparancy"},
 	[0x127] = {["Type"] = "Byte", ["Name"] = "Eye State"},
 	[0x128] = {["Type"] = "Float", ["Name"] = "Scale"},
+
 	[0x12C] = {["Type"] = "Pointer"},
 	[0x130] = {["Type"] = "Pointer"},
+	[0x14C] = {["Type"] = "Pointer"},
+	[0x150] = {["Type"] = "Pointer"},
 };
 
 local function fillBlankVariableSlots()
