@@ -1,4 +1,4 @@
-Domain EEPROM
+Domain RDRAM
 SystemID N64
 02D500	d	h	1	RDRAM	Huge linked list root, investigate further
 2808D8	d	s	1	RDRAM	Frame timer

@@ -1,3 +1,5 @@
+Domain EEPROM
+SystemID N64
 0074	d	h	0	EEPROM	EEPROM Checksum 1
 00EC	d	h	0	EEPROM	EEPROM Checksum 2
 014A	w	u	1	EEPROM	FF RNG
@@ -5,3 +7,4 @@
 01C2	w	u	1	EEPROM	FF RNG
 01DC	d	h	0	EEPROM	EEPROM Checksum 4
 01FC	d	h	0	EEPROM	EEPROM Checksum 5 (Global flags?)
+
