@@ -1,10 +1,10 @@
 -- DK64 C-Upless ledge clip angle/position finder
 -- Written by Isotarge, 2015
 
-local kong_object_pointer = 0x7fbb4d; -- TODO: Port to other versions
+local kong_object_pointer = 0x7FBB4D; -- TODO: Port to other versions
 
 -- Relative to kong object
-local x_pos = 0x7c;
+local x_pos = 0x7C;
 local y_pos = 0x80;
 local z_pos = 0x84;
 local angle = 0xe4;
@@ -22,7 +22,7 @@ local end_x = 176.5;
 local current_x = start_x;
 
 local currentAngle = 0x0000;
-local maxAngle = 0x0fff;
+local maxAngle = 0x0FFF;
 local angle_increments = 1;
 
 local running = true;
