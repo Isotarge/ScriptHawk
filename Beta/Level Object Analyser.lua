@@ -238,7 +238,7 @@ function resolve_variable_name(name)
 	-- Comparison loop
 	local relative_address, variable_data;
 	for relative_address, variable_data in pairs(slot_variables) do
-		if type(variable_data) == "table"
+		if type(variable_data) == "table" then
 			if type(variable_data.Name) == "string" and string.upper(variable_data.Name) == name then
 				return relative_address;
 			elseif type(variable_data.Name) == "table" then
