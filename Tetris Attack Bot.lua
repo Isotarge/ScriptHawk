@@ -589,7 +589,6 @@ local function resetBotState()
 	previousFrameDirection = {};
 	previousHeightTickerValues = {};
 
-	local currentPlayer;
 	for currentPlayer = 1, num_players do
 		table.insert(moveQueue, {});
 		table.insert(numMoves, 0);
@@ -605,8 +604,7 @@ end
 resetBotState();
 
 local function getAverageMoveLength()
-	local currentPlayer;
-	for currentPlayer=1,num_players do
+	for currentPlayer = 1, num_players do
 		print("Avarage move length: "..(frameSum[currentPlayer] / numMoves[currentPlayer]));
 	end
 end
@@ -701,7 +699,6 @@ local function mainLoop()
 		return;
 	end
 
-	local player;
 	for player = 1, num_players do
 		invalidateGridCache(player)
 
