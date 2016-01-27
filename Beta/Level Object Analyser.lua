@@ -42,6 +42,8 @@ slot_variables = {
 	[0x18] = {["Type"] = "Pointer"},
 
 	[0x28] = {["Type"] = "Float"}, -- TODO: Velocity?
+	[0x2C] = {["Type"] = "Float"},
+	[0x30] = {["Type"] = "Float"},
 
 	[0x38] = {["Type"] = "u16_be", ["Name"] = "Movement Timer"},
 	[0x3B] = {["Type"] = "Byte", ["Name"] = "Movement State"},
@@ -59,6 +61,9 @@ slot_variables = {
 	[0x8C] = {["Type"] = "Float", ["Name"] = "Countdown timer?"},
 	[0xE8] = {["Type"] = "Byte", ["Name"] = "Damages Player"},
 
+	[0x100] = {["Type"] = "Pointer"},
+	[0x104] = {["Type"] = "Pointer"},
+
 	[0x114] = {["Type"] = "Float", ["Name"] = "Sound timer?"}, -- Also used by Conga to decide when to throw orange
 	[0x118] = {["Type"] = "Float"},
 	[0x11C] = {["Type"] = "Float"},
@@ -67,6 +72,8 @@ slot_variables = {
 	[0x125] = {["Type"] = "Byte", ["Name"] = "Transparancy"},
 	[0x127] = {["Type"] = "Byte", ["Name"] = "Eye State"},
 	[0x128] = {["Type"] = "Float", ["Name"] = "Scale"},
+	[0x12C] = {["Type"] = "Pointer"},
+	[0x130] = {["Type"] = "Pointer"},
 };
 
 local function fillBlankVariableSlots()
