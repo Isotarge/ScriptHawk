@@ -400,6 +400,7 @@ local movementStates = {
 	[21] = "Idle", -- Talon Trot
 	[22] = "Walking", -- Talon Trot
 	[23] = "Leaving Talon Trot",
+	[24] = "Knockback", -- Flying
 
 	[26] = "Entering Wonderwing",
 	[27] = "Idle", -- Wonderwing
@@ -463,6 +464,7 @@ local movementStates = {
 	[85] = "Slipping", -- Wading Boots
 	[86] = "Knockback", -- Successful enemy damage
 	[87] = "Beak Bomb", -- Ending
+	[88] = "Damaged", -- Beak Bomb
 	[89] = "Damaged", -- Beak Bomb
 
 	[90] = "Loading Zone",
@@ -549,6 +551,9 @@ function autoPound()
 	if forms.ischecked(options_autopound_checkbox) then
 		local currentMovementState = mainmemory.read_u32_be(current_movement_state);
 		local YVelocity = Game.getYVelocity();
+
+		-- Perfect roll flutters
+		RF_step();
 
 		-- First frame pound out of peck
 		if allowPound and currentMovementState == 17 and YVelocity == -272 and not Game.isPhysicsFrame() then -- TODO: YVelocity == -272 doesn't work for all versions
@@ -869,24 +874,8 @@ end
 -- Roll Flutter stuff --
 ------------------------
 
-RF_absolute_target_angle = 180;
-
-local RF_max_analog = 127;
-
-function set_angle(num)
-	RF_absolute_target_angle = num;
-end
-
 local function RF_step()
-	local current_camera_rot = mainmemory.readfloat(camera_rot, true) % 360;
-	local analog_angle = rotation_to_radians(math.abs(RF_absolute_target_angle - current_camera_rot) % 360);
-	local analog_x = math.sin(analog_angle) * RF_max_analog;
-	local analog_y = -1 * math.cos(analog_angle) * RF_max_analog;
-	--print("camera rot: "..current_camera_rot);
-	--print("analog angle: "..analog_angle);
-	--print("raw sincos: "..math.sin(analog_angle)..","..math.cos(analog_angle));
-	--print("analog inputs: "..analog_x..","..analog_y);
-	joypad.setanalog({['X Axis'] = analog_x, ['Y Axis'] = analog_y}, 1);
+	-- TODO
 end
 
 -------------------------------
@@ -1091,40 +1080,42 @@ function Game.setZVelocity(value)
 end
 
 ------------------
--- CC Early bot --
+-- CCW Clip bot --
 ------------------
 
-CCBotRunning = false;
-local bestVelocity = 0;
-local requiredVelocity = -2900;
+CCWBotRunning = false;
+local requiredY = 4500;
+local requiredMovementState = "Flying";
 
-local xParams = {["min"] = 10, ["max"] = 127};
-local yParams = {["min"] = 10, ["max"] = 127};
+local maxAngle = 40;
+local minAngle = 320;
+local angleStep = 0.1;
+local currentAngle = minAngle;
 
-function setRandomJoystick()
-	joypad.setanalog({['X Axis'] = math.random(xParams.min, xParams.max), ['Y Axis'] = math.random(yParams.min, yParams.max)}, 1);
-end
+function CCWBot()
+	CCWBotRunning = true;
+	while CCWBotRunning do
+		savestate.loadslot(4);
 
-function CCBot()
-	if CCBotRunning then
-		savestate.loadslot(0);
-		setRandomJoystick();
-		emu.frameadvance();
-		emu.frameadvance();
-		emu.frameadvance();
-		emu.frameadvance();
-		emu.frameadvance();
-		emu.frameadvance();
+		currentAngle = currentAngle + angleStep;
+		if currentAngle > 360 then
+			currentAngle = 0;
+		end
 
-		local currentVelocity = Game.getYVelocity();
-		if currentVelocity <= bestVelocity then
-			bestVelocity = currentVelocity;
-			savestate.saveslot(0);
+		Game.setYRotation(currentAngle);
+		joypad.set({["B"] = true}, 1);
+
+		for i = 0, 100 do
+			emu.frameadvance();
+		end
+
+		local currentY = Game.getYPosition();
+		if currentY <= requiredY then
+			print("Found solution: "..currentAngle);
+			CCWBotRunning = false;
 		end
 	end
 end
-
---event.onframestart(CCBot, "ScriptHawk - Clanker's Cavern early bot");
 
 -------------------------
 -- Pulse Clip Velocity --
@@ -1203,7 +1194,6 @@ function Game.eachFrame()
 
 	if forms.ischecked(options_toggle_neverslip) then
 		neverSlip();
-		--RF_step();
 	end
 
 	if forms.ischecked(encircle_checkbox) then
