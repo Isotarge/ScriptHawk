@@ -95,10 +95,11 @@ SystemID N64
 7ED559	b	h	1	RDRAM	Extra cutscenes & Rambi unlocked
 7ED55B	b	h	1	RDRAM	Mystery menu bosses enabled (up to galleon)
 7F0560	d	u	1	RDRAM	Frames (Real)
-7F098C	d	h	1	RDRAM	Pointer to big linked list
 7F0990	d	h	1	RDRAM	Pointer to big linked list
 7F5D10	d	h	1	RDRAM	Camera pointer?
 7F5D14	b	h	1	RDRAM	ISG Fadeout
+7F6000	d	h	1	RDRAM	Trigger Array Pointer
+7F6004	d	u	1	RDRAM	Trigger Array Count
 7F8E88	b	u	1	RDRAM	Object Count?
 7F948C	d	f	1	RDRAM	Stored Y?
 7F94B8	d	h	1	RDRAM	Slope object pointer?
