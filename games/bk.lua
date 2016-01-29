@@ -543,6 +543,14 @@ function Game.colorCurrentMovementState()
 	return 0xFFFFFFFF; -- White
 end
 
+------------------------
+-- Roll Flutter stuff --
+------------------------
+
+local function RF_step()
+	-- TODO
+end
+
 local options_autopound_checkbox;
 local holdingAPostJump = false;
 allowPound = false;
@@ -868,14 +876,6 @@ local function fireAllSlots()
 	for i = 1, number_of_slots do
 		fireSlot(vile_state, i, colour);
 	end
-end
-
-------------------------
--- Roll Flutter stuff --
-------------------------
-
-local function RF_step()
-	-- TODO
 end
 
 -------------------------------
