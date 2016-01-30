@@ -319,7 +319,7 @@ local max_crowns = 10;
 local max_medals = 40;
 local max_cb = 3511;
 local max_gb = 201;
-local max_warps = (5 * 2 * 7) + 4 + 2 + 2 + 6;
+local max_warps = (5 * 2 * 8) + 4 + 2 + 2 + 6;
 
 -- Relative to global_base
 local standard_ammo = 0;
