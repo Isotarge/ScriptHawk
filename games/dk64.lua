@@ -650,9 +650,27 @@ local flag_array = {
 
 	{["byte"] = 0x13, ["bit"] = 0, ["name"] = "Factory: T&S Cleared"},
 	{["byte"] = 0x13, ["bit"] = 1, ["name"] = "Galleon: Cannon game room open"},
+	{["byte"] = 0x13, ["bit"] = 7, ["name"] = "Galleon: Enguarde door open"},
+
+	{["byte"] = 0x14, ["bit"] = 2, ["name"] = "Galleon: Gold tower gate open"},
 
 	{["byte"] = 0x15, ["bit"] = 0, ["name"] = "Key 4", ["type"] = "Key"},
+	{["byte"] = 0x15, ["bit"] = 1, ["name"] = "Galleon: W5: 5DS", ["type"] = "Warp"},
+	{["byte"] = 0x15, ["bit"] = 3, ["name"] = "Galleon: W2: 2DS", ["type"] = "Warp"},
+	{["byte"] = 0x15, ["bit"] = 4, ["name"] = "Galleon: W2: Cranky", ["type"] = "Warp"},
+	{["byte"] = 0x15, ["bit"] = 5, ["name"] = "Galleon: W3: Snide", ["type"] = "Warp"},
+	{["byte"] = 0x15, ["bit"] = 6, ["name"] = "Galleon: W3: Cranky", ["type"] = "Warp"},
 
+	{["byte"] = 0x16, ["bit"] = 2, ["name"] = "Galleon: W1: Cranky", ["type"] = "Warp"},
+
+	{["byte"] = 0x17, ["bit"] = 0, ["name"] = "Galleon: Tiny GB: 2DS", ["type"] = "GB"},
+	{["byte"] = 0x17, ["bit"] = 7, ["name"] = "Galleon: Tiny GB: Pearls", ["type"] = "GB"},
+
+	{["byte"] = 0x18, ["bit"] = 3, ["name"] = "Galleon: Water level raised CS"},
+	{["byte"] = 0x18, ["bit"] = 4, ["name"] = "Galleon: Water level lowered CS"},
+
+	{["byte"] = 0x19, ["bit"] = 1, ["name"] = "Galleon: Tiny GB: 5DS", ["type"] = "GB"},
+	{["byte"] = 0x19, ["bit"] = 2, ["name"] = "Galleon: Tiny GB: Submarine", ["type"] = "GB"},
 	{["byte"] = 0x19, ["bit"] = 3, ["name"] = "Galleon: T&S Cleared"},
 	{["byte"] = 0x19, ["bit"] = 5, ["name"] = "Fungi: Tiny GB: Anthill", ["type"] = "GB"},
 	{["byte"] = 0x19, ["bit"] = 6, ["name"] = "Fungi: Nighttime"},
@@ -819,6 +837,7 @@ local flag_array = {
 	{["byte"] = 0x2D, ["bit"] = 7, ["name"] = "? Caves Lobby: Diddy GB, more like FTT of some sort", ["type"] = "FTT"}, -- TODO: Test this
 	{["byte"] = 0x2D, ["bit"] = 4, ["name"] = "Rainbow Coin FTT", ["type"] = "FTT"}, -- TODO: Test this
 	{["byte"] = 0x2D, ["bit"] = 5, ["name"] = "Rambi FTT", ["type"] = "FTT"}, -- TODO: Test this
+	{["byte"] = 0x2D, ["bit"] = 6, ["name"] = "Enguarde FTT", ["type"] = "Type"},
 
 	{["byte"] = 0x2E, ["bit"] = 0, ["name"] = "Lanky FT GB", ["type"] = "FTT"},
 	{["byte"] = 0x2E, ["bit"] = 1, ["name"] = "Tiny FT GB", ["type"] = "FTT"},
@@ -1026,6 +1045,7 @@ local flag_array = {
 	{["byte"] = 0x46, ["bit"] = 1, ["name"] = "Factory: Lanky Banana Medal", ["type"] = "Medal"},
 	{["byte"] = 0x46, ["bit"] = 2, ["name"] = "Factory: Tiny Banana Medal", ["type"] = "Medal"},
 	{["byte"] = 0x46, ["bit"] = 3, ["name"] = "Factory: Chunky Banana Medal", ["type"] = "Medal"},
+	{["byte"] = 0x46, ["bit"] = 7, ["name"] = "Galleon: Tiny Banana medal", ["type"] = "Medal"},
 
 	{["byte"] = 0x47, ["bit"] = 1, ["name"] = "Fungi: DK Banana Medal ", ["type"] = "Medal"},
 	{["byte"] = 0x47, ["bit"] = 2, ["name"] = "Fungi: Diddy Banana Medal: ", ["type"] = "Medal"},
@@ -1124,7 +1144,10 @@ local flag_array = {
 	{["byte"] = 0x52, ["bit"] = 3, ["name"] = "Factory: Lanky CB: Production room", ["type"] = "Balloon"},
 	{["byte"] = 0x52, ["bit"] = 4, ["name"] = "Factory: Chunky CB: Toy monster", ["type"] = "Balloon"},
 	{["byte"] = 0x52, ["bit"] = 5, ["name"] = "Factory: Rainbow Coin", ["type"] = "Rainbow Coin"},
+	{["byte"] = 0x52, ["bit"] = 7, ["name"] = "Galleon: Tiny CB: Diddy kasplat balloon", ["type"] = "Balloon"},
 
+	{["byte"] = 0x54, ["bit"] = 2, ["name"] = "Galleon: Tiny CB: Snides Balloon", ["type"] = "Balloon"},
+	{["byte"] = 0x54, ["bit"] = 3, ["name"] = "Galleon: Tiny CB: Gold tower balloon", ["type"] = "Balloon"},
 	{["byte"] = 0x54, ["bit"] = 4, ["name"] = "Isles: Rainbow Coin (Fungi Lobby Entrance)?", ["type"] = "Rainbow Coin"},
 	{["byte"] = 0x54, ["bit"] = 5, ["name"] = "Isles: Rainbow Coin (Caves Early)", ["type"] = "Rainbow Coin"},
 	{["byte"] = 0x54, ["bit"] = 6, ["name"] = "Isles: Rainbow Coin (Aztec Lobby Roof)", ["type"] = "Rainbow Coin"},
@@ -1927,12 +1950,69 @@ local flag_array = {
 	{["byte"] = 0xBF, ["bit"] = 6, ["name"] = "Factory: Tiny Coin: Production Room (2)", ["type"] = "Coin"},
 	{["byte"] = 0xBF, ["bit"] = 7, ["name"] = "Factory: Tiny Coin: Production Room (3)", ["type"] = "Coin"},
 
+	{["byte"] = 0xC2, ["bit"] = 7, ["name"] = "Galleon: Tiny Coin: Outside mermaid(1)", ["type"] = "Coin"},
+
+	{["byte"] = 0xC3, ["bit"] = 0, ["name"] = "Galleon: Tiny Coin: Outside mermaid(2)", ["type"] = "Coin"},
+	{["byte"] = 0xC3, ["bit"] = 1, ["name"] = "Galleon: Tiny Coin: Outside mermaid(3)", ["type"] = "Coin"},
+	{["byte"] = 0xC3, ["bit"] = 3, ["name"] = "Galleon: Tiny Coin: Outside mermaid(4)", ["type"] = "Coin"},
+
+	{["byte"] = 0xC4, ["bit"] = 5, ["name"] = "Galleon: Tiny Coin: Outside mermaid(5)", ["type"] = "Coin"},
+
+	{["byte"] = 0xCC, ["bit"] = 0, ["name"] = "Galleon: Tiny CB: Hallway(1)", ["type"] = "CB"},
+	{["byte"] = 0xCC, ["bit"] = 1, ["name"] = "Galleon: Tiny CB: Hallway(2)", ["type"] = "CB"},
+	{["byte"] = 0xCC, ["bit"] = 2, ["name"] = "Galleon: Tiny CB: Hallway(3)", ["type"] = "CB"},
+	{["byte"] = 0xCC, ["bit"] = 3, ["name"] = "Galleon: Tiny CB: Hallway(4)", ["type"] = "CB"},
+	{["byte"] = 0xCC, ["bit"] = 4, ["name"] = "Galleon: Tiny CB: Hallway(5)", ["type"] = "CB"},
+	{["byte"] = 0xCC, ["bit"] = 5, ["name"] = "Galleon: Tiny CB: W3 bunch(1)", ["type"] = "Bunch"},
+	{["byte"] = 0xCC, ["bit"] = 6, ["name"] = "Galleon: Tiny CB: W3 bunch(2)", ["type"] = "Bunch"},
+	{["byte"] = 0xCC, ["bit"] = 7, ["name"] = "Galleon: Tiny CB: Gold tower bunch", ["type"] = "Bunch"},
+
+	{["byte"] = 0xCD, ["bit"] = 1, ["name"] = "Galleon: Tiny CB: Near kasplat(1)", ["type"] = "CB"},
+	{["byte"] = 0xCD, ["bit"] = 2, ["name"] = "Galleon: Tiny CB: Near kasplat(2)", ["type"] = "CB"},
+	{["byte"] = 0xCD, ["bit"] = 3, ["name"] = "Galleon: Tiny CB: Near kasplat(3)", ["type"] = "CB"},
+	{["byte"] = 0xCD, ["bit"] = 4, ["name"] = "Galleon: Tiny CB: Hallway(6)", ["type"] = "CB"},
+	{["byte"] = 0xCD, ["bit"] = 5, ["name"] = "Galleon: Tiny CB: Hallway(7)", ["type"] = "CB"},
+	{["byte"] = 0xCD, ["bit"] = 6, ["name"] = "Galleon: Tiny CB: Hallway(8)", ["type"] = "CB"},
+	{["byte"] = 0xCD, ["bit"] = 7, ["name"] = "Galleon: Tiny CB: Hallway(9)", ["type"] = "CB"},
+
 	{["byte"] = 0xD0, ["bit"] = 0, ["name"] = "Galleon: Chunky Coin: BP (1)", ["type"] = "Coin"},
 
 	{["byte"] = 0xD1, ["bit"] = 4, ["name"] = "Galleon: Chunky Coin: BP (2)", ["type"] = "Coin"},
 	{["byte"] = 0xD1, ["bit"] = 5, ["name"] = "Galleon: Chunky Coin: BP (3)", ["type"] = "Coin"},
 	{["byte"] = 0xD1, ["bit"] = 6, ["name"] = "Galleon: Chunky Coin: BP (4)", ["type"] = "Coin"},
 	{["byte"] = 0xD1, ["bit"] = 7, ["name"] = "Galleon: Chunky Coin: BP (5)", ["type"] = "Coin"},
+
+	{["byte"] = 0xD3, ["bit"] = 0, ["name"] = "Galleon: Tiny CB: Cannon bunch(1)", ["type"] = "Bunch"},
+	{["byte"] = 0xD3, ["bit"] = 1, ["name"] = "Galleon: Tiny CB: Cannon bunch(2)", ["type"] = "Bunch"},
+	{["byte"] = 0xD3, ["bit"] = 2, ["name"] = "Galleon: Tiny CB: Cannon bunch(3)", ["type"] = "Bunch"},
+	{["byte"] = 0xD3, ["bit"] = 3, ["name"] = "Galleon: Tiny Coin: Cannon room(1)", ["type"] = "Coin"},
+	{["byte"] = 0xD3, ["bit"] = 4, ["name"] = "Galleon: Tiny Coin: Cannon room(2)", ["type"] = "Coin"},
+	{["byte"] = 0xD3, ["bit"] = 5, ["name"] = "Galleon: Tiny Coin: Cannon room(3)", ["type"] = "Coin"},
+
+	{["byte"] = 0xD4, ["bit"] = 5, ["name"] = "Galleon: Tiny Coin: Pearls(1)", ["type"] = "Coin"},
+	{["byte"] = 0xD4, ["bit"] = 6, ["name"] = "Galleon: Tiny Coin: Pearls(2)", ["type"] = "Coin"},
+	{["byte"] = 0xD4, ["bit"] = 7, ["name"] = "Galleon: Tiny Coin: Pearls(3)", ["type"] = "Coin"},
+
+	{["byte"] = 0xD8, ["bit"] = 2, ["name"] = "Galleon: Tiny CB: 5DS(1)", ["type"] = "CB"},
+	{["byte"] = 0xD8, ["bit"] = 3, ["name"] = "Galleon: Tiny CB: 5DS(2)", ["type"] = "CB"},
+	{["byte"] = 0xD8, ["bit"] = 4, ["name"] = "Galleon: Tiny CB: 5DS(3)", ["type"] = "CB"},
+	{["byte"] = 0xD8, ["bit"] = 5, ["name"] = "Galleon: Tiny CB: 5DS(4)", ["type"] = "CB"},
+	{["byte"] = 0xD8, ["bit"] = 6, ["name"] = "Galleon: Tiny CB: 2DS bunch(1)", ["type"] = "Bunch"},
+
+	{["byte"] = 0xD9, ["bit"] = 0, ["name"] = "Galleon: Tiny CB: 5DS bunch(1)", ["type"] = "Bunch"},
+
+	{["byte"] = 0xDA, ["bit"] = 0, ["name"] = "Galleon: Tiny CB: 5DS(5)", ["type"] = "CB"},
+	{["byte"] = 0xDA, ["bit"] = 1, ["name"] = "Galleon: Tiny CB: 5DS(6)", ["type"] = "CB"},
+	{["byte"] = 0xDA, ["bit"] = 2, ["name"] = "Galleon: Tiny CB: 5DS(7)", ["type"] = "CB"},
+
+	{["byte"] = 0xDB, ["bit"] = 0, ["name"] = "Galleon: Tiny Coin: Pearls(4)", ["type"] = "Coin"},
+	{["byte"] = 0xDB, ["bit"] = 1, ["name"] = "Galleon: Tiny Coin: Inside mermaid(1)", ["type"] = "Coin"},
+	{["byte"] = 0xDB, ["bit"] = 2, ["name"] = "Galleon: Tiny Coin: Inside mermaid(2)", ["type"] = "Coin"},
+	{["byte"] = 0xDB, ["bit"] = 3, ["name"] = "Galleon: Tiny Coin: Inside mermaid(3)", ["type"] = "Coin"},
+	{["byte"] = 0xDB, ["bit"] = 4, ["name"] = "Galleon: Tiny CB: 5DS bunch(2)", ["type"] = "Bunch"},
+	{["byte"] = 0xDB, ["bit"] = 5, ["name"] = "Galleon: Tiny Coin: 5DS(1)", ["type"] = "Coin"},
+	{["byte"] = 0xDB, ["bit"] = 6, ["name"] = "Galleon: Tiny Coin: 5DS(2)", ["type"] = "Coin"},
+	{["byte"] = 0xDB, ["bit"] = 7, ["name"] = "Galleon: Tiny CB: 5DS(8)", ["type"] = "CB"},
 
 	{["byte"] = 0xDC, ["bit"] = 0, ["name"] = "Fungi: DK CB: Blue tunnel (1)", ["type"] = "CB"},
 	{["byte"] = 0xDC, ["bit"] = 1, ["name"] = "Fungi: DK CB: Blue tunnel (2)", ["type"] = "CB"},
@@ -1948,6 +2028,8 @@ local flag_array = {
 	{["byte"] = 0xDD, ["bit"] = 5, ["name"] = "Fungi: DK CB: Pink tunnel (3)", ["type"] = "CB"},
 	{["byte"] = 0xDD, ["bit"] = 6, ["name"] = "Fungi: DK CB: Pink tunnel (4)", ["type"] = "CB"},
 	{["byte"] = 0xDD, ["bit"] = 7, ["name"] = "Fungi: DK CB: Pink tunnel (5)", ["type"] = "CB"},
+
+	{["byte"] = 0xDF, ["bit"] = 4, ["name"] = "Galleon: Tiny CB: 2DS bunch(2)", ["type"] = "Bunch"},
 
 	{["byte"] = 0xE0, ["bit"] = 0, ["name"] = "Fungi: DK Coin: bblast (1)", ["type"] = "Coin"},
 	{["byte"] = 0xE0, ["bit"] = 1, ["name"] = "Fungi: DK Coin: bblast (2)", ["type"] = "Coin"},
