@@ -1,32 +1,52 @@
 local pointer_list;
 local kong_pointer;
 local camera_pointer;
+
 safeMode = true;
+grab_script_mode = "Examine";
+local object_pointers = {};
+local object_index = 1;
+local max_objects = 0xFF;
+local radius = 100;
 
 local romName = gameinfo.getromname();
 
 if bizstring.contains(romName, "Donkey Kong 64") then
 	if bizstring.contains(romName, "USA") and not bizstring.contains(romName, "Kiosk") then
-		pointer_list = 0x7fbff0;
-		camera_pointer = 0x7fb968;
-		kong_pointer = 0x7fbb4d;
+		pointer_list = 0x7FBFF0;
+		camera_pointer = 0x7FB968;
+		kong_pointer = 0x7FBB4D;
 	elseif bizstring.contains(romName, "Europe") then
-		pointer_list = 0x7fbf10;
-		camera_pointer = 0x7fb888;
-		kong_pointer = 0x7fba6d;
+		pointer_list = 0x7FBF10;
+		camera_pointer = 0x7FB888;
+		kong_pointer = 0x7FBA6D;
 	elseif bizstring.contains(romName, "Japan") then
-		pointer_list = 0x7fc460;
-		camera_pointer = 0x7fbdd8;
-		kong_pointer = 0x7fbfbd;
+		pointer_list = 0x7FC460;
+		camera_pointer = 0x7FBDD8;
+		kong_pointer = 0x7FBFBD;
 	elseif bizstring.contains(romName, "Kiosk") then
-		pointer_list = 0x7b5e58;
-		camera_pointer = 0x7b5918; -- TODO: Does this work?
-		kong_pointer = 0x7b5afd;
+		pointer_list = 0x7B5E58;
+		camera_pointer = 0x7B5918; -- TODO: Does this work?
+		kong_pointer = 0x7B5AFD;
 		grab_pointer = 0x2F4;
 	end
 else
 	print("This game is not supported.");
 	return;
+end
+
+----------------------
+-- Helper functions --
+----------------------
+
+function toHexString(value, desiredLength, prefix)
+	value = string.format("%X", value or 0);
+	prefix = prefix or "0x";
+	desiredLength = desiredLength or string.len(value);
+	while string.len(value) < desiredLength do
+		value = "0"..value;
+	end
+	return prefix..value;
 end
 
 local function isPointer(value)
@@ -41,11 +61,19 @@ function get_bit(field, index)
 	return false;
 end
 
-local object_pointers = {};
-local object_index = 1;
-local max_objects = 0xFF;
-local radius = 100;
+---------------------------
+-- Model 1 object fields --
+---------------------------
 
+-- Relative to objects found in the pointer list
+local previous_object = -0x10; -- u32_be
+local object_size = -0x0C; -- u32_be
+
+local model_pointer = 0x00; -- u32_be
+local rendering_parameters_pointer = 0x04; -- u32_be
+local current_bone_array_pointer = 0x08; -- u32_be
+
+local actor_type = 0x58; -- u32_be
 local actor_types = {
 	[2] = "DK",
 	[3] = "Diddy",
@@ -239,31 +267,23 @@ local actor_types = {
 	[339] = "Arena Controller", -- Rambi/Enguarde
 	[340] = "Bug Enemy (Castle Trash Can)",
 	[342] = "Try Again Dialog",
-}
+};
 
--- Relative to objects found in the pointer list
-local model_pointer = 0x00;
-local rendering_parameters_pointer = 0x04;
-local current_bone_array_pointer = 0x08;
-
-local actor_type = 0x58; -- TODO: Document values for this
-local visibility = 0x63; -- 127 = visible
+local visibility = 0x63; -- Bitfield -- TODO: Fully document
 
 local specular_highlight = 0x6D;
 
-local shadow_width = 0x6E;
-local shadow_height = 0x6F;
+local shadow_width = 0x6E; -- u8
+local shadow_height = 0x6F; -- u8
 
-local x_pos = 0x7C;
-local y_pos = x_pos + 4;
-local z_pos = y_pos + 4;
+local x_pos = 0x7C; -- 32 bit float big endian
+local y_pos = x_pos + 4; -- 32 bit float big endian
+local z_pos = y_pos + 4; -- 32 bit float big endian
 
-local visibility = 0x63; -- 127 = visible
+local floor = 0xA4; -- 32 bit float big endian
+local distance_from_floor = 0xB4; -- 32 bit float big endian
 
-local floor = 0xA4;
-local distance_from_floor = 0xB4;
-
-local velocity = 0xB8;
+local velocity = 0xB8; -- 32 bit float big endian
 --local acceleration = 0xBC; -- Seems wrong
 
 local y_velocity = 0xC0;
@@ -277,12 +297,12 @@ local x_rot = 0xE4;
 local y_rot = x_rot + 2;
 local z_rot = y_rot + 2;
 
-local health = 0x134; -- Signed int 2 byte
+local health = 0x134; -- s16_be
 local takes_enemy_damage = 0x13B;
 
 local hand_state = 0x147; -- Bitfield
 
-local shade_byte = 0x16D; -- TODO: Global?
+local shade_byte = 0x16D;
 
 -- Relative to tag barrel
 local tb_scroll_timer = 0x17D;
@@ -312,25 +332,23 @@ local camera_state_switch_timer_2 = 0x26E;
 local camera_state_type = 0x26B;
 
 -- Relative to text overlay
-local text_shown = 0x1EE; -- 16 bit uint
+local text_shown = 0x1EE; -- 16 bit uint -- TODO: This needs to be in a separate object, text overlays are only 0x190 big
 
 -- Relative to player
 local grabbed_vine_pointer = 0x2B0;
-local grab_pointer = 0x32c;
-local fairy_active = 0x36c;
-
-grab_script_mode = "Examine";
+local grab_pointer = 0x32C;
+local fairy_active = 0x36C;
 
 -- Relative to rendering params
-local scale_x = 0x34;
-local scale_y = scale_x + 4;
-local scale_z = scale_y + 4;
+local scale_x = 0x34; -- 32 bit float big endian
+local scale_y = scale_x + 4; -- 32 bit float big endian
+local scale_z = scale_y + 4; -- 32 bit float big endian
 
-local anim_timer1 = 0x94;
-local anim_timer2 = 0x98;
+local anim_timer1 = 0x94; -- 32 bit float big endian
+local anim_timer2 = 0x98; -- 32 bit float big endian
 
-local anim_timer3 = 0x104;
-local anim_timer4 = 0x108;
+local anim_timer3 = 0x104; -- 32 bit float big endian
+local anim_timer4 = 0x108; -- 32 bit float big endian
 
 -----------------------
 -- Kremling Kosh Bot --
@@ -437,7 +455,7 @@ function koshBotLoop()
 				end
 				previousFrameB = not previousFrameB;
 				joypad.set({["B"] = true}, 1);
-				print("Firing!");
+				--print("Firing!");
 			end
 		else
 			joypad.setanalog({["X Axis"] = false, ["Y Axis"] = false}, 1);
@@ -445,7 +463,7 @@ function koshBotLoop()
 	end
 end
 
---event.onframestart(koshBotLoop, "ScriptHawk - Kremling Kosh Bot");
+event.onframestart(koshBotLoop, "ScriptHawk - Kremling Kosh Bot");
 
 -- Keybinds
 -- For full list go here http://slimdx.org/docs/html/T_SlimDX_DirectInput_Key.htm
@@ -473,30 +491,30 @@ local function switch_grab_script_mode()
 end
 
 local function grab_object(pointer)
-	local kongObject = mainmemory.read_u24_be(kong_pointer);
-	if kongObject > 0x000000 and kongObject < 0x7FFFFF then
-		mainmemory.writebyte(kongObject + grab_pointer, 0x80);
-		mainmemory.write_u24_be(kongObject + grab_pointer + 1, pointer);
-		mainmemory.writebyte(kongObject + grab_pointer + 4, 0x80);
-		mainmemory.write_u24_be(kongObject + grab_pointer + 4 + 1, pointer);
+	local playerObject = mainmemory.read_u24_be(kong_pointer);
+	if playerObject > 0x000000 and playerObject < 0x7FFFFF then
+		mainmemory.writebyte(playerObject + grab_pointer, 0x80);
+		mainmemory.write_u24_be(playerObject + grab_pointer + 1, pointer);
+		mainmemory.writebyte(playerObject + grab_pointer + 4, 0x80);
+		mainmemory.write_u24_be(playerObject + grab_pointer + 4 + 1, pointer);
 	end
 end
 
 local function focus_object(pointer)
-	local camera_object = mainmemory.read_u24_be(camera_pointer + 1);
-	if camera_object > 0x000000 and camera_object < 0x7FFFFF then
-		mainmemory.writebyte(camera_object + camera_focus_pointer, 0x80);
-		mainmemory.write_u24_be(camera_object + camera_focus_pointer + 1, pointer);
+	local cameraObject = mainmemory.read_u24_be(camera_pointer + 1);
+	if cameraObject > 0x000000 and cameraObject < 0x7FFFFF then
+		mainmemory.writebyte(cameraObject + camera_focus_pointer, 0x80);
+		mainmemory.write_u24_be(cameraObject + camera_focus_pointer + 1, pointer);
 	end
 end
 
 local function encircle_kong()
 	local x, z;
 
-	local kongObject = mainmemory.read_u24_be(kong_pointer);
-	local kong_x = mainmemory.readfloat(kongObject + x_pos, true);
-	local kong_y = mainmemory.readfloat(kongObject + y_pos, true);
-	local kong_z = mainmemory.readfloat(kongObject + z_pos, true);
+	local playerObject = mainmemory.read_u24_be(kong_pointer);
+	local kong_x = mainmemory.readfloat(playerObject + x_pos, true);
+	local kong_y = mainmemory.readfloat(playerObject + y_pos, true);
+	local kong_z = mainmemory.readfloat(playerObject + z_pos, true);
 
 	for i = 1, #object_pointers do
 		x = kong_x + math.cos(math.pi * 2 * i / #object_pointers) * radius;
@@ -511,6 +529,7 @@ end
 local function getExamineData(pointer)
 	local examine_data = {};
 
+	local actorSize = mainmemory.read_u32_be(pointer + object_size)
 	local modelPointer = mainmemory.read_u32_be(pointer + model_pointer);
 	local renderingParametersPointer = mainmemory.read_u32_be(pointer + rendering_parameters_pointer);
 	local boneArrayPointer = mainmemory.read_u32_be(pointer + current_bone_array_pointer);
@@ -526,6 +545,7 @@ local function getExamineData(pointer)
 	if type(actor_types[currentActorType]) ~= "nil" then
 		currentActorType = actor_types[currentActorType];
 	end
+	table.insert(examine_data, { "Actor size", toHexString(actorSize) });
 	table.insert(examine_data, { "Actor type", currentActorType });
 	table.insert(examine_data, { "Separator", 1 });
 
@@ -560,9 +580,6 @@ local function getExamineData(pointer)
 
 	table.insert(examine_data, { "Shadow width", mainmemory.readbyte(pointer + shadow_width) });
 	table.insert(examine_data, { "Shadow height", mainmemory.readbyte(pointer + shadow_height) });
-	table.insert(examine_data, { "Separator", 1 });
-
-	table.insert(examine_data, { "Fairy Active", mainmemory.readbyte(pointer + fairy_active) });
 	table.insert(examine_data, { "Brightness", mainmemory.readbyte(pointer + shade_byte) });
 	table.insert(examine_data, { "Separator", 1 });
 
@@ -573,9 +590,10 @@ local function getExamineData(pointer)
 	table.insert(examine_data, { "In water", tostring(not get_bit(visibilityValue, 0)) });
 	table.insert(examine_data, { "Separator", 1 });
 
-	if currentActorType ~= "Camera" then
+	if currentActorType == "Player" then
 		table.insert(examine_data, { "Grabbed Vine Pointer", string.format("0x%08x", mainmemory.read_u32_be(pointer + grabbed_vine_pointer)) });
 		table.insert(examine_data, { "Grab pointer", string.format("0x%08x", mainmemory.read_u32_be(pointer + grab_pointer)) });
+		table.insert(examine_data, { "Fairy Active", mainmemory.readbyte(pointer + fairy_active) });
 		table.insert(examine_data, { "Separator", 1 });
 	end
 
@@ -705,14 +723,13 @@ local function draw_gui()
 	row = row + 1;
 
 	-- Display which object is grabbed
-	local kongObject = mainmemory.read_u24_be(kong_pointer);
-	gui.text(gui_x, gui_y + height * row, string.format("Grabbed object: 0x%06x", mainmemory.read_u24_be(kongObject + grab_pointer + 1)), nil, nil, 'bottomright');
+	local playerObject = mainmemory.read_u24_be(kong_pointer);
+	gui.text(gui_x, gui_y + height * row, string.format("Grabbed object: 0x%06x", mainmemory.read_u24_be(playerObject + grab_pointer + 1)), nil, nil, 'bottomright');
 	row = row + 1;
 
 	-- Display which object the camera is currently focusing on
-	local camera_object = mainmemory.read_u24_be(camera_pointer + 1);
-	gui.text(gui_x, gui_y + height * row, string.format("Focused object: 0x%06x", mainmemory.read_u24_be(camera_object + camera_focus_pointer + 1)), nil, nil, 'bottomright');
-	row = row + 1;
+	local cameraObject = mainmemory.read_u24_be(camera_pointer + 1);
+	gui.text(gui_x, gui_y + height * row, string.format("Focused object: 0x%06x", mainmemory.read_u24_be(cameraObject + camera_focus_pointer + 1)), nil, nil, 'bottomright');
 	row = row + 1;
 
 	if #object_pointers > 0 and object_index <= #object_pointers then
@@ -729,18 +746,20 @@ local function draw_gui()
 		end
 
 		if grab_script_mode == "List" then
+			row = row + 1;
 			for i = #object_pointers, 1, -1 do
 				local currentActorType = mainmemory.read_u32_be(object_pointers[i] + actor_type);
+				local currentActorSize = mainmemory.read_u32_be(object_pointers[i] + object_size)
 				if type(actor_types[currentActorType]) ~= "nil" then
 					currentActorType = actor_types[currentActorType];
 				end
 				if object_index == i then
-					gui.text(gui_x, gui_y + height * row, i..": "..string.format("0x%06x: ", object_pointers[i] or 0)..currentActorType, green_highlight, nil, 'bottomright');
+					gui.text(gui_x, gui_y + height * row, i..": "..string.format("0x%06x: ", object_pointers[i] or 0)..currentActorType.." ("..toHexString(currentActorSize)..")", green_highlight, nil, 'bottomright');
 				else
-					if object_pointers[i] == kongObject then
-						gui.text(gui_x, gui_y + height * row, i..": "..string.format("0x%06x: ", object_pointers[i] or 0)..currentActorType, yellow_highlight, nil, 'bottomright');
+					if object_pointers[i] == playerObject then
+						gui.text(gui_x, gui_y + height * row, i..": "..string.format("0x%06x: ", object_pointers[i] or 0)..currentActorType.." ("..toHexString(currentActorSize)..")", yellow_highlight, nil, 'bottomright');
 					else
-						gui.text(gui_x, gui_y + height * row, i..": "..string.format("0x%06x: ", object_pointers[i] or 0)..currentActorType, nil, nil, 'bottomright');
+						gui.text(gui_x, gui_y + height * row, i..": "..string.format("0x%06x: ", object_pointers[i] or 0)..currentActorType.." ("..toHexString(currentActorSize)..")", nil, nil, 'bottomright');
 					end
 				end
 				row = row + 1;
@@ -749,7 +768,7 @@ local function draw_gui()
 	end
 end
 
-local function isValidObject(pointer, kongObject, camera_object)
+local function isValidObject(pointer, playerObject, cameraObject)
 	if grab_script_mode == "Examine" or grab_script_mode == "List" or not safeMode then
 		return true;
 	end
@@ -757,12 +776,8 @@ local function isValidObject(pointer, kongObject, camera_object)
 	local modelPointer = mainmemory.read_u32_be(pointer + model_pointer);
 	local hasModel = isPointer(modelPointer);
 
-	if grab_script_mode == "Camera" and pointer ~= camera_object then
-		return hasModel;
-	end
-
-	if grab_script_mode == "Grab" or grab_script_mode == "Encircle" then
-		if pointer ~= kongObject then
+	if grab_script_mode == "Encircle" then
+		if pointer ~= playerObject then
 			return hasModel;
 		end
 	end
@@ -770,15 +785,15 @@ end
 
 local function pull_objects()
 	local object_no = 0;
-	local kongObject = mainmemory.read_u24_be(kong_pointer);
-	local camera_object = mainmemory.read_u24_be(camera_pointer + 1);
+	local playerObject = mainmemory.read_u24_be(kong_pointer);
+	local cameraObject = mainmemory.read_u24_be(camera_pointer + 1);
 
 	object_pointers = {};
 	for object_no = 0, max_objects do
 		local pointer = mainmemory.read_u24_be(pointer_list + (object_no * 4) + 1);
 		local object_found = pointer > 0x000000 and pointer <= 0x7FFFFF;
 
-		if object_found and isValidObject(pointer, kongObject, camera_object) then
+		if object_found and isValidObject(pointer, playerObject, cameraObject) then
 			table.insert(object_pointers, pointer);
 		end
 	end
@@ -788,7 +803,7 @@ local function pull_objects()
 
 	if grab_script_mode == "Encircle" then
 		encircle_kong();
-		--local renderingParams = mainmemory.read_u24_be(kongObject + rendering_parameters_pointer + 1);
+		--local renderingParams = mainmemory.read_u24_be(playerObject + rendering_parameters_pointer + 1);
 		--if renderingParams > 0x000000 and renderingParams < 0x7FFFFF then
 			--if math.random() > 0.9 then
 				--local timerValue = math.random() * 50;

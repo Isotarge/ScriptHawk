@@ -1,3 +1,13 @@
+Starting to see the bigger picture with DK64's memory layout.
+There's a huge linked list in memory that starts after executable code ~0x060000-0x080000 (the base moves around in each map, has a global pointer to locate it).
+The list ends somewhere around ~0x500000 (barely reaching into the expension pak).
+This list contains objects from model 1 (actors, enemy, player etc) and model 2 (simpler stuff, gb's, cb's, dynamic level geometry, lighting).
+It also contains the DKTV HUD overlay.
+Objects from both model 1 and model 2 use bone arrays to render however bone displacement appears to happen only in model 1, possibly because objects in model 2 rarely have as many bones as actors from model 1
+I am yet to find stuff from model 3 (butterflies, fish etc) but they're likely in this linked list somewhere.
+Objects from model 3 also use bone arrays to render.
+All global stuff that doesn't change location in memory (moves, consumables, map, character) is later in memory, 0x700000+ which is right at the end of the expansion pak.
+
 TODO stuff:
 
 Find movement angle (ie what direction are you currently moving, not necessarily facing)

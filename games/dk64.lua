@@ -354,7 +354,10 @@ local lives      = 9; -- This is used as instrument ammo in single player
 -- Relative to shared model object (model_pointer)
 local num_bones = 0x20;
 
--- Relative to Kong Object
+-- Relative to objects found in the pointer list (Model 1)
+local previous_object = -0x10;
+local object_size = -0x0C;
+
 local model_pointer = 0x00;
 local rendering_parameters_pointer = 0x04;
 local current_bone_array_pointer = 0x08;
