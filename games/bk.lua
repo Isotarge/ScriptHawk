@@ -1079,6 +1079,13 @@ function Game.setZVelocity(value)
 	return mainmemory.writefloat(z_vel, value, true);
 end
 
+-- Calculated VXZ
+function Game.getVelocity()
+	local VX = Game.getXVelocity();
+	local VZ = Game.getZVelocity();
+	return math.sqrt(VX*VX + VZ*VZ);
+end
+
 ------------------
 -- CCW Clip bot --
 ------------------
@@ -1222,9 +1229,10 @@ Game.OSD = {
 	{"Separator", 1},
 	{"dY"},
 	{"dXZ"},
-	{"X Velocity", Game.getXVelocity},
+	--{"X Velocity", Game.getXVelocity},
+	{"Velocity", Game.getVelocity};
 	{"Y Velocity", Game.getYVelocity, Game.colorYVelocity},
-	{"Z Velocity", Game.getZVelocity},
+	--{"Z Velocity", Game.getZVelocity},
 	{"Separator", 1},
 	{"Max dY"},
 	{"Max dXZ"},
