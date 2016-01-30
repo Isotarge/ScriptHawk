@@ -537,9 +537,9 @@ local function getExamineData(pointer)
 	end
 
 	if hasPosition then
-		table.insert(examine_data, { "X", mainmemory.readfloat(pointer + x_pos, true) });
-		table.insert(examine_data, { "Y", mainmemory.readfloat(pointer + y_pos, true) });
-		table.insert(examine_data, { "Z", mainmemory.readfloat(pointer + z_pos, true) });
+		table.insert(examine_data, { "X", xPos });
+		table.insert(examine_data, { "Y", yPos });
+		table.insert(examine_data, { "Z", zPos });
 		table.insert(examine_data, { "Separator", 1 });
 
 		table.insert(examine_data, { "Rot X", mainmemory.read_u16_be(pointer + x_rot) });
@@ -787,17 +787,17 @@ local function pull_objects()
 	object_index = math.min(object_index, math.max(1, #object_pointers));
 
 	if grab_script_mode == "Encircle" then
-		--encircle_kong();
-		local renderingParams = mainmemory.read_u24_be(kongObject + rendering_parameters_pointer + 1);
-		if renderingParams > 0x000000 and renderingParams < 0x7FFFFF then
-			if math.random() > 0.9 then
-				local timerValue = math.random() * 50;
-				mainmemory.writefloat(renderingParams + anim_timer1, timerValue, true);
-				mainmemory.writefloat(renderingParams + anim_timer2, timerValue, true);
-				mainmemory.writefloat(renderingParams + anim_timer3, timerValue, true);
-				mainmemory.writefloat(renderingParams + anim_timer4, timerValue, true);
-			end
-		end
+		encircle_kong();
+		--local renderingParams = mainmemory.read_u24_be(kongObject + rendering_parameters_pointer + 1);
+		--if renderingParams > 0x000000 and renderingParams < 0x7FFFFF then
+			--if math.random() > 0.9 then
+				--local timerValue = math.random() * 50;
+				--mainmemory.writefloat(renderingParams + anim_timer1, timerValue, true);
+				--mainmemory.writefloat(renderingParams + anim_timer2, timerValue, true);
+				--mainmemory.writefloat(renderingParams + anim_timer3, timerValue, true);
+				--mainmemory.writefloat(renderingParams + anim_timer4, timerValue, true);
+			--end
+		--end
 	end
 
 	draw_gui();
