@@ -319,25 +319,25 @@ local map;
 local map_trigger;
 
 function Game.detectVersion(romName)
-	if bizstring.contains(romName, "Australia") then
+	if stringContains(romName, "Australia") then
 		air = 0x12FDC0;
 		frame_timer = 0x083550;
 		linked_list_root = 0x13C380;
 		map = 0x12C390;
 		moves_pointer = 0x1314F0;
-	elseif bizstring.contains(romName, "Europe") then
+	elseif stringContains(romName, "Europe") then
 		air = 0x12FFD0;
 		frame_timer = 0x083550;
 		linked_list_root = 0x13C680;
 		map = 0x12C5A0;
 		moves_pointer = 0x131780;
-	elseif bizstring.contains(romName, "Japan") then
+	elseif stringContains(romName, "Japan") then
 		air = 0x125220;
 		frame_timer = 0x0788F8;
 		linked_list_root = 0x131850;
 		map = 0x127640; -- TODO
 		moves_pointer = 0x126940;
-	elseif bizstring.contains(romName, "USA") then
+	elseif stringContains(romName, "USA") then
 		air = 0x12B050;
 		frame_timer = 0x079138;
 		linked_list_root = 0x137800;

@@ -165,35 +165,35 @@ end
 --------------------
 
 function Game.detectVersion(romName)
-	if bizstring.contains(romName, "Europe") and bizstring.contains(romName, "Rev A") then
+	if stringContains(romName, "Europe") and stringContains(romName, "Rev A") then
 		map_freeze_values = {
 			0x121777, 0x123B07, 0x208699 -- TODO: Double check these
 		}
 		is_paused = 0x123B24;
 		get_ready = 0x11B3C3;
 		cheat_menu = 0x0E03AC;
-	elseif bizstring.contains(romName, "Europe") then
+	elseif stringContains(romName, "Europe") then
 		map_freeze_values = {
 			0x11AF3B, 0x1211F7, 0x1212E2, 0x123587, 0x206BB5, 0x206C3B, 0x207EA9 -- TODO: Double check these
 		};
 		is_paused = 0x1235A4;
 		get_ready = 0x11AE43;
 		cheat_menu = 0x0DFE2C;
-	elseif bizstring.contains(romName, "Japan") then
+	elseif stringContains(romName, "Japan") then
 		map_freeze_values = {
 			0x11C91B, 0x122BD7, 0x122CC2, 0x124F67, 0x1FD4A5, 0x1FD52B, 0x1FE729 -- TODO: Double check these
 		};
 		is_paused = 0x124F84;
 		get_ready = 0x11C823;
 		cheat_menu = 0x0E17FC;
-	elseif bizstring.contains(romName, "USA") and bizstring.contains(romName, "Rev A") then
+	elseif stringContains(romName, "USA") and stringContains(romName, "Rev A") then
 		map_freeze_values = {
 			0x1216E7, 0x123A77, 0x1FD209 -- TODO: Double check these
 		};
 		is_paused = 0x123A94;
 		get_ready = 0x11B333;
 		cheat_menu = 0x0E031C;
-	elseif bizstring.contains(romName, "USA") then
+	elseif stringContains(romName, "USA") then
 		map_freeze_values = {
 			0x121167, 0x121252, 0x1234F7, 0x1FCA19 -- TODO: Double check these
 		};

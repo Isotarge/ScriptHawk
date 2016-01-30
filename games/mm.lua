@@ -15,23 +15,23 @@ Game.maps = { "Not Implemented" };
 --------------------
 
 function Game.detectVersion(romName)
-	if bizstring.contains(romName, "Europe") or bizstring.contains(romName, "(E)") then
-		if bizstring.contains(romName, "Rev A") then
+	if stringContains(romName, "Europe") or stringContains(romName, "(E)") then
+		if stringContains(romName, "Rev A") then
 			x_pos = 0x3F7614;
 			facing_angle = 0x3F76AE;
 		else
 			x_pos = 0x3F7274;
 			facing_angle = 0x3F730E;
 		end
-	elseif bizstring.contains(romName, "Japan") then
-		if bizstring.contains(romName, "Rev A") then
+	elseif stringContains(romName, "Japan") then
+		if stringContains(romName, "Rev A") then
 			x_pos = 0x400284;
 			facing_angle = 0x40031E;
 		else
 			x_pos = 0x3FFFC4;
 			facing_angle = 0x40005E;
 		end
-	elseif bizstring.contains(romName, "USA") then
+	elseif stringContains(romName, "USA") then
 		x_pos = 0x3FFDD4;
 		facing_angle = 0x3FFE6E;
 	else

@@ -3065,7 +3065,7 @@ function flagStats(verbose)
 		end
 		if flagType == "Blueprint" then
 			blueprints_known = blueprints_known + 1;
-			if bizstring.contains(name, "Turned") then
+			if stringContains(name, "Turned") then
 				gb_known = gb_known + 1;
 			end
 		end
@@ -3135,7 +3135,7 @@ event.onframestart(forceTBS, "ScriptHawk - Force TBS");
 --------------------
 
 function Game.detectVersion(romName)
-	if bizstring.contains(romName, "USA") and not bizstring.contains(romName, "Kiosk") then
+	if stringContains(romName, "USA") and not stringContains(romName, "Kiosk") then
 		version = "USA";
 		map                    = 0x7444E7;
 		file                   = 0x7467C8;
@@ -3168,7 +3168,7 @@ function Game.detectVersion(romName)
 		jumpman_velocity = {0x04BD78, 0x04BD7C};
 		jetman_position  = {0x02F050, 0x02F054};
 		jetman_velocity =  {0x02F058, 0x02F05C};
-	elseif bizstring.contains(romName, "Europe") then
+	elseif stringContains(romName, "Europe") then
 		version = "PAL";
 		map                    = 0x73EC37;
 		file                   = 0x740F18;
@@ -3201,7 +3201,7 @@ function Game.detectVersion(romName)
 		jumpman_velocity = {0x03ECD8, 0x03ECDC};
 		jetman_position  = {0x022100, 0x022104};
 		jetman_velocity  = {0x022108, 0x02210C};
-	elseif bizstring.contains(romName, "Japan") then
+	elseif stringContains(romName, "Japan") then
 		version = "JP";
 		map                    = 0x743DA7;
 		file                   = 0x746088;
@@ -3234,7 +3234,7 @@ function Game.detectVersion(romName)
 		jumpman_velocity = {0x03EB00, 0x03EB04};
 		jetman_position  = {0x022060, 0x022064};
 		jetman_velocity  = {0x022068, 0x02206C};
-	elseif bizstring.contains(romName, "Kiosk") then
+	elseif stringContains(romName, "Kiosk") then
 		version = "Kiosk";
 		file                = 0x7467C8; -- TODO?
 		map                 = 0x72CDE7;
@@ -3999,7 +3999,7 @@ local function toJPString(value)
 	local char;
 	local charFound = false;
 	for i = 1, length do
-		char = bizstring.substring(value, i - 1, 1);
+		char = bizstring.substring(value, i - 1, 1); -- TODO: call string.sub() instead, how do params work?
 		charFound = false;
 		for j = 1, #jp_charset do
 			if jp_charset[j] == char then

@@ -15,11 +15,11 @@ Game.maps = { "Not Implemented" };
 --------------------
 
 function Game.detectVersion(romName)
-	if bizstring.contains(romName, "Europe") then
+	if stringContains(romName, "Europe") then
 		-- TODO
-	elseif bizstring.contains(romName, "Japan") then
+	elseif stringContains(romName, "Japan") then
 		-- TODO
-	elseif bizstring.contains(romName, "USA") then
+	elseif stringContains(romName, "USA") then
 		-- TODO
 	else
 		return false;

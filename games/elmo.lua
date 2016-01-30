@@ -17,12 +17,12 @@ Game.maps = { "Not Implemented" };
 
 function Game.detectVersion(romName)
 	if emu.getsystemid() == "N64" then
-		if bizstring.contains(romName, "Number Journey") and bizstring.contains(romName, "USA") then
+		if stringContains(romName, "Number Journey") and stringContains(romName, "USA") then
 			elmo_pointer = 0x106C84;
 			return true;
 		end
 
-		if bizstring.contains(romName, "Letter Adventure") and bizstring.contains(romName, "USA") then
+		if stringContains(romName, "Letter Adventure") and stringContains(romName, "USA") then
 			elmo_pointer = 0x106888;
 			return true;
 		end

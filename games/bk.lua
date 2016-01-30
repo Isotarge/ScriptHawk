@@ -235,7 +235,7 @@ Game.maps = {
 }
 
 function Game.detectVersion(romName)
-	if bizstring.contains(romName, "Europe") then
+	if stringContains(romName, "Europe") then
 		frame_timer = 0x280700;
 		slope_timer = 0x37CCB4;
 		player_grounded = 0x37C930;
@@ -253,7 +253,7 @@ function Game.detectVersion(romName)
 		ff_question_pointer = 0x383AC0;
 		notes = 0x386940;
 		object_array_pointer = 0x36EAE0;
-	elseif bizstring.contains(romName, "Japan") then
+	elseif stringContains(romName, "Japan") then
 		frame_timer = 0x27F718;
 		slope_timer = 0x37CDE4;
 		player_grounded = 0x37CA60;
@@ -270,7 +270,7 @@ function Game.detectVersion(romName)
 		ff_question_pointer = 0x383C20;
 		notes = 0x386AA0;
 		object_array_pointer = 0x36F260;
-	elseif bizstring.contains(romName, "USA") and bizstring.contains(romName, "Rev A") then
+	elseif stringContains(romName, "USA") and stringContains(romName, "Rev A") then
 		frame_timer = 0x27F718;
 		slope_timer = 0x37B4E4;
 		player_grounded = 0x37B160;
@@ -287,7 +287,7 @@ function Game.detectVersion(romName)
 		ff_question_pointer = 0x382300;
 		notes = 0x385180;
 		object_array_pointer = 0x36D760;
-	elseif bizstring.contains(romName, "USA") then
+	elseif stringContains(romName, "USA") then
 		frame_timer = 0x2808D8;
 		slope_timer = 0x37C2E4;
 		player_grounded = 0x37BF60;
@@ -676,7 +676,7 @@ function decodeSandcastleString(base, length, nullTerminate)
 		if type(sandcastleStringConversionTable[byte]) ~= "nil" then
 			builtString = builtString..sandcastleStringConversionTable[byte];
 		else
-			builtString = builtString.."?".."("..bizstring.hex(byte).." = "..string.char(byte)..")";
+			builtString = builtString.."?".."("..toHexString(byte).." = "..string.char(byte)..")";
 		end
 	end
 	print(builtString);

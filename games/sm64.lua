@@ -56,19 +56,19 @@ Game.maps = {
 --------------------
 
 function Game.detectVersion(romName)
-	if bizstring.contains(romName, "USA") then
+	if stringContains(romName, "USA") then
 		x_rot = 0x33b19c;
 		x_pos = 0x33b1ac;
 		map = 0x32DDF8;
-	elseif bizstring.contains(romName, "Europe") then
+	elseif stringContains(romName, "Europe") then
 		x_rot = 0x30945c;
 		x_pos = 0x30946c;
 		map = 0x2F9FC8;
-	elseif bizstring.contains(romName, "Japan") and bizstring.contains(romName, "Shindou Edition") then
+	elseif stringContains(romName, "Japan") and stringContains(romName, "Shindou Edition") then
 		x_rot = 0x31d9ec;
 		x_pos = 0x31d9fc;
 		map = 0x30D528;
-	elseif bizstring.contains(romName, "Japan") then
+	elseif stringContains(romName, "Japan") then
 		x_rot = 0x339e2c;
 		x_pos = 0x339e3c;
 		map = 0x32CE98;

@@ -15,33 +15,33 @@ Game.maps = { "Not Implemented" };
 --------------------
 
 function Game.detectVersion(romName)
-	if bizstring.contains(romName, "Europe") or bizstring.contains(romName, "(E)") then
-		if bizstring.contains(romName, "Rev A") then
+	if stringContains(romName, "Europe") or stringContains(romName, "(E)") then
+		if stringContains(romName, "Rev A") then
 			x_pos = 0x1D8AD4;
 			facing_angle = 0x1D8B66;
-		elseif bizstring.contains(romName, "Master Quest") then
+		elseif stringContains(romName, "Master Quest") then
 			x_pos = 0x1D9394;
 			facing_angle = 0x1D9426;
 		else
 			x_pos = 0x1D8A94;
 			facing_angle = 0x1D8B26;
 		end
-	elseif bizstring.contains(romName, "Japan") then
-		if bizstring.contains(romName, "Rev A") then
+	elseif stringContains(romName, "Japan") then
+		if stringContains(romName, "Rev A") then
 			x_pos = 0x1DAC14;
 			facing_angle = 0x1DACA6;
-		elseif bizstring.contains(romName, "Rev B") then
+		elseif stringContains(romName, "Rev B") then
 			x_pos = 0x1DB314;
 			facing_angle = 0x1DB3A6;
 		else
 			x_pos = 0x1DAA54;
 			facing_angle = 0x1DAAE6;
 		end
-	elseif bizstring.contains(romName, "USA") then
-		if bizstring.contains(romName, "Rev A") then
+	elseif stringContains(romName, "USA") then
+		if stringContains(romName, "Rev A") then
 			x_pos = 0x1DAC14;
 			facing_angle = 0x1DACA6;
-		elseif bizstring.contains(romName, "Rev B") then
+		elseif stringContains(romName, "Rev B") then
 			x_pos = 0x1DB314;
 			facing_angle = 0x1DB3A6;
 		else
