@@ -3882,6 +3882,7 @@ function everythingIsKong()
 			local hasModel = modelPointer > 0x000000 and modelPointer < 0x7FFFFF;
 
 			local actorType = mainmemory.read_u32_be(pointer + actor_type);
+			-- TODO: Merge this table from Grab Objects.lua
 			--if type(actor_types[actorType]) ~= nil then
 			--	actorType = actor_types[actorType];
 			--end
@@ -4033,8 +4034,6 @@ end
 -- For papa cfox --
 -------------------
 
-
-
 local list_previous_pointer = 0x00; -- pointer
 local list_size = 0x04; -- u32be
 
@@ -4134,6 +4133,43 @@ function loadASMPatch()
 	dprint("Patched hook ("..#hook.." bytes)");
 	dprint("Done!");
 	print_deferred();
+end
+
+----------------------
+-- Framebuffer Jank --
+----------------------
+
+local framebuffer_pointer = 0x7F07F4; -- TODO: Port to other versions
+local framebuffer_size = 320 * 240;
+
+local rConst = 0x0800;
+local gConst = 0x0040;
+local bConst = 0x0002;
+
+-- Pixel format: 16bit RGBA 5551
+-- RRRR RGGG GGBB BBBA
+function fillFB()
+	local image_filename = forms.openfile(nil, nil, "All Files (*.*)|*.*");
+	if image_filename == "" then
+		print("No image selected. Exiting.");
+		return;
+	end
+	input_file = assert(io.open(image_filename, "rb"));
+
+	local frameBufferLocation = mainmemory.read_u24_be(framebuffer_pointer + 1);
+	if frameBufferLocation > 0 and frameBufferLocation < 0x7FFFFF then
+		for i = 0, framebuffer_size - 1 do
+			local r = math.floor(string.byte(input_file:read(1)) / 8) * rConst;
+			local g = math.floor(string.byte(input_file:read(1)) / 8) * gConst;
+			local b = math.floor(string.byte(input_file:read(1)) / 8) * bConst;
+			local a = 1;
+
+			mainmemory.write_u16_be(frameBufferLocation + (i * 2), r + g + b + a);
+			mainmemory.write_u16_be(frameBufferLocation + framebuffer_size + (i * 2), r + g + b + a);
+		end
+	end
+
+	input_file:close();
 end
 
 ------------

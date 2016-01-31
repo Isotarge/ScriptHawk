@@ -31,6 +31,7 @@ SystemID N64
 4B210A	b	h	1	RDRAM	Main menu screen?
 4B210F	b	u	1	RDRAM	Main menu position
 4B2904	b	h	1	RDRAM	FF for voidout on main menu?!?
+744470	d	h	1	RDRAM	Framebuffer Pointer
 7444C0	b	u	1	RDRAM	Screen Size
 7444E7	b	h	1	RDRAM	Map
 7444EB	b	h	1	RDRAM	Exit
@@ -89,12 +90,11 @@ SystemID N64
 76AF10	d	u	1	RDRAM	Frame (Lag)
 76FDF8	d	h	1	RDRAM	Sound pointer thing
 7E9AFE	w	u	1	RDRAM	Weird sound control?
-7ECED7	b	u	1	RDRAM	KeysCoinsCollected
-7ECEF3	b	u	1	RDRAM	Fairies
 7ED558	b	h	1	RDRAM	Mystery menu enabled
 7ED559	b	h	1	RDRAM	Extra cutscenes & Rambi unlocked
 7ED55B	b	h	1	RDRAM	Mystery menu bosses enabled (up to galleon)
 7F0560	d	u	1	RDRAM	Frames (Real)
+7F07F4	d	h	1	RDRAM	Framebuffer Pointer
 7F0990	d	h	1	RDRAM	Pointer to big linked list
 7F5D10	d	h	1	RDRAM	Camera pointer?
 7F5D14	b	h	1	RDRAM	ISG Fadeout
