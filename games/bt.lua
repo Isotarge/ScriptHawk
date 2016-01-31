@@ -335,7 +335,7 @@ function Game.detectVersion(romName)
 		air = 0x125220;
 		frame_timer = 0x0788F8;
 		linked_list_root = 0x131850;
-		map = 0x127640; -- TODO
+		map = 0x1217F0;
 		moves_pointer = 0x126940;
 	elseif stringContains(romName, "USA") then
 		air = 0x12B050;

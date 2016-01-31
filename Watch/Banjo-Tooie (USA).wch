@@ -112,6 +112,8 @@ SystemID N64
 11B677	b	u	1	RDRAM	Dinosaur: Current Health
 11B678	b	u	1	RDRAM	Dinosaur: Max Health
 1254B0	d	f	1	RDRAM	Banjo Brightness Doodad
+127638	d	f	1	RDRAM	Game Runtime
+12763C	d	f	1	RDRAM	Map Runtime
 12A990	d	f	1	RDRAM	Unknown Float
 12A9F0	d	f	1	RDRAM	Unknown Float
 12A9F4	d	f	1	RDRAM	Unknown Float

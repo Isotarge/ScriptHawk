@@ -17,7 +17,6 @@
 - DK64: Finish integrating Loader.lua
 	- Just needs a UI, it can currently be called via the Lua console
 - BK: Integrate Level Object Analyser.lua
-- BT: Take me there support for JP
 - BT: Jinjo Manip memory analysis
 	- Help finish the table [here](https://docs.google.com/spreadsheets/d/1QLn9yh7ZS9dT-lMymj_98mKmnEb5OLqz_QKkEhrVzyM/pub?gid=0)
 
