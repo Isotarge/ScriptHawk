@@ -6,6 +6,7 @@ local obj_model2_array_count;
 
 safeMode = true;
 encircle_enabled = false;
+rat_enabled = false;
 local object_pointers = {};
 local object_index = 1;
 local max_objects = 0xFF;
@@ -923,7 +924,7 @@ local function draw_gui()
 		encirclePlayerObjectModel2();
 	end
 
-	if grab_script_mode == "Random Animation Timer" then
+	if rat_enabled then
 		local renderingParams = mainmemory.read_u24_be(playerObject + rendering_parameters_pointer + 1);
 		if renderingParams > 0x000000 and renderingParams < 0x7FFFFF then
 			if math.random() > 0.9 then
@@ -1002,11 +1003,7 @@ local function draw_gui()
 				if object_index == i then
 					gui.text(gui_x, gui_y + height * row, i..": "..string.format("0x%06x", object_pointers[i] or 0), green_highlight, nil, 'bottomright');
 				else
-					if object_pointers[i] == playerObject then
-						gui.text(gui_x, gui_y + height * row, i..": "..string.format("0x%06x", object_pointers[i] or 0), yellow_highlight, nil, 'bottomright');
-					else
-						gui.text(gui_x, gui_y + height * row, i..": "..string.format("0x%06x", object_pointers[i] or 0), nil, nil, 'bottomright');
-					end
+					gui.text(gui_x, gui_y + height * row, i..": "..string.format("0x%06x", object_pointers[i] or 0), nil, nil, 'bottomright');
 				end
 				row = row + 1;
 			end
