@@ -494,6 +494,7 @@ local movementStates = {
 	[121] = "Locked", -- Holding Jiggy, Talon Trot
 	[122] = "Creeping", -- In damaging water etc
 	[123] = "Damaged", -- Talon Trot
+	[124] = "Locked", -- Sled in FP sliding down scarf
 	[127] = "Damaged", -- Swimming
 
 	[133] = "Idle", -- Bee
@@ -506,6 +507,7 @@ local movementStates = {
 	[140] = "Flying", -- Bee
 	[141] = "Locked", -- Mumbo transformation, Mr. Vile
 	[142] = "Locked", -- Jiggy podium, Bottles' text outside Mumbo's
+	[145] = "Damaged", -- Flying
 	[147] = "Locked", -- Pumpkin?
 	[148] = "Locked", -- Mumbo transformation
 	[149] = "Locked", -- Walrus?
