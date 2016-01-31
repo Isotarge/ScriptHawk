@@ -523,6 +523,7 @@ local movementStates = {
 	[161] = "Knockback", -- Croc, not damaged
 	[162] = "Knockback", -- Walrus, not damaged
 	[163] = "Knockback", -- Bee, not damaged
+	[165] = "Locked", -- Wonderwing
 };
 
 function Game.getCurrentMovementState()
