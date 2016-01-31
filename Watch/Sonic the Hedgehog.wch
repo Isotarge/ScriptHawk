@@ -1,22 +1,19 @@
 Domain Main RAM
 SystemID SMS
+1208	b	h	0	Main RAM	Invuln. State
+123E	b	h	0	Main RAM	Level
 1246	b	u	0	Main RAM	Lives
-125A	w	h	0	Main RAM	Screen X
-126F	w	h	0	Main RAM	Screen X2
-12AA	b	u	0	Main RAM	Rings
+125A	w	s	0	Main RAM	Viewport X
+125C	w	s	0	Main RAM	Viewport Y
+126F	w	s	0	Main RAM	Viewport X2
+128D	b	u	0	Main RAM	Invuln. Timer
+12AA	b	h	0	Main RAM	Rings
 12CF	b	u	0	Main RAM	Game Time
 1403	b	h	0	Main RAM	X Velocity related
-1404	b	s	0	Main RAM	Good X velocity
-1406	b	h	0	Main RAM	Y velocity related
-1407	b	s	0	Main RAM	Y velocity related
-1405	b	h	0	Main RAM	Facing Direction
-1408	b	h	0	Main RAM	Vertical Travel direction
-1411	b	h	0	Main RAM	Speed Shoes timer
+1404	w	s	0	Main RAM	X Velocity
+1406	b	h	0	Main RAM	Y Velocity related
+1407	w	s	0	Main RAM	Y Velocity
+1411	b	u	0	Main RAM	Speed Shoes timer
 1414	b	h	0	Main RAM	Floor Check
 1CE1	b	u	0	Main RAM	Unknown
-D25A	b	h	0	System Bus	Camera
-D25D	b	h	0	System Bus	Camera
-D23E	b	h	0	System Bus	Level
-D208	b	h	0	System Bus	Invuln. State
-D28D	b	h	0	System Bus	Invuln. Timer
 
