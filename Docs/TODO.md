@@ -22,6 +22,7 @@
 	- Help finish the table [here](https://docs.google.com/spreadsheets/d/1QLn9yh7ZS9dT-lMymj_98mKmnEb5OLqz_QKkEhrVzyM/pub?gid=0)
 
 ##Low priority, recurring, or waiting:
+- General: Detailed watch toggle (checkbox maybe)
 - Port Tetris Attack bot to Pokémon Puzzle League (once it boots in m64p & BizHawk ofc)
 	- [Info here](https://github.com/mupen64plus/mupen64plus-user-issues/issues/567)
 - Keep [LIPS](https://github.com/notwa/lips) up to date

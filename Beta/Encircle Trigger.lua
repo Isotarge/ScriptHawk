@@ -3,18 +3,18 @@ local function isPointer(value)
 end
 
 -- Things in this array
-	-- GB's
+	-- GB's & CB's
 	-- Doors in helm
 	-- K. Rool's chair
-	-- Gorilla Grab
+	-- Gorilla Grab Levers
 	-- Bananaporters
 	-- DK portals
 	-- Trees
 	-- Instrument pads
 	-- Wrinkly doors
 
-local kong_object_pointer = 0x7FBB4D;
-local trigger_array_pointer = 0x7F6000;
+local player_pointer = 0x7FBB4D;
+local trigger_array_pointer = 0x7F6000; -- TODO: Find in all versions
 local trigger_array_count = trigger_array_pointer + 4; -- u32_be
 
 local slot_size = 0x90;
@@ -111,20 +111,20 @@ local x_pos = 0x7C;
 local y_pos = x_pos + 4;
 local z_pos = y_pos + 4;
 
-local function getKongObject() -- TODO: Cache this
-	return mainmemory.read_u24_be(kong_object_pointer);
+local function getPlayerObject() -- TODO: Cache this
+	return mainmemory.read_u24_be(player_pointer);
 end
 
 function Game.getXPosition()
-	return mainmemory.readfloat(getKongObject() + x_pos, true);
+	return mainmemory.readfloat(getPlayerObject() + x_pos, true);
 end
 
 function Game.getYPosition()
-	return mainmemory.readfloat(getKongObject() + y_pos, true);
+	return mainmemory.readfloat(getPlayerObject() + y_pos, true);
 end
 
 function Game.getZPosition()
-	return mainmemory.readfloat(getKongObject() + z_pos, true);
+	return mainmemory.readfloat(getPlayerObject() + z_pos, true);
 end
 
 function populateObjectPointerList()
@@ -156,8 +156,9 @@ local function encircle_player()
 			mainmemory.writefloat(object_pointers[i] + slot_z_pos, z, true);
 
 			-- Set model X, Y, Z
-			modelPointer = mainmemory.read_u24_be(object_pointers[i] + slot_model_pointer + 1);
-			if modelPointer > 0 and modelPointer <= 0x7FFFFF then
+			modelPointer = mainmemory.read_u32_be(object_pointers[i] + slot_model_pointer);
+			if isPointer(modelPointer) then
+				modelPointer = modelPointer - 0x80000000;
 				mainmemory.writefloat(modelPointer + model_x_pos, x, true);
 				mainmemory.writefloat(modelPointer + model_y_pos, current_player_y, true);
 				mainmemory.writefloat(modelPointer + model_z_pos, z, true);
@@ -192,7 +193,7 @@ local function switch_grab_script_mode()
 	end
 end
 
-local function getExamineData(pointer)
+local function getExamineDataModelTwo(pointer)
 	local examine_data = {};
 
 	local modelPointer = mainmemory.read_u32_be(pointer + slot_model_pointer);
@@ -216,7 +217,7 @@ local function getExamineData(pointer)
 		table.insert(examine_data, { "Separator", 1 });
 	end
 
-	table.insert(examine_data, { "Unknown Pointer", string.format("0x%08x", mainmemory.read_u32_be(pointer + slot_unknown_pointer, true)) });
+	table.insert(examine_data, { "Unknown Pointer", string.format("0x%08x", mainmemory.read_u32_be(pointer + slot_unknown_pointer)) });
 	table.insert(examine_data, { "Unknown Counter", mainmemory.read_u16_be(pointer + slot_unknown_counter) });
 
 	if hasModel then
@@ -294,7 +295,7 @@ local function draw_gui()
 
 	if #object_pointers > 0 and object_index <= #object_pointers then
 		if grab_script_mode == "Examine" then
-			local examine_data = getExamineData(object_pointers[object_index]);
+			local examine_data = getExamineDataModelTwo(object_pointers[object_index]);
 			for i = #examine_data, 1, -1 do
 				if examine_data[i][1] ~= "Separator" then
 					gui.text(gui_x, gui_y + height * row, examine_data[i][1]..": "..examine_data[i][2], nil, nil, 'bottomright');
@@ -310,7 +311,7 @@ local function draw_gui()
 				if object_index == i then
 					gui.text(gui_x, gui_y + height * row, i..": "..string.format("0x%06x", object_pointers[i] or 0), green_highlight, nil, 'bottomright');
 				else
-					if object_pointers[i] == kongObject then
+					if object_pointers[i] == getPlayerObject() then
 						gui.text(gui_x, gui_y + height * row, i..": "..string.format("0x%06x", object_pointers[i] or 0), yellow_highlight, nil, 'bottomright');
 					else
 						gui.text(gui_x, gui_y + height * row, i..": "..string.format("0x%06x", object_pointers[i] or 0), nil, nil, 'bottomright');

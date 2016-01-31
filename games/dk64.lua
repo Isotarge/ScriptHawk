@@ -7,7 +7,7 @@ local Game = {};
 local form_controls = {};
 
 local version;
-local kong_object_pointer;
+local player_pointer;
 local camera_pointer;
 local pointer_list;
 local global_base;
@@ -387,8 +387,6 @@ local gravity_strength = 0xC8;
 
 local light_thing = 0xCC; -- Values 0x00->0x14
 
-local slope_byte = 0xDE;
-
 local x_rot = 0xE4;
 local y_rot = x_rot + 2;
 local z_rot = y_rot + 2;
@@ -438,8 +436,8 @@ local scale = {
 
 local effect_byte = 0x372; -- Bitfield, TODO: Document bits
 
-local function getKongObject() -- TODO: Cache this
-	return mainmemory.read_u24_be(kong_object_pointer);
+local function getPlayerObject() -- TODO: Cache this
+	return mainmemory.read_u24_be(player_pointer);
 end
 
 local prev_map = 0;
@@ -3121,10 +3119,10 @@ end
 --force_tbs = false;
 function forceTBS()
 	if force_tbs then
-		local pointer = mainmemory.read_u32_be(getKongObject() + locked_to_rainbow_coin_pointer);
+		local pointer = mainmemory.read_u32_be(getPlayerObject() + locked_to_rainbow_coin_pointer);
 		if pointer > 0x80000000 and pointer < 0x807FFFFF then
 			print("Forcing TBS");
-			mainmemory.write_u32_be(getKongObject() + locked_to_rainbow_coin_pointer, 0x00000000);
+			mainmemory.write_u32_be(getPlayerObject() + locked_to_rainbow_coin_pointer, 0x00000000);
 		end
 	end
 end
@@ -3141,7 +3139,7 @@ function Game.detectVersion(romName)
 		file                   = 0x7467C8;
 		flag_pointer           = 0x7654F4;
 		menu_flags             = 0x7ED558;
-		kong_object_pointer    = 0x7FBB4D;
+		player_pointer    = 0x7FBB4D;
 		camera_pointer         = 0x7FB968;
 		tb_void_byte           = 0x7FBB63;
 		pointer_list           = 0x7FBFF0;
@@ -3174,7 +3172,7 @@ function Game.detectVersion(romName)
 		file                   = 0x740F18;
 		flag_pointer           = 0x760014;
 		menu_flags             = 0x7ed478;
-		kong_object_pointer    = 0x7fba6d;
+		player_pointer    = 0x7fba6d;
 		camera_pointer         = 0x7fb888;
 		tb_void_byte           = 0x7FBA83;
 		pointer_list           = 0x7fbf10;
@@ -3207,7 +3205,7 @@ function Game.detectVersion(romName)
 		file                   = 0x746088;
 		flag_pointer           = 0x7656E4;
 		menu_flags             = 0x7ed9c8;
-		kong_object_pointer    = 0x7fbfbd;
+		player_pointer    = 0x7fbfbd;
 		camera_pointer         = 0x7fbdd8;
 		tb_void_byte           = 0x7FBFD3;
 		pointer_list           = 0x7fc460;
@@ -3239,7 +3237,7 @@ function Game.detectVersion(romName)
 		file                = 0x7467C8; -- TODO?
 		map                 = 0x72CDE7;
 		menu_flags          = 0x7ED558; -- TODO?
-		kong_object_pointer = 0x7B5AFD;
+		player_pointer = 0x7B5AFD;
 		tb_void_byte        = 0x7FBB63; -- TODO?
 		pointer_list        = 0x7B5E58;
 		kongbase            = 0x7FC950; -- TODO
@@ -3313,11 +3311,11 @@ function isInSubGame()
 end
 
 function Game.getFloor() -- TODO: Got errors with this when exiting tiny temple
-	return mainmemory.readfloat(getKongObject() + floor, true);
+	return mainmemory.readfloat(getPlayerObject() + floor, true);
 end
 
 function Game.getDistanceFromFloor()
-	return mainmemory.readfloat(getKongObject() + distance_from_floor, true);
+	return mainmemory.readfloat(getPlayerObject() + distance_from_floor, true);
 end
 
 --------------
@@ -3330,7 +3328,7 @@ function Game.getXPosition()
 	elseif map_value == jetpac_map then
 		return mainmemory.readfloat(jetman_position[1], true);
 	end
-	return mainmemory.readfloat(getKongObject() + x_pos, true);
+	return mainmemory.readfloat(getPlayerObject() + x_pos, true);
 end
 
 function Game.getYPosition()
@@ -3339,12 +3337,12 @@ function Game.getYPosition()
 	elseif map_value == jetpac_map then
 		return mainmemory.readfloat(jetman_position[2], true);
 	end
-	return mainmemory.readfloat(getKongObject() + y_pos, true);
+	return mainmemory.readfloat(getPlayerObject() + y_pos, true);
 end
 
 function Game.getZPosition()
 	if not isInSubGame() then
-		return mainmemory.readfloat(getKongObject() + z_pos, true);
+		return mainmemory.readfloat(getPlayerObject() + z_pos, true);
 	end
 	return 0;
 end
@@ -3355,9 +3353,9 @@ function Game.setXPosition(value)
 	elseif map_value == jetpac_map then
 		--mainmemory.writefloat(jetman_position[1], value, true);
 	else
-		mainmemory.writefloat(getKongObject() + x_pos, value, true);
-		mainmemory.writebyte(getKongObject() + locked_to_pad, 0x00);
-		mainmemory.write_u32_be(getKongObject() + locked_to_rainbow_coin_pointer, 0x00);
+		mainmemory.writefloat(getPlayerObject() + x_pos, value, true);
+		mainmemory.writebyte(getPlayerObject() + locked_to_pad, 0x00);
+		mainmemory.write_u32_be(getPlayerObject() + locked_to_rainbow_coin_pointer, 0x00);
 	end
 end
 
@@ -3367,16 +3365,16 @@ function Game.setYPosition(value)
 	elseif map_value == jetpac_map then
 		--mainmemory.writefloat(jetman_position[2], value, true);
 	else
-		mainmemory.writefloat(getKongObject() + y_pos, value, true);
-		mainmemory.writebyte(getKongObject() + locked_to_pad, 0x00);
+		mainmemory.writefloat(getPlayerObject() + y_pos, value, true);
+		mainmemory.writebyte(getPlayerObject() + locked_to_pad, 0x00);
 	end
 end
 
 function Game.setZPosition(value)
 	if not isInSubGame() then
-		mainmemory.writefloat(getKongObject() + z_pos, value, true);
-		mainmemory.writebyte(getKongObject() + locked_to_pad, 0x00);
-		mainmemory.write_u32_be(getKongObject() + locked_to_rainbow_coin_pointer, 0x00);
+		mainmemory.writefloat(getPlayerObject() + z_pos, value, true);
+		mainmemory.writebyte(getPlayerObject() + locked_to_pad, 0x00);
+		mainmemory.write_u32_be(getPlayerObject() + locked_to_rainbow_coin_pointer, 0x00);
 	end
 end
 
@@ -3386,40 +3384,40 @@ end
 
 function Game.getXRotation()
 	if not isInSubGame() then
-		return mainmemory.read_u16_be(getKongObject() + x_rot);
+		return mainmemory.read_u16_be(getPlayerObject() + x_rot);
 	end
 	return 0;
 end
 
 function Game.getYRotation()
 	if not isInSubGame() then
-		return mainmemory.read_u16_be(getKongObject() + y_rot);
+		return mainmemory.read_u16_be(getPlayerObject() + y_rot);
 	end
 	return 0;
 end
 
 function Game.getZRotation()
 	if not isInSubGame() then
-		return mainmemory.read_u16_be(getKongObject() + z_rot);
+		return mainmemory.read_u16_be(getPlayerObject() + z_rot);
 	end
 	return 0;
 end
 
 function Game.setXRotation(value)
 	if not isInSubGame() then
-		mainmemory.write_u16_be(getKongObject() + x_rot, value);
+		mainmemory.write_u16_be(getPlayerObject() + x_rot, value);
 	end
 end
 
 function Game.setYRotation(value)
 	if not isInSubGame() then
-		mainmemory.write_u16_be(getKongObject() + y_rot, value);
+		mainmemory.write_u16_be(getPlayerObject() + y_rot, value);
 	end
 end
 
 function Game.setZRotation(value)
 	if not isInSubGame() then
-		mainmemory.write_u16_be(getKongObject() + z_rot, value);
+		mainmemory.write_u16_be(getPlayerObject() + z_rot, value);
 	end
 end
 
@@ -3433,7 +3431,7 @@ function Game.getVelocity()
 	elseif map_value == jetpac_map then
 		return mainmemory.readfloat(jetman_velocity[1], true);
 	end
-	return mainmemory.readfloat(getKongObject() + velocity, true);
+	return mainmemory.readfloat(getPlayerObject() + velocity, true);
 end
 
 function Game.setVelocity(value)
@@ -3442,13 +3440,13 @@ function Game.setVelocity(value)
 	elseif map_value == jetpac_map then
 		mainmemory.writefloat(jetman_velocity[1], value, true);
 	else
-		mainmemory.writefloat(getKongObject() + velocity, value, true);
+		mainmemory.writefloat(getPlayerObject() + velocity, value, true);
 	end
 end
 
 --function Game.getAcceleration()
 --	if not isInSubGame() then
---		return mainmemory.readfloat(getKongObject() + acceleration, true);
+--		return mainmemory.readfloat(getPlayerObject() + acceleration, true);
 --	end
 --	return 0;
 --end
@@ -3459,7 +3457,7 @@ function Game.getYVelocity()
 	elseif map_value == jetpac_map then
 		return mainmemory.readfloat(jetman_velocity[2], true);
 	end
-	return mainmemory.readfloat(getKongObject() + y_velocity, true);
+	return mainmemory.readfloat(getPlayerObject() + y_velocity, true);
 end
 
 function Game.setYVelocity(value)
@@ -3468,13 +3466,13 @@ function Game.setYVelocity(value)
 	elseif map_value == jetpac_map then
 		mainmemory.writefloat(jetman_velocity[2], value, true);
 	else
-		mainmemory.writefloat(getKongObject() + y_velocity, value, true);
+		mainmemory.writefloat(getPlayerObject() + y_velocity, value, true);
 	end
 end
 
 function Game.getYAcceleration()
 	if not isInSubGame() then
-		return mainmemory.readfloat(getKongObject() + y_acceleration, true);
+		return mainmemory.readfloat(getPlayerObject() + y_acceleration, true);
 	end
 	return 0;
 end
@@ -3484,11 +3482,11 @@ end
 --------------------
 
 local function invisify()
-	mainmemory.writebyte(getKongObject() + visibility, 0x00);
+	mainmemory.writebyte(getPlayerObject() + visibility, 0x00);
 end
 
 local function visify()
-	mainmemory.writebyte(getKongObject() + visibility, 0x7F);
+	mainmemory.writebyte(getPlayerObject() + visibility, 0x7F);
 end
 
 local current_invisify = "Invisify";
@@ -3782,20 +3780,15 @@ end
 ------------------------------------
 
 -- Pointers
-local slope_object_pointer = 0x7f94b9; -- TODO - Find on PAL & JP
+local slope_object_pointer = 0x7F94B9; -- TODO - Find on PAL & JP
 
 -- Relative to slope object
-local slope_timer = 0xc3;
+local slope_timer = 0xC3;
 
 local function neverSlip()
 	-- Patch the slope timer
 	local slope_object = mainmemory.read_u24_be(slope_object_pointer);
 	mainmemory.writebyte(slope_object + slope_timer, 0);
-
-	-- Patch the Kong object
-	local slope_value = mainmemory.read_u8(getKongObject() + slope_byte);
-	--mainmemory.writebyte(getKongObject() + slope_byte, math.max(3, slope_value));
-	mainmemory.writebyte(getKongObject() + slope_byte + 1, 0xFE);
 end
 
 ----------------------
@@ -3803,11 +3796,9 @@ end
 ----------------------
 
 local spiking_fix = false;
-local freeze_value = 0;
 
 local function fix_geometry_spiking()
 	spiking_fix = true;
-	--freeze_value = mainmemory.read_u32_be(geometry_spike_pointer);
 end
 
 local function break_geometry_spiking()
@@ -3816,26 +3807,9 @@ end
 
 event.onloadstate(break_geometry_spiking, "ScriptHawk - Break spiking");
 
-local stored_y_addresses = {
-	0x7480DC,
-	0x7F948C,
-	0x7F94F8,
-	0x7F94E8
-};
-
 local function apply_spiking_fix()
 	-- Old fix basically crashes sound thread, seems to work well but... no sound.
-	mainmemory.write_u32_be(geometry_spike_pointer, freeze_value);
-	--return;
-
-	--local xPos = Game.getXPosition();
-	--local yPos = Game.getYPosition();
-	--local zPos = Game.getZPosition();
-	
-	-- TODO: Set every stored position to these values
-	--for i = 1, #stored_y_addresses do
-	--	mainmemory.writefloat(stored_y_addresses[i], yPos, true);
-	--end
+	mainmemory.write_u32_be(geometry_spike_pointer, 0);
 end
 
 -----------------------
@@ -3882,7 +3856,7 @@ end
 local max_objects = 0xff;
 
 function everythingIsKong()
-	local kongSharedModel = mainmemory.read_u32_be(getKongObject() + model_pointer);
+	local kongSharedModel = mainmemory.read_u32_be(getPlayerObject() + model_pointer);
 
 	if not isPointer(kongSharedModel) then
 		print("This ain't gonna work...");
@@ -3920,14 +3894,14 @@ end
 
 function Game.setScale(value)
 	for i = 1, #scale do
-		mainmemory.writefloat(getKongObject() + scale[i], value, true);
+		mainmemory.writefloat(getPlayerObject() + scale[i], value, true);
 	end
 end
 
 function Game.randomEffect()
 	-- Randomly manipulate the effect byte
 	local randomEffect = math.random(0, 0xffff);
-	mainmemory.write_u16_be(getKongObject() + effect_byte, randomEffect);
+	mainmemory.write_u16_be(getPlayerObject() + effect_byte, randomEffect);
 
 	-- Randomly resize the kong
 	local scaleValue = 0.01 + math.random() * 0.49;
@@ -4257,8 +4231,8 @@ function Game.eachFrame()
 	process_flag_queue();
 
 	-- Moonkick
-	if moon_mode == 'All' or (moon_mode == 'Kick' and mainmemory.readbyte(getKongObject() + kick_animation) == kick_animation_value) then
-		mainmemory.writefloat(getKongObject() + y_acceleration, -2.5, true);
+	if moon_mode == 'All' or (moon_mode == 'Kick' and mainmemory.readbyte(getPlayerObject() + kick_animation) == kick_animation_value) then
+		mainmemory.writefloat(getPlayerObject() + y_acceleration, -2.5, true);
 	end
 
 	-- Check EEPROM checksums
@@ -4268,9 +4242,9 @@ function Game.eachFrame()
 			checksum_value = memory.read_u32_be(eep_checksum_offsets[i]);
 			if eep_checksum_values[i] ~= checksum_value then
 				if i == 5 then
-					dprint("Global flags "..i.." Checksum: "..toHexString(eep_checksum_values[i]).." -> "..toHexString(checksum_value));
+					dprint("Global flags "..i.." Checksum: "..toHexString(eep_checksum_values[i], 8).." -> "..toHexString(checksum_value));
 				else
-					dprint("Slot "..i.." Checksum: "..toHexString(eep_checksum_values[i]).." -> "..toHexString(checksum_value));
+					dprint("Slot "..i.." Checksum: "..toHexString(eep_checksum_values[i], 8).." -> "..toHexString(checksum_value));
 				end
 				eep_checksum_values[i] = checksum_value;
 			end

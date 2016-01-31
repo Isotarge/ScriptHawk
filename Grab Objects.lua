@@ -1,6 +1,7 @@
 local pointer_list;
-local kong_pointer;
+local player_pointer;
 local camera_pointer;
+local trigger_array_pointer;
 
 safeMode = true;
 grab_script_mode = "Examine";
@@ -15,19 +16,23 @@ if bizstring.contains(romName, "Donkey Kong 64") then
 	if bizstring.contains(romName, "USA") and not bizstring.contains(romName, "Kiosk") then
 		pointer_list = 0x7FBFF0;
 		camera_pointer = 0x7FB968;
-		kong_pointer = 0x7FBB4D;
+		player_pointer = 0x7FBB4D;
+		trigger_array_pointer = 0x7F6000;
 	elseif bizstring.contains(romName, "Europe") then
 		pointer_list = 0x7FBF10;
 		camera_pointer = 0x7FB888;
-		kong_pointer = 0x7FBA6D;
+		player_pointer = 0x7FBA6D;
+		trigger_array_pointer = 0x7F6000; -- TODO
 	elseif bizstring.contains(romName, "Japan") then
 		pointer_list = 0x7FC460;
 		camera_pointer = 0x7FBDD8;
-		kong_pointer = 0x7FBFBD;
+		player_pointer = 0x7FBFBD;
+		trigger_array_pointer = 0x7F6000; -- TODO
 	elseif bizstring.contains(romName, "Kiosk") then
 		pointer_list = 0x7B5E58;
 		camera_pointer = 0x7B5918; -- TODO: Does this work?
-		kong_pointer = 0x7B5AFD;
+		player_pointer = 0x7B5AFD;
+		trigger_array_pointer = 0x7F6000; -- TODO
 		grab_pointer = 0x2F4;
 	end
 else
@@ -65,7 +70,7 @@ end
 -- Model 1 object fields --
 ---------------------------
 
--- Relative to objects found in the pointer list
+-- Relative to objects found in the model 1 pointer list
 local previous_object = -0x10; -- u32_be
 local object_size = -0x0C; -- u32_be
 
@@ -491,7 +496,7 @@ local function switch_grab_script_mode()
 end
 
 local function grab_object(pointer)
-	local playerObject = mainmemory.read_u24_be(kong_pointer);
+	local playerObject = mainmemory.read_u24_be(player_pointer);
 	if playerObject > 0x000000 and playerObject < 0x7FFFFF then
 		mainmemory.writebyte(playerObject + grab_pointer, 0x80);
 		mainmemory.write_u24_be(playerObject + grab_pointer + 1, pointer);
@@ -511,7 +516,7 @@ end
 local function encircle_kong()
 	local x, z;
 
-	local playerObject = mainmemory.read_u24_be(kong_pointer);
+	local playerObject = mainmemory.read_u24_be(player_pointer);
 	local kong_x = mainmemory.readfloat(playerObject + x_pos, true);
 	local kong_y = mainmemory.readfloat(playerObject + y_pos, true);
 	local kong_z = mainmemory.readfloat(playerObject + z_pos, true);
@@ -723,7 +728,7 @@ local function draw_gui()
 	row = row + 1;
 
 	-- Display which object is grabbed
-	local playerObject = mainmemory.read_u24_be(kong_pointer);
+	local playerObject = mainmemory.read_u24_be(player_pointer);
 	gui.text(gui_x, gui_y + height * row, string.format("Grabbed object: 0x%06x", mainmemory.read_u24_be(playerObject + grab_pointer + 1)), nil, nil, 'bottomright');
 	row = row + 1;
 
@@ -785,7 +790,7 @@ end
 
 local function pull_objects()
 	local object_no = 0;
-	local playerObject = mainmemory.read_u24_be(kong_pointer);
+	local playerObject = mainmemory.read_u24_be(player_pointer);
 	local cameraObject = mainmemory.read_u24_be(camera_pointer + 1);
 
 	object_pointers = {};
