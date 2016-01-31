@@ -10,6 +10,7 @@ local version;
 local player_pointer;
 local camera_pointer;
 local pointer_list;
+local linked_list_pointer;
 local global_base;
 local kongbase;
 local tb_void_byte;
@@ -355,12 +356,12 @@ local lives      = 9; -- This is used as instrument ammo in single player
 local num_bones = 0x20;
 
 -- Relative to objects found in the pointer list (Model 1)
-local previous_object = -0x10;
-local object_size = -0x0C;
+local previous_object = -0x10; -- u32_be
+local object_size = -0x0C; -- u32_be
 
-local model_pointer = 0x00;
-local rendering_parameters_pointer = 0x04;
-local current_bone_array_pointer = 0x08;
+local model_pointer = 0x00; -- u32_be
+local rendering_parameters_pointer = 0x04; -- u32_be
+local current_bone_array_pointer = 0x08; -- u32_be
 
 local actor_type = 0x58; -- TODO: Document values for this
 local visibility = 0x63; -- Bitfield, also contains whether the actor collides with terrain and whether they are in water
@@ -415,7 +416,7 @@ local object_state_byte = 0x154;
 
 local camera_focus_pointer = 0x178;
 
-local kick_animation = 0x181;
+local animation_type = 0x181;
 local kick_animation_value = 0x29;
 
 local velocity_uncrouch_aerial = 0x1A4;
@@ -2991,7 +2992,7 @@ function clearFlagByName(name)
 		table.insert(flag_action_queue, flag);
 		process_flag_queue();
 	end
-end	
+end
 
 function clearFlagByType(_type)
 	local num_cleared = 0;
@@ -3139,10 +3140,11 @@ function Game.detectVersion(romName)
 		file                   = 0x7467C8;
 		flag_pointer           = 0x7654F4;
 		menu_flags             = 0x7ED558;
-		player_pointer    = 0x7FBB4D;
+		player_pointer         = 0x7FBB4D;
 		camera_pointer         = 0x7FB968;
 		tb_void_byte           = 0x7FBB63;
 		pointer_list           = 0x7FBFF0;
+		linked_list_pointer    = 0x7F0990;
 		kongbase               = 0x7FC950;
 		global_base            = 0x7FCC41;
 		security_byte          = 0x7552E0;
@@ -3172,10 +3174,11 @@ function Game.detectVersion(romName)
 		file                   = 0x740F18;
 		flag_pointer           = 0x760014;
 		menu_flags             = 0x7ed478;
-		player_pointer    = 0x7fba6d;
+		player_pointer         = 0x7fba6d;
 		camera_pointer         = 0x7fb888;
 		tb_void_byte           = 0x7FBA83;
 		pointer_list           = 0x7fbf10;
+		linked_list_pointer    = 0x7F0990; -- TODO: Find
 		kongbase               = 0x7fc890;
 		global_base            = 0x7fcb81;
 		security_byte          = 0x74FB60;
@@ -3205,10 +3208,11 @@ function Game.detectVersion(romName)
 		file                   = 0x746088;
 		flag_pointer           = 0x7656E4;
 		menu_flags             = 0x7ed9c8;
-		player_pointer    = 0x7fbfbd;
+		player_pointer         = 0x7fbfbd;
 		camera_pointer         = 0x7fbdd8;
 		tb_void_byte           = 0x7FBFD3;
 		pointer_list           = 0x7fc460;
+		linked_list_pointer    = 0x7F0990; -- TODO: Find
 		kongbase               = 0x7fcde0;
 		global_base            = 0x7fd0d1;
 		security_byte          = 0x7553A0;
@@ -3237,9 +3241,10 @@ function Game.detectVersion(romName)
 		file                = 0x7467C8; -- TODO?
 		map                 = 0x72CDE7;
 		menu_flags          = 0x7ED558; -- TODO?
-		player_pointer = 0x7B5AFD;
+		player_pointer      = 0x7B5AFD;
 		tb_void_byte        = 0x7FBB63; -- TODO?
 		pointer_list        = 0x7B5E58;
+		linked_list_pointer = 0x7F0990; -- TODO: Find
 		kongbase            = 0x7FC950; -- TODO
 		global_base         = 0x7FCC41; -- TODO
 
@@ -4024,6 +4029,43 @@ local function do_brb()
 	end
 end
 
+-------------------
+-- For papa cfox --
+-------------------
+
+
+
+local list_previous_pointer = 0x00; -- pointer
+local list_size = 0x04; -- u32be
+
+max_length = 0x40;
+
+function setText(pointer, message)
+	local messageLength = math.min(string.len(message), max_length);
+	for i = 1, messageLength do
+		mainmemory.writebyte(pointer + i - 1, string.byte(message, i));
+	end
+	mainmemory.writebyte(pointer + messageLength, 0x00);
+end
+
+function setDKTV(message)
+	local linkedListRoot = mainmemory.read_u24_be(linked_list_pointer + 1);
+	local linkedListSize = mainmemory.read_u32_be(linked_list_pointer + 4);
+	local totalSize = 0;
+	local currentPointer = linkedListRoot;
+	while totalSize < linkedListSize do
+		local currentObjectSize = mainmemory.read_u32_be(currentPointer + 4);
+		currentPointer = currentPointer + 0x10;
+		if currentObjectSize == 0x40 then
+			if mainmemory.read_u32_be(currentPointer) == 0x444B2054 then
+				setText(currentPointer, message);
+			end
+		end
+		currentPointer = currentPointer + currentObjectSize;
+		totalSize = currentPointer - linkedListRoot;
+	end
+end
+
 ----------------
 -- ASM Loader --
 ----------------
@@ -4231,7 +4273,7 @@ function Game.eachFrame()
 	process_flag_queue();
 
 	-- Moonkick
-	if moon_mode == 'All' or (moon_mode == 'Kick' and mainmemory.readbyte(getPlayerObject() + kick_animation) == kick_animation_value) then
+	if moon_mode == 'All' or (moon_mode == 'Kick' and mainmemory.readbyte(getPlayerObject() + animation_type) == kick_animation_value) then
 		mainmemory.writefloat(getPlayerObject() + y_acceleration, -2.5, true);
 	end
 
