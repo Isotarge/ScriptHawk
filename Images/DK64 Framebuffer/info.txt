@@ -7,4 +7,4 @@ Custom DK64 FB image how to:
 - Open ScriptHawk
 - Call fillFB() from the lua console
 - Load your .rgb24 file in the open file dialog that pops up
-- Pause the gamew or start a file to see it
+- Pause the game or start a file to see it
