@@ -643,52 +643,52 @@ end
 -- Probably best to use a base + offset dealeo
 local iconAddress = 0x11B065;
 local healthAddresses = {
-	[0x01] = {0x11B644, 0x11B645}, -- BK
-	[0x10] = {0x11B65F, 0x11B660}, -- Banjo (Solo)
-	[0x11] = {0x11B668, 0x11B669}, -- Mumbo
-	[0x2D] = {0x11B659, 0x11B65A}, -- Stony
-	[0x2E] = {0x11B66E, 0x11B66F}, -- Detonator
-	[0x2F] = {0x11B665, 0x11B666}, -- Submarine
-	[0x30] = {0x11B677, 0x11B678}, -- Dinosaur
-	[0x31] = {0x11B653, 0x11B654}, -- Bee
-	[0x32] = {0x11B647, 0x11B648}, -- Snowball
-	[0x36] = {0x11B656, 0x11B657}, -- Washing Machine
-	[0x5F] = {0x11B662, 0x11B663} -- Kazooie (Solo)
+	[0x01] = 0x11B644, -- BK
+	[0x10] = 0x11B65F, -- Banjo (Solo)
+	[0x11] = 0x11B668, -- Mumbo
+	[0x2D] = 0x11B659, -- Stony
+	[0x2E] = 0x11B66E, -- Detonator
+	[0x2F] = 0x11B665, -- Submarine
+	[0x30] = 0x11B677, -- Dinosaur
+	[0x31] = 0x11B653, -- Bee
+	[0x32] = 0x11B647, -- Snowball
+	[0x36] = 0x11B656, -- Washing Machine
+	[0x5F] = 0x11B662, -- Kazooie (Solo)
 };
 
 function Game.getCurrentHealth()
 	local currentTransformation = mainmemory.readbyte(iconAddress);
-	if type(healthAddresses[currentTransformation]) == 'table' then
-		return mainmemory.read_u8(healthAddresses[currentTransformation][1]);
+	if type(healthAddresses[currentTransformation]) == 'number' then
+		return mainmemory.read_u8(healthAddresses[currentTransformation]);
 	end
 	return 1;
 end
 
 function Game.setCurrentHealth(value)
 	local currentTransformation = mainmemory.readbyte(iconAddress);
-	if type(healthAddresses[currentTransformation]) == 'table' then
+	if type(healthAddresses[currentTransformation]) == 'number' then
 		value = value or 0;
 		value = math.max(0x00, value);
 		value = math.min(0xFF, value);
-		return mainmemory.write_u8(healthAddresses[currentTransformation][1], value);
+		return mainmemory.write_u8(healthAddresses[currentTransformation], value);
 	end
 end
 
 function Game.getMaxHealth()
 	local currentTransformation = mainmemory.readbyte(iconAddress);
-	if type(healthAddresses[currentTransformation]) == 'table' then
-		return mainmemory.read_u8(healthAddresses[currentTransformation][2]);
+	if type(healthAddresses[currentTransformation]) == 'number' then
+		return mainmemory.read_u8(healthAddresses[currentTransformation] + 1);
 	end
 	return 1;
 end
 
 function Game.setMaxHealth(value)
 	local currentTransformation = mainmemory.readbyte(iconAddress);
-	if type(healthAddresses[currentTransformation]) == 'table' then
+	if type(healthAddresses[currentTransformation]) == 'number' then
 		value = value or 0;
 		value = math.max(0x00, value);
 		value = math.min(0xFF, value);
-		return mainmemory.write_u8(healthAddresses[currentTransformation][2], value);
+		return mainmemory.write_u8(healthAddresses[currentTransformation] + 1, value);
 	end
 end
 
