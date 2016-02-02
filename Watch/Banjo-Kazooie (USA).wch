@@ -129,17 +129,18 @@ SystemID N64
 37D96C	d	f	1	RDRAM	Camera Horizontal Rotation
 37D970	d	f	1	RDRAM	Viewport Roll
 37D974	d	f	1	RDRAM	Camera tracking offset?
+37D978	d	f	1	RDRAM	Camera Something
 37D97C	d	f	1	RDRAM	Camera tracking offset?
-37D980	d	f	1	RDRAM	Camera something?
-37D984	d	f	1	RDRAM	Camera something?
-37D988	d	f	1	RDRAM	Camera something?
+37D980	d	f	1	RDRAM	Camera Peripheral X Offset
+37D984	d	f	1	RDRAM	Camera Peripheral Y Offset
+37D988	d	f	1	RDRAM	Camera Peripheral Z Offset
 37D98C	d	f	1	RDRAM	C-Up camera max vertical speed
 37D990	d	f	1	RDRAM	C-Up camera max horizontal speed
 37D9A4	d	f	1	RDRAM	Camera something?
 37D9B4	d	f	1	RDRAM	Camera something?
-37D9B8	d	f	1	RDRAM	Camera something?
-37D9BC	d	f	1	RDRAM	Camera something?
-37D9C0	d	f	1	RDRAM	Camera something?
+37D9B8	d	f	1	RDRAM	Camera X Offset
+37D9BC	d	f	1	RDRAM	Camera Y Offset
+37D9C0	d	f	1	RDRAM	Camera Z Offset
 37D9C4	d	f	1	RDRAM	Camera something?
 37D9C8	d	f	1	RDRAM	Camera Pitch Velocity
 37D9CC	d	f	1	RDRAM	Camera Yaw Velocity
