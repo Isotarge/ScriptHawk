@@ -38,7 +38,7 @@ slot_variables = {
 	[0x08] = {["Type"] = "Float", ["Name"] = {"Y", "Y Pos", "Y Position"}},
 	[0x0C] = {["Type"] = "Float", ["Name"] = {"Z", "Z Pos", "Z Position"}},
 
-	[0x14] = {["Type"] = "Pointer"},
+	[0x14] = {["Type"] = "Pointer", ["Name"] = "Animation Object Pointer"},
 	[0x18] = {["Type"] = "Pointer"},
 
 	[0x1C] = {["Type"] = "Float"},
@@ -62,8 +62,16 @@ slot_variables = {
 	[0x64] = {["Type"] = "Float", ["Name"] = {"Moving Angle", "Moving", "Rot Y", "Rot. Y", "Y Rotation"}},
 	[0x68] = {["Type"] = "Float", ["Name"] = {"Rot X", "Rot. X", "X Rotation"}},
 
+	[0x7C] = {["Type"] = "Float"},
+	[0x80] = {["Type"] = "Float"},
+	[0x84] = {["Type"] = "Float"},
+
 	[0x8C] = {["Type"] = "Float", ["Name"] = "Countdown timer?"},
 	[0xE8] = {["Type"] = "Byte", ["Name"] = "Damages Player"},
+
+	[0x90] = {["Type"] = "Float"},
+	[0x94] = {["Type"] = "Float"},
+	[0x98] = {["Type"] = "Float"},
 
 	[0x100] = {["Type"] = "Pointer"},
 	[0x104] = {["Type"] = "Pointer"},
@@ -80,7 +88,11 @@ slot_variables = {
 	[0x12C] = {["Type"] = "Pointer"},
 	[0x130] = {["Type"] = "Pointer"},
 	[0x14C] = {["Type"] = "Pointer"},
-	[0x150] = {["Type"] = "Pointer"},
+	[0x150] = {["Type"] = "Pointer", ["Name"] = "Bone Array Pointer"},
+
+	[0x170] = {["Type"] = "Float"},
+	[0x174] = {["Type"] = "Float"},
+	[0x178] = {["Type"] = "Float"},
 };
 
 local function fillBlankVariableSlots()
@@ -332,6 +344,115 @@ function get_all_unique(variable)
 	end
 end
 getAllUnique = get_all_unique;
+
+local animation_object_unknown_pointer = 0x00;
+local animation_object_animation_type = 0x38;
+local animation_object_animation_timer = 0x3C;
+
+local animation_types = {
+	[0x10] = "Bigbutt Running",
+	[0x2C] = "Snippet Walking",
+	[0x2D] = "Jinjo Idle",
+	[0x2F] = "Jinjo Waving",
+	[0x32] = "Bigbutt Attacking",
+	[0x33] = "Bigbutt Eating Grass",
+	[0x35] = "Bigbutt Alerted",
+	[0x36] = "Bigbutt Walking",
+	[0x5E] = "Termite Idle",
+	[0x5F] = "Termite Walking",
+	[0x65] = "Beehive Dying",
+	[0x6A] = "Mumbo Sleeping",
+	[0x6B] = "Mumbo Waking",
+	[0x6C] = "Mumbo Idle",
+	[0x6D] = "Mumbo Transforming",
+	[0x92] = "Water Explody dude chasing", -- TODO: Name
+	[0x96] = "Snippet Recovering",
+	[0x130] = "Jinjo Circling", -- TODO: Used outside grunty fight?
+	[0x131] = "Jinjo Circling", -- TODO: how does this work
+	[0x165] = "Beehive Jumping",
+	[0x16E] = "Mumbo Reclining", -- CCW Summer
+	[0x17F] = "Mumbo Sweeping",
+	[0x180] = "Mumbo Rotating",
+	[0x1C5] = "Grunty Flying",
+	[0x1D6] = "Grublin Walking",
+	[0x1D7] = "Grublin Alerted",
+	[0x1D8] = "Grublin Chasing",
+	[0x1DA] = "Snippet Idle",
+	[0x1F4] = "Water Explody dude idle", -- TODO: Name
+	[0x212] = "Cauldron Activating",
+	[0x213] = "Cauldron Sleeping",
+	[0x214] = "Cauldron Activated",
+	[0x215] = "Cauldron Teleporting",
+	[0x216] = "Cauldron Rejected",
+	[0x217] = "Transform Pad",
+	[0x223] = "Topper Idle", -- Carrot gets it
+	[0x225] = "Colliwobble Isle",
+	[0x226] = "Onion Idle", -- TODO: Name
+	[0x257] = "Grunty Green Spell", -- Flying
+	[0x258] = "Grunty Hurt",
+	[0x259] = "Grunty Hurt",
+	[0x25A] = "Grunty Fireball Spell", -- Flying
+	[0x25C] = "Grunty Phase 1 Swooping",
+	[0x25E] = "Grunty Phase 1 Vulnerable",
+	[0x25F] = "Grunty Idle",
+	[0x260] = "Grunty Fireball Spell", -- Landed
+	[0x261] = "Grunty Green Spell", -- Landed
+	[0x262] = "Jinjo Statue Rising", -- TODO: Also diving?
+	[0x264] = "Jinjo Statue Activating",
+	[0x265] = "Jinjo Statue",
+	[0x26B] = "Brentilda Idle",
+	[0x26B] = "Brentilda Hands on Hips",
+	[0x26D] = "Gruntling Idle",
+	[0x26F] = "Gruntling Chasing",
+	[0x275] = "Jinjonator Activating", -- TODO: verify
+	[0x276] = "Jinjonator Charging",
+	[0x278] = "Jinjonator Recoil",
+	[0x27A] = "Grunty Hurt by Jinjonator",
+	[0x27C] = "Jinjonator Charging",
+	[0x27D] = "Jinjonator Final Hit",
+	[0x27F] = "Jinjonator Circling",
+	[0x283] = "Grunty Chattering Teeth",
+	[0x28F] = "Dingpot Idle",
+	[0x290] = "Dingpot Shooting",
+};
+
+function getAnimationInfo()
+	local level_object_array = mainmemory.read_u24_be(level_object_array_pointer + 1);
+	local numSlots = math.min(max_slots, mainmemory.read_u32_be(level_object_array));
+	for i = 0, numSlots - 1 do
+		local currentSlotBase = get_slot_base(level_object_array, i);
+		local animationObjectPointer = mainmemory.read_u24_be(currentSlotBase + 0x14 + 1);
+		if animationObjectPointer > 0x000000 and animationObjectPointer < 0x3FFFFF then
+			local animationType = mainmemory.read_u32_be(animationObjectPointer + animation_object_animation_type);
+			if type(animation_types[animationType]) == "string" then
+				animationType = animation_types[animationType];
+			else
+				animationType = toHexString(animationType);
+			end
+			print("Index "..i..": type: "..animationType.." timer: "..mainmemory.readfloat(animationObjectPointer + animation_object_animation_timer, true));
+		end
+	end
+end
+
+function setAnimationType(index, animationType)
+	local level_object_array = mainmemory.read_u24_be(level_object_array_pointer + 1);
+	local numSlots = math.min(max_slots, mainmemory.read_u32_be(level_object_array));
+	local objectSlotBase = get_slot_base(level_object_array, index);
+	local animationObjectPointer = mainmemory.read_u24_be(objectSlotBase + 0x14 + 1);
+	if animationObjectPointer > 0x000000 and animationObjectPointer < 0x3FFFFF then
+		mainmemory.write_u32_be(animationObjectPointer + animation_object_animation_type, animationType);
+	end
+end
+
+function setAnimationObjectFloat(index, var, value)
+	local level_object_array = mainmemory.read_u24_be(level_object_array_pointer + 1);
+	local numSlots = math.min(max_slots, mainmemory.read_u32_be(level_object_array));
+	local objectSlotBase = get_slot_base(level_object_array, index);
+	local animationObjectPointer = mainmemory.read_u24_be(objectSlotBase + 0x14 + 1);
+	if animationObjectPointer > 0x000000 and animationObjectPointer < 0x3FFFFF then
+		mainmemory.writefloat(animationObjectPointer + var, value, true);
+	end
+end
 
 function set_all(variable, value)
 	if type(variable) == "string" then
