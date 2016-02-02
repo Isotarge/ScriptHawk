@@ -15,8 +15,8 @@ local x_position = 0x120;
 -- State --
 -----------
 
-local currentFrame;
-local previousFrame;
+local currentFrame = 0;
+local previousFrame = 0;
 
 local currentP;
 local previousP;
@@ -45,7 +45,7 @@ local function checkForMovementErrors()
 	currentVelocityGround = mainmemory.read_s8(velocity_ground);
 	currentXPosition = mainmemory.read_u16_le(x_position);
 
-	if currentFrame == previousFrame or 0 + 1 then
+	if currentFrame > previousFrame then
 		if currentP == max_p and previousP == max_p then
 			output("2 frames with P meter at "..max_p..", consider spinning earlier.");
 		end
@@ -56,6 +56,10 @@ local function checkForMovementErrors()
 
 		if currentVelocityBase == max_velocity_base and (currentVelocityGround == 2 or currentVelocityGround == 5) then
 			output("Suboptimal jump detected, consider jumping earlier or longer.");
+		end
+
+		if previousXPosition == currentXPosition then
+			tastudio.setlag(currentFrame - 1, true);
 		end
 	end
 
