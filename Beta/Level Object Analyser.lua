@@ -286,16 +286,13 @@ function get_minimum_value(variable)
 	if type(variable) == "string" then
 		variable = resolve_variable_name(variable);
 	end
+	local min = math.huge;
 	if type(slot_variables[variable]) == "table" then
-		local min = slot_data[1][variable];
 		for i = 1, #slot_data do
-			if slot_data[i][variable] < min then
-				min = slot_data[i][variable];
-			end
+			min = math.min(min, slot_data[i][variable]);
 		end
-		return min;
 	end
-	return 0;
+	return min;
 end
 getMinimumValue = get_minimum_value;
 
@@ -303,16 +300,13 @@ function get_maximum_value(variable)
 	if type(variable) == "string" then
 		variable = resolve_variable_name(variable);
 	end
+	local max = -math.huge;
 	if type(slot_variables[variable]) == "table" then
-		local max = slot_data[1][variable];
 		for i = 1, #slot_data do
-			if slot_data[i][variable] > max then
-				max = slot_data[i][variable];
-			end
+			max = math.max(max, slot_data[i][variable]);
 		end
-		return max;
 	end
-	return 0;
+	return max;
 end
 getMaximumValue = get_maximum_value;
 
@@ -365,7 +359,7 @@ local animation_types = {
 	[0x6B] = "Mumbo Waking",
 	[0x6C] = "Mumbo Idle",
 	[0x6D] = "Mumbo Transforming",
-	[0x92] = "Water Explody dude chasing", -- TODO: Name
+	[0x92] = "Shrapnel Chasing",
 	[0x96] = "Snippet Recovering",
 	[0xD6] = "Turbo Trainers",
 	[0x130] = "Jinjo Circling", -- TODO: Used outside Grunty fight?
@@ -373,7 +367,7 @@ local animation_types = {
 	[0x13A] = "Bottles", -- TODO: Details
 	[0x13B] = "Bottles", -- TODO: Details
 	[0x13D] = "Bottles", -- TODO: Details
-	[0x14B] = "Golden Crocodile", -- BGS, feed egg
+	[0x14B] = "Croctus", -- BGS, feed egg
 	[0x165] = "Beehive",
 	[0x16E] = "Mumbo Reclining", -- CCW Summer
 	[0x17F] = "Mumbo Sweeping",
@@ -384,7 +378,7 @@ local animation_types = {
 	[0x1D7] = "Grublin Alerted",
 	[0x1D8] = "Grublin Chasing",
 	[0x1DA] = "Snippet Idle",
-	[0x1F4] = "Water Explody Dude Idle", -- TODO: Name
+	[0x1F4] = "Shrapnel Idle",
 	[0x208] = "Goldfish", -- Banjo's house
 	[0x209] = "Cuckoo Clock Idle",
 	[0x20A] = "Cuckoo Clock Chiming",
@@ -396,7 +390,7 @@ local animation_types = {
 	[0x217] = "Transform Pad",
 	[0x223] = "Topper Idle", -- Carrot gets it
 	[0x225] = "Colliwobble Idle",
-	[0x226] = "Onion Idle", -- TODO: Name
+	[0x226] = "Bawl Idle",
 	[0x257] = "Grunty Green Spell", -- Flying
 	[0x258] = "Grunty Hurt",
 	[0x259] = "Grunty Hurt",
