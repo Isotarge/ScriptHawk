@@ -67,7 +67,6 @@ slot_variables = {
 	[0x84] = {["Type"] = "Float"},
 
 	[0x8C] = {["Type"] = "Float", ["Name"] = "Countdown timer?"},
-	[0xE8] = {["Type"] = "Byte", ["Name"] = "Damages Player"},
 
 	[0x90] = {["Type"] = "Float"},
 	[0x94] = {["Type"] = "Float"},
@@ -164,7 +163,7 @@ end
 ------------
 
 function output_slot(index)
-	if index > 0 and index < #slot_data then
+	if type(slot_data[index]) ~= "nil" then
 		local previous_type = "";
 		local current_slot = slot_data[index + 1];
 		print("Starting output of slot "..index + 1);
@@ -361,24 +360,34 @@ local animation_types = {
 	[0x5E] = "Termite Idle",
 	[0x5F] = "Termite Walking",
 	[0x65] = "Beehive Dying",
+	[0x67] = "Wading Boots",
 	[0x6A] = "Mumbo Sleeping",
 	[0x6B] = "Mumbo Waking",
 	[0x6C] = "Mumbo Idle",
 	[0x6D] = "Mumbo Transforming",
 	[0x92] = "Water Explody dude chasing", -- TODO: Name
 	[0x96] = "Snippet Recovering",
-	[0x130] = "Jinjo Circling", -- TODO: Used outside grunty fight?
-	[0x131] = "Jinjo Circling", -- TODO: how does this work
-	[0x165] = "Beehive Jumping",
+	[0xD6] = "Turbo Trainers",
+	[0x130] = "Jinjo Circling", -- TODO: Used outside Grunty fight?
+	[0x131] = "Jinjo Circling", -- TODO: How does this work
+	[0x13A] = "Bottles", -- TODO: Details
+	[0x13B] = "Bottles", -- TODO: Details
+	[0x13D] = "Bottles", -- TODO: Details
+	[0x14B] = "Golden Crocodile", -- BGS, feed egg
+	[0x165] = "Beehive",
 	[0x16E] = "Mumbo Reclining", -- CCW Summer
 	[0x17F] = "Mumbo Sweeping",
 	[0x180] = "Mumbo Rotating",
 	[0x1C5] = "Grunty Flying",
+	[0x1CE] = "Curtain", -- Banjo's house
 	[0x1D6] = "Grublin Walking",
 	[0x1D7] = "Grublin Alerted",
 	[0x1D8] = "Grublin Chasing",
 	[0x1DA] = "Snippet Idle",
-	[0x1F4] = "Water Explody dude idle", -- TODO: Name
+	[0x1F4] = "Water Explody Dude Idle", -- TODO: Name
+	[0x208] = "Goldfish", -- Banjo's house
+	[0x209] = "Cuckoo Clock Idle",
+	[0x20A] = "Cuckoo Clock Chiming",
 	[0x212] = "Cauldron Activating",
 	[0x213] = "Cauldron Sleeping",
 	[0x214] = "Cauldron Activated",
@@ -386,7 +395,7 @@ local animation_types = {
 	[0x216] = "Cauldron Rejected",
 	[0x217] = "Transform Pad",
 	[0x223] = "Topper Idle", -- Carrot gets it
-	[0x225] = "Colliwobble Isle",
+	[0x225] = "Colliwobble Idle",
 	[0x226] = "Onion Idle", -- TODO: Name
 	[0x257] = "Grunty Green Spell", -- Flying
 	[0x258] = "Grunty Hurt",
