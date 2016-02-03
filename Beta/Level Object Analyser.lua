@@ -317,7 +317,7 @@ function get_all_unique(variable)
 	if type(slot_variables[variable]) == "table" then
 		local unique_values = {};
 		local value, count;
-		if #slot_data == 0 then
+		if type(slot_data) ~= "table" or #slot_data == 0 then
 			parseSlotData();
 		end
 		for i = 1, #slot_data do
