@@ -430,7 +430,7 @@ local velocity_ground = 0x1C0;
 
 local grabbed_vine_pointer = 0x2B0;
 
--- TODO: Properly document these
+-- TODO: Properly document these, also these only apply to the player and maybe kongs in the tag barrel
 local scale = {
 	0x344, 0x348, 0x34C, 0x350, 0x354
 }
@@ -466,7 +466,7 @@ function adjustBlockSize(value)
 	checkFlags();
 end
 
-local flag_array = {
+local flag_array = { -- TODO: Split out into separate lua files (one for each version)
 	---------------------------
 	-- Needs further testing --
 	---------------------------
@@ -3154,7 +3154,7 @@ function Game.detectVersion(romName)
 		geometry_spike_pointer = 0x76FDF8;
 
 		--Mad Jack
-		MJ_state_pointer      = 0x7FDC91;
+		MJ_state_pointer      = 0x7FDC91; -- TODO: Find Mad Jack state based on Model 1 pointer list and actor type knowledge rather than relying on this pointer
 		MJ_time_until_next_action = 0x2D;
 		MJ_actions_remaining      = 0x58;
 		MJ_action_type            = 0x59;
@@ -3173,14 +3173,14 @@ function Game.detectVersion(romName)
 		map                    = 0x73EC37;
 		file                   = 0x740F18;
 		flag_pointer           = 0x760014;
-		menu_flags             = 0x7ed478;
-		player_pointer         = 0x7fba6d;
-		camera_pointer         = 0x7fb888;
+		menu_flags             = 0x7ED478;
+		player_pointer         = 0x7FBA6D;
+		camera_pointer         = 0x7FB888;
 		tb_void_byte           = 0x7FBA83;
-		pointer_list           = 0x7fbf10;
-		linked_list_pointer    = 0x7F0990; -- TODO: Find
-		kongbase               = 0x7fc890;
-		global_base            = 0x7fcb81;
+		pointer_list           = 0x7FBF10;
+		linked_list_pointer    = 0x7F08B0;
+		kongbase               = 0x7FC890;
+		global_base            = 0x7FCB81;
 		security_byte          = 0x74FB60;
 		security_message       = 0x7590F0;
 		frames_lag             = 0x765A30;
@@ -3207,14 +3207,14 @@ function Game.detectVersion(romName)
 		map                    = 0x743DA7;
 		file                   = 0x746088;
 		flag_pointer           = 0x7656E4;
-		menu_flags             = 0x7ed9c8;
-		player_pointer         = 0x7fbfbd;
-		camera_pointer         = 0x7fbdd8;
+		menu_flags             = 0x7ED9C8;
+		player_pointer         = 0x7FBFBD;
+		camera_pointer         = 0x7FBDD8;
 		tb_void_byte           = 0x7FBFD3;
-		pointer_list           = 0x7fc460;
-		linked_list_pointer    = 0x7F0990; -- TODO: Find
-		kongbase               = 0x7fcde0;
-		global_base            = 0x7fd0d1;
+		pointer_list           = 0x7FC460;
+		linked_list_pointer    = 0x7F0E00;
+		kongbase               = 0x7FCDE0;
+		global_base            = 0x7FD0D1;
 		security_byte          = 0x7553A0;
 		security_message       = 0x75E790;
 		frames_lag             = 0x76B100;
@@ -3222,7 +3222,7 @@ function Game.detectVersion(romName)
 		geometry_spike_pointer = 0x76FFE8;
 
 		--Mad Jack
-		MJ_state_pointer      = 0x7fe121;
+		MJ_state_pointer      = 0x7FE121;
 		MJ_time_until_next_action = 0x25;
 		MJ_actions_remaining      = 0x60;
 		MJ_action_type            = 0x61;
@@ -3906,7 +3906,7 @@ end
 
 function Game.randomEffect()
 	-- Randomly manipulate the effect byte
-	local randomEffect = math.random(0, 0xffff);
+	local randomEffect = math.random(0, 0xFFFF);
 	mainmemory.write_u16_be(getPlayerObject() + effect_byte, randomEffect);
 
 	-- Randomly resize the kong
@@ -4274,6 +4274,13 @@ function Game.eachFrame()
 	map_value = mainmemory.readbyte(map);
 
 	Game.unlock_menus();
+
+	-- Force STVW
+	--local player = getPlayerObject();
+	--local yRot = Game.getYRotation();
+	--if yRot < Game.max_rot_units then
+	--		Game.setYRotation(yRot + Game.max_rot_units);
+	--end
 
 	-- Lag fix
 	forms.settext(form_controls["Lag Factor Value Label"], lag_factor);
