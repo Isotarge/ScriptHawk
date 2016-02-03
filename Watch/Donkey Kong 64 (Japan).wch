@@ -6,9 +6,11 @@ SystemID N64
 03EB04	d	f	1	RDRAM	Jumpman Y Position
 743DA7	b	u	1	RDRAM	Map
 746088	b	u	1	RDRAM	File
-7553A0	b	h	1	RDRAM	Security Byte
+7553A0	b	u	1	RDRAM	Security Byte
 767EB4	d	u	1	RDRAM	Freeze to freeze main thread
 76B100	d	u	1	RDRAM	Frames (Lag)
 7F09D0	d	u	1	RDRAM	Frames (Real)
+7F0E00	d	h	1	RDRAM	Linked List Pointer
+7FBFBC	d	h	1	RDRAM	Player Pointer
 7FBFD3	b	h	1	RDRAM	TB Void Byte
 
