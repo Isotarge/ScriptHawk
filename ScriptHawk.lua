@@ -126,6 +126,19 @@ function find_root_size(object)
 end
 findRootSize = find_root_size;
 
+-- Finds the end of a linked list, outputting object size
+function traverse_size(object)
+	local count = 0;
+	while object > 0 and object < 0x7FFFFF do
+		local size = mainmemory.read_u32_be(object + 4);
+		dprint(count..": "..toHexString(object).." Size: "..toHexString(size));
+		object = object + 0x10 + size;
+		count = count + 1;
+	end
+	print_deferred();
+end
+traverseSize = traverse_size;
+
 -----------------
 -- Game checks --
 -----------------
