@@ -1113,16 +1113,9 @@ function CCWBot()
 		end
 
 		Game.setYRotation(currentAngle);
-		joypad.set({["B"] = true}, 1);
 
 		for i = 0, 100 do
 			emu.frameadvance();
-		end
-
-		local currentY = Game.getYPosition();
-		if currentY <= requiredY then
-			print("Found solution: "..currentAngle);
-			CCWBotRunning = false;
 		end
 	end
 end
