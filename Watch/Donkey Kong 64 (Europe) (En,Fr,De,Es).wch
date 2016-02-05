@@ -11,6 +11,8 @@ SystemID N64
 76A918	d	h	1	RDRAM	Geometry Spiking Pointer
 7F0480	d	u	1	RDRAM	Frames (Real)
 7F08B0	d	h	1	RDRAM	Linked List Pointer
+7F5F20	d	h	1	RDRAM	Object Model 2 Array Pointer
+7F5F24	d	u	1	RDRAM	Object Model 2 Array Size
 7FBA6C	d	h	1	RDRAM	Player Pointer
 7FBA83	b	h	1	RDRAM	TB Void Byte
 

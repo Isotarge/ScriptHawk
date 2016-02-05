@@ -45,12 +45,12 @@ if bizstring.contains(romName, "Donkey Kong 64") then
 		pointer_list = 0x7FBF10;
 		camera_pointer = 0x7FB888;
 		player_pointer = 0x7FBA6D;
-		obj_model2_array_pointer = 0x7F6000; -- TODO
+		obj_model2_array_pointer = 0x7F5F20;
 	elseif bizstring.contains(romName, "Japan") then
 		pointer_list = 0x7FC460;
 		camera_pointer = 0x7FBDD8;
 		player_pointer = 0x7FBFBD;
-		obj_model2_array_pointer = 0x7F6000; -- TODO
+		obj_model2_array_pointer = 0x7F6470;
 	elseif bizstring.contains(romName, "Kiosk") then
 		pointer_list = 0x7B5E58;
 		camera_pointer = 0x7B5918; -- TODO: Does this work?
