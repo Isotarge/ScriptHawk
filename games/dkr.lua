@@ -20,6 +20,7 @@ local velocity = 0xC4;
 local lateral_velocity = 0xC8;
 
 local camera_zoom = 0x12C;
+local throttle = 0x14C;
 
 local spin_timer = 0x206; -- Signed 2 byte
 
@@ -287,6 +288,15 @@ function Game.getBoost()
 	if is_pointer(player_object) then
 		player_object = player_object - 0x80000000;
 		return mainmemory.read_s8(player_object + boost_timer);
+	end
+	return 0;
+end
+
+function Game.getThrottle()
+	local player_object = mainmemory.read_u32_be(player_object_pointer);
+	if is_pointer(player_object) then
+		player_object = player_object - 0x80000000;
+		return mainmemory.readfloat(player_object + throttle, true);
 	end
 	return 0;
 end
@@ -745,7 +755,7 @@ Game.OSD = {
 	{"Y Velocity", Game.getYVelocity},
 	{"Lateral Velocity", Game.getLateralVelocity},
 	--{"Lateral Velocity", Game.getLateralAcceleration}, -- TODO: Is this a thing?
-	--{"Throttle", Game.getThrottle}, -- TODO
+	{"Throttle", Game.getThrottle},
 	{"Separator", 1},
 	{"Max dY"},
 	{"Max dXZ"},
