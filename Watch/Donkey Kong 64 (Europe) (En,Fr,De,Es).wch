@@ -4,7 +4,8 @@ SystemID N64
 022104	d	f	1	RDRAM	Jetman Y Position
 03ECD0	d	f	1	RDRAM	Jumpman X Position
 03ECD4	d	f	1	RDRAM	Jumpman Y Position
-73EC37	b	u	1	RDRAM	Map
+73EC34	d	u	1	RDRAM	Map
+73EC38	d	u	1	RDRAM	Exit
 740F18	b	u	1	RDRAM	File
 74FB60	b	u	1	RDRAM	Security Byte
 765A30	d	u	1	RDRAM	Frames (Lag)

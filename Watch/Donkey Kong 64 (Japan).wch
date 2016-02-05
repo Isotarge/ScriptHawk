@@ -4,7 +4,8 @@ SystemID N64
 022064	d	f	1	RDRAM	Jetman Y Position
 03EB00	d	f	1	RDRAM	Jumpman X Position
 03EB04	d	f	1	RDRAM	Jumpman Y Position
-743DA7	b	u	1	RDRAM	Map
+743DA4	d	u	1	RDRAM	Map
+743DA8	d	u	1	RDRAM	Exit
 746088	b	u	1	RDRAM	File
 7553A0	b	u	1	RDRAM	Security Byte
 767EB4	d	u	1	RDRAM	Freeze to freeze main thread

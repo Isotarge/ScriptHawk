@@ -33,8 +33,8 @@ SystemID N64
 4B2904	b	h	1	RDRAM	FF for voidout on main menu?!?
 744470	d	h	1	RDRAM	Framebuffer Pointer
 7444C0	b	u	1	RDRAM	Screen Size
-7444E7	b	h	1	RDRAM	Map
-7444EB	b	h	1	RDRAM	Exit
+7444E4	d	u	1	RDRAM	Map
+7444E8	d	u	1	RDRAM	Exit
 744519	b	u	1	RDRAM	Rambi Arena Score
 74452C	b	u	1	RDRAM	Story skip
 744530	b	u	1	RDRAM	Chimpy Cam
@@ -109,7 +109,7 @@ SystemID N64
 7FB970	d	h	1	RDRAM	Boss fight controller pointer
 7FBB35	b	u	1	RDRAM	Object Count?
 7FBB3D	b	u	1	RDRAM	Object Count?
-7FBB4C	d	h	1	RDRAM	Kong Object Pointer
+7FBB4C	d	h	1	RDRAM	Player Pointer
 7FBB62	b	h	1	RDRAM	Zipper byte
 7FBB63	b	h	1	RDRAM	TB Void Byte
 7FBB66	b	h	1	RDRAM	Long Distance Enemy Spawn

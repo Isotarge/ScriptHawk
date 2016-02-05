@@ -16,6 +16,7 @@ local kongbase;
 local tb_void_byte;
 local menu_flags;
 local map;
+local exit; -- Map + 4
 local security_byte;
 local security_message;
 local geometry_spike_pointer;
@@ -3136,7 +3137,7 @@ event.onframestart(forceTBS, "ScriptHawk - Force TBS");
 function Game.detectVersion(romName)
 	if stringContains(romName, "USA") and not stringContains(romName, "Kiosk") then
 		version = "USA";
-		map                    = 0x7444E7;
+		map                    = 0x7444E4;
 		file                   = 0x7467C8;
 		flag_pointer           = 0x7654F4;
 		menu_flags             = 0x7ED558;
@@ -3170,7 +3171,7 @@ function Game.detectVersion(romName)
 		jetman_velocity =  {0x02F058, 0x02F05C};
 	elseif stringContains(romName, "Europe") then
 		version = "PAL";
-		map                    = 0x73EC37;
+		map                    = 0x73EC34;
 		file                   = 0x740F18;
 		flag_pointer           = 0x760014;
 		menu_flags             = 0x7ED478;
@@ -3204,7 +3205,7 @@ function Game.detectVersion(romName)
 		jetman_velocity  = {0x022108, 0x02210C};
 	elseif stringContains(romName, "Japan") then
 		version = "JP";
-		map                    = 0x743DA7;
+		map                    = 0x743DA4;
 		file                   = 0x746088;
 		flag_pointer           = 0x7656E4;
 		menu_flags             = 0x7ED9C8;
@@ -3239,7 +3240,7 @@ function Game.detectVersion(romName)
 	elseif stringContains(romName, "Kiosk") then
 		version = "Kiosk";
 		file                = 0x7467C8; -- TODO?
-		map                 = 0x72CDE7;
+		map                 = 0x72CDE4;
 		menu_flags          = 0x7ED558; -- TODO?
 		player_pointer      = 0x7B5AFD;
 		tb_void_byte        = 0x7FBB63; -- TODO?
@@ -3285,6 +3286,8 @@ function Game.detectVersion(romName)
 	else
 		return false;
 	end
+
+	exit = map + 4;	-- Calculate exit memory address
 
 	-- Read EEPROM checksums
 	if memory.usememorydomain("EEPROM") then
@@ -3531,7 +3534,7 @@ local timer_start_frame = 0;
 local timer_started = false;
 
 local function timer()
-	local map_value = mainmemory.readbyte(map);
+	local map_value = mainmemory.read_u32_be(map);
 	if map_value == 153 and prev_map ~= 153 then
 		timer_value = 0;
 		timer_start_frame = emu.framecount();
@@ -3705,7 +3708,7 @@ end
 
 local function draw_mj_minimap()
 	-- Only draw minimap if the player is in the Mad Jack fight
-	if mainmemory.readbyte(map) == mad_jack_map then
+	if mainmemory.read_u32_be(map) == mad_jack_map then
 		local MJ_state = mainmemory.read_u24_be(MJ_state_pointer);
 
 		local cur_pos = MJ_parse_position(mainmemory.readbyte(MJ_state + MJ_current_pos));
@@ -4202,7 +4205,7 @@ end
 
 function Game.setMap(value)
 	if value >= 1 and value <= #Game.maps then
-		mainmemory.writebyte(map, value - 1);
+		mainmemory.write_u32_be(map, value - 1);
 	end
 end
 
@@ -4271,7 +4274,7 @@ function Game.applyInfinites()
 end
 
 function Game.eachFrame()
-	map_value = mainmemory.readbyte(map);
+	map_value = mainmemory.read_u32_be(map);
 
 	Game.unlock_menus();
 
