@@ -1,10 +1,12 @@
 Domain RDRAM
 SystemID N64
 0E031C	d	h	1	RDRAM	Cheat Menu
-1FD3DC	w	u	1	RDRAM	Balloons
+11B333	b	u	1	RDRAM	Get Ready
+11B3D8	d	h	1	RDRAM	Object Pointer List
+11B3DC	d	u	1	RDRAM	Number of Objects
 1216E7	b	h	1	RDRAM	Map
 123A77	b	h	1	RDRAM	Map
-1FD209	b	h	1	RDRAM	Map
 123A94	w	u	1	RDRAM	Is Paused
-11B333	b	u	1	RDRAM	Get Ready
+1FD209	b	h	1	RDRAM	Map
+1FD3DC	w	u	1	RDRAM	Balloons
 

@@ -3,6 +3,8 @@ SystemID N64
 0DF4C7	b	h	1	RDRAM	Track List Map Modifier
 0DFD9C	d	h	1	RDRAM	Cheat Menu
 11ADB3	b	u	1	RDRAM	Get Ready
+11AE58	d	h	1	RDRAM	Object Pointer List
+11AE5C	d	u	1	RDRAM	Number of Objects
 121167	b	h	1	RDRAM	Map
 121252	b	h	1	RDRAM	Map
 1234F7	b	h	1	RDRAM	Map

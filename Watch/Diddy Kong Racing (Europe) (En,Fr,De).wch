@@ -2,6 +2,8 @@ Domain RDRAM
 SystemID N64
 0DFE2C	d	h	1	RDRAM	Cheat Menu
 11AE43	b	u	1	RDRAM	Get Ready
+11AEE8	d	h	1	RDRAM	Object Pointer List
+11AEEC	d	u	1	RDRAM	Number of Objects
 11AF3B	b	u	1	RDRAM	Map
 1211F7	b	u	1	RDRAM	Map
 1212E2	b	u	1	RDRAM	Map

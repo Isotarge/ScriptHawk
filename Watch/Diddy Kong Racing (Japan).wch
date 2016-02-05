@@ -3,6 +3,8 @@ SystemID N64
 0DEDD4	d	h	1	RDRAM	Particle RNG
 0E17FC	d	h	1	RDRAM	Cheat Menu
 11C823	b	u	1	RDRAM	Get Ready (real)
+11C8C8	d	h	1	RDRAM	Object Pointer List
+11C8CC	d	u	1	RDRAM	Number of Objects
 11C91B	b	u	1	RDRAM	Map (actual?)
 122BD7	b	u	1	RDRAM	Map
 122CC2	b	u	1	RDRAM	Map
@@ -15,9 +17,6 @@ SystemID N64
 127F20	b	u	1	RDRAM	Character?
 127F22	b	u	1	RDRAM	Character?
 130D1A	b	u	1	RDRAM	Character?
-1DB31C	d	f	1	RDRAM	TT Z Position (Dino Domain)
-1DB320	d	f	1	RDRAM	TT Y Position? (Dino Domain)
-1DB324	d	f	1	RDRAM	TT X Position (Dino Domain)
 1DB388	d	h	1	RDRAM	TT Interaction State (Dino Domain)
 1DB38C	d	u	1	RDRAM	TT Activation timer (Dino Domain)
 1FD4A5	b	u	1	RDRAM	Map

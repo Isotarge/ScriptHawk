@@ -1,31 +1,33 @@
 local Game = {};
 
-local player_object_pointer = 0x3FFFC0;
 local cheat_menu;
 
 local is_paused;
 local get_ready;
 
-local get_ready_yellow_max = 36;
-local get_ready_yellow_min = 20;
-local get_ready_blue_max = 18;
-local get_ready_blue_min = 6;
+local pointer_list;
+local player_object_pointer = 0x3FFFC0; -- Seems to be the same for all versions
 
-local x_pos = 0x0C;
-local y_pos = 0x10;
-local z_pos = 0x14;
+-- Relative to objects in pointer list
+local x_pos = 0x0C; -- Float
+local y_pos = x_pos + 4; -- Float
+local z_pos = y_pos + 4; -- Float
 
-local y_velocity = 0x20;
-local velocity = 0xC4;
-local lateral_velocity = 0xC8;
+local y_velocity = 0x20; -- Float
+local velocity = 0xC4; -- Float
+local lateral_velocity = 0xC8; -- Float
+
+local wheel_array_pointer = 0x60;
+	-- Relative to wheel array
+	local wheel_array_size = 0x00; -- u32_be
+	local wheel_array_base = 0x04; -- List of wheel object pointers
 
 local camera_zoom = 0x12C;
-local throttle = 0x14C;
+local throttle = 0x14C; -- Float
 
-local spin_timer = 0x206; -- Signed 2 byte
+local spin_timer = 0x206; -- s16_be
 
--- Max 0x0A=10
-local powerup_quantity = 0x20B;
+local powerup_quantity = 0x20B; -- Max 10
 
 -- Values:
 --	0x00 Blue 1
@@ -173,6 +175,7 @@ function Game.detectVersion(romName)
 		is_paused = 0x123B24;
 		get_ready = 0x11B3C3;
 		cheat_menu = 0x0E03AC;
+		pointer_list = 0x11B468;
 	elseif stringContains(romName, "Europe") then
 		map_freeze_values = {
 			0x11AF3B, 0x1211F7, 0x1212E2, 0x123587, 0x206BB5, 0x206C3B, 0x207EA9 -- TODO: Double check these
@@ -180,6 +183,7 @@ function Game.detectVersion(romName)
 		is_paused = 0x1235A4;
 		get_ready = 0x11AE43;
 		cheat_menu = 0x0DFE2C;
+		pointer_list = 0x11AEE8;
 	elseif stringContains(romName, "Japan") then
 		map_freeze_values = {
 			0x11C91B, 0x122BD7, 0x122CC2, 0x124F67, 0x1FD4A5, 0x1FD52B, 0x1FE729 -- TODO: Double check these
@@ -187,6 +191,7 @@ function Game.detectVersion(romName)
 		is_paused = 0x124F84;
 		get_ready = 0x11C823;
 		cheat_menu = 0x0E17FC;
+		pointer_list = 0x11C8C8;
 	elseif stringContains(romName, "USA") and stringContains(romName, "Rev A") then
 		map_freeze_values = {
 			0x1216E7, 0x123A77, 0x1FD209 -- TODO: Double check these
@@ -194,6 +199,7 @@ function Game.detectVersion(romName)
 		is_paused = 0x123A94;
 		get_ready = 0x11B333;
 		cheat_menu = 0x0E031C;
+		pointer_list = 0x11B3D8;
 	elseif stringContains(romName, "USA") then
 		map_freeze_values = {
 			0x121167, 0x121252, 0x1234F7, 0x1FCA19 -- TODO: Double check these
@@ -201,9 +207,12 @@ function Game.detectVersion(romName)
 		is_paused = 0x123514;
 		get_ready = 0x11ADB3;
 		cheat_menu = 0x0DFD9C;
+		pointer_list = 0x11AE58;
 	else
 		return false;
 	end
+
+	num_objects = pointer_list + 4;
 
 	return true;
 end
@@ -426,6 +435,11 @@ end
 -- Written by Faschz, 2015 --
 -----------------------------
 
+local get_ready_yellow_max = 36;
+local get_ready_yellow_min = 20;
+local get_ready_blue_max = 18;
+local get_ready_blue_min = 6;
+
 local otap_checkbox;
 local otap_boost_dropdown;
 local otap_enabled = false;
@@ -612,50 +626,44 @@ end
 
 local encircle_checkbox;
 
---pointer_list = 0x3ffe00;
-pointer_list = 0x3fff70;
-
--- Relative to object
 local radius = 1000;
 
 local function get_num_slots()
-	local i = 0;
-	local isPointer = true;
-	while isPointer do
-		isPointer = is_pointer(mainmemory.read_u32_be(pointer_list + i * 4));
-		i = i + 1;
-	end
-	return i;
+	return mainmemory.read_u32_be(num_objects);
 end
 
-local function get_slot_base(index)
-	return mainmemory.read_u24_be(pointer_list + (index * 4) + 1);
+local function get_slot_base(pointerList, index)
+	return mainmemory.read_u24_be(pointerList + (index * 4) + 1);
 end
 
 local function encircle_player()
+	local playerObject = mainmemory.read_u24_be(player_object_pointer + 1);
 	local current_player_x = Game.getXPosition();
 	local current_player_y = Game.getYPosition();
 	local current_player_z = Game.getZPosition();
 	local x, z;
-	local _currentPointers = {};
 
+	local pointerList = mainmemory.read_u24_be(pointer_list + 1);
 	local num_slots = get_num_slots();
-	--radius = num_slots * 15;
 
 	-- Populate and sort pointer list
+	local currentPointers = {};
 	for i = 0, num_slots - 1 do
-		table.insert(_currentPointers, get_slot_base(i));
+		local slotBase = get_slot_base(pointerList, i);
+		if slotBase ~= playerObject and slotBase > 0x000000 and slotBase < 0x7FFFFF then
+			table.insert(currentPointers, slotBase);
+		end
 	end
-	table.sort(_currentPointers);
+	table.sort(currentPointers);
 
 	-- Iterate and set position
-	for i = 1, #_currentPointers do
-		x = current_player_x + math.cos(math.pi * 2 * i / #_currentPointers) * radius;
-		z = current_player_z + math.sin(math.pi * 2 * i / #_currentPointers) * radius;
+	for i = 1, #currentPointers do
+		x = current_player_x + math.cos(math.pi * 2 * i / #currentPointers) * radius;
+		z = current_player_z + math.sin(math.pi * 2 * i / #currentPointers) * radius;
 
-		mainmemory.writefloat(_currentPointers[i] + x_pos, x, true);
-		mainmemory.writefloat(_currentPointers[i] + y_pos, current_player_y, true);
-		mainmemory.writefloat(_currentPointers[i] + z_pos, z, true);
+		mainmemory.writefloat(currentPointers[i] + x_pos, x, true);
+		mainmemory.writefloat(currentPointers[i] + y_pos, current_player_y, true);
+		mainmemory.writefloat(currentPointers[i] + z_pos, z, true);
 	end
 end
 
