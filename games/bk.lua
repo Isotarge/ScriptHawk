@@ -1206,7 +1206,7 @@ function Game.eachFrame()
 		for i = 1, #eep_checksum_offsets do
 			checksum_value = memory.read_u32_be(eep_checksum_offsets[i]);
 			if eep_checksum_values[i] ~= checksum_value then
-				print("Slot "..i.." Checksum: "..toHexString(eep_checksum_values[i], 8).." -> "..toHexString(checksum_value));
+				print("Slot "..i.." Checksum: "..toHexString(eep_checksum_values[i], 8).." -> "..toHexString(checksum_value, 8));
 				eep_checksum_values[i] = checksum_value;
 			end
 		end
