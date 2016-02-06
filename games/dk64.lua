@@ -15,6 +15,7 @@ local global_base;
 local kongbase;
 local tb_void_byte;
 local menu_flags;
+local flag_pointer;
 local map;
 local exit; -- Map + 4
 local security_byte;
@@ -624,7 +625,6 @@ local scale_z = scale_y + 4;
 -- Flag stuff --
 ----------------
 
-local flag_pointer;
 local flag_block_size = 0x13B;
 
 local flag_action_queue = {};
