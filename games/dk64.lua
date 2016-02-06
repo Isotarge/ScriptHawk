@@ -3404,6 +3404,13 @@ function Game.getYRotation()
 	return 0;
 end
 
+function Game.colorYRotation()
+	local currentRotation = Game.getYRotation()
+	if currentRotation > 4095 then -- Detect STVW angles
+		return 0xFF007FFF;
+	end
+end
+
 function Game.getZRotation()
 	if not isInSubGame() then
 		return mainmemory.read_u16_be(getPlayerObject() + z_rot);
@@ -4365,7 +4372,7 @@ Game.OSD = {
 	{"Odometer"},
 	{"Separator", 1},
 	{"Rot. X", Game.getXRotation},
-	{"Facing", Game.getYRotation},
+	{"Facing", Game.getYRotation, Game.colorYRotation},
 	--{"Moving", Game.getMovingRotation}, -- TODO
 	{"Rot. Z", Game.getZRotation},
 };

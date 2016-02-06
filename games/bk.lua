@@ -348,7 +348,6 @@ function Game.colorSlopeTimer()
 		if slopeTimer >= 0.75 then
 		return getColor(slopeTimer);
 	end
-	return 0xFFFFFFFF; -- White
 end
 
 -----------------
@@ -543,7 +542,6 @@ function Game.colorCurrentMovementState()
 	if stringMovementState == "Damaged" or stringMovementState == "Death" then
 		return 0xFFFF0000; -- Red
 	end
-	return 0xFFFFFFFF; -- White
 end
 
 ------------------------
@@ -1063,7 +1061,6 @@ function Game.colorYVelocity()
 	if Game.getYVelocity() <= clip_vel then
 		return 0xFF00FF00; -- Green
 	end
-	return 0xFFFFFFFF; -- White
 end
 
 function Game.getZVelocity()
