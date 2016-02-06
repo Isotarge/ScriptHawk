@@ -81,7 +81,7 @@ SystemID N64
 75C49B	b	h	1	RDRAM	Squawks Model
 75C4AB	b	h	1	RDRAM	Squawks Model
 7654F4	d	h	1	RDRAM	Flag Block Pointer
-767CC4	d	u	1	RDRAM	Freeze to freeze main thread
+767CC4	d	u	1	RDRAM	Frames (Real)
 76A066	w	1	1	RDRAM	Main object timer?
 76A0AB	b	h	1	RDRAM	Background?
 76A0CD	b	u	1	RDRAM	Adventure
@@ -93,9 +93,11 @@ SystemID N64
 7ED558	b	h	1	RDRAM	Mystery menu enabled
 7ED559	b	h	1	RDRAM	Extra cutscenes & Rambi unlocked
 7ED55B	b	h	1	RDRAM	Mystery menu bosses enabled (up to galleon)
-7F0560	d	u	1	RDRAM	Frames (Real)
 7F07F4	d	h	1	RDRAM	Framebuffer Pointer
 7F0990	d	h	1	RDRAM	Pointer to big linked list
+7F5CF0	w	h	1	RDRAM	Prev Camera State
+7F5CF2	w	h	1	RDRAM	Current Camera State
+7F5D00	d	f	1	RDRAM	Camera State Change Timer
 7F5D10	d	h	1	RDRAM	Camera pointer?
 7F5D14	b	h	1	RDRAM	ISG Fadeout
 7F6000	d	h	1	RDRAM	Trigger Array Pointer

@@ -75,6 +75,176 @@ local eep_checksum_values = {
 	0x00000000
 }
 
+--------------------
+-- Region/Version --
+--------------------
+
+function Game.detectVersion(romName)
+	if stringContains(romName, "USA") and not stringContains(romName, "Kiosk") then
+		version = "USA";
+		map                    = 0x7444E4;
+		file                   = 0x7467C8;
+		flag_pointer           = 0x7654F4;
+		menu_flags             = 0x7ED558;
+		player_pointer         = 0x7FBB4D;
+		camera_pointer         = 0x7FB968;
+		tb_void_byte           = 0x7FBB63;
+		pointer_list           = 0x7FBFF0;
+		linked_list_pointer    = 0x7F0990;
+		kongbase               = 0x7FC950;
+		global_base            = 0x7FCC41;
+		security_byte          = 0x7552E0;
+		security_message       = 0x75E5DC;
+		frames_lag             = 0x76AF10;
+		frames_real            = 0x7F0560;
+		geometry_spike_pointer = 0x76FDF8;
+
+		--Mad Jack
+		MJ_state_pointer      = 0x7FDC91; -- TODO: Find Mad Jack state based on Model 1 pointer list and actor type knowledge rather than relying on this pointer
+		MJ_time_until_next_action = 0x2D;
+		MJ_actions_remaining      = 0x58;
+		MJ_action_type            = 0x59;
+		MJ_current_pos            = 0x60;
+		MJ_next_pos               = 0x61;
+		MJ_white_switch_pos       = 0x64;
+		MJ_blue_switch_pos        = 0x65;
+
+		--Subgames
+		jumpman_position = {0x04BD70, 0x04BD74};
+		jumpman_velocity = {0x04BD78, 0x04BD7C};
+		jetman_position  = {0x02F050, 0x02F054};
+		jetman_velocity =  {0x02F058, 0x02F05C};
+	elseif stringContains(romName, "Europe") then
+		version = "PAL";
+		map                    = 0x73EC34;
+		file                   = 0x740F18;
+		flag_pointer           = 0x760014;
+		menu_flags             = 0x7ED478;
+		player_pointer         = 0x7FBA6D;
+		camera_pointer         = 0x7FB888;
+		tb_void_byte           = 0x7FBA83;
+		pointer_list           = 0x7FBF10;
+		linked_list_pointer    = 0x7F08B0;
+		kongbase               = 0x7FC890;
+		global_base            = 0x7FCB81;
+		security_byte          = 0x74FB60;
+		security_message       = 0x7590F0;
+		frames_lag             = 0x765A30;
+		frames_real            = 0x7F0480;
+		geometry_spike_pointer = 0x76A918;
+
+		--Mad Jack
+		MJ_state_pointer      = 0x7FDBD1;
+		MJ_time_until_next_action = 0x25;
+		MJ_actions_remaining      = 0x60;
+		MJ_action_type            = 0x61;
+		MJ_current_pos            = 0x68;
+		MJ_next_pos               = 0x69;
+		MJ_white_switch_pos       = 0x6C;
+		MJ_blue_switch_pos        = 0x6D;
+
+		--Subgames
+		jumpman_position = {0x03ECD0, 0x03ECD4};
+		jumpman_velocity = {0x03ECD8, 0x03ECDC};
+		jetman_position  = {0x022100, 0x022104};
+		jetman_velocity  = {0x022108, 0x02210C};
+	elseif stringContains(romName, "Japan") then
+		version = "JP";
+		map                    = 0x743DA4;
+		file                   = 0x746088;
+		flag_pointer           = 0x7656E4;
+		menu_flags             = 0x7ED9C8;
+		player_pointer         = 0x7FBFBD;
+		camera_pointer         = 0x7FBDD8;
+		tb_void_byte           = 0x7FBFD3;
+		pointer_list           = 0x7FC460;
+		linked_list_pointer    = 0x7F0E00;
+		kongbase               = 0x7FCDE0;
+		global_base            = 0x7FD0D1;
+		security_byte          = 0x7553A0;
+		security_message       = 0x75E790;
+		frames_lag             = 0x76B100;
+		frames_real            = 0x7F09D0;
+		geometry_spike_pointer = 0x76FFE8;
+
+		--Mad Jack
+		MJ_state_pointer      = 0x7FE121;
+		MJ_time_until_next_action = 0x25;
+		MJ_actions_remaining      = 0x60;
+		MJ_action_type            = 0x61;
+		MJ_current_pos            = 0x68;
+		MJ_next_pos               = 0x69;
+		MJ_white_switch_pos       = 0x6C;
+		MJ_blue_switch_pos        = 0x6D;
+
+		--Subgames
+		jumpman_position = {0x03EB00, 0x03EB04};
+		jumpman_velocity = {0x03EB00, 0x03EB04};
+		jetman_position  = {0x022060, 0x022064};
+		jetman_velocity  = {0x022068, 0x02206C};
+	elseif stringContains(romName, "Kiosk") then
+		version = "Kiosk";
+		file                = 0x7467C8; -- TODO?
+		map                 = 0x72CDE4;
+		menu_flags          = 0x7ED558; -- TODO?
+		player_pointer      = 0x7B5AFD;
+		tb_void_byte        = 0x7FBB63; -- TODO?
+		pointer_list        = 0x7B5E58;
+		linked_list_pointer = 0x7F0990; -- TODO: Find
+		kongbase            = 0x7FC950; -- TODO
+		global_base         = 0x7FCC41; -- TODO
+
+		-- TODO: Flags?
+
+		x_rot = 0xD8;
+		y_rot = x_rot + 2;
+		z_rot = y_rot + 2;
+
+		-- Kiosk version maps
+		--0 Crash
+		--1 Crash
+		--2 Crash
+		--3 Dogadon (2?) fight (Crash??!?!?!)
+		--4 Crash
+		--5 Crash
+		--6 Minecart
+		--7 Crash
+		--8 Armydillo fight -> crash?
+		--9-39 Crash
+		--40 N+R logo
+		--41-75 Crash
+		--76 DK Rap
+		--77 Crash
+		--78 Crash
+		--79 Crash
+		--80 Title screen
+		--81 "Thanks for playing" or Test Map
+		--82 Crash?
+		--83 Partially loads, then crashes
+		--84-214 Crash
+		--215 Partially loads (kong position changes), then crashes
+		--216-228 Crash
+		--229 Partially loads (kong position changes), then crashes
+		--230-240 Crash
+		--241 Partially loads (kong position changes), then crashes
+		--242-255 Crash
+	else
+		return false;
+	end
+
+	exit = map + 4;	-- Calculate exit memory address
+
+	-- Read EEPROM checksums
+	if memory.usememorydomain("EEPROM") then
+		for i = 1, #eep_checksum_offsets do
+			eep_checksum_values[i] = memory.read_u32_be(eep_checksum_offsets[i]);
+		end
+	end
+	memory.usememorydomain("RDRAM");
+
+	return true;
+end
+
 Game.maps = {
 	"Test Map",
 	"Funky's Store",
@@ -2804,8 +2974,7 @@ local flag_array = { -- TODO: Split out into separate lua files (one for each ve
 	{["byte"] = 0x13B, ["bit"] = 3, ["name"] = "Training Grounds: Left Tunnel Coin", ["type"] = "Coin"},
 	{["byte"] = 0x13B, ["bit"] = 2, ["name"] = "Training Grounds: Center Tunnel Coin", ["type"] = "Coin"},
 	{["byte"] = 0x13B, ["bit"] = 1, ["name"] = "Training Grounds: Right Tunnel Coin", ["type"] = "Coin"},
-
-}
+};
 
 local function fill_flag_names()
 	for i = 1, #flag_array do
@@ -3129,176 +3298,6 @@ function forceTBS()
 	end
 end
 event.onframestart(forceTBS, "ScriptHawk - Force TBS");
-
---------------------
--- Region/Version --
---------------------
-
-function Game.detectVersion(romName)
-	if stringContains(romName, "USA") and not stringContains(romName, "Kiosk") then
-		version = "USA";
-		map                    = 0x7444E4;
-		file                   = 0x7467C8;
-		flag_pointer           = 0x7654F4;
-		menu_flags             = 0x7ED558;
-		player_pointer         = 0x7FBB4D;
-		camera_pointer         = 0x7FB968;
-		tb_void_byte           = 0x7FBB63;
-		pointer_list           = 0x7FBFF0;
-		linked_list_pointer    = 0x7F0990;
-		kongbase               = 0x7FC950;
-		global_base            = 0x7FCC41;
-		security_byte          = 0x7552E0;
-		security_message       = 0x75E5DC;
-		frames_lag             = 0x76AF10;
-		frames_real            = 0x7F0560;
-		geometry_spike_pointer = 0x76FDF8;
-
-		--Mad Jack
-		MJ_state_pointer      = 0x7FDC91; -- TODO: Find Mad Jack state based on Model 1 pointer list and actor type knowledge rather than relying on this pointer
-		MJ_time_until_next_action = 0x2D;
-		MJ_actions_remaining      = 0x58;
-		MJ_action_type            = 0x59;
-		MJ_current_pos            = 0x60;
-		MJ_next_pos               = 0x61;
-		MJ_white_switch_pos       = 0x64;
-		MJ_blue_switch_pos        = 0x65;
-
-		--Subgames
-		jumpman_position = {0x04BD70, 0x04BD74};
-		jumpman_velocity = {0x04BD78, 0x04BD7C};
-		jetman_position  = {0x02F050, 0x02F054};
-		jetman_velocity =  {0x02F058, 0x02F05C};
-	elseif stringContains(romName, "Europe") then
-		version = "PAL";
-		map                    = 0x73EC34;
-		file                   = 0x740F18;
-		flag_pointer           = 0x760014;
-		menu_flags             = 0x7ED478;
-		player_pointer         = 0x7FBA6D;
-		camera_pointer         = 0x7FB888;
-		tb_void_byte           = 0x7FBA83;
-		pointer_list           = 0x7FBF10;
-		linked_list_pointer    = 0x7F08B0;
-		kongbase               = 0x7FC890;
-		global_base            = 0x7FCB81;
-		security_byte          = 0x74FB60;
-		security_message       = 0x7590F0;
-		frames_lag             = 0x765A30;
-		frames_real            = 0x7F0480;
-		geometry_spike_pointer = 0x76A918;
-
-		--Mad Jack
-		MJ_state_pointer      = 0x7FDBD1;
-		MJ_time_until_next_action = 0x25;
-		MJ_actions_remaining      = 0x60;
-		MJ_action_type            = 0x61;
-		MJ_current_pos            = 0x68;
-		MJ_next_pos               = 0x69;
-		MJ_white_switch_pos       = 0x6C;
-		MJ_blue_switch_pos        = 0x6D;
-
-		--Subgames
-		jumpman_position = {0x03ECD0, 0x03ECD4};
-		jumpman_velocity = {0x03ECD8, 0x03ECDC};
-		jetman_position  = {0x022100, 0x022104};
-		jetman_velocity  = {0x022108, 0x02210C};
-	elseif stringContains(romName, "Japan") then
-		version = "JP";
-		map                    = 0x743DA4;
-		file                   = 0x746088;
-		flag_pointer           = 0x7656E4;
-		menu_flags             = 0x7ED9C8;
-		player_pointer         = 0x7FBFBD;
-		camera_pointer         = 0x7FBDD8;
-		tb_void_byte           = 0x7FBFD3;
-		pointer_list           = 0x7FC460;
-		linked_list_pointer    = 0x7F0E00;
-		kongbase               = 0x7FCDE0;
-		global_base            = 0x7FD0D1;
-		security_byte          = 0x7553A0;
-		security_message       = 0x75E790;
-		frames_lag             = 0x76B100;
-		frames_real            = 0x7F09D0;
-		geometry_spike_pointer = 0x76FFE8;
-
-		--Mad Jack
-		MJ_state_pointer      = 0x7FE121;
-		MJ_time_until_next_action = 0x25;
-		MJ_actions_remaining      = 0x60;
-		MJ_action_type            = 0x61;
-		MJ_current_pos            = 0x68;
-		MJ_next_pos               = 0x69;
-		MJ_white_switch_pos       = 0x6C;
-		MJ_blue_switch_pos        = 0x6D;
-
-		--Subgames
-		jumpman_position = {0x03EB00, 0x03EB04};
-		jumpman_velocity = {0x03EB00, 0x03EB04};
-		jetman_position  = {0x022060, 0x022064};
-		jetman_velocity  = {0x022068, 0x02206C};
-	elseif stringContains(romName, "Kiosk") then
-		version = "Kiosk";
-		file                = 0x7467C8; -- TODO?
-		map                 = 0x72CDE4;
-		menu_flags          = 0x7ED558; -- TODO?
-		player_pointer      = 0x7B5AFD;
-		tb_void_byte        = 0x7FBB63; -- TODO?
-		pointer_list        = 0x7B5E58;
-		linked_list_pointer = 0x7F0990; -- TODO: Find
-		kongbase            = 0x7FC950; -- TODO
-		global_base         = 0x7FCC41; -- TODO
-
-		-- TODO: Flags?
-
-		x_rot = 0xD8;
-		y_rot = x_rot + 2;
-		z_rot = y_rot + 2;
-
-		-- Kiosk version maps
-		--0 Crash
-		--1 Crash
-		--2 Crash
-		--3 Dogadon (2?) fight (Crash??!?!?!)
-		--4 Crash
-		--5 Crash
-		--6 Minecart
-		--7 Crash
-		--8 Armydillo fight -> crash?
-		--9-39 Crash
-		--40 N+R logo
-		--41-75 Crash
-		--76 DK Rap
-		--77 Crash
-		--78 Crash
-		--79 Crash
-		--80 Title screen
-		--81 "Thanks for playing" or Test Map
-		--82 Crash?
-		--83 Partially loads, then crashes
-		--84-214 Crash
-		--215 Partially loads (kong position changes), then crashes
-		--216-228 Crash
-		--229 Partially loads (kong position changes), then crashes
-		--230-240 Crash
-		--241 Partially loads (kong position changes), then crashes
-		--242-255 Crash
-	else
-		return false;
-	end
-
-	exit = map + 4;	-- Calculate exit memory address
-
-	-- Read EEPROM checksums
-	if memory.usememorydomain("EEPROM") then
-		for i = 1, #eep_checksum_offsets do
-			eep_checksum_values[i] = memory.read_u32_be(eep_checksum_offsets[i]);
-		end
-	end
-	memory.usememorydomain("RDRAM");
-
-	return true;
-end
 
 -------------------
 -- Physics/Scale --
@@ -4152,12 +4151,14 @@ end
 local framebuffer_pointer = 0x7F07F4; -- TODO: Port to other versions
 local framebuffer_size = 320 * 240;
 
-local rConst = 0x0800;
-local gConst = 0x0040;
-local bConst = 0x0002;
-
 -- Pixel format: 16bit RGBA 5551
 -- RRRR RGGG GGBB BBBA
+local framebuffer_color_bit_constants = {
+	["Red"] = 0x0800,
+	["Green"] = 0x0040,
+	["Blue"] = 0x0002,
+};
+
 function fillFB()
 	local image_filename = forms.openfile(nil, nil, "All Files (*.*)|*.*");
 	if image_filename == "" then
@@ -4169,9 +4170,9 @@ function fillFB()
 	local frameBufferLocation = mainmemory.read_u24_be(framebuffer_pointer + 1);
 	if frameBufferLocation > 0 and frameBufferLocation < 0x7FFFFF then
 		for i = 0, framebuffer_size - 1 do
-			local r = math.floor(string.byte(input_file:read(1)) / 8) * rConst;
-			local g = math.floor(string.byte(input_file:read(1)) / 8) * gConst;
-			local b = math.floor(string.byte(input_file:read(1)) / 8) * bConst;
+			local r = math.floor(string.byte(input_file:read(1)) / 8) * framebuffer_color_bit_constants["Red"];
+			local g = math.floor(string.byte(input_file:read(1)) / 8) * framebuffer_color_bit_constants["Green"];
+			local b = math.floor(string.byte(input_file:read(1)) / 8) * framebuffer_color_bit_constants["Blue"];
 			local a = 1;
 
 			mainmemory.write_u16_be(frameBufferLocation + (i * 2), r + g + b + a);
@@ -4278,6 +4279,78 @@ function Game.applyInfinites()
 		mainmemory.writebyte(base + coins, max_coins);
 		mainmemory.writebyte(base + lives, max_musical_energy);
 	end
+end
+
+-------------------
+-- Color setters --
+-------------------
+
+local actor_texture_renderer_pointer = 0x158;
+local texture_renderer_texture_index = 0x0C; -- u16_be
+local texture_renderer_next_renderer = 0x24; -- u32_be
+
+function getNextTextureRenderer(texturePointer)
+	texturePointer = mainmemory.read_u24_be(texturePointer + texture_renderer_next_renderer + 1);
+	if texturePointer > 0x000000 and texturePointer < 0x7FFFFF then
+		print(toHexString(texturePointer));
+		return texturePointer;
+	end
+	return 0;
+end
+
+local DKBodyColors = {
+	{"Normal", 0},
+	{"Light Blue", 1},
+	{"Light Green", 2},
+	{"Purple", 3},
+	{"Bright Orange", 16},
+	{"Yellow", 19},
+};
+
+local DKTieColors = {
+	{"Red (Normal)", 0},
+	{"Purple", 1},
+	{"Blue", 2},
+	{"Yellow", 3},
+};
+
+function Game.setDKColors()
+	local playerObject = getPlayerObject();
+	local texturePointer = mainmemory.read_u24_be(playerObject + actor_texture_renderer_pointer + 1);
+
+	if texturePointer > 0x000000 and texturePointer < 0x7FFFFF then
+		-- 0 Eyes
+		--mainmemory.write_u16_be(texturePointer + texture_renderer_texture_index, eyes); -- Skip the eyes
+		texturePointer = getNextTextureRenderer(texturePointer);
+
+		-- 1 Body
+		mainmemory.write_u16_be(texturePointer + texture_renderer_texture_index, DKBodyColors[math.random(1, #DKBodyColors)][2]);
+		texturePointer = getNextTextureRenderer(texturePointer);
+
+		-- 2 Tie Outer
+		mainmemory.write_u16_be(texturePointer + texture_renderer_texture_index, DKTieColors[math.random(1, #DKTieColors)][2]);
+		--texturePointer = getNextTextureRenderer(texturePointer);
+	end
+end
+
+function Game.setDiddyColors()
+	-- TODO
+end
+
+function Game.setLankyColors()
+	-- TODO
+end
+
+function Game.setTinyColors()
+	-- TODO
+end
+
+function Game.setChunkyColors()
+	-- TODO
+end
+
+function Game.setKrushaColors()
+	-- TODO
 end
 
 function Game.eachFrame()
