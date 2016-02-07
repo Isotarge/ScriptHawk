@@ -27,7 +27,6 @@ local OBJDEF = {
 	AUTHOR_NOTE  = AUTHOR_NOTE,
 }
 
-
 --
 -- Simple JSON encoding and decoding in pure Lua.
 -- http://www.json.org/
@@ -269,9 +268,6 @@ local OBJDEF = {
 --      JSON.noKeyConversion = true
 --
 
-
-
-
 --
 -- SUMMARY OF METHODS YOU CAN OVERRIDE IN YOUR LOCAL LUA JSON OBJECT
 --
@@ -291,7 +287,6 @@ local default_pretty_options = { pretty = true, align_keys = false, indent = def
 
 local isArray  = { __tostring = function() return "JSON array"  end }    isArray.__index  = isArray
 local isObject = { __tostring = function() return "JSON object" end }    isObject.__index = isObject
-
 
 function OBJDEF:newArray(tbl)
 	return setmetatable(tbl or {}, isArray)
@@ -436,9 +431,7 @@ local function grok_number(self, text, start, etc)
 	return as_number, i
 end
 
-
 local function grok_string(self, text, start, etc)
-
 	if text:sub(start,start) ~= '"' then
 		self:onDecodeError("expected string's opening quote", text, start, etc)
 	end
@@ -599,7 +592,6 @@ local function grok_array(self, text, start, etc)
 	end
 	self:onDecodeError("unclosed '['", text, start, etc)
 end
-
 
 grok_one = function(self, text, start, etc)
 	-- Skip any whitespace
@@ -933,7 +925,6 @@ function encode_value(self, value, parents, etc, options, indent)
 		return result_value
 	end
 end
-
 
 function OBJDEF:encode(value, etc, options)
 	if type(self) ~= 'table' or self.__index ~= OBJDEF then

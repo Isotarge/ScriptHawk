@@ -4,9 +4,13 @@ local x_pos;
 local y_pos;
 local z_pos;
 
-local x_rot;
-local y_rot;
-local z_rot;
+local rot_base;
+
+local sine = 0x00;
+local sine_mirror = 0x10;
+
+local cosine = 0x04;
+local cosine_inverse = 0x0C;
 
 Game.maps = { "Not Implemented" };
 
@@ -24,15 +28,18 @@ function Game.detectVersion(romName)
 	elseif stringContains(romName, "USA") then
 		-- TODO
 		x_pos = 0x1C6B34;
-		y_pos = 0x1C6B3C;
-		z_pos = 0x1C6B38;
-
-		x_rot = 0x1C69BC; -- TODO
-		y_rot = 0; -- TODO
-		z_rot = 0x1C69C0; -- TODO
+		rot_base = 0x1C69BC; -- TODO
+		--[[
+			Rotation is weird in this game
+			There's 4 addresses associated
+			Likely sine, cosine and their inverse
+		]]--
 	else
 		return false;
 	end
+
+	z_pos = x_pos + 4; -- Ordered X, Z, Y in memory
+	y_pos = z_pos + 4;
 
 	return true;
 end
@@ -45,7 +52,7 @@ Game.speedy_speeds = { .001, .01, .1, 1 };
 Game.speedy_index = 4;
 
 Game.rot_speed = 0.05;
-Game.max_rot_units = 2.0;
+Game.max_rot_units = 360;
 
 function Game.isPhysicsFrame()
 	return not emu.islagged();
@@ -84,27 +91,42 @@ end
 --------------
 
 function Game.getXRotation()
-	return mainmemory.readfloat(x_rot, true) + 1;
+	--return mainmemory.readfloat(x_rot, true) + 1;
+	return 0;
 end
 
 function Game.getYRotation()
-	return mainmemory.readfloat(y_rot, true) + 1;
+	local currentSine = mainmemory.readfloat(rot_base + sine, true);
+	local currentSineMirror = mainmemory.readfloat(rot_base + sine_mirror, true);
+	local currentCosine = mainmemory.readfloat(rot_base + cosine, true);
+	local currentInverseCosine = mainmemory.readfloat(rot_base + cosine_inverse, true);
+	return math.deg(math.acos(currentCosine));
 end
 
 function Game.getZRotation()
-	return mainmemory.readfloat(z_rot, true) + 1;
+	--return mainmemory.readfloat(z_rot, true) + 1;
+	return 0;
 end
 
 function Game.setXRotation(value)
-	mainmemory.writefloat(x_rot, value - 1, true);
+	--mainmemory.writefloat(x_rot, value - 1, true);
 end
 
 function Game.setYRotation(value)
-	mainmemory.writefloat(y_rot, value - 1, true);
+	local sineValue = math.sin(math.rad(value));
+	local cosineValue = math.cos(math.rad(value));
+
+	-- Set the sine values
+	mainmemory.writefloat(rot_base + sine, sineValue, true);
+	mainmemory.writefloat(rot_base + sine_mirror, sineValue, true);
+
+	-- Set the cosine values
+	mainmemory.writefloat(rot_base + cosine, cosineValue, true);
+	mainmemory.writefloat(rot_base + cosine_inverse, cosineValue * -1, true);
 end
 
 function Game.setZRotation(value)
-	mainmemory.writefloat(z_rot, value - 1, true);
+	--mainmemory.writefloat(z_rot, value - 1, true);
 end
 
 ------------
@@ -119,7 +141,7 @@ function Game.applyInfinites()
 	-- TODO
 end
 
-function Game.initUI(form_handle, col, row, button_height, label_offset, dropdown_offset)
+function Game.initUI()
 	-- TODO
 end
 

@@ -1,5 +1,8 @@
 Domain RDRAM
 SystemID N64
-7B5AFC	d	h	1	RDRAM	Kong Object Pointer
 72CDE7	b	u	1	RDRAM	Map
+7A12C0	d	h	1	RDRAM	Linked List Pointer
+7A1E14	d	h	1	RDRAM	Camera Pointer
+7B5918	d	h	1	RDRAM	Camera Pointer
+7B5AFC	d	h	1	RDRAM	Kong Object Pointer
 

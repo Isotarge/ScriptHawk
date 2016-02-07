@@ -1165,25 +1165,25 @@ function Game.applyInfinites()
 	mainmemory.write_s32_be(notes + jiggies, max_jiggies);
 end
 
-function Game.initUI(form_handle, col, row, button_height, label_offset, dropdown_offset)
-	options_toggle_neverslip = forms.checkbox(form_handle, "Never Slip", col(0) + dropdown_offset, row(6) + dropdown_offset);
+function Game.initUI()
+	options_toggle_neverslip = forms.checkbox(ScriptHawkUI.options_form, "Never Slip", ScriptHawkUI.col(0) + ScriptHawkUI.dropdown_offset, ScriptHawkUI.row(6) + ScriptHawkUI.dropdown_offset);
 	if allowFurnaceFunPatch then
-		options_allow_ff_patch = forms.checkbox(form_handle, "Allow FF patch", col(0) + dropdown_offset, row(7) + dropdown_offset);
+		options_allow_ff_patch = forms.checkbox(ScriptHawkUI.options_form, "Allow FF patch", ScriptHawkUI.col(0) + ScriptHawkUI.dropdown_offset, ScriptHawkUI.row(7) + ScriptHawkUI.dropdown_offset);
 	end
 
-	encircle_checkbox = forms.checkbox(form_handle, "Encircle (Beta)", col(5) + dropdown_offset, row(4) + dropdown_offset);
-	dynamic_radius_checkbox = forms.checkbox(form_handle, "Dynamic Radius", col(5) + dropdown_offset, row(5) + dropdown_offset);
-	options_pulse_clip_velocity = forms.checkbox(form_handle, "Pulse Clip Vel.", col(5) + dropdown_offset, row(6) + dropdown_offset);
-	options_autopound_checkbox = forms.checkbox(form_handle, "Auto Pound", col(10) + dropdown_offset, row(6) + dropdown_offset);
+	encircle_checkbox = forms.checkbox(ScriptHawkUI.options_form, "Encircle (Beta)", ScriptHawkUI.col(5) + ScriptHawkUI.dropdown_offset, ScriptHawkUI.row(4) + ScriptHawkUI.dropdown_offset);
+	dynamic_radius_checkbox = forms.checkbox(ScriptHawkUI.options_form, "Dynamic Radius", ScriptHawkUI.col(5) + ScriptHawkUI.dropdown_offset, ScriptHawkUI.row(5) + ScriptHawkUI.dropdown_offset);
+	options_pulse_clip_velocity = forms.checkbox(ScriptHawkUI.options_form, "Pulse Clip Vel.", ScriptHawkUI.col(5) + ScriptHawkUI.dropdown_offset, ScriptHawkUI.row(6) + ScriptHawkUI.dropdown_offset);
+	options_autopound_checkbox = forms.checkbox(ScriptHawkUI.options_form, "Auto Pound", ScriptHawkUI.col(10) + ScriptHawkUI.dropdown_offset, ScriptHawkUI.row(6) + ScriptHawkUI.dropdown_offset);
 
 	-- Vile
-	options_wave_button =     forms.button(form_handle, "Wave", initWave,         col(10), row(4), col(2), button_height);
-	options_heart_button =    forms.button(form_handle, "Heart", doHeart,         col(12) + 8, row(4), col(2), button_height);
-	options_fire_all_button = forms.button(form_handle, "Fire all", fireAllSlots, col(10), row(5), col(4) + 8, button_height);
+	options_wave_button =     forms.button(ScriptHawkUI.options_form, "Wave", initWave,         ScriptHawkUI.col(10), ScriptHawkUI.row(4), ScriptHawkUI.col(2), ScriptHawkUI.button_height);
+	options_heart_button =    forms.button(ScriptHawkUI.options_form, "Heart", doHeart,         ScriptHawkUI.col(12) + 8, ScriptHawkUI.row(4), ScriptHawkUI.col(2), ScriptHawkUI.button_height);
+	options_fire_all_button = forms.button(ScriptHawkUI.options_form, "Fire all", fireAllSlots, ScriptHawkUI.col(10), ScriptHawkUI.row(5), ScriptHawkUI.col(4) + 8, ScriptHawkUI.button_height);
 
 	-- Moves
-	options_moves_dropdown = forms.dropdown(form_handle, { "0. None", "1. Spiral Mountain 100%", "2. FFM Setup", "3. All", "3. Demo" }, col(10) + dropdown_offset, row(7) + dropdown_offset);
-	options_moves_button = forms.button(form_handle, "Unlock Moves", unlock_moves, col(5), row(7), col(4) + 8, button_height);
+	options_moves_dropdown = forms.dropdown(ScriptHawkUI.options_form, { "0. None", "1. Spiral Mountain 100%", "2. FFM Setup", "3. All", "3. Demo" }, ScriptHawkUI.col(10) + ScriptHawkUI.dropdown_offset, ScriptHawkUI.row(7) + ScriptHawkUI.dropdown_offset);
+	options_moves_button = forms.button(ScriptHawkUI.options_form, "Unlock Moves", unlock_moves, ScriptHawkUI.col(5), ScriptHawkUI.row(7), ScriptHawkUI.col(4) + 8, ScriptHawkUI.button_height);
 end
 
 function Game.eachFrame()

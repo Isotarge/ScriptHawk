@@ -479,9 +479,9 @@ countperop,vi refresh rate,ai count per byte
 1,1500,600 =59.86 (music was out of sync)
 1,1500,750 =59.92 (music was closer to sync but stopped too early)
 
-----------------------------------
--- Bone array based spiking fix --
-----------------------------------
+---------------------------------------
+-- Bone array based displacement fix --
+---------------------------------------
 
 Fix pseudocode:
 

@@ -321,14 +321,14 @@ local gravity_strength = 0xC8; -- 32 bit float big endian
 
 local light_thing = 0xCC; -- Values 0x00->0x14
 
-local x_rot = 0xE4;
+local x_rot = 0xE4; -- TODO: Earlier in the Kiosk version
 local y_rot = x_rot + 2;
 local z_rot = y_rot + 2;
 
 local health = 0x134; -- s16_be
 local takes_enemy_damage = 0x13B;
 
-local hand_state = 0x147; -- Bitfield
+local hand_state = 0x147; -- Bitfield, TODO: 0x137 in the Kiosk version
 
 local shade_byte = 0x16D;
 
@@ -585,6 +585,20 @@ local obj_model2_unknown_pointer = 0x24;
 
 local obj_model2_unknown_counter = 0x3A; -- u16_be
 
+-- 0x00 Unknown
+-- 0x01 Unknown
+-- 0x02 Unknown
+-- 0x04 Unknown
+-- 0x08 Unknown
+-- 0x20 Unknown
+-- 0x21 100001 GB - Chunky can collect
+-- 0x22 100010 GB - Diddy can collect
+-- 0x24 100100 GB - Tiny can collect
+-- 0x28 101000 GB - DK can collect
+-- 0x30 110000 GB - Lanky can collect
+-- 0x3F 111111 GB - Anyone can collect?
+local obj_model2_collectable_state = 0x8C; -- byte long bitfield
+
 -- Relative to model pointer
 local obj_model2_model_x_pos = 0x00; -- Float
 local obj_model2_model_y_pos = obj_model2_model_x_pos + 4; -- Float
@@ -680,6 +694,7 @@ local function getExamineDataModelTwo(pointer)
 
 	table.insert(examine_data, { "Unknown Pointer", string.format("0x%08x", mainmemory.read_u32_be(pointer + obj_model2_unknown_pointer)) });
 	table.insert(examine_data, { "Unknown Counter", mainmemory.read_u16_be(pointer + obj_model2_unknown_counter) });
+	table.insert(examine_data, { "Collectable", bizstring.binary(mainmemory.readbyte(pointer + obj_model2_collectable_state)) });
 
 	if hasModel then
 		modelPointer = modelPointer - 0x80000000;

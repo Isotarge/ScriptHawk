@@ -134,7 +134,7 @@ function Game.applyInfinites()
 	-- TODO
 end
 
-function Game.initUI(form_handle, col, row, button_height, label_offset, dropdown_offset)
+function Game.initUI()
 	-- TODO
 end
 

@@ -51,7 +51,7 @@ Game -- Table containing all information and functions about a game that are vis
 		function Game.setYRotation(value)
 		function Game.setZRotation(value)
 
-	function Game.initUI(options_form, col, row, button_height, label_offset, dropdown_offset) -- Draw any custom UI that the module desires here
+	function Game.initUI() -- Draw any custom UI that the module desires here
 	function Game.applyInfinites() -- Refill consumables
 	function Game.eachFrame() -- This function will be executed at the start of each frame of emulation
 

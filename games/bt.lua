@@ -719,12 +719,12 @@ function Game.applyInfinites()
 	mainmemory.writefloat(air, max_air, true);
 end
 
-function Game.initUI(form_handle, col, row, button_height, label_offset, dropdown_offset)
-	options_toggle_neverslip = forms.checkbox(form_handle, "Never Slip", col(0) + dropdown_offset, row(6) + dropdown_offset);
+function Game.initUI()
+	options_toggle_neverslip = forms.checkbox(ScriptHawkUI.options_form, "Never Slip", ScriptHawkUI.col(0) + ScriptHawkUI.dropdown_offset, ScriptHawkUI.row(6) + ScriptHawkUI.dropdown_offset);
 
 	-- Moves
-	options_moves_dropdown = forms.dropdown(form_handle, { "0. None", "1. All" }, col(10) + dropdown_offset, row(7) + dropdown_offset);
-	options_moves_button = forms.button(form_handle, "Unlock Moves", unlock_moves, col(5), row(7), col(4) + 8, button_height);
+	options_moves_dropdown = forms.dropdown(ScriptHawkUI.options_form, { "0. None", "1. All" }, ScriptHawkUI.col(10) + ScriptHawkUI.dropdown_offset, ScriptHawkUI.row(7) + ScriptHawkUI.dropdown_offset);
+	options_moves_button = forms.button(ScriptHawkUI.options_form, "Unlock Moves", unlock_moves, ScriptHawkUI.col(5), ScriptHawkUI.row(7), ScriptHawkUI.col(4) + 8, ScriptHawkUI.button_height);
 end
 
 function Game.eachFrame()

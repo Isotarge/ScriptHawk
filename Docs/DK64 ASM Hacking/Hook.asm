@@ -16,6 +16,6 @@
 
 // .org 0x80007494
 LUI     t0, @JumpAddress
-ORI     t0, t0, @JumpAddress	
+ORI     t0, t0, @JumpAddress
 JR      t0
 NOP

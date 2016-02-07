@@ -359,7 +359,6 @@ All collected 0xFFFC
 Left 270        Right 90
          Down 0
 
-
 Camera = 90
 Target = 180
 
