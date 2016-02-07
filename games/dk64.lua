@@ -126,6 +126,7 @@ local Diddy  = 1;
 local Lanky  = 2;
 local Tiny   = 3;
 local Chunky = 4;
+local Krusha = 5;
 
 -- Pointers relative to Kong base
 local moves      = 0;
@@ -1885,14 +1886,11 @@ function Game.initUI()
 	ScriptHawkUI.form_controls["Moon Mode Label"] = forms.label(ScriptHawkUI.options_form, "Moon:", ScriptHawkUI.col(10), ScriptHawkUI.row(2) + ScriptHawkUI.label_offset, 48, ScriptHawkUI.button_height);
 	ScriptHawkUI.form_controls["Moon Mode Button"] = forms.button(ScriptHawkUI.options_form, moon_mode, toggle_moonmode, ScriptHawkUI.col(13) - 20, ScriptHawkUI.row(2), 59, ScriptHawkUI.button_height);
 
-	ScriptHawkUI.form_controls["Toggle MJ Minimap"] = forms.checkbox(ScriptHawkUI.options_form, "MJ Minimap", ScriptHawkUI.col(5) + ScriptHawkUI.dropdown_offset, ScriptHawkUI.row(6) + ScriptHawkUI.dropdown_offset);
-	--ScriptHawkUI.form_controls["Toggle ISG Timer"] = forms.checkbox(ScriptHawkUI.options_form, "ISG Timer", ScriptHawkUI.col(5) + ScriptHawkUI.dropdown_offset, ScriptHawkUI.row(5) + ScriptHawkUI.dropdown_offset);
-	ScriptHawkUI.form_controls["Toggle OhWrongnana"] = forms.checkbox(ScriptHawkUI.options_form, "OhWrongnana", ScriptHawkUI.col(5) + ScriptHawkUI.dropdown_offset, ScriptHawkUI.row(5) + ScriptHawkUI.dropdown_offset);
-
 	-- Buttons
 	ScriptHawkUI.form_controls["Toggle Invisify Button"] = forms.button(ScriptHawkUI.options_form, "Invisify", toggle_invisify, ScriptHawkUI.col(7), ScriptHawkUI.row(1), 64, ScriptHawkUI.button_height);
 	ScriptHawkUI.form_controls["Clear TB Void Button"] = forms.button(ScriptHawkUI.options_form, "Clear TB void", clear_tb_void, ScriptHawkUI.col(10), ScriptHawkUI.row(1), ScriptHawkUI.col(4) + 8, ScriptHawkUI.button_height);
 	ScriptHawkUI.form_controls["Unlock Moves Button"] = forms.button(ScriptHawkUI.options_form, "Unlock Moves", unlock_moves, ScriptHawkUI.col(10), ScriptHawkUI.row(4), ScriptHawkUI.col(4) + 8, ScriptHawkUI.button_height);
+	ScriptHawkUI.form_controls["Random Color"] = forms.button(ScriptHawkUI.options_form, "Random Color", Game.setKongColor, ScriptHawkUI.col(5), ScriptHawkUI.row(5), ScriptHawkUI.col(4) + 8, ScriptHawkUI.button_height);
 
 	--ScriptHawkUI.form_controls["Everything is Kong Button"] = forms.button(ScriptHawkUI.options_form, "Kong", everythingIsKong, ScriptHawkUI.col(10), ScriptHawkUI.row(3), ScriptHawkUI.col(4) + 8, ScriptHawkUI.button_height);
 	--ScriptHawkUI.form_controls["Force Pause Button"] = forms.button(ScriptHawkUI.options_form, "Force Pause", force_pause, ScriptHawkUI.col(10), ScriptHawkUI.row(4), ScriptHawkUI.col(4) + 8, ScriptHawkUI.button_height);
@@ -1910,7 +1908,10 @@ function Game.initUI()
 	ScriptHawkUI.form_controls["Toggle Homing Ammo Checkbox"] = forms.checkbox(ScriptHawkUI.options_form, "Homing Ammo", ScriptHawkUI.col(0) + ScriptHawkUI.dropdown_offset, ScriptHawkUI.row(6) + ScriptHawkUI.dropdown_offset);
 	--ScriptHawkUI.form_controls["Toggle Neverslip Checkbox"] = forms.checkbox(ScriptHawkUI.options_form, "Never Slip", ScriptHawkUI.col(10) + ScriptHawkUI.dropdown_offset, ScriptHawkUI.row(5) + ScriptHawkUI.dropdown_offset);
 	ScriptHawkUI.form_controls["Toggle Paper Mode Checkbox"] = forms.checkbox(ScriptHawkUI.options_form, "Paper Mode", ScriptHawkUI.col(10) + ScriptHawkUI.dropdown_offset, ScriptHawkUI.row(5) + ScriptHawkUI.dropdown_offset);
-
+	--ScriptHawkUI.form_controls["Toggle MJ Minimap"] = forms.checkbox(ScriptHawkUI.options_form, "MJ Minimap", ScriptHawkUI.col(5) + ScriptHawkUI.dropdown_offset, ScriptHawkUI.row(6) + ScriptHawkUI.dropdown_offset);
+	--ScriptHawkUI.form_controls["Toggle ISG Timer"] = forms.checkbox(ScriptHawkUI.options_form, "ISG Timer", ScriptHawkUI.col(5) + ScriptHawkUI.dropdown_offset, ScriptHawkUI.row(5) + ScriptHawkUI.dropdown_offset);
+	ScriptHawkUI.form_controls["Toggle OhWrongnana"] = forms.checkbox(ScriptHawkUI.options_form, "OhWrongnana", ScriptHawkUI.col(5) + ScriptHawkUI.dropdown_offset, ScriptHawkUI.row(6) + ScriptHawkUI.dropdown_offset);
+	
 	-- Output flag statistics
 	flagStats();
 end
@@ -2019,12 +2020,31 @@ function Game.setDiddyColors()
 		texturePointer = getNextTextureRenderer(texturePointer); -- Skip Left eye
 		texturePointer = getNextTextureRenderer(texturePointer); -- Skip Right eye
 
+		-- 3 Hat
 		mainmemory.write_u16_be(texturePointer + texture_renderer_texture_index, DiddyHatColors[math.random(1, #DiddyHatColors)][2]);
 	end
 end
 
+local LankyTopColors = {
+	{"Blue (Normal)", 0},
+	{"Green", 1},
+	{"Purple", 2},
+	{"Red", 3},
+	{"Yellow", 27},
+}
+
 function Game.setLankyColors()
-	-- TODO
+	local playerObject = getPlayerObject();
+	local texturePointer = mainmemory.read_u24_be(playerObject + actor_texture_renderer_pointer + 1);
+
+	if isRDRAM(texturePointer) then
+		texturePointer = getNextTextureRenderer(texturePointer); -- Skip eyes
+
+		-- 1 Top
+		mainmemory.write_u16_be(texturePointer + texture_renderer_texture_index, LankyTopColors[math.random(1, #LankyTopColors)][2]);
+
+		-- TODO: Bottom
+	end
 end
 
 local TinyBodyColors = {
@@ -2042,16 +2062,78 @@ function Game.setTinyColors()
 		texturePointer = getNextTextureRenderer(texturePointer); -- Skip Left eye
 		texturePointer = getNextTextureRenderer(texturePointer); -- Skip Right eye
 
+		-- 3 Body
 		mainmemory.write_u16_be(texturePointer + texture_renderer_texture_index, TinyBodyColors[math.random(1, #TinyBodyColors)][2]);
 	end
 end
 
+local ChunkyBackColors = {
+	{"Green + Yellow (Normal)", 0},
+	{"Red + Yellow", 1},
+	{"Blue + Light Blue", 2},
+	{"Purple + Pink", 3},
+	{"Blue", 16},
+	{"Red", 17},
+	{"Purple", 18},
+	{"Green", 19},
+};
+
+local ChunkyFrontColors = {
+	{"Blue (Normal)", 0},
+	{"Red", 1},
+	{"Purple", 2},
+	{"Green", 3},
+}
+
 function Game.setChunkyColors()
-	-- TODO
+	local playerObject = getPlayerObject();
+	local texturePointer = mainmemory.read_u24_be(playerObject + actor_texture_renderer_pointer + 1);
+
+	if isRDRAM(texturePointer) then
+		texturePointer = getNextTextureRenderer(texturePointer); -- Skip Eyes
+
+		-- 1 Back
+		mainmemory.write_u16_be(texturePointer + texture_renderer_texture_index, ChunkyBackColors[math.random(1, #ChunkyBackColors)][2]);
+		texturePointer = getNextTextureRenderer(texturePointer);
+
+		-- 2 Front
+		mainmemory.write_u16_be(texturePointer + texture_renderer_texture_index, ChunkyFrontColors[math.random(1, #ChunkyFrontColors)][2]);
+	end
 end
 
+local KrushaColors = {
+	{"Blue (Normal)", 0},
+	{"Green", 1},
+	{"Purple", 2},
+	{"Yellow", 3},
+}
+
 function Game.setKrushaColors()
-	-- TODO
+	local playerObject = getPlayerObject();
+	local texturePointer = mainmemory.read_u24_be(playerObject + actor_texture_renderer_pointer + 1);
+
+	if isRDRAM(texturePointer) then
+		texturePointer = getNextTextureRenderer(texturePointer); -- Skip Eyes
+
+		-- 2 Body
+		mainmemory.write_u16_be(texturePointer + texture_renderer_texture_index, TinyBodyColors[math.random(1, #TinyBodyColors)][2]);
+	end
+end
+
+local setColorFunctions = {
+	[DK] = Game.setDKColors,
+	[Diddy] = Game.setDiddyColors,
+	[Lanky] = Game.setLankyColors,
+	[Tiny] = Game.setTinyColors,
+	[Chunky] = Game.setChunkyColors,
+	[Krusha] = Game.setKrushaColors
+};
+
+function Game.setKongColor()
+	local currentKong = mainmemory.readbyte(Game.Memory.character[version]);
+	if type(setColorFunctions[currentKong]) == "function" then
+		setColorFunctions[currentKong]();
+	end
 end
 
 function Game.eachFrame()
@@ -2086,9 +2168,7 @@ function Game.eachFrame()
 	end
 
 	-- Mad Jack
-	if type(ScriptHawkUI.form_controls["Toggle MJ Minimap"]) ~= "nil" and forms.ischecked(ScriptHawkUI.form_controls["Toggle MJ Minimap"]) then
-		draw_mj_minimap();
-	end
+	draw_mj_minimap();
 
 	-- ISG Timer
 	if type(ScriptHawkUI.form_controls["Toggle ISG Timer"]) ~= "nil" and forms.ischecked(ScriptHawkUI.form_controls["Toggle ISG Timer"]) then

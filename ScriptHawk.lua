@@ -418,7 +418,7 @@ end
 --------------------
 
 ScriptHawkUI = {
-	["form_controls"] = {}, -- TODO: m,ake game modules use this table for their own controls mayb?
+	["form_controls"] = {}, -- TODO: Make game modules use this table for their own controls mayb?
 	["form_padding"] = 8,
 	["label_offset"] = 5,
 	["dropdown_offset"] = 1,
