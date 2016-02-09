@@ -457,6 +457,7 @@ local movementStates = {
 
 	[80] = "Climbing", -- Tree, pole, etc.
 	[81] = "Leaving Climb",
+	[82] = "Tumblar", -- Standing on Tumblar
 	[83] = "Tumblar", -- Standing on Tumblar
 
 	[84] = "Death", -- Drowning

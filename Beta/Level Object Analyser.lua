@@ -578,6 +578,22 @@ function address_to_slot(address)
 end
 addressToSlot = address_to_slot;
 
+function outputAllAddresses(variable)
+	if type(variable) == "string" then
+		variable = resolve_variable_name(variable);
+	end
+	if type(slot_variables[variable]) == "table" then
+		local level_object_array = mainmemory.read_u24_be(level_object_array_pointer + 1);
+		local numSlots = math.min(max_slots, mainmemory.read_u32_be(level_object_array));
+
+		local currentSlotBase;
+		for i = 0, numSlots - 1 do
+			currentSlotBase = get_slot_base(level_object_array, i);
+			print(toHexString(currentSlotBase + variable));
+		end
+	end
+end
+
 function process_slot(slot_base)
 	local current_slot_variables = {};
 	local relative_address, variable_data;
