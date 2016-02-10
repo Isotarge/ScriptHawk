@@ -28,6 +28,7 @@ Game.Memory = {
 	["slope_object_pointer"] = {0x7F94B8, nil, nil , nil}, -- TODO - PAL, JP & Kiosk, also note this is part of the player object so might be simpler to do getPlayerObject() + offset if it doesn't break anything
 	["obj_model2_array_pointer"] = {0x7F6000, 0x7F5F20, 0x7F6470, nil},
 	["obj_model2_array_count"] = {0x7F6004, 0x7F5F24, 0x7F6474, nil},
+	["obj_model2_collision_linked_list_pointer"] = {0x754244, nil, nil, nil}, -- TODO: PAL, JP, Kiosk?
 };
 
 local flag_array = {};
@@ -139,6 +140,8 @@ local lives      = 9; -- This is used as instrument ammo in single player
 ----------------------------------
 -- Object Model 1 Documentation --
 ----------------------------------
+
+local max_objects = 0xFF;
 
 -- Relative to objects found in the pointer list (Model 1)
 local previous_object = -0x10; -- u32_be
@@ -574,7 +577,7 @@ Game.maps = {
 };
 
 local function isPointer(value)
-	return value > 0x80000000 and value < 0x80800000;
+	return value >= 0x80000000 and value < 0x80800000;
 end
 
 local function isRDRAM(value)
@@ -1485,8 +1488,6 @@ end
 -- Effect byte stuff --
 -----------------------
 
-local max_objects = 0xff;
-
 function everythingIsKong()
 	local kongSharedModel = mainmemory.read_u32_be(getPlayerObject() + model_pointer);
 
@@ -1692,37 +1693,182 @@ function setDKTV(message)
 	end
 end
 
------------------
--- OhWrongnana --
------------------
-
-local GBStates = {
-	[0] = 0x28, -- DK
-	[1] = 0x22, -- Diddy
-	[2] = 0x30, -- Lanky
-	[3] = 0x24, -- Tiny
-	[4] = 0x21, -- Chunky
-};
+--------------------------
+-- Free Trade Agreement --
+--------------------------
 
 local obj_model2_slot_size = 0x90;
 local obj_model2_collectable_state = 0x8C; -- byte long bitfield
+
+BalloonStates = {
+	[DK] = 114,
+	[Diddy] = 91,
+	[Lanky] = 113,
+	[Tiny] = 112,
+	[Chunky] = 111,
+};
+
+KasplatStates = {
+	[DK] = 241,
+	[Diddy] = 242,
+	[Lanky] = 243,
+	[Tiny] = 244,
+	[Chunky] = 245,
+}
+
+function isBalloon(actorType)
+	return array_contains(BalloonStates, actorType)
+end
+
+function isKasplat(actorType)
+	return actorType >= 241 and actorType <= 245;
+end
+
+function isKong(actorType)
+	return actorType >= 2 and actorType <= 6;
+end
+
+function freeTradeObjectModel1(currentKong)
+	for object_no = 0, max_objects do
+		local pointer = mainmemory.read_u24_be(Game.Memory.pointer_list[version] + (object_no * 4) + 1);
+		if isRDRAM(pointer) then
+			local actorType = mainmemory.read_u32_be(pointer + actor_type);
+			if isKasplat(actorType) then
+				-- Fix which blueprint the Kasplat drops
+				mainmemory.write_u32_be(pointer + actor_type, KasplatStates[currentKong]);
+			end
+			if isBalloon(actorType) then
+				-- Fix balloon color
+				mainmemory.write_u32_be(pointer + actor_type, BalloonStates[currentKong]);
+			end
+		end
+	end
+end
+
+function fixSingleCollision(objectBase)
+	local currentCollisionValue = mainmemory.read_u16_be(objectBase + 4);
+	if isKong(currentCollisionValue) then
+		mainmemory.write_u16_be(objectBase + 4, 0); -- Set the collision to accept the any Kong
+		-- TODO: Is setting 0 here safe?
+		-- It'll be faster, yeah but safe idk
+	end
+end
+
+function freeTradeCollisionListBackboneMethod(currentKong)
+	local object = mainmemory.read_u24_be(Game.Memory.linked_list_pointer[version] + 1);
+	while isRDRAM(object) do
+		size = mainmemory.read_u32_be(object + 4);
+		if size == 0x20 then
+			fixSingleCollision(object + 0x10);
+		end
+		object = object + 0x10 + size;
+	end
+end
+
+local previousCollisionLinkedListPointer = 0;
+function freeTradeCollisionList(currentKong)
+	if version == 1 then -- TODO: PAL, JP, Kiosk?
+		-- This call resolves the pointer to the object that contains a pointer to the linked list of collision data
+		local currentCollisionLinkedListPointer = mainmemory.read_u32_be(Game.Memory.obj_model2_collision_linked_list_pointer[version]);
+		if currentCollisionLinkedListPointer ~= previousCollisionLinkedListPointer and isPointer(currentCollisionLinkedListPointer) then
+			freeTradeCollisionListBackboneMethod(currentKong);
+		end
+		previousCollisionLinkedListPointer = currentCollisionLinkedListPointer;
+	end
+end
+
+GBStates = {
+	[DK] = 0x28,
+	[Diddy] = 0x22,
+	[Lanky] = 0x30,
+	[Tiny] = 0x24,
+	[Chunky] = 0x21,
+};
+
+function isGB(collectableState)
+	return array_contains(GBStates, collectableState);
+end
+
+-- TODO: Sort this object model 2 constants mess out
+local obj_model2_behavior_type_pointer = 0x24;
+
+function getScriptName(objectModel2Base)
+	local behaviorTypePointer = mainmemory.read_u32_be(objectModel2Base + obj_model2_behavior_type_pointer);
+	if isPointer(behaviorTypePointer) then
+		return readNullTerminatedString(behaviorTypePointer - 0x80000000 + 0x0C);
+	end
+	return "";
+end
+
+BulletChecks = {
+	[DK] = 0x0030,
+	[Diddy] = 0x0024,
+	[Lanky] = 0x002A,
+	[Tiny] = 0x002B,
+	[Chunky] = 0x0026,
+};
+
+function isBulletCheck(value)
+	return array_contains(BulletChecks, value);
+end
+
+SimSlamChecks = {
+	[DK] = 0x0002,
+	[Diddy] = 0x0003,
+	[Lanky] = 0x0004,
+	[Tiny] = 0x0005,
+	[Chunky] = 0x0006,
+};
+
+function isSimSlamCheck(value)
+	return array_contains(SimSlamChecks, value);
+end
 
 function ohWrongnana()
 	if version ~= 4 then -- Anything but Kiosk
 		local objModel2Array = mainmemory.read_u24_be(Game.Memory.obj_model2_array_pointer[version] + 1);
 		local numSlots = mainmemory.read_u32_be(Game.Memory.obj_model2_array_count[version]);
 		local currentKong = mainmemory.readbyte(Game.Memory.character[version]);
-
+		local scriptName, slotBase, currentValue, activationScript, earlyCheckValue, lateCheckValue;
 		-- Fill and sort pointer list
 		for i = 0, numSlots - 1 do
-			local slotBase = objModel2Array + i * obj_model2_slot_size;
-			local currentValue = mainmemory.readbyte(slotBase + obj_model2_collectable_state);
-			for kong = 0, 4 do
-				if currentValue == GBStates[kong] then
-					mainmemory.writebyte(slotBase + obj_model2_collectable_state, GBStates[currentKong]);
+			slotBase = objModel2Array + i * obj_model2_slot_size;
+			currentValue = mainmemory.readbyte(slotBase + obj_model2_collectable_state);
+			if isGB(currentValue) then
+				mainmemory.writebyte(slotBase + obj_model2_collectable_state, GBStates[currentKong]);
+			end
+			scriptName = getScriptName(slotBase);
+			if scriptName == "gunswitches" or scriptName == "buttons" then
+				-- Get activation script
+				activationScript = mainmemory.read_u32_be(slotBase + 0x7C);
+				if isPointer(activationScript) then
+					activationScript = activationScript - 0x80000000;
+					-- Get part 2
+					activationScript = mainmemory.read_u32_be(activationScript + 0xA0);
+					while isPointer(activationScript) do
+						activationScript = activationScript - 0x80000000;
+						earlyCheckValue = mainmemory.read_u16_be(activationScript + 0x0C);
+						lateCheckValue = mainmemory.read_u16_be(activationScript + 0x24);
+						-- Check for the bullet magic and patch if needed
+						if isBulletCheck(earlyCheckValue) then
+							mainmemory.write_u16_be(activationScript + 0x0C, BulletChecks[currentKong]);
+						end
+						-- Check for the simslam magic and patch if needed
+						if isSimSlamCheck(earlyCheckValue) then
+							mainmemory.write_u16_be(activationScript + 0x0C, SimSlamChecks[currentKong]);
+						end
+						if isSimSlamCheck(lateCheckValue) then
+							mainmemory.write_u16_be(activationScript + 0x24, SimSlamChecks[currentKong]);
+						end
+						-- Get next script chunk
+						activationScript = mainmemory.read_u32_be(activationScript + 0x4C);
+					end
 				end
 			end
 		end
+
+		freeTradeObjectModel1(currentKong);
+		freeTradeCollisionList(currentKong);
 	end
 end
 

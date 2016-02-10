@@ -4,6 +4,7 @@ local camera_pointer;
 local obj_model2_array_pointer;
 local obj_model2_array_count;
 
+hide_non_scripted = false;
 safeMode = true;
 encircle_enabled = false;
 rat_enabled = false;
@@ -13,11 +14,12 @@ local max_objects = 0xFF;
 local radius = 100;
 
 local grab_script_modes = {
-	"Examine (Object Model 1)",
 	"List (Object Model 1)",
-	"Examine (Object Model 2)",
+	"Examine (Object Model 1)",
 	"List (Object Model 2)",
+	"Examine (Object Model 2)",
 };
+
 local grab_script_mode_index = 1;
 grab_script_mode = grab_script_modes[grab_script_mode_index];
 
@@ -28,6 +30,14 @@ local function switch_grab_script_mode()
 	end
 	grab_script_mode = grab_script_modes[grab_script_mode_index];
 end
+
+-- Kong index
+local DK     = 0;
+local Diddy  = 1;
+local Lanky  = 2;
+local Tiny   = 3;
+local Chunky = 4;
+local Krusha = 5;
 
 ----------------------------
 -- Version specific stuff --
@@ -67,6 +77,19 @@ end
 ----------------------
 -- Helper functions --
 ----------------------
+
+max_string_length = 25;
+function readNullTerminatedString(base)
+	local builtString = "";
+	local length = 0;
+	local nextByte = mainmemory.readbyte(base + length);
+	repeat
+		builtString = builtString..string.char(nextByte);
+		length = length + 1;
+		nextByte = mainmemory.readbyte(base + length);
+	until nextByte == 0 or length > max_string_length;
+	return builtString;
+end
 
 function toHexString(value, desiredLength, prefix)
 	value = string.format("%X", value or 0);
@@ -277,6 +300,7 @@ local actor_types = {
 	[295] = "K. Rool (Chunky Phase)",
 	[299] = "Textbox",
 	[305] = "Missile (Car Race)",
+	[309] = "DK Logo (Instrument)",
 	[310] = "Spotlight", -- Tag barrel, instrument etc.
 	[311] = "Checkpoint (Race)", -- Seal race & Castle car race
 	[313] = "Particle (Idle Anim.)",
@@ -581,9 +605,11 @@ local obj_model2_z_pos = obj_model2_y_pos + 4; -- Float
 local obj_model2_hitbox_scale = 0x0C; -- Float
 
 local obj_model2_model_pointer = 0x20;
-local obj_model2_unknown_pointer = 0x24;
+local obj_model2_behavior_type_pointer = 0x24;
 
 local obj_model2_unknown_counter = 0x3A; -- u16_be
+
+local obj_model2_behavior_pointer = 0x7C;
 
 -- 0x00 Unknown
 -- 0x01 Unknown
@@ -598,6 +624,23 @@ local obj_model2_unknown_counter = 0x3A; -- u16_be
 -- 0x30 110000 GB - Lanky can collect
 -- 0x3F 111111 GB - Anyone can collect?
 local obj_model2_collectable_state = 0x8C; -- byte long bitfield
+
+local GBStates = {
+	[DK] = 0x28,
+	[Diddy] = 0x22,
+	[Lanky] = 0x30,
+	[Tiny] = 0x24,
+	[Chunky] = 0x21,
+};
+
+function isGB(collectableState)
+	for kong = DK, Chunky do
+		if collectableState == GBStates[kong] then
+			return true;
+		end
+	end
+	return false;
+end
 
 -- Relative to model pointer
 local obj_model2_model_x_pos = 0x00; -- Float
@@ -692,8 +735,19 @@ local function getExamineDataModelTwo(pointer)
 		table.insert(examine_data, { "Separator", 1 });
 	end
 
-	table.insert(examine_data, { "Unknown Pointer", string.format("0x%08x", mainmemory.read_u32_be(pointer + obj_model2_unknown_pointer)) });
+	local behaviorTypePointer = mainmemory.read_u32_be(pointer + obj_model2_behavior_type_pointer);
+	table.insert(examine_data, { "Behavior Type Pointer", string.format("0x%08x", behaviorTypePointer) });
+	if isPointer(behaviorTypePointer) then
+		table.insert(examine_data, { "Behavior Type", readNullTerminatedString(behaviorTypePointer - 0x80000000 + 0x0C) });
+	end
+
 	table.insert(examine_data, { "Unknown Counter", mainmemory.read_u16_be(pointer + obj_model2_unknown_counter) });
+
+	local behaviorPointer = mainmemory.read_u32_be(pointer + obj_model2_behavior_pointer);
+	if behaviorPointer ~= 0 then
+		table.insert(examine_data, { "Behavior Pointer", string.format("0x%08x", behaviorPointer) });
+	end
+
 	table.insert(examine_data, { "Collectable", bizstring.binary(mainmemory.readbyte(pointer + obj_model2_collectable_state)) });
 
 	if hasModel then
@@ -1000,27 +1054,45 @@ local function draw_gui()
 				if type(actor_types[currentActorType]) ~= "nil" then
 					currentActorType = actor_types[currentActorType];
 				end
+				local color = nil;
 				if object_index == i then
-					gui.text(gui_x, gui_y + height * row, i..": "..string.format("0x%06x: ", object_pointers[i] or 0)..currentActorType.." ("..toHexString(currentActorSize)..")", green_highlight, nil, 'bottomright');
-				else
-					if object_pointers[i] == playerObject then
-						gui.text(gui_x, gui_y + height * row, i..": "..string.format("0x%06x: ", object_pointers[i] or 0)..currentActorType.." ("..toHexString(currentActorSize)..")", yellow_highlight, nil, 'bottomright');
-					else
-						gui.text(gui_x, gui_y + height * row, i..": "..string.format("0x%06x: ", object_pointers[i] or 0)..currentActorType.." ("..toHexString(currentActorSize)..")", nil, nil, 'bottomright');
-					end
+					color = yellow_highlight;
 				end
+				if object_pointers[i] == playerObject then
+					color = green_highlight;
+				end
+				gui.text(gui_x, gui_y + height * row, i..": "..string.format("0x%06x: ", object_pointers[i] or 0)..currentActorType.." ("..toHexString(currentActorSize)..")", color, nil, 'bottomright');
 				row = row + 1;
 			end
 		end
 
 		if grab_script_mode == "List (Object Model 2)" then
 			for i = #object_pointers, 1, -1 do
-				if object_index == i then
-					gui.text(gui_x, gui_y + height * row, i..": "..string.format("0x%06x", object_pointers[i] or 0), green_highlight, nil, 'bottomright');
+				local behaviorPointer = mainmemory.read_u32_be(object_pointers[i] + obj_model2_behavior_pointer);
+				local collectableState = mainmemory.readbyte(object_pointers[i] + obj_model2_collectable_state);
+				if behaviorPointer > 0 then
+					behaviorPointer = " ("..string.format("0x%08x", behaviorPointer or 0)..")";
 				else
-					gui.text(gui_x, gui_y + height * row, i..": "..string.format("0x%06x", object_pointers[i] or 0), nil, nil, 'bottomright');
+					behaviorPointer = "";
 				end
-				row = row + 1;
+				local color = nil;
+				if isGB(collectableState) then
+					color = yellow_highlight;
+				end
+				if object_index == i then
+					color = green_highlight
+				end
+
+				local behaviorType = "";
+				local behaviorTypePointer = mainmemory.read_u32_be(object_pointers[i] + obj_model2_behavior_type_pointer);
+				if isPointer(behaviorTypePointer) then
+					behaviorType = " "..behaviorType..readNullTerminatedString(behaviorTypePointer - 0x80000000 + 0x0C);
+				end
+
+				if not (behaviorPointer == "" and hide_non_scripted) then
+					gui.text(gui_x, gui_y + height * row, i..": "..string.format("0x%06x", object_pointers[i] or 0)..behaviorType..behaviorPointer, color, nil, 'bottomright');
+					row = row + 1;
+				end
 			end
 		end
 	end

@@ -58,7 +58,9 @@ SystemID N64
 7476F5	b	u	1	RDRAM	Cutscene
 7480DC	d	f	1	RDRAM	Stored Y?
 74E77C	b	u	1	RDRAM	Character
-7552E0	b	h	1	RDRAM	Security?!?!?
+754244	d	h	1	RDRAM	Collision Linked List Pointer
+754280	d	h	1	RDRAM	HUD Pointer
+7552E0	b	u	1	RDRAM	Security Byte
 75530C	b	h	1	RDRAM	Movement speed?
 755310	b	h	1	RDRAM	Movement speed?
 755314	b	u	1	RDRAM	Mode
@@ -99,8 +101,8 @@ SystemID N64
 7F5D00	d	f	1	RDRAM	Camera State Change Timer
 7F5D10	d	h	1	RDRAM	Camera pointer?
 7F5D14	b	h	1	RDRAM	ISG Fadeout
-7F6000	d	h	1	RDRAM	Trigger Array Pointer
-7F6004	d	u	1	RDRAM	Trigger Array Count
+7F6000	d	h	1	RDRAM	Object Model 2 Array Pointer
+7F6004	d	u	1	RDRAM	Object Model 2 Array Count
 7F8E88	b	u	1	RDRAM	Object Count?
 7F948C	d	f	1	RDRAM	Stored Y?
 7F94B8	d	h	1	RDRAM	Slope object pointer?

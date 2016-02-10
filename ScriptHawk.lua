@@ -139,6 +139,19 @@ function traverse_size(object)
 end
 traverseSize = traverse_size;
 
+max_string_length = 25;
+function readNullTerminatedString(base)
+	local builtString = "";
+	local length = 0;
+	local nextByte = mainmemory.readbyte(base + length);
+	repeat
+		builtString = builtString..string.char(nextByte);
+		length = length + 1;
+		nextByte = mainmemory.readbyte(base + length);
+	until nextByte == 0 or length > max_string_length;
+	return builtString;
+end
+
 -----------------
 -- Game checks --
 -----------------
@@ -314,16 +327,25 @@ function rotation_to_radians(num)
 	return ((num % Game.max_rot_units) / Game.max_rot_units) * two_pi;
 end
 
-local function array_contains(array, value)
-	if type(array) == "table" and #array > 0 then
-		for i = 1, #array do
-			if array[i] == value then
+function array_contains(array, value)
+	if type(array) == "table" then
+		-- TODO: Special check for index zero because ipairs doesn't support starting from 0?
+		if type(array[0]) ~= "nil" then
+			if array[0] == value then
+				return true;
+			end
+		end
+
+		-- Carry on
+		for i, v in ipairs(array) do
+			if v == value then
 				return true;
 			end
 		end
 	end
 	return false;
 end
+arrayContains = array_contains;
 
 local function toggleRotationUnits()
 	if rotation_units == "Degrees" then
