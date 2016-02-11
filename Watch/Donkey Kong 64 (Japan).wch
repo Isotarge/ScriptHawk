@@ -9,6 +9,8 @@ SystemID N64
 743DA8	d	u	1	RDRAM	Exit
 746088	b	u	1	RDRAM	File
 74E05C	b	u	1	RDRAM	Character
+753B34	d	h	1	RDRAM	Object Model 2 Collision Linked List Pointer
+753B70	d	h	1	RDRAM	HUD Pointer
 7553A0	b	u	1	RDRAM	Security Byte
 767EB4	d	u	1	RDRAM	Frames (Real)
 76B100	d	u	1	RDRAM	Frames (Lag)

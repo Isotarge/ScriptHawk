@@ -9,6 +9,8 @@ SystemID N64
 73EC38	d	u	1	RDRAM	Exit
 740F18	b	u	1	RDRAM	File
 748EDC	b	u	1	RDRAM	Character
+74E9A4	d	h	1	RDRAM	Object Model 2 Collision Linked List Pointer
+74E9E0	d	h	1	RDRAM	HUD Pointer
 74FB60	b	u	1	RDRAM	Security Byte
 765A30	d	u	1	RDRAM	Frames (Lag)
 76A918	d	h	1	RDRAM	Bone Displacement Pointer

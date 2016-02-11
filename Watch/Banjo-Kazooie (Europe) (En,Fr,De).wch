@@ -76,6 +76,7 @@ SystemID N64
 37E683	b	u	1	RDRAM	MM Hut index
 37E784	d	f	1	RDRAM	Jiggy Spawn Angle
 37E788	d	f	1	RDRAM	Jiggy Spawn Velocity
+37E93B	b	h	1	RDRAM	Bottles Bonus Puzzle Index
 37F2B7	b	h	1	RDRAM	Demo State
 37F2B8	d	f	1	RDRAM	Game Time
 37F2C0	d	f	1	RDRAM	Map Time

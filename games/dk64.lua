@@ -28,7 +28,7 @@ Game.Memory = {
 	["slope_object_pointer"] = {0x7F94B8, nil, nil , nil}, -- TODO - PAL, JP & Kiosk, also note this is part of the player object so might be simpler to do getPlayerObject() + offset if it doesn't break anything
 	["obj_model2_array_pointer"] = {0x7F6000, 0x7F5F20, 0x7F6470, nil},
 	["obj_model2_array_count"] = {0x7F6004, 0x7F5F24, 0x7F6474, nil},
-	["obj_model2_collision_linked_list_pointer"] = {0x754244, nil, nil, nil}, -- TODO: PAL, JP, Kiosk?
+	["obj_model2_collision_linked_list_pointer"] = {0x754244, 0x74E9A4, 0x753B34, nil}, -- TODO: Kiosk?
 };
 
 local flag_array = {};
@@ -1767,7 +1767,7 @@ end
 
 local previousCollisionLinkedListPointer = 0;
 function freeTradeCollisionList(currentKong)
-	if version == 1 then -- TODO: PAL, JP, Kiosk?
+	if version ~= 4 then
 		-- This call resolves the pointer to the object that contains a pointer to the linked list of collision data
 		local currentCollisionLinkedListPointer = mainmemory.read_u32_be(Game.Memory.obj_model2_collision_linked_list_pointer[version]);
 		if currentCollisionLinkedListPointer ~= previousCollisionLinkedListPointer and isPointer(currentCollisionLinkedListPointer) then
