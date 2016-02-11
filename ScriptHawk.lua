@@ -127,11 +127,15 @@ end
 findRootSize = find_root_size;
 
 -- Finds the end of a linked list, outputting object size
-function traverse_size(object)
+function traverse_size(object, minimumPrintSize, maximumPrintSize)
+	minimumPrintSize = minimumPrintSize or -math.huge;
+	maximumPrintSize = maximumPrintSize or math.huge;
 	local count = 0;
 	while object > 0 and object < 0x7FFFFF do
 		local size = mainmemory.read_u32_be(object + 4);
-		dprint(count..": "..toHexString(object).." Size: "..toHexString(size));
+		if size >= minimumPrintSize and size <= maximumPrintSize then
+			dprint(count..": "..toHexString(object).." Size: "..toHexString(size));
+		end
 		object = object + 0x10 + size;
 		count = count + 1;
 	end
@@ -300,7 +304,7 @@ end
 function searchPointers(base, range, allowLater)
 	local foundPointers = {};
 	allowLater = allowLater or false;
-	for address = 0x000000, 0x7FFFFC do
+	for address = 0x000000, 0x7FFFFC, 4 do
 		local value = mainmemory.read_u32_be(address);
 		if allowLater then
 			if value >= base - range and value <= base + range then

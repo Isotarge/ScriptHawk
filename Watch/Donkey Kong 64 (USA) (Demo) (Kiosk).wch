@@ -1,8 +1,29 @@
 Domain RDRAM
 SystemID N64
+6F9EB8	b	u	1	RDRAM	Character
+6FF054	d	h	1	RDRAM	Object Model 2 Collision Linked List Pointer
+6FF080	d	h	1	RDRAM	HUD Pointer
+6FFE70	w	u	1	RDRAM	Demo Fadeout Timer
+6FFE74	d	u	1	RDRAM	Frames in current map
+707DDB	b	h	1	RDRAM	DK Model
+707DEB	b	h	1	RDRAM	Diddy Model
+707DFB	b	h	1	RDRAM	Lanky Model
+707E0B	b	h	1	RDRAM	Tiny Model
+707E1B	b	h	1	RDRAM	Chunky Model
+707E2B	b	h	1	RDRAM	Rambi Model
+707E3B	b	h	1	RDRAM	Enguarde Model
+707E4B	b	h	1	RDRAM	Squawks Model
+707E5B	b	h	1	RDRAM	Squawks Model
+70AA9C	w	h	1	RDRAM	Dogadon Actor Type
+70AA9E	w	h	1	RDRAM	Dogadon Model
 72CDE7	b	u	1	RDRAM	Map
+72D140	d	u	1	RDRAM	Frames (Lag) (TODO: Seems to work for Diddy's map but not for any others)
 7A12C0	d	h	1	RDRAM	Linked List Pointer
 7A1E14	d	h	1	RDRAM	Camera Pointer
 7B5918	d	h	1	RDRAM	Camera Pointer
 7B5AFC	d	h	1	RDRAM	Kong Object Pointer
+7B5B12	b	b	1	RDRAM	Zipper Byte
+7B5B13	b	b	1	RDRAM	Tag Barrel Void Byte
+7B675E	b	u	1	RDRAM	Health
+7B675F	b	u	1	RDRAM	Melons
 

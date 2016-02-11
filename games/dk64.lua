@@ -8,16 +8,16 @@ local version; -- 1 USA, 2 PAL, 3 JP, 4 Kiosk
 Game.Memory = {
 	["map"] = {0x7444E4, 0x73EC34, 0x743DA4, 0x72CDE4}, -- Note: Exit = Map + 4
 	["file"] = {0x7467C8, 0x740F18, 0x746088, nil},
-	["character"] = {0x74E77C, 0x748EDC, 0x74E05C, nil}, -- TODO: Kiosk
-	["tb_void_byte"] = {0x7FBB63, 0x7FBA83, 0x7FBFD3, nil}, -- TODO: Kiosk
+	["character"] = {0x74E77C, 0x748EDC, 0x74E05C, 0x6F9EB8},
+	["tb_void_byte"] = {0x7FBB63, 0x7FBA83, 0x7FBFD3, 0x7B5B13},
 	["player_pointer"] = {0x7FBB4C, 0x7FBA6C, 0x7FBFBC, 0x7B5AFC},
 	["camera_pointer"] = {0x7FB968, 0x7FB888, 0x7FBDD8, nil}, -- TODO: Kiosk
 	["pointer_list"] = {0x7FBFF0, 0x7FBF10, 0x7FC460, 0x7B5E58}, -- TODO: Kiosk is in a weird spot, is this correct?
 	["linked_list_pointer"] = {0x7F0990, 0x7F08B0, 0x7F0E00, 0x7A12C0},
-	["global_base"] = {0x7FCC41, 0x7FCB81, 0x7FD0D1, nil}, -- TODO: Kiosk?
+	["global_base"] = {0x7FCC41, 0x7FCB81, 0x7FD0D1, 0x7B6754},
 	["kong_base"] = {0x7FC950, 0x7FC890, 0x7FCDE0, nil}, -- TODO: Kiosk?
 	["menu_flags"] = {0x7ED558, 0x7ED478, 0x7ED9C8, nil},
-	["framebuffer_pointer"] = {0x7F07F4, 0x73EBC0, 0x743D30, nil}, -- TODO: Kiosk?
+	["framebuffer_pointer"] = {0x7F07F4, 0x73EBC0, 0x743D30, nil}, -- TODO: Kiosk
 	["flag_block_pointer"] = {0x7654F4, 0x760014, 0x7656E4, nil},
 	["security_byte"] = {0x7552E0, 0x74FB60, 0x7553A0, nil}, -- TODO: Kiosk?
 	["security_message"] = {0x75E5DC, 0x7590F0, 0x75E790, nil},
@@ -28,7 +28,7 @@ Game.Memory = {
 	["slope_object_pointer"] = {0x7F94B8, nil, nil , nil}, -- TODO - PAL, JP & Kiosk, also note this is part of the player object so might be simpler to do getPlayerObject() + offset if it doesn't break anything
 	["obj_model2_array_pointer"] = {0x7F6000, 0x7F5F20, 0x7F6470, nil},
 	["obj_model2_array_count"] = {0x7F6004, 0x7F5F24, 0x7F6474, nil},
-	["obj_model2_collision_linked_list_pointer"] = {0x754244, 0x74E9A4, 0x753B34, nil}, -- TODO: Kiosk?
+	["obj_model2_collision_linked_list_pointer"] = {0x754244, 0x74E9A4, 0x753B34, 0x6FF054},
 };
 
 local flag_array = {};
@@ -313,7 +313,7 @@ function Game.detectVersion(romName)
 		--5 Crash
 		--6 Minecart
 		--7 Crash
-		--8 Armydillo fight -> crash?
+		--8 Armydillo fight
 		--9-39 Crash
 		--40 N+R logo
 		--41-75 Crash
@@ -324,7 +324,7 @@ function Game.detectVersion(romName)
 		--80 Title screen
 		--81 "Thanks for playing" or Test Map
 		--82 Crash?
-		--83 Partially loads, then crashes
+		--83 Dogadon Fight
 		--84-214 Crash
 		--215 Partially loads (kong position changes), then crashes
 		--216-228 Crash
@@ -1892,7 +1892,7 @@ function outputGamesharkCode(bytes, base, skipZeroes)
 	return skippedZeroes;
 end
 
-local hookBase = 0x7494;
+local hookBase = 0x7494; -- TODO: Other versions
 local codeBase = 0x7FF500;
 local maxCodeSize = 0xAFF;
 
@@ -2082,13 +2082,15 @@ function Game.applyInfinites()
 	mainmemory.writebyte(global_base + oranges, max_oranges);
 	mainmemory.write_u16_be(global_base + crystals, max_crystals * 150);
 	mainmemory.writebyte(global_base + film, max_film);
-	mainmemory.writebyte(global_base + health, max_health);
-	mainmemory.writebyte(global_base + melons, max_melons);
+	mainmemory.writebyte(global_base + health, mainmemory.readbyte(global_base + melons) * 4);
+	--mainmemory.writebyte(global_base + melons, max_melons);
 
-	for kong = DK, Chunky do
-		local base = Game.Memory.kong_base[version] + kong * 0x5e;
-		mainmemory.writebyte(base + coins, max_coins);
-		mainmemory.writebyte(base + lives, max_musical_energy);
+	if version ~= 4 then -- TODO: Kiosk
+		for kong = DK, Chunky do
+			local base = Game.Memory.kong_base[version] + kong * 0x5e;
+			mainmemory.writebyte(base + coins, max_coins);
+			mainmemory.writebyte(base + lives, max_musical_energy);
+		end
 	end
 end
 
