@@ -385,7 +385,7 @@ local flag_array = {
 	{["byte"] = 0x2F, ["bit"] = 1, ["name"] = "Camera/Shockwave"},
 	{["byte"] = 0x2F, ["bit"] = 2, ["name"] = "Training Grounds: Treehouse Squawk Cutscene"},
 	{["byte"] = 0x2F, ["bit"] = 4, ["name"] = "Key 8", ["type"] = "Key"},
-	{["byte"] = 0x2F, ["bit"] = 5, ["name"] = "Isles: Japes boulder GB", ["type"] = "GB"},
+	{["byte"] = 0x2F, ["bit"] = 5, ["name"] = "Isles: DK GB: Japes boulder", ["type"] = "GB"},
 	{["byte"] = 0x2F, ["bit"] = 6, ["name"] = "B. Locker FTT", ["type"] = "FTT"},
 	{["byte"] = 0x2F, ["bit"] = 7, ["name"] = "Training Grounds: Barrels spwaned"}, -- TODO: Test this
 
@@ -466,12 +466,12 @@ local flag_array = {
 	{["byte"] = 0x39, ["bit"] = 2, ["name"] = "Story: Caves Intro"},
 	{["byte"] = 0x39, ["bit"] = 3, ["name"] = "Story: Castle Intro"},
 	{["byte"] = 0x39, ["bit"] = 4, ["name"] = "Story: Helm Intro"},
-	{["byte"] = 0x39, ["bit"] = 5, ["name"] = "Japes Lobby: B. Locker Cleared"},
-	{["byte"] = 0x39, ["bit"] = 6, ["name"] = "Aztec Lobby: B. Locker Cleared"},
-	{["byte"] = 0x39, ["bit"] = 7, ["name"] = "Factory Lobby: B. Locker Cleared"},
+	{["byte"] = 0x39, ["bit"] = 5, ["name"] = "Japes Lobby: B. Locker Cleared", ["type"] = "B. Locker"},
+	{["byte"] = 0x39, ["bit"] = 6, ["name"] = "Aztec Lobby: B. Locker Cleared", ["type"] = "B. Locker"},
+	{["byte"] = 0x39, ["bit"] = 7, ["name"] = "Factory Lobby: B. Locker Cleared", ["type"] = "B. Locker"},
 
-	{["byte"] = 0x3A, ["bit"] = 0, ["name"] = "Galleon Lobby: B. Locker Cleared"},
-	{["byte"] = 0x3A, ["bit"] = 1, ["name"] = "Fungi B. Locker cleared"},
+	{["byte"] = 0x3A, ["bit"] = 0, ["name"] = "Galleon Lobby: B. Locker Cleared", ["type"] = "B. Locker"},
+	{["byte"] = 0x3A, ["bit"] = 1, ["name"] = "Fungi B. Locker cleared", ["type"] = "B. Locker"},
 	{["byte"] = 0x3A, ["bit"] = 5, ["name"] = "Japes: Blueprint - DK", ["type"] = "Blueprint"},
 	{["byte"] = 0x3A, ["bit"] = 6, ["name"] = "Japes: Blueprint - Diddy", ["type"] = "Blueprint"},
 	{["byte"] = 0x3A, ["bit"] = 7, ["name"] = "Japes: Blueprint - Lanky", ["type"] = "Blueprint"},

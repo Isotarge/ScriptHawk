@@ -9,7 +9,11 @@ local flag_array = {
 
 	{["byte"] = 0x2F, ["bit"] = 1, ["name"] = "Camera/Shockwave"},
 	{["byte"] = 0x2F, ["bit"] = 4, ["name"] = "Key 8", ["type"] = "Key"},
+	{["byte"] = 0x2F, ["bit"] = 5, ["name"] = "Isles: DK GB: Japes boulder", ["type"] = "GB"},
 	{["byte"] = 0x2F, ["bit"] = 6, ["name"] = "B. Locker FTT", ["type"] = "FTT"},
+	{["byte"] = 0x2F, ["bit"] = 7, ["name"] = "Training Grounds: Barrels spwaned"}, -- TODO: Test this
+
+	{["byte"] = 0x30, ["bit"] = 2, ["name"] = "Training Grounds: Dive Barrel Completed"},
 
 	{["byte"] = 0x34, ["bit"] = 3, ["name"] = "Isles: DK Caged GB", ["type"] = "GB"},
 
@@ -24,6 +28,9 @@ local flag_array = {
 	{["byte"] = 0x37, ["bit"] = 0, ["name"] = "Isles: W4 (High)", ["type"] = "Warp"},
 	{["byte"] = 0x37, ["bit"] = 1, ["name"] = "Isles: W5 (Far)", ["type"] = "Warp"},
 	{["byte"] = 0x37, ["bit"] = 2, ["name"] = "Isles: W5 (Ring)", ["type"] = "Warp"},
+	{["byte"] = 0x37, ["bit"] = 3, ["name"] = "Isles: Japes boulder smashed"},
+
+	{["byte"] = 0x39, ["bit"] = 5, ["name"] = "Japes Lobby: B. Locker Cleared", ["type"] = "B. Locker"},
 
 	{["byte"] = 0x4A, ["bit"] = 6, ["name"] = "Helm: Fairy (1)", ["type"] = "Fairy"},
 	{["byte"] = 0x4A, ["bit"] = 7, ["name"] = "Helm: Fairy (2)", ["type"] = "Fairy"},
@@ -33,6 +40,9 @@ local flag_array = {
 
 	{["byte"] = 0x60, ["bit"] = 5, ["name"] = "Helm: W1 (Entrance)", ["type"] = "Warp"},
 	{["byte"] = 0x60, ["bit"] = 6, ["name"] = "Helm: W1 (Far)", ["type"] = "Warp"},
+
+	{["byte"] = 0x61, ["bit"] = 1, ["name"] = "Cranky's Lab: FTT", ["type"] = "FTT"},
+
 	{["byte"] = 0x62, ["bit"] = 2, ["name"] = "Helm: FTT", ["type"] = "FTT"},
 
 	{["byte"] = 0x13B, ["bit"] = 1, ["name"] = "Training Grounds: Right Tunnel Coin", ["type"] = "Coin"},
