@@ -123,8 +123,12 @@ function toHexString(value, desiredLength, prefix)
 	return prefix..value;
 end
 
+local function isRDRAM(value)
+	return value >= 0x000000 and value < 0x800000;
+end
+
 local function isPointer(value)
-	return value >= 0x80000000 and value <= 0x807FFFFF;
+	return value >= 0x80000000 and value < 0x80800000;
 end
 
 function get_bit(field, index)
@@ -431,7 +435,7 @@ local function populateObjectModel1Pointers()
 	object_pointers = {};
 	for object_no = 0, max_objects do
 		local pointer = mainmemory.read_u24_be(pointer_list + (object_no * 4) + 1);
-		local object_found = pointer > 0x000000 and pointer <= 0x7FFFFF;
+		local object_found = isRDRAM(pointer);
 
 		if object_found and isValidObject(pointer, playerObject, cameraObject) then
 			table.insert(object_pointers, pointer);
@@ -537,7 +541,7 @@ local function getExamineDataModelOne(pointer)
 		local focusedActor = mainmemory.read_u24_be(pointer + camera_focus_pointer + 1);
 		local focusedActorType;
 
-		if focusedActor > 0x000000 and focusedActor < 0x7FFFFF then
+		if isRDRAM(focusedActor) then
 			focusedActorType = mainmemory.read_u32_be(focusedActor + actor_type);
 			if type(actor_types[focusedActorType]) ~= "nil" then
 				focusedActorType = actor_types[focusedActorType];
@@ -664,7 +668,7 @@ local obj_model2_model_rot_z = obj_model2_model_rot_y + 4; -- Float
 
 function getObjectModel2ArraySize()
 	local objModel2Array = mainmemory.read_u24_be(obj_model2_array_pointer + 1);
-	if objModel2Array > 0 and objModel2Array < 0x7FFFFF then
+	if isRDRAM(objModel2Array) then
 		return mainmemory.read_u32_be(objModel2Array - 0x0C) / obj_model2_slot_size;
 	end
 	return 0;
@@ -911,7 +915,7 @@ local yellow_highlight = 0xFFFFFF00;
 
 local function grab_object(pointer)
 	local playerObject = mainmemory.read_u24_be(player_pointer);
-	if playerObject > 0x000000 and playerObject < 0x7FFFFF then
+	if isRDRAM(playerObject) then
 		mainmemory.writebyte(playerObject + grab_pointer, 0x80);
 		mainmemory.write_u24_be(playerObject + grab_pointer + 1, pointer);
 		mainmemory.writebyte(playerObject + grab_pointer + 4, 0x80);
@@ -921,7 +925,7 @@ end
 
 local function focus_object(pointer)
 	local cameraObject = mainmemory.read_u24_be(camera_pointer + 1);
-	if cameraObject > 0x000000 and cameraObject < 0x7FFFFF then
+	if isRDRAM(cameraObject) then
 		mainmemory.writebyte(cameraObject + camera_focus_pointer, 0x80);
 		mainmemory.write_u24_be(cameraObject + camera_focus_pointer + 1, pointer);
 	end
@@ -1005,7 +1009,7 @@ local function draw_gui()
 
 	if rat_enabled then
 		local renderingParams = mainmemory.read_u24_be(playerObject + rendering_parameters_pointer + 1);
-		if renderingParams > 0x000000 and renderingParams < 0x7FFFFF then
+		if isRDRAM(renderingParams) then
 			if math.random() > 0.9 then
 				local timerValue = math.random() * 50;
 				mainmemory.writefloat(renderingParams + anim_timer1, timerValue, true);
