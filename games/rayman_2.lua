@@ -97,10 +97,11 @@ end
 
 function Game.getYRotation()
 	local currentSine = mainmemory.readfloat(rot_base + sine, true);
-	local currentSineMirror = mainmemory.readfloat(rot_base + sine_mirror, true);
 	local currentCosine = mainmemory.readfloat(rot_base + cosine, true);
-	local currentInverseCosine = mainmemory.readfloat(rot_base + cosine_inverse, true);
-	return math.deg(math.acos(currentCosine));
+	if currentSine > 0 then
+		return math.deg(math.acos(currentCosine));
+	end
+	return 360 - math.deg(math.acos(currentCosine));
 end
 
 function Game.getZRotation()
