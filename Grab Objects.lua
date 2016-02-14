@@ -47,6 +47,8 @@ local x_rot = 0xE4; -- u16_be
 local y_rot = x_rot + 2; -- u16_be
 local z_rot = y_rot + 2; -- u16_be
 local hand_state = 0x147; -- Bitfield
+
+local camera_focus_pointer = 0x178;
 local grab_pointer = 0x32C;
 
 ----------------------------
@@ -73,7 +75,7 @@ if bizstring.contains(romName, "Donkey Kong 64") then
 		obj_model2_array_pointer = 0x7F6470;
 	elseif bizstring.contains(romName, "Kiosk") then
 		pointer_list = 0x7B5E58;
-		camera_pointer = 0x7B5918; -- TODO: Does this work?
+		camera_pointer = 0x7B5918;
 		player_pointer = 0x7B5AFD;
 		obj_model2_array_pointer = 0x7F6000; -- TODO
 
@@ -85,6 +87,7 @@ if bizstring.contains(romName, "Donkey Kong 64") then
 		y_rot = x_rot + 2;
 		z_rot = y_rot + 2;
 		hand_state = 0x137;
+		camera_focus_pointer = 0x168;
 		grab_pointer = 0x2F4;
 	end
 	obj_model2_array_count = obj_model2_array_pointer + 4; -- u32_be
@@ -373,8 +376,6 @@ local tb_kickout_timer = 0x1B4;
 
 -- Relative to camera
 -- TODO: Verify for all versions
-local camera_focus_pointer = 0x178;
-
 local camera_viewport_x_position = 0x1FC;
 local camera_viewport_y_position = camera_viewport_x_position + 4;
 local camera_viewport_z_position = camera_viewport_y_position + 4;
