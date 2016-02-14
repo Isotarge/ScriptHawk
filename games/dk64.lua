@@ -22,7 +22,7 @@ Game.Memory = {
 	["security_byte"] = {0x7552E0, 0x74FB60, 0x7553A0, nil}, -- TODO: Kiosk?
 	["security_message"] = {0x75E5DC, 0x7590F0, 0x75E790, nil},
 	["bone_displacement_pointer"] = {0x76FDF8, 0x76A918, 0x76FFE8, nil}, -- TODO: Kiosk
-	["frames_lag"] = {0x76AF10, 0x765A30, 0x76B100, nil}, -- TODO: Kiosk
+	["frames_lag"] = {0x76AF10, 0x765A30, 0x76B100, 0x72D140}, -- TODO: Kiosk only works for minecart?
 	["frames_real"] = {0x7F0560, 0x7F0480, 0x7F09D0, nil}, -- TODO: Make sure freezing these crashes the main thread -- TODO: Kiosk
 	["MJ_state_pointer"] = {0x7FDC90, 0x7FDBD0, 0x7FE120, nil}, -- TODO: Find Mad Jack state based on Model 1 pointer list and actor type knowledge rather than relying on this pointer
 	["slope_object_pointer"] = {0x7F94B8, nil, nil , nil}, -- TODO - PAL, JP & Kiosk, also note this is part of the player object so might be simpler to do getPlayerObject() + offset if it doesn't break anything
@@ -303,6 +303,10 @@ function Game.detectVersion(romName)
 		x_rot = 0xD8;
 		y_rot = x_rot + 2;
 		z_rot = y_rot + 2;
+
+		velocity = 0xB0;
+		y_velocity = 0xB8;
+		y_acceleration = 0xBC;
 
 		-- Kiosk version maps
 		--0 Crash

@@ -39,6 +39,16 @@ local Tiny   = 3;
 local Chunky = 4;
 local Krusha = 5;
 
+-- Kiosk specific Object Model 1 offsets
+local velocity = 0xB8; -- 32 bit float big endian
+local y_velocity = 0xC0; -- 32 bit float big endian
+local y_acceleration = 0xC4; -- 32 bit float big endian
+local x_rot = 0xE4; -- u16_be
+local y_rot = x_rot + 2; -- u16_be
+local z_rot = y_rot + 2; -- u16_be
+local hand_state = 0x147; -- Bitfield
+local grab_pointer = 0x32C;
+
 ----------------------------
 -- Version specific stuff --
 ----------------------------
@@ -66,6 +76,15 @@ if bizstring.contains(romName, "Donkey Kong 64") then
 		camera_pointer = 0x7B5918; -- TODO: Does this work?
 		player_pointer = 0x7B5AFD;
 		obj_model2_array_pointer = 0x7F6000; -- TODO
+
+		-- Kiosk specific Object Model 1 offsets
+		velocity = 0xB0;
+		y_velocity = 0xB8;
+		y_acceleration = 0xBC;
+		x_rot = 0xD8;
+		y_rot = x_rot + 2;
+		z_rot = y_rot + 2;
+		hand_state = 0x137;
 		grab_pointer = 0x2F4;
 	end
 	obj_model2_array_count = obj_model2_array_pointer + 4; -- u32_be
@@ -336,23 +355,13 @@ local z_pos = y_pos + 4; -- 32 bit float big endian
 local floor = 0xA4; -- 32 bit float big endian
 local distance_from_floor = 0xB4; -- 32 bit float big endian
 
-local velocity = 0xB8; -- 32 bit float big endian
 --local acceleration = 0xBC; -- Seems wrong
-
-local y_velocity = 0xC0; -- 32 bit float big endian
-local y_acceleration = 0xC4; -- 32 bit float big endian
 local gravity_strength = 0xC8; -- 32 bit float big endian
 
 local light_thing = 0xCC; -- Values 0x00->0x14
 
-local x_rot = 0xE4; -- TODO: Earlier in the Kiosk version
-local y_rot = x_rot + 2;
-local z_rot = y_rot + 2;
-
 local health = 0x134; -- s16_be
 local takes_enemy_damage = 0x13B;
-
-local hand_state = 0x147; -- Bitfield, TODO: 0x137 in the Kiosk version
 
 local shade_byte = 0x16D;
 
@@ -388,7 +397,7 @@ local text_shown = 0x1EE; -- 16 bit uint -- TODO: This needs to be in a separate
 
 -- Relative to player
 local grabbed_vine_pointer = 0x2B0;
-local grab_pointer = 0x32C;
+
 local fairy_active = 0x36C;
 
 -- Relative to rendering params

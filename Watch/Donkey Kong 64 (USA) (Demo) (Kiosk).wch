@@ -1,4 +1,3 @@
-Domain RDRAM
 SystemID N64
 6F9EB8	b	u	1	RDRAM	Character
 6FF054	d	h	1	RDRAM	Object Model 2 Collision Linked List Pointer
@@ -21,7 +20,7 @@ SystemID N64
 7A12C0	d	h	1	RDRAM	Linked List Pointer
 7A1E14	d	h	1	RDRAM	Camera Pointer
 7B5918	d	h	1	RDRAM	Camera Pointer
-7B5AFC	d	h	1	RDRAM	Kong Object Pointer
+7B5AFC	d	h	1	RDRAM	Player Pointer
 7B5B12	b	b	1	RDRAM	Zipper Byte
 7B5B13	b	b	1	RDRAM	Tag Barrel Void Byte
 7B675E	b	u	1	RDRAM	Health

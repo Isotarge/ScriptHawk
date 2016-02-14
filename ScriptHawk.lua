@@ -8,6 +8,14 @@ end
 
 function isnan(x) return x ~= x end
 
+function divisibleBy(number, divisor)
+	if type(number) == "number" and (not isnan(number)) and number ~= 0 and type(divisor) == "number" and (not isnan(divisor)) and divisor ~= 0 then
+		local divValue = number / divisor;
+		return math.floor(divValue) == divValue;
+	end
+	return false;
+end
+
 function esc(str)
 	return (str:gsub('%%', '%%%%')
 		:gsub('%^', '%%%^')
