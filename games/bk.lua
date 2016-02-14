@@ -719,28 +719,17 @@ function getSelectedFFAnswer()
 	if ff_question_object > 0x000000 and ff_question_object < 0x3FFFFF then
 		return mainmemory.readbyte(ff_question_object + ff_current_answer);
 	end
+	return 0;
 end
 
+-- TODO: Doesn't always work
 function getCorrectFFAnswer()
 	local ff_question_object = mainmemory.read_u24_be(ff_question_pointer + 1);
 	if ff_question_object > 0x000000 and ff_question_object < 0x3FFFFF then
 		return mainmemory.readbyte(ff_question_object + ff_correct_answer);
 	end
+	return 0;
 end
-
-ui_ff_x = 100;
-ui_ff_y_base = 100;
-ui_ff_answer_height = 16;
-
--- TODO: Finish this
-function doFFHelp()
-	local selectedAnswer = getSelectedFFAnswer();
-	local correctAnswer = getCorrectFFAnswer();
-	if type(correctAnswer) == "number" and correctAnswer >= 0 and correctAnswer <= 3 then
-		gui.drawText(ui_ff_x, ui_ff_y_base + ui_ff_answer_height * correctAnswer, "ya"..correctAnswer);
-	end
-end
---event.onframestart(doFFHelp, "ScriptHawk - Furnace Fun helper");
 
 ----------------------
 -- Vile state stuff --
@@ -1239,6 +1228,7 @@ Game.OSD = {
 	{"Separator", 1},
 	{"Movement", Game.getCurrentMovementState, Game.colorCurrentMovementState},
 	{"Slope Timer", Game.getSlopeTimer, Game.colorSlopeTimer},
+	--{"FF Answer", getCorrectFFAnswer},
 };
 
 return Game;
