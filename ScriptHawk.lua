@@ -52,6 +52,7 @@ function get_bit(field, index)
 	end
 	return false;
 end
+getBit = get_bit;
 
 function set_bit(field, index)
 	if index < 32 then
@@ -60,6 +61,7 @@ function set_bit(field, index)
 	end
 	return field;
 end
+setBit = set_bit;
 
 function clear_bit(field, index)
 	if index < 32 then
@@ -68,6 +70,7 @@ function clear_bit(field, index)
 	end
 	return field;
 end
+clearBit = clear_bit;
 
 function deepcompare(t1, t2, ignore_mt)
 	local ty1 = type(t1);

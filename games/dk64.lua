@@ -1190,7 +1190,7 @@ end
 -- DK64 - Mad Jack Minimap
 -- Written by Isotarge, 2014-2015
 -----------------------------------
-local script_root = "Lua/ScriptHawk"; -- TODO: Move this to ScriptHawk.lua, it'll probably be useful in other places eventually
+script_root = "ScriptHawk"; -- TODO: Move this to ScriptHawk.lua, it'll probably be useful in other places eventually
 
 -- Colors (ARGB)
 local MJ_blue         = 0x7F00A2E8;
@@ -1215,22 +1215,8 @@ local MJ_kong_row_y                  = MJ_time_until_next_action_y + MJ_minimap_
 local MJ_kong_col_y                  = MJ_kong_row_y + MJ_minimap_height;
 
 local function position_to_rowcol(pos)
-	if pos < 450 then
-		return 0;
-	elseif pos < 570 then
-		return 1;
-	elseif pos < 690 then
-		return 2;
-	elseif pos < 810 then
-		return 3;
-	elseif pos < 930 then
-		return 4;
-	elseif pos < 1050 then
-		return 5;
-	elseif pos < 1170 then
-		return 6;
-	end
-	return 7;
+	pos = math.floor((pos - 330) / 120); -- Calculate row index
+	return math.min(7, math.max(0, pos)); -- Clamp between 0 and 7
 end
 
 local function get_kong_position()
@@ -1271,12 +1257,10 @@ local function MJ_get_color(col, row)
 end
 
 local function MJ_get_action_type(phase_byte)
-	if phase_byte == 0x08 or phase_byte == 0x0a or phase_byte == 0x0b or phase_byte == 0x0c or phase_byte == 0x0e then
-		return "Jump";
+	if phase_byte == 0x28 or phase_byte == 0x2D or phase_byte == 0x32 then
+		return "Fireball";
 	elseif phase_byte == 0x01 or phase_byte == 0x05 then
 		return "Laser";
-	elseif phase_byte == 0x28 or phase_byte == 0x2D or phase_byte == 0x32 then
-		return "Fireball";
 	end
 	return "Jump";
 end
@@ -1344,7 +1328,7 @@ local function draw_mj_minimap()
 
 		local switches_active = white_pos.active or blue_pos.active;
 
-		local row, col, x, y, color;
+		local x, y, color;
 
 		gui.clearGraphics();
 
@@ -1372,18 +1356,22 @@ local function draw_mj_minimap()
 
 				if switches_active then
 					if (white_pos.row == row and white_pos.col == col) or (blue_pos.row == row and blue_pos.col == col) then
-						gui.drawImage(script_root.."/Images/switch.png", x, y, MJ_minimap_width, MJ_minimap_height);
+						--gui.drawImage(script_root.."/Images/switch.png", x, y, MJ_minimap_width, MJ_minimap_height); -- TODO: Fix
+						gui.drawText(x, y, "S");
 					end
 				end
 
 				if cur_pos.row == row and cur_pos.col == col then
-					gui.drawImage(script_root.."/Images/jack_icon.png", x, y, MJ_minimap_width, MJ_minimap_height);
+					--gui.drawImage(script_root.."/Images/jack_icon.png", x, y, MJ_minimap_width, MJ_minimap_height); -- TODO: Fix
+					gui.drawText(x, y, "J")
 				elseif next_pos.row == row and next_pos.col == col then
-					gui.drawImage(MJ_get_arrow_image(cur_pos, next_pos), x, y, MJ_minimap_width, MJ_minimap_height);
+					--gui.drawImage(MJ_get_arrow_image(cur_pos, next_pos), x, y, MJ_minimap_width, MJ_minimap_height); -- TODO: Fix
+					gui.drawText(x, y, "N");
 				end
 
 				if kong_position.row == row and kong_position.col == col then
-					gui.drawImage(script_root.."/Images/TinyFaceEdited.png", x, y, MJ_minimap_width, MJ_minimap_height);
+					--gui.drawImage(script_root.."/Images/TinyFaceEdited.png", x, y, MJ_minimap_width, MJ_minimap_height); -- TODO: Fix
+					gui.drawText(x, y, "K");
 				end
 			end
 		end
@@ -1416,7 +1404,7 @@ end
 local slope_timer = 0xC3;
 
 local function neverSlip()
-	if version ~= 1 then -- TODO: PAL, JP, Kiosk
+	if version == 1 then -- TODO: PAL, JP, Kiosk
 		-- Patch the slope timer
 		local slopeObject = mainmemory.read_u32_be(Game.Memory.slope_object_pointer[version]);
 		if isPointer(slopeObject) then
@@ -1445,7 +1433,7 @@ event.onloadstate(breakBoneDisplacement, "ScriptHawk - Break bone displacement")
 local function applyBoneDisplacementFix()
 	if version ~= 4 then -- TODO: Kiosk
 		-- Old fix basically crashes sound thread, seems to work well but... no sound.
-		mainmemory.write_u32_be(Game.Memory.bone_displacement_pointer[version], 0x00000000);
+		mainmemory.write_u32_be(Game.Memory.bone_displacement_pointer[version], 0);
 	end
 end
 
@@ -1961,7 +1949,7 @@ local framebuffer_color_bit_constants = {
 };
 
 function fillFB()
-	if version ~= 4 then
+	if version ~= 4 then -- TODO: Kiosk
 		local image_filename = forms.openfile(nil, nil, "All Files (*.*)|*.*");
 		if image_filename == "" then
 			print("No image selected. Exiting.");
@@ -2064,6 +2052,49 @@ function Game.initUI()
 	
 	-- Output flag statistics
 	flagStats();
+end
+
+----------------------
+-- High Score Stuff --
+----------------------
+
+local arcadeScores = { -- TODO: How long can these names be
+	{"AAA", 0}, -- TODO: Get some good scores with proof
+};
+
+local enguardeScores = {
+	{"JON", 430}, -- https://www.youtube.com/watch?v=VrFWWcGlKOE
+	{"ING", 420}, -- https://www.youtube.com/watch?v=UEPeqomGHN4
+};
+
+local jetpacScores = { -- TODO: How long can these names be
+	{"AAA", 0}, -- TODO: Get some good scores with proof
+};
+
+local rambiBase = 0x744548; -- TODO: Port to all versions
+local scoreBase = 0;
+local nameBase = 2;
+local scoreInstanceSize = 6;
+
+local rambiScores = {
+	{"BIS", 220}, -- http://www.twitch.tv/bismuth9/v/42515576
+};
+
+function Game.getScore(index)
+	readNullTerminatedString();
+end
+
+function Game.setScore(index, name, score)
+	if version ~= 4 then -- TODO: Are the scores in Kiosk or nah
+		mainmemory.write_u16_be(rambiBase + index * scoreInstanceSize + scoreBase, score);
+		for i = 0, 3 do
+			mainmemory.writebyte(rambiBase + index * scoreInstanceSize + nameBase, string.byte(name, i))
+		end
+	end
+end
+
+function Game.setHighScores()
+	-- TODO
 end
 
 function Game.unlock_menus()

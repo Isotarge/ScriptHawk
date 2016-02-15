@@ -507,6 +507,7 @@ local movementStates = {
 	[140] = "Flying", -- Bee
 	[141] = "Locked", -- Mumbo transformation, Mr. Vile
 	[142] = "Locked", -- Jiggy podium, Bottles' text outside Mumbo's
+	[143] = "Locked", -- Pumpkin
 	[145] = "Damaged", -- Flying
 	[147] = "Locked", -- Pumpkin?
 	[148] = "Locked", -- Mumbo transformation
@@ -690,6 +691,7 @@ end
 
 local options_allow_ff_patch;
 
+-- TODO: Figure out how to patch for other versions
 local function applyFurnaceFunPatch()
 	if allowFurnaceFunPatch and forms.ischecked(options_allow_ff_patch) then
 		mainmemory.write_u16_be(0x320064, 0x080A);
