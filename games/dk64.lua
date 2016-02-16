@@ -1190,7 +1190,7 @@ end
 -- DK64 - Mad Jack Minimap
 -- Written by Isotarge, 2014-2015
 -----------------------------------
-script_root = "ScriptHawk"; -- TODO: Move this to ScriptHawk.lua, it'll probably be useful in other places eventually
+image_directory_root = ".\\Images\\"; -- TODO: Move this to ScriptHawk.lua, it'll probably be useful in other places eventually
 
 -- Colors (ARGB)
 local MJ_blue         = 0x7F00A2E8;
@@ -1283,28 +1283,28 @@ end
 local function MJ_get_arrow_image(current, new)
 	if new.row > current.row then
 		if new.col > current.col then
-			return script_root.."/Images/up_right.png";
+			return image_directory_root.."up_right.png";
 		elseif new.col == current.col then
-			return script_root.."/Images/up.png";
+			return image_directory_root.."up.png";
 		elseif new.col < current.col then
-			return script_root.."/Images/up_left.png";
+			return image_directory_root.."up_left.png";
 		end
 	elseif new.row == current.row then
 		if new.col > current.col then
-			return script_root.."/Images/right.png";
+			return image_directory_root.."right.png";
 		elseif new.col < current.col then
-			return script_root.."/Images/left.png";
+			return image_directory_root.."left.png";
 		end
 	elseif new.row < current.row then
 		if new.col > current.col then
-			return script_root.."/Images/down_right.png";
+			return image_directory_root.."down_right.png";
 		elseif new.col == current.col then
-			return script_root.."/Images/down.png";
+			return image_directory_root.."down.png";
 		elseif new.col < current.col then
-			return script_root.."/Images/down_left.png";
+			return image_directory_root.."down_left.png";
 		end
 	end
-	return script_root.."/Images/question-mark.png";
+	return image_directory_root.."question-mark.png";
 end
 
 local function MJ_parse_position(position)
@@ -1356,22 +1356,22 @@ local function draw_mj_minimap()
 
 				if switches_active then
 					if (white_pos.row == row and white_pos.col == col) or (blue_pos.row == row and blue_pos.col == col) then
-						--gui.drawImage(script_root.."/Images/switch.png", x, y, MJ_minimap_width, MJ_minimap_height); -- TODO: Fix
-						gui.drawText(x, y, "S");
+						gui.drawImage(image_directory_root.."switch.png", x, y, MJ_minimap_width, MJ_minimap_height); -- TODO: Fix
+						--gui.drawText(x, y, "S");
 					end
 				end
 
 				if cur_pos.row == row and cur_pos.col == col then
-					--gui.drawImage(script_root.."/Images/jack_icon.png", x, y, MJ_minimap_width, MJ_minimap_height); -- TODO: Fix
-					gui.drawText(x, y, "J")
+					gui.drawImage(image_directory_root.."jack_icon.png", x, y, MJ_minimap_width, MJ_minimap_height); -- TODO: Fix
+					--gui.drawText(x, y, "J")
 				elseif next_pos.row == row and next_pos.col == col then
-					--gui.drawImage(MJ_get_arrow_image(cur_pos, next_pos), x, y, MJ_minimap_width, MJ_minimap_height); -- TODO: Fix
-					gui.drawText(x, y, "N");
+					gui.drawImage(MJ_get_arrow_image(cur_pos, next_pos), x, y, MJ_minimap_width, MJ_minimap_height); -- TODO: Fix
+					--gui.drawText(x, y, "N");
 				end
 
 				if kong_position.row == row and kong_position.col == col then
-					--gui.drawImage(script_root.."/Images/TinyFaceEdited.png", x, y, MJ_minimap_width, MJ_minimap_height); -- TODO: Fix
-					gui.drawText(x, y, "K");
+					gui.drawImage(image_directory_root.."TinyFaceEdited.png", x, y, MJ_minimap_width, MJ_minimap_height); -- TODO: Fix
+					--gui.drawText(x, y, "K");
 				end
 			end
 		end
