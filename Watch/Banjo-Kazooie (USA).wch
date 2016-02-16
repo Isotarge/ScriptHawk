@@ -1,4 +1,3 @@
-Domain RDRAM
 SystemID N64
 02D500	d	h	1	RDRAM	Huge linked list root, investigate further
 2808D8	d	s	1	RDRAM	Frame timer
@@ -148,9 +147,10 @@ SystemID N64
 37D9E4	d	f	1	RDRAM	Camera Y vel?
 37D9E8	d	f	1	RDRAM	Camera Z vel?
 37DC70	d	f	1	RDRAM	C-Up camera angle
-37DCB3	b	u	1	RDRAM	MM Hut index
+37DCB0	d	s	1	RDRAM	MM Hut index
 37DDB4	d	f	1	RDRAM	Jiggy Spawn Angle
 37DDB8	d	f	1	RDRAM	Jiggy Spawn Velocity
+37DF68	d	u	1	RDRAM	Bottles Bonus Puzzle Index
 37E8E8	d	f	1	RDRAM	Game runtime
 37E8F0	d	f	1	RDRAM	Map runtime
 37E8F4	b	h	1	RDRAM	Map Load State

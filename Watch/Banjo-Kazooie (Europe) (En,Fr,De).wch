@@ -1,4 +1,3 @@
-Domain RDRAM
 SystemID N64
 280700	d	s	1	RDRAM	Frame timer
 280704	d	s	1	RDRAM	Frameskip
@@ -73,10 +72,10 @@ SystemID N64
 37DD45	b	h	1	RDRAM	Peck Bizzo
 37DD46	b	h	1	RDRAM	Peck Bizzo
 37E578	d	f	1	RDRAM	Camera Y Rotation
-37E683	b	u	1	RDRAM	MM Hut index
+37E680	d	s	1	RDRAM	MM Hut index
 37E784	d	f	1	RDRAM	Jiggy Spawn Angle
 37E788	d	f	1	RDRAM	Jiggy Spawn Velocity
-37E93B	b	h	1	RDRAM	Bottles Bonus Puzzle Index
+37E938	d	u	1	RDRAM	Bottles Bonus Puzzle Index
 37F2B7	b	h	1	RDRAM	Demo State
 37F2B8	d	f	1	RDRAM	Game Time
 37F2C0	d	f	1	RDRAM	Map Time
