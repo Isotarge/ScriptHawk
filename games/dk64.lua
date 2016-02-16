@@ -1356,21 +1356,21 @@ local function draw_mj_minimap()
 
 				if switches_active then
 					if (white_pos.row == row and white_pos.col == col) or (blue_pos.row == row and blue_pos.col == col) then
-						gui.drawImage(image_directory_root.."switch.png", x, y, MJ_minimap_width, MJ_minimap_height); -- TODO: Fix
+						gui.drawImage(image_directory_root.."switch.png", x, y, MJ_minimap_width, MJ_minimap_height);
 						--gui.drawText(x, y, "S");
 					end
 				end
 
 				if cur_pos.row == row and cur_pos.col == col then
-					gui.drawImage(image_directory_root.."jack_icon.png", x, y, MJ_minimap_width, MJ_minimap_height); -- TODO: Fix
+					gui.drawImage(image_directory_root.."jack_icon.png", x, y, MJ_minimap_width, MJ_minimap_height);
 					--gui.drawText(x, y, "J")
 				elseif next_pos.row == row and next_pos.col == col then
-					gui.drawImage(MJ_get_arrow_image(cur_pos, next_pos), x, y, MJ_minimap_width, MJ_minimap_height); -- TODO: Fix
+					gui.drawImage(MJ_get_arrow_image(cur_pos, next_pos), x, y, MJ_minimap_width, MJ_minimap_height);
 					--gui.drawText(x, y, "N");
 				end
 
 				if kong_position.row == row and kong_position.col == col then
-					gui.drawImage(image_directory_root.."TinyFaceEdited.png", x, y, MJ_minimap_width, MJ_minimap_height); -- TODO: Fix
+					gui.drawImage(image_directory_root.."TinyFaceEdited.png", x, y, MJ_minimap_width, MJ_minimap_height);
 					--gui.drawText(x, y, "K");
 				end
 			end
