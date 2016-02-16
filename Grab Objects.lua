@@ -39,119 +39,7 @@ local Tiny   = 3;
 local Chunky = 4;
 local Krusha = 5;
 
--- Kiosk specific Object Model 1 offsets
-local velocity = 0xB8; -- 32 bit float big endian
-local y_velocity = 0xC0; -- 32 bit float big endian
-local y_acceleration = 0xC4; -- 32 bit float big endian
-local x_rot = 0xE4; -- u16_be
-local y_rot = x_rot + 2; -- u16_be
-local z_rot = y_rot + 2; -- u16_be
-local hand_state = 0x147; -- Bitfield
-
-local camera_focus_pointer = 0x178;
-local grab_pointer = 0x32C;
-
-----------------------------
--- Version specific stuff --
-----------------------------
-
-local romName = gameinfo.getromname();
-
-if bizstring.contains(romName, "Donkey Kong 64") then
-	if bizstring.contains(romName, "USA") and not bizstring.contains(romName, "Kiosk") then
-		pointer_list = 0x7FBFF0;
-		camera_pointer = 0x7FB968;
-		player_pointer = 0x7FBB4D;
-		obj_model2_array_pointer = 0x7F6000;
-	elseif bizstring.contains(romName, "Europe") then
-		pointer_list = 0x7FBF10;
-		camera_pointer = 0x7FB888;
-		player_pointer = 0x7FBA6D;
-		obj_model2_array_pointer = 0x7F5F20;
-	elseif bizstring.contains(romName, "Japan") then
-		pointer_list = 0x7FC460;
-		camera_pointer = 0x7FBDD8;
-		player_pointer = 0x7FBFBD;
-		obj_model2_array_pointer = 0x7F6470;
-	elseif bizstring.contains(romName, "Kiosk") then
-		pointer_list = 0x7B5E58;
-		camera_pointer = 0x7B5918;
-		player_pointer = 0x7B5AFD;
-		obj_model2_array_pointer = 0x7F6000; -- TODO
-
-		-- Kiosk specific Object Model 1 offsets
-		velocity = 0xB0;
-		y_velocity = 0xB8;
-		y_acceleration = 0xBC;
-		x_rot = 0xD8;
-		y_rot = x_rot + 2;
-		z_rot = y_rot + 2;
-		hand_state = 0x137;
-		camera_focus_pointer = 0x168;
-		grab_pointer = 0x2F4;
-	end
-	obj_model2_array_count = obj_model2_array_pointer + 4; -- u32_be
-else
-	print("This game is not supported.");
-	return;
-end
-
-----------------------
--- Helper functions --
-----------------------
-
-max_string_length = 25;
-function readNullTerminatedString(base)
-	local builtString = "";
-	local length = 0;
-	local nextByte = mainmemory.readbyte(base + length);
-	repeat
-		builtString = builtString..string.char(nextByte);
-		length = length + 1;
-		nextByte = mainmemory.readbyte(base + length);
-	until nextByte == 0 or length > max_string_length;
-	return builtString;
-end
-
-function toHexString(value, desiredLength, prefix)
-	value = string.format("%X", value or 0);
-	prefix = prefix or "0x";
-	desiredLength = desiredLength or string.len(value);
-	while string.len(value) < desiredLength do
-		value = "0"..value;
-	end
-	return prefix..value;
-end
-
-local function isRDRAM(value)
-	return value >= 0x000000 and value < 0x800000;
-end
-
-local function isPointer(value)
-	return value >= 0x80000000 and value < 0x80800000;
-end
-
-function get_bit(field, index)
-	if index < 32 then
-		local bitmask = math.pow(2, index);
-		return bit.band(bitmask, field) == bitmask;
-	end
-	return false;
-end
-
-----------------------------------
--- Object Model 1 documentation --
-----------------------------------
-
--- Relative to objects found in the model 1 pointer list
-local previous_object = -0x10; -- u32_be
-local object_size = -0x0C; -- u32_be
-
-local model_pointer = 0x00; -- u32_be
-local rendering_parameters_pointer = 0x04; -- u32_be
-local current_bone_array_pointer = 0x08; -- u32_be
-
-local actor_type = 0x58; -- u32_be
+-- These are different on Kiosk so we declare before version detection to allow overwriting
 local actor_types = {
 	[2] = "DK",
 	[3] = "Diddy",
@@ -347,6 +235,139 @@ local actor_types = {
 	[340] = "Bug Enemy (Castle Trash Can)",
 	[342] = "Try Again Dialog",
 };
+
+-- Kiosk specific Object Model 1 offsets
+local velocity = 0xB8; -- 32 bit float big endian
+local y_velocity = 0xC0; -- 32 bit float big endian
+local y_acceleration = 0xC4; -- 32 bit float big endian
+local x_rot = 0xE4; -- u16_be
+local y_rot = x_rot + 2; -- u16_be
+local z_rot = y_rot + 2; -- u16_be
+local hand_state = 0x147; -- Bitfield
+
+local camera_focus_pointer = 0x178;
+local grab_pointer = 0x32C;
+
+----------------------------
+-- Version specific stuff --
+----------------------------
+
+local romName = gameinfo.getromname();
+
+if bizstring.contains(romName, "Donkey Kong 64") then
+	if bizstring.contains(romName, "USA") and not bizstring.contains(romName, "Kiosk") then
+		pointer_list = 0x7FBFF0;
+		camera_pointer = 0x7FB968;
+		player_pointer = 0x7FBB4D;
+		obj_model2_array_pointer = 0x7F6000;
+	elseif bizstring.contains(romName, "Europe") then
+		pointer_list = 0x7FBF10;
+		camera_pointer = 0x7FB888;
+		player_pointer = 0x7FBA6D;
+		obj_model2_array_pointer = 0x7F5F20;
+	elseif bizstring.contains(romName, "Japan") then
+		pointer_list = 0x7FC460;
+		camera_pointer = 0x7FBDD8;
+		player_pointer = 0x7FBFBD;
+		obj_model2_array_pointer = 0x7F6470;
+	elseif bizstring.contains(romName, "Kiosk") then
+		pointer_list = 0x7B5E58;
+		camera_pointer = 0x7B5918;
+		player_pointer = 0x7B5AFD;
+		obj_model2_array_pointer = 0x7F6000; -- TODO
+
+		actor_types = {
+			[2] = "DK",
+			[3] = "Diddy",
+			[4] = "Lanky",
+			[5] = "Tiny",
+			[6] = "Chunky",
+			[25] = "TNT Barrel",
+			[26] = "TNT Barrel Spawner (Armydillo)",
+			[29] = "Fireball", -- Armydillo, Dogadon
+			[71] = "Boss Key",
+			[96] = "TNT Barrel Spawner (Dogadon)",
+			[145] = "Armydillo",
+			[149] = "Camera",
+			[201] = "Dogadon",
+			[221] = "Static Object", -- Fake Chunky in Dogadon 2 opening cutscene
+			[230] = "Fireball Shockwave", -- Dogadon
+			[232] = "Light Beam", -- Boss fights etc
+		};
+
+		-- Kiosk specific Object Model 1 offsets
+		velocity = 0xB0;
+		y_velocity = 0xB8;
+		y_acceleration = 0xBC;
+		x_rot = 0xD8;
+		y_rot = x_rot + 2;
+		z_rot = y_rot + 2;
+		hand_state = 0x137;
+		camera_focus_pointer = 0x168;
+		grab_pointer = 0x2F4;
+	end
+	obj_model2_array_count = obj_model2_array_pointer + 4; -- u32_be
+else
+	print("This game is not supported.");
+	return;
+end
+
+----------------------
+-- Helper functions --
+----------------------
+
+max_string_length = 25;
+function readNullTerminatedString(base)
+	local builtString = "";
+	local length = 0;
+	local nextByte = mainmemory.readbyte(base + length);
+	repeat
+		builtString = builtString..string.char(nextByte);
+		length = length + 1;
+		nextByte = mainmemory.readbyte(base + length);
+	until nextByte == 0 or length > max_string_length;
+	return builtString;
+end
+
+function toHexString(value, desiredLength, prefix)
+	value = string.format("%X", value or 0);
+	prefix = prefix or "0x";
+	desiredLength = desiredLength or string.len(value);
+	while string.len(value) < desiredLength do
+		value = "0"..value;
+	end
+	return prefix..value;
+end
+
+local function isRDRAM(value)
+	return value >= 0x000000 and value < 0x800000;
+end
+
+local function isPointer(value)
+	return value >= 0x80000000 and value < 0x80800000;
+end
+
+function get_bit(field, index)
+	if index < 32 then
+		local bitmask = math.pow(2, index);
+		return bit.band(bitmask, field) == bitmask;
+	end
+	return false;
+end
+
+----------------------------------
+-- Object Model 1 documentation --
+----------------------------------
+
+-- Relative to objects found in the model 1 pointer list
+local previous_object = -0x10; -- u32_be
+local object_size = -0x0C; -- u32_be
+
+local model_pointer = 0x00; -- u32_be
+local rendering_parameters_pointer = 0x04; -- u32_be
+local current_bone_array_pointer = 0x08; -- u32_be
+
+local actor_type = 0x58; -- u32_be
 
 local visibility = 0x63; -- Bitfield -- TODO: Fully document
 
@@ -1064,7 +1085,7 @@ local function draw_gui()
 			row = row + 1;
 			for i = #object_pointers, 1, -1 do
 				local currentActorType = mainmemory.read_u32_be(object_pointers[i] + actor_type);
-				local currentActorSize = mainmemory.read_u32_be(object_pointers[i] + object_size)
+				local currentActorSize = mainmemory.read_u32_be(object_pointers[i] + object_size); -- TODO: Got an exception here while kiosk was booting
 				if type(actor_types[currentActorType]) ~= "nil" then
 					currentActorType = actor_types[currentActorType];
 				end
