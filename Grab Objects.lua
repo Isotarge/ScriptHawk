@@ -125,6 +125,7 @@ local actor_types = {
 	[134] = "Training Barrel",
 	[135] = "Boombox (Treehouse)",
 	[136] = "Tag Barrel",
+	[137] = "Tag Barrel", -- Troff'n'Scoff
 	[138] = "B. Locker",
 	[139] = "Rainbow Coin Patch",
 	[140] = "Rainbow Coin (Spawner?)",
