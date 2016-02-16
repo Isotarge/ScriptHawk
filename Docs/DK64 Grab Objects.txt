@@ -1,12 +1,4 @@
-How to use grab objects.lua
-
-Keyboard shortcuts
-
-c = Cycle Grab Script mode
-v = Grab an object (only works when examining/listing object model 1)
-b = Focus the camera on an object (only works when examining/listing object model 1)
-n = Previous object
-m = Next object
+How to use Grab Objects.lua
 
 Grab Objects.lua allows you to list and examine details about the currently loaded objects
 from two (of likely three+) object models in DK64. 
@@ -14,10 +6,19 @@ from two (of likely three+) object models in DK64.
 "List" shows all currently loaded objects from that model
 "Examine" shows all known details about the currently selected object
 
+Keyboard shortcuts:
+
+c = Cycle Grab Script mode
+v = Grab an object (only works when examining/listing object model 1)
+b = Focus the camera on an object (only works when examining/listing object model 1)
+n = Previous object
+m = Next object
+
 Model 1 contains Actors, for example:
 - Player
 - Camera
 - Enemies & Bosses
+- Blueprints
 - Boss keys (except key 8)
 - Banana fairies
 - Bonus barrels
@@ -47,3 +48,9 @@ It is currently unknown where the following objects are stored:
 - etc etc
 
 Butterflies use standard bone arrays to render
+
+Stuff you can toggle with the lua console:
+
+encircle_enabled (boolean) - Circles objects from the currently selected object model around the player, warning: crashy & laggy
+rat_enabled (boolean) - Sets the animation timers for the player randomly
+hide_non_scripted (boolean) - Hides model 2 objects without special behavior scripts

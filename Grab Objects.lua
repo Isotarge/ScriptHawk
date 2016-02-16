@@ -5,7 +5,6 @@ local obj_model2_array_pointer;
 local obj_model2_array_count;
 
 hide_non_scripted = false;
-safeMode = true;
 encircle_enabled = false;
 rat_enabled = false;
 local object_pointers = {};
