@@ -1,0 +1,49 @@
+How to use grab objects.lua
+
+Keyboard shortcuts
+
+c = Cycle Grab Script mode
+v = Grab an object (only works when examining/listing object model 1)
+b = Focus the camera on an object (only works when examining/listing object model 1)
+n = Previous object
+m = Next object
+
+Grab Objects.lua allows you to list and examine details about the currently loaded objects
+from two (of likely three+) object models in DK64. 
+
+"List" shows all currently loaded objects from that model
+"Examine" shows all known details about the currently selected object
+
+Model 1 contains Actors, for example:
+- Player
+- Camera
+- Enemies & Bosses
+- Boss keys (except key 8)
+- Banana fairies
+- Bonus barrels
+- Boulders/Barrels
+- Rainbow coin pads
+- Cutscene and Bonus Barrel controllers
+- Loading zone controller
+- Fake Kongs (caged, DKRAP, test room, cutscenes)
+- Balloons
+
+Model 2 contains lightweight objects, for example:
+- Gold Bananas
+- Key 8
+- Banana coins
+- Colored Bananas (singles & bunches)
+- Ammo crates
+- Crystal coconuts
+- Bananaporters
+- Instrument pads
+- Bullet switches
+- Simian Slam switches
+- Gorilla Grab levers
+
+It is currently unknown where the following objects are stored:
+- Butterflies
+- Fish
+- etc etc
+
+Butterflies use standard bone arrays to render
