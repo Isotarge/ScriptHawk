@@ -668,7 +668,7 @@ local GBStates = {
 	[Chunky] = 0x21,
 };
 
-function isGB(collectableState)
+function isGB(collectableState) -- TODO: When rolling this into the DK64 module use array_contains
 	for kong = DK, Chunky do
 		if collectableState == GBStates[kong] then
 			return true;

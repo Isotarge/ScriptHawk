@@ -1,4 +1,3 @@
-Domain RDRAM
 SystemID N64
 014DC4	d	h	1	RDRAM	Controller Input P1
 014DC6	b	s	1	RDRAM	Joystick X (P1)
@@ -31,6 +30,11 @@ SystemID N64
 4B210F	b	u	1	RDRAM	Main menu position
 4B2904	b	h	1	RDRAM	FF for voidout on main menu?!?
 744470	d	h	1	RDRAM	Framebuffer Pointer
+744478	d	u	1	RDRAM	Current Lag Speed Boost
+74447C	b	u	1	RDRAM	Squish Screen (Left)
+744480	b	u	1	RDRAM	Squish Screen (Right)
+744484	b	u	1	RDRAM	Squish Screen (Top)
+744488	b	u	1	RDRAM	Squish Screen (Bottom)
 7444C0	b	u	1	RDRAM	Screen Size
 7444E4	d	u	1	RDRAM	Map
 7444E8	d	u	1	RDRAM	Exit
