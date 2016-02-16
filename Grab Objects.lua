@@ -993,14 +993,16 @@ local function process_input()
 		increase_object_index_pressed = true;
 	end
 
-	if input_table[grab_object_key] == true and grab_object_pressed == false and bizstring.contains(grab_script_mode, "Model 1") then
-		grab_object(object_pointers[object_index]);
-		grab_object_pressed = true;
-	end
+	if bizstring.contains(grab_script_mode, "Model 1") then
+		if input_table[grab_object_key] == true and grab_object_pressed == false then
+			grab_object(object_pointers[object_index]);
+			grab_object_pressed = true;
+		end
 
-	if input_table[focus_object_key] == true and focus_object_pressed == false and bizstring.contains(grab_script_mode, "Model 1") then
-		focus_object(object_pointers[object_index]);
-		focus_object_pressed = true;
+		if input_table[focus_object_key] == true and focus_object_pressed == false then
+			focus_object(object_pointers[object_index]);
+			focus_object_pressed = true;
+		end
 	end
 
 	if input_table[switch_grab_script_mode_key] == true and switch_grab_script_mode_pressed == false then
