@@ -17,7 +17,7 @@ Game.Memory = {
 	["global_base"] = {0x7FCC41, 0x7FCB81, 0x7FD0D1, 0x7B6754},
 	["kong_base"] = {0x7FC950, 0x7FC890, 0x7FCDE0, nil}, -- TODO: Kiosk?
 	["menu_flags"] = {0x7ED558, 0x7ED478, 0x7ED9C8, nil},
-	["framebuffer_pointer"] = {0x7F07F4, 0x73EBC0, 0x743D30, nil}, -- TODO: Kiosk
+	["framebuffer_pointer"] = {0x7F07F4, 0x73EBC0, 0x743D30, 0x72CDA0},
 	["flag_block_pointer"] = {0x7654F4, 0x760014, 0x7656E4, nil},
 	["security_byte"] = {0x7552E0, 0x74FB60, 0x7553A0, nil}, -- TODO: Kiosk?
 	["security_message"] = {0x75E5DC, 0x7590F0, 0x75E790, nil},
@@ -1949,31 +1949,27 @@ local framebuffer_color_bit_constants = {
 };
 
 function fillFB()
-	if version ~= 4 then -- TODO: Kiosk
-		local image_filename = forms.openfile(nil, nil, "All Files (*.*)|*.*");
-		if image_filename == "" then
-			print("No image selected. Exiting.");
-			return;
-		end
-		input_file = assert(io.open(image_filename, "rb"));
-
-		local frameBufferLocation = mainmemory.read_u24_be(Game.Memory.framebuffer_pointer[version] + 1);
-		if isRDRAM(frameBufferLocation) then
-			for i = 0, framebuffer_size - 1 do
-				local r = math.floor(string.byte(input_file:read(1)) / 8) * framebuffer_color_bit_constants["Red"];
-				local g = math.floor(string.byte(input_file:read(1)) / 8) * framebuffer_color_bit_constants["Green"];
-				local b = math.floor(string.byte(input_file:read(1)) / 8) * framebuffer_color_bit_constants["Blue"];
-				local a = 1;
-
-				mainmemory.write_u16_be(frameBufferLocation + (i * 2), r + g + b + a);
-				mainmemory.write_u16_be(frameBufferLocation + framebuffer_size + (i * 2), r + g + b + a);
-			end
-		end
-
-		input_file:close();
-	else
-		print("Sorry, this function is currently unavailable on the Kiosk ROM.");
+	local image_filename = forms.openfile(nil, nil, "All Files (*.*)|*.*");
+	if image_filename == "" then
+		print("No image selected. Exiting.");
+		return;
 	end
+	input_file = assert(io.open(image_filename, "rb"));
+
+	local frameBufferLocation = mainmemory.read_u24_be(Game.Memory.framebuffer_pointer[version] + 1);
+	if isRDRAM(frameBufferLocation) then
+		for i = 0, framebuffer_size - 1 do
+			local r = math.floor(string.byte(input_file:read(1)) / 8) * framebuffer_color_bit_constants["Red"];
+			local g = math.floor(string.byte(input_file:read(1)) / 8) * framebuffer_color_bit_constants["Green"];
+			local b = math.floor(string.byte(input_file:read(1)) / 8) * framebuffer_color_bit_constants["Blue"];
+			local a = 1;
+
+			mainmemory.write_u16_be(frameBufferLocation + (i * 2), r + g + b + a);
+			mainmemory.write_u16_be(frameBufferLocation + framebuffer_size + (i * 2), r + g + b + a);
+		end
+	end
+
+	input_file:close();
 end
 
 ------------

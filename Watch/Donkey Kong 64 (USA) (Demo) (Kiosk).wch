@@ -15,8 +15,10 @@ SystemID N64
 707E5B	b	h	1	RDRAM	Squawks Model
 70AA9C	w	h	1	RDRAM	Dogadon Actor Type
 70AA9E	w	h	1	RDRAM	Dogadon Model
+72CDA0	d	h	1	RDRAM	Framebuffer Pointer
 72CDE7	b	u	1	RDRAM	Map
 72D140	d	u	1	RDRAM	Frames (Lag) (TODO: Seems to work for Diddy's map but not for any others)
+7A106C	d	h	1	RDRAM	Framebuffer Pointer (Copy)
 7A12C0	d	h	1	RDRAM	Linked List Pointer
 7A1E14	d	h	1	RDRAM	Camera Pointer
 7B5918	d	h	1	RDRAM	Camera Pointer
