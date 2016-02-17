@@ -1,5 +1,13 @@
 local Game = {};
 
+local function isPointer(value)
+	return value >= 0x80000000 and value < 0x80800000;
+end
+
+local function isRDRAM(value)
+	return value > 0x000000 and value < 0x800000;
+end
+
 --------------------
 -- Region/Version --
 --------------------
@@ -7,6 +15,8 @@ local Game = {};
 -- Only patch US 1.0
 -- TODO - Figure out how to patch other versions
 local allowFurnaceFunPatch = false;
+local fbPointer;
+local framebuffer_size = 292 * 200; -- Bigger on PAL
 
 local player_grounded;
 local slope_timer;
@@ -16,7 +26,7 @@ local x_vel;
 local y_vel;
 local z_vel;
 
-local clip_vel = -3500; -- Velocity required to clip on the Y axis
+local clip_vel = -3500; -- Velocity required to clip on the Y axis -- TODO: This seems to be different for different geometry
 
 local x_pos;
 local y_pos;
@@ -236,6 +246,8 @@ Game.maps = {
 
 function Game.detectVersion(romName)
 	if stringContains(romName, "Europe") then
+		framebuffer_size = 292 * 216;
+		fbPointer = 0x282E00;
 		frame_timer = 0x280700;
 		slope_timer = 0x37CCB4;
 		player_grounded = 0x37C930;
@@ -254,6 +266,7 @@ function Game.detectVersion(romName)
 		notes = 0x386940;
 		object_array_pointer = 0x36EAE0;
 	elseif stringContains(romName, "Japan") then
+		fbPointer = 0x281E20;
 		frame_timer = 0x27F718;
 		slope_timer = 0x37CDE4;
 		player_grounded = 0x37CA60;
@@ -271,6 +284,7 @@ function Game.detectVersion(romName)
 		notes = 0x386AA0;
 		object_array_pointer = 0x36F260;
 	elseif stringContains(romName, "USA") and stringContains(romName, "Rev A") then
+		fbPointer = 0x281E20;
 		frame_timer = 0x27F718;
 		slope_timer = 0x37B4E4;
 		player_grounded = 0x37B160;
@@ -288,6 +302,7 @@ function Game.detectVersion(romName)
 		notes = 0x385180;
 		object_array_pointer = 0x36D760;
 	elseif stringContains(romName, "USA") then
+		fbPointer = 0x282FE0;
 		frame_timer = 0x2808D8;
 		slope_timer = 0x37C2E4;
 		player_grounded = 0x37BF60;
@@ -948,6 +963,43 @@ local function encircle_banjo()
 		mainmemory.writefloat(currentPointers[i] + slot_z_pos, z, true);
 	end
 end
+
+----------------------
+-- Framebuffer Jank --
+----------------------
+
+-- Pixel format: 16bit RGBA 5551
+-- RRRR RGGG GGBB BBBA
+local framebuffer_color_bit_constants = {
+	["Red"] = 0x0800,
+	["Green"] = 0x0040,
+	["Blue"] = 0x0002,
+};
+
+
+function fillFB()
+	local image_filename = forms.openfile(nil, nil, "All Files (*.*)|*.*");
+	if image_filename == "" then
+		print("No image selected. Exiting.");
+		return;
+	end
+	input_file = assert(io.open(image_filename, "rb"));
+
+	local frameBufferLocation = mainmemory.read_u24_be(fbPointer + 1);
+	if isRDRAM(frameBufferLocation) then
+		for i = 0, framebuffer_size - 1 do
+			local r = math.floor(string.byte(input_file:read(1)) / 8) * framebuffer_color_bit_constants["Red"];
+			local g = math.floor(string.byte(input_file:read(1)) / 8) * framebuffer_color_bit_constants["Green"];
+			local b = math.floor(string.byte(input_file:read(1)) / 8) * framebuffer_color_bit_constants["Blue"];
+			local a = 1;
+
+			mainmemory.write_u16_be(frameBufferLocation + (i * 2), r + g + b + a);
+		end
+	end
+
+	input_file:close();
+end
+
 
 -------------------
 -- Physics/Scale --

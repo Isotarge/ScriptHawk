@@ -1,5 +1,6 @@
 SystemID N64
 02D500	d	h	1	RDRAM	Huge linked list root, investigate further
+27597C	d	h	1	RDRAM	Framebuffer Pointer (Copy)
 2808D8	d	s	1	RDRAM	Frame timer
 2808DC	d	s	1	RDRAM	Frameskip
 281138	d	u	1	RDRAM	P1 A Button Held Timer
@@ -34,6 +35,7 @@ SystemID N64
 2812BA	b	s	1	RDRAM	P1 Joystick X Axis
 2812BB	b	s	1	RDRAM	P1 Joystick Y Axis
 28189A	w	h	1	RDRAM	Music Track
+282FE0	d	h	1	RDRAM	Framebuffer Pointer
 283400	w	b	1	RDRAM	Stop'N'Swop Items
 2986BA	w	h	1	RDRAM	Banjo Model Replacement
 2986BE	w	h	1	RDRAM	Banjo Model Replacement

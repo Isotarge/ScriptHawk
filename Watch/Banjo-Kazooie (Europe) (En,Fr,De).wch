@@ -1,7 +1,9 @@
 SystemID N64
+2757DC	d	h	1	RDRAM	Framebuffer Pointer (Copy)
 280700	d	s	1	RDRAM	Frame timer
 280704	d	s	1	RDRAM	Frameskip
 2816BA	w	h	1	RDRAM	Music Track
+282E00	d	h	1	RDRAM	Framebuffer Pointer
 283220	w	b	1	RDRAM	Stop'N'Swop Items
 285734	w	b	1	RDRAM	P1 Controller Buttons
 285736	b	s	1	RDRAM	P1 Joystick X

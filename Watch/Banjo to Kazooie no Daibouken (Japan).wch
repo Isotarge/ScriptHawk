@@ -1,7 +1,9 @@
 SystemID N64
+2748DC	d	h	1	RDRAM	Framebuffer Pointer (Copy)
 27F718	d	s	1	RDRAM	Frame timer
 27F71C	d	s	1	RDRAM	Frameskip
 2806DA	w	h	1	RDRAM	Music Track
+281E20	d	h	1	RDRAM	Framebuffer Pointer
 282240	w	b	1	RDRAM	Stop'N'Swop Items
 36F260	d	h	1	RDRAM	Object Array pointer
 37CA60	b	u	1	RDRAM	Player is on ground
