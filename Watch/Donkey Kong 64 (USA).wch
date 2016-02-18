@@ -119,7 +119,7 @@ SystemID N64
 7FBB4C	d	h	1	RDRAM	Player Pointer
 7FBB62	b	h	1	RDRAM	Zipper byte
 7FBB63	b	h	1	RDRAM	TB Void Byte
-7FBB66	b	h	1	RDRAM	Long Distance Enemy Spawn
+7FBB66	b	b	1	RDRAM	Long Distance Enemy Spawn
 7FBFF8	d	h	1	RDRAM	Camera pointer?
 7FC3F1	b	u	1	RDRAM	Object Count?
 7FC950	b	u	1	RDRAM	DK Moves
