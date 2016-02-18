@@ -1130,37 +1130,6 @@ function Game.getVelocity()
 	return math.sqrt(VX*VX + VZ*VZ);
 end
 
-------------------
--- CCW Clip bot --
-------------------
-
-CCWBotRunning = false;
-local requiredY = 4500;
-local requiredMovementState = "Flying";
-
-local maxAngle = 40;
-local minAngle = 320;
-local angleStep = 0.1;
-local currentAngle = minAngle;
-
-function CCWBot()
-	CCWBotRunning = true;
-	while CCWBotRunning do
-		savestate.loadslot(4);
-
-		currentAngle = currentAngle + angleStep;
-		if currentAngle > 360 then
-			currentAngle = 0;
-		end
-
-		Game.setYRotation(currentAngle);
-
-		for i = 0, 100 do
-			emu.frameadvance();
-		end
-	end
-end
-
 -------------------------
 -- Pulse Clip Velocity --
 -------------------------
