@@ -446,6 +446,7 @@ local movementStates = {
 	[49] = "Rolling",
 	[50] = "Slipping",
 
+	[52] = "Jig", -- Note door
 	[53] = "Idle", -- Termite
 	[54] = "Walking", -- Termite
 	[55] = "Jumping", -- Termite
@@ -457,8 +458,9 @@ local movementStates = {
 	[61] = "Falling", -- Tumbling, will take damage
 	[62] = "Damaged", -- Termite
 
+	[64] = "Locked", -- Pumpkin: Pipe
 	[65] = "Death",
-	[68] = "Jiggy Jig",
+	[68] = "Jig", -- Jiggy
 	[69] = "Slipping", -- Talon Trot
 
 	[72] = "Idle", -- Pumpkin
