@@ -87,7 +87,7 @@ SystemID N64
 75C4AB	b	h	1	RDRAM	Squawks Model
 7654F4	d	h	1	RDRAM	Flag Block Pointer
 767CC4	d	u	1	RDRAM	Frames (Real)
-76A066	w	1	1	RDRAM	Main object timer?
+76A064	d	u	1	RDRAM	Object Model 2 Timer
 76A0AB	b	h	1	RDRAM	Background?
 76A0CD	b	u	1	RDRAM	Adventure
 76A0DA	b	h	1	RDRAM	Mystery Menu
@@ -113,12 +113,14 @@ SystemID N64
 7F94E8	d	f	1	RDRAM	Stored Y?
 7F94F8	d	f	1	RDRAM	Stored Y?
 7FB968	d	h	1	RDRAM	Camera pointer?
-7FB970	d	h	1	RDRAM	Boss fight controller pointer
+7FB970	d	h	1	RDRAM	Boss Pointer
 7FBB35	b	u	1	RDRAM	Object Count?
 7FBB3D	b	u	1	RDRAM	Object Count?
 7FBB4C	d	h	1	RDRAM	Player Pointer
-7FBB62	b	h	1	RDRAM	Zipper byte
-7FBB63	b	h	1	RDRAM	TB Void Byte
+7FBB62	b	b	1	RDRAM	Zipper bitfield
+7FBB63	b	b	1	RDRAM	TB Void Bitfield
+7FBB64	b	b	1	RDRAM	Shadow Display Bitfield
+7FBB65	b	b	1	RDRAM	Unknown Bitfield
 7FBB66	b	b	1	RDRAM	Long Distance Enemy Spawn
 7FBFF8	d	h	1	RDRAM	Camera pointer?
 7FC3F1	b	u	1	RDRAM	Object Count?

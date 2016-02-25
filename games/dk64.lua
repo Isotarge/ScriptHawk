@@ -159,8 +159,12 @@ local rendering_parameters_pointer = 0x04; -- u32_be
 
 local current_bone_array_pointer = 0x08; -- u32_be
 
-local actor_type = 0x58; -- TODO: Document values for this
-local visibility = 0x63; -- Bitfield, also contains whether the actor collides with terrain and whether they are in water
+local actor_type = 0x58; -- TODO: Document values for this, different on Kiosk
+
+-- 0001 0000 = collides with terrain
+-- 0000 0100 = visible
+-- 0000 0001 = in water
+local visibility = 0x63; -- Bitfield TODO: Fully document
 
 local specular_highlight = 0x6D;
 
@@ -189,7 +193,7 @@ local y_rot = x_rot + 2;
 local z_rot = y_rot + 2;
 
 local locked_to_pad = 0x110;
-local locked_to_rainbow_coin_pointer = 0x13C;
+local lock_method_1_pointer = 0x13C;
 local hand_state = 0x147; -- Bitfield
 
 -- State byte
@@ -910,10 +914,10 @@ end
 --force_tbs = false;
 function forceTBS()
 	if force_tbs then
-		local pointer = mainmemory.read_u32_be(getPlayerObject() + locked_to_rainbow_coin_pointer);
+		local pointer = mainmemory.read_u32_be(getPlayerObject() + lock_method_1_pointer);
 		if pointer > 0x80000000 and pointer < 0x807FFFFF then
 			print("Forcing TBS");
-			mainmemory.write_u32_be(getPlayerObject() + locked_to_rainbow_coin_pointer, 0x00000000);
+			mainmemory.write_u32_be(getPlayerObject() + lock_method_1_pointer, 0x00000000);
 		end
 	end
 end
@@ -982,7 +986,7 @@ function Game.setXPosition(value)
 	else
 		mainmemory.writefloat(getPlayerObject() + x_pos, value, true);
 		mainmemory.writebyte(getPlayerObject() + locked_to_pad, 0x00);
-		mainmemory.write_u32_be(getPlayerObject() + locked_to_rainbow_coin_pointer, 0x00);
+		mainmemory.write_u32_be(getPlayerObject() + lock_method_1_pointer, 0x00);
 	end
 end
 
@@ -1001,7 +1005,7 @@ function Game.setZPosition(value)
 	if not isInSubGame() then
 		mainmemory.writefloat(getPlayerObject() + z_pos, value, true);
 		mainmemory.writebyte(getPlayerObject() + locked_to_pad, 0x00);
-		mainmemory.write_u32_be(getPlayerObject() + locked_to_rainbow_coin_pointer, 0x00);
+		mainmemory.write_u32_be(getPlayerObject() + lock_method_1_pointer, 0x00);
 	end
 end
 
@@ -1060,53 +1064,67 @@ end
 -----------------------------
 
 function Game.getVelocity()
+	local playerObject = getPlayerObject();
 	if map_value == arcade_map then
 		return mainmemory.readfloat(jumpman_velocity[1], true);
 	elseif map_value == jetpac_map then
 		return mainmemory.readfloat(jetman_velocity[1], true);
+	elseif isRDRAM(playerObject) then
+		return mainmemory.readfloat(playerObject + velocity, true);
 	end
-	return mainmemory.readfloat(getPlayerObject() + velocity, true);
+	return 0;
 end
 
 function Game.setVelocity(value)
+	local playerObject = getPlayerObject();
 	if map_value == arcade_map then
 		mainmemory.writefloat(jumpman_velocity[1], value, true);
 	elseif map_value == jetpac_map then
 		mainmemory.writefloat(jetman_velocity[1], value, true);
-	else
-		mainmemory.writefloat(getPlayerObject() + velocity, value, true);
+	elseif isRDRAM(playerObject) then
+		mainmemory.writefloat(playerObject + velocity, value, true);
 	end
 end
 
 --function Game.getAcceleration()
 --	if not isInSubGame() then
---		return mainmemory.readfloat(getPlayerObject() + acceleration, true);
+--		local playerObject = getPlayerObject();
+--		if isRDRAM(playerObject) then
+--			return mainmemory.readfloat(playerObject + acceleration, true);
+--		end
 --	end
 --	return 0;
 --end
 
 function Game.getYVelocity()
+	local playerObject = getPlayerObject();
 	if map_value == arcade_map then
 		return mainmemory.readfloat(jumpman_velocity[2], true);
 	elseif map_value == jetpac_map then
 		return mainmemory.readfloat(jetman_velocity[2], true);
+	elseif isRDRAM(playerObject) then
+		return mainmemory.readfloat(playerObject + y_velocity, true);
 	end
-	return mainmemory.readfloat(getPlayerObject() + y_velocity, true);
+	return 0;
 end
 
 function Game.setYVelocity(value)
+	local playerObject = getPlayerObject();
 	if map_value == arcade_map then
 		mainmemory.writefloat(jumpman_velocity[2], value, true);
 	elseif map_value == jetpac_map then
 		mainmemory.writefloat(jetman_velocity[2], value, true);
-	else
-		mainmemory.writefloat(getPlayerObject() + y_velocity, value, true);
+	elseif isRDRAM(playerObject) then
+		mainmemory.writefloat(playerObject + y_velocity, value, true);
 	end
 end
 
 function Game.getYAcceleration()
 	if not isInSubGame() then
-		return mainmemory.readfloat(getPlayerObject() + y_acceleration, true);
+		local playerObject = getPlayerObject();
+		if isRDRAM(playerObject) then
+			return mainmemory.readfloat(playerObject + y_acceleration, true);
+		end
 	end
 	return 0;
 end
@@ -1116,37 +1134,58 @@ end
 --------------------
 
 local function invisify()
-	mainmemory.writebyte(getPlayerObject() + visibility, 0x00);
+	local playerObject = getPlayerObject();
+	if isRDRAM(playerObject) then
+		local visibilityBitfieldValue = mainmemory.readbyte(playerObject + visibility);
+		mainmemory.writebyte(playerObject + visibility, clear_bit(visibilityBitfieldValue, 2));
+	end
 end
 
 local function visify()
-	mainmemory.writebyte(getPlayerObject() + visibility, 0x7F);
+	local playerObject = getPlayerObject();
+	if isRDRAM(playerObject) then
+		local visibilityBitfieldValue = mainmemory.readbyte(playerObject + visibility);
+		mainmemory.writebyte(playerObject + visibility, set_bit(visibilityBitfieldValue, 2));
+	end
 end
 
 local current_invisify = "Invisify";
 local function toggle_invisify()
 	if current_invisify == "Invisify" then
 		invisify();
-		current_invisify = "Visify";
 	else
 		visify();
-		current_invisify = "Invisify";
 	end
+end
 
-	forms.settext(ScriptHawkUI.form_controls["Toggle Invisify Button"], current_invisify);
+local function updateCurrentInvisify()
+	local playerObject = getPlayerObject();
+	if isRDRAM(playerObject) then
+		local isVisible = check_bit(mainmemory.readbyte(playerObject + visibility), 2);
+		if isVisible then
+			current_invisify = "Invisify";
+		else
+			current_invisify = "Visify";
+		end
+		forms.settext(ScriptHawkUI.form_controls["Toggle Invisify Button"], current_invisify);
+	end
 end
 
 local function clear_tb_void()
 	local tb_void_byte_val = mainmemory.readbyte(Game.Memory.tb_void_byte[version]);
-	mainmemory.writebyte(Game.Memory.tb_void_byte[version], bit.bor(tb_void_byte_val, 0x30));
+	tb_void_byte_val = set_bit(tb_void_byte_val, 4); -- Show Object Model 2 Objects
+	tb_void_byte_val = set_bit(tb_void_byte_val, 5); -- Turn on the lights
+	mainmemory.writebyte(Game.Memory.tb_void_byte[version], tb_void_byte_val);
 end
 
 function force_pause()
-	mainmemory.writebyte(Game.Memory.tb_void_byte[version], 0x31);
+	local voidByteValue = mainmemory.readbyte(Game.Memory.tb_void_byte[version]);
+	mainmemory.writebyte(Game.Memory.tb_void_byte[version], set_bit(voidByteValue, 0));
 end
 
 function force_zipper()
-	mainmemory.writebyte(Game.Memory.tb_void_byte[version] - 1, 0x01);
+	local voidByteValue = mainmemory.readbyte(Game.Memory.tb_void_byte[version] - 1);
+	mainmemory.writebyte(Game.Memory.tb_void_byte[version] - 1, set_bit(voidByteValue, 0));
 end
 
 -----------------------------------
@@ -2165,19 +2204,21 @@ local DKTieColors = {
 
 function Game.setDKColors()
 	local playerObject = getPlayerObject();
-	local texturePointer = mainmemory.read_u24_be(playerObject + actor_texture_renderer_pointer + 1);
+	if isRDRAM(playerObject) then
+		local texturePointer = mainmemory.read_u24_be(playerObject + actor_texture_renderer_pointer + 1);
 
-	if isRDRAM(texturePointer) then
-		texturePointer = getNextTextureRenderer(texturePointer); -- Skip eyes
+		if isRDRAM(texturePointer) then
+			texturePointer = getNextTextureRenderer(texturePointer); -- Skip eyes
 
-		-- 1 Body
-		mainmemory.write_u16_be(texturePointer + texture_renderer_texture_index, DKBodyColors[math.random(1, #DKBodyColors)][2]);
-		texturePointer = getNextTextureRenderer(texturePointer);
+			-- 1 Body
+			mainmemory.write_u16_be(texturePointer + texture_renderer_texture_index, DKBodyColors[math.random(1, #DKBodyColors)][2]);
+			texturePointer = getNextTextureRenderer(texturePointer);
 
-		-- 2 Tie Outer
-		mainmemory.write_u16_be(texturePointer + texture_renderer_texture_index, DKTieColors[math.random(1, #DKTieColors)][2]);
+			-- 2 Tie Outer
+			mainmemory.write_u16_be(texturePointer + texture_renderer_texture_index, DKTieColors[math.random(1, #DKTieColors)][2]);
 
-		-- TODO: Tie inner
+			-- TODO: Tie inner
+		end
 	end
 end
 
@@ -2193,14 +2234,16 @@ local DiddyHatColors = {
 
 function Game.setDiddyColors()
 	local playerObject = getPlayerObject();
-	local texturePointer = mainmemory.read_u24_be(playerObject + actor_texture_renderer_pointer + 1);
+	if isRDRAM(playerObject) then
+		local texturePointer = mainmemory.read_u24_be(playerObject + actor_texture_renderer_pointer + 1);
 
-	if isRDRAM(texturePointer) then
-		texturePointer = getNextTextureRenderer(texturePointer); -- Skip Left eye
-		texturePointer = getNextTextureRenderer(texturePointer); -- Skip Right eye
+		if isRDRAM(texturePointer) then
+			texturePointer = getNextTextureRenderer(texturePointer); -- Skip Left eye
+			texturePointer = getNextTextureRenderer(texturePointer); -- Skip Right eye
 
-		-- 3 Hat
-		mainmemory.write_u16_be(texturePointer + texture_renderer_texture_index, DiddyHatColors[math.random(1, #DiddyHatColors)][2]);
+			-- 3 Hat
+			mainmemory.write_u16_be(texturePointer + texture_renderer_texture_index, DiddyHatColors[math.random(1, #DiddyHatColors)][2]);
+		end
 	end
 end
 
@@ -2214,15 +2257,17 @@ local LankyTopColors = {
 
 function Game.setLankyColors()
 	local playerObject = getPlayerObject();
-	local texturePointer = mainmemory.read_u24_be(playerObject + actor_texture_renderer_pointer + 1);
+	if isRDRAM(playerObject) then
+		local texturePointer = mainmemory.read_u24_be(playerObject + actor_texture_renderer_pointer + 1);
 
-	if isRDRAM(texturePointer) then
-		texturePointer = getNextTextureRenderer(texturePointer); -- Skip eyes
+		if isRDRAM(texturePointer) then
+			texturePointer = getNextTextureRenderer(texturePointer); -- Skip eyes
 
-		-- 1 Top
-		mainmemory.write_u16_be(texturePointer + texture_renderer_texture_index, LankyTopColors[math.random(1, #LankyTopColors)][2]);
+			-- 1 Top
+			mainmemory.write_u16_be(texturePointer + texture_renderer_texture_index, LankyTopColors[math.random(1, #LankyTopColors)][2]);
 
-		-- TODO: Bottom
+			-- TODO: Bottom
+		end
 	end
 end
 
@@ -2235,14 +2280,16 @@ local TinyBodyColors = {
 
 function Game.setTinyColors()
 	local playerObject = getPlayerObject();
-	local texturePointer = mainmemory.read_u24_be(playerObject + actor_texture_renderer_pointer + 1);
+	if isRDRAM(playerObject) then
+		local texturePointer = mainmemory.read_u24_be(playerObject + actor_texture_renderer_pointer + 1);
 
-	if isRDRAM(texturePointer) then
-		texturePointer = getNextTextureRenderer(texturePointer); -- Skip Left eye
-		texturePointer = getNextTextureRenderer(texturePointer); -- Skip Right eye
+		if isRDRAM(texturePointer) then
+			texturePointer = getNextTextureRenderer(texturePointer); -- Skip Left eye
+			texturePointer = getNextTextureRenderer(texturePointer); -- Skip Right eye
 
-		-- 3 Body
-		mainmemory.write_u16_be(texturePointer + texture_renderer_texture_index, TinyBodyColors[math.random(1, #TinyBodyColors)][2]);
+			-- 3 Body
+			mainmemory.write_u16_be(texturePointer + texture_renderer_texture_index, TinyBodyColors[math.random(1, #TinyBodyColors)][2]);
+		end
 	end
 end
 
@@ -2266,17 +2313,19 @@ local ChunkyFrontColors = {
 
 function Game.setChunkyColors()
 	local playerObject = getPlayerObject();
-	local texturePointer = mainmemory.read_u24_be(playerObject + actor_texture_renderer_pointer + 1);
+	if isRDRAM(playerObject) then
+		local texturePointer = mainmemory.read_u24_be(playerObject + actor_texture_renderer_pointer + 1);
 
-	if isRDRAM(texturePointer) then
-		texturePointer = getNextTextureRenderer(texturePointer); -- Skip Eyes
+		if isRDRAM(texturePointer) then
+			texturePointer = getNextTextureRenderer(texturePointer); -- Skip Eyes
 
-		-- 1 Back
-		mainmemory.write_u16_be(texturePointer + texture_renderer_texture_index, ChunkyBackColors[math.random(1, #ChunkyBackColors)][2]);
-		texturePointer = getNextTextureRenderer(texturePointer);
+			-- 1 Back
+			mainmemory.write_u16_be(texturePointer + texture_renderer_texture_index, ChunkyBackColors[math.random(1, #ChunkyBackColors)][2]);
+			texturePointer = getNextTextureRenderer(texturePointer);
 
-		-- 2 Front
-		mainmemory.write_u16_be(texturePointer + texture_renderer_texture_index, ChunkyFrontColors[math.random(1, #ChunkyFrontColors)][2]);
+			-- 2 Front
+			mainmemory.write_u16_be(texturePointer + texture_renderer_texture_index, ChunkyFrontColors[math.random(1, #ChunkyFrontColors)][2]);
+		end
 	end
 end
 
@@ -2289,13 +2338,15 @@ local KrushaColors = {
 
 function Game.setKrushaColors()
 	local playerObject = getPlayerObject();
-	local texturePointer = mainmemory.read_u24_be(playerObject + actor_texture_renderer_pointer + 1);
+	if isRDRAM(playerObject) then
+		local texturePointer = mainmemory.read_u24_be(playerObject + actor_texture_renderer_pointer + 1);
 
-	if isRDRAM(texturePointer) then
-		texturePointer = getNextTextureRenderer(texturePointer); -- Skip Eyes
+		if isRDRAM(texturePointer) then
+			texturePointer = getNextTextureRenderer(texturePointer); -- Skip Eyes
 
-		-- 2 Body
-		mainmemory.write_u16_be(texturePointer + texture_renderer_texture_index, TinyBodyColors[math.random(1, #TinyBodyColors)][2]);
+			-- 2 Body
+			mainmemory.write_u16_be(texturePointer + texture_renderer_texture_index, TinyBodyColors[math.random(1, #TinyBodyColors)][2]);
+		end
 	end
 end
 
@@ -2317,7 +2368,9 @@ end
 
 function Game.eachFrame()
 	map_value = Game.getMap();
+	updateCurrentInvisify();
 
+	-- TODO: Allow user to toggle this
 	Game.unlock_menus();
 
 	-- Force STVW

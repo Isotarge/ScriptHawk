@@ -78,7 +78,7 @@ local actor_types = {
 	[56] = "Orangstand Sprint Barrel",
 	[57] = "Strong Kong Barrel",
 	[58] = "Swinging Light",
-	[59] = "Fireball (Mad Jack)", -- TODO: where else is this used?
+	[59] = "Fireball", -- Mad Jack -- TODO: where else is this used?
 	[61] = "Boulder",
 	[63] = "Vase (O)",
 	[64] = "Vase (:)",
@@ -140,18 +140,18 @@ local actor_types = {
 	[176] = "Timer",
 	[178] = "Beaver (Blue)",
 	[179] = "Shockwave (Mad Jack)",
-	[181] = "Book (Castle Library)",
+	[181] = "Book", -- Castle Library
 	[182] = "Barrel Enemy (Normal)",
 	[183] = "Zinger",
 	[184] = "Snide",
 	[185] = "Armydillo",
-	[186] = "Kremling (Kremling Kosh)",
+	[186] = "Kremling", -- Kremling Kosh
 	[187] = "Klump",
 	[188] = "Camera",
 	[189] = "Cranky",
 	[190] = "Funky",
 	[191] = "Candy",
-	[192] = "Beetle (Race)",
+	[192] = "Beetle", -- Race
 	[193] = "Mermaid",
 	[195] = "Squawks",
 	[197] = "Trapped Diddy",
@@ -186,12 +186,12 @@ local actor_types = {
 	[247] = "Seal",
 	[248] = "Banana Fairy",
 	[249] = "Squawks w/spotlight",
-	[252] = "Rabbit (Fungi)",
-	[254] = "Static Object", -- Fake DK, wheel in Helm, something in DK Rap
+	[252] = "Rabbit", -- Fungi
+	[254] = "Static Object", -- Used in TONS of places, mainly for objects animated by cutscenes
 	[255] = "Shockwave",
-	[258] = "Shockwave (Boss)",
-	[259] = "Guard (Stealthy Snoop)",
-	[260] = "Text Overlay (K. Rool fight)",
+	[258] = "Shockwave", -- Boss
+	[259] = "Guard", -- Stealthy Snoop
+	[260] = "Text Overlay", -- K. Rool fight
 	[261] = "Robo-Zinger",
 	[262] = "Krossbones",
 	[263] = "Fire Shockwave (Dogadon)",
@@ -218,21 +218,22 @@ local actor_types = {
 	[310] = "Spotlight", -- Tag barrel, instrument etc.
 	[311] = "Checkpoint (Race)", -- Seal race & Castle car race
 	[313] = "Particle (Idle Anim.)",
-	--[315] = "Sim Slam Shockwave", TODO: uhhhhh idk
 	[316] = "Kong (Tag Barrel)",
 	[317] = "Locked Kong (Tag Barrel)",
 	[325] = "Sim Slam Shockwave",
-	[328] = "Klaptrap (Peril Path Panic)",
-	[329] = "Fairy (Peril Path Panic)",
-	[330] = "Bug (Big Bug Bash)",
-	[332] = "Big Bug Bash Controller?", -- TODO: Verify
-	[333] = "Unknown on main menu",
+	[326] = "Main Menu Controller",
+	[328] = "Klaptrap", -- Peril Path Panic
+	[329] = "Fairy", -- Peril Path Panic
+	[330] = "Bug", -- Big Bug Bash
+	[331] = "Klaptrap", -- Searchlight Seek
+	[332] = "Big Bug Bash Controller?", -- TODO: Verify -- TODO: Fly swatter?
+	[333] = "Barrel (Main Menu)",
 	[334] = "Padlock (K. Lumsy)",
 	[335] = "Snide's Menu",
 	[336] = "Training Barrel Controller",
 	[337] = "Multiplayer Model (Main Menu)",
 	[339] = "Arena Controller", -- Rambi/Enguarde
-	[340] = "Bug Enemy (Castle Trash Can)",
+	[340] = "Bug", -- Trash Can
 	[342] = "Try Again Dialog",
 };
 
@@ -368,7 +369,13 @@ local rendering_parameters_pointer = 0x04; -- u32_be
 local current_bone_array_pointer = 0x08; -- u32_be
 
 local actor_type = 0x58; -- u32_be
+function isKong(actorType)
+	return actorType >= 2 and actorType <= 6;
+end
 
+-- 0001 0000 = collides with terrain
+-- 0000 0100 = visible
+-- 0000 0001 = in water
 local visibility = 0x63; -- Bitfield -- TODO: Fully document
 
 local specular_highlight = 0x6D;
@@ -390,6 +397,8 @@ local light_thing = 0xCC; -- Values 0x00->0x14
 
 local health = 0x134; -- s16_be
 local takes_enemy_damage = 0x13B;
+
+local lock_method_1_pointer = 0x13C;
 
 local shade_byte = 0x16D;
 
@@ -502,7 +511,8 @@ local function getExamineDataModelOne(pointer)
 	local hasPosition = xPos ~= 0 or yPos ~= 0 or zPos ~= 0 or hasModel;
 
 	table.insert(examine_data, { "Actor base", string.format("0x%06x", pointer) });
-	local currentActorType = mainmemory.read_u32_be(pointer + actor_type);
+	local currentActorTypeNumeric = mainmemory.read_u32_be(pointer + actor_type);
+	local currentActorType = currentActorTypeNumeric;
 	if type(actor_types[currentActorType]) ~= "nil" then
 		currentActorType = actor_types[currentActorType];
 	end
@@ -546,12 +556,15 @@ local function getExamineDataModelOne(pointer)
 
 	local visibilityValue = mainmemory.readbyte(pointer + visibility);
 	table.insert(examine_data, { "Visibility", bizstring.binary(visibilityValue) });
+	table.insert(examine_data, { "In water", tostring(not get_bit(visibilityValue, 0)) });
 	table.insert(examine_data, { "Visible", tostring(get_bit(visibilityValue, 2)) });
 	table.insert(examine_data, { "Collides with terrain", tostring(get_bit(visibilityValue, 4)) });
-	table.insert(examine_data, { "In water", tostring(not get_bit(visibilityValue, 0)) });
 	table.insert(examine_data, { "Separator", 1 });
 
-	if currentActorType == "Player" then
+	table.insert(examine_data, { "Lock Method 1 Pointer", string.format("0x%08x", mainmemory.read_u32_be(pointer + lock_method_1_pointer)) });
+	table.insert(examine_data, { "Separator", 1 });
+
+	if isKong(currentActorTypeNumeric) then
 		table.insert(examine_data, { "Grabbed Vine Pointer", string.format("0x%08x", mainmemory.read_u32_be(pointer + grabbed_vine_pointer)) });
 		table.insert(examine_data, { "Grab pointer", string.format("0x%08x", mainmemory.read_u32_be(pointer + grab_pointer)) });
 		table.insert(examine_data, { "Fairy Active", mainmemory.readbyte(pointer + fairy_active) });
@@ -609,6 +622,9 @@ local function getExamineDataModelOne(pointer)
 			table.insert(examine_data, { "Slot "..i.." pointer", string.format("0x%08x", mainmemory.read_u32_be(pointer + slot_pointer_base + (i - 1) * 4)) });
 		end
 		table.insert(examine_data, { "Separator", 1 });
+	elseif currentActorTypeNumeric == 330 then -- Bug: Big Bug Bash
+		table.insert(examine_data, { "Current AI direction", mainmemory.readfloat(pointer + 0x180) });
+		table.insert(examine_data, { "Ticks til direction change", mainmemory.read_u32_be(pointer + 0x184) });
 	end
 
 	return examine_data;
