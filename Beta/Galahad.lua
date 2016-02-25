@@ -135,7 +135,7 @@ function getExamineData(pointer)
 end
 
 function fetch_address(index)
-	obj_address = obj_start+obj_size*(index-1)
+	obj_address = obj_start + obj_size * (index - 1)
 end
 
 function draw_ui()
@@ -153,10 +153,6 @@ function draw_ui()
 			row = row + examine_data[i][2];
 		end
 	end
-end
-
-function fetch_address(index)
-	return obj_start + obj_size * (index - 1);
 end
 
 local function incr_obj_index()
