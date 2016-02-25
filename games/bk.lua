@@ -244,7 +244,7 @@ Game.maps = {
 	"Intro - Grunty Threat 2"
 }
 
-function Game.detectVersion(romName)
+function Game.detectVersion(romName) -- TODO: Move addresses to a Memory table like DK64 module
 	if stringContains(romName, "Europe") then
 		framebuffer_size = 292 * 216;
 		fbPointer = 0x282E00;
@@ -452,9 +452,9 @@ local movementStates = {
 	[55] = "Jumping", -- Termite
 	[56] = "Falling", -- Termite
 	[57] = "Swimming (A)",
-
 	[58] = "Idle", -- Carrying object (eg. Orange)
 	[59] = "Walking", -- Carrying object (eg. Orange)
+
 	[61] = "Falling", -- Tumbling, will take damage
 	[62] = "Damaged", -- Termite
 

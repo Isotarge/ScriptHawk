@@ -116,6 +116,7 @@ SystemID N64
 37C6F4	d	f	1	RDRAM	Unknown Float
 37C6F8	d	f	1	RDRAM	Unknown Float
 37C6FC	d	f	1	RDRAM	Unknown Float
+37C714	d	h	1	RDRAM	Idle Movement Script
 37D160	d	u	1	RDRAM	Previous Movement State
 37D164	d	u	1	RDRAM	Current Movement State
 37D23C	d	f	1	RDRAM	Eye State (Left)
