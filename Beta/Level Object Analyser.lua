@@ -422,24 +422,6 @@ local animation_types = {
 	[0x290] = "Dingpot Shooting",
 };
 
-function getAnimationInfo()
-	local level_object_array = mainmemory.read_u24_be(level_object_array_pointer + 1);
-	local numSlots = math.min(max_slots, mainmemory.read_u32_be(level_object_array));
-	for i = 0, numSlots - 1 do
-		local currentSlotBase = get_slot_base(level_object_array, i);
-		local animationObjectPointer = mainmemory.read_u24_be(currentSlotBase + 0x14 + 1);
-		if animationObjectPointer > 0x000000 and animationObjectPointer < 0x3FFFFF then
-			local animationType = mainmemory.read_u32_be(animationObjectPointer + animation_object_animation_type);
-			if type(animation_types[animationType]) == "string" then
-				animationType = animation_types[animationType];
-			else
-				animationType = toHexString(animationType);
-			end
-			print("Index "..i..": type: "..animationType.." timer: "..mainmemory.readfloat(animationObjectPointer + animation_object_animation_timer, true));
-		end
-	end
-end
-
 function setAnimationType(index, animationType)
 	local level_object_array = mainmemory.read_u24_be(level_object_array_pointer + 1);
 	local numSlots = math.min(max_slots, mainmemory.read_u32_be(level_object_array));
@@ -630,3 +612,167 @@ function parse_slot_data()
 	output_stats();
 end
 parseSlotData = parse_slot_data;
+
+---------------
+-- OSD Stuff --
+---------------
+
+local green_highlight = 0xFF00FF00;
+local yellow_highlight = 0xFFFFFF00;
+
+local script_modes = {
+	"List",
+	"Examine",
+};
+
+local script_mode_index = 1;
+script_mode = script_modes[script_mode_index];
+
+local function switch_script_mode()
+	script_mode_index = script_mode_index + 1;
+	if script_mode_index > #script_modes then
+		script_mode_index = 1;
+	end
+	script_mode = script_modes[script_mode_index];
+end
+
+function getExamineData(slot_base)
+	local current_slot_variables = {};
+	local relative_address, variable_data;
+	for relative_address, variable_data in pairs(slot_variables) do
+		if type(variable_data) == "table" then
+			local variableName = getVariableName(relative_address);
+			if variable_data.Type == "Byte" then
+				table.insert(current_slot_variables, {variableName, formatForOutput(variable_data.Type, mainmemory.readbyte(slot_base + relative_address))});
+			elseif variable_data.Type == "u16_be" then
+				table.insert(current_slot_variables, {variableName, formatForOutput(variable_data.Type, mainmemory.read_u16_be(slot_base + relative_address))});
+			elseif variable_data.Type == "Z4_Unknown" then
+				-- Don't print yo
+			elseif variable_data.Type == "Pointer" then
+				table.insert(current_slot_variables, {variableName, formatForOutput(variable_data.Type, mainmemory.read_u32_be(slot_base + relative_address))});
+			elseif variable_data.Type == "Float" then
+				table.insert(current_slot_variables, {variableName, formatForOutput(variable_data.Type, mainmemory.readfloat(slot_base + relative_address, true))});
+			end
+		end
+	end
+	return current_slot_variables;
+end
+
+function fetch_address(index)
+	local level_object_array = mainmemory.read_u24_be(level_object_array_pointer + 1);
+	return getSlotBase(level_object_array, index);
+end
+
+object_index = 1;
+function draw_ui()
+	local gui_x = 32;
+	local gui_y = 32;
+	local row = 0;
+	local height = 16;
+
+	local level_object_array = mainmemory.read_u24_be(level_object_array_pointer + 1);
+	local numSlots = math.min(max_slots, mainmemory.read_u32_be(level_object_array));
+	gui.text(gui_x, gui_y + height * row, "Index: "..(object_index).."/"..(numSlots), nil, nil, 'bottomright');
+	row = row + 1;
+
+	if script_mode == "Examine" then
+		local examine_data = getExamineData(fetch_address(object_index));
+		for i = #examine_data, 1, -1 do
+			if examine_data[i][1] ~= "Separator" then
+				gui.text(gui_x, gui_y + height * row, examine_data[i][1]..": "..examine_data[i][2], nil, nil, 'bottomright');
+				row = row + 1;
+			else
+				row = row + examine_data[i][2];
+			end
+		end
+	end
+	
+	if script_mode == "List" then
+		for i = numSlots, 1, -1 do
+			local currentSlotBase = get_slot_base(level_object_array, i);
+
+			local animationObjectPointer = mainmemory.read_u24_be(currentSlotBase + 0x14 + 1);
+			local animationType = "Unknown";
+			if animationObjectPointer > 0x000000 and animationObjectPointer < 0x3FFFFF then
+				animationType = mainmemory.read_u32_be(animationObjectPointer + animation_object_animation_type);
+				if type(animation_types[animationType]) == "string" then
+					animationType = animation_types[animationType];
+				else
+					animationType = toHexString(animationType);
+				end
+			end
+
+			local color = nil;
+			if object_index == i then
+				color = yellow_highlight;
+			end
+
+			gui.text(gui_x, gui_y + height * row, i..": "..string.format("0x%06x: ", currentSlotBase or 0)..animationType, color, nil, 'bottomright');
+			row = row + 1;
+		end
+	end
+end
+
+local function incr_object_index()
+	local level_object_array = mainmemory.read_u24_be(level_object_array_pointer + 1);
+	local numSlots = math.min(max_slots, mainmemory.read_u32_be(level_object_array));
+	object_index = object_index + 1;
+	if object_index > numSlots then
+		object_index = 1;
+	end
+end
+
+local function decr_object_index()
+	object_index = object_index - 1;
+	if object_index <= 0 then
+		local level_object_array = mainmemory.read_u24_be(level_object_array_pointer + 1);
+		local numSlots = math.min(max_slots, mainmemory.read_u32_be(level_object_array));
+		object_index = numSlots;
+	end
+end
+
+-- Keybinds
+-- For full list go here http://slimdx.org/docs/html/T_SlimDX_DirectInput_Key.htm
+local decrease_object_index_key = "N";
+local increase_object_index_key = "M";
+local switch_script_mode_key = "C";
+
+local decrease_object_index_pressed = false;
+local increase_object_index_pressed = false;
+local switch_mode_pressed = false;
+
+local function process_input()
+	input_table = input.get();
+
+	-- Hold down key prevention
+	if input_table[decrease_object_index_key] == nil then
+		decrease_object_index_pressed = false;
+	end
+
+	if input_table[increase_object_index_key] == nil then
+		increase_object_index_pressed = false;
+	end
+
+	if input_table[switch_script_mode_key] == nil then
+		switch_script_mode_pressed = false;
+	end
+
+	-- Check for key presses
+	if input_table[decrease_object_index_key] == true and decrease_object_index_pressed == false then
+		decr_object_index();
+		decrease_object_index_pressed = true;
+	end
+
+	if input_table[increase_object_index_key] == true and increase_object_index_pressed == false then
+		incr_object_index();
+		increase_object_index_pressed = true;
+	end
+
+	if input_table[switch_script_mode_key] == true and switch_script_mode_pressed == false then
+		switch_script_mode();
+		switch_script_mode_pressed = true;
+	end
+end
+
+event.onframestart(draw_ui, "ScriptHawk - Examine BK Level Objects");
+event.onframestart(process_input, "ScriptHawk - Process input");
