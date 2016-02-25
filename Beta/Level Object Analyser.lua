@@ -6,6 +6,8 @@
 
 -----------------------
 
+object_index = 1;
+hide_non_animated = false;
 local level_object_array_pointer;
 local romName = gameinfo.getromname();
 
@@ -351,8 +353,17 @@ local animation_types = {
 	[0x33] = "Bigbutt Eating Grass",
 	[0x35] = "Bigbutt Alerted",
 	[0x36] = "Bigbutt Walking",
+	[0x51] = "Conga Idle",
+	[0x52] = "Conga Hurt",
+	[0x54] = "Conga Throwing",
+	[0x55] = "Conga Beating Chest",
+	[0x56] = "Conga Raising Arms",
+	[0x5B] = "Chimpy",
+	[0x5C] = "Chimpy",
+	[0x5D] = "Chimpy",
 	[0x5E] = "Termite Idle",
 	[0x5F] = "Termite Walking",
+	[0x62] = "Grublin Idle",
 	[0x65] = "Beehive Dying",
 	[0x67] = "Wading Boots",
 	[0x6A] = "Mumbo Sleeping",
@@ -361,7 +372,18 @@ local animation_types = {
 	[0x6D] = "Mumbo Transforming",
 	[0x92] = "Shrapnel Chasing",
 	[0x96] = "Snippet Recovering",
+	[0x9A] = "Ripper Idle",
+	[0x9B] = "Ripper Chasing",
+	[0x9D] = "Bat Chasing", -- TODO: name
+	[0xA2] = "Conga Throwing", -- Retaliation
+	[0xA9] = "Pot", -- MMM
+	[0xAE] = "Bat Idle",
+	[0xB3] = "Chump Idle",
+	[0xB4] = "Chump Chomping",
+	[0xC9] = "Carpet", -- GV
+	[0xD4] = "Switch", -- Witch Switch (MM), Shock Spring Pad Switch (GV Lobby)
 	[0xD6] = "Turbo Trainers",
+	[0xF1] = "Carpet", -- GV
 	[0x108] = "Sir Slush Idle",
 	[0x109] = "Sir Slush Attacking",
 	[0x130] = "Jinjo Circling", -- TODO: Used outside Grunty fight?
@@ -369,17 +391,26 @@ local animation_types = {
 	[0x13A] = "Bottles", -- TODO: Details
 	[0x13B] = "Bottles", -- TODO: Details
 	[0x13D] = "Bottles", -- TODO: Details
+	[0x143] = "Button", -- Snowman, Xmas tree
 	[0x14B] = "Croctus", -- BGS, feed egg
+	[0x14E] = "Boggy", -- Lying on back
 	[0x165] = "Beehive",
 	[0x16E] = "Mumbo Reclining", -- CCW Summer
 	[0x17F] = "Mumbo Sweeping",
 	[0x180] = "Mumbo Rotating",
+	[0x18A] = "Present", -- FP
+	[0x1A1] = "Sled", -- FP
 	[0x1C5] = "Grunty Flying",
 	[0x1CE] = "Curtain", -- Banjo's house
 	[0x1D6] = "Grublin Walking",
 	[0x1D7] = "Grublin Alerted",
 	[0x1D8] = "Grublin Chasing",
 	[0x1DA] = "Snippet Idle",
+	[0x1E9] = "Mum-Mum Idle",
+	[0x1ED] = "Ripper Damaged",
+	[0x1EE] = "Ripper Dying",
+	[0x1F0] = "Web Idle",
+	[0x1F1] = "Web Dying",
 	[0x1F4] = "Shrapnel Idle",
 	[0x208] = "Goldfish", -- Banjo's house
 	[0x209] = "Cuckoo Clock Idle",
@@ -410,6 +441,7 @@ local animation_types = {
 	[0x26B] = "Brentilda Hands on Hips",
 	[0x26D] = "Gruntling Idle",
 	[0x26F] = "Gruntling Chasing",
+	[0x272] = "Cheato",
 	[0x275] = "Jinjonator Activating", -- TODO: verify
 	[0x276] = "Jinjonator Charging",
 	[0x278] = "Jinjonator Recoil",
@@ -613,6 +645,21 @@ function parse_slot_data()
 end
 parseSlotData = parse_slot_data;
 
+function zipToSelectedObject()
+	local level_object_array = mainmemory.read_u24_be(level_object_array_pointer + 1);
+	local slotBase = getSlotBase(level_object_array, object_index);
+
+	local x = mainmemory.readfloat(slotBase + 0x04, true);
+	local y = mainmemory.readfloat(slotBase + 0x08, true);
+	local z = mainmemory.readfloat(slotBase + 0x0C, true);
+
+	if Game ~= nil then
+		Game.setXPosition(x);
+		Game.setYPosition(y);
+		Game.setZPosition(z);
+	end
+end
+
 ---------------
 -- OSD Stuff --
 ---------------
@@ -663,7 +710,6 @@ function fetch_address(index)
 	return getSlotBase(level_object_array, index);
 end
 
-object_index = 1;
 function draw_ui()
 	local gui_x = 32;
 	local gui_y = 32;
@@ -707,8 +753,15 @@ function draw_ui()
 				color = yellow_highlight;
 			end
 
-			gui.text(gui_x, gui_y + height * row, i..": "..string.format("0x%06x: ", currentSlotBase or 0)..animationType, color, nil, 'bottomright');
-			row = row + 1;
+			if animationType == "Unknown" then
+				if not hide_non_animated then
+					gui.text(gui_x, gui_y + height * row, i..": "..string.format("0x%06x", currentSlotBase or 0), color, nil, 'bottomright');
+					row = row + 1;
+				end
+			else
+				gui.text(gui_x, gui_y + height * row, animationType.." "..i..": "..string.format("0x%06x", currentSlotBase or 0), color, nil, 'bottomright');
+				row = row + 1;
+			end
 		end
 	end
 end
@@ -736,10 +789,12 @@ end
 local decrease_object_index_key = "N";
 local increase_object_index_key = "M";
 local switch_script_mode_key = "C";
+local zip_key = "Z";
 
 local decrease_object_index_pressed = false;
 local increase_object_index_pressed = false;
 local switch_mode_pressed = false;
+local zip_pressed = false;
 
 local function process_input()
 	input_table = input.get();
@@ -757,6 +812,10 @@ local function process_input()
 		switch_script_mode_pressed = false;
 	end
 
+	if input_table[zip_key] == nil then
+		zip_pressed = false;
+	end
+
 	-- Check for key presses
 	if input_table[decrease_object_index_key] == true and decrease_object_index_pressed == false then
 		decr_object_index();
@@ -771,6 +830,11 @@ local function process_input()
 	if input_table[switch_script_mode_key] == true and switch_script_mode_pressed == false then
 		switch_script_mode();
 		switch_script_mode_pressed = true;
+	end
+	
+	if input_table[zip_key] == true and zip_pressed == false then
+		zipToSelectedObject();
+		zip_pressed = true;
 	end
 end
 
