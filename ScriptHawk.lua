@@ -53,6 +53,8 @@ function get_bit(field, index)
 	return false;
 end
 getBit = get_bit;
+check_bit = get_bit;
+checkBit = check_bit;
 
 function set_bit(field, index)
 	if index < 32 then
@@ -403,15 +405,35 @@ end
 -- Telemetry --
 ---------------
 
-local telemetryData = {};
+telemetryData = {};
 local collecting_telemetry = false;
+
+function getTelemetryHeaderString()
+	local headerString = "Time (Frames),";
+	for i, v in ipairs(Game.OSD) do
+		if type(v) == "table" then
+			if v[1] ~= "Separator" then
+				headerString = headerString..v[1]..",";
+			end
+		end
+	end
+	return headerString;
+end
 
 -- Outputs telemetry data as CSV to the console
 local function outputTelemetry()
-	dprint("Time (Frames),X Position,Y Position,Z Position,Dxz,Dy,Rotation X,Rotation Y,Rotation Z,");
+	-- Print CSV header
+	dprint(getTelemetryHeaderString());
+
+	-- Print CSV values
 	for i = 1, #telemetryData do
-		dprint(i..","..telemetryData[i]["X Position"]..","..telemetryData[i]["Y Position"]..","..telemetryData[i]["Z Position"]..","..telemetryData[i]["Dxz"]..","..telemetryData[i]["Dy"]..","..telemetryData[i]["Rotation X"]..","..telemetryData[i]["Rotation Y"]..","..telemetryData[i]["Rotation Z"]..",");
+		local outputString = i..",";
+		for k, v in ipairs(telemetryData[i]) do
+			outputString = outputString..(v)..",";
+		end
+		dprint(outputString);
 	end
+
 	print_deferred();
 end
 
@@ -567,46 +589,46 @@ function updateUIReadouts_ScriptHawk()
 		local value = Game.OSD[i][2];
 		local color = Game.OSD[i][3];
 
-		-- Detect special keywords
-		if label == "dY" or label == "DY" then
-			value = dy or 0;
-		end
-		if label == "dXZ" or label == "DXZ" then
-			value = d or 0;
-		end
-
-		if label == "Max dY" or label == "Max DY" then
-			value = max_dy or 0;
-		end
-		if label == "Max dXZ" or label == "Max DXZ" then
-			value = max_d or 0;
-		end
-		if label == "Odometer" then
-			value = odometer or 0;
-		end
-
-		-- Get the value
-		if type(value) == "function" then
-			value = value();
-		end
-
-		-- Round the value
-		if type(value) == "number" and label ~= "Separator" then
-			value = round(value, precision);
-		end
-
-		-- Detect and format rotation based on a keyword search
-		for j = 1, #angleKeywords do
-			if label == angleKeywords[j] then
-				value = formatRotation(value);
-			end
-		end
-
-		if type(color) == "function" then
-			color = color();
-		end
-
 		if label ~= "Separator" then
+			-- Detect special keywords
+			if label == "dY" or label == "DY" then
+				value = dy or 0;
+			end
+			if label == "dXZ" or label == "DXZ" then
+				value = d or 0;
+			end
+
+			if label == "Max dY" or label == "Max DY" then
+				value = max_dy or 0;
+			end
+			if label == "Max dXZ" or label == "Max DXZ" then
+				value = max_d or 0;
+			end
+			if label == "Odometer" then
+				value = odometer or 0;
+			end
+
+			-- Get the value
+			if type(value) == "function" then
+				value = value();
+			end
+
+			-- Round the value
+			if type(value) == "number" then
+				value = round(value, precision);
+			end
+
+			-- Detect and format rotation based on a keyword search
+			for j = 1, #angleKeywords do
+				if label == angleKeywords[j] then
+					value = formatRotation(value);
+				end
+			end
+
+			if type(color) == "function" then
+				color = color();
+			end
+
 			gui.text(OSDX, OSDY + Game.OSDRowHeight * row, label..": "..value, color);
 		else
 			if type(value) == "number" and value > 1 then
@@ -839,16 +861,50 @@ local function plot_pos()
 
 		-- Telemetry
 		if collecting_telemetry then
-			local tempTelemetryData = {
-				["X Position"] = x,
-				["Y Position"] = y,
-				["Z Position"] = z,
-				["Dxz"] = d,
-				["Dy"] = dy,
-				["Rotation X"] = Game.getXRotation(),
-				["Rotation Y"] = Game.getYRotation(),
-				["Rotation Z"] = Game.getZRotation(),
-			};
+			local tempTelemetryData = {};
+			for i = 1, #Game.OSD do
+				local label = Game.OSD[i][1];
+				local value = Game.OSD[i][2];
+
+				if label ~= "Separator" then
+					-- Detect special keywords
+					if label == "dY" or label == "DY" then
+						value = dy or 0;
+					end
+					if label == "dXZ" or label == "DXZ" then
+						value = d or 0;
+					end
+
+					if label == "Max dY" or label == "Max DY" then
+						value = max_dy or 0;
+					end
+					if label == "Max dXZ" or label == "Max DXZ" then
+						value = max_d or 0;
+					end
+					if label == "Odometer" then
+						value = odometer or 0;
+					end
+
+					-- Get the value
+					if type(value) == "function" then
+						value = value();
+					end
+
+					-- Round the value
+					if type(value) == "number" then
+						value = round(value, precision);
+					end
+
+					-- Detect and format rotation based on a keyword search
+					for j = 1, #angleKeywords do
+						if label == angleKeywords[j] then
+							value = formatRotation(value);
+						end
+					end
+
+					table.insert(tempTelemetryData, value);
+				end
+			end
 			table.insert(telemetryData, tempTelemetryData);
 		end
 	end
