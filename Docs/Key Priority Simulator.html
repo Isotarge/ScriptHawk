@@ -1,7 +1,7 @@
 <html>
 <head>
 	<title>Key Priority Simulator 2015</title>
-	<script src="https://code.jquery.com/jquery-2.1.4.min.js"></script>
+	<script src="https://code.jquery.com/jquery-2.2.1.min.js"></script>
 	<script>
 		var keys = [false, false, false, false, false, false, false, false],
 			queue = [];
@@ -27,7 +27,7 @@
 
 				var priorityString = "";
 				for (var i = 0; i < queue.length; i++) {
-					priorityString += queue[i] + (i < queue.length - 1 ? " => " : "");
+					priorityString += queue[i] + (i < queue.length - 1 ? " ⇨ " : "");
 				}
 				$("#order").html(priorityString);
 			} else {
@@ -65,21 +65,48 @@
 
 		$(function() {
 			$('input').change(computePriority);
+			$('#year').html(new Date().getFullYear());
 		});
 	</script>
+	<style>
+		* {
+			color: white;
+			margin-left: auto;
+			margin-right: auto;
+			text-align: center;
+		}
+		td, a {
+			color: goldenrod;
+			text-decoration: none;
+		}
+		body {
+			background: #222222;
+			font-family: sans-serif;
+		}
+	</style>
 </head>
 <body>
-	<h1>Key Priority Simulator 2015</h1>
+	<h1>Key Priority Simulator <span id="year">2016</span></h1>
 	<h2>Select Keys in inventory</h2>
-	<input type="checkbox">Key 1<br>
-	<input type="checkbox">Key 2<br>
-	<input type="checkbox">Key 3<br>
-	<input type="checkbox">Key 4<br>
-	<input type="checkbox">Key 5<br>
-	<input type="checkbox">Key 6<br>
-	<input type="checkbox">Key 7<br>
-	<input type="checkbox">Key 8<br>
-	<h2>Predicted turn in order</h2>
+	<table>
+		<tr>
+			<td><input type="checkbox">&nbsp;Key 1</td>
+			<td><input type="checkbox">&nbsp;Key 5</td>
+		</tr>
+		<tr>
+			<td><input type="checkbox">&nbsp;Key 2</td>
+			<td><input type="checkbox">&nbsp;Key 6</td>
+		</tr>
+		<tr>
+			<td><input type="checkbox">&nbsp;Key 3</td>
+			<td><input type="checkbox">&nbsp;Key 7</td>
+		</tr>
+		<tr>
+			<td><input type="checkbox">&nbsp;Key 4</td>
+			<td><input type="checkbox">&nbsp;Key 8</td>
+		</tr>
+	</table>
+	<h2>Turn order</h2>
 	<div id="order">No keys selected.</div>
 	<br>
 	<b>Based on research by <a href="http://www.twitch.tv/tiffanyfruit">TJ</a> &amp; <a href="http://www.twitch.tv/isotarge">Isotarge</a></b>
