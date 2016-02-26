@@ -673,18 +673,22 @@ local function process_flag_queue()
 					if queue_item["action_type"] == "set" then
 						current_value = mainmemory.readbyte(flags + queue_item["byte"]);
 						mainmemory.writebyte(flags + queue_item["byte"], set_bit(current_value, queue_item["bit"]));
-						if type(queue_item["name"]) == "string" then
-							dprint("Set \""..queue_item["name"].."\" at "..toHexString(queue_item["byte"]).." bit "..queue_item["bit"]);
-						else
-							dprint("Set flag at "..toHexString(queue_item["byte"]).." bit "..queue_item["bit"]);
+						if not queue_item["suppressPrint"] then
+							if type(queue_item["name"]) == "string" then
+								dprint("Set \""..queue_item["name"].."\" at "..toHexString(queue_item["byte"]).." bit "..queue_item["bit"]);
+							else
+								dprint("Set flag at "..toHexString(queue_item["byte"]).." bit "..queue_item["bit"]);
+							end
 						end
 					elseif queue_item["action_type"] == "clear" then
 						current_value = mainmemory.readbyte(flags + queue_item["byte"]);
 						mainmemory.writebyte(flags + queue_item["byte"], clear_bit(current_value, queue_item["bit"]));
-						if type(queue_item["name"]) == "string" then
-							dprint("Cleared \""..queue_item["name"].."\" at "..toHexString(queue_item["byte"]).." bit "..queue_item["bit"]);
-						else
-							dprint("Cleared flag at "..toHexString(queue_item["byte"]).." bit "..queue_item["bit"]);
+						if not queue_item["suppressPrint"] then
+							if type(queue_item["name"]) == "string" then
+								dprint("Cleared \""..queue_item["name"].."\" at "..toHexString(queue_item["byte"]).." bit "..queue_item["bit"]);
+							else
+								dprint("Cleared flag at "..toHexString(queue_item["byte"]).." bit "..queue_item["bit"]);
+							end
 						end
 					elseif queue_item["action_type"] == "check" then
 						checkFlags();
@@ -711,9 +715,10 @@ end
 -- Set flag functions --
 ------------------------
 
-function setFlag(byte, bit)
+function setFlag(byte, bit, suppressPrint)
+	suppressPrint = suppressPrint or false;
 	if type(byte) == "number" and type(bit) == "number" and bit >= 0 and bit <= 7 then
-		table.insert(flag_action_queue, {["action_type"]="set", ["byte"]=byte, ["bit"]=bit});
+		table.insert(flag_action_queue, {["action_type"]="set", ["byte"]=byte, ["bit"]=bit, ["suppressPrint"]=suppressPrint});
 		process_flag_queue();
 	end
 end
@@ -735,6 +740,7 @@ function setFlagByType(_type)
 			if flag_array[i]["type"] == _type then
 				flag = flag_array[i];
 				flag["action_type"] = "set";
+				flag["suppressPrint"] = true;
 				table.insert(flag_action_queue, flag);
 				num_set = num_set + 1;
 			end
@@ -747,15 +753,12 @@ function setFlagByType(_type)
 		print("No flags found for specified type.");
 	end
 end
-
-function setFlagsByType(_type)
-	setFlagByType(_type); -- TODO: Cleanup print noise caused by this
-end
+setFlagsByType = setFlagByType;
 
 function setAllFlags()
 	for byte = 0, flag_block_size do
 		for bit = 0, 7 do
-			setFlag(byte, bit); -- TODO: Cleanup print noise caused by this
+			setFlag(byte, bit, true);
 		end
 	end
 end
@@ -763,7 +766,7 @@ end
 function clearAllFlags()
 	for byte = 0, flag_block_size do
 		for bit = 0, 7 do
-			clearFlag(byte, bit); -- TODO: Cleanup print noise caused by this
+			clearFlag(byte, bit, true);
 		end
 	end
 end
@@ -772,9 +775,10 @@ end
 -- Clear flag functions --
 --------------------------
 
-function clearFlag(byte, bit)
+function clearFlag(byte, bit, suppressPrint)
+	suppressPrint = suppressPrint or false;
 	if type(byte) == "number" and type(bit) == "number" and bit >= 0 and bit <= 7 then
-		table.insert(flag_action_queue, {["action_type"]="clear", ["byte"]=byte, ["bit"]=bit});
+		table.insert(flag_action_queue, {["action_type"]="clear", ["byte"]=byte, ["bit"]=bit, ["suppressPrint"]=suppressPrint});
 		process_flag_queue();
 	end
 end
@@ -796,6 +800,7 @@ function clearFlagByType(_type)
 			if flag_array[i]["type"] == _type then
 				flag = flag_array[i];
 				flag["action_type"] = "clear";
+				flag["suppressPrint"] = true;
 				table.insert(flag_action_queue, flag);
 				num_cleared = num_cleared + 1;
 			end
@@ -808,10 +813,7 @@ function clearFlagByType(_type)
 		print("No flags found for specified type.");
 	end
 end
-
-function clearFlagsByType(_type)
-	clearFlagByType(_type);
-end
+clearFlagsByType = clearFlagByType;
 
 --------------------------
 -- Other flag functions --
