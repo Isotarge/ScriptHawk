@@ -433,6 +433,10 @@ local text_shown = 0x1EE; -- 16 bit uint -- TODO: This needs to be in a separate
 -- Relative to player
 local grabbed_vine_pointer = 0x2B0;
 
+local scale = {
+	0x344, 0x348, 0x34C, 0x350, 0x354 -- 0x344 and 0x348 seem to be a target, the rest must be current value for each axis
+};
+
 local fairy_active = 0x36C;
 
 -- Relative to rendering params
@@ -569,6 +573,11 @@ local function getExamineDataModelOne(pointer)
 		table.insert(examine_data, { "Grab pointer", string.format("0x%08x", mainmemory.read_u32_be(pointer + grab_pointer)) });
 		table.insert(examine_data, { "Fairy Active", mainmemory.readbyte(pointer + fairy_active) });
 		table.insert(examine_data, { "Separator", 1 });
+		
+		for index, offset in ipairs(scale) do
+			table.insert(examine_data, { "Scale "..toHexString(offset), mainmemory.readfloat(pointer + offset, true) });
+		end
+		table.insert(examine_data, { "Separator", 1 });
 	end
 
 	if currentActorType == "Camera" then
@@ -648,7 +657,7 @@ end
 
 local obj_model2_slot_size = 0x90;
 
--- Relative to trigger slot
+-- Relative to objects in model 2 array
 local obj_model2_x_pos = 0x00; -- Float
 local obj_model2_y_pos = obj_model2_x_pos + 4; -- Float
 local obj_model2_z_pos = obj_model2_y_pos + 4; -- Float
@@ -802,8 +811,8 @@ local function getExamineDataModelTwo(pointer)
 	table.insert(examine_data, { "Collectable", bizstring.binary(mainmemory.readbyte(pointer + obj_model2_collectable_state)) });
 
 	if hasModel then
-		modelPointer = modelPointer - 0x80000000;
 		table.insert(examine_data, { "Model Base", string.format("0x%08x", modelPointer) });
+		modelPointer = modelPointer - 0x80000000;
 		table.insert(examine_data, { "Separator", 1 });
 
 		table.insert(examine_data, { "Model X", mainmemory.readfloat(modelPointer + obj_model2_model_x_pos, true) });
@@ -940,12 +949,14 @@ local increase_object_index_key = "M";
 local grab_object_key = "V";
 local focus_object_key = "B";
 local switch_grab_script_mode_key = "C";
+local zip_key = "Z";
 
 local decrease_object_index_pressed = false;
 local increase_object_index_pressed = false;
 local grab_object_pressed = false;
 local focus_object_pressed = false;
 local switch_mode_pressed = false;
+local zip_pressed = false;
 
 local green_highlight = 0xFF00FF00;
 local yellow_highlight = 0xFFFFFF00;
@@ -965,6 +976,29 @@ local function focus_object(pointer)
 	if isRDRAM(cameraObject) then
 		mainmemory.writebyte(cameraObject + camera_focus_pointer, 0x80);
 		mainmemory.write_u24_be(cameraObject + camera_focus_pointer + 1, pointer);
+	end
+end
+
+local function zipToSelectedObject() -- TODO: when setting position clear the locked pointers (warp pads etc)
+	local playerObject = mainmemory.read_u24_be(player_pointer);
+	if isRDRAM(playerObject) then
+		if bizstring.contains(grab_script_mode, "Model 1") then
+			local selectedActorBase = mainmemory.read_u24_be(pointer_list + (object_index - 1) * 4 + 1);
+			if isRDRAM(selectedActorBase) then
+				mainmemory.writefloat(playerObject + x_pos, mainmemory.readfloat(selectedActorBase + x_pos, true), true);
+				mainmemory.writefloat(playerObject + y_pos, mainmemory.readfloat(selectedActorBase + y_pos, true), true);
+				mainmemory.writefloat(playerObject + z_pos, mainmemory.readfloat(selectedActorBase + z_pos, true), true);
+			end
+		elseif bizstring.contains(grab_script_mode, "Model 2") then
+			local model2Array = mainmemory.read_u24_be(obj_model2_array_pointer + 1);
+			if isRDRAM(model2Array) then
+				local selectedActorBase = model2Array + (object_index - 1) * obj_model2_slot_size;
+
+				mainmemory.writefloat(playerObject + x_pos, mainmemory.readfloat(selectedActorBase + obj_model2_x_pos, true), true);
+				mainmemory.writefloat(playerObject + y_pos, mainmemory.readfloat(selectedActorBase + obj_model2_y_pos, true), true);
+				mainmemory.writefloat(playerObject + z_pos, mainmemory.readfloat(selectedActorBase + obj_model2_z_pos, true), true);
+			end
+		end
 	end
 end
 
@@ -990,6 +1024,10 @@ local function process_input()
 
 	if input_table[switch_grab_script_mode_key] == nil then
 		switch_grab_script_mode_pressed = false;
+	end
+
+	if input_table[zip_key] == nil then
+		zip_pressed = false;
 	end
 
 	-- Check for key presses
@@ -1024,6 +1062,11 @@ local function process_input()
 	if input_table[switch_grab_script_mode_key] == true and switch_grab_script_mode_pressed == false then
 		switch_grab_script_mode();
 		switch_grab_script_mode_pressed = true;
+	end
+
+	if input_table[zip_key] == true and zip_pressed == false then
+		zipToSelectedObject();
+		zip_pressed = true;
 	end
 end
 

@@ -24,7 +24,7 @@ Game.Memory = {
 	["bone_displacement_pointer"] = {0x76FDF8, 0x76A918, 0x76FFE8, nil}, -- TODO: Kiosk
 	["frames_lag"] = {0x76AF10, 0x765A30, 0x76B100, 0x72D140}, -- TODO: Kiosk only works for minecart?
 	["frames_real"] = {0x7F0560, 0x7F0480, 0x7F09D0, nil}, -- TODO: Make sure freezing these crashes the main thread -- TODO: Kiosk
-	["MJ_state_pointer"] = {0x7FDC90, 0x7FDBD0, 0x7FE120, nil}, -- TODO: Find Mad Jack state based on Model 1 pointer list and actor type knowledge rather than relying on this pointer
+	["boss_pointer"] = {0x7FDC90, 0x7FDBD0, 0x7FE120, nil}, -- TODO: Find Mad Jack state based on Model 1 pointer list and actor type knowledge. MJ is actor 204
 	["slope_object_pointer"] = {0x7F94B8, nil, nil , nil}, -- TODO - PAL, JP & Kiosk, also note this is part of the player object so might be simpler to do getPlayerObject() + offset if it doesn't break anything
 	["obj_model2_array_pointer"] = {0x7F6000, 0x7F5F20, 0x7F6470, nil},
 	["obj_model2_array_count"] = {0x7F6004, 0x7F5F24, 0x7F6474, nil},
@@ -1359,7 +1359,7 @@ end
 local function draw_mj_minimap()
 	-- Only draw minimap if the player is in the Mad Jack fight
 	if version ~= 4 and map_value == mad_jack_map then
-		local MJ_state = mainmemory.read_u24_be(Game.Memory.MJ_state_pointer[version] + 1);
+		local MJ_state = mainmemory.read_u24_be(Game.Memory.boss_pointer[version] + 1);
 
 		local cur_pos = MJ_parse_position(mainmemory.readbyte(MJ_state + MJ_current_pos));
 		local next_pos = MJ_parse_position(mainmemory.readbyte(MJ_state + MJ_next_pos));
@@ -1778,6 +1778,30 @@ function freeTradeObjectModel1(currentKong)
 	end
 end
 
+local collisionTypes = {
+	[0x000A] = "CB Single (A)",
+	[0x000D] = "CB Single (D)",
+	[0x0011] = "Homing Ammo Crate",
+	[0x0016] = "CB Single (16)",
+	[0x001C] = "Coin (1C)",
+	[0x001D] = "Coin (1D)",
+	[0x001E] = "CB Single (1E)",
+	[0x001F] = "CB Single (1F)",
+	[0x0023] = "Coin (23)",
+	[0x0024] = "Coin (24)",
+	[0x0027] = "Coin (27)",
+	[0x002B] = "CB Bunch (2B)",
+	[0x0056] = "Orange",
+	[0x0074] = "GB (Tiny)",
+	[0x008E] = "Crystal Coconut",
+	[0x008F] = "Ammo Crate",
+	[0x0098] = "Film",
+	[0x0205] = "CB Bunch (205)",
+	[0x0206] = "CB Bunch (206)",
+	[0x0207] = "CB Bunch (207)",
+	[0x0208] = "CB Bunch (208)",
+};
+
 function fixSingleCollision(objectBase)
 	local currentCollisionValue = mainmemory.read_u16_be(objectBase + 4);
 	if isKong(currentCollisionValue) then
@@ -1793,6 +1817,38 @@ function freeTradeCollisionListBackboneMethod(currentKong)
 		size = mainmemory.read_u32_be(object + 4);
 		if size == 0x20 then
 			fixSingleCollision(object + 0x10);
+		end
+		object = object + 0x10 + size;
+	end
+end
+
+function dumpCollisionTypes()
+	local object = mainmemory.read_u24_be(Game.Memory.linked_list_pointer[version] + 1);
+	while isRDRAM(object) do
+		size = mainmemory.read_u32_be(object + 4);
+		if size == 0x20 then
+			local collisionType = mainmemory.read_u16_be(object + 0x10 + 0x02);
+			if collisionTypes[collisionType] ~= nil then
+				collisionType = collisionTypes[collisionType];
+			else
+				collisionType = toHexString(collisionType, 4);
+			end
+			dprint(toHexString(object + 0x10)..": "..collisionType);
+		end
+		object = object + 0x10 + size;
+	end
+	print_deferred();
+end
+
+function replaceCollisionType(target, desired)
+	local object = mainmemory.read_u24_be(Game.Memory.linked_list_pointer[version] + 1);
+	while isRDRAM(object) do
+		size = mainmemory.read_u32_be(object + 4);
+		if size == 0x20 then
+			local collisionType = mainmemory.read_u16_be(object + 0x10 + 0x02);
+			if collisionType == target then
+				mainmemory.write_u16_be(object + 0x10 + 0x02, desired);
+			end
 		end
 		object = object + 0x10 + size;
 	end
@@ -2142,7 +2198,7 @@ function Game.unlock_menus()
 end
 
 function Game.applyInfinites()
-	local global_base = Game.Memory.global_base[version];
+	local global_base = Game.Memory.global_base[version]; -- TODO: Use HUD pointer and object to get these memory locations
 
 	mainmemory.writebyte(global_base + standard_ammo, max_standard_ammo);
 	if forms.ischecked(ScriptHawkUI.form_controls["Toggle Homing Ammo Checkbox"]) then

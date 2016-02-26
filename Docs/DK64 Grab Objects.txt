@@ -13,6 +13,7 @@ v = Grab an object (only works when examining/listing object model 1)
 b = Focus the camera on an object (only works when examining/listing object model 1)
 n = Previous object
 m = Next object
+z = Zip to selected object, works with both model 1 and model 2
 
 Model 1 contains Actors, for example:
 - Player
