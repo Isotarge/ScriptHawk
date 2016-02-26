@@ -246,20 +246,20 @@ current_frame = emu.framecount();
 previous_map = "";
 previous_map_value = 0;
 
-dx = 0.0;
-dy = 0.0;
-dz = 0.0;
-d  = 0.0;
-odometer = 0.0;
+local dx = 0.0;
+local dy = 0.0;
+local dz = 0.0;
+local d  = 0.0;
+local odometer = 0.0;
 
-prev_x = 0.0;
-prev_y = 0.0;
-prev_z = 0.0;
+local prev_x = 0.0;
+local prev_y = 0.0;
+local prev_z = 0.0;
 
-max_dx = 0.0;
-max_dy = 0.0;
-max_dz = 0.0;
-max_d  = 0.0;
+local max_dx = 0.0;
+local max_dy = 0.0;
+local max_dz = 0.0;
+local max_d  = 0.0;
 
 -- Rounding precision
 precision = 3;
