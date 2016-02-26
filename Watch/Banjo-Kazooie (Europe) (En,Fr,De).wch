@@ -104,6 +104,7 @@ SystemID N64
 386944	d	s	1	RDRAM	Eggs
 38694C	d	s	1	RDRAM	Red Feathers
 386950	d	s	1	RDRAM	Gold Feathers
+38695B	b	b	1	RDRAM	Jinjo Bitfield
 386960	d	s	1	RDRAM	Health
 386964	d	s	1	RDRAM	Health Containers
 386968	d	s	1	RDRAM	Lives
