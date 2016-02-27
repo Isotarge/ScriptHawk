@@ -5,6 +5,7 @@ SystemID N64
 014DCC	d	h	1	RDRAM	Controller Input P2
 014DCE	b	s	1	RDRAM	Joystick X (P2)
 014DCF	b	s	1	RDRAM	Joystick Y (P2)
+029BA0	d	h	1	RDRAM	FFA Renderer Pointer
 02F050	d	f	1	RDRAM	Jetman X Position
 02F054	d	f	1	RDRAM	Jetman Y Position
 02F058	d	f	1	RDRAM	Jetman X Velocity
@@ -100,7 +101,7 @@ SystemID N64
 7ED55B	b	h	1	RDRAM	Mystery menu bosses enabled (up to galleon)
 7F07F4	d	h	1	RDRAM	Framebuffer Pointer
 7F0990	d	h	1	RDRAM	Backbone Pointer
-7F09A0	d	h	1	RDRAM	Pointer to unknown linked list
+7F09A0	d	h	1	RDRAM	Size 0x10 Linked List Pointer
 7F09B4	d	h	1	RDRAM	Object Model 2 Collision Linked List Pointer
 7F09C8	d	h	1	RDRAM	Pointer to unknown linked list
 7F5CF0	w	h	1	RDRAM	Prev Camera State

@@ -53,6 +53,15 @@ It is currently unknown where the following objects are stored:
 
 Butterflies use standard bone arrays to render
 
+Model 3 documentation
+Training grounds there is an object of size 0x60 (0x433A00, may change) containing:
+	- Group Type (0x00)
+		- 0x02 = Fish
+		- 0x03 = Butterflies
+	- Number of members (0x02)
+	- Unknown Pointer (0x04)
+	- Pointer to bone array (0x08)
+
 Stuff you can toggle with the lua console:
 
 encircle_enabled (boolean) - Circles objects from the currently selected object model around the player, warning: crashy & laggy
