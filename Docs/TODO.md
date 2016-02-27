@@ -11,7 +11,7 @@
 	- Figure out how the 101% credits are triggered
 	- Start documentation for other versions
 - DK64: Neverslip enhancements, can't roll/kick on slopes
-- DK64: Fix dpad for boats/cars/fly swatter etc
+- DK64: Fix DPad for fly swatter
 - DK64: Integrate Grab Objects.lua
 - DK64: Finish integrating Loader.lua
 	- Just needs a UI, it can currently be called via the Lua console

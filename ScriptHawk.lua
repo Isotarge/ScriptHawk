@@ -140,7 +140,7 @@ end
 findRootSize = find_root_size;
 
 -- Finds the end of a linked list, outputting object size
-function traverse_size(object, minimumPrintSize, maximumPrintSize)
+function traverse_size(object, minimumPrintSize, maximumPrintSize) -- TODO: Set prefix to nil in toHexString
 	minimumPrintSize = minimumPrintSize or -math.huge;
 	maximumPrintSize = maximumPrintSize or math.huge;
 	local count = 0;

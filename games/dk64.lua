@@ -5,6 +5,9 @@ local Game = {};
 -------------------------
 
 local version; -- 1 USA, 2 PAL, 3 JP, 4 Kiosk
+-- 7fa8a0 bone array pointer block
+-- 2 pointers
+-- 1 uint32be
 Game.Memory = {
 	["map"] = {0x7444E4, 0x73EC34, 0x743DA4, 0x72CDE4}, -- Note: Exit = Map + 4
 	["file"] = {0x7467C8, 0x740F18, 0x746088, nil},
@@ -93,9 +96,6 @@ local eep_checksum_values = {
 ----------------------------------
 
 -- Maximum values
-local max_melons = 3;
-local max_health = max_melons * 4;
-
 local max_coins          = 50;
 local max_crystals       = 20;
 local max_film           = 10;
@@ -192,7 +192,7 @@ local x_rot = 0xE4;
 local y_rot = x_rot + 2;
 local z_rot = y_rot + 2;
 
-local locked_to_pad = 0x110;
+local locked_to_pad = 0x110; -- TODO: What datatype is this? code says byte but I'd think it'd be a pointer
 local lock_method_1_pointer = 0x13C;
 local hand_state = 0x147; -- Bitfield
 
@@ -227,6 +227,8 @@ local misc_acceleration_float_2 = 0x1B4;
 local misc_acceleration_float_3 = 0x1B8;
 
 local velocity_ground = 0x1C0;
+
+local vehicle_actor_pointer = 0x208;
 
 local grabbed_vine_pointer = 0x2B0;
 
@@ -986,9 +988,15 @@ function Game.setXPosition(value)
 	elseif map_value == jetpac_map then
 		--mainmemory.writefloat(jetman_position[1], value, true);
 	else
-		mainmemory.writefloat(getPlayerObject() + x_pos, value, true);
-		mainmemory.writebyte(getPlayerObject() + locked_to_pad, 0x00);
-		mainmemory.write_u32_be(getPlayerObject() + lock_method_1_pointer, 0x00);
+		local playerObject = getPlayerObject();
+		local vehiclePointer = mainmemory.read_u32_be(playerObject + vehicle_actor_pointer);
+		if isPointer(vehiclePointer) then
+			vehiclePointer = vehiclePointer - 0x80000000;
+			mainmemory.writefloat(vehiclePointer + x_pos, value, true);
+		end
+		mainmemory.writefloat(playerObject + x_pos, value, true);
+		mainmemory.writebyte(playerObject + locked_to_pad, 0x00);
+		mainmemory.write_u32_be(playerObject + lock_method_1_pointer, 0x00);
 	end
 end
 
@@ -998,13 +1006,25 @@ function Game.setYPosition(value)
 	elseif map_value == jetpac_map then
 		--mainmemory.writefloat(jetman_position[2], value, true);
 	else
-		mainmemory.writefloat(getPlayerObject() + y_pos, value, true);
-		mainmemory.writebyte(getPlayerObject() + locked_to_pad, 0x00);
+		local playerObject = getPlayerObject();
+		local vehiclePointer = mainmemory.read_u32_be(playerObject + vehicle_actor_pointer);
+		if isPointer(vehiclePointer) then
+			vehiclePointer = vehiclePointer - 0x80000000;
+			mainmemory.writefloat(vehiclePointer + y_pos, value, true);
+		end
+		mainmemory.writefloat(playerObject + y_pos, value, true);
+		mainmemory.writebyte(playerObject + locked_to_pad, 0x00);
 	end
 end
 
 function Game.setZPosition(value)
 	if not isInSubGame() then
+		local playerObject = getPlayerObject();
+		local vehiclePointer = mainmemory.read_u32_be(playerObject + vehicle_actor_pointer);
+		if isPointer(vehiclePointer) then
+			vehiclePointer = vehiclePointer - 0x80000000;
+			mainmemory.writefloat(vehiclePointer + z_pos, value, true);
+		end
 		mainmemory.writefloat(getPlayerObject() + z_pos, value, true);
 		mainmemory.writebyte(getPlayerObject() + locked_to_pad, 0x00);
 		mainmemory.write_u32_be(getPlayerObject() + lock_method_1_pointer, 0x00);
@@ -1812,18 +1832,20 @@ function fixSingleCollision(objectBase)
 end
 
 function freeTradeCollisionListBackboneMethod(currentKong)
-	local object = mainmemory.read_u24_be(Game.Memory.linked_list_pointer[version] + 1);
+	local object = mainmemory.read_u24_be(Game.Memory.linked_list_pointer[version] + 0x24 + 1); -- Adding 0x24 here as a performance improvement, seems to be a pointer to the start of the object model 2 collision data in the backbone
 	while isRDRAM(object) do
 		size = mainmemory.read_u32_be(object + 4);
 		if size == 0x20 then
 			fixSingleCollision(object + 0x10);
+		elseif size == 0x00 then
+			break;
 		end
 		object = object + 0x10 + size;
 	end
 end
 
 function dumpCollisionTypes()
-	local object = mainmemory.read_u24_be(Game.Memory.linked_list_pointer[version] + 1);
+	local object = mainmemory.read_u24_be(Game.Memory.linked_list_pointer[version] + 0x24 + 1); -- Adding 0x24 here as a performance improvement, seems to be a pointer to the start of the object model 2 collision data in the backbone
 	while isRDRAM(object) do
 		size = mainmemory.read_u32_be(object + 4);
 		if size == 0x20 then
@@ -1834,6 +1856,8 @@ function dumpCollisionTypes()
 				collisionType = toHexString(collisionType, 4);
 			end
 			dprint(toHexString(object + 0x10)..": "..collisionType);
+		elseif size == 0x00 then
+			break;
 		end
 		object = object + 0x10 + size;
 	end
@@ -1841,7 +1865,7 @@ function dumpCollisionTypes()
 end
 
 function replaceCollisionType(target, desired)
-	local object = mainmemory.read_u24_be(Game.Memory.linked_list_pointer[version] + 1);
+	local object = mainmemory.read_u24_be(Game.Memory.linked_list_pointer[version] + 0x24 + 1); -- Adding 0x24 here as a performance improvement, seems to be a pointer to the start of the object model 2 collision data in the backbone
 	while isRDRAM(object) do
 		size = mainmemory.read_u32_be(object + 4);
 		if size == 0x20 then
@@ -1849,6 +1873,8 @@ function replaceCollisionType(target, desired)
 			if collisionType == target then
 				mainmemory.write_u16_be(object + 0x10 + 0x02, desired);
 			end
+		elseif size == 0x00 then
+			break;
 		end
 		object = object + 0x10 + size;
 	end
@@ -2211,7 +2237,6 @@ function Game.applyInfinites()
 	mainmemory.write_u16_be(global_base + crystals, max_crystals * 150);
 	mainmemory.writebyte(global_base + film, max_film);
 	mainmemory.writebyte(global_base + health, mainmemory.readbyte(global_base + melons) * 4);
-	--mainmemory.writebyte(global_base + melons, max_melons);
 
 	if version ~= 4 then -- TODO: Kiosk
 		for kong = DK, Chunky do

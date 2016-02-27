@@ -220,6 +220,8 @@ local actor_types = {
 	[313] = "Particle (Idle Anim.)",
 	[316] = "Kong (Tag Barrel)",
 	[317] = "Locked Kong (Tag Barrel)",
+	[322] = "Car", -- Car Race
+	[323] = "Enemy Car", -- Car Race, aka George
 	[325] = "Sim Slam Shockwave",
 	[326] = "Main Menu Controller",
 	[328] = "Klaptrap", -- Peril Path Panic
@@ -398,8 +400,10 @@ local light_thing = 0xCC; -- Values 0x00->0x14
 local health = 0x134; -- s16_be
 local takes_enemy_damage = 0x13B;
 
+local locked_to_pad = 0x110; -- TODO: What datatype is this? code says byte but I'd think it'd be a pointer
 local lock_method_1_pointer = 0x13C;
 
+local pickup_state = 0x154;
 local shade_byte = 0x16D;
 
 -- Relative to tag barrel
@@ -431,6 +435,8 @@ local camera_state_type = 0x26B;
 local text_shown = 0x1EE; -- 16 bit uint -- TODO: This needs to be in a separate object, text overlays are only 0x190 big
 
 -- Relative to player
+local animation_type = 0x181;
+local vehicle_actor_pointer = 0x208;
 local grabbed_vine_pointer = 0x2B0;
 
 local scale = {
@@ -555,6 +561,7 @@ local function getExamineDataModelOne(pointer)
 
 	table.insert(examine_data, { "Shadow width", mainmemory.readbyte(pointer + shadow_width) });
 	table.insert(examine_data, { "Shadow height", mainmemory.readbyte(pointer + shadow_height) });
+	table.insert(examine_data, { "Pickup State", mainmemory.readbyte(pointer + pickup_state) });
 	table.insert(examine_data, { "Brightness", mainmemory.readbyte(pointer + shade_byte) });
 	table.insert(examine_data, { "Separator", 1 });
 
@@ -569,11 +576,13 @@ local function getExamineDataModelOne(pointer)
 	table.insert(examine_data, { "Separator", 1 });
 
 	if isKong(currentActorTypeNumeric) then
+		table.insert(examine_data, { "Vehicle Actor Pointer", string.format("0x%08x", mainmemory.read_u32_be(pointer + vehicle_actor_pointer)) });
 		table.insert(examine_data, { "Grabbed Vine Pointer", string.format("0x%08x", mainmemory.read_u32_be(pointer + grabbed_vine_pointer)) });
 		table.insert(examine_data, { "Grab pointer", string.format("0x%08x", mainmemory.read_u32_be(pointer + grab_pointer)) });
 		table.insert(examine_data, { "Fairy Active", mainmemory.readbyte(pointer + fairy_active) });
+		table.insert(examine_data, { "Animation Type", mainmemory.readbyte(pointer + animation_type) });
 		table.insert(examine_data, { "Separator", 1 });
-		
+
 		for index, offset in ipairs(scale) do
 			table.insert(examine_data, { "Scale "..toHexString(offset), mainmemory.readfloat(pointer + offset, true) });
 		end
@@ -979,25 +988,38 @@ local function focus_object(pointer)
 	end
 end
 
-local function zipToSelectedObject() -- TODO: when setting position clear the locked pointers (warp pads etc)
+local function zipToSelectedObject()
 	local playerObject = mainmemory.read_u24_be(player_pointer);
+	local desiredX, desiredY, desiredZ;
 	if isRDRAM(playerObject) then
+		-- Get selected object X,Y,Z position
 		if bizstring.contains(grab_script_mode, "Model 1") then
 			local selectedActorBase = mainmemory.read_u24_be(pointer_list + (object_index - 1) * 4 + 1);
 			if isRDRAM(selectedActorBase) then
-				mainmemory.writefloat(playerObject + x_pos, mainmemory.readfloat(selectedActorBase + x_pos, true), true);
-				mainmemory.writefloat(playerObject + y_pos, mainmemory.readfloat(selectedActorBase + y_pos, true), true);
-				mainmemory.writefloat(playerObject + z_pos, mainmemory.readfloat(selectedActorBase + z_pos, true), true);
+				desiredX = mainmemory.readfloat(selectedActorBase + x_pos, true);
+				desiredY = mainmemory.readfloat(selectedActorBase + y_pos, true);
+				desiredZ = mainmemory.readfloat(selectedActorBase + z_pos, true);
 			end
 		elseif bizstring.contains(grab_script_mode, "Model 2") then
 			local model2Array = mainmemory.read_u24_be(obj_model2_array_pointer + 1);
 			if isRDRAM(model2Array) then
 				local selectedActorBase = model2Array + (object_index - 1) * obj_model2_slot_size;
 
-				mainmemory.writefloat(playerObject + x_pos, mainmemory.readfloat(selectedActorBase + obj_model2_x_pos, true), true);
-				mainmemory.writefloat(playerObject + y_pos, mainmemory.readfloat(selectedActorBase + obj_model2_y_pos, true), true);
-				mainmemory.writefloat(playerObject + z_pos, mainmemory.readfloat(selectedActorBase + obj_model2_z_pos, true), true);
+				desiredX = mainmemory.readfloat(selectedActorBase + obj_model2_x_pos, true);
+				desiredY = mainmemory.readfloat(selectedActorBase + obj_model2_y_pos, true);
+				desiredZ = mainmemory.readfloat(selectedActorBase + obj_model2_z_pos, true);
 			end
+		end
+
+		-- Update player position
+		if type(desiredX) == "number" and type(desiredY) == "number" and type(desiredZ) == "number" then
+			mainmemory.writefloat(playerObject + x_pos, desiredX, true);
+			mainmemory.writefloat(playerObject + y_pos, desiredY, true);
+			mainmemory.writefloat(playerObject + z_pos, desiredZ, true);
+
+			-- Allow movement when locked to pads etc
+			mainmemory.writebyte(playerObject + locked_to_pad, 0x00);
+			mainmemory.write_u32_be(playerObject + lock_method_1_pointer, 0x00);
 		end
 	end
 end

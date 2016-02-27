@@ -1,7 +1,6 @@
 local pointer_list;
 local max_objects = 0xFF;
 local precision = 5 or precision;
-local bone_size = 0x40;
 print_every_frame = false;
 
 local romName = gameinfo.getromname();
@@ -30,13 +29,14 @@ local current_bone_array_pointer = 0x08;
 local num_bones = 0x20;
 
 -- Relative to objects in bone array
-local bone_position_x = 0x18;
-local bone_position_y = 0x1A;
-local bone_position_z = 0x1C;
+local bone_size = 0x40;
+local bone_position_x = 0x18; -- int 16 be
+local bone_position_y = 0x1A; -- int 16 be
+local bone_position_z = 0x1C; -- int 16 be
 
-local bone_scale_x = 0x20;
-local bone_scale_y = 0x2A;
-local bone_scale_z = 0x34;
+local bone_scale_x = 0x20; -- uint 16 be
+local bone_scale_y = 0x2A; -- uint 16 be
+local bone_scale_z = 0x34; -- uint 16 be
 
 --------------------
 -- Load Libraries --

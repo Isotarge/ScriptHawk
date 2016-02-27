@@ -99,7 +99,10 @@ SystemID N64
 7ED559	b	h	1	RDRAM	Extra cutscenes & Rambi unlocked
 7ED55B	b	h	1	RDRAM	Mystery menu bosses enabled (up to galleon)
 7F07F4	d	h	1	RDRAM	Framebuffer Pointer
-7F0990	d	h	1	RDRAM	Pointer to big linked list
+7F0990	d	h	1	RDRAM	Backbone Pointer
+7F09A0	d	h	1	RDRAM	Pointer to unknown linked list
+7F09B4	d	h	1	RDRAM	Object Model 2 Collision Linked List Pointer
+7F09C8	d	h	1	RDRAM	Pointer to unknown linked list
 7F5CF0	w	h	1	RDRAM	Prev Camera State
 7F5CF2	w	h	1	RDRAM	Current Camera State
 7F5D00	d	f	1	RDRAM	Camera State Change Timer
