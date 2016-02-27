@@ -7,12 +7,18 @@
 			queue = [];
 
 		function computePriority() {
-			$('input[type=checkbox]').each(function(index) {
-				keys[index] = this.checked;
-			});
+			// TODO: Clean this up
+			keys[0] = $('#key1').prop("checked");
+			keys[1] = $('#key2').prop("checked");
+			keys[2] = $('#key3').prop("checked");
+			keys[3] = $('#key4').prop("checked");
+			keys[4] = $('#key5').prop("checked");
+			keys[5] = $('#key6').prop("checked");
+			keys[6] = $('#key7').prop("checked");
+			keys[7] = $('#key8').prop("checked");
 
 			var selectedKeys = countSelectedKeys();
-			if(selectedKeys > 0) {
+			if (selectedKeys > 0) {
 				lastKey = pickHighest();
 				queue = [];
 				queue.push(lastKey);
@@ -27,7 +33,7 @@
 
 				var priorityString = "";
 				for (var i = 0; i < queue.length; i++) {
-					priorityString += queue[i] + (i < queue.length - 1 ? " ⇨ " : "");
+					priorityString += queue[i] + (i < queue.length - 1 ? " &#8680; " : "");
 				}
 				$("#order").html(priorityString);
 			} else {
@@ -90,20 +96,20 @@
 	<h2>Select Keys in inventory</h2>
 	<table>
 		<tr>
-			<td><input type="checkbox">&nbsp;Key 1</td>
-			<td><input type="checkbox">&nbsp;Key 5</td>
+			<td><input id="key1" type="checkbox">&nbsp;Key 1</td>
+			<td><input id="key5" type="checkbox">&nbsp;Key 5</td>
 		</tr>
 		<tr>
-			<td><input type="checkbox">&nbsp;Key 2</td>
-			<td><input type="checkbox">&nbsp;Key 6</td>
+			<td><input id="key2" type="checkbox">&nbsp;Key 2</td>
+			<td><input id="key6" type="checkbox">&nbsp;Key 6</td>
 		</tr>
 		<tr>
-			<td><input type="checkbox">&nbsp;Key 3</td>
-			<td><input type="checkbox">&nbsp;Key 7</td>
+			<td><input id="key3" type="checkbox">&nbsp;Key 3</td>
+			<td><input id="key7" type="checkbox">&nbsp;Key 7</td>
 		</tr>
 		<tr>
-			<td><input type="checkbox">&nbsp;Key 4</td>
-			<td><input type="checkbox">&nbsp;Key 8</td>
+			<td><input id="key4" type="checkbox">&nbsp;Key 4</td>
+			<td><input id="key8" type="checkbox">&nbsp;Key 8</td>
 		</tr>
 	</table>
 	<h2>Turn order</h2>
