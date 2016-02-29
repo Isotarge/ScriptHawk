@@ -88,6 +88,7 @@ SystemID N64
 75C4AB	b	h	1	RDRAM	Squawks Model
 7654F4	d	h	1	RDRAM	Flag Block Pointer
 767CC4	d	u	1	RDRAM	Frames (Real)
+76A050	d	h	1	RDRAM	2D Renderer Array Pointer?
 76A064	d	u	1	RDRAM	Object Model 2 Timer
 76A0AB	b	h	1	RDRAM	Background?
 76A0CD	b	u	1	RDRAM	Adventure
@@ -100,6 +101,7 @@ SystemID N64
 7ED559	b	h	1	RDRAM	Extra cutscenes & Rambi unlocked
 7ED55B	b	h	1	RDRAM	Mystery menu bosses enabled (up to galleon)
 7F07F4	d	h	1	RDRAM	Framebuffer Pointer
+7F0828	d	h	1	RDRAM	2D Renderer Array Pointer?
 7F0990	d	h	1	RDRAM	Backbone Pointer
 7F09A0	d	h	1	RDRAM	Size 0x10 Linked List Pointer
 7F09B4	d	h	1	RDRAM	Object Model 2 Collision Linked List Pointer
@@ -116,6 +118,7 @@ SystemID N64
 7F94B8	d	h	1	RDRAM	Slope object pointer?
 7F94E8	d	f	1	RDRAM	Stored Y?
 7F94F8	d	f	1	RDRAM	Stored Y?
+7F9680	d	u	1	RDRAM	Texture Index?
 7FB968	d	h	1	RDRAM	Camera pointer?
 7FB970	d	h	1	RDRAM	Boss Pointer
 7FBB35	b	u	1	RDRAM	Object Count?
