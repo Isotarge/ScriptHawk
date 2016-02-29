@@ -792,6 +792,15 @@ local function getExamineDataModelTwo(pointer)
 	local hasPosition = xPos ~= 0 or yPos ~= 0 or zPos ~= 0 or hasModel;
 
 	table.insert(examine_data, { "Slot base", string.format("0x%06x", pointer) });
+	local behaviorTypePointer = mainmemory.read_u32_be(pointer + obj_model2_behavior_type_pointer);
+	local behaviorPointer = mainmemory.read_u32_be(pointer + obj_model2_behavior_pointer);
+	if isPointer(behaviorTypePointer) then
+		table.insert(examine_data, { "Behavior Type", readNullTerminatedString(behaviorTypePointer - 0x80000000 + 0x0C) });
+		table.insert(examine_data, { "Behavior Type Pointer", toHexString(behaviorTypePointer) });
+	end
+	if isPointer(behaviorPointer) then
+		table.insert(examine_data, { "Behavior Pointer", toHexString(behaviorPointer) });
+	end
 	table.insert(examine_data, { "Separator", 1 });
 
 	if hasPosition then
@@ -804,23 +813,11 @@ local function getExamineDataModelTwo(pointer)
 		table.insert(examine_data, { "Separator", 1 });
 	end
 
-	local behaviorTypePointer = mainmemory.read_u32_be(pointer + obj_model2_behavior_type_pointer);
-	table.insert(examine_data, { "Behavior Type Pointer", string.format("0x%08x", behaviorTypePointer) });
-	if isPointer(behaviorTypePointer) then
-		table.insert(examine_data, { "Behavior Type", readNullTerminatedString(behaviorTypePointer - 0x80000000 + 0x0C) });
-	end
-
 	table.insert(examine_data, { "Unknown Counter", mainmemory.read_u16_be(pointer + obj_model2_unknown_counter) });
-
-	local behaviorPointer = mainmemory.read_u32_be(pointer + obj_model2_behavior_pointer);
-	if behaviorPointer ~= 0 then
-		table.insert(examine_data, { "Behavior Pointer", string.format("0x%08x", behaviorPointer) });
-	end
-
-	table.insert(examine_data, { "Collectable", bizstring.binary(mainmemory.readbyte(pointer + obj_model2_collectable_state)) });
+	table.insert(examine_data, { "GB Interaction Bitfield", bizstring.binary(mainmemory.readbyte(pointer + obj_model2_collectable_state)) });
 
 	if hasModel then
-		table.insert(examine_data, { "Model Base", string.format("0x%08x", modelPointer) });
+		table.insert(examine_data, { "Model Base", toHexString(modelPointer) });
 		modelPointer = modelPointer - 0x80000000;
 		table.insert(examine_data, { "Separator", 1 });
 
