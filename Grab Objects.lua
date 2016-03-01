@@ -136,6 +136,7 @@ local actor_types = {
 	[165] = "Tag Barrel (King Kutout)",
 	[166] = "King Kutout Part",
 	[167] = "Cannon",
+	[171] = "Orange", -- Krusha's Gun
 	[173] = "Cutscene Controller",
 	[176] = "Timer",
 	[178] = "Beaver (Blue)",
@@ -261,22 +262,22 @@ if bizstring.contains(romName, "Donkey Kong 64") then
 	if bizstring.contains(romName, "USA") and not bizstring.contains(romName, "Kiosk") then
 		pointer_list = 0x7FBFF0;
 		camera_pointer = 0x7FB968;
-		player_pointer = 0x7FBB4D;
+		player_pointer = 0x7FBB4C;
 		obj_model2_array_pointer = 0x7F6000;
 	elseif bizstring.contains(romName, "Europe") then
 		pointer_list = 0x7FBF10;
 		camera_pointer = 0x7FB888;
-		player_pointer = 0x7FBA6D;
+		player_pointer = 0x7FBA6C;
 		obj_model2_array_pointer = 0x7F5F20;
 	elseif bizstring.contains(romName, "Japan") then
 		pointer_list = 0x7FC460;
 		camera_pointer = 0x7FBDD8;
-		player_pointer = 0x7FBFBD;
+		player_pointer = 0x7FBFBC;
 		obj_model2_array_pointer = 0x7F6470;
 	elseif bizstring.contains(romName, "Kiosk") then
 		pointer_list = 0x7B5E58;
 		camera_pointer = 0x7B5918;
-		player_pointer = 0x7B5AFD;
+		player_pointer = 0x7B5AFC;
 		obj_model2_array_pointer = 0x7F6000; -- TODO
 
 		actor_types = {
@@ -342,12 +343,15 @@ function toHexString(value, desiredLength, prefix)
 	return prefix..value;
 end
 
+local RDRAMBase = 0x80000000;
+local RDRAMSize = 0x800000;
+
 local function isRDRAM(value)
-	return value >= 0x000000 and value < 0x800000;
+	return value >= 0 and value < RDRAMSize;
 end
 
 local function isPointer(value)
-	return value >= 0x80000000 and value < 0x80800000;
+	return value >= RDRAMBase and value < RDRAMBase + RDRAMSize;
 end
 
 function get_bit(field, index)
@@ -393,7 +397,7 @@ local floor = 0xA4; -- 32 bit float big endian
 local distance_from_floor = 0xB4; -- 32 bit float big endian
 
 --local acceleration = 0xBC; -- Seems wrong
-local gravity_strength = 0xC8; -- 32 bit float big endian
+local terminal_velocity = 0xC8; -- 32 bit float big endian
 
 local light_thing = 0xCC; -- Values 0x00->0x14
 
@@ -403,7 +407,7 @@ local takes_enemy_damage = 0x13B;
 local locked_to_pad = 0x110; -- TODO: What datatype is this? code says byte but I'd think it'd be a pointer
 local lock_method_1_pointer = 0x13C;
 
-local pickup_state = 0x154;
+local object_state_byte = 0x154;
 local shade_byte = 0x16D;
 
 -- Relative to tag barrel
@@ -469,16 +473,14 @@ end
 
 local function populateObjectModel1Pointers()
 	local object_no = 0;
-	local playerObject = mainmemory.read_u24_be(player_pointer);
+	local playerObject = mainmemory.read_u24_be(player_pointer + 1);
 	local cameraObject = mainmemory.read_u24_be(camera_pointer + 1);
 
 	object_pointers = {};
 	for object_no = 0, max_objects do
-		local pointer = mainmemory.read_u24_be(pointer_list + (object_no * 4) + 1);
-		local object_found = isRDRAM(pointer);
-
-		if object_found and isValidObject(pointer, playerObject, cameraObject) then
-			table.insert(object_pointers, pointer);
+		local pointer = mainmemory.read_u32_be(pointer_list + (object_no * 4));
+		if isPointer(pointer) and isValidObject(pointer - RDRAMBase, playerObject, cameraObject) then
+			table.insert(object_pointers, pointer - RDRAMBase);
 		end
 	end
 
@@ -490,7 +492,7 @@ local function encirclePlayerObjectModel1()
 	if encircle_enabled then
 		local x, z;
 
-		local playerObject = mainmemory.read_u24_be(player_pointer);
+		local playerObject = mainmemory.read_u24_be(player_pointer + 1);
 		local xPos = mainmemory.readfloat(playerObject + x_pos, true);
 		local yPos = mainmemory.readfloat(playerObject + y_pos, true);
 		local zPos = mainmemory.readfloat(playerObject + z_pos, true);
@@ -551,6 +553,7 @@ local function getExamineDataModelOne(pointer)
 		table.insert(examine_data, { "Velocity", mainmemory.readfloat(pointer + velocity, true) });
 		table.insert(examine_data, { "Y Velocity", mainmemory.readfloat(pointer + y_velocity, true) });
 		table.insert(examine_data, { "Y Accel", mainmemory.readfloat(pointer + y_acceleration, true) });
+		table.insert(examine_data, { "Terminal Velocity", mainmemory.readfloat(pointer + terminal_velocity, true) });
 		table.insert(examine_data, { "Separator", 1 });
 	end
 
@@ -561,7 +564,7 @@ local function getExamineDataModelOne(pointer)
 
 	table.insert(examine_data, { "Shadow width", mainmemory.readbyte(pointer + shadow_width) });
 	table.insert(examine_data, { "Shadow height", mainmemory.readbyte(pointer + shadow_height) });
-	table.insert(examine_data, { "Pickup State", mainmemory.readbyte(pointer + pickup_state) });
+	table.insert(examine_data, { "Control State", mainmemory.readbyte(pointer + object_state_byte) });
 	table.insert(examine_data, { "Brightness", mainmemory.readbyte(pointer + shade_byte) });
 	table.insert(examine_data, { "Separator", 1 });
 
@@ -722,37 +725,47 @@ local obj_model2_model_rot_y = obj_model2_model_rot_x + 4; -- Float
 local obj_model2_model_rot_z = obj_model2_model_rot_y + 4; -- Float
 
 function getObjectModel2ArraySize()
-	local objModel2Array = mainmemory.read_u24_be(obj_model2_array_pointer + 1);
-	if isRDRAM(objModel2Array) then
-		return mainmemory.read_u32_be(objModel2Array - 0x0C) / obj_model2_slot_size;
+	local objModel2Array = mainmemory.read_u32_be(obj_model2_array_pointer);
+	if isPointer(objModel2Array) then
+		return mainmemory.read_u32_be(objModel2Array - RDRAMBase + object_size) / obj_model2_slot_size;
 	end
 	return 0;
 end
 
 function getObjectModel2SlotBase(index)
-	local objModel2Array = mainmemory.read_u24_be(obj_model2_array_pointer + 1);
-	return objModel2Array + index * obj_model2_slot_size;
+	local objModel2Array = mainmemory.read_u32_be(obj_model2_array_pointer);
+	if isPointer(objModel2Array) then
+		return objModel2Array - RDRAMBase + index * obj_model2_slot_size;
+	end
+	return 0;
 end
 
 function getObjectModel2ModelBase(index)
-	local objModel2Array = mainmemory.read_u24_be(obj_model2_array_pointer + 1);
-	return mainmemory.read_u24_be(objModel2Array + index * obj_model2_slot_size + obj_model2_model_pointer + 1);
+	local objModel2Array = mainmemory.read_u32_be(obj_model2_array_pointer);
+	if isPointer(objModel2Array) then
+		return mainmemory.read_u24_be(objModel2Array - RDRAMBase + index * obj_model2_slot_size + obj_model2_model_pointer + 1);
+	end
+	return 0;
 end
 
 function populateObjectModel2Pointers()
 	object_pointers = {};
-	numSlots = mainmemory.read_u32_be(obj_model2_array_count);
+	objModel2Array = mainmemory.read_u32_be(obj_model2_array_pointer);
+	if isPointer(objModel2Array) then
+		objModel2Array = objModel2Array - RDRAMBase;
+		numSlots = mainmemory.read_u32_be(obj_model2_array_count);
 
-	-- Fill and sort pointer list
-	for i = 0, numSlots - 1 do
-		table.insert(object_pointers, getObjectModel2SlotBase(i));
+		-- Fill and sort pointer list
+		for i = 1, numSlots do
+			table.insert(object_pointers, objModel2Array + (i - 1) * obj_model2_slot_size);
+		end
+		table.sort(object_pointers);
 	end
-	table.sort(object_pointers);
 end
 
 local function encirclePlayerObjectModel2()
 	if encircle_enabled then
-		local playerObject = mainmemory.read_u24_be(player_pointer);
+		local playerObject = mainmemory.read_u24_be(player_pointer + 1);
 		local xPos = mainmemory.readfloat(playerObject + x_pos, true);
 		local yPos = mainmemory.readfloat(playerObject + y_pos, true);
 		local zPos = mainmemory.readfloat(playerObject + z_pos, true);
@@ -771,7 +784,7 @@ local function encirclePlayerObjectModel2()
 			-- Set model X, Y, Z
 			modelPointer = mainmemory.read_u32_be(object_pointers[i] + obj_model2_model_pointer);
 			if isPointer(modelPointer) then
-				modelPointer = modelPointer - 0x80000000;
+				modelPointer = modelPointer - RDRAMBase;
 				mainmemory.writefloat(modelPointer + obj_model2_model_x_pos, x, true);
 				mainmemory.writefloat(modelPointer + obj_model2_model_y_pos, yPos, true);
 				mainmemory.writefloat(modelPointer + obj_model2_model_z_pos, z, true);
@@ -795,7 +808,7 @@ local function getExamineDataModelTwo(pointer)
 	local behaviorTypePointer = mainmemory.read_u32_be(pointer + obj_model2_behavior_type_pointer);
 	local behaviorPointer = mainmemory.read_u32_be(pointer + obj_model2_behavior_pointer);
 	if isPointer(behaviorTypePointer) then
-		table.insert(examine_data, { "Behavior Type", readNullTerminatedString(behaviorTypePointer - 0x80000000 + 0x0C) });
+		table.insert(examine_data, { "Behavior Type", readNullTerminatedString(behaviorTypePointer - RDRAMBase + 0x0C) });
 		table.insert(examine_data, { "Behavior Type Pointer", toHexString(behaviorTypePointer) });
 	end
 	if isPointer(behaviorPointer) then
@@ -818,7 +831,7 @@ local function getExamineDataModelTwo(pointer)
 
 	if hasModel then
 		table.insert(examine_data, { "Model Base", toHexString(modelPointer) });
-		modelPointer = modelPointer - 0x80000000;
+		modelPointer = modelPointer - RDRAMBase;
 		table.insert(examine_data, { "Separator", 1 });
 
 		table.insert(examine_data, { "Model X", mainmemory.readfloat(modelPointer + obj_model2_model_x_pos, true) });
@@ -968,7 +981,7 @@ local green_highlight = 0xFF00FF00;
 local yellow_highlight = 0xFFFFFF00;
 
 local function grab_object(pointer)
-	local playerObject = mainmemory.read_u24_be(player_pointer);
+	local playerObject = mainmemory.read_u24_be(player_pointer + 1);
 	if isRDRAM(playerObject) then
 		mainmemory.writebyte(playerObject + grab_pointer, 0x80);
 		mainmemory.write_u24_be(playerObject + grab_pointer + 1, pointer);
@@ -986,7 +999,7 @@ local function focus_object(pointer)
 end
 
 local function zipToSelectedObject()
-	local playerObject = mainmemory.read_u24_be(player_pointer);
+	local playerObject = mainmemory.read_u24_be(player_pointer + 1);
 	local desiredX, desiredY, desiredZ;
 	if isRDRAM(playerObject) then
 		-- Get selected object X,Y,Z position
@@ -1095,7 +1108,7 @@ local function draw_gui()
 	local row = 0;
 	local height = 16;
 
-	local playerObject = mainmemory.read_u24_be(player_pointer);
+	local playerObject = mainmemory.read_u24_be(player_pointer + 1);
 	local cameraObject = mainmemory.read_u24_be(camera_pointer + 1);
 
 	if bizstring.contains(grab_script_mode, "Model 1") then
@@ -1142,6 +1155,11 @@ local function draw_gui()
 		row = row + 1;
 	end
 
+	-- Clamp index to number of objects
+	if #object_pointers > 0 and object_index > #object_pointers then
+		object_index = #object_pointers;
+	end
+
 	if #object_pointers > 0 and object_index <= #object_pointers then
 		if bizstring.contains(grab_script_mode, "Examine") then
 			local examine_data = {};
@@ -1176,7 +1194,7 @@ local function draw_gui()
 				if object_pointers[i] == playerObject then
 					color = green_highlight;
 				end
-				gui.text(gui_x, gui_y + height * row, i..": "..string.format("0x%06x: ", object_pointers[i] or 0)..currentActorType.." ("..toHexString(currentActorSize)..")", color, nil, 'bottomright');
+				gui.text(gui_x, gui_y + height * row, i..": "..currentActorType.." "..toHexString(object_pointers[i] or 0, 6).." ("..toHexString(currentActorSize)..")", color, nil, 'bottomright');
 				row = row + 1;
 			end
 		end
@@ -1201,7 +1219,7 @@ local function draw_gui()
 				local behaviorType = "";
 				local behaviorTypePointer = mainmemory.read_u32_be(object_pointers[i] + obj_model2_behavior_type_pointer);
 				if isPointer(behaviorTypePointer) then
-					behaviorType = " "..behaviorType..readNullTerminatedString(behaviorTypePointer - 0x80000000 + 0x0C);
+					behaviorType = " "..behaviorType..readNullTerminatedString(behaviorTypePointer - RDRAMBase + 0x0C);
 				end
 
 				if not (behaviorPointer == "" and hide_non_scripted) then

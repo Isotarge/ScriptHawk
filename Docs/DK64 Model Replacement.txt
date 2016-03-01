@@ -13,6 +13,8 @@ Enguarde Modifier 8075C48B 00??
 Squawks Modifier  8075C49B 00??
 Squawks Modifier  8075C4AB 00??
 
+00CC0025 Mad Jack
+
 Replace ?? with any of the following values:
 
 00 - Crash

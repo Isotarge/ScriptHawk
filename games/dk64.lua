@@ -183,8 +183,7 @@ local velocity = 0xB8;
 
 local y_velocity = 0xC0;
 local y_acceleration = 0xC4;
-
-local gravity_strength = 0xC8;
+local terminal_velocity = 0xC8;
 
 local light_thing = 0xCC; -- Values 0x00->0x14
 
@@ -1014,6 +1013,7 @@ function Game.setYPosition(value)
 		end
 		mainmemory.writefloat(playerObject + y_pos, value, true);
 		mainmemory.writebyte(playerObject + locked_to_pad, 0x00);
+		Game.setYVelocity(0);
 	end
 end
 
@@ -1199,16 +1199,32 @@ local function clear_tb_void()
 	tb_void_byte_val = set_bit(tb_void_byte_val, 5); -- Turn on the lights
 	mainmemory.writebyte(Game.Memory.tb_void_byte[version], tb_void_byte_val);
 end
+clearTBVoid = clear_tb_void;
+Game.clearTBVoid = clearTBVoid;
 
 function force_pause()
 	local voidByteValue = mainmemory.readbyte(Game.Memory.tb_void_byte[version]);
 	mainmemory.writebyte(Game.Memory.tb_void_byte[version], set_bit(voidByteValue, 0));
 end
+forcePause = force_pause;
+Game.forcePause = forcePause;
 
 function force_zipper()
 	local voidByteValue = mainmemory.readbyte(Game.Memory.tb_void_byte[version] - 1);
 	mainmemory.writebyte(Game.Memory.tb_void_byte[version] - 1, set_bit(voidByteValue, 0));
 end
+forceZipper = force_zipper;
+Game.forceZipper = forceZipper;
+
+function gainControl()
+	local player = getPlayerObject();
+	if isRDRAM(player) then
+		visify();
+		mainmemory.writebyte(player + object_state_byte, 0x05);
+	end
+end
+gain_control = gainControl;
+Game.gainControl = gainControl;
 
 -----------------------------------
 -- DK64 - ISG Timer
