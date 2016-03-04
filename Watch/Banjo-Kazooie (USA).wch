@@ -39,6 +39,7 @@ SystemID N64
 283400	w	b	1	RDRAM	Stop'N'Swop Items
 2986BA	w	h	1	RDRAM	Banjo Model Replacement
 2986BE	w	h	1	RDRAM	Banjo Model Replacement
+322300	w	h	1	RDRAM	N64 Logo Skippable (set to 1000)
 364964	d	f	1	RDRAM	Termite Movement Speed
 364968	d	f	1	RDRAM	Termite Animation Duration
 36496C	d	f	1	RDRAM	Termite Animation Duration

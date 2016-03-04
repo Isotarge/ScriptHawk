@@ -1,5 +1,6 @@
 SystemID N64
 6F9EB8	b	u	1	RDRAM	Character
+6FB9D0	d	h	1	RDRAM	Start of pointers to strings
 6FF054	d	h	1	RDRAM	Object Model 2 Collision Linked List Pointer
 6FF080	d	h	1	RDRAM	HUD Pointer
 6FFE70	w	u	1	RDRAM	Demo Fadeout Timer
