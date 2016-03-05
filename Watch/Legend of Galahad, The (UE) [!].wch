@@ -3,10 +3,13 @@ SystemID GEN
 0568	w	s	1	68K RAM	Screen Y Position
 058A	b	s	1	68K RAM	Screen X Velocity
 058B	b	s	1	68K RAM	Screen Y Velocity
+0F25	b	u	1	68K RAM	LTUS Code Active
 0F41	b	u	1	68K RAM	Player is in cave
 0F43	b	s	1	68K RAM	Player X Velocity
 0F44	b	s	1	68K RAM	Player Y Velocity
 0F4F	b	u	1	68K RAM	Player is on moving platform?
+0F78	w	h	1	68K RAM	Player Respawn Chunk X
+0F7C	b	h	1	68K RAM	Player Respawn Chunk Y
 13E0	w	h	0	68K RAM	Score 1 & 2
 13E2	w	h	0	68K RAM	Score 3 & 4
 13E4	w	h	0	68K RAM	Score 5 & 6
@@ -15,6 +18,9 @@ SystemID GEN
 13FC	b	h	1	68K RAM	Charge 2
 1428	b	u	0	68K RAM	Got Key
 1432	w	u	1	68K RAM	Stage
+145D	b	u	1	68K RAM	Shop Item Index
+145E	b	u	1	68K RAM	Shop Item Switch Timer
+1464	b	h	1	68K RAM	Shop Text Index
 146A	w	u	1	68K RAM	Bombs
 146C	w	u	1	68K RAM	Coins
 1471	b	u	0	68K RAM	Health

@@ -62,32 +62,37 @@ local object_held_item = 0x3C; -- u16_be
 
 local object_types = {
 	[0x00] = "Null",
+
 	[0x01] = "Shop",
 	[0x02] = "Dragon",
 	[0x03] = "Jumping Barrel",
 	[0x04] = "Platform",
 	[0x05] = "Bridge",
-
 	[0x07] = "Swinging Ball on Chain",
-
 	[0x08] = "Destroyed Object / Pickup Spawner",
 	[0x09] = "Fancy Spike",
 	[0x0A] = "Guard",
-
+	[0x0B] = "Horse and Cart",
 	[0x0C] = "Waterfall Log",
 	[0x0D] = "Big Plant Enemy",
 	[0x0E] = "Pickup", -- Health, Coin
 	[0x0F] = "Destroyed Object / Pickup Spawner",
+
 	[0x10] = "Destroyed Object / Pickup Spawner",
 	[0x11] = "Roof Chain Spike Thing",
 	[0x12] = "Grey Floor Spike",
 	[0x13] = "Ant Enemy",
 	[0x14] = "Killable Glitch Dragon Thing (W2 tileset)",
+	[0x1B] = "Goblin (Bow)",
+	[0x1C] = "Falling Rock",
 
 	[0x20] = "Chest",
 	[0x21] = "Level End Portal",
 
 	[0x38] = "Spawning Object", -- Guard?
+
+	[0x43] = "Big Bat", -- Gold
+
 	--TODO: Finish Table
 };
 
