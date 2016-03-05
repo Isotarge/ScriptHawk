@@ -40,9 +40,10 @@ local function decrement_object_index()
 end
 
 local formhandle = forms.newform(320, 200, "Galahad");
-local checkbox_extra_data = forms.checkbox(formhandle, "Show all", 16, 16);
-local button_increment_object_index = forms.button(formhandle, "-", decrement_object_index, 16, 48, 20, 20);
-local button_decrement_object_index = forms.button(formhandle, "+", increment_object_index, 48, 48, 20, 20);
+local checkbox_extra_data = forms.checkbox(formhandle, "Show all", 17, 8);
+local checkbox_list_mode = forms.checkbox(formhandle, "List mode", 17, 32);
+local button_increment_object_index = forms.button(formhandle, "-", decrement_object_index, 16, 56, 32, 32);
+local button_decrement_object_index = forms.button(formhandle, "+", increment_object_index, 48, 56, 32, 32);
 
 ------------------------------
 -- Object Model Information --
@@ -213,13 +214,33 @@ function draw_ui()
 	local row = 0;
 	local height = 16;
 
-	local examine_data = getExamineData(getObjectBase(object_index));
-	for i = #examine_data, 1, -1 do
-		if examine_data[i][1] ~= "Separator" then
-			gui.text(gui_x, gui_y + height * row, examine_data[i][1]..": "..examine_data[i][2], nil, nil, 'bottomright');
-			row = row + 1;
-		else
-			row = row + examine_data[i][2];
+	if forms.ischecked(checkbox_list_mode) then
+		for i = max_objects, 1, -1 do
+			local objectBase = getObjectBase(i - 1);
+			local objectType = mainmemory.read_u16_be(objectBase + object_type);
+			if objectType ~= 0 or forms.ischecked(checkbox_extra_data) then
+				if type(object_types[objectType]) ~= "nil" then
+					objectType = object_types[objectType].." ("..toHexString(objectType)..")";
+				else
+					objectType = "Unknown ("..toHexString(objectType)..")";
+				end
+				local color = nil;
+				if i == object_index then
+					color = 0xFFFFFF00; -- Yellow
+				end
+				gui.text(gui_x, gui_y + height * row, objectType.." ("..toHexString(objectBase)..") "..i, color, nil, 'bottomright');
+				row = row + 1;
+			end
+		end
+	else
+		local examine_data = getExamineData(getObjectBase(object_index));
+		for i = #examine_data, 1, -1 do
+			if examine_data[i][1] ~= "Separator" then
+				gui.text(gui_x, gui_y + height * row, examine_data[i][1]..": "..examine_data[i][2], nil, nil, 'bottomright');
+				row = row + 1;
+			else
+				row = row + examine_data[i][2];
+			end
 		end
 	end
 end
