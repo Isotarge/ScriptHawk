@@ -21,11 +21,17 @@ function toHexString(value, desiredLength, prefix)
 end
 
 local function increment_object_index()
-	object_index = math.min(max_objects, object_index + 1);
+	object_index = object_index + 1;
+	if object_index > max_objects then
+		object_index = 1;
+	end
 end
 
 local function decrement_object_index()
-	object_index = math.max(1, object_index - 1);
+	object_index = object_index - 1;
+	if object_index < 1 then
+		object_index = max_objects;
+	end
 end
 
 local formhandle = forms.newform(320, 200, "Galahad");
