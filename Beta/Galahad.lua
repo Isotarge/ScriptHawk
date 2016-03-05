@@ -20,6 +20,11 @@ function toHexString(value, desiredLength, prefix)
 	return prefix..value;
 end
 
+local increment_object_index_key = "M";
+local increment_object_index_pressed = false;
+local decrement_object_index_key = "N";
+local decrement_object_index_pressed = false;
+
 local function increment_object_index()
 	object_index = object_index + 1;
 	if object_index > max_objects then
@@ -178,6 +183,30 @@ function getExamineData(objectBase)
 	return examine_data;
 end
 
+function process_input()
+	input_table = input.get();
+
+	-- Hold down key prevention
+	if input_table[decrement_object_index_key] == nil then
+		decrement_object_index_pressed = false;
+	end
+
+	if input_table[increment_object_index_key] == nil then
+		increment_object_index_pressed = false;
+	end
+
+	-- Check for key presses
+	if input_table[decrement_object_index_key] == true and not decrement_object_index_pressed then
+		decrement_object_index();
+		decrement_object_index_pressed = true;
+	end
+
+	if input_table[increment_object_index_key] == true and not increment_object_index_pressed then
+		increment_object_index();
+		increment_object_index_pressed = true;
+	end
+end
+
 function draw_ui()
 	local gui_x = 32;
 	local gui_y = 32;
@@ -195,4 +224,5 @@ function draw_ui()
 	end
 end
 
-event.onframestart(draw_ui , "ScriptHawk - Galahad object list OSD");
+event.onframestart(process_input, "ScriptHawk - Galahad object list Keybinds");
+event.onframestart(draw_ui, "ScriptHawk - Galahad object list OSD");

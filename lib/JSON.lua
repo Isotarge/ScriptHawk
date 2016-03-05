@@ -778,7 +778,7 @@ local function object_or_array(self, T, etc)
 		for _, number_key in ipairs(number_keys) do
 			local string_key = tostring(number_key)
 			if map[string_key] == nil then
-				table.insert(string_keys , string_key)
+				table.insert(string_keys, string_key)
 				map[string_key] = T[number_key]
 			else
 				self:onEncodeError("conflict converting table with mixed-type keys into a JSON object: key " .. number_key .. " exists both as a string and a number.", etc)

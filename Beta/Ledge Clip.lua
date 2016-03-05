@@ -58,7 +58,7 @@ local function plot_pos()
 			end
 
 			-- Set angle and position
-			rotate(1 , currentAngle);
+			rotate(1, currentAngle);
 			memory.writefloat(kong_object + x_pos, current_x, true);
 
 			-- Update angle and position for next test

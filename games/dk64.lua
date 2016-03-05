@@ -28,7 +28,7 @@ Game.Memory = {
 	["frames_lag"] = {0x76AF10, 0x765A30, 0x76B100, 0x72D140}, -- TODO: Kiosk only works for minecart?
 	["frames_real"] = {0x7F0560, 0x7F0480, 0x7F09D0, nil}, -- TODO: Make sure freezing these crashes the main thread -- TODO: Kiosk
 	["boss_pointer"] = {0x7FDC90, 0x7FDBD0, 0x7FE120, nil}, -- TODO: Find Mad Jack state based on Model 1 pointer list and actor type knowledge. MJ is actor 204
-	["slope_object_pointer"] = {0x7F94B8, nil, nil , nil}, -- TODO - PAL, JP & Kiosk, also note this is part of the player object so might be simpler to do getPlayerObject() + offset if it doesn't break anything
+	["slope_object_pointer"] = {0x7F94B8, nil, nil, nil}, -- TODO - PAL, JP & Kiosk, also note this is part of the player object so might be simpler to do getPlayerObject() + offset if it doesn't break anything
 	["obj_model2_array_pointer"] = {0x7F6000, 0x7F5F20, 0x7F6470, nil},
 	["obj_model2_array_count"] = {0x7F6004, 0x7F5F24, 0x7F6474, nil},
 	["obj_model2_collision_linked_list_pointer"] = {0x754244, 0x74E9A4, 0x753B34, 0x6FF054},
@@ -1464,10 +1464,10 @@ local function draw_mj_minimap()
 		gui.drawText(MJ_minimap_text_x, MJ_minimap_actions_remaining_y, actions_remaining.." "..action_type.."s remaining");
 
 		if action_type ~= "Jump" then
-			gui.drawText(MJ_minimap_text_x, MJ_minimap_phase_number_y , "Phase "..phase.." (switch)");
+			gui.drawText(MJ_minimap_text_x, MJ_minimap_phase_number_y, "Phase "..phase.." (switch)");
 			gui.drawText(MJ_minimap_text_x, MJ_time_until_next_action_y, time_until_next_action.." ticks until next "..action_type);
 		else
-			gui.drawText(MJ_minimap_text_x, MJ_minimap_phase_number_y , "Phase "..phase);
+			gui.drawText(MJ_minimap_text_x, MJ_minimap_phase_number_y, "Phase "..phase);
 		end
 	end
 end
