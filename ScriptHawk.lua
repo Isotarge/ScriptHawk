@@ -183,6 +183,9 @@ elseif stringContains(romName, "Banjo-Kazooie") or stringContains(romName, "Banj
 	Game = require "games.bk";
 elseif stringContains(romName, "Diddy Kong Racing") then
 	Game = require "games.dkr";
+elseif stringContains(romName, "Legend of Galahad") then
+	Game = require "beta.Galahad";
+	return;
 elseif stringContains(romName, "Rayman 2 - The Great Escape") then
 	Game = require "games.rayman_2";
 elseif stringContains(romName, "Super Mario 64") then
