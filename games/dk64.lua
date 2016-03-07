@@ -1182,14 +1182,14 @@ local function updateCurrentInvisify()
 	end
 end
 
-local function clear_tb_void()
+local function toggle_tb_void()
 	local tb_void_byte_val = mainmemory.readbyte(Game.Memory.tb_void_byte[version]);
-	tb_void_byte_val = set_bit(tb_void_byte_val, 4); -- Show Object Model 2 Objects
-	tb_void_byte_val = set_bit(tb_void_byte_val, 5); -- Turn on the lights
+	tb_void_byte_val = toggle_bit(tb_void_byte_val, 4); -- Show Object Model 2 Objects
+	tb_void_byte_val = toggle_bit(tb_void_byte_val, 5); -- Turn on the lights
 	mainmemory.writebyte(Game.Memory.tb_void_byte[version], tb_void_byte_val);
 end
-clearTBVoid = clear_tb_void;
-Game.clearTBVoid = clearTBVoid;
+toggleTBVoid = toggle_tb_void;
+Game.toggleTBVoid = toggleTBVoid;
 
 function force_pause()
 	local voidByteValue = mainmemory.readbyte(Game.Memory.tb_void_byte[version]);
@@ -1992,6 +1992,17 @@ function ohWrongnana()
 	end
 end
 
+function Game.replaceTextures()
+	replace_u32_be(0x805AC370, 0x805B23D0) -- Chunky left
+	replace_u32_be(0x805AD380, 0x805B33E0) -- Chunky Right
+	replace_u32_be(0x805AE390, 0x805B23D0) -- Diddy Left
+	replace_u32_be(0x805AF3A0, 0x805B33E0) -- Diddy Right
+	replace_u32_be(0x805B03B0, 0x805B23D0) -- DK Left
+	replace_u32_be(0x805B13C0, 0x805B33E0) -- DK Right
+	replace_u32_be(0x805B43F0, 0x805B23D0) -- Tiny Left
+	replace_u32_be(0x805B5400, 0x805B33E0) -- Tiny Right
+end
+
 ----------------
 -- ASM Loader --
 ----------------
@@ -2150,7 +2161,7 @@ function Game.initUI()
 
 	-- Buttons
 	ScriptHawkUI.form_controls["Toggle Invisify Button"] = forms.button(ScriptHawkUI.options_form, "Invisify", toggle_invisify, ScriptHawkUI.col(7), ScriptHawkUI.row(1), 64, ScriptHawkUI.button_height);
-	ScriptHawkUI.form_controls["Clear TB Void Button"] = forms.button(ScriptHawkUI.options_form, "Clear TB void", clear_tb_void, ScriptHawkUI.col(10), ScriptHawkUI.row(1), ScriptHawkUI.col(4) + 8, ScriptHawkUI.button_height);
+	ScriptHawkUI.form_controls["Toggle TB Void Button"] = forms.button(ScriptHawkUI.options_form, "Toggle TB void", toggle_tb_void, ScriptHawkUI.col(10), ScriptHawkUI.row(1), ScriptHawkUI.col(4) + 8, ScriptHawkUI.button_height);
 	ScriptHawkUI.form_controls["Unlock Moves Button"] = forms.button(ScriptHawkUI.options_form, "Unlock Moves", unlock_moves, ScriptHawkUI.col(10), ScriptHawkUI.row(4), ScriptHawkUI.col(4) + 8, ScriptHawkUI.button_height);
 	ScriptHawkUI.form_controls["Random Color"] = forms.button(ScriptHawkUI.options_form, "Random Color", Game.setKongColor, ScriptHawkUI.col(5), ScriptHawkUI.row(5), ScriptHawkUI.col(4) + 8, ScriptHawkUI.button_height);
 
