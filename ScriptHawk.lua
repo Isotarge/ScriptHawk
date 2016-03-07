@@ -171,6 +171,7 @@ function replace_u32_be(find, replace)
 			mainmemory.write_u32_be(i, replace);
 		end
 	end
+	print_deferred();
 end
 
 max_string_length = 25;
