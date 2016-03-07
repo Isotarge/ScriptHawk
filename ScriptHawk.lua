@@ -74,6 +74,14 @@ function clear_bit(field, index)
 end
 clearBit = clear_bit;
 
+function toggle_bit(field, index)
+	if getBit(field, index) then
+		return clearBit(field, index);
+	end
+	return setBit(field, index);
+end
+toggleBit = toggle_bit;
+
 function deepcompare(t1, t2, ignore_mt)
 	local ty1 = type(t1);
 	local ty2 = type(t2);
@@ -147,7 +155,7 @@ function traverse_size(object, minimumPrintSize, maximumPrintSize) -- TODO: Set 
 	while object > 0 and object < 0x7FFFFF do
 		local size = mainmemory.read_u32_be(object + 4);
 		if size >= minimumPrintSize and size <= maximumPrintSize then
-			dprint(count..": "..toHexString(object).." Size: "..toHexString(size));
+			dprint(count..": "..toHexString(object + 0x10).." "..(object + 0x10).." Size: "..toHexString(size));
 		end
 		object = object + 0x10 + size;
 		count = count + 1;
@@ -155,6 +163,15 @@ function traverse_size(object, minimumPrintSize, maximumPrintSize) -- TODO: Set 
 	print_deferred();
 end
 traverseSize = traverse_size;
+
+function replace_u32_be(find, replace)
+	for i = 0, 0x7FFFFF, 4 do
+		if mainmemory.read_u32_be(i) == find then
+			dprint("Replaced "..toHexString(i, 6));
+			mainmemory.write_u32_be(i, replace);
+		end
+	end
+end
 
 max_string_length = 25;
 function readNullTerminatedString(base)

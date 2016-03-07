@@ -312,6 +312,7 @@ Game.maps = {
 -- Region/Version --
 --------------------
 
+local player_pointer;
 local air;
 local frame_timer;
 local linked_list_root;
@@ -320,29 +321,33 @@ local map_trigger;
 
 function Game.detectVersion(romName)
 	if stringContains(romName, "Australia") then
+		player_pointer = 0x13A210;
+		moves_pointer = 0x1314F0;
 		air = 0x12FDC0;
 		frame_timer = 0x083550;
 		linked_list_root = 0x13C380;
 		map = 0x12C390;
-		moves_pointer = 0x1314F0;
 	elseif stringContains(romName, "Europe") then
+		player_pointer = 0x13A4A0;
+		moves_pointer = 0x131780;
 		air = 0x12FFD0;
 		frame_timer = 0x083550;
 		linked_list_root = 0x13C680;
 		map = 0x12C5A0;
-		moves_pointer = 0x131780;
 	elseif stringContains(romName, "Japan") then
+		player_pointer = 0x12F660;
+		moves_pointer = 0x126940;
 		air = 0x125220;
 		frame_timer = 0x0788F8;
 		linked_list_root = 0x131850;
 		map = 0x1217F0;
-		moves_pointer = 0x126940;
 	elseif stringContains(romName, "USA") then
+		player_pointer = 0x135490;
+		moves_pointer = 0x12C770;
 		air = 0x12B050;
 		frame_timer = 0x079138;
 		linked_list_root = 0x137800;
 		map = 0x127640;
-		moves_pointer = 0x12C770;
 	else
 		return false;
 	end
@@ -352,20 +357,22 @@ function Game.detectVersion(romName)
 	return true;
 end
 
-local function isPointer(number)
-	return number >= 0x000000 and number <= 0x3FFFFF;
+local RDRAMBase = 0x80000000;
+local RDRAMSize = 0x400000; -- Doubled With Expansion Pak
+
+-- Checks whether a value falls within N64 RDRAM
+local function isRDRAM(value)
+	return type(value) == "number" and value >= 0 and value < RDRAMSize;
+end
+
+-- Checks whether a value is a pointer
+local function isPointer(value)
+	return type(value) == "number" and value >= RDRAMBase and value < RDRAMBase + RDRAMSize;
 end
 
 function resolvePointer(base, index)
-	if isPointer(base) then
-		return mainmemory.read_u32_be(base + index) - 0x80000000;
-	end
-end
-
-local function find_root(object)
-	while object > 0 do
-		print(toHexString(object));
-		object = mainmemory.read_u24_be(object + 1);
+	if isRDRAM(base) then
+		return mainmemory.read_u32_be(base + index) - RDRAMBase;
 	end
 end
 
@@ -427,41 +434,11 @@ local slope_timer = 0x38;
 -- Relative to Velocity object
 local y_velocity = 0x14;
 
-local function getPlayerObject()
-	-- Get first object in linked list
-	local objectBase = resolvePointer(linked_list_root, next_item);
-
-	-- Iterate through linked list looking for pointer list that matches a known template
-	local playerFound = false;
-	while not playerFound and isPointer(objectBase) do
-		-- Check if current linked list object has pointers in the correct spots
-		local slopeObjectPointer = resolvePointer(objectBase, slope_pointer_index);
-		local positionObjectPointer = resolvePointer(objectBase, position_pointer_index);
-		local rotXObjectPointer = resolvePointer(objectBase, rot_x_pointer_index);
-		local rotYObjectPointer = resolvePointer(objectBase, rot_y_pointer_index);
-		local rotZObjectPointer = resolvePointer(objectBase, rot_z_pointer_index);
-		local velocityObjectPointer = resolvePointer(objectBase, velocity_pointer_index);
-
-		if isPointer(positionObjectPointer) and isPointer(rotXObjectPointer) and isPointer(rotYObjectPointer) and isPointer(rotZObjectPointer) and isPointer(velocityObjectPointer) and isPointer(slopeObjectPointer) then
-			playerFound = true;
-
-			-- Check for pointers near player pointer to make sure
-			-- TODO: Find a better method to do this
-			for i = 4, 89 do
-				if not isPointer(resolvePointer(objectBase, i * 4)) then
-					playerFound = false;
-				end
-			end
-		end
-
-		-- Get next object in linked list
-		if not playerFound then
-			objectBase = resolvePointer(objectBase, next_item);
-		end
-	end
-
-	if playerFound then
-		return objectBase;
+-- New method (player pointer):
+function Game.getPlayerObject()
+	local playerObject = mainmemory.read_u24_be(player_pointer + 1) - 0x10;
+	if isRDRAM(playerObject) then
+		return playerObject;
 	end
 end
 
@@ -558,21 +535,21 @@ end
 --------------
 
 function Game.getXRotation()
-	if type(playerObject) ~= "nil" and isPointer(playerObject) then
+	if type(playerObject) ~= "nil" and isRDRAM(playerObject) then
 		return mainmemory.readfloat(resolvePointer(playerObject, rot_x_pointer_index) + x_rot_current, true);
 	end
 	return 0;
 end
 
 function Game.getYRotation()
-	if type(playerObject) ~= "nil" and isPointer(playerObject) then
-		return mainmemory.readfloat(resolvePointer(playerObject, rot_y_pointer_index) + facing_angle, true);
+	if type(playerObject) ~= "nil" and isRDRAM(playerObject) then
+		return mainmemory.readfloat(resolvePointer(playerObject, rot_y_pointer_index) + facing_angle, true); -- TODO: Exception here
 	end
 	return 0;
 end
 
 function Game.getZRotation()
-	if type(playerObject) ~= "nil" and isPointer(playerObject) then
+	if type(playerObject) ~= "nil" and isRDRAM(playerObject) then
 		return mainmemory.readfloat(resolvePointer(playerObject, rot_z_pointer_index) + z_rot_current, true);
 	end
 	return 0;
@@ -629,7 +606,7 @@ local move_levels = {
 local function unlock_moves()
 	local level = forms.gettext(options_moves_dropdown);
 	local movesObject = mainmemory.read_u24_be(moves_pointer + 1);
-	if isPointer(movesObject) then
+	if isRDRAM(movesObject) then
 		mainmemory.write_u32_be(movesObject + 0x18, move_levels[level][1]);
 		mainmemory.write_u32_be(movesObject + 0x1C, move_levels[level][2]);
 	end
@@ -728,7 +705,7 @@ function Game.initUI()
 end
 
 function Game.eachFrame()
-	playerObject = getPlayerObject();
+	playerObject = Game.getPlayerObject();
 
 	if forms.ischecked(options_toggle_neverslip) then
 		neverSlip();

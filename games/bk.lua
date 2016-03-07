@@ -1,11 +1,16 @@
 local Game = {};
 
-local function isPointer(value)
-	return value >= 0x80000000 and value < 0x80800000;
+local RDRAMBase = 0x80000000;
+local RDRAMSize = 0x400000; -- Doubled with expansion pak
+
+-- Checks whether a value falls within N64 RDRAM
+local function isRDRAM(value)
+	return type(value) == "number" and value >= 0 and value < RDRAMSize;
 end
 
-local function isRDRAM(value)
-	return value > 0x000000 and value < 0x800000;
+-- Checks whether a value is a pointer
+local function isPointer(value)
+	return type(value) == "number" and value >= RDRAMBase and value < RDRAMBase + RDRAMSize;
 end
 
 --------------------
@@ -735,7 +740,7 @@ local ff_answer3_text_pointer = 0x44;
 
 function getSelectedFFAnswer()
 	local ff_question_object = mainmemory.read_u24_be(ff_question_pointer + 1);
-	if ff_question_object > 0x000000 and ff_question_object < 0x3FFFFF then
+	if isRDRAM(ff_question_object) then
 		return mainmemory.readbyte(ff_question_object + ff_current_answer);
 	end
 	return 0;
@@ -744,7 +749,7 @@ end
 -- TODO: Doesn't always work
 function getCorrectFFAnswer()
 	local ff_question_object = mainmemory.read_u24_be(ff_question_pointer + 1);
-	if ff_question_object > 0x000000 and ff_question_object < 0x3FFFFF then
+	if isRDRAM(ff_question_object) then
 		return mainmemory.readbyte(ff_question_object + ff_correct_answer);
 	end
 	return 0;

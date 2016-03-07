@@ -344,14 +344,16 @@ function toHexString(value, desiredLength, prefix)
 end
 
 local RDRAMBase = 0x80000000;
-local RDRAMSize = 0x800000;
+local RDRAMSize = 0x800000; -- Halved without expansion pak
 
+-- Checks whether a value falls within N64 RDRAM
 local function isRDRAM(value)
-	return value >= 0 and value < RDRAMSize;
+	return type(value) == "number" and value >= 0 and value < RDRAMSize;
 end
 
+-- Checks whether a value is a pointer
 local function isPointer(value)
-	return value >= RDRAMBase and value < RDRAMBase + RDRAMSize;
+	return type(value) == "number" and value >= RDRAMBase and value < RDRAMBase + RDRAMSize;
 end
 
 function get_bit(field, index)

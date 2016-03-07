@@ -1,4 +1,3 @@
-Domain RDRAM
 SystemID N64
 079138	d	s	1	RDRAM	Frame timer
 07913C	d	s	1	RDRAM	Frameskip
@@ -148,4 +147,5 @@ SystemID N64
 12C7F8	d	h	1	RDRAM	RNG
 12C7FC	d	h	1	RDRAM	RNG
 12C830	d	f	1	RDRAM	Unknown Float
+135490	d	h	1	RDRAM	Player Pointer
 

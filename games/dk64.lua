@@ -585,12 +585,17 @@ Game.maps = {
 	"K. Rool's Arena"
 };
 
-local function isPointer(value)
-	return value >= 0x80000000 and value < 0x80800000;
+local RDRAMBase = 0x80000000;
+local RDRAMSize = 0x800000; -- Halved without expansion pak
+
+-- Checks whether a value falls within N64 RDRAM
+local function isRDRAM(value)
+	return type(value) == "number" and value >= 0 and value < RDRAMSize;
 end
 
-local function isRDRAM(value)
-	return value > 0x000000 and value < 0x800000;
+-- Checks whether a value is a pointer
+local function isPointer(value)
+	return type(value) == "number" and value >= RDRAMBase and value < RDRAMBase + RDRAMSize;
 end
 
 ----------------
@@ -622,7 +627,7 @@ function checkFlags()
 	local temp_value;
 	local flag_found = false;
 	local known_flags_found = 0;
-	if flags > 0x700000 and flags < 0x7FFFFF - flag_block_size then
+	if flags > 0x700000 and flags < RDRAMSize - flag_block_size then
 		if #flag_block > 0 then
 			for i = 0, #flag_block do
 				temp_value = mainmemory.readbyte(flags + i);
@@ -666,7 +671,7 @@ end
 local function process_flag_queue()
 	if #flag_action_queue > 0 then
 		local flags = mainmemory.read_u24_be(Game.Memory.flag_block_pointer[version] + 1);
-		if flags > 0x700000 and flags < 0x7FFFFF - flag_block_size then
+		if flags > 0x700000 and flags < RDRAMSize - flag_block_size then
 			local queue_item, current_value;
 			for i = 1, #flag_action_queue do
 				queue_item = flag_action_queue[i];
@@ -918,7 +923,7 @@ end
 function forceTBS()
 	if force_tbs then
 		local pointer = mainmemory.read_u32_be(getPlayerObject() + lock_method_1_pointer);
-		if pointer > 0x80000000 and pointer < 0x807FFFFF then
+		if isPointer(pointer) then
 			print("Forcing TBS");
 			mainmemory.write_u32_be(getPlayerObject() + lock_method_1_pointer, 0x00000000);
 		end
@@ -990,7 +995,7 @@ function Game.setXPosition(value)
 		local playerObject = getPlayerObject();
 		local vehiclePointer = mainmemory.read_u32_be(playerObject + vehicle_actor_pointer);
 		if isPointer(vehiclePointer) then
-			vehiclePointer = vehiclePointer - 0x80000000;
+			vehiclePointer = vehiclePointer - RDRAMBase;
 			mainmemory.writefloat(vehiclePointer + x_pos, value, true);
 		end
 		mainmemory.writefloat(playerObject + x_pos, value, true);
@@ -1008,7 +1013,7 @@ function Game.setYPosition(value)
 		local playerObject = getPlayerObject();
 		local vehiclePointer = mainmemory.read_u32_be(playerObject + vehicle_actor_pointer);
 		if isPointer(vehiclePointer) then
-			vehiclePointer = vehiclePointer - 0x80000000;
+			vehiclePointer = vehiclePointer - RDRAMBase;
 			mainmemory.writefloat(vehiclePointer + y_pos, value, true);
 		end
 		mainmemory.writefloat(playerObject + y_pos, value, true);
@@ -1022,7 +1027,7 @@ function Game.setZPosition(value)
 		local playerObject = getPlayerObject();
 		local vehiclePointer = mainmemory.read_u32_be(playerObject + vehicle_actor_pointer);
 		if isPointer(vehiclePointer) then
-			vehiclePointer = vehiclePointer - 0x80000000;
+			vehiclePointer = vehiclePointer - RDRAMBase;
 			mainmemory.writefloat(vehiclePointer + z_pos, value, true);
 		end
 		mainmemory.writefloat(getPlayerObject() + z_pos, value, true);
@@ -1155,28 +1160,12 @@ end
 -- Misc functions --
 --------------------
 
-local function invisify()
-	local playerObject = getPlayerObject();
-	if isRDRAM(playerObject) then
-		local visibilityBitfieldValue = mainmemory.readbyte(playerObject + visibility);
-		mainmemory.writebyte(playerObject + visibility, clear_bit(visibilityBitfieldValue, 2));
-	end
-end
-
-local function visify()
-	local playerObject = getPlayerObject();
-	if isRDRAM(playerObject) then
-		local visibilityBitfieldValue = mainmemory.readbyte(playerObject + visibility);
-		mainmemory.writebyte(playerObject + visibility, set_bit(visibilityBitfieldValue, 2));
-	end
-end
-
 local current_invisify = "Invisify";
 local function toggle_invisify()
-	if current_invisify == "Invisify" then
-		invisify();
-	else
-		visify();
+	local playerObject = getPlayerObject();
+	if isRDRAM(playerObject) then
+		local visibilityBitfieldValue = mainmemory.readbyte(playerObject + visibility);
+		mainmemory.writebyte(playerObject + visibility, toggle_bit(visibilityBitfieldValue, 2));
 	end
 end
 
@@ -1485,7 +1474,7 @@ local function neverSlip()
 		-- Patch the slope timer
 		local slopeObject = mainmemory.read_u32_be(Game.Memory.slope_object_pointer[version]);
 		if isPointer(slopeObject) then
-			slopeObject = slopeObject - 0x80000000;
+			slopeObject = slopeObject - RDRAMBase;
 			mainmemory.writebyte(slopeObject + slope_timer, 0);
 		end
 	end
@@ -1565,7 +1554,7 @@ function everythingIsKong()
 		return;
 	end
 
-	local kongNumBones = mainmemory.readbyte(kongSharedModel - 0x80000000 + num_bones);
+	local kongNumBones = mainmemory.readbyte(kongSharedModel - RDRAMBase + num_bones);
 
 	local cameraObject = mainmemory.read_u24_be(Game.Memory.camera_pointer[version] + 1);
 	local actorListIndex = 0;
@@ -1926,7 +1915,7 @@ local obj_model2_behavior_type_pointer = 0x24;
 function getScriptName(objectModel2Base)
 	local behaviorTypePointer = mainmemory.read_u32_be(objectModel2Base + obj_model2_behavior_type_pointer);
 	if isPointer(behaviorTypePointer) then
-		return readNullTerminatedString(behaviorTypePointer - 0x80000000 + 0x0C);
+		return readNullTerminatedString(behaviorTypePointer - RDRAMBase + 0x0C);
 	end
 	return "";
 end
@@ -1973,11 +1962,11 @@ function ohWrongnana()
 				-- Get activation script
 				activationScript = mainmemory.read_u32_be(slotBase + 0x7C);
 				if isPointer(activationScript) then
-					activationScript = activationScript - 0x80000000;
+					activationScript = activationScript - RDRAMBase;
 					-- Get part 2
 					activationScript = mainmemory.read_u32_be(activationScript + 0xA0);
 					while isPointer(activationScript) do
-						activationScript = activationScript - 0x80000000;
+						activationScript = activationScript - RDRAMBase;
 						earlyCheckValue = mainmemory.read_u16_be(activationScript + 0x0C);
 						lateCheckValue = mainmemory.read_u16_be(activationScript + 0x24);
 						-- Check for the bullet magic and patch if needed
@@ -2477,6 +2466,13 @@ function Game.eachFrame()
 	--local yRot = Game.getYRotation();
 	--if yRot < Game.max_rot_units then
 	--		Game.setYRotation(yRot + Game.max_rot_units);
+	--end
+
+	-- Joypad copy
+	--local buttons = joypad.get(1);
+	--for i = 2, 4 do
+	--	joypad.set(buttons, i);
+	--	joypad.setanalog(buttons, i);
 	--end
 
 	-- Lag fix

@@ -206,11 +206,11 @@ SystemID N64
 7F94E8	d	f	1	RDRAM	Stored Y?
 7F94F8	d	f	1	RDRAM	Stored Y?
 7F9680	d	u	1	RDRAM	Texture Index?
-7FB968	d	h	1	RDRAM	Camera pointer?
-7FB970	d	h	1	RDRAM	Boss Pointer
-7FBB35	b	u	1	RDRAM	Object Count?
-7FBB3D	b	u	1	RDRAM	Object Count?
-7FBB4C	d	h	1	RDRAM	Player Pointer
+7FB940	d	h	1	RDRAM	Loading Zone Controller Pointer
+7FB960	d	h	1	RDRAM	Player 1 Pointer
+7FB968	d	h	1	RDRAM	Player 1 Camera Pointer
+7FBB35	b	u	1	RDRAM	Object Count (Model 1)
+7FBB3D	b	u	1	RDRAM	Object Index (Model 1)
 7FBB62	b	b	1	RDRAM	Zipper bitfield
 7FBB63	b	b	1	RDRAM	TB Void Bitfield
 7FBB64	b	b	1	RDRAM	Shadow Display Bitfield

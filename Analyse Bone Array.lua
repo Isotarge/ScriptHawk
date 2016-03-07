@@ -7,13 +7,13 @@ local romName = gameinfo.getromname();
 
 if bizstring.contains(romName, "Donkey Kong 64") then
 	if bizstring.contains(romName, "USA") and not bizstring.contains(romName, "Kiosk") then
-		pointer_list = 0x7fbff0;
+		pointer_list = 0x7FBFF0;
 	elseif bizstring.contains(romName, "Europe") then
-		pointer_list = 0x7fbf10;
+		pointer_list = 0x7FBF10;
 	elseif bizstring.contains(romName, "Japan") then
-		pointer_list = 0x7fc460;
+		pointer_list = 0x7FC460;
 	elseif bizstring.contains(romName, "Kiosk") then
-		pointer_list = 0x7b5e58;
+		pointer_list = 0x7B5E58;
 	end
 else
 	print("This game is not supported.");
@@ -61,14 +61,17 @@ function toHexString(value)
 	return "0x"..value;
 end
 
+local RDRAMBase = 0x80000000;
+local RDRAMSize = 0x800000; -- Halved without expansion pak
+
 -- Checks whether a value falls within N64 RDRAM
 local function isRDRAM(value)
-	return type(value) == "number" and value > 0x000000 and value < 0x7FFFFF;
+	return type(value) == "number" and value >= 0 and value < RDRAMSize;
 end
 
 -- Checks whether a value is a pointer
 local function isPointer(value)
-	return type(value) == "number" and isRDRAM(value - 0x80000000);
+	return type(value) == "number" and value >= RDRAMBase and value < RDRAMBase + RDRAMSize;
 end
 
 -- Reads a signed, fixed point (16.16) big endian value from memory
