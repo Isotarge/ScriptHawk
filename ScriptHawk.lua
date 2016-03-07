@@ -152,14 +152,17 @@ function traverse_size(object, minimumPrintSize, maximumPrintSize) -- TODO: Set 
 	minimumPrintSize = minimumPrintSize or -math.huge;
 	maximumPrintSize = maximumPrintSize or math.huge;
 	local count = 0;
-	while object > 0 and object < 0x7FFFFF do
-		local size = mainmemory.read_u32_be(object + 4);
+	local size = 0;
+	local prev = 0;
+	repeat
+		count = count + 1;
+		size = mainmemory.read_u32_be(object + 4);
 		if size >= minimumPrintSize and size <= maximumPrintSize then
 			dprint(count..": "..toHexString(object + 0x10).." "..(object + 0x10).." Size: "..toHexString(size));
 		end
 		object = object + 0x10 + size;
-		count = count + 1;
-	end
+		prev = mainmemory.read_u32_be(object);
+	until prev == 0 or not (object > 0 and object < 0x800000);
 	print_deferred();
 end
 traverseSize = traverse_size;

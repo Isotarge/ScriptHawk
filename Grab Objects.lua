@@ -809,14 +809,26 @@ local function getExamineDataModelTwo(pointer)
 	table.insert(examine_data, { "Slot base", string.format("0x%06x", pointer) });
 	local behaviorTypePointer = mainmemory.read_u32_be(pointer + obj_model2_behavior_type_pointer);
 	local behaviorPointer = mainmemory.read_u32_be(pointer + obj_model2_behavior_pointer);
+	local behaviorType = "unknown";
 	if isPointer(behaviorTypePointer) then
-		table.insert(examine_data, { "Behavior Type", readNullTerminatedString(behaviorTypePointer - RDRAMBase + 0x0C) });
+		behaviorType = readNullTerminatedString(behaviorTypePointer - RDRAMBase + 0x0C);
+		table.insert(examine_data, { "Behavior Type", behaviorType });
 		table.insert(examine_data, { "Behavior Type Pointer", toHexString(behaviorTypePointer) });
 	end
 	if isPointer(behaviorPointer) then
 		table.insert(examine_data, { "Behavior Pointer", toHexString(behaviorPointer) });
 	end
 	table.insert(examine_data, { "Separator", 1 });
+
+	if behaviorType == "pads" then
+		table.insert(examine_data, { "Warp Pad Texture", toHexString(mainmemory.read_u32_be(behaviorTypePointer - RDRAMBase + 0x374)) });
+		table.insert(examine_data, { "Separator", 1 });
+	end
+
+	if behaviorType == "gunswitches" then
+		table.insert(examine_data, { "Gunswitch Texture", toHexString(mainmemory.read_u32_be(behaviorTypePointer - RDRAMBase + 0x22C)) });
+		table.insert(examine_data, { "Separator", 1 });
+	end
 
 	if hasPosition then
 		table.insert(examine_data, { "Hitbox X", xPos });
