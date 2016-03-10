@@ -1,0 +1,18 @@
+Domain RDRAM
+SystemID N64
+76D4D0	d	h	1	RDRAM	points to the blocks
+79E168	d	h	1	RDRAM	points to the blocks
+79E168	d	h	1	RDRAM	points to the blocks
+79F038	d	h	1	RDRAM	points to the blocks
+79F038	d	h	1	RDRAM	points to the blocks
+767938	d	h	1	RDRAM	points to the blocks
+79D298	d	h	1	RDRAM	points to the blocks
+79E120	d	h	1	RDRAM	points to block 3
+79E190	d	h	1	RDRAM	block 3
+791250	d	h	1	RDRAM	block 2
+797250	d	h	1	RDRAM	block 1
+76C000	d	h	1	RDRAM	isles - melody
+7DDFE8	d	h	1	RDRAM	start of HUGE pointer block
+7E0110	d	h	1	RDRAM	start of midi file?
+7E1BA8	d	h	1	RDRAM	end of midi file?
+
