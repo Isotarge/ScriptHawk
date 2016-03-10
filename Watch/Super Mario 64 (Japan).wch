@@ -1,6 +1,82 @@
-Domain RDRAM
 SystemID N64
+0EB1E0	d	h	1	RDRAM	Pointer to Debug Function
+1A7AF0	w	h	1	RDRAM	Demo Timer
+1A8010	b	u	1	RDRAM	Highlighted Star (Visual)
+1A8014	b	u	1	RDRAM	Highlighted Star (Controls)
+32C640	d	u	1	RDRAM	V/I Timer
+32C694	d	u	1	RDRAM	Input Timer
+32CE20	b	u	1	RDRAM	Related to Keys
 32CE98	w	u	1	RDRAM	Map
+32FF60	b	u	1	RDRAM	Border Star Fade Counter
+32FFDC	d	f	1	RDRAM	Painting Entrance Height
+3305C4	d	h	1	RDRAM	Save and Continue/Quit Screen Timer
+3305CA	w	u	1	RDRAM	Score Screen Coin Counter
+339C30	w	u	1	RDRAM	Current Input
+339E0C	d	u	1	RDRAM	Mario Animation
+339E24	w	u	1	RDRAM	Mario Movement Angle
+339E2C	w	u	1	RDRAM	Mario Facing Angle
+339E3C	d	f	1	RDRAM	Mario X Position
+339E40	d	f	1	RDRAM	Mario Y Position
+339E44	d	f	1	RDRAM	Mario Z Position
+339E54	d	f	1	RDRAM	Mario Speed
 339E54	d	f	1	RDRAM	Horizontal Speed
 339E6C	d	f	1	RDRAM	Ceiling Height
+339EA8	w	u	1	RDRAM	Coins
+339EAA	w	u	1	RDRAM	Stars
+339EAC	b	h	1	RDRAM	Keys
+339EAD	b	u	1	RDRAM	Lives
+339EAE	b	u	1	RDRAM	Health
+339EAF	b	u	1	RDRAM	Health Countdown
+339EB0	w	h	1	RDRAM	Height of Mario Model
+339EB2	b	h	1	RDRAM	Damage Trigger
+339EB3	b	h	1	RDRAM	Damage Related
+339EB4	b	h	1	RDRAM	Damage Squished Animation Timer
+339EB6	w	u	1	RDRAM	Cap Timer
+339EB9	b	h	1	RDRAM	related to star counter
+339EC8	w	u	1	RDRAM	Star Select
+339EC9	b	h	1	RDRAM	Type of Menu (?)
+339ECC	w	h	1	RDRAM	this goes FFFF when paused
+339ED8	b	h	1	RDRAM	Level Reset
+339ED9	b	h	1	RDRAM	Level
+339EDA	b	u	1	RDRAM	Sublevel
+339EDB	b	h	1	RDRAM	Level Entrance
+339EEE	b	h	1	RDRAM	Timer Ticking
+339EF0	w	u	1	RDRAM	Lives (Incremental)
+339EF2	w	u	1	RDRAM	Coins (Incremental)
+339EF4	w	u	1	RDRAM	Stars 2
+339EFA	w	h	1	RDRAM	HUD Flags
+339EFC	w	u	1	RDRAM	Timer
+33B364	b	u	1	RDRAM	Camera Type
+33B365	b	u	1	RDRAM	Camera Type Entered With (???)
+33BF03	b	u	1	RDRAM	Objects
+33DC2F	b	u	1	RDRAM	THI Red Coin Counter
+33EA6F	b	u	1	RDRAM	SA Red Coin Counter
+33FB0F	b	u	1	RDRAM	CotMC Red Coin Counter
+34048F	b	u	1	RDRAM	DDD Red Coin Counter
+341C4F	b	u	1	RDRAM	VCutM Red Coin Counter
+34282F	b	u	1	RDRAM	WDW Red Coin Counter
+3438CF	b	u	1	RDRAM	WF Red Coin Counter
+343B2F	b	u	1	RDRAM	ToTWC Red Coin Counter
+343D8F	b	u	1	RDRAM	SSL Red Coin Counter
+343D8F	b	u	1	RDRAM	LLL Red Coin Counter
+344E2F	b	u	1	RDRAM	CCM Red Coin Counter
+344FD8	w	h	1	RDRAM	Mario Animation Timer
+344FDC	w	u	1	RDRAM	Mario Animation Timer(useless)
+3452EF	b	u	1	RDRAM	BBH Red Coin Counter
+34554F	b	u	1	RDRAM	SL Red Coin Counter
+3457AF	b	u	1	RDRAM	BitFS Red Coin Counter
+345A0F	b	u	1	RDRAM	JRB Red Coin Counter
+34684F	b	u	1	RDRAM	TTM Red Coin Counter
+347368	d	u	1	RDRAM	BitDW Switch Related
+3473C3	b	u	1	RDRAM	BBH Merry Ghost Counter
+3478EF	b	u	1	RDRAM	BitS Red Coin Counter
+34826F	b	u	1	RDRAM	BitDW Red Coin Counter
+348BEF	b	u	1	RDRAM	RR Red Coin Counter
+34AF8F	b	u	1	RDRAM	HMC Red Coin Counter
+34C74F	b	u	1	RDRAM	TTC Red Coin Counter
+34CC0F	b	u	1	RDRAM	BoB Red Coin Counter
+35FEE8	w	u	1	RDRAM	TTC Clock Speed
+36008E	b	u	1	RDRAM	Global Red Coin Counter
+3600A4	w	u	1	RDRAM	CCM/SL Snowfall
+38EEE0	w	u	1	RDRAM	RNG
 
