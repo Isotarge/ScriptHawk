@@ -1,0 +1,10 @@
+SystemID GEN
+156A	w	u	1	68K RAM	Help Enabled
+B50E	w	h	1	68K RAM	RNG?
+B602	w	u	1	68K RAM	Men allocated to Battle
+E262	w	1	1	68K RAM	Breed Ticker
+E264	w	u	1	68K RAM	Men
+E470	b	u	1	68K RAM	Rocks Aloha Bottom Sector Scarlet
+E471	b	u	1	68K RAM	Slingshots Aloha Bottom Sector Scarlet
+E49C	w	u	1	68K RAM	Red Army Total Aloha Bottom Sector Scarlet
+
