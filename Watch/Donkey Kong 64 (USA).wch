@@ -80,6 +80,11 @@ SystemID N64
 753204	d	f	1	RDRAM	Lanky Walk Maximum Velocity
 753208	d	f	1	RDRAM	Tiny Walk Maximum Velocity
 75320C	d	f	1	RDRAM	Chunky Walk Maximum Velocity
+7532D4	d	f	1	RDRAM	DK Carrying Object Maximum Velocity
+7532D8	d	f	1	RDRAM	Diddy Carrying Object Maximum Velocity
+7532DC	d	f	1	RDRAM	Lanky Carrying Object Maximum Velocity
+7532E0	d	f	1	RDRAM	Tiny Carrying Object Maximum Velocity
+7532E4	d	f	1	RDRAM	Chunky Carrying Object Maximum Velocity
 753578	d	f	1	RDRAM	DK Idle, Kick, Crouch, Fall Y Acceleration
 753590	d	f	1	RDRAM	Rambi Idle Y Acceleration
 7535B0	d	f	1	RDRAM	DK Jump Y Acceleration
