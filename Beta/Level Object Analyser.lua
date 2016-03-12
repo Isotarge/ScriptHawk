@@ -120,6 +120,7 @@ function isHex(var_type)
 	return var_type == "Hex" or var_type == "Pointer" or var_type == "Z4_Unknown";
 end
 
+-- TOOD: Use ScriptHawks' beefy implementation
 function toHexString(value)
 	value = string.format("%X", value or 0);
 	if string.len(value) % 2 ~= 0 then

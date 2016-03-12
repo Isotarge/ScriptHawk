@@ -7,7 +7,7 @@ local Game = {};
 local version; -- 1 USA, 2 PAL, 3 JP, 4 Kiosk
 -- 7fa8a0 bone array pointer block
 -- 2 pointers
--- 1 uint32be
+-- 1 u32_be
 Game.Memory = {
 	["map"] = {0x7444E4, 0x73EC34, 0x743DA4, 0x72CDE4}, -- Note: Exit = Map + 4
 	["file"] = {0x7467C8, 0x740F18, 0x746088, nil},

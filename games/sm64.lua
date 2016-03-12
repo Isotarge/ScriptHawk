@@ -9,6 +9,7 @@ local y_pos;
 local z_pos;
 
 local map;
+local object_list;
 
 Game.maps = {
 	"Unknown 1",
@@ -51,27 +52,49 @@ Game.maps = {
 	"Unknown 38"
 };
 
+local RDRAMBase = 0x80000000;
+local RDRAMSize = 0x400000; -- Doubled with expansion pak
+
+-- Checks whether a value falls within N64 RDRAM
+local function isRDRAM(value)
+	return type(value) == "number" and value >= 0 and value < RDRAMSize;
+end
+
+-- Checks whether a value is a pointer
+local function isPointer(value)
+	return type(value) == "number" and value >= RDRAMBase and value < RDRAMBase + RDRAMSize;
+end
+
 --------------------
 -- Region/Version --
 --------------------
 
 function Game.detectVersion(romName)
 	if stringContains(romName, "USA") then
-		x_rot = 0x33b19c;
-		x_pos = 0x33b1ac;
+		x_rot = 0x33B19C; -- u16_be
+		x_pos = 0x33B1AC; -- Float
+		velocity = 0x33B1C4; -- Float
 		map = 0x32DDF8;
+		object_list = 0x33D488;
 	elseif stringContains(romName, "Europe") then
-		x_rot = 0x30945c;
-		x_pos = 0x30946c;
+		x_rot = 0x30945C; -- u16_be
+		x_pos = 0x30946C; -- Float
+		velocity = 0x309484; -- Float
 		map = 0x2F9FC8;
+		object_list = 0x30B0B8;
+		-- global_object_data = 0x386A20;
 	elseif stringContains(romName, "Japan") and stringContains(romName, "Shindou Edition") then
-		x_rot = 0x31d9ec;
-		x_pos = 0x31d9fc;
+		x_rot = 0x31D9EC; -- u16_be
+		x_pos = 0x31D9FC; -- Float
+		velocity = 0x31DA14; -- Float
 		map = 0x30D528;
+		object_list = 0x31F648;
 	elseif stringContains(romName, "Japan") then
-		x_rot = 0x339e2c;
-		x_pos = 0x339e3c;
+		x_rot = 0x339E2C; -- u16_be
+		x_pos = 0x339E3C; -- Float
+		velocity = 0x339E54; -- Float
 		map = 0x32CE98;
+		object_list = 0x33C118;
 	else
 		return false;
 	end
@@ -83,6 +106,210 @@ function Game.detectVersion(romName)
 
 	return true;
 end
+
+---------------------
+-- Object Analysis --
+---------------------
+
+local objectIndex = 0;
+local numObjects = 240;
+local objectSize = 0x260; -- Double check
+
+local decrement_object_index_key = "N";
+local increment_object_index_key = "M";
+local zip_key = "Z";
+
+local decrement_object_index_pressed = false;
+local increment_object_index_pressed = false;
+local zip_pressed = false;
+
+function incrementObjectIndex()
+	objectIndex = objectIndex + 1;
+	if objectIndex >= numObjects then
+		objectIndex = 0;
+	end
+	--Game.eachFrame(); -- TODO: Think of a better way to update OSD
+end
+
+function decrementObjectIndex()
+	objectIndex = objectIndex - 1;
+	if objectIndex < 0 then
+		objectIndex = numObjects;
+	end
+	--Game.eachFrame(); -- TODO: Think of a better way to update OSD
+end
+
+local object_vars = {
+	--[0x00] = {["Type"] = "u16_be", ["Display"] = "hex", ["Name"] = "Header", ["Description"] = "Always 0x18"},
+	[0x02] = {["Type"] = "u16_be", ["Display"] = "binary", ["Name"] = "Camera Bitfield", ["Description"] = "Affects how the object behaves according to the camera (billboarding, hide object, etc)"},
+	[0x04] = {["Type"] = "pointer", ["Name"] = "Previous Object", ["Description"] = "Pointer to next object (if last object, pointer to first object)"},
+	[0x08] = {["Type"] = "pointer", ["Name"] = "Next Object", ["Description"] = "Pointer to previous object (if first object, pointer to last object)"},
+	--[0x0C] = {["Type"] = "pointer", ["Name"] = "Global Object Variables", ["Description"] = "Pointer to variables that affect all objects"},
+
+	[0x14] = {["Type"] = "pointer", ["Name"] = "Graphics Data", ["Description"] = "Pointer to the object's graphics data. If zero, object has no graphics"},
+	[0x18] = {["Type"] = "u16_be", ["Display"] = "binary", ["Name"] = "Graphics Enabled", ["Description"] = "Use graphics flag"},
+
+	--[0x20] = {["Type"] = "float", ["Name"] = "Unknown Float 0x20"},
+	--[0x24] = {["Type"] = "float", ["Name"] = "Unknown Float 0x24"},
+	--[0x28] = {["Type"] = "float", ["Name"] = "Unknown Float 0x28"},
+
+	[0x2C] = {["Type"] = "float", ["Name"] = "X Scale"},
+	[0x30] = {["Type"] = "float", ["Name"] = "Y Scale"},
+	[0x34] = {["Type"] = "float", ["Name"] = "Z Scale"},
+
+	[0x38] = {["Type"] = "u16_be", ["Name"] = "Current Action", ["Description"] = "Object's current action (Mario only?)"},
+	[0x3A] = {["Type"] = "u16_be", ["Name"] = "Vertical Offset", ["Description"] = "Higher object above or lower below ground (Mario only?)"},
+	[0x3C] = {["Type"] = "pointer", ["Name"] = "Animation Data", ["Description"] = "Pointer to the object's animation data. If zero, object is not animated"},
+	[0x40] = {["Type"] = "u16_be", ["Name"] = "Animation Frame", ["Description"] = "For animated objects, current animation frame"},
+
+	--[0x54] = {["Type"] = "float", ["Name"] = "Unknown Float 0x54"},
+	--[0x58] = {["Type"] = "float", ["Name"] = "Unknown Float 0x58"},
+	--[0x5C] = {["Type"] = "float", ["Name"] = "Unknown Float 0x5C"},
+
+	--[0x60] = {["Type"] = "pointer", ["Name"] = "Unknown Object Pointer 0x60", ["Description"] = "Points to an object, use is currently unknown"},
+	--[0x64] = {["Type"] = "pointer", ["Name"] = "Unknown Object Pointer 0x64", ["Description"] = "Points to an object, use is currently unknown"},
+	[0x68] = {["Type"] = "pointer", ["Name"] = "Target Object", ["Description"] = "For objects that follow another this is a pointer to the object to follow"},
+
+	[0x74] = {["Type"] = "u16_be", ["Display"] = "binary", ["Name"] = "Is Active", ["Description"] = "Determines if the object is being used"},
+	[0x76] = {["Type"] = "u16_be", ["Display"] = "binary", ["Name"] = "Collision", ["Description"] = "Collision flag?"},
+	[0x78] = {["Type"] = "pointer", ["Name"] = "Collision Object", ["Description"] = "Pointer to object this object collided with"},
+
+	[0x8E] = {["Type"] = "u16_be", ["Display"] = "binary", ["Name"] = "Reaction", ["Description"] = "How much object reacts to Mario (use depends on behaviour)"},
+
+	[0xA0] = {["Type"] = "float", ["Name"] = "X Position"},
+	[0xA4] = {["Type"] = "float", ["Name"] = "Y Position"},
+	[0xA8] = {["Type"] = "float", ["Name"] = "Z Position"},
+
+	[0xC4] = {["Type"] = "u32_be", ["Name"] = "X Collision Rotation"}, -- TODO: Hitbox rotation?
+	[0xC8] = {["Type"] = "u32_be", ["Name"] = "Y Collision Rotation"}, -- TODO: Hitbox rotation?
+	[0xCC] = {["Type"] = "u32_be", ["Name"] = "Z Collision Rotation"}, -- TODO: Hitbox rotation?
+
+	[0xD0] = {["Type"] = "float", ["Name"] = "X Rotation"},
+	[0xD4] = {["Type"] = "float", ["Name"] = "Y Rotation"}, -- TODO: Getting bogus values here, are these u16_be?
+	[0xD8] = {["Type"] = "float", ["Name"] = "Z Rotation"},
+
+	[0xF0] = {["Type"] = "u32_be", ["Name"] = "Appearance", ["Description"] = "Changes the appearance of the object (used by some object graphics)"},
+	[0xF4] = {["Type"] = "u32_be", ["Name"] = "Object Type", ["Description"] = "Type of object (used by some behaviours to allow for behaviour variations)"},
+	[0xF8] = {["Type"] = "float", ["Name"] = "Scale", ["Description"] = "Used by some behaviors to scale all 3 axes"},
+	[0xFC] = {["Type"] = "u32_be", ["Name"] = "Fuse Timer", ["Description"] = "Fuse timer used by Bob-omb behavior"}, -- TODO: Used for anything else?
+
+	[0x108] = {["Type"] = "float", ["Name"] = "Scale", ["Description"] = "Used for file select buttons to scale all 3 axes"},
+
+	[0x120] = {["Type"] = "u32_be", ["Name"] = "Animation Start Offset", ["Description"] = "Segment/offset value indicating start of animation data"},
+	[0x124] = {["Type"] = "u32_be", ["Name"] = "Current Action (0x124)", ["Description"] = "What the object is doing, exact use depends on behavior"},
+	[0x130] = {["Type"] = "u32_be", ["Name"] = "Current Action (0x130)", ["Description"] = "Simple behaviour select such as climbing it like a tree or to act like a door"},
+	[0x134] = {["Type"] = "u32_be", ["Name"] = "Special Action (0x134)", ["Description"] = "Certain actions performed only by Mario? For other behaviors, to do with collisions"},
+
+	[0x144] = {["Type"] = "u32_be", ["Name"] = "Current Action (0x144)", ["Description"] = "Used by some behaviors to remember what it's doing, other behaviours have different use"},
+	[0x14C] = {["Type"] = "u32_be", ["Name"] = "Current Action (0x14C)", ["Description"] = "Used by most behaviors to remember what it's doing"},
+	[0x150] = {["Type"] = "u32_be", ["Name"] = "Current Action (0x150)", ["Description"] = "Used by some behaviors to remember what it's doing"},
+	[0x154] = {["Type"] = "u32_be", ["Name"] = "Timer", ["Description"] = "Timer used by and updated by some behaviors"},
+
+	[0x17C] = {["Type"] = "u32_be", ["Name"] = "Transparancy", ["Description"] = "Level of transparency for object's graphics"},
+	[0x180] = {["Type"] = "u32_be", ["Name"] = "Damage", ["Description"] = "How many segments of damage to do to Mario for objects that cause him harm"},
+	[0x184] = {["Type"] = "u32_be", ["Name"] = "Health", ["Description"] = "Used by some behaviours to remember its health. Other behaviours have similar use"},
+
+	[0x198] = {["Type"] = "u32_be", ["Name"] = "Coin Payout", ["Description"] = "How many coins to give, how you get the coins depends on the behaviour"},
+	[0x19C] = {["Type"] = "float", ["Name"] = "Activation Radius", ["Description"] = "Controls what distance from the camera the object becomes active?"},
+
+	[0x1AC] = {["Type"] = "pointer", ["Name"] = "External Behavior Data (0x1AC)", ["Description"] = "Pointer to external data used by some behaviors"},
+	[0x1B0] = {["Type"] = "u32_be", ["Name"] = "External Behavior Data Index", ["Description"] = "Used by some behaviors as an index into the external data"},
+	[0x1B8] = {["Type"] = "u16_be", ["Name"] = "External Behavior Data Value", ["Description"] = "For some behaviors, this is the value copied from the External Behavior Data object (0x1C0)"},
+	[0x1C0] = {["Type"] = "pointer", ["Name"] = "External Behavior Data (0x1C0)", ["Description"] = "Pointer to external data used by some behaviors"},
+
+	[0x1CC] = {["Type"] = "pointer", ["Name"] = "Behavior Script Offset 1", ["Description"] = "Pointer to part of behaviour script to be executed"}, -- TODO: On kill? On hit? What are these?
+	[0x1D4] = {["Type"] = "pointer", ["Name"] = "Behavior Script Offset 2", ["Description"] = "Pointer to part of behaviour script to be executed"}, -- TODO: On kill? On hit? What are these?
+	[0x1DC] = {["Type"] = "pointer", ["Name"] = "Behavior Script Offset 3", ["Description"] = "Pointer to part of behaviour script to be executed"}, -- TODO: On kill? On hit? What are these?
+
+	[0x1F8] = {["Type"] = "float", ["Name"] = "Tree Bottom", ["Description"] = "Determines start of tree where Mario can grab before climbing"}, -- TODO: Better description
+	[0x1FC] = {["Type"] = "float", ["Name"] = "Tree Top", ["Description"] = "Determines height of tree and thus, when Mario can handstand"}, -- TODO: Better description
+
+	[0x20C] = {["Type"] = "pointer", ["Name"] = "Behavior Script", ["Description"] = "Pointer to start of the object's behaviour script"},
+	[0x214] = {["Type"] = "pointer", ["Name"] = "Standing On", ["Description"] = "Pointer to the object this object is standing on (used only by Mario?)"},
+	[0x218] = {["Type"] = "pointer", ["Name"] = "Collision Data", ["Description"] = "Pointer to collision data (as set by behaviour script command 0x2A)"},
+	--[0x25C] = {["Type"] = "pointer", ["Name"] = "Unknown Pointer 0x25C"},
+};
+
+function getVariableName(address)
+	local variable = object_vars[address];
+	local nameType = type(variable.Name);
+
+	if nameType == "string" then
+		return variable.Name;
+	elseif nameType == "table" then
+		-- TODO: Decide how to pick shorter/longer names, maybe maximum length passed in?
+		return variable.Name[1];
+	end
+
+	return variable.Type;
+end
+
+function getExamineData(objectBase)
+	local examineData = {};
+	local relativeAddress, variable;
+	for relativeAddress = 0, objectSize do
+		variable = object_vars[relativeAddress];
+		if type(variable) == "table" then
+			local variableName = getVariableName(relativeAddress);
+			local variableValue = 0;
+			if variable.Type == "u8" or variable.Type == "byte" or variable.Type == "Byte" then
+				variableValue = mainmemory.read_u8(objectBase + relativeAddress);
+			elseif variable.Type == "s8" then
+				variableValue = mainmemory.read_s8(objectBase + relativeAddress);
+			elseif variable.Type == "u16_be" then
+				variableValue = mainmemory.read_u16_be(objectBase + relativeAddress);
+			elseif variable.Type == "s16_be" then
+				variableValue = mainmemory.read_s16_be(objectBase + relativeAddress);
+			elseif variable.Type == "u32_be" or variable.Type == "pointer" or variable.Type == "Pointer" then
+				variableValue = mainmemory.read_u32_be(objectBase + relativeAddress);
+			elseif variable.Type == "s32_be" then
+				variableValue = mainmemory.read_s32_be(objectBase + relativeAddress);
+			elseif variable.Type == "float" or variable.Type == "Float" then
+				variableValue = mainmemory.readfloat(objectBase + relativeAddress, true);
+			end
+			if variable.Type == "pointer" or variable.Type == "Pointer" then
+				if isPointer(variableValue) then
+					table.insert(examineData, {variableName, toHexString(variableValue)});
+				end
+			else
+				if variable.Display == "Hex" or variable.Display == "hex" then
+					table.insert(examineData, {variableName, toHexString(variableValue)});
+				elseif variable.Display == "Binary" or variable.Display == "binary" or variable.Display == "Bitfield" or variable.Display == "bitfield" then
+					table.insert(examineData, {variableName, bizstring.binary(variableValue)});
+				else
+					table.insert(examineData, {variableName, variableValue});
+				end
+			end
+		end
+	end
+	return examineData;
+end
+
+function zipToSelectedObject()
+	local objectBase = object_list + objectIndex * objectSize;
+
+	local objectX = mainmemory.readfloat(objectBase + 0xA0, true);
+	local objectY = mainmemory.readfloat(objectBase + 0xA4, true);
+	local objectZ = mainmemory.readfloat(objectBase + 0xA8, true);
+
+	Game.setXPosition(objectX);
+	Game.setYPosition(objectY);
+	Game.setZPosition(objectZ);
+end
+
+-- TODO: Put unknowns in object_vars table somehow, probably autopopulate and have checkbox to display unknown fields
+	-- float: Unknown Use:
+		-- 0xE8, 0x100, 0x104, 0x15C, 0x194, 0x200, 0x204, 0x21C, 0x230, 0x244, 0x258
+	-- u16_be: Unknown Use:
+		-- 0x1A, 0x42, 0x8C, 0x1F4, 0x1F6
+	-- u16_be(?): Unknown Type, Unknown Use:
+		-- 0x94, 0x96, 0x1BA, 0x1BC
+	-- u32_be(?): Unknown Type, Unknown Use:
+		-- 0x10, 0x1C, 0x44, 0x48, 0x4C, 0x50, 0x6C, 0x70, 0x7C, 0x80, 0x84, 0x88, 0x90, 0x98, 0x9C, 0xAC, 0xB0,
+		-- 0xB4, 0xB8, 0xBC, 0xC0, 0xDC, 0xE0, 0xE4, 0xEC, 0x10C, 0x110, 0x114, 0x118, 0x11C, 0x128, 0x12C, 0x138, 0x13C, 0x140, 0x148,
+		-- 0x158, 0x160, 0x164, 0x168, 0x16C, 0x170, 0x174, 0x178, 0x188, 0x18C, 0x190, 0x1A0, 0x1A4, 0x1A8, 0x1B4, 0x1C4,
+		-- 0x1C8, 0x1D0, 0x1D8, 0x1E0, 0x1E4, 0x1E8, 0x1EC, 0x1F0, 0x208, 0x210, 0x220, 0x224, 0x228, 0x22C, 0x234,
+		-- 0x238, 0x23C, 0x240, 0x248, 0x24C, 0x250, 0x254
 
 -------------------
 -- Physics/Scale --
@@ -169,11 +396,61 @@ function Game.applyInfinites()
 end
 
 function Game.initUI()
-	-- TODO
+	ScriptHawkUI.form_controls["Enable Object Analyzer"] = forms.checkbox(ScriptHawkUI.options_form, "Object Analyzer", ScriptHawkUI.col(10) + ScriptHawkUI.dropdown_offset, ScriptHawkUI.row(6) + ScriptHawkUI.dropdown_offset);
+	ScriptHawkUI.form_controls["Decrement Object Index"] = forms.button(ScriptHawkUI.options_form, "-", decrementObjectIndex, ScriptHawkUI.col(13) - 7, ScriptHawkUI.row(7), ScriptHawkUI.button_height, ScriptHawkUI.button_height);
+	ScriptHawkUI.form_controls["Increment Object Index"] = forms.button(ScriptHawkUI.options_form, "+", incrementObjectIndex, ScriptHawkUI.col(13) + ScriptHawkUI.button_height - 7, ScriptHawkUI.row(7), ScriptHawkUI.button_height, ScriptHawkUI.button_height);
+	ScriptHawkUI.form_controls["Object Index Label"] = forms.label(ScriptHawkUI.options_form, "Index: 0", ScriptHawkUI.col(8) + ScriptHawkUI.button_height + 21, ScriptHawkUI.row(7) + ScriptHawkUI.label_offset, 64, 14);
 end
 
 function Game.eachFrame()
-	-- TODO
+	input_table = input.get();
+
+	-- Hold down key prevention
+	if input_table[decrement_object_index_key] == nil then
+		decrement_object_index_pressed = false;
+	end
+
+	if input_table[increment_object_index_key] == nil then
+		increment_object_index_pressed = false;
+	end
+
+	if input_table[zip_key] == nil then
+		zip_pressed = false;
+	end
+
+	-- Check for key presses
+	if input_table[decrement_object_index_key] == true and decrement_object_index_pressed == false then
+		decrementObjectIndex();
+		decrement_object_index_pressed = true;
+	end
+
+	if input_table[increment_object_index_key] == true and increment_object_index_pressed == false then
+		incrementObjectIndex();
+		increment_object_index_pressed = true;
+	end
+
+	if input_table[zip_key] == true and zip_pressed == false then
+		zipToSelectedObject();
+		zip_pressed = true;
+	end
+
+	forms.settext(ScriptHawkUI.form_controls["Object Index Label"], "Index: "..objectIndex);
+	if forms.ischecked(ScriptHawkUI.form_controls["Enable Object Analyzer"]) then
+		local gui_x = 2;
+		local gui_y = 2;
+		local row = 0;
+		local height = 16;
+
+		local examine_data = getExamineData(object_list + objectIndex * objectSize);
+		for i = #examine_data, 1, -1 do
+			if examine_data[i][1] ~= "Separator" then
+				gui.text(gui_x, gui_y + height * row, examine_data[i][2].." - "..examine_data[i][1], nil, nil, 'bottomright');
+				row = row + 1;
+			else
+				row = row + examine_data[i][2];
+			end
+		end
+	end
 end
 
 return Game;
