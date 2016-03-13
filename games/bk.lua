@@ -1261,4 +1261,17 @@ Game.OSD = {
 	--{"FF Answer", getCorrectFFAnswer},
 };
 
+---------------
+-- ASM Stuff --
+---------------
+
+Game.supportsASMHacks = true;
+Game.ASMHookBase = 0x24EE88;
+Game.ASMHook = {
+	0x08, 0x10, 0x00, 0x00,
+}
+
+Game.ASMCodeBase = 0x400000;
+Game.ASMMaxCodeSize = 0x400000;
+
 return Game;

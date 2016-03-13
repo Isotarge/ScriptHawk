@@ -235,8 +235,79 @@ end
 
 JSON = require "lib.JSON";
 Stats = require "lib.Stats";
-Lips = require "lib.lips.lips";
+lips = require "lips.init";
 require "lib.DPrint";
+
+----------------
+-- ASM Loader --
+----------------
+
+-- Output gameshark code
+function outputGamesharkCode(bytes, base, skipZeroes)
+	skipZeroes = skipZeroes or false;
+	skippedZeroes = 0;
+	if type(bytes) == "table" and #bytes > 0 and #bytes % 2 == 0 then
+		for i = 1, #bytes, 2 do
+			if not (skipZeroes and bytes[i] == 0x00 and bytes[i + 1] == 0x00) then
+				dprint("81"..toHexString(base + i - 1, 6, "").." "..toHexString(bytes[i], 2, "")..toHexString(bytes[i + 1], 2, ""));
+			else
+				skippedZeroes = skippedZeroes + 1;
+			end
+		end
+	end
+	return skippedZeroes;
+end
+
+local code = {};
+
+function codeWriter(...)
+	table.insert(code, tonumber(arg[2], 16));
+end
+
+function loadASMPatch()
+	if Game.supportsASMHacks then
+		local code_filename = forms.openfile(nil, nil, "R4300i Assembly Code|*.asm|All Files (*.*)|*.*");
+		if code_filename == "" then
+			print("No code loaded, aborting mission...");
+			return;
+		end
+
+		-- Open the file and assemble the code
+		code = {};
+		local result = lips(code_filename, codeWriter);
+
+		if #code == 0 then
+			print(result);
+			print("The code did not compile correctly, check for errors in your source.");
+			return;
+		end
+
+		if #code > Game.ASMMaxCodeSize then
+			print("The compiled code was too large to safely inject into the game.");
+			return;
+		end
+
+		-- Patch the code
+		for i = 1, #code do
+			mainmemory.writebyte(Game.ASMCodeBase + (i - 1), code[i]);
+		end
+
+		-- Patch the hook
+		for i = 1, #Game.ASMHook do
+			mainmemory.writebyte(Game.ASMHookBase + (i - 1), Game.ASMHook[i]);
+		end
+
+		outputGamesharkCode(Game.ASMHook, Game.ASMHookBase, false);
+		outputGamesharkCode(code, Game.ASMCodeBase, false);
+
+		dprint("Patched code ("..#code.." bytes)");
+		dprint("Patched hook ("..#Game.ASMHook.." bytes)");
+		dprint("Done!");
+		print_deferred();
+	else
+		print("This game does not support ASM hacks.");
+	end
+end
 
 --------------
 -- Keybinds --
