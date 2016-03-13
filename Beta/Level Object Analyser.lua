@@ -158,7 +158,7 @@ function getVariableName(address)
 		return variable.Name[1];
 	end
 
-	return variable.Type;
+	return variable.Type.." "..toHexString(address);
 end
 
 ------------
@@ -687,7 +687,8 @@ end
 function getExamineData(slot_base)
 	local current_slot_variables = {};
 	local relative_address, variable_data;
-	for relative_address, variable_data in pairs(slot_variables) do
+	for relative_address = 0, slot_size do
+		variable_data = slot_variables[relative_address];
 		if type(variable_data) == "table" then
 			local variableName = getVariableName(relative_address);
 			if variable_data.Type == "Byte" then
@@ -726,14 +727,14 @@ function draw_ui()
 		local examine_data = getExamineData(fetch_address(object_index));
 		for i = #examine_data, 1, -1 do
 			if examine_data[i][1] ~= "Separator" then
-				gui.text(gui_x, gui_y + height * row, examine_data[i][1]..": "..examine_data[i][2], nil, nil, 'bottomright');
+				gui.text(gui_x, gui_y + height * row, examine_data[i][2].." - "..examine_data[i][1], nil, nil, 'bottomright');
 				row = row + 1;
 			else
 				row = row + examine_data[i][2];
 			end
 		end
 	end
-	
+
 	if script_mode == "List" then
 		for i = numSlots, 1, -1 do
 			local currentSlotBase = get_slot_base(level_object_array, i);
