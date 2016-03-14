@@ -503,6 +503,7 @@ local movementStates = {
 	[104] = "Walking", -- Walrus
 	[105] = "Jumping", -- Walrus
 	[106] = "Falling", -- Walrus
+	[107] = "Locked", -- Bee, Mumbo Transform Cutscene
 	[108] = "Knockback", -- Walrus
 	[109] = "Death", -- Walrus
 	[110] = "Biting", -- Croc
