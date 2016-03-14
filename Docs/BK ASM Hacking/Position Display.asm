@@ -4,9 +4,6 @@
 [XPos]: 0x8037B7A0
 [YPos]: 0x8037B7A4
 [ZPos]: 0x8037B7A8
-[XSTRLoc]: 0x804000B8
-[YSTRLoc]: 0x804000BE
-[ZSTRLoc]: 0x804000C4
 [PositionStringLength]: 6
 
 // .org 0x80400000
@@ -19,7 +16,7 @@ PUSH a3
 LI a0 0x10 // X Pos
 LI a1 0x10 // Y Pos
 LI a2 0xBF000666 // Unknown param
-LI a3 @XSTRLoc
+LA a3 XPosStr
 
 JAL @Print
 NOP
@@ -27,7 +24,7 @@ NOP
 LI a0 0x10 // X Pos
 LI a1 0x20 // Y Pos
 LI a2 0xBF000666 // Unknown param
-LI a3 @YSTRLoc
+LA a3 YPosStr
 
 JAL @Print
 NOP
@@ -35,7 +32,7 @@ NOP
 LI a0 0x10 // X Pos
 LI a1 0x30 // Y Pos
 LI a2 0xBF000666 // Unknown param
-LI a3 @ZSTRLoc
+LA a3 ZPosStr
 
 JAL @Print
 NOP

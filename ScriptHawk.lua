@@ -274,7 +274,7 @@ function loadASMPatch()
 
 		-- Open the file and assemble the code
 		code = {};
-		local result = lips(code_filename, codeWriter);
+		local result = lips(code_filename, codeWriter, {['unsafe']=true, ['offset']=Game.ASMCodeBase+0x80000000});
 
 		if #code == 0 then
 			print(result);
