@@ -99,7 +99,7 @@ function Dumper:add_directive(fn, line, name, a, b)
         t.kind = 'goto'
         t.addr = a
         insert(self.commands, t)
-        self.pos = a % 0x80000000
+        self.pos = a
         self:advance(0)
     elseif name == 'ALIGN' then
         t.kind = 'ahead'

@@ -167,6 +167,10 @@ SystemID N64
 38214B	b	u	1	RDRAM	Standing on switch
 382F20	d	h	1	RDRAM	Textbox object pointer
 383012	b	u	1	RDRAM	Current Pause Menu Item
+383020	d	h	1	RDRAM	"Return to Game" Pointer
+383024	d	h	1	RDRAM	"Return to Lair" Pointer
+383028	d	h	1	RDRAM	"View Totals" Pointer
+38302C	d	h	1	RDRAM	"Save and Quit" Pointer
 3830E0	d	h	1	RDRAM	FF question object pointer
 3831AC	b	h	1	RDRAM	Lair Water Level
 3831E7	b	u	1	RDRAM	BB Active (EEPROM)

@@ -28,6 +28,7 @@ function Lexer:init(asm, fn, options)
     self.pos = 1
     self.line = 1
     self.EOF = -1
+    self.was_EOL = false
     self:nextc()
 end
 
@@ -59,6 +60,7 @@ function Lexer:nextc()
         end
         self.ord = 10
     end
+    self.was_EOL = self.ord == 10
 
     self.chr = char(self.ord)
     if self.pos <= #self.asm then
@@ -281,6 +283,9 @@ function Lexer:lex(_yield)
             yield('EOL', '\n')
             self:nextc()
         elseif self.ord == self.EOF then
+            if not self.was_EOL then
+                yield('EOL', '\n')
+            end
             yield('EOF', self.EOF)
             break
         elseif self.chr == ';' then
