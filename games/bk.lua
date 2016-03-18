@@ -1159,6 +1159,62 @@ function pulseClipVelocity()
 	end
 end
 
+-------------------
+-- Actor Spawner --
+-------------------
+
+local spawnerEnabled = false;
+local spawnActorFlag;
+local spawnActorID;
+local actorXPosition;
+local actorYPosition;
+local actorZPosition;
+
+function enableActorSpawner()
+	spawnerEnabled = false;
+	loadASMPatch("./docs/BK ASM Hacking/Actor Spawner.asm");
+	-- Find magic flag
+	for i = Game.ASMCodeBase, Game.ASMCodeBase + Game.ASMMaxCodeSize, 4 do
+		if mainmemory.read_u32_be(i) == 0xABCDEF12 then
+			print("Actor spawner enabled successfully!");
+			spawnActorFlag = i + 4;
+			spawnActorID = i + 6;
+			actorXPosition = i + 8;
+			actorYPosition = i + 12;
+			actorZPosition = i + 16;
+			spawnerEnabled = true;
+			break;
+		end
+	end
+end
+
+function updateActorSpawnPosition()
+	if spawnerEnabled then
+		mainmemory.writefloat(actorXPosition, Game.getXPosition(), true);
+		mainmemory.writefloat(actorYPosition, Game.getYPosition(), true);
+		mainmemory.writefloat(actorZPosition, Game.getZPosition(), true);
+	end
+end
+
+function spawnActor(id)
+	if spawnerEnabled then
+		if type(id) == 'nil' then
+			id = 4; -- Default to bull
+		end
+		updateActorSpawnPosition();
+		mainmemory.write_u16_be(spawnActorFlag, 1);
+		mainmemory.write_u16_be(spawnActorID, id);
+	else
+		enableActorSpawner();
+		print("Try again now :)");
+	end
+end
+
+function disableActorSpawner()
+	spawnerEnabled = false;
+end
+event.onloadstate(disableActorSpawner, "ScriptHawk - Disable Actor Spawner");
+
 ------------
 -- Events --
 ------------

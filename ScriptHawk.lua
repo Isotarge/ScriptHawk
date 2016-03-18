@@ -264,17 +264,19 @@ function codeWriter(...)
 	table.insert(code, tonumber(arg[2], 16));
 end
 
-function loadASMPatch()
+function loadASMPatch(code_filename)
 	if Game.supportsASMHacks then
-		local code_filename = forms.openfile(nil, nil, "R4300i Assembly Code|*.asm|All Files (*.*)|*.*");
-		if code_filename == "" then
-			print("No code loaded, aborting mission...");
-			return;
+		if type(code_filename) == 'nil' then
+			code_filename = forms.openfile(nil, nil, "R4300i Assembly Code|*.asm|All Files (*.*)|*.*");
+			if code_filename == "" then
+				print("No code loaded, aborting mission...");
+				return;
+			end
 		end
 
 		-- Open the file and assemble the code
 		code = {};
-		local result = lips(code_filename, codeWriter, {['unsafe']=true, ['offset']=Game.ASMCodeBase+0x80000000});
+		local result = lips(code_filename, codeWriter, {['unsafe'] = true, ['offset'] = Game.ASMCodeBase+0x80000000});
 
 		if #code == 0 then
 			print(result);
