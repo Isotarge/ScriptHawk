@@ -147,6 +147,10 @@ BNEZ t2 CheckByte // if t2 == 0 goto ClearByte
 NOP
 
 SUBI t0 t0 3 // i -= 3
+
+//BLT a0 t0 SkipDecimalPoint // Don't add decimal place if the string is less than 3 characters long
+//NOP
+
 LB t4 2(t0) // Move last 3 decimal places forward by 1 to add a byte space for decimal point
 SB t4 3(t0)
 LB t4 1(t0)
@@ -157,6 +161,7 @@ SB t4 1(t0)
 LI t4 0x2E // Decimal point
 SB t4 0(t0)
 
+SkipDecimalPoint:
 POP a3
 POP a2
 POP a1
