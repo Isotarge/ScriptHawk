@@ -1,4 +1,3 @@
-Domain WRAM
 SystemID SNES
 0002C2	d	u	0	WRAM	P1 Score (Single Player)
 00030E	w	u	0	WRAM	P1 Score

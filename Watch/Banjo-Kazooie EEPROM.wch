@@ -1,4 +1,3 @@
-Domain EEPROM
 SystemID N64
 0074	d	h	0	EEPROM	EEPROM Checksum 1
 00EC	d	h	0	EEPROM	EEPROM Checksum 2

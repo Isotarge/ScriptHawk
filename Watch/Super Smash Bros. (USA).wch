@@ -1,4 +1,3 @@
-Domain RDRAM
 SystemID N64
 0466FC	d	h	1	RDRAM	P1 Pointer
 046784	d	h	1	RDRAM	P2 Pointer? - Likely

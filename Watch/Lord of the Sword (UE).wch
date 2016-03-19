@@ -1,4 +1,3 @@
-Domain Main RAM
 SystemID SMS
 0098	b	h	1	Main RAM	Current map checkpoint
 00A0	b	h	0	Main RAM	Map Status

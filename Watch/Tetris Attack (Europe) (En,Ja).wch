@@ -1,4 +1,3 @@
-Domain WRAM
 SystemID SNES
 0003A6	b	u	0	WRAM	P1 Cursor Left X
 0003A8	b	u	0	WRAM	P2 Cursor Left X

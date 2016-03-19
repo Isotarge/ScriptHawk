@@ -1,4 +1,3 @@
-Domain RDRAM
 SystemID N64
 0ED088	w	s	0	RDRAM	X Relative to Center of Screen
 0ED08C	w	s	0	RDRAM	Y Relative to Center of Screen

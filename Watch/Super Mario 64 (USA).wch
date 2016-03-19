@@ -1,4 +1,3 @@
-Domain RDRAM
 SystemID N64
 1A7D14	b	u	1	RDRAM	Menu Select Mode?
 1A7D30	b	u	1	RDRAM	File Being Selected

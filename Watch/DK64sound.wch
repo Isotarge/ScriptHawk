@@ -1,4 +1,3 @@
-Domain RDRAM
 SystemID N64
 76D4D0	d	h	1	RDRAM	points to the blocks
 79E168	d	h	1	RDRAM	points to the blocks
