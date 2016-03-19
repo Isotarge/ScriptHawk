@@ -1166,9 +1166,7 @@ end
 local spawnerEnabled = false;
 local spawnActorFlag;
 local spawnActorID;
-local actorXPosition;
-local actorYPosition;
-local actorZPosition;
+local actorPosition;
 
 function enableActorSpawner()
 	spawnerEnabled = false;
@@ -1179,9 +1177,7 @@ function enableActorSpawner()
 			print("Actor spawner enabled successfully!");
 			spawnActorFlag = i + 4;
 			spawnActorID = i + 6;
-			actorXPosition = i + 8;
-			actorYPosition = i + 12;
-			actorZPosition = i + 16;
+			actorPosition = i + 8;
 			spawnerEnabled = true;
 			break;
 		end
@@ -1190,23 +1186,40 @@ end
 
 function updateActorSpawnPosition()
 	if spawnerEnabled then
-		mainmemory.writefloat(actorXPosition, Game.getXPosition(), true);
-		mainmemory.writefloat(actorYPosition, Game.getYPosition(), true);
-		mainmemory.writefloat(actorZPosition, Game.getZPosition(), true);
+		mainmemory.writefloat(actorPosition, Game.getXPosition(), true);
+		mainmemory.writefloat(actorPosition + 4, Game.getYPosition(), true);
+		mainmemory.writefloat(actorPosition + 8, Game.getZPosition(), true);
 	end
 end
 
+local actorTypes = require "games.bk_objects_USA";
+local actorNames = {};
+for k, v in pairs(actorTypes) do
+	table.insert(actorNames, v.name);
+end
+
+function getActorID(name)
+	for k, v in pairs(actorTypes) do
+		if v.name == name then
+			return v.id;
+		end
+	end
+	return 0;
+end
+
 function spawnActor(id)
+	if not spawnerEnabled then
+		enableActorSpawner();
+	end
 	if spawnerEnabled then
 		if type(id) == 'nil' then
-			id = 4; -- Default to bull
+			id = getActorID(forms.gettext(options_actor_dropdown));
 		end
 		updateActorSpawnPosition();
 		mainmemory.write_u16_be(spawnActorFlag, 1);
 		mainmemory.write_u16_be(spawnActorID, id);
 	else
-		enableActorSpawner();
-		print("Try again now :)");
+		print("Error enabling the Actor Spawner :(");
 	end
 end
 
@@ -1253,13 +1266,17 @@ function Game.initUI()
 	options_pulse_clip_velocity = forms.checkbox(ScriptHawkUI.options_form, "Pulse Clip Vel.", ScriptHawkUI.col(5) + ScriptHawkUI.dropdown_offset, ScriptHawkUI.row(6) + ScriptHawkUI.dropdown_offset);
 	options_autopound_checkbox = forms.checkbox(ScriptHawkUI.options_form, "Auto Pound", ScriptHawkUI.col(10) + ScriptHawkUI.dropdown_offset, ScriptHawkUI.row(6) + ScriptHawkUI.dropdown_offset);
 
+	-- Actor spawner
+	options_actor_dropdown = forms.dropdown(ScriptHawkUI.options_form, actorNames, ScriptHawkUI.col(10) + ScriptHawkUI.dropdown_offset, ScriptHawkUI.row(0) + ScriptHawkUI.dropdown_offset);
+	options_spawn_actor_button = forms.button(ScriptHawkUI.options_form, "Spawn", spawnActor, ScriptHawkUI.col(10), ScriptHawkUI.row(1), ScriptHawkUI.col(2), ScriptHawkUI.button_height);
+
 	-- Vile
 	options_wave_button =     forms.button(ScriptHawkUI.options_form, "Wave", initWave,         ScriptHawkUI.col(10), ScriptHawkUI.row(4), ScriptHawkUI.col(2), ScriptHawkUI.button_height);
 	options_heart_button =    forms.button(ScriptHawkUI.options_form, "Heart", doHeart,         ScriptHawkUI.col(12) + 8, ScriptHawkUI.row(4), ScriptHawkUI.col(2), ScriptHawkUI.button_height);
 	options_fire_all_button = forms.button(ScriptHawkUI.options_form, "Fire all", fireAllSlots, ScriptHawkUI.col(10), ScriptHawkUI.row(5), ScriptHawkUI.col(4) + 8, ScriptHawkUI.button_height);
 
 	-- Moves
-	options_moves_dropdown = forms.dropdown(ScriptHawkUI.options_form, { "0. None", "1. Spiral Mountain 100%", "2. FFM Setup", "3. All", "3. Demo" }, ScriptHawkUI.col(10) + ScriptHawkUI.dropdown_offset, ScriptHawkUI.row(7) + ScriptHawkUI.dropdown_offset);
+	--options_moves_dropdown = forms.dropdown(ScriptHawkUI.options_form, { "0. None", "1. Spiral Mountain 100%", "2. FFM Setup", "3. All", "3. Demo" }, ScriptHawkUI.col(10) + ScriptHawkUI.dropdown_offset, ScriptHawkUI.row(7) + ScriptHawkUI.dropdown_offset);
 	options_moves_button = forms.button(ScriptHawkUI.options_form, "Unlock Moves", unlock_moves, ScriptHawkUI.col(5), ScriptHawkUI.row(7), ScriptHawkUI.col(4) + 8, ScriptHawkUI.button_height);
 end
 

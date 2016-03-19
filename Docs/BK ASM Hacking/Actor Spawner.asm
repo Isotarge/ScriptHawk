@@ -15,7 +15,7 @@ PUSH a3
 LH a0 SpawnActivationFlag
 BEQI a0 0 SkipSpawn
 LH a0 SpawnActorID
-LA a1 SpawnXLocation
+LA a1 SpawnLocationArray
 JAL @SpawnActor //SpawnActor(u16 id, float[] position)
 NOP
 
@@ -37,10 +37,8 @@ MagicHeader:
 SpawnActivationFlag:
 .halfword 0
 SpawnActorID:
-.halfword 4
-SpawnXLocation:
+.halfword 4 // Bull
+SpawnLocationArray:
 .word 0
-SpawnYLocation:
 .word 0
-SpawnZLocation:
 .word 0
