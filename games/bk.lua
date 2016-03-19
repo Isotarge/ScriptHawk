@@ -67,6 +67,7 @@ local jiggies = 104;
 
 local max_notes = 100;
 local max_eggs = 200; -- TODO: How do you get this information out of the game?
+	-- The max eggs value appears in register v0 when executing the beql at 0x80346200
 local max_red_feathers = 50; -- TODO: How do you get this information out of the game?
 local max_gold_feathers = 10; -- TODO: How do you get this information out of the game?
 local max_lives = 9;

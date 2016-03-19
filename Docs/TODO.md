@@ -13,6 +13,7 @@
 - DK64: Neverslip enhancements, can't roll/kick on slopes
 - DK64: Fix DPad for fly swatter
 - DK64: Integrate Grab Objects.lua
+	- Move to SM64.lua's struct format for object model 1 and model 2
 - DK64: Finish integrating Loader.lua
 	- Just needs a UI, it can currently be called via the Lua console
 - BK: Integrate Level Object Analyser.lua
@@ -25,6 +26,7 @@
 ##Low priority, recurring, or waiting:
 - DK64: Exception when gui.cleargraphics() is called on first frame (by MJ minimap)
 - General: Detailed watch toggle (checkbox maybe)
+	- "Verbosity level" for object viewer scripts, include as a struct field flag
 - Port Tetris Attack bot to Pokémon Puzzle League (once it boots in m64p & BizHawk ofc)
 	- [Info here](https://github.com/mupen64plus/mupen64plus-user-issues/issues/567)
 - Keep [LIPS](https://github.com/notwa/lips) up to date
