@@ -7,7 +7,7 @@
 [ScaleZ]: 0x3C
 [PaperScale]: 0x3C75C28F
 
-//.org 0x807FF500
+.org 0x807FF500
 
 // Defererence Kong Object pointer
 LW      t0, @KongObjectPointer

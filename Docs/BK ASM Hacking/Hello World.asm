@@ -1,7 +1,7 @@
 [Print]: 0x802F7870
 [Return]: 0x8024EE90
 
-// .org 0x80400000
+.org 0x80400000
 PUSH ra
 PUSH a0
 PUSH a1

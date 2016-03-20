@@ -37,7 +37,7 @@
 
 [Speed]: 0x4080
 
-//.org 0x807FF500
+.org 0x807FF500
 // Store return address for later
 //OR      t7, RA, r0
 

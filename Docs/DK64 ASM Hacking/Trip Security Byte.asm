@@ -3,7 +3,7 @@
 [ReturnAddress]: 0x800074A0
 [L_Button]: 0x0020
 
-//.org 0x807FF500
+.org 0x807FF500
 LH      t2, @ControllerInput
 LI      t3, @L_Button
 BNE     t2, t3, Return
