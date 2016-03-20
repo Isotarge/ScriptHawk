@@ -10,8 +10,8 @@ PUSH a3
 
 LI a0 0x10 // X Pos
 LI a1 0x10 // Y Pos
-LI a2 0xBF000666 // Unknown param
-LI a3 Hello
+LI a2 0xBF000666 // Text Size, Float
+LA a3 Hello
 
 JAL @Print // Call Print Function
 NOP
