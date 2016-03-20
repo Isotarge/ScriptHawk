@@ -35,10 +35,11 @@ local max_slots = 0x100;
 
 -- Relative to slot start
 slot_variables = {
-	[0x00] = {["Type"] = "Pointer"}, -- TODO: Does this have anything to do with that huge linked list?
+	[0x00] = {["Type"] = "Pointer"}, -- TODO: Does this have anything to do with that huge linked list? Doesn't seem to
 	[0x04] = {["Type"] = "Float", ["Name"] = {"X", "X Pos", "X Position"}},
 	[0x08] = {["Type"] = "Float", ["Name"] = {"Y", "Y Pos", "Y Position"}},
 	[0x0C] = {["Type"] = "Float", ["Name"] = {"Z", "Z Pos", "Z Position"}},
+	[0x10] = {["Type"] = "u8", ["Name"] = "State",
 
 	[0x14] = {["Type"] = "Pointer", ["Name"] = "Animation Object Pointer"},
 	[0x18] = {["Type"] = "Pointer"},
@@ -47,7 +48,7 @@ slot_variables = {
 	[0x20] = {["Type"] = "Float"},
 	[0x24] = {["Type"] = "Float"},
 
-	[0x28] = {["Type"] = "Float"}, -- TODO: Velocity?
+	[0x28] = {["Type"] = "Float", ["Name"] = "Chase Velocity"},
 	[0x2C] = {["Type"] = "Float"},
 	[0x30] = {["Type"] = "Float"},
 
@@ -64,15 +65,16 @@ slot_variables = {
 	[0x64] = {["Type"] = "Float", ["Name"] = {"Moving Angle", "Moving", "Rot Y", "Rot. Y", "Y Rotation"}},
 	[0x68] = {["Type"] = "Float", ["Name"] = {"Rot X", "Rot. X", "X Rotation"}},
 
-	[0x7C] = {["Type"] = "Float"},
+	[0x7C] = {["Type"] = "Float", ["Name"] = "Popped Amount"},
 	[0x80] = {["Type"] = "Float"},
-	[0x84] = {["Type"] = "Float"},
-
-	[0x8C] = {["Type"] = "Float", ["Name"] = "Countdown timer?"},
+	[0x84] = {["Type"] = "Float", ["Name"] = "Countdown timer?"},
 
 	[0x90] = {["Type"] = "Float"},
 	[0x94] = {["Type"] = "Float"},
 	[0x98] = {["Type"] = "Float"},
+
+	[0xBC] = {["Type"] = "u32_be", ["Name"] = "Spawn Actor ID"}, -- TODO: Better name for this, lifted from Runehero's C source
+	[0xEB] = {["Type"] = "Byte", ["Name"] = "Flag 2"}, -- TODO: Better name for this, lifted from Runehero's C source
 
 	[0x100] = {["Type"] = "Pointer"},
 	[0x104] = {["Type"] = "Pointer"},
@@ -88,8 +90,8 @@ slot_variables = {
 
 	[0x12C] = {["Type"] = "Pointer"},
 	[0x130] = {["Type"] = "Pointer"},
-	[0x14C] = {["Type"] = "Pointer"},
-	[0x150] = {["Type"] = "Pointer", ["Name"] = "Bone Array Pointer"},
+	[0x14C] = {["Type"] = "Pointer", ["Name"] = "Bone Array 1 Pointer"},
+	[0x150] = {["Type"] = "Pointer", ["Name"] = "Bone Array 2 Pointer"},
 
 	[0x170] = {["Type"] = "Float"},
 	[0x174] = {["Type"] = "Float"},
@@ -107,6 +109,19 @@ end
 fillBlankVariableSlots();
 
 local slot_data = {};
+
+local RDRAMBase = 0x80000000;
+local RDRAMSize = 0x400000; -- Doubled with expansion pak
+
+-- Checks whether a value falls within N64 RDRAM
+local function isRDRAM(value)
+	return type(value) == "number" and value >= 0 and value < RDRAMSize;
+end
+
+-- Checks whether a value is a pointer
+local function isPointer(value)
+	return type(value) == "number" and value >= RDRAMBase and value < RDRAMBase + RDRAMSize;
+end
 
 --------------------
 -- Output Helpers --
@@ -350,6 +365,7 @@ local animation_types = {
 	[0x2C] = "Snippet Walking",
 	[0x2D] = "Jinjo Idle",
 	[0x2F] = "Jinjo Waving",
+	[0x31] = "Jinjo", -- TODO: What is this exactly?
 	[0x32] = "Bigbutt Attacking",
 	[0x33] = "Bigbutt Eating Grass",
 	[0x35] = "Bigbutt Alerted",
@@ -376,15 +392,24 @@ local animation_types = {
 	[0x9A] = "Ripper Idle",
 	[0x9B] = "Ripper Chasing",
 	[0x9D] = "Bat Chasing", -- TODO: name
+	[0x9E] = "Green Ghost Idle",
+	[0x9F] = "Green Ghost Alerted",
 	[0xA2] = "Conga Throwing", -- Retaliation
 	[0xA9] = "Pot", -- MMM
+	[0xAC] = "Green Ghost Chasing",
 	[0xAE] = "Bat Idle",
 	[0xB3] = "Chump Idle",
 	[0xB4] = "Chump Chomping",
 	[0xC9] = "Carpet", -- GV
+	[0xD1] = "Rubee's Pot",
 	[0xD4] = "Switch", -- Witch Switch (MM), Shock Spring Pad Switch (GV Lobby)
 	[0xD6] = "Turbo Trainers",
+	[0xDF] = "Rubee",
+	[0xE3] = "Rubee",
 	[0xF1] = "Carpet", -- GV
+	[0x101] = "Tanktup's Head",
+	[0x102] = "Tanktup's Head Pounded",
+	[0x107] = "Tanktup Spawning Jiggy",
 	[0x108] = "Sir Slush Idle",
 	[0x109] = "Sir Slush Attacking",
 	[0x130] = "Jinjo Circling", -- TODO: Used outside Grunty fight?
@@ -395,18 +420,32 @@ local animation_types = {
 	[0x143] = "Button", -- Snowman, Xmas tree
 	[0x14B] = "Croctus", -- BGS, feed egg
 	[0x14E] = "Boggy", -- Lying on back
+	[0x162] = "Toots",
 	[0x165] = "Beehive",
+	[0x16B] = "Snare-Bear Snapping",
+	[0x16C] = "Snare-Bear Idle",
+	[0x16D] = "Twinklie Present",
 	[0x16E] = "Mumbo Reclining", -- CCW Summer
+	[0x178] = "Twinklie Spawning",
+	[0x17C] = "Twinklie Twinkling",
+	[0x17E] = "Spawn of Boggy",
 	[0x17F] = "Mumbo Sweeping",
 	[0x180] = "Mumbo Rotating",
 	[0x18A] = "Present", -- FP
 	[0x1A1] = "Sled", -- FP
+	[0x1B1] = "Twinklie Muncher Idle",
+	[0x1B2] = "Twinklie Muncher Munching",
+	[0x1B4] = "Wozza Bodyblocking",
 	[0x1C5] = "Grunty Flying",
 	[0x1CE] = "Curtain", -- Banjo's house
+	[0x1D5] = "Tooty Chattering Teeth",
 	[0x1D6] = "Grublin Walking",
 	[0x1D7] = "Grublin Alerted",
 	[0x1D8] = "Grublin Chasing",
 	[0x1DA] = "Snippet Idle",
+	[0x1E4] = "Skeleton Idle",
+	[0x1E5] = "Skeleton Alerted",
+	[0x1E6] = "Skeleton Chasing",
 	[0x1E9] = "Mum-Mum Idle",
 	[0x1ED] = "Ripper Damaged",
 	[0x1EE] = "Ripper Dying",
@@ -422,10 +461,18 @@ local animation_types = {
 	[0x215] = "Cauldron Teleporting",
 	[0x216] = "Cauldron Rejected",
 	[0x217] = "Transform Pad",
+	[0x220] = "Sir. Slush",
 	[0x223] = "Topper Idle", -- Carrot gets it
 	[0x225] = "Colliwobble Idle",
 	[0x226] = "Bawl Idle",
 	[0x233] = "Ice Cube", -- TODO: More info
+	[0x234] = "Snare-Bear (Winter)",
+	[0x237] = "Twinklie Present",
+	[0x23F] = "Portrait",
+	[0x243] = "Grublin-Hood Idle",
+	[0x244] = "Grublin-Hood Alerted",
+	[0x245] = "Grublin-Hood Chasing",
+	[0x246] = "Grublin-Hood Dying",
 	[0x257] = "Grunty Green Spell", -- Flying
 	[0x258] = "Grunty Hurt",
 	[0x259] = "Grunty Hurt",
@@ -438,10 +485,14 @@ local animation_types = {
 	[0x262] = "Jinjo Statue Rising", -- TODO: Also diving?
 	[0x264] = "Jinjo Statue Activating",
 	[0x265] = "Jinjo Statue",
+	[0x268] = "Big Blue Egg",
+	[0x269] = "Big Red Feather",
+	[0x26A] = "Big Gold Feather",
 	[0x26B] = "Brentilda Idle",
-	[0x26B] = "Brentilda Hands on Hips",
+	[0x26C] = "Brentilda Hands on Hips",
 	[0x26D] = "Gruntling Idle",
 	[0x26F] = "Gruntling Chasing",
+	[0x271] = "DoG", -- TODO: Verify
 	[0x272] = "Cheato",
 	[0x275] = "Jinjonator Activating", -- TODO: verify
 	[0x276] = "Jinjonator Charging",
@@ -451,7 +502,10 @@ local animation_types = {
 	[0x27D] = "Jinjonator Final Hit",
 	[0x27F] = "Jinjonator Circling",
 	[0x283] = "Grunty Chattering Teeth",
-	[0x28F] = "Dingpot Idle",
+	[0x28B] = "Grunty",
+	[0x28C] = "Grunty Doll",
+	[0x28E] = "Tooty Looking Left & Right",
+	[0x28F] = "Dingpot",
 	[0x290] = "Dingpot Shooting",
 };
 
@@ -459,8 +513,9 @@ function setAnimationType(index, animationType)
 	local level_object_array = mainmemory.read_u24_be(level_object_array_pointer + 1);
 	local numSlots = math.min(max_slots, mainmemory.read_u32_be(level_object_array));
 	local objectSlotBase = get_slot_base(level_object_array, index);
-	local animationObjectPointer = mainmemory.read_u24_be(objectSlotBase + 0x14 + 1);
-	if animationObjectPointer > 0x000000 and animationObjectPointer < 0x3FFFFF then
+	local animationObjectPointer = mainmemory.read_u32_be(objectSlotBase + 0x14);
+	if isPointer(animationObjectPointer) then
+		animationObjectPointer = animationObjectPointer - RDRAMBase;
 		mainmemory.write_u32_be(animationObjectPointer + animation_object_animation_type, animationType);
 	end
 end
@@ -469,8 +524,9 @@ function setAnimationObjectFloat(index, var, value)
 	local level_object_array = mainmemory.read_u24_be(level_object_array_pointer + 1);
 	local numSlots = math.min(max_slots, mainmemory.read_u32_be(level_object_array));
 	local objectSlotBase = get_slot_base(level_object_array, index);
-	local animationObjectPointer = mainmemory.read_u24_be(objectSlotBase + 0x14 + 1);
-	if animationObjectPointer > 0x000000 and animationObjectPointer < 0x3FFFFF then
+	local animationObjectPointer = mainmemory.read_u32_be(objectSlotBase + 0x14);
+	if isPointer(animationObjectPointer) then
+		animationObjectPointer = animationObjectPointer - RDRAMBase;
 		mainmemory.writefloat(animationObjectPointer + var, value, true);
 	end
 end
@@ -697,7 +753,7 @@ function getExamineData(slot_base)
 				table.insert(current_slot_variables, {variableName, formatForOutput(variable_data.Type, mainmemory.read_u16_be(slot_base + relative_address))});
 			elseif variable_data.Type == "Z4_Unknown" then
 				-- Don't print yo
-			elseif variable_data.Type == "Pointer" then
+			elseif variable_data.Type == "Pointer" or variable_data.Type == "u32_be" then
 				table.insert(current_slot_variables, {variableName, formatForOutput(variable_data.Type, mainmemory.read_u32_be(slot_base + relative_address))});
 			elseif variable_data.Type == "Float" then
 				table.insert(current_slot_variables, {variableName, formatForOutput(variable_data.Type, mainmemory.readfloat(slot_base + relative_address, true))});
@@ -739,9 +795,10 @@ function draw_ui()
 		for i = numSlots, 1, -1 do
 			local currentSlotBase = get_slot_base(level_object_array, i);
 
-			local animationObjectPointer = mainmemory.read_u24_be(currentSlotBase + 0x14 + 1);
 			local animationType = "Unknown";
-			if animationObjectPointer > 0x000000 and animationObjectPointer < 0x3FFFFF then
+			local animationObjectPointer = mainmemory.read_u32_be(currentSlotBase + 0x14);
+			if isPointer(animationObjectPointer) then
+				animationObjectPointer = animationObjectPointer - RDRAMBase;
 				animationType = mainmemory.read_u32_be(animationObjectPointer + animation_object_animation_type);
 				if type(animation_types[animationType]) == "string" then
 					animationType = animation_types[animationType];
@@ -756,7 +813,9 @@ function draw_ui()
 			end
 
 			if animationType == "Unknown" then
-				if not hide_non_animated then
+				local boneArray1 = mainmemory.read_u32_be(currentSlotBase + 0x14C);
+				local boneArray2 = mainmemory.read_u32_be(currentSlotBase + 0x150);
+				if not hide_non_animated or (isPointer(boneArray1) or isPointer(boneArray2)) then
 					gui.text(gui_x, gui_y + height * row, i..": "..string.format("0x%06x", currentSlotBase or 0), color, nil, 'bottomright');
 					row = row + 1;
 				end

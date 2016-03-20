@@ -310,7 +310,7 @@ function loadASMPatch(code_filename, suppress_print)
 		local ss_fn = 'lips temp.State'
 		savestate.save(ss_fn)
 		savestate.load(ss_fn)
-		
+
 		if not suppress_print then
 			outputGamesharkCode(Game.ASMHook, Game.ASMHookBase, false);
 			outputGamesharkCode(code, Game.ASMCodeBase, false);

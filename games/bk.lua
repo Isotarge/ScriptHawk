@@ -116,7 +116,7 @@ Game.maps = {
 	"GV - Matching Game",
 	"GV - Maze",
 	"GV - Water",
-	"GV - Snake",
+	"GV - Rubee's Chamber",
 	"Unknown 0x17",
 	"Unknown 0x18",
 	"Unknown 0x19",
@@ -772,7 +772,7 @@ local player_score = 0x92;
 local vile_score = 0x93;
 local minigame_timer = 0x94;
 
-local number_of_slots = 25;
+local number_of_slots = 24;
 local first_slot_base = 0x08;
 local slot_size = 0x180;
 local slot_base = first_slot_base + 2 * slot_size;
@@ -782,33 +782,44 @@ local slot_base = first_slot_base + 2 * slot_size;
 -- 00000 0x00 Disabled
 -- 00100 0x04 Idle
 -- 01000 0x08 Rising
--- 01100 0x0c Alive
+-- 01100 0x0C Alive
 -- 10000 0x10 Falling (not eaten)
 -- 10100 0x14 Eaten
-local slot_state = 0x00;
+local slot_state = 0x10;
 
 -- Float 0-1
-local popped_amount = 0x6C;
+local popped_amount = 0x7C;
 
 -- 0x00 = yum, > 0x00 = grum
-local slot_type = 0x70;
+local slot_type = 0x80;
 
 -- Float 0-15?
-local slot_timer = 0x74;
+local slot_timer = 0x84;
 
-local function getSlotBase(index)
-	if index < 12 then
-		return slot_base + (index - 1) * slot_size;
+-- Returns the RDRAM location of the yumbly/grumbly slot at the index referenced by "Docs/Vile Map.jpg"
+local function getVileSlotBase(vile_state, index)
+	if isRDRAM(vile_state) then
+		local numSlots = mainmemory.read_u32_be(vile_state);
+		local slotsFound = 0;
+		for i = 0, numSlots do
+			if mainmemory.readfloat(vile_state + first_slot_base + (i * slot_size) + 0x08, true) == -100 then
+				if slotsFound == index then
+					return vile_state + first_slot_base + (i * slot_size);
+				end
+				slotsFound = slotsFound + 1;
+			end
+		end
 	end
-	return slot_base + index * slot_size;
 end
 
 local function fireSlot(vile_state, index, slotType)
-	current_slot_base = getSlotBase(index);
-	mainmemory.writebyte(vile_state + current_slot_base + slot_state, 0x08);
-	mainmemory.writebyte(vile_state + current_slot_base + slot_type, slotType);
-	mainmemory.writefloat(vile_state + current_slot_base + popped_amount, 1.0, true);
-	mainmemory.writefloat(vile_state + current_slot_base + slot_timer, 0.0, true);
+	current_slot_base = getVileSlotBase(vile_state, index);
+	if isRDRAM(current_slot_base) then
+		mainmemory.writebyte(current_slot_base + slot_state, 0x0C);
+		mainmemory.writebyte(current_slot_base + slot_type, slotType);
+		mainmemory.writefloat(current_slot_base + popped_amount, 1.0, true);
+		mainmemory.writefloat(current_slot_base + slot_timer, 0.1, true);
+	end
 end
 
 local vileMap = {
@@ -844,9 +855,9 @@ function getSlotIndex(row, col)
 	if row <= #vileMap then
 		col = math.max(col, 1);
 		col = math.min(col, #vileMap[row]);
-		return vileMap[row][col] + 1;
+		return vileMap[row][col];
 	end
-	return 1;
+	return 0;
 end
 
 local waving = false;
@@ -866,12 +877,15 @@ local function updateWave()
 	if waving then
 		wave_counter = wave_counter + 1;
 		if wave_counter == wave_delay then
-			local vile_state = mainmemory.read_u24_be(object_array_pointer + 1);
-			for i = 1, #waveFrames[wave_frame] do
-				fireSlot(vile_state, getSlotIndex(waveFrames[wave_frame][i][1], waveFrames[wave_frame][i][2]), wave_colour);
+			local vile_state = mainmemory.read_u32_be(object_array_pointer);
+			if isPointer(vile_state) then
+				vile_state = vile_state - RDRAMBase;
+				for i = 1, #waveFrames[wave_frame] do
+					fireSlot(vile_state, getSlotIndex(waveFrames[wave_frame][i][1], waveFrames[wave_frame][i][2]), wave_colour);
+				end
+				wave_counter = 0;
+				wave_frame = wave_frame + 1;
 			end
-			wave_counter = 0;
-			wave_frame = wave_frame + 1;
 		end
 		if wave_frame > #waveFrames then
 			waving = false;
@@ -880,18 +894,24 @@ local function updateWave()
 end
 
 local function doHeart()
-	local vile_state = mainmemory.read_u24_be(object_array_pointer + 1);
-	local colour = math.random(0, 1);
-	for i = 1, #heart do
-		fireSlot(vile_state, getSlotIndex(heart[i][1], heart[i][2]), colour);
+	local vile_state = mainmemory.read_u32_be(object_array_pointer);
+	if isPointer(vile_state) then
+		vile_state = vile_state - RDRAMBase;
+		local colour = math.random(0, 1);
+		for i = 1, #heart do
+			fireSlot(vile_state, getSlotIndex(heart[i][1], heart[i][2]), colour);
+		end
 	end
 end
 
 local function fireAllSlots()
-	local vile_state = mainmemory.read_u24_be(object_array_pointer + 1);
-	local colour = math.random(0, 1);
-	for i = 1, number_of_slots do
-		fireSlot(vile_state, i, colour);
+	local vile_state = mainmemory.read_u32_be(object_array_pointer);
+	if isPointer(vile_state) then
+		vile_state = vile_state - RDRAMBase;
+		local colour = math.random(0, 1);
+		for i = 0, number_of_slots do
+			fireSlot(vile_state, i, colour);
+		end
 	end
 end
 
@@ -931,11 +951,13 @@ local slot_x_pos = 0x04;
 local slot_y_pos = 0x08;
 local slot_z_pos = 0x0C;
 
+-- TODO: Null pointer protection
 local function get_num_slots()
 	local level_object_array_state = mainmemory.read_u24_be(object_array_pointer + 1);
 	return math.min(max_slots, mainmemory.read_u32_be(level_object_array_state));
 end
 
+-- TODO: Null pointer protection
 local function get_slot_base(index)
 	local level_object_array_state = mainmemory.read_u24_be(object_array_pointer + 1);
 	return level_object_array_state + first_slot_base + index * slot_size;
