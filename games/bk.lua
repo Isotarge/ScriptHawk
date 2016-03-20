@@ -248,7 +248,7 @@ Game.maps = {
 	"End Scene 4",
 	"Intro - Grunty Threat 1",
 	"Intro - Grunty Threat 2"
-}
+};
 
 function Game.detectVersion(romName) -- TODO: Move addresses to a Memory table like DK64 module
 	if stringContains(romName, "Europe") then
@@ -920,16 +920,32 @@ end
 -- Written by Isotarge, 2015 -- 
 -------------------------------
 
-local throw_slot = 39; -- TODO: Detect conga object dynamically
-local orange_timer = 0x114;
-
-local orange_timer_value = 0.5;
+function findConga()
+	if mainmemory.readbyte(map) == 0x02 then -- Make sure we're in Mumbo's Mountain
+		local levelObjectArray = mainmemory.read_u32_be(object_array_pointer);
+		if isPointer(levelObjectArray) then -- Make sure the level object array is valid
+			levelObjectArray = levelObjectArray - RDRAMBase;
+			local numObjects = mainmemory.read_u32_be(levelObjectArray);
+			for i = 0, numObjects do
+				local slotBase = levelObjectArray + first_slot_base + (i * slot_size);
+				local x = mainmemory.readfloat(slotBase + 0x04, true);
+				local y = mainmemory.readfloat(slotBase + 0x08, true);
+				local z = mainmemory.readfloat(slotBase + 0x0C, true);
+				if x == -4100 and y == 236 and z == 4650 then -- TODO: Base this off of animation type, rather than position
+					return slotBase;
+				end
+			end
+		end
+	end
+end
 
 function throwOrange()
 	local keyboard_pressed = input.get();
 	if keyboard_pressed["C"] then
-		local level_object_array_base = mainmemory.read_u24_be(object_array_pointer + 1);
-		mainmemory.writefloat(level_object_array_base + first_slot_base + throw_slot * slot_size + orange_timer, orange_timer_value, true); 
+		local congaBase = findConga();
+		if isRDRAM(congaBase) then
+			mainmemory.writefloat(congaBase + 0x114, 0.5, true); -- Write 0.5 to main behavior timer, these fields are documented in Beta/Level Object Analyser.lua
+		end
 	end
 end
 
@@ -951,16 +967,22 @@ local slot_x_pos = 0x04;
 local slot_y_pos = 0x08;
 local slot_z_pos = 0x0C;
 
--- TODO: Null pointer protection
 local function get_num_slots()
-	local level_object_array_state = mainmemory.read_u24_be(object_array_pointer + 1);
-	return math.min(max_slots, mainmemory.read_u32_be(level_object_array_state));
+	local levelObjectArray = mainmemory.read_u32_be(object_array_pointer);
+	if isPointer(levelObjectArray) then
+		levelObjectArray = levelObjectArray - RDRAMBase;
+		return math.min(max_slots, mainmemory.read_u32_be(levelObjectArray));
+	end
+	return 0;
 end
 
--- TODO: Null pointer protection
 local function get_slot_base(index)
-	local level_object_array_state = mainmemory.read_u24_be(object_array_pointer + 1);
-	return level_object_array_state + first_slot_base + index * slot_size;
+	local levelObjectArray = mainmemory.read_u32_be(object_array_pointer);
+	if isPointer(levelObjectArray) then
+		levelObjectArray = levelObjectArray - RDRAMBase;
+		return levelObjectArray + first_slot_base + index * slot_size;
+	end
+	return 0;
 end
 
 local function encircle_banjo()
@@ -971,14 +993,14 @@ local function encircle_banjo()
 
 	num_slots = get_num_slots();
 
+	radius = 1000;
 	if forms.ischecked(dynamic_radius_checkbox) then
 		radius = num_slots * dynamic_radius_factor;
-	else
-		radius = 1000;
 	end
 
 	-- Fill and sort pointer list
 	for i = 0, num_slots - 1 do
+		-- TODO: Check for bone arrays before adding to table, we don't want to move stuff we can't see
 		table.insert(currentPointers, get_slot_base(i));
 	end
 	table.sort(currentPointers);

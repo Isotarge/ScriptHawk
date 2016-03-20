@@ -39,7 +39,7 @@ slot_variables = {
 	[0x04] = {["Type"] = "Float", ["Name"] = {"X", "X Pos", "X Position"}},
 	[0x08] = {["Type"] = "Float", ["Name"] = {"Y", "Y Pos", "Y Position"}},
 	[0x0C] = {["Type"] = "Float", ["Name"] = {"Z", "Z Pos", "Z Position"}},
-	[0x10] = {["Type"] = "u8", ["Name"] = "State",
+	[0x10] = {["Type"] = "u8", ["Name"] = "State"},
 
 	[0x14] = {["Type"] = "Pointer", ["Name"] = "Animation Object Pointer"},
 	[0x18] = {["Type"] = "Pointer"},
@@ -391,13 +391,13 @@ local animation_types = {
 	[0x96] = "Snippet Recovering",
 	[0x9A] = "Ripper Idle",
 	[0x9B] = "Ripper Chasing",
-	[0x9D] = "Bat Chasing", -- TODO: name
+	[0x9D] = "Nibbly Chasing", -- Bat
 	[0x9E] = "Green Ghost Idle",
 	[0x9F] = "Green Ghost Alerted",
 	[0xA2] = "Conga Throwing", -- Retaliation
 	[0xA9] = "Pot", -- MMM
 	[0xAC] = "Green Ghost Chasing",
-	[0xAE] = "Bat Idle",
+	[0xAE] = "Nibbly Idle", -- Bat
 	[0xB3] = "Chump Idle",
 	[0xB4] = "Chump Chomping",
 	[0xC9] = "Carpet", -- GV
