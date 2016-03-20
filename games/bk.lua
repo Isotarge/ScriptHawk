@@ -1171,7 +1171,7 @@ local actorPosition;
 
 function enableActorSpawner()
 	spawnerEnabled = false;
-	loadASMPatch("./docs/BK ASM Hacking/Actor Spawner.asm");
+	loadASMPatch("./docs/BK ASM Hacking/Actor Spawner.asm", true);
 	-- Find magic flag
 	for i = Game.ASMCodeBase, Game.ASMCodeBase + Game.ASMMaxCodeSize, 4 do
 		if mainmemory.read_u32_be(i) == 0xABCDEF12 then

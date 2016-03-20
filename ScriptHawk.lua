@@ -264,12 +264,14 @@ function codeWriter(...)
 	table.insert(code, tonumber(arg[2], 16));
 end
 
-function loadASMPatch(code_filename)
+function loadASMPatch(code_filename, suppress_print)
 	if Game.supportsASMHacks then
 		if type(code_filename) == 'nil' then
 			code_filename = forms.openfile(nil, nil, "R4300i Assembly Code|*.asm|All Files (*.*)|*.*");
 			if code_filename == "" then
-				print("No code loaded, aborting mission...");
+				if not suppress_print then
+					print("No code loaded, aborting mission...");
+				end
 				return;
 			end
 		end
@@ -279,13 +281,17 @@ function loadASMPatch(code_filename)
 		local result = lips(code_filename, codeWriter, {['unsafe'] = true, ['offset'] = Game.ASMCodeBase+0x80000000});
 
 		if #code == 0 then
-			print(result);
-			print("The code did not compile correctly, check for errors in your source.");
+			if not suppress_print then
+				print(result);
+				print("The code did not compile correctly, check for errors in your source.");
+			end
 			return;
 		end
 
 		if #code > Game.ASMMaxCodeSize then
-			print("The compiled code was too large to safely inject into the game.");
+			if not suppress_print then
+				print("The compiled code was too large to safely inject into the game.");
+			end
 			return;
 		end
 
@@ -299,13 +305,21 @@ function loadASMPatch(code_filename)
 			mainmemory.writebyte(Game.ASMHookBase + (i - 1), Game.ASMHook[i]);
 		end
 
-		outputGamesharkCode(Game.ASMHook, Game.ASMHookBase, false);
-		outputGamesharkCode(code, Game.ASMCodeBase, false);
+		-- Hacky, yes, but if we're using dynarec the patched code pages don't get marked as dirty
+		-- Quickest and easiest way around this is to save and reload a state
+		local ss_fn = 'lips temp.State'
+		savestate.save(ss_fn)
+		savestate.load(ss_fn)
+		
+		if not suppress_print then
+			outputGamesharkCode(Game.ASMHook, Game.ASMHookBase, false);
+			outputGamesharkCode(code, Game.ASMCodeBase, false);
 
-		dprint("Patched code ("..#code.." bytes)");
-		dprint("Patched hook ("..#Game.ASMHook.." bytes)");
-		dprint("Done!");
-		print_deferred();
+			dprint("Patched code ("..#code.." bytes)");
+			dprint("Patched hook ("..#Game.ASMHook.." bytes)");
+			dprint("Done!");
+			print_deferred();
+		end
 	else
 		print("This game does not support ASM hacks.");
 	end
