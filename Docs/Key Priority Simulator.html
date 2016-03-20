@@ -7,15 +7,9 @@
 			queue = [];
 
 		function computePriority() {
-			// TODO: Clean this up
-			keys[0] = $('#key1').prop("checked");
-			keys[1] = $('#key2').prop("checked");
-			keys[2] = $('#key3').prop("checked");
-			keys[3] = $('#key4').prop("checked");
-			keys[4] = $('#key5').prop("checked");
-			keys[5] = $('#key6').prop("checked");
-			keys[6] = $('#key7').prop("checked");
-			keys[7] = $('#key8').prop("checked");
+			for (var i = 0; i < 8; i++) {
+				keys[i] = $('#key' + (i + 1)).prop("checked");
+			}
 
 			var selectedKeys = countSelectedKeys();
 			if (selectedKeys > 0) {

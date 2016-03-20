@@ -26,14 +26,9 @@ function Game.detectVersion(romName)
 		-- TODO
 		return false;
 	elseif stringContains(romName, "USA") then
-		-- TODO
+		-- TODO: Get this working on every map
 		x_pos = 0x1C6B34;
-		rot_base = 0x1C69BC; -- TODO
-		--[[
-			Rotation is weird in this game
-			There's 4 addresses associated
-			Likely sine, cosine and their inverse
-		]]--
+		rot_base = 0x1C69BC;
 	else
 		return false;
 	end
@@ -89,6 +84,12 @@ end
 --------------
 -- Rotation --
 --------------
+
+--[[
+	Rotation is weird in this game
+	There's 4 addresses associated
+	Sine, cosine and their inverse
+]]--
 
 function Game.getXRotation()
 	--return mainmemory.readfloat(x_rot, true) + 1;

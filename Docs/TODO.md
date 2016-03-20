@@ -3,6 +3,7 @@
 - General: Base game detection on ROM hash rather than name
 - General: Rework input/keybinds, multiple profiles like wasd/arrow keys
 - General: 2D game support
+- General: Button/Checkbox style take me there, set by game module
 - General: Move from x, y, z variables to position/rotation/velocity etc. tables with x, y, z indexes
 - Rayman 2: Find player object pointer
 - Toy story 2 stuff
@@ -33,6 +34,8 @@
 - Support both BizHawk and m64p
 	- [Info here](https://github.com/notwa/mm/commit/90d30e218f3128fb130e54bd8662527bdd73f40f)
 	- Squish remaining calls to bizstring library
+- BK: ASM hook for other regions
+- DK64: ASM hook for other regions
 
 #Game support wishlist:
 - Conker's Bad Fur Day
