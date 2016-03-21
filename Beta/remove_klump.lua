@@ -1,1 +1,1 @@
-d=0x7FBFF1;m=memory;r=m.read_u24_be;w=m.writebyte;while 7 do for i=0,255 do o=r(d+i*4)if o>0 and o<d and r(o+89)==187 then w(o+99,0);w(o+340,55)end end emu.frameadvance()end
+d=8372209;m=memory;r=m.read_u24_be;w=m.writebyte;while 7 do for i=0,255 do o=r(d+i*4)if o>0 and o<d and r(o+89)==187 then w(o+99,0);w(o+340,55)end end emu.yield()end
