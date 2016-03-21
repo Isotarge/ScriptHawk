@@ -307,7 +307,7 @@ function loadASMPatch(code_filename, suppress_print)
 
 		-- Hacky, yes, but if we're using dynarec the patched code pages don't get marked as dirty
 		-- Quickest and easiest way around this is to save and reload a state
-		local ss_fn = 'lips temp.State'
+		local ss_fn = 'lips/temp.state'
 		savestate.save(ss_fn)
 		savestate.load(ss_fn)
 
