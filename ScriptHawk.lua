@@ -272,27 +272,27 @@ function loadASMPatch(code_filename, suppress_print)
 				if not suppress_print then
 					print("No code loaded, aborting mission...");
 				end
-				return;
+				return false;
 			end
 		end
 
 		-- Open the file and assemble the code
 		code = {};
-		local result = lips(code_filename, codeWriter, {['unsafe'] = true, ['offset'] = Game.ASMCodeBase+0x80000000});
+		local result = lips(code_filename, codeWriter, {['unsafe'] = true, ['offset'] = Game.ASMCodeBase + 0x80000000});
 
 		if #code == 0 then
 			if not suppress_print then
 				print(result);
 				print("The code did not compile correctly, check for errors in your source.");
 			end
-			return;
+			return false;
 		end
 
 		if #code > Game.ASMMaxCodeSize then
 			if not suppress_print then
 				print("The compiled code was too large to safely inject into the game.");
 			end
-			return;
+			return false;
 		end
 
 		-- Patch the code
@@ -320,8 +320,12 @@ function loadASMPatch(code_filename, suppress_print)
 			dprint("Done!");
 			print_deferred();
 		end
+		return true;
 	else
-		print("This game does not support ASM hacks.");
+		if not suppress_print then
+			print("This game does not support ASM hacks.");
+		end
+		return false;
 	end
 end
 
