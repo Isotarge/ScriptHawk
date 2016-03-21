@@ -204,6 +204,10 @@ SystemID N64
 7F5D00	d	f	1	RDRAM	Camera State Change Timer
 7F5D10	d	h	1	RDRAM	Camera pointer?
 7F5D14	b	h	1	RDRAM	ISG Fadeout
+7F5DE0	d	h	1	RDRAM	Map Model Pointer?
+7F5DE4	d	h	1	RDRAM	Map Model Pointer?
+7F5DE8	d	h	1	RDRAM	Map Model Pointer?
+7F5DEC	d	h	1	RDRAM	Map Model Pointer?
 7F6000	d	h	1	RDRAM	Object Model 2 Array Pointer
 7F6004	d	u	1	RDRAM	Object Model 2 Array Count
 7F8E88	b	u	1	RDRAM	Object Count?
