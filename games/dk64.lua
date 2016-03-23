@@ -1206,7 +1206,7 @@ Game.forceZipper = forceZipper;
 function gainControl()
 	local player = getPlayerObject();
 	if isRDRAM(player) then
-		visify();
+		toggle_invisify();
 		mainmemory.writebyte(player + object_state_byte, 0x05);
 	end
 end
@@ -2112,7 +2112,7 @@ function Game.initUI()
 	--ScriptHawkUI.form_controls["Toggle MJ Minimap"] = forms.checkbox(ScriptHawkUI.options_form, "MJ Minimap", ScriptHawkUI.col(5) + ScriptHawkUI.dropdown_offset, ScriptHawkUI.row(6) + ScriptHawkUI.dropdown_offset);
 	--ScriptHawkUI.form_controls["Toggle ISG Timer"] = forms.checkbox(ScriptHawkUI.options_form, "ISG Timer", ScriptHawkUI.col(5) + ScriptHawkUI.dropdown_offset, ScriptHawkUI.row(5) + ScriptHawkUI.dropdown_offset);
 	ScriptHawkUI.form_controls["Toggle OhWrongnana"] = forms.checkbox(ScriptHawkUI.options_form, "OhWrongnana", ScriptHawkUI.col(5) + ScriptHawkUI.dropdown_offset, ScriptHawkUI.row(6) + ScriptHawkUI.dropdown_offset);
-	
+
 	-- Output flag statistics
 	flagStats();
 end
