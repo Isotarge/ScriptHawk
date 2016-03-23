@@ -190,45 +190,6 @@ function readNullTerminatedString(base)
 	return builtString;
 end
 
------------------
--- Game checks --
------------------
-
-local romName = gameinfo.getromname();
-
-if stringContains(romName, "Donkey Kong 64") then
-	Game = require "games.dk64";
-elseif stringContains(romName, "Banjo-Tooie") or stringContains(romName, "Banjo to Kazooie no Daibouken 2") then
-	Game = require "games.bt";
-elseif stringContains(romName, "Banjo-Kazooie") or stringContains(romName, "Banjo to Kazooie no Daibouken") then
-	Game = require "games.bk";
-elseif stringContains(romName, "Diddy Kong Racing") then
-	Game = require "games.dkr";
-elseif stringContains(romName, "Legend of Galahad") then
-	Game = require "beta.Galahad";
-	return;
-elseif stringContains(romName, "Rayman 2 - The Great Escape") then
-	Game = require "games.rayman_2";
-elseif stringContains(romName, "Super Mario 64") then
-	Game = require "games.sm64";
-elseif stringContains(romName, "Toy Story 2") then
-	Game = require "games.ts2";
-elseif stringContains(romName, "Ocarina of Time") or stringContains(romName, "Toki no Ocarina") then
-	Game = require "games.oot";
-elseif stringContains(romName, "Majora's Mask") or stringContains(romName, "Mujura no Kamen") then
-	Game = require "games.mm";
-elseif stringContains(romName, "Elmo's Letter Adventure") or stringContains(romName, "Elmo's Number Journey") then
-	Game = require "games.elmo";
-else
-	print("This game is not currently supported.");
-	return;
-end
-
-if not Game.detectVersion(romName) then
-	print("This version of the game is not currently supported.");
-	return;
-end
-
 --------------------
 -- Load libraries --
 --------------------
@@ -310,6 +271,45 @@ function ScriptHawk.processJoypadBinds(joypadBinds)
 			joypadBind.pressed = true;
 		end
 	end
+end
+
+-----------------
+-- Game checks --
+-----------------
+
+local romName = gameinfo.getromname();
+
+if stringContains(romName, "Donkey Kong 64") then
+	Game = require "games.dk64";
+elseif stringContains(romName, "Banjo-Tooie") or stringContains(romName, "Banjo to Kazooie no Daibouken 2") then
+	Game = require "games.bt";
+elseif stringContains(romName, "Banjo-Kazooie") or stringContains(romName, "Banjo to Kazooie no Daibouken") then
+	Game = require "games.bk";
+elseif stringContains(romName, "Diddy Kong Racing") then
+	Game = require "games.dkr";
+elseif stringContains(romName, "Legend of Galahad") then
+	Game = require "beta.Galahad";
+	return;
+elseif stringContains(romName, "Rayman 2 - The Great Escape") then
+	Game = require "games.rayman_2";
+elseif stringContains(romName, "Super Mario 64") then
+	Game = require "games.sm64";
+elseif stringContains(romName, "Toy Story 2") then
+	Game = require "games.ts2";
+elseif stringContains(romName, "Ocarina of Time") or stringContains(romName, "Toki no Ocarina") then
+	Game = require "games.oot";
+elseif stringContains(romName, "Majora's Mask") or stringContains(romName, "Mujura no Kamen") then
+	Game = require "games.mm";
+elseif stringContains(romName, "Elmo's Letter Adventure") or stringContains(romName, "Elmo's Number Journey") then
+	Game = require "games.elmo";
+else
+	print("This game is not currently supported.");
+	return;
+end
+
+if not Game.detectVersion(romName) then
+	print("This version of the game is not currently supported.");
+	return;
 end
 
 ----------------
@@ -926,6 +926,8 @@ local function mainloop()
 end
 
 local function plot_pos()
+	ScriptHawk.processKeybinds(ScriptHawk.keybindsFrame);
+	ScriptHawk.processKeybinds(ScriptHawk.joypadBindsFrame);
 	Game.eachFrame();
 
 	previous_frame = current_frame;

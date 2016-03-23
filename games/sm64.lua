@@ -115,30 +115,6 @@ local objectIndex = 0;
 local numObjects = 240;
 local objectSize = 0x260; -- Double check
 
-local decrement_object_index_key = "N";
-local increment_object_index_key = "M";
-local zip_key = "Z";
-
-local decrement_object_index_pressed = false;
-local increment_object_index_pressed = false;
-local zip_pressed = false;
-
-function incrementObjectIndex()
-	objectIndex = objectIndex + 1;
-	if objectIndex >= numObjects then
-		objectIndex = 0;
-	end
-	--Game.eachFrame(); -- TODO: Think of a better way to update OSD
-end
-
-function decrementObjectIndex()
-	objectIndex = objectIndex - 1;
-	if objectIndex < 0 then
-		objectIndex = numObjects;
-	end
-	--Game.eachFrame(); -- TODO: Think of a better way to update OSD
-end
-
 local object_vars = {
 	--[0x00] = {["Type"] = "u16_be", ["Display"] = "hex", ["Name"] = "Header", ["Description"] = "Always 0x18"},
 	[0x02] = {["Type"] = "u16_be", ["Display"] = "binary", ["Name"] = "Camera Bitfield", ["Description"] = "Affects how the object behaves according to the camera (billboarding, hide object, etc)"},
@@ -230,6 +206,20 @@ local object_vars = {
 	--[0x25C] = {["Type"] = "pointer", ["Name"] = "Unknown Pointer 0x25C"},
 };
 
+-- TODO: Put unknowns in object_vars table somehow, probably autopopulate and have checkbox to display unknown fields
+-- float: Unknown Use:
+	-- 0xE8, 0x100, 0x104, 0x15C, 0x194, 0x200, 0x204, 0x21C, 0x230, 0x244, 0x258
+-- u16_be: Unknown Use:
+	-- 0x1A, 0x42, 0x8C, 0x1F4, 0x1F6
+-- u16_be(?): Unknown Type, Unknown Use:
+	-- 0x94, 0x96, 0x1BA, 0x1BC
+-- u32_be(?): Unknown Type, Unknown Use:
+	-- 0x10, 0x1C, 0x44, 0x48, 0x4C, 0x50, 0x6C, 0x70, 0x7C, 0x80, 0x84, 0x88, 0x90, 0x98, 0x9C, 0xAC, 0xB0,
+	-- 0xB4, 0xB8, 0xBC, 0xC0, 0xDC, 0xE0, 0xE4, 0xEC, 0x10C, 0x110, 0x114, 0x118, 0x11C, 0x128, 0x12C, 0x138, 0x13C, 0x140, 0x148,
+	-- 0x158, 0x160, 0x164, 0x168, 0x16C, 0x170, 0x174, 0x178, 0x188, 0x18C, 0x190, 0x1A0, 0x1A4, 0x1A8, 0x1B4, 0x1C4,
+	-- 0x1C8, 0x1D0, 0x1D8, 0x1E0, 0x1E4, 0x1E8, 0x1EC, 0x1F0, 0x208, 0x210, 0x220, 0x224, 0x228, 0x22C, 0x234,
+	-- 0x238, 0x23C, 0x240, 0x248, 0x24C, 0x250, 0x254
+
 function getVariableName(address)
 	local variable = object_vars[address];
 	local nameType = type(variable.Name);
@@ -285,31 +275,65 @@ function getExamineData(objectBase)
 	return examineData;
 end
 
-function zipToSelectedObject()
-	local objectBase = object_list + objectIndex * objectSize;
+function drawObjectViewerOSD()
+	forms.settext(ScriptHawkUI.form_controls["Object Index Label"], "Index: "..objectIndex);
+	if forms.ischecked(ScriptHawkUI.form_controls["Enable Object Analyzer"]) then
+		gui.cleartext();
 
-	local objectX = mainmemory.readfloat(objectBase + 0xA0, true);
-	local objectY = mainmemory.readfloat(objectBase + 0xA4, true);
-	local objectZ = mainmemory.readfloat(objectBase + 0xA8, true);
+		local gui_x = 2;
+		local gui_y = 2;
+		local row = 0;
+		local height = 16;
 
-	Game.setXPosition(objectX);
-	Game.setYPosition(objectY);
-	Game.setZPosition(objectZ);
+		local examine_data = getExamineData(object_list + objectIndex * objectSize);
+		for i = #examine_data, 1, -1 do
+			if examine_data[i][1] ~= "Separator" then
+				gui.text(gui_x, gui_y + height * row, examine_data[i][2].." - "..examine_data[i][1], nil, nil, 'bottomright');
+				row = row + 1;
+			else
+				row = row + examine_data[i][2];
+			end
+		end
+	end
 end
 
--- TODO: Put unknowns in object_vars table somehow, probably autopopulate and have checkbox to display unknown fields
-	-- float: Unknown Use:
-		-- 0xE8, 0x100, 0x104, 0x15C, 0x194, 0x200, 0x204, 0x21C, 0x230, 0x244, 0x258
-	-- u16_be: Unknown Use:
-		-- 0x1A, 0x42, 0x8C, 0x1F4, 0x1F6
-	-- u16_be(?): Unknown Type, Unknown Use:
-		-- 0x94, 0x96, 0x1BA, 0x1BC
-	-- u32_be(?): Unknown Type, Unknown Use:
-		-- 0x10, 0x1C, 0x44, 0x48, 0x4C, 0x50, 0x6C, 0x70, 0x7C, 0x80, 0x84, 0x88, 0x90, 0x98, 0x9C, 0xAC, 0xB0,
-		-- 0xB4, 0xB8, 0xBC, 0xC0, 0xDC, 0xE0, 0xE4, 0xEC, 0x10C, 0x110, 0x114, 0x118, 0x11C, 0x128, 0x12C, 0x138, 0x13C, 0x140, 0x148,
-		-- 0x158, 0x160, 0x164, 0x168, 0x16C, 0x170, 0x174, 0x178, 0x188, 0x18C, 0x190, 0x1A0, 0x1A4, 0x1A8, 0x1B4, 0x1C4,
-		-- 0x1C8, 0x1D0, 0x1D8, 0x1E0, 0x1E4, 0x1E8, 0x1EC, 0x1F0, 0x208, 0x210, 0x220, 0x224, 0x228, 0x22C, 0x234,
-		-- 0x238, 0x23C, 0x240, 0x248, 0x24C, 0x250, 0x254
+function incrementObjectIndex()
+	if forms.ischecked(ScriptHawkUI.form_controls["Enable Object Analyzer"]) then
+		objectIndex = objectIndex + 1;
+		if objectIndex >= numObjects then
+			objectIndex = 0;
+		end
+
+		drawObjectViewerOSD();
+	end
+end
+
+function decrementObjectIndex()
+	if forms.ischecked(ScriptHawkUI.form_controls["Enable Object Analyzer"]) then
+		objectIndex = objectIndex - 1;
+		if objectIndex < 0 then
+			objectIndex = numObjects;
+		end
+
+		drawObjectViewerOSD();
+	end
+end
+
+function zipToSelectedObject()
+	if forms.ischecked(ScriptHawkUI.form_controls["Enable Object Analyzer"]) then
+		local objectBase = object_list + objectIndex * objectSize;
+
+		local objectX = mainmemory.readfloat(objectBase + 0xA0, true);
+		local objectY = mainmemory.readfloat(objectBase + 0xA4, true);
+		local objectZ = mainmemory.readfloat(objectBase + 0xA8, true);
+
+		Game.setXPosition(objectX);
+		Game.setYPosition(objectY);
+		Game.setZPosition(objectZ);
+
+		drawObjectViewerOSD();
+	end
+end
 
 -------------------
 -- Physics/Scale --
@@ -402,55 +426,12 @@ function Game.initUI()
 	ScriptHawkUI.form_controls["Object Index Label"] = forms.label(ScriptHawkUI.options_form, "Index: 0", ScriptHawkUI.col(8) + ScriptHawkUI.button_height + 21, ScriptHawkUI.row(7) + ScriptHawkUI.label_offset, 64, 14);
 end
 
+ScriptHawk.bindKeyRealtime("Z", zipToSelectedObject, true);
+ScriptHawk.bindKeyRealtime("N", decrementObjectIndex, true);
+ScriptHawk.bindKeyRealtime("M", incrementObjectIndex, true);
+
 function Game.eachFrame()
-	input_table = input.get();
-
-	-- Hold down key prevention
-	if input_table[decrement_object_index_key] == nil then
-		decrement_object_index_pressed = false;
-	end
-
-	if input_table[increment_object_index_key] == nil then
-		increment_object_index_pressed = false;
-	end
-
-	if input_table[zip_key] == nil then
-		zip_pressed = false;
-	end
-
-	-- Check for key presses
-	if input_table[decrement_object_index_key] == true and decrement_object_index_pressed == false then
-		decrementObjectIndex();
-		decrement_object_index_pressed = true;
-	end
-
-	if input_table[increment_object_index_key] == true and increment_object_index_pressed == false then
-		incrementObjectIndex();
-		increment_object_index_pressed = true;
-	end
-
-	if input_table[zip_key] == true and zip_pressed == false then
-		zipToSelectedObject();
-		zip_pressed = true;
-	end
-
-	forms.settext(ScriptHawkUI.form_controls["Object Index Label"], "Index: "..objectIndex);
-	if forms.ischecked(ScriptHawkUI.form_controls["Enable Object Analyzer"]) then
-		local gui_x = 2;
-		local gui_y = 2;
-		local row = 0;
-		local height = 16;
-
-		local examine_data = getExamineData(object_list + objectIndex * objectSize);
-		for i = #examine_data, 1, -1 do
-			if examine_data[i][1] ~= "Separator" then
-				gui.text(gui_x, gui_y + height * row, examine_data[i][2].." - "..examine_data[i][1], nil, nil, 'bottomright');
-				row = row + 1;
-			else
-				row = row + examine_data[i][2];
-			end
-		end
-	end
+	drawObjectViewerOSD();
 end
 
 return Game;

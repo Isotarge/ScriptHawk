@@ -940,14 +940,13 @@ function findConga()
 end
 
 function throwOrange()
-	local keyboard_pressed = input.get();
-	if keyboard_pressed["C"] then
-		local congaBase = findConga();
-		if isRDRAM(congaBase) then
-			mainmemory.writefloat(congaBase + 0x114, 0.5, true); -- Write 0.5 to main behavior timer, these fields are documented in Beta/Level Object Analyser.lua
-		end
+	local congaBase = findConga();
+	if isRDRAM(congaBase) then
+		mainmemory.writefloat(congaBase + 0x114, 0.5, true); -- Write 0.5 to main behavior timer, these fields are documented in Beta/Level Object Analyser.lua
 	end
 end
+
+ScriptHawk.bindKeyFrame("C", throwOrange, false);
 
 --------------
 -- Encircle --
@@ -1328,7 +1327,6 @@ end
 function Game.eachFrame()
 	applyFurnaceFunPatch();
 	updateWave();
-	throwOrange();
 	pulseClipVelocity();
 
 	if forms.ischecked(options_toggle_neverslip) then
