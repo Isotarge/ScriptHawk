@@ -1,7 +1,18 @@
 local mmv_filename = forms.openfile(nil, nil, "Dega Movie Files (*.mmv)|*.mmv|All Files (*.*)|*.*");
 
+function fileExists(name)
+	if type(name) == 'string' then
+		local f = io.open(name, "r");
+		if f ~= nil then
+			io.close(f);
+			return true;
+		end
+	end
+	return false;
+end
+
 console.clear()
-if mmv_filename == "" then
+if fileExists(mmv_filename) then
 	print("No movie selected. Exiting.");
 	return;
 end

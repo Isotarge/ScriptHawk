@@ -2,6 +2,17 @@
 -- Helper functions --
 ----------------------
 
+function fileExists(name)
+	if type(name) == 'string' then
+		local f = io.open(name, "r");
+		if f ~= nil then
+			io.close(f);
+			return true;
+		end
+	end
+	return false;
+end
+
 function round(num, idp)
 	return tonumber(string.format("%." .. (idp or 0) .. "f", num));
 end
@@ -340,9 +351,9 @@ end
 
 function loadASMPatch(code_filename, suppress_print)
 	if Game.supportsASMHacks then
-		if type(code_filename) == 'nil' then
+		if not fileExists(code_filename) then
 			code_filename = forms.openfile(nil, nil, "R4300i Assembly Code|*.asm|All Files (*.*)|*.*");
-			if code_filename == "" then
+			if not fileExists(code_filename) then
 				if not suppress_print then
 					print("No code loaded, aborting mission...");
 				end
@@ -401,6 +412,40 @@ function loadASMPatch(code_filename, suppress_print)
 		end
 		return false;
 	end
+end
+
+-------------
+-- Texture --
+-------------
+
+-- Pixel format: 16bit RGBA 5551
+-- RRRR RGGG GGBB BBBA
+local rgba5551_color_constants = {
+	["Red"] = 0x0800,
+	["Green"] = 0x0040,
+	["Blue"] = 0x0002,
+};
+
+function replaceTextureRGBA5551(filename, base, size)
+	if not fileExists(filename) then
+		filename = forms.openfile(nil, nil, "All Files (*.*)|*.*");
+		if not fileExists(filename) then
+			print("No image selected. Exiting.");
+			return;
+		end
+	end
+
+	local input_file = assert(io.open(filename, "rb"));
+	for i = 0, size - 1 do
+		local r = math.floor(string.byte(input_file:read(1)) / 8) * rgba5551_color_constants["Red"];
+		local g = math.floor(string.byte(input_file:read(1)) / 8) * rgba5551_color_constants["Green"];
+		local b = math.floor(string.byte(input_file:read(1)) / 8) * rgba5551_color_constants["Blue"];
+		local a = 1;
+
+		mainmemory.write_u16_be(base + (i * 2), r + g + b + a);
+	end
+
+	input_file:close();
 end
 
 -----------

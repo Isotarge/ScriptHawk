@@ -1990,6 +1990,7 @@ function ohWrongnana()
 	end
 end
 
+-- TODO: Better detection for these
 function Game.replaceTextures()
 	replace_u32_be(0x805AC370, 0x805B23D0) -- Chunky left
 	replace_u32_be(0x805AD380, 0x805B33E0) -- Chunky Right
@@ -2007,36 +2008,18 @@ end
 
 local framebuffer_size = 320 * 240; -- Oddly enough it's the same size on PAL
 
--- Pixel format: 16bit RGBA 5551
--- RRRR RGGG GGBB BBBA
-local framebuffer_color_bit_constants = {
-	["Red"] = 0x0800,
-	["Green"] = 0x0040,
-	["Blue"] = 0x0002,
-};
-
 function fillFB()
 	local image_filename = forms.openfile(nil, nil, "All Files (*.*)|*.*");
-	if image_filename == "" then
+	if not fileExists(image_filename) then
 		print("No image selected. Exiting.");
 		return;
 	end
-	input_file = assert(io.open(image_filename, "rb"));
 
 	local frameBufferLocation = mainmemory.read_u24_be(Game.Memory.framebuffer_pointer[version] + 1);
 	if isRDRAM(frameBufferLocation) then
-		for i = 0, framebuffer_size - 1 do
-			local r = math.floor(string.byte(input_file:read(1)) / 8) * framebuffer_color_bit_constants["Red"];
-			local g = math.floor(string.byte(input_file:read(1)) / 8) * framebuffer_color_bit_constants["Green"];
-			local b = math.floor(string.byte(input_file:read(1)) / 8) * framebuffer_color_bit_constants["Blue"];
-			local a = 1;
-
-			mainmemory.write_u16_be(frameBufferLocation + (i * 2), r + g + b + a);
-			mainmemory.write_u16_be(frameBufferLocation + framebuffer_size + (i * 2), r + g + b + a);
-		end
+		replaceTextureRGBA5551(image_filename, frameBufferLocation, framebuffer_size);
+		replaceTextureRGBA5551(image_filename, frameBufferLocation + (framebuffer_size * 2), framebuffer_size);
 	end
-
-	input_file:close();
 end
 
 ------------

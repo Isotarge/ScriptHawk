@@ -2,8 +2,6 @@
 ##High Priority
 - General: Base game detection on ROM hash rather than name
 - General: Rework input/keybinds, multiple profiles like wasd/arrow keys
-	- Generic keybind framework for calling functions with/without hold prevention
-		- ScriptHawk.bindKey("A", moveLeft, false)
 - General: 2D game support
 - General: Button/Checkbox style take me there, set by game module
 - General: Move from x, y, z variables to position/rotation/velocity etc. tables with x, y, z indexes
