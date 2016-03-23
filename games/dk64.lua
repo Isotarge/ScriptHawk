@@ -59,8 +59,6 @@ local jetman_velocity;
 -- Mad Jack --
 --------------
 
-local mad_jack_map = 154;
-
 -- Relative to MJ state object
 local MJ_time_until_next_action;
 local MJ_actions_remaining;
@@ -1383,7 +1381,7 @@ end
 
 local function draw_mj_minimap()
 	-- Only draw minimap if the player is in the Mad Jack fight
-	if version ~= 4 and map_value == mad_jack_map then
+	if version ~= 4 and map_value == 154 then
 		local MJ_state = mainmemory.read_u24_be(Game.Memory.boss_pointer[version] + 1);
 
 		local cur_pos = MJ_parse_position(mainmemory.readbyte(MJ_state + MJ_current_pos));

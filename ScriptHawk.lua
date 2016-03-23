@@ -238,6 +238,80 @@ Stats = require "lib.Stats";
 lips = require "lips.init";
 require "lib.DPrint";
 
+-----------------------
+-- Keybind framework --
+-----------------------
+ScriptHawk = {};
+
+ScriptHawk.keybindsFrame = {};
+ScriptHawk.keybindsRealtime = {};
+
+ScriptHawk.joypadBindsFrame = {};
+ScriptHawk.joypadBindsRealtime = {};
+
+function ScriptHawk.bind(keybindArray, key, callback, preventHold)
+	if type(keybindArray) == "table" and type(key) == "string" and type(callback) == "function" then
+		if type(preventHold) ~= 'boolean' then
+			preventHold = true;
+		end
+		table.insert(keybindArray, {['key'] = key, ['callback'] = callback, ['pressed'] = false, ['preventHold'] = preventHold});
+	end
+end
+
+function ScriptHawk.bindKeyRealtime(key, callback, preventHold)
+	ScriptHawk.bind(ScriptHawk.keybindsRealtime, key, callback, preventHold);
+end
+
+function ScriptHawk.bindKeyFrame(key, callback, preventHold)
+	ScriptHawk.bind(ScriptHawk.keybindsFrame, key, callback, preventHold);
+end
+
+function ScriptHawk.bindJoypadFrame(key, callback, preventHold)
+	ScriptHawk.bind(ScriptHawk.joypadBindsFrame, key, callback, preventHold);
+end
+
+function ScriptHawk.bindJoypadRealtime(key, callback, preventHold)
+	ScriptHawk.bind(ScriptHawk.joypadBindsRealtime, key, callback, preventHold);
+end
+
+function ScriptHawk.unbind(keybinds, key)
+	if type(key) == "string" then
+		for i, keybind in ipairs(keybinds) do
+			if key == keybind.key then
+				table.remove(keybinds, i);
+			end
+		end
+	end
+end
+
+function ScriptHawk.processKeybinds(keybinds)
+	local input_table = input.get();
+
+	for i, keybind in ipairs(keybinds) do
+		if not input_table[keybind.key] then
+			keybind.pressed = false;
+		end
+		if input_table[keybind.key] and (not keybind.preventHold or not keybind.pressed) then
+			keybind.callback();
+			keybind.pressed = true;
+		end
+	end
+end
+
+function ScriptHawk.processJoypadBinds(joypadBinds)
+	local input_table = joypad.getimmediate();
+
+	for i, joypadBind in ipairs(joypadBinds) do
+		if not input_table[joypadBind.key] then
+			joypadBind.pressed = false;
+		end
+		if input_table[joypadBind.key] and (not joypadBind.preventHold or not joypadBind.pressed) then
+			joypadBind.callback();
+			joypadBind.pressed = true;
+		end
+	end
+end
+
 ----------------
 -- ASM Loader --
 ----------------
@@ -329,23 +403,6 @@ function loadASMPatch(code_filename, suppress_print)
 	end
 end
 
---------------
--- Keybinds --
---------------
--- For full list go here http://slimdx.org/docs/html/T_SlimDX_DirectInput_Key.htm
-
---local decrease_precision_key = "Comma";
---local decrease_precision_pressed = false;
-
---local increase_precision_key = "Period";
---local increase_precision_pressed = false;
-
-local reset_max_key = "Slash";
-local reset_max_pressed = false;
-
---local switch_mode_key = "M";
---local switch_mode_pressed = false;
-
 -----------
 -- State --
 -----------
@@ -408,22 +465,47 @@ end
 -------------------------
 
 local practice_save_slot = 0;
-local practice_decrease_slot_pressed = false;
-local practice_increase_slot_pressed = false;
-local practice_load_slot_pressed = false;
-local practice_save_slot_pressed = false;
 
 local function decreaseSaveSlot()
-	practice_save_slot = math.max(0, practice_save_slot - 1);
-	gui.cleartext();
-	updateUIReadouts_ScriptHawk();
+	if mode == "Practice" then
+		practice_save_slot = math.max(0, practice_save_slot - 1);
+		gui.cleartext();
+		gui.addmessage("Switched to save slot "..practice_save_slot);
+		updateUIReadouts_ScriptHawk();
+	end
 end
 
 local function increaseSaveSlot()
-	practice_save_slot = math.min(9, practice_save_slot + 1);
-	gui.cleartext();
-	updateUIReadouts_ScriptHawk();
+	if mode == "Practice" then
+		practice_save_slot = math.min(9, practice_save_slot + 1);
+		gui.cleartext();
+		gui.addmessage("Switched to save slot "..practice_save_slot);
+		updateUIReadouts_ScriptHawk();
+	end
 end
+
+local function loadPracticeSlot()
+	if mode == "Practice" then
+		savestate.loadslot(practice_save_slot);
+		gui.cleartext();
+		updateUIReadouts_ScriptHawk();
+	end
+end
+
+local function savePracticeSlot()
+	if mode == "Practice" then
+		savestate.saveslot(practice_save_slot);
+		gui.cleartext();
+		updateUIReadouts_ScriptHawk();
+	end
+end
+
+-- Practice mode JoypadBinds
+ScriptHawk.bindJoypadRealtime("P1 DPad L", decreaseSaveSlot, true);
+ScriptHawk.bindJoypadRealtime("P1 DPad R", increaseSaveSlot, true);
+ScriptHawk.bindJoypadRealtime("P1 DPad U", savePracticeSlot, true);
+ScriptHawk.bindJoypadRealtime("P1 DPad D", loadPracticeSlot, true);
+ScriptHawk.bindJoypadRealtime("P1 L", loadPracticeSlot, true);
 
 ----------------------------
 -- Other helper functions --
@@ -488,6 +570,7 @@ local function toggleRotationUnits()
 		rotation_units = "Degrees";
 	end
 	gui.cleartext();
+	updateUIReadouts_ScriptHawk();
 	updateUIReadouts_ScriptHawk();
 end
 
@@ -833,41 +916,6 @@ local function mainloop()
 		end
 	end
 
-	if mode == 'Practice' then
-		-- Hold down prevention
-		if not joypad_pressed["P1 DPad L"] then
-			practice_decrease_slot_pressed = false;
-		end
-		if not joypad_pressed["P1 DPad R"] then
-			practice_increase_slot_pressed = false;
-		end
-		if not joypad_pressed["P1 DPad U"] then
-			practice_save_slot_pressed = false;
-		end
-		if not joypad_pressed["P1 DPad D"] and not joypad_pressed["P1 L"] then
-			practice_load_slot_pressed = false;
-		end
-
-		if joypad_pressed["P1 DPad U"] and not practice_save_slot_pressed then
-			savestate.saveslot(practice_save_slot);
-			practice_save_slot_pressed = true;
-		end
-		if (joypad_pressed["P1 DPad D"] or joypad_pressed["P1 L"]) and not practice_load_slot_pressed then
-			savestate.loadslot(practice_save_slot);
-			practice_load_slot_pressed = true;
-		end
-		if joypad_pressed["P1 DPad L"] and not practice_decrease_slot_pressed then
-			decreaseSaveSlot();
-			gui.addmessage("Switched to save slot "..practice_save_slot);
-			practice_decrease_slot_pressed = true;
-		end
-		if joypad_pressed["P1 DPad R"] and not practice_increase_slot_pressed then
-			increaseSaveSlot();
-			gui.addmessage("Switched to save slot "..practice_save_slot);
-			practice_increase_slot_pressed = true;
-		end
-	end
-
 	if forms.ischecked(ScriptHawkUI.form_controls["Toggle Infinites Checkbox"]) then
 		Game.applyInfinites();
 	end
@@ -875,52 +923,6 @@ local function mainloop()
 	if forms.ischecked(ScriptHawkUI.form_controls["Map Checkbox"]) then
 		Game.setMap(previous_map_value);
 	end
-end
-
-local function handleInput()
-	input_table = input.get();
-
-	-- Hold down key prevention
-	--if input_table[decrease_precision_key] == nil then
-	--	decrease_precision_pressed = false;
-	--end
-
-	--if input_table[increase_precision_key] == nil then
-	--	increase_precision_pressed = false;
-	--end
-
-	if input_table[reset_max_key] == nil then
-		reset_max_pressed = false;
-	end
-
-	--if input_table[switch_mode_key] == nil then
-	--	switch_mode_pressed = false;
-	--end
-
-	-- Check for key presses
-	--if input_table[decrease_precision_key] == true and decrease_precision_pressed == false then
-	--	decreasePrecision();
-	--	decrease_precision_pressed = true;
-	--end
-
-	--if input_table[increase_precision_key] == true and increase_precision_pressed == false then
-	--	increasePrecision();
-	--	increase_precision_pressed = true;
-	--end
-
-	if input_table[reset_max_key] == true and reset_max_pressed == false then
-		max_dx = 0.0;
-		max_dy = 0.0;
-		max_dz = 0.0;
-		max_d = 0.0;
-		odometer = 0.0;
-		reset_max_pressed = true;
-	end
-
-	--if input_table[switch_mode_key] == true and switch_mode_pressed == false then
-	--	toggleMode();
-	--	switch_mode_pressed = true;
-	--end
 end
 
 local function plot_pos()
@@ -1027,7 +1029,33 @@ local function plot_pos()
 	updateUIReadouts_ScriptHawk();
 end
 
-event.onframestart(handleInput, "ScriptHawk - Keyboard input handler");
 event.onframestart(mainloop, "ScriptHawk - Controller input handler");
 event.onframestart(plot_pos, "ScriptHawk - Update position each frame");
 event.onloadstate(plot_pos, "ScriptHawk - Update position on load state");
+
+--------------
+-- Keybinds --
+--------------
+-- For full list go here http://slimdx.org/docs/html/T_SlimDX_DirectInput_Key.htm
+
+--ScriptHawk.bindKeyRealtime("Comma", decreasePrecision, true);
+--ScriptHawk.bindKeyRealtime("Period", increasePrecision, true);
+
+function ScriptHawk.resetMax()
+	max_dx = 0.0;
+	max_dy = 0.0;
+	max_dz = 0.0;
+	max_d = 0.0;
+	odometer = 0.0;
+	reset_max_pressed = true;
+end
+ScriptHawk.bindKeyRealtime("Slash", ScriptHawk.resetMax, true);
+--ScriptHawk.bindKeyRealtime("M", toggleMode, true);
+
+while true do
+	ScriptHawk.processKeybinds(ScriptHawk.keybindsRealtime);
+	ScriptHawk.processJoypadBinds(ScriptHawk.joypadBindsRealtime);
+	updateUIReadouts_ScriptHawk();
+	-- TODO: Game.realtime() update method thingo
+	emu.yield();
+end
