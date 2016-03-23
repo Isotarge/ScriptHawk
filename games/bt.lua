@@ -17,7 +17,7 @@ Game.maps = {
 	"SM - Behind the waterfall",
 	"SM - Spiral Mountain",
 
-	"Crash 0x00B0", "Crash 0x00B1", "Unknown 0x00B2", "Crash 0x00B3", "Unknown 0x00B4", "Crash 0x00B5", 
+	"Crash 0x00B0", "Crash 0x00B1", "Unknown 0x00B2", "Crash 0x00B3", "Unknown 0x00B4", "Crash 0x00B5",
 
 	"MT - Humba's Wigwam",
 	"MT - Mumbo's Skull",

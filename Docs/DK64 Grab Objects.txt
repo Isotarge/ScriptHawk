@@ -1,7 +1,7 @@
 How to use Grab Objects.lua
 
 Grab Objects.lua allows you to list and examine details about the currently loaded objects
-from two (of likely three+) object models in DK64. 
+from two (of likely three+) object models in DK64.
 
 "List" shows all currently loaded objects from that model
 "Examine" shows all known details about the currently selected object

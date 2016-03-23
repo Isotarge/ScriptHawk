@@ -336,7 +336,7 @@ All collected 0xFFFC
 0x69 Completely froze BizHawk
 0x6A Crash
 0x6B Crash -> Empty
-0x6C Crash 
+0x6C Crash
 0x6D Crash
 0x6E Completely froze BizHawk
 0x6F Crash

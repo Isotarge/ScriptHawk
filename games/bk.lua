@@ -917,7 +917,7 @@ end
 
 -------------------------------
 -- Conga.lua                 --
--- Written by Isotarge, 2015 -- 
+-- Written by Isotarge, 2015 --
 -------------------------------
 
 function findConga()

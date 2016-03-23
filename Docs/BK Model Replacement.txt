@@ -653,7 +653,7 @@
 051F Bug asshole's body
 
 0520 Bug asshole's detached leg or something idk
-0521 Wall hole enemy skeleton guy 
+0521 Wall hole enemy skeleton guy
 0522 ???
 0523 Wall hole guy jaw
 0524 Some head idk

@@ -126,7 +126,7 @@ NOP
 
 // Convert float to signed 32 bit int
 LWC1 f31 0(a1)
-LA t1 PrecisionMultiplier 
+LA t1 PrecisionMultiplier
 LWC1 f30 0(t1)
 MUL.S f31 f31 f30
 CVT.W.S f31 f31

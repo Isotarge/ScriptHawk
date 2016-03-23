@@ -55,7 +55,7 @@ local silver_coins = 0x29A;
 
 local map_freeze_values = {};
 
-Game.maps = { 
+Game.maps = {
 	"0x00 - Overworld",
 	"0x01 - Bluey 1",
 	"0x02 - Dragon Forest (Hub)",

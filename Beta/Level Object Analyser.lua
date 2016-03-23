@@ -55,8 +55,8 @@ slot_variables = {
 	[0x38] = {["Type"] = "u16_be", ["Name"] = "Movement Timer"},
 	[0x3B] = {["Type"] = "Byte", ["Name"] = "Movement State"},
 
-	[0x48] = {["Type"] = "Float", ["Name"] = "Race path progression"}, 
-	[0x4C] = {["Type"] = "Float", ["Name"] = "Speed (rubberband)"}, 
+	[0x48] = {["Type"] = "Float", ["Name"] = "Race path progression"},
+	[0x4C] = {["Type"] = "Float", ["Name"] = "Speed (rubberband)"},
 
 	[0x50] = {["Type"] = "Float", ["Name"] = {"Facing Angle", "Facing", "Rot Y", "Rot. Y", "Y Rotation"}},
 
@@ -892,7 +892,7 @@ local function process_input()
 		switch_script_mode();
 		switch_script_mode_pressed = true;
 	end
-	
+
 	if input_table[zip_key] == true and zip_pressed == false then
 		zipToSelectedObject();
 		zip_pressed = true;

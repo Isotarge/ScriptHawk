@@ -1,4 +1,4 @@
-[SpawnActor]: 0x8032813C 
+[SpawnActor]: 0x8032813C
 [Return]: 0x8024EE90
 
 [XPos]: 0x8037C5A0
