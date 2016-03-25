@@ -1,0 +1,27 @@
+Banjo Kazooie Functions US 1.0
+
+0x8024E55C -- (called with a0 0)
+0x80264550 Main Game Loop? Does Rendering, called by controller handler?
+0x802F55D8 -- Does a lot with floats
+0x802F75C8
+0x802F7870 Print($a0 u8 XPosition, $a1, u8 YPosition, $a2 float TextSize, $a3 char[] Message)
+0x802F7B90 Unknown($a0 u8 Shade, $a1 u8 Shade)
+0x802FB0E4 --
+0x80316EF4 PrintPauseMenuItem(a0 object* MenuItemObject)?
+	MenuItemObject (Size 0x840):
+		0x00 String
+		0xF0 Shadow BG Texture Pointer
+		0xF4 Shadow Context Pointer
+		0x169 Shading byte 0xFF = fully lit 0x00 = black
+0x8033D884 --
+0x8033D8A4 IToA($a0 char[]* dest, $a1 u32 source, 16 radix)
+0x8033DD9C
+0x8032813C SpawnActor(u16 id, float[] position)
+
+Functions called when collecting note
+8023F68C
+80287294
+8028BA2C
+80297AB8
+802F3670
+802F379C
