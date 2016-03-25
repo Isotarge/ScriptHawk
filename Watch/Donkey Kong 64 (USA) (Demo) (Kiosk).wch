@@ -1,4 +1,6 @@
 SystemID N64
+5931B8	w	h	1	RDRAM	Object Model 2 "Room Replacement"
+5931BA	w	h	1	RDRAM	Object Model 2 "Room Replacement"
 6F9EB8	b	u	1	RDRAM	Character
 6FB9D0	d	h	1	RDRAM	Start of pointers to strings
 6FF054	d	h	1	RDRAM	Object Model 2 Collision Linked List Pointer
@@ -14,13 +16,15 @@ SystemID N64
 707E3B	b	h	1	RDRAM	Enguarde Model
 707E4B	b	h	1	RDRAM	Squawks Model
 707E5B	b	h	1	RDRAM	Squawks Model
-70AA9C	w	h	1	RDRAM	Dogadon Actor Type
+70A540	w	h	1	RDRAM	Armydillo Behavior
+70A542	w	h	1	RDRAM	Armydillo Model
+70AA9C	w	h	1	RDRAM	Dogadon Behavior
 70AA9E	w	h	1	RDRAM	Dogadon Model
 72CDA0	d	h	1	RDRAM	Framebuffer Pointer
 72CDE7	b	u	1	RDRAM	Map
 72D140	d	u	1	RDRAM	Frames (Lag) (TODO: Seems to work for Diddy's map but not for any others)
 7A106C	d	h	1	RDRAM	Framebuffer Pointer (Copy)
-7A12C0	d	h	1	RDRAM	Linked List Pointer
+7A12C0	d	h	1	RDRAM	Backbone Pointer
 7A1E14	d	h	1	RDRAM	Camera Pointer
 7B5918	d	h	1	RDRAM	Camera Pointer
 7B5AFC	d	h	1	RDRAM	Player Pointer
@@ -28,4 +32,5 @@ SystemID N64
 7B5B13	b	b	1	RDRAM	Tag Barrel Void Byte
 7B675E	b	u	1	RDRAM	Health
 7B675F	b	u	1	RDRAM	Melons
+7B71C4	d	h	1	RDRAM	Object Model 2 Array Pointer?
 

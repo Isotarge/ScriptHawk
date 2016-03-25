@@ -7,4 +7,5 @@ Active object loader code:
 Loads level object's, but not enemy's.
 Examples: 
 
-16-Aztec Room with Banana Medal?
+15: Llama temple
+16: Aztec Room? with Banana Medal on ground
