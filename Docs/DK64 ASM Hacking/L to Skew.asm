@@ -12,7 +12,7 @@ ADDIU   t3, r0, @L_Button
 BNE     t2, t3, Return
 
 LW      t0, @KongObjectPointer
-LI      t3, 0x3B00 // Skew amount
+LI      t3, 0x3C00 // Skew amount
 SH      t3, @Z_Rot(t0)
 
 Return:
@@ -41,7 +41,7 @@ NOP
 // 817FF514 8C28
 // 817FF516 BB4C
 // 817FF518 240B
-// 817FF51A 3B00
+// 817FF51A 3C00
 // 817FF51C A50B
 // 817FF51E 00E8
 // 817FF520 0800
