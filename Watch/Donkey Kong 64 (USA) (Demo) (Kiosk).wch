@@ -30,6 +30,16 @@ SystemID N64
 7B5AFC	d	h	1	RDRAM	Player Pointer
 7B5B12	b	b	1	RDRAM	Zipper Byte
 7B5B13	b	b	1	RDRAM	Tag Barrel Void Byte
+7B6591	b	h	1	RDRAM	DK Sim Slam
+7B6596	w	u	1	RDRAM	DK Coins
+7B6598	w	u	1	RDRAM	DK Instrument Ammo
+7B659A	w	u	1	RDRAM	DK CB's (Japes?)
+7B65CE	w	u	1	RDRAM	DK GB's (Japes?)
+7B6752	w	u	1	RDRAM	Normal Ammo
+7B6754	w	u	1	RDRAM	Homing Ammo
+7B6756	w	u	1	RDRAM	Oranges
+7B6758	w	u	1	RDRAM	Crystal Coconuts
+7B675A	w	u	1	RDRAM	Film
 7B675E	b	u	1	RDRAM	Health
 7B675F	b	u	1	RDRAM	Melons
 7B71C4	d	h	1	RDRAM	Object Model 2 Array Pointer?

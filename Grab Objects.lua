@@ -278,7 +278,8 @@ if bizstring.contains(romName, "Donkey Kong 64") then
 		pointer_list = 0x7B5E58;
 		camera_pointer = 0x7B5918;
 		player_pointer = 0x7B5AFC;
-		obj_model2_array_pointer = 0x7F6000; -- TODO
+		isKiosk = true;
+		obj_model2_array_pointer = 0x7A20B0;
 
 		actor_types = {
 			[2] = "DK",
@@ -727,7 +728,10 @@ local obj_model2_model_rot_y = obj_model2_model_rot_x + 4; -- Float
 local obj_model2_model_rot_z = obj_model2_model_rot_y + 4; -- Float
 
 function getObjectModel2ArraySize()
-	local objModel2Array = mainmemory.read_u32_be(obj_model2_array_pointer);
+	local objModel2Array = obj_model2_array_pointer + RDRAMBase;
+	if not isKiosk then
+		objModel2Array = mainmemory.read_u32_be(obj_model2_array_pointer);
+	end
 	if isPointer(objModel2Array) then
 		return mainmemory.read_u32_be(objModel2Array - RDRAMBase + object_size) / obj_model2_slot_size;
 	end
@@ -735,7 +739,10 @@ function getObjectModel2ArraySize()
 end
 
 function getObjectModel2SlotBase(index)
-	local objModel2Array = mainmemory.read_u32_be(obj_model2_array_pointer);
+	local objModel2Array = obj_model2_array_pointer + RDRAMBase;
+	if not isKiosk then
+		objModel2Array = mainmemory.read_u32_be(obj_model2_array_pointer);
+	end
 	if isPointer(objModel2Array) then
 		return objModel2Array - RDRAMBase + index * obj_model2_slot_size;
 	end
@@ -743,7 +750,10 @@ function getObjectModel2SlotBase(index)
 end
 
 function getObjectModel2ModelBase(index)
-	local objModel2Array = mainmemory.read_u32_be(obj_model2_array_pointer);
+	local objModel2Array = obj_model2_array_pointer + RDRAMBase;
+	if not isKiosk then
+		objModel2Array = mainmemory.read_u32_be(obj_model2_array_pointer);
+	end
 	if isPointer(objModel2Array) then
 		return mainmemory.read_u24_be(objModel2Array - RDRAMBase + index * obj_model2_slot_size + obj_model2_model_pointer + 1);
 	end
@@ -752,10 +762,17 @@ end
 
 function populateObjectModel2Pointers()
 	object_pointers = {};
-	objModel2Array = mainmemory.read_u32_be(obj_model2_array_pointer);
+	local objModel2Array = obj_model2_array_pointer + RDRAMBase;
+	if not isKiosk then
+		objModel2Array = mainmemory.read_u32_be(obj_model2_array_pointer);
+	end
 	if isPointer(objModel2Array) then
 		objModel2Array = objModel2Array - RDRAMBase;
-		numSlots = mainmemory.read_u32_be(obj_model2_array_count);
+		if not isKiosk then
+			numSlots = mainmemory.read_u32_be(obj_model2_array_count);
+		else
+			numSlots = 430;
+		end
 
 		-- Fill and sort pointer list
 		for i = 1, numSlots do
@@ -790,6 +807,45 @@ local function encirclePlayerObjectModel2()
 				mainmemory.writefloat(modelPointer + obj_model2_model_x_pos, x, true);
 				mainmemory.writefloat(modelPointer + obj_model2_model_y_pos, yPos, true);
 				mainmemory.writefloat(modelPointer + obj_model2_model_z_pos, z, true);
+			end
+		end
+	end
+end
+
+function offsetObjectModel2(x, y, z)
+	-- Iterate and set position
+	local behaviorTypePointer, behaviorType, modelPointer, currentX, currentY, currentZ;
+	for i = 1, #object_pointers do
+		behaviorTypePointer = mainmemory.read_u32_be(object_pointers[i] + obj_model2_behavior_type_pointer);
+		behaviorType = "unknown";
+		if isPointer(behaviorTypePointer) then
+			behaviorType = readNullTerminatedString(behaviorTypePointer - RDRAMBase + 0x0C);
+		end
+		if behaviorType == "pickups" then
+			-- Read hitbox X, Y, Z
+			currentX = mainmemory.readfloat(object_pointers[i] + obj_model2_x_pos, true);
+			currentY = mainmemory.readfloat(object_pointers[i] + obj_model2_y_pos, true);
+			currentZ = mainmemory.readfloat(object_pointers[i] + obj_model2_z_pos, true);
+
+			-- Write hitbox X, Y, Z
+			mainmemory.writefloat(object_pointers[i] + obj_model2_x_pos, currentX + x, true);
+			mainmemory.writefloat(object_pointers[i] + obj_model2_y_pos, currentY + y, true);
+			mainmemory.writefloat(object_pointers[i] + obj_model2_z_pos, currentZ + z, true);
+
+			-- Check for model
+			modelPointer = mainmemory.read_u32_be(object_pointers[i] + obj_model2_model_pointer);
+			if isPointer(modelPointer) then
+				modelPointer = modelPointer - RDRAMBase;
+
+				-- Read model X, Y, Z
+				currentX = mainmemory.readfloat(modelPointer + obj_model2_model_x_pos, true);
+				currentY = mainmemory.readfloat(modelPointer + obj_model2_model_y_pos, true);
+				currentZ = mainmemory.readfloat(modelPointer + obj_model2_model_z_pos, true);
+
+				-- Write model X, Y, Z
+				mainmemory.writefloat(modelPointer + obj_model2_model_x_pos, currentX + x, true);
+				mainmemory.writefloat(modelPointer + obj_model2_model_y_pos, currentY + y, true);
+				mainmemory.writefloat(modelPointer + obj_model2_model_z_pos, currentZ + z, true);
 			end
 		end
 	end
@@ -1025,8 +1081,12 @@ local function zipToSelectedObject()
 				desiredZ = mainmemory.readfloat(selectedActorBase + z_pos, true);
 			end
 		elseif bizstring.contains(grab_script_mode, "Model 2") then
-			local model2Array = mainmemory.read_u24_be(obj_model2_array_pointer + 1);
-			if isRDRAM(model2Array) then
+			local model2Array = obj_model2_array_pointer + RDRAMBase;
+			if not isKiosk then
+				model2Array = mainmemory.read_u32_be(obj_model2_array_pointer);
+			end
+			if isPointer(model2Array) then
+				model2Array = model2Array - RDRAMBase;
 				local selectedActorBase = model2Array + (object_index - 1) * obj_model2_slot_size;
 
 				desiredX = mainmemory.readfloat(selectedActorBase + obj_model2_x_pos, true);

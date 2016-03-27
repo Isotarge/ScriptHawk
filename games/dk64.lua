@@ -29,8 +29,8 @@ Game.Memory = {
 	["frames_real"] = {0x7F0560, 0x7F0480, 0x7F09D0, nil}, -- TODO: Make sure freezing these crashes the main thread -- TODO: Kiosk
 	["boss_pointer"] = {0x7FDC90, 0x7FDBD0, 0x7FE120, nil}, -- TODO: Find Mad Jack state based on Model 1 pointer list and actor type knowledge. MJ is actor 204
 	["slope_object_pointer"] = {0x7F94B8, nil, nil, nil}, -- TODO - PAL, JP & Kiosk, also note this is part of the player object so might be simpler to do getPlayerObject() + offset if it doesn't break anything
-	["obj_model2_array_pointer"] = {0x7F6000, 0x7F5F20, 0x7F6470, nil},
-	["obj_model2_array_count"] = {0x7F6004, 0x7F5F24, 0x7F6474, nil},
+	["obj_model2_array_pointer"] = {0x7F6000, 0x7F5F20, 0x7F6470, 0x6F4470},
+	["obj_model2_array_count"] = {0x7F6004, 0x7F5F24, 0x7F6474, nil}, -- TODO: Kiosk
 	["obj_model2_collision_linked_list_pointer"] = {0x754244, 0x74E9A4, 0x753B34, 0x6FF054},
 };
 
@@ -111,6 +111,7 @@ local max_gb = 201;
 local max_warps = (5 * 2 * 8) + 4 + 2 + 2 + 6;
 
 -- Relative to global_base
+-- TODO: Different on Kiosk
 local standard_ammo = 0;
 local homing_ammo   = 2;
 local oranges       = 4;
@@ -127,7 +128,7 @@ local Tiny   = 3;
 local Chunky = 4;
 local Krusha = 5;
 
--- Pointers relative to Kong base
+-- Relative to Kong base
 local moves      = 0;
 local sim_slam   = 1;
 local weapon     = 2;
@@ -141,10 +142,11 @@ local lives      = 9; -- This is used as instrument ammo in single player
 
 local max_objects = 0xFF;
 
--- Relative to objects found in the pointer list (Model 1)
+-- Relative to objects found in the backbone
 local previous_object = -0x10; -- u32_be
 local object_size = -0x0C; -- u32_be
 
+-- Relative to Model 1 Objects
 local model_pointer = 0x00; -- u32_be
 	-- Relative to model_pointer
 	local num_bones = 0x20;
@@ -2056,7 +2058,11 @@ end
 
 function Game.setMap(value)
 	if value >= 1 and value <= #Game.maps then
-		mainmemory.write_u32_be(Game.Memory.map[version], value - 1);
+		if version == 4 then
+			mainmemory.write_u16_be(0x5931BA, value - 1); -- Replace object model 2, rather than loading the map since basically everything crashes on kiosk
+		else
+			mainmemory.write_u32_be(Game.Memory.map[version], value - 1);
+		end
 	end
 end
 

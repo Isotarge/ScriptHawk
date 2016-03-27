@@ -9,3 +9,5 @@ Examples:
 
 15: Llama temple
 16: Aztec Room? with Banana Medal on ground
+17: Torches in center of arena
+22: Normally DK Isles overworld, but actually Jungle Japes in the Kiosk
