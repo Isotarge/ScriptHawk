@@ -16,6 +16,11 @@ LI      t3, 0x3C00 // Skew amount
 SH      t3, @Z_Rot(t0)
 
 Return:
+LBU     t9, 6(sp) // I am not exactly sure what the next 4 lines do but they were in the original moonjump code so it might prevent crashing
+ANDI    t0, t9, 0x00C0
+SRA     t1, t0, 0x04
+ANDI    t2, t1, 0x00FF
+
 J       @ReturnAddress
 NOP
 
@@ -44,7 +49,15 @@ NOP
 // 817FF51A 3C00
 // 817FF51C A50B
 // 817FF51E 00E8
-// 817FF520 0800
-// 817FF522 1D28
-// 817FF524 0000
-// 817FF526 0000
+// 817FF520 93B9
+// 817FF522 0006
+// 817FF524 3328
+// 817FF526 00C0
+// 817FF528 0008
+// 817FF52A 4903
+// 817FF52C 312A
+// 817FF52E 00FF
+// 817FF530 0800
+// 817FF532 1D28
+// 817FF534 0000
+// 817FF536 0000
