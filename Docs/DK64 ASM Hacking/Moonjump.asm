@@ -19,5 +19,9 @@ ADD.S   F8, F8, F10
 SWC1    F8, @Y_Position(t0)
 
 Return:
+LBU     t9, 6(sp) // These 4 lines appear to be replaced by Subdrag's hook, they don't contribute to our code but they might prevent some crashes/weirdness so I'll keep them
+ANDI    t0, t9, 0x00C0
+SRA     t1, t0, 0x04
+ANDI    t2, t1, 0x00FF
 J       @ReturnAddress
 NOP
