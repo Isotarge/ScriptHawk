@@ -1011,14 +1011,17 @@ function Game.setYPosition(value)
 		--mainmemory.writefloat(jetman_position[2], value, true);
 	else
 		local playerObject = getPlayerObject();
-		local vehiclePointer = mainmemory.read_u32_be(playerObject + vehicle_actor_pointer);
-		if isPointer(vehiclePointer) then
-			vehiclePointer = vehiclePointer - RDRAMBase;
-			mainmemory.writefloat(vehiclePointer + y_pos, value, true);
+		if isRDRAM(playerObject) then
+			local vehiclePointer = mainmemory.read_u32_be(playerObject + vehicle_actor_pointer);
+			if isPointer(vehiclePointer) then
+				vehiclePointer = vehiclePointer - RDRAMBase;
+				mainmemory.writefloat(vehiclePointer + y_pos, value, true);
+				mainmemory.writebyte(vehiclePointer + locked_to_pad, 0x00);
+			end
+			mainmemory.writefloat(playerObject + y_pos, value, true);
+			mainmemory.writebyte(playerObject + locked_to_pad, 0x00);
+			Game.setYVelocity(0);
 		end
-		mainmemory.writefloat(playerObject + y_pos, value, true);
-		mainmemory.writebyte(playerObject + locked_to_pad, 0x00);
-		Game.setYVelocity(0);
 	end
 end
 
@@ -1030,10 +1033,128 @@ function Game.setZPosition(value)
 			vehiclePointer = vehiclePointer - RDRAMBase;
 			mainmemory.writefloat(vehiclePointer + z_pos, value, true);
 		end
-		mainmemory.writefloat(getPlayerObject() + z_pos, value, true);
-		mainmemory.writebyte(getPlayerObject() + locked_to_pad, 0x00);
-		mainmemory.write_u32_be(getPlayerObject() + lock_method_1_pointer, 0x00);
+		mainmemory.writefloat(playerObject + z_pos, value, true);
+		mainmemory.writebyte(playerObject + locked_to_pad, 0x00);
+		mainmemory.write_u32_be(playerObject + lock_method_1_pointer, 0x00);
 	end
+end
+
+-- Relative to objects in bone array
+local bone_size = 0x40;
+local bone_position_x = 0x18; -- int 16 be
+local bone_position_y = 0x1A; -- int 16 be
+local bone_position_z = 0x1C; -- int 16 be
+
+local bone_scale_x = 0x20; -- uint 16 be
+local bone_scale_y = 0x2A; -- uint 16 be
+local bone_scale_z = 0x34; -- uint 16 be
+
+function Game.getActiveBoneArray()
+	if not isInSubGame() then
+		local playerObject = getPlayerObject();
+		if isRDRAM(playerObject) then
+			return mainmemory.read_u32_be(playerObject + current_bone_array_pointer);
+		end
+	end
+	return 0;
+end
+
+function Game.getBoneArray1()
+	if not isInSubGame() then
+		local playerObject = getPlayerObject();
+		if isRDRAM(playerObject) then
+			local animationParamObject = mainmemory.read_u32_be(playerObject + rendering_parameters_pointer);
+			if isPointer(animationParamObject) then
+				animationParamObject = animationParamObject - RDRAMBase;
+				return mainmemory.read_u32_be(animationParamObject + 0x14);
+			end
+		end
+	end
+	return 0;
+end
+
+function Game.getBoneArray2()
+	if not isInSubGame() then
+		local playerObject = getPlayerObject();
+		if isRDRAM(playerObject) then
+			local animationParamObject = mainmemory.read_u32_be(playerObject + rendering_parameters_pointer);
+			if isPointer(animationParamObject) then
+				animationParamObject = animationParamObject - RDRAMBase;
+				return mainmemory.read_u32_be(animationParamObject + 0x18);
+			end
+		end
+	end
+	return 0;
+end
+
+function Game.getOSDBoneArray1()
+	local suffix = "";
+	if Game.getActiveBoneArray() == Game.getBoneArray1() then
+		suffix = "*";
+	end
+	return toHexString(Game.getBoneArray1())..suffix;
+end
+
+function Game.getOSDBoneArray2()
+	local suffix = "";
+	if Game.getActiveBoneArray() == Game.getBoneArray2() then
+		suffix = "*";
+	end
+	return toHexString(Game.getBoneArray2())..suffix;
+end
+
+function Game.getStoredX1()
+	local boneArray1 = Game.getBoneArray1();
+	if isPointer(boneArray1) then
+		boneArray1 = boneArray1 - RDRAMBase;
+		return mainmemory.read_s16_be(boneArray1 + bone_size + bone_position_x);
+	end
+	return 0;
+end
+
+function Game.getStoredX2()
+	local boneArray2 = Game.getBoneArray2();
+	if isPointer(boneArray2) then
+		boneArray2 = boneArray2 - RDRAMBase;
+		return mainmemory.read_s16_be(boneArray2 + bone_size + bone_position_x);
+	end
+	return 0;
+end
+
+function Game.getStoredY1()
+	local boneArray1 = Game.getBoneArray1();
+	if isPointer(boneArray1) then
+		boneArray1 = boneArray1 - RDRAMBase;
+		return mainmemory.read_s16_be(boneArray1 + bone_size + bone_position_y);
+	end
+	return 0;
+end
+
+function Game.getStoredY2()
+	local boneArray2 = Game.getBoneArray2();
+	if isPointer(boneArray2) then
+		boneArray2 = boneArray2 - RDRAMBase;
+		return mainmemory.read_s16_be(boneArray2 + bone_size + bone_position_y);
+	end
+	return 0;
+end
+
+function Game.getStoredZ1()
+	local boneArray1 = Game.getBoneArray1();
+	if isPointer(boneArray1) then
+		boneArray1 = boneArray1 - RDRAMBase;
+		return mainmemory.read_s16_be(boneArray1 + bone_size + bone_position_z);
+	end
+	return 0;
+end
+
+function Game.getStoredZ2()
+	local boneArray2 = Game.getBoneArray2();
+	if isPointer(boneArray2) then
+		boneArray2 = boneArray2 - RDRAMBase;
+		return mainmemory.read_s16_be(boneArray2 + bone_size + bone_position_z);
+	end
+	return 0;
 end
 
 --------------
@@ -1057,7 +1178,7 @@ end
 function Game.colorYRotation()
 	local currentRotation = Game.getYRotation()
 	if currentRotation > 4095 then -- Detect STVW angles
-		return 0xFF007FFF;
+		return 0xFF007FFF; -- Blue
 	end
 end
 
@@ -1617,8 +1738,9 @@ function paperMode()
 		local objectFound = isRDRAM(pointer);
 
 		if objectFound and pointer ~= cameraObject then
-			local objectRenderingParameters = mainmemory.read_u24_be(pointer + rendering_parameters_pointer + 1);
-			if isRDRAM(objectRenderingParameters) then
+			local objectRenderingParameters = mainmemory.read_u32_be(pointer + rendering_parameters_pointer);
+			if isPointer(objectRenderingParameters) then
+				objectRenderingParameters = objectRenderingParameters - RDRAMBase;
 				mainmemory.writefloat(objectRenderingParameters + scale_z, paper_thickness, true);
 			end
 		end
@@ -1825,6 +1947,7 @@ local collisionTypes = {
 	[0x0206] = "CB Bunch (206)",
 	[0x0207] = "CB Bunch (207)",
 	[0x0208] = "CB Bunch (208)",
+	[0x0288] = "Rareware GB (288)",
 };
 
 function fixSingleCollision(objectBase)
@@ -2489,6 +2612,16 @@ Game.OSD = {
 	{"Facing", Game.getYRotation, Game.colorYRotation},
 	--{"Moving", Game.getMovingRotation}, -- TODO
 	{"Rot. Z", Game.getZRotation},
+	{"Separator", 1},
+	{"Bone Array 1", Game.getOSDBoneArray1},
+	{"Stored X1", Game.getStoredX1},
+	{"Stored Y1", Game.getStoredY1},
+	{"Stored Z1", Game.getStoredZ1},
+	{"Separator", 1},
+	{"Bone Array 2", Game.getOSDBoneArray2},
+	{"Stored X2", Game.getStoredX2},
+	{"Stored Y2", Game.getStoredY2},
+	{"Stored Z2", Game.getStoredZ2},
 };
 
 ---------------
