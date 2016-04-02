@@ -1,13 +1,31 @@
 -- DK64 C-Upless ledge clip angle/position finder
--- Written by Isotarge, 2015
+-- Written by Isotarge, 2015-2016
+-- TODO: Base this method on floor value, if the floor is lower and your XZ doesn't change you probably clipped
 
-local kong_object_pointer = 0x7FBB4D; -- TODO: Port to other versions
+local player_pointer;
 
--- Relative to kong object
-local x_pos = 0x7C;
-local y_pos = 0x80;
-local z_pos = 0x84;
-local angle = 0xe4;
+-- Relative to Objects in Model 1, some offsets are different on Kiosk
+local x_pos = 0x7C; -- Float 32 bit Big Endian
+local y_pos = x_pos + 4; -- Float 32 bit Big Endian
+local z_pos = y_pos + 4; -- Float 32 bit Big Endian
+local angle = 0xE4; -- u16_be
+
+local romName = gameinfo.getromname();
+if bizstring.contains(romName, "Donkey Kong 64") then
+	if bizstring.contains(romName, "USA") and not bizstring.contains(romName, "Kiosk") then
+		player_pointer = 0x7FBB4C;
+	elseif bizstring.contains(romName, "Europe") then
+		player_pointer = 0x7FBA6C;
+	elseif bizstring.contains(romName, "Japan") then
+		player_pointer = 0x7FBFBC;
+	elseif bizstring.contains(romName, "Kiosk") then
+		player_pointer = 0x7B5AFC;
+		angle = 0xD8;
+	end
+else
+	print("This game is not supported.");
+	return false;
+end
 
 local x = 0.0;
 local y = 0.0;
@@ -37,18 +55,18 @@ function round(num, idp)
 end
 
 local function rotate(axis, amount)
-	local kong_object = mainmemory.read_u24_be(kong_object_pointer);
-	local current_value = mainmemory.read_u16_be(kong_object + angle + axis * 2);
-	mainmemory.write_u16_be(kong_object + angle + axis * 2, current_value + amount);
+	local playerObject = mainmemory.read_u24_be(player_pointer + 1);
+	local current_value = mainmemory.read_u16_be(playerObject + angle + axis * 2);
+	mainmemory.write_u16_be(playerObject + angle + axis * 2, current_value + amount);
 end
 
 local function plot_pos()
 	if running then
-		local kong_object = mainmemory.read_u24_be(kong_object_pointer);
+		local playerObject = mainmemory.read_u24_be(player_pointer + 1);
 
-		x = mainmemory.readfloat(kong_object + x_pos, true);
-		y = mainmemory.readfloat(kong_object + y_pos, true);
-		z = mainmemory.readfloat(kong_object + z_pos, true);
+		x = mainmemory.readfloat(playerObject + x_pos, true);
+		y = mainmemory.readfloat(playerObject + y_pos, true);
+		z = mainmemory.readfloat(playerObject + z_pos, true);
 
 		if frames_since_set == 0 then
 			savestate.loadslot(0);
@@ -59,7 +77,7 @@ local function plot_pos()
 
 			-- Set angle and position
 			rotate(1, currentAngle);
-			memory.writefloat(kong_object + x_pos, current_x, true);
+			memory.writefloat(playerObject + x_pos, current_x, true);
 
 			-- Update angle and position for next test
 			currentAngle = currentAngle + angle_increments;
