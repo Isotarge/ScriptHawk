@@ -391,12 +391,9 @@ function Game.isPhysicsFrame()
 	return frameTimerValue <= 0 and not emu.islagged();
 end
 
-------------------------
--- Player object shit --
-------------------------
-
--- Update this each frame
-playerObject = nil;
+-------------------
+-- Player object --
+-------------------
 
 -- Relative to objects in linked list, including player
 local previous_item = 0x00;
@@ -443,7 +440,8 @@ function Game.getPlayerObject()
 end
 
 function output_objects()
-	if type(playerObject) ~= "nil" then
+	local playerObject = Game.getPlayerObject();
+	if isRDRAM(playerObject) then
 		print("Player: "..toHexString(playerObject, nil, ""));
 		print("Position: "..toHexString(resolvePointer(playerObject, position_pointer_index), nil, ""));
 		print("Rot X: "..toHexString(resolvePointer(playerObject, rot_x_pointer_index), nil, ""));
@@ -461,28 +459,32 @@ end
 --------------
 
 function Game.getXPosition()
-	if type(playerObject) ~= "nil" then
+	local playerObject = Game.getPlayerObject();
+	if isRDRAM(playerObject) then
 		return mainmemory.readfloat(resolvePointer(playerObject, position_pointer_index) + x_pos, true);
 	end
 	return 0;
 end
 
 function Game.getYPosition()
-	if type(playerObject) ~= "nil" then
+	local playerObject = Game.getPlayerObject();
+	if isRDRAM(playerObject) then
 		return mainmemory.readfloat(resolvePointer(playerObject, position_pointer_index) + y_pos, true);
 	end
 	return 0;
 end
 
 function Game.getZPosition()
-	if type(playerObject) ~= "nil" then
+	local playerObject = Game.getPlayerObject();
+	if isRDRAM(playerObject) then
 		return mainmemory.readfloat(resolvePointer(playerObject, position_pointer_index) + z_pos, true);
 	end
 	return 0;
 end
 
 function Game.setXPosition(value)
-	if type(playerObject) ~= "nil" then
+	local playerObject = Game.getPlayerObject();
+	if isRDRAM(playerObject) then
 		local playerPositionObject = resolvePointer(playerObject, position_pointer_index);
 		mainmemory.writefloat(playerPositionObject + x_pos, value, true);
 		mainmemory.writefloat(playerPositionObject + x_pos + 12, value, true);
@@ -491,7 +493,8 @@ function Game.setXPosition(value)
 end
 
 function Game.setYPosition(value)
-	if type(playerObject) ~= "nil" then
+	local playerObject = Game.getPlayerObject();
+	if isRDRAM(playerObject) then
 		local playerPositionObject = resolvePointer(playerObject, position_pointer_index);
 
 		mainmemory.writefloat(playerPositionObject + y_pos, value, true);
@@ -503,7 +506,8 @@ function Game.setYPosition(value)
 end
 
 function Game.setZPosition(value)
-	if type(playerObject) ~= "nil" then
+	local playerObject = Game.getPlayerObject();
+	if isRDRAM(playerObject) then
 		local playerPositionObject = resolvePointer(playerObject, position_pointer_index);
 		mainmemory.writefloat(playerPositionObject + z_pos, value, true);
 		mainmemory.writefloat(playerPositionObject + z_pos + 12, value, true);
@@ -516,7 +520,8 @@ end
 --------------
 
 function Game.getYVelocity()
-	if type(playerObject) ~= "nil" then
+	local playerObject = Game.getPlayerObject();
+	if isRDRAM(playerObject) then
 		local playerVelocityObject = resolvePointer(playerObject, velocity_pointer_index);
 		return mainmemory.readfloat(playerVelocityObject + y_velocity, true);
 	end
@@ -524,7 +529,8 @@ function Game.getYVelocity()
 end
 
 function Game.setYVelocity(value)
-	if type(playerObject) ~= "nil" then
+	local playerObject = Game.getPlayerObject();
+	if isRDRAM(playerObject) then
 		local playerVelocityObject = resolvePointer(playerObject, velocity_pointer_index);
 		mainmemory.writefloat(playerVelocityObject + y_velocity, value, true);
 	end
@@ -535,28 +541,32 @@ end
 --------------
 
 function Game.getXRotation()
-	if type(playerObject) ~= "nil" and isRDRAM(playerObject) then
+	local playerObject = Game.getPlayerObject();
+	if isRDRAM(playerObject) then
 		return mainmemory.readfloat(resolvePointer(playerObject, rot_x_pointer_index) + x_rot_current, true);
 	end
 	return 0;
 end
 
 function Game.getYRotation()
-	if type(playerObject) ~= "nil" and isRDRAM(playerObject) then
+	local playerObject = Game.getPlayerObject();
+	if isRDRAM(playerObject) then
 		return mainmemory.readfloat(resolvePointer(playerObject, rot_y_pointer_index) + facing_angle, true); -- TODO: Exception here
 	end
 	return 0;
 end
 
 function Game.getZRotation()
-	if type(playerObject) ~= "nil" and isRDRAM(playerObject) then
+	local playerObject = Game.getPlayerObject();
+	if isRDRAM(playerObject) then
 		return mainmemory.readfloat(resolvePointer(playerObject, rot_z_pointer_index) + z_rot_current, true);
 	end
 	return 0;
 end
 
 function Game.setXRotation(value)
-	if type(playerObject) ~= "nil" then
+	local playerObject = Game.getPlayerObject();
+	if isRDRAM(playerObject) then
 		local rotXObject = resolvePointer(playerObject, rot_x_pointer_index);
 		mainmemory.writefloat(rotXObject + x_rot_current, value, true);
 		mainmemory.writefloat(rotXObject + x_rot_target, value, true);
@@ -564,7 +574,8 @@ function Game.setXRotation(value)
 end
 
 function Game.setYRotation(value)
-	if type(playerObject) ~= "nil" then
+	local playerObject = Game.getPlayerObject();
+	if isRDRAM(playerObject) then
 		local rotYObject = resolvePointer(playerObject, rot_y_pointer_index);
 		mainmemory.writefloat(rotYObject + facing_angle, value, true);
 		mainmemory.writefloat(rotYObject + moving_angle, value, true);
@@ -572,7 +583,8 @@ function Game.setYRotation(value)
 end
 
 function Game.setZRotation(value)
-	if type(playerObject) ~= "nil" then
+	local playerObject = Game.getPlayerObject();
+	if isRDRAM(playerObject) then
 		local rotZObject = resolvePointer(playerObject, rot_z_pointer_index);
 		mainmemory.writefloat(rotZObject + z_rot_current, value, true);
 		mainmemory.writefloat(rotZObject + z_rot_target, value, true);
@@ -586,8 +598,27 @@ end
 local options_toggle_neverslip;
 
 local function neverSlip()
-	if type(playerObject) ~= "nil" then
+	local playerObject = Game.getPlayerObject();
+	if isRDRAM(playerObject) then
 		mainmemory.writefloat(resolvePointer(playerObject, slope_pointer_index) + slope_timer, 0.0, true);
+	end
+end
+
+function Game.getSlopeTimer()
+	local playerObject = Game.getPlayerObject();
+	if isRDRAM(playerObject) then
+		return mainmemory.readfloat(resolvePointer(playerObject, slope_pointer_index) + slope_timer, true);
+	end
+	return 0;
+end
+
+function Game.colorSlopeTimer()
+	if forms.ischecked(options_toggle_neverslip) then
+		return 0xFF00FFFF; -- Light blue
+	end
+	local slopeTimer = Game.getSlopeTimer();
+	if slopeTimer >= 0.75 then
+		return getColor(slopeTimer);
 	end
 end
 
@@ -705,8 +736,6 @@ function Game.initUI()
 end
 
 function Game.eachFrame()
-	playerObject = Game.getPlayerObject();
-
 	if forms.ischecked(options_toggle_neverslip) then
 		neverSlip();
 	end
@@ -734,6 +763,7 @@ Game.OSD = {
 	{"Rot. Z", Game.getZRotation},
 	{"Separator", 1},
 	--{"Movement", Game.getCurrentMovementState}, TODO
+	{"Slope Timer", Game.getSlopeTimer, Game.colorSlopeTimer},
 };
 
 return Game;
