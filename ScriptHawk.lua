@@ -886,6 +886,22 @@ end
 -- Core functions --
 --------------------
 
+if type(Game.setPosition) == "nil" then
+	function Game.setPosition(x, y, z)
+		Game.setXPosition(x);
+		Game.setYPosition(y);
+		Game.setZPosition(z);
+	end
+end
+
+if type(Game.setRotation) == "nil" then
+	function Game.setRotation(x, y, z)
+		Game.setXRotation(x);
+		Game.setYRotation(y);
+		Game.setZRotation(z);
+	end
+end
+
 local function gofast(axis, speed)
 	if axis == "x" then
 		Game.setXPosition(Game.getXPosition() + speed);

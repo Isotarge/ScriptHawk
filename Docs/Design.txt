@@ -33,7 +33,8 @@ Game -- Table containing all information and functions about a game that are vis
 		function Game.getYPosition()
 		function Game.getZPosition()
 
-	function Game.setPosition(values) -- Pass table of desired axis + value pairs
+	function Game.setPosition(x, y, z) -- ScriptHawk.lua provides a simple method which calls Game.setXPosition(x), Game.setYpositon(y) and Game.setZPosition(z)
+									   -- I might update this to support passing in a table in the future
 
 		function Game.setXPosition(value)
 		function Game.setYPosition(value)
@@ -41,19 +42,21 @@ Game -- Table containing all information and functions about a game that are vis
 
 	function Game.getRotation() -- Return table of axis + value pairs
 
-		function Game.getXRotation()
-		function Game.getYRotation() -- Facing direction
-		function Game.getZRotation()
+		function Game.getXRotation() -- Pitch
+		function Game.getYRotation() -- Yaw - Facing direction - See https://en.wikipedia.org/wiki/Aircraft_principal_axes
+		function Game.getZRotation() -- Roll
 
-	function Game.setRotation(values) -- Pass table of desired axis + value pairs
+	function Game.setRotation(x, y, z) -- ScriptHawk.lua provides a simple method which calls Game.setXRotation(x), Game.setYRotaton(y) and Game.setZRotation(z)
+									   -- I might update this to support passing in a table in the future
 
 		function Game.setXRotation(value)
 		function Game.setYRotation(value)
 		function Game.setZRotation(value)
 
-	function Game.initUI() -- Draw any custom UI that the module desires here
+	function Game.initUI() -- Initialize any custom UI (for example, form buttons) that the module desires here
 	function Game.applyInfinites() -- Refill consumables
-	function Game.eachFrame() -- This function will be executed at the start of each frame of emulation
+	function Game.eachFrame() -- This function will be executed at the start of each frame of emulation.
+	function Game.realTime() -- This function will be executed as fast as the emulator can execute it. Useful for UI/OSD that should function while paused.
 
 	Game.OSDPosition -- Table containing the X, Y position of the OSD
 	Game.OSD -- Table containing labels and functions that populate the OSD
