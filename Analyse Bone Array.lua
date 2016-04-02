@@ -88,9 +88,9 @@ function read_unsigned_fixed1616_be(address)
 	return wholePart + fractionalPart;
 end
 
------------------
--- Stupid shit --
------------------
+------------------
+-- Stupid stuff --
+------------------
 
 local safeBoneNumbers = {};
 
@@ -196,7 +196,7 @@ local function processObject(objectPointer)
 	local currentBoneArrayBase = mainmemory.read_u24_be(objectPointer + current_bone_array_pointer + 1);
 
 	if isRDRAM(currentModelBase) and isRDRAM(currentBoneArrayBase) then
-		-- Stupid shit
+		-- Stupid stuff
 		setNumberOfBones(currentModelBase);
 
 		-- Calculate how many bones were correctly processed this frame

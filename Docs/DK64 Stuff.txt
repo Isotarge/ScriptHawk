@@ -326,14 +326,6 @@ barrel 804bdf80
 30bdf0 <- Kong
 30be53 <- "Visible" 127 visible, 0 not
 
-------------------
--- Key priority --
-------------------
-
-When klumsy loads, pick highest key from inventory to turn first
-If key plays level opening cutscene, area reloads
-Else pick lowest key to turn next
-
 --------------
 -- Mad Jack --
 --------------
@@ -387,6 +379,9 @@ Dogadon 1 mystery menu fight cutscenes
 Normal hit: x -> 2 -> 3
 Last hit:   x -> 9
 DDQ:        x -> 9
+
+Diddy Control State
+-> 49 (Knockback?) -> 12
 
 Dogadon 2 mystery menu fight cutscenes
 1 -> Long intro to fight
@@ -455,21 +450,6 @@ b10
 0x154 - Freezing causes key not to spawn
 0x155 - Freezing causes key not to spawn
 
----------------------
--- Stored position --
----------------------
-
-Stored Positions:
-
--0.375, y, 1
--1, 527.25, 6.75
-
-Copy of current position:
-
-7FD740 - X
-7FD744 - Y
-7FD748 - Z
-
 -------------------
 -- Sync settings --
 -------------------
@@ -478,27 +458,3 @@ countperop,vi refresh rate,ai count per byte
 1,5000,5000=17.53
 1,1500,600 =59.86 (music was out of sync)
 1,1500,750 =59.92 (music was closer to sync but stopped too early)
-
----------------------------------------
--- Bone array based displacement fix --
----------------------------------------
-
-Fix pseudocode:
-
-current bones [bone array pointer]
-current scores [bone array pointer]
-
-each frame
-	for each object in pointer array
-		dump bone array
-		calculate zero to non-zero ratio
-		if lower than previous frame
-			update bone array in current bones [bone array pointer]
-			update ratio in current scores [bone array pointer]
-		else
-			overwrite bone array with one from current bones [bone array pointer]
-		end
-	end
-end
-
-clean out current bones array for objects that despawn

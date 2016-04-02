@@ -22,8 +22,8 @@ Replace ?? with any of the following values:
 01 - Diddy
 02 - Diddy (with instrument)
 03 - Diddy (with gun)
-04 - DK!?!?!?!?!?!?!?
-05 - DK?!?!??!?!?!??!!?!?!!?!?!?!!?!?!
+04 - DK
+05 - DK
 06 - Lanky
 07 - Lanky (with instrument)
 08 - Lanky
@@ -157,7 +157,7 @@ Replace ?? with any of the following values:
 80 - Swinging chains (Diddy castle?)
 81 - Swinging light (lobby roof)
 82 - Minecart
-83 - Barrel (there's too many fucking barrels in this game)
+83 - Barrel
 84 - Castle bridge (level entry)
 85 - Castle bridge/climb??????!?!?!?!
 86 - Feather
@@ -266,7 +266,7 @@ E6 - Banana Barrel (Lanky phase)
 E7 - Training barrel
 E8 - Weird pirate photo thing yarr
 E9 - Butterfly
-EA - ANOTHER FUCKING BARREL ARRRRRRRGHHHH!!!
+EA - Barrel
 EB - Funky's gun? (K. Rool cutscene?)
 EC - Boot (K. Rool fight cutscene)
 ED - Crash?

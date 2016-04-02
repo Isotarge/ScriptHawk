@@ -24,7 +24,7 @@
 02CF --CRASH--
 
 02D0 --CRASH--
-02D1 Some fucking brick or something idk
+02D1 A brick or something idk
 02D2 Conga's orange
 02D3 Conga's palm tree
 02D4 Trunker Shadow
@@ -288,7 +288,7 @@
 03C7 Blubber's treasure
 03C8 Wooden stump (with green leaves/moss)
 03C9 ???
-03CA Purple bat (cute as fuck)
+03CA Purple bat
 03CB Green ghost
 03CC 1881 door
 03CD Another door
@@ -429,7 +429,7 @@
 044C Soggy? (little blue shorts kid)
 044D Boggy's green kid
 044E Boggy's pink kid
-044F Big green dank shit
+044F Big green dank stuff
 
 0450 Dingpot
 0451 Grunty
@@ -449,7 +449,7 @@
 045F Lava/fire ball?
 
 0460 Fire texture?
-0461 Smaller green dank shit
+0461 Smaller green dank stuff
 0462 Albino squirrel with no legs
 0463 Banjo's bedsheets?
 0464 Bed
@@ -601,7 +601,7 @@
 04EE Colliwobble
 04EF The onion one (less memorable clearly)
 
-04F0 Leaf or some shit
+04F0 Leaf or some stuff
 04F1 Slightly lighter leaf
 04F2 Slightly biger leaf
 04F3 More leaf
@@ -646,8 +646,8 @@
 0518 An wooden door (with window!)
 0519 Loggo
 051A Leaky
-051B Bug idiot enemy from GV
-051C Bug idiot enemy from GV head
+051B Bug enemy from GV
+051C Bug enemy from GV head
 051D Some kind of tear texture? idk
 051E Bug asshole's side body part thing eye face body arm leg thing yeah?
 051F Bug asshole's body
