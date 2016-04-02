@@ -13,6 +13,7 @@ local romName = gameinfo.getromname();
 
 if not bizstring.contains(romName, "Banjo-Kazooie") and not bizstring.contains(romName, "Banjo to Kazooie no Daibouken") then
 	print("This game is not currently supported.");
+	return false;
 end
 
 if bizstring.contains(romName, "Europe") then

@@ -17,7 +17,7 @@ if bizstring.contains(romName, "Donkey Kong 64") then
 	end
 else
 	print("This game is not supported.");
-	return;
+	return false;
 end
 
 -- Relative to objects in pointer list

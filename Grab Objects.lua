@@ -314,7 +314,7 @@ if bizstring.contains(romName, "Donkey Kong 64") then
 	obj_model2_array_count = obj_model2_array_pointer + 4; -- u32_be
 else
 	print("This game is not supported.");
-	return;
+	return false;
 end
 
 ----------------------

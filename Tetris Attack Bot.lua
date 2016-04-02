@@ -30,7 +30,7 @@ elseif romName == "Tetris Attack (Europe) (En,Ja)" then
 	grid_base = {0xFB0, 0x10B0};
 else
 	print("This game is not currently supported.");
-	return;
+	return false;
 end
 
 local grid_height = 12;

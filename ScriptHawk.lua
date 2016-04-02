@@ -315,12 +315,12 @@ elseif stringContains(romName, "Elmo's Letter Adventure") or stringContains(romN
 	Game = require "games.elmo";
 else
 	print("This game is not currently supported.");
-	return;
+	return false;
 end
 
 if not Game.detectVersion(romName) then
 	print("This version of the game is not currently supported.");
-	return;
+	return false;
 end
 
 ----------------
