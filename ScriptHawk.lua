@@ -2,6 +2,7 @@
 -- Helper functions --
 ----------------------
 
+image_directory_root = ".\\Images\\";
 function fileExists(name)
 	if type(name) == 'string' then
 		local f = io.open(name, "r");

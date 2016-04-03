@@ -1,5 +1,32 @@
 local Game = {};
 
+local RDRAMBase = 0x80000000;
+local RDRAMSize = 0x800000; -- Halved without expansion pak
+
+-- Checks whether a value falls within N64 RDRAM
+local function isRDRAM(value)
+	return type(value) == "number" and value >= 0 and value < RDRAMSize;
+end
+
+-- Checks whether a value is a pointer
+local function isPointer(value)
+	return type(value) == "number" and value >= RDRAMBase and value < RDRAMBase + RDRAMSize;
+end
+
+-- TODO: Need to put some grab script state up here because encircle uses it before they would normally be defined
+-- This can probably be fixed with a clever reshuffle of grab script state/functions
+local object_pointers = {};
+local radius = 100;
+encircle_enabled = false;
+local grab_script_modes = {
+	"List (Object Model 1)",
+	"Examine (Object Model 1)",
+	"List (Object Model 2)",
+	"Examine (Object Model 2)",
+};
+local grab_script_mode_index = 1;
+grab_script_mode = grab_script_modes[grab_script_mode_index];
+
 -------------------------
 -- DK64 specific state --
 -------------------------
@@ -28,7 +55,7 @@ Game.Memory = {
 	["frames_lag"] = {0x76AF10, 0x765A30, 0x76B100, 0x72D140}, -- TODO: Kiosk only works for minecart?
 	["frames_real"] = {0x7F0560, 0x7F0480, 0x7F09D0, nil}, -- TODO: Make sure freezing these crashes the main thread -- TODO: Kiosk
 	["boss_pointer"] = {0x7FDC90, 0x7FDBD0, 0x7FE120, nil}, -- TODO: Find Mad Jack state based on Model 1 pointer list and actor type knowledge. MJ is actor 204
-	["slope_object_pointer"] = {0x7F94B8, nil, nil, nil}, -- TODO - PAL, JP & Kiosk, also note this is part of the player object so might be simpler to do getPlayerObject() + offset if it doesn't break anything
+	["slope_object_pointer"] = {0x7F94B8, nil, nil, nil}, -- TODO - PAL, JP & Kiosk, also note this is part of the player object so might be simpler to do Game.getPlayerObject() + offset if it doesn't break anything
 	["obj_model2_array_pointer"] = {0x7F6000, 0x7F5F20, 0x7F6470, 0x6F4470},
 	["obj_model2_array_count"] = {0x7F6004, 0x7F5F24, 0x7F6474, nil}, -- TODO: Kiosk
 	["obj_model2_collision_linked_list_pointer"] = {0x754244, 0x74E9A4, 0x753B34, 0x6FF054},
@@ -44,29 +71,31 @@ local map_value = 0;
 ---------------------------
 
 local arcade_map = 2;
-local jumpman_position;
-local jumpman_velocity;
+local jumpman_position = {0x04BD70, 0x04BD74}; -- US Defaults
+local jumpman_velocity = {0x04BD78, 0x04BD7C}; -- US Defaults
 
 ---------------------------
 -- Jetpac specific state --
 ---------------------------
 
 local jetpac_map = 9;
-local jetman_position;
-local jetman_velocity;
+local jetman_position = {0x02F050, 0x02F054}; -- US Defaults
+local jetman_velocity = {0x02F058, 0x02F05C}; -- US Defaults
 
 --------------
 -- Mad Jack --
 --------------
 
 -- Relative to MJ state object
-local MJ_time_until_next_action;
-local MJ_actions_remaining;
-local MJ_action_type;
-local MJ_current_pos;
-local MJ_next_pos;
-local MJ_white_switch_pos;
-local MJ_blue_switch_pos;
+local MJ_offsets = { -- US Defaults
+	["ticks_until_next_action"] = 0x2D,
+	["actions_remaining"] = 0x58,
+	["action_type"] = 0x59,
+	["current_position"] = 0x60,
+	["next_position"] = 0x61,
+	["white_switch_position"] = 0x64,
+	["blue_switch_position"] = 0x65
+};
 
 -----------------
 -- Other state --
@@ -140,106 +169,732 @@ local lives      = 9; -- This is used as instrument ammo in single player
 -- Object Model 1 Documentation --
 ----------------------------------
 
-local max_objects = 0xFF;
-
--- Relative to objects found in the backbone
+-- Relative to objects found in the backbone (and similar linked lists)
 local previous_object = -0x10; -- u32_be
 local object_size = -0x0C; -- u32_be
 
+local max_objects = 0xFF; -- This only applies to the model 1 pointer list used to check collisions
+
 -- Relative to Model 1 Objects
-local model_pointer = 0x00; -- u32_be
-	-- Relative to model_pointer
-	local num_bones = 0x20;
+local obj_model1 = {
+	["model_pointer"] = 0x00,
+	["model"] = { -- Relative to model_pointer
+		["num_bones"] = 0x20,
+	},
+	["rendering_paramaters_pointer"] = 0x04,
+	["rendering_paramaters"] = { -- Relative to rendering_paramaters_pointer
+		["scale_x"] = 0x34, -- 32 bit float big endian
+		["scale_y"] = 0x38, -- 32 bit float big endian
+		["scale_z"] = 0x3C, -- 32 bit float big endian
+		["anim_timer1"] = 0x94, -- 32 bit float big endian
+		["anim_timer2"] = 0x98, -- 32 bit float big endian
+		["anim_timer3"] = 0x104, -- 32 bit float big endian
+		["anim_timer4"] = 0x108, -- 32 bit float big endian
+	},
+	["current_bone_array_pointer"] = 0x08,
+	["actor_type"] = 0x58, -- u32 be
+	["actor_types"] = { -- These are different on Kiosk
+		[2] = "DK",
+		[3] = "Diddy",
+		[4] = "Lanky",
+		[5] = "Tiny",
+		[6] = "Chunky",
+		[7] = "Krusha",
+		[8] = "Rambi",
+		[9] = "Enguarde",
+		[12] = "Loading Zone Controller",
+		[17] = "Cannon Barrel",
+		[19] = "Barrel (Diddy 5DI)",
+		[18] = "Rambi Box",
+		[23] = "Cannon",
+		[25] = "Hunky Chunky Barrel",
+		[26] = "TNT Barrel",
+		[27] = "TNT Barrel Spawner (Armydillo)",
+		[28] = "Bonus Barrel",
+		[30] = "Fireball", -- Boss fights TODO: where else is this used?
+		[31] = "Bridge (Castle)",
+		[32] = "Swinging Light",
+		[33] = "Vine (Brown)",
+		[34] = "Kremling Kosh Controller",
+		[35] = "Melon (Projectile)",
+		[36] = "Peanut",
+		[38] = "Pineapple",
+		[40] = "Mini Monkey barrel",
+		[41] = "Orange",
+		[42] = "Grape",
+		[43] = "Feather",
+		[44] = "Lazer (Projectile)",
+		[47] = "Watermelon Slice",
+		[48] = "Coconut",
+		[49] = "Rocketbarrel",
+		[50] = "Lime",
+		[52] = "Orange Pickup", -- Dropped by Klump & Purple Klaptrap
+		[56] = "Orangstand Sprint Barrel",
+		[57] = "Strong Kong Barrel",
+		[58] = "Swinging Light",
+		[59] = "Fireball", -- Mad Jack -- TODO: where else is this used?
+		[61] = "Boulder",
+		[63] = "Vase (O)",
+		[64] = "Vase (:)",
+		[65] = "Vase (Triangle)",
+		[66] = "Vase (+)",
+		[67] = "Cannon Ball",
+		[69] = "Vine (Green)",
+		[71] = "Red Kremling (Lanky's Keyboard Game in R&D)",
+		[72] = "Boss Key",
+		[75] = "Blueprint (Diddy)",
+		[76] = "Blueprint (Chunky)",
+		[77] = "Blueprint (Lanky)",
+		[78] = "Blueprint (DK)",
+		[79] = "Blueprint (Tiny)",
+		[81] = "Fire Spawner? (Dogadon)", -- TODO: Verify
+		[85] = "Steel Keg",
+		[86] = "Crown",
+		[91] = "Balloon (Diddy)",
+		[92] = "Stalactite",
+		[95] = "Pause Menu",
+		[96] = "Hunky Chunky Barrel (Dogadon)",
+		[98] = "Tag Barrel",
+		[97] = "TNT Barrel Spawner (Dogadon)",
+		[100] = "1 Pad (Diddy 5DI)",
+		[101] = "2 Pad (Diddy 5DI)",
+		[102] = "3 Pad (Diddy 5DI)",
+		[103] = "4 Pad (Diddy 5DI)",
+		[104] = "5 Pad (Diddy 5DI)",
+		[105] = "6 Pad (Diddy 5DI)",
+		[106] = "5DI Controller?", -- TODO: Investigate
+		[107] = "Bonus Barrel (Hideout Helm)",
+		[111] = "Balloon (Chunky)",
+		[112] = "Balloon (Tiny)",
+		[113] = "Balloon (Lanky)",
+		[114] = "Balloon (DK)",
+		[115] = "K. Lumsy's Cage", -- TODO: Also rabbit race finish line?
+		[116] = "Chain",
+		[124] = "Peril Path Panic Controller?", -- TODO: Verify, used anywhere else?
+		[126] = "Fly Swatter",
+		[128] = "Headphones",
+		[129] = "Enguarde Box",
+		[130] = "Apple (Fungi)",
+		[133] = "Barrel",
+		[134] = "Training Barrel",
+		[135] = "Boombox (Treehouse)",
+		[136] = "Tag Barrel",
+		[137] = "Tag Barrel", -- Troff'n'Scoff
+		[138] = "B. Locker",
+		[139] = "Rainbow Coin Patch",
+		[140] = "Rainbow Coin (Spawner?)",
+		[148] = "Rope (K. Rool ring)",
+		[156] = "Wrinkly",
+		[163] = "Banana Fairy (BFI)",
+		[164] = "Ice Tomato",
+		[165] = "Tag Barrel (King Kutout)",
+		[166] = "King Kutout Part",
+		[167] = "Cannon",
+		[171] = "Orange", -- Krusha's Gun
+		[173] = "Cutscene Controller",
+		[176] = "Timer",
+		[178] = "Beaver (Blue)",
+		[179] = "Shockwave (Mad Jack)",
+		[181] = "Book", -- Castle Library
+		[182] = "Barrel Enemy (Normal)",
+		[183] = "Zinger",
+		[184] = "Snide",
+		[185] = "Armydillo",
+		[186] = "Kremling", -- Kremling Kosh
+		[187] = "Klump",
+		[188] = "Camera",
+		[189] = "Cranky",
+		[190] = "Funky",
+		[191] = "Candy",
+		[192] = "Beetle", -- Race
+		[193] = "Mermaid",
+		[195] = "Squawks",
+		[197] = "Trapped Diddy",
+		[198] = "Trapped Lanky",
+		[199] = "Trapped Tiny",
+		[200] = "Trapped Chunky",
+		[201] = "Llama",
+		[203] = "Padlock (T&S)",
+		[204] = "Mad Jack",
+		[205] = "Klaptrap (Green)",
+		[206] = "Zinger",
+		[207] = "Vulture (Race)",
+		[208] = "Klaptrap (Purple)",
+		[212] = "Beaver (Gold)",
+		[216] = "Pufftoss",
+		[224] = "Mushroom Man",
+		[226] = "Troff",
+		[228] = "Bad Hit Detection Man",
+		[230] = "Ruler Enemy",
+		[231] = "Toy Box",
+		[232] = "Text Overlay",
+		[234] = "Scoff",
+		[235] = "Robo-Kremling",
+		[236] = "Dogadon",
+		[238] = "Kremling",
+		[240] = "Fish with headlamp",
+		[241] = "Kasplat (DK)",
+		[242] = "Kasplat (Diddy)",
+		[243] = "Kasplat (Lanky)",
+		[244] = "Kasplat (Tiny)",
+		[245] = "Kasplat (Chunky)",
+		[247] = "Seal",
+		[248] = "Banana Fairy",
+		[249] = "Squawks w/spotlight",
+		[252] = "Rabbit", -- Fungi
+		[254] = "Static Object", -- Used in TONS of places, mainly for objects animated by cutscenes
+		[255] = "Shockwave",
+		[258] = "Shockwave", -- Boss
+		[259] = "Guard", -- Stealthy Snoop
+		[260] = "Text Overlay", -- K. Rool fight
+		[261] = "Robo-Zinger",
+		[262] = "Krossbones",
+		[263] = "Fire Shockwave (Dogadon)",
+		[264] = "Squawks",
+		[265] = "Light beam", -- Boss fights etc
+		[267] = "Starfish Enemy",
+		[268] = "Gimpfish Enemy",
+		[270] = "Sir Domino",
+		[271] = "Mr. Dice",
+		[275] = "K. Lumsy",
+		[281] = "K. Rool (DK Phase)",
+		[285] = "Bat",
+		[286] = "Giant Clam",
+		[289] = "Kritter-in-a-Sheet",
+		[290] = "Pufferfish Enemy",
+		[291] = "Kosha",
+		[292] = "K. Rool (Diddy Phase)",
+		[293] = "K. Rool (Lanky Phase)",
+		[294] = "K. Rool (Tiny Phase)",
+		[295] = "K. Rool (Chunky Phase)",
+		[299] = "Textbox",
+		[305] = "Missile (Car Race)",
+		[309] = "DK Logo (Instrument)",
+		[310] = "Spotlight", -- Tag barrel, instrument etc.
+		[311] = "Checkpoint (Race)", -- Seal race & Castle car race
+		[313] = "Particle (Idle Anim.)",
+		[316] = "Kong (Tag Barrel)",
+		[317] = "Locked Kong (Tag Barrel)",
+		[322] = "Car", -- Car Race
+		[323] = "Enemy Car", -- Car Race, aka George
+		[325] = "Sim Slam Shockwave",
+		[326] = "Main Menu Controller",
+		[328] = "Klaptrap", -- Peril Path Panic
+		[329] = "Fairy", -- Peril Path Panic
+		[330] = "Bug", -- Big Bug Bash
+		[331] = "Klaptrap", -- Searchlight Seek
+		[332] = "Big Bug Bash Controller?", -- TODO: Verify -- TODO: Fly swatter?
+		[333] = "Barrel (Main Menu)",
+		[334] = "Padlock (K. Lumsy)",
+		[335] = "Snide's Menu",
+		[336] = "Training Barrel Controller",
+		[337] = "Multiplayer Model (Main Menu)",
+		[339] = "Arena Controller", -- Rambi/Enguarde
+		[340] = "Bug", -- Trash Can
+		[342] = "Try Again Dialog",
+	},
+	-- 0001 0000 = collides with terrain
+	-- 0000 0100 = visible
+	-- 0000 0001 = in water
+	["visibility"] = 0x63, -- Byte (bitfield) TODO: Fully document
+	["specular_highlight"] = 0x6D, -- TODO: uh
+	["shadow_width"] = 0x6E, -- u8
+	["shadow_height"] = 0x6F, -- u8
+	["x_pos"] = 0x7C, -- 32 bit float big endian
+	["y_pos"] = 0x80, -- 32 bit float big endian
+	["z_pos"] = 0x84, -- 32 bit float big endian
+	["floor"] = 0xA4, -- 32 bit float big endian
+	["distance_from_floor"] = 0xB4, -- 32 bit float big endian
+	["velocity"] = 0xB8, -- 32 bit float big endian
+	--["acceleration"] = 0xBC, -- TODO: Seems wrong
+	["y_velocity"] = 0xC0, -- 32 bit float big endian
+	["y_acceleration"] = 0xC4, -- 32 bit float big endian
+	["terminal_velocity"] = 0xC8, -- 32 bit float big endian
+	["light_thing"] = 0xCC, -- Values 0x00->0x14
+	["x_rot"] = 0xE4, -- u16_be
+	["y_rot"] = 0xE6, -- u16_be
+	["z_rot"] = 0xE8, -- u16_be
+	["locked_to_pad"] = 0x110, -- TODO: What datatype is this? code says byte but I'd think it'd be a pointer
+	["health"] = 0x134, -- s16_be
+	["takes_enemy_damage"] = 0x13B, -- TODO: put into examine method and double check datatype
+	["lock_method_1_pointer"] = 0x13C,
+	["hand_state"] = 0x147, -- Bitfield
+	["control_state_byte"] = 0x154,
+	["control_state_values"] = {
+		[0x02] = "First person camera",
+		[0x04] = "Fairy camera",
+		[0x05] = "Camera (Entering?)", -- TODO: Idk exactly what this is but it allows the player to gain control in weird places
+		[0x0C] = "standing normally",
+		[0x0E] = "Skid",
+		[0x18] = "Moonrise?",
+		[0x20] = "Splat",
+		[0x24] = "Sparkles",
+		[0x2C] = "Crouch?",
+		[0x39] = "Shrinking",
+		[0x31] = "ESS",
+		[0x36] = "Backwalk into loading zone?",
+		[0x39] = "Shrink",
+		[0x3E] = "Camera zooms out",
+		[0x4E] = "Surface swimming",
+		[0x4F] = "Underwater",
+	},
+	["texture_renderer_pointer"] = 0x158, -- u32_be
+	["shade_byte"] = 0x16D,
+	["player"] = {
+		["animation_type"] = 0x181,
+		["animation_types"] = {
+			["kick"] = 0x29, -- TODO: Document all of these
+		},
+		["velocity_uncrouch_aerial"] = 0x1A4, -- TODO: what is this?
+		["misc_acceleration_float"] = 0x1AC, -- TODO: what is this?
+		["horizontal_acceleration"] = 0x1B0, -- Set to a negative number to go fast
+		["misc_acceleration_float_2"] = 0x1B4, -- TODO: what is this?
+		["misc_acceleration_float_3"] = 0x1B8, -- TODO: What is this?
+		["velocity_ground"] = 0x1C0, -- TODO: What is this?
+		["vehicle_actor_pointer"] = 0x208, -- u32 be
+		["grabbed_vine_pointer"] = 0x2B0, -- u32 be
+		["grab_pointer"] = 0x32C, -- u32 be
+		["scale"] = {
+			0x344, 0x348, 0x34C, 0x350, 0x354 -- 0x344 and 0x348 seem to be a target, the rest must be current value for each axis
+		},
+		["fairy_active"] = 0x36C;
+		["effect_byte"] = 0x372; -- Bitfield, TODO: Document bits
+	},
+	["camera"] = {
+		-- TODO: Focused vehicle pointers
+		-- TODO: Verify for all versions
+		["focused_actor_pointer"] = 0x178,
+		["viewport_x_position"] = 0x1FC, -- 32 bit float big endian
+		["viewport_y_position"] = 0x200, -- 32 bit float big endian
+		["viewport_z_position"] = 0x204, -- 32 bit float big endian
+		["tracking_distance"] = 0x21C, -- 32 bit float big endian
+		["viewport_y_rotation"] = 0x22A,
+		["tracking_angle"] = 0x230,
+		["zoom_level_c_down"] = 0x266, -- u8
+		["zoom_level_current"] = 0x267, -- u8
+		["zoom_level_after_c_up"] = 0x268, -- u8
+		["state_switch_timer_1"] = 0x269,
+		["state_switch_timer_2"] = 0x26E,
+		["state_type"] = 0x26B,
+		["state_values"] = {
+			-- TODO: Document values for this
+		},
+	},
+	["tag_barrel"] = {
+		-- Relative to tag barrel
+		["scroll_timer"] = 0x17D,
+		["current_index"] = 0x17E,
+		["previous_index"] = 0x17F,
+		["kickout_timer"] = 0x1B4, -- TODO: what's the max value for this again? I seem to recall 9000... legit...
+	},
+	["text_overlay"] = {
+		-- Relative to text overlay
+		["text_shown"] = 0x1EE, -- u16 be
+	},
+	["kosh_kontroller"] = {
+		["slot_location"] = 0x1A2,
+		["melons_remaining"] = 0x1A3,
+		["slot_pointer_base"] = 0x1A8,
+	},
+};
 
-local rendering_parameters_pointer = 0x04; -- u32_be
-	-- Relative to rendering parameters
-	local scale_x = 0x34;
-	local scale_y = scale_x + 4;
-	local scale_z = scale_y + 4;
+local function getExamineDataModelOne(pointer)
+	local examine_data = {};
 
-local current_bone_array_pointer = 0x08; -- u32_be
+	local actorSize = mainmemory.read_u32_be(pointer + object_size)
+	local modelPointer = mainmemory.read_u32_be(pointer + obj_model1.model_pointer);
+	local renderingParametersPointer = mainmemory.read_u32_be(pointer + obj_model1.rendering_paramaters_pointer);
+	local boneArrayPointer = mainmemory.read_u32_be(pointer + obj_model1.current_bone_array_pointer);
+	local hasModel = isPointer(modelPointer) or isPointer(renderingParametersPointer) or isPointer(boneArrayPointer);
 
-local actor_type = 0x58; -- TODO: Document values for this, different on Kiosk
+	local xPos = mainmemory.readfloat(pointer + obj_model1.x_pos, true);
+	local yPos = mainmemory.readfloat(pointer + obj_model1.y_pos, true);
+	local zPos = mainmemory.readfloat(pointer + obj_model1.z_pos, true);
+	local hasPosition = xPos ~= 0 or yPos ~= 0 or zPos ~= 0 or hasModel;
 
--- 0001 0000 = collides with terrain
--- 0000 0100 = visible
--- 0000 0001 = in water
-local visibility = 0x63; -- Bitfield TODO: Fully document
+	table.insert(examine_data, { "Actor base", toHexString(pointer, 6) });
+	local currentActorTypeNumeric = mainmemory.read_u32_be(pointer + obj_model1.actor_type);
+	local currentActorType = currentActorTypeNumeric;
+	if type(obj_model1.actor_types[currentActorType]) ~= "nil" then
+		currentActorType = obj_model1.actor_types[currentActorType];
+	end
+	table.insert(examine_data, { "Actor size", toHexString(actorSize) });
+	table.insert(examine_data, { "Actor type", currentActorType });
+	table.insert(examine_data, { "Separator", 1 });
 
-local specular_highlight = 0x6D;
+	if hasModel then
+		table.insert(examine_data, { "Model", toHexString(modelPointer, 8) });
+		table.insert(examine_data, { "Rendering Params", toHexString(renderingParametersPointer, 8) });
+		table.insert(examine_data, { "Bone Array", toHexString(boneArrayPointer, 8) });
+		table.insert(examine_data, { "Separator", 1 });
+	end
 
-local shadow_width = 0x6E;
-local shadow_height = 0x6F;
+	if hasPosition then
+		table.insert(examine_data, { "X", xPos });
+		table.insert(examine_data, { "Y", yPos });
+		table.insert(examine_data, { "Z", zPos });
+		table.insert(examine_data, { "Separator", 1 });
 
-local x_pos = 0x7C;
-local y_pos = x_pos + 4;
-local z_pos = y_pos + 4;
+		table.insert(examine_data, { "Floor", mainmemory.readfloat(pointer + obj_model1.floor, true) });
+		table.insert(examine_data, { "Distance From Floor", mainmemory.readfloat(pointer + obj_model1.distance_from_floor, true) });
+		table.insert(examine_data, { "Separator", 1 });
 
-local floor = 0xA4;
-local distance_from_floor = 0xB4;
+		table.insert(examine_data, { "Rot X", mainmemory.read_u16_be(pointer + obj_model1.x_rot) });
+		table.insert(examine_data, { "Rot Y", mainmemory.read_u16_be(pointer + obj_model1.y_rot) });
+		table.insert(examine_data, { "Rot Z", mainmemory.read_u16_be(pointer + obj_model1.z_rot) });
+		table.insert(examine_data, { "Separator", 1 });
 
-local velocity = 0xB8;
---local acceleration = 0xBC; -- Seems wrong
+		table.insert(examine_data, { "Velocity", mainmemory.readfloat(pointer + obj_model1.velocity, true) });
+		table.insert(examine_data, { "Y Velocity", mainmemory.readfloat(pointer + obj_model1.y_velocity, true) });
+		table.insert(examine_data, { "Y Accel", mainmemory.readfloat(pointer + obj_model1.y_acceleration, true) });
+		table.insert(examine_data, { "Terminal Velocity", mainmemory.readfloat(pointer + obj_model1.terminal_velocity, true) });
+		table.insert(examine_data, { "Separator", 1 });
+	end
 
-local y_velocity = 0xC0;
-local y_acceleration = 0xC4;
-local terminal_velocity = 0xC8;
+	table.insert(examine_data, { "Health", mainmemory.read_s16_be(pointer + obj_model1.health) });
+	table.insert(examine_data, { "Hand state", mainmemory.readbyte(pointer + obj_model1.hand_state) });
+	table.insert(examine_data, { "Specular highlight", mainmemory.readbyte(pointer + obj_model1.specular_highlight) });
+	table.insert(examine_data, { "Separator", 1 });
 
-local light_thing = 0xCC; -- Values 0x00->0x14
+	table.insert(examine_data, { "Shadow width", mainmemory.readbyte(pointer + obj_model1.shadow_width) });
+	table.insert(examine_data, { "Shadow height", mainmemory.readbyte(pointer + obj_model1.shadow_height) });
+	table.insert(examine_data, { "Control State", mainmemory.readbyte(pointer + obj_model1.control_state_byte) }); -- TODO: Pretty print using control_state_values table
+	table.insert(examine_data, { "Brightness", mainmemory.readbyte(pointer + obj_model1.shade_byte) });
+	table.insert(examine_data, { "Separator", 1 });
 
-local x_rot = 0xE4;
-local y_rot = x_rot + 2;
-local z_rot = y_rot + 2;
+	local visibilityValue = mainmemory.readbyte(pointer + obj_model1.visibility);
+	table.insert(examine_data, { "Visibility", bizstring.binary(visibilityValue) });
+	table.insert(examine_data, { "In water", tostring(not get_bit(visibilityValue, 0)) });
+	table.insert(examine_data, { "Visible", tostring(get_bit(visibilityValue, 2)) });
+	table.insert(examine_data, { "Collides with terrain", tostring(get_bit(visibilityValue, 4)) });
+	table.insert(examine_data, { "Separator", 1 });
 
-local locked_to_pad = 0x110; -- TODO: What datatype is this? code says byte but I'd think it'd be a pointer
-local lock_method_1_pointer = 0x13C;
-local hand_state = 0x147; -- Bitfield
+	table.insert(examine_data, { "Lock Method 1 Pointer", toHexString(mainmemory.read_u32_be(pointer + obj_model1.lock_method_1_pointer), 8) });
+	table.insert(examine_data, { "Separator", 1 });
 
--- State byte
--- 0x02 First person camera
--- 0x04 Fairy camera
--- 0x0C standing normally
--- 0x0e Skid
--- 0x18 Moonrise?
--- 0x20 Splat
--- 0x24 Sparkles
--- 0x2C Crouch?
--- 0x39 Shrinking
--- 0x31 ESS
--- 0x36 Backwalk into loading zone?
--- 0x39 Shrink
--- 0x3E Camera zooms out
--- 0x4E Surface swimming
--- 0x4F Underwater
-local object_state_byte = 0x154;
+	if isKong(currentActorTypeNumeric) then
+		table.insert(examine_data, { "Vehicle Actor Pointer", toHexString(mainmemory.read_u32_be(pointer + obj_model1.player.vehicle_actor_pointer), 8) });
+		table.insert(examine_data, { "Grabbed Vine Pointer", toHexString(mainmemory.read_u32_be(pointer + obj_model1.player.grabbed_vine_pointer), 8) });
+		table.insert(examine_data, { "Grab pointer", toHexString(mainmemory.read_u32_be(pointer + obj_model1.player.grab_pointer), 8) });
+		table.insert(examine_data, { "Fairy Active", mainmemory.readbyte(pointer + obj_model1.player.fairy_active) });
+		table.insert(examine_data, { "Animation Type", mainmemory.readbyte(pointer + obj_model1.player.animation_type) }); -- TODO: Pretty print using animation_types table
+		table.insert(examine_data, { "Separator", 1 });
 
-local camera_focus_pointer = 0x178;
+		for index, offset in ipairs(obj_model1.player.scale) do
+			table.insert(examine_data, { "Scale "..toHexString(offset), mainmemory.readfloat(pointer + offset, true) });
+		end
+		table.insert(examine_data, { "Separator", 1 });
+	end
 
-local animation_type = 0x181;
-local kick_animation_value = 0x29;
+	if currentActorType == "Camera" then
+		local focusedActor = mainmemory.read_u24_be(pointer + obj_model1.camera.focused_actor_pointer + 1);
+		local focusedActorType;
 
-local velocity_uncrouch_aerial = 0x1A4;
+		if isRDRAM(focusedActor) then
+			focusedActorType = mainmemory.read_u32_be(focusedActor + obj_model1.actor_type);
+			if type(obj_model1.actor_types[focusedActorType]) ~= "nil" then
+				focusedActorType = obj_model1.actor_types[focusedActorType];
+			end
+		end
 
-local misc_acceleration_float = 0x1AC;
-local horizontal_acceleration = 0x1B0; -- Set to a negative number to go fast
-local misc_acceleration_float_2 = 0x1B4;
-local misc_acceleration_float_3 = 0x1B8;
+		table.insert(examine_data, { "Focused Actor", toHexString(focusedActor, 6) });
+		if type(focusedActorType) ~= "nil" then
+			table.insert(examine_data, { "Focused Actor Type", focusedActorType });
+		end
+		table.insert(examine_data, { "Separator", 1 });
 
-local velocity_ground = 0x1C0;
+		table.insert(examine_data, { "Viewport X Pos", mainmemory.readfloat(pointer + obj_model1.camera.viewport_x_position, true) });
+		table.insert(examine_data, { "Viewport Y Pos", mainmemory.readfloat(pointer + obj_model1.camera.viewport_y_position, true) });
+		table.insert(examine_data, { "Viewport Z Pos", mainmemory.readfloat(pointer + obj_model1.camera.viewport_z_position, true) });
+		table.insert(examine_data, { "Separator", 1 });
 
-local vehicle_actor_pointer = 0x208;
+		table.insert(examine_data, { "Viewport Y Rot", mainmemory.read_u16_be(pointer + obj_model1.camera.viewport_y_rotation) });
+		table.insert(examine_data, { "Separator", 1 });
 
-local grabbed_vine_pointer = 0x2B0;
+		table.insert(examine_data, { "Tracking Distance", mainmemory.readfloat(pointer + obj_model1.camera.tracking_distance, true) });
+		table.insert(examine_data, { "Tracking Angle", mainmemory.readfloat(pointer + obj_model1.camera.tracking_angle, true) });
+		table.insert(examine_data, { "Separator", 1 });
 
--- TODO: Properly document these, also these only apply to the player and maybe kongs in the tag barrel
-local scale = {
-	0x344, 0x348, 0x34C, 0x350, 0x354
-}
+		table.insert(examine_data, { "Camera State Type", mainmemory.readbyte(pointer + obj_model1.camera.state_type) });
+		table.insert(examine_data, { "C-Down Zoom Level", mainmemory.readbyte(pointer + obj_model1.camera.zoom_level_c_down) });
+		table.insert(examine_data, { "Current Zoom Level", mainmemory.readbyte(pointer + obj_model1.camera.zoom_level_current) });
+		table.insert(examine_data, { "Zoom Level After C-Up", mainmemory.readbyte(pointer + obj_model1.camera.zoom_level_after_c_up) });
+		table.insert(examine_data, { "Zoom Level Timer 1", mainmemory.readbyte(pointer + obj_model1.camera.state_switch_timer_1) });
+		table.insert(examine_data, { "Zoom Level Timer 2", mainmemory.readbyte(pointer + obj_model1.camera.state_switch_timer_2) });
+		table.insert(examine_data, { "Separator", 1 });
+	end
 
-local effect_byte = 0x372; -- Bitfield, TODO: Document bits
+	if currentActorType == "Tag Barrel" then
+		table.insert(examine_data, { "TB scroll timer", mainmemory.readbyte(pointer + obj_model1.tag_barrel.scroll_timer) });
+		table.insert(examine_data, { "TB current index", mainmemory.readbyte(pointer + obj_model1.tag_barrel.current_index) });
+		table.insert(examine_data, { "TB previous index", mainmemory.readbyte(pointer + obj_model1.tag_barrel.previous_index) });
+		table.insert(examine_data, { "TB kickout timer", mainmemory.read_u32_be(pointer + obj_model1.tag_barrel.kickout_timer) });
+		table.insert(examine_data, { "Separator", 1 });
+	elseif currentActorType == "Kremling Kosh Controller" then
+		table.insert(examine_data, { "Current Slot", mainmemory.readbyte(pointer + obj_model1.kosh_kontroller.slot_location) });
+		table.insert(examine_data, { "Melons Remaining", mainmemory.readbyte(pointer + obj_model1.kosh_kontroller.melons_remaining) });
+		for i = 1, 8 do
+			table.insert(examine_data, { "Slot "..i.." pointer", toHexString(mainmemory.read_u32_be(pointer + obj_model1.kosh_kontroller.slot_pointer_base + (i - 1) * 4), 8) });
+		end
+		table.insert(examine_data, { "Separator", 1 });
+	elseif currentActorTypeNumeric == 330 then -- Bug: Big Bug Bash
+		table.insert(examine_data, { "Current AI direction", mainmemory.readfloat(pointer + 0x180) });
+		table.insert(examine_data, { "Ticks til direction change", mainmemory.read_u32_be(pointer + 0x184) });
+	end
 
-local function getPlayerObject() -- TODO: Cache this
+	return examine_data;
+end
+
+function Game.getPlayerObject() -- TODO: Cache this
 	return mainmemory.read_u24_be(Game.Memory.player_pointer[version] + 1);
+end
+
+----------------------------------
+-- Object Model 2 Documentation --
+----------------------------------
+
+-- Things in object model 2
+-- GB's & CB's
+-- Doors in helm
+-- K. Rool's chair
+-- Gorilla Grab Levers
+-- Bananaporters
+-- DK portals
+-- Trees
+-- Instrument pads
+-- Wrinkly doors
+-- Shops (Snide's, Cranky's, Funky's, Candy's)
+
+local obj_model2_slot_size = 0x90;
+
+-- Relative to objects in model 2 array
+local obj_model2 = {
+	["x_pos"] = 0x00, -- Float
+	["y_pos"] = 0x04, -- Float
+	["z_pos"] = 0x08, -- Float
+	["hitbox_scale"] = 0x0C, -- Float
+	["model_pointer"] = 0x20,
+	["model"] = {
+		["x_pos"] = 0x00, -- Float
+		["y_pos"] = 0x04, -- Float
+		["z_pos"] = 0x08, -- Float
+		["scale"] = 0x0C, -- Float
+		["rot_x"] = 0x10, -- Float
+		["rot_y"] = 0x14, -- Float
+		["rot_z"] = 0x18, -- Float
+	},
+	["behavior_type_pointer"] = 0x24, -- TODO: Fields for this object
+	["unknown_counter"] = 0x3A, -- u16_be
+	["behavior_pointer"] = 0x7C,
+	-- 0x00 Seen in game, but currently unknown
+	-- 0x01 Seen in game, but currently unknown
+	-- 0x02 Seen in game, but currently unknown
+	-- 0x04 Seen in game, but currently unknown
+	-- 0x08 Seen in game, but currently unknown
+	-- 0x20 Seen in game, but currently unknown
+	-- 0x21 100001 GB - Chunky can collect
+	-- 0x22 100010 GB - Diddy can collect
+	-- 0x24 100100 GB - Tiny can collect
+	-- 0x28 101000 GB - DK can collect
+	-- 0x30 110000 GB - Lanky can collect
+	-- 0x3F 111111 GB - Anyone can collect?
+	["collectable_state"] = 0x8C, -- byte (bitfield)
+};
+
+function getObjectModel2ArraySize()
+	local objModel2Array = Game.Memory["obj_model2_array_pointer"][version] + RDRAMBase;
+	if version ~= 4 then
+		objModel2Array = mainmemory.read_u32_be(Game.Memory["obj_model2_array_pointer"][version]);
+	end
+	if isPointer(objModel2Array) then
+		return mainmemory.read_u32_be(objModel2Array - RDRAMBase + object_size) / obj_model2_slot_size;
+	end
+	return 0;
+end
+
+function getObjectModel2SlotBase(index)
+	local objModel2Array = Game.Memory["obj_model2_array_pointer"][version] + RDRAMBase;
+	if version ~= 4 then
+		objModel2Array = mainmemory.read_u32_be(Game.Memory["obj_model2_array_pointer"][version]);
+	end
+	if isPointer(objModel2Array) then
+		return objModel2Array - RDRAMBase + index * obj_model2_slot_size;
+	end
+	return 0;
+end
+
+function getObjectModel2ModelBase(index)
+	local objModel2Array = Game.Memory["obj_model2_array_pointer"][version] + RDRAMBase;
+	if version ~= 4 then
+		objModel2Array = mainmemory.read_u32_be(Game.Memory["obj_model2_array_pointer"][version]);
+	end
+	if isPointer(objModel2Array) then
+		return mainmemory.read_u24_be(objModel2Array - RDRAMBase + index * obj_model2_slot_size + obj_model2.model_pointer + 1);
+	end
+	return 0;
+end
+
+function populateObjectModel2Pointers()
+	object_pointers = {};
+	local objModel2Array = Game.Memory["obj_model2_array_pointer"][version] + RDRAMBase;
+	if version ~= 4 then
+		objModel2Array = mainmemory.read_u32_be(Game.Memory["obj_model2_array_pointer"][version]);
+	end
+	if isPointer(objModel2Array) then
+		objModel2Array = objModel2Array - RDRAMBase;
+		if version ~= 4 then
+			numSlots = mainmemory.read_u32_be(Game.Memory["obj_model2_array_count"][version]);
+		else
+			numSlots = 430;
+		end
+
+		-- Fill and sort pointer list
+		for i = 1, numSlots do
+			table.insert(object_pointers, objModel2Array + (i - 1) * obj_model2_slot_size);
+		end
+		table.sort(object_pointers);
+	end
+end
+
+local function encirclePlayerObjectModel2()
+	if encircle_enabled and stringContains(grab_script_mode, "Model 2") then
+		local playerObject = Game.getPlayerObject();
+		if isRDRAM(playerObject) then
+			local xPos = mainmemory.readfloat(playerObject + obj_model1.x_pos, true);
+			local yPos = mainmemory.readfloat(playerObject + obj_model1.y_pos, true);
+			local zPos = mainmemory.readfloat(playerObject + obj_model1.z_pos, true);
+
+			-- Iterate and set position
+			local x, z, modelPointer;
+			for i = 1, #object_pointers do
+				x = xPos + math.cos(math.pi * 2 * i / #object_pointers) * radius;
+				z = zPos + math.sin(math.pi * 2 * i / #object_pointers) * radius;
+
+				-- Set hitbox X, Y, Z
+				mainmemory.writefloat(object_pointers[i] + obj_model2.x_pos, x, true);
+				mainmemory.writefloat(object_pointers[i] + obj_model2.y_pos, yPos, true);
+				mainmemory.writefloat(object_pointers[i] + obj_model2.z_pos, z, true);
+
+				-- Set model X, Y, Z
+				modelPointer = mainmemory.read_u32_be(object_pointers[i] + obj_model2.model_pointer);
+				if isPointer(modelPointer) then
+					modelPointer = modelPointer - RDRAMBase;
+					mainmemory.writefloat(modelPointer + obj_model2.model.x_pos, x, true);
+					mainmemory.writefloat(modelPointer + obj_model2.model.y_pos, yPos, true);
+					mainmemory.writefloat(modelPointer + obj_model2.model.z_pos, z, true);
+				end
+			end
+		end
+	end
+end
+
+function offsetObjectModel2(x, y, z)
+	-- Iterate and set position
+	local behaviorTypePointer, behaviorType, modelPointer, currentX, currentY, currentZ;
+	for i = 1, #object_pointers do
+		behaviorTypePointer = mainmemory.read_u32_be(object_pointers[i] + obj_model2.behavior_type_pointer);
+		behaviorType = "unknown";
+		if isPointer(behaviorTypePointer) then
+			behaviorType = readNullTerminatedString(behaviorTypePointer - RDRAMBase + 0x0C);
+		end
+		if behaviorType == "pickups" then
+			-- Read hitbox X, Y, Z
+			currentX = mainmemory.readfloat(object_pointers[i] + obj_model2.x_pos, true);
+			currentY = mainmemory.readfloat(object_pointers[i] + obj_model2.y_pos, true);
+			currentZ = mainmemory.readfloat(object_pointers[i] + obj_model2.z_pos, true);
+
+			-- Write hitbox X, Y, Z
+			mainmemory.writefloat(object_pointers[i] + obj_model2.x_pos, currentX + x, true);
+			mainmemory.writefloat(object_pointers[i] + obj_model2.y_pos, currentY + y, true);
+			mainmemory.writefloat(object_pointers[i] + obj_model2.z_pos, currentZ + z, true);
+
+			-- Check for model
+			modelPointer = mainmemory.read_u32_be(object_pointers[i] + obj_model2.model_pointer);
+			if isPointer(modelPointer) then
+				modelPointer = modelPointer - RDRAMBase;
+
+				-- Read model X, Y, Z
+				currentX = mainmemory.readfloat(modelPointer + obj_model2.model.x_pos, true);
+				currentY = mainmemory.readfloat(modelPointer + obj_model2.model.y_pos, true);
+				currentZ = mainmemory.readfloat(modelPointer + obj_model2.model.z_pos, true);
+
+				-- Write model X, Y, Z
+				mainmemory.writefloat(modelPointer + obj_model2.model.x_pos, currentX + x, true);
+				mainmemory.writefloat(modelPointer + obj_model2.model.y_pos, currentY + y, true);
+				mainmemory.writefloat(modelPointer + obj_model2.model.z_pos, currentZ + z, true);
+			end
+		end
+	end
+end
+
+local function getExamineDataModelTwo(pointer)
+	local examine_data = {};
+
+	local modelPointer = mainmemory.read_u32_be(pointer + obj_model2.model_pointer);
+	local hasModel = isPointer(modelPointer);
+
+	local xPos = mainmemory.readfloat(pointer + obj_model2.x_pos, true);
+	local yPos = mainmemory.readfloat(pointer + obj_model2.y_pos, true);
+	local zPos = mainmemory.readfloat(pointer + obj_model2.z_pos, true);
+	local hasPosition = xPos ~= 0 or yPos ~= 0 or zPos ~= 0 or hasModel;
+
+	table.insert(examine_data, { "Slot base", toHexString(pointer, 6) });
+	local behaviorTypePointer = mainmemory.read_u32_be(pointer + obj_model2.behavior_type_pointer);
+	local behaviorPointer = mainmemory.read_u32_be(pointer + obj_model2.behavior_pointer);
+	local behaviorType = "unknown";
+	if isPointer(behaviorTypePointer) then
+		behaviorType = readNullTerminatedString(behaviorTypePointer - RDRAMBase + 0x0C);
+		table.insert(examine_data, { "Behavior Type", behaviorType });
+		table.insert(examine_data, { "Behavior Type Pointer", toHexString(behaviorTypePointer) });
+	end
+	if isPointer(behaviorPointer) then
+		table.insert(examine_data, { "Behavior Pointer", toHexString(behaviorPointer) });
+	end
+	table.insert(examine_data, { "Separator", 1 });
+
+	if behaviorType == "pads" then
+		table.insert(examine_data, { "Warp Pad Texture", toHexString(mainmemory.read_u32_be(behaviorTypePointer - RDRAMBase + 0x374), 8) }); -- TODO: figure out the format for behavior scripts
+		table.insert(examine_data, { "Separator", 1 });
+	end
+
+	if behaviorType == "gunswitches" then
+		table.insert(examine_data, { "Gunswitch Texture", toHexString(mainmemory.read_u32_be(behaviorTypePointer - RDRAMBase + 0x22C), 8) }); -- TODO: figure out the format for behavior scripts
+		table.insert(examine_data, { "Separator", 1 });
+	end
+
+	if hasPosition then
+		table.insert(examine_data, { "Hitbox X", xPos });
+		table.insert(examine_data, { "Hitbox Y", yPos });
+		table.insert(examine_data, { "Hitbox Z", zPos });
+		table.insert(examine_data, { "Separator", 1 });
+
+		table.insert(examine_data, { "Hitbox Scale", mainmemory.readfloat(pointer + obj_model2.hitbox_scale, true) });
+		table.insert(examine_data, { "Separator", 1 });
+	end
+
+	table.insert(examine_data, { "Unknown Counter", mainmemory.read_u16_be(pointer + obj_model2.unknown_counter) });
+	table.insert(examine_data, { "GB Interaction Bitfield", bizstring.binary(mainmemory.readbyte(pointer + obj_model2.collectable_state)) });
+
+	if hasModel then
+		table.insert(examine_data, { "Model Base", toHexString(modelPointer) });
+		modelPointer = modelPointer - RDRAMBase;
+		table.insert(examine_data, { "Separator", 1 });
+
+		table.insert(examine_data, { "Model X", mainmemory.readfloat(modelPointer + obj_model2.model.x_pos, true) });
+		table.insert(examine_data, { "Model Y", mainmemory.readfloat(modelPointer + obj_model2.model.y_pos, true) });
+		table.insert(examine_data, { "Model Z", mainmemory.readfloat(modelPointer + obj_model2.model.z_pos, true) });
+		table.insert(examine_data, { "Separator", 1 });
+
+		table.insert(examine_data, { "Model Rot X", mainmemory.readfloat(modelPointer + obj_model2.model.rot_x, true) });
+		table.insert(examine_data, { "Model Rot Y", mainmemory.readfloat(modelPointer + obj_model2.model.rot_y, true) });
+		table.insert(examine_data, { "Model Rot Z", mainmemory.readfloat(modelPointer + obj_model2.model.rot_z, true) });
+		table.insert(examine_data, { "Separator", 1 });
+
+		table.insert(examine_data, { "Model Scale", mainmemory.readfloat(modelPointer + obj_model2.model.scale, true) });
+		table.insert(examine_data, { "Separator", 1 });
+	end
+
+	return examine_data;
 end
 
 --------------------
@@ -250,33 +905,18 @@ function Game.detectVersion(romName)
 	if stringContains(romName, "USA") and not stringContains(romName, "Kiosk") then
 		version = 1;
 		flag_array = require("games.dk64_flags_USA");
-
-		--Mad Jack
-		MJ_time_until_next_action = 0x2D;
-		MJ_actions_remaining      = 0x58;
-		MJ_action_type            = 0x59;
-		MJ_current_pos            = 0x60;
-		MJ_next_pos               = 0x61;
-		MJ_white_switch_pos       = 0x64;
-		MJ_blue_switch_pos        = 0x65;
-
-		--Subgames
-		jumpman_position = {0x04BD70, 0x04BD74};
-		jumpman_velocity = {0x04BD78, 0x04BD7C};
-		jetman_position  = {0x02F050, 0x02F054};
-		jetman_velocity =  {0x02F058, 0x02F05C};
 	elseif stringContains(romName, "Europe") then
 		version = 2;
 		flag_array = require("games.dk64_flags_PAL");
 
 		--Mad Jack
-		MJ_time_until_next_action = 0x25;
-		MJ_actions_remaining      = 0x60;
-		MJ_action_type            = 0x61;
-		MJ_current_pos            = 0x68;
-		MJ_next_pos               = 0x69;
-		MJ_white_switch_pos       = 0x6C;
-		MJ_blue_switch_pos        = 0x6D;
+		MJ_offsets["ticks_until_next_action"] = 0x25;
+		MJ_offsets["actions_remaining"]       = 0x60;
+		MJ_offsets["action_type"]             = 0x61;
+		MJ_offsets["current_position"]        = 0x68;
+		MJ_offsets["next_position"]           = 0x69;
+		MJ_offsets["white_switch_position"]   = 0x6C;
+		MJ_offsets["blue_switch_position"]    = 0x6D;
 
 		--Subgames
 		jumpman_position = {0x03ECD0, 0x03ECD4};
@@ -288,13 +928,13 @@ function Game.detectVersion(romName)
 		flag_array = require("games.dk64_flags_JP");
 
 		--Mad Jack
-		MJ_time_until_next_action = 0x25;
-		MJ_actions_remaining      = 0x60;
-		MJ_action_type            = 0x61;
-		MJ_current_pos            = 0x68;
-		MJ_next_pos               = 0x69;
-		MJ_white_switch_pos       = 0x6C;
-		MJ_blue_switch_pos        = 0x6D;
+		MJ_offsets["ticks_until_next_action"] = 0x25;
+		MJ_offsets["actions_remaining"]       = 0x60;
+		MJ_offsets["action_type"]             = 0x61;
+		MJ_offsets["current_position"]        = 0x68;
+		MJ_offsets["next_position"]           = 0x69;
+		MJ_offsets["white_switch_position"]   = 0x6C;
+		MJ_offsets["blue_switch_position"]    = 0x6D;
 
 		--Subgames
 		jumpman_position = {0x03EB00, 0x03EB04};
@@ -303,15 +943,38 @@ function Game.detectVersion(romName)
 		jetman_velocity  = {0x022068, 0x02206C};
 	elseif stringContains(romName, "Kiosk") then
 		version = 4;
-		-- TODO: Flags?
+		-- flag_array = require("games.dk64_flags_Kiosk"); -- TODO: Flags?
 
-		x_rot = 0xD8;
-		y_rot = x_rot + 2;
-		z_rot = y_rot + 2;
+		-- Kiosk specific Object Model 1 offsets
+		obj_model1.x_rot = 0xD8;
+		obj_model1.y_rot = obj_model1.x_rot + 2;
+		obj_model1.z_rot = obj_model1.y_rot + 2;
 
-		velocity = 0xB0;
-		y_velocity = 0xB8;
-		y_acceleration = 0xBC;
+		obj_model1.velocity = 0xB0;
+		obj_model1.y_velocity = 0xB8;
+		obj_model1.y_acceleration = 0xBC;
+		obj_model1.hand_state = 0x137;
+		obj_model1.camera.focus_pointer = 0x168;
+		obj_model1.player.obj_model1.player.grab_pointer = 0x2F4;
+
+		obj_model1.actor_types = {
+			[2] = "DK",
+			[3] = "Diddy",
+			[4] = "Lanky",
+			[5] = "Tiny",
+			[6] = "Chunky",
+			[25] = "TNT Barrel",
+			[26] = "TNT Barrel Spawner (Armydillo)",
+			[29] = "Fireball", -- Armydillo, Dogadon
+			[71] = "Boss Key",
+			[96] = "TNT Barrel Spawner (Dogadon)",
+			[145] = "Armydillo",
+			[149] = "Camera",
+			[201] = "Dogadon",
+			[221] = "Static Object", -- Fake Chunky in Dogadon 2 opening cutscene
+			[230] = "Fireball Shockwave", -- Dogadon
+			[232] = "Light Beam", -- Boss fights etc
+		};
 
 		-- Kiosk version maps
 		--0 Crash
@@ -584,19 +1247,6 @@ Game.maps = {
 	"K. Rool's Shoe",
 	"K. Rool's Arena"
 };
-
-local RDRAMBase = 0x80000000;
-local RDRAMSize = 0x800000; -- Halved without expansion pak
-
--- Checks whether a value falls within N64 RDRAM
-local function isRDRAM(value)
-	return type(value) == "number" and value >= 0 and value < RDRAMSize;
-end
-
--- Checks whether a value is a pointer
-local function isPointer(value)
-	return type(value) == "number" and value >= RDRAMBase and value < RDRAMBase + RDRAMSize;
-end
 
 ----------------
 -- Flag stuff --
@@ -919,17 +1569,19 @@ end
 -- TBS Nonsense --
 ------------------
 
---force_tbs = false;
+force_tbs = false; -- Set this through lua console for now -- TODO: Add some kind of UI for it
 function forceTBS()
 	if force_tbs then
-		local pointer = mainmemory.read_u32_be(getPlayerObject() + lock_method_1_pointer);
-		if isPointer(pointer) then
-			print("Forcing TBS");
-			mainmemory.write_u32_be(getPlayerObject() + lock_method_1_pointer, 0x00000000);
+		local playerObject = Game.getPlayerObject();
+		if isRDRAM(playerObject) then
+			local pointer = mainmemory.read_u32_be(playerObject + obj_model1.lock_method_1_pointer);
+			if isPointer(pointer) then
+				print("Forcing TBS");
+				mainmemory.write_u32_be(playerObject + obj_model1.lock_method_1_pointer, 0x00000000);
+			end
 		end
 	end
 end
-event.onframestart(forceTBS, "ScriptHawk - Force TBS");
 
 -------------------
 -- Physics/Scale --
@@ -950,12 +1602,22 @@ function isInSubGame()
 end
 
 function Game.getFloor() -- TODO: Got errors with this when exiting tiny temple
-	return mainmemory.readfloat(getPlayerObject() + floor, true);
+	local playerObject = Game.getPlayerObject();
+	if isRDRAM(playerObject) then
+		return mainmemory.readfloat(playerObject + obj_model1.floor, true);
+	end
+	return 0;
 end
 
 function Game.getDistanceFromFloor()
-	return mainmemory.readfloat(getPlayerObject() + distance_from_floor, true);
+	local playerObject = Game.getPlayerObject();
+	if isRDRAM(playerObject) then
+		return mainmemory.readfloat(playerObject + distance_from_obj_model1.floor, true);
+	end
+	return 0;
 end
+
+-- TODO: Game.getWaterHeight()
 
 --------------
 -- Position --
@@ -967,7 +1629,7 @@ function Game.getXPosition()
 	elseif map_value == jetpac_map then
 		return mainmemory.readfloat(jetman_position[1], true);
 	end
-	return mainmemory.readfloat(getPlayerObject() + x_pos, true);
+	return mainmemory.readfloat(Game.getPlayerObject() + obj_model1.x_pos, true);
 end
 
 function Game.getYPosition()
@@ -976,12 +1638,12 @@ function Game.getYPosition()
 	elseif map_value == jetpac_map then
 		return mainmemory.readfloat(jetman_position[2], true);
 	end
-	return mainmemory.readfloat(getPlayerObject() + y_pos, true);
+	return mainmemory.readfloat(Game.getPlayerObject() + obj_model1.y_pos, true);
 end
 
 function Game.getZPosition()
 	if not isInSubGame() then
-		return mainmemory.readfloat(getPlayerObject() + z_pos, true);
+		return mainmemory.readfloat(Game.getPlayerObject() + obj_model1.z_pos, true);
 	end
 	return 0;
 end
@@ -992,15 +1654,15 @@ function Game.setXPosition(value)
 	elseif map_value == jetpac_map then
 		--mainmemory.writefloat(jetman_position[1], value, true);
 	else
-		local playerObject = getPlayerObject();
-		local vehiclePointer = mainmemory.read_u32_be(playerObject + vehicle_actor_pointer);
+		local playerObject = Game.getPlayerObject();
+		local vehiclePointer = mainmemory.read_u32_be(playerObject + obj_model1.player.vehicle_actor_pointer);
 		if isPointer(vehiclePointer) then
 			vehiclePointer = vehiclePointer - RDRAMBase;
-			mainmemory.writefloat(vehiclePointer + x_pos, value, true);
+			mainmemory.writefloat(vehiclePointer + obj_model1.x_pos, value, true);
 		end
-		mainmemory.writefloat(playerObject + x_pos, value, true);
-		mainmemory.writebyte(playerObject + locked_to_pad, 0x00);
-		mainmemory.write_u32_be(playerObject + lock_method_1_pointer, 0x00);
+		mainmemory.writefloat(playerObject + obj_model1.x_pos, value, true);
+		mainmemory.writebyte(playerObject + obj_model1.locked_to_pad, 0x00);
+		mainmemory.write_u32_be(playerObject + obj_model1.lock_method_1_pointer, 0x00);
 	end
 end
 
@@ -1010,16 +1672,16 @@ function Game.setYPosition(value)
 	elseif map_value == jetpac_map then
 		--mainmemory.writefloat(jetman_position[2], value, true);
 	else
-		local playerObject = getPlayerObject();
+		local playerObject = Game.getPlayerObject();
 		if isRDRAM(playerObject) then
-			local vehiclePointer = mainmemory.read_u32_be(playerObject + vehicle_actor_pointer);
+			local vehiclePointer = mainmemory.read_u32_be(playerObject + obj_model1.player.vehicle_actor_pointer);
 			if isPointer(vehiclePointer) then
 				vehiclePointer = vehiclePointer - RDRAMBase;
-				mainmemory.writefloat(vehiclePointer + y_pos, value, true);
-				mainmemory.writebyte(vehiclePointer + locked_to_pad, 0x00);
+				mainmemory.writefloat(vehiclePointer + obj_model1.y_pos, value, true);
+				mainmemory.writebyte(vehiclePointer + obj_model1.locked_to_pad, 0x00);
 			end
-			mainmemory.writefloat(playerObject + y_pos, value, true);
-			mainmemory.writebyte(playerObject + locked_to_pad, 0x00);
+			mainmemory.writefloat(playerObject + obj_model1.y_pos, value, true);
+			mainmemory.writebyte(playerObject + obj_model1.locked_to_pad, 0x00);
 			Game.setYVelocity(0);
 		end
 	end
@@ -1027,19 +1689,20 @@ end
 
 function Game.setZPosition(value)
 	if not isInSubGame() then
-		local playerObject = getPlayerObject();
-		local vehiclePointer = mainmemory.read_u32_be(playerObject + vehicle_actor_pointer);
+		local playerObject = Game.getPlayerObject();
+		local vehiclePointer = mainmemory.read_u32_be(playerObject + obj_model1.player.vehicle_actor_pointer);
 		if isPointer(vehiclePointer) then
 			vehiclePointer = vehiclePointer - RDRAMBase;
-			mainmemory.writefloat(vehiclePointer + z_pos, value, true);
+			mainmemory.writefloat(vehiclePointer + obj_model1.z_pos, value, true);
 		end
-		mainmemory.writefloat(playerObject + z_pos, value, true);
-		mainmemory.writebyte(playerObject + locked_to_pad, 0x00);
-		mainmemory.write_u32_be(playerObject + lock_method_1_pointer, 0x00);
+		mainmemory.writefloat(playerObject + obj_model1.z_pos, value, true);
+		mainmemory.writebyte(playerObject + obj_model1.locked_to_pad, 0x00);
+		mainmemory.write_u32_be(playerObject + obj_model1.lock_method_1_pointer, 0x00);
 	end
 end
 
 -- Relative to objects in bone array
+-- TODO: Put these in a table
 local bone_size = 0x40;
 local bone_position_x = 0x18; -- int 16 be
 local bone_position_y = 0x1A; -- int 16 be
@@ -1051,9 +1714,9 @@ local bone_scale_z = 0x34; -- uint 16 be
 
 function Game.getActiveBoneArray()
 	if not isInSubGame() then
-		local playerObject = getPlayerObject();
+		local playerObject = Game.getPlayerObject();
 		if isRDRAM(playerObject) then
-			return mainmemory.read_u32_be(playerObject + current_bone_array_pointer);
+			return mainmemory.read_u32_be(playerObject + obj_model1.current_bone_array_pointer);
 		end
 	end
 	return 0;
@@ -1061,9 +1724,9 @@ end
 
 function Game.getBoneArray1()
 	if not isInSubGame() then
-		local playerObject = getPlayerObject();
+		local playerObject = Game.getPlayerObject();
 		if isRDRAM(playerObject) then
-			local animationParamObject = mainmemory.read_u32_be(playerObject + rendering_parameters_pointer);
+			local animationParamObject = mainmemory.read_u32_be(playerObject + obj_model1.rendering_paramaters_pointer);
 			if isPointer(animationParamObject) then
 				animationParamObject = animationParamObject - RDRAMBase;
 				return mainmemory.read_u32_be(animationParamObject + 0x14);
@@ -1075,9 +1738,9 @@ end
 
 function Game.getBoneArray2()
 	if not isInSubGame() then
-		local playerObject = getPlayerObject();
+		local playerObject = Game.getPlayerObject();
 		if isRDRAM(playerObject) then
-			local animationParamObject = mainmemory.read_u32_be(playerObject + rendering_parameters_pointer);
+			local animationParamObject = mainmemory.read_u32_be(playerObject + obj_model1.rendering_paramaters_pointer);
 			if isPointer(animationParamObject) then
 				animationParamObject = animationParamObject - RDRAMBase;
 				return mainmemory.read_u32_be(animationParamObject + 0x18);
@@ -1163,14 +1826,14 @@ end
 
 function Game.getXRotation()
 	if not isInSubGame() then
-		return mainmemory.read_u16_be(getPlayerObject() + x_rot);
+		return mainmemory.read_u16_be(Game.getPlayerObject() + obj_model1.x_rot);
 	end
 	return 0;
 end
 
 function Game.getYRotation()
 	if not isInSubGame() then
-		return mainmemory.read_u16_be(getPlayerObject() + y_rot);
+		return mainmemory.read_u16_be(Game.getPlayerObject() + obj_model1.y_rot);
 	end
 	return 0;
 end
@@ -1184,26 +1847,26 @@ end
 
 function Game.getZRotation()
 	if not isInSubGame() then
-		return mainmemory.read_u16_be(getPlayerObject() + z_rot);
+		return mainmemory.read_u16_be(Game.getPlayerObject() + obj_model1.z_rot);
 	end
 	return 0;
 end
 
 function Game.setXRotation(value)
 	if not isInSubGame() then
-		mainmemory.write_u16_be(getPlayerObject() + x_rot, value);
+		mainmemory.write_u16_be(Game.getPlayerObject() + obj_model1.x_rot, value);
 	end
 end
 
 function Game.setYRotation(value)
 	if not isInSubGame() then
-		mainmemory.write_u16_be(getPlayerObject() + y_rot, value);
+		mainmemory.write_u16_be(Game.getPlayerObject() + obj_model1.y_rot, value);
 	end
 end
 
 function Game.setZRotation(value)
 	if not isInSubGame() then
-		mainmemory.write_u16_be(getPlayerObject() + z_rot, value);
+		mainmemory.write_u16_be(Game.getPlayerObject() + obj_model1.z_rot, value);
 	end
 end
 
@@ -1212,31 +1875,31 @@ end
 -----------------------------
 
 function Game.getVelocity()
-	local playerObject = getPlayerObject();
+	local playerObject = Game.getPlayerObject();
 	if map_value == arcade_map then
 		return mainmemory.readfloat(jumpman_velocity[1], true);
 	elseif map_value == jetpac_map then
 		return mainmemory.readfloat(jetman_velocity[1], true);
 	elseif isRDRAM(playerObject) then
-		return mainmemory.readfloat(playerObject + velocity, true);
+		return mainmemory.readfloat(playerObject + obj_model1.velocity, true);
 	end
 	return 0;
 end
 
 function Game.setVelocity(value)
-	local playerObject = getPlayerObject();
+	local playerObject = Game.getPlayerObject();
 	if map_value == arcade_map then
 		mainmemory.writefloat(jumpman_velocity[1], value, true);
 	elseif map_value == jetpac_map then
 		mainmemory.writefloat(jetman_velocity[1], value, true);
 	elseif isRDRAM(playerObject) then
-		mainmemory.writefloat(playerObject + velocity, value, true);
+		mainmemory.writefloat(playerObject + obj_model1.velocity, value, true);
 	end
 end
 
 --function Game.getAcceleration()
 --	if not isInSubGame() then
---		local playerObject = getPlayerObject();
+--		local playerObject = Game.getPlayerObject();
 --		if isRDRAM(playerObject) then
 --			return mainmemory.readfloat(playerObject + acceleration, true);
 --		end
@@ -1245,33 +1908,33 @@ end
 --end
 
 function Game.getYVelocity()
-	local playerObject = getPlayerObject();
+	local playerObject = Game.getPlayerObject();
 	if map_value == arcade_map then
 		return mainmemory.readfloat(jumpman_velocity[2], true);
 	elseif map_value == jetpac_map then
 		return mainmemory.readfloat(jetman_velocity[2], true);
 	elseif isRDRAM(playerObject) then
-		return mainmemory.readfloat(playerObject + y_velocity, true);
+		return mainmemory.readfloat(playerObject + obj_model1.y_velocity, true);
 	end
 	return 0;
 end
 
 function Game.setYVelocity(value)
-	local playerObject = getPlayerObject();
+	local playerObject = Game.getPlayerObject();
 	if map_value == arcade_map then
 		mainmemory.writefloat(jumpman_velocity[2], value, true);
 	elseif map_value == jetpac_map then
 		mainmemory.writefloat(jetman_velocity[2], value, true);
 	elseif isRDRAM(playerObject) then
-		mainmemory.writefloat(playerObject + y_velocity, value, true);
+		mainmemory.writefloat(playerObject + obj_model1.y_velocity, value, true);
 	end
 end
 
 function Game.getYAcceleration()
 	if not isInSubGame() then
-		local playerObject = getPlayerObject();
+		local playerObject = Game.getPlayerObject();
 		if isRDRAM(playerObject) then
-			return mainmemory.readfloat(playerObject + y_acceleration, true);
+			return mainmemory.readfloat(playerObject + obj_model1.y_acceleration, true);
 		end
 	end
 	return 0;
@@ -1283,17 +1946,17 @@ end
 
 local current_invisify = "Invisify";
 local function toggle_invisify()
-	local playerObject = getPlayerObject();
+	local playerObject = Game.getPlayerObject();
 	if isRDRAM(playerObject) then
-		local visibilityBitfieldValue = mainmemory.readbyte(playerObject + visibility);
-		mainmemory.writebyte(playerObject + visibility, toggle_bit(visibilityBitfieldValue, 2));
+		local visibilityBitfieldValue = mainmemory.readbyte(playerObject + obj_model1.visibility);
+		mainmemory.writebyte(playerObject + obj_model1.visibility, toggle_bit(visibilityBitfieldValue, 2));
 	end
 end
 
 local function updateCurrentInvisify()
-	local playerObject = getPlayerObject();
+	local playerObject = Game.getPlayerObject();
 	if isRDRAM(playerObject) then
-		local isVisible = check_bit(mainmemory.readbyte(playerObject + visibility), 2);
+		local isVisible = check_bit(mainmemory.readbyte(playerObject + obj_model1.visibility), 2);
 		if isVisible then
 			current_invisify = "Invisify";
 		else
@@ -1327,10 +1990,11 @@ forceZipper = force_zipper;
 Game.forceZipper = forceZipper;
 
 function gainControl()
-	local player = getPlayerObject();
-	if isRDRAM(player) then
-		toggle_invisify();
-		mainmemory.writebyte(player + object_state_byte, 0x05);
+	local playerObject = Game.getPlayerObject();
+	if isRDRAM(playerObject) then
+		local visibilityBitfieldValue = mainmemory.readbyte(playerObject + obj_model1.visibility);
+		mainmemory.writebyte(playerObject + obj_model1.visibility, set_bit(visibilityBitfieldValue, 2));
+		mainmemory.writebyte(playerObject + obj_model1.control_state_byte, 0x05);
 	end
 end
 gain_control = gainControl;
@@ -1377,13 +2041,14 @@ end
 -- DK64 - Mad Jack Minimap
 -- Written by Isotarge, 2014-2015
 -----------------------------------
-image_directory_root = ".\\Images\\"; -- TODO: Move this to ScriptHawk.lua, it'll probably be useful in other places eventually
 
--- Colors (ARGB)
-local MJ_blue         = 0x7F00A2E8;
-local MJ_blue_switch  = 0xFF00A2E8;
-local MJ_white        = 0x7FFFFFFF;
-local MJ_white_switch = 0xFFFFFFFF;
+-- Colors (ARGB32)
+local MJ_colors = {
+	["blue"] = 0x7F00A2E8,
+	["blue_switch"] = 0xFF00A2E8,
+	["white"] = 0x7FFFFFFF,
+	["white_switch"] = 0xFFFFFFFF
+};
 
 -- Minimap ui
 local MJ_minimap_x_offset  = 19;
@@ -1404,23 +2069,6 @@ local MJ_kong_col_y                  = MJ_kong_row_y + MJ_minimap_height;
 local function position_to_rowcol(pos)
 	pos = math.floor((pos - 330) / 120); -- Calculate row index
 	return math.min(7, math.max(0, pos)); -- Clamp between 0 and 7
-end
-
-local function get_kong_position()
-	local x = Game.getXPosition();
-	local z = Game.getZPosition();
-
-	local colseg = position_to_rowcol(z);
-	local rowseg = position_to_rowcol(x);
-
-	local col = math.floor(colseg / 2);
-	local row = math.floor(rowseg / 2);
-
-	return {
-		["x"] = x, ["z"] = z,
-		["col"] = col, ["row"] = row,
-		["col_seg"] = colseg, ["row_seg"] = rowseg
-	};
 end
 
 local function MJ_get_col_mask(position)
@@ -1502,16 +2150,16 @@ local function MJ_parse_position(position)
 	};
 end
 
-local function draw_mj_minimap()
+function Game.drawMJMinimap()
 	-- Only draw minimap if the player is in the Mad Jack fight
 	if version ~= 4 and map_value == 154 then
 		local MJ_state = mainmemory.read_u24_be(Game.Memory.boss_pointer[version] + 1);
 
-		local cur_pos = MJ_parse_position(mainmemory.readbyte(MJ_state + MJ_current_pos));
-		local next_pos = MJ_parse_position(mainmemory.readbyte(MJ_state + MJ_next_pos));
+		local cur_pos = MJ_parse_position(mainmemory.readbyte(MJ_state + MJ_offsets["current_position"]));
+		local next_pos = MJ_parse_position(mainmemory.readbyte(MJ_state + MJ_offsets["next_position"]));
 
-		local white_pos = MJ_parse_position(mainmemory.readbyte(MJ_state + MJ_white_switch_pos));
-		local blue_pos = MJ_parse_position(mainmemory.readbyte(MJ_state + MJ_blue_switch_pos));
+		local white_pos = MJ_parse_position(mainmemory.readbyte(MJ_state + MJ_offsets["white_switch_position"]));
+		local blue_pos = MJ_parse_position(mainmemory.readbyte(MJ_state + MJ_offsets["blue_switch_position"]));
 
 		local switches_active = white_pos.active or blue_pos.active;
 
@@ -1519,23 +2167,37 @@ local function draw_mj_minimap()
 
 		gui.clearGraphics();
 
-		local kong_position = get_kong_position();
+		-- Calculate where the kong is on the MJ Board
+		local x = Game.getXPosition();
+		local z = Game.getZPosition();
+
+		local colseg = position_to_rowcol(z);
+		local rowseg = position_to_rowcol(x);
+
+		local col = math.floor(colseg / 2);
+		local row = math.floor(rowseg / 2);
+
+		kongPosition = {
+			["x"] = x, ["z"] = z,
+			["col"] = col, ["row"] = row,
+			["col_seg"] = colseg, ["row_seg"] = rowseg
+		};
 
 		for row = 0, 3 do
 			for	col = 0, 3 do
 				x = MJ_minimap_x_offset + col * MJ_minimap_width;
 				y = MJ_minimap_y_offset + (3 - row) * MJ_minimap_height;
 
-				color = MJ_blue;
+				color = MJ_colors.blue;
 				if MJ_get_color(col, row) == 'white' then
-					color = MJ_white;
+					color = MJ_colors.white;
 				end
 
 				if switches_active then
 					if white_pos.row == row and white_pos.col == col and MJ_get_color(cur_pos.col, cur_pos.row) == 'white' then
-						color = MJ_white_switch;
+						color = MJ_colors.white_switch;
 					elseif blue_pos.row == row and blue_pos.col == col and MJ_get_color(cur_pos.col, cur_pos.row) == 'blue' then
-						color = MJ_blue_switch;
+						color = MJ_colors.blue_switch;
 					end
 				end
 
@@ -1556,7 +2218,7 @@ local function draw_mj_minimap()
 					--gui.drawText(x, y, "N");
 				end
 
-				if kong_position.row == row and kong_position.col == col then
+				if kongPosition.row == row and kongPosition.col == col then
 					gui.drawImage(image_directory_root.."TinyFaceEdited.png", x, y, MJ_minimap_width, MJ_minimap_height);
 					--gui.drawText(x, y, "K");
 				end
@@ -1564,9 +2226,9 @@ local function draw_mj_minimap()
 		end
 
 		-- Text info
-		local phase_byte = mainmemory.readbyte(MJ_state + MJ_action_type);
-		local actions_remaining = mainmemory.readbyte(MJ_state + MJ_actions_remaining);
-		local time_until_next_action = mainmemory.readbyte(MJ_state + MJ_time_until_next_action);
+		local phase_byte = mainmemory.readbyte(MJ_state + MJ_offsets["action_type"]);
+		local actions_remaining = mainmemory.readbyte(MJ_state + MJ_offsets["actions_remaining"]);
+		local time_until_next_action = mainmemory.readbyte(MJ_state + MJ_offsets["ticks_until_next_action"]);
 
 		local phase = MJ_get_phase(phase_byte);
 		local action_type = MJ_get_action_type(phase_byte);
@@ -1587,12 +2249,10 @@ end
 -- Written by Isotarge, 2014-2015 --
 ------------------------------------
 
--- Relative to slope object
-local slope_timer = 0xC3;
-
-local function neverSlip()
+function Game.neverSlip()
 	if version == 1 then -- TODO: PAL, JP, Kiosk
 		-- Patch the slope timer
+		local slope_timer = 0xC3; -- TODO: This is relative to the player object, figure out the actual offset and replace "slope_object_pointer" which is actually player + x
 		local slopeObject = mainmemory.read_u32_be(Game.Memory.slope_object_pointer[version]);
 		if isPointer(slopeObject) then
 			slopeObject = slopeObject - RDRAMBase;
@@ -1628,15 +2288,15 @@ end
 -- Lag configuration --
 -----------------------
 
-local min_lag_factor = -30;
-local max_lag_factor = 20;
 local lag_factor = 1;
 
 local function increase_lag_factor()
+	local max_lag_factor = 20;
 	lag_factor = math.min(max_lag_factor, lag_factor + 1);
 end
 
 local function decrease_lag_factor()
+	local min_lag_factor = -30;
 	lag_factor = math.max(min_lag_factor, lag_factor - 1);
 end
 
@@ -1660,7 +2320,7 @@ local function toggle_moonmode()
 	elseif moon_mode == 'All' then
 		moon_mode = 'None';
 	end
-	Game.eachFrame();
+	Game.eachFrame(); -- TODO: no bueno, update HUD in Game.realtime() instead
 end
 
 -----------------------
@@ -1668,14 +2328,19 @@ end
 -----------------------
 
 function everythingIsKong()
-	local kongSharedModel = mainmemory.read_u32_be(getPlayerObject() + model_pointer);
+	local playerObject = Game.getPlayerObject();
+	if not isRDRAM(playerObject) then
+		return false;
+	end
+
+	local kongSharedModel = mainmemory.read_u32_be(playerObject + obj_model1.model_pointer);
 
 	if not isPointer(kongSharedModel) then
 		print("This ain't gonna work...");
-		return;
+		return false;
 	end
 
-	local kongNumBones = mainmemory.readbyte(kongSharedModel - RDRAMBase + num_bones);
+	local kongNumBones = mainmemory.readbyte(kongSharedModel - RDRAMBase + obj_model1.model.num_bones);
 
 	local cameraObject = mainmemory.read_u24_be(Game.Memory.camera_pointer[version] + 1);
 	local actorListIndex = 0;
@@ -1685,19 +2350,18 @@ function everythingIsKong()
 		local objectFound = isRDRAM(pointer);
 
 		if objectFound and (pointer ~= cameraObject) then
-			local modelPointer = mainmemory.read_u24_be(pointer + model_pointer + 1);
+			local modelPointer = mainmemory.read_u24_be(pointer + obj_model1.model_pointer + 1);
 			local hasModel = isRDRAM(modelPointer);
 
-			local actorType = mainmemory.read_u32_be(pointer + actor_type);
-			-- TODO: Merge this table from Grab Objects.lua
-			--if type(actor_types[actorType]) ~= nil then
-			--	actorType = actor_types[actorType];
-			--end
+			local actorType = mainmemory.read_u32_be(pointer + obj_model1.actor_type);
+			if type(obj_model1.actor_types[actorType]) ~= nil then
+				actorType = obj_model1.actor_types[actorType];
+			end
 
 			if hasModel then
-				local numBones = mainmemory.readbyte(modelPointer + num_bones);
+				local numBones = mainmemory.readbyte(modelPointer + obj_model1.model.num_bones);
 				if numBones <= kongNumBones then
-					mainmemory.write_u32_be(pointer + model_pointer, kongSharedModel);
+					mainmemory.write_u32_be(pointer + obj_model1.model_pointer, kongSharedModel);
 					print("Wrote: "..toHexString(pointer).." Bones: "..numBones.." Type: "..actorType);
 				end
 			end
@@ -1706,15 +2370,18 @@ function everythingIsKong()
 end
 
 function Game.setScale(value)
-	for i = 1, #scale do
-		mainmemory.writefloat(getPlayerObject() + scale[i], value, true);
+	local playerObject = Game.getPlayerObject();
+	if isRDRAM(playerObject) then
+		for i = 1, #obj_model1.player.scale do
+			mainmemory.writefloat(playerObject + obj_model1.player.scale[i], value, true);
+		end
 	end
 end
 
 function Game.randomEffect()
 	-- Randomly manipulate the effect byte
 	local randomEffect = math.random(0, 0xFFFF);
-	mainmemory.write_u16_be(getPlayerObject() + effect_byte, randomEffect);
+	mainmemory.write_u16_be(Game.getPlayerObject() + obj_model1.player.effect_byte, randomEffect);
 
 	-- Randomly resize the kong
 	local scaleValue = 0.01 + math.random() * 0.49;
@@ -1727,9 +2394,8 @@ end
 -- Paper Mode --
 ----------------
 
-paper_thickness = 0.015;
-
-function paperMode()
+function Game.paperMode()
+	local paper_thickness = 0.015;
 	local actorListIndex = 0;
 	local cameraObject = mainmemory.read_u24_be(Game.Memory.camera_pointer[version] + 1);
 
@@ -1738,10 +2404,10 @@ function paperMode()
 		local objectFound = isRDRAM(pointer);
 
 		if objectFound and pointer ~= cameraObject then
-			local objectRenderingParameters = mainmemory.read_u32_be(pointer + rendering_parameters_pointer);
+			local objectRenderingParameters = mainmemory.read_u32_be(pointer + obj_model1.rendering_paramaters_pointer);
 			if isPointer(objectRenderingParameters) then
 				objectRenderingParameters = objectRenderingParameters - RDRAMBase;
-				mainmemory.writefloat(objectRenderingParameters + scale_z, paper_thickness, true);
+				mainmemory.writefloat(objectRenderingParameters + obj_model1.rendering_paramaters.scale_z, paper_thickness, true);
 			end
 		end
 	end
@@ -1781,7 +2447,7 @@ local jp_charset = {
 	"ぱ", "ぴ", "ぷ", "ぺ", "ぽ", "ヴ" -- 25
 };
 
-local function toJPString(value)
+function Game.toJPString(value)
 	local length = string.len(value);
 	local tempString = "";
 	local char;
@@ -1804,14 +2470,13 @@ local function toJPString(value)
 	return tempString;
 end
 
-local brb_message_max_length = 79;
 brb_message = "BRB";
 is_brb = false;
 
 function brb(value)
 	local message = value or "BRB";
 	if version == 3 then -- JP
-		message = toJPString(message);
+		message = Game.toJPString(message);
 	else
 		message = string.upper(message);
 	end
@@ -1830,7 +2495,7 @@ end
 local function do_brb()
 	if is_brb then
 		mainmemory.writebyte(Game.Memory.security_byte[version], 0x01);
-		local messageLength = math.min(string.len(brb_message), brb_message_max_length);
+		local messageLength = math.min(string.len(brb_message), 79); -- 79 bytes appears to be the maximum length we can write here without crashing
 		for i = 1, messageLength do
 			mainmemory.writebyte(Game.Memory.security_message[version] + i - 1, string.byte(brb_message, i));
 		end
@@ -1842,13 +2507,8 @@ end
 -- For papa cfox --
 -------------------
 
-local list_previous_pointer = 0x00; -- pointer
-local list_size = 0x04; -- u32_be
-
-max_length = 0x40;
-
 function setText(pointer, message)
-	local messageLength = math.min(string.len(message), max_length);
+	local messageLength = math.min(string.len(message), 40); -- Maximum message length is 40
 	for i = 1, messageLength do
 		mainmemory.writebyte(pointer + i - 1, string.byte(message, i));
 	end
@@ -1877,10 +2537,7 @@ end
 -- Free Trade Agreement --
 --------------------------
 
-local obj_model2_slot_size = 0x90;
-local obj_model2_collectable_state = 0x8C; -- byte long bitfield
-
-BalloonStates = {
+local BalloonStates = {
 	[DK] = 114,
 	[Diddy] = 91,
 	[Lanky] = 113,
@@ -1888,7 +2545,7 @@ BalloonStates = {
 	[Chunky] = 111,
 };
 
-KasplatStates = {
+local KasplatStates = {
 	[DK] = 241,
 	[Diddy] = 242,
 	[Lanky] = 243,
@@ -1912,14 +2569,14 @@ function freeTradeObjectModel1(currentKong)
 	for object_no = 0, max_objects do
 		local pointer = mainmemory.read_u24_be(Game.Memory.pointer_list[version] + (object_no * 4) + 1);
 		if isRDRAM(pointer) then
-			local actorType = mainmemory.read_u32_be(pointer + actor_type);
+			local actorType = mainmemory.read_u32_be(pointer + obj_model1.actor_type);
 			if isKasplat(actorType) then
 				-- Fix which blueprint the Kasplat drops
-				mainmemory.write_u32_be(pointer + actor_type, KasplatStates[currentKong]);
+				mainmemory.write_u32_be(pointer + obj_model1.actor_type, KasplatStates[currentKong]);
 			end
 			if isBalloon(actorType) then
 				-- Fix balloon color
-				mainmemory.write_u32_be(pointer + actor_type, BalloonStates[currentKong]);
+				mainmemory.write_u32_be(pointer + obj_model1.actor_type, BalloonStates[currentKong]);
 			end
 		end
 	end
@@ -2020,7 +2677,7 @@ function freeTradeCollisionList(currentKong)
 	end
 end
 
-GBStates = {
+local GBStates = {
 	[DK] = 0x28,
 	[Diddy] = 0x22,
 	[Lanky] = 0x30,
@@ -2032,18 +2689,15 @@ function isGB(collectableState)
 	return array_contains(GBStates, collectableState);
 end
 
--- TODO: Sort this object model 2 constants mess out
-local obj_model2_behavior_type_pointer = 0x24;
-
 function getScriptName(objectModel2Base)
-	local behaviorTypePointer = mainmemory.read_u32_be(objectModel2Base + obj_model2_behavior_type_pointer);
+	local behaviorTypePointer = mainmemory.read_u32_be(objectModel2Base + obj_model2.behavior_type_pointer);
 	if isPointer(behaviorTypePointer) then
 		return readNullTerminatedString(behaviorTypePointer - RDRAMBase + 0x0C);
 	end
 	return "";
 end
 
-BulletChecks = {
+local BulletChecks = {
 	[DK] = 0x0030,
 	[Diddy] = 0x0024,
 	[Lanky] = 0x002A,
@@ -2055,7 +2709,7 @@ function isBulletCheck(value)
 	return array_contains(BulletChecks, value);
 end
 
-SimSlamChecks = {
+local SimSlamChecks = {
 	[DK] = 0x0002,
 	[Diddy] = 0x0003,
 	[Lanky] = 0x0004,
@@ -2076,9 +2730,9 @@ function ohWrongnana()
 		-- Fill and sort pointer list
 		for i = 0, numSlots - 1 do
 			slotBase = objModel2Array + i * obj_model2_slot_size;
-			currentValue = mainmemory.readbyte(slotBase + obj_model2_collectable_state);
+			currentValue = mainmemory.readbyte(slotBase + obj_model2.collectable_state);
 			if isGB(currentValue) then
-				mainmemory.writebyte(slotBase + obj_model2_collectable_state, GBStates[currentKong]);
+				mainmemory.writebyte(slotBase + obj_model2.collectable_state, GBStates[currentKong]);
 			end
 			scriptName = getScriptName(slotBase);
 			if scriptName == "gunswitches" or scriptName == "buttons" then
@@ -2131,8 +2785,6 @@ end
 -- Framebuffer Jank --
 ----------------------
 
-local framebuffer_size = 320 * 240; -- Oddly enough it's the same size on PAL
-
 function fillFB()
 	local image_filename = forms.openfile(nil, nil, "All Files (*.*)|*.*");
 	if not fileExists(image_filename) then
@@ -2141,11 +2793,416 @@ function fillFB()
 	end
 
 	local frameBufferLocation = mainmemory.read_u24_be(Game.Memory.framebuffer_pointer[version] + 1);
+	local framebuffer_size = 320 * 240; -- Oddly enough it's the same size on PAL
 	if isRDRAM(frameBufferLocation) then
 		replaceTextureRGBA5551(image_filename, frameBufferLocation, framebuffer_size);
 		replaceTextureRGBA5551(image_filename, frameBufferLocation + (framebuffer_size * 2), framebuffer_size);
 	end
 end
+
+-----------------
+-- Grab Script --
+-----------------
+
+local object_index = 1;
+
+hide_non_scripted = false;
+rat_enabled = false;
+
+local function switch_grab_script_mode()
+	grab_script_mode_index = grab_script_mode_index + 1;
+	if grab_script_mode_index > #grab_script_modes then
+		grab_script_mode_index = 1;
+	end
+	grab_script_mode = grab_script_modes[grab_script_mode_index];
+end
+
+local function incrementObjectIndex()
+	object_index = object_index + 1;
+	if object_index > #object_pointers then
+		object_index = 1;
+	end
+end
+
+local function decrementObjectIndex()
+	object_index = object_index - 1;
+	if object_index <= 0 then
+		object_index = #object_pointers;
+	end
+end
+
+local function grab_object(pointer)
+	local playerObject = Game.getPlayerObject();
+	if isRDRAM(playerObject) then
+		mainmemory.writebyte(playerObject + obj_model1.player.grab_pointer, 0x80);
+		mainmemory.write_u24_be(playerObject + obj_model1.player.grab_pointer + 1, pointer);
+		mainmemory.writebyte(playerObject + obj_model1.player.grab_pointer + 4, 0x80);
+		mainmemory.write_u24_be(playerObject + obj_model1.player.grab_pointer + 4 + 1, pointer);
+	end
+end
+
+local function grabSelectedObject()
+	if stringContains(grab_script_mode, "Model 1") then
+		grabObject(object_pointers[object_index]);
+	end
+end
+
+local function focus_object(pointer) -- TODO: There's more pointers to set here, mainly vehicle stuff
+	local cameraObject = mainmemory.read_u24_be(Game.Memory["camera_pointer"][version] + 1);
+	if isRDRAM(cameraObject) then
+		mainmemory.writebyte(cameraObject + obj_model1.camera.focused_actor_pointer, 0x80);
+		mainmemory.write_u24_be(cameraObject + obj_model1.camera.focused_actor_pointer + 1, pointer);
+	end
+end
+
+local function focusSelectedObject()
+	if stringContains(grab_script_mode, "Model 1") then
+		focusObject(object_pointers[object_index]);
+	end
+end
+
+local function zipToSelectedObject()
+	local playerObject = Game.getPlayerObject();
+	if isRDRAM(playerObject) then
+		local desiredX, desiredY, desiredZ;
+		-- Get selected object X,Y,Z position
+		if bizstring.contains(grab_script_mode, "Model 1") then
+			local selectedActorBase = mainmemory.read_u24_be(Game.Memory["pointer_list"][version] + (object_index - 1) * 4 + 1);
+			if isRDRAM(selectedActorBase) then
+				desiredX = mainmemory.readfloat(selectedActorBase + obj_model1.x_pos, true);
+				desiredY = mainmemory.readfloat(selectedActorBase + obj_model1.y_pos, true);
+				desiredZ = mainmemory.readfloat(selectedActorBase + obj_model1.z_pos, true);
+			end
+		elseif bizstring.contains(grab_script_mode, "Model 2") then
+			local model2Array = Game.Memory["obj_model2_array_pointer"][version] + RDRAMBase;
+			if version ~= 4 then
+				model2Array = mainmemory.read_u32_be(Game.Memory["obj_model2_array_pointer"][version]);
+			end
+			if isPointer(model2Array) then
+				model2Array = model2Array - RDRAMBase;
+				local selectedActorBase = model2Array + (object_index - 1) * obj_model2_slot_size;
+
+				desiredX = mainmemory.readfloat(selectedActorBase + obj_model2.x_pos, true);
+				desiredY = mainmemory.readfloat(selectedActorBase + obj_model2.y_pos, true);
+				desiredZ = mainmemory.readfloat(selectedActorBase + obj_model2.z_pos, true);
+			end
+		end
+
+		-- Update player position
+		if type(desiredX) == "number" and type(desiredY) == "number" and type(desiredZ) == "number" then
+			mainmemory.writefloat(playerObject + obj_model1.x_pos, desiredX, true);
+			mainmemory.writefloat(playerObject + obj_model1.y_pos, desiredY, true);
+			mainmemory.writefloat(playerObject + obj_model1.z_pos, desiredZ, true);
+
+			-- Allow movement when locked to pads etc
+			mainmemory.writebyte(playerObject + obj_model1.locked_to_pad, 0x00);
+			mainmemory.write_u32_be(playerObject + obj_model1.lock_method_1_pointer, 0x00);
+		end
+	end
+end
+
+ScriptHawk.bindKeyRealtime("N", decrementObjectIndex, true);
+ScriptHawk.bindKeyRealtime("M", incrementObjectIndex, true);
+ScriptHawk.bindKeyRealtime("Z", zipToSelectedObject, true);
+ScriptHawk.bindKeyRealtime("B", focusSelectedObject, true);
+ScriptHawk.bindKeyRealtime("C", switch_grab_script_mode, true);
+
+------------------------------
+-- Grab Script              --
+-- Object Model 1 Functions --
+------------------------------
+
+local function isValidModel1Object(pointer, playerObject, cameraObject)
+	local modelPointer = mainmemory.read_u32_be(pointer + obj_model1.model_pointer);
+	local hasModel = isPointer(modelPointer);
+
+	if encircle_enabled then
+		return hasModel and pointer ~= playerObject;
+	end
+
+	return true;
+end
+
+local function populateObjectModel1Pointers()
+	local playerObject = Game.getPlayerObject();
+	if isRDRAM(playerObject) then
+		local cameraObject = mainmemory.read_u24_be(Game.Memory["camera_pointer"][version] + 1);
+
+		object_pointers = {};
+		for object_no = 0, max_objects do
+			local pointer = mainmemory.read_u32_be(Game.Memory["pointer_list"][version] + (object_no * 4));
+			if isPointer(pointer) and isValidModel1Object(pointer - RDRAMBase, playerObject, cameraObject) then
+				table.insert(object_pointers, pointer - RDRAMBase);
+			end
+		end
+
+		-- Clamp index
+		object_index = math.min(object_index, math.max(1, #object_pointers));
+	end
+end
+
+local function encirclePlayerObjectModel1()
+	if encircle_enabled and stringContains(grab_script_mode, "Model 1") then
+		local playerObject = Game.getPlayerObject();
+		if isRDRAM(playerObject) then
+			local x, z;
+			local xPos = mainmemory.readfloat(playerObject + obj_model1.x_pos, true);
+			local yPos = mainmemory.readfloat(playerObject + obj_model1.y_pos, true);
+			local zPos = mainmemory.readfloat(playerObject + obj_model1.z_pos, true);
+
+			for i = 1, #object_pointers do
+				x = xPos + math.cos(math.pi * 2 * i / #object_pointers) * radius;
+				z = zPos + math.sin(math.pi * 2 * i / #object_pointers) * radius;
+
+				mainmemory.writefloat(object_pointers[i] + obj_model1.x_pos, x, true);
+				mainmemory.writefloat(object_pointers[i] + obj_model1.y_pos, yPos, true);
+				mainmemory.writefloat(object_pointers[i] + obj_model1.z_pos, z, true);
+			end
+		end
+	end
+end
+
+-----------------------
+-- Kremling Kosh Bot --
+-----------------------
+
+local kremling_kosh_joypad_angles = {
+	[0] = {["X Axis"] = 0,    ["Y Axis"] = 0},
+	[1] = {["X Axis"] = -128, ["Y Axis"] = 0},
+	[2] = {["X Axis"] = -128, ["Y Axis"] = -128},
+	[3] = {["X Axis"] = 0,    ["Y Axis"] = -128},
+	[4] = {["X Axis"] = 127,  ["Y Axis"] = -128},
+	[5] = {["X Axis"] = 127,  ["Y Axis"] = 0},
+	[6] = {["X Axis"] = 127,  ["Y Axis"] = 127},
+	[7] = {["X Axis"] = 0,    ["Y Axis"] = 127},
+	[8] = {["X Axis"] = -128, ["Y Axis"] = 127},
+};
+
+function getKoshController()
+	for i = 1, #object_pointers do
+		local currentActorType = mainmemory.read_u32_be(object_pointers[i] + obj_model1.actor_type);
+		if type(obj_model1.actor_types[currentActorType]) ~= "nil" then
+			currentActorType = obj_model1.actor_types[currentActorType];
+		end
+		if currentActorType == "Kremling Kosh Controller" then
+			return object_pointers[i];
+		end
+	end
+end
+
+function countMelonProjectiles()
+	local melonCount = 0;
+	for i = 1, #object_pointers do
+		local currentActorType = mainmemory.read_u32_be(object_pointers[i] + obj_model1.actor_type);
+		if type(obj_model1.actor_types[currentActorType]) ~= "nil" then
+			currentActorType = obj_model1.actor_types[currentActorType];
+		end
+		if currentActorType == "Melon (Projectile)" then
+			melonCount = melonCount + 1;
+		end
+	end
+	return melonCount;
+end
+
+function getSlotPointer(koshController, slotIndex)
+	return mainmemory.read_u32_be(koshController + obj_model1.kosh_kontroller.slot_pointer_base + (slotIndex - 1) * 4);
+end
+
+function getCurrentSlot()
+	local koshController = getKoshController();
+	if type(koshController) ~= "nil" then
+		return mainmemory.readbyte(koshController + obj_model1.kosh_kontroller.slot_location);
+	end
+end
+
+local shots_fired = {
+	0, 0, 0, 0, 0, 0, 0, 0
+};
+
+function getDesiredSlot()
+	local koshController = getKoshController();
+	if type(koshController) ~= "nil" then
+		local currentSlot = mainmemory.readbyte(koshController + obj_model1.kosh_kontroller.slot_location);
+		local melonsRemaining = mainmemory.readbyte(koshController + obj_model1.kosh_kontroller.melons_remaining);
+		if melonsRemaining == 0 then
+			return 0;
+		end
+
+		-- Check for kremlings
+		local slotIndex = 0;
+		local desiredSlot = 0;
+		for slotIndex = 1,8 do
+			local slotPointer = getSlotPointer(koshController, slotIndex)
+			if slotPointer > 0 and slotPointer ~= shots_fired[slotIndex] then
+				desiredSlot = slotIndex;
+			end
+			if slotPointer == 0 then
+				shots_fired[slotIndex] = 0;
+			end
+		end
+
+		if desiredSlot > 0 then
+			return desiredSlot;
+		end
+	end
+end
+
+local previousFrameB = false;
+function koshBotLoop()
+	if not emu.islagged() then
+		local currentSlot = getCurrentSlot();
+		local desiredSlot = getDesiredSlot();
+		if type(desiredSlot) ~= "nil" then
+			joypad.setanalog(kremling_kosh_joypad_angles[desiredSlot], 1);
+			--print("Moving to slot "..desiredSlot);
+			if currentSlot == desiredSlot then
+				if desiredSlot > 0 then
+					local koshController = getKoshController();
+					shots_fired[desiredSlot] = getSlotPointer(koshController, desiredSlot);
+				end
+				previousFrameB = not previousFrameB;
+				joypad.set({["B"] = true}, 1);
+				--print("Firing!");
+			end
+		else
+			joypad.setanalog({["X Axis"] = false, ["Y Axis"] = false}, 1);
+		end
+	end
+end
+
+local function draw_grab_script_ui()
+	local gui_x = 32;
+	local gui_y = 32;
+	local row = 0;
+	local height = 16;
+
+	local green_highlight = 0xFF00FF00;
+	local yellow_highlight = 0xFFFFFF00;
+
+	local playerObject = Game.getPlayerObject();
+	local cameraObject = mainmemory.read_u24_be(Game.Memory["camera_pointer"][version] + 1);
+
+	if stringContains(grab_script_mode, "Model 1") then
+		populateObjectModel1Pointers();
+		encirclePlayerObjectModel1();
+	end
+
+	if stringContains(grab_script_mode, "Model 2") then
+		populateObjectModel2Pointers();
+		encirclePlayerObjectModel2();
+	end
+
+	if rat_enabled then
+		local renderingParams = mainmemory.read_u24_be(playerObject + obj_model1.rendering_paramaters_pointer + 1);
+		if isRDRAM(renderingParams) then
+			if math.random() > 0.9 then
+				local timerValue = math.random() * 50;
+				mainmemory.writefloat(renderingParams + obj_model1.rendering_paramaters.anim_timer1, timerValue, true);
+				mainmemory.writefloat(renderingParams + obj_model1.rendering_paramaters.anim_timer2, timerValue, true);
+				mainmemory.writefloat(renderingParams + obj_model1.rendering_paramaters.anim_timer3, timerValue, true);
+				mainmemory.writefloat(renderingParams + obj_model1.rendering_paramaters.anim_timer4, timerValue, true);
+			end
+		end
+	end
+
+	gui.text(gui_x, gui_y + height * row, "Mode: "..grab_script_mode, nil, nil, 'bottomright');
+	row = row + 1;
+
+	if stringContains(grab_script_mode, "Model 2") then
+		gui.text(gui_x, gui_y + height * row, "Array Size: "..getObjectModel2ArraySize(), nil, nil, 'bottomright');
+		row = row + 1;
+	end
+
+	gui.text(gui_x, gui_y + height * row, "Index: "..object_index.."/"..#object_pointers, nil, nil, 'bottomright');
+	row = row + 1;
+
+	if stringContains(grab_script_mode, "Model 1") then
+		-- Display which object is grabbed
+		gui.text(gui_x, gui_y + height * row, "Grabbed object: "..toHexString(mainmemory.read_u24_be(playerObject + obj_model1.player.grab_pointer + 1), 6), nil, nil, 'bottomright');
+		row = row + 1;
+
+		-- Display which object the camera is currently focusing on
+		gui.text(gui_x, gui_y + height * row, "Focused object: "..toHexString(mainmemory.read_u24_be(cameraObject + obj_model1.camera.focused_actor_pointer + 1), 6), nil, nil, 'bottomright');
+		row = row + 1;
+	end
+
+	-- Clamp index to number of objects
+	if #object_pointers > 0 and object_index > #object_pointers then
+		object_index = #object_pointers;
+	end
+
+	if #object_pointers > 0 and object_index <= #object_pointers then
+		if bizstring.contains(grab_script_mode, "Examine") then
+			local examine_data = {};
+			if grab_script_mode == "Examine (Object Model 1)" then
+				examine_data = getExamineDataModelOne(object_pointers[object_index]);
+			elseif grab_script_mode == "Examine (Object Model 2)" then
+				examine_data = getExamineDataModelTwo(object_pointers[object_index]);
+			end
+
+			for i = #examine_data, 1, -1 do
+				if examine_data[i][1] ~= "Separator" then
+					gui.text(gui_x, gui_y + height * row, examine_data[i][1]..": "..examine_data[i][2], nil, nil, 'bottomright');
+					row = row + 1;
+				else
+					row = row + examine_data[i][2];
+				end
+			end
+		end
+
+		if grab_script_mode == "List (Object Model 1)" then
+			row = row + 1;
+			for i = #object_pointers, 1, -1 do
+				local currentActorType = mainmemory.read_u32_be(object_pointers[i] + obj_model1.actor_type);
+				local currentActorSize = mainmemory.read_u32_be(object_pointers[i] + object_size); -- TODO: Got an exception here while kiosk was booting
+				if type(obj_model1.actor_types[currentActorType]) ~= "nil" then
+					currentActorType = obj_model1.actor_types[currentActorType];
+				end
+				local color = nil;
+				if object_index == i then
+					color = yellow_highlight;
+				end
+				if object_pointers[i] == playerObject then
+					color = green_highlight;
+				end
+				gui.text(gui_x, gui_y + height * row, i..": "..currentActorType.." "..toHexString(object_pointers[i] or 0, 6).." ("..toHexString(currentActorSize)..")", color, nil, 'bottomright');
+				row = row + 1;
+			end
+		end
+
+		if grab_script_mode == "List (Object Model 2)" then
+			for i = #object_pointers, 1, -1 do
+				local behaviorPointer = mainmemory.read_u32_be(object_pointers[i] + obj_model2.behavior_pointer);
+				local collectableState = mainmemory.readbyte(object_pointers[i] + obj_model2.collectable_state);
+				if behaviorPointer > 0 then
+					behaviorPointer = " ("..toHexString(behaviorPointer or 0, 8)..")";
+				else
+					behaviorPointer = "";
+				end
+				local color = nil;
+				if isGB(collectableState) then
+					color = yellow_highlight;
+				end
+				if object_index == i then
+					color = green_highlight
+				end
+
+				local behaviorType = "";
+				local behaviorTypePointer = mainmemory.read_u32_be(object_pointers[i] + obj_model2.behavior_type_pointer);
+				if isPointer(behaviorTypePointer) then
+					behaviorType = " "..behaviorType..readNullTerminatedString(behaviorTypePointer - RDRAMBase + 0x0C);
+				end
+
+				if not (behaviorPointer == "" and hide_non_scripted) then
+					gui.text(gui_x, gui_y + height * row, i..": "..toHexString(object_pointers[i] or 0, 6)..behaviorType..behaviorPointer, color, nil, 'bottomright');
+					row = row + 1;
+				end
+			end
+		end
+	end
+end
+
+event.onframestart(draw_grab_script_ui, "ScriptHawk - Object model analysis main loop");
 
 ------------
 -- Events --
@@ -2233,6 +3290,8 @@ end
 -- High Score Stuff --
 ----------------------
 
+--[[
+
 local arcadeScores = { -- TODO: How long can these names be
 	{"AAA", 0}, -- TODO: Get some good scores with proof
 };
@@ -2272,6 +3331,8 @@ function Game.setHighScores()
 	-- TODO
 end
 
+]]--
+
 function Game.unlock_menus()
 	if version ~= 4 then -- Anything but the Kiosk version
 		mainmemory.write_u32_be(Game.Memory.menu_flags[version], 0xFFFFFFFF);
@@ -2307,7 +3368,6 @@ end
 -- Color setters --
 -------------------
 
-local actor_texture_renderer_pointer = 0x158;
 local texture_renderer_texture_index = 0x0C; -- u16_be
 local texture_renderer_next_renderer = 0x24; -- u32_be
 
@@ -2316,8 +3376,8 @@ function getNextTextureRenderer(texturePointer)
 end
 
 function Game.getTextureRenderers()
-	local playerObject = getPlayerObject();
-	local texturePointer = mainmemory.read_u24_be(playerObject + actor_texture_renderer_pointer + 1);
+	local playerObject = Game.getPlayerObject();
+	local texturePointer = mainmemory.read_u24_be(playerObject + obj_model1.texture_renderer_pointer + 1);
 
 	while isRDRAM(texturePointer) do
 		print(toHexString(texturePointer));
@@ -2325,26 +3385,26 @@ function Game.getTextureRenderers()
 	end
 end
 
-local DKBodyColors = {
-	{"Normal", 0},
-	{"Light Blue", 1},
-	{"Light Green", 2},
-	{"Purple", 3},
-	{"Bright Orange", 16},
-	{"Yellow", 19},
-};
-
-local DKTieColors = {
-	{"Red (Normal)", 0},
-	{"Purple", 1},
-	{"Blue", 2},
-	{"Yellow", 3},
-};
-
 function Game.setDKColors()
-	local playerObject = getPlayerObject();
+	local playerObject = Game.getPlayerObject();
 	if isRDRAM(playerObject) then
-		local texturePointer = mainmemory.read_u24_be(playerObject + actor_texture_renderer_pointer + 1);
+		local DKBodyColors = {
+			{"Normal", 0},
+			{"Light Blue", 1},
+			{"Light Green", 2},
+			{"Purple", 3},
+			{"Bright Orange", 16},
+			{"Yellow", 19},
+		};
+
+		local DKTieColors = {
+			{"Red (Normal)", 0},
+			{"Purple", 1},
+			{"Blue", 2},
+			{"Yellow", 3},
+		};
+
+		local texturePointer = mainmemory.read_u24_be(playerObject + obj_model1.texture_renderer_pointer + 1);
 
 		if isRDRAM(texturePointer) then
 			texturePointer = getNextTextureRenderer(texturePointer); -- Skip eyes
@@ -2361,20 +3421,20 @@ function Game.setDKColors()
 	end
 end
 
-local DiddyHatColors = {
-	{"Red (Normal)", 0},
-	{"Dark Blue", 1},
-	{"Yellow", 2},
-	{"Blue", 3},
-	{"Purple", 19},
-	{"Dark Red", 24},
-	{"Green", 26},
-}
-
 function Game.setDiddyColors()
-	local playerObject = getPlayerObject();
+	local playerObject = Game.getPlayerObject();
 	if isRDRAM(playerObject) then
-		local texturePointer = mainmemory.read_u24_be(playerObject + actor_texture_renderer_pointer + 1);
+		local DiddyHatColors = {
+			{"Red (Normal)", 0},
+			{"Dark Blue", 1},
+			{"Yellow", 2},
+			{"Blue", 3},
+			{"Purple", 19},
+			{"Dark Red", 24},
+			{"Green", 26},
+		}
+
+		local texturePointer = mainmemory.read_u24_be(playerObject + obj_model1.texture_renderer_pointer + 1);
 
 		if isRDRAM(texturePointer) then
 			texturePointer = getNextTextureRenderer(texturePointer); -- Skip Left eye
@@ -2386,18 +3446,18 @@ function Game.setDiddyColors()
 	end
 end
 
-local LankyTopColors = {
-	{"Blue (Normal)", 0},
-	{"Green", 1},
-	{"Purple", 2},
-	{"Red", 3},
-	{"Yellow", 27},
-}
-
 function Game.setLankyColors()
-	local playerObject = getPlayerObject();
+	local playerObject = Game.getPlayerObject();
 	if isRDRAM(playerObject) then
-		local texturePointer = mainmemory.read_u24_be(playerObject + actor_texture_renderer_pointer + 1);
+		local LankyTopColors = {
+			{"Blue (Normal)", 0},
+			{"Green", 1},
+			{"Purple", 2},
+			{"Red", 3},
+			{"Yellow", 27},
+		};
+
+		local texturePointer = mainmemory.read_u24_be(playerObject + obj_model1.texture_renderer_pointer + 1);
 
 		if isRDRAM(texturePointer) then
 			texturePointer = getNextTextureRenderer(texturePointer); -- Skip eyes
@@ -2410,17 +3470,17 @@ function Game.setLankyColors()
 	end
 end
 
-local TinyBodyColors = {
-	{"Blue (Normal)", 0},
-	{"Green", 1},
-	{"Purple", 2},
-	{"Orange", 3},
-};
-
 function Game.setTinyColors()
-	local playerObject = getPlayerObject();
+	local playerObject = Game.getPlayerObject();
 	if isRDRAM(playerObject) then
-		local texturePointer = mainmemory.read_u24_be(playerObject + actor_texture_renderer_pointer + 1);
+		local TinyBodyColors = {
+			{"Blue (Normal)", 0},
+			{"Green", 1},
+			{"Purple", 2},
+			{"Orange", 3},
+		};
+
+		local texturePointer = mainmemory.read_u24_be(playerObject + obj_model1.texture_renderer_pointer + 1);
 
 		if isRDRAM(texturePointer) then
 			texturePointer = getNextTextureRenderer(texturePointer); -- Skip Left eye
@@ -2432,28 +3492,28 @@ function Game.setTinyColors()
 	end
 end
 
-local ChunkyBackColors = {
-	{"Green + Yellow (Normal)", 0},
-	{"Red + Yellow", 1},
-	{"Blue + Light Blue", 2},
-	{"Purple + Pink", 3},
-	{"Blue", 16},
-	{"Red", 17},
-	{"Purple", 18},
-	{"Green", 19},
-};
-
-local ChunkyFrontColors = {
-	{"Blue (Normal)", 0},
-	{"Red", 1},
-	{"Purple", 2},
-	{"Green", 3},
-}
-
 function Game.setChunkyColors()
-	local playerObject = getPlayerObject();
+	local playerObject = Game.getPlayerObject();
 	if isRDRAM(playerObject) then
-		local texturePointer = mainmemory.read_u24_be(playerObject + actor_texture_renderer_pointer + 1);
+		local ChunkyBackColors = {
+			{"Green + Yellow (Normal)", 0},
+			{"Red + Yellow", 1},
+			{"Blue + Light Blue", 2},
+			{"Purple + Pink", 3},
+			{"Blue", 16},
+			{"Red", 17},
+			{"Purple", 18},
+			{"Green", 19},
+		};
+
+		local ChunkyFrontColors = {
+			{"Blue (Normal)", 0},
+			{"Red", 1},
+			{"Purple", 2},
+			{"Green", 3},
+		};
+
+		local texturePointer = mainmemory.read_u24_be(playerObject + obj_model1.texture_renderer_pointer + 1);
 
 		if isRDRAM(texturePointer) then
 			texturePointer = getNextTextureRenderer(texturePointer); -- Skip Eyes
@@ -2468,17 +3528,17 @@ function Game.setChunkyColors()
 	end
 end
 
-local KrushaColors = {
-	{"Blue (Normal)", 0},
-	{"Green", 1},
-	{"Purple", 2},
-	{"Yellow", 3},
-}
-
 function Game.setKrushaColors()
-	local playerObject = getPlayerObject();
+	local playerObject = Game.getPlayerObject();
 	if isRDRAM(playerObject) then
-		local texturePointer = mainmemory.read_u24_be(playerObject + actor_texture_renderer_pointer + 1);
+		local KrushaColors = {
+			{"Blue (Normal)", 0},
+			{"Green", 1},
+			{"Purple", 2},
+			{"Yellow", 3},
+		};
+
+		local texturePointer = mainmemory.read_u24_be(playerObject + obj_model1.texture_renderer_pointer + 1);
 
 		if isRDRAM(texturePointer) then
 			texturePointer = getNextTextureRenderer(texturePointer); -- Skip Eyes
@@ -2508,12 +3568,15 @@ end
 function Game.eachFrame()
 	map_value = Game.getMap();
 	updateCurrentInvisify();
+	koshBotLoop();
+	forceTBS();
+	draw_grab_script_ui();
 
 	-- TODO: Allow user to toggle this
 	Game.unlock_menus();
 
 	-- Force STVW
-	--local player = getPlayerObject();
+	--local player = Game.getPlayerObject();
 	--local yRot = Game.getYRotation();
 	--if yRot < Game.max_rot_units then
 	--		Game.setYRotation(yRot + Game.max_rot_units);
@@ -2533,11 +3596,11 @@ function Game.eachFrame()
 	end
 
 	--if forms.ischecked(ScriptHawkUI.form_controls["Toggle Neverslip Checkbox"]) then
-	--	neverSlip();
+	--	Game.neverSlip();
 	--end
 
-	if forms.ischecked(ScriptHawkUI.form_controls["Toggle Paper Mode Checkbox"]) then
-		paperMode();
+	if type(ScriptHawkUI.form_controls["Toggle Paper Mode Checkbox"]) ~= "nil" and forms.ischecked(ScriptHawkUI.form_controls["Toggle Paper Mode Checkbox"]) then
+		Game.paperMode();
 	end
 
 	-- OhWrongnana
@@ -2546,7 +3609,7 @@ function Game.eachFrame()
 	end
 
 	-- Mad Jack
-	draw_mj_minimap();
+	Game.drawMJMinimap();
 
 	-- ISG Timer
 	if type(ScriptHawkUI.form_controls["Toggle ISG Timer"]) ~= "nil" and forms.ischecked(ScriptHawkUI.form_controls["Toggle ISG Timer"]) then
@@ -2563,8 +3626,8 @@ function Game.eachFrame()
 	process_flag_queue();
 
 	-- Moonkick
-	if moon_mode == 'All' or (moon_mode == 'Kick' and mainmemory.readbyte(getPlayerObject() + animation_type) == kick_animation_value) then
-		mainmemory.writefloat(getPlayerObject() + y_acceleration, -2.5, true);
+	if moon_mode == 'All' or (moon_mode == 'Kick' and mainmemory.readbyte(Game.getPlayerObject() + obj_model1.player.animation_type) == obj_model1.player.animation_types.kick) then
+		mainmemory.writefloat(Game.getPlayerObject() + obj_model1.y_acceleration, -2.5, true);
 	end
 
 	-- Check EEPROM checksums
