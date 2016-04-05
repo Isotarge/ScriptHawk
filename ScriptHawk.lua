@@ -1009,6 +1009,13 @@ local function plot_pos()
 		firstframe = false;
 	end
 
+	if lock_y then -- TODO: Checkbox
+		if y < prev_y then
+			Game.setYPosition(prev_y);
+			y = prev_y;
+		end
+	end
+
 	if Game.isPhysicsFrame() then
 		if math.abs(current_frame - previous_frame) > 1 then
 			dx = 0;
