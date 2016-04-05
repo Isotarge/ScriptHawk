@@ -2847,7 +2847,7 @@ local function grabSelectedObject()
 	end
 end
 
-local function focus_object(pointer) -- TODO: There's more pointers to set here, mainly vehicle stuff
+local function focusObject(pointer) -- TODO: There's more pointers to set here, mainly vehicle stuff
 	local cameraObject = mainmemory.read_u24_be(Game.Memory["camera_pointer"][version] + 1);
 	if isRDRAM(cameraObject) then
 		mainmemory.writebyte(cameraObject + obj_model1.camera.focused_actor_pointer, 0x80);
