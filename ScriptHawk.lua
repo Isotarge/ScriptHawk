@@ -138,8 +138,10 @@ getColor = getColour; -- To speak Americano
 -- Finds the root of a linked list
 function find_root(object)
 	local count = 0;
+	local prev_object = object;
 	while object > 0 do
-		dprint(count..": "..toHexString(object));
+		dprint(count..": "..toHexString(object + 0x10).." Size: "..toHexString(prev_object - object));
+		prev_object = object;
 		object = mainmemory.read_u24_be(object + 1);
 		count = count + 1;
 	end
@@ -151,7 +153,7 @@ findRoot = find_root;
 function find_root_size(object)
 	local count = 0;
 	while object > 0 do
-		dprint(count..": "..toHexString(object).." Size: "..toHexString(mainmemory.read_u32_be(object + 4)));
+		dprint(count..": "..toHexString(object + 0x10).." Size: "..toHexString(mainmemory.read_u32_be(object + 4)));
 		object = mainmemory.read_u24_be(object + 1);
 		count = count + 1;
 	end
