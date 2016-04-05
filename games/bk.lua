@@ -1295,7 +1295,7 @@ function Game.initUI()
 	options_fire_all_button = forms.button(ScriptHawkUI.options_form, "Fire all", fireAllSlots, ScriptHawkUI.col(10), ScriptHawkUI.row(5), ScriptHawkUI.col(4) + 8, ScriptHawkUI.button_height);
 
 	-- Moves
-	--options_moves_dropdown = forms.dropdown(ScriptHawkUI.options_form, { "0. None", "1. Spiral Mountain 100%", "2. FFM Setup", "3. All", "3. Demo" }, ScriptHawkUI.col(10) + ScriptHawkUI.dropdown_offset, ScriptHawkUI.row(7) + ScriptHawkUI.dropdown_offset);
+	options_moves_dropdown = forms.dropdown(ScriptHawkUI.options_form, { "0. None", "1. Spiral Mountain 100%", "2. FFM Setup", "3. All", "3. Demo" }, ScriptHawkUI.col(10) + ScriptHawkUI.dropdown_offset, ScriptHawkUI.row(7) + ScriptHawkUI.dropdown_offset);
 	options_moves_button = forms.button(ScriptHawkUI.options_form, "Unlock Moves", unlock_moves, ScriptHawkUI.col(5), ScriptHawkUI.row(7), ScriptHawkUI.col(4) + 8, ScriptHawkUI.button_height);
 end
 
