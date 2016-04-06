@@ -437,6 +437,8 @@ local obj_model1 = {
 		[0x3E] = "Camera zooms out",
 		[0x4E] = "Surface swimming",
 		[0x4F] = "Underwater",
+		[0x5B] = "Grabbed Ledge",
+		[0x5C] = "Pulling up on Ledge",
 	},
 	["texture_renderer_pointer"] = 0x158, -- u32_be
 	["shade_byte"] = 0x16D,
