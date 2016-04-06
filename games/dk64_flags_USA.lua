@@ -15,7 +15,7 @@ local flag_array = {
 	{["byte"] = 0x00, ["bit"] = 3, ["name"] = "Japes: DK: Babboon blast GB", ["type"] = "GB"},
 	{["byte"] = 0x00, ["bit"] = 4, ["name"] = "Japes: DK: GB in front of Diddy's cage", ["type"] = "GB"},
 	{["byte"] = 0x00, ["bit"] = 5, ["name"] = "Japes: DK: GB in Diddy's cage", ["type"] = "GB"},
-	{["byte"] = 0x00, ["bit"] = 6, ["name"] = "Kong Unlocked: Diddy"},
+	{["byte"] = 0x00, ["bit"] = 6, ["name"] = "Kong Unlocked: Diddy", ["type"] = "Kong"},
 	{["byte"] = 0x00, ["bit"] = 7, ["name"] = "Japes: Feather gate open"},
 
 	{["byte"] = 0x01, ["bit"] = 0, ["name"] = "Japes: Tiny: Stump GB", ["type"] = "GB"},
@@ -81,11 +81,11 @@ local flag_array = {
 
 	{["byte"] = 0x08, ["bit"] = 0, ["name"] = "Aztec: Chunky GB: Rotating room", ["type"] = "GB"},
 	{["byte"] = 0x08, ["bit"] = 1, ["name"] = "Aztec: Tiny GB: Tiny temple", ["type"] = "GB"},
-	{["byte"] = 0x08, ["bit"] = 2, ["name"] = "Kong Unlocked: Tiny"},
+	{["byte"] = 0x08, ["bit"] = 2, ["name"] = "Kong Unlocked: Tiny", ["type"] = "Kong"},
 	{["byte"] = 0x08, ["bit"] = 3, ["name"] = "Aztec: Diddy GB: Tiny Temple", ["type"] = "GB"},
 	{["byte"] = 0x08, ["bit"] = 4, ["name"] = "Aztec: Lanky: Vulture GB", ["type"] = "GB"},
 	{["byte"] = 0x08, ["bit"] = 5, ["name"] = "Aztec: Tiny Temple ice melted"},
-	{["byte"] = 0x08, ["bit"] = 6, ["name"] = "Kong Unlocked: Lanky"},
+	{["byte"] = 0x08, ["bit"] = 6, ["name"] = "Kong Unlocked: Lanky", ["type"] = "Kong"},
 	{["byte"] = 0x08, ["bit"] = 7, ["name"] = "Aztec: Tiny GB: Llama temple", ["type"] = "GB"},
 
 	{["byte"] = 0x09, ["bit"] = 0, ["name"] = "Aztec: Lanky GB: Matching game", ["type"] = "GB"},
@@ -138,7 +138,7 @@ local flag_array = {
 	{["byte"] = 0x0E, ["bit"] = 4, ["name"] = "Factory: Tiny GB: Production room", ["type"] = "GB"},
 	{["byte"] = 0x0E, ["bit"] = 2, ["name"] = "Factory: Chunky GB: Production room", ["type"] = "GB"},
 	{["byte"] = 0x0E, ["bit"] = 3, ["name"] = "Factory: Lanky GB: Production room", ["type"] = "GB"},
-	{["byte"] = 0x0E, ["bit"] = 5, ["name"] = "Kong Unlocked: Chunky"},
+	{["byte"] = 0x0E, ["bit"] = 5, ["name"] = "Kong Unlocked: Chunky", ["type"] = "Kong"},
 	{["byte"] = 0x0E, ["bit"] = 6, ["name"] = "Factory: Lanky GB: Free Chunky", ["type"] = "GB"},
 	{["byte"] = 0x0E, ["bit"] = 7, ["name"] = "Factory: Dark Room Gate"},
 
@@ -155,7 +155,7 @@ local flag_array = {
 	{["byte"] = 0x10, ["bit"] = 1, ["name"] = "Factory: Arcade Lever"},
 	{["byte"] = 0x10, ["bit"] = 2, ["name"] = "Factory: DK GB: Arcade", ["type"] = "GB"},
 	{["byte"] = 0x10, ["bit"] = 3, ["name"] = "Factory: Arcade LV3"},
-	{["byte"] = 0x10, ["bit"] = 4, ["name"] = "Nintendo Coin"},
+	{["byte"] = 0x10, ["bit"] = 4, ["name"] = "Nintendo Coin", ["type"] = "Coin"},
 	{["byte"] = 0x10, ["bit"] = 5, ["name"] = "Factory: Chunky R&D Gate open"},
 	{["byte"] = 0x10, ["bit"] = 6, ["name"] = "Factory: Diddy GB: Beaver bother", ["type"] = "GB"},
 	{["byte"] = 0x10, ["bit"] = 7, ["name"] = "Factory: Diddy GB: Block Tower", ["type"] = "GB"},
@@ -418,13 +418,13 @@ local flag_array = {
 	{["byte"] = 0x2F, ["bit"] = 0, ["name"] = "Wrinkly FTT", ["type"] = "FTT"}, -- TODO: Test this
 	{["byte"] = 0x2F, ["bit"] = 1, ["name"] = "Camera/Shockwave"},
 	{["byte"] = 0x2F, ["bit"] = 2, ["name"] = "Training Grounds: Treehouse Squawk Cutscene"},
-	{["byte"] = 0x2F, ["bit"] = 3, ["name"] = "Rareware Coin", ["type"] = "Type"},
+	{["byte"] = 0x2F, ["bit"] = 3, ["name"] = "Rareware Coin", ["type"] = "Coin"},
 	{["byte"] = 0x2F, ["bit"] = 4, ["name"] = "Key 8", ["type"] = "Key"},
 	{["byte"] = 0x2F, ["bit"] = 5, ["name"] = "Isles: DK GB: Japes boulder", ["type"] = "GB"},
 	{["byte"] = 0x2F, ["bit"] = 6, ["name"] = "B. Locker FTT", ["type"] = "FTT"},
 	{["byte"] = 0x2F, ["bit"] = 7, ["name"] = "Training Grounds: Barrels spwaned"}, -- TODO: Test this
 
-	{["byte"] = 0x30, ["bit"] = 1, ["name"] = "Kong Unlocked: DK"},
+	{["byte"] = 0x30, ["bit"] = 1, ["name"] = "Kong Unlocked: DK", ["type"] = "Kong"},
 	{["byte"] = 0x30, ["bit"] = 2, ["name"] = "Training Grounds: Dive Barrel Completed"},
 	{["byte"] = 0x30, ["bit"] = 3, ["name"] = "Training Grounds: Vine Barrel Completed"},
 	{["byte"] = 0x30, ["bit"] = 4, ["name"] = "Training Grounds: Orange Barrel Completed"}, -- TODO: Test this

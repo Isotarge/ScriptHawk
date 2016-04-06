@@ -162,8 +162,10 @@ local moves      = 0;
 local sim_slam   = 1;
 local weapon     = 2;
 local instrument = 4;
-local coins      = 7;
-local lives      = 9; -- This is used as instrument ammo in single player
+local coins      = 6;
+local lives      = 8; -- This is used as instrument ammo in single player
+local CB_Base    = 10; -- There's 7 of these
+local GB_Base    = 66; -- There's 8 of these
 
 ----------------------------------
 -- Object Model 1 Documentation --
@@ -3219,19 +3221,15 @@ local function unlock_moves()
 		mainmemory.writebyte(base + instrument, 15);
 	end
 
-	-- Training barrels
+	-- Complete Training barrels & Unlock Camera
 	setFlagByName("Camera/Shockwave");
 	setFlagByName("Training Grounds: Dive Barrel Completed");
 	setFlagByName("Training Grounds: Orange Barrel Completed");
 	setFlagByName("Training Grounds: Barrel Barrel Completed");
 	setFlagByName("Training Grounds: Vine Barrel Completed");
 
-	-- Kongs
-	setFlagByName("Kong Unlocked: DK");
-	setFlagByName("Kong Unlocked: Diddy");
-	setFlagByName("Kong Unlocked: Lanky");
-	setFlagByName("Kong Unlocked: Tiny");
-	setFlagByName("Kong Unlocked: Chunky");
+	-- Unlock Kongs
+	setFlagByType("Kong");
 end
 
 function Game.getMap()
@@ -3360,8 +3358,8 @@ function Game.applyInfinites()
 	if version ~= 4 then -- TODO: Kiosk
 		for kong = DK, Chunky do
 			local base = Game.Memory.kong_base[version] + kong * 0x5e;
-			mainmemory.writebyte(base + coins, max_coins);
-			mainmemory.writebyte(base + lives, max_musical_energy);
+			mainmemory.write_u16_be(base + coins, max_coins);
+			mainmemory.write_u16_be(base + lives, max_musical_energy);
 		end
 	end
 end
@@ -3652,6 +3650,34 @@ function Game.eachFrame()
 
 	forms.settext(ScriptHawkUI.form_controls["Toggle Invisify Button"], current_invisify);
 	forms.settext(ScriptHawkUI.form_controls["Moon Mode Button"], moon_mode);
+end
+
+function Game.completeFile()
+	unlock_moves();
+
+	setFlagsByType("Blueprint");
+	setFlagsByType("CB");
+	setFlagsByType("Crown");
+	setFlagsByType("Fairy");
+	setFlagsByType("GB");
+	setFlagsByType("Key");
+	setFlagsByType("Medal");
+	setFlagByName("Nintendo Coin");
+	setFlagByName("Rareware Coin");
+
+	-- CB and GB counters
+	for kong = DK, Chunky do
+		local base = Game.Memory.kong_base[version] + kong * 0x5E;
+		for level = 0, 6 do
+			mainmemory.write_u16_be(base + CB_Base + (level * 2), 75); -- Enough for banana medal
+		end
+		for level = 0, 7 do
+			mainmemory.write_s16_be(base + GB_Base + (level * 2), 5); -- Normal GB's
+			if level == 7 and kong == Tiny then
+				mainmemory.write_s16_be(base + GB_Base + (level * 2), 6); -- Rareware GB
+			end
+		end
+	end
 end
 
 Game.OSDPosition = {32, 70}
