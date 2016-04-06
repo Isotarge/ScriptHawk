@@ -8,7 +8,6 @@
 
 object_index = 1;
 hide_non_animated = false;
-local level_object_array_pointer;
 local romName = gameinfo.getromname();
 
 if not bizstring.contains(romName, "Banjo-Kazooie") and not bizstring.contains(romName, "Banjo to Kazooie no Daibouken") then
@@ -16,17 +15,153 @@ if not bizstring.contains(romName, "Banjo-Kazooie") and not bizstring.contains(r
 	return false;
 end
 
+local version;
+local Game = {};
+
+Game.Memory = {
+	["x_velocity"] = {0x37CE88, 0x37CFB8, 0x37B6B8, 0x37C4B8},
+	["y_velocity"] = {0x37CE8C, 0x37CFBC, 0x37B6BC, 0x37C4BC},
+	["z_velocity"] = {0x37CE90, 0x37CFC0, 0x37B6C0, 0x37C4C0},
+	["x_position"] = {0x37CF70, 0x37D0A0, 0x37B7A0, 0x37C5A0},
+	["y_position"] = {0x37CF74, 0x37D0A4, 0x37B7A4, 0x37C5A4},
+	["z_position"] = {0x37CF78, 0x37D0A8, 0x37B7A8, 0x37C5A8},
+	["x_rotation"] = {0x37CF10, 0x37D040, 0x37B740, 0x37C540},
+	["y_rotation"] = {0x37D060, 0x37D190, 0x37B890, 0x37C690},
+	["facing_angle"] = {0x37D060, 0x37D190, 0x37B890, 0x37C690},
+	["moving_angle"] = {0x37D064, 0x37D194, 0x37B894, 0x37C694},
+	["z_rotation"] = {0x37D050, 0x37D180, 0x37B880, 0x37C680},
+	["camera_rotation"] = {0x37E578, 0x37E6A8, 0x37CDA8, 0x37D96C},
+	["previous_movement_state"] = {0x37DB30, 0x37DC60, 0x37C360, 0x37D160},
+	["current_movement_state"] = {0x37DB34, 0x37DC64, 0x37C364, 0x37D164},
+	["level_object_array_pointer"] = {0x36EAE0, 0x36F260, 0x36D760, 0x36E560},
+	["struct_array_pointer"] = {nil, nil, nil, 0x36E7C8}, -- TODO: Other versions
+};
+
 if bizstring.contains(romName, "Europe") then
-	level_object_array_pointer = 0x36EAE0;
+	version = 1;
 elseif bizstring.contains(romName, "Japan") then
-	level_object_array_pointer = 0x36F260;
+	version = 2;
 elseif bizstring.contains(romName, "USA") and bizstring.contains(romName, "Rev A") then
-	level_object_array_pointer = 0x36D760;
+	version = 3;
 elseif bizstring.contains(romName, "USA") then
-	level_object_array_pointer = 0x36E560;
+	version = 4;
 else
 	print("This version of the game is not currently supported.");
 	return false;
+end
+
+--------------
+-- Position --
+--------------
+
+function Game.getXPosition()
+	return mainmemory.readfloat(Game.Memory.x_position[version], true);
+end
+
+function Game.getYPosition()
+	return mainmemory.readfloat(Game.Memory.y_position[version], true);
+end
+
+function Game.getZPosition()
+	return mainmemory.readfloat(Game.Memory.z_position[version], true);
+end
+
+function Game.setXPosition(value)
+	mainmemory.writefloat(Game.Memory.x_position[version], value, true);
+	mainmemory.writefloat(Game.Memory.x_position[version] + 0x10, value, true);
+end
+
+function Game.setYPosition(value)
+	mainmemory.writefloat(Game.Memory.y_position[version], value, true);
+	mainmemory.writefloat(Game.Memory.y_position[version] + 0x10, value, true);
+
+	-- Nullify gravity when setting Y position
+	Game.setYVelocity(0);
+end
+
+function Game.setZPosition(value)
+	mainmemory.writefloat(Game.Memory.z_position[version], value, true);
+	mainmemory.writefloat(Game.Memory.z_position[version] + 0x10, value, true);
+end
+
+--------------
+-- Rotation --
+--------------
+
+function Game.getXRotation()
+	return mainmemory.readfloat(Game.Memory.x_rotation[version], true);
+end
+
+function Game.getYRotation()
+	return mainmemory.readfloat(Game.Memory.moving_angle[version], true);
+end
+
+function Game.getFacingAngle()
+	return mainmemory.readfloat(Game.Memory.facing_angle[version], true);
+end
+
+function Game.getZRotation()
+	return mainmemory.readfloat(Game.Memory.z_rotation[version], true);
+end
+
+function Game.setXRotation(value)
+	mainmemory.writefloat(Game.Memory.x_rotation[version], value, true);
+
+	-- Also set the target
+	mainmemory.writefloat(Game.Memory.x_rotation[version] + 4, value, true);
+end
+
+function Game.setYRotation(value)
+	mainmemory.writefloat(Game.Memory.moving_angle[version], value, true);
+	mainmemory.writefloat(Game.Memory.facing_angle[version], value, true);
+end
+
+function Game.setZRotation(value)
+	mainmemory.writefloat(Game.Memory.z_rotation[version], value, true);
+
+	-- Also set the target
+	mainmemory.writefloat(Game.Memory.z_rotation[version] + 4, value, true);
+end
+
+--------------
+-- Velocity --
+--------------
+
+function Game.getXVelocity()
+	return mainmemory.readfloat(Game.Memory.x_velocity[version], true);
+end
+
+function Game.getYVelocity()
+	return mainmemory.readfloat(Game.Memory.y_velocity[version], true);
+end
+
+function Game.colorYVelocity()
+	if Game.getYVelocity() <= clip_vel then
+		return 0xFF00FF00; -- Green
+	end
+end
+
+function Game.getZVelocity()
+	return mainmemory.readfloat(Game.Memory.z_velocity[version], true);
+end
+
+function Game.setXVelocity(value)
+	return mainmemory.writefloat(Game.Memory.x_velocity[version], value, true);
+end
+
+function Game.setYVelocity(value)
+	return mainmemory.writefloat(Game.Memory.y_velocity[version], value, true);
+end
+
+function Game.setZVelocity(value)
+	return mainmemory.writefloat(Game.Memory.z_velocity[version], value, true);
+end
+
+-- Calculated VXZ
+function Game.getVelocity()
+	local VX = Game.getXVelocity();
+	local VZ = Game.getZVelocity();
+	return math.sqrt(VX*VX + VZ*VZ);
 end
 
 -- Slot data
@@ -42,7 +177,11 @@ slot_variables = {
 	[0x0C] = {["Type"] = "Float", ["Name"] = {"Z", "Z Pos", "Z Position"}},
 	[0x10] = {["Type"] = "u8", ["Name"] = "State"},
 
-	[0x14] = {["Type"] = "Pointer", ["Name"] = "Animation Object Pointer"},
+	[0x14] = {["Type"] = "Pointer", ["Name"] = "Animation Object Pointer", ["Fields"] = {
+		[0x00] = {["Type"] = "Pointer"},
+		[0x38] = {["Type"] = "u16_be", ["Name"] = "Animation Type"},
+		[0x3C] = {["Type"] = "Float", ["Name"] = "Animation Timer"},
+	}},
 	[0x18] = {["Type"] = "Pointer"},
 
 	[0x1C] = {["Type"] = "Float"},
@@ -261,21 +400,75 @@ function json_slots()
 end
 jsonSlots = json_slots;
 
+--------------------
+-- "Struct" stuff --
+--------------------
+
+struct_slot_size = 0x60;
+struct_array_variables = {
+	[0x00] = {["Name"] = "Renderer Pointer", ["Type"] = "Pointer", ["Fields"] = {
+		[0x0E] = {["Name"] = "scale", ["Type"] = "u16_be"},
+		[0x10] = {["Name"] = "x_pos", ["Type"] = "s16_be"},
+		[0x12] = {["Name"] = "y_pos", ["Type"] = "s16_be"},
+		[0x14] = {["Name"] = "z_pos", ["Type"] = "s16_be"},
+	}},
+	[0x04] = {["Name"] = "Unknown Pointer 0x04", ["Type"] = "Pointer"},
+	[0x08] = {["Name"] = "Unknown Pointer 0x08", ["Type"] = "Pointer"},
+};
+
+function analyzeStructArray(x, y, z)
+	local structArray = mainmemory.read_u32_be(Game.Memory.struct_array_pointer[version]);
+	if isPointer(structArray) then
+		structArray = structArray - RDRAMBase;
+		structArrayCapacity = ((mainmemory.read_u32_be(structArray - 0x0C) - RDRAMBase) - structArray) / struct_slot_size;
+		for i = 0, structArrayCapacity - 1 do
+			local rendererPointer = mainmemory.read_u32_be(structArray + i * struct_slot_size);
+			if isPointer(rendererPointer) then
+				rendererPointer = rendererPointer - RDRAMBase;
+				local currentX = mainmemory.read_s16_be(rendererPointer + 0x10);
+				local currentY = mainmemory.read_s16_be(rendererPointer + 0x12);
+				local currentZ = mainmemory.read_s16_be(rendererPointer + 0x14);
+
+				print(i.." "..toHexString(rendererPointer)..": "..currentX..", "..currentY..", "..currentZ);
+				if currentY > 2750 and currentY < 2760 then
+					--mainmemory.write_s16_be(rendererPointer + 0x10, x);
+					mainmemory.write_s16_be(rendererPointer + 0x12, y);
+					--mainmemory.write_s16_be(rendererPointer + 0x14, z);
+				end
+			end
+		end
+	end
+end
+
+function getStructData(pointer)
+	local structData = {};
+	table.insert(structData, {"Slot Base", toHexString(pointer)});
+	table.insert(structData, {"Separator", 1});
+
+	local rendererPointer = mainmemory.read_u32_be(pointer);
+	if isPointer(rendererPointer) then
+		rendererPointer = rendererPointer - RDRAMBase;
+		table.insert(structData, {"Renderer Pointer", toHexString(rendererPointer)});
+		table.insert(structData, {"Separator", 1});
+		table.insert(structData, {"X", mainmemory.read_s16_be(rendererPointer + 0x10)});
+		table.insert(structData, {"Y", mainmemory.read_s16_be(rendererPointer + 0x12)});
+		table.insert(structData, {"Z", mainmemory.read_s16_be(rendererPointer + 0x14)});
+		table.insert(structData, {"Scale", mainmemory.read_u16_be(rendererPointer + 0x0E)});
+		table.insert(structData, {"Separator", 1});
+	end
+	table.insert(structData, {"Unknown Pointer 0x04", toHexString(mainmemory.read_u32_be(pointer + 0x04))});
+	table.insert(structData, {"Unknown Pointer 0x08", toHexString(mainmemory.read_u32_be(pointer + 0x08))});
+	table.insert(structData, {"Unknown Pointer 0x10", toHexString(mainmemory.read_u32_be(pointer + 0x10))});
+	table.insert(structData, {"Unknown Pointer 0x1C", toHexString(mainmemory.read_u32_be(pointer + 0x1C))});
+	table.insert(structData, {"Unknown Pointer 0x54", toHexString(mainmemory.read_u32_be(pointer + 0x54))});
+	return structData;
+end
+
 --------------
 -- Analysis --
 --------------
 
-function find_root(object)
-	local count = 0;
-	while object > 0 do
-		print(count..": .."..toHexString(object));
-		object = mainmemory.read_u24_be(object + 1);
-		count = count + 1;
-	end
-end
-findRoot = find_root;
-
-function resolve_variable_name(name)
+function resolveVariableName(name) -- TODO: Get this function working for any object model
 	-- Make sure comparisons are case insensitive
 	name = string.upper(name);
 
@@ -299,11 +492,10 @@ function resolve_variable_name(name)
 	print("Variable name: '"..name.."' not found =(");
 	return 0x00;
 end
-resolveVariableName = resolve_variable_name;
 
 function get_minimum_value(variable)
 	if type(variable) == "string" then
-		variable = resolve_variable_name(variable);
+		variable = resolveVariableName(variable);
 	end
 	local min = math.huge;
 	if type(slot_variables[variable]) == "table" then
@@ -317,7 +509,7 @@ getMinimumValue = get_minimum_value;
 
 function get_maximum_value(variable)
 	if type(variable) == "string" then
-		variable = resolve_variable_name(variable);
+		variable = resolveVariableName(variable);
 	end
 	local max = -math.huge;
 	if type(slot_variables[variable]) == "table" then
@@ -331,7 +523,7 @@ getMaximumValue = get_maximum_value;
 
 function get_all_unique(variable)
 	if type(variable) == "string" then
-		variable = resolve_variable_name(variable);
+		variable = resolveVariableName(variable);
 	end
 	if type(slot_variables[variable]) == "table" then
 		local unique_values = {};
@@ -357,7 +549,7 @@ function get_all_unique(variable)
 end
 getAllUnique = get_all_unique;
 
-local animation_object_unknown_pointer = 0x00;
+local animation_object_unknown_pointer = 0x00; -- TODO: Stop using local constants for this stuff, they're in the slot_variables array now
 local animation_object_animation_type = 0x38;
 local animation_object_animation_timer = 0x3C;
 
@@ -998,8 +1190,25 @@ local animation_types = {
 	[0x2C8] = "Mumbo's Hand Leaving",
 };
 
+function getNumSlots()
+	if script_mode == "Examine" or script_mode == "List" then -- Model 1
+		local levelObjectArray = mainmemory.read_u32_be(Game.Memory.level_object_array_pointer[version]);
+		if isPointer(levelObjectArray) then
+			levelObjectArray = levelObjectArray - RDRAMBase;
+			return math.min(max_slots, mainmemory.read_u32_be(levelObjectArray));
+		end
+	else -- Model 2
+		local structArray = mainmemory.read_u32_be(Game.Memory.struct_array_pointer[version]);
+		if isPointer(structArray) then
+			structArray = structArray - RDRAMBase;
+			return ((mainmemory.read_u32_be(structArray - 0x0C) - RDRAMBase) - structArray) / struct_slot_size;
+		end
+	end
+	return 0;
+end
+
 function setAnimationType(index, animationType)
-	local level_object_array = mainmemory.read_u24_be(level_object_array_pointer + 1);
+	local level_object_array = mainmemory.read_u24_be(Game.Memory.level_object_array_pointer[version] + 1);
 	local numSlots = math.min(max_slots, mainmemory.read_u32_be(level_object_array));
 	local objectSlotBase = get_slot_base(level_object_array, index);
 	local animationObjectPointer = mainmemory.read_u32_be(objectSlotBase + 0x14);
@@ -1010,7 +1219,7 @@ function setAnimationType(index, animationType)
 end
 
 function setAnimationObjectFloat(index, var, value)
-	local level_object_array = mainmemory.read_u24_be(level_object_array_pointer + 1);
+	local level_object_array = mainmemory.read_u24_be(Game.Memory.level_object_array_pointer[version] + 1);
 	local numSlots = math.min(max_slots, mainmemory.read_u32_be(level_object_array));
 	local objectSlotBase = get_slot_base(level_object_array, index);
 	local animationObjectPointer = mainmemory.read_u32_be(objectSlotBase + 0x14);
@@ -1022,10 +1231,10 @@ end
 
 function set_all(variable, value)
 	if type(variable) == "string" then
-		variable = resolve_variable_name(variable);
+		variable = resolveVariableName(variable);
 	end
 	if type(slot_variables[variable]) == "table" then
-		local level_object_array = mainmemory.read_u24_be(level_object_array_pointer + 1);
+		local level_object_array = mainmemory.read_u24_be(Game.Memory.level_object_array_pointer[version] + 1);
 		local numSlots = math.min(max_slots, mainmemory.read_u32_be(level_object_array));
 
 		local currentSlotBase;
@@ -1125,7 +1334,7 @@ function address_to_slot(address)
 		print("Address: "..toHexString(address).." is out of RDRAM range.");
 	end
 
-	local level_object_array = mainmemory.read_u24_be(level_object_array_pointer + 1);
+	local level_object_array = mainmemory.read_u24_be(Game.Memory.level_object_array_pointer[version] + 1);
 	local numSlots = math.min(max_slots, mainmemory.read_u32_be(level_object_array));
 	local position = address - level_object_array - slot_base;
 	local relativeToObject = position % slot_size;
@@ -1140,10 +1349,10 @@ addressToSlot = address_to_slot;
 
 function outputAllAddresses(variable)
 	if type(variable) == "string" then
-		variable = resolve_variable_name(variable);
+		variable = resolveVariableName(variable);
 	end
 	if type(slot_variables[variable]) == "table" then
-		local level_object_array = mainmemory.read_u24_be(level_object_array_pointer + 1);
+		local level_object_array = mainmemory.read_u24_be(Game.Memory.level_object_array_pointer[version] + 1);
 		local numSlots = math.min(max_slots, mainmemory.read_u32_be(level_object_array));
 
 		local currentSlotBase;
@@ -1175,7 +1384,7 @@ end
 processSlot = process_slot;
 
 function parse_slot_data()
-	local level_object_array = mainmemory.read_u24_be(level_object_array_pointer + 1);
+	local level_object_array = mainmemory.read_u24_be(Game.Memory.level_object_array_pointer[version] + 1);
 	local numSlots = math.min(max_slots, mainmemory.read_u32_be(level_object_array));
 
 	-- Clear out old data
@@ -1192,17 +1401,35 @@ end
 parseSlotData = parse_slot_data;
 
 function zipToSelectedObject()
-	local level_object_array = mainmemory.read_u24_be(level_object_array_pointer + 1);
-	local slotBase = getSlotBase(level_object_array, object_index);
+	if script_mode == "Examine" or script_mode == "List" then -- Model 1
+		local levelObjectArray = mainmemory.read_u24_be(Game.Memory.level_object_array_pointer[version]);
+		if isPointer(levelObjectArray) then
+			local slotBase = getSlotBase(levelObjectArray, object_index);
 
-	local x = mainmemory.readfloat(slotBase + 0x04, true);
-	local y = mainmemory.readfloat(slotBase + 0x08, true);
-	local z = mainmemory.readfloat(slotBase + 0x0C, true);
+			local x = mainmemory.readfloat(slotBase + 0x04, true);
+			local y = mainmemory.readfloat(slotBase + 0x08, true);
+			local z = mainmemory.readfloat(slotBase + 0x0C, true);
 
-	if Game ~= nil then
-		Game.setXPosition(x);
-		Game.setYPosition(y);
-		Game.setZPosition(z);
+			Game.setXPosition(x);
+			Game.setYPosition(y);
+			Game.setZPosition(z);
+		end
+	else
+		local structArray = mainmemory.read_u32_be(Game.Memory.struct_array_pointer[version]);
+		if isPointer(structArray) then
+			structArray = structArray - RDRAMBase;
+			local rendererPointer = mainmemory.read_u32_be(structArray + object_index * struct_slot_size);
+			if isPointer(rendererPointer) then
+				rendererPointer = rendererPointer - RDRAMBase;
+				local x = mainmemory.read_s16_be(rendererPointer + 0x10);
+				local y = mainmemory.read_s16_be(rendererPointer + 0x12);
+				local z = mainmemory.read_s16_be(rendererPointer + 0x14);
+
+				Game.setXPosition(x);
+				Game.setYPosition(y);
+				Game.setZPosition(z);
+			end
+		end
 	end
 end
 
@@ -1216,6 +1443,8 @@ local yellow_highlight = 0xFFFFFF00;
 local script_modes = {
 	"List",
 	"Examine",
+	"List Struct",
+	"Examine Struct",
 };
 
 local script_mode_index = 1;
@@ -1252,30 +1481,46 @@ function getExamineData(slot_base)
 	return current_slot_variables;
 end
 
-function fetch_address(index)
-	local level_object_array = mainmemory.read_u24_be(level_object_array_pointer + 1);
-	return getSlotBase(level_object_array, index);
-end
-
 function draw_ui()
 	local gui_x = 32;
 	local gui_y = 32;
 	local row = 0;
 	local height = 16;
 
-	local level_object_array = mainmemory.read_u24_be(level_object_array_pointer + 1);
-	local numSlots = math.min(max_slots, mainmemory.read_u32_be(level_object_array));
+	local level_object_array = mainmemory.read_u24_be(Game.Memory.level_object_array_pointer[version] + 1);
+	local structArray = mainmemory.read_u32_be(Game.Memory.struct_array_pointer[version]);
+	if isPointer(structArray) then
+		structArray = structArray - RDRAMBase;
+	end
+	local numSlots = getNumSlots();
+
+	gui.text(gui_x, gui_y + height * row, "Mode: "..script_mode, nil, nil, 'bottomright');
+	row = row + 1;
 	gui.text(gui_x, gui_y + height * row, "Index: "..(object_index).."/"..(numSlots), nil, nil, 'bottomright');
 	row = row + 1;
 
 	if script_mode == "Examine" then
-		local examine_data = getExamineData(fetch_address(object_index));
+		local examine_data = getExamineData(getSlotBase(level_object_array, object_index));
 		for i = #examine_data, 1, -1 do
 			if examine_data[i][1] ~= "Separator" then
 				gui.text(gui_x, gui_y + height * row, examine_data[i][2].." - "..examine_data[i][1], nil, nil, 'bottomright');
 				row = row + 1;
 			else
 				row = row + examine_data[i][2];
+			end
+		end
+	end
+
+	if script_mode == "Examine Struct" then
+		if isRDRAM(structArray) then
+			local structData = getStructData(structArray + object_index * struct_slot_size)
+			for i = #structData, 1, -1 do
+				if structData[i][1] ~= "Separator" then
+					gui.text(gui_x, gui_y + height * row, structData[i][2].." - "..structData[i][1], nil, nil, 'bottomright');
+					row = row + 1;
+				else
+					row = row + structData[i][2];
+				end
 			end
 		end
 	end
@@ -1305,20 +1550,31 @@ function draw_ui()
 				local boneArray1 = mainmemory.read_u32_be(currentSlotBase + 0x14C);
 				local boneArray2 = mainmemory.read_u32_be(currentSlotBase + 0x150);
 				if not hide_non_animated or (isPointer(boneArray1) or isPointer(boneArray2)) then
-					gui.text(gui_x, gui_y + height * row, i..": "..string.format("0x%06x", currentSlotBase or 0), color, nil, 'bottomright');
+					gui.text(gui_x, gui_y + height * row, i..": "..toHexString(currentSlotBase or 0), color, nil, 'bottomright');
 					row = row + 1;
 				end
 			else
-				gui.text(gui_x, gui_y + height * row, animationType.." "..i..": "..string.format("0x%06x", currentSlotBase or 0), color, nil, 'bottomright');
+				gui.text(gui_x, gui_y + height * row, animationType.." "..i..": "..toHexString(currentSlotBase or 0), color, nil, 'bottomright');
 				row = row + 1;
+			end
+		end
+	end
+	
+	if script_mode == "List Struct" then
+		if isRDRAM(structArray) then
+			for i = 0, numSlots - 1 do
+				local rendererPointer = mainmemory.read_u32_be(structArray + i * struct_slot_size);
+				if isPointer(rendererPointer) then
+					gui.text(gui_x, gui_y + height * row, i..": "..toHexString(structArray + i * struct_slot_size), nil, nil, 'bottomright');
+					row = row + 1;
+				end
 			end
 		end
 	end
 end
 
 local function incr_object_index()
-	local level_object_array = mainmemory.read_u24_be(level_object_array_pointer + 1);
-	local numSlots = math.min(max_slots, mainmemory.read_u32_be(level_object_array));
+	local numSlots = getNumSlots();
 	object_index = object_index + 1;
 	if object_index > numSlots then
 		object_index = 1;
@@ -1328,8 +1584,7 @@ end
 local function decr_object_index()
 	object_index = object_index - 1;
 	if object_index <= 0 then
-		local level_object_array = mainmemory.read_u24_be(level_object_array_pointer + 1);
-		local numSlots = math.min(max_slots, mainmemory.read_u32_be(level_object_array));
+		local numSlots = getNumSlots();
 		object_index = numSlots;
 	end
 end
