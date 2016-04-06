@@ -138,10 +138,10 @@ getColor = getColour; -- To speak Americano
 -- Finds the root of a linked list
 function find_root(object)
 	local count = 0;
-	local prev_object = object;
+	local prevObject = object;
 	while object > 0 do
-		dprint(count..": "..toHexString(object + 0x10).." Size: "..toHexString(prev_object - object));
-		prev_object = object;
+		dprint(count..": "..toHexString(object + 0x10, 6, "").." Size: "..toHexString(prevObject - object));
+		prevObject = object;
 		object = mainmemory.read_u24_be(object + 1);
 		count = count + 1;
 	end
@@ -153,7 +153,7 @@ findRoot = find_root;
 function find_root_size(object)
 	local count = 0;
 	while object > 0 do
-		dprint(count..": "..toHexString(object + 0x10).." Size: "..toHexString(mainmemory.read_u32_be(object + 4)));
+		dprint(count..": "..toHexString(object + 0x10, 6, "").." Size: "..toHexString(mainmemory.read_u32_be(object + 4)));
 		object = mainmemory.read_u24_be(object + 1);
 		count = count + 1;
 	end
@@ -162,7 +162,7 @@ end
 findRootSize = find_root_size;
 
 -- Finds the end of a linked list, outputting object size
-function traverse_size(object, minimumPrintSize, maximumPrintSize) -- TODO: Set prefix to nil in toHexString
+function traverse_size(object, minimumPrintSize, maximumPrintSize)
 	minimumPrintSize = minimumPrintSize or -math.huge;
 	maximumPrintSize = maximumPrintSize or math.huge;
 	local count = 0;
@@ -172,7 +172,7 @@ function traverse_size(object, minimumPrintSize, maximumPrintSize) -- TODO: Set 
 		count = count + 1;
 		size = mainmemory.read_u32_be(object + 4);
 		if size >= minimumPrintSize and size <= maximumPrintSize then
-			dprint(count..": "..toHexString(object + 0x10).." "..(object + 0x10).." Size: "..toHexString(size));
+			dprint(count..": "..toHexString(object + 0x10, 6, "").." "..(object + 0x10).." Size: "..toHexString(size));
 		end
 		object = object + 0x10 + size;
 		prev = mainmemory.read_u32_be(object);
@@ -180,6 +180,19 @@ function traverse_size(object, minimumPrintSize, maximumPrintSize) -- TODO: Set 
 	print_deferred();
 end
 traverseSize = traverse_size;
+
+-- Finds the end of a linked list
+function traverse(object)
+	local count = 0;
+	local prevObject = object;
+	while object > 0 do
+		dprint(count..": "..toHexString(object + 0x10, 6, "").." Size: "..toHexString(object - prevObject));
+		prevObject = object;
+		object = mainmemory.read_u24_be(object + 4 + 1);
+		count = count + 1;
+	end
+	print_deferred();
+end
 
 function replace_u32_be(find, replace)
 	for i = 0, 0x7FFFFF, 4 do
