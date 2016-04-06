@@ -20,37 +20,9 @@ end
 -- Only patch US 1.0
 -- TODO - Figure out how to patch other versions
 local allowFurnaceFunPatch = false;
-local fbPointer;
 local framebuffer_size = 292 * 200; -- Bigger on PAL
 
-local player_grounded;
-local slope_timer;
-local moves_bitfield;
-
-local x_vel;
-local y_vel;
-local z_vel;
-
 local clip_vel = -3500; -- Velocity required to clip on the Y axis -- TODO: This seems to be different for different geometry
-
-local x_pos;
-local y_pos;
-local z_pos;
-
-local x_rot;
-local y_rot;
-local facing_angle;
-local moving_angle;
-local z_rot;
-
-local camera_rot;
-
-local map;
-local frame_timer;
-local object_array_pointer;
-local ff_question_pointer;
-
-local notes;
 
 -- Relative to notes
 -- TODO: Add jinjos
@@ -74,9 +46,6 @@ local max_lives = 9;
 local max_air = 6 * 600;
 local max_mumbo_tokens = 99;
 local max_jiggies = 100;
-
-local previous_movement_state;
-local current_movement_state;
 
 local eep_checksum_offsets = {
 	0x74,
@@ -250,95 +219,51 @@ Game.maps = {
 	"Intro - Grunty Threat 2"
 };
 
+-- Version order: PAL, JP, US 1.1, US 1.0
+Game.Memory = {
+	["fb_pointer"] = {0x282E00, 0x281E20, 0x281E20, 0x282FE0},
+	["frame_timer"] = {0x280700, 0x27F718, 0x27F718, 0x2808D8},
+	["slope_timer"] = {0x37CCB4, 0x37CDE4, 0x37B4E4, 0x37C2E4},
+	["player_grounded"] = {0x37C930, 0x37CA60, 0x37B160, 0x37BF60},
+	["moves_bitfield"] = {0x37CD70, 0x37CEA0, 0x37B5A0, 0x37C3A0},
+	["x_velocity"] = {0x37CE88, 0x37CFB8, 0x37B6B8, 0x37C4B8},
+	["y_velocity"] = {0x37CE8C, 0x37CFBC, 0x37B6BC, 0x37C4BC},
+	["z_velocity"] = {0x37CE90, 0x37CFC0, 0x37B6C0, 0x37C4C0},
+	["x_position"] = {0x37CF70, 0x37D0A0, 0x37B7A0, 0x37C5A0},
+	["y_position"] = {0x37CF74, 0x37D0A4, 0x37B7A4, 0x37C5A4},
+	["z_position"] = {0x37CF78, 0x37D0A8, 0x37B7A8, 0x37C5A8},
+	["x_rotation"] = {0x37CF10, 0x37D040, 0x37B740, 0x37C540},
+	["y_rotation"] = {0x37D060, 0x37D190, 0x37B890, 0x37C690},
+	["facing_angle"] = {0x37D060, 0x37D190, 0x37B890, 0x37C690},
+	["moving_angle"] = {0x37D064, 0x37D194, 0x37B894, 0x37C694},
+	["z_rotation"] = {0x37D050, 0x37D180, 0x37B880, 0x37C680},
+	["camera_rotation"] = {0x37E578, 0x37E6A8, 0x37CDA8, 0x37D96C},
+	["previous_movement_state"] = {0x37DB30, 0x37DC60, 0x37C360, 0x37D160},
+	["current_movement_state"] = {0x37DB34, 0x37DC64, 0x37C364, 0x37D164},
+	["map"] = {0x37F2C5, 0x37F405, 0x37DAF5, 0x37E8F5},
+	["ff_question_pointer"] = {0x383AC0, 0x383C20, 0x382300, 0x3830E0},
+	["notes"] = {0x386940, 0x386AA0, 0x385180, 0x385F60},
+	["object_array_pointer"] = {0x36EAE0, 0x36F260, 0x36D760, 0x36E560},
+};
+
 function Game.detectVersion(romName) -- TODO: Move addresses to a Memory table like DK64 module
 	if stringContains(romName, "Europe") then
+		version = 1;
 		framebuffer_size = 292 * 216;
-		fbPointer = 0x282E00;
-		frame_timer = 0x280700;
-		slope_timer = 0x37CCB4;
-		player_grounded = 0x37C930;
-		moves_bitfield = 0x37CD70;
-		x_vel = 0x37CE88;
 		clip_vel = -2900;
-		x_pos = 0x37CF70;
-		x_rot = 0x37CF10;
-		moving_angle = 0x37D064;
-		camera_rot = 0x37E578;
-		z_rot = 0x37D050;
-		current_movement_state = 0x37DB34;
-		map = 0x37F2C5;
 		allowFurnaceFunPatch = false;
-		ff_question_pointer = 0x383AC0;
-		notes = 0x386940;
-		object_array_pointer = 0x36EAE0;
 	elseif stringContains(romName, "Japan") then
-		fbPointer = 0x281E20;
-		frame_timer = 0x27F718;
-		slope_timer = 0x37CDE4;
-		player_grounded = 0x37CA60;
-		moves_bitfield = 0x37CEA0;
-		x_vel = 0x37CFB8;
-		x_pos = 0x37D0A0;
-		x_rot = 0x37D040;
-		moving_angle = 0x37D194;
-		camera_rot = 0x37E6A8;
-		z_rot = 0x37D180;
-		current_movement_state = 0x37DC64;
-		map = 0x37F405;
+		version = 2;
 		allowFurnaceFunPatch = false;
-		ff_question_pointer = 0x383C20;
-		notes = 0x386AA0;
-		object_array_pointer = 0x36F260;
 	elseif stringContains(romName, "USA") and stringContains(romName, "Rev A") then
-		fbPointer = 0x281E20;
-		frame_timer = 0x27F718;
-		slope_timer = 0x37B4E4;
-		player_grounded = 0x37B160;
-		moves_bitfield = 0x37B5A0;
-		x_vel = 0x37B6B8;
-		x_pos = 0x37B7A0;
-		x_rot = 0x37B740;
-		moving_angle = 0x37B894;
-		camera_rot = 0x37CDA8;
-		z_rot = 0x37B880;
-		current_movement_state = 0x37C364;
-		map = 0x37DAF5;
+		version = 3;
 		allowFurnaceFunPatch = false;
-		ff_question_pointer = 0x382300;
-		notes = 0x385180;
-		object_array_pointer = 0x36D760;
 	elseif stringContains(romName, "USA") then
-		fbPointer = 0x282FE0;
-		frame_timer = 0x2808D8;
-		slope_timer = 0x37C2E4;
-		player_grounded = 0x37BF60;
-		moves_bitfield = 0x37C3A0;
-		x_vel = 0x37C4B8;
-		x_pos = 0x37C5A0;
-		x_rot = 0x37C540;
-		moving_angle = 0x37C694;
-		camera_rot = 0x37D96C;
-		z_rot = 0x37C680;
-		current_movement_state = 0x37D164;
-		map = 0x37E8F5;
+		version = 4;
 		allowFurnaceFunPatch = true;
-		ff_question_pointer = 0x3830E0;
-		notes = 0x385F60;
-		object_array_pointer = 0x36E560;
 	else
 		return false;
 	end
-
-	y_pos = x_pos + 4;
-	z_pos = y_pos + 4;
-
-	y_vel = x_vel + 4;
-	z_vel = y_vel + 4;
-
-	facing_angle = moving_angle - 4;
-	y_rot = moving_angle;
-
-	previous_movement_state = current_movement_state - 4;
 
 	-- Read EEPROM checksums
 	if memory.usememorydomain("EEPROM") then
@@ -354,11 +279,11 @@ end
 local options_toggle_neverslip;
 
 local function neverSlip()
-	mainmemory.writefloat(slope_timer, 0.0, true);
+	mainmemory.writefloat(Game.Memory.slope_timer[version], 0.0, true);
 end
 
 function Game.getSlopeTimer()
-	return mainmemory.readfloat(slope_timer, true);
+	return mainmemory.readfloat(Game.Memory.slope_timer[version], true);
 end
 
 function Game.colorSlopeTimer()
@@ -388,7 +313,7 @@ local move_levels = {
 
 local function unlock_moves()
 	local level = forms.gettext(options_moves_dropdown);
-	mainmemory.write_u32_be(moves_bitfield, move_levels[level]);
+	mainmemory.write_u32_be(Game.Memory.moves_bitfield[version], move_levels[level]);
 end
 
 --------------------
@@ -552,7 +477,7 @@ local movementStates = {
 };
 
 function Game.getCurrentMovementState()
-	local currentMovementState = mainmemory.read_u32_be(current_movement_state);
+	local currentMovementState = mainmemory.read_u32_be(Game.Memory.current_movement_state[version]);
 	if type(movementStates[currentMovementState]) ~= "nil" then
 		return movementStates[currentMovementState];
 	end
@@ -560,7 +485,7 @@ function Game.getCurrentMovementState()
 end
 
 function Game.colorCurrentMovementState()
-	local currentMovementState = mainmemory.read_u32_be(current_movement_state);
+	local currentMovementState = mainmemory.read_u32_be(Game.Memory.current_movement_state[version]);
 	local stringMovementState = Game.getCurrentMovementState();
 	if stringMovementState == "Slipping" or stringMovementState == "Skidding" or stringMovementState == "Recovering" or stringMovementState == "Knockback" then
 		return 0xFFFFFF00; -- Yellow
@@ -584,7 +509,7 @@ allowPound = false;
 allowTTrotJump = true;
 function autoPound()
 	if forms.ischecked(options_autopound_checkbox) then
-		local currentMovementState = mainmemory.read_u32_be(current_movement_state);
+		local currentMovementState = mainmemory.read_u32_be(Game.Memory.current_movement_state[version]);
 		local YVelocity = Game.getYVelocity();
 
 		-- Perfect roll flutters
@@ -596,7 +521,7 @@ function autoPound()
 		end
 
 		-- Frame perfect mid air talon trot slide jump
-		if allowTTrotJump and (currentMovementState == 21 and mainmemory.readbyte(player_grounded) == 0 or holdingAPostJump) then
+		if allowTTrotJump and (currentMovementState == 21 and mainmemory.readbyte(Game.Memory.player_grounded[version]) == 0 or holdingAPostJump) then
 			holdingAPostJump = true;
 			if holdingAPostJump then
 				holdingAPostJump = holdingAPostJump and (currentMovementState == 21 or Game.getYVelocity() > 0); -- TODO: Better method for detecting end of a jump, velocity > 0 is janky
@@ -741,7 +666,7 @@ local ff_answer2_text_pointer = 0x54;
 local ff_answer3_text_pointer = 0x44;
 
 function getSelectedFFAnswer()
-	local ff_question_object = mainmemory.read_u24_be(ff_question_pointer + 1);
+	local ff_question_object = mainmemory.read_u24_be(Game.Memory.ff_question_pointer[version] + 1);
 	if isRDRAM(ff_question_object) then
 		return mainmemory.readbyte(ff_question_object + ff_current_answer);
 	end
@@ -750,7 +675,7 @@ end
 
 -- TODO: Doesn't always work
 function getCorrectFFAnswer()
-	local ff_question_object = mainmemory.read_u24_be(ff_question_pointer + 1);
+	local ff_question_object = mainmemory.read_u24_be(Game.Memory.ff_question_pointer[version] + 1);
 	if isRDRAM(ff_question_object) then
 		return mainmemory.readbyte(ff_question_object + ff_correct_answer);
 	end
@@ -797,14 +722,14 @@ local slot_type = 0x80;
 local slot_timer = 0x84;
 
 -- Returns the RDRAM location of the yumbly/grumbly slot at the index referenced by "Docs/Vile Map.jpg"
-local function getVileSlotBase(vile_state, index)
-	if isRDRAM(vile_state) then
-		local numSlots = mainmemory.read_u32_be(vile_state);
+local function getVileSlotBase(objectArray, index)
+	if isRDRAM(objectArray) then
+		local numSlots = mainmemory.read_u32_be(objectArray);
 		local slotsFound = 0;
 		for i = 0, numSlots do
-			if mainmemory.readfloat(vile_state + first_slot_base + (i * slot_size) + 0x08, true) == -100 then
+			if mainmemory.readfloat(objectArray + first_slot_base + (i * slot_size) + 0x08, true) == -100 then
 				if slotsFound == index then
-					return vile_state + first_slot_base + (i * slot_size);
+					return objectArray + first_slot_base + (i * slot_size);
 				end
 				slotsFound = slotsFound + 1;
 			end
@@ -812,8 +737,8 @@ local function getVileSlotBase(vile_state, index)
 	end
 end
 
-local function fireSlot(vile_state, index, slotType)
-	current_slot_base = getVileSlotBase(vile_state, index);
+local function fireSlot(objectArray, index, slotType)
+	current_slot_base = getVileSlotBase(objectArray, index);
 	if isRDRAM(current_slot_base) then
 		mainmemory.writebyte(current_slot_base + slot_state, 0x0C);
 		mainmemory.writebyte(current_slot_base + slot_type, slotType);
@@ -877,11 +802,11 @@ local function updateWave()
 	if waving then
 		wave_counter = wave_counter + 1;
 		if wave_counter == wave_delay then
-			local vile_state = mainmemory.read_u32_be(object_array_pointer);
-			if isPointer(vile_state) then
-				vile_state = vile_state - RDRAMBase;
+			local objectArray = mainmemory.read_u32_be(Game.Memory.object_array_pointer[version]);
+			if isPointer(objectArray) then
+				objectArray = objectArray - RDRAMBase;
 				for i = 1, #waveFrames[wave_frame] do
-					fireSlot(vile_state, getSlotIndex(waveFrames[wave_frame][i][1], waveFrames[wave_frame][i][2]), wave_colour);
+					fireSlot(objectArray, getSlotIndex(waveFrames[wave_frame][i][1], waveFrames[wave_frame][i][2]), wave_colour);
 				end
 				wave_counter = 0;
 				wave_frame = wave_frame + 1;
@@ -894,23 +819,23 @@ local function updateWave()
 end
 
 local function doHeart()
-	local vile_state = mainmemory.read_u32_be(object_array_pointer);
-	if isPointer(vile_state) then
-		vile_state = vile_state - RDRAMBase;
+	local objectArray = mainmemory.read_u32_be(Game.Memory.object_array_pointer[version]);
+	if isPointer(objectArray) then
+		objectArray = objectArray - RDRAMBase;
 		local colour = math.random(0, 1);
 		for i = 1, #heart do
-			fireSlot(vile_state, getSlotIndex(heart[i][1], heart[i][2]), colour);
+			fireSlot(objectArray, getSlotIndex(heart[i][1], heart[i][2]), colour);
 		end
 	end
 end
 
 local function fireAllSlots()
-	local vile_state = mainmemory.read_u32_be(object_array_pointer);
-	if isPointer(vile_state) then
-		vile_state = vile_state - RDRAMBase;
+	local objectArray = mainmemory.read_u32_be(Game.Memory.object_array_pointer[version]);
+	if isPointer(objectArray) then
+		objectArray = objectArray - RDRAMBase;
 		local colour = math.random(0, 1);
 		for i = 0, number_of_slots do
-			fireSlot(vile_state, i, colour);
+			fireSlot(objectArray, i, colour);
 		end
 	end
 end
@@ -921,8 +846,8 @@ end
 -------------------------------
 
 function findConga()
-	if mainmemory.readbyte(map) == 0x02 then -- Make sure we're in Mumbo's Mountain
-		local levelObjectArray = mainmemory.read_u32_be(object_array_pointer);
+	if mainmemory.readbyte(Game.Memory.map[version]) == 0x02 then -- Make sure we're in Mumbo's Mountain
+		local levelObjectArray = mainmemory.read_u32_be(Game.Memory.object_array_pointer[version]);
 		if isPointer(levelObjectArray) then -- Make sure the level object array is valid
 			levelObjectArray = levelObjectArray - RDRAMBase;
 			local numObjects = mainmemory.read_u32_be(levelObjectArray);
@@ -967,7 +892,7 @@ local slot_y_pos = 0x08;
 local slot_z_pos = 0x0C;
 
 local function get_num_slots()
-	local levelObjectArray = mainmemory.read_u32_be(object_array_pointer);
+	local levelObjectArray = mainmemory.read_u32_be(Game.Memory.object_array_pointer[version]);
 	if isPointer(levelObjectArray) then
 		levelObjectArray = levelObjectArray - RDRAMBase;
 		return math.min(max_slots, mainmemory.read_u32_be(levelObjectArray));
@@ -976,7 +901,7 @@ local function get_num_slots()
 end
 
 local function get_slot_base(index)
-	local levelObjectArray = mainmemory.read_u32_be(object_array_pointer);
+	local levelObjectArray = mainmemory.read_u32_be(Game.Memory.object_array_pointer[version]);
 	if isPointer(levelObjectArray) then
 		levelObjectArray = levelObjectArray - RDRAMBase;
 		return levelObjectArray + first_slot_base + index * slot_size;
@@ -1022,7 +947,7 @@ end
 
 -- TODO: Not working?
 function fillFB()
-	local frameBufferLocation = mainmemory.read_u24_be(fbPointer + 1);
+	local frameBufferLocation = mainmemory.read_u24_be(Game.Memory.fb_pointer[version] + 1);
 	if isRDRAM(frameBufferLocation) then
 		replaceTextureRGBA5551(nil, frameBufferLocation, framebuffer_size)
 	end
@@ -1039,7 +964,7 @@ Game.rot_speed = 5;
 Game.max_rot_units = 360;
 
 function Game.isPhysicsFrame()
-	local frameTimerValue = mainmemory.read_s32_be(frame_timer);
+	local frameTimerValue = mainmemory.read_s32_be(Game.Memory.frame_timer[version]);
 	return frameTimerValue <= 0 and not emu.islagged();
 end
 
@@ -1048,33 +973,33 @@ end
 --------------
 
 function Game.getXPosition()
-	return mainmemory.readfloat(x_pos, true);
+	return mainmemory.readfloat(Game.Memory.x_position[version], true);
 end
 
 function Game.getYPosition()
-	return mainmemory.readfloat(y_pos, true);
+	return mainmemory.readfloat(Game.Memory.y_position[version], true);
 end
 
 function Game.getZPosition()
-	return mainmemory.readfloat(z_pos, true);
+	return mainmemory.readfloat(Game.Memory.z_position[version], true);
 end
 
 function Game.setXPosition(value)
-	mainmemory.writefloat(x_pos, value, true);
-	mainmemory.writefloat(x_pos + 0x10, value, true);
+	mainmemory.writefloat(Game.Memory.x_position[version], value, true);
+	mainmemory.writefloat(Game.Memory.x_position[version] + 0x10, value, true);
 end
 
 function Game.setYPosition(value)
-	mainmemory.writefloat(y_pos, value, true);
-	mainmemory.writefloat(y_pos + 0x10, value, true);
+	mainmemory.writefloat(Game.Memory.y_position[version], value, true);
+	mainmemory.writefloat(Game.Memory.y_position[version] + 0x10, value, true);
 
 	-- Nullify gravity when setting Y position
 	Game.setYVelocity(0);
 end
 
 function Game.setZPosition(value)
-	mainmemory.writefloat(z_pos, value, true);
-	mainmemory.writefloat(z_pos + 0x10, value, true);
+	mainmemory.writefloat(Game.Memory.z_position[version], value, true);
+	mainmemory.writefloat(Game.Memory.z_position[version] + 0x10, value, true);
 end
 
 --------------
@@ -1082,38 +1007,38 @@ end
 --------------
 
 function Game.getXRotation()
-	return mainmemory.readfloat(x_rot, true);
+	return mainmemory.readfloat(Game.Memory.x_rotation[version], true);
 end
 
 function Game.getYRotation()
-	return mainmemory.readfloat(moving_angle, true);
+	return mainmemory.readfloat(Game.Memory.moving_angle[version], true);
 end
 
 function Game.getFacingAngle()
-	return mainmemory.readfloat(facing_angle, true);
+	return mainmemory.readfloat(Game.Memory.facing_angle[version], true);
 end
 
 function Game.getZRotation()
-	return mainmemory.readfloat(z_rot, true);
+	return mainmemory.readfloat(Game.Memory.z_rotation[version], true);
 end
 
 function Game.setXRotation(value)
-	mainmemory.writefloat(x_rot, value, true);
+	mainmemory.writefloat(Game.Memory.x_rotation[version], value, true);
 
 	-- Also set the target
-	mainmemory.writefloat(x_rot + 4, value, true);
+	mainmemory.writefloat(Game.Memory.x_rotation[version] + 4, value, true);
 end
 
 function Game.setYRotation(value)
-	mainmemory.writefloat(moving_angle, value, true);
-	mainmemory.writefloat(facing_angle, value, true);
+	mainmemory.writefloat(Game.Memory.moving_angle[version], value, true);
+	mainmemory.writefloat(Game.Memory.facing_angle[version], value, true);
 end
 
 function Game.setZRotation(value)
-	mainmemory.writefloat(z_rot, value, true);
+	mainmemory.writefloat(Game.Memory.z_rotation[version], value, true);
 
 	-- Also set the target
-	mainmemory.writefloat(z_rot + 4, value, true);
+	mainmemory.writefloat(Game.Memory.z_rotation[version] + 4, value, true);
 end
 
 --------------
@@ -1121,11 +1046,11 @@ end
 --------------
 
 function Game.getXVelocity()
-	return mainmemory.readfloat(x_vel, true);
+	return mainmemory.readfloat(Game.Memory.x_velocity[version], true);
 end
 
 function Game.getYVelocity()
-	return mainmemory.readfloat(y_vel, true);
+	return mainmemory.readfloat(Game.Memory.y_velocity[version], true);
 end
 
 function Game.colorYVelocity()
@@ -1135,19 +1060,19 @@ function Game.colorYVelocity()
 end
 
 function Game.getZVelocity()
-	return mainmemory.readfloat(z_vel, true);
+	return mainmemory.readfloat(Game.Memory.z_velocity[version], true);
 end
 
 function Game.setXVelocity(value)
-	return mainmemory.writefloat(x_vel, value, true);
+	return mainmemory.writefloat(Game.Memory.x_velocity[version], value, true);
 end
 
 function Game.setYVelocity(value)
-	return mainmemory.writefloat(y_vel, value, true);
+	return mainmemory.writefloat(Game.Memory.y_velocity[version], value, true);
 end
 
 function Game.setZVelocity(value)
-	return mainmemory.writefloat(z_vel, value, true);
+	return mainmemory.writefloat(Game.Memory.z_velocity[version], value, true);
 end
 
 -- Calculated VXZ
@@ -1253,25 +1178,25 @@ event.onloadstate(disableActorSpawner, "ScriptHawk - Disable Actor Spawner");
 
 function Game.setMap(value)
 	if value >= 1 and value <= #Game.maps then
-		mainmemory.writebyte(map, value);
+		mainmemory.writebyte(Game.Memory.map[version], value);
 
 		-- Force the game to load the map instantly
-		mainmemory.writebyte(map - 1, 0x01);
+		mainmemory.writebyte(Game.Memory.map[version] - 1, 0x01);
 	end
 end
 
 function Game.applyInfinites()
 	-- We don't apply infinite notes since it messes up note routing
-	--mainmemory.write_s32_be(notes, max_notes);
-	mainmemory.write_s32_be(notes + eggs, max_eggs);
-	mainmemory.write_s32_be(notes + red_feathers, max_red_feathers);
-	mainmemory.write_s32_be(notes + gold_feathers, max_gold_feathers);
-	mainmemory.write_s32_be(notes + health, mainmemory.read_s32_be(notes + health_containers));
-	mainmemory.write_s32_be(notes + lives, max_lives);
-	mainmemory.write_s32_be(notes + air, max_air);
-	mainmemory.write_s32_be(notes + mumbo_tokens, max_mumbo_tokens);
-	mainmemory.write_s32_be(notes + mumbo_tokens_on_hand, max_mumbo_tokens);
-	mainmemory.write_s32_be(notes + jiggies, max_jiggies);
+	--mainmemory.write_s32_be(Game.Memory.notes[version], max_notes);
+	mainmemory.write_s32_be(Game.Memory.notes[version] + eggs, max_eggs);
+	mainmemory.write_s32_be(Game.Memory.notes[version] + red_feathers, max_red_feathers);
+	mainmemory.write_s32_be(Game.Memory.notes[version] + gold_feathers, max_gold_feathers);
+	mainmemory.write_s32_be(Game.Memory.notes[version] + health, mainmemory.read_s32_be(Game.Memory.notes[version] + health_containers));
+	mainmemory.write_s32_be(Game.Memory.notes[version] + lives, max_lives);
+	mainmemory.write_s32_be(Game.Memory.notes[version] + air, max_air);
+	mainmemory.write_s32_be(Game.Memory.notes[version] + mumbo_tokens, max_mumbo_tokens);
+	mainmemory.write_s32_be(Game.Memory.notes[version] + mumbo_tokens_on_hand, max_mumbo_tokens);
+	mainmemory.write_s32_be(Game.Memory.notes[version] + jiggies, max_jiggies);
 end
 
 function Game.initUI()
