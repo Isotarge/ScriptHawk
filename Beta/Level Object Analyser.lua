@@ -416,30 +416,6 @@ struct_array_variables = {
 	[0x08] = {["Name"] = "Unknown Pointer 0x08", ["Type"] = "Pointer"},
 };
 
-function analyzeStructArray(x, y, z)
-	local structArray = mainmemory.read_u32_be(Game.Memory.struct_array_pointer[version]);
-	if isPointer(structArray) then
-		structArray = structArray - RDRAMBase;
-		structArrayCapacity = ((mainmemory.read_u32_be(structArray - 0x0C) - RDRAMBase) - structArray) / struct_slot_size;
-		for i = 0, structArrayCapacity - 1 do
-			local rendererPointer = mainmemory.read_u32_be(structArray + i * struct_slot_size);
-			if isPointer(rendererPointer) then
-				rendererPointer = rendererPointer - RDRAMBase;
-				local currentX = mainmemory.read_s16_be(rendererPointer + 0x10);
-				local currentY = mainmemory.read_s16_be(rendererPointer + 0x12);
-				local currentZ = mainmemory.read_s16_be(rendererPointer + 0x14);
-
-				print(i.." "..toHexString(rendererPointer)..": "..currentX..", "..currentY..", "..currentZ);
-				if currentY > 2750 and currentY < 2760 then
-					--mainmemory.write_s16_be(rendererPointer + 0x10, x);
-					mainmemory.write_s16_be(rendererPointer + 0x12, y);
-					--mainmemory.write_s16_be(rendererPointer + 0x14, z);
-				end
-			end
-		end
-	end
-end
-
 function getStructData(pointer)
 	local structData = {};
 	table.insert(structData, {"Slot Base", toHexString(pointer)});
