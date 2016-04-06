@@ -13,7 +13,9 @@
 	- Figure out how the 101% credits are triggered
 	- Start documentation for other versions
 - DK64: Exception when gui.cleargraphics() is called on first frame (by MJ minimap)
-- DK64: Integrate Grab Objects.lua
+- DK64: Finish integrating the Object Analysis tools
+	- UI to toggle the tools, right now they're always on
+	- Call formatRotation() for some of the OSD displays
 	- Move to SM64.lua's struct format for object model 1 and model 2
 - BK: Integrate Level Object Analyser.lua
 - BK: Integrate flags (and many other finds) from Bitalive's research https://docs.google.com/document/d/1Gek6Bkfcy1RHSDTBa3L3fEzJhaWROX3hfcmOrcekTV0/edit

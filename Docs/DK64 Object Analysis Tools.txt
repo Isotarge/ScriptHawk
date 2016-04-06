@@ -1,6 +1,6 @@
-How to use Grab Objects.lua
+How to use the DK64 object analysis tools
 
-Grab Objects.lua allows you to list and examine details about the currently loaded objects
+These tools allow you to list and examine details about the currently loaded objects
 from two (of likely three+) object models in DK64.
 
 "List" shows all currently loaded objects from that model
@@ -8,7 +8,7 @@ from two (of likely three+) object models in DK64.
 
 Keyboard shortcuts:
 
-c = Cycle Grab Script mode
+c = Cycle mode
 v = Grab an object (only works when examining/listing object model 1)
 b = Focus the camera on an object (only works when examining/listing object model 1)
 n = Previous object
@@ -16,32 +16,32 @@ m = Next object
 z = Zip to selected object, works with both model 1 and model 2
 
 Model 1 contains Actors, for example:
-- Player
-- Camera
-- Enemies & Bosses
-- Blueprints
-- Boss keys (except key 8)
-- Banana fairies
-- Bonus barrels
-- Boulders/Barrels
-- Rainbow coin pads
-- Cutscene and Bonus Barrel controllers
-- Loading zone controller
-- Fake Kongs (caged, DKRAP, test room, cutscenes)
-- Balloons
+	- Player
+	- Camera
+	- Enemies & Bosses
+	- Blueprints
+	- Boss keys (except key 8)
+	- Banana fairies
+	- Bonus barrels
+	- Boulders/Barrels
+	- Rainbow coin pads
+	- Cutscene and Bonus Barrel controllers
+	- Loading zone controller
+	- Fake Kongs (caged, DK Rap, test room, cutscenes)
+	- Balloons
 
 Model 2 contains lightweight objects, for example:
-- Gold Bananas
-- Key 8
-- Banana coins
-- Colored Bananas (singles & bunches)
-- Ammo crates
-- Crystal coconuts
-- Bananaporters
-- Instrument pads
-- Bullet switches
-- Simian Slam switches
-- Gorilla Grab levers
+	- Gold Bananas
+	- Key 8
+	- Banana coins
+	- Colored Bananas (singles & bunches)
+	- Ammo crates
+	- Crystal coconuts
+	- Bananaporters
+	- Instrument pads
+	- Bullet switches
+	- Simian Slam switches
+	- Gorilla Grab levers
 
 Even on maps with no Model 2 objects loaded, eg. main menu, the game allocates the object model 2 array with a minimum capacity of 450 objects or 0x90 * 450 or 0xFD20
 Larger maps, eg. Japes, have array object model 2 array sizes over 450
@@ -67,3 +67,5 @@ Stuff you can toggle with the lua console:
 encircle_enabled (boolean) - Circles objects from the currently selected object model around the player, warning: crashy & laggy
 rat_enabled (boolean) - Sets the animation timers for the player randomly
 hide_non_scripted (boolean) - Hides model 2 objects without special behavior scripts
+
+I'll probably add UI for this stuff in the future.
