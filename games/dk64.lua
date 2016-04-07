@@ -32,11 +32,12 @@ grab_script_mode = grab_script_modes[grab_script_mode_index];
 -------------------------
 
 local version; -- 1 USA, 2 PAL, 3 JP, 4 Kiosk
--- 7fa8a0 bone array pointer block
+-- 0x7FA8A0 bone array pointer block
 -- 2 pointers
 -- 1 u32_be
 Game.Memory = {
-	["map"] = {0x7444E4, 0x73EC34, 0x743DA4, 0x72CDE4}, -- Note: Exit = Map + 4
+	["map"] = {0x7444E4, 0x73EC34, 0x743DA4, 0x72CDE4},
+	["exit"] = {0x7444E8, 0x73EC38, 0x743DA8, 0x72CDE8},
 	["file"] = {0x7467C8, 0x740F18, 0x746088, nil},
 	["character"] = {0x74E77C, 0x748EDC, 0x74E05C, 0x6F9EB8},
 	["tb_void_byte"] = {0x7FBB63, 0x7FBA83, 0x7FBFD3, 0x7B5B13},
@@ -1335,9 +1336,9 @@ local function process_flag_queue()
 						mainmemory.writebyte(flags + queue_item["byte"], set_bit(current_value, queue_item["bit"]));
 						if not queue_item["suppressPrint"] then
 							if type(queue_item["name"]) == "string" then
-								dprint("Set \""..queue_item["name"].."\" at "..toHexString(queue_item["byte"]).." bit "..queue_item["bit"]);
+								dprint("Set \""..queue_item["name"].."\" at "..toHexString(queue_item["byte"])..">"..queue_item["bit"]);
 							else
-								dprint("Set flag at "..toHexString(queue_item["byte"]).." bit "..queue_item["bit"]);
+								dprint("Set flag at "..toHexString(queue_item["byte"])..">"..queue_item["bit"]);
 							end
 						end
 					elseif queue_item["action_type"] == "clear" then
@@ -1345,9 +1346,9 @@ local function process_flag_queue()
 						mainmemory.writebyte(flags + queue_item["byte"], clear_bit(current_value, queue_item["bit"]));
 						if not queue_item["suppressPrint"] then
 							if type(queue_item["name"]) == "string" then
-								dprint("Cleared \""..queue_item["name"].."\" at "..toHexString(queue_item["byte"]).." bit "..queue_item["bit"]);
+								dprint("Cleared \""..queue_item["name"].."\" at "..toHexString(queue_item["byte"])..">"..queue_item["bit"]);
 							else
-								dprint("Cleared flag at "..toHexString(queue_item["byte"]).." bit "..queue_item["bit"]);
+								dprint("Cleared flag at "..toHexString(queue_item["byte"])..">"..queue_item["bit"]);
 							end
 						end
 					elseif queue_item["action_type"] == "check" then
@@ -1392,7 +1393,7 @@ function setFlagByName(name)
 	end
 end
 
-function setFlagByType(_type)
+function setFlagsByType(_type)
 	local num_set = 0;
 	if type(_type) == "string" then
 		local flag;
@@ -1413,7 +1414,6 @@ function setFlagByType(_type)
 		print("No flags found for specified type.");
 	end
 end
-setFlagsByType = setFlagByType;
 
 function setAllFlags()
 	for byte = 0, flag_block_size do
@@ -1625,7 +1625,7 @@ function isInSubGame()
 	return map_value == arcade_map or map_value == jetpac_map;
 end
 
-function Game.getFloor() -- TODO: Got errors with this when exiting tiny temple
+function Game.getFloor()
 	local playerObject = Game.getPlayerObject();
 	if isRDRAM(playerObject) then
 		return mainmemory.readfloat(playerObject + obj_model1.floor, true);
@@ -3250,7 +3250,7 @@ local function unlock_moves()
 	setFlagByName("Training Grounds: Vine Barrel Completed");
 
 	-- Unlock Kongs
-	setFlagByType("Kong");
+	setFlagsByType("Kong");
 end
 
 function Game.getMap()
