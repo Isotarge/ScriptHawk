@@ -224,6 +224,7 @@ end
 JSON = require "lib.JSON";
 Stats = require "lib.Stats";
 lips = require "lips.init";
+require "lib.pngLua.png";
 require "lib.DPrint";
 
 -----------------------
@@ -442,26 +443,33 @@ local rgba5551_color_constants = {
 	["Blue"] = 0x0002,
 };
 
-function replaceTextureRGBA5551(filename, base, size)
+function replaceTextureRGBA5551(filename, base, width, height)
 	if not fileExists(filename) then
-		filename = forms.openfile(nil, nil, "All Files (*.*)|*.*");
+		filename = forms.openfile(nil, nil, "PNG Image (*.png)|*.png");
 		if not fileExists(filename) then
 			print("No image selected. Exiting.");
 			return;
 		end
 	end
 
-	local input_file = assert(io.open(filename, "rb"));
-	for i = 0, size - 1 do
-		local r = math.floor(string.byte(input_file:read(1)) / 8) * rgba5551_color_constants["Red"];
-		local g = math.floor(string.byte(input_file:read(1)) / 8) * rgba5551_color_constants["Green"];
-		local b = math.floor(string.byte(input_file:read(1)) / 8) * rgba5551_color_constants["Blue"];
-		local a = 1;
+	img = pngImage(filename);
 
-		mainmemory.write_u16_be(base + (i * 2), r + g + b + a);
+	for y = 1, height do
+		for x = 1, width do
+			if x <= img.width and y <= img.height then
+				local pixel = img:getPixel(x, y);
+				local r = math.floor(pixel.R / img.depth) * rgba5551_color_constants["Red"];
+				local g = math.floor(pixel.G / img.depth) * rgba5551_color_constants["Green"];
+				local b = math.floor(pixel.B / img.depth) * rgba5551_color_constants["Blue"];
+				local a = 0;
+				if pixel.A > 0 then
+					a = 1
+				end
+
+				mainmemory.write_u16_be(base + ((y - 1) * width * 2) + ((x - 1) * 2), r + g + b + a);
+			end
+		end
 	end
-
-	input_file:close();
 end
 
 -----------

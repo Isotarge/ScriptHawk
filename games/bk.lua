@@ -20,7 +20,8 @@ end
 -- Only patch US 1.0
 -- TODO - Figure out how to patch other versions
 local allowFurnaceFunPatch = false;
-local framebuffer_size = 292 * 200; -- Bigger on PAL
+local framebuffer_width = 292; -- Bigger on PAL
+local framebuffer_height = 200; -- Bigger on PAL
 
 local clip_vel = -3500; -- Velocity required to clip on the Y axis -- TODO: This seems to be different for different geometry
 
@@ -249,7 +250,8 @@ Game.Memory = {
 function Game.detectVersion(romName) -- TODO: Move addresses to a Memory table like DK64 module
 	if stringContains(romName, "Europe") then
 		version = 1;
-		framebuffer_size = 292 * 216;
+		framebuffer_width = 292;
+		framebuffer_height = 216;
 		clip_vel = -2900;
 		allowFurnaceFunPatch = false;
 	elseif stringContains(romName, "Japan") then
@@ -949,7 +951,7 @@ end
 function fillFB()
 	local frameBufferLocation = mainmemory.read_u24_be(Game.Memory.fb_pointer[version] + 1);
 	if isRDRAM(frameBufferLocation) then
-		replaceTextureRGBA5551(nil, frameBufferLocation, framebuffer_size)
+		replaceTextureRGBA5551(nil, frameBufferLocation, framebuffer_width, framebuffer_height)
 	end
 end
 

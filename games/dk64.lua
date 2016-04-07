@@ -2797,10 +2797,11 @@ function fillFB()
 	end
 
 	local frameBufferLocation = mainmemory.read_u24_be(Game.Memory.framebuffer_pointer[version] + 1);
-	local framebuffer_size = 320 * 240; -- Oddly enough it's the same size on PAL
+	local framebuffer_width = 320; -- Oddly enough it's the same size on PAL
+	local framebuffer_height = 240; -- Oddly enough it's the same size on PAL
 	if isRDRAM(frameBufferLocation) then
-		replaceTextureRGBA5551(image_filename, frameBufferLocation, framebuffer_size);
-		replaceTextureRGBA5551(image_filename, frameBufferLocation + (framebuffer_size * 2), framebuffer_size);
+		replaceTextureRGBA5551(image_filename, frameBufferLocation, framebuffer_width, framebuffer_height);
+		replaceTextureRGBA5551(image_filename, frameBufferLocation + (framebuffer_width * framebuffer_height * 2), framebuffer_width, framebuffer_height);
 	end
 end
 
