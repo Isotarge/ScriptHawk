@@ -1,10 +1,9 @@
 Custom DK64 FB image how to:
 
-- Convert your 320*240 image into a raw 24 bit RGB bitstream with the .rgb24 extension
 - Open BizHawk + DK64
 - Ensure "Copy framebuffer to RDRAM" (or a similarly named option) is disabled
 - Reboot core (if necessary)
 - Open ScriptHawk
 - Call fillFB() from the lua console
-- Load your .rgb24 file in the open file dialog that pops up
-- Pause the game or start a file to see it
+- Load your 320*240 png file in the open file dialog that pops up
+- Pause the game, start a file or take a photo to see it

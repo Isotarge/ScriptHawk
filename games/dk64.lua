@@ -2790,7 +2790,7 @@ end
 ----------------------
 
 function fillFB()
-	local image_filename = forms.openfile(nil, nil, "All Files (*.*)|*.*");
+	local image_filename = forms.openfile(nil, nil, "PNG Images (*.png)|*.png");
 	if not fileExists(image_filename) then
 		print("No image selected. Exiting.");
 		return;
