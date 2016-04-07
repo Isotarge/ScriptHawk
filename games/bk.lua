@@ -247,7 +247,7 @@ Game.Memory = {
 	["object_array_pointer"] = {0x36EAE0, 0x36F260, 0x36D760, 0x36E560},
 };
 
-function Game.detectVersion(romName) -- TODO: Move addresses to a Memory table like DK64 module
+function Game.detectVersion(romName)
 	if stringContains(romName, "Europe") then
 		version = 1;
 		framebuffer_width = 292;
@@ -497,13 +497,9 @@ function Game.colorCurrentMovementState()
 	end
 end
 
-------------------------
--- Roll Flutter stuff --
-------------------------
-
-local function RF_step()
-	-- TODO
-end
+---------------
+-- Autopound --
+---------------
 
 local options_autopound_checkbox;
 local holdingAPostJump = false;
@@ -513,9 +509,6 @@ function autoPound()
 	if forms.ischecked(options_autopound_checkbox) then
 		local currentMovementState = mainmemory.read_u32_be(Game.Memory.current_movement_state[version]);
 		local YVelocity = Game.getYVelocity();
-
-		-- Perfect roll flutters
-		RF_step();
 
 		-- First frame pound out of peck
 		if allowPound and currentMovementState == 17 and YVelocity == -272 and not Game.isPhysicsFrame() then -- TODO: YVelocity == -272 doesn't work for all versions
