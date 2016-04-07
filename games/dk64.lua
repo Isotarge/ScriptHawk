@@ -42,7 +42,7 @@ Game.Memory = {
 	["tb_void_byte"] = {0x7FBB63, 0x7FBA83, 0x7FBFD3, 0x7B5B13},
 	["player_pointer"] = {0x7FBB4C, 0x7FBA6C, 0x7FBFBC, 0x7B5AFC},
 	["camera_pointer"] = {0x7FB968, 0x7FB888, 0x7FBDD8, 0x7B5918},
-	["pointer_list"] = {0x7FBFF0, 0x7FBF10, 0x7FC460, 0x7B5E58}, -- TODO: Kiosk is in a weird spot, is this correct?
+	["pointer_list"] = {0x7FBFF0, 0x7FBF10, 0x7FC460, 0x7B5E58},
 	["linked_list_pointer"] = {0x7F0990, 0x7F08B0, 0x7F0E00, 0x7A12C0},
 	["global_base"] = {0x7FCC41, 0x7FCB81, 0x7FD0D1, 0x7B6754},
 	["kong_base"] = {0x7FC950, 0x7FC890, 0x7FCDE0, nil}, -- TODO: Kiosk?
@@ -131,7 +131,7 @@ local max_musical_energy = 10;
 local max_standard_ammo  = 50;
 local max_homing_ammo    = 50;
 
-local max_blueprints = 40 * 2;
+local max_blueprints = 40;
 local max_fairies = 20;
 local max_crowns = 10;
 local max_medals = 40;
@@ -1500,53 +1500,72 @@ function flagStats(verbose)
 	local crowns_known = 0;
 	local coins_known = 0;
 	local untypedFlags = 0;
+	local flagsWithUnknownType = 0;
 
 	-- Setting this to true warns the user of flags without types
 	verbose = verbose or false;
 
-	local flag, name, flagType;
+	local flag, name, flagType, validType;
 	for i = 1, #flag_array do
 		flag = flag_array[i];
 		name = flag["name"];
 		flagType = flag["type"];
-		if flagType == nil then
-			untypedFlags = untypedFlags + 1;
-			if verbose then
-				dprint("Warning: Flag without type detected at "..toHexString(flag["byte"]).." bit "..flag["bit"].." with name: \""..flag["name"].."\"");
-			end
-		end
+		validType = false;
 		if flagType == "Fairy" then
 			fairies_known = fairies_known + 1;
+			validType = true;
 		end
 		if flagType == "Blueprint" then
 			blueprints_known = blueprints_known + 1;
-			if stringContains(name, "Turned") then
-				gb_known = gb_known + 1;
-			end
+			validType = true;
 		end
 		if flagType == "Warp" then
 			warps_known = warps_known + 1;
+			validType = true;
 		end
 		if flagType == "GB" then
 			gb_known = gb_known + 1;
+			validType = true;
 		end
 		if flagType == "CB" then
 			cb_known = cb_known + 1;
+			validType = true;
 		end
 		if flagType == "Bunch" then
 			cb_known = cb_known + 5;
+			validType = true;
 		end
 		if flagType == "Balloon" then
 			cb_known = cb_known + 10;
+			validType = true;
 		end
 		if flagType == "Crown" then
 			crowns_known = crowns_known + 1;
+			validType = true;
 		end
 		if flagType == "Coin" then
 			coins_known = coins_known + 1;
+			validType = true;
 		end
 		if flagType == "Rainbow Coin" then
 			coins_known = coins_known + 25;
+			validType = true;
+		end
+		if flagType == nil then
+			untypedFlags = untypedFlags + 1;
+			if verbose then
+				dprint("Warning: Flag without type at "..toHexString(flag["byte"])..">"..flag["bit"].." with name: \""..name.."\"");
+			end
+		else
+			if flagType == "B. Locker" or flagType == "Cutscene" or flagType == "FTT" or flagType == "Key" or flagType == "Kong" or flagType == "Medal" or flagType == "Unknown" then
+				validType = true;
+			end
+			if not validType then
+				flagsWithUnknownType = flagsWithUnknownType + 1;
+				if verbose then
+					dprint("Warning: Flag with unknown type at "..toHexString(flag["byte"])..">"..flag["bit"].." with name: \""..name.."\"".." and type: \""..flagType.."\"");
+				end
+			end
 		end
 	end
 
@@ -1555,7 +1574,8 @@ function flagStats(verbose)
 
 	dprint("Block size: "..toHexString(flag_block_size));
 	dprint(formatOutputString("Flags known: ", knownFlags, totalFlags));
-	dprint(formatOutputString("Flags without types: ", untypedFlags, knownFlags));
+	dprint(formatOutputString("Without types: ", untypedFlags, knownFlags));
+	dprint(formatOutputString("Unknown types:", flagsWithUnknownType, knownFlags));
 	dprint("");
 	dprint(formatOutputString("Crowns: ", crowns_known, max_crowns));
 	dprint(formatOutputString("Fairies: ", fairies_known, max_fairies));
