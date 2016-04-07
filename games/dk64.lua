@@ -908,10 +908,10 @@ end
 function Game.detectVersion(romName)
 	if stringContains(romName, "USA") and not stringContains(romName, "Kiosk") then
 		version = 1;
-		flag_array = require("games.dk64_flags_USA");
+		flag_array = require("games.dk64_flags");
 	elseif stringContains(romName, "Europe") then
 		version = 2;
-		flag_array = require("games.dk64_flags_PAL");
+		flag_array = require("games.dk64_flags");
 
 		--Mad Jack
 		MJ_offsets["ticks_until_next_action"] = 0x25;
