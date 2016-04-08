@@ -133,11 +133,11 @@ local max_standard_ammo  = 50;
 local max_homing_ammo    = 50;
 
 local max_blueprints = 40;
-local max_fairies = 20;
-local max_crowns = 10;
-local max_medals = 40;
 local max_cb = 3511;
+local max_crowns = 10;
+local max_fairies = 20;
 local max_gb = 201;
+local max_medals = 40;
 local max_warps = (5 * 2 * 8) + 4 + 2 + 2 + 6;
 
 -- Relative to global_base
@@ -1277,12 +1277,17 @@ function isFound(byte, bit)
 	return false;
 end
 
-function checkFlags()
+function isValidFlagBlockAddress(address)
+	return address > 0x700000 and address ~= 0x756494 and address ~= 0x7F0000 and address ~= 0x7FBFB0 and address < RDRAMSize - flag_block_size;
+end
+
+function checkFlags(_type)
 	local flags = mainmemory.read_u24_be(Game.Memory.flag_block_pointer[version] + 1);
 	local temp_value;
 	local flag_found = false;
 	local known_flags_found = 0;
-	if flags > 0x700000 and flags < RDRAMSize - flag_block_size then
+	_type = _type or "Type";
+	if isValidFlagBlockAddress(flags) then
 		if #flag_block > 0 then
 			for i = 0, #flag_block do
 				temp_value = mainmemory.readbyte(flags + i);
@@ -1292,7 +1297,7 @@ function checkFlags()
 							-- Output debug info if the flag isn't known
 							if not isFound(i, bit) then
 								flag_found = true;
-								dprint("{[\"byte\"] = "..toHexString(i)..", [\"bit\"] = "..bit..", [\"name\"] = \"Name\", [\"type\"] = \"Type\"},");
+								dprint("{[\"byte\"] = "..toHexString(i)..", [\"bit\"] = "..bit..", [\"name\"] = \"Name\", [\"type\"] = \"".._type.."\", [\"map\"] = "..Game.getMap().."},");
 							else
 								known_flags_found = known_flags_found + 1;
 							end
@@ -1318,7 +1323,7 @@ function checkFlags()
 		end
 	else
 		dprint("Failed to find flag block on this frame, adding to queue. Will be checked next time block is found.");
-		table.insert(flag_action_queue, {["action_type"]="check"});
+		table.insert(flag_action_queue, {["action_type"] = "check"});
 	end
 	print_deferred();
 end
@@ -1326,7 +1331,7 @@ end
 local function process_flag_queue()
 	if #flag_action_queue > 0 then
 		local flags = mainmemory.read_u24_be(Game.Memory.flag_block_pointer[version] + 1);
-		if flags > 0x700000 and flags < RDRAMSize - flag_block_size then
+		if isValidFlagBlockAddress(flags) then
 			local queue_item, current_value;
 			for i = 1, #flag_action_queue do
 				queue_item = flag_action_queue[i];
@@ -1411,8 +1416,24 @@ function setFlagsByType(_type)
 		process_flag_queue();
 		print("Set "..num_set.." flags of type '".._type.."'");
 	else
-		print("No flags found for specified type.");
+		print("No flags found of type '".._type.."'");
 	end
+end
+
+function setFlagsByMap(mapIndex)
+	-- TODO
+end
+
+function clearFlagsByMap(mapIndex)
+	-- TODO
+end
+
+function setKnownFlags()
+	-- TODO
+end
+
+function clearKnownFlags()
+	-- TODO
 end
 
 function setAllFlags()
@@ -1499,6 +1520,7 @@ function flagStats(verbose)
 	local gb_known = 0;
 	local crowns_known = 0;
 	local coins_known = 0;
+	local medals_known = 0;
 	local untypedFlags = 0;
 	local flagsWithUnknownType = 0;
 
@@ -1547,6 +1569,10 @@ function flagStats(verbose)
 			coins_known = coins_known + 1;
 			validType = true;
 		end
+		if flagType == "Medal" then
+			medals_known = medals_known + 1;
+			validType = true;
+		end
 		if flagType == "Rainbow Coin" then
 			coins_known = coins_known + 25;
 			validType = true;
@@ -1557,7 +1583,7 @@ function flagStats(verbose)
 				dprint("Warning: Flag without type at "..toHexString(flag["byte"])..">"..flag["bit"].." with name: \""..name.."\"");
 			end
 		else
-			if flagType == "B. Locker" or flagType == "Cutscene" or flagType == "FTT" or flagType == "Key" or flagType == "Kong" or flagType == "Medal" or flagType == "Unknown" then
+			if flagType == "B. Locker" or flagType == "Cutscene" or flagType == "FTT" or flagType == "Key" or flagType == "Kong" or flagType == "T&S" or flagType == "Unknown" then
 				validType = true;
 			end
 			if not validType then
@@ -1577,13 +1603,14 @@ function flagStats(verbose)
 	dprint(formatOutputString("Without types: ", untypedFlags, knownFlags));
 	dprint(formatOutputString("Unknown types:", flagsWithUnknownType, knownFlags));
 	dprint("");
+	dprint(formatOutputString("CB: ", cb_known, max_cb));
+	dprint(formatOutputString("GB: ", gb_known, max_gb));
+	dprint("");
 	dprint(formatOutputString("Crowns: ", crowns_known, max_crowns));
 	dprint(formatOutputString("Fairies: ", fairies_known, max_fairies));
 	dprint(formatOutputString("Blueprints: ", blueprints_known, max_blueprints));
-	dprint("");
+	dprint(formatOutputString("Medals: ", medals_known, max_medals));
 	dprint(formatOutputString("Warps: ", warps_known, max_warps));
-	dprint(formatOutputString("CB: ", cb_known, max_cb));
-	dprint(formatOutputString("GB: ", gb_known, max_gb));
 	dprint("Coins: "..coins_known); -- Just a note: Fungi Rabbit Race coins aren't flagged
 	dprint("");
 	print_deferred();
@@ -2856,7 +2883,7 @@ local function decrementObjectIndex()
 	end
 end
 
-local function grab_object(pointer)
+local function grabObject(pointer)
 	local playerObject = Game.getPlayerObject();
 	if isRDRAM(playerObject) then
 		mainmemory.writebyte(playerObject + obj_model1.player.grab_pointer, 0x80);
@@ -2929,6 +2956,7 @@ end
 ScriptHawk.bindKeyRealtime("N", decrementObjectIndex, true);
 ScriptHawk.bindKeyRealtime("M", incrementObjectIndex, true);
 ScriptHawk.bindKeyRealtime("Z", zipToSelectedObject, true);
+ScriptHawk.bindKeyRealtime("V", grabSelectedObject, true);
 ScriptHawk.bindKeyRealtime("B", focusSelectedObject, true);
 ScriptHawk.bindKeyRealtime("C", switch_grab_script_mode, true);
 
@@ -3690,6 +3718,7 @@ function Game.completeFile()
 	for kong = DK, Chunky do
 		local base = Game.Memory.kong_base[version] + kong * 0x5E;
 		for level = 0, 6 do
+			--mainmemory.write_u16_be(base + CB_Base + (level * 2), 74); -- Enough for quick banana medal flag finding
 			mainmemory.write_u16_be(base + CB_Base + (level * 2), 75); -- Enough for banana medal
 		end
 		for level = 0, 7 do

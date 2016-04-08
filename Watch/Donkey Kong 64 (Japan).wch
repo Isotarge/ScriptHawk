@@ -11,6 +11,7 @@ SystemID N64
 753B34	d	h	1	RDRAM	Object Model 2 Collision Linked List Pointer
 753B70	d	h	1	RDRAM	HUD Pointer
 7553A0	b	u	1	RDRAM	Security Byte
+7656E4	d	h	1	RDRAM	Flag Block Pointer
 767EB4	d	u	1	RDRAM	Frames (Real)
 76B100	d	u	1	RDRAM	Frames (Lag)
 7F0E00	d	h	1	RDRAM	Linked List Pointer
