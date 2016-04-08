@@ -2918,14 +2918,14 @@ local function zipToSelectedObject()
 	if isRDRAM(playerObject) then
 		local desiredX, desiredY, desiredZ;
 		-- Get selected object X,Y,Z position
-		if bizstring.contains(grab_script_mode, "Model 1") then
+		if stringContains(grab_script_mode, "Model 1") then
 			local selectedActorBase = mainmemory.read_u24_be(Game.Memory["pointer_list"][version] + (object_index - 1) * 4 + 1);
 			if isRDRAM(selectedActorBase) then
 				desiredX = mainmemory.readfloat(selectedActorBase + obj_model1.x_pos, true);
 				desiredY = mainmemory.readfloat(selectedActorBase + obj_model1.y_pos, true);
 				desiredZ = mainmemory.readfloat(selectedActorBase + obj_model1.z_pos, true);
 			end
-		elseif bizstring.contains(grab_script_mode, "Model 2") then
+		elseif stringContains(grab_script_mode, "Model 2") then
 			local model2Array = Game.Memory["obj_model2_array_pointer"][version] + RDRAMBase;
 			if version ~= 4 then
 				model2Array = mainmemory.read_u32_be(Game.Memory["obj_model2_array_pointer"][version]);
@@ -3185,7 +3185,7 @@ local function draw_grab_script_ui()
 	end
 
 	if #object_pointers > 0 and object_index <= #object_pointers then
-		if bizstring.contains(grab_script_mode, "Examine") then
+		if stringContains(grab_script_mode, "Examine") then
 			local examine_data = {};
 			if grab_script_mode == "Examine (Object Model 1)" then
 				examine_data = getExamineDataModelOne(object_pointers[object_index]);
