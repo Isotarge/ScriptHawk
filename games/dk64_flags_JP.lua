@@ -23,6 +23,8 @@ local flag_array = {
 	{["byte"] = 0xE, ["bit"] = 6, ["name"] = "Kong Unlocked: Chunky", ["type"] = "Kong", ["map"] = 26},
 	{["byte"] = 0xE, ["bit"] = 7, ["name"] = "Factory: Lanky GB: Free Chunky", ["type"] = "GB", ["map"] = 26},
 
+	{["byte"] = 0x10, ["bit"] = 5, ["name"] = "Nintendo Coin", ["type"] = "Coin"},
+
 	{["byte"] = 0x11, ["bit"] = 3, ["name"] = "Key 3", ["type"] = "Key", ["map"] = 154},
 	{["byte"] = 0x11, ["bit"] = 5, ["name"] = "Factory: Chunky's help me cutscene", ["type"] = "Cutscene", ["map"] = 26},
 
@@ -42,6 +44,7 @@ local flag_array = {
 	{["byte"] = 0x2C, ["bit"] = 4, ["name"] = "Warp pad FTT", ["type"] = "FTT"},
 
 	{["byte"] = 0x2F, ["bit"] = 2, ["name"] = "Camera/Shockwave", ["map"] = 189},
+	{["byte"] = 0x2F, ["bit"] = 4, ["name"] = "Rareware Coin", ["type"] = "Coin", ["map"] = 5},
 	{["byte"] = 0x2F, ["bit"] = 5, ["name"] = "Key 8", ["type"] = "Key", ["map"] = 17},
 
 	{["byte"] = 0x30, ["bit"] = 2, ["name"] = "Kong Unlocked: DK", ["type"] = "Kong"},

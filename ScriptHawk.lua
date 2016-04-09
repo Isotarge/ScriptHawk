@@ -1059,7 +1059,7 @@ local function plot_pos()
 			if math.abs(dx) > max_dx then max_dx = math.abs(dx) end
 			if math.abs(dy) > max_dy then max_dy = math.abs(dy) end
 			if math.abs(dz) > max_dz then max_dz = math.abs(dz) end
-			if math.abs(current_frame-previous_frame) > 1 then
+			if math.abs(current_frame - previous_frame) > 1 then
 				max_dx = 0; max_dy = 0; max_dz = 0;
 				max_d = 0;
 			end

@@ -1660,6 +1660,13 @@ function Game.getFloor()
 	return 0;
 end
 
+function Game.setFloor(value)
+	local playerObject = Game.getPlayerObject();
+	if isRDRAM(playerObject) then
+		mainmemory.writefloat(playerObject + obj_model1.floor, value, true);
+	end
+end
+
 function Game.getDistanceFromFloor()
 	local playerObject = Game.getPlayerObject();
 	if isRDRAM(playerObject) then
@@ -3701,14 +3708,34 @@ function Game.eachFrame()
 	forms.settext(ScriptHawkUI.form_controls["Moon Mode Button"], moon_mode);
 end
 
+function Game.crankyCutsceneMininumRequirements()
+	setFlagsByType("Crown");
+	setFlagsByType("Fairy");
+	setFlagsByType("Key");
+	setFlagsByType("Medal");
+	setFlagByName("Nintendo Coin");
+	setFlagByName("Rareware Coin");
+
+	-- CB and GB counters
+	for kong = DK, Chunky do
+		local base = Game.Memory.kong_base[version] + kong * 0x5E;
+		for level = 0, 7 do
+			mainmemory.write_s16_be(base + GB_Base + (level * 2), 5); -- Normal GB's
+			if level == 7 and kong == Tiny then
+				mainmemory.write_s16_be(base + GB_Base + (level * 2), 6); -- Rareware GB
+			end
+		end
+	end
+end
+
 function Game.completeFile()
 	unlock_moves();
 
-	setFlagsByType("Blueprint");
-	setFlagsByType("CB");
+	setFlagsByType("Blueprint"); -- Not needed to trigger Cranky Cutscene
+	setFlagsByType("CB"); -- Not needed to trigger the Cranky Cutscene
 	setFlagsByType("Crown");
 	setFlagsByType("Fairy");
-	setFlagsByType("GB");
+	setFlagsByType("GB"); -- Not needed to trigger Cranky Cutscene
 	setFlagsByType("Key");
 	setFlagsByType("Medal");
 	setFlagByName("Nintendo Coin");
@@ -3718,8 +3745,7 @@ function Game.completeFile()
 	for kong = DK, Chunky do
 		local base = Game.Memory.kong_base[version] + kong * 0x5E;
 		for level = 0, 6 do
-			--mainmemory.write_u16_be(base + CB_Base + (level * 2), 74); -- Enough for quick banana medal flag finding
-			mainmemory.write_u16_be(base + CB_Base + (level * 2), 75); -- Enough for banana medal
+			mainmemory.write_u16_be(base + CB_Base + (level * 2), 75); -- Not needed to trigger Cranky Cutscene
 		end
 		for level = 0, 7 do
 			mainmemory.write_s16_be(base + GB_Base + (level * 2), 5); -- Normal GB's
