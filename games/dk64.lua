@@ -3627,6 +3627,7 @@ function Game.setKongColor()
 end
 
 function Game.eachFrame()
+	local playerObject = Game.getPlayerObject();
 	map_value = Game.getMap();
 	updateCurrentInvisify();
 	koshBotLoop();
@@ -3637,10 +3638,9 @@ function Game.eachFrame()
 	Game.unlock_menus();
 
 	-- Force STVW
-	--local player = Game.getPlayerObject();
 	--local yRot = Game.getYRotation();
 	--if yRot < Game.max_rot_units then
-	--		Game.setYRotation(yRot + Game.max_rot_units);
+	--	Game.setYRotation(yRot + Game.max_rot_units);
 	--end
 
 	-- Joypad copy
@@ -3687,8 +3687,8 @@ function Game.eachFrame()
 	process_flag_queue();
 
 	-- Moonkick
-	if moon_mode == 'All' or (moon_mode == 'Kick' and mainmemory.readbyte(Game.getPlayerObject() + obj_model1.player.animation_type) == obj_model1.player.animation_types.kick) then
-		mainmemory.writefloat(Game.getPlayerObject() + obj_model1.y_acceleration, -2.5, true);
+	if moon_mode == 'All' or (moon_mode == 'Kick' and isRDRAM(playerObject) and mainmemory.readbyte(playerObject + obj_model1.player.animation_type) == obj_model1.player.animation_types.kick) then
+		mainmemory.writefloat(playerObject + obj_model1.y_acceleration, -2.5, true);
 	end
 
 	-- Check EEPROM checksums
