@@ -23,7 +23,7 @@ local allowFurnaceFunPatch = false;
 local framebuffer_width = 292; -- Bigger on PAL
 local framebuffer_height = 200; -- Bigger on PAL
 
-local clip_vel = -3500; -- Velocity required to clip on the Y axis -- TODO: This seems to be different for different geometry
+local clip_vel = -3500; -- Minimum velocity required to clip on the Y axis -- TODO: This seems to be different for different geometry
 
 -- Relative to notes
 -- TODO: Add jinjos
@@ -278,8 +278,6 @@ function Game.detectVersion(romName)
 	return true;
 end
 
-local options_toggle_neverslip;
-
 local function neverSlip()
 	mainmemory.writefloat(Game.Memory.slope_timer[version], 0.0, true);
 end
@@ -289,7 +287,7 @@ function Game.getSlopeTimer()
 end
 
 function Game.colorSlopeTimer()
-	if forms.ischecked(options_toggle_neverslip) then
+	if forms.ischecked(ScriptHawkUI.form_controls.toggle_neverslip) then
 		return 0xFF00FFFF; -- Light blue
 	end
 	local slopeTimer = Game.getSlopeTimer();
@@ -302,9 +300,6 @@ end
 -- Moves stuff --
 -----------------
 
-local options_moves_dropdown;
-local options_moves_button;
-
 local move_levels = {
 	["0. None"]                 = 0x00000000,
 	["1. Spiral Mountain 100%"] = 0x00009DB9,
@@ -314,7 +309,7 @@ local move_levels = {
 };
 
 local function unlock_moves()
-	local level = forms.gettext(options_moves_dropdown);
+	local level = forms.gettext(ScriptHawkUI.form_controls.moves_dropdown);
 	mainmemory.write_u32_be(Game.Memory.moves_bitfield[version], move_levels[level]);
 end
 
@@ -501,12 +496,11 @@ end
 -- Autopound --
 ---------------
 
-local options_autopound_checkbox;
 local holdingAPostJump = false;
 allowPound = false;
 allowTTrotJump = true;
 function autoPound()
-	if forms.ischecked(options_autopound_checkbox) then
+	if forms.ischecked(ScriptHawkUI.form_controls.autopound_checkbox) then
 		local currentMovementState = mainmemory.read_u32_be(Game.Memory.current_movement_state[version]);
 		local YVelocity = Game.getYVelocity();
 
@@ -633,11 +627,9 @@ end
 -- Furnace fun stuff --
 -----------------------
 
-local options_allow_ff_patch;
-
 -- TODO: Figure out how to patch for other versions
 local function applyFurnaceFunPatch()
-	if allowFurnaceFunPatch and forms.ischecked(options_allow_ff_patch) then
+	if allowFurnaceFunPatch and forms.ischecked(ScriptHawkUI.form_controls.allow_ff_patch) then
 		mainmemory.write_u16_be(0x320064, 0x080A);
 		mainmemory.write_u16_be(0x320066, 0x1840);
 
@@ -680,11 +672,6 @@ end
 ----------------------
 -- Vile state stuff --
 ----------------------
-
--- Wave UI
-local options_wave_button;
-local options_heart_button;
-local options_fire_all_button;
 
 local game_type = 0x90; -- TODO: Verify these
 local previous_game_type = 0x91;
@@ -872,8 +859,6 @@ ScriptHawk.bindKeyFrame("C", throwOrange, false);
 -- Encircle --
 --------------
 
-local encircle_checkbox;
-local dynamic_radius_checkbox;
 local dynamic_radius_factor = 15;
 y_stagger_amount = 10;
 
@@ -913,7 +898,7 @@ local function encircle_banjo()
 	num_slots = get_num_slots();
 
 	radius = 1000;
-	if forms.ischecked(dynamic_radius_checkbox) then
+	if forms.ischecked(ScriptHawkUI.form_controls.dynamic_radius_checkbox) then
 		radius = num_slots * dynamic_radius_factor;
 	end
 
@@ -1072,29 +1057,41 @@ end
 
 -- Calculated VXZ
 function Game.getVelocity()
-	local VX = Game.getXVelocity();
-	local VZ = Game.getZVelocity();
-	return math.sqrt(VX*VX + VZ*VZ);
+	local vX = Game.getXVelocity();
+	local vZ = Game.getZVelocity();
+	return math.sqrt(vX*vX + vZ*vZ);
 end
 
--------------------------
--- Pulse Clip Velocity --
--------------------------
+-------------------------------------
+-- Freeze Clip Velocity            --
+-- Written by Isotarge, 2015-2016  --
+-------------------------------------
 
-local options_pulse_clip_velocity;
-local pulseClipVelocityCounter = 0;
-pulseClipVelocityInterval = 5;
+-- This function can be used to check for RTA or TAS viability of a clip using the standard talon trot setup.
 
-function pulseClipVelocity()
-	if not forms.ischecked(options_pulse_clip_velocity) or joypad.getimmediate()["P1 L"] then
+-- Since RTA and TAS viable talon trot clips work by exceeding clip velocity (differs on PAL/NTSC)
+-- while hooked (off the ground) on an edge that it's possible to ascend without jumping, it's possible
+-- that simply freezing Y velocity at -4000 using the RAM watch will yield false positives for talon trot style clips
+-- by allowing the player to have -4000 velocity while on the ground, which is not possible RTA or TAS.
+
+-- Thus this method only freezes Y velocity at -4000 while the player is in the air.
+
+-- Unfortunately this comes at a cost of false negatives, for example, the Clanker's Cavern lobby clip
+-- might not be possible with this method since it (seemingly) requires a small height boost during the talon trot setup
+-- which this method prevents due to the steep increase of velocity over one frame.
+
+-- Ideally, when searching for talon trot style clips, you'd initially lock your Y velocity at -4000 using standard tools
+-- to avoid false negatives, then verify that it's psosible RTA or TAS using this function to minimize false positives.
+
+function freezeClipVelocity()
+	local inputs = joypad.getimmediate();
+	-- if not forms.ischecked(ScriptHawkUI.form_controls.freeze_clip_velocity) or inputs["P1 L"] or inputs["P1 A"] then
+	if not forms.ischecked(ScriptHawkUI.form_controls.freeze_clip_velocity) or inputs["P1 L"] then -- TODO: Less hacky method of detecting moonjump lol
 		return;
 	end
 
-	pulseClipVelocityCounter = pulseClipVelocityCounter + 1;
-	local currentVelocity = Game.getYVelocity();
-	if pulseClipVelocityCounter >= pulseClipVelocityInterval and Game.getYPosition() >= 5 and currentVelocity > clip_vel then
-		Game.setYVelocity(clip_vel);
-		pulseClipVelocityCounter = 0;
+	if mainmemory.readbyte(Game.Memory.player_grounded[version]) == 0 and Game.getYVelocity() > -4000 then
+		Game.setYVelocity(-4000); -- This velocity is pretty much guaranteed to clip on any version if it's possible at all
 	end
 end
 
@@ -1152,7 +1149,7 @@ function spawnActor(id)
 	end
 	if spawnerEnabled then
 		if type(id) == 'nil' then
-			id = getActorID(forms.gettext(options_actor_dropdown));
+			id = getActorID(forms.gettext(ScriptHawkUI.form_controls.actor_dropdown));
 		end
 		updateActorSpawnPosition();
 		mainmemory.write_u16_be(spawnActorFlag, 1);
@@ -1195,40 +1192,40 @@ function Game.applyInfinites()
 end
 
 function Game.initUI()
-	options_toggle_neverslip = forms.checkbox(ScriptHawkUI.options_form, "Never Slip", ScriptHawkUI.col(0) + ScriptHawkUI.dropdown_offset, ScriptHawkUI.row(6) + ScriptHawkUI.dropdown_offset);
+	ScriptHawkUI.form_controls.toggle_neverslip = forms.checkbox(ScriptHawkUI.options_form, "Never Slip", ScriptHawkUI.col(0) + ScriptHawkUI.dropdown_offset, ScriptHawkUI.row(6) + ScriptHawkUI.dropdown_offset);
 	if allowFurnaceFunPatch then
-		options_allow_ff_patch = forms.checkbox(ScriptHawkUI.options_form, "Allow FF patch", ScriptHawkUI.col(0) + ScriptHawkUI.dropdown_offset, ScriptHawkUI.row(7) + ScriptHawkUI.dropdown_offset);
+		ScriptHawkUI.form_controls.allow_ff_patch = forms.checkbox(ScriptHawkUI.options_form, "Allow FF patch", ScriptHawkUI.col(0) + ScriptHawkUI.dropdown_offset, ScriptHawkUI.row(7) + ScriptHawkUI.dropdown_offset);
 	end
 
-	encircle_checkbox = forms.checkbox(ScriptHawkUI.options_form, "Encircle (Beta)", ScriptHawkUI.col(5) + ScriptHawkUI.dropdown_offset, ScriptHawkUI.row(4) + ScriptHawkUI.dropdown_offset);
-	dynamic_radius_checkbox = forms.checkbox(ScriptHawkUI.options_form, "Dynamic Radius", ScriptHawkUI.col(5) + ScriptHawkUI.dropdown_offset, ScriptHawkUI.row(5) + ScriptHawkUI.dropdown_offset);
-	options_pulse_clip_velocity = forms.checkbox(ScriptHawkUI.options_form, "Pulse Clip Vel.", ScriptHawkUI.col(5) + ScriptHawkUI.dropdown_offset, ScriptHawkUI.row(6) + ScriptHawkUI.dropdown_offset);
-	options_autopound_checkbox = forms.checkbox(ScriptHawkUI.options_form, "Auto Pound", ScriptHawkUI.col(10) + ScriptHawkUI.dropdown_offset, ScriptHawkUI.row(6) + ScriptHawkUI.dropdown_offset);
+	ScriptHawkUI.form_controls.encircle_checkbox = forms.checkbox(ScriptHawkUI.options_form, "Encircle (Beta)", ScriptHawkUI.col(5) + ScriptHawkUI.dropdown_offset, ScriptHawkUI.row(4) + ScriptHawkUI.dropdown_offset);
+	ScriptHawkUI.form_controls.dynamic_radius_checkbox = forms.checkbox(ScriptHawkUI.options_form, "Dynamic Radius", ScriptHawkUI.col(5) + ScriptHawkUI.dropdown_offset, ScriptHawkUI.row(5) + ScriptHawkUI.dropdown_offset);
+	ScriptHawkUI.form_controls.freeze_clip_velocity = forms.checkbox(ScriptHawkUI.options_form, "Freeze Clip Vel.", ScriptHawkUI.col(5) + ScriptHawkUI.dropdown_offset, ScriptHawkUI.row(6) + ScriptHawkUI.dropdown_offset);
+	ScriptHawkUI.form_controls.autopound_checkbox = forms.checkbox(ScriptHawkUI.options_form, "Auto Pound", ScriptHawkUI.col(10) + ScriptHawkUI.dropdown_offset, ScriptHawkUI.row(6) + ScriptHawkUI.dropdown_offset);
 
 	-- Actor spawner
-	options_actor_dropdown = forms.dropdown(ScriptHawkUI.options_form, actorNames, ScriptHawkUI.col(10) + ScriptHawkUI.dropdown_offset, ScriptHawkUI.row(0) + ScriptHawkUI.dropdown_offset);
-	options_spawn_actor_button = forms.button(ScriptHawkUI.options_form, "Spawn", spawnActor, ScriptHawkUI.col(10), ScriptHawkUI.row(1), ScriptHawkUI.col(2), ScriptHawkUI.button_height);
+	ScriptHawkUI.form_controls.actor_dropdown = forms.dropdown(ScriptHawkUI.options_form, actorNames, ScriptHawkUI.col(10) + ScriptHawkUI.dropdown_offset, ScriptHawkUI.row(0) + ScriptHawkUI.dropdown_offset);
+	ScriptHawkUI.form_controls.spawn_actor_button = forms.button(ScriptHawkUI.options_form, "Spawn", spawnActor, ScriptHawkUI.col(10), ScriptHawkUI.row(1), ScriptHawkUI.col(2), ScriptHawkUI.button_height);
 
 	-- Vile
-	options_wave_button =     forms.button(ScriptHawkUI.options_form, "Wave", initWave,         ScriptHawkUI.col(10), ScriptHawkUI.row(4), ScriptHawkUI.col(2), ScriptHawkUI.button_height);
-	options_heart_button =    forms.button(ScriptHawkUI.options_form, "Heart", doHeart,         ScriptHawkUI.col(12) + 8, ScriptHawkUI.row(4), ScriptHawkUI.col(2), ScriptHawkUI.button_height);
-	options_fire_all_button = forms.button(ScriptHawkUI.options_form, "Fire all", fireAllSlots, ScriptHawkUI.col(10), ScriptHawkUI.row(5), ScriptHawkUI.col(4) + 8, ScriptHawkUI.button_height);
+	ScriptHawkUI.form_controls.wave_button =     forms.button(ScriptHawkUI.options_form, "Wave", initWave,         ScriptHawkUI.col(10), ScriptHawkUI.row(4), ScriptHawkUI.col(2), ScriptHawkUI.button_height);
+	ScriptHawkUI.form_controls.heart_button =    forms.button(ScriptHawkUI.options_form, "Heart", doHeart,         ScriptHawkUI.col(12) + 8, ScriptHawkUI.row(4), ScriptHawkUI.col(2), ScriptHawkUI.button_height);
+	ScriptHawkUI.form_controls.fire_all_button = forms.button(ScriptHawkUI.options_form, "Fire all", fireAllSlots, ScriptHawkUI.col(10), ScriptHawkUI.row(5), ScriptHawkUI.col(4) + 8, ScriptHawkUI.button_height);
 
 	-- Moves
-	options_moves_dropdown = forms.dropdown(ScriptHawkUI.options_form, { "0. None", "1. Spiral Mountain 100%", "2. FFM Setup", "3. All", "3. Demo" }, ScriptHawkUI.col(10) + ScriptHawkUI.dropdown_offset, ScriptHawkUI.row(7) + ScriptHawkUI.dropdown_offset);
-	options_moves_button = forms.button(ScriptHawkUI.options_form, "Unlock Moves", unlock_moves, ScriptHawkUI.col(5), ScriptHawkUI.row(7), ScriptHawkUI.col(4) + 8, ScriptHawkUI.button_height);
+	ScriptHawkUI.form_controls.moves_dropdown = forms.dropdown(ScriptHawkUI.options_form, { "0. None", "1. Spiral Mountain 100%", "2. FFM Setup", "3. All", "3. Demo" }, ScriptHawkUI.col(10) + ScriptHawkUI.dropdown_offset, ScriptHawkUI.row(7) + ScriptHawkUI.dropdown_offset);
+	ScriptHawkUI.form_controls.moves_button = forms.button(ScriptHawkUI.options_form, "Unlock Moves", unlock_moves, ScriptHawkUI.col(5), ScriptHawkUI.row(7), ScriptHawkUI.col(4) + 8, ScriptHawkUI.button_height);
 end
 
 function Game.eachFrame()
 	applyFurnaceFunPatch();
 	updateWave();
-	pulseClipVelocity();
+	freezeClipVelocity();
 
-	if forms.ischecked(options_toggle_neverslip) then
+	if forms.ischecked(ScriptHawkUI.form_controls.toggle_neverslip) then
 		neverSlip();
 	end
 
-	if forms.ischecked(encircle_checkbox) then
+	if forms.ischecked(ScriptHawkUI.form_controls.encircle_checkbox) then
 		encircle_banjo();
 	end
 
