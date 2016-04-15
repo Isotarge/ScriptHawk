@@ -547,9 +547,9 @@ local function getExamineDataModelOne(pointer)
 		table.insert(examine_data, { "Distance From Floor", mainmemory.readfloat(pointer + obj_model1.distance_from_floor, true) });
 		table.insert(examine_data, { "Separator", 1 });
 
-		table.insert(examine_data, { "Rot X", mainmemory.read_u16_be(pointer + obj_model1.x_rot) });
-		table.insert(examine_data, { "Rot Y", mainmemory.read_u16_be(pointer + obj_model1.y_rot) });
-		table.insert(examine_data, { "Rot Z", mainmemory.read_u16_be(pointer + obj_model1.z_rot) });
+		table.insert(examine_data, { "Rot X", ScriptHawkUI.formatRotation(mainmemory.read_u16_be(pointer + obj_model1.x_rot)) });
+		table.insert(examine_data, { "Rot Y", ScriptHawkUI.formatRotation(mainmemory.read_u16_be(pointer + obj_model1.y_rot)) });
+			table.insert(examine_data, { "Rot Z", ScriptHawkUI.formatRotation(mainmemory.read_u16_be(pointer + obj_model1.z_rot)) });
 		table.insert(examine_data, { "Separator", 1 });
 
 		table.insert(examine_data, { "Velocity", mainmemory.readfloat(pointer + obj_model1.velocity, true) });
@@ -616,7 +616,7 @@ local function getExamineDataModelOne(pointer)
 		table.insert(examine_data, { "Viewport Z Pos", mainmemory.readfloat(pointer + obj_model1.camera.viewport_z_position, true) });
 		table.insert(examine_data, { "Separator", 1 });
 
-		table.insert(examine_data, { "Viewport Y Rot", mainmemory.read_u16_be(pointer + obj_model1.camera.viewport_y_rotation) });
+		table.insert(examine_data, { "Viewport Y Rot", ScriptHawkUI.formatRotation(mainmemory.read_u16_be(pointer + obj_model1.camera.viewport_y_rotation)) });
 		table.insert(examine_data, { "Separator", 1 });
 
 		table.insert(examine_data, { "Tracking Distance", mainmemory.readfloat(pointer + obj_model1.camera.tracking_distance, true) });
@@ -3209,6 +3209,9 @@ local function draw_grab_script_ui()
 
 			for i = #examine_data, 1, -1 do
 				if examine_data[i][1] ~= "Separator" then
+					if type(examine_data[i][2]) == "number" then
+						examine_data[i][2] = round(examine_data[i][2], precision);
+					end
 					gui.text(gui_x, gui_y + height * row, examine_data[i][1]..": "..examine_data[i][2], nil, nil, 'bottomright');
 					row = row + 1;
 				else
