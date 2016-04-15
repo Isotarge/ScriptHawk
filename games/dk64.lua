@@ -2384,7 +2384,6 @@ local function toggle_moonmode()
 	elseif moon_mode == 'All' then
 		moon_mode = 'None';
 	end
-	Game.eachFrame(); -- TODO: no bueno, update HUD in Game.realtime() instead
 end
 
 -----------------------

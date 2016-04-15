@@ -1150,8 +1150,8 @@ while true do
 	ScriptHawk.processKeybinds(ScriptHawk.keybindsRealtime);
 	ScriptHawk.processJoypadBinds(ScriptHawk.joypadBindsRealtime);
 	updateUIReadouts_ScriptHawk();
-	if type(Game.realtime) == "function" then
-		Game.realtime();
+	if type(Game.realTime) == "function" then
+		Game.realTime();
 	end
 	emu.yield();
 end
