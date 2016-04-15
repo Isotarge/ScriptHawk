@@ -1,3 +1,16 @@
+--------------------
+-- UI State Table --
+--------------------
+
+ScriptHawkUI = {
+	["form_controls"] = {}, -- TODO: Make game modules use this table for their own controls mayb?
+	["form_padding"] = 8,
+	["label_offset"] = 5,
+	["dropdown_offset"] = 1,
+	["long_label_width"] = 140,
+	["button_height"] = 23,
+};
+
 ----------------------
 -- Helper functions --
 ----------------------
@@ -643,7 +656,7 @@ local function toggleRotationUnits()
 	updateUIReadouts_ScriptHawk();
 end
 
-local function formatRotation(num)
+function ScriptHawkUI.formatRotation(num)
 	num = num or 0;
 	if isnan(num) then
 		num = 0;
@@ -738,19 +751,6 @@ local function toggleTelemetry()
 		startTelemetry();
 	end
 end
-
---------------------
--- UI State Table --
---------------------
-
-ScriptHawkUI = {
-	["form_controls"] = {}, -- TODO: Make game modules use this table for their own controls mayb?
-	["form_padding"] = 8,
-	["label_offset"] = 5,
-	["dropdown_offset"] = 1,
-	["long_label_width"] = 140,
-	["button_height"] = 23,
-};
 
 -------------
 -- UI Code --
@@ -888,7 +888,7 @@ function updateUIReadouts_ScriptHawk()
 			-- Detect and format rotation based on a keyword search
 			for j = 1, #angleKeywords do
 				if label == angleKeywords[j] then
-					value = formatRotation(value);
+					value = ScriptHawkUI.formatRotation(value);
 				end
 			end
 
@@ -1109,7 +1109,7 @@ local function plot_pos()
 					-- Detect and format rotation based on a keyword search
 					for j = 1, #angleKeywords do
 						if label == angleKeywords[j] then
-							value = formatRotation(value);
+							value = ScriptHawkUI.formatRotation(value);
 						end
 					end
 
