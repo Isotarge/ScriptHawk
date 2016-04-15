@@ -19,6 +19,7 @@ local object_pointers = {};
 local radius = 100;
 encircle_enabled = false;
 local grab_script_modes = {
+	"Disabled",
 	"List (Object Model 1)",
 	"Examine (Object Model 1)",
 	"List (Object Model 2)",
@@ -396,10 +397,12 @@ local obj_model1 = {
 		[340] = "Bug", -- Trash Can
 		[342] = "Try Again Dialog",
 	},
+	-- 0000 0010 = Block playing instrument
+	["object_properties_bitfield_1"] = 0x60, -- TODO: Document & rename this, probably lump into a u32_be bitfield
 	-- 0001 0000 = collides with terrain
 	-- 0000 0100 = visible
 	-- 0000 0001 = in water
-	["visibility"] = 0x63, -- Byte (bitfield) TODO: Fully document
+	["visibility"] = 0x63, -- Byte (bitfield) TODO: Fully document & rename this, probably lump into a u32_be bitfield
 	["specular_highlight"] = 0x6D, -- TODO: uh
 	["shadow_width"] = 0x6E, -- u8
 	["shadow_height"] = 0x6F, -- u8
@@ -3131,6 +3134,10 @@ function koshBotLoop()
 end
 
 local function draw_grab_script_ui()
+	if grab_script_mode == "Disabled" then
+		return;
+	end
+
 	local gui_x = 32;
 	local gui_y = 32;
 	local row = 0;
@@ -3261,8 +3268,6 @@ local function draw_grab_script_ui()
 		end
 	end
 end
-
-event.onframestart(draw_grab_script_ui, "ScriptHawk - Object model analysis main loop");
 
 ------------
 -- Events --
