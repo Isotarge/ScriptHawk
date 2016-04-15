@@ -14,8 +14,6 @@
 	- Start documentation for other versions
 - DK64: Exception when gui.cleargraphics() is called on first frame (by MJ minimap)
 - DK64: Finish integrating the Object Analysis tools
-	- UI to toggle the tools, right now they're always on
-	- Call formatRotation() for some of the OSD displays
 	- Move to SM64.lua's struct format for object model 1 and model 2
 - BK: Integrate Level Object Analyser.lua
 - BK: Integrate flags (and many other finds) from Bitalive's research https://docs.google.com/document/d/1Gek6Bkfcy1RHSDTBa3L3fEzJhaWROX3hfcmOrcekTV0/edit
@@ -27,8 +25,9 @@
 	- "Verbosity level" for object viewer scripts, include as a struct field flag
 - DK64: Neverslip enhancements, can't roll/kick on slopes
 - DK64: Fix DPad for fly swatter
-- Port Tetris Attack bot to Pokémon Puzzle League (once it boots in m64p & BizHawk ofc)
-	- [Info here](https://github.com/mupen64plus/mupen64plus-user-issues/issues/567)
+- Port Tetris Attack bot to other Puzzle League games
+	- [List of Games](http://www.speedrun.com/puzzle_league)
+	- [Pokémon Puzzle League Info here](https://github.com/mupen64plus/mupen64plus-user-issues/issues/567)
 - Keep [LIPS](https://github.com/notwa/lips) up to date
 - Support both BizHawk and m64p
 	- [Info here](https://github.com/notwa/mm/commit/90d30e218f3128fb130e54bd8662527bdd73f40f)
