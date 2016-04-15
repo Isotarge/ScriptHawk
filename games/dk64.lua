@@ -2364,7 +2364,7 @@ local function decrease_lag_factor()
 	lag_factor = math.max(min_lag_factor, lag_factor - 1);
 end
 
-local function fix_lag()
+local function fixLag()
 	if version ~= 4 then -- TODO: Kiosk
 		local frames_real_value = mainmemory.read_u32_be(Game.Memory.frames_real[version]);
 		mainmemory.write_u32_be(Game.Memory.frames_lag[version], frames_real_value - lag_factor);
@@ -3135,7 +3135,7 @@ function koshBotLoop()
 	end
 end
 
-local function draw_grab_script_ui()
+local function drawGrabScriptUI()
 	if grab_script_mode == "Disabled" then
 		return;
 	end
@@ -3278,7 +3278,7 @@ end
 -- Events --
 ------------
 
-local function unlock_moves()
+function Game.unlockMoves()
 	for kong = DK, Chunky do
 		local base = Game.Memory.kong_base[version] + kong * 0x5E;
 		mainmemory.writebyte(base + moves, 3);
@@ -3325,7 +3325,7 @@ function Game.initUI()
 	-- Buttons
 	ScriptHawkUI.form_controls["Toggle Invisify Button"] = forms.button(ScriptHawkUI.options_form, "Invisify", toggle_invisify, ScriptHawkUI.col(7), ScriptHawkUI.row(1), 64, ScriptHawkUI.button_height);
 	ScriptHawkUI.form_controls["Toggle TB Void Button"] = forms.button(ScriptHawkUI.options_form, "Toggle TB void", toggle_tb_void, ScriptHawkUI.col(10), ScriptHawkUI.row(1), ScriptHawkUI.col(4) + 8, ScriptHawkUI.button_height);
-	ScriptHawkUI.form_controls["Unlock Moves Button"] = forms.button(ScriptHawkUI.options_form, "Unlock Moves", unlock_moves, ScriptHawkUI.col(10), ScriptHawkUI.row(4), ScriptHawkUI.col(4) + 8, ScriptHawkUI.button_height);
+	ScriptHawkUI.form_controls["Unlock Moves Button"] = forms.button(ScriptHawkUI.options_form, "Unlock Moves", Game.unlockMoves, ScriptHawkUI.col(10), ScriptHawkUI.row(4), ScriptHawkUI.col(4) + 8, ScriptHawkUI.button_height);
 	ScriptHawkUI.form_controls["Random Color"] = forms.button(ScriptHawkUI.options_form, "Random Color", Game.setKongColor, ScriptHawkUI.col(5), ScriptHawkUI.row(5), ScriptHawkUI.col(4) + 8, ScriptHawkUI.button_height);
 
 	--ScriptHawkUI.form_controls["Everything is Kong Button"] = forms.button(ScriptHawkUI.options_form, "Kong", everythingIsKong, ScriptHawkUI.col(10), ScriptHawkUI.row(3), ScriptHawkUI.col(4) + 8, ScriptHawkUI.button_height);
@@ -3397,7 +3397,7 @@ end
 
 ]]--
 
-function Game.unlock_menus()
+function Game.unlockMenus()
 	if version ~= 4 then -- Anything but the Kiosk version
 		mainmemory.write_u32_be(Game.Memory.menu_flags[version], 0xFFFFFFFF);
 		mainmemory.write_u32_be(Game.Memory.menu_flags[version] + 4, 0xFFFFFFFF);
@@ -3642,10 +3642,8 @@ function Game.eachFrame()
 	
 	koshBotLoop();
 	forceTBS();
-	draw_grab_script_ui();
-
-	-- TODO: Allow user to toggle this
-	Game.unlock_menus();
+	drawGrabScriptUI();
+	Game.unlockMenus(); -- TODO: Allow user to toggle this
 
 	-- Force STVW
 	--local yRot = Game.getYRotation();
@@ -3655,7 +3653,7 @@ function Game.eachFrame()
 
 	-- Lag fix
 	if forms.ischecked(ScriptHawkUI.form_controls["Toggle Lag Fix Checkbox"]) then
-		fix_lag();
+		fixLag();
 	end
 
 	--if forms.ischecked(ScriptHawkUI.form_controls["Toggle Neverslip Checkbox"]) then
@@ -3728,7 +3726,7 @@ function Game.crankyCutsceneMininumRequirements()
 end
 
 function Game.completeFile()
-	unlock_moves();
+	Game.unlockMoves();
 
 	setFlagsByType("Blueprint"); -- Not needed to trigger Cranky Cutscene
 	setFlagsByType("CB"); -- Not needed to trigger the Cranky Cutscene
