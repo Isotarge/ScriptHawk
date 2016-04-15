@@ -1331,7 +1331,7 @@ function checkFlags(_type)
 	print_deferred();
 end
 
-local function process_flag_queue()
+local function processFlagQueue()
 	if #flag_action_queue > 0 then
 		local flags = mainmemory.read_u24_be(Game.Memory.flag_block_pointer[version] + 1);
 		if isValidFlagBlockAddress(flags) then
@@ -1388,7 +1388,7 @@ function setFlag(byte, bit, suppressPrint)
 	suppressPrint = suppressPrint or false;
 	if type(byte) == "number" and type(bit) == "number" and bit >= 0 and bit <= 7 then
 		table.insert(flag_action_queue, {["action_type"]="set", ["byte"]=byte, ["bit"]=bit, ["suppressPrint"]=suppressPrint});
-		process_flag_queue();
+		processFlagQueue();
 	end
 end
 
@@ -1397,7 +1397,7 @@ function setFlagByName(name)
 	if type(flag) == "table" then
 		flag["action_type"] = "set";
 		table.insert(flag_action_queue, flag);
-		process_flag_queue();
+		processFlagQueue();
 	end
 end
 
@@ -1416,7 +1416,7 @@ function setFlagsByType(_type)
 		end
 	end
 	if num_set > 0 then
-		process_flag_queue();
+		processFlagQueue();
 		print("Set "..num_set.." flags of type '".._type.."'");
 	else
 		print("No flags found of type '".._type.."'");
@@ -1463,7 +1463,7 @@ function clearFlag(byte, bit, suppressPrint)
 	suppressPrint = suppressPrint or false;
 	if type(byte) == "number" and type(bit) == "number" and bit >= 0 and bit <= 7 then
 		table.insert(flag_action_queue, {["action_type"]="clear", ["byte"]=byte, ["bit"]=bit, ["suppressPrint"]=suppressPrint});
-		process_flag_queue();
+		processFlagQueue();
 	end
 end
 
@@ -1472,7 +1472,7 @@ function clearFlagByName(name)
 	if type(flag) == "table" then
 		flag["action_type"] = "clear";
 		table.insert(flag_action_queue, flag);
-		process_flag_queue();
+		processFlagQueue();
 	end
 end
 
@@ -1491,7 +1491,7 @@ function clearFlagByType(_type)
 		end
 	end
 	if num_cleared > 0 then
-		process_flag_queue();
+		processFlagQueue();
 		print("Cleared "..num_cleared.." flags of type '".._type.."'");
 	else
 		print("No flags found for specified type.");
@@ -1964,16 +1964,6 @@ function Game.setVelocity(value)
 	end
 end
 
---function Game.getAcceleration()
---	if not isInSubGame() then
---		local playerObject = Game.getPlayerObject();
---		if isRDRAM(playerObject) then
---			return mainmemory.readfloat(playerObject + acceleration, true);
---		end
---	end
---	return 0;
---end
-
 function Game.getYVelocity()
 	local playerObject = Game.getPlayerObject();
 	if map_value == arcade_map then
@@ -2005,6 +1995,13 @@ function Game.getYAcceleration()
 		end
 	end
 	return 0;
+end
+
+function Game.setYAcceleration(value)
+	local playerObject = Game.getPlayerObject();
+	if isRDRAM(playerObject) then
+		mainmemory.writefloat(playerObject + obj_model1.y_acceleration, value, true);
+	end
 end
 
 --------------------
@@ -2077,7 +2074,7 @@ local timer_value = 0;
 local timer_start_frame = 0;
 local timer_started = false;
 
-local function timer()
+local function ISGTimer()
 	if map_value == 153 and prev_map ~= 153 then
 		timer_value = 0;
 		timer_start_frame = emu.framecount();
@@ -2100,7 +2097,7 @@ local function timer()
 		local timer_string = string.format("%.2d:%05.2f", s / 60 % 60, s % 60);
 		gui.text(16, 16, "ISG Timer: "..timer_string, nil, nil, 'topright');
 	else
-		gui.text(16, 16, "Waiting for ISG", nil, nil, 'topright');
+		--gui.text(16, 16, "Waiting for ISG", nil, nil, 'topright');
 	end
 end
 
@@ -2345,7 +2342,7 @@ end
 event.onloadstate(breakBoneDisplacement, "ScriptHawk - Break bone displacement");
 
 local function applyBoneDisplacementFix()
-	if version ~= 4 then -- TODO: Kiosk
+	if bone_displacement_fix and version ~= 4 then -- TODO: Kiosk
 		-- Old fix basically crashes sound thread, seems to work well but... no sound.
 		mainmemory.write_u32_be(Game.Memory.bone_displacement_pointer[version], 0);
 	end
@@ -2559,7 +2556,7 @@ function back()
 	is_brb = false;
 end
 
-local function do_brb()
+local function doBRB()
 	if is_brb then
 		mainmemory.writebyte(Game.Memory.security_byte[version], 0x01);
 		local messageLength = math.min(string.len(brb_message), 79); -- 79 bytes appears to be the maximum length we can write here without crashing
@@ -3348,8 +3345,6 @@ function Game.initUI()
 	ScriptHawkUI.form_controls["Toggle Homing Ammo Checkbox"] = forms.checkbox(ScriptHawkUI.options_form, "Homing Ammo", ScriptHawkUI.col(0) + ScriptHawkUI.dropdown_offset, ScriptHawkUI.row(6) + ScriptHawkUI.dropdown_offset);
 	--ScriptHawkUI.form_controls["Toggle Neverslip Checkbox"] = forms.checkbox(ScriptHawkUI.options_form, "Never Slip", ScriptHawkUI.col(10) + ScriptHawkUI.dropdown_offset, ScriptHawkUI.row(5) + ScriptHawkUI.dropdown_offset);
 	ScriptHawkUI.form_controls["Toggle Paper Mode Checkbox"] = forms.checkbox(ScriptHawkUI.options_form, "Paper Mode", ScriptHawkUI.col(10) + ScriptHawkUI.dropdown_offset, ScriptHawkUI.row(5) + ScriptHawkUI.dropdown_offset);
-	--ScriptHawkUI.form_controls["Toggle MJ Minimap"] = forms.checkbox(ScriptHawkUI.options_form, "MJ Minimap", ScriptHawkUI.col(5) + ScriptHawkUI.dropdown_offset, ScriptHawkUI.row(6) + ScriptHawkUI.dropdown_offset);
-	--ScriptHawkUI.form_controls["Toggle ISG Timer"] = forms.checkbox(ScriptHawkUI.options_form, "ISG Timer", ScriptHawkUI.col(5) + ScriptHawkUI.dropdown_offset, ScriptHawkUI.row(5) + ScriptHawkUI.dropdown_offset);
 	ScriptHawkUI.form_controls["Toggle OhWrongnana"] = forms.checkbox(ScriptHawkUI.options_form, "OhWrongnana", ScriptHawkUI.col(5) + ScriptHawkUI.dropdown_offset, ScriptHawkUI.row(6) + ScriptHawkUI.dropdown_offset);
 
 	-- Output flag statistics
@@ -3635,10 +3630,17 @@ function Game.setKongColor()
 	end
 end
 
+function Game.realTime()
+	updateCurrentInvisify();
+	forms.settext(ScriptHawkUI.form_controls["Lag Factor Value Label"], lag_factor);
+	forms.settext(ScriptHawkUI.form_controls["Toggle Invisify Button"], current_invisify);
+	forms.settext(ScriptHawkUI.form_controls["Moon Mode Button"], moon_mode);
+end
+
 function Game.eachFrame()
 	local playerObject = Game.getPlayerObject();
 	map_value = Game.getMap();
-	updateCurrentInvisify();
+	
 	koshBotLoop();
 	forceTBS();
 	draw_grab_script_ui();
@@ -3652,15 +3654,7 @@ function Game.eachFrame()
 	--	Game.setYRotation(yRot + Game.max_rot_units);
 	--end
 
-	-- Joypad copy
-	--local buttons = joypad.get(1);
-	--for i = 2, 4 do
-	--	joypad.set(buttons, i);
-	--	joypad.setanalog(buttons, i);
-	--end
-
 	-- Lag fix
-	forms.settext(ScriptHawkUI.form_controls["Lag Factor Value Label"], lag_factor);
 	if forms.ischecked(ScriptHawkUI.form_controls["Toggle Lag Fix Checkbox"]) then
 		fix_lag();
 	end
@@ -3681,31 +3675,24 @@ function Game.eachFrame()
 	-- Mad Jack
 	Game.drawMJMinimap();
 
-	-- ISG Timer
-	if type(ScriptHawkUI.form_controls["Toggle ISG Timer"]) ~= "nil" and forms.ischecked(ScriptHawkUI.form_controls["Toggle ISG Timer"]) then
-		timer();
-	else
-		timer_started = false;
-	end
-
-	if bone_displacement_fix then
-		applyBoneDisplacementFix();
-	end
-
-	do_brb();
-	process_flag_queue();
+	applyBoneDisplacementFix();
+	ISGTimer();
+	doBRB();
+	processFlagQueue();
 
 	-- Moonkick
 	if moon_mode == 'All' or (moon_mode == 'Kick' and isRDRAM(playerObject) and mainmemory.readbyte(playerObject + obj_model1.player.animation_type) == obj_model1.player.animation_types.kick) then
-		mainmemory.writefloat(playerObject + obj_model1.y_acceleration, -2.5, true);
+		Game.setYAcceleration(-2.5);
 	end
 
 	-- Check EEPROM checksums
 	if memory.usememorydomain("EEPROM") then
 		local checksum_value;
+		local slotChanged = false;
 		for i = 1, #eep_checksum_offsets do
 			checksum_value = memory.read_u32_be(eep_checksum_offsets[i]);
 			if eep_checksum_values[i] ~= checksum_value then
+				slotChanged = true;
 				if i == 5 then
 					dprint("Global flags "..i.." Checksum: "..toHexString(eep_checksum_values[i], 8).." -> "..toHexString(checksum_value, 8));
 				else
@@ -3714,12 +3701,11 @@ function Game.eachFrame()
 				eep_checksum_values[i] = checksum_value;
 			end
 		end
-		print_deferred();
+		if slotChanged then
+			print_deferred();
+		end
 	end
 	memory.usememorydomain("RDRAM");
-
-	forms.settext(ScriptHawkUI.form_controls["Toggle Invisify Button"], current_invisify);
-	forms.settext(ScriptHawkUI.form_controls["Moon Mode Button"], moon_mode);
 end
 
 function Game.crankyCutsceneMininumRequirements()
