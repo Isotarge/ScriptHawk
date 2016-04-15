@@ -1738,11 +1738,17 @@ function Game.setYPosition(value)
 			local vehiclePointer = mainmemory.read_u32_be(playerObject + obj_model1.player.vehicle_actor_pointer);
 			if isPointer(vehiclePointer) then
 				vehiclePointer = vehiclePointer - RDRAMBase;
+				if mainmemory.readfloat(vehiclePointer + obj_model1.floor, true) > value then -- Move the vehicle floor down if the desired Y position is lower than the floor
+					mainmemory.writefloat(vehiclePointer + obj_model1.floor, value, true);
+				end
 				mainmemory.writefloat(vehiclePointer + obj_model1.y_pos, value, true);
 				mainmemory.writebyte(vehiclePointer + obj_model1.locked_to_pad, 0x00);
 			end
 			mainmemory.writefloat(playerObject + obj_model1.y_pos, value, true);
 			mainmemory.writebyte(playerObject + obj_model1.locked_to_pad, 0x00);
+			if Game.getFloor() > value then  -- Move the floor down if the desired Y position is lower than the floor
+				Game.setFloor(value);
+			end
 			Game.setYVelocity(0);
 		end
 	end
