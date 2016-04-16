@@ -430,29 +430,40 @@ local obj_model1 = {
 		[0x02] = "First person camera",
 		[0x04] = "Fairy camera",
 		[0x05] = "Camera (Entering?)", -- TODO: Idk exactly what this is but it allows the player to gain control in weird places
-		[0x0C] = "standing normally",
-		[0x0E] = "Skid",
+		[0x0C] = "Idle",
+		[0x0D] = "Walking",
+		[0x0E] = "Skidding",
+		[0x17] = "Jumping",
 		[0x18] = "Moonrise?",
+		[0x1C] = "Simian Slam",
+		[0x1D] = "Long Jumping",
 		[0x20] = "Splat",
 		[0x24] = "Sparkles",
+		[0x26] = "Ground Attack",
+		[0x28] = "Ground Attack (Final)",
+		[0x29] = "Kicking",
+		[0x2A] = "Aerial Attack",
+		[0x2B] = "Rolling",
 		[0x2C] = "Crouch?",
 		[0x39] = "Shrinking",
 		[0x31] = "ESS",
 		[0x36] = "Backwalk into loading zone?",
 		[0x39] = "Shrink",
+		[0x3C] = "Crouching",
+		[0x3D] = "Uncrouching",
 		[0x3E] = "Camera zooms out",
 		[0x4E] = "Surface swimming",
 		[0x4F] = "Underwater",
+		[0x50] = "Leaving Water",
+		[0x59] = "Climbing Tree",
+		[0x5A] = "Leaving Tree",
 		[0x5B] = "Grabbed Ledge",
 		[0x5C] = "Pulling up on Ledge",
 	},
 	["texture_renderer_pointer"] = 0x158, -- u32_be
 	["shade_byte"] = 0x16D,
 	["player"] = {
-		["animation_type"] = 0x181,
-		["animation_types"] = {
-			["kick"] = 0x29, -- TODO: Document all of these
-		},
+		["animation_type"] = 0x181, -- Seems to be the same value as control_state_values
 		["velocity_uncrouch_aerial"] = 0x1A4, -- TODO: what is this?
 		["misc_acceleration_float"] = 0x1AC, -- TODO: what is this?
 		["horizontal_acceleration"] = 0x1B0, -- Set to a negative number to go fast
@@ -566,7 +577,13 @@ local function getExamineDataModelOne(pointer)
 
 	table.insert(examine_data, { "Shadow width", mainmemory.readbyte(pointer + obj_model1.shadow_width) });
 	table.insert(examine_data, { "Shadow height", mainmemory.readbyte(pointer + obj_model1.shadow_height) });
-	table.insert(examine_data, { "Control State", mainmemory.readbyte(pointer + obj_model1.control_state_byte) }); -- TODO: Pretty print using control_state_values table
+	local controlStateValue = mainmemory.readbyte(pointer + obj_model1.control_state_byte);
+	if obj_model1.control_state_values[controlStateValue] ~= nil then
+		controlStateValue = obj_model1.control_state_values[controlStateValue]
+	else
+		controlStateValue = toHexString(controlStateValue);
+	end
+	table.insert(examine_data, { "Control State", controlStateValue });
 	table.insert(examine_data, { "Brightness", mainmemory.readbyte(pointer + obj_model1.shade_byte) });
 	table.insert(examine_data, { "Separator", 1 });
 
@@ -595,20 +612,17 @@ local function getExamineDataModelOne(pointer)
 	end
 
 	if currentActorType == "Camera" then
-		local focusedActor = mainmemory.read_u24_be(pointer + obj_model1.camera.focused_actor_pointer + 1);
-		local focusedActorType;
+		local focusedActor = mainmemory.read_u32_be(pointer + obj_model1.camera.focused_actor_pointer);
+		local focusedActorType = "Unknown";
 
-		if isRDRAM(focusedActor) then
-			focusedActorType = mainmemory.read_u32_be(focusedActor + obj_model1.actor_type);
+		if isPointer(focusedActor) then
+			focusedActorType = mainmemory.read_u32_be(focusedActor - RDRAMBase + obj_model1.actor_type);
 			if type(obj_model1.actor_types[focusedActorType]) ~= "nil" then
 				focusedActorType = obj_model1.actor_types[focusedActorType];
 			end
 		end
 
-		table.insert(examine_data, { "Focused Actor", toHexString(focusedActor, 6) });
-		if type(focusedActorType) ~= "nil" then
-			table.insert(examine_data, { "Focused Actor Type", focusedActorType });
-		end
+		table.insert(examine_data, { "Focused Actor", toHexString(focusedActor, 8).." "..focusedActorType });
 		table.insert(examine_data, { "Separator", 1 });
 
 		table.insert(examine_data, { "Viewport X Pos", mainmemory.readfloat(pointer + obj_model1.camera.viewport_x_position, true) });
@@ -3182,12 +3196,32 @@ local function drawGrabScriptUI()
 	row = row + 1;
 
 	if stringContains(grab_script_mode, "Model 1") then
+		local focusedActor = mainmemory.read_u32_be(playerObject + obj_model1.player.grab_pointer);
+		local grabbedActor = mainmemory.read_u32_be(cameraObject + obj_model1.camera.focused_actor_pointer);
+
+		local focusedActorType = "Unknown";
+		local grabbedActorType = "Unknown";
+
+		if isPointer(focusedActor) then
+			focusedActorType = mainmemory.read_u32_be(focusedActor - RDRAMBase + obj_model1.actor_type);
+			if type(obj_model1.actor_types[focusedActorType]) ~= "nil" then
+				focusedActorType = obj_model1.actor_types[focusedActorType];
+			end
+		end
+
+		if isPointer(grabbedActor) then
+			grabbedActorType = mainmemory.read_u32_be(grabbedActor - RDRAMBase + obj_model1.actor_type);
+			if type(obj_model1.actor_types[grabbedActorType]) ~= "nil" then
+				grabbedActorType = obj_model1.actor_types[grabbedActorType];
+			end
+		end
+
 		-- Display which object is grabbed
-		gui.text(gui_x, gui_y + height * row, "Grabbed object: "..toHexString(mainmemory.read_u24_be(playerObject + obj_model1.player.grab_pointer + 1), 6), nil, nil, 'bottomright');
+		gui.text(gui_x, gui_y + height * row, "Grabbed Actor: "..toHexString(focusedActor, 8).." "..focusedActorType, nil, nil, 'bottomright');
 		row = row + 1;
 
 		-- Display which object the camera is currently focusing on
-		gui.text(gui_x, gui_y + height * row, "Focused object: "..toHexString(mainmemory.read_u24_be(cameraObject + obj_model1.camera.focused_actor_pointer + 1), 6), nil, nil, 'bottomright');
+		gui.text(gui_x, gui_y + height * row, "Focused Actor: "..toHexString(grabbedActor, 8).." "..grabbedActorType, nil, nil, 'bottomright');
 		row = row + 1;
 	end
 
@@ -3631,15 +3665,15 @@ function Game.realTime()
 	forms.settext(ScriptHawkUI.form_controls["Lag Factor Value Label"], lag_factor);
 	forms.settext(ScriptHawkUI.form_controls["Toggle Invisify Button"], current_invisify);
 	forms.settext(ScriptHawkUI.form_controls["Moon Mode Button"], moon_mode);
+	drawGrabScriptUI();
 end
 
 function Game.eachFrame()
 	local playerObject = Game.getPlayerObject();
 	map_value = Game.getMap();
-	
+
 	koshBotLoop();
 	forceTBS();
-	drawGrabScriptUI();
 	Game.unlockMenus(); -- TODO: Allow user to toggle this
 
 	-- Force STVW
