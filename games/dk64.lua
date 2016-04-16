@@ -3432,6 +3432,7 @@ end
 -- Color setters --
 -------------------
 
+-- TODO: Put these in a table
 local texture_renderer_texture_index = 0x0C; -- u16_be
 local texture_renderer_next_renderer = 0x24; -- u32_be
 
