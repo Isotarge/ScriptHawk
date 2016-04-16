@@ -334,6 +334,10 @@ function Game.getYVelocity()
 	return mainmemory.readfloat(Game.Memory.y_velocity[version], true);
 end
 
+function Game.setYVelocity(value)
+	mainmemory.writefloat(Game.Memory.y_velocity[version], value, true);
+end
+
 --------------
 -- Position --
 --------------
@@ -356,6 +360,7 @@ end
 
 function Game.setYPosition(value)
 	mainmemory.writefloat(Game.Memory.y_pos[version], value, true);
+	Game.setYVelocity(0);
 end
 
 function Game.setZPosition(value)
