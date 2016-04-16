@@ -3196,8 +3196,8 @@ local function drawGrabScriptUI()
 	row = row + 1;
 
 	if stringContains(grab_script_mode, "Model 1") then
-		local focusedActor = mainmemory.read_u32_be(playerObject + obj_model1.player.grab_pointer);
-		local grabbedActor = mainmemory.read_u32_be(cameraObject + obj_model1.camera.focused_actor_pointer);
+		local focusedActor = mainmemory.read_u32_be(cameraObject + obj_model1.camera.focused_actor_pointer);
+		local grabbedActor = mainmemory.read_u32_be(playerObject + obj_model1.player.grab_pointer);
 
 		local focusedActorType = "Unknown";
 		local grabbedActorType = "Unknown";
@@ -3216,12 +3216,12 @@ local function drawGrabScriptUI()
 			end
 		end
 
-		-- Display which object is grabbed
-		gui.text(gui_x, gui_y + height * row, "Grabbed Actor: "..toHexString(focusedActor, 8).." "..focusedActorType, nil, nil, 'bottomright');
+		-- Display which object the camera is currently focusing on
+		gui.text(gui_x, gui_y + height * row, "Focused Actor: "..toHexString(grabbedActor, 8).." "..focusedActorType, nil, nil, 'bottomright');
 		row = row + 1;
 
-		-- Display which object the camera is currently focusing on
-		gui.text(gui_x, gui_y + height * row, "Focused Actor: "..toHexString(grabbedActor, 8).." "..grabbedActorType, nil, nil, 'bottomright');
+		-- Display which object is grabbed
+		gui.text(gui_x, gui_y + height * row, "Grabbed Actor: "..toHexString(focusedActor, 8).." "..grabbedActorType, nil, nil, 'bottomright');
 		row = row + 1;
 	end
 
