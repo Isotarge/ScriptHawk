@@ -513,7 +513,7 @@ function autoPound()
 		if allowTTrotJump and (currentMovementState == 21 and mainmemory.readbyte(Game.Memory.player_grounded[version]) == 0 or holdingAPostJump) then
 			holdingAPostJump = true;
 			if holdingAPostJump then
-				holdingAPostJump = holdingAPostJump and (currentMovementState == 21 or Game.getYVelocity() > 0); -- TODO: Better method for detecting end of a jump, velocity > 0 is janky
+				holdingAPostJump = holdingAPostJump and (currentMovementState == 21 or YVelocity > 0); -- TODO: Better method for detecting end of a jump, velocity > 0 is janky
 			end
 			joypad.set({["A"] = true}, 1);
 		end
@@ -1105,17 +1105,19 @@ local spawnActorID;
 local actorPosition;
 
 function enableActorSpawner()
-	spawnerEnabled = false;
-	loadASMPatch("./docs/BK ASM Hacking/Actor Spawner.asm", true);
-	-- Find magic flag
-	for i = Game.ASMCodeBase, Game.ASMCodeBase + Game.ASMMaxCodeSize, 4 do
-		if mainmemory.read_u32_be(i) == 0xABCDEF12 then
-			print("Actor spawner enabled successfully!");
-			spawnActorFlag = i + 4;
-			spawnActorID = i + 6;
-			actorPosition = i + 8;
-			spawnerEnabled = true;
-			break;
+	if version == 4 then -- TODO: Other versions
+		spawnerEnabled = false;
+		loadASMPatch("./docs/BK ASM Hacking/Actor Spawner.asm", true);
+		-- Find magic flag
+		for i = Game.ASMCodeBase, Game.ASMCodeBase + Game.ASMMaxCodeSize, 4 do
+			if mainmemory.read_u32_be(i) == 0xABCDEF12 then
+				print("Actor spawner enabled successfully!");
+				spawnActorFlag = i + 4;
+				spawnActorID = i + 6;
+				actorPosition = i + 8;
+				spawnerEnabled = true;
+				break;
+			end
 		end
 	end
 end
@@ -1251,10 +1253,8 @@ Game.OSD = {
 	{"Separator", 1},
 	{"dY"},
 	{"dXZ"},
-	--{"X Velocity", Game.getXVelocity},
 	{"Velocity", Game.getVelocity};
 	{"Y Velocity", Game.getYVelocity, Game.colorYVelocity},
-	--{"Z Velocity", Game.getZVelocity},
 	{"Separator", 1},
 	{"Max dY"},
 	{"Max dXZ"},
@@ -1274,7 +1274,7 @@ Game.OSD = {
 -- ASM Stuff --
 ---------------
 
-Game.supportsASMHacks = true;
+Game.supportsASMHacks = true; -- TODO: this is only true for US 1.0 currently
 Game.ASMHookBase = 0x24EE88;
 Game.ASMHook = {
 	0x08, 0x10, 0x00, 0x00,
