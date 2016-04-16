@@ -520,26 +520,18 @@ precision = 3;
 
 local function decreasePrecision()
 	precision = math.max(0, precision - 1);
-	gui.cleartext();
-	updateUIReadouts_ScriptHawk();
 end
 
 local function increasePrecision()
 	precision = math.min(5, precision + 1);
-	gui.cleartext();
-	updateUIReadouts_ScriptHawk();
 end
 
 local function decreaseSpeed()
 	Game.speedy_index = math.max(1, Game.speedy_index - 1);
-	gui.cleartext();
-	updateUIReadouts_ScriptHawk();
 end
 
 local function increaseSpeed()
 	Game.speedy_index = math.min(#Game.speedy_speeds, Game.speedy_index + 1);
-	gui.cleartext();
-	updateUIReadouts_ScriptHawk();
 end
 
 -------------------------
@@ -551,34 +543,26 @@ local practice_save_slot = 0;
 local function decreaseSaveSlot()
 	if mode == "Practice" then
 		practice_save_slot = math.max(0, practice_save_slot - 1);
-		gui.cleartext();
 		gui.addmessage("Switched to save slot "..practice_save_slot);
-		updateUIReadouts_ScriptHawk();
 	end
 end
 
 local function increaseSaveSlot()
 	if mode == "Practice" then
 		practice_save_slot = math.min(9, practice_save_slot + 1);
-		gui.cleartext();
 		gui.addmessage("Switched to save slot "..practice_save_slot);
-		updateUIReadouts_ScriptHawk();
 	end
 end
 
 local function loadPracticeSlot()
 	if mode == "Practice" then
 		savestate.loadslot(practice_save_slot);
-		gui.cleartext();
-		updateUIReadouts_ScriptHawk();
 	end
 end
 
 local function savePracticeSlot()
 	if mode == "Practice" then
 		savestate.saveslot(practice_save_slot);
-		gui.cleartext();
-		updateUIReadouts_ScriptHawk();
 	end
 end
 
@@ -651,9 +635,6 @@ local function toggleRotationUnits()
 	else
 		rotation_units = "Degrees";
 	end
-	gui.cleartext();
-	updateUIReadouts_ScriptHawk();
-	updateUIReadouts_ScriptHawk();
 end
 
 function ScriptHawkUI.formatRotation(num)
@@ -677,8 +658,6 @@ local function toggleMode()
 	else
 		mode = 'Position';
 	end
-	gui.cleartext();
-	updateUIReadouts_ScriptHawk();
 end
 
 ---------------
@@ -1130,8 +1109,6 @@ local function plot_pos()
 			table.insert(telemetryData, tempTelemetryData);
 		end
 	end
-
-	updateUIReadouts_ScriptHawk();
 end
 
 event.onframestart(mainloop, "ScriptHawk - Controller input handler");
@@ -1158,9 +1135,10 @@ ScriptHawk.bindKeyRealtime("Slash", ScriptHawk.resetMax, true);
 --ScriptHawk.bindKeyRealtime("M", toggleMode, true);
 
 while true do
+	gui.cleartext();
+	updateUIReadouts_ScriptHawk();
 	ScriptHawk.processKeybinds(ScriptHawk.keybindsRealtime);
 	ScriptHawk.processJoypadBinds(ScriptHawk.joypadBindsRealtime);
-	updateUIReadouts_ScriptHawk();
 	if type(Game.realTime) == "function" then
 		Game.realTime();
 	end
