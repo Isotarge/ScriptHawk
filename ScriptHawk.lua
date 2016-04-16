@@ -910,7 +910,7 @@ end
 -- Core functions --
 --------------------
 
-if type(Game.setPosition) == "nil" then
+if type(Game.setPosition) ~= "function" then
 	function Game.setPosition(x, y, z)
 		Game.setXPosition(x);
 		Game.setYPosition(y);
@@ -918,11 +918,19 @@ if type(Game.setPosition) == "nil" then
 	end
 end
 
-if type(Game.setRotation) == "nil" then
+if type(Game.setRotation) ~= "function" then
 	function Game.setRotation(x, y, z)
 		Game.setXRotation(x);
 		Game.setYRotation(y);
 		Game.setZRotation(z);
+	end
+end
+
+-- Default Game.isPhysicsFrame function
+-- uses emu.islagged() as a fallback if the game module does not implement it
+if type(Game.isPhysicsFrame) ~= "function" then
+	function Game.isPhysicsFrame()
+		return not emu.islagged();
 	end
 end
 

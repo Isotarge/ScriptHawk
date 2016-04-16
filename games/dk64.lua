@@ -1647,10 +1647,6 @@ Game.speedy_index = 8;
 Game.rot_speed = 10;
 Game.max_rot_units = 4096;
 
-function Game.isPhysicsFrame()
-	return not emu.islagged();
-end
-
 function isInSubGame()
 	return map_value == arcade_map or map_value == jetpac_map;
 end

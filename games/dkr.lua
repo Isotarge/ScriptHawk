@@ -228,10 +228,6 @@ Game.speedy_index = 7;
 Game.rot_speed = 100;
 Game.max_rot_units = 65535;
 
-function Game.isPhysicsFrame()
-	return not emu.islagged();
-end
-
 function Game.getVelocity()
 	local player_object = mainmemory.read_u32_be(player_object_pointer);
 	if is_pointer(player_object) then

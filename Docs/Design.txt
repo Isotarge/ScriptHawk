@@ -25,7 +25,9 @@ Game -- Table containing all information and functions about a game that are vis
 	Game.rotSpeed
 	Game.max_rot_units
 
-	function Game.isPhysicsFrame() -- Return false if physics weren't computed on this frame, true if they were. Sometimes it's just a wrapper for emu.islagged()
+	function Game.isPhysicsFrame() -- Return false if physics weren't computed on this frame, true if they were.
+								   -- Sometimes it's just a wrapper for emu.islagged()
+								   -- Game modules can omit their own implementation if all that's required is emu.islagged()
 
 	function Game.getPosition() -- Return table of axis + value pairs
 

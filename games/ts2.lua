@@ -44,10 +44,6 @@ Game.speedy_invert_Y = true;
 Game.rot_speed = 10;
 Game.max_rot_units = 4096;
 
-function Game.isPhysicsFrame()
-	return not emu.islagged();
-end
-
 --------------
 -- Position --
 --------------
