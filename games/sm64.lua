@@ -1,16 +1,5 @@
 local Game = {};
 
-local x_rot;
-local y_rot;
-local z_rot;
-
-local x_pos;
-local y_pos;
-local z_pos;
-
-local map;
-local object_list;
-
 Game.maps = {
 	"Unknown 1",
 	"Unknown 2",
@@ -69,40 +58,33 @@ end
 -- Region/Version --
 --------------------
 
+-- Version order: USA, PAL, JP Shindou, JP
+Game.Memory = {
+	["x_rot"] = {0x33B19C, 0x30945C, 0x31D9EC, 0x339E2C}, -- u16_be
+	["y_rot"] = {0x33B19C, 0x30945C, 0x31D9EC, 0x339E2C}, -- u16_be -- TODO: Find
+	["z_rot"] = {0x33B19C, 0x30945C, 0x31D9EC, 0x339E2C}, -- u16_be -- TODO: Find
+	["x_pos"] = {0x33B1AC, 0x30946C, 0x31D9FC, 0x339E3C}, -- Float
+	["y_pos"] = {0x33B1B0, 0x309470, 0x31DA00, 0x339E40}, -- Float
+	["z_pos"] = {0x33B1B4, 0x309474, 0x31DA04, 0x339E44}, -- Float
+	["velocity"] = {0x33B1C4, 0x309484, 0x31DA14, 0x339E54}, -- Float
+	["y_velocity"] = {0x33B1B8, 0x30947C, 0x31DA0C, 0x339E48}, -- Float
+	["map"] = {0x32DDF8, 0x2F9FC8, 0x30D528, 0x32CE98}, -- u16_be
+	["object_list"] = {0x33D488, 0x30B0B8, 0x31F648, 0x33C118},
+	["global_object_data"] = {nil, 0x386A20, nil, nil}, -- TODO: Find on all versions
+};
+
 function Game.detectVersion(romName)
 	if stringContains(romName, "USA") then
-		x_rot = 0x33B19C; -- u16_be
-		x_pos = 0x33B1AC; -- Float
-		velocity = 0x33B1C4; -- Float
-		map = 0x32DDF8;
-		object_list = 0x33D488;
+		version = 1;
 	elseif stringContains(romName, "Europe") then
-		x_rot = 0x30945C; -- u16_be
-		x_pos = 0x30946C; -- Float
-		velocity = 0x309484; -- Float
-		map = 0x2F9FC8;
-		object_list = 0x30B0B8;
-		-- global_object_data = 0x386A20;
+		version = 2;
 	elseif stringContains(romName, "Japan") and stringContains(romName, "Shindou Edition") then
-		x_rot = 0x31D9EC; -- u16_be
-		x_pos = 0x31D9FC; -- Float
-		velocity = 0x31DA14; -- Float
-		map = 0x30D528;
-		object_list = 0x31F648;
+		version = 3;
 	elseif stringContains(romName, "Japan") then
-		x_rot = 0x339E2C; -- u16_be
-		x_pos = 0x339E3C; -- Float
-		velocity = 0x339E54; -- Float
-		map = 0x32CE98;
-		object_list = 0x33C118;
+		version = 4;
 	else
 		return false;
 	end
-
-	y_pos = x_pos + 4;
-	z_pos = y_pos + 4;
-	y_rot = x_rot;
-	z_rot = x_rot;
 
 	return true;
 end
@@ -278,16 +260,17 @@ end
 function drawObjectViewerOSD()
 	forms.settext(ScriptHawkUI.form_controls["Object Index Label"], "Index: "..objectIndex);
 	if forms.ischecked(ScriptHawkUI.form_controls["Enable Object Analyzer"]) then
-		gui.cleartext();
-
 		local gui_x = 2;
 		local gui_y = 2;
 		local row = 0;
 		local height = 16;
 
-		local examine_data = getExamineData(object_list + objectIndex * objectSize);
+		local examine_data = getExamineData(Game.Memory.object_list[version] + objectIndex * objectSize);
 		for i = #examine_data, 1, -1 do
 			if examine_data[i][1] ~= "Separator" then
+				if type(examine_data[i][2]) == "number" then
+					examine_data[i][2] = round(examine_data[i][2], precision);
+				end
 				gui.text(gui_x, gui_y + height * row, examine_data[i][2].." - "..examine_data[i][1], nil, nil, 'bottomright');
 				row = row + 1;
 			else
@@ -303,8 +286,6 @@ function incrementObjectIndex()
 		if objectIndex >= numObjects then
 			objectIndex = 0;
 		end
-
-		drawObjectViewerOSD();
 	end
 end
 
@@ -314,14 +295,12 @@ function decrementObjectIndex()
 		if objectIndex < 0 then
 			objectIndex = numObjects;
 		end
-
-		drawObjectViewerOSD();
 	end
 end
 
 function zipToSelectedObject()
 	if forms.ischecked(ScriptHawkUI.form_controls["Enable Object Analyzer"]) then
-		local objectBase = object_list + objectIndex * objectSize;
+		local objectBase = Game.Memory.object_list[version] + objectIndex * objectSize;
 
 		local objectX = mainmemory.readfloat(objectBase + 0xA0, true);
 		local objectY = mainmemory.readfloat(objectBase + 0xA4, true);
@@ -330,8 +309,6 @@ function zipToSelectedObject()
 		Game.setXPosition(objectX);
 		Game.setYPosition(objectY);
 		Game.setZPosition(objectZ);
-
-		drawObjectViewerOSD();
 	end
 end
 
@@ -349,32 +326,40 @@ function Game.isPhysicsFrame()
 	return not emu.islagged();
 end
 
+function Game.getVelocity()
+	return mainmemory.readfloat(Game.Memory.velocity[version], true);
+end
+
+function Game.getYVelocity()
+	return mainmemory.readfloat(Game.Memory.y_velocity[version], true);
+end
+
 --------------
 -- Position --
 --------------
 
 function Game.getXPosition()
-	return mainmemory.readfloat(x_pos, true);
+	return mainmemory.readfloat(Game.Memory.x_pos[version], true);
 end
 
 function Game.getYPosition()
-	return mainmemory.readfloat(y_pos, true);
+	return mainmemory.readfloat(Game.Memory.y_pos[version], true);
 end
 
 function Game.getZPosition()
-	return mainmemory.readfloat(z_pos, true);
+	return mainmemory.readfloat(Game.Memory.z_pos[version], true);
 end
 
 function Game.setXPosition(value)
-	mainmemory.writefloat(x_pos, value, true);
+	mainmemory.writefloat(Game.Memory.x_pos[version], value, true);
 end
 
 function Game.setYPosition(value)
-	mainmemory.writefloat(y_pos, value, true);
+	mainmemory.writefloat(Game.Memory.y_pos[version], value, true);
 end
 
 function Game.setZPosition(value)
-	mainmemory.writefloat(z_pos, value, true);
+	mainmemory.writefloat(Game.Memory.z_pos[version], value, true);
 end
 
 --------------
@@ -382,27 +367,27 @@ end
 --------------
 
 function Game.getXRotation()
-	return mainmemory.read_u32_be(x_rot);
+	return mainmemory.read_u32_be(Game.Memory.x_rot[version]);
 end
 
 function Game.getYRotation()
-	return mainmemory.read_u32_be(y_rot);
+	return mainmemory.read_u32_be(Game.Memory.y_rot[version]);
 end
 
 function Game.getZRotation()
-	return mainmemory.read_u32_be(z_rot);
+	return mainmemory.read_u32_be(Game.Memory.z_rot[version]);
 end
 
 function Game.setXRotation(value)
-	return mainmemory.write_u32_be(x_rot, value);
+	return mainmemory.write_u32_be(Game.Memory.x_rot[version], value);
 end
 
 function Game.setYRotation(value)
-	return mainmemory.write_u32_be(y_rot, value);
+	return mainmemory.write_u32_be(Game.Memory.y_rot[version], value);
 end
 
 function Game.setZRotation(value)
-	return mainmemory.write_u32_be(z_rot, value);
+	return mainmemory.write_u32_be(Game.Memory.z_rot[version], value);
 end
 
 ------------
@@ -411,7 +396,7 @@ end
 
 function Game.setMap(value)
 	if value >= 1 and value <= #Game.maps then
-		mainmemory.write_u16_be(map, value);
+		mainmemory.write_u16_be(Game.Memory.map[version], value);
 	end
 end
 
@@ -430,8 +415,30 @@ ScriptHawk.bindKeyRealtime("Z", zipToSelectedObject, true);
 ScriptHawk.bindKeyRealtime("N", decrementObjectIndex, true);
 ScriptHawk.bindKeyRealtime("M", incrementObjectIndex, true);
 
-function Game.eachFrame()
+function Game.realTime()
 	drawObjectViewerOSD();
 end
+
+function Game.eachFrame()
+end
+
+Game.OSD = {
+	{"X", Game.getXPosition},
+	{"Y", Game.getYPosition},
+	{"Z", Game.getZPosition},
+	{"Separator", 1},
+	{"dY"},
+	{"dXZ"},
+	{"Velocity", Game.getVelocity},
+	{"Y Velocity", Game.getYVelocity},
+	{"Separator", 1},
+	{"Max dY"},
+	{"Max dXZ"},
+	{"Odometer"},
+	{"Separator", 1},
+	--{"Rot. X", Game.getXRotation}, -- TODO
+	{"Facing", Game.getYRotation},
+	--{"Rot. Z", Game.getZRotation}, -- TODO
+};
 
 return Game;

@@ -1,3 +1,10 @@
 SystemID N64
 30D528	w	u	1	RDRAM	Map
+31D9E4	w	u	1	RDRAM	Mario Angle (Movement)
+31D9EE	w	u	1	RDRAM	Mario Angle (Facing)
+31D9FC	d	f	1	RDRAM	Mario X Position
+31DA00	d	f	1	RDRAM	Mario Y Position
+31DA04	d	f	1	RDRAM	Mario Z Position
+31DA0C	d	f	1	RDRAM	Mario Y Velocity
+31DA14	d	f	1	RDRAM	Mario Velocity
 

@@ -19,6 +19,7 @@ SystemID N64
 30946C	d	f	1	RDRAM	X Position
 309470	d	f	1	RDRAM	Y Position
 309474	d	f	1	RDRAM	Z Position
+30947C	d	f	1	RDRAM	Y Velocity
 309484	d	f	1	RDRAM	Velocity
 3094DA	w	u	1	RDRAM	Star count
 3094DD	b	u	1	RDRAM	Lives
