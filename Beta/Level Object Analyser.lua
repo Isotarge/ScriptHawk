@@ -1174,10 +1174,12 @@ function getNumSlots()
 			return math.min(max_slots, mainmemory.read_u32_be(levelObjectArray));
 		end
 	else -- Model 2
-		local structArray = mainmemory.read_u32_be(Game.Memory.struct_array_pointer[version]);
-		if isPointer(structArray) then
-			structArray = structArray - RDRAMBase;
-			return ((mainmemory.read_u32_be(structArray - 0x0C) - RDRAMBase) - structArray) / struct_slot_size;
+		if version == 4 then -- TODO: Other versions
+			local structArray = mainmemory.read_u32_be(Game.Memory.struct_array_pointer[version]);
+			if isPointer(structArray) then
+				structArray = structArray - RDRAMBase;
+				return ((mainmemory.read_u32_be(structArray - 0x0C) - RDRAMBase) - structArray) / struct_slot_size;
+			end
 		end
 	end
 	return 0;
@@ -1391,19 +1393,21 @@ function zipToSelectedObject()
 			Game.setZPosition(z);
 		end
 	else
-		local structArray = mainmemory.read_u32_be(Game.Memory.struct_array_pointer[version]);
-		if isPointer(structArray) then
-			structArray = structArray - RDRAMBase;
-			local rendererPointer = mainmemory.read_u32_be(structArray + object_index * struct_slot_size);
-			if isPointer(rendererPointer) then
-				rendererPointer = rendererPointer - RDRAMBase;
-				local x = mainmemory.read_s16_be(rendererPointer + 0x10);
-				local y = mainmemory.read_s16_be(rendererPointer + 0x12);
-				local z = mainmemory.read_s16_be(rendererPointer + 0x14);
+		if version == 4 then -- TODO: Other versions
+			local structArray = mainmemory.read_u32_be(Game.Memory.struct_array_pointer[version]);
+			if isPointer(structArray) then
+				structArray = structArray - RDRAMBase;
+				local rendererPointer = mainmemory.read_u32_be(structArray + object_index * struct_slot_size);
+				if isPointer(rendererPointer) then
+					rendererPointer = rendererPointer - RDRAMBase;
+					local x = mainmemory.read_s16_be(rendererPointer + 0x10);
+					local y = mainmemory.read_s16_be(rendererPointer + 0x12);
+					local z = mainmemory.read_s16_be(rendererPointer + 0x14);
 
-				Game.setXPosition(x);
-				Game.setYPosition(y);
-				Game.setZPosition(z);
+					Game.setXPosition(x);
+					Game.setYPosition(y);
+					Game.setZPosition(z);
+				end
 			end
 		end
 	end
@@ -1464,9 +1468,12 @@ function draw_ui()
 	local height = 16;
 
 	local level_object_array = mainmemory.read_u24_be(Game.Memory.level_object_array_pointer[version] + 1);
-	local structArray = mainmemory.read_u32_be(Game.Memory.struct_array_pointer[version]);
-	if isPointer(structArray) then
-		structArray = structArray - RDRAMBase;
+	local structArray;
+	if version == 4 then -- TODO: Other versions
+		structArray = mainmemory.read_u32_be(Game.Memory.struct_array_pointer[version]);
+		if isPointer(structArray) then
+			structArray = structArray - RDRAMBase;
+		end
 	end
 	local numSlots = getNumSlots();
 
@@ -1619,5 +1626,8 @@ local function process_input()
 	end
 end
 
-event.onframestart(draw_ui, "ScriptHawk - Examine BK Level Objects");
-event.onframestart(process_input, "ScriptHawk - Process input");
+while true do
+	process_input();
+	draw_ui()
+	emu.yield();
+end
