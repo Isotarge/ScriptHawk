@@ -405,10 +405,6 @@ function Game.setMap(value)
 	end
 end
 
-function Game.applyInfinites()
-	-- TODO
-end
-
 function Game.initUI()
 	ScriptHawkUI.form_controls["Enable Object Analyzer"] = forms.checkbox(ScriptHawkUI.options_form, "Object Analyzer", ScriptHawkUI.col(10) + ScriptHawkUI.dropdown_offset, ScriptHawkUI.row(6) + ScriptHawkUI.dropdown_offset);
 	ScriptHawkUI.form_controls["Decrement Object Index"] = forms.button(ScriptHawkUI.options_form, "-", decrementObjectIndex, ScriptHawkUI.col(13) - 7, ScriptHawkUI.row(7), ScriptHawkUI.button_height, ScriptHawkUI.button_height);

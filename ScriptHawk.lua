@@ -783,7 +783,10 @@ ScriptHawkUI.form_controls["Speed Value Label"] = forms.label(ScriptHawkUI.optio
 ScriptHawkUI.form_controls["Map Dropdown"] = forms.dropdown(ScriptHawkUI.options_form, Game.maps, ScriptHawkUI.col(0), ScriptHawkUI.row(3) + ScriptHawkUI.dropdown_offset, ScriptHawkUI.col(9) + 7, ScriptHawkUI.button_height);
 ScriptHawkUI.form_controls["Toggle Telemetry Button"] = forms.button(ScriptHawkUI.options_form, "Start Telemetry", toggleTelemetry, ScriptHawkUI.col(10), ScriptHawkUI.row(3), ScriptHawkUI.col(4) + 8, ScriptHawkUI.button_height);
 ScriptHawkUI.form_controls["Map Checkbox"] = forms.checkbox(ScriptHawkUI.options_form, "Take me there", ScriptHawkUI.col(0) + ScriptHawkUI.dropdown_offset, ScriptHawkUI.row(4) + ScriptHawkUI.dropdown_offset);
-ScriptHawkUI.form_controls["Toggle Infinites Checkbox"] = forms.checkbox(ScriptHawkUI.options_form, "Infinites", ScriptHawkUI.col(0) + ScriptHawkUI.dropdown_offset, ScriptHawkUI.row(5) + ScriptHawkUI.dropdown_offset);
+
+if type(Game.applyInfinites) == "function" then
+	ScriptHawkUI.form_controls["Toggle Infinites Checkbox"] = forms.checkbox(ScriptHawkUI.options_form, "Infinites", ScriptHawkUI.col(0) + ScriptHawkUI.dropdown_offset, ScriptHawkUI.row(5) + ScriptHawkUI.dropdown_offset);
+end
 
 ScriptHawkUI.form_controls["Rotation Units Label"] = forms.label(ScriptHawkUI.options_form, "Units:", ScriptHawkUI.col(5), ScriptHawkUI.row(0) + ScriptHawkUI.label_offset, 44, 14);
 ScriptHawkUI.form_controls["Toggle Rotation Units Button"] = forms.button(ScriptHawkUI.options_form, rotation_units, toggleRotationUnits, ScriptHawkUI.col(7), ScriptHawkUI.row(0), 64, ScriptHawkUI.button_height);
@@ -1009,7 +1012,7 @@ local function mainloop()
 		end
 	end
 
-	if forms.ischecked(ScriptHawkUI.form_controls["Toggle Infinites Checkbox"]) then
+	if ScriptHawkUI.form_controls["Toggle Infinites Checkbox"] ~= nil and forms.ischecked(ScriptHawkUI.form_controls["Toggle Infinites Checkbox"]) then
 		Game.applyInfinites();
 	end
 

@@ -126,10 +126,6 @@ function Game.setMap(value)
 	-- TODO
 end
 
-function Game.applyInfinites()
-	-- TODO
-end
-
 function Game.initUI()
 	-- TODO
 end
