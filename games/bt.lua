@@ -312,47 +312,29 @@ Game.maps = {
 -- Region/Version --
 --------------------
 
-local player_pointer;
-local air;
-local frame_timer;
-local linked_list_root;
-local map;
-local map_trigger;
+-- Version order: AUS, EUR, JPN, USA
+Game.Memory = {
+	["player_pointer"] = {0x13A210, 0x13A4A0, 0x12F660, 0x135490},
+	["moves_pointer"] = {0x1314F0, 0x131780, 0x126940, 0x12C770},
+	["air"] = {0x12FDC0, 0x12FFD0, 0x125220, 0x12B050},
+	["frame_timer"] = {0x083550, 0x083550, 0x0788F8, 0x079138},
+	["linked_list_root"] = {0x13C380, 0x13C680, 0x131850, 0x137800},
+	["map"] = {0x12C390, 0x12C5A0, 0x1217F0, 0x127640},
+	["map_trigger"] = {0x12C392, 0x12C5A2, 0x1217F2, 0x127642},
+};
 
 function Game.detectVersion(romName)
 	if stringContains(romName, "Australia") then
-		player_pointer = 0x13A210;
-		moves_pointer = 0x1314F0;
-		air = 0x12FDC0;
-		frame_timer = 0x083550;
-		linked_list_root = 0x13C380;
-		map = 0x12C390;
+		version = 1;
 	elseif stringContains(romName, "Europe") then
-		player_pointer = 0x13A4A0;
-		moves_pointer = 0x131780;
-		air = 0x12FFD0;
-		frame_timer = 0x083550;
-		linked_list_root = 0x13C680;
-		map = 0x12C5A0;
+		version = 2;
 	elseif stringContains(romName, "Japan") then
-		player_pointer = 0x12F660;
-		moves_pointer = 0x126940;
-		air = 0x125220;
-		frame_timer = 0x0788F8;
-		linked_list_root = 0x131850;
-		map = 0x1217F0;
+		version = 3;
 	elseif stringContains(romName, "USA") then
-		player_pointer = 0x135490;
-		moves_pointer = 0x12C770;
-		air = 0x12B050;
-		frame_timer = 0x079138;
-		linked_list_root = 0x137800;
-		map = 0x127640;
+		version = 4;
 	else
 		return false;
 	end
-
-	map_trigger = map + 2;
 
 	return true;
 end
@@ -387,7 +369,7 @@ Game.rot_speed = 10;
 Game.max_rot_units = 360;
 
 function Game.isPhysicsFrame()
-	local frameTimerValue = mainmemory.read_s32_be(frame_timer);
+	local frameTimerValue = mainmemory.read_s32_be(Game.Memory.frame_timer[version]);
 	return frameTimerValue <= 0 and not emu.islagged();
 end
 
@@ -431,9 +413,8 @@ local slope_timer = 0x38;
 -- Relative to Velocity object
 local y_velocity = 0x14;
 
--- New method (player pointer):
 function Game.getPlayerObject()
-	local playerObject = mainmemory.read_u24_be(player_pointer + 1) - 0x10;
+	local playerObject = mainmemory.read_u24_be(Game.Memory.player_pointer[version] + 1) - 0x10;
 	if isRDRAM(playerObject) then
 		return playerObject;
 	end
@@ -636,8 +617,9 @@ local move_levels = {
 
 local function unlock_moves()
 	local level = forms.gettext(options_moves_dropdown);
-	local movesObject = mainmemory.read_u24_be(moves_pointer + 1);
-	if isRDRAM(movesObject) then
+	local movesObject = mainmemory.read_u32_be(Game.Memory.moves_pointer[version]);
+	if isPointer(movesObject) then
+		movesObject = movesObject - RDRAMBase;
 		mainmemory.write_u32_be(movesObject + 0x18, move_levels[level][1]);
 		mainmemory.write_u32_be(movesObject + 0x1C, move_levels[level][2]);
 	end
@@ -709,12 +691,12 @@ end
 ------------
 
 function Game.setMap(value)
-	local trigger_value = mainmemory.read_u16_be(map_trigger);
+	local trigger_value = mainmemory.read_u16_be(Game.Memory.map_trigger[version]);
 	if trigger_value == 0 then
-		mainmemory.write_u16_be(map, value);
+		mainmemory.write_u16_be(Game.Memory.map[version], value);
 
 		-- Force game to reload with desired map
-		mainmemory.write_u16_be(map_trigger, 0x0101);
+		mainmemory.write_u16_be(Game.Memory.map_trigger[version], 0x0101);
 	end
 end
 
@@ -724,7 +706,7 @@ function Game.applyInfinites()
 	-- TODO: Eggs, feathers, glowbos etc
 	local maxHealth = Game.getMaxHealth();
 	Game.setCurrentHealth(maxHealth);
-	mainmemory.writefloat(air, max_air, true);
+	mainmemory.writefloat(Game.Memory.air[version], max_air, true);
 end
 
 function Game.initUI()
