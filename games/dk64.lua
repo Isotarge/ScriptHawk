@@ -1401,7 +1401,7 @@ end
 function setFlag(byte, bit, suppressPrint)
 	suppressPrint = suppressPrint or false;
 	if type(byte) == "number" and type(bit) == "number" and bit >= 0 and bit <= 7 then
-		table.insert(flag_action_queue, {["action_type"]="set", ["byte"]=byte, ["bit"]=bit, ["suppressPrint"]=suppressPrint});
+		table.insert(flag_action_queue, {["action_type"] = "set", ["byte"] = byte, ["bit"] = bit, ["suppressPrint"] = suppressPrint});
 		processFlagQueue();
 	end
 end
@@ -1438,19 +1438,39 @@ function setFlagsByType(_type)
 end
 
 function setFlagsByMap(mapIndex)
-	-- TODO
+	for i = 1, #flag_array do
+		local flag = flag_array[i];
+		if flag["map"] == mapIndex then
+			setFlag(flag["byte"], flag["bit"], true);
+		end
+	end
 end
 
 function clearFlagsByMap(mapIndex)
-	-- TODO
+	for i = 1, #flag_array do
+		local flag = flag_array[i];
+		if flag["map"] == mapIndex then
+			clearFlag(flag["byte"], flag["bit"], true);
+		end
+	end
 end
 
 function setKnownFlags()
-	-- TODO
+	for i = 1, #flag_array do
+		local flag = flag_array[i];
+		if flag["type"] ~= "Unknown" then
+			setFlag(flag["byte"], flag["bit"], true);
+		end
+	end
 end
 
 function clearKnownFlags()
-	-- TODO
+	for i = 1, #flag_array do
+		local flag = flag_array[i];
+		if flag["type"] ~= "Unknown" then
+			clearFlag(flag["byte"], flag["bit"], true);
+		end
+	end
 end
 
 function setAllFlags()
