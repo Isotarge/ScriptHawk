@@ -197,7 +197,7 @@ local obj_model1 = {
 	},
 	["current_bone_array_pointer"] = 0x08,
 	["actor_type"] = 0x58, -- u32 be
-	["actor_types"] = { -- These are different on Kiosk
+	["actor_types"] = { -- These are different on Kiosk -- TODO: Spider boss map
 		[2] = "DK",
 		[3] = "Diddy",
 		[4] = "Lanky",
@@ -519,6 +519,10 @@ local obj_model1 = {
 
 local function getExamineDataModelOne(pointer)
 	local examine_data = {};
+
+	if not isRDRAM(pointer) then
+		return examine_data;
+	end
 
 	local actorSize = mainmemory.read_u32_be(pointer + object_size)
 	local modelPointer = mainmemory.read_u32_be(pointer + obj_model1.model_pointer);
@@ -851,6 +855,10 @@ end
 
 local function getExamineDataModelTwo(pointer)
 	local examine_data = {};
+
+	if not isRDRAM(pointer) then
+		return examine_data;
+	end
 
 	local modelPointer = mainmemory.read_u32_be(pointer + obj_model2.model_pointer);
 	local hasModel = isPointer(modelPointer);
