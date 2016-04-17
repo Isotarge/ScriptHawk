@@ -1,14 +1,22 @@
 local Game = {};
 
-local cheat_menu;
+local RDRAMBase = 0x80000000;
+local RDRAMSize = 0x400000; -- Doubled with expansion pak
 
-local is_paused;
-local get_ready;
+-- Checks whether a value falls within N64 RDRAM
+local function isRDRAM(value)
+	return type(value) == "number" and value >= 0 and value < RDRAMSize;
+end
 
-local pointer_list;
+-- Checks whether a value is a pointer
+local function isPointer(value)
+	return type(value) == "number" and value >= RDRAMBase and value < RDRAMBase + RDRAMSize;
+end
+
 local player_object_pointer = 0x3FFFC0; -- Seems to be the same for all versions
 
 -- Relative to objects in pointer list
+-- TODO: Port this to an obeject model table, see BK, DK64, SM64
 local x_pos = 0x0C; -- Float
 local y_pos = x_pos + 4; -- Float
 local z_pos = y_pos + 4; -- Float
@@ -159,60 +167,48 @@ Game.maps = {
 	"0x5F - ",
 };
 
-local function is_pointer(number)
-	return number >= 0x80000000 and number <= 0x803FFFFF;
-end
-
 --------------------
 -- Region/Version --
 --------------------
 
+-- Version order: PAL 1.1, PAL 1.0, JP, US 1.1, US 1.0
+Game.Memory = {
+	["is_paused"] = {0x123B24, 0x1235A4, 0x124F84, 0x123A94, 0x123514},
+	["get_ready"] = {0x11B3C3, 0x11AE43, 0x11C823, 0x11B333, 0x11ADB3},
+	["cheat_menu"] = {0x0E03AC, 0x0DFE2C, 0x0E17FC, 0x0E031C, 0x0DFD9C},
+	["pointer_list"] = {0x11B468, 0x11AEE8, 0x11C8C8, 0x11B3D8, 0x11AE58},
+	["num_objects"] = {0x11B46C, 0x11AEEC, 0x11C8CC, 0x11B3DC, 0x11AE5C},
+};
+
 function Game.detectVersion(romName)
 	if stringContains(romName, "Europe") and stringContains(romName, "Rev A") then
+		version = 1;
 		map_freeze_values = {
 			0x121777, 0x123B07, 0x208699 -- TODO: Double check these
-		}
-		is_paused = 0x123B24;
-		get_ready = 0x11B3C3;
-		cheat_menu = 0x0E03AC;
-		pointer_list = 0x11B468;
+		};
 	elseif stringContains(romName, "Europe") then
+		version = 2;
 		map_freeze_values = {
 			0x11AF3B, 0x1211F7, 0x1212E2, 0x123587, 0x206BB5, 0x206C3B, 0x207EA9 -- TODO: Double check these
 		};
-		is_paused = 0x1235A4;
-		get_ready = 0x11AE43;
-		cheat_menu = 0x0DFE2C;
-		pointer_list = 0x11AEE8;
 	elseif stringContains(romName, "Japan") then
+		version = 3;
 		map_freeze_values = {
 			0x11C91B, 0x122BD7, 0x122CC2, 0x124F67, 0x1FD4A5, 0x1FD52B, 0x1FE729 -- TODO: Double check these
 		};
-		is_paused = 0x124F84;
-		get_ready = 0x11C823;
-		cheat_menu = 0x0E17FC;
-		pointer_list = 0x11C8C8;
 	elseif stringContains(romName, "USA") and stringContains(romName, "Rev A") then
+		version = 4;
 		map_freeze_values = {
 			0x1216E7, 0x123A77, 0x1FD209 -- TODO: Double check these
 		};
-		is_paused = 0x123A94;
-		get_ready = 0x11B333;
-		cheat_menu = 0x0E031C;
-		pointer_list = 0x11B3D8;
 	elseif stringContains(romName, "USA") then
+		version = 5;
 		map_freeze_values = {
 			0x121167, 0x121252, 0x1234F7, 0x1FCA19 -- TODO: Double check these
 		};
-		is_paused = 0x123514;
-		get_ready = 0x11ADB3;
-		cheat_menu = 0x0DFD9C;
-		pointer_list = 0x11AE58;
 	else
 		return false;
 	end
-
-	num_objects = pointer_list + 4;
 
 	return true;
 end
@@ -230,8 +226,8 @@ Game.max_rot_units = 65535;
 
 function Game.getVelocity()
 	local player_object = mainmemory.read_u32_be(player_object_pointer);
-	if is_pointer(player_object) then
-		player_object = player_object - 0x80000000;
+	if isPointer(player_object) then
+		player_object = player_object - RDRAMBase;
 		return mainmemory.readfloat(player_object + velocity, true);
 	end
 	return 0;
@@ -239,16 +235,16 @@ end
 
 function Game.setVelocity(value)
 	local player_object = mainmemory.read_u32_be(player_object_pointer);
-	if is_pointer(player_object) then
-		player_object = player_object - 0x80000000;
+	if isPointer(player_object) then
+		player_object = player_object - RDRAMBase;
 		mainmemory.writefloat(player_object + velocity, value, true);
 	end
 end
 
 function Game.getLateralVelocity()
 	local player_object = mainmemory.read_u32_be(player_object_pointer);
-	if is_pointer(player_object) then
-		player_object = player_object - 0x80000000;
+	if isPointer(player_object) then
+		player_object = player_object - RDRAMBase;
 		return mainmemory.readfloat(player_object + lateral_velocity, true);
 	end
 	return 0;
@@ -256,25 +252,36 @@ end
 
 function Game.setLateralVelocity(value)
 	local player_object = mainmemory.read_u32_be(player_object_pointer);
-	if is_pointer(player_object) then
-		player_object = player_object - 0x80000000;
+	if isPointer(player_object) then
+		player_object = player_object - RDRAMBase;
 		mainmemory.writefloat(player_object + lateral_velocity, value, true);
 	end
 end
 
 function Game.getSpinTimer()
 	local player_object = mainmemory.read_u32_be(player_object_pointer);
-	if is_pointer(player_object) then
-		player_object = player_object - 0x80000000;
+	if isPointer(player_object) then
+		player_object = player_object - RDRAMBase;
 		return mainmemory.read_s16_be(player_object + spin_timer);
 	end
 	return 0;
 end
 
+function Game.colorSpinTimer()
+	local spinTimer = Game.getSpinTimer();
+	spinTimer = math.abs(spinTimer);
+	spinTimer = math.min(spinTimer, 80);
+	spinTimer = spinTimer / 80;
+	if spinTimer == 0 then
+		return 0xFFFFFFFF; -- White
+	end
+	return getColor(spinTimer);
+end
+
 function Game.getYVelocity()
 	local player_object = mainmemory.read_u32_be(player_object_pointer);
-	if is_pointer(player_object) then
-		player_object = player_object - 0x80000000;
+	if isPointer(player_object) then
+		player_object = player_object - RDRAMBase;
 		return mainmemory.readfloat(player_object + y_velocity, true);
 	end
 	return 0;
@@ -282,16 +289,16 @@ end
 
 function Game.setYVelocity(value)
 	local player_object = mainmemory.read_u32_be(player_object_pointer);
-	if is_pointer(player_object) then
-		player_object = player_object - 0x80000000;
+	if isPointer(player_object) then
+		player_object = player_object - RDRAMBase;
 		mainmemory.writefloat(player_object + y_velocity, value, true);
 	end
 end
 
 function Game.getBoost()
 	local player_object = mainmemory.read_u32_be(player_object_pointer);
-	if is_pointer(player_object) then
-		player_object = player_object - 0x80000000;
+	if isPointer(player_object) then
+		player_object = player_object - RDRAMBase;
 		return mainmemory.read_s8(player_object + boost_timer);
 	end
 	return 0;
@@ -299,8 +306,8 @@ end
 
 function Game.getThrottle()
 	local player_object = mainmemory.read_u32_be(player_object_pointer);
-	if is_pointer(player_object) then
-		player_object = player_object - 0x80000000;
+	if isPointer(player_object) then
+		player_object = player_object - RDRAMBase;
 		return mainmemory.readfloat(player_object + throttle, true);
 	end
 	return 0;
@@ -308,8 +315,8 @@ end
 
 function Game.getBananas()
 	local player_object = mainmemory.read_u32_be(player_object_pointer);
-	if is_pointer(player_object) then
-		player_object = player_object - 0x80000000;
+	if isPointer(player_object) then
+		player_object = player_object - RDRAMBase;
 		return mainmemory.readbyte(player_object + bananas);
 	end
 	return 0;
@@ -321,8 +328,8 @@ end
 
 function Game.getXPosition()
 	local player_object = mainmemory.read_u32_be(player_object_pointer);
-	if is_pointer(player_object) then
-		player_object = player_object - 0x80000000;
+	if isPointer(player_object) then
+		player_object = player_object - RDRAMBase;
 		return mainmemory.readfloat(player_object + x_pos, true);
 	end
 	return 0;
@@ -330,8 +337,8 @@ end
 
 function Game.getYPosition()
 	local player_object = mainmemory.read_u32_be(player_object_pointer);
-	if is_pointer(player_object) then
-		player_object = player_object - 0x80000000;
+	if isPointer(player_object) then
+		player_object = player_object - RDRAMBase;
 		return mainmemory.readfloat(player_object + y_pos, true);
 	end
 	return 0;
@@ -339,8 +346,8 @@ end
 
 function Game.getZPosition()
 	local player_object = mainmemory.read_u32_be(player_object_pointer);
-	if is_pointer(player_object) then
-		player_object = player_object - 0x80000000;
+	if isPointer(player_object) then
+		player_object = player_object - RDRAMBase;
 		return mainmemory.readfloat(player_object + z_pos, true);
 	end
 	return 0;
@@ -348,16 +355,16 @@ end
 
 function Game.setXPosition(value)
 	local player_object = mainmemory.read_u32_be(player_object_pointer);
-	if is_pointer(player_object) then
-		player_object = player_object - 0x80000000;
+	if isPointer(player_object) then
+		player_object = player_object - RDRAMBase;
 		mainmemory.writefloat(player_object + x_pos, value, true);
 	end
 end
 
 function Game.setYPosition(value)
 	local player_object = mainmemory.read_u32_be(player_object_pointer);
-	if is_pointer(player_object) then
-		player_object = player_object - 0x80000000;
+	if isPointer(player_object) then
+		player_object = player_object - RDRAMBase;
 		mainmemory.writefloat(player_object + y_pos, value, true);
 		Game.setYVelocity(0);
 	end
@@ -365,8 +372,8 @@ end
 
 function Game.setZPosition(value)
 	local player_object = mainmemory.read_u32_be(player_object_pointer);
-	if is_pointer(player_object) then
-		player_object = player_object - 0x80000000;
+	if isPointer(player_object) then
+		player_object = player_object - RDRAMBase;
 		mainmemory.writefloat(player_object + z_pos, value, true);
 	end
 end
@@ -377,8 +384,8 @@ end
 
 function Game.getXRotation()
 	local player_object = mainmemory.read_u32_be(player_object_pointer);
-	if is_pointer(player_object) then
-		player_object = player_object - 0x80000000;
+	if isPointer(player_object) then
+		player_object = player_object - RDRAMBase;
 		return mainmemory.read_u16_be(player_object + x_rot);
 	end
 	return 0;
@@ -386,8 +393,8 @@ end
 
 function Game.getYRotation()
 	local player_object = mainmemory.read_u32_be(player_object_pointer);
-	if is_pointer(player_object) then
-		player_object = player_object - 0x80000000;
+	if isPointer(player_object) then
+		player_object = player_object - RDRAMBase;
 		return mainmemory.read_u16_be(player_object + facing_angle);
 	end
 	return 0;
@@ -395,8 +402,8 @@ end
 
 function Game.getZRotation()
 	local player_object = mainmemory.read_u32_be(player_object_pointer);
-	if is_pointer(player_object) then
-		player_object = player_object - 0x80000000;
+	if isPointer(player_object) then
+		player_object = player_object - RDRAMBase;
 		return mainmemory.read_u16_be(player_object + z_rot);
 	end
 	return 0;
@@ -404,24 +411,24 @@ end
 
 function Game.setXRotation(value)
 	local player_object = mainmemory.read_u32_be(player_object_pointer);
-	if is_pointer(player_object) then
-		player_object = player_object - 0x80000000;
+	if isPointer(player_object) then
+		player_object = player_object - RDRAMBase;
 		mainmemory.write_u16_be(player_object + x_rot, value);
 	end
 end
 
 function Game.setYRotation(value)
 	local player_object = mainmemory.read_u32_be(player_object_pointer);
-	if is_pointer(player_object) then
-		player_object = player_object - 0x80000000;
+	if isPointer(player_object) then
+		player_object = player_object - RDRAMBase;
 		mainmemory.write_u16_be(player_object + facing_angle, value);
 	end
 end
 
 function Game.setZRotation(value)
 	local player_object = mainmemory.read_u32_be(player_object_pointer);
-	if is_pointer(player_object) then
-		player_object = player_object - 0x80000000;
+	if isPointer(player_object) then
+		player_object = player_object - RDRAMBase;
 		mainmemory.write_u16_be(player_object + z_rot, value);
 	end
 end
@@ -466,25 +473,25 @@ end
 local function optimalTap()
 	local _velocity = Game.getVelocity();
 	local _bananas = Game.getBananas();
-	local _boost = Game.getBoost();
-	local _getReady = mainmemory.readbyte(get_ready);
-	local _isPaused = mainmemory.read_u16_be(is_paused);
+	local boost = Game.getBoost();
+	local getReady = mainmemory.readbyte(Game.Memory.get_ready[version]);
+	local isPaused = mainmemory.read_u16_be(Game.Memory.is_paused[version]);
 
 	local boostType = forms.getproperty(otap_boost_dropdown, "SelectedItem");
 
 	-- Don't press A if we're paused
-	if _isPaused ~= 0 then
+	if isPaused ~= 0 then -- TODO: This check isn't perfect, it's still possible that it'll tap A and close the menu, I think we need a menu object pointer or something
 		--print("Don't press A, we're paused.");
 		return;
 	end
 
 	-- Don't press A if we're boosting
-	if _boost > 0 then
+	if boost > 0 then
 		return;
 	end
 
 	-- Get a zipper at the start of the race
-	if _getReady ~= 0 and boostType ~= "None" then
+	if getReady ~= 0 and boostType ~= "None" then
 		local boostMin = 0;
 		local boostMax = 0;
 
@@ -496,16 +503,12 @@ local function optimalTap()
 			boostMax = get_ready_yellow_max;
 		end
 
-		if _getReady >= boostMin and _getReady <= boostMax and _boost == 0 then
-			print("Got "..boostType.." boost at value: ".._getReady);
-			joypad.set({["A"] = true}, 1);
-		else
-			joypad.set({["A"] = false}, 1);
-		end
+		local shouldWeTap = getReady >= boostMin and getReady <= boostMax and boost == 0;
+		joypad.set({["A"] = shouldWeTap}, 1);
 		return;
 	end
 
-	-- Bot taps A every modulo frames
+	-- Bot taps A once every modulo frames
 	local modulo = 1;
 
 	if _velocity >= velocity_min then
@@ -531,14 +534,14 @@ local output_boost_stats_checkbox;
 
 local function outputBoostStats()
 	if Game.isPhysicsFrame() and forms.ischecked(output_boost_stats_checkbox) then
-		local _boost = Game.getBoost();
-		local _getReady = mainmemory.readbyte(get_ready);
-		if _boost > 0 and _getReady == 0 then
+		local boost = Game.getBoost();
+		local getReady = mainmemory.readbyte(Game.Memory.get_ready[version]);
+		if boost > 0 and getReady == 0 then
 			local aPressed = joypad.getimmediate()["P1 A"];
 			if aPressed then
-				print("Frame: "..boostFrames.." Boost: ".._boost.." (A Pressed)");
+				print("Frame: "..boostFrames.." Boost: "..boost.." (A Pressed)");
 			else
-				print("Frame: "..boostFrames.." Boost: ".._boost);
+				print("Frame: "..boostFrames.." Boost: "..boost);
 			end
 			boostFrames = boostFrames + 1;
 		else
@@ -625,7 +628,7 @@ local encircle_checkbox;
 local radius = 1000;
 
 local function get_num_slots()
-	return mainmemory.read_u32_be(num_objects);
+	return mainmemory.read_u32_be(Game.Memory.num_objects[version]);
 end
 
 local function get_slot_base(pointerList, index)
@@ -639,14 +642,19 @@ local function encircle_player()
 	local current_player_z = Game.getZPosition();
 	local x, z;
 
-	local pointerList = mainmemory.read_u24_be(pointer_list + 1);
+	local pointerList = mainmemory.read_u32_be(Game.Memory.pointer_list[version]);
+	if not isPointer(pointerList) then
+		return;
+	end
+	pointerList = pointerList - RDRAMBase;
+
 	local num_slots = get_num_slots();
 
 	-- Populate and sort pointer list
 	local currentPointers = {};
 	for i = 0, num_slots - 1 do
 		local slotBase = get_slot_base(pointerList, i);
-		if slotBase ~= playerObject and slotBase > 0x000000 and slotBase < 0x7FFFFF then
+		if slotBase ~= playerObject and slotBase > 0x000000 and slotBase < 0x800000 then
 			table.insert(currentPointers, slotBase);
 		end
 	end
@@ -676,12 +684,12 @@ end
 
 function Game.applyInfinites()
 	-- Unlock cheat menu
-	mainmemory.write_u32_be(cheat_menu, 0xFFFFFFFF);
+	mainmemory.write_u32_be(Game.Memory.cheat_menu[version], 0xFFFFFFFF);
 
 	-- Player object bizzo
 	local player_object = mainmemory.read_u32_be(player_object_pointer);
-	if is_pointer(player_object) then
-		player_object = player_object - 0x80000000;
+	if isPointer(player_object) then
+		player_object = player_object - RDRAMBase;
 		mainmemory.writebyte(player_object + bananas, max_bananas);
 		mainmemory.writebyte(player_object + powerup_quantity, 1);
 		--mainmemory.write_s8(player_object + boost_timer, 1);
@@ -753,12 +761,12 @@ Game.OSD = {
 	{"dY"},
 	{"dXZ"},
 	{"Separator", 1},
-	{"Spin Timer", Game.getSpinTimer},
+	{"Spin Timer", Game.getSpinTimer, Game.colorSpinTimer},
 	{"Boost", Game.getBoost},
 	{"Velocity", Game.getVelocity},
 	{"Y Velocity", Game.getYVelocity},
 	{"Lateral Velocity", Game.getLateralVelocity},
-	--{"Lateral Velocity", Game.getLateralAcceleration}, -- TODO: Is this a thing?
+	--{"Lateral Acceleration", Game.getLateralAcceleration}, -- TODO: Is this a thing?
 	{"Throttle", Game.getThrottle},
 	{"Separator", 1},
 	{"Max dY"},
