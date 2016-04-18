@@ -192,10 +192,13 @@ end
 
 print_threshold = 1;
 local function processObject(objectPointer)
-	local currentModelBase = mainmemory.read_u24_be(objectPointer + model_pointer + 1);
-	local currentBoneArrayBase = mainmemory.read_u24_be(objectPointer + current_bone_array_pointer + 1);
+	local currentModelBase = mainmemory.read_u32_be(objectPointer + model_pointer);
+	local currentBoneArrayBase = mainmemory.read_u32_be(objectPointer + current_bone_array_pointer);
 
-	if isRDRAM(currentModelBase) and isRDRAM(currentBoneArrayBase) then
+	if isPointer(currentModelBase) and isPointer(currentBoneArrayBase) then
+		currentModelBase = currentModelBase - RDRAMBase;
+		currentBoneArrayBase = currentBoneArrayBase - RDRAMBase;
+
 		-- Stupid stuff
 		setNumberOfBones(currentModelBase);
 
