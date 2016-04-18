@@ -433,22 +433,58 @@ function Game.setZRotation(value)
 	end
 end
 
------------------------------
--- Optimal tapping script  --
--- Written by Faschz, 2015 --
------------------------------
+----------------------------------------
+-- Optimal tapping script             --
+-- Written by Faschz, 2015            --
+-- Enhancements by Isotarge 2015-2016 --
+----------------------------------------
 
+-- Boost Thresholds
 local get_ready_yellow_max = 36;
 local get_ready_yellow_min = 20;
 local get_ready_blue_max = 18;
 local get_ready_blue_min = 6;
 
-local otap_checkbox;
-local otap_boost_dropdown;
+-- Blue
+local function increase_get_ready_blue_max()
+	get_ready_blue_max = math.min(80, get_ready_blue_max + 1);
+end
+
+local function decrease_get_ready_blue_max()
+	get_ready_blue_max = math.max(0, get_ready_blue_max - 1);
+end
+
+local function increase_get_ready_blue_min()
+	get_ready_blue_min = math.min(80, get_ready_blue_min + 1);
+end
+
+local function decrease_get_ready_blue_min()
+	get_ready_blue_min = math.max(0, get_ready_blue_min - 1);
+end
+
+-- Yellow
+local function increase_get_ready_yellow_max()
+	get_ready_yellow_max = math.min(80, get_ready_yellow_max + 1);
+end
+
+local function decrease_get_ready_yellow_max()
+	get_ready_yellow_max = math.max(0, get_ready_yellow_max - 1);
+end
+
+local function increase_get_ready_yellow_min()
+	get_ready_yellow_min = math.min(80, get_ready_yellow_min + 1);
+end
+
+local function decrease_get_ready_yellow_min()
+	get_ready_yellow_min = math.max(0, get_ready_yellow_min - 1);
+end
+
+local otap_checkbox; -- TODO: Put in ScriptHawkUI.form_controls table
+local otap_boost_dropdown; -- TODO: Put in ScriptHawkUI.form_controls table
 local otap_enabled = false;
 
-local otap_startFrame = emu.framecount();
-local otap_startLag = emu.lagcount();
+local otap_startFrame;
+local otap_startLag;
 
 -- TODO: Adjust velocity thresholds based on lateral velocity
 -- TODO: Adjust velocity thresholds based on bananas
@@ -530,7 +566,7 @@ end
 --------------------
 
 local boostFrames = 0;
-local output_boost_stats_checkbox;
+local output_boost_stats_checkbox; -- TODO: Put in ScriptHawkUI.form_controls table
 
 local function outputBoostStats()
 	if Game.isPhysicsFrame() and forms.ischecked(output_boost_stats_checkbox) then
@@ -553,69 +589,11 @@ local function outputBoostStats()
 	end
 end
 
---------------------
--- Get ready jank --
---------------------
-
--- Blue UI
-local options_get_ready_blue_max_label;
-local options_decrease_get_ready_blue_max_button;
-local options_increase_get_ready_blue_max_button;
-local options_get_ready_blue_max_value_label;
-
-local options_get_ready_blue_min_label;
-local options_decrease_get_ready_blue_min_button;
-local options_increase_get_ready_blue_min_button;
-local options_get_ready_blue_min_value_label;
-
-local function increase_get_ready_blue_max()
-	get_ready_blue_max = math.min(80, get_ready_blue_max + 1);
-end
-
-local function decrease_get_ready_blue_max()
-	get_ready_blue_max = math.max(0, get_ready_blue_max - 1);
-end
-
-local function increase_get_ready_blue_min()
-	get_ready_blue_min = math.min(80, get_ready_blue_min + 1);
-end
-
-local function decrease_get_ready_blue_min()
-	get_ready_blue_min = math.max(0, get_ready_blue_min - 1);
-end
-
--- Yellow UI
-local options_get_ready_yellow_max_label;
-local options_decrease_get_ready_yellow_max_button;
-local options_increase_get_ready_yellow_max_button;
-local options_get_ready_yellow_max_value_label;
-
-local options_get_ready_yellow_min_label;
-local options_decrease_get_ready_yellow_min_button;
-local options_increase_get_ready_yellow_min_button;
-local options_get_ready_yellow_min_value_label;
-
-local function increase_get_ready_yellow_max()
-	get_ready_yellow_max = math.min(80, get_ready_yellow_max + 1);
-end
-
-local function decrease_get_ready_yellow_max()
-	get_ready_yellow_max = math.max(0, get_ready_yellow_max - 1);
-end
-
-local function increase_get_ready_yellow_min()
-	get_ready_yellow_min = math.min(80, get_ready_yellow_min + 1);
-end
-
-local function decrease_get_ready_yellow_min()
-	get_ready_yellow_min = math.max(0, get_ready_yellow_min - 1);
-end
-
 --------------
 -- Encircle --
 --------------
 
-local encircle_checkbox;
+local encircle_checkbox; -- TODO: Put in ScriptHawkUI.form_controls table
 
 local radius = 1000;
 
@@ -699,29 +677,29 @@ function Game.initUI()
 	local blue_col_base = 5;
 	local yellow_col_base = 11;
 
-	-- Get ready paramater, blue min
-	options_get_ready_blue_min_label = forms.label(ScriptHawkUI.options_form, "BMin:", ScriptHawkUI.col(blue_col_base), ScriptHawkUI.row(6) + ScriptHawkUI.label_offset, 40, 14);
-	options_decrease_get_ready_blue_min_button = forms.button(ScriptHawkUI.options_form, "-", decrease_get_ready_blue_min, ScriptHawkUI.col(blue_col_base + 3) - 28, ScriptHawkUI.row(6), ScriptHawkUI.button_height, ScriptHawkUI.button_height);
-	options_increase_get_ready_blue_min_button = forms.button(ScriptHawkUI.options_form, "+", increase_get_ready_blue_min, ScriptHawkUI.col(blue_col_base + 4) - 28, ScriptHawkUI.row(6), ScriptHawkUI.button_height, ScriptHawkUI.button_height);
-	options_get_ready_blue_min_value_label = forms.label(ScriptHawkUI.options_form, get_ready_blue_min, ScriptHawkUI.col(blue_col_base + 4), ScriptHawkUI.row(6) + ScriptHawkUI.label_offset, 32, 14);
+	-- Boost Threshold, blue min
+	ScriptHawkUI.form_controls.get_ready_blue_min_label = forms.label(ScriptHawkUI.options_form, "BMin:", ScriptHawkUI.col(blue_col_base), ScriptHawkUI.row(6) + ScriptHawkUI.label_offset, 40, 14);
+	ScriptHawkUI.form_controls.decrease_get_ready_blue_min_button = forms.button(ScriptHawkUI.options_form, "-", decrease_get_ready_blue_min, ScriptHawkUI.col(blue_col_base + 3) - 28, ScriptHawkUI.row(6), ScriptHawkUI.button_height, ScriptHawkUI.button_height);
+	ScriptHawkUI.form_controls.increase_get_ready_blue_min_button = forms.button(ScriptHawkUI.options_form, "+", increase_get_ready_blue_min, ScriptHawkUI.col(blue_col_base + 4) - 28, ScriptHawkUI.row(6), ScriptHawkUI.button_height, ScriptHawkUI.button_height);
+	ScriptHawkUI.form_controls.get_ready_blue_min_value_label = forms.label(ScriptHawkUI.options_form, get_ready_blue_min, ScriptHawkUI.col(blue_col_base + 4), ScriptHawkUI.row(6) + ScriptHawkUI.label_offset, 32, 14);
 
-	-- Get ready paramater, blue max
-	options_get_ready_blue_max_label = forms.label(ScriptHawkUI.options_form, "BMax:", ScriptHawkUI.col(blue_col_base), ScriptHawkUI.row(7) + ScriptHawkUI.label_offset, 40, 14);
-	options_decrease_get_ready_blue_max_button = forms.button(ScriptHawkUI.options_form, "-", decrease_get_ready_blue_max, ScriptHawkUI.col(blue_col_base + 3) - 28, ScriptHawkUI.row(7), ScriptHawkUI.button_height, ScriptHawkUI.button_height);
-	options_increase_get_ready_blue_max_button = forms.button(ScriptHawkUI.options_form, "+", increase_get_ready_blue_max, ScriptHawkUI.col(blue_col_base + 4) - 28, ScriptHawkUI.row(7), ScriptHawkUI.button_height, ScriptHawkUI.button_height);
-	options_get_ready_blue_max_value_label = forms.label(ScriptHawkUI.options_form, get_ready_blue_max, ScriptHawkUI.col(blue_col_base + 4), ScriptHawkUI.row(7) + ScriptHawkUI.label_offset, 32, 14);
+	-- Boost Threshold, blue max
+	ScriptHawkUI.form_controls.get_ready_blue_max_label = forms.label(ScriptHawkUI.options_form, "BMax:", ScriptHawkUI.col(blue_col_base), ScriptHawkUI.row(7) + ScriptHawkUI.label_offset, 40, 14);
+	ScriptHawkUI.form_controls.decrease_get_ready_blue_max_button = forms.button(ScriptHawkUI.options_form, "-", decrease_get_ready_blue_max, ScriptHawkUI.col(blue_col_base + 3) - 28, ScriptHawkUI.row(7), ScriptHawkUI.button_height, ScriptHawkUI.button_height);
+	ScriptHawkUI.form_controls.increase_get_ready_blue_max_button = forms.button(ScriptHawkUI.options_form, "+", increase_get_ready_blue_max, ScriptHawkUI.col(blue_col_base + 4) - 28, ScriptHawkUI.row(7), ScriptHawkUI.button_height, ScriptHawkUI.button_height);
+	ScriptHawkUI.form_controls.get_ready_blue_max_value_label = forms.label(ScriptHawkUI.options_form, get_ready_blue_max, ScriptHawkUI.col(blue_col_base + 4), ScriptHawkUI.row(7) + ScriptHawkUI.label_offset, 32, 14);
 
-	-- Get ready paramater, yellow min
-	options_get_ready_yellow_min_label = forms.label(ScriptHawkUI.options_form, "YMin:", ScriptHawkUI.col(yellow_col_base), ScriptHawkUI.row(6) + ScriptHawkUI.label_offset, 40, 14);
-	options_decrease_get_ready_yellow_min_button = forms.button(ScriptHawkUI.options_form, "-", decrease_get_ready_yellow_min, ScriptHawkUI.col(yellow_col_base + 3) - 28, ScriptHawkUI.row(6), ScriptHawkUI.button_height, ScriptHawkUI.button_height);
-	options_increase_get_ready_yellow_min_button = forms.button(ScriptHawkUI.options_form, "+", increase_get_ready_yellow_min, ScriptHawkUI.col(yellow_col_base + 4) - 28, ScriptHawkUI.row(6), ScriptHawkUI.button_height, ScriptHawkUI.button_height);
-	options_get_ready_yellow_min_value_label = forms.label(ScriptHawkUI.options_form, get_ready_yellow_min, ScriptHawkUI.col(yellow_col_base + 4), ScriptHawkUI.row(6) + ScriptHawkUI.label_offset, 32, 14);
+	-- Boost Threshold, yellow min
+	ScriptHawkUI.form_controls.get_ready_yellow_min_label = forms.label(ScriptHawkUI.options_form, "YMin:", ScriptHawkUI.col(yellow_col_base), ScriptHawkUI.row(6) + ScriptHawkUI.label_offset, 40, 14);
+	ScriptHawkUI.form_controls.decrease_get_ready_yellow_min_button = forms.button(ScriptHawkUI.options_form, "-", decrease_get_ready_yellow_min, ScriptHawkUI.col(yellow_col_base + 3) - 28, ScriptHawkUI.row(6), ScriptHawkUI.button_height, ScriptHawkUI.button_height);
+	ScriptHawkUI.form_controls.increase_get_ready_yellow_min_button = forms.button(ScriptHawkUI.options_form, "+", increase_get_ready_yellow_min, ScriptHawkUI.col(yellow_col_base + 4) - 28, ScriptHawkUI.row(6), ScriptHawkUI.button_height, ScriptHawkUI.button_height);
+	ScriptHawkUI.form_controls.get_ready_yellow_min_value_label = forms.label(ScriptHawkUI.options_form, get_ready_yellow_min, ScriptHawkUI.col(yellow_col_base + 4), ScriptHawkUI.row(6) + ScriptHawkUI.label_offset, 32, 14);
 
-	-- Get ready paramater, yellow max
-	options_get_ready_yellow_max_label = forms.label(ScriptHawkUI.options_form, "YMax:", ScriptHawkUI.col(yellow_col_base), ScriptHawkUI.row(7) + ScriptHawkUI.label_offset, 40, 14);
-	options_decrease_get_ready_yellow_max_button = forms.button(ScriptHawkUI.options_form, "-", decrease_get_ready_yellow_max, ScriptHawkUI.col(yellow_col_base + 3) - 28, ScriptHawkUI.row(7), ScriptHawkUI.button_height, ScriptHawkUI.button_height);
-	options_increase_get_ready_yellow_max_button = forms.button(ScriptHawkUI.options_form, "+", increase_get_ready_yellow_max, ScriptHawkUI.col(yellow_col_base + 4) - 28, ScriptHawkUI.row(7), ScriptHawkUI.button_height, ScriptHawkUI.button_height);
-	options_get_ready_yellow_max_value_label = forms.label(ScriptHawkUI.options_form, get_ready_yellow_max, ScriptHawkUI.col(yellow_col_base + 4), ScriptHawkUI.row(7) + ScriptHawkUI.label_offset, 32, 14);
+	-- Boost Threshold, yellow max
+	ScriptHawkUI.form_controls.get_ready_yellow_max_label = forms.label(ScriptHawkUI.options_form, "YMax:", ScriptHawkUI.col(yellow_col_base), ScriptHawkUI.row(7) + ScriptHawkUI.label_offset, 40, 14);
+	ScriptHawkUI.form_controls.decrease_get_ready_yellow_max_button = forms.button(ScriptHawkUI.options_form, "-", decrease_get_ready_yellow_max, ScriptHawkUI.col(yellow_col_base + 3) - 28, ScriptHawkUI.row(7), ScriptHawkUI.button_height, ScriptHawkUI.button_height);
+	ScriptHawkUI.form_controls.increase_get_ready_yellow_max_button = forms.button(ScriptHawkUI.options_form, "+", increase_get_ready_yellow_max, ScriptHawkUI.col(yellow_col_base + 4) - 28, ScriptHawkUI.row(7), ScriptHawkUI.button_height, ScriptHawkUI.button_height);
+	ScriptHawkUI.form_controls.get_ready_yellow_max_value_label = forms.label(ScriptHawkUI.options_form, get_ready_yellow_max, ScriptHawkUI.col(yellow_col_base + 4), ScriptHawkUI.row(7) + ScriptHawkUI.label_offset, 32, 14);
 end
 
 function Game.eachFrame()
@@ -745,10 +723,10 @@ function Game.eachFrame()
 end
 
 function Game.realTime()
-	forms.settext(options_get_ready_blue_min_value_label, get_ready_blue_min);
-	forms.settext(options_get_ready_blue_max_value_label, get_ready_blue_max);
-	forms.settext(options_get_ready_yellow_min_value_label, get_ready_yellow_min);
-	forms.settext(options_get_ready_yellow_max_value_label, get_ready_yellow_max);
+	forms.settext(ScriptHawkUI.form_controls.get_ready_blue_min_value_label, get_ready_blue_min);
+	forms.settext(ScriptHawkUI.form_controls.get_ready_blue_max_value_label, get_ready_blue_max);
+	forms.settext(ScriptHawkUI.form_controls.get_ready_yellow_min_value_label, get_ready_yellow_min);
+	forms.settext(ScriptHawkUI.form_controls.get_ready_yellow_max_value_label, get_ready_yellow_max);
 end
 
 Game.OSDPosition = {2, 70}
