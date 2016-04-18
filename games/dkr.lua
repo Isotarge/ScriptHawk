@@ -570,22 +570,18 @@ local options_get_ready_blue_min_value_label;
 
 local function increase_get_ready_blue_max()
 	get_ready_blue_max = math.min(80, get_ready_blue_max + 1);
-	forms.settext(options_get_ready_blue_max_value_label, get_ready_blue_max);
 end
 
 local function decrease_get_ready_blue_max()
 	get_ready_blue_max = math.max(0, get_ready_blue_max - 1);
-	forms.settext(options_get_ready_blue_max_value_label, get_ready_blue_max);
 end
 
 local function increase_get_ready_blue_min()
 	get_ready_blue_min = math.min(80, get_ready_blue_min + 1);
-	forms.settext(options_get_ready_blue_min_value_label, get_ready_blue_min);
 end
 
 local function decrease_get_ready_blue_min()
 	get_ready_blue_min = math.max(0, get_ready_blue_min - 1);
-	forms.settext(options_get_ready_blue_min_value_label, get_ready_blue_min);
 end
 
 -- Yellow UI
@@ -601,22 +597,18 @@ local options_get_ready_yellow_min_value_label;
 
 local function increase_get_ready_yellow_max()
 	get_ready_yellow_max = math.min(80, get_ready_yellow_max + 1);
-	forms.settext(options_get_ready_yellow_max_value_label, get_ready_yellow_max);
 end
 
 local function decrease_get_ready_yellow_max()
 	get_ready_yellow_max = math.max(0, get_ready_yellow_max - 1);
-	forms.settext(options_get_ready_yellow_max_value_label, get_ready_yellow_max);
 end
 
 local function increase_get_ready_yellow_min()
 	get_ready_yellow_min = math.min(80, get_ready_yellow_min + 1);
-	forms.settext(options_get_ready_yellow_min_value_label, get_ready_yellow_min);
 end
 
 local function decrease_get_ready_yellow_min()
 	get_ready_yellow_min = math.max(0, get_ready_yellow_min - 1);
-	forms.settext(options_get_ready_yellow_min_value_label, get_ready_yellow_min);
 end
 
 --------------
@@ -750,6 +742,13 @@ function Game.eachFrame()
 	end
 
 	outputBoostStats();
+end
+
+function Game.realTime()
+	forms.settext(options_get_ready_blue_min_value_label, get_ready_blue_min);
+	forms.settext(options_get_ready_blue_max_value_label, get_ready_blue_max);
+	forms.settext(options_get_ready_yellow_min_value_label, get_ready_yellow_min);
+	forms.settext(options_get_ready_yellow_max_value_label, get_ready_yellow_max);
 end
 
 Game.OSDPosition = {2, 70}
