@@ -479,10 +479,7 @@ local function decrease_get_ready_yellow_min()
 	get_ready_yellow_min = math.max(0, get_ready_yellow_min - 1);
 end
 
-local otap_checkbox; -- TODO: Put in ScriptHawkUI.form_controls table
-local otap_boost_dropdown; -- TODO: Put in ScriptHawkUI.form_controls table
 local otap_enabled = false;
-
 local otap_startFrame;
 local otap_startLag;
 
@@ -513,7 +510,7 @@ local function optimalTap()
 	local getReady = mainmemory.readbyte(Game.Memory.get_ready[version]);
 	local isPaused = mainmemory.read_u16_be(Game.Memory.is_paused[version]);
 
-	local boostType = forms.getproperty(otap_boost_dropdown, "SelectedItem");
+	local boostType = forms.getproperty(ScriptHawkUI.form_controls.otap_boost_dropdown, "SelectedItem");
 
 	-- Don't press A if we're paused
 	if isPaused ~= 0 then -- TODO: This check isn't perfect, it's still possible that it'll tap A and close the menu, I think we need a menu object pointer or something
@@ -566,10 +563,9 @@ end
 --------------------
 
 local boostFrames = 0;
-local output_boost_stats_checkbox; -- TODO: Put in ScriptHawkUI.form_controls table
 
 local function outputBoostStats()
-	if Game.isPhysicsFrame() and forms.ischecked(output_boost_stats_checkbox) then
+	if Game.isPhysicsFrame() and forms.ischecked(ScriptHawkUI.form_controls.boost_info_checkbox) then
 		local boost = Game.getBoost();
 		local getReady = mainmemory.readbyte(Game.Memory.get_ready[version]);
 		if boost > 0 and getReady == 0 then
@@ -592,8 +588,6 @@ end
 --------------
 -- Encircle --
 --------------
-
-local encircle_checkbox; -- TODO: Put in ScriptHawkUI.form_controls table
 
 local radius = 1000;
 
@@ -668,11 +662,11 @@ function Game.applyInfinites()
 end
 
 function Game.initUI()
-	output_boost_stats_checkbox = forms.checkbox(ScriptHawkUI.options_form, "Boost info", ScriptHawkUI.col(5) + ScriptHawkUI.dropdown_offset, ScriptHawkUI.row(4) + ScriptHawkUI.dropdown_offset);
-	encircle_checkbox = forms.checkbox(ScriptHawkUI.options_form, "Encircle (beta)", ScriptHawkUI.col(5) + ScriptHawkUI.dropdown_offset, ScriptHawkUI.row(5) + ScriptHawkUI.dropdown_offset);
+	ScriptHawkUI.form_controls.boost_info_checkbox = forms.checkbox(ScriptHawkUI.options_form, "Boost info", ScriptHawkUI.col(5) + ScriptHawkUI.dropdown_offset, ScriptHawkUI.row(4) + ScriptHawkUI.dropdown_offset);
+	ScriptHawkUI.form_controls.encircle_checkbox = forms.checkbox(ScriptHawkUI.options_form, "Encircle (beta)", ScriptHawkUI.col(5) + ScriptHawkUI.dropdown_offset, ScriptHawkUI.row(5) + ScriptHawkUI.dropdown_offset);
 
-	otap_checkbox = forms.checkbox(ScriptHawkUI.options_form, "Auto tapper", ScriptHawkUI.col(0) + ScriptHawkUI.dropdown_offset, ScriptHawkUI.row(6) + ScriptHawkUI.dropdown_offset);
-	otap_boost_dropdown = forms.dropdown(ScriptHawkUI.options_form, {"Yellow", "Blue", "None"}, ScriptHawkUI.col(0) + ScriptHawkUI.dropdown_offset, ScriptHawkUI.row(7) + ScriptHawkUI.dropdown_offset, ScriptHawkUI.col(4), ScriptHawkUI.button_height);
+	ScriptHawkUI.form_controls.otap_checkbox = forms.checkbox(ScriptHawkUI.options_form, "Auto tapper", ScriptHawkUI.col(0) + ScriptHawkUI.dropdown_offset, ScriptHawkUI.row(6) + ScriptHawkUI.dropdown_offset);
+	ScriptHawkUI.form_controls.otap_boost_dropdown = forms.dropdown(ScriptHawkUI.options_form, {"Yellow", "Blue", "None"}, ScriptHawkUI.col(0) + ScriptHawkUI.dropdown_offset, ScriptHawkUI.row(7) + ScriptHawkUI.dropdown_offset, ScriptHawkUI.col(4), ScriptHawkUI.button_height);
 
 	local blue_col_base = 5;
 	local yellow_col_base = 11;
@@ -703,11 +697,11 @@ function Game.initUI()
 end
 
 function Game.eachFrame()
-	if not otap_enabled and forms.ischecked(otap_checkbox) then
+	if not otap_enabled and forms.ischecked(ScriptHawkUI.form_controls.otap_checkbox) then
 		enableOptimalTap();
 	end
 
-	if otap_enabled and not forms.ischecked(otap_checkbox) then
+	if otap_enabled and not forms.ischecked(ScriptHawkUI.form_controls.otap_checkbox) then
 		disableOptimalTap();
 	end
 
@@ -715,7 +709,7 @@ function Game.eachFrame()
 		optimalTap();
 	end
 
-	if forms.ischecked(encircle_checkbox) then
+	if forms.ischecked(ScriptHawkUI.form_controls.encircle_checkbox) then
 		encircle_player();
 	end
 
