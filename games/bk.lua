@@ -4,9 +4,6 @@ local Game = {};
 -- Region/Version --
 --------------------
 
--- Only patch US 1.0
--- TODO - Figure out how to patch other versions
-local allowFurnaceFunPatch = false;
 local framebuffer_width = 292; -- Bigger on PAL
 local framebuffer_height = 200; -- Bigger on PAL
 
@@ -240,16 +237,20 @@ function Game.detectVersion(romName)
 		framebuffer_width = 292;
 		framebuffer_height = 216;
 		clip_vel = -2900;
-		allowFurnaceFunPatch = false;
+		Game.allowFurnaceFunPatch = false; -- TODO: FF Patch for this version
+		Game.supportsASMHacks = false; -- TODO: Research ASM hook for this version
 	elseif stringContains(romName, "Japan") then
 		version = 2;
-		allowFurnaceFunPatch = false;
+		Game.allowFurnaceFunPatch = false; -- TODO: FF Patch for this version
+		Game.supportsASMHacks = false; -- TODO: Research ASM hook for this version
 	elseif stringContains(romName, "USA") and stringContains(romName, "Rev A") then
 		version = 3;
-		allowFurnaceFunPatch = false;
+		Game.allowFurnaceFunPatch = false; -- TODO: FF Patch for this version
+		Game.supportsASMHacks = false; -- TODO: Research ASM hook for this version
 	elseif stringContains(romName, "USA") then
 		version = 4;
-		allowFurnaceFunPatch = true;
+		Game.allowFurnaceFunPatch = true;
+		Game.supportsASMHacks = true;
 	else
 		return false;
 	end
@@ -614,9 +615,8 @@ end
 -- Furnace fun stuff --
 -----------------------
 
--- TODO: Figure out how to patch for other versions
-local function applyFurnaceFunPatch()
-	if allowFurnaceFunPatch and forms.ischecked(ScriptHawkUI.form_controls.allow_ff_patch) then
+local function applyFurnaceFunPatch() -- TODO: Can we just read the FF bytes from EEPROM?
+	if Game.allowFurnaceFunPatch and forms.ischecked(ScriptHawkUI.form_controls.allow_ff_patch) then
 		mainmemory.write_u16_be(0x320064, 0x080A);
 		mainmemory.write_u16_be(0x320066, 0x1840);
 
@@ -1176,7 +1176,7 @@ end
 
 function Game.initUI()
 	ScriptHawkUI.form_controls.toggle_neverslip = forms.checkbox(ScriptHawkUI.options_form, "Never Slip", ScriptHawkUI.col(0) + ScriptHawkUI.dropdown_offset, ScriptHawkUI.row(6) + ScriptHawkUI.dropdown_offset);
-	if allowFurnaceFunPatch then
+	if Game.allowFurnaceFunPatch then
 		ScriptHawkUI.form_controls.allow_ff_patch = forms.checkbox(ScriptHawkUI.options_form, "Allow FF patch", ScriptHawkUI.col(0) + ScriptHawkUI.dropdown_offset, ScriptHawkUI.row(7) + ScriptHawkUI.dropdown_offset);
 	end
 
@@ -1255,7 +1255,6 @@ Game.OSD = {
 -- ASM Stuff --
 ---------------
 
-Game.supportsASMHacks = true; -- TODO: this is only true for US 1.0 currently
 Game.ASMHookBase = 0x24EE88;
 Game.ASMHook = {
 	0x08, 0x10, 0x00, 0x00,
