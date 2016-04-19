@@ -1,0 +1,7 @@
+Ok so I have a few "super" ideas but they will take me a while to type up and i'm leaving for work in 5 mins, but I can give you a couple of things to look into if you want. First one is very minor, we have a way around it. Second one is fucking weird.
+
+1) In the Hoop Hurry minigame in WitchyWorld, the time when the game ends is random, unless you are standing in a ring. If you are not standing in a ring, the game can end instantly after the timer hits "0", one second after it hits "0", or two seconds after it hits "0". We have no idea why it does this, but standing in the hoop at the end makes it end instantly. It's not a big deal to look into since we have a way to determine this, but if you want to find out why it does this, be my guest.
+
+2) In HFP, if you are in the igloo as solo Kazooie and slide out of the igloo while shooting a clockwork and manage to do a clockwork warp off of it, the game will "lose" Kazooie and you will only have solo Banjo. If you die as solo Banjo, solo Kazooie shows up on the pad and you "lose" solo Banjo. If you die as Kazooie, you enter this weird map state where you have full control but the map is way off in the distance. There is a Wumba loading zone nearby, but I've never been able to hit it on console. I'm sure with emulator you could make an input file that leads you directly to the loading zone blind. I've always wondered what hitting that loading zone would do.
+
+If you're confused about 2), here's a video http://www.twitch.tv/konditioner/v/11462259?t=1h09m53s
