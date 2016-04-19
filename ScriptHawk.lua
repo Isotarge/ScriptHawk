@@ -1,9 +1,38 @@
+ScriptHawk = {};
+
+if emu.getsystemid() == "N64" then
+	RDRAMBase = 0x80000000;
+	RDRAMSize = 0x800000; -- Halved with no expansion pak
+
+	-- Dereferences a N64 RDRAM pointer
+	-- Returns the RDRAM address pointed to if it's a valid pointer
+	-- Returns nil if invalid
+	function dereferencePointer(address)
+		if type(address) == "number" and address >= 0 and address < (RDRAMSize - 4) then
+			address = mainmemory.read_u32_be(address);
+			if address >= RDRAMBase and address < RDRAMBase + RDRAMSize then
+				return address - RDRAMBase;
+			end
+		end
+	end
+
+	-- Checks whether a value falls within N64 RDRAM
+	function isRDRAM(value)
+		return type(value) == "number" and value >= 0 and value < RDRAMSize;
+	end
+
+	-- Checks whether a value is a N64 RDRAM pointer
+	function isPointer(value)
+		return type(value) == "number" and value >= RDRAMBase and value < RDRAMBase + RDRAMSize;
+	end
+end
+
 --------------------
 -- UI State Table --
 --------------------
 
-ScriptHawkUI = {
-	["form_controls"] = {}, -- TODO: Make game modules use this table for their own controls mayb?
+ScriptHawkUI = { -- TODO: Refactor to ScriptHawk.UI
+	["form_controls"] = {}, -- TODO: Make game modules use this table for their own controls mayb? -- TODO: Detect UI position problems using this array
 	["form_padding"] = 8,
 	["label_offset"] = 5,
 	["dropdown_offset"] = 1,
@@ -189,7 +218,7 @@ function traverse_size(object, minimumPrintSize, maximumPrintSize)
 		end
 		object = object + 0x10 + size;
 		prev = mainmemory.read_u32_be(object);
-	until prev == 0 or not (object > 0 and object < 0x800000);
+	until prev == 0 or not isRDRAM(object);
 	print_deferred();
 end
 traverseSize = traverse_size;
@@ -208,7 +237,7 @@ function traverse(object)
 end
 
 function replace_u32_be(find, replace)
-	for i = 0, 0x7FFFFF, 4 do
+	for i = 0, RDRAMSize - 4, 4 do
 		if mainmemory.read_u32_be(i) == find then
 			dprint("Replaced "..toHexString(i, 6));
 			mainmemory.write_u32_be(i, replace);
@@ -243,7 +272,6 @@ require "lib.DPrint";
 -----------------------
 -- Keybind framework --
 -----------------------
-ScriptHawk = {};
 
 ScriptHawk.keybindsFrame = {};
 ScriptHawk.keybindsRealtime = {};
@@ -393,7 +421,7 @@ function loadASMPatch(code_filename, suppress_print)
 
 		-- Open the file and assemble the code
 		code = {};
-		local result = lips(code_filename, codeWriter, {['unsafe'] = true, ['offset'] = Game.ASMCodeBase + 0x80000000});
+		local result = lips(code_filename, codeWriter, {['unsafe'] = true, ['offset'] = Game.ASMCodeBase + RDRAMBase});
 
 		if #code == 0 then
 			if not suppress_print then
@@ -580,7 +608,7 @@ ScriptHawk.bindJoypadRealtime("P1 L", loadPracticeSlot, true);
 function searchPointers(base, range, allowLater)
 	local foundPointers = {};
 	allowLater = allowLater or false;
-	for address = 0x000000, 0x7FFFFC, 4 do
+	for address = 0, RDRAMSize - 4, 4 do
 		local value = mainmemory.read_u32_be(address);
 		if allowLater then
 			if value >= base - range and value <= base + range then
@@ -714,12 +742,12 @@ local function stopTelemetry()
 	--local json_data = JSON:encode_pretty(telemetryData);
 	--local file = io.open("Lua/ScriptHawk/DK64_Y_Data.json", "w+");
 	--if type(file) ~= "nil" then
-	--io.output(file);
-	--io.write(json_data);
-	--io.close(file);
+		--io.output(file);
+		--io.write(json_data);
+		--io.close(file);
 	--else
-	--print("Error writing to file =(");
-	--outputTelemetry();
+		--print("Error writing to file =(");
+		--outputTelemetry();
 	--end
 end
 
@@ -759,9 +787,12 @@ ScriptHawkUI.form_controls["Decrease Speed Button"] = forms.button(ScriptHawkUI.
 ScriptHawkUI.form_controls["Increase Speed Button"] = forms.button(ScriptHawkUI.options_form, "+", increaseSpeed, ScriptHawkUI.col(5) - 28, ScriptHawkUI.row(2), ScriptHawkUI.button_height, ScriptHawkUI.button_height);
 ScriptHawkUI.form_controls["Speed Value Label"] = forms.label(ScriptHawkUI.options_form, "0", ScriptHawkUI.col(5), ScriptHawkUI.row(2) + ScriptHawkUI.label_offset, 54, 14);
 
-ScriptHawkUI.form_controls["Map Dropdown"] = forms.dropdown(ScriptHawkUI.options_form, Game.maps, ScriptHawkUI.col(0), ScriptHawkUI.row(3) + ScriptHawkUI.dropdown_offset, ScriptHawkUI.col(9) + 7, ScriptHawkUI.button_height);
+if type(Game.maps) == "table" then
+	ScriptHawkUI.form_controls["Map Dropdown"] = forms.dropdown(ScriptHawkUI.options_form, Game.maps, ScriptHawkUI.col(0), ScriptHawkUI.row(3) + ScriptHawkUI.dropdown_offset, ScriptHawkUI.col(9) + 7, ScriptHawkUI.button_height);
+	ScriptHawkUI.form_controls["Map Checkbox"] = forms.checkbox(ScriptHawkUI.options_form, "Take me there", ScriptHawkUI.col(0) + ScriptHawkUI.dropdown_offset, ScriptHawkUI.row(4) + ScriptHawkUI.dropdown_offset);
+end
+
 ScriptHawkUI.form_controls["Toggle Telemetry Button"] = forms.button(ScriptHawkUI.options_form, "Start Telemetry", toggleTelemetry, ScriptHawkUI.col(10), ScriptHawkUI.row(3), ScriptHawkUI.col(4) + 8, ScriptHawkUI.button_height);
-ScriptHawkUI.form_controls["Map Checkbox"] = forms.checkbox(ScriptHawkUI.options_form, "Take me there", ScriptHawkUI.col(0) + ScriptHawkUI.dropdown_offset, ScriptHawkUI.row(4) + ScriptHawkUI.dropdown_offset);
 
 if type(Game.applyInfinites) == "function" then
 	ScriptHawkUI.form_controls["Toggle Infinites Checkbox"] = forms.checkbox(ScriptHawkUI.options_form, "Infinites", ScriptHawkUI.col(0) + ScriptHawkUI.dropdown_offset, ScriptHawkUI.row(5) + ScriptHawkUI.dropdown_offset);
@@ -771,12 +802,16 @@ ScriptHawkUI.form_controls["Rotation Units Label"] = forms.label(ScriptHawkUI.op
 ScriptHawkUI.form_controls["Toggle Rotation Units Button"] = forms.button(ScriptHawkUI.options_form, rotation_units, toggleRotationUnits, ScriptHawkUI.col(7), ScriptHawkUI.row(0), 64, ScriptHawkUI.button_height);
 
 -- Init any custom UI that the game module uses
-Game.initUI();
+if type(Game.initUI) == "function" then
+	Game.initUI();
+end
 
 local function findMapValue()
-	for i = 1, #Game.maps do
-		if Game.maps[i] == previous_map then
-			return i;
+	if type(Game.maps) == "table" then
+		for i = 1, #Game.maps do
+			if Game.maps[i] == previous_map then
+				return i;
+			end
 		end
 	end
 	return 0;
@@ -823,7 +858,7 @@ function updateUIReadouts_ScriptHawk()
 	forms.settext(ScriptHawkUI.form_controls["Precision Value Label"], precision);
 	forms.settext(ScriptHawkUI.form_controls["Mode Button"], mode);
 	forms.settext(ScriptHawkUI.form_controls["Toggle Rotation Units Button"], rotation_units);
-	if previous_map ~= forms.gettext(ScriptHawkUI.form_controls["Map Dropdown"]) then
+	if type(Game.maps) == "table" and previous_map ~= forms.gettext(ScriptHawkUI.form_controls["Map Dropdown"]) then
 		previous_map = forms.gettext(ScriptHawkUI.form_controls["Map Dropdown"]);
 		previous_map_value = findMapValue();
 	end
@@ -995,7 +1030,7 @@ local function mainloop()
 		Game.applyInfinites();
 	end
 
-	if forms.ischecked(ScriptHawkUI.form_controls["Map Checkbox"]) then
+	if type(Game.maps) == "table" and forms.ischecked(ScriptHawkUI.form_controls["Map Checkbox"]) then
 		Game.setMap(previous_map_value);
 	end
 end
@@ -1003,7 +1038,9 @@ end
 local function plot_pos()
 	ScriptHawk.processKeybinds(ScriptHawk.keybindsFrame);
 	ScriptHawk.processKeybinds(ScriptHawk.joypadBindsFrame);
-	Game.eachFrame();
+	if type(Game.eachFrame) == "function" then
+		Game.eachFrame();
+	end
 
 	previous_frame = current_frame;
 	current_frame = emu.framecount();
