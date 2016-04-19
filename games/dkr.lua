@@ -567,11 +567,10 @@ local function encircle_player()
 	local playerZ = Game.getZPosition();
 	local x, z;
 
-	local pointerList = mainmemory.read_u32_be(Game.Memory.pointer_list[version]);
-	if not isPointer(pointerList) then
+	local pointerList = dereferencePointer(Game.Memory.pointer_list[version]);
+	if not isRDRAM(pointerList) then
 		return;
 	end
-	pointerList = pointerList - RDRAMBase;
 
 	local num_slots = get_num_slots();
 
