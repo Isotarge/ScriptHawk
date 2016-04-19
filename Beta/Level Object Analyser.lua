@@ -1186,24 +1186,30 @@ function getNumSlots()
 end
 
 function setAnimationType(index, animationType)
-	local level_object_array = mainmemory.read_u24_be(Game.Memory.level_object_array_pointer[version] + 1);
-	local numSlots = math.min(max_slots, mainmemory.read_u32_be(level_object_array));
-	local objectSlotBase = get_slot_base(level_object_array, index);
-	local animationObjectPointer = mainmemory.read_u32_be(objectSlotBase + 0x14);
-	if isPointer(animationObjectPointer) then
-		animationObjectPointer = animationObjectPointer - RDRAMBase;
-		mainmemory.write_u32_be(animationObjectPointer + animation_object_animation_type, animationType);
+	local level_object_array = mainmemory.read_u32_be(Game.Memory.level_object_array_pointer[version]);
+	if isPointer(level_object_array) then
+		level_object_array = level_object_array - RDRAMBase;
+		local numSlots = math.min(max_slots, mainmemory.read_u32_be(level_object_array));
+		local objectSlotBase = get_slot_base(level_object_array, index);
+		local animationObjectPointer = mainmemory.read_u32_be(objectSlotBase + 0x14);
+		if isPointer(animationObjectPointer) then
+			animationObjectPointer = animationObjectPointer - RDRAMBase;
+			mainmemory.write_u32_be(animationObjectPointer + animation_object_animation_type, animationType);
+		end
 	end
 end
 
 function setAnimationObjectFloat(index, var, value)
-	local level_object_array = mainmemory.read_u24_be(Game.Memory.level_object_array_pointer[version] + 1);
-	local numSlots = math.min(max_slots, mainmemory.read_u32_be(level_object_array));
-	local objectSlotBase = get_slot_base(level_object_array, index);
-	local animationObjectPointer = mainmemory.read_u32_be(objectSlotBase + 0x14);
-	if isPointer(animationObjectPointer) then
-		animationObjectPointer = animationObjectPointer - RDRAMBase;
-		mainmemory.writefloat(animationObjectPointer + var, value, true);
+	local level_object_array = mainmemory.read_u32_be(Game.Memory.level_object_array_pointer[version]);
+	if isPointer(level_object_array) then
+		level_object_array = level_object_array - RDRAMBase;
+		local numSlots = math.min(max_slots, mainmemory.read_u32_be(level_object_array));
+		local objectSlotBase = get_slot_base(level_object_array, index);
+		local animationObjectPointer = mainmemory.read_u32_be(objectSlotBase + 0x14);
+		if isPointer(animationObjectPointer) then
+			animationObjectPointer = animationObjectPointer - RDRAMBase;
+			mainmemory.writefloat(animationObjectPointer + var, value, true);
+		end
 	end
 end
 
@@ -1212,23 +1218,26 @@ function set_all(variable, value)
 		variable = resolveVariableName(variable);
 	end
 	if type(slot_variables[variable]) == "table" then
-		local level_object_array = mainmemory.read_u24_be(Game.Memory.level_object_array_pointer[version] + 1);
-		local numSlots = math.min(max_slots, mainmemory.read_u32_be(level_object_array));
+		local level_object_array = mainmemory.read_u32_be(Game.Memory.level_object_array_pointer[version]);
+		if isPointer(level_object_array) then
+			level_object_array = level_object_array - RDRAMBase;
+			local numSlots = math.min(max_slots, mainmemory.read_u32_be(level_object_array));
 
-		local currentSlotBase;
-		for i = 0, numSlots - 1 do
-			currentSlotBase = get_slot_base(level_object_array, i);
-			if slot_variables[variable].Type == "Float" then
-				--print("writing float to slot "..i);
-				mainmemory.writefloat(currentSlotBase + variable, value, true);
-			elseif isHex(slot_variables[variable].Type) then
-				--print("writing u32_be to slot "..i);
-				mainmemory.write_u32_be(currentSlotBase + variable, value);
-			elseif slot_variables[variable].Type == "u16_be" then
-				mainmemory.write_u16_be(currentSlotBase + variable, value);
-			else
-				--print("writing byte to slot "..i);
-				mainmemory.writebyte(currentSlotBase + variable, value);
+			local currentSlotBase;
+			for i = 0, numSlots - 1 do
+				currentSlotBase = get_slot_base(level_object_array, i);
+				if slot_variables[variable].Type == "Float" then
+					--print("writing float to slot "..i);
+					mainmemory.writefloat(currentSlotBase + variable, value, true);
+				elseif isHex(slot_variables[variable].Type) then
+					--print("writing u32_be to slot "..i);
+					mainmemory.write_u32_be(currentSlotBase + variable, value);
+				elseif slot_variables[variable].Type == "u16_be" then
+					mainmemory.write_u16_be(currentSlotBase + variable, value);
+				else
+					--print("writing byte to slot "..i);
+					mainmemory.writebyte(currentSlotBase + variable, value);
+				end
 			end
 		end
 	end
@@ -1308,19 +1317,22 @@ getSlotBase = get_slot_base;
 
 function address_to_slot(address)
 	address = address or 0;
-	if address < 0x000000 or address > 0x7FFFFF then
+	if not isRDRAM(address) then
 		print("Address: "..toHexString(address).." is out of RDRAM range.");
 	end
 
-	local level_object_array = mainmemory.read_u24_be(Game.Memory.level_object_array_pointer[version] + 1);
-	local numSlots = math.min(max_slots, mainmemory.read_u32_be(level_object_array));
-	local position = address - level_object_array - slot_base;
-	local relativeToObject = position % slot_size;
-	local objectNumber = math.floor(position / slot_size);
-	if objectNumber >= 0 and objectNumber <= numSlots then
-		print("Object number "..objectNumber.." address relative "..toHexString(relativeToObject));
-	else
-		print("Address: "..toHexString(address).." is out of range of the object array.");
+	local level_object_array = mainmemory.read_u32_be(Game.Memory.level_object_array_pointer[version]);
+	if isPointer(level_object_array) then
+		level_object_array = level_object_array - RDRAMBase;
+		local numSlots = math.min(max_slots, mainmemory.read_u32_be(level_object_array));
+		local position = address - level_object_array - slot_base;
+		local relativeToObject = position % slot_size;
+		local objectNumber = math.floor(position / slot_size);
+		if objectNumber >= 0 and objectNumber <= numSlots then
+			print("Object number "..objectNumber.." address relative "..toHexString(relativeToObject));
+		else
+			print("Address: "..toHexString(address).." is out of range of the object array.");
+		end
 	end
 end
 addressToSlot = address_to_slot;

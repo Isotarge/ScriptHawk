@@ -1,18 +1,5 @@
 local Game = {};
 
-local RDRAMBase = 0x80000000;
-local RDRAMSize = 0x400000; -- Doubled with expansion pak
-
--- Checks whether a value falls within N64 RDRAM
-local function isRDRAM(value)
-	return type(value) == "number" and value >= 0 and value < RDRAMSize;
-end
-
--- Checks whether a value is a pointer
-local function isPointer(value)
-	return type(value) == "number" and value >= RDRAMBase and value < RDRAMBase + RDRAMSize;
-end
-
 --------------------
 -- Region/Version --
 --------------------
@@ -653,7 +640,7 @@ local ff_answer2_text_pointer = 0x54;
 local ff_answer3_text_pointer = 0x44;
 
 function getSelectedFFAnswer()
-	local ff_question_object = mainmemory.read_u24_be(Game.Memory.ff_question_pointer[version] + 1);
+	local ff_question_object = dereferencePointer(Game.Memory.ff_question_pointer[version]);
 	if isRDRAM(ff_question_object) then
 		return mainmemory.readbyte(ff_question_object + ff_current_answer);
 	end
@@ -662,7 +649,7 @@ end
 
 -- TODO: Doesn't always work
 function getCorrectFFAnswer()
-	local ff_question_object = mainmemory.read_u24_be(Game.Memory.ff_question_pointer[version] + 1);
+	local ff_question_object = dereferencePointer(Game.Memory.ff_question_pointer[version]);
 	if isRDRAM(ff_question_object) then
 		return mainmemory.readbyte(ff_question_object + ff_correct_answer);
 	end
@@ -784,9 +771,8 @@ local function updateWave()
 	if waving then
 		wave_counter = wave_counter + 1;
 		if wave_counter == wave_delay then
-			local objectArray = mainmemory.read_u32_be(Game.Memory.object_array_pointer[version]);
-			if isPointer(objectArray) then
-				objectArray = objectArray - RDRAMBase;
+			local objectArray = dereferencePointer(Game.Memory.object_array_pointer[version]);
+			if isRDRAM(objectArray) then
 				for i = 1, #waveFrames[wave_frame] do
 					fireSlot(objectArray, getSlotIndex(waveFrames[wave_frame][i][1], waveFrames[wave_frame][i][2]), wave_colour);
 				end
@@ -801,9 +787,8 @@ local function updateWave()
 end
 
 local function doHeart()
-	local objectArray = mainmemory.read_u32_be(Game.Memory.object_array_pointer[version]);
-	if isPointer(objectArray) then
-		objectArray = objectArray - RDRAMBase;
+	local objectArray = dereferencePointer(Game.Memory.object_array_pointer[version]);
+	if isRDRAM(objectArray) then
 		local colour = math.random(0, 1);
 		for i = 1, #heart do
 			fireSlot(objectArray, getSlotIndex(heart[i][1], heart[i][2]), colour);
@@ -812,9 +797,8 @@ local function doHeart()
 end
 
 local function fireAllSlots()
-	local objectArray = mainmemory.read_u32_be(Game.Memory.object_array_pointer[version]);
-	if isPointer(objectArray) then
-		objectArray = objectArray - RDRAMBase;
+	local objectArray = dereferencePointer(Game.Memory.object_array_pointer[version]);
+	if isRDRAM(objectArray) then
 		local colour = math.random(0, 1);
 		for i = 0, number_of_slots do
 			fireSlot(objectArray, i, colour);
@@ -829,9 +813,8 @@ end
 
 function findConga()
 	if mainmemory.readbyte(Game.Memory.map[version]) == 0x02 then -- Make sure we're in Mumbo's Mountain
-		local levelObjectArray = mainmemory.read_u32_be(Game.Memory.object_array_pointer[version]);
-		if isPointer(levelObjectArray) then -- Make sure the level object array is valid
-			levelObjectArray = levelObjectArray - RDRAMBase;
+		local levelObjectArray = dereferencePointer(Game.Memory.object_array_pointer[version]);
+		if isRDRAM(levelObjectArray) then
 			local numObjects = mainmemory.read_u32_be(levelObjectArray);
 			for i = 0, numObjects do
 				local slotBase = levelObjectArray + first_slot_base + (i * slot_size);
@@ -872,18 +855,16 @@ local slot_y_pos = 0x08;
 local slot_z_pos = 0x0C;
 
 local function get_num_slots()
-	local levelObjectArray = mainmemory.read_u32_be(Game.Memory.object_array_pointer[version]);
-	if isPointer(levelObjectArray) then
-		levelObjectArray = levelObjectArray - RDRAMBase;
+	local levelObjectArray = dereferencePointer(Game.Memory.object_array_pointer[version]);
+	if isRDRAM(levelObjectArray) then
 		return math.min(max_slots, mainmemory.read_u32_be(levelObjectArray));
 	end
 	return 0;
 end
 
 local function get_slot_base(index)
-	local levelObjectArray = mainmemory.read_u32_be(Game.Memory.object_array_pointer[version]);
-	if isPointer(levelObjectArray) then
-		levelObjectArray = levelObjectArray - RDRAMBase;
+	local levelObjectArray = dereferencePointer(Game.Memory.object_array_pointer[version]);
+	if isRDRAM(levelObjectArray) then
 		return levelObjectArray + first_slot_base + index * slot_size;
 	end
 	return 0;
@@ -927,7 +908,7 @@ end
 
 -- TODO: Not working?
 function fillFB()
-	local frameBufferLocation = mainmemory.read_u24_be(Game.Memory.fb_pointer[version] + 1);
+	local frameBufferLocation = dereferencePointer(Game.Memory.fb_pointer[version]);
 	if isRDRAM(frameBufferLocation) then
 		replaceTextureRGBA5551(nil, frameBufferLocation, framebuffer_width, framebuffer_height)
 	end
@@ -1278,7 +1259,7 @@ Game.supportsASMHacks = true; -- TODO: this is only true for US 1.0 currently
 Game.ASMHookBase = 0x24EE88;
 Game.ASMHook = {
 	0x08, 0x10, 0x00, 0x00,
-}
+};
 
 Game.ASMCodeBase = 0x400000;
 Game.ASMMaxCodeSize = 0x400000;
