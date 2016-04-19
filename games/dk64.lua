@@ -1,18 +1,5 @@
 local Game = {};
 
-local RDRAMBase = 0x80000000;
-local RDRAMSize = 0x800000; -- Halved without expansion pak
-
--- Checks whether a value falls within N64 RDRAM
-local function isRDRAM(value)
-	return type(value) == "number" and value >= 0 and value < RDRAMSize;
-end
-
--- Checks whether a value is a pointer
-local function isPointer(value)
-	return type(value) == "number" and value >= RDRAMBase and value < RDRAMBase + RDRAMSize;
-end
-
 -- TODO: Need to put some grab script state up here because encircle uses it before they would normally be defined
 -- This can probably be fixed with a clever reshuffle of grab script state/functions
 local object_pointers = {};
@@ -616,17 +603,17 @@ local function getExamineDataModelOne(pointer)
 	end
 
 	if currentActorType == "Camera" then
-		local focusedActor = mainmemory.read_u32_be(pointer + obj_model1.camera.focused_actor_pointer);
+		local focusedActor = dereferencePointer(pointer + obj_model1.camera.focused_actor_pointer);
 		local focusedActorType = "Unknown";
 
-		if isPointer(focusedActor) then
-			focusedActorType = mainmemory.read_u32_be(focusedActor - RDRAMBase + obj_model1.actor_type);
+		if isRDRAM(focusedActor) then
+			focusedActorType = mainmemory.read_u32_be(focusedActor + obj_model1.actor_type);
 			if type(obj_model1.actor_types[focusedActorType]) ~= "nil" then
 				focusedActorType = obj_model1.actor_types[focusedActorType];
 			end
 		end
 
-		table.insert(examine_data, { "Focused Actor", toHexString(focusedActor, 8).." "..focusedActorType });
+		table.insert(examine_data, { "Focused Actor", toHexString(focusedActor, 6).." "..focusedActorType });
 		table.insert(examine_data, { "Separator", 1 });
 
 		table.insert(examine_data, { "Viewport X Pos", mainmemory.readfloat(pointer + obj_model1.camera.viewport_x_position, true) });
@@ -672,7 +659,7 @@ local function getExamineDataModelOne(pointer)
 end
 
 function Game.getPlayerObject() -- TODO: Cache this
-	return mainmemory.read_u24_be(Game.Memory.player_pointer[version] + 1);
+	return dereferencePointer(Game.Memory.player_pointer[version]);
 end
 
 ----------------------------------
@@ -727,47 +714,39 @@ local obj_model2 = {
 	["collectable_state"] = 0x8C, -- byte (bitfield)
 };
 
-function getObjectModel2ArraySize()
-	local objModel2Array = Game.Memory["obj_model2_array_pointer"][version] + RDRAMBase;
+function getObjectModel2Array()
 	if version ~= 4 then
-		objModel2Array = mainmemory.read_u32_be(Game.Memory["obj_model2_array_pointer"][version]);
+		return dereferencePointer(Game.Memory["obj_model2_array_pointer"][version]);
 	end
-	if isPointer(objModel2Array) then
-		return mainmemory.read_u32_be(objModel2Array - RDRAMBase + object_size) / obj_model2_slot_size;
+	return Game.Memory["obj_model2_array_pointer"][version]; -- Kiosk doesn't move
+end
+
+function getObjectModel2ArraySize()
+	local objModel2Array = getObjectModel2Array();
+	if isRDRAM(objModel2Array) then
+		return mainmemory.read_u32_be(objModel2Array + object_size) / obj_model2_slot_size;
 	end
 	return 0;
 end
 
-function getObjectModel2SlotBase(index)
-	local objModel2Array = Game.Memory["obj_model2_array_pointer"][version] + RDRAMBase;
-	if version ~= 4 then
-		objModel2Array = mainmemory.read_u32_be(Game.Memory["obj_model2_array_pointer"][version]);
+function getObjectModel2SlotBase(index) -- TODO: Can this be used anywhere?
+	local objModel2Array = getObjectModel2Array();
+	if isRDRAM(objModel2Array) then
+		return objModel2Array + index * obj_model2_slot_size;
 	end
-	if isPointer(objModel2Array) then
-		return objModel2Array - RDRAMBase + index * obj_model2_slot_size;
-	end
-	return 0;
 end
 
 function getObjectModel2ModelBase(index)
-	local objModel2Array = Game.Memory["obj_model2_array_pointer"][version] + RDRAMBase;
-	if version ~= 4 then
-		objModel2Array = mainmemory.read_u32_be(Game.Memory["obj_model2_array_pointer"][version]);
+	local objModel2Array = getObjectModel2Array();
+	if isRDRAM(objModel2Array) then
+		return dereferencePointer(objModel2Array + (index * obj_model2_slot_size) + obj_model2.model_pointer);
 	end
-	if isPointer(objModel2Array) then
-		return mainmemory.read_u24_be(objModel2Array - RDRAMBase + index * obj_model2_slot_size + obj_model2.model_pointer + 1);
-	end
-	return 0;
 end
 
 function populateObjectModel2Pointers()
 	object_pointers = {};
-	local objModel2Array = Game.Memory["obj_model2_array_pointer"][version] + RDRAMBase;
-	if version ~= 4 then
-		objModel2Array = mainmemory.read_u32_be(Game.Memory["obj_model2_array_pointer"][version]);
-	end
-	if isPointer(objModel2Array) then
-		objModel2Array = objModel2Array - RDRAMBase;
+	local objModel2Array = getObjectModel2Array();
+	if isRDRAM(objModel2Array) then
 		if version ~= 4 then
 			numSlots = mainmemory.read_u32_be(Game.Memory["obj_model2_array_count"][version]);
 		else
@@ -1303,16 +1282,17 @@ function isFound(byte, bit)
 end
 
 function isValidFlagBlockAddress(address)
-	return address > 0x700000 and address ~= 0x756494 and address ~= 0x7F0000 and address ~= 0x7FBFB0 and address < RDRAMSize - flag_block_size;
+	return type(address) == "number" and address > 0x700000 and address ~= 0x756494 and address ~= 0x7F0000 and address ~= 0x7FBFB0 and address < RDRAMSize - flag_block_size;
 end
 
 function checkFlags(_type)
-	local flags = mainmemory.read_u24_be(Game.Memory.flag_block_pointer[version] + 1);
-	local temp_value;
-	local flag_found = false;
-	local known_flags_found = 0;
-	_type = _type or "Type";
+	local flags = dereferencePointer(Game.Memory.flag_block_pointer[version]);
 	if isValidFlagBlockAddress(flags) then
+		local temp_value;
+		local flag_found = false;
+		local known_flags_found = 0;
+		_type = _type or "Type";
+
 		if #flag_block > 0 then
 			for i = 0, #flag_block do
 				temp_value = mainmemory.readbyte(flags + i);
@@ -1355,7 +1335,7 @@ end
 
 local function processFlagQueue()
 	if #flag_action_queue > 0 then
-		local flags = mainmemory.read_u24_be(Game.Memory.flag_block_pointer[version] + 1);
+		local flags = dereferencePointer(Game.Memory.flag_block_pointer[version]);
 		if isValidFlagBlockAddress(flags) then
 			local queue_item, current_value;
 			for i = 1, #flag_action_queue do
@@ -1728,7 +1708,11 @@ function Game.getXPosition()
 	elseif map_value == jetpac_map then
 		return mainmemory.readfloat(jetman_position[1], true);
 	end
-	return mainmemory.readfloat(Game.getPlayerObject() + obj_model1.x_pos, true);
+	local playerObject = Game.getPlayerObject();
+	if isRDRAM(playerObject) then
+		return mainmemory.readfloat(playerObject + obj_model1.x_pos, true);
+	end
+	return 0;
 end
 
 function Game.getYPosition()
@@ -1737,12 +1721,19 @@ function Game.getYPosition()
 	elseif map_value == jetpac_map then
 		return mainmemory.readfloat(jetman_position[2], true);
 	end
-	return mainmemory.readfloat(Game.getPlayerObject() + obj_model1.y_pos, true);
+	local playerObject = Game.getPlayerObject();
+	if isRDRAM(playerObject) then
+		return mainmemory.readfloat(playerObject + obj_model1.y_pos, true);
+	end
+	return 0;
 end
 
 function Game.getZPosition()
 	if not isInSubGame() then
-		return mainmemory.readfloat(Game.getPlayerObject() + obj_model1.z_pos, true);
+		local playerObject = Game.getPlayerObject();
+		if isRDRAM(playerObject) then
+			return mainmemory.readfloat(playerObject + obj_model1.z_pos, true);
+		end
 	end
 	return 0;
 end
@@ -1754,14 +1745,15 @@ function Game.setXPosition(value)
 		--mainmemory.writefloat(jetman_position[1], value, true);
 	else
 		local playerObject = Game.getPlayerObject();
-		local vehiclePointer = mainmemory.read_u32_be(playerObject + obj_model1.player.vehicle_actor_pointer);
-		if isPointer(vehiclePointer) then
-			vehiclePointer = vehiclePointer - RDRAMBase;
-			mainmemory.writefloat(vehiclePointer + obj_model1.x_pos, value, true);
+		if isRDRAM(playerObject) then
+			local vehiclePointer = dereferencePointer(playerObject + obj_model1.player.vehicle_actor_pointer);
+			if isRDRAM(vehiclePointer) then
+				mainmemory.writefloat(vehiclePointer + obj_model1.x_pos, value, true);
+			end
+			mainmemory.writefloat(playerObject + obj_model1.x_pos, value, true);
+			mainmemory.writebyte(playerObject + obj_model1.locked_to_pad, 0x00);
+			mainmemory.write_u32_be(playerObject + obj_model1.lock_method_1_pointer, 0x00);
 		end
-		mainmemory.writefloat(playerObject + obj_model1.x_pos, value, true);
-		mainmemory.writebyte(playerObject + obj_model1.locked_to_pad, 0x00);
-		mainmemory.write_u32_be(playerObject + obj_model1.lock_method_1_pointer, 0x00);
 	end
 end
 
@@ -1773,17 +1765,16 @@ function Game.setYPosition(value)
 	else
 		local playerObject = Game.getPlayerObject();
 		if isRDRAM(playerObject) then
-			local vehiclePointer = mainmemory.read_u32_be(playerObject + obj_model1.player.vehicle_actor_pointer);
-			if isPointer(vehiclePointer) then
-				vehiclePointer = vehiclePointer - RDRAMBase;
+			local vehiclePointer = dereferencePointer(playerObject + obj_model1.player.vehicle_actor_pointer);
+			if isRDRAM(vehiclePointer) then
 				if mainmemory.readfloat(vehiclePointer + obj_model1.floor, true) > value then -- Move the vehicle floor down if the desired Y position is lower than the floor
 					mainmemory.writefloat(vehiclePointer + obj_model1.floor, value, true);
 				end
 				mainmemory.writefloat(vehiclePointer + obj_model1.y_pos, value, true);
-				mainmemory.writebyte(vehiclePointer + obj_model1.locked_to_pad, 0x00);
+				mainmemory.writebyte(vehiclePointer + obj_model1.locked_to_pad, 0);
 			end
 			mainmemory.writefloat(playerObject + obj_model1.y_pos, value, true);
-			mainmemory.writebyte(playerObject + obj_model1.locked_to_pad, 0x00);
+			mainmemory.writebyte(playerObject + obj_model1.locked_to_pad, 0);
 			if Game.getFloor() > value then  -- Move the floor down if the desired Y position is lower than the floor
 				Game.setFloor(value);
 			end
@@ -1795,14 +1786,15 @@ end
 function Game.setZPosition(value)
 	if not isInSubGame() then
 		local playerObject = Game.getPlayerObject();
-		local vehiclePointer = mainmemory.read_u32_be(playerObject + obj_model1.player.vehicle_actor_pointer);
-		if isPointer(vehiclePointer) then
-			vehiclePointer = vehiclePointer - RDRAMBase;
-			mainmemory.writefloat(vehiclePointer + obj_model1.z_pos, value, true);
+		if isRDRAM(playerObject) then
+			local vehiclePointer = dereferencePointer(playerObject + obj_model1.player.vehicle_actor_pointer);
+			if isRDRAM(vehiclePointer) then
+				mainmemory.writefloat(vehiclePointer + obj_model1.z_pos, value, true);
+			end
+			mainmemory.writefloat(playerObject + obj_model1.z_pos, value, true);
+			mainmemory.writebyte(playerObject + obj_model1.locked_to_pad, 0x00);
+			mainmemory.write_u32_be(playerObject + obj_model1.lock_method_1_pointer, 0x00);
 		end
-		mainmemory.writefloat(playerObject + obj_model1.z_pos, value, true);
-		mainmemory.writebyte(playerObject + obj_model1.locked_to_pad, 0x00);
-		mainmemory.write_u32_be(playerObject + obj_model1.lock_method_1_pointer, 0x00);
 	end
 end
 
@@ -1831,10 +1823,9 @@ function Game.getBoneArray1()
 	if not isInSubGame() then
 		local playerObject = Game.getPlayerObject();
 		if isRDRAM(playerObject) then
-			local animationParamObject = mainmemory.read_u32_be(playerObject + obj_model1.rendering_paramaters_pointer);
-			if isPointer(animationParamObject) then
-				animationParamObject = animationParamObject - RDRAMBase;
-				return mainmemory.read_u32_be(animationParamObject + 0x14);
+			local animationParamObject = dereferencePointer(playerObject + obj_model1.rendering_paramaters_pointer);
+			if isRDRAM(animationParamObject) then
+				return mainmemory.read_u32_be(animationParamObject + 0x14); -- TODO: Table
 			end
 		end
 	end
@@ -1845,10 +1836,9 @@ function Game.getBoneArray2()
 	if not isInSubGame() then
 		local playerObject = Game.getPlayerObject();
 		if isRDRAM(playerObject) then
-			local animationParamObject = mainmemory.read_u32_be(playerObject + obj_model1.rendering_paramaters_pointer);
-			if isPointer(animationParamObject) then
-				animationParamObject = animationParamObject - RDRAMBase;
-				return mainmemory.read_u32_be(animationParamObject + 0x18);
+			local animationParamObject = dereferencePointer(playerObject + obj_model1.rendering_paramaters_pointer);
+			if isRDRAM(animationParamObject) then
+				return mainmemory.read_u32_be(animationParamObject + 0x18); -- TODO: Table
 			end
 		end
 	end
@@ -1931,14 +1921,20 @@ end
 
 function Game.getXRotation()
 	if not isInSubGame() then
-		return mainmemory.read_u16_be(Game.getPlayerObject() + obj_model1.x_rot);
+		local playerObject = Game.getPlayerObject();
+		if isRDRAM(playerObject) then
+			return mainmemory.read_u16_be(playerObject + obj_model1.x_rot);
+		end
 	end
 	return 0;
 end
 
 function Game.getYRotation()
 	if not isInSubGame() then
-		return mainmemory.read_u16_be(Game.getPlayerObject() + obj_model1.y_rot);
+		local playerObject = Game.getPlayerObject();
+		if isRDRAM(playerObject) then
+			return mainmemory.read_u16_be(playerObject + obj_model1.y_rot);
+		end
 	end
 	return 0;
 end
@@ -1952,26 +1948,38 @@ end
 
 function Game.getZRotation()
 	if not isInSubGame() then
-		return mainmemory.read_u16_be(Game.getPlayerObject() + obj_model1.z_rot);
+		local playerObject = Game.getPlayerObject();
+		if isRDRAM(playerObject) then
+			return mainmemory.read_u16_be(playerObject + obj_model1.z_rot);
+		end
 	end
 	return 0;
 end
 
 function Game.setXRotation(value)
 	if not isInSubGame() then
-		mainmemory.write_u16_be(Game.getPlayerObject() + obj_model1.x_rot, value);
+		local playerObject = Game.getPlayerObject();
+		if isRDRAM(playerObject) then
+			mainmemory.write_u16_be(playerObject + obj_model1.x_rot, value);
+		end
 	end
 end
 
 function Game.setYRotation(value)
 	if not isInSubGame() then
-		mainmemory.write_u16_be(Game.getPlayerObject() + obj_model1.y_rot, value);
+		local playerObject = Game.getPlayerObject();
+		if isRDRAM(playerObject) then
+			mainmemory.write_u16_be(playerObject + obj_model1.y_rot, value);
+		end
 	end
 end
 
 function Game.setZRotation(value)
 	if not isInSubGame() then
-		mainmemory.write_u16_be(Game.getPlayerObject() + obj_model1.z_rot, value);
+		local playerObject = Game.getPlayerObject();
+		if isRDRAM(playerObject) then
+			mainmemory.write_u16_be(playerObject + obj_model1.z_rot, value);
+		end
 	end
 end
 
@@ -2255,7 +2263,10 @@ end
 function Game.drawMJMinimap()
 	-- Only draw minimap if the player is in the Mad Jack fight
 	if version ~= 4 and map_value == 154 then
-		local MJ_state = mainmemory.read_u24_be(Game.Memory.boss_pointer[version] + 1);
+		local MJ_state = dereferencePointer(Game.Memory.boss_pointer[version]);
+		if not isRDRAM(MJ_state) then -- MJ object not found
+			return;
+		end
 
 		local cur_pos = MJ_parse_position(mainmemory.readbyte(MJ_state + MJ_offsets["current_position"]));
 		local next_pos = MJ_parse_position(mainmemory.readbyte(MJ_state + MJ_offsets["next_position"]));
@@ -2617,7 +2628,11 @@ function setText(pointer, message)
 end
 
 function setDKTV(message)
-	local linkedListRoot = mainmemory.read_u24_be(Game.Memory.linked_list_pointer[version] + 1);
+	local linkedListRoot = derferencePointer(Game.Memory.linked_list_pointer[version]);
+	if not isRDRAM(linkedListRoot) then
+		return; -- Something went hilariously wrong here
+	end
+
 	local linkedListSize = mainmemory.read_u32_be(Game.Memory.linked_list_pointer[version] + 4);
 	local totalSize = 0;
 	local currentPointer = linkedListRoot;
@@ -2625,7 +2640,7 @@ function setDKTV(message)
 		local currentObjectSize = mainmemory.read_u32_be(currentPointer + 4);
 		currentPointer = currentPointer + 0x10;
 		if currentObjectSize == 0x40 then
-			if mainmemory.read_u32_be(currentPointer) == 0x444B2054 then
+			if mainmemory.read_u32_be(currentPointer) == 0x444B2054 then -- TODO: Better method of detection
 				setText(currentPointer, message);
 			end
 		end
@@ -2969,19 +2984,15 @@ local function zipToSelectedObject()
 		local desiredX, desiredY, desiredZ;
 		-- Get selected object X,Y,Z position
 		if stringContains(grab_script_mode, "Model 1") then
-			local selectedActorBase = mainmemory.read_u24_be(Game.Memory["pointer_list"][version] + (object_index - 1) * 4 + 1);
+			local selectedActorBase = dereferencePointer(Game.Memory["pointer_list"][version] + (object_index - 1) * 4);
 			if isRDRAM(selectedActorBase) then
 				desiredX = mainmemory.readfloat(selectedActorBase + obj_model1.x_pos, true);
 				desiredY = mainmemory.readfloat(selectedActorBase + obj_model1.y_pos, true);
 				desiredZ = mainmemory.readfloat(selectedActorBase + obj_model1.z_pos, true);
 			end
 		elseif stringContains(grab_script_mode, "Model 2") then
-			local model2Array = Game.Memory["obj_model2_array_pointer"][version] + RDRAMBase;
-			if version ~= 4 then
-				model2Array = mainmemory.read_u32_be(Game.Memory["obj_model2_array_pointer"][version]);
-			end
-			if isPointer(model2Array) then
-				model2Array = model2Array - RDRAMBase;
+			local model2Array = getObjectModel2Array();
+			if isRDRAM(model2Array) then
 				local selectedActorBase = model2Array + (object_index - 1) * obj_model2_slot_size;
 
 				desiredX = mainmemory.readfloat(selectedActorBase + obj_model2.x_pos, true);
@@ -3033,9 +3044,9 @@ local function populateObjectModel1Pointers()
 
 		object_pointers = {};
 		for object_no = 0, max_objects do
-			local pointer = mainmemory.read_u32_be(Game.Memory["pointer_list"][version] + (object_no * 4));
-			if isPointer(pointer) and isValidModel1Object(pointer - RDRAMBase, playerObject, cameraObject) then
-				table.insert(object_pointers, pointer - RDRAMBase);
+			local pointer = dereferencePointer(Game.Memory["pointer_list"][version] + (object_no * 4));
+			if isRDRAM(pointer) and isValidModel1Object(pointer, playerObject, cameraObject) then
+				table.insert(object_pointers, pointer);
 			end
 		end
 
@@ -3737,7 +3748,7 @@ function Game.eachFrame()
 	processFlagQueue();
 
 	-- Moonkick
-	if moon_mode == 'All' or (moon_mode == 'Kick' and isRDRAM(playerObject) and mainmemory.readbyte(playerObject + obj_model1.player.animation_type) == obj_model1.player.animation_types.kick) then
+	if moon_mode == 'All' or (moon_mode == 'Kick' and isRDRAM(playerObject) and mainmemory.readbyte(playerObject + obj_model1.player.animation_type) == 0x29) then
 		Game.setYAcceleration(-2.5);
 	end
 
