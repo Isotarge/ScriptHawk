@@ -339,25 +339,6 @@ function Game.detectVersion(romName)
 	return true;
 end
 
-local RDRAMBase = 0x80000000;
-local RDRAMSize = 0x400000; -- Doubled With Expansion Pak
-
--- Checks whether a value falls within N64 RDRAM
-local function isRDRAM(value)
-	return type(value) == "number" and value >= 0 and value < RDRAMSize;
-end
-
--- Checks whether a value is a pointer
-local function isPointer(value)
-	return type(value) == "number" and value >= RDRAMBase and value < RDRAMBase + RDRAMSize;
-end
-
-function resolvePointer(base, index)
-	if isRDRAM(base) then
-		return mainmemory.read_u32_be(base + index) - RDRAMBase;
-	end
-end
-
 -------------------
 -- Physics/Scale --
 -------------------
@@ -414,9 +395,9 @@ local slope_timer = 0x38;
 local y_velocity = 0x14;
 
 function Game.getPlayerObject()
-	local playerObject = mainmemory.read_u24_be(Game.Memory.player_pointer[version] + 1) - 0x10;
+	local playerObject = dereferencePointer(Game.Memory.player_pointer[version]);
 	if isRDRAM(playerObject) then
-		return playerObject;
+		return playerObject - 0x10;
 	end
 end
 
@@ -424,12 +405,12 @@ function output_objects()
 	local playerObject = Game.getPlayerObject();
 	if isRDRAM(playerObject) then
 		print("Player: "..toHexString(playerObject, nil, ""));
-		print("Position: "..toHexString(resolvePointer(playerObject, position_pointer_index), nil, ""));
-		print("Rot X: "..toHexString(resolvePointer(playerObject, rot_x_pointer_index), nil, ""));
-		print("Rot Y: "..toHexString(resolvePointer(playerObject, rot_y_pointer_index), nil, ""));
-		print("Rot Z: "..toHexString(resolvePointer(playerObject, rot_z_pointer_index), nil, ""));
-		print("Slope: "..toHexString(resolvePointer(playerObject, slope_pointer_index), nil, ""));
-		print("Velocity: "..toHexString(resolvePointer(playerObject, velocity_pointer_index), nil, ""));
+		print("Position: "..toHexString(dereferencePointer(playerObject + position_pointer_index), nil, ""));
+		print("Rot X: "..toHexString(dereferencePointer(playerObject + rot_x_pointer_index), nil, ""));
+		print("Rot Y: "..toHexString(dereferencePointer(playerObject + rot_y_pointer_index), nil, ""));
+		print("Rot Z: "..toHexString(dereferencePointer(playerObject + rot_z_pointer_index), nil, ""));
+		print("Slope: "..toHexString(dereferencePointer(playerObject + slope_pointer_index), nil, ""));
+		print("Velocity: "..toHexString(dereferencePointer(playerObject + velocity_pointer_index), nil, ""));
 	else
 		print("Can't get a read...");
 	end
@@ -442,7 +423,10 @@ end
 function Game.getXPosition()
 	local playerObject = Game.getPlayerObject();
 	if isRDRAM(playerObject) then
-		return mainmemory.readfloat(resolvePointer(playerObject, position_pointer_index) + x_pos, true);
+		local positionObject = dereferencePointer(playerObject + position_pointer_index);
+		if isRDRAM(positionObject) then
+			return mainmemory.readfloat(positionObject + x_pos, true);
+		end
 	end
 	return 0;
 end
@@ -450,7 +434,10 @@ end
 function Game.getYPosition()
 	local playerObject = Game.getPlayerObject();
 	if isRDRAM(playerObject) then
-		return mainmemory.readfloat(resolvePointer(playerObject, position_pointer_index) + y_pos, true);
+		local positionObject = dereferencePointer(playerObject + position_pointer_index);
+		if isRDRAM(positionObject) then
+			return mainmemory.readfloat(positionObject + y_pos, true);
+		end
 	end
 	return 0;
 end
@@ -458,7 +445,10 @@ end
 function Game.getZPosition()
 	local playerObject = Game.getPlayerObject();
 	if isRDRAM(playerObject) then
-		return mainmemory.readfloat(resolvePointer(playerObject, position_pointer_index) + z_pos, true);
+		local positionObject = dereferencePointer(playerObject + position_pointer_index);
+		if isRDRAM(positionObject) then
+			return mainmemory.readfloat(positionObject + z_pos, true);
+		end
 	end
 	return 0;
 end
@@ -466,22 +456,24 @@ end
 function Game.setXPosition(value)
 	local playerObject = Game.getPlayerObject();
 	if isRDRAM(playerObject) then
-		local playerPositionObject = resolvePointer(playerObject, position_pointer_index);
-		mainmemory.writefloat(playerPositionObject + x_pos, value, true);
-		mainmemory.writefloat(playerPositionObject + x_pos + 12, value, true);
-		mainmemory.writefloat(playerPositionObject + x_pos + 24, value, true);
+		local playerPositionObject = dereferencePointer(playerObject + position_pointer_index);
+		if isRDRAM(playerPositionObject) then
+			mainmemory.writefloat(playerPositionObject + x_pos, value, true);
+			mainmemory.writefloat(playerPositionObject + x_pos + 12, value, true);
+			mainmemory.writefloat(playerPositionObject + x_pos + 24, value, true);
+		end
 	end
 end
 
 function Game.setYPosition(value)
 	local playerObject = Game.getPlayerObject();
 	if isRDRAM(playerObject) then
-		local playerPositionObject = resolvePointer(playerObject, position_pointer_index);
-
-		mainmemory.writefloat(playerPositionObject + y_pos, value, true);
-		mainmemory.writefloat(playerPositionObject + y_pos + 12, value, true);
-		mainmemory.writefloat(playerPositionObject + y_pos + 24, value, true);
-
+		local playerPositionObject = dereferencePointer(playerObject + position_pointer_index);
+		if isRDRAM(playerPositionObject) then
+			mainmemory.writefloat(playerPositionObject + y_pos, value, true);
+			mainmemory.writefloat(playerPositionObject + y_pos + 12, value, true);
+			mainmemory.writefloat(playerPositionObject + y_pos + 24, value, true);
+		end
 		Game.setYVelocity(0);
 	end
 end
@@ -489,10 +481,12 @@ end
 function Game.setZPosition(value)
 	local playerObject = Game.getPlayerObject();
 	if isRDRAM(playerObject) then
-		local playerPositionObject = resolvePointer(playerObject, position_pointer_index);
-		mainmemory.writefloat(playerPositionObject + z_pos, value, true);
-		mainmemory.writefloat(playerPositionObject + z_pos + 12, value, true);
-		mainmemory.writefloat(playerPositionObject + z_pos + 24, value, true);
+		local playerPositionObject = dereferencePointer(playerObject + position_pointer_index);
+		if isRDRAM(playerPositionObject) then
+			mainmemory.writefloat(playerPositionObject + z_pos, value, true);
+			mainmemory.writefloat(playerPositionObject + z_pos + 12, value, true);
+			mainmemory.writefloat(playerPositionObject + z_pos + 24, value, true);
+		end
 	end
 end
 
@@ -503,8 +497,10 @@ end
 function Game.getYVelocity()
 	local playerObject = Game.getPlayerObject();
 	if isRDRAM(playerObject) then
-		local playerVelocityObject = resolvePointer(playerObject, velocity_pointer_index);
-		return mainmemory.readfloat(playerVelocityObject + y_velocity, true);
+		local playerVelocityObject = dereferencePointer(playerObject + velocity_pointer_index);
+		if isRDRAM(playerVelocityObject) then
+			return mainmemory.readfloat(playerVelocityObject + y_velocity, true);
+		end
 	end
 	return 0;
 end
@@ -512,8 +508,10 @@ end
 function Game.setYVelocity(value)
 	local playerObject = Game.getPlayerObject();
 	if isRDRAM(playerObject) then
-		local playerVelocityObject = resolvePointer(playerObject, velocity_pointer_index);
-		mainmemory.writefloat(playerVelocityObject + y_velocity, value, true);
+		local playerVelocityObject = dereferencePointer(playerObject + velocity_pointer_index);
+		if isRDRAM(playerVelocityObject) then
+			mainmemory.writefloat(playerVelocityObject + y_velocity, value, true);
+		end
 	end
 end
 
@@ -524,7 +522,10 @@ end
 function Game.getXRotation()
 	local playerObject = Game.getPlayerObject();
 	if isRDRAM(playerObject) then
-		return mainmemory.readfloat(resolvePointer(playerObject, rot_x_pointer_index) + x_rot_current, true);
+		local rotationObject = dereferencePointer(playerObject + rot_x_pointer_index);
+		if isRDRAM(rotationObject) then
+			return mainmemory.readfloat(rotationObject + x_rot_current, true);
+		end
 	end
 	return 0;
 end
@@ -532,7 +533,10 @@ end
 function Game.getYRotation()
 	local playerObject = Game.getPlayerObject();
 	if isRDRAM(playerObject) then
-		return mainmemory.readfloat(resolvePointer(playerObject, rot_y_pointer_index) + facing_angle, true); -- TODO: Exception here
+		local rotationObject = dereferencePointer(playerObject + rot_y_pointer_index);
+		if isRDRAM(rotationObject) then
+			return mainmemory.readfloat(rotationObject + facing_angle, true);
+		end
 	end
 	return 0;
 end
@@ -540,7 +544,10 @@ end
 function Game.getZRotation()
 	local playerObject = Game.getPlayerObject();
 	if isRDRAM(playerObject) then
-		return mainmemory.readfloat(resolvePointer(playerObject, rot_z_pointer_index) + z_rot_current, true);
+		local rotationObject = dereferencePointer(playerObject + rot_z_pointer_index);
+		if isRDRAM(rotationObject) then
+			return mainmemory.readfloat(rotationObject + z_rot_current, true);
+		end
 	end
 	return 0;
 end
@@ -548,27 +555,33 @@ end
 function Game.setXRotation(value)
 	local playerObject = Game.getPlayerObject();
 	if isRDRAM(playerObject) then
-		local rotXObject = resolvePointer(playerObject, rot_x_pointer_index);
-		mainmemory.writefloat(rotXObject + x_rot_current, value, true);
-		mainmemory.writefloat(rotXObject + x_rot_target, value, true);
+		local rotXObject = dereferencePointer(playerObject + rot_x_pointer_index);
+		if isRDRAM(rotXObject) then
+			mainmemory.writefloat(rotXObject + x_rot_current, value, true);
+			mainmemory.writefloat(rotXObject + x_rot_target, value, true);
+		end
 	end
 end
 
 function Game.setYRotation(value)
 	local playerObject = Game.getPlayerObject();
 	if isRDRAM(playerObject) then
-		local rotYObject = resolvePointer(playerObject, rot_y_pointer_index);
-		mainmemory.writefloat(rotYObject + facing_angle, value, true);
-		mainmemory.writefloat(rotYObject + moving_angle, value, true);
+		local rotYObject = dereferencePointer(playerObject + rot_y_pointer_index);
+		if isRDRAM(rotYObject) then
+			mainmemory.writefloat(rotYObject + facing_angle, value, true);
+			mainmemory.writefloat(rotYObject + moving_angle, value, true);
+		end
 	end
 end
 
 function Game.setZRotation(value)
 	local playerObject = Game.getPlayerObject();
 	if isRDRAM(playerObject) then
-		local rotZObject = resolvePointer(playerObject, rot_z_pointer_index);
-		mainmemory.writefloat(rotZObject + z_rot_current, value, true);
-		mainmemory.writefloat(rotZObject + z_rot_target, value, true);
+		local rotZObject = dereferencePointer(playerObject + rot_z_pointer_index);
+		if isRDRAM(rotZObject) then
+			mainmemory.writefloat(rotZObject + z_rot_current, value, true);
+			mainmemory.writefloat(rotZObject + z_rot_target, value, true);
+		end
 	end
 end
 
@@ -581,14 +594,20 @@ local options_toggle_neverslip;
 local function neverSlip()
 	local playerObject = Game.getPlayerObject();
 	if isRDRAM(playerObject) then
-		mainmemory.writefloat(resolvePointer(playerObject, slope_pointer_index) + slope_timer, 0.0, true);
+		local slope_object = dereferencePointer(playerObject + slope_pointer_index);
+		if isRDRAM(slope_object) then
+			mainmemory.writefloat(slope_object + slope_timer, 0.0, true);
+		end
 	end
 end
 
 function Game.getSlopeTimer()
 	local playerObject = Game.getPlayerObject();
 	if isRDRAM(playerObject) then
-		return mainmemory.readfloat(resolvePointer(playerObject, slope_pointer_index) + slope_timer, true);
+		local slope_object = dereferencePointer(playerObject + slope_pointer_index);
+		if isRDRAM(slope_object) then
+			return mainmemory.readfloat(slope_object + slope_timer, true);
+		end
 	end
 	return 0;
 end
@@ -617,9 +636,8 @@ local move_levels = {
 
 local function unlock_moves()
 	local level = forms.gettext(options_moves_dropdown);
-	local movesObject = mainmemory.read_u32_be(Game.Memory.moves_pointer[version]);
-	if isPointer(movesObject) then
-		movesObject = movesObject - RDRAMBase;
+	local movesObject = dereferencePointer(Game.Memory.moves_pointer[version]);
+	if isRDRAM(movesObject) then
 		mainmemory.write_u32_be(movesObject + 0x18, move_levels[level][1]);
 		mainmemory.write_u32_be(movesObject + 0x1C, move_levels[level][2]);
 	end
