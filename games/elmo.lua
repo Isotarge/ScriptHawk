@@ -3,13 +3,12 @@ local Game = {};
 local elmo_pointer;
 
 -- Relative to elmo object
+-- TODO: Move to object model table
 local x_pos = 0x24;
 local y_pos = x_pos + 4;
 local z_pos = y_pos + 4;
 
-local facing_angle = 0x1b8;
-
-Game.maps = { "Not Implemented" };
+local facing_angle = 0x1B8;
 
 --------------------
 -- Region/Version --
@@ -46,33 +45,48 @@ Game.max_rot_units = 2;
 --------------
 
 function Game.getXPosition()
-	local elmo_object = mainmemory.read_u24_be(elmo_pointer + 1);
-	return mainmemory.readfloat(elmo_object + x_pos, true);
+	local elmoObject = dereferencePointer(elmo_pointer);
+	if isRDRAM(elmoObject) then
+		return mainmemory.readfloat(elmoObject + x_pos, true);
+	end
+	return 0;
 end
 
 function Game.getYPosition()
-	local elmo_object = mainmemory.read_u24_be(elmo_pointer + 1);
-	return mainmemory.readfloat(elmo_object + y_pos, true);
+	local elmoObject = dereferencePointer(elmo_pointer);
+	if isRDRAM(elmoObject) then
+		return mainmemory.readfloat(elmoObject + y_pos, true);
+	end
+	return 0;
 end
 
 function Game.getZPosition()
-	local elmo_object = mainmemory.read_u24_be(elmo_pointer + 1);
-	return mainmemory.readfloat(elmo_object + z_pos, true);
+	local elmoObject = dereferencePointer(elmo_pointer);
+	if isRDRAM(elmoObject) then
+		return mainmemory.readfloat(elmoObject + z_pos, true);
+	end
+	return 0;
 end
 
 function Game.setXPosition(value)
-	local elmo_object = mainmemory.read_u24_be(elmo_pointer + 1);
-	mainmemory.writefloat(elmo_object + x_pos, value, true);
+	local elmoObject = dereferencePointer(elmo_pointer);
+	if isRDRAM(elmoObject) then
+		mainmemory.writefloat(elmoObject + x_pos, value, true);
+	end
 end
 
 function Game.setYPosition(value)
-	local elmo_object = mainmemory.read_u24_be(elmo_pointer + 1);
-	mainmemory.writefloat(elmo_object + y_pos, value, true);
+	local elmoObject = dereferencePointer(elmo_pointer);
+	if isRDRAM(elmoObject) then
+		mainmemory.writefloat(elmoObject + y_pos, value, true);
+	end
 end
 
 function Game.setZPosition(value)
-	local elmo_object = mainmemory.read_u24_be(elmo_pointer + 1);
-	mainmemory.writefloat(elmo_object + z_pos, value, true);
+	local elmoObject = dereferencePointer(elmo_pointer);
+	if isRDRAM(elmoObject) then
+		mainmemory.writefloat(elmoObject + z_pos, value, true);
+	end
 end
 
 --------------
@@ -80,48 +94,33 @@ end
 --------------
 
 function Game.getXRotation()
-	local elmo_object = mainmemory.read_u24_be(elmo_pointer + 1);
-	return mainmemory.readfloat(elmo_object + facing_angle, true) + 1;
+	return 0; -- TODO
 end
 
 function Game.getYRotation()
-	local elmo_object = mainmemory.read_u24_be(elmo_pointer + 1);
-	return mainmemory.readfloat(elmo_object + facing_angle, true) + 1;
+	local elmoObject = dereferencePointer(elmo_pointer);
+	if isRDRAM(elmoObject) then
+		return mainmemory.readfloat(elmoObject + facing_angle, true) + 1;
+	end
+	return 0;
 end
 
 function Game.getZRotation()
-	local elmo_object = mainmemory.read_u24_be(elmo_pointer + 1);
-	return mainmemory.readfloat(elmo_object + facing_angle, true) + 1;
+	return 0; -- TODO
 end
 
 function Game.setXRotation(value)
-	local elmo_object = mainmemory.read_u24_be(elmo_pointer + 1);
-	return mainmemory.writefloat(elmo_object + facing_angle, value - 1, true);
+	-- TODO
 end
 
 function Game.setYRotation(value)
-	local elmo_object = mainmemory.read_u24_be(elmo_pointer + 1);
-	return mainmemory.writefloat(elmo_object + facing_angle, value - 1, true);
+	local elmoObject = dereferencePointer(elmo_pointer);
+	if isRDRAM(elmoObject) then
+		return mainmemory.writefloat(elmoObject + facing_angle, value - 1, true);
+	end
 end
 
 function Game.setZRotation(value)
-	local elmo_object = mainmemory.read_u24_be(elmo_pointer + 1);
-	return mainmemory.writefloat(elmo_object + facing_angle, value - 1, true);
-end
-
-------------
--- Events --
-------------
-
-function Game.setMap(value)
-	-- TODO
-end
-
-function Game.initUI()
-	-- TODO
-end
-
-function Game.eachFrame()
 	-- TODO
 end
 
