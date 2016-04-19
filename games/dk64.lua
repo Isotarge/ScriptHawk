@@ -781,9 +781,8 @@ local function encirclePlayerObjectModel2()
 				mainmemory.writefloat(object_pointers[i] + obj_model2.z_pos, z, true);
 
 				-- Set model X, Y, Z
-				modelPointer = mainmemory.read_u32_be(object_pointers[i] + obj_model2.model_pointer);
-				if isPointer(modelPointer) then
-					modelPointer = modelPointer - RDRAMBase;
+				modelPointer = dereferencePointer(object_pointers[i] + obj_model2.model_pointer);
+				if isRDRAM(modelPointer) then
 					mainmemory.writefloat(modelPointer + obj_model2.model.x_pos, x, true);
 					mainmemory.writefloat(modelPointer + obj_model2.model.y_pos, yPos, true);
 					mainmemory.writefloat(modelPointer + obj_model2.model.z_pos, z, true);
@@ -814,10 +813,8 @@ function offsetObjectModel2(x, y, z)
 			mainmemory.writefloat(object_pointers[i] + obj_model2.z_pos, currentZ + z, true);
 
 			-- Check for model
-			modelPointer = mainmemory.read_u32_be(object_pointers[i] + obj_model2.model_pointer);
-			if isPointer(modelPointer) then
-				modelPointer = modelPointer - RDRAMBase;
-
+			modelPointer = dereferencePointer(object_pointers[i] + obj_model2.model_pointer);
+			if isRDRAM(modelPointer) then
 				-- Read model X, Y, Z
 				currentX = mainmemory.readfloat(modelPointer + obj_model2.model.x_pos, true);
 				currentY = mainmemory.readfloat(modelPointer + obj_model2.model.y_pos, true);
@@ -2853,9 +2850,8 @@ function ohWrongnana()
 			scriptName = getScriptName(slotBase);
 			if scriptName == "gunswitches" or scriptName == "buttons" then
 				-- Get activation script
-				activationScript = mainmemory.read_u32_be(slotBase + 0x7C);
-				if isPointer(activationScript) then
-					activationScript = activationScript - RDRAMBase;
+				activationScript = dereferencePointer(slotBase + 0x7C);
+				if isRDRAM(activationScript) then
 					-- Get part 2
 					activationScript = mainmemory.read_u32_be(activationScript + 0xA0);
 					while isPointer(activationScript) do
