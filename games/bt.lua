@@ -650,8 +650,6 @@ end
 -- Never Slip --
 ----------------
 
-local options_toggle_neverslip;
-
 local function neverSlip()
 	local playerObject = Game.getPlayerObject();
 	if isRDRAM(playerObject) then
@@ -674,7 +672,7 @@ function Game.getSlopeTimer()
 end
 
 function Game.colorSlopeTimer()
-	if forms.ischecked(options_toggle_neverslip) then
+	if forms.ischecked(ScriptHawkUI.form_controls.toggle_neverslip) then
 		return 0xFF00FFFF; -- Light blue
 	end
 	local slopeTimer = Game.getSlopeTimer();
@@ -687,9 +685,6 @@ end
 -- Moves stuff --
 -----------------
 
-local options_moves_dropdown;
-local options_moves_button;
-
 local move_levels = {
 	["0. None"] = {0xE0FFFF01, 0x00004000, false},
 	["1. All"]  = {0xFFFFFFFF, 0xFFFFFFFF, false},
@@ -697,7 +692,7 @@ local move_levels = {
 };
 
 local function unlock_moves()
-	local level = forms.gettext(options_moves_dropdown);
+	local level = forms.gettext(ScriptHawkUI.form_controls.moves_dropdown);
 	local movesObject = dereferencePointer(Game.Memory.moves_pointer[version]);
 	if isRDRAM(movesObject) then
 		mainmemory.write_u32_be(movesObject + 0x18, move_levels[level][1]);
@@ -798,15 +793,15 @@ function Game.applyInfinites()
 end
 
 function Game.initUI()
-	options_toggle_neverslip = forms.checkbox(ScriptHawkUI.options_form, "Never Slip", ScriptHawkUI.col(0) + ScriptHawkUI.dropdown_offset, ScriptHawkUI.row(6) + ScriptHawkUI.dropdown_offset);
+	ScriptHawkUI.form_controls.toggle_neverslip = forms.checkbox(ScriptHawkUI.options_form, "Never Slip", ScriptHawkUI.col(0) + ScriptHawkUI.dropdown_offset, ScriptHawkUI.row(6) + ScriptHawkUI.dropdown_offset);
 
 	-- Moves
-	options_moves_dropdown = forms.dropdown(ScriptHawkUI.options_form, { "0. None", "1. All", "2. All + Dragon Kazooie" }, ScriptHawkUI.col(10) + ScriptHawkUI.dropdown_offset, ScriptHawkUI.row(7) + ScriptHawkUI.dropdown_offset);
-	options_moves_button = forms.button(ScriptHawkUI.options_form, "Unlock Moves", unlock_moves, ScriptHawkUI.col(5), ScriptHawkUI.row(7), ScriptHawkUI.col(4) + 10, ScriptHawkUI.button_height);
+	ScriptHawkUI.form_controls.moves_dropdown = forms.dropdown(ScriptHawkUI.options_form, { "0. None", "1. All", "2. All + Dragon Kazooie" }, ScriptHawkUI.col(10) + ScriptHawkUI.dropdown_offset, ScriptHawkUI.row(7) + ScriptHawkUI.dropdown_offset);
+	ScriptHawkUI.form_controls.moves_button = forms.button(ScriptHawkUI.options_form, "Unlock Moves", unlock_moves, ScriptHawkUI.col(5), ScriptHawkUI.row(7), ScriptHawkUI.col(4) + 10, ScriptHawkUI.button_height);
 end
 
 function Game.eachFrame()
-	if forms.ischecked(options_toggle_neverslip) then
+	if forms.ischecked(ScriptHawkUI.form_controls.toggle_neverslip) then
 		neverSlip();
 	end
 end
