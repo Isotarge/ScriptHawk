@@ -12,7 +12,7 @@
 // Defererence Kong Object pointer
 LW      t0, @KongObjectPointer
 
-// Dereference Rendering Paramaters
+// Dereference Rendering Parameters
 LW      t0, @RenderingParamsPointer(t0)
 
 LI      t1, @PaperScale

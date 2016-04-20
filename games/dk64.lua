@@ -172,8 +172,8 @@ local obj_model1 = {
 	["model"] = { -- Relative to model_pointer
 		["num_bones"] = 0x20,
 	},
-	["rendering_paramaters_pointer"] = 0x04,
-	["rendering_paramaters"] = { -- Relative to rendering_paramaters_pointer
+	["rendering_parameters_pointer"] = 0x04,
+	["rendering_parameters"] = { -- Relative to rendering_parameters_pointer
 		["scale_x"] = 0x34, -- 32 bit float big endian
 		["scale_y"] = 0x38, -- 32 bit float big endian
 		["scale_z"] = 0x3C, -- 32 bit float big endian
@@ -513,7 +513,7 @@ local function getExamineDataModelOne(pointer)
 
 	local actorSize = mainmemory.read_u32_be(pointer + object_size)
 	local modelPointer = mainmemory.read_u32_be(pointer + obj_model1.model_pointer);
-	local renderingParametersPointer = mainmemory.read_u32_be(pointer + obj_model1.rendering_paramaters_pointer);
+	local renderingParametersPointer = mainmemory.read_u32_be(pointer + obj_model1.rendering_parameters_pointer);
 	local boneArrayPointer = mainmemory.read_u32_be(pointer + obj_model1.current_bone_array_pointer);
 	local hasModel = isPointer(modelPointer) or isPointer(renderingParametersPointer) or isPointer(boneArrayPointer);
 
@@ -1820,7 +1820,7 @@ function Game.getBoneArray1()
 	if not isInSubGame() then
 		local playerObject = Game.getPlayerObject();
 		if isRDRAM(playerObject) then
-			local animationParamObject = dereferencePointer(playerObject + obj_model1.rendering_paramaters_pointer);
+			local animationParamObject = dereferencePointer(playerObject + obj_model1.rendering_parameters_pointer);
 			if isRDRAM(animationParamObject) then
 				return mainmemory.read_u32_be(animationParamObject + 0x14); -- TODO: Table
 			end
@@ -1833,7 +1833,7 @@ function Game.getBoneArray2()
 	if not isInSubGame() then
 		local playerObject = Game.getPlayerObject();
 		if isRDRAM(playerObject) then
-			local animationParamObject = dereferencePointer(playerObject + obj_model1.rendering_paramaters_pointer);
+			local animationParamObject = dereferencePointer(playerObject + obj_model1.rendering_parameters_pointer);
 			if isRDRAM(animationParamObject) then
 				return mainmemory.read_u32_be(animationParamObject + 0x18); -- TODO: Table
 			end
@@ -2513,10 +2513,10 @@ function Game.paperMode()
 		local objectFound = isRDRAM(pointer);
 
 		if objectFound and pointer ~= cameraObject then
-			local objectRenderingParameters = mainmemory.read_u32_be(pointer + obj_model1.rendering_paramaters_pointer);
+			local objectRenderingParameters = mainmemory.read_u32_be(pointer + obj_model1.rendering_parameters_pointer);
 			if isPointer(objectRenderingParameters) then
 				objectRenderingParameters = objectRenderingParameters - RDRAMBase;
-				mainmemory.writefloat(objectRenderingParameters + obj_model1.rendering_paramaters.scale_z, paper_thickness, true);
+				mainmemory.writefloat(objectRenderingParameters + obj_model1.rendering_parameters.scale_z, paper_thickness, true);
 			end
 		end
 	end
@@ -3207,14 +3207,14 @@ local function drawGrabScriptUI()
 	end
 
 	if rat_enabled then
-		local renderingParams = mainmemory.read_u24_be(playerObject + obj_model1.rendering_paramaters_pointer + 1);
+		local renderingParams = mainmemory.read_u24_be(playerObject + obj_model1.rendering_parameters_pointer + 1);
 		if isRDRAM(renderingParams) then
 			if math.random() > 0.9 then
 				local timerValue = math.random() * 50;
-				mainmemory.writefloat(renderingParams + obj_model1.rendering_paramaters.anim_timer1, timerValue, true);
-				mainmemory.writefloat(renderingParams + obj_model1.rendering_paramaters.anim_timer2, timerValue, true);
-				mainmemory.writefloat(renderingParams + obj_model1.rendering_paramaters.anim_timer3, timerValue, true);
-				mainmemory.writefloat(renderingParams + obj_model1.rendering_paramaters.anim_timer4, timerValue, true);
+				mainmemory.writefloat(renderingParams + obj_model1.rendering_parameters.anim_timer1, timerValue, true);
+				mainmemory.writefloat(renderingParams + obj_model1.rendering_parameters.anim_timer2, timerValue, true);
+				mainmemory.writefloat(renderingParams + obj_model1.rendering_parameters.anim_timer3, timerValue, true);
+				mainmemory.writefloat(renderingParams + obj_model1.rendering_parameters.anim_timer4, timerValue, true);
 			end
 		end
 	end
