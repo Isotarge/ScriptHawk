@@ -3,7 +3,7 @@ Extra Lua scripts and RAM watches for the [BizHawk](https://github.com/TASVideos
 
 ##How to use
 ###Setup
-1. Clone the repository into a ScriptHawk folder inside the Lua folder that comes with BizHawk
+1. [Clone the repository](https://help.github.com/articles/cloning-a-repository/) into a ScriptHawk folder inside the Lua folder that comes with BizHawk
 2. Open BizHawk and your game of choice
 3. Click Tools -> Lua Console
 4. Open ScriptHawk.lua
