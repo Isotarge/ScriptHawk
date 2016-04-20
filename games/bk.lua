@@ -1151,6 +1151,7 @@ event.onloadstate(disableActorSpawner, "ScriptHawk - Disable Actor Spawner");
 -- Events --
 ------------
 
+Game.takeMeThereType = "Button";
 function Game.setMap(value)
 	if value >= 1 and value <= #Game.maps then
 		mainmemory.writebyte(Game.Memory.map[version], value);

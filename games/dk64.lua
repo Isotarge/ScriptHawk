@@ -3379,29 +3379,29 @@ end
 
 function Game.initUI()
 	-- Flag stuff
-	ScriptHawkUI.form_controls["Flag Dropdown"] = forms.dropdown(ScriptHawkUI.options_form, flag_names, ScriptHawkUI.col(0) + ScriptHawkUI.dropdown_offset, ScriptHawkUI.row(7) + ScriptHawkUI.dropdown_offset, ScriptHawkUI.col(9) + 7, ScriptHawkUI.button_height);
+	ScriptHawkUI.form_controls["Flag Dropdown"] = forms.dropdown(ScriptHawkUI.options_form, flag_names, ScriptHawkUI.col(0) + ScriptHawkUI.dropdown_offset, ScriptHawkUI.row(7) + ScriptHawkUI.dropdown_offset, ScriptHawkUI.col(9) + 8, ScriptHawkUI.button_height);
 	ScriptHawkUI.form_controls["Set Flag Button"] = forms.button(ScriptHawkUI.options_form, "Set", flagSetButtonHandler, ScriptHawkUI.col(10), ScriptHawkUI.row(7), 59, ScriptHawkUI.button_height);
 	ScriptHawkUI.form_controls["Clear Flag Button"] = forms.button(ScriptHawkUI.options_form, "Clear", flagClearButtonHandler, ScriptHawkUI.col(13) - 5, ScriptHawkUI.row(7), 59, ScriptHawkUI.button_height);
 
 	-- Moon stuff
 	ScriptHawkUI.form_controls["Moon Mode Label"] = forms.label(ScriptHawkUI.options_form, "Moon:", ScriptHawkUI.col(10), ScriptHawkUI.row(2) + ScriptHawkUI.label_offset, 48, ScriptHawkUI.button_height);
-	ScriptHawkUI.form_controls["Moon Mode Button"] = forms.button(ScriptHawkUI.options_form, moon_mode, toggle_moonmode, ScriptHawkUI.col(13) - 20, ScriptHawkUI.row(2), 59, ScriptHawkUI.button_height);
+	ScriptHawkUI.form_controls["Moon Mode Button"] = forms.button(ScriptHawkUI.options_form, moon_mode, toggle_moonmode, ScriptHawkUI.col(13) - 18, ScriptHawkUI.row(2), 59, ScriptHawkUI.button_height);
 
 	-- Buttons
 	ScriptHawkUI.form_controls["Toggle Invisify Button"] = forms.button(ScriptHawkUI.options_form, "Invisify", toggle_invisify, ScriptHawkUI.col(7), ScriptHawkUI.row(1), 64, ScriptHawkUI.button_height);
-	ScriptHawkUI.form_controls["Toggle TB Void Button"] = forms.button(ScriptHawkUI.options_form, "Toggle TB void", toggle_tb_void, ScriptHawkUI.col(10), ScriptHawkUI.row(1), ScriptHawkUI.col(4) + 8, ScriptHawkUI.button_height);
-	ScriptHawkUI.form_controls["Unlock Moves Button"] = forms.button(ScriptHawkUI.options_form, "Unlock Moves", Game.unlockMoves, ScriptHawkUI.col(10), ScriptHawkUI.row(4), ScriptHawkUI.col(4) + 8, ScriptHawkUI.button_height);
-	ScriptHawkUI.form_controls["Random Color"] = forms.button(ScriptHawkUI.options_form, "Random Color", Game.setKongColor, ScriptHawkUI.col(5), ScriptHawkUI.row(5), ScriptHawkUI.col(4) + 8, ScriptHawkUI.button_height);
+	ScriptHawkUI.form_controls["Toggle TB Void Button"] = forms.button(ScriptHawkUI.options_form, "Toggle TB void", toggle_tb_void, ScriptHawkUI.col(10), ScriptHawkUI.row(1), ScriptHawkUI.col(4) + 10, ScriptHawkUI.button_height);
+	ScriptHawkUI.form_controls["Unlock Moves Button"] = forms.button(ScriptHawkUI.options_form, "Unlock Moves", Game.unlockMoves, ScriptHawkUI.col(10), ScriptHawkUI.row(4), ScriptHawkUI.col(4) + 10, ScriptHawkUI.button_height);
+	ScriptHawkUI.form_controls["Random Color"] = forms.button(ScriptHawkUI.options_form, "Random Color", Game.setKongColor, ScriptHawkUI.col(5), ScriptHawkUI.row(5), ScriptHawkUI.col(4) + 10, ScriptHawkUI.button_height);
 
-	--ScriptHawkUI.form_controls["Everything is Kong Button"] = forms.button(ScriptHawkUI.options_form, "Kong", everythingIsKong, ScriptHawkUI.col(10), ScriptHawkUI.row(3), ScriptHawkUI.col(4) + 8, ScriptHawkUI.button_height);
-	--ScriptHawkUI.form_controls["Force Pause Button"] = forms.button(ScriptHawkUI.options_form, "Force Pause", force_pause, ScriptHawkUI.col(10), ScriptHawkUI.row(4), ScriptHawkUI.col(4) + 8, ScriptHawkUI.button_height);
-	ScriptHawkUI.form_controls["Force Zipper Button"] = forms.button(ScriptHawkUI.options_form, "Force Zipper", force_zipper, ScriptHawkUI.col(5), ScriptHawkUI.row(4), ScriptHawkUI.col(4) + 8, ScriptHawkUI.button_height);
-	ScriptHawkUI.form_controls["Fix Bone Displacement Button"] = forms.button(ScriptHawkUI.options_form, "Fix Spiking", fixBoneDisplacement, ScriptHawkUI.col(10), ScriptHawkUI.row(0), ScriptHawkUI.col(4) + 8, ScriptHawkUI.button_height);
-	--ScriptHawkUI.form_controls["Random Effect Button"] = forms.button(ScriptHawkUI.options_form, "Random effect", random_effect, ScriptHawkUI.col(10), ScriptHawkUI.row(6), ScriptHawkUI.col(4) + 8, ScriptHawkUI.button_height);
+	--ScriptHawkUI.form_controls["Everything is Kong Button"] = forms.button(ScriptHawkUI.options_form, "Kong", everythingIsKong, ScriptHawkUI.col(10), ScriptHawkUI.row(3), ScriptHawkUI.col(4) + 10, ScriptHawkUI.button_height);
+	--ScriptHawkUI.form_controls["Force Pause Button"] = forms.button(ScriptHawkUI.options_form, "Force Pause", force_pause, ScriptHawkUI.col(10), ScriptHawkUI.row(4), ScriptHawkUI.col(4) + 10, ScriptHawkUI.button_height);
+	ScriptHawkUI.form_controls["Force Zipper Button"] = forms.button(ScriptHawkUI.options_form, "Force Zipper", force_zipper, ScriptHawkUI.col(5), ScriptHawkUI.row(4), ScriptHawkUI.col(4) + 10, ScriptHawkUI.button_height);
+	ScriptHawkUI.form_controls["Fix Bone Displacement Button"] = forms.button(ScriptHawkUI.options_form, "Fix Spiking", fixBoneDisplacement, ScriptHawkUI.col(10), ScriptHawkUI.row(0), ScriptHawkUI.col(4) + 10, ScriptHawkUI.button_height);
+	--ScriptHawkUI.form_controls["Random Effect Button"] = forms.button(ScriptHawkUI.options_form, "Random effect", random_effect, ScriptHawkUI.col(10), ScriptHawkUI.row(6), ScriptHawkUI.col(4) + 10, ScriptHawkUI.button_height);
 
 	-- Lag fix
-	ScriptHawkUI.form_controls["Decrease Lag Factor Button"] = forms.button(ScriptHawkUI.options_form, "-", decrease_lag_factor, ScriptHawkUI.col(13) - 7, ScriptHawkUI.row(6), ScriptHawkUI.button_height, ScriptHawkUI.button_height);
-	ScriptHawkUI.form_controls["Increase Lag Factor Button"] = forms.button(ScriptHawkUI.options_form, "+", increase_lag_factor, ScriptHawkUI.col(13) + ScriptHawkUI.button_height - 7, ScriptHawkUI.row(6),ScriptHawkUI.button_height, ScriptHawkUI.button_height);
+	ScriptHawkUI.form_controls["Decrease Lag Factor Button"] = forms.button(ScriptHawkUI.options_form, "-", decrease_lag_factor, ScriptHawkUI.col(13) - 5, ScriptHawkUI.row(6), ScriptHawkUI.button_height, ScriptHawkUI.button_height);
+	ScriptHawkUI.form_controls["Increase Lag Factor Button"] = forms.button(ScriptHawkUI.options_form, "+", increase_lag_factor, ScriptHawkUI.col(13) + ScriptHawkUI.button_height - 5, ScriptHawkUI.row(6),ScriptHawkUI.button_height, ScriptHawkUI.button_height);
 	ScriptHawkUI.form_controls["Lag Factor Value Label"] = forms.label(ScriptHawkUI.options_form, "0", ScriptHawkUI.col(13) + ScriptHawkUI.button_height + 21, ScriptHawkUI.row(6) + ScriptHawkUI.label_offset, 54, 14);
 	ScriptHawkUI.form_controls["Toggle Lag Fix Checkbox"] = forms.checkbox(ScriptHawkUI.options_form, "Lag fix", ScriptHawkUI.col(10) + ScriptHawkUI.dropdown_offset, ScriptHawkUI.row(6) + ScriptHawkUI.dropdown_offset);
 

@@ -788,11 +788,15 @@ ScriptHawkUI.form_controls["Increase Speed Button"] = forms.button(ScriptHawkUI.
 ScriptHawkUI.form_controls["Speed Value Label"] = forms.label(ScriptHawkUI.options_form, "0", ScriptHawkUI.col(5), ScriptHawkUI.row(2) + ScriptHawkUI.label_offset, 54, 14);
 
 if type(Game.maps) == "table" then
-	ScriptHawkUI.form_controls["Map Dropdown"] = forms.dropdown(ScriptHawkUI.options_form, Game.maps, ScriptHawkUI.col(0), ScriptHawkUI.row(3) + ScriptHawkUI.dropdown_offset, ScriptHawkUI.col(9) + 7, ScriptHawkUI.button_height);
-	ScriptHawkUI.form_controls["Map Checkbox"] = forms.checkbox(ScriptHawkUI.options_form, "Take me there", ScriptHawkUI.col(0) + ScriptHawkUI.dropdown_offset, ScriptHawkUI.row(4) + ScriptHawkUI.dropdown_offset);
+	ScriptHawkUI.form_controls["Map Dropdown"] = forms.dropdown(ScriptHawkUI.options_form, Game.maps, ScriptHawkUI.col(0) + ScriptHawkUI.dropdown_offset, ScriptHawkUI.row(3) + ScriptHawkUI.dropdown_offset, ScriptHawkUI.col(9) + 8, ScriptHawkUI.button_height);
+	if Game.takeMeThereType == nil or Game.takeMeThereType == "Checkbox" then
+		ScriptHawkUI.form_controls["Map Checkbox"] = forms.checkbox(ScriptHawkUI.options_form, "Take me there", ScriptHawkUI.col(0) + ScriptHawkUI.dropdown_offset, ScriptHawkUI.row(4) + ScriptHawkUI.dropdown_offset);
+	elseif Game.takeMeThereType == "Button" then
+		ScriptHawkUI.form_controls["Map Button"] = forms.button(ScriptHawkUI.options_form, "Take me there", function() Game.setMap(previous_map_value); end, ScriptHawkUI.col(0), ScriptHawkUI.row(4), ScriptHawkUI.col(4) + 10, ScriptHawkUI.button_height);
+	end
 end
 
-ScriptHawkUI.form_controls["Toggle Telemetry Button"] = forms.button(ScriptHawkUI.options_form, "Start Telemetry", toggleTelemetry, ScriptHawkUI.col(10), ScriptHawkUI.row(3), ScriptHawkUI.col(4) + 8, ScriptHawkUI.button_height);
+ScriptHawkUI.form_controls["Toggle Telemetry Button"] = forms.button(ScriptHawkUI.options_form, "Start Telemetry", toggleTelemetry, ScriptHawkUI.col(10), ScriptHawkUI.row(3), ScriptHawkUI.col(4) + 10, ScriptHawkUI.button_height);
 
 if type(Game.applyInfinites) == "function" then
 	ScriptHawkUI.form_controls["Toggle Infinites Checkbox"] = forms.checkbox(ScriptHawkUI.options_form, "Infinites", ScriptHawkUI.col(0) + ScriptHawkUI.dropdown_offset, ScriptHawkUI.row(5) + ScriptHawkUI.dropdown_offset);
@@ -806,7 +810,7 @@ if type(Game.initUI) == "function" then
 	Game.initUI();
 end
 
-local function findMapValue()
+function ScriptHawkUI.findMapValue()
 	if type(Game.maps) == "table" then
 		for i = 1, #Game.maps do
 			if Game.maps[i] == previous_map then
@@ -852,7 +856,7 @@ local angleKeywords = {
 	"Facing", "Moving", "Angle"
 };
 
-function updateUIReadouts_ScriptHawk()
+function ScriptHawkUI.updateReadouts()
 	-- Update form buttons etc
 	forms.settext(ScriptHawkUI.form_controls["Speed Value Label"], Game.speedy_speeds[Game.speedy_index]);
 	forms.settext(ScriptHawkUI.form_controls["Precision Value Label"], precision);
@@ -860,7 +864,7 @@ function updateUIReadouts_ScriptHawk()
 	forms.settext(ScriptHawkUI.form_controls["Toggle Rotation Units Button"], rotation_units);
 	if type(Game.maps) == "table" and previous_map ~= forms.gettext(ScriptHawkUI.form_controls["Map Dropdown"]) then
 		previous_map = forms.gettext(ScriptHawkUI.form_controls["Map Dropdown"]);
-		previous_map_value = findMapValue();
+		previous_map_value = ScriptHawkUI.findMapValue();
 	end
 
 	-- Draw OSD
@@ -1030,7 +1034,7 @@ local function mainloop()
 		Game.applyInfinites();
 	end
 
-	if type(Game.maps) == "table" and forms.ischecked(ScriptHawkUI.form_controls["Map Checkbox"]) then
+	if type(Game.maps) == "table" and Game.takeMeThereType == "Checkbox" and forms.ischecked(ScriptHawkUI.form_controls["Map Checkbox"]) then
 		Game.setMap(previous_map_value);
 	end
 end
@@ -1173,7 +1177,7 @@ ScriptHawk.bindKeyRealtime("Slash", ScriptHawk.resetMax, true);
 
 while true do
 	gui.cleartext();
-	updateUIReadouts_ScriptHawk();
+	ScriptHawkUI.updateReadouts();
 	ScriptHawk.processKeybinds(ScriptHawk.keybindsRealtime);
 	ScriptHawk.processJoypadBinds(ScriptHawk.joypadBindsRealtime);
 	if type(Game.realTime) == "function" then

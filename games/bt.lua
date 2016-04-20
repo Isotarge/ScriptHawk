@@ -708,6 +708,7 @@ end
 -- Events --
 ------------
 
+Game.takeMeThereType = "Button";
 function Game.setMap(value)
 	local trigger_value = mainmemory.read_u16_be(Game.Memory.map_trigger[version]);
 	if trigger_value == 0 then
@@ -734,7 +735,7 @@ function Game.initUI()
 
 	-- Moves
 	options_moves_dropdown = forms.dropdown(ScriptHawkUI.options_form, { "0. None", "1. All" }, ScriptHawkUI.col(10) + ScriptHawkUI.dropdown_offset, ScriptHawkUI.row(7) + ScriptHawkUI.dropdown_offset);
-	options_moves_button = forms.button(ScriptHawkUI.options_form, "Unlock Moves", unlock_moves, ScriptHawkUI.col(5), ScriptHawkUI.row(7), ScriptHawkUI.col(4) + 8, ScriptHawkUI.button_height);
+	options_moves_button = forms.button(ScriptHawkUI.options_form, "Unlock Moves", unlock_moves, ScriptHawkUI.col(5), ScriptHawkUI.row(7), ScriptHawkUI.col(4) + 10, ScriptHawkUI.button_height);
 end
 
 function Game.eachFrame()
