@@ -1036,8 +1036,7 @@ function Game.setZVelocity(value)
 	return mainmemory.writefloat(Game.Memory.z_velocity[version], value, true);
 end
 
--- Calculated VXZ
-function Game.getVelocity()
+function Game.getVelocity() -- Calculated VXZ
 	local vX = Game.getXVelocity();
 	local vZ = Game.getZVelocity();
 	return math.sqrt(vX*vX + vZ*vZ);
