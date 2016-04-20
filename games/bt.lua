@@ -785,10 +785,10 @@ local max_air = 60;
 
 function Game.applyInfinites()
 	-- TODO: Eggs, feathers, glowbos etc
+	mainmemory.writefloat(Game.Memory.air[version], max_air, true);
 	if version == 4 then -- TODO: Port health addresses to other versions
 		local maxHealth = Game.getMaxHealth();
 		Game.setCurrentHealth(maxHealth);
-		mainmemory.writefloat(Game.Memory.air[version], max_air, true);
 	end
 end
 
