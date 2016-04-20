@@ -1,5 +1,6 @@
 local Game = {};
 
+-- TODO: Game.Memory table
 local x_pos;
 local y_pos;
 local z_pos;
@@ -7,8 +8,6 @@ local z_pos;
 local x_rot;
 local facing_angle;
 local y_rot;
-
-Game.maps = { "Not Implemented" };
 
 --------------------
 -- Region/Version --
@@ -60,7 +59,7 @@ Game.speedy_speeds = { 1, 5, 10 };
 Game.speedy_index = 2;
 
 Game.rot_speed = 64;
-Game.max_rot_units = 0xffff;
+Game.max_rot_units = 0xFFFF;
 
 --------------
 -- Position --
@@ -116,22 +115,6 @@ end
 
 function Game.setZRotation(value)
 	mainmemory.write_u16_be(z_rot, value);
-end
-
-------------
--- Events --
-------------
-
-function Game.setMap(value)
-	-- TODO
-end
-
-function Game.initUI()
-	-- TODO
-end
-
-function Game.eachFrame()
-	-- TODO
 end
 
 return Game;
