@@ -17,8 +17,9 @@ Game -- Table containing all information and functions about a game that are vis
 
 	function Game.detectVersion(romName) -- Used to set up version specific memory addresses or flags. Should return true if the version is supported, false if not
 
+	Game.takeMeThereType -- String: Values "Button" or "Checkbox", defaults to "Checkbox" if not present
 	Game.maps -- Table containing strings that populate the "Take Me There" dropdown box provided by ScriptHawk, ordered by in game value
-	function Game.setMap(value) -- This function will be executed at the start of each frame when the "Take me there" checkbox is ticked on the ScriptHawk options form
+	function Game.setMap(value) -- This function will be executed when "Take Me There" is activated, either every frame by Checkbox, or once by Button
 
 	Game.speedy_speeds -- A table defining all values available for D-Pad speeds
 	Game.speedy_index -- The index of the default D-Pad speed, in the above table
