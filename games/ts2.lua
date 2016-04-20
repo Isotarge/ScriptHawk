@@ -6,25 +6,21 @@ local z_pos;
 
 local facing_angle;
 
-Game.maps = { "Not Implemented" };
-
 --------------------
 -- Region/Version --
 --------------------
 
 function Game.detectVersion(romName)
 	if stringContains(romName, "Europe") then
-		-- TODO
-		return false;
+		return false; -- TODO
 	elseif stringContains(romName, "Japan") then
-		-- TODO
-		return false;
+		return false; -- TODO
 	elseif stringContains(romName, "USA") then
-		x_pos = 0x0bb070;
-		y_pos = 0x0bb074;
-		z_pos = 0x0bb078;
+		x_pos = 0x0BB070;
+		y_pos = 0x0BB074;
+		z_pos = 0x0BB078;
 
-		facing_angle = 0x0bb0b8;
+		facing_angle = 0x0BB0B8;
 	else
 		return false;
 	end
@@ -89,7 +85,7 @@ function Game.getZRotation()
 end
 
 function Game.setXRotation(value)
-	mainmemory.write_u16_be(facing_angle, value);
+	mainmemory.write_u16_be(facing_angle, value); -- TODO
 end
 
 function Game.setYRotation(value)
@@ -97,27 +93,24 @@ function Game.setYRotation(value)
 end
 
 function Game.setZRotation(value)
-	mainmemory.write_u16_be(facing_angle, value);
+	mainmemory.write_u16_be(facing_angle, value); -- TODO
 end
 
-------------
--- Events --
-------------
-
-function Game.setMap(value)
-	-- TODO
-end
-
-function Game.applyInfinites()
-	-- TODO
-end
-
-function Game.initUI()
-	-- TODO
-end
-
-function Game.eachFrame()
-	-- TODO
-end
+Game.OSD = {
+	{"X", Game.getXPosition},
+	{"Y", Game.getYPosition},
+	{"Z", Game.getZPosition},
+	{"Separator", 1},
+	{"dY"},
+	{"dXZ"},
+	{"Separator", 1},
+	{"Max dY"},
+	{"Max dXZ"},
+	{"Odometer"},
+	{"Separator", 1},
+	--{"Rot. X", Game.getXRotation}, -- TODO
+	{"Facing", Game.getYRotation},
+	--{"Rot. Z", Game.getZRotation}, -- TODO
+};
 
 return Game;
