@@ -1,5 +1,6 @@
 local Game = {};
 
+-- TODO: Game.Memory table
 local x_pos;
 local y_pos;
 local z_pos;
@@ -11,8 +12,6 @@ local sine_mirror = 0x10;
 
 local cosine = 0x04;
 local cosine_inverse = 0x0C;
-
-Game.maps = { "Not Implemented" };
 
 --------------------
 -- Region/Version --
@@ -125,22 +124,6 @@ end
 
 function Game.setZRotation(value)
 	--mainmemory.writefloat(z_rot, value - 1, true);
-end
-
-------------
--- Events --
-------------
-
-function Game.setMap(value)
-	-- TODO
-end
-
-function Game.initUI()
-	-- TODO
-end
-
-function Game.eachFrame()
-	-- TODO
 end
 
 return Game;
