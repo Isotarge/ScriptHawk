@@ -392,7 +392,9 @@ local z_rot_target = z_rot_current + 4;
 local slope_timer = 0x38;
 
 -- Relative to Velocity object
+local x_velocity = 0x10;
 local y_velocity = 0x14;
+local z_velocity = 0x18;
 
 function Game.getPlayerObject()
 	local playerObject = dereferencePointer(Game.Memory.player_pointer[version]);
@@ -494,6 +496,17 @@ end
 -- Velocity --
 --------------
 
+function Game.getXVelocity()
+	local playerObject = Game.getPlayerObject();
+	if isRDRAM(playerObject) then
+		local playerVelocityObject = dereferencePointer(playerObject + velocity_pointer_index);
+		if isRDRAM(playerVelocityObject) then
+			return mainmemory.readfloat(playerVelocityObject + x_velocity, true);
+		end
+	end
+	return 0;
+end
+
 function Game.getYVelocity()
 	local playerObject = Game.getPlayerObject();
 	if isRDRAM(playerObject) then
@@ -505,12 +518,49 @@ function Game.getYVelocity()
 	return 0;
 end
 
+function Game.getZVelocity()
+	local playerObject = Game.getPlayerObject();
+	if isRDRAM(playerObject) then
+		local playerVelocityObject = dereferencePointer(playerObject + velocity_pointer_index);
+		if isRDRAM(playerVelocityObject) then
+			return mainmemory.readfloat(playerVelocityObject + z_velocity, true);
+		end
+	end
+	return 0;
+end
+
+function Game.getVelocity() -- Calculated VXZ
+	local vX = Game.getXVelocity();
+	local vZ = Game.getZVelocity();
+	return math.sqrt(vX*vX + vZ*vZ);
+end
+
+function Game.setXVelocity(value)
+	local playerObject = Game.getPlayerObject();
+	if isRDRAM(playerObject) then
+		local playerVelocityObject = dereferencePointer(playerObject + velocity_pointer_index);
+		if isRDRAM(playerVelocityObject) then
+			mainmemory.writefloat(playerVelocityObject + x_velocity, value, true);
+		end
+	end
+end
+
 function Game.setYVelocity(value)
 	local playerObject = Game.getPlayerObject();
 	if isRDRAM(playerObject) then
 		local playerVelocityObject = dereferencePointer(playerObject + velocity_pointer_index);
 		if isRDRAM(playerVelocityObject) then
 			mainmemory.writefloat(playerVelocityObject + y_velocity, value, true);
+		end
+	end
+end
+
+function Game.setZVelocity(value)
+	local playerObject = Game.getPlayerObject();
+	if isRDRAM(playerObject) then
+		local playerVelocityObject = dereferencePointer(playerObject + velocity_pointer_index);
+		if isRDRAM(playerVelocityObject) then
+			mainmemory.writefloat(playerVelocityObject + z_velocity, value, true);
 		end
 	end
 end
@@ -536,6 +586,17 @@ function Game.getYRotation()
 		local rotationObject = dereferencePointer(playerObject + rot_y_pointer_index);
 		if isRDRAM(rotationObject) then
 			return mainmemory.readfloat(rotationObject + facing_angle, true);
+		end
+	end
+	return 0;
+end
+
+function Game.getMovingAngle()
+	local playerObject = Game.getPlayerObject();
+	if isRDRAM(playerObject) then
+		local rotationObject = dereferencePointer(playerObject + rot_y_pointer_index);
+		if isRDRAM(rotationObject) then
+			return mainmemory.readfloat(rotationObject + moving_angle, true);
 		end
 	end
 	return 0;
@@ -630,8 +691,9 @@ local options_moves_dropdown;
 local options_moves_button;
 
 local move_levels = {
-	["0. None"] = {0xE0FFFF01, 0x00004000},
-	["1. All"]  = {0xFFFFFFFF, 0xFFFFFFFF},
+	["0. None"] = {0xE0FFFF01, 0x00004000, false},
+	["1. All"]  = {0xFFFFFFFF, 0xFFFFFFFF, false},
+	["2. All + Dragon Kazooie"]  = {0xFFFFFFFF, 0xFFFFFFFF, true},
 };
 
 local function unlock_moves()
@@ -640,6 +702,11 @@ local function unlock_moves()
 	if isRDRAM(movesObject) then
 		mainmemory.write_u32_be(movesObject + 0x18, move_levels[level][1]);
 		mainmemory.write_u32_be(movesObject + 0x1C, move_levels[level][2]);
+		if move_levels[level][3] then
+			mainmemory.writebyte(movesObject + 0x78, 0xFF); -- Unlock dragon kazooie
+		else
+			mainmemory.writebyte(movesObject + 0x78, 0x00); -- Lock dragon kazooie
+		end
 	end
 end
 
@@ -734,7 +801,7 @@ function Game.initUI()
 	options_toggle_neverslip = forms.checkbox(ScriptHawkUI.options_form, "Never Slip", ScriptHawkUI.col(0) + ScriptHawkUI.dropdown_offset, ScriptHawkUI.row(6) + ScriptHawkUI.dropdown_offset);
 
 	-- Moves
-	options_moves_dropdown = forms.dropdown(ScriptHawkUI.options_form, { "0. None", "1. All" }, ScriptHawkUI.col(10) + ScriptHawkUI.dropdown_offset, ScriptHawkUI.row(7) + ScriptHawkUI.dropdown_offset);
+	options_moves_dropdown = forms.dropdown(ScriptHawkUI.options_form, { "0. None", "1. All", "2. All + Dragon Kazooie" }, ScriptHawkUI.col(10) + ScriptHawkUI.dropdown_offset, ScriptHawkUI.row(7) + ScriptHawkUI.dropdown_offset);
 	options_moves_button = forms.button(ScriptHawkUI.options_form, "Unlock Moves", unlock_moves, ScriptHawkUI.col(5), ScriptHawkUI.row(7), ScriptHawkUI.col(4) + 10, ScriptHawkUI.button_height);
 end
 
@@ -752,9 +819,8 @@ Game.OSD = {
 	{"Separator", 1},
 	{"dY"},
 	{"dXZ"},
-	--{"X Velocity", Game.getXVelocity}, -- TODO
+	{"Velocity", Game.getVelocity},
 	{"Y Velocity", Game.getYVelocity},
-	--{"Z Velocity", Game.getZVelocity}, -- TODO
 	{"Separator", 1},
 	{"Max dY"},
 	{"Max dXZ"},
@@ -762,7 +828,7 @@ Game.OSD = {
 	{"Separator", 1},
 	{"Rot. X", Game.getXRotation},
 	{"Facing", Game.getYRotation},
-	--{"Moving", Game.getMovingAngle}, -- TODO
+	{"Moving", Game.getMovingAngle},
 	{"Rot. Z", Game.getZRotation},
 	{"Separator", 1},
 	--{"Movement", Game.getCurrentMovementState}, TODO
