@@ -51,7 +51,8 @@ SystemID N64
 11ABBF	b	u	1	RDRAM	Jinjo: IoH: Cliff Top
 11ABC2	b	u	1	RDRAM	Jinjo: IoH: Plateau
 11ABC5	b	u	1	RDRAM	Jinjo: IoH: Spiral Mountain
-11B065	b	h	1	RDRAM	Health Icon (HUD)
+11B04D	b	h	1	RDRAM	HUD Icon (Air)
+11B065	b	h	1	RDRAM	HUD Icon (Health)
 11B069	b	u	1	RDRAM	Health (HUD)
 11B074	w	s	1	RDRAM	Notes (HUD)
 11B078	d	f	1	RDRAM	Notes (HUD)

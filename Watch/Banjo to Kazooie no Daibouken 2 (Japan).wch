@@ -1,6 +1,8 @@
 SystemID N64
 0788F8	d	s	1	RDRAM	Frame timer
 0788FC	d	s	1	RDRAM	Frameskip
+11530D	b	h	1	RDRAM	HUD Icon (Air)
+115325	b	h	1	RDRAM	HUD Icon (Health)
 1217E8	d	f	1	RDRAM	Game Runtime
 1217EC	d	f	1	RDRAM	Map Runtime
 125220	d	f	1	RDRAM	Air (Real)

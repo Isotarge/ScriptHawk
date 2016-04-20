@@ -321,6 +321,7 @@ Game.Memory = {
 	["linked_list_root"] = {0x13C380, 0x13C680, 0x131850, 0x137800},
 	["map"] = {0x12C390, 0x12C5A0, 0x1217F0, 0x127640},
 	["map_trigger"] = {0x12C392, 0x12C5A2, 0x1217F2, 0x127642},
+	["iconAddress"] = {0x11FF95, 0x120155, 0x115325, 0x11B065},
 };
 
 function Game.detectVersion(romName)
@@ -711,7 +712,6 @@ end
 
 -- TODO: Port these addresses to other versions
 -- Probably best to use a base + offset dealeo
-local iconAddress = 0x11B065;
 local healthAddresses = {
 	[0x01] = 0x11B644, -- BK
 	[0x10] = 0x11B65F, -- Banjo (Solo)
@@ -727,7 +727,7 @@ local healthAddresses = {
 };
 
 function Game.getCurrentHealth()
-	local currentTransformation = mainmemory.readbyte(iconAddress);
+	local currentTransformation = mainmemory.readbyte(Game.Memory.iconAddress[version]);
 	if type(healthAddresses[currentTransformation]) == 'number' then
 		return mainmemory.read_u8(healthAddresses[currentTransformation]);
 	end
@@ -735,7 +735,7 @@ function Game.getCurrentHealth()
 end
 
 function Game.setCurrentHealth(value)
-	local currentTransformation = mainmemory.readbyte(iconAddress);
+	local currentTransformation = mainmemory.readbyte(Game.Memory.iconAddress[version]);
 	if type(healthAddresses[currentTransformation]) == 'number' then
 		value = value or 0;
 		value = math.max(0x00, value);
@@ -745,7 +745,7 @@ function Game.setCurrentHealth(value)
 end
 
 function Game.getMaxHealth()
-	local currentTransformation = mainmemory.readbyte(iconAddress);
+	local currentTransformation = mainmemory.readbyte(Game.Memory.iconAddress[version]);
 	if type(healthAddresses[currentTransformation]) == 'number' then
 		return mainmemory.read_u8(healthAddresses[currentTransformation] + 1);
 	end
@@ -753,7 +753,7 @@ function Game.getMaxHealth()
 end
 
 function Game.setMaxHealth(value)
-	local currentTransformation = mainmemory.readbyte(iconAddress);
+	local currentTransformation = mainmemory.readbyte(Game.Memory.iconAddress[version]);
 	if type(healthAddresses[currentTransformation]) == 'number' then
 		value = value or 0;
 		value = math.max(0x00, value);

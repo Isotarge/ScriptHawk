@@ -1,6 +1,8 @@
 SystemID N64
 083550	d	s	1	RDRAM	Frame timer
 083554	d	s	1	RDRAM	Frameskip
+12013D	b	h	1	RDRAM	HUD Icon (Air)
+120155	b	h	1	RDRAM	HUD Icon (Health)
 12C5A0	w	h	1	RDRAM	Map
 12C5A2	w	h	1	RDRAM	Map Load Trigger
 12FFD0	d	f	1	RDRAM	Air (Real)
