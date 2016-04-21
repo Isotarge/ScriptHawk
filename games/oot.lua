@@ -13,40 +13,39 @@ local z_rot;
 -- Region/Version --
 --------------------
 
-function Game.detectVersion(romName)
-	if stringContains(romName, "Europe") or stringContains(romName, "(E)") then
-		if stringContains(romName, "Rev A") then
-			x_pos = 0x1D8AD4;
-			facing_angle = 0x1D8B66;
-		elseif stringContains(romName, "Master Quest") then
-			x_pos = 0x1D9394;
-			facing_angle = 0x1D9426;
-		else
-			x_pos = 0x1D8A94;
-			facing_angle = 0x1D8B26;
-		end
-	elseif stringContains(romName, "Japan") then
-		if stringContains(romName, "Rev A") then
-			x_pos = 0x1DAC14;
-			facing_angle = 0x1DACA6;
-		elseif stringContains(romName, "Rev B") then
-			x_pos = 0x1DB314;
-			facing_angle = 0x1DB3A6;
-		else
-			x_pos = 0x1DAA54;
-			facing_angle = 0x1DAAE6;
-		end
-	elseif stringContains(romName, "USA") then
-		if stringContains(romName, "Rev A") then
-			x_pos = 0x1DAC14;
-			facing_angle = 0x1DACA6;
-		elseif stringContains(romName, "Rev B") then
-			x_pos = 0x1DB314;
-			facing_angle = 0x1DB3A6;
-		else
-			x_pos = 0x1DAA54;
-			facing_angle = 0x1DAAE6;
-		end
+-- TODO: Sort out these versions
+--["50BEBEDAD9E0F10746A52B07239E47FA6C284D03"] = {["moduleName"] = "games.oot", ["friendlyName"] = "Legend of Zelda, The - Ocarina of Time - Master Quest (USA) (Debug Edition)"},
+--["8B5D13AAC69BFBF989861CFDC50B1D840945FC1D"] = {["moduleName"] = "games.oot", ["friendlyName"] = "Legend of Zelda, The - Ocarina of Time - Master Quest (USA) (GC)"},
+--["DD14E143C4275861FE93EA79D0C02E36AE8C6C2F"] = {["moduleName"] = "games.oot", ["friendlyName"] = "Zelda no Densetsu - Toki no Ocarina (Japan) (GC)"},
+
+function Game.detectVersion(romName, romHash)
+	if romHash == "CFBB98D392E4A9D39DA8285D10CBEF3974C2F012" then -- Europe 1.1
+		x_pos = 0x1D8AD4;
+		facing_angle = 0x1D8B66;
+	--elseif stringContains(romName, "Master Quest") then -- TODO: uh, this was lumped in with PAL?
+	--	x_pos = 0x1D9394;
+	--	facing_angle = 0x1D9426;
+	elseif romHash == "328A1F1BEBA30CE5E178F031662019EB32C5F3B5" then -- Europe 1.0
+		x_pos = 0x1D8A94;
+		facing_angle = 0x1D8B26;
+	elseif romHash == "DBFC81F655187DC6FEFD93FA6798FACE770D579D" then -- Japan 1.1
+		x_pos = 0x1DAC14;
+		facing_angle = 0x1DACA6;
+	elseif romHash == "FA5F5942B27480D60243C2D52C0E93E26B9E6B86" then -- Japan 1.2
+		x_pos = 0x1DB314;
+		facing_angle = 0x1DB3A6;
+	elseif romHash == "C892BBDA3993E66BD0D56A10ECD30B1EE612210F" then -- Japan 1.0
+		x_pos = 0x1DAA54;
+		facing_angle = 0x1DAAE6;
+	elseif romHash == "D3ECB253776CD847A5AA63D859D8C89A2F37B364" then -- USA 1.1
+		x_pos = 0x1DAC14;
+		facing_angle = 0x1DACA6;
+	elseif romHash == "41B3BDC48D98C48529219919015A1AF22F5057C2" then -- USA 1.2
+		x_pos = 0x1DB314;
+		facing_angle = 0x1DB3A6;
+	elseif romHash == "AD69C91157F6705E8AB06C79FE08AAD47BB57BA7" then -- USA 1.0
+		x_pos = 0x1DAA54;
+		facing_angle = 0x1DAAE6;
 	else
 		return false;
 	end

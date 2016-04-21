@@ -14,14 +14,14 @@ local facing_angle = 0x1B8;
 -- Region/Version --
 --------------------
 
-function Game.detectVersion(romName)
+function Game.detectVersion(romName, romHash)
 	if emu.getsystemid() == "N64" then
-		if stringContains(romName, "Number Journey") and stringContains(romName, "USA") then
+		if romHash == "7195EA96D9FE5DE065AF61F70D55C92C8EE905E6" then -- Number Journey, N64, USA
 			elmo_pointer = 0x106C84;
 			return true;
 		end
 
-		if stringContains(romName, "Letter Adventure") and stringContains(romName, "USA") then
+		if romHash == "97777CA06F4E8AFF8F1E95033CC8D3833BE40F76" then -- Letter Adventure, N64, USA
 			elmo_pointer = 0x106888;
 			return true;
 		end

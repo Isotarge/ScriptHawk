@@ -1,4 +1,4 @@
-local romName = gameinfo.getromname();
+local romHash = gameinfo.getromhash();
 
 local cursor_left_x;
 local cursor_left_y;
@@ -7,21 +7,23 @@ local cursor_right_y;
 local row_height_tickers;
 local grid_base;
 
-if romName == "Panel de Pon (Japan)" then
+-- TODO: Support more versions of this game
+if romHash == "EAD855D774C9943F7FFB5B4F429B2DD07FB6F606" then -- Panel de Pon (Japan) (SNES)
 	cursor_left_x = {0x3A6, 0x3A8};
 	cursor_left_y = {0x3AA, 0x3AC};
 	cursor_right_x = {0x3AE, 0x3B0};
 	cursor_right_y = {0x3B2, 0x3B4};
 	row_height_tickers = {0x406, 0x408};
 	grid_base = {0x17B0, 0x18B0};
-elseif romName == "Tetris Attack (USA) (En,Ja)" then
+--elseif romHash == "B59061561A3AEAC13E46735582F29826E7310141" then -- Panel de Pon - Event '98 (Japan) (BS) (SNES) -- TODO: Support this
+elseif romHash == "2DC56EAB3E70C0910AE47119D8B69F494E6000DF" then -- Tetris Attack (USA) (En,Ja) (SNES)
 	cursor_left_x = {0x3A4, 0x3A6};
 	cursor_left_y = {0x3A8, 0x3AA};
 	cursor_right_x = {0x3AC, 0x3AE};
 	cursor_right_y = {0x3B0, 0x3B2};
 	row_height_tickers = {0x404, 0x406};
 	grid_base = {0xFAE, 0x10AE};
-elseif romName == "Tetris Attack (Europe) (En,Ja)" then
+elseif romHash == "08E01F9AD5B6148E1A4355C80E2B23D8B2463443" then -- Tetris Attack (Europe) (En,Ja) (SNES)
 	cursor_left_x = {0x3A6, 0x3A8};
 	cursor_left_y = {0x3AA, 0x3AC};
 	cursor_right_x = {0x3AE, 0x3B0};

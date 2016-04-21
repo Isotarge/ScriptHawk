@@ -60,14 +60,14 @@ Game.Memory = {
 	["global_object_data"] = {nil, 0x386A20, nil, nil}, -- TODO: Find on all versions
 };
 
-function Game.detectVersion(romName)
-	if stringContains(romName, "USA") then
+function Game.detectVersion(romName, romHash)
+	if romHash == "9BEF1128717F958171A4AFAC3ED78EE2BB4E86CE" then -- USA
 		version = 1;
-	elseif stringContains(romName, "Europe") then
+	elseif romHash == "4AC5721683D0E0B6BBB561B58A71740845DCEEA9" then -- Europe
 		version = 2;
-	elseif stringContains(romName, "Japan") and stringContains(romName, "Shindou Edition") then
+	elseif romHash == "3F319AE697533A255A1003D09202379D78D5A2E0" then -- Japan Shindou Edition
 		version = 3;
-	elseif stringContains(romName, "Japan") then
+	elseif romHash == "8A20A5C83D6CEB0F0506CFC9FA20D8F438CAFE51" then -- Japan
 		version = 4;
 	else
 		return false;

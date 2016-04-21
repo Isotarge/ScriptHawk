@@ -159,28 +159,28 @@ Game.Memory = {
 	["num_objects"] = {0x11B46C, 0x11AEEC, 0x11C8CC, 0x11B3DC, 0x11AE5C},
 };
 
-function Game.detectVersion(romName)
-	if stringContains(romName, "Europe") and stringContains(romName, "Rev A") then
+function Game.detectVersion(romName, romHash)
+	if romHash == "B7F628073237B3D211D40406AA0884FF8FDD70D5" then -- Europe 1.1
 		version = 1;
 		map_freeze_values = {
 			0x121777, 0x123B07, 0x208699 -- TODO: Double check these
 		};
-	elseif stringContains(romName, "Europe") then
+	elseif romHash == "DD5D64DD140CB7AA28404FA35ABDCABA33C29260" then -- Europe 1.0
 		version = 2;
 		map_freeze_values = {
 			0x11AF3B, 0x1211F7, 0x1212E2, 0x123587, 0x206BB5, 0x206C3B, 0x207EA9 -- TODO: Double check these
 		};
-	elseif stringContains(romName, "Japan") then
+	elseif romHash == "23BA3D302025153D111416E751027CEF11213A19" then -- Japan
 		version = 3;
 		map_freeze_values = {
 			0x11C91B, 0x122BD7, 0x122CC2, 0x124F67, 0x1FD4A5, 0x1FD52B, 0x1FE729 -- TODO: Double check these
 		};
-	elseif stringContains(romName, "USA") and stringContains(romName, "Rev A") then
+	elseif romHash == "6D96743D46F8C0CD0EDB0EC5600B003C89B93755" then -- USA 1.1
 		version = 4;
 		map_freeze_values = {
 			0x1216E7, 0x123A77, 0x1FD209 -- TODO: Double check these
 		};
-	elseif stringContains(romName, "USA") then
+	elseif romHash == "0CB115D8716DBBC2922FDA38E533B9FE63BB9670" then -- USA 1.0
 		version = 5;
 		map_freeze_values = {
 			0x121167, 0x121252, 0x1234F7, 0x1FCA19 -- TODO: Double check these

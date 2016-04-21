@@ -15,7 +15,7 @@ Game.Memory = { -- Lua has a maximum of 200 local variables per function, we use
 	["z_position"] = {0x100008, 0x200008, 0x300008},
 }
 
-function Game.detectVersion(romName) -- TODO: Base this on ROM Hash, more reliable
+function Game.detectVersion(romName, romHash) -- Modules should ideally use ROM hash rather than name, but both are passed in by ScriptHawk
 	if stringContains(romName, "Europe") then -- stringContains is a pure Lua global function provided by ScriptHawk, intended to replace calls to bizstring.contains()
 		version = 1; -- We use the version variable as an index for the Game.Memory table
 	elseif stringContains(romName, "Japan") then

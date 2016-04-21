@@ -17,25 +17,25 @@ local cosine_inverse = 0x0C;
 -- Region/Version --
 --------------------
 
-function Game.detectVersion(romName)
-	if stringContains(romName, "Europe") then
-		-- TODO
-		return false;
-	elseif stringContains(romName, "Japan") then
-		-- TODO
-		return false;
-	elseif stringContains(romName, "USA") then
-		-- TODO: Get this working on every map
-		x_pos = 0x1C6B34;
-		rot_base = 0x1C69BC;
-	else
-		return false;
+function Game.detectVersion(romName, romHash)
+	if emu.getsystemid() == "N64" then
+		if romHash == "619AB27EA1645399439AD324566361D3E7FF020E" then -- Europe N64
+			return false; -- TODO
+		elseif romHash == "50558356B059AD3FBAF5FE95380512B9DCEAAF52" then -- USA N64
+			-- TODO: Get this working on every map
+			x_pos = 0x1C6B34;
+			rot_base = 0x1C69BC;
+		else
+			return false;
+		end
+
+		z_pos = x_pos + 4; -- Ordered X, Z, Y in memory
+		y_pos = z_pos + 4;
+
+		return true;
 	end
 
-	z_pos = x_pos + 4; -- Ordered X, Z, Y in memory
-	y_pos = z_pos + 4;
-
-	return true;
+	return false;
 end
 
 -------------------

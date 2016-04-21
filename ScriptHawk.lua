@@ -346,37 +346,107 @@ end
 -- Game checks --
 -----------------
 
-local romName = gameinfo.getromname();
+local supportedGames = {
+	-- Banjo
+	["90726D7E7CD5BF6CDFD38F45C9ACBF4D45BD9FD8"] = {["moduleName"] = "games.bk", ["friendlyName"] = "Banjo to Kazooie no Daibouken (Japan)"},
+	["5A5172383037D171F121790959962703BE1F373C"] = {["moduleName"] = "games.bt", ["friendlyName"] = "Banjo to Kazooie no Daibouken 2 (Japan)"},
+	["BB359A75941DF74BF7290212C89FBC6E2C5601FE"] = {["moduleName"] = "games.bk", ["friendlyName"] = "Banjo-Kazooie (Europe) (En,Fr,De)"},
+	["DED6EE166E740AD1BC810FD678A84B48E245AB80"] = {["moduleName"] = "games.bk", ["friendlyName"] = "Banjo-Kazooie (USA) (Rev A)"},
+	["1FE1632098865F639E22C11B9A81EE8F29C75D7A"] = {["moduleName"] = "games.bk", ["friendlyName"] = "Banjo-Kazooie (USA)"},
+	["4CA2D332F6E6B018777AFC6A8B7880B38B6DFB79"] = {["moduleName"] = "games.bt", ["friendlyName"] = "Banjo-Tooie (Australia)"},
+	["93BF2FAC1387320AD07251CB4B64FD36BAC1D7A6"] = {["moduleName"] = "games.bt", ["friendlyName"] = "Banjo-Tooie (Europe) (En,Fr,De,Es)"},
+	["AF1A89E12B638B8D82CC4C085C8E01D4CBA03FB3"] = {["moduleName"] = "games.bt", ["friendlyName"] = "Banjo-Tooie (USA)"},
 
-if stringContains(romName, "Donkey Kong 64") then
-	Game = require "games.dk64";
-elseif stringContains(romName, "Banjo-Tooie") or stringContains(romName, "Banjo to Kazooie no Daibouken 2") then
-	Game = require "games.bt";
-elseif stringContains(romName, "Banjo-Kazooie") or stringContains(romName, "Banjo to Kazooie no Daibouken") then
-	Game = require "games.bk";
-elseif stringContains(romName, "Diddy Kong Racing") then
-	Game = require "games.dkr";
-elseif stringContains(romName, "Legend of Galahad") then
-	Game = require "beta.Galahad";
-	return;
-elseif stringContains(romName, "Rayman 2 - The Great Escape") then
-	Game = require "games.rayman_2";
-elseif stringContains(romName, "Super Mario 64") then
-	Game = require "games.sm64";
-elseif stringContains(romName, "Toy Story 2") then
-	Game = require "games.ts2";
-elseif stringContains(romName, "Ocarina of Time") or stringContains(romName, "Toki no Ocarina") then
-	Game = require "games.oot";
-elseif stringContains(romName, "Majora's Mask") or stringContains(romName, "Mujura no Kamen") then
-	Game = require "games.mm";
-elseif stringContains(romName, "Elmo's Letter Adventure") or stringContains(romName, "Elmo's Number Journey") then
-	Game = require "games.elmo";
-else
+	-- Diddy Kong Racing
+	["B7F628073237B3D211D40406AA0884FF8FDD70D5"] = {["moduleName"] = "games.dkr", ["friendlyName"] = "Diddy Kong Racing (Europe) (En,Fr,De) (Rev A)"},
+	["DD5D64DD140CB7AA28404FA35ABDCABA33C29260"] = {["moduleName"] = "games.dkr", ["friendlyName"] = "Diddy Kong Racing (Europe) (En,Fr,De)"},
+	["23BA3D302025153D111416E751027CEF11213A19"] = {["moduleName"] = "games.dkr", ["friendlyName"] = "Diddy Kong Racing (Japan)"},
+	["6D96743D46F8C0CD0EDB0EC5600B003C89B93755"] = {["moduleName"] = "games.dkr", ["friendlyName"] = "Diddy Kong Racing (USA) (En,Fr) (Rev A)"},
+	["0CB115D8716DBBC2922FDA38E533B9FE63BB9670"] = {["moduleName"] = "games.dkr", ["friendlyName"] = "Diddy Kong Racing (USA) (En,Fr)"},
+
+	-- Donkey Kong 64
+	["F96AF883845308106600D84E0618C1A066DC6676"] = {["moduleName"] = "games.dk64", ["friendlyName"] = "Donkey Kong 64 (Europe) (En,Fr,De,Es)"},
+	["F0AD2B2BBF04D574ED7AFBB1BB6A4F0511DCD87D"] = {["moduleName"] = "games.dk64", ["friendlyName"] = "Donkey Kong 64 (Japan)"},
+	["B4717E602F07CA9BE0D4822813C658CD8B99F993"] = {["moduleName"] = "games.dk64", ["friendlyName"] = "Donkey Kong 64 (USA) (Demo) (Kiosk)"},
+	["CF806FF2603640A748FCA5026DED28802F1F4A50"] = {["moduleName"] = "games.dk64", ["friendlyName"] = "Donkey Kong 64 (USA)"},
+
+	-- Elmo
+	["97777CA06F4E8AFF8F1E95033CC8D3833BE40F76"] = {["moduleName"] = "games.elmo", ["friendlyName"] = "Elmo's Letter Adventure (USA)"},
+	["7195EA96D9FE5DE065AF61F70D55C92C8EE905E6"] = {["moduleName"] = "games.elmo", ["friendlyName"] = "Elmo's Number Journey (USA)"},
+
+	-- Galahad
+	["536E5A1FFB50D33632A9978B35DB5DF6"] = {["moduleName"] = "beta.Galahad", ["selfContained"] = true, ["friendlyName"] = "Legend of Galahad, The (UE) [!]"},
+	["FA7A34B92D06013625C2FE155A9DB5A8"] = {["moduleName"] = "beta.Galahad", ["selfContained"] = true, ["friendlyName"] = "Legend of Galahad, The (UE) [t1+C]"},
+	["3F183BD8A7360E3BE3CF65AE8FF9810C"] = {["moduleName"] = "beta.Galahad", ["selfContained"] = true, ["friendlyName"] = "Legend of Galahad, The (UE) [t1]"},
+
+	-- MM
+	["B38B71D2961DFFB523020A67F4807A4B704E347A"] = {["moduleName"] = "games.mm", ["friendlyName"] = "Legend of Zelda, The - Majora's Mask (Europe) (En,Fr,De,Es) (Beta)"},
+	["BB4E4757D10727C7584C59C1F2E5F44196E9C293"] = {["moduleName"] = "games.mm", ["friendlyName"] = "Legend of Zelda, The - Majora's Mask (Europe) (En,Fr,De,Es) (Rev A)"},
+	["C04599CDAFEE1C84A7AF9A71DF68F139179ADA84"] = {["moduleName"] = "games.mm", ["friendlyName"] = "Legend of Zelda, The - Majora's Mask (Europe) (En,Fr,De,Es)"},
+	["2F0744F2422B0421697A74B305CB1EF27041AB11"] = {["moduleName"] = "games.mm", ["friendlyName"] = "Legend of Zelda, The - Majora's Mask (USA) (Demo)"},
+	["D6133ACE5AFAA0882CF214CF88DABA39E266C078"] = {["moduleName"] = "games.mm", ["friendlyName"] = "Legend of Zelda, The - Majora's Mask (USA)"},
+	["41FDB879AB422EC158B4EAFEA69087F255EA8589"] = {["moduleName"] = "games.mm", ["friendlyName"] = "Zelda no Densetsu - Mujura no Kamen (Japan) (Rev A)"},
+	["5FB2301AACBF85278AF30DCA3E4194AD48599E36"] = {["moduleName"] = "games.mm", ["friendlyName"] = "Zelda no Densetsu - Mujura no Kamen (Japan)"},
+
+	-- OoT
+	["CFBB98D392E4A9D39DA8285D10CBEF3974C2F012"] = {["moduleName"] = "games.oot", ["friendlyName"] = "Legend of Zelda, The - Ocarina of Time (Europe) (En,Fr,De) (Rev A)"},
+	["328A1F1BEBA30CE5E178F031662019EB32C5F3B5"] = {["moduleName"] = "games.oot", ["friendlyName"] = "Legend of Zelda, The - Ocarina of Time (Europe) (En,Fr,De)"},
+	["D3ECB253776CD847A5AA63D859D8C89A2F37B364"] = {["moduleName"] = "games.oot", ["friendlyName"] = "Legend of Zelda, The - Ocarina of Time (USA) (Rev A)"},
+	["41B3BDC48D98C48529219919015A1AF22F5057C2"] = {["moduleName"] = "games.oot", ["friendlyName"] = "Legend of Zelda, The - Ocarina of Time (USA) (Rev B)"},
+	["AD69C91157F6705E8AB06C79FE08AAD47BB57BA7"] = {["moduleName"] = "games.oot", ["friendlyName"] = "Legend of Zelda, The - Ocarina of Time (USA)"},
+	["50BEBEDAD9E0F10746A52B07239E47FA6C284D03"] = {["moduleName"] = "games.oot", ["friendlyName"] = "Legend of Zelda, The - Ocarina of Time - Master Quest (USA) (Debug Edition)"},
+	["8B5D13AAC69BFBF989861CFDC50B1D840945FC1D"] = {["moduleName"] = "games.oot", ["friendlyName"] = "Legend of Zelda, The - Ocarina of Time - Master Quest (USA) (GC)"},
+	["DBFC81F655187DC6FEFD93FA6798FACE770D579D"] = {["moduleName"] = "games.oot", ["friendlyName"] = "Zelda no Densetsu - Toki no Ocarina (Japan) (Rev A)"},
+	["FA5F5942B27480D60243C2D52C0E93E26B9E6B86"] = {["moduleName"] = "games.oot", ["friendlyName"] = "Zelda no Densetsu - Toki no Ocarina (Japan) (Rev B)"},
+	["C892BBDA3993E66BD0D56A10ECD30B1EE612210F"] = {["moduleName"] = "games.oot", ["friendlyName"] = "Zelda no Densetsu - Toki no Ocarina (Japan)"},
+	["DD14E143C4275861FE93EA79D0C02E36AE8C6C2F"] = {["moduleName"] = "games.oot", ["friendlyName"] = "Zelda no Densetsu - Toki no Ocarina (Japan) (GC)"},
+
+	-- Rayman 2
+	["619AB27EA1645399439AD324566361D3E7FF020E"] = {["moduleName"] = "games.rayman_2", ["friendlyName"] = "Rayman 2 - The Great Escape (Europe) (En,Fr,De,Es,It)"},
+	["50558356B059AD3FBAF5FE95380512B9DCEAAF52"] = {["moduleName"] = "games.rayman_2", ["friendlyName"] = "Rayman 2 - The Great Escape (USA) (En,Fr,De,Es,It)"},
+
+	-- SM64
+	["4AC5721683D0E0B6BBB561B58A71740845DCEEA9"] = {["moduleName"] = "games.sm64", ["friendlyName"] = "Super Mario 64 (Europe) (En,Fr,De)"},
+	["3F319AE697533A255A1003D09202379D78D5A2E0"] = {["moduleName"] = "games.sm64", ["friendlyName"] = "Super Mario 64 (Japan) (Rev A) (Shindou Edition)"},
+	["8A20A5C83D6CEB0F0506CFC9FA20D8F438CAFE51"] = {["moduleName"] = "games.sm64", ["friendlyName"] = "Super Mario 64 (Japan)"},
+	["9BEF1128717F958171A4AFAC3ED78EE2BB4E86CE"] = {["moduleName"] = "games.sm64", ["friendlyName"] = "Super Mario 64 (USA)"},
+
+	-- Tetris Attack
+	-- TODO: Support more versions of this game
+	["EAD855D774C9943F7FFB5B4F429B2DD07FB6F606"] = {["moduleName"] = "Tetris Attack Bot", ["selfContained"] = true, ["friendlyName"] = "Panel de Pon (Japan)"}, -- SNES
+	["B59061561A3AEAC13E46735582F29826E7310141"] = {["moduleName"] = "Tetris Attack Bot", ["selfContained"] = true, ["friendlyName"] = "Panel de Pon - Event '98 (Japan) (BS)"}, -- SNES
+	["08E01F9AD5B6148E1A4355C80E2B23D8B2463443"] = {["moduleName"] = "Tetris Attack Bot", ["selfContained"] = true, ["friendlyName"] = "Tetris Attack (Europe) (En,Ja)"}, -- SNES
+	["2DC56EAB3E70C0910AE47119D8B69F494E6000DF"] = {["moduleName"] = "Tetris Attack Bot", ["selfContained"] = true, ["friendlyName"] = "Tetris Attack (USA) (En,Ja)"}, -- SNES
+
+	-- Toy Story 2
+	["A9F97E22391313095D2C2FBAF81FB33BFA2BA7C6"] = {["moduleName"] = "games.ts2", ["friendlyName"] = "Toy Story 2 - Buzz l'Eclair a la Rescousse! (France)"},
+	["92015E5254CBBAD1BC668ECB13A4B568E5F55052"] = {["moduleName"] = "games.ts2", ["friendlyName"] = "Toy Story 2 - Buzz Lightyear to the Rescue! (Europe)"},
+	["982AD2E1E44C6662C88A77367BC5DF91C51531BF"] = {["moduleName"] = "games.ts2", ["friendlyName"] = "Toy Story 2 - Buzz Lightyear to the Rescue! (USA)"},
+	["EAE83C07E2E777D8E71A5BE6120AED03D7E67782"] = {["moduleName"] = "games.ts2", ["friendlyName"] = "Toy Story 2 - Captain Buzz Lightyear auf Rettungsmission! (Germany) (Rev A)"},
+	["F8FBB100227015BE8629243F53D70F29A2A14315"] = {["moduleName"] = "games.ts2", ["friendlyName"] = "Toy Story 2 - Captain Buzz Lightyear auf Rettungsmission! (Germany)"},
+
+	-- Wonder Boy III
+	["E7F86C049E4BD8B26844FF62BD067D57"] = {["moduleName"] = "beta.Wonder Boy III RNG Watch", ["selfContained"] = true, ["friendlyName"] = "Wonder Boy III - The Dragon's Trap (UE)"},
+};
+
+local romName = gameinfo.getromname();
+local romHash = gameinfo.getromhash();
+Game = nil;
+for k, v in pairs(supportedGames) do
+	if romHash == k then
+		Game = require (v.moduleName);
+		if v.selfContained then -- Self contained modules that do not require ScriptHawk's functionality and merely use ScriptHawk.lua as a convenient loader
+			return true;
+		end
+	end
+end
+
+if Game == nil then
 	print("This game is not currently supported.");
 	return false;
 end
 
-if not Game.detectVersion(romName) then
+if type(Game.detectVersion) ~= "function" or not Game.detectVersion(romName, romHash) then
 	print("This version of the game is not currently supported.");
 	return false;
 end

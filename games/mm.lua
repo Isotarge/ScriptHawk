@@ -13,26 +13,26 @@ local y_rot;
 -- Region/Version --
 --------------------
 
-function Game.detectVersion(romName)
-	if stringContains(romName, "Europe") or stringContains(romName, "(E)") then
-		if stringContains(romName, "Rev A") then
-			x_pos = 0x3F7614;
-			facing_angle = 0x3F76AE;
-		else
-			x_pos = 0x3F7274;
-			facing_angle = 0x3F730E;
-		end
-	elseif stringContains(romName, "Japan") then
-		if stringContains(romName, "Rev A") then
-			x_pos = 0x400284;
-			facing_angle = 0x40031E;
-		else
-			x_pos = 0x3FFFC4;
-			facing_angle = 0x40005E;
-		end
-	elseif stringContains(romName, "USA") then
+function Game.detectVersion(romName, romHash)
+	if romHash == "BB4E4757D10727C7584C59C1F2E5F44196E9C293" then -- Europe 1.1
+		x_pos = 0x3F7614;
+		facing_angle = 0x3F76AE;
+	elseif romHash == "C04599CDAFEE1C84A7AF9A71DF68F139179ADA84" then -- Europe 1.0
+		x_pos = 0x3F7274;
+		facing_angle = 0x3F730E;
+	elseif romHash == "B38B71D2961DFFB523020A67F4807A4B704E347A" then -- Europe Beta
+		return false; -- TODO
+	elseif romHash == "41FDB879AB422EC158B4EAFEA69087F255EA8589" then -- Japan 1.1
+		x_pos = 0x400284;
+		facing_angle = 0x40031E;
+	elseif romHash == "5FB2301AACBF85278AF30DCA3E4194AD48599E36" then -- Japan 1.0
+		x_pos = 0x3FFFC4;
+		facing_angle = 0x40005E;
+	elseif romHash == "D6133ACE5AFAA0882CF214CF88DABA39E266C078" then -- USA 1.0
 		x_pos = 0x3FFDD4;
 		facing_angle = 0x3FFE6E;
+	elseif romHash == "2F0744F2422B0421697A74B305CB1EF27041AB11" then -- USA Demo
+		return false; -- TODO
 	else
 		return false;
 	end

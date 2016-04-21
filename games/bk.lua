@@ -231,23 +231,23 @@ Game.Memory = {
 	["object_array_pointer"] = {0x36EAE0, 0x36F260, 0x36D760, 0x36E560},
 };
 
-function Game.detectVersion(romName)
-	if stringContains(romName, "Europe") then
+function Game.detectVersion(romName, romHash)
+	if romHash == "BB359A75941DF74BF7290212C89FBC6E2C5601FE" then -- Europe
 		version = 1;
 		framebuffer_width = 292;
 		framebuffer_height = 216;
 		clip_vel = -2900;
 		Game.allowFurnaceFunPatch = false; -- TODO: FF Patch for this version
 		Game.supportsASMHacks = false; -- TODO: Research ASM hook for this version
-	elseif stringContains(romName, "Japan") then
+	elseif romHash == "90726D7E7CD5BF6CDFD38F45C9ACBF4D45BD9FD8" then -- Japan
 		version = 2;
 		Game.allowFurnaceFunPatch = false; -- TODO: FF Patch for this version
 		Game.supportsASMHacks = false; -- TODO: Research ASM hook for this version
-	elseif stringContains(romName, "USA") and stringContains(romName, "Rev A") then
+	elseif romHash == "DED6EE166E740AD1BC810FD678A84B48E245AB80" then -- USA 1.1
 		version = 3;
 		Game.allowFurnaceFunPatch = false; -- TODO: FF Patch for this version
 		Game.supportsASMHacks = false; -- TODO: Research ASM hook for this version
-	elseif stringContains(romName, "USA") then
+	elseif romHash == "1FE1632098865F639E22C11B9A81EE8F29C75D7A" then -- USA 1.0
 		version = 4;
 		Game.allowFurnaceFunPatch = true;
 		Game.supportsASMHacks = true;

@@ -907,11 +907,11 @@ end
 -- Region/Version --
 --------------------
 
-function Game.detectVersion(romName)
-	if stringContains(romName, "USA") and not stringContains(romName, "Kiosk") then
+function Game.detectVersion(romName, romHash)
+	if romHash == "CF806FF2603640A748FCA5026DED28802F1F4A50" then -- USA
 		version = 1;
 		flag_array = require("games.dk64_flags");
-	elseif stringContains(romName, "Europe") then
+	elseif romHash == "F96AF883845308106600D84E0618C1A066DC6676" then -- PAL
 		version = 2;
 		flag_array = require("games.dk64_flags");
 
@@ -929,7 +929,7 @@ function Game.detectVersion(romName)
 		jumpman_velocity = {0x03ECD8, 0x03ECDC};
 		jetman_position  = {0x022100, 0x022104};
 		jetman_velocity  = {0x022108, 0x02210C};
-	elseif stringContains(romName, "Japan") then
+	elseif romHash == "F0AD2B2BBF04D574ED7AFBB1BB6A4F0511DCD87D" then -- JPN
 		version = 3;
 		flag_array = require("games.dk64_flags_JP");
 
@@ -947,7 +947,7 @@ function Game.detectVersion(romName)
 		jumpman_velocity = {0x03EB00, 0x03EB04};
 		jetman_position  = {0x022060, 0x022064};
 		jetman_velocity  = {0x022068, 0x02206C};
-	elseif stringContains(romName, "Kiosk") then
+	elseif romHash == "B4717E602F07CA9BE0D4822813C658CD8B99F993" then -- Kiosk
 		version = 4;
 		-- flag_array = require("games.dk64_flags_Kiosk"); -- TODO: Flags?
 

@@ -6,16 +6,13 @@ ScriptHawk was designed to be modular by nature. It should be very easy to suppo
 To make writing a module easier, I have included a blank module template with stubs for these methods called "blank.lua".
 Modules must be located in the games subdirectory of the ScriptHawk folder.
 
-To decide which module is loaded I am currently using the ROM Name provided by BizHawk in a check at the top of "ScriptHawk.lua".
-I will soon be switching to using the hash of the ROM as this is less error prone.
-
 ---------------------------
 -- ScriptHawk Module API --
 ---------------------------
 
 Game -- Table containing all information and functions about a game that are visible to ScriptHawk
 
-	function Game.detectVersion(romName) -- Used to set up version specific memory addresses or flags. Should return true if the version is supported, false if not
+	function Game.detectVersion(romName, romHash) -- Used to set up version specific memory addresses or flags. Should return true if the version is supported, false if not
 
 	Game.takeMeThereType -- String: Values "Button" or "Checkbox", defaults to "Checkbox" if not present
 	Game.maps -- Table containing strings that populate the "Take Me There" dropdown box provided by ScriptHawk, ordered by in game value

@@ -10,22 +10,26 @@ local facing_angle;
 -- Region/Version --
 --------------------
 
-function Game.detectVersion(romName)
-	if stringContains(romName, "Europe") then
-		return false; -- TODO
-	elseif stringContains(romName, "Japan") then
-		return false; -- TODO
-	elseif stringContains(romName, "USA") then
-		x_pos = 0x0BB070;
-		y_pos = 0x0BB074;
-		z_pos = 0x0BB078;
+function Game.detectVersion(romName, romHash)
+	if emu.getsystemid() == "N64" then
+		if romHash == "A9F97E22391313095D2C2FBAF81FB33BFA2BA7C6" then -- France
+			-- TODO
+		elseif romHash == "92015E5254CBBAD1BC668ECB13A4B568E5F55052" then -- PAL/Europe
+			-- TODO
+		elseif romHash == "982AD2E1E44C6662C88A77367BC5DF91C51531BF" then -- USA
+			x_pos = 0x0BB070;
+			y_pos = 0x0BB074;
+			z_pos = 0x0BB078;
 
-		facing_angle = 0x0BB0B8;
-	else
-		return false;
+			facing_angle = 0x0BB0B8;
+			return true;
+		elseif romHash == "EAE83C07E2E777D8E71A5BE6120AED03D7E67782" then -- German 1.1
+			-- TODO
+		elseif romHash == "F8FBB100227015BE8629243F53D70F29A2A14315" then -- German 1.0
+			-- TODO
+		end
 	end
-
-	return true;
+	return false;
 end
 
 -------------------

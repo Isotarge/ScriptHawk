@@ -324,14 +324,14 @@ Game.Memory = {
 	["iconAddress"] = {0x11FF95, 0x120155, 0x115325, 0x11B065},
 };
 
-function Game.detectVersion(romName)
-	if stringContains(romName, "Australia") then
+function Game.detectVersion(romName, romHash)
+	if romHash == "4CA2D332F6E6B018777AFC6A8B7880B38B6DFB79" then -- Australia
 		version = 1;
-	elseif stringContains(romName, "Europe") then
+	elseif romHash == "93BF2FAC1387320AD07251CB4B64FD36BAC1D7A6" then -- Europe
 		version = 2;
-	elseif stringContains(romName, "Japan") then
+	elseif romHash == "5A5172383037D171F121790959962703BE1F373C" then -- Japan
 		version = 3;
-	elseif stringContains(romName, "USA") then
+	elseif romHash == "AF1A89E12B638B8D82CC4C085C8E01D4CBA03FB3" then -- USA
 		version = 4;
 	else
 		return false;
