@@ -48,6 +48,7 @@ Game.Memory = {
 	["obj_model2_array_pointer"] = {0x7F6000, 0x7F5F20, 0x7F6470, 0x6F4470},
 	["obj_model2_array_count"] = {0x7F6004, 0x7F5F24, 0x7F6474, nil}, -- TODO: Kiosk
 	["obj_model2_collision_linked_list_pointer"] = {0x754244, 0x74E9A4, 0x753B34, 0x6FF054},
+	["rambiBase"] = {0x744548, nil, nil, nil}, -- TODO: PAL, JP & Kiosk
 };
 
 local flag_array = {};
@@ -1376,6 +1377,32 @@ local function getFlagByName(flagName)
 		if flagName == flag_array[i]["name"] then
 			return flag_array[i];
 		end
+	end
+end
+
+----------------------------------
+-- Duplicate checking functions --
+----------------------------------
+
+local function checkDuplicatedName(flagName)
+	local count = 0;
+	local flags = {};
+	for i = 1, #flag_array do
+		if flagName == flag_array[i]["name"] then
+			count = count + 1;
+			table.insert(flags, flag_array[i]);
+		end
+	end
+	if #flags > 1 then
+		for i = 1, #flags do
+			print("Warning: Duplicate flag name found for '"..flags[i]["name"].."' at "..toHexString(flags[i]["byte"])..">"..flags[i]["bit"]);
+		end
+	end
+end
+
+function checkDuplicateFlagNames()
+	for i = 1, #flag_array do
+		checkDuplicatedName(flag_array[i]["name"]);
 	end
 end
 
@@ -3434,7 +3461,7 @@ local jetpacScores = { -- TODO: How long can these names be
 	{"AAA", 0}, -- TODO: Get some good scores with proof
 };
 
-local rambiBase = 0x744548; -- TODO: Port to all versions
+
 local scoreBase = 0;
 local nameBase = 2;
 local scoreInstanceSize = 6;
@@ -3449,9 +3476,9 @@ end
 
 function Game.setScore(index, name, score)
 	if version ~= 4 then -- TODO: Are the scores in Kiosk or nah
-		mainmemory.write_u16_be(rambiBase + index * scoreInstanceSize + scoreBase, score);
+		mainmemory.write_u16_be(Game.Memory.rambiBase[version] + index * scoreInstanceSize + scoreBase, score);
 		for i = 0, 3 do
-			mainmemory.writebyte(rambiBase + index * scoreInstanceSize + nameBase, string.byte(name, i))
+			mainmemory.writebyte(Game.Memory.rambiBase[version] + index * scoreInstanceSize + nameBase, string.byte(name, i))
 		end
 	end
 end
