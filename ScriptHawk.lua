@@ -860,6 +860,7 @@ ScriptHawkUI.form_controls["Speed Value Label"] = forms.label(ScriptHawkUI.optio
 if type(Game.maps) == "table" then
 	ScriptHawkUI.form_controls["Map Dropdown"] = forms.dropdown(ScriptHawkUI.options_form, Game.maps, ScriptHawkUI.col(0) + ScriptHawkUI.dropdown_offset, ScriptHawkUI.row(3) + ScriptHawkUI.dropdown_offset, ScriptHawkUI.col(9) + 8, ScriptHawkUI.button_height);
 	if Game.takeMeThereType == nil or Game.takeMeThereType == "Checkbox" then
+		Game.takeMeThereType = "Checkbox";
 		ScriptHawkUI.form_controls["Map Checkbox"] = forms.checkbox(ScriptHawkUI.options_form, "Take me there", ScriptHawkUI.col(0) + ScriptHawkUI.dropdown_offset, ScriptHawkUI.row(4) + ScriptHawkUI.dropdown_offset);
 	elseif Game.takeMeThereType == "Button" then
 		ScriptHawkUI.form_controls["Map Button"] = forms.button(ScriptHawkUI.options_form, "Take me there", function() Game.setMap(previous_map_value); end, ScriptHawkUI.col(0), ScriptHawkUI.row(4), ScriptHawkUI.col(4) + 10, ScriptHawkUI.button_height);
