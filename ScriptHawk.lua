@@ -741,7 +741,7 @@ function ScriptHawkUI.formatRotation(num)
 		num = 0;
 	end
 	if rotation_units == "Degrees" then
-		return ""..round(rotation_to_degrees(num), precision).."°";
+		return round(rotation_to_degrees(num), precision).."°";
 	elseif rotation_units == "Radians" then
 		return round(rotation_to_radians(num), precision);
 	end
