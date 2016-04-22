@@ -47,8 +47,8 @@ Game.maps = {
 
 -- Version order: USA, PAL, JP Shindou, JP
 Game.Memory = {
-	["x_rot"] = {0x33B19C, 0x30945C, 0x31D9EC, 0x339E2C}, -- u16_be
-	["y_rot"] = {0x33B19C, 0x30945C, 0x31D9EC, 0x339E2C}, -- u16_be -- TODO: Find
+	["x_rot"] = {0x33B19C, 0x30945C, 0x31D9EC, 0x339E2C}, -- u16_be -- TODO: Find
+	["y_rot"] = {0x33B19C, 0x30945C, 0x31D9EC, 0x339E2C}, -- u16_be
 	["z_rot"] = {0x33B19C, 0x30945C, 0x31D9EC, 0x339E2C}, -- u16_be -- TODO: Find
 	["x_pos"] = {0x33B1AC, 0x30946C, 0x31D9FC, 0x339E3C}, -- Float
 	["y_pos"] = {0x33B1B0, 0x309470, 0x31DA00, 0x339E40}, -- Float
@@ -94,9 +94,9 @@ local object_vars = {
 	[0x14] = {["Type"] = "pointer", ["Name"] = "Graphics Data", ["Description"] = "Pointer to the object's graphics data. If zero, object has no graphics"},
 	[0x18] = {["Type"] = "u16_be", ["Display"] = "binary", ["Name"] = "Graphics Enabled", ["Description"] = "Use graphics flag"},
 
-	--[0x20] = {["Type"] = "float", ["Name"] = "Unknown Float 0x20"},
-	--[0x24] = {["Type"] = "float", ["Name"] = "Unknown Float 0x24"},
-	--[0x28] = {["Type"] = "float", ["Name"] = "Unknown Float 0x28"},
+	--[0x20] = {["Type"] = "float", ["Name"] = "Unknown Float 0x20"}, -- TODO: Unknown
+	--[0x24] = {["Type"] = "float", ["Name"] = "Unknown Float 0x24"}, -- TODO: Unknown
+	--[0x28] = {["Type"] = "float", ["Name"] = "Unknown Float 0x28"}, -- TODO: Unknown
 
 	[0x2C] = {["Type"] = "float", ["Name"] = "X Scale"},
 	[0x30] = {["Type"] = "float", ["Name"] = "Y Scale"},
@@ -107,9 +107,9 @@ local object_vars = {
 	[0x3C] = {["Type"] = "pointer", ["Name"] = "Animation Data", ["Description"] = "Pointer to the object's animation data. If zero, object is not animated"},
 	[0x40] = {["Type"] = "u16_be", ["Name"] = "Animation Frame", ["Description"] = "For animated objects, current animation frame"},
 
-	--[0x54] = {["Type"] = "float", ["Name"] = "Unknown Float 0x54"},
-	--[0x58] = {["Type"] = "float", ["Name"] = "Unknown Float 0x58"},
-	--[0x5C] = {["Type"] = "float", ["Name"] = "Unknown Float 0x5C"},
+	--[0x54] = {["Type"] = "float", ["Name"] = "Unknown Float 0x54"}, -- TODO: Unknown
+	--[0x58] = {["Type"] = "float", ["Name"] = "Unknown Float 0x58"}, -- TODO: Unknown
+	--[0x5C] = {["Type"] = "float", ["Name"] = "Unknown Float 0x5C"}, -- TODO: Unknown
 
 	--[0x60] = {["Type"] = "pointer", ["Name"] = "Unknown Object Pointer 0x60", ["Description"] = "Points to an object, use is currently unknown"},
 	--[0x64] = {["Type"] = "pointer", ["Name"] = "Unknown Object Pointer 0x64", ["Description"] = "Points to an object, use is currently unknown"},
@@ -133,11 +133,15 @@ local object_vars = {
 	[0xD4] = {["Type"] = "float", ["Name"] = "Y Rotation"}, -- TODO: Getting bogus values here, are these u16_be?
 	[0xD8] = {["Type"] = "float", ["Name"] = "Z Rotation"},
 
+	--[0xE8] = {["Type"] = "float", ["Name"] = "Unknown Float 0xE8"}, -- TODO: Unknown
+
 	[0xF0] = {["Type"] = "u32_be", ["Name"] = "Appearance", ["Description"] = "Changes the appearance of the object (used by some object graphics)"},
 	[0xF4] = {["Type"] = "u32_be", ["Name"] = "Object Type", ["Description"] = "Type of object (used by some behaviours to allow for behaviour variations)"},
 	[0xF8] = {["Type"] = "float", ["Name"] = "Scale", ["Description"] = "Used by some behaviors to scale all 3 axes"},
 	[0xFC] = {["Type"] = "u32_be", ["Name"] = "Fuse Timer", ["Description"] = "Fuse timer used by Bob-omb behavior"}, -- TODO: Used for anything else?
 
+	--[0x100] = {["Type"] = "float", ["Name"] = "Unknown Float 0x100"}, -- TODO: Unknown
+	--[0x104] = {["Type"] = "float", ["Name"] = "Unknown Float 0x104"}, -- TODO: Unknown
 	[0x108] = {["Type"] = "float", ["Name"] = "Scale", ["Description"] = "Used for file select buttons to scale all 3 axes"},
 
 	[0x120] = {["Type"] = "u32_be", ["Name"] = "Animation Start Offset", ["Description"] = "Segment/offset value indicating start of animation data"},
@@ -149,11 +153,13 @@ local object_vars = {
 	[0x14C] = {["Type"] = "u32_be", ["Name"] = "Current Action (0x14C)", ["Description"] = "Used by most behaviors to remember what it's doing"},
 	[0x150] = {["Type"] = "u32_be", ["Name"] = "Current Action (0x150)", ["Description"] = "Used by some behaviors to remember what it's doing"},
 	[0x154] = {["Type"] = "u32_be", ["Name"] = "Timer", ["Description"] = "Timer used by and updated by some behaviors"},
+	--[0x15C] = {["Type"] = "float", ["Name"] = "Unknown Float 0x15C"}, -- TODO: Unknown
 
 	[0x17C] = {["Type"] = "u32_be", ["Name"] = "Transparancy", ["Description"] = "Level of transparency for object's graphics"},
 	[0x180] = {["Type"] = "u32_be", ["Name"] = "Damage", ["Description"] = "How many segments of damage to do to Mario for objects that cause him harm"},
 	[0x184] = {["Type"] = "u32_be", ["Name"] = "Health", ["Description"] = "Used by some behaviours to remember its health. Other behaviours have similar use"},
 
+	--[0x194] = {["Type"] = "float", ["Name"] = "Unknown Float 0x194"}, -- TODO: Unknown
 	[0x198] = {["Type"] = "u32_be", ["Name"] = "Coin Payout", ["Description"] = "How many coins to give, how you get the coins depends on the behaviour"},
 	[0x19C] = {["Type"] = "float", ["Name"] = "Activation Radius", ["Description"] = "Controls what distance from the camera the object becomes active?"},
 
@@ -169,15 +175,23 @@ local object_vars = {
 	[0x1F8] = {["Type"] = "float", ["Name"] = "Tree Bottom", ["Description"] = "Determines start of tree where Mario can grab before climbing"}, -- TODO: Better description
 	[0x1FC] = {["Type"] = "float", ["Name"] = "Tree Top", ["Description"] = "Determines height of tree and thus, when Mario can handstand"}, -- TODO: Better description
 
+	--[0x200] = {["Type"] = "float", ["Name"] = "Unknown Float 0x200"}, -- TODO: Unknown
+	--[0x204] = {["Type"] = "float", ["Name"] = "Unknown Float 0x204"}, -- TODO: Unknown
 	[0x20C] = {["Type"] = "pointer", ["Name"] = "Behavior Script", ["Description"] = "Pointer to start of the object's behaviour script"},
+
 	[0x214] = {["Type"] = "pointer", ["Name"] = "Standing On", ["Description"] = "Pointer to the object this object is standing on (used only by Mario?)"},
 	[0x218] = {["Type"] = "pointer", ["Name"] = "Collision Data", ["Description"] = "Pointer to collision data (as set by behaviour script command 0x2A)"},
+	--[0x21C] = {["Type"] = "float", ["Name"] = "Unknown Float 0x21C"}, -- TODO: Unknown
+
+	--[0x230] = {["Type"] = "float", ["Name"] = "Unknown Float 0x230"}, -- TODO: Unknown
+
+	--[0x244] = {["Type"] = "float", ["Name"] = "Unknown Float 0x244"}, -- TODO: Unknown
+
+	--[0x258] = {["Type"] = "float", ["Name"] = "Unknown Float 0x258"}, -- TODO: Unknown
 	--[0x25C] = {["Type"] = "pointer", ["Name"] = "Unknown Pointer 0x25C"},
 };
 
 -- TODO: Put unknowns in object_vars table somehow, probably autopopulate and have checkbox to display unknown fields
--- float: Unknown Use:
-	-- 0xE8, 0x100, 0x104, 0x15C, 0x194, 0x200, 0x204, 0x21C, 0x230, 0x244, 0x258
 -- u16_be: Unknown Use:
 	-- 0x1A, 0x42, 0x8C, 0x1F4, 0x1F6
 -- u16_be(?): Unknown Type, Unknown Use:
