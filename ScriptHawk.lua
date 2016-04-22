@@ -31,8 +31,8 @@ end
 -- UI State Table --
 --------------------
 
-ScriptHawkUI = { -- TODO: Refactor to ScriptHawk.UI
-	["form_controls"] = {}, -- TODO: Make game modules use this table for their own controls mayb? -- TODO: Detect UI position problems using this array
+ScriptHawk.UI = {
+	["form_controls"] = {}, -- TODO: Detect UI position problems using this array
 	["form_padding"] = 8,
 	["label_offset"] = 5,
 	["dropdown_offset"] = 1,
@@ -735,7 +735,7 @@ local function toggleRotationUnits()
 	end
 end
 
-function ScriptHawkUI.formatRotation(num)
+function ScriptHawk.UI.formatRotation(num)
 	num = num or 0;
 	if isnan(num) then
 		num = 0;
@@ -796,13 +796,13 @@ end
 
 local function startTelemetry()
 	collecting_telemetry = true;
-	forms.settext(ScriptHawkUI.form_controls["Toggle Telemetry Button"], "Stop Telemetry");
+	forms.settext(ScriptHawk.UI.form_controls["Toggle Telemetry Button"], "Stop Telemetry");
 	telemetryData = {};
 end
 
 local function stopTelemetry()
 	collecting_telemetry = false;
-	forms.settext(ScriptHawkUI.form_controls["Toggle Telemetry Button"], "Start Telemetry");
+	forms.settext(ScriptHawk.UI.form_controls["Toggle Telemetry Button"], "Start Telemetry");
 
 	outputTelemetry();
 	return;
@@ -833,55 +833,55 @@ end
 -- UI Code --
 -------------
 
-function ScriptHawkUI.row(row_num)
-	return round(ScriptHawkUI.form_padding + ScriptHawkUI.button_height * row_num, 0);
+function ScriptHawk.UI.row(row_num)
+	return round(ScriptHawk.UI.form_padding + ScriptHawk.UI.button_height * row_num, 0);
 end
 
-function ScriptHawkUI.col(col_num)
-	return ScriptHawkUI.row(col_num);
+function ScriptHawk.UI.col(col_num)
+	return ScriptHawk.UI.row(col_num);
 end
 
-ScriptHawkUI.options_form = forms.newform(ScriptHawkUI.col(17), ScriptHawkUI.row(10), "ScriptHawk Options");
+ScriptHawk.UI.options_form = forms.newform(ScriptHawk.UI.col(17), ScriptHawk.UI.row(10), "ScriptHawk Options");
 
 -- Handle, Type, Caption, Callback, X position, Y position, Width, Height
-ScriptHawkUI.form_controls["Mode Label"] = forms.label(ScriptHawkUI.options_form, "Mode:", ScriptHawkUI.col(0), ScriptHawkUI.row(0) + ScriptHawkUI.label_offset, 44, ScriptHawkUI.button_height);
-ScriptHawkUI.form_controls["Mode Button"] = forms.button(ScriptHawkUI.options_form, mode, toggleMode, ScriptHawkUI.col(2), ScriptHawkUI.row(0), 64, ScriptHawkUI.button_height);
+ScriptHawk.UI.form_controls["Mode Label"] = forms.label(ScriptHawk.UI.options_form, "Mode:", ScriptHawk.UI.col(0), ScriptHawk.UI.row(0) + ScriptHawk.UI.label_offset, 44, ScriptHawk.UI.button_height);
+ScriptHawk.UI.form_controls["Mode Button"] = forms.button(ScriptHawk.UI.options_form, mode, toggleMode, ScriptHawk.UI.col(2), ScriptHawk.UI.row(0), 64, ScriptHawk.UI.button_height);
 
-ScriptHawkUI.form_controls["Precision Label"] = forms.label(ScriptHawkUI.options_form, "Precision:", ScriptHawkUI.col(0), ScriptHawkUI.row(1) + ScriptHawkUI.label_offset, 54, 14);
-ScriptHawkUI.form_controls["Decrease Precision Button"] = forms.button(ScriptHawkUI.options_form, "-", decreasePrecision, ScriptHawkUI.col(4) - 28, ScriptHawkUI.row(1), ScriptHawkUI.button_height, ScriptHawkUI.button_height);
-ScriptHawkUI.form_controls["Increase Precision Button"] = forms.button(ScriptHawkUI.options_form, "+", increasePrecision, ScriptHawkUI.col(5) - 28, ScriptHawkUI.row(1), ScriptHawkUI.button_height, ScriptHawkUI.button_height);
-ScriptHawkUI.form_controls["Precision Value Label"] = forms.label(ScriptHawkUI.options_form, precision, ScriptHawkUI.col(5), ScriptHawkUI.row(1) + ScriptHawkUI.label_offset, 44, 14);
+ScriptHawk.UI.form_controls["Precision Label"] = forms.label(ScriptHawk.UI.options_form, "Precision:", ScriptHawk.UI.col(0), ScriptHawk.UI.row(1) + ScriptHawk.UI.label_offset, 54, 14);
+ScriptHawk.UI.form_controls["Decrease Precision Button"] = forms.button(ScriptHawk.UI.options_form, "-", decreasePrecision, ScriptHawk.UI.col(4) - 28, ScriptHawk.UI.row(1), ScriptHawk.UI.button_height, ScriptHawk.UI.button_height);
+ScriptHawk.UI.form_controls["Increase Precision Button"] = forms.button(ScriptHawk.UI.options_form, "+", increasePrecision, ScriptHawk.UI.col(5) - 28, ScriptHawk.UI.row(1), ScriptHawk.UI.button_height, ScriptHawk.UI.button_height);
+ScriptHawk.UI.form_controls["Precision Value Label"] = forms.label(ScriptHawk.UI.options_form, precision, ScriptHawk.UI.col(5), ScriptHawk.UI.row(1) + ScriptHawk.UI.label_offset, 44, 14);
 
-ScriptHawkUI.form_controls["Speed Label"] = forms.label(ScriptHawkUI.options_form, "Speed:", ScriptHawkUI.col(0), ScriptHawkUI.row(2) + ScriptHawkUI.label_offset, 54, 14);
-ScriptHawkUI.form_controls["Decrease Speed Button"] = forms.button(ScriptHawkUI.options_form, "-", decreaseSpeed, ScriptHawkUI.col(4) - 28, ScriptHawkUI.row(2), ScriptHawkUI.button_height, ScriptHawkUI.button_height);
-ScriptHawkUI.form_controls["Increase Speed Button"] = forms.button(ScriptHawkUI.options_form, "+", increaseSpeed, ScriptHawkUI.col(5) - 28, ScriptHawkUI.row(2), ScriptHawkUI.button_height, ScriptHawkUI.button_height);
-ScriptHawkUI.form_controls["Speed Value Label"] = forms.label(ScriptHawkUI.options_form, "0", ScriptHawkUI.col(5), ScriptHawkUI.row(2) + ScriptHawkUI.label_offset, 54, 14);
+ScriptHawk.UI.form_controls["Speed Label"] = forms.label(ScriptHawk.UI.options_form, "Speed:", ScriptHawk.UI.col(0), ScriptHawk.UI.row(2) + ScriptHawk.UI.label_offset, 54, 14);
+ScriptHawk.UI.form_controls["Decrease Speed Button"] = forms.button(ScriptHawk.UI.options_form, "-", decreaseSpeed, ScriptHawk.UI.col(4) - 28, ScriptHawk.UI.row(2), ScriptHawk.UI.button_height, ScriptHawk.UI.button_height);
+ScriptHawk.UI.form_controls["Increase Speed Button"] = forms.button(ScriptHawk.UI.options_form, "+", increaseSpeed, ScriptHawk.UI.col(5) - 28, ScriptHawk.UI.row(2), ScriptHawk.UI.button_height, ScriptHawk.UI.button_height);
+ScriptHawk.UI.form_controls["Speed Value Label"] = forms.label(ScriptHawk.UI.options_form, "0", ScriptHawk.UI.col(5), ScriptHawk.UI.row(2) + ScriptHawk.UI.label_offset, 54, 14);
 
 if type(Game.maps) == "table" then
-	ScriptHawkUI.form_controls["Map Dropdown"] = forms.dropdown(ScriptHawkUI.options_form, Game.maps, ScriptHawkUI.col(0) + ScriptHawkUI.dropdown_offset, ScriptHawkUI.row(3) + ScriptHawkUI.dropdown_offset, ScriptHawkUI.col(9) + 8, ScriptHawkUI.button_height);
+	ScriptHawk.UI.form_controls["Map Dropdown"] = forms.dropdown(ScriptHawk.UI.options_form, Game.maps, ScriptHawk.UI.col(0) + ScriptHawk.UI.dropdown_offset, ScriptHawk.UI.row(3) + ScriptHawk.UI.dropdown_offset, ScriptHawk.UI.col(9) + 8, ScriptHawk.UI.button_height);
 	if Game.takeMeThereType == nil or Game.takeMeThereType == "Checkbox" then
 		Game.takeMeThereType = "Checkbox";
-		ScriptHawkUI.form_controls["Map Checkbox"] = forms.checkbox(ScriptHawkUI.options_form, "Take me there", ScriptHawkUI.col(0) + ScriptHawkUI.dropdown_offset, ScriptHawkUI.row(4) + ScriptHawkUI.dropdown_offset);
+		ScriptHawk.UI.form_controls["Map Checkbox"] = forms.checkbox(ScriptHawk.UI.options_form, "Take me there", ScriptHawk.UI.col(0) + ScriptHawk.UI.dropdown_offset, ScriptHawk.UI.row(4) + ScriptHawk.UI.dropdown_offset);
 	elseif Game.takeMeThereType == "Button" then
-		ScriptHawkUI.form_controls["Map Button"] = forms.button(ScriptHawkUI.options_form, "Take me there", function() Game.setMap(previous_map_value); end, ScriptHawkUI.col(0), ScriptHawkUI.row(4), ScriptHawkUI.col(4) + 10, ScriptHawkUI.button_height);
+		ScriptHawk.UI.form_controls["Map Button"] = forms.button(ScriptHawk.UI.options_form, "Take me there", function() Game.setMap(previous_map_value); end, ScriptHawk.UI.col(0), ScriptHawk.UI.row(4), ScriptHawk.UI.col(4) + 10, ScriptHawk.UI.button_height);
 	end
 end
 
-ScriptHawkUI.form_controls["Toggle Telemetry Button"] = forms.button(ScriptHawkUI.options_form, "Start Telemetry", toggleTelemetry, ScriptHawkUI.col(10), ScriptHawkUI.row(3), ScriptHawkUI.col(4) + 10, ScriptHawkUI.button_height);
+ScriptHawk.UI.form_controls["Toggle Telemetry Button"] = forms.button(ScriptHawk.UI.options_form, "Start Telemetry", toggleTelemetry, ScriptHawk.UI.col(10), ScriptHawk.UI.row(3), ScriptHawk.UI.col(4) + 10, ScriptHawk.UI.button_height);
 
 if type(Game.applyInfinites) == "function" then
-	ScriptHawkUI.form_controls["Toggle Infinites Checkbox"] = forms.checkbox(ScriptHawkUI.options_form, "Infinites", ScriptHawkUI.col(0) + ScriptHawkUI.dropdown_offset, ScriptHawkUI.row(5) + ScriptHawkUI.dropdown_offset);
+	ScriptHawk.UI.form_controls["Toggle Infinites Checkbox"] = forms.checkbox(ScriptHawk.UI.options_form, "Infinites", ScriptHawk.UI.col(0) + ScriptHawk.UI.dropdown_offset, ScriptHawk.UI.row(5) + ScriptHawk.UI.dropdown_offset);
 end
 
-ScriptHawkUI.form_controls["Rotation Units Label"] = forms.label(ScriptHawkUI.options_form, "Units:", ScriptHawkUI.col(5), ScriptHawkUI.row(0) + ScriptHawkUI.label_offset, 44, 14);
-ScriptHawkUI.form_controls["Toggle Rotation Units Button"] = forms.button(ScriptHawkUI.options_form, rotation_units, toggleRotationUnits, ScriptHawkUI.col(7), ScriptHawkUI.row(0), 64, ScriptHawkUI.button_height);
+ScriptHawk.UI.form_controls["Rotation Units Label"] = forms.label(ScriptHawk.UI.options_form, "Units:", ScriptHawk.UI.col(5), ScriptHawk.UI.row(0) + ScriptHawk.UI.label_offset, 44, 14);
+ScriptHawk.UI.form_controls["Toggle Rotation Units Button"] = forms.button(ScriptHawk.UI.options_form, rotation_units, toggleRotationUnits, ScriptHawk.UI.col(7), ScriptHawk.UI.row(0), 64, ScriptHawk.UI.button_height);
 
 -- Init any custom UI that the game module uses
 if type(Game.initUI) == "function" then
 	Game.initUI();
 end
 
-function ScriptHawkUI.findMapValue()
+function ScriptHawk.UI.findMapValue()
 	if type(Game.maps) == "table" then
 		for i = 1, #Game.maps do
 			if Game.maps[i] == previous_map then
@@ -927,15 +927,15 @@ local angleKeywords = {
 	"Facing", "Moving", "Angle"
 };
 
-function ScriptHawkUI.updateReadouts()
+function ScriptHawk.UI.updateReadouts()
 	-- Update form buttons etc
-	forms.settext(ScriptHawkUI.form_controls["Speed Value Label"], Game.speedy_speeds[Game.speedy_index]);
-	forms.settext(ScriptHawkUI.form_controls["Precision Value Label"], precision);
-	forms.settext(ScriptHawkUI.form_controls["Mode Button"], mode);
-	forms.settext(ScriptHawkUI.form_controls["Toggle Rotation Units Button"], rotation_units);
-	if type(Game.maps) == "table" and previous_map ~= forms.gettext(ScriptHawkUI.form_controls["Map Dropdown"]) then
-		previous_map = forms.gettext(ScriptHawkUI.form_controls["Map Dropdown"]);
-		previous_map_value = ScriptHawkUI.findMapValue();
+	forms.settext(ScriptHawk.UI.form_controls["Speed Value Label"], Game.speedy_speeds[Game.speedy_index]);
+	forms.settext(ScriptHawk.UI.form_controls["Precision Value Label"], precision);
+	forms.settext(ScriptHawk.UI.form_controls["Mode Button"], mode);
+	forms.settext(ScriptHawk.UI.form_controls["Toggle Rotation Units Button"], rotation_units);
+	if type(Game.maps) == "table" and previous_map ~= forms.gettext(ScriptHawk.UI.form_controls["Map Dropdown"]) then
+		previous_map = forms.gettext(ScriptHawk.UI.form_controls["Map Dropdown"]);
+		previous_map_value = ScriptHawk.UI.findMapValue();
 	end
 
 	-- Draw OSD
@@ -980,7 +980,7 @@ function ScriptHawkUI.updateReadouts()
 			-- Detect and format rotation based on a keyword search
 			for j = 1, #angleKeywords do
 				if label == angleKeywords[j] then
-					value = ScriptHawkUI.formatRotation(value);
+					value = ScriptHawk.UI.formatRotation(value);
 				end
 			end
 
@@ -1101,11 +1101,11 @@ local function mainloop()
 		end
 	end
 
-	if ScriptHawkUI.form_controls["Toggle Infinites Checkbox"] ~= nil and forms.ischecked(ScriptHawkUI.form_controls["Toggle Infinites Checkbox"]) then
+	if ScriptHawk.UI.form_controls["Toggle Infinites Checkbox"] ~= nil and forms.ischecked(ScriptHawk.UI.form_controls["Toggle Infinites Checkbox"]) then
 		Game.applyInfinites();
 	end
 
-	if type(Game.maps) == "table" and Game.takeMeThereType == "Checkbox" and forms.ischecked(ScriptHawkUI.form_controls["Map Checkbox"]) then
+	if type(Game.maps) == "table" and Game.takeMeThereType == "Checkbox" and forms.ischecked(ScriptHawk.UI.form_controls["Map Checkbox"]) then
 		Game.setMap(previous_map_value);
 	end
 end
@@ -1211,7 +1211,7 @@ local function plot_pos()
 					-- Detect and format rotation based on a keyword search
 					for j = 1, #angleKeywords do
 						if label == angleKeywords[j] then
-							value = ScriptHawkUI.formatRotation(value);
+							value = ScriptHawk.UI.formatRotation(value);
 						end
 					end
 
@@ -1248,7 +1248,7 @@ ScriptHawk.bindKeyRealtime("Slash", ScriptHawk.resetMax, true);
 
 while true do
 	gui.cleartext();
-	ScriptHawkUI.updateReadouts();
+	ScriptHawk.UI.updateReadouts();
 	ScriptHawk.processKeybinds(ScriptHawk.keybindsRealtime);
 	ScriptHawk.processJoypadBinds(ScriptHawk.joypadBindsRealtime);
 	if type(Game.realTime) == "function" then

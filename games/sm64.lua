@@ -245,8 +245,8 @@ function getExamineData(objectBase)
 end
 
 function drawObjectViewerOSD()
-	forms.settext(ScriptHawkUI.form_controls["Object Index Label"], "Index: "..objectIndex);
-	if forms.ischecked(ScriptHawkUI.form_controls["Enable Object Analyzer"]) then
+	forms.settext(ScriptHawk.UI.form_controls["Object Index Label"], "Index: "..objectIndex);
+	if forms.ischecked(ScriptHawk.UI.form_controls["Enable Object Analyzer"]) then
 		local gui_x = 2;
 		local gui_y = 2;
 		local row = 0;
@@ -268,7 +268,7 @@ function drawObjectViewerOSD()
 end
 
 function incrementObjectIndex()
-	if forms.ischecked(ScriptHawkUI.form_controls["Enable Object Analyzer"]) then
+	if forms.ischecked(ScriptHawk.UI.form_controls["Enable Object Analyzer"]) then
 		objectIndex = objectIndex + 1;
 		if objectIndex >= numObjects then
 			objectIndex = 0;
@@ -277,7 +277,7 @@ function incrementObjectIndex()
 end
 
 function decrementObjectIndex()
-	if forms.ischecked(ScriptHawkUI.form_controls["Enable Object Analyzer"]) then
+	if forms.ischecked(ScriptHawk.UI.form_controls["Enable Object Analyzer"]) then
 		objectIndex = objectIndex - 1;
 		if objectIndex < 0 then
 			objectIndex = numObjects;
@@ -286,7 +286,7 @@ function decrementObjectIndex()
 end
 
 function zipToSelectedObject()
-	if forms.ischecked(ScriptHawkUI.form_controls["Enable Object Analyzer"]) then
+	if forms.ischecked(ScriptHawk.UI.form_controls["Enable Object Analyzer"]) then
 		local objectBase = Game.Memory.object_list[version] + objectIndex * objectSize;
 
 		local objectX = mainmemory.readfloat(objectBase + 0xA0, true);
@@ -393,10 +393,10 @@ function Game.setMap(value)
 end
 
 function Game.initUI()
-	ScriptHawkUI.form_controls["Enable Object Analyzer"] = forms.checkbox(ScriptHawkUI.options_form, "Object Analyzer", ScriptHawkUI.col(10) + ScriptHawkUI.dropdown_offset, ScriptHawkUI.row(6) + ScriptHawkUI.dropdown_offset);
-	ScriptHawkUI.form_controls["Decrement Object Index"] = forms.button(ScriptHawkUI.options_form, "-", decrementObjectIndex, ScriptHawkUI.col(13) - 7, ScriptHawkUI.row(7), ScriptHawkUI.button_height, ScriptHawkUI.button_height);
-	ScriptHawkUI.form_controls["Increment Object Index"] = forms.button(ScriptHawkUI.options_form, "+", incrementObjectIndex, ScriptHawkUI.col(13) + ScriptHawkUI.button_height - 7, ScriptHawkUI.row(7), ScriptHawkUI.button_height, ScriptHawkUI.button_height);
-	ScriptHawkUI.form_controls["Object Index Label"] = forms.label(ScriptHawkUI.options_form, "Index: 0", ScriptHawkUI.col(8) + ScriptHawkUI.button_height + 21, ScriptHawkUI.row(7) + ScriptHawkUI.label_offset, 64, 14);
+	ScriptHawk.UI.form_controls["Enable Object Analyzer"] = forms.checkbox(ScriptHawk.UI.options_form, "Object Analyzer", ScriptHawk.UI.col(10) + ScriptHawk.UI.dropdown_offset, ScriptHawk.UI.row(6) + ScriptHawk.UI.dropdown_offset);
+	ScriptHawk.UI.form_controls["Decrement Object Index"] = forms.button(ScriptHawk.UI.options_form, "-", decrementObjectIndex, ScriptHawk.UI.col(13) - 7, ScriptHawk.UI.row(7), ScriptHawk.UI.button_height, ScriptHawk.UI.button_height);
+	ScriptHawk.UI.form_controls["Increment Object Index"] = forms.button(ScriptHawk.UI.options_form, "+", incrementObjectIndex, ScriptHawk.UI.col(13) + ScriptHawk.UI.button_height - 7, ScriptHawk.UI.row(7), ScriptHawk.UI.button_height, ScriptHawk.UI.button_height);
+	ScriptHawk.UI.form_controls["Object Index Label"] = forms.label(ScriptHawk.UI.options_form, "Index: 0", ScriptHawk.UI.col(8) + ScriptHawk.UI.button_height + 21, ScriptHawk.UI.row(7) + ScriptHawk.UI.label_offset, 64, 14);
 end
 
 ScriptHawk.bindKeyRealtime("Z", zipToSelectedObject, true);

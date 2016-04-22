@@ -128,12 +128,12 @@ end
 local labelValue = 0;
 function Game.initUI() -- Optional: Init any UI state here, mainly useful for setting up your form controls. Runs once at startup after successful version detection.
 	-- Here are some examples for the most common UI control types
-	ScriptHawkUI.form_controls["Example Dropdown"] = forms.dropdown(ScriptHawkUI.options_form, {"Option 1", "Option 2", "Option 3"}, ScriptHawkUI.col(0) + ScriptHawkUI.dropdown_offset, ScriptHawkUI.row(7) + ScriptHawkUI.dropdown_offset, ScriptHawkUI.col(9) + 7, ScriptHawkUI.button_height);
-	ScriptHawkUI.form_controls["Example Button"] = forms.button(ScriptHawkUI.options_form, "Label", flagSetButtonHandler, ScriptHawkUI.col(10), ScriptHawkUI.row(7), 59, ScriptHawkUI.button_height);
-	ScriptHawkUI.form_controls["Example Plus Button"] = forms.button(ScriptHawkUI.options_form, "-", function() labelValue = labelValue + 1 end, ScriptHawkUI.col(13) - 7, ScriptHawkUI.row(6), ScriptHawkUI.button_height, ScriptHawkUI.button_height);
-	ScriptHawkUI.form_controls["Example Minus Button"] = forms.button(ScriptHawkUI.options_form, "+", function() labelValue = labelValue - 1 end, ScriptHawkUI.col(13) + ScriptHawkUI.button_height - 7, ScriptHawkUI.row(6), ScriptHawkUI.button_height, ScriptHawkUI.button_height);
-	ScriptHawkUI.form_controls["Example Value Label"] = forms.label(ScriptHawkUI.options_form, "0", ScriptHawkUI.col(13) + ScriptHawkUI.button_height + 21, ScriptHawkUI.row(6) + ScriptHawkUI.label_offset, 54, 14);
-	ScriptHawkUI.form_controls["Example Checkbox"] = forms.checkbox(ScriptHawkUI.options_form, "Label", ScriptHawkUI.col(10) + ScriptHawkUI.dropdown_offset, ScriptHawkUI.row(6) + ScriptHawkUI.dropdown_offset);
+	ScriptHawk.UI.form_controls["Example Dropdown"] = forms.dropdown(ScriptHawk.UI.options_form, {"Option 1", "Option 2", "Option 3"}, ScriptHawk.UI.col(0) + ScriptHawk.UI.dropdown_offset, ScriptHawk.UI.row(7) + ScriptHawk.UI.dropdown_offset, ScriptHawk.UI.col(9) + 7, ScriptHawk.UI.button_height);
+	ScriptHawk.UI.form_controls["Example Button"] = forms.button(ScriptHawk.UI.options_form, "Label", flagSetButtonHandler, ScriptHawk.UI.col(10), ScriptHawk.UI.row(7), 59, ScriptHawk.UI.button_height);
+	ScriptHawk.UI.form_controls["Example Plus Button"] = forms.button(ScriptHawk.UI.options_form, "-", function() labelValue = labelValue + 1 end, ScriptHawk.UI.col(13) - 7, ScriptHawk.UI.row(6), ScriptHawk.UI.button_height, ScriptHawk.UI.button_height);
+	ScriptHawk.UI.form_controls["Example Minus Button"] = forms.button(ScriptHawk.UI.options_form, "+", function() labelValue = labelValue - 1 end, ScriptHawk.UI.col(13) + ScriptHawk.UI.button_height - 7, ScriptHawk.UI.row(6), ScriptHawk.UI.button_height, ScriptHawk.UI.button_height);
+	ScriptHawk.UI.form_controls["Example Value Label"] = forms.label(ScriptHawk.UI.options_form, "0", ScriptHawk.UI.col(13) + ScriptHawk.UI.button_height + 21, ScriptHawk.UI.row(6) + ScriptHawk.UI.label_offset, 54, 14);
+	ScriptHawk.UI.form_controls["Example Checkbox"] = forms.checkbox(ScriptHawk.UI.options_form, "Label", ScriptHawk.UI.col(10) + ScriptHawk.UI.dropdown_offset, ScriptHawk.UI.row(6) + ScriptHawk.UI.dropdown_offset);
 end
 
 function Game.eachFrame() -- Optional: This function will be executed once per frame
@@ -141,7 +141,7 @@ function Game.eachFrame() -- Optional: This function will be executed once per f
 end
 
 function Game.realTime() -- Optional: This function will be executed as fast as possible, useful for OSD/UI that needs to be updated while emulation is paused
-	forms.settext(ScriptHawkUI.form_controls["Example Value Label"], labelValue);
+	forms.settext(ScriptHawk.UI.form_controls["Example Value Label"], labelValue);
 end
 
 Game.OSDPosition = {2, 70}; -- Optional: OSD position in pixels from the top left corner of the screen, defaults to 2, 70 if not set by a game module

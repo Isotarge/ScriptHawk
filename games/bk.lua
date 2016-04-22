@@ -275,7 +275,7 @@ function Game.getSlopeTimer()
 end
 
 function Game.colorSlopeTimer()
-	if forms.ischecked(ScriptHawkUI.form_controls.toggle_neverslip) then
+	if forms.ischecked(ScriptHawk.UI.form_controls.toggle_neverslip) then
 		return 0xFF00FFFF; -- Light blue
 	end
 	local slopeTimer = Game.getSlopeTimer();
@@ -297,7 +297,7 @@ local move_levels = {
 };
 
 local function unlock_moves()
-	local level = forms.gettext(ScriptHawkUI.form_controls.moves_dropdown);
+	local level = forms.gettext(ScriptHawk.UI.form_controls.moves_dropdown);
 	mainmemory.write_u32_be(Game.Memory.moves_bitfield[version], move_levels[level]);
 end
 
@@ -488,7 +488,7 @@ local holdingAPostJump = false;
 allowPound = false;
 allowTTrotJump = true;
 function autoPound()
-	if forms.ischecked(ScriptHawkUI.form_controls.autopound_checkbox) then
+	if forms.ischecked(ScriptHawk.UI.form_controls.autopound_checkbox) then
 		local currentMovementState = mainmemory.read_u32_be(Game.Memory.current_movement_state[version]);
 		local YVelocity = Game.getYVelocity();
 
@@ -616,7 +616,7 @@ end
 -----------------------
 
 local function applyFurnaceFunPatch() -- TODO: Can we just read the FF bytes from EEPROM?
-	if Game.allowFurnaceFunPatch and forms.ischecked(ScriptHawkUI.form_controls.allow_ff_patch) then
+	if Game.allowFurnaceFunPatch and forms.ischecked(ScriptHawk.UI.form_controls.allow_ff_patch) then
 		mainmemory.write_u16_be(0x320064, 0x080A);
 		mainmemory.write_u16_be(0x320066, 0x1840);
 
@@ -879,7 +879,7 @@ local function encircle_banjo()
 	num_slots = get_num_slots();
 
 	radius = 1000;
-	if forms.ischecked(ScriptHawkUI.form_controls.dynamic_radius_checkbox) then
+	if forms.ischecked(ScriptHawk.UI.form_controls.dynamic_radius_checkbox) then
 		radius = num_slots * dynamic_radius_factor;
 	end
 
@@ -1065,8 +1065,8 @@ end
 
 function freezeClipVelocity()
 	local inputs = joypad.getimmediate();
-	-- if not forms.ischecked(ScriptHawkUI.form_controls.freeze_clip_velocity) or inputs["P1 L"] or inputs["P1 A"] then
-	if not forms.ischecked(ScriptHawkUI.form_controls.freeze_clip_velocity) or inputs["P1 L"] then -- TODO: Less hacky method of detecting moonjump lol
+	-- if not forms.ischecked(ScriptHawk.UI.form_controls.freeze_clip_velocity) or inputs["P1 L"] or inputs["P1 A"] then
+	if not forms.ischecked(ScriptHawk.UI.form_controls.freeze_clip_velocity) or inputs["P1 L"] then -- TODO: Less hacky method of detecting moonjump lol
 		return;
 	end
 
@@ -1131,7 +1131,7 @@ function spawnActor(id)
 	end
 	if spawnerEnabled then
 		if type(id) == 'nil' then
-			id = getActorID(forms.gettext(ScriptHawkUI.form_controls.actor_dropdown));
+			id = getActorID(forms.gettext(ScriptHawk.UI.form_controls.actor_dropdown));
 		end
 		updateActorSpawnPosition();
 		mainmemory.write_u16_be(spawnActorFlag, 1);
@@ -1175,28 +1175,28 @@ function Game.applyInfinites()
 end
 
 function Game.initUI()
-	ScriptHawkUI.form_controls.toggle_neverslip = forms.checkbox(ScriptHawkUI.options_form, "Never Slip", ScriptHawkUI.col(0) + ScriptHawkUI.dropdown_offset, ScriptHawkUI.row(6) + ScriptHawkUI.dropdown_offset);
+	ScriptHawk.UI.form_controls.toggle_neverslip = forms.checkbox(ScriptHawk.UI.options_form, "Never Slip", ScriptHawk.UI.col(0) + ScriptHawk.UI.dropdown_offset, ScriptHawk.UI.row(6) + ScriptHawk.UI.dropdown_offset);
 	if Game.allowFurnaceFunPatch then
-		ScriptHawkUI.form_controls.allow_ff_patch = forms.checkbox(ScriptHawkUI.options_form, "Allow FF patch", ScriptHawkUI.col(0) + ScriptHawkUI.dropdown_offset, ScriptHawkUI.row(7) + ScriptHawkUI.dropdown_offset);
+		ScriptHawk.UI.form_controls.allow_ff_patch = forms.checkbox(ScriptHawk.UI.options_form, "Allow FF patch", ScriptHawk.UI.col(0) + ScriptHawk.UI.dropdown_offset, ScriptHawk.UI.row(7) + ScriptHawk.UI.dropdown_offset);
 	end
 
-	ScriptHawkUI.form_controls.encircle_checkbox = forms.checkbox(ScriptHawkUI.options_form, "Encircle (Beta)", ScriptHawkUI.col(5) + ScriptHawkUI.dropdown_offset, ScriptHawkUI.row(4) + ScriptHawkUI.dropdown_offset);
-	ScriptHawkUI.form_controls.dynamic_radius_checkbox = forms.checkbox(ScriptHawkUI.options_form, "Dynamic Radius", ScriptHawkUI.col(5) + ScriptHawkUI.dropdown_offset, ScriptHawkUI.row(5) + ScriptHawkUI.dropdown_offset);
-	ScriptHawkUI.form_controls.freeze_clip_velocity = forms.checkbox(ScriptHawkUI.options_form, "Freeze Clip Vel.", ScriptHawkUI.col(5) + ScriptHawkUI.dropdown_offset, ScriptHawkUI.row(6) + ScriptHawkUI.dropdown_offset);
-	ScriptHawkUI.form_controls.autopound_checkbox = forms.checkbox(ScriptHawkUI.options_form, "Auto Pound", ScriptHawkUI.col(10) + ScriptHawkUI.dropdown_offset, ScriptHawkUI.row(6) + ScriptHawkUI.dropdown_offset);
+	ScriptHawk.UI.form_controls.encircle_checkbox = forms.checkbox(ScriptHawk.UI.options_form, "Encircle (Beta)", ScriptHawk.UI.col(5) + ScriptHawk.UI.dropdown_offset, ScriptHawk.UI.row(4) + ScriptHawk.UI.dropdown_offset);
+	ScriptHawk.UI.form_controls.dynamic_radius_checkbox = forms.checkbox(ScriptHawk.UI.options_form, "Dynamic Radius", ScriptHawk.UI.col(5) + ScriptHawk.UI.dropdown_offset, ScriptHawk.UI.row(5) + ScriptHawk.UI.dropdown_offset);
+	ScriptHawk.UI.form_controls.freeze_clip_velocity = forms.checkbox(ScriptHawk.UI.options_form, "Freeze Clip Vel.", ScriptHawk.UI.col(5) + ScriptHawk.UI.dropdown_offset, ScriptHawk.UI.row(6) + ScriptHawk.UI.dropdown_offset);
+	ScriptHawk.UI.form_controls.autopound_checkbox = forms.checkbox(ScriptHawk.UI.options_form, "Auto Pound", ScriptHawk.UI.col(10) + ScriptHawk.UI.dropdown_offset, ScriptHawk.UI.row(6) + ScriptHawk.UI.dropdown_offset);
 
 	-- Actor spawner
-	ScriptHawkUI.form_controls.actor_dropdown = forms.dropdown(ScriptHawkUI.options_form, actorNames, ScriptHawkUI.col(10) + ScriptHawkUI.dropdown_offset, ScriptHawkUI.row(0) + ScriptHawkUI.dropdown_offset);
-	ScriptHawkUI.form_controls.spawn_actor_button = forms.button(ScriptHawkUI.options_form, "Spawn", spawnActor, ScriptHawkUI.col(10), ScriptHawkUI.row(1), ScriptHawkUI.col(2), ScriptHawkUI.button_height);
+	ScriptHawk.UI.form_controls.actor_dropdown = forms.dropdown(ScriptHawk.UI.options_form, actorNames, ScriptHawk.UI.col(10) + ScriptHawk.UI.dropdown_offset, ScriptHawk.UI.row(0) + ScriptHawk.UI.dropdown_offset);
+	ScriptHawk.UI.form_controls.spawn_actor_button = forms.button(ScriptHawk.UI.options_form, "Spawn", spawnActor, ScriptHawk.UI.col(10), ScriptHawk.UI.row(1), ScriptHawk.UI.col(2), ScriptHawk.UI.button_height);
 
 	-- Vile
-	ScriptHawkUI.form_controls.wave_button =     forms.button(ScriptHawkUI.options_form, "Wave", initWave,         ScriptHawkUI.col(10), ScriptHawkUI.row(4), ScriptHawkUI.col(2), ScriptHawkUI.button_height);
-	ScriptHawkUI.form_controls.heart_button =    forms.button(ScriptHawkUI.options_form, "Heart", doHeart,         ScriptHawkUI.col(12) + 8, ScriptHawkUI.row(4), ScriptHawkUI.col(2), ScriptHawkUI.button_height);
-	ScriptHawkUI.form_controls.fire_all_button = forms.button(ScriptHawkUI.options_form, "Fire all", fireAllSlots, ScriptHawkUI.col(10), ScriptHawkUI.row(5), ScriptHawkUI.col(4) + 8, ScriptHawkUI.button_height);
+	ScriptHawk.UI.form_controls.wave_button =     forms.button(ScriptHawk.UI.options_form, "Wave", initWave,         ScriptHawk.UI.col(10), ScriptHawk.UI.row(4), ScriptHawk.UI.col(2), ScriptHawk.UI.button_height);
+	ScriptHawk.UI.form_controls.heart_button =    forms.button(ScriptHawk.UI.options_form, "Heart", doHeart,         ScriptHawk.UI.col(12) + 8, ScriptHawk.UI.row(4), ScriptHawk.UI.col(2), ScriptHawk.UI.button_height);
+	ScriptHawk.UI.form_controls.fire_all_button = forms.button(ScriptHawk.UI.options_form, "Fire all", fireAllSlots, ScriptHawk.UI.col(10), ScriptHawk.UI.row(5), ScriptHawk.UI.col(4) + 8, ScriptHawk.UI.button_height);
 
 	-- Moves
-	ScriptHawkUI.form_controls.moves_dropdown = forms.dropdown(ScriptHawkUI.options_form, { "0. None", "1. Spiral Mountain 100%", "2. FFM Setup", "3. All", "3. Demo" }, ScriptHawkUI.col(10) + ScriptHawkUI.dropdown_offset, ScriptHawkUI.row(7) + ScriptHawkUI.dropdown_offset);
-	ScriptHawkUI.form_controls.moves_button = forms.button(ScriptHawkUI.options_form, "Unlock Moves", unlock_moves, ScriptHawkUI.col(5), ScriptHawkUI.row(7), ScriptHawkUI.col(4) + 8, ScriptHawkUI.button_height);
+	ScriptHawk.UI.form_controls.moves_dropdown = forms.dropdown(ScriptHawk.UI.options_form, { "0. None", "1. Spiral Mountain 100%", "2. FFM Setup", "3. All", "3. Demo" }, ScriptHawk.UI.col(10) + ScriptHawk.UI.dropdown_offset, ScriptHawk.UI.row(7) + ScriptHawk.UI.dropdown_offset);
+	ScriptHawk.UI.form_controls.moves_button = forms.button(ScriptHawk.UI.options_form, "Unlock Moves", unlock_moves, ScriptHawk.UI.col(5), ScriptHawk.UI.row(7), ScriptHawk.UI.col(4) + 8, ScriptHawk.UI.button_height);
 end
 
 function Game.eachFrame()
@@ -1204,11 +1204,11 @@ function Game.eachFrame()
 	updateWave();
 	freezeClipVelocity();
 
-	if forms.ischecked(ScriptHawkUI.form_controls.toggle_neverslip) then
+	if forms.ischecked(ScriptHawk.UI.form_controls.toggle_neverslip) then
 		neverSlip();
 	end
 
-	if forms.ischecked(ScriptHawkUI.form_controls.encircle_checkbox) then
+	if forms.ischecked(ScriptHawk.UI.form_controls.encircle_checkbox) then
 		encircle_banjo();
 	end
 

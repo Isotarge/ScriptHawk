@@ -673,7 +673,7 @@ function Game.getSlopeTimer()
 end
 
 function Game.colorSlopeTimer()
-	if forms.ischecked(ScriptHawkUI.form_controls.toggle_neverslip) then
+	if forms.ischecked(ScriptHawk.UI.form_controls.toggle_neverslip) then
 		return 0xFF00FFFF; -- Light blue
 	end
 	local slopeTimer = Game.getSlopeTimer();
@@ -693,7 +693,7 @@ local move_levels = {
 };
 
 local function unlock_moves()
-	local level = forms.gettext(ScriptHawkUI.form_controls.moves_dropdown);
+	local level = forms.gettext(ScriptHawk.UI.form_controls.moves_dropdown);
 	local movesObject = dereferencePointer(Game.Memory.moves_pointer[version]);
 	if isRDRAM(movesObject) then
 		mainmemory.write_u32_be(movesObject + 0x18, move_levels[level][1]);
@@ -793,15 +793,15 @@ function Game.applyInfinites()
 end
 
 function Game.initUI()
-	ScriptHawkUI.form_controls.toggle_neverslip = forms.checkbox(ScriptHawkUI.options_form, "Never Slip", ScriptHawkUI.col(0) + ScriptHawkUI.dropdown_offset, ScriptHawkUI.row(6) + ScriptHawkUI.dropdown_offset);
+	ScriptHawk.UI.form_controls.toggle_neverslip = forms.checkbox(ScriptHawk.UI.options_form, "Never Slip", ScriptHawk.UI.col(0) + ScriptHawk.UI.dropdown_offset, ScriptHawk.UI.row(6) + ScriptHawk.UI.dropdown_offset);
 
 	-- Moves
-	ScriptHawkUI.form_controls.moves_dropdown = forms.dropdown(ScriptHawkUI.options_form, { "0. None", "1. All", "2. All + Dragon Kazooie" }, ScriptHawkUI.col(10) + ScriptHawkUI.dropdown_offset, ScriptHawkUI.row(7) + ScriptHawkUI.dropdown_offset);
-	ScriptHawkUI.form_controls.moves_button = forms.button(ScriptHawkUI.options_form, "Unlock Moves", unlock_moves, ScriptHawkUI.col(5), ScriptHawkUI.row(7), ScriptHawkUI.col(4) + 10, ScriptHawkUI.button_height);
+	ScriptHawk.UI.form_controls.moves_dropdown = forms.dropdown(ScriptHawk.UI.options_form, { "0. None", "1. All", "2. All + Dragon Kazooie" }, ScriptHawk.UI.col(10) + ScriptHawk.UI.dropdown_offset, ScriptHawk.UI.row(7) + ScriptHawk.UI.dropdown_offset);
+	ScriptHawk.UI.form_controls.moves_button = forms.button(ScriptHawk.UI.options_form, "Unlock Moves", unlock_moves, ScriptHawk.UI.col(5), ScriptHawk.UI.row(7), ScriptHawk.UI.col(4) + 10, ScriptHawk.UI.button_height);
 end
 
 function Game.eachFrame()
-	if forms.ischecked(ScriptHawkUI.form_controls.toggle_neverslip) then
+	if forms.ischecked(ScriptHawk.UI.form_controls.toggle_neverslip) then
 		neverSlip();
 	end
 end
