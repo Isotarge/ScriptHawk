@@ -45,7 +45,7 @@ Game.maps = {
 -- Region/Version --
 --------------------
 
--- Version order: USA, PAL, JP Shindou, JP
+-- Version order: USA, Europe, Japan Shindou, Japan
 Game.Memory = {
 	["x_rot"] = {0x33B19C, 0x30945C, 0x31D9EC, 0x339E2C}, -- u16_be -- TODO: Find
 	["y_rot"] = {0x33B19C, 0x30945C, 0x31D9EC, 0x339E2C}, -- u16_be

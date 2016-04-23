@@ -204,7 +204,7 @@ Game.maps = {
 	"Intro - Grunty Threat 2"
 };
 
--- Version order: PAL, JP, US 1.1, US 1.0
+-- Version order: Europe, Japan, US 1.1, US 1.0
 Game.Memory = {
 	["fb_pointer"] = {0x282E00, 0x281E20, 0x281E20, 0x282FE0},
 	["frame_timer"] = {0x280700, 0x27F718, 0x27F718, 0x2808D8},

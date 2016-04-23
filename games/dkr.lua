@@ -150,7 +150,7 @@ Game.maps = {
 -- Region/Version --
 --------------------
 
--- Version order: PAL 1.1, PAL 1.0, JP, US 1.1, US 1.0
+-- Version order: PAL 1.1, PAL 1.0, Japan, US 1.1, US 1.0
 Game.Memory = {
 	["is_paused"] = {0x123B24, 0x1235A4, 0x124F84, 0x123A94, 0x123514},
 	["get_ready"] = {0x11B3C3, 0x11AE43, 0x11C823, 0x11B333, 0x11ADB3},

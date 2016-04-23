@@ -312,7 +312,7 @@ Game.maps = {
 -- Region/Version --
 --------------------
 
--- Version order: AUS, EUR, JPN, USA
+-- Version order: Australia, Europe, Japan, USA
 Game.Memory = {
 	["player_pointer"] = {0x13A210, 0x13A4A0, 0x12F660, 0x135490},
 	["moves_pointer"] = {0x1314F0, 0x131780, 0x126940, 0x12C770},
@@ -322,7 +322,7 @@ Game.Memory = {
 	["map"] = {0x12C390, 0x12C5A0, 0x1217F0, 0x127640},
 	["map_trigger"] = {0x12C392, 0x12C5A2, 0x1217F2, 0x127642},
 	["iconAddress"] = {0x11FF95, 0x120155, 0x115325, 0x11B065},
-	["healthAddresses"] = { -- TODO: Port these addresses to EUR & JPN
+	["healthAddresses"] = { -- TODO: Port these addresses to Europe & Japan
 		[0x01] = {0x120584, nil, nil, 0x11B644}, -- BK
 		[0x10] = {0x12059F, nil, nil, 0x11B65F}, -- Banjo (Solo)
 		[0x11] = {0x1205A8, nil, nil, 0x11B668}, -- Mumbo

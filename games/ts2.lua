@@ -14,7 +14,7 @@ function Game.detectVersion(romName, romHash)
 	if emu.getsystemid() == "N64" then
 		if romHash == "A9F97E22391313095D2C2FBAF81FB33BFA2BA7C6" then -- France
 			-- TODO
-		elseif romHash == "92015E5254CBBAD1BC668ECB13A4B568E5F55052" then -- PAL/Europe
+		elseif romHash == "92015E5254CBBAD1BC668ECB13A4B568E5F55052" then -- Europe
 			-- TODO
 		elseif romHash == "982AD2E1E44C6662C88A77367BC5DF91C51531BF" then -- USA
 			x_pos = 0x0BB070;

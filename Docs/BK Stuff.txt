@@ -126,8 +126,8 @@ Falling state (eaten)
 
 Moves unlocked:
 
-0x37CEA0 (JP)
-0x37CD70 (PAL)
+0x37CEA0 (Japan)
+0x37CD70 (Europe)
 0x37C3A0 (US 1.0)
 0x37B5A0 (US 1.1)
 
@@ -181,8 +181,8 @@ FF FF FF FF - Used during demos
 
 Located at:
 
-0x282240 (JP)
-0x283220 (PAL)
+0x282240 (Japan)
+0x283220 (Europe)
 0x283400 (US 1.0)
 0x282240 (US 1.1)
 

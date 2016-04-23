@@ -19,7 +19,7 @@ grab_script_mode = grab_script_modes[grab_script_mode_index];
 -- DK64 specific state --
 -------------------------
 
-local version; -- 1 USA, 2 PAL, 3 JP, 4 Kiosk
+local version; -- 1 USA, 2 Europe, 3 Japan, 4 Kiosk
 -- 0x7FA8A0 bone array pointer block
 -- 2 pointers
 -- 1 u32_be
@@ -44,11 +44,11 @@ Game.Memory = {
 	["frames_lag"] = {0x76AF10, 0x765A30, 0x76B100, 0x72D140}, -- TODO: Kiosk only works for minecart?
 	["frames_real"] = {0x7F0560, 0x7F0480, 0x7F09D0, nil}, -- TODO: Make sure freezing these crashes the main thread -- TODO: Kiosk
 	["boss_pointer"] = {0x7FDC90, 0x7FDBD0, 0x7FE120, nil}, -- TODO: Find Mad Jack state based on Model 1 pointer list and actor type knowledge. MJ is actor 204
-	["slope_object_pointer"] = {0x7F94B8, nil, nil, nil}, -- TODO - PAL, JP & Kiosk, also note this is part of the player object so might be simpler to do Game.getPlayerObject() + offset if it doesn't break anything
+	["slope_object_pointer"] = {0x7F94B8, nil, nil, nil}, -- TODO - PAL, Japan & Kiosk, also note this is part of the player object so might be simpler to do Game.getPlayerObject() + offset if it doesn't break anything
 	["obj_model2_array_pointer"] = {0x7F6000, 0x7F5F20, 0x7F6470, 0x6F4470},
 	["obj_model2_array_count"] = {0x7F6004, 0x7F5F24, 0x7F6474, nil}, -- TODO: Kiosk
 	["obj_model2_collision_linked_list_pointer"] = {0x754244, 0x74E9A4, 0x753B34, 0x6FF054},
-	["rambiBase"] = {0x744548, nil, nil, nil}, -- TODO: PAL, JP & Kiosk
+	["rambiBase"] = {0x744548, nil, nil, nil}, -- TODO: Europe, Japan & Kiosk
 };
 
 local flag_array = {};
@@ -917,7 +917,7 @@ function Game.detectVersion(romName, romHash)
 	if romHash == "CF806FF2603640A748FCA5026DED28802F1F4A50" then -- USA
 		version = 1;
 		flag_array = require("games.dk64_flags");
-	elseif romHash == "F96AF883845308106600D84E0618C1A066DC6676" then -- PAL
+	elseif romHash == "F96AF883845308106600D84E0618C1A066DC6676" then -- Europe
 		version = 2;
 		flag_array = require("games.dk64_flags");
 
@@ -935,7 +935,7 @@ function Game.detectVersion(romName, romHash)
 		jumpman_velocity = {0x03ECD8, 0x03ECDC};
 		jetman_position  = {0x022100, 0x022104};
 		jetman_velocity  = {0x022108, 0x02210C};
-	elseif romHash == "F0AD2B2BBF04D574ED7AFBB1BB6A4F0511DCD87D" then -- JPN
+	elseif romHash == "F0AD2B2BBF04D574ED7AFBB1BB6A4F0511DCD87D" then -- Japan
 		version = 3;
 		flag_array = require("games.dk64_flags_JP");
 
@@ -1264,7 +1264,7 @@ Game.maps = {
 -- Flag stuff --
 ----------------
 
-local flag_block_size = 0x13B; -- TODO: Different size on PAL/JP? -- TODO: Find exact size
+local flag_block_size = 0x13B; -- TODO: Different size on Europe/Japan? -- TODO: Find exact size
 
 local flag_action_queue = {};
 flag_block = {};
@@ -2392,7 +2392,7 @@ end
 ------------------------------------
 
 function Game.neverSlip()
-	if version == 1 then -- TODO: PAL, JP, Kiosk
+	if version == 1 then -- TODO: Europe, Japan, Kiosk
 		-- Patch the slope timer
 		local slope_timer = 0xC3; -- TODO: This is relative to the player object, figure out the actual offset and replace "slope_object_pointer" which is actually player + x
 		local slopeObject = mainmemory.read_u32_be(Game.Memory.slope_object_pointer[version]);
@@ -2558,7 +2558,7 @@ end
 -- BRB Stuff --
 ---------------
 
-local jp_charset = {
+local japan_charset = {
 --   0    1    2    3    4    5    6    7    8    9
 	"\0", "\0", "$", "(", ")", "\0", "%", "「", "」", "`", -- 0
 	"\0", "<", ">", "&", "~", " ", "0", "1", "2", "3", -- 1
@@ -2588,7 +2588,7 @@ local jp_charset = {
 	"ぱ", "ぴ", "ぷ", "ぺ", "ぽ", "ヴ" -- 25
 };
 
-function Game.toJPString(value)
+function Game.toJapaneseString(value)
 	local length = string.len(value);
 	local tempString = "";
 	local char;
@@ -2596,15 +2596,15 @@ function Game.toJPString(value)
 	for i = 1, length do
 		char = bizstring.substring(value, i - 1, 1); -- TODO: call string.sub() instead, how do params work?
 		charFound = false;
-		for j = 1, #jp_charset do
-			if jp_charset[j] == char then
+		for j = 1, #japan_charset do
+			if japan_charset[j] == char then
 				tempString = tempString..string.char(j - 1);
 				charFound = true;
 				break;
 			end
 		end
 		if charFound == false then
-			dprint("JP String parse warning: Didn't find character for '"..char..'\'');
+			dprint("String parse warning: Didn't find character for '"..char..'\'');
 		end
 	end
 	print_deferred();
@@ -2616,8 +2616,8 @@ is_brb = false;
 
 function brb(value)
 	local message = value or "BRB";
-	if version == 3 then -- JP
-		message = Game.toJPString(message);
+	if version == 3 then -- Japan
+		message = Game.toJapaneseString(message);
 	else
 		message = string.upper(message);
 	end

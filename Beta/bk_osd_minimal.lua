@@ -1,6 +1,6 @@
 local Game = {
 	["Memory"] = {
-		-- Version order: PAL, JP, US 1.1, US 1.0
+		-- Version order: Europe, Japan, US 1.1, US 1.0
 		["slope_timer"] = {0x37CCB4, 0x37CDE4, 0x37B4E4, 0x37C2E4},
 		["player_grounded"] = {0x37C930, 0x37CA60, 0x37B160, 0x37BF60},
 		["x_velocity"] = {0x37CE88, 0x37CFB8, 0x37B6B8, 0x37C4B8},
@@ -18,7 +18,7 @@ local Game = {
 };
 
 local ROMHash = gameinfo.getromhash();
-if ROMHash == "BB359A75941DF74BF7290212C89FBC6E2C5601FE" then -- PAL
+if ROMHash == "BB359A75941DF74BF7290212C89FBC6E2C5601FE" then -- Europe
 	Game.version = 1;
 elseif ROMHash == "90726D7E7CD5BF6CDFD38F45C9ACBF4D45BD9FD8" then -- Japan
 	Game.version = 2;
