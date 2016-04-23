@@ -25,12 +25,12 @@ Extra Lua scripts and RAM watches for the [BizHawk](https://github.com/TASVideos
 - Kiosk Demo
 - USA
 
-###Banjo Kazooie
+###Banjo-Kazooie
 - Europe
 - Japan
 - USA 1.0 and 1.1
 
-###Banjo Tooie
+###Banjo-Tooie
 - Australia
 - Europe
 - Japan

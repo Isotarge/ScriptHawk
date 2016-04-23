@@ -1,4 +1,4 @@
-Banjo Kazooie Functions US 1.0
+Banjo-Kazooie Functions US 1.0
 
 0x8024E55C -- (called with a0 0)
 0x80264550 Main Game Loop? Does Rendering, called by controller handler?
