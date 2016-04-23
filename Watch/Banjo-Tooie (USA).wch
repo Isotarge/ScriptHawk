@@ -108,9 +108,9 @@ SystemID N64
 11B66D	b	h	1	RDRAM	Detonator: Health Icon
 11B66E	b	u	1	RDRAM	Detonator: Current Health
 11B66F	b	u	1	RDRAM	Detonator: Max Health
-11B676	b	h	1	RDRAM	Dinosaur: Health Icon
-11B677	b	u	1	RDRAM	Dinosaur: Current Health
-11B678	b	u	1	RDRAM	Dinosaur: Max Health
+11B676	b	h	1	RDRAM	T-Rex: Health Icon
+11B677	b	u	1	RDRAM	T-Rex: Current Health
+11B678	b	u	1	RDRAM	T-Rex: Max Health
 1254B0	d	f	1	RDRAM	Banjo Brightness Doodad
 127638	d	f	1	RDRAM	Game Runtime
 12763C	d	f	1	RDRAM	Map Runtime

@@ -322,17 +322,17 @@ Game.Memory = {
 	["map"] = {0x12C390, 0x12C5A0, 0x1217F0, 0x127640},
 	["map_trigger"] = {0x12C392, 0x12C5A2, 0x1217F2, 0x127642},
 	["iconAddress"] = {0x11FF95, 0x120155, 0x115325, 0x11B065},
-	["healthAddresses"] = { -- TODO: Port these addresses to other versions
+	["healthAddresses"] = { -- TODO: Port these addresses to EUR & JPN
 		[0x01] = {0x120584, nil, nil, 0x11B644}, -- BK
 		[0x10] = {0x12059F, nil, nil, 0x11B65F}, -- Banjo (Solo)
 		[0x11] = {0x1205A8, nil, nil, 0x11B668}, -- Mumbo
-		[0x2D] = {nil, nil, nil, 0x11B659}, -- Stony
-		[0x2E] = {nil, nil, nil, 0x11B66E}, -- Detonator
-		[0x2F] = {nil, nil, nil, 0x11B665}, -- Submarine
-		[0x30] = {nil, nil, nil, 0x11B677}, -- Dinosaur
-		[0x31] = {nil, nil, nil, 0x11B653}, -- Bee
-		[0x32] = {nil, nil, nil, 0x11B647}, -- Snowball
-		[0x36] = {nil, nil, nil, 0x11B656}, -- Washing Machine
+		[0x2D] = {0x120599, nil, nil, 0x11B659}, -- Stony
+		[0x2E] = {0x1205AE, nil, nil, 0x11B66E}, -- Detonator
+		[0x2F] = {0x1205A5, nil, nil, 0x11B665}, -- Submarine
+		[0x30] = {0x1205B7, nil, nil, 0x11B677}, -- T-Rex
+		[0x31] = {0x120593, nil, nil, 0x11B653}, -- Bee
+		[0x32] = {0x120587, nil, nil, 0x11B647}, -- Snowball
+		[0x36] = {0x120596, nil, nil, 0x11B656}, -- Washing Machine
 		[0x5F] = {0x1205A2, nil, nil, 0x11B662}, -- Kazooie (Solo)
 	},
 };

@@ -6,12 +6,26 @@ SystemID N64
 11FF99	b	u	1	RDRAM	Health (HUD)
 120584	b	u	1	RDRAM	BK: Current Health
 120585	b	u	1	RDRAM	BK: Max Health
+120587	b	u	1	RDRAM	Snowball: Current Health
+120588	b	u	1	RDRAM	Snowball: Max Health
+120593	b	u	1	RDRAM	Bee: Current Health
+120594	b	u	1	RDRAM	Bee: Max Health
+120596	b	u	1	RDRAM	Washing Machine: Current Health
+120597	b	u	1	RDRAM	Washing Machine: Max Health
+120599	b	u	1	RDRAM	Stony: Current Health
+12059A	b	u	1	RDRAM	Stony: Max Health
 12059F	b	u	1	RDRAM	Banjo: Current Health
 1205A0	b	u	1	RDRAM	Banjo: Max Health
 1205A2	b	u	1	RDRAM	Kazooie: Current Health
 1205A3	b	u	1	RDRAM	Kazooie: Max Health
+1205A5	b	u	1	RDRAM	Submarine: Current Health
+1205A6	b	u	1	RDRAM	Submarine: Max Health
 1205A8	b	u	1	RDRAM	Mumbo: Current Health
 1205A9	b	u	1	RDRAM	Mumbo: Max Health
+1205AE	b	u	1	RDRAM	Detonator: Current Health
+1205AF	b	u	1	RDRAM	Detonator: Max Health
+1205B7	b	u	1	RDRAM	T-Rex: Current Health
+1205B8	b	u	1	RDRAM	T-Rex: Max Health
 12C390	w	h	1	RDRAM	Map
 12C392	w	h	1	RDRAM	Map Load Trigger
 12FDC0	d	f	1	RDRAM	Air (Real)
