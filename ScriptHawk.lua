@@ -357,6 +357,10 @@ local supportedGames = {
 	["93BF2FAC1387320AD07251CB4B64FD36BAC1D7A6"] = {["moduleName"] = "games.bt", ["friendlyName"] = "Banjo-Tooie (Europe) (En,Fr,De,Es)"},
 	["AF1A89E12B638B8D82CC4C085C8E01D4CBA03FB3"] = {["moduleName"] = "games.bt", ["friendlyName"] = "Banjo-Tooie (USA)"},
 
+	-- Conker's Bad Fur Day
+	["EE7BC6656FD1E1D9FFB3D19ADD759F28B88DF710"] = {["moduleName"] = "games.cbfd", ["friendlyName"] = "Conker's Bad Fur Day (Europe)"},
+	["4CBADD3C4E0729DEC46AF64AD018050EADA4F47A"] = {["moduleName"] = "games.cbfd", ["friendlyName"] = "Conker's Bad Fur Day (USA)"},
+
 	-- Diddy Kong Racing
 	["B7F628073237B3D211D40406AA0884FF8FDD70D5"] = {["moduleName"] = "games.dkr", ["friendlyName"] = "Diddy Kong Racing (Europe) (En,Fr,De) (Rev A)"},
 	["DD5D64DD140CB7AA28404FA35ABDCABA33C29260"] = {["moduleName"] = "games.dkr", ["friendlyName"] = "Diddy Kong Racing (Europe) (En,Fr,De)"},

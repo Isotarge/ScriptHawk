@@ -34,7 +34,6 @@
 - DK64: ASM hook for other regions
 
 #Game support wishlist:
-- Conker's Bad Fur Day
 - Gex: Enter the Gecko
 - Gex 3: Deep Cover Gecko
 - Wave Race 64
