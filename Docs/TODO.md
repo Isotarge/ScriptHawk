@@ -5,7 +5,10 @@
 - General: Move from x, y, z variables to position/rotation/velocity etc. tables with x, y, z indexes
 - General: UI to load ASM patches, can currently only be done by calling loadASMPatch(filename, suppressprint) in the lua console
 - Rayman 2: Find player object pointer
-- Toy story 2 stuff
+- DPAD Fixes for:
+	- CBFD
+	- Toy story 2
+	- DK64 (Fly Swatter)
 - DK64: Finish flag documentation
 	- Complete documentation for US
 	- Figure out how the 101% credits are triggered
@@ -22,7 +25,6 @@
 - General: Detailed watch toggle (checkbox maybe)
 	- "Verbosity level" for object viewer scripts, include as a struct field flag
 - DK64: Neverslip enhancements, can't roll/kick on slopes
-- DK64: Fix DPad for fly swatter
 - Port Tetris Attack bot to other Puzzle League games
 	- [List of Games](http://www.speedrun.com/puzzle_league)
 	- [Pokémon Puzzle League Info here](https://github.com/mupen64plus/mupen64plus-user-issues/issues/567)
