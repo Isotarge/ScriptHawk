@@ -37,7 +37,7 @@ Game.Memory = {
 	["struct_array_pointer"] = {nil, nil, nil, 0x36E7C8}, -- TODO: Other versions
 };
 
-if bizstring.contains(romName, "Europe") then
+if bizstring.contains(romName, "Europe") then -- TODO: Detect using ROM hash rather than name
 	version = 1;
 elseif bizstring.contains(romName, "Japan") then
 	version = 2;

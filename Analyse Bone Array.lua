@@ -5,7 +5,7 @@ print_every_frame = false;
 
 local romName = gameinfo.getromname();
 
-if bizstring.contains(romName, "Donkey Kong 64") then
+if bizstring.contains(romName, "Donkey Kong 64") then -- TODO: Detect using ROM hash rather than name
 	if bizstring.contains(romName, "USA") and not bizstring.contains(romName, "Kiosk") then
 		pointer_list = 0x7FBFF0;
 	elseif bizstring.contains(romName, "Europe") then
