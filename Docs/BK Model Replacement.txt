@@ -461,15 +461,15 @@
 046A Klungo
 046B Green bars (sexification/uglification cutscene)
 046C Puzzle
-046D Weird ass grey texture that follows the camera
-046E Goldfish in bowl
+046D Weird grey texture that follows the camera
+046E Roysten
 046F Cuckoo clock
 
 0470 Banjo's fireplace
 0471 Banjo's house puzzle frame
 0472 Banjo's house puzzle
 0473 Chef Mumbo
-0474 Mumbo's BBQ (goldfish & steaks included)
+0474 Mumbo's BBQ (Roysten & steaks included)
 0475 --CRASH--
 0476 --CRASH--
 0477 --CRASH--

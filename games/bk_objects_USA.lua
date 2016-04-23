@@ -452,7 +452,7 @@ return {
 	{["id"] = 0x02F1, ["name"] = "Tooty's force field"},
 	{["id"] = 0x02F2, ["name"] = "Machine Room booth"},
 	{["id"] = 0x02F3, ["name"] = "Lightning"},
-	{["id"] = 0x02F4, ["name"] = "Goldfish Bowl"},
+	{["id"] = 0x02F4, ["name"] = "Roysten's Bowl"},
 	{["id"] = 0x02F5, ["name"] = "Cuckoo Clock"},
 	{["id"] = 0x02F6, ["name"] = "Yellow Jinjo 0x02F6"},
 	{["id"] = 0x02F7, ["name"] = "Yellow Jinjo 0x02F7"},
