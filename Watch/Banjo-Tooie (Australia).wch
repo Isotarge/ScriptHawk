@@ -46,5 +46,13 @@ SystemID N64
 131574	d	h	1	RDRAM	RNG?
 131578	d	h	1	RDRAM	RNG?
 13157C	d	h	1	RDRAM	RNG?
-13A210	d	h	1	RDRAM	Player Pointer
+13A210	d	h	1	RDRAM	Player Pointer 0
+13A214	d	h	1	RDRAM	Player Pointer 1
+13A218	d	h	1	RDRAM	Player Pointer 2
+13A21C	d	h	1	RDRAM	Player Pointer 3
+13A220	d	h	1	RDRAM	Player Pointer 4
+13A224	d	h	1	RDRAM	Player Pointer 5
+13A228	d	h	1	RDRAM	Player Pointer 6
+13A22C	d	h	1	RDRAM	Player Pointer 7
+13A25F	b	h	1	RDRAM	Player Pointer Index
 

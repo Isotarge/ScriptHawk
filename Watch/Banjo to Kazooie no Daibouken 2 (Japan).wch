@@ -43,5 +43,13 @@ SystemID N64
 1269C4	d	h	1	RDRAM	RNG?
 1269C8	d	h	1	RDRAM	RNG?
 1269CC	d	h	1	RDRAM	RNG?
-12F660	d	h	1	RDRAM	Player Pointer
+12F660	d	h	1	RDRAM	Player Pointer 0
+12F664	d	h	1	RDRAM	Player Pointer 1
+12F668	d	h	1	RDRAM	Player Pointer 2
+12F66C	d	h	1	RDRAM	Player Pointer 3
+12F670	d	h	1	RDRAM	Player Pointer 4
+12F674	d	h	1	RDRAM	Player Pointer 5
+12F678	d	h	1	RDRAM	Player Pointer 6
+12F67C	d	h	1	RDRAM	Player Pointer 7
+12F6AF	b	h	1	RDRAM	Player Pointer Index
 

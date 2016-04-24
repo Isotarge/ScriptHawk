@@ -315,6 +315,7 @@ Game.maps = {
 -- Version order: Australia, Europe, Japan, USA
 Game.Memory = {
 	["player_pointer"] = {0x13A210, 0x13A4A0, 0x12F660, 0x135490},
+	["player_pointer_index"] = {0x13A25F, 0x13A4EF, 0x12F6AF, 0x1354DF},
 	["moves_pointer"] = {0x1314F0, 0x131780, 0x126940, 0x12C770},
 	["air"] = {0x12FDC0, 0x12FFD0, 0x125220, 0x12B050},
 	["frame_timer"] = {0x083550, 0x083550, 0x0788F8, 0x079138},
@@ -410,7 +411,8 @@ local y_velocity = 0x14;
 local z_velocity = 0x18;
 
 function Game.getPlayerObject()
-	local playerObject = dereferencePointer(Game.Memory.player_pointer[version]);
+	local playerPointerIndex = mainmemory.readbyte(Game.Memory.player_pointer_index[version]);
+	local playerObject = dereferencePointer(Game.Memory.player_pointer[version] + 4 * playerPointerIndex);
 	if isRDRAM(playerObject) then
 		return playerObject - 0x10;
 	end
@@ -781,6 +783,9 @@ local max_air = 60; -- TODO: This changes once you finish Roysten's quest, how t
 
 function Game.applyInfinites()
 	-- TODO: Eggs, feathers, glowbos etc
+	--if version == 4 then -- TODO: Other versions
+		--mainmemory.write_u16_be(0x0D1A58, 0x0000); -- Janky infinite egg/feather code, I don't like this
+	--end
 	mainmemory.writefloat(Game.Memory.air[version], max_air, true);
 	Game.setCurrentHealth(Game.getMaxHealth());
 end
