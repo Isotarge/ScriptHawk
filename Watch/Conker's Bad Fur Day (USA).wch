@@ -1,4 +1,6 @@
 SystemID N64
+0BE3DE	w	h	1	RDRAM	Map
+0BE3E0	b	h	1	RDRAM	Exit
 0CC2E4	d	f	1	RDRAM	X Position
 0CC2E8	d	f	1	RDRAM	Y Position
 0CC2EC	d	f	1	RDRAM	Z Position
