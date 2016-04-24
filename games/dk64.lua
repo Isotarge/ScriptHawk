@@ -2395,9 +2395,8 @@ function Game.neverSlip()
 	if version == 1 then -- TODO: Europe, Japan, Kiosk
 		-- Patch the slope timer
 		local slope_timer = 0xC3; -- TODO: This is relative to the player object, figure out the actual offset and replace "slope_object_pointer" which is actually player + x
-		local slopeObject = mainmemory.read_u32_be(Game.Memory.slope_object_pointer[version]);
-		if isPointer(slopeObject) then
-			slopeObject = slopeObject - RDRAMBase;
+		local slopeObject = dereferencePointer(Game.Memory.slope_object_pointer[version]);
+		if isRDRAM(slopeObject) then
 			mainmemory.writebyte(slopeObject + slope_timer, 0);
 		end
 	end
@@ -2621,7 +2620,7 @@ function brb(value)
 	else
 		message = string.upper(message);
 	end
-	if version ~= 4 then -- TODO: Not Kiosk
+	if version ~= 4 then -- TODO: Kiosk?
 		brb_message = message;
 		is_brb = true;
 	else
@@ -3225,7 +3224,14 @@ local function drawGrabScriptUI()
 	local green_highlight = 0xFF00FF00;
 	local yellow_highlight = 0xFFFFFF00;
 
+	gui.text(gui_x, gui_y + height * row, "Mode: "..grab_script_mode, nil, nil, 'bottomright');
+	row = row + 1;
+
 	local playerObject = Game.getPlayerObject();
+	if not isRDRAM(playerObject) then
+		return;
+	end
+
 	local cameraObject = mainmemory.read_u24_be(Game.Memory["camera_pointer"][version] + 1);
 
 	if stringContains(grab_script_mode, "Model 1") then
@@ -3239,7 +3245,7 @@ local function drawGrabScriptUI()
 	end
 
 	if rat_enabled then
-		local renderingParams = mainmemory.read_u24_be(playerObject + obj_model1.rendering_parameters_pointer + 1);
+		local renderingParams = dereferencePointer(playerObject + obj_model1.rendering_parameters_pointer);
 		if isRDRAM(renderingParams) then
 			if math.random() > 0.9 then
 				local timerValue = math.random() * 50;
@@ -3250,9 +3256,6 @@ local function drawGrabScriptUI()
 			end
 		end
 	end
-
-	gui.text(gui_x, gui_y + height * row, "Mode: "..grab_script_mode, nil, nil, 'bottomright');
-	row = row + 1;
 
 	if stringContains(grab_script_mode, "Model 2") then
 		gui.text(gui_x, gui_y + height * row, "Array Size: "..getObjectModel2ArraySize(), nil, nil, 'bottomright');
