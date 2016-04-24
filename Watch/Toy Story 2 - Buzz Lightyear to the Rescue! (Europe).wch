@@ -1,0 +1,11 @@
+SystemID N64
+0BB460	d	s	1	RDRAM	X Position
+0BB464	d	s	1	RDRAM	Y Position
+0BB468	d	s	1	RDRAM	Z Position
+0BB46E	w	u	1	RDRAM	Rotation
+0BB4A8	w	u	1	RDRAM	Rotation
+0BB4BA	w	u	1	RDRAM	Rotation
+0BB4C8	d	s	1	RDRAM	X Velocity
+0BB4CC	d	s	1	RDRAM	Y Velocity
+0BB4D0	d	s	1	RDRAM	Z Velocity
+
