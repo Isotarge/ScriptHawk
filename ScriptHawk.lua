@@ -1059,6 +1059,7 @@ local function mainloop()
 	if Game.speedy_invert_XZ then
 		speedy_speed_XZ = speedy_speed_XZ * -1;
 	end
+
 	if Game.speedy_invert_Y then
 		speedy_speed_Y = speedy_speed_Y * -1;
 	end
@@ -1066,22 +1067,46 @@ local function mainloop()
 	if Game.isPhysicsFrame() then
 		if mode == 'Position' then
 			rot_rad = rotation_to_radians(Game.getYRotation());
-			if joypad_pressed["P1 DPad U"] then
-				gofast("x", speedy_speed_XZ * math.sin(rot_rad));
-				gofast("z", speedy_speed_XZ * math.cos(rot_rad));
+			if Game.speedy_invert_UD then
+				if joypad_pressed["P1 DPad U"] then
+					gofast("x", -1.0 * (speedy_speed_XZ * math.sin(rot_rad)));
+					gofast("z", -1.0 * (speedy_speed_XZ * math.cos(rot_rad)));
+				end
+				if joypad_pressed["P1 DPad D"] then
+					gofast("x", speedy_speed_XZ * math.sin(rot_rad));
+					gofast("z", speedy_speed_XZ * math.cos(rot_rad));
+				end
+			else
+				if joypad_pressed["P1 DPad U"] then
+					gofast("x", speedy_speed_XZ * math.sin(rot_rad));
+					gofast("z", speedy_speed_XZ * math.cos(rot_rad));
+				end
+				if joypad_pressed["P1 DPad D"] then
+					gofast("x", -1.0 * (speedy_speed_XZ * math.sin(rot_rad)));
+					gofast("z", -1.0 * (speedy_speed_XZ * math.cos(rot_rad)));
+				end
 			end
-			if joypad_pressed["P1 DPad D"] then
-				gofast("x", -1.0 * (speedy_speed_XZ * math.sin(rot_rad)));
-				gofast("z", -1.0 * (speedy_speed_XZ * math.cos(rot_rad)));
+
+			if Game.speedy_invert_LR then
+				if joypad_pressed["P1 DPad L"] then
+					gofast("x", -1.0 * (speedy_speed_XZ * math.cos(rot_rad)));
+					gofast("z", speedy_speed_XZ * math.sin(rot_rad));
+				end
+				if joypad_pressed["P1 DPad R"] then
+					gofast("x", speedy_speed_XZ * math.cos(rot_rad));
+					gofast("z", -1.0 * (speedy_speed_XZ * math.sin(rot_rad)));
+				end
+			else
+				if joypad_pressed["P1 DPad L"] then
+					gofast("x", speedy_speed_XZ * math.cos(rot_rad));
+					gofast("z", -1.0 * (speedy_speed_XZ * math.sin(rot_rad)));
+				end
+				if joypad_pressed["P1 DPad R"] then
+					gofast("x", -1.0 * (speedy_speed_XZ * math.cos(rot_rad)));
+					gofast("z", speedy_speed_XZ * math.sin(rot_rad));
+				end
 			end
-			if joypad_pressed["P1 DPad L"] then
-				gofast("x", speedy_speed_XZ * math.cos(rot_rad));
-				gofast("z", -1.0 * (speedy_speed_XZ * math.sin(rot_rad)));
-			end
-			if joypad_pressed["P1 DPad R"] then
-				gofast("x", -1.0 * (speedy_speed_XZ * math.cos(rot_rad)));
-				gofast("z", speedy_speed_XZ * math.sin(rot_rad));
-			end
+
 			if joypad_pressed["P1 L"] then
 				gofast("y", speedy_speed_Y);
 			end

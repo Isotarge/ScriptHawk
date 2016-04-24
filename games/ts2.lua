@@ -38,7 +38,7 @@ end
 
 Game.speedy_speeds = { 100, 1000, 2000, 5000, 7500, 10000, 20000, 50000, 100000 };
 Game.speedy_index = 4;
-Game.speedy_invert_XZ = true;
+Game.speedy_invert_LR = true;
 Game.speedy_invert_Y = true;
 
 Game.rot_speed = 10;
