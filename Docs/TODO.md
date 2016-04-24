@@ -6,7 +6,6 @@
 - General: UI to load ASM patches, can currently only be done by calling loadASMPatch(filename, suppressprint) in the lua console
 - Rayman 2: Find player object pointer
 - DPAD Fixes for:
-	- CBFD
 	- Toy story 2
 	- DK64 (Fly Swatter)
 - DK64: Finish flag documentation
