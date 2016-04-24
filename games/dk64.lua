@@ -1513,7 +1513,7 @@ end
 function clearFlag(byte, bit, suppressPrint)
 	suppressPrint = suppressPrint or false;
 	if type(byte) == "number" and type(bit) == "number" and bit >= 0 and bit <= 7 then
-		table.insert(flag_action_queue, {["action_type"]="clear", ["byte"]=byte, ["bit"]=bit, ["suppressPrint"]=suppressPrint});
+		table.insert(flag_action_queue, {["action_type"] = "clear", ["byte"] = byte, ["bit"] = bit, ["suppressPrint"] = suppressPrint});
 		processFlagQueue();
 	end
 end
@@ -2473,40 +2473,33 @@ function everythingIsKong()
 		return false;
 	end
 
-	local kongSharedModel = mainmemory.read_u32_be(playerObject + obj_model1.model_pointer);
-
-	if not isPointer(kongSharedModel) then
+	local kongSharedModel = dereferencePointer(playerObject + obj_model1.model_pointer);
+	if not isRDRAM(kongSharedModel) then
 		print("This ain't gonna work...");
 		return false;
 	end
 
-	local kongNumBones = mainmemory.readbyte(kongSharedModel - RDRAMBase + obj_model1.model.num_bones);
-
-	local cameraObject = mainmemory.read_u24_be(Game.Memory.camera_pointer[version] + 1);
-	local actorListIndex = 0;
+	local kongNumBones = mainmemory.readbyte(kongSharedModel + obj_model1.model.num_bones);
+	local cameraObject = dereferencePointer(Game.Memory.camera_pointer[version]);
 
 	for actorListIndex = 0, max_objects do
-		local pointer = mainmemory.read_u24_be(Game.Memory.pointer_list[version] + (actorListIndex * 4) + 1);
-		local objectFound = isRDRAM(pointer);
-
-		if objectFound and (pointer ~= cameraObject) then
-			local modelPointer = mainmemory.read_u24_be(pointer + obj_model1.model_pointer + 1);
-			local hasModel = isRDRAM(modelPointer);
-
-			local actorType = mainmemory.read_u32_be(pointer + obj_model1.actor_type);
-			if type(obj_model1.actor_types[actorType]) ~= nil then
-				actorType = obj_model1.actor_types[actorType];
-			end
-
-			if hasModel then
+		local pointer = dereferencePointer(Game.Memory.pointer_list[version] + (actorListIndex * 4));
+		if isRDRAM(pointer) and (pointer ~= cameraObject) then
+			local modelPointer = dereferencePointer(pointer + obj_model1.model_pointer);
+			if isRDRAM(modelPointer) then
+				local actorType = mainmemory.read_u32_be(pointer + obj_model1.actor_type);
+				if type(obj_model1.actor_types[actorType]) ~= nil then
+					actorType = obj_model1.actor_types[actorType];
+				end
 				local numBones = mainmemory.readbyte(modelPointer + obj_model1.model.num_bones);
-				if numBones <= kongNumBones then
-					mainmemory.write_u32_be(pointer + obj_model1.model_pointer, kongSharedModel);
+				if numBones >= kongNumBones then
+					mainmemory.write_u32_be(pointer + obj_model1.model_pointer, kongSharedModel + RDRAMBase);
 					print("Wrote: "..toHexString(pointer).." Bones: "..numBones.." Type: "..actorType);
 				end
 			end
 		end
 	end
+	return true;
 end
 
 function Game.setScale(value)
@@ -2537,16 +2530,14 @@ end
 function Game.paperMode()
 	local paper_thickness = 0.015;
 	local actorListIndex = 0;
-	local cameraObject = mainmemory.read_u24_be(Game.Memory.camera_pointer[version] + 1);
+	local cameraObject = dereferencePointer(Game.Memory.camera_pointer[version]);
 
 	for actorListIndex = 0, max_objects do
-		local pointer = mainmemory.read_u24_be(Game.Memory.pointer_list[version] + (actorListIndex * 4) + 1);
-		local objectFound = isRDRAM(pointer);
+		local pointer = dereferencePointer(Game.Memory.pointer_list[version] + (actorListIndex * 4));
 
-		if objectFound and pointer ~= cameraObject then
-			local objectRenderingParameters = mainmemory.read_u32_be(pointer + obj_model1.rendering_parameters_pointer);
-			if isPointer(objectRenderingParameters) then
-				objectRenderingParameters = objectRenderingParameters - RDRAMBase;
+		if isRDRAM(pointer) and pointer ~= cameraObject then
+			local objectRenderingParameters = dereferencePointer(pointer + obj_model1.rendering_parameters_pointer);
+			if isRDRAM(objectRenderingParameters) then
 				mainmemory.writefloat(objectRenderingParameters + obj_model1.rendering_parameters.scale_z, paper_thickness, true);
 			end
 		end
@@ -2711,7 +2702,7 @@ end
 
 function freeTradeObjectModel1(currentKong)
 	for object_no = 0, max_objects do
-		local pointer = mainmemory.read_u24_be(Game.Memory.pointer_list[version] + (object_no * 4) + 1);
+		local pointer = dereferencePointer(Game.Memory.pointer_list[version] + (object_no * 4));
 		if isRDRAM(pointer) then
 			local actorType = mainmemory.read_u32_be(pointer + obj_model1.actor_type);
 			if isKasplat(actorType) then
@@ -2761,8 +2752,8 @@ function fixSingleCollision(objectBase)
 end
 
 function freeTradeCollisionListBackboneMethod(currentKong)
-	local object = mainmemory.read_u24_be(Game.Memory.linked_list_pointer[version] + 0x24 + 1); -- Adding 0x24 here as a performance improvement, seems to be a pointer to the start of the object model 2 collision data in the backbone
-	while isRDRAM(object) do
+	local object = dereferencePointer(Game.Memory.linked_list_pointer[version] + 0x24); -- Adding 0x24 here as a performance improvement, seems to be a pointer to the start of the object model 2 collision data in the backbone
+	while isRDRAM(object) and object ~= 0 do
 		size = mainmemory.read_u32_be(object + 4);
 		if size == 0x20 then
 			fixSingleCollision(object + 0x10);
@@ -2774,8 +2765,8 @@ function freeTradeCollisionListBackboneMethod(currentKong)
 end
 
 function dumpCollisionTypes()
-	local object = mainmemory.read_u24_be(Game.Memory.linked_list_pointer[version] + 0x24 + 1); -- Adding 0x24 here as a performance improvement, seems to be a pointer to the start of the object model 2 collision data in the backbone
-	while isRDRAM(object) do
+	local object = dereferencePointer(Game.Memory.linked_list_pointer[version] + 0x24); -- Adding 0x24 here as a performance improvement, seems to be a pointer to the start of the object model 2 collision data in the backbone
+	while isRDRAM(object) and object ~= 0 do
 		size = mainmemory.read_u32_be(object + 4);
 		if size == 0x20 then
 			local collisionType = mainmemory.read_u16_be(object + 0x10 + 0x02);
@@ -2794,8 +2785,8 @@ function dumpCollisionTypes()
 end
 
 function replaceCollisionType(target, desired)
-	local object = mainmemory.read_u24_be(Game.Memory.linked_list_pointer[version] + 0x24 + 1); -- Adding 0x24 here as a performance improvement, seems to be a pointer to the start of the object model 2 collision data in the backbone
-	while isRDRAM(object) do
+	local object = dereferencePointer(Game.Memory.linked_list_pointer[version] + 0x24); -- Adding 0x24 here as a performance improvement, seems to be a pointer to the start of the object model 2 collision data in the backbone
+	while isRDRAM(object) and object ~= 0 do
 		size = mainmemory.read_u32_be(object + 4);
 		if size == 0x20 then
 			local collisionType = mainmemory.read_u16_be(object + 0x10 + 0x02);
@@ -2834,9 +2825,9 @@ function isGB(collectableState)
 end
 
 function getScriptName(objectModel2Base)
-	local behaviorTypePointer = mainmemory.read_u32_be(objectModel2Base + obj_model2.behavior_type_pointer);
-	if isPointer(behaviorTypePointer) then
-		return readNullTerminatedString(behaviorTypePointer - RDRAMBase + 0x0C);
+	local behaviorTypePointer = dereferencePointer(objectModel2Base + obj_model2.behavior_type_pointer);
+	if isRDRAM(behaviorTypePointer) then
+		return readNullTerminatedString(behaviorTypePointer + 0x0C);
 	end
 	return "";
 end
@@ -2867,7 +2858,7 @@ end
 
 function ohWrongnana()
 	if version ~= 4 then -- Anything but Kiosk
-		local objModel2Array = mainmemory.read_u24_be(Game.Memory.obj_model2_array_pointer[version] + 1);
+		local objModel2Array = dereferencePointer(Game.Memory.obj_model2_array_pointer[version]); -- TODO: Pointer safety
 		local numSlots = mainmemory.read_u32_be(Game.Memory.obj_model2_array_count[version]);
 		local currentKong = mainmemory.readbyte(Game.Memory.character[version]);
 		local scriptName, slotBase, currentValue, activationScript, earlyCheckValue, lateCheckValue;
@@ -2884,7 +2875,7 @@ function ohWrongnana()
 				activationScript = dereferencePointer(slotBase + 0x7C);
 				if isRDRAM(activationScript) then
 					-- Get part 2
-					activationScript = mainmemory.read_u32_be(activationScript + 0xA0);
+					activationScript = mainmemory.read_u32_be(activationScript + 0xA0); -- TODO: dereferencePointer call
 					while isPointer(activationScript) do
 						activationScript = activationScript - RDRAMBase;
 						earlyCheckValue = mainmemory.read_u16_be(activationScript + 0x0C);
@@ -2935,9 +2926,9 @@ function fillFB()
 		return;
 	end
 
-	local frameBufferLocation = mainmemory.read_u24_be(Game.Memory.framebuffer_pointer[version] + 1);
 	local framebuffer_width = 320; -- Oddly enough it's the same size on PAL
 	local framebuffer_height = 240; -- Oddly enough it's the same size on PAL
+	local frameBufferLocation = dereferencePointer(Game.Memory.framebuffer_pointer[version]);
 	if isRDRAM(frameBufferLocation) then
 		replaceTextureRGBA5551(image_filename, frameBufferLocation, framebuffer_width, framebuffer_height);
 		replaceTextureRGBA5551(image_filename, frameBufferLocation + (framebuffer_width * framebuffer_height * 2), framebuffer_width, framebuffer_height);
@@ -2978,10 +2969,8 @@ end
 local function grabObject(pointer)
 	local playerObject = Game.getPlayerObject();
 	if isRDRAM(playerObject) then
-		mainmemory.writebyte(playerObject + obj_model1.player.grab_pointer, 0x80);
-		mainmemory.write_u24_be(playerObject + obj_model1.player.grab_pointer + 1, pointer);
-		mainmemory.writebyte(playerObject + obj_model1.player.grab_pointer + 4, 0x80);
-		mainmemory.write_u24_be(playerObject + obj_model1.player.grab_pointer + 4 + 1, pointer);
+		mainmemory.write_u32_be(playerObject + obj_model1.player.grab_pointer, pointer + RDRAMBase);
+		mainmemory.write_u32_be(playerObject + obj_model1.player.grab_pointer + 4, pointer + RDRAMBase);
 	end
 end
 
@@ -2992,10 +2981,9 @@ local function grabSelectedObject()
 end
 
 local function focusObject(pointer) -- TODO: There's more pointers to set here, mainly vehicle stuff
-	local cameraObject = mainmemory.read_u24_be(Game.Memory["camera_pointer"][version] + 1);
-	if isRDRAM(cameraObject) then
-		mainmemory.writebyte(cameraObject + obj_model1.camera.focused_actor_pointer, 0x80);
-		mainmemory.write_u24_be(cameraObject + obj_model1.camera.focused_actor_pointer + 1, pointer);
+	local cameraObject = dereferencePointer(Game.Memory["camera_pointer"][version]);
+	if isRDRAM(cameraObject) and isRDRAM(pointer) then
+		mainmemory.write_u32_be(cameraObject + obj_model1.camera.focused_actor_pointer, pointer + RDRAMBase);
 	end
 end
 
@@ -3066,9 +3054,8 @@ end
 
 local function populateObjectModel1Pointers()
 	local playerObject = Game.getPlayerObject();
-	if isRDRAM(playerObject) then
-		local cameraObject = mainmemory.read_u24_be(Game.Memory["camera_pointer"][version] + 1);
-
+	local cameraObject = dereferencePointer(Game.Memory["camera_pointer"][version]);
+	if isRDRAM(playerObject) and isRDRAM(cameraObject) then
 		object_pointers = {};
 		for object_no = 0, max_objects do
 			local pointer = dereferencePointer(Game.Memory["pointer_list"][version] + (object_no * 4));
@@ -3232,7 +3219,7 @@ local function drawGrabScriptUI()
 		return;
 	end
 
-	local cameraObject = mainmemory.read_u24_be(Game.Memory["camera_pointer"][version] + 1);
+	local cameraObject = dereferencePointer(Game.Memory["camera_pointer"][version]);
 
 	if stringContains(grab_script_mode, "Model 1") then
 		populateObjectModel1Pointers();
@@ -3266,7 +3253,7 @@ local function drawGrabScriptUI()
 	row = row + 1;
 
 	if stringContains(grab_script_mode, "Model 1") then
-		local focusedActor = mainmemory.read_u32_be(cameraObject + obj_model1.camera.focused_actor_pointer);
+		local focusedActor = mainmemory.read_u32_be(cameraObject + obj_model1.camera.focused_actor_pointer); -- TODO: dereferencePointer calls
 		local grabbedActor = mainmemory.read_u32_be(playerObject + obj_model1.player.grab_pointer);
 
 		local focusedActorType = "Unknown";
@@ -3360,9 +3347,9 @@ local function drawGrabScriptUI()
 				end
 
 				local behaviorType = "";
-				local behaviorTypePointer = mainmemory.read_u32_be(object_pointers[i] + obj_model2.behavior_type_pointer);
-				if isPointer(behaviorTypePointer) then
-					behaviorType = " "..behaviorType..readNullTerminatedString(behaviorTypePointer - RDRAMBase + 0x0C);
+				local behaviorTypePointer = dereferencePointer(object_pointers[i] + obj_model2.behavior_type_pointer);
+				if isRDRAM(behaviorTypePointer) then
+					behaviorType = " "..behaviorType..readNullTerminatedString(behaviorTypePointer + 0x0C);
 				end
 
 				if not (behaviorPointer == "" and hide_non_scripted) then
@@ -3537,41 +3524,41 @@ local texture_renderer_texture_index = 0x0C; -- u16_be
 local texture_renderer_next_renderer = 0x24; -- u32_be
 
 function getNextTextureRenderer(texturePointer)
-	return mainmemory.read_u24_be(texturePointer + texture_renderer_next_renderer + 1);
+	return dereferencePointer(texturePointer + texture_renderer_next_renderer);
 end
 
 function Game.getTextureRenderers()
 	local playerObject = Game.getPlayerObject();
-	local texturePointer = mainmemory.read_u24_be(playerObject + obj_model1.texture_renderer_pointer + 1);
-
-	while isRDRAM(texturePointer) do
-		print(toHexString(texturePointer));
-		texturePointer = getNextTextureRenderer(texturePointer);
+	if isRDRAM(playerObject) then
+		local texturePointer = dereferencePointer(playerObject + obj_model1.texture_renderer_pointer);
+		while isRDRAM(texturePointer) do
+			print(toHexString(texturePointer));
+			texturePointer = getNextTextureRenderer(texturePointer);
+		end
 	end
 end
 
 function Game.setDKColors()
 	local playerObject = Game.getPlayerObject();
 	if isRDRAM(playerObject) then
-		local DKBodyColors = {
-			{"Normal", 0},
-			{"Light Blue", 1},
-			{"Light Green", 2},
-			{"Purple", 3},
-			{"Bright Orange", 16},
-			{"Yellow", 19},
-		};
-
-		local DKTieColors = {
-			{"Red (Normal)", 0},
-			{"Purple", 1},
-			{"Blue", 2},
-			{"Yellow", 3},
-		};
-
-		local texturePointer = mainmemory.read_u24_be(playerObject + obj_model1.texture_renderer_pointer + 1);
-
+		local texturePointer = dereferencePointer(playerObject + obj_model1.texture_renderer_pointer);
 		if isRDRAM(texturePointer) then
+			local DKBodyColors = {
+				{"Normal", 0},
+				{"Light Blue", 1},
+				{"Light Green", 2},
+				{"Purple", 3},
+				{"Bright Orange", 16},
+				{"Yellow", 19},
+			};
+
+			local DKTieColors = {
+				{"Red (Normal)", 0},
+				{"Purple", 1},
+				{"Blue", 2},
+				{"Yellow", 3},
+			};
+
 			texturePointer = getNextTextureRenderer(texturePointer); -- Skip eyes
 
 			-- 1 Body
@@ -3589,19 +3576,18 @@ end
 function Game.setDiddyColors()
 	local playerObject = Game.getPlayerObject();
 	if isRDRAM(playerObject) then
-		local DiddyHatColors = {
-			{"Red (Normal)", 0},
-			{"Dark Blue", 1},
-			{"Yellow", 2},
-			{"Blue", 3},
-			{"Purple", 19},
-			{"Dark Red", 24},
-			{"Green", 26},
-		}
-
-		local texturePointer = mainmemory.read_u24_be(playerObject + obj_model1.texture_renderer_pointer + 1);
-
+		local texturePointer = mainmemory.dereferencePointer(playerObject + obj_model1.texture_renderer_pointer);
 		if isRDRAM(texturePointer) then
+			local DiddyHatColors = {
+				{"Red (Normal)", 0},
+				{"Dark Blue", 1},
+				{"Yellow", 2},
+				{"Blue", 3},
+				{"Purple", 19},
+				{"Dark Red", 24},
+				{"Green", 26},
+			}
+
 			texturePointer = getNextTextureRenderer(texturePointer); -- Skip Left eye
 			texturePointer = getNextTextureRenderer(texturePointer); -- Skip Right eye
 
@@ -3614,17 +3600,16 @@ end
 function Game.setLankyColors()
 	local playerObject = Game.getPlayerObject();
 	if isRDRAM(playerObject) then
-		local LankyTopColors = {
-			{"Blue (Normal)", 0},
-			{"Green", 1},
-			{"Purple", 2},
-			{"Red", 3},
-			{"Yellow", 27},
-		};
-
-		local texturePointer = mainmemory.read_u24_be(playerObject + obj_model1.texture_renderer_pointer + 1);
-
+		local texturePointer = dereferencePointer(playerObject + obj_model1.texture_renderer_pointer);
 		if isRDRAM(texturePointer) then
+			local LankyTopColors = {
+				{"Blue (Normal)", 0},
+				{"Green", 1},
+				{"Purple", 2},
+				{"Red", 3},
+				{"Yellow", 27},
+			};
+
 			texturePointer = getNextTextureRenderer(texturePointer); -- Skip eyes
 
 			-- 1 Top
@@ -3638,16 +3623,15 @@ end
 function Game.setTinyColors()
 	local playerObject = Game.getPlayerObject();
 	if isRDRAM(playerObject) then
-		local TinyBodyColors = {
-			{"Blue (Normal)", 0},
-			{"Green", 1},
-			{"Purple", 2},
-			{"Orange", 3},
-		};
-
-		local texturePointer = mainmemory.read_u24_be(playerObject + obj_model1.texture_renderer_pointer + 1);
-
+		local texturePointer = dereferencePointer(playerObject + obj_model1.texture_renderer_pointer);
 		if isRDRAM(texturePointer) then
+			local TinyBodyColors = {
+				{"Blue (Normal)", 0},
+				{"Green", 1},
+				{"Purple", 2},
+				{"Orange", 3},
+			};
+
 			texturePointer = getNextTextureRenderer(texturePointer); -- Skip Left eye
 			texturePointer = getNextTextureRenderer(texturePointer); -- Skip Right eye
 
@@ -3660,27 +3644,26 @@ end
 function Game.setChunkyColors()
 	local playerObject = Game.getPlayerObject();
 	if isRDRAM(playerObject) then
-		local ChunkyBackColors = {
-			{"Green + Yellow (Normal)", 0},
-			{"Red + Yellow", 1},
-			{"Blue + Light Blue", 2},
-			{"Purple + Pink", 3},
-			{"Blue", 16},
-			{"Red", 17},
-			{"Purple", 18},
-			{"Green", 19},
-		};
-
-		local ChunkyFrontColors = {
-			{"Blue (Normal)", 0},
-			{"Red", 1},
-			{"Purple", 2},
-			{"Green", 3},
-		};
-
-		local texturePointer = mainmemory.read_u24_be(playerObject + obj_model1.texture_renderer_pointer + 1);
-
+		local texturePointer = dereferencePointer(playerObject + obj_model1.texture_renderer_pointer);
 		if isRDRAM(texturePointer) then
+			local ChunkyBackColors = {
+				{"Green + Yellow (Normal)", 0},
+				{"Red + Yellow", 1},
+				{"Blue + Light Blue", 2},
+				{"Purple + Pink", 3},
+				{"Blue", 16},
+				{"Red", 17},
+				{"Purple", 18},
+				{"Green", 19},
+			};
+
+			local ChunkyFrontColors = {
+				{"Blue (Normal)", 0},
+				{"Red", 1},
+				{"Purple", 2},
+				{"Green", 3},
+			};
+
 			texturePointer = getNextTextureRenderer(texturePointer); -- Skip Eyes
 
 			-- 1 Back
@@ -3696,16 +3679,15 @@ end
 function Game.setKrushaColors()
 	local playerObject = Game.getPlayerObject();
 	if isRDRAM(playerObject) then
-		local KrushaColors = {
-			{"Blue (Normal)", 0},
-			{"Green", 1},
-			{"Purple", 2},
-			{"Yellow", 3},
-		};
-
-		local texturePointer = mainmemory.read_u24_be(playerObject + obj_model1.texture_renderer_pointer + 1);
-
+		local texturePointer = dereferencePointer(playerObject + obj_model1.texture_renderer_pointer);
 		if isRDRAM(texturePointer) then
+			local KrushaColors = {
+				{"Blue (Normal)", 0},
+				{"Green", 1},
+				{"Purple", 2},
+				{"Yellow", 3},
+			};
+
 			texturePointer = getNextTextureRenderer(texturePointer); -- Skip Eyes
 
 			-- 2 Body
