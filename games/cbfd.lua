@@ -5,19 +5,19 @@ local Game = {};
 --------------------
 
 Game.Memory = { -- Version order: Europe, USA
-	["x_position"] = {nil, 0x0CC2E4},
-	["y_position"] = {nil, 0x0CC2E8},
-	["z_position"] = {nil, 0x0CC2EC},
-	["y_velocity"] = {nil, 0x0CC2F0},
-	["velocity"] = {nil, 0x0CC30C},
-	["moving_angle"] = {nil, 0x0CC346}, -- u16_be
-	["facing_angle"] = {nil, 0x0CC34A}, -- u16_be
+	["x_position"] = {0x0CC704, 0x0CC2E4}, -- Float
+	["y_position"] = {0x0CC708, 0x0CC2E8}, -- Float
+	["z_position"] = {0x0CC70C, 0x0CC2EC}, -- Float
+	["y_velocity"] = {0x0CC710, 0x0CC2F0}, -- Float
+	["velocity"] = {0x0CC72C, 0x0CC30C}, -- Float
+	["moving_angle"] = {0x0CC766, 0x0CC346}, -- u16_be
+	["facing_angle"] = {0x0CC76A, 0x0CC34A}, -- u16_be
 };
 
 function Game.detectVersion(romName, romHash)
 	if romHash == "EE7BC6656FD1E1D9FFB3D19ADD759F28B88DF710" then -- Europe
 		version = 1;
-		return false; -- TODO: Support European version
+		return true;
 	elseif romHash == "4CBADD3C4E0729DEC46AF64AD018050EADA4F47A" then -- USA
 		version = 2;
 		return true;

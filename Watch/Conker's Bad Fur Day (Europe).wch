@@ -1,0 +1,9 @@
+SystemID N64
+0CC704	d	f	1	RDRAM	X Position
+0CC708	d	f	1	RDRAM	Y Position
+0CC70C	d	f	1	RDRAM	Z Position
+0CC710	d	f	1	RDRAM	Y Velocity
+0CC72C	d	f	1	RDRAM	Velocity
+0CC766	w	u	1	RDRAM	Moving Angle
+0CC76A	w	u	1	RDRAM	Facing Angle
+
