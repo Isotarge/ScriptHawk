@@ -3,6 +3,8 @@ SystemID N64
 07913C	d	s	1	RDRAM	Frameskip
 0799E0	d	u	1	RDRAM	Counter: A Button Pressed
 079AC0	d	u	1	RDRAM	Counter: A Button Pressed
+07E990	d	h	1	RDRAM	Linked list root pointer
+07E994	d	h	1	RDRAM	Linked list root pointer
 0D1A58	w	h	1	RDRAM	Set to 0000 for Infinite Eggs & Feathers (TODO: How does this work?)
 117DDA	w	h	1	RDRAM	Player Model Modifier
 117DEA	w	h	1	RDRAM	Player Model Modifier
@@ -112,6 +114,7 @@ SystemID N64
 11B677	b	u	1	RDRAM	T-Rex: Current Health
 11B678	b	u	1	RDRAM	T-Rex: Max Health
 1254B0	d	f	1	RDRAM	Banjo Brightness Doodad
+126738	d	h	1	RDRAM	Beginning of pointer list
 127638	d	f	1	RDRAM	Game Runtime
 12763C	d	f	1	RDRAM	Map Runtime
 12A990	d	f	1	RDRAM	Unknown Float

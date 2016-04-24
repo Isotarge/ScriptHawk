@@ -764,6 +764,26 @@ function outputHealth()
 	print("Health: "..Game.getCurrentHealth().."/"..Game.getMaxHealth());
 end
 
+function dumpPointerListStrings()
+	local object;
+	local index = 0;
+	repeat
+		object = dereferencePointer(0x126738 + index * 4);
+		if isRDRAM(object) then
+			local string = "Unknown";
+			local checkPointerOffset = 0x3C;
+			repeat
+				checkPointerOffset = checkPointerOffset + 4;
+				checkPointer = dereferencePointer(object + checkPointerOffset);
+			until not isRDRAM(checkPointer);
+			string = readNullTerminatedString(object + checkPointerOffset);
+
+			print(index.." "..toHexString(object)..": "..string);
+		end
+		index = index + 1;
+	until not isRDRAM(object);
+end
+
 ------------
 -- Events --
 ------------
