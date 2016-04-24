@@ -1,4 +1,5 @@
 SystemID N64
+0B86E8	w	h	1	RDRAM	Special Weapon State
 0BB070	d	s	1	RDRAM	X Position
 0BB074	d	s	1	RDRAM	Y Position
 0BB078	d	s	1	RDRAM	Z Position
@@ -8,4 +9,8 @@ SystemID N64
 0BB0D8	d	s	1	RDRAM	X Velocity
 0BB0DC	d	s	1	RDRAM	Y Velocity
 0BB0E0	d	s	1	RDRAM	Z Velocity
+0BB0FC	w	h	1	RDRAM	Jump State
+0BB106	w	u	1	RDRAM	Battery
+0BB10A	w	u	1	RDRAM	Lives
+0BB10E	w	s	1	RDRAM	Coins
 
