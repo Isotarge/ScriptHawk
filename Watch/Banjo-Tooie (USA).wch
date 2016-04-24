@@ -149,4 +149,6 @@ SystemID N64
 12C7FC	d	h	1	RDRAM	RNG
 12C830	d	f	1	RDRAM	Unknown Float
 135490	d	h	1	RDRAM	Player Pointer
+1354DF	b	h	1	RDRAM	Split up: IsKazooie?
+1354F8	b	h	1	RDRAM	Split up: IsSplit?
 

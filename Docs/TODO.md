@@ -16,6 +16,10 @@
 	- Move to SM64.lua's struct format for object model 1 and model 2
 - BK: Integrate Level Object Analyser.lua
 - BK: Integrate flags (and many other finds) from Bitalive's research https://docs.google.com/document/d/1Gek6Bkfcy1RHSDTBa3L3fEzJhaWROX3hfcmOrcekTV0/edit
+- BT: ScriptHawk tracks the wrong object in certain circumstances
+	- Asked for Mumbo's help but still in Skull
+	- Split up pads
+	- Clockwork Kazooie eggs
 - BT: Jinjo Manip memory analysis
 	- Help finish the table [here](https://docs.google.com/spreadsheets/d/1QLn9yh7ZS9dT-lMymj_98mKmnEb5OLqz_QKkEhrVzyM/pub?gid=0)
 
