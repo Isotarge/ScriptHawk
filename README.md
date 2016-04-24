@@ -57,6 +57,12 @@ A collection of Lua scripts and RAM watches for [BizHawk](https://github.com/TAS
 - Japan 1.0, 1.1 and 1.2
 - USA 1.0, 1.1 and 1.2
 
+###Toy Story 2: Buzz Lightyear to the Rescue
+- Europe (N64)
+- France (N64)
+- German 1.0 and 1.1 (N64)
+- USA (N64)
+
 ###Regarding Zelda
 While ScriptHawk does have basic support for OoT and MM there are people who are much more dedicated to these games than I will ever be. Check out the great work at the following GitHub repos for more comprehensive support:  
 - [notwa/mm](https://github.com/notwa/mm/tree/master/Lua)  
@@ -67,7 +73,6 @@ While ScriptHawk does have basic support for OoT and MM there are people who are
 - Elmo's Number Journey (N64 only)
 - Elmo's Letter Adventure (N64 only)
 - Rayman 2 (N64 USA only)
-- Toy Story 2: Buzz Lightyear to the Rescue (N64 USA only)
 
 ##Support me
 If you like my work, consider donating [here](https://streamtip.com/t/isotarge)
