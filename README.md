@@ -37,6 +37,10 @@ A collection of Lua scripts and RAM watches for [BizHawk](https://github.com/TAS
 - Japan
 - USA
 
+###Conker's Bad Fur Day
+- Europe
+- USA
+
 ###Diddy Kong Racing
 - Europe 1.0 and 1.1
 - Japan
@@ -69,7 +73,6 @@ While ScriptHawk does have basic support for OoT and MM there are people who are
 - [RainingChain/Z64LuaHooks](https://github.com/RainingChain/Z64LuaHooks)  
 
 ##Partially Supported Games
-- Conker's Bad Fur Day (USA only)
 - Elmo's Number Journey (N64 only)
 - Elmo's Letter Adventure (N64 only)
 - Rayman 2 (N64 USA only)
