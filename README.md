@@ -1,12 +1,13 @@
 #ScriptHawk
-Extra Lua scripts and RAM watches for the [BizHawk](https://github.com/TASVideos/BizHawk) emulator. Currently focused on DK64 but expanding rapidly to other games.
+A collection of Lua scripts and RAM watches for [BizHawk](https://github.com/TASVideos/BizHawk) providing many tools to assist with Glitch Hunting and TASing. ScriptHawk's Modular API allows new games to be supported easily.
 
 ##How to use
 ###Setup
-1. [Clone the repository](https://help.github.com/articles/cloning-a-repository/) into a ScriptHawk folder inside the Lua folder that comes with BizHawk
-2. Open BizHawk and your game of choice
-3. Click Tools -> Lua Console
-4. Open ScriptHawk.lua
+1. Set up [BizHawk](https://github.com/TASVideos/BizHawk) and run the prerequisite installer, the latest version is always recommended
+2. [Clone the repository](https://help.github.com/articles/cloning-a-repository/) into a ScriptHawk folder inside the Lua folder that comes with BizHawk
+3. Open BizHawk and your game of choice
+4. Click Tools -> Lua Console
+5. Open ScriptHawk.lua
 
 ###Basic functionality
 - Player position, rotation and speed will be displayed on screen
