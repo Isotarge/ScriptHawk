@@ -554,7 +554,7 @@ local function drawUI(player)
 	end
 
 	-- Output current move to the screen
-	drawGridText(UI_HUD_LEFT_X_OFFSET,3,"Move");
+	drawGridText(UI_HUD_LEFT_X_OFFSET, 3, "Move");
 	if #moveQueue[player] > 0 then
 		local currentMove = moveQueue[player][1];
 		drawGridText(UI_HUD_LEFT_X_OFFSET, 4, currentMove["x"]..","..currentMove["y"]);
@@ -697,16 +697,18 @@ local function movePickFunction(player)
 end
 
 local function mainLoop()
+	if draw_grid then
+		for player = 1, num_players do
+			drawUI(player);
+		end
+	end
+
 	if emu.islagged() then
 		return;
 	end
 
 	for player = 1, num_players do
-		invalidateGridCache(player)
-
-		if draw_grid then
-			drawUI(player);
-		end
+		invalidateGridCache(player);
 
 		if #moveQueue[player] > 0 then
 			local currentMove = moveQueue[player][1];
