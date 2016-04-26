@@ -13,7 +13,7 @@ Game.Memory = { -- Version order: Europe, USA
 	["moving_angle"] = {0x0CC766, 0x0CC346}, -- u16_be
 	["facing_angle"] = {0x0CC76A, 0x0CC34A}, -- u16_be
 	["map"] = {0x0BE7FE, 0x0BE3DE}, -- u16_be
-	["exit"] = {0x0BE800, 0x0BE3E0}, -- byte -- TODO: USA
+	["exit"] = {0x0BE800, 0x0BE3E0}, -- byte
 };
 
 Game.takeMeThereStyle = "Checkbox";
