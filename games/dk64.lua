@@ -3193,7 +3193,7 @@ function koshBotLoop()
 				--print("Firing!");
 			end
 		else
-			joypad.setanalog({["X Axis"] = false, ["Y Axis"] = false}, 1);
+			--joypad.setanalog({["X Axis"] = false, ["Y Axis"] = false}, 1); -- TODO: This stops the virtual pad from working
 		end
 	end
 end
@@ -3724,7 +3724,7 @@ function Game.eachFrame()
 	local playerObject = Game.getPlayerObject();
 	map_value = Game.getMap();
 
-	koshBotLoop();
+	--koshBotLoop(); -- TODO: This stops the virtual pad from working
 	forceTBS();
 	Game.unlockMenus(); -- TODO: Allow user to toggle this
 
