@@ -74,20 +74,6 @@ local function isPointer(value)
 	return type(value) == "number" and value >= RDRAMBase and value < RDRAMBase + RDRAMSize;
 end
 
--- Reads a signed, fixed point (16.16) big endian value from memory
-function read_signed_fixed1616_be(address)
-	local wholePart = mainmemory.read_s16_be(address);
-	local fractionalPart = mainmemory.read_u16_be(address + 2) / 65536.0;
-	return wholePart + fractionalPart;
-end
-
--- Reads an unsigned, fixed point (16.16) big endian value from memory
-function read_unsigned_fixed1616_be(address)
-	local wholePart = mainmemory.read_u16_be(address);
-	local fractionalPart = mainmemory.read_u16_be(address + 2) / 65536.0;
-	return wholePart + fractionalPart;
-end
-
 ------------------
 -- Stupid stuff --
 ------------------
