@@ -225,7 +225,7 @@ local function drawGraphicalRepresentation()
 end
 
 local function islagged()
-	if type(Game) ~= "nil" then
+	if type(Game) == "table" and type(Game.isPhysicsFrame) == "function" then
 		return not Game.isPhysicsFrame();
 	end
 	return emu.islagged();
