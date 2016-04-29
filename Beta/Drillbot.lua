@@ -20,17 +20,18 @@ local states = {
 	[0x09] = "Drilled",
 	[0x0A] = "Drilled",
 	[0x0C] = "Drilled", -- Checkpoint reached
-}
+};
 
 local facingDirection = {
 	["Left"] = 0x00,
 	["Right"] = 0x01,
 	["Down"] = 0x02,
 	["Up"] = 0x03,
-}
+};
 
 local gridBase = 0x1320;
 local gridWidth = 9;
+local gridHeight = 32;
 local blockSize = 0x20;
 local rowSize = (gridWidth + 3) * blockSize;
 
@@ -51,6 +52,10 @@ end
 -- y>=22 is under the player
 function getYPosition()
 	return 21;
+end
+
+function getAir()
+	return mainmemory.readbyte(0x114E);
 end
 
 function isBlockSafe(x, y)
@@ -79,7 +84,7 @@ function isSafe(x)
 		end
 		return false;
 	end
-	for y = 19, 21 do
+	for y = 18, 21 do
 		if not isBlockSafe(x, y) then
 			return false;
 		end
@@ -88,23 +93,34 @@ function isSafe(x)
 end
 
 function columnContainsReachableAir(x)
-	return false; -- TODO
+	for y = 1, 20 do
+		if colors[getColor(x, y)] == "Air" and states[getState(x, y)] == "Falling" then
+			return true;
+		end
+	end
+	for y = 21, 32 do
+		if colors[getColor(x, y)] == "Air" then
+			return true;
+		end
+	end
+	return false;
 end
 
--- TODO: Needs tons of work & weighting
-function getColumnScore(x)
+function getColumnScore(x) -- TODO: Needs tons of work & weighting
 	if not isSafe(x) then
 		return -math.huge; -- If the column is not safe then we never want to go there
 	end
 
 	local score = 0;
-	score = score - math.abs(getXPosition() - x); -- Delta between the player and the column
-	if columnContainsReachableAir(x) then
-		score = score + 1;
+
+	if getAir() < 50 and columnContainsReachableAir(x) then -- Check for air
+		score = score + 3;
 	end
 	if colors[getColor(x, 22)] == "Brown" then -- Check for brown block
 		score = score - 10;
 	end
+
+	score = score - math.abs(getXPosition() - x); -- Delta between the player and the column
 
 	return score;
 end
@@ -152,13 +168,8 @@ function eachFrame()
 	else
 		joypad.set({["Down"] = true});
 	end
-	if prevFrameA then
-		joypad.set({["A"] = false});
-		prevFrameA = false;
-	else
-		joypad.set({["A"] = true});
-		prevFrameA = true;
-	end
+	prevFrameA = not prevFrameA;
+	joypad.set({["A"] = prevFrameA}); -- Mash A like there's no tomorrow
 	drawUI();
 end
 

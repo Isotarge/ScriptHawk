@@ -2,6 +2,7 @@ SystemID GBA
 1136	w	u	0	IWRAM	X Position
 113C	w	u	0	IWRAM	Y Position
 1148	b	h	0	IWRAM	Facing Direction
-114E	w	u	0	IWRAM	Air
+114E	b	u	0	IWRAM	Air
+114F	b	u	0	IWRAM	Air Countdown Timer
 4320	d	h	0	IWRAM	RNG
 
