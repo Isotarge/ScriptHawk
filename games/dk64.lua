@@ -419,7 +419,7 @@ local obj_model1 = {
 	["lock_method_1_pointer"] = 0x13C,
 	["hand_state"] = 0x147, -- Bitfield
 	["control_state_byte"] = 0x154,
-	["control_state_values"] = {
+	["control_states"] = {
 		[0x02] = "First person camera",
 		[0x04] = "Fairy camera",
 		[0x05] = "Camera (Entering?)", -- TODO: Idk exactly what this is but it allows the player to gain control in weird places
@@ -456,7 +456,7 @@ local obj_model1 = {
 	["texture_renderer_pointer"] = 0x158, -- u32_be
 	["shade_byte"] = 0x16D,
 	["player"] = {
-		["animation_type"] = 0x181, -- Seems to be the same value as control_state_values
+		["animation_type"] = 0x181, -- Seems to be the same value as control_states
 		["velocity_uncrouch_aerial"] = 0x1A4, -- TODO: what is this?
 		["misc_acceleration_float"] = 0x1AC, -- TODO: what is this?
 		["horizontal_acceleration"] = 0x1B0, -- Set to a negative number to go fast
@@ -575,8 +575,8 @@ local function getExamineDataModelOne(pointer)
 	table.insert(examine_data, { "Shadow width", mainmemory.readbyte(pointer + obj_model1.shadow_width) });
 	table.insert(examine_data, { "Shadow height", mainmemory.readbyte(pointer + obj_model1.shadow_height) });
 	local controlStateValue = mainmemory.readbyte(pointer + obj_model1.control_state_byte);
-	if obj_model1.control_state_values[controlStateValue] ~= nil then
-		controlStateValue = obj_model1.control_state_values[controlStateValue]
+	if obj_model1.control_states[controlStateValue] ~= nil then
+		controlStateValue = obj_model1.control_states[controlStateValue]
 	else
 		controlStateValue = toHexString(controlStateValue);
 	end
@@ -1720,7 +1720,19 @@ end
 function Game.getDistanceFromFloor()
 	local playerObject = Game.getPlayerObject();
 	if isRDRAM(playerObject) then
-		return mainmemory.readfloat(playerObject + distance_from_obj_model1.floor, true);
+		return mainmemory.readfloat(playerObject + obj_model1.distance_from_floor, true);
+	end
+	return 0;
+end
+
+function Game.getMovementState()
+	local playerObject = Game.getPlayerObject();
+	if isRDRAM(playerObject) then
+		local controlState = mainmemory.readbyte(playerObject + obj_model1.control_state_byte);
+		if obj_model1.control_states[controlState] ~= nil then
+			return obj_model1.control_states[controlState];
+		end
+		return controlState;
 	end
 	return 0;
 end
@@ -3859,6 +3871,7 @@ Game.OSD = {
 	{"Facing", Game.getYRotation, Game.colorYRotation},
 	--{"Moving", Game.getMovingRotation}, -- TODO
 	{"Rot. Z", Game.getZRotation},
+	{"Movement", Game.getMovementState},
 	{"Separator", 1},
 	{"Bone Array 1", Game.getOSDBoneArray1},
 	{"Stored X1", Game.getStoredX1},
