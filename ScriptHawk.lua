@@ -392,6 +392,9 @@ local supportedGames = {
 	["41FDB879AB422EC158B4EAFEA69087F255EA8589"] = {["moduleName"] = "games.mm", ["friendlyName"] = "Zelda no Densetsu - Mujura no Kamen (Japan) (Rev A)"},
 	["5FB2301AACBF85278AF30DCA3E4194AD48599E36"] = {["moduleName"] = "games.mm", ["friendlyName"] = "Zelda no Densetsu - Mujura no Kamen (Japan)"},
 
+	-- Mr. Driller
+	["E7009DD8418303343C4AAC2558538B8CAA28B694"] = {["moduleName"] = "beta.Drillbot", ["selfContained"] = true, ["friendlyName"] = "Mr. Driller 2 (USA)"},
+
 	-- OoT
 	["CFBB98D392E4A9D39DA8285D10CBEF3974C2F012"] = {["moduleName"] = "games.oot", ["friendlyName"] = "Legend of Zelda, The - Ocarina of Time (Europe) (En,Fr,De) (Rev A)"},
 	["328A1F1BEBA30CE5E178F031662019EB32C5F3B5"] = {["moduleName"] = "games.oot", ["friendlyName"] = "Legend of Zelda, The - Ocarina of Time (Europe) (En,Fr,De)"},
