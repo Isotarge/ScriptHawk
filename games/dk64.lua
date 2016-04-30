@@ -709,7 +709,9 @@ local obj_model1 = {
 		[0x70] = "GB Dance",
 		[0x71] = "Key Dance",
 		[0x75] = "Vehicle", -- Castle Car Race
+		[0x77] = "Locked", -- Tons of cutscenes use this
 		[0x78] = "Gorilla Grab",
+		[0x85] = "Main Menu",
 		[0x87] = "Entering Portal",
 		[0x88] = "Exiting Portal",
 	},
