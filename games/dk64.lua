@@ -421,37 +421,67 @@ local obj_model1 = {
 	["control_state_byte"] = 0x154,
 	["control_states"] = {
 		[0x02] = "First person camera",
+		[0x03] = "First person camera", -- Water
 		[0x04] = "Fairy camera",
 		[0x05] = "Camera (Entering?)", -- TODO: Idk exactly what this is but it allows the player to gain control in weird places
 		[0x0C] = "Idle",
 		[0x0D] = "Walking",
 		[0x0E] = "Skidding",
+		[0x15] = "Slipping",
+		[0x16] = "Slipping", -- DK Slope in Helm
 		[0x17] = "Jumping",
 		[0x18] = "Moonrise?",
 		[0x1C] = "Simian Slam",
 		[0x1D] = "Long Jumping",
-		[0x20] = "Splat",
+		[0x1E] = "Falling",
+		[0x20] = "Falling/Splat",
+		[0x22] = "Pony Tail Twirl",
 		[0x24] = "Sparkles",
 		[0x26] = "Ground Attack",
 		[0x28] = "Ground Attack (Final)",
-		[0x29] = "Kicking",
+		[0x29] = "Moving Ground Attack",
 		[0x2A] = "Aerial Attack",
 		[0x2B] = "Rolling",
-		[0x2C] = "Crouch?",
+		[0x2C] = "Throwing Orange",
+		[0x2E] = "Chimpy Charge",
 		[0x39] = "Shrinking",
-		[0x31] = "ESS",
-		[0x36] = "Backwalk into loading zone?",
+		[0x31] = "Damaged",
+		[0x35] = "Damaged", -- Klump knockback
+		[0x36] = "Death",
 		[0x39] = "Shrink",
 		[0x3C] = "Crouching",
 		[0x3D] = "Uncrouching",
-		[0x3E] = "Camera zooms out",
+		[0x3E] = "Backflip",
+		[0x3F] = "Entering Orangstand",
+		[0x40] = "Orangstand",
+		[0x41] = "Jumping", -- Orangstand
+		[0x42] = "Tag Barrel",
+		[0x47] = "Picking up Object",
+		[0x48] = "Idle", -- Carrying Object (Boulder?)
+		[0x49] = "Walking", -- Carrying Object (Boulder?)
+		[0x4A] = "Dropping Object",
+		[0x4B] = "Throwing Boulder",
 		[0x4E] = "Surface swimming",
 		[0x4F] = "Underwater",
 		[0x50] = "Leaving Water",
+		[0x51] = "Jumping", -- Out of water
+		[0x52] = "Bananaporter",
+		[0x53] = "Monkeyport",
+		[0x57] = "Swinging on Vine",
+		[0x58] = "Leaving Vine",
 		[0x59] = "Climbing Tree",
 		[0x5A] = "Leaving Tree",
 		[0x5B] = "Grabbed Ledge",
 		[0x5C] = "Pulling up on Ledge",
+		[0x5D] = "Idle", -- With gun
+		[0x5E] = "Walking", -- With gun
+		[0x5F] = "Putting away gun",
+		[0x60] = "Pulling out gun", -- Chunky?
+		[0x62] = "Aiming gun",
+		[0x64] = "Taking Photo",
+		[0x67] = "Playing instrument",
+		[0x70] = "GB Dance",
+		[0x71] = "Key Dance",
 	},
 	["texture_renderer_pointer"] = 0x158, -- u32_be
 	["shade_byte"] = 0x16D,
@@ -1732,9 +1762,9 @@ function Game.getMovementState()
 		if obj_model1.control_states[controlState] ~= nil then
 			return obj_model1.control_states[controlState];
 		end
-		return controlState;
+		return toHexString(controlState);
 	end
-	return 0;
+	return 'Unknown';
 end
 
 -- TODO: Game.getWaterHeight()
