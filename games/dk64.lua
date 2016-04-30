@@ -670,6 +670,7 @@ local obj_model1 = {
 		[0x31] = "Damaged",
 		[0x35] = "Damaged", -- Klump knockback
 		[0x36] = "Death",
+		[0x37] = "Damaged", -- Underwater
 		[0x39] = "Shrink",
 		[0x3C] = "Crouching",
 		[0x3D] = "Uncrouching",
@@ -678,6 +679,7 @@ local obj_model1 = {
 		[0x40] = "Orangstand",
 		[0x41] = "Jumping", -- Orangstand
 		[0x42] = "Barrel", -- Tag Barrel, Bonus Barrel, Mini Monkey Barrel
+		[0x43] = "Barrel", -- Underwater
 		[0x47] = "Picking up Object",
 		[0x48] = "Idle", -- Carrying Object (Boulder?)
 		[0x49] = "Walking", -- Carrying Object (Boulder?)
@@ -700,12 +702,16 @@ local obj_model1 = {
 		[0x5F] = "Putting away gun",
 		[0x60] = "Pulling out gun", -- Chunky?
 		[0x62] = "Aiming gun",
+		[0x63] = "Rocketbarrel",
 		[0x64] = "Taking Photo",
-		[0x67] = "Playing instrument",
+		[0x67] = "Instrument",
+		[0x6B] = "Locked", -- Bonus barrel
 		[0x70] = "GB Dance",
 		[0x71] = "Key Dance",
 		[0x75] = "Vehicle", -- Castle Car Race
 		[0x78] = "Gorilla Grab",
+		[0x87] = "Entering Portal",
+		[0x88] = "Exiting Portal",
 	},
 	["texture_renderer_pointer"] = 0x158, -- u32_be
 	["shade_byte"] = 0x16D,
@@ -3267,6 +3273,9 @@ local function drawGrabScriptUI()
 	end
 
 	local cameraObject = dereferencePointer(Game.Memory["camera_pointer"][version]);
+	if not isRDRAM(cameraObject) then
+		return;
+	end
 
 	if stringContains(grab_script_mode, "Model 1") then
 		populateObjectModel1Pointers();
