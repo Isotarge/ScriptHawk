@@ -1331,6 +1331,23 @@ function isValidFlagBlockAddress(address)
 	return type(address) == "number" and address > 0x700000 and address ~= 0x756494 and address ~= 0x7F0000 and address ~= 0x7FBFB0 and address < RDRAMSize - flag_block_size;
 end
 
+local function getFlagByName(flagName)
+	for i = 1, #flag_array do
+		if flagName == flag_array[i]["name"] then
+			return flag_array[i];
+		end
+	end
+end
+
+local function getFlagName(byte, bit)
+	for i = 1, #flag_array do
+		if byte == flag_array[i]["byte"] and bit == flag_array[i]["bit"] then
+			return flag_array[i]["name"];
+		end
+	end
+	return "Unknown at "..toHexString(byte)..">"..bit;
+end
+
 function checkFlags(_type)
 	local flags = dereferencePointer(Game.Memory.flag_block_pointer[version]);
 	if isValidFlagBlockAddress(flags) then
@@ -1407,6 +1424,13 @@ local function processFlagQueue()
 								dprint("Cleared flag at "..toHexString(queue_item["byte"])..">"..queue_item["bit"]);
 							end
 						end
+					elseif queue_item["action_type"] == "checkSingle" then
+						current_value = mainmemory.readbyte(flags + queue_item["byte"]);
+						if check_bit(current_value, queue_item["bit"]) then
+							dprint(getFlagName(queue_item["byte"], queue_item["bit"]).." is set.");
+						else
+							dprint(getFlagName(queue_item["byte"], queue_item["bit"]).." is not set.");
+						end
 					elseif queue_item["action_type"] == "check" then
 						checkFlags();
 					end
@@ -1420,11 +1444,18 @@ local function processFlagQueue()
 	end
 end
 
-local function getFlagByName(flagName)
-	for i = 1, #flag_array do
-		if flagName == flag_array[i]["name"] then
-			return flag_array[i];
+function checkFlag(byte, bit)
+	if type(byte) == "string" then
+		local flag = getFlagByName(byte);
+		if type(flag) == "table" then
+			byte = flag["byte"];
+			bit = flag["bit"];
 		end
+	end
+	if type(byte) == "number" and type(bit) == "number" then
+		table.insert(flag_action_queue, {["action_type"] = "checkSingle", ["byte"] = byte, ["bit"] = bit});
+	else
+		print("Warning: Flag not found.");
 	end
 end
 
