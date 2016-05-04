@@ -14,8 +14,9 @@ Even this README is incomplete.
 Copy the lips directory to somewhere Lua's `package.path` can find it.
 If you're using it locally, you will need to write something like:
 ```
-package.path = package.path..";./?/init.lua"
+package.path = package.path..";?/init.lua"
 ```
+or `require "lips.init"` directly.
 
 You can then use it as such:
 [example.lua][elua] — [example.asm][easm]
@@ -91,8 +92,6 @@ my_label:
     lw      s1, (s0)
     lw      s2, 256(s0)
     lw      s3, label(s0)
-
-; this is currently unsupported however
     sw      s2, label+4
     sw      s3, label+4(s0)
 
@@ -239,6 +238,11 @@ include an external assembly file as-is at this position.
 lips will look for the included file
 in the directory of the file using the directive.
 
+* `.incbin {filename}`  
+write an external binary file as-is at this position.
+lips will look for the included file
+in the directory of the file using the directive.
+
 * `.ascii "some\ntext\0"`  
 writes a string using its characters' ASCII values.
 a few escapes are currently supported: `\ " a b f n r t v 0`
@@ -251,5 +255,3 @@ same as ascii, but with a null byte added to the end.
 * FLOAT: writes a list of 32-bit floating point numbers until end-of-line.
 this may not get implemented due to a lack of aliasing in vanilla Lua,
 and thus accuracy issues.
-
-* INCBIN: write an external binary file as-is at this position.

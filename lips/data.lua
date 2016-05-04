@@ -367,21 +367,23 @@ data.instructions = {
     TRUNC_L_D={17, 'DS', 'F0SDC',  9, data.fmt_double},
     TRUNC_L_S={17, 'DS', 'F0SDC',  9, data.fmt_single},
     TRUNC_W_D={17, 'DS', 'F0SDC', 13, data.fmt_double},
-    TRUNC_W_S={17, 'DS', 'F0SDC', 13, data.fmt_double},
+    TRUNC_W_S={17, 'DS', 'F0SDC', 13, data.fmt_single},
 
     -- pseudo-instructions
 
-    B       = {4, 'r', '00o'},          -- BEQ R0, R0, offset
-    BAL     = {1, 'r', '0Co', 17},      -- BGEZAL R0, offset
-    BEQZ    = {4, 'sr', 's0o'},         -- BEQ RS, R0, offset
-    BNEZ    = {5, 'sr', 's0o'},         -- BNE RS, R0, offset
-    CL      = {0, 'd', '00d0C', 37},    -- OR RD, R0, R0
-    MOV     = {0, 'ds', 's0d0C', 37},   -- OR RD, RS, R0
-    NEG     = {0, 'dt', '0td0C', 34},   -- SUB RD, R0, RT
-    NOP     = {0, '', '0'},             -- SLL R0, R0, 0
-    NOT     = {0, 'ds', 's0d0C', 39},   -- NOR RD, RS, R0
-    SUBI    = {8, 'tsk', 'sti'},        -- ADDI RT, RS, -immediate
-    SUBIU   = {9, 'tsk', 'sti'},        -- ADDIU RT, RS, -immediate
+    B       = { 4, 'r', '00o'},         -- BEQ R0, R0, offset
+    BAL     = { 1, 'r', '0Co', 17},     -- BGEZAL R0, offset
+    BEQZ    = { 4, 'sr', 's0o'},        -- BEQ RS, R0, offset
+    BEQZL   = {20, 'sr', 's0o'},        -- BEQL RS, R0, offset
+    BNEZ    = { 5, 'sr', 's0o'},        -- BNE RS, R0, offset
+    BNEZL   = {21, 'sr', 's0o'},        -- BNEL RS, R0, offset
+    CL      = { 0, 'd', '00d0C', 37},   -- OR RD, R0, R0
+    MOV     = { 0, 'ds', 's0d0C', 37},  -- OR RD, RS, R0
+    NEG     = { 0, 'dt', '0td0C', 34},  -- SUB RD, R0, RT
+    NOP     = { 0, '', '0'},            -- SLL R0, R0, 0
+    NOT     = { 0, 'ds', 's0d0C', 39},  -- NOR RD, RS, R0
+    SUBI    = { 8, 'tsk', 'sti'},       -- ADDI RT, RS, -immediate
+    SUBIU   = { 9, 'tsk', 'sti'},       -- ADDIU RT, RS, -immediate
 
     -- ...that expand to multiple instructions
     LI      = __, -- only one instruction for values < 0x10000
@@ -409,12 +411,17 @@ data.instructions = {
     SLE     = __, SLEI    = __, SLEIU   = __, SLEU    = __,
     SNE     = __, SNEI    = __, SNEIU   = __, SNEU    = __,
 
-                  BEQI    = __,
-                  BNEI    = __,
-    BGE     = __, BGEI    = __,
-    BLE     = __, BLEI    = __,
-    BLT     = __, BLTI    = __,
-    BGT     = __, BGTI    = __,
+    BGE     = __,
+    BLE     = __,
+    BLT     = __,
+    BGT     = __,
+
+    BEQI    = __, BEQIL   = __,
+    BNEI    = __, BNEIL   = __,
+    BGEI    = __, BGEIL   = __,
+    BLEI    = __, BLEIL   = __,
+    BLTI    = __, BLTIL   = __,
+    BGTI    = __, BGTIL   = __,
 }
 
 data.all_instructions = {}

@@ -1,6 +1,7 @@
-local util = require "lips.util"
+local path = string.gsub(..., "[^.]+$", "")
+local Base = require(path.."Base")
 
-local Token = util.Class()
+local Token = Base:extend()
 function Token:init(...)
     local args = {...}
     if #args == 1 then

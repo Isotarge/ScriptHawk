@@ -2,17 +2,19 @@ local floor = math.floor
 local format = string.format
 local insert = table.insert
 
-local data = require "lips.data"
-local util = require "lips.util"
+local path = string.gsub(..., "[^.]+$", "")
+local data = require(path.."data")
+local util = require(path.."util")
+local Base = require(path.."Base")
 
 local bitrange = util.bitrange
 
-local Dumper = util.Class()
+local Dumper = Base:extend()
 function Dumper:init(writer, fn, options)
     self.writer = writer
     self.fn = fn or '(string)'
     self.options = options or {}
-    self.labels = {}
+    self.labels = setmetatable({}, {__index=options.labels})
     self.commands = {}
     self.pos = options.offset or 0
     self.lastcommand = nil
@@ -20,6 +22,17 @@ end
 
 function Dumper:error(msg)
     error(format('%s:%d: Error: %s', self.fn, self.line, msg), 2)
+end
+
+function Dumper:export_labels(t)
+    for k, v in pairs(self.labels) do
+        -- only return valid labels; those that don't begin with a number
+        -- (relative labels are invalid)
+        if not tostring(k):sub(1, 1):find('%d') then
+            t[k] = v
+        end
+    end
+    return t
 end
 
 function Dumper:advance(by)
@@ -85,7 +98,8 @@ function Dumper:add_directive(fn, line, name, a, b)
         self:add_bytes(line, b1, b0)
     elseif name == 'WORD' then
         if type(a) == 'string' then
-            local t = {line=line, kind='label', name=a}
+            t.kind = 'label'
+            t.name = a
             insert(self.commands, t)
             self:advance(4)
         else
@@ -113,13 +127,13 @@ function Dumper:add_directive(fn, line, name, a, b)
         end
         local temp = self.pos + align - 1
         t.skip = temp - (temp % align) - self.pos
-        t.fill = t.fill or 0
+        t.fill = b and b % 0x100 or 0
         insert(self.commands, t)
         self:advance(t.skip)
     elseif name == 'SKIP' then
         t.kind = 'ahead'
         t.skip = a
-        t.fill = b
+        t.fill = b and b % 0x100 or nil
         insert(self.commands, t)
         self:advance(t.skip)
     else
@@ -128,22 +142,34 @@ function Dumper:add_directive(fn, line, name, a, b)
 end
 
 function Dumper:desym(t)
-    if type(t.tok) == 'number' then
+    if t.tt == 'REL' then
+        local target = t.tok % 0x80000000
+        local pos = self.pos % 0x80000000
+        local rel = floor(target/4) - 1 - floor(pos/4)
+        if rel > 0x8000 or rel <= -0x8000 then
+            self:error('branch too far')
+        end
+        return rel % 0x10000
+    elseif type(t.tok) == 'number' then
+        if t.offset then
+            return t.tok + t.offset
+        end
         return t.tok
     elseif t.tt == 'REG' then
         assert(data.all_registers[t.tok], 'Internal Error: unknown register')
         return data.registers[t.tok] or data.fpu_registers[t.tok] or data.sys_registers[t.tok]
-    elseif t.tt == 'LABELSYM' then
+    elseif t.tt == 'LABELSYM' or t.tt == 'LABELREL' then
         local label = self.labels[t.tok]
         if label == nil then
             self:error('undefined label')
         end
-        return label
-    elseif t.tt == 'LABELREL' then
-        local label = self.labels[t.tok]
-        if label == nil then
-            self:error('undefined label')
+        if t.offset then
+            label = label + t.offset
         end
+        if t.tt == 'LABELSYM' then
+            return label
+        end
+
         label = label % 0x80000000
         local pos = self.pos % 0x80000000
         local rel = floor(label/4) - 1 - floor(pos/4)
@@ -209,8 +235,7 @@ end
 
 function Dumper:write(t)
     for _, b in ipairs(t) do
-        local s = ('%02X'):format(b)
-        self.writer(self.pos, s)
+        self.writer(self.pos, b)
         self.pos = self.pos + 1
     end
 end
@@ -270,7 +295,7 @@ function Dumper:dump()
                 self.pos = self.pos + t.skip
             end
         elseif t.kind == 'label' then
-            local val = self:desym{'LABELSYM', t.name}
+            local val = self:desym{tt='LABELSYM', tok=t.name}
             val = (val % 0x80000000) + 0x80000000
             local b0 = bitrange(val, 0, 7)
             local b1 = bitrange(val, 8, 15)

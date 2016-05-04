@@ -481,7 +481,7 @@ end
 local code = {};
 
 function codeWriter(...)
-	table.insert(code, tonumber(arg[2], 16));
+	table.insert(code, arg[2]);
 end
 
 function loadASMPatch(code_filename, suppress_print)

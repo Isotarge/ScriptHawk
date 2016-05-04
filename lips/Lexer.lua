@@ -4,8 +4,10 @@ local find = string.find
 local format = string.format
 local insert = table.insert
 
-local data = require "lips.data"
-local util = require "lips.util"
+local path = string.gsub(..., "[^.]+$", "")
+local data = require(path.."data")
+local util = require(path.."util")
+local Base = require(path.."Base")
 
 local simple_escapes = {
     ['0']   = 0x00,
@@ -20,7 +22,7 @@ local simple_escapes = {
     ['v']   = 0x0B,
 }
 
-local Lexer = util.Class()
+local Lexer = Base:extend()
 function Lexer:init(asm, fn, options)
     self.asm = asm
     self.fn = fn or '(string)'
@@ -37,6 +39,19 @@ function Lexer:error(msg)
 end
 
 function Lexer:nextc()
+    -- iterate to the next character while translating newlines.
+    -- outputs:
+    --self.chr      the character as a string
+    --self.chr2     the character after it as a string
+    --self.chrchr   both characters as a string
+    --              chr values can be empty
+    --self.ord      numeric value of the character
+    --self.ord2     numeric value of the character after it
+    --              ord values can be self.EOF
+    --self.was_EOL  if the character was an EOL
+    --              this EOL state is preserved past the EOF
+    --              so it can be used to determine if the file lacks a final EOL
+
     if self.pos > #self.asm then
         self.ord = self.EOF
         self.ord2 = self.EOF
@@ -89,6 +104,10 @@ function Lexer:read_chars(pattern)
     return buff
 end
 
+function Lexer:read_spaces()
+    return self:read_chars('[ \t]')
+end
+
 function Lexer:read_decimal()
     local buff = self:read_chars('%d')
     local num = tonumber(buff)
@@ -125,10 +144,18 @@ function Lexer:read_number()
         self:nextc()
         return self:read_hex()
     elseif self.chr:find('%d') then
-        if self.chr2 == 'x' or self.chr2 == 'X' then
+        if self.chr2 == 'x' then
             self:nextc()
             self:nextc()
             return self:read_hex()
+        elseif self.chr2 == 'o' then
+            self:nextc()
+            self:nextc()
+            return self:read_octal()
+        elseif self.chr2 == 'b' then
+            self:nextc()
+            self:nextc()
+            return self:read_binary()
         elseif self.chr == '0' and self.chr2:find('%d') then
             self:nextc()
             return self:read_octal()
@@ -262,7 +289,7 @@ function Lexer:lex_string_naive(yield) -- no escape sequences
 end
 
 function Lexer:lex_include(_yield)
-    self:read_chars('%s')
+    self:read_spaces()
     local fn
     self:lex_string_naive(function(tt, tok)
         fn = tok
@@ -272,6 +299,25 @@ function Lexer:lex_include(_yield)
     end
     local sublexer = Lexer(util.readfile(fn), fn, self.options)
     sublexer:lex(_yield)
+end
+
+function Lexer:lex_include_binary(_yield)
+    self:read_spaces()
+    local fn
+    self:lex_string_naive(function(tt, tok)
+        fn = tok
+    end)
+    -- TODO: allow optional offset and size arguments
+    if self.options.path then
+        fn = self.options.path..fn
+    end
+    -- FIXME: this allocates two tables for each byte.
+    --        this could easily cause performance issues on big files.
+    local data = util.readfile(fn, true)
+    for b in string.gfind(data, '.') do
+        _yield('DIR', 'BYTE', fn, 0)
+        _yield('NUM', string.byte(b), fn, 0)
+    end
 end
 
 function Lexer:lex(_yield)
@@ -305,11 +351,11 @@ function Lexer:lex(_yield)
             self:nextc()
             local buff = self:read_chars('[%w_]')
             if self.chr ~= ']' then
-                self:error('invalid define name')
+                self:error('invalid variable name')
             end
             self:nextc()
             if self.chr ~= ':' then
-                self:error('define requires a colon')
+                self:error('expected a colon after closing bracket')
             end
             self:nextc()
             yield('DEF', buff)
@@ -334,6 +380,9 @@ function Lexer:lex(_yield)
             if up == 'INC' or up == 'INCASM' or up == 'INCLUDE' then
                 yield('DIR', 'INC')
                 self:lex_include(_yield)
+            elseif up == 'INCBIN' then
+                yield('DIR', 'INCBIN')
+                self:lex_include_binary(_yield)
             else
                 yield('DIR', up)
             end
@@ -345,8 +394,16 @@ function Lexer:lex(_yield)
             yield('DEFSYM', buff)
         elseif self.chr == '%' then
             self:nextc()
-            local call = self:read_chars('[%w_]')
-            yield('SPECIAL', call)
+            if self.chr:find('[%a_]') then
+                local call = self:read_chars('[%w_]')
+                if call ~= '' then
+                    yield('SPECIAL', call)
+                end
+            elseif self.chr:find('[01]') then
+                yield('NUM', self:read_binary())
+            else
+                self:error('unknown % syntax')
+            end
         elseif self.chr:find('[%a_]') then
             local buff = self:read_chars('[%w_.]')
             local up = buff:upper()
@@ -371,16 +428,25 @@ function Lexer:lex(_yield)
         elseif self.chr == '+' or self.chr == '-' then
             local sign_chr = self.chr
             local sign = sign_chr == '+' and 1 or -1
-            local buff = self:read_chars('%'..self.chr)
-            if #buff == 1 and self.chr == ':' then
+            local signs = self:read_chars('%'..self.chr)
+            local name = ''
+            if self.chr:find('[%a_]') then
+                name = self:read_chars('[%w_]')
+            end
+            if #signs == 1 and self.chr == ':' then
                 self:nextc()
-                yield('RELLABEL', sign_chr)
+                yield('RELLABEL', signs..name)
             else
+                self:read_spaces()
                 local n = self:read_number()
                 if n then
                     yield('NUM', sign*n)
+                elseif #signs == 1 and name == '' then
+                    -- this could be a RELLABELSYM
+                    -- we'll have to let the preproc figure it out
+                    yield('UNARY', sign)
                 else
-                    yield('RELLABELSYM', sign*#buff)
+                    yield('RELLABELSYM', signs..name)
                 end
             end
         else

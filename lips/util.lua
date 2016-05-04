@@ -1,29 +1,16 @@
 local floor = math.floor
 local open = io.open
 
-local function Class(inherit)
-    local class = {}
-    local mt_obj = {__index = class}
-    local mt_class = {
-        __call = function(self, ...)
-            local obj = setmetatable({}, mt_obj)
-            obj:init(...)
-            return obj
-        end,
-        __index = inherit,
-    }
-
-    return setmetatable(class, mt_class)
-end
-
-local function readfile(fn)
-    local f = open(fn, 'r')
+local function readfile(fn, binary)
+    local mode = binary and 'rb' or 'r'
+    local f = open(fn, mode)
     if not f then
-        error('could not open assembly file for reading: '..tostring(fn), 2)
+        local kind = binary and 'binary' or 'assembly'
+        error('could not open '..kind..' file for reading: '..tostring(fn), 2)
     end
-    local asm = f:read('*a')
+    local data = f:read('*a')
     f:close()
-    return asm
+    return data
 end
 
 local function bitrange(x, lower, upper)
@@ -31,7 +18,6 @@ local function bitrange(x, lower, upper)
 end
 
 return {
-    Class = Class,
     readfile = readfile,
     bitrange = bitrange,
 }

@@ -1,9 +1,10 @@
 local format = string.format
 local insert = table.insert
 
-local data = require "lips.data"
-local util = require "lips.util"
-local Token = require "lips.Token"
+local path = string.gsub(..., "[^.]+$", "")
+local data = require(path.."data")
+local Base = require(path.."Base")
+local Token = require(path.."Token")
 
 local arg_types = {
     NUM = true,
@@ -13,7 +14,7 @@ local arg_types = {
     RELLABELSYM = true,
 }
 
-local Muncher = util.Class()
+local Muncher = Base:extend()
 -- no base init method
 
 function Muncher:error(msg)
@@ -25,16 +26,17 @@ function Muncher:token(t, val)
     if type(t) == 'table' then
         t.fn = self.fn
         t.line = self.line
-        return Token(t)
+        local token = Token(t)
+        return token
     else
-        return Token(self.fn, self.line, t, val)
+        local token = Token(self.fn, self.line, t, val)
+        return token
     end
 end
 
 function Muncher:advance()
     self.i = self.i + 1
     self.t = self.tokens[self.i]
-	--print(self.t);
     self.tt = self.t.tt
     self.tok = self.t.tok
     self.fn = self.t.fn
@@ -117,8 +119,12 @@ function Muncher:const(relative, no_label)
         self:error('labels are not allowed here')
     end
     local t = self:token(self.t)
-    if relative and self.tt == 'LABELSYM' then
-        t.tt = 'LABELREL'
+    if relative then
+        if self.tt == 'LABELSYM' then
+            t.tt = 'LABELREL'
+        else
+            t.tt = 'REL'
+        end
     end
     self:advance()
     return t

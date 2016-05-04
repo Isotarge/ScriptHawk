@@ -1,7 +1,7 @@
 local insert = table.insert
 
-local data = require "lips.data"
-local util = require "lips.util"
+local path = string.gsub(..., "[^.]+$", "")
+local data = require(path.."data")
 
 local instructions = data.instructions
 
@@ -237,6 +237,12 @@ local branch_basics = {
     BLEI = "BNE",
     BLTI = "BNE",
     BNEI = "BNE",
+    BEQIL = "BEQL",
+    BGEIL = "BEQL",
+    BGTIL = "BEQL",
+    BLEIL = "BNEL",
+    BLTIL = "BNEL",
+    BNEIL = "BNEL",
 }
 
 function overrides.BEQI(self, name)
@@ -261,6 +267,8 @@ function overrides.BEQI(self, name)
     self:format_out(branch, args)
 end
 overrides.BNEI = overrides.BEQI
+overrides.BEQIL = overrides.BEQI
+overrides.BNEIL = overrides.BEQI
 
 function overrides.BLTI(self, name)
     local slti = instructions['SLTI']
@@ -284,6 +292,8 @@ function overrides.BLTI(self, name)
     self:format_out(branch, args)
 end
 overrides.BGEI = overrides.BLTI
+overrides.BLTIL = overrides.BLTI
+overrides.BGEIL = overrides.BLTI
 
 function overrides.BLEI(self, name)
     -- TODO: this can probably be optimized
@@ -323,5 +333,7 @@ function overrides.BLEI(self, name)
     self:format_out(branch, args)
 end
 overrides.BGTI = overrides.BLEI
+overrides.BLEIL = overrides.BLEI
+overrides.BGTIL = overrides.BLEI
 
 return overrides
