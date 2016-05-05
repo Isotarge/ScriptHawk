@@ -1554,7 +1554,7 @@ function draw_ui()
 			end
 		end
 	end
-	
+
 	if script_mode == "List Struct" then
 		if isRDRAM(structArray) then
 			for i = 0, numSlots - 1 do

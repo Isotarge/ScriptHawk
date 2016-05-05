@@ -190,7 +190,7 @@ local flag_array = {
 	{["byte"] = 0x47, ["bit"] = 5, ["name"] = "Fungi: Tiny Banana Medal", ["type"] = "Medal"},
 	{["byte"] = 0x47, ["bit"] = 6, ["name"] = "Fungi: Chunky Banana Medal", ["type"] = "Medal"},
 	{["byte"] = 0x47, ["bit"] = 7, ["name"] = "Caves: DK Banana Medal", ["type"] = "Medal"},
-	
+
 	{["byte"] = 0x48, ["bit"] = 0, ["name"] = "Caves: Diddy Banana Medal", ["type"] = "Medal"},
 	{["byte"] = 0x48, ["bit"] = 1, ["name"] = "Caves: Lanky Banana Medal", ["type"] = "Medal"},
 	{["byte"] = 0x48, ["bit"] = 2, ["name"] = "Caves: Tiny Banana Medal", ["type"] = "Medal"},
