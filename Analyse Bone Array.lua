@@ -1,6 +1,5 @@
 local pointer_list;
 local max_objects = 0xFF;
-local precision = 5 or precision;
 print_every_frame = false;
 
 local romName = gameinfo.getromname();
@@ -48,10 +47,6 @@ require "lib.DPrint";
 ----------------------
 -- Helper functions --
 ----------------------
-
-function round(num, idp)
-	return tonumber(string.format("%." .. (idp or 0) .. "f", num));
-end
 
 function toHexString(value)
 	value = string.format("%X", value or 0);
@@ -178,13 +173,10 @@ end
 
 print_threshold = 1;
 local function processObject(objectPointer)
-	local currentModelBase = mainmemory.read_u32_be(objectPointer + model_pointer);
-	local currentBoneArrayBase = mainmemory.read_u32_be(objectPointer + current_bone_array_pointer);
+	local currentModelBase = mainmemory.read_u32_be(objectPointer + model_pointer) - RDRAMBase;
+	local currentBoneArrayBase = mainmemory.read_u32_be(objectPointer + current_bone_array_pointer) - RDRAMBase;
 
-	if isPointer(currentModelBase) and isPointer(currentBoneArrayBase) then
-		currentModelBase = currentModelBase - RDRAMBase;
-		currentBoneArrayBase = currentBoneArrayBase - RDRAMBase;
-
+	if isRDRAM(currentModelBase) and isRDRAM(currentBoneArrayBase) then
 		-- Stupid stuff
 		setNumberOfBones(currentModelBase);
 
@@ -206,7 +198,7 @@ local function mainLoop()
 		local objectPointer = 0x000000;
 		local objectIndex = 0;
 		repeat
-			objectPointer = mainmemory.read_u24_be(pointer_list + (objectIndex * 4) + 1);
+			objectPointer = mainmemory.read_u32_be(pointer_list + (objectIndex * 4)) - RDRAMBase;
 			objectIndex = objectIndex + 1;
 			if isRDRAM(objectPointer) then
 				processObject(objectPointer);
