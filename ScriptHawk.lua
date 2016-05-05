@@ -1165,7 +1165,7 @@ local function plot_pos()
 	end
 
 	if lock_y then -- TODO: Checkbox
-		if y < prev_y then
+		if (not Game.speedy_invert_Y and y < prev_y) or (Game.speedy_invert_Y and y > prev_y) then
 			Game.setYPosition(prev_y);
 			y = prev_y;
 		end
