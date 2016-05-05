@@ -1,4 +1,4 @@
-local colors = {
+colors = {
 	[0x00] = "Empty",
 	[0x06] = "Empty",
 	[0x07] = "Empty",
@@ -12,7 +12,7 @@ local colors = {
 	[0x0F] = "Yellow",
 };
 
-local states = {
+states = {
 	[0x00] = "Empty",
 	[0x03] = "Falling",
 	[0x04] = "Active",
@@ -22,7 +22,7 @@ local states = {
 	[0x0C] = "Drilled", -- Checkpoint reached
 };
 
-local facingDirection = {
+facingDirection = {
 	["Left"] = 0x00,
 	["Right"] = 0x01,
 	["Down"] = 0x02,
@@ -35,12 +35,32 @@ local gridHeight = 32;
 local blockSize = 0x20;
 local rowSize = (gridWidth + 3) * blockSize;
 
+function getOSDXPos(x)
+	return 10 + (x - 1) * 16;
+end
+
+function getOSDYPos(y)
+	return -264 + (y * 16);
+end
+
+function getBlockAddress(x, y)
+	return gridBase + ((y - 1) * rowSize) + (x * blockSize);
+end
+
 function getColor(x, y)
-	return mainmemory.readbyte(gridBase + ((y - 1) * rowSize) + (x * blockSize) + 0x0E);
+	return mainmemory.readbyte(getBlockAddress(x, y) + 0x0E);
+end
+
+function getTimer(x, y)
+	return mainmemory.readbyte(getBlockAddress(x, y) + 0x16);
+end
+
+function setTimer(x, y, value)
+	mainmemory.writebyte(getBlockAddress(x, y) + 0x16, value);
 end
 
 function getState(x, y)
-	return mainmemory.readbyte(gridBase + ((y - 1) * rowSize) + (x * blockSize));
+	return mainmemory.readbyte(getBlockAddress(x, y));
 end
 
 function getXPosition()
@@ -65,7 +85,7 @@ function isBlockSafe(x, y)
 		return true;
 	end
 	if state == "Falling" and color ~= "Air" then
-		return false;
+		return not (getTimer(x, y) == 0);
 	end
 	if color == "Empty" or color == "Air" or color == "Star" then
 		return true;
@@ -84,7 +104,7 @@ function isSafe(x)
 		end
 		return false;
 	end
-	for y = 18, 21 do
+	for y = 19, 21 do
 		if not isBlockSafe(x, y) then
 			return false;
 		end
@@ -106,21 +126,37 @@ function columnContainsReachableAir(x)
 	return false;
 end
 
+weight = {
+	["Air"] = 5,
+	["Safe"] = -50,
+	["Brown"] = -5,
+	["Distance"] = -2,
+};
+
 function getColumnScore(x) -- TODO: Needs tons of work & weighting
-	if not isSafe(x) then
-		return -math.huge; -- If the column is not safe then we never want to go there
-	end
-
 	local score = 0;
-
-	if getAir() < 50 and columnContainsReachableAir(x) then -- Check for air
-		score = score + 3;
-	end
-	if colors[getColor(x, 22)] == "Brown" then -- Check for brown block
-		score = score - 10;
+	if not isSafe(x) then
+		score = score + weight.Safe;
 	end
 
-	score = score - math.abs(getXPosition() - x); -- Delta between the player and the column
+	if getAir() <= 50 and columnContainsReachableAir(x) then -- Check for air
+		score = score + weight.Air;
+	end
+	if colors[getColor(x, 22)] == "Brown" then -- Check for brown block underneath
+		score = score + weight.Brown;
+	end
+	for test = 1, x - 1 do
+		if colors[getColor(test, 21)] == "Brown" then -- Check for brown blocks to the left
+			score = score + weight.Brown;
+		end
+	end
+	for test = x + 1, gridWidth do
+		if colors[getColor(test, 21)] == "Brown" then -- Check for brown blocks to the right
+			score = score + weight.Brown;
+		end
+	end
+
+	score = score + math.abs(getXPosition() - x) * weight.Distance; -- Delta between the player and the column
 
 	return score;
 end
@@ -138,21 +174,22 @@ function getMaxScoredColumn()
 	return maxScored;
 end
 
-function getOSDXPos(x)
-	return 10 + (x - 1) * 16;
-end
-
 function drawUI()
 	gui.cleartext();
 	for x = 1, gridWidth do
 		if isSafe(x) then
-			gui.drawText(getOSDXPos(x), 72, "Y", 0xFF00FF00); -- Green
+			gui.drawText(getOSDXPos(x), getOSDYPos(21), "Y", 0xFF00FF00); -- Green
 		else
-			gui.drawText(getOSDXPos(x), 72, "N", 0xFFFF0000); -- Red
+			gui.drawText(getOSDXPos(x), getOSDYPos(21), "N", 0xFFFF0000); -- Red
 		end
 		local columnScore = getColumnScore(x);
-		if columnScore ~= -math.huge then -- Only draw if it's actually possible to move there
-			gui.drawText(getOSDXPos(x), 88, columnScore);
+		--if columnScore ~= -math.huge then -- Only draw if it's actually possible to move there
+		--	gui.drawText(getOSDXPos(x), getOSDYPos(22), columnScore);
+		--end
+		for y = 1, 32 do
+			if states[getState(x, y)] == "Falling" then
+				gui.drawText(getOSDXPos(x), getOSDYPos(y), getTimer(x, y));
+			end
 		end
 	end
 end
