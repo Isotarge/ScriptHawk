@@ -6,6 +6,16 @@ SystemID N64
 743D30	d	h	1	RDRAM	Framebuffer Pointer
 743DA4	d	u	1	RDRAM	Map
 743DA8	d	u	1	RDRAM	Exit
+743E08	w	s	1	RDRAM	Rambi Score 1
+743E0E	w	s	1	RDRAM	Rambi Score 2
+743E14	w	s	1	RDRAM	Rambi Score 3
+743E1A	w	s	1	RDRAM	Rambi Score 4
+743E20	w	s	1	RDRAM	Rambi Score 5
+743E28	w	s	1	RDRAM	Enguarde Score 1
+743E2E	w	s	1	RDRAM	Enguarde Score 2
+743E34	w	s	1	RDRAM	Enguarde Score 3
+743E3A	w	s	1	RDRAM	Enguarde Score 4
+743E40	w	s	1	RDRAM	Enguarde Score 5
 746088	b	u	1	RDRAM	File
 74E05C	b	u	1	RDRAM	Character
 753B34	d	h	1	RDRAM	Object Model 2 Collision Linked List Pointer

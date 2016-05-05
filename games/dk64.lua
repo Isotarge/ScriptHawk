@@ -34,7 +34,7 @@ Game.Memory = {
 	["pointer_list"] = {0x7FBFF0, 0x7FBF10, 0x7FC460, 0x7B5E58},
 	["linked_list_pointer"] = {0x7F0990, 0x7F08B0, 0x7F0E00, 0x7A12C0},
 	["global_base"] = {0x7FCC41, 0x7FCB81, 0x7FD0D1, 0x7B6754},
-	["kong_base"] = {0x7FC950, 0x7FC890, 0x7FCDE0, nil}, -- TODO: Kiosk?
+	["kong_base"] = {0x7FC950, 0x7FC890, 0x7FCDE0, nil}, -- TODO: Kiosk
 	["menu_flags"] = {0x7ED558, 0x7ED478, 0x7ED9C8, nil},
 	["framebuffer_pointer"] = {0x7F07F4, 0x73EBC0, 0x743D30, 0x72CDA0},
 	["flag_block_pointer"] = {0x7654F4, 0x760014, 0x7656E4, nil},
@@ -48,7 +48,7 @@ Game.Memory = {
 	["obj_model2_array_pointer"] = {0x7F6000, 0x7F5F20, 0x7F6470, 0x6F4470},
 	["obj_model2_array_count"] = {0x7F6004, 0x7F5F24, 0x7F6474, nil}, -- TODO: Kiosk
 	["obj_model2_collision_linked_list_pointer"] = {0x754244, 0x74E9A4, 0x753B34, 0x6FF054},
-	["rambiBase"] = {0x744548, nil, nil, nil}, -- TODO: Europe, Japan & Kiosk
+	["rambiBase"] = {0x744548, 0x73EC98, 0x743E08, nil}, -- High score base
 };
 
 local flag_array = {};

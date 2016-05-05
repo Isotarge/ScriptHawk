@@ -6,6 +6,16 @@ SystemID N64
 73EBC0	d	h	1	RDRAM	Framebuffer Pointer
 73EC34	d	u	1	RDRAM	Map
 73EC38	d	u	1	RDRAM	Exit
+73EC98	w	s	1	RDRAM	Rambi Score 1
+73EC9E	w	s	1	RDRAM	Rambi Score 2
+73ECA4	w	s	1	RDRAM	Rambi Score 3
+73ECAA	w	s	1	RDRAM	Rambi Score 4
+73ECB0	w	s	1	RDRAM	Rambi Score 5
+73ECB8	w	s	1	RDRAM	Enguarde Score 1
+73ECBE	w	s	1	RDRAM	Enguarde Score 2
+73ECC4	w	s	1	RDRAM	Enguarde Score 3
+73ECCA	w	s	1	RDRAM	Enguarde Score 4
+73ECD0	w	s	1	RDRAM	Enguarde Score 5
 740F18	b	u	1	RDRAM	File
 748EDC	b	u	1	RDRAM	Character
 74D94C	d	f	1	RDRAM	DK Walk Maximum Velocity
