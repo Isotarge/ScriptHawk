@@ -1770,7 +1770,7 @@ end
 -- Physics/Scale --
 -------------------
 
-Game.speedy_speeds = { .001, .01, .1, 1, 5, 10, 15, 20, 35, 50, 100 };
+Game.speedy_speeds = { .001, .01, .1, 1, 5, 10, 15, 20, 35, 50, 100, 250, 500, 1000 };
 Game.speedy_index = 8;
 
 Game.rot_speed = 10;
