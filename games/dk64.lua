@@ -1229,7 +1229,7 @@ function Game.detectVersion(romName, romHash)
 		obj_model1.y_acceleration = 0xBC;
 		obj_model1.hand_state = 0x137;
 		obj_model1.camera.focus_pointer = 0x168;
-		obj_model1.player.obj_model1.player.grab_pointer = 0x2F4;
+		obj_model1.player.grab_pointer = 0x2F4;
 
 		obj_model1.actor_types = {
 			[2] = "DK",
