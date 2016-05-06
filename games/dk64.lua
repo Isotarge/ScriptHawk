@@ -3193,26 +3193,32 @@ local kremling_kosh_joypad_angles = {
 };
 
 function getKoshController()
-	for i = 1, #object_pointers do
-		local currentActorType = mainmemory.read_u32_be(object_pointers[i] + obj_model1.actor_type);
-		if type(obj_model1.actor_types[currentActorType]) ~= "nil" then
-			currentActorType = obj_model1.actor_types[currentActorType];
-		end
-		if currentActorType == "Kremling Kosh Controller" then
-			return object_pointers[i];
+	for object_no = 0, max_objects do
+		local pointer = dereferencePointer(Game.Memory["pointer_list"][version] + (object_no * 4));
+		if isRDRAM(pointer) then
+			local currentActorType = mainmemory.read_u32_be(pointer + obj_model1.actor_type);
+			if type(obj_model1.actor_types[currentActorType]) ~= "nil" then
+				currentActorType = obj_model1.actor_types[currentActorType];
+			end
+			if currentActorType == "Kremling Kosh Controller" then
+				return pointer;
+			end
 		end
 	end
 end
 
 function countMelonProjectiles()
 	local melonCount = 0;
-	for i = 1, #object_pointers do
-		local currentActorType = mainmemory.read_u32_be(object_pointers[i] + obj_model1.actor_type);
-		if type(obj_model1.actor_types[currentActorType]) ~= "nil" then
-			currentActorType = obj_model1.actor_types[currentActorType];
-		end
-		if currentActorType == "Melon (Projectile)" then
-			melonCount = melonCount + 1;
+	for object_no = 0, max_objects do
+		local pointer = dereferencePointer(Game.Memory["pointer_list"][version] + (object_no * 4));
+		if isRDRAM(pointer) then
+			local currentActorType = mainmemory.read_u32_be(pointer + obj_model1.actor_type);
+			if type(obj_model1.actor_types[currentActorType]) ~= "nil" then
+				currentActorType = obj_model1.actor_types[currentActorType];
+			end
+			if currentActorType == "Melon (Projectile)" then
+				melonCount = melonCount + 1;
+			end
 		end
 	end
 	return melonCount;
@@ -3261,9 +3267,9 @@ function getDesiredSlot()
 	end
 end
 
-local previousFrameB = false;
 function koshBotLoop()
-	if not emu.islagged() then
+	local koshController = getKoshController();
+	if koshController ~= nil then
 		local currentSlot = getCurrentSlot();
 		local desiredSlot = getDesiredSlot();
 		if type(desiredSlot) ~= "nil" then
@@ -3271,15 +3277,13 @@ function koshBotLoop()
 			--print("Moving to slot "..desiredSlot);
 			if currentSlot == desiredSlot then
 				if desiredSlot > 0 then
-					local koshController = getKoshController();
 					shots_fired[desiredSlot] = getSlotPointer(koshController, desiredSlot);
 				end
-				previousFrameB = not previousFrameB;
 				joypad.set({["B"] = true}, 1);
 				--print("Firing!");
 			end
 		else
-			--joypad.setanalog({["X Axis"] = false, ["Y Axis"] = false}, 1); -- TODO: This stops the virtual pad from working
+			joypad.setanalog({["X Axis"] = false, ["Y Axis"] = false}, 1);
 		end
 	end
 end
@@ -3559,7 +3563,7 @@ function Game.getScore(index)
 end
 
 function Game.setScore(index, name, score)
-	if version ~= 4 then -- TODO: Are the scores in Kiosk or nah
+	if version ~= 4 then
 		mainmemory.write_u16_be(Game.Memory.rambiBase[version] + index * scoreInstanceSize + scoreBase, score);
 		for i = 0, 3 do
 			mainmemory.writebyte(Game.Memory.rambiBase[version] + index * scoreInstanceSize + nameBase, string.byte(name, i))
@@ -3813,7 +3817,7 @@ function Game.eachFrame()
 	local playerObject = Game.getPlayerObject();
 	map_value = Game.getMap();
 
-	--koshBotLoop(); -- TODO: This stops the virtual pad from working
+	--koshBotLoop(); -- TODO: This probably stops the virtual pad from working
 	forceTBS();
 	Game.unlockMenus(); -- TODO: Allow user to toggle this
 
