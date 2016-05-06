@@ -165,6 +165,7 @@ SystemID N64
 75532C	b	u	1	RDRAM	DK Rap Fadeout Counter
 75534A	w	u	1	RDRAM	Helm Timer
 755350	b	u	1	RDRAM	Helm Timer Enabled
+758F10	d	f	1	RDRAM	Upwarp Floor/Y
 75C41A	w	h	1	RDRAM	DK Model
 75C42A	w	h	1	RDRAM	Diddy Model
 75C43A	w	h	1	RDRAM	Lanky Model
