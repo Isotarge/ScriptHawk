@@ -133,7 +133,7 @@ local flag_array = {
 	{["byte"] = 0x0D, ["bit"] = 6, ["name"] = "Factory: Storage Room Neutral Switch"},
 	{["byte"] = 0x0D, ["bit"] = 7, ["name"] = "Factory: Power shed activated"},
 
-	{["byte"] = 0x0E, ["bit"] = 0, ["name"] = "Factory: Power shed GB", ["type"] = "GB"},
+	{["byte"] = 0x0E, ["bit"] = 0, ["name"] = "Factory: DK GB: Power shed", ["type"] = "GB"},
 	{["byte"] = 0x0E, ["bit"] = 1, ["name"] = "Factory: Diddy GB: Production room", ["type"] = "GB"},
 	{["byte"] = 0x0E, ["bit"] = 4, ["name"] = "Factory: Tiny GB: Production room", ["type"] = "GB"},
 	{["byte"] = 0x0E, ["bit"] = 2, ["name"] = "Factory: Chunky GB: Production room", ["type"] = "GB"},
@@ -229,7 +229,7 @@ local flag_array = {
 	{["byte"] = 0x19, ["bit"] = 0, ["name"] = "Galleon: DK GB: 5DS", ["type"] = "GB"},
 	{["byte"] = 0x19, ["bit"] = 1, ["name"] = "Galleon: Tiny GB: 5DS", ["type"] = "GB"},
 	{["byte"] = 0x19, ["bit"] = 2, ["name"] = "Galleon: Tiny GB: Submarine", ["type"] = "GB"},
-	{["byte"] = 0x19, ["bit"] = 3, ["name"] = "Galleon: T&S Cleared"},
+	{["byte"] = 0x19, ["bit"] = 3, ["name"] = "Galleon: T&S Cleared", ["type"] = "T&S"},
 	{["byte"] = 0x19, ["bit"] = 4, ["name"] = "Galleon: Diddy GB: Lighthouse", ["type"] = "GB"},
 	{["byte"] = 0x19, ["bit"] = 5, ["name"] = "Fungi: Tiny GB: Anthill", ["type"] = "GB"},
 	{["byte"] = 0x19, ["bit"] = 6, ["name"] = "Fungi: Nighttime"},
@@ -244,7 +244,7 @@ local flag_array = {
 	{["byte"] = 0x1A, ["bit"] = 6, ["name"] = "Fungi: Diddy GB: Cage GB", ["type"] = "GB"},
 	{["byte"] = 0x1A, ["bit"] = 7, ["name"] = "Fungi: Chunky GB: Minecart", ["type"] = "GB"},
 
-	{["byte"] = 0x1B, ["bit"] = 0, ["name"] = "Fungi: Diddy Barn GB", ["type"] = "GB"},
+	{["byte"] = 0x1B, ["bit"] = 0, ["name"] = "Fungi: Diddy GB: Barn", ["type"] = "GB"},
 	{["byte"] = 0x1B, ["bit"] = 1, ["name"] = "Fungi: Lanky GB: Attic", ["type"] = "GB"},
 	{["byte"] = 0x1B, ["bit"] = 2, ["name"] = "Fungi: Mill crate broken (1)"},
 	{["byte"] = 0x1B, ["bit"] = 3, ["name"] = "Fungi: DK GB: Mill", ["type"] = "GB"},
@@ -308,7 +308,7 @@ local flag_array = {
 
 	{["byte"] = 0x22, ["bit"] = 2, ["name"] = "Caves: Diddy GB: 5DI", ["type"] = "GB"},
 	{["byte"] = 0x22, ["bit"] = 3, ["name"] = "Caves: DK GB: 5DI", ["type"] = "GB"},
-	{["byte"] = 0x22, ["bit"] = 4, ["name"] = "Caves: DK Rotating room GB", ["type"] = "GB"},
+	{["byte"] = 0x22, ["bit"] = 4, ["name"] = "Caves: DK GB: Rotating room", ["type"] = "GB"},
 	{["byte"] = 0x22, ["bit"] = 5, ["name"] = "Caves: FT Enter Rotating room CS", ["type"] = "Cutscene"},
 	{["byte"] = 0x22, ["bit"] = 6, ["name"] = "Caves: Chunky GB: 5DI", ["type"] = "GB"},
 	{["byte"] = 0x22, ["bit"] = 7, ["name"] = "Caves: Tiny Igloo GB", ["type"] = "GB"},
@@ -424,7 +424,7 @@ local flag_array = {
 	{["byte"] = 0x2F, ["bit"] = 6, ["name"] = "B. Locker FTT", ["type"] = "FTT"},
 	{["byte"] = 0x2F, ["bit"] = 7, ["name"] = "Training Grounds: Barrels spwaned"}, -- TODO: Test this
 
-	{["byte"] = 0x30, ["bit"] = 1, ["name"] = "Kong Unlocked: DK", ["type"] = "Kong"},
+	{["byte"] = 0x30, ["bit"] = 1, ["name"] = "Kong Unlocked: DK", ["type"] = "Kong"}, -- Note: Set both when Simian Slamming the switch in training grounds and entering tag barrel for the first time
 	{["byte"] = 0x30, ["bit"] = 2, ["name"] = "Training Grounds: Dive Barrel Completed"},
 	{["byte"] = 0x30, ["bit"] = 3, ["name"] = "Training Grounds: Vine Barrel Completed"},
 	{["byte"] = 0x30, ["bit"] = 4, ["name"] = "Training Grounds: Orange Barrel Completed"}, -- TODO: Test this
@@ -456,23 +456,23 @@ local flag_array = {
 	{["byte"] = 0x33, ["bit"] = 5, ["name"] = "Caves Lobby: Boulder on pad"}, -- TODO: Test this
 	{["byte"] = 0x33, ["bit"] = 7, ["name"] = "Castle Lobby: Searchlight seek GB", ["type"] = "GB"},
 
-	{["byte"] = 0x34, ["bit"] = 0, ["name"] = "Isles: Diddy GB: BBB", ["type"] = "GB"},
+	{["byte"] = 0x34, ["bit"] = 0, ["name"] = "Isles: Diddy GB: BBB", ["type"] = "GB"}, -- TODO: Better name
 	{["byte"] = 0x34, ["bit"] = 1, ["name"] = "Helm Lobby: W1 (Entrance)", ["type"] = "Warp"},
 	{["byte"] = 0x34, ["bit"] = 2, ["name"] = "Helm Lobby: W1 (Far)", ["type"] = "Warp"},
-	{["byte"] = 0x34, ["bit"] = 3, ["name"] = "Isles: DK Caged GB", ["type"] = "GB"},
-	{["byte"] = 0x34, ["bit"] = 4, ["name"] = "Isles: Tiny Caged GB", ["type"] = "GB"},
-	{["byte"] = 0x34, ["bit"] = 5, ["name"] = "Isles: Lanky Caged GB", ["type"] = "GB"},
-	{["byte"] = 0x34, ["bit"] = 6, ["name"] = "Isles: Chunky Caged GB", ["type"] = "GB"},
-	{["byte"] = 0x34, ["bit"] = 7, ["name"] = "Isles: Diddy Caged GB", ["type"] = "GB"},
+	{["byte"] = 0x34, ["bit"] = 3, ["name"] = "Isles: DK GB: Caged GB", ["type"] = "GB"},
+	{["byte"] = 0x34, ["bit"] = 4, ["name"] = "Isles: Tiny GB: Caged GB", ["type"] = "GB"},
+	{["byte"] = 0x34, ["bit"] = 5, ["name"] = "Isles: Lanky GB: Caged GB", ["type"] = "GB"},
+	{["byte"] = 0x34, ["bit"] = 6, ["name"] = "Isles: Chunky GB: Caged GB", ["type"] = "GB"},
+	{["byte"] = 0x34, ["bit"] = 7, ["name"] = "Isles: Diddy GB: Caged GB", ["type"] = "GB"},
 
-	{["byte"] = 0x35, ["bit"] = 0, ["name"] = "Isles: Chunky instrument pad GB", ["type"] = "GB"},
-	{["byte"] = 0x35, ["bit"] = 1, ["name"] = "Isles: Tiny: High instrument pad GB", ["type"] = "GB"}, -- TODO: Test this
+	{["byte"] = 0x35, ["bit"] = 0, ["name"] = "Isles: Chunky GB: Instrument pad", ["type"] = "GB"},
+	{["byte"] = 0x35, ["bit"] = 1, ["name"] = "Isles: Tiny GB: High instrument pad", ["type"] = "GB"}, -- TODO: Test this
 	{["byte"] = 0x35, ["bit"] = 2, ["name"] = "Isles: Lanky instrument pad played"},
 	{["byte"] = 0x35, ["bit"] = 3, ["name"] = "Isles: Tiny: High instrument pad played"}, -- TODO: Test this
-	{["byte"] = 0x35, ["bit"] = 4, ["name"] = "Isles: Diddy: Summit Bonus Barrel GB", ["type"] = "GB"},
+	{["byte"] = 0x35, ["bit"] = 4, ["name"] = "Isles: Diddy GB: Peril Path Panic!", ["type"] = "GB"},
 	{["byte"] = 0x35, ["bit"] = 5, ["name"] = "Isles: Lanky: Sprint GB", ["type"] = "GB"}, -- TODO: Test this
 	{["byte"] = 0x35, ["bit"] = 6, ["name"] = "Isles: Chunky: Pound the X"},
-	{["byte"] = 0x35, ["bit"] = 7, ["name"] = "Isles: Chunky: Pound the X GB", ["type"] = "GB"},
+	{["byte"] = 0x35, ["bit"] = 7, ["name"] = "Isles: Chunky GB: Pound the X GB", ["type"] = "GB"},
 
 	{["byte"] = 0x36, ["bit"] = 0, ["name"] = "K. Rool Defeated"},
 	{["byte"] = 0x36, ["bit"] = 1, ["name"] = "Isles: W1 (Ring)", ["type"] = "Warp", ["map"] = 34},
