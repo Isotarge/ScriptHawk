@@ -772,6 +772,11 @@ local obj_model1 = {
 		["scroll_timer"] = 0x17D,
 		["current_index"] = 0x17E,
 		["previous_index"] = 0x17F,
+		["DK_actor_pointer"] = 0x180,
+		["Diddy_actor_pointer"] = 0x184,
+		["Lanky_actor_pointer"] = 0x188,
+		["Tiny_actor_pointer"] = 0x18C,
+		["Chunky_actor_pointer"] = 0x190,
 		["kickout_timer"] = 0x1B4, -- TODO: what's the max value for this again? I seem to recall 9000... legit...
 	},
 	["text_overlay"] = {
@@ -923,6 +928,12 @@ local function getExamineDataModelOne(pointer)
 		table.insert(examine_data, { "TB current index", mainmemory.readbyte(pointer + obj_model1.tag_barrel.current_index) });
 		table.insert(examine_data, { "TB previous index", mainmemory.readbyte(pointer + obj_model1.tag_barrel.previous_index) });
 		table.insert(examine_data, { "TB kickout timer", mainmemory.read_u32_be(pointer + obj_model1.tag_barrel.kickout_timer) });
+		table.insert(examine_data, { "Separator", 1 });
+		table.insert(examine_data, { "DK Actor Pointer", toHexString(mainmemory.read_u32_be(pointer + obj_model1.tag_barrel.DK_actor_pointer)) });
+		table.insert(examine_data, { "Diddy Actor Pointer", toHexString(mainmemory.read_u32_be(pointer + obj_model1.tag_barrel.Diddy_actor_pointer)) });
+		table.insert(examine_data, { "Lanky Actor Pointer", toHexString(mainmemory.read_u32_be(pointer + obj_model1.tag_barrel.Lanky_actor_pointer)) });
+		table.insert(examine_data, { "Tiny Actor Pointer", toHexString(mainmemory.read_u32_be(pointer + obj_model1.tag_barrel.Tiny_actor_pointer)) });
+		table.insert(examine_data, { "Chunky Actor Pointer", toHexString(mainmemory.read_u32_be(pointer + obj_model1.tag_barrel.Chunky_actor_pointer)) });
 		table.insert(examine_data, { "Separator", 1 });
 	elseif currentActorType == "Kremling Kosh Controller" then
 		table.insert(examine_data, { "Current Slot", mainmemory.readbyte(pointer + obj_model1.kosh_kontroller.slot_location) });
