@@ -12,7 +12,7 @@ local flag_array = {
 	{["byte"] = 0x00, ["bit"] = 0, ["name"] = "Japes: DK Switch by entrance"},
 	{["byte"] = 0x00, ["bit"] = 1, ["name"] = "Japes: Lanky GB: Mad Maze Maul", ["type"] = "GB"},
 	{["byte"] = 0x00, ["bit"] = 2, ["name"] = "Japes: Tiny GB: Splish-Splash Salvage", ["type"] = "GB"},
-	{["byte"] = 0x00, ["bit"] = 3, ["name"] = "Japes: DK GB: Babboon blast", ["type"] = "GB"},
+	{["byte"] = 0x00, ["bit"] = 3, ["name"] = "Japes: DK GB: Baboon blast", ["type"] = "GB"},
 	{["byte"] = 0x00, ["bit"] = 4, ["name"] = "Japes: DK GB: In front of Diddy's cage", ["type"] = "GB"},
 	{["byte"] = 0x00, ["bit"] = 5, ["name"] = "Japes: DK GB: In Diddy's cage", ["type"] = "GB"},
 	{["byte"] = 0x00, ["bit"] = 6, ["name"] = "Kong Unlocked: Diddy", ["type"] = "Kong"},
@@ -899,7 +899,7 @@ local flag_array = {
 	{["byte"] = 0x6A, ["bit"] = 6, ["name"] = "Japes: DK CB: W4 hallway (6)", ["type"] = "CB"},
 	{["byte"] = 0x6A, ["bit"] = 7, ["name"] = "Japes: DK CB: W4 hallway (7)", ["type"] = "CB"},
 
-	{["byte"] = 0x6B, ["bit"] = 0, ["name"] = "Japes: DK Coin: Babboon Blast Pad (1)", ["type"] = "Coin"},
+	{["byte"] = 0x6B, ["bit"] = 0, ["name"] = "Japes: DK Coin: Baboon Blast Pad (1)", ["type"] = "Coin"},
 	{["byte"] = 0x6B, ["bit"] = 1, ["name"] = "Japes: DK CB: high W2 (2)", ["type"] = "CB"},
 	{["byte"] = 0x6B, ["bit"] = 2, ["name"] = "Japes: DK CB: high W2 (3)", ["type"] = "CB"},
 	{["byte"] = 0x6B, ["bit"] = 3, ["name"] = "Japes: DK CB: high W2 (4)", ["type"] = "CB"},
@@ -923,7 +923,7 @@ local flag_array = {
 	{["byte"] = 0x6D, ["bit"] = 3, ["name"] = "Japes: Diddy CB: In right tunnel (2)", ["type"] = "CB"},
 	{["byte"] = 0x6D, ["bit"] = 4, ["name"] = "Japes: Diddy CB: In right tunnel (3)", ["type"] = "CB"},
 	{["byte"] = 0x6D, ["bit"] = 5, ["name"] = "Japes: DK CB: tree bunch (2)", ["type"] = "Bunch"},
-	{["byte"] = 0x6D, ["bit"] = 6, ["name"] = "Japes: DK Coin: Babboon Blast Pad (2)", ["type"] = "Coin"},
+	{["byte"] = 0x6D, ["bit"] = 6, ["name"] = "Japes: DK Coin: Baboon Blast Pad (2)", ["type"] = "Coin"},
 	{["byte"] = 0x6D, ["bit"] = 7, ["name"] = "Japes: DK Coin: Entrance (2)", ["type"] = "Coin"},
 
 	{["byte"] = 0x6E, ["bit"] = 0, ["name"] = "Japes: Tiny CB: Bunch under hut", ["type"] = "Bunch"},
@@ -972,7 +972,7 @@ local flag_array = {
 	{["byte"] = 0x72, ["bit"] = 7, ["name"] = "Japes: Diddy CB: Diddy mountain (6)", ["type"] = "CB"},
 
 	{["byte"] = 0x73, ["bit"] = 0, ["name"] = "Japes: Tiny CB: Tunnel to main area (5)", ["type"] = "CB"},
-	{["byte"] = 0x73, ["bit"] = 1, ["name"] = "Japes: DK Coin: Babboon Blast Pad (3)", ["type"] = "Coin"},
+	{["byte"] = 0x73, ["bit"] = 1, ["name"] = "Japes: DK Coin: Baboon Blast Pad (3)", ["type"] = "Coin"},
 	{["byte"] = 0x73, ["bit"] = 2, ["name"] = "Japes: Chunky Coin: By portal (3)", ["type"] = "Coin"},
 	{["byte"] = 0x73, ["bit"] = 3, ["name"] = "Japes: Tiny CB: Fairy cave (1)", ["type"] = "CB"},
 	{["byte"] = 0x73, ["bit"] = 4, ["name"] = "Japes: Tiny CB: Fairy cave (2)", ["type"] = "CB"},
@@ -1058,8 +1058,8 @@ local flag_array = {
 	{["byte"] = 0x7C, ["bit"] = 3, ["name"] = "Japes: Tiny Coin: Underground (2)", ["type"] = "Coin"},
 	{["byte"] = 0x7C, ["bit"] = 4, ["name"] = "Japes: Chunky Coin: Underground (1)", ["type"] = "Coin"},
 	{["byte"] = 0x7C, ["bit"] = 5, ["name"] = "Japes: Chunky Coin: Underground (2)", ["type"] = "Coin"},
-	{["byte"] = 0x7C, ["bit"] = 6, ["name"] = "Japes: DK CB: Bunch in Babboon blast (1)", ["type"] = "Bunch"}, -- TODO: Flags missing in this room with block size 0x80
-	{["byte"] = 0x7C, ["bit"] = 7, ["name"] = "Japes: DK Coin: Babboon blast (1)", ["type"] = "Coin"}, -- TODO: Flags missing in this room with block size 0x80
+	{["byte"] = 0x7C, ["bit"] = 6, ["name"] = "Japes: DK CB: Bunch in Baboon blast (1)", ["type"] = "Bunch"}, -- TODO: Flags missing in this room with block size 0x80
+	{["byte"] = 0x7C, ["bit"] = 7, ["name"] = "Japes: DK Coin: Baboon blast (1)", ["type"] = "Coin"}, -- TODO: Flags missing in this room with block size 0x80
 
 	{["byte"] = 0x7D, ["bit"] = 0, ["name"] = "Japes: Lanky CB: Bunch in painting room (Left)", ["type"] = "Bunch"},
 	{["byte"] = 0x7D, ["bit"] = 1, ["name"] = "Japes: Tiny Coin: Underground (3)", ["type"] = "Coin"},

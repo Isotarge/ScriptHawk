@@ -655,7 +655,7 @@ local obj_model1 = {
 		[0x15] = "Slipping",
 		[0x16] = "Slipping", -- DK Slope in Helm
 		[0x17] = "Jumping",
-		[0x18] = "Moonrise?",
+		[0x18] = "Baboon Blast Pad",
 		[0x1A] = "Double Jump", -- Diddy
 		[0x1C] = "Simian Slam",
 		[0x1D] = "Long Jumping",
@@ -672,12 +672,13 @@ local obj_model1 = {
 		[0x2C] = "Throwing Orange",
 		[0x2D] = "Shockwave",
 		[0x2E] = "Chimpy Charge",
-		[0x39] = "Shrinking",
+		[0x2F] = "Rambi Charge",
+		[0x30] = "Bouncing",
 		[0x31] = "Damaged",
 		[0x35] = "Damaged", -- Klump knockback
 		[0x36] = "Death",
 		[0x37] = "Damaged", -- Underwater
-		[0x39] = "Shrink",
+		[0x39] = "Shrinking",
 		[0x3C] = "Crouching",
 		[0x3D] = "Uncrouching",
 		[0x3E] = "Backflip",
@@ -686,6 +687,7 @@ local obj_model1 = {
 		[0x41] = "Jumping", -- Orangstand
 		[0x42] = "Barrel", -- Tag Barrel, Bonus Barrel, Mini Monkey Barrel
 		[0x43] = "Barrel", -- Underwater
+		[0x44] = "Baboon Blast Shot",
 		[0x45] = "Cannon Shot",
 		[0x47] = "Picking up Object",
 		[0x48] = "Idle", -- Carrying Object (Boulder?)
@@ -1824,6 +1826,13 @@ function Game.getMovementState()
 		return toHexString(controlState);
 	end
 	return 'Unknown';
+end
+
+function Game.setMovementState(value)
+	local playerObject = Game.getPlayerObject();
+	if isRDRAM(playerObject) then
+		mainmemory.writebyte(playerObject + obj_model1.control_state_byte, value);
+	end
 end
 
 -- TODO: Game.getWaterHeight()
