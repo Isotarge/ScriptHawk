@@ -86,14 +86,14 @@ Game.maps = {
 	"Frantic Factory",
 	"Frantic Factory: Car Race",
 	"Hideout Helm (Level Intros, Game Over)",
-	"Frantic Factory: Power Hut",
+	"Frantic Factory: Power Shed",
 	"Gloomy Galleon",
 	"Gloomy Galleon: K. Rool's Ship",
 	"Batty Barrel Bandit! (easy)",
 	"Jungle Japes: Chunky's Cave",
 	"DK Isles Overworld",
 	"K. Rool Barrel: DK's Target Game",
-	"Frantic Factory: Conveyor Belt",
+	"Frantic Factory: Crusher Room",
 	"Jungle Japes: Barrel Blast",
 	"Angry Aztec",
 	"Gloomy Galleon: Seal Race",
@@ -497,7 +497,7 @@ local obj_model1 = {
 		[138] = "B. Locker",
 		[139] = "Rainbow Coin Patch",
 		[140] = "Rainbow Coin (Spawner?)",
-		[148] = "Rope (K. Rool ring)",
+		[148] = "Rope", -- K. Rool's Arena
 		[156] = "Wrinkly",
 		[163] = "Banana Fairy (BFI)",
 		[164] = "Ice Tomato",
@@ -524,6 +524,7 @@ local obj_model1 = {
 		[192] = "Beetle", -- Race
 		[193] = "Mermaid",
 		[195] = "Squawks",
+		[196] = "DK (Rap)",
 		[197] = "Trapped Diddy",
 		[198] = "Trapped Lanky",
 		[199] = "Trapped Tiny",
@@ -668,7 +669,7 @@ local obj_model1 = {
 		[0x1F] = "Falling", -- Gun
 		[0x20] = "Falling/Splat",
 		[0x22] = "Pony Tail Twirl",
-		[0x24] = "Sparkles",
+		[0x24] = "Primate Punch", -- TODO: Is this used anywhere else?
 		[0x26] = "Ground Attack",
 		[0x28] = "Ground Attack (Final)",
 		[0x29] = "Moving Ground Attack",
@@ -1258,9 +1259,30 @@ function Game.detectVersion(romName, romHash)
 		obj_model1.y_acceleration = 0xBC;
 		obj_model1.hand_state = 0x137;
 		obj_model1.control_state_byte = 0x144;
-		obj_model1.control_states = {
-			-- TODO: These are different on Kiosk
-		}
+		obj_model1.control_states = { -- TODO: Fill this in
+			[0x02] = "First Person Camera",
+			[0x07] = "Minecart (Idle)",
+			[0x08] = "Minecart (Crouch)",
+			[0x09] = "Minecart (Jump)",
+			[0x0A] = "Minecart (Left)",
+			[0x0B] = "Minecart (Right)",
+			[0x0C] = "Idle",
+			[0x0D] = "Walking",
+			[0x0F] = "Skidding",
+			[0x18] = "Jumping",
+			[0x1D] = "Long Jumping",
+			[0x23] = "Primate Punch",
+			[0x25] = "Ground Attack",
+			[0x28] = "Moving Ground Attack",
+			[0x29] = "Aerial Attack",
+			[0x2F] = "Damaged",
+			[0x37] = "Crouching",
+			[0x38] = "Uncrouching",
+			[0x39] = "Backflip",
+			[0x44] = "Picking up Object",
+			[0x6B] = "Key Dance",
+			[0x71] = "Locked", -- Tons of cutscenes use this
+		};
 		obj_model1.camera.focus_pointer = 0x168;
 		obj_model1.player.grab_pointer = 0x2F4;
 
