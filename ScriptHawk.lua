@@ -760,6 +760,8 @@ local function toggleMode()
 		mode = 'Rotation';
 	elseif mode == 'Rotation' then
 		mode = 'Practice';
+	elseif mode == 'Practice' then
+		mode = 'TAS';
 	else
 		mode = 'Position';
 	end
