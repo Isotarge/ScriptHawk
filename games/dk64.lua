@@ -416,7 +416,12 @@ local obj_model1 = {
 		[7] = "Krusha",
 		[8] = "Rambi",
 		[9] = "Enguarde",
-		[12] = "Loading Zone Controller",
+		--[10] = "Unknown", -- Always loaded -- TODO: What is this?
+		--[11] = "Unknown", -- Always loaded -- TODO: What is this?
+		[12] = "Loading Zone Controller", -- Always loaded
+		--[13] = "Unknown", -- Always loaded -- TODO: What is this?
+		--[14] = "Unknown", -- Always loaded -- TODO: What is this?
+		--[15] = "Unknown", -- Always loaded -- TODO: What is this?
 		[17] = "Cannon Barrel",
 		[19] = "Barrel (Diddy 5DI)",
 		[18] = "Rambi Box",
@@ -573,6 +578,7 @@ local obj_model1 = {
 		[263] = "Fire Shockwave (Dogadon)",
 		[264] = "Squawks",
 		[265] = "Light beam", -- Boss fights etc
+		[266] = "DK Rap Controller", -- Handles the lyrics etc
 		[267] = "Shuri",
 		[268] = "Gimpfish",
 		[270] = "Sir Domino",
@@ -617,6 +623,7 @@ local obj_model1 = {
 		[339] = "Arena Controller", -- Rambi/Enguarde
 		[340] = "Bug", -- Trash Can
 		[342] = "Try Again Dialog",
+		[343] = "Pause Menu", -- Mystery menu bosses
 	},
 	-- 0000 0010 = Block playing instrument
 	["object_properties_bitfield_1"] = 0x60, -- TODO: Document & rename this, probably lump into a u32_be bitfield
@@ -661,19 +668,30 @@ local obj_model1 = {
 		[0x0C] = "Idle",
 		[0x0D] = "Walking",
 		[0x0E] = "Skidding",
+		--[0x0F] = "Crash",
+		--[0x10] = "Crash",
+		--[0x11] = "Crash",
+		--[0x12] = "Crash",
+		--[0x13] = "Crash",
+		--[0x14] = "Crash",
 		[0x15] = "Slipping",
 		[0x16] = "Slipping", -- DK Slope in Helm
 		[0x17] = "Jumping",
 		[0x18] = "Baboon Blast Pad",
+
 		[0x1A] = "Double Jump", -- Diddy
 		[0x1C] = "Simian Slam",
 		[0x1D] = "Long Jumping",
 		[0x1E] = "Falling",
 		[0x1F] = "Falling", -- Gun
 		[0x20] = "Falling/Splat",
+
 		[0x22] = "Pony Tail Twirl",
+
 		[0x24] = "Primate Punch", -- TODO: Is this used anywhere else?
+
 		[0x26] = "Ground Attack",
+
 		[0x28] = "Ground Attack (Final)",
 		[0x29] = "Moving Ground Attack",
 		[0x2A] = "Aerial Attack",
@@ -684,9 +702,11 @@ local obj_model1 = {
 		[0x2F] = "Charging", -- Rambi
 		[0x30] = "Bouncing",
 		[0x31] = "Damaged",
+
 		[0x35] = "Damaged", -- Klump knockback
 		[0x36] = "Death",
 		[0x37] = "Damaged", -- Underwater
+
 		[0x39] = "Shrinking",
 		[0x3C] = "Crouching",
 		[0x3D] = "Uncrouching",
@@ -698,11 +718,13 @@ local obj_model1 = {
 		[0x43] = "Barrel", -- Underwater
 		[0x44] = "Baboon Blast Shot",
 		[0x45] = "Cannon Shot",
+
 		[0x47] = "Picking up Object",
 		[0x48] = "Idle", -- Carrying Object (Boulder?)
 		[0x49] = "Walking", -- Carrying Object (Boulder?)
 		[0x4A] = "Dropping Object",
 		[0x4B] = "Throwing Boulder",
+
 		[0x4E] = "Surface swimming",
 		[0x4F] = "Underwater",
 		[0x50] = "Leaving Water",
@@ -710,6 +732,8 @@ local obj_model1 = {
 		[0x52] = "Bananaporter",
 		[0x53] = "Monkeyport",
 		[0x54] = "Bananaporter", -- Multiplayer
+
+		[0x56] = "Locked", -- Funky's & Candy's store
 		[0x57] = "Swinging on Vine",
 		[0x58] = "Leaving Vine",
 		[0x59] = "Climbing Tree",
@@ -720,22 +744,35 @@ local obj_model1 = {
 		[0x5E] = "Walking", -- With gun
 		[0x5F] = "Putting away gun",
 		[0x60] = "Pulling out gun",
+		[0x61] = "Jumping", -- With gun
 		[0x62] = "Aiming gun",
 		[0x63] = "Rocketbarrel",
 		[0x64] = "Taking Photo",
+
 		[0x67] = "Instrument",
+
+		[0x6A] = "Learning Gun",
 		[0x6B] = "Locked", -- Bonus barrel
+
 		[0x6D] = "Boat",
+
 		[0x70] = "GB Dance",
 		[0x71] = "Key Dance",
+
 		[0x73] = "Loss Dance",
+		[0x74] = "Victory Dance",
 		[0x75] = "Vehicle", -- Castle Car Race
+
 		[0x77] = "Locked", -- Tons of cutscenes use this
 		[0x78] = "Gorilla Grab",
+
 		[0x7A] = "Locked", -- Car race loss, possibly elsewhere
+
 		[0x7C] = "Trapped", -- Spider miniBoss
 		[0x7D] = "Klaptrap Kong", -- Beaver Bother
+
 		[0x85] = "Main Menu",
+
 		[0x87] = "Entering Portal",
 		[0x88] = "Exiting Portal",
 	},
@@ -1266,6 +1303,10 @@ function Game.detectVersion(romName, romHash)
 		obj_model1.control_state_byte = 0x144;
 		obj_model1.control_states = { -- TODO: Fill this in
 			[0x02] = "First Person Camera",
+			[0x03] = "First Person Camera", -- Water
+			[0x04] = "Fairy Camera",
+			[0x05] = "Fairy Camera", -- Water
+
 			[0x07] = "Minecart (Idle)",
 			[0x08] = "Minecart (Crouch)",
 			[0x09] = "Minecart (Jump)",
@@ -1273,27 +1314,41 @@ function Game.detectVersion(romName, romHash)
 			[0x0B] = "Minecart (Right)",
 			[0x0C] = "Idle",
 			[0x0D] = "Walking",
+
 			[0x0F] = "Skidding",
+
 			[0x18] = "Jumping",
+
+			[0x1D] = "Long Jumping",
 			[0x1F] = "Falling",
 			[0x20] = "Falling/Splat",
-			[0x1D] = "Long Jumping",
+
 			[0x23] = "Primate Punch",
+
 			[0x25] = "Ground Attack",
+
 			[0x28] = "Moving Ground Attack",
 			[0x29] = "Aerial Attack",
+
 			[0x2D] = "Charging", -- Rambi
+
 			[0x2F] = "Damaged",
+
 			[0x37] = "Crouching",
 			[0x38] = "Uncrouching",
 			[0x39] = "Backflip",
+
 			[0x44] = "Picking up Object",
 			[0x45] = "Idle", -- Carrying Object
 			[0x46] = "Walking", -- Carrying Object
 			[0x47] = "Dropping Object",
+
 			[0x49] = "Jumping", -- Carrying Object
+
 			[0x4F] = "Bananaporter",
+
 			[0x6B] = "Key Dance",
+
 			[0x71] = "Locked", -- Tons of cutscenes use this
 		};
 		obj_model1.camera.focus_pointer = 0x168;
