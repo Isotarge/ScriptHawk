@@ -63,8 +63,8 @@ SystemID N64
 745840	b	u	1	RDRAM	Music Volume
 745844	b	u	1	RDRAM	Sound mode
 7467C8	b	u	1	RDRAM	File
-746820	d	u	1	RDRAM	Related to geometry spiking
-746824	d	u	1	RDRAM	Related to geometry spiking
+746820	d	u	1	RDRAM	Related to bone displacement
+746824	d	u	1	RDRAM	Related to bone displacement
 746A40	d	h	1	RDRAM	Particle RNG?
 7476F5	b	u	1	RDRAM	Cutscene
 7480DC	d	f	1	RDRAM	Stored Y?

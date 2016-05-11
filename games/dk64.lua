@@ -1302,7 +1302,7 @@ function Game.detectVersion(romName, romHash)
 			[4] = "Lanky",
 			[5] = "Tiny",
 			[6] = "Chunky",
-			[7] = "Rambi"
+			[7] = "Rambi",
 			[11] = "Loading Zone Controller",
 			[25] = "TNT Barrel",
 			[26] = "TNT Barrel Spawner (Armydillo)",
