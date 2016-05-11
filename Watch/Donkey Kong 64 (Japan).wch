@@ -21,6 +21,26 @@ SystemID N64
 753B34	d	h	1	RDRAM	Object Model 2 Collision Linked List Pointer
 753B70	d	h	1	RDRAM	HUD Pointer
 7553A0	b	u	1	RDRAM	Security Byte
+75C5D2	w	h	1	RDRAM	DK Behavior
+75C5DA	w	h	1	RDRAM	DK Model
+75C5E2	w	h	1	RDRAM	Diddy Behavior
+75C5EA	w	h	1	RDRAM	Diddy Model
+75C5F2	w	h	1	RDRAM	Lanky Behavior
+75C5FA	w	h	1	RDRAM	Lanky Model
+75C602	w	h	1	RDRAM	Tiny Behavior
+75C60A	w	h	1	RDRAM	Tiny Model
+75C612	w	h	1	RDRAM	Chunky Behavior
+75C61A	w	h	1	RDRAM	Chunky Model
+75C622	w	h	1	RDRAM	Krusha Behavior
+75C62A	w	h	1	RDRAM	Krusha Model
+75C632	w	h	1	RDRAM	Rambi Behavior
+75C63A	w	h	1	RDRAM	Rambi Model
+75C642	w	h	1	RDRAM	Enguarde Behavior
+75C64A	w	h	1	RDRAM	Enguarde Model
+75C652	w	h	1	RDRAM	Squawks Behavior
+75C65A	w	h	1	RDRAM	Squawks Model
+75C662	w	h	1	RDRAM	Squawks Behavior
+75C66A	w	h	1	RDRAM	Squawks Model
 7656E4	d	h	1	RDRAM	Flag Block Pointer
 767EB4	d	u	1	RDRAM	Frames (Real)
 76B100	d	u	1	RDRAM	Frames (Lag)
