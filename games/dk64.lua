@@ -678,7 +678,7 @@ local obj_model1 = {
 		[0x2C] = "Throwing Orange",
 		[0x2D] = "Shockwave",
 		[0x2E] = "Chimpy Charge",
-		[0x2F] = "Rambi Charge",
+		[0x2F] = "Charging", -- Rambi
 		[0x30] = "Bouncing",
 		[0x31] = "Damaged",
 		[0x35] = "Damaged", -- Klump knockback
@@ -1279,6 +1279,7 @@ function Game.detectVersion(romName, romHash)
 			[0x25] = "Ground Attack",
 			[0x28] = "Moving Ground Attack",
 			[0x29] = "Aerial Attack",
+			[0x2D] = "Charging", -- Rambi
 			[0x2F] = "Damaged",
 			[0x37] = "Crouching",
 			[0x38] = "Uncrouching",
@@ -1301,6 +1302,8 @@ function Game.detectVersion(romName, romHash)
 			[4] = "Lanky",
 			[5] = "Tiny",
 			[6] = "Chunky",
+			[7] = "Rambi"
+			[11] = "Loading Zone Controller",
 			[25] = "TNT Barrel",
 			[26] = "TNT Barrel Spawner (Armydillo)",
 			[29] = "Fireball", -- Armydillo, Dogadon

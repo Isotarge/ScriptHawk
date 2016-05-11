@@ -7,15 +7,25 @@ SystemID N64
 6FF080	d	h	1	RDRAM	HUD Pointer
 6FFE70	w	u	1	RDRAM	Demo Fadeout Timer
 6FFE74	d	u	1	RDRAM	Frames in current map
-707DDB	b	h	1	RDRAM	DK Model
-707DEB	b	h	1	RDRAM	Diddy Model
-707DFB	b	h	1	RDRAM	Lanky Model
-707E0B	b	h	1	RDRAM	Tiny Model
-707E1B	b	h	1	RDRAM	Chunky Model
-707E2B	b	h	1	RDRAM	Rambi Model
-707E3B	b	h	1	RDRAM	Enguarde Model
-707E4B	b	h	1	RDRAM	Squawks Model
-707E5B	b	h	1	RDRAM	Squawks Model
+704E30	d	f	1	RDRAM	Lava & Cutscene Floor/Y (Upwarp)
+707DD2	w	h	1	RDRAM	DK Behavior
+707DDA	w	h	1	RDRAM	DK Model
+707DE2	w	h	1	RDRAM	Diddy Behavior
+707DEA	w	h	1	RDRAM	Diddy Model
+707DF2	w	h	1	RDRAM	Lanky Behavior
+707DFA	w	h	1	RDRAM	Lanky Model
+707E02	w	h	1	RDRAM	Tiny Behavior
+707E0A	w	h	1	RDRAM	Tiny Model
+707E12	w	h	1	RDRAM	Chunky Behavior
+707E1A	w	h	1	RDRAM	Chunky Model
+707E22	w	h	1	RDRAM	Rambi Behavior
+707E2A	w	h	1	RDRAM	Rambi Model
+707E32	w	h	1	RDRAM	Enguarde Behavior
+707E3A	w	h	1	RDRAM	Enguarde Model
+707E42	w	h	1	RDRAM	Squawks Behavior
+707E4A	w	h	1	RDRAM	Squawks Model
+707E52	w	h	1	RDRAM	Squawks Behavior
+707E5A	w	h	1	RDRAM	Squawks Model
 70A540	w	h	1	RDRAM	Armydillo Behavior
 70A542	w	h	1	RDRAM	Armydillo Model
 70AA9C	w	h	1	RDRAM	Dogadon Behavior

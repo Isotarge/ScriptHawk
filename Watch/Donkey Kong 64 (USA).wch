@@ -167,15 +167,25 @@ SystemID N64
 755350	b	u	1	RDRAM	Helm Timer Enabled
 758EC0	d	f	1	RDRAM	Pad Fake Floor Y
 758F10	d	f	1	RDRAM	Lava & Cutscene Floor/Y (Upwarp)
+75C412	w	h	1	RDRAM	DK Behavior
 75C41A	w	h	1	RDRAM	DK Model
+75C422	w	h	1	RDRAM	Diddy Behavior
 75C42A	w	h	1	RDRAM	Diddy Model
+75C432	w	h	1	RDRAM	Lanky Behavior
 75C43A	w	h	1	RDRAM	Lanky Model
+75C442	w	h	1	RDRAM	Tiny Behavior
 75C44A	w	h	1	RDRAM	Tiny Model
+75C452	w	h	1	RDRAM	Chunky Behavior
 75C45A	w	h	1	RDRAM	Chunky Model
+75C462	w	h	1	RDRAM	Krusha Behavior
 75C46A	w	h	1	RDRAM	Krusha Model
+75C472	w	h	1	RDRAM	Rambi Behavior
 75C47A	w	h	1	RDRAM	Rambi Model
+75C482	w	h	1	RDRAM	Enguarde Behavior
 75C48A	w	h	1	RDRAM	Enguarde Model
+75C492	w	h	1	RDRAM	Squawks Behavior
 75C49A	w	h	1	RDRAM	Squawks Model
+75C4A2	w	h	1	RDRAM	Squawks Behavior
 75C4AA	w	h	1	RDRAM	Squawks Model
 75EC28	w	h	1	RDRAM	Snide Behavior
 75EC2A	w	h	1	RDRAM	Snide Model
