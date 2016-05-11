@@ -65,9 +65,8 @@ SystemID N64
 7467C8	b	u	1	RDRAM	File
 746820	d	u	1	RDRAM	Related to bone displacement
 746824	d	u	1	RDRAM	Related to bone displacement
-746A40	d	h	1	RDRAM	Particle RNG?
+746A40	d	h	1	RDRAM	Particle RNG
 7476F5	b	u	1	RDRAM	Cutscene
-7480DC	d	f	1	RDRAM	Stored Y?
 74E77C	b	u	1	RDRAM	Character
 74E808	d	f	1	RDRAM	Rambi Walk Maximum Velocity
 74E8B0	d	h	1	RDRAM	Interesting block related to scripts
@@ -224,10 +223,7 @@ SystemID N64
 7F6000	d	h	1	RDRAM	Object Model 2 Array Pointer
 7F6004	d	u	1	RDRAM	Object Model 2 Array Count
 7F8E88	b	u	1	RDRAM	Object Count?
-7F948C	d	f	1	RDRAM	Stored Y?
 7F94B8	d	h	1	RDRAM	Slope object pointer?
-7F94E8	d	f	1	RDRAM	Stored Y?
-7F94F8	d	f	1	RDRAM	Stored Y?
 7F9680	d	u	1	RDRAM	Texture Index?
 7FB940	d	h	1	RDRAM	Loading Zone Controller Pointer
 7FB960	d	h	1	RDRAM	Player 1 Pointer
