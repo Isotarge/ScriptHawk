@@ -40,6 +40,9 @@ Game.Memory = {
 	["flag_block_pointer"] = {0x7654F4, 0x760014, 0x7656E4, nil},
 	["security_byte"] = {0x7552E0, 0x74FB60, 0x7553A0, nil}, -- TODO: Kiosk?
 	["security_message"] = {0x75E5DC, 0x7590F0, 0x75E790, nil},
+	["buttons_enabled_bitfield"] = {0x755308, 0x74FB88, 0x7553C8, 0x6FFE5C},
+	["joystick_enabled_x"] = {0x75530C, 0x74FB8C, 0x7553CC, 0x6FFE60},
+	["joystick_enabled_y"] = {0x755310, 0x74FB90, 0x7553D0, 0x6FFE64},
 	["bone_displacement_pointer"] = {0x76FDF8, 0x76A918, 0x76FFE8, nil}, -- TODO: Kiosk
 	["frames_lag"] = {0x76AF10, 0x765A30, 0x76B100, 0x72D140}, -- TODO: Kiosk only works for minecart?
 	["frames_real"] = {0x7F0560, 0x7F0480, 0x7F09D0, nil}, -- TODO: Make sure freezing these stalls the main thread -- TODO: Kiosk
@@ -2296,6 +2299,9 @@ function gainControl()
 		mainmemory.writebyte(playerObject + obj_model1.visibility, set_bit(visibilityBitfieldValue, 2));
 		mainmemory.writebyte(playerObject + obj_model1.control_state_byte, 0x05);
 	end
+	mainmemory.write_u16_be(Game.Memory.buttons_enabled_bitfield[version], 0xFFFF); -- Enable all buttons
+	mainmemory.writebyte(Game.Memory.joystick_enabled_x[version], 0xFF); -- Enable Joystick X axis
+	mainmemory.writebyte(Game.Memory.joystick_enabled_y[version], 0xFF); -- Enable Joystick X axis
 end
 gain_control = gainControl;
 Game.gainControl = gainControl;
