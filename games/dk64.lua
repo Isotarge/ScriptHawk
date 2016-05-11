@@ -1272,6 +1272,7 @@ function Game.detectVersion(romName, romHash)
 			[0x0D] = "Walking",
 			[0x0F] = "Skidding",
 			[0x18] = "Jumping",
+			[0x1F] = "Falling",
 			[0x20] = "Falling/Splat",
 			[0x1D] = "Long Jumping",
 			[0x23] = "Primate Punch",
@@ -1283,6 +1284,10 @@ function Game.detectVersion(romName, romHash)
 			[0x38] = "Uncrouching",
 			[0x39] = "Backflip",
 			[0x44] = "Picking up Object",
+			[0x45] = "Idle", -- Carrying Object
+			[0x46] = "Walking", -- Carrying Object
+			[0x47] = "Dropping Object",
+			[0x49] = "Jumping", -- Carrying Object
 			[0x4F] = "Bananaporter",
 			[0x6B] = "Key Dance",
 			[0x71] = "Locked", -- Tons of cutscenes use this
@@ -1304,6 +1309,7 @@ function Game.detectVersion(romName, romHash)
 			[145] = "Armydillo",
 			[149] = "Camera",
 			[201] = "Dogadon",
+			[214] = "Banana Fairy",
 			[221] = "Static Object", -- Fake Chunky in Dogadon 2 opening cutscene
 			[230] = "Fireball Shockwave", -- Dogadon
 			[232] = "Light Beam", -- Boss fights etc
