@@ -88,7 +88,8 @@ SystemID N64
 74E8B0	d	h	1	RDRAM	Interesting block related to scripts
 74FDB0	w	h	1	RDRAM	Tag Barrel Behavior
 74FDB2	w	h	1	RDRAM	Tag Barrel Model
-74FF00	d	h	1	RDRAM	Tag Barrel (Kutout) Behavior + Model
+74FF00	w	h	1	RDRAM	Tag Barrel (Kutout) Behavior
+74FF02	w	h	1	RDRAM	Tag Barrel (Kutout) Model
 7502E4	d	f	1	RDRAM	Orange Y Acceleration
 7531FC	d	f	1	RDRAM	DK Walk Maximum Velocity
 753200	d	f	1	RDRAM	Diddy Walk Maximum Velocity
@@ -257,7 +258,6 @@ SystemID N64
 7FBB64	b	b	1	RDRAM	Shadow Display Bitfield
 7FBB65	b	b	1	RDRAM	Unknown Bitfield
 7FBB66	b	b	1	RDRAM	Long Distance Enemy Spawn
-7FBFF8	d	h	1	RDRAM	Camera pointer?
 7FC3F1	b	u	1	RDRAM	Object Count?
 7FC950	b	u	1	RDRAM	DK Moves
 7FC951	b	u	1	RDRAM	DK Sim Slam
