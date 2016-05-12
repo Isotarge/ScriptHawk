@@ -706,7 +706,7 @@ local obj_model1 = {
 		[0x35] = "Damaged", -- Klump knockback
 		[0x36] = "Death",
 		[0x37] = "Damaged", -- Underwater
-
+		--[0x38] == "Crash",
 		[0x39] = "Shrinking",
 		[0x3C] = "Crouching",
 		[0x3D] = "Uncrouching",
@@ -720,10 +720,11 @@ local obj_model1 = {
 		[0x45] = "Cannon Shot",
 
 		[0x47] = "Picking up Object",
-		[0x48] = "Idle", -- Carrying Object (Boulder?)
-		[0x49] = "Walking", -- Carrying Object (Boulder?)
+		[0x48] = "Idle", -- Carrying Object
+		[0x49] = "Walking", -- Carrying Object
 		[0x4A] = "Dropping Object",
 		[0x4B] = "Throwing Boulder",
+		[0x4C] = "Jumping", -- Carrying Object
 
 		[0x4E] = "Surface swimming",
 		[0x4F] = "Underwater",
@@ -762,7 +763,7 @@ local obj_model1 = {
 		[0x73] = "Loss Dance",
 		[0x74] = "Victory Dance",
 		[0x75] = "Vehicle", -- Castle Car Race
-
+		[0x76] = "Entering Battle Crown",
 		[0x77] = "Locked", -- Tons of cutscenes use this
 		[0x78] = "Gorilla Grab",
 
@@ -3503,11 +3504,11 @@ local function drawGrabScriptUI()
 		end
 
 		-- Display which object the camera is currently focusing on
-		gui.text(gui_x, gui_y + height * row, "Focused Actor: "..toHexString(grabbedActor, 8).." "..focusedActorType, nil, nil, 'bottomright');
+		gui.text(gui_x, gui_y + height * row, "Focused Actor: "..toHexString(focusedActor, 8).." "..focusedActorType, nil, nil, 'bottomright');
 		row = row + 1;
 
 		-- Display which object is grabbed
-		gui.text(gui_x, gui_y + height * row, "Grabbed Actor: "..toHexString(focusedActor, 8).." "..grabbedActorType, nil, nil, 'bottomright');
+		gui.text(gui_x, gui_y + height * row, "Grabbed Actor: "..toHexString(grabbedActor, 8).." "..grabbedActorType, nil, nil, 'bottomright');
 		row = row + 1;
 	end
 
