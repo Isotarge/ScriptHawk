@@ -49,7 +49,7 @@ SystemID N64
 7444C0	b	u	1	RDRAM	Widescreen Toggle
 7444E4	d	u	1	RDRAM	Map
 7444E8	d	u	1	RDRAM	Exit
-744519	b	u	1	RDRAM	Rambi Arena Score
+744518	w	u	1	RDRAM	Arena Current Score
 74452C	b	u	1	RDRAM	Story skip
 744530	b	u	1	RDRAM	Chimpy Cam
 744538	b	u	1	RDRAM	Monkey Smash Map
@@ -65,8 +65,18 @@ SystemID N64
 74455C	d	h	1	RDRAM	Rambi Score 4 Name
 744560	w	s	1	RDRAM	Rambi Score 5
 744562	d	h	1	RDRAM	Rambi Score 5 Name
-74583C	b	u	1	RDRAM	SFX Volume
-745840	b	u	1	RDRAM	Music Volume
+744568	w	s	1	RDRAM	Enguarde Score 1
+74456A	d	h	1	RDRAM	Enguarde Score 1 Name
+74456E	w	s	1	RDRAM	Enguarde Score 2
+744570	d	h	1	RDRAM	Enguarde Score 2 Name
+744574	w	s	1	RDRAM	Enguarde Score 3
+744576	d	h	1	RDRAM	Enguarde Score 3 Name
+74457A	w	s	1	RDRAM	Enguarde Score 4
+74457C	d	h	1	RDRAM	Enguarde Score 4 Name
+744580	w	s	1	RDRAM	Enguarde Score 5
+744582	d	h	1	RDRAM	Enguarde Score 5 Name
+74583C	b	s	1	RDRAM	SFX Volume
+745840	b	s	1	RDRAM	Music Volume
 745844	b	u	1	RDRAM	Sound mode
 7467C8	b	u	1	RDRAM	File
 746820	d	u	1	RDRAM	Related to bone displacement
@@ -195,7 +205,8 @@ SystemID N64
 75C4AA	w	h	1	RDRAM	Squawks Model
 75EC28	w	h	1	RDRAM	Snide Behavior
 75EC2A	w	h	1	RDRAM	Snide Model
-75EDF0	d	h	1	RDRAM	Mad Jack Model + Behavior
+75EDF0	w	h	1	RDRAM	Mad Jack Behavior
+75EDF2	w	h	1	RDRAM	Mad Jack Model
 7654F4	d	h	1	RDRAM	Flag Block Pointer
 767CC4	d	u	1	RDRAM	Frames (Real)
 76A050	d	h	1	RDRAM	2D Renderer Array Pointer?
