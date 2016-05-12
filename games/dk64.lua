@@ -34,7 +34,7 @@ Game.Memory = {
 	["pointer_list"] = {0x7FBFF0, 0x7FBF10, 0x7FC460, 0x7B5E58},
 	["linked_list_pointer"] = {0x7F0990, 0x7F08B0, 0x7F0E00, 0x7A12C0},
 	["global_base"] = {0x7FCC41, 0x7FCB81, 0x7FD0D1, 0x7B6754},
-	["kong_base"] = {0x7FC950, 0x7FC890, 0x7FCDE0, nil}, -- TODO: Kiosk
+	["kong_base"] = {0x7FC950, 0x7FC890, 0x7FCDE0, 0x7B6590},
 	["menu_flags"] = {0x7ED558, 0x7ED478, 0x7ED9C8, nil},
 	["framebuffer_pointer"] = {0x7F07F4, 0x73EBC0, 0x743D30, 0x72CDA0},
 	["flag_block_pointer"] = {0x7654F4, 0x760014, 0x7656E4, nil},
@@ -1320,6 +1320,7 @@ function Game.detectVersion(romName, romHash)
 
 			[0x18] = "Jumping",
 
+			[0x1C] = "Simian Slam",
 			[0x1D] = "Long Jumping",
 			[0x1F] = "Falling",
 			[0x20] = "Falling/Splat",
@@ -3596,7 +3597,7 @@ end
 ------------
 
 function Game.unlockMoves()
-	for kong = DK, Chunky do
+	for kong = DK, Chunky do -- TODO: Double check Kiosk offsets
 		local base = Game.Memory.kong_base[version] + kong * 0x5E;
 		mainmemory.writebyte(base + moves, 3);
 		mainmemory.writebyte(base + sim_slam, 3);
