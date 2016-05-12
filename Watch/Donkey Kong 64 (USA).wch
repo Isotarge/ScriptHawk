@@ -9,6 +9,12 @@ SystemID N64
 014DCC	d	h	1	RDRAM	Controller Input P2
 014DCE	b	s	1	RDRAM	Joystick X (P2)
 014DCF	b	s	1	RDRAM	Joystick Y (P2)
+014DD4	d	h	1	RDRAM	Controller Input P3
+014DD6	b	s	1	RDRAM	Joystick X (P3)
+014DD7	b	s	1	RDRAM	Joystick Y (P3)
+014DDC	d	h	1	RDRAM	Controller Input P4
+014DDE	b	s	1	RDRAM	Joystick X (P4)
+014DDF	b	s	1	RDRAM	Joystick Y (P4)
 029BA0	d	h	1	RDRAM	FFA Renderer Pointer
 02F050	d	f	1	RDRAM	Jetman X Position
 02F054	d	f	1	RDRAM	Jetman Y Position
@@ -250,6 +256,7 @@ SystemID N64
 7FC962	w	u	1	RDRAM	DK Fungi CBs
 7FC964	w	u	1	RDRAM	DK Caves CBs
 7FC966	w	u	1	RDRAM	DK Castle CBs
+7FC972	w	u	1	RDRAM	DK Isles CBs
 7FC992	w	s	1	RDRAM	DK Japes GBs
 7FC994	w	s	1	RDRAM	DK Aztec GBs
 7FC996	w	s	1	RDRAM	DK Factory GBs
@@ -261,7 +268,9 @@ SystemID N64
 7FC9AE	b	u	1	RDRAM	Diddy Moves
 7FC9AF	b	u	1	RDRAM	Diddy Sim Slam
 7FC9B0	b	b	1	RDRAM	Diddy Weapon (bitfield xxxxxshw)
+7FC9B2	b	b	1	RDRAM	Diddy Instrument (bitfield xxxx321i)
 7FC9B4	w	u	1	RDRAM	Diddy Coins
+7FC9B6	w	u	1	RDRAM	Diddy Instrument Energy
 7FC9B8	w	u	1	RDRAM	Diddy Japes CBs
 7FC9BA	w	u	1	RDRAM	Diddy Aztec CBs
 7FC9BC	w	u	1	RDRAM	Diddy Factory CBs
@@ -280,6 +289,7 @@ SystemID N64
 7FCA0C	b	u	1	RDRAM	Lanky Moves
 7FCA0D	b	u	1	RDRAM	Lanky Sim Slam
 7FCA0E	b	b	1	RDRAM	Lanky Weapon (bitfield xxxxxshw)
+7FCA10	b	b	1	RDRAM	Lanky Instrument (bitfield xxxx321i)
 7FCA12	w	u	1	RDRAM	Lanky Coins
 7FCA14	w	u	1	RDRAM	Lanky Instrument Energy
 7FCA16	w	u	1	RDRAM	Lanky Japes CBs
@@ -300,6 +310,7 @@ SystemID N64
 7FCA6A	b	u	1	RDRAM	Tiny Moves
 7FCA6B	b	u	1	RDRAM	Tiny Sim Slam
 7FCA6C	b	b	1	RDRAM	Tiny Weapon (bitfield xxxxxshw)
+7FCA6E	b	b	1	RDRAM	Tiny Instrument (bitfield xxxx321i)
 7FCA70	w	u	1	RDRAM	Tiny Coins
 7FCA72	w	u	1	RDRAM	Tiny Instrument Energy
 7FCA74	w	u	1	RDRAM	Tiny Japes CBs
@@ -320,6 +331,7 @@ SystemID N64
 7FCAC8	b	u	1	RDRAM	Chunky Moves
 7FCAC9	b	u	1	RDRAM	Chunky Sim Slam
 7FCACA	b	b	1	RDRAM	Chunky Weapon (bitfield xxxxxshw)
+7FCACC	b	b	1	RDRAM	Chunky Instrument (bitfield xxxx321i)
 7FCACE	w	u	1	RDRAM	Chunky Coins
 7FCAD0	w	u	1	RDRAM	Chunky Instrument Energy
 7FCAD2	w	u	1	RDRAM	Chunky Japes CBs
