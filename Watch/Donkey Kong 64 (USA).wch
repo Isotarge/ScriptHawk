@@ -176,13 +176,13 @@ SystemID N64
 755314	b	u	1	RDRAM	Mode
 755318	b	u	1	RDRAM	Mode
 75531C	w	u	1	RDRAM	Demo fadeout timer
-755320	d	u	1	RDRAM	Frames in current map
+755320	d	u	1	RDRAM	Frames in current demo
 755328	b	u	1	RDRAM	DK TV Counter
 75532C	b	u	1	RDRAM	DK Rap Fadeout Counter
 75534A	w	u	1	RDRAM	Helm Timer
 755350	b	u	1	RDRAM	Helm Timer Enabled
 758EC0	d	f	1	RDRAM	Pad Fake Floor Y
-758F10	d	f	1	RDRAM	Lava & Cutscene Floor/Y (Upwarp)
+758F10	d	f	1	RDRAM	Water Fake Floor Y
 75C412	w	h	1	RDRAM	DK Behavior
 75C41A	w	h	1	RDRAM	DK Model
 75C422	w	h	1	RDRAM	Diddy Behavior
@@ -228,6 +228,7 @@ SystemID N64
 7F09B4	d	h	1	RDRAM	Object Model 2 Collision Linked List Pointer
 7F09C8	d	h	1	RDRAM	Size 0x30 Linked List Pointer
 7F09DC	d	h	1	RDRAM	Size 0x1000 Texture Linked List Pointer
+7F5CEC	w	u	1	RDRAM	Camera State Change Timer
 7F5CF0	w	h	1	RDRAM	Prev Camera State
 7F5CF2	w	h	1	RDRAM	Current Camera State
 7F5D00	d	f	1	RDRAM	Camera State Change Timer
