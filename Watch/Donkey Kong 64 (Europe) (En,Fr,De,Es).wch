@@ -13,8 +13,12 @@ SystemID N64
 0153BF	b	s	1	RDRAM	Joystick Y (P4)
 022100	d	f	1	RDRAM	Jetman X Position
 022104	d	f	1	RDRAM	Jetman Y Position
+022108	d	f	1	RDRAM	Jetman X Velocity
+02210C	d	f	1	RDRAM	Jetman Y Velocity
 03ECD0	d	f	1	RDRAM	Jumpman X Position
 03ECD4	d	f	1	RDRAM	Jumpman Y Position
+03ECD8	d	f	1	RDRAM	Jumpman X Velocity
+03ECDC	d	f	1	RDRAM	Jumpman Y Velocity
 73EBC0	d	h	1	RDRAM	Framebuffer Pointer
 73EBCC	b	h	1	RDRAM	Squish Screen (Left)
 73EBD0	b	h	1	RDRAM	Squish Screen (Right)
@@ -74,5 +78,9 @@ SystemID N64
 7F5F20	d	h	1	RDRAM	Object Model 2 Array Pointer
 7F5F24	d	u	1	RDRAM	Object Model 2 Array Size
 7FBA6C	d	h	1	RDRAM	Player Pointer
+7FBA82	b	b	1	RDRAM	Zipper Bitfield
 7FBA83	b	b	1	RDRAM	TB Void Bitfield
+7FBA84	b	b	1	RDRAM	Shadow Display Bitfield
+7FBA85	b	b	1	RDRAM	Unknown Bitfield
+7FBA86	b	b	1	RDRAM	Long Distance Actor Spawn
 

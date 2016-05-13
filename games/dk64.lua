@@ -19,10 +19,10 @@ grab_script_mode = grab_script_modes[grab_script_mode_index];
 -- DK64 specific state --
 -------------------------
 
+-- TODO: Investigate bone array pointer block at 0x7FA8A0 (USA)
+	-- 2 pointers
+	-- 1 u32_be
 local version; -- 1 USA, 2 Europe, 3 Japan, 4 Kiosk
--- 0x7FA8A0 bone array pointer block
--- 2 pointers
--- 1 u32_be
 Game.Memory = {
 	["map"] = {0x7444E4, 0x73EC34, 0x743DA4, 0x72CDE4},
 	["exit"] = {0x7444E8, 0x73EC38, 0x743DA8, 0x72CDE8},
@@ -609,7 +609,7 @@ local obj_model1 = {
 		[317] = "Locked Kong (Tag Barrel)",
 		[322] = "Car", -- Car Race
 		[323] = "Enemy Car", -- Car Race, aka George
-		[325] = "Sim Slam Shockwave",
+		[325] = "Shockwave", -- Simian Slam
 		[326] = "Main Menu Controller",
 		[328] = "Klaptrap", -- Peril Path Panic
 		[329] = "Fairy", -- Peril Path Panic
