@@ -800,6 +800,8 @@ local obj_model1 = {
 		-- TODO: Focused vehicle pointers
 		-- TODO: Verify for all versions
 		["focused_actor_pointer"] = 0x178,
+		["focused_vehicle_pointer"] = 0x1BC,
+		["focused_vehicle_pointer_2"] = 0x1C0,
 		["viewport_x_position"] = 0x1FC, -- 32 bit float big endian
 		["viewport_y_position"] = 0x200, -- 32 bit float big endian
 		["viewport_z_position"] = 0x204, -- 32 bit float big endian
@@ -949,6 +951,8 @@ local function getExamineDataModelOne(pointer)
 		end
 
 		table.insert(examine_data, { "Focused Actor", toHexString(focusedActor, 6).." "..focusedActorType });
+		table.insert(examine_data, { "Focused Vehicle", toHexString(mainmemory.read_u32_be(pointer + obj_model1.camera.focused_vehicle_pointer))});
+		table.insert(examine_data, { "Focused Vehicle 2", toHexString(mainmemory.read_u32_be(pointer + obj_model1.camera.focused_vehicle_pointer_2))});
 		table.insert(examine_data, { "Separator", 1 });
 
 		table.insert(examine_data, { "Viewport X Pos", mainmemory.readfloat(pointer + obj_model1.camera.viewport_x_position, true) });
@@ -2351,10 +2355,21 @@ Game.forceZipper = forceZipper;
 
 function gainControl()
 	local playerObject = Game.getPlayerObject();
+	local cameraObject = dereferencePointer(Game.Memory.camera_pointer[version]);
 	if isRDRAM(playerObject) then
 		local visibilityBitfieldValue = mainmemory.readbyte(playerObject + obj_model1.visibility);
 		mainmemory.writebyte(playerObject + obj_model1.visibility, set_bit(visibilityBitfieldValue, 2));
 		mainmemory.writebyte(playerObject + obj_model1.control_state_byte, 0x0C);
+		local vehiclePointer = dereferencePointer(playerObject + obj_model1.player.vehicle_actor_pointer);
+		if isRDRAM(vehiclePointer) then
+			mainmemory.write_u32_be(playerObject + obj_model1.player.vehicle_actor_pointer, playerObject + RDRAMBase);
+		end
+		--mainmemory.write_u32_be(playerObject + obj_model1.lock_method_1_pointer, 0);
+		if isRDRAM(cameraObject) then
+			mainmemory.writebyte(cameraObject + obj_model1.camera.state_type, 1);
+			mainmemory.write_u32_be(cameraObject + obj_model1.camera.focused_vehicle_pointer, 0);
+			mainmemory.write_u32_be(cameraObject + obj_model1.camera.focused_vehicle_pointer_2, 0);
+		end
 	end
 	mainmemory.write_u16_be(Game.Memory.buttons_enabled_bitfield[version], 0xFFFF); -- Enable all buttons
 	mainmemory.writebyte(Game.Memory.joystick_enabled_x[version], 0xFF); -- Enable Joystick X axis
