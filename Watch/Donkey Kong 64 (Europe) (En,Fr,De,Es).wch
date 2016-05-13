@@ -83,4 +83,244 @@ SystemID N64
 7FBA84	b	b	1	RDRAM	Shadow Display Bitfield
 7FBA85	b	b	1	RDRAM	Unknown Bitfield
 7FBA86	b	b	1	RDRAM	Long Distance Actor Spawn
+7FC890	b	u	1	RDRAM	DK Moves
+7FC891	b	u	1	RDRAM	DK Simian Slam
+7FC892	b	b	1	RDRAM	DK Weapon (bitfield xxxxxshw)
+7FC894	b	b	1	RDRAM	DK Instrument (bitfield xxxx321i)
+7FC896	w	u	1	RDRAM	DK Coins
+7FC898	w	u	1	RDRAM	DK Instrument Energy
+7FC89A	w	u	1	RDRAM	DK Japes CBs
+7FC89C	w	u	1	RDRAM	DK Aztec CBs
+7FC89E	w	u	1	RDRAM	DK Factory CBs
+7FC8A0	w	u	1	RDRAM	DK Galleon CBs
+7FC8A2	w	u	1	RDRAM	DK Fungi CBs
+7FC8A4	w	u	1	RDRAM	DK Caves CBs
+7FC8A6	w	u	1	RDRAM	DK Castle CBs
+7FC8A8	w	u	1	RDRAM	DK Isles CBs
+7FC8AA	w	u	1	RDRAM	DK Helm CBs
+7FC8AC	w	u	1	RDRAM	DK Unknown 1 CBs
+7FC8AE	w	u	1	RDRAM	DK Unknown 2 CBs
+7FC8B0	w	u	1	RDRAM	DK Unknown 3 CBs
+7FC8B2	w	u	1	RDRAM	DK Unknown 4 CBs
+7FC8B4	w	u	1	RDRAM	DK Null CBs
+7FC8B6	w	u	1	RDRAM	DK Japes T&S CBs
+7FC8B8	w	u	1	RDRAM	DK Aztec T&S CBs
+7FC8BA	w	u	1	RDRAM	DK Factory T&S CBs
+7FC8BC	w	u	1	RDRAM	DK Galleon T&S CBs
+7FC8BE	w	u	1	RDRAM	DK Fungi T&S CBs
+7FC8C0	w	u	1	RDRAM	DK Caves T&S CBs
+7FC8C2	w	u	1	RDRAM	DK Castle T&S CBs
+7FC8C4	w	u	1	RDRAM	DK Isles T&S CBs
+7FC8C6	w	u	1	RDRAM	DK Helm T&S CBs
+7FC8C8	w	u	1	RDRAM	DK Unknown 1 T&S CBs
+7FC8CA	w	u	1	RDRAM	DK Unknown 2 T&S CBs
+7FC8CC	w	u	1	RDRAM	DK Unknown 3 T&S CBs
+7FC8CE	w	u	1	RDRAM	DK Unknown 4 T&S CBs
+7FC8D0	w	u	1	RDRAM	DK Null T&S CBs
+7FC8D2	w	s	1	RDRAM	DK Japes GBs
+7FC8D4	w	s	1	RDRAM	DK Aztec GBs
+7FC8D6	w	s	1	RDRAM	DK Factory GBs
+7FC8D8	w	s	1	RDRAM	DK Galleon GBs
+7FC8DA	w	s	1	RDRAM	DK Fungi GBs
+7FC8DC	w	s	1	RDRAM	DK Caves GBs
+7FC8DE	w	s	1	RDRAM	DK Castle GBs
+7FC8E0	w	s	1	RDRAM	DK Isles GBs
+7FC8E2	w	s	1	RDRAM	DK Helm GBs
+7FC8E4	w	s	1	RDRAM	DK Unknown 1 GBs
+7FC8E6	w	s	1	RDRAM	DK Unknown 2 GBs
+7FC8E8	w	s	1	RDRAM	DK Unknown 3 GBs
+7FC8EA	w	s	1	RDRAM	DK Unknown 4 GBs
+7FC8EC	w	s	1	RDRAM	DK Null GBs
+7FC8EE	b	u	1	RDRAM	Diddy Moves
+7FC8EF	b	u	1	RDRAM	Diddy Simian Slam
+7FC8F0	b	b	1	RDRAM	Diddy Weapon (bitfield xxxxxshw)
+7FC8F2	b	b	1	RDRAM	Diddy Instrument (bitfield xxxx321i)
+7FC8F4	w	u	1	RDRAM	Diddy Coins
+7FC8F6	w	u	1	RDRAM	Diddy Instrument Energy
+7FC8F8	w	u	1	RDRAM	Diddy Japes CBs
+7FC8FA	w	u	1	RDRAM	Diddy Aztec CBs
+7FC8FC	w	u	1	RDRAM	Diddy Factory CBs
+7FC8FE	w	u	1	RDRAM	Diddy Galleon CBs
+7FC900	w	u	1	RDRAM	Diddy Fungi CBs
+7FC902	w	u	1	RDRAM	Diddy Caves CBs
+7FC904	w	u	1	RDRAM	Diddy Castle CBs
+7FC906	w	u	1	RDRAM	Diddy Isles CBs
+7FC908	w	u	1	RDRAM	Diddy Helm CBs
+7FC90A	w	u	1	RDRAM	Diddy Unknown 1 CBs
+7FC90C	w	u	1	RDRAM	Diddy Unknown 2 CBs
+7FC90E	w	u	1	RDRAM	Diddy Unknown 3 CBs
+7FC910	w	u	1	RDRAM	Diddy Unknown 4 CBs
+7FC912	w	u	1	RDRAM	Diddy Null CBs
+7FC914	w	u	1	RDRAM	Diddy Japes T&S CBs
+7FC916	w	u	1	RDRAM	Diddy Aztec T&S CBs
+7FC918	w	u	1	RDRAM	Diddy Factory T&S CBs
+7FC91A	w	u	1	RDRAM	Diddy Galleon T&S CBs
+7FC91C	w	u	1	RDRAM	Diddy Fungi T&S CBs
+7FC91E	w	u	1	RDRAM	Diddy Caves T&S CBs
+7FC920	w	u	1	RDRAM	Diddy Castle T&S CBs
+7FC922	w	u	1	RDRAM	Diddy Isles T&S CBs
+7FC924	w	u	1	RDRAM	Diddy Helm T&S CBs
+7FC926	w	u	1	RDRAM	Diddy Unknown 1 T&S CBs
+7FC928	w	u	1	RDRAM	Diddy Unknown 2 T&S CBs
+7FC92A	w	u	1	RDRAM	Diddy Unknown 3 T&S CBs
+7FC92C	w	u	1	RDRAM	Diddy Unknown 4 T&S CBs
+7FC92E	w	u	1	RDRAM	Diddy Null T&S CBs
+7FC930	w	s	1	RDRAM	Diddy Japes GBs
+7FC932	w	s	1	RDRAM	Diddy Aztec GBs
+7FC934	w	s	1	RDRAM	Diddy Factory GBs
+7FC936	w	s	1	RDRAM	Diddy Galleon GBs
+7FC938	w	s	1	RDRAM	Diddy Fungi GBs
+7FC93A	w	s	1	RDRAM	Diddy Caves GBs
+7FC93C	w	s	1	RDRAM	Diddy Castle GBs
+7FC93E	w	s	1	RDRAM	Diddy Isles GBs
+7FC940	w	s	1	RDRAM	Diddy Helm GBs
+7FC942	w	s	1	RDRAM	Diddy Unknown 1 GBs
+7FC944	w	s	1	RDRAM	Diddy Unknown 2 GBs
+7FC946	w	s	1	RDRAM	Diddy Unknown 3 GBs
+7FC948	w	s	1	RDRAM	Diddy Unknown 4 GBs
+7FC94A	w	s	1	RDRAM	Diddy Null GBs
+7FC94C	b	u	1	RDRAM	Lanky Moves
+7FC94D	b	u	1	RDRAM	Lanky Simian Slam
+7FC94E	b	b	1	RDRAM	Lanky Weapon (bitfield xxxxxshw)
+7FC950	b	b	1	RDRAM	Lanky Instrument (bitfield xxxx321i)
+7FC952	w	u	1	RDRAM	Lanky Coins
+7FC954	w	u	1	RDRAM	Lanky Instrument Energy
+7FC956	w	u	1	RDRAM	Lanky Japes CBs
+7FC958	w	u	1	RDRAM	Lanky Aztec CBs
+7FC95A	w	u	1	RDRAM	Lanky Factory CBs
+7FC95C	w	u	1	RDRAM	Lanky Galleon CBs
+7FC95E	w	u	1	RDRAM	Lanky Fungi CBs
+7FC960	w	u	1	RDRAM	Lanky Caves CBs
+7FC962	w	u	1	RDRAM	Lanky Castle CBs
+7FC964	w	u	1	RDRAM	Lanky Isles CBs
+7FC966	w	u	1	RDRAM	Lanky Helm CBs
+7FC968	w	u	1	RDRAM	Lanky Unknown 1 CBs
+7FC96A	w	u	1	RDRAM	Lanky Unknown 2 CBs
+7FC96C	w	u	1	RDRAM	Lanky Unknown 3 CBs
+7FC96E	w	u	1	RDRAM	Lanky Unknown 4 CBs
+7FC970	w	u	1	RDRAM	Lanky Null CBs
+7FC972	w	u	1	RDRAM	Lanky Japes T&S CBs
+7FC974	w	u	1	RDRAM	Lanky Aztec T&S CBs
+7FC976	w	u	1	RDRAM	Lanky Factory T&S CBs
+7FC978	w	u	1	RDRAM	Lanky Galleon T&S CBs
+7FC97A	w	u	1	RDRAM	Lanky Fungi T&S CBs
+7FC97C	w	u	1	RDRAM	Lanky Caves T&S CBs
+7FC97E	w	u	1	RDRAM	Lanky Castle T&S CBs
+7FC980	w	u	1	RDRAM	Lanky Isles T&S CBs
+7FC982	w	u	1	RDRAM	Lanky Helm T&S CBs
+7FC984	w	u	1	RDRAM	Lanky Unknown 1 T&S CBs
+7FC986	w	u	1	RDRAM	Lanky Unknown 2 T&S CBs
+7FC988	w	u	1	RDRAM	Lanky Unknown 3 T&S CBs
+7FC98A	w	u	1	RDRAM	Lanky Unknown 4 T&S CBs
+7FC98C	w	u	1	RDRAM	Lanky Null T&S CBs
+7FC98E	w	s	1	RDRAM	Lanky Japes GBs
+7FC990	w	s	1	RDRAM	Lanky Aztec GBs
+7FC992	w	s	1	RDRAM	Lanky Factory GBs
+7FC994	w	s	1	RDRAM	Lanky Galleon GBs
+7FC996	w	s	1	RDRAM	Lanky Fungi GBs
+7FC998	w	s	1	RDRAM	Lanky Caves GBs
+7FC99A	w	s	1	RDRAM	Lanky Castle GBs
+7FC99C	w	s	1	RDRAM	Lanky Isles GBs
+7FC99E	w	s	1	RDRAM	Lanky Helm GBs
+7FC9A0	w	s	1	RDRAM	Lanky Unknown 1 GBs
+7FC9A2	w	s	1	RDRAM	Lanky Unknown 2 GBs
+7FC9A4	w	s	1	RDRAM	Lanky Unknown 3 GBs
+7FC9A6	w	s	1	RDRAM	Lanky Unknown 4 GBs
+7FC9A8	w	s	1	RDRAM	Lanky Null GBs
+7FC9AA	b	u	1	RDRAM	Tiny Moves
+7FC9AB	b	u	1	RDRAM	Tiny Simian Slam
+7FC9AC	b	b	1	RDRAM	Tiny Weapon (bitfield xxxxxshw)
+7FC9AE	b	b	1	RDRAM	Tiny Instrument (bitfield xxxx321i)
+7FC9B0	w	u	1	RDRAM	Tiny Coins
+7FC9B2	w	u	1	RDRAM	Tiny Instrument Energy
+7FC9B4	w	u	1	RDRAM	Tiny Japes CBs
+7FC9B6	w	u	1	RDRAM	Tiny Aztec CBs
+7FC9B8	w	u	1	RDRAM	Tiny Factory CBs
+7FC9BA	w	u	1	RDRAM	Tiny Galleon CBs
+7FC9BC	w	u	1	RDRAM	Tiny Fungi CBs
+7FC9BE	w	u	1	RDRAM	Tiny Caves CBs
+7FC9C0	w	u	1	RDRAM	Tiny Castle CBs
+7FC9C2	w	u	1	RDRAM	Tiny Isles CBs
+7FC9C4	w	u	1	RDRAM	Tiny Helm CBs
+7FC9C6	w	u	1	RDRAM	Tiny Unknown 1 CBs
+7FC9C8	w	u	1	RDRAM	Tiny Unknown 2 CBs
+7FC9CA	w	u	1	RDRAM	Tiny Unknown 3 CBs
+7FC9CC	w	u	1	RDRAM	Tiny Unknown 4 CBs
+7FC9CE	w	u	1	RDRAM	Tiny Null CBs
+7FC9D0	w	u	1	RDRAM	Tiny Japes T&S CBs
+7FC9D2	w	u	1	RDRAM	Tiny Aztec T&S CBs
+7FC9D4	w	u	1	RDRAM	Tiny Factory T&S CBs
+7FC9D6	w	u	1	RDRAM	Tiny Galleon T&S CBs
+7FC9D8	w	u	1	RDRAM	Tiny Fungi T&S CBs
+7FC9DA	w	u	1	RDRAM	Tiny Caves T&S CBs
+7FC9DC	w	u	1	RDRAM	Tiny Castle T&S CBs
+7FC9DE	w	u	1	RDRAM	Tiny Isles T&S CBs
+7FC9E0	w	u	1	RDRAM	Tiny Helm T&S CBs
+7FC9E2	w	u	1	RDRAM	Tiny Unknown 1 T&S CBs
+7FC9E4	w	u	1	RDRAM	Tiny Unknown 2 T&S CBs
+7FC9E6	w	u	1	RDRAM	Tiny Unknown 3 T&S CBs
+7FC9E8	w	u	1	RDRAM	Tiny Unknown 4 T&S CBs
+7FC9EA	w	u	1	RDRAM	Tiny Null T&S CBs
+7FC9EC	w	s	1	RDRAM	Tiny Japes GBs
+7FC9EE	w	s	1	RDRAM	Tiny Aztec GBs
+7FC9F0	w	s	1	RDRAM	Tiny Factory GBs
+7FC9F2	w	s	1	RDRAM	Tiny Galleon GBs
+7FC9F4	w	s	1	RDRAM	Tiny Fungi GBs
+7FC9F6	w	s	1	RDRAM	Tiny Caves GBs
+7FC9F8	w	s	1	RDRAM	Tiny Castle GBs
+7FC9FA	w	s	1	RDRAM	Tiny Isles GBs
+7FC9FC	w	s	1	RDRAM	Tiny Helm GBs
+7FC9FE	w	s	1	RDRAM	Tiny Unknown 1 GBs
+7FCA00	w	s	1	RDRAM	Tiny Unknown 2 GBs
+7FCA02	w	s	1	RDRAM	Tiny Unknown 3 GBs
+7FCA04	w	s	1	RDRAM	Tiny Unknown 4 GBs
+7FCA06	w	s	1	RDRAM	Tiny Null GBs
+7FCA08	b	u	1	RDRAM	Chunky Moves
+7FCA09	b	u	1	RDRAM	Chunky Simian Slam
+7FCA0A	b	b	1	RDRAM	Chunky Weapon (bitfield xxxxxshw)
+7FCA0C	b	b	1	RDRAM	Chunky Instrument (bitfield xxxx321i)
+7FCA0E	w	u	1	RDRAM	Chunky Coins
+7FCA10	w	u	1	RDRAM	Chunky Instrument Energy
+7FCA12	w	u	1	RDRAM	Chunky Japes CBs
+7FCA14	w	u	1	RDRAM	Chunky Aztec CBs
+7FCA16	w	u	1	RDRAM	Chunky Factory CBs
+7FCA18	w	u	1	RDRAM	Chunky Galleon CBs
+7FCA1A	w	u	1	RDRAM	Chunky Fungi CBs
+7FCA1C	w	u	1	RDRAM	Chunky Caves CBs
+7FCA1E	w	u	1	RDRAM	Chunky Castle CBs
+7FCA20	w	u	1	RDRAM	Chunky Isles CBs
+7FCA22	w	u	1	RDRAM	Chunky Helm CBs
+7FCA24	w	u	1	RDRAM	Chunky Unknown 1 CBs
+7FCA26	w	u	1	RDRAM	Chunky Unknown 2 CBs
+7FCA28	w	u	1	RDRAM	Chunky Unknown 3 CBs
+7FCA2A	w	u	1	RDRAM	Chunky Unknown 4 CBs
+7FCA2C	w	u	1	RDRAM	Chunky Null CBs
+7FCA2E	w	u	1	RDRAM	Chunky Japes T&S CBs
+7FCA30	w	u	1	RDRAM	Chunky Aztec T&S CBs
+7FCA32	w	u	1	RDRAM	Chunky Factory T&S CBs
+7FCA34	w	u	1	RDRAM	Chunky Galleon T&S CBs
+7FCA36	w	u	1	RDRAM	Chunky Fungi T&S CBs
+7FCA38	w	u	1	RDRAM	Chunky Caves T&S CBs
+7FCA3A	w	u	1	RDRAM	Chunky Castle T&S CBs
+7FCA3C	w	u	1	RDRAM	Chunky Isles T&S CBs
+7FCA3E	w	u	1	RDRAM	Chunky Helm T&S CBs
+7FCA40	w	u	1	RDRAM	Chunky Unknown 1 T&S CBs
+7FCA42	w	u	1	RDRAM	Chunky Unknown 2 T&S CBs
+7FCA44	w	u	1	RDRAM	Chunky Unknown 3 T&S CBs
+7FCA46	w	u	1	RDRAM	Chunky Unknown 4 T&S CBs
+7FCA48	w	u	1	RDRAM	Chunky Null T&S CBs
+7FCA4A	w	s	1	RDRAM	Chunky Japes GBs
+7FCA4C	w	s	1	RDRAM	Chunky Aztec GBs
+7FCA4E	w	s	1	RDRAM	Chunky Factory GBs
+7FCA50	w	s	1	RDRAM	Chunky Galleon GBs
+7FCA52	w	s	1	RDRAM	Chunky Fungi GBs
+7FCA54	w	s	1	RDRAM	Chunky Caves GBs
+7FCA56	w	s	1	RDRAM	Chunky Castle GBs
+7FCA58	w	s	1	RDRAM	Chunky Isles GBs
+7FCA5A	w	s	1	RDRAM	Chunky Helm GBs
+7FCA5C	w	s	1	RDRAM	Chunky Unknown 1 GBs
+7FCA5E	w	s	1	RDRAM	Chunky Unknown 2 GBs
+7FCA60	w	s	1	RDRAM	Chunky Unknown 3 GBs
+7FCA62	w	s	1	RDRAM	Chunky Unknown 4 GBs
+7FCA64	w	s	1	RDRAM	Chunky Null GBs
 
