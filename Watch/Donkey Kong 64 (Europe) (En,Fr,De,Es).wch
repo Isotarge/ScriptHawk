@@ -1,4 +1,16 @@
 SystemID N64
+0153A4	d	h	1	RDRAM	Controller Input P1
+0153A6	b	s	1	RDRAM	Joystick X (P1)
+0153A7	b	s	1	RDRAM	Joystick Y (P1)
+0153AC	d	h	1	RDRAM	Controller Input P2
+0153AE	b	s	1	RDRAM	Joystick X (P2)
+0153AF	b	s	1	RDRAM	Joystick Y (P2)
+0153B4	d	h	1	RDRAM	Controller Input P3
+0153B6	b	s	1	RDRAM	Joystick X (P3)
+0153B7	b	s	1	RDRAM	Joystick Y (P3)
+0153BC	d	h	1	RDRAM	Controller Input P4
+0153BE	b	s	1	RDRAM	Joystick X (P4)
+0153BF	b	s	1	RDRAM	Joystick Y (P4)
 022100	d	f	1	RDRAM	Jetman X Position
 022104	d	f	1	RDRAM	Jetman Y Position
 03ECD0	d	f	1	RDRAM	Jumpman X Position
