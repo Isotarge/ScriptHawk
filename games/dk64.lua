@@ -60,7 +60,7 @@ local prev_map = 0;
 local map_value = 0;
 
 Game.maps = {
-	"Test Map",
+	"Test Map", -- 0
 	"Funky's Store",
 	"DK Arcade",
 	"K. Rool Barrel: Lanky's Maze",
@@ -70,7 +70,7 @@ Game.maps = {
 	"Jungle Japes",
 	"Jungle Japes: Army Dillo",
 	"Jetpac",
-	"Kremling Kosh! (very easy)",
+	"Kremling Kosh! (very easy)", -- 10
 	"Stealthy Snoop! (normal, no logo)",
 	"Jungle Japes: Shell",
 	"Jungle Japes: Lanky's Cave",
@@ -80,7 +80,7 @@ Game.maps = {
 	"Hideout Helm",
 	"Teetering Turtle Trouble! (very easy)",
 	"Angry Aztec: Five Door Temple (DK)",
-	"Angry Aztec: Llama Temple",
+	"Angry Aztec: Llama Temple", -- 20
 	"Angry Aztec: Five Door Temple (Diddy)",
 	"Angry Aztec: Five Door Temple (Tiny)",
 	"Angry Aztec: Five Door Temple (Lanky)",
@@ -90,7 +90,7 @@ Game.maps = {
 	"Frantic Factory: Car Race",
 	"Hideout Helm (Level Intros, Game Over)",
 	"Frantic Factory: Power Shed",
-	"Gloomy Galleon",
+	"Gloomy Galleon", -- 30
 	"Gloomy Galleon: K. Rool's Ship",
 	"Batty Barrel Bandit! (easy)",
 	"Jungle Japes: Chunky's Cave",
@@ -100,9 +100,9 @@ Game.maps = {
 	"Jungle Japes: Barrel Blast",
 	"Angry Aztec",
 	"Gloomy Galleon: Seal Race",
-	"Nintendo Logo",
+	"Nintendo Logo", -- 40
 	"Angry Aztec: Barrel Blast",
-	"Troff 'n' Scoff",
+	"Troff 'n' Scoff", -- 42
 	"Gloomy Galleon: Shipwreck (Diddy, Lanky, Chunky)",
 	"Gloomy Galleon: Treasure Chest",
 	"Gloomy Galleon: Mermaid",
@@ -110,7 +110,7 @@ Game.maps = {
 	"Gloomy Galleon: Shipwreck (Lanky, Tiny)",
 	"Fungi Forest",
 	"Gloomy Galleon: Lighthouse",
-	"K. Rool Barrel: Tiny's Mushroom Game",
+	"K. Rool Barrel: Tiny's Mushroom Game", -- 50
 	"Gloomy Galleon: Mechanical Fish",
 	"Fungi Forest: Tree Stump",
 	"Beaver Brawl!",
@@ -120,7 +120,7 @@ Game.maps = {
 	"Fungi Forest: Diddy's Attic",
 	"Fungi Forest: Lanky's Attic",
 	"Fungi Forest: DK's Barn",
-	"Fungi Forest: Spider",
+	"Fungi Forest: Spider", -- 60
 	"Fungi Forest: Front Part of Mill",
 	"Fungi Forest: Rear Part of Mill",
 	"Fungi Forest: Mushroom Puzzle",
@@ -129,18 +129,18 @@ Game.maps = {
 	"Mad Maze Maul! (hard)",
 	"Stash Snatch! (normal)",
 	"Mad Maze Maul! (easy)",
-	"Mad Maze Maul! (normal)",
-	"Fungi Forest: Mushroom Leap",
+	"Mad Maze Maul! (normal)", -- 69
+	"Fungi Forest: Mushroom Leap", -- 70
 	"Fungi Forest: Shooting Game",
 	"Crystal Caves",
 	"Kritter Karnage!",
 	"Stash Snatch! (easy)",
 	"Stash Snatch! (hard)",
 	"DK Rap",
-	"Minecart Mayhem! (easy)",
+	"Minecart Mayhem! (easy)", -- 77
 	"Busy Barrel Barrage! (easy)",
 	"Busy Barrel Barrage! (normal)",
-	"Main Menu",
+	"Main Menu", -- 80
 	"Title Screen (Not For Resale Version)",
 	"Crystal Caves: Beetle Race",
 	"Fungi Forest: Dogadon",
@@ -150,7 +150,7 @@ Game.maps = {
 	"Creepy Castle",
 	"Creepy Castle: Ballroom",
 	"Crystal Caves: DK's Hut",
-	"Crystal Caves: Shack (Chunky)",
+	"Crystal Caves: Shack (Chunky)", -- 90
 	"Crystal Caves: Shack (DK)",
 	"Crystal Caves: Shack (Diddy, middle part)",
 	"Crystal Caves: Shack (Tiny)",
@@ -160,7 +160,7 @@ Game.maps = {
 	"K. Lumsy",
 	"Crystal Caves: Ice Castle",
 	"Speedy Swing Sortie! (easy)",
-	"Crystal Caves: Igloo (Diddy)",
+	"Crystal Caves: Igloo (Diddy)", -- 100
 	"Krazy Kong Klamour! (easy)",
 	"Big Bug Bash! (very easy)",
 	"Searchlight Seek! (very easy)",
@@ -170,7 +170,7 @@ Game.maps = {
 	"Kong Battle: Battle Arena",
 	"Creepy Castle: Basement (Lanky, Tiny)",
 	"Kong Battle: Arena 1",
-	"Frantic Factory: Barrel Blast",
+	"Frantic Factory: Barrel Blast", -- 110
 	"Gloomy Galleon: Pufftoss",
 	"Creepy Castle: Basement (DK, Diddy, Chunky)",
 	"Creepy Castle: Museum",
@@ -180,7 +180,7 @@ Game.maps = {
 	"Kremling Kosh! (hard)",
 	"Teetering Turtle Trouble! (easy)",
 	"Teetering Turtle Trouble! (normal)",
-	"Teetering Turtle Trouble! (hard)",
+	"Teetering Turtle Trouble! (hard)", -- 120
 	"Batty Barrel Bandit! (easy)",
 	"Batty Barrel Bandit! (normal)",
 	"Batty Barrel Bandit! (hard)",
@@ -190,7 +190,7 @@ Game.maps = {
 	"Stealthy Snoop! (easy)",
 	"Stealthy Snoop! (hard)",
 	"Minecart Mayhem! (normal)",
-	"Minecart Mayhem! (hard)",
+	"Minecart Mayhem! (hard)", -- 130
 	"Busy Barrel Barrage! (hard)",
 	"Splish-Splash Salvage! (hard)",
 	"Splish-Splash Salvage! (easy)",
@@ -200,7 +200,7 @@ Game.maps = {
 	"Beaver Bother! (hard)",
 	"Searchlight Seek! (easy)",
 	"Searchlight Seek! (normal)",
-	"Searchlight Seek! (hard)",
+	"Searchlight Seek! (hard)", -- 140
 	"Krazy Kong Klamour! (normal)",
 	"Krazy Kong Klamour! (hard)",
 	"Krazy Kong Klamour! (insane)",
@@ -210,7 +210,7 @@ Game.maps = {
 	"Peril Path Panic! (hard)",
 	"Big Bug Bash! (easy)",
 	"Big Bug Bash! (normal)",
-	"Big Bug Bash! (hard)",
+	"Big Bug Bash! (hard)", -- 150
 	"Creepy Castle: Tunnel",
 	"Hideout Helm (Intro Story)",
 	"DK Isles (DK Theatre)",
@@ -220,7 +220,7 @@ Game.maps = {
 	"Forest Fracas!",
 	"Bish Bash Brawl!",
 	"Kamikaze Kremlings!",
-	"Plinth Panic!",
+	"Plinth Panic!", -- 160
 	"Pinnacle Palaver!",
 	"Shockwave Showdown!",
 	"Creepy Castle: Dungeon",
@@ -230,7 +230,7 @@ Game.maps = {
 	"Creepy Castle: Trash Can",
 	"Creepy Castle: Greenhouse",
 	"Jungle Japes Lobby",
-	"Hideout Helm Lobby",
+	"Hideout Helm Lobby", -- 170
 	"DK's House",
 	"Rock (Intro Story)",
 	"Angry Aztec Lobby",
@@ -240,7 +240,7 @@ Game.maps = {
 	"Water Barrel",
 	"Fungi Forest Lobby",
 	"Gloomy Galleon: Submarine",
-	"Orange Barrel",
+	"Orange Barrel", -- 180
 	"Barrel Barrel",
 	"Vine Barrel",
 	"Creepy Castle: Crypt",
@@ -250,7 +250,7 @@ Game.maps = {
 	"Creepy Castle: Barrel Blast",
 	"Fungi Forest: Barrel Blast",
 	"Fairy Island",
-	"Kong Battle: Arena 2",
+	"Kong Battle: Arena 2", -- 190
 	"Rambi Arena",
 	"Kong Battle: Arena 3",
 	"Creepy Castle Lobby",
@@ -260,7 +260,7 @@ Game.maps = {
 	"Angry Aztec: Dogadon",
 	"Training Grounds (End Sequence)",
 	"Creepy Castle: King Kutout",
-	"Crystal Caves: Shack (Diddy, upper part)",
+	"Crystal Caves: Shack (Diddy, upper part)", -- 200
 	"K. Rool Barrel: Diddy's Rocketbarrel Game",
 	"K. Rool Barrel: Lanky's Shooting Game",
 	"K. Rool Fight: DK Phase",
@@ -270,12 +270,12 @@ Game.maps = {
 	"K. Rool Fight: Chunky Phase",
 	"Bloopers Ending",
 	"K. Rool Barrel: Chunky's Hidden Kremling Game",
-	"K. Rool Barrel: Tiny's Pony Tail Twirl Game",
+	"K. Rool Barrel: Tiny's Pony Tail Twirl Game", -- 210
 	"K. Rool Barrel: Chunky's Shooting Game",
 	"K. Rool Barrel: DK's Rambi Game",
 	"K. Lumsy Ending",
 	"K. Rool's Shoe",
-	"K. Rool's Arena"
+	"K. Rool's Arena", -- 215
 };
 
 ---------------------------
@@ -755,6 +755,7 @@ local obj_model1 = {
 
 		[0x6A] = "Learning Gun",
 		[0x6B] = "Locked", -- Bonus barrel
+		[0x63] = "Feeding T&S",
 
 		[0x6D] = "Boat",
 
