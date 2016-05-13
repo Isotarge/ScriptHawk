@@ -723,7 +723,7 @@ local obj_model1 = {
 		[0x48] = "Idle", -- Carrying Object
 		[0x49] = "Walking", -- Carrying Object
 		[0x4A] = "Dropping Object",
-		[0x4B] = "Throwing Boulder",
+		[0x4B] = "Throwing Object",
 		[0x4C] = "Jumping", -- Carrying Object
 
 		[0x4E] = "Surface swimming",
@@ -2354,7 +2354,7 @@ function gainControl()
 	if isRDRAM(playerObject) then
 		local visibilityBitfieldValue = mainmemory.readbyte(playerObject + obj_model1.visibility);
 		mainmemory.writebyte(playerObject + obj_model1.visibility, set_bit(visibilityBitfieldValue, 2));
-		mainmemory.writebyte(playerObject + obj_model1.control_state_byte, 0x05);
+		mainmemory.writebyte(playerObject + obj_model1.control_state_byte, 0x0C);
 	end
 	mainmemory.write_u16_be(Game.Memory.buttons_enabled_bitfield[version], 0xFFFF); -- Enable all buttons
 	mainmemory.writebyte(Game.Memory.joystick_enabled_x[version], 0xFF); -- Enable Joystick X axis
