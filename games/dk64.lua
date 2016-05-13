@@ -546,6 +546,7 @@ local obj_model1 = {
 		[208] = "Klaptrap (Purple)",
 		[212] = "Beaver (Gold)",
 		[214] = "TNT Minecart", -- Minecart Mayhem
+		[215] = "TNT Minecart",
 		[216] = "Pufftoss",
 		[224] = "Mushroom Man",
 		[226] = "Troff",

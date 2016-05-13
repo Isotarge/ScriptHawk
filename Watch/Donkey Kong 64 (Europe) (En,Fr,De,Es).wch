@@ -16,6 +16,10 @@ SystemID N64
 03ECD0	d	f	1	RDRAM	Jumpman X Position
 03ECD4	d	f	1	RDRAM	Jumpman Y Position
 73EBC0	d	h	1	RDRAM	Framebuffer Pointer
+73EBCC	b	h	1	RDRAM	Squish Screen (Left)
+73EBD0	b	h	1	RDRAM	Squish Screen (Right)
+73EBD4	b	h	1	RDRAM	Squish Screen (Top)
+73EBD8	b	h	1	RDRAM	Squish Screen (Bottom)
 73EC34	d	u	1	RDRAM	Map
 73EC38	d	u	1	RDRAM	Exit
 73EC98	w	s	1	RDRAM	Rambi Score 1
