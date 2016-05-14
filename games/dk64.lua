@@ -376,8 +376,25 @@ local weapon     = 2;
 local instrument = 4;
 local coins      = 6;
 local lives      = 8; -- This is used as instrument ammo in single player
-local CB_Base    = 10; -- There's 7 of these
-local GB_Base    = 66; -- There's 8 of these
+local CB_Base    = 10; -- Unsigned 16 bit int array
+local TS_CB_Base = CB_Base + (14 * 2); -- Unsigned 16 bit int array
+local GB_Base    = TS_CB_Base + (14 * 2); -- Signed 16 bit int array
+
+-- For CB, T&S CB, GB level indexes are:
+-- Japes
+-- Aztec
+-- Factory
+-- Galleon
+-- Fungi
+-- Caves
+-- Castle
+-- Isles
+-- Helm
+-- Unknown 1
+-- Unknown 2
+-- Unknown 3
+-- Unknown 4
+-- Null
 
 ----------------------------------
 -- Object Model 1 Documentation --
@@ -540,10 +557,11 @@ local obj_model1 = {
 		[201] = "Llama",
 		[203] = "Padlock (T&S)",
 		[204] = "Mad Jack",
-		[205] = "Klaptrap (Green)",
+		[205] = "Klaptrap", -- Green
 		[206] = "Zinger",
 		[207] = "Vulture (Race)",
 		[208] = "Klaptrap (Purple)",
+		[211] = "Klaptrap (Skeleton)",
 		[212] = "Beaver (Gold)",
 		[214] = "TNT Minecart", -- Minecart Mayhem
 		[215] = "TNT Minecart",
@@ -656,6 +674,7 @@ local obj_model1 = {
 	["hand_state"] = 0x147, -- Bitfield
 	["control_state_byte"] = 0x154,
 	["control_states"] = {
+		[0x01] = "Idle", -- Enemy
 		[0x02] = "First person camera",
 		[0x03] = "First person camera", -- Water
 		[0x04] = "Fairy Camera",
@@ -671,7 +690,7 @@ local obj_model1 = {
 		[0x0E] = "Skidding",
 		--[0x0F] = "Crash",
 		--[0x10] = "Crash",
-		--[0x11] = "Crash",
+		[0x11] = "Special Animation", -- Enemy
 		--[0x12] = "Crash",
 		--[0x13] = "Crash",
 		--[0x14] = "Crash",
@@ -688,11 +707,11 @@ local obj_model1 = {
 		[0x20] = "Falling/Splat",
 
 		[0x22] = "Pony Tail Twirl",
-
+		[0x23] = "Attacking", -- Enemy
 		[0x24] = "Primate Punch", -- TODO: Is this used anywhere else?
-
+		[0x25] = "Attacking", -- Enemy
 		[0x26] = "Ground Attack",
-
+		[0x27] = "Attacking", -- Enemy
 		[0x28] = "Ground Attack (Final)",
 		[0x29] = "Moving Ground Attack",
 		[0x2A] = "Aerial Attack",
