@@ -18,27 +18,36 @@ z = Zip to selected object, works with both model 1 and model 2
 Model 1 contains Actors, for example:
 	- Player
 	- Camera
-	- Enemies & Bosses
-	- Blueprints
-	- Boss keys (except key 8)
-	- Banana fairies
-	- Bonus barrels
-	- Boulders/Barrels
+	- Enemies, Bosses, and NPC's
+	- Blueprints & Kasplats
+	- Boss keys (except Key 8)
+	- Banana Fairies
+	- Bonus Barrels
+	- K. Rool Barrels
+	- Tag Barrels
+	- Kong specific barrels & crates
+	- Objects you can carry
+		- Boulders
+		- Barrels
+		- Kegs
+	- Cannons & Vines
 	- Rainbow coin pads
 	- Cutscene and Bonus Barrel controllers
+	- Text Boxes
 	- Loading zone controller
 	- Fake Kongs (caged, DK Rap, test room, cutscenes)
 	- Balloons
 
-Model 2 contains lightweight objects, for example:
+Model 2 contains lighter weight objects, for example:
 	- Gold Bananas
+	- Colored Bananas (singles & bunches)
 	- Key 8
 	- Banana coins
-	- Colored Bananas (singles & bunches)
 	- Ammo crates
 	- Crystal coconuts
 	- Bananaporters
 	- Instrument pads
+	- Kong Specific Pads
 	- Bullet switches
 	- Simian Slam switches
 	- Gorilla Grab levers
