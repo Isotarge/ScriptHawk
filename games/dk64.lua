@@ -751,6 +751,7 @@ local obj_model1 = {
 		[0x63] = "Rocketbarrel",
 		[0x64] = "Taking Photo",
 
+		[0x66] = "Damaged", -- Exploding TNT Barrels
 		[0x67] = "Instrument",
 
 		[0x6A] = "Learning Gun",
