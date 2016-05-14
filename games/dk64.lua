@@ -822,7 +822,7 @@ local obj_model1 = {
 			[2] = "Locked",
 			[3] = "First Person",
 			[4] = "Vehicle",
-			[5] = "Underwater",
+			[5] = "Water",
 			[9] = "Tag Barrel",
 			[11] = "Fairy",
 			[12] = "Vine", -- Swinging
@@ -1942,6 +1942,20 @@ function Game.getDistanceFromFloor()
 		return mainmemory.readfloat(playerObject + obj_model1.distance_from_floor, true);
 	end
 	return 0;
+end
+
+function Game.getCameraState()
+	local cameraObject = dereferencePointer(Game.Memory.camera_pointer[version]);
+	local cameraState = "Unknown";
+	if isRDRAM(cameraObject) then
+		cameraState = mainmemory.readbyte(cameraObject + obj_model1.camera.state_type);
+		if obj_model1.camera.state_values[cameraState] ~= nil then
+			cameraState = obj_model1.camera.state_values[cameraState];
+		else
+			cameraState = toHexString(cameraState);
+		end
+	end
+	return cameraState;
 end
 
 function Game.getMovementState()
@@ -4119,6 +4133,7 @@ Game.OSD = {
 	--{"Moving", Game.getMovingRotation}, -- TODO
 	{"Rot. Z", Game.getZRotation},
 	{"Movement", Game.getMovementState},
+	--{"Camera", Game.getCameraState},
 	{"Separator", 1},
 	{"Bone Array 1", Game.getOSDBoneArray1},
 	{"Stored X1", Game.getStoredX1},

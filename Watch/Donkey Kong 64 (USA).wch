@@ -184,7 +184,10 @@ SystemID N64
 755320	d	u	1	RDRAM	Frames in current demo
 755328	b	u	1	RDRAM	DK TV Counter
 75532C	b	u	1	RDRAM	DK Rap Fadeout Counter
-75534A	w	u	1	RDRAM	Helm Timer
+755340	d	u	1	RDRAM	Helm Timer Start Time Major
+755344	d	u	1	RDRAM	Helm Timer Start Time Minor
+755348	d	s	1	RDRAM	Helm Timer
+75534C	d	s	1	RDRAM	Initial Helm Time
 755350	b	u	1	RDRAM	Helm Timer Enabled
 758EC0	d	f	1	RDRAM	Pad Fake Floor Y
 758F10	d	f	1	RDRAM	Water Fake Floor Y
@@ -210,6 +213,8 @@ SystemID N64
 75C4AA	w	h	1	RDRAM	Squawks Model
 75EC28	w	h	1	RDRAM	Snide Behavior
 75EC2A	w	h	1	RDRAM	Snide Model
+75EC58	w	h	1	RDRAM	Klump Behavior
+75EC5A	w	h	1	RDRAM	Klump Model
 75EDF0	w	h	1	RDRAM	Mad Jack Behavior
 75EDF2	w	h	1	RDRAM	Mad Jack Model
 7654F4	d	h	1	RDRAM	Flag Block Pointer
