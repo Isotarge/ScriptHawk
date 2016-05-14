@@ -31,8 +31,8 @@ SystemID N64
 707E4A	w	h	1	RDRAM	Squawks Model
 707E52	w	h	1	RDRAM	Squawks Behavior
 707E5A	w	h	1	RDRAM	Squawks Model
-70A540	w	h	1	RDRAM	Armydillo Behavior
-70A542	w	h	1	RDRAM	Armydillo Model
+70A540	w	h	1	RDRAM	Army Dillo Behavior
+70A542	w	h	1	RDRAM	Army Dillo Model
 70AA9C	w	h	1	RDRAM	Dogadon Behavior
 70AA9E	w	h	1	RDRAM	Dogadon Model
 72CDA0	d	h	1	RDRAM	Framebuffer Pointer

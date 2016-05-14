@@ -13,7 +13,7 @@ Enguarde Modifier 8075C48B 00??
 Squawks Modifier  8075C49B 00??
 Squawks Modifier  8075C4AB 00??
 
-00910038 Armydillo
+00910038 Army Dillo
 00CC0025 Mad Jack
 
 Replace ?? with any of the following values:
@@ -77,7 +77,7 @@ Replace ?? with any of the following values:
 35 - Toy Car
 36 - Clam
 37 - Kasplat
-38 - Armydillo (With shell)
+38 - Army Dillo (With shell)
 39 - Mr. Dice
 3A - Klump
 3B - Pufftoss
@@ -123,11 +123,11 @@ Replace ?? with any of the following values:
 60 - Cuckoo clock bird (Fungi day night thing)
 61 - Kosha
 62 - Ice tomato man? (wtf is his name)
-63 - Armydillo (no shell)
+63 - Army Dillo (no shell)
 64 - Boombox
 65 - B. Locker
 66 - K. Rool's ship (cutscene version)
-67 - Armydillo's cannon
+67 - Army Dillo's cannon
 68 - K. Rool (No head?)
 69 - Gold Banana
 6A - Shockwave
@@ -217,7 +217,7 @@ B8 - Shockwave (green)
 B9 - Potion
 BA - Caves boss missile
 BB - Shockwave (red)
-BC - Ice wall in caves? Too thick? Texture on wall armydillo 2?
+BC - Ice wall in caves? Too thick? Texture on wall Army Dillo 2?
 BD - Rare logo
 BE - Stalactits
 BF - Rock wall somewhere? similar to ice wall?

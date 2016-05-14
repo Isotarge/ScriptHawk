@@ -428,7 +428,7 @@ local obj_model1 = {
 		[23] = "Cannon",
 		[25] = "Hunky Chunky Barrel",
 		[26] = "TNT Barrel",
-		[27] = "TNT Barrel Spawner (Armydillo)",
+		[27] = "TNT Barrel Spawner (Army Dillo)",
 		[28] = "Bonus Barrel",
 		[30] = "Fireball", -- Boss fights TODO: where else is this used?
 		[31] = "Bridge (Castle)",
@@ -522,7 +522,7 @@ local obj_model1 = {
 		[182] = "Barrel Enemy (Normal)",
 		[183] = "Zinger",
 		[184] = "Snide",
-		[185] = "Armydillo",
+		[185] = "Army Dillo",
 		[186] = "Kremling", -- Kremling Kosh
 		[187] = "Klump",
 		[188] = "Camera",
@@ -818,11 +818,18 @@ local obj_model1 = {
 		["state_switch_timer_2"] = 0x26E,
 		["state_type"] = 0x26B,
 		["state_values"] = {
-			-- TODO: Document values for this
+			[1] = "Normal",
+			[2] = "Locked",
+			[3] = "First Person",
+			[4] = "Vehicle",
+			[5] = "Underwater",
+			[9] = "Tag Barrel",
+			[11] = "Fairy",
+			[12] = "Vine", -- Swinging
+			[13] = "Aiming", -- Gun, not first person
 		},
 	},
 	["tag_barrel"] = {
-		-- Relative to tag barrel
 		["scroll_timer"] = 0x17D,
 		["current_index"] = 0x17E,
 		["previous_index"] = 0x17F,
@@ -834,7 +841,6 @@ local obj_model1 = {
 		["kickout_timer"] = 0x1B4, -- TODO: what's the max value for this again? I seem to recall 9000... legit...
 	},
 	["text_overlay"] = {
-		-- Relative to text overlay
 		["text_shown"] = 0x1EE, -- u16 be
 	},
 	["kosh_kontroller"] = {
@@ -970,7 +976,11 @@ local function getExamineDataModelOne(pointer)
 		table.insert(examine_data, { "Tracking Angle", mainmemory.readfloat(pointer + obj_model1.camera.tracking_angle, true) });
 		table.insert(examine_data, { "Separator", 1 });
 
-		table.insert(examine_data, { "Camera State Type", mainmemory.readbyte(pointer + obj_model1.camera.state_type) });
+		local stateType = mainmemory.readbyte(pointer + obj_model1.camera.state_type);
+		if obj_model1.camera.state_values[stateType] ~= nil then
+			stateType = obj_model1.camera.state_values[stateType];
+		end
+		table.insert(examine_data, { "Camera State Type", stateType });
 		table.insert(examine_data, { "C-Down Zoom Level", mainmemory.readbyte(pointer + obj_model1.camera.zoom_level_c_down) });
 		table.insert(examine_data, { "Current Zoom Level", mainmemory.readbyte(pointer + obj_model1.camera.zoom_level_current) });
 		table.insert(examine_data, { "Zoom Level After C-Up", mainmemory.readbyte(pointer + obj_model1.camera.zoom_level_after_c_up) });
@@ -1372,11 +1382,11 @@ function Game.detectVersion(romName, romHash)
 			[7] = "Rambi",
 			[11] = "Loading Zone Controller",
 			[25] = "TNT Barrel",
-			[26] = "TNT Barrel Spawner (Armydillo)",
-			[29] = "Fireball", -- Armydillo, Dogadon
+			[26] = "TNT Barrel Spawner (Army Dillo)",
+			[29] = "Fireball", -- Army Dillo, Dogadon
 			[71] = "Boss Key",
 			[96] = "TNT Barrel Spawner (Dogadon)",
-			[145] = "Armydillo",
+			[145] = "Army Dillo",
 			[149] = "Camera",
 			[201] = "Dogadon",
 			[214] = "Banana Fairy",
@@ -1394,7 +1404,7 @@ function Game.detectVersion(romName, romHash)
 		--5 Crash
 		--6 Minecart
 		--7 Crash
-		--8 Armydillo fight
+		--8 Army Dillo fight
 		--9-39 Crash
 		--40 N+R logo
 		--41-75 Crash
