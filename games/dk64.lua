@@ -776,7 +776,7 @@ local obj_model1 = {
 		[0x7D] = "Klaptrap Kong", -- Beaver Bother
 
 		[0x85] = "Main Menu",
-
+		[0x86] = "Entering Main Menu",
 		[0x87] = "Entering Portal",
 		[0x88] = "Exiting Portal",
 	},
