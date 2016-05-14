@@ -251,7 +251,6 @@ SystemID N64
 7F6000	d	h	1	RDRAM	Object Model 2 Array Pointer
 7F6004	d	u	1	RDRAM	Object Model 2 Array Count
 7F8E88	b	u	1	RDRAM	Object Count?
-7F94B8	d	h	1	RDRAM	Slope object pointer?
 7F9680	d	u	1	RDRAM	Texture Index?
 7FB940	d	h	1	RDRAM	Loading Zone Controller Pointer
 7FB960	d	h	1	RDRAM	Player 1 Pointer
@@ -510,6 +509,5 @@ SystemID N64
 7FCC48	w	u	1	RDRAM	Film
 7FCC4B	b	u	1	RDRAM	Health
 7FCC4C	b	u	1	RDRAM	Melons
-7FD580	d	h	1	RDRAM	Slope object pointer?
 7FDC90	d	h	1	RDRAM	Boss pointer
 

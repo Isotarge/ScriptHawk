@@ -47,7 +47,6 @@ Game.Memory = {
 	["frames_lag"] = {0x76AF10, 0x765A30, 0x76B100, 0x72D140}, -- TODO: Kiosk only works for minecart?
 	["frames_real"] = {0x7F0560, 0x7F0480, 0x7F09D0, nil}, -- TODO: Make sure freezing these stalls the main thread -- TODO: Kiosk
 	["boss_pointer"] = {0x7FDC90, 0x7FDBD0, 0x7FE120, nil}, -- TODO: Find Mad Jack state based on Model 1 pointer list and actor type knowledge. MJ is actor 204
-	["slope_object_pointer"] = {0x7F94B8, nil, nil, nil}, -- TODO - PAL, Japan & Kiosk, also note this is part of the player object so might be simpler to do Game.getPlayerObject() + offset if it doesn't break anything
 	["obj_model2_array_pointer"] = {0x7F6000, 0x7F5F20, 0x7F6470, 0x6F4470},
 	["obj_model2_array_count"] = {0x7F6004, 0x7F5F24, 0x7F6474, nil}, -- TODO: Kiosk
 	["obj_model2_collision_linked_list_pointer"] = {0x754244, 0x74E9A4, 0x753B34, 0x6FF054},
@@ -810,6 +809,7 @@ local obj_model1 = {
 		["misc_acceleration_float_3"] = 0x1B8, -- TODO: What is this?
 		["velocity_ground"] = 0x1C0, -- TODO: What is this?
 		["vehicle_actor_pointer"] = 0x208, -- u32 be
+		["slope_timer"] = 0x243,
 		["grabbed_vine_pointer"] = 0x2B0, -- u32 be
 		["grab_pointer"] = 0x32C, -- u32 be
 		["scale"] = {
@@ -2673,17 +2673,13 @@ end
 
 ------------------------------------
 -- Never Slip                     --
--- Written by Isotarge, 2014-2015 --
+-- Written by Isotarge, 2014-2016 --
 ------------------------------------
 
 function Game.neverSlip()
-	if version == 1 then -- TODO: Europe, Japan, Kiosk
-		-- Patch the slope timer
-		local slope_timer = 0xC3; -- TODO: This is relative to the player object, figure out the actual offset and replace "slope_object_pointer" which is actually player + x
-		local slopeObject = dereferencePointer(Game.Memory.slope_object_pointer[version]);
-		if isRDRAM(slopeObject) then
-			mainmemory.writebyte(slopeObject + slope_timer, 0);
-		end
+	local playerObject = Game.getPlayerObject();
+	if isRDRAM(playerObject) then
+		mainmemory.writebyte(playerObject + obj_model1.player.slope_timer, 0); -- Patch the slope timer
 	end
 end
 
@@ -4031,9 +4027,10 @@ function Game.eachFrame()
 		fixLag();
 	end
 
+	if neverSlip then
 	--if forms.ischecked(ScriptHawk.UI.form_controls["Toggle Neverslip Checkbox"]) then
-	--	Game.neverSlip();
-	--end
+		Game.neverSlip();
+	end
 
 	if type(ScriptHawk.UI.form_controls["Toggle Paper Mode Checkbox"]) ~= "nil" and forms.ischecked(ScriptHawk.UI.form_controls["Toggle Paper Mode Checkbox"]) then
 		Game.paperMode();
