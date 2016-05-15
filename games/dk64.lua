@@ -467,7 +467,7 @@ local obj_model1 = {
 		[56] = "Orangstand Sprint Barrel",
 		[57] = "Strong Kong Barrel",
 		[58] = "Swinging Light",
-		[59] = "Fireball", -- Mad Jack -- TODO: where else is this used?
+		[59] = "Fireball", -- Mad Jack etc.
 		[61] = "Boulder",
 		[63] = "Vase (O)",
 		[64] = "Vase (:)",
@@ -554,6 +554,7 @@ local obj_model1 = {
 		[199] = "Trapped Tiny",
 		[200] = "Trapped Chunky",
 		[201] = "Llama",
+		[202] = "Fairy Picture",
 		[203] = "Padlock (T&S)",
 		[204] = "Mad Jack",
 		[205] = "Klaptrap", -- Green
@@ -768,7 +769,7 @@ local obj_model1 = {
 		[0x62] = "Aiming gun",
 		[0x63] = "Rocketbarrel",
 		[0x64] = "Taking Photo",
-
+		[0x65] = "Taking Photo", -- Underwater
 		[0x66] = "Damaged", -- Exploding TNT Barrels
 		[0x67] = "Instrument",
 
@@ -792,6 +793,11 @@ local obj_model1 = {
 
 		[0x7C] = "Trapped", -- Spider miniBoss
 		[0x7D] = "Klaptrap Kong", -- Beaver Bother
+		[0x7E] = "Surface Swimming", -- Enguarde
+		[0x7F] = "Underwater", -- Enguarde
+		[0x81] = "Attacking", -- Enguarde
+		[0x82] = "Leaving Water", -- Enguarde
+		[0x83] = "Fairy Refill",
 
 		[0x85] = "Main Menu",
 		[0x86] = "Entering Main Menu",
