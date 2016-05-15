@@ -125,6 +125,8 @@ SystemID N64
 37D240	d	f	1	RDRAM	Eye State (Right)
 37D260	d	f	1	RDRAM	Ground Damage Timer
 37D280	d	f	1	RDRAM	Ground Damage Timer (Copy)
+37D2B7	b	u	1	RDRAM	Ground Pound Active
+37D2BA	b	u	1	RDRAM	Ground Pound Progress
 37D3A4	b	u	1	RDRAM	Talon Trot Skid State
 37D958	d	f	1	RDRAM	Camera X Position
 37D95C	d	f	1	RDRAM	Camera Y position
