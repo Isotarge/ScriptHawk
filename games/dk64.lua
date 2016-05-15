@@ -815,8 +815,8 @@ local obj_model1 = {
 		["scale"] = {
 			0x344, 0x348, 0x34C, 0x350, 0x354 -- 0x344 and 0x348 seem to be a target, the rest must be current value for each axis
 		},
-		["fairy_active"] = 0x36C;
-		["effect_byte"] = 0x372; -- Bitfield, TODO: Document bits
+		["fairy_active"] = 0x36C, -- TODO: Find a pointer for the actor the camera is focusing on
+		["effect_byte"] = 0x372, -- Bitfield, TODO: Document bits
 	},
 	["camera"] = {
 		-- TODO: Focused vehicle pointers
