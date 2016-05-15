@@ -2729,10 +2729,6 @@ local function fixLag()
 	end
 end
 
-----------------
--- Moon stuff --
-----------------
-
 local moon_mode = "None";
 local function toggle_moonmode()
 	if moon_mode == 'None' then
@@ -2743,10 +2739,6 @@ local function toggle_moonmode()
 		moon_mode = 'None';
 	end
 end
-
------------------------
--- Effect byte stuff --
------------------------
 
 function everythingIsKong()
 	local playerObject = Game.getPlayerObject();

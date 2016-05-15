@@ -910,7 +910,7 @@ end
 function fillFB()
 	local frameBufferLocation = dereferencePointer(Game.Memory.fb_pointer[version]);
 	if isRDRAM(frameBufferLocation) then
-		replaceTextureRGBA5551(nil, frameBufferLocation, framebuffer_width, framebuffer_height)
+		replaceTextureRGBA5551(nil, frameBufferLocation, framebuffer_width, framebuffer_height);
 	end
 end
 
