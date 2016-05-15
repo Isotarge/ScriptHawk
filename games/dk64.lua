@@ -869,6 +869,17 @@ local obj_model1 = {
 	},
 };
 
+local function getActorName(pointer)
+	if isRDRAM(pointer) then
+		local actorBehavior = mainmemory.read_u32_be(pointer + obj_model1.actor_type);
+		if type(obj_model1.actor_types[actorBehavior]) ~= "nil" then
+			return obj_model1.actor_types[actorBehavior];
+		end
+		return actorBehavior;
+	end
+	return "Unknown";
+end
+
 local function getExamineDataModelOne(pointer)
 	local examine_data = {};
 
@@ -888,13 +899,9 @@ local function getExamineDataModelOne(pointer)
 	local hasPosition = xPos ~= 0 or yPos ~= 0 or zPos ~= 0 or hasModel;
 
 	table.insert(examine_data, { "Actor base", toHexString(pointer, 6) });
-	local currentActorTypeNumeric = mainmemory.read_u32_be(pointer + obj_model1.actor_type);
-	local currentActorType = currentActorTypeNumeric;
-	if type(obj_model1.actor_types[currentActorType]) ~= "nil" then
-		currentActorType = obj_model1.actor_types[currentActorType];
-	end
 	table.insert(examine_data, { "Actor size", toHexString(actorSize) });
-	table.insert(examine_data, { "Actor type", currentActorType });
+	local currentActorTypeNumeric = mainmemory.read_u32_be(pointer + obj_model1.actor_type);
+	table.insert(examine_data, { "Actor type", getActorName(pointer) });
 	table.insert(examine_data, { "Separator", 1 });
 
 	if hasModel then
@@ -972,10 +979,7 @@ local function getExamineDataModelOne(pointer)
 		local focusedActorType = "Unknown";
 
 		if isRDRAM(focusedActor) then
-			focusedActorType = mainmemory.read_u32_be(focusedActor + obj_model1.actor_type);
-			if type(obj_model1.actor_types[focusedActorType]) ~= "nil" then
-				focusedActorType = obj_model1.actor_types[focusedActorType];
-			end
+			focusedActorType = getActorName(focusedActor);
 		end
 
 		table.insert(examine_data, { "Focused Actor", toHexString(focusedActor, 6).." "..focusedActorType });
@@ -2372,7 +2376,7 @@ local function updateCurrentInvisify()
 		else
 			current_invisify = "Visify";
 		end
-		forms.settext(ScriptHawk.UI.form_controls["Toggle Invisify Button"], current_invisify);
+		forms.settext(ScriptHawk.UI.form_controls["Toggle Visibility Button"], current_invisify);
 	end
 end
 
@@ -2706,6 +2710,137 @@ local function applyBoneDisplacementFix()
 	end
 end
 
+---------------------------------
+-- Bone Displacement Detection --
+---------------------------------
+
+print_every_frame = false;
+print_threshold = 1;
+
+local safeBoneNumbers = {};
+
+local function setNumberOfBones(modelBasePointer)
+	if isRDRAM(modelBasePointer) then
+		if safeBoneNumbers[modelBasePointer] == nil then
+			safeBoneNumbers[modelBasePointer] = mainmemory.readbyte(modelBasePointer + obj_model1.model.num_bones);
+		end
+
+		local currentNumBones = mainmemory.readbyte(modelBasePointer + obj_model1.model.num_bones);
+		local newNumBones;
+
+		if joypad.getimmediate()["P1 L"] then
+			newNumBones = math.max(currentNumBones - 1, 1);
+		else
+			newNumBones = math.min(currentNumBones + 1, safeBoneNumbers[modelBasePointer]);
+		end
+
+		if newNumBones ~= currentNumBones then
+			mainmemory.writebyte(modelBasePointer + obj_model1.model.num_bones, newNumBones);
+		end
+	end
+end
+
+local function getBoneInfo(baseAddress)
+	local boneInfo = {};
+	boneInfo["positionX"] = mainmemory.read_s16_be(baseAddress + bone_position_x);
+	boneInfo["positionY"] = mainmemory.read_s16_be(baseAddress + bone_position_y);
+	boneInfo["positionZ"] = mainmemory.read_s16_be(baseAddress + bone_position_z);
+	boneInfo["scaleX"] = mainmemory.read_u16_be(baseAddress + bone_scale_x);
+	boneInfo["scaleY"] = mainmemory.read_u16_be(baseAddress + bone_scale_y);
+	boneInfo["scaleZ"] = mainmemory.read_u16_be(baseAddress + bone_scale_z);
+	return boneInfo;
+end
+
+local function outputBones(boneArrayBase, numBones)
+	dprint("Bone,X,Y,Z,ScaleX,ScaleY,ScaleZ,");
+	local boneInfoTables = {};
+	for i = 0, numBones - 1 do
+		local boneInfo = getBoneInfo(boneArrayBase + i * bone_size);
+		table.insert(boneInfoTables, boneInfo);
+		dprint(i..","..boneInfo["positionX"]..","..boneInfo["positionY"]..","..boneInfo["positionZ"]..","..boneInfo["scaleX"]..","..boneInfo["scaleY"]..","..boneInfo["scaleZ"]..",");
+	end
+	print_deferred();
+	return boneInfoTables;
+end
+
+local function calculateCompleteBones(boneArrayBase, numberOfBones)
+	local numberOfCompletedBones = numberOfBones;
+	local statisticallySignificantX = {};
+	local statisticallySignificantZ = {};
+	for currentBone = 0, numberOfBones - 1 do
+		-- Get all known information about the current bone
+		local boneInfo = getBoneInfo(boneArrayBase + currentBone * bone_size);
+		local boneDisplaced = false;
+
+		-- Detect basic zeroing, the bone displacement method method currently detailed in the document
+		if boneInfo["positionX"] == 0 and boneInfo["positionY"] == 0 and boneInfo["positionZ"] == 0 then
+			if boneInfo["scaleX"] == 0 and boneInfo["scaleY"] == 0 and boneInfo["scaleZ"] == 0 then
+				boneDisplaced = true;
+			end
+		end
+
+		-- Detect position being set to -32768
+		if boneInfo["positionX"] == -32768 and boneInfo["positionY"] == -32768 and boneInfo["positionZ"] == -32768 then
+			boneDisplaced = true;
+		end
+
+		if boneDisplaced then
+			numberOfCompletedBones = numberOfCompletedBones - 1;
+		else
+			table.insert(statisticallySignificantX, boneInfo["positionX"]);
+			table.insert(statisticallySignificantZ, boneInfo["positionZ"]);
+		end
+	end
+
+	-- Stats based check for type 3 "translation"
+	local meanX = Stats.mean(statisticallySignificantX);
+	local stdX = Stats.standardDeviation(statisticallySignificantX) * 2.5;
+
+	local meanZ = Stats.mean(statisticallySignificantZ);
+	local stdZ = Stats.standardDeviation(statisticallySignificantZ) * 2.5;
+
+	-- Check for outliers
+	for currentBone = 1, #statisticallySignificantX do
+		local diffX = math.abs(meanX - statisticallySignificantX[currentBone]);
+		local diffZ = math.abs(meanZ - statisticallySignificantZ[currentBone]);
+		if diffX > stdX and diffZ > stdZ then
+			numberOfCompletedBones = numberOfCompletedBones - 1;
+		end
+	end
+
+	return math.max(0, numberOfCompletedBones);
+end
+
+local function detectDisplacement(objectPointer)
+	local currentModelBase = dereferencePointer(objectPointer + obj_model1.model_pointer);
+	local currentBoneArrayBase = dereferencePointer(objectPointer + obj_model1.current_bone_array_pointer);
+
+	if isRDRAM(currentModelBase) and isRDRAM(currentBoneArrayBase) then
+		-- Stupid stuff
+		setNumberOfBones(currentModelBase);
+
+		-- Calculate how many bones were correctly processed this frame
+		local numberOfBones = mainmemory.readbyte(currentModelBase + obj_model1.model.num_bones);
+		local completedBones = calculateCompleteBones(currentBoneArrayBase, numberOfBones);
+
+		local completedBoneRatio = completedBones / numberOfBones;
+
+		if completedBoneRatio < print_threshold or print_every_frame then
+			print(toHexString(objectPointer).." updated "..completedBones.."/"..numberOfBones.." bones.");
+			outputBones(currentBoneArrayBase, numberOfBones);
+		end
+	end
+end
+
+local function displacementDetection()
+	for i = 0, max_objects do
+		local objectPointer = dereferencePointer(Game.Memory.pointer_list[version] + (i * 4));
+		if isRDRAM(objectPointer) then
+			detectDisplacement(objectPointer);
+		end
+	end
+end
+
 -----------------------
 -- Lag configuration --
 -----------------------
@@ -2760,14 +2895,10 @@ function everythingIsKong()
 		if isRDRAM(pointer) and (pointer ~= cameraObject) then
 			local modelPointer = dereferencePointer(pointer + obj_model1.model_pointer);
 			if isRDRAM(modelPointer) then
-				local actorType = mainmemory.read_u32_be(pointer + obj_model1.actor_type);
-				if type(obj_model1.actor_types[actorType]) ~= nil then
-					actorType = obj_model1.actor_types[actorType];
-				end
 				local numBones = mainmemory.readbyte(modelPointer + obj_model1.model.num_bones);
 				if numBones >= kongNumBones then
 					mainmemory.write_u32_be(pointer + obj_model1.model_pointer, kongSharedModel + RDRAMBase);
-					print("Wrote: "..toHexString(pointer).." Bones: "..numBones.." Type: "..actorType);
+					print("Wrote: "..toHexString(pointer).." Bones: "..numBones.." Type: "..getActorName(pointer));
 				end
 			end
 		end
@@ -3382,14 +3513,8 @@ local kremling_kosh_joypad_angles = {
 function getKoshController()
 	for object_no = 0, max_objects do
 		local pointer = dereferencePointer(Game.Memory["pointer_list"][version] + (object_no * 4));
-		if isRDRAM(pointer) then
-			local currentActorType = mainmemory.read_u32_be(pointer + obj_model1.actor_type);
-			if type(obj_model1.actor_types[currentActorType]) ~= "nil" then
-				currentActorType = obj_model1.actor_types[currentActorType];
-			end
-			if currentActorType == "Kremling Kosh Controller" then
-				return pointer;
-			end
+		if isRDRAM(pointer) and getActorName(pointer) == "Kremling Kosh Controller" then
+			return pointer;
 		end
 	end
 end
@@ -3398,14 +3523,8 @@ function countMelonProjectiles()
 	local melonCount = 0;
 	for object_no = 0, max_objects do
 		local pointer = dereferencePointer(Game.Memory["pointer_list"][version] + (object_no * 4));
-		if isRDRAM(pointer) then
-			local currentActorType = mainmemory.read_u32_be(pointer + obj_model1.actor_type);
-			if type(obj_model1.actor_types[currentActorType]) ~= "nil" then
-				currentActorType = obj_model1.actor_types[currentActorType];
-			end
-			if currentActorType == "Melon (Projectile)" then
-				melonCount = melonCount + 1;
-			end
+		if isRDRAM(pointer) and getActorName(pointer) == "Melon (Projectile)" then
+			melonCount = melonCount + 1;
 		end
 	end
 	return melonCount;
@@ -3533,24 +3652,18 @@ local function drawGrabScriptUI()
 	row = row + 1;
 
 	if stringContains(grab_script_mode, "Model 1") then
-		local focusedActor = mainmemory.read_u32_be(cameraObject + obj_model1.camera.focused_actor_pointer); -- TODO: dereferencePointer calls
-		local grabbedActor = mainmemory.read_u32_be(playerObject + obj_model1.player.grab_pointer);
+		local focusedActor = dereferencePointer(cameraObject + obj_model1.camera.focused_actor_pointer);
+		local grabbedActor = dereferencePointer(playerObject + obj_model1.player.grab_pointer);
 
 		local focusedActorType = "Unknown";
 		local grabbedActorType = "Unknown";
 
-		if isPointer(focusedActor) then
-			focusedActorType = mainmemory.read_u32_be(focusedActor - RDRAMBase + obj_model1.actor_type);
-			if type(obj_model1.actor_types[focusedActorType]) ~= "nil" then
-				focusedActorType = obj_model1.actor_types[focusedActorType];
-			end
+		if isRDRAM(focusedActor) then
+			focusedActorType = getActorName(focusedActor);
 		end
 
-		if isPointer(grabbedActor) then
-			grabbedActorType = mainmemory.read_u32_be(grabbedActor - RDRAMBase + obj_model1.actor_type);
-			if type(obj_model1.actor_types[grabbedActorType]) ~= "nil" then
-				grabbedActorType = obj_model1.actor_types[grabbedActorType];
-			end
+		if isRDRAM(grabbedActor) then
+			grabbedActorType = getActorName(grabbedActor);
 		end
 
 		-- Display which object the camera is currently focusing on
@@ -3592,11 +3705,7 @@ local function drawGrabScriptUI()
 		if grab_script_mode == "List (Object Model 1)" then
 			row = row + 1;
 			for i = #object_pointers, 1, -1 do
-				local currentActorType = mainmemory.read_u32_be(object_pointers[i] + obj_model1.actor_type);
 				local currentActorSize = mainmemory.read_u32_be(object_pointers[i] + object_size); -- TODO: Got an exception here while kiosk was booting
-				if type(obj_model1.actor_types[currentActorType]) ~= "nil" then
-					currentActorType = obj_model1.actor_types[currentActorType];
-				end
 				local color = nil;
 				if object_index == i then
 					color = yellow_highlight;
@@ -3604,7 +3713,7 @@ local function drawGrabScriptUI()
 				if object_pointers[i] == playerObject then
 					color = green_highlight;
 				end
-				gui.text(gui_x, gui_y + height * row, i..": "..currentActorType.." "..toHexString(object_pointers[i] or 0, 6).." ("..toHexString(currentActorSize)..")", color, nil, 'bottomright');
+				gui.text(gui_x, gui_y + height * row, i..": "..getActorName(object_pointers[i]).." "..toHexString(object_pointers[i] or 0, 6).." ("..toHexString(currentActorSize)..")", color, nil, 'bottomright');
 				row = row + 1;
 			end
 		end
@@ -3690,15 +3799,15 @@ function Game.initUI()
 	ScriptHawk.UI.form_controls["Moon Mode Button"] = forms.button(ScriptHawk.UI.options_form, moon_mode, toggle_moonmode, ScriptHawk.UI.col(13) - 18, ScriptHawk.UI.row(2), 59, ScriptHawk.UI.button_height);
 
 	-- Buttons
-	ScriptHawk.UI.form_controls["Toggle Invisify Button"] = forms.button(ScriptHawk.UI.options_form, "Invisify", toggle_invisify, ScriptHawk.UI.col(7), ScriptHawk.UI.row(1), 64, ScriptHawk.UI.button_height);
-	ScriptHawk.UI.form_controls["Toggle TB Void Button"] = forms.button(ScriptHawk.UI.options_form, "Toggle TB void", toggle_tb_void, ScriptHawk.UI.col(10), ScriptHawk.UI.row(1), ScriptHawk.UI.col(4) + 10, ScriptHawk.UI.button_height);
-	ScriptHawk.UI.form_controls["Unlock Moves Button"] = forms.button(ScriptHawk.UI.options_form, "Unlock Moves", Game.unlockMoves, ScriptHawk.UI.col(10), ScriptHawk.UI.row(4), ScriptHawk.UI.col(4) + 10, ScriptHawk.UI.button_height);
-	ScriptHawk.UI.form_controls["Random Color"] = forms.button(ScriptHawk.UI.options_form, "Random Color", Game.setKongColor, ScriptHawk.UI.col(5), ScriptHawk.UI.row(5), ScriptHawk.UI.col(4) + 10, ScriptHawk.UI.button_height);
-
+	ScriptHawk.UI.form_controls["Unlock Moves Button"] = forms.button(ScriptHawk.UI.options_form, "Unlock Moves", Game.unlockMoves, ScriptHawk.UI.col(10), ScriptHawk.UI.row(0), ScriptHawk.UI.col(4) + 10, ScriptHawk.UI.button_height);
+	ScriptHawk.UI.form_controls["Toggle Visibility Button"] = forms.button(ScriptHawk.UI.options_form, "Invisify", toggle_invisify, ScriptHawk.UI.col(7), ScriptHawk.UI.row(1), 64, ScriptHawk.UI.button_height);
+	ScriptHawk.UI.form_controls["Toggle TB Void Button"] = forms.button(ScriptHawk.UI.options_form, "Toggle TB Void", toggle_tb_void, ScriptHawk.UI.col(10), ScriptHawk.UI.row(1), ScriptHawk.UI.col(4) + 10, ScriptHawk.UI.button_height);
+	ScriptHawk.UI.form_controls["Fix Bone Displacement Button"] = forms.button(ScriptHawk.UI.options_form, "Fix Spiking", fixBoneDisplacement, ScriptHawk.UI.col(10), ScriptHawk.UI.row(4), ScriptHawk.UI.col(4) + 10, ScriptHawk.UI.button_height);
+	ScriptHawk.UI.form_controls["Toggle Detect Displacement Checkbox"] = forms.checkbox(ScriptHawk.UI.options_form, "Detect Spiking", ScriptHawk.UI.col(10) + ScriptHawk.UI.dropdown_offset, ScriptHawk.UI.row(5) + ScriptHawk.UI.dropdown_offset);
+	--ScriptHawk.UI.form_controls["Random Color"] = forms.button(ScriptHawk.UI.options_form, "Random Color", Game.setKongColor, ScriptHawk.UI.col(5), ScriptHawk.UI.row(5), ScriptHawk.UI.col(4) + 10, ScriptHawk.UI.button_height);
 	--ScriptHawk.UI.form_controls["Everything is Kong Button"] = forms.button(ScriptHawk.UI.options_form, "Kong", everythingIsKong, ScriptHawk.UI.col(10), ScriptHawk.UI.row(3), ScriptHawk.UI.col(4) + 10, ScriptHawk.UI.button_height);
 	--ScriptHawk.UI.form_controls["Force Pause Button"] = forms.button(ScriptHawk.UI.options_form, "Force Pause", force_pause, ScriptHawk.UI.col(10), ScriptHawk.UI.row(4), ScriptHawk.UI.col(4) + 10, ScriptHawk.UI.button_height);
 	ScriptHawk.UI.form_controls["Force Zipper Button"] = forms.button(ScriptHawk.UI.options_form, "Force Zipper", force_zipper, ScriptHawk.UI.col(5), ScriptHawk.UI.row(4), ScriptHawk.UI.col(4) + 10, ScriptHawk.UI.button_height);
-	ScriptHawk.UI.form_controls["Fix Bone Displacement Button"] = forms.button(ScriptHawk.UI.options_form, "Fix Spiking", fixBoneDisplacement, ScriptHawk.UI.col(10), ScriptHawk.UI.row(0), ScriptHawk.UI.col(4) + 10, ScriptHawk.UI.button_height);
 	--ScriptHawk.UI.form_controls["Random Effect Button"] = forms.button(ScriptHawk.UI.options_form, "Random effect", random_effect, ScriptHawk.UI.col(10), ScriptHawk.UI.row(6), ScriptHawk.UI.col(4) + 10, ScriptHawk.UI.button_height);
 
 	-- Lag fix
@@ -3710,7 +3819,7 @@ function Game.initUI()
 	-- Checkboxes
 	ScriptHawk.UI.form_controls["Toggle Homing Ammo Checkbox"] = forms.checkbox(ScriptHawk.UI.options_form, "Homing Ammo", ScriptHawk.UI.col(0) + ScriptHawk.UI.dropdown_offset, ScriptHawk.UI.row(6) + ScriptHawk.UI.dropdown_offset);
 	--ScriptHawk.UI.form_controls["Toggle Neverslip Checkbox"] = forms.checkbox(ScriptHawk.UI.options_form, "Never Slip", ScriptHawk.UI.col(10) + ScriptHawk.UI.dropdown_offset, ScriptHawk.UI.row(5) + ScriptHawk.UI.dropdown_offset);
-	ScriptHawk.UI.form_controls["Toggle Paper Mode Checkbox"] = forms.checkbox(ScriptHawk.UI.options_form, "Paper Mode", ScriptHawk.UI.col(10) + ScriptHawk.UI.dropdown_offset, ScriptHawk.UI.row(5) + ScriptHawk.UI.dropdown_offset);
+	ScriptHawk.UI.form_controls["Toggle Paper Mode Checkbox"] = forms.checkbox(ScriptHawk.UI.options_form, "Paper Mode", ScriptHawk.UI.col(5) + ScriptHawk.UI.dropdown_offset, ScriptHawk.UI.row(5) + ScriptHawk.UI.dropdown_offset);
 	ScriptHawk.UI.form_controls["Toggle OhWrongnana"] = forms.checkbox(ScriptHawk.UI.options_form, "OhWrongnana", ScriptHawk.UI.col(5) + ScriptHawk.UI.dropdown_offset, ScriptHawk.UI.row(6) + ScriptHawk.UI.dropdown_offset);
 
 	-- Output flag statistics
@@ -3995,7 +4104,7 @@ end
 function Game.realTime()
 	updateCurrentInvisify();
 	forms.settext(ScriptHawk.UI.form_controls["Lag Factor Value Label"], lag_factor);
-	forms.settext(ScriptHawk.UI.form_controls["Toggle Invisify Button"], current_invisify);
+	forms.settext(ScriptHawk.UI.form_controls["Toggle Visibility Button"], current_invisify);
 	forms.settext(ScriptHawk.UI.form_controls["Moon Mode Button"], moon_mode);
 	drawGrabScriptUI();
 end
@@ -4037,6 +4146,9 @@ function Game.eachFrame()
 	Game.drawMJMinimap();
 
 	applyBoneDisplacementFix();
+	if type(ScriptHawk.UI.form_controls["Toggle Detect Displacement Checkbox"]) ~= "nil" and forms.ischecked(ScriptHawk.UI.form_controls["Toggle Detect Displacement Checkbox"]) then
+		displacementDetection();
+	end
 	ISGTimer();
 	doBRB();
 	processFlagQueue();
