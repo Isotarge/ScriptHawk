@@ -2114,15 +2114,15 @@ function Game.setZPosition(value)
 end
 
 -- Relative to objects in bone array
--- TODO: Put these in a table
 local bone_size = 0x40;
-local bone_position_x = 0x18; -- int 16 be
-local bone_position_y = 0x1A; -- int 16 be
-local bone_position_z = 0x1C; -- int 16 be
-
-local bone_scale_x = 0x20; -- uint 16 be
-local bone_scale_y = 0x2A; -- uint 16 be
-local bone_scale_z = 0x34; -- uint 16 be
+local bone = {
+	['position_x'] = 0x18, -- int 16 be
+	['position_y'] = 0x1A, -- int 16 be
+	['position_z'] = 0x1C, -- int 16 be
+	['scale_x'] = 0x20, -- uint 16 be
+	['scale_y'] = 0x2A, -- uint 16 be
+	['scale_z'] = 0x34, -- uint 16 be
+};
 
 function Game.getActiveBoneArray()
 	if not isInSubGame() then
@@ -2180,7 +2180,7 @@ function Game.getStoredX1()
 	local boneArray1 = Game.getBoneArray1();
 	if isPointer(boneArray1) then
 		boneArray1 = boneArray1 - RDRAMBase;
-		return mainmemory.read_s16_be(boneArray1 + bone_size + bone_position_x);
+		return mainmemory.read_s16_be(boneArray1 + bone_size + bone.position_x);
 	end
 	return 0;
 end
@@ -2189,7 +2189,7 @@ function Game.getStoredX2()
 	local boneArray2 = Game.getBoneArray2();
 	if isPointer(boneArray2) then
 		boneArray2 = boneArray2 - RDRAMBase;
-		return mainmemory.read_s16_be(boneArray2 + bone_size + bone_position_x);
+		return mainmemory.read_s16_be(boneArray2 + bone_size + bone.position_x);
 	end
 	return 0;
 end
@@ -2198,7 +2198,7 @@ function Game.getStoredY1()
 	local boneArray1 = Game.getBoneArray1();
 	if isPointer(boneArray1) then
 		boneArray1 = boneArray1 - RDRAMBase;
-		return mainmemory.read_s16_be(boneArray1 + bone_size + bone_position_y);
+		return mainmemory.read_s16_be(boneArray1 + bone_size + bone.position_y);
 	end
 	return 0;
 end
@@ -2207,7 +2207,7 @@ function Game.getStoredY2()
 	local boneArray2 = Game.getBoneArray2();
 	if isPointer(boneArray2) then
 		boneArray2 = boneArray2 - RDRAMBase;
-		return mainmemory.read_s16_be(boneArray2 + bone_size + bone_position_y);
+		return mainmemory.read_s16_be(boneArray2 + bone_size + bone.position_y);
 	end
 	return 0;
 end
@@ -2216,7 +2216,7 @@ function Game.getStoredZ1()
 	local boneArray1 = Game.getBoneArray1();
 	if isPointer(boneArray1) then
 		boneArray1 = boneArray1 - RDRAMBase;
-		return mainmemory.read_s16_be(boneArray1 + bone_size + bone_position_z);
+		return mainmemory.read_s16_be(boneArray1 + bone_size + bone.position_z);
 	end
 	return 0;
 end
@@ -2225,7 +2225,7 @@ function Game.getStoredZ2()
 	local boneArray2 = Game.getBoneArray2();
 	if isPointer(boneArray2) then
 		boneArray2 = boneArray2 - RDRAMBase;
-		return mainmemory.read_s16_be(boneArray2 + bone_size + bone_position_z);
+		return mainmemory.read_s16_be(boneArray2 + bone_size + bone.position_z);
 	end
 	return 0;
 end
@@ -2753,12 +2753,12 @@ end
 
 local function getBoneInfo(baseAddress)
 	local boneInfo = {};
-	boneInfo["positionX"] = mainmemory.read_s16_be(baseAddress + bone_position_x);
-	boneInfo["positionY"] = mainmemory.read_s16_be(baseAddress + bone_position_y);
-	boneInfo["positionZ"] = mainmemory.read_s16_be(baseAddress + bone_position_z);
-	boneInfo["scaleX"] = mainmemory.read_u16_be(baseAddress + bone_scale_x);
-	boneInfo["scaleY"] = mainmemory.read_u16_be(baseAddress + bone_scale_y);
-	boneInfo["scaleZ"] = mainmemory.read_u16_be(baseAddress + bone_scale_z);
+	boneInfo["positionX"] = mainmemory.read_s16_be(baseAddress + bone.position_x);
+	boneInfo["positionY"] = mainmemory.read_s16_be(baseAddress + bone.position_y);
+	boneInfo["positionZ"] = mainmemory.read_s16_be(baseAddress + bone.position_z);
+	boneInfo["scaleX"] = mainmemory.read_u16_be(baseAddress + bone.scale_x);
+	boneInfo["scaleY"] = mainmemory.read_u16_be(baseAddress + bone.scale_y);
+	boneInfo["scaleZ"] = mainmemory.read_u16_be(baseAddress + bone.scale_z);
 	return boneInfo;
 end
 
@@ -2837,7 +2837,7 @@ local function detectDisplacement(objectPointer)
 		local completedBoneRatio = completedBones / numberOfBones;
 
 		if completedBoneRatio < print_threshold or print_every_frame then
-			print(toHexString(objectPointer).." updated "..completedBones.."/"..numberOfBones.." bones.");
+			print(toHexString(objectPointer).." ("..getActorName(objectPointer)..") updated "..completedBones.."/"..numberOfBones.." bones.");
 			outputBones(currentBoneArrayBase, numberOfBones);
 		end
 	end
