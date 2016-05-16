@@ -413,6 +413,8 @@ local obj_model1 = {
 	},
 	["rendering_parameters_pointer"] = 0x04,
 	["rendering_parameters"] = { -- Relative to rendering_parameters_pointer
+		["bone_array_1"] = 0x14, -- Pointer
+		["bone_array_2"] = 0x18, -- Pointer
 		["scale_x"] = 0x34, -- 32 bit float big endian
 		["scale_y"] = 0x38, -- 32 bit float big endian
 		["scale_z"] = 0x3C, -- 32 bit float big endian
@@ -439,8 +441,9 @@ local obj_model1 = {
 		--[14] = "Unknown", -- Always loaded -- TODO: What is this?
 		--[15] = "Unknown", -- Always loaded -- TODO: What is this?
 		[17] = "Cannon Barrel",
-		[19] = "Barrel (Diddy 5DI)",
 		[18] = "Rambi Box",
+		[19] = "Barrel (Diddy 5DI)",
+		--[20] = "Unknown", -- Possibily some kind of cutscene controller
 		[23] = "Cannon",
 		[25] = "Hunky Chunky Barrel",
 		[26] = "TNT Barrel",
@@ -453,6 +456,7 @@ local obj_model1 = {
 		[34] = "Kremling Kosh Controller",
 		[35] = "Melon (Projectile)",
 		[36] = "Peanut",
+		--[37] = "Unknown - Factory Intro", -- TODO
 		[38] = "Pineapple",
 		[40] = "Mini Monkey barrel",
 		[41] = "Orange",
@@ -576,6 +580,7 @@ local obj_model1 = {
 		[235] = "Robo-Kremling",
 		[236] = "Dogadon",
 		[238] = "Kremling",
+		[239] = "Bongos",
 		[240] = "Fish with headlamp",
 		[241] = "Kasplat (DK)",
 		[242] = "Kasplat (Diddy)",
@@ -2135,7 +2140,7 @@ function Game.getBoneArray1()
 		if isRDRAM(playerObject) then
 			local animationParamObject = dereferencePointer(playerObject + obj_model1.rendering_parameters_pointer);
 			if isRDRAM(animationParamObject) then
-				return mainmemory.read_u32_be(animationParamObject + 0x14); -- TODO: Table
+				return mainmemory.read_u32_be(animationParamObject + obj_model1.rendering_parameters.bone_array_1);
 			end
 		end
 	end
@@ -2148,7 +2153,7 @@ function Game.getBoneArray2()
 		if isRDRAM(playerObject) then
 			local animationParamObject = dereferencePointer(playerObject + obj_model1.rendering_parameters_pointer);
 			if isRDRAM(animationParamObject) then
-				return mainmemory.read_u32_be(animationParamObject + 0x18); -- TODO: Table
+				return mainmemory.read_u32_be(animationParamObject + obj_model1.rendering_parameters.bone_array_2);
 			end
 		end
 	end

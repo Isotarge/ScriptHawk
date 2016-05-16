@@ -91,6 +91,7 @@ SystemID N64
 74FF00	w	h	1	RDRAM	Tag Barrel (Kutout) Behavior
 74FF02	w	h	1	RDRAM	Tag Barrel (Kutout) Model
 7502E4	d	f	1	RDRAM	Orange Y Acceleration
+750AC0	b	u	1	RDRAM	Number of Players
 7531FC	d	f	1	RDRAM	DK Walk Maximum Velocity
 753200	d	f	1	RDRAM	Diddy Walk Maximum Velocity
 753204	d	f	1	RDRAM	Lanky Walk Maximum Velocity
