@@ -11,6 +11,7 @@
 	- Complete documentation for US
 	- Figure out how the 101% credits are triggered
 	- Start documentation for other versions
+	- Write a loop to detect when flags are set/cleared
 - DK64: Exception when gui.cleargraphics() is called on first frame (by MJ minimap)
 - DK64: Finish integrating the Object Analysis tools
 	- Move to SM64.lua's struct format for object model 1 and model 2

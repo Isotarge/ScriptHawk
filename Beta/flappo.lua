@@ -9,7 +9,7 @@ local screen_type = 0x5C;
 local y_position = {
 	0x05,
 	0x1D
-}
+};
 
 ideal_height = { 39, 55, 37, 69, 37 };
 

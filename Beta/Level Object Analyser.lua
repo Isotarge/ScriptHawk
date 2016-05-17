@@ -865,7 +865,7 @@ local animation_types = {
 	[0x184] = "Big Clucker Attacking (Short)",
 	[0x185] = "Big Clucker Attacking (Long)",
 	[0x186] = "Big Clucker Dying",
-	-- [0x187] rotateodd and go in ground. -- TODO
+	-- [0x187] = "rotateodd and go in ground.", -- TODO
 	[0x188] = "Pumpkin Banjo Dying",
 	[0x189] = "Floatsam Dying",
 	[0x18A] = "Present", -- FP
