@@ -81,6 +81,7 @@ SystemID N64
 7FCDE0	b	u	1	RDRAM	DK Moves
 7FCDE1	b	u	1	RDRAM	DK Simian Slam
 7FCDE2	b	b	1	RDRAM	DK Weapon (bitfield xxxxxshw)
+7FCDE3	b	u	1	RDRAM	DK Ammo Belt
 7FCDE4	b	b	1	RDRAM	DK Instrument (bitfield xxxx321i)
 7FCDE6	w	u	1	RDRAM	DK Coins
 7FCDE8	w	u	1	RDRAM	DK Instrument Energy
@@ -129,6 +130,7 @@ SystemID N64
 7FCE3E	b	u	1	RDRAM	Diddy Moves
 7FCE3F	b	u	1	RDRAM	Diddy Simian Slam
 7FCE40	b	b	1	RDRAM	Diddy Weapon (bitfield xxxxxshw)
+7FCE41	b	u	1	RDRAM	Diddy Ammo Belt
 7FCE42	b	b	1	RDRAM	Diddy Instrument (bitfield xxxx321i)
 7FCE44	w	u	1	RDRAM	Diddy Coins
 7FCE46	w	u	1	RDRAM	Diddy Instrument Energy
@@ -177,6 +179,7 @@ SystemID N64
 7FCE9C	b	u	1	RDRAM	Lanky Moves
 7FCE9D	b	u	1	RDRAM	Lanky Simian Slam
 7FCE9E	b	b	1	RDRAM	Lanky Weapon (bitfield xxxxxshw)
+7FCE9F	b	u	1	RDRAM	Lanky Ammo Belt
 7FCEA0	b	b	1	RDRAM	Lanky Instrument (bitfield xxxx321i)
 7FCEA2	w	u	1	RDRAM	Lanky Coins
 7FCEA4	w	u	1	RDRAM	Lanky Instrument Energy
@@ -225,6 +228,7 @@ SystemID N64
 7FCEFA	b	u	1	RDRAM	Tiny Moves
 7FCEFB	b	u	1	RDRAM	Tiny Simian Slam
 7FCEFC	b	b	1	RDRAM	Tiny Weapon (bitfield xxxxxshw)
+7FCEFD	b	u	1	RDRAM	Tiny Ammo Belt
 7FCEFE	b	b	1	RDRAM	Tiny Instrument (bitfield xxxx321i)
 7FCF00	w	u	1	RDRAM	Tiny Coins
 7FCF02	w	u	1	RDRAM	Tiny Instrument Energy
@@ -273,6 +277,7 @@ SystemID N64
 7FCF58	b	u	1	RDRAM	Chunky Moves
 7FCF59	b	u	1	RDRAM	Chunky Simian Slam
 7FCF5A	b	b	1	RDRAM	Chunky Weapon (bitfield xxxxxshw)
+7FCF5B	b	u	1	RDRAM	Chunky Ammo Belt
 7FCF5C	b	b	1	RDRAM	Chunky Instrument (bitfield xxxx321i)
 7FCF5E	w	u	1	RDRAM	Chunky Coins
 7FCF60	w	u	1	RDRAM	Chunky Instrument Energy
