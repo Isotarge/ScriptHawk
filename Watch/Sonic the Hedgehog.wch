@@ -7,7 +7,9 @@ SystemID SMS
 126F	w	s	0	Main RAM	Viewport X2
 128D	b	u	0	Main RAM	Invuln. Timer
 12AA	b	h	0	Main RAM	Rings
-12CF	b	u	0	Main RAM	Game Time
+12CE	b	h	0	Main RAM	Game Time (Minutes)
+12CF	b	h	0	Main RAM	Game Time (Seconds)
+12D0	b	u	0	Main RAM	Game Time (Frames)
 1403	b	h	0	Main RAM	X Velocity related
 1404	w	s	0	Main RAM	X Velocity
 1406	b	h	0	Main RAM	Y Velocity related
