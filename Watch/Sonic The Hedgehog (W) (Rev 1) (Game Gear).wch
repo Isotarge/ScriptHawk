@@ -1,0 +1,11 @@
+SystemID SMS
+1240	b	h	0	Main RAM	Lives
+12A9	b	h	0	Main RAM	Rings
+12CF	b	h	0	Main RAM	Game Time (Minutes)
+12D0	b	h	0	Main RAM	Game Time (Seconds)
+12D1	b	u	0	Main RAM	Game Time (Frames)
+1404	b	h	0	Main RAM	X Velocity (Minor)
+1405	w	s	0	Main RAM	X Velocity
+1407	b	h	0	Main RAM	Y Velocity (Minor)
+1408	w	s	0	Main RAM	Y Velocity
+
