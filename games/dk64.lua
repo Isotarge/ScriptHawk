@@ -339,8 +339,6 @@ local max_crystals       = 20;
 local max_film           = 10;
 local max_oranges        = 20;
 local max_musical_energy = 10;
-local max_standard_ammo  = 50; -- TODO: I know where ammo belt is now, get this via a function
-local max_homing_ammo    = 50; -- TODO: I know where ammo belt is now, get this via a function
 
 local max_blueprints = 40;
 local max_cb = 3511;
@@ -395,6 +393,13 @@ local GB_Base    = TS_CB_Base + (14 * 2); -- Signed 16 bit int array
 -- Unknown 3
 -- Unknown 4
 -- Null
+
+function Game.getMaxStandardAmmo()
+	local kong = mainmemory.readbyte(Game.Memory.character[version]);
+	local ammoBelt = mainmemory.readbyte(Game.Memory.kong_base[version] + (kong * 0x5E) + ammo_belt);
+	return ((2 ^ ammoBelt) * 100) / 2;
+end
+Game.getMaxHomingAmmo = Game.getMaxStandardAmmo;
 
 ----------------------------------
 -- Object Model 1 Documentation --
@@ -3895,9 +3900,9 @@ end
 function Game.applyInfinites()
 	local global_base = Game.Memory.global_base[version]; -- TODO: Use HUD pointer and object to get these memory locations
 
-	mainmemory.writebyte(global_base + standard_ammo, max_standard_ammo);
+	mainmemory.writebyte(global_base + standard_ammo, Game.getMaxStandardAmmo());
 	if forms.ischecked(ScriptHawk.UI.form_controls["Toggle Homing Ammo Checkbox"]) then
-		mainmemory.writebyte(global_base + homing_ammo, max_homing_ammo);
+		mainmemory.writebyte(global_base + homing_ammo, Game.getMaxHomingAmmo());
 	else
 		mainmemory.writebyte(global_base + homing_ammo, 0);
 	end
@@ -3909,7 +3914,7 @@ function Game.applyInfinites()
 
 	if version ~= 4 then -- TODO: Kiosk
 		for kong = DK, Chunky do
-			local base = Game.Memory.kong_base[version] + kong * 0x5e;
+			local base = Game.Memory.kong_base[version] + kong * 0x5E;
 			mainmemory.write_u16_be(base + coins, max_coins);
 			mainmemory.write_u16_be(base + lives, max_musical_energy);
 		end
