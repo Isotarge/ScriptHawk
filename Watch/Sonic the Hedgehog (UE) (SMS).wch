@@ -3,17 +3,18 @@ SystemID SMS
 123E	b	h	0	Main RAM	Level
 1246	b	u	0	Main RAM	Lives
 125A	w	s	0	Main RAM	Viewport X
-125C	w	s	0	Main RAM	Viewport Y
+125D	w	u	0	Main RAM	Viewport Y
 126F	w	s	0	Main RAM	Viewport X2
-128D	b	u	0	Main RAM	Invuln. Timer
+128D	b	u	0	Main RAM	Invulnerability Timer
 12AA	b	h	0	Main RAM	Rings
 12CE	b	h	0	Main RAM	Game Time (Minutes)
 12CF	b	h	0	Main RAM	Game Time (Seconds)
 12D0	b	u	0	Main RAM	Game Time (Frames)
-1403	b	h	0	Main RAM	X Velocity related
+1403	b	h	0	Main RAM	X Velocity (Minor)
 1404	w	s	0	Main RAM	X Velocity
-1406	b	h	0	Main RAM	Y Velocity related
+1406	b	h	0	Main RAM	Y Velocity (Minor)
 1407	w	s	0	Main RAM	Y Velocity
+1410	b	h	0	Main RAM	Movement State?
 1411	b	u	0	Main RAM	Speed Shoes timer
 1414	b	h	0	Main RAM	Floor Check
 1CE1	b	u	0	Main RAM	Unknown
