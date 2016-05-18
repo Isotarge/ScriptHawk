@@ -264,6 +264,20 @@ SystemID N64
 7FBB65	b	b	1	RDRAM	Unknown Bitfield
 7FBB66	b	b	1	RDRAM	Long Distance Actor Spawn
 7FC3F1	b	u	1	RDRAM	Object Count?
+7FC930	w	u	1	RDRAM	Japes T&S CBs (Total)
+7FC932	w	u	1	RDRAM	Aztec T&S CBs (Total)
+7FC934	w	u	1	RDRAM	Factory T&S CBs (Total)
+7FC936	w	u	1	RDRAM	Galleon T&S CBs (Total)
+7FC938	w	u	1	RDRAM	Fungi T&S CBs (Total)
+7FC93A	w	u	1	RDRAM	Caves T&S CBs (Total)
+7FC93C	w	u	1	RDRAM	Castle T&S CBs (Total)
+7FC93E	w	u	1	RDRAM	Isles T&S CBs (Total)
+7FC940	w	u	1	RDRAM	Helm T&S CBs (Total)
+7FC942	w	u	1	RDRAM	Unknown 1 T&S CBs (Total)
+7FC944	w	u	1	RDRAM	Unknown 2 T&S CBs (Total)
+7FC946	w	u	1	RDRAM	Unknown 3 T&S CBs (Total)
+7FC948	w	u	1	RDRAM	Unknown 4 T&S CBs (Total)
+7FC94A	w	u	1	RDRAM	Null T&S CBs (Total)
 7FC950	b	u	1	RDRAM	DK Moves
 7FC951	b	u	1	RDRAM	DK Simian Slam
 7FC952	b	b	1	RDRAM	DK Weapon (bitfield xxxxxshw)
@@ -509,9 +523,59 @@ SystemID N64
 7FCB20	w	s	1	RDRAM	Chunky Unknown 3 GBs
 7FCB22	w	s	1	RDRAM	Chunky Unknown 4 GBs
 7FCB24	w	s	1	RDRAM	Chunky Null GBs
+7FCB26	b	u	1	RDRAM	Krusha Moves
+7FCB27	b	u	1	RDRAM	Krusha Simian Slam
+7FCB28	b	b	1	RDRAM	Krusha Weapon (bitfield xxxxxshw)
+7FCB29	b	u	1	RDRAM	Krusha Ammo Belt
+7FCB2A	b	b	1	RDRAM	Krusha Instrument (bitfield xxxx321i)
+7FCB2C	w	u	1	RDRAM	Krusha Coins
+7FCB2E	w	u	1	RDRAM	Krusha Instrument Ammo
+7FCB30	w	u	1	RDRAM	Krusha Japes CBs
+7FCB32	w	u	1	RDRAM	Krusha Aztec CBs
+7FCB34	w	u	1	RDRAM	Krusha Factory CBs
+7FCB36	w	u	1	RDRAM	Krusha Galleon CBs
+7FCB38	w	u	1	RDRAM	Krusha Fungi CBs
+7FCB3A	w	u	1	RDRAM	Krusha Caves CBs
+7FCB3C	w	u	1	RDRAM	Krusha Castle CBs
+7FCB3E	w	u	1	RDRAM	Krusha Isles CBs
+7FCB40	w	u	1	RDRAM	Krusha Helm CBs
+7FCB42	w	u	1	RDRAM	Krusha Unknown 1 CBs
+7FCB44	w	u	1	RDRAM	Krusha Unknown 2 CBs
+7FCB46	w	u	1	RDRAM	Krusha Unknown 3 CBs
+7FCB48	w	u	1	RDRAM	Krusha Unknown 4 CBs
+7FCB4A	w	u	1	RDRAM	Krusha Null CBs
+7FCB4C	w	u	1	RDRAM	Krusha Japes T&S CBs
+7FCB4E	w	u	1	RDRAM	Krusha Aztec T&S CBs
+7FCB50	w	u	1	RDRAM	Krusha Factory T&S CBs
+7FCB52	w	u	1	RDRAM	Krusha Galleon T&S CBs
+7FCB54	w	u	1	RDRAM	Krusha Fungi T&S CBs
+7FCB56	w	u	1	RDRAM	Krusha Caves T&S CBs
+7FCB58	w	u	1	RDRAM	Krusha Castle T&S CBs
+7FCB5A	w	u	1	RDRAM	Krusha Isles T&S CBs
+7FCB5C	w	u	1	RDRAM	Krusha Helm T&S CBs
+7FCB5E	w	u	1	RDRAM	Krusha Unknown 1 T&S CBs
+7FCB60	w	u	1	RDRAM	Krusha Unknown 2 T&S CBs
+7FCB62	w	u	1	RDRAM	Krusha Unknown 3 T&S CBs
+7FCB64	w	u	1	RDRAM	Krusha Unknown 4 T&S CBs
+7FCB66	w	u	1	RDRAM	Krusha Null T&S CBs
+7FCB68	w	s	1	RDRAM	Krusha Japes GBs
+7FCB6A	w	s	1	RDRAM	Krusha Aztec GBs
+7FCB6C	w	s	1	RDRAM	Krusha Factory GBs
+7FCB6E	w	s	1	RDRAM	Krusha Galleon GBs
+7FCB70	w	s	1	RDRAM	Krusha Fungi GBs
+7FCB72	w	s	1	RDRAM	Krusha Caves GBs
+7FCB74	w	s	1	RDRAM	Krusha Castle GBs
+7FCB76	w	s	1	RDRAM	Krusha Isles GBs
+7FCB78	w	s	1	RDRAM	Krusha Helm GBs
+7FCB7A	w	s	1	RDRAM	Krusha Unknown 1 GBs
+7FCB7C	w	s	1	RDRAM	Krusha Unknown 2 GBs
+7FCB7E	w	s	1	RDRAM	Krusha Unknown 3 GBs
+7FCB80	w	s	1	RDRAM	Krusha Unknown 4 GBs
+7FCB82	w	s	1	RDRAM	Krusha Null GBs
 7FCC40	w	u	1	RDRAM	Standard Ammo
 7FCC42	w	u	1	RDRAM	Homing Ammo
 7FCC44	w	u	1	RDRAM	Oranges
+7FCC46	w	u	1	RDRAM	Crystals
 7FCC48	w	u	1	RDRAM	Film
 7FCC4B	b	u	1	RDRAM	Health
 7FCC4C	b	u	1	RDRAM	Melons

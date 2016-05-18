@@ -350,13 +350,13 @@ local max_warps = (5 * 2 * 8) + 4 + 2 + 2 + 6;
 
 -- Relative to global_base
 -- TODO: Different on Kiosk
-local standard_ammo = 0;
-local homing_ammo   = 2;
-local oranges       = 4;
-local crystals      = 5;
-local film          = 8;
-local health        = 10;
-local melons        = 11;
+local standard_ammo = 0; -- u16_be
+local homing_ammo   = 2; -- u16_be
+local oranges       = 4; -- u16_be
+local crystals      = 5; -- u16_be, 150 ticks per crystal or 125 in European version
+local film          = 8; -- u16_be
+local health        = 10; -- unknown, possibly u16_be
+local melons        = 11; -- u8
 
 -- Kong index
 local DK     = 0;
@@ -367,16 +367,16 @@ local Chunky = 4;
 local Krusha = 5;
 
 -- Relative to Kong base
-local moves      = 0;
-local sim_slam   = 1;
-local weapon     = 2;
-local ammo_belt  = 3;
-local instrument = 4;
-local coins      = 6;
-local lives      = 8; -- This is used as instrument ammo in single player
-local CB_Base    = 10; -- Unsigned 16 bit int array
-local TS_CB_Base = CB_Base + (14 * 2); -- Unsigned 16 bit int array
-local GB_Base    = TS_CB_Base + (14 * 2); -- Signed 16 bit int array
+local moves      = 0; -- u8
+local sim_slam   = 1; -- u8
+local weapon     = 2; -- byte, bitfield, xxxxxshw
+local ammo_belt  = 3; -- u8, see Game.getMaxStandardAmmo() for formula
+local instrument = 4; -- byte, bitfield, xxxx321i
+local coins      = 6; -- u16_be
+local lives      = 8; -- u16_be This is used as instrument ammo in single player
+local CB_Base    = 10; -- u16_be array
+local TS_CB_Base = CB_Base + (14 * 2); -- u16_be array
+local GB_Base    = TS_CB_Base + (14 * 2); -- u16_be array
 
 -- For CB, T&S CB, GB level indexes are:
 -- Japes
@@ -3122,17 +3122,17 @@ function isKong(actorType)
 end
 
 function freeTradeObjectModel1(currentKong)
-	for object_no = 0, max_objects do
-		local pointer = dereferencePointer(Game.Memory.pointer_list[version] + (object_no * 4));
-		if isRDRAM(pointer) then
-			local actorType = mainmemory.read_u32_be(pointer + obj_model1.actor_type);
-			if isKasplat(actorType) then
-				-- Fix which blueprint the Kasplat drops
-				mainmemory.write_u32_be(pointer + obj_model1.actor_type, KasplatStates[currentKong]);
-			end
-			if isBalloon(actorType) then
-				-- Fix balloon color
-				mainmemory.write_u32_be(pointer + obj_model1.actor_type, BalloonStates[currentKong]);
+	if currentKong >= DK and currentKong < Krusha then
+		for object_no = 0, max_objects do
+			local pointer = dereferencePointer(Game.Memory.pointer_list[version] + (object_no * 4));
+			if isRDRAM(pointer) then
+				local actorType = mainmemory.read_u32_be(pointer + obj_model1.actor_type);
+				if isKasplat(actorType) then
+					mainmemory.write_u32_be(pointer + obj_model1.actor_type, KasplatStates[currentKong]); -- Fix which blueprint the Kasplat drops
+				end
+				if isBalloon(actorType) then
+					mainmemory.write_u32_be(pointer + obj_model1.actor_type, BalloonStates[currentKong]); -- Fix balloon color
+				end
 			end
 		end
 	end
@@ -3259,6 +3259,7 @@ local BulletChecks = {
 	[Lanky] = 0x002A,
 	[Tiny] = 0x002B,
 	[Chunky] = 0x0026,
+	[Krusha] = 0x00AB,
 };
 
 function isBulletCheck(value)
@@ -3271,6 +3272,7 @@ local SimSlamChecks = {
 	[Lanky] = 0x0004,
 	[Tiny] = 0x0005,
 	[Chunky] = 0x0006,
+	[Krusha] = 0x0007,
 };
 
 function isSimSlamCheck(value)
@@ -3287,7 +3289,7 @@ function ohWrongnana()
 		for i = 0, numSlots - 1 do
 			slotBase = objModel2Array + i * obj_model2_slot_size;
 			currentValue = mainmemory.readbyte(slotBase + obj_model2.collectable_state);
-			if isGB(currentValue) then
+			if currentKong ~= Krusha and isGB(currentValue) then
 				mainmemory.writebyte(slotBase + obj_model2.collectable_state, GBStates[currentKong]);
 			end
 			scriptName = getScriptName(slotBase);
@@ -3772,7 +3774,7 @@ end
 ------------
 
 function Game.unlockMoves()
-	for kong = DK, Chunky do -- TODO: Double check Kiosk offsets
+	for kong = DK, Krusha do -- TODO: Double check Kiosk offsets
 		local base = Game.Memory.kong_base[version] + kong * 0x5E;
 		mainmemory.writebyte(base + moves, 3);
 		mainmemory.writebyte(base + sim_slam, 3);
@@ -3908,12 +3910,12 @@ function Game.applyInfinites()
 	end
 
 	mainmemory.writebyte(global_base + oranges, max_oranges);
-	mainmemory.write_u16_be(global_base + crystals, max_crystals * 150);
+	mainmemory.write_u16_be(global_base + crystals, max_crystals * 150); -- TODO: This is 125 on European version
 	mainmemory.writebyte(global_base + film, max_film);
 	mainmemory.writebyte(global_base + health, mainmemory.readbyte(global_base + melons) * 4);
 
 	if version ~= 4 then -- TODO: Kiosk
-		for kong = DK, Chunky do
+		for kong = DK, Krusha do
 			local base = Game.Memory.kong_base[version] + kong * 0x5E;
 			mainmemory.write_u16_be(base + coins, max_coins);
 			mainmemory.write_u16_be(base + lives, max_musical_energy);
