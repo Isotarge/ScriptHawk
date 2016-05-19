@@ -3285,41 +3285,43 @@ end
 
 function ohWrongnana()
 	if version ~= 4 then -- Anything but Kiosk
-		local objModel2Array = dereferencePointer(Game.Memory.obj_model2_array_pointer[version]); -- TODO: Pointer safety
-		local numSlots = mainmemory.read_u32_be(Game.Memory.obj_model2_array_count[version]);
 		local currentKong = mainmemory.readbyte(Game.Memory.character[version]);
-		local scriptName, slotBase, currentValue, activationScript, earlyCheckValue, lateCheckValue;
-		-- Fill and sort pointer list
-		for i = 0, numSlots - 1 do
-			slotBase = objModel2Array + i * obj_model2_slot_size;
-			currentValue = mainmemory.readbyte(slotBase + obj_model2.collectable_state);
-			if currentKong ~= Krusha and isGB(currentValue) then
-				mainmemory.writebyte(slotBase + obj_model2.collectable_state, GBStates[currentKong]);
-			end
-			scriptName = getScriptName(slotBase);
-			if scriptName == "gunswitches" or scriptName == "buttons" then
-				-- Get activation script
-				activationScript = dereferencePointer(slotBase + 0x7C);
-				if isRDRAM(activationScript) then
-					-- Get part 2
-					activationScript = mainmemory.read_u32_be(activationScript + 0xA0); -- TODO: dereferencePointer call
-					while isPointer(activationScript) do
-						activationScript = activationScript - RDRAMBase;
-						earlyCheckValue = mainmemory.read_u16_be(activationScript + 0x0C);
-						lateCheckValue = mainmemory.read_u16_be(activationScript + 0x24);
-						-- Check for the bullet magic and patch if needed
-						if isBulletCheck(earlyCheckValue) then
-							mainmemory.write_u16_be(activationScript + 0x0C, BulletChecks[currentKong]);
+
+		local objModel2Array = dereferencePointer(Game.Memory.obj_model2_array_pointer[version]);
+		if isRDRAM(objModel2Array) then
+			local numSlots = mainmemory.read_u32_be(Game.Memory.obj_model2_array_count[version]);
+			local scriptName, slotBase, currentValue, activationScript, earlyCheckValue, lateCheckValue;
+			-- Fill and sort pointer list
+			for i = 0, numSlots - 1 do
+				slotBase = objModel2Array + i * obj_model2_slot_size;
+				currentValue = mainmemory.readbyte(slotBase + obj_model2.collectable_state);
+				if currentKong ~= Krusha and isGB(currentValue) then
+					mainmemory.writebyte(slotBase + obj_model2.collectable_state, GBStates[currentKong]);
+				end
+				scriptName = getScriptName(slotBase);
+				if scriptName == "gunswitches" or scriptName == "buttons" then
+					-- Get activation script
+					activationScript = dereferencePointer(slotBase + 0x7C);
+					if isRDRAM(activationScript) then
+						-- Get part 2
+						activationScript = dereferencePointer(activationScript + 0xA0);
+						while isRDRAM(activationScript) do
+							earlyCheckValue = mainmemory.read_u16_be(activationScript + 0x0C);
+							lateCheckValue = mainmemory.read_u16_be(activationScript + 0x24);
+							-- Check for the bullet magic and patch if needed
+							if isBulletCheck(earlyCheckValue) then
+								mainmemory.write_u16_be(activationScript + 0x0C, BulletChecks[currentKong]);
+							end
+							-- Check for the simslam magic and patch if needed
+							if isSimSlamCheck(earlyCheckValue) then
+								mainmemory.write_u16_be(activationScript + 0x0C, SimSlamChecks[currentKong]);
+							end
+							if isSimSlamCheck(lateCheckValue) then
+								mainmemory.write_u16_be(activationScript + 0x24, SimSlamChecks[currentKong]);
+							end
+							-- Get next script chunk
+							activationScript = dereferencePointer(activationScript + 0x4C);
 						end
-						-- Check for the simslam magic and patch if needed
-						if isSimSlamCheck(earlyCheckValue) then
-							mainmemory.write_u16_be(activationScript + 0x0C, SimSlamChecks[currentKong]);
-						end
-						if isSimSlamCheck(lateCheckValue) then
-							mainmemory.write_u16_be(activationScript + 0x24, SimSlamChecks[currentKong]);
-						end
-						-- Get next script chunk
-						activationScript = mainmemory.read_u32_be(activationScript + 0x4C);
 					end
 				end
 			end
@@ -3328,18 +3330,6 @@ function ohWrongnana()
 		freeTradeObjectModel1(currentKong);
 		freeTradeCollisionList(currentKong);
 	end
-end
-
--- TODO: Better detection for these
-function Game.replaceTextures()
-	replace_u32_be(0x805AC370, 0x805B23D0) -- Chunky left
-	replace_u32_be(0x805AD380, 0x805B33E0) -- Chunky Right
-	replace_u32_be(0x805AE390, 0x805B23D0) -- Diddy Left
-	replace_u32_be(0x805AF3A0, 0x805B33E0) -- Diddy Right
-	replace_u32_be(0x805B03B0, 0x805B23D0) -- DK Left
-	replace_u32_be(0x805B13C0, 0x805B33E0) -- DK Right
-	replace_u32_be(0x805B43F0, 0x805B23D0) -- Tiny Left
-	replace_u32_be(0x805B5400, 0x805B33E0) -- Tiny Right
 end
 
 ----------------------
