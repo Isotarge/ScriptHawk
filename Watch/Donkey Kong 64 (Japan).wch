@@ -1,4 +1,8 @@
 SystemID N64
+0103A4	d	h	1	RDRAM	Framebuffer Pointer
+0103A8	d	h	1	RDRAM	Render Mode Pointer
+0103D4	d	h	1	RDRAM	Framebuffer Pointer
+0103D8	d	h	1	RDRAM	Render Mode Pointer
 0150E4	d	h	1	RDRAM	Controller Input P1
 0150E6	b	s	1	RDRAM	Joystick X (P1)
 0150E7	b	s	1	RDRAM	Joystick Y (P1)
@@ -27,15 +31,25 @@ SystemID N64
 743DA4	d	u	1	RDRAM	Map
 743DA8	d	u	1	RDRAM	Exit
 743E08	w	s	1	RDRAM	Rambi Score 1
+743E0A	d	h	1	RDRAM	Rambi Score 1 Name
 743E0E	w	s	1	RDRAM	Rambi Score 2
+743E10	d	h	1	RDRAM	Rambi Score 2 Name
 743E14	w	s	1	RDRAM	Rambi Score 3
+743E16	d	h	1	RDRAM	Rambi Score 3 Name
 743E1A	w	s	1	RDRAM	Rambi Score 4
+743E1C	d	h	1	RDRAM	Rambi Score 4 Name
 743E20	w	s	1	RDRAM	Rambi Score 5
+743E22	d	h	1	RDRAM	Rambi Score 5 Name
 743E28	w	s	1	RDRAM	Enguarde Score 1
+743E2A	d	h	1	RDRAM	Enguarde Score 1 Name
 743E2E	w	s	1	RDRAM	Enguarde Score 2
+743E30	d	h	1	RDRAM	Enguarde Score 2 Name
 743E34	w	s	1	RDRAM	Enguarde Score 3
+743E36	d	h	1	RDRAM	Enguarde Score 3 Name
 743E3A	w	s	1	RDRAM	Enguarde Score 4
+743E3C	d	h	1	RDRAM	Enguarde Score 4 Name
 743E40	w	s	1	RDRAM	Enguarde Score 5
+743E42	d	h	1	RDRAM	Enguarde Score 5 Name
 746088	b	u	1	RDRAM	File
 74E05C	b	u	1	RDRAM	Character
 753B34	d	h	1	RDRAM	Object Model 2 Collision Linked List Pointer

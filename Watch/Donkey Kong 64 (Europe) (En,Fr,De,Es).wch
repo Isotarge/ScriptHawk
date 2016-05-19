@@ -1,4 +1,8 @@
 SystemID N64
+010364	d	h	1	RDRAM	Framebuffer Pointer
+010368	d	h	1	RDRAM	Render Mode Pointer
+010394	d	h	1	RDRAM	Framebuffer Pointer
+010398	d	h	1	RDRAM	Render Mode Pointer
 0153A4	d	h	1	RDRAM	Controller Input P1
 0153A6	b	s	1	RDRAM	Joystick X (P1)
 0153A7	b	s	1	RDRAM	Joystick Y (P1)
@@ -27,15 +31,25 @@ SystemID N64
 73EC34	d	u	1	RDRAM	Map
 73EC38	d	u	1	RDRAM	Exit
 73EC98	w	s	1	RDRAM	Rambi Score 1
+73EC9A	d	h	1	RDRAM	Rambi Score 1 Name
 73EC9E	w	s	1	RDRAM	Rambi Score 2
+73ECA0	d	h	1	RDRAM	Rambi Score 2 Name
 73ECA4	w	s	1	RDRAM	Rambi Score 3
+73ECA6	d	h	1	RDRAM	Rambi Score 3 Name
 73ECAA	w	s	1	RDRAM	Rambi Score 4
+73ECAC	d	h	1	RDRAM	Rambi Score 4 Name
 73ECB0	w	s	1	RDRAM	Rambi Score 5
+73ECB2	d	h	1	RDRAM	Rambi Score 5 Name
 73ECB8	w	s	1	RDRAM	Enguarde Score 1
+73ECBA	d	h	1	RDRAM	Enguarde Score 1 Name
 73ECBE	w	s	1	RDRAM	Enguarde Score 2
+73ECC0	d	h	1	RDRAM	Enguarde Score 2 Name
 73ECC4	w	s	1	RDRAM	Enguarde Score 3
+73ECC6	d	h	1	RDRAM	Enguarde Score 3 Name
 73ECCA	w	s	1	RDRAM	Enguarde Score 4
+73ECCC	d	h	1	RDRAM	Enguarde Score 4 Name
 73ECD0	w	s	1	RDRAM	Enguarde Score 5
+73ECD2	d	h	1	RDRAM	Enguarde Score 5 Name
 740F18	b	u	1	RDRAM	File
 748EDC	b	u	1	RDRAM	Character
 74D94C	d	f	1	RDRAM	DK Walk Maximum Velocity

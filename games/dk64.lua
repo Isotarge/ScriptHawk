@@ -884,6 +884,10 @@ local obj_model1 = {
 		["melons_remaining"] = 0x1A3,
 		["slot_pointer_base"] = 0x1A8,
 	},
+	["main_menu_controller"] = { -- TODO: Add these to the analysis tools
+		["menu_screen"] = 0x18A,
+		["menu_position"] = 0x18F,
+	},
 };
 
 local function getActorName(pointer)

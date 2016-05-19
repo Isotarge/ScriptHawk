@@ -37,8 +37,6 @@ SystemID N64
 04C71B	b	u	1	RDRAM	Jumpman Lives (Real)
 04C71C	b	u	1	RDRAM	Jumpman Lives (HUD)
 46E680	b	u	1	RDRAM	Key 8 enabled
-4B210A	b	h	1	RDRAM	Main menu screen?
-4B210F	b	u	1	RDRAM	Main menu position
 4B2904	b	h	1	RDRAM	FF for voidout on main menu?!?
 744470	d	h	1	RDRAM	Framebuffer Pointer
 744478	d	u	1	RDRAM	Current Lag Speed Boost
