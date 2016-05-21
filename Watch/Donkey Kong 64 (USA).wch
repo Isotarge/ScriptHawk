@@ -16,6 +16,7 @@ SystemID N64
 014DDE	b	s	1	RDRAM	Joystick X (P4)
 014DDF	b	s	1	RDRAM	Joystick Y (P4)
 029BA0	d	h	1	RDRAM	FFA Renderer Pointer
+02EC50	d	s	1	RDRAM	Jetpac Score
 02F050	d	f	1	RDRAM	Jetman X Position
 02F054	d	f	1	RDRAM	Jetman Y Position
 02F058	d	f	1	RDRAM	Jetman X Velocity

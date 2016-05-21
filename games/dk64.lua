@@ -38,8 +38,8 @@ Game.Memory = {
 	["menu_flags"] = {0x7ED558, 0x7ED478, 0x7ED9C8, nil},
 	["framebuffer_pointer"] = {0x7F07F4, 0x73EBC0, 0x743D30, 0x72CDA0},
 	["flag_block_pointer"] = {0x7654F4, 0x760014, 0x7656E4, nil},
-	["security_byte"] = {0x7552E0, 0x74FB60, 0x7553A0, nil}, -- TODO: Kiosk?
-	["security_message"] = {0x75E5DC, 0x7590F0, 0x75E790, nil},
+	["security_byte"] = {0x7552E0, 0x74FB60, 0x7553A0, nil}, -- As far as I am aware this function is not present in the Kiosk version
+	["security_message"] = {0x75E5DC, 0x7590F0, 0x75E790, nil}, -- As far as I am aware this function is not present in the Kiosk version
 	["buttons_enabled_bitfield"] = {0x755308, 0x74FB88, 0x7553C8, 0x6FFE5C},
 	["joystick_enabled_x"] = {0x75530C, 0x74FB8C, 0x7553CC, 0x6FFE60},
 	["joystick_enabled_y"] = {0x755310, 0x74FB90, 0x7553D0, 0x6FFE64},
@@ -3845,7 +3845,7 @@ end
 
 --[[
 
-local arcadeScores = { -- TODO: How long can these names be
+local arcadeScores = {
 	{"AAA", 0}, -- TODO: Get some good scores with proof
 };
 
@@ -3857,7 +3857,6 @@ local enguardeScores = {
 local jetpacScores = { -- TODO: How long can these names be
 	{"AAA", 0}, -- TODO: Get some good scores with proof
 };
-
 
 local scoreBase = 0;
 local nameBase = 2;
