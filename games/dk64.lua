@@ -412,7 +412,7 @@ local object_size = -0x0C; -- u32_be
 local max_objects = 0xFF; -- This only applies to the model 1 pointer list used to check collisions
 
 -- Relative to Model 1 Objects
-local obj_model1 = {
+obj_model1 = {
 	["model_pointer"] = 0x00,
 	["model"] = { -- Relative to model_pointer
 		["num_bones"] = 0x20,
@@ -908,27 +908,26 @@ local function getExamineDataModelOne(pointer)
 		return examine_data;
 	end
 
-	local actorSize = mainmemory.read_u32_be(pointer + object_size)
-	local modelPointer = mainmemory.read_u32_be(pointer + obj_model1.model_pointer);
-	local renderingParametersPointer = mainmemory.read_u32_be(pointer + obj_model1.rendering_parameters_pointer);
-	local boneArrayPointer = mainmemory.read_u32_be(pointer + obj_model1.current_bone_array_pointer);
-	local hasModel = isPointer(modelPointer) or isPointer(renderingParametersPointer) or isPointer(boneArrayPointer);
+	local modelPointer = dereferencePointer(pointer + obj_model1.model_pointer);
+	local renderingParametersPointer = dereferencePointer(pointer + obj_model1.rendering_parameters_pointer);
+	local boneArrayPointer = dereferencePointer(pointer + obj_model1.current_bone_array_pointer);
+	local hasModel = isRDRAM(modelPointer) or isRDRAM(renderingParametersPointer) or isRDRAM(boneArrayPointer);
 
 	local xPos = mainmemory.readfloat(pointer + obj_model1.x_pos, true);
 	local yPos = mainmemory.readfloat(pointer + obj_model1.y_pos, true);
 	local zPos = mainmemory.readfloat(pointer + obj_model1.z_pos, true);
-	local hasPosition = xPos ~= 0 or yPos ~= 0 or zPos ~= 0 or hasModel;
+	local hasPosition = hasModel or xPos ~= 0 or yPos ~= 0 or zPos ~= 0;
 
 	table.insert(examine_data, { "Actor base", toHexString(pointer, 6) });
-	table.insert(examine_data, { "Actor size", toHexString(actorSize) });
+	table.insert(examine_data, { "Actor size", toHexString(mainmemory.read_u32_be(pointer + object_size)) });
 	local currentActorTypeNumeric = mainmemory.read_u32_be(pointer + obj_model1.actor_type);
 	table.insert(examine_data, { "Actor type", getActorName(pointer) });
 	table.insert(examine_data, { "Separator", 1 });
 
 	if hasModel then
-		table.insert(examine_data, { "Model", toHexString(modelPointer, 8) });
-		table.insert(examine_data, { "Rendering Params", toHexString(renderingParametersPointer, 8) });
-		table.insert(examine_data, { "Bone Array", toHexString(boneArrayPointer, 8) });
+		table.insert(examine_data, { "Model", toHexString(modelPointer, 6) });
+		table.insert(examine_data, { "Rendering Params", toHexString(renderingParametersPointer, 6) });
+		table.insert(examine_data, { "Bone Array", toHexString(boneArrayPointer, 6) });
 		table.insert(examine_data, { "Separator", 1 });
 	end
 
@@ -944,7 +943,7 @@ local function getExamineDataModelOne(pointer)
 
 		table.insert(examine_data, { "Rot X", ScriptHawk.UI.formatRotation(mainmemory.read_u16_be(pointer + obj_model1.x_rot)) });
 		table.insert(examine_data, { "Rot Y", ScriptHawk.UI.formatRotation(mainmemory.read_u16_be(pointer + obj_model1.y_rot)) });
-			table.insert(examine_data, { "Rot Z", ScriptHawk.UI.formatRotation(mainmemory.read_u16_be(pointer + obj_model1.z_rot)) });
+		table.insert(examine_data, { "Rot Z", ScriptHawk.UI.formatRotation(mainmemory.read_u16_be(pointer + obj_model1.z_rot)) });
 		table.insert(examine_data, { "Separator", 1 });
 
 		table.insert(examine_data, { "Velocity", mainmemory.readfloat(pointer + obj_model1.velocity, true) });
@@ -1056,7 +1055,7 @@ local function getExamineDataModelOne(pointer)
 			table.insert(examine_data, { "Slot "..i.." pointer", toHexString(mainmemory.read_u32_be(pointer + obj_model1.kosh_kontroller.slot_pointer_base + (i - 1) * 4), 8) });
 		end
 		table.insert(examine_data, { "Separator", 1 });
-	elseif currentActorTypeNumeric == 330 then -- Bug: Big Bug Bash
+	elseif currentActorTypeNumeric == 330 then -- Bug: Big Bug Bash -- TODO: Pop these into model 1 table
 		table.insert(examine_data, { "Current AI direction", mainmemory.readfloat(pointer + 0x180) });
 		table.insert(examine_data, { "Ticks til direction change", mainmemory.read_u32_be(pointer + 0x184) });
 	end
@@ -1087,7 +1086,7 @@ end
 local obj_model2_slot_size = 0x90;
 
 -- Relative to objects in model 2 array
-local obj_model2 = {
+obj_model2 = {
 	["x_pos"] = 0x00, -- Float
 	["y_pos"] = 0x04, -- Float
 	["z_pos"] = 0x08, -- Float
@@ -1359,8 +1358,8 @@ function Game.detectVersion(romName, romHash)
 
 		-- Kiosk specific Object Model 1 offsets
 		obj_model1.x_rot = 0xD8;
-		obj_model1.y_rot = obj_model1.x_rot + 2;
-		obj_model1.z_rot = obj_model1.y_rot + 2;
+		obj_model1.y_rot = 0xDA;
+		obj_model1.z_rot = 0xDC;
 
 		obj_model1.velocity = 0xB0;
 		obj_model1.y_velocity = 0xB8;
@@ -3684,11 +3683,11 @@ local function drawGrabScriptUI()
 		end
 
 		-- Display which object the camera is currently focusing on
-		gui.text(gui_x, gui_y + height * row, "Focused Actor: "..toHexString(focusedActor, 8).." "..focusedActorType, nil, nil, 'bottomright');
+		gui.text(gui_x, gui_y + height * row, "Focused Actor: "..toHexString(focusedActor, 6).." "..focusedActorType, nil, nil, 'bottomright');
 		row = row + 1;
 
 		-- Display which object is grabbed
-		gui.text(gui_x, gui_y + height * row, "Grabbed Actor: "..toHexString(grabbedActor, 8).." "..grabbedActorType, nil, nil, 'bottomright');
+		gui.text(gui_x, gui_y + height * row, "Grabbed Actor: "..toHexString(grabbedActor, 6).." "..grabbedActorType, nil, nil, 'bottomright');
 		row = row + 1;
 	end
 
