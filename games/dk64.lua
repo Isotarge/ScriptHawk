@@ -1946,10 +1946,10 @@ function forceTBS()
 	if force_tbs then
 		local playerObject = Game.getPlayerObject();
 		if isRDRAM(playerObject) then
-			local pointer = mainmemory.read_u32_be(playerObject + obj_model1.lock_method_1_pointer);
-			if isPointer(pointer) then
-				print("Forcing TBS");
-				mainmemory.write_u32_be(playerObject + obj_model1.lock_method_1_pointer, 0x00000000);
+			local pointer = dereferencePointer(playerObject + obj_model1.lock_method_1_pointer);
+			if isRDRAM(pointer) then
+				mainmemory.write_u32_be(playerObject + obj_model1.lock_method_1_pointer, 0);
+				print("Forcing TBS. Nulled pointer to "..toHexString(pointer));
 			end
 		end
 	end
