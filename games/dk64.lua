@@ -986,7 +986,11 @@ local function getExamineDataModelOne(pointer)
 		table.insert(examine_data, { "Grabbed Vine Pointer", toHexString(mainmemory.read_u32_be(pointer + obj_model1.player.grabbed_vine_pointer), 8) });
 		table.insert(examine_data, { "Grab pointer", toHexString(mainmemory.read_u32_be(pointer + obj_model1.player.grab_pointer), 8) });
 		table.insert(examine_data, { "Fairy Active", mainmemory.readbyte(pointer + obj_model1.player.fairy_active) });
-		table.insert(examine_data, { "Animation Type", mainmemory.readbyte(pointer + obj_model1.player.animation_type) }); -- TODO: Pretty print using animation_types table
+		local animationType = mainmemory.readbyte(pointer + obj_model1.player.animation_type);
+		if obj_model1.control_states[animationType] ~= nil then
+			animationType = obj_model1.control_states[animationType];
+		end
+		table.insert(examine_data, { "Animation Type", animationType });
 		table.insert(examine_data, { "Separator", 1 });
 
 		for index, offset in ipairs(obj_model1.player.scale) do
@@ -3846,24 +3850,23 @@ end
 --[[
 
 local arcadeScores = {
-	{"AAA", 0}, -- TODO: Get some good scores with proof
+	{"INT", 1222900}, -- intestinachoz https://www.youtube.com/watch?v=lekPEle8F8w
 };
 
 local enguardeScores = {
-	{"JON", 430}, -- https://www.youtube.com/watch?v=VrFWWcGlKOE
-	{"ING", 420}, -- https://www.youtube.com/watch?v=UEPeqomGHN4
+	{"JON", 430}, -- Ngamer https://www.youtube.com/watch?v=VrFWWcGlKOE
+	{"ING", 420}, -- ingx32 https://www.youtube.com/watch?v=UEPeqomGHN4
 };
 
-local jetpacScores = { -- TODO: How long can these names be
-	{"AAA", 0}, -- TODO: Get some good scores with proof
-};
+local jetpacScore = 999135; -- Bismuth http://i.imgur.com/5mHz6QA.png
 
 local scoreBase = 0;
 local nameBase = 2;
 local scoreInstanceSize = 6;
 
 local rambiScores = {
-	{"BIS", 220}, -- http://www.twitch.tv/bismuth9/v/42515576
+	{"BIS", 220}, -- Bismuth http://www.twitch.tv/bismuth9/v/42515576
+	{"ISO", 184}, -- Isotarge https://www.youtube.com/watch?v=uTeS_710zus
 };
 
 function Game.getScore(index)
