@@ -56,7 +56,6 @@ A60200023C0E802885CE1250240F00203C188041371907EC
 3C1980373739C70C15EE00063C0280418C4F0000AF0F0000
 244200041738FFFC2718000408093BA424000000
 
-.start "C:\Users\Isotarge\Desktop\bk_savestate.bin"
 .size 0x0000005C
 80400000:	A6020002	SH      $v0, 0x0002($s0)	#
 80400004:	3C0E8028	LUI     $t6, 0x8028	#
@@ -84,53 +83,3 @@ A60200023C0E802885CE1250240F00203C188041371907EC
 80400054:	08093BA4	J       0x8024EE90	#
 80400058:	24000000	ADDIU   $zero, $zero, 0x0000	#
 .end
-
--------------------------------------------------------------
-
-v0 = read from
-t8 = write to
-t9 = write until
-t7 = holding register
-
-.org 0x80400000
-	PUSH v0
-	PUSH t6
-	PUSH t7
-	PUSH t8
-	PUSH t9
-
-Save:
-	LI      $v0, 0x8037BF20		// Start reading at 0x8037BF20
-    LUI     $t8, 0x8041			// Start writing at 0x80410000
-	LI      $t9, 0x804107EC		// End at 0x804107EC
-
-CheckController:
-	LUI     $t6, 0x8028
-	LH      $t6, 0x1250($t6)	// Load controller input (0x80281250)
-	ADDIU   $t7, $r0, 0x0020    // L button
-	BEQ     $t7, $t6, TransferWord
-	NOP
-	ADDIU   $t7, $r0, 0x0010    // R Button
-	BNE     $t7, $t6, Return
-	NOP
-
-Load:
-	LUI     $v0, 0x8041         // Start reading at 0x80410000
-	LI      $t8, 0x8037BF20		// Start writing at 0x8037BF20
-	LI      $t9, 0x8037C70C		// End at 0x8037C70C
-
-TransferWord:
-	LW      $t7, 0x0000($v0)	// Read word
-	SW      $t7, 0x0000($t8)	// Write word
-	ADDIU   $v0, $v0, 0x0004	// r += 4
-	BNE     $t9, $t8, TransferWord
-	ADDIU   $t8, $t8, 0x0004	// w += 4
-
-Return:
-	POP t9
-	POP t8
-	POP t7
-	POP t6
-	POP v0
-	J       0x8024EE90
-	NOP
