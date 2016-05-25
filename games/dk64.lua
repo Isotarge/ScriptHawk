@@ -3849,12 +3849,12 @@ end
 --[[
 
 local arcadeScores = {
-	{"INT", 1222900}, -- intestinachoz https://www.youtube.com/watch?v=lekPEle8F8w
+	{"INT", 1222900}, -- https://www.youtube.com/watch?v=lekPEle8F8w
 };
 
 local enguardeScores = {
-	{"JON", 430}, -- Ngamer https://www.youtube.com/watch?v=VrFWWcGlKOE
-	{"ING", 420}, -- ingx32 https://www.youtube.com/watch?v=UEPeqomGHN4
+	{"JON", 430}, -- https://www.youtube.com/watch?v=VrFWWcGlKOE
+	{"ING", 420}, -- https://www.youtube.com/watch?v=UEPeqomGHN4
 };
 
 local jetpacScore = 999135; -- Bismuth http://i.imgur.com/5mHz6QA.png
@@ -3864,8 +3864,9 @@ local nameBase = 2;
 local scoreInstanceSize = 6;
 
 local rambiScores = {
-	{"BIS", 220}, -- Bismuth http://www.twitch.tv/bismuth9/v/42515576
-	{"ISO", 184}, -- Isotarge https://www.youtube.com/watch?v=uTeS_710zus
+	{"BIS", 220}, -- http://www.twitch.tv/bismuth9/v/42515576
+	{"BO ", 220}, -- http://highscore.com/scores/N64/DonkeyKong64/33503
+	{"ISO", 190}, -- https://www.youtube.com/watch?v=pu3lmK3p8bc
 };
 
 function Game.getScore(index)
