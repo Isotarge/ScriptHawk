@@ -36,6 +36,7 @@ local flag_array = {
 
 	{["byte"] = 0x24, ["bit"] = 5, ["name"] = "Key 6", ["type"] = "Key", ["map"] = 196},
 
+	{["byte"] = 0x25, ["bit"] = 6, ["name"] = "Isles: Rareware GB", ["type"] = "GB"},
 	{["byte"] = 0x25, ["bit"] = 7, ["name"] = "Caves: T&S Cleared", ["type"] = "T&S", ["map"] = 72},
 
 	{["byte"] = 0x27, ["bit"] = 6, ["name"] = "Key 7", ["type"] = "Key", ["map"] = 199},
@@ -46,9 +47,36 @@ local flag_array = {
 	{["byte"] = 0x2F, ["bit"] = 2, ["name"] = "Camera/Shockwave", ["map"] = 189},
 	{["byte"] = 0x2F, ["bit"] = 4, ["name"] = "Rareware Coin", ["type"] = "Coin", ["map"] = 5},
 	{["byte"] = 0x2F, ["bit"] = 5, ["name"] = "Key 8", ["type"] = "Key", ["map"] = 17},
+	{["byte"] = 0x2F, ["bit"] = 6, ["name"] = "Isles: First GB", ["type"] = "GB"},
 
 	{["byte"] = 0x30, ["bit"] = 2, ["name"] = "Kong Unlocked: DK", ["type"] = "Kong"},
 
+	{["byte"] = 0x31, ["bit"] = 7, ["name"] = "Isles: Lanky Instrument GB", ["type"] = "GB"},
+
+	{["byte"] = 0x32, ["bit"] = 2, ["name"] = "Isles: Galleon Lobby Grate Opened"},
+	{["byte"] = 0x32, ["bit"] = 3, ["name"] = "Isles: Big Bug Bash GB", ["type"] = "GB"},
+	{["byte"] = 0x32, ["bit"] = 4, ["name"] = "Isles: Galleon Lobby GB", ["type"] = "GB"},
+	{["byte"] = 0x32, ["bit"] = 5, ["name"] = "Isles: DK Instrument GB", ["type"] = "GB"},
+	{["byte"] = 0x32, ["bit"] = 7, ["name"] = "Isles: Kremling Kosh GB", ["type"] = "GB"},
+
+	{["byte"] = 0x33, ["bit"] = 3, ["name"] = "Isles: Diddy Instrument GB", ["type"] = "GB"},
+	{["byte"] = 0x33, ["bit"] = 4, ["name"] = "Isles: Caves Lobby GB", ["type"] = "GB"},
+
+	{["byte"] = 0x34, ["bit"] = 0, ["name"] = "Isles: Castle Lobby GB", ["type"] = "GB"},
+	{["byte"] = 0x34, ["bit"] = 1, ["name"] = "Isles: Batty Barrel Bandit GB", ["type"] = "GB"},
+	{["byte"] = 0x34, ["bit"] = 4, ["name"] = "Isles: DK Caged GB", ["type"] = "GB"},
+	{["byte"] = 0x34, ["bit"] = 5, ["name"] = "Isles: Tiny Caged GB", ["type"] = "GB"},
+	{["byte"] = 0x34, ["bit"] = 6, ["name"] = "Isles: Lanky Caged GB", ["type"] = "GB"},
+	{["byte"] = 0x34, ["bit"] = 7, ["name"] = "Isles: Chunky Caged GB", ["type"] = "GB"},
+
+	{["byte"] = 0x35, ["bit"] = 0, ["name"] = "Isles: Diddy Caged GB", ["type"] = "GB"},
+	{["byte"] = 0x35, ["bit"] = 1, ["name"] = "Isles: Chunky Instrument GB", ["type"] = "GB"},
+	{["byte"] = 0x35, ["bit"] = 2, ["name"] = "Isles: Tiny Instrument GB", ["type"] = "Type"},
+	{["byte"] = 0x35, ["bit"] = 4, ["name"] = "Hunky Chunky Barrel Spawned"},
+	{["byte"] = 0x35, ["bit"] = 5, ["name"] = "Isles: Summit GB", ["type"] = "GB"},
+	{["byte"] = 0x35, ["bit"] = 6, ["name"] = "Isles: K-Lumsy Cage GB", ["type"] = "GB"},
+
+	{["byte"] = 0x36, ["bit"] = 0, ["name"] = "Isles: Pound the X GB", ["type"] = "GB"},
 	{["byte"] = 0x36, ["bit"] = 2, ["name"] = "Isles: W1 (Ring)", ["type"] = "Warp", ["map"] = 34},
 	{["byte"] = 0x36, ["bit"] = 3, ["name"] = "Isles: W1 (Far)", ["type"] = "Warp", ["map"] = 34},
 	{["byte"] = 0x36, ["bit"] = 4, ["name"] = "Isles: W2 (Ring)", ["type"] = "Warp", ["map"] = 34},
@@ -60,7 +88,7 @@ local flag_array = {
 	{["byte"] = 0x37, ["bit"] = 1, ["name"] = "Isles: W4 (High)", ["type"] = "Warp", ["map"] = 34},
 	{["byte"] = 0x37, ["bit"] = 2, ["name"] = "Isles: W5 (Far)", ["type"] = "Warp", ["map"] = 34},
 	{["byte"] = 0x37, ["bit"] = 3, ["name"] = "Isles: W5 (Ring)", ["type"] = "Warp", ["map"] = 34},
-
+	{["byte"] = 0x37, ["bit"] = 4, ["name"] = "Japes Rock Blasted", ["type"] = "Cutscene"},
 	{["byte"] = 0x37, ["bit"] = 5, ["name"] = "Key 1 Turned", ["type"] = "Key", ["map"] = {34,97}},
 	{["byte"] = 0x37, ["bit"] = 6, ["name"] = "Key 2 Turned", ["type"] = "Key", ["map"] = {34,97}},
 	{["byte"] = 0x37, ["bit"] = 7, ["name"] = "Key 3 Turned", ["type"] = "Key", ["map"] = {34,97}},
