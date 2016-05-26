@@ -1603,7 +1603,7 @@ local function processFlagQueue()
 							if type(queue_item["name"]) == "string" then
 								dprint("Set \""..queue_item["name"].."\" at "..toHexString(queue_item["byte"])..">"..queue_item["bit"]);
 							else
-								dprint("Set flag at "..toHexString(queue_item["byte"])..">"..queue_item["bit"]);
+								dprint("Set "..getFlagName(queue_item["byte"], queue_item["bit"]));
 							end
 						end
 					elseif queue_item["action_type"] == "clear" then
@@ -1613,7 +1613,7 @@ local function processFlagQueue()
 							if type(queue_item["name"]) == "string" then
 								dprint("Cleared \""..queue_item["name"].."\" at "..toHexString(queue_item["byte"])..">"..queue_item["bit"]);
 							else
-								dprint("Cleared flag at "..toHexString(queue_item["byte"])..">"..queue_item["bit"]);
+								dprint("Cleared "..getFlagName(queue_item["byte"], queue_item["bit"]));
 							end
 						end
 					elseif queue_item["action_type"] == "checkSingle" then
@@ -1921,7 +1921,7 @@ function flagStats(verbose)
 	dprint("Block size: "..toHexString(flag_block_size));
 	dprint(formatOutputString("Flags known: ", knownFlags, totalFlags));
 	dprint(formatOutputString("Without types: ", untypedFlags, knownFlags));
-	dprint(formatOutputString("Unknown types:", flagsWithUnknownType, knownFlags));
+	dprint(formatOutputString("Unknown types: ", flagsWithUnknownType, knownFlags));
 	dprint("");
 	dprint(formatOutputString("CB: ", cb_known, max_cb));
 	dprint(formatOutputString("GB: ", gb_known, max_gb));

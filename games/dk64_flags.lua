@@ -446,14 +446,14 @@ local flag_array = {
 	{["byte"] = 0x32, ["bit"] = 3, ["name"] = "? Galleon Lobby: Tiny GB?", ["type"] = "GB"}, -- TODO: Which one actually set it
 	{["byte"] = 0x32, ["bit"] = 4, ["name"] = "Factory Lobby: DK GB", ["type"] = "GB"}, -- TODO: Test this
 	{["byte"] = 0x32, ["bit"] = 5, ["name"] = "Isles: Fungi lobby GGpad open"},
-	{["byte"] = 0x32, ["bit"] = 6, ["name"] = "Helm Lobby: Kremling Kosh GB", ["type"] = "GB"},
+	{["byte"] = 0x32, ["bit"] = 6, ["name"] = "Helm Lobby: Chunky GB: Kremling Kosh", ["type"] = "GB"},
 	{["byte"] = 0x32, ["bit"] = 7, ["name"] = "Helm Lobby: Bridge Spawned"},
 
-	{["byte"] = 0x33, ["bit"] = 0, ["name"] = "Caves Lobby: Ice wall BP room"}, -- TODO: Test this
-	{["byte"] = 0x33, ["bit"] = 1, ["name"] = "Caves Lobby: Ice wall GB room"}, -- TODO: Test this
-	{["byte"] = 0x33, ["bit"] = 2, ["name"] = "Caves Lobby: Diddy GB", ["type"] = "GB"}, -- TODO: Test this
-	{["byte"] = 0x33, ["bit"] = 3, ["name"] = "Caves Lobby: DK GB", ["type"] = "GB"}, -- TODO: Test this
-	{["byte"] = 0x33, ["bit"] = 5, ["name"] = "Caves Lobby: Boulder on pad"}, -- TODO: Test this
+	{["byte"] = 0x33, ["bit"] = 0, ["name"] = "Caves Lobby: Ice wall BP room", ["map"] = 194},
+	{["byte"] = 0x33, ["bit"] = 1, ["name"] = "Caves Lobby: Ice wall GB room", ["map"] = 194},
+	{["byte"] = 0x33, ["bit"] = 2, ["name"] = "Caves Lobby: Diddy GB", ["type"] = "GB", ["map"] = 194}, -- TODO: Test this
+	{["byte"] = 0x33, ["bit"] = 3, ["name"] = "Caves Lobby: DK GB", ["type"] = "GB", ["map"] = 194}, -- TODO: Test this
+	{["byte"] = 0x33, ["bit"] = 5, ["name"] = "Caves Lobby: Boulder on pad", ["map"] = 194},
 	{["byte"] = 0x33, ["bit"] = 7, ["name"] = "Castle Lobby: Searchlight seek GB", ["type"] = "GB"},
 
 	{["byte"] = 0x34, ["bit"] = 0, ["name"] = "Isles: Diddy GB: BBB", ["type"] = "GB"}, -- TODO: Better name
