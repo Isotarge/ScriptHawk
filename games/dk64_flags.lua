@@ -60,7 +60,7 @@ local flag_array = {
 	{["byte"] = 0x05, ["bit"] = 4, ["name"] = "Japes: Diddy mountain open CS", ["type"] = "Cutscene"},
 	{["byte"] = 0x05, ["bit"] = 5, ["name"] = "Japes: Rambi coconut switch"},
 	{["byte"] = 0x05, ["bit"] = 6, ["name"] = "Japes: T&S Cleared", ["type"] = "T&S"},
-	{["byte"] = 0x05, ["bit"] = 7, ["name"] = "Open Chunky vase room"},
+	{["byte"] = 0x05, ["bit"] = 7, ["name"] = "Aztec: Open Chunky vase room"},
 
 	{["byte"] = 0x06, ["bit"] = 0, ["name"] = "Aztec: DK Blueprint room open"},
 	{["byte"] = 0x06, ["bit"] = 1, ["name"] = "Aztec: Chunky GB: Vase", ["type"] = "GB"},
@@ -76,6 +76,7 @@ local flag_array = {
 	{["byte"] = 0x07, ["bit"] = 2, ["name"] = "Aztec: Tiny GB: 5DT", ["type"] = "GB"},
 	{["byte"] = 0x07, ["bit"] = 3, ["name"] = "Aztec: Chunky GB: 5DT", ["type"] = "GB"},
 	{["byte"] = 0x07, ["bit"] = 4, ["name"] = "Aztec: Lanky GB: 5DT", ["type"] = "GB"},
+	{["byte"] = 0x07, ["bit"] = 5, ["name"] = "Aztec: Instrument Pad in front of Beetle Tower Spawned"},
 	{["byte"] = 0x07, ["bit"] = 6, ["name"] = "Aztec: DK GB: W5", ["type"] = "GB"},
 	{["byte"] = 0x07, ["bit"] = 7, ["name"] = "Aztec: Diddy GB: Vulture Race", ["type"] = "GB"},
 
