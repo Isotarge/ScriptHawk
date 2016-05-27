@@ -4223,6 +4223,8 @@ function Game.completeFile()
 
 	setFlagsByType("Blueprint"); -- Not needed to trigger Cranky Cutscene
 	setFlagsByType("CB"); -- Not needed to trigger the Cranky Cutscene
+	setFlagsByType("Bunch"); -- Not needed to trigger the Cranky Cutscene
+	setFlagsByType("Balloon"); -- Not needed to trigger the Cranky Cutscene
 	setFlagsByType("Crown");
 	setFlagsByType("Fairy");
 	setFlagsByType("GB"); -- Not needed to trigger Cranky Cutscene
