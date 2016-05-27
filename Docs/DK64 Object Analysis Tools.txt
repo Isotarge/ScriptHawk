@@ -52,8 +52,8 @@ Model 2 contains lighter weight objects, for example:
 	- Simian Slam switches
 	- Gorilla Grab levers
 
-Even on maps with no Model 2 objects loaded, eg. main menu, the game allocates the object model 2 array with a minimum capacity of 450 objects or 0x90 * 450 or 0xFD20
-Larger maps, eg. Japes, have array object model 2 array sizes over 450
+Even on maps with no Model 2 objects loaded, eg. main menu, the game still allocates the object model 2 array with a minimum capacity of 450 objects or 0x90 * 450 or 0xFD20
+Larger maps, eg. Japes, have object model 2 array sizes over 450
 
 It is currently unknown where the following objects are stored:
 - Butterflies

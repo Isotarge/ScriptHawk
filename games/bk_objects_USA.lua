@@ -1,4 +1,4 @@
-return {
+return { -- TODO: Add field for where the object can be spawned
 	{["id"] = 0x0004, ["name"] = "Bigbutt"},
 	{["id"] = 0x0005, ["name"] = "Ticker"},
 	{["id"] = 0x0006, ["name"] = "Grublin "},
@@ -13,7 +13,7 @@ return {
 	{["id"] = 0x0012, ["name"] = "Beehive"},
 	{["id"] = 0x0014, ["name"] = "Orange"},
 	{["id"] = 0x0017, ["name"] = "Shadow"},
-	{["id"] = 0x001E, ["name"] = "Leaky "},
+	{["id"] = 0x001E, ["name"] = "Leaky"},
 	{["id"] = 0x0024, ["name"] = "Oyster"},
 	{["id"] = 0x0025, ["name"] = "Cemetary Pot"},
 	{["id"] = 0x0029, ["name"] = "Orange"},
