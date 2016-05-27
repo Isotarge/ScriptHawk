@@ -77,7 +77,7 @@ local flag_array = {
 	{["byte"] = 0x07, ["bit"] = 3, ["name"] = "Aztec: Chunky GB: 5DT", ["type"] = "GB"},
 	{["byte"] = 0x07, ["bit"] = 4, ["name"] = "Aztec: Lanky GB: 5DT", ["type"] = "GB"},
 	{["byte"] = 0x07, ["bit"] = 5, ["name"] = "Aztec: Instrument Pad in front of Beetle Tower Spawned"},
-	{["byte"] = 0x07, ["bit"] = 6, ["name"] = "Aztec: DK GB: W5", ["type"] = "GB"},
+	{["byte"] = 0x07, ["bit"] = 6, ["name"] = "Aztec: DK GB: W5", ["type"] = "GB"}, -- Note: This flag also spawns the warp
 	{["byte"] = 0x07, ["bit"] = 7, ["name"] = "Aztec: Diddy GB: Vulture Race", ["type"] = "GB"},
 
 	{["byte"] = 0x08, ["bit"] = 0, ["name"] = "Aztec: Chunky GB: Rotating room", ["type"] = "GB"},
@@ -113,7 +113,7 @@ local flag_array = {
 	{["byte"] = 0x0B, ["bit"] = 3, ["name"] = "Aztec: W2 (Llama Temple, low)", ["type"] = "Warp"},
 	{["byte"] = 0x0B, ["bit"] = 4, ["name"] = "Aztec: Llama Cutscene", ["type"] = "Cutscene"},
 	{["byte"] = 0x0B, ["bit"] = 5, ["name"] = "Aztec: Lanky's help me cutscene", ["type"] = "Cutscene"},
-	{["byte"] = 0x0B, ["bit"] = 6, ["name"] = "Aztec: W2 (Tiny Temple)", ["type"] = "Warp"},
+	{["byte"] = 0x0B, ["bit"] = 6, ["name"] = "Aztec: Tiny's help me cutscene", ["type"] = "Cutscene", ["map"] = 16},
 	{["byte"] = 0x0B, ["bit"] = 7, ["name"] = "Aztec: FT Cutscene", ["type"] = "Cutscene"},
 
 	{["byte"] = 0x0C, ["bit"] = 0, ["name"] = "Aztec: FT Open door of Tiny Temple CS (Tiny)", ["type"] = "Cutscene"},
@@ -191,7 +191,7 @@ local flag_array = {
 	{["byte"] = 0x14, ["bit"] = 0, ["name"] = "Galleon: Water level raised"},
 	{["byte"] = 0x14, ["bit"] = 1, ["name"] = "Galleon: Peanut gate open"},
 	{["byte"] = 0x14, ["bit"] = 2, ["name"] = "Galleon: Gold tower gate open"},
-	{["byte"] = 0x14, ["bit"] = 3, ["name"] = "Galleon: Diddy GB: Gold tower", ["type"] = "GB"},
+	{["byte"] = 0x14, ["bit"] = 3, ["name"] = "Galleon: Diddy GB: W4", ["type"] = "GB"}, -- Note: This flag is also used to spawn the warp
 	{["byte"] = 0x14, ["bit"] = 4, ["name"] = "Galleon: Lanky GB: Gold tower", ["type"] = "GB"},
 	{["byte"] = 0x14, ["bit"] = 5, ["name"] = "Galleon: DK GB: Seal race", ["type"] = "GB"},
 	{["byte"] = 0x14, ["bit"] = 6, ["name"] = "Galleon: Chunky GB: Seasick", ["type"] = "GB"},
@@ -330,7 +330,7 @@ local flag_array = {
 	{["byte"] = 0x24, ["bit"] = 4, ["name"] = "Key 6", ["type"] = "Key", ["map"] = 196},
 	{["byte"] = 0x24, ["bit"] = 5, ["name"] = "Caves: Diddy GB: Cabin (Upper)", ["type"] = "GB"},
 	{["byte"] = 0x24, ["bit"] = 6, ["name"] = "Caves: Diddy GB: Mad Maze Maul", ["type"] = "GB"},
-	{["byte"] = 0x24, ["bit"] = 7, ["name"] = "Caves: Tiny GB: W3", ["type"] = "GB"},
+	{["byte"] = 0x24, ["bit"] = 7, ["name"] = "Caves: Tiny GB: W3", ["type"] = "GB"}, -- Note: This flag doubles as the warp 3 spawned flag
 
 	{["byte"] = 0x25, ["bit"] = 0, ["name"] = "Caves: 5DI pads spawned"},
 	{["byte"] = 0x25, ["bit"] = 1, ["name"] = "Caves: Tiny GB: Mini monkey Igloo", ["type"] = "GB"},

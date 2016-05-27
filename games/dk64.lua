@@ -1861,7 +1861,7 @@ function flagStats(verbose)
 			blueprints_known = blueprints_known + 1;
 			validType = true;
 		end
-		if flagType == "Warp" then
+		if flagType == "Warp" or name == "Caves: Tiny GB: W3" or name == "Aztec: DK GB: W5" or name == "Galleon: Diddy GB: W4" then
 			warps_known = warps_known + 1;
 			validType = true;
 		end
@@ -3573,7 +3573,7 @@ function getDesiredSlot()
 		-- Check for kremlings
 		local slotIndex = 0;
 		local desiredSlot = 0;
-		for slotIndex = 1,8 do
+		for slotIndex = 1, 8 do
 			local slotPointer = getSlotPointer(koshController, slotIndex)
 			if slotPointer > 0 and slotPointer ~= shots_fired[slotIndex] then
 				desiredSlot = slotIndex;
@@ -3589,6 +3589,7 @@ function getDesiredSlot()
 	end
 end
 
+local previousFrameMelonCount = 0;
 function koshBotLoop()
 	local koshController = getKoshController();
 	if koshController ~= nil then
@@ -3598,11 +3599,12 @@ function koshBotLoop()
 			joypad.setanalog(kremling_kosh_joypad_angles[desiredSlot], 1);
 			--print("Moving to slot "..desiredSlot);
 			if currentSlot == desiredSlot then
-				if desiredSlot > 0 then
+				joypad.set({["B"] = emu.framecount() % 5 == 0}, 1);
+				--print("Firing!");
+				if desiredSlot > 0 and countMelonProjectiles() > previousFrameMelonCount then
 					shots_fired[desiredSlot] = getSlotPointer(koshController, desiredSlot);
 				end
-				joypad.set({["B"] = true}, 1);
-				--print("Firing!");
+				previousFrameMelonCount = countMelonProjectiles();
 			end
 		else
 			joypad.setanalog({["X Axis"] = false, ["Y Axis"] = false}, 1);
