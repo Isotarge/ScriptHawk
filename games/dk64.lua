@@ -3232,8 +3232,8 @@ local previousCollisionLinkedListPointer = 0;
 function freeTradeCollisionList(currentKong)
 	if version ~= 4 then
 		-- This call resolves the pointer to the object that contains a pointer to the linked list of collision data
-		local currentCollisionLinkedListPointer = mainmemory.read_u32_be(Game.Memory.obj_model2_collision_linked_list_pointer[version]);
-		if currentCollisionLinkedListPointer ~= previousCollisionLinkedListPointer and isPointer(currentCollisionLinkedListPointer) then
+		local currentCollisionLinkedListPointer = dereferencePointer(Game.Memory.obj_model2_collision_linked_list_pointer[version]);
+		if isRDRAM(currentCollisionLinkedListPointer) and currentCollisionLinkedListPointer ~= previousCollisionLinkedListPointer then
 			freeTradeCollisionListBackboneMethod(currentKong);
 		end
 		previousCollisionLinkedListPointer = currentCollisionLinkedListPointer;
