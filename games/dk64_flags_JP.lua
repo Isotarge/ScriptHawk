@@ -90,7 +90,7 @@ local flag_array = {
 
 	{["byte"] = 0x30, ["bit"] = 0, ["name"] = "Training Grounds: Spawn Training Barrels Cutscene", ["type"] = "Cutscene"},
 	{["byte"] = 0x30, ["bit"] = 2, ["name"] = "Kong Unlocked: DK", ["type"] = "Kong"},
-	{["byte"] = 0x30, ["bit"] = 3, ["name"] = "Training Grounds: Water Barrel Completed", ["type"] = "Training Barrels"},
+	{["byte"] = 0x30, ["bit"] = 3, ["name"] = "Training Grounds: Dive Barrel Completed", ["type"] = "Training Barrels"},
 	{["byte"] = 0x30, ["bit"] = 4, ["name"] = "Training Grounds: Vine Barrel Completed", ["type"] = "Training Barrels"},
 	{["byte"] = 0x30, ["bit"] = 5, ["name"] = "Training Grounds: Orange Barrel Completed", ["type"] = "Training Barrels"},
 	{["byte"] = 0x30, ["bit"] = 6, ["name"] = "Training Grounds: Barrel Barrel Completed", ["type"] = "Training Barrels"},
