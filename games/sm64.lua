@@ -260,7 +260,7 @@ end
 
 function drawObjectViewerOSD()
 	forms.settext(ScriptHawk.UI.form_controls["Object Index Label"], "Index: "..objectIndex);
-	if forms.ischecked(ScriptHawk.UI.form_controls["Enable Object Analyzer"]) then
+	if forms.ischecked(ScriptHawk.UI.form_controls["Enable Object Analyzer"]) then -- TODO: Switch to standard keybinds?
 		local gui_x = 2;
 		local gui_y = 2;
 		local row = 0;
