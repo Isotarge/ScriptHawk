@@ -2,6 +2,39 @@ local Game = {};
 
 local player_object_pointer = 0x3FFFC0; -- Seems to be the same for all versions
 
+currentPointers = {};
+object_index = 1; -- TODO: Grab script stuff up top for because of reasons, fix w/refactor please
+
+local function incrementObjectIndex()
+	object_index = object_index + 1;
+	if object_index > #currentPointers then
+		object_index = 1;
+	end
+end
+
+local function decrementObjectIndex()
+	object_index = object_index - 1;
+	if object_index <= 0 then
+		object_index = #currentPointers;
+	end
+end
+
+local grab_script_modes = {
+	"Disabled",
+	"List",
+	"Examine",
+};
+local grab_script_mode_index = 1;
+grab_script_mode = grab_script_modes[grab_script_mode_index];
+
+local function switchObjectAnalysisToolsMode()
+	grab_script_mode_index = grab_script_mode_index + 1;
+	if grab_script_mode_index > #grab_script_modes then
+		grab_script_mode_index = 1;
+	end
+	grab_script_mode = grab_script_modes[grab_script_mode_index];
+end
+
 -- Relative to objects in pointer list
 local object_fields = {
 	["x_pos"] = 0x0C, -- Float
@@ -39,6 +72,46 @@ local object_fields = {
 	["boost_timer"] = 0x26B, -- s8
 	["silver_coins"] = 0x29A,
 };
+
+function getExamineData(objectBase)
+	local examineData = {};
+	if isRDRAM(objectBase) then
+		table.insert(examineData, {"Object Base", toHexString(objectBase, 6)});
+		table.insert(examineData, {"Name", getObjectName(objectBase)});
+		table.insert(examineData, { "Separator", 1 });
+		
+		table.insert(examineData, {"X Position", mainmemory.readfloat(objectBase + object_fields.x_pos, true)});
+		table.insert(examineData, {"Y Position", mainmemory.readfloat(objectBase + object_fields.y_pos, true)});
+		table.insert(examineData, {"Z Position", mainmemory.readfloat(objectBase + object_fields.z_pos, true)});
+		table.insert(examineData, { "Separator", 1 });
+		
+		table.insert(examineData, {"Velocity", mainmemory.readfloat(objectBase + object_fields.velocity, true)});
+		table.insert(examineData, {"Y Velocity", mainmemory.readfloat(objectBase + object_fields.y_velocity, true)});
+		table.insert(examineData, { "Separator", 1 });
+	end
+	return examineData;
+end
+
+local function get_slot_base(pointerList, index)
+	return dereferencePointer(pointerList + (index * 4));
+end
+
+-- Populate and sort pointer list
+function populateObjectPointerList()
+	currentPointers = {};
+	local pointerList = dereferencePointer(Game.Memory.pointer_list[version]);
+	if not isRDRAM(pointerList) then
+		return;
+	end
+	local num_slots = mainmemory.read_u32_be(Game.Memory.num_objects[version]);
+	for i = 0, num_slots - 1 do
+		local slotBase = get_slot_base(pointerList, i);
+		if isRDRAM(slotBase) and slotBase ~= playerObject then
+			table.insert(currentPointers, slotBase);
+		end
+	end
+	table.sort(currentPointers);
+end
 
 local map_freeze_values = {};
 
@@ -548,14 +621,6 @@ end
 
 local radius = 1000;
 
-local function get_num_slots()
-	return mainmemory.read_u32_be(Game.Memory.num_objects[version]);
-end
-
-local function get_slot_base(pointerList, index)
-	return dereferencePointer(pointerList + (index * 4));
-end
-
 local function encircle_player()
 	local playerObject = dereferencePointer(player_object_pointer);
 	if not isRDRAM(playerObject) then
@@ -567,23 +632,6 @@ local function encircle_player()
 	local playerZ = Game.getZPosition();
 	local x, z;
 
-	local pointerList = dereferencePointer(Game.Memory.pointer_list[version]);
-	if not isRDRAM(pointerList) then
-		return;
-	end
-
-	local num_slots = get_num_slots();
-
-	-- Populate and sort pointer list
-	local currentPointers = {};
-	for i = 0, num_slots - 1 do
-		local slotBase = get_slot_base(pointerList, i);
-		if isRDRAM(slotBase) and slotBase ~= playerObject then
-			table.insert(currentPointers, slotBase);
-		end
-	end
-	table.sort(currentPointers);
-
 	-- Iterate and set position
 	for i = 1, #currentPointers do
 		x = playerX + math.cos(math.pi * 2 * i / #currentPointers) * radius;
@@ -594,6 +642,73 @@ local function encircle_player()
 		mainmemory.writefloat(currentPointers[i] + object_fields.z_pos, z, true);
 	end
 end
+
+function getObjectName(objectBase) -- TODO: I know these are in memory
+	if isRDRAM(objectBase) then
+		return readNullTerminatedString(objectBase - 0x20);
+	end
+	return "Unknown";
+end
+
+function drawAnalysisToolsOSD()
+	if grab_script_mode == "Disabled" then
+		return;
+	end
+	local row = 0;
+
+	gui.text(Game.OSDPosition[1], 0 + Game.OSDRowHeight * row, "Index: "..object_index.."/"..#currentPointers, nil, nil, 'bottomright');
+	row = row + 1;
+
+	if grab_script_mode == "List" then
+		row = row + 1;
+
+		for i = #currentPointers, 1, -1 do
+			local color = nil;
+			if object_index == i then
+				color = yellow_highlight;
+			end
+			if currentPointers[i] == playerObject then
+				color = green_highlight;
+			end
+			gui.text(Game.OSDPosition[1], 0 + Game.OSDRowHeight * row, i..": "..getObjectName(currentPointers[i]).." "..toHexString(currentPointers[i] or 0, 6), color, nil, 'bottomright');
+			row = row + 1;
+		end
+	end
+
+	if grab_script_mode == "Examine" then
+		local examine_data = getExamineData(currentPointers[object_index]);
+		for i = #examine_data, 1, -1 do
+			if examine_data[i][1] ~= "Separator" then
+				if type(examine_data[i][2]) == "number" then
+					examine_data[i][2] = round(examine_data[i][2], precision);
+				end
+				gui.text(Game.OSDPosition[1], 0 + Game.OSDRowHeight * row, examine_data[i][2].." - "..examine_data[i][1], nil, nil, 'bottomright');
+				row = row + 1;
+			else
+				row = row + examine_data[i][2];
+			end
+		end
+	end
+end
+
+function zipToSelectedObject()
+	if isRDRAM(currentPointers[object_index]) then
+		-- Read the selected object's position
+		local objectX = mainmemory.readfloat(currentPointers[object_index] + object_fields.x_pos, true);
+		local objectY = mainmemory.readfloat(currentPointers[object_index] + object_fields.y_pos, true);
+		local objectZ = mainmemory.readfloat(currentPointers[object_index] + object_fields.z_pos, true);
+
+		-- Set the player position to the object
+		Game.setXPosition(objectX);
+		Game.setYPosition(objectY);
+		Game.setZPosition(objectZ);
+	end
+end
+
+ScriptHawk.bindKeyRealtime("N", decrementObjectIndex, true);
+ScriptHawk.bindKeyRealtime("M", incrementObjectIndex, true);
+ScriptHawk.bindKeyRealtime("Z", zipToSelectedObject, true);
+ScriptHawk.bindKeyRealtime("C", switchObjectAnalysisToolsMode, true);
 
 ------------
 -- Events --
@@ -656,6 +771,8 @@ function Game.initUI()
 end
 
 function Game.eachFrame()
+	populateObjectPointerList();
+
 	if not otap_enabled and forms.ischecked(ScriptHawk.UI.form_controls.otap_checkbox) then
 		enableOptimalTap();
 	end
@@ -680,6 +797,7 @@ function Game.realTime()
 	forms.settext(ScriptHawk.UI.form_controls.get_ready_blue_max_value_label, get_ready_blue_max);
 	forms.settext(ScriptHawk.UI.form_controls.get_ready_yellow_min_value_label, get_ready_yellow_min);
 	forms.settext(ScriptHawk.UI.form_controls.get_ready_yellow_max_value_label, get_ready_yellow_max);
+	drawAnalysisToolsOSD();
 end
 
 Game.OSDPosition = {2, 70}
