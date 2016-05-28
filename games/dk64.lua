@@ -15,6 +15,14 @@ local grab_script_modes = {
 local grab_script_mode_index = 1;
 grab_script_mode = grab_script_modes[grab_script_mode_index];
 
+local function switch_grab_script_mode()
+	grab_script_mode_index = grab_script_mode_index + 1;
+	if grab_script_mode_index > #grab_script_modes then
+		grab_script_mode_index = 1;
+	end
+	grab_script_mode = grab_script_modes[grab_script_mode_index];
+end
+
 -------------------------
 -- DK64 specific state --
 -------------------------
@@ -627,7 +635,7 @@ obj_model1 = {
 		[293] = "K. Rool (Lanky Phase)",
 		[294] = "K. Rool (Tiny Phase)",
 		[295] = "K. Rool (Chunky Phase)",
-		--[297] = "Unknown - Kritter Karnage"
+		--[297] = "Unknown - Kritter Karnage",
 		[299] = "Textbox",
 		[305] = "Missile", -- Car Race
 		[309] = "Kong Logo (Instrument)", -- DK for DK, Star for Diddy, DK for Lanky, Flower for Tiny, DK for Chunky
@@ -1201,7 +1209,7 @@ function offsetObjectModel2(x, y, z)
 	-- Iterate and set position
 	local behaviorTypePointer, behaviorType, modelPointer, currentX, currentY, currentZ;
 	for i = 1, #object_pointers do
-		behaviorTypePointer = mainmemory.read_u32_be(object_pointers[i] + obj_model2.behavior_type_pointer);
+		behaviorTypePointer = mainmemory.read_u32_be(object_pointers[i] + obj_model2.behavior_type_pointer); -- TODO: dreferencePointer call
 		behaviorType = "unknown";
 		if isPointer(behaviorTypePointer) then
 			behaviorType = readNullTerminatedString(behaviorTypePointer - RDRAMBase + 0x0C);
@@ -3363,14 +3371,6 @@ local object_index = 1;
 
 hide_non_scripted = false;
 rat_enabled = false;
-
-local function switch_grab_script_mode()
-	grab_script_mode_index = grab_script_mode_index + 1;
-	if grab_script_mode_index > #grab_script_modes then
-		grab_script_mode_index = 1;
-	end
-	grab_script_mode = grab_script_modes[grab_script_mode_index];
-end
 
 local function incrementObjectIndex()
 	object_index = object_index + 1;
