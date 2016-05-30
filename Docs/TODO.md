@@ -7,6 +7,7 @@
 - Rayman 2: Find player object pointer
 - DPAD Fixes for:
 	- DK64 (Fly Swatter)
+- DK64: Find menu cutscene flags
 - DK64: Finish flag documentation
 	- Complete documentation for US
 	- Figure out how the 101% credits are triggered

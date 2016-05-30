@@ -1209,10 +1209,10 @@ function offsetObjectModel2(x, y, z)
 	-- Iterate and set position
 	local behaviorTypePointer, behaviorType, modelPointer, currentX, currentY, currentZ;
 	for i = 1, #object_pointers do
-		behaviorTypePointer = mainmemory.read_u32_be(object_pointers[i] + obj_model2.behavior_type_pointer); -- TODO: dreferencePointer call
+		behaviorTypePointer = dereferencePointer(object_pointers[i] + obj_model2.behavior_type_pointer);
 		behaviorType = "unknown";
-		if isPointer(behaviorTypePointer) then
-			behaviorType = readNullTerminatedString(behaviorTypePointer - RDRAMBase + 0x0C);
+		if isRDRAM(behaviorTypePointer) then
+			behaviorType = readNullTerminatedString(behaviorTypePointer + 0x0C);
 		end
 		if behaviorType == "pickups" then
 			-- Read hitbox X, Y, Z
