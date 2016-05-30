@@ -79,14 +79,23 @@ function getExamineData(objectBase)
 		table.insert(examineData, {"Object Base", toHexString(objectBase, 6)});
 		table.insert(examineData, {"Name", getObjectName(objectBase)});
 		table.insert(examineData, { "Separator", 1 });
-		
+
 		table.insert(examineData, {"X Position", mainmemory.readfloat(objectBase + object_fields.x_pos, true)});
 		table.insert(examineData, {"Y Position", mainmemory.readfloat(objectBase + object_fields.y_pos, true)});
 		table.insert(examineData, {"Z Position", mainmemory.readfloat(objectBase + object_fields.z_pos, true)});
 		table.insert(examineData, { "Separator", 1 });
-		
+
+		table.insert(examineData, {"X Rotation", ScriptHawk.UI.formatRotation(mainmemory.read_u16_be(objectBase + object_fields.x_rot))});
+		table.insert(examineData, {"Y Rotation", ScriptHawk.UI.formatRotation(mainmemory.read_u16_be(objectBase + object_fields.y_rot))});
+		table.insert(examineData, {"Z Rotation", ScriptHawk.UI.formatRotation(mainmemory.read_u16_be(objectBase + object_fields.z_rot))});
+		table.insert(examineData, { "Separator", 1 });
+
 		table.insert(examineData, {"Velocity", mainmemory.readfloat(objectBase + object_fields.velocity, true)});
+		table.insert(examineData, {"Lateral Velocity", mainmemory.readfloat(objectBase + object_fields.lateral_velocity, true)});
 		table.insert(examineData, {"Y Velocity", mainmemory.readfloat(objectBase + object_fields.y_velocity, true)});
+		table.insert(examineData, { "Separator", 1 });
+
+		table.insert(examineData, {"Wheel Array", toHexString(mainmemory.read_u32_be(objectBase + object_fields.wheel_array_pointer), 8)});
 		table.insert(examineData, { "Separator", 1 });
 	end
 	return examineData;
@@ -655,6 +664,7 @@ function drawAnalysisToolsOSD()
 		return;
 	end
 	local row = 0;
+	local playerObject = dereferencePointer(player_object_pointer);
 
 	gui.text(Game.OSDPosition[1], 0 + Game.OSDRowHeight * row, "Index: "..object_index.."/"..#currentPointers, nil, nil, 'bottomright');
 	row = row + 1;
