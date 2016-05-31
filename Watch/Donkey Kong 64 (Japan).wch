@@ -51,6 +51,7 @@ SystemID N64
 743E40	w	s	1	RDRAM	Enguarde Score 5
 743E42	d	h	1	RDRAM	Enguarde Score 5 Name
 746088	b	u	1	RDRAM	File
+746300	d	h	1	RDRAM	RNG
 74E05C	b	u	1	RDRAM	Character
 753B34	d	h	1	RDRAM	Object Model 2 Collision Linked List Pointer
 753B70	d	h	1	RDRAM	HUD Pointer

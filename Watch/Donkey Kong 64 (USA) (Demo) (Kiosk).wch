@@ -1,6 +1,7 @@
 SystemID N64
 5931B8	w	h	1	RDRAM	Object Model 2 "Room Replacement"
 5931BA	w	h	1	RDRAM	Object Model 2 "Room Replacement"
+6F36E0	d	h	1	RDRAM	RNG
 6F9EB8	b	u	1	RDRAM	Character
 6FB9D0	d	h	1	RDRAM	Start of pointers to strings
 6FF054	d	h	1	RDRAM	Object Model 2 Collision Linked List Pointer

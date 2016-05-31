@@ -51,6 +51,7 @@ SystemID N64
 73ECD0	w	s	1	RDRAM	Enguarde Score 5
 73ECD2	d	h	1	RDRAM	Enguarde Score 5 Name
 740F18	b	u	1	RDRAM	File
+7411A0	d	h	1	RDRAM	RNG
 748EDC	b	u	1	RDRAM	Character
 74D94C	d	f	1	RDRAM	DK Walk Maximum Velocity
 74D950	d	f	1	RDRAM	Diddy Walk Maximum Velocity
