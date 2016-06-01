@@ -41,6 +41,10 @@ local object_fields = {
 	["y_pos"] = 0x10, -- Float
 	["z_pos"] = 0x14, -- Float
 	["y_velocity"] = 0x20, -- Float
+	["object_descriptor_pointer"] = 0x40, -- Pointer
+	["object_descriptor"] = {
+		["name"] = 0x60, -- Null terminated string
+	},
 	["map_color"] = 0x9B, -- Byte
 	["velocity"] = 0xC4, -- Float
 	["lateral_velocity"] = 0xC8, -- Float
@@ -77,11 +81,64 @@ local object_fields = {
 	["silver_coins"] = 0x29A,
 };
 
+-- Boost size: 0x90
+-- Checkpoint size: 0xB0
+-- exit size: 0xD0
+-- Flowers size: 0xE0
+-- LevelDoor size: 0x1F0
+-- setuppoint size: 0x90
+-- WorldGate size: 0x1E0
+
+cars = { -- Indexed by character
+	[0] = "KremCar",
+	[1] = "BadgerCar",
+	[2] = "TortCar",
+	[3] = "ConkaCar",
+	[4] = "TigerCar",
+	[5] = "BanjoCar",
+	[6] = "ChickenCar",
+	[7] = "MouseCar",
+	[8] = "SWcar", -- TT
+	[9] = "diddycar",
+};
+
+hovers = {
+	[0] = "KremlinHover",
+	[1] = "BadgerHover",
+	[2] = "TortHover",
+	[3] = "ConkaHover",
+	[4] = "TigerHover",
+	[5] = "BanjoHover",
+	[6] = "ChickenHover",
+	[7] = "MouseHover",
+	[8] = "ticktockhover",
+	[9] = "diddyhover",
+};
+
+planes = {
+	[0] = "KremPlane",
+	[1] = "BadgerPlane",
+	[2] = "TortPlane",
+	[3] = "Conka",
+	[4] = "TigPlane",
+	[5] = "BanjoPlane",
+	[6] = "ChickenPlane",
+	[7] = "MousePlane",
+	[8] = "ticktockplane",
+	[9] = "diddyplane",
+};
+
+function isVehicle(objectBase)
+	local name = getObjectName(objectBase);
+	return arrayContains(cars, name) or arrayContains(hovers, name) or arrayContains(planes, name); -- TODO: Faster method of detection, object size?
+end
+
 function getExamineData(objectBase)
 	local examineData = {};
 	if isRDRAM(objectBase) then
-		table.insert(examineData, {"Object Base", toHexString(objectBase, 6)});
-		table.insert(examineData, {"Name", getObjectName(objectBase)});
+		table.insert(examineData, {getObjectName(objectBase), toHexString(objectBase, 6)});
+		table.insert(examineData, {"Descriptor", toHexString(mainmemory.read_u32_be(objectBase + object_fields.object_descriptor_pointer), 8)});
+		table.insert(examineData, {"isVehicle", tostring(isVehicle(objectBase))});
 		table.insert(examineData, {"Separator", 1});
 
 		table.insert(examineData, {"X Position", mainmemory.readfloat(objectBase + object_fields.x_pos, true)});
@@ -89,19 +146,21 @@ function getExamineData(objectBase)
 		table.insert(examineData, {"Z Position", mainmemory.readfloat(objectBase + object_fields.z_pos, true)});
 		table.insert(examineData, {"Separator", 1});
 
-		table.insert(examineData, {"X Rotation", ScriptHawk.UI.formatRotation(mainmemory.read_u16_be(objectBase + object_fields.x_rot))});
-		table.insert(examineData, {"Y Rotation", ScriptHawk.UI.formatRotation(mainmemory.read_u16_be(objectBase + object_fields.y_rot))});
-		table.insert(examineData, {"Z Rotation", ScriptHawk.UI.formatRotation(mainmemory.read_u16_be(objectBase + object_fields.z_rot))});
-		table.insert(examineData, {"Separator", 1});
+		if isVehicle(objectBase) then
+			table.insert(examineData, {"X Rotation", ScriptHawk.UI.formatRotation(mainmemory.read_u16_be(objectBase + object_fields.x_rot))});
+			table.insert(examineData, {"Y Rotation", ScriptHawk.UI.formatRotation(mainmemory.read_u16_be(objectBase + object_fields.y_rot))});
+			table.insert(examineData, {"Z Rotation", ScriptHawk.UI.formatRotation(mainmemory.read_u16_be(objectBase + object_fields.z_rot))});
+			table.insert(examineData, {"Separator", 1});
 
-		table.insert(examineData, {"Velocity", mainmemory.readfloat(objectBase + object_fields.velocity, true)});
-		table.insert(examineData, {"Lateral Velocity", mainmemory.readfloat(objectBase + object_fields.lateral_velocity, true)});
-		table.insert(examineData, {"Y Velocity", mainmemory.readfloat(objectBase + object_fields.y_velocity, true)});
-		table.insert(examineData, {"Separator", 1});
+			table.insert(examineData, {"Velocity", mainmemory.readfloat(objectBase + object_fields.velocity, true)});
+			table.insert(examineData, {"Lateral Velocity", mainmemory.readfloat(objectBase + object_fields.lateral_velocity, true)});
+			table.insert(examineData, {"Y Velocity", mainmemory.readfloat(objectBase + object_fields.y_velocity, true)});
+			table.insert(examineData, {"Separator", 1});
 
-		table.insert(examineData, {"Map Color", mainmemory.readbyte(objectBase + object_fields.map_color)});
-		table.insert(examineData, {"Wheel Array", toHexString(mainmemory.read_u32_be(objectBase + object_fields.wheel_array_pointer), 8)});
-		table.insert(examineData, {"Separator", 1});
+			table.insert(examineData, {"Map Color", mainmemory.readbyte(objectBase + object_fields.map_color)});
+			table.insert(examineData, {"Wheel Array", toHexString(mainmemory.read_u32_be(objectBase + object_fields.wheel_array_pointer), 8)});
+			table.insert(examineData, {"Separator", 1});
+		end
 	end
 	return examineData;
 end
@@ -667,15 +726,22 @@ local function encircle_player()
 	end
 end
 
-function getObjectName(objectBase) -- TODO: I know these are in memory
+function getObjectName(objectBase) -- TODO: Cache descriptor
 	if isRDRAM(objectBase) then
-		local pointer = dereferencePointer(objectBase + 0x40);
-		if isRDRAM(pointer) then
-			return readNullTerminatedString(pointer + 0x60);
+		local objectDescriptor = dereferencePointer(objectBase + object_fields.object_descriptor_pointer);
+		if isRDRAM(objectDescriptor) then
+			return readNullTerminatedString(objectDescriptor + object_fields.object_descriptor.name);
 		end
-		return readNullTerminatedString(objectBase - 0x20);
 	end
 	return "Unknown";
+end
+
+function checkFor(objectName)
+	for i = 1, #currentPointers do
+		if getObjectName(currentPointers[i]) == objectName then
+			print("Found "..objectName.." at "..toHexString(currentPointers[i], 6));
+		end
+	end
 end
 
 function drawAnalysisToolsOSD()
