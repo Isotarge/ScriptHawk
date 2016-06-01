@@ -41,12 +41,16 @@ local object_fields = {
 	["y_pos"] = 0x10, -- Float
 	["z_pos"] = 0x14, -- Float
 	["y_velocity"] = 0x20, -- Float
+	["map_color"] = 0x9B, -- Byte
 	["velocity"] = 0xC4, -- Float
 	["lateral_velocity"] = 0xC8, -- Float
 	["wheel_array_pointer"] = 0x60, -- Pointer
 	["wheel_array"] = {
 		["size"] = 0x00, -- u32_be
 		["array_base"] = 0x04, -- Array of wheel object pointers
+		["wheel"] = {
+			["size"] = 0x08, -- Float
+		},
 	},
 	["camera_zoom"] = 0x12C, -- Float
 	["throttle"] = 0x14C, -- Float 0-1
@@ -95,6 +99,7 @@ function getExamineData(objectBase)
 		table.insert(examineData, {"Y Velocity", mainmemory.readfloat(objectBase + object_fields.y_velocity, true)});
 		table.insert(examineData, {"Separator", 1});
 
+		table.insert(examineData, {"Map Color", mainmemory.readbyte(objectBase + object_fields.map_color)});
 		table.insert(examineData, {"Wheel Array", toHexString(mainmemory.read_u32_be(objectBase + object_fields.wheel_array_pointer), 8)});
 		table.insert(examineData, {"Separator", 1});
 	end
@@ -405,6 +410,16 @@ function Game.setXPosition(value)
 	local playerObject = dereferencePointer(player_object_pointer);
 	if isRDRAM(playerObject) then
 		mainmemory.writefloat(playerObject + object_fields.x_pos, value, true);
+		local wheelArray = dereferencePointer(playerObject + object_fields.wheel_array_pointer);
+		if isRDRAM(wheelArray) then
+			local wheelArraySize = mainmemory.read_u32_be(wheelArray + object_fields.wheel_array.size);
+			for i = 0, wheelArraySize do
+				local wheel = dereferencePointer(wheelArray + object_fields.wheel_array.array_base + i * 4);
+				if isRDRAM(wheel) then
+					print("Wheel "..i..": "..toHexString(wheel));
+				end
+			end
+		end
 	end
 end
 
@@ -654,6 +669,10 @@ end
 
 function getObjectName(objectBase) -- TODO: I know these are in memory
 	if isRDRAM(objectBase) then
+		local pointer = dereferencePointer(objectBase + 0x40);
+		if isRDRAM(pointer) then
+			return readNullTerminatedString(pointer + 0x60);
+		end
 		return readNullTerminatedString(objectBase - 0x20);
 	end
 	return "Unknown";
