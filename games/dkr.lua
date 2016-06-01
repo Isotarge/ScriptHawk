@@ -416,7 +416,7 @@ function Game.setXPosition(value)
 			for i = 0, wheelArraySize do
 				local wheel = dereferencePointer(wheelArray + object_fields.wheel_array.array_base + i * 4);
 				if isRDRAM(wheel) then
-					print("Wheel "..i..": "..toHexString(wheel));
+					--print("Wheel "..i..": "..toHexString(wheel));
 				end
 			end
 		end
