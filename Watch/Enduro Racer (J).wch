@@ -1,0 +1,7 @@
+SystemID SMS
+0322	w	h	1	Main RAM	Velocity
+0391	b	u	0	Main RAM	Time (Frames)
+0392	b	h	0	Main RAM	Time (Seconds)
+0396	b	h	0	Main RAM	Damage
+040F	b	u	0	Main RAM	X Position
+
