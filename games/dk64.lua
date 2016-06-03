@@ -427,8 +427,8 @@ obj_model1 = {
 	},
 	["rendering_parameters_pointer"] = 0x04,
 	["rendering_parameters"] = { -- Relative to rendering_parameters_pointer
-		["bone_array_1"] = 0x14, -- Pointer
-		["bone_array_2"] = 0x18, -- Pointer
+		["bone_array_1"] = 0x14, -- Pointer: Used for camera, updating bone positions
+		["bone_array_2"] = 0x18, -- Pointer: Used for camera, updating bone positions
 		["scale_x"] = 0x34, -- 32 bit float big endian
 		["scale_y"] = 0x38, -- 32 bit float big endian
 		["scale_z"] = 0x3C, -- 32 bit float big endian
@@ -690,6 +690,14 @@ obj_model1 = {
 	["health"] = 0x134, -- s16_be
 	["takes_enemy_damage"] = 0x13B, -- TODO: put into examine method and double check datatype
 	["lock_method_1_pointer"] = 0x13C,
+	["ledge_info_pointer"] = 0x140, -- TODO: I don't quite know what to call this, it has 2 pointers to the bone arrays used for tree grab, telegrab, oranges & bullets
+	["ledge_info"] = {
+		["last_x"] = 0x1C, -- 32 bit float big endian
+		["last_z"] = 0x20, -- 32 bit float big endian
+		["is_locked"] = 0x21, -- Byte, setting this > 0 will send the player to last_x, player Y, last_z
+		["bone_array_1_pointer"] = 0x74, -- Pointer: Used for enemy eye position, bullets & oranges, telegrabs & tree warps
+		["bone_array_2_pointer"] = 0x78, -- Pointer: Used for enemy eye position, bullets & oranges, telegrabs & tree warps
+	},
 	["hand_state"] = 0x147, -- Bitfield
 	["control_state_byte"] = 0x154,
 	["control_states"] = {
