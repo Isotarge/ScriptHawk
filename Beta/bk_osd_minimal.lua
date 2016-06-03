@@ -59,6 +59,10 @@ function Game.getYVelocity()
 	return mainmemory.readfloat(Game.Memory.y_velocity[Game.version], true);
 end
 
+function Game.getXRotation()
+	return mainmemory.readfloat(Game.Memory.x_rotation[Game.version], true);
+end
+
 function Game.getMovingAngle()
 	return mainmemory.readfloat(Game.Memory.moving_angle[Game.version], true);
 end
@@ -243,6 +247,7 @@ local OSD = {
 	{"Velocity", Game.getVelocity};
 	{"Y Velocity", Game.getYVelocity},
 	{"Separator", 1},
+	{"X Rotation", Game.getXRotation},
 	{"Angle", Game.getMovingAngle},
 	{"Separator", 1},
 	{"Movement", Game.getCurrentMovementState},
