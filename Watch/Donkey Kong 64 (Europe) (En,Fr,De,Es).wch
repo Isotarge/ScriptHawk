@@ -28,8 +28,8 @@ SystemID N64
 73EBD0	b	h	1	RDRAM	Squish Screen (Right)
 73EBD4	b	h	1	RDRAM	Squish Screen (Top)
 73EBD8	b	h	1	RDRAM	Squish Screen (Bottom)
-73EC34	d	u	1	RDRAM	Map
-73EC38	d	u	1	RDRAM	Exit
+73EC34	d	u	1	RDRAM	Next Map
+73EC38	d	u	1	RDRAM	Next Exit
 73EC98	w	s	1	RDRAM	Rambi Score 1
 73EC9A	d	h	1	RDRAM	Rambi Score 1 Name
 73EC9E	w	s	1	RDRAM	Rambi Score 2
@@ -86,6 +86,9 @@ SystemID N64
 756EFA	w	h	1	RDRAM	Squawks Model
 756F02	w	h	1	RDRAM	Squawks Behavior
 756F0A	w	h	1	RDRAM	Squawks Model
+764BC8	d	u	1	RDRAM	Current Map
+764BCC	d	u	1	RDRAM	Current Exit
+764BD1	b	h	1	RDRAM	Map State
 765A30	d	u	1	RDRAM	Frames (Lag)
 76A918	d	h	1	RDRAM	Bone Displacement Pointer
 7F0480	d	u	1	RDRAM	Frames (Real)

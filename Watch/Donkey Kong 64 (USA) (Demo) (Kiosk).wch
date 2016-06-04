@@ -37,7 +37,9 @@ SystemID N64
 70AA9C	w	h	1	RDRAM	Dogadon Behavior
 70AA9E	w	h	1	RDRAM	Dogadon Model
 72CDA0	d	h	1	RDRAM	Framebuffer Pointer
-72CDE7	b	u	1	RDRAM	Map
+72CDE4	d	u	1	RDRAM	Current Map
+72CDE8	d	u	1	RDRAM	Current Exit
+72CDED	b	h	1	RDRAM	Map State
 72D140	d	u	1	RDRAM	Frames (Lag) (TODO: Seems to work for Diddy's map but not for any others)
 7A106C	d	h	1	RDRAM	Framebuffer Pointer (Copy)
 7A12C0	d	h	1	RDRAM	Backbone Pointer

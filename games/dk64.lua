@@ -33,6 +33,7 @@ end
 local version; -- 1 USA, 2 Europe, 3 Japan, 4 Kiosk
 Game.Memory = {
 	["map"] = {0x7444E4, 0x73EC34, 0x743DA4, 0x72CDE4},
+	["map_state"] = {0x76A0B1, 0x764BD1, 0x76A2A1, 0x72CDED},
 	["exit"] = {0x7444E8, 0x73EC38, 0x743DA8, 0x72CDE8},
 	["file"] = {0x7467C8, 0x740F18, 0x746088, nil},
 	["character"] = {0x74E77C, 0x748EDC, 0x74E05C, 0x6F9EB8},
@@ -642,6 +643,7 @@ obj_model1 = {
 		[310] = "Spotlight", -- Tag barrel, instrument etc.
 		[311] = "Checkpoint (Race)", -- Seal race & Castle car race
 		[313] = "Particle (Idle Anim.)",
+		[314] = "Rareware logo",
 		[316] = "Kong (Tag Barrel)",
 		[317] = "Locked Kong (Tag Barrel)",
 		[322] = "Car", -- Car Race
@@ -2464,6 +2466,7 @@ function gainControl()
 	mainmemory.write_u16_be(Game.Memory.buttons_enabled_bitfield[version], 0xFFFF); -- Enable all buttons
 	mainmemory.writebyte(Game.Memory.joystick_enabled_x[version], 0xFF); -- Enable Joystick X axis
 	mainmemory.writebyte(Game.Memory.joystick_enabled_y[version], 0xFF); -- Enable Joystick X axis
+	mainmemory.writebyte(Game.Memory.map_state[version], 0x08); -- Patch map state byte to a value where the player has control, allows gaining control during death and some cutscenes
 end
 gain_control = gainControl;
 Game.gainControl = gainControl;
@@ -2639,17 +2642,13 @@ function Game.drawMJMinimap()
 		gui.clearGraphics();
 
 		-- Calculate where the kong is on the MJ Board
-		local x = Game.getXPosition();
-		local z = Game.getZPosition();
-
-		local colseg = position_to_rowcol(z);
-		local rowseg = position_to_rowcol(x);
+		local colseg = position_to_rowcol(Game.getZPosition());
+		local rowseg = position_to_rowcol(Game.getXPosition());
 
 		local col = math.floor(colseg / 2);
 		local row = math.floor(rowseg / 2);
 
-		kongPosition = {
-			["x"] = x, ["z"] = z,
+		local kongPosition = {
 			["col"] = col, ["row"] = row,
 			["col_seg"] = colseg, ["row_seg"] = rowseg
 		};

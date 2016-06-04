@@ -28,8 +28,8 @@ SystemID N64
 743D40	b	u	1	RDRAM	Squish Screen (Right)
 743D44	b	u	1	RDRAM	Squish Screen (Top)
 743D48	b	u	1	RDRAM	Squish Screen (Bottom)
-743DA4	d	u	1	RDRAM	Map
-743DA8	d	u	1	RDRAM	Exit
+743DA4	d	u	1	RDRAM	Next Map
+743DA8	d	u	1	RDRAM	Next Exit
 743E08	w	s	1	RDRAM	Rambi Score 1
 743E0A	d	h	1	RDRAM	Rambi Score 1 Name
 743E0E	w	s	1	RDRAM	Rambi Score 2
@@ -83,6 +83,9 @@ SystemID N64
 75C66A	w	h	1	RDRAM	Squawks Model
 7656E4	d	h	1	RDRAM	Flag Block Pointer
 767EB4	d	u	1	RDRAM	Frames (Real)
+76A298	d	u	1	RDRAM	Current Map
+76A29C	d	u	1	RDRAM	Current Exit
+76A2A1	b	h	1	RDRAM	Map State
 76B100	d	u	1	RDRAM	Frames (Lag)
 7F0E00	d	h	1	RDRAM	Backbone Pointer
 7F6470	d	h	1	RDRAM	Object Model 2 Array Pointer

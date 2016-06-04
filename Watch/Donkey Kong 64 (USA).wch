@@ -46,8 +46,8 @@ SystemID N64
 744484	b	u	1	RDRAM	Squish Screen (Top)
 744488	b	u	1	RDRAM	Squish Screen (Bottom)
 7444C0	b	u	1	RDRAM	Widescreen Toggle
-7444E4	d	u	1	RDRAM	Map
-7444E8	d	u	1	RDRAM	Exit
+7444E4	d	u	1	RDRAM	Next Map
+7444E8	d	u	1	RDRAM	Next Exit
 744518	w	u	1	RDRAM	Arena Current Score
 74452C	b	u	1	RDRAM	Story skip
 744530	b	u	1	RDRAM	Chimpy Cam
@@ -221,7 +221,9 @@ SystemID N64
 767CC4	d	u	1	RDRAM	Frames (Real)
 76A050	d	h	1	RDRAM	2D Renderer Array Pointer?
 76A064	d	u	1	RDRAM	Object Model 2 Timer
-76A0AB	b	h	1	RDRAM	Background?
+76A0A8	d	u	1	RDRAM	Current Map
+76A0AC	d	u	1	RDRAM	Current Exit
+76A0B1	b	h	1	RDRAM	Map State
 76A0CD	b	u	1	RDRAM	Adventure
 76A0DA	b	h	1	RDRAM	Mystery Menu
 76AEF3	b	h	1	RDRAM	Previous Map
@@ -231,6 +233,7 @@ SystemID N64
 7ED558	b	h	1	RDRAM	Mystery menu enabled
 7ED559	b	h	1	RDRAM	Extra cutscenes & Rambi unlocked
 7ED55B	b	h	1	RDRAM	Mystery menu bosses enabled (up to galleon)
+7ED560	d	h	1	RDRAM	Jetpac High Score (Last X Bits, multiplied by 5)
 7F07F4	d	h	1	RDRAM	Framebuffer Pointer
 7F0828	d	h	1	RDRAM	2D Renderer Array Pointer?
 7F0990	d	h	1	RDRAM	Backbone Pointer
