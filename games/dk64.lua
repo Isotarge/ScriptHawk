@@ -35,6 +35,7 @@ Game.Memory = {
 	["map"] = {0x7444E4, 0x73EC34, 0x743DA4, 0x72CDE4},
 	["map_state"] = {0x76A0B1, 0x764BD1, 0x76A2A1, 0x72CDED},
 	["exit"] = {0x7444E8, 0x73EC38, 0x743DA8, 0x72CDE8},
+	["loading_zone_array"] = {0x7FDCB4, nil, nil, nil},
 	["file"] = {0x7467C8, 0x740F18, 0x746088, nil},
 	["character"] = {0x74E77C, 0x748EDC, 0x74E05C, 0x6F9EB8},
 	["tb_void_byte"] = {0x7FBB63, 0x7FBA83, 0x7FBFD3, 0x7B5B13},
@@ -245,7 +246,7 @@ Game.maps = {
 	"Gloomy Galleon Lobby",
 	"Frantic Factory Lobby",
 	"Training Grounds",
-	"Water Barrel",
+	"Dive Barrel",
 	"Fungi Forest Lobby",
 	"Gloomy Galleon: Submarine",
 	"Orange Barrel", -- 180
@@ -1324,6 +1325,80 @@ local function getExamineDataModelTwo(pointer)
 	end
 
 	return examine_data;
+end
+
+--------------------------------
+-- Loading Zone Documentation --
+--------------------------------
+
+function getLoadingZoneArray()
+	return dereferencePointer(Game.Memory.loading_zone_array[version]);
+end
+
+local loading_zone_size = 0x3A;
+local loading_zone_fields = {
+	["x_position"] = 0x00, -- s16_be
+	["y_position"] = 0x02, -- s16_be
+	["z_position"] = 0x04, -- s16_be
+	["object_type"] = 0x10, -- u16_be
+	["object_types"] = {
+		[0x05] = "Cutscene Trigger",
+		[0x09] = "Loading Zone",
+		[0x0A] = "Cutscene Trigger",
+		[0x0C] = "Loading Zone",
+		[0x0D] = "Loading Zone",
+		[0x10] = "Loading Zone",
+		-- [0x11] = "Cutscene Trigger", -- Snide's
+		-- [0x13] = "Unknown - Caves Lobby", -- Behind ice walls
+		[0x15] = "Cutscene Trigger",
+		[0x17] = "Cutscene Trigger",
+	},
+	["destination_map"] = 0x12, -- u16_be, index of Game.maps
+	["destination_exit"] = 0x14, -- u16_be
+	["fade_type"] = 0x16, -- u16_be?
+};
+
+function dumpLoadingZones()
+	local loadingZoneArray = getLoadingZoneArray();
+	if isRDRAM(loadingZoneArray) then
+		local arraySize = mainmemory.read_u32_be(loadingZoneArray + object_size) / loading_zone_size;
+		for i = 0, arraySize do
+			local _type = mainmemory.read_u16_be(loadingZoneArray + (i * loading_zone_size) + loading_zone_fields.object_type);
+			if loading_zone_fields.object_types[_type] ~= nil then
+				_type = loading_zone_fields.object_types[_type];
+			else
+				_type = toHexString(_type);
+			end
+			local data = {
+				{"Index", i},
+				{"Address", toHexString(loadingZoneArray + (i * loading_zone_size))},
+				{"Type", _type},
+				{"X Position", mainmemory.read_s16_be(loadingZoneArray + (i * loading_zone_size) + loading_zone_fields.x_position)},
+				{"Y Position", mainmemory.read_s16_be(loadingZoneArray + (i * loading_zone_size) + loading_zone_fields.y_position)},
+				{"Z Position", mainmemory.read_s16_be(loadingZoneArray + (i * loading_zone_size) + loading_zone_fields.z_position)},
+			};
+			if _type == "Loading Zone" then
+				table.insert(data, {"Destination Map", Game.maps[mainmemory.read_u16_be(loadingZoneArray + (i * loading_zone_size) + loading_zone_fields.destination_map) + 1]});
+				table.insert(data, {"Destination Exit", mainmemory.read_u16_be(loadingZoneArray + (i * loading_zone_size) + loading_zone_fields.destination_exit)});
+				table.insert(data, {"Fade", mainmemory.read_u16_be(loadingZoneArray + (i * loading_zone_size) + loading_zone_fields.fade_type)});
+			else
+				
+			end
+			for d = 1, #data do
+				print(data[d][1]..": "..(data[d][2] or "Unknown"));
+			end
+			print();
+		end
+	end
+end
+
+function zipToLZ(index)
+	local loadingZoneArray = getLoadingZoneArray();
+	if isRDRAM(loadingZoneArray) then
+		Game.setXPosition(mainmemory.read_s16_be(loadingZoneArray + (index * loading_zone_size) + loading_zone_fields.x_position));
+		Game.setYPosition(mainmemory.read_s16_be(loadingZoneArray + (index * loading_zone_size) + loading_zone_fields.y_position));
+		Game.setZPosition(mainmemory.read_s16_be(loadingZoneArray + (index * loading_zone_size) + loading_zone_fields.z_position));
+	end
 end
 
 --------------------
