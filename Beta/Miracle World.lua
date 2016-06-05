@@ -6,8 +6,13 @@ local object_fields = {
 	["object_type"] = 0x00, -- Byte
 	["object_types"] = {
 		[0x01] = "Player",
-		[0x02] = "Bullet", -- Helecopter
+		[0x02] = "Bullet",
+		[0x03] = "Explosion", -- Vehicle dying
+		[0x04] = "Bullet", -- Dying
 		--[0x18] = "Unknown 0x18", -- Title Screen
+		[0x1B] = "Projectile", -- Ring
+		[0x1E] = "Scissors Head",
+		[0x20] = "Bat", -- Left
 		[0x22] = "Bubble", -- Big Frog
 		[0x23] = "Big Frog",
 		[0x24] = "Octopus", -- Arm segment
@@ -21,6 +26,7 @@ local object_fields = {
 		[0x32] = "Seahorse", -- Right
 		[0x34] = "Fish", -- Small Right
 		[0x35] = "Fish", -- Big Right
+		[0x36] = "Bat", -- Right
 		[0x33] = "Bird", -- Right
 		[0x37] = "Frog", -- Small, Jumping
 		[0x38] = "Box Particle",
@@ -28,19 +34,29 @@ local object_fields = {
 		[0x3A] = "Box Particle",
 		[0x3B] = "Box Particle",
 		[0x3C] = "Money",
+		[0x3D] = "Flame",
 		[0x3E] = "Scorpion", -- Left
 		[0x3F] = "Scorpion", -- Right
+		[0x42] = "Fish", -- Jumping Piranha
 		[0x44] = "Rice Cake",
+		[0x45] = "Saint Nurari", -- Level 4
 		--[0x46] = "Unknown Enemy 0x46",
 		--[0x48] = "Unknown Enemy 0x48",
 		[0x4E] = "Ring",
 		[0x4F] = "Ghost",
-		[0x52] = "Helecopter", -- Collectable
-		--[0x55] = "Unknown Enemy 0x55",
+		[0x52] = "Item", -- Helecopter, Crown, Blue circle with star
+		[0x54] = "Rolling Rock",
+		[0x55] = "Hopper",
 	},
 	["state"] = 0x01, -- Byte
 	["x_position"] = 0x0C, -- Byte
 	["y_position"] = 0x0E, -- Byte
+	["janken_decision"] = 0x17, -- Byte
+	["janken_decisions"] = {
+		[0] = "Rock",
+		[1] = "Scissors",
+		[2] = "Paper",
+	},
 };
 
 function toHexString(value, desiredLength, prefix)
@@ -62,7 +78,17 @@ function draw_ui()
 	for i = 0, object_array_capacity do
 		local objectBase = object_array_base + (i * object_size);
 		local objectType = mainmemory.readbyte(objectBase + object_fields.object_type);
+		local color = nil;
 		if objectType ~= 0 then
+			if objectType == 0x52 then
+				if mainmemory.readbyte(objectBase + 0x07) == 0xD3 and mainmemory.readbyte(objectBase + 0x08) == 0x80 then -- Detect a crown and make it flash Red & Yellow
+					if emu.framecount() % 10 > 4 then
+						color = 0xFFFF0000; -- Red
+					else
+						color = 0xFFFFFF00; -- Yellow
+					end
+				end
+			end
 			if type(object_fields.object_types[objectType]) ~= "nil" then
 				objectType = object_fields.object_types[objectType];
 			else
@@ -70,7 +96,7 @@ function draw_ui()
 			end
 			local xPosition = mainmemory.readbyte(objectBase + object_fields.x_position);
 			local yPosition = mainmemory.readbyte(objectBase + object_fields.y_position);
-			gui.text(gui_x, gui_y + height * row, xPosition..", "..yPosition.." - "..objectType.." "..toHexString(objectBase), nil, nil, 'bottomright');
+			gui.text(gui_x, gui_y + height * row, xPosition..", "..yPosition.." - "..objectType.." "..toHexString(objectBase), color, nil, 'bottomright');
 			row = row + 1;
 		end
 	end
