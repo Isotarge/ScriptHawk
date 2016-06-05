@@ -8,7 +8,10 @@ SystemID SMS
 0054	b	h	0	Main RAM	Invincibility state
 005A	w	u	0	Main RAM	Invincibility timer
 007E	w	u	0	Main RAM	Game Over Timer
-00BE	w	u	0	Main RAM	Screen Position (Y)
+00B0	b	h	0	Main RAM	Horizontal Screen Scroll
+00B6	w	u	1	Main RAM	Horizontal Viewport Position
+00BE	b	h	0	Main RAM	Vertical Screen Scroll
+00C4	w	u	1	Main RAM	Vertical Viewport Position
 030C	b	u	0	Main RAM	X Position (Screen)
 030E	b	u	0	Main RAM	Y Position (Screen)
 0310	b	s	0	Main RAM	X Velocity

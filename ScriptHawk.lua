@@ -347,6 +347,12 @@ end
 -----------------
 
 local supportedGames = {
+	-- Alex Kidd in Miracle World
+	-- TODO: Somehow support self contained modules with while true loops...
+	--["6E8E702E1D8A893EE698B93F5807972A"] = {["moduleName"] = "beta.Miracle World", ["selfContained"] = true, ["friendlyName"] = "Alex Kidd in Miracle World (J)"},
+	--["3D9A8D5C2D6D3F8FF63A8F7C77FFA983"] = {["moduleName"] = "beta.Miracle World", ["selfContained"] = true, ["friendlyName"] = "Alex Kidd in Miracle World (UE)"},
+	--["F43E74FFEC58DDF62F0B8667D31F22C0"] = {["moduleName"] = "beta.Miracle World", ["selfContained"] = true, ["friendlyName"] = "Alex Kidd in Miracle World (UE) (Rev 1)"},
+
 	-- Banjo
 	["90726D7E7CD5BF6CDFD38F45C9ACBF4D45BD9FD8"] = {["moduleName"] = "games.bk", ["friendlyName"] = "Banjo to Kazooie no Daibouken (Japan)"},
 	["5A5172383037D171F121790959962703BE1F373C"] = {["moduleName"] = "games.bt", ["friendlyName"] = "Banjo to Kazooie no Daibouken 2 (Japan)"},
