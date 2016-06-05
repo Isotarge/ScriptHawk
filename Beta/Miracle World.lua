@@ -9,9 +9,15 @@ local object_fields = {
 		[0x02] = "Bullet",
 		[0x03] = "Explosion", -- Vehicle dying
 		[0x04] = "Bullet", -- Dying
+		[0x0B] = "Janken Choice Display", -- Player
+		[0x0C] = "Janken Score Display",
+		[0x10] = "Spike", -- Will fall when room loads
+		[0x14] = "Spike", -- Falling
 		--[0x18] = "Unknown 0x18", -- Title Screen
 		[0x1B] = "Projectile", -- Ring
+		[0x1D] = "Stone Head",
 		[0x1E] = "Scissors Head",
+		[0x1F] = "Paper Head",
 		[0x20] = "Bat", -- Left
 		[0x22] = "Bubble", -- Big Frog
 		[0x23] = "Big Frog",
@@ -37,20 +43,30 @@ local object_fields = {
 		[0x3D] = "Flame",
 		[0x3E] = "Scorpion", -- Left
 		[0x3F] = "Scorpion", -- Right
+		[0x40] = "Cloud",
+		[0x41] = "Cloud", -- Shooting Lightning
 		[0x42] = "Fish", -- Jumping Piranha
+		[0x43] = "Dying", -- Boss, turns into Rice Cake
 		[0x44] = "Rice Cake",
 		[0x45] = "Saint Nurari", -- Level 4
-		--[0x46] = "Unknown Enemy 0x46",
-		--[0x48] = "Unknown Enemy 0x48",
+		[0x46] = "OX", -- Left
+		[0x47] = "OX", -- Left, Hurt
+		[0x48] = "OX", -- Right
+		[0x49] = "OX", -- Right, Hurt
+		[0x4D] = "Extra Life",
 		[0x4E] = "Ring",
 		[0x4F] = "Ghost",
+		[0x50] = "Saint Nurari", -- Level 6
 		[0x52] = "Item", -- Helecopter, Crown, Blue circle with star
 		[0x54] = "Rolling Rock",
 		[0x55] = "Hopper",
+		[0x57] = "Flame", -- Stationary
 	},
 	["state"] = 0x01, -- Byte
 	["x_position"] = 0x0C, -- Byte
 	["y_position"] = 0x0E, -- Byte
+	["x_velocity"] = 0x10, -- S8
+	["y_velocity"] = 0x12, -- S8
 	["janken_decision"] = 0x17, -- Byte
 	["janken_decisions"] = {
 		[0] = "Rock",
@@ -81,13 +97,16 @@ function draw_ui()
 		local color = nil;
 		if objectType ~= 0 then
 			if objectType == 0x52 then
-				if mainmemory.readbyte(objectBase + 0x07) == 0xD3 and mainmemory.readbyte(objectBase + 0x08) == 0x80 then -- Detect a crown and make it flash Red & Yellow
+				if mainmemory.readbyte(objectBase + 0x07) == 0xD3 and mainmemory.readbyte(objectBase + 0x08) == 0x80 then -- Detect crown and make it flash Red & Yellow
 					if emu.framecount() % 10 > 4 then
 						color = 0xFFFF0000; -- Red
 					else
 						color = 0xFFFFFF00; -- Yellow
 					end
 				end
+			end
+			if objectType == 0x44 then -- Detect Rice Cake and color it green
+				color = 0xFF00FF00; -- Green
 			end
 			if type(object_fields.object_types[objectType]) ~= "nil" then
 				objectType = object_fields.object_types[objectType];
@@ -100,16 +119,6 @@ function draw_ui()
 			row = row + 1;
 		end
 	end
-
-	--local examine_data = getExamineData(getObjectBase(object_index));
-	--for i = #examine_data, 1, -1 do
-	--	if examine_data[i][1] ~= "Separator" then
-	--		gui.text(gui_x, gui_y + height * row, examine_data[i][1]..": "..examine_data[i][2], nil, nil, 'bottomright');
-	--		row = row + 1;
-	--	else
-	--		row = row + examine_data[i][2];
-	--	end
-	--end
 end
 
 while true do
