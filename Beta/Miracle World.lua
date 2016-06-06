@@ -30,14 +30,14 @@ local object_fields = {
 		[0x16] = {["name"] = "Trapdoor", ["color"] = pink}, -- Opens when stepped on
 		[0x17] = {["name"] = "Trigger", ["color"] = pink}, -- For falling blocks
 		--[0x18] = {["name"] = "Unknown 0x18"}, -- Title Screen
-		[0x19] = {["name"] = "Projectile", ["color"] = red}, -- Janken Ninja Star
+		[0x19] = {["name"] = "Projectile", ["hitbox_x"] = 8, ["hitbox_y"] = 8, ["color"] = red}, -- Janken Ninja Star
 		[0x1B] = {["name"] = "Projectile", ["hitbox_x"] = 8, ["hitbox_y"] = 8}, -- Ring
-		[0x1A] = {["name"] = "Projectile", ["color"] = red}, -- Scissors Head Ninja Star
+		[0x1A] = {["name"] = "Projectile", ["hitbox_x"] = 8, ["hitbox_y"] = 8, ["color"] = red}, -- Scissors Head Ninja Star
 		[0x1C] = {["name"] = "Janken", ["color"] = pink},
 		[0x1D] = {["name"] = "Stone Head", ["color"] = pink},
 		[0x1E] = {["name"] = "Scissors Head", ["color"] = pink},
 		[0x1F] = {["name"] = "Paper Head", ["color"] = pink},
-		[0x20] = {["name"] = "Bat", ["direction"] = "Left", ["color"] = red}, -- Left
+		[0x20] = {["name"] = "Bat", ["direction"] = "Left", ["hitbox_x"] = 16, ["hitbox_y"] = 8, ["color"] = red}, -- Left
 		[0x22] = {["name"] = "Bubble", ["color"] = red, ["hitbox_x"] = 8, ["hitbox_y"] = 8}, -- Big Frog
 		[0x23] = {["name"] = "Big Frog", ["color"] = red},
 		[0x24] = {["name"] = "Octopus", ["color"] = red, ["hitbox_x"] = 8, ["hitbox_y"] = 8}, -- Arm segment
@@ -54,7 +54,7 @@ local object_fields = {
 		[0x32] = {["name"] = "Seahorse", ["direction"] = "Right", ["color"] = red},
 		[0x34] = {["name"] = "Fish", ["direction"] = "Right", ["color"] = red}, -- Small
 		[0x35] = {["name"] = "Fish", ["direction"] = "Right", ["color"] = red}, -- Big
-		[0x36] = {["name"] = "Bat", ["direction"] = "Right", ["color"] = red},
+		[0x36] = {["name"] = "Bat", ["direction"] = "Right", ["hitbox_x"] = 16, ["hitbox_y"] = 8, ["color"] = red},
 		[0x33] = {["name"] = "Bird", ["direction"] = "Right", ["color"] = red, ["hitbox_x"] = 24, ["hitbox_y"] = 16},
 		[0x37] = {["name"] = "Frog", ["color"] = red}, -- Small, Jumping
 		[0x38] = {["name"] = "Box Particle", ["hitbox_x"] = 8, ["hitbox_y"] = 8},
