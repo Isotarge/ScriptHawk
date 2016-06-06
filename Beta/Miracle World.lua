@@ -117,6 +117,7 @@ function draw_ui()
 	local gui_y = 2;
 	local row = 0;
 	local height = 16;
+	local width = 8;
 	local mouse = input.getmouse();
 	if mode == "Hitbox" then
 		gui.clearGraphics();
@@ -181,8 +182,21 @@ function draw_ui()
 			if mode == "Hitbox" then
 				if showInactive or objectActive == 0x00 then
 					if (mouse.X >= xPosition and mouse.X <= xPosition + hitboxX) and (mouse.Y >= yPosition and mouse.Y <= yPosition + hitboxY) then
-						gui.drawText(xPosition, yPosition, objectType, color);
-						gui.drawText(xPosition, yPosition + height, toHexString(objectBase).." "..xPosition..","..yPosition, color);
+						local mouseOverText = {
+							objectType,
+							toHexString(objectBase).." "..xPosition..","..yPosition,
+						};
+
+						local maxLength = -math.huge;
+						for i = 1, #mouseOverText do
+							maxLength = math.max(maxLength, string.len(mouseOverText[i]));
+						end
+						local safeX = math.min(xPosition, 256 - (maxLength * width));
+						local safeY = math.min(yPosition, 192 - (#mouseOverText * height));
+
+						for i = 1, #mouseOverText do
+							gui.drawText(safeX, safeY + ((i - 1) * height), mouseOverText[i], color);
+						end
 					end
 					gui.drawRectangle(xPosition, yPosition, hitboxX, hitboxY, color); -- Draw the object's hitbox
 				end
