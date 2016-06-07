@@ -95,7 +95,7 @@ local object_fields = {
 		[0x4E] = {["name"] = "Ring", ["color"] = pink},
 		[0x4F] = {["name"] = "Ghost", ["color"] = red},
 		[0x50] = {["name"] = "Saint Nurari", ["color"] = yellow, ["active"] = isActiveEnemy}, -- Level 6
-		[0x51] = {["name"] = "Patricia", ["color"] = yelow}, -- Level 16
+		[0x51] = {["name"] = "Patricia", ["color"] = yellow}, -- Level 16
 		[0x52] = {["name"] = "Item", ["color"] = pink}, -- Helecopter, Crown, Blue circle with star
 		[0x54] = {["name"] = "Rolling Rock", ["color"] = red, ["active"] = isActiveEnemy},
 		[0x55] = {["name"] = "Hopper", ["color"] = red, ["active"] = isActiveEnemy},
