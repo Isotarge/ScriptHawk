@@ -1,14 +1,25 @@
-mode = "Hitbox"; -- Standard
-show_inactive = true;
-
-local object_array_base = 0x300;
-local object_size = 0x20;
-local object_array_capacity = 30;
+-- Configuration
+showList = false;
+showHitbox = true;
+showInactive = false;
 
 local red = 0xFFFF0000;
 local yellow = 0xFFFFFF00;
 local green = 0xFF00FF00;
 local pink = 0xFFFF00FF;
+
+-- Game state
+local object_array_base = 0x300;
+local object_size = 0x20;
+local object_array_capacity = 30;
+
+function isActiveEnemy(objectBase)
+	return (mainmemory.readbyte(objectBase + 0x09) == 0) and (mainmemory.readbyte(objectBase + 0x0A) == 0);
+end
+
+function isActiveBoss(objectBase)
+	return isActiveEnemy and (mainmemory.readbyte(objectBase + 0x1A) > 1);
+end
 
 local object_fields = {
 	["object_type"] = 0x00, -- Byte
@@ -29,61 +40,61 @@ local object_fields = {
 		[0x15] = {["name"] = "Waterfall", ["color"] = red}, -- Falling
 		[0x16] = {["name"] = "Trapdoor", ["color"] = pink}, -- Opens when stepped on
 		[0x17] = {["name"] = "Trigger", ["color"] = pink}, -- For falling blocks
-		--[0x18] = {["name"] = "Unknown 0x18"}, -- Title Screen
+		[0x18] = {["name"] = "Title Screen Sprite"},
 		[0x19] = {["name"] = "Projectile", ["hitbox_x"] = 8, ["hitbox_y"] = 8, ["color"] = red}, -- Janken Ninja Star
 		[0x1B] = {["name"] = "Projectile", ["hitbox_x"] = 8, ["hitbox_y"] = 8}, -- Ring
 		[0x1A] = {["name"] = "Projectile", ["hitbox_x"] = 8, ["hitbox_y"] = 8, ["color"] = red}, -- Scissors Head Ninja Star
 		[0x1C] = {["name"] = "Janken", ["color"] = pink},
-		[0x1D] = {["name"] = "Stone Head", ["color"] = pink},
-		[0x1E] = {["name"] = "Scissors Head", ["color"] = pink},
+		[0x1D] = {["name"] = "Stone Head", ["color"] = pink, ["active"] = isActiveBoss},
+		[0x1E] = {["name"] = "Scissors Head", ["color"] = pink, ["active"] = isActiveBoss},
 		[0x1F] = {["name"] = "Paper Head", ["color"] = pink},
-		[0x20] = {["name"] = "Bat", ["direction"] = "Left", ["hitbox_x"] = 16, ["hitbox_y"] = 8, ["color"] = red}, -- Left
+		[0x20] = {["name"] = "Bat", ["direction"] = "Left", ["hitbox_x"] = 16, ["hitbox_y"] = 8, ["color"] = red, ["active"] = isActiveEnemy},
 		[0x22] = {["name"] = "Bubble", ["color"] = red, ["hitbox_x"] = 8, ["hitbox_y"] = 8}, -- Big Frog
 		[0x23] = {["name"] = "Big Frog", ["color"] = red},
-		[0x24] = {["name"] = "Octopus", ["color"] = red, ["hitbox_x"] = 8, ["hitbox_y"] = 8}, -- Arm segment
+		[0x24] = {["name"] = "Octopus", ["color"] = red, ["hitbox_x"] = 8, ["hitbox_y"] = 8, ["active"] = isActiveEnemy}, -- Arm segment
 		[0x27] = {["name"] = "Blue Bear", ["color"] = pink},
 		[0x29] = {["name"] = "Projectile", ["color"] = red}, -- Monkey's projectile
 		[0x2A] = {["name"] = "Monkey", ["color"] = red},
 		[0x2B] = {["name"] = "Dying"}, -- Small enemy
-		[0x2C] = {["name"] = "Plant", ["color"] = red}, -- Moves up and down
-		[0x2D] = {["name"] = "Bird", ["direction"] = "Left", ["color"] = red, ["hitbox_x"] = 24, ["hitbox_y"] = 16},
-		[0x2E] = {["name"] = "Fish", ["directoin"] = "Left", ["color"] = red}, -- Big
-		[0x2F] = {["name"] = "Frog", ["color"] = red}, -- Small, Grounded
-		[0x30] = {["name"] = "Fish", ["direction"] = "Left", ["color"] = red}, -- Small Left
-		[0x31] = {["name"] = "Seahorse", ["direction"] = "Left", ["color"] = red},
-		[0x32] = {["name"] = "Seahorse", ["direction"] = "Right", ["color"] = red},
-		[0x34] = {["name"] = "Fish", ["direction"] = "Right", ["color"] = red}, -- Small
-		[0x35] = {["name"] = "Fish", ["direction"] = "Right", ["color"] = red}, -- Big
-		[0x36] = {["name"] = "Bat", ["direction"] = "Right", ["hitbox_x"] = 16, ["hitbox_y"] = 8, ["color"] = red},
-		[0x33] = {["name"] = "Bird", ["direction"] = "Right", ["color"] = red, ["hitbox_x"] = 24, ["hitbox_y"] = 16},
+		[0x2C] = {["name"] = "Plant", ["color"] = red, ["hitbox_x"] = 16, ["hitbox_y"] = 32, ["active"] = isActiveEnemy}, -- Moves up and down
+		[0x2D] = {["name"] = "Bird", ["direction"] = "Left", ["color"] = red, ["hitbox_x"] = 24, ["hitbox_y"] = 16, ["active"] = isActiveEnemy},
+		[0x2E] = {["name"] = "Killer Fish", ["directoin"] = "Left", ["color"] = red, ["active"] = isActiveEnemy},
+		[0x2F] = {["name"] = "Frog", ["color"] = red, ["active"] = isActiveEnemy}, -- Small, Grounded
+		[0x30] = {["name"] = "Fish", ["direction"] = "Left", ["color"] = red, ["active"] = isActiveEnemy}, -- Small Left
+		[0x31] = {["name"] = "Seahorse", ["direction"] = "Left", ["color"] = red, ["active"] = isActiveEnemy},
+		[0x32] = {["name"] = "Seahorse", ["direction"] = "Right", ["color"] = red, ["active"] = isActiveEnemy},
+		[0x34] = {["name"] = "Fish", ["direction"] = "Right", ["color"] = red, ["active"] = isActiveEnemy}, -- Small
+		[0x35] = {["name"] = "Killer Fish", ["direction"] = "Right", ["color"] = red, ["active"] = isActiveEnemy},
+		[0x36] = {["name"] = "Bat", ["direction"] = "Right", ["hitbox_x"] = 16, ["hitbox_y"] = 8, ["color"] = red, ["active"] = isActiveEnemy},
+		[0x33] = {["name"] = "Bird", ["direction"] = "Right", ["color"] = red, ["hitbox_x"] = 24, ["hitbox_y"] = 16, ["active"] = isActiveEnemy},
 		[0x37] = {["name"] = "Frog", ["color"] = red}, -- Small, Jumping
 		[0x38] = {["name"] = "Box Particle", ["hitbox_x"] = 8, ["hitbox_y"] = 8},
 		[0x39] = {["name"] = "Box Particle", ["hitbox_x"] = 8, ["hitbox_y"] = 8},
 		[0x3A] = {["name"] = "Box Particle", ["hitbox_x"] = 8, ["hitbox_y"] = 8},
 		[0x3B] = {["name"] = "Box Particle", ["hitbox_x"] = 8, ["hitbox_y"] = 8},
 		[0x3C] = {["name"] = "Money", ["color"] = green},
-		[0x3D] = {["name"] = "Flame", ["color"] = red},
-		[0x3E] = {["name"] = "Scorpion", ["direction"] = "Left", ["color"] = red}, -- Also used for flames in later levels
-		[0x3F] = {["name"] = "Scorpion", ["direction"] = "Right", ["color"] = red}, -- Also used for flames in later levels
-		[0x40] = {["name"] = "Cloud", ["color"] = red},
-		[0x41] = {["name"] = "Cloud", ["color"] = red}, -- Shooting Lightning
-		[0x42] = {["name"] = "Flying Fish", ["color"] = red},
+		[0x3D] = {["name"] = "Flame", ["color"] = red, ["active"] = isActiveEnemy},
+		[0x3E] = {["name"] = "Scorpion", ["direction"] = "Left", ["color"] = red, ["active"] = isActiveEnemy}, -- Also used for flames in later levels
+		[0x3F] = {["name"] = "Scorpion", ["direction"] = "Right", ["color"] = red, ["active"] = isActiveEnemy}, -- Also used for flames in later levels
+		[0x40] = {["name"] = "Cloud", ["color"] = red, ["active"] = isActiveEnemy},
+		[0x41] = {["name"] = "Cloud", ["color"] = red, ["active"] = isActiveEnemy}, -- Shooting Lightning
+		[0x42] = {["name"] = "Flying Fish", ["color"] = red, ["active"] = isActiveEnemy},
 		[0x43] = {["name"] = "Dying", ["color"] = pink}, -- Boss, turns into Rice Cake
-		[0x44] = {["name"] = "Rice Cake", ["color"] = green},
-		[0x45] = {["name"] = "Saint Nurari", ["color"] = yellow}, -- Level 4
-		[0x46] = {["name"] = "OX", ["direction"] = "Left", ["color"] = pink},
-		[0x47] = {["name"] = "OX", ["direction"] = "Left", ["color"] = pink}, -- Hurt
-		[0x48] = {["name"] = "OX", ["direction"] = "Right", ["color"] = pink},
-		[0x49] = {["name"] = "OX", ["direction"] = "Right", ["color"] = pink}, -- Hurt
-		[0x4B] = {["name"] = "Hidden Block", ["color"] = pink},
+		[0x44] = {["name"] = "Rice Cake", ["color"] = green, ["active"] = isActiveEnemy},
+		[0x45] = {["name"] = "Saint Nurari", ["color"] = yellow, ["active"] = isActiveEnemy}, -- Level 4
+		[0x46] = {["name"] = "OX", ["direction"] = "Left", ["color"] = pink, ["active"] = isActiveEnemy},
+		[0x47] = {["name"] = "OX", ["direction"] = "Left", ["color"] = pink, ["active"] = isActiveEnemy}, -- Hurt
+		[0x48] = {["name"] = "OX", ["direction"] = "Right", ["color"] = pink, ["active"] = isActiveEnemy},
+		[0x49] = {["name"] = "OX", ["direction"] = "Right", ["color"] = pink, ["active"] = isActiveEnemy}, -- Hurt
+		[0x4B] = {["name"] = "Hidden Block", ["color"] = pink, ["active"] = isActiveEnemy},
 		[0x4D] = {["name"] = "Extra Life", ["color"] = pink},
 		[0x4E] = {["name"] = "Ring", ["color"] = pink},
 		[0x4F] = {["name"] = "Ghost", ["color"] = red},
-		[0x50] = {["name"] = "Saint Nurari", ["color"] = yellow}, -- Level 6
+		[0x50] = {["name"] = "Saint Nurari", ["color"] = yellow, ["active"] = isActiveEnemy}, -- Level 6
 		[0x51] = {["name"] = "Patricia", ["color"] = yelow}, -- Level 16
 		[0x52] = {["name"] = "Item", ["color"] = pink}, -- Helecopter, Crown, Blue circle with star
-		[0x54] = {["name"] = "Rolling Rock", ["color"] = red},
-		[0x55] = {["name"] = "Hopper", ["color"] = red},
+		[0x54] = {["name"] = "Rolling Rock", ["color"] = red, ["active"] = isActiveEnemy},
+		[0x55] = {["name"] = "Hopper", ["color"] = red, ["active"] = isActiveEnemy},
 		[0x56] = {["name"] = "Arrow", ["hitbox_x"] = 8, ["hitbox_y"] = 8}, -- Map
 		[0x57] = {["name"] = "Flame", ["color"] = red}, -- Stationary
 		[0x61] = {["name"] = "Crown Code Controller", ["color"] = pink},
@@ -113,13 +124,11 @@ function toHexString(value, desiredLength, prefix)
 end
 
 function draw_ui()
-	local gui_x = 2;
-	local gui_y = 2;
-	local row = 0;
-	local height = 16;
-	local width = 8;
+	local height = 16; -- Text row height
+	local width = 8; -- Text column width
 	local mouse = input.getmouse();
-	if mode == "Hitbox" then
+
+	if showHitbox then
 		gui.clearGraphics();
 	end
 
@@ -129,7 +138,7 @@ function draw_ui()
 	for i = 0, object_array_capacity do
 		local objectBase = object_array_base + (i * object_size);
 		local objectType = mainmemory.readbyte(objectBase + object_fields.object_type);
-		local objectActive = mainmemory.read_u16_be(objectBase + object_fields.active);
+		local objectActive = true;
 		local objectTypeTable = nil;
 		local color = nil;
 		if objectType ~= 0 then
@@ -160,6 +169,10 @@ function draw_ui()
 				if type(objectTypeTable.hitbox_y) == "number" then
 					hitboxY = objectTypeTable.hitbox_y;
 				end
+
+				if type(objectTypeTable.active) == "function" then
+					objectActive = objectTypeTable.active(objectBase); -- Call the function to check whether the object is active
+				end
 			else
 				objectType = "Unknown ("..toHexString(objectType)..")";
 			end
@@ -174,13 +187,17 @@ function draw_ui()
 				end
 			end
 
-			if mode == "Standard" then
-				gui.text(gui_x, gui_y + height * row, xPosition..", "..yPosition.." - "..objectType.." "..toHexString(objectBase), color, nil, 'bottomright');
+			if showList then
+				local list_x_offset = 2;
+				local list_y_offset = 2;
+				local row = 0;
+
+				gui.text(list_x_offset, list_y_offset + height * row, xPosition..", "..yPosition.." - "..objectType.." "..toHexString(objectBase), color, nil, 'bottomright');
 				row = row + 1;
 			end
 
-			if mode == "Hitbox" then
-				if showInactive or objectActive == 0x00 then
+			if showHitbox then
+				if showInactive or objectActive then
 					if (mouse.X >= xPosition and mouse.X <= xPosition + hitboxX) and (mouse.Y >= yPosition and mouse.Y <= yPosition + hitboxY) then
 						local mouseOverText = {
 							objectType,
