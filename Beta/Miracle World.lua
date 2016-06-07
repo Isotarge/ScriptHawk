@@ -18,7 +18,7 @@ function isActiveEnemy(objectBase)
 end
 
 function isActiveBoss(objectBase)
-	return isActiveEnemy and (mainmemory.readbyte(objectBase + 0x1A) > 1);
+	return isActiveEnemy(objectBase) and (mainmemory.readbyte(objectBase + 0x1A) > 1);
 end
 
 local object_fields = {
