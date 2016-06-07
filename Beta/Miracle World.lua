@@ -47,16 +47,19 @@ local object_fields = {
 		[0x1C] = {["name"] = "Janken", ["color"] = pink},
 		[0x1D] = {["name"] = "Stone Head", ["color"] = pink, ["active"] = isActiveBoss},
 		[0x1E] = {["name"] = "Scissors Head", ["color"] = pink, ["active"] = isActiveBoss},
-		[0x1F] = {["name"] = "Paper Head", ["color"] = pink},
+		[0x1F] = {["name"] = "Paper Head", ["color"] = pink, ["active"] = isActiveBoss},
 		[0x20] = {["name"] = "Bat", ["direction"] = "Left", ["hitbox_x"] = 16, ["hitbox_y"] = 8, ["color"] = red, ["active"] = isActiveEnemy},
 		[0x22] = {["name"] = "Bubble", ["color"] = red, ["hitbox_x"] = 8, ["hitbox_y"] = 8}, -- Big Frog
-		[0x23] = {["name"] = "Big Frog", ["color"] = red},
+		[0x23] = {["name"] = "Big Frog", ["color"] = red, ["active"] = isActiveEnemy},
 		[0x24] = {["name"] = "Octopus", ["color"] = red, ["hitbox_x"] = 8, ["hitbox_y"] = 8, ["active"] = isActiveEnemy}, -- Arm segment
-		[0x27] = {["name"] = "Blue Bear", ["color"] = pink},
-		[0x29] = {["name"] = "Projectile", ["color"] = red}, -- Monkey's projectile
-		[0x2A] = {["name"] = "Monkey", ["color"] = red},
+		[0x25] = {["name"] = "Blue Bear", ["direction"] = "Left", ["color"] = pink, ["active"] = isActiveEnemy}, -- Walking
+		[0x26] = {["name"] = "Blue Bear", ["direction"] = "Right", ["color"] = pink, ["active"] = isActiveEnemy}, -- Walking
+		[0x27] = {["name"] = "Blue Bear", ["direction"] = "Left", ["color"] = pink, ["active"] = isActiveEnemy}, -- Attacking
+		[0x28] = {["name"] = "Blue Bear", ["direction"] = "Right", ["color"] = pink, ["active"] = isActiveEnemy}, -- Attacking
+		[0x29] = {["name"] = "Projectile", ["color"] = red, ["hitbox_x"] = 8, ["hitbox_y"] = 8}, -- Monkey
+		[0x2A] = {["name"] = "Monkey", ["color"] = red, ["active"] = isActiveEnemy},
 		[0x2B] = {["name"] = "Dying"}, -- Small enemy
-		[0x2C] = {["name"] = "Plant", ["color"] = red, ["hitbox_x"] = 16, ["hitbox_y"] = 32, ["active"] = isActiveEnemy}, -- Moves up and down
+		[0x2C] = {["name"] = "Plant", ["color"] = red, ["hitbox_x"] = 16, ["hitbox_y"] = 40, ["active"] = isActiveEnemy}, -- Moves up and down
 		[0x2D] = {["name"] = "Bird", ["direction"] = "Left", ["color"] = red, ["hitbox_x"] = 24, ["hitbox_y"] = 16, ["active"] = isActiveEnemy},
 		[0x2E] = {["name"] = "Killer Fish", ["directoin"] = "Left", ["color"] = red, ["active"] = isActiveEnemy},
 		[0x2F] = {["name"] = "Frog", ["color"] = red, ["active"] = isActiveEnemy}, -- Small, Grounded
@@ -86,6 +89,7 @@ local object_fields = {
 		[0x47] = {["name"] = "OX", ["direction"] = "Left", ["color"] = pink, ["active"] = isActiveEnemy}, -- Hurt
 		[0x48] = {["name"] = "OX", ["direction"] = "Right", ["color"] = pink, ["active"] = isActiveEnemy},
 		[0x49] = {["name"] = "OX", ["direction"] = "Right", ["color"] = pink, ["active"] = isActiveEnemy}, -- Hurt
+		[0x4A] = {["name"] = "Blue Bear", ["color"] = pink, ["active"] = isActiveEnemy}, -- Hurt
 		[0x4B] = {["name"] = "Hidden Block", ["color"] = pink, ["active"] = isActiveEnemy},
 		[0x4D] = {["name"] = "Extra Life", ["color"] = pink},
 		[0x4E] = {["name"] = "Ring", ["color"] = pink},
@@ -96,7 +100,7 @@ local object_fields = {
 		[0x54] = {["name"] = "Rolling Rock", ["color"] = red, ["active"] = isActiveEnemy},
 		[0x55] = {["name"] = "Hopper", ["color"] = red, ["active"] = isActiveEnemy},
 		[0x56] = {["name"] = "Arrow", ["hitbox_x"] = 8, ["hitbox_y"] = 8}, -- Map
-		[0x57] = {["name"] = "Flame", ["color"] = red}, -- Stationary
+		[0x57] = {["name"] = "Flame", ["color"] = red, ["active"] = isActiveEnemy}, -- Stationary
 		[0x61] = {["name"] = "Crown Code Controller", ["color"] = pink},
 	},
 	["state"] = 0x01, -- Byte
