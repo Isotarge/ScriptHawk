@@ -5,6 +5,15 @@ SystemID SMS
 0023	b	u	0	Main RAM	Level
 0025	b	h	0	Main RAM	Lives
 0030	w	h	0	Main RAM	Money
+0046	b	h	0	Main RAM	Inventory: miniAlex Turret
+0047	b	h	0	Main RAM	Inventory: Shield
+0048	b	h	0	Main RAM	Inventory: Janken Reveal
+0049	b	h	0	Main RAM	Inventory: Cane
+004A	b	h	0	Main RAM	Inventory: Invincibility
+004B	b	h	0	Main RAM	Inventory: Yellow Jewel
+004C	b	h	0	Main RAM	Inventory: Scroll
+004D	b	h	0	Main RAM	Inventory: Ring
+004E	b	h	0	Main RAM	Inventory: Crown Code
 0054	b	h	0	Main RAM	Invincibility state
 005A	w	u	0	Main RAM	Invincibility timer
 007E	w	u	0	Main RAM	Game Over Timer

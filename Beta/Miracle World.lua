@@ -28,8 +28,14 @@ local object_fields = {
 		[0x02] = {["name"] = "Bullet", ["hitbox_x"] = 8, ["hitbox_y"] = 8},
 		[0x03] = {["name"] = "Explosion", ["color"] = yellow}, -- Vehicle dying
 		[0x04] = {["name"] = "Bullet"}, -- Dying
-		[0x0B] = {["name"] = "Janken Choice Display", ["hitbox_x"] = 32, ["hitbox_y"] = 32, ["color"] = pink}, -- Player
-		[0x0C] = {["name"] = "Janken Score Display"},
+		[0x05] = {["name"] = "miniAlex Turret", ["color"] = yellow}, -- Falling
+		[0x06] = {["name"] = "miniAlex Turret", ["color"] = yellow}, -- Active
+		[0x07] = {["name"] = "Shield Spawner", ["color"] = yellow},
+		[0x08] = {["name"] = "Shield", ["color"] = yellow},
+		[0x09] = {["name"] = "miniAlex", ["color"] = yellow},
+		[0x0A] = {["name"] = "miniAlex", ["color"] = yellow}, -- Falling
+		[0x0B] = {["name"] = "Janken Choice Display", ["hitbox_x"] = 32, ["hitbox_y"] = 32, ["color"] = yellow},
+		[0x0C] = {["name"] = "Janken Score Display", ["hitbox_x"] = 24, ["hitbox_y"] = 8, ["color"] = yellow},
 		[0x0D] = {["name"] = "Stone Head's Head", ["color"] = red},
 		[0x0E] = {["name"] = "Scissors Head's Head", ["color"] = red},
 		[0x0F] = {["name"] = "Paper Head's Head", ["color"] = red},
@@ -38,9 +44,9 @@ local object_fields = {
 		[0x13] = {["name"] = "Spike", ["color"] = red}, -- Loading
 		[0x14] = {["name"] = "Spike", ["color"] = red}, -- Falling
 		[0x15] = {["name"] = "Waterfall", ["color"] = red}, -- Falling
-		[0x16] = {["name"] = "Trapdoor", ["color"] = pink}, -- Opens when stepped on
+		[0x16] = {["name"] = "Trapdoor", ["color"] = pink, ["active"] = isActiveEnemy}, -- Opens when stepped on
 		[0x17] = {["name"] = "Trigger", ["color"] = pink}, -- For falling blocks
-		[0x18] = {["name"] = "Title Screen Sprite"},
+		[0x18] = {["name"] = "Title Screen Sprite", ["color"] = yellow},
 		[0x19] = {["name"] = "Projectile", ["hitbox_x"] = 8, ["hitbox_y"] = 8, ["color"] = red}, -- Janken Ninja Star
 		[0x1B] = {["name"] = "Projectile", ["hitbox_x"] = 8, ["hitbox_y"] = 8}, -- Ring
 		[0x1A] = {["name"] = "Projectile", ["hitbox_x"] = 8, ["hitbox_y"] = 8, ["color"] = red}, -- Scissors Head Ninja Star
@@ -91,17 +97,20 @@ local object_fields = {
 		[0x49] = {["name"] = "OX", ["direction"] = "Right", ["color"] = pink, ["active"] = isActiveEnemy}, -- Hurt
 		[0x4A] = {["name"] = "Blue Bear", ["color"] = pink, ["active"] = isActiveEnemy}, -- Hurt
 		[0x4B] = {["name"] = "Hidden Block", ["color"] = pink, ["active"] = isActiveEnemy},
+		[0x4C] = {["name"] = "Warp", ["color"] = pink, ["active"] = isActiveEnemy},
 		[0x4D] = {["name"] = "Extra Life", ["color"] = pink},
 		[0x4E] = {["name"] = "Ring", ["color"] = pink},
 		[0x4F] = {["name"] = "Ghost", ["color"] = red},
 		[0x50] = {["name"] = "Saint Nurari", ["color"] = yellow, ["active"] = isActiveEnemy}, -- Level 6
-		[0x51] = {["name"] = "Patricia", ["color"] = yellow}, -- Level 16
-		[0x52] = {["name"] = "Item", ["color"] = pink}, -- Helecopter, Crown, Blue circle with star
+		[0x51] = {["name"] = "Patricia", ["color"] = yellow, ["active"] = isActiveEnemy}, -- Level 16
+		[0x52] = {["name"] = "Item", ["color"] = pink, ["active"] = isActiveEnemy}, -- Helecopter, Crown, Blue circle with star
 		[0x54] = {["name"] = "Rolling Rock", ["color"] = red, ["active"] = isActiveEnemy},
 		[0x55] = {["name"] = "Hopper", ["color"] = red, ["active"] = isActiveEnemy},
 		[0x56] = {["name"] = "Arrow", ["hitbox_x"] = 8, ["hitbox_y"] = 8}, -- Map
 		[0x57] = {["name"] = "Flame", ["color"] = red, ["active"] = isActiveEnemy}, -- Stationary
+		[0x60] = {["name"] = "Crown Door Trigger", ["color"] = yellow, ["active"] = isActiveEnemy},
 		[0x61] = {["name"] = "Crown Code Controller", ["color"] = pink},
+		[0x63] = {["name"] = "Hidden Block", ["color"] = pink, ["active"] = isActiveEnemy},
 	},
 	["state"] = 0x01, -- Byte
 	["active"] = 0x09, -- u16, 0x0000
@@ -127,6 +136,10 @@ function toHexString(value, desiredLength, prefix)
 	return prefix..value;
 end
 
+local mouseClickedLastFrame = false;
+local startDragPosition = {0,0};
+local draggedObjects = {};
+
 function draw_ui()
 	local height = 16; -- Text row height
 	local width = 8; -- Text column width
@@ -138,6 +151,23 @@ function draw_ui()
 
 	-- Draw mouse pixel
 	--gui.drawPixel(mouse.X, mouse.Y, red);
+
+	local startDrag = false;
+	local dragging = false;
+	local dragTransform = {0, 0};
+	if mouse.Left then
+		if not mouseClickedLastFrame then
+			startDrag = true;
+			startDragPosition = {mouse.X, mouse.Y};
+		end
+		mouseClickedLastFrame = true;
+		dragging = true;
+		dragTransform = {mouse.X - startDragPosition[1], mouse.Y - startDragPosition[2]};
+	else
+		draggedObjects = {};
+		mouseClickedLastFrame = false;
+		dragging = false;
+	end
 
 	for i = 0, object_array_capacity do
 		local objectBase = object_array_base + (i * object_size);
@@ -191,6 +221,47 @@ function draw_ui()
 				end
 			end
 
+			if showHitbox then
+				if showInactive or objectActive then
+					if dragging then
+						for d = 1, #draggedObjects do
+							if draggedObjects[d][1] == objectBase then
+								xPosition = draggedObjects[d][2] + dragTransform[1];
+								yPosition = draggedObjects[d][3] + dragTransform[2];
+								mainmemory.writebyte(objectBase + object_fields.x_position, xPosition);
+								mainmemory.writebyte(objectBase + object_fields.y_position, yPosition);
+								--mainmemory.write_s8(objectBase + object_fields.x_velocity, 0);
+								--mainmemory.write_s8(objectBase + object_fields.y_velocity, 0);
+								break;
+							end
+						end
+					end
+
+					if (mouse.X >= xPosition and mouse.X <= xPosition + hitboxX) and (mouse.Y >= yPosition and mouse.Y <= yPosition + hitboxY) then
+						if startDrag then
+							table.insert(draggedObjects, {objectBase, xPosition, yPosition});
+						end
+
+						local mouseOverText = {
+							objectType,
+							toHexString(objectBase).." "..xPosition..","..yPosition,
+						};
+
+						local maxLength = -math.huge;
+						for t = 1, #mouseOverText do
+							maxLength = math.max(maxLength, string.len(mouseOverText[t]));
+						end
+						local safeX = math.min(xPosition, 256 - (maxLength * width));
+						local safeY = math.min(yPosition, 192 - (#mouseOverText * height));
+
+						for t = 1, #mouseOverText do
+							gui.drawText(safeX, safeY + ((t - 1) * height), mouseOverText[t], color);
+						end
+					end
+					gui.drawRectangle(xPosition, yPosition, hitboxX, hitboxY, color); -- Draw the object's hitbox
+				end
+			end
+
 			if showList then
 				local list_x_offset = 2;
 				local list_y_offset = 2;
@@ -198,29 +269,6 @@ function draw_ui()
 
 				gui.text(list_x_offset, list_y_offset + height * row, xPosition..", "..yPosition.." - "..objectType.." "..toHexString(objectBase), color, nil, 'bottomright');
 				row = row + 1;
-			end
-
-			if showHitbox then
-				if showInactive or objectActive then
-					if (mouse.X >= xPosition and mouse.X <= xPosition + hitboxX) and (mouse.Y >= yPosition and mouse.Y <= yPosition + hitboxY) then
-						local mouseOverText = {
-							objectType,
-							toHexString(objectBase).." "..xPosition..","..yPosition,
-						};
-
-						local maxLength = -math.huge;
-						for i = 1, #mouseOverText do
-							maxLength = math.max(maxLength, string.len(mouseOverText[i]));
-						end
-						local safeX = math.min(xPosition, 256 - (maxLength * width));
-						local safeY = math.min(yPosition, 192 - (#mouseOverText * height));
-
-						for i = 1, #mouseOverText do
-							gui.drawText(safeX, safeY + ((i - 1) * height), mouseOverText[i], color);
-						end
-					end
-					gui.drawRectangle(xPosition, yPosition, hitboxX, hitboxY, color); -- Draw the object's hitbox
-				end
 			end
 		end
 	end
