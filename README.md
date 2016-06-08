@@ -17,39 +17,42 @@ A collection of Lua scripts and RAM watches for [BizHawk](https://github.com/TAS
 1. Implement the API detailed in Docs/Design.txt, a template is provided at games/blank.lua
 2. Your module should reside in the games/ subdirectory
 3. Add detection for your game to ScriptHawk.lua
-4. Submit a pull request to this repository, or contact [@Isotarge](https://twitter.com/Isotarge)
+4. Submit a pull request to this repository, or contact [Isotarge](https://twitter.com/Isotarge)
 
 ##Supported Games
 ###Donkey Kong 64
-- Europe
-- Japan
-- Kiosk Demo
-- USA
+- All known versions supported
+- Object analysis tools including: List, Examine, Grab, Focus, Encircle, Zip
+- Bone displacement fix (disables audio)
+- Documentation of over 95% of permanent flags in USA save files
+
+![Donkey Kong 64 Support](Images/Promo/dk64.png)
+
+![Donkey Kong 64 Support](Images/Promo/dk64_ui.png)
 
 ###Banjo-Kazooie
-- Europe
-- Japan
-- USA 1.0 and 1.1
+- All known versions supported
+- Spawn objects (currently USA 1.0 only)
+- Object analysis tools: List, Examine, Encircle, Zip
+
+![Banjo-Kazooie Support](Images/Promo/bk_ui.png)
 
 ###Banjo-Tooie
-- Australia
-- Europe
-- Japan
-- USA
+- All known versions supported
 
 ###Conker's Bad Fur Day
-- Europe
-- USA
+- All known versions supported
 
 ###Diddy Kong Racing
-- Europe 1.0 and 1.1
-- Japan
-- USA 1.0 and 1.1
+- All known versions supported
+- Object analysis tools: List, Examine, Encircle, Zip
+- Autotapper, written by [Faschz](https://twitter.com/Faschz) with various improvements
+
+![DKR Support](Images/Promo/dkr_ui.png)
 
 ###Super Mario 64
-- Europe
-- Japan 1.0 and Shindou Edition
-- USA
+- All known versions supported
+- Object analysis tools: List, Examine
 
 ###The Legend of Zelda: Majora's Mask
 - Europe 1.0 and 1.1
@@ -76,6 +79,15 @@ While ScriptHawk does have basic support for OoT and MM there are people who are
 - Elmo's Number Journey (N64 only)
 - Elmo's Letter Adventure (N64 only)
 - Rayman 2 (N64 USA only)
+
+##Other Notable Scripts
+- Alex Kidd in Miracle World object viewer with drag and drop support
+- Tetris Attack bot, plays the game quite well using a simple sorting algorithm
+- Mr. Driller 2 bot
+- Dega .MMV reader
+- remove_klump.lua, [code golf](https://en.wikipedia.org/wiki/Code_golf) that removes Klumps from DK64 USA version
+- Legend of Galahad object viewer, written by [The8BitBeast](https://twitter.com/the8bitbeast)
+- Wonder Boy III RNG watch, written by [The8BitBeast](https://twitter.com/the8bitbeast)
 
 ##Support me
 If you like my work, consider donating [here](https://streamtip.com/t/isotarge)
