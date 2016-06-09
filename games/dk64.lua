@@ -3967,7 +3967,7 @@ function Game.setScore(index, name, score)
 end
 
 function Game.setHighScores()
-	-- TODO
+	-- TODO: Game.setHighScores
 end
 
 ]]--
@@ -4341,7 +4341,7 @@ Game.OSD = {
 	{"dY"},
 	{"dXZ"},
 	{"Velocity", Game.getVelocity},
-	--{"Accel", Game.getAcceleration}, -- TODO
+	--{"Accel", Game.getAcceleration}, -- TODO: Game.getAcceleration
 	{"Y Velocity", Game.getYVelocity},
 	{"Y Accel", Game.getYAcceleration},
 	{"Separator", 1},
@@ -4351,7 +4351,7 @@ Game.OSD = {
 	{"Separator", 1},
 	{"Rot. X", Game.getXRotation},
 	{"Facing", Game.getYRotation, Game.colorYRotation},
-	--{"Moving", Game.getMovingRotation}, -- TODO
+	--{"Moving", Game.getMovingRotation}, -- TODO: Game.getMovingRotation
 	{"Rot. Z", Game.getZRotation},
 	{"Movement", Game.getMovementState},
 	--{"Camera", Game.getCameraState},

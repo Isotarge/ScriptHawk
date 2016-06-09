@@ -918,7 +918,7 @@ Game.OSD = {
 	{"Separator", 1},
 	{"Rot. X", Game.getXRotation},
 	{"Facing", Game.getYRotation},
-	--{"Moving", Game.getMovingRotation}, -- TODO
+	--{"Moving", Game.getMovingRotation}, -- TODO: Game.getMovingRotation
 	{"Rot. Z", Game.getZRotation},
 };
 

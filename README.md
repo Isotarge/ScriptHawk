@@ -74,6 +74,7 @@ A collection of Lua scripts and RAM watches for [BizHawk](https://github.com/TAS
 While ScriptHawk does have basic support for OoT and MM there are people who are much more dedicated to these games than I will ever be. Check out the great work at the following GitHub repos for more comprehensive support:  
 - [notwa/mm](https://github.com/notwa/mm/tree/master/Lua)  
 - [RainingChain/Z64LuaHooks](https://github.com/RainingChain/Z64LuaHooks)  
+- [mattpilla/Majora-s-Mask-Lua-Scripts](https://github.com/mattpilla/Majora-s-Mask-Lua-Scripts)
 
 ##Partially Supported Games
 - Elmo's Number Journey (N64 only)
