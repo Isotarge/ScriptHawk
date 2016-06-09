@@ -1356,6 +1356,7 @@ local loading_zone_fields = {
 	["destination_map"] = 0x12, -- u16_be, index of Game.maps
 	["destination_exit"] = 0x14, -- u16_be
 	["fade_type"] = 0x16, -- u16_be?
+	["active"] = 0x39, -- Byte
 };
 
 function dumpLoadingZones()
@@ -2572,14 +2573,6 @@ local function ISGTimer()
 		timer_value = 0;
 		timer_start_frame = 0;
 		timer_started = false;
-	end
-
-	if timer_started then
-		local s = timer_value / 60;
-		local timer_string = string.format("%.2d:%05.2f", s / 60 % 60, s % 60);
-		gui.text(16, 16, "ISG Timer: "..timer_string, nil, nil, 'topright');
-	else
-		--gui.text(16, 16, "Waiting for ISG", nil, nil, 'topright');
 	end
 end
 
@@ -4206,6 +4199,15 @@ function Game.realTime()
 	forms.settext(ScriptHawk.UI.form_controls["Toggle Visibility Button"], current_invisify);
 	forms.settext(ScriptHawk.UI.form_controls["Moon Mode Button"], moon_mode);
 	drawGrabScriptUI();
+
+	-- Draw ISG timer
+	if timer_started then
+		local s = timer_value / 60;
+		local timer_string = string.format("%.2d:%05.2f", s / 60 % 60, s % 60);
+		gui.text(16, 16, "ISG Timer: "..timer_string, nil, nil, 'topright');
+	else
+		--gui.text(16, 16, "Waiting for ISG", nil, nil, 'topright');
+	end
 end
 
 function Game.eachFrame()
