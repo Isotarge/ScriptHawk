@@ -1359,12 +1359,13 @@ local loading_zone_fields = {
 	["active"] = 0x39, -- Byte
 };
 
-function dumpLoadingZones()
+function dumpLoadingZones() -- TODO: Add loading zones to object analysis tools
 	local loadingZoneArray = getLoadingZoneArray();
 	if isRDRAM(loadingZoneArray) then
 		local arraySize = mainmemory.read_u32_be(loadingZoneArray + object_size) / loading_zone_size;
 		for i = 0, arraySize do
-			local _type = mainmemory.read_u16_be(loadingZoneArray + (i * loading_zone_size) + loading_zone_fields.object_type);
+			local base = loadingZoneArray + (i * loading_zone_size);
+			local _type = mainmemory.read_u16_be(base + loading_zone_fields.object_type);
 			if loading_zone_fields.object_types[_type] ~= nil then
 				_type = loading_zone_fields.object_types[_type];
 			else
@@ -1372,18 +1373,17 @@ function dumpLoadingZones()
 			end
 			local data = {
 				{"Index", i},
-				{"Address", toHexString(loadingZoneArray + (i * loading_zone_size))},
+				{"Address", toHexString(base)},
 				{"Type", _type},
-				{"X Position", mainmemory.read_s16_be(loadingZoneArray + (i * loading_zone_size) + loading_zone_fields.x_position)},
-				{"Y Position", mainmemory.read_s16_be(loadingZoneArray + (i * loading_zone_size) + loading_zone_fields.y_position)},
-				{"Z Position", mainmemory.read_s16_be(loadingZoneArray + (i * loading_zone_size) + loading_zone_fields.z_position)},
+				{"X Position", mainmemory.read_s16_be(base + loading_zone_fields.x_position)},
+				{"Y Position", mainmemory.read_s16_be(base + loading_zone_fields.y_position)},
+				{"Z Position", mainmemory.read_s16_be(base + loading_zone_fields.z_position)},
 			};
 			if _type == "Loading Zone" then
-				table.insert(data, {"Destination Map", Game.maps[mainmemory.read_u16_be(loadingZoneArray + (i * loading_zone_size) + loading_zone_fields.destination_map) + 1]});
-				table.insert(data, {"Destination Exit", mainmemory.read_u16_be(loadingZoneArray + (i * loading_zone_size) + loading_zone_fields.destination_exit)});
-				table.insert(data, {"Fade", mainmemory.read_u16_be(loadingZoneArray + (i * loading_zone_size) + loading_zone_fields.fade_type)});
-			else
-				
+				table.insert(data, {"Destination Map", Game.maps[mainmemory.read_u16_be(base + loading_zone_fields.destination_map) + 1]});
+				table.insert(data, {"Destination Exit", mainmemory.read_u16_be(base + loading_zone_fields.destination_exit)});
+				table.insert(data, {"Fade", mainmemory.read_u16_be(base + loading_zone_fields.fade_type)});
+				table.insert(data, {"Active", mainmemory.readbyte(base + loading_zone_fields.active)});
 			end
 			for d = 1, #data do
 				print(data[d][1]..": "..(data[d][2] or "Unknown"));
