@@ -2,6 +2,7 @@ local Game = {};
 
 -- TODO: Need to put some grab script state up here because encircle uses it before they would normally be defined
 -- This can probably be fixed with a clever reshuffle of grab script state/functions
+local object_index = 1;
 local object_pointers = {};
 local radius = 100;
 encircle_enabled = false;
@@ -11,6 +12,8 @@ local grab_script_modes = {
 	"Examine (Object Model 1)",
 	"List (Object Model 2)",
 	"Examine (Object Model 2)",
+	"List (Loading Zones)",
+	"Examine (Loading Zones)",
 };
 local grab_script_mode_index = 1;
 grab_script_mode = grab_script_modes[grab_script_mode_index];
@@ -35,7 +38,8 @@ Game.Memory = {
 	["map"] = {0x7444E4, 0x73EC34, 0x743DA4, 0x72CDE4},
 	["map_state"] = {0x76A0B1, 0x764BD1, 0x76A2A1, 0x72CDED},
 	["exit"] = {0x7444E8, 0x73EC38, 0x743DA8, 0x72CDE8},
-	["loading_zone_array"] = {0x7FDCB4, nil, nil, nil},
+	["loading_zone_array"] = {0x7FDCB4, nil, nil, nil}, -- TODO: Other versions
+	["loading_zone_array_size"] = {0x7FDCB0, nil, nil, nil}, -- u16_be -- TODO: Other versions
 	["file"] = {0x7467C8, 0x740F18, 0x746088, nil},
 	["character"] = {0x74E77C, 0x748EDC, 0x74E05C, 0x6F9EB8},
 	["tb_void_byte"] = {0x7FBB63, 0x7FBA83, 0x7FBFD3, 0x7B5B13},
@@ -1348,7 +1352,7 @@ local loading_zone_fields = {
 		[0x0C] = "Loading Zone",
 		[0x0D] = "Loading Zone",
 		[0x10] = "Loading Zone",
-		-- [0x11] = "Cutscene Trigger", -- Snide's
+		[0x11] = "Loading Zone", -- Snide's
 		-- [0x13] = "Unknown - Caves Lobby", -- Behind ice walls
 		[0x15] = "Cutscene Trigger",
 		[0x17] = "Cutscene Trigger",
@@ -1359,46 +1363,51 @@ local loading_zone_fields = {
 	["active"] = 0x39, -- Byte
 };
 
-function dumpLoadingZones() -- TODO: Add loading zones to object analysis tools
-	local loadingZoneArray = getLoadingZoneArray();
-	if isRDRAM(loadingZoneArray) then
-		local arraySize = mainmemory.read_u32_be(loadingZoneArray + object_size) / loading_zone_size;
-		for i = 0, arraySize do
-			local base = loadingZoneArray + (i * loading_zone_size);
-			local _type = mainmemory.read_u16_be(base + loading_zone_fields.object_type);
-			if loading_zone_fields.object_types[_type] ~= nil then
-				_type = loading_zone_fields.object_types[_type];
+function getExamineDataLoadingZone(base)
+	local data = {};
+	if isRDRAM(base) then
+		local _type = mainmemory.read_u16_be(base + loading_zone_fields.object_type);
+		if loading_zone_fields.object_types[_type] ~= nil then
+			_type = loading_zone_fields.object_types[_type];
+		else
+			_type = toHexString(_type);
+		end
+		table.insert(data, {"Address", toHexString(base)});
+		table.insert(data, {"Type", _type});
+		table.insert(data, {"Separator", 1});
+
+		table.insert(data, {"X Position", mainmemory.read_s16_be(base + loading_zone_fields.x_position)});
+		table.insert(data, {"Y Position", mainmemory.read_s16_be(base + loading_zone_fields.y_position)});
+		table.insert(data, {"Z Position", mainmemory.read_s16_be(base + loading_zone_fields.z_position)});
+		table.insert(data, {"Separator", 1});
+
+		if _type == "Loading Zone" then
+			local destinationMap = mainmemory.read_u16_be(base + loading_zone_fields.destination_map);
+			if Game.maps[destinationMap + 1] ~= nil then
+				destinationMap = Game.maps[destinationMap + 1];
 			else
-				_type = toHexString(_type);
+				destinationMap = "Unknown Map "..toHexString(destinationMap);
 			end
-			local data = {
-				{"Index", i},
-				{"Address", toHexString(base)},
-				{"Type", _type},
-				{"X Position", mainmemory.read_s16_be(base + loading_zone_fields.x_position)},
-				{"Y Position", mainmemory.read_s16_be(base + loading_zone_fields.y_position)},
-				{"Z Position", mainmemory.read_s16_be(base + loading_zone_fields.z_position)},
-			};
-			if _type == "Loading Zone" then
-				table.insert(data, {"Destination Map", Game.maps[mainmemory.read_u16_be(base + loading_zone_fields.destination_map) + 1]});
-				table.insert(data, {"Destination Exit", mainmemory.read_u16_be(base + loading_zone_fields.destination_exit)});
-				table.insert(data, {"Fade", mainmemory.read_u16_be(base + loading_zone_fields.fade_type)});
-				table.insert(data, {"Active", mainmemory.readbyte(base + loading_zone_fields.active)});
-			end
-			for d = 1, #data do
-				print(data[d][1]..": "..(data[d][2] or "Unknown"));
-			end
-			print();
+			table.insert(data, {"Destination Map", destinationMap});
+			table.insert(data, {"Destination Exit", mainmemory.read_u16_be(base + loading_zone_fields.destination_exit)});
+			table.insert(data, {"Fade", mainmemory.read_u16_be(base + loading_zone_fields.fade_type)});
+			table.insert(data, {"Active", mainmemory.readbyte(base + loading_zone_fields.active)});
 		end
 	end
+	return data;
 end
 
-function zipToLZ(index)
+function populateLoadingZonePointers()
 	local loadingZoneArray = getLoadingZoneArray();
 	if isRDRAM(loadingZoneArray) then
-		Game.setXPosition(mainmemory.read_s16_be(loadingZoneArray + (index * loading_zone_size) + loading_zone_fields.x_position));
-		Game.setYPosition(mainmemory.read_s16_be(loadingZoneArray + (index * loading_zone_size) + loading_zone_fields.y_position));
-		Game.setZPosition(mainmemory.read_s16_be(loadingZoneArray + (index * loading_zone_size) + loading_zone_fields.z_position));
+		object_pointers = {};
+		local arraySize = mainmemory.read_u16_be(Game.Memory.loading_zone_array_size[version]);
+		for i = 0, arraySize do
+			table.insert(object_pointers, loadingZoneArray + (i * loading_zone_size));
+		end
+
+		-- Clamp index
+		object_index = math.min(object_index, math.max(1, #object_pointers));
 	end
 end
 
@@ -3442,8 +3451,6 @@ end
 -- Grab Script --
 -----------------
 
-local object_index = 1;
-
 hide_non_scripted = false;
 rat_enabled = false;
 
@@ -3508,6 +3515,13 @@ local function zipToSelectedObject()
 				desiredX = mainmemory.readfloat(selectedActorBase + obj_model2.x_pos, true);
 				desiredY = mainmemory.readfloat(selectedActorBase + obj_model2.y_pos, true);
 				desiredZ = mainmemory.readfloat(selectedActorBase + obj_model2.z_pos, true);
+			end
+		elseif stringContains(grab_script_mode, "Loading Zones") then
+			local selectedLoadingZoneBase = object_pointers[object_index];
+			if isRDRAM(selectedLoadingZoneBase) then
+				desiredX = mainmemory.read_s16_be(selectedLoadingZoneBase + loading_zone_fields.x_position);
+				desiredY = mainmemory.read_s16_be(selectedLoadingZoneBase + loading_zone_fields.y_position);
+				desiredZ = mainmemory.read_s16_be(selectedLoadingZoneBase + loading_zone_fields.z_position);
 			end
 		end
 
@@ -3723,6 +3737,10 @@ local function drawGrabScriptUI()
 		encirclePlayerObjectModel2();
 	end
 
+	if stringContains(grab_script_mode, "Loading Zones") then
+		populateLoadingZonePointers();
+	end
+
 	if rat_enabled then
 		local renderingParams = dereferencePointer(playerObject + obj_model1.rendering_parameters_pointer);
 		if isRDRAM(renderingParams) then
@@ -3780,6 +3798,8 @@ local function drawGrabScriptUI()
 				examine_data = getExamineDataModelOne(object_pointers[object_index]);
 			elseif grab_script_mode == "Examine (Object Model 2)" then
 				examine_data = getExamineDataModelTwo(object_pointers[object_index]);
+			elseif grab_script_mode == "Examine (Loading Zones)" then
+				examine_data = getExamineDataLoadingZone(object_pointers[object_index]);
 			end
 
 			for i = #examine_data, 1, -1 do
@@ -3837,6 +3857,40 @@ local function drawGrabScriptUI()
 				if not (behaviorPointer == "" and hide_non_scripted) then
 					gui.text(gui_x, gui_y + height * row, i..": "..toHexString(object_pointers[i] or 0, 6)..behaviorType..behaviorPointer, color, nil, 'bottomright');
 					row = row + 1;
+				end
+			end
+		end
+
+		if grab_script_mode == "List (Loading Zones)" then
+			for i = #object_pointers, 1, -1 do
+				local color = nil;
+				if object_index == i then
+					color = green_highlight
+				end
+
+				local base = object_pointers[i];
+				if isRDRAM(base) then
+					local _type = mainmemory.read_u16_be(base + loading_zone_fields.object_type);
+					if loading_zone_fields.object_types[_type] ~= nil then
+						_type = loading_zone_fields.object_types[_type];
+					else
+						_type = toHexString(_type);
+					end
+					if _type == "Loading Zone" then
+						local destinationMap = mainmemory.read_u16_be(base + loading_zone_fields.destination_map);
+						if Game.maps[destinationMap + 1] ~= nil then
+							destinationMap = Game.maps[destinationMap + 1];
+						else
+							destinationMap = "Unknown Map "..toHexString(destinationMap);
+						end
+						local destinationExit = mainmemory.read_u16_be(base + loading_zone_fields.destination_exit);
+						gui.text(gui_x, gui_y + height * row, destinationMap.." ("..destinationExit..") "..toHexString(base or 0, 6).." "..i, color, nil, 'bottomright');
+						row = row + 1;
+					else
+						-- TODO: Figure out cutscene index
+						gui.text(gui_x, gui_y + height * row, _type.." "..toHexString(base or 0, 6).." "..i, color, nil, 'bottomright');
+						row = row + 1;
+					end
 				end
 			end
 		end

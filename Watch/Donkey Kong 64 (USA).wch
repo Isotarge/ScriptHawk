@@ -582,5 +582,6 @@ SystemID N64
 7FCC4B	b	u	1	RDRAM	Health
 7FCC4C	b	u	1	RDRAM	Melons
 7FDC90	d	h	1	RDRAM	Boss pointer
+7FDCB0	w	u	1	RDRAM	Loading Zone Array Size
 7FDCB4	d	h	1	RDRAM	Loading Zone Array Pointer
 
