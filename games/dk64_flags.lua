@@ -1,14 +1,4 @@
 local flag_array = {
-	---------------------------
-	-- Needs further testing --
-	---------------------------
-
-	{["byte"] = 0x38, ["bit"] = 5, ["name"] = "? Definitely not entering Japes"}, -- TODO: Test this
-
-	-----------
-	-- Known --
-	-----------
-
 	{["byte"] = 0x00, ["bit"] = 0, ["name"] = "Japes: DK Switch by entrance"},
 	{["byte"] = 0x00, ["bit"] = 1, ["name"] = "Japes: Lanky GB: Mad Maze Maul", ["type"] = "GB"},
 	{["byte"] = 0x00, ["bit"] = 2, ["name"] = "Japes: Tiny GB: Splish-Splash Salvage", ["type"] = "GB"},
