@@ -38,8 +38,8 @@ Game.Memory = {
 	["map"] = {0x7444E4, 0x73EC34, 0x743DA4, 0x72CDE4},
 	["map_state"] = {0x76A0B1, 0x764BD1, 0x76A2A1, 0x72CDED},
 	["exit"] = {0x7444E8, 0x73EC38, 0x743DA8, 0x72CDE8},
-	["loading_zone_array"] = {0x7FDCB4, nil, nil, nil}, -- TODO: Other versions
-	["loading_zone_array_size"] = {0x7FDCB0, nil, nil, nil}, -- u16_be -- TODO: Other versions
+	["loading_zone_array"] = {0x7FDCB4, 0x7FDBF4, 0x7FE144, nil}, -- TODO: Kiosk
+	["loading_zone_array_size"] = {0x7FDCB0, 0x7FDBF0, 0x7FE140, nil}, -- u16_be -- TODO: Kiosk
 	["file"] = {0x7467C8, 0x740F18, 0x746088, nil},
 	["character"] = {0x74E77C, 0x748EDC, 0x74E05C, 0x6F9EB8},
 	["tb_void_byte"] = {0x7FBB63, 0x7FBA83, 0x7FBFD3, 0x7B5B13},
@@ -1336,7 +1336,9 @@ end
 --------------------------------
 
 function getLoadingZoneArray()
-	return dereferencePointer(Game.Memory.loading_zone_array[version]);
+	if version ~= 4 then
+		return dereferencePointer(Game.Memory.loading_zone_array[version]);
+	end
 end
 
 local loading_zone_size = 0x3A;

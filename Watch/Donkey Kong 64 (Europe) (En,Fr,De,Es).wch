@@ -416,4 +416,6 @@ SystemID N64
 7FCB88	w	u	1	RDRAM	Film
 7FCB8B	b	u	1	RDRAM	Health
 7FCB8C	b	u	1	RDRAM	Melons
+7FDBF0	w	u	1	RDRAM	Loading Zone Array Size
+7FDBF4	d	h	1	RDRAM	Loading Zone Array Pointer
 
