@@ -839,6 +839,10 @@ obj_model1 = {
 		[0x88] = "Exiting Portal",
 	},
 	["texture_renderer_pointer"] = 0x158, -- u32_be
+	["texture_renderer"] = {
+		["texture_index"] = 0x0C, -- u16_be
+		["next_renderer"] = 0x24, -- Pointer
+	},
 	["shade_byte"] = 0x16D,
 	["player"] = {
 		["animation_type"] = 0x181, -- Seems to be the same value as control_states
@@ -4068,12 +4072,8 @@ end
 -- Color setters --
 -------------------
 
--- TODO: Put these in a table
-local texture_renderer_texture_index = 0x0C; -- u16_be
-local texture_renderer_next_renderer = 0x24; -- u32_be
-
 function getNextTextureRenderer(texturePointer)
-	return dereferencePointer(texturePointer + texture_renderer_next_renderer);
+	return dereferencePointer(texturePointer + obj_model1.texture_renderer.next_renderer);
 end
 
 function Game.getTextureRenderers()
@@ -4111,11 +4111,11 @@ function Game.setDKColors()
 			texturePointer = getNextTextureRenderer(texturePointer); -- Skip eyes
 
 			-- 1 Body
-			mainmemory.write_u16_be(texturePointer + texture_renderer_texture_index, DKBodyColors[math.random(1, #DKBodyColors)][2]);
+			mainmemory.write_u16_be(texturePointer + obj_model1.texture_renderer.texture_index, DKBodyColors[math.random(1, #DKBodyColors)][2]);
 			texturePointer = getNextTextureRenderer(texturePointer);
 
 			-- 2 Tie Outer
-			mainmemory.write_u16_be(texturePointer + texture_renderer_texture_index, DKTieColors[math.random(1, #DKTieColors)][2]);
+			mainmemory.write_u16_be(texturePointer + obj_model1.texture_renderer.texture_index, DKTieColors[math.random(1, #DKTieColors)][2]);
 
 			-- TODO: Tie inner
 		end
@@ -4141,7 +4141,7 @@ function Game.setDiddyColors()
 			texturePointer = getNextTextureRenderer(texturePointer); -- Skip Right eye
 
 			-- 3 Hat
-			mainmemory.write_u16_be(texturePointer + texture_renderer_texture_index, DiddyHatColors[math.random(1, #DiddyHatColors)][2]);
+			mainmemory.write_u16_be(texturePointer + obj_model1.texture_renderer.texture_index, DiddyHatColors[math.random(1, #DiddyHatColors)][2]);
 		end
 	end
 end
@@ -4162,7 +4162,7 @@ function Game.setLankyColors()
 			texturePointer = getNextTextureRenderer(texturePointer); -- Skip eyes
 
 			-- 1 Top
-			mainmemory.write_u16_be(texturePointer + texture_renderer_texture_index, LankyTopColors[math.random(1, #LankyTopColors)][2]);
+			mainmemory.write_u16_be(texturePointer + obj_model1.texture_renderer.texture_index, LankyTopColors[math.random(1, #LankyTopColors)][2]);
 
 			-- TODO: Bottom
 		end
@@ -4185,7 +4185,7 @@ function Game.setTinyColors()
 			texturePointer = getNextTextureRenderer(texturePointer); -- Skip Right eye
 
 			-- 3 Body
-			mainmemory.write_u16_be(texturePointer + texture_renderer_texture_index, TinyBodyColors[math.random(1, #TinyBodyColors)][2]);
+			mainmemory.write_u16_be(texturePointer + obj_model1.texture_renderer.texture_index, TinyBodyColors[math.random(1, #TinyBodyColors)][2]);
 		end
 	end
 end
@@ -4216,11 +4216,11 @@ function Game.setChunkyColors()
 			texturePointer = getNextTextureRenderer(texturePointer); -- Skip Eyes
 
 			-- 1 Back
-			mainmemory.write_u16_be(texturePointer + texture_renderer_texture_index, ChunkyBackColors[math.random(1, #ChunkyBackColors)][2]);
+			mainmemory.write_u16_be(texturePointer + obj_model1.texture_renderer.texture_index, ChunkyBackColors[math.random(1, #ChunkyBackColors)][2]);
 			texturePointer = getNextTextureRenderer(texturePointer);
 
 			-- 2 Front
-			mainmemory.write_u16_be(texturePointer + texture_renderer_texture_index, ChunkyFrontColors[math.random(1, #ChunkyFrontColors)][2]);
+			mainmemory.write_u16_be(texturePointer + obj_model1.texture_renderer.texture_index, ChunkyFrontColors[math.random(1, #ChunkyFrontColors)][2]);
 		end
 	end
 end
@@ -4240,7 +4240,7 @@ function Game.setKrushaColors()
 			texturePointer = getNextTextureRenderer(texturePointer); -- Skip Eyes
 
 			-- 2 Body
-			mainmemory.write_u16_be(texturePointer + texture_renderer_texture_index, TinyBodyColors[math.random(1, #TinyBodyColors)][2]);
+			mainmemory.write_u16_be(texturePointer + obj_model1.texture_renderer.texture_index, TinyBodyColors[math.random(1, #TinyBodyColors)][2]);
 		end
 	end
 end
