@@ -178,7 +178,7 @@ SystemID N64
 755308	w	b	1	RDRAM	Buttons Enabled (Bitfield)
 75530C	b	b	1	RDRAM	Joystick X Bits Enabled
 755310	b	b	1	RDRAM	Joystick Y Bits Enabled
-755314	b	u	1	RDRAM	Mode
+755314	b	u	1	RDRAM	Mode (Copy)
 755318	b	u	1	RDRAM	Mode
 75531C	w	u	1	RDRAM	Demo fadeout timer
 755320	d	u	1	RDRAM	Frames in current demo

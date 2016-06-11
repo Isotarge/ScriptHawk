@@ -64,7 +64,7 @@ SystemID N64
 74FB88	w	b	1	RDRAM	Buttons Enabled (Bitfield)
 74FB8C	b	b	1	RDRAM	Joystick X Bits Enabled
 74FB90	b	b	1	RDRAM	Joystick Y Bits Enabled
-74FB94	b	u	1	RDRAM	Mode
+74FB94	b	u	1	RDRAM	Mode (Copy)
 74FB98	b	u	1	RDRAM	Mode
 756E72	w	h	1	RDRAM	DK Behavior
 756E7A	w	h	1	RDRAM	DK Model

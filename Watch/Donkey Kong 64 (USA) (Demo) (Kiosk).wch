@@ -9,7 +9,7 @@ SystemID N64
 6FFE5C	w	b	1	RDRAM	Buttons Enabled (Bitfield)
 6FFE60	b	b	1	RDRAM	Joystick X Bits Enabled
 6FFE64	b	b	1	RDRAM	Joystick Y Bits Enabled
-6FFE68	b	u	1	RDRAM	Mode
+6FFE68	b	u	1	RDRAM	Mode (Copy)
 6FFE6C	b	u	1	RDRAM	Mode
 6FFE70	w	u	1	RDRAM	Demo Fadeout Timer
 6FFE74	d	u	1	RDRAM	Frames in current map

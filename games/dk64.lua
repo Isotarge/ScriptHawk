@@ -35,6 +35,7 @@ end
 	-- 1 u32_be
 local version; -- 1 USA, 2 Europe, 3 Japan, 4 Kiosk
 Game.Memory = {
+	["mode"] = {0x755318, 0x74FB98, 0x7553D8, 0x6FFE6C},
 	["map"] = {0x7444E4, 0x73EC34, 0x743DA4, 0x72CDE4},
 	["map_state"] = {0x76A0B1, 0x764BD1, 0x76A2A1, 0x72CDED},
 	["exit"] = {0x7444E8, 0x73EC38, 0x743DA8, 0x72CDE8},
@@ -66,6 +67,32 @@ Game.Memory = {
 	["obj_model2_collision_linked_list_pointer"] = {0x754244, 0x74E9A4, 0x753B34, 0x6FF054},
 	["rambiBase"] = {0x744548, 0x73EC98, 0x743E08, nil}, -- High score base
 };
+
+Game.modes = {
+	[0] = "Nintendo Logo",
+	[1] = "Opening Cutscene",
+	[2] = "DK Rap",
+	[3] = "DK TV",
+	-- 4 is unknown
+	[5] = "Main Menu",
+	[6] = "Adventure",
+	[7] = "Quit Game",
+	-- 8 is unknown
+	[9] = "Game Over",
+	[10] = "End Sequence",
+	[11] = "DK Theatre",
+	[12] = "Mystery Menu Minigame",
+	[13] = "Snide's Bonus Game",
+	[14] = "End Sequence (DK Theatre)",
+};
+
+function Game.getCurrentMode()
+	local modeValue = mainmemory.readbyte(Game.Memory.mode[version]);
+	if Game.modes[modeValue] ~= nil then
+		return Game.modes[modeValue];
+	end
+	return "Unknown "..modeValue;
+end
 
 local flag_array = {};
 local flag_names = {};
@@ -760,7 +787,7 @@ obj_model1 = {
 		[0x35] = "Damaged", -- Klump knockback
 		[0x36] = "Death",
 		[0x37] = "Damaged", -- Underwater
-		--[0x38] == "Crash",
+		--[0x38] = "Crash",
 		[0x39] = "Shrinking",
 		[0x3C] = "Crouching",
 		[0x3D] = "Uncrouching",
@@ -838,9 +865,11 @@ obj_model1 = {
 		[0x87] = "Entering Portal",
 		[0x88] = "Exiting Portal",
 	},
-	["texture_renderer_pointer"] = 0x158, -- u32_be
+	["texture_renderer_pointer"] = 0x158, -- Pointer
 	["texture_renderer"] = {
 		["texture_index"] = 0x0C, -- u16_be
+		--["unknown_float"] = 0x10, -- Float -- TODO
+		--["unknown_float"] = 0x14, -- Float -- TODO
 		["next_renderer"] = 0x24, -- Pointer
 	},
 	["shade_byte"] = 0x16D,
@@ -956,6 +985,7 @@ local function getExamineDataModelOne(pointer)
 		table.insert(examine_data, { "Model", toHexString(modelPointer, 6) });
 		table.insert(examine_data, { "Rendering Params", toHexString(renderingParametersPointer, 6) });
 		table.insert(examine_data, { "Bone Array", toHexString(boneArrayPointer, 6) });
+		table.insert(examine_data, { "Texture Renderer", toHexString(dereferencePointer(pointer + obj_model1.texture_renderer_pointer) or 0)});
 		table.insert(examine_data, { "Separator", 1 });
 	end
 
@@ -2142,6 +2172,7 @@ function Game.setMovementState(value)
 		mainmemory.writebyte(playerObject + obj_model1.control_state_byte, value);
 	end
 end
+Game.setControlState = Game.setMovementState;
 
 -- TODO: Game.getWaterHeight()
 
@@ -4424,6 +4455,7 @@ Game.OSD = {
 	--{"Moving", Game.getMovingRotation}, -- TODO: Game.getMovingRotation
 	{"Rot. Z", Game.getZRotation},
 	{"Movement", Game.getMovementState},
+	--{"Mode", Game.getCurrentMode},
 	--{"Camera", Game.getCameraState},
 	{"Separator", 1},
 	{"Bone Array 1", Game.getOSDBoneArray1},
