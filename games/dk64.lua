@@ -897,7 +897,7 @@ obj_model1 = {
 		["Lanky_actor_pointer"] = 0x188,
 		["Tiny_actor_pointer"] = 0x18C,
 		["Chunky_actor_pointer"] = 0x190,
-		["kickout_timer"] = 0x1B4, -- TODO: what's the max value for this again? I seem to recall 9000... legit...
+		["kickout_timer"] = 0x1B4, -- Kicks the player out of the tag barrel at >= 9000
 	},
 	["text_overlay"] = {
 		["text_shown"] = 0x1EE, -- u16 be
@@ -907,7 +907,7 @@ obj_model1 = {
 		["melons_remaining"] = 0x1A3,
 		["slot_pointer_base"] = 0x1A8,
 	},
-	["main_menu_controller"] = { -- TODO: Add these to the analysis tools
+	["main_menu_controller"] = {
 		["menu_screen"] = 0x18A,
 		["menu_position"] = 0x18F,
 	},
@@ -944,7 +944,8 @@ local function getExamineDataModelOne(pointer)
 	table.insert(examine_data, { "Actor base", toHexString(pointer, 6) });
 	table.insert(examine_data, { "Actor size", toHexString(mainmemory.read_u32_be(pointer + object_size)) });
 	local currentActorTypeNumeric = mainmemory.read_u32_be(pointer + obj_model1.actor_type);
-	table.insert(examine_data, { "Actor type", getActorName(pointer) });
+	local currentActorType = getActorName(pointer); -- Needed for detecting special fields
+	table.insert(examine_data, { "Actor type", currentActorType });
 	table.insert(examine_data, { "Separator", 1 });
 
 	if hasModel then
@@ -1078,9 +1079,14 @@ local function getExamineDataModelOne(pointer)
 			table.insert(examine_data, { "Slot "..i.." pointer", toHexString(mainmemory.read_u32_be(pointer + obj_model1.kosh_kontroller.slot_pointer_base + (i - 1) * 4), 8) });
 		end
 		table.insert(examine_data, { "Separator", 1 });
-	elseif currentActorTypeNumeric == 330 then -- Bug: Big Bug Bash -- TODO: Pop these into model 1 table
-		table.insert(examine_data, { "Current AI direction", mainmemory.readfloat(pointer + 0x180) });
-		table.insert(examine_data, { "Ticks til direction change", mainmemory.read_u32_be(pointer + 0x184) });
+	elseif currentActorType == "Bug" then -- Big Bug Bash
+		table.insert(examine_data, { "Current AI direction", mainmemory.readfloat(pointer + 0x180) }); -- TODO: Pop these into model 1 table
+		table.insert(examine_data, { "Ticks til direction change", mainmemory.read_u32_be(pointer + 0x184) }); -- TODO: These possibly apply to other AI objects
+		table.insert(examine_data, { "Separator", 1 });
+	elseif currentActorType == "Main Menu Controller" then
+		table.insert(examine_data, { "Menu Screen", mainmemory.readbyte(pointer + obj_model1.main_menu_controller.menu_screen) });
+		table.insert(examine_data, { "Menu Position", mainmemory.readbyte(pointer + obj_model1.main_menu_controller.menu_position) });
+		table.insert(examine_data, { "Separator", 1 });
 	end
 
 	return examine_data;
