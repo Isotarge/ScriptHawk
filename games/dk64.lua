@@ -1395,14 +1395,18 @@ function getExamineDataLoadingZone(base)
 			table.insert(data, {"Fade", mainmemory.read_u16_be(base + loading_zone_fields.fade_type)});
 			table.insert(data, {"Active", mainmemory.readbyte(base + loading_zone_fields.active)});
 		end
+
+		if _type == "Cutscene Trigger" then
+			table.insert(data, {"Cutscene Index", mainmemory.read_u16_be(base + loading_zone_fields.destination_map)});
+		end
 	end
 	return data;
 end
 
 function populateLoadingZonePointers()
+	object_pointers = {};
 	local loadingZoneArray = getLoadingZoneArray();
 	if isRDRAM(loadingZoneArray) then
-		object_pointers = {};
 		local arraySize = mainmemory.read_u16_be(Game.Memory.loading_zone_array_size[version]);
 		for i = 0, arraySize do
 			table.insert(object_pointers, loadingZoneArray + (i * loading_zone_size));
@@ -3564,10 +3568,10 @@ local function isValidModel1Object(pointer, playerObject, cameraObject)
 end
 
 local function populateObjectModel1Pointers()
+	object_pointers = {};
 	local playerObject = Game.getPlayerObject();
 	local cameraObject = dereferencePointer(Game.Memory["camera_pointer"][version]);
 	if isRDRAM(playerObject) and isRDRAM(cameraObject) then
-		object_pointers = {};
 		for object_no = 0, max_objects do
 			local pointer = dereferencePointer(Game.Memory["pointer_list"][version] + (object_no * 4));
 			if isRDRAM(pointer) and isValidModel1Object(pointer, playerObject, cameraObject) then
@@ -3888,8 +3892,10 @@ local function drawGrabScriptUI()
 						local destinationExit = mainmemory.read_u16_be(base + loading_zone_fields.destination_exit);
 						gui.text(gui_x, gui_y + height * row, destinationMap.." ("..destinationExit..") "..toHexString(base or 0, 6).." "..i, color, nil, 'bottomright');
 						row = row + 1;
+					elseif _type == "Cutscene Trigger" then
+						gui.text(gui_x, gui_y + height * row, _type.." ("..mainmemory.read_u16_be(base + loading_zone_fields.destination_map)..") "..toHexString(base or 0, 6).." "..i, color, nil, 'bottomright');
+						row = row + 1;
 					else
-						-- TODO: Figure out cutscene index
 						gui.text(gui_x, gui_y + height * row, _type.." "..toHexString(base or 0, 6).." "..i, color, nil, 'bottomright');
 						row = row + 1;
 					end
