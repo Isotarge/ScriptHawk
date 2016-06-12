@@ -7,6 +7,7 @@ local red = 0xFFFF0000;
 local yellow = 0xFFFFFF00;
 local green = 0xFF00FF00;
 local pink = 0xFFFF00FF;
+local black = 0xFF000000;
 
 -- Game state
 local object_array_base = 0xE80;
@@ -14,7 +15,7 @@ local object_size = 0x21;
 local object_array_capacity = 26;
 
 local maxPlayerProjectiles = 3;
-local maxEnemies = 0; -- TODO: Figure out max enemies
+local maxEnemies = 7;
 local maxEnemyProjectiles = 0; -- TODO: Figure out max enemy projectiles
 
 local object_fields = {
@@ -23,21 +24,31 @@ local object_fields = {
 		[0x01] = {["name"] = "Player", ["color"] = yellow},
 		[0x02] = {["name"] = "Player Projectile", ["color"] = yellow},
 		[0x03] = {["name"] = "Player Projectile", ["color"] = yellow},
-		[0x04] = {["name"] = "Boss", ["color"] = red},
+		[0x04] = {["name"] = "Boss", ["color"] = pink},
+		[0x06] = {["name"] = "Boss Projectile", ["isEnemyProjectile"] = true, ["color"] = red}, -- Spinny big thing
 		[0x09] = {["name"] = "Enemy Projectile", ["isEnemyProjectile"] = true, ["color"] = red}, -- Small projectile
 		[0x0B] = {["name"] = "Red Scroll", ["color"] = pink},
-		[0x0C] = {["name"] = "Blue Scroll", ["color"] = pink}
+		[0x0C] = {["name"] = "Blue Scroll", ["color"] = pink},
 		[0x0D] = {["name"] = "Green Scroll", ["color"] = pink},
+		[0x0F] = {["name"] = "Enemy Dying", ["isEnemy"] = true},
 		[0x10] = {["name"] = "Grey Enemy", ["isEnemy"] = true},
+		[0x11] = {["name"] = "Blue Enemy", ["isEnemy"] = true},
+		[0x12] = {["name"] = "Grey Enemy", ["isEnemy"] = true},
 		[0x13] = {["name"] = "Grey Enemy", ["isEnemy"] = true},
 		[0x16] = {["name"] = "Grey Enemy", ["isEnemy"] = true}, -- Scythe
 		[0x17] = {["name"] = "Boulder Enemy", ["isEnemy"] = true},
-		[0x1C] = {["name"] = "Wolf Enemy", ["isEnemy"] = true},
+		[0x18] = {["name"] = "Popup Enemy", ["isEnemy"] = true}, -- Level 2
+		[0x1A] = {["name"] = "Bouncing Boulder", ["isEnemy"] = true}, -- Level 2
+		[0x1A] = {["name"] = "Bouncing Boulder Shadow"}, -- Level 2
+		[0x1C] = {["name"] = "Wolf", ["isEnemy"] = true},
 		[0x1F] = {["name"] = "Enemy Projectile", ["isEnemyProjectile"] = true, ["color"] = red}, -- Scythe
 		[0x20] = {["name"] = "Grey Enemy"}, -- From boulder
-		[0x2D] = {["name"] = "Boulder Enemy", ["isEnemy"] = true, ["color"] = pink}, -- Conrtains green scroll
+		[0x2D] = {["name"] = "Boulder Enemy", ["isEnemy"] = true, ["color"] = pink}, -- Contains green scroll
 		[0x2E] = {["name"] = "Arrow", ["color"] = pink}, -- Map Screen
-		[0x36] = {["name"] = "Blue Enemy", ["isEnemy"] = true},
+		[0x36] = {["name"] = "Blue Enemy", ["isEnemy"] = true, ["color"] = pink}, -- Contains red scroll
+		[0x37] = {["name"] = "Blue Enemy", ["isEnemy"] = true, ["color"] = pink}, -- Contains blue scroll
+		[0x38] = {["name"] = "Wolf", ["isEnemy"] = true, ["color"] = pink}, -- Contains red scroll
+		[0x39] = {["name"] = "Grey Enemy", ["isEnemy"] = true, ["color"] = pink}, -- Contains blue scroll
 	},
 	["x_position"] = 0x11, -- s16_le
 	["y_position"] = 0x0E, -- s16_le
@@ -225,17 +236,8 @@ function drawObjects()
 					objectActive = objectTypeTable.active(objectBase); -- Call the function to check whether the object is active
 				end
 			else
+				color = black;
 				objectType = "Unknown ("..toHexString(objectType)..")";
-			end
-
-			if objectType == 0x52 then
-				if mainmemory.readbyte(objectBase + 0x07) == 0xD3 and mainmemory.readbyte(objectBase + 0x08) == 0x80 then -- Detect crown and make it flash Red & Yellow
-					if emu.framecount() % 10 > 4 then
-						color = red;
-					else
-						color = yellow;
-					end
-				end
 			end
 
 			if showHitbox then

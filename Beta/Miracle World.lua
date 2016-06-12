@@ -211,7 +211,7 @@ function draw_ui()
 				objectType = "Unknown ("..toHexString(objectType)..")";
 			end
 
-			if objectType == 0x52 then
+			if objectType == "Item 0x52" then
 				if mainmemory.readbyte(objectBase + 0x07) == 0xD3 and mainmemory.readbyte(objectBase + 0x08) == 0x80 then -- Detect crown and make it flash Red & Yellow
 					if emu.framecount() % 10 > 4 then
 						color = red;
