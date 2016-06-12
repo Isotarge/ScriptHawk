@@ -17,6 +17,32 @@ local maxPlayerProjectiles = 3;
 local maxEnemies = 0; -- TODO: Figure out max enemies
 local maxEnemyProjectiles = 0; -- TODO: Figure out max enemy projectiles
 
+local object_fields = {
+	["object_type"] = 0x00, -- Byte
+	["object_types"] = {
+		[0x01] = {["name"] = "Player", ["color"] = yellow},
+		[0x02] = {["name"] = "Player Projectile", ["color"] = yellow},
+		[0x03] = {["name"] = "Player Projectile", ["color"] = yellow},
+		[0x04] = {["name"] = "Boss", ["color"] = red},
+		[0x09] = {["name"] = "Enemy Projectile", ["isEnemyProjectile"] = true, ["color"] = red}, -- Small projectile
+		[0x0B] = {["name"] = "Red Scroll", ["color"] = pink},
+		[0x0D] = {["name"] = "Green Scroll", ["color"] = pink},
+		[0x10] = {["name"] = "Grey Enemy", ["isEnemy"] = true},
+		[0x13] = {["name"] = "Grey Enemy", ["isEnemy"] = true},
+		[0x16] = {["name"] = "Grey Enemy", ["isEnemy"] = true}, -- Scythe
+		[0x17] = {["name"] = "Boulder Enemy", ["isEnemy"] = true},
+		[0x1C] = {["name"] = "Wolf Enemy", ["isEnemy"] = true},
+		[0x1F] = {["name"] = "Enemy Projectile", ["isEnemyProjectile"] = true, ["color"] = red}, -- Scythe
+		[0x20] = {["name"] = "Grey Enemy"}, -- From boulder
+		[0x2D] = {["name"] = "Boulder Enemy", ["isEnemy"] = true, ["color"] = pink}, -- Conrtains green scroll
+		[0x2E] = {["name"] = "Arrow", ["color"] = pink}, -- Map Screen
+		[0x36] = {["name"] = "Blue Enemy", ["isEnemy"] = true},
+	},
+	["x_position"] = 0x11, -- s16_le
+	["y_position"] = 0x0E, -- s16_le
+	["boss_health"] = 0x1E, -- byte
+};
+
 function toHexString(value, desiredLength, prefix)
 	value = string.format("%X", value or 0);
 	prefix = prefix or "0x";
@@ -32,15 +58,43 @@ function round(num, idp)
 end
 
 function countPlayerProjectiles()
-	return 0; -- TODO
+	local num = 0;
+	for i = 0, object_array_capacity do
+		local objectBase = object_array_base + (i * object_size);
+		local objectType = mainmemory.readbyte(objectBase + object_fields.object_type);
+		if objectType == 0x02 or objectType == 0x03 then
+			num = num + 1;
+		end
+	end
+	return num;
 end
 
 function countEnemies()
-	return 0; -- TODO
+	local num = 0;
+	for i = 0, object_array_capacity do
+		local objectBase = object_array_base + (i * object_size);
+		local objectType = mainmemory.readbyte(objectBase + object_fields.object_type);
+		if object_fields.object_types[objectType] ~= nil then
+			if object_fields.object_types[objectType].isEnemy == true then
+				num = num + 1;
+			end
+		end
+	end
+	return num;
 end
 
 function countEnemyProjectiles()
-	return 0; -- TODO
+	local num = 0;
+	for i = 0, object_array_capacity do
+		local objectBase = object_array_base + (i * object_size);
+		local objectType = mainmemory.readbyte(objectBase + object_fields.object_type);
+		if object_fields.object_types[objectType] ~= nil then
+			if object_fields.object_types[objectType].isEnemyProjectile == true then
+				num = num + 1;
+			end
+		end
+	end
+	return num;
 end
 
 function getX()
@@ -77,37 +131,26 @@ function getHitRatio()
 end
 
 function isBossLoaded()
-	return mainmemory.readbyte(0xF25) ~= 0x00;
+	for i = 0, object_array_capacity do
+		local objectBase = object_array_base + (i * object_size);
+		local objectType = mainmemory.readbyte(objectBase + object_fields.object_type);
+		if objectType == 0x04 then
+			return true;
+		end
+	end
+	return false;
 end
 
 function getBossHealth()
-	return mainmemory.readbyte(0xF43);
+	for i = 0, object_array_capacity do
+		local objectBase = object_array_base + (i * object_size);
+		local objectType = mainmemory.readbyte(objectBase + object_fields.object_type);
+		if objectType == 0x04 then
+			return mainmemory.readbyte(objectBase + object_fields.boss_health;
+		end
+	end
+	return 0;
 end
-
-local object_fields = {
-	["object_type"] = 0x00, -- Byte
-	["object_types"] = {
-		[0x01] = {["name"] = "Player", ["color"] = yellow},
-		[0x02] = {["name"] = "Player Projectile", ["color"] = yellow},
-		[0x03] = {["name"] = "Player Projectile", ["color"] = yellow},
-		[0x04] = {["name"] = "Boss", ["color"] = red},
-		[0x09] = {["name"] = "Enemy Projectile", ["color"] = red},
-		[0x0B] = {["name"] = "Red Scroll", ["color"] = pink},
-		[0x0D] = {["name"] = "Green Scroll", ["color"] = pink},
-		[0x10] = {["name"] = "Grey Enemy"},
-		[0x13] = {["name"] = "Grey Enemy"},
-		[0x16] = {["name"] = "Grey Enemy"}, -- Scythe
-		[0x17] = {["name"] = "Boulder Enemy"},
-		[0x1C] = {["name"] = "Wolf Enemy"},
-		[0x1F] = {["name"] = "Enemy Projectile", ["color"] = red}, -- Scythe
-		[0x20] = {["name"] = "Grey Enemy"}, -- From boulder
-		[0x2D] = {["name"] = "Boulder Enemy", ["color"] = pink}, -- Conrtains green scroll
-		[0x2E] = {["name"] = "Arrow", ["color"] = pink}, -- Map Screen
-		[0x36] = {["name"] = "Blue Enemy"},
-	},
-	["x_position"] = 0x11, -- s16_le
-	["y_position"] = 0x0E, -- s16_le
-};
 
 local mouseClickedLastFrame = false;
 local startDragPosition = {0,0};
@@ -150,8 +193,8 @@ function drawObjects()
 		local color = nil;
 		if objectType ~= 0 then
 			-- Default to 16 width/height for hitbox
-			local hitboxX = 16;
-			local hitboxY = 16;
+			local hitboxWidth = 16;
+			local hitboxHeight = 16;
 
 			-- Get the X and Y position of the object
 			local xPosition = mainmemory.read_s16_le(objectBase + object_fields.x_position);
@@ -170,11 +213,11 @@ function drawObjects()
 					color = objectTypeTable["color"];
 				end
 
-				if type(objectTypeTable.hitbox_x) == "number" then
-					hitboxX = objectTypeTable.hitbox_x;
+				if type(objectTypeTable.hitbox_width) == "number" then
+					hitboxWidth = objectTypeTable.hitbox_width;
 				end
-				if type(objectTypeTable.hitbox_y) == "number" then
-					hitboxY = objectTypeTable.hitbox_y;
+				if type(objectTypeTable.hitbox_height) == "number" then
+					hitboxHeight = objectTypeTable.hitbox_height;
 				end
 
 				if type(objectTypeTable.active) == "function" then
@@ -208,7 +251,7 @@ function drawObjects()
 						end
 					end
 
-					if (mouse.X >= xPosition and mouse.X <= xPosition + hitboxX) and (mouse.Y >= yPosition and mouse.Y <= yPosition + hitboxY) then
+					if (mouse.X >= xPosition and mouse.X <= xPosition + hitboxWidth) and (mouse.Y >= yPosition and mouse.Y <= yPosition + hitboxHeight) then
 						if startDrag then
 							table.insert(draggedObjects, {objectBase, xPosition, yPosition});
 						end
@@ -229,7 +272,7 @@ function drawObjects()
 							gui.drawText(safeX, safeY + ((t - 1) * height), mouseOverText[t], color);
 						end
 					end
-					gui.drawRectangle(xPosition, yPosition, hitboxX, hitboxY, color); -- Draw the object's hitbox
+					gui.drawRectangle(xPosition, yPosition, hitboxWidth, hitboxHeight, color); -- Draw the object's hitbox
 				end
 			end
 

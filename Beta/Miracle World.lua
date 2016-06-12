@@ -25,7 +25,7 @@ local object_fields = {
 	["object_type"] = 0x00, -- Byte
 	["object_types"] = {
 		[0x01] = {["name"] = "Player", ["color"] = yellow},
-		[0x02] = {["name"] = "Bullet", ["hitbox_x"] = 8, ["hitbox_y"] = 8},
+		[0x02] = {["name"] = "Bullet", ["hitbox_width"] = 8, ["hitbox_height"] = 8},
 		[0x03] = {["name"] = "Explosion", ["color"] = yellow}, -- Vehicle dying
 		[0x04] = {["name"] = "Bullet"}, -- Dying
 		[0x05] = {["name"] = "miniAlex Turret", ["color"] = yellow}, -- Falling
@@ -34,8 +34,8 @@ local object_fields = {
 		[0x08] = {["name"] = "Shield", ["color"] = yellow},
 		[0x09] = {["name"] = "miniAlex", ["color"] = yellow},
 		[0x0A] = {["name"] = "miniAlex", ["color"] = yellow}, -- Falling
-		[0x0B] = {["name"] = "Janken Choice Display", ["hitbox_x"] = 32, ["hitbox_y"] = 32, ["color"] = yellow},
-		[0x0C] = {["name"] = "Janken Score Display", ["hitbox_x"] = 24, ["hitbox_y"] = 8, ["color"] = yellow},
+		[0x0B] = {["name"] = "Janken Choice Display", ["hitbox_width"] = 32, ["hitbox_height"] = 32, ["color"] = yellow},
+		[0x0C] = {["name"] = "Janken Score Display", ["hitbox_width"] = 24, ["hitbox_height"] = 8, ["color"] = yellow},
 		[0x0D] = {["name"] = "Stone Head's Head", ["color"] = red},
 		[0x0E] = {["name"] = "Scissors Head's Head", ["color"] = red},
 		[0x0F] = {["name"] = "Paper Head's Head", ["color"] = red},
@@ -47,26 +47,26 @@ local object_fields = {
 		[0x16] = {["name"] = "Trapdoor", ["color"] = pink, ["active"] = isActiveEnemy}, -- Opens when stepped on
 		[0x17] = {["name"] = "Trigger", ["color"] = pink}, -- For falling blocks
 		[0x18] = {["name"] = "Title Screen Sprite", ["color"] = yellow},
-		[0x19] = {["name"] = "Projectile", ["hitbox_x"] = 8, ["hitbox_y"] = 8, ["color"] = red}, -- Janken Ninja Star
-		[0x1B] = {["name"] = "Projectile", ["hitbox_x"] = 8, ["hitbox_y"] = 8}, -- Ring
-		[0x1A] = {["name"] = "Projectile", ["hitbox_x"] = 8, ["hitbox_y"] = 8, ["color"] = red}, -- Scissors Head Ninja Star
+		[0x19] = {["name"] = "Projectile", ["hitbox_width"] = 8, ["hitbox_height"] = 8, ["color"] = red}, -- Janken Ninja Star
+		[0x1B] = {["name"] = "Projectile", ["hitbox_width"] = 8, ["hitbox_height"] = 8}, -- Ring
+		[0x1A] = {["name"] = "Projectile", ["hitbox_width"] = 8, ["hitbox_height"] = 8, ["color"] = red}, -- Scissors Head Ninja Star
 		[0x1C] = {["name"] = "Janken", ["color"] = pink},
 		[0x1D] = {["name"] = "Stone Head", ["color"] = pink, ["active"] = isActiveBoss},
 		[0x1E] = {["name"] = "Scissors Head", ["color"] = pink, ["active"] = isActiveBoss},
 		[0x1F] = {["name"] = "Paper Head", ["color"] = pink, ["active"] = isActiveBoss},
-		[0x20] = {["name"] = "Bat", ["direction"] = "Left", ["hitbox_x"] = 16, ["hitbox_y"] = 8, ["color"] = red, ["active"] = isActiveEnemy},
-		[0x22] = {["name"] = "Bubble", ["color"] = red, ["hitbox_x"] = 8, ["hitbox_y"] = 8}, -- Big Frog
+		[0x20] = {["name"] = "Bat", ["direction"] = "Left", ["hitbox_width"] = 16, ["hitbox_height"] = 8, ["color"] = red, ["active"] = isActiveEnemy},
+		[0x22] = {["name"] = "Bubble", ["color"] = red, ["hitbox_width"] = 8, ["hitbox_height"] = 8}, -- Big Frog
 		[0x23] = {["name"] = "Big Frog", ["color"] = red, ["active"] = isActiveEnemy},
-		[0x24] = {["name"] = "Octopus", ["color"] = red, ["hitbox_x"] = 8, ["hitbox_y"] = 8, ["active"] = isActiveEnemy}, -- Arm segment
+		[0x24] = {["name"] = "Octopus", ["color"] = red, ["hitbox_width"] = 8, ["hitbox_height"] = 8, ["active"] = isActiveEnemy}, -- Arm segment
 		[0x25] = {["name"] = "Blue Bear", ["direction"] = "Left", ["color"] = pink, ["active"] = isActiveEnemy}, -- Walking
 		[0x26] = {["name"] = "Blue Bear", ["direction"] = "Right", ["color"] = pink, ["active"] = isActiveEnemy}, -- Walking
 		[0x27] = {["name"] = "Blue Bear", ["direction"] = "Left", ["color"] = pink, ["active"] = isActiveEnemy}, -- Attacking
 		[0x28] = {["name"] = "Blue Bear", ["direction"] = "Right", ["color"] = pink, ["active"] = isActiveEnemy}, -- Attacking
-		[0x29] = {["name"] = "Projectile", ["color"] = red, ["hitbox_x"] = 8, ["hitbox_y"] = 8}, -- Monkey
+		[0x29] = {["name"] = "Projectile", ["color"] = red, ["hitbox_width"] = 8, ["hitbox_height"] = 8}, -- Monkey
 		[0x2A] = {["name"] = "Monkey", ["color"] = red, ["active"] = isActiveEnemy},
 		[0x2B] = {["name"] = "Dying"}, -- Small enemy
-		[0x2C] = {["name"] = "Plant", ["color"] = red, ["hitbox_x"] = 16, ["hitbox_y"] = 40, ["active"] = isActiveEnemy}, -- Moves up and down
-		[0x2D] = {["name"] = "Bird", ["direction"] = "Left", ["color"] = red, ["hitbox_x"] = 24, ["hitbox_y"] = 16, ["active"] = isActiveEnemy},
+		[0x2C] = {["name"] = "Plant", ["color"] = red, ["hitbox_width"] = 16, ["hitbox_height"] = 40, ["active"] = isActiveEnemy}, -- Moves up and down
+		[0x2D] = {["name"] = "Bird", ["direction"] = "Left", ["color"] = red, ["hitbox_width"] = 24, ["hitbox_height"] = 16, ["active"] = isActiveEnemy},
 		[0x2E] = {["name"] = "Killer Fish", ["directoin"] = "Left", ["color"] = red, ["active"] = isActiveEnemy},
 		[0x2F] = {["name"] = "Frog", ["color"] = red, ["active"] = isActiveEnemy}, -- Small, Grounded
 		[0x30] = {["name"] = "Fish", ["direction"] = "Left", ["color"] = red, ["active"] = isActiveEnemy}, -- Small Left
@@ -74,13 +74,13 @@ local object_fields = {
 		[0x32] = {["name"] = "Seahorse", ["direction"] = "Right", ["color"] = red, ["active"] = isActiveEnemy},
 		[0x34] = {["name"] = "Fish", ["direction"] = "Right", ["color"] = red, ["active"] = isActiveEnemy}, -- Small
 		[0x35] = {["name"] = "Killer Fish", ["direction"] = "Right", ["color"] = red, ["active"] = isActiveEnemy},
-		[0x36] = {["name"] = "Bat", ["direction"] = "Right", ["hitbox_x"] = 16, ["hitbox_y"] = 8, ["color"] = red, ["active"] = isActiveEnemy},
-		[0x33] = {["name"] = "Bird", ["direction"] = "Right", ["color"] = red, ["hitbox_x"] = 24, ["hitbox_y"] = 16, ["active"] = isActiveEnemy},
+		[0x36] = {["name"] = "Bat", ["direction"] = "Right", ["hitbox_width"] = 16, ["hitbox_height"] = 8, ["color"] = red, ["active"] = isActiveEnemy},
+		[0x33] = {["name"] = "Bird", ["direction"] = "Right", ["color"] = red, ["hitbox_width"] = 24, ["hitbox_height"] = 16, ["active"] = isActiveEnemy},
 		[0x37] = {["name"] = "Frog", ["color"] = red}, -- Small, Jumping
-		[0x38] = {["name"] = "Box Particle", ["hitbox_x"] = 8, ["hitbox_y"] = 8},
-		[0x39] = {["name"] = "Box Particle", ["hitbox_x"] = 8, ["hitbox_y"] = 8},
-		[0x3A] = {["name"] = "Box Particle", ["hitbox_x"] = 8, ["hitbox_y"] = 8},
-		[0x3B] = {["name"] = "Box Particle", ["hitbox_x"] = 8, ["hitbox_y"] = 8},
+		[0x38] = {["name"] = "Box Particle", ["hitbox_width"] = 8, ["hitbox_height"] = 8},
+		[0x39] = {["name"] = "Box Particle", ["hitbox_width"] = 8, ["hitbox_height"] = 8},
+		[0x3A] = {["name"] = "Box Particle", ["hitbox_width"] = 8, ["hitbox_height"] = 8},
+		[0x3B] = {["name"] = "Box Particle", ["hitbox_width"] = 8, ["hitbox_height"] = 8},
 		[0x3C] = {["name"] = "Money", ["color"] = green},
 		[0x3D] = {["name"] = "Flame", ["color"] = red, ["active"] = isActiveEnemy},
 		[0x3E] = {["name"] = "Scorpion", ["direction"] = "Left", ["color"] = red, ["active"] = isActiveEnemy}, -- Also used for flames in later levels
@@ -106,7 +106,7 @@ local object_fields = {
 		[0x52] = {["name"] = "Item", ["color"] = pink, ["active"] = isActiveEnemy}, -- Helecopter, Crown, Blue circle with star
 		[0x54] = {["name"] = "Rolling Rock", ["color"] = red, ["active"] = isActiveEnemy},
 		[0x55] = {["name"] = "Hopper", ["color"] = red, ["active"] = isActiveEnemy},
-		[0x56] = {["name"] = "Arrow", ["hitbox_x"] = 8, ["hitbox_y"] = 8}, -- Map
+		[0x56] = {["name"] = "Arrow", ["hitbox_width"] = 8, ["hitbox_height"] = 8}, -- Map
 		[0x57] = {["name"] = "Flame", ["color"] = red, ["active"] = isActiveEnemy}, -- Stationary
 		[0x60] = {["name"] = "Crown Door Trigger", ["color"] = yellow, ["active"] = isActiveEnemy},
 		[0x61] = {["name"] = "Crown Code Controller", ["color"] = pink},
@@ -177,8 +177,8 @@ function draw_ui()
 		local color = nil;
 		if objectType ~= 0 then
 			-- Default to 16 width/height for hitbox
-			local hitboxX = 16;
-			local hitboxY = 16;
+			local hitboxWidth = 16;
+			local hitboxHeight = 16;
 
 			-- Get the X and Y position of the object
 			local xPosition = mainmemory.readbyte(objectBase + object_fields.x_position);
@@ -197,11 +197,11 @@ function draw_ui()
 					color = objectTypeTable["color"];
 				end
 
-				if type(objectTypeTable.hitbox_x) == "number" then
-					hitboxX = objectTypeTable.hitbox_x;
+				if type(objectTypeTable.hitbox_width) == "number" then
+					hitboxWidth = objectTypeTable.hitbox_width;
 				end
-				if type(objectTypeTable.hitbox_y) == "number" then
-					hitboxY = objectTypeTable.hitbox_y;
+				if type(objectTypeTable.hitbox_height) == "number" then
+					hitboxHeight = objectTypeTable.hitbox_height;
 				end
 
 				if type(objectTypeTable.active) == "function" then
@@ -237,7 +237,7 @@ function draw_ui()
 						end
 					end
 
-					if (mouse.X >= xPosition and mouse.X <= xPosition + hitboxX) and (mouse.Y >= yPosition and mouse.Y <= yPosition + hitboxY) then
+					if (mouse.X >= xPosition and mouse.X <= xPosition + hitboxWidth) and (mouse.Y >= yPosition and mouse.Y <= yPosition + hitboxHeight) then
 						if startDrag then
 							table.insert(draggedObjects, {objectBase, xPosition, yPosition});
 						end
@@ -258,7 +258,7 @@ function draw_ui()
 							gui.drawText(safeX, safeY + ((t - 1) * height), mouseOverText[t], color);
 						end
 					end
-					gui.drawRectangle(xPosition, yPosition, hitboxX, hitboxY, color); -- Draw the object's hitbox
+					gui.drawRectangle(xPosition, yPosition, hitboxWidth, hitboxHeight, color); -- Draw the object's hitbox
 				end
 			end
 
