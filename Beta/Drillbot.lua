@@ -194,7 +194,6 @@ function drawUI()
 	end
 end
 
-local prevFrameA = false;
 function eachFrame()
 	local maxScored = getMaxScoredColumn();
 	local xPos = getXPosition();
@@ -205,8 +204,7 @@ function eachFrame()
 	else
 		joypad.set({["Down"] = true});
 	end
-	prevFrameA = not prevFrameA;
-	joypad.set({["A"] = prevFrameA}); -- Mash A like there's no tomorrow
+	joypad.set({["A"] = (emu.framecount() % 2 == 0)}); -- Mash A like there's no tomorrow
 	drawUI();
 end
 

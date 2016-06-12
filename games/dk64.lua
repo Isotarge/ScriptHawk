@@ -503,7 +503,7 @@ obj_model1 = {
 		[34] = "Kremling Kosh Controller",
 		[35] = "Melon (Projectile)",
 		[36] = "Peanut",
-		--[37] = "Unknown - Factory Intro", -- TODO
+		--[37] = "Unknown - Factory Intro", -- TODO: What is this?
 		[38] = "Pineapple",
 		[40] = "Mini Monkey barrel",
 		[41] = "Orange",
@@ -657,7 +657,7 @@ obj_model1 = {
 		[275] = "K. Lumsy",
 		[276] = "Spiderling",
 		[278] = "Projectile", -- Spider miniBoss
-		--[280] = "Unknown - Spider Boss Map" -- TODO
+		--[280] = "Unknown - Spider Boss Map" -- TODO: What is this?
 		[281] = "K. Rool (DK Phase)",
 		[285] = "Bat",
 		[286] = "Giant Clam",
@@ -868,17 +868,17 @@ obj_model1 = {
 	["texture_renderer_pointer"] = 0x158, -- Pointer
 	["texture_renderer"] = {
 		["texture_index"] = 0x0C, -- u16_be
-		--["unknown_float"] = 0x10, -- Float -- TODO
-		--["unknown_float"] = 0x14, -- Float -- TODO
+		--["unknown_float"] = 0x10, -- Float -- TODO: What is this?
+		--["unknown_float"] = 0x14, -- Float -- TODO: What is this?
 		["next_renderer"] = 0x24, -- Pointer
 	},
 	["shade_byte"] = 0x16D,
 	["player"] = {
 		["animation_type"] = 0x181, -- Seems to be the same value as control_states
-		["velocity_uncrouch_aerial"] = 0x1A4, -- TODO: what is this?
-		["misc_acceleration_float"] = 0x1AC, -- TODO: what is this?
+		["velocity_uncrouch_aerial"] = 0x1A4, -- TODO: What is this?
+		["misc_acceleration_float"] = 0x1AC, -- TODO: What is this?
 		["horizontal_acceleration"] = 0x1B0, -- Set to a negative number to go fast
-		["misc_acceleration_float_2"] = 0x1B4, -- TODO: what is this?
+		["misc_acceleration_float_2"] = 0x1B4, -- TODO: What is this?
 		["misc_acceleration_float_3"] = 0x1B8, -- TODO: What is this?
 		["velocity_ground"] = 0x1C0, -- TODO: What is this?
 		["vehicle_actor_pointer"] = 0x208, -- u32 be
@@ -1313,7 +1313,7 @@ local function getExamineDataModelTwo(pointer)
 	local hasPosition = xPos ~= 0 or yPos ~= 0 or zPos ~= 0 or hasModel;
 
 	table.insert(examine_data, { "Slot base", toHexString(pointer, 6) });
-	local behaviorTypePointer = mainmemory.read_u32_be(pointer + obj_model2.behavior_type_pointer);
+	local behaviorTypePointer = mainmemory.read_u32_be(pointer + obj_model2.behavior_type_pointer); -- TODO: dereferencePointer calls
 	local behaviorPointer = mainmemory.read_u32_be(pointer + obj_model2.behavior_pointer);
 	local behaviorType = "unknown";
 	if isPointer(behaviorTypePointer) then
