@@ -26,6 +26,7 @@ local object_fields = {
 		[0x04] = {["name"] = "Boss", ["color"] = red},
 		[0x09] = {["name"] = "Enemy Projectile", ["isEnemyProjectile"] = true, ["color"] = red}, -- Small projectile
 		[0x0B] = {["name"] = "Red Scroll", ["color"] = pink},
+		[0x0C] = {["name"] = "Blue Scroll", ["color"] = pink}
 		[0x0D] = {["name"] = "Green Scroll", ["color"] = pink},
 		[0x10] = {["name"] = "Grey Enemy", ["isEnemy"] = true},
 		[0x13] = {["name"] = "Grey Enemy", ["isEnemy"] = true},
@@ -54,7 +55,7 @@ function toHexString(value, desiredLength, prefix)
 end
 
 function round(num, idp)
-	return tonumber(string.format("%." .. (idp or 0) .. "f", num));
+	return tonumber(string.format("%."..(idp or 0).."f", num));
 end
 
 function countPlayerProjectiles()
@@ -146,7 +147,7 @@ function getBossHealth()
 		local objectBase = object_array_base + (i * object_size);
 		local objectType = mainmemory.readbyte(objectBase + object_fields.object_type);
 		if objectType == 0x04 then
-			return mainmemory.readbyte(objectBase + object_fields.boss_health;
+			return mainmemory.readbyte(objectBase + object_fields.boss_health);
 		end
 	end
 	return 0;
