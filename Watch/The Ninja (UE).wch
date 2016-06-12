@@ -1,11 +1,13 @@
 SystemID SMS
+0D2B	w	u	0	Main RAM	Level Y Position
 0D62	w	u	0	Main RAM	Demo Timer
+0D72	w	u	0	Main RAM	Level X Position?
 0DC0	b	u	0	Main RAM	Lives
 0DC4	b	u	0	Main RAM	Hits
 0DC6	w	u	0	Main RAM	Shots
 0DC8	b	u	0	Main RAM	Level
-0EAF	b	u	0	Main RAM	Y Position (Screen)
-0EB2	w	u	0	Main RAM	X Position (Screen)
+0EAF	w	s	0	Main RAM	Y Position (Screen)
+0EB2	w	s	0	Main RAM	X Position (Screen)
 0EC2	b	h	0	Main RAM	Player Projectile
 0EE3	b	h	0	Main RAM	Player Projectile
 0F04	b	h	0	Main RAM	Player Projectile
