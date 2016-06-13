@@ -25,7 +25,8 @@ local object_fields = {
 		[0x02] = {["name"] = "Player Projectile", ["color"] = yellow},
 		[0x03] = {["name"] = "Player Projectile", ["color"] = yellow},
 		[0x04] = {["name"] = "Boss", ["color"] = pink},
-		[0x06] = {["name"] = "Boss Projectile", ["isEnemyProjectile"] = true, ["color"] = red}, -- Spinny big thing
+		[0x06] = {["name"] = "Boss Projectile", ["isEnemyProjectile"] = true, ["color"] = red},
+		[0x08] = {["name"] = "Boss Projectile", ["isEnemyProjectile"] = true, ["color"] = red},
 		[0x09] = {["name"] = "Enemy Projectile", ["isEnemyProjectile"] = true, ["color"] = red}, -- Small projectile
 		[0x0B] = {["name"] = "Red Scroll", ["color"] = pink},
 		[0x0C] = {["name"] = "Blue Scroll", ["color"] = pink},
@@ -38,18 +39,31 @@ local object_fields = {
 		[0x16] = {["name"] = "Grey Enemy", ["isEnemy"] = true}, -- Scythe
 		[0x17] = {["name"] = "Boulder Enemy", ["isEnemy"] = true},
 		[0x18] = {["name"] = "Popup Enemy", ["isEnemy"] = true}, -- Level 2
-		[0x1A] = {["name"] = "Bouncing Boulder", ["isEnemy"] = true}, -- Level 2
+		[0x19] = {["name"] = "Bouncing Boulder", ["isEnemy"] = true}, -- Level 2
 		[0x1A] = {["name"] = "Bouncing Boulder Shadow"}, -- Level 2
 		[0x1C] = {["name"] = "Wolf", ["isEnemy"] = true},
 		[0x1F] = {["name"] = "Enemy Projectile", ["isEnemyProjectile"] = true, ["color"] = red}, -- Scythe
 		[0x20] = {["name"] = "Grey Enemy"}, -- From boulder
+		[0x24] = {["name"] = "Red Jumping Enemy", ["isEnemy"] = true}, -- Level 4
+		[0x25] = {["name"] = "Red Running Enemy", ["isEnemy"] = true}, -- Level 4
+		[0x26] = {["name"] = "Red Running Enemy", ["isEnemy"] = true}, -- Level 4, after jumping
+		[0x2C] = {["name"] = "Statue", ["color"] = pink}, -- Level 4
 		[0x2D] = {["name"] = "Boulder Enemy", ["isEnemy"] = true, ["color"] = pink}, -- Contains green scroll
 		[0x2E] = {["name"] = "Arrow", ["color"] = pink}, -- Map Screen
+		[0x2F] = {["name"] = "Red Scroll", ["color"] = pink}, -- Map Screen
+		[0x30] = {["name"] = "Blue Scroll", ["color"] = pink}, -- Map Screen
+		[0x31] = {["name"] = "Green Scroll", ["color"] = pink}, -- Map Screen
+		[0x35] = {["name"] = "Boulder Enemy", ["isEnemy"] = true},
 		[0x36] = {["name"] = "Blue Enemy", ["isEnemy"] = true, ["color"] = pink}, -- Contains red scroll
 		[0x37] = {["name"] = "Blue Enemy", ["isEnemy"] = true, ["color"] = pink}, -- Contains blue scroll
 		[0x38] = {["name"] = "Wolf", ["isEnemy"] = true, ["color"] = pink}, -- Contains red scroll
 		[0x39] = {["name"] = "Grey Enemy", ["isEnemy"] = true, ["color"] = pink}, -- Contains blue scroll
 	},
+	["animation_index"] = 0x03, -- Byte
+	["animation_current_frame"] = 0x04, -- Byte
+	["animation_length"] = 0x05, -- Byte
+	["segment_current_frame"] = 0x06, -- Byte
+	["segment_length_frames"] = 0x07,
 	["x_position"] = 0x11, -- s16_le
 	["y_position"] = 0x0E, -- s16_le
 	["boss_health"] = 0x1E, -- byte
@@ -205,6 +219,8 @@ function drawObjects()
 		local color = nil;
 		if objectType ~= 0 then
 			-- Default to 16 width/height for hitbox
+			local hitboxXOffset = -8;
+			local hitboxYOffset = -8;
 			local hitboxWidth = 16;
 			local hitboxHeight = 16;
 
@@ -223,6 +239,13 @@ function drawObjects()
 
 				if type(objectTypeTable["color"]) == "number" then
 					color = objectTypeTable["color"];
+				end
+
+				if type(objectTypeTable.hitbox_x_offset) == "number" then
+					hitboxXOffset = objectTypeTable.hitbox_x_offset;
+				end
+				if type(objectTypeTable.hitbox_y_offset) == "number" then
+					hitboxYOffset = objectTypeTable.hitbox_y_offset;
 				end
 
 				if type(objectTypeTable.hitbox_width) == "number" then
@@ -254,7 +277,7 @@ function drawObjects()
 						end
 					end
 
-					if (mouse.X >= xPosition and mouse.X <= xPosition + hitboxWidth) and (mouse.Y >= yPosition and mouse.Y <= yPosition + hitboxHeight) then
+					if (mouse.X >= xPosition + hitboxXOffset and mouse.X <= xPosition + hitboxXOffset + hitboxWidth) and (mouse.Y >= yPosition + hitboxYOffset and mouse.Y <= yPosition + hitboxYOffset + hitboxHeight) then
 						if startDrag then
 							table.insert(draggedObjects, {objectBase, xPosition, yPosition});
 						end
@@ -268,14 +291,14 @@ function drawObjects()
 						for t = 1, #mouseOverText do
 							maxLength = math.max(maxLength, string.len(mouseOverText[t]));
 						end
-						local safeX = math.min(xPosition, 256 - (maxLength * width));
-						local safeY = math.min(yPosition, 192 - (#mouseOverText * height));
+						local safeX = math.min(xPosition + hitboxXOffset, 256 - (maxLength * width));
+						local safeY = math.min(yPosition + hitboxYOffset, 192 - (#mouseOverText * height));
 
 						for t = 1, #mouseOverText do
 							gui.drawText(safeX, safeY + ((t - 1) * height), mouseOverText[t], color);
 						end
 					end
-					gui.drawRectangle(xPosition, yPosition, hitboxWidth, hitboxHeight, color); -- Draw the object's hitbox
+					gui.drawRectangle(xPosition + hitboxXOffset, yPosition + hitboxYOffset, hitboxWidth, hitboxHeight, color); -- Draw the object's hitbox
 				end
 			end
 
