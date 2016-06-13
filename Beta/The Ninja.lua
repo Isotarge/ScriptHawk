@@ -15,7 +15,6 @@ local object_array_capacity = 26;
 
 local max_player_projectiles = 3;
 local max_enemies = 7;
-local max_enemy_projectiles = 0; -- TODO: Figure out max enemy projectiles
 
 local object_fields = {
 	["object_type"] = 0x00, -- Byte
@@ -25,11 +24,11 @@ local object_fields = {
 		[0x03] = {["name"] = "Player Projectile", ["color"] = yellow},
 		[0x04] = {["name"] = "Boss", ["color"] = pink}, -- Early levels
 		[0x05] = {["name"] = "Boss", ["color"] = pink}, -- Later levels
-		[0x06] = {["name"] = "Boss Projectile", ["isEnemyProjectile"] = true, ["color"] = red},
-		[0x07] = {["name"] = "Boss Projectile", ["isEnemyProjectile"] = true, ["color"] = red}, -- Level 5
-		[0x08] = {["name"] = "Boss Projectile", ["isEnemyProjectile"] = true, ["color"] = red},
-		[0x09] = {["name"] = "Enemy Projectile", ["isEnemyProjectile"] = true, ["color"] = red}, -- Small projectile
-		[0x0A] = {["name"] = "Boss Projectile", ["isEnemyProjectile"] = true, ["color"] = red},
+		[0x06] = {["name"] = "Boss Projectile", ["color"] = red},
+		[0x07] = {["name"] = "Boss Projectile", ["color"] = red}, -- Level 5
+		[0x08] = {["name"] = "Boss Projectile", ["color"] = red},
+		[0x09] = {["name"] = "Enemy Projectile", ["color"] = red}, -- Small projectile
+		[0x0A] = {["name"] = "Boss Projectile", ["color"] = red},
 		[0x0B] = {["name"] = "Red Scroll", ["color"] = pink},
 		[0x0C] = {["name"] = "Blue Scroll", ["color"] = pink},
 		[0x0D] = {["name"] = "Green Scroll", ["color"] = pink},
@@ -50,7 +49,7 @@ local object_fields = {
 		[0x1C] = {["name"] = "Wolf", ["isEnemy"] = true},
 		[0x1D] = {["name"] = "Light Blue Enemy", ["isEnemy"] = true}, -- Level 11
 		[0x1E] = {["name"] = "Green Enemy", ["isEnemy"] = true}, -- Level 8
-		[0x1F] = {["name"] = "Enemy Projectile", ["isEnemyProjectile"] = true, ["color"] = red}, -- Scythe
+		[0x1F] = {["name"] = "Enemy Projectile", ["color"] = red}, -- Scythe
 		[0x20] = {["name"] = "Grey Enemy", ["isEnemy"] = true}, -- From boulder
 
 		[0x22] = {["name"] = "Grey Enemy", ["isEnemy"] = true}, -- Circling
@@ -62,7 +61,7 @@ local object_fields = {
 		[0x28] = {["name"] = "Blue Enemy", ["isEnemy"] = true}, -- Cliff
 		[0x29] = {["name"] = "Grey Enemy", ["isEnemy"] = true}, -- Cliff, moving up
 		[0x2A] = {["name"] = "Ball Spawner"}, -- Cliff
-		[0x2B] = {["name"] = "Ball", ["isEnemyProjectile"] = true, ["color"] = red}, -- Cliff
+		[0x2B] = {["name"] = "Ball", ["color"] = red}, -- Cliff
 		[0x2C] = {["name"] = "Green Scroll Trigger", ["color"] = pink},
 		[0x2D] = {["name"] = "Boulder Enemy", ["isEnemy"] = true, ["color"] = pink}, -- Contains green scroll
 		[0x2E] = {["name"] = "Arrow", ["color"] = pink}, -- Map Screen
@@ -131,20 +130,6 @@ function countEnemies()
 		local objectType = mainmemory.readbyte(objectBase + object_fields.object_type);
 		if object_fields.object_types[objectType] ~= nil then
 			if object_fields.object_types[objectType].isEnemy == true then
-				num = num + 1;
-			end
-		end
-	end
-	return num;
-end
-
-function countEnemyProjectiles()
-	local num = 0;
-	for i = 0, object_array_capacity do
-		local objectBase = object_array_base + (i * object_size);
-		local objectType = mainmemory.readbyte(objectBase + object_fields.object_type);
-		if object_fields.object_types[objectType] ~= nil then
-			if object_fields.object_types[objectType].isEnemyProjectile == true then
 				num = num + 1;
 			end
 		end
@@ -372,8 +357,6 @@ function drawOSD()
 	row = row + 1;
 	gui.text(OSDX, OSDY + height * row, "Enemies: "..countEnemies().."/"..max_enemies);
 	row = row + 2;
-	--gui.text(OSDX, OSDY + height * row, "Enemy Proj: "..countEnemyProjectiles().."/"..max_enemy_projectiles);
-	--row = row + 2;
 
 	if isBossLoaded() then
 		gui.text(OSDX, OSDY + height * row, "Boss Health: "..getBossHealth());
