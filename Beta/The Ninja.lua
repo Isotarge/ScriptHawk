@@ -1,7 +1,6 @@
 -- Configuration
 showList = false;
 showHitbox = true;
-showInactive = false;
 
 local red = 0xFFFF0000;
 local yellow = 0xFFFFFF00;
@@ -14,9 +13,9 @@ local object_array_base = 0xE80;
 local object_size = 0x21;
 local object_array_capacity = 26;
 
-local maxPlayerProjectiles = 3;
-local maxEnemies = 7;
-local maxEnemyProjectiles = 0; -- TODO: Figure out max enemy projectiles
+local max_player_projectiles = 3;
+local max_enemies = 7;
+local max_enemy_projectiles = 0; -- TODO: Figure out max enemy projectiles
 
 local object_fields = {
 	["object_type"] = 0x00, -- Byte
@@ -153,6 +152,18 @@ function countEnemyProjectiles()
 	return num;
 end
 
+function countObjects()
+	local num = 0;
+	for i = 0, object_array_capacity do
+		local objectBase = object_array_base + (i * object_size);
+		local objectType = mainmemory.readbyte(objectBase + object_fields.object_type);
+		if objectType ~= 0x00 then
+			num = num + 1;
+		end
+	end
+	return num;
+end
+
 function getX()
 	return mainmemory.readbyte(0xEB2); -- TODO: This is a s16_le
 end
@@ -244,7 +255,6 @@ function drawObjects()
 	for i = 0, object_array_capacity do
 		local objectBase = object_array_base + (i * object_size);
 		local objectType = mainmemory.readbyte(objectBase + object_fields.object_type);
-		local objectActive = true;
 		local objectTypeTable = nil;
 		local color = nil;
 		if objectType ~= 0 then
@@ -284,52 +294,46 @@ function drawObjects()
 				if type(objectTypeTable.hitbox_height) == "number" then
 					hitboxHeight = objectTypeTable.hitbox_height;
 				end
-
-				if type(objectTypeTable.active) == "function" then
-					objectActive = objectTypeTable.active(objectBase); -- Call the function to check whether the object is active
-				end
 			else
 				color = black;
 				objectType = "Unknown ("..toHexString(objectType)..")";
 			end
 
 			if showHitbox then
-				if showInactive or objectActive then
-					if dragging then
-						for d = 1, #draggedObjects do
-							if draggedObjects[d][1] == objectBase then
-								xPosition = draggedObjects[d][2] + dragTransform[1];
-								yPosition = draggedObjects[d][3] + dragTransform[2];
-								mainmemory.write_s16_le(objectBase + object_fields.x_position, xPosition);
-								mainmemory.write_s16_le(objectBase + object_fields.y_position, yPosition);
-								break;
-							end
+				if dragging then
+					for d = 1, #draggedObjects do
+						if draggedObjects[d][1] == objectBase then
+							xPosition = draggedObjects[d][2] + dragTransform[1];
+							yPosition = draggedObjects[d][3] + dragTransform[2];
+							mainmemory.write_s16_le(objectBase + object_fields.x_position, xPosition);
+							mainmemory.write_s16_le(objectBase + object_fields.y_position, yPosition);
+							break;
 						end
 					end
-
-					if (mouse.X >= xPosition + hitboxXOffset and mouse.X <= xPosition + hitboxXOffset + hitboxWidth) and (mouse.Y >= yPosition + hitboxYOffset and mouse.Y <= yPosition + hitboxYOffset + hitboxHeight) then
-						if startDrag then
-							table.insert(draggedObjects, {objectBase, xPosition, yPosition});
-						end
-
-						local mouseOverText = {
-							objectType,
-							toHexString(objectBase).." "..xPosition..","..yPosition,
-						};
-
-						local maxLength = -math.huge;
-						for t = 1, #mouseOverText do
-							maxLength = math.max(maxLength, string.len(mouseOverText[t]));
-						end
-						local safeX = math.min(xPosition + hitboxXOffset, 256 - (maxLength * width));
-						local safeY = math.min(yPosition + hitboxYOffset, 192 - (#mouseOverText * height));
-
-						for t = 1, #mouseOverText do
-							gui.drawText(safeX, safeY + ((t - 1) * height), mouseOverText[t], color);
-						end
-					end
-					gui.drawRectangle(xPosition + hitboxXOffset, yPosition + hitboxYOffset, hitboxWidth, hitboxHeight, color); -- Draw the object's hitbox
 				end
+
+				if (mouse.X >= xPosition + hitboxXOffset and mouse.X <= xPosition + hitboxXOffset + hitboxWidth) and (mouse.Y >= yPosition + hitboxYOffset and mouse.Y <= yPosition + hitboxYOffset + hitboxHeight) then
+					if startDrag then
+						table.insert(draggedObjects, {objectBase, xPosition, yPosition});
+					end
+
+					local mouseOverText = {
+						objectType,
+						toHexString(objectBase).." "..xPosition..","..yPosition,
+					};
+
+					local maxLength = -math.huge;
+					for t = 1, #mouseOverText do
+						maxLength = math.max(maxLength, string.len(mouseOverText[t]));
+					end
+					local safeX = math.min(xPosition + hitboxXOffset, 256 - (maxLength * width));
+					local safeY = math.min(yPosition + hitboxYOffset, 192 - (#mouseOverText * height));
+
+					for t = 1, #mouseOverText do
+						gui.drawText(safeX, safeY + ((t - 1) * height), mouseOverText[t], color);
+					end
+				end
+				gui.drawRectangle(xPosition + hitboxXOffset, yPosition + hitboxYOffset, hitboxWidth, hitboxHeight, color); -- Draw the object's hitbox
 			end
 
 			if showList then
@@ -357,17 +361,19 @@ function drawOSD()
 	gui.text(OSDX, OSDY + height * row, "Level Pos: "..getLevelX()..","..getLevelY());
 	row = row + 2;
 
-	gui.text(OSDX, OSDY + height * row, "Player Proj: "..countPlayerProjectiles().."/"..maxPlayerProjectiles);
+	gui.text(OSDX, OSDY + height * row, "Player Proj: "..countPlayerProjectiles().."/"..max_player_projectiles);
 	row = row + 1;
 	gui.text(OSDX, OSDY + height * row, "Hits: "..getHits().."/"..getShots());
 	row = row + 1;
 	gui.text(OSDX, OSDY + height * row, "Ratio: "..getHitRatio());
 	row = row + 2;
 
-	gui.text(OSDX, OSDY + height * row, "Enemies: "..countEnemies().."/"..maxEnemies);
+	gui.text(OSDX, OSDY + height * row, "Objects: "..countObjects().."/"..object_array_capacity);
 	row = row + 1;
-	gui.text(OSDX, OSDY + height * row, "Enemy Proj: "..countEnemyProjectiles().."/"..maxEnemyProjectiles);
+	gui.text(OSDX, OSDY + height * row, "Enemies: "..countEnemies().."/"..max_enemies);
 	row = row + 2;
+	--gui.text(OSDX, OSDY + height * row, "Enemy Proj: "..countEnemyProjectiles().."/"..max_enemy_projectiles);
+	--row = row + 2;
 
 	if isBossLoaded() then
 		gui.text(OSDX, OSDY + height * row, "Boss Health: "..getBossHealth());
