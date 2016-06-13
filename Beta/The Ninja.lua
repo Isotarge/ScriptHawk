@@ -78,13 +78,16 @@ local object_fields = {
 		[0x38] = {["name"] = "Wolf", ["isEnemy"] = true, ["color"] = pink}, -- Contains red scroll
 		[0x39] = {["name"] = "Grey Enemy", ["isEnemy"] = true, ["color"] = pink}, -- Contains blue scroll
 		[0x3A] = {["name"] = "Red Enemy", ["isEnemy"] = true, ["color"] = pink}, -- Level 6, Contains red scroll
+		[0x3B] = {["name"] = "Grey Enemy", ["isEnemy"] = true}, -- Circles, Contains red scroll
 
+		[0x3D] = {["name"] = "Grey Enemy", ["isEnemy"] = true}, -- Level 10, Contains red scroll
 		[0x3E] = {["name"] = "Light Blue Enemy", ["isEnemy"] = true, ["color"] = pink}, -- Level 11, Contains red scroll
 		[0x3F] = {["name"] = "Light Blue Enemy", ["isEnemy"] = true, ["color"] = pink}, -- Level 11, Contains blue scroll
 		[0x40] = {["name"] = "Grey Enemy", ["isEnemy"] = true}, -- Level 5
 		[0x41] = {["name"] = "Grey Enemy", ["isEnemy"] = true, ["color"] = pink}, -- Level 5, Contains red scroll
 		[0x42] = {["name"] = "Fire Enemy", ["isEnemy"] = true, ["color"] = pink}, -- Level 7, Contains red scroll
 		[0x43] = {["name"] = "Grey Enemy", ["isEnemy"] = true, ["color"] = pink}, -- Cliff, Contains red scroll
+		[0x44] = {["name"] = "Fire Enemy", ["isEnemy"] = true, ["color"] = pink}, -- Contains blue scroll
 	},
 	["animation_index"] = 0x03, -- Byte
 	["animation_current_frame"] = 0x04, -- Byte
@@ -177,7 +180,7 @@ end
 function getHitRatio()
 	local hits = getHits();
 	local shots = getShots();
-	if hits == 0 and shots == 0 then
+	if hits >= shots or (hits == 0 and shots == 0) then
 		return "100%";
 	end
 	return round(hits / shots * 100, 2).."%";
