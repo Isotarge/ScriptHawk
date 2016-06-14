@@ -50,8 +50,8 @@ local object_fields = {
 		[0x1D] = {["name"] = "Light Blue Enemy", ["isEnemy"] = true}, -- Level 11
 		[0x1E] = {["name"] = "Green Enemy", ["isEnemy"] = true}, -- Level 8
 		[0x1F] = {["name"] = "Enemy Projectile", ["color"] = red}, -- Scythe
-		[0x20] = {["name"] = "Grey Enemy", ["isEnemy"] = true}, -- From boulder
-
+		[0x20] = {["name"] = "Grey Enemy", ["isEnemy"] = true}, -- From boulder, can contain green scroll
+		[0x21] = {["name"] = "Boulder Enemy", ["isEnemy"] = true},
 		[0x22] = {["name"] = "Grey Enemy", ["isEnemy"] = true}, -- Circling
 		[0x23] = {["name"] = "Fire Enemy", ["isEnemy"] = true}, -- Level 7
 		[0x24] = {["name"] = "Red Jumping Enemy", ["isEnemy"] = true}, -- Level 4
@@ -63,7 +63,7 @@ local object_fields = {
 		[0x2A] = {["name"] = "Ball Spawner"}, -- Cliff
 		[0x2B] = {["name"] = "Ball", ["color"] = red}, -- Cliff
 		[0x2C] = {["name"] = "Green Scroll Trigger", ["color"] = pink},
-		[0x2D] = {["name"] = "Boulder Enemy", ["isEnemy"] = true, ["color"] = pink}, -- Contains green scroll
+		[0x2D] = {["name"] = "Boulder Enemy", ["color"] = pink}, -- Contains green scroll, does not count towards enemy cap
 		[0x2E] = {["name"] = "Arrow", ["color"] = pink}, -- Map Screen
 		[0x2F] = {["name"] = "Red Scroll", ["color"] = pink}, -- Map Screen
 		[0x30] = {["name"] = "Blue Scroll", ["color"] = pink}, -- Map Screen
