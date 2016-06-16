@@ -195,6 +195,7 @@ local movementStates = {
 	[116] = "Locked", -- Jiggy pad, Mumbo transformation, Bottles
 	[117] = "Locked", -- Bottles
 
+	[120] = "Locked", -- Underwater
 	[121] = "Locked", -- Holding Jiggy, Talon Trot
 	[122] = "Creeping", -- In damaging water etc
 	[123] = "Damaged", -- Talon Trot
