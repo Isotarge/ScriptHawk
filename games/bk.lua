@@ -408,8 +408,8 @@ fillBlankVariableSlots();
 
 slot_data = {};
 
-function getSlotBase(object_array, index)
-	return object_array + slot_base + index * slot_size;
+function getSlotBase(index)
+	return slot_base + index * slot_size;
 end
 
 function addressToSlot(address)
@@ -1081,7 +1081,7 @@ function setAnimationType(index, animationType)
 	local objectArray = dereferencePointer(Game.Memory.object_array_pointer[version]);
 	if isRDRAM(objectArray) then
 		local numSlots = math.min(max_slots, mainmemory.read_u32_be(objectArray));
-		local objectSlotBase = getSlotBase(objectArray, index);
+		local objectSlotBase = objectArray + getSlotBase(index);
 		local animationObjectPointer = dereferencePointer(objectSlotBase + 0x14);
 		if isRDRAM(animationObjectPointer) then
 			mainmemory.write_u32_be(animationObjectPointer + animation_object_animation_type, animationType);
@@ -1514,7 +1514,7 @@ function setAll(variable, value)
 
 			local currentSlotBase;
 			for i = 0, numSlots - 1 do
-				currentSlotBase = getSlotBase(objectArray, i);
+				currentSlotBase = objectArray + getSlotBase(i);
 				if slot_variables[variable].Type == "Float" then
 					--print("writing float to slot "..i);
 					mainmemory.writefloat(currentSlotBase + variable, value, true);
@@ -1567,7 +1567,7 @@ function parseSlotData()
 
 		local currentSlotBase;
 		for i = 0, numSlots - 1 do
-			currentSlotBase = getSlotBase(objectArray, i);
+			currentSlotBase = objectArray + getSlotBase(i);
 			table.insert(slot_data, processSlot(currentSlotBase));
 		end
 
@@ -1577,9 +1577,9 @@ end
 
 function zipToSelectedObject()
 	if script_mode == "Examine" or script_mode == "List" then -- Model 1
-		local levelObjectArray = dereferencePointer(Game.Memory.object_array_pointer[version]);
+		local levelObjectArray = dereferencePointer(Game.Memory.object_array_pointer[version]); -- TODO: Refactor to objectArray
 		if isRDRAM(levelObjectArray) then
-			local slotBase = getSlotBase(levelObjectArray, object_index);
+			local slotBase = levelObjectArray + getSlotBase(object_index);
 
 			local x = mainmemory.readfloat(slotBase + 0x04, true);
 			local y = mainmemory.readfloat(slotBase + 0x08, true);
@@ -1667,8 +1667,8 @@ function draw_ui() -- TODO: Refactor to something about object analysis tools
 	gui.text(Game.OSDPosition[1], 2 + Game.OSDRowHeight * row, "Index: "..(object_index).."/"..(numSlots), nil, nil, 'bottomright');
 	row = row + 1;
 
-	if script_mode == "Examine" then
-		local examine_data = getExamineData(getSlotBase(objectArray, object_index));
+	if script_mode == "Examine" and isRDRAM(objectArray) then
+		local examine_data = getExamineData(objectArray + getSlotBase(object_index));
 		for i = #examine_data, 1, -1 do
 			if examine_data[i][1] ~= "Separator" then
 				gui.text(Game.OSDPosition[1], 2 + Game.OSDRowHeight * row, examine_data[i][2].." - "..examine_data[i][1], nil, nil, 'bottomright');
@@ -1693,9 +1693,9 @@ function draw_ui() -- TODO: Refactor to something about object analysis tools
 		end
 	end
 
-	if script_mode == "List" then
+	if script_mode == "List" and isRDRAM(objectArray) then
 		for i = numSlots, 1, -1 do
-			local currentSlotBase = getSlotBase(objectArray, i);
+			local currentSlotBase = objectArray + getSlotBase(i);
 
 			local animationType = "Unknown";
 			local animationObjectPointer = dereferencePointer(currentSlotBase + 0x14); -- TODO: Get this constant from variable name somehow
@@ -2152,7 +2152,7 @@ local function encircle_banjo()
 		-- Fill and sort pointer list
 		for i = 0, num_slots - 1 do
 			-- TODO: Check for bone arrays before adding to table, we don't want to move stuff we can't see
-			table.insert(currentPointers, getSlotBase(objectArray, i));
+			table.insert(currentPointers, objectArray + getSlotBase(i));
 		end
 		table.sort(currentPointers);
 
