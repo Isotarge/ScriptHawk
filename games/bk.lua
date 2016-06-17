@@ -251,6 +251,7 @@ function Game.detectVersion(romName, romHash)
 		clip_vel = -2900;
 		Game.allowFurnaceFunPatch = false; -- TODO: FF Patch for this version
 		Game.supportsASMHacks = false; -- TODO: Research ASM hook for this version
+		max_air = 6 * 500;
 	elseif romHash == "90726D7E7CD5BF6CDFD38F45C9ACBF4D45BD9FD8" then -- Japan
 		version = 2;
 		Game.allowFurnaceFunPatch = false; -- TODO: FF Patch for this version
@@ -1163,6 +1164,8 @@ local movementStates = {
 
 	[64] = "Locked", -- Pumpkin: Pipe
 	[65] = "Death",
+	[66] = "Dingpot",
+
 	[68] = "Jig", -- Jiggy
 	[69] = "Slipping", -- Talon Trot
 

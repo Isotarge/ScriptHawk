@@ -146,6 +146,8 @@ local movementStates = {
 
 	[64] = "Locked", -- Pumpkin: Pipe
 	[65] = "Death",
+	[66] = "Dingpot",
+
 	[68] = "Jig", -- Jiggy
 	[69] = "Slipping", -- Talon Trot
 
