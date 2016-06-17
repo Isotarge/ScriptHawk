@@ -1113,7 +1113,6 @@ local movementStates = {
 	[17] = "Rat-a-tat rap",
 	[18] = "Backflip", -- Flap Flip
 	[19] = "Beak Barge",
-
 	[20] = "Entering Talon Trot",
 	[21] = "Idle", -- Talon Trot
 	[22] = "Walking", -- Talon Trot
@@ -1125,7 +1124,6 @@ local movementStates = {
 	[28] = "Walking", -- Wonderwing
 	[29] = "Jumping", -- Wonderwing
 	[30] = "Leaving Wonderwing",
-
 	[31] = "Creeping",
 	[32] = "Landing", -- After Jump
 	[33] = "Charging Shock Spring Jump",
@@ -1135,7 +1133,6 @@ local movementStates = {
 	[37] = "Entering Wading Boots",
 	[38] = "Idle", -- Wading Boots
 	[39] = "Walking", -- Wading Boots
-
 	[40] = "Jumping", -- Wading Boots
 	[41] = "Leaving Wading Boots",
 	[42] = "Beak Bomb",
@@ -1143,10 +1140,8 @@ local movementStates = {
 	[44] = "Swimming (B)",
 	[45] = "Idle", -- Treading water
 	[46] = "Paddling",
-
 	[47] = "Falling", -- After pecking
 	[48] = "Diving",
-
 	[49] = "Rolling",
 	[50] = "Slipping",
 
@@ -1177,19 +1172,16 @@ local movementStates = {
 	[77] = "Damaged", -- Pumpkin
 	[78] = "Death", -- Pumpkin
 	[79] = "Idle", -- Holding tree, pole, etc.
-
 	[80] = "Climbing", -- Tree, pole, etc.
 	[81] = "Leaving Climb",
 	[82] = "Tumblar", -- Standing on Tumblar
 	[83] = "Tumblar", -- Standing on Tumblar
-
 	[84] = "Death", -- Drowning
 	[85] = "Slipping", -- Wading Boots
 	[86] = "Knockback", -- Successful enemy damage
 	[87] = "Beak Bomb", -- Ending
 	[88] = "Damaged", -- Beak Bomb
 	[89] = "Damaged", -- Beak Bomb
-
 	[90] = "Loading Zone",
 	[91] = "Throwing", -- Throwing object (eg. Orange)
 
@@ -1237,7 +1229,6 @@ local movementStates = {
 	[147] = "Locked", -- Pumpkin?
 	[148] = "Locked", -- Mumbo transformation
 	[149] = "Locked", -- Walrus?
-
 	[150] = "Locked", -- Paddling
 	[151] = "Locked", -- Swimming
 	[152] = "Locked", -- Loading zone, Mumbo transformation
