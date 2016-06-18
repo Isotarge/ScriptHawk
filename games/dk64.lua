@@ -975,7 +975,7 @@ obj_model1 = {
 
 local function getActorName(pointer)
 	if isRDRAM(pointer) then
-		local actorBehavior = mainmemory.read_u32_be(pointer + obj_model1.actor_type);
+		local actorBehavior = mainmemory.read_u32_be(pointer + obj_model1.actor_type) % 0x10000;
 		if type(obj_model1.actor_types[actorBehavior]) ~= "nil" then
 			return obj_model1.actor_types[actorBehavior];
 		end
