@@ -944,6 +944,10 @@ obj_model1 = {
 		["menu_screen"] = 0x18A,
 		["menu_position"] = 0x18F,
 	},
+	["bug"] = { -- Big Bug Bash -- TODO: These possibly apply to other AI objects
+		["current_direction"] = 0x180, -- Float
+		["ticks_til_direction_change"] = 0x184, -- u32_be
+	},
 };
 
 local function getActorName(pointer)
@@ -1114,8 +1118,8 @@ local function getExamineDataModelOne(pointer)
 		end
 		table.insert(examine_data, { "Separator", 1 });
 	elseif currentActorType == "Bug" then -- Big Bug Bash
-		table.insert(examine_data, { "Current AI direction", mainmemory.readfloat(pointer + 0x180) }); -- TODO: Pop these into model 1 table
-		table.insert(examine_data, { "Ticks til direction change", mainmemory.read_u32_be(pointer + 0x184) }); -- TODO: These possibly apply to other AI objects
+		table.insert(examine_data, { "Current AI direction", mainmemory.readfloat(pointer + obj_model1.bug.current_direction, true) });
+		table.insert(examine_data, { "Ticks til direction change", mainmemory.read_u32_be(pointer + obj_model1.bug.ticks_til_direction_change) });
 		table.insert(examine_data, { "Separator", 1 });
 	elseif currentActorType == "Main Menu Controller" then
 		table.insert(examine_data, { "Menu Screen", mainmemory.readbyte(pointer + obj_model1.main_menu_controller.menu_screen) });
@@ -1304,8 +1308,8 @@ local function getExamineDataModelTwo(pointer)
 		return examine_data;
 	end
 
-	local modelPointer = mainmemory.read_u32_be(pointer + obj_model2.model_pointer);
-	local hasModel = isPointer(modelPointer);
+	local modelPointer = dereferencePointer(pointer + obj_model2.model_pointer);
+	local hasModel = isRDRAM(modelPointer);
 
 	local xPos = mainmemory.readfloat(pointer + obj_model2.x_pos, true);
 	local yPos = mainmemory.readfloat(pointer + obj_model2.y_pos, true);
@@ -1350,8 +1354,7 @@ local function getExamineDataModelTwo(pointer)
 	table.insert(examine_data, { "GB Interaction Bitfield", bizstring.binary(mainmemory.readbyte(pointer + obj_model2.collectable_state)) });
 
 	if hasModel then
-		table.insert(examine_data, { "Model Base", toHexString(modelPointer) });
-		modelPointer = modelPointer - RDRAMBase;
+		table.insert(examine_data, { "Model Base", toHexString(modelPointer, 6) });
 		table.insert(examine_data, { "Separator", 1 });
 
 		table.insert(examine_data, { "Model X", mainmemory.readfloat(modelPointer + obj_model2.model.x_pos, true) });
@@ -3598,11 +3601,10 @@ ScriptHawk.bindKeyRealtime("C", switch_grab_script_mode, true);
 ------------------------------
 
 local function isValidModel1Object(pointer, playerObject, cameraObject)
-	local modelPointer = mainmemory.read_u32_be(pointer + obj_model1.model_pointer);
-	local hasModel = isPointer(modelPointer);
+	local modelPointer = dereferencePointer(pointer + obj_model1.model_pointer);
 
 	if encircle_enabled then
-		return hasModel and pointer ~= playerObject;
+		return isRDRAM(modelPointer) and pointer ~= playerObject;
 	end
 
 	return true;
@@ -3683,7 +3685,7 @@ function countMelonProjectiles()
 end
 
 function getSlotPointer(koshController, slotIndex)
-	return mainmemory.read_u32_be(koshController + obj_model1.kosh_kontroller.slot_pointer_base + (slotIndex - 1) * 4);
+	return dereferencePointer(koshController + obj_model1.kosh_kontroller.slot_pointer_base + (slotIndex - 1) * 4);
 end
 
 function getCurrentSlot()
@@ -3710,8 +3712,8 @@ function getDesiredSlot()
 		local slotIndex = 0;
 		local desiredSlot = 0;
 		for slotIndex = 1, 8 do
-			local slotPointer = getSlotPointer(koshController, slotIndex)
-			if slotPointer > 0 and slotPointer ~= shots_fired[slotIndex] then
+			local slotPointer = getSlotPointer(koshController, slotIndex);
+			if isRDRAM(slotPointer) and slotPointer ~= shots_fired[slotIndex] then
 				desiredSlot = slotIndex;
 			end
 			if slotPointer == 0 then
@@ -3880,9 +3882,9 @@ local function drawGrabScriptUI()
 
 		if grab_script_mode == "List (Object Model 2)" then
 			for i = #object_pointers, 1, -1 do
-				local behaviorPointer = mainmemory.read_u32_be(object_pointers[i] + obj_model2.behavior_pointer);
+				local behaviorPointer = dereferencePointer(object_pointers[i] + obj_model2.behavior_pointer);
 				local collectableState = mainmemory.readbyte(object_pointers[i] + obj_model2.collectable_state);
-				if behaviorPointer > 0 then
+				if isRDRAM(behaviorPointer) then
 					behaviorPointer = " ("..toHexString(behaviorPointer or 0, 8)..")";
 				else
 					behaviorPointer = "";
