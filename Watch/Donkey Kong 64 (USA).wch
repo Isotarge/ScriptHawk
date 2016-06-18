@@ -263,7 +263,7 @@ SystemID N64
 7FBB62	b	b	1	RDRAM	Zipper Bitfield
 7FBB63	b	b	1	RDRAM	TB Void Bitfield
 7FBB64	b	b	1	RDRAM	Shadow Display Bitfield
-7FBB65	b	b	1	RDRAM	Unknown Bitfield
+7FBB65	b	b	1	RDRAM	Shockwave Bitfield
 7FBB66	b	b	1	RDRAM	Long Distance Actor Spawn
 7FC3F1	b	u	1	RDRAM	Object Count?
 7FC930	w	u	1	RDRAM	Japes T&S CBs (Total)

@@ -491,6 +491,8 @@ obj_model1 = {
 		[18] = "Rambi Box",
 		[19] = "Barrel (Diddy 5DI)",
 		--[20] = "Unknown", -- Possibily some kind of cutscene controller
+		[21] = "Pushable Box", -- TODO: Unused?
+		[22] = "Barrel Spawner", -- TODO: Unused?
 		[23] = "Cannon",
 		[25] = "Hunky Chunky Barrel",
 		[26] = "TNT Barrel",
@@ -505,16 +507,22 @@ obj_model1 = {
 		[36] = "Peanut",
 		--[37] = "Unknown - Factory Intro", -- TODO: What is this?
 		[38] = "Pineapple",
+		[39] = "Large Brown Bridge", -- TODO: Unused?
 		[40] = "Mini Monkey barrel",
 		[41] = "Orange",
 		[42] = "Grape",
 		[43] = "Feather",
 		[44] = "Laser (Projectile)",
+		[45] = "Golden Banana", -- TODO: Unused? There are normally model 2
 		[47] = "Watermelon Slice",
 		[48] = "Coconut",
 		[49] = "Rocketbarrel",
 		[50] = "Lime",
+		[51] = "Ammo Crate", -- TODO: Unused? Doesn't seem to work, these are normally model 2
 		[52] = "Orange Pickup", -- Dropped by Klump & Purple Klaptrap
+		[53] = "Banana Coin", -- TODO: Unused? Doesn't seem to work, these are normally model 2
+		[54] = "DK Coin", -- TODO: Unused? Doesn't seem to work, these are normally model 2
+		[55] = "Small Explosion", -- TODO: Unused?
 		[56] = "Orangstand Sprint Barrel",
 		[57] = "Strong Kong Barrel",
 		[58] = "Swinging Light",
@@ -526,6 +534,7 @@ obj_model1 = {
 		[66] = "Vase (+)",
 		[67] = "Cannon Ball",
 		[69] = "Vine", -- Green
+		[70] = "Counter", -- TODO: Unused?
 		[71] = "Red Kremling (Lanky's Keyboard Game in R&D)",
 		[72] = "Boss Key",
 		[73] = "Cannon", -- Galleon Minigame
@@ -535,12 +544,15 @@ obj_model1 = {
 		[78] = "Blueprint (DK)",
 		[79] = "Blueprint (Tiny)",
 		[81] = "Fire Spawner? (Dogadon)", -- TODO: Verify
+		[82] = "Small Grey Rock", -- TODO: Unused?
 		[83] = "Spider Web", -- Fungi miniBoss
 		[84] = "Steel Keg Spawner",
 		[85] = "Steel Keg",
 		[86] = "Crown",
+		[89] = "Fire", -- TODO: Unused?
 		[91] = "Balloon (Diddy)",
 		[92] = "Stalactite",
+		[94] = "Car", -- TODO: Unused?
 		[95] = "Pause Menu",
 		[96] = "Hunky Chunky Barrel (Dogadon)",
 		[98] = "Tag Barrel",
@@ -553,17 +565,24 @@ obj_model1 = {
 		[105] = "6 Pad (Diddy 5DI)",
 		[106] = "5DI Controller?", -- TODO: Investigate
 		[107] = "Bonus Barrel (Hideout Helm)",
+		[110] = "CB Bunch", -- TODO: Unused? Doesn't seem to work, these are normally model 2
 		[111] = "Balloon (Chunky)",
 		[112] = "Balloon (Tiny)",
 		[113] = "Balloon (Lanky)",
 		[114] = "Balloon (DK)",
 		[115] = "K. Lumsy's Cage", -- TODO: Also rabbit race finish line?
 		[116] = "Chain",
+		[118] = "Yellow ?", -- TODO: Unused?
+		[119] = "CB Single (Blue)", -- TODO: Unused? Doesn't seem to work, these are normally model 2
+		[120] = "CB Single (Yellow)", -- TODO: Unused? Doesn't seem to work, these are normally model 2
+		[121] = "Crystal Coconut", -- TODO: Unused? Doesn't seem to work, these are normally model 2
+		[122] = "DK Coin", -- TODO: Unused? Doesn't seem to work, these are normally model 2
 		[124] = "Peril Path Panic Controller?", -- TODO: Verify, used anywhere else?
 		[126] = "Fly Swatter",
 		[128] = "Headphones",
 		[129] = "Enguarde Box",
 		[130] = "Apple (Fungi)",
+		[132] = "Enguarde Box", -- TODO: Does this work? Unused?
 		[133] = "Barrel",
 		[134] = "Training Barrel",
 		[135] = "Boombox (Treehouse)",
@@ -571,14 +590,16 @@ obj_model1 = {
 		[137] = "Tag Barrel", -- Troff'n'Scoff
 		[138] = "B. Locker",
 		[139] = "Rainbow Coin Patch",
-		[140] = "Rainbow Coin (Spawner?)",
+		[140] = "Rainbow Coin",
 		[148] = "Rope", -- K. Rool's Arena
+		[149] = "Banana Barrel", -- TODO: Lanky Phase?
 		[156] = "Wrinkly",
 		[163] = "Banana Fairy (BFI)",
 		[164] = "Ice Tomato",
 		[165] = "Tag Barrel (King Kutout)",
 		[166] = "King Kutout Part",
 		[167] = "Cannon",
+		[170] = "Damage Source", -- TODO?
 		[171] = "Orange", -- Krusha's Gun
 		[173] = "Cutscene Controller",
 		[175] = "Barrel Enemy (TNT)",
@@ -799,7 +820,7 @@ obj_model1 = {
 		[0x43] = "Barrel", -- Underwater
 		[0x44] = "Baboon Blast Shot",
 		[0x45] = "Cannon Shot",
-
+		[0x46] = "Pushing Object", -- TODO: Unused?
 		[0x47] = "Picking up Object",
 		[0x48] = "Idle", -- Carrying Object
 		[0x49] = "Walking", -- Carrying Object
@@ -1110,12 +1131,14 @@ local function getExamineDataModelOne(pointer)
 		table.insert(examine_data, { "TB previous index", mainmemory.readbyte(pointer + obj_model1.tag_barrel.previous_index) });
 		table.insert(examine_data, { "TB kickout timer", mainmemory.read_u32_be(pointer + obj_model1.tag_barrel.kickout_timer) });
 		table.insert(examine_data, { "Separator", 1 });
+
 		table.insert(examine_data, { "DK Actor Pointer", toHexString(mainmemory.read_u32_be(pointer + obj_model1.tag_barrel.DK_actor_pointer)) });
 		table.insert(examine_data, { "Diddy Actor Pointer", toHexString(mainmemory.read_u32_be(pointer + obj_model1.tag_barrel.Diddy_actor_pointer)) });
 		table.insert(examine_data, { "Lanky Actor Pointer", toHexString(mainmemory.read_u32_be(pointer + obj_model1.tag_barrel.Lanky_actor_pointer)) });
 		table.insert(examine_data, { "Tiny Actor Pointer", toHexString(mainmemory.read_u32_be(pointer + obj_model1.tag_barrel.Tiny_actor_pointer)) });
 		table.insert(examine_data, { "Chunky Actor Pointer", toHexString(mainmemory.read_u32_be(pointer + obj_model1.tag_barrel.Chunky_actor_pointer)) });
 		table.insert(examine_data, { "Separator", 1 });
+
 	elseif currentActorType == "Kremling Kosh Controller" then
 		table.insert(examine_data, { "Current Slot", mainmemory.readbyte(pointer + obj_model1.kosh_kontroller.slot_location) });
 		table.insert(examine_data, { "Melons Remaining", mainmemory.readbyte(pointer + obj_model1.kosh_kontroller.melons_remaining) });
@@ -1400,7 +1423,7 @@ local loading_zone_fields = {
 		[0x05] = "Cutscene Trigger",
 		[0x09] = "Loading Zone",
 		[0x0A] = "Cutscene Trigger",
-		[0x0C] = "Loading Zone",
+		[0x0C] = "Loading Zone + Objects", -- Alows objects through
 		[0x0D] = "Loading Zone",
 		[0x10] = "Loading Zone",
 		[0x11] = "Loading Zone", -- Snide's
@@ -1432,7 +1455,7 @@ function getExamineDataLoadingZone(base)
 		table.insert(data, {"Z Position", mainmemory.read_s16_be(base + loading_zone_fields.z_position)});
 		table.insert(data, {"Separator", 1});
 
-		if _type == "Loading Zone" then
+		if stringContains(_type, "Loading Zone") then
 			local destinationMap = mainmemory.read_u16_be(base + loading_zone_fields.destination_map);
 			if Game.maps[destinationMap + 1] ~= nil then
 				destinationMap = Game.maps[destinationMap + 1];
@@ -3931,7 +3954,7 @@ local function drawGrabScriptUI()
 					else
 						_type = toHexString(_type);
 					end
-					if _type == "Loading Zone" then
+					if stringContains(_type, "Loading Zone") then
 						local destinationMap = mainmemory.read_u16_be(base + loading_zone_fields.destination_map);
 						if Game.maps[destinationMap + 1] ~= nil then
 							destinationMap = Game.maps[destinationMap + 1];
