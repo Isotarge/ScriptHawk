@@ -1442,7 +1442,7 @@ function getExamineDataLoadingZone(base)
 	if isRDRAM(base) then
 		local _type = mainmemory.read_u16_be(base + loading_zone_fields.object_type);
 		if loading_zone_fields.object_types[_type] ~= nil then
-			_type = loading_zone_fields.object_types[_type];
+			_type = loading_zone_fields.object_types[_type].." ("..toHexString(_type)..")";
 		else
 			_type = toHexString(_type);
 		end
@@ -1450,10 +1450,10 @@ function getExamineDataLoadingZone(base)
 		table.insert(data, {"Type", _type});
 		table.insert(data, {"Separator", 1});
 
-		table.insert(data, {"X Position", mainmemory.read_s16_be(base + loading_zone_fields.x_position)});
-		table.insert(data, {"Y Position", mainmemory.read_s16_be(base + loading_zone_fields.y_position)});
-		table.insert(data, {"Z Position", mainmemory.read_s16_be(base + loading_zone_fields.z_position)});
-		table.insert(data, {"Separator", 1});
+		if stringContains(_type, "Cutscene Trigger") then
+			table.insert(data, {"Cutscene Index", mainmemory.read_u16_be(base + loading_zone_fields.destination_map)});
+			table.insert(data, {"Separator", 1});
+		end
 
 		if stringContains(_type, "Loading Zone") then
 			local destinationMap = mainmemory.read_u16_be(base + loading_zone_fields.destination_map);
@@ -1466,11 +1466,13 @@ function getExamineDataLoadingZone(base)
 			table.insert(data, {"Destination Exit", mainmemory.read_u16_be(base + loading_zone_fields.destination_exit)});
 			table.insert(data, {"Fade", mainmemory.read_u16_be(base + loading_zone_fields.fade_type)});
 			table.insert(data, {"Active", mainmemory.readbyte(base + loading_zone_fields.active)});
+			table.insert(data, {"Separator", 1});
 		end
 
-		if _type == "Cutscene Trigger" then
-			table.insert(data, {"Cutscene Index", mainmemory.read_u16_be(base + loading_zone_fields.destination_map)});
-		end
+		table.insert(data, {"X Position", mainmemory.read_s16_be(base + loading_zone_fields.x_position)});
+		table.insert(data, {"Y Position", mainmemory.read_s16_be(base + loading_zone_fields.y_position)});
+		table.insert(data, {"Z Position", mainmemory.read_s16_be(base + loading_zone_fields.z_position)});
+		table.insert(data, {"Separator", 1});
 	end
 	return data;
 end
@@ -3950,7 +3952,7 @@ local function drawGrabScriptUI()
 				if isRDRAM(base) then
 					local _type = mainmemory.read_u16_be(base + loading_zone_fields.object_type);
 					if loading_zone_fields.object_types[_type] ~= nil then
-						_type = loading_zone_fields.object_types[_type];
+						_type = loading_zone_fields.object_types[_type].." ("..toHexString(_type)..")";
 					else
 						_type = toHexString(_type);
 					end
@@ -3964,7 +3966,7 @@ local function drawGrabScriptUI()
 						local destinationExit = mainmemory.read_u16_be(base + loading_zone_fields.destination_exit);
 						gui.text(gui_x, gui_y + height * row, destinationMap.." ("..destinationExit..") "..toHexString(base or 0, 6).." "..i, color, nil, 'bottomright');
 						row = row + 1;
-					elseif _type == "Cutscene Trigger" then
+					elseif stringContains(_type, "Cutscene Trigger") then
 						gui.text(gui_x, gui_y + height * row, _type.." ("..mainmemory.read_u16_be(base + loading_zone_fields.destination_map)..") "..toHexString(base or 0, 6).." "..i, color, nil, 'bottomright');
 						row = row + 1;
 					else
