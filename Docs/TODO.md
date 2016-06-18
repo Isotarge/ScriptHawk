@@ -1,18 +1,16 @@
-#Official ScriptHawk TODO list
+#ScriptHawk TODO list
 ##High Priority
 - General: Rework input/keybinds, multiple profiles like wasd/arrow keys
 - General: 2D game support
-- General: Move from x, y, z variables to position/rotation/velocity etc. tables with x, y, z indexes
+	- Move from x, y, z variables to position/rotation/velocity etc. tables with x, y, z indexes
 - General: UI to load ASM patches, can currently only be done by calling loadASMPatch(filename, suppressprint) in the lua console
 - Rayman 2: Find player object pointer
-- DPAD Fixes for:
+- D-Pad Fixes for:
 	- DK64 (Fly Swatter)
 - DK64: Find menu cutscene flags
 - DK64: Finish flag documentation
-	- Complete documentation for US
-	- Figure out how the 101% credits are triggered
-	- Start documentation for other versions
-	- Write a loop to detect when flags are set/cleared
+	- Figure out how to reliably find flag block on any frame, the current method reads the pointer from what I assume is the stack and this doesn't work on lag frames
+	- Implement framework to detect when flags are set/cleared & print to console
 - DK64: Exception when gui.cleargraphics() is called on first frame (by MJ minimap)
 - DK64: Finish integrating the Object Analysis tools
 	- Move to SM64.lua's struct format for object model 1 and model 2
