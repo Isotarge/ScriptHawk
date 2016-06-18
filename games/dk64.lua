@@ -1491,6 +1491,42 @@ function populateLoadingZonePointers()
 	end
 end
 
+function dumpLoadingZones()
+	local loadingZoneArray = getLoadingZoneArray();
+	if isRDRAM(loadingZoneArray) then
+		local arraySize = mainmemory.read_u16_be(Game.Memory.loading_zone_array_size[version]);
+		for i = 0, arraySize do
+			local base = loadingZoneArray + (i * loading_zone_size);
+
+			if isRDRAM(base) then
+				local _type = mainmemory.read_u16_be(base + loading_zone_fields.object_type);
+				if loading_zone_fields.object_types[_type] ~= nil then
+					_type = loading_zone_fields.object_types[_type].." ("..toHexString(_type)..")";
+				else
+					_type = toHexString(_type);
+				end
+
+				if stringContains(_type, "Loading Zone") then
+					local destinationMap = mainmemory.read_u16_be(base + loading_zone_fields.destination_map);
+					if Game.maps[destinationMap + 1] ~= nil then
+						destinationMap = Game.maps[destinationMap + 1];
+					else
+						destinationMap = "Unknown Map "..toHexString(destinationMap);
+					end
+					local destinationExit = mainmemory.read_u16_be(base + loading_zone_fields.destination_exit);
+					local transitionType = mainmemory.read_u16_be(base + loading_zone_fields.fade_type);
+
+					local xPosition = mainmemory.read_s16_be(base + loading_zone_fields.x_position);
+					local yPosition = mainmemory.read_s16_be(base + loading_zone_fields.y_position);
+					local zPosition = mainmemory.read_s16_be(base + loading_zone_fields.z_position);
+
+					print(Game.maps[map_value + 1]..","..destinationMap..","..destinationExit..","..transitionType..",unknown,"..xPosition..","..yPosition..","..zPosition);
+				end
+			end
+		end
+	end
+end
+
 --------------------
 -- Region/Version --
 --------------------
