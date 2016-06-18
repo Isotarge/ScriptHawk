@@ -883,6 +883,8 @@ obj_model1 = {
 		["velocity_ground"] = 0x1C0, -- TODO: What is this?
 		["vehicle_actor_pointer"] = 0x208, -- u32 be
 		["slope_timer"] = 0x243,
+		["shockwave_charge_timer"] = 0x248, -- s16 be
+		["shockwave_recovery_timer"] = 0x24A, -- byte
 		["grabbed_vine_pointer"] = 0x2B0, -- u32 be
 		["grab_pointer"] = 0x32C, -- u32 be
 		["scale"] = {
@@ -1043,6 +1045,10 @@ local function getExamineDataModelOne(pointer)
 	table.insert(examine_data, { "Separator", 1 });
 
 	if isKong(currentActorTypeNumeric) then
+		table.insert(examine_data, { "Shockwave Charge Timer", mainmemory.read_s16_be(pointer + obj_model1.player.shockwave_charge_timer) });
+		table.insert(examine_data, { "Shockwave Recovery Timer", mainmemory.readbyte(pointer + obj_model1.player.shockwave_recovery_timer) });
+		table.insert(examine_data, { "Separator", 1 });
+
 		table.insert(examine_data, { "Vehicle Actor Pointer", toHexString(mainmemory.read_u32_be(pointer + obj_model1.player.vehicle_actor_pointer), 8) });
 		table.insert(examine_data, { "Grabbed Vine Pointer", toHexString(mainmemory.read_u32_be(pointer + obj_model1.player.grabbed_vine_pointer), 8) });
 		table.insert(examine_data, { "Grab pointer", toHexString(mainmemory.read_u32_be(pointer + obj_model1.player.grab_pointer), 8) });
