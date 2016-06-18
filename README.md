@@ -54,23 +54,13 @@ A collection of Lua scripts and RAM watches for [BizHawk](https://github.com/TAS
 - All known versions supported
 - Object analysis tools: List, Examine
 
-###The Legend of Zelda: Majora's Mask
-- Europe 1.0 and 1.1
-- Japan 1.0 and 1.1
-- USA 1.0
-
-###The Legend of Zelda: Ocarina of Time
-- Europe 1.0, 1.1 and Master Quest
-- Japan 1.0, 1.1 and 1.2
-- USA 1.0, 1.1 and 1.2
-
 ###Toy Story 2: Buzz Lightyear to the Rescue
 - Europe (N64)
 - France (N64)
 - German 1.0 and 1.1 (N64)
 - USA (N64)
 
-###Regarding Zelda
+###Ocarina of Time & Majora's Mask
 While ScriptHawk does have basic support for OoT and MM there are people who are much more dedicated to these games than I will ever be. Check out the great work at the following GitHub repos for more comprehensive support:  
 - [notwa/mm](https://github.com/notwa/mm/tree/master/Lua)  
 - [RainingChain/Z64LuaHooks](https://github.com/RainingChain/Z64LuaHooks)  
@@ -83,12 +73,18 @@ While ScriptHawk does have basic support for OoT and MM there are people who are
 
 ##Other Notable Scripts
 - Alex Kidd in Miracle World object viewer with drag and drop support
+- The Ninja (SMS) object viewer with drag and drop support
 - Tetris Attack bot, plays the game quite well using a simple sorting algorithm
 - Mr. Driller 2 bot
 - Dega .MMV reader
 - remove_klump.lua, [code golf](https://en.wikipedia.org/wiki/Code_golf) that removes Klumps from DK64 USA version
 - Legend of Galahad object viewer, written by [The8BitBeast](https://twitter.com/the8bitbeast)
 - Wonder Boy III RNG watch, written by [The8BitBeast](https://twitter.com/the8bitbeast)
+
+##Other Notable BizHawk + Lua Repositories
+- GoldenEye [Wyst3r/GoldenEye](https://bitbucket.org/Wyst3r/bizhawklua)
+- Super Mario World [rodamaral/smw-tas](https://github.com/rodamaral/smw-tas)
+- Pokémon Red & Yellow [kylecoburn/PokéBot](https://github.com/kylecoburn/PokeBot)
 
 ##Support me
 If you like my work, consider donating [here](https://streamtip.com/t/isotarge)
