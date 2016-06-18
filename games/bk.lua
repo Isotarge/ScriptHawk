@@ -1655,7 +1655,7 @@ function draw_ui() -- TODO: Refactor to something about object analysis tools
 
 	local row = 0;
 
-	local objectArray = dereferencePointer(Game.Memory.object_array_pointer[version]); -- TODO: isRDRAM check
+	local objectArray = dereferencePointer(Game.Memory.object_array_pointer[version]);
 	local structArray;
 	if version == 4 then -- TODO: Other versions
 		structArray = dereferencePointer(Game.Memory.struct_array_pointer[version]);

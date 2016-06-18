@@ -150,11 +150,11 @@ function countObjects()
 end
 
 function getX()
-	return mainmemory.readbyte(0xEB2); -- TODO: This is a s16_le
+	return mainmemory.read_s16_le(0xEB2);
 end
 
 function getY()
-	return mainmemory.readbyte(0xEAF); -- TODO: This is a s16_le
+	return mainmemory.read_s16_le(0xEAF);
 end
 
 function getLevelX()
