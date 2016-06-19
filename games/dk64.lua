@@ -152,7 +152,7 @@ Game.maps = {
 	"Gloomy Galleon: Lighthouse",
 	"K. Rool Barrel: Tiny's Mushroom Game", -- 50
 	"Gloomy Galleon: Mechanical Fish",
-	"Fungi Forest: Tree Stump",
+	"Fungi Forest: Ant Hill",
 	"Beaver Brawl!",
 	"Gloomy Galleon: Barrel Blast",
 	"Fungi Forest: Minecart",
@@ -770,24 +770,25 @@ obj_model1 = {
 		[0x0C] = "Idle",
 		[0x0D] = "Walking",
 		[0x0E] = "Skidding",
-		--[0x0F] = "Crash",
-		--[0x10] = "Crash",
-		[0x11] = "Special Animation", -- Enemy
-		--[0x12] = "Crash",
-		--[0x13] = "Crash",
-		--[0x14] = "Crash",
+		[0x0F] = "Sliding", -- Beetle Race
+		[0x10] = "Sliding (Left)", -- Beetle Race
+		[0x11] = "Sliding (Right)", -- Beetle Race
+		[0x12] = "Sliding (Forward)", -- Beetle Race
+		[0x13] = "Sliding (Back)", -- Beetle Race
+		[0x14] = "Jumping", -- Beetle Race
 		[0x15] = "Slipping",
 		[0x16] = "Slipping", -- DK Slope in Helm
 		[0x17] = "Jumping",
 		[0x18] = "Baboon Blast Pad",
 		[0x19] = "Bouncing", -- Mushroom
 		[0x1A] = "Double Jump", -- Diddy
+
 		[0x1C] = "Simian Slam",
 		[0x1D] = "Long Jumping",
 		[0x1E] = "Falling",
 		[0x1F] = "Falling", -- Gun
 		[0x20] = "Falling/Splat",
-
+		[0x21] = "Falling", -- Beetle Race
 		[0x22] = "Pony Tail Twirl",
 		[0x23] = "Attacking", -- Enemy
 		[0x24] = "Primate Punch", -- TODO: Is this used anywhere else?
@@ -1430,6 +1431,7 @@ local loading_zone_fields = {
 		-- [0x13] = "Unknown - Caves Lobby", -- Behind ice walls
 		[0x15] = "Cutscene Trigger",
 		[0x17] = "Cutscene Trigger",
+		-- [0x19] = "Trigger", -- Seal Race
 	},
 	["destination_map"] = 0x12, -- u16_be, index of Game.maps
 	["destination_exit"] = 0x14, -- u16_be
