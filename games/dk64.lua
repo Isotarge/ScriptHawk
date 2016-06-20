@@ -3640,20 +3640,18 @@ local function zipToSelectedObject()
 		local desiredX, desiredY, desiredZ;
 		-- Get selected object X,Y,Z position
 		if stringContains(grab_script_mode, "Model 1") then
-			local selectedActorBase = dereferencePointer(Game.Memory["pointer_list"][version] + (object_index - 1) * 4);
+			local selectedActorBase = object_pointers[object_index];
 			if isRDRAM(selectedActorBase) then
 				desiredX = mainmemory.readfloat(selectedActorBase + obj_model1.x_pos, true);
 				desiredY = mainmemory.readfloat(selectedActorBase + obj_model1.y_pos, true);
 				desiredZ = mainmemory.readfloat(selectedActorBase + obj_model1.z_pos, true);
 			end
 		elseif stringContains(grab_script_mode, "Model 2") then
-			local model2Array = getObjectModel2Array();
-			if isRDRAM(model2Array) then
-				local selectedActorBase = model2Array + (object_index - 1) * obj_model2_slot_size;
-
-				desiredX = mainmemory.readfloat(selectedActorBase + obj_model2.x_pos, true);
-				desiredY = mainmemory.readfloat(selectedActorBase + obj_model2.y_pos, true);
-				desiredZ = mainmemory.readfloat(selectedActorBase + obj_model2.z_pos, true);
+			local selectedObjectBase = object_pointers[object_index];
+			if isRDRAM(selectedObjectBase) then
+				desiredX = mainmemory.readfloat(selectedObjectBase + obj_model2.x_pos, true);
+				desiredY = mainmemory.readfloat(selectedObjectBase + obj_model2.y_pos, true);
+				desiredZ = mainmemory.readfloat(selectedObjectBase + obj_model2.z_pos, true);
 			end
 		elseif stringContains(grab_script_mode, "Loading Zones") then
 			local selectedLoadingZoneBase = object_pointers[object_index];
