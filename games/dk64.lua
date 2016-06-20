@@ -535,7 +535,7 @@ obj_model1 = {
 		[67] = "Cannon Ball",
 		[69] = "Vine", -- Green
 		[70] = "Counter", -- TODO: Unused?
-		[71] = "Red Kremling (Lanky's Keyboard Game in R&D)",
+		[71] = "Red Kremling", -- Lanky's Keyboard Game in R&D
 		[72] = "Boss Key",
 		[73] = "Cannon", -- Galleon Minigame
 		[75] = "Blueprint (Diddy)",
@@ -1245,6 +1245,7 @@ function getObjectModel2ModelBase(index)
 	end
 end
 
+object_model2_filter = nil;
 function populateObjectModel2Pointers()
 	object_pointers = {};
 	local objModel2Array = getObjectModel2Array();
@@ -1255,11 +1256,20 @@ function populateObjectModel2Pointers()
 			numSlots = 430;
 		end
 
-		-- Fill and sort pointer list
-		for i = 1, numSlots do
-			table.insert(object_pointers, objModel2Array + (i - 1) * obj_model2_slot_size);
+		if object_model2_filter == nil then
+			-- Fill and sort pointer list
+			for i = 1, numSlots do
+				table.insert(object_pointers, objModel2Array + (i - 1) * obj_model2_slot_size);
+			end
+		else
+			-- Fill and sort pointer list
+			for i = 1, numSlots do
+				base = objModel2Array + (i - 1) * obj_model2_slot_size;
+				if getScriptName(base) == object_model2_filter then
+					table.insert(object_pointers, base);
+				end
+			end
 		end
-		table.sort(object_pointers);
 	end
 end
 
@@ -3512,11 +3522,11 @@ function ohWrongnana()
 				if currentKong ~= Krusha and isGB(currentValue) then
 					mainmemory.writebyte(slotBase + obj_model2.collectable_state, GBStates[currentKong]);
 				end
-				scriptName = getScriptName(slotBase);
-				if scriptName == "gunswitches" or scriptName == "buttons" then
-					-- Get activation script
-					activationScript = dereferencePointer(slotBase + 0x7C);
-					if isRDRAM(activationScript) then
+				-- Get activation script
+				activationScript = dereferencePointer(slotBase + 0x7C);
+				if isRDRAM(activationScript) then
+					scriptName = getScriptName(slotBase);
+					if scriptName == "gunswitches" then
 						-- Get part 2
 						activationScript = dereferencePointer(activationScript + 0xA0);
 						while isRDRAM(activationScript) do
@@ -3526,6 +3536,16 @@ function ohWrongnana()
 							if isBulletCheck(earlyCheckValue) then
 								mainmemory.write_u16_be(activationScript + 0x0C, BulletChecks[currentKong]);
 							end
+							-- Get next script chunk
+							activationScript = dereferencePointer(activationScript + 0x4C);
+						end
+					end
+					if scriptName == "buttons" then
+						-- Get part 2
+						activationScript = dereferencePointer(activationScript + 0xA0);
+						while isRDRAM(activationScript) do
+							earlyCheckValue = mainmemory.read_u16_be(activationScript + 0x0C);
+							lateCheckValue = mainmemory.read_u16_be(activationScript + 0x24);
 							-- Check for the simslam magic and patch if needed
 							if isSimSlamCheck(earlyCheckValue) then
 								mainmemory.write_u16_be(activationScript + 0x0C, SimSlamChecks[currentKong]);
@@ -3954,7 +3974,7 @@ local function drawGrabScriptUI()
 				local behaviorPointer = dereferencePointer(object_pointers[i] + obj_model2.behavior_pointer);
 				local collectableState = mainmemory.readbyte(object_pointers[i] + obj_model2.collectable_state);
 				if isRDRAM(behaviorPointer) then
-					behaviorPointer = " ("..toHexString(behaviorPointer or 0, 8)..")";
+					behaviorPointer = " ("..toHexString(behaviorPointer or 0, 6)..")";
 				else
 					behaviorPointer = "";
 				end
