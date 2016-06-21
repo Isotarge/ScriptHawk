@@ -36,7 +36,7 @@ end
 local version; -- 1 USA, 2 Europe, 3 Japan, 4 Kiosk
 Game.Memory = {
 	["mode"] = {0x755318, 0x74FB98, 0x7553D8, 0x6FFE6C},
-	["map"] = {0x7444E4, 0x73EC34, 0x743DA4, 0x72CDE4},
+	["map"] = {0x7444E4, 0x73EC34, 0x743DA4, 0x72CDE4}, -- TODO: This is actually destination map
 	["map_state"] = {0x76A0B1, 0x764BD1, 0x76A2A1, 0x72CDED},
 	["exit"] = {0x7444E8, 0x73EC38, 0x743DA8, 0x72CDE8},
 	["loading_zone_array"] = {0x7FDCB4, 0x7FDBF4, 0x7FE144, nil}, -- TODO: Kiosk
@@ -3374,28 +3374,28 @@ function freeTradeObjectModel1(currentKong)
 end
 
 local collisionTypes = {
-	[0x000A] = "CB Single (A)",
-	[0x000D] = "CB Single (D)",
+	[0x000A] = "CB Single (0x0A)",
+	[0x000D] = "CB Single (0x0D)",
 	[0x0011] = "Homing Ammo Crate",
-	[0x0016] = "CB Single (16)",
-	[0x001C] = "Coin (1C)",
-	[0x001D] = "Coin (1D)",
-	[0x001E] = "CB Single (1E)",
-	[0x001F] = "CB Single (1F)",
-	[0x0023] = "Coin (23)",
-	[0x0024] = "Coin (24)",
-	[0x0027] = "Coin (27)",
-	[0x002B] = "CB Bunch (2B)",
+	[0x0016] = "CB Single (0x16)",
+	[0x001C] = "Coin (0x1C)",
+	[0x001D] = "Coin (0x1D)",
+	[0x001E] = "CB Single (0x1E)",
+	[0x001F] = "CB Single (0x1F)",
+	[0x0023] = "Coin (0x23)",
+	[0x0024] = "Coin (0x24)",
+	[0x0027] = "Coin (0x27)",
+	[0x002B] = "CB Bunch (0x2B)",
 	[0x0056] = "Orange",
-	[0x0074] = "GB (Tiny)",
+	[0x0074] = "GB",
 	[0x008E] = "Crystal Coconut",
 	[0x008F] = "Ammo Crate",
 	[0x0098] = "Film",
-	[0x0205] = "CB Bunch (205)",
-	[0x0206] = "CB Bunch (206)",
-	[0x0207] = "CB Bunch (207)",
-	[0x0208] = "CB Bunch (208)",
-	[0x0288] = "Rareware GB (288)",
+	[0x0205] = "CB Bunch (0x205)",
+	[0x0206] = "CB Bunch (0x206)",
+	[0x0207] = "CB Bunch (0x207)",
+	[0x0208] = "CB Bunch (0x208)",
+	[0x0288] = "Rareware GB (0x288)",
 };
 
 function fixSingleCollision(objectBase)
@@ -3456,15 +3456,17 @@ function replaceCollisionType(target, desired)
 	end
 end
 
+local previousKong = -1;
 local previousCollisionLinkedListPointer = 0;
 function freeTradeCollisionList(currentKong)
 	if version ~= 4 then
-		-- This call resolves the pointer to the object that contains a pointer to the linked list of collision data
+		-- This object that contains a pointer to the linked list of collision data
 		local currentCollisionLinkedListPointer = dereferencePointer(Game.Memory.obj_model2_collision_linked_list_pointer[version]);
-		if isRDRAM(currentCollisionLinkedListPointer) and currentCollisionLinkedListPointer ~= previousCollisionLinkedListPointer then
+		if isRDRAM(currentCollisionLinkedListPointer) and (currentCollisionLinkedListPointer ~= previousCollisionLinkedListPointer or currentKong ~= previousKong) then
 			freeTradeCollisionListBackboneMethod(currentKong);
 		end
 		previousCollisionLinkedListPointer = currentCollisionLinkedListPointer;
+		previousKong = currentKong;
 	end
 end
 
@@ -3514,7 +3516,12 @@ function isSimSlamCheck(value)
 	return value >= 0x0002 and value <= 0x0007;
 end
 
-function ohWrongnana()
+function ohWrongnanaDebugOut(objName, objBase, scriptBase, scriptOffset)
+	local preceedingCommand = mainmemory.read_u16_be(scriptBase + scriptOffset - 2);
+	print("patched "..objName.." at "..toHexString(objBase).." -> "..toHexString(scriptBase).." + "..toHexString(scriptOffset).." preceeding command "..toHexString(preceedingCommand));
+end
+
+function ohWrongnana(verbose)
 	if version ~= 4 then -- Anything but Kiosk
 		local currentKong = mainmemory.readbyte(Game.Memory.character[version]);
 
@@ -3539,6 +3546,9 @@ function ohWrongnana()
 						while isRDRAM(activationScript) do
 							-- Check for the bullet magic and patch if needed
 							if isBulletCheck(mainmemory.read_u16_be(activationScript + 0x0C)) then
+								if verbose then
+									ohWrongnanaDebugOut(scriptName, slotBase, activationScript, 0x0C);
+								end
 								mainmemory.write_u16_be(activationScript + 0x0C, BulletChecks[currentKong]);
 							end
 							-- Get next script chunk
@@ -3550,26 +3560,35 @@ function ohWrongnana()
 						activationScript = dereferencePointer(activationScript + 0xA0);
 						while isRDRAM(activationScript) do
 							-- New method, slower but catches weird switches
-							for j = 0x04, 0x48, 4 do
-								if mainmemory.read_u16_be(activationScript + j) == 0x0019 then
-									if isSimSlamCheck(mainmemory.read_u16_be(activationScript + j + 2)) then
-										mainmemory.write_u16_be(activationScript + j + 2, SimSlamChecks[currentKong]);
-									end
-								end
-							end
-							--[[
+							--for j = 0x04, 0x48, 4 do
+							--	if mainmemory.read_u16_be(activationScript + j) == 0x0019 then
+							--		if isSimSlamCheck(mainmemory.read_u16_be(activationScript + j + 2)) then
+							--			mainmemory.write_u16_be(activationScript + j + 2, SimSlamChecks[currentKong]);
+							--		end
+							--	end
+							--end
+
 							-- Old method
 							-- Check for the simslam magic and patch if needed
 							if isSimSlamCheck(mainmemory.read_u16_be(activationScript + 0x0C)) then
+								if verbose then
+									ohWrongnanaDebugOut(scriptName, slotBase, activationScript, 0x0C);
+								end
 								mainmemory.write_u16_be(activationScript + 0x0C, SimSlamChecks[currentKong]);
 							end
 							if isSimSlamCheck(mainmemory.read_u16_be(activationScript + 0x1C)) then
+								if verbose then
+									ohWrongnanaDebugOut(scriptName, slotBase, activationScript, 0x1C);
+								end
 								mainmemory.write_u16_be(activationScript + 0x1C, SimSlamChecks[currentKong]);
 							end
 							if isSimSlamCheck(mainmemory.read_u16_be(activationScript + 0x24)) then
+								if verbose then
+									ohWrongnanaDebugOut(scriptName, slotBase, activationScript, 0x24);
+								end
 								mainmemory.write_u16_be(activationScript + 0x24, SimSlamChecks[currentKong]);
 							end
-							--]]
+
 							-- Get next script chunk
 							activationScript = dereferencePointer(activationScript + 0x4C);
 						end
