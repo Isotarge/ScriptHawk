@@ -858,10 +858,10 @@ obj_model1 = {
 
 		[0x6A] = "Learning Gun",
 		[0x6B] = "Locked", -- Bonus barrel
-		[0x63] = "Feeding T&S",
-
+		[0x6C] = "Feeding T&S",
 		[0x6D] = "Boat",
-
+		[0x6E] = "Baboon Balloon",
+		[0x6F] = "Updraft", -- Castle tower
 		[0x70] = "GB Dance",
 		[0x71] = "Key Dance",
 
@@ -3530,10 +3530,8 @@ function ohWrongnana()
 						-- Get part 2
 						activationScript = dereferencePointer(activationScript + 0xA0);
 						while isRDRAM(activationScript) do
-							earlyCheckValue = mainmemory.read_u16_be(activationScript + 0x0C);
-							lateCheckValue = mainmemory.read_u16_be(activationScript + 0x24);
 							-- Check for the bullet magic and patch if needed
-							if isBulletCheck(earlyCheckValue) then
+							if isBulletCheck(mainmemory.read_u16_be(activationScript + 0x0C)) then
 								mainmemory.write_u16_be(activationScript + 0x0C, BulletChecks[currentKong]);
 							end
 							-- Get next script chunk
@@ -3544,13 +3542,14 @@ function ohWrongnana()
 						-- Get part 2
 						activationScript = dereferencePointer(activationScript + 0xA0);
 						while isRDRAM(activationScript) do
-							earlyCheckValue = mainmemory.read_u16_be(activationScript + 0x0C);
-							lateCheckValue = mainmemory.read_u16_be(activationScript + 0x24);
 							-- Check for the simslam magic and patch if needed
-							if isSimSlamCheck(earlyCheckValue) then
+							if isSimSlamCheck(mainmemory.read_u16_be(activationScript + 0x0C)) then
 								mainmemory.write_u16_be(activationScript + 0x0C, SimSlamChecks[currentKong]);
 							end
-							if isSimSlamCheck(lateCheckValue) then
+							if isSimSlamCheck(mainmemory.read_u16_be(activationScript + 0x1C)) then
+								mainmemory.write_u16_be(activationScript + 0x1C, SimSlamChecks[currentKong]);
+							end
+							if isSimSlamCheck(mainmemory.read_u16_be(activationScript + 0x24)) then
 								mainmemory.write_u16_be(activationScript + 0x24, SimSlamChecks[currentKong]);
 							end
 							-- Get next script chunk
