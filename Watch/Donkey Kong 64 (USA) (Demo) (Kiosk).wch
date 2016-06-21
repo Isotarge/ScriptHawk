@@ -48,6 +48,7 @@ SystemID N64
 7B5AFC	d	h	1	RDRAM	Player Pointer
 7B5B12	b	b	1	RDRAM	Zipper Byte
 7B5B13	b	b	1	RDRAM	Tag Barrel Void Byte
+7B6258	w	u	1	RDRAM	Actor Count
 7B6590	b	h	1	RDRAM	DK Moves
 7B6591	b	h	1	RDRAM	DK Simian Slam
 7B6596	w	u	1	RDRAM	DK Coins

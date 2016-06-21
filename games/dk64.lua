@@ -47,6 +47,7 @@ Game.Memory = {
 	["player_pointer"] = {0x7FBB4C, 0x7FBA6C, 0x7FBFBC, 0x7B5AFC},
 	["camera_pointer"] = {0x7FB968, 0x7FB888, 0x7FBDD8, 0x7B5918},
 	["pointer_list"] = {0x7FBFF0, 0x7FBF10, 0x7FC460, 0x7B5E58},
+	["actor_count"] = {0x7FC3F0, 0x7FC310, 0x7FC860, 0x7B6258},
 	["linked_list_pointer"] = {0x7F0990, 0x7F08B0, 0x7F0E00, 0x7A12C0},
 	["global_base"] = {0x7FCC41, 0x7FCB81, 0x7FD0D1, 0x7B6754},
 	["kong_base"] = {0x7FC950, 0x7FC890, 0x7FCDE0, 0x7B6590},
@@ -452,6 +453,10 @@ local object_size = -0x0C; -- u32_be
 
 local max_objects = 0xFF; -- This only applies to the model 1 pointer list used to check collisions
 
+local function getObjectModel1Count()
+	return math.min(max_objects, mainmemory.read_u16_be(Game.Memory.actor_count[version]));
+end
+
 -- Relative to Model 1 Objects
 obj_model1 = {
 	["model_pointer"] = 0x00,
@@ -496,8 +501,9 @@ obj_model1 = {
 		[23] = "Cannon",
 		[25] = "Hunky Chunky Barrel",
 		[26] = "TNT Barrel",
-		[27] = "TNT Barrel Spawner (Army Dillo)",
+		[27] = "TNT Barrel Spawner", -- Army Dillo
 		[28] = "Bonus Barrel",
+		--[29] = "Unknown - Japes Minecart", -- TODO
 		[30] = "Fireball", -- Boss fights TODO: where else is this used?
 		[31] = "Bridge (Castle)",
 		[32] = "Swinging Light",
@@ -512,7 +518,7 @@ obj_model1 = {
 		[41] = "Orange",
 		[42] = "Grape",
 		[43] = "Feather",
-		[44] = "Laser (Projectile)",
+		[44] = "Laser", -- Projectile
 		[45] = "Golden Banana", -- TODO: Unused? There are normally model 2
 		[47] = "Watermelon Slice",
 		[48] = "Coconut",
@@ -581,7 +587,7 @@ obj_model1 = {
 		[126] = "Fly Swatter",
 		[128] = "Headphones",
 		[129] = "Enguarde Box",
-		[130] = "Apple (Fungi)",
+		[130] = "Apple", -- Fungi
 		[132] = "Enguarde Box", -- TODO: Does this work? Unused?
 		[133] = "Barrel",
 		[134] = "Training Barrel",
@@ -682,6 +688,7 @@ obj_model1 = {
 		[281] = "K. Rool (DK Phase)",
 		[285] = "Bat",
 		[286] = "Giant Clam",
+		[288] = "Tomato", -- Fungi
 		[289] = "Kritter-in-a-Sheet",
 		[290] = "Pufftup",
 		[291] = "Kosha",
@@ -3078,7 +3085,7 @@ local function detectDisplacement(objectPointer)
 end
 
 local function displacementDetection()
-	for i = 0, max_objects do
+	for i = 0, getObjectModel1Count() do
 		local objectPointer = dereferencePointer(Game.Memory.pointer_list[version] + (i * 4));
 		if isRDRAM(objectPointer) then
 			detectDisplacement(objectPointer);
@@ -3135,7 +3142,7 @@ function everythingIsKong()
 	local kongNumBones = mainmemory.readbyte(kongSharedModel + obj_model1.model.num_bones);
 	local cameraObject = dereferencePointer(Game.Memory.camera_pointer[version]);
 
-	for actorListIndex = 0, max_objects do
+	for actorListIndex = 0, getObjectModel1Count() do
 		local pointer = dereferencePointer(Game.Memory.pointer_list[version] + (actorListIndex * 4));
 		if isRDRAM(pointer) and (pointer ~= cameraObject) then
 			local modelPointer = dereferencePointer(pointer + obj_model1.model_pointer);
@@ -3181,7 +3188,7 @@ function Game.paperMode()
 	local actorListIndex = 0;
 	local cameraObject = dereferencePointer(Game.Memory.camera_pointer[version]);
 
-	for actorListIndex = 0, max_objects do
+	for actorListIndex = 0, getObjectModel1Count() do
 		local pointer = dereferencePointer(Game.Memory.pointer_list[version] + (actorListIndex * 4));
 
 		if isRDRAM(pointer) and pointer ~= cameraObject then
@@ -3350,8 +3357,8 @@ function isKong(actorType)
 end
 
 function freeTradeObjectModel1(currentKong)
-	if currentKong >= DK and currentKong < Krusha then
-		for object_no = 0, max_objects do
+	if currentKong >= DK and currentKong <= Chunky then
+		for object_no = 0, getObjectModel1Count() do
 			local pointer = dereferencePointer(Game.Memory.pointer_list[version] + (object_no * 4));
 			if isRDRAM(pointer) then
 				local actorType = mainmemory.read_u32_be(pointer + obj_model1.actor_type);
@@ -3494,7 +3501,7 @@ function isBulletCheck(value)
 	return array_contains(BulletChecks, value);
 end
 
-local SimSlamChecks = {
+local SimSlamChecks = { -- Not actually used by the check function for speed reasons, really just here for documentation
 	[DK] = 0x0002,
 	[Diddy] = 0x0003,
 	[Lanky] = 0x0004,
@@ -3504,7 +3511,7 @@ local SimSlamChecks = {
 };
 
 function isSimSlamCheck(value)
-	return array_contains(SimSlamChecks, value);
+	return value >= 0x0002 and value <= 0x0007;
 end
 
 function ohWrongnana()
@@ -3542,6 +3549,16 @@ function ohWrongnana()
 						-- Get part 2
 						activationScript = dereferencePointer(activationScript + 0xA0);
 						while isRDRAM(activationScript) do
+							-- New method, slower but catches weird switches
+							for j = 0x04, 0x48, 4 do
+								if mainmemory.read_u16_be(activationScript + j) == 0x0019 then
+									if isSimSlamCheck(mainmemory.read_u16_be(activationScript + j + 2)) then
+										mainmemory.write_u16_be(activationScript + j + 2, SimSlamChecks[currentKong]);
+									end
+								end
+							end
+							--[[
+							-- Old method
 							-- Check for the simslam magic and patch if needed
 							if isSimSlamCheck(mainmemory.read_u16_be(activationScript + 0x0C)) then
 								mainmemory.write_u16_be(activationScript + 0x0C, SimSlamChecks[currentKong]);
@@ -3552,6 +3569,7 @@ function ohWrongnana()
 							if isSimSlamCheck(mainmemory.read_u16_be(activationScript + 0x24)) then
 								mainmemory.write_u16_be(activationScript + 0x24, SimSlamChecks[currentKong]);
 							end
+							--]]
 							-- Get next script chunk
 							activationScript = dereferencePointer(activationScript + 0x4C);
 						end
@@ -3701,7 +3719,7 @@ local function populateObjectModel1Pointers()
 	local playerObject = Game.getPlayerObject();
 	local cameraObject = dereferencePointer(Game.Memory["camera_pointer"][version]);
 	if isRDRAM(playerObject) and isRDRAM(cameraObject) then
-		for object_no = 0, max_objects do
+		for object_no = 0, getObjectModel1Count() do
 			local pointer = dereferencePointer(Game.Memory["pointer_list"][version] + (object_no * 4));
 			if isRDRAM(pointer) and isValidModel1Object(pointer, playerObject, cameraObject) then
 				table.insert(object_pointers, pointer);
@@ -3751,7 +3769,7 @@ local kremling_kosh_joypad_angles = {
 };
 
 function getKoshController()
-	for object_no = 0, max_objects do
+	for object_no = 0, getObjectModel1Count() do
 		local pointer = dereferencePointer(Game.Memory["pointer_list"][version] + (object_no * 4));
 		if isRDRAM(pointer) and getActorName(pointer) == "Kremling Kosh Controller" then
 			return pointer;
@@ -3761,7 +3779,7 @@ end
 
 function countMelonProjectiles()
 	local melonCount = 0;
-	for object_no = 0, max_objects do
+	for object_no = 0, getObjectModel1Count() do
 		local pointer = dereferencePointer(Game.Memory["pointer_list"][version] + (object_no * 4));
 		if isRDRAM(pointer) and getActorName(pointer) == "Melon (Projectile)" then
 			melonCount = melonCount + 1;

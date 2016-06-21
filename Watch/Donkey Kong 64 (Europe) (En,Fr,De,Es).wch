@@ -101,6 +101,7 @@ SystemID N64
 7FBA84	b	b	1	RDRAM	Shadow Display Bitfield
 7FBA85	b	b	1	RDRAM	Unknown Bitfield
 7FBA86	b	b	1	RDRAM	Long Distance Actor Spawn
+7FC310	w	u	1	RDRAM	Actor Count
 7FC870	w	u	1	RDRAM	Japes T&S CBs (Total)
 7FC872	w	u	1	RDRAM	Aztec T&S CBs (Total)
 7FC874	w	u	1	RDRAM	Factory T&S CBs (Total)
