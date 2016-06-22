@@ -4222,7 +4222,11 @@ function Game.applyInfinites()
 	end
 
 	mainmemory.writebyte(global_base + oranges, max_oranges);
-	mainmemory.write_u16_be(global_base + crystals, max_crystals * 150); -- TODO: This is 125 on European version
+	if version == 2 then
+		mainmemory.write_u16_be(global_base + crystals, max_crystals * 125); -- European ticks per crystal is 125
+	else
+		mainmemory.write_u16_be(global_base + crystals, max_crystals * 150);
+	end
 	mainmemory.writebyte(global_base + film, max_film);
 	mainmemory.writebyte(global_base + health, mainmemory.readbyte(global_base + melons) * 4);
 
