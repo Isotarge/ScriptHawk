@@ -3459,9 +3459,14 @@ function freeTradeCollisionList()
 		local collisionListObjectSize = mainmemory.read_u32_be(collisionLinkedListPointer + object_size);
 		for i = 0, collisionListObjectSize, 4 do
 			local object = dereferencePointer(collisionLinkedListPointer + i);
+			local safety = nil;
 			while isRDRAM(object) do
 				fixSingleCollision(object);
-				object = dereferencePointer(object + 0x18);
+				safety = dereferencePointer(object + 0x18);
+				if safety == object then -- Prevent infinite loops
+					break;
+				end
+				object = safety;
 			end
 		end
 	end
