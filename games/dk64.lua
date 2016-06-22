@@ -65,6 +65,7 @@ Game.Memory = {
 	["boss_pointer"] = {0x7FDC90, 0x7FDBD0, 0x7FE120, nil}, -- TODO: Find Mad Jack state based on Model 1 pointer list and actor type knowledge. MJ is actor 204
 	["obj_model2_array_pointer"] = {0x7F6000, 0x7F5F20, 0x7F6470, 0x6F4470},
 	["obj_model2_array_count"] = {0x7F6004, 0x7F5F24, 0x7F6474, nil}, -- TODO: Kiosk
+	["obj_model2_timer"] = {0x76A064, nil, nil, nil}, -- TODO: Europe, Japan, Kiosk
 	["obj_model2_collision_linked_list_pointer"] = {0x754244, 0x74E9A4, 0x753B34, 0x6FF054},
 	["rambiBase"] = {0x744548, 0x73EC98, 0x743E08, nil}, -- High score base
 };
@@ -1250,6 +1251,14 @@ function getObjectModel2ModelBase(index)
 	if isRDRAM(objModel2Array) then
 		return dereferencePointer(objModel2Array + (index * obj_model2_slot_size) + obj_model2.model_pointer);
 	end
+end
+
+function getScriptName(objectModel2Base) -- TODO: Can this be used anywhere else?
+	local behaviorTypePointer = dereferencePointer(objectModel2Base + obj_model2.behavior_type_pointer);
+	if isRDRAM(behaviorTypePointer) then
+		return readNullTerminatedString(behaviorTypePointer + 0x0C);
+	end
+	return "";
 end
 
 object_model2_filter = nil;
@@ -3336,21 +3345,55 @@ local BalloonStates = {
 	[Chunky] = 111,
 };
 
-local KasplatStates = {
+function isBalloon(actorType)
+	return array_contains(BalloonStates, actorType)
+end
+
+local KasplatStates = { -- Not actually used by the check function for speed reasons, really just here for documentation
 	[DK] = 241,
 	[Diddy] = 242,
 	[Lanky] = 243,
 	[Tiny] = 244,
 	[Chunky] = 245,
-}
-
-function isBalloon(actorType)
-	return array_contains(BalloonStates, actorType)
-end
+};
 
 function isKasplat(actorType)
 	return actorType >= 241 and actorType <= 245;
 end
+
+local BulletChecks = {
+	[DK] = 0x0030,
+	[Diddy] = 0x0024,
+	[Lanky] = 0x002A,
+	[Tiny] = 0x002B,
+	[Chunky] = 0x0026,
+	[Krusha] = 0x00AB,
+};
+
+function isBulletCheck(value)
+	return array_contains(BulletChecks, value);
+end
+
+local GBStates = {
+	[DK] = 0x28,
+	[Diddy] = 0x22,
+	[Lanky] = 0x30,
+	[Tiny] = 0x24,
+	[Chunky] = 0x21,
+};
+
+function isGB(collectableState)
+	return array_contains(GBStates, collectableState);
+end
+
+local SimSlamChecks = { -- Not actually used by the check function for speed reasons, really just here for documentation
+	[DK] = 0x0002,
+	[Diddy] = 0x0003,
+	[Lanky] = 0x0004,
+	[Tiny] = 0x0005,
+	[Chunky] = 0x0006,
+	[Krusha] = 0x0007,
+};
 
 function isKong(actorType)
 	return actorType >= 2 and actorType <= 6;
@@ -3398,122 +3441,80 @@ local collisionTypes = {
 	[0x0288] = "Rareware GB (0x288)",
 };
 
+local function isKnownCollisionType(collisionType)
+	return collisionTypes[collisionType] ~= nil;
+end
+
 function fixSingleCollision(objectBase)
-	local currentCollisionValue = mainmemory.read_u16_be(objectBase + 4);
-	if isKong(currentCollisionValue) then
-		mainmemory.write_u16_be(objectBase + 4, 0); -- Set the collision to accept the any Kong
-		-- TODO: Is setting 0 here safe?
-		-- It'll be faster, yeah but safe idk
+	local collisionType = mainmemory.read_u16_be(objectBase + 2);
+	local collisionValue = mainmemory.read_u16_be(objectBase + 4);
+	if isKnownCollisionType(collisionType) and isKong(collisionValue) then
+		mainmemory.write_u16_be(objectBase + 4, 0); -- Set the collision to accept any Kong
 	end
 end
 
-function freeTradeCollisionListBackboneMethod(currentKong)
-	local object = dereferencePointer(Game.Memory.linked_list_pointer[version] + 0x24); -- Adding 0x24 here as a performance improvement, seems to be a pointer to the start of the object model 2 collision data in the backbone
-	while isRDRAM(object) and object ~= 0 do
-		size = mainmemory.read_u32_be(object + 4);
-		if size == 0x20 then
-			fixSingleCollision(object + 0x10);
-		elseif size == 0x00 then
-			break;
-		end
-		object = object + 0x10 + size;
-	end
-end
-
-function dumpCollisionTypes()
-	local object = dereferencePointer(Game.Memory.linked_list_pointer[version] + 0x24); -- Adding 0x24 here as a performance improvement, seems to be a pointer to the start of the object model 2 collision data in the backbone
-	while isRDRAM(object) and object ~= 0 do
-		size = mainmemory.read_u32_be(object + 4);
-		if size == 0x20 then
-			local collisionType = mainmemory.read_u16_be(object + 0x10 + 0x02);
-			if collisionTypes[collisionType] ~= nil then
-				collisionType = collisionTypes[collisionType];
-			else
-				collisionType = toHexString(collisionType, 4);
+function freeTradeCollisionList()
+	local collisionLinkedListPointer = dereferencePointer(Game.Memory.obj_model2_collision_linked_list_pointer[version]);
+	if isRDRAM(collisionLinkedListPointer) then
+		local collisionListObjectSize = mainmemory.read_u32_be(collisionLinkedListPointer + object_size);
+		for i = 0, collisionListObjectSize, 4 do
+			local object = dereferencePointer(collisionLinkedListPointer + i);
+			while isRDRAM(object) do
+				fixSingleCollision(object);
+				object = dereferencePointer(object + 0x18);
 			end
-			dprint(toHexString(object + 0x10)..": "..collisionType);
-		elseif size == 0x00 then
-			break;
 		end
-		object = object + 0x10 + size;
 	end
-	print_deferred();
+end
+
+function dumpCollisionTypes(kongFilter)
+	local kongCounts = {};
+	local collisionLinkedListPointer = dereferencePointer(Game.Memory.obj_model2_collision_linked_list_pointer[version]);
+	if isRDRAM(collisionLinkedListPointer) then
+		local collisionListObjectSize = mainmemory.read_u32_be(collisionLinkedListPointer + object_size);
+		for i = 0, collisionListObjectSize, 4 do
+			local object = dereferencePointer(collisionLinkedListPointer + i);
+			while isRDRAM(object) do
+				local kong = mainmemory.read_u16_be(object + 0x04);
+				if isKong(kong) and (kongFilter == nil or kong == kongFilter) then
+					local collisionType = mainmemory.read_u16_be(object + 0x02);
+					if collisionTypes[collisionType] ~= nil then
+						collisionType = collisionTypes[collisionType];
+					else
+						collisionType = toHexString(collisionType, 4);
+					end
+					if kongCounts[kong] == nil then
+						kongCounts[kong] = 1;
+					else
+						kongCounts[kong] = kongCounts[kong] + 1;
+					end
+					dprint(toHexString(object)..": "..collisionType..", Kong: "..toHexString(kong));
+				end
+				object = dereferencePointer(object + 0x18);
+			end
+		end
+		for k, v in pairs(kongCounts) do
+			dprint("Kong "..toHexString(k).." Count: "..v);
+		end
+		print_deferred();
+	end
 end
 
 function replaceCollisionType(target, desired)
-	local object = dereferencePointer(Game.Memory.linked_list_pointer[version] + 0x24); -- Adding 0x24 here as a performance improvement, seems to be a pointer to the start of the object model 2 collision data in the backbone
-	while isRDRAM(object) and object ~= 0 do
-		size = mainmemory.read_u32_be(object + 4);
-		if size == 0x20 then
-			local collisionType = mainmemory.read_u16_be(object + 0x10 + 0x02);
-			if collisionType == target then
-				mainmemory.write_u16_be(object + 0x10 + 0x02, desired);
+	local collisionLinkedListPointer = dereferencePointer(Game.Memory.obj_model2_collision_linked_list_pointer[version]);
+	if isRDRAM(collisionLinkedListPointer) then
+		local collisionListObjectSize = mainmemory.read_u32_be(collisionLinkedListPointer + object_size);
+		for i = 0, collisionListObjectSize, 4 do
+			local object = dereferencePointer(collisionLinkedListPointer + i);
+			while isRDRAM(object) do
+				local collisionType = mainmemory.read_u16_be(object + 0x02);
+				if collisionType == target then
+					mainmemory.write_u16_be(object + 0x02, desired);
+				end
+				object = dereferencePointer(object + 0x18);
 			end
-		elseif size == 0x00 then
-			break;
 		end
-		object = object + 0x10 + size;
 	end
-end
-
-local previousKong = -1;
-local previousCollisionLinkedListPointer = 0;
-function freeTradeCollisionList(currentKong)
-	if version ~= 4 then
-		-- This object that contains a pointer to the linked list of collision data
-		local currentCollisionLinkedListPointer = dereferencePointer(Game.Memory.obj_model2_collision_linked_list_pointer[version]);
-		if isRDRAM(currentCollisionLinkedListPointer) and (currentCollisionLinkedListPointer ~= previousCollisionLinkedListPointer or currentKong ~= previousKong) then
-			freeTradeCollisionListBackboneMethod(currentKong);
-		end
-		previousCollisionLinkedListPointer = currentCollisionLinkedListPointer;
-		previousKong = currentKong;
-	end
-end
-
-local GBStates = {
-	[DK] = 0x28,
-	[Diddy] = 0x22,
-	[Lanky] = 0x30,
-	[Tiny] = 0x24,
-	[Chunky] = 0x21,
-};
-
-function isGB(collectableState)
-	return array_contains(GBStates, collectableState);
-end
-
-function getScriptName(objectModel2Base)
-	local behaviorTypePointer = dereferencePointer(objectModel2Base + obj_model2.behavior_type_pointer);
-	if isRDRAM(behaviorTypePointer) then
-		return readNullTerminatedString(behaviorTypePointer + 0x0C);
-	end
-	return "";
-end
-
-local BulletChecks = {
-	[DK] = 0x0030,
-	[Diddy] = 0x0024,
-	[Lanky] = 0x002A,
-	[Tiny] = 0x002B,
-	[Chunky] = 0x0026,
-	[Krusha] = 0x00AB,
-};
-
-function isBulletCheck(value)
-	return array_contains(BulletChecks, value);
-end
-
-local SimSlamChecks = { -- Not actually used by the check function for speed reasons, really just here for documentation
-	[DK] = 0x0002,
-	[Diddy] = 0x0003,
-	[Lanky] = 0x0004,
-	[Tiny] = 0x0005,
-	[Chunky] = 0x0006,
-	[Krusha] = 0x0007,
-};
-
-function isSimSlamCheck(value)
-	return value >= 0x0002 and value <= 0x0007;
 end
 
 function ohWrongnanaDebugOut(objName, objBase, scriptBase, scriptOffset)
@@ -3522,83 +3523,93 @@ function ohWrongnanaDebugOut(objName, objBase, scriptBase, scriptOffset)
 end
 
 function ohWrongnana(verbose)
-	if version ~= 4 then -- Anything but Kiosk
-		local currentKong = mainmemory.readbyte(Game.Memory.character[version]);
+	if version ~= 1 then -- Make sure we're on the US version, the model 2 timer is mostly what's stopping this from running elsewhere
+		return;
+	end
 
-		local objModel2Array = dereferencePointer(Game.Memory.obj_model2_array_pointer[version]);
-		if isRDRAM(objModel2Array) then
-			local numSlots = mainmemory.read_u32_be(Game.Memory.obj_model2_array_count[version]);
-			local scriptName, slotBase, currentValue, activationScript, earlyCheckValue, lateCheckValue;
-			-- Fill and sort pointer list
-			for i = 0, numSlots - 1 do
-				slotBase = objModel2Array + i * obj_model2_slot_size;
-				currentValue = mainmemory.readbyte(slotBase + obj_model2.collectable_state);
-				if currentKong ~= Krusha and isGB(currentValue) then
-					mainmemory.writebyte(slotBase + obj_model2.collectable_state, GBStates[currentKong]);
-				end
-				-- Get activation script
-				activationScript = dereferencePointer(slotBase + 0x7C);
-				if isRDRAM(activationScript) then
-					scriptName = getScriptName(slotBase);
-					if scriptName == "gunswitches" then
-						-- Get part 2
-						activationScript = dereferencePointer(activationScript + 0xA0);
-						while isRDRAM(activationScript) do
-							-- Check for the bullet magic and patch if needed
-							if isBulletCheck(mainmemory.read_u16_be(activationScript + 0x0C)) then
-								if verbose then
-									ohWrongnanaDebugOut(scriptName, slotBase, activationScript, 0x0C);
-								end
-								mainmemory.write_u16_be(activationScript + 0x0C, BulletChecks[currentKong]);
+	if mainmemory.read_u32_be(Game.Memory.obj_model2_timer[version]) == 0 then -- Check model 2 timer to make sure we're not patching through loading zones
+		return;
+	end
+
+	--if emu.framecount() % 100 ~= 0 then -- Only run this once every 100 frames
+	--	return;
+	--end
+
+	local currentKong = mainmemory.readbyte(Game.Memory.character[version]);
+
+	local objModel2Array = dereferencePointer(Game.Memory.obj_model2_array_pointer[version]);
+	if isRDRAM(objModel2Array) and currentKong >= DK and currentKong <= Chunky then
+		local numSlots = mainmemory.read_u32_be(Game.Memory.obj_model2_array_count[version]);
+		local scriptName, slotBase, currentValue, activationScript;
+		-- Fill and sort pointer list
+		for i = 0, numSlots - 1 do
+			slotBase = objModel2Array + i * obj_model2_slot_size;
+			currentValue = mainmemory.readbyte(slotBase + obj_model2.collectable_state);
+			if currentKong ~= Krusha and isGB(currentValue) then
+				mainmemory.writebyte(slotBase + obj_model2.collectable_state, GBStates[currentKong]);
+			end
+			-- Get activation script
+			activationScript = dereferencePointer(slotBase + 0x7C);
+			if isRDRAM(activationScript) then
+				scriptName = getScriptName(slotBase);
+				if scriptName == "gunswitches" then
+					-- Get part 2
+					activationScript = dereferencePointer(activationScript + 0xA0);
+					while isRDRAM(activationScript) do
+						-- Check for the bullet magic and patch if needed
+						if isBulletCheck(mainmemory.read_u16_be(activationScript + 0x0C)) then
+							if verbose then
+								ohWrongnanaDebugOut(scriptName, slotBase, activationScript, 0x0C);
 							end
-							-- Get next script chunk
-							activationScript = dereferencePointer(activationScript + 0x4C);
+							mainmemory.write_u16_be(activationScript + 0x0C, BulletChecks[currentKong]);
 						end
+						-- Get next script chunk
+						activationScript = dereferencePointer(activationScript + 0x4C);
 					end
-					if scriptName == "buttons" then
-						-- Get part 2
-						activationScript = dereferencePointer(activationScript + 0xA0);
-						while isRDRAM(activationScript) do
-							-- New method, slower but catches weird switches
-							--for j = 0x04, 0x48, 4 do
-							--	if mainmemory.read_u16_be(activationScript + j) == 0x0019 then
-							--		if isSimSlamCheck(mainmemory.read_u16_be(activationScript + j + 2)) then
-							--			mainmemory.write_u16_be(activationScript + j + 2, SimSlamChecks[currentKong]);
-							--		end
-							--	end
-							--end
+				end
+				if scriptName == "buttons" then
+					-- Get part 2
+					activationScript = dereferencePointer(activationScript + 0xA0);
+					while isRDRAM(activationScript) do
+						-- New method, slower but catches weird switches
+						--for j = 0x04, 0x48, 4 do
+						--	if mainmemory.read_u16_be(activationScript + j) == 0x0019 then
+						--		if isKong(mainmemory.read_u16_be(activationScript + j + 2)) then
+						--			mainmemory.write_u16_be(activationScript + j + 2, SimSlamChecks[currentKong]);
+						--		end
+						--	end
+						--end
 
-							-- Old method
-							-- Check for the simslam magic and patch if needed
-							if isSimSlamCheck(mainmemory.read_u16_be(activationScript + 0x0C)) then
-								if verbose then
-									ohWrongnanaDebugOut(scriptName, slotBase, activationScript, 0x0C);
-								end
-								mainmemory.write_u16_be(activationScript + 0x0C, SimSlamChecks[currentKong]);
+						-- Old method
+						-- Check for the simslam magic and patch if needed
+						if isKong(mainmemory.read_u16_be(activationScript + 0x0C)) then
+							if verbose then
+								ohWrongnanaDebugOut(scriptName, slotBase, activationScript, 0x0C);
 							end
-							if isSimSlamCheck(mainmemory.read_u16_be(activationScript + 0x1C)) then
-								if verbose then
-									ohWrongnanaDebugOut(scriptName, slotBase, activationScript, 0x1C);
-								end
-								mainmemory.write_u16_be(activationScript + 0x1C, SimSlamChecks[currentKong]);
-							end
-							if isSimSlamCheck(mainmemory.read_u16_be(activationScript + 0x24)) then
-								if verbose then
-									ohWrongnanaDebugOut(scriptName, slotBase, activationScript, 0x24);
-								end
-								mainmemory.write_u16_be(activationScript + 0x24, SimSlamChecks[currentKong]);
-							end
-
-							-- Get next script chunk
-							activationScript = dereferencePointer(activationScript + 0x4C);
+							mainmemory.write_u16_be(activationScript + 0x0C, SimSlamChecks[currentKong]);
 						end
+						if isKong(mainmemory.read_u16_be(activationScript + 0x1C)) then
+							if verbose then
+								ohWrongnanaDebugOut(scriptName, slotBase, activationScript, 0x1C);
+							end
+							mainmemory.write_u16_be(activationScript + 0x1C, SimSlamChecks[currentKong]);
+						end
+						if isKong(mainmemory.read_u16_be(activationScript + 0x24)) then
+							if verbose then
+								ohWrongnanaDebugOut(scriptName, slotBase, activationScript, 0x24);
+							end
+							mainmemory.write_u16_be(activationScript + 0x24, SimSlamChecks[currentKong]);
+						end
+
+						-- Get next script chunk
+						activationScript = dereferencePointer(activationScript + 0x4C);
 					end
 				end
 			end
 		end
 
 		freeTradeObjectModel1(currentKong);
-		freeTradeCollisionList(currentKong);
+		freeTradeCollisionList();
 	end
 end
 
