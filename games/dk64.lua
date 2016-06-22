@@ -65,7 +65,7 @@ Game.Memory = {
 	["boss_pointer"] = {0x7FDC90, 0x7FDBD0, 0x7FE120, nil}, -- TODO: Find Mad Jack state based on Model 1 pointer list and actor type knowledge. MJ is actor 204
 	["obj_model2_array_pointer"] = {0x7F6000, 0x7F5F20, 0x7F6470, 0x6F4470},
 	["obj_model2_array_count"] = {0x7F6004, 0x7F5F24, 0x7F6474, nil}, -- TODO: Kiosk
-	["obj_model2_timer"] = {0x76A064, nil, nil, nil}, -- TODO: Europe, Japan, Kiosk
+	["obj_model2_timer"] = {0x76A064, 0x764B84, 0x76A254, 0x72CDAC},
 	["obj_model2_collision_linked_list_pointer"] = {0x754244, 0x74E9A4, 0x753B34, 0x6FF054},
 	["rambiBase"] = {0x744548, 0x73EC98, 0x743E08, nil}, -- High score base
 };
@@ -3523,7 +3523,7 @@ function ohWrongnanaDebugOut(objName, objBase, scriptBase, scriptOffset)
 end
 
 function ohWrongnana(verbose)
-	if version ~= 1 then -- Make sure we're on the US version, the model 2 timer is mostly what's stopping this from running elsewhere
+	if version == 4 then -- Anything but kiosk
 		return;
 	end
 

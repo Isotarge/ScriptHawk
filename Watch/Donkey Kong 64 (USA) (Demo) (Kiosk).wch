@@ -37,6 +37,7 @@ SystemID N64
 70AA9C	w	h	1	RDRAM	Dogadon Behavior
 70AA9E	w	h	1	RDRAM	Dogadon Model
 72CDA0	d	h	1	RDRAM	Framebuffer Pointer
+72CDAC	d	u	1	RDRAM	Object Model 2 Timer
 72CDE4	d	u	1	RDRAM	Current Map
 72CDE8	d	u	1	RDRAM	Current Exit
 72CDED	b	h	1	RDRAM	Map State

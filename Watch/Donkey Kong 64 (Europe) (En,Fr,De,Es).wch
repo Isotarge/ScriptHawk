@@ -86,6 +86,7 @@ SystemID N64
 756EFA	w	h	1	RDRAM	Squawks Model
 756F02	w	h	1	RDRAM	Squawks Behavior
 756F0A	w	h	1	RDRAM	Squawks Model
+764B84	d	u	1	RDRAM	Object Model 2 Timer
 764BC8	d	u	1	RDRAM	Current Map
 764BCC	d	u	1	RDRAM	Current Exit
 764BD1	b	h	1	RDRAM	Map State
@@ -417,6 +418,7 @@ SystemID N64
 7FCB88	w	u	1	RDRAM	Film
 7FCB8B	b	u	1	RDRAM	Health
 7FCB8C	b	u	1	RDRAM	Melons
+7FD550	d	u	1	RDRAM	Idle Timer
 7FDBF0	w	u	1	RDRAM	Loading Zone Array Size
 7FDBF4	d	h	1	RDRAM	Loading Zone Array Pointer
 
