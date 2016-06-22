@@ -2941,7 +2941,7 @@ end
 -- Written by Isotarge, 2014-2016 --
 ------------------------------------
 
-function Game.neverSlip()
+function Game.neverSlip() -- TODO: Set movement state properly
 	local playerObject = Game.getPlayerObject();
 	if isRDRAM(playerObject) then
 		mainmemory.writebyte(playerObject + obj_model1.player.slope_timer, 0); -- Patch the slope timer
@@ -4571,7 +4571,7 @@ function Game.completeFile()
 	end
 end
 
-Game.OSDPosition = {32, 70}
+Game.OSDPosition = {32, 70};
 Game.OSD = {
 	{"X", Game.getXPosition},
 	{"Y", Game.getYPosition},

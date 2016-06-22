@@ -476,7 +476,7 @@ JinjoAddresses = { -- USA Version
 	{0x11ABAA, "CCL: Trash Can"},
 	{0x11ABAD, "CCL: Cheese Wedge"},
 	{0x11ABB0, "CCL: Central Cavern"},
-	{0x11ABB3, "CCL: Minjo Jongo"},
+	{0x11ABB3, "CCL: Mingy Jongo"},
 	{0x11ABB6, "CCL: Wumba's"},
 	{0x11ABB9, "IoH: Wooded Hollow"},
 	{0x11ABBC, "IoH: Wasteland"},

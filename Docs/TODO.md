@@ -4,24 +4,24 @@
 - General: 2D game support
 	- Move from x, y, z variables to position/rotation/velocity etc. tables with x, y, z indexes
 - General: UI to load ASM patches, can currently only be done by calling loadASMPatch(filename, suppressprint) in the lua console
-- Rayman 2: Find player object pointer
 - D-Pad Fixes for:
 	- DK64 (Fly Swatter)
 - DK64: Find menu cutscene flags
 - DK64: Finish flag documentation
-	- Figure out how to reliably find flag block on any frame, the current method reads the pointer from what I assume is the stack and this doesn't work on lag frames
+	- Figure out how to reliably find flag block on any frame
+		- The current method reads the pointer from what I assume is the stack and this doesn't work on lag frames
+		- There are other pointers to the flag block (in non-global space?), these might be a clue
 	- Implement framework to detect when flags are set/cleared & print to console
 - DK64: Exception when gui.cleargraphics() is called on first frame (by MJ minimap)
-- DK64: Finish integrating the Object Analysis tools
-	- Move to SM64.lua's struct format for object model 1 and model 2
 - BK: Integrate flags (and many other finds) from Bitalive's research https://docs.google.com/document/d/1Gek6Bkfcy1RHSDTBa3L3fEzJhaWROX3hfcmOrcekTV0/edit
-- BT: Jinjo Manip memory analysis
-	- Help finish the table [here](https://docs.google.com/spreadsheets/d/1QLn9yh7ZS9dT-lMymj_98mKmnEb5OLqz_QKkEhrVzyM/pub?gid=0)
 
 ##Low priority, recurring, or waiting:
+- Object Analysis Tools:
+	- Find a decent object/struct format that has a good balance between documentation, useability, flexibility and speed
+		- Metatable?
+		- Standardize the type names and getters between BK & SM64
 - General: Detailed watch toggle (checkbox maybe)
 	- "Verbosity level" for object viewer scripts, include as a struct field flag
-- DK64: Neverslip enhancements, can't roll/kick on slopes
 - Port Tetris Attack bot to other Puzzle League games
 	- [List of Games](http://www.speedrun.com/puzzle_league)
 	- [Pokémon Puzzle League Info here](https://github.com/mupen64plus/mupen64plus-user-issues/issues/567)
