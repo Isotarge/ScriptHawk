@@ -59,6 +59,15 @@ SystemID N64
 3851AC	d	s	1	RDRAM	Air
 3851E4	d	s	1	RDRAM	Mumbo Tokens
 3851E8	d	s	1	RDRAM	Jiggies (on hand)
+385211	b	u	1	RDRAM	Note Score (MM)
+385212	b	u	1	RDRAM	Note Score (TTC)
+385213	b	u	1	RDRAM	Note Score (CC)
+385214	b	u	1	RDRAM	Note Score (BGS)
+385215	b	u	1	RDRAM	Note Score (FP)
+385217	b	u	1	RDRAM	Note Score (GV)
+385218	b	u	1	RDRAM	Note Score (CCW)
+385219	b	u	1	RDRAM	Note Score (RBB)
+38521A	b	u	1	RDRAM	Note Score (MMM)
 385224	d	f	1	RDRAM	Game Time (MM)
 385228	d	f	1	RDRAM	Game Time (TTC)
 38522C	d	f	1	RDRAM	Game Time (CC)
