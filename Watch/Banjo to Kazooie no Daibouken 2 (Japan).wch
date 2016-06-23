@@ -1,6 +1,51 @@
 SystemID N64
 0788F8	d	s	1	RDRAM	Frame timer
 0788FC	d	s	1	RDRAM	Frameskip
+114E01	b	u	1	RDRAM	Jinjo: MT: Jade Snake Grove
+114E04	b	u	1	RDRAM	Jinjo: MT: Roof of Stadium
+114E07	b	u	1	RDRAM	Jinjo: MT: Targitzan's Temple
+114E0A	b	u	1	RDRAM	Jinjo: MT: Pool of Water
+114E0D	b	u	1	RDRAM	Jinjo: MT: Bridge
+114E10	b	u	1	RDRAM	Jinjo: GGM: Water Storage
+114E13	b	u	1	RDRAM	Jinjo: GGM: Jail
+114E16	b	u	1	RDRAM	Jinjo: GGM: Toxic Gas Cave
+114E19	b	u	1	RDRAM	Jinjo: GGM: Boulder
+114E1C	b	u	1	RDRAM	Jinjo: GGM: Mine Tracks
+114E1F	b	u	1	RDRAM	Jinjo: WW: Tent
+114E22	b	u	1	RDRAM	Jinjo: WW: Cave of Horrors
+114E25	b	u	1	RDRAM	Jinjo: WW: Van Door
+114E28	b	u	1	RDRAM	Jinjo: WW: Dodgem Dome
+114E2B	b	u	1	RDRAM	Jinjo: WW: Cactus of Strength
+114E2E	b	u	1	RDRAM	Jinjo: JRL: Lagoon Alcove
+114E31	b	u	1	RDRAM	Jinjo: JRL: Blubber
+114E34	b	u	1	RDRAM	Jinjo: JRL: Big Fish
+114E37	b	u	1	RDRAM	Jinjo: JRL: Seaweed Sanctum
+114E3A	b	u	1	RDRAM	Jinjo: JRL: Sunken Ship
+114E3D	b	u	1	RDRAM	Jinjo: TDL: Talon Torpedo
+114E40	b	u	1	RDRAM	Jinjo: TDL: Cutscene Skip
+114E43	b	u	1	RDRAM	Jinjo: TDL: Beside Rocknut
+114E46	b	u	1	RDRAM	Jinjo: TDL: Big T-Rex Skip
+114E49	b	u	1	RDRAM	Jinjo: TDL: Stomping Plains
+114E4C	b	u	1	RDRAM	Jinjo: GI: Floor 5
+114E4F	b	u	1	RDRAM	Jinjo: GI: Leg Spring
+114E52	b	u	1	RDRAM	Jinjo: GI: Toxic Waste
+114E55	b	u	1	RDRAM	Jinjo: GI: Boiler Plant
+114E58	b	u	1	RDRAM	Jinjo: GI: Outside
+114E5B	b	u	1	RDRAM	Jinjo: HFP: Lava Waterfall
+114E5E	b	u	1	RDRAM	Jinjo: HFP: Boiling Hot Pool
+114E61	b	u	1	RDRAM	Jinjo: HFP: Windy Hole
+114E64	b	u	1	RDRAM	Jinjo: HFP: Icicle Grotto
+114E67	b	u	1	RDRAM	Jinjo: HFP: Mildred Ice Cube
+114E6A	b	u	1	RDRAM	Jinjo: CCL: Trash Can
+114E6D	b	u	1	RDRAM	Jinjo: CCL: Cheese Wedge
+114E70	b	u	1	RDRAM	Jinjo: CCL: Central Cavern
+114E73	b	u	1	RDRAM	Jinjo: CCL: Mingy Jongo
+114E76	b	u	1	RDRAM	Jinjo: CCL: Wumba's
+114E79	b	u	1	RDRAM	Jinjo: IoH: Wooded Hollow
+114E7C	b	u	1	RDRAM	Jinjo: IoH: Wasteland
+114E7F	b	u	1	RDRAM	Jinjo: IoH: Cliff Top
+114E82	b	u	1	RDRAM	Jinjo: IoH: Plateau
+114E85	b	u	1	RDRAM	Jinjo: IoH: Spiral Mountain
 11530D	b	h	1	RDRAM	HUD Icon (Air)
 115325	b	h	1	RDRAM	HUD Icon (Health)
 115A04	b	u	1	RDRAM	BK: Current Health
@@ -39,10 +84,10 @@ SystemID N64
 126998	d	f	1	RDRAM	Game Time (CCL)
 12699C	d	f	1	RDRAM	Game Time (CK)
 1269A0	d	f	1	RDRAM	Game Time (Isle'o'Hags)
-1269C0	d	h	1	RDRAM	RNG?
-1269C4	d	h	1	RDRAM	RNG?
-1269C8	d	h	1	RDRAM	RNG?
-1269CC	d	h	1	RDRAM	RNG?
+1269C0	d	h	1	RDRAM	RNG
+1269C4	d	h	1	RDRAM	RNG
+1269C8	d	h	1	RDRAM	RNG
+1269CC	d	h	1	RDRAM	RNG
 12F660	d	h	1	RDRAM	Player Pointer 0
 12F664	d	h	1	RDRAM	Player Pointer 1
 12F668	d	h	1	RDRAM	Player Pointer 2

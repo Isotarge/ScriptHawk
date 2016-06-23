@@ -437,52 +437,52 @@ end
 -- Jinjo Dump --
 ----------------
 
-JinjoAddresses = { -- USA Version
-	{0x11AB41, "MT: Jade Snake Grove"},
-	{0x11AB44, "MT: Roof of Stadium"},
-	{0x11AB47, "MT: Targitzan's Temple"},
-	{0x11AB4A, "MT: Pool of Water"},
-	{0x11AB4D, "MT: Bridge"},
-	{0x11AB50, "GGM: Water Storage"},
-	{0x11AB53, "GGM: Jail"},
-	{0x11AB56, "GGM: Toxic Gas Cave"},
-	{0x11AB59, "GGM: Boulder"},
-	{0x11AB5C, "GGM: Mine Tracks"},
-	{0x11AB5F, "WW: Tent"},
-	{0x11AB62, "WW: Cave of Horrors"},
-	{0x11AB65, "WW: Van Door"},
-	{0x11AB68, "WW: Dodgem Dome"},
-	{0x11AB6B, "WW: Cactus of Strength"},
-	{0x11AB6E, "JRL: Lagoon Alcove"},
-	{0x11AB71, "JRL: Blubber"},
-	{0x11AB74, "JRL: Big Fish"},
-	{0x11AB77, "JRL: Seaweed Sanctum"},
-	{0x11AB7A, "JRL: Sunken Ship"},
-	{0x11AB7D, "TDL: Talon Torpedo"},
-	{0x11AB80, "TDL: Cutscene Skip"},
-	{0x11AB83, "TDL: Beside Rocknut"},
-	{0x11AB86, "TDL: Big T-Rex Skip"},
-	{0x11AB89, "TDL: Stomping Plains"},
-	{0x11AB8C, "GI: Floor 5"},
-	{0x11AB8F, "GI: Leg Spring"},
-	{0x11AB92, "GI: Toxic Waste"},
-	{0x11AB95, "GI: Boiler Plant"},
-	{0x11AB98, "GI: Outside"},
-	{0x11AB9B, "HFP: Lava Waterfall"},
-	{0x11AB9E, "HFP: Boiling Hot Pool"},
-	{0x11ABA1, "HFP: Windy Hole"},
-	{0x11ABA4, "HFP: Icicle Grotto"},
-	{0x11ABA7, "HFP: Mildred Ice Cube"},
-	{0x11ABAA, "CCL: Trash Can"},
-	{0x11ABAD, "CCL: Cheese Wedge"},
-	{0x11ABB0, "CCL: Central Cavern"},
-	{0x11ABB3, "CCL: Mingy Jongo"},
-	{0x11ABB6, "CCL: Wumba's"},
-	{0x11ABB9, "IoH: Wooded Hollow"},
-	{0x11ABBC, "IoH: Wasteland"},
-	{0x11ABBF, "IoH: Cliff Top"},
-	{0x11ABC2, "IoH: Plateau"},
-	{0x11ABC5, "IoH: Spiral Mountain"},
+JinjoAddresses = {
+	{{0x11FA71, 0x11FC31, 0x114E01, 0x11AB41}, "MT: Jade Snake Grove"},
+	{{0x11FA74, 0x11FC34, 0x114E04, 0x11AB44}, "MT: Roof of Stadium"},
+	{{0x11FA77, 0x11FC37, 0x114E07, 0x11AB47}, "MT: Targitzan's Temple"},
+	{{0x11FA7A, 0x11FC3A, 0x114E0A, 0x11AB4A}, "MT: Pool of Water"},
+	{{0x11FA7D, 0x11FC3D, 0x114E0D, 0x11AB4D}, "MT: Bridge"},
+	{{0x11FA80, 0x11FC40, 0x114E10, 0x11AB50}, "GGM: Water Storage"},
+	{{0x11FA83, 0x11FC43, 0x114E13, 0x11AB53}, "GGM: Jail"},
+	{{0x11FA86, 0x11FC46, 0x114E16, 0x11AB56}, "GGM: Toxic Gas Cave"},
+	{{0x11FA89, 0x11FC49, 0x114E19, 0x11AB59}, "GGM: Boulder"},
+	{{0x11FA8C, 0x11FC4C, 0x114E1C, 0x11AB5C}, "GGM: Mine Tracks"},
+	{{0x11FA8F, 0x11FC4F, 0x114E1F, 0x11AB5F}, "WW: Tent"},
+	{{0x11FA92, 0x11FC52, 0x114E22, 0x11AB62}, "WW: Cave of Horrors"},
+	{{0x11FA95, 0x11FC55, 0x114E25, 0x11AB65}, "WW: Van Door"},
+	{{0x11FA98, 0x11FC58, 0x114E28, 0x11AB68}, "WW: Dodgem Dome"},
+	{{0x11FA9B, 0x11FC5B, 0x114E2B, 0x11AB6B}, "WW: Cactus of Strength"},
+	{{0x11FA9E, 0x11FC5E, 0x114E2E, 0x11AB6E}, "JRL: Lagoon Alcove"},
+	{{0x11FAA1, 0x11FC61, 0x114E31, 0x11AB71}, "JRL: Blubber"},
+	{{0x11FAA4, 0x11FC64, 0x114E34, 0x11AB74}, "JRL: Big Fish"},
+	{{0x11FAA7, 0x11FC67, 0x114E37, 0x11AB77}, "JRL: Seaweed Sanctum"},
+	{{0x11FAAA, 0x11FC6A, 0x114E3A, 0x11AB7A}, "JRL: Sunken Ship"},	
+	{{0x11FAAD, 0x11FC6D, 0x114E3D, 0x11AB7D}, "TDL: Talon Torpedo"},
+	{{0x11FAB0, 0x11FC70, 0x114E40, 0x11AB80}, "TDL: Cutscene Skip"},
+	{{0x11FAB3, 0x11FC73, 0x114E43, 0x11AB83}, "TDL: Beside Rocknut"},
+	{{0x11FAB6, 0x11FC76, 0x114E46, 0x11AB86}, "TDL: Big T-Rex Skip"},
+	{{0x11FAB9, 0x11FC79, 0x114E49, 0x11AB89}, "TDL: Stomping Plains"},
+	{{0x11FABC, 0x11FC7C, 0x114E4C, 0x11AB8C}, "GI: Floor 5"},
+	{{0x11FABF, 0x11FC7F, 0x114E4F, 0x11AB8F}, "GI: Leg Spring"},
+	{{0x11FAC2, 0x11FC82, 0x114E52, 0x11AB92}, "GI: Toxic Waste"},
+	{{0x11FAC5, 0x11FC85, 0x114E55, 0x11AB95}, "GI: Boiler Plant"},
+	{{0x11FAC8, 0x11FC88, 0x114E58, 0x11AB98}, "GI: Outside"},
+	{{0x11FACB, 0x11FC8B, 0x114E5B, 0x11AB9B}, "HFP: Lava Waterfall"},
+	{{0x11FACE, 0x11FC8E, 0x114E5E, 0x11AB9E}, "HFP: Boiling Hot Pool"},
+	{{0x11FAD1, 0x11FC91, 0x114E61, 0x11ABA1}, "HFP: Windy Hole"},
+	{{0x11FAD4, 0x11FC94, 0x114E64, 0x11ABA4}, "HFP: Icicle Grotto"},
+	{{0x11FAD7, 0x11FC97, 0x114E67, 0x11ABA7}, "HFP: Mildred Ice Cube"},
+	{{0x11FADA, 0x11FC9A, 0x114E6A, 0x11ABAA}, "CCL: Trash Can"},
+	{{0x11FADD, 0x11FC9D, 0x114E6D, 0x11ABAD}, "CCL: Cheese Wedge"},
+	{{0x11FAE0, 0x11FCA0, 0x114E70, 0x11ABB0}, "CCL: Central Cavern"},
+	{{0x11FAE3, 0x11FCA3, 0x114E73, 0x11ABB3}, "CCL: Mingy Jongo"},
+	{{0x11FAE6, 0x11FCA6, 0x114E76, 0x11ABB6}, "CCL: Wumba's"},
+	{{0x11FAE9, 0x11FCA9, 0x114E79, 0x11ABB9}, "IoH: Wooded Hollow"},
+	{{0x11FAEC, 0x11FCAC, 0x114E7C, 0x11ABBC}, "IoH: Wasteland"},
+	{{0x11FAEF, 0x11FCAF, 0x114E7F, 0x11ABBF}, "IoH: Cliff Top"},
+	{{0x11FAF2, 0x11FCB2, 0x114E82, 0x11ABC2}, "IoH: Plateau"},
+	{{0x11FAF5, 0x11FCB5, 0x114E85, 0x11ABC5}, "IoH: Spiral Mountain"},
 };
 
 JinjoColors = {
@@ -536,7 +536,7 @@ knownPatterns = { -- To test for more patterns: Freeze u32_be 0x12C7F0 at a desi
 function getCurrentPattern()
 	local pattern = {};
 	for i = 1, #JinjoAddresses do
-		table.insert(pattern, mainmemory.readbyte(JinjoAddresses[i][1]));
+		table.insert(pattern, mainmemory.readbyte(JinjoAddresses[i][1][version]));
 	end
 	return pattern;
 end
@@ -560,7 +560,7 @@ function isKnownPattern()
 			end
 		end
 		if patternMatch then
-			return true;
+			return tostring(true).." index: "..i;
 		end
 	end
 	console.clear();
