@@ -62,7 +62,6 @@ Game.Memory = {
 	["bone_displacement_pointer"] = {0x76FDF8, 0x76A918, 0x76FFE8, nil}, -- TODO: Kiosk
 	["frames_lag"] = {0x76AF10, 0x765A30, 0x76B100, 0x72D140}, -- TODO: Kiosk only works for minecart?
 	["frames_real"] = {0x7F0560, 0x7F0480, 0x7F09D0, nil}, -- TODO: Make sure freezing these stalls the main thread -- TODO: Kiosk
-	["boss_pointer"] = {0x7FDC90, 0x7FDBD0, 0x7FE120, nil}, -- TODO: Find Mad Jack state based on Model 1 pointer list and actor type knowledge. MJ is actor 204
 	["obj_model2_array_pointer"] = {0x7F6000, 0x7F5F20, 0x7F6470, 0x6F4470},
 	["obj_model2_array_count"] = {0x7F6004, 0x7F5F24, 0x7F6474, nil}, -- TODO: Kiosk
 	["obj_model2_timer"] = {0x76A064, 0x764B84, 0x76A254, 0x72CDAC},
@@ -1253,12 +1252,12 @@ function getObjectModel2ModelBase(index)
 	end
 end
 
-function getScriptName(objectModel2Base) -- TODO: Can this be used anywhere else?
+function getScriptName(objectModel2Base)
 	local behaviorTypePointer = dereferencePointer(objectModel2Base + obj_model2.behavior_type_pointer);
 	if isRDRAM(behaviorTypePointer) then
 		return readNullTerminatedString(behaviorTypePointer + 0x0C);
 	end
-	return "";
+	return "unknown";
 end
 
 object_model2_filter = nil;
@@ -1322,13 +1321,9 @@ end
 
 function offsetObjectModel2(x, y, z)
 	-- Iterate and set position
-	local behaviorTypePointer, behaviorType, modelPointer, currentX, currentY, currentZ;
+	local behaviorType, modelPointer, currentX, currentY, currentZ;
 	for i = 1, #object_pointers do
-		behaviorTypePointer = dereferencePointer(object_pointers[i] + obj_model2.behavior_type_pointer);
-		behaviorType = "unknown";
-		if isRDRAM(behaviorTypePointer) then
-			behaviorType = readNullTerminatedString(behaviorTypePointer + 0x0C);
-		end
+		behaviorType = getScriptName(object_pointers[i]);
 		if behaviorType == "pickups" then
 			-- Read hitbox X, Y, Z
 			currentX = mainmemory.readfloat(object_pointers[i] + obj_model2.x_pos, true);
@@ -1373,26 +1368,26 @@ local function getExamineDataModelTwo(pointer)
 	local hasPosition = xPos ~= 0 or yPos ~= 0 or zPos ~= 0 or hasModel;
 
 	table.insert(examine_data, { "Slot base", toHexString(pointer, 6) });
-	local behaviorTypePointer = mainmemory.read_u32_be(pointer + obj_model2.behavior_type_pointer); -- TODO: dereferencePointer calls
-	local behaviorPointer = mainmemory.read_u32_be(pointer + obj_model2.behavior_pointer);
-	local behaviorType = "unknown";
-	if isPointer(behaviorTypePointer) then
-		behaviorType = readNullTerminatedString(behaviorTypePointer - RDRAMBase + 0x0C);
+
+	local behaviorTypePointer = dereferencePointer(pointer + obj_model2.behavior_type_pointer);
+	local behaviorType = getScriptName(pointer); 
+	if isRDRAM(behaviorTypePointer) then
 		table.insert(examine_data, { "Behavior Type", behaviorType });
-		table.insert(examine_data, { "Behavior Type Pointer", toHexString(behaviorTypePointer) });
+		table.insert(examine_data, { "Behavior Type Pointer", toHexString(behaviorTypePointer, 6) });
 	end
-	if isPointer(behaviorPointer) then
-		table.insert(examine_data, { "Behavior Pointer", toHexString(behaviorPointer) });
+	local behaviorPointer = dereferencePointer(pointer + obj_model2.behavior_pointer);
+	if isRDRAM(behaviorPointer) then
+		table.insert(examine_data, { "Behavior Pointer", toHexString(behaviorPointer, 6) });
 	end
 	table.insert(examine_data, { "Separator", 1 });
 
 	if behaviorType == "pads" then
-		table.insert(examine_data, { "Warp Pad Texture", toHexString(mainmemory.read_u32_be(behaviorTypePointer - RDRAMBase + 0x374), 8) }); -- TODO: figure out the format for behavior scripts
+		table.insert(examine_data, { "Warp Pad Texture", toHexString(mainmemory.read_u32_be(behaviorTypePointer + 0x374), 8) }); -- TODO: figure out the format for behavior scripts
 		table.insert(examine_data, { "Separator", 1 });
 	end
 
 	if behaviorType == "gunswitches" then
-		table.insert(examine_data, { "Gunswitch Texture", toHexString(mainmemory.read_u32_be(behaviorTypePointer - RDRAMBase + 0x22C), 8) }); -- TODO: figure out the format for behavior scripts
+		table.insert(examine_data, { "Gunswitch Texture", toHexString(mainmemory.read_u32_be(behaviorTypePointer + 0x22C), 8) }); -- TODO: figure out the format for behavior scripts
 		table.insert(examine_data, { "Separator", 1 });
 	end
 
@@ -2843,10 +2838,19 @@ local function MJ_parse_position(position)
 	};
 end
 
+function getMadJack()
+	for object_no = 0, getObjectModel1Count() do
+		local pointer = dereferencePointer(Game.Memory["pointer_list"][version] + (object_no * 4));
+		if isRDRAM(pointer) and getActorName(pointer) == "Mad Jack" then
+			return pointer + 0x180;
+		end
+	end
+end
+
 function Game.drawMJMinimap()
 	-- Only draw minimap if the player is in the Mad Jack fight
 	if version ~= 4 and map_value == 154 then
-		local MJ_state = dereferencePointer(Game.Memory.boss_pointer[version]);
+		local MJ_state = getMadJack();
 		if not isRDRAM(MJ_state) then -- MJ object not found
 			return;
 		end
@@ -4022,9 +4026,10 @@ local function drawGrabScriptUI()
 		if grab_script_mode == "List (Object Model 2)" then
 			for i = #object_pointers, 1, -1 do
 				local behaviorPointer = dereferencePointer(object_pointers[i] + obj_model2.behavior_pointer);
+				local behaviorType = " "..getScriptName(object_pointers[i]);
 				local collectableState = mainmemory.readbyte(object_pointers[i] + obj_model2.collectable_state);
 				if isRDRAM(behaviorPointer) then
-					behaviorPointer = " ("..toHexString(behaviorPointer or 0, 6)..")";
+					behaviorPointer = " ("..toHexString(behaviorPointer, 6)..")";
 				else
 					behaviorPointer = "";
 				end
@@ -4034,12 +4039,6 @@ local function drawGrabScriptUI()
 				end
 				if object_index == i then
 					color = green_highlight
-				end
-
-				local behaviorType = "";
-				local behaviorTypePointer = dereferencePointer(object_pointers[i] + obj_model2.behavior_type_pointer);
-				if isRDRAM(behaviorTypePointer) then
-					behaviorType = " "..behaviorType..readNullTerminatedString(behaviorTypePointer + 0x0C);
 				end
 
 				if not (behaviorPointer == "" and hide_non_scripted) then
