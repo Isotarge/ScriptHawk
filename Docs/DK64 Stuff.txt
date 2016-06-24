@@ -10,6 +10,7 @@ All global stuff that doesn't change location in memory (moves, consumables, map
 
 TODO stuff:
 
+Make the fly swatter hitbox the size of the entire barrel or just cave and write a bot
 Find movement angle (ie what direction are you currently moving, not necessarily facing)
 More info about the camera:
 

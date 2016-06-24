@@ -828,7 +828,7 @@ obj_model1 = {
 		[0x43] = "Barrel", -- Underwater
 		[0x44] = "Baboon Blast Shot",
 		[0x45] = "Cannon Shot",
-		[0x46] = "Pushing Object", -- TODO: Unused?
+		[0x46] = "Pushing Object", -- Unused
 		[0x47] = "Picking up Object",
 		[0x48] = "Idle", -- Carrying Object
 		[0x49] = "Walking", -- Carrying Object
@@ -902,6 +902,7 @@ obj_model1 = {
 		["next_renderer"] = 0x24, -- Pointer
 	},
 	["shade_byte"] = 0x16D,
+	["destination_map"] = 0x17E, -- u16_be, bonus barrels etc
 	["player"] = {
 		["animation_type"] = 0x181, -- Seems to be the same value as control_states
 		["velocity_uncrouch_aerial"] = 0x1A4, -- TODO: What is this?
@@ -1068,6 +1069,7 @@ local function getExamineDataModelOne(pointer)
 	table.insert(examine_data, { "In water", tostring(not get_bit(visibilityValue, 0)) });
 	table.insert(examine_data, { "Visible", tostring(get_bit(visibilityValue, 2)) });
 	table.insert(examine_data, { "Collides with terrain", tostring(get_bit(visibilityValue, 4)) });
+	table.insert(examine_data, { "Destination", Game.maps[mainmemory.read_u16_be(pointer + obj_model1.destination_map) + 1] or "Unknown"});
 	table.insert(examine_data, { "Separator", 1 });
 
 	table.insert(examine_data, { "Lock Method 1 Pointer", toHexString(mainmemory.read_u32_be(pointer + obj_model1.lock_method_1_pointer), 8) });
