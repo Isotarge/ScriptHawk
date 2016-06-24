@@ -413,6 +413,7 @@ SystemID N64
 7FD0D8	w	u	1	RDRAM	Film
 7FD0DB	b	u	1	RDRAM	Health
 7FD0DC	b	u	1	RDRAM	Melons
+7FDA00	w	h	1	RDRAM	Transferred Actor Type
 7FDAA0	d	u	1	RDRAM	Idle Timer
 7FE140	w	u	1	RDRAM	Loading Zone Array Size
 7FE144	d	h	1	RDRAM	Loading Zone Array Pointer
