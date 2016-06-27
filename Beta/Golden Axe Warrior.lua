@@ -10,8 +10,8 @@ local black = 0xFF000000;
 
 -- Game state
 local object_array_base = 0x300;
-local object_size = 0x20;
-local object_array_capacity = 48;
+local object_size = 0x30;
+local object_array_capacity = 31;
 
 local object_fields = {
 	["object_type"] = 0x00, -- Byte
@@ -69,6 +69,7 @@ function drawObjects()
 		dragging = false;
 	end
 
+	local row = 0;
 	for i = 0, object_array_capacity do
 		local objectBase = object_array_base + (i * object_size);
 		local objectType = mainmemory.readbyte(objectBase + object_fields.object_type);
@@ -154,11 +155,7 @@ function drawObjects()
 			end
 
 			if showList then
-				local list_x_offset = 2;
-				local list_y_offset = 2;
-				local row = 0;
-
-				gui.text(list_x_offset, list_y_offset + height * row, xPosition..", "..yPosition.." - "..objectType.." "..toHexString(objectBase), color, nil, 'bottomright');
+				gui.text(2, 2 + height * row, xPosition..", "..yPosition.." - "..objectType.." "..toHexString(objectBase), color, nil, 'bottomright');
 				row = row + 1;
 			end
 		end
