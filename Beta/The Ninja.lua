@@ -69,7 +69,8 @@ local object_fields = {
 		[0x30] = {["name"] = "Blue Scroll", ["color"] = pink}, -- Map Screen
 		[0x31] = {["name"] = "Green Scrolls", ["color"] = pink}, -- Map Screen
 		[0x32] = {["name"] = "Staircase Trigger", ["color"] = pink}, -- Level 10
-
+		[0x33] = {["name"] = "Player", ["color"] = pink}, -- End screen
+		[0x34] = {["name"] = "Princess", ["color"] = pink}, -- End screen
 		[0x35] = {["name"] = "Boulder Enemy", ["isEnemy"] = true},
 		[0x36] = {["name"] = "Blue Enemy", ["isEnemy"] = true, ["color"] = pink}, -- Contains red scroll
 		[0x37] = {["name"] = "Blue Enemy", ["isEnemy"] = true, ["color"] = pink}, -- Contains blue scroll
@@ -86,6 +87,7 @@ local object_fields = {
 		[0x42] = {["name"] = "Fire Enemy", ["isEnemy"] = true, ["color"] = pink}, -- Level 7, Contains red scroll
 		[0x43] = {["name"] = "Grey Enemy", ["isEnemy"] = true, ["color"] = pink}, -- Cliff, Contains red scroll
 		[0x44] = {["name"] = "Fire Enemy", ["isEnemy"] = true, ["color"] = pink}, -- Contains blue scroll
+		[0x45] = {["name"] = "Easter Egg Trigger", ["color"] = yellow}, -- Only in Japanese version
 	},
 	["animation_index"] = 0x03, -- Byte
 	["animation_current_frame"] = 0x04, -- Byte
@@ -164,6 +166,22 @@ end
 function getLevelY()
 	return mainmemory.read_u16_le(0xD2B);
 end
+
+local prevPosition = {0,0};
+local prevLevelPosition = {0,0};
+local dx = 0;
+local dy = 0;
+local d = 0;
+
+function calculateDelta()
+	local position = {getX(), getY()};
+	local levelPosition = {getLevelX(), getLevelY()};
+	dx = math.abs(prevLevelPosition[1] - levelPosition[1]) + math.abs(prevPosition[1] - position[1]);
+	dy = math.abs(prevLevelPosition[2] - levelPosition[2]) + math.abs(prevPosition[2] - position[2]);
+	prevPosition = position;
+	prevLevelPosition = levelPosition;
+end
+event.onframestart(calculateDelta, "ScriptHawk - Calculate Delta");
 
 function getHits()
 	return mainmemory.read_u16_le(0xDC4);
@@ -341,6 +359,10 @@ function drawOSD()
 	gui.text(OSDX, OSDY + height * row, "Position: "..getX()..","..getY());
 	row = row + 1;
 	gui.text(OSDX, OSDY + height * row, "Level Pos: "..getLevelX()..","..getLevelY());
+	row = row + 1;
+	gui.text(OSDX, OSDY + height * row, "dX: "..dx);
+	row = row + 1;
+	gui.text(OSDX, OSDY + height * row, "dY: "..dy);
 	row = row + 2;
 
 	gui.text(OSDX, OSDY + height * row, "Player Proj: "..countPlayerProjectiles().."/"..max_player_projectiles);

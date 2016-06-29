@@ -6,6 +6,17 @@ SystemID SMS
 0DC4	b	u	0	Main RAM	Hits
 0DC6	w	u	0	Main RAM	Shots
 0DC8	b	u	0	Main RAM	Level
+0DDB	b	h	0	Main RAM	Green Scroll Flag
+0DDC	b	h	0	Main RAM	Green Scroll Flag
+0DDD	b	h	0	Main RAM	Green Scroll Flag
+0DDE	b	h	0	Main RAM	Green Scroll Flag
+0DDF	b	h	0	Main RAM	Green Scroll Flag
+0DF0	b	h	0	Main RAM	Easter Egg Flag (Level 1)
+0DF1	b	h	0	Main RAM	Easter Egg Flag (Level 2)
+0DF3	b	h	0	Main RAM	Easter Egg Flag
+0DF4	b	h	0	Main RAM	Easter Egg Flag
+0DF6	b	h	0	Main RAM	Easter Egg Flag
+0DF8	b	h	0	Main RAM	Easter Egg Flag
 0EAF	w	s	0	Main RAM	Y Position (Screen)
 0EB2	w	s	0	Main RAM	X Position (Screen)
 0EC2	b	h	0	Main RAM	Player Projectile
