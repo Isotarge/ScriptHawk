@@ -2,6 +2,9 @@
 ##High Priority
 - General: Rework input/keybinds, multiple profiles like wasd/arrow keys
 - General: 2D game support
+	- Integrate SMS object viewers into ScriptHawk.lua
+		- Currently they share a lot of code that would work well as a game module
+		- I think it'd be fun to bulk support SMS games since the object layout is so simple :P
 	- Move from x, y, z variables to position/rotation/velocity etc. tables with x, y, z indexes
 - General: UI to load ASM patches, can currently only be done by calling loadASMPatch(filename, suppressprint) in the lua console
 - D-Pad Fixes for:
@@ -25,7 +28,7 @@
 - Port Tetris Attack bot to other Puzzle League games
 	- [List of Games](http://www.speedrun.com/puzzle_league)
 	- [Pokémon Puzzle League Info here](https://github.com/mupen64plus/mupen64plus-user-issues/issues/567)
-- Keep [LIPS](https://github.com/notwa/lips) up to date
+- Keep [lips](https://github.com/notwa/lips) up to date
 - Support both BizHawk and m64p
 	- [Info here](https://github.com/notwa/mm/commit/90d30e218f3128fb130e54bd8662527bdd73f40f)
 	- Squish remaining calls to bizstring library

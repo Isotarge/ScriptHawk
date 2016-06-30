@@ -1,7 +1,7 @@
-How to use the DK64 object analysis tools
+How to use the Object Analysis Tools
 
-These tools allow you to list and examine details about the currently loaded objects
-from two (of likely three+) object models in DK64.
+These tools allow you to list and examine details about the currently loaded objects.
+This guide was originally written for DK64, but the keybinds apply to several games.
 
 "List" shows all currently loaded objects from that model
 "Examine" shows all known details about the currently selected object
