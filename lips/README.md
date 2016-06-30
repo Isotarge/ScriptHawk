@@ -1,22 +1,18 @@
 # lips
 
-An assembler for the MIPS R4300i architecture, written in Lua.
+An assembler for the MIPS R4300i processor, written in Lua.
 
 This is not a 'true' assembler; it won't produce executable binary files.
 This was intended to assist in hacking N64 games.
 It does little more than output hex.
 
-Not for production. Much of the code and syntax is untested and likely to change.
+Not for production.
+Much of the code and syntax is untested and likely to change.
 Even this README is incomplete.
 
 ## Usage
 
-Copy the lips directory to somewhere Lua's `package.path` can find it.
-If you're using it locally, you will need to write something like:
-```
-package.path = package.path..";?/init.lua"
-```
-or `require "lips.init"` directly.
+`local lips = require "lips.init"`
 
 You can then use it as such:
 [example.lua][elua] — [example.asm][easm]
@@ -37,57 +33,85 @@ By default, lips will print the assembled word values in hex:
 etc...
 ```
 
+Other predefined output formats are available in [lips.writers];
+you can instantiate one and pass it through the second argument of lips.
+
 Since lips is designed to assist with ROM/RAM hacking,
 it cannot produce executable files on its own.
-Instead, it is meant to be integrated with an existing executable or memory dump.
+Instead, it is meant to be integrated with
+an existing executable or memory dump.
 For instance, consider [this injection routine][inject.lua]
 written for the Nintendo 64 Zelda games.
 
+[writers]: https://github.com/notwa/lips/blob/master/lips/writers.lua
 [inject.lua]: https://github.com/notwa/mm/blob/master/Lua/inject.lua
 
 ## Syntax
 
 lips uses a derivative of [CajeASM's][caje] syntax.
-It takes a couple notes from more traditional assemblers as well.
+It takes a couple of notes from other assemblers as well.
 
 [caje]: https://github.com/Tarek701/CajeASM/
 
 A run-down of various syntax elements:
 ```asm
-// this is a comment
+// this is a comment.
 /* this is a block comment */
-; this is a more traditional assembly style of comment
-; we'll be using this so github's syntax highlighting doesn't blow up
+; this is a more traditional assembly style of comment.
+; we'll be using this so github's syntax highlighting doesn't blow up.
 
-; this is comparible to C's #define my_const 0xDEADBEEF
+; set a variable. these are inlined in the preprocessing stage.
 [my_const]: 0xDEADBEEF
-; we can then use it in instructions by adding a @ prefix
+; we can then use it in instructions by adding a @ prefix:
     li      a0, @my_const
 
-; whitespace is optional
+; whitespace is optional.
 li a0,@myconst
 ; commas can be optional too,
 ; but this feature will likely be removed in the future.
 li a0 @myconst
-; instruction/register names are case-insensitive, as are hex digits
+; instructions may end in an extra comma;
+; this may make mass-entry or generation of instructions easier.
+li  a0, @my_const,
+
+; instruction/register names are case-insensitive, as are hex digits.
     LI      A0, @my_const
     LuI     a0, 0xDeAd
+; however, note that the 'x' in "0x" must be lowercase.
+; the same applies for 0b and 0o for binary and octal, respectively.
+
 ; coprocessor 0 registers are case-insensitive as well,
 ; though this may change in the future.
     mfc0    a1, CouNT
 
-; labels are defined with a colon and referenced without prefix, as such:
+; labels are defined with a colon, and referenced without a prefix, as such:
 my_label:
     b       my_label
     nop
+
 ; directives are prefixed with a dot.
 ; also, labels may be used in .word directives.
     .word   my_label, 1, 2, 3, 0x4567
-; octal numbers are supported
-    .short   0177, 0404
+
+; numbers may be written in eight different ways: two for each base.
+    li      t1, 0xDEADBEEF
+    li      t2, $DEADBEEF
+    li      t3, %11011110101011011011111011101111
+    li      t4, 0b11011110101011011011111011101111
+    li      t5, 0o33653337357
+    li      t6, 033653337357
+    li      t7, 3735928559
+    li      t8, #3735928559
+
+; though, as a stylistic choice, the preferred way of writing them are as such:
+    li      t1, 0xDEADBEEF
+    li      t4, 0b11011110101011011011111011101111
+    li      t5, 0o33653337357
+    li      t7, 3735928559
+
 .align ; implied argument of 2, for a 2**n=4 byte alignment
 
-; loading and storing can be written in several ways (addressing modes)
+; loading and storing can be written in several ways (addressing modes):
     lw      s0, label
     lw      s1, (s0)
     lw      s2, 256(s0)
@@ -95,16 +119,16 @@ my_label:
     sw      s2, label+4
     sw      s3, label+4(s0)
 
-; relative labels, borrowed from asw (except ours require a suffixing colon)
--:
-    b       ++
+; relative labels are borrowed from asw, except ours require a suffixing colon:
+-:              : #1
+    b       ++  ; branches to #3
     nop
 +:
--:
-    b       --
+-:              ; #2
+    b       --  ; branches to #1
     nop
-+:
-    b       -
++:              : #3
+    b       -   ; branches to #2
     nop
 
 ; TODO: more examples!
@@ -112,7 +136,8 @@ my_label:
 
 ## Instructions
 
-Instructions were primarily referenced from [the N64 Toolkit: Opcodes.][n64op]
+Instructions were primarily referenced from [the N64 Toolkit: Opcodes][n64op]
+and the [bass assembler.][basstables]
 
 An in-depth look at instructions for MIPS IV processors
 is given by [the MIPS IV Instruction Set manual.][mipsiv]
@@ -120,36 +145,33 @@ Most of this applies to our MIPS III architecture.
 
 [The MIPS64 Instruction Set manual][mips64] is sometimes useful.
 Much of it doesn't apply to our older MIPS III architecture,
-but it's a little cleaner than the older manual.
+but it's a little cleaner than the older manuals.
 
-There's also a brief and incomplete [overview of MIPS instructions.][overview]
-First-time writers of MIPS assembly may find this the most useful.
+Last, but not least, [the R4300i datasheet][r4300i] covers
+some of the nuances of the processor.
 
 [n64op]: https://github.com/mikeryan/n64dev/tree/master/docs/n64ops
+[basstables]: https://github.com/ARM9/bass/tree/master/bass/arch/table/mipseb
 [mipsiv]: http://www.cs.cmu.edu/afs/cs/academic/class/15740-f97/public/doc/mips-isa.pdf
 [mips64]: http://scc.ustc.edu.cn/zlsc/lxwycj/200910/W020100308600769158777.pdf
-[overview]: http://www.mrc.uidaho.edu/mrc/people/jff/digital/MIPSir.html
+[r4300i]: http://www.futuretech.blinkenlights.nl/R4300_datasheet.Rev0.3.pdf
 
-### Unimplemented
+### Unimplemented Instructions
 
 As far as I know, all native R4300i instructions have been implemented.
 Whether or not they output the proper machine code is another thing.
 
 ### Unimplemented Pseudo-Instructions
 
-Besides implicit arguments for existing instructions, there are:
+* MUL, DIV, REM
 
-* ABS, MUL, DIV, REM
-
-* BGE, BLE, BLT, BGT
-
-* any Set (Condition) \[Immediate\] \[Unsigned\] pseudo-instructions
+* many Set [Condition] pseudo-instructions
 
 ## Registers
 
 In order of numerical value, with intended usage:
 
-* R0: always zero; cannot be written to. 'zero' is an acceptable alias.
+* ZERO: always zero; cannot be changed.
 
 * AT: assembler temporary. used by various pseudo-instructions.
   user may use freely if they're wary.
@@ -174,8 +196,9 @@ In order of numerical value, with intended usage:
 
 * RA: subroutine return address.
 
-* REG#: whereas # is a decimal number from 0 to 31.
-aliased to the appropriate register. eg: REG0 is R0, REG1 is at, REG2 is V0.
+* R#: whereas # is a decimal number from 0 to 31.
+aliased to the appropriate register, for instance:
+R0 is ZERO, R1 is at, R2 is V0, etc.
 
 * F#: coprocessor 1 registers, whereas # is a decimal number from 0 to 31.
 
@@ -216,9 +239,18 @@ if `fill` is omitted, no bytes are overwritten,
 and only the position is changed.
 
 * `.org {address}`  
-set the current address for writing to; seek.
-until lips is a little more optimized,
-be cautious of seeking to large addresses.
+set the current address for writing to; seek to origin.
+
+* `.base {offset}`  
+sets a virtual offset relative to the origin (.org).
+defaults to 0x80000000.
+this allows you to have a PC value different from origin:
+`PC = origin + base`
+
+* `.push {vars...}`  
+`.pop {vars...}`  
+pushes or pops variables with an internal stack.
+supported variables: org, base, pc.
 
 * `HEX { ... }`  
 write a series of bytes given in hexadecimal.
@@ -252,6 +284,7 @@ same as ascii, but with a null byte added to the end.
 
 ### Unimplemented
 
-* FLOAT: writes a list of 32-bit floating point numbers until end-of-line.
-this may not get implemented due to a lack of aliasing in vanilla Lua,
-and thus accuracy issues.
+* `.float {numbers..}`  
+`.double {numbers..}`  
+writes a list of 32-bit/64-bit floating point numbers until end-of-line.
+this may not get implemented in vanilla Lua due to a lack of aliasing.

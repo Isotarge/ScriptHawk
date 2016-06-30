@@ -193,11 +193,13 @@ function Lexer:lex_hex(yield)
             end
             self:nextc()
             entered = true
+            yield('OPEN', '{')
         elseif self.chr == '}' then
             if not entered then
                 self:error('expected opening brace')
             end
             self:nextc()
+            yield('CLOSE', '}')
             break
         elseif self.chr == ',' then
             self:error('commas are not allowed in HEX directives')
@@ -208,7 +210,6 @@ function Lexer:lex_hex(yield)
             if self.chr:find(hexmatch) then
                 self:error('too many hex digits to be a single byte')
             end
-            yield('DIR', 'BYTE')
             yield('NUM', num)
         elseif self.chr:find(hexmatch) then
             self:error('expected two hex digits to make a byte')
@@ -248,7 +249,7 @@ function Lexer:lex_string(yield)
     local bytes = {}
     while true do
         if self.chr == '\n' then
-            self:error('unimplemented')
+            self:error('unimplemented: newlines in strings')
             yield('EOL', '\n')
             self:nextc()
         elseif self.ord == self.EOF then
@@ -294,10 +295,15 @@ function Lexer:lex_include(_yield)
     self:lex_string_naive(function(tt, tok)
         fn = tok
     end)
+    _yield('STRING', fn, self.fn, self.line)
+
     if self.options.path then
         fn = self.options.path..fn
     end
-    local sublexer = Lexer(util.readfile(fn), fn, self.options)
+
+    local new_options = setmetatable({}, {__index=self.options})
+    new_options.path = fn:match(".*/")
+    local sublexer = Lexer(util.readfile(fn), fn, new_options)
     sublexer:lex(_yield)
 end
 
@@ -307,15 +313,18 @@ function Lexer:lex_include_binary(_yield)
     self:lex_string_naive(function(tt, tok)
         fn = tok
     end)
+    _yield('STRING', fn, self.fn, self.line)
+
     -- TODO: allow optional offset and size arguments
     if self.options.path then
         fn = self.options.path..fn
     end
-    -- FIXME: this allocates two tables for each byte.
-    --        this could easily cause performance issues on big files.
     local data = util.readfile(fn, true)
+
+    -- FIXME: this allocates a table for each byte.
+    --        this could easily cause performance issues on big files.
+    _yield('DIR', 'BYTE', fn, 0)
     for b in string.gfind(data, '.') do
-        _yield('DIR', 'BYTE', fn, 0)
         _yield('NUM', string.byte(b), fn, 0)
     end
 end
@@ -358,7 +367,7 @@ function Lexer:lex(_yield)
                 self:error('expected a colon after closing bracket')
             end
             self:nextc()
-            yield('DEF', buff)
+            yield('VAR', buff)
         elseif self.chr == ']' then
             self:error('unmatched closing bracket')
         elseif self.chr == '(' then
@@ -391,7 +400,7 @@ function Lexer:lex(_yield)
         elseif self.chr == '@' then
             self:nextc()
             local buff = self:read_chars('[%w_]')
-            yield('DEFSYM', buff)
+            yield('VARSYM', buff)
         elseif self.chr == '%' then
             self:nextc()
             if self.chr:find('[%a_]') then
@@ -414,6 +423,7 @@ function Lexer:lex(_yield)
                 self:nextc()
                 yield('LABEL', buff)
             elseif up == 'HEX' then
+                yield('DIR', 'HEX')
                 self:lex_hex(yield)
             elseif data.all_registers[up] then
                 yield('REG', up)

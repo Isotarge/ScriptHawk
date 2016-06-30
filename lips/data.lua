@@ -2,10 +2,10 @@ local data = {}
 
 data.registers = {
     [0]=
-    'R0', 'AT', 'V0', 'V1', 'A0', 'A1', 'A2', 'A3',
-    'T0', 'T1', 'T2', 'T3', 'T4', 'T5', 'T6', 'T7',
-    'S0', 'S1', 'S2', 'S3', 'S4', 'S5', 'S6', 'S7',
-    'T8', 'T9', 'K0', 'K1', 'GP', 'SP', 'FP', 'RA',
+    'ZERO', 'AT', 'V0', 'V1', 'A0', 'A1', 'A2', 'A3',
+    'T0',   'T1', 'T2', 'T3', 'T4', 'T5', 'T6', 'T7',
+    'S0',   'S1', 'S2', 'S3', 'S4', 'S5', 'S6', 'S7',
+    'T8',   'T9', 'K0', 'K1', 'GP', 'SP', 'FP', 'RA',
 }
 
 data.sys_registers = {
@@ -29,7 +29,8 @@ data.fpu_registers = {
 }
 
 data.all_directives = {
-    'ORG', 'ALIGN', 'SKIP',
+    'ORG', 'BASE', 'ALIGN', 'SKIP',
+    'PUSH', 'POP', -- experimental
     'ASCII', 'ASCIIZ',
     'BYTE', 'HALFWORD', 'WORD',
     --'HEX', -- excluded here due to different syntax
@@ -69,13 +70,11 @@ revtable(data.all_registers)
 revtable(data.all_directives)
 
 -- alternate register names
-data.registers['ZERO'] = 0
-data.all_registers['ZERO'] = 0
 data.registers['S8'] = 30
 data.all_registers['S8'] = 30
 
 for i=0, 31 do
-    local r = 'REG'..tostring(i)
+    local r = 'R'..tostring(i)
     data.registers[r] = i
     data.all_registers[r] = i
 end
@@ -85,7 +84,13 @@ data.fmt_double = 17
 data.fmt_word = 20
 data.fmt_long = 21
 
+-- set up dummy values for pseudo-instructions later
 local __ = {}
+-- instructions with the first two arguments as registers, but not the third
+local o1 = {}
+-- instructions with all three arguments as registers
+local o2 = {}
+
 data.instructions = {
     --[[
     data guide:
@@ -247,6 +252,7 @@ data.instructions = {
 
     -- coprocessor-related instructions
 
+    -- TODO: these can take a code value
     TEQ     = {0, 'st', 'st00C', 52},
     TGE     = {0, 'st', 'st00C', 48},
     TGEU    = {0, 'st', 'st00C', 49},
@@ -279,6 +285,7 @@ data.instructions = {
     CACHE   = {47, 'iob', 'bio'},
 
     -- misuses 'F' to write the initial bit
+--  RFE     = {16, '', 'F000C', 16, 16},
     ERET    = {16, '', 'F000C', 24, 16},
     TLBP    = {16, '', 'F000C',  8, 16},
     TLBR    = {16, '', 'F000C',  1, 16},
@@ -379,11 +386,23 @@ data.instructions = {
     BNEZL   = {21, 'sr', 's0o'},        -- BNEL RS, R0, offset
     CL      = { 0, 'd', '00d0C', 37},   -- OR RD, R0, R0
     MOV     = { 0, 'ds', 's0d0C', 37},  -- OR RD, RS, R0
+    DMOV    = { 0, 'ds', 's0d0C', 45},  -- DADDU RD, RS, R0
+-- bass does it this way
+--  MOV     = { 0, 'dt', '0td0C', 33},  -- ADDU RD, R0, RT
+--  DMOV    = { 0, 'dt', '0td0C', 45},  -- DADDU RD, R0, RT
     NEG     = { 0, 'dt', '0td0C', 34},  -- SUB RD, R0, RT
+    NEGU    = { 0, 'dt', '0td0C', 35},  -- SUBU RD, R0, RT
     NOP     = { 0, '', '0'},            -- SLL R0, R0, 0
     NOT     = { 0, 'ds', 's0d0C', 39},  -- NOR RD, RS, R0
+    SGT     = { 0, 'dst', 'tsd0C', 42}, -- SLT RD, RT, RS
+    SGTU    = { 0, 'dst', 'tsd0C', 43}, -- SLTU RD, RT, RS
     SUBI    = { 8, 'tsk', 'sti'},       -- ADDI RT, RS, -immediate
     SUBIU   = { 9, 'tsk', 'sti'},       -- ADDIU RT, RS, -immediate
+
+    L_D     = {53, 'Tob', 'bTo'}, -- LDC1
+    L_S     = {49, 'Tob', 'bTo'}, -- LWC1
+    S_D     = {61, 'Tob', 'bTo'}, -- SDC1
+    S_S     = {57, 'Tob', 'bTo'}, -- SWC1
 
     -- ...that expand to multiple instructions
     LI      = __, -- only one instruction for values < 0x10000
@@ -392,42 +411,99 @@ data.instructions = {
     -- variable arguments
     PUSH    = __,
     POP     = __,
-    JPOP    = __,
+    JPOP    = __, -- deprecated alias of RET
+    CALL    = __,
+    RET     = __,
+--  CL      = __, overridden to take varargs
 
-    ABS     = __, -- BGEZ NOP SUBU?
-    MUL     = __, -- MULT MFLO
-    --DIV     = __, -- 3 arguments
-    REM     = __, -- 3 arguments
+    ABS     = o1, -- SRA XOR SUBU
+    MUL     = o2, -- MULT MFLO
+--  DIV     = o2, -- 3 arguments
+    REM     = o2, -- 3 arguments
 
-    NAND    = __, -- AND, NOT
-    NANDI   = __, -- ANDI, NOT
-    NORI    = __, -- ORI, NOT
-    ROL     = __, -- SLL, SRL, OR
-    ROR     = __, -- SRL, SLL, OR
+    NAND    = o2, -- AND, NOT
+    NANDI   = o1, -- ANDI, NOT
+    NORI    = o1, -- ORI, NOT
+    ROL     = o1, -- SLL, SRL, OR
+    ROR     = o1, -- SRL, SLL, OR
 
-    SEQ     = __, SEQI    = __, SEQIU   = __, SEQU    = __,
-    SGE     = __, SGEI    = __, SGEIU   = __, SGEU    = __,
-    SGT     = __, SGTI    = __, SGTIU   = __, SGTU    = __,
-    SLE     = __, SLEI    = __, SLEIU   = __, SLEU    = __,
-    SNE     = __, SNEI    = __, SNEIU   = __, SNEU    = __,
+    SEQ     = o2,
+    SGE     = o2, SGEU    = o2,
+    SLE     = o2, SLEU    = o2,
+    SNE     = o2,
 
-    BGE     = __,
-    BLE     = __,
-    BLT     = __,
-    BGT     = __,
+    SEQI    = o1, SEQIU   = o1,
+    SGEI    = o1, SGEIU   = o1,
+    SGTI    = o1, SGTIU   = o1,
+    SLEI    = o1, SLEIU   = o1,
+    SNEI    = o1, SNEIU   = o1,
 
-    BEQI    = __, BEQIL   = __,
-    BNEI    = __, BNEIL   = __,
-    BGEI    = __, BGEIL   = __,
-    BLEI    = __, BLEIL   = __,
-    BLTI    = __, BLTIL   = __,
-    BGTI    = __, BGTIL   = __,
+    BGE     = o1, BGEU    = o1,
+    BLE     = o1, BLEU    = o1,
+    BLT     = o1, BLTU    = o1,
+    BGT     = o1, BGTU    = o1,
+
+    -- note: signedness of BEQI/BNEI determines how the immediate is loaded
+    BEQI    = __, BEQIU   = __, BEQIL   = __, BEQIUL  = __,
+    BGEI    = __, BGEIU   = __, BGEIL   = __, BGEIUL  = __,
+    BGTI    = __, BGTIU   = __, BGTIL   = __, BGTIUL  = __,
+    BLEI    = __, BLEIU   = __, BLEIL   = __, BLEIUL  = __,
+    BLTI    = __, BLTIU   = __, BLTIL   = __, BLTIUL  = __,
+    BNEI    = __, BNEIU   = __, BNEIL   = __, BNEIUL  = __,
+
+    BGEL    = o1, BGEUL   = o1,
+    BGTL    = o1, BGTUL   = o1,
+    BLEL    = o1, BLEUL   = o1,
+    BLTL    = o1, BLTUL   = o1,
+
 }
+
+local register_types = {
+    d = 0,
+    s = 0,
+    t = 0,
+    D = 1,
+    S = 1,
+    T = 1,
+    X = 2,
+    Y = 2,
+    Z = 2,
+}
+
+data.one_register_variants = {}
+data.two_register_variants = {}
 
 data.all_instructions = {}
 local i = 1
 for k, v in pairs(data.instructions) do
-    data.all_instructions[k:gsub('_', '.')] = i
+    local name = k:gsub('_', '.')
+
+    -- if the first two args of an instructions are the same register type,
+    -- allow it to be used with just one argument to cover both.
+    -- likewise, if all three arguments are registers of the same type,
+    -- allow just two to be used.
+    local fmt = v[2]
+    if fmt then
+        local a = fmt:sub(1, 1)
+        local b = fmt:sub(2, 2)
+        local c = fmt:sub(3, 3)
+        a = register_types[a]
+        b = register_types[b]
+        c = register_types[c]
+        if a ~= nil and b ~= nil and a == b then
+            if c == nil then
+                data.one_register_variants[name] = true
+            elseif c == a then
+                data.two_register_variants[name] = true
+            end
+        end
+    elseif v == o1 then
+        data.one_register_variants[name] = true
+    elseif v == o2 then
+        data.two_register_variants[name] = true
+    end
+
+    data.all_instructions[name] = i
     i = i + 1
 end
 revtable(data.all_instructions)

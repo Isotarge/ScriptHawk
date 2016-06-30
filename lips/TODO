@@ -1,0 +1,18 @@
+add basic command-line interface (patch.lua)
+
+document options
+maybe deprecate options.unsafe
+
+add delay slot warnings
+
+add arithmetic (using %() syntax?)
+add macros
+implement push/pop/jpop as macros
+be able to point to specific args of push/pop using variables
+add file-reading directives (e.g. for automatic hook injection macros)
+allow generation of shared object files (zelda overlays specifically)
+
+don't require colons for +/- labels (this shouldn't break anything right?)
+
+write tests for everything (try to focus on code paths)
+test unary tokens
