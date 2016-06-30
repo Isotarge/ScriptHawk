@@ -11,7 +11,7 @@ local black = 0xFF000000;
 -- Game state
 local object_array_base = 0xE80;
 local object_size = 0x21;
-local object_array_capacity = 26;
+local object_array_capacity = 27;
 
 local max_player_projectiles = 3;
 local max_enemies = 7;
