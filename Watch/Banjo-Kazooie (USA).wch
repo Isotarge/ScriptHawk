@@ -159,6 +159,7 @@ SystemID N64
 37DDB4	d	f	1	RDRAM	Jiggy Spawn Angle
 37DDB8	d	f	1	RDRAM	Jiggy Spawn Velocity
 37DF68	d	u	1	RDRAM	Bottles Bonus Puzzle Index
+37E8E7	b	h	1	RDRAM	Demo State
 37E8E8	d	f	1	RDRAM	Game runtime
 37E8F0	d	f	1	RDRAM	Map runtime
 37E8F4	b	h	1	RDRAM	Map Load State
