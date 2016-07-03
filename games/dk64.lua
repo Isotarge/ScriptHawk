@@ -51,6 +51,7 @@ Game.Memory = {
 	["linked_list_pointer"] = {0x7F0990, 0x7F08B0, 0x7F0E00, 0x7A12C0},
 	["global_base"] = {0x7FCC41, 0x7FCB81, 0x7FD0D1, 0x7B6754},
 	["kong_base"] = {0x7FC950, 0x7FC890, 0x7FCDE0, 0x7B6590},
+	["kong_size"] = {0x5E, 0x5E, 0x5E, 0x5A},
 	["menu_flags"] = {0x7ED558, 0x7ED478, 0x7ED9C8, nil},
 	["framebuffer_pointer"] = {0x7F07F4, 0x73EBC0, 0x743D30, 0x72CDA0},
 	["flag_block_pointer"] = {0x7654F4, 0x760014, 0x7656E4, nil},
@@ -438,7 +439,7 @@ local GB_Base    = TS_CB_Base + (14 * 2); -- u16_be array
 
 function Game.getMaxStandardAmmo()
 	local kong = mainmemory.readbyte(Game.Memory.character[version]);
-	local ammoBelt = mainmemory.readbyte(Game.Memory.kong_base[version] + (kong * 0x5E) + ammo_belt);
+	local ammoBelt = mainmemory.readbyte(Game.Memory.kong_base[version] + (kong * Game.Memory.kong_size[version]) + ammo_belt);
 	return ((2 ^ ammoBelt) * 100) / 2;
 end
 Game.getMaxHomingAmmo = Game.getMaxStandardAmmo;
@@ -703,7 +704,7 @@ obj_model1 = {
 		[309] = "Kong Logo (Instrument)", -- DK for DK, Star for Diddy, DK for Lanky, Flower for Tiny, DK for Chunky
 		[310] = "Spotlight", -- Tag barrel, instrument etc.
 		[311] = "Checkpoint (Race)", -- Seal race & Castle car race
-		[313] = "Particle (Idle Anim.)",
+		[313] = "Idle Particle",
 		[314] = "Rareware logo",
 		[316] = "Kong (Tag Barrel)",
 		[317] = "Locked Kong (Tag Barrel)",
@@ -895,6 +896,7 @@ obj_model1 = {
 		[0x87] = "Entering Portal",
 		[0x88] = "Exiting Portal",
 	},
+	["control_state_progress"] = 0x155, -- Byte, describes how far through the action the actor is, for example simian slam is only active once this byte hits 0x04
 	["texture_renderer_pointer"] = 0x158, -- Pointer
 	["texture_renderer"] = {
 		["texture_index"] = 0x0C, -- u16_be
@@ -1602,6 +1604,8 @@ function Game.detectVersion(romName, romHash)
 		-- flag_array = require("games.dk64_flags_Kiosk"); -- TODO: Flags?
 
 		-- Kiosk specific Object Model 1 offsets
+		obj_model1.floor = 0x9C;
+
 		obj_model1.x_rot = 0xD8;
 		obj_model1.y_rot = 0xDA;
 		obj_model1.z_rot = 0xDC;
@@ -1629,18 +1633,26 @@ function Game.detectVersion(romName, romHash)
 
 			[0x18] = "Jumping",
 
+			[0x1A] = "Double Jump", -- Diddy
+
 			[0x1C] = "Simian Slam",
 			[0x1D] = "Long Jumping",
+			[0x1E] = "Long Jumping", -- Lanky, weird as hell
 			[0x1F] = "Falling",
 			[0x20] = "Falling/Splat",
 
+			[0x22] = "Ponytail twirl",
 			[0x23] = "Primate Punch",
 
 			[0x25] = "Ground Attack",
+			[0x26] = "Ground Attack",
+			[0x27] = "Ground Attack (Final)",
 
 			[0x28] = "Moving Ground Attack",
 			[0x29] = "Aerial Attack",
-
+			[0x2A] = "Rolling",
+			[0x2B] = "Throwing Orange",
+			[0x2C] = "Shockwave",
 			[0x2D] = "Charging", -- Rambi
 
 			[0x2F] = "Damaged",
@@ -1648,7 +1660,14 @@ function Game.detectVersion(romName, romHash)
 			[0x37] = "Crouching",
 			[0x38] = "Uncrouching",
 			[0x39] = "Backflip",
+			[0x3A] = "Idle", -- Orangstand
+			[0x3B] = "Walking", -- Orangstand
+			[0x3C] = "Jumping", -- Orangstand
+			[0x3D] = "Barrel",
+			[0x3F] = "Leaving Barrel",
+			[0x40] = "Cannon Shot",
 
+			[0x43] = "Pushing Object", -- Unused?
 			[0x44] = "Picking up Object",
 			[0x45] = "Idle", -- Carrying Object
 			[0x46] = "Walking", -- Carrying Object
@@ -1658,6 +1677,17 @@ function Game.detectVersion(romName, romHash)
 
 			[0x4F] = "Bananaporter",
 
+			[0x56] = "Grabbed Ledge",
+			[0x57] = "Pulling up on Ledge",
+			[0x58] = "Idle", -- Gun
+			[0x59] = "Walking", -- Gun
+			[0x5A] = "Gun Action", -- Taking out or putting away
+			[0x5B] = "Jumping", -- Gun
+			[0x5C] = "Aiming", -- Gun
+			[0x5D] = "Rocketbarrel",
+			[0x61] = "Instrument",
+
+			[0x6A] = "GB Dance",
 			[0x6B] = "Key Dance",
 
 			[0x71] = "Locked", -- Tons of cutscenes use this
@@ -1673,18 +1703,95 @@ function Game.detectVersion(romName, romHash)
 			[6] = "Chunky",
 			[7] = "Rambi",
 			[11] = "Loading Zone Controller",
+			[16] = "Cannon Barrel",
+			[17] = "Rambi Crate",
+			[18] = "Barrel",
+			[20] = "Pushable Box", -- Unused
+			[21] = "Barrel Spawner",
+			[22] = "Cannon",
+			[23] = "Race Checkpoint", -- Circular
+			[24] = "Hunky Chunky Barrel",
 			[25] = "TNT Barrel",
 			[26] = "TNT Barrel Spawner (Army Dillo)",
+			[27] = "Bonus Barrel",
 			[29] = "Fireball", -- Army Dillo, Dogadon
+			[30] = "Bridge", -- Creepy Castle?
+			[31] = "Swinging Light", -- Grey
+
+			[35] = "Peanut", -- Projectile
+			[37] = "Pineapple", -- Projectile
+			[38] = "Large Bridge", -- Unused?
+			[39] = "Mini Monkey Barrel",
+			[40] = "Orange",
+			[41] = "Grape", -- Projectile
+			[42] = "Feather", -- Projectile
+			[44] = "Gold Banana", -- Unusued? Normally these are object model 2
+			--[45] = "Unknown", -- Crash
+			[46] = "Watermelon Slice",
+			[47] = "Coconut", -- Projectile
+			[48] = "Rocketbarrel",
+			[49] = "Orange/Lime", -- TODO: Not sure which
+			[50] = "Ammo Crate", -- Unusued? Normally these are object model 2
+			[51] = "Orange", -- Unusued? Normally these are object model 2
+			[52] = "Banana Coin", -- Unusued? Normally these are object model 2
+			[53] = "DK Coin", -- Unusued? Normally these are object model 2
+
+			[55] = "Orangstand Sprint Barrel",
+			[56] = "Strong Kong Barrel",
+			[57] = "Swinging Light", -- Green
+
+			[66] = "Cannonball?", -- Fungi Minigame
+			[68] = "Vine", -- Green
+			[69] = "Counter", -- Unused?
 			[71] = "Boss Key",
+			[72] = "Cannon", -- Fungi Minigame
+
+			[74] = "Blueprint", -- Diddy?
+			[75] = "Blueprint", -- Chunky?
+			[76] = "Blueprint", -- Lanky?
+			[77] = "Blueprint", -- DK?
+			[78] = "Blueprint", -- Tiny?
+			--[79] = "Unknown", -- Crash
+			[81] = "Boulder", -- Unused
+			[82] = "Spider Web",
+			[83] = "Steel Keg Spawner",
+			[84] = "Steel Keg", -- Looks different from retail
+			[85] = "Collectable", -- Not sure what yet
+			--[86] = "Unknown", -- Crash
+			[88] = "Missile?",
+
+			[90] = "Balloon (Diddy)",
+			[91] = "Stalactite",
+			[93] = "Car",
+			[95] = "Hunky Chunky Barrel",
 			[96] = "TNT Barrel Spawner (Dogadon)",
+			[97] = "Tag Barrel",
+
+			[99] = "1 Pad",
+			[100] = "2 Pad",
+			[101] = "3 Pad",
+			[102] = "4 Pad",
+			[103] = "5 Pad",
+			[104] = "6 Pad",
+			[106] = "Lever", -- Gorilla Grab
+			[109] = "CB Bunch", -- Unusued? Normally these are object model 2
+			[110] = "Balloon (Chunky)",
+			[111] = "Balloon (Tiny)",
+			[112] = "Balloon (Lanky)",
+			[113] = "Balloon (DK)",
 			[145] = "Army Dillo",
 			[149] = "Camera",
 			[201] = "Dogadon",
 			[214] = "Banana Fairy",
+			[222] = "Shockwave",
 			[221] = "Static Object", -- Fake Chunky in Dogadon 2 opening cutscene
 			[230] = "Fireball Shockwave", -- Dogadon
 			[232] = "Light Beam", -- Boss fights etc
+			[272] = "Kong Logo (Instrument)",
+			[273] = "Spotlight",
+			[276] = "Idle Particle",
+			[281] = "Kong (Tag Barrel)",
+			[282] = "Locked Kong (Tag Barrel)",
 		};
 
 		-- Kiosk version maps
@@ -4095,7 +4202,7 @@ end
 
 function Game.unlockMoves()
 	for kong = DK, Krusha do -- TODO: Double check Kiosk offsets
-		local base = Game.Memory.kong_base[version] + kong * 0x5E;
+		local base = Game.Memory.kong_base[version] + kong * Game.Memory.kong_size[version];
 		mainmemory.writebyte(base + moves, 3);
 		mainmemory.writebyte(base + sim_slam, 3);
 		mainmemory.writebyte(base + weapon, 7);
@@ -4237,12 +4344,10 @@ function Game.applyInfinites()
 	mainmemory.writebyte(global_base + film, max_film);
 	mainmemory.writebyte(global_base + health, mainmemory.readbyte(global_base + melons) * 4);
 
-	if version ~= 4 then -- TODO: Kiosk
-		for kong = DK, Krusha do
-			local base = Game.Memory.kong_base[version] + kong * 0x5E;
-			mainmemory.write_u16_be(base + coins, max_coins);
-			mainmemory.write_u16_be(base + lives, max_musical_energy);
-		end
+	for kong = DK, Krusha do
+		local base = Game.Memory.kong_base[version] + kong * Game.Memory.kong_size[version];
+		mainmemory.write_u16_be(base + coins, max_coins);
+		mainmemory.write_u16_be(base + lives, max_musical_energy);
 	end
 end
 
@@ -4538,7 +4643,7 @@ function Game.crankyCutsceneMininumRequirements()
 
 	-- CB and GB counters
 	for kong = DK, Chunky do
-		local base = Game.Memory.kong_base[version] + kong * 0x5E;
+		local base = Game.Memory.kong_base[version] + kong * Game.Memory.kong_size[version];
 		for level = 0, 7 do
 			mainmemory.write_s16_be(base + GB_Base + (level * 2), 5); -- Normal GB's
 			if level == 7 and kong == Tiny then
@@ -4565,7 +4670,7 @@ function Game.completeFile()
 
 	-- CB and GB counters
 	for kong = DK, Chunky do
-		local base = Game.Memory.kong_base[version] + kong * 0x5E;
+		local base = Game.Memory.kong_base[version] + kong * Game.Memory.kong_size[version];
 		for level = 0, 6 do
 			mainmemory.write_u16_be(base + CB_Base + (level * 2), 75); -- Not needed to trigger Cranky Cutscene
 		end

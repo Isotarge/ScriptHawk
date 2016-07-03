@@ -55,7 +55,11 @@ SystemID N64
 7B6596	w	u	1	RDRAM	DK Coins
 7B6598	w	u	1	RDRAM	DK Instrument Ammo
 7B659A	w	u	1	RDRAM	DK CB's (Japes?)
+7B65B2	w	u	1	RDRAM	DK CB's
 7B65CE	w	u	1	RDRAM	DK GB's (Japes?)
+7B660C	w	u	1	RDRAM	Diddy CBs
+7B6666	w	u	1	RDRAM	Lanky CBs
+7B671A	w	u	1	RDRAM	Chunky CBs
 7B6752	w	u	1	RDRAM	Normal Ammo
 7B6754	w	u	1	RDRAM	Homing Ammo
 7B6756	w	u	1	RDRAM	Oranges
@@ -63,5 +67,7 @@ SystemID N64
 7B675A	w	u	1	RDRAM	Film
 7B675E	b	u	1	RDRAM	Health
 7B675F	b	u	1	RDRAM	Melons
+7B6D00	w	u	1	RDRAM	Transferred Actor Type
+7B6DA0	d	u	1	RDRAM	Idle Timer
 7B71C4	d	h	1	RDRAM	Object Model 2 Array Pointer?
 
