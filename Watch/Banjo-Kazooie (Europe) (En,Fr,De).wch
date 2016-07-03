@@ -10,6 +10,7 @@ SystemID N64
 285737	b	s	1	RDRAM	P1 Joystick Y
 2984FA	w	h	1	RDRAM	Banjo Model Replacement
 2984FE	w	h	1	RDRAM	Banjo Model Replacement
+3226FC	w	h	1	RDRAM	N64 logo skippable (set to 0x1000)
 364E90	d	f	1	RDRAM	Backflip Velocity
 365140	d	f	1	RDRAM	Jump Velocity
 366514	w	h	1	RDRAM	Bigbutt Model Replacement
@@ -17,7 +18,11 @@ SystemID N64
 368564	w	h	1	RDRAM	Mumbo's Skull Sign Model Replacement (MM)
 368AA4	w	h	1	RDRAM	Snacker Model Replacement
 36EAE0	d	h	1	RDRAM	Object Array Pointer
+3723A0	d	f	1	RDRAM	Game Speed Coefficient
+372480	b	h	1	RDRAM	MM Demo Input File Index
+372486	b	h	1	RDRAM	CC Demo Input File Index
 3734D4	w	h	1	RDRAM	Ticker Model Replacement
+379978	d	f	1	RDRAM	Game Speed
 37C930	b	u	1	RDRAM	Player is on ground
 37C931	b	u	1	RDRAM	Player is Swimming
 37CABC	d	f	1	RDRAM	Player Scale
@@ -78,7 +83,7 @@ SystemID N64
 37E784	d	f	1	RDRAM	Jiggy Spawn Angle
 37E788	d	f	1	RDRAM	Jiggy Spawn Velocity
 37E938	d	u	1	RDRAM	Bottles Bonus Puzzle Index
-37F2B7	b	h	1	RDRAM	Demo State
+37F2B4	d	h	1	RDRAM	Demo State
 37F2B8	d	f	1	RDRAM	Game Time
 37F2C0	d	f	1	RDRAM	Map Time
 37F2C4	b	h	1	RDRAM	Map Load State
@@ -86,7 +91,7 @@ SystemID N64
 37F2C6	b	u	1	RDRAM	Exit
 383AC0	d	h	1	RDRAM	FF Question Pointer
 383B38	b	h	1	RDRAM	Language
-383B91	w	h	1	RDRAM	Cauldron state
+383B91	w	h	1	RDRAM	Cauldron Bitfield
 383CC0	d	h	1	RDRAM	Honeycomb Bitfield
 383D08	b	h	1	RDRAM	Sandcastle Water State
 383D64	d	f	1	RDRAM	Text Timer
@@ -133,12 +138,16 @@ SystemID N64
 386A04	d	f	1	RDRAM	Game Time (RBB)
 386A08	d	f	1	RDRAM	Game Time (MMM)
 386A0C	d	f	1	RDRAM	Game Time (SM)
+386AB4	d	h	1	RDRAM	Demo Input Pointer
+386AB8	d	u	1	RDRAM	Demo Input Current Frame
+386ABC	d	u	1	RDRAM	Demo Input Total Frames
 386AC0	d	h	1	RDRAM	RNG
 386AC4	d	h	1	RDRAM	RNG
 386AC8	d	h	1	RDRAM	RNG
 386ACC	d	h	1	RDRAM	RNG
 386AD0	d	h	1	RDRAM	RNG
 386AD4	d	h	1	RDRAM	RNG
+386AF0	d	u	1	RDRAM	Demo Map Index
 38A300	w	h	1	RDRAM	Chimpy's Stump Model Replacement
 38A37C	w	h	1	RDRAM	Conga Model Replacement
 38A3B4	w	h	1	RDRAM	Orange Model Replacement

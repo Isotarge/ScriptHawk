@@ -80,6 +80,10 @@ SystemID N64
 36C51C	w	u	1	RDRAM	Pause Menu Item 4 Y Position
 36C51E	b	u	1	RDRAM	Pause Menu Item 4 Portrait
 36E560	d	h	1	RDRAM	Object Array pointer
+371E20	d	f	1	RDRAM	Game Speed Coefficient
+371F00	b	h	1	RDRAM	MM Demo Input File Index
+371F06	b	h	1	RDRAM	CC Demo Input File Index
+378FA8	d	f	1	RDRAM	Game Speed
 37BF60	b	u	1	RDRAM	Player is on ground
 37BF61	b	u	1	RDRAM	Player is swimming
 37C004	d	f	1	RDRAM	Unknown Float
@@ -159,7 +163,7 @@ SystemID N64
 37DDB4	d	f	1	RDRAM	Jiggy Spawn Angle
 37DDB8	d	f	1	RDRAM	Jiggy Spawn Velocity
 37DF68	d	u	1	RDRAM	Bottles Bonus Puzzle Index
-37E8E7	b	h	1	RDRAM	Demo State
+37E8E4	d	h	1	RDRAM	Demo State
 37E8E8	d	f	1	RDRAM	Game runtime
 37E8F0	d	f	1	RDRAM	Map runtime
 37E8F4	b	h	1	RDRAM	Map Load State
@@ -186,6 +190,7 @@ SystemID N64
 3832E0	d	h	1	RDRAM	Honeycomb Bitfield
 383328	b	h	1	RDRAM	Sandcastle Water State
 383384	d	f	1	RDRAM	Text Timer
+384484	d	u	1	RDRAM	Game Time Scale Factor
 385F60	d	s	1	RDRAM	Notes (on hand)
 385F64	d	s	1	RDRAM	Eggs
 385F6C	d	s	1	RDRAM	Red Feathers
@@ -218,12 +223,16 @@ SystemID N64
 386024	d	f	1	RDRAM	Game Time (RBB)
 386028	d	f	1	RDRAM	Game Time (MMM)
 38602C	d	f	1	RDRAM	Game Time (SM)
+3860D4	d	h	1	RDRAM	Demo Input Pointer
+3860D8	d	u	1	RDRAM	Demo Input Index
+3860DC	d	u	1	RDRAM	Demo Input Length
 3860E0	d	h	1	RDRAM	RNG
 3860E4	d	h	1	RDRAM	RNG
 3860E8	d	h	1	RDRAM	RNG
 3860EC	d	h	1	RDRAM	RNG
 3860F0	d	h	1	RDRAM	RNG
 3860F4	d	h	1	RDRAM	RNG
+386110	d	u	1	RDRAM	Demo Map Index
 38CA90	w	b	1	RDRAM	BOTTLESBONUSONE Cheat bitmask
 38CA92	w	u	1	RDRAM	BOTTLESBONUSONE Cheat progress
 38CAC8	w	b	1	RDRAM	NOBONUS Cheat bitmask
