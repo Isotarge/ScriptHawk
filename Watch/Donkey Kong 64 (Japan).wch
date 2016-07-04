@@ -1,4 +1,5 @@
 SystemID N64
+00F292	b	h	1	RDRAM	Counter Factor?
 0103A4	d	h	1	RDRAM	Framebuffer Pointer
 0103A8	d	h	1	RDRAM	Render Mode Pointer
 0103D4	d	h	1	RDRAM	Framebuffer Pointer

@@ -99,7 +99,7 @@ Fight controller object?
 00 Player has been hit (switch)
 
 20 Starting fight?
-	0c ???
+	0C Idle?
 
 23 In jump phase
 	01 Calculate next jump?

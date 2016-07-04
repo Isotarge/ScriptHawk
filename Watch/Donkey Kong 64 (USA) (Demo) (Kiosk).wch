@@ -57,8 +57,16 @@ SystemID N64
 7B659A	w	u	1	RDRAM	DK CB's (Japes?)
 7B65B2	w	u	1	RDRAM	DK CB's
 7B65CE	w	u	1	RDRAM	DK GB's (Japes?)
+7B65EA	b	h	1	RDRAM	Diddy Moves
+7B65EB	b	h	1	RDRAM	Diddy Simian Slam
 7B660C	w	u	1	RDRAM	Diddy CBs
+7B6644	b	h	1	RDRAM	Lanky Moves
+7B6645	b	h	1	RDRAM	Lanky Simian Slam
 7B6666	w	u	1	RDRAM	Lanky CBs
+7B669E	b	h	1	RDRAM	Tiny Moves
+7B669F	b	h	1	RDRAM	Tiny Simian Slam
+7B66F8	b	h	1	RDRAM	Chunky Moves
+7B66F9	b	h	1	RDRAM	Chunky Simian Slam
 7B671A	w	u	1	RDRAM	Chunky CBs
 7B6752	w	u	1	RDRAM	Normal Ammo
 7B6754	w	u	1	RDRAM	Homing Ammo
