@@ -227,13 +227,39 @@ traverseSize = traverse_size;
 function traverse(object)
 	local count = 0;
 	local prevObject = object;
-	while object > 0 do
+	while isRDRAM(object) do
 		dprint(count..": "..toHexString(object + 0x10, 6, "").." Size: "..toHexString(object - prevObject));
 		prevObject = object;
-		object = mainmemory.read_u24_be(object + 4 + 1);
+		object = dereferencePointer(object + 4);
 		count = count + 1;
 	end
 	print_deferred();
+end
+
+function getMemoryStats(object)
+	local size = 0;
+	local prev = 0;
+	local nextFree = 0;
+	local prevFree = 0;
+	local memoryStats = {
+		["free"] = 0,
+		["used"] = 0,
+	};
+	if isRDRAM(object) then
+		repeat
+			size = mainmemory.read_u32_be(object + 4);
+			nextFree = dereferencePointer(object + 8);
+			prevFree = dereferencePointer(object + 12);
+			if isRDRAM(nextFree) or isRDRAM(prevFree) then
+				memoryStats.free = memoryStats.free + size;
+			else
+				memoryStats.used = memoryStats.used + size;
+			end
+			object = object + 0x10 + size;
+			prev = dereferencePointer(object);
+		until (not isRDRAM(prev)) or (not isRDRAM(object));
+	end
+	return memoryStats;
 end
 
 function replace_u32_be(find, replace)

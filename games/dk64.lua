@@ -449,8 +449,10 @@ Game.getMaxHomingAmmo = Game.getMaxStandardAmmo;
 ----------------------------------
 
 -- Relative to objects found in the backbone (and similar linked lists)
-local previous_object = -0x10; -- u32_be
+local previous_object = -0x10; -- Pointer
 local object_size = -0x0C; -- u32_be
+local next_free_block = -0x08; -- Pointer
+local prev_free_block = -0x04; -- Pointer
 
 local max_objects = 0xFF; -- This only applies to the model 1 pointer list used to check collisions
 
@@ -2304,6 +2306,33 @@ function forceTBS()
 			end
 		end
 	end
+end
+
+------------------------
+-- Memory usage stuff --
+------------------------
+
+memoryStatCache = nil;
+
+function getFreeMemory()
+	if memoryStatCache ~= nil then
+		return toHexString(memoryStatCache.free).." bytes";
+	end
+	return "Unknown";
+end
+
+function getUsedMemory()
+	if memoryStatCache ~= nil then
+		return toHexString(memoryStatCache.used).." bytes";
+	end
+	return "Unknown";
+end
+
+function getTotalMemory()
+	if memoryStatCache ~= nil then
+		return toHexString(memoryStatCache.free + memoryStatCache.used).." bytes";
+	end
+	return "Unknown";
 end
 
 -------------------
@@ -4565,6 +4594,8 @@ function Game.eachFrame()
 	local playerObject = Game.getPlayerObject();
 	map_value = Game.getMap();
 
+	--memoryStatCache = getMemoryStats(dereferencePointer(Game.Memory.linked_list_pointer[version]));
+
 	--koshBotLoop(); -- TODO: This probably stops the virtual pad from working
 	forceTBS();
 	Game.unlockMenus(); -- TODO: Allow user to toggle this
@@ -4719,6 +4750,10 @@ Game.OSD = {
 	{"Stored X2", Game.getStoredX2},
 	{"Stored Y2", Game.getStoredY2},
 	{"Stored Z2", Game.getStoredZ2},
+	--{"Separator", 1},
+	--{"Free", getFreeMemory},
+	--{"Used", getUsedMemory},
+	--{"Total", getTotalMemory},
 };
 
 ---------------
