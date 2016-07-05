@@ -171,6 +171,14 @@ SystemID N64
 753E40	d	f	1	RDRAM	Krusha Orange Velocity (Gun)
 754244	d	h	1	RDRAM	Collision Linked List Pointer
 754280	d	h	1	RDRAM	HUD Pointer
+754F4C	b	h	1	RDRAM	Main Menu Background Top Red
+754F4D	b	h	1	RDRAM	Main Menu Background Top Green
+754F4E	b	h	1	RDRAM	Main Menu Background Top Blue
+754F4F	b	h	1	RDRAM	Main Menu Background Red
+754F50	b	h	1	RDRAM	Main Menu Background Green
+754F51	b	h	1	RDRAM	Main Menu Background Blue
+754F70	w	u	1	RDRAM	Main Menu Background X
+754F74	w	u	1	RDRAM	Main Menu Background Y
 7552E0	b	u	1	RDRAM	Security Byte
 7552F6	w	h	1	RDRAM	Player 1 Color
 7552FA	w	h	1	RDRAM	Player 2 Color
