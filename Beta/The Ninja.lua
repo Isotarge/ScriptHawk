@@ -7,6 +7,7 @@ local yellow = 0xFFFFFF00;
 local green = 0xFF00FF00;
 local pink = 0xFFFF00FF;
 local black = 0xFF000000;
+local white = 0xFFFFFFFF;
 
 -- Game state
 local object_array_base = 0xE80;
@@ -20,15 +21,15 @@ local object_fields = {
 	["object_type"] = 0x00, -- Byte
 	["object_types"] = {
 		[0x01] = {["name"] = "Player", ["color"] = yellow},
-		[0x02] = {["name"] = "Player Projectile", ["color"] = yellow},
-		[0x03] = {["name"] = "Player Projectile", ["color"] = yellow},
+		[0x02] = {["name"] = "Player Projectile", ["color"] = yellow, ["hitbox_height"] = 8, ["hitbox_width"] = 8},
+		[0x03] = {["name"] = "Player Projectile", ["color"] = yellow, ["hitbox_height"] = 8, ["hitbox_width"] = 8},
 		[0x04] = {["name"] = "Boss", ["color"] = pink}, -- Early levels
 		[0x05] = {["name"] = "Boss", ["color"] = pink}, -- Later levels
 		[0x06] = {["name"] = "Boss Projectile", ["color"] = red},
 		[0x07] = {["name"] = "Boss Projectile", ["color"] = red}, -- Level 5
 		[0x08] = {["name"] = "Boss Projectile", ["color"] = red},
-		[0x09] = {["name"] = "Enemy Projectile", ["color"] = red}, -- Small projectile
-		[0x0A] = {["name"] = "Boss Projectile", ["color"] = red},
+		[0x09] = {["name"] = "Enemy Projectile", ["color"] = red, ["hitbox_height"] = 8, ["hitbox_width"] = 8}, -- Small projectile
+		[0x0A] = {["name"] = "Boss Projectile", ["color"] = red, ["hitbox_height"] = 8, ["hitbox_width"] = 8},
 		[0x0B] = {["name"] = "Red Scroll", ["color"] = pink},
 		[0x0C] = {["name"] = "Blue Scroll", ["color"] = pink},
 		[0x0D] = {["name"] = "Green Scroll", ["color"] = pink},
@@ -172,12 +173,18 @@ local prevLevelPosition = {0,0};
 local dx = 0;
 local dy = 0;
 local d = 0;
+local dcolor = white;
 
 function calculateDelta()
 	local position = {getX(), getY()};
 	local levelPosition = {getLevelX(), getLevelY()};
 	dx = math.abs(prevLevelPosition[1] - levelPosition[1]) + math.abs(prevPosition[1] - position[1]);
 	dy = math.abs(prevLevelPosition[2] - levelPosition[2]) + math.abs(prevPosition[2] - position[2]);
+	if dx > 0 or dy > 0 then
+		dcolor = white;
+	else
+		dcolor = red;
+	end
 	prevPosition = position;
 	prevLevelPosition = levelPosition;
 end
@@ -204,7 +211,7 @@ function isBossLoaded()
 	for i = 0, object_array_capacity do
 		local objectBase = object_array_base + (i * object_size);
 		local objectType = mainmemory.readbyte(objectBase + object_fields.object_type);
-		if objectType == 0x04 then
+		if objectType == 0x04 or objectType == 0x05 then
 			return true;
 		end
 	end
@@ -215,7 +222,7 @@ function getBossHealth()
 	for i = 0, object_array_capacity do
 		local objectBase = object_array_base + (i * object_size);
 		local objectType = mainmemory.readbyte(objectBase + object_fields.object_type);
-		if objectType == 0x04 then
+		if objectType == 0x04 or objectType == 0x05 then
 			return mainmemory.readbyte(objectBase + object_fields.boss_health);
 		end
 	end
@@ -263,8 +270,6 @@ function drawObjects()
 		local color = nil;
 		if objectType ~= 0 then
 			-- Default to 16 width/height for hitbox
-			local hitboxXOffset = -8;
-			local hitboxYOffset = -8;
 			local hitboxWidth = 16;
 			local hitboxHeight = 16;
 
@@ -302,6 +307,9 @@ function drawObjects()
 				color = black;
 				objectType = "Unknown ("..toHexString(objectType)..")";
 			end
+
+			local hitboxXOffset = -(hitboxWidth / 2);
+			local hitboxYOffset = -(hitboxHeight / 2);
 
 			if showHitbox then
 				if dragging then
@@ -360,9 +368,9 @@ function drawOSD()
 	row = row + 1;
 	gui.text(OSDX, OSDY + height * row, "Level Pos: "..getLevelX()..","..getLevelY());
 	row = row + 1;
-	gui.text(OSDX, OSDY + height * row, "dX: "..dx);
+	gui.text(OSDX, OSDY + height * row, "dX: "..dx, dcolor);
 	row = row + 1;
-	gui.text(OSDX, OSDY + height * row, "dY: "..dy);
+	gui.text(OSDX, OSDY + height * row, "dY: "..dy, dcolor);
 	row = row + 2;
 
 	gui.text(OSDX, OSDY + height * row, "Player Proj: "..countPlayerProjectiles().."/"..max_player_projectiles);
