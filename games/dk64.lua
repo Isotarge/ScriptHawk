@@ -36,7 +36,8 @@ end
 local version; -- 1 USA, 2 Europe, 3 Japan, 4 Kiosk
 Game.Memory = {
 	["mode"] = {0x755318, 0x74FB98, 0x7553D8, 0x6FFE6C},
-	["map"] = {0x7444E4, 0x73EC34, 0x743DA4, 0x72CDE4}, -- TODO: This is actually destination map
+	["current_map"] = {0x76A0A8, 0x764BC8, 0x76A298, 0x72CDE4},
+	["destination_map"] = {0x7444E4, 0x73EC34, 0x743DA4, 0x72CDE4}, -- TODO: I don't think Kiosk is correct?
 	["map_state"] = {0x76A0B1, 0x764BD1, 0x76A2A1, 0x72CDED},
 	["exit"] = {0x7444E8, 0x73EC38, 0x743DA8, 0x72CDE8},
 	["loading_zone_array"] = {0x7FDCB4, 0x7FDBF4, 0x7FE144, nil}, -- TODO: Kiosk
@@ -1268,6 +1269,7 @@ function getScriptName(objectModel2Base)
 end
 
 object_model2_filter = nil;
+--object_model2_filter = "buttons"; -- TODO: Remove this, it's just here for FTA testing
 function populateObjectModel2Pointers()
 	object_pointers = {};
 	local objModel2Array = getObjectModel2Array();
@@ -3538,6 +3540,25 @@ local SimSlamChecks = { -- Not actually used by the check function for speed rea
 	[Krusha] = 0x0007,
 };
 
+local safePreceedingCommands = {
+	0x0011,
+		-- Working, Aztec top of 5DT Diddy Switch (base + 0x0C, 2 blocks)
+	0x0019,
+		-- Working, Llama Temple DK Switch (base + 0x1C, 1 block)
+		-- Llama Temple Lanky Switch (base + 0x1C, 2 blocks)
+		-- Working, Llama Temple Tiny Switches (base + 0x1C, 2 blocks)
+		-- Working, Tiny Temple Diddy Switch (base + 0x1C, 2 blocks)
+		-- Working, Tiny Temple Lanky Switch (base + 0x1C, 2 blocks)
+};
+
+function isSafePreceedingCommand(preceedingCommand)
+	return array_contains(safePreceedingCommands, preceedingCommand);
+end
+
+-- Potentially unsafe:
+-- 0x8019
+-- 0x0025
+
 function isKong(actorType)
 	return actorType >= 2 and actorType <= 6;
 end
@@ -3720,16 +3741,20 @@ function ohWrongnana(verbose)
 					activationScript = dereferencePointer(activationScript + 0xA0);
 					while isRDRAM(activationScript) do
 						-- New method, slower but catches weird switches
-						--for j = 0x04, 0x48, 4 do
-						--	if mainmemory.read_u16_be(activationScript + j) == 0x0019 then
-						--		if isKong(mainmemory.read_u16_be(activationScript + j + 2)) then
-						--			mainmemory.write_u16_be(activationScript + j + 2, SimSlamChecks[currentKong]);
-						--		end
-						--	end
-						--end
+						for j = 0x04, 0x48, 4 do
+							if isSafePreceedingCommand(mainmemory.read_u16_be(activationScript + j - 2)) then
+								if isKong(mainmemory.read_u16_be(activationScript + j)) then
+									mainmemory.write_u16_be(activationScript + j, SimSlamChecks[currentKong]);
+									if verbose then
+										ohWrongnanaDebugOut(scriptName, slotBase, activationScript, j);
+									end
+								end
+							end
+						end
 
 						-- Old method
 						-- Check for the simslam magic and patch if needed
+						--[[
 						if isKong(mainmemory.read_u16_be(activationScript + 0x0C)) then
 							if verbose then
 								ohWrongnanaDebugOut(scriptName, slotBase, activationScript, 0x0C);
@@ -3748,6 +3773,7 @@ function ohWrongnana(verbose)
 							end
 							mainmemory.write_u16_be(activationScript + 0x24, SimSlamChecks[currentKong]);
 						end
+						]]--
 
 						-- Get next script chunk
 						activationScript = dereferencePointer(activationScript + 0x4C);
@@ -4250,7 +4276,7 @@ function Game.unlockMoves()
 end
 
 function Game.getMap()
-	return mainmemory.read_u32_be(Game.Memory.map[version]);
+	return mainmemory.read_u32_be(Game.Memory.destination_map[version]);
 end
 
 function Game.setMap(value)
@@ -4258,7 +4284,7 @@ function Game.setMap(value)
 		if version == 4 then
 			mainmemory.write_u16_be(0x5931BA, value - 1); -- Replace object model 2, rather than loading the map since basically everything crashes on kiosk
 		else
-			mainmemory.write_u32_be(Game.Memory.map[version], value - 1);
+			mainmemory.write_u32_be(Game.Memory.destination_map[version], value - 1);
 		end
 	end
 end
@@ -4594,6 +4620,7 @@ function Game.eachFrame()
 	local playerObject = Game.getPlayerObject();
 	map_value = Game.getMap();
 
+	-- TODO: This is really slow and doesn't cover all memory domains
 	--memoryStatCache = getMemoryStats(dereferencePointer(Game.Memory.linked_list_pointer[version]));
 
 	--koshBotLoop(); -- TODO: This probably stops the virtual pad from working
