@@ -1914,7 +1914,7 @@ function checkFlags(_type)
 							-- Output debug info if the flag isn't known
 							if not isFound(i, bit) then
 								flag_found = true;
-								dprint("{[\"byte\"] = "..toHexString(i)..", [\"bit\"] = "..bit..", [\"name\"] = \"Name\", [\"type\"] = \"".._type.."\", [\"map\"] = "..Game.getMap().."},");
+								dprint("{[\"byte\"] = "..toHexString(i)..", [\"bit\"] = "..bit..", [\"name\"] = \"Name\", [\"type\"] = \"".._type.."\", [\"map\"] = "..map_value.."},");
 							else
 								known_flags_found = known_flags_found + 1;
 							end
@@ -2849,12 +2849,13 @@ local timer_start_frame = 0;
 local timer_started = false;
 
 local function ISGTimer()
-	if map_value == 153 and prev_map ~= 153 then
+	local destinationMap = mainmemory.read_u32_be(Game.Memory.destination_map[version]);
+	if destinationMap == 153 and prev_map ~= 153 then
 		timer_value = 0;
 		timer_start_frame = emu.framecount();
 		timer_started = true;
 	end
-	prev_map = map_value;
+	prev_map = destinationMap;
 
 	if timer_started then
 		timer_value = emu.framecount() - timer_start_frame;
@@ -4277,7 +4278,7 @@ function Game.unlockMoves()
 end
 
 function Game.getMap()
-	return mainmemory.read_u32_be(Game.Memory.destination_map[version]);
+	return mainmemory.read_u32_be(Game.Memory.current_map[version]);
 end
 
 function Game.setMap(value)
@@ -4621,6 +4622,12 @@ function Game.eachFrame()
 	local playerObject = Game.getPlayerObject();
 	map_value = Game.getMap();
 
+	if isInSubGame() then
+		Game.OSD = Game.subgameOSD;
+	else
+		Game.OSD = Game.standardOSD;
+	end
+
 	-- TODO: This is really slow and doesn't cover all memory domains
 	--memoryStatCache = getMemoryStats(dereferencePointer(Game.Memory.linked_list_pointer[version]));
 
@@ -4742,8 +4749,7 @@ function Game.completeFile()
 	end
 end
 
-Game.OSDPosition = {32, 70};
-Game.OSD = {
+Game.standardOSD = {
 	{"X", Game.getXPosition},
 	{"Y", Game.getYPosition},
 	{"Z", Game.getZPosition},
@@ -4783,6 +4789,25 @@ Game.OSD = {
 	--{"Used", getUsedMemory},
 	--{"Total", getTotalMemory},
 };
+
+Game.subgameOSD = {
+	{"X", Game.getXPosition},
+	{"Y", Game.getYPosition},
+	{"Separator", 1},
+	{"dY"},
+	{"dXZ"},
+	{"Separator", 1},
+	{"Velocity", Game.getVelocity},
+	{"Y Velocity", Game.getYVelocity},
+	{"Separator", 1},
+	{"Max dY"},
+	{"Max dXZ"},
+	{"Odometer"},
+	{"Separator", 1},
+};
+
+Game.OSDPosition = {32, 70};
+Game.OSD = Game.standardOSD;
 
 ---------------
 -- ASM Stuff --
