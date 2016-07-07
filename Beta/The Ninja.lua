@@ -61,8 +61,8 @@ local object_fields = {
 		[0x27] = {["name"] = "Grey Enemy", ["isEnemy"] = true}, -- Cliff
 		[0x28] = {["name"] = "Blue Enemy", ["isEnemy"] = true}, -- Cliff
 		[0x29] = {["name"] = "Grey Enemy", ["isEnemy"] = true}, -- Cliff, moving up
-		[0x2A] = {["name"] = "Ball Spawner"}, -- Cliff
-		[0x2B] = {["name"] = "Ball", ["color"] = red}, -- Cliff
+		[0x2A] = {["name"] = "Ball Spawner"}, -- Cliff -- TODO: Does this count as an enemy?
+		[0x2B] = {["name"] = "Ball", ["color"] = red, ["hitbox_height"] = 8, ["hitbox_width"] = 8}, -- Cliff
 		[0x2C] = {["name"] = "Green Scroll Trigger", ["color"] = pink},
 		[0x2D] = {["name"] = "Boulder Enemy", ["color"] = pink}, -- Contains green scroll, does not count towards enemy cap
 		[0x2E] = {["name"] = "Arrow", ["color"] = pink}, -- Map Screen
@@ -196,6 +196,10 @@ end
 
 function getShots()
 	return mainmemory.read_u16_le(0xDC6);
+end
+
+function getOptimalShots()
+	return getHits() * 100 / 2 + 1;
 end
 
 function getHitRatio()
@@ -375,7 +379,7 @@ function drawOSD()
 
 	gui.text(OSDX, OSDY + height * row, "Player Proj: "..countPlayerProjectiles().."/"..max_player_projectiles);
 	row = row + 1;
-	gui.text(OSDX, OSDY + height * row, "Hits: "..getHits().."/"..getShots());
+	gui.text(OSDX, OSDY + height * row, "Hits: "..getHits().."/"..getShots().." ("..getOptimalShots()..")");
 	row = row + 1;
 	gui.text(OSDX, OSDY + height * row, "Ratio: "..getHitRatio());
 	row = row + 2;
