@@ -37,9 +37,10 @@ local version; -- 1 USA, 2 Europe, 3 Japan, 4 Kiosk
 Game.Memory = {
 	["mode"] = {0x755318, 0x74FB98, 0x7553D8, 0x6FFE6C},
 	["current_map"] = {0x76A0A8, 0x764BC8, 0x76A298, 0x72CDE4},
-	["destination_map"] = {0x7444E4, 0x73EC34, 0x743DA4, 0x72CDE4}, -- TODO: I don't think Kiosk is correct?
+	["current_exit"] = {0x76A0AC, 0x764BCC, 0x76A29C, 0x72CDE8},
+	["destination_map"] = {0x7444E4, 0x73EC34, 0x743DA4, 0x6F1CC4},
+	["destination_exit"] = {0x7444E8, 0x73EC38, 0x743DA8, 0x6F1CC8},
 	["map_state"] = {0x76A0B1, 0x764BD1, 0x76A2A1, 0x72CDED},
-	["exit"] = {0x7444E8, 0x73EC38, 0x743DA8, 0x72CDE8},
 	["loading_zone_array"] = {0x7FDCB4, 0x7FDBF4, 0x7FE144, nil}, -- TODO: Kiosk
 	["loading_zone_array_size"] = {0x7FDCB0, 0x7FDBF0, 0x7FE140, nil}, -- u16_be -- TODO: Kiosk
 	["file"] = {0x7467C8, 0x740F18, 0x746088, nil},
