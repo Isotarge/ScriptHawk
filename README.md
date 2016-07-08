@@ -25,6 +25,8 @@ A collection of Lua scripts and RAM watches for [BizHawk](https://github.com/TAS
 - Object analysis tools including: List, Examine, Grab, Focus, Encircle, Zip
 - [Bone displacement](http://bombch.us/Bn1C) fix (disables audio)
 - Documentation of over 95% of permanent flags in USA save files
+- Mad Jack minimap
+- Automatic [ISG](http://dk64.wikia.com/wiki/Intro_Story_Glitch) timer
 
 ![Donkey Kong 64 Support](Images/Promo/dk64.png)
 
