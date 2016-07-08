@@ -1330,7 +1330,7 @@ end
 
 function formatForOutput(var_type, value)
 	if isBinary(var_type) then
-		local binstring = bizstring.binary(value);
+		local binstring = toBinaryString(value);
 		if binstring ~= "" then
 			return binstring;
 		end

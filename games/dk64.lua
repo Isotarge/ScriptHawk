@@ -1072,7 +1072,7 @@ local function getExamineDataModelOne(pointer)
 	table.insert(examine_data, { "Separator", 1 });
 
 	local visibilityValue = mainmemory.readbyte(pointer + obj_model1.visibility);
-	table.insert(examine_data, { "Visibility", bizstring.binary(visibilityValue) });
+	table.insert(examine_data, { "Visibility", toBinaryString(visibilityValue) });
 	table.insert(examine_data, { "In water", tostring(not get_bit(visibilityValue, 0)) });
 	table.insert(examine_data, { "Visible", tostring(get_bit(visibilityValue, 2)) });
 	table.insert(examine_data, { "Collides with terrain", tostring(get_bit(visibilityValue, 4)) });
@@ -1412,7 +1412,7 @@ local function getExamineDataModelTwo(pointer)
 	end
 
 	table.insert(examine_data, { "Unknown Counter", mainmemory.read_u16_be(pointer + obj_model2.unknown_counter) });
-	table.insert(examine_data, { "GB Interaction Bitfield", bizstring.binary(mainmemory.readbyte(pointer + obj_model2.collectable_state)) });
+	table.insert(examine_data, { "GB Interaction Bitfield", toBinaryString(mainmemory.readbyte(pointer + obj_model2.collectable_state)) });
 
 	if hasModel then
 		table.insert(examine_data, { "Model Base", toHexString(modelPointer, 6) });
@@ -3332,7 +3332,7 @@ function Game.randomEffect()
 	local scaleValue = 0.01 + math.random() * 0.49;
 	Game.setScale(scaleValue);
 
-	print("Activated effect: "..bizstring.binary(randomEffect).." with scale "..scaleValue);
+	print("Activated effect: "..toBinaryString(randomEffect).." with scale "..scaleValue);
 end
 
 ----------------

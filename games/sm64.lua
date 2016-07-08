@@ -248,7 +248,7 @@ function getExamineData(objectBase)
 				if variable.Display == "Hex" or variable.Display == "hex" then
 					table.insert(examineData, {variableName, toHexString(variableValue)});
 				elseif variable.Display == "Binary" or variable.Display == "binary" or variable.Display == "Bitfield" or variable.Display == "bitfield" then
-					table.insert(examineData, {variableName, bizstring.binary(variableValue)});
+					table.insert(examineData, {variableName, toBinaryString(variableValue)});
 				else
 					table.insert(examineData, {variableName, variableValue});
 				end

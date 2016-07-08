@@ -99,6 +99,19 @@ function toHexString(value, desiredLength, prefix)
 	return prefix..value;
 end
 
+function toBinaryString(num, bits) -- TODO: Properly define behavior for negative numbers
+	if type(num) ~= "number" then
+		return "0";
+	end
+	bits = bits or select(2, math.frexp(num));
+	local t = {};       
+	for b = bits, 1, -1 do
+		t[b] = math.fmod(num, 2);
+		num = (num - t[b]) / 2;
+	end
+	return table.concat(t);
+end
+
 function get_bit(field, index)
 	if index < 32 then
 		local bitmask = math.pow(2, index);
