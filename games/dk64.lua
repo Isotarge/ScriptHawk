@@ -3396,7 +3396,7 @@ function Game.toJapaneseString(value)
 	local char;
 	local charFound = false;
 	for i = 1, length do
-		char = bizstring.substring(value, i - 1, 1); -- TODO: call string.sub() instead, how do params work?
+		char = string.sub(value, i, i);
 		charFound = false;
 		for j = 1, #japan_charset do
 			if japan_charset[j] == char then
