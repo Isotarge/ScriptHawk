@@ -69,7 +69,6 @@ Game.Memory = {
 	["obj_model2_array_count"] = {0x7F6004, 0x7F5F24, 0x7F6474, nil}, -- TODO: Kiosk
 	["obj_model2_timer"] = {0x76A064, 0x764B84, 0x76A254, 0x72CDAC},
 	["obj_model2_collision_linked_list_pointer"] = {0x754244, 0x74E9A4, 0x753B34, 0x6FF054},
-	["rambiBase"] = {0x744548, 0x73EC98, 0x743E08, nil}, -- High score base
 };
 
 Game.modes = {
@@ -380,7 +379,7 @@ local eep_checksum_values = {
 
 -- Maximum values
 local max_coins          = 50;
-local max_crystals       = 20;
+local max_crystals       = 20; local ticks_per_crystal = 150; -- 125 for European version
 local max_film           = 10;
 local max_oranges        = 20;
 local max_musical_energy = 10;
@@ -1586,6 +1585,8 @@ function Game.detectVersion(romName, romHash)
 		jumpman_velocity = {0x03ECD8, 0x03ECDC};
 		jetman_position  = {0x022100, 0x022104};
 		jetman_velocity  = {0x022108, 0x02210C};
+
+		ticks_per_crystal = 125;
 	elseif romHash == "F0AD2B2BBF04D574ED7AFBB1BB6A4F0511DCD87D" then -- Japan
 		version = 3;
 		flag_array = require("games.dk64_flags_JP");
@@ -4329,52 +4330,6 @@ function Game.initUI()
 	flagStats();
 end
 
-----------------------
--- High Score Stuff --
-----------------------
-
---[[
-
-local arcadeScores = {
-	{"INT", 1222900}, -- https://www.youtube.com/watch?v=lekPEle8F8w
-};
-
-local enguardeScores = {
-	{"JON", 430}, -- https://www.youtube.com/watch?v=VrFWWcGlKOE
-	{"ING", 420}, -- https://www.youtube.com/watch?v=UEPeqomGHN4
-};
-
-local jetpacScore = 999135; -- Bismuth http://i.imgur.com/5mHz6QA.png
-
-local scoreBase = 0;
-local nameBase = 2;
-local scoreInstanceSize = 6;
-
-local rambiScores = {
-	{"BIS", 220}, -- http://www.twitch.tv/bismuth9/v/42515576
-	{"BO ", 220}, -- http://highscore.com/scores/N64/DonkeyKong64/33503
-	{"ISO", 190}, -- https://www.youtube.com/watch?v=pu3lmK3p8bc
-};
-
-function Game.getScore(index)
-	readNullTerminatedString();
-end
-
-function Game.setScore(index, name, score)
-	if version ~= 4 then
-		mainmemory.write_u16_be(Game.Memory.rambiBase[version] + index * scoreInstanceSize + scoreBase, score);
-		for i = 0, 3 do
-			mainmemory.writebyte(Game.Memory.rambiBase[version] + index * scoreInstanceSize + nameBase, string.byte(name, i))
-		end
-	end
-end
-
-function Game.setHighScores()
-	-- TODO: Game.setHighScores
-end
-
-]]--
-
 function Game.unlockMenus()
 	if version ~= 4 then -- Anything but the Kiosk version
 		mainmemory.write_u32_be(Game.Memory.menu_flags[version], 0xFFFFFFFF);
@@ -4393,11 +4348,7 @@ function Game.applyInfinites()
 	end
 
 	mainmemory.writebyte(global_base + oranges, max_oranges);
-	if version == 2 then
-		mainmemory.write_u16_be(global_base + crystals, max_crystals * 125); -- European ticks per crystal is 125
-	else
-		mainmemory.write_u16_be(global_base + crystals, max_crystals * 150);
-	end
+	mainmemory.write_u16_be(global_base + crystals, max_crystals * ticks_per_crystal);
 	mainmemory.writebyte(global_base + film, max_film);
 	mainmemory.writebyte(global_base + health, mainmemory.readbyte(global_base + melons) * 4);
 
@@ -4806,7 +4757,7 @@ Game.subgameOSD = {
 	{"Separator", 1},
 };
 
-Game.OSDPosition = {32, 70};
+Game.OSDPosition = {32, 70}; -- TODO: Adjust this for subgames & different regions
 Game.OSD = Game.standardOSD;
 
 ---------------
@@ -4814,7 +4765,7 @@ Game.OSD = Game.standardOSD;
 ---------------
 
 Game.supportsASMHacks = true;
-Game.ASMHookBase = 0x7494;
+Game.ASMHookBase = 0x7494; -- TODO: Find a hook that works on real hardware -- TODO: Find a hook for all versions
 Game.ASMHook = {
 	0x3C, 0x08, 0x80, 0x7F, 0x35, 0x08, 0xF5, 0x00,
 	0x01, 0x00, 0x00, 0x08, 0x00, 0x00, 0x00, 0x00
