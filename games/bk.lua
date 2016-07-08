@@ -444,16 +444,21 @@ local animation_types = {
 	[0x01] = "Banjo Ducking",
 	[0x02] = "Banjo Walking (Slow)",
 	[0x03] = "Banjo Walking",
+
 	[0x05] = "Banjo Punching",
+
 	[0x07] = "Kazooie Leaving Talon Trot",
 	[0x08] = "Banjo Jumping",
 	[0x09] = "Banjo Dying",
 	[0x0A] = "Banjo Climbing",
+
 	[0x0C] = "Banjo Running",
+
 	[0x0E] = "Banjo Skidding",
 	[0x0F] = "Banjo Damaged", -- "Banjo Hit"
 	[0x10] = "Bigbutt Charging",
 	[0x11] = "Banjo Running (Wonderwing)",
+
 	[0x15] = "Kazooie Walking (Talon Trot)",
 	[0x16] = "Kazooie Entering Talon Trot",
 	[0x17] = "Kazooie Flutter", -- "Kazooie Hover"
@@ -463,10 +468,12 @@ local animation_types = {
 	[0x1B] = "Banjo Jumping (Wonderwing)",
 	[0x1C] = "Kazooie Beak Barge",
 	[0x1D] = "Kazooie Beak Buster",
+
 	[0x21] = "Bigbutt Skidding",
 	[0x22] = "Banjo Entering Wonderwing",
 	[0x23] = "Banjo (Wonderwing)",
 	[0x24] = "Yum-Yum Hopping",
+
 	[0x26] = "Kazooie (Talon Trot)",
 	[0x27] = "Kazooie Jumping (Talon Trot)",
 	[0x28] = "Banjo Termite Hurt",
@@ -484,8 +491,10 @@ local animation_types = {
 	[0x34] = "Bigbutt Kill", -- TODO: What is this exactly?
 	[0x35] = "Bigbutt Alerted",
 	[0x36] = "Bigbutt Walking",
+
 	[0x38] = "Banjo Flying",
 	[0x39] = "Banjo Swimming (Surface)",
+
 	[0x3C] = "Banjo Diving",
 	[0x3D] = "Banjo Shock Spring", -- TODO: Names
 	[0x3E] = "Banjo Fly Crash",
@@ -496,14 +505,17 @@ local animation_types = {
 	[0x43] = "Kazooie Starting Beakbomb",
 	[0x44] = "Kazooie Turbo Trainers",
 	[0x45] = "Kazooie Taking Flight",
+
 	[0x47] = "Kazooie Beak Bomb",
 	[0x48] = "Kazooie Shock Spring Start",
 	[0x49] = "Kazooie Shock Sprint Jump",
+
 	[0x4B] = "Banjo Backflip",
 	[0x4C] = "Banjo Backflip Transition",
 	[0x4D] = "Banjo Hurt",
 	[0x4E] = "MM Hut Smashing",
 	[0x4F] = "Banjo Water Splash",
+
 	[0x51] = "Conga",
 	[0x52] = "Conga Hurt",
 	[0x53] = "Conga Defeated",
@@ -539,6 +551,7 @@ local animation_types = {
 	[0x71] = "Banjo Swimming (Slow)",
 	[0x72] = "Banjo (Holding Item)",
 	[0x73] = "Banjo Walking (Holding Item)",
+
 	[0x77] = "Banjo Lose Minigame",
 	[0x78] = "Snacker Swimming",
 	[0x79] = "Mumbo Concert Playing Instrument",
@@ -553,7 +566,9 @@ local animation_types = {
 	[0x82] = "Mumbo Concert Dance",
 	[0x83] = "Tooty Concert Dance",
 	[0x84] = "Tooty Hopping",
+
 	[0x8C] = "Rareware Logo Falling",
+
 	[0x8F] = "Nintendo Logo Walking",
 	[0x90] = "Nintendo Logo Shrugging",
 	[0x91] = "Frog Hopping (Concert)",
@@ -563,8 +578,10 @@ local animation_types = {
 	[0x95] = "Kazooie Taunting Banjo",
 	[0x96] = "Snippet Recovering",
 	[0x97] = "Snippet Dying",
+
 	[0x9A] = "Ripper", -- TODO: Appearing?
 	[0x9B] = "Ripper Chasing",
+
 	[0x9D] = "Nibbly Chasing", -- Bat
 	[0x9E] = "Tee-Hee",
 	[0x9F] = "Tee-Hee Alerted",
@@ -583,6 +600,7 @@ local animation_types = {
 	[0xAC] = "Tee-Hee Chasing",
 	[0xAD] = "Nibbly Taking Flight", -- Bat
 	[0xAE] = "Nibbly", -- Bat
+
 	[0xB0] = "Banjo Falling",
 	[0xB1] = "Banjo Climbing",
 	[0xB2] = "Banjo Climbing (Freeze)",
@@ -593,8 +611,9 @@ local animation_types = {
 	[0xB7] = "Blubber Danceing",
 	[0xB8] = "Blubber Running",
 	[0xB9] = "Banjo Drowning",
+
 	[0xBC] = "Lockup",
-	[0xBB] = "Nipper Tired",
+	[0xBD] = "Nipper Vulnerable",
 	[0xBE] = "Nipper Hurt",
 	[0xBF] = "Nipper Attacking",
 	[0xC0] = "Nipper",
@@ -620,6 +639,7 @@ local animation_types = {
 	[0xD4] = "Switch Down", -- Witch Switch (MM), Shock Spring Pad Switch (GV Lobby)
 	[0xD5] = "Switch Up",
 	[0xD6] = "Turbo Trainers",
+
 	[0xD9] = "Gobi",
 	[0xDA] = "Gobi Pulling Back",
 	[0xDB] = "Flibbit Hopping",
@@ -638,13 +658,16 @@ local animation_types = {
 	[0xE9] = "Slappa Appearing", -- Purple Hand
 	[0xEA] = "Slappa Moving",
 	[0xEB] = "Slappa Slapping",
+
 	[0xEC] = "Slappa Getting up",
 	[0xED] = "Ancient Ones Leave (And appear?)",
 	[0xEE] = "Slappa Dying", -- Plays 0.001 seconds before he falls apart
 	[0xEF] = "Slappa Hurt",
 	[0xF0] = "Mini-Jinxy Eating",
 	[0xF1] = "Carpet", -- GV
+
 	[0xF4] = "Gobi Relaxing",
+
 	[0xF6] = "Banjo Punishing Kazooie",
 	[0xF7] = "Gobi Happy",
 	[0xF8] = "Gobi Running",
@@ -665,6 +688,7 @@ local animation_types = {
 	[0x107] = "Tanktup Spawning Jiggy",
 	[0x108] = "Sir Slush",
 	[0x109] = "Sir Slush Attacking",
+
 	[0x10C] = "Banjo Ducking & Turning",
 	[0x10D] = "Banjo Hit (Flying)",
 	[0x10E] = "Buzzbomb Prepare charge",
@@ -673,8 +697,10 @@ local animation_types = {
 	[0x111] = "Buzzbomb Dying",
 	[0x112] = "Flibbit Dying (Start)", -- Frog
 	[0x113] = "Flibbit Dying (Finish)",
+
 	[0x116] = "Banjo Look Duck", -- TODO: What are these?
 	[0x117] = "Jellyfish (Unknown) 0x117", -- TODO: What are these? Whipcrack?
+
 	[0x11B] = "Banjo Throwing Item", -- TODO: Confirm
 	[0x11C] = "Crocodile Banjo Jumping",
 	[0x11D] = "Crocodile Banjo Hurt",
@@ -700,6 +726,7 @@ local animation_types = {
 	[0x131] = "Jinjo Circling (End)",
 	[0x132] = "Floatsam Bouncing",
 	[0x133] = "Nipper Dying",
+
 	[0x137] = "Grimlet Attacking", -- Pipe
 	[0x138] = "Text Shadow Animation",
 	[0x139] = "Bottles Disappearing",
@@ -709,6 +736,7 @@ local animation_types = {
 	[0x13D] = "Bottles' Molehill", -- Bottles coming out
 	[0x13E] = "Snorkel Swimming",
 	[0x13F] = "Snorkel Stuck",
+
 	[0x141] = "Anchor On Snorkel",
 	[0x142] = "Anchor Rising",
 	[0x143] = "Button", -- Snowman, Xmas tree
@@ -738,8 +766,10 @@ local animation_types = {
 	[0x15B] = "Grille Chompa Dying",
 	[0x15C] = "Whiplash",
 	[0x15D] = "Whiplash Attack",
+
 	[0x15F] = "Concert Banjo Before Start (Keeps him off screen)",
 	[0x160] = "Concert Bug Crawling",
+
 	[0x162] = "Toots",
 	[0x163] = "Cutscene Buzzbomb Smack",
 	-- [0x164] = "rotatetowardground+nosegrowning and shrinking. (Toots/Happy?)", -- TODO: What is this?
@@ -748,6 +778,7 @@ local animation_types = {
 	[0x167] = "Banjo/MoveVeryLittle (used in small cutscenes)",
 	-- [0x168] = "twisted, nose really tiny. (BeforeRareLogoAppears)", -- TODO: What is this?
 	-- [0x169] = "BetaVent/Open (Shooting out smoke)", -- TODO: What is this?
+
 	[0x16B] = "Snare-Bear Snapping",
 	[0x16C] = "Snare-Bear",
 	[0x16D] = "Twinklie Present Opening",
@@ -780,6 +811,7 @@ local animation_types = {
 	[0x188] = "Pumpkin Banjo Dying",
 	[0x189] = "Floatsam Dying",
 	[0x18A] = "Present", -- FP
+
 	-- [0x18D] = "rotate to standing mode, and back.", -- TODO: What is this?
 	-- [0x18E] = "rock sideways gently", -- TODO: What is this?
 	[0x18F] = "Spring Eyrie Yawn -> Sleep", -- Names
@@ -804,6 +836,7 @@ local animation_types = {
 	[0x1A2] = "Nabnut Sleeping",
 	[0x1A3] = "Nabnut",
 	[0x1A4] = "Nabnut Eating",
+
 	[0x1A6] = "Gnawty",
 	[0x1A7] = "Gnawty Happy",
 	[0x1A8] = "Gnawty Walking",
@@ -824,23 +857,30 @@ local animation_types = {
 	[0x1B7] = "Green Mist", -- Intro
 	[0x1B8] = "Door Opening", -- Intro
 	[0x1B9] = "Grunty", -- Intro
+
 	[0x1BB] = "Grunty Picking Nose", -- Intro
+
 	[0x1BD] = "Grunty Angry at Dingpot ", -- Intro
 	[0x1BE] = "Grunty Throwing Booger ", -- Intro
 	[0x1BF] = "Grunty Shocked > Confused ", -- Intro
 	[0x1C0] = "Grunty Walking", -- Intro
+
 	[0x1C2] = "Door Closing", -- Intro
+
 	[0x1C4] = "Grunty's Broomstick Flying", -- Intro
 	[0x1C5] = "Grunty Flying", -- Intro
+
 	[0x1C7] = "Banjo Sleeping", -- Intro
 	[0x1C8] = "Banjo Waking Up", -- Intro
 	[0x1C9] = "Bedsheets Banjo Sleeping", -- Intro
 	[0x1CA] = "Bedsheets Banjo Awake", -- Intro
 	[0x1CB] = "Kazooie Appearing", -- Intro
+
 	[0x1CD] = "Kazooie Inside Backpack", -- Intro
 	[0x1CE] = "Curtain", -- Banjo's house
 	[0x1CF] = "Kazooie Uneasy",
 	[0x1D0] = "Tooty Hopping",
+
 	[0x1D3] = "Kazooie Waking Banjo",
 	[0x1D4] = "Kazooie Falling",
 	[0x1D5] = "Tooty Chattering Teeth",
@@ -866,6 +906,7 @@ local animation_types = {
 	[0x1E9] = "Mum-Mum",
 	[0x1EA] = "Mum-Mum Curling",
 	[0x1EB] = "Mum-Mum Uncurling",
+
 	[0x1ED] = "Ripper Damaged",
 	[0x1EE] = "Ripper Dying",
 	-- [0x1EF] = "noseforward>back", -- TODO: Switch?
@@ -888,6 +929,7 @@ local animation_types = {
 	[0x200] = "Static Machine Door Up",
 	[0x201] = "Klungo Limping",
 	[0x202] = "Klungo Pushing Button",
+
 	[0x204] = "Grunty Falling",
 	[0x205] = "Dingpot wap", -- TODO: wat
 	[0x206] = "Dingpot",
@@ -912,8 +954,10 @@ local animation_types = {
 	-- [0x219] = "twistedup.", -- TODO: What is this?
 	[0x21A] = "Eyrie Eating", -- Summer
 	[0x21B] = "Eyrie Eating", -- Autumn
+
 	[0x21D] = "Eyrie Flying",
 	[0x21E] = "Eyrie Pooping Jiggy",
+
 	[0x220] = "Sir. Slush",
 	[0x221] = "Wozza", -- In Cave
 	[0x222] = "Boggy Sleeping",
@@ -1034,6 +1078,7 @@ local animation_types = {
 	[0x295] = "Banjo's Chair Breaking", -- Also music trigger for N64 Cutscene
 	[0x296] = "Bottles Eating corn",
 	[0x297] = "Mumbo Skidding", -- Giving flower to Sexy Grunty
+
 	[0x299] = "Bottles Falling off chair",
 	[0x29A] = "Banjo Drunk", -- Ending
 	[0x29B] = "Kazooie Hits Banjo",
@@ -1071,6 +1116,7 @@ local animation_types = {
 	[0x2BB] = "Mumbo Running", -- After MelonBabe
 	[0x2BC] = "Mumbo Talking", -- About pictures, on ground
 	[0x2C0] = "Piranha Dying", -- TODO: Where is this used?
+
 	[0x2C5] = "Grunty Preparing charge",
 	[0x2C6] = "Mumbo's Hand",
 	[0x2C7] = "Mumbo's Hand Appearing",

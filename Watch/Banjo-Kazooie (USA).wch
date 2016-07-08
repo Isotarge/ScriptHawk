@@ -64,12 +64,14 @@ SystemID N64
 364A64	d	f	1	RDRAM	Rat-A-Tat Rap Height
 364A94	d	f	1	RDRAM	Talon Trot Speed
 364A9C	d	f	1	RDRAM	Turbo Trainers Speed
+364AA0	d	f	1	RDRAM	Talon Trot Speed (Slowed)
 364AA8	d	f	1	RDRAM	Talon Trot Animation Duration
 364ABC	d	f	1	RDRAM	Talon Trot Jump Height
 364AC0	d	f	1	RDRAM	Talon Trot Jump Gravity
 364AD4	d	f	1	RDRAM	Wonderwing Movement Speed
 364AE0	d	f	1	RDRAM	Wonderwing Jump Height
 364AE4	d	f	1	RDRAM	Wonderwing Jump Gravity
+364D80	d	f	1	RDRAM	Walking Speed
 36A9B4	d	h	1	RDRAM	Pointer to linked list? of pointers
 36C4EC	w	u	1	RDRAM	Pause Menu Item 1 Y Position
 36C4EE	b	u	1	RDRAM	Pause Menu Item 1 Portrait

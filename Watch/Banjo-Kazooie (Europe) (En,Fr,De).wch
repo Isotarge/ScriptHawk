@@ -11,8 +11,12 @@ SystemID N64
 2984FA	w	h	1	RDRAM	Banjo Model Replacement
 2984FE	w	h	1	RDRAM	Banjo Model Replacement
 3226FC	w	h	1	RDRAM	N64 logo skippable (set to 0x1000)
+364E18	d	f	1	RDRAM	Beak Buster Final Velocity
 364E90	d	f	1	RDRAM	Backflip Velocity
+364F04	d	f	1	RDRAM	Talon Trot Velocity
 365140	d	f	1	RDRAM	Jump Velocity
+3651F0	d	f	1	RDRAM	Walking Velocity
+3651F8	d	f	1	RDRAM	Walking Velocity (Slowed)
 366514	w	h	1	RDRAM	Bigbutt Model Replacement
 36672C	w	h	1	RDRAM	Jiggy Model Replacement
 368564	w	h	1	RDRAM	Mumbo's Skull Sign Model Replacement (MM)

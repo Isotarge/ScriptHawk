@@ -1,14 +1,9 @@
 [ReturnAddress]: 0x8024EE90
 
-//[ReadStart]: 0x8037BF20
-//[ReadEnd]: 0x8037C70C
-//[WriteStart]: 0x80410000
-//[WriteEnd]: 0x804107EC
-
-[ReadStart]: 0x8037C4B8
-[ReadEnd]: 0x8037DC70
+[ReadStart]: 0x8037BF20
+[ReadEnd]: 0x8037C70C
 [WriteStart]: 0x80401000
-[WriteEnd]: 0x804027B8
+[WriteEnd]: 0x804017EC
 
 .org 0x80400000
 PUSH v0 // Read from
