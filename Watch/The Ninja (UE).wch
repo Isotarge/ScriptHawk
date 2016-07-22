@@ -40,4 +40,5 @@ SystemID SMS
 10F3	b	h	0	Main RAM	Projectile
 1114	b	h	0	Main RAM	Projectile
 11B6	b	u	0	Main RAM	Statue Health
+11D7	b	u	0	Main RAM	Statue Health (JP)
 

@@ -1,0 +1,11 @@
+SystemID N64
+462C4C	d	h	1	RDRAM	Dogadon Lock Method 1
+462C64	b	h	1	RDRAM	Dogadon Control State
+462C65	b	h	1	RDRAM	Dogadon Control + 1
+48B10C	d	h	1	RDRAM	TNT Lock Method 1
+48B124	b	h	1	RDRAM	TNT Barrel Control State
+48B125	b	h	1	RDRAM	TNT Control + 1
+4AA7CC	d	h	1	RDRAM	Diddy Lock Method 1
+4AA7E4	b	h	1	RDRAM	Diddy Control State
+4AA7E5	b	h	1	RDRAM	Diddy Control + 1
+

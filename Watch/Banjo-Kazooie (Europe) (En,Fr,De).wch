@@ -96,6 +96,7 @@ SystemID N64
 383AC0	d	h	1	RDRAM	FF Question Pointer
 383B38	b	h	1	RDRAM	Language
 383B91	w	h	1	RDRAM	Cauldron Bitfield
+383B9C	b	u	1	RDRAM	FF Completed (0=no,64=yes)
 383CC0	d	h	1	RDRAM	Honeycomb Bitfield
 383D08	b	h	1	RDRAM	Sandcastle Water State
 383D64	d	f	1	RDRAM	Text Timer
@@ -159,4 +160,5 @@ SystemID N64
 38A4F4	w	h	1	RDRAM	Ju-Ju Model Replacement
 38CF64	w	h	1	RDRAM	Nipper Model Replacement
 38D00C	w	h	1	RDRAM	Sharkfood Island Model Replacement
+394150	b	h	1	RDRAM	FF Board Start
 
