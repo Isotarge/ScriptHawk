@@ -85,6 +85,7 @@ While ScriptHawk does have basic support for OoT and MM there are people who are
 
 ##Other Notable BizHawk + Lua Repositories
 - GoldenEye [Wyst3r/GoldenEye](https://bitbucket.org/Wyst3r/bizhawklua)
+- Mario Kart 64 [weatherton/BizHawkMarioKart64](https://github.com/weatherton/BizHawkMarioKart64)
 - Super Mario World [rodamaral/smw-tas](https://github.com/rodamaral/smw-tas)
 - Pokémon Red & Yellow [kylecoburn/PokéBot](https://github.com/kylecoburn/PokeBot)
 
