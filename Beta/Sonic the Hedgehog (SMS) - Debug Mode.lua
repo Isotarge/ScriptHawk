@@ -1,6 +1,6 @@
 -------------------------------------------------------
 -- A simple debug mode for Sonic the Hedgehog on SMS --
--- Written by The8BitBeast, 2016                     --
+-- Written by The8bitbeast, 2016                     --
 -------------------------------------------------------
 
 local speed = 0x02;

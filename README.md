@@ -80,8 +80,8 @@ While ScriptHawk does have basic support for OoT and MM there are people who are
 - Mr. Driller 2 bot
 - Dega .MMV reader
 - remove_klump.lua, [code golf](https://en.wikipedia.org/wiki/Code_golf) that removes Klumps from DK64 USA version
-- Legend of Galahad object viewer, written by [The8BitBeast](https://twitter.com/the8bitbeast)
-- Wonder Boy III RNG watch, written by [The8BitBeast](https://twitter.com/the8bitbeast)
+- Legend of Galahad object viewer, written by [The8bitbeast](https://twitter.com/the8bitbeast)
+- Wonder Boy III RNG watch, written by [The8bitbeast](https://twitter.com/the8bitbeast)
 
 ##Other Notable BizHawk + Lua Repositories
 - GoldenEye [Wyst3r/GoldenEye](https://bitbucket.org/Wyst3r/bizhawklua)

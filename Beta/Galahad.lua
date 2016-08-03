@@ -1,6 +1,6 @@
 -----------------------------------------------------------
 -- An object viewer for Legend of Galahad on the Genesis --
--- Written by The8BitBeast, 2016                         --
+-- Written by The8bitbeast, 2016                         --
 -----------------------------------------------------------
 
 --------------
