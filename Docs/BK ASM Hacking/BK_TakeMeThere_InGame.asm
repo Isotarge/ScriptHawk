@@ -14,10 +14,8 @@
   # 11 DoG
   # 12 Grunty
   # 13 Cancel
-  # After having the correct warp location selected, press D-down again to perform the warp
+  # After having the correct warp location selected, press D-down again to perform the warp. You will regain moves and eggs upon warping/exiting warp select state
   #Note: If you accidentally poop out too many eggs, the number will wrap around after you poop your last egg
-  #
-  #Enjoy Love, Mittenz ;-]
   */
 
 [ControllerInputs]: 0x80281250
@@ -29,8 +27,8 @@
 [ReturnAddress]: 0x8024EE90 
 
 .ORG 0x80400000 ;CODE
- ;.halfword 0xA602
- ;.halfword 0x0002
+.halfword 0xA602 
+.halfword 0x0002 ;instrunction we replaced in main code
 
  
  PUSH t6;push registers
@@ -79,8 +77,9 @@
            SW t6 @CurrentEggs //restore original egg count
            LW t6 MoveSave
            SW t6 @MovePointer //restore original move register
+		   LI t6 0x03
+           SW t6 WarpState ;clear warp menu state flag 
 		   B Housekeeping
-		   NOP
        
 		Grunty:
            B RoomIsSet
@@ -185,5 +184,3 @@ EggSave:
 .word 0
 MoveSave:
 .word 0
-TestSave:
-.half 0
