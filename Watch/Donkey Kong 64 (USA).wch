@@ -40,6 +40,13 @@ SystemID N64
 04C71C	b	u	1	RDRAM	Jumpman Lives (HUD)
 46E680	b	u	1	RDRAM	Key 8 enabled
 4B2904	b	h	1	RDRAM	FF for voidout on main menu?!?
+678050	d	h	1	RDRAM	loadActor() function start
+6E234B	b	h	1	RDRAM	Freeze at 3 for infinite shots out
+6E2492	w	h	1	RDRAM	Chunky Shot SFX
+6E24D6	w	h	1	RDRAM	Lanky Shot SFX
+6E250A	w	h	1	RDRAM	Tiny Shot SFX
+6E253A	w	h	1	RDRAM	DK Shot SFX
+6E256A	w	h	1	RDRAM	Diddy Shot SFX
 744470	d	h	1	RDRAM	Framebuffer Pointer
 744478	d	u	1	RDRAM	Current Lag Speed Boost
 74447C	b	u	1	RDRAM	Squish Screen (Left)
@@ -49,6 +56,7 @@ SystemID N64
 7444C0	b	u	1	RDRAM	Widescreen Toggle
 7444E4	d	u	1	RDRAM	Next Map
 7444E8	d	u	1	RDRAM	Next Exit
+744509	b	u	1	RDRAM	Enemies Killed
 744518	w	u	1	RDRAM	Arena Current Score
 74452C	b	u	1	RDRAM	Story skip
 744530	b	u	1	RDRAM	Chimpy Cam
@@ -78,6 +86,18 @@ SystemID N64
 74583C	b	s	1	RDRAM	SFX Volume
 745840	b	s	1	RDRAM	Music Volume
 745844	b	u	1	RDRAM	Sound mode
+746344	w	h	1	RDRAM	Footstep SFX
+74634A	w	h	1	RDRAM	Footstep SFX
+746350	w	h	1	RDRAM	Footstep SFX
+746356	w	h	1	RDRAM	Footstep SFX
+74635C	w	h	1	RDRAM	Footstep SFX
+746362	w	h	1	RDRAM	Footstep SFX
+746368	w	h	1	RDRAM	Footstep SFX
+74636E	w	h	1	RDRAM	Footstep SFX
+746374	w	h	1	RDRAM	Footstep SFX
+74637A	w	h	1	RDRAM	Footstep SFX
+746380	w	h	1	RDRAM	Footstep SFX
+746392	w	h	1	RDRAM	Footstep SFX
 7467C8	b	u	1	RDRAM	File
 746820	d	u	1	RDRAM	Related to bone displacement
 746824	d	u	1	RDRAM	Related to bone displacement
@@ -92,6 +112,21 @@ SystemID N64
 74FF02	w	h	1	RDRAM	Tag Barrel (Kutout) Model
 7502E4	d	f	1	RDRAM	Orange Y Acceleration
 750AC0	b	u	1	RDRAM	Number of Players
+7530B0	w	u	1	RDRAM	DK Invulnerability Timer
+7530B2	w	u	1	RDRAM	Diddy Invulnerability Timer
+7530B4	w	u	1	RDRAM	Lanky Invulnerability Timer
+7530B6	w	u	1	RDRAM	Tiny Invulnerability Timer
+7530B8	w	u	1	RDRAM	Chunky Invulnerability Timer
+7530D0	w	u	1	RDRAM	DK Invulnerability Timer
+7530D2	w	u	1	RDRAM	Diddy Invulnerability Timer
+7530D4	w	u	1	RDRAM	Lanky Invulnerability Timer
+7530D6	w	u	1	RDRAM	Tiny Invulnerability Timer
+7530D8	w	u	1	RDRAM	Chunky Invulnerability Timer
+753160	w	u	1	RDRAM	DK Invulnerability Timer
+753162	w	u	1	RDRAM	Diddy Invulnerability Timer
+753164	w	u	1	RDRAM	Lanky Invulnerability Timer
+753166	w	u	1	RDRAM	Tiny Invulnerability Timer
+753168	w	u	1	RDRAM	Chunky Invulnerability Timer
 7531FC	d	f	1	RDRAM	DK Walk Maximum Velocity
 753200	d	f	1	RDRAM	Diddy Walk Maximum Velocity
 753204	d	f	1	RDRAM	Lanky Walk Maximum Velocity
@@ -236,6 +271,14 @@ SystemID N64
 76A0CD	b	u	1	RDRAM	Adventure
 76A0DA	b	h	1	RDRAM	Mystery Menu
 76AEF3	b	h	1	RDRAM	Previous Map
+76AF00	w	h	1	RDRAM	Some kind of frameskip value?
+76AF02	w	h	1	RDRAM	Some kind of frameskip value?
+76AF04	w	h	1	RDRAM	Some kind of frameskip value?
+76AF06	w	h	1	RDRAM	Some kind of frameskip value?
+76AF08	w	h	1	RDRAM	Some kind of frameskip value?
+76AF0A	w	h	1	RDRAM	Some kind of frameskip value?
+76AF0C	w	h	1	RDRAM	Some kind of frameskip value?
+76AF0E	w	h	1	RDRAM	Some kind of frameskip value?
 76AF10	d	u	1	RDRAM	Frame (Lag)
 76FDF8	d	h	1	RDRAM	Sound pointer thing
 7E9AFE	w	u	1	RDRAM	Weird sound control?
@@ -256,12 +299,13 @@ SystemID N64
 7F5D00	d	f	1	RDRAM	Camera State Change Timer
 7F5D10	d	h	1	RDRAM	Camera pointer?
 7F5D14	b	h	1	RDRAM	ISG Fadeout
-7F5DE0	d	h	1	RDRAM	Map Model Pointer?
+7F5DE0	d	h	1	RDRAM	Map Block Pointer
 7F5DE4	d	h	1	RDRAM	Map Model Pointer?
-7F5DE8	d	h	1	RDRAM	Map Model Pointer?
+7F5DE8	d	h	1	RDRAM	Map Verts Pointer
 7F5DEC	d	h	1	RDRAM	Map Model Pointer?
 7F6000	d	h	1	RDRAM	Object Model 2 Array Pointer
 7F6004	d	u	1	RDRAM	Object Model 2 Array Count
+7F6010	d	h	1	RDRAM	Setup File Pointer
 7F8E88	b	u	1	RDRAM	Object Count?
 7F9680	d	u	1	RDRAM	Texture Index?
 7FB940	d	h	1	RDRAM	Loading Zone Controller Pointer

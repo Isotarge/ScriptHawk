@@ -4074,7 +4074,7 @@ local function drawGrabScriptUI()
 	local green_highlight = 0xFF00FF00;
 	local yellow_highlight = 0xFFFFFF00;
 
-	gui.text(gui_x, gui_y + height * row, "Mode: "..grab_script_mode, nil, nil, 'bottomright');
+	gui.text(gui_x, gui_y + height * row, "Mode: "..grab_script_mode, nil, nil, 'bottomright'); -- Exception here in interim
 	row = row + 1;
 
 	local playerObject = Game.getPlayerObject();
@@ -4569,6 +4569,52 @@ function Game.realTime()
 	end
 end
 
+local vertSize = 0x10;
+local vert = {
+	["x_position"] = 0x00, -- s16_be
+	["y_position"] = 0x02, -- s16_be
+	["z_position"] = 0x04, -- s16_be
+	["mapping_1"] = 0x08, -- Texture mapping, unknown datatype
+	["mapping_2"] = 0x0A, -- Texture mapping, unknown datatype
+	["shading_1"] = 0x0C, -- Unknown datatype
+	["shading_2"] = 0x0E, -- Unknown datatype
+};
+
+function crumble()
+	local mapBase = dereferencePointer(0x7F5DE0);
+	local vertBase = dereferencePointer(0x7F5DE8);
+
+	if isRDRAM(mapBase) and isRDRAM(vertBase) then
+		local mapSize = mainmemory.read_u32_be(mapBase + object_size);
+		for v = vertBase, mapBase + mapSize - 0x10, vertSize do
+			if math.random() > 0.9 then
+				local xPos = mainmemory.read_s16_be(v + vert.x_position);
+				local yPos = mainmemory.read_s16_be(v + vert.y_position);
+				local zPos = mainmemory.read_s16_be(v + vert.z_position);
+
+				local mapping1 = mainmemory.read_s16_be(v + vert.mapping_1);
+				local mapping2 = mainmemory.read_s16_be(v + vert.mapping_2);
+
+				if math.random() > 0.5 then
+					mainmemory.write_s16_be(v + vert.x_position, xPos - 1);
+					mainmemory.write_s16_be(v + vert.y_position, yPos - 1);
+					mainmemory.write_s16_be(v + vert.z_position, zPos - 1);
+
+					mainmemory.write_s16_be(v + vert.mapping_1, mapping1 + math.floor(math.random(50, 100)));
+					mainmemory.write_s16_be(v + vert.mapping_2, mapping2 + math.floor(math.random(50, 100)));
+				else
+					mainmemory.write_s16_be(v + vert.x_position, xPos + 1);
+					mainmemory.write_s16_be(v + vert.y_position, yPos + 1);
+					mainmemory.write_s16_be(v + vert.z_position, zPos + 1);
+
+					mainmemory.write_s16_be(v + vert.mapping_1, mapping1 - math.floor(math.random(50, 100)));
+					mainmemory.write_s16_be(v + vert.mapping_2, mapping2 - math.floor(math.random(50, 100)));
+				end
+			end
+		end
+	end
+end
+
 function Game.eachFrame()
 	local playerObject = Game.getPlayerObject();
 	map_value = Game.getMap();
@@ -4578,6 +4624,8 @@ function Game.eachFrame()
 	else
 		Game.OSD = Game.standardOSD;
 	end
+
+	--crumble();
 
 	-- TODO: This is really slow and doesn't cover all memory domains
 	--memoryStatCache = getMemoryStats(dereferencePointer(Game.Memory.linked_list_pointer[version]));
