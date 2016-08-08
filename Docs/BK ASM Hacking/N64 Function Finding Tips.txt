@@ -1,0 +1,41 @@
+Memory mapping functions
+
+What to look for:
+
+1) All opcodes must be word aligned 
+   -starts at adresss that ends in 2 zero's, 
+      -EXAMPLES: xxxxx0, xxxxx4, xxxxx8, xxxxxC
+
+2) Functions must be jumped to and jumped away from
+   -J (jump)
+      -Jumps to specified address 
+         -is commonly used if you don't plan on returning from the function
+            -Example: entering the main loop
+      -First 6 bits are 0b000010
+         -Opcode always looks like 0x08??????, 0x09??????, 0x0A??????, or 0x0B??????
+      -Remaining 26 bits are jump address right shifted by 2 (shifted since last 2 bits are always 0)
+         -Find new address by (({OPCODE} | 0x03FFFFFF) << 2) or (({OPCODE} % 0x04000000) * 4)
+
+*  -JAL (jump and link)
+      -Jumps to specified address AND saves the return address in RA register
+         -MOST COMMON WAY of jumping to a function since it saves return address
+      -First 6 bits are 0b000011
+         -Opcode always looks like 0x0C??????, 0x0D??????, 0x0E??????, or 0x0F??????
+      -Remaining 26 bits are jump address right shifted by 2 (shifted since last 2 bits are always 0)
+         -Find new address by (({OPCODE} | 0x03FFFFFF) << 2) or (({OPCODE} % 0x04000000) * 4)
+
+** -JR (jump register)
+      -jumps the the address stored in the specified address
+         -MOST COMMON WAY of returning from a function since return address is already saved in RA by JAL
+      -Allways starts with 0b000000 and ends with 0b001000
+         -Opcode always looks like on of the following: 
+             0x00?00008, 0x01?00008, 0x02?00008, 0x03?00008
+          -$RA is specified by 0b11111 (FACT CHECK this) so most common function return is
+             0x03E00008
+
+   -JALR (jump and link register)
+
+
+3) Functions will normally have a jump to and a return from
+   -JAL points start of function 
+   -JR indicates end the function
