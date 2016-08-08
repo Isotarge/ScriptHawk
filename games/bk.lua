@@ -2608,17 +2608,10 @@ Game.OSD = {
 
 Game.ASMHookBase = 0x24EE88;
 
-<<<<<<< HEAD
-Game.ASMCodeBase = 0x0400000; --supports 28 bit number
-Game.ASMMaxCodeSize = 0x400000;
-
-Game.ASMHook = { --Hook = J ASMCodeBase = (0b000010 << 26) | (ASMHooKBase >> 2)
-=======
 Game.ASMCodeBase = 0x0400000; --supports up to 28 bits, 0xFFFFFFC
 Game.ASMMaxCodeSize = 0x400000;
 
 Game.ASMHook = { --Hook == J ASMCodeBase == (0b000010 << 26) | (ASMHooKBase >> 2)
->>>>>>> refs/remotes/origin/master
 	0x08 + math.floor(Game.ASMCodeBase/(2^26))%(2^8),
 	math.floor(Game.ASMCodeBase/(2^18))%(2^8), 
 	math.floor(Game.ASMCodeBase/(2^10))%(2^8), 
