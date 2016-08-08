@@ -2574,11 +2574,15 @@ Game.OSD = {
 ---------------
 
 Game.ASMHookBase = 0x24EE88;
-Game.ASMHook = {
-	0x08, 0x10, 0x00, 0x00,
-};
 
-Game.ASMCodeBase = 0x400000;
+Game.ASMCodeBase = 0x0400000; --supports up to 28 bits, 0xFFFFFFC
 Game.ASMMaxCodeSize = 0x400000;
+
+Game.ASMHook = { --Hook == J ASMCodeBase == (0b000010 << 26) | (ASMHooKBase >> 2)
+	0x08 + math.floor(Game.ASMCodeBase/(2^26))%(2^8),
+	math.floor(Game.ASMCodeBase/(2^18))%(2^8), 
+	math.floor(Game.ASMCodeBase/(2^10))%(2^8), 
+	math.floor(Game.ASMCodeBase/(2^2))%(2^8),
+};
 
 return Game;
