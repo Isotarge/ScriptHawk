@@ -1985,39 +1985,6 @@ function getCorrectFFAnswer()
 	return 0;
 end
 
--- FF Board State
-local boardBase = 0x394140; -- TODO: Find in all versions -- TODO: Is this global?
-local squareSize = 0x20;
-local numSquares = 95;
-
--- 0x08 Byte - Question Type
-local questionTypes = {
-	[0x00] = "None",
-	[0x01] = "BK",
-	[0x02] = "Screen",
-	[0x03] = "Sound",
-	[0x04] = "Minigame",
-	[0x05] = "Grunty",
-	[0x06] = "Death",
-	[0x07] = "Joker", -- Gives 1 card
-	[0x08] = "Joker", -- Gives 2 cards
-	[0x09] = "Joker", -- Gives 3 cards
-	[0x0A] = "Joker?", -- Gives 0 cards?
-	[0x0B] = "Joker", -- Gives 5 cards
-	[0x0C] = "Joker", -- Gives 6 cards
-	-- TODO: Finish this table
-};
-
--- 0x10 Float - Brightness?
-
-function randomizeBrightness()
-	for i = 0, numSquares do
-		--mainmemory.writefloat(boardBase + i * squareSize + 0x10, math.random(), true);
-		--mainmemory.writefloat(boardBase + i * squareSize + 0x10, i / numSquares, true);
-		print(i..": "..questionTypes[mainmemory.readbyte(boardBase + i * squareSize + 0x08)]);
-	end
-end
-
 ----------------------
 -- Vile state stuff --
 ----------------------
@@ -2606,16 +2573,16 @@ Game.OSD = {
 -- ASM Stuff --
 ---------------
 
-Game.ASMHookBase = 0x24EE88;
-
-Game.ASMCodeBase = 0x0400000; --supports up to 28 bits, 0xFFFFFFC
+Game.ASMHookBase = 0x024EE90; -- changed to existing JAL point to aviod issues with branch delay
+Game.ASMCodeBase = 0x0400000; --supports up to 28 bits, 0xFFFFFFA
 Game.ASMMaxCodeSize = 0x400000;
 
-Game.ASMHook = { --Hook == J ASMCodeBase == (0b000010 << 26) | (ASMHooKBase >> 2)
-	0x08 + math.floor(Game.ASMCodeBase/(2^26))%(2^8),
+Game.ASMHook = { --Hook == JAL ASMCodeBase == (0b000010 << 26) | (ASMHooKBase >> 2)
+	0x0C + math.floor(Game.ASMCodeBase/(2^26))%(2^8),
 	math.floor(Game.ASMCodeBase/(2^18))%(2^8), 
 	math.floor(Game.ASMCodeBase/(2^10))%(2^8), 
 	math.floor(Game.ASMCodeBase/(2^2))%(2^8),
 };
+-- end .asm code with J 0x8024E420 {opcode: 0x08093908}
 
 return Game;

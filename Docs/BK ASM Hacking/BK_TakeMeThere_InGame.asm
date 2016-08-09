@@ -24,11 +24,11 @@
 [CurrentEggs]: 0x80385F64
 [MovePointer]: 0x8037C3A0
 
-[ReturnAddress]: 0x8024EE90 
+[ReturnAddress]: 0x8024E420
 
 .ORG 0x80400000 ;CODE
-.halfword 0xA602 
-.halfword 0x0002 ;instrunction we replaced in main code
+;.halfword 0xA602 
+;.halfword 0x0002 ;instrunction we replaced in main code
 
  
  PUSH t6;push registers
@@ -78,9 +78,11 @@
            LW t6 MoveSave
            SW t6 @MovePointer //restore original move register
 		   LI t6 0x03
-           SW t6 WarpState ;clear warp menu state flag 
+		   SW t6 WarpState ;clear warp menu state flag 
 		   B Housekeeping
-       
+		   NOP
+           
+
 		Grunty:
            B RoomIsSet
 		   LI t6 0x93
@@ -175,7 +177,9 @@
   POP t7
   POP t6
   
-  J @ReturnAddress ;return
+  ;J @ReturnAddress ;return
+  .halfword 0x0809
+  .halfword 0x3908
   NOP
 
 WarpState:
