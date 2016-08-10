@@ -86,6 +86,12 @@ SystemID N64
 74583C	b	s	1	RDRAM	SFX Volume
 745840	b	s	1	RDRAM	Music Volume
 745844	b	u	1	RDRAM	Sound mode
+7458DC	w	h	1	RDRAM	Music Track (Channel 1)
+7458DE	w	h	1	RDRAM	Music Track (Channel 2)
+7458E0	w	h	1	RDRAM	Music Track (Channel 3)
+7458F4	d	f	1	RDRAM	Volume?
+7458F8	d	f	1	RDRAM	Volume?
+7458FC	d	f	1	RDRAM	Volume?
 746344	w	h	1	RDRAM	Footstep SFX
 74634A	w	h	1	RDRAM	Footstep SFX
 746350	w	h	1	RDRAM	Footstep SFX
@@ -308,6 +314,7 @@ SystemID N64
 7F6010	d	h	1	RDRAM	Setup File Pointer
 7F8E88	b	u	1	RDRAM	Object Count?
 7F9680	d	u	1	RDRAM	Texture Index?
+7FB534	d	h	1	RDRAM	Collision Data Pointer?
 7FB940	d	h	1	RDRAM	Loading Zone Controller Pointer
 7FB960	d	h	1	RDRAM	Player 1 Pointer
 7FB968	d	h	1	RDRAM	Player 1 Camera Pointer
