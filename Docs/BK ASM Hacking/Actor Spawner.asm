@@ -1,5 +1,5 @@
 [SpawnActor]: 0x8032813C
-[Return]: 0x8024EE90
+[Return]: 0x8024E420
 
 [XPos]: 0x8037C5A0
 [YPos]: 0x8037C5A4

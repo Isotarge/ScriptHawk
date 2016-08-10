@@ -1,4 +1,4 @@
-[ReturnAddress]: 0x8024EE90
+[Return]: 0x8024E420
 
 [ReadStart]: 0x8037BF20
 [ReadEnd]: 0x8037C70C
@@ -68,5 +68,5 @@ POP t7
 POP t6
 POP t5
 POP v0
-J       @ReturnAddress
+J       @Return
 NOP

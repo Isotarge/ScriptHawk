@@ -1,6 +1,6 @@
 [Print]: 0x802F7870
 [IToA]: 0x8033D8A4
-[Return]: 0x8024EE90
+[Return]: 0x8024E420
 
 [XPos]: 0x8037C5A0
 [YPos]: 0x8037C5A4
@@ -167,7 +167,7 @@ POP a2
 POP a1
 POP a0
 POP ra
-JR RA
+J @Return
 NOP
 
 PrecisionMultiplier:
