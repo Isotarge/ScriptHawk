@@ -11,6 +11,7 @@ SystemID SMS
 0DDD	b	h	0	Main RAM	Green Scroll Flag
 0DDE	b	h	0	Main RAM	Green Scroll Flag
 0DDF	b	h	0	Main RAM	Green Scroll Flag
+0DE1	b	u	0	Main RAM	Statue Shots (Level 10)
 0DF0	b	h	0	Main RAM	Easter Egg Flag (Level 1)
 0DF1	b	h	0	Main RAM	Easter Egg Flag (Level 2)
 0DF3	b	h	0	Main RAM	Easter Egg Flag (Level 4)
