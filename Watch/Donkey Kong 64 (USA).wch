@@ -239,6 +239,7 @@ SystemID N64
 755348	d	s	1	RDRAM	Helm Timer
 75534C	d	s	1	RDRAM	Initial Helm Time
 755350	b	u	1	RDRAM	Helm Timer Enabled
+758C60	d	f	1	RDRAM	Map Scale
 758EC0	d	f	1	RDRAM	Pad Fake Floor Y
 758F10	d	f	1	RDRAM	Water Fake Floor Y
 75C412	w	h	1	RDRAM	DK Behavior

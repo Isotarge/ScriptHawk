@@ -1559,6 +1559,24 @@ function dumpLoadingZones()
 	end
 end
 
+function dumpModel2Positions()
+	local objModel2Array = dereferencePointer(Game.Memory.obj_model2_array_pointer[version]);
+	if isRDRAM(objModel2Array) then
+		local numSlots = mainmemory.read_u32_be(Game.Memory.obj_model2_array_count[version]);
+		local scriptName, slotBase, currentValue, activationScript;
+		-- Fill and sort pointer list
+		for i = 0, numSlots - 1 do
+			slotBase = objModel2Array + i * obj_model2_slot_size;
+			scriptName = getScriptName(slotBase);
+			xPos = mainmemory.readfloat(slotBase + obj_model2.x_pos, true);
+			yPos = mainmemory.readfloat(slotBase + obj_model2.y_pos, true);
+			zPos = mainmemory.readfloat(slotBase + obj_model2.z_pos, true);
+			dprint(scriptName.." at "..xPos..", "..yPos..", "..zPos);
+		end
+		print_deferred();
+	end
+end
+
 --------------------
 -- Region/Version --
 --------------------
