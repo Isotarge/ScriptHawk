@@ -18,8 +18,9 @@
 [StringBufferSize]: 33
 [TextSize]: 0x3F800000 // 0xBF000666
 
-[OSDXOffset]: 0x10
-[OSDXOffsetValue]: 0x40
+[OSDXOffset]: 0x08
+[OSDXOffsetValue]: 0x16
+[OSDXOffsetVelocityValue]:0x24
 
 .org 0x80400000
 PUSH ra
@@ -28,7 +29,7 @@ PUSH a1
 PUSH a2
 
 // Print X Position Label
-LI a1 0x10 // Y Pos
+LI a1 0x08 // Y Pos
 LA a2 XPosStr
 JAL @Print
 LI a0 @OSDXOffset
@@ -40,13 +41,13 @@ JAL FloatToString
 NOP
 
 // Print X Position Value
-LI a1 0x10 // Y Pos
+LI a1 0x08 // Y Pos
 LA a2 XPosValueStr
 JAL @Print
 LI a0 @OSDXOffsetValue
 
 // Print Y Position Label
-LI a1 0x20 // Y Pos
+LI a1 0x14 // Y Pos
 LA a2 YPosStr
 JAL @Print
 LI a0 @OSDXOffset
@@ -58,13 +59,13 @@ JAL FloatToString
 NOP
 
 // Print Y Position Value
-LI a1 0x20 // Y Pos
+LI a1 0x14 // Y Pos
 LA a2 YPosValueStr
 JAL @Print
 LI a0 @OSDXOffsetValue
 
 // Print Z Position Label
-LI a1 0x30 // Y Pos
+LI a1 0x20 // Y Pos
 LA a2 ZPosStr
 JAL @Print
 LI a0 @OSDXOffset
@@ -76,7 +77,7 @@ JAL FloatToString
 NOP
 
 // Print Z Position Value
-LI a1 0x30 // Y Pos
+LI a1 0x20 // Y Pos
 LA a2 ZPosValueStr
 JAL @Print
 LI a0 @OSDXOffsetValue
@@ -86,6 +87,59 @@ LA a0 SlopeTimerValueStr
 LA a1 @SlopeTimer
 JAL FloatToString
 NOP
+
+
+// Print XZ Velocity Label
+LI a1 0x34// Y Pos
+LA a2 XZVelocityStr
+JAL @Print
+LI a0 @OSDXOffset
+
+//calc x-z plane velocity
+LA a0 @XVelocity
+LA a1 @ZVelocity
+LWC1 f30 0(a0)
+LWC1 f31 0(a1)
+MUL.S f30, f30, f30
+MUL.S f31, f31, f31
+ADD.S f31, f31, f30
+SQRT.S f31, f31
+LA a1 XZVelocity
+SWC1 f31, 0(a1)
+
+// Convert XZ velocity to String
+LA a0 XZVelocityValueStr
+JAL FloatToString
+NOP
+
+// Print XZ velocity Value
+LI a1 0x34 // Y Pos
+LA a2 XZVelocityValueStr
+JAL @Print
+LI a0 @OSDXOffsetVelocityValue
+
+
+// Print Y Velocity Label
+LI a1 0x40// Y Pos
+LA a2 YVelocityStr
+JAL @Print
+;LI a0 @OSDXOffset
+LI a0 0x12
+
+// Convert Y velocity to String
+LA a0 YVelocityValueStr
+LA a1 @YVelocity
+JAL FloatToString
+NOP
+
+// Print Y velocity Value
+LI a1 0x40 // Y Pos
+LA a2 YVelocityValueStr
+JAL @Print
+LI a0 @OSDXOffsetVelocityValue
+
+
+
 
 // Print Slope Timer Value
 LI a1 0x50 // Y Pos
@@ -164,18 +218,20 @@ NOP
 
 PrecisionMultiplier:
 .word 0x447A0000 // 100
+XZVelocity:
+.word 0x00000000
 XPosStr:
 .asciiz "X:"
 YPosStr:
 .asciiz "Y:"
 ZPosStr:
 .asciiz "Z:"
-XVelocityStr:
-.asciiz "X VEL:"
+XZVelocityStr:
+.asciiz "XZ':"
 YVelocityStr:
-.asciiz "Y VEL:"
+.asciiz "Y':"
 ZVelocityStr:
-.asciiz "Z VEL:"
+.asciiz "Z':"
 SlopeTimerStr:
 .asciiz "SLOPE:"
 XPosValueStr:
@@ -183,6 +239,10 @@ XPosValueStr:
 YPosValueStr:
 .asciiz "\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0"
 ZPosValueStr:
+.asciiz "\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0"
+YVelocityValueStr:
+.asciiz "\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0"
+XZVelocityValueStr:
 .asciiz "\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0"
 SlopeTimerValueStr:
 .asciiz "\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0"
