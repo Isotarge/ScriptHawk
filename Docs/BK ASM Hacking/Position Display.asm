@@ -1,4 +1,7 @@
-[Print]: 0x802F7870
+;TO DO: add Y-velocity
+;       calc and add xz-Velocity
+
+[Print]: 0x802F78FC
 [IToA]: 0x8033D8A4
 [Return]: 0x8024E420
 
@@ -23,12 +26,10 @@ PUSH ra
 PUSH a0
 PUSH a1
 PUSH a2
-PUSH a3
 
 // Print X Position Label
 LI a1 0x10 // Y Pos
-LI a2 @TextSize
-LA a3 XPosStr
+LA a2 XPosStr
 JAL @Print
 LI a0 @OSDXOffset
 
@@ -40,15 +41,13 @@ NOP
 
 // Print X Position Value
 LI a1 0x10 // Y Pos
-LI a2 @TextSize
-LA a3 XPosValueStr
+LA a2 XPosValueStr
 JAL @Print
 LI a0 @OSDXOffsetValue
 
 // Print Y Position Label
 LI a1 0x20 // Y Pos
-LI a2 @TextSize
-LA a3 YPosStr
+LA a2 YPosStr
 JAL @Print
 LI a0 @OSDXOffset
 
@@ -60,15 +59,13 @@ NOP
 
 // Print Y Position Value
 LI a1 0x20 // Y Pos
-LI a2 @TextSize
-LA a3 YPosValueStr
+LA a2 YPosValueStr
 JAL @Print
 LI a0 @OSDXOffsetValue
 
 // Print Z Position Label
 LI a1 0x30 // Y Pos
-LI a2 @TextSize
-LA a3 ZPosStr
+LA a2 ZPosStr
 JAL @Print
 LI a0 @OSDXOffset
 
@@ -80,8 +77,7 @@ NOP
 
 // Print Z Position Value
 LI a1 0x30 // Y Pos
-LI a2 @TextSize
-LA a3 ZPosValueStr
+LA a2 ZPosValueStr
 JAL @Print
 LI a0 @OSDXOffsetValue
 
@@ -93,12 +89,10 @@ NOP
 
 // Print Slope Timer Value
 LI a1 0x50 // Y Pos
-LI a2 @TextSize
-LA a3 SlopeTimerValueStr
+LA a2 SlopeTimerValueStr
 JAL @Print
 LI a0 @OSDXOffsetValue
 
-POP a3
 POP a2
 POP a1
 POP a0
@@ -113,7 +107,6 @@ PUSH ra
 PUSH a0
 PUSH a1
 PUSH a2
-PUSH a3
 
 // Clear the string buffer
 LI t1 0 // i = 0
@@ -162,7 +155,6 @@ LI t4 0x2E // Decimal point
 SB t4 0(t0)
 
 SkipDecimalPoint:
-POP a3
 POP a2
 POP a1
 POP a0

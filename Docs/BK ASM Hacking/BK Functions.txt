@@ -1,28 +1,28 @@
 Banjo-Kazooie Functions US 1.0
 
-[Addr Strart-  JR addr  ]: Size bytes: Description
-[0x8023DB5C -           ]:           : --unknown start
 
-[0x8023E000 -           ]:           : --unknown start
+0x8023DB5C --unknown start
 
+0x8023E000 --unknown start
 
-[0x8024E420 - 0x8024E554]:       309 : --Unknown Function
-[0x8024E55C - 0x8024E5A0]:        69 : --Unknown Function (called with a0 0)
-[0x8024E5A8 - 0x8024E5E0]:        57 : --Unknown Function
-[0x8024E5E8 - 0x8024E604]:        28 : --Unknown Function
-[0x8024E60C - 0x8024E690]:       132 : --Unknown Function
-[0x8024E698 - 0x8024E6D8]:        64 : --Unknown Function (calls functions 0x8023DB5C)
-[0x8024E6E0 - 0x8024E714]:        52 : --Unknown Function
-[0x8024E71C - 0x8024E7C0]:       165 : --Unknown Function (calls functions 0x802E4A08, 0x8024E420)
-[0x8024E7C8 - 0x8024EF6C]:      1956 : --Unknown Function, currently used for GS hook(calls functions 0x8023E000, 0x8024E420, 0x80265000, 0x802E4384, 0x802E49FC, 0x8030BD98, 0x803204E4, 0x8033DD04, 0x8033DD90, 0x8033DD9C, 0x80349EE4 
+0x8024E55C --Unknown Function (called with a0 0)
+
+0x8024E7C8 --Unknown Function, currently used for GS hook(calls functions 0x8023E000, 0x8024E420, 0x80265000, 0x802E4384, 0x802E49FC, 0x8030BD98, 0x803204E4, 0x8033DD04, 0x8033DD90, 0x8033DD9C, 0x80349EE4 
 
 0x80264550 Main Game Loop? Does Rendering, called by controller handler?
 
-[0x80265000 -           ]:           : --unknown start
+0x80265000 --unknown 
 
 0x802F55D8 -- Does a lot with floats
 0x802F75C8
-0x802F7870 Print($a0 u8 XPosition, $a1, u8 YPosition, $a2 float TextSize, $a3 char[] Message)
+0x802F7870 Print($a0 u8 XPosition, $a1 u8 YPosition, $a2 float TextSize, $a3 char[] Message) -- used for character parade????
+0x802F78C0 PrintItemValues($a0 u8 XPosition, $a1 u8 YPosition,$a2 char[] Message) -- Used to print item values 
+0x802F78fc PrintStaticCharacterTexts($a0 u8 XPosition, $a1 u8 YPosition,$a2 char[] Message) --used to print character's texts
+0x802f7938 print??(???????) --print function need to look into what it prints and passed inputs
+0x802f7974 print??(???????) --print function need to look into what it prints and passed inputs
+0x802f79D0 print??(???????) --print function need to look into what it prints and passed inputs
+
+
 0x802F7B90 Unknown($a0 u8 Shade, $a1 u8 Shade)
 0x802FB0E4 --
 0x80316EF4 PrintPauseMenuItem(a0 object* MenuItemObject)?
@@ -43,3 +43,5 @@ Functions called when collecting note
 80297AB8
 802F3670
 802F379C
+
+0C0C4BE2
