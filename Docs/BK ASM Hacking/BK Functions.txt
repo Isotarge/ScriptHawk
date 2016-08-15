@@ -22,6 +22,10 @@ Banjo-Kazooie Functions US 1.0
 0x802f7974 print??(???????) --print function need to look into what it prints and passed inputs
 0x802f79D0 print??(???????) --print function need to look into what it prints and passed inputs
 
+0x802fdaf4 DisplayItemIconAndCount(?????) --(Found by looking at function calls, and disabling) does not include lives and jiggies, Uses PrintItemValues()
+
+0x802fff34 DisplayLifeIconAndCount(?????) --(Found by looking at function calls, and disabling)Uses PrintItemValues()
+
 
 0x802F7B90 Unknown($a0 u8 Shade, $a1 u8 Shade)
 0x802FB0E4 --
