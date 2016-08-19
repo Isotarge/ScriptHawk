@@ -69,6 +69,7 @@ Game.Memory = {
 	["obj_model2_array_count"] = {0x7F6004, 0x7F5F24, 0x7F6474, nil}, -- TODO: Kiosk
 	["obj_model2_timer"] = {0x76A064, 0x764B84, 0x76A254, 0x72CDAC},
 	["obj_model2_collision_linked_list_pointer"] = {0x754244, 0x74E9A4, 0x753B34, 0x6FF054},
+	["obj_model2_setup_pointer"] = {0x7F6010, nil, nil, 0x7B17C4}, -- TODO: JP & PAL
 };
 
 Game.modes = {
@@ -555,15 +556,16 @@ obj_model1 = {
 		[78] = "Blueprint (DK)",
 		[79] = "Blueprint (Tiny)",
 		[81] = "Fire Spawner? (Dogadon)", -- TODO: Verify
-		[82] = "Small Grey Rock", -- TODO: Unused?
+		[82] = "Small Grey Rock", -- Minecart
 		[83] = "Spider Web", -- Fungi miniBoss
 		[84] = "Steel Keg Spawner",
 		[85] = "Steel Keg",
 		[86] = "Crown",
-		[89] = "Fire", -- TODO: Unused?
+		[89] = "Fire", -- Unused?
 		[91] = "Balloon (Diddy)",
 		[92] = "Stalactite",
-		[94] = "Car", -- TODO: Unused?
+		[93] = "Rock Debris", -- Rotating, Unused?
+		[94] = "Car", -- Unused?
 		[95] = "Pause Menu",
 		[96] = "Hunky Chunky Barrel (Dogadon)",
 		[98] = "Tag Barrel",
@@ -576,6 +578,7 @@ obj_model1 = {
 		[105] = "6 Pad (Diddy 5DI)",
 		[106] = "5DI Controller?", -- TODO: Investigate, also I saw this somewhere else
 		[107] = "Bonus Barrel (Hideout Helm)",
+		--[109] = "Unknown", -- Spawned by Fungi Forest setup but seems to disappear immediately
 		[110] = "CB Bunch", -- Unused? Doesn't seem to work, these are normally model 2
 		[111] = "Balloon (Chunky)",
 		[112] = "Balloon (Tiny)",
@@ -1360,7 +1363,7 @@ local collisionTypes = { -- These seem to be the model 2 equivalent to the model
 	[0x76] = "Metal Bars",
 	[0x77] = "-",
 	[0x78] = "Metal fence",
-	[0x79] = "Nothing",
+	[0x79] = "Snide's HQ",
 	[0x7A] = "Funky's Armory",
 	[0x7B] = "-",
 	[0x7C] = "Blue lazer field",
@@ -1385,13 +1388,13 @@ local collisionTypes = { -- These seem to be the model 2 equivalent to the model
 	[0x8E] = "Crystal Coconut",
 	[0x8F] = "Ammo Crate",
 
-	[0x90] = "Gold ring",
+	[0x90] = "Banana Medal",
 	[0x91] = "Peanut",
-	[0x92] = "Switch",
-	[0x93] = "Switch",
-	[0x94] = "Switch",
-	[0x95] = "Switch",
-	[0x96] = "Switch",
+	[0x92] = "Simian Slam Switch (Chunky, Green)",
+	[0x93] = "Simian Slam Switch (Diddy, Green)",
+	[0x94] = "Simian Slam Switch (DK, Green)",
+	[0x95] = "Simian Slam Switch (Lanky, Green)",
+	[0x96] = "Simian Slam Switch (Tiny, Green)",
 	[0x97] = "Baboon Blast Pad",
 	[0x98] = "Film",
 	[0x99] = "Chunky Rotating Room", -- Aztec, Tiny Temple
@@ -1419,9 +1422,9 @@ local collisionTypes = { -- These seem to be the model 2 equivalent to the model
 	[0xAE] = "Wood panel small",
 	[0xAF] = "Wood panel small",
 
-	[0xB0] = "Wood panel small",
-	[0xB1] = "Wall Panel Aztec",
-	[0xB2] = "Wall panel Cave",
+	[0xB0] = "Wood Panel small",
+	[0xB1] = "Wall Panel", -- Aztec
+	[0xB2] = "Wall Panel", -- Caves?
 	[0xB3] = "Blue light?",
 	[0xB4] = "Feed Me Totem", -- Aztec
 	[0xB5] = "Melon Crate",
@@ -1431,7 +1434,7 @@ local collisionTypes = { -- These seem to be the model 2 equivalent to the model
 	[0xB9] = "Coconut Indicator", -- Free Diddy
 	[0xBA] = "Snake Head", -- Aztec, Llama temple
 	[0xBB] = "Matching Game Board", -- Aztec, Llama temple
-	[0xBC] = "Blue Metal thing",
+	[0xBC] = "Stone Monkey Head", -- Aztec
 	[0xBD] = "Large metal section",
 	[0xBE] = "Production Room Crusher", -- Factory
 	[0xBF] = "Metal Platform",
@@ -1440,7 +1443,7 @@ local collisionTypes = { -- These seem to be the model 2 equivalent to the model
 	[0xC1] = "Metal Object",
 	[0xC2] = "Metal Object",
 	[0xC3] = "Gong", -- Diddy Kong
-	[0xC4] = "Not sure",
+	[0xC4] = "Platform", -- Aztec
 	[0xC5] = "Bamboo together",
 	[0xC6] = "Metal Bars",
 	[0xC7] = "Target", -- Minigames
@@ -1457,8 +1460,8 @@ local collisionTypes = { -- These seem to be the model 2 equivalent to the model
 	[0xD1] = "Metal Bars",
 	[0xD2] = "Raisable Metal Platform",
 	[0xD3] = "Metal Cage",
-	[0xD4] = "Big Gold Thing",
-	[0xD5] = "Large shipping container thing",
+	[0xD4] = "Simian Spring Pad",
+	[0xD5] = "Power Shed", -- Factory
 	[0xD6] = "Metal platform",
 	[0xD7] = "Sun Lighting effect panel",
 	[0xD8] = "Wooden Pole",
@@ -1466,12 +1469,12 @@ local collisionTypes = { -- These seem to be the model 2 equivalent to the model
 	[0xDA] = "Wooden Pole",
 	[0xDB] = "-",
 	[0xDC] = "Question Mark Box",
-	[0xDD] = "Purple Blueprint",
-	[0xDE] = "Yellow Blueprint",
-	[0xDF] = "Green Blueprint",
+	[0xDD] = "Blueprint (Tiny)",
+	[0xDE] = "Blueprint (DK)",
+	[0xDF] = "Blueprint (Chunky)",
 
-	[0xE0] = "Red Blueprint",
-	[0xE1] = "Red Blueprint",
+	[0xE0] = "Blueprint (Diddy)",
+	[0xE1] = "Blueprint (Lanky)",
 	[0xE2] = "Tree Dark",
 	[0xE3] = "Rope",
 	[0xE4] = "-",
@@ -1480,7 +1483,7 @@ local collisionTypes = { -- These seem to be the model 2 equivalent to the model
 	[0xE7] = "Large Mouth looks like croc mouth",
 	[0xE8] = "Metal Gate with red/white stripes",
 	[0xE9] = "-",
-	[0xEA] = " Not sure",
+	[0xEA] = "Purple Croc Head", -- Minecart
 	[0xEB] = "Wood panel",
 	[0xEC] = "DK coin",
 	[0xED] = "Wooden leg",
@@ -1531,15 +1534,15 @@ local collisionTypes = { -- These seem to be the model 2 equivalent to the model
 	[0x117] = "Crusher", -- Factory
 	[0x118] = "Floor Panel",
 	[0x119] = "Metal floor panel mesh",
-	[0x11A] = "Metal thing",
-	[0x11B] = "Metal thing",
-	[0x11C] = "Metal thing",
-	[0x11D] = "Metal thing",
-	[0x11E] = "Metal thing",
-	[0x11F] = "Metal thing",
+	[0x11A] = "Metal Door", -- Factory or Car Race
+	[0x11B] = "Metal Door", -- Factory or Car Race
+	[0x11C] = "Metal Door", -- Factory or Car Race
+	[0x11D] = "Metal Door", -- Factory or Car Race
+	[0x11E] = "Metal Door", -- Factory or Car Race
+	[0x11F] = "Metal Door", -- Factory or Car Race
 
 	[0x120] = "Toyz Box",
-	[0x121] = "Circle Wood numbers on it",
+	[0x121] = "Circle Wood numbers on it", -- TODO: O Pad, Aztec chunky puzzle
 	[0x122] = "Bonus Barrel Trap", -- Aztec
 	[0x123] = "Sun Idol", -- Aztec, top of "feed me" totem
 	[0x124] = "Candy's Shop",
@@ -1555,30 +1558,30 @@ local collisionTypes = { -- These seem to be the model 2 equivalent to the model
 	[0x12E] = "Metal Bars horizontal",
 	[0x12F] = "Metal Bars",
 
-	[0x130] = "Something",
-	[0x131] = "nothing",
+	[0x130] = "Harbour Gate", -- Galleon
+	[0x131] = "K. Rool's Ship", -- Galleon
 	[0x132] = "Metal Platform",
 	[0x133] = "-",
 	[0x134] = "Flame",
 	[0x135] = "Flame",
 	[0x136] = "Scoff n Troff platform",
-	[0x137] = "Disco Pad?",
-	[0x138] = "Little Fire Pit",
+	[0x137] = "Troff 'n' Scoff Banana Count Pad (DK)",
+	[0x138] = "Torch",
 	[0x139] = "-",
 	[0x13A] = "-",
 	[0x13B] = "-",
 	[0x13C] = "Boss Key",
 	[0x13D] = "Machine",
-	[0x13E] = "Metal thing",
-	[0x13F] = "Metal thing",
+	[0x13E] = "Metal Door", -- Factory or Car Race - Production Room & Lobby - Unused?
+	[0x13F] = "Metal Door", -- Factory or Car Race - Testing Dept. & Krem Storage
 
-	[0x140] = "Metal thing",
-	[0x141] = "Metal thing",
+	[0x140] = "Metal Door", -- Factory or Car Race - R&D
+	[0x141] = "Metal Door", -- Factory or Car Race - Testing Dept.
 	[0x142] = "Piano Game", -- Factory, Lanky
-	[0x143] = "Disco Pad",
-	[0x144] = "Disco Pad",
-	[0x145] = "Disco Pad",
-	[0x146] = "Disco Pad",
+	[0x143] = "Troff 'n' Scoff Banana Count Pad (Diddy)",
+	[0x144] = "Troff 'n' Scoff Banana Count Pad (Lanky)",
+	[0x145] = "Troff 'n' Scoff Banana Count Pad (Chunky)",
+	[0x146] = "Troff 'n' Scoff Banana Count Pad (Tiny)",
 	[0x147] = "Metal thing",
 	[0x148] = "Metal thing",
 	[0x149] = "Metal thing",
@@ -1616,10 +1619,39 @@ local collisionTypes = { -- These seem to be the model 2 equivalent to the model
 	[0x167] = "Metal Red Switch",
 	[0x168] = "Metal Red Switch",
 	[0x169] = "Metal Red Switch",
-	[0x16A] = "Metal Blue Switch",
-	[0x16B] = "Metal Blue Switch",
-	[0x16C] = "Metal Blue Switch",
+	[0x16A] = "Simian Slam Switch (Chunky, Blue)",
+	[0x16B] = "Simian Slam Switch (Diddy, Blue)",
+	[0x16C] = "Simian Slam Switch (DK, Blue)",
+	[0x16D] = "Simian Slam Switch (Lanky, Blue)",
 
+	[0x170] = "Pendulum", -- Fungi Clock
+	[0x171] = "Weight", -- Fungi Clock
+	[0x172] = "Door", -- Fungi Clock
+	[0x173] = "Day Switch", -- Fungi Clock
+	[0x174] = "Night Switch", -- Fungi Clock
+	[0x175] = "Hands", -- Fungi Clock
+	[0x17B] = "Door", -- Fungi
+	[0x17C] = "Gate", -- Fungi, angled
+	[0x17D] = "Breakable Door", -- Fungi
+	[0x17E] = "Night Gate", -- Fungi, angled
+	[0x17F] = "Night Grate", -- Fungi
+
+	--[0x180] = "Unknown", -- Internal name is "minecart"
+	[0x181] = "Gate", -- Fungi, breakable
+	[0x182] = "Mill Pulley Mechanism", -- Fungi
+	[0x184] = "Water Wheel", -- Fungi
+	[0x185] = "Crusher", -- Fungi Mill
+	[0x186] = "Coveyor Belt",
+	[0x187] = "Night Gate",
+	[0x188] = "Question Mark Box", -- Factory Lobby, probably other places too
+	[0x18C] = "Door", -- Minecart
+
+	[0x196] = "DK Star", -- Baboon Blast
+
+	[0x1B5] = "Small Door", -- Fungi
+	[0x1B9] = "Door", -- Fungi
+
+	[0x1C1] = "Mushroom", -- Climbable, Fungi
 	[0x1C4] = "Simian Slam Switch (Any Kong?)", -- Mad Jack fight
 	[0x1C6] = "Battle Crown Pad",
 	[0x1C7] = "Seaweed",
@@ -1700,6 +1732,24 @@ local collisionTypes = { -- These seem to be the model 2 equivalent to the model
 	[0x213] = "Warp 2 Pad",
 	[0x214] = "Warp 1 Pad",
 
+	[0x221] = "Aztec Wall Section",
+	[0x228] = "+ Pad (Aztec Chunky Puzzle)",
+	[0x22C] = "Door", -- Caves Beetle Race
+
+	[0x234] = "Down Switch",
+
+	--[0x241] = "Unknown", -- Internal name is "torches"
+	[0x24C] = "Pound The X Platform", -- DK Isles
+
+	[0x253] = "Door (Llama Temple)", -- Aztec
+	[0x255] = "Metal Bars",
+
+	[0x266] = "Boulder", -- DK Isles, covering cannon to Fungi
+	[0x267] = "Boulder", -- DK Isles
+	[0x26B] = "Door", -- DK Isles, covering factory lobby, not solid
+	[0x26C] = "Platform", -- DK Isles, up to Factory Lobby
+	[0x26D] = "Propeller", -- K. Rool's Ship
+	[0x26E] = "K. Rool's Ship", -- DK Isles, Intro Story
 	[0x26F] = "Mad Jack Platform (White)",
 
 	[0x270] = "Mad Jack Platform (White)", -- Factory
@@ -1711,11 +1761,13 @@ local collisionTypes = { -- These seem to be the model 2 equivalent to the model
 	[0x276] = "Boxing Ring Corner (Green)",
 	[0x277] = "Boxing Ring Corner (Blue)",
 	[0x278] = "Boxing Ring Corner (Yellow)",
+	[0x279] = "Lightning Rod", -- Pufftoss Fight, DK Isles for some reason
 
 	[0x27C] = "Target", -- K. Rool Fight (Diddy Phase)
 	[0x27D] = "Spotlight", -- K. Rool Fight
 	--[0x27E] = "Crash?",
 	[0x27F] = "Vine", -- Unused?
+
 	[0x280] = "Director's Chair", -- Blooper Ending
 	[0x281] = "Spotlight", -- Blooper Ending
 	[0x282] = "Spotlight", -- Blooper Ending
@@ -1729,6 +1781,8 @@ local collisionTypes = { -- These seem to be the model 2 equivalent to the model
 
 	[0x290] = "Golden Banana", -- Not collectable?
 
+	[0x2A2] = "Rock", -- DK Isles, Covering Castle Cannon?
+	[0x2A3] = "K. Rool's Ship", -- DK Isles, Entrance to final fight
 	[0x2AC] = "Troff'n'Scoff Portal",
 	[0x2AD] = "Level Entry/Exit",
 	[0x2AE] = "K. Lumsy Key Indicator?",
@@ -2085,30 +2139,87 @@ function dumpModel2Positions()
 	end
 end
 
+local model1SetupSize = 0x38;
+local model1Setup = {
+	["x_pos"] = 0x00, -- Float
+	["y_pos"] = 0x04, -- Float
+	["z_pos"] = 0x08, -- Float
+	["scale"] = 0x0C, -- Float
+	["behavior"] = 0x32, -- Short, see obj_model1.actor_types table
+};
+
 local model2SetupSize = 0x30;
 local model2Setup = {
 	["x_pos"] = 0x00, -- Float
 	["y_pos"] = 0x04, -- Float
 	["z_pos"] = 0x08, -- Float
 	["scale"] = 0x0C, -- Float
-	["behavior"] = 0x28, -- Short, See collisionTypes table
+	["behavior"] = 0x28, -- Short, see collisionTypes table
 };
 
-function dumpSetup()
-	local setupFile = dereferencePointer(0x7F6010); -- TODO: Find on all versions
+function dumpSetup(hideKnown)
+	hideKnown = hideKnown or false;
+	local setupFile = dereferencePointer(Game.Memory.obj_model2_setup_pointer[version]);
 	if isRDRAM(setupFile) then
+		dprint("Dumping setup for Object Model 2...");
 		local model2Count = mainmemory.read_u32_be(setupFile);
+		local model2Base = setupFile + 0x04;
+		dprint("Base: "..toHexString(setupFile));
+		dprint("Count: "..model2Count);
+		dprint();
+
 		for i = 0, model2Count - 1 do
-			local xPos = mainmemory.readfloat(setupFile + 0x04 + i * model2SetupSize + model2Setup.x_pos, true);
-			local yPos = mainmemory.readfloat(setupFile + 0x04 + i * model2SetupSize + model2Setup.y_pos, true);
-			local zPos = mainmemory.readfloat(setupFile + 0x04 + i * model2SetupSize + model2Setup.z_pos, true);
-			local behavior = mainmemory.read_u16_be(setupFile + 0x04 + i * model2SetupSize + model2Setup.behavior);
+			local entryBase = model2Base + i * model2SetupSize;
+			local xPos = mainmemory.readfloat(entryBase + model2Setup.x_pos, true);
+			local yPos = mainmemory.readfloat(entryBase + model2Setup.y_pos, true);
+			local zPos = mainmemory.readfloat(entryBase + model2Setup.z_pos, true);
+			local behavior = mainmemory.read_u16_be(entryBase + model2Setup.behavior);
+			local known = false;
 			if type(collisionTypes[behavior]) == 'string' then
+				known = true;
 				behavior = collisionTypes[behavior];
 			else
 				behavior = toHexString(behavior);
 			end
-			dprint(behavior.." at "..xPos..", "..yPos..", "..zPos);
+			if not (known and hideKnown) then
+				dprint(toHexString(entryBase)..": "..behavior.." at "..round(xPos)..", "..round(yPos)..", "..round(zPos));
+			end
+		end
+
+		-- TODO: What to heck is this data used for?
+		-- It's a bunch of floats that get loaded in to model 2 behaviors as far as I can tell
+		local mysteryModelSize = 0x24;
+		local mysteryModelBase = model2Base + model2Count * model2SetupSize;
+		local mysteryModelCount = mainmemory.read_u32_be(mysteryModelBase);
+		dprint();
+		dprint("Dumping setup for 'mystery model'...");
+		dprint("Base: "..toHexString(mysteryModelBase));
+		dprint("Count: "..mysteryModelCount);
+
+		dprint();
+		dprint("Dumping setup for Object Model 1...");
+		local model1Base = mysteryModelBase + 0x04 + mysteryModelCount * mysteryModelSize;
+		local model1Count = mainmemory.read_u32_be(model1Base);
+		dprint("Base: "..toHexString(model1Base));
+		dprint("Count: "..model1Count);
+		dprint();
+
+		for i = 0, model1Count - 1 do
+			local entryBase = model1Base + 0x04 + i * model1SetupSize;
+			local xPos = mainmemory.readfloat(entryBase + model1Setup.x_pos, true);
+			local yPos = mainmemory.readfloat(entryBase + model1Setup.y_pos, true);
+			local zPos = mainmemory.readfloat(entryBase + model1Setup.z_pos, true);
+			local behavior = (mainmemory.read_u16_be(entryBase + model1Setup.behavior) + 0x10) % 0x10000;
+			local known = false;
+			if type(obj_model1.actor_types[behavior]) == 'string' then
+				known = true;
+				behavior = obj_model1.actor_types[behavior];
+			else
+				behavior = toHexString(behavior);
+			end
+			if not (known and hideKnown) then
+				dprint(toHexString(entryBase)..": "..behavior.." at "..round(xPos)..", "..round(yPos)..", "..round(zPos));
+			end
 		end
 		print_deferred();
 	end
@@ -2238,6 +2349,7 @@ function Game.detectVersion(romName, romHash)
 
 			[0x4F] = "Bananaporter",
 
+			[0x54] = "Climbing Tree",
 			[0x56] = "Grabbed Ledge",
 			[0x57] = "Pulling up on Ledge",
 			[0x58] = "Idle", -- Gun
