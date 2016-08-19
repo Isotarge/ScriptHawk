@@ -47,6 +47,7 @@ SystemID N64
 7A106C	d	h	1	RDRAM	Framebuffer Pointer (Copy)
 7A12C0	d	h	1	RDRAM	Backbone Pointer
 7A1E14	d	h	1	RDRAM	Camera Pointer
+7B17C4	d	h	1	RDRAM	Setup File Pointer
 7B5918	d	h	1	RDRAM	Camera Pointer
 7B5AFC	d	h	1	RDRAM	Player Pointer
 7B5B12	b	b	1	RDRAM	Zipper Byte

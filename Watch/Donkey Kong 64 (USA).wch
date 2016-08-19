@@ -40,7 +40,7 @@ SystemID N64
 04C71C	b	u	1	RDRAM	Jumpman Lives (HUD)
 46E680	b	u	1	RDRAM	Key 8 enabled
 4B2904	b	h	1	RDRAM	FF for voidout on main menu?!?
-678050	d	h	1	RDRAM	loadActor() function start
+678050	b	h	1	RDRAM	loadActor() function start?
 6E234B	b	h	1	RDRAM	Freeze at 3 for infinite shots out
 6E2492	w	h	1	RDRAM	Chunky Shot SFX
 6E24D6	w	h	1	RDRAM	Lanky Shot SFX
@@ -108,7 +108,8 @@ SystemID N64
 746820	d	u	1	RDRAM	Related to bone displacement
 746824	d	u	1	RDRAM	Related to bone displacement
 746A40	d	h	1	RDRAM	RNG
-7476F5	b	u	1	RDRAM	Cutscene
+7476F4	w	u	1	RDRAM	Cutscene
+747CD0	d	f	1	RDRAM	FOV
 74E77C	b	u	1	RDRAM	Character
 74E808	d	f	1	RDRAM	Rambi Walk Maximum Velocity
 74E8B0	d	h	1	RDRAM	Interesting block related to scripts
@@ -190,6 +191,13 @@ SystemID N64
 753798	d	f	1	RDRAM	Tiny Long Jump Initial Y Velocity
 75379C	d	f	1	RDRAM	Chunky Long Jump Initial Y Velocity
 7537A0	d	f	1	RDRAM	Krusha Long Jump Initial Y Velocity
+75388C	w	s	1	RDRAM	DK Water Surface Offset
+75388E	w	s	1	RDRAM	Diddy Water Surface Offset
+753890	w	s	1	RDRAM	Lanky Water Surface Offset
+753892	w	s	1	RDRAM	Tiny Water Surface Offset
+753894	w	s	1	RDRAM	Chunky Water Surface Offset
+753896	w	s	1	RDRAM	Krusha Water Surface Offset
+753898	w	s	1	RDRAM	Rambi Water Surface Offset
 753988	d	f	1	RDRAM	DK Surface Swim Terminal X Velocity
 75398C	d	f	1	RDRAM	Diddy Surface Swim Terminal X Velocity
 753990	d	f	1	RDRAM	Lanky Surface Swim Terminal X Velocity
@@ -300,6 +308,8 @@ SystemID N64
 7F09B4	d	h	1	RDRAM	Object Model 2 Collision Linked List Pointer
 7F09C8	d	h	1	RDRAM	Size 0x30 Linked List Pointer
 7F09DC	d	h	1	RDRAM	Size 0x1000 Texture Linked List Pointer
+7F5CE0	d	u	1	RDRAM	ISG Start Time Major
+7F5CE4	d	u	1	RDRAM	ISG Start Time Minor
 7F5CEC	w	u	1	RDRAM	Camera State Change Timer
 7F5CF0	w	h	1	RDRAM	Prev Camera State
 7F5CF2	w	h	1	RDRAM	Current Camera State
@@ -321,6 +331,7 @@ SystemID N64
 7FB968	d	h	1	RDRAM	Player 1 Camera Pointer
 7FBB35	b	u	1	RDRAM	Loaded Actor Count
 7FBB3D	b	u	1	RDRAM	Actor Index
+7FBB48	d	h	1	RDRAM	Player Pointer
 7FBB62	b	b	1	RDRAM	Zipper Bitfield
 7FBB63	b	b	1	RDRAM	TB Void Bitfield
 7FBB64	b	b	1	RDRAM	Shadow Display Bitfield
