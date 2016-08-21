@@ -22,10 +22,40 @@ Banjo-Kazooie Functions US 1.0
 0x802f7974 print??(???????) --print function need to look into what it prints and passed inputs
 0x802f79D0 print??(???????) --print function need to look into what it prints and passed inputs
 
-0x802fdaf4 DisplayItemIconAndCount(?????) --(Found by looking at function calls, and disabling) does not include lives and jiggies, Uses PrintItemValues()
+0x802fae1c $v0 S32 GetDisplayedItemQuanity($a0 u8 ItemOffset);
+	0x000C = Notes
+	0x000D = Eggs
+	0x000F = Red Feathers
+	0x0010 = Gold Feathers
 
-0x802fff34 DisplayLifeIconAndCount(?????) --(Found by looking at function calls, and disabling)Uses PrintItemValues()
+0x802fd360 DisplayItemIcon($a0 ?? ????, $a1 ?? ????, $a2 ?? ????, $a3 ?? ????)
 
+0x802fdaf4 DisplayItemIconAndCount($a0 s16 ItemOffset, $a1 ?? ????, $a2 ?? ????, $a3 ?? ????) --(Found by looking at function calls, and disabling) does not include lives and jiggies, Uses PrintItemValues()
+	0x000C = Notes
+	0x000D = Eggs
+	0x000F = Red Feathers
+	0x0010 = Gold Feathers
+
+
+0x802fff34 DisplayLifeIconAndCount(?????) --(Found by looki$ng at function calls, and disabling)Uses PrintItemValues()
+
+
+0x803046EEC $v0 u16 GetTotalOfNotesScores(void) --uses $a0, $t6-t9, $v0, $v1, but does not push to stack
+                      --Max Scores for each world stored as u8 at 0x80385FF1 to 0x80385FFE
+
+0x80321900 $v0 u8 GetCurrentLevel(void) --returns current level 
+	Return values: --stored at 0x80383301
+		0x01=MM
+        	0x02=TTC
+		0x03=CC
+		0x04=BGS
+		0x05=FP
+		0x06=Lair
+		0x07=GV
+		0x08=CCW
+		0x09=RBB
+		0x0A=MMM
+		0x0B=SM
 
 0x802F7B90 Unknown($a0 u8 Shade, $a1 u8 Shade)
 0x802FB0E4 --
