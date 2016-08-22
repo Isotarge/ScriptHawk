@@ -3829,12 +3829,12 @@ local function getBoneInfo(baseAddress)
 end
 
 local function outputBones(boneArrayBase, numBones)
-	dprint("Bone,X,Y,Z,ScaleX,ScaleY,ScaleZ,");
+	dprint("Bone,Index,X,Y,Z,ScaleX,ScaleY,ScaleZ,");
 	local boneInfoTables = {};
 	for i = 0, numBones - 1 do
 		local boneInfo = getBoneInfo(boneArrayBase + i * bone_size);
 		table.insert(boneInfoTables, boneInfo);
-		dprint(i..","..boneInfo["positionX"]..","..boneInfo["positionY"]..","..boneInfo["positionZ"]..","..boneInfo["scaleX"]..","..boneInfo["scaleY"]..","..boneInfo["scaleZ"]..",");
+		dprint(toHexString(boneArrayBase + i * bone_size)..","..i..","..boneInfo["positionX"]..","..boneInfo["positionY"]..","..boneInfo["positionZ"]..","..boneInfo["scaleX"]..","..boneInfo["scaleY"]..","..boneInfo["scaleZ"]..",");
 	end
 	print_deferred();
 	return boneInfoTables;
