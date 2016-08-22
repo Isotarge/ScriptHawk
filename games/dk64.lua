@@ -67,9 +67,9 @@ Game.Memory = {
 	["frames_real"] = {0x7F0560, 0x7F0480, 0x7F09D0, nil}, -- TODO: Make sure freezing these stalls the main thread -- TODO: Kiosk
 	["obj_model2_array_pointer"] = {0x7F6000, 0x7F5F20, 0x7F6470, 0x6F4470},
 	["obj_model2_array_count"] = {0x7F6004, 0x7F5F24, 0x7F6474, nil}, -- TODO: Kiosk
+	["obj_model2_setup_pointer"] = {0x7F6010, 0x7F5F30, 0x7F6480, 0x7B17C4},
 	["obj_model2_timer"] = {0x76A064, 0x764B84, 0x76A254, 0x72CDAC},
 	["obj_model2_collision_linked_list_pointer"] = {0x754244, 0x74E9A4, 0x753B34, 0x6FF054},
-	["obj_model2_setup_pointer"] = {0x7F6010, nil, nil, 0x7B17C4}, -- TODO: JP & PAL
 };
 
 Game.modes = {
@@ -605,6 +605,7 @@ obj_model1 = {
 		[138] = "B. Locker",
 		[139] = "Rainbow Coin Patch",
 		[140] = "Rainbow Coin",
+		[147] = "K. Rool Banana Balloon", -- TODO: This is the internal name, what to heck does this do? Maybe used in Lanky phase?
 		[148] = "Rope", -- K. Rool's Arena
 		[149] = "Banana Barrel", -- TODO: Lanky Phase?
 		[156] = "Wrinkly",

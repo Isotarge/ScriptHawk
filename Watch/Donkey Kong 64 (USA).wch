@@ -56,7 +56,7 @@ SystemID N64
 7444C0	b	u	1	RDRAM	Widescreen Toggle
 7444E4	d	u	1	RDRAM	Next Map
 7444E8	d	u	1	RDRAM	Next Exit
-744509	b	u	1	RDRAM	Enemies Killed
+744508	w	u	1	RDRAM	Enemies Killed
 744518	w	u	1	RDRAM	Arena Current Score
 74452C	b	u	1	RDRAM	Story skip
 744530	b	u	1	RDRAM	Chimpy Cam
@@ -247,9 +247,11 @@ SystemID N64
 755348	d	s	1	RDRAM	Helm Timer
 75534C	d	s	1	RDRAM	Initial Helm Time
 755350	b	u	1	RDRAM	Helm Timer Enabled
+757360	d	f	1	RDRAM	Object Model 1 Scale
 758C60	d	f	1	RDRAM	Map Scale
 758EC0	d	f	1	RDRAM	Pad Fake Floor Y
 758F10	d	f	1	RDRAM	Water Fake Floor Y
+759C80	d	f	1	RDRAM	Object Model 1 Scale (Double Precision)
 75C412	w	h	1	RDRAM	DK Behavior
 75C41A	w	h	1	RDRAM	DK Model
 75C422	w	h	1	RDRAM	Diddy Behavior
@@ -330,7 +332,9 @@ SystemID N64
 7FB960	d	h	1	RDRAM	Player 1 Pointer
 7FB968	d	h	1	RDRAM	Player 1 Camera Pointer
 7FBB35	b	u	1	RDRAM	Loaded Actor Count
-7FBB3D	b	u	1	RDRAM	Actor Index
+7FBB3C	w	u	1	RDRAM	Current Actor Index?
+7FBB3E	w	u	1	RDRAM	
+7FBB40	d	h	1	RDRAM	Current Actor Pointer?
 7FBB48	d	h	1	RDRAM	Player Pointer
 7FBB62	b	b	1	RDRAM	Zipper Bitfield
 7FBB63	b	b	1	RDRAM	TB Void Bitfield
@@ -338,6 +342,7 @@ SystemID N64
 7FBB65	b	b	1	RDRAM	Shockwave Bitfield
 7FBB66	b	b	1	RDRAM	Long Distance Actor Spawn
 7FC3F0	w	u	1	RDRAM	Actor Count
+7FC400	d	h	1	RDRAM	
 7FC930	w	u	1	RDRAM	Japes T&S CBs (Total)
 7FC932	w	u	1	RDRAM	Aztec T&S CBs (Total)
 7FC934	w	u	1	RDRAM	Factory T&S CBs (Total)
@@ -654,6 +659,7 @@ SystemID N64
 7FCC4B	b	u	1	RDRAM	Health
 7FCC4C	b	u	1	RDRAM	Melons
 7FD570	w	h	1	RDRAM	Transferred Actor Type
+7FD888	d	f	1	RDRAM	Loading Zone Fadeout Progress
 7FDC90	d	h	1	RDRAM	Boss pointer
 7FDCB0	w	u	1	RDRAM	Loading Zone Array Size
 7FDCB4	d	h	1	RDRAM	Loading Zone Array Pointer
