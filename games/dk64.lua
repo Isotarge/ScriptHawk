@@ -734,6 +734,7 @@ obj_model1 = {
 		[342] = "Try Again Dialog",
 		[343] = "Pause Menu", -- Mystery menu bosses
 	},
+	["interactable"] = 0x5C, -- u16 be, bitfield
 	-- 0000 0010 = Block playing instrument
 	["object_properties_bitfield_1"] = 0x60, -- TODO: Document & rename this, probably lump into a u32_be bitfield
 	-- 0001 0000 = collides with terrain
@@ -5456,12 +5457,15 @@ Game.OSD = Game.standardOSD;
 ---------------
 
 Game.supportsASMHacks = true;
-Game.ASMHookBase = 0x7494; -- TODO: Find a hook that works on real hardware -- TODO: Find a hook for all versions
-Game.ASMHook = {
-	0x3C, 0x08, 0x80, 0x7F, 0x35, 0x08, 0xF5, 0x00,
-	0x01, 0x00, 0x00, 0x08, 0x00, 0x00, 0x00, 0x00
-};
 Game.ASMCodeBase = 0x7FF500;
 Game.ASMMaxCodeSize = 0xAFF;
+
+Game.ASMHookBase = 0x7494; -- TODO: Find a hook that works on real hardware -- TODO: Find a hook for all versions
+Game.ASMHook = {
+	0x3C, 0x08, 0x80, 0x7F,
+	0x35, 0x08, 0xF5, 0x00,
+	0x01, 0x00, 0x00, 0x08,
+	0x00, 0x00, 0x00, 0x00
+};
 
 return Game;
