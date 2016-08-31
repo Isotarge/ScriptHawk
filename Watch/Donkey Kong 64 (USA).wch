@@ -48,6 +48,7 @@ SystemID N64
 6E250A	w	h	1	RDRAM	Tiny Shot SFX
 6E253A	w	h	1	RDRAM	DK Shot SFX
 6E256A	w	h	1	RDRAM	Diddy Shot SFX
+6EAC74	d	h	1	RDRAM	STVW Write, 0 to patch
 744470	d	h	1	RDRAM	Framebuffer Pointer
 744478	d	u	1	RDRAM	Current Lag Speed Boost
 74447C	b	u	1	RDRAM	Squish Screen (Left)
@@ -229,6 +230,7 @@ SystemID N64
 754F51	b	h	1	RDRAM	Main Menu Background Blue
 754F70	w	u	1	RDRAM	Main Menu Background X
 754F74	w	u	1	RDRAM	Main Menu Background Y
+755070	b	h	1	RDRAM	Intro Story is Playing
 7552E0	b	u	1	RDRAM	Security Byte
 7552F6	w	h	1	RDRAM	Player 1 Color
 7552FA	w	h	1	RDRAM	Player 2 Color
@@ -273,6 +275,9 @@ SystemID N64
 75C49A	w	h	1	RDRAM	Squawks Model
 75C4A2	w	h	1	RDRAM	Squawks Behavior
 75C4AA	w	h	1	RDRAM	Squawks Model
+75D16C	d	f	1	RDRAM	Feather Scale
+75D170	d	f	1	RDRAM	Coconut Scale
+75D174	d	f	1	RDRAM	Peanut Scale
 75EC28	w	h	1	RDRAM	Snide Behavior
 75EC2A	w	h	1	RDRAM	Snide Model
 75EC58	w	h	1	RDRAM	Klump Behavior
@@ -282,7 +287,7 @@ SystemID N64
 7654F4	d	h	1	RDRAM	Flag Block Pointer
 767CC4	d	u	1	RDRAM	Frames (Real)
 76A050	d	h	1	RDRAM	2D Renderer Array Pointer?
-76A064	d	u	1	RDRAM	Object Model 2 Timer
+76A064	d	u	1	RDRAM	Object Timer
 76A0A8	d	u	1	RDRAM	Current Map
 76A0AC	d	u	1	RDRAM	Current Exit
 76A0B1	b	h	1	RDRAM	Map State
