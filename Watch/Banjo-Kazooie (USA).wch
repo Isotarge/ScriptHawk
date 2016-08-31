@@ -71,6 +71,7 @@ SystemID N64
 364AD4	d	f	1	RDRAM	Wonderwing Movement Speed
 364AE0	d	f	1	RDRAM	Wonderwing Jump Height
 364AE4	d	f	1	RDRAM	Wonderwing Jump Gravity
+364D44	d	f	1	RDRAM	Surface Swimming Speed
 364D80	d	f	1	RDRAM	Walking Speed
 36A9B4	d	h	1	RDRAM	Pointer to linked list? of pointers
 36C4EC	w	u	1	RDRAM	Pause Menu Item 1 Y Position
@@ -89,6 +90,9 @@ SystemID N64
 37BF60	b	u	1	RDRAM	Player is on ground
 37BF61	b	u	1	RDRAM	Player is swimming
 37C004	d	f	1	RDRAM	Unknown Float
+37C010	d	h	1	RDRAM	
+37C014	d	h	1	RDRAM	
+37C018	d	h	1	RDRAM	Gameplay Camera ID
 37C0B0	d	f	1	RDRAM	Wading Boots Timer
 37C0B4	d	f	1	RDRAM	Wading Boots Timer (copy)
 37C0B8	d	f	1	RDRAM	Turbo Trainers Timer
@@ -98,6 +102,9 @@ SystemID N64
 37C0E0	d	h	1	RDRAM	Player Model Pointer?
 37C0E6	b	u	1	RDRAM	Player Transparancy
 37C0EC	d	f	1	RDRAM	Player Scale
+37C0F0	d	f	1	RDRAM	
+37C0F4	d	f	1	RDRAM	
+37C0F8	d	f	1	RDRAM	
 37C1D1	b	u	1	RDRAM	Standing on Fly Pad
 37C1D2	b	u	1	RDRAM	Standing on Shock Spring Pad
 37C2D3	b	u	1	RDRAM	Mumbo Transformation
@@ -125,6 +132,7 @@ SystemID N64
 37C6F8	d	f	1	RDRAM	Unknown Float
 37C6FC	d	f	1	RDRAM	Unknown Float
 37C714	d	h	1	RDRAM	Idle Movement Script
+37CA14	d	h	1	RDRAM	Roll Movement Script
 37D160	d	u	1	RDRAM	Previous Movement State
 37D164	d	u	1	RDRAM	Current Movement State
 37D23C	d	f	1	RDRAM	Eye State (Left)
@@ -134,8 +142,10 @@ SystemID N64
 37D2B7	b	u	1	RDRAM	Ground Pound Active
 37D2BA	b	u	1	RDRAM	Ground Pound Progress
 37D3A4	b	u	1	RDRAM	Talon Trot Skid State
+37D5A4	b	h	1	RDRAM	Roll Stuff
+37D5A5	b	h	1	RDRAM	Roll Stuff
 37D958	d	f	1	RDRAM	Camera X Position
-37D95C	d	f	1	RDRAM	Camera Y position
+37D95C	d	f	1	RDRAM	Camera Y Position
 37D960	d	f	1	RDRAM	Camera Z Position
 37D968	d	f	1	RDRAM	Camera Vertical Rotation
 37D96C	d	f	1	RDRAM	Camera Horizontal Rotation
@@ -190,8 +200,10 @@ SystemID N64
 3831EA	b	u	1	RDRAM	BB Active (Checksummed)
 3831EB	b	b	1	RDRAM	BB Type (Checksummed)
 3832E0	d	h	1	RDRAM	Honeycomb Bitfield
+383301	b	u	1	RDRAM	Current Level Index
 383328	b	h	1	RDRAM	Sandcastle Water State
 383384	d	f	1	RDRAM	Text Timer
+384480	d	f	1	RDRAM	
 384484	d	u	1	RDRAM	Game Time Scale Factor
 385F60	d	s	1	RDRAM	Notes (on hand)
 385F64	d	s	1	RDRAM	Eggs
