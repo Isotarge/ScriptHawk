@@ -1,9 +1,11 @@
 Banjo-Kazooie Functions US 1.0
 
-
 0x8023DB5C --unknown start
 
 0x8023E000 --unknown start
+
+0x8024BF94 SetFrameSkip(a0 value) sets dword 0x802808DC from register a0
+0x8024BFA0 GetFrameSkip() returns dword 0x802808DC in register v0, normally 2 but sometimes 3 eg. GV lobby
 
 0x8024E55C --Unknown Function (called with a0 0)
 
@@ -13,16 +15,24 @@ Banjo-Kazooie Functions US 1.0
 
 0x80265000 --unknown 
 
+0x802957F0 GetMovesUnlockedBitfield() loads dword 0x8037C3A0 into register v0
+0x80295864 SetMovesUnlockedBitfield(a0 value) writes register a0 to the moves bitfield at 0x8037C3A0
+
+0x802979A0 SetYVelocity(f12 value) writes register f12 to 0x8037C4BC (Y Velocity)
+0x80297AAC GetYVelocity() loads Y Velocity into register f0
+
+0x80297F98 GetXRotation() loads float 0x8037C540 (X Rotation) into register f0
+
 0x802F55D8 -- Does a lot with floats
 0x802F75C8
 0x802F7870 Print($a0 u8 XPosition, $a1 u8 YPosition, $a2 float TextSize, $a3 char[] Message) -- used for character parade????
 0x802F78C0 PrintItemValues($a0 u8 XPosition, $a1 u8 YPosition,$a2 char[] Message) -- Used to print item values 
-0x802F78fc PrintStaticCharacterTexts($a0 u8 XPosition, $a1 u8 YPosition,$a2 char[] Message) --used to print character's texts
-0x802f7938 print??(???????) --print function need to look into what it prints and passed inputs
-0x802f7974 print??(???????) --print function need to look into what it prints and passed inputs
-0x802f79D0 print??(???????) --print function need to look into what it prints and passed inputs
+0x802F78FC PrintStaticCharacterTexts($a0 u8 XPosition, $a1 u8 YPosition,$a2 char[] Message) --used to print character's texts
+0x802F7938 print??(???????) --print function need to look into what it prints and passed inputs
+0x802F7974 print??(???????) --print function need to look into what it prints and passed inputs
+0x802F79D0 print??(???????) --print function need to look into what it prints and passed inputs
 
-0x802fae1c $v0 S32 GetDisplayedItemQuanity($a0 u8 ItemOffset);
+0x802FAE1C $v0 S32 GetDisplayedItemQuanity($a0 u8 ItemOffset);
 	0x000C = Notes
 	0x000D = Eggs
 	0x000F = Red Feathers
@@ -36,9 +46,7 @@ Banjo-Kazooie Functions US 1.0
 	0x000F = Red Feathers
 	0x0010 = Gold Feathers
 
-
 0x802fff34 DisplayLifeIconAndCount(?????) --(Found by looki$ng at function calls, and disabling)Uses PrintItemValues()
-
 
 0x803046EEC $v0 u16 GetTotalOfNotesScores(void) --uses $a0, $t6-t9, $v0, $v1, but does not push to stack
                       --Max Scores for each world stored as u8 at 0x80385FF1 to 0x80385FFE
@@ -46,7 +54,7 @@ Banjo-Kazooie Functions US 1.0
 0x80321900 $v0 u8 GetCurrentLevel(void) --returns current level 
 	Return values: --stored at 0x80383301
 		0x01=MM
-        	0x02=TTC
+        0x02=TTC
 		0x03=CC
 		0x04=BGS
 		0x05=FP
@@ -65,17 +73,13 @@ Banjo-Kazooie Functions US 1.0
 		0xF0 Shadow BG Texture Pointer
 		0xF4 Shadow Context Pointer
 		0x169 Shading byte 0xFF = fully lit 0x00 = black
-0x8033D884 --
+0x8033D884 IToA(?)
 0x8033D8A4 IToA($a0 char[]* dest, $a1 u32 source, 16 radix)
 0x8033DD9C
 0x8032813C SpawnActor(u16 id, float[] position)
 
 Functions called when collecting note
-8023F68C
-80287294
 8028BA2C
 80297AB8
 802F3670
 802F379C
-
-0C0C4BE2
