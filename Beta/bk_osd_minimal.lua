@@ -15,6 +15,7 @@ local Game = {
 		["moving_angle"] = {0x37D064, 0x37D194, 0x37B894, 0x37C694},
 		["z_rotation"] = {0x37D050, 0x37D180, 0x37B880, 0x37C680},
 		["current_movement_state"] = {0x37DB34, 0x37DC64, 0x37C364, 0x37D164},
+		["object_array_pointer"] = {0x36EAE0, 0x36F260, 0x36D760, 0x36E560},
 	},
 };
 
@@ -30,6 +31,26 @@ elseif ROMHash == "1FE1632098865F639E22C11B9A81EE8F29C75D7A" then -- US 1.0
 else
 	print("This game is not supported.");
 	return false;
+end
+
+RDRAMBase = 0x80000000;
+RDRAMSize = 0x800000; -- Halved with no expansion pak
+
+-- Dereferences a N64 RDRAM pointer
+-- Returns the RDRAM address pointed to if it's a valid pointer
+-- Returns nil if invalid
+function dereferencePointer(address)
+	if type(address) == "number" and address >= 0 and address < (RDRAMSize - 4) then
+		address = mainmemory.read_u32_be(address);
+		if address >= RDRAMBase and address < RDRAMBase + RDRAMSize then
+			return address - RDRAMBase;
+		end
+	end
+end
+
+-- Checks whether a value falls within N64 RDRAM
+function isRDRAM(value)
+	return type(value) == "number" and value >= 0 and value < RDRAMSize;
 end
 
 local precision = 3;
@@ -234,6 +255,80 @@ function Game.getCurrentMovementState()
 	return "Unknown ("..currentMovementState..")";
 end
 
+local gruntyStates = {
+	[0x1C4] = "Flying", -- Intro
+	[0x1C5] = "Flying", -- Intro
+
+	[0x257] = "Green Spell", -- Flying
+	[0x258] = "Hurt",
+	[0x259] = "Hurt",
+	[0x25A] = "Fireball Spell", -- Flying
+
+	[0x25C] = "Swooping",
+	[0x25D] = "Recovering",
+	[0x25E] = "Vulnerable",
+	[0x25F] = "Standing",
+	[0x260] = "Fireball Spell", -- Landed
+	[0x261] = "Green Spell", -- Landed
+	[0x263] = "Fall off Broom",
+	-- [0x266] = "Grunty/Falling down tower", -- TODO: What is this?
+	-- [0x267] = "Grunty?", -- TODO: What is this?
+};
+
+local slot_base = 0x08;
+local slot_size = 0x180;
+local max_slots = 0x100;
+
+function getSlotBase(index)
+	return slot_base + index * slot_size;
+end
+
+local gruntyPosition = {
+	["x"] = 0,
+	["y"] = 0,
+	["z"] = 0,
+	["facing"] = 0,
+};
+
+function Game.getGruntyXPosition()
+	return gruntyPosition.x;	
+end
+
+function Game.getGruntyYPosition()
+	return gruntyPosition.y;
+end
+
+function Game.getGruntyZPosition()
+	return gruntyPosition.z;
+end
+
+function Game.getGruntyFacingAngle()
+	return gruntyPosition.facing;
+end
+
+function Game.getGruntyState()
+	local numSlots = 0;
+	local levelObjectArray = dereferencePointer(Game.Memory.object_array_pointer[Game.version]);
+	if isRDRAM(levelObjectArray) then
+		numSlots = math.min(max_slots, mainmemory.read_u32_be(levelObjectArray));
+	end
+	for i = numSlots, 1, -1 do
+		local currentSlotBase = levelObjectArray + getSlotBase(i);
+		local animationObjectPointer = dereferencePointer(currentSlotBase + 0x14);
+		if isRDRAM(animationObjectPointer) then
+			animationType = mainmemory.read_u32_be(animationObjectPointer + 0x38);
+			if type(gruntyStates[animationType]) == "string" then
+				gruntyPosition.x = mainmemory.readfloat(currentSlotBase + 0x04, true);
+				gruntyPosition.y = mainmemory.readfloat(currentSlotBase + 0x08, true);
+				gruntyPosition.z = mainmemory.readfloat(currentSlotBase + 0x0C, true);
+				gruntyPosition.facing = mainmemory.readfloat(currentSlotBase + 0x50, true);
+				return gruntyStates[animationType];
+			end
+		end
+	end
+	return "Unknown";
+end
+
 local OSD = {
 	{"X", Game.getXPosition},
 	{"Y", Game.getYPosition},
@@ -248,6 +343,13 @@ local OSD = {
 	{"Movement", Game.getCurrentMovementState},
 	{"On Ground", Game.getGroundState},
 	{"Slope Timer", Game.getSlopeTimer},
+	{"Separator", 1},
+	{"Grunty State", Game.getGruntyState},
+	{"Separator", 1},
+	{"Grunty X", Game.getGruntyXPosition},
+	{"Grunty Y", Game.getGruntyYPosition},
+	{"Grunty Z", Game.getGruntyZPosition},
+	{"Grunty Facing", Game.getGruntyFacingAngle},
 };
 
 local function drawOSD()
