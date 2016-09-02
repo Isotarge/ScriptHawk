@@ -1,5 +1,5 @@
 #ScriptHawk
-A collection of Lua scripts and RAM watches for [BizHawk](https://github.com/TASVideos/BizHawk) providing many tools to assist with Glitch Hunting and TASing. ScriptHawk's Modular API allows new games to be supported easily.
+A collection of Lua scripts and RAM watches for [BizHawk](https://github.com/TASVideos/BizHawk) providing many tools to assist with Glitch Hunting and [TASing](http://tasvideos.org). ScriptHawk's Modular API allows new games to be supported easily.
 
 ##How to use
 ###Setup
@@ -22,7 +22,7 @@ A collection of Lua scripts and RAM watches for [BizHawk](https://github.com/TAS
 ##Supported Games
 ###Donkey Kong 64
 - All known versions supported
-- [Object analysis tools](../master/Docs/Object%20Analysis%20Tools.txt): List, Examine, Grab, Focus, Encircle, Zip
+- [Object analysis tools](Docs/Object%20Analysis%20Tools.txt): List, Examine, Grab, Focus, Encircle, Zip
 - [Bone displacement](http://bombch.us/Bn1C) fix (disables audio)
 - Documentation of over 95% of permanent flags in USA save files
 - Mad Jack minimap
@@ -35,7 +35,7 @@ A collection of Lua scripts and RAM watches for [BizHawk](https://github.com/TAS
 ###Banjo-Kazooie
 - All known versions supported
 - Spawn objects (currently USA 1.0 only)
-- [Object analysis tools](../master/Docs/Object%20Analysis%20Tools.txt): List, Examine, Encircle, Zip
+- [Object analysis tools](Docs/Object%20Analysis%20Tools.txt): List, Examine, Encircle, Zip
 
 ![Banjo-Kazooie Support](Images/Promo/bk_ui.png)
 
@@ -47,14 +47,14 @@ A collection of Lua scripts and RAM watches for [BizHawk](https://github.com/TAS
 
 ###Diddy Kong Racing
 - All known versions supported
-- [Object analysis tools](../master/Docs/Object%20Analysis%20Tools.txt): List, Examine, Encircle, Zip
+- [Object analysis tools](Docs/Object%20Analysis%20Tools.txt): List, Examine, Encircle, Zip
 - Autotapper, written by [Faschz](https://twitter.com/Faschz) with various improvements
 
 ![DKR Support](Images/Promo/dkr_ui.png)
 
 ###Super Mario 64
 - All known versions supported
-- [Object analysis tools](../master/Docs/Object%20Analysis%20Tools.txt): List, Examine
+- [Object analysis tools](Docs/Object%20Analysis%20Tools.txt): List, Examine
 
 ###Toy Story 2: Buzz Lightyear to the Rescue
 - Europe (N64)
@@ -83,7 +83,7 @@ While ScriptHawk does have basic support for OoT and MM there are people who are
 - Legend of Galahad object viewer, written by [The8bitbeast](https://twitter.com/the8bitbeast)
 - Wonder Boy III RNG watch, written by [The8bitbeast](https://twitter.com/the8bitbeast)
 
-##Other Notable BizHawk + Lua Repositories
+##Other Notable BizHawk + Lua Projects
 - GoldenEye [Wyst3r/GoldenEye](https://bitbucket.org/Wyst3r/bizhawklua)
 - Mario Kart 64 [weatherton/BizHawkMarioKart64](https://github.com/weatherton/BizHawkMarioKart64)
 - Super Mario World [rodamaral/smw-tas](https://github.com/rodamaral/smw-tas)
