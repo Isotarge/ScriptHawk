@@ -87,6 +87,7 @@ SystemID N64
 371F00	b	h	1	RDRAM	MM Demo Input File Index
 371F06	b	h	1	RDRAM	CC Demo Input File Index
 378FA8	d	f	1	RDRAM	Game Speed
+37BF20	d	h	1	RDRAM	Player Animation Pointer
 37BF60	b	u	1	RDRAM	Player is on ground
 37BF61	b	u	1	RDRAM	Player is swimming
 37C004	d	f	1	RDRAM	Unknown Float

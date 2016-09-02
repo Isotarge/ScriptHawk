@@ -1,0 +1,18 @@
+SystemID SMS
+0191	b	u	0	Main RAM	Enemy 1 HP
+01A0	b	u	0	Main RAM	Level
+0210	b	u	0	Main RAM	Y-Position (on screen)
+0211	b	u	0	Main RAM	X-Position (on screen)
+0222	b	u	0	Main RAM	HP Left
+0223	b	u	0	Main RAM	Strength
+0224	b	u	0	Main RAM	Defense
+0225	w	u	0	Main RAM	Gold
+0227	w	u	0	Main RAM	EXP
+022A	b	u	0	Main RAM	HP Total
+0480	b	u	0	Main RAM	Enemy 1 Y-Position
+0481	b	u	0	Main RAM	Enemy 1 X-Position
+04C2	b	u	0	Main RAM	Enemy 2 HP
+04E0	b	u	0	Main RAM	Enemy 2 Y-Position
+04E1	b	u	0	Main RAM	Enemy 2 X-Position
+04F2	b	u	0	Main RAM	Enemy 3 HP
+

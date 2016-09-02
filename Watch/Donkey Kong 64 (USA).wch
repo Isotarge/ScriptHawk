@@ -245,6 +245,7 @@ SystemID N64
 755320	d	u	1	RDRAM	Frames in current demo
 755328	b	u	1	RDRAM	DK TV Counter
 75532C	b	u	1	RDRAM	DK Rap Fadeout Counter
+755338	d	h	1	RDRAM	Play CS 1 Next Map Load
 755340	d	u	1	RDRAM	Helm Timer Start Time Major
 755344	d	u	1	RDRAM	Helm Timer Start Time Minor
 755348	d	s	1	RDRAM	Helm Timer
@@ -291,6 +292,7 @@ SystemID N64
 76A0A8	d	u	1	RDRAM	Current Map
 76A0AC	d	u	1	RDRAM	Current Exit
 76A0B1	b	h	1	RDRAM	Map State
+76A0B3	b	h	1	RDRAM	Cutscene Bar State
 76A0CD	b	u	1	RDRAM	Adventure
 76A0DA	b	h	1	RDRAM	Mystery Menu
 76AEF3	b	h	1	RDRAM	Previous Map
