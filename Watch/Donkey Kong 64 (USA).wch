@@ -16,6 +16,8 @@ SystemID N64
 014DDC	d	h	1	RDRAM	Controller Input P4
 014DDE	b	s	1	RDRAM	Joystick X (P4)
 014DDF	b	s	1	RDRAM	Joystick Y (P4)
+014FE4	d	u	1	RDRAM	COUNT Register
+014FE8	d	u	1	RDRAM	COUNT Register
 029BA0	d	h	1	RDRAM	FFA Renderer Pointer
 02EC50	d	s	1	RDRAM	Jetpac Score
 02F050	d	f	1	RDRAM	Jetman X Position
@@ -64,7 +66,7 @@ SystemID N64
 744530	b	u	1	RDRAM	Chimpy Cam
 744538	b	u	1	RDRAM	Monkey Smash Map
 744540	b	h	1	RDRAM	Cheat Menu Index
-744544	b	h	1	RDRAM	Debug Pos Toggle (doesn't display)
+744544	w	b	1	RDRAM	Cheats Enabled Bitfield
 744548	w	s	1	RDRAM	Rambi Score 1
 74454A	d	h	1	RDRAM	Rambi Score 1 Name
 74454E	w	u	1	RDRAM	Rambi Score 2
