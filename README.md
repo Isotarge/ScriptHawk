@@ -22,7 +22,7 @@ A collection of Lua scripts and RAM watches for [BizHawk](https://github.com/TAS
 ##Supported Games
 ###Donkey Kong 64
 - All known versions supported
-- [Object analysis tools](../blob/master/Docs/Object%20Analysis%20Tools.txt): List, Examine, Grab, Focus, Encircle, Zip
+- [Object analysis tools](../master/Docs/Object%20Analysis%20Tools.txt): List, Examine, Grab, Focus, Encircle, Zip
 - [Bone displacement](http://bombch.us/Bn1C) fix (disables audio)
 - Documentation of over 95% of permanent flags in USA save files
 - Mad Jack minimap
@@ -35,7 +35,7 @@ A collection of Lua scripts and RAM watches for [BizHawk](https://github.com/TAS
 ###Banjo-Kazooie
 - All known versions supported
 - Spawn objects (currently USA 1.0 only)
-- [Object analysis tools](../blob/master/Docs/Object%20Analysis%20Tools.txt): List, Examine, Encircle, Zip
+- [Object analysis tools](../master/Docs/Object%20Analysis%20Tools.txt): List, Examine, Encircle, Zip
 
 ![Banjo-Kazooie Support](Images/Promo/bk_ui.png)
 
@@ -47,14 +47,14 @@ A collection of Lua scripts and RAM watches for [BizHawk](https://github.com/TAS
 
 ###Diddy Kong Racing
 - All known versions supported
-- [Object analysis tools](../blob/master/Docs/Object%20Analysis%20Tools.txt): List, Examine, Encircle, Zip
+- [Object analysis tools](../master/Docs/Object%20Analysis%20Tools.txt): List, Examine, Encircle, Zip
 - Autotapper, written by [Faschz](https://twitter.com/Faschz) with various improvements
 
 ![DKR Support](Images/Promo/dkr_ui.png)
 
 ###Super Mario 64
 - All known versions supported
-- [Object analysis tools](../blob/master/Docs/Object%20Analysis%20Tools.txt): List, Examine
+- [Object analysis tools](../master/Docs/Object%20Analysis%20Tools.txt): List, Examine
 
 ###Toy Story 2: Buzz Lightyear to the Rescue
 - Europe (N64)
