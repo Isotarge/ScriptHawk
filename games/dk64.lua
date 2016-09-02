@@ -826,7 +826,7 @@ obj_model1 = {
 		[0x35] = "Damaged", -- Klump knockback
 		[0x36] = "Death",
 		[0x37] = "Damaged", -- Underwater
-		--[0x38] = "Crash",
+		[0x38] = "Damaged", -- Vehicle (Boat?)
 		[0x39] = "Shrinking",
 		[0x3C] = "Crouching",
 		[0x3D] = "Uncrouching",
@@ -873,6 +873,7 @@ obj_model1 = {
 		[0x66] = "Damaged", -- Exploding TNT Barrels
 		[0x67] = "Instrument",
 
+		[0x69] = "Car", -- Race
 		[0x6A] = "Learning Gun",
 		[0x6B] = "Locked", -- Bonus barrel
 		[0x6C] = "Feeding T&S",
@@ -1373,7 +1374,7 @@ local collisionTypes = { -- These seem to be the model 2 equivalent to the model
 	[0x7E] = "Bamboo Gate",
 	[0x7F] = "-",
 
-	[0x80] = "Tree",
+	[0x80] = "Tree Stump",
 	[0x81] = "Breakable Hut", -- Japes
 	[0x82] = "Mountain Bridge", -- Japes
 	[0x83] = "Tree Stump", -- Japes
@@ -1639,7 +1640,7 @@ local collisionTypes = { -- These seem to be the model 2 equivalent to the model
 	[0x17F] = "Night Grate", -- Fungi
 
 	--[0x180] = "Unknown", -- Internal name is "minecart"
-	[0x181] = "Gate", -- Fungi, breakable
+	[0x181] = "Metal Grate", -- Fungi, breakable, well
 	[0x182] = "Mill Pulley Mechanism", -- Fungi
 	[0x184] = "Water Wheel", -- Fungi
 	[0x185] = "Crusher", -- Fungi Mill
