@@ -104,7 +104,7 @@ function toBinaryString(num, bits) -- TODO: Properly define behavior for negativ
 		return "0";
 	end
 	bits = bits or select(2, math.frexp(num));
-	local t = {};       
+	local t = {};
 	for b = bits, 1, -1 do
 		t[b] = math.fmod(num, 2);
 		num = (num - t[b]) / 2;

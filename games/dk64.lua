@@ -4719,7 +4719,7 @@ local function drawGrabScriptUI()
 	local green_highlight = 0xFF00FF00;
 	local yellow_highlight = 0xFFFFFF00;
 
-	gui.text(gui_x, gui_y + height * row, "Mode: "..grab_script_mode, nil, nil, 'bottomright'); -- Exception here in interim
+	gui.text(gui_x, gui_y + height * row, "Mode: "..grab_script_mode, nil, 'bottomright');
 	row = row + 1;
 
 	local playerObject = Game.getPlayerObject();
@@ -4760,11 +4760,11 @@ local function drawGrabScriptUI()
 	end
 
 	if stringContains(grab_script_mode, "Model 2") then
-		gui.text(gui_x, gui_y + height * row, "Array Size: "..getObjectModel2ArraySize(), nil, nil, 'bottomright');
+		gui.text(gui_x, gui_y + height * row, "Array Size: "..getObjectModel2ArraySize(), nil, 'bottomright');
 		row = row + 1;
 	end
 
-	gui.text(gui_x, gui_y + height * row, "Index: "..object_index.."/"..#object_pointers, nil, nil, 'bottomright');
+	gui.text(gui_x, gui_y + height * row, "Index: "..object_index.."/"..#object_pointers, nil, 'bottomright');
 	row = row + 1;
 
 	if stringContains(grab_script_mode, "Model 1") then
@@ -4783,11 +4783,11 @@ local function drawGrabScriptUI()
 		end
 
 		-- Display which object the camera is currently focusing on
-		gui.text(gui_x, gui_y + height * row, "Focused Actor: "..toHexString(focusedActor, 6).." "..focusedActorType, nil, nil, 'bottomright');
+		gui.text(gui_x, gui_y + height * row, "Focused Actor: "..toHexString(focusedActor, 6).." "..focusedActorType, nil, 'bottomright');
 		row = row + 1;
 
 		-- Display which object is grabbed
-		gui.text(gui_x, gui_y + height * row, "Grabbed Actor: "..toHexString(grabbedActor, 6).." "..grabbedActorType, nil, nil, 'bottomright');
+		gui.text(gui_x, gui_y + height * row, "Grabbed Actor: "..toHexString(grabbedActor, 6).." "..grabbedActorType, nil, 'bottomright');
 		row = row + 1;
 	end
 
@@ -4812,7 +4812,7 @@ local function drawGrabScriptUI()
 					if type(examine_data[i][2]) == "number" then
 						examine_data[i][2] = round(examine_data[i][2], precision);
 					end
-					gui.text(gui_x, gui_y + height * row, examine_data[i][1]..": "..examine_data[i][2], nil, nil, 'bottomright');
+					gui.text(gui_x, gui_y + height * row, examine_data[i][1]..": "..examine_data[i][2], nil, 'bottomright');
 					row = row + 1;
 				else
 					row = row + examine_data[i][2];
@@ -4831,7 +4831,7 @@ local function drawGrabScriptUI()
 				if object_pointers[i] == playerObject then
 					color = green_highlight;
 				end
-				gui.text(gui_x, gui_y + height * row, i..": "..getActorName(object_pointers[i]).." "..toHexString(object_pointers[i] or 0, 6).." ("..toHexString(currentActorSize)..")", color, nil, 'bottomright');
+				gui.text(gui_x, gui_y + height * row, i..": "..getActorName(object_pointers[i]).." "..toHexString(object_pointers[i] or 0, 6).." ("..toHexString(currentActorSize)..")", color, 'bottomright');
 				row = row + 1;
 			end
 		end
@@ -4855,7 +4855,7 @@ local function drawGrabScriptUI()
 				end
 
 				if not (behaviorPointer == "" and hide_non_scripted) then
-					gui.text(gui_x, gui_y + height * row, i..": "..toHexString(object_pointers[i] or 0, 6)..behaviorType..behaviorPointer, color, nil, 'bottomright');
+					gui.text(gui_x, gui_y + height * row, i..": "..toHexString(object_pointers[i] or 0, 6)..behaviorType..behaviorPointer, color, 'bottomright');
 					row = row + 1;
 				end
 			end
@@ -4884,13 +4884,13 @@ local function drawGrabScriptUI()
 							destinationMap = "Unknown Map "..toHexString(destinationMap);
 						end
 						local destinationExit = mainmemory.read_u16_be(base + loading_zone_fields.destination_exit);
-						gui.text(gui_x, gui_y + height * row, destinationMap.." ("..destinationExit..") "..toHexString(base or 0, 6).." "..i, color, nil, 'bottomright');
+						gui.text(gui_x, gui_y + height * row, destinationMap.." ("..destinationExit..") "..toHexString(base or 0, 6).." "..i, color, 'bottomright');
 						row = row + 1;
 					elseif stringContains(_type, "Cutscene Trigger") then
-						gui.text(gui_x, gui_y + height * row, _type.." ("..mainmemory.read_u16_be(base + loading_zone_fields.destination_map)..") "..toHexString(base or 0, 6).." "..i, color, nil, 'bottomright');
+						gui.text(gui_x, gui_y + height * row, _type.." ("..mainmemory.read_u16_be(base + loading_zone_fields.destination_map)..") "..toHexString(base or 0, 6).." "..i, color, 'bottomright');
 						row = row + 1;
 					else
-						gui.text(gui_x, gui_y + height * row, _type.." "..toHexString(base or 0, 6).." "..i, color, nil, 'bottomright');
+						gui.text(gui_x, gui_y + height * row, _type.." "..toHexString(base or 0, 6).." "..i, color, 'bottomright');
 						row = row + 1;
 					end
 				end
@@ -5208,9 +5208,9 @@ function Game.realTime()
 	if timer_started then
 		local s = timer_value / 60;
 		local timer_string = string.format("%.2d:%05.2f", s / 60 % 60, s % 60);
-		gui.text(16, 16, "ISG Timer: "..timer_string, nil, nil, 'topright');
+		gui.text(16, 16, "ISG Timer: "..timer_string, nil, 'topright');
 	else
-		--gui.text(16, 16, "Waiting for ISG", nil, nil, 'topright');
+		--gui.text(16, 16, "Waiting for ISG", nil, 'topright');
 	end
 end
 

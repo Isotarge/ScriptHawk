@@ -751,7 +751,7 @@ function drawAnalysisToolsOSD()
 	local row = 0;
 	local playerObject = dereferencePointer(player_object_pointer);
 
-	gui.text(Game.OSDPosition[1], 0 + Game.OSDRowHeight * row, "Index: "..object_index.."/"..#currentPointers, nil, nil, 'bottomright');
+	gui.text(Game.OSDPosition[1], 0 + Game.OSDRowHeight * row, "Index: "..object_index.."/"..#currentPointers, nil, 'bottomright');
 	row = row + 1;
 
 	if grab_script_mode == "List" then
@@ -765,7 +765,7 @@ function drawAnalysisToolsOSD()
 			if currentPointers[i] == playerObject then
 				color = green_highlight;
 			end
-			gui.text(Game.OSDPosition[1], 0 + Game.OSDRowHeight * row, i..": "..getObjectName(currentPointers[i]).." "..toHexString(currentPointers[i] or 0, 6), color, nil, 'bottomright');
+			gui.text(Game.OSDPosition[1], 0 + Game.OSDRowHeight * row, i..": "..getObjectName(currentPointers[i]).." "..toHexString(currentPointers[i] or 0, 6), color, 'bottomright');
 			row = row + 1;
 		end
 	end
@@ -777,7 +777,7 @@ function drawAnalysisToolsOSD()
 				if type(examine_data[i][2]) == "number" then
 					examine_data[i][2] = round(examine_data[i][2], precision);
 				end
-				gui.text(Game.OSDPosition[1], 0 + Game.OSDRowHeight * row, examine_data[i][2].." - "..examine_data[i][1], nil, nil, 'bottomright');
+				gui.text(Game.OSDPosition[1], 0 + Game.OSDRowHeight * row, examine_data[i][2].." - "..examine_data[i][1], nil, 'bottomright');
 				row = row + 1;
 			else
 				row = row + examine_data[i][2];

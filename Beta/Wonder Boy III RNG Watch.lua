@@ -32,7 +32,7 @@ function draw_ui()
 		if slot[i] % 8 == 7 or (slot[i] % 8 == 6 and ((slot[i] < 0x80 and slot[i] > 0x3F) or (slot[i] > 0xBF))) then
 			crit = " (crit)";
 		end
-		gui.text(gui_x, gui_y + height * row, bizstring.hex(slotAddress[i])..": "..bizstring.hex(slot[i])..crit, nil, nil, 'topleft');
+		gui.text(gui_x, gui_y + height * row, bizstring.hex(slotAddress[i])..": "..bizstring.hex(slot[i])..crit, nil, 'topleft');
 		row = row + 1;
 	end
 end

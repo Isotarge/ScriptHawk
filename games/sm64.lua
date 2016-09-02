@@ -272,7 +272,7 @@ function drawObjectViewerOSD()
 				if type(examine_data[i][2]) == "number" then
 					examine_data[i][2] = round(examine_data[i][2], precision);
 				end
-				gui.text(gui_x, gui_y + height * row, examine_data[i][2].." - "..examine_data[i][1], nil, nil, 'bottomright');
+				gui.text(gui_x, gui_y + height * row, examine_data[i][2].." - "..examine_data[i][1], nil, 'bottomright');
 				row = row + 1;
 			else
 				row = row + examine_data[i][2];

@@ -1708,16 +1708,16 @@ function draw_ui() -- TODO: Refactor to something about object analysis tools
 	end
 	local numSlots = getNumSlots();
 
-	gui.text(Game.OSDPosition[1], 2 + Game.OSDRowHeight * row, "Mode: "..script_mode, nil, nil, 'bottomright');
+	gui.text(Game.OSDPosition[1], 2 + Game.OSDRowHeight * row, "Mode: "..script_mode, nil, 'bottomright');
 	row = row + 1;
-	gui.text(Game.OSDPosition[1], 2 + Game.OSDRowHeight * row, "Index: "..(object_index).."/"..(numSlots), nil, nil, 'bottomright');
+	gui.text(Game.OSDPosition[1], 2 + Game.OSDRowHeight * row, "Index: "..(object_index).."/"..(numSlots), nil, 'bottomright');
 	row = row + 1;
 
 	if script_mode == "Examine" and isRDRAM(objectArray) then
 		local examine_data = getExamineData(objectArray + getSlotBase(object_index));
 		for i = #examine_data, 1, -1 do
 			if examine_data[i][1] ~= "Separator" then
-				gui.text(Game.OSDPosition[1], 2 + Game.OSDRowHeight * row, examine_data[i][2].." - "..examine_data[i][1], nil, nil, 'bottomright');
+				gui.text(Game.OSDPosition[1], 2 + Game.OSDRowHeight * row, examine_data[i][2].." - "..examine_data[i][1], nil, 'bottomright');
 				row = row + 1;
 			else
 				row = row + examine_data[i][2];
@@ -1730,7 +1730,7 @@ function draw_ui() -- TODO: Refactor to something about object analysis tools
 			local structData = getStructData(structArray + object_index * struct_slot_size)
 			for i = #structData, 1, -1 do
 				if structData[i][1] ~= "Separator" then
-					gui.text(Game.OSDPosition[1], 2 + Game.OSDRowHeight * row, structData[i][2].." - "..structData[i][1], nil, nil, 'bottomright');
+					gui.text(Game.OSDPosition[1], 2 + Game.OSDRowHeight * row, structData[i][2].." - "..structData[i][1], nil, 'bottomright');
 					row = row + 1;
 				else
 					row = row + structData[i][2];
@@ -1763,11 +1763,11 @@ function draw_ui() -- TODO: Refactor to something about object analysis tools
 				local boneArray1 = dereferencePointer(currentSlotBase + 0x14C); -- TODO: Get this constant from variable name somehow
 				local boneArray2 = dereferencePointer(currentSlotBase + 0x150);
 				if not hide_non_animated or (isRDRAM(boneArray1) or isRDRAM(boneArray2)) then
-					gui.text(Game.OSDPosition[1], 2 + Game.OSDRowHeight * row, i..": "..toHexString(currentSlotBase or 0), color, nil, 'bottomright');
+					gui.text(Game.OSDPosition[1], 2 + Game.OSDRowHeight * row, i..": "..toHexString(currentSlotBase or 0), color, 'bottomright');
 					row = row + 1;
 				end
 			else
-				gui.text(Game.OSDPosition[1], 2 + Game.OSDRowHeight * row, animationType.." "..i..": "..toHexString(currentSlotBase or 0), color, nil, 'bottomright');
+				gui.text(Game.OSDPosition[1], 2 + Game.OSDRowHeight * row, animationType.." "..i..": "..toHexString(currentSlotBase or 0), color, 'bottomright');
 				row = row + 1;
 			end
 		end
@@ -1778,7 +1778,7 @@ function draw_ui() -- TODO: Refactor to something about object analysis tools
 			for i = 0, numSlots - 1 do
 				local rendererPointer = dereferencePointer(structArray + i * struct_slot_size);
 				if isRDRAM(rendererPointer) then
-					gui.text(Game.OSDPosition[1], 2 + Game.OSDRowHeight * row, i..": "..toHexString(structArray + i * struct_slot_size), nil, nil, 'bottomright');
+					gui.text(Game.OSDPosition[1], 2 + Game.OSDRowHeight * row, i..": "..toHexString(structArray + i * struct_slot_size), nil, 'bottomright');
 					row = row + 1;
 				end
 			end

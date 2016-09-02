@@ -264,7 +264,7 @@ function draw_ui()
 			end
 
 			if showList then
-				gui.text(2, 2 + height * row, xPosition..", "..yPosition.." - "..objectType.." "..toHexString(objectBase), color, nil, 'bottomright');
+				gui.text(2, 2 + height * row, xPosition..", "..yPosition.." - "..objectType.." "..toHexString(objectBase), color, 'bottomright');
 				row = row + 1;
 			end
 		end

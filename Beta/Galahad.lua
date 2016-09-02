@@ -228,7 +228,7 @@ function draw_ui()
 				if i == object_index then
 					color = 0xFFFFFF00; -- Yellow
 				end
-				gui.text(gui_x, gui_y + height * row, objectType.." ("..toHexString(objectBase)..") "..i, color, nil, 'bottomright');
+				gui.text(gui_x, gui_y + height * row, objectType.." ("..toHexString(objectBase)..") "..i, color, 'bottomright');
 				row = row + 1;
 			end
 		end
@@ -236,7 +236,7 @@ function draw_ui()
 		local examine_data = getExamineData(getObjectBase(object_index));
 		for i = #examine_data, 1, -1 do
 			if examine_data[i][1] ~= "Separator" then
-				gui.text(gui_x, gui_y + height * row, examine_data[i][1]..": "..examine_data[i][2], nil, nil, 'bottomright');
+				gui.text(gui_x, gui_y + height * row, examine_data[i][1]..": "..examine_data[i][2], nil, 'bottomright');
 				row = row + 1;
 			else
 				row = row + examine_data[i][2];
