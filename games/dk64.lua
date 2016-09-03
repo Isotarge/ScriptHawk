@@ -386,7 +386,7 @@ local max_oranges        = 20;
 local max_musical_energy = 10;
 
 local max_blueprints = 40;
-local max_cb = 3511;
+local max_cb = 3512;
 local max_crowns = 10;
 local max_fairies = 20;
 local max_gb = 201;
@@ -822,6 +822,7 @@ obj_model1 = {
 		[0x2F] = "Charging", -- Rambi
 		[0x30] = "Bouncing",
 		[0x31] = "Damaged",
+		[0x32] = "Stunlocked", -- Kasplat
 
 		[0x35] = "Damaged", -- Klump knockback
 		[0x36] = "Death",

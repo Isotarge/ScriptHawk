@@ -90,4 +90,4 @@ While ScriptHawk does have basic support for OoT and MM there are people who are
 - Pokémon Red & Yellow [kylecoburn/PokéBot](https://github.com/kylecoburn/PokeBot)
 
 ##Support me
-If you like my work, consider donating [here](https://streamtip.com/t/isotarge)
+If you like my work, consider [donating](https://streamtip.com/t/isotarge)

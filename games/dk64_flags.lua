@@ -872,6 +872,7 @@ local flag_array = {
 	{["byte"] = 0x68, ["bit"] = 3, ["name"] = "Japes: Chunky Coin: In water (3)", ["type"] = "Coin"},
 	{["byte"] = 0x68, ["bit"] = 4, ["name"] = "Japes: Diddy CB: Bunch under hut", ["type"] = "Bunch"},
 	{["byte"] = 0x68, ["bit"] = 5, ["name"] = "Japes: Lanky CB: Bonus Barrel Room (2)", ["type"] = "CB"},
+	{["byte"] = 0x68, ["bit"] = 6, ["name"] = "Japes: DK CB: OOBB under Rambi Box", ["type"] = "CB", ["map"] = 7},
 	{["byte"] = 0x68, ["bit"] = 7, ["name"] = "Japes: Lanky Coin: Cave near entrance (1)", ["type"] = "Coin"},
 
 	{["byte"] = 0x69, ["bit"] = 0, ["name"] = "Japes: Diddy Coin: peanut gate GB (1)", ["type"] = "Coin"},
