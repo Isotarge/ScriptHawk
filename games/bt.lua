@@ -382,6 +382,7 @@ local rot_x_pointer_index = 59 * 4;
 local position_pointer_index = 61 * 4;
 local rot_z_pointer_index = 65 * 4;
 local rot_y_pointer_index = 66 * 4;
+local movement_state_pointer_index = 76 * 4;
 
 -- Relative to Position object
 local x_pos = 0x00;
@@ -428,6 +429,7 @@ function output_objects()
 		print("Rot Z: "..toHexString(dereferencePointer(playerObject + rot_z_pointer_index), nil, ""));
 		print("Slope: "..toHexString(dereferencePointer(playerObject + slope_pointer_index), nil, ""));
 		print("Velocity: "..toHexString(dereferencePointer(playerObject + velocity_pointer_index), nil, ""));
+		print("Movement State: "..toHexString(dereferencePointer(playerObject + movement_state_pointer_index), nil, ""));
 	else
 		print("Can't get a read...");
 	end
@@ -855,6 +857,40 @@ local function unlock_moves()
 	end
 end
 
+local movementStates = {
+	-- TODO: Fill this table, hexadecimal index please
+};
+
+function Game.getCurrentMovementState()
+	local player = Game.getPlayerObject();
+	if isRDRAM(player) then
+		local movementStateObject = dereferencePointer(player + movement_state_pointer_index);
+		if isRDRAM(movementStateObject) then
+			local movementState = mainmemory.read_u32_be(movementStateObject + 4);
+			if type(movementStates[movementState]) == "string" then
+				return movementStates[movementState];
+			end
+			return toHexString(movementState);
+		end
+	end
+	return "Unknown";
+end
+
+function Game.getPreviousMovementState()
+	local player = Game.getPlayerObject();
+	if isRDRAM(player) then
+		local movementStateObject = dereferencePointer(player + movement_state_pointer_index);
+		if isRDRAM(movementStateObject) then
+			local movementState = mainmemory.read_u32_be(movementStateObject + 0);
+			if type(movementStates[movementState]) == "string" then
+				return movementStates[movementState];
+			end
+			return toHexString(movementState);
+		end
+	end
+	return "Unknown";
+end
+
 ------------
 -- Health --
 ------------
@@ -979,7 +1015,7 @@ Game.OSD = {
 	{"Moving", Game.getMovingAngle},
 	{"Rot. Z", Game.getZRotation},
 	{"Separator", 1},
-	--{"Movement", Game.getCurrentMovementState}, TODO
+	{"Movement", Game.getCurrentMovementState},
 	{"Slope Timer", Game.getSlopeTimer, Game.colorSlopeTimer},
 };
 
