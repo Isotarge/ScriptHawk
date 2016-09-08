@@ -1736,7 +1736,8 @@ local collisionTypes = { -- These seem to be the model 2 equivalent to the model
 	[0x213] = "Warp 2 Pad",
 	[0x214] = "Warp 1 Pad",
 
-	[0x221] = "Aztec Wall Section",
+	[0x221] = "Large Aztec Door",
+	[0x222] = "Large Aztec Door",
 	[0x228] = "+ Pad (Aztec Chunky Puzzle)",
 	[0x22C] = "Door", -- Caves Beetle Race
 
