@@ -376,13 +376,13 @@ end
 local previous_item = 0x00;
 local next_item = 0x04;
 
-local slope_pointer_index = 44 * 4;
-local velocity_pointer_index = 54 * 4;
-local rot_x_pointer_index = 59 * 4;
-local position_pointer_index = 61 * 4;
-local rot_z_pointer_index = 65 * 4;
-local rot_y_pointer_index = 66 * 4;
-local movement_state_pointer_index = 76 * 4;
+local slope_pointer_index = 40 * 4;
+local velocity_pointer_index = 50 * 4;
+local rot_x_pointer_index = 55 * 4;
+local position_pointer_index = 57 * 4;
+local rot_z_pointer_index = 61 * 4;
+local rot_y_pointer_index = 62 * 4;
+local movement_state_pointer_index = 72 * 4;
 
 -- Relative to Position object
 local x_pos = 0x00;
@@ -415,7 +415,14 @@ function Game.getPlayerObject()
 	local playerPointerIndex = mainmemory.readbyte(Game.Memory.player_pointer_index[version]);
 	local playerObject = dereferencePointer(Game.Memory.player_pointer[version] + 4 * playerPointerIndex);
 	if isRDRAM(playerObject) then
-		return playerObject - 0x10;
+		return playerObject;
+	end
+end
+
+function Game.getPlayerSubObject(index)
+	local player = Game.getPlayerObject();
+	if isRDRAM(playerObject) then
+		return dereferencePointer(player + index);
 	end
 end
 
@@ -857,8 +864,90 @@ local function unlock_moves()
 	end
 end
 
-local movementStates = {
-	-- TODO: Fill this table, hexadecimal index please
+local movementStates = { -- TODO: Fill this table
+	[0x00] = "Null",
+	[0x01] = "Idle",
+	[0x02] = "Walking", -- Slow
+	[0x03] = "Walking", -- Medium
+	[0x04] = "Walking", -- Fast
+	[0x05] = "Jumping",
+
+	[0x07] = "Crouching",
+	[0x08] = "Jumping", -- Talon Trot
+
+	[0x0E] = "Damaged",
+	[0x0F] = "Beak Buster",
+
+	[0x10] = "Featherty Flap",
+	[0x11] = "Rat-a-tat Rap",
+	[0x12] = "Flap Flip",
+	[0x13] = "Beak Barge",
+	[0x14] = "Entering Talon Trot",
+	[0x15] = "Idle", -- Talon Trot
+	[0x16] = "Walking", -- Talon Trot
+
+	[0x1A] = "Entering Wonderwing",
+	[0x1B] = "Idle", -- Wonderwing
+	[0x1C] = "Walking", -- Wonderwing
+	[0x1D] = "Jumping", -- Wonderwing
+
+	[0x20] = "Landing",
+
+	[0x2D] = "Idle", -- Water Surface
+	[0x2E] = "Paddling", -- Water Surface
+	[0x2F] = "Falling",
+
+	[0x31] = "Rolling",
+
+	[0x3D] = "Falling (Splat)",
+
+	[0x41] = "Death",
+	[0x4F] = "Idle", -- Climbing
+	[0x50] = "Climbing",
+
+	[0x71] = "Falling", -- Talon Trot
+	[0x72] = "Recovering", -- Splat
+	[0x73] = "Locked",
+
+	[0x8F] = "Locked", -- Solo Kazooie
+
+	[0x98] = "Loading Zone",
+
+	[0xA6] = "Idle", -- Grip Grab
+	[0xA7] = "Moving", -- Grip Grab
+	[0xA8] = "Grabbing Ledge", -- Grip Grab
+	[0xA9] = "Pecking", -- Grip Grab
+	[0xAA] = "Pulling up", -- Grip Grab
+	[0xAB] = "Death", -- Stony
+	[0xAC] = "Loading Zone", -- Stony
+
+	[0xAE] = "Jumping", -- Stony
+	[0xAF] = "Damaged", -- Stony
+
+	[0xB1] = "Locked", -- Stony
+	[0xB2] = "Walking", -- Stony
+	[0xB3] = "Idle", -- Stony
+	[0xB4] = "Diving", -- Stony
+
+	[0xB6] = "Bill Drill",
+
+	[0xBB] = "Idle", -- Solo Kazooie
+	[0xBC] = "Creeping", -- Solo Kazooie
+	[0xBD] = "Jumping", -- Solo Kazooie
+
+	[0xC2] = "Wing Whack", -- Solo Kazooie
+	
+	[0xC6] = "Leg Spring", -- Solo Kazooie
+	[0xC7] = "Walking", -- Solo Kazooie
+
+	[0xDF] = "Falling", -- Solo Kazooie
+
+	[0x15C] = "Feathery Flap", -- Solo Kazooie
+
+	[0x17B] = "Idle", -- On Wall, Claw Clamber
+	[0x17C] = "Walking", -- On Wall, Claw Clamber
+
+	[0x18A] = "Breathing Fire", -- BK
 };
 
 function Game.getCurrentMovementState()
