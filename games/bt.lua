@@ -803,14 +803,17 @@ end
 
 local movementStates = { -- TODO: Fill this table
 	[0x00] = "Null",
+
 	[0x01] = "Idle",
 	[0x02] = "Walking", -- Slow
 	[0x03] = "Walking", -- Medium
 	[0x04] = "Walking", -- Fast
 	[0x05] = "Jumping",
-
+	[0x06] = "Pecking", -- Bear Punch replacement
 	[0x07] = "Crouching",
 	[0x08] = "Jumping", -- Talon Trot
+
+	[0x0C] = "Slipping",
 
 	[0x0E] = "Damaged",
 	[0x0F] = "Beak Buster",
@@ -822,33 +825,46 @@ local movementStates = { -- TODO: Fill this table
 	[0x14] = "Entering Talon Trot",
 	[0x15] = "Idle", -- Talon Trot
 	[0x16] = "Walking", -- Talon Trot
+	[0x17] = "Leaving Talon Trot",
 
+	[0x19] = "Swimming (A+B)",
 	[0x1A] = "Entering Wonderwing",
 	[0x1B] = "Idle", -- Wonderwing
 	[0x1C] = "Walking", -- Wonderwing
 	[0x1D] = "Jumping", -- Wonderwing
+	[0x1E] = "Leaving Wonderwing",
 
 	[0x20] = "Landing",
 
+	[0x2B] = "Idle", -- Underwater
+	[0x2C] = "Swimming (B)",
 	[0x2D] = "Idle", -- Water Surface
 	[0x2E] = "Paddling", -- Water Surface
 	[0x2F] = "Falling",
-
+	[0x30] = "Diving",
 	[0x31] = "Rolling",
+
+	[0x39] = "Swimming (A)",
 
 	[0x3D] = "Falling (Splat)",
 
 	[0x41] = "Death",
+
+	[0x4C] = "Landing", -- Water Surface
+
 	[0x4F] = "Idle", -- Climbing
 	[0x50] = "Climbing",
+
+	[0x5B] = "Throwing Object", -- Glowbo
 
 	[0x71] = "Falling", -- Talon Trot
 	[0x72] = "Recovering", -- Splat
 	[0x73] = "Locked",
+	[0x74] = "Locked", -- Mumbo's Skull
 
 	[0x8F] = "Locked", -- Solo Kazooie
 
-	[0x98] = "Loading Zone",
+	[0x9C] = "Jumping", -- Springy Step Shoes
 
 	[0xA6] = "Idle", -- Grip Grab
 	[0xA7] = "Moving", -- Grip Grab
@@ -873,17 +889,58 @@ local movementStates = { -- TODO: Fill this table
 	[0xBD] = "Jumping", -- Solo Kazooie
 
 	[0xC2] = "Wing Whack", -- Solo Kazooie
-	
+
 	[0xC6] = "Leg Spring", -- Solo Kazooie
 	[0xC7] = "Walking", -- Solo Kazooie
 
 	[0xDF] = "Falling", -- Solo Kazooie
 
+	[0xE4] = "Pack Whack", -- Solo Banjo
+	[0xE5] = "Idle", -- Mumbo
+	[0xE6] = "Walking", -- Mumbo, slow
+	[0xE7] = "Walking", -- Mumbo, fast
+	[0xE8] = "Jumping", -- Mumbo
+	[0xE9] = "Falling", -- Mumbo
+	[0xEA] = "Damaged", -- Mumbo
+	[0xEB] = "Death", -- Mumbo
+
+	[0xEE] = "Falling (Splat)", -- Mumbo
+	[0xEF] = "Landing", -- Mumbo
+	[0xF0] = "Idle", -- Mumbo - Water Surface
+	[0xF1] = "Paddling", -- Mumbo
+
+	[0xF3] = "Locked", -- Mumbo first person camera water surface
+	[0xF4] = "Landing", -- Mumbo - Water Surface
+	[0xF5] = "Slipping", -- Mumbo, TODO: Also used for loading zones & first person camera?
+	[0xF6] = "Locked", -- Mumbo
+	[0xF7] = "Attacking", -- Mumbo's Wand
+
+	[0xF9] = "Idle", -- Golden Goliath
+	[0xFA] = "Walking", -- Golden Goliath
+	[0xFB] = "Jumping", -- Golden Goliath
+	[0xFC] = "Kicking", -- Golden Goliath
+
+	[0xFF] = "Recovering", -- Mumbo
+
+	[0x103] = "Death", -- Solo Banjo
+
+	[0x11E] = "Casting Spell", -- Mumbo
+
 	[0x15C] = "Feathery Flap", -- Solo Kazooie
+
+	[0x16A] = "Entering Shack Pack",
+	[0x16B] = "Leaving Shack Pack",
+	[0x16C] = "Idle", -- Shack Pack
+	[0x16D] = "Walking", -- Shack Pack
+	[0x16E] = "Jumping", -- Shack Pack
+	[0x16F] = "Snoozing", -- Snooze Pack
+	[0x171] = "Entering Snooze Pack",
+	[0x172] = "Leaving Snooze Pack",
 
 	[0x17B] = "Idle", -- On Wall, Claw Clamber
 	[0x17C] = "Walking", -- On Wall, Claw Clamber
 
+	[0x189] = "Breegull Bash",
 	[0x18A] = "Breathing Fire", -- BK
 };
 
