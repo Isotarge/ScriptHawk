@@ -912,7 +912,13 @@ ScriptHawk.UI.form_controls["Increase Speed Button"] = forms.button(ScriptHawk.U
 ScriptHawk.UI.form_controls["Speed Value Label"] = forms.label(ScriptHawk.UI.options_form, "0", ScriptHawk.UI.col(5), ScriptHawk.UI.row(2) + ScriptHawk.UI.label_offset, 54, 14);
 
 if type(Game.maps) == "table" then
-	ScriptHawk.UI.form_controls["Map Dropdown"] = forms.dropdown(ScriptHawk.UI.options_form, Game.maps, ScriptHawk.UI.col(0) + ScriptHawk.UI.dropdown_offset, ScriptHawk.UI.row(3) + ScriptHawk.UI.dropdown_offset, ScriptHawk.UI.col(9) + 8, ScriptHawk.UI.button_height);
+	local filteredMaps = {};
+	for i = 1, #Game.maps do
+		if string.sub(Game.maps[i],1,1) ~= "!" then
+			table.insert(filteredMaps, Game.maps[i]);
+		end
+	end
+	ScriptHawk.UI.form_controls["Map Dropdown"] = forms.dropdown(ScriptHawk.UI.options_form, filteredMaps, ScriptHawk.UI.col(0) + ScriptHawk.UI.dropdown_offset, ScriptHawk.UI.row(3) + ScriptHawk.UI.dropdown_offset, ScriptHawk.UI.col(9) + 8, ScriptHawk.UI.button_height);
 	if Game.takeMeThereType == nil or Game.takeMeThereType == "Checkbox" then
 		Game.takeMeThereType = "Checkbox";
 		ScriptHawk.UI.form_controls["Map Checkbox"] = forms.checkbox(ScriptHawk.UI.options_form, "Take me there", ScriptHawk.UI.col(0) + ScriptHawk.UI.dropdown_offset, ScriptHawk.UI.row(4) + ScriptHawk.UI.dropdown_offset);

@@ -1,311 +1,282 @@
 local Game = {};
 
 Game.maps = {
-	"Unknown 0x0001", "Unknown 0x0002", "Unknown 0x0003", "Unknown 0x0004", "Unknown 0x0005", "Unknown 0x0006", "Unknown 0x0007", "Unknown 0x0008", "Unknown 0x0009", "Unknown 0x000A", "Unknown 0x000B", "Unknown 0x000C", "Unknown 0x000D", "Unknown 0x000E", "Unknown 0x000F",
-	"Unknown 0x0010", "Unknown 0x0011", "Unknown 0x0012", "Unknown 0x0013", "Unknown 0x0014", "Unknown 0x0015", "Unknown 0x0016", "Unknown 0x0017", "Unknown 0x0018", "Unknown 0x0019", "Unknown 0x001A", "Unknown 0x001B", "Unknown 0x001C", "Unknown 0x001D", "Unknown 0x001E", "Unknown 0x001F",
-	"Unknown 0x0020", "Unknown 0x0021", "Unknown 0x0022", "Unknown 0x0023", "Unknown 0x0024", "Unknown 0x0025", "Unknown 0x0026", "Unknown 0x0027", "Unknown 0x0028", "Unknown 0x0029", "Unknown 0x002A", "Unknown 0x002B", "Unknown 0x002C", "Unknown 0x002D", "Unknown 0x002E", "Unknown 0x002F",
-	"Unknown 0x0030", "Unknown 0x0031", "Unknown 0x0032", "Unknown 0x0033", "Unknown 0x0034", "Unknown 0x0035", "Unknown 0x0036", "Unknown 0x0037", "Unknown 0x0038", "Unknown 0x0039", "Unknown 0x003A", "Unknown 0x003B", "Unknown 0x003C", "Unknown 0x003D", "Unknown 0x003E", "Unknown 0x003F",
-	"Unknown 0x0040", "Unknown 0x0041", "Unknown 0x0042", "Unknown 0x0043", "Unknown 0x0044", "Unknown 0x0045", "Unknown 0x0046", "Unknown 0x0047", "Unknown 0x0048", "Unknown 0x0049", "Unknown 0x004A", "Unknown 0x004B", "Unknown 0x004C", "Unknown 0x004D", "Unknown 0x004E", "Unknown 0x004F",
-	"Unknown 0x0050", "Unknown 0x0051", "Unknown 0x0052", "Unknown 0x0053", "Unknown 0x0054", "Unknown 0x0055", "Unknown 0x0056", "Unknown 0x0057", "Unknown 0x0058", "Unknown 0x0059", "Unknown 0x005A", "Unknown 0x005B", "Unknown 0x005C", "Unknown 0x005D", "Unknown 0x005E", "Unknown 0x005F",
-	"Unknown 0x0060", "Unknown 0x0061", "Unknown 0x0062", "Unknown 0x0063", "Unknown 0x0064", "Unknown 0x0065", "Unknown 0x0066", "Unknown 0x0067", "Unknown 0x0068", "Unknown 0x0069", "Unknown 0x006A", "Unknown 0x006B", "Unknown 0x006C", "Unknown 0x006D", "Unknown 0x006E", "Unknown 0x006F",
-	"Unknown 0x0070", "Unknown 0x0071", "Unknown 0x0072", "Unknown 0x0073", "Unknown 0x0074", "Unknown 0x0075", "Unknown 0x0076", "Unknown 0x0077", "Unknown 0x0078", "Unknown 0x0079", "Unknown 0x007A", "Unknown 0x007B", "Unknown 0x007C", "Unknown 0x007D", "Unknown 0x007E", "Unknown 0x007F",
-	"Unknown 0x0080", "Unknown 0x0081", "Unknown 0x0082", "Unknown 0x0083", "Unknown 0x0084", "Unknown 0x0085", "Unknown 0x0086", "Unknown 0x0087", "Unknown 0x0088", "Unknown 0x0089", "Unknown 0x008A", "Unknown 0x008B", "Unknown 0x008C", "Unknown 0x008D", "Unknown 0x008E", "Unknown 0x008F",
-	"Unknown 0x0090", "Unknown 0x0091", "Unknown 0x0092", "Unknown 0x0093", "Unknown 0x0094", "Unknown 0x0095", "Unknown 0x0096", "Unknown 0x0097", "Unknown 0x0098", "Unknown 0x0099", "Unknown 0x009A", "Unknown 0x009B", "Unknown 0x009C", "Unknown 0x009D", "Unknown 0x009E", "Unknown 0x009F",
-	"Unknown 0x00A0", "Unknown 0x00A1", "Crash 0x00A2", "Crash 0x00A3", "Crash 0x00A4", "Crash 0x00A5", "Crash 0x00A6", "Crash 0x00A7", "Unknown 0x00A8", "Unknown 0x00A9", "Unknown 0x00AA", "Crash 0x00AB", "Crash 0x00AC",
+	"!Unknown 0x0001", "!Unknown 0x0002", "!Unknown 0x0003", "!Unknown 0x0004", "!Unknown 0x0005", "!Unknown 0x0006", "!Unknown 0x0007", "!Unknown 0x0008", "!Unknown 0x0009", "!Unknown 0x000A", "!Unknown 0x000B", "!Unknown 0x000C", "!Unknown 0x000D", "!Unknown 0x000E", "!Unknown 0x000F",
+	"!Unknown 0x0010", "!Unknown 0x0011", "!Unknown 0x0012", "!Unknown 0x0013", "!Unknown 0x0014", "!Unknown 0x0015", "!Unknown 0x0016", "!Unknown 0x0017", "!Unknown 0x0018", "!Unknown 0x0019", "!Unknown 0x001A", "!Unknown 0x001B", "!Unknown 0x001C", "!Unknown 0x001D", "!Unknown 0x001E", "!Unknown 0x001F",
+	"!Unknown 0x0020", "!Unknown 0x0021", "!Unknown 0x0022", "!Unknown 0x0023", "!Unknown 0x0024", "!Unknown 0x0025", "!Unknown 0x0026", "!Unknown 0x0027", "!Unknown 0x0028", "!Unknown 0x0029", "!Unknown 0x002A", "!Unknown 0x002B", "!Unknown 0x002C", "!Unknown 0x002D", "!Unknown 0x002E", "!Unknown 0x002F",
+	"!Unknown 0x0030", "!Unknown 0x0031", "!Unknown 0x0032", "!Unknown 0x0033", "!Unknown 0x0034", "!Unknown 0x0035", "!Unknown 0x0036", "!Unknown 0x0037", "!Unknown 0x0038", "!Unknown 0x0039", "!Unknown 0x003A", "!Unknown 0x003B", "!Unknown 0x003C", "!Unknown 0x003D", "!Unknown 0x003E", "!Unknown 0x003F",
+	"!Unknown 0x0040", "!Unknown 0x0041", "!Unknown 0x0042", "!Unknown 0x0043", "!Unknown 0x0044", "!Unknown 0x0045", "!Unknown 0x0046", "!Unknown 0x0047", "!Unknown 0x0048", "!Unknown 0x0049", "!Unknown 0x004A", "!Unknown 0x004B", "!Unknown 0x004C", "!Unknown 0x004D", "!Unknown 0x004E", "!Unknown 0x004F",
+	"!Unknown 0x0050", "!Unknown 0x0051", "!Unknown 0x0052", "!Unknown 0x0053", "!Unknown 0x0054", "!Unknown 0x0055", "!Unknown 0x0056", "!Unknown 0x0057", "!Unknown 0x0058", "!Unknown 0x0059", "!Unknown 0x005A", "!Unknown 0x005B", "!Unknown 0x005C", "!Unknown 0x005D", "!Unknown 0x005E", "!Unknown 0x005F",
+	"!Unknown 0x0060", "!Unknown 0x0061", "!Unknown 0x0062", "!Unknown 0x0063", "!Unknown 0x0064", "!Unknown 0x0065", "!Unknown 0x0066", "!Unknown 0x0067", "!Unknown 0x0068", "!Unknown 0x0069", "!Unknown 0x006A", "!Unknown 0x006B", "!Unknown 0x006C", "!Unknown 0x006D", "!Unknown 0x006E", "!Unknown 0x006F",
+	"!Unknown 0x0070", "!Unknown 0x0071", "!Unknown 0x0072", "!Unknown 0x0073", "!Unknown 0x0074", "!Unknown 0x0075", "!Unknown 0x0076", "!Unknown 0x0077", "!Unknown 0x0078", "!Unknown 0x0079", "!Unknown 0x007A", "!Unknown 0x007B", "!Unknown 0x007C", "!Unknown 0x007D", "!Unknown 0x007E", "!Unknown 0x007F",
+	"!Unknown 0x0080", "!Unknown 0x0081", "!Unknown 0x0082", "!Unknown 0x0083", "!Unknown 0x0084", "!Unknown 0x0085", "!Unknown 0x0086", "!Unknown 0x0087", "!Unknown 0x0088", "!Unknown 0x0089", "!Unknown 0x008A", "!Unknown 0x008B", "!Unknown 0x008C", "!Unknown 0x008D", "!Unknown 0x008E", "!Unknown 0x008F",
+	"!Unknown 0x0090", "!Unknown 0x0091", "!Unknown 0x0092", "!Unknown 0x0093", "!Unknown 0x0094", "!Unknown 0x0095", "!Unknown 0x0096", "!Unknown 0x0097", "!Unknown 0x0098", "!Unknown 0x0099", "!Unknown 0x009A", "!Unknown 0x009B", "!Unknown 0x009C", "!Unknown 0x009D", "!Unknown 0x009E", "!Unknown 0x009F",
+	"!Unknown 0x00A0", "!Unknown 0x00A1", "!Crash 0x00A2", "!Crash 0x00A3", "!Crash 0x00A4", "!Crash 0x00A5", "!Crash 0x00A6", "!Crash 0x00A7", "!Unknown 0x00A8", "!Unknown 0x00A9", "!Unknown 0x00AA", "!Crash 0x00AB", "!Crash 0x00AC",
 
 	"SM - Grunty's Lair",
 	"SM - Behind the waterfall",
 	"SM - Spiral Mountain",
 
-	"Crash 0x00B0", "Crash 0x00B1", "Unknown 0x00B2", "Crash 0x00B3", "Unknown 0x00B4", "Crash 0x00B5",
+	"!Crash 0x00B0", "!Crash 0x00B1", "!Unknown 0x00B2", "!Crash 0x00B3", "!Unknown 0x00B4", "!Crash 0x00B5",
 
-	"MT - Humba's Wigwam",
+	"MT - Wumba's Wigwam",
 	"MT - Mumbo's Skull",
-	"MT - Mayahem Temple",
+	"MT",
 	"MT - Prison Compound",
 
-	"Unknown 0x00BA", "Unknown 0x00BB",
+	"!Unknown 0x00BA", "!Unknown 0x00BB",
 
-	"MT - Code chamber",
+	"MT - Code Chamber",
 
-	"Crash 0x00BD", "Crash 0x00BE", "Unknown 0x00BF",
-	"Crash 0x00C0", "Crash 0x00C1", "Crash 0x00C2", "Crash 0x00C3",
+	"!Crash 0x00BD", "!Crash 0x00BE", "!Unknown 0x00BF",
+	"!Crash 0x00C0", "!Crash 0x00C1", "!Crash 0x00C2", "!Crash 0x00C3",
 
-	"MT - Jade snake grove",
-	"MT - Treasure chamber",
-	"MT - Kickball arena",
+	"MT - Jade Snake Grove",
+	"MT - Treasure Chamber",
+	"MT - Kickball Arena 1",
 	"GGM",
-	"MT - Kickball arena",
-	"MT - Kickball arena",
-
-	"GGM - Fuel depot",
-	"GGM - Crushing shed",
-	"GGM - Flooded caves",
-	"GGM - Water storage",
-	"GGM - Waterfall cavern",
-	"GGM - Power hut basement",
-	"GGM - Chuffy's cab",
-	"GGM - Inside Chuffy's boiler",
-	"GGM - Gloomy caverns",
-	"GGM - Generator caverns",
-	"GGM - Power hut",
-	"GGM - Humba's Wigwam",
-
+	"MT - Kickball Arena 2",
+	"MT - Kickball Arena 3",
+	"GGM - Fuel Depot",
+	"GGM - Crushing Shed",
+	"GGM - Flooded Caves",
+	"GGM - Water Storage",
+	"GGM - Waterfall Cavern",
+	"GGM - Power Hut Basement",
+	"GGM - Chuffy's Cab",
+	"GGM - Inside Chuffy's Boiler",
+	"GGM - Gloomy Caverns",
+	"GGM - Generator Cavern",
+	"GGM - Power Hut",
+	"WW - Wumba's Wigwam",
 	"WW - Witchy World",
-
-	"GGM - Train station",
-	"GGM - Prospectors hut",
+	"GGM - Train Station",
+	"GGM - Prospector's Hut",
 	"GGM - Mumbo's Skull",
-	"GGM - Toxic gas cave",
-	"GGM - Canary cave",
+	"GGM - Toxic Gas Cave",
+	"GGM - Canary Cave",
 	"GGM - Ordnance storage",
+	"WW - Dodgem Dome Lobby",
+	"WW - Dodgem Challenge 1 vs 1",
+	"WW - Dodgem Challenge 2 vs 1",
+	"WW - Dodgem Challenge 3 vs 1",
+	"WW - Crazy Castle Stockade",
+	"WW - Crazy Castle Lobby",
+	"WW - Crazy Castle Pump Room",
+	"WW - Balloon Burst Game",
+	"WW - Hoop Hurry",
+	"WW - Star Spinner",
+	"WW - The Inferno",
 
-	"WW - Dodgem dome lobby",
-	"WW - Dodgem challenge 1 vs 1",
-	"WW - Dodgem challenge 2 vs 1",
-	"WW - Dodgem challenge 3 vs 1",
-	"WW - Crazy castle stockade",
-	"WW - Crazy castle lobby",
-	"WW - Crazy castle pump room",
-	"WW - Balloon burst game",
-	"WW - Hoop hurry game",
-	"WW - Star spinner",
-	"WW - The inferno",
+	"!Crash 0x00E8",
 
-	"Crash 0x00E8",
-
-	"GGM - Humba's Wigwam",
-	"WW - cave of horrors",
-	"WW - haunted cavern",
-	"WW - Train station",
+	"GGM - Wumba's Wigwam",
+	"WW - Cave of Horrors",
+	"WW - Haunted Cavern",
+	"WW - Train Station",
 	"JRL - Jolly's",
-	"JRL - Pawno's emporium",
+	"JRL - Pawno's Emporium",
 	"JRL - Mumbo's Skull",
 
-	"Crash 0x00F0",
+	"!Crash 0x00F0",
 
 	"HP - Inside the UFO",
 
-	"Unknown 0x00F2", "Crash 0x00F3",
+	"!Unknown 0x00F2", "!Crash 0x00F3",
 
 	"JRL - Ancient Swimming Baths",
 
-	"Crash 0x00F5",
+	"!Crash 0x00F5",
 
 	"JRL - Electric Eel's lair",
 	"JRL - Seaweed Sanctum",
-	"JRL - Inside the big fish",
-	"WW - Mr Patch",
-	"JRL - temple of the fishes",
+	"JRL - Inside the Big Fish",
+	"WW - Mr. Patch",
+	"JRL - Temple of the Fishes",
 
-	"Crash 0x00FB",
+	"!Crash 0x00FB",
 
-	"JRL - Lord woo fak fak",
+	"JRL - Lord Woo Fak Fak",
 
-	"Crash 0x00FD", "Crash 0x00FE",
+	"!Crash 0x00FD", "!Crash 0x00FE",
 
-	"JRL - Blubber's wave race hire",
-
-	"GI - Outside",
-	"GI - Inside",
-	"GI - Train station",
-	"GI - Workers quarters",
-	"GI - Trash compactor",
+	"JRL - Blubber's Wave Race Hire",
+	"GI",
+	"GI - Floor 1",
+	"GI - Train Station",
+	"GI - Workers Quarters",
+	"GI - Trash Compactor",
 	"GI - Elevator shaft",
 	"GI - Floor 2",
-	"GI - Floor 2 (electromagnet chamber)",
+	"GI - Floor 2 (Electromagnet Chamber)",
 	"GI - Floor 3",
-	"GI - Floor 3 (boiler plant)",
-	"GI - Floor 3 (packing room)",
+	"GI - Floor 3 (Boiler Plant)",
+	"GI - Floor 3 (Packing Room)",
 	"GI - Floor 4",
-	"GI - Floor 4 (cable room)",
-	"GI - Floor 4 (quality control)",
+	"GI - Floor 4 (Cable Room)",
+	"GI - Floor 4 (Quality Control)",
 	"GI - Floor 5",
 	"GI - Basement",
-	"GI - Basement (repair depot)",
-	"GI - Basement (waste disposal)",
-
-	"TDL - Overworld",
-	"TDL - Terry's nest",
-	"TDL - Train station",
+	"GI - Basement (Repair Depot)",
+	"GI - Basement (Waste Disposal)",
+	"TDL",
+	"TDL - Terry's Nest",
+	"TDL - Train Station",
 	"TDL - Oogle Boogles cave",
 	"TDL - Inside the mountain",
-	"TDL - River passage",
-	"TDL - Styracosaurus family cave",
-	"TDL - Unga Bunga's cave",
-	"TDL - Stomping plains",
-	"TDL - Bonfire cavern",
+	"TDL - River Passage",
+	"TDL - Styracosaurus Family Cave",
+	"TDL - Unga Bunga's Cave",
+	"TDL - Stomping Plains",
+	"TDL - Bonfire Cavern",
 
-	"Crash 0x011C", "Crash 0x011D",
+	"!Crash 0x011C", "!Crash 0x011D",
 
-	"TDL - Humba's Wigwam",
-	"GI - Wide angle Humba's Wigwam",
-	"JRL - Wide angle Humba's Wigwam",
-	"GGM - Inside Chuffy's wagon",
-	"TDL - Wide angle Humba's Wigwam",
-	"TDL - Inside Chompa's belly",
+	"TDL - Wumba's Wigwam",
+	"GI - Wumba's Wigwam",
+	"JRL - Wide Angle Wumba's Wigwam",
+	"GGM - Inside Chuffy's Wagon",
+	"TDL - Wide Angle Wumba's Wigwam",
+	"TDL - Inside Chompa's Belly",
 	"WW - Saucer of Peril",
-	"GI - Water supply pipe",
-	"GGM - Water supply pipe",
-
-	"HP - Lava side",
-	"HP - Icy side",
-	"HP - Lava train station",
-	"HP - Ice train station",
+	"GI - Water Supply Pipe",
+	"GGM - Water Supply Pipe",
+	"HP - Lava Side",
+	"HP - Icy Side",
+	"HP - Lava Train Station",
+	"HP - Ice Train Station",
 	"HP - Chilli Billi",
 	"HP - Chilly Willy",
-	"HP - Colosseum kickball stadium lobby",
-	"HP - Colosseum kickball stadium - wide angle",
-	"HP - Colosseum kickball stadium - wide angle",
-	"HP - Colosseum kickball stadium - wide angle",
-	"HP - Boggy's igloo",
-	"HP - Icicle grotto",
-	"HP - Inside the volcano",
+	"HP - Kickball Stadium lobby",
+	"HP - Kickball Stadium - wide angle 1",
+	"HP - Kickball Stadium - wide angle 2",
+	"HP - Kickball Stadium - wide angle 3",
+	"HP - Boggy's Igloo",
+	"HP - Icicle Grotto",
+	"HP - Inside the Volcano",
 	"HP - Mumbo's Skull",
-	"HP - Humba's Wigwam",
-
-	"CCL - Cloud Cuckoo Land",
-	"CCL - Inside the trashcan",
-	"CCL - Inside the cheesewedge",
-	"CCL - Zubba's nest",
-	"CCL - Central cavern",
-
-	"WW - Crazy castle stockade (Saucer)",
-	"WW - Star spinner (Saucer)",
-
-	"CCL - Inside the pot'o'gold",
+	"HP - Wumba's Wigwam",
+	"CCL",
+	"CCL - Inside the Trash Can",
+	"CCL - Inside the Cheese Wedge",
+	"CCL - Zubba's Nest",
+	"CCL - Central Cavern",
+	"WW - Crazy Castle Stockade (Saucer)",
+	"WW - Star Spinner (Saucer)",
+	"CCL - Inside the Pot o' Gold",
 	"CCL - Mumbo's Skull",
 	"CCL - Mingy Jongo's Skull",
-	"CCL - Humba's Wigwam",
-
-	"SM - Inside the digger tunnel",
-
-	"JV - Jinjo Village",
-	"JV - Bottles house",
-	"JV - King Jingalings throne room",
+	"CCL - Wumba's Wigwam",
+	"SM - Inside the Digger Tunnel",
+	"JV",
+	"JV - Bottles' House",
+	"JV - King Jingaling's Throne Room",
 	"JV - Green Jinjo's house",
 	"JV - Black Jinjo's house",
 	"JV - Yellow Jinjo's house",
 	"JV - Blue Jinjo's house",
 
-	"Crash 0x0149",
+	"!Crash 0x0149",
 
 	"JV - Brown Jinjo's house",
 	"JV - Orange Jinjo's house",
 	"JV - Purple Jinjo's house",
 	"JV - Red Jinjo's house",
 	"JV - White Jinjo's house",
-
 	"WH - Wooded Hollow",
-	"WH - Heggy's egg shed",
-	"WH - Jiggywiggy's temple",
-
+	"WH - Heggy's Egg Shed",
+	"WH - Jiggywiggy's Temple",
 	"IoH - Plateau",
 	"IoH - Plateau - Honey B's Hive",
 	"IoH - Pine Grove",
-	"IoH - Cliff top",
-	"IoH - Cliff top - Mumbo's Skull",
-	"IoH - Pine Grove - Humba's Wigwam",
-
-	"Game select screen",
-	"Opening cutscene",
-
+	"IoH - Clifftop",
+	"IoH - Clifftop - Mumbo's Skull",
+	"IoH - Pine Grove - Wumba's Wigwam",
+	"Game Select Screen",
+	"Cutscene - Opening cutscene",
 	"IoH - Wasteland",
 	"IoH - Inside another digger tunnel",
 	"IoH - Quagmire",
-
-	"CK - Cauldron Keep",
-	"CK - The gatehouse",
+	"CK",
+	"CK - The Gatehouse",
 	"CK - Tower of Tragedy",
-	"CK - Gun chamber",
-
-	"CCL",
-
+	"CK - Gun Chamber",
+	"CCL - Canary Mary Race?",
 	"GI - Floor 4 - Clinker's cavern",
-
-	"GGM - Ordnance Storage entrance",
+	"GGM - Ordnance Storage Entrance",
 	"GGM - Ordnance Storage ",
 	"GGM - Ordnance Storage (multiplayer)",
-
-	"MT - Targitzan's temple (multiplayer)",
+	"MT - Targitzan's Temple (multiplayer)",
 	"MT - (still)",
-	"HP - Icy side (still)",
-	"JV - Bottles' house (still)",
-	"CK - Gun room (still)",
+	"HP - Icy Side (still)",
+	"JV - Bottles' House (still)",
+	"CK - Gun Room (still)",
 
-	"Crash 0x016B", "Crash 0x016C", "Crash 0x016D", "Crash 0x016E",
+	"!Crash 0x016B", "!Crash 0x016C", "!Crash 0x016D", "!Crash 0x016E",
 
-	"GGM - Testing",
-	"GGM - Testing",
-	"GGM - Mumbo's Skull",
-
+	"GGM - Testing 1",
+	"GGM - Testing 2",
+	"TDL - Mumbo's Skull",
 	"GI - Mumbo's Skull",
+	"SM - Banjo's House",
 
-	"SM - Banjo's house",
-
-	"Crash 0x0174", "Crash 0x0175",
+	"!Crash 0x0174", "!Crash 0x0175",
 
 	"WW - Mumbo's Skull",
-
-	"MT - Targitzan's slighty sacred temple",
-	"MT - Inside Targitzan's temple",
-	"MT - Targitzan's temple lobby",
-	"MT - Targitzan's temple boss",
-
+	"MT - Targitzan's Slighty Sacred Chamber",
+	"MT - Inside Targitzan's Temple",
+	"MT - Targitzan's Temple Lobby",
+	"MT - Targitzan's Really Sacred Chamber",
 	"WW - Balloon burst (multiplayer)",
-	"WW - Jump the hoops (multiplayer)",
-	"GI - Packing game",
-	"JV - Zombified throne room cutscene",
-	"MT? - Mayan kickball arena",
-
-	"Colosseum kickball arena",
-	"JRL - Sea bottom cavern",
+	"WW - Jump the Hoops (multiplayer)",
+	"GI - Packing Game",
+	"Cutscene - Zombified Throne Room",
+	"MT - Kickball Arena 4",
+	"HP - Kickball Arena",
+	"JRL - Sea Bottom Cavern",
 	"JRL - Submarine (multiplayer)",
-	"TDL - Chompa's belly (multiplayer)",
+	"TDL - Chompa's Belly (multiplayer)",
 
-	"Crash 0x0184",
+	"!Crash 0x0184",
 
-	"CCL - Trash can mini",
+	"CCL - Trash Can Mini",
 	"WW - Dodgems",
-	"GI - Sewer entrance",
-	"CCL - Zubba's nest (multiplayer)",
+	"GI - Sewer Entrance",
+	"CCL - Zubba's Nest (multiplayer)",
 
-	"Crash 0x0189",
+	"!Crash 0x0189",
 
-	"CK - Inside HAG1",
-	"0x018B - Intro screen",
+	"CK - Inside HAG 1",
+	"Intro Screen",
 
-	"Crash 0x018C",
+	"!Crash 0x018C",
 
-	"Cutscene - Jingaling zapped",
-	"Cutscene - Meanwhile....Jingaling zapping",
+	"Cutscene - Jingaling Zapped",
+	"Cutscene - Meanwhile.... Jingaling Zapping",
 	"Cutscene - B.O.B preparing to fire",
-	"Cutscene - Jingaling getting zapped",
-	"Cutscene - Sad Party at Bottles",
-	"Cutscene - Bottles eating burnt food",
-	"Cutscene - Bottle's energy restoring",
-	"Cutscene - Banjo and Kazooie running into Gun Chamber",
+	"Cutscene - Jingaling Getting Zapped",
+	"Cutscene - Sad Party at Bottles'",
+	"Cutscene - Bottles Eating Burnt Food",
+	"Cutscene - Bottles' energy restoring",
+	"Cutscene - Banjo and Kazooie Running Into Gun Chamber",
 	"Cutscene - Banjo and Kazooie at B.O.B's controls",
-	"Cutscene - Kick about",
+	"Cutscene - Kick About",
 	"Cutscene - `I wonder what we'll hit...` Kazooie",
-	"Cutscene - Jingaling restoring",
-	"Cutscene - All Jinjos happy again",
+	"Cutscene - Jingaling Restoring",
+	"Cutscene - All Jinjos Happy Again",
 
-	"CK - HAG1",
+	"CK - HAG 1",
 	"JV - Jingaling's Zombified Palace",
 
-	"0x019C - Roll the credits",
-	"0x019D - End of credits",
+	"Cutscene - Roll the credits",
+	"Cutscene - End of credits",
 
-	"Crash 0x019E", "Crash 0x019F",
-	"Unknown 0x01A0", "Unknown 0x01A1", "Unknown 0x01A2", "Unknown 0x01A3", "Unknown 0x01A4", "Unknown 0x01A5",
+	"!Crash 0x019E", "!Crash 0x019F", "!Unknown 0x01A0", "!Unknown 0x01A1", "!Unknown 0x01A2", "!Unknown 0x01A3", "!Unknown 0x01A4", "!Unknown 0x01A5",
 
-	"JRL - Smuggler cavern",
+	"JRL - Smuggler's cavern",
 	"JRL",
 	"JRL - Atlantis",
 	"JRL - Seabottom",
-
-	"Crash 0x01AA", "Unknown 0x01AB", "Crash 0x01AC", "Crash 0x01AD"
 };
 
 --------------------
@@ -858,6 +829,8 @@ local movementStates = { -- TODO: Fill this table
 
 	[0x41] = "Death",
 
+	[0x45] = "Locked", -- Talon Trot, sliding
+
 	[0x4C] = "Landing", -- Water Surface
 
 	[0x4F] = "Idle", -- Climbing
@@ -870,6 +843,9 @@ local movementStates = { -- TODO: Fill this table
 	[0x5B] = "Throwing Object", -- Glowbo
 	[0x5C] = "Knockback",
 
+	[0x69] = "Joining", -- Split up pad
+	[0x6A] = "Joining", -- Split up pad
+
 	[0x6C] = "Backflip", -- Solo Banjo -- TODO: What is the name for this?
 	[0x6D] = "Diving", -- Solo Banjo
 
@@ -881,6 +857,10 @@ local movementStates = { -- TODO: Fill this table
 
 	[0x77] = "Locked", -- Water Surface
 
+	[0x7D] = "Damaged", -- Solo Banjo - Sack Pack
+
+	[0x7F] = "Damaged", -- Underwater
+
 	[0x81] = "Swimming (A)", -- Solo Banjo
 	[0x82] = "Swimming (B)", -- Solo Banjo
 
@@ -891,6 +871,7 @@ local movementStates = { -- TODO: Fill this table
 	[0x96] = "Locked", -- Transforming
 
 	[0x98] = "Locked", -- First person camera, some damage sources, loading zones
+	[0x9A] = "Locked", -- Talon Trot, loading zone etc
 
 	[0x9C] = "Jumping", -- Springy Step Shoes
 
@@ -912,15 +893,32 @@ local movementStates = { -- TODO: Fill this table
 
 	[0xB6] = "Bill Drill",
 
+	[0xB8] = "Splitting", -- Split up pad
+	[0xB9] = "Splitting", -- Split up pad
+
 	[0xBB] = "Idle", -- Solo Kazooie
 	[0xBC] = "Creeping", -- Solo Kazooie
 	[0xBD] = "Jumping", -- Solo Kazooie
+	[0xBE] = "Gliding", -- Solo Kazooie
 
 	[0xC2] = "Wing Whack", -- Solo Kazooie
+	[0xC4] = "Wing Whack", -- Solo Kazooie - Moving
 
 	[0xC6] = "Leg Spring", -- Solo Kazooie
 	[0xC7] = "Walking", -- Solo Kazooie
 
+	[0xCA] = "Idle", -- Breegull Blaster
+
+	[0xD1] = "Walking", -- Breegull Blaster
+	[0xD2] = "Beak Bayonet",
+
+	[0xD6] = "Firing CK Egg", -- Breegull Blaster
+	[0xD7] = "Clockwork Kazooie", -- Breegull Blaster
+	[0xD8] = "Firing Egg", -- Breegull Blaster
+
+	[0xDA] = "Damaged", -- Breegull Blaster
+
+	[0xDE] = "Landing", -- Solo Kazooie
 	[0xDF] = "Falling", -- Solo Kazooie
 
 	[0xE4] = "Pack Whack", -- Solo Banjo
@@ -939,7 +937,7 @@ local movementStates = { -- TODO: Fill this table
 
 	[0xF3] = "Locked", -- Mumbo first person camera water surface
 	[0xF4] = "Landing", -- Mumbo - Water Surface
-	[0xF5] = "Slipping", -- Mumbo, TODO: Also used for loading zones & first person camera?
+	[0xF5] = "Locked", -- Mumbo
 	[0xF6] = "Locked", -- Mumbo
 	[0xF7] = "Attacking", -- Mumbo's Wand
 
@@ -949,11 +947,24 @@ local movementStates = { -- TODO: Fill this table
 	[0xFC] = "Kicking", -- Golden Goliath
 
 	[0xFF] = "Recovering", -- Mumbo
-
+	[0x100] = "Damaged", -- Solo Kazooie
+	[0x101] = "Death", -- Solo Kazooie
+	[0x102] = "Death", -- Solo Banjo - Sack Pack
 	[0x103] = "Death", -- Solo Banjo
 
+	[0x113] = "Locked", -- Van - Loading zone etc
+	[0x114] = "Falling", -- Van
+	[0x115] = "Jumping", -- Van
+	[0x116] = "Driving", -- Van
+
+	[0x119] = "Locked", -- Van
+	[0x11A] = "Idle", -- Van
+
+	[0x11C] = "Paddling", -- Van
+	[0x11D] = "Landing", -- Van - Water Surface
 	[0x11E] = "Casting Spell", -- Mumbo
 
+	[0x121] = "Paying Coin", -- Van
 	[0x122] = "Entering Taxi Pack",
 	[0x123] = "Walking", -- Taxi Pack
 	[0x124] = "Scooping", -- Taxi Pack
@@ -968,7 +979,17 @@ local movementStates = { -- TODO: Fill this table
 
 	[0x138] = "Locked", -- Clockwork Kazooie, slipping, loading zones
 
+	[0x153] = "Entering Talon Torpedo",
+	[0x154] = "Swimming", -- Talon Torpedo
+
+	[0x157] = "Deploying Talon Torpedo",
+	[0x159] = "Swimming (A)", -- Talon Torpedo
+
 	[0x15C] = "Feathery Flap", -- Solo Kazooie
+	[0x15D] = "Idle", -- Solo Kazooie - Water Surface
+	[0x15E] = "Paddling", -- Solo Kazooie
+	[0x15F] = "Diving", -- Solo Kazooie
+	[0x160] = "Landing", -- Solo Kazooie - Water Surface
 
 	[0x163] = "Entering Sack Pack",
 	[0x164] = "Leaving Sack Pack",
@@ -994,8 +1015,11 @@ local movementStates = { -- TODO: Fill this table
 
 	[0x181] = "Damaged", -- Snowball
 
+	[0x186] = "Jumping", -- Solo Kazooie - Springy Step Shoes
+
 	[0x189] = "Breegull Bash",
 	[0x18A] = "Breathing Fire", -- BK
+	[0x18B] = "Breathing Fire", -- Solo Kazooie
 };
 
 function Game.getCurrentMovementState()
