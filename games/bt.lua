@@ -803,7 +803,6 @@ end
 
 local movementStates = { -- TODO: Fill this table
 	[0x00] = "Null",
-
 	[0x01] = "Idle",
 	[0x02] = "Walking", -- Slow
 	[0x03] = "Walking", -- Medium
@@ -812,12 +811,13 @@ local movementStates = { -- TODO: Fill this table
 	[0x06] = "Pecking", -- Bear Punch replacement
 	[0x07] = "Crouching",
 	[0x08] = "Jumping", -- Talon Trot
+	[0x09] = "Shooting Egg", -- BK on ground
+	[0x0A] = "Pooping Egg", -- BK on ground
 
 	[0x0C] = "Slipping",
 
 	[0x0E] = "Damaged",
 	[0x0F] = "Beak Buster",
-
 	[0x10] = "Featherty Flap",
 	[0x11] = "Rat-a-tat Rap",
 	[0x12] = "Flap Flip",
@@ -836,6 +836,14 @@ local movementStates = { -- TODO: Fill this table
 
 	[0x20] = "Landing",
 
+	[0x23] = "Taking Flight",
+	[0x24] = "Flying",
+	[0x25] = "Entering Stilt Stride",
+	[0x26] = "Idle", -- Stilt Stride
+	[0x27] = "Walking", -- Stilt Stride
+	[0x28] = "Jumping", -- Stilt Stride
+	[0x29] = "Leaving Stilt Stride",
+	[0x2A] = "Beak Bomb",
 	[0x2B] = "Idle", -- Underwater
 	[0x2C] = "Swimming (B)",
 	[0x2D] = "Idle", -- Water Surface
@@ -855,14 +863,34 @@ local movementStates = { -- TODO: Fill this table
 	[0x4F] = "Idle", -- Climbing
 	[0x50] = "Climbing",
 
+	[0x54] = "Drowning",
+
+	[0x56] = "Knockback", -- Solo Banjo
+
 	[0x5B] = "Throwing Object", -- Glowbo
+	[0x5C] = "Knockback",
+
+	[0x6C] = "Backflip", -- Solo Banjo -- TODO: What is the name for this?
+	[0x6D] = "Diving", -- Solo Banjo
 
 	[0x71] = "Falling", -- Talon Trot
 	[0x72] = "Recovering", -- Splat
 	[0x73] = "Locked",
 	[0x74] = "Locked", -- Mumbo's Skull
+	[0x75] = "Locked", -- Signpost
+
+	[0x77] = "Locked", -- Water Surface
+
+	[0x81] = "Swimming (A)", -- Solo Banjo
+	[0x82] = "Swimming (B)", -- Solo Banjo
 
 	[0x8F] = "Locked", -- Solo Kazooie
+
+	[0x90] = "Swimming (A+B)", -- Solo Banjo
+
+	[0x96] = "Locked", -- Transforming
+
+	[0x98] = "Locked", -- First person camera, some damage sources, loading zones
 
 	[0x9C] = "Jumping", -- Springy Step Shoes
 
@@ -872,11 +900,11 @@ local movementStates = { -- TODO: Fill this table
 	[0xA9] = "Pecking", -- Grip Grab
 	[0xAA] = "Pulling up", -- Grip Grab
 	[0xAB] = "Death", -- Stony
-	[0xAC] = "Loading Zone", -- Stony
-
+	[0xAC] = "Locked", -- Stony - Loading zone, transformation
+	[0xAD] = "Falling", -- Stony
 	[0xAE] = "Jumping", -- Stony
 	[0xAF] = "Damaged", -- Stony
-
+	[0xB0] = "Knockback", -- Stony
 	[0xB1] = "Locked", -- Stony
 	[0xB2] = "Walking", -- Stony
 	[0xB3] = "Idle", -- Stony
@@ -926,19 +954,45 @@ local movementStates = { -- TODO: Fill this table
 
 	[0x11E] = "Casting Spell", -- Mumbo
 
+	[0x122] = "Entering Taxi Pack",
+	[0x123] = "Walking", -- Taxi Pack
+	[0x124] = "Scooping", -- Taxi Pack
+	[0x125] = "Idle", -- Taxi Pack
+	[0x126] = "Jumping", -- Taxi Pack
+	[0x127] = "Leaving Taxi Pack",
+
+	[0x132] = "Landing", -- Clockwork Kazooie
+	[0x134] = "Jumping", -- Clockwork Kazooie
+	[0x135] = "Walking", -- Clockwork Kazooie
+	[0x136] = "Idle", -- Clockwork Kazooie
+
+	[0x138] = "Locked", -- Clockwork Kazooie, slipping, loading zones
+
 	[0x15C] = "Feathery Flap", -- Solo Kazooie
 
+	[0x163] = "Entering Sack Pack",
+	[0x164] = "Leaving Sack Pack",
+	[0x165] = "Idle", -- Sack Pack
+	[0x166] = "Walking", -- Sack Pack
+
+	[0x169] = "Jumping", -- Sack Pack
 	[0x16A] = "Entering Shack Pack",
 	[0x16B] = "Leaving Shack Pack",
 	[0x16C] = "Idle", -- Shack Pack
 	[0x16D] = "Walking", -- Shack Pack
 	[0x16E] = "Jumping", -- Shack Pack
 	[0x16F] = "Snoozing", -- Snooze Pack
+
 	[0x171] = "Entering Snooze Pack",
 	[0x172] = "Leaving Snooze Pack",
 
 	[0x17B] = "Idle", -- On Wall, Claw Clamber
 	[0x17C] = "Walking", -- On Wall, Claw Clamber
+	[0x17D] = "Idle", -- Snowball
+	[0x17E] = "Rolling", -- Snowball
+	[0x17F] = "Jumping", -- Snowball
+
+	[0x181] = "Damaged", -- Snowball
 
 	[0x189] = "Breegull Bash",
 	[0x18A] = "Breathing Fire", -- BK
@@ -966,6 +1020,13 @@ function Game.getPreviousMovementState()
 		return toHexString(movementState);
 	end
 	return "Unknown";
+end
+
+function Game.setMovementState(state)
+	local movementStateObject = Game.getPlayerSubObject(movement_state_pointer_index);
+	if isRDRAM(movementStateObject) then
+		mainmemory.write_u32_be(movementStateObject + 4, state);
+	end
 end
 
 ------------
