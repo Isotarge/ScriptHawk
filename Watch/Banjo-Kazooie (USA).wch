@@ -103,9 +103,9 @@ SystemID N64
 37C0E0	d	h	1	RDRAM	Player Model Pointer?
 37C0E6	b	u	1	RDRAM	Player Transparancy
 37C0EC	d	f	1	RDRAM	Player Scale
-37C0F0	d	f	1	RDRAM	
-37C0F4	d	f	1	RDRAM	
-37C0F8	d	f	1	RDRAM	
+37C120	d	f	1	RDRAM	X Disjoint Amount
+37C124	d	f	1	RDRAM	Y Disjoint Amount
+37C128	d	f	1	RDRAM	Z Disjoint Amount
 37C1D1	b	u	1	RDRAM	Standing on Fly Pad
 37C1D2	b	u	1	RDRAM	Standing on Shock Spring Pad
 37C2D3	b	u	1	RDRAM	Mumbo Transformation
@@ -136,6 +136,7 @@ SystemID N64
 37CA14	d	h	1	RDRAM	Roll Movement Script
 37D160	d	u	1	RDRAM	Previous Movement State
 37D164	d	u	1	RDRAM	Current Movement State
+37D188	b	h	1	RDRAM	Mumbo Transformation
 37D23C	d	f	1	RDRAM	Eye State (Left)
 37D240	d	f	1	RDRAM	Eye State (Right)
 37D260	d	f	1	RDRAM	Ground Damage Timer
