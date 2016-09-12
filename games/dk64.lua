@@ -1324,7 +1324,7 @@ local collisionTypes = { -- These seem to be the model 2 equivalent to the model
 	[0x4E] = "-",
 	[0x4F] = "Metal box/platform",
 
-	[0x50] = "K Crate", -- Unused
+	[0x50] = "K Crate", -- DK Helm Target Barrel
 	[0x51] = "-",
 	[0x52] = "Wooden panel",
 	[0x53] = "-",
