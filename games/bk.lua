@@ -34,12 +34,11 @@ local mumbo_tokens = 100;
 local jiggies = 104;
 
 local max_notes = 100;
-local max_eggs = 200; -- TODO: How do you get this information out of the game?
-	-- The max eggs value appears in register v0 when executing the beql at 0x80346200
-local max_red_feathers = 50; -- TODO: How do you get this information out of the game?
-local max_gold_feathers = 10; -- TODO: How do you get this information out of the game?
+local max_eggs = 200; -- RAM:803461AC li $v0, 0x64 -- US 1.0
+local max_red_feathers = 50; -- RAM:803461CC li $v0, 0x32 -- US 1.0
+local max_gold_feathers = 10; -- RAM:803461E8 li $v0, 0xA -- US 1.0
 local max_lives = 9;
-local max_air = 6 * 600;
+local max_air = 6 * 600; -- 6 * 500 on PAL
 local max_mumbo_tokens = 99;
 local max_jiggies = 100;
 
@@ -241,6 +240,7 @@ Game.Memory = {
 	["notes"] = {0x386940, 0x386AA0, 0x385180, 0x385F60},
 	["object_array_pointer"] = {0x36EAE0, 0x36F260, 0x36D760, 0x36E560},
 	["struct_array_pointer"] = {nil, nil, nil, 0x36E7C8}, -- TODO: Other versions
+	["board_base"] = {0x394140, 0x394350, 0x3929C0, 0x393760},
 };
 
 function Game.detectVersion(romName, romHash)
@@ -1534,9 +1534,9 @@ end
 
 function getNumSlots()
 	if script_mode == "Examine" or script_mode == "List" then -- Model 1
-		local levelObjectArray = dereferencePointer(Game.Memory.object_array_pointer[version]);
-		if isRDRAM(levelObjectArray) then
-			return math.min(max_slots, mainmemory.read_u32_be(levelObjectArray));
+		local objectArray = dereferencePointer(Game.Memory.object_array_pointer[version]);
+		if isRDRAM(objectArray) then
+			return math.min(max_slots, mainmemory.read_u32_be(objectArray));
 		end
 	else -- Model 2
 		if version == 4 then -- TODO: Other versions
@@ -1623,9 +1623,9 @@ end
 
 function zipToSelectedObject()
 	if script_mode == "Examine" or script_mode == "List" then -- Model 1
-		local levelObjectArray = dereferencePointer(Game.Memory.object_array_pointer[version]); -- TODO: Refactor to objectArray
-		if isRDRAM(levelObjectArray) then
-			local slotBase = levelObjectArray + getSlotBase(object_index);
+		local objectArray = dereferencePointer(Game.Memory.object_array_pointer[version]);
+		if isRDRAM(objectArray) then
+			local slotBase = objectArray + getSlotBase(object_index);
 
 			local x = mainmemory.readfloat(slotBase + 0x04, true);
 			local y = mainmemory.readfloat(slotBase + 0x08, true);
@@ -1985,40 +1985,39 @@ function getCorrectFFAnswer()
 	return 0;
 end
 
-
 -- FF Board State
- local boardBase = 0x394140; -- TODO: Find in all versions -- TODO: Is this global?
- local squareSize = 0x20;
- local numSquares = 95;
- 
- -- 0x08 Byte - Question Type
- local questionTypes = {
- 	[0x00] = "None",
- 	[0x01] = "BK",
- 	[0x02] = "Screen",
- 	[0x03] = "Sound",
- 	[0x04] = "Minigame",
- 	[0x05] = "Grunty",
- 	[0x06] = "Death",
- 	[0x07] = "Joker", -- Gives 1 card
- 	[0x08] = "Joker", -- Gives 2 cards
- 	[0x09] = "Joker", -- Gives 3 cards
- 	[0x0A] = "Joker?", -- Gives 0 cards?
- 	[0x0B] = "Joker", -- Gives 5 cards
- 	[0x0C] = "Joker", -- Gives 6 cards
- 	-- TODO: Finish this table
- };
- 
- -- 0x10 Float - Brightness?
- 
- function randomizeBrightness()
- 	for i = 0, numSquares do
- 		--mainmemory.writefloat(boardBase + i * squareSize + 0x10, math.random(), true);
- 		--mainmemory.writefloat(boardBase + i * squareSize + 0x10, i / numSquares, true);
- 		print(i..": "..questionTypes[mainmemory.readbyte(boardBase + i * squareSize + 0x08)]);
- 	end
- end
- 
+--Europe, Japan, US 1.1, US 1.0
+local squareSize = 0x20;
+local numSquares = 95;
+
+-- 0x08 Byte - Question Type
+local questionTypes = {
+	[0x00] = "None",
+	[0x01] = "BK",
+	[0x02] = "Screen",
+	[0x03] = "Sound",
+	[0x04] = "Minigame",
+	[0x05] = "Grunty",
+	[0x06] = "Death",
+	[0x07] = "Joker", -- Gives 1 card
+	[0x08] = "Joker", -- Gives 2 cards
+	[0x09] = "Joker", -- Gives 3 cards
+	[0x0A] = "Joker?", -- Gives 0 cards?
+	[0x0B] = "Joker", -- Gives 5 cards
+	[0x0C] = "Joker", -- Gives 6 cards
+	-- TODO: Finish this table
+};
+
+-- 0x10 Float - Brightness?
+
+function randomizeBrightness()
+	for i = 0, numSquares do
+		--mainmemory.writefloat(Game.Memory.board_base[version] + i * squareSize + 0x10, math.random(), true);
+		--mainmemory.writefloat(Game.Memory.board_base[version] + i * squareSize + 0x10, i / numSquares, true);
+		dprint(i..": "..questionTypes[mainmemory.readbyte(Game.Memory.board_base[version] + i * squareSize + 0x08)]);
+	end
+	print_deferred();
+end
 
 ----------------------
 -- Vile state stuff --
@@ -2174,11 +2173,11 @@ end
 
 function findConga()
 	if mainmemory.readbyte(Game.Memory.map[version]) == 0x02 then -- Make sure we're in Mumbo's Mountain
-		local levelObjectArray = dereferencePointer(Game.Memory.object_array_pointer[version]);
-		if isRDRAM(levelObjectArray) then
-			local numObjects = mainmemory.read_u32_be(levelObjectArray);
+		local objectArray = dereferencePointer(Game.Memory.object_array_pointer[version]);
+		if isRDRAM(objectArray) then
+			local numObjects = mainmemory.read_u32_be(objectArray);
 			for i = 0, numObjects do
-				local slotBase = levelObjectArray + slot_base + (i * slot_size);
+				local slotBase = objectArray + slot_base + (i * slot_size);
 				local x = mainmemory.readfloat(slotBase + 0x04, true);
 				local y = mainmemory.readfloat(slotBase + 0x08, true);
 				local z = mainmemory.readfloat(slotBase + 0x0C, true);
@@ -2614,8 +2613,8 @@ Game.ASMMaxCodeSize = 0x400000;
 
 Game.ASMHook = { --Hook == JAL ASMCodeBase == (0b000010 << 26) | (ASMHooKBase >> 2)
 	0x0C + math.floor(Game.ASMCodeBase/(2^26))%(2^8),
-	math.floor(Game.ASMCodeBase/(2^18))%(2^8), 
-	math.floor(Game.ASMCodeBase/(2^10))%(2^8), 
+	math.floor(Game.ASMCodeBase/(2^18))%(2^8),
+	math.floor(Game.ASMCodeBase/(2^10))%(2^8),
 	math.floor(Game.ASMCodeBase/(2^2))%(2^8),
 };
 -- end .asm code with J 0x8024E420 {opcode: 0x08093908}
