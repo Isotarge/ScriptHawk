@@ -132,11 +132,11 @@ Game.maps = {
 
 	"!Crash 0x011C", "!Crash 0x011D",
 
-	"TDL - Wumba's Wigwam",
+	"TDL - Wumba's Wigwam (Small)",
 	"GI - Wumba's Wigwam",
 	"JRL - Wumba's Wigwam",
 	"GGM - Inside Chuffy's Wagon",
-	"TDL - Wumba's Wigwam",
+	"TDL - Wumba's Wigwam (Big)",
 	"TDL - Inside Chompa's Belly",
 	"WW - Saucer of Peril",
 	"GI - Water Supply Pipe",
@@ -849,6 +849,8 @@ local movementStates = {
 	[0x6C] = "Backflip", -- Solo Banjo -- TODO: What is the name for this?
 	[0x6D] = "Diving", -- Solo Banjo
 
+	[0x6F] = "Floating", -- Solo Banjo, CCL
+
 	[0x71] = "Falling", -- Talon Trot
 	[0x72] = "Recovering", -- Splat
 	[0x73] = "Locked",
@@ -857,6 +859,8 @@ local movementStates = {
 
 	[0x77] = "Locked", -- Water Surface
 	[0x78] = "Locked", -- Underwater
+
+	[0x7A] = "Walking", -- Damaging Ground, eg. quicksand
 
 	[0x7D] = "Damaged", -- Solo Banjo - Sack Pack
 
@@ -870,6 +874,7 @@ local movementStates = {
 
 	[0x90] = "Swimming (A+B)", -- Solo Banjo
 
+	[0x95] = "Jumping", -- Claw Clamber
 	[0x96] = "Locked", -- Transforming
 	[0x97] = "Locked", -- Underwater - Loading Zone
 	[0x98] = "Locked", -- First person camera, some damage sources, loading zones
@@ -907,7 +912,7 @@ local movementStates = {
 	[0xC2] = "Wing Whack", -- Solo Kazooie
 
 	[0xC4] = "Wing Whack", -- Solo Kazooie - Moving
-
+	[0xC5] = "Hatching", -- Solo Kazooie
 	[0xC6] = "Leg Spring", -- Solo Kazooie
 	[0xC7] = "Walking", -- Solo Kazooie
 
@@ -922,6 +927,7 @@ local movementStates = {
 
 	[0xDA] = "Damaged", -- Breegull Blaster
 
+	[0xDD] = "Crouching", -- Solo Kazooie
 	[0xDE] = "Landing", -- Solo Kazooie
 	[0xDF] = "Falling", -- Solo Kazooie
 
@@ -956,11 +962,27 @@ local movementStates = {
 	[0x102] = "Death", -- Solo Banjo - Sack Pack
 	[0x103] = "Death", -- Solo Banjo
 
+	[0x104] = "Death", -- Detonator
+	[0x105] = "Locked", -- Detonator, Loading Zone, First Person Camera
+
+	[0x107] = "Jumping", -- Detonator
+	[0x108] = "Walking", -- Detonator
+	[0x109] = "Damaged", -- Detonator
+	[0x10A] = "Knockback", -- Detonator
+	[0x10B] = "Locked", -- Detonator, Talking
+	[0x10C] = "Idle", -- Detonator
+	[0x10D] = "Detonating", -- Detonator, Scripted
+	[0x10E] = "Detonating", -- Detonator
+	[0x10F] = "Idle", -- Detonator, Water Surface
+	[0x110] = "Paddling", -- Detonator, Water Surface
+	[0x111] = "Landing", -- Detonator, Water Surface
+
 	[0x113] = "Locked", -- Van - Loading zone etc
 	[0x114] = "Falling", -- Van
 	[0x115] = "Jumping", -- Van
 	[0x116] = "Driving", -- Van
 
+	[0x118] = "Knockback", -- Van
 	[0x119] = "Locked", -- Van
 	[0x11A] = "Idle", -- Van
 
@@ -989,6 +1011,29 @@ local movementStates = {
 
 	[0x138] = "Locked", -- Clockwork Kazooie, slipping, loading zones
 
+	[0x13B] = "Landing", -- Small T-Rex
+	[0x13C] = "Death", -- Small T-Rex
+	[0x13D] = "Locked", -- Small T-Rex
+	[0x13E] = "Falling", -- Small T-Rex
+	[0x13F] = "Jumping", -- Small T-Rex
+	[0x140] = "Damaged", -- Small T-Rex
+	[0x141] = "Knockback", -- Small T-Rex
+	[0x142] = "Locked", -- Small T-Rex, Talking
+	[0x143] = "Roar", -- Small T-Rex
+	[0x144] = "Walking", -- Small T-Rex
+	[0x145] = "Idle", -- Small T-Rex
+	[0x146] = "Walking", -- Small T-Rex, Slow
+	[0x147] = "Landing", -- Big T-Rex
+
+	[0x149] = "Locked", -- Big T-Rex, Loading Zone
+	[0x14A] = "Falling", -- Big T-Rex
+	[0x14B] = "Jumping", -- Big T-Rex
+
+	[0x14E] = "Locked", -- Big T-Rex, Talking
+	[0x14F] = "Roar", -- Big T-Rex
+	[0x150] = "Walking", -- Big T-Rex
+	[0x151] = "Idle", -- Big T-Rex
+	[0x152] = "Walking", -- Big T-Rex, Slow
 	[0x153] = "Entering Talon Torpedo",
 	[0x154] = "Swimming", -- Talon Torpedo
 
@@ -1026,7 +1071,8 @@ local movementStates = {
 	[0x181] = "Damaged", -- Snowball
 
 	[0x186] = "Jumping", -- Solo Kazooie - Springy Step Shoes
-
+	[0x187] = "Idle", -- Solo Kazooie - On Wall, Claw Clamber
+	[0x188] = "Walking", -- Solo Kazooie - On Wall, Claw Clamber
 	[0x189] = "Breegull Bash",
 	[0x18A] = "Breathing Fire", -- BK
 	[0x18B] = "Breathing Fire", -- Solo Kazooie
