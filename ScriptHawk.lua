@@ -804,6 +804,8 @@ local function toggleMode()
 	if mode == 'Position' then
 		mode = 'Rotation';
 	elseif mode == 'Rotation' then
+		mode = 'YRotation';
+	elseif mode == 'YRotation' then
 		mode = 'Practice';
 	elseif mode == 'Practice' then
 		mode = 'TAS';
@@ -1179,6 +1181,37 @@ local function mainloop()
 			end
 			if joypad_pressed["P1 DPad R"] then
 				rotate("z", Game.rot_speed);
+			end
+			if joypad_pressed["P1 L"] then
+				gofast("y", speedy_speed_Y);
+			end
+		end
+		if mode == 'YRotation' then
+			rot_rad = rotation_to_radians(Game.getYRotation());
+			if Game.speedy_invert_UD then
+				if joypad_pressed["P1 DPad U"] then
+					gofast("x", -1.0 * (speedy_speed_XZ * math.sin(rot_rad)));
+					gofast("z", -1.0 * (speedy_speed_XZ * math.cos(rot_rad)));
+				end
+				if joypad_pressed["P1 DPad D"] then
+					gofast("x", speedy_speed_XZ * math.sin(rot_rad));
+					gofast("z", speedy_speed_XZ * math.cos(rot_rad));
+				end
+			else
+				if joypad_pressed["P1 DPad U"] then
+					gofast("x", speedy_speed_XZ * math.sin(rot_rad));
+					gofast("z", speedy_speed_XZ * math.cos(rot_rad));
+				end
+				if joypad_pressed["P1 DPad D"] then
+					gofast("x", -1.0 * (speedy_speed_XZ * math.sin(rot_rad)));
+					gofast("z", -1.0 * (speedy_speed_XZ * math.cos(rot_rad)));
+				end
+			end
+			if joypad_pressed["P1 DPad L"] then
+				rotate("y", -Game.rot_speed);
+			end
+			if joypad_pressed["P1 DPad R"] then
+				rotate("y", Game.rot_speed);
 			end
 			if joypad_pressed["P1 L"] then
 				gofast("y", speedy_speed_Y);
