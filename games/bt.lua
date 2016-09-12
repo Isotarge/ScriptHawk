@@ -134,9 +134,9 @@ Game.maps = {
 
 	"TDL - Wumba's Wigwam",
 	"GI - Wumba's Wigwam",
-	"JRL - Wide Angle Wumba's Wigwam",
+	"JRL - Wumba's Wigwam",
 	"GGM - Inside Chuffy's Wagon",
-	"TDL - Wide Angle Wumba's Wigwam",
+	"TDL - Wumba's Wigwam",
 	"TDL - Inside Chompa's Belly",
 	"WW - Saucer of Peril",
 	"GI - Water Supply Pipe",
@@ -148,9 +148,9 @@ Game.maps = {
 	"HP - Chilli Billi",
 	"HP - Chilly Willy",
 	"HP - Kickball Stadium lobby",
-	"HP - Kickball Stadium - wide angle 1",
-	"HP - Kickball Stadium - wide angle 2",
-	"HP - Kickball Stadium - wide angle 3",
+	"HP - Kickball Stadium 1",
+	"HP - Kickball Stadium 2",
+	"HP - Kickball Stadium 3",
 	"HP - Boggy's Igloo",
 	"HP - Icicle Grotto",
 	"HP - Inside the Volcano",
@@ -772,7 +772,7 @@ local function unlock_moves()
 	end
 end
 
-local movementStates = { -- TODO: Fill this table
+local movementStates = {
 	[0x00] = "Null",
 	[0x01] = "Idle",
 	[0x02] = "Walking", -- Slow
@@ -856,6 +856,7 @@ local movementStates = { -- TODO: Fill this table
 	[0x75] = "Locked", -- Signpost
 
 	[0x77] = "Locked", -- Water Surface
+	[0x78] = "Locked", -- Underwater
 
 	[0x7D] = "Damaged", -- Solo Banjo - Sack Pack
 
@@ -863,14 +864,16 @@ local movementStates = { -- TODO: Fill this table
 
 	[0x81] = "Swimming (A)", -- Solo Banjo
 	[0x82] = "Swimming (B)", -- Solo Banjo
+	[0x83] = "Knockback", -- Submarine on land
 
 	[0x8F] = "Locked", -- Solo Kazooie
 
 	[0x90] = "Swimming (A+B)", -- Solo Banjo
 
 	[0x96] = "Locked", -- Transforming
-
+	[0x97] = "Locked", -- Underwater - Loading Zone
 	[0x98] = "Locked", -- First person camera, some damage sources, loading zones
+
 	[0x9A] = "Locked", -- Talon Trot, loading zone etc
 
 	[0x9C] = "Jumping", -- Springy Step Shoes
@@ -902,6 +905,7 @@ local movementStates = { -- TODO: Fill this table
 	[0xBE] = "Gliding", -- Solo Kazooie
 
 	[0xC2] = "Wing Whack", -- Solo Kazooie
+
 	[0xC4] = "Wing Whack", -- Solo Kazooie - Moving
 
 	[0xC6] = "Leg Spring", -- Solo Kazooie
@@ -972,6 +976,12 @@ local movementStates = { -- TODO: Fill this table
 	[0x126] = "Jumping", -- Taxi Pack
 	[0x127] = "Leaving Taxi Pack",
 
+	[0x12C] = "Swimming", -- Submarine
+	[0x12D] = "Damaged", -- Submarine
+	[0x12E] = "Death", -- Submarine
+	[0x12F] = "Locked", -- Submarine - Signpost etc
+	[0x130] = "Locked", -- Submarine - Loading Zone, Transforming etc
+	[0x131] = "Idle", -- Submarine
 	[0x132] = "Landing", -- Clockwork Kazooie
 	[0x134] = "Jumping", -- Clockwork Kazooie
 	[0x135] = "Walking", -- Clockwork Kazooie
