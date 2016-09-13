@@ -44,9 +44,15 @@ for f in funcs:
     print "{['start'] = 0x%08x, ['end'] = 0x%08x, ['size'] = 0x%02x, ['name'] = '%s'}," % (apifunc.startEA, apifunc.endEA, size, name)
 ]]--
 
---local functions = require("BKFunctions");
---local functions = require("BTFunctions");
-local functions = require("DK64Functions");
+local functions = {};
+local romHash = gameinfo.getromhash();
+if romHash == "1FE1632098865F639E22C11B9A81EE8F29C75D7A" then -- BK US 1.0
+	functions = require("BKFunctions");
+elseif romHash == "AF1A89E12B638B8D82CC4C085C8E01D4CBA03FB3" then -- BT US
+	functions = require("BTFunctions");
+elseif romHash == "CF806FF2603640A748FCA5026DED28802F1F4A50" then -- DK64 US
+	functions = require("DK64Functions");
+end
 
 RDRAMBase = 0x80000000;
 RDRAMSize = 0x800000; -- Halved with no expansion pak
@@ -275,6 +281,10 @@ function callStack(stackPointer, stackEnd)
 		local currentFunction = isFunction(currentValue);
 		if currentFunction ~= false then
 			dprint(currentFunction.name.." + "..toHexString(currentValue - currentFunction.start));
+		else
+			if isPointer(currentValue) then
+				print(toHexString(currentValue, 8, ""));
+			end
 		end
 	end
 end
@@ -283,10 +293,16 @@ function callback()
 	local registers = emu.getregisters();
 
 	local stackPointer = registers["REG29_lo"];
-	local stackEnd = 0x80016630; -- TODO: Confirm or compute this somehow
-	if stackPointer > 0x80016630 then
-		stackEnd = 0x80767C00; -- TODO: Confirm or compute this somehow
-	end
+	
+	-- DK64 Stack
+	--local stackEnd = 0x80016630; -- TODO: Confirm or compute this somehow
+	--if stackPointer > 0x80016630 then
+	--	stackEnd = 0x80767C00; -- TODO: Confirm or compute this somehow
+	--end
+	
+	-- BT Stack
+	local stackEnd = 0x800459B0; -- TODO: Confirm or compute this somehow
+
 	callStack(stackPointer, stackEnd);
 	dprint();
 	print_deferred();

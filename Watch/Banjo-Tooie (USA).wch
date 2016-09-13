@@ -135,6 +135,7 @@ SystemID N64
 12B010	d	f	1	RDRAM	Frameskip Factor?
 12B050	d	f	1	RDRAM	Air (Real)
 12B054	d	f	1	RDRAM	Air
+12B3F2	b	h	1	RDRAM	Bottles' Revenge Toggle
 12C770	d	h	1	RDRAM	Moves Pointer
 12C7A4	d	f	1	RDRAM	Game Time (GGM)
 12C7A8	d	f	1	RDRAM	Game Time (MT)
