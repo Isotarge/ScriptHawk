@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<title>Sound Question Training</title>
+		<script>
+			var questions = [
+				"YOU PICK UP ITEMS ON THE GROUND, WHICH ONE MAKES THIS SILLY SOUND?",
+				"LISTEN UP NOW THEN MAKE YOUR CHOICE, WHICH CHARACTER HAS THIS DUMB VOICE?",
+				"LISTEN UP NOW THEN MAKE YOUR CHOICE, WHICH CHARACTER HAS THIS COOL VOICE?",
+				"LISTEN UP NOW THEN MAKE YOUR CHOICE, WHICH CHARACTERS HAVE THIS DUMB VOICE?",
+				"WHEN THIS PIECE OF MUSIC'S HEARD, WHICH MOVE'S DONE BY YOUR STUPID BIRD?",
+				"WHEN THIS PIECE OF MUSIC IS HEARD, WHICH MOVE'S DONE BY YOUR STUPID BIRD?",
+				"YOU SHOULD REMEMBER BUT WE'LL SEE, IF THIS IS HEARD WHERE WOULD YOU BE?",
+				"LISTEN CAREFULLY TO THIS TUNE, WHICH WORLD'S IT FROM, YOU FURRY GOON?",
+			];
+
+			var answers = [
+				[0, "MUSICAL NOTES", "BLUE EGGS", "BLUE WHALE"],
+				[1, "BOTTLES THE MOLE", "JAMJARS THE MOLE", "BEAKERS THE MOLE"],
+				[1, "CHIMPY THE CHIMP", "CONGA THE GORILLA", "BUMPY THE BABOON"],
+				[1, "TIPTUP THE TURTLE", "RIPTUP THE TURTLE", "BOTTLES THE MOLE"],
+				[1, "RUBEE THE SNAKE CHARMER", "RATLEE THE SNAKE", "HISTUP THE SNAKE"],
+				[1, "NAPPER THE SLEEPING GHOST", "SIPPER THE DRINKING GHOST", "NAKKER THE INJURED GHOST"],
+				[1, "SNORKEL THE DOLPHIN", "AQUALUNG THE DOLPHIN.ƒ.BUBBLES THE FISH"],
+				[1, "CAPTAIN BLUBBER THE HIPPO PIRATE", "CAPTAIN BLACKEYE THE PIRATE", "ADMIRAL BROWNEYE THE DIRTY PIRATE"],
+				[0, "GOLD FEATHER", "RED FEATHER", "GOLD NECKLACE"],
+				[0, "EXTRA HONEYCOMB PIECE", "EXTRA LIFE", "EXTRA MONEY"],
+				[1, "GOBI THE CAMEL", "MOBI THE CAMEL", "HOBO THE CAMEL"],
+				[1, "CLANKER THE WHALE", "CRANKY THE WHALE", "CRANKY KONG"],
+				[1, "TRUNKER THE TREE", "STINKER THE TREE", "TRUNKER THE ELEPHANT"],
+				[1, "MR. VILE THE CROCODILE", "MR. PILES THE ALLIGATOR", "MRS. BILE THE CROCODILE"],
+				[1, "MUMBO JUMBO THE SHAMAN", "HUMBA WUMBA THE SHAMAN", "JIMBO JAMBO THE SHAMAN"],
+				[1, "CONGA THE GORILLA", "FUNKY THE MONKEY", "CHIMPY THE CHIMP"],
+				[2, "GRUNTILDA THE WITCH", "BRENTILDA THE FAIRY GODMOTHER", "TOOTY THE BEAR"],
+				[1, "EYRIE THE EAGLE", "BEERIE THE BUZZARD", "KAZOOIE THE BREEGULL"],
+				[1, "BRENTILDA THE UGLY FAIRY GODMOTHER", "GRUNTILDA THE LOVELY WITCH", "TOOTY THE NASTY BEAR"],
+				[1, "BOGGY THE POLAR BEAR", "WOZZA THE WALRUS", "BOZZO THE SEAL"],
+				[1, "WOZZA THE WALRUS", "SNORKEL THE DOLPHIN", "ROBNUT THE SQUIRREL"],
+				[1, "NABNUT THE SQUIRREL", "GNAWTY THE BEAVER", "CONKER THE SQUIRREL"],
+				[3, "THE POLAR BEAR KIDS", "THE TURTLE CHOIR", "THE MUMMY ORCHESTRA"],
+				[1, "TOOTY THE BEAR", "BANJO THE STUPID FAT BEAR", "BOTTLES THE MOLE"],
+				[1, "LOGGO THE TOILET", "SHANKER THE TOILET", "WIZZO THE WASHBASIN"],
+				[1, "NIPPER THE HERMIT CRAB", "SNIPPET THE CRAB", "NIBBLES THE CROCODILE"],
+				[1, "TANKTUP THE GIANT TURTLE", "NIPPER THE HUGE CRAB", "SLAPPER THE MASSIVE WHALE"],
+				[1, "JINJO", "TOOTY", "BOTTLES"],
+				[4, "TURBO TALON TROT", "WONDER WING", "WONDER TURBO WING TROT"],
+				[5, "STILT STRIDE", "TURBO TALON TROT", "TURBO STILT TALON STRIDE"],
+				[5, "WONDER WING", "STILT STRIDE", "WONDER STRIDE STILT WING"],
+				[6, "INSIDE THE POLAR BEAR'S IGLOO", "INSIDE THE HAUNTED CHURCH", "INSIDE THE HAUNTED BEAR'S CHURCH"],
+				[6, "INSIDE THE SQUIRREL'S TREE HOUSE", "INSIDE BANJO'S HOUSE", "INSIDE BANJO THE SQUIRREL'S HOUSE"],
+				[6, "INSIDE THE SHAMAN'S SKULL", "INSIDE THE CROCODILE'S HEAD", "INSIDE THE SHAMAN'S HEAD"],
+				[7, "MUMBO'S MOUNTAIN", "MAD MONSTER MANSION", "MAD MUMBO'S MANSION"],
+				[7, "TREASURE TROVE COVE", "RUSTY BUCKET BAY", "TREASURE BUCKET BAY"],
+				[7, "CLANKER'S CAVERN", "CLICK CLOCK WOOD", "CLANKER'S CLOCK"],
+				[7, "BUBBLEGLOOP SWAMP", "MUMBO'S MOUNTAIN", "BUBBLE GUM MOUNTAIN"],
+				[7, "GOBI'S VALLEY", "FREEZEEZY PEAK", "GOBI'S PEAK"],
+				[7, "MAD MONSTER MANSION", "RUSTY BUCKET BAY", "RUSTY MONSTER BAY"],
+				[7, "FREEZEEZY PEAK", "TREASURE TROVE COVE", "FREEZEEZY COVE"],
+				[7, "CLICK CLOCK WOOD", "BUBBLEGLOOP SWAMP", "BUBBLECLOCK WOOD"],
+				[7, "RUSTY BUCKET BAY", "CLICK CLOCK WOOD", "RUSTY CLOCK WOOD"],
+				[6, "INSIDE THE HORNET HIVE", "INSIDE THE TERMITE TOWER", "INSIDE THE CRAB SHELL"],
+				[6, "INSIDE THE WALRUS'S CAVE", "INSIDE THE GIANT MECHANICAL WHALE", "INSIDE THE SHAMAN'S SKULL"],
+				[6, "INSIDE THE PIRATE SHIP HOLD", "INSIDE THE GIANT TURTLE", "INSIDE THE SPHINX"],
+				[0, "SHAMAN'S TOKEN", "EXTRA LIFE", "SHAMAN'S WIFE"],
+				[0, "BLUE EGGS", "MUSICAL NOTES", "MUSICAL GOATS"],
+				[0, "RED FEATHER", "GOLD FEATHER", "FEATHER PILLOW"],
+				[0, "EXTRA LIFE", "EXTRA WIFE", "EXTRA HONEYCOMB PIECE"],
+				[0, "HONEYCOMB", "BLUE EGGS", "HAIR COMB"],
+			];
+
+			var answer1 = 1;
+			var answer2 = 2;
+			var answer3 = 3;
+			var streak = 0;
+
+			function generateQuestion() {
+				var randomQuestion = answers[Math.floor(Math.random() * answers.length)];
+				document.getElementById("question").innerHTML = questions[randomQuestion[0]];
+				answer1 = Math.ceil(Math.random() * 3); // Pick first answer
+				do {
+					answer2 = Math.ceil(Math.random() * 3); // Pick second answer
+				} while (answer2 == answer1);
+				do {
+					answer3 = Math.ceil(Math.random() * 3); // Pick third answer
+				} while (answer3 == answer2 || answer2 == answer1 || answer3 == answer1);
+				document.getElementById("answer1").innerHTML = randomQuestion[answer1];
+				document.getElementById("answer2").innerHTML = randomQuestion[answer2];
+				document.getElementById("answer3").innerHTML = randomQuestion[answer3];
+			}
+
+			function doanswer1() {
+				if (answer1 == 1) {
+					streak++;
+					document.getElementById("result").innerHTML = "Correct!";
+				} else {
+					streak = 0;
+					document.getElementById("result").innerHTML = "Incorrect!";
+				}
+				document.getElementById("streak").innerHTML = streak;
+				generateQuestion();
+			}
+
+			function doanswer2() {
+				if (answer2 == 1) {
+					streak++;
+					document.getElementById("result").innerHTML = "Correct!";
+				} else {
+					streak = 0;
+					document.getElementById("result").innerHTML = "Incorrect!";
+				}
+				document.getElementById("streak").innerHTML = streak;
+				generateQuestion();
+			}
+
+			function doanswer3() {
+				if (answer3 == 1) {
+					streak++;
+					document.getElementById("result").innerHTML = "Correct!";
+				} else {
+					streak = 0;
+					document.getElementById("result").innerHTML = "Incorrect!";
+				}
+				document.getElementById("streak").innerHTML = streak;
+				generateQuestion();
+			}
+		</script>
+	</head>
+	<body onload="generateQuestion()">
+		<div id="question"></div>
+		<button id="answer1" onclick="doanswer1()"></button><br>
+		<button id="answer2" onclick="doanswer2()"></button><br>
+		<button id="answer3" onclick="doanswer3()"></button><br>
+		<br>
+		<div id="result"></div>
+		<span id="streak">0</span> Streak
+	</body>
+</html>
