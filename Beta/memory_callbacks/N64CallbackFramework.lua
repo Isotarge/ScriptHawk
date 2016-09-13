@@ -283,7 +283,7 @@ function callStack(stackPointer, stackEnd)
 			dprint(currentFunction.name.." + "..toHexString(currentValue - currentFunction.start));
 		else
 			if isPointer(currentValue) then
-				print(toHexString(currentValue, 8, ""));
+				dprint(toHexString(currentValue, 8, ""));
 			end
 		end
 	end
@@ -295,13 +295,13 @@ function callback()
 	local stackPointer = registers["REG29_lo"];
 	
 	-- DK64 Stack
-	--local stackEnd = 0x80016630; -- TODO: Confirm or compute this somehow
-	--if stackPointer > 0x80016630 then
-	--	stackEnd = 0x80767C00; -- TODO: Confirm or compute this somehow
-	--end
+	local stackEnd = 0x80016630; -- TODO: Confirm or compute this somehow
+	if stackPointer > 0x80016630 then
+		stackEnd = 0x80767C00; -- TODO: Confirm or compute this somehow
+	end
 	
 	-- BT Stack
-	local stackEnd = 0x800459B0; -- TODO: Confirm or compute this somehow
+	--local stackEnd = 0x800459B0; -- TODO: Confirm or compute this somehow
 
 	callStack(stackPointer, stackEnd);
 	dprint();
