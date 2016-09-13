@@ -117,6 +117,7 @@ SystemID N64
 126738	d	h	1	RDRAM	Beginning of pointer list
 127638	d	f	1	RDRAM	Game Runtime
 12763C	d	f	1	RDRAM	Map Runtime
+127690	d	f	1	RDRAM	FOV
 12A990	d	f	1	RDRAM	Unknown Float
 12A9F0	d	f	1	RDRAM	Unknown Float
 12A9F4	d	f	1	RDRAM	Unknown Float
