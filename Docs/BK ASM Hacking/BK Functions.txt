@@ -1,30 +1,134 @@
 Banjo-Kazooie Functions US 1.0
 
-0x8023DB5C --unknown start
+0x8000210C [ word $v0 ] GetPIStatusReg( void )
 
-0x8023E000 --unknown start
+0x80002190 [ void ] 	SetCOP0StatusRegister( $a0 input )
+0x800021a0 [ $v0  ] 	GetCOP0StatusRegister( void )
 
-0x8024BF94 SetFrameSkip(a0 value) sets dword 0x802808DC from register a0
-0x8024BFA0 GetFrameSkip() returns dword 0x802808DC in register v0, normally 2 but sometimes 3 eg. GV lobby
+0x8023E06C [ void ] 	SetApplyButtonInputsToBanjoFlag( void )
 
-0x8024E55C --Unknown Function (called with a0 0)
+0x8024BF94 [ void ] 	SetFrameSkip( word $a0 input )
+0x8024BFA0 [ word $v0 ] GetFrameSkip( void )		//normally 2 but sometimes 3 eg. GV lobby
 
-0x8024E7C8 --Unknown Function, currently used for GS hook(calls functions 0x8023E000, 0x8024E420, 0x80265000, 0x802E4384, 0x802E49FC, 0x8030BD98, 0x803204E4, 0x8033DD04, 0x8033DD90, 0x8033DD9C, 0x80349EE4 
+0x8024C788 [ float $f0 ]GetCamera_YRotation( void )
 
-0x80264550 Main Game Loop? Does Rendering, called by controller handler?
+0x8024CD88 [ void ] 	SetCamera_XYZPosition( float* $a0 xPosPtr )
 
-0x80265000 --unknown 
+0x8024CE18 [ void ] 	SetCamera_XYZRotation( float* $a0 xRotPtr )
 
-0x802957F0 GetMovesUnlockedBitfield() loads dword 0x8037C3A0 into register v0
-0x80295864 SetMovesUnlockedBitfield(a0 value) writes register a0 to the moves bitfield at 0x8037C3A0
+0x8024E7C8 [ ???  ] 	UpdateButtonInputs( ????? )
 
-0x802979A0 SetYVelocity(f12 value) writes register f12 to 0x8037C4BC (Y Velocity)
-0x80297AAC GetYVelocity() loads Y Velocity into register f0
+0x80255D04 [ $v0 ] 	Clear$v0( void )
 
-0x80297F98 GetXRotation() loads float 0x8037C540 (X Rotation) into register f0
+0x80255F74 [ void ] 	ComputeXYZCrossProduct( float* $a0 resultXPtr, float* $a1 inputXPtr1, float* $a2 inputXPtr2 )
 
-0x802F55D8 -- Does a lot with floats
-0x802F75C8
+0x80256064 [ float $f0 ]GetPositionDifference( float* $a0 inputXPtr1, float* $a1 inputXPtr2 )
+
+0x80256280 [ float $f0 ]GetPositionDifferenceSquared( float* $a0 inputXPtr1, float* $a1 inputXPtr2 )
+
+0x80258B8C [ void ] 	ClearXYZData( float* $a0 xPtr)
+0x80258BA4 [ void ] 	CopyXYZData( float* $a0 destinationXPtr, float* $a1 sourceXPtr )
+0x80258BC0 [ void ] 	GetXYZDifference( float* $a0 resultXPtr, float* $a1 minuendXPtr, float* $a2 subtraendXPtr )
+
+0x8025943C [ void ] 	DecrementTimerByOneFrame( float* $a0 timerPtr ) 
+
+0x80265350 [ float $f0 ]GetSquareRoot( float $f12 input )
+
+0x80289E00 [ ??? ] 	UpdateMovementAnimationFrame( ??? )
+
+0x80289F64 [ word $v0 ] GetPlayerPointer( void )
+
+0x8028B6FC [ void ] 	SetPlayerAsGrounded( void )
+0x8028B71C [ ??? ] 	UpdatePossibleMovementStates( ??? )
+
+0x8028D2E4 [ ??? ] 	ItemAndEnemyCollision( ??? )
+
+0x8028E71C [ ??? ] 	UpdateBanjo ( ??? )
+
+0x8028E7CC [ byte $v0 ] GetMumboTransformation( void )
+
+0x8028F150 [ byte $v0 ] GetPlayerIsVisibleFlag( void )
+
+0x8028F7D0 [ void ] 	WritePlayerIsFrozenFlag( byte $a0 boolean )
+
+0x8028FCC8 [ void ] 	WritePlayerIsVisibleFlag( byte $a0 boolean )
+
+0x80290B60 [ void ] 	SetCameraZoomState( byte $a0 cameraZoomState )
+
+0x80290F14 [ ??? ] 	ChangeCameraState( ??? )
+
+0x80291358 [ ??? ] 	UpdateCameraPositionRotationAndZoom( ??? )
+
+0x80291A0C [ void ] 	UpdatePlayerModelFacingAngle( void )
+
+0x80292194 [ void ] 	SetXYZDisjointAmount( float* $a0 inputXPtr )
+0x802921BC [ void ] 	SetYDisjointAmount( float $f12 disjointAmount)
+0x802921C8 [ void ] 	WritePlayerIsVisibleFlag_( byte $a0 boolean )
+
+0x80292548 [ byte $v0 ] GetPlayerIsVisibleFlag_( void )
+
+0x80293F0C [ ??? ] 	TerrainCollisionDetection( ??? )
+
+0x80294378 [ void ] 	SetCollisionState( byte $a0 collisionState )
+0x80294384 [ void ] 	SetFrictionState( byte $a0 frictionState )
+
+0x802944F4 [ word $v0 ] GetFrictionState( void )
+
+0x80294524 [ byte $v0 ] GetJumpingFromWaterSurfaceEnabledFlag( void )
+0x80294530 [ byte $v0 ] GetWallCollisionFlag( void )
+
+0x80295448 [ ??? ] 	updateBanjoFromButtonInputs( ??? )
+
+0x802957F0 [ word $v0 ] GetMovesUnlockedBitfield( void )
+0x802957FC 		NULL_FUNCTION
+0x80295804 [ void ] 	LockAllMoves( void )
+0x80295818 [ void ] 	LockOrUnlockMove( byte $a0 move, byte_bool $a1 unlock )
+0x80295864 [ void ] 	SetMovesUnlockedBitfield
+
+0x80297744 [ ??? ] 	UpdatePlayersPosition( ??? )
+
+0x802979A0 [ void ] 	SetYVelocity( float $f12 input )
+
+0x80297A88 [ void ] 	CopyXYZVelocity( float* $a0 destinationXPtr )
+0x80297AAC [ float $f0 ]GetYVelocity( void )
+
+0x80297F10 [ ??? ] 	UpdateCharacterXRotation( ??? )
+
+0x80297F84 [ void ] 	SetXRotationToXRotationTarget( void )
+0x80297F98 [ float $f0 ]GetXRotation( void )
+0x80297FA4 [ float $f0 ]GetXRotationTarget( void )
+
+
+0x8029842C [ void ] 	Copy_XYZPos_To_XYZPosCopy_And_Clear_AddToXYZPos( void )
+
+0x802984A0 [ void ] 	SetXYZPosition( float* $a0 sourceXPtr )
+0x802984C8 [ void ] 	SetYPosition( float $f12 input )
+0x802984D4 [ void ] 	CopyXYZPosition( float* $a0 destinationXPtr )
+0x802984F8 [ float $f0 ]GetYPosition( void )
+
+0x80298CB4 [ ??? ]	UpdateCharaterZRotation( void )
+
+0x80298D3C [ float $f0 ]GetZRotation( void )
+
+0x802991FC [ void ]	UpdateFacingAngleToMovingAngle( void )
+
+0x8029921C [ float $f0 ]GetFacingAngle( void )
+0x80299228 [ float $f0 ]GetMovingAngle( void )
+
+0x802993C8 [ ??? ] 	UpdateCharaterYRotation( ??? )
+
+0x8029A72C [ ??? ]	SetMovementState( ??? )
+0x8029A7BC [ word $v0 ]	GetPreviousMovementState( void )	
+0x8029A7C8 [ word $v0 ]	GetMovementState( void )
+
+0x8029A7E0 [ ??? ]	updateCurrentMovementState( ??? )
+
+0x8029A8F4 [ byte $v0 ]	GetMumboTransformation_(void)
+0x8029A95C [ void ]	SetMumboTransformation_( byte $a0 input )
+
+========================================= Current Stopping point for updating ==
+
+
 0x802F7870 Print($a0 u8 XPosition, $a1 u8 YPosition, $a2 float TextSize, $a3 char[] Message) -- used for character parade????
 0x802F78C0 PrintItemValues($a0 u8 XPosition, $a1 u8 YPosition,$a2 char[] Message) -- Used to print item values 
 0x802F78FC PrintStaticCharacterTexts($a0 u8 XPosition, $a1 u8 YPosition,$a2 char[] Message) --used to print character's texts
