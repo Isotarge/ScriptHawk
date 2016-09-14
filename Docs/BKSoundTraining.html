@@ -2,16 +2,35 @@
 <html>
 	<head>
 		<title>Sound Question Training</title>
+		<style>
+			body {
+				height: 100%;
+			}
+			.textbox {
+				font-size: 4vh;
+				font-family: cursive,sans-serif;
+				text-align: center;
+				color: white;
+				background: #333333;
+
+				border-style: none;
+				border-radius: 100px;
+
+				margin-bottom: 0.1em;
+				width: 100%;
+				height: 3em;
+			}
+		</style>
 		<script>
 			var questions = [
-				"YOU PICK UP ITEMS ON THE GROUND, WHICH ONE MAKES THIS SILLY SOUND?",
-				"LISTEN UP NOW THEN MAKE YOUR CHOICE, WHICH CHARACTER HAS THIS DUMB VOICE?",
-				"LISTEN UP NOW THEN MAKE YOUR CHOICE, WHICH CHARACTER HAS THIS COOL VOICE?",
-				"LISTEN UP NOW THEN MAKE YOUR CHOICE, WHICH CHARACTERS HAVE THIS DUMB VOICE?",
-				"WHEN THIS PIECE OF MUSIC'S HEARD, WHICH MOVE'S DONE BY YOUR STUPID BIRD?",
-				"WHEN THIS PIECE OF MUSIC IS HEARD, WHICH MOVE'S DONE BY YOUR STUPID BIRD?",
-				"YOU SHOULD REMEMBER BUT WE'LL SEE, IF THIS IS HEARD WHERE WOULD YOU BE?",
-				"LISTEN CAREFULLY TO THIS TUNE, WHICH WORLD'S IT FROM, YOU FURRY GOON?",
+				"YOU PICK UP ITEMS ON THE GROUND,<br>WHICH ONE MAKES THIS SILLY SOUND?",
+				"LISTEN UP NOW THEN MAKE YOUR CHOICE,<br>WHICH CHARACTER HAS THIS DUMB VOICE?",
+				"LISTEN UP NOW THEN MAKE YOUR CHOICE,<br>WHICH CHARACTER HAS THIS COOL VOICE?",
+				"LISTEN UP NOW THEN MAKE YOUR CHOICE,<br>WHICH CHARACTERS HAVE THIS DUMB VOICE?",
+				"WHEN THIS PIECE OF MUSIC'S HEARD,<br>WHICH MOVE'S DONE BY YOUR STUPID BIRD?",
+				"WHEN THIS PIECE OF MUSIC IS HEARD,<br>WHICH MOVE'S DONE BY YOUR STUPID BIRD?",
+				"YOU SHOULD REMEMBER BUT WE'LL SEE,<br>IF THIS IS HEARD WHERE WOULD YOU BE?",
+				"LISTEN CAREFULLY TO THIS TUNE,<br>WHICH WORLD'S IT FROM, YOU FURRY GOON?",
 			];
 
 			var answers = [
@@ -90,48 +109,54 @@
 
 			function doanswer1() {
 				if (answer1 == 1) {
-					streak++;
-					document.getElementById("result").innerHTML = "Correct!";
+					correct();
 				} else {
-					streak = 0;
-					document.getElementById("result").innerHTML = "Incorrect!";
+					incorrect();
 				}
-				document.getElementById("streak").innerHTML = streak;
-				generateQuestion();
 			}
 
 			function doanswer2() {
 				if (answer2 == 1) {
-					streak++;
-					document.getElementById("result").innerHTML = "Correct!";
+					correct();
 				} else {
-					streak = 0;
-					document.getElementById("result").innerHTML = "Incorrect!";
+					incorrect();
 				}
-				document.getElementById("streak").innerHTML = streak;
-				generateQuestion();
 			}
 
 			function doanswer3() {
 				if (answer3 == 1) {
-					streak++;
-					document.getElementById("result").innerHTML = "Correct!";
+					correct();
 				} else {
-					streak = 0;
-					document.getElementById("result").innerHTML = "Incorrect!";
+					incorrect();
 				}
+			}
+
+			function correct() {
+				streak++;
+				document.getElementById("result").innerHTML = "Correct!";
+				document.getElementById("result").style.color = "#00FF00";
+				document.getElementById("streak").innerHTML = streak;
+				generateQuestion();
+			}
+
+			function incorrect() {
+				streak = 0;
+				document.getElementById("result").innerHTML = "Incorrect!";
+				document.getElementById("result").style.color = "red";
 				document.getElementById("streak").innerHTML = streak;
 				generateQuestion();
 			}
 		</script>
 	</head>
 	<body onload="generateQuestion()">
-		<div id="question"></div>
-		<button id="answer1" onclick="doanswer1()"></button><br>
-		<button id="answer2" onclick="doanswer2()"></button><br>
-		<button id="answer3" onclick="doanswer3()"></button><br>
+		<div class="textbox" id="question"></div>
+		<button class="textbox" id="answer1" onclick="doanswer1()"></button>
+		<button class="textbox" id="answer2" onclick="doanswer2()"></button>
+		<button class="textbox" id="answer3" onclick="doanswer3()"></button>
 		<br>
-		<div id="result"></div>
-		<span id="streak">0</span> Streak
+		<div class="textbox">
+			<span id="result">Select an answer</span><br>
+			<span id="streak">0</span> Streak
+		</div>
 	</body>
 </html>
