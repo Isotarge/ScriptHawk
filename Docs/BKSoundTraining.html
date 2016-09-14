@@ -91,6 +91,7 @@
 			var answer2 = 2;
 			var answer3 = 3;
 			var streak = 0;
+			var bestStreak = 0;
 
 			function generateQuestion() {
 				var randomQuestion = answers[Math.floor(Math.random() * answers.length)];
@@ -133,17 +134,19 @@
 
 			function correct() {
 				streak++;
+				bestStreak = Math.max(streak, bestStreak);
+				document.getElementById("streak").innerHTML = streak;
+				document.getElementById("beststreak").innerHTML = bestStreak;
 				document.getElementById("result").innerHTML = "Correct!";
 				document.getElementById("result").style.color = "#00FF00";
-				document.getElementById("streak").innerHTML = streak;
 				generateQuestion();
 			}
 
 			function incorrect() {
 				streak = 0;
+				document.getElementById("streak").innerHTML = streak;
 				document.getElementById("result").innerHTML = "Incorrect!";
 				document.getElementById("result").style.color = "red";
-				document.getElementById("streak").innerHTML = streak;
 				generateQuestion();
 			}
 		</script>
@@ -156,7 +159,7 @@
 		<br>
 		<div class="textbox">
 			<span id="result">Select an answer</span><br>
-			<span id="streak">0</span> Streak
+			<span id="streak">0</span> Streak | <span id="beststreak">0</span> PB
 		</div>
 	</body>
 </html>
