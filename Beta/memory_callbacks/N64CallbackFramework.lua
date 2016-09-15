@@ -281,10 +281,8 @@ function callStack(stackPointer, stackEnd)
 		local currentFunction = isFunction(currentValue);
 		if currentFunction ~= false then
 			dprint(currentFunction.name.." + "..toHexString(currentValue - currentFunction.start));
-		else
-			if isPointer(currentValue) then
-				dprint(toHexString(currentValue, 8, ""));
-			end
+		elseif isPointer(currentValue) then
+			dprint(toHexString(currentValue, 8, ""));
 		end
 	end
 end
@@ -293,16 +291,23 @@ function callback()
 	local registers = emu.getregisters();
 
 	local stackPointer = registers["REG29_lo"];
-	
+	local PC = registers["PC"];
+
 	-- DK64 Stack
 	local stackEnd = 0x80016630; -- TODO: Confirm or compute this somehow
 	if stackPointer > 0x80016630 then
 		stackEnd = 0x80767C00; -- TODO: Confirm or compute this somehow
 	end
-	
+
 	-- BT Stack
 	--local stackEnd = 0x800459B0; -- TODO: Confirm or compute this somehow
 
+	local PCFunction = isFunction(PC);
+	if PCFunction ~= false then
+		dprint(PCFunction.name.." + "..toHexString(PC - PCFunction.start));
+	elseif isPointer(PC) then
+		dprint(toHexString(PC, 8, ""));
+	end
 	callStack(stackPointer, stackEnd);
 	dprint();
 	print_deferred();
