@@ -63,6 +63,7 @@ Game.Memory = {
 	["joystick_enabled_x"] = {0x75530C, 0x74FB8C, 0x7553CC, 0x6FFE60},
 	["joystick_enabled_y"] = {0x755310, 0x74FB90, 0x7553D0, 0x6FFE64},
 	["bone_displacement_pointer"] = {0x76FDF8, 0x76A918, 0x76FFE8, nil}, -- TODO: Kiosk
+	["bone_displacement_cop0_write"] = {0x61963C, 0x6128EC, 0x6170AC, 0x5AFB1C},
 	["frames_lag"] = {0x76AF10, 0x765A30, 0x76B100, 0x72D140}, -- TODO: Kiosk only works for minecart?
 	["frames_real"] = {0x7F0560, 0x7F0480, 0x7F09D0, nil}, -- TODO: Make sure freezing these stalls the main thread -- TODO: Kiosk
 	["obj_model2_array_pointer"] = {0x7F6000, 0x7F5F20, 0x7F6470, 0x6F4470},
@@ -3829,9 +3830,12 @@ end
 event.onloadstate(breakBoneDisplacement, "ScriptHawk - Break bone displacement");
 
 local function applyBoneDisplacementFix()
-	if bone_displacement_fix and version ~= 4 then -- TODO: Kiosk
+	if bone_displacement_fix then
 		-- Old fix basically crashes sound thread, seems to work well but... no sound.
-		mainmemory.write_u32_be(Game.Memory.bone_displacement_pointer[version], 0);
+		--mainmemory.write_u32_be(Game.Memory.bone_displacement_pointer[version], 0); -- TODO: Kiosk
+
+		-- New fix NOPs out a cop0 status register write at the start of the updateBonePosition function
+		mainmemory.write_u32_be(Game.Memory.bone_displacement_cop0_write[version], 0);
 	end
 end
 
