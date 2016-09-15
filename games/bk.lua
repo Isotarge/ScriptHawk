@@ -2268,7 +2268,7 @@ end
 Game.speedy_speeds = { .1, 1, 5, 10, 20, 35, 50, 75, 100 };
 Game.speedy_index = 6;
 
-Game.rot_speed = 1;
+Game.rot_speed = 0.5;
 Game.max_rot_units = 360;
 
 function Game.isPhysicsFrame()
