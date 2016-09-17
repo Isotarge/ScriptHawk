@@ -5468,7 +5468,7 @@ Game.standardOSD = {
 	{"Movement", Game.getMovementState},
 	--{"Mode", Game.getCurrentMode},
 	--{"Camera", Game.getCameraState},
-	{"Separator", 1},
+	--{"Separator", 1},
 	--{"Anim Timer 1", Game.getAnimTimer1},
 	--{"Anim Timer 2", Game.getAnimTimer2},
 	--{"Anim Timer 3", Game.getAnimTimer3},
