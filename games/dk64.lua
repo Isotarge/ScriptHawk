@@ -5327,7 +5327,7 @@ function Game.eachFrame()
 
 	--koshBotLoop(); -- TODO: This probably stops the virtual pad from working
 	forceTBS();
-	Game.unlockMenus(); -- TODO: Allow user to toggle this
+	--Game.unlockMenus(); -- TODO: Allow user to toggle this
 
 	-- Force STVW
 	--local yRot = Game.getYRotation();
