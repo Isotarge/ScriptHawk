@@ -847,7 +847,7 @@ obj_model1 = {
 		[0x4A] = "Dropping Object",
 		[0x4B] = "Throwing Object",
 		[0x4C] = "Jumping", -- Carrying Object
-
+		[0x4D] = "Throwing Object", -- In Air
 		[0x4E] = "Surface swimming",
 		[0x4F] = "Underwater",
 		[0x50] = "Leaving Water",
