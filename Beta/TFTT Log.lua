@@ -1,35 +1,43 @@
-local men = 0xE264; -- u16be
-local breed_ticker = 0xE262; -- fixed 12.4 be
-logging = true;
-data = {};
+function toHexString(value, desiredLength, prefix)
+	value = string.format("%X", value or 0);
+	prefix = prefix or "0x";
+	desiredLength = desiredLength or string.len(value);
+	while string.len(value) < desiredLength do
+		value = "0"..value;
+	end
+	return prefix..value;
+end
 
-local prev_breed_ticker = 0;
+local selectedSectorPointer = 0xB5B4;
+local sectorBase = 0xB6C4;
+local sectorSize = 0x44A;
+local numSectors = 16;
 
-function log()
-	if not emu.islagged() then
-		if logging then
-			local _men = mainmemory.read_u16_be(men);
-			local _breed_ticker = mainmemory.read_u16_be(breed_ticker) / 16;
-			if _breed_ticker ~= prev_breed_ticker then
-				table.insert(data, {emu.framecount(), _men, _breed_ticker});
-				prev_breed_ticker = _breed_ticker;
-			end
-			if _men >= 100 then
-				logging = false;
-			end
-		end
-		if not logging then
-			print("Frames,Men,Counter");
-			for k, v in pairs(data) do
-				local builtString = "";
-				for l, w in pairs(v) do
-					builtString = builtString..w..",";
-				end
-				print(builtString);
-			end
-			data = {};
+local sectorData = {
+	["breed_ticker"] = 0xBA, -- 12.4 fixed point (u16_be / 16)
+	["population"] = 0xBC, -- u16_be
+};
+
+local OSDPosition = {2, 70};
+local OSDRowHeight = 16;
+
+function getSectorData(sector)
+	local data = {};
+	data.breed_ticker = mainmemory.read_u16_be(sector + sectorData.breed_ticker) / 16;
+	data.population = mainmemory.read_u16_be(sector + sectorData.population);
+	return data;
+end
+
+function draw_OSD()
+	local row = 0;
+	for i = 1, numSectors do
+		local sector = sectorBase + (i - 1) * sectorSize;
+		local data = getSectorData(sector);
+		if data.breed_ticker ~= 0 then -- TODO: Better detection for sector in use
+			gui.text(OSDPosition[1], OSDPosition[2] + row * OSDRowHeight, toHexString(sector).." pop: "..data.population.." breed: "..data.breed_ticker);
+			row = row + 1;
 		end
 	end
 end
 
-event.onframestart(log);
+event.onframestart(draw_OSD);

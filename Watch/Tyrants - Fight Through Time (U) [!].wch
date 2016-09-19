@@ -1,10 +1,24 @@
 SystemID GEN
 156A	w	u	1	68K RAM	Help Enabled
+157A	w	u	1	68K RAM	Speech Enabled
+157C	w	u	1	68K RAM	SFX Enabled
+157E	w	u	1	68K RAM	Music Enabled
+1588	w	s	1	68K RAM	Island Index
+2300	w	u	1	68K RAM	Cursor Color
+B364	w	u	1	68K RAM	Character?
+B410	w	u	1	68K RAM	Cursor X Position
+B412	w	u	1	68K RAM	Cursor Y Position
 B50E	w	h	1	68K RAM	RNG?
+B5B4	w	h	1	68K RAM	Selected Sector Pointer
+B5BC	w	u	1	68K RAM	Paused
+B5C0	w	u	1	68K RAM	Game Speed
 B602	w	u	1	68K RAM	Men allocated to Battle
-E262	w	1	1	68K RAM	Breed Ticker
-E264	w	u	1	68K RAM	Men
+D144	w	h	1	68K RAM	Research
+D14E	w	h	1	68K RAM	Research
 E470	b	u	1	68K RAM	Rocks Aloha Bottom Sector Scarlet
 E471	b	u	1	68K RAM	Slingshots Aloha Bottom Sector Scarlet
+E472	b	u	1	68K RAM	Pikes
+E473	b	u	1	68K RAM	Catapault
+E47A	b	u	1	68K RAM	Men Army
 E49C	w	u	1	68K RAM	Red Army Total Aloha Bottom Sector Scarlet
 
