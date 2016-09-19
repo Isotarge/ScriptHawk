@@ -23,7 +23,7 @@ A collection of Lua scripts and RAM watches for [BizHawk](https://github.com/TAS
 ###Donkey Kong 64
 - All known versions supported
 - [Object analysis tools](Docs/Object%20Analysis%20Tools.txt): List, Examine, Grab, Focus, Encircle, Zip
-- [Bone displacement](http://bombch.us/Bn1C) fix (disables audio)
+- [Bone displacement](http://bombch.us/Bn1C) fix & detection
 - Documentation of over 95% of permanent flags in USA save files
 - Mad Jack minimap
 - Automatic [ISG](http://dk64.wikia.com/wiki/Intro_Story_Glitch) timer

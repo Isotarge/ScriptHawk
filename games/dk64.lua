@@ -1547,7 +1547,7 @@ local collisionTypes = { -- These seem to be the model 2 equivalent to the model
 	[0x11F] = "Metal Door", -- Factory or Car Race
 
 	[0x120] = "Toyz Box",
-	[0x121] = "Circle Wood numbers on it", -- TODO: O Pad, Aztec chunky puzzle
+	[0x121] = "O Pad", -- Aztec chunky puzzle
 	[0x122] = "Bonus Barrel Trap", -- Aztec
 	[0x123] = "Sun Idol", -- Aztec, top of "feed me" totem
 	[0x124] = "Candy's Shop",
