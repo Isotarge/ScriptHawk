@@ -49,7 +49,7 @@ Game.maps = {
 	"GGM - Generator Cavern",
 	"GGM - Power Hut",
 	"WW - Wumba's Wigwam",
-	"WW - Witchy World",
+	"WW",
 	"GGM - Train Station",
 	"GGM - Prospector's Hut",
 	"GGM - Mumbo's Skull",
@@ -840,9 +840,14 @@ local movementStates = {
 
 	[0x56] = "Knockback", -- Solo Banjo
 
+	[0x59] = "Damaged", -- Beak Bomb
+
 	[0x5B] = "Throwing Object", -- Glowbo
 	[0x5C] = "Knockback",
 
+	[0x66] = "Locked", -- Solo Kazooie - Water surface?
+	[0x67] = "Shooting Egg", -- Solo Kazooie
+	[0x68] = "Pooping Egg", -- Solo Kazooie
 	[0x69] = "Joining", -- Split up pad
 	[0x6A] = "Joining", -- Split up pad
 
@@ -873,6 +878,9 @@ local movementStates = {
 	[0x8F] = "Locked", -- Solo Kazooie
 
 	[0x90] = "Swimming (A+B)", -- Solo Banjo
+	[0x91] = "Damaged", -- Flying
+
+	[0x93] = "Locked", -- Solo Kazooie, Loading Zone, First Person Camera, Slipping
 
 	[0x95] = "Jumping", -- Claw Clamber
 	[0x96] = "Locked", -- Transforming
@@ -930,6 +938,7 @@ local movementStates = {
 	[0xDD] = "Crouching", -- Solo Kazooie
 	[0xDE] = "Landing", -- Solo Kazooie
 	[0xDF] = "Falling", -- Solo Kazooie
+	[0xE0] = "Falling (Splat)", -- Solo Kazooie
 
 	[0xE4] = "Pack Whack", -- Solo Banjo
 	[0xE5] = "Idle", -- Mumbo
@@ -1011,6 +1020,7 @@ local movementStates = {
 
 	[0x138] = "Locked", -- Clockwork Kazooie, slipping, loading zones
 
+	[0x13A] = "Knockback", -- Solo Kazooie
 	[0x13B] = "Landing", -- Small T-Rex
 	[0x13C] = "Death", -- Small T-Rex
 	[0x13D] = "Locked", -- Small T-Rex
@@ -1038,6 +1048,7 @@ local movementStates = {
 	[0x154] = "Swimming", -- Talon Torpedo
 
 	[0x157] = "Deploying Talon Torpedo",
+
 	[0x159] = "Swimming (A)", -- Talon Torpedo
 
 	[0x15C] = "Feathery Flap", -- Solo Kazooie
@@ -1061,6 +1072,8 @@ local movementStates = {
 
 	[0x171] = "Entering Snooze Pack",
 	[0x172] = "Leaving Snooze Pack",
+
+	[0x176] = "Recovering", -- Solo Kazooie, post splat
 
 	[0x17B] = "Idle", -- On Wall, Claw Clamber
 	[0x17C] = "Walking", -- On Wall, Claw Clamber
