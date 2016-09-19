@@ -269,12 +269,9 @@ function Game.detectVersion(romName, romHash)
 	end
 
 	-- Read EEPROM checksums
-	if memory.usememorydomain("EEPROM") then
-		for i = 1, #eep_checksum_offsets do
-			eep_checksum_values[i] = memory.read_u32_be(eep_checksum_offsets[i]);
-		end
+	for i = 1, #eep_checksum_offsets do
+		eep_checksum_values[i] = memory.read_u32_be(eep_checksum_offsets[i], "EEPROM");
 	end
-	memory.usememorydomain("RDRAM");
 
 	return true;
 end
@@ -2560,17 +2557,14 @@ function Game.eachFrame()
 	end
 
 	-- Check EEPROM checksums
-	if memory.usememorydomain("EEPROM") then
-		local checksum_value;
-		for i = 1, #eep_checksum_offsets do
-			checksum_value = memory.read_u32_be(eep_checksum_offsets[i]);
-			if eep_checksum_values[i] ~= checksum_value then
-				print("Slot "..i.." Checksum: "..toHexString(eep_checksum_values[i], 8).." -> "..toHexString(checksum_value, 8));
-				eep_checksum_values[i] = checksum_value;
-			end
+	local checksum_value;
+	for i = 1, #eep_checksum_offsets do
+		checksum_value = memory.read_u32_be(eep_checksum_offsets[i], "EEPROM");
+		if eep_checksum_values[i] ~= checksum_value then
+			print("Slot "..i.." Checksum: "..toHexString(eep_checksum_values[i], 8).." -> "..toHexString(checksum_value, 8));
+			eep_checksum_values[i] = checksum_value;
 		end
 	end
-	memory.usememorydomain("RDRAM");
 end
 
 function Game.realTime()

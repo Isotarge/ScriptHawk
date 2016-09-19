@@ -2506,12 +2506,9 @@ function Game.detectVersion(romName, romHash)
 	end
 
 	-- Read EEPROM checksums
-	if memory.usememorydomain("EEPROM") then
-		for i = 1, #eep_checksum_offsets do
-			eep_checksum_values[i] = memory.read_u32_be(eep_checksum_offsets[i]);
-		end
+	for i = 1, #eep_checksum_offsets do
+		eep_checksum_values[i] = memory.read_u32_be(eep_checksum_offsets[i], "EEPROM");
 	end
-	memory.usememorydomain("RDRAM");
 
 	-- Fill the flag names
 	if #flag_array > 0 then
@@ -5371,26 +5368,23 @@ function Game.eachFrame()
 	end
 
 	-- Check EEPROM checksums
-	if memory.usememorydomain("EEPROM") then
-		local checksum_value;
-		local slotChanged = false;
-		for i = 1, #eep_checksum_offsets do
-			checksum_value = memory.read_u32_be(eep_checksum_offsets[i]);
-			if eep_checksum_values[i] ~= checksum_value then
-				slotChanged = true;
-				if i == 5 then
-					dprint("Global flags "..i.." Checksum: "..toHexString(eep_checksum_values[i], 8).." -> "..toHexString(checksum_value, 8));
-				else
-					dprint("Slot "..i.." Checksum: "..toHexString(eep_checksum_values[i], 8).." -> "..toHexString(checksum_value, 8));
-				end
-				eep_checksum_values[i] = checksum_value;
+	local checksum_value;
+	local slotChanged = false;
+	for i = 1, #eep_checksum_offsets do
+		checksum_value = memory.read_u32_be(eep_checksum_offsets[i], "EEPROM");
+		if eep_checksum_values[i] ~= checksum_value then
+			slotChanged = true;
+			if i == 5 then
+				dprint("Global flags "..i.." Checksum: "..toHexString(eep_checksum_values[i], 8).." -> "..toHexString(checksum_value, 8));
+			else
+				dprint("Slot "..i.." Checksum: "..toHexString(eep_checksum_values[i], 8).." -> "..toHexString(checksum_value, 8));
 			end
-		end
-		if slotChanged then
-			print_deferred();
+			eep_checksum_values[i] = checksum_value;
 		end
 	end
-	memory.usememorydomain("RDRAM");
+	if slotChanged then
+		print_deferred();
+	end
 end
 
 function Game.crankyCutsceneMininumRequirements()

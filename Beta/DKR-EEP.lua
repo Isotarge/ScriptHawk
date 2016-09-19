@@ -50,11 +50,10 @@ local function getFieldByIndex(index)
 end
 
 local function analyseSlots()
-	memory.usememorydomain("EEPROM");
 	local diffFound = false;
 	local newSlotData = {};
 	for i = 1, number_of_slots do
-		newSlotData[i] = memory.readbyterange(slot_size * (i - 1), slot_size);
+		newSlotData[i] = memory.readbyterange(slot_size * (i - 1), slot_size, "EEPROM");
 	end
 	if #slot_data == number_of_slots then
 		for i = 1, #slot_data do
