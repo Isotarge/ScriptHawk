@@ -1051,6 +1051,7 @@ local movementStates = {
 
 	[0x159] = "Swimming (A)", -- Talon Torpedo
 
+	[0x15B] = "Damaged", -- Solo Kazooie - Gliding
 	[0x15C] = "Feathery Flap", -- Solo Kazooie
 	[0x15D] = "Idle", -- Solo Kazooie - Water Surface
 	[0x15E] = "Paddling", -- Solo Kazooie
