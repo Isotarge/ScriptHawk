@@ -15,10 +15,6 @@ B5C0	w	u	1	68K RAM	Game Speed
 B602	w	u	1	68K RAM	Men allocated to Battle
 D144	w	h	1	68K RAM	Research
 D14E	w	h	1	68K RAM	Research
-E470	b	u	1	68K RAM	Rocks Aloha Bottom Sector Scarlet
-E471	b	u	1	68K RAM	Slingshots Aloha Bottom Sector Scarlet
-E472	b	u	1	68K RAM	Pikes
-E473	b	u	1	68K RAM	Catapault
-E47A	b	u	1	68K RAM	Men Army
-E49C	w	u	1	68K RAM	Red Army Total Aloha Bottom Sector Scarlet
+E26C	w	h	1	68K RAM	Research
+E276	w	h	1	68K RAM	Research
 
