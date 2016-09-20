@@ -1,10 +1,12 @@
 SystemID GEN
 156A	w	u	1	68K RAM	Help Enabled
+156E	w	u	1	68K RAM	Population Available For Battle
 157A	w	u	1	68K RAM	Speech Enabled
 157C	w	u	1	68K RAM	SFX Enabled
 157E	w	u	1	68K RAM	Music Enabled
 1588	w	s	1	68K RAM	Island Index
 2300	w	u	1	68K RAM	Cursor Color
+A760	b	b	1	68K RAM	Opponents
 B364	w	u	1	68K RAM	Character?
 B410	w	u	1	68K RAM	Cursor X Position
 B412	w	u	1	68K RAM	Cursor Y Position

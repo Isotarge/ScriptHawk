@@ -17,10 +17,17 @@ local cursorX = 0xB410;
 local cursorY = 0xB412;
 
 local cursorColors = { -- Pattern repeats % 4
-	[0] = 0xFF0000FF, -- Blue
-	[1] = 0xFFFF0000, -- Red
-	[2] = 0xFFFFFF00, -- Yellow
-	[3] = 0xFF00FF00, -- Green
+	[0] = 0xFF66AAEE, -- Blue
+	[1] = 0xFFEE0000, -- Red
+	[2] = 0xFFEECC22, -- Yellow
+	[3] = 0xFF00AA00, -- Green
+};
+
+local characterColors = {
+	[0] = 0xFFEE0000, -- Red
+	[1] = 0xFF00AA00, -- Green
+	[2] = 0xFFEECC22, -- Yellow
+	[3] = 0xFF66AAEE, -- Blue
 };
 
 local epochs = {
@@ -34,6 +41,19 @@ local epochs = {
 	[7] = "1945AD",
 	[8] = "1980AD",
 	[9] = "2001AD",
+};
+
+local maxTowerHealth = {
+	[0] = 200,
+	[1] = 300,
+	[2] = 400,
+	[3] = 500,
+	[4] = 600,
+	[5] = 700,
+	[6] = 0xFFFF, -- TODO
+	[7] = 0xFFFF, -- TODO
+	[8] = 0xFFFF, -- TODO
+	[9] = 0xFFFF, -- TODO
 };
 
 local sectorData = {
@@ -53,7 +73,7 @@ local sectorData = {
 		["catapaults"] = 0x01, -- u8
 		["pikes"] = 0x02, -- u8
 		["longbows"] = 0x03, -- u8
-		["giant_catapaults"] = 0x04, -- u8 TODO: Is this correct?
+		["giant_catapaults"] = 0x04, -- u8
 		-- TODO: Everything inbetween
 		["unarmed"] = 0x0A, -- u8
 	},
@@ -63,16 +83,19 @@ local sectorData = {
 		["oberon"] = 0x2F8, -- u16_be
 		["madcap"] = 0x2FA, -- u16_be
 	},
+	["defenses"] = 0x3B8, -- Array, 10 bytes, TTTTMM
 	["tower_health"] = 0x3D6, -- u16_be
 	["mine_health"] = 0x3D8, -- u16_be
 	["lab_health"] = 0x3DA, -- u16_be
 	["factory_health"] = 0x3DC, -- u16_be
+	["owner"] = 0x3FE, -- u16_be
 	["population"] = 0x406, -- u16_be
 	["epoch"] = 0x418, -- u16_be
 };
 
 local OSDPosition = {2, 70};
 local OSDRowHeight = 16;
+local OSDCharacterWidth = 10;
 
 function getArmyData(army)
 	return {
@@ -80,6 +103,7 @@ function getArmyData(army)
 		["catapaults"] = mainmemory.read_u8(army + sectorData.army.catapaults),
 		["pikes"] = mainmemory.read_u8(army + sectorData.army.pikes),
 		["longbows"] = mainmemory.read_u8(army + sectorData.army.longbows),
+		["giant_catapaults"] = mainmemory.read_u8(army + sectorData.army.giant_catapaults),
 		-- TODO: Everything inbetween
 		["unarmed"] = mainmemory.read_u8(army + sectorData.army.unarmed),
 	};
@@ -91,9 +115,13 @@ function getSectorData(sector)
 	data.breed_population = mainmemory.read_u16_be(sector + sectorData.breed_population);
 	data.population = mainmemory.read_u16_be(sector + sectorData.population);
 	data.epoch = mainmemory.read_u16_be(sector + sectorData.epoch);
+	data.owner = mainmemory.read_u16_be(sector + sectorData.owner);
 
 	data.tower_health = mainmemory.read_u16_be(sector + sectorData.tower_health);
+	data.max_tower_health = maxTowerHealth[data.epoch];
 	data.mine_health = mainmemory.read_u16_be(sector + sectorData.mine_health);
+	data.lab_health = mainmemory.read_u16_be(sector + sectorData.lab_health);
+	data.factory_health = mainmemory.read_u16_be(sector + sectorData.factory_health);
 
 	data.army = {
 		["scarlet"] = getArmyData(sector + sectorData.army_bases.scarlet),
@@ -115,8 +143,9 @@ function draw_OSD()
 	for i = 1, numSectors do
 		local sector = sectorBase + (i - 1) * sectorSize;
 		local data = getSectorData(sector);
-		if data.breed_ticker ~= 0 then -- TODO: Better detection for sector in use
-			gui.text(OSDPosition[1], OSDPosition[2] + row * OSDRowHeight, toHexString(sector)..": "..epochs[data.epoch].." pop: "..data.population.." armies: "..data.army.scarlet.total..","..data.army.caesar.total..","..data.army.oberon.total..","..data.army.madcap.total);
+		if data.tower_health > 0 and data.owner < 4 then
+			gui.text(OSDPosition[1], OSDPosition[2] + row * OSDRowHeight, toHexString(sector)..":", characterColors[data.owner]);
+			gui.text(OSDPosition[1] + 8 * OSDCharacterWidth, OSDPosition[2] + row * OSDRowHeight, epochs[data.epoch].." "..data.tower_health.."/"..data.max_tower_health.."HP pop: "..data.population.." armies: "..data.army.scarlet.total..","..data.army.caesar.total..","..data.army.oberon.total..","..data.army.madcap.total);
 			row = row + 1;
 		end
 	end
