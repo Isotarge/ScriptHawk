@@ -1,0 +1,48 @@
+SystemID NES
+0091	b	u	0	RAM	P1 X
+0400	b	u	0	RAM	P1 Sub-X
+009A	b	u	0	RAM	P1 Y
+0409	b	u	0	RAM	P1 Sub-Y
+0424	b	u	0	RAM	P1 X Speed
+007F	b	u	0	RAM	P1 State
+0	S	_	1		
+0092	b	u	0	RAM	P2 X
+0401	b	u	0	RAM	P2 Sub-X
+009B	b	u	0	RAM	P2 Y
+040A	b	u	0	RAM	P2 Sub-Y
+0425	b	u	0	RAM	P2 X Speed
+0080	b	u	0	RAM	P2 State
+0	S	_	1		
+0093	b	u	0	RAM	E1 X
+009C	b	u	0	RAM	E1 Y
+0081	b	u	0	RAM	E1 State
+045C	b	u	0	RAM	E1 Counter
+0	S	_	1		
+0094	b	u	0	RAM	E2 X
+009D	b	u	0	RAM	E2 Y
+0082	b	u	0	RAM	E2 State
+045D	b	u	0	RAM	E2 Counter
+0	S	_	1		
+0095	b	u	0	RAM	E3 X
+009E	b	u	0	RAM	E3 Y
+0083	b	u	0	RAM	E3 State
+045E	b	u	0	RAM	E3 Counter
+0	S	_	1		
+0096	b	u	0	RAM	E4 X
+009F	b	u	0	RAM	E4 Y
+0084	b	u	0	RAM	E4 State
+045F	b	u	0	RAM	E4 Counter
+0	S	_	1		
+0097	b	u	0	RAM	E5 X
+00A0	b	u	0	RAM	E5 Y
+0085	b	u	0	RAM	E5 State
+0460	b	u	0	RAM	E5 Counter
+0	S	_	1		
+0098	b	u	0	RAM	E6 X
+00A1	b	u	0	RAM	E6 Y
+0086	b	u	0	RAM	E6 State
+0461	b	u	0	RAM	E6 Counter
+0	S	_	1		
+004C	b	u	0	RAM	Paused
+0019	b	u	0	RAM	Counter
+
