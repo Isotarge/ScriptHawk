@@ -1,5 +1,4 @@
 -- Configuration
-showList = false;
 showHitbox = true;
 
 local red = 0xFFFF0000;
@@ -14,7 +13,9 @@ local object_array_capacity = 6;
 
 local object_fields = {
 	["object_type"] = 0x7F, -- Byte
-	["object_types"] = {},
+	["object_types"] = {
+		-- TODO
+	},
 	["x_position"] = 0x91, -- u8
 	["y_position"] = 0x9A, -- u8
 };
@@ -66,9 +67,19 @@ function drawObjects()
 		dragging = false;
 	end
 
-	local row = 0;
+	local objects = {};
 	for i = 0, object_array_capacity do
-		local objectType = mainmemory.readbyte(object_fields.object_type + i);
+		table.insert(objects, {
+			["xPosAddress"] = object_fields.x_position + i,
+			["yPosAddress"] = object_fields.y_position + i,
+			["xPos"] = mainmemory.read_u8(object_fields.x_position + i),
+			["yPos"] = mainmemory.read_u8(object_fields.y_position + i),
+			["type"] = mainmemory.readbyte(object_fields.object_type + i),
+		});
+	end
+
+	for i = 1, #objects do
+		local object = objects[i];
 		local objectTypeTable = nil;
 		local color = nil;
 
@@ -78,17 +89,13 @@ function drawObjects()
 		local hitboxWidth = 16;
 		local hitboxHeight = 16;
 
-		-- Get the X and Y position of the object
-		local xPosition = mainmemory.read_u8(object_fields.x_position + i);
-		local yPosition = mainmemory.read_u8(object_fields.y_position + i);
-
-		if type(object_fields.object_types[objectType]) == "table" then
-			objectTypeTable = object_fields.object_types[objectType];
+		if type(object_fields.object_types[object.type]) == "table" then
+			objectTypeTable = object_fields.object_types[object.type];
 
 			if type(objectTypeTable.name) == "string" then
-				objectType = object_fields.object_types[objectType].name.." "..toHexString(objectType);
+				object.type = object_fields.object_types[object.type].name.." "..toHexString(object.type);
 			else
-				objectType = "Unknown ("..toHexString(objectType)..")";
+				object.type = "Unknown ("..toHexString(object.type)..")";
 			end
 
 			if type(objectTypeTable["color"]) == "number" then
@@ -110,49 +117,44 @@ function drawObjects()
 			end
 		else
 			color = white;
-			objectType = "Unknown ("..toHexString(objectType)..")";
+			object.type = "Unknown ("..toHexString(object.type)..")";
 		end
 
 		if showHitbox then
 			if dragging then
 				for d = 1, #draggedObjects do
-					if draggedObjects[d][1] == objectBase then
-						xPosition = draggedObjects[d][2] + dragTransform[1];
-						yPosition = draggedObjects[d][3] + dragTransform[2];
-						mainmemory.write_u8(object_fields.x_position + i, xPosition);
-						mainmemory.write_u8(object_fields.y_position + i, yPosition);
+					if draggedObjects[d][1] == i then
+						object.xPos = draggedObjects[d][2] + dragTransform[1];
+						object.yPos = draggedObjects[d][3] + dragTransform[2];
+						mainmemory.write_u8(object.xPosAddress, object.xPos);
+						mainmemory.write_u8(object.yPosAddress, object.yPos);
 						break;
 					end
 				end
 			end
 
-			if (mouse.X >= xPosition + hitboxXOffset and mouse.X <= xPosition + hitboxXOffset + hitboxWidth) and (mouse.Y >= yPosition + hitboxYOffset and mouse.Y <= yPosition + hitboxYOffset + hitboxHeight) then
+			if (mouse.X >= object.xPos + hitboxXOffset and mouse.X <= object.xPos + hitboxXOffset + hitboxWidth) and (mouse.Y >= object.yPos + hitboxYOffset and mouse.Y <= object.yPos + hitboxYOffset + hitboxHeight) then
 				if startDrag then
-					table.insert(draggedObjects, {objectBase, xPosition, yPosition});
+					table.insert(draggedObjects, {i, object.xPos, object.yPos});
 				end
 
 				local mouseOverText = {
-					objectType,
-					toHexString(objectBase).." "..xPosition..","..yPosition,
+					object.type,
+					i..": "..object.xPos..","..object.yPos,
 				};
 
 				local maxLength = -math.huge;
 				for t = 1, #mouseOverText do
 					maxLength = math.max(maxLength, string.len(mouseOverText[t]));
 				end
-				local safeX = math.min(xPosition + hitboxXOffset, 256 - (maxLength * width));
-				local safeY = math.min(yPosition + hitboxYOffset, 192 - (#mouseOverText * height));
+				local safeX = math.min(object.xPos + hitboxXOffset, 256 - (maxLength * width)); -- TODO: Correct safe values for NES
+				local safeY = math.min(object.yPos + hitboxYOffset, 192 - (#mouseOverText * height)); -- TODO: Correct safe values for NES
 
 				for t = 1, #mouseOverText do
 					gui.drawText(safeX, safeY + ((t - 1) * height), mouseOverText[t], color);
 				end
 			end
-			gui.drawRectangle(xPosition + hitboxXOffset, yPosition + hitboxYOffset, hitboxWidth, hitboxHeight, color); -- Draw the object's hitbox
-		end
-
-		if showList then
-			gui.text(2, 2 + height * row, xPosition..", "..yPosition.." - "..objectType.." "..toHexString(objectBase), color, 'bottomright');
-			row = row + 1;
+			gui.drawRectangle(object.xPos + hitboxXOffset, object.yPos + hitboxYOffset, hitboxWidth, hitboxHeight, color); -- Draw the object's hitbox
 		end
 	end
 end
