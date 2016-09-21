@@ -43,17 +43,17 @@ local epochs = {
 	[9] = "2001AD",
 };
 
-local maxTowerHealth = {
+local maxTowerHealth = { -- TODO: Calculate this
 	[0] = 200,
 	[1] = 300,
 	[2] = 400,
 	[3] = 500,
 	[4] = 600,
 	[5] = 700,
-	[6] = 0xFFFF, -- TODO
-	[7] = 0xFFFF, -- TODO
-	[8] = 0xFFFF, -- TODO
-	[9] = 0xFFFF, -- TODO
+	[6] = 800,
+	[7] = 900,
+	[8] = 1000,
+	[9] = 1000, -- TODO: I think this is correct but I'm not 100%
 };
 
 local sectorData = {
@@ -74,7 +74,11 @@ local sectorData = {
 		["pikes"] = 0x02, -- u8
 		["longbows"] = 0x03, -- u8
 		["giant_catapaults"] = 0x04, -- u8
-		-- TODO: Everything inbetween
+		["cannons"] = 0x05, -- u8
+		--["?"] = 0x06, -- u8 -- TODO
+		["planes"] = 0x07, -- u8
+		["jets"] = 0x08, -- u8
+		--["?"] = 0x09, -- u8 -- TODO
 		["unarmed"] = 0x0A, -- u8
 	},
 	["army_totals"] = {
@@ -83,7 +87,7 @@ local sectorData = {
 		["oberon"] = 0x2F8, -- u16_be
 		["madcap"] = 0x2FA, -- u16_be
 	},
-	["defenses"] = 0x3B8, -- Array, 10 bytes, TTTTMM
+	["defenses"] = 0x3B8, -- Array, 10 bytes, TTTTMMLFFF
 	["tower_health"] = 0x3D6, -- u16_be
 	["mine_health"] = 0x3D8, -- u16_be
 	["lab_health"] = 0x3DA, -- u16_be
@@ -104,7 +108,11 @@ function getArmyData(army)
 		["pikes"] = mainmemory.read_u8(army + sectorData.army.pikes),
 		["longbows"] = mainmemory.read_u8(army + sectorData.army.longbows),
 		["giant_catapaults"] = mainmemory.read_u8(army + sectorData.army.giant_catapaults),
-		-- TODO: Everything inbetween
+		["cannons"] = mainmemory.read_u8(army + sectorData.army.cannons),
+		-- TODO
+		["planes"] = mainmemory.read_u8(army + sectorData.army.planes),
+		["jets"] = mainmemory.read_u8(army + sectorData.army.jets),
+		-- TODO
 		["unarmed"] = mainmemory.read_u8(army + sectorData.army.unarmed),
 	};
 end
