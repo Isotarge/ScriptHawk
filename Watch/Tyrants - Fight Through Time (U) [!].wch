@@ -6,8 +6,12 @@ SystemID GEN
 157E	w	u	1	68K RAM	Music Enabled
 1588	w	s	1	68K RAM	Island Index
 2300	w	u	1	68K RAM	Cursor Color
+A754	b	h	1	68K RAM	Alliance
 A760	b	b	1	68K RAM	Opponents
 B364	w	u	1	68K RAM	Character?
+B394	w	u	1	68K RAM	Counter Held Duration
+B396	b	u	1	68K RAM	Counter Speed 1
+B397	b	u	1	68K RAM	Counter Speed 2
 B410	w	u	1	68K RAM	Cursor X Position
 B412	w	u	1	68K RAM	Cursor Y Position
 B50E	w	h	1	68K RAM	RNG?
