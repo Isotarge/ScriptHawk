@@ -10,7 +10,6 @@ local white = 0xFFFFFFFF
 
 -- Game state
 local object_array_capacity = 6;
-
 local object_fields = {
 	["object_type"] = 0x7F, -- Byte
 	["object_types"] = {
@@ -18,6 +17,12 @@ local object_fields = {
 	},
 	["x_position"] = 0x91, -- u8
 	["y_position"] = 0x9A, -- u8
+};
+
+local projectile_array_capacity = 4;
+local projectile_fields = {
+	["x_position"] = 0x490, -- u8
+	["y_position"] = 0x4A4, -- u8
 };
 
 function toHexString(value, desiredLength, prefix)
@@ -75,6 +80,16 @@ function drawObjects()
 			["xPos"] = mainmemory.read_u8(object_fields.x_position + i),
 			["yPos"] = mainmemory.read_u8(object_fields.y_position + i),
 			["type"] = mainmemory.readbyte(object_fields.object_type + i),
+		});
+	end
+
+	for i = 0, projectile_array_capacity do
+		table.insert(objects, {
+			["xPosAddress"] = projectile_fields.x_position + i,
+			["yPosAddress"] = projectile_fields.y_position + i,
+			["xPos"] = mainmemory.read_u8(projectile_fields.x_position + i),
+			["yPos"] = mainmemory.read_u8(projectile_fields.y_position + i),
+			["type"] = 1, -- TODO: need to find this
 		});
 	end
 
