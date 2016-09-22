@@ -56,9 +56,58 @@ local maxTowerHealth = { -- TODO: Calculate this
 	[9] = 1000, -- TODO: I think this is correct but I'm not 100%
 };
 
+local researchTypes = {
+	[0] = { -- Shield
+		[0] = "1 Shield",
+		[1] = "2 Shield",
+		[2] = "3 Shield",
+		--
+		[4] = "3H Shield",
+		[5] = "4H Shield", -- TODO: This can be 1H and 2H sheld too?
+		--
+		[7] = "4H Shield",
+	},
+	[1] = { -- Defense
+		[0] = "Stick",
+		[1] = "Spear",
+		[2] = "Bow", -- Bow and Arrow
+		[3] = "Oil", -- Cauldron of Oil
+		[4] = "Crossbow",
+		[5] = "Musket",
+		[6] = "Machine Gun",
+		[7] = "Bazooka",
+	},
+	[2] = { -- Weapon
+		[0] = "Rock",
+		[1] = "Catapault",
+		[2] = "Pike",
+		[3] = "Longbow",
+		[4] = "Giant Catapault",
+		[5] = "Cannon",
+		[6] = "Plane",
+		[7] = "Jet",
+		[8] = "Nuke",
+	},
+};
+
+function getResearchString(data)
+	local researchString = "lab: ";
+	if researchTypes[data.research_type] ~= nil then
+		if researchTypes[data.research_type][data.research_index] ~= nil then
+			return researchString..researchTypes[data.research_type][data.research_index];
+		end
+	end
+	if data.research_type == 0xFFFF then
+		return researchString.."None";
+	end
+	return researchString.."Unknown ".."("..data.research_type..","..data.research_index..")";
+end
+
 local sectorData = {
 	["breed_ticker"] = 0xBA, -- 12.4 fixed point (u16_be / 16)
 	["breed_population"] = 0xBC, -- u16_be
+	["research_type"] = 0xBE, -- u16_be
+	["research_index"] = 0xC0, -- u16_be
 	["research_pop"] = 0xC4, -- u16_be
 	["research_ticker"] = 0xCC, -- u16_be
 	["research_pop_2"] = 0xCE, -- u16_be
@@ -125,6 +174,9 @@ function getSectorData(sector)
 	data.epoch = mainmemory.read_u16_be(sector + sectorData.epoch);
 	data.owner = mainmemory.read_u16_be(sector + sectorData.owner);
 
+	data.research_type = mainmemory.read_u16_be(sector + sectorData.research_type);
+	data.research_index = mainmemory.read_u16_be(sector + sectorData.research_index);
+
 	data.tower_health = mainmemory.read_u16_be(sector + sectorData.tower_health);
 	data.max_tower_health = maxTowerHealth[data.epoch];
 	data.mine_health = mainmemory.read_u16_be(sector + sectorData.mine_health);
@@ -166,6 +218,7 @@ function draw_OSD()
 
 			rowString = rowString..getArmyString(data).." ";
 			rowString = rowString.."pop: "..data.population.." ";
+			rowString = rowString..getResearchString(data).." ";
 			rowString = rowString..data.tower_health.."/"..data.max_tower_health.."HP ";
 			rowString = rowString..epochs[data.epoch];
 
