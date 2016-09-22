@@ -97,7 +97,7 @@ local sectorData = {
 	["epoch"] = 0x418, -- u16_be
 };
 
-local OSDPosition = {2, 70};
+local OSDPosition = {2, 2};
 local OSDRowHeight = 16;
 local OSDCharacterWidth = 10;
 
@@ -146,14 +146,30 @@ function getSectorData(sector)
 	return data;
 end
 
+function getArmyString(data)
+	local armyString = "armies: ";
+	armyString = armyString..data.army.scarlet.total..",";
+	armyString = armyString..data.army.caesar.total..",";
+	armyString = armyString..data.army.oberon.total..",";
+	armyString = armyString..data.army.madcap.total;
+	return armyString;
+end
+
 function draw_OSD()
 	local row = 0;
 	for i = 1, numSectors do
 		local sector = sectorBase + (i - 1) * sectorSize;
 		local data = getSectorData(sector);
 		if data.tower_health > 0 and data.owner < 4 then
-			gui.text(OSDPosition[1], OSDPosition[2] + row * OSDRowHeight, toHexString(sector)..":", characterColors[data.owner]);
-			gui.text(OSDPosition[1] + 8 * OSDCharacterWidth, OSDPosition[2] + row * OSDRowHeight, epochs[data.epoch].." "..data.tower_health.."/"..data.max_tower_health.."HP pop: "..data.population.." armies: "..data.army.scarlet.total..","..data.army.caesar.total..","..data.army.oberon.total..","..data.army.madcap.total);
+			gui.text(OSDPosition[1], OSDPosition[2] + row * OSDRowHeight, toHexString(sector), characterColors[data.owner], "bottomright");
+			local rowString = "";
+
+			rowString = rowString..getArmyString(data).." ";
+			rowString = rowString.."pop: "..data.population.." ";
+			rowString = rowString..data.tower_health.."/"..data.max_tower_health.."HP ";
+			rowString = rowString..epochs[data.epoch];
+
+			gui.text(OSDPosition[1] + 7 * OSDCharacterWidth, OSDPosition[2] + row * OSDRowHeight, rowString, nil, "bottomright");
 			row = row + 1;
 		end
 	end
