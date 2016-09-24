@@ -342,7 +342,7 @@ end
 
 function draw_OSD()
 	local row = 0;
-	for i = 1, numSectors do
+	for i = numSectors, 1, -1 do
 		local sector = sectorBase + (i - 1) * sectorSize;
 		local data = getSectorData(sector);
 		--if data.tower_health > 0 and data.owner < 4 then
