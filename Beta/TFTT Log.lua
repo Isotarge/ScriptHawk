@@ -120,7 +120,7 @@ function getResearchString(data)
 			return researchString..researchTypes[data.research_type][data.research_index];
 		end
 	end
-	if data.research_type == 0xFFFF then
+	if data.research_type >= 0 then
 		return researchString.."None";
 	end
 	return researchString.."Unknown ".."("..data.research_type..","..data.research_index..")";
@@ -144,9 +144,20 @@ local sectorData = {
 		["factory_construction"] = 0xA0,
 		["breed"] = 0xB2,
 		["research"] = 0xC4,
+		["factory"] = 0xD8,
+		["element1"] = 0x134,
+		["element2"] = 0x144,
+		["element3"] = 0x154,
+		["element4"] = 0x164,
 	},
-	["research_type"] = 0xBE, -- u16_be
+	["element1_index"] = 0x140, -- s16_be
+	["element2_index"] = 0x150, -- s16_be
+	["element3_index"] = 0x160, -- s16_be
+	["element4_index"] = 0x170, -- s16_be
+	["element_total_array"] = 0x174, -- 0x13 entries
+	["research_type"] = 0xBE, -- s16_be
 	["research_index"] = 0xC0, -- u16_be
+	["factory_quantity"] = 0xD6, -- u16_be, 0x00 = infinite
 	["army_bases"] = {
 		["scarlet"] = 0x2C8,
 		["caesar"] = 0x2D3,
@@ -180,6 +191,7 @@ local sectorData = {
 	["owner"] = 0x3FE, -- u16_be
 	["population"] = 0x406, -- u16_be
 	["epoch"] = 0x418, -- u16_be
+	["status"] = 0x448, -- u16_be (0x0000 unusable, 0x8000 normal, 0x4000 nuked)
 };
 
 local OSDPosition = {2, 2};
@@ -210,6 +222,52 @@ function getTickerData(ticker)
 	};
 end
 
+local elementNames = {
+	[0] = "Wood",
+	[1] = "Stone",
+	[2] = "Bone",
+	[3] = "Tin",
+	[4] = "Moon", -- Moonlite      -- TIER 2 START
+	[5] = "Planet", -- Planetarium
+	[6] = "Star", -- Bethlium
+	[7] = "Sun", -- Solarium
+	[8] = "Bottle", -- Aruldite    -- TIER 3 START
+	[9] = "Herb", -- Herbirite
+	[10] = "C", -- Yeridium
+	[11] = "Valium",
+	[12] = "Bug", -- Parasite
+	[13] = "Fish", -- Aquarium
+	[14] = "Hat", -- Paladium
+	[15] = "Onion",
+	[16] = "ZZZ", -- Tedium
+	[17] = "Face", -- Moron
+	[18] = "Green", -- Marmite
+	[19] = "Alien",
+};
+
+function getElementData(sector, indexOffset)
+	local elementIndex = mainmemory.read_s16_be(sector + indexOffset);
+	local elementData = {
+		["index"] = elementIndex,
+		["name"] = "None",
+		["quantity"] = 0,
+		["remaining"] = 0,
+		["total"] = 0,
+	};
+
+	if elementData.index >= 0 then
+		elementData.name = elementNames[elementIndex];
+		elementData.quantity = mainmemory.read_u16_be(sector + sectorData.element_total_array + elementIndex * 2) / 2;
+		elementData.remaining = mainmemory.read_u16_be(sector + indexOffset + 2) / 2;
+		elementData.total = elementData.quantity + elementData.remaining;
+		if elementData.index < 4 then
+			elementData.total = elementData.quantity;
+		end
+	end
+
+	return elementData;
+end
+
 function getSectorData(sector)
 	local data = {};
 
@@ -225,6 +283,11 @@ function getSectorData(sector)
 		["factory_construction"] = getTickerData(sector + sectorData.tickers.factory_construction),
 		["breed"] = getTickerData(sector + sectorData.tickers.breed),
 		["research"] = getTickerData(sector + sectorData.tickers.research),
+		["factory"] = getTickerData(sector + sectorData.tickers.factory),
+		["element1"] = getTickerData(sector + sectorData.tickers.element1),
+		["element2"] = getTickerData(sector + sectorData.tickers.element2),
+		["element3"] = getTickerData(sector + sectorData.tickers.element3),
+		["element4"] = getTickerData(sector + sectorData.tickers.element4),
 	};
 
 	data.population = mainmemory.read_u16_be(sector + sectorData.population);
@@ -234,11 +297,18 @@ function getSectorData(sector)
 	data.research_type = mainmemory.read_u16_be(sector + sectorData.research_type);
 	data.research_index = mainmemory.read_u16_be(sector + sectorData.research_index);
 
+	data.factory_quantity = mainmemory.read_u16_be(sector + sectorData.factory_quantity);
+
 	data.tower_health = mainmemory.read_u16_be(sector + sectorData.tower_health);
 	data.max_tower_health = maxTowerHealth[data.epoch];
 	data.mine_health = mainmemory.read_u16_be(sector + sectorData.mine_health);
 	data.lab_health = mainmemory.read_u16_be(sector + sectorData.lab_health);
 	data.factory_health = mainmemory.read_u16_be(sector + sectorData.factory_health);
+
+	data.element1 = getElementData(sector, sectorData.element1_index);
+	data.element2 = getElementData(sector, sectorData.element2_index);
+	data.element3 = getElementData(sector, sectorData.element3_index);
+	data.element4 = getElementData(sector, sectorData.element4_index);
 
 	data.army = {
 		["scarlet"] = getArmyData(sector + sectorData.army_bases.scarlet),
@@ -252,11 +322,13 @@ function getSectorData(sector)
 	data.army.oberon.total = mainmemory.read_u16_be(sector + sectorData.army_totals.oberon);
 	data.army.madcap.total = mainmemory.read_u16_be(sector + sectorData.army_totals.madcap);
 
+	data.status = mainmemory.read_u16_be(sector + sectorData.status);
+
 	return data;
 end
 
 function printSectorData(sector)
-	rPrint(getSectorData(sector));
+	rPrint(getSectorData(sector), 10000);
 end
 
 function getArmyString(data)
@@ -273,21 +345,47 @@ function draw_OSD()
 	for i = 1, numSectors do
 		local sector = sectorBase + (i - 1) * sectorSize;
 		local data = getSectorData(sector);
-		if data.tower_health > 0 and data.owner < 4 then
+		--if data.tower_health > 0 and data.owner < 4 then
+		if data.status ~= 0x0000 then
 			gui.text(OSDPosition[1], OSDPosition[2] + row * OSDRowHeight, toHexString(sector), characterColors[data.owner], "bottomright");
 			local rowString = "";
 
-			rowString = rowString..getArmyString(data).." ";
-			rowString = rowString.."pop: "..data.population.." ";
-			rowString = rowString..getResearchString(data).." ";
-			rowString = rowString..data.tower_health.."/"..data.max_tower_health.."HP ";
+			--rowString = rowString..getArmyString(data).." ";
+			--rowString = rowString.."pop: "..data.population.." ";
+			--rowString = rowString..getResearchString(data).." ";
+			--rowString = rowString..data.tower_health.."/"..data.max_tower_health.."HP ";
 			--rowString = rowString.."owner: "..data.owner.." ";
-			rowString = rowString..epochs[data.epoch];
+			--rowString = rowString.."status: "..toHexString(data.status, 4, "").." ";
+			--rowString = rowString..epochs[data.epoch];
+
+			-- Elements
+			rowString = rowString..data.element1.name..": "..data.element1.total.." ";
+			rowString = rowString..data.element2.name..": "..data.element2.total.." ";
+			rowString = rowString..data.element3.name..": "..data.element3.total.." ";
+			rowString = rowString..data.element4.name..": "..data.element4.total.." ";
+
+			--rowString = rowString..data.element1.name..": r: "..data.element1.remaining.." q: "..data.element1.quantity.." ";
+			--rowString = rowString..data.element2.name..": r: "..data.element2.remaining.." q: "..data.element2.quantity.." ";
+			--rowString = rowString..data.element3.name..": r: "..data.element3.remaining.." q: "..data.element3.quantity.." ";
+			--rowString = rowString..data.element4.name..": r: "..data.element4.remaining.." q: "..data.element4.quantity.." ";
+
+			rowString = rowString..(i - 1);
 
 			gui.text(OSDPosition[1] + 7 * OSDCharacterWidth, OSDPosition[2] + row * OSDRowHeight, rowString, nil, "bottomright");
 			row = row + 1;
 		end
 	end
 end
+
+function infiniteMen()
+	for i = 1, numSectors do
+		local sector = sectorBase + (i - 1) * sectorSize;
+		local data = getSectorData(sector);
+		if data.owner == mainmemory.read_u16_be(0xB364) then
+			mainmemory.write_u16_be(sector + sectorData.population, 419);
+		end
+	end
+end
+event.onframestart(infiniteMen);
 
 event.onframestart(draw_OSD);
