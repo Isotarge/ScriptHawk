@@ -29,6 +29,7 @@ end
 local displayModes = {
 	"General",
 	"Element",
+	"Off",
 };
 currentDisplayMode = 1;
 
@@ -64,8 +65,8 @@ local characterColors = {
 local epochs = {
 	[0] = "9500BC",
 	[1] = "3000BC",
-	[2] = " 100BC", -- TODO: Sort out padding w/table renderer library
-	[3] = " 900AD",
+	[2] = "100BC", -- TODO: Sort out padding w/table renderer library
+	[3] = "900AD",
 	[4] = "1400AD",
 	[5] = "1850AD",
 	[6] = "1915AD",
@@ -365,6 +366,10 @@ function draw_OSD()
 		CPressed = false;
 	end
 
+	if displayModes[currentDisplayMode] == "Off" then
+		return;
+	end
+
 	gui.text(OSDPosition[1], OSDPosition[2] + row * OSDRowHeight, "Mode: "..displayModes[currentDisplayMode], nil, "bottomright");
 	row = row + 1;
 
@@ -382,7 +387,7 @@ function draw_OSD()
 				rowString = rowString..getResearchString(data).." ";
 				rowString = rowString..data.tower_health.."/"..data.max_tower_health.."HP ";
 				--rowString = rowString.."owner: "..data.owner.." ";
-				rowString = rowString.."status: "..toHexString(data.status, 4, "").." ";
+				--rowString = rowString.."status: "..toHexString(data.status, 4, "").." ";
 				rowString = rowString..epochs[data.epoch].." ";
 			end
 
