@@ -26,6 +26,19 @@ function rPrint(s, l, i) -- recursive Print (structure, limit, indent)
 	return l
 end	
 
+local displayModes = {
+	"General",
+	"Element",
+};
+currentDisplayMode = 1;
+
+function toggleDisplayMode()
+	currentDisplayMode = currentDisplayMode + 1;
+	if currentDisplayMode > #displayModes then
+		currentDisplayMode = 1;
+	end
+end
+
 local selectedSectorPointer = 0xB5B4;
 local sectorBase = 0xB6C4;
 local sectorSize = 0x44A;
@@ -340,8 +353,21 @@ function getArmyString(data)
 	return armyString;
 end
 
+local CPressed = false;
 function draw_OSD()
 	local row = 0;
+
+	local input_table = input.get();
+	if input_table["C"] and not CPressed then
+		CPressed = true;
+		toggleDisplayMode();
+	elseif not input_table["C"] then
+		CPressed = false;
+	end
+
+	gui.text(OSDPosition[1], OSDPosition[2] + row * OSDRowHeight, "Mode: "..displayModes[currentDisplayMode], nil, "bottomright");
+	row = row + 1;
+
 	for i = numSectors, 1, -1 do
 		local sector = sectorBase + (i - 1) * sectorSize;
 		local data = getSectorData(sector);
@@ -350,29 +376,50 @@ function draw_OSD()
 			gui.text(OSDPosition[1], OSDPosition[2] + row * OSDRowHeight, toHexString(sector), characterColors[data.owner], "bottomright");
 			local rowString = "";
 
-			--rowString = rowString..getArmyString(data).." ";
-			--rowString = rowString.."pop: "..data.population.." ";
-			--rowString = rowString..getResearchString(data).." ";
-			--rowString = rowString..data.tower_health.."/"..data.max_tower_health.."HP ";
-			--rowString = rowString.."owner: "..data.owner.." ";
-			--rowString = rowString.."status: "..toHexString(data.status, 4, "").." ";
-			--rowString = rowString..epochs[data.epoch];
+			if displayModes[currentDisplayMode] == "General" then
+				rowString = rowString..getArmyString(data).." ";
+				rowString = rowString.."pop: "..data.population.." ";
+				rowString = rowString..getResearchString(data).." ";
+				rowString = rowString..data.tower_health.."/"..data.max_tower_health.."HP ";
+				--rowString = rowString.."owner: "..data.owner.." ";
+				rowString = rowString.."status: "..toHexString(data.status, 4, "").." ";
+				rowString = rowString..epochs[data.epoch].." ";
+			end
 
-			-- Elements
-			rowString = rowString..data.element1.name..": "..data.element1.total.." ";
-			rowString = rowString..data.element2.name..": "..data.element2.total.." ";
-			rowString = rowString..data.element3.name..": "..data.element3.total.." ";
-			rowString = rowString..data.element4.name..": "..data.element4.total.." ";
+			if displayModes[currentDisplayMode] == "Element" then
+				rowString = rowString..data.element1.name..": "..data.element1.total.." ";
+				rowString = rowString..data.element2.name..": "..data.element2.total.." ";
+				rowString = rowString..data.element3.name..": "..data.element3.total.." ";
+				rowString = rowString..data.element4.name..": "..data.element4.total.." ";
 
-			--rowString = rowString..data.element1.name..": r: "..data.element1.remaining.." q: "..data.element1.quantity.." ";
-			--rowString = rowString..data.element2.name..": r: "..data.element2.remaining.." q: "..data.element2.quantity.." ";
-			--rowString = rowString..data.element3.name..": r: "..data.element3.remaining.." q: "..data.element3.quantity.." ";
-			--rowString = rowString..data.element4.name..": r: "..data.element4.remaining.." q: "..data.element4.quantity.." ";
+				--rowString = rowString..data.element1.name..": r: "..data.element1.remaining.." q: "..data.element1.quantity.." ";
+				--rowString = rowString..data.element2.name..": r: "..data.element2.remaining.." q: "..data.element2.quantity.." ";
+				--rowString = rowString..data.element3.name..": r: "..data.element3.remaining.." q: "..data.element3.quantity.." ";
+				--rowString = rowString..data.element4.name..": r: "..data.element4.remaining.." q: "..data.element4.quantity.." ";
+			end
 
 			rowString = rowString..(i - 1);
 
 			gui.text(OSDPosition[1] + 7 * OSDCharacterWidth, OSDPosition[2] + row * OSDRowHeight, rowString, nil, "bottomright");
 			row = row + 1;
+		end
+	end
+end
+
+function dump()
+	for i = 1, numSectors do
+		local sector = sectorBase + (i - 1) * sectorSize;
+		local data = getSectorData(sector);
+		if data.status ~= 0x0000 then
+			local rowString = toHexString(sector).." ";
+			rowString = rowString..(i - 1).." ";
+
+			rowString = rowString..data.element1.name..": "..data.element1.total.." ";
+			rowString = rowString..data.element2.name..": "..data.element2.total.." ";
+			rowString = rowString..data.element3.name..": "..data.element3.total.." ";
+			rowString = rowString..data.element4.name..": "..data.element4.total.." ";
+
+			print(rowString);
 		end
 	end
 end
