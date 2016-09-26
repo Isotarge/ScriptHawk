@@ -1,6 +1,7 @@
 ;TO DO: add Y-velocity
 ;       calc and add xz-Velocity
 
+[GetXZVelocity]: 0x80297AB8
 [Print]: 0x802F78FC
 [IToA]: 0x8033D8A4
 [Return]: 0x8024E420
@@ -96,16 +97,9 @@ JAL @Print
 LI a0 @OSDXOffset
 
 //calc x-z plane velocity
-LA a0 @XVelocity
-LA a1 @ZVelocity
-LWC1 f30 0(a0)
-LWC1 f31 0(a1)
-MUL.S f30, f30, f30
-MUL.S f31, f31, f31
-ADD.S f31, f31, f30
-SQRT.S f31, f31
+JAL @GetXZVelocity
 LA a1 XZVelocity
-SWC1 f31, 0(a1)
+SWC1 f0, 0(a1)
 
 // Convert XZ velocity to String
 LA a0 XZVelocityValueStr
