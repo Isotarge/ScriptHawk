@@ -115,6 +115,9 @@ SystemID N64
 37C4B8	d	f	1	RDRAM	X Velocity
 37C4BC	d	f	1	RDRAM	Y Velocity
 37C4C0	d	f	1	RDRAM	Z Velocity
+37C4E8	d	f	1	RDRAM	Gravity
+37C4EC	d	f	1	RDRAM	Terminal Velocity
+37C4F0	d	f	1	RDRAM	Target XZ Velocity
 37C540	d	f	1	RDRAM	X Rotation - Current
 37C544	d	f	1	RDRAM	X Rotation - Moving to
 37C548	d	f	1	RDRAM	X Rotation - Update Speed
