@@ -40,6 +40,11 @@ function toggleDisplayMode()
 	end
 end
 
+displayEmptySectors = true;
+function toggleDisplayEmptySectors()
+	displayEmptySectors = not displayEmptySectors;
+end
+
 local selectedSectorPointer = 0xB5B4;
 local sectorBase = 0xB6C4;
 local sectorSize = 0x44A;
@@ -172,6 +177,9 @@ local sectorData = {
 	["research_type"] = 0xBE, -- s16_be
 	["research_index"] = 0xC0, -- u16_be
 	["factory_quantity"] = 0xD6, -- u16_be, 0x00 = infinite
+	["recipe_base_shield"] = 0x1AC, -- Array of recipes, 10 elements, 0x0A each
+	["recipe_base_defense"] = 0x200, -- Array of recipes, 10 elements, 0x0A each
+	["recipe_base_weapon"] = 0x264, -- Array of recipes, 10 elements, 0x0A each
 	["army_bases"] = {
 		["scarlet"] = 0x2C8,
 		["caesar"] = 0x2D3,
@@ -188,7 +196,7 @@ local sectorData = {
 		--["?"] = 0x06, -- u8 -- TODO
 		["planes"] = 0x07, -- u8
 		["jets"] = 0x08, -- u8
-		--["?"] = 0x09, -- u8 -- TODO
+		["UFOs"] = 0x09, -- u8
 		["unarmed"] = 0x0A, -- u8
 	},
 	["army_totals"] = {
@@ -223,7 +231,7 @@ function getArmyData(army)
 		-- TODO
 		["planes"] = mainmemory.read_u8(army + sectorData.army.planes),
 		["jets"] = mainmemory.read_u8(army + sectorData.army.jets),
-		-- TODO
+		["UFOs"] = mainmemory.read_u8(army + sectorData.army.UFOs),
 		["unarmed"] = mainmemory.read_u8(army + sectorData.army.unarmed),
 	};
 end
@@ -258,6 +266,28 @@ local elementNames = {
 	[18] = "Green", -- Marmite
 	[19] = "Alien",
 };
+
+function getRecipeData(sector, recipeArrayBase, recipeType)
+	local recipeData = {};
+	for i = 0, 9 do
+		local recipe = {};
+		local recipeBase = sector + recipeArrayBase + i * 10;
+		for elementIndex = 0, 4 do
+			local elementData = {
+				["element"] = mainmemory.readbyte(recipeBase + elementIndex * 2),
+				["quantity"] = mainmemory.readbyte(recipeBase + elementIndex * 2 + 1) / 2,
+			};
+			if elementData.element ~= 0xFF and elementData.quantity > 0 then
+				elementData.element = elementNames[elementData.element];
+				recipe[elementIndex] = elementData;
+			end
+		end
+		if #recipe > 0 then
+			recipeData[researchTypes[recipeType][i]] = recipe;
+		end
+	end
+	return recipeData;
+end
 
 function getElementData(sector, indexOffset)
 	local elementIndex = mainmemory.read_s16_be(sector + indexOffset);
@@ -311,6 +341,14 @@ function getSectorData(sector)
 	data.research_type = mainmemory.read_u16_be(sector + sectorData.research_type);
 	data.research_index = mainmemory.read_u16_be(sector + sectorData.research_index);
 
+	--[[
+	data.recipes = {
+		["shield"] = getRecipeData(sector, sectorData.recipe_base_shield, 0),
+		["defense"] = getRecipeData(sector, sectorData.recipe_base_defense, 1),
+		["weapon"] = getRecipeData(sector, sectorData.recipe_base_weapon, 2),
+	};
+	]]--
+
 	data.factory_quantity = mainmemory.read_u16_be(sector + sectorData.factory_quantity);
 
 	data.tower_health = mainmemory.read_u16_be(sector + sectorData.tower_health);
@@ -355,6 +393,7 @@ function getArmyString(data)
 end
 
 local CPressed = false;
+local VPressed = false;
 function draw_OSD()
 	local row = 0;
 
@@ -364,6 +403,13 @@ function draw_OSD()
 		toggleDisplayMode();
 	elseif not input_table["C"] then
 		CPressed = false;
+	end
+
+	if input_table["V"] and not VPressed then
+		VPressed = true;
+		toggleDisplayEmptySectors();
+	elseif not input_table["V"] then
+		VPressed = false;
 	end
 
 	if displayModes[currentDisplayMode] == "Off" then
@@ -378,35 +424,37 @@ function draw_OSD()
 		local data = getSectorData(sector);
 		--if data.tower_health > 0 and data.owner < 4 then
 		if data.status ~= 0x0000 then
-			gui.text(OSDPosition[1], OSDPosition[2] + row * OSDRowHeight, toHexString(sector), characterColors[data.owner], "bottomright");
-			local rowString = "";
+			if displayEmptySectors or data.owner < 4 then
+				gui.text(OSDPosition[1], OSDPosition[2] + row * OSDRowHeight, toHexString(sector), characterColors[data.owner], "bottomright");
+				local rowString = "";
 
-			if displayModes[currentDisplayMode] == "General" then
-				rowString = rowString..getArmyString(data).." ";
-				rowString = rowString.."pop: "..data.population.." ";
-				rowString = rowString..getResearchString(data).." ";
-				rowString = rowString..data.tower_health.."/"..data.max_tower_health.."HP ";
-				--rowString = rowString.."owner: "..data.owner.." ";
-				--rowString = rowString.."status: "..toHexString(data.status, 4, "").." ";
-				rowString = rowString..epochs[data.epoch].." ";
+				if displayModes[currentDisplayMode] == "General" then
+					rowString = rowString..getArmyString(data).." ";
+					rowString = rowString.."pop: "..data.population.." ";
+					rowString = rowString..getResearchString(data).." ";
+					rowString = rowString..data.tower_health.."/"..data.max_tower_health.."HP ";
+					--rowString = rowString.."owner: "..data.owner.." ";
+					--rowString = rowString.."status: "..toHexString(data.status, 4, "").." ";
+					rowString = rowString..epochs[data.epoch].." ";
+				end
+
+				if displayModes[currentDisplayMode] == "Element" then
+					rowString = rowString..data.element1.name..": "..data.element1.total.." ";
+					rowString = rowString..data.element2.name..": "..data.element2.total.." ";
+					rowString = rowString..data.element3.name..": "..data.element3.total.." ";
+					rowString = rowString..data.element4.name..": "..data.element4.total.." ";
+
+					--rowString = rowString..data.element1.name..": r: "..data.element1.remaining.." q: "..data.element1.quantity.." ";
+					--rowString = rowString..data.element2.name..": r: "..data.element2.remaining.." q: "..data.element2.quantity.." ";
+					--rowString = rowString..data.element3.name..": r: "..data.element3.remaining.." q: "..data.element3.quantity.." ";
+					--rowString = rowString..data.element4.name..": r: "..data.element4.remaining.." q: "..data.element4.quantity.." ";
+				end
+
+				rowString = rowString..(i - 1);
+
+				gui.text(OSDPosition[1] + 7 * OSDCharacterWidth, OSDPosition[2] + row * OSDRowHeight, rowString, nil, "bottomright");
+				row = row + 1;
 			end
-
-			if displayModes[currentDisplayMode] == "Element" then
-				rowString = rowString..data.element1.name..": "..data.element1.total.." ";
-				rowString = rowString..data.element2.name..": "..data.element2.total.." ";
-				rowString = rowString..data.element3.name..": "..data.element3.total.." ";
-				rowString = rowString..data.element4.name..": "..data.element4.total.." ";
-
-				--rowString = rowString..data.element1.name..": r: "..data.element1.remaining.." q: "..data.element1.quantity.." ";
-				--rowString = rowString..data.element2.name..": r: "..data.element2.remaining.." q: "..data.element2.quantity.." ";
-				--rowString = rowString..data.element3.name..": r: "..data.element3.remaining.." q: "..data.element3.quantity.." ";
-				--rowString = rowString..data.element4.name..": r: "..data.element4.remaining.." q: "..data.element4.quantity.." ";
-			end
-
-			rowString = rowString..(i - 1);
-
-			gui.text(OSDPosition[1] + 7 * OSDCharacterWidth, OSDPosition[2] + row * OSDRowHeight, rowString, nil, "bottomright");
-			row = row + 1;
 		end
 	end
 end
@@ -429,15 +477,27 @@ function dump()
 	end
 end
 
-function infiniteMen()
+function buildAll()
+	local character = mainmemory.read_u16_be(0xB364)
 	for i = 1, numSectors do
 		local sector = sectorBase + (i - 1) * sectorSize;
 		local data = getSectorData(sector);
-		if data.owner == mainmemory.read_u16_be(0xB364) then
+		if data.owner == 4 then
+			mainmemory.write_u16_be(sector + sectorData.owner, character);
+		end
+	end
+end
+
+function infiniteMen()
+	local character = mainmemory.read_u16_be(0xB364);
+	for i = 1, numSectors do
+		local sector = sectorBase + (i - 1) * sectorSize;
+		local data = getSectorData(sector);
+		if data.owner == character then
 			mainmemory.write_u16_be(sector + sectorData.population, 419);
 		end
 	end
 end
-event.onframestart(infiniteMen);
+--event.onframestart(infiniteMen);
 
 event.onframestart(draw_OSD);
