@@ -32,11 +32,14 @@ local function calculate_angle()
     angle = 180*(math.atan2(dx,dz))/math.pi;
     angle = (angle+360)%360
     
+    --distance = math.sqrt(dx*dx+dz*dz)
+    
     forms.settext(anglebox,angle)
     
     print('Point 1:', round(p1x,4), round(p1z,4))
     print('Point 2:', round(p2x,4), round(p2z,4))
     print('Angle:', angle)
+    --print('Distance:', distance)
     print("")
 end
 
