@@ -511,25 +511,10 @@ end
 function outputGamesharkCode(bytes, base, skipZeroes)
 	skipZeroes = skipZeroes or false;
 	skippedZeroes = 0;
-	if type(bytes) == "table" and #bytes > 0 then
-		if #bytes % 2 == 0 then
-			for i = 1, #bytes, 2 do
-				if not (skipZeroes and bytes[i] == 0x00 and bytes[i + 1] == 0x00) then
-					dprint("81"..toHexString(base + i - 1, 6, "").." "..toHexString(bytes[i], 2, "")..toHexString(bytes[i + 1], 2, ""));
-				else
-					skippedZeroes = skippedZeroes + 1;
-				end
-			end
-		else
-			for i = 1, #bytes-1, 2 do
-				if not (skipZeroes and bytes[i] == 0x00 and bytes[i + 1] == 0x00) then
-					dprint("81"..toHexString(base + i - 1, 6, "").." "..toHexString(bytes[i], 2, "")..toHexString(bytes[i + 1], 2, ""));
-				else
-					skippedZeroes = skippedZeroes + 1;
-				end
-			end
-			if not (skipZeroes and bytes[#bytes] == 0x00) then
-				dprint("80"..toHexString(base + #bytes - 1, 6, "").." 00"..toHexString(bytes[#bytes], 2, ""));
+	if type(bytes) == "table" and #bytes > 0 and #bytes % 2 == 0 then
+		for i = 1, #bytes, 2 do
+			if not (skipZeroes and bytes[i] == 0x00 and bytes[i + 1] == 0x00) then
+				dprint("81"..toHexString(base + i - 1, 6, "").." "..toHexString(bytes[i], 2, "")..toHexString(bytes[i + 1], 2, ""));
 			else
 				skippedZeroes = skippedZeroes + 1;
 			end
@@ -761,6 +746,14 @@ function searchPointers(base, range, allowLater)
 	end
 	print_deferred();
 	return foundPointers;
+end
+
+function angleBetweenPoints(x1, y1, x2, y2)
+	local dx = x2 - x1;
+	local dy = y2 - y1;
+
+	local angle = 180 * (math.atan2(dx, dy)) / math.pi;
+	return (angle + 360) % 360;
 end
 
 function rotation_to_degrees(num)
@@ -1378,6 +1371,95 @@ function ScriptHawk.resetMax()
 end
 ScriptHawk.bindKeyRealtime("Slash", ScriptHawk.resetMax, true);
 --ScriptHawk.bindKeyRealtime("M", toggleMode, true);
+
+
+----------------------------------------
+-- Angle Calculator                   --
+-- Originally written by The8bitbeast --
+-- Ported to ScriptHawk by Isotarge   --
+----------------------------------------
+
+angleCalc = {
+	["buttonX"] = 220,
+	["visible"] = false,
+	["form"] = nil,
+	["p1xbox"] = nil,
+	["p1zbox"] = nil,
+	["p2xbox"] = nil,
+	["p2zbox"] = nil,
+	["anglebox"] = nil,
+};
+
+angleCalc.setPoint1 = function()
+	forms.settext(angleCalc.p1xbox, Game.getXPosition())
+	forms.settext(angleCalc.p1zbox, Game.getZPosition())
+	forms.settext(angleCalc.anglebox, "");
+end
+
+angleCalc.setPoint2 = function()
+	forms.settext(angleCalc.p2xbox, Game.getXPosition());
+	forms.settext(angleCalc.p2zbox, Game.getZPosition());
+	forms.settext(angleCalc.anglebox, "");
+end
+
+angleCalc.calculateAngle = function()
+	local p1x = forms.gettext(angleCalc.p1xbox);
+	local p1z = forms.gettext(angleCalc.p1zbox);
+	local p2x = forms.gettext(angleCalc.p2xbox);
+	local p2z = forms.gettext(angleCalc.p2zbox);
+
+	local angle = angleBetweenPoints(p1x, p1z, p2x, p2z);
+
+	forms.settext(angleCalc.anglebox, angle);
+
+	dprint('Point 1: '..round(p1x, 4)..", "..round(p1z, 4));
+	dprint('Point 2: '..round(p2x, 4)..", "..round(p2z, 4));
+	dprint('Angle: '..angle);
+	dprint("");
+	print_deferred();
+end
+
+angleCalc.clearAll = function()
+	forms.settext(angleCalc.p1xbox, "");
+	forms.settext(angleCalc.p1zbox, "");
+	forms.settext(angleCalc.p2xbox, "");
+	forms.settext(angleCalc.p2zbox, "");
+	forms.settext(angleCalc.anglebox, "");
+end
+
+angleCalc.close = function()
+	angleCalc.visible = false;
+end
+
+angleCalc.open = function()
+	if not angleCalc.visible then
+		angleCalc.visible = true;
+		angleCalc.form = forms.newform(390, 190, "Angle Calculator", angleCalc.close);
+
+		-- Buttons
+		forms.button(angleCalc.form, "Use Current Coordinates", angleCalc.setPoint1, angleCalc.buttonX, 40, 150, 32);
+		forms.button(angleCalc.form, "Use Current Coordinates", angleCalc.setPoint2, angleCalc.buttonX, 74, 150, 32);
+		forms.button(angleCalc.form, "Calculate Angle", angleCalc.calculateAngle, angleCalc.buttonX, 108, 90, 32);
+		forms.button(angleCalc.form, "Clear All", angleCalc.clearAll, angleCalc.buttonX + 95, 108, 55, 32);
+		forms.label(angleCalc.form, "Calculates the angle of the straight line betwen 2 points", 0, 0, 500, 15);
+
+		-- Labels
+		forms.label(angleCalc.form, "Point 1:", 0, 50, 50, 15);
+		forms.label(angleCalc.form, "Point 2:", 0, 84, 50, 15);
+		forms.label(angleCalc.form, "Angle:", 0, 118, 50, 15);
+		forms.label(angleCalc.form, "x", 85, 20, 20, 15);
+		forms.label(angleCalc.form, "z", 170, 20, 20, 15);
+
+		-- Textboxes
+		angleCalc.p1xbox = forms.textbox(angleCalc.form, "", 80, 20, 1, 50, 45);
+		angleCalc.p1zbox = forms.textbox(angleCalc.form, "", 80, 20, 1, 135, 45);
+		angleCalc.p2xbox = forms.textbox(angleCalc.form, "", 80, 20, 1, 50, 79);
+		angleCalc.p2zbox = forms.textbox(angleCalc.form, "", 80, 20, 1, 135, 79);
+		angleCalc.anglebox = forms.textbox(angleCalc.form, "", 70, 20, 1, 50, 113);
+	else
+		--print("Please close the angle calculator before opening another one.");
+	end
+end
 
 while true do
 	gui.cleartext();
