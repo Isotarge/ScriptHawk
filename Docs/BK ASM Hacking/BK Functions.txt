@@ -5,61 +5,171 @@ Banjo-Kazooie Functions US 1.0
 0x80002190 [ void ] 	SetCOP0StatusRegister( $a0 input )
 0x800021a0 [ $v0  ] 	GetCOP0StatusRegister( void )
 
+0x80003FE0 [ void ]     SetStatusRegisterBits( word $a0 bitsToSet )
+
+0x8023DB5C [ word $v0 ]	GetGlobalGameOnCounter( void ) 
+
+0x8023DDCDC [ void ] 	IncrementGlobalOnCounter( void )
+
 0x8023E06C [ void ] 	SetApplyButtonInputsToBanjoFlag( void )
 
 0x8024BF94 [ void ] 	SetFrameSkip( word $a0 input )
 0x8024BFA0 [ word $v0 ] GetFrameSkip( void )		//normally 2 but sometimes 3 eg. GV lobby
 
+0x8024C764 [ void ]	CopyCameraXYZRotation( float* $a0 destinationXPtr )
 0x8024C788 [ float $f0 ]GetCamera_YRotation( void )
 
 0x8024CD88 [ void ] 	SetCamera_XYZPosition( float* $a0 xPosPtr )
 
 0x8024CE18 [ void ] 	SetCamera_XYZRotation( float* $a0 xRotPtr )
 
-0x8024E7C8 [ ???  ] 	UpdateButtonInputs( ????? )
+0x8024E55C [ void ]	CopyP1InputTimers( word $a0 srcInputSetIndex, float* $a1 destinationSetPtr )
 
-0x80255D04 [ $v0 ] 	Clear$v0( void )
+0x8024E7C8 [ void ] 	UpdateButtonInputs( void )
 
-0x80255F74 [ void ] 	ComputeXYZCrossProduct( float* $a0 resultXPtr, float* $a1 inputXPtr1, float* $a2 inputXPtr2 )
+0x80254FD0 [ void ]	IncreaseGlodalOnTimerBy50( void )
 
+0x80255ACC [ void ]	IncrementGlobalOnTimer( void )
+
+0x80255D04 [ $v0 ] 	GetZero( void )
+
+0x80255D70 [ float $f0 ]ArcCos( float $f12) 	//input -1 to 1, output 0 to 180
+
+0x80255F74 [ void ] 	CrossProduct( float* $a0 resultXPtr, float* $a1 inputXPtr1, float* $a2 inputXPtr2 )
+
+0c80256034 [ float $f0 ]DotProduct( float* $a0 input1XPtr, float* $a1 input2XPtr )
 0x80256064 [ float $f0 ]GetPositionDifference( float* $a0 inputXPtr1, float* $a1 inputXPtr2 )
 
 0x80256280 [ float $f0 ]GetPositionDifferenceSquared( float* $a0 inputXPtr1, float* $a1 inputXPtr2 )
 
+0x80256378 [ float $f0 ]PythagoreanTheorenXYZ( float* $a0 inputXPtr );
+
+0x80256FE0 [ float $f0 ]ArcSin( float $f12 inputDegrees );
+
+0x80257EA8 [ word $v0 ]	Clamp( word $a0 input, word $a1 lowerLimit, word $a2 upperLimit )
+0x80257ED8 [ float $f0 ]Clamp_Float( float $f12 input, float $f14 lowerLimit, float $a2 upperLimit )
+
+0x8025881C [ float $f0 ]GetAngleBetween0And360( float $f12 inputDegrees)
+0x802588D0 [ float $f0 ]Remainder_float( float $f12 dividend, float $f14 divisor )
+0x802588DC [ float $f0 ]SelectMaximum_float( float $f12 input1, float $f14 input2 )
+0x80258904 [ float $f0 ]SelectMinimum_float( float $f12 input1, float $f14 input2 )
+0x8025892C [ word $v0 ]	SelectMinimum( word $a0 input1, word $a1 input2 )
+0x80258948 [ word $v0 ]	Selectmaximum( word $a0 input1, word $a1 input2 )
+0x80258964 [ float $f0 ]AbsoluteValue_float( float $f12 )
+0x80258994 [ float $f0 ]SumOfXZAbsoluteValue( float* $a0 Xptr )
+0x802589CC [ word $v0 ]	AbsoluteValue( word $a0 )
+
 0x80258B8C [ void ] 	ClearXYZData( float* $a0 xPtr)
 0x80258BA4 [ void ] 	CopyXYZData( float* $a0 destinationXPtr, float* $a1 sourceXPtr )
-0x80258BC0 [ void ] 	GetXYZDifference( float* $a0 resultXPtr, float* $a1 minuendXPtr, float* $a2 subtraendXPtr )
+0x80258BC0 [ void ] 	CopyXYZDifference( float* $a0 resultXPtr, float* $a1 minuendXPtr, float* $a2 subtraendXPtr )
+0x80258BF4 [ void ]	SubtractVectorXYZ( float* $a0 destMinuendXPtr, float* $a1 subtraendXPtr )
+0x80258C28 [ void ]	SetXYZData( float* $a0 destinationXPtr, float $a1 xInput, float $a2 yInput, float $a3 ZInput )
+0x80258C48 [ void ]	CopyXYZSum( float* $a0 destinationXPtr, float* $a1 src1XPtr, float* $a2 src2XPtr ) 
+0x80258C7C [ void ]	ScaleXYZ( float* $a0 XPtr, float $a1 scalingFactor )
+0x80258CB0 [ void ]	ScaleCopyXYZ( float *$a0 destinationXPtr, float* $a1 sourceXPtr, float $a2 scalingFactor )
+0x80258CDC [ void ]	SumOfAbsoluteValueXYZ( float* $a0 destAndSrc1Xptr, float* $a1 src2Ptr )
+0x80258D58 [ void ]	ConvertXYZFloatToWord( word* $a0 destinationXPtr, float* sourceXPtr)
+0x80258DA8 [ void ]	ConvertXYZFloatToHalf( half* $a0 destinationXPtr, float* sourceXPtr)
+0x80258DE8 [ void ]	TruncXYZFloatToWord( word* $a0 destinationXPtr, float* sourceXPtr)
+0x80258E24 [ void ]	TruncXYZFloatToHalf( half* $a0 destinationXPtr, float* sourceXPtr)
+
+0x802591D8 [ float $f0 ]DifferenceOfAngles( float $f12 minuend, float $f14 subtrend )
 
 0x8025943C [ void ] 	DecrementTimerByOneFrame( float* $a0 timerPtr ) 
 
-0x80265350 [ float $f0 ]GetSquareRoot( float $f12 input )
+0x8025C100 [ ??? ]	CheckSum( ??? )????
 
-0x80289E00 [ ??? ] 	UpdateMovementAnimationFrame( ??? )
+0x80265350 [ float $f0 ]SquareRoot( float $f12 input )
+
+0x8028745C [ void ]	SetPlayerMovementState( struct* $a0 playerStructPtr, word $a1 movementState )
+
+0x80287674 [ void ]	SetPlayerMovementSubstate( struct* $a0 playerStructPtr, word $a1 movementSubState )
+
+0x80287674 [ byte $v0 ]	GetPlayerMovementSubstate( struct* $a0 playerStructPtr )
+
+0x802878C4 [ bool $v0 ] IsCharacterMovmentSubstate3(  struct* $a0 playerStructPtr )
+
+0x80289688 [ word $v0 ] GetPlayerAnimationState( struct* $a0 playerAnimationStructPtr )
+0x80289688 [ float $f0 ]GetPlayerAnimationTimer( struct* $a0 playerAnimationStructPtr )
+
+0x8028977C [ void ]	SetPlayerAnimationState( struct* $a0 playerAnimationStructPtr, word $a1 animationState )
+
+0x80289820 [ void ]	SetPlayerBounceRate_( word $a0 input)
+
+0x80289E00 [ void ] 	UpdateMovementAnimationFrame( void )
+
+0x80289F10 [ void ]	SetPlayerBounceRate( word $a0 input)
 
 0x80289F64 [ word $v0 ] GetPlayerPointer( void )
 
+0x8028A960 [ word $v0 ]	GetBeakBargeUnlockedFlag( void )
+0x8028A980 [ word $v0 ]	GetBeakBombUnlockedFlag( void )
+0x8028A9A0 [ word $v0 ]	GetBeakBusterUnlockedFlag( void )
+0x8028A9C0 [ word $v0 ]	GetCameraControlsUnlockedFlag( void )
+0x8028A9E0 [ word $v0 ]	GetBearPunchUnlockedFlag( void )
+0x8028AA00 [ word $v0 ]	GetClimbTreesUnlockedFlag( void )
+
+0x8028AA98 [ word $v0 ]	GetEggMovesUnlockedFlag( void )
+
+0x8028AB08 [ word $v0 ]	GetFlapFlipUnlockedFlag( void )
+0x8028AB28 [ word $v0 ]	GetFlyingUnlockedFlag( void )
+0x8028AB48 [ word $v0 ]	GetHoldAToJumpHigherUnlockedFlag( void )
+
+0x8028AC18 [ word $v0 ]	GetRollUnlockedFlag( void )
+0x8028AC38 [ word $v0 ]	GetShockSpringJumpUnlockedFlag( void )
+0x8028AC58 [ word $v0 ]	GetWadingBootsUnlockedFlag( void )
+0x8028AC78 [ word $v0 ]	GetTalonTrotUnlockedFlag( void )
+0x8028AC98 [ word $v0 ]	GetTalonTrotUnlockedFlag_Copy( void )
+0x8028ACB8 [ word $v0 ]	GetWonderwingUnlockedFlag_Copy( void )
+
+0x8028AD8C [ bool $v0 ] InPumpkinMovementSet( void )
+
+0x8028B094 [ bool $v0 ] IsPlayerMoreThan60AboveGround( void ) //height falling begins
+
+0x8028B51C [ byte $v0 ] GetPlayerIsInWaterFlag( void 0)
+
 0x8028B6FC [ void ] 	SetPlayerAsGrounded( void )
-0x8028B71C [ ??? ] 	UpdatePossibleMovementStates( ??? )
+0x8028B71C [ void ] 	UpdatePossibleMovementStates( void )
 
-0x8028D2E4 [ ??? ] 	ItemAndEnemyCollision( ??? )
+0x8028D2E4 [ void ] 	ItemAndEnemyCollision( void )
 
-0x8028E71C [ ??? ] 	UpdateBanjo ( ??? )
+0x8028E71C [ void ] 	UpdateBanjo ( void )
 
 0x8028E7CC [ byte $v0 ] GetMumboTransformation( void )
 
+0x8028E9A4 [ void ]	CopyXYZPosition_wrapper( float $a0 destinationXPtr )
+
+0x8028F070 [ bool $v0 ]	IsPlayerAndShadowVisible( void )
+
+0x8028F108 [ bool $v0 ]	InJiggyJigMovementSet( void )
+
 0x8028F150 [ byte $v0 ] GetPlayerIsVisibleFlag( void )
+
+0x8028F1D4 [ byte $v0 ] GetPlayersShadowIsVisibleFlag( void )
+
+0x8028F22C [ bool $v0 ] InDeathMovementSet( void )
+
+0x8028F3B8 [ void ]	UnlockMove( byte $a0 moveIndex )
 
 0x8028F7D0 [ void ] 	WritePlayerIsFrozenFlag( byte $a0 boolean )
 
 0x8028FCC8 [ void ] 	WritePlayerIsVisibleFlag( byte $a0 boolean )
 
+0x802906D8 [ void ]	UpdateUnderwaterWalrusBubbles( void )
+
 0x80290B60 [ void ] 	SetCameraZoomState( byte $a0 cameraZoomState )
 
 0x80290F14 [ ??? ] 	ChangeCameraState( ??? )
 
-0x80291358 [ ??? ] 	UpdateCameraPositionRotationAndZoom( ??? )
+0x80291358 [ void ] 	UpdateCameraPositionRotationAndZoom( void )
+
+0x802916C4 [ bool $v0 ]	IsShoeTimerEqualToZero( void )
 
 0x80291A0C [ void ] 	UpdatePlayerModelFacingAngle( void )
+
+0x80291D04 [ void ]	updatePlayerModelToMumboTransformation( byte $a0 transformationIndex )
+
+0x80292090 [ void ]	CorrectForDominantModelChange( byte $a0 dominantModel) //1= banjo, 2=kazooie
 
 0x80292194 [ void ] 	SetXYZDisjointAmount( float* $a0 inputXPtr )
 0x802921BC [ void ] 	SetYDisjointAmount( float $f12 disjointAmount)
@@ -72,32 +182,63 @@ Banjo-Kazooie Functions US 1.0
 0x80294378 [ void ] 	SetCollisionState( byte $a0 collisionState )
 0x80294384 [ void ] 	SetFrictionState( byte $a0 frictionState )
 
+0x80294438 [ float $f0 ]GetHeightOfGroundBeneathPlayer( void )
+ 
 0x802944F4 [ word $v0 ] GetFrictionState( void )
 
 0x80294524 [ byte $v0 ] GetJumpingFromWaterSurfaceEnabledFlag( void )
 0x80294530 [ byte $v0 ] GetWallCollisionFlag( void )
 
-0x80295448 [ ??? ] 	updateBanjoFromButtonInputs( ??? )
+0x80294548 [ byte $v0 ] GetGroundCollision1Flag( void )
 
+0x80294A4c [ word $v0 ] GetMumboXfromToXformInto( void )
+
+0x80294AF4 [ void ]	SetMumboXfromToXformInto( word $a0 )
+
+0x80295448 [ void ] 	updateBanjoFromButtonInputs( void )
+0x8029551C [ word $v0 ] GetButtonPressTimer( word $a0 buttonIndex )
+0x80295530 [ Word $v0 ] GetButtonReleaseTimer( word $a0 buttonIndex )
+0x80295544 [ bool $v0 ] IsButtonNewlyPressed( word $a0 buttonIndex )
+0x80295560 [ bool $v0 ] IsButtonNewlyReleased( word $a0 buttonIndex )
+0x8029557C [ word $v0 ] GetButtonPressTimer( word $a0 buttonIndex ) 	//copy
+0x80295590 [ Word $v0 ] GetButtonReleaseTimer( word $a0 buttonIndex ) 	//copy
+
+0x802957D8 [ word $v0 ] GetSpecificMoveUnlockedFlag( word $a0 moveIndex )
 0x802957F0 [ word $v0 ] GetMovesUnlockedBitfield( void )
-0x802957FC 		NULL_FUNCTION
+0x802957FC 		NULL
 0x80295804 [ void ] 	LockAllMoves( void )
 0x80295818 [ void ] 	LockOrUnlockMove( byte $a0 move, byte_bool $a1 unlock )
-0x80295864 [ void ] 	SetMovesUnlockedBitfield
+0x80295864 [ void ] 	SetMovesUnlockedBitfield( word $a0 input )
+
+0x80295C14 [ void ]	UpdateBanjo( void )
 
 0x80297744 [ ??? ] 	UpdatePlayersPosition( ??? )
 
+0x80297970 [ void ]	SetTargetVelocityXZComponentFromMovement( float $f12 )
+0x8029797C [ void ]	SetMovingAngleCopy( float $f12 )
 0x802979A0 [ void ] 	SetYVelocity( float $f12 input )
+
+0x80297A4C [ float $f0 ]GetGravitaionalAcceleration( void )
+
+0x80297A64 [ void ]	GetTargetVelocityXZComponentFromMovement( void )
 
 0x80297A88 [ void ] 	CopyXYZVelocity( float* $a0 destinationXPtr )
 0x80297AAC [ float $f0 ]GetYVelocity( void )
+0x80297AB8 [ float $f0 ]GetXZVelocity( void )
+
+0x80297B70 [ void ]	UpdateGravitationalAcceleration( void )
+0x80297B94 [ void ]	UpdatemaximumFallVelocity( void )
+
+0x80297BEC [ void ]	SetGravitaionalAcceleration( float $f12 )
+0x80297BF8 [ void ]	SetMaximumFallVelocity( float $f12 )
+0x80297C04 [ bool $v0 ]	IsXZVelocityGreaterThanInput( float $f12 )
 
 0x80297F10 [ ??? ] 	UpdateCharacterXRotation( ??? )
 
-0x80297F84 [ void ] 	SetXRotationToXRotationTarget( void )
-0x80297F98 [ float $f0 ]GetXRotation( void )
 0x80297FA4 [ float $f0 ]GetXRotationTarget( void )
-
+0x80297F60 [ void ]	SetXRotation( float $f12 )
+0x80297F84 [ void ]	SetXRotationToXRotationTarget( void )
+0x80297F98 [ float $f0 ]GetXRotation( void )
 
 0x8029842C [ void ] 	Copy_XYZPos_To_XYZPosCopy_And_Clear_AddToXYZPos( void )
 
@@ -106,16 +247,21 @@ Banjo-Kazooie Functions US 1.0
 0x802984D4 [ void ] 	CopyXYZPosition( float* $a0 destinationXPtr )
 0x802984F8 [ float $f0 ]GetYPosition( void )
 
-0x80298CB4 [ ??? ]	UpdateCharaterZRotation( void )
-
+0x80298CB4 [ void ]	UpdateCharaterZRotation( void )
+0x80298CE0 [ void ]	SetZRotationTarget( float $f12 )
+0x80298D04 [ void ]	SetZRotation( float $f12 )
+0x80298D28 [ void ]	SetZRotationToZRotationTarget( float $f12 )
 0x80298D3C [ float $f0 ]GetZRotation( void )
 
+0x802991B4 [ void ]	SetMovingAngle( float $f12 )
+0x802991D8 [ void ]	SetFacingAngle( float $f12 )
 0x802991FC [ void ]	UpdateFacingAngleToMovingAngle( void )
 
 0x8029921C [ float $f0 ]GetFacingAngle( void )
 0x80299228 [ float $f0 ]GetMovingAngle( void )
 
 0x802993C8 [ ??? ] 	UpdateCharaterYRotation( ??? )
+0x8029957C [ void ]	SetFacingMovingAngleRelationship( float $f12 )
 
 0x8029A72C [ ??? ]	SetMovementState( ??? )
 0x8029A7BC [ word $v0 ]	GetPreviousMovementState( void )	
@@ -124,7 +270,12 @@ Banjo-Kazooie Functions US 1.0
 0x8029A7E0 [ ??? ]	updateCurrentMovementState( ??? )
 
 0x8029A8F4 [ byte $v0 ]	GetMumboTransformation_(void)
+
 0x8029A95C [ void ]	SetMumboTransformation_( byte $a0 input )
+
+0x8029AF50 [ float $f0 ]NormalizeToRange( float $f12 input, float $f14 lowerLimit, float $a2 upperlimit )
+0x8029AF68 [ void ]	updateCurrentWalkingStatesSpeed( void )
+
 
 ========================================= Current Stopping point for updating ==
 
