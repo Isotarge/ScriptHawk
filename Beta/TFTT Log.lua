@@ -341,6 +341,12 @@ end
 function getSectorData(sector)
 	local data = {};
 
+	data.status = mainmemory.read_u16_be(sector + sectorData.status);
+
+	if data.status ~= 0x8000 then -- Speedup: Don't get data for unusable or nuked sectors
+		return data;
+	end
+
 	data.tickers = {
 		["tower_construction"] = {
 			["scarlet"] = getTickerData(sector + sectorData.tickers.tower_construction.scarlet),
@@ -393,8 +399,6 @@ function getSectorData(sector)
 		["madcap"] = getArmyData(sector, sectorData.army_bases.madcap, sectorData.army_totals.madcap),
 	};
 
-	data.status = mainmemory.read_u16_be(sector + sectorData.status);
-
 	return data;
 end
 
@@ -441,8 +445,7 @@ function draw_OSD()
 	for i = numSectors, 1, -1 do
 		local sector = sectorBase + (i - 1) * sectorSize;
 		local data = getSectorData(sector);
-		--if data.tower_health > 0 and data.owner < 4 then
-		if data.status ~= 0x0000 then
+		if data.status == 0x8000 then
 			if displayEmptySectors or data.owner < 4 then
 				gui.text(OSDPosition[1], OSDPosition[2] + row * OSDRowHeight, toHexString(sector), characterColors[data.owner], "bottomright");
 				local rowString = "";
@@ -482,7 +485,7 @@ function dump()
 	for i = 1, numSectors do
 		local sector = sectorBase + (i - 1) * sectorSize;
 		local data = getSectorData(sector);
-		if data.status ~= 0x0000 then
+		if data.status == 0x8000 then
 			local rowString = toHexString(sector).." ";
 			rowString = rowString..(i - 1).." ";
 
