@@ -236,7 +236,7 @@ local emptyArmy = {
 };
 
 function getArmyData(sector, army, total)
-	total = mainmemory.read_u8(sector + total);
+	total = mainmemory.read_u16_be(sector + total);
 	if total > 0 then
 		army = sector + army;
 		return {
