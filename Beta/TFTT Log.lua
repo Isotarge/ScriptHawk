@@ -220,20 +220,42 @@ local OSDPosition = {2, 2};
 local OSDRowHeight = 16;
 local OSDCharacterWidth = 10;
 
-function getArmyData(army)
-	return {
-		["rocks"] = mainmemory.read_u8(army + sectorData.army.rocks),
-		["catapaults"] = mainmemory.read_u8(army + sectorData.army.catapaults),
-		["pikes"] = mainmemory.read_u8(army + sectorData.army.pikes),
-		["longbows"] = mainmemory.read_u8(army + sectorData.army.longbows),
-		["giant_catapaults"] = mainmemory.read_u8(army + sectorData.army.giant_catapaults),
-		["cannons"] = mainmemory.read_u8(army + sectorData.army.cannons),
-		-- TODO
-		["planes"] = mainmemory.read_u8(army + sectorData.army.planes),
-		["jets"] = mainmemory.read_u8(army + sectorData.army.jets),
-		["UFOs"] = mainmemory.read_u8(army + sectorData.army.UFOs),
-		["unarmed"] = mainmemory.read_u8(army + sectorData.army.unarmed),
-	};
+local emptyArmy = {
+	["rocks"] = 0,
+	["catapaults"] = 0,
+	["pikes"] = 0,
+	["longbows"] = 0,
+	["giant_catapaults"] = 0,
+	["cannons"] = 0,
+	-- TODO
+	["planes"] = 0,
+	["jets"] = 0,
+	["UFOs"] = 0,
+	["unarmed"] = 0,
+	["total"] = 0,
+};
+
+function getArmyData(sector, army, total)
+	total = mainmemory.read_u8(sector + total);
+	if total > 0 then
+		army = sector + army;
+		return {
+			["rocks"] = mainmemory.read_u8(army + sectorData.army.rocks),
+			["catapaults"] = mainmemory.read_u8(army + sectorData.army.catapaults),
+			["pikes"] = mainmemory.read_u8(army + sectorData.army.pikes),
+			["longbows"] = mainmemory.read_u8(army + sectorData.army.longbows),
+			["giant_catapaults"] = mainmemory.read_u8(army + sectorData.army.giant_catapaults),
+			["cannons"] = mainmemory.read_u8(army + sectorData.army.cannons),
+			-- TODO
+			["planes"] = mainmemory.read_u8(army + sectorData.army.planes),
+			["jets"] = mainmemory.read_u8(army + sectorData.army.jets),
+			["UFOs"] = mainmemory.read_u8(army + sectorData.army.UFOs),
+			["unarmed"] = mainmemory.read_u8(army + sectorData.army.unarmed),
+			["total"] = total,
+		};
+	else
+		return emptyArmy;
+	end
 end
 
 function getTickerData(ticker)
@@ -277,6 +299,10 @@ function getRecipeData(sector, recipeArrayBase, recipeType)
 				["element"] = mainmemory.readbyte(recipeBase + elementIndex * 2),
 				["quantity"] = mainmemory.readbyte(recipeBase + elementIndex * 2 + 1) / 2,
 			};
+			if elementData.element == 0 and elementData.quantity == 0 then
+				--Speed up this function by breaking out of fake recipes since we don't return them anyway
+				break;
+			end
 			if elementData.element ~= 0xFF and elementData.quantity > 0 then
 				elementData.element = elementNames[elementData.element];
 				recipe[elementIndex] = elementData;
@@ -341,13 +367,11 @@ function getSectorData(sector)
 	data.research_type = mainmemory.read_u16_be(sector + sectorData.research_type);
 	data.research_index = mainmemory.read_u16_be(sector + sectorData.research_index);
 
-	--[[
 	data.recipes = {
 		["shield"] = getRecipeData(sector, sectorData.recipe_base_shield, 0),
 		["defense"] = getRecipeData(sector, sectorData.recipe_base_defense, 1),
 		["weapon"] = getRecipeData(sector, sectorData.recipe_base_weapon, 2),
 	};
-	]]--
 
 	data.factory_quantity = mainmemory.read_u16_be(sector + sectorData.factory_quantity);
 
@@ -363,16 +387,11 @@ function getSectorData(sector)
 	data.element4 = getElementData(sector, sectorData.element4_index);
 
 	data.army = {
-		["scarlet"] = getArmyData(sector + sectorData.army_bases.scarlet),
-		["caesar"] = getArmyData(sector + sectorData.army_bases.caesar),
-		["oberon"] = getArmyData(sector + sectorData.army_bases.oberon),
-		["madcap"] = getArmyData(sector + sectorData.army_bases.madcap),
+		["scarlet"] = getArmyData(sector, sectorData.army_bases.scarlet, sectorData.army_totals.scarlet),
+		["caesar"] = getArmyData(sector, sectorData.army_bases.caesar, sectorData.army_totals.caesar),
+		["oberon"] = getArmyData(sector, sectorData.army_bases.oberon, sectorData.army_totals.oberon),
+		["madcap"] = getArmyData(sector, sectorData.army_bases.madcap, sectorData.army_totals.madcap),
 	};
-
-	data.army.scarlet.total = mainmemory.read_u16_be(sector + sectorData.army_totals.scarlet);
-	data.army.caesar.total = mainmemory.read_u16_be(sector + sectorData.army_totals.caesar);
-	data.army.oberon.total = mainmemory.read_u16_be(sector + sectorData.army_totals.oberon);
-	data.army.madcap.total = mainmemory.read_u16_be(sector + sectorData.army_totals.madcap);
 
 	data.status = mainmemory.read_u16_be(sector + sectorData.status);
 
