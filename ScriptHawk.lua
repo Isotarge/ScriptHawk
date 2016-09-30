@@ -1422,10 +1422,14 @@ angleCalc.clearAll = function()
 	forms.settext(angleCalc.anglebox, "");
 end
 
+angleCalc.close = function()
+	angleCalc.visible = false;
+end
+
 angleCalc.open = function()
 	if not angleCalc.visible then
 		angleCalc.visible = true;
-		angleCalc.form = forms.newform(390, 190, "Angle Calculator");
+		angleCalc.form = forms.newform(390, 190, "Angle Calculator", angleCalc.close);
 
 		-- Buttons
 		forms.button(angleCalc.form, "Use Current Coordinates", angleCalc.setPoint1, angleCalc.buttonX, 40, 150, 32);
@@ -1450,10 +1454,6 @@ angleCalc.open = function()
 	else
 		--print("Please close the angle calculator before opening another one.");
 	end
-end
-
-angleCalc.close = function()
-	angleCalc.visible = false;
 end
 
 while true do
