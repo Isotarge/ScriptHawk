@@ -748,6 +748,14 @@ function searchPointers(base, range, allowLater)
 	return foundPointers;
 end
 
+function angleBetweenPoints(x1, y1, x2, y2)
+	local dx = x2 - x1;
+	local dy = y2 - y1;
+
+	local angle = 180 * (math.atan2(dx, dy)) / math.pi;
+	return (angle + 360) % 360;
+end
+
 function rotation_to_degrees(num)
 	return ((num % Game.max_rot_units) / Game.max_rot_units) * 360;
 end
@@ -1385,13 +1393,13 @@ angleCalc = {
 angleCalc.setPoint1 = function()
 	forms.settext(angleCalc.p1xbox, Game.getXPosition())
 	forms.settext(angleCalc.p1zbox, Game.getZPosition())
-	forms.settext(angleCalc.anglebox,"");
+	forms.settext(angleCalc.anglebox, "");
 end
 
 angleCalc.setPoint2 = function()
 	forms.settext(angleCalc.p2xbox, Game.getXPosition());
 	forms.settext(angleCalc.p2zbox, Game.getZPosition());
-	forms.settext(angleCalc.anglebox,"");
+	forms.settext(angleCalc.anglebox, "");
 end
 
 angleCalc.calculateAngle = function()
@@ -1399,11 +1407,8 @@ angleCalc.calculateAngle = function()
 	local p1z = forms.gettext(angleCalc.p1zbox);
 	local p2x = forms.gettext(angleCalc.p2xbox);
 	local p2z = forms.gettext(angleCalc.p2zbox);
-	local dx = p2x-p1x;
-	local dz = p2z-p1z;
 
-	local angle = 180 * (math.atan2(dx, dz)) / math.pi;
-	angle = (angle + 360) % 360;
+	local angle = angleBetweenPoints(p1x, p1z, p2x, p2z);
 
 	forms.settext(angleCalc.anglebox, angle);
 
