@@ -511,10 +511,25 @@ end
 function outputGamesharkCode(bytes, base, skipZeroes)
 	skipZeroes = skipZeroes or false;
 	skippedZeroes = 0;
-	if type(bytes) == "table" and #bytes > 0 and #bytes % 2 == 0 then
-		for i = 1, #bytes, 2 do
-			if not (skipZeroes and bytes[i] == 0x00 and bytes[i + 1] == 0x00) then
-				dprint("81"..toHexString(base + i - 1, 6, "").." "..toHexString(bytes[i], 2, "")..toHexString(bytes[i + 1], 2, ""));
+	if type(bytes) == "table" and #bytes > 0 then
+		if #bytes % 2 == 0 then
+			for i = 1, #bytes, 2 do
+				if not (skipZeroes and bytes[i] == 0x00 and bytes[i + 1] == 0x00) then
+					dprint("81"..toHexString(base + i - 1, 6, "").." "..toHexString(bytes[i], 2, "")..toHexString(bytes[i + 1], 2, ""));
+				else
+					skippedZeroes = skippedZeroes + 1;
+				end
+			end
+		else
+			for i = 1, #bytes-1, 2 do
+				if not (skipZeroes and bytes[i] == 0x00 and bytes[i + 1] == 0x00) then
+					dprint("81"..toHexString(base + i - 1, 6, "").." "..toHexString(bytes[i], 2, "")..toHexString(bytes[i + 1], 2, ""));
+				else
+					skippedZeroes = skippedZeroes + 1;
+				end
+			end
+			if not (skipZeroes and bytes[#bytes] == 0x00) then
+				dprint("80"..toHexString(base + #bytes - 1, 6, "").." 00"..toHexString(bytes[#bytes], 2, ""));
 			else
 				skippedZeroes = skippedZeroes + 1;
 			end
