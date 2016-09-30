@@ -100,6 +100,8 @@ function drawOSD()
 	local BOXs = mainmemory.read_u32_le(0x6CDC1);
 	local Level = mainmemory.read_u32_le(0x618DC);
 
+    
+    
 	gui.text(xOffset, yOffset + row * height, string.format("%8X : Crash Pointer", actor));
 	row = row + 1;
 	gui.text(xOffset, yOffset + row * height, string.format("%8d : Level", Level));
@@ -127,8 +129,28 @@ function drawOSD()
 	gui.text(xOffset, yOffset + row * height, string.format("%8.2f : Velocity", V));
 	row = row + 1;
 	gui.text(xOffset, yOffset + row * height, string.format("%8.2f : Jumps", J));
-	row = row + 1;
+	row = row + 2;
     
+ --Calculated moving angle by The8bitbeast
+    
+    if type(oldX) == "number" then
+        
+        local movingAngle2 = 180*(math.atan2(X-oldX,Z-oldZ))/math.pi;
+        movingAngle2 = (movingAngle2+360)%360;
+        
+        if movingAngle2 ~= 0 then 
+            movingAngle = movingAngle2
+        elseif V==0 then
+            movingAngle = 0
+        end
+        
+        gui.text(xOffset, yOffset + row * height, string.format("%8.2f : Moving Angle", movingAngle));
+	    row = row + 1;
+    end
+    
+    oldX=X;
+    oldZ=Z;
+        
     x=X
     z=Z
 end
