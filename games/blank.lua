@@ -13,7 +13,8 @@ Game.Memory = { -- Lua has a maximum of 200 local variables per function, we use
 	["x_position"] = {0x100000, 0x200000, 0x300000}, -- Example addresses
 	["y_position"] = {0x100004, 0x200004, 0x300004},
 	["z_position"] = {0x100008, 0x200008, 0x300008},
-}
+	["map_index"] = {0x10000C, 0x20000C, 0x30000C},
+};
 
 function Game.detectVersion(romName, romHash) -- Modules should ideally use ROM hash rather than name, but both are passed in by ScriptHawk
 	if stringContains(romName, "Europe") then -- stringContains is a pure Lua global function provided by ScriptHawk, intended to replace calls to bizstring.contains() for portability reasons
@@ -51,6 +52,15 @@ end
 
 function Game.getYPosition()
 	return mainmemory.readfloat(Game.Memory.y_position[version], true);
+end
+
+function Game.colorYPosition()
+	local yPosition = Game.getYPosition();
+	if yPosition < 0 then
+		-- Color Y position values less than 0 red
+		-- Format 0xAARRGGBB
+		return 0xFFFF0000;
+	end
 end
 
 function Game.getZPosition()
@@ -111,18 +121,26 @@ end
 Game.maps = {
 	"Map 1",
 	"Map 2",
-	"Crashes/Unknown 3", -- TODO: Unfortunately entries like this will still be shown in the dropdown, I'm still thinking about how to deal with this
+	"!Crash 3", -- Prefixing a map with '!' will hide it from the dropdown menu without misaligning the automatic index calculation
 	"Map 4",
 };
 
-Game.takeMeThereType = "Checkbox"; -- Optional: Can also be "Button". If not present will default to checkbox
-function Game.setMap(value) -- Optional
-	-- TODO: Set the Game's map index to the index selected by the dropdown
-	-- The selected value will be passed into the function by ScriptHawk
+-- Checkbox:
+	-- Will be called each frame while the checkbox is checked
+	-- Should not reload the map instantly
+	-- Should take effect after walking through a door
+-- Button:
+	-- Will be called exacty once when the button is pressed
+	-- Should load the selected map as soon as possible after the button is pressed
+Game.takeMeThereType = "Checkbox"; -- Optional. If not present will default to checkbox
+
+function Game.setMap(index) -- Optional
+	-- Set the Game's map index to the index selected in the dropdown
+	mainmemory.writebyte(Game.Memory.map_index[version], index);
 end
 
-function Game.applyInfinites() -- Optional: Toggled by a checkbox. If not present the checkbox will not appear
-	-- TODO: Give the player infinite consumables using this function
+function Game.applyInfinites() -- Optional: Toggled by a checkbox. If this function is not present in the module, the checkbox will not appear
+	-- TODO: Give the player infinite consumables
 end
 
 local labelValue = 0;
@@ -145,9 +163,9 @@ function Game.realTime() -- Optional: This function will be executed as fast as 
 end
 
 Game.OSDPosition = {2, 70}; -- Optional: OSD position in pixels from the top left corner of the screen, defaults to 2, 70 if not set by a game module
-Game.OSD = { -- TODO: Example for color -- A third parameter can be added to these table entries, a function that returns a 32 bit int AARRGGBB color value for that OSD entry
+Game.OSD = {
 	{"X", Game.getXPosition},
-	{"Y", Game.getYPosition},
+	{"Y", Game.getYPosition, Game.colorYPosition}, -- A third parameter can be added to these table entries, a function that returns a 32 bit int AARRGGBB color value for that OSD entry
 	{"Z", Game.getZPosition},
 	{"Separator", 1},
 	{"dY"},
