@@ -155,7 +155,13 @@ function drawOSD()
     z=Z
 end
 
+function loadclear()
+   oldX = "nil"
+    oldZ = "nil"
+end
+
 event.onframestart(drawOSD);
+event.onloadstate(loadclear)
 --[[
 function key_input()
 	local t = joypad.getdown(1);
