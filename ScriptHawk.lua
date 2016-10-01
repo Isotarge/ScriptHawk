@@ -764,10 +764,7 @@ function searchPointers(base, range, allowLater)
 end
 
 function angleBetweenPoints(x1, y1, x2, y2)
-	local dx = x2 - x1;
-	local dy = y2 - y1;
-
-	local angle = 180 * (math.atan2(dx, dy)) / math.pi;
+	local angle = 180 * (math.atan2(x2 - x1, y2 - y1)) / math.pi;
 	return (angle + 360) % 360;
 end
 
@@ -1386,7 +1383,6 @@ function ScriptHawk.resetMax()
 end
 ScriptHawk.bindKeyRealtime("Slash", ScriptHawk.resetMax, true);
 --ScriptHawk.bindKeyRealtime("M", toggleMode, true);
-
 
 ----------------------------------------
 -- Angle Calculator                   --
