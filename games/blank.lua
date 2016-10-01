@@ -1,15 +1,17 @@
-local Game = {}; -- We'll put all of our functions in here and return it to ScriptHawk
+local Game = {}; -- This table stores the module's API function implementations and game state, it's returned to ScriptHawk at the end of the module code
 
 --------------------
 -- Region/Version --
 --------------------
 
-Game.Memory = { -- Lua has a maximum of 200 local variables per function, we use a table for memory addresses to get around this
+Game.Memory = {
+	-- Lua has a maximum of 200 local variables per function, we use a table to store memory addresses to get around this
 	-- It's a 2 dimensional table, the first dimension is the name of the address
 	-- the second dimension is an index for which version of the game was detected, set below by Game.detectVersion()
 	-- Examples of how to access the memory address for X Position:
-		-- Game.Memory.x_position[version]
+		-- Game.Memory.x_position[version] -- Preferred
 		-- Game.Memory["x_position"][version]
+		-- Game["Memory"]["x_position"][version]
 	["x_position"] = {0x100000, 0x200000, 0x300000}, -- Example addresses
 	["y_position"] = {0x100004, 0x200004, 0x300004},
 	["z_position"] = {0x100008, 0x200008, 0x300008},
@@ -34,7 +36,7 @@ end
 -- Physics/Scale --
 -------------------
 
-Game.speedy_speeds = { .001, .01, .1, 1, 5, 10, 20, 50, 100 };
+Game.speedy_speeds = { .001, .01, .1, 1, 5, 10, 20, 50, 100 }; -- D-Pad speeds, scale these appropriately with your game's coordinate system
 Game.speedy_index = 7;
 
 function Game.isPhysicsFrame() -- Optional: If lag in your game is more complicated than a simple emu.islagged() call you should add the logic to detect it here
@@ -91,27 +93,27 @@ Game.max_rot_units = 360; -- Maximum value of the Game's native rotation units
 -- If the Game.max_rot_units value is correct (and minimum is 0) ScriptHawk will correctly convert in game units to both degrees (default) and radians
 
 function Game.getXRotation()
-	return 0; -- TODO
+	return 0; -- TODO: Read X rotation from memory
 end
 
 function Game.getYRotation()
-	return 0; -- TODO
+	return 0; -- TODO: Read Y rotation from memory
 end
 
 function Game.getZRotation()
-	return 0; -- TODO
+	return 0; -- TODO: Read Z rotation from memory
 end
 
 function Game.setXRotation(value)
-	-- TODO
+	-- TODO: Write X rotation to memory
 end
 
 function Game.setYRotation(value)
-	-- TODO
+	-- TODO: Write Y rotation to memory
 end
 
 function Game.setZRotation(value)
-	-- TODO
+	-- TODO: Write Z rotation to memory
 end
 
 ------------
