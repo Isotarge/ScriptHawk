@@ -1866,7 +1866,7 @@ function populateObjectModel2Pointers()
 end
 
 local function encirclePlayerObjectModel2()
-	if encircle_enabled and stringContains(grab_script_mode, "Model 2") then
+	if encircle_enabled and string.contains(grab_script_mode, "Model 2") then
 		local playerObject = Game.getPlayerObject();
 		if isRDRAM(playerObject) then
 			local xPos = mainmemory.readfloat(playerObject + obj_model1.x_pos, true);
@@ -2050,12 +2050,12 @@ function getExamineDataLoadingZone(base)
 		table.insert(data, {"Type", _type});
 		table.insert(data, {"Separator", 1});
 
-		if stringContains(_type, "Cutscene Trigger") then
+		if string.contains(_type, "Cutscene Trigger") then
 			table.insert(data, {"Cutscene Index", mainmemory.read_u16_be(base + loading_zone_fields.destination_map)});
 			table.insert(data, {"Separator", 1});
 		end
 
-		if stringContains(_type, "Loading Zone") then
+		if string.contains(_type, "Loading Zone") then
 			local destinationMap = mainmemory.read_u16_be(base + loading_zone_fields.destination_map);
 			if Game.maps[destinationMap + 1] ~= nil then
 				destinationMap = Game.maps[destinationMap + 1];
@@ -2106,7 +2106,7 @@ function dumpLoadingZones()
 					_type = toHexString(_type);
 				end
 
-				if stringContains(_type, "Loading Zone") then
+				if string.contains(_type, "Loading Zone") then
 					local destinationMap = mainmemory.read_u16_be(base + loading_zone_fields.destination_map);
 					if Game.maps[destinationMap + 1] ~= nil then
 						destinationMap = Game.maps[destinationMap + 1];
@@ -4532,7 +4532,7 @@ local function grabObject(pointer)
 end
 
 local function grabSelectedObject()
-	if stringContains(grab_script_mode, "Model 1") then
+	if string.contains(grab_script_mode, "Model 1") then
 		grabObject(object_pointers[object_index]);
 	end
 end
@@ -4545,7 +4545,7 @@ local function focusObject(pointer) -- TODO: There's more pointers to set here, 
 end
 
 local function focusSelectedObject()
-	if stringContains(grab_script_mode, "Model 1") then
+	if string.contains(grab_script_mode, "Model 1") then
 		focusObject(object_pointers[object_index]);
 	end
 end
@@ -4555,21 +4555,21 @@ local function zipToSelectedObject()
 	if isRDRAM(playerObject) then
 		local desiredX, desiredY, desiredZ;
 		-- Get selected object X,Y,Z position
-		if stringContains(grab_script_mode, "Model 1") then
+		if string.contains(grab_script_mode, "Model 1") then
 			local selectedActorBase = object_pointers[object_index];
 			if isRDRAM(selectedActorBase) then
 				desiredX = mainmemory.readfloat(selectedActorBase + obj_model1.x_pos, true);
 				desiredY = mainmemory.readfloat(selectedActorBase + obj_model1.y_pos, true);
 				desiredZ = mainmemory.readfloat(selectedActorBase + obj_model1.z_pos, true);
 			end
-		elseif stringContains(grab_script_mode, "Model 2") then
+		elseif string.contains(grab_script_mode, "Model 2") then
 			local selectedObjectBase = object_pointers[object_index];
 			if isRDRAM(selectedObjectBase) then
 				desiredX = mainmemory.readfloat(selectedObjectBase + obj_model2.x_pos, true);
 				desiredY = mainmemory.readfloat(selectedObjectBase + obj_model2.y_pos, true);
 				desiredZ = mainmemory.readfloat(selectedObjectBase + obj_model2.z_pos, true);
 			end
-		elseif stringContains(grab_script_mode, "Loading Zones") then
+		elseif string.contains(grab_script_mode, "Loading Zones") then
 			local selectedLoadingZoneBase = object_pointers[object_index];
 			if isRDRAM(selectedLoadingZoneBase) then
 				desiredX = mainmemory.read_s16_be(selectedLoadingZoneBase + loading_zone_fields.x_position);
@@ -4631,7 +4631,7 @@ local function populateObjectModel1Pointers()
 end
 
 local function encirclePlayerObjectModel1()
-	if encircle_enabled and stringContains(grab_script_mode, "Model 1") then
+	if encircle_enabled and string.contains(grab_script_mode, "Model 1") then
 		local playerObject = Game.getPlayerObject();
 		if isRDRAM(playerObject) then
 			local x, z;
@@ -4779,17 +4779,17 @@ local function drawGrabScriptUI()
 		return;
 	end
 
-	if stringContains(grab_script_mode, "Model 1") then
+	if string.contains(grab_script_mode, "Model 1") then
 		populateObjectModel1Pointers();
 		encirclePlayerObjectModel1();
 	end
 
-	if stringContains(grab_script_mode, "Model 2") then
+	if string.contains(grab_script_mode, "Model 2") then
 		populateObjectModel2Pointers();
 		encirclePlayerObjectModel2();
 	end
 
-	if stringContains(grab_script_mode, "Loading Zones") then
+	if string.contains(grab_script_mode, "Loading Zones") then
 		populateLoadingZonePointers();
 	end
 
@@ -4806,7 +4806,7 @@ local function drawGrabScriptUI()
 		end
 	end
 
-	if stringContains(grab_script_mode, "Model 2") then
+	if string.contains(grab_script_mode, "Model 2") then
 		gui.text(gui_x, gui_y + height * row, "Array Size: "..getObjectModel2ArraySize(), nil, 'bottomright');
 		row = row + 1;
 	end
@@ -4814,7 +4814,7 @@ local function drawGrabScriptUI()
 	gui.text(gui_x, gui_y + height * row, "Index: "..object_index.."/"..#object_pointers, nil, 'bottomright');
 	row = row + 1;
 
-	if stringContains(grab_script_mode, "Model 1") then
+	if string.contains(grab_script_mode, "Model 1") then
 		local focusedActor = dereferencePointer(cameraObject + obj_model1.camera.focused_actor_pointer);
 		local grabbedActor = dereferencePointer(playerObject + obj_model1.player.grab_pointer);
 
@@ -4844,7 +4844,7 @@ local function drawGrabScriptUI()
 	end
 
 	if #object_pointers > 0 and object_index <= #object_pointers then
-		if stringContains(grab_script_mode, "Examine") then
+		if string.contains(grab_script_mode, "Examine") then
 			local examine_data = {};
 			if grab_script_mode == "Examine (Object Model 1)" then
 				examine_data = getExamineDataModelOne(object_pointers[object_index]);
@@ -4923,7 +4923,7 @@ local function drawGrabScriptUI()
 					else
 						_type = toHexString(_type);
 					end
-					if stringContains(_type, "Loading Zone") then
+					if string.contains(_type, "Loading Zone") then
 						local destinationMap = mainmemory.read_u16_be(base + loading_zone_fields.destination_map);
 						if Game.maps[destinationMap + 1] ~= nil then
 							destinationMap = Game.maps[destinationMap + 1];
@@ -4933,7 +4933,7 @@ local function drawGrabScriptUI()
 						local destinationExit = mainmemory.read_u16_be(base + loading_zone_fields.destination_exit);
 						gui.text(gui_x, gui_y + height * row, destinationMap.." ("..destinationExit..") "..toHexString(base or 0, 6).." "..i, color, 'bottomright');
 						row = row + 1;
-					elseif stringContains(_type, "Cutscene Trigger") then
+					elseif string.contains(_type, "Cutscene Trigger") then
 						gui.text(gui_x, gui_y + height * row, _type.." ("..mainmemory.read_u16_be(base + loading_zone_fields.destination_map)..") "..toHexString(base or 0, 6).." "..i, color, 'bottomright');
 						row = row + 1;
 					else

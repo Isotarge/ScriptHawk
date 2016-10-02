@@ -19,11 +19,11 @@ Game.Memory = {
 };
 
 function Game.detectVersion(romName, romHash) -- Modules should ideally use ROM hash rather than name, but both are passed in by ScriptHawk
-	if stringContains(romName, "Europe") then -- stringContains is a pure Lua global function provided by ScriptHawk, intended to replace calls to bizstring.contains() for portability reasons
+	if string.contains(romName, "Europe") then -- string.contains is a pure Lua global function provided by ScriptHawk, intended to replace calls to bizstring.contains() for portability reasons
 		version = 1; -- We use the version variable as an index for the Game.Memory table
-	elseif stringContains(romName, "Japan") then
+	elseif string.contains(romName, "Japan") then
 		version = 2;
-	elseif stringContains(romName, "USA") then
+	elseif string.contains(romName, "USA") then
 		version = 3;
 	else
 		return false; -- Return false if this version of the game is not supported

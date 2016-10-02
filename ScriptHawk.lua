@@ -85,18 +85,24 @@ function esc(str)
 		:gsub('%?', '%%%?'));
 end
 
-function stringContains(haystack, needle)
+string.contains = function(haystack, needle)
 	return type(string.find(haystack, esc(needle))) == "number";
+end
+
+string.lpad = function(str, len, char)
+	if char == nil then char = ' ' end
+	return string.rep(char, len - #str) .. str
+end
+
+string.rpad = function(str, len, char)
+	if char == nil then char = ' ' end
+	return str .. string.rep(char, len - #str)
 end
 
 function toHexString(value, desiredLength, prefix)
 	value = string.format("%X", value or 0);
-	prefix = prefix or "0x";
-	desiredLength = desiredLength or string.len(value);
-	while string.len(value) < desiredLength do
-		value = "0"..value;
-	end
-	return prefix..value;
+	value = string.lpad(value, desiredLength or string.len(value), '0');
+	return (prefix or "0x")..value;
 end
 
 function toBinaryString(num, bits) -- TODO: Properly define behavior for negative numbers

@@ -22,7 +22,7 @@ function Game.detectVersion(romName, romHash)
 	if romHash == "CFBB98D392E4A9D39DA8285D10CBEF3974C2F012" then -- Europe 1.1
 		x_pos = 0x1D8AD4;
 		facing_angle = 0x1D8B66;
-	--elseif stringContains(romName, "Master Quest") then -- TODO: uh, this was lumped in with PAL?
+	--elseif string.contains(romName, "Master Quest") then -- TODO: uh, this was lumped in with PAL?
 	--	x_pos = 0x1D9394;
 	--	facing_angle = 0x1D9426;
 	elseif romHash == "328A1F1BEBA30CE5E178F031662019EB32C5F3B5" then -- Europe 1.0
