@@ -2,7 +2,17 @@ ScriptHawk = {};
 
 if emu.getsystemid() == "N64" then
 	RDRAMBase = 0x80000000;
-	RDRAMSize = 0x800000; -- Halved with no expansion pak
+	RDRAMSize = 0x800000; -- Halved with no expansion pak, can be read from 0x80000318
+
+	-- Checks whether a value falls within N64 RDRAM
+	function isRDRAM(value)
+		return type(value) == "number" and value >= 0 and value < RDRAMSize;
+	end
+
+	-- Checks whether a value is a pointer in to N64 RDRAM on the system bus
+	function isPointer(value)
+		return type(value) == "number" and value >= RDRAMBase and value < RDRAMBase + RDRAMSize;
+	end
 
 	-- Dereferences a N64 RDRAM pointer
 	-- Returns the RDRAM address pointed to if it's a valid pointer
@@ -10,20 +20,38 @@ if emu.getsystemid() == "N64" then
 	function dereferencePointer(address)
 		if type(address) == "number" and address >= 0 and address < (RDRAMSize - 4) then
 			address = mainmemory.read_u32_be(address);
-			if address >= RDRAMBase and address < RDRAMBase + RDRAMSize then
+			if isPointer(address) then
 				return address - RDRAMBase;
 			end
 		end
 	end
+end
 
-	-- Checks whether a value falls within N64 RDRAM
-	function isRDRAM(value)
-		return type(value) == "number" and value >= 0 and value < RDRAMSize;
+if emu.getsystemid() == "PSX" then
+	RAMBase = 0x80000000;
+	RAMSize = 0x200000;
+
+	function isPointer(addr)
+		if type(addr) ~= "number" then
+			return false;
+		end
+		return addr >= RAMBase and addr < RAMBase + RAMSize;
 	end
 
-	-- Checks whether a value is a N64 RDRAM pointer
-	function isPointer(value)
-		return type(value) == "number" and value >= RDRAMBase and value < RDRAMBase + RDRAMSize;
+	function isRAM(addr)
+		if type(addr) ~= "number" then
+			return false;
+		end
+		return addr >= 0 and addr < RAMSize;
+	end
+
+	function dereferencePointer(addr)
+		if isRAM(addr) then
+			addr = mainmemory.read_u32_le(addr);
+			if isPointer(addr) then
+				return addr - RAMBase;
+			end
+		end
 	end
 end
 
