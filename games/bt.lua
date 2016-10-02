@@ -183,9 +183,9 @@ Game.maps = {
 	"JV - Purple Jinjo's house",
 	"JV - Red Jinjo's house",
 	"JV - White Jinjo's house",
-	"WH - Wooded Hollow",
-	"WH - Heggy's Egg Shed",
-	"WH - Jiggywiggy's Temple",
+	"IoH - Wooded Hollow",
+	"IoH - Heggy's Egg Shed",
+	"IoH - Jiggywiggy's Temple",
 	"IoH - Plateau",
 	"IoH - Plateau - Honey B's Hive",
 	"IoH - Pine Grove",
@@ -845,6 +845,11 @@ local movementStates = {
 	[0x5B] = "Throwing Object", -- Glowbo
 	[0x5C] = "Knockback",
 
+	[0x5E] = "Locked", -- Shack Pack, Talking, moving to target
+	[0x5F] = "Locked", -- Shack pack, Talking
+	[0x60] = "Locked", -- Snooze Pack, Talking, moving to target
+	[0x61] = "Locked", -- Snooze Pack, Talking
+
 	[0x66] = "Locked", -- Solo Kazooie - Water surface?
 	[0x67] = "Shooting Egg", -- Solo Kazooie
 	[0x68] = "Pooping Egg", -- Solo Kazooie
@@ -854,6 +859,7 @@ local movementStates = {
 	[0x6C] = "Backflip", -- Solo Banjo -- TODO: What is the name for this?
 	[0x6D] = "Diving", -- Solo Banjo
 
+	[0x6E] = "Locked", -- Sack Pack, Talking, moving to target
 	[0x6F] = "Floating", -- Solo Banjo, CCL
 
 	[0x71] = "Falling", -- Talon Trot
@@ -870,7 +876,7 @@ local movementStates = {
 	[0x7D] = "Damaged", -- Solo Banjo - Sack Pack
 
 	[0x7F] = "Damaged", -- Underwater
-
+	[0x80] = "Locked", -- Sack Pack, Talking
 	[0x81] = "Swimming (A)", -- Solo Banjo
 	[0x82] = "Swimming (B)", -- Solo Banjo
 	[0x83] = "Knockback", -- Submarine on land
@@ -1129,7 +1135,7 @@ end
 
 function Game.getCurrentHealth()
 	local currentTransformation = mainmemory.readbyte(Game.Memory.iconAddress[version]);
-	if type(Game.Memory.healthAddresses[currentTransformation][version]) == 'number' then
+	if type(Game.Memory.healthAddresses[currentTransformation]) == 'table' then
 		return mainmemory.read_u8(Game.Memory.healthAddresses[currentTransformation][version]);
 	end
 	return 1;
@@ -1137,7 +1143,7 @@ end
 
 function Game.setCurrentHealth(value)
 	local currentTransformation = mainmemory.readbyte(Game.Memory.iconAddress[version]);
-	if type(Game.Memory.healthAddresses[currentTransformation][version]) == 'number' then
+	if type(Game.Memory.healthAddresses[currentTransformation]) == 'table' then
 		value = value or 0;
 		value = math.max(0x00, value);
 		value = math.min(0xFF, value);
@@ -1147,7 +1153,7 @@ end
 
 function Game.getMaxHealth()
 	local currentTransformation = mainmemory.readbyte(Game.Memory.iconAddress[version]);
-	if type(Game.Memory.healthAddresses[currentTransformation][version]) == 'number' then
+	if type(Game.Memory.healthAddresses[currentTransformation]) == 'table' then
 		return mainmemory.read_u8(Game.Memory.healthAddresses[currentTransformation][version] + 1);
 	end
 	return 1;
@@ -1155,7 +1161,7 @@ end
 
 function Game.setMaxHealth(value)
 	local currentTransformation = mainmemory.readbyte(Game.Memory.iconAddress[version]);
-	if type(Game.Memory.healthAddresses[currentTransformation][version]) == 'number' then
+	if type(Game.Memory.healthAddresses[currentTransformation]) == 'table' then
 		value = value or 0;
 		value = math.max(0x00, value);
 		value = math.min(0xFF, value);
