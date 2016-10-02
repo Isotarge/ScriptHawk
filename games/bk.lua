@@ -2602,6 +2602,7 @@ Game.OSD = {
 ---------------
 
 Game.ASMHookBase = 0x024EE90; -- changed to existing JAL point to aviod issues with branch delay
+--Game.ASMHookBase = 0x0334FFC; -- For Position Display.asm
 Game.ASMCodeBase = 0x0400000; --supports up to 28 bits, 0xFFFFFFA
 Game.ASMMaxCodeSize = 0x400000;
 
