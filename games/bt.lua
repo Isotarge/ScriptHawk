@@ -400,14 +400,15 @@ end
 function output_objects()
 	local playerObject = Game.getPlayerObject();
 	if isRDRAM(playerObject) then
-		print("Player: "..toHexString(playerObject, nil, ""));
-		print("Position: "..toHexString(dereferencePointer(playerObject + position_pointer_index), nil, ""));
-		print("Rot X: "..toHexString(dereferencePointer(playerObject + rot_x_pointer_index), nil, ""));
-		print("Rot Y: "..toHexString(dereferencePointer(playerObject + rot_y_pointer_index), nil, ""));
-		print("Rot Z: "..toHexString(dereferencePointer(playerObject + rot_z_pointer_index), nil, ""));
-		print("Slope: "..toHexString(dereferencePointer(playerObject + slope_pointer_index), nil, ""));
-		print("Velocity: "..toHexString(dereferencePointer(playerObject + velocity_pointer_index), nil, ""));
-		print("Movement State: "..toHexString(dereferencePointer(playerObject + movement_state_pointer_index), nil, ""));
+		dprint("Player: "..toHexString(playerObject, nil, ""));
+		dprint("Position: "..toHexString(dereferencePointer(playerObject + position_pointer_index), nil, ""));
+		dprint("Rot X: "..toHexString(dereferencePointer(playerObject + rot_x_pointer_index), nil, ""));
+		dprint("Rot Y: "..toHexString(dereferencePointer(playerObject + rot_y_pointer_index), nil, ""));
+		dprint("Rot Z: "..toHexString(dereferencePointer(playerObject + rot_z_pointer_index), nil, ""));
+		dprint("Slope: "..toHexString(dereferencePointer(playerObject + slope_pointer_index), nil, ""));
+		dprint("Velocity: "..toHexString(dereferencePointer(playerObject + velocity_pointer_index), nil, ""));
+		dprint("Movement State: "..toHexString(dereferencePointer(playerObject + movement_state_pointer_index), nil, ""));
+		print_deferred();
 	else
 		print("Can't get a read...");
 	end
