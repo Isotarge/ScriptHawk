@@ -15,23 +15,28 @@ script_mode = script_modes[script_mode_index];
 -- Region/Version --
 --------------------
 
-local framebuffer_width = 292; -- Bigger on PAL
-local framebuffer_height = 200; -- Bigger on PAL
+local framebuffer = { -- Larger on PAL
+	width = 292,
+	height = 200,
+};
 
 local clip_vel = -3500; -- Minimum velocity required to clip on the Y axis -- TODO: This seems to be different for different geometry
 
 -- Relative to notes
 -- TODO: Add jinjos
-local eggs = 4;
-local red_feathers = 12;
-local gold_feathers = 16;
-local health = 32;
-local health_containers = 36;
-local lives = 40;
-local air = 44;
-local mumbo_tokens_on_hand = 64;
-local mumbo_tokens = 100;
-local jiggies = 104;
+local collectable_offsets = {
+	notes = 0,
+	eggs = 4,
+	red_feathers = 12,
+	gold_feathers = 16,
+	health = 32,
+	health_containers = 36,
+	lives = 40,
+	air = 44,
+	mumbo_tokens_on_hand = 64,
+	mumbo_tokens = 100,
+	jiggies = 104,
+};
 
 local max_notes = 100;
 local max_eggs = 200; -- RAM:803461AC li $v0, 0x64 -- US 1.0
@@ -237,7 +242,7 @@ Game.Memory = {
 	["current_movement_state"] = {0x37DB34, 0x37DC64, 0x37C364, 0x37D164},
 	["map"] = {0x37F2C5, 0x37F405, 0x37DAF5, 0x37E8F5},
 	["ff_question_pointer"] = {0x383AC0, 0x383C20, 0x382300, 0x3830E0},
-	["notes"] = {0x386940, 0x386AA0, 0x385180, 0x385F60},
+	["collectable_base"] = {0x386940, 0x386AA0, 0x385180, 0x385F60},
 	["object_array_pointer"] = {0x36EAE0, 0x36F260, 0x36D760, 0x36E560},
 	["struct_array_pointer"] = {nil, nil, nil, 0x36E7C8}, -- TODO: Other versions
 	["board_base"] = {0x394140, 0x394350, 0x3929C0, 0x393760},
@@ -246,8 +251,8 @@ Game.Memory = {
 function Game.detectVersion(romName, romHash)
 	if romHash == "BB359A75941DF74BF7290212C89FBC6E2C5601FE" then -- Europe
 		version = 1;
-		framebuffer_width = 292;
-		framebuffer_height = 216;
+		framebuffer.width = 292;
+		framebuffer.height = 216;
 		clip_vel = -2900;
 		Game.allowFurnaceFunPatch = false; -- TODO: FF Patch for this version
 		Game.supportsASMHacks = false; -- TODO: Research ASM hook for this version
@@ -2254,7 +2259,7 @@ end
 function fillFB()
 	local frameBufferLocation = dereferencePointer(Game.Memory.fb_pointer[version]);
 	if isRDRAM(frameBufferLocation) then
-		replaceTextureRGBA5551(nil, frameBufferLocation, framebuffer_width, framebuffer_height);
+		replaceTextureRGBA5551(nil, frameBufferLocation, framebuffer.width, framebuffer.height);
 	end
 end
 
@@ -2506,16 +2511,17 @@ end
 
 function Game.applyInfinites()
 	-- We don't apply infinite notes since it messes up note routing
-	--mainmemory.write_s32_be(Game.Memory.notes[version], max_notes);
-	mainmemory.write_s32_be(Game.Memory.notes[version] + eggs, max_eggs);
-	mainmemory.write_s32_be(Game.Memory.notes[version] + red_feathers, max_red_feathers);
-	mainmemory.write_s32_be(Game.Memory.notes[version] + gold_feathers, max_gold_feathers);
-	mainmemory.write_s32_be(Game.Memory.notes[version] + health, mainmemory.read_s32_be(Game.Memory.notes[version] + health_containers));
-	mainmemory.write_s32_be(Game.Memory.notes[version] + lives, max_lives);
-	mainmemory.write_s32_be(Game.Memory.notes[version] + air, max_air);
-	mainmemory.write_s32_be(Game.Memory.notes[version] + mumbo_tokens, max_mumbo_tokens);
-	mainmemory.write_s32_be(Game.Memory.notes[version] + mumbo_tokens_on_hand, max_mumbo_tokens);
-	mainmemory.write_s32_be(Game.Memory.notes[version] + jiggies, max_jiggies);
+	local collectable_base = Game.Memory.collectable_base[version];
+	--mainmemory.write_s32_be(collectable_base + collectable_offsets.notes, max_notes);
+	mainmemory.write_s32_be(collectable_base + collectable_offsets.eggs, max_eggs);
+	mainmemory.write_s32_be(collectable_base + collectable_offsets.red_feathers, max_red_feathers);
+	mainmemory.write_s32_be(collectable_base + collectable_offsets.gold_feathers, max_gold_feathers);
+	mainmemory.write_s32_be(collectable_base + collectable_offsets.health, mainmemory.read_s32_be(collectable_base + collectable_offsets.health_containers));
+	mainmemory.write_s32_be(collectable_base + collectable_offsets.lives, max_lives);
+	mainmemory.write_s32_be(collectable_base + collectable_offsets.air, max_air);
+	mainmemory.write_s32_be(collectable_base + collectable_offsets.mumbo_tokens, max_mumbo_tokens);
+	mainmemory.write_s32_be(collectable_base + collectable_offsets.mumbo_tokens_on_hand, max_mumbo_tokens);
+	mainmemory.write_s32_be(collectable_base + collectable_offsets.jiggies, max_jiggies);
 end
 
 function Game.initUI()
