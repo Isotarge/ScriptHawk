@@ -1801,9 +1801,9 @@ local collisionTypes = { -- These seem to be the model 2 equivalent to the model
 
 function getObjectModel2Array()
 	if version ~= 4 then
-		return dereferencePointer(Game.Memory["obj_model2_array_pointer"][version]);
+		return dereferencePointer(Game.Memory.obj_model2_array_pointer[version]);
 	end
-	return Game.Memory["obj_model2_array_pointer"][version]; -- Kiosk doesn't move
+	return Game.Memory.obj_model2_array_pointer[version]; -- Kiosk doesn't move
 end
 
 function getObjectModel2ArraySize()
@@ -1843,7 +1843,7 @@ function populateObjectModel2Pointers()
 	local objModel2Array = getObjectModel2Array();
 	if isRDRAM(objModel2Array) then
 		if version ~= 4 then
-			numSlots = mainmemory.read_u32_be(Game.Memory["obj_model2_array_count"][version]);
+			numSlots = mainmemory.read_u32_be(Game.Memory.obj_model2_array_count[version]);
 		else
 			numSlots = 430;
 		end
@@ -3698,7 +3698,7 @@ end
 
 function getMadJack()
 	for object_no = 0, getObjectModel1Count() do
-		local pointer = dereferencePointer(Game.Memory["pointer_list"][version] + (object_no * 4));
+		local pointer = dereferencePointer(Game.Memory.pointer_list[version] + (object_no * 4));
 		if isRDRAM(pointer) and getActorName(pointer) == "Mad Jack" then
 			return pointer + 0x180;
 		end
@@ -4538,7 +4538,7 @@ local function grabSelectedObject()
 end
 
 local function focusObject(pointer) -- TODO: There's more pointers to set here, mainly vehicle stuff
-	local cameraObject = dereferencePointer(Game.Memory["camera_pointer"][version]);
+	local cameraObject = dereferencePointer(Game.Memory.camera_pointer[version]);
 	if isRDRAM(cameraObject) and isRDRAM(pointer) then
 		mainmemory.write_u32_be(cameraObject + obj_model1.camera.focused_actor_pointer, pointer + RDRAMBase);
 	end
@@ -4616,10 +4616,10 @@ end
 local function populateObjectModel1Pointers()
 	object_pointers = {};
 	local playerObject = Game.getPlayerObject();
-	local cameraObject = dereferencePointer(Game.Memory["camera_pointer"][version]);
+	local cameraObject = dereferencePointer(Game.Memory.camera_pointer[version]);
 	if isRDRAM(playerObject) and isRDRAM(cameraObject) then
 		for object_no = 0, getObjectModel1Count() do
-			local pointer = dereferencePointer(Game.Memory["pointer_list"][version] + (object_no * 4));
+			local pointer = dereferencePointer(Game.Memory.pointer_list[version] + (object_no * 4));
 			if isRDRAM(pointer) and isValidModel1Object(pointer, playerObject, cameraObject) then
 				table.insert(object_pointers, pointer);
 			end
@@ -4669,7 +4669,7 @@ local kremling_kosh_joypad_angles = {
 
 function getKoshController()
 	for object_no = 0, getObjectModel1Count() do
-		local pointer = dereferencePointer(Game.Memory["pointer_list"][version] + (object_no * 4));
+		local pointer = dereferencePointer(Game.Memory.pointer_list[version] + (object_no * 4));
 		if isRDRAM(pointer) and getActorName(pointer) == "Kremling Kosh Controller" then
 			return pointer;
 		end
@@ -4679,7 +4679,7 @@ end
 function countMelonProjectiles()
 	local melonCount = 0;
 	for object_no = 0, getObjectModel1Count() do
-		local pointer = dereferencePointer(Game.Memory["pointer_list"][version] + (object_no * 4));
+		local pointer = dereferencePointer(Game.Memory.pointer_list[version] + (object_no * 4));
 		if isRDRAM(pointer) and getActorName(pointer) == "Melon (Projectile)" then
 			melonCount = melonCount + 1;
 		end
@@ -4774,7 +4774,7 @@ local function drawGrabScriptUI()
 		return;
 	end
 
-	local cameraObject = dereferencePointer(Game.Memory["camera_pointer"][version]);
+	local cameraObject = dereferencePointer(Game.Memory.camera_pointer[version]);
 	if not isRDRAM(cameraObject) then
 		return;
 	end

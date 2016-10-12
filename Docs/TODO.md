@@ -7,8 +7,6 @@
 		- I think it'd be fun to bulk support SMS games since the object layout is so simple :P
 	- Move from x, y, z variables to position/rotation/velocity etc. tables with x, y, z indexes
 - General: UI to load ASM patches, can currently only be done by calling loadASMPatch(filename, suppressprint) in the lua console
-- D-Pad Fixes for:
-	- DK64 (Fly Swatter)
 - DK64: Find menu cutscene flags
 - DK64: Finish flag documentation
 	- Figure out how to reliably find flag block on any frame

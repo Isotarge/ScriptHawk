@@ -55,7 +55,17 @@ elseif romHash == "CF806FF2603640A748FCA5026DED28802F1F4A50" then -- DK64 US
 end
 
 RDRAMBase = 0x80000000;
-RDRAMSize = 0x800000; -- Halved with no expansion pak
+RDRAMSize = 0x800000; -- Halved with no expansion pak, can be read from 0x80000318
+
+-- Checks whether a value falls within N64 RDRAM
+function isRDRAM(value)
+	return type(value) == "number" and value >= 0 and value < RDRAMSize;
+end
+
+-- Checks whether a value is a pointer in to N64 RDRAM on the system bus
+function isPointer(value)
+	return type(value) == "number" and value >= RDRAMBase and value < RDRAMBase + RDRAMSize;
+end
 
 -- Dereferences a N64 RDRAM pointer
 -- Returns the RDRAM address pointed to if it's a valid pointer
@@ -63,24 +73,14 @@ RDRAMSize = 0x800000; -- Halved with no expansion pak
 function dereferencePointer(address)
 	if type(address) == "number" and address >= 0 and address < (RDRAMSize - 4) then
 		address = mainmemory.read_u32_be(address);
-		if address >= RDRAMBase and address < RDRAMBase + RDRAMSize then
+		if isPointer(address) then
 			return address - RDRAMBase;
 		end
 	end
 end
 
--- Checks whether a value falls within N64 RDRAM
-function isRDRAM(value)
-	return type(value) == "number" and value >= 0 and value < RDRAMSize;
-end
-
--- Checks whether a value is a N64 RDRAM pointer
-function isPointer(value)
-	return type(value) == "number" and value >= RDRAMBase and value < RDRAMBase + RDRAMSize;
-end
-
-function string.starts(String,Start)
-	return string.sub(String,1,string.len(Start))==Start;
+function string.starts(String, Start)
+	return string.sub(String, 1, string.len(Start)) == Start;
 end
 
 function toHexString(value, desiredLength, prefix)
