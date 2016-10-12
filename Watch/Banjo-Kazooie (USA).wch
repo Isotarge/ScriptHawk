@@ -198,6 +198,7 @@ SystemID N64
 383024	d	h	1	RDRAM	"Return to Lair" Pointer
 383028	d	h	1	RDRAM	"View Totals" Pointer
 38302C	d	h	1	RDRAM	"Save and Quit" Pointer
+383080	b	h	1	RDRAM	"Return to Lair" Enabled
 3830E0	d	h	1	RDRAM	FF question object pointer
 383190	b	h	1	RDRAM	Loading Zones Disabled
 3831AC	b	h	1	RDRAM	Lair Water Level

@@ -63,7 +63,16 @@ SystemID N64
 37E8C4	d	f	1	RDRAM	Jiggy Spawn Angle
 37E8C8	d	f	1	RDRAM	Jiggy Spawn Velocity
 37EA78	d	u	1	RDRAM	Bottles Bonus Puzzle Index
-37F405	b	u	1	RDRAM	Map
+37F3F8	d	f	1	RDRAM	Game Runtime
+37F400	d	f	1	RDRAM	Map Runtime
+37F404	b	h	1	RDRAM	Map Load State
+37F405	b	h	1	RDRAM	Map
+37F406	b	h	1	RDRAM	Exit
+383B60	d	h	1	RDRAM	"Return to Game" Pointer
+383B64	d	h	1	RDRAM	"Return to Lair" Pointer
+383B68	d	h	1	RDRAM	"View Totals" Pointer
+383B6C	d	h	1	RDRAM	"Save and Quit" Pointer
+383BC0	b	h	1	RDRAM	"Return to Lair" Enabled
 383C20	d	h	1	RDRAM	FF Question Pointer
 383E20	d	h	1	RDRAM	Honeycomb Bitfield
 383E68	b	h	1	RDRAM	Sandcastle Water State

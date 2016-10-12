@@ -99,8 +99,13 @@ SystemID N64
 37F2B8	d	f	1	RDRAM	Game Time
 37F2C0	d	f	1	RDRAM	Map Time
 37F2C4	b	h	1	RDRAM	Map Load State
-37F2C5	b	u	1	RDRAM	Map
-37F2C6	b	u	1	RDRAM	Exit
+37F2C5	b	h	1	RDRAM	Map
+37F2C6	b	h	1	RDRAM	Exit
+383A00	d	h	1	RDRAM	"Return to Game" Pointer
+383A04	d	h	1	RDRAM	"Return to Lair" Pointer
+383A08	d	h	1	RDRAM	"View Totals" Pointer
+383A0C	d	h	1	RDRAM	"Save and Quit" Pointer
+383A60	b	h	1	RDRAM	"Return to Lair" Enabled
 383AC0	d	h	1	RDRAM	FF Question Pointer
 383B38	b	h	1	RDRAM	Language
 383B91	w	h	1	RDRAM	Cauldron Bitfield

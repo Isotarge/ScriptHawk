@@ -50,9 +50,14 @@ SystemID N64
 37D168	d	u	1	RDRAM	Bottles Bonus Puzzle Index
 37DAE8	d	f	1	RDRAM	Game runtime
 37DAF0	d	f	1	RDRAM	Map runtime
-37DAF4	b	u	1	RDRAM	Map Load State
-37DAF5	b	u	1	RDRAM	Map
-37DAF6	b	u	1	RDRAM	Exit
+37DAF4	b	h	1	RDRAM	Map Load State
+37DAF5	b	h	1	RDRAM	Map
+37DAF6	b	h	1	RDRAM	Exit
+382240	d	h	1	RDRAM	"Return to Game" Pointer
+382244	d	h	1	RDRAM	"Return to Lair" Pointer
+382248	d	h	1	RDRAM	"View Totals" Pointer
+38224C	d	h	1	RDRAM	"Save and Quit" Pointer
+3822A0	b	h	1	RDRAM	"Return to Lair" Enabled
 382300	d	h	1	RDRAM	FF Question Pointer
 382500	d	h	1	RDRAM	Honeycomb Bitfield
 382548	b	h	1	RDRAM	Sandcastle Water State
