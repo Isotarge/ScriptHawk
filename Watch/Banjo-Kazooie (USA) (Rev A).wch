@@ -5,6 +5,14 @@ SystemID N64
 2806DA	w	h	1	RDRAM	Music Track
 281E20	d	h	1	RDRAM	Framebuffer Pointer
 282240	w	h	1	RDRAM	Stop'N'Swop Items
+36B6EC	w	u	1	RDRAM	Pause Menu Item 1 Y Position
+36B6EE	b	u	1	RDRAM	Pause Menu Item 1 Portrait
+36B6FC	w	u	1	RDRAM	Pause Menu Item 2 Y Position
+36B6FE	b	u	1	RDRAM	Pause Menu Item 2 Portrait
+36B70C	w	u	1	RDRAM	Pause Menu Item 3 Y Position
+36B70E	b	u	1	RDRAM	Pause Menu Item 3 Portrait
+36B71C	w	u	1	RDRAM	Pause Menu Item 4 Y Position
+36B71E	b	u	1	RDRAM	Pause Menu Item 4 Portrait
 36D760	d	h	1	RDRAM	Object Array pointer
 37B160	b	u	1	RDRAM	Player is on ground
 37B161	b	u	1	RDRAM	Player is swimming

@@ -21,6 +21,14 @@ SystemID N64
 36672C	w	h	1	RDRAM	Jiggy Model Replacement
 368564	w	h	1	RDRAM	Mumbo's Skull Sign Model Replacement (MM)
 368AA4	w	h	1	RDRAM	Snacker Model Replacement
+36C9A8	w	u	1	RDRAM	Pause Menu Item 1 Y Position
+36C9AA	b	u	1	RDRAM	Pause Menu Item 1 Portrait
+36C9B8	w	u	1	RDRAM	Pause Menu Item 2 Y Position
+36C9BA	b	u	1	RDRAM	Pause Menu Item 2 Portrait
+36C9C8	w	u	1	RDRAM	Pause Menu Item 3 Y Position
+36C9CA	b	u	1	RDRAM	Pause Menu Item 3 Portrait
+36C9D8	w	u	1	RDRAM	Pause Menu Item 4 Y Position
+36C9DA	b	u	1	RDRAM	Pause Menu Item 4 Portrait
 36EAE0	d	h	1	RDRAM	Object Array Pointer
 3723A0	d	f	1	RDRAM	Game Speed Coefficient
 372480	b	h	1	RDRAM	MM Demo Input File Index
