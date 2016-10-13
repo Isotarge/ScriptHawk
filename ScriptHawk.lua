@@ -294,7 +294,7 @@ function getMemoryStats(object)
 	};
 	if isRDRAM(object) then
 		repeat
-			size = mainmemory.read_u32_be(object + 4); -- TODO: These offsets only apply to DK64's heap header
+			size = mainmemory.read_u32_be(object + 4);
 			nextFree = dereferencePointer(object + 8);
 			prevFree = dereferencePointer(object + 12);
 			if isRDRAM(nextFree) or isRDRAM(prevFree) then
@@ -309,93 +309,26 @@ function getMemoryStats(object)
 	return memoryStats;
 end
 
-function mainmemory.readfloat_be(address)
-	return mainmemory.readfloat(address, true);
-end
-
-function mainmemory.writefloat_be(address, value)
-	mainmemory.writefloat(address, value, true);
-end
-
-function mainmemory.readfloat_le(address)
-	return mainmemory.readfloat(address, false);
-end
-
-function mainmemory.writefloat_le(address, value)
-	mainmemory.writefloat(address, value, false);
-end
-
--- Replaces all instances of a given value in memory
--- This logic is reused in the wrappers below
-function replace_memory(find, replace, read_function, write_function, stride)
-	for i = 0, RDRAMSize - stride, stride do
-		if read_function(i) == find then
+function replace_u32_be(find, replace)
+	for i = 0, RDRAMSize - 4, 4 do
+		if mainmemory.read_u32_be(i) == find then
 			dprint("Replaced "..toHexString(i, 6));
-			write_function(i, replace);
+			mainmemory.write_u32_be(i, replace);
 		end
 	end
 	print_deferred();
 end
 
-function replacebyte(find, replace)
-	replace_memory(find, replace, mainmemory.readbyte, mainmemory.writebyte, 1);
-end
-replace_u8 = replacebyte;
-
-function replace_s8(find, replace)
-	replace_memory(find, replace, mainmemory.read_s8, mainmemory.write_s8, 1);
-end
-
-function replace_u16_be(find, replace)
-	replace_memory(find, replace, mainmemory.read_u16_be, mainmemory.write_u16_be, 2);
-end
-
-function replace_s16_be(find, replace)
-	replace_memory(find, replace, mainmemory.read_s16_be, mainmemory.write_s16_be, 2);
-end
-
-function replace_u16_le(find, replace)
-	replace_memory(find, replace, mainmemory.read_u16_le, mainmemory.write_u16_le, 2);
-end
-
-function replace_s16_le(find, replace)
-	replace_memory(find, replace, mainmemory.read_s16_le, mainmemory.write_s16_le, 2);
-end
-
-function replace_u32_be(find, replace)
-	replace_memory(find, replace, mainmemory.read_u32_be, mainmemory.write_u32_be, 4);
-end
-
-function replace_s32_be(find, replace)
-	replace_memory(find, replace, mainmemory.read_s32_be, mainmemory.write_s32_be, 4);
-end
-
-function replace_u32_le(find, replace)
-	replace_memory(find, replace, mainmemory.read_u32_le, mainmemory.write_u32_le, 4);
-end
-
-function replace_s32_le(find, replace)
-	replace_memory(find, replace, mainmemory.read_s32_le, mainmemory.write_s32_le, 4);
-end
-
-function replace_float_be(find, replace)
-	replace_memory(find, replace, mainmemory.readfloat_be, mainmemory.writefloat_be, 4);
-end
-
-function replace_float_le(find, replace)
-	replace_memory(find, replace, mainmemory.readfloat_le, mainmemory.writefloat_le, 4);
-end
-
-function readNullTerminatedString(base, max_length)
-	max_length = max_length or 25;
+max_string_length = 25;
+function readNullTerminatedString(base)
 	local builtString = "";
-	for i = 0, max_length do
-		local character = mainmemory.readbyte(base + i);
-		if character == 0 then
-			return builtString;
-		end
-		builtString = builtString..string.char(character);
-	end
+	local length = 0;
+	local nextByte = mainmemory.readbyte(base + length);
+	repeat
+		builtString = builtString..string.char(nextByte);
+		length = length + 1;
+		nextByte = mainmemory.readbyte(base + length);
+	until nextByte == 0 or length > max_string_length;
 	return builtString;
 end
 
