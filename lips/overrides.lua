@@ -1,5 +1,5 @@
 local insert = table.insert
-local unpack = rawget(_G, 'unpack') or table.insert
+local unpack = rawget(_G, 'unpack') or table.unpack
 
 local path = string.gsub(..., "[^.]+$", "")
 local data = require(path.."data")

@@ -2,7 +2,6 @@ local floor = math.floor
 local format = string.format
 local insert = table.insert
 local remove = table.remove
-local unpack = unpack or table.unpack
 
 local path = string.gsub(..., "[^.]+$", "")
 local data = require(path.."data")
@@ -222,6 +221,15 @@ function Dumper:fill(length, content)
 end
 
 function Dumper:pc()
+    --[[ work around a potential overflow issue. consider the assembly:
+    .base 0x80000000 ; possibly by default and not explicitly written
+    .org 0x80001000
+    mylabel:
+    la      a0, mylabel ; BUG: this would load 0x1000 instead of 0x80001000
+    --]]
+    if self.pos >= 0x80000000 and self.base >= 0x80000000 then
+        return self.pos - 0x80000000 + self.base
+    end
     return self.pos + self.base
 end
 

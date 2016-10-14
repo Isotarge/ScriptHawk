@@ -33,7 +33,7 @@ By default, lips will print the assembled word values in hex:
 etc...
 ```
 
-Other predefined output formats are available in [lips.writers];
+Other predefined output formats are available in [lips.writers][writers];
 you can instantiate one and pass it through the second argument of lips.
 
 Since lips is designed to assist with ROM/RAM hacking,
@@ -43,7 +43,7 @@ an existing executable or memory dump.
 For instance, consider [this injection routine][inject.lua]
 written for the Nintendo 64 Zelda games.
 
-[writers]: https://github.com/notwa/lips/blob/master/lips/writers.lua
+[writers]: /lips/writers.lua
 [inject.lua]: https://github.com/notwa/mm/blob/master/Lua/inject.lua
 
 ## Syntax
@@ -120,14 +120,14 @@ my_label:
     sw      s3, label+4(s0)
 
 ; relative labels are borrowed from asw, except ours require a suffixing colon:
--:              : #1
+-:              ; #1
     b       ++  ; branches to #3
     nop
 +:
 -:              ; #2
     b       --  ; branches to #1
     nop
-+:              : #3
++:              ; #3
     b       -   ; branches to #2
     nop
 
@@ -198,7 +198,7 @@ In order of numerical value, with intended usage:
 
 * R#: whereas # is a decimal number from 0 to 31.
 aliased to the appropriate register, for instance:
-R0 is ZERO, R1 is at, R2 is V0, etc.
+R0 is ZERO, R1 is AT, R2 is V0, etc.
 
 * F#: coprocessor 1 registers, whereas # is a decimal number from 0 to 31.
 
