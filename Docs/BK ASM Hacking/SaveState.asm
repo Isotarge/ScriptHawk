@@ -1,3 +1,7 @@
+// Hook
+.org 0x8024EE90
+JAL 0x80400000
+
 [Return]: 0x8024E420
 
 [ReadStart]: 0x8037BF20

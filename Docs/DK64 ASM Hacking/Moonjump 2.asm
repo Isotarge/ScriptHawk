@@ -1,4 +1,10 @@
-[ReturnAddress]: 0x800074A0
+// Hook
+.org 0x807140BC
+
+jal 0x807FF500
+nop
+b 0x80714110
+nop
 
 // Controller stuff
 [ControllerInput]: 0x80014DC4
@@ -31,6 +37,8 @@
 
 [Floor]: 0xA4
 
+[Y_Velocity]: 0xC0
+
 [X_Rotation]: 0xE4
 [Y_Rotation]: 0xE6
 [Z_Rotation]: 0xE8
@@ -38,9 +46,6 @@
 [Speed]: 0x4080
 
 .org 0x807FF500
-// Store return address for later
-//OR      t7, RA, r0
-
 LUI     t1, @Speed
 MTC1    t1, F10
 
@@ -59,6 +64,7 @@ BNE     t2, t3, Up
 LWC1    F8, @Y_Position(t0)
 ADD.S   F8, F8, F10
 SWC1    F8, @Y_Position(t0)
+SW      r0, @Y_Velocity(t0)
 
 // U +, +
 Up:
@@ -125,13 +131,5 @@ ADD.S   F8, F8, F10
 SWC1    F8, @Z_Position(t0)
 
 Return:
-// Restore RA register
-//OR      RA, t7, r0
-
-// Return to hooked function
-LBU     t9, 6(sp) // These 4 lines appear to be replaced by Subdrag's hook, they don't contribute to our code but they might prevent some crashes/weirdness so I'll keep them
-ANDI    t0, t9, 0x00C0
-SRA     t1, t0, 0x04
-ANDI    t2, t1, 0x00FF
-J       @ReturnAddress
+JR      ra
 NOP

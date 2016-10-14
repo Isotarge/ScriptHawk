@@ -609,28 +609,14 @@ end
 ----------------
 
 -- Output gameshark code
-function outputGamesharkCode(bytes, base, skipZeroes)
+-- TODO: Output codes in 81 format, and possibly the patch code format if we're really keen
+function outputGamesharkCode(bytes, skipZeroes)
 	skipZeroes = skipZeroes or false;
 	skippedZeroes = 0;
 	if type(bytes) == "table" and #bytes > 0 then
-		if #bytes % 2 == 0 then
-			for i = 1, #bytes, 2 do
-				if not (skipZeroes and bytes[i] == 0x00 and bytes[i + 1] == 0x00) then
-					dprint("81"..toHexString(base + i - 1, 6, "").." "..toHexString(bytes[i], 2, "")..toHexString(bytes[i + 1], 2, ""));
-				else
-					skippedZeroes = skippedZeroes + 1;
-				end
-			end
-		else
-			for i = 1, #bytes-1, 2 do
-				if not (skipZeroes and bytes[i] == 0x00 and bytes[i + 1] == 0x00) then
-					dprint("81"..toHexString(base + i - 1, 6, "").." "..toHexString(bytes[i], 2, "")..toHexString(bytes[i + 1], 2, ""));
-				else
-					skippedZeroes = skippedZeroes + 1;
-				end
-			end
-			if not (skipZeroes and bytes[#bytes] == 0x00) then
-				dprint("80"..toHexString(base + #bytes - 1, 6, "").." 00"..toHexString(bytes[#bytes], 2, ""));
+		for i = 1, #bytes do
+			if not (skipZeroes and bytes[i][2] == 0x00) then
+				dprint("80"..toHexString(bytes[i][1], 6, "")..toHexString(bytes[i][2], 2, " 00"));
 			else
 				skippedZeroes = skippedZeroes + 1;
 			end
@@ -639,75 +625,57 @@ function outputGamesharkCode(bytes, base, skipZeroes)
 	return skippedZeroes;
 end
 
-local code = {};
+code = {};
 
 function codeWriter(...)
-	table.insert(code, arg[2]);
+	if isPointer(arg[1]) then
+		table.insert(code, {arg[1] - RDRAMBase, arg[2]});
+	else
+		print("Warning: "..toHexString(arg[1]).." isn't a pointer to RDRAM on the System Bus. Writing outside RDRAM isn't currently supported.");
+	end
 end
 
 function loadASMPatch(code_filename, suppress_print)
-	if Game.supportsASMHacks then
+	if not fileExists(code_filename) then
+		code_filename = forms.openfile(nil, nil, "R4300i Assembly Code|*.asm|All Files (*.*)|*.*");
 		if not fileExists(code_filename) then
-			code_filename = forms.openfile(nil, nil, "R4300i Assembly Code|*.asm|All Files (*.*)|*.*");
-			if not fileExists(code_filename) then
-				if not suppress_print then
-					print("No code loaded, aborting mission...");
-				end
-				return false;
-			end
-		end
-
-		-- Open the file and assemble the code
-		code = {};
-		local result = lips(code_filename, codeWriter, {['unsafe'] = true, ['offset'] = Game.ASMCodeBase + RDRAMBase});
-
-		if #code == 0 then
 			if not suppress_print then
-				print(result);
-				print("The code did not compile correctly, check for errors in your source.");
+				print("No code loaded, aborting mission...");
 			end
 			return false;
 		end
+	end
 
-		if #code > Game.ASMMaxCodeSize then
-			if not suppress_print then
-				print("The compiled code was too large to safely inject into the game.");
-			end
-			return false;
-		end
+	-- Open the file and assemble the code
+	code = {};
+	local result = lips(code_filename, codeWriter);
 
-		-- Patch the code
-		for i = 1, #code do
-			mainmemory.writebyte(Game.ASMCodeBase + (i - 1), code[i]);
-		end
-
-		-- Patch the hook
-		for i = 1, #Game.ASMHook do
-			mainmemory.writebyte(Game.ASMHookBase + (i - 1), Game.ASMHook[i]);
-		end
-
-		-- Hacky, yes, but if we're using dynarec the patched code pages don't get marked as dirty
-		-- Quickest and easiest way around this is to save and reload a state
-		local ss_fn = 'lips/temp.state'
-		savestate.save(ss_fn)
-		savestate.load(ss_fn)
-
+	if #code == 0 then
 		if not suppress_print then
-			outputGamesharkCode(Game.ASMHook, Game.ASMHookBase, false);
-			outputGamesharkCode(code, Game.ASMCodeBase, false);
-
-			dprint("Patched code ("..#code.." bytes)");
-			dprint("Patched hook ("..#Game.ASMHook.." bytes)");
-			dprint("Done!");
-			print_deferred();
-		end
-		return true;
-	else
-		if not suppress_print then
-			print("This game does not support ASM hacks.");
+			print(result);
+			print("The code did not compile correctly, check for errors in your source.");
 		end
 		return false;
 	end
+
+	-- Patch the code
+	for i = 1, #code do
+		mainmemory.writebyte(code[i][1], code[i][2]);
+	end
+
+	-- Hacky, yes, but if we're using dynarec the patched code pages don't get marked as dirty
+	-- Quickest and easiest way around this is to save and reload a state
+	local ss_fn = 'lips/temp.state'
+	savestate.save(ss_fn)
+	savestate.load(ss_fn)
+
+	if not suppress_print then
+		outputGamesharkCode(code, false);
+		dprint("Patched code ("..#code.." bytes)");
+		dprint("Done!");
+		print_deferred();
+	end
+	return true;
 end
 
 -------------

@@ -1,3 +1,7 @@
+// Hook
+.org 0x80334FFC
+JAL 0x80400000
+
 /*HOOK USED WAS 0x80334FFC
 |    hook was a JAL to a null_function in the same function that updates the playersPositionVel, etc
 |    NOTE: Since player only updates when game is in normalUpdateMode: 2 (not paused),
@@ -12,8 +16,6 @@
 [AppendString]:0x8033D670
 
 //VARIABLES
-[Return]: 0x8024E420
-
 [XPos]: 0x8037C5A0
 [XVelocity]: 0x8037C4B8
 
@@ -22,15 +24,12 @@
 //CONSTANTS
 [OSDXOffset]: 0x08
 
-
-
 //POSITION_DISPLAY
 .org 0x80400000
 PUSH ra
 PUSH a0
 PUSH a1
 PUSH a2
-
 
 // Convert X position to String
 LA a0 XPosValueStr
@@ -49,8 +48,6 @@ LA a2 XPosValueStr
 JAL @Print
 LI a0 @OSDXOffset
 
-
-
 // Convert Y position to String
 LA a0 YPosValueStr
 LA a1 YPosStr //label
@@ -67,8 +64,6 @@ LI a1 0x14 // Y Pos
 LA a2 YPosValueStr
 JAL @Print
 LI a0 @OSDXOffset
-
-
 
 // Convert Z position to String
 LA a0 ZPosValueStr
@@ -87,8 +82,6 @@ LA a2 ZPosValueStr
 JAL @Print
 LI a0 @OSDXOffset
 
-
-
 // Convert XZ velocity to String
 LA a0 XZVelocityValueStr
 LA a1 XZVelocityStr
@@ -102,13 +95,10 @@ JAL @FToA
 LI a2 3
 
 // Print XZ Velocity
-LI a1 0x34// Y Pos
+LI a1 0x34 // Y Pos
 LA a2 XZVelocityValueStr
 JAL @Print
 LI a0 @OSDXOffset
-
-
-
 
 // Convert Y velocity to String
 LA a0 YVelocityValueStr
@@ -127,8 +117,6 @@ LA a2 YVelocityValueStr
 JAL @Print
 LI a0 @OSDXOffset
 
-
-
 // Convert SlopeTimer to String
 LA a0 SlopeTimerValueStr
 LA a1 SlopeTimerStr
@@ -145,8 +133,6 @@ LI a1 0x54 // Y Pos
 LA a2 SlopeTimerValueStr
 JAL @Print
 LI a0 @OSDXOffset
-
-
 
 POP a2
 POP a1
@@ -182,6 +168,3 @@ XZVelocityValueStr:
 .asciiz "\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0"
 SlopeTimerValueStr:
 .asciiz "\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0"
-
-evenOut:
-.byte 0

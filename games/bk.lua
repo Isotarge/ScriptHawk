@@ -257,20 +257,16 @@ function Game.detectVersion(romName, romHash)
 		framebuffer.height = 216;
 		clip_vel = -2900;
 		Game.allowFurnaceFunPatch = false; -- TODO: FF Patch for this version
-		Game.supportsASMHacks = false; -- TODO: Research ASM hook for this version
 		max_air = 6 * 500;
 	elseif romHash == "90726D7E7CD5BF6CDFD38F45C9ACBF4D45BD9FD8" then -- Japan
 		version = 2;
 		Game.allowFurnaceFunPatch = false; -- TODO: FF Patch for this version
-		Game.supportsASMHacks = false; -- TODO: Research ASM hook for this version
 	elseif romHash == "DED6EE166E740AD1BC810FD678A84B48E245AB80" then -- USA 1.1
 		version = 3;
 		Game.allowFurnaceFunPatch = false; -- TODO: FF Patch for this version
-		Game.supportsASMHacks = false; -- TODO: Research ASM hook for this version
 	elseif romHash == "1FE1632098865F639E22C11B9A81EE8F29C75D7A" then -- USA 1.0
 		version = 4;
 		Game.allowFurnaceFunPatch = true;
-		Game.supportsASMHacks = true;
 	else
 		return false;
 	end
@@ -2461,7 +2457,7 @@ function enableActorSpawner()
 		spawnerEnabled = false;
 		loadASMPatch("./docs/BK ASM Hacking/Actor Spawner.asm", true);
 		-- Find magic flag
-		for i = Game.ASMCodeBase, Game.ASMCodeBase + Game.ASMMaxCodeSize, 4 do
+		for i = 0x400000, RDRAMSize, 4 do
 			if mainmemory.read_u32_be(i) == 0xABCDEF12 then
 				print("Actor spawner enabled successfully!");
 				spawnActorFlag = i + 4;
@@ -2631,24 +2627,4 @@ Game.OSD = {
 	--{"FF Answer", getCorrectFFAnswer},
 };
 
-
-
----------------
--- ASM Stuff --
----------------
-
-Game.ASMHookBase = 0x024EE90; -- changed to existing JAL point to aviod issues with branch delay
---Game.ASMHookBase = 0x0334FFC; -- For Position Display.asm
-Game.ASMCodeBase = 0x0400000; --supports up to 28 bits, 0xFFFFFFA
-Game.ASMMaxCodeSize = 0x400000;
-
-Game.ASMHook = { --Hook == JAL ASMCodeBase == (0b000010 << 26) | (ASMHooKBase >> 2)
-	0x0C + math.floor(Game.ASMCodeBase/(2^26))%(2^8),
-	math.floor(Game.ASMCodeBase/(2^18))%(2^8),
-	math.floor(Game.ASMCodeBase/(2^10))%(2^8),
-	math.floor(Game.ASMCodeBase/(2^2))%(2^8),
-};
--- end .asm code with J 0x8024E420 {opcode: 0x08093908}
-
 return Game;
-

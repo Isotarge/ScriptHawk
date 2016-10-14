@@ -1,5 +1,8 @@
-//EXISTING FUNCTIONS
+// Hook
+.org 0x80334FFC
+JAL 0x80400000
 
+//EXISTING FUNCTIONS
 
 //EXISTING VARIABLES
 [PlayerPointer]:0x8037BF20
@@ -12,9 +15,9 @@ PUSH a2
 PUSH at
 
 LA a0 @PlayerPointer
-LW a1 0(a0); //PlayerPtr
-LW a0 0(a1); //AnimationPtr
-LI a1 0x09; //DeathAnimation
+LW a1 0(a0); // PlayerPtr
+LW a0 0(a1); // AnimationPtr
+LI a1 0x09; // DeathAnimation
 SW a1 0x10(a0);
 
 HouseKeeping:
@@ -26,5 +29,6 @@ POP ra
 JR
 NOP
 
-//0x09 death *****
-//0x0A climbing *****
+// See animation_types table in bk.lua for values
+// 0x09 death *****
+// 0x0A climbing *****

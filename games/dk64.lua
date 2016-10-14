@@ -5502,20 +5502,4 @@ Game.subgameOSD = {
 Game.OSDPosition = {32, 70}; -- TODO: Adjust this for subgames & different regions
 Game.OSD = Game.standardOSD;
 
----------------
--- ASM Stuff --
----------------
-
-Game.supportsASMHacks = true;
-Game.ASMCodeBase = 0x7FF500;
-Game.ASMMaxCodeSize = 0xAFF;
-
-Game.ASMHookBase = 0x7494; -- TODO: Find a hook that works on real hardware -- TODO: Find a hook for all versions
-Game.ASMHook = {
-	0x3C, 0x08, 0x80, 0x7F,
-	0x35, 0x08, 0xF5, 0x00,
-	0x01, 0x00, 0x00, 0x08,
-	0x00, 0x00, 0x00, 0x00
-};
-
 return Game;
