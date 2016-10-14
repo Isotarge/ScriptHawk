@@ -5,10 +5,6 @@ JAL 0x80400000
 [SpawnActor]: 0x8032813C
 
 .org 0x80400000
-
-//LI a0 0xDEADBEEF
-//SW a0 MagicHeader
-
 PUSH ra
 PUSH a0
 PUSH a1
