@@ -4,7 +4,7 @@ Active object loader code:
 815931B8 2005
 815931BA 00??
 
-Loads level object's, but not enemy's.
+Loads level objects, but not enemies.
 Examples: 
 
 15: Llama temple
