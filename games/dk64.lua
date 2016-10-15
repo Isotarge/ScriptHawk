@@ -62,7 +62,6 @@ Game.Memory = {
 	["buttons_enabled_bitfield"] = {0x755308, 0x74FB88, 0x7553C8, 0x6FFE5C},
 	["joystick_enabled_x"] = {0x75530C, 0x74FB8C, 0x7553CC, 0x6FFE60},
 	["joystick_enabled_y"] = {0x755310, 0x74FB90, 0x7553D0, 0x6FFE64},
-	["bone_displacement_pointer"] = {0x76FDF8, 0x76A918, 0x76FFE8, nil}, -- TODO: Kiosk
 	["bone_displacement_cop0_write"] = {0x61963C, 0x6128EC, 0x6170AC, 0x5AFB1C},
 	["frames_lag"] = {0x76AF10, 0x765A30, 0x76B100, 0x72D140}, -- TODO: Kiosk only works for minecart?
 	["frames_real"] = {0x7F0560, 0x7F0480, 0x7F09D0, nil}, -- TODO: Make sure freezing these stalls the main thread -- TODO: Kiosk
@@ -608,7 +607,8 @@ obj_model1 = {
 		[140] = "Rainbow Coin",
 		[147] = "K. Rool Banana Balloon", -- TODO: This is the internal name, what to heck does this do? Maybe used in Lanky phase?
 		[148] = "Rope", -- K. Rool's Arena
-		[149] = "Banana Barrel", -- TODO: Lanky Phase?
+		[149] = "Banana Barrel", -- Lanky Phase
+		[150] = "Banana Barrel Spawner", -- Lanky Phase -- TODO: Verify
 		[156] = "Wrinkly",
 		[163] = "Banana Fairy (BFI)",
 		[164] = "Ice Tomato",
@@ -654,6 +654,7 @@ obj_model1 = {
 		[214] = "TNT Minecart", -- Minecart Mayhem
 		[215] = "TNT Minecart",
 		[216] = "Pufftoss",
+		--[221] = "Lanky Phase", -- TODO: Not sure exactly what this is, maybe the light?
 		[224] = "Mushroom Man",
 		[226] = "Troff",
 		[228] = "Bad Hit Detection Man",
@@ -3814,26 +3815,15 @@ end
 -- Bone Displacement --
 -----------------------
 
-local bone_displacement_fix = false;
-
 local function fixBoneDisplacement()
-	bone_displacement_fix = true;
-end
+	-- NOP out a cop0 status register write at the start of the updateBonePosition function
+	mainmemory.write_u32_be(Game.Memory.bone_displacement_cop0_write[version], 0);
 
-local function breakBoneDisplacement()
-	bone_displacement_fix = false;
-end
-
-event.onloadstate(breakBoneDisplacement, "ScriptHawk - Break bone displacement");
-
-local function applyBoneDisplacementFix()
-	if bone_displacement_fix then
-		-- Old fix basically crashes sound thread, seems to work well but... no sound.
-		--mainmemory.write_u32_be(Game.Memory.bone_displacement_pointer[version], 0); -- TODO: Kiosk
-
-		-- New fix NOPs out a cop0 status register write at the start of the updateBonePosition function
-		mainmemory.write_u32_be(Game.Memory.bone_displacement_cop0_write[version], 0);
-	end
+	-- Hacky, yes, but if we're using dynarec the patched code pages don't get marked as dirty
+	-- Quickest and easiest way around this is to save and reload a state
+	local ss_fn = 'lips/temp.state';
+	savestate.save(ss_fn);
+	savestate.load(ss_fn);
 end
 
 ---------------------------------
@@ -5354,7 +5344,6 @@ function Game.eachFrame()
 	-- Mad Jack
 	Game.drawMJMinimap();
 
-	applyBoneDisplacementFix();
 	if type(ScriptHawk.UI.form_controls["Toggle Detect Displacement Checkbox"]) ~= "nil" and forms.ischecked(ScriptHawk.UI.form_controls["Toggle Detect Displacement Checkbox"]) then
 		displacementDetection();
 	end
