@@ -608,17 +608,29 @@ end
 -- ASM Loader --
 ----------------
 
--- Output gameshark code
--- TODO: Output codes in 81 format, and possibly the patch code format if we're really keen
 function outputGamesharkCode(bytes, skipZeroes)
 	skipZeroes = skipZeroes or false;
 	skippedZeroes = 0;
 	if type(bytes) == "table" and #bytes > 0 then
+		nextByteHandled = false;
 		for i = 1, #bytes do
-			if not (skipZeroes and bytes[i][2] == 0x00) then
-				dprint("80"..toHexString(bytes[i][1], 6, "")..toHexString(bytes[i][2], 2, " 00"));
+			if not nextByteHandled then
+				if i < #bytes and bytes[i][1] == (bytes[i + 1][1] - 1) then
+					if not (skipZeroes and bytes[i][2] == 0x00 and bytes[i + 1] == 0x00) then
+						dprint(toHexString(bytes[i][1], 6, "81")..toHexString(bytes[i][2], 2, " ")..toHexString(bytes[i + 1][2], 2, ""));
+					else
+						skippedZeroes = skippedZeroes + 2;
+					end
+					nextByteHandled = true;
+				else
+					if not (skipZeroes and bytes[i][2] == 0x00) then
+						dprint(toHexString(bytes[i][1], 6, "80")..toHexString(bytes[i][2], 2, " 00"));
+					else
+						skippedZeroes = skippedZeroes + 1;
+					end
+				end
 			else
-				skippedZeroes = skippedZeroes + 1;
+				nextByteHandled = false;
 			end
 		end
 	end
