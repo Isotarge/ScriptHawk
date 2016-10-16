@@ -246,8 +246,8 @@ Game.Memory = {
 	["object_array_pointer"] = {0x36EAE0, 0x36F260, 0x36D760, 0x36E560},
 	["struct_array_pointer"] = {nil, nil, nil, 0x36E7C8}, -- TODO: Other versions
 	["board_base"] = {0x394140, 0x394350, 0x3929C0, 0x393760},
-	["pause_menu_strings_base"] = {0x36C99C, 0x36CAF0, 0x36C4E0, 0x36C4E0}, -- TODO: Other versions
-	["return_to_lair_enabled"] = {0x383A60, 0x383BC0, 0x3822A0,  0x383080},
+	["pause_menu_strings_base"] = {0x36C99C, 0x36CAF0, 0x36B6E0, 0x36C4E0},
+	["return_to_lair_enabled"] = {0x383A60, 0x383BC0, 0x3822A0, 0x383080},
 };
 
 function Game.detectVersion(romName, romHash)
@@ -1336,7 +1336,6 @@ end
 
 object_index = 1;
 hide_non_animated = false;
-
 
 --------------------
 -- Output Helpers --
