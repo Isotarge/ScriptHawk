@@ -41,8 +41,8 @@ Game.Memory = {
 	["destination_map"] = {0x7444E4, 0x73EC34, 0x743DA4, 0x6F1CC4},
 	["destination_exit"] = {0x7444E8, 0x73EC38, 0x743DA8, 0x6F1CC8},
 	["map_state"] = {0x76A0B1, 0x764BD1, 0x76A2A1, 0x72CDED},
-	["loading_zone_array"] = {0x7FDCB4, 0x7FDBF4, 0x7FE144, nil}, -- TODO: Kiosk
-	["loading_zone_array_size"] = {0x7FDCB0, 0x7FDBF0, 0x7FE140, nil}, -- u16_be -- TODO: Kiosk
+	["loading_zone_array"] = {0x7FDCB4, 0x7FDBF4, 0x7FE144, nil}, -- TODO: Kiosk?
+	["loading_zone_array_size"] = {0x7FDCB0, 0x7FDBF0, 0x7FE140, nil}, -- u16_be -- TODO: Kiosk?
 	["file"] = {0x7467C8, 0x740F18, 0x746088, nil},
 	["character"] = {0x74E77C, 0x748EDC, 0x74E05C, 0x6F9EB8},
 	["tb_void_byte"] = {0x7FBB63, 0x7FBA83, 0x7FBFD3, 0x7B5B13},
@@ -65,6 +65,9 @@ Game.Memory = {
 	["bone_displacement_cop0_write"] = {0x61963C, 0x6128EC, 0x6170AC, 0x5AFB1C},
 	["frames_lag"] = {0x76AF10, 0x765A30, 0x76B100, 0x72D140}, -- TODO: Kiosk only works for minecart?
 	["frames_real"] = {0x7F0560, 0x7F0480, 0x7F09D0, nil}, -- TODO: Make sure freezing these stalls the main thread -- TODO: Kiosk
+	["isg_active"] = {0x755070, 0x74F8F0, 0x755130, nil},
+	["isg_timestamp"] = {0x7F5CE0, 0x7F5C00, 0x7F6150, nil},
+	["timestamp"] = {0x14FE0, 0x155C0, 0x15300, nil}, -- TODO: Kiosk
 	["obj_model2_array_pointer"] = {0x7F6000, 0x7F5F20, 0x7F6470, 0x6F4470},
 	["obj_model2_array_count"] = {0x7F6004, 0x7F5F24, 0x7F6474, nil}, -- TODO: Kiosk
 	["obj_model2_setup_pointer"] = {0x7F6010, 0x7F5F30, 0x7F6480, 0x7B17C4},
@@ -2236,6 +2239,10 @@ end
 -- Region/Version --
 --------------------
 
+-- NTSC values
+secs_per_major_tick = 94.1104858713; -- 2 ^ 32 * 21.911805 / 1000000000
+nano_per_minor_tick = 21.911805; -- Tick rate: 45.6375 Mhz
+
 function Game.detectVersion(romName, romHash)
 	if romHash == "CF806FF2603640A748FCA5026DED28802F1F4A50" then -- USA
 		version = 1;
@@ -2244,7 +2251,7 @@ function Game.detectVersion(romName, romHash)
 		version = 2;
 		flag_array = require("games.dk64_flags");
 
-		--Mad Jack
+		-- Mad Jack
 		MJ_offsets["ticks_until_next_action"] = 0x25;
 		MJ_offsets["actions_remaining"]       = 0x60;
 		MJ_offsets["action_type"]             = 0x61;
@@ -2253,18 +2260,22 @@ function Game.detectVersion(romName, romHash)
 		MJ_offsets["white_switch_position"]   = 0x6C;
 		MJ_offsets["blue_switch_position"]    = 0x6D;
 
-		--Subgames
+		-- Subgames
 		jumpman_position = {0x03ECD0, 0x03ECD4};
 		jumpman_velocity = {0x03ECD8, 0x03ECDC};
 		jetman_position  = {0x022100, 0x022104};
 		jetman_velocity  = {0x022108, 0x02210C};
 
 		ticks_per_crystal = 125;
+
+		-- PAL values
+		secs_per_major_tick = 92.2607229138; -- 2 ^ 32 * 21.4811235 / 1000000000
+		nano_per_minor_tick = 21.4811235; -- Tick rate: 46.5525 Mhz
 	elseif romHash == "F0AD2B2BBF04D574ED7AFBB1BB6A4F0511DCD87D" then -- Japan
 		version = 3;
 		flag_array = require("games.dk64_flags_JP");
 
-		--Mad Jack
+		-- Mad Jack
 		MJ_offsets["ticks_until_next_action"] = 0x25;
 		MJ_offsets["actions_remaining"]       = 0x60;
 		MJ_offsets["action_type"]             = 0x61;
@@ -2273,7 +2284,7 @@ function Game.detectVersion(romName, romHash)
 		MJ_offsets["white_switch_position"]   = 0x6C;
 		MJ_offsets["blue_switch_position"]    = 0x6D;
 
-		--Subgames
+		-- Subgames
 		jumpman_position = {0x03EB00, 0x03EB04};
 		jumpman_velocity = {0x03EB00, 0x03EB04};
 		jetman_position  = {0x022060, 0x022064};
@@ -3553,36 +3564,6 @@ function gainControl()
 end
 gain_control = gainControl;
 Game.gainControl = gainControl;
-
------------------------------------
--- DK64 - ISG Timer
--- Written by Isotarge, 2015
--- Based on research by Exchord
------------------------------------
-
-local timer_value = 0;
-local timer_start_frame = 0;
-local timer_started = false;
-
-local function ISGTimer()
-	local destinationMap = mainmemory.read_u32_be(Game.Memory.destination_map[version]);
-	if destinationMap == 153 and prev_map ~= 153 then
-		timer_value = 0;
-		timer_start_frame = emu.framecount();
-		timer_started = true;
-	end
-	prev_map = destinationMap;
-
-	if timer_started then
-		timer_value = emu.framecount() - timer_start_frame;
-	end
-
-	if timer_value / 60 > 270 or timer_value < 0 then
-		timer_value = 0;
-		timer_start_frame = 0;
-		timer_started = false;
-	end
-end
 
 -----------------------------------
 -- DK64 - Mad Jack Minimap
@@ -5234,6 +5215,12 @@ function Game.setKongColor()
 	end
 end
 
+function readTimestamp(address)
+	local major = mainmemory.read_u32_be(address) * secs_per_major_tick;
+	local minor = mainmemory.read_u32_be(address + 4) * nano_per_minor_tick / 1000000000;
+	return major + minor; -- Seconds
+end
+
 function Game.realTime()
 	updateCurrentInvisify();
 	forms.settext(ScriptHawk.UI.form_controls["Lag Factor Value Label"], lag_factor);
@@ -5241,13 +5228,15 @@ function Game.realTime()
 	forms.settext(ScriptHawk.UI.form_controls["Moon Mode Button"], moon_mode);
 	drawGrabScriptUI();
 
-	-- Draw ISG timer
-	if timer_started then
-		local s = timer_value / 60;
-		local timer_string = string.format("%.2d:%05.2f", s / 60 % 60, s % 60);
-		gui.text(16, 16, "ISG Timer: "..timer_string, nil, 'topright');
-	else
-		--gui.text(16, 16, "Waiting for ISG", nil, 'topright');
+	if version ~= 4 then
+		-- Draw ISG timer
+		if mainmemory.readbyte(Game.Memory.isg_active[version]) > 0 then
+			local isg_time = readTimestamp(Game.Memory.timestamp[version]) - readTimestamp(Game.Memory.isg_timestamp[version]);
+			local timer_string = string.format("%.2d:%05.2f", isg_time / 60 % 60, isg_time % 60);
+			gui.text(16, 16, "ISG Timer: "..timer_string, nil, 'topright');
+		else
+			--gui.text(16, 16, "Waiting for ISG", nil, 'topright');
+		end
 	end
 end
 
@@ -5263,7 +5252,7 @@ local vert = {
 };
 
 function crumble()
-	local mapBase = dereferencePointer(0x7F5DE0);
+	local mapBase = dereferencePointer(0x7F5DE0); -- TODO: Other versions
 	local vertBase = dereferencePointer(0x7F5DE8);
 
 	if isRDRAM(mapBase) and isRDRAM(vertBase) then
@@ -5347,7 +5336,6 @@ function Game.eachFrame()
 	if type(ScriptHawk.UI.form_controls["Toggle Detect Displacement Checkbox"]) ~= "nil" and forms.ischecked(ScriptHawk.UI.form_controls["Toggle Detect Displacement Checkbox"]) then
 		displacementDetection();
 	end
-	ISGTimer();
 	doBRB();
 	processFlagQueue();
 

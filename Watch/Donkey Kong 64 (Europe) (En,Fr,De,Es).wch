@@ -60,6 +60,7 @@ SystemID N64
 74D95C	d	f	1	RDRAM	Chunky Walk Maximum Velocity
 74E9A4	d	h	1	RDRAM	Object Model 2 Collision Linked List Pointer
 74E9E0	d	h	1	RDRAM	HUD Pointer
+74F8F0	b	h	1	RDRAM	Intro Story is Playing
 74FB60	b	u	1	RDRAM	Security Byte
 74FB88	w	b	1	RDRAM	Buttons Enabled (Bitfield)
 74FB8C	b	b	1	RDRAM	Joystick X Bits Enabled
@@ -94,6 +95,8 @@ SystemID N64
 76A918	d	h	1	RDRAM	Bone Displacement Pointer
 7F0480	d	u	1	RDRAM	Frames (Real)
 7F08B0	d	h	1	RDRAM	Backbone Pointer
+7F5C00	d	h	1	RDRAM	ISG Start Time Major
+7F5C04	d	h	1	RDRAM	ISG Start Time Minor
 7F5F20	d	h	1	RDRAM	Object Model 2 Array Pointer
 7F5F24	d	u	1	RDRAM	Object Model 2 Array Size
 7F5F30	d	h	1	RDRAM	Setup File Pointer
