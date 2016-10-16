@@ -2213,7 +2213,7 @@ end
 function throwOrange()
 	local congaBase = findConga();
 	if isRDRAM(congaBase) then
-		mainmemory.writefloat(congaBase + 0x114, 0.5, true); -- Write 0.5 to main behavior timer, these fields are documented in Beta/Level Object Analyser.lua
+		mainmemory.writefloat(congaBase + 0x114, 0.5, true); -- Write 0.5 to main behavior timer
 	end
 end
 

@@ -713,20 +713,18 @@ function replaceTextureRGBA5551(filename, base, width, height)
 
 	img = pngImage(filename);
 
-	for y = 1, height do
-		for x = 1, width do
-			if x <= img.width and y <= img.height then
-				local pixel = img:getPixel(x, y);
-				local r = math.floor(pixel.R / img.depth) * rgba5551_color_constants["Red"];
-				local g = math.floor(pixel.G / img.depth) * rgba5551_color_constants["Green"];
-				local b = math.floor(pixel.B / img.depth) * rgba5551_color_constants["Blue"];
-				local a = 0;
-				if pixel.A > 0 then
-					a = 1
-				end
-
-				mainmemory.write_u16_be(base + ((y - 1) * width * 2) + ((x - 1) * 2), r + g + b + a);
+	for y = 1, math.min(img.height, height) do
+		for x = 1, math.min(img.width, width) do
+			local pixel = img:getPixel(x, y);
+			local r = math.floor(pixel.R / img.depth) * rgba5551_color_constants["Red"];
+			local g = math.floor(pixel.G / img.depth) * rgba5551_color_constants["Green"];
+			local b = math.floor(pixel.B / img.depth) * rgba5551_color_constants["Blue"];
+			local a = 0;
+			if pixel.A > 0 then
+				a = 1
 			end
+
+			mainmemory.write_u16_be(base + ((y - 1) * width * 2) + ((x - 1) * 2), r + g + b + a);
 		end
 	end
 end
