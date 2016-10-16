@@ -23,12 +23,12 @@ local framebuffer = { -- Larger on PAL
 local clip_vel = -3500; -- Minimum velocity required to clip on the Y axis -- TODO: This seems to be different for different geometry
 
 -- Relative to notes
--- TODO: Add jinjos
 local collectable_offsets = {
 	notes = 0,
 	eggs = 4,
 	red_feathers = 12,
 	gold_feathers = 16,
+	jinjos = 27, -- Byte, bitfield ...YPOGB
 	health = 32,
 	health_containers = 36,
 	lives = 40,
