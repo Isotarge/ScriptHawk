@@ -5231,9 +5231,12 @@ function Game.realTime()
 	if version ~= 4 then
 		-- Draw ISG timer
 		if mainmemory.readbyte(Game.Memory.isg_active[version]) > 0 then
-			local isg_time = readTimestamp(Game.Memory.timestamp[version]) - readTimestamp(Game.Memory.isg_timestamp[version]);
-			local timer_string = string.format("%.2d:%05.2f", isg_time / 60 % 60, isg_time % 60);
-			gui.text(16, 16, "ISG Timer: "..timer_string, nil, 'topright');
+			local isg_start = readTimestamp(Game.Memory.isg_timestamp[version]);
+			if isg_start > 0 then -- If intro story start timestamp is 0 fadeouts will never happen
+				local isg_time = readTimestamp(Game.Memory.timestamp[version]) - isg_start;
+				local timer_string = string.format("%.2d:%05.2f", isg_time / 60 % 60, isg_time % 60);
+				gui.text(16, 16, "ISG Timer: "..timer_string, nil, 'topright');
+			end
 		else
 			--gui.text(16, 16, "Waiting for ISG", nil, 'topright');
 		end
