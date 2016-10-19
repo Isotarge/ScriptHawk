@@ -3,7 +3,7 @@
 JAL 0x80400000
 
 [Return]: 0x8024E420
-[Print]: 0x802F7870
+.include "Docs/BK ASM Hacking/BK_NTSC.S"
 
 .org 0x80400000
 PUSH ra
@@ -17,7 +17,7 @@ LI a1 0x10 // Y Pos
 LI a2 0xBF000666 // Text Size, Float
 LA a3 Hello
 
-JAL @Print // Call Print Function
+JAL @Print_TotalMenuFont // Call Print Function
 NOP
 
 POP a3

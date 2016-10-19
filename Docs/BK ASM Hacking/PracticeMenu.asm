@@ -13,11 +13,7 @@
 
 
 //EXISTING FUNCTIONS
-[ClampInt]: 0x80257EA8
-[SelectMaxInt]: 0x8025892C
-[SelectMinInt]: 0x80258948
-[PauseMenu]: 0x80313380
-[CopyString]: 0x8033DA54
+.include "Docs/BK ASM Hacking/BK_NTSC.S"
 
 //EXISTING VARIABLES
 [P1DPadUp]:0x8028115C

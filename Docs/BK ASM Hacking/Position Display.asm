@@ -8,18 +8,8 @@ JAL 0x80400000
 |          the hook will not catch when game it paused
 */
 
-//FUNCTIONS
-[GetXZVelocity]: 0x80297AB8
-[Print]: 0x802F78FC
-[FToA]: 0x8033D7B0
-[CopyString]:0x8033DA54
-[AppendString]:0x8033D670
-
-//VARIABLES
-[XPos]: 0x8037C5A0
-[XVelocity]: 0x8037C4B8
-
-[SlopeTimer]: 0x8037C2E4
+//FUNCTIONS & VARIABLES
+.include "Docs/BK ASM Hacking/BK_NTSC.S"
 
 //CONSTANTS
 [OSDXOffset]: 0x08
@@ -45,7 +35,7 @@ LI a2 3
 // Print X Position
 LI a1 0x08 // Y Pos
 LA a2 XPosValueStr
-JAL @Print
+JAL @Print_CharFont
 LI a0 @OSDXOffset
 
 // Convert Y position to String
@@ -62,7 +52,7 @@ LI a2 3
 // Print Y Position
 LI a1 0x14 // Y Pos
 LA a2 YPosValueStr
-JAL @Print
+JAL @Print_CharFont
 LI a0 @OSDXOffset
 
 // Convert Z position to String
@@ -79,7 +69,7 @@ LI a2 3
 // Print Z Position
 LI a1 0x20 // Y Pos
 LA a2 ZPosValueStr
-JAL @Print
+JAL @Print_CharFont
 LI a0 @OSDXOffset
 
 // Convert XZ velocity to String
@@ -97,7 +87,7 @@ LI a2 3
 // Print XZ Velocity
 LI a1 0x34 // Y Pos
 LA a2 XZVelocityValueStr
-JAL @Print
+JAL @Print_CharFont
 LI a0 @OSDXOffset
 
 // Convert Y velocity to String
@@ -114,7 +104,7 @@ LI a2 3
 // Print Y Velocity
 LI a1 0x40 // Y Pos
 LA a2 YVelocityValueStr
-JAL @Print
+JAL @Print_CharFont
 LI a0 @OSDXOffset
 
 // Convert SlopeTimer to String
@@ -131,7 +121,7 @@ LI a2 3
 // Print SlopeTimer
 LI a1 0x54 // Y Pos
 LA a2 SlopeTimerValueStr
-JAL @Print
+JAL @Print_CharFont
 LI a0 @OSDXOffset
 
 POP a2

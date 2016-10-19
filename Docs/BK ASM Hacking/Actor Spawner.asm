@@ -2,7 +2,8 @@
 .org 0x8024EE90
 JAL 0x80400000
 
-[SpawnActor]: 0x8032813C
+//FUNCTIONS & VARIABLES
+.include "Docs/BK ASM Hacking/BK_NTSC.S"
 
 .org 0x80400000
 PUSH ra
