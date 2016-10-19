@@ -1,20 +1,8 @@
 Banjo-Kazooie Functions US 1.0
+SLOWLY MOVING TO BK_NTSC.S
 
-0x8000210C [ word $v0 ] GetPIStatusReg( void )
 
-0x80002190 [ void ] 	SetCOP0StatusRegister( $a0 input )
-0x800021a0 [ $v0  ] 	GetCOP0StatusRegister( void )
 
-0x80003FE0 [ void ]     SetStatusRegisterBits( word $a0 bitsToSet )
-
-0x8023DB5C [ word $v0 ]	GetGlobalGameOnCounter( void ) 
-
-0x8023DDCDC [ void ] 	IncrementGlobalOnCounter( void )
-
-0x8023E06C [ void ] 	SetApplyButtonInputsToBanjoFlag( void )
-
-0x8024BF94 [ void ] 	SetFrameSkip( word $a0 input )
-0x8024BFA0 [ word $v0 ] GetFrameSkip( void )		//normally 2 but sometimes 3 eg. GV lobby
 
 0x8024C764 [ void ]	CopyCameraXYZRotation( float* $a0 destinationXPtr )
 0x8024C788 [ float $f0 ]GetCamera_YRotation( void )
@@ -45,19 +33,6 @@ Banjo-Kazooie Functions US 1.0
 0x80256378 [ float $f0 ]PythagoreanTheorenXYZ( float* $a0 inputXPtr );
 
 0x80256FE0 [ float $f0 ]ArcSin( float $f12 inputDegrees );
-
-0x80257EA8 [ word $v0 ]	Clamp( word $a0 input, word $a1 lowerLimit, word $a2 upperLimit )
-0x80257ED8 [ float $f0 ]Clamp_Float( float $f12 input, float $f14 lowerLimit, float $a2 upperLimit )
-
-0x8025881C [ float $f0 ]GetAngleBetween0And360( float $f12 inputDegrees)
-0x802588D0 [ float $f0 ]Remainder_float( float $f12 dividend, float $f14 divisor )
-0x802588DC [ float $f0 ]SelectMaximum_float( float $f12 input1, float $f14 input2 )
-0x80258904 [ float $f0 ]SelectMinimum_float( float $f12 input1, float $f14 input2 )
-0x8025892C [ word $v0 ]	SelectMinimum( word $a0 input1, word $a1 input2 )
-0x80258948 [ word $v0 ]	Selectmaximum( word $a0 input1, word $a1 input2 )
-0x80258964 [ float $f0 ]AbsoluteValue_float( float $f12 )
-0x80258994 [ float $f0 ]SumOfXZAbsoluteValue( float* $a0 Xptr )
-0x802589CC [ word $v0 ]	AbsoluteValue( word $a0 )
 
 0x80258B8C [ void ] 	ClearXYZData( float* $a0 xPtr)
 0x80258BA4 [ void ] 	CopyXYZData( float* $a0 destinationXPtr, float* $a1 sourceXPtr )
