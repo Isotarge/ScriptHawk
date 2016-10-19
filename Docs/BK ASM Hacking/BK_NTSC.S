@@ -25,9 +25,9 @@
 
 [SetStatusRegister]: 0x80003FE0 ;Inputs: (word $a0 input)
 
-[GetGlobalGameOnCounter]: 0x8023DB5C; Outputs: [word $v0]
+[GetGlobalOnCounter]: 0x8023DB5C; Outputs: [word $v0]
 
-[IncrementGlobalOnCounter]: 0x8023DDCDC
+[IncrementGlobalOnCounter]: 0x8023DCDC
 
 [SetApplyButtonInputsToBanjoFlag]: 0x8023E06C
 
@@ -44,7 +44,6 @@
 
 [GetAngleBetween0And360]: 0x8025881C ;Inputs: ( float $f12 inputDegrees)
                                      ;Outputs: [ float $f0 ]
-                                                                  
 [RemainderFloat]: 0x802588D0 ;Inputs: (float $f12 dividend), (float $f14 divisor)
                              ;Outputs: [float $f0]
 [SelectMaxFloat]: 0x802588DC ;Inputs: (float $f12 input1), (float $f14 input2)
