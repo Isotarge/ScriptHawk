@@ -9,40 +9,56 @@
 //Syntax: #define VERSION
 //Valid version options: BK_NTSC, BK_NTSC_REV_A, BK_PAL, BK_NTSC_J
 
+#ifndef BK_H
+#define BK_H
 #include <stdint.h>
 
-//TypeDefs
-typedef void func_v_v(void);
-typedef int32_t func_v_w(void);
+/*enumerations*/
 
-typedef void func_w_v(int32_t);
-typedef int32_t func_www_w(int32_t, int32_t, int32_t);
+/*function pointer typeDefs*/
+typedef uint32_t (*bkGetPIStatusRegProc)(void);
 
-typedef float func_fff_f(float, float, float);
+typedef void (*bkSetCOP0StatusRegProc)(uint32_t input);
+typedef uint32_t (*bkGetCOP0StatusRegProc)(void);
+
+typedef uint32_t (*bkGetGlobalOnCounterProc)(void);
+
+typedef void (*bkIncrementGlobalOnCounterProc)(void);
+
+typedef void (*bkSetApplyButtonInputsToBanjoFlagProc)(void);
+
+typedef void (*bkSetFrameSkipProc)(uint32_t input);
+typedef uint32_t (*bkGetFrameSkipProc)(void);
+
+typedef uint32_t (*bkClampIntProc)(uint32_t input, uint32_t lowerLimit, uint32_t upperLimit);
+typedef float (*bkClampFloatProc)(float input, float lowerLimit, float upperLimit);
 
 #ifndef BK_VERSION
     #error "Version of Banjo-Kazooie no Defined. See 1st comment in BanjoKazooie.h." 
 #else
     #if BK_VERSION == BK_NTSC
         //all NTSC specific definitions
-        //float _attribute_((section (".slopeTimer"))) bkSlopeTimer;
 
-        func_v_w* bkGetPIStatusReg = (func_v_w*)0x8000210C;
+        /*variable addresses*/
+        #define slope_timer_addr        0x8037C2E4
 
-        func_w_v* bkSetCOP0StatusReg = (func_w_v*)0x80002190;
-        func_v_w* bkGetCOP0StatusReg = (func_v_w*)0x800021A0;
+        /*function point addresses*/
+        #define bkGetPIStatusReg        ((bkGetPIStatusRegProc)     0x8000210C);
 
-        func_v_w* bkGetGlobalOnCounter = (func_v_w*)0x8023DB5C;
+        #define bkSetCOP0StatusReg      ((bkSetCOP0StatusRegProc)   0x80002190);
+        #define bkGetCOP0StatusReg      ((bkGetCOP0StatusRegProc)   0x800021A0);
+
+        #define bkGetGlobalOnCounter    ((bkGetGlobalOnCounterProc) 0x8023DB5C);
         
-        func_v_v* bkIncrementGlobalOnCounter = (func_v_v*)0x8023DCDC;
+        #define bkIncrementGlobalOnCounter ((bkIncrementGlobalOnCounterProc) 0x8023DCDC);
 
-        func_v_v* bkSetApplyButtonInputsToBanjoFlag = (func_v_v*)0x8023E06C;
+        #define bkSetApplyButtonInputsToBanjoFlag ((bkSetApplyButtonInputsToBanjoFlagProc) 0x8023E06C);
 
-        func_w_v* bkSetFrameSkip = (func_w_v*)0x8024BF94;
-        func_v_w* bkGetFrameSkip = (func_v_w*)0x8024BFA0;
+        #define bkSetFrameSkip          ((bkSetFrameSkipProc)       0x8024BF94);
+        #define bkGetFrameSkip          ((bkGetFrameSkipProc)       0x8024BFA0);
 
-        func_www_w* bkClampInt = (func_www_w*)0x80257EA8;
-        func_fff_w* bkClampFloat = (func_fff_f*)0x80257ED8;
+        #define bkClampInt              ((bkClampIntProc)           0x80257EA8);
+        #define bkClampFloat            ((bkClampFloatProc)         0x80257ED8);
 
     #elseif BK_VERSION == BK_PAL
         //all PAL specific definitions
