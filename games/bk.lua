@@ -2472,25 +2472,25 @@ local spawnActorID;
 local actorPosition;
 
 function enableActorSpawner()
-	if version ~= 3 then -- TODO: USA 1.1
-		spawnerEnabled = false;
-		if version == 1 then
-			loadASMPatch("./docs/BK ASM Hacking/Actor Spawner (PAL).asm", true);
-		elseif version == 2 then
-			loadASMPatch("./docs/BK ASM Hacking/Actor Spawner (Japan).asm", true);
-		elseif version == 4 then
-			loadASMPatch("./docs/BK ASM Hacking/Actor Spawner.asm", true);
-		end
-		-- Find magic flag
-		for i = 0x400000, RDRAMSize, 4 do
-			if mainmemory.read_u32_be(i) == 0xABCDEF12 then
-				print("Actor Spawner enabled successfully!");
-				spawnActorFlag = i + 4;
-				spawnActorID = i + 6;
-				actorPosition = i + 8;
-				spawnerEnabled = true;
-				break;
-			end
+	spawnerEnabled = false;
+	if version == 1 then
+		loadASMPatch("./docs/BK ASM Hacking/Actor Spawner (PAL).asm", true);
+	elseif version == 2 then
+		loadASMPatch("./docs/BK ASM Hacking/Actor Spawner (Japan).asm", true);
+	elseif version == 3 then
+		loadASMPatch("./docs/BK ASM Hacking/Actor Spawner (USA 1.1).asm", true);
+	elseif version == 4 then
+		loadASMPatch("./docs/BK ASM Hacking/Actor Spawner.asm", true);
+	end
+	-- Find magic flag
+	for i = 0x400000, RDRAMSize, 4 do
+		if mainmemory.read_u32_be(i) == 0xABCDEF12 then
+			print("Actor Spawner enabled successfully!");
+			spawnActorFlag = i + 4;
+			spawnActorID = i + 6;
+			actorPosition = i + 8;
+			spawnerEnabled = true;
+			break;
 		end
 	end
 end
