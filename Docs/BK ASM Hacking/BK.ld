@@ -1,16 +1,22 @@
 MEMORY{
-    RAM: ORIGIN = 0x80000000, LENGTH = 8M 
+    /* ROM */
+    RAM: ORIGIN = 0x80000000, LENGTH = 0x800000 /*8M 
 }
 
 SECTIONS{
-   .=0x80400000;
-   .start :
-   {
+    .existingGameBlock:
+    {
+        
+    }
+    .=0x400000;
+    .text :
+    {
+        .=ALIGN(4);
         *(.start)
-   } 
-   .data :
-   {
+    } 
+    .data :
+    {
         .=ALIGN(4);
         *(.data)
-   }
+    }
 }

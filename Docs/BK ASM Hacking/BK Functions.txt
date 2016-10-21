@@ -2,18 +2,11 @@ Banjo-Kazooie Functions US 1.0
 SLOWLY MOVING TO BK_NTSC.S
 
 
-
-
-0x8024C764 [ void ]	CopyCameraXYZRotation( float* $a0 destinationXPtr )
-0x8024C788 [ float $f0 ]GetCamera_YRotation( void )
-
-0x8024CD88 [ void ] 	SetCamera_XYZPosition( float* $a0 xPosPtr )
-
-0x8024CE18 [ void ] 	SetCamera_XYZRotation( float* $a0 xRotPtr )
+0x8024CE18 [ void ] SetCamera_XYZRotation( float* $a0 xRotPtr )
 
 0x8024E55C [ void ]	CopyP1InputTimers( word $a0 srcInputSetIndex, float* $a1 destinationSetPtr )
 
-0x8024E7C8 [ void ] 	UpdateButtonInputs( void )
+0x8024E7C8 [ void ] UpdateButtonInputs( void )
 
 0x80254FD0 [ void ]	IncreaseGlodalOnTimerBy50( void )
 
@@ -23,7 +16,7 @@ SLOWLY MOVING TO BK_NTSC.S
 
 0x80255D70 [ float $f0 ]ArcCos( float $f12) 	//input -1 to 1, output 0 to 180
 
-0x80255F74 [ void ] 	CrossProduct( float* $a0 resultXPtr, float* $a1 inputXPtr1, float* $a2 inputXPtr2 )
+0x80255F74 [ void ] CrossProduct( float* $a0 resultXPtr, float* $a1 inputXPtr1, float* $a2 inputXPtr2 )
 
 0c80256034 [ float $f0 ]DotProduct( float* $a0 input1XPtr, float* $a1 input2XPtr )
 0x80256064 [ float $f0 ]GetPositionDifference( float* $a0 inputXPtr1, float* $a1 inputXPtr2 )
@@ -34,9 +27,9 @@ SLOWLY MOVING TO BK_NTSC.S
 
 0x80256FE0 [ float $f0 ]ArcSin( float $f12 inputDegrees );
 
-0x80258B8C [ void ] 	ClearXYZData( float* $a0 xPtr)
-0x80258BA4 [ void ] 	CopyXYZData( float* $a0 destinationXPtr, float* $a1 sourceXPtr )
-0x80258BC0 [ void ] 	CopyXYZDifference( float* $a0 resultXPtr, float* $a1 minuendXPtr, float* $a2 subtraendXPtr )
+0x80258B8C [ void ] ClearXYZData( float* $a0 xPtr)
+0x80258BA4 [ void ] CopyXYZData( float* $a0 destinationXPtr, float* $a1 sourceXPtr )
+0x80258BC0 [ void ] CopyXYZDifference( float* $a0 resultXPtr, float* $a1 minuendXPtr, float* $a2 subtraendXPtr )
 0x80258BF4 [ void ]	SubtractVectorXYZ( float* $a0 destMinuendXPtr, float* $a1 subtraendXPtr )
 0x80258C28 [ void ]	SetXYZData( float* $a0 destinationXPtr, float $a1 xInput, float $a2 yInput, float $a3 ZInput )
 0x80258C48 [ void ]	CopyXYZSum( float* $a0 destinationXPtr, float* $a1 src1XPtr, float* $a2 src2XPtr ) 
@@ -50,7 +43,7 @@ SLOWLY MOVING TO BK_NTSC.S
 
 0x802591D8 [ float $f0 ]DifferenceOfAngles( float $f12 minuend, float $f14 subtrend )
 
-0x8025943C [ void ] 	DecrementTimerByOneFrame( float* $a0 timerPtr ) 
+0x8025943C [ void ] DecrementTimerByOneFrame( float* $a0 timerPtr ) 
 
 0x8025C100 [ ??? ]	CheckSum( ??? )????
 

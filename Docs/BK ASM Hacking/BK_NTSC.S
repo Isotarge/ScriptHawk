@@ -63,6 +63,12 @@
 
 [GetXZVelocity]: 0x80297AB8 ;Outputs: [float $f0]
 
+[CopyCameraXYZRotation]: 0x8024C764 ;Inputs: (float* $a0 destinationXPtr)
+[GetCamera_YRotation]: 0x8024C788 ;Outputs: [float $f0]
+
+[SetCamera_XYZPosition]: 0x8024CD88 ;Inputs: (float* $a0 xPosPtr)
+
+
 
 
 
