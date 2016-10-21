@@ -2472,9 +2472,14 @@ local spawnActorID;
 local actorPosition;
 
 function enableActorSpawner()
-	if version == 4 then -- TODO: Other versions
+	if version == 1 or version == 4 then -- TODO: USA 1.1, Japan
 		spawnerEnabled = false;
-		loadASMPatch("./docs/BK ASM Hacking/Actor Spawner.asm", true);
+		if version == 1 then
+			print("Loading pal actor spawner...");
+			loadASMPatch("./docs/BK ASM Hacking/Actor Spawner (PAL).asm", false);
+		elseif version == 4 then
+			loadASMPatch("./docs/BK ASM Hacking/Actor Spawner.asm", true);
+		end
 		-- Find magic flag
 		for i = 0x400000, RDRAMSize, 4 do
 			if mainmemory.read_u32_be(i) == 0xABCDEF12 then

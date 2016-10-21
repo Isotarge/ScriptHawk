@@ -26,6 +26,8 @@
 
 [Print_CharFont]: 0x802F7ADC ;Inputs: (word $a0 XPos), (word $a1 YPos), (char* $a2 str)
 
+[SpawnActor]: 0x80328594 ;Inputs: (word $a0 ActorIndex), (float* $a1 LocationXPtr), (??? $a2 ???)
+
 [FToA]: 0x8033DC00 ;Inputs: (char* $a0 destinationStr), (float $a1 inputFloat), (int $a2 float precision) //appends to destination string
 
 [CopyString]: 0x8033DEA4 ;Inputs: (char* $a0 destinationStr), (char* $a1 srcStr)
