@@ -2475,15 +2475,14 @@ function enableActorSpawner()
 	if version == 1 or version == 4 then -- TODO: USA 1.1, Japan
 		spawnerEnabled = false;
 		if version == 1 then
-			print("Loading pal actor spawner...");
-			loadASMPatch("./docs/BK ASM Hacking/Actor Spawner (PAL).asm", false);
+			loadASMPatch("./docs/BK ASM Hacking/Actor Spawner (PAL).asm", true);
 		elseif version == 4 then
 			loadASMPatch("./docs/BK ASM Hacking/Actor Spawner.asm", true);
 		end
 		-- Find magic flag
 		for i = 0x400000, RDRAMSize, 4 do
 			if mainmemory.read_u32_be(i) == 0xABCDEF12 then
-				print("Actor spawner enabled successfully!");
+				print("Actor Spawner enabled successfully!");
 				spawnActorFlag = i + 4;
 				spawnActorID = i + 6;
 				actorPosition = i + 8;
