@@ -2472,10 +2472,12 @@ local spawnActorID;
 local actorPosition;
 
 function enableActorSpawner()
-	if version == 1 or version == 4 then -- TODO: USA 1.1, Japan
+	if version ~= 3 then -- TODO: USA 1.1
 		spawnerEnabled = false;
 		if version == 1 then
 			loadASMPatch("./docs/BK ASM Hacking/Actor Spawner (PAL).asm", true);
+		elseif version == 2 then
+			loadASMPatch("./docs/BK ASM Hacking/Actor Spawner (Japan).asm", true);
 		elseif version == 4 then
 			loadASMPatch("./docs/BK ASM Hacking/Actor Spawner.asm", true);
 		end
