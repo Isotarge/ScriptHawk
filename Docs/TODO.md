@@ -32,7 +32,6 @@
 	- Squish remaining calls to bizstring library
 		- Ledge Clip.lua
 		- Wonder Boy III RNG Watch.lua
-- BK: ASM hook for other regions
 - DK64: ASM hook for other regions
 
 #Game support wishlist:

@@ -14,7 +14,7 @@ A collection of Lua scripts and RAM watches for [BizHawk](https://github.com/TAS
 - Use L to levitate and the D-Pad to move quickly around the map
 
 ###Writing your own ScriptHawk module
-1. Implement the API detailed in Docs/Design.txt, a template is provided at games/blank.lua
+1. Implement the API detailed in [Docs/Design.txt](Docs/Design.txt), a template is provided at [games/blank.lua](games/blank.lua)
 2. Your module should reside in the games/ subdirectory
 3. Add detection for your game to ScriptHawk.lua
 4. Submit a pull request to this repository, or contact [Isotarge](https://twitter.com/Isotarge)
