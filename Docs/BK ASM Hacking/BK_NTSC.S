@@ -1,6 +1,8 @@
 /*-------------------------------
 | VARIABLES
 ---------------------------------*/
+[PauseMenuStringsBase]:0x8036C4E0
+
 [PlayerPointer]:0x8037BF20
 
 [XPos]: 0x8037C5A0
@@ -8,6 +10,11 @@
 [XVelocity]: 0x8037C4B8
 
 [SlopeTimer]: 0x8037C2E4
+
+[PauseMenuState]: 0x80383010
+
+[ReturnToLairEnabled]: 0x80383080
+
 
 
 /*-------------------------------

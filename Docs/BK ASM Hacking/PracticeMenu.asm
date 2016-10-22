@@ -3,9 +3,7 @@
 //  Press D-Right to return to main menu
 //
 //
-// TO DO: Limit entering practice menu when pause menu state 2
-//        Incoorperate beta pause menu code so user has 4 positions to work with
-//        Append Each menu item's current code to end of sting
+// TO DO: Append Each menu item's current state to end of sting
 //        Create functions for setting enable bits/states for each
 //        Create normal mode code section
 
@@ -20,14 +18,6 @@ NOP
 ;.org 0x80334FFC
 ;JAL NormalMode
 ;NOP
-
-;BETA PAUSE MENU HOOK:
-;.org 0x80??????
-;JAL BetaPauseMenu
-;NOP
-
-
-
 
 //EXISTING FUNCTIONS
 .include "Docs/BK ASM Hacking/BK_NTSC.S"
@@ -61,8 +51,7 @@ NOP
 
 InPracMenu:
     /*UPDATE DISPLAY*/
-	;;;Pracitce Menu stuff
-	;Print Cursor Text
+
     ;Calculate Text
     LA a0 MenuLabelStrings
     LB a1 PageTopPos
@@ -98,7 +87,7 @@ InPracMenu:
     ADDIU a0 0x20
     JAL @CopyString
     NOP
-    //append option3's current state
+    //append option4's current state
 	JAL PrintPracMenuText
 
 	;Highlight cursor position
@@ -201,16 +190,23 @@ MOV v0 zero
 B HouseKeeping
 
 NotInPracMenu:
+    JAL BetaPauseMenu
+    NOP
 	JAL @PauseMenu
 	NOP
 	;check if entering practice menu
-	LA a0 @P1DPadLeft
-	LW a0 0(a0)
-	XORI a0, a0, 1
-	BNEZ a0 StayInNormPause ;If d-left press
-	LI a0 0x01
-		SB a0 InPracMenu ;set InPracMenu
-		NOP
+    LA a0 @PauseMenuState
+    LB a0 0(a0)
+    LI a1 0x02 ;main pause menu screen open
+    BNE a0 a1 StayInNormPause
+	NOP
+        LA a0 @P1DPadLeft
+        LW a0 0(a0)
+	    XORI a0, a0, 1
+	    BNEZ a0 StayInNormPause ;If d-left press
+	    LI a0 0x01
+		   SB a0 InPracMenu ;set InPracMenu
+		   NOP
 	StayInNormPause:
 NOP
 
@@ -393,6 +389,45 @@ NOP
 ;
 ;----------------------------------------------------------------
 BetaPauseMenu:
+PUSH a0
+PUSH a1
+
+;Enable "Exit to lair
+LA a0 @ReturnToLairEnabled
+SB zero 0(a0)
+
+;change menu items
+LA a0 @PauseMenuStringsBase
+LI a1 45
+SH a1 0x0C(a0) ;YPos1
+
+ADDIU a0 a0 0x10
+LUI a1 0x3DCC
+ADDIU a1 a1 0xCCCD
+SW a1 0(a0)    ;timing
+LI a1 75
+SH a1 0x0C(a0) ;YPos2
+LI a1 5
+SB a1 0x0E(a0) ;Portrait
+
+ADDIU a0 a0 0x10
+LUI a1 0x3E4C
+ADDIU a1 a1 0xCCCD
+SW a1 0(a0)    ;timing
+LI a1 105
+SH a1 0x0C(a0) ;YPos3
+
+ADDIU a0 a0 0x10
+LUI a1 0x3E99
+ADDIU a1 a1 0x999A
+SW a1 0(a0)    ;timing
+LI a1 135
+SH a1 0x0C(a0) ;YPos4
+
+POP a1
+POP a0
+JR
+NOP
 
 ;----------------------------------------------------------------
 ; Global Variables
@@ -407,6 +442,16 @@ PracMenuOptionNumber:
 .byte 0
 PageTopPos:
 .byte 0
+InfinitesState:
+.byte 0
+ResetOnEnterState:
+.byte 0
+MoveSet
+.byte 0
+TakeMeThereState:
+.byte 0
+L2LevitateState:
+.byte 0
 
 MenuItemStr:
 .asciiz "PRACTICE MENU 1: \0\0\0\0\0\0\0\0\0\0\0\0\0\0"
@@ -416,8 +461,8 @@ MenuItemStr:
 
 MenuLabelStrings:
 .asciiz "INFINITES: \0\0\0\0"     ; OFF, ON
-.asciiz "RESET ON ENTER:"         ; OFF, SINGLE, ALL
-.asciiz "MOVE SET: \0\0\0\0\0"    ;OFF, NONE, FFM, ALL
+.asciiz "RESET ON ENTER:"         ; OFF, ON
+.asciiz "MOVE SET: \0\0\0\0\0"    ; OFF, NONE, FFM, ALL
 .asciiz "TAKE ME THERE: "         ; OFF, SM, MM, TTC, CC, BGS, FP, GV, MMM, RBB, CCW, FF, DOG, GRUNTY
 .asciiz "L 2 LEVITATE: \0\0"      ;ON, OFF
 .asciiz "\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0"
