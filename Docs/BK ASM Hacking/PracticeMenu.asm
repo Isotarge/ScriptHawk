@@ -3,12 +3,29 @@
 //  Press D-Right to return to main menu
 //
 //
-//
-//
+// TO DO: Limit entering practice menu when pause menu state 2
+//        Incoorperate beta pause menu code so user has 4 positions to work with
+//        Append Each menu item's current code to end of sting
+//        Create functions for setting enable bits/states for each
+//        Create normal mode code section
 
+// HOOKS
 
 ;PAUSE MODE JUMP LOCATION: 0x802E47F4
+.org 0x802E47F4
+JAL 0x80400000
+NOP
+
 ;NORMAL MODE JUMP LOCATION: 0x80334FFC
+;.org 0x80334FFC
+;JAL NormalMode
+;NOP
+
+;BETA PAUSE MENU HOOK:
+;.org 0x80??????
+;JAL BetaPauseMenu
+;NOP
+
 
 
 
@@ -28,20 +45,60 @@
 ; Code Run from Pause Mode
 ; 
 ;----------------------------------------------------------------
+
 .org 0x80400000
+PauseMode:
 PUSH ra
 PUSH a0
 PUSH a1
 PUSH a2
 PUSH at
+PUSH s3
 
 LB a0 InPracMenu
 BEQ a0 zero NotInPracMenu
 NOP 
 
 InPracMenu:
+    /*UPDATE DISPLAY*/
 	;;;Pracitce Menu stuff
 	;Print Cursor Text
+    ;Calculate Text
+    LA a0 MenuLabelStrings
+    LB a1 PageTopPos
+    SLL a1 a1 4 
+    ADD a1 a0 a1
+    LA a0 MenuItemStr
+    PUSH a0
+    PUSH a1
+    JAL @CopyString
+    NOP
+    //append option1's current state
+    POP a1
+    POP a0
+    ADDIU a1 0x10
+    ADDIU a0 0x20
+    PUSH a0
+    PUSH a1
+    JAL @CopyString
+    NOP
+    //append option2's current state
+    POP a1
+    POP a0
+    ADDIU a1 0x10
+    ADDIU a0 0x20
+    PUSH a0
+    PUSH a1
+    JAL @CopyString
+    NOP
+    //append option3's current state
+    POP a1
+    POP a0
+    ADDIU a1 0x10
+    ADDIU a0 0x20
+    JAL @CopyString
+    NOP
+    //append option3's current state
 	JAL PrintPracMenuText
 
 	;Highlight cursor position
@@ -49,13 +106,28 @@ InPracMenu:
 	JAL HighlightCursorPosition
 	NOP
 
-
+    
+    /* UPDATE OPTION BASED ON BUTTON INPUTS*/
+    
 	;;;ChangeCursor and topPos based on controls
 	LA a0 @P1DPadUp ;Up - up one pos
 	LW a0 0(a0)
 	XORI a0, a0, 1
 	BNEZ a0 NoDPadUpPress 
 	LB a0 PracMenuCursorPos
+        BNEZ a0 NotAtPageTop ;if(cursor on bottom option)
+        NOP
+            PUSH a0
+            LB a1 PageTopPos
+            ADDI a0 a1 -1
+            JAL @SelectMaxInt
+            MOV a1 zero  ;PageTopMin
+            POP a0
+            SB v0 PageTopPos
+            B NoDPadUpPress
+            NOP
+            
+        NotAtPageTop:
 		ADDI a0 a0 -1
 		JAL @SelectMaxInt
 		LI a1 0
@@ -69,6 +141,19 @@ InPracMenu:
 	XORI a0, a0, 1
 	BNEZ a0 NoDPadDownPress 
 	LB a0 PracMenuCursorPos
+        LI a1 0x03
+        BNE a0 a1 NotAtPageBottom
+        NOP
+            PUSH a0
+            LB a1 PageTopPos
+            ADDI a0 a1 1
+            JAL @SelectMinInt
+            LI a1 0x01  ;PageTopMax
+            POP a0
+            SB v0 PageTopPos
+            B NoDPadDownPress
+            POP a0
+        NotAtPageBottom:
 		ADDIU a0 a0 1
 		JAL @SelectMinInt
 		LI a1 0x03
@@ -78,11 +163,13 @@ InPracMenu:
 	LA a0 @P1DPadLeft ;left - previous option
 	LW a0 0(a0)
 	XORI a0, a0, 1
+    //decrement current option's state
 		
 
 	LA a0 @P1DPadRight ;right - next option
 	LW a0 0(a0)
 	XORI a0, a0, 1
+    //increment current option's state
 
 
 	;check if exiting practice menu
@@ -128,6 +215,7 @@ NotInPracMenu:
 NOP
 
 HouseKeeping:
+POP s3
 POP at
 POP a2
 POP a1
@@ -176,12 +264,6 @@ POP a1
 POP ra
 JR
 NOP
-
-
-;----------------------------------------------------------------
-; Get Prac Menu Text
-; Inputs: byte $a0 PageTopPos
-;----------------------------------------------------------------
 
 ;----------------------------------------------------------------
 ; Restore Main Menu Text
@@ -306,6 +388,17 @@ POP ra
 JR
 NOP
 
+;----------------------------------------------------------------
+; Beta Menu Code
+;
+;----------------------------------------------------------------
+BetaPauseMenu:
+
+;----------------------------------------------------------------
+; Global Variables
+; BitFlags
+;----------------------------------------------------------------
+
 InPracMenu:
 .byte 0
 PracMenuCursorPos:
@@ -322,17 +415,14 @@ MenuItemStr:
 .asciiz "PRACTICE MENU 4: \0\0\0\0\0\0\0\0\0\0\0\0\0\0"
 
 MenuLabelStrings:
-.asciiz "INFINITES: \0\0\0\0\0"  ; OFF, ON
-.asciiz "RESET ON ENTER:\0" ; OFF, SINGLE, ALL
-.asciiz "MOVE SET: \0\0\0\0\0\0" ;OFF, NONE, FFM, ALL
-.asciiz "TAKE ME THERE: \0"; OFF, SM, MM, TTC, CC, BGS, FP, GV, MMM, RBB, CCW, FF, DOG, GRUNTY
-.asciiz "L 2 LEVITATE: \0\0\0" ;ON, OFF
+.asciiz "INFINITES: \0\0\0\0"     ; OFF, ON
+.asciiz "RESET ON ENTER:"         ; OFF, SINGLE, ALL
+.asciiz "MOVE SET: \0\0\0\0\0"    ;OFF, NONE, FFM, ALL
+.asciiz "TAKE ME THERE: "         ; OFF, SM, MM, TTC, CC, BGS, FP, GV, MMM, RBB, CCW, FF, DOG, GRUNTY
+.asciiz "L 2 LEVITATE: \0\0"      ;ON, OFF
 .asciiz "\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0"
 
 
 
-;----------------------------------------------------------------
-; Shared Variables
-; BitFlags
-;----------------------------------------------------------------
+
 
