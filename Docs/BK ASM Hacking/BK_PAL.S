@@ -29,5 +29,9 @@
 [SpawnActor]: 0x80328594 ;Inputs: (word $a0 ActorIndex), (float* $a1 LocationXPtr), (??? $a2 ???)
 
 [FToA]: 0x8033DC00 ;Inputs: (char* $a0 destinationStr), (float $a1 inputFloat), (int $a2 float precision) //appends to destination string
+[IToA_10]: 0x8033DCD4 ;Inputs: (char* $a0 destinationStr), (word $a1 inputInt) //base 10
+[IToA]: 0x8033DCF4 ;Inputs: (char* $a0 destinationStr), (word $a1 inputInt), (word $a2 Radix)
 
 [CopyString]: 0x8033DEA4 ;Inputs: (char* $a0 destinationStr), (char* $a1 srcStr)
+[GetStringSize]: 0x8033DED0 ;Inputs: (char* $a0 string)
+							;Outputs: [word $v0]
