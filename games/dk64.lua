@@ -5417,7 +5417,17 @@ function Game.completeFile()
 	end
 end
 
+function Game.getFileIndex()
+	if version ~= 4 then
+		return mainmemory.readbyte(Game.Memory.file[version]);
+	end
+	return 0;
+end
+
 Game.standardOSD = {
+	{"Mode", Game.getCurrentMode},
+	{"File", Game.getFileIndex},
+	{"Separator", 1},
 	{"X", Game.getXPosition},
 	{"Y", Game.getYPosition},
 	{"Z", Game.getZPosition},
@@ -5440,7 +5450,6 @@ Game.standardOSD = {
 	--{"Moving", Game.getMovingRotation}, -- TODO: Game.getMovingRotation
 	{"Rot. Z", Game.getZRotation},
 	{"Movement", Game.getMovementState},
-	--{"Mode", Game.getCurrentMode},
 	--{"Camera", Game.getCameraState},
 	--{"Separator", 1},
 	--{"Anim Timer 1", Game.getAnimTimer1},
