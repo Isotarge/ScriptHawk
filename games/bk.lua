@@ -2480,7 +2480,7 @@ function enableActorSpawner()
 	elseif version == 3 then
 		loadASMPatch("./docs/BK ASM Hacking/Actor Spawner (USA 1.1).asm", true);
 	elseif version == 4 then
-		loadASMPatch("./docs/BK ASM Hacking/Actor Spawner.asm", true);
+		loadASMPatch("./docs/BK ASM Hacking/Actor Spawner (USA 1.0).asm", true);
 	end
 	-- Find magic flag
 	for i = 0x400000, RDRAMSize, 4 do
