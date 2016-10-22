@@ -5425,9 +5425,9 @@ function Game.getFileIndex()
 end
 
 Game.standardOSD = {
-	{"Mode", Game.getCurrentMode},
-	{"File", Game.getFileIndex},
-	{"Separator", 1},
+	--{"Mode", Game.getCurrentMode},
+	--{"File", Game.getFileIndex},
+	--{"Separator", 1},
 	{"X", Game.getXPosition},
 	{"Y", Game.getYPosition},
 	{"Z", Game.getZPosition},
