@@ -4969,8 +4969,11 @@ function Game.initUI()
 	ScriptHawk.UI.form_controls["Unlock Moves Button"] = forms.button(ScriptHawk.UI.options_form, "Unlock Moves", Game.unlockMoves, ScriptHawk.UI.col(10), ScriptHawk.UI.row(0), ScriptHawk.UI.col(4) + 10, ScriptHawk.UI.button_height);
 	ScriptHawk.UI.form_controls["Toggle Visibility Button"] = forms.button(ScriptHawk.UI.options_form, "Invisify", toggle_invisify, ScriptHawk.UI.col(7), ScriptHawk.UI.row(1), 64, ScriptHawk.UI.button_height);
 	ScriptHawk.UI.form_controls["Toggle TB Void Button"] = forms.button(ScriptHawk.UI.options_form, "Toggle TB Void", toggle_tb_void, ScriptHawk.UI.col(10), ScriptHawk.UI.row(1), ScriptHawk.UI.col(4) + 10, ScriptHawk.UI.button_height);
-	ScriptHawk.UI.form_controls["Fix Bone Displacement Button"] = forms.button(ScriptHawk.UI.options_form, "Fix Spiking", fixBoneDisplacement, ScriptHawk.UI.col(10), ScriptHawk.UI.row(4), ScriptHawk.UI.col(4) + 10, ScriptHawk.UI.button_height);
-	ScriptHawk.UI.form_controls["Toggle Detect Displacement Checkbox"] = forms.checkbox(ScriptHawk.UI.options_form, "Detect Spiking", ScriptHawk.UI.col(10) + ScriptHawk.UI.dropdown_offset, ScriptHawk.UI.row(5) + ScriptHawk.UI.dropdown_offset);
+
+	-- As of BizHawk 1.11.8, ScriptHawk's Bone Displacement fix is integrated in to the emulator, as such the UI surrounding the bug is no longer needed
+	--ScriptHawk.UI.form_controls["Fix Bone Displacement Button"] = forms.button(ScriptHawk.UI.options_form, "Fix Spiking", fixBoneDisplacement, ScriptHawk.UI.col(10), ScriptHawk.UI.row(4), ScriptHawk.UI.col(4) + 10, ScriptHawk.UI.button_height);
+	--ScriptHawk.UI.form_controls["Toggle Detect Displacement Checkbox"] = forms.checkbox(ScriptHawk.UI.options_form, "Detect Spiking", ScriptHawk.UI.col(10) + ScriptHawk.UI.dropdown_offset, ScriptHawk.UI.row(5) + ScriptHawk.UI.dropdown_offset);
+
 	--ScriptHawk.UI.form_controls["Random Color"] = forms.button(ScriptHawk.UI.options_form, "Random Color", Game.setKongColor, ScriptHawk.UI.col(5), ScriptHawk.UI.row(5), ScriptHawk.UI.col(4) + 10, ScriptHawk.UI.button_height);
 	--ScriptHawk.UI.form_controls["Everything is Kong Button"] = forms.button(ScriptHawk.UI.options_form, "Kong", everythingIsKong, ScriptHawk.UI.col(10), ScriptHawk.UI.row(3), ScriptHawk.UI.col(4) + 10, ScriptHawk.UI.button_height);
 	--ScriptHawk.UI.form_controls["Force Pause Button"] = forms.button(ScriptHawk.UI.options_form, "Force Pause", force_pause, ScriptHawk.UI.col(10), ScriptHawk.UI.row(4), ScriptHawk.UI.col(4) + 10, ScriptHawk.UI.button_height);
@@ -5336,9 +5339,11 @@ function Game.eachFrame()
 	-- Mad Jack
 	Game.drawMJMinimap();
 
-	if type(ScriptHawk.UI.form_controls["Toggle Detect Displacement Checkbox"]) ~= "nil" and forms.ischecked(ScriptHawk.UI.form_controls["Toggle Detect Displacement Checkbox"]) then
-		displacementDetection();
-	end
+	-- As of BizHawk 1.11.8, ScriptHawk's Bone Displacement fix is integrated in to the emulator, as such the UI surrounding the bug is no longer needed
+	--if type(ScriptHawk.UI.form_controls["Toggle Detect Displacement Checkbox"]) ~= "nil" and forms.ischecked(ScriptHawk.UI.form_controls["Toggle Detect Displacement Checkbox"]) then
+	--	displacementDetection();
+	--end
+
 	doBRB();
 	processFlagQueue();
 

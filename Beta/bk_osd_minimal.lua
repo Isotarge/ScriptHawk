@@ -472,7 +472,5 @@ local function drawOSD()
 	end
 end
 
-while true do
-	drawOSD();
-	emu.yield();
-end
+event.onframestart(drawOSD);
+event.onloadstate(drawOSD);
