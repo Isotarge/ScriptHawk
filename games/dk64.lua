@@ -56,7 +56,8 @@ Game.Memory = {
 	["kong_size"] = {0x5E, 0x5E, 0x5E, 0x5A},
 	["menu_flags"] = {0x7ED558, 0x7ED478, 0x7ED9C8, nil},
 	["framebuffer_pointer"] = {0x7F07F4, 0x73EBC0, 0x743D30, 0x72CDA0},
-	["flag_block_pointer"] = {0x7654F4, 0x760014, 0x7656E4, nil},
+	["eeprom_copy_base"] = {0x7ECEA8, 0x7ECDC8, 0x7ED318, nil},
+	["eeprom_file_mapping"] = {0x7EDEA8, 0x7EDDC8, 0x7EE318, nil},
 	["security_byte"] = {0x7552E0, 0x74FB60, 0x7553A0, nil}, -- As far as I am aware this function is not present in the Kiosk version
 	["security_message"] = {0x75E5DC, 0x7590F0, 0x75E790, nil}, -- As far as I am aware this function is not present in the Kiosk version
 	["buttons_enabled_bitfield"] = {0x755308, 0x74FB88, 0x7553C8, 0x6FFE5C},
@@ -360,20 +361,14 @@ local MJ_offsets = { -- US Defaults
 -- Other state --
 -----------------
 
-local eep_checksum_offsets = {
-	0x1A8,
-	0x354,
-	0x500,
-	0x6AC,
-	0x6EC
-};
-
-local eep_checksum_values = {
-	0x00000000,
-	0x00000000,
-	0x00000000,
-	0x00000000,
-	0x00000000
+local eeprom_size = 0x800;
+local eeprom_slot_size = 0x1AC;
+local eep_checksum = {
+	{ address = 0x1A8, value = 0 }, -- Save Slot 1
+	{ address = 0x354, value = 0 }, -- Save Slot 2
+	{ address = 0x500, value = 0 }, -- Save Slot 3
+	{ address = 0x6AC, value = 0 }, -- Save Slot 4
+	{ address = 0x6EC, value = 0 }, -- Global flags
 };
 
 ----------------------------------
@@ -2518,8 +2513,8 @@ function Game.detectVersion(romName, romHash)
 	end
 
 	-- Read EEPROM checksums
-	for i = 1, #eep_checksum_offsets do
-		eep_checksum_values[i] = memory.read_u32_be(eep_checksum_offsets[i], "EEPROM");
+	for i = 1, #eep_checksum do
+		eep_checksum[i].value = memory.read_u32_be(eep_checksum[i].address, "EEPROM");
 	end
 
 	-- Fill the flag names
@@ -2535,17 +2530,40 @@ function Game.detectVersion(romName, romHash)
 	return true;
 end
 
+function Game.getFileIndex()
+	if version == 4 then
+		return 0;
+	end
+	return mainmemory.readbyte(Game.Memory.file[version]);
+end
+
+function Game.getCurrentEEPROMSlot()
+	if version == 4 then
+		return 0;
+	end
+	local fileIndex = Game.getFileIndex();
+	for i = 0, 3 do
+		local EEPROMMap = mainmemory.readbyte(Game.Memory.eeprom_file_mapping[version] + i);
+		if EEPROMMap == fileIndex then
+			return i;
+		end
+	end
+	return 0; -- Default
+end
+
+function Game.getFlagBlockAddress()
+	return Game.Memory.eeprom_copy_base[version] + Game.getCurrentEEPROMSlot() * eeprom_slot_size;
+end
+
 ----------------
 -- Flag stuff --
 ----------------
 
-local flag_block_size = 0x13B; -- TODO: Different size on Europe/Japan? -- TODO: Find exact size
-
-local flag_action_queue = {};
-flag_block = {};
+local flag_block_size = 0x13B; -- TODO: Find exact size, absolute maximum is 0x1A8 based on physical EEPROM slot size but it's likely much smaller than this
+flag_block_cache = {};
 
 function adjustBlockSize(value)
-	flag_block = {};
+	flag_block_cache = {};
 	flag_block_size = value;
 	checkFlags();
 end
@@ -2557,10 +2575,6 @@ function isFound(byte, bit)
 		end
 	end
 	return false;
-end
-
-function isValidFlagBlockAddress(address)
-	return type(address) == "number" and address > 0x700000 and address ~= 0x756494 and address ~= 0x7F0000 and address ~= 0x7FBFB0 and address < RDRAMSize - flag_block_size;
 end
 
 local function getFlagByName(flagName)
@@ -2581,99 +2595,46 @@ local function getFlagName(byte, bit)
 end
 
 function checkFlags(_type)
-	local flags = dereferencePointer(Game.Memory.flag_block_pointer[version]);
-	if isValidFlagBlockAddress(flags) then
-		local temp_value;
-		local flag_found = false;
-		local known_flags_found = 0;
+	local flags = Game.getFlagBlockAddress();
+
+	if #flag_block_cache > 0 then
+		local flagFound = false;
+		local knownFlagsFound = 0;
 		_type = _type or "Type";
 
-		if #flag_block > 0 then
-			for i = 0, #flag_block do
-				temp_value = mainmemory.readbyte(flags + i);
-				if flag_block[i] ~= temp_value then
-					for bit = 0, 7 do
-						if get_bit(temp_value, bit) and not get_bit(flag_block[i], bit) then
-							-- Output debug info if the flag isn't known
-							if not isFound(i, bit) then
-								flag_found = true;
-								dprint("{[\"byte\"] = "..toHexString(i)..", [\"bit\"] = "..bit..", [\"name\"] = \"Name\", [\"type\"] = \"".._type.."\", [\"map\"] = "..map_value.."},");
-							else
-								known_flags_found = known_flags_found + 1;
-							end
+		for i = 0, #flag_block_cache do
+			currentValue = mainmemory.readbyte(flags + i);
+			previousValue = flag_block_cache[i];
+			if currentValue ~= previousValue then
+				for bit = 0, 7 do
+					if get_bit(currentValue, bit) and not get_bit(previousValue, bit) then
+						if not isFound(i, bit) then
+							flagFound = true;
+							dprint("{[\"byte\"] = "..toHexString(i)..", [\"bit\"] = "..bit..", [\"name\"] = \"Name\", [\"type\"] = \"".._type.."\", [\"map\"] = "..map_value.."},");
+						else
+							knownFlagsFound = knownFlagsFound + 1;
 						end
 					end
-
-					-- Update entry in array
-					flag_block[i] = temp_value;
 				end
+
+				-- Update entry in cache
+				flag_block_cache[i] = currentValue;
 			end
-			if known_flags_found > 0 then
-				dprint(known_flags_found.." Known flags skipped.")
-			end
-			if not flag_found then
-				dprint("No unknown flags were changed.")
-			end
-		else
-			-- Populate flag block
-			for i = 0, flag_block_size do
-				flag_block[i] = mainmemory.readbyte(flags + i);
-			end
-			dprint("Populated flag array.")
+		end
+		if knownFlagsFound > 0 then
+			dprint(knownFlagsFound.." Known flags skipped.")
+		end
+		if not flagFound then
+			dprint("No unknown flags were changed.")
 		end
 	else
-		dprint("Failed to find flag block on this frame, adding to queue. Will be checked next time block is found.");
-		table.insert(flag_action_queue, {["action_type"] = "check"});
+		-- Fill flag block cache
+		for i = 0, flag_block_size do
+			flag_block_cache[i] = mainmemory.readbyte(flags + i);
+		end
+		dprint("Populated flag block cache.")
 	end
 	print_deferred();
-end
-
-local function processFlagQueue()
-	if #flag_action_queue > 0 then
-		local flags = dereferencePointer(Game.Memory.flag_block_pointer[version]);
-		if isValidFlagBlockAddress(flags) then
-			local queue_item, current_value;
-			for i = 1, #flag_action_queue do
-				queue_item = flag_action_queue[i];
-				if type(queue_item) == "table" then
-					if queue_item["action_type"] == "set" then
-						current_value = mainmemory.readbyte(flags + queue_item["byte"]);
-						mainmemory.writebyte(flags + queue_item["byte"], set_bit(current_value, queue_item["bit"]));
-						if not queue_item["suppressPrint"] then
-							if type(queue_item["name"]) == "string" then
-								dprint("Set \""..queue_item["name"].."\" at "..toHexString(queue_item["byte"])..">"..queue_item["bit"]);
-							else
-								dprint("Set "..getFlagName(queue_item["byte"], queue_item["bit"]));
-							end
-						end
-					elseif queue_item["action_type"] == "clear" then
-						current_value = mainmemory.readbyte(flags + queue_item["byte"]);
-						mainmemory.writebyte(flags + queue_item["byte"], clear_bit(current_value, queue_item["bit"]));
-						if not queue_item["suppressPrint"] then
-							if type(queue_item["name"]) == "string" then
-								dprint("Cleared \""..queue_item["name"].."\" at "..toHexString(queue_item["byte"])..">"..queue_item["bit"]);
-							else
-								dprint("Cleared "..getFlagName(queue_item["byte"], queue_item["bit"]));
-							end
-						end
-					elseif queue_item["action_type"] == "checkSingle" then
-						current_value = mainmemory.readbyte(flags + queue_item["byte"]);
-						if check_bit(current_value, queue_item["bit"]) then
-							dprint(getFlagName(queue_item["byte"], queue_item["bit"]).." is set.");
-						else
-							dprint(getFlagName(queue_item["byte"], queue_item["bit"]).." is not set.");
-						end
-					elseif queue_item["action_type"] == "check" then
-						checkFlags();
-					end
-				end
-			end
-			-- Speed up output by printing everything in one call to print
-			print_deferred();
-			-- Clear queue if we found the block that frame
-			flag_action_queue = {};
-		end
-	end
 end
 
 function checkFlag(byte, bit)
@@ -2684,8 +2645,14 @@ function checkFlag(byte, bit)
 			bit = flag["bit"];
 		end
 	end
-	if type(byte) == "number" and type(bit) == "number" then
-		table.insert(flag_action_queue, {["action_type"] = "checkSingle", ["byte"] = byte, ["bit"] = bit});
+	if type(byte) == "number" and type(bit) == "number" and bit >= 0 and bit < 8 then
+		local flags = Game.getFlagBlockAddress();
+		currentValue = mainmemory.readbyte(flags + byte);
+		if check_bit(currentValue, bit) then
+			print(getFlagName(byte, bit).." is set.");
+		else
+			print(getFlagName(byte, bit).." is not set.");
+		end
 	else
 		print("Warning: Flag not found.");
 	end
@@ -2722,41 +2689,41 @@ end
 ------------------------
 
 function setFlag(byte, bit, suppressPrint)
-	suppressPrint = suppressPrint or false;
-	if type(byte) == "number" and type(bit) == "number" and bit >= 0 and bit <= 7 then
-		table.insert(flag_action_queue, {["action_type"] = "set", ["byte"] = byte, ["bit"] = bit, ["suppressPrint"] = suppressPrint});
-		processFlagQueue();
+	local flags = Game.getFlagBlockAddress();
+	if type(byte) == "number" and type(bit) == "number" and bit >= 0 and bit < 8 then
+		currentValue = mainmemory.readbyte(flags + byte);
+		mainmemory.writebyte(flags + byte, set_bit(currentValue, bit));
+		if not suppressPrint then
+			if isFound(byte, bit) then
+				print("Set \""..getFlagName(byte, bit).."\" at "..toHexString(byte)..">"..bit);
+			else
+				print("Set "..getFlagName(byte, bit));
+			end
+		end
 	end
 end
 
 function setFlagByName(name)
 	local flag = getFlagByName(name);
 	if type(flag) == "table" then
-		flag["action_type"] = "set";
-		table.insert(flag_action_queue, flag);
-		processFlagQueue();
+		setFlag(flag["byte"], flag["bit"]);
 	end
 end
 
 function setFlagsByType(_type)
-	local num_set = 0;
 	if type(_type) == "string" then
-		local flag;
+		local numSet = 0;
 		for i = 1, #flag_array do
 			if flag_array[i]["type"] == _type then
-				flag = flag_array[i];
-				flag["action_type"] = "set";
-				flag["suppressPrint"] = true;
-				table.insert(flag_action_queue, flag);
-				num_set = num_set + 1;
+				setFlag(flag_array[i]["byte"], flag_array[i]["bit"], true);
+				numSet = numSet + 1;
 			end
 		end
-	end
-	if num_set > 0 then
-		processFlagQueue();
-		print("Set "..num_set.." flags of type '".._type.."'");
-	else
-		print("No flags found of type '".._type.."'");
+		if numSet > 0 then
+			print("Set "..numSet.." flags of type '".._type.."'");
+		else
+			print("No flags found of type '".._type.."'");
+		end
 	end
 end
 
@@ -2765,15 +2732,6 @@ function setFlagsByMap(mapIndex)
 		local flag = flag_array[i];
 		if flag["map"] == mapIndex then
 			setFlag(flag["byte"], flag["bit"], true);
-		end
-	end
-end
-
-function clearFlagsByMap(mapIndex)
-	for i = 1, #flag_array do
-		local flag = flag_array[i];
-		if flag["map"] == mapIndex then
-			clearFlag(flag["byte"], flag["bit"], true);
 		end
 	end
 end
@@ -2787,19 +2745,71 @@ function setKnownFlags()
 	end
 end
 
-function clearKnownFlags()
+function setAllFlags()
+	for byte = 0, flag_block_size do
+		for bit = 0, 7 do
+			setFlag(byte, bit, true);
+		end
+	end
+end
+
+--------------------------
+-- Clear flag functions --
+--------------------------
+
+function clearFlag(byte, bit, suppressPrint)
+	local flags = Game.getFlagBlockAddress();
+	if type(byte) == "number" and type(bit) == "number" and bit >= 0 and bit < 8 then
+		currentValue = mainmemory.readbyte(flags + byte);
+		mainmemory.writebyte(flags + byte, clear_bit(currentValue, bit));
+		if not suppressPrint then
+			if isFound(byte, bit) then
+				print("Cleared \""..getFlagName(byte, bit).."\" at "..toHexString(byte)..">"..bit);
+			else
+				print("Cleared "..getFlagName(byte, bit));
+			end
+		end
+	end
+end
+
+function clearFlagByName(name)
+	local flag = getFlagByName(name);
+	if type(flag) == "table" then
+		clearFlag(flag["byte"], flag["bit"]);
+	end
+end
+
+function clearFlagsByType(_type)
+	if type(_type) == "string" then
+		local numCleared = 0;
+		for i = 1, #flag_array do
+			if flag_array[i]["type"] == _type then
+				clearFlag(flag_array[i]["byte"], flag_array[i]["bit"], true);
+				numCleared = numCleared + 1;
+			end
+		end
+		if numCleared > 0 then
+			print("Cleared "..numCleared.." flags of type '".._type.."'");
+		else
+			print("No flags found of type '".._type.."'");
+		end
+	end
+end
+
+function clearFlagsByMap(mapIndex)
 	for i = 1, #flag_array do
 		local flag = flag_array[i];
-		if flag["type"] ~= "Unknown" then
+		if flag["map"] == mapIndex then
 			clearFlag(flag["byte"], flag["bit"], true);
 		end
 	end
 end
 
-function setAllFlags()
-	for byte = 0, flag_block_size do
-		for bit = 0, 7 do
-			setFlag(byte, bit, true);
+function clearKnownFlags()
+	for i = 1, #flag_array do
+		local flag = flag_array[i];
+		if flag["type"] ~= "Unknown" then
+			clearFlag(flag["byte"], flag["bit"], true);
 		end
 	end
 end
@@ -2811,50 +2821,6 @@ function clearAllFlags()
 		end
 	end
 end
-
---------------------------
--- Clear flag functions --
---------------------------
-
-function clearFlag(byte, bit, suppressPrint)
-	suppressPrint = suppressPrint or false;
-	if type(byte) == "number" and type(bit) == "number" and bit >= 0 and bit <= 7 then
-		table.insert(flag_action_queue, {["action_type"] = "clear", ["byte"] = byte, ["bit"] = bit, ["suppressPrint"] = suppressPrint});
-		processFlagQueue();
-	end
-end
-
-function clearFlagByName(name)
-	local flag = getFlagByName(name);
-	if type(flag) == "table" then
-		flag["action_type"] = "clear";
-		table.insert(flag_action_queue, flag);
-		processFlagQueue();
-	end
-end
-
-function clearFlagByType(_type)
-	local num_cleared = 0;
-	if type(_type) == "string" then
-		local flag;
-		for i = 1, #flag_array do
-			if flag_array[i]["type"] == _type then
-				flag = flag_array[i];
-				flag["action_type"] = "clear";
-				flag["suppressPrint"] = true;
-				table.insert(flag_action_queue, flag);
-				num_cleared = num_cleared + 1;
-			end
-		end
-	end
-	if num_cleared > 0 then
-		processFlagQueue();
-		print("Cleared "..num_cleared.." flags of type '".._type.."'");
-	else
-		print("No flags found for specified type.");
-	end
-end
-clearFlagsByType = clearFlagByType;
 
 --------------------------
 -- Other flag functions --
@@ -4231,6 +4197,10 @@ local SimSlamChecks = { -- Not actually used by the check function for speed rea
 	[Krusha] = 0x0007,
 };
 
+-- Script Commands
+-- 0018 xxxx 0001 - Check actor collision, index xxxx, result 0001
+-- 0025 xxxx - Play cutscene, index xxxx
+
 local safePreceedingCommands = {
 	0x0011,
 		-- Working, Aztec top of 5DT Diddy Switch (base + 0x0C, 2 blocks)
@@ -4960,6 +4930,7 @@ function Game.initUI()
 	ScriptHawk.UI.form_controls["Flag Dropdown"] = forms.dropdown(ScriptHawk.UI.options_form, flag_names, ScriptHawk.UI.col(0) + ScriptHawk.UI.dropdown_offset, ScriptHawk.UI.row(7) + ScriptHawk.UI.dropdown_offset, ScriptHawk.UI.col(9) + 8, ScriptHawk.UI.button_height);
 	ScriptHawk.UI.form_controls["Set Flag Button"] = forms.button(ScriptHawk.UI.options_form, "Set", flagSetButtonHandler, ScriptHawk.UI.col(10), ScriptHawk.UI.row(7), 59, ScriptHawk.UI.button_height);
 	ScriptHawk.UI.form_controls["Clear Flag Button"] = forms.button(ScriptHawk.UI.options_form, "Clear", flagClearButtonHandler, ScriptHawk.UI.col(13) - 5, ScriptHawk.UI.row(7), 59, ScriptHawk.UI.button_height);
+	-- TODO: Check button
 
 	-- Moon stuff
 	ScriptHawk.UI.form_controls["Moon Mode Label"] = forms.label(ScriptHawk.UI.options_form, "Moon:", ScriptHawk.UI.col(10), ScriptHawk.UI.row(2) + ScriptHawk.UI.label_offset, 48, ScriptHawk.UI.button_height);
@@ -5231,6 +5202,12 @@ function Game.realTime()
 	forms.settext(ScriptHawk.UI.form_controls["Moon Mode Button"], moon_mode);
 	drawGrabScriptUI();
 
+	-- Force STVW
+	--local yRot = Game.getYRotation();
+	--if yRot < Game.max_rot_units then
+	--	Game.setYRotation(yRot + Game.max_rot_units);
+	--end
+
 	if version ~= 4 then
 		-- Draw ISG timer
 		if mainmemory.readbyte(Game.Memory.isg_active[version]) > 0 then
@@ -5311,12 +5288,6 @@ function Game.eachFrame()
 	forceTBS();
 	--Game.unlockMenus(); -- TODO: Allow user to toggle this
 
-	-- Force STVW
-	--local yRot = Game.getYRotation();
-	--if yRot < Game.max_rot_units then
-	--	Game.setYRotation(yRot + Game.max_rot_units);
-	--end
-
 	-- Lag fix
 	if forms.ischecked(ScriptHawk.UI.form_controls["Toggle Lag Fix Checkbox"]) then
 		fixLag();
@@ -5345,7 +5316,6 @@ function Game.eachFrame()
 	--end
 
 	doBRB();
-	processFlagQueue();
 
 	-- Moonkick
 	if moon_mode == 'All' or (moon_mode == 'Kick' and isRDRAM(playerObject) and mainmemory.readbyte(playerObject + obj_model1.player.animation_type) == 0x29) then
@@ -5353,18 +5323,17 @@ function Game.eachFrame()
 	end
 
 	-- Check EEPROM checksums
-	local checksum_value;
 	local slotChanged = false;
-	for i = 1, #eep_checksum_offsets do
-		checksum_value = memory.read_u32_be(eep_checksum_offsets[i], "EEPROM");
-		if eep_checksum_values[i] ~= checksum_value then
+	for i = 1, #eep_checksum do
+		checksum_value = memory.read_u32_be(eep_checksum[i].address, "EEPROM");
+		if eep_checksum[i].value ~= checksum_value then
 			slotChanged = true;
 			if i == 5 then
-				dprint("Global flags "..i.." Checksum: "..toHexString(eep_checksum_values[i], 8).." -> "..toHexString(checksum_value, 8));
+				dprint("Global flags Checksum: "..toHexString(eep_checksum[i].value, 8).." -> "..toHexString(checksum_value, 8));
 			else
-				dprint("Slot "..i.." Checksum: "..toHexString(eep_checksum_values[i], 8).." -> "..toHexString(checksum_value, 8));
+				dprint("Slot "..(i - 1).." Checksum: "..toHexString(eep_checksum[i].value, 8).." -> "..toHexString(checksum_value, 8));
 			end
-			eep_checksum_values[i] = checksum_value;
+			eep_checksum[i].value = checksum_value;
 		end
 	end
 	if slotChanged then
@@ -5422,17 +5391,11 @@ function Game.completeFile()
 	end
 end
 
-function Game.getFileIndex()
-	if version ~= 4 then
-		return mainmemory.readbyte(Game.Memory.file[version]);
-	end
-	return 0;
-end
-
 Game.standardOSD = {
-	--{"Mode", Game.getCurrentMode},
-	--{"File", Game.getFileIndex},
-	--{"Separator", 1},
+	{"Mode", Game.getCurrentMode},
+	{"File", Game.getFileIndex},
+	{"EEPROM Slot", Game.getCurrentEEPROMSlot},
+	{"Separator", 1},
 	{"X", Game.getXPosition},
 	{"Y", Game.getYPosition},
 	{"Z", Game.getZPosition},

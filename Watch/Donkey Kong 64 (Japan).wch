@@ -83,13 +83,16 @@ SystemID N64
 75C65A	w	h	1	RDRAM	Squawks Model
 75C662	w	h	1	RDRAM	Squawks Behavior
 75C66A	w	h	1	RDRAM	Squawks Model
-7656E4	d	h	1	RDRAM	Flag Block Pointer
 767EB4	d	u	1	RDRAM	Frames (Real)
 76A254	d	u	1	RDRAM	Object Model 2 Timer
 76A298	d	u	1	RDRAM	Current Map
 76A29C	d	u	1	RDRAM	Current Exit
 76A2A1	b	h	1	RDRAM	Map State
 76B100	d	u	1	RDRAM	Frames (Lag)
+7EE318	b	h	1	RDRAM	EEPROM Slot 0 File Index
+7EE319	b	h	1	RDRAM	EEPROM Slot 1 File Index
+7EE31A	b	h	1	RDRAM	EEPROM Slot 2 File Index
+7EE31B	b	h	1	RDRAM	EEPROM Slot 3 File Index
 7F0E00	d	h	1	RDRAM	Backbone Pointer
 7F6150	d	h	1	RDRAM	ISG Start Time Major
 7F6154	d	h	1	RDRAM	ISG Start Time Minor

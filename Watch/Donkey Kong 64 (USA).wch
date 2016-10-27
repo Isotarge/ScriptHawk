@@ -287,7 +287,6 @@ SystemID N64
 75EC5A	w	h	1	RDRAM	Klump Model
 75EDF0	w	h	1	RDRAM	Mad Jack Behavior
 75EDF2	w	h	1	RDRAM	Mad Jack Model
-7654F4	d	h	1	RDRAM	Flag Block Pointer
 767CC4	d	u	1	RDRAM	Frames (Real)
 76A050	d	h	1	RDRAM	2D Renderer Array Pointer?
 76A064	d	u	1	RDRAM	Object Timer
@@ -313,6 +312,12 @@ SystemID N64
 7ED559	b	h	1	RDRAM	Extra cutscenes & Rambi unlocked
 7ED55B	b	h	1	RDRAM	Mystery menu bosses enabled (up to galleon)
 7ED560	d	h	1	RDRAM	Jetpac High Score (Last X Bits, multiplied by 5)
+7EDEA8	b	h	1	RDRAM	EEPROM Slot 0 File Index
+7EDEA9	b	h	1	RDRAM	EEPROM Slot 1 File Index
+7EDEAA	b	h	1	RDRAM	EEPROM Slot 2 File Index
+7EDEAB	b	h	1	RDRAM	EEPROM Slot 3 File Index
+7F02C4	d	s	1	RDRAM	Current File ID?
+7F02C8	d	s	1	RDRAM	Max File ID?
 7F07F4	d	h	1	RDRAM	Framebuffer Pointer
 7F0828	d	h	1	RDRAM	2D Renderer Array Pointer?
 7F0990	d	h	1	RDRAM	Backbone Pointer
