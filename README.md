@@ -12,6 +12,13 @@ A collection of Lua scripts and RAM watches for [BizHawk](https://github.com/TAS
 ###Basic functionality
 - Player position, rotation and speed will be displayed on screen
 - Use L to levitate and the D-Pad to move quickly around the map
+- Press / to reset max velocity, odometer etc.
+
+###Advanced functionality
+- The telemetry system records everything shown in ScriptHawk's OSD to the Lua console in CSV format
+- Type angleCalc.open() in the Lua console to open a calculator for the angle between 2 points in game, written by [The8bitbeast](https://twitter.com/the8bitbeast)
+- Type lock_y = true in the Lua console to freeze the player's Y position, lock_y = false to disable
+- Type loadASMPatch() in the Lua console to load a MIPS R4300i assembly patch for any N64 game, huge thanks to [notwa/lips](https://github.com/notwa/lips)
 
 ###Writing your own ScriptHawk module
 1. Implement the API detailed in [Docs/Design.txt](Docs/Design.txt), a template is provided at [games/blank.lua](games/blank.lua)
@@ -23,7 +30,6 @@ A collection of Lua scripts and RAM watches for [BizHawk](https://github.com/TAS
 ###Donkey Kong 64
 - All known versions supported
 - [Object analysis tools](Docs/Object%20Analysis%20Tools.txt): List, Examine, Grab, Focus, Encircle, Zip
-- [Bone displacement](http://bombch.us/Bn1C) fix & detection
 - Documentation of over 95% of permanent flags in USA save files
 - Mad Jack minimap
 - Automatic [ISG](http://dk64.wikia.com/wiki/Intro_Story_Glitch) timer
