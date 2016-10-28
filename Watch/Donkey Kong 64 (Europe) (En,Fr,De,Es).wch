@@ -92,7 +92,6 @@ SystemID N64
 764BCC	d	u	1	RDRAM	Current Exit
 764BD1	b	h	1	RDRAM	Map State
 765A30	d	u	1	RDRAM	Frames (Lag)
-76A918	d	h	1	RDRAM	Bone Displacement Pointer
 7EDDC8	b	h	1	RDRAM	EEPROM Slot 0 File Index
 7EDDC9	b	h	1	RDRAM	EEPROM Slot 1 File Index
 7EDDCA	b	h	1	RDRAM	EEPROM Slot 2 File Index

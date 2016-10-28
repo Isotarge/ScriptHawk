@@ -109,8 +109,6 @@ SystemID N64
 746380	w	h	1	RDRAM	Footstep SFX
 746392	w	h	1	RDRAM	Footstep SFX
 7467C8	b	u	1	RDRAM	File
-746820	d	u	1	RDRAM	Related to bone displacement
-746824	d	u	1	RDRAM	Related to bone displacement
 746A40	d	h	1	RDRAM	RNG
 7476F4	w	u	1	RDRAM	Cutscene
 747CD0	d	f	1	RDRAM	FOV
