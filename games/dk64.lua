@@ -4198,18 +4198,23 @@ local SimSlamChecks = { -- Not actually used by the check function for speed rea
 };
 
 -- Script Commands
--- 0018 xxxx 0001 - Check actor collision, index xxxx, result 0001
+-- 0000 - nop
+-- 0018 xxxx - Check actor collision, index xxxx, 0000 is any actor
+-- 0019 xxxx - Check actor sim slam collision, index xxxx
 -- 0025 xxxx - Play cutscene, index xxxx
 
 local safePreceedingCommands = {
-	0x0011,
+	0x11,
 		-- Working, Aztec top of 5DT Diddy Switch (base + 0x0C, 2 blocks)
-	0x0019,
+	0x18,
+		-- Lots of gunswitches
+	0x19,
 		-- Working, Llama Temple DK Switch (base + 0x1C, 1 block)
 		-- Llama Temple Lanky Switch (base + 0x1C, 2 blocks)
 		-- Working, Llama Temple Tiny Switches (base + 0x1C, 2 blocks)
 		-- Working, Tiny Temple Diddy Switch (base + 0x1C, 2 blocks)
 		-- Working, Tiny Temple Lanky Switch (base + 0x1C, 2 blocks)
+		-- Used in K. Lumsy Grape Switch to keep pressed, character check
 };
 
 function isSafePreceedingCommand(preceedingCommand)
@@ -4217,7 +4222,6 @@ function isSafePreceedingCommand(preceedingCommand)
 end
 
 -- Potentially unsafe:
--- 0x8019
 -- 0x0025
 
 function isKong(actorType)
@@ -4357,59 +4361,27 @@ function ohWrongnana(verbose)
 			activationScript = dereferencePointer(slotBase + 0x7C);
 			if isRDRAM(activationScript) then
 				scriptName = getScriptName(slotBase);
-				if scriptName == "gunswitches" then
+				if scriptName == "gunswitches" or scriptName == "buttons" then
 					-- Get part 2
 					activationScript = dereferencePointer(activationScript + 0xA0);
+					
 					while isRDRAM(activationScript) do
-						-- Check for the bullet magic and patch if needed
-						if isBulletCheck(mainmemory.read_u16_be(activationScript + 0x0C)) then
-							if verbose then
-								ohWrongnanaDebugOut(scriptName, slotBase, activationScript, 0x0C);
-							end
-							mainmemory.write_u16_be(activationScript + 0x0C, BulletChecks[currentKong]);
-						end
-						-- Get next script chunk
-						activationScript = dereferencePointer(activationScript + 0x4C);
-					end
-				end
-				if scriptName == "buttons" then
-					-- Get part 2
-					activationScript = dereferencePointer(activationScript + 0xA0);
-					while isRDRAM(activationScript) do
-						-- New method, slower but catches weird switches
-						for j = 0x04, 0x48, 4 do
-							if isSafePreceedingCommand(mainmemory.read_u16_be(activationScript + j - 2)) then
-								if isKong(mainmemory.read_u16_be(activationScript + j)) then
+						for j = 0x04, 0x48, 8 do
+							if isSafePreceedingCommand(mainmemory.readbyte(activationScript + j - 1)) then
+								local commandParam = mainmemory.read_u16_be(activationScript + j);
+								if isKong(commandParam) then
 									mainmemory.write_u16_be(activationScript + j, SimSlamChecks[currentKong]);
+									if verbose then
+										ohWrongnanaDebugOut(scriptName, slotBase, activationScript, j);
+									end
+								elseif isBulletCheck(commandParam) then
+									mainmemory.write_u16_be(activationScript + j, BulletChecks[currentKong]);
 									if verbose then
 										ohWrongnanaDebugOut(scriptName, slotBase, activationScript, j);
 									end
 								end
 							end
 						end
-
-						-- Old method
-						-- Check for the simslam magic and patch if needed
-						--[[
-						if isKong(mainmemory.read_u16_be(activationScript + 0x0C)) then
-							if verbose then
-								ohWrongnanaDebugOut(scriptName, slotBase, activationScript, 0x0C);
-							end
-							mainmemory.write_u16_be(activationScript + 0x0C, SimSlamChecks[currentKong]);
-						end
-						if isKong(mainmemory.read_u16_be(activationScript + 0x1C)) then
-							if verbose then
-								ohWrongnanaDebugOut(scriptName, slotBase, activationScript, 0x1C);
-							end
-							mainmemory.write_u16_be(activationScript + 0x1C, SimSlamChecks[currentKong]);
-						end
-						if isKong(mainmemory.read_u16_be(activationScript + 0x24)) then
-							if verbose then
-								ohWrongnanaDebugOut(scriptName, slotBase, activationScript, 0x24);
-							end
-							mainmemory.write_u16_be(activationScript + 0x24, SimSlamChecks[currentKong]);
-						end
-						]]--
 
 						-- Get next script chunk
 						activationScript = dereferencePointer(activationScript + 0x4C);
