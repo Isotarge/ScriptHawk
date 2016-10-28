@@ -403,7 +403,6 @@ end
 -- Load libraries --
 --------------------
 
-JSON = require "lib.JSON";
 Stats = require "lib.Stats";
 lips = require "lips.init";
 require "lib.pngLua.png";
@@ -933,6 +932,7 @@ function getTelemetryHeaderString()
 end
 
 -- Outputs telemetry data as CSV to the console
+-- TODO: Save as CSV file on disk
 local function outputTelemetry()
 	-- Print CSV header
 	dprint(getTelemetryHeaderString());
@@ -961,19 +961,6 @@ local function stopTelemetry()
 
 	outputTelemetry();
 	return;
-
-	-- Output to file
-	-- Output data to JSON
-	--local json_data = JSON:encode_pretty(telemetryData);
-	--local file = io.open("Lua/ScriptHawk/DK64_Y_Data.json", "w+");
-	--if type(file) ~= "nil" then
-		--io.output(file);
-		--io.write(json_data);
-		--io.close(file);
-	--else
-		--print("Error writing to file =(");
-		--outputTelemetry();
-	--end
 end
 
 local function toggleTelemetry()
