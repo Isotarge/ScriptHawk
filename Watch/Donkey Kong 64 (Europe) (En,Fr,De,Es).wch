@@ -52,6 +52,7 @@ SystemID N64
 73ECD2	d	h	1	RDRAM	Enguarde Score 5 Name
 740F18	b	u	1	RDRAM	File
 7411A0	d	h	1	RDRAM	RNG
+742430	d	f	1	RDRAM	FOV
 748EDC	b	u	1	RDRAM	Character
 74D94C	d	f	1	RDRAM	DK Walk Maximum Velocity
 74D950	d	f	1	RDRAM	Diddy Walk Maximum Velocity
@@ -62,6 +63,10 @@ SystemID N64
 74E9E0	d	h	1	RDRAM	HUD Pointer
 74F8F0	b	h	1	RDRAM	Intro Story is Playing
 74FB60	b	u	1	RDRAM	Security Byte
+74FB76	w	h	1	RDRAM	Player 1 Color
+74FB7A	w	h	1	RDRAM	Player 2 Color
+74FB7E	w	h	1	RDRAM	Player 3 Color
+74FB82	w	h	1	RDRAM	Player 4 Color
 74FB88	w	b	1	RDRAM	Buttons Enabled (Bitfield)
 74FB8C	b	b	1	RDRAM	Joystick X Bits Enabled
 74FB90	b	b	1	RDRAM	Joystick Y Bits Enabled
@@ -100,6 +105,10 @@ SystemID N64
 7F08B0	d	h	1	RDRAM	Backbone Pointer
 7F5C00	d	h	1	RDRAM	ISG Start Time Major
 7F5C04	d	h	1	RDRAM	ISG Start Time Minor
+7F5D00	d	h	1	RDRAM	Map Block Pointer
+7F5D04	d	h	1	RDRAM	Map Model Pointer?
+7F5D08	d	h	1	RDRAM	Map Verts Pointer
+7F5D0C	d	h	1	RDRAM	Map Model Pointer?
 7F5F20	d	h	1	RDRAM	Object Model 2 Array Pointer
 7F5F24	d	u	1	RDRAM	Object Model 2 Array Size
 7F5F30	d	h	1	RDRAM	Setup File Pointer

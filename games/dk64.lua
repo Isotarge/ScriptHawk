@@ -30,7 +30,7 @@ end
 -- DK64 specific state --
 -------------------------
 
--- TODO: Investigate bone array pointer block at 0x7FA8A0 (USA)
+-- TODO: Investigate texture pointer block at 0x7FA8A0 (USA)
 	-- 2 pointers
 	-- 1 u32_be
 local version; -- 1 USA, 2 Europe, 3 Japan, 4 Kiosk
@@ -74,6 +74,8 @@ Game.Memory = {
 	["obj_model2_setup_pointer"] = {0x7F6010, 0x7F5F30, 0x7F6480, 0x7B17C4},
 	["obj_model2_timer"] = {0x76A064, 0x764B84, 0x76A254, 0x72CDAC},
 	["obj_model2_collision_linked_list_pointer"] = {0x754244, 0x74E9A4, 0x753B34, 0x6FF054},
+	["map_base"] = {0x7F5DE0, 0x7F5D00, 0x7F6250, 0x7A1E90},
+	["vert_base"] = {0x7F5DE8, 0x7F5D08, 0x7F6258, 0x7A1E98},
 };
 
 Game.modes = {
@@ -492,7 +494,7 @@ obj_model1 = {
 		--[10] = "Unknown", -- Always loaded -- TODO: What is this?
 		--[11] = "Unknown", -- Always loaded -- TODO: What is this?
 		[12] = "Loading Zone Controller", -- Always loaded
-		--[13] = "Unknown", -- Always loaded -- TODO: What is this?
+		[13] = "Object Model 2 Controller", -- Always loaded
 		--[14] = "Unknown", -- Always loaded -- TODO: What is this?
 		--[15] = "Unknown", -- Always loaded -- TODO: What is this?
 		[17] = "Cannon Barrel",
@@ -536,6 +538,7 @@ obj_model1 = {
 		[57] = "Strong Kong Barrel",
 		[58] = "Swinging Light",
 		[59] = "Fireball", -- Mad Jack etc.
+		--[60] = "Unknown", -- Spawns during bananaporter
 		[61] = "Boulder",
 		[63] = "Vase (O)",
 		[64] = "Vase (:)",
@@ -723,7 +726,7 @@ obj_model1 = {
 		[329] = "Fairy", -- Peril Path Panic
 		[330] = "Bug", -- Big Bug Bash
 		[331] = "Klaptrap", -- Searchlight Seek
-		[332] = "Big Bug Bash Controller?", -- TODO: Verify -- TODO: Fly swatter?
+		[332] = "Big Bug Bash Controller?", -- TODO: Fly swatter?
 		[333] = "Barrel (Main Menu)",
 		[334] = "Padlock (K. Lumsy)",
 		[335] = "Snide's Menu",
@@ -1191,7 +1194,7 @@ end
 ----------------------------------
 
 -- Things in object model 2
--- GB's & CB's
+-- GBs & CBs
 -- Doors in helm
 -- K. Rool's chair
 -- Gorilla Grab Levers
@@ -2349,6 +2352,7 @@ function Game.detectVersion(romName, romHash)
 			[0x3B] = "Walking", -- Orangstand
 			[0x3C] = "Jumping", -- Orangstand
 			[0x3D] = "Barrel",
+
 			[0x3F] = "Leaving Barrel",
 			[0x40] = "Cannon Shot",
 
@@ -2363,6 +2367,7 @@ function Game.detectVersion(romName, romHash)
 			[0x4F] = "Bananaporter",
 
 			[0x54] = "Climbing Tree",
+
 			[0x56] = "Grabbed Ledge",
 			[0x57] = "Pulling up on Ledge",
 			[0x58] = "Idle", -- Gun
@@ -2371,6 +2376,7 @@ function Game.detectVersion(romName, romHash)
 			[0x5B] = "Jumping", -- Gun
 			[0x5C] = "Aiming", -- Gun
 			[0x5D] = "Rocketbarrel",
+
 			[0x61] = "Instrument",
 
 			[0x6A] = "GB Dance",
@@ -2948,14 +2954,12 @@ end
 
 force_tbs = false; -- Set this through lua console for now -- TODO: Add some kind of UI for it
 function forceTBS()
-	if force_tbs then
-		local playerObject = Game.getPlayerObject();
-		if isRDRAM(playerObject) then
-			local pointer = dereferencePointer(playerObject + obj_model1.lock_method_1_pointer);
-			if isRDRAM(pointer) then
-				mainmemory.write_u32_be(playerObject + obj_model1.lock_method_1_pointer, 0);
-				print("Forcing TBS. Nulled pointer to "..toHexString(pointer));
-			end
+	local playerObject = Game.getPlayerObject();
+	if isRDRAM(playerObject) then
+		local pointer = dereferencePointer(playerObject + obj_model1.lock_method_1_pointer);
+		if isRDRAM(pointer) then
+			mainmemory.write_u32_be(playerObject + obj_model1.lock_method_1_pointer, 0);
+			print("Forcing TBS. Nulled pointer to "..toHexString(pointer));
 		end
 	end
 end
@@ -4811,7 +4815,7 @@ local function drawGrabScriptUI()
 					color = yellow_highlight;
 				end
 				if object_index == i then
-					color = green_highlight
+					color = green_highlight;
 				end
 
 				if not (behaviorPointer == "" and hide_non_scripted) then
@@ -5207,8 +5211,8 @@ local vert = {
 };
 
 function crumble()
-	local mapBase = dereferencePointer(0x7F5DE0); -- TODO: Other versions
-	local vertBase = dereferencePointer(0x7F5DE8);
+	local mapBase = dereferencePointer(Game.Memory.map_base[version]);
+	local vertBase = dereferencePointer(Game.Memory.vert_base[version]);
 
 	if isRDRAM(mapBase) and isRDRAM(vertBase) then
 		local mapSize = mainmemory.read_u32_be(mapBase + object_size);
@@ -5251,13 +5255,18 @@ function Game.eachFrame()
 		Game.OSD = Game.standardOSD;
 	end
 
-	--crumble();
+	if crumbling then
+		crumble();
+	end
+
+	if force_tbs then
+		forceTBS();
+	end
 
 	-- TODO: This is really slow and doesn't cover all memory domains
 	--memoryStatCache = getMemoryStats(dereferencePointer(Game.Memory.linked_list_pointer[version]));
 
 	--koshBotLoop(); -- TODO: This probably stops the virtual pad from working
-	forceTBS();
 	--Game.unlockMenus(); -- TODO: Allow user to toggle this
 
 	-- Lag fix
@@ -5321,11 +5330,11 @@ function Game.crankyCutsceneMininumRequirements()
 	setFlagByName("Nintendo Coin");
 	setFlagByName("Rareware Coin");
 
-	-- CB and GB counters
+	-- GB counters
 	for kong = DK, Chunky do
 		local base = Game.Memory.kong_base[version] + kong * Game.Memory.kong_size[version];
 		for level = 0, 7 do
-			mainmemory.write_s16_be(base + GB_Base + (level * 2), 5); -- Normal GB's
+			mainmemory.write_s16_be(base + GB_Base + (level * 2), 5); -- Normal GBs
 			if level == 7 and kong == Tiny then
 				mainmemory.write_s16_be(base + GB_Base + (level * 2), 6); -- Rareware GB
 			end
@@ -5355,7 +5364,7 @@ function Game.completeFile()
 			mainmemory.write_u16_be(base + CB_Base + (level * 2), 75); -- Not needed to trigger Cranky Cutscene
 		end
 		for level = 0, 7 do
-			mainmemory.write_s16_be(base + GB_Base + (level * 2), 5); -- Normal GB's
+			mainmemory.write_s16_be(base + GB_Base + (level * 2), 5); -- Normal GBs
 			if level == 7 and kong == Tiny then
 				mainmemory.write_s16_be(base + GB_Base + (level * 2), 6); -- Rareware GB
 			end

@@ -3,6 +3,7 @@ SystemID N64
 5931BA	w	h	1	RDRAM	Object Model 2 "Room Replacement"
 6F1CC4	d	u	1	RDRAM	Destination Map
 6F1CC8	d	u	1	RDRAM	Destination Exit
+6F3448	w	h	1	RDRAM	Music Track
 6F36E0	d	h	1	RDRAM	RNG
 6F9EB8	b	u	1	RDRAM	Character
 6FB9D0	d	h	1	RDRAM	Start of pointers to strings
@@ -47,6 +48,10 @@ SystemID N64
 7A106C	d	h	1	RDRAM	Framebuffer Pointer (Copy)
 7A12C0	d	h	1	RDRAM	Backbone Pointer
 7A1E14	d	h	1	RDRAM	Camera Pointer
+7A1E90	d	h	1	RDRAM	Map Block Pointer
+7A1E94	d	h	1	RDRAM	Map Model Pointer?
+7A1E98	d	h	1	RDRAM	Map Verts Pointer
+7A1E9C	d	h	1	RDRAM	Map Model Pointer?
 7B17C4	d	h	1	RDRAM	Setup File Pointer
 7B5918	d	h	1	RDRAM	Camera Pointer
 7B5AFC	d	h	1	RDRAM	Player Pointer
@@ -57,9 +62,9 @@ SystemID N64
 7B6591	b	h	1	RDRAM	DK Simian Slam
 7B6596	w	u	1	RDRAM	DK Coins
 7B6598	w	u	1	RDRAM	DK Instrument Ammo
-7B659A	w	u	1	RDRAM	DK CB's (Japes?)
-7B65B2	w	u	1	RDRAM	DK CB's
-7B65CE	w	u	1	RDRAM	DK GB's (Japes?)
+7B659A	w	u	1	RDRAM	DK CBs (Japes?)
+7B65B2	w	u	1	RDRAM	DK CBs
+7B65CE	w	u	1	RDRAM	DK GBs (Japes?)
 7B65EA	b	h	1	RDRAM	Diddy Moves
 7B65EB	b	h	1	RDRAM	Diddy Simian Slam
 7B660C	w	u	1	RDRAM	Diddy CBs

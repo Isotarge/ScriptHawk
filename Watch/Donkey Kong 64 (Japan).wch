@@ -53,11 +53,16 @@ SystemID N64
 743E42	d	h	1	RDRAM	Enguarde Score 5 Name
 746088	b	u	1	RDRAM	File
 746300	d	h	1	RDRAM	RNG
+747590	d	f	1	RDRAM	FOV
 74E05C	b	u	1	RDRAM	Character
 753B34	d	h	1	RDRAM	Object Model 2 Collision Linked List Pointer
 753B70	d	h	1	RDRAM	HUD Pointer
 755130	b	h	1	RDRAM	Intro Story is Playing
 7553A0	b	u	1	RDRAM	Security Byte
+7553B6	w	h	1	RDRAM	Player 1 Color
+7553BA	w	h	1	RDRAM	Player 2 Color
+7553BE	w	h	1	RDRAM	Player 3 Color
+7553C2	w	h	1	RDRAM	Player 4 Color
 7553C8	w	b	1	RDRAM	Buttons Enabled (Bitfield)
 7553CC	b	b	1	RDRAM	Joystick X Bits Enabled
 7553D0	b	b	1	RDRAM	Joystick Y Bits Enabled
@@ -96,6 +101,10 @@ SystemID N64
 7F0E00	d	h	1	RDRAM	Backbone Pointer
 7F6150	d	h	1	RDRAM	ISG Start Time Major
 7F6154	d	h	1	RDRAM	ISG Start Time Minor
+7F6250	d	h	1	RDRAM	Map Block Pointer
+7F6254	d	h	1	RDRAM	Map Model Pointer?
+7F6258	d	h	1	RDRAM	Map Verts Pointer
+7F625C	d	h	1	RDRAM	Map Model Pointer?
 7F6470	d	h	1	RDRAM	Object Model 2 Array Pointer
 7F6474	d	u	1	RDRAM	Object Model 2 Array Size
 7F6480	d	h	1	RDRAM	Setup File Pointer
