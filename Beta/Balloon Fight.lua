@@ -6,7 +6,7 @@ local yellow = 0xFFFFFF00;
 local green = 0xFF00FF00;
 local pink = 0xFFFF00FF;
 local black = 0xFF000000;
-local white = 0xFFFFFFFF
+local white = 0xFFFFFFFF;
 
 -- Game state
 local object_array_capacity = 6;

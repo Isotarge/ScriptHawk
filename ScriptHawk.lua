@@ -1069,10 +1069,10 @@ if type(Game.OSDRowHeight) ~= "number" then
 end
 
 local angleKeywords = {
-	"Rot X", "Rot Y", "Rot Z", "Rot",
-	"Rot. X", "Rot. Y", "Rot. Z", "Rot.",
-	"Rotation X", "Rotation Y", "Rotation Z", "Rotation",
-	"Facing", "Moving", "Angle"
+	"rot x", "rot y", "rot z", "rot",
+	"rot. x", "rot. y", "rot. z", "rot.",
+	"rotation x", "rotation y", "rotation z", "rotation",
+	"facing", "moving", "angle",
 };
 
 function ScriptHawk.UI.updateReadouts()
@@ -1097,21 +1097,29 @@ function ScriptHawk.UI.updateReadouts()
 		local color = Game.OSD[i][3];
 
 		if label ~= "Separator" then
+			local labelLower = string.lower(label);
+
 			-- Detect special keywords
-			if label == "dY" or label == "DY" then
+			if labelLower == "dx" then
+				value = dx or 0;
+			end
+			if labelLower == "dy" then
 				value = dy or 0;
 			end
-			if label == "dXZ" or label == "DXZ" then
+			if labelLower == "dxz" then
 				value = d or 0;
 			end
 
-			if label == "Max dY" or label == "Max DY" then
+			if labelLower == "max dx" then
+				value = max_dx or 0;
+			end
+			if labelLower == "max dy" then
 				value = max_dy or 0;
 			end
-			if label == "Max dXZ" or label == "Max DXZ" then
+			if labelLower == "max dxz" then
 				value = max_d or 0;
 			end
-			if label == "Odometer" then
+			if labelLower == "odometer" then
 				value = odometer or 0;
 			end
 
@@ -1127,7 +1135,7 @@ function ScriptHawk.UI.updateReadouts()
 
 			-- Detect and format rotation based on a keyword search
 			for j = 1, #angleKeywords do
-				if label == angleKeywords[j] then
+				if labelLower == angleKeywords[j] then
 					value = ScriptHawk.UI.formatRotation(value);
 				end
 			end

@@ -35,28 +35,36 @@ end
 	-- 1 u32_be
 local version; -- 1 USA, 2 Europe, 3 Japan, 4 Kiosk
 Game.Memory = {
-	["mode"] = {0x755318, 0x74FB98, 0x7553D8, 0x6FFE6C},
-	["current_map"] = {0x76A0A8, 0x764BC8, 0x76A298, 0x72CDE4},
+	["jetman_position_x"] = {0x02F050, 0x022100, 0x022060, nil},
+	["jetman_position_y"] = {0x02F054, 0x022104, 0x022064, nil},
+	["jetman_velocity_x"] = {0x02F058, 0x022108, 0x022068, nil},
+	["jetman_velocity_y"] = {0x02F05C, 0x02210C, 0x02206C, nil},
+	["jumpman_position_x"] = {0x04BD70, 0x03ECD0, 0x03EB00, nil},
+	["jumpman_position_y"] = {0x04BD74, 0x03ECD4, 0x03EB04, nil},
+	["jumpman_velocity_x"] = {0x04BD78, 0x03ECD8, 0x03EB08, nil},
+	["jumpman_velocity_y"] = {0x04BD7C, 0x03ECDC, 0x03EB0C, nil},
+	["mode"] = {0x755318, 0x74FB98, 0x7553D8, 0x6FFE6C}, -- See Game.modes for values
+	["current_map"] = {0x76A0A8, 0x764BC8, 0x76A298, 0x72CDE4}, -- See Game.maps for values
 	["current_exit"] = {0x76A0AC, 0x764BCC, 0x76A29C, 0x72CDE8},
-	["destination_map"] = {0x7444E4, 0x73EC34, 0x743DA4, 0x6F1CC4},
+	["destination_map"] = {0x7444E4, 0x73EC34, 0x743DA4, 0x6F1CC4}, -- See Game.maps for values
 	["destination_exit"] = {0x7444E8, 0x73EC38, 0x743DA8, 0x6F1CC8},
-	["map_state"] = {0x76A0B1, 0x764BD1, 0x76A2A1, 0x72CDED},
+	["map_state"] = {0x76A0B1, 0x764BD1, 0x76A2A1, 0x72CDED}, -- byte, bitfield -- TODO: Document values
 	["loading_zone_array"] = {0x7FDCB4, 0x7FDBF4, 0x7FE144, nil}, -- TODO: Kiosk?
 	["loading_zone_array_size"] = {0x7FDCB0, 0x7FDBF0, 0x7FE140, nil}, -- u16_be -- TODO: Kiosk?
 	["file"] = {0x7467C8, 0x740F18, 0x746088, nil},
 	["character"] = {0x74E77C, 0x748EDC, 0x74E05C, 0x6F9EB8},
-	["tb_void_byte"] = {0x7FBB63, 0x7FBA83, 0x7FBFD3, 0x7B5B13},
+	["tb_void_byte"] = {0x7FBB63, 0x7FBA83, 0x7FBFD3, 0x7B5B13}, -- byte, bitfield -- TODO: Document values
 	["player_pointer"] = {0x7FBB4C, 0x7FBA6C, 0x7FBFBC, 0x7B5AFC},
 	["camera_pointer"] = {0x7FB968, 0x7FB888, 0x7FBDD8, 0x7B5918},
 	["pointer_list"] = {0x7FBFF0, 0x7FBF10, 0x7FC460, 0x7B5E58},
 	["actor_count"] = {0x7FC3F0, 0x7FC310, 0x7FC860, 0x7B6258},
-	["linked_list_pointer"] = {0x7F0990, 0x7F08B0, 0x7F0E00, 0x7A12C0},
-	["global_base"] = {0x7FCC41, 0x7FCB81, 0x7FD0D1, 0x7B6754},
+	["linked_list_pointer"] = {0x7F0990, 0x7F08B0, 0x7F0E00, 0x7A12C0}, -- TODO: Refactor to something about heap
+	["shared_collectables"] = {0x7FCC41, 0x7FCB81, 0x7FD0D1, 0x7B6754},
 	["kong_base"] = {0x7FC950, 0x7FC890, 0x7FCDE0, 0x7B6590},
 	["kong_size"] = {0x5E, 0x5E, 0x5E, 0x5A},
-	["menu_flags"] = {0x7ED558, 0x7ED478, 0x7ED9C8, nil},
 	["framebuffer_pointer"] = {0x7F07F4, 0x73EBC0, 0x743D30, 0x72CDA0},
 	["eeprom_copy_base"] = {0x7ECEA8, 0x7ECDC8, 0x7ED318, nil},
+	["menu_flags"] = {0x7ED558, 0x7ED478, 0x7ED9C8, nil},
 	["eeprom_file_mapping"] = {0x7EDEA8, 0x7EDDC8, 0x7EE318, nil},
 	["security_byte"] = {0x7552E0, 0x74FB60, 0x7553A0, nil}, -- As far as I am aware this function is not present in the Kiosk version
 	["security_message"] = {0x75E5DC, 0x7590F0, 0x75E790, nil}, -- As far as I am aware this function is not present in the Kiosk version
@@ -328,21 +336,12 @@ Game.maps = {
 	"K. Rool's Arena", -- 215
 };
 
----------------------------
--- Arcade specific state --
----------------------------
+------------------
+-- Subgame maps --
+------------------
 
 local arcade_map = 2;
-local jumpman_position = {0x04BD70, 0x04BD74}; -- US Defaults
-local jumpman_velocity = {0x04BD78, 0x04BD7C}; -- US Defaults
-
----------------------------
--- Jetpac specific state --
----------------------------
-
 local jetpac_map = 9;
-local jetman_position = {0x02F050, 0x02F054}; -- US Defaults
-local jetman_velocity = {0x02F058, 0x02F05C}; -- US Defaults
 
 --------------
 -- Mad Jack --
@@ -386,14 +385,14 @@ local max_oranges        = 20;
 local max_musical_energy = 10;
 
 local max_blueprints = 40;
-local max_cb = 3512;
+local max_cb = 3512; -- 3500 in levels, 10 in test room balloon, 2 out of bounds in Japes
 local max_crowns = 10;
 local max_fairies = 20;
 local max_gb = 201;
 local max_medals = 40;
 local max_warps = (5 * 2 * 8) + 4 + 2 + 2 + 6;
 
--- Relative to global_base
+-- Relative to shared_collectables
 -- TODO: Different on Kiosk
 local standard_ammo = 0; -- u16_be
 local homing_ammo   = 2; -- u16_be
@@ -1241,7 +1240,7 @@ obj_model2 = {
 	["collectable_state"] = 0x8C, -- byte (bitfield)
 };
 
-local collisionTypes = { -- These seem to be the model 2 equivalent to the model 1 "actor_types" array
+local collisionTypes = { -- TODO: Refactor, these are the model 2 equivalent to the model 1 "actor_types" array
 	[0x00] = "Nothing", -- "test" internal name
 	[0x01] = "Thin Flame?", -- 2D
 	[0x02] = "-",
@@ -1407,7 +1406,7 @@ local collisionTypes = { -- These seem to be the model 2 equivalent to the model
 	[0x99] = "Chunky Rotating Room", -- Aztec, Tiny Temple
 	[0x9A] = "Black and purple thing",
 	[0x9B] = "Black and purple thing",
-	[0x9C] = "Aztek Panel blue",
+	[0x9C] = "Aztec Panel blue",
 	[0x9D] = "-",
 	[0x9E] = "Ice Floor",
 	[0x9F] = "Ice Pole", -- I think this is a spotlight
@@ -1838,8 +1837,7 @@ function getScriptName(objectModel2Base)
 	return "unknown";
 end
 
-object_model2_filter = nil;
---object_model2_filter = "buttons"; -- TODO: Remove this, it's just here for FTA testing
+object_model2_filter = nil; -- String, internal name eg. "buttons", "gunswitches", "pickups"
 function populateObjectModel2Pointers()
 	object_pointers = {};
 	local objModel2Array = getObjectModel2Array();
@@ -2258,12 +2256,6 @@ function Game.detectVersion(romName, romHash)
 		MJ_offsets["white_switch_position"]   = 0x6C;
 		MJ_offsets["blue_switch_position"]    = 0x6D;
 
-		-- Subgames
-		jumpman_position = {0x03ECD0, 0x03ECD4};
-		jumpman_velocity = {0x03ECD8, 0x03ECDC};
-		jetman_position  = {0x022100, 0x022104};
-		jetman_velocity  = {0x022108, 0x02210C};
-
 		ticks_per_crystal = 125;
 
 		-- PAL values
@@ -2281,12 +2273,6 @@ function Game.detectVersion(romName, romHash)
 		MJ_offsets["next_position"]           = 0x69;
 		MJ_offsets["white_switch_position"]   = 0x6C;
 		MJ_offsets["blue_switch_position"]    = 0x6D;
-
-		-- Subgames
-		jumpman_position = {0x03EB00, 0x03EB04};
-		jumpman_velocity = {0x03EB00, 0x03EB04};
-		jetman_position  = {0x022060, 0x022064};
-		jetman_velocity  = {0x022068, 0x02206C};
 	elseif romHash == "B4717E602F07CA9BE0D4822813C658CD8B99F993" then -- Kiosk
 		version = 4;
 		-- flag_array = require("games.dk64_flags_Kiosk"); -- TODO: Flags?
@@ -3114,9 +3100,9 @@ end
 
 function Game.getXPosition()
 	if map_value == arcade_map then
-		return mainmemory.readfloat(jumpman_position[1], true);
+		return mainmemory.readfloat(Game.Memory.jumpman_position_x[version], true);
 	elseif map_value == jetpac_map then
-		return mainmemory.readfloat(jetman_position[1], true);
+		return mainmemory.readfloat(Game.Memory.jetman_position_x[version], true);
 	end
 	local playerObject = Game.getPlayerObject();
 	if isRDRAM(playerObject) then
@@ -3127,9 +3113,9 @@ end
 
 function Game.getYPosition()
 	if map_value == arcade_map then
-		return mainmemory.readfloat(jumpman_position[2], true);
+		return mainmemory.readfloat(Game.Memory.jumpman_position_y[version], true);
 	elseif map_value == jetpac_map then
-		return mainmemory.readfloat(jetman_position[2], true);
+		return mainmemory.readfloat(Game.Memory.jetman_position_y[version], true);
 	end
 	local playerObject = Game.getPlayerObject();
 	if isRDRAM(playerObject) then
@@ -3150,9 +3136,9 @@ end
 
 function Game.setXPosition(value)
 	if map_value == arcade_map then
-		--mainmemory.writefloat(jumpman_position[1], value, true);
+		--mainmemory.writefloat(Game.Memory.jumpman_position_x[version], value, true);
 	elseif map_value == jetpac_map then
-		--mainmemory.writefloat(jetman_position[1], value, true);
+		--mainmemory.writefloat(Game.Memory.jetman_position_x[version], value, true);
 	else
 		local playerObject = Game.getPlayerObject();
 		if isRDRAM(playerObject) then
@@ -3169,9 +3155,9 @@ end
 
 function Game.setYPosition(value)
 	if map_value == arcade_map then
-		--mainmemory.writefloat(jumpman_position[2], value, true);
+		--mainmemory.writefloat(Game.Memory.jumpman_position_y[version], value, true);
 	elseif map_value == jetpac_map then
-		--mainmemory.writefloat(jetman_position[2], value, true);
+		--mainmemory.writefloat(Game.Memory.jetman_position_y[version], value, true);
 	else
 		local playerObject = Game.getPlayerObject();
 		if isRDRAM(playerObject) then
@@ -3400,9 +3386,9 @@ end
 function Game.getVelocity()
 	local playerObject = Game.getPlayerObject();
 	if map_value == arcade_map then
-		return mainmemory.readfloat(jumpman_velocity[1], true);
+		return mainmemory.readfloat(Game.Memory.jumpman_velocity_x[version], true);
 	elseif map_value == jetpac_map then
-		return mainmemory.readfloat(jetman_velocity[1], true);
+		return mainmemory.readfloat(Game.Memory.jetman_velocity_x[version], true);
 	elseif isRDRAM(playerObject) then
 		return mainmemory.readfloat(playerObject + obj_model1.velocity, true);
 	end
@@ -3412,9 +3398,9 @@ end
 function Game.setVelocity(value)
 	local playerObject = Game.getPlayerObject();
 	if map_value == arcade_map then
-		mainmemory.writefloat(jumpman_velocity[1], value, true);
+		mainmemory.writefloat(Game.Memory.jumpman_velocity_x[version], value, true);
 	elseif map_value == jetpac_map then
-		mainmemory.writefloat(jetman_velocity[1], value, true);
+		mainmemory.writefloat(Game.Memory.jetman_velocity_x[version], value, true);
 	elseif isRDRAM(playerObject) then
 		mainmemory.writefloat(playerObject + obj_model1.velocity, value, true);
 	end
@@ -3423,9 +3409,9 @@ end
 function Game.getYVelocity()
 	local playerObject = Game.getPlayerObject();
 	if map_value == arcade_map then
-		return mainmemory.readfloat(jumpman_velocity[2], true);
+		return mainmemory.readfloat(Game.Memory.jumpman_velocity_y[version], true);
 	elseif map_value == jetpac_map then
-		return mainmemory.readfloat(jetman_velocity[2], true);
+		return mainmemory.readfloat(Game.Memory.jetman_velocity_y[version], true);
 	elseif isRDRAM(playerObject) then
 		return mainmemory.readfloat(playerObject + obj_model1.y_velocity, true);
 	end
@@ -3435,9 +3421,9 @@ end
 function Game.setYVelocity(value)
 	local playerObject = Game.getPlayerObject();
 	if map_value == arcade_map then
-		mainmemory.writefloat(jumpman_velocity[2], value, true);
+		mainmemory.writefloat(Game.Memory.jumpman_velocity_y[version], value, true);
 	elseif map_value == jetpac_map then
-		mainmemory.writefloat(jetman_velocity[2], value, true);
+		mainmemory.writefloat(Game.Memory.jetman_velocity_y[version], value, true);
 	elseif isRDRAM(playerObject) then
 		mainmemory.writefloat(playerObject + obj_model1.y_velocity, value, true);
 	end
@@ -4951,19 +4937,19 @@ function Game.unlockMenus()
 end
 
 function Game.applyInfinites()
-	local global_base = Game.Memory.global_base[version]; -- TODO: Use HUD pointer and object to get these memory locations
+	local shared_collectables = Game.Memory.shared_collectables[version];
 
-	mainmemory.writebyte(global_base + standard_ammo, Game.getMaxStandardAmmo());
+	mainmemory.writebyte(shared_collectables + standard_ammo, Game.getMaxStandardAmmo());
 	if forms.ischecked(ScriptHawk.UI.form_controls["Toggle Homing Ammo Checkbox"]) then
-		mainmemory.writebyte(global_base + homing_ammo, Game.getMaxHomingAmmo());
+		mainmemory.writebyte(shared_collectables + homing_ammo, Game.getMaxHomingAmmo());
 	else
-		mainmemory.writebyte(global_base + homing_ammo, 0);
+		mainmemory.writebyte(shared_collectables + homing_ammo, 0);
 	end
 
-	mainmemory.writebyte(global_base + oranges, max_oranges);
-	mainmemory.write_u16_be(global_base + crystals, max_crystals * ticks_per_crystal);
-	mainmemory.writebyte(global_base + film, max_film);
-	mainmemory.writebyte(global_base + health, mainmemory.readbyte(global_base + melons) * 4);
+	mainmemory.writebyte(shared_collectables + oranges, max_oranges);
+	mainmemory.write_u16_be(shared_collectables + crystals, max_crystals * ticks_per_crystal);
+	mainmemory.writebyte(shared_collectables + film, max_film);
+	mainmemory.writebyte(shared_collectables + health, mainmemory.readbyte(shared_collectables + melons) * 4);
 
 	for kong = DK, Krusha do
 		local base = Game.Memory.kong_base[version] + kong * Game.Memory.kong_size[version];
@@ -5425,14 +5411,14 @@ Game.subgameOSD = {
 	{"X", Game.getXPosition},
 	{"Y", Game.getYPosition},
 	{"Separator", 1},
+	{"dX"},
 	{"dY"},
-	{"dXZ"},
 	{"Separator", 1},
 	{"Velocity", Game.getVelocity},
 	{"Y Velocity", Game.getYVelocity},
 	{"Separator", 1},
+	{"Max dX"},
 	{"Max dY"},
-	{"Max dXZ"},
 	{"Odometer"},
 	{"Separator", 1},
 };
