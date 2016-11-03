@@ -2466,13 +2466,15 @@ end
 -- Actor Spawner --
 -------------------
 
-local spawnerEnabled = false;
-local spawnActorFlag;
-local spawnActorID;
-local actorPosition;
+local spawner = {
+	enabled = false,
+	actorFlag = 0, -- Memory address of the flag that is checked to decide whether to spawn an actor
+	actorID = 0, -- Memory address of the ID of the actor that will be spawned
+	actorPosition = 0, -- Memory address of the array of coordinates to spawn the actor at
+};
 
-function enableActorSpawner()
-	spawnerEnabled = false;
+function spawner.enable()
+	spawner.enabled = false;
 	if version == 1 then
 		loadASMPatch("./docs/BK ASM Hacking/Actor Spawner (PAL).asm", true);
 	elseif version == 2 then
@@ -2486,20 +2488,20 @@ function enableActorSpawner()
 	for i = 0x400000, RDRAMSize, 4 do
 		if mainmemory.read_u32_be(i) == 0xABCDEF12 then
 			print("Actor Spawner enabled successfully!");
-			spawnActorFlag = i + 4;
-			spawnActorID = i + 6;
-			actorPosition = i + 8;
-			spawnerEnabled = true;
+			spawner.actorFlag = i + 4;
+			spawner.actorID = i + 6;
+			spawner.actorPosition = i + 8;
+			spawner.enabled = true;
 			break;
 		end
 	end
 end
 
-function updateActorSpawnPosition()
-	if spawnerEnabled then
-		mainmemory.writefloat(actorPosition, Game.getXPosition(), true);
-		mainmemory.writefloat(actorPosition + 4, Game.getYPosition(), true);
-		mainmemory.writefloat(actorPosition + 8, Game.getZPosition(), true);
+function spawner.updatePosition()
+	if spawner.enabled then
+		mainmemory.writefloat(spawner.actorPosition, Game.getXPosition(), true);
+		mainmemory.writefloat(spawner.actorPosition + 4, Game.getYPosition(), true);
+		mainmemory.writefloat(spawner.actorPosition + 8, Game.getZPosition(), true);
 	end
 end
 
@@ -2518,26 +2520,26 @@ function getActorID(name)
 	return 0;
 end
 
-function spawnActor(id)
-	if not spawnerEnabled then
-		enableActorSpawner();
+function spawner.spawn(id)
+	if not spawner.enabled then
+		spawner.enable();
 	end
-	if spawnerEnabled then
+	if spawner.enabled then
 		if type(id) == 'nil' then
 			id = getActorID(forms.gettext(ScriptHawk.UI.form_controls.actor_dropdown));
 		end
-		updateActorSpawnPosition();
-		mainmemory.write_u16_be(spawnActorFlag, 1);
-		mainmemory.write_u16_be(spawnActorID, id);
+		spawner.updatePosition();
+		mainmemory.write_u16_be(spawner.actorFlag, 1);
+		mainmemory.write_u16_be(spawner.actorID, id);
 	else
 		print("Error enabling the Actor Spawner :(");
 	end
 end
 
-function disableActorSpawner()
-	spawnerEnabled = false;
+function spawner.disable()
+	spawner.enabled = false;
 end
-event.onloadstate(disableActorSpawner, "ScriptHawk - Disable Actor Spawner");
+event.onloadstate(spawner.disable, "ScriptHawk - Disable Actor Spawner");
 
 ------------
 -- Events --
@@ -2582,7 +2584,7 @@ function Game.initUI()
 
 	-- Actor spawner
 	ScriptHawk.UI.form_controls.actor_dropdown = forms.dropdown(ScriptHawk.UI.options_form, actorNames, ScriptHawk.UI.col(10) + ScriptHawk.UI.dropdown_offset, ScriptHawk.UI.row(0) + ScriptHawk.UI.dropdown_offset);
-	ScriptHawk.UI.form_controls.spawn_actor_button = forms.button(ScriptHawk.UI.options_form, "Spawn", spawnActor, ScriptHawk.UI.col(10), ScriptHawk.UI.row(1), ScriptHawk.UI.col(2), ScriptHawk.UI.button_height);
+	ScriptHawk.UI.form_controls.spawn_actor_button = forms.button(ScriptHawk.UI.options_form, "Spawn", spawner.spawn, ScriptHawk.UI.col(10), ScriptHawk.UI.row(1), ScriptHawk.UI.col(2), ScriptHawk.UI.button_height);
 
 	-- Vile
 	ScriptHawk.UI.form_controls.wave_button =     forms.button(ScriptHawk.UI.options_form, "Wave", initWave,         ScriptHawk.UI.col(10), ScriptHawk.UI.row(4), ScriptHawk.UI.col(2), ScriptHawk.UI.button_height);
