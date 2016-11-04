@@ -111,6 +111,7 @@ SystemID N64
 383B38	b	h	1	RDRAM	Language
 383B91	w	h	1	RDRAM	Cauldron Bitfield
 383B9C	b	u	1	RDRAM	FF Completed (0=no,64=yes)
+383BA2	w	h	1	RDRAM	FF Pattern
 383CC0	d	h	1	RDRAM	Honeycomb Bitfield
 383D08	b	h	1	RDRAM	Sandcastle Water State
 383D64	d	f	1	RDRAM	Text Timer

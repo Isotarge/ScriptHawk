@@ -203,6 +203,7 @@ SystemID N64
 3830E0	d	h	1	RDRAM	FF question object pointer
 383190	b	h	1	RDRAM	Loading Zones Disabled
 3831AC	b	h	1	RDRAM	Lair Water Level
+3831C2	w	h	1	RDRAM	FF Pattern
 3831E7	b	u	1	RDRAM	BB Active (Checksummed)
 3831EA	b	u	1	RDRAM	BB Active (Checksummed)
 3831EB	b	b	1	RDRAM	BB Type (Checksummed)

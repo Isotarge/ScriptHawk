@@ -261,6 +261,7 @@ Game.Memory = {
 	["current_movement_state"] = {0x37DB34, 0x37DC64, 0x37C364, 0x37D164},
 	["map"] = {0x37F2C5, 0x37F405, 0x37DAF5, 0x37E8F5},
 	["ff_question_pointer"] = {0x383AC0, 0x383C20, 0x382300, 0x3830E0},
+	["ff_pattern"] = {0x383BA2, 0x383D02, 0x3823E2, 0x3831C2},
 	["collectable_base"] = {0x386910, 0x386A70, 0x385150, 0x385F30},
 	["object_array_pointer"] = {0x36EAE0, 0x36F260, 0x36D760, 0x36E560},
 	["struct_array_pointer"] = {nil, nil, nil, 0x36E7C8}, -- TODO: Other versions
@@ -275,17 +276,13 @@ function Game.detectVersion(romName, romHash)
 		framebuffer.width = 292;
 		framebuffer.height = 216;
 		clip_vel = -2900;
-		Game.allowFurnaceFunPatch = false; -- TODO: FF Patch for this version
 		max_air = 6 * 500;
 	elseif romHash == "90726D7E7CD5BF6CDFD38F45C9ACBF4D45BD9FD8" then -- Japan
 		version = 2;
-		Game.allowFurnaceFunPatch = false; -- TODO: FF Patch for this version
 	elseif romHash == "DED6EE166E740AD1BC810FD678A84B48E245AB80" then -- USA 1.1
 		version = 3;
-		Game.allowFurnaceFunPatch = false; -- TODO: FF Patch for this version
 	elseif romHash == "1FE1632098865F639E22C11B9A81EE8F29C75D7A" then -- USA 1.0
 		version = 4;
-		Game.allowFurnaceFunPatch = true;
 	else
 		return false;
 	end
@@ -1984,19 +1981,46 @@ end
 -- Furnace fun stuff --
 -----------------------
 
-local function applyFurnaceFunPatch() -- TODO: Can we just read the FF bytes from EEPROM?
-	if Game.allowFurnaceFunPatch and forms.ischecked(ScriptHawk.UI.form_controls.allow_ff_patch) then
-		mainmemory.write_u16_be(0x320064, 0x080A);
-		mainmemory.write_u16_be(0x320066, 0x1840);
-
-		mainmemory.write_u16_be(0x286100, 0xAC86);
-		mainmemory.write_u16_be(0x286102, 0x2DC8);
-		mainmemory.write_u16_be(0x286104, 0x0C0C);
-		mainmemory.write_u16_be(0x286106, 0x8072);
-
-		mainmemory.write_u16_be(0x28610C, 0x080C);
-		mainmemory.write_u16_be(0x28610E, 0x801B);
+function patternToEEPROM(index)
+	if index < 0 or index > 255 then
+		return 0x0008;
 	end
+
+	local indexScaled = math.floor(index / 2) + 0x80;
+	local mostSignificantDigit = math.floor(indexScaled / 16);
+	local leastSignificantDigit = indexScaled % 16;
+
+	local value = leastSignificantDigit * 0x1000 + mostSignificantDigit;
+	if index % 2 == 1 then
+		value = value + 0x800;
+	end
+	return value;
+end
+
+function EEPROMToPattern(index)
+	local leastSignificantDigit = math.floor(index / 0x1000);
+	local mostSignificantDigit = index % 16;
+	local scaledIndex = (((mostSignificantDigit * 16) + leastSignificantDigit) - 0x80) * 2;
+	if index - (leastSignificantDigit * 0x1000) - mostSignificantDigit == 0x800 then
+		return math.max(0, scaledIndex + 1);
+	end
+	return math.max(0, scaledIndex);
+end
+
+function Game.getFFPattern()
+	return EEPROMToPattern(mainmemory.read_u16_be(Game.Memory.ff_pattern[version]));
+end
+
+-- The original method of detecting FF pattern index, written by BonaparteZ
+-- Writes the pattern in to the player's Gold Feather count upon generation
+-- Only works with US 1.0
+local function applyFurnaceFunPatch()
+	mainmemory.write_u32_be(0x320064, 0x080A1840);
+
+	mainmemory.write_u32_be(0x286100, 0xAC862DC8); -- sw a2, 11720(a0)
+	mainmemory.write_u32_be(0x286104, 0x0C0C8072); -- jal 803201C8
+
+	mainmemory.write_u32_be(0x28610C, 0x080C801B);
 end
 
 -- Relative to question object
@@ -2572,9 +2596,6 @@ end
 
 function Game.initUI()
 	ScriptHawk.UI.form_controls.toggle_neverslip = forms.checkbox(ScriptHawk.UI.options_form, "Never Slip", ScriptHawk.UI.col(0) + ScriptHawk.UI.dropdown_offset, ScriptHawk.UI.row(6) + ScriptHawk.UI.dropdown_offset);
-	if Game.allowFurnaceFunPatch then
-		ScriptHawk.UI.form_controls.allow_ff_patch = forms.checkbox(ScriptHawk.UI.options_form, "Allow FF patch", ScriptHawk.UI.col(0) + ScriptHawk.UI.dropdown_offset, ScriptHawk.UI.row(7) + ScriptHawk.UI.dropdown_offset);
-	end
 
 	ScriptHawk.UI.form_controls.encircle_checkbox = forms.checkbox(ScriptHawk.UI.options_form, "Encircle (Beta)", ScriptHawk.UI.col(5) + ScriptHawk.UI.dropdown_offset, ScriptHawk.UI.row(4) + ScriptHawk.UI.dropdown_offset);
 	ScriptHawk.UI.form_controls.dynamic_radius_checkbox = forms.checkbox(ScriptHawk.UI.options_form, "Dynamic Radius", ScriptHawk.UI.col(5) + ScriptHawk.UI.dropdown_offset, ScriptHawk.UI.row(5) + ScriptHawk.UI.dropdown_offset);
@@ -2597,7 +2618,6 @@ function Game.initUI()
 end
 
 function Game.eachFrame()
-	applyFurnaceFunPatch();
 	updateWave();
 	freezeClipVelocity();
 
@@ -2652,6 +2672,7 @@ Game.OSD = {
 	{"Slope Timer", Game.getSlopeTimer, Game.colorSlopeTimer},
 	{"Grounded", Game.getGroundState},
 	--{"FF Answer", getCorrectFFAnswer},
+	{"FF Pattern", Game.getFFPattern},
 };
 
 return Game;
