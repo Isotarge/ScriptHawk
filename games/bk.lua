@@ -66,20 +66,12 @@ local max_air = 6 * 600; -- 6 * 500 on PAL
 local max_mumbo_tokens = 99;
 local max_jiggies = 100;
 
-local eep_checksum_offsets = {
-	0x74,
-	0xEC,
-	0x164,
-	0x1DC,
-	0x1FC
-};
-
-local eep_checksum_values = {
-	0x00000000,
-	0x00000000,
-	0x00000000,
-	0x00000000,
-	0x00000000
+local eep_checksum = {
+	{ address = 0x74, value = 0 }, -- Save Slot 1
+	{ address = 0xEC, value = 0 }, -- Save Slot 2
+	{ address = 0x164, value = 0 }, -- Save Slot 3
+	{ address = 0x1DC, value = 0 }, -- Save Slot 4
+	{ address = 0x1FC, value = 0 }, -- Global flags
 };
 
 Game.maps = {
@@ -288,8 +280,8 @@ function Game.detectVersion(romName, romHash)
 	end
 
 	-- Read EEPROM checksums
-	for i = 1, #eep_checksum_offsets do
-		eep_checksum_values[i] = memory.read_u32_be(eep_checksum_offsets[i], "EEPROM");
+	for i = 1, #eep_checksum do
+		eep_checksum[i].value = memory.read_u32_be(eep_checksum[i].address, "EEPROM");
 	end
 
 	return true;
@@ -2635,11 +2627,11 @@ function Game.eachFrame()
 
 	-- Check EEPROM checksums
 	local checksum_value;
-	for i = 1, #eep_checksum_offsets do
-		checksum_value = memory.read_u32_be(eep_checksum_offsets[i], "EEPROM");
-		if eep_checksum_values[i] ~= checksum_value then
-			print("Slot "..i.." Checksum: "..toHexString(eep_checksum_values[i], 8).." -> "..toHexString(checksum_value, 8));
-			eep_checksum_values[i] = checksum_value;
+	for i = 1, #eep_checksum do
+		checksum_value = memory.read_u32_be(eep_checksum[i].address, "EEPROM");
+		if eep_checksum[i].value ~= checksum_value then
+			print("Slot "..i.." Checksum: "..toHexString(eep_checksum[i].value, 8).." -> "..toHexString(checksum_value, 8));
+			eep_checksum[i].value = checksum_value;
 		end
 	end
 end
