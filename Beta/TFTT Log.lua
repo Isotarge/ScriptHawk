@@ -24,7 +24,7 @@ function rPrint(s, l, i) -- recursive Print (structure, limit, indent)
 		if (l < 0) then break end
 	end
 	return l
-end	
+end
 
 local displayModes = {
 	"General",
