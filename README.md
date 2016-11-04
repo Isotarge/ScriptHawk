@@ -70,9 +70,10 @@ A collection of Lua scripts and RAM watches for [BizHawk](https://github.com/TAS
 
 ###Ocarina of Time & Majora's Mask
 While ScriptHawk does have basic support for OoT and MM there are people who are much more dedicated to these games than I will ever be. Check out the great work at the following GitHub repos for more comprehensive support:  
-- [notwa/mm](https://github.com/notwa/mm/tree/master/Lua)  
-- [RainingChain/Z64LuaHooks](https://github.com/RainingChain/Z64LuaHooks)  
+- [notwa/mm](https://github.com/notwa/mm/tree/master/Lua)
+- [RainingChain/Z64LuaHooks](https://github.com/RainingChain/Z64LuaHooks)
 - [mattpilla/Majora-s-Mask-Lua-Scripts](https://github.com/mattpilla/Majora-s-Mask-Lua-Scripts)
+- [glankk/gz](https://github.com/glankk/gz)
 
 ##Partially Supported Games
 - Elmo's Number Journey (N64 only)
@@ -90,6 +91,7 @@ While ScriptHawk does have basic support for OoT and MM there are people who are
 - Wonder Boy III RNG watch, written by [The8bitbeast](https://twitter.com/the8bitbeast)
 
 ##Other Notable BizHawk + Lua Projects
+- Banjo-Kazooie [MittenzHugg/Banjo-KazooC](https://github.com/MittenzHugg/Banjo-KazooC)
 - GoldenEye [Wyst3r/GoldenEye](https://bitbucket.org/Wyst3r/bizhawklua)
 - Mario Kart 64 [weatherton/BizHawkMarioKart64](https://github.com/weatherton/BizHawkMarioKart64)
 - Super Mario World [rodamaral/smw-tas](https://github.com/rodamaral/smw-tas)
