@@ -101,13 +101,20 @@ SystemID N64
 37C0C0	d	f	1	RDRAM	Unknown Float (Beak Buster?)
 37C0C4	d	f	1	RDRAM	Unknown Float (Beak Buster?)
 37C0E0	d	h	1	RDRAM	Player Model Pointer?
-37C0E6	b	u	1	RDRAM	Player Transparancy
+37C0E6	b	u	1	RDRAM	Player Opacity
 37C0EC	d	f	1	RDRAM	Player Scale
 37C120	d	f	1	RDRAM	X Disjoint Amount
 37C124	d	f	1	RDRAM	Y Disjoint Amount
 37C128	d	f	1	RDRAM	Z Disjoint Amount
 37C1D1	b	u	1	RDRAM	Standing on Fly Pad
 37C1D2	b	u	1	RDRAM	Standing on Shock Spring Pad
+37C274	d	u	1	RDRAM	Enable Collision State
+37C278	b	h	1	RDRAM	Water Collision
+37C279	b	h	1	RDRAM	Ground Collision 1
+37C27B	b	h	1	RDRAM	Ground Collision 2
+37C27D	b	h	1	RDRAM	Wall Collision
+37C27E	b	h	1	RDRAM	Enable Jumping From Water Surface
+37C284	d	u	1	RDRAM	Friction State
 37C2D3	b	u	1	RDRAM	Mumbo Transformation
 37C2E4	d	f	1	RDRAM	Slope Timer
 37C397	b	u	1	RDRAM	Standing on Mumbo Pad
@@ -193,6 +200,10 @@ SystemID N64
 3810B8	d	f	1	RDRAM	FF Answer Timer
 381FA0	d	h	1	RDRAM	Note renderer block pointer?
 38214B	b	u	1	RDRAM	Standing on switch
+382360	d	h	1	RDRAM	Map Vert List Pointer?
+382364	d	h	1	RDRAM	Water Vert List Pointer?
+382368	d	h	1	RDRAM	Map Geometry Pointer
+38236C	d	h	1	RDRAM	Water Geometry Pointer
 382F20	d	h	1	RDRAM	Textbox object pointer
 383012	b	u	1	RDRAM	Current Pause Menu Item
 383020	d	h	1	RDRAM	"Return to Game" Pointer
