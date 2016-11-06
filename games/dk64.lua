@@ -500,7 +500,7 @@ obj_model1 = {
 		[18] = "Rambi Box",
 		[19] = "Barrel (Diddy 5DI)",
 		--[20] = "Unknown", -- Possibily some kind of cutscene controller
-		[21] = "Pushable Box", -- TODO: Unused?
+		[21] = "Pushable Box",
 		[22] = "Barrel Spawner", -- TODO: Unused?
 		[23] = "Cannon",
 		[25] = "Hunky Chunky Barrel",
@@ -523,7 +523,7 @@ obj_model1 = {
 		[42] = "Grape",
 		[43] = "Feather",
 		[44] = "Laser", -- Projectile
-		[45] = "Golden Banana", -- TODO: Unused? There are normally model 2
+		[45] = "Golden Banana", -- TODO: Unused? These are normally model 2
 		[47] = "Watermelon Slice",
 		[48] = "Coconut",
 		[49] = "Rocketbarrel",
@@ -596,7 +596,7 @@ obj_model1 = {
 		[128] = "Headphones",
 		[129] = "Enguarde Box",
 		[130] = "Apple", -- Fungi
-		[132] = "Enguarde Box", -- TODO: Does this work? Unused?
+		[132] = "Enguarde Box (Unused?)",
 		[133] = "Barrel",
 		[134] = "Training Barrel",
 		[135] = "Boombox (Treehouse)",
@@ -2977,6 +2977,54 @@ function getTotalMemory()
 	return "Unknown";
 end
 
+----------------------------
+-- Dynamic Water Surfaces --
+----------------------------
+
+local dynamicWaterSurfacePointer = 0x7F93C0;
+local dynamicWaterSurface = {
+	["timer_1"] = 0x30,
+	["timer_2"] = 0x34,
+	["next_surface_pointer"] = 0x50,
+};
+
+function dumpWaterSurfaces()
+	local waterSurface = dereferencePointer(dynamicWaterSurfacePointer);
+	if isRDRAM(waterSurface) then
+		while isRDRAM(waterSurface) do
+			local t1Str = " timer1: "..mainmemory.read_u32_be(waterSurface + dynamicWaterSurface.timer_1);
+			local t2Str = " timer2: "..mainmemory.read_u32_be(waterSurface + dynamicWaterSurface.timer_2);
+			print(toHexString(waterSurface)..t1Str..t2Str);
+			waterSurface = dereferencePointer(waterSurface + dynamicWaterSurface.next_surface_pointer);
+		end
+	else
+		print("There is no dynamic water currently loaded.");
+	end
+end
+
+surfaceTimerHack = 0;
+surfaceTimerHackInterval = 100;
+
+function increaseSurfaceTimerHack()
+	surfaceTimerHack = surfaceTimerHack + surfaceTimerHackInterval;
+end
+
+function decreaseSurfaceTimerHack()
+	surfaceTimerHack = surfaceTimerHack - surfaceTimerHackInterval;
+end
+
+--ScriptHawk.bindKeyFrame("K", decreaseSurfaceTimerHack, false);
+--ScriptHawk.bindKeyFrame("L", increaseSurfaceTimerHack, false);
+
+function setWaterSurfaceTimers(value)
+	local waterSurface = dereferencePointer(dynamicWaterSurfacePointer);
+	while isRDRAM(waterSurface) do
+		mainmemory.write_u32_be(waterSurface + dynamicWaterSurface.timer_1, value);
+		mainmemory.write_u32_be(waterSurface + dynamicWaterSurface.timer_2, value);
+		waterSurface = dereferencePointer(waterSurface + dynamicWaterSurface.next_surface_pointer);
+	end
+end
+
 -------------------
 -- Physics/Scale --
 -------------------
@@ -5252,6 +5300,7 @@ function Game.eachFrame()
 	-- TODO: This is really slow and doesn't cover all memory domains
 	--memoryStatCache = getMemoryStats(dereferencePointer(Game.Memory.linked_list_pointer[version]));
 
+	--setWaterSurfaceTimers(surfaceTimerHack);
 	--koshBotLoop(); -- TODO: This probably stops the virtual pad from working
 	--Game.unlockMenus(); -- TODO: Allow user to toggle this
 
