@@ -84,6 +84,7 @@ Game.Memory = {
 	["obj_model2_collision_linked_list_pointer"] = {0x754244, 0x74E9A4, 0x753B34, 0x6FF054},
 	["map_base"] = {0x7F5DE0, 0x7F5D00, 0x7F6250, 0x7A1E90},
 	["vert_base"] = {0x7F5DE8, 0x7F5D08, 0x7F6258, 0x7A1E98},
+	["water_surface_list"] = {0x7F93C0, 0x7F92E0, 0x7F9830, nil}, -- TODO: Kiosk
 };
 
 Game.modes = {
@@ -2981,7 +2982,6 @@ end
 -- Dynamic Water Surfaces --
 ----------------------------
 
-local dynamicWaterSurfacePointer = 0x7F93C0;
 local dynamicWaterSurface = {
 	["timer_1"] = 0x30,
 	["timer_2"] = 0x34,
@@ -2989,7 +2989,7 @@ local dynamicWaterSurface = {
 };
 
 function dumpWaterSurfaces()
-	local waterSurface = dereferencePointer(dynamicWaterSurfacePointer);
+	local waterSurface = dereferencePointer(Game.Memory.water_surface_list[version]);
 	if isRDRAM(waterSurface) then
 		while isRDRAM(waterSurface) do
 			local t1Str = " timer1: "..mainmemory.read_u32_be(waterSurface + dynamicWaterSurface.timer_1);
@@ -3017,7 +3017,7 @@ end
 --ScriptHawk.bindKeyFrame("L", increaseSurfaceTimerHack, false);
 
 function setWaterSurfaceTimers(value)
-	local waterSurface = dereferencePointer(dynamicWaterSurfacePointer);
+	local waterSurface = dereferencePointer(Game.Memory.water_surface_list[version]);
 	while isRDRAM(waterSurface) do
 		mainmemory.write_u32_be(waterSurface + dynamicWaterSurface.timer_1, value);
 		mainmemory.write_u32_be(waterSurface + dynamicWaterSurface.timer_2, value);
