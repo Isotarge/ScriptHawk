@@ -403,20 +403,28 @@ M=MMM
 R=RBB
 C=CCW
 
---------------------------
--- Cauldron stuff (PAL) --
---------------------------
+--------------------
+-- Cauldron stuff --
+--------------------
 
-0x383B91
-.4.. .... - Red CCW Lobby
-..2. .... - Red near CC Lobby
+Is this part of the EEPROM save file in RAM?
+Changing the value updates something close to it that looks like a checksum
 
-0x383B92
-.... .4.. - 810 room
-.... ..2. - FF room
+0x3831B1 USA 1.0
+0x3823D1 USA 1.1
+0x383B91 Europe
+0x383CF1 Japan
 
-80383B91 0060
-80383B92 0004
+.4.. .... .... .... - Red CCW Lobby
+..2. .... .... .... - Red near CC Lobby
+...1 .... .... .... - Green RBB Lobby
+.... 8... .... .... - Green FP Lobby
+.... .4.. .... .... - Pink FP Lobby
+.... ..2. .... .... - Pink near TTC/CC Puzzles
+.... .... .... .4.. - Gold 810 room
+.... .... .... ..2. - Gold FF room
+
+81383B91 6004 PAL
 
 Lives:
 8038696B 0007

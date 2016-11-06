@@ -857,7 +857,7 @@ local movementStates = {
 	[0x69] = "Joining", -- Split up pad
 	[0x6A] = "Joining", -- Split up pad
 
-	[0x6C] = "Backflip", -- Solo Banjo -- TODO: What is the name for this?
+	[0x6C] = "Failed Flip", -- Solo Banjo Z+A
 	[0x6D] = "Diving", -- Solo Banjo
 
 	[0x6E] = "Locked", -- Sack Pack, Talking, moving to target

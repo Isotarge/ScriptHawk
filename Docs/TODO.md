@@ -7,13 +7,11 @@
 		- I think it'd be fun to bulk support SMS games since the object layout is so simple :P
 	- Move from x, y, z variables to position/rotation/velocity etc. tables with x, y, z indexes
 - General: UI to load ASM patches, can currently only be done by calling loadASMPatch(filename, suppressprint) in the lua console
-- DK64: Find menu cutscene flags
-- DK64: Finish flag documentation
-	- Figure out how to reliably find flag block on any frame
-		- The current method reads the pointer from what I assume is the stack and this doesn't work on lag frames
-		- There are other pointers to the flag block (in non-global space?), these might be a clue
+- DK64:
+	- Find menu cutscene flags
+	- Finish flag documentation
 	- Implement framework to detect when flags are set/cleared & print to console
-- DK64: Exception when gui.cleargraphics() is called on first frame (by MJ minimap)
+	- Exception when gui.cleargraphics() is called on first frame (by MJ minimap)
 - BK: Integrate flags (and many other finds) from Bitalive's research https://docs.google.com/document/d/1Gek6Bkfcy1RHSDTBa3L3fEzJhaWROX3hfcmOrcekTV0/edit
 
 ##Low priority, recurring, or waiting:

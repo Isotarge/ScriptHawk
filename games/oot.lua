@@ -56,10 +56,13 @@ function Game.detectVersion(romName, romHash)
 	x_rot = facing_angle - 2;
 	z_rot = facing_angle + 2;
 
-	print("While ScriptHawk does have basic support for OOT/MM there are people who are much more dedicated to these games than I will ever be.");
-	print("Check out the great work at the following GitHub repos for more comprehensive support:");
-	print("https://github.com/notwa/mm/tree/master/Lua");
-	print("https://github.com/RainingChain/Z64LuaHooks");
+	dprint("While ScriptHawk does have basic support for OOT/MM there are people who are much more dedicated to these games than I will ever be.");
+	dprint("Check out the great work at the following GitHub repos for more comprehensive support:");
+	dprint("https://github.com/notwa/mm/tree/master/Lua");
+	dprint("https://github.com/RainingChain/Z64LuaHooks");
+	dprint("https://github.com/mattpilla/Majora-s-Mask-Lua-Scripts");
+	dprint("https://github.com/glankk/gz");
+	print_deferred();
 
 	return true;
 end

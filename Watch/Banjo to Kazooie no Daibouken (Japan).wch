@@ -75,6 +75,7 @@ SystemID N64
 383B6C	d	h	1	RDRAM	"Save and Quit" Pointer
 383BC0	b	h	1	RDRAM	"Return to Lair" Enabled
 383C20	d	h	1	RDRAM	FF Question Pointer
+383CF1	w	h	1	RDRAM	Cauldron Bitfield
 383D02	w	h	1	RDRAM	FF Pattern
 383E20	d	h	1	RDRAM	Honeycomb Bitfield
 383E68	b	h	1	RDRAM	Sandcastle Water State

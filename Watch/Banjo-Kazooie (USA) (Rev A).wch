@@ -59,6 +59,7 @@ SystemID N64
 38224C	d	h	1	RDRAM	"Save and Quit" Pointer
 3822A0	b	h	1	RDRAM	"Return to Lair" Enabled
 382300	d	h	1	RDRAM	FF Question Pointer
+3823D1	w	h	1	RDRAM	Cauldron Bitfield
 3823E2	w	h	1	RDRAM	FF Pattern
 382500	d	h	1	RDRAM	Honeycomb Bitfield
 382548	b	h	1	RDRAM	Sandcastle Water State
