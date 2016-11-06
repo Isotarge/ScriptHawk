@@ -3096,9 +3096,7 @@ function Game.setMovementState(value)
 end
 Game.setControlState = Game.setMovementState;
 
--- TODO: Game.getWaterHeight()
-
-function Game.getAnimTimer1()
+function Game.getAnimationTimer1()
 	local playerObject = Game.getPlayerObject();
 	if isRDRAM(playerObject) then
 		local renderingParams = dereferencePointer(playerObject + obj_model1.rendering_parameters_pointer);
@@ -3109,7 +3107,17 @@ function Game.getAnimTimer1()
 	return 0;
 end
 
-function Game.getAnimTimer2()
+function Game.setAnimationTimer1(value)
+	local playerObject = Game.getPlayerObject();
+	if isRDRAM(playerObject) then
+		local renderingParams = dereferencePointer(playerObject + obj_model1.rendering_parameters_pointer);
+		if isRDRAM(renderingParams) then
+			mainmemory.writefloat(renderingParams + obj_model1.rendering_parameters.anim_timer1, value, true);
+		end
+	end
+end
+
+function Game.getAnimationTimer2()
 	local playerObject = Game.getPlayerObject();
 	if isRDRAM(playerObject) then
 		local renderingParams = dereferencePointer(playerObject + obj_model1.rendering_parameters_pointer);
@@ -3120,7 +3128,17 @@ function Game.getAnimTimer2()
 	return 0;
 end
 
-function Game.getAnimTimer3()
+function Game.setAnimationTimer2(value)
+	local playerObject = Game.getPlayerObject();
+	if isRDRAM(playerObject) then
+		local renderingParams = dereferencePointer(playerObject + obj_model1.rendering_parameters_pointer);
+		if isRDRAM(renderingParams) then
+			mainmemory.writefloat(renderingParams + obj_model1.rendering_parameters.anim_timer2, value, true);
+		end
+	end
+end
+
+function Game.getAnimationTimer3()
 	local playerObject = Game.getPlayerObject();
 	if isRDRAM(playerObject) then
 		local renderingParams = dereferencePointer(playerObject + obj_model1.rendering_parameters_pointer);
@@ -3131,7 +3149,17 @@ function Game.getAnimTimer3()
 	return 0;
 end
 
-function Game.getAnimTimer4()
+function Game.setAnimationTimer3(value)
+	local playerObject = Game.getPlayerObject();
+	if isRDRAM(playerObject) then
+		local renderingParams = dereferencePointer(playerObject + obj_model1.rendering_parameters_pointer);
+		if isRDRAM(renderingParams) then
+			mainmemory.writefloat(renderingParams + obj_model1.rendering_parameters.anim_timer3, value, true);
+		end
+	end
+end
+
+function Game.getAnimationTimer4()
 	local playerObject = Game.getPlayerObject();
 	if isRDRAM(playerObject) then
 		local renderingParams = dereferencePointer(playerObject + obj_model1.rendering_parameters_pointer);
@@ -3140,6 +3168,16 @@ function Game.getAnimTimer4()
 		end
 	end
 	return 0;
+end
+
+function Game.setAnimationTimer4(value)
+	local playerObject = Game.getPlayerObject();
+	if isRDRAM(playerObject) then
+		local renderingParams = dereferencePointer(playerObject + obj_model1.rendering_parameters_pointer);
+		if isRDRAM(renderingParams) then
+			mainmemory.writefloat(renderingParams + obj_model1.rendering_parameters.anim_timer4, value, true);
+		end
+	end
 end
 
 --------------
@@ -5436,10 +5474,10 @@ Game.standardOSD = {
 	{"Movement", Game.getMovementState},
 	--{"Camera", Game.getCameraState},
 	--{"Separator", 1},
-	--{"Anim Timer 1", Game.getAnimTimer1},
-	--{"Anim Timer 2", Game.getAnimTimer2},
-	--{"Anim Timer 3", Game.getAnimTimer3},
-	--{"Anim Timer 4", Game.getAnimTimer4},
+	--{"Anim Timer 1", Game.getAnimationTimer1},
+	--{"Anim Timer 2", Game.getAnimationTimer2},
+	--{"Anim Timer 3", Game.getAnimationTimer3},
+	--{"Anim Timer 4", Game.getAnimationTimer4},
 	{"Separator", 1},
 	{"Bone Array 1", Game.getOSDBoneArray1},
 	{"Stored X1", Game.getStoredX1},
