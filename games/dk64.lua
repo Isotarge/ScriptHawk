@@ -84,7 +84,7 @@ Game.Memory = {
 	["obj_model2_collision_linked_list_pointer"] = {0x754244, 0x74E9A4, 0x753B34, 0x6FF054},
 	["map_base"] = {0x7F5DE0, 0x7F5D00, 0x7F6250, 0x7A1E90},
 	["vert_base"] = {0x7F5DE8, 0x7F5D08, 0x7F6258, 0x7A1E98},
-	["water_surface_list"] = {0x7F93C0, 0x7F92E0, 0x7F9830, nil}, -- TODO: Kiosk
+	["water_surface_list"] = {0x7F93C0, 0x7F92E0, 0x7F9830, 0x7B48A0},
 };
 
 Game.modes = {
@@ -2982,6 +2982,14 @@ end
 -- Dynamic Water Surfaces --
 ----------------------------
 
+local dynamicWaterSurfaceKiosk = {
+	["timer_1"] = 0x24,
+	["timer_2"] = 0x28,
+	["timer_3"] = 0x2C,
+	["timer_4"] = 0x30,
+	["next_surface_pointer"] = 0x44,
+};
+
 local dynamicWaterSurface = {
 	["timer_1"] = 0x30,
 	["timer_2"] = 0x34,
@@ -2989,6 +2997,23 @@ local dynamicWaterSurface = {
 };
 
 function dumpWaterSurfaces()
+	if version == 4 then
+		local waterSurface = dereferencePointer(Game.Memory.water_surface_list[version]);
+		if isRDRAM(waterSurface) then
+			while isRDRAM(waterSurface) do
+				local t1Str = " timer1: "..mainmemory.read_u32_be(waterSurface + dynamicWaterSurfaceKiosk.timer_1);
+				local t2Str = " timer2: "..mainmemory.read_u32_be(waterSurface + dynamicWaterSurfaceKiosk.timer_2);
+				local t3Str = " timer3: "..mainmemory.read_u32_be(waterSurface + dynamicWaterSurfaceKiosk.timer_3);
+				local t4Str = " timer4: "..mainmemory.read_u32_be(waterSurface + dynamicWaterSurfaceKiosk.timer_4);
+				print(toHexString(waterSurface)..t1Str..t2Str..t3Str..t4Str);
+				waterSurface = dereferencePointer(waterSurface + dynamicWaterSurfaceKiosk.next_surface_pointer);
+			end
+		else
+			print("There is no dynamic water currently loaded.");
+		end
+		return;
+	end
+
 	local waterSurface = dereferencePointer(Game.Memory.water_surface_list[version]);
 	if isRDRAM(waterSurface) then
 		while isRDRAM(waterSurface) do
@@ -3017,6 +3042,18 @@ end
 --ScriptHawk.bindKeyFrame("L", increaseSurfaceTimerHack, false);
 
 function setWaterSurfaceTimers(value)
+	if version == 4 then
+		local waterSurface = dereferencePointer(Game.Memory.water_surface_list[version]);
+		while isRDRAM(waterSurface) do
+			mainmemory.write_u32_be(waterSurface + dynamicWaterSurfaceKiosk.timer_1, value);
+			mainmemory.write_u32_be(waterSurface + dynamicWaterSurfaceKiosk.timer_2, value);
+			mainmemory.write_u32_be(waterSurface + dynamicWaterSurfaceKiosk.timer_3, value);
+			mainmemory.write_u32_be(waterSurface + dynamicWaterSurfaceKiosk.timer_4, value);
+			waterSurface = dereferencePointer(waterSurface + dynamicWaterSurfaceKiosk.next_surface_pointer);
+		end
+		return;
+	end
+
 	local waterSurface = dereferencePointer(Game.Memory.water_surface_list[version]);
 	while isRDRAM(waterSurface) do
 		mainmemory.write_u32_be(waterSurface + dynamicWaterSurface.timer_1, value);
