@@ -1,5 +1,6 @@
 #ScriptHawk TODO list
 ##High Priority
+- Break out helper functions in to a "libscripthawk" file for standalone scripts that need them and don't want to be a full fat game module
 - General: Rework input/keybinds, multiple profiles like wasd/arrow keys
 - General: 2D game support
 	- Integrate SMS object viewers into ScriptHawk.lua
@@ -16,7 +17,7 @@
 
 ##Low priority, recurring, or waiting:
 - Object Analysis Tools:
-	- Find a decent object/struct format that has a good balance between documentation, useability, flexibility and speed
+	- Find a decent object/struct format that has a good balance between documentation, useability, flexibility, and speed
 		- Metatable?
 		- Standardize the type names and getters between BK & SM64
 - General: Detailed watch toggle (checkbox maybe)
