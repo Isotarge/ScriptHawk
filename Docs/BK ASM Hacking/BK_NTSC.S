@@ -1,9 +1,9 @@
 /*-------------------------------
 | VARIABLES
 ---------------------------------*/
-[PauseMenuStringsBase]:0x8036C4E0
+[PauseMenuStringsBase]: 0x8036C4E0
 
-[PlayerPointer]:0x8037BF20
+[PlayerPointer]: 0x8037BF20
 
 [XPos]: 0x8037C5A0
 
@@ -15,34 +15,36 @@
 
 [ReturnToLairEnabled]: 0x80383080
 
-
-
 /*-------------------------------
 | Functions
 ---------------------------------*/
 /* 
-   NOTE: Consecutive functions identify no unknown functions in between 
-   NOTE 2: If inputs or outputs are not listed, assume they are void
+	NOTE: Consecutive functions identify no unknown functions in between 
+	NOTE 2: If inputs or outputs are not listed, assume they are void
 */
 
-[GetPIStatusReg]: 0x8000210C ;Outputs: [word $v0]
+[GetPIStatusReg]: 0x800020E0 ;Outputs: [word $v0]
 
 [SetCOP0StatusRegister]: 0x80002190 ;Inputs: (word $a0 input)                                 
-[GetCOP0StatusRegister]: 0x800021a0 ;Outputs: [word $v0]
+[GetCOP0StatusRegister]: 0x800021A0 ;Outputs: [word $v0]
 
 [SetStatusRegister]: 0x80003FE0 ;Inputs: (word $a0 input)
 
-[GetGlobalOnCounter]: 0x8023DB5C; Outputs: [word $v0]
+[GetGlobalOnCounter]: 0x8023DB5C ;Outputs: [word $v0]
+[ResetGlobalOnCounter]: 0x8023DB68
 
 [IncrementGlobalOnCounter]: 0x8023DCDC
+[DecrementGlobalOnCounter]: 0x8023DCF4
 
 [SetApplyButtonInputsToBanjoFlag]: 0x8023E06C
 
 [SetFrameSkip]: 0x8024BF94 ;Inputs: (word $a0 input) 
 [GetFrameSkip]: 0x8024BFA0 ;Outputs: [word $v0] //normally 2 but sometimes 3 eg. GV lobby
 
+[CopyCameraXYZRotation]: 0x8024C764 ;Inputs: (float* $a0 destinationXPtr)
+[GetCamera_YRotation]: 0x8024C788 ;Outputs: [float $f0]
 
-
+[SetCamera_XYZPosition]: 0x8024CD88 ;Inputs: (float* $a0 xPosPtr)
 
 [ClampInt]: 0x80257EA8 ;Inputs: (word $a0 input), (word $a1 lowerLimit), (word $a2 upperLimit)
                        ;Outputs: [word $v0]
@@ -70,15 +72,6 @@
 
 [GetXZVelocity]: 0x80297AB8 ;Outputs: [float $f0]
 
-[CopyCameraXYZRotation]: 0x8024C764 ;Inputs: (float* $a0 destinationXPtr)
-[GetCamera_YRotation]: 0x8024C788 ;Outputs: [float $f0]
-
-[SetCamera_XYZPosition]: 0x8024CD88 ;Inputs: (float* $a0 xPosPtr)
-
-
-
-
-
 [Print_TotalMenuFont]: 0x802F7870 ;Inputs: (word $a0 XPos), (word $a1 YPos), (word $a3 fontSize), (char* $a3 str)      
 
 [Print_CharFont]: 0x802F78FC ;Inputs: (word $a0 XPos), (word $a1 YPos), (char* $a2 str)
@@ -87,10 +80,9 @@
 
 [SpawnActor]: 0x8032813C ;Inputs: (word $a0 ActorIndex), (float* $a1 LocationXPtr), (??? $a2 ???)
 
-
-[AppendString]: 0x8033D670 ;Inputs: (char* $a0 destinationStr), (char* $a1 srcStr)
+[AppendString]: 0x8033D660 ;Inputs: (char* $a0 destinationStr), (char* $a1 srcStr)
 [AppendChar]: 0x8033D6A8 ;Inputs: (char* $a0 destinationStr), (char $a1 inputChar)
-                          
+
 [FToA]: 0x8033D7B0 ;Inputs: (char* $a0 destinationStr), (float $a1 inputFloat), (int $a2 float precision) //appends to destination string
 [IToA_10]: 0x8033D884 ;Inputs: (char* $a0 destinationStr), (word $a1 inputInt) //base 10
 [IToA]: 0x8033D884 ;Inputs: (char* $a0 destinationStr), (word $a1 inputInt), (word $a2 Radix)
@@ -99,8 +91,5 @@
 [CopyString]: 0x8033DA54 ;Inputs: (char* $a0 destinationStr), (char* $a1 srcStr)
 [GetStringSize]: 0x8033DA80 ;Inputs: (char* $a0 string)
                             ;Outputs: [word $v0]
-                            
+
 [ToUpper]: 0x8033DBA4 ;Inputs: (char* $a0 string)
-
-
-
