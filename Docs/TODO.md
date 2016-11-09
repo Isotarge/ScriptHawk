@@ -1,6 +1,5 @@
 #ScriptHawk TODO list
 ##High Priority
-- Break out helper functions in to a "libscripthawk" file for standalone scripts that need them and don't want to be a full fat game module
 - General: Rework input/keybinds, multiple profiles like wasd/arrow keys
 - General: 2D game support
 	- Integrate SMS object viewers into ScriptHawk.lua

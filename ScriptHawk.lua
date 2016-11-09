@@ -1,64 +1,5 @@
 ScriptHawk = {};
 
-if emu.getsystemid() == "N64" then
-	RDRAMBase = 0x80000000;
-	RDRAMSize = 0x800000; -- Halved with no expansion pak, can be read from 0x80000318
-
-	-- Checks whether a value falls within N64 RDRAM
-	function isRDRAM(value)
-		return type(value) == "number" and value >= 0 and value < RDRAMSize;
-	end
-
-	-- Checks whether a value is a pointer in to N64 RDRAM on the system bus
-	function isPointer(value)
-		return type(value) == "number" and value >= RDRAMBase and value < RDRAMBase + RDRAMSize;
-	end
-
-	-- Dereferences a N64 RDRAM pointer
-	-- Returns the RDRAM address pointed to if it's a valid pointer
-	-- Returns nil if invalid
-	function dereferencePointer(address)
-		if type(address) == "number" and address >= 0 and address < (RDRAMSize - 4) then
-			address = mainmemory.read_u32_be(address);
-			if isPointer(address) then
-				return address - RDRAMBase;
-			end
-		end
-	end
-end
-
-if emu.getsystemid() == "PSX" then
-	RAMBase = 0x80000000;
-	RAMSize = 0x200000;
-
-	function isPointer(addr)
-		if type(addr) ~= "number" then
-			return false;
-		end
-		return addr >= RAMBase and addr < RAMBase + RAMSize;
-	end
-
-	function isRAM(addr)
-		if type(addr) ~= "number" then
-			return false;
-		end
-		return addr >= 0 and addr < RAMSize;
-	end
-
-	function dereferencePointer(addr)
-		if isRAM(addr) then
-			addr = mainmemory.read_u32_le(addr);
-			if isPointer(addr) then
-				return addr - RAMBase;
-			end
-		end
-	end
-end
-
---------------------
--- UI State Table --
---------------------
-
 ScriptHawk.UI = {
 	["form_controls"] = {}, -- TODO: Detect UI position problems using this array
 	["form_padding"] = 8,
@@ -68,345 +9,55 @@ ScriptHawk.UI = {
 	["button_height"] = 23,
 };
 
-----------------------
--- Helper functions --
-----------------------
+---------------
+-- Libraries --
+---------------
 
-image_directory_root = ".\\Images\\";
-function fileExists(name)
-	if type(name) == 'string' then
-		local f = io.open(name, "r");
-		if f ~= nil then
-			io.close(f);
-			return true;
-		end
-	end
-	return false;
-end
-
-function round(num, idp)
-	return tonumber(string.format("%." .. (idp or 0) .. "f", num));
-end
-
-function isnan(x) return x ~= x end
-
-function divisibleBy(number, divisor)
-	if type(number) == "number" and (not isnan(number)) and number ~= 0 and type(divisor) == "number" and (not isnan(divisor)) and divisor ~= 0 then
-		local divValue = number / divisor;
-		return math.floor(divValue) == divValue;
-	end
-	return false;
-end
-
-function esc(str)
-	return (str:gsub('%%', '%%%%')
-		:gsub('%^', '%%%^')
-		:gsub('%$', '%%%$')
-		:gsub('%(', '%%%(')
-		:gsub('%)', '%%%)')
-		:gsub('%.', '%%%.')
-		:gsub('%[', '%%%[')
-		:gsub('%]', '%%%]')
-		:gsub('%*', '%%%*')
-		:gsub('%+', '%%%+')
-		:gsub('%-', '%%%-')
-		:gsub('%?', '%%%?'));
-end
-
-string.contains = function(haystack, needle)
-	return type(string.find(haystack, esc(needle))) == "number";
-end
-
-string.lpad = function(str, len, char)
-	if char == nil then char = ' ' end
-	return string.rep(char, len - #str) .. str
-end
-
-string.rpad = function(str, len, char)
-	if char == nil then char = ' ' end
-	return str .. string.rep(char, len - #str)
-end
-
-function toHexString(value, desiredLength, prefix)
-	value = string.format("%X", value or 0);
-	value = string.lpad(value, desiredLength or string.len(value), '0');
-	return (prefix or "0x")..value;
-end
-
-function toBinaryString(num, bits) -- TODO: Properly define behavior for negative numbers
-	if type(num) ~= "number" then
-		return "0";
-	end
-	bits = bits or select(2, math.frexp(num));
-	local t = {};
-	for b = bits, 1, -1 do
-		t[b] = math.fmod(num, 2);
-		num = (num - t[b]) / 2;
-	end
-	return table.concat(t);
-end
-
-function get_bit(field, index)
-	if index < 32 then
-		local bitmask = math.pow(2, index);
-		return bit.band(bitmask, field) == bitmask;
-	end
-	return false;
-end
-getBit = get_bit;
-check_bit = get_bit;
-checkBit = check_bit;
-
-function set_bit(field, index)
-	if index < 32 then
-		local bitmask = math.pow(2, index);
-		return bit.bor(bitmask, field);
-	end
-	return field;
-end
-setBit = set_bit;
-
-function clear_bit(field, index)
-	if index < 32 then
-		local bitmask = math.pow(2, index);
-		return bit.band(field, bit.bnot(bitmask));
-	end
-	return field;
-end
-clearBit = clear_bit;
-
-function toggle_bit(field, index)
-	if getBit(field, index) then
-		return clearBit(field, index);
-	end
-	return setBit(field, index);
-end
-toggleBit = toggle_bit;
-
-function deepcompare(t1, t2, ignore_mt)
-	local ty1 = type(t1);
-	local ty2 = type(t2);
-	if ty1 ~= ty2 then return false end
-	-- non-table types can be directly compared
-	if ty1 ~= 'table' and ty2 ~= 'table' then return t1 == t2 end
-	-- as well as tables which have the metamethod __eq
-	local mt = getmetatable(t1);
-	if not ignore_mt and mt and mt.__eq then return t1 == t2 end
-	for k1, v1 in pairs(t1) do
-		local v2 = t2[k1];
-		if v2 == nil or not deepcompare(v1,v2) then return false end
-	end
-	for k2, v2 in pairs(t2) do
-		local v1 = t1[k2];
-		if v1 == nil or not deepcompare(v1,v2) then return false end
-	end
-	return true;
-end
-
---       a  r  g  b
--- 0.0 = 7F 00 FF 00 = Green
--- 0.5 = 7F FF FF 00 = Yellow
--- 1.0 = 7F FF 00 00 = Red
-function getColour(ratio, alpha)
-	local green = 255;
-	local red = 255;
-	alpha = alpha or 255;
-
-	if ratio > 0.5 then
-		green = 255 - round(((ratio - 0.5) * 2) * 255);
-		red = 255;
-	elseif ratio < 0.5 then
-		red = round((ratio * 2) * 255);
-		green = 255;
-	end
-
-	return (alpha * 0x01000000) + (red * 0x00010000) + (green * 0x00000100);
-end
-getColor = getColour; -- To speak Americano
-
--- Finds the root of a linked list
-function find_root(object)
-	local count = 0;
-	local prevObject = object;
-	while object > 0 do
-		dprint(count..": "..toHexString(object + 0x10, 6, "").." Size: "..toHexString(prevObject - object));
-		prevObject = object;
-		object = mainmemory.read_u24_be(object + 1);
-		count = count + 1;
-	end
-	print_deferred();
-end
-findRoot = find_root;
-
--- Finds the root of a linked list, outputting object size
-function find_root_size(object)
-	local count = 0;
-	while object > 0 do
-		dprint(count..": "..toHexString(object + 0x10, 6, "").." Size: "..toHexString(mainmemory.read_u32_be(object + 4)));
-		object = mainmemory.read_u24_be(object + 1);
-		count = count + 1;
-	end
-	print_deferred();
-end
-findRootSize = find_root_size;
-
--- Finds the end of a linked list, outputting object size
-function traverse_size(object, minimumPrintSize, maximumPrintSize)
-	minimumPrintSize = minimumPrintSize or -math.huge;
-	maximumPrintSize = maximumPrintSize or math.huge;
-	local count = 0;
-	local size = 0;
-	local prev = 0;
-	repeat
-		count = count + 1;
-		size = mainmemory.read_u32_be(object + 4);
-		if size >= minimumPrintSize and size <= maximumPrintSize then
-			dprint(count..": "..toHexString(object + 0x10, 6, "").." "..(object + 0x10).." Size: "..toHexString(size));
-		end
-		object = object + 0x10 + size;
-		prev = mainmemory.read_u32_be(object);
-	until prev == 0 or not isRDRAM(object);
-	print_deferred();
-end
-traverseSize = traverse_size;
-
--- Finds the end of a linked list
-function traverse(object)
-	local count = 0;
-	local prevObject = object;
-	while isRDRAM(object) do
-		dprint(count..": "..toHexString(object + 0x10, 6, "").." Size: "..toHexString(object - prevObject));
-		prevObject = object;
-		object = dereferencePointer(object + 4);
-		count = count + 1;
-	end
-	print_deferred();
-end
-
-function getMemoryStats(object)
-	local size = 0;
-	local prev = 0;
-	local nextFree = 0;
-	local prevFree = 0;
-	local memoryStats = {
-		["free"] = 0,
-		["used"] = 0,
-	};
-	if isRDRAM(object) then
-		repeat
-			size = mainmemory.read_u32_be(object + 4); -- TODO: These offsets only apply to DK64's heap header
-			nextFree = dereferencePointer(object + 8);
-			prevFree = dereferencePointer(object + 12);
-			if isRDRAM(nextFree) or isRDRAM(prevFree) then
-				memoryStats.free = memoryStats.free + size;
-			else
-				memoryStats.used = memoryStats.used + size;
-			end
-			object = object + 0x10 + size;
-			prev = dereferencePointer(object);
-		until (not isRDRAM(prev)) or (not isRDRAM(object));
-	end
-	return memoryStats;
-end
-
-function mainmemory.readfloat_be(address)
-	return mainmemory.readfloat(address, true);
-end
-
-function mainmemory.writefloat_be(address, value)
-	mainmemory.writefloat(address, value, true);
-end
-
-function mainmemory.readfloat_le(address)
-	return mainmemory.readfloat(address, false);
-end
-
-function mainmemory.writefloat_le(address, value)
-	mainmemory.writefloat(address, value, false);
-end
-
--- Replaces all instances of a given value in memory
--- This logic is reused in the wrappers below
-function replace_memory(find, replace, read_function, write_function, stride)
-	for i = 0, RDRAMSize - stride, stride do
-		if read_function(i) == find then
-			dprint("Replaced "..toHexString(i, 6));
-			write_function(i, replace);
-		end
-	end
-	print_deferred();
-end
-
-function replacebyte(find, replace)
-	replace_memory(find, replace, mainmemory.readbyte, mainmemory.writebyte, 1);
-end
-replace_u8 = replacebyte;
-
-function replace_s8(find, replace)
-	replace_memory(find, replace, mainmemory.read_s8, mainmemory.write_s8, 1);
-end
-
-function replace_u16_be(find, replace)
-	replace_memory(find, replace, mainmemory.read_u16_be, mainmemory.write_u16_be, 2);
-end
-
-function replace_s16_be(find, replace)
-	replace_memory(find, replace, mainmemory.read_s16_be, mainmemory.write_s16_be, 2);
-end
-
-function replace_u16_le(find, replace)
-	replace_memory(find, replace, mainmemory.read_u16_le, mainmemory.write_u16_le, 2);
-end
-
-function replace_s16_le(find, replace)
-	replace_memory(find, replace, mainmemory.read_s16_le, mainmemory.write_s16_le, 2);
-end
-
-function replace_u32_be(find, replace)
-	replace_memory(find, replace, mainmemory.read_u32_be, mainmemory.write_u32_be, 4);
-end
-
-function replace_s32_be(find, replace)
-	replace_memory(find, replace, mainmemory.read_s32_be, mainmemory.write_s32_be, 4);
-end
-
-function replace_u32_le(find, replace)
-	replace_memory(find, replace, mainmemory.read_u32_le, mainmemory.write_u32_le, 4);
-end
-
-function replace_s32_le(find, replace)
-	replace_memory(find, replace, mainmemory.read_s32_le, mainmemory.write_s32_le, 4);
-end
-
-function replace_float_be(find, replace)
-	replace_memory(find, replace, mainmemory.readfloat_be, mainmemory.writefloat_be, 4);
-end
-
-function replace_float_le(find, replace)
-	replace_memory(find, replace, mainmemory.readfloat_le, mainmemory.writefloat_le, 4);
-end
-
-function readNullTerminatedString(base, max_length)
-	max_length = max_length or 25;
-	local builtString = "";
-	for i = 0, max_length do
-		local character = mainmemory.readbyte(base + i);
-		if character == 0 then
-			return builtString;
-		end
-		builtString = builtString..string.char(character);
-	end
-	return builtString;
-end
-
---------------------
--- Load libraries --
---------------------
-
+require "lib.LibScriptHawk";
 Stats = require "lib.Stats";
 lips = require "lips.init";
 require "lib.pngLua.png";
-require "lib.DPrint";
+
+-------------
+-- Texture --
+-------------
+
+image_directory_root = ".\\Images\\";
+
+-- Pixel format: 16bit RGBA 5551
+-- RRRR RGGG GGBB BBBA
+local rgba5551_color_constants = {
+	["Red"] = 0x0800,
+	["Green"] = 0x0040,
+	["Blue"] = 0x0002,
+};
+
+function replaceTextureRGBA5551(filename, base, width, height)
+	if not fileExists(filename) then
+		filename = forms.openfile(nil, nil, "PNG Image (*.png)|*.png");
+		if not fileExists(filename) then
+			print("No image selected. Exiting.");
+			return;
+		end
+	end
+
+	img = pngImage(filename);
+
+	for y = 1, math.min(img.height, height) do
+		for x = 1, math.min(img.width, width) do
+			local pixel = img:getPixel(x, y);
+			local r = math.floor(pixel.R / img.depth) * rgba5551_color_constants["Red"];
+			local g = math.floor(pixel.G / img.depth) * rgba5551_color_constants["Green"];
+			local b = math.floor(pixel.B / img.depth) * rgba5551_color_constants["Blue"];
+			local a = 0;
+			if pixel.A > 0 then
+				a = 1
+			end
+
+			mainmemory.write_u16_be(base + ((y - 1) * width * 2) + ((x - 1) * 2), r + g + b + a);
+		end
+	end
+end
 
 -----------------------
 -- Keybind framework --
@@ -479,6 +130,92 @@ function ScriptHawk.processJoypadBinds(joypadBinds)
 			joypadBind.pressed = true;
 		end
 	end
+end
+
+----------------
+-- ASM Loader --
+----------------
+
+function outputGamesharkCode(bytes, skipZeroes)
+	skipZeroes = skipZeroes or false;
+	skippedZeroes = 0;
+	if type(bytes) == "table" and #bytes > 0 then
+		nextByteHandled = false;
+		for i = 1, #bytes do
+			if not nextByteHandled then
+				if i < #bytes and bytes[i][1] == (bytes[i + 1][1] - 1) then
+					if not (skipZeroes and bytes[i][2] == 0x00 and bytes[i + 1] == 0x00) then
+						dprint(toHexString(bytes[i][1], 6, "81")..toHexString(bytes[i][2], 2, " ")..toHexString(bytes[i + 1][2], 2, ""));
+					else
+						skippedZeroes = skippedZeroes + 2;
+					end
+					nextByteHandled = true;
+				else
+					if not (skipZeroes and bytes[i][2] == 0x00) then
+						dprint(toHexString(bytes[i][1], 6, "80")..toHexString(bytes[i][2], 2, " 00"));
+					else
+						skippedZeroes = skippedZeroes + 1;
+					end
+				end
+			else
+				nextByteHandled = false;
+			end
+		end
+	end
+	return skippedZeroes;
+end
+
+code = {};
+
+function codeWriter(...)
+	if isPointer(arg[1]) then
+		table.insert(code, {arg[1] - RDRAMBase, arg[2]});
+	else
+		print("Warning: "..toHexString(arg[1]).." isn't a pointer to RDRAM on the System Bus. Writing outside RDRAM isn't currently supported.");
+	end
+end
+
+function loadASMPatch(code_filename, suppress_print)
+	if not fileExists(code_filename) then
+		code_filename = forms.openfile(nil, nil, "R4300i Assembly Code|*.asm|All Files (*.*)|*.*");
+		if not fileExists(code_filename) then
+			if not suppress_print then
+				print("No code loaded, aborting mission...");
+			end
+			return false;
+		end
+	end
+
+	-- Open the file and assemble the code
+	code = {};
+	local result = lips(code_filename, codeWriter);
+
+	if #code == 0 then
+		if not suppress_print then
+			print(result);
+			print("The code did not compile correctly, check for errors in your source.");
+		end
+		return false;
+	end
+
+	-- Patch the code
+	for i = 1, #code do
+		mainmemory.writebyte(code[i][1], code[i][2]);
+	end
+
+	-- Hacky, yes, but if we're using dynarec the patched code pages don't get marked as dirty
+	-- Quickest and easiest way around this is to save and reload a state
+	local ss_fn = 'lips/temp.state';
+	savestate.save(ss_fn);
+	savestate.load(ss_fn);
+
+	if not suppress_print then
+		outputGamesharkCode(code, false);
+		dprint("Patched code ("..#code.." bytes)");
+		dprint("Done!");
+		print_deferred();
+	end
+	return true;
 end
 
 -----------------
@@ -603,131 +340,6 @@ if type(Game.detectVersion) ~= "function" or not Game.detectVersion(romName, rom
 	return false;
 end
 
-----------------
--- ASM Loader --
-----------------
-
-function outputGamesharkCode(bytes, skipZeroes)
-	skipZeroes = skipZeroes or false;
-	skippedZeroes = 0;
-	if type(bytes) == "table" and #bytes > 0 then
-		nextByteHandled = false;
-		for i = 1, #bytes do
-			if not nextByteHandled then
-				if i < #bytes and bytes[i][1] == (bytes[i + 1][1] - 1) then
-					if not (skipZeroes and bytes[i][2] == 0x00 and bytes[i + 1] == 0x00) then
-						dprint(toHexString(bytes[i][1], 6, "81")..toHexString(bytes[i][2], 2, " ")..toHexString(bytes[i + 1][2], 2, ""));
-					else
-						skippedZeroes = skippedZeroes + 2;
-					end
-					nextByteHandled = true;
-				else
-					if not (skipZeroes and bytes[i][2] == 0x00) then
-						dprint(toHexString(bytes[i][1], 6, "80")..toHexString(bytes[i][2], 2, " 00"));
-					else
-						skippedZeroes = skippedZeroes + 1;
-					end
-				end
-			else
-				nextByteHandled = false;
-			end
-		end
-	end
-	return skippedZeroes;
-end
-
-code = {};
-
-function codeWriter(...)
-	if isPointer(arg[1]) then
-		table.insert(code, {arg[1] - RDRAMBase, arg[2]});
-	else
-		print("Warning: "..toHexString(arg[1]).." isn't a pointer to RDRAM on the System Bus. Writing outside RDRAM isn't currently supported.");
-	end
-end
-
-function loadASMPatch(code_filename, suppress_print)
-	if not fileExists(code_filename) then
-		code_filename = forms.openfile(nil, nil, "R4300i Assembly Code|*.asm|All Files (*.*)|*.*");
-		if not fileExists(code_filename) then
-			if not suppress_print then
-				print("No code loaded, aborting mission...");
-			end
-			return false;
-		end
-	end
-
-	-- Open the file and assemble the code
-	code = {};
-	local result = lips(code_filename, codeWriter);
-
-	if #code == 0 then
-		if not suppress_print then
-			print(result);
-			print("The code did not compile correctly, check for errors in your source.");
-		end
-		return false;
-	end
-
-	-- Patch the code
-	for i = 1, #code do
-		mainmemory.writebyte(code[i][1], code[i][2]);
-	end
-
-	-- Hacky, yes, but if we're using dynarec the patched code pages don't get marked as dirty
-	-- Quickest and easiest way around this is to save and reload a state
-	local ss_fn = 'lips/temp.state';
-	savestate.save(ss_fn);
-	savestate.load(ss_fn);
-
-	if not suppress_print then
-		outputGamesharkCode(code, false);
-		dprint("Patched code ("..#code.." bytes)");
-		dprint("Done!");
-		print_deferred();
-	end
-	return true;
-end
-
--------------
--- Texture --
--------------
-
--- Pixel format: 16bit RGBA 5551
--- RRRR RGGG GGBB BBBA
-local rgba5551_color_constants = {
-	["Red"] = 0x0800,
-	["Green"] = 0x0040,
-	["Blue"] = 0x0002,
-};
-
-function replaceTextureRGBA5551(filename, base, width, height)
-	if not fileExists(filename) then
-		filename = forms.openfile(nil, nil, "PNG Image (*.png)|*.png");
-		if not fileExists(filename) then
-			print("No image selected. Exiting.");
-			return;
-		end
-	end
-
-	img = pngImage(filename);
-
-	for y = 1, math.min(img.height, height) do
-		for x = 1, math.min(img.width, width) do
-			local pixel = img:getPixel(x, y);
-			local r = math.floor(pixel.R / img.depth) * rgba5551_color_constants["Red"];
-			local g = math.floor(pixel.G / img.depth) * rgba5551_color_constants["Green"];
-			local b = math.floor(pixel.B / img.depth) * rgba5551_color_constants["Blue"];
-			local a = 0;
-			if pixel.A > 0 then
-				a = 1
-			end
-
-			mainmemory.write_u16_be(base + ((y - 1) * width * 2) + ((x - 1) * 2), r + g + b + a);
-		end
-	end
-end
-
 -----------
 -- State --
 -----------
@@ -781,70 +393,49 @@ end
 -- Practice mode stuff --
 -------------------------
 
-local practice_save_slot = 0;
+ScriptHawk.practice = {
+	slot = 0,
+	minSlot = 0,
+	maxSlot = 9, -- Limited to 9 by savestate.loadslot and savestate.saveslot
+};
 
-local function decreaseSaveSlot()
+function ScriptHawk.practice.decreaseSlot()
 	if mode == "Practice" then
-		practice_save_slot = math.max(0, practice_save_slot - 1);
-		gui.addmessage("Switched to save slot "..practice_save_slot);
+		ScriptHawk.practice.slot = math.max(ScriptHawk.practice.minSlot, ScriptHawk.practice.slot - 1);
+		gui.addmessage("Switched to practice slot "..ScriptHawk.practice.slot);
 	end
 end
 
-local function increaseSaveSlot()
+function ScriptHawk.practice.increaseSlot()
 	if mode == "Practice" then
-		practice_save_slot = math.min(9, practice_save_slot + 1);
-		gui.addmessage("Switched to save slot "..practice_save_slot);
+		ScriptHawk.practice.slot = math.min(ScriptHawk.practice.maxSlot, ScriptHawk.practice.slot + 1);
+		gui.addmessage("Switched to practice slot "..ScriptHawk.practice.slot);
 	end
 end
 
-local function loadPracticeSlot()
+function ScriptHawk.practice.load()
 	if mode == "Practice" then
-		savestate.loadslot(practice_save_slot);
+		savestate.loadslot(ScriptHawk.practice.slot);
 	end
 end
 
-local function savePracticeSlot()
+function ScriptHawk.practice.save()
 	if mode == "Practice" then
-		savestate.saveslot(practice_save_slot);
+		savestate.saveslot(ScriptHawk.practice.slot);
 	end
 end
 
 -- Practice mode JoypadBinds
-ScriptHawk.bindJoypadRealtime("P1 DPad L", decreaseSaveSlot, true);
-ScriptHawk.bindJoypadRealtime("P1 DPad R", increaseSaveSlot, true);
-ScriptHawk.bindJoypadRealtime("P1 DPad U", savePracticeSlot, true);
-ScriptHawk.bindJoypadRealtime("P1 DPad D", loadPracticeSlot, true);
-ScriptHawk.bindJoypadRealtime("P1 L", loadPracticeSlot, true);
+-- TODO: Move bind/unbind to togglemode
+ScriptHawk.bindJoypadRealtime("P1 DPad L", ScriptHawk.practice.decreaseSlot, true);
+ScriptHawk.bindJoypadRealtime("P1 DPad R", ScriptHawk.practice.increaseSlot, true);
+ScriptHawk.bindJoypadRealtime("P1 DPad U", ScriptHawk.practice.save, true);
+ScriptHawk.bindJoypadRealtime("P1 DPad D", ScriptHawk.practice.load, true);
+ScriptHawk.bindJoypadRealtime("P1 L", ScriptHawk.practice.load, true);
 
-----------------------------
--- Other helper functions --
-----------------------------
-
-function searchPointers(base, range, allowLater)
-	local foundPointers = {};
-	allowLater = allowLater or false;
-	for address = 0, RDRAMSize - 4, 4 do
-		local value = mainmemory.read_u32_be(address);
-		if allowLater then
-			if value >= base - range and value <= base + range then
-				table.insert(foundPointers, {["Address"] = toHexString(address), ["Value"] = toHexString(value)});
-				dprint(toHexString(address).." -> "..toHexString(value));
-			end
-		else
-			if value >= base - range and value <= base then
-				table.insert(foundPointers, {["Address"] = toHexString(address), ["Value"] = toHexString(value)});
-				dprint(toHexString(address).." -> "..toHexString(value));
-			end
-		end
-	end
-	print_deferred();
-	return foundPointers;
-end
-
-function angleBetweenPoints(x1, y1, x2, y2)
-	local angle = 180 * (math.atan2(x2 - x1, y2 - y1)) / math.pi;
-	return (angle + 360) % 360;
-end
+--------------
+-- Rotation --
+--------------
 
 function rotation_to_degrees(num)
 	return ((num % Game.max_rot_units) / Game.max_rot_units) * 360;
@@ -854,26 +445,6 @@ two_pi = math.pi * 2;
 function rotation_to_radians(num)
 	return ((num % Game.max_rot_units) / Game.max_rot_units) * two_pi;
 end
-
-function array_contains(array, value)
-	if type(array) == "table" then
-		-- TODO: Special check for index zero because ipairs doesn't support starting from 0?
-		if type(array[0]) ~= "nil" then
-			if array[0] == value then
-				return true;
-			end
-		end
-
-		-- Carry on
-		for i, v in ipairs(array) do
-			if v == value then
-				return true;
-			end
-		end
-	end
-	return false;
-end
-arrayContains = array_contains;
 
 local function toggleRotationUnits()
 	if rotation_units == "Degrees" then
@@ -905,6 +476,7 @@ local function toggleMode()
 		mode = 'YRotation';
 	elseif mode == 'YRotation' then
 		mode = 'Practice';
+		-- TODO: Bind and unbind the joypadbinds for practice mode here, saves some CPU
 	elseif mode == 'Practice' then
 		mode = 'TAS';
 	else
