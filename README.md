@@ -76,6 +76,7 @@ While ScriptHawk does have basic support for OoT and MM there are people who are
 - [glankk/gz](https://github.com/glankk/gz)
 
 ##Partially Supported Games
+- Crash Bandicoot 3: Warped
 - Elmo's Number Journey (N64 only)
 - Elmo's Letter Adventure (N64 only)
 - Rayman 2 (N64 USA only)

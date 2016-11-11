@@ -132,6 +132,23 @@ function ScriptHawk.processJoypadBinds(joypadBinds)
 	end
 end
 
+-- Default to N64 binds
+local dpad_binds = {
+	up = "P1 DPad U",
+	down = "P1 DPad D",
+	left = "P1 DPad L",
+	right = "P1 DPad R",
+};
+
+if emu.getsystemid() == "PSX" then
+	dpad_binds = {
+		up = "P1 Up",
+		down = "P1 Down",
+		left = "P1 Left",
+		right = "P1 Right",
+	};
+end
+
 ----------------
 -- ASM Loader --
 ----------------
@@ -242,6 +259,9 @@ local supportedGames = {
 	-- Conker's Bad Fur Day
 	["EE7BC6656FD1E1D9FFB3D19ADD759F28B88DF710"] = {["moduleName"] = "games.cbfd", ["friendlyName"] = "Conker's Bad Fur Day (Europe)"},
 	["4CBADD3C4E0729DEC46AF64AD018050EADA4F47A"] = {["moduleName"] = "games.cbfd", ["friendlyName"] = "Conker's Bad Fur Day (USA)"},
+
+	-- Crash Bandicoot 3: Warped
+	["9BF37B2C"] = {["moduleName"] = "games.crash3", ["friendlyName"] = "Crash Bandicoot - Warped (USA)"},
 
 	-- Diddy Kong Racing
 	["B7F628073237B3D211D40406AA0884FF8FDD70D5"] = {["moduleName"] = "games.dkr", ["friendlyName"] = "Diddy Kong Racing (Europe) (En,Fr,De) (Rev A)"},
@@ -389,6 +409,13 @@ local function increaseSpeed()
 	Game.speedy_index = math.min(#Game.speedy_speeds, Game.speedy_index + 1);
 end
 
+function ScriptHawk.getMovingAngle()
+	if dx == 0 and dz == 0 then
+		return 0;
+	end
+	return angleBetweenPoints(prev_x, prev_z, Game.getXPosition(), Game.getZPosition());
+end
+
 -------------------------
 -- Practice mode stuff --
 -------------------------
@@ -427,10 +454,10 @@ end
 
 -- Practice mode JoypadBinds
 -- TODO: Move bind/unbind to togglemode
-ScriptHawk.bindJoypadRealtime("P1 DPad L", ScriptHawk.practice.decreaseSlot, true);
-ScriptHawk.bindJoypadRealtime("P1 DPad R", ScriptHawk.practice.increaseSlot, true);
-ScriptHawk.bindJoypadRealtime("P1 DPad U", ScriptHawk.practice.save, true);
-ScriptHawk.bindJoypadRealtime("P1 DPad D", ScriptHawk.practice.load, true);
+ScriptHawk.bindJoypadRealtime(dpad_binds.left, ScriptHawk.practice.decreaseSlot, true);
+ScriptHawk.bindJoypadRealtime(dpad_binds.right, ScriptHawk.practice.increaseSlot, true);
+ScriptHawk.bindJoypadRealtime(dpad_binds.up, ScriptHawk.practice.save, true);
+ScriptHawk.bindJoypadRealtime(dpad_binds.down, ScriptHawk.practice.load, true);
 ScriptHawk.bindJoypadRealtime("P1 L", ScriptHawk.practice.load, true);
 
 --------------
@@ -678,7 +705,10 @@ function ScriptHawk.UI.updateReadouts()
 			if labelLower == "dy" then
 				value = dy or 0;
 			end
-			if labelLower == "dxz" then
+			if labelLower == "dz" then
+				value = dz or 0;
+			end
+			if labelLower == "dxz" or labelLower == "d" then
 				value = d or 0;
 			end
 
@@ -688,11 +718,18 @@ function ScriptHawk.UI.updateReadouts()
 			if labelLower == "max dy" then
 				value = max_dy or 0;
 			end
-			if labelLower == "max dxz" then
+			if labelLower == "max dz" then
+				value = max_dz or 0;
+			end
+			if labelLower == "max dxz" or labelLower == "max d" then
 				value = max_d or 0;
 			end
 			if labelLower == "odometer" then
 				value = odometer or 0;
+			end
+
+			if labelLower == "moving angle" and value == nil then -- TODO: This has some name conflicts, "moving"
+				value = round(ScriptHawk.getMovingAngle())..string.char(0xB0);
 			end
 
 			-- Get the value
@@ -775,77 +812,66 @@ local function rotate(axis, amount)
 end
 
 local function mainloop()
-	joypad_pressed = joypad.getimmediate();
-
-	-- Calculate speed for D-Pad and L button
-	local speedy_speed_XZ = Game.speedy_speeds[Game.speedy_index];
-	local speedy_speed_Y = Game.speedy_speeds[Game.speedy_index];
-	if Game.speedy_invert_XZ then
-		speedy_speed_XZ = speedy_speed_XZ * -1;
-	end
-
-	if Game.speedy_invert_Y then
-		speedy_speed_Y = speedy_speed_Y * -1;
-	end
-
 	if Game.isPhysicsFrame() then
+		joypad_pressed = joypad.getimmediate();
+		rot_rad = rotation_to_radians(Game.getYRotation());
+
+		-- Calculate speed for D-Pad and L button
+		local speedy_speed_XZ = Game.speedy_speeds[Game.speedy_index];
+		local speedy_speed_Y = Game.speedy_speeds[Game.speedy_index];
+		if Game.speedy_invert_XZ then
+			speedy_speed_XZ = speedy_speed_XZ * -1;
+		end
+		if Game.speedy_invert_Y then
+			speedy_speed_Y = speedy_speed_Y * -1;
+		end
+
+		local dpad_up_multiplier = 1.0;
+		local dpad_down_multiplier = -1.0;
+		if Game.speedy_invert_UD then
+			dpad_up_multiplier = -1.0;
+			dpad_down_multiplier = 1.0;
+		end
+
+		local dpad_left_multiplier = 1.0;
+		local dpad_right_multiplier = -1.0;
+		if Game.speedy_invert_LR then
+			dpad_left_multiplier = -1.0;
+			dpad_right_multiplier = 1.0;
+		end
+
 		if mode == 'Position' then
-			rot_rad = rotation_to_radians(Game.getYRotation());
-			if Game.speedy_invert_UD then
-				if joypad_pressed["P1 DPad U"] then
-					gofast("x", -1.0 * (speedy_speed_XZ * math.sin(rot_rad)));
-					gofast("z", -1.0 * (speedy_speed_XZ * math.cos(rot_rad)));
-				end
-				if joypad_pressed["P1 DPad D"] then
-					gofast("x", speedy_speed_XZ * math.sin(rot_rad));
-					gofast("z", speedy_speed_XZ * math.cos(rot_rad));
-				end
-			else
-				if joypad_pressed["P1 DPad U"] then
-					gofast("x", speedy_speed_XZ * math.sin(rot_rad));
-					gofast("z", speedy_speed_XZ * math.cos(rot_rad));
-				end
-				if joypad_pressed["P1 DPad D"] then
-					gofast("x", -1.0 * (speedy_speed_XZ * math.sin(rot_rad)));
-					gofast("z", -1.0 * (speedy_speed_XZ * math.cos(rot_rad)));
-				end
+			if joypad_pressed[dpad_binds.up] then
+				gofast("x", dpad_up_multiplier * (speedy_speed_XZ * math.sin(rot_rad)));
+				gofast("z", dpad_up_multiplier * (speedy_speed_XZ * math.cos(rot_rad)));
 			end
-
-			if Game.speedy_invert_LR then
-				if joypad_pressed["P1 DPad L"] then
-					gofast("x", -1.0 * (speedy_speed_XZ * math.cos(rot_rad)));
-					gofast("z", speedy_speed_XZ * math.sin(rot_rad));
-				end
-				if joypad_pressed["P1 DPad R"] then
-					gofast("x", speedy_speed_XZ * math.cos(rot_rad));
-					gofast("z", -1.0 * (speedy_speed_XZ * math.sin(rot_rad)));
-				end
-			else
-				if joypad_pressed["P1 DPad L"] then
-					gofast("x", speedy_speed_XZ * math.cos(rot_rad));
-					gofast("z", -1.0 * (speedy_speed_XZ * math.sin(rot_rad)));
-				end
-				if joypad_pressed["P1 DPad R"] then
-					gofast("x", -1.0 * (speedy_speed_XZ * math.cos(rot_rad)));
-					gofast("z", speedy_speed_XZ * math.sin(rot_rad));
-				end
+			if joypad_pressed[dpad_binds.down] then
+				gofast("x", dpad_down_multiplier * (speedy_speed_XZ * math.sin(rot_rad)));
+				gofast("z", dpad_down_multiplier * (speedy_speed_XZ * math.cos(rot_rad)));
 			end
-
+			if joypad_pressed[dpad_binds.left] then
+				gofast("x", dpad_left_multiplier * (speedy_speed_XZ * math.cos(rot_rad)));
+				gofast("z", dpad_right_multiplier * (speedy_speed_XZ * math.sin(rot_rad)));
+			end
+			if joypad_pressed[dpad_binds.right] then
+				gofast("x", dpad_right_multiplier * (speedy_speed_XZ * math.cos(rot_rad)));
+				gofast("z", dpad_left_multiplier * (speedy_speed_XZ * math.sin(rot_rad)));
+			end
 			if joypad_pressed["P1 L"] then
 				gofast("y", speedy_speed_Y);
 			end
 		end
 		if mode == 'Rotation' then
-			if joypad_pressed["P1 DPad U"] then
+			if joypad_pressed[dpad_binds.up] then
 				rotate("x", Game.rot_speed);
 			end
-			if joypad_pressed["P1 DPad D"] then
+			if joypad_pressed[dpad_binds.down] then
 				rotate("x", -Game.rot_speed);
 			end
-			if joypad_pressed["P1 DPad L"] then
+			if joypad_pressed[dpad_binds.left] then
 				rotate("z", -Game.rot_speed);
 			end
-			if joypad_pressed["P1 DPad R"] then
+			if joypad_pressed[dpad_binds.right] then
 				rotate("z", Game.rot_speed);
 			end
 			if joypad_pressed["P1 L"] then
@@ -853,30 +879,18 @@ local function mainloop()
 			end
 		end
 		if mode == 'YRotation' then
-			rot_rad = rotation_to_radians(Game.getYRotation());
-			if Game.speedy_invert_UD then
-				if joypad_pressed["P1 DPad U"] then
-					gofast("x", -1.0 * (speedy_speed_XZ * math.sin(rot_rad)));
-					gofast("z", -1.0 * (speedy_speed_XZ * math.cos(rot_rad)));
-				end
-				if joypad_pressed["P1 DPad D"] then
-					gofast("x", speedy_speed_XZ * math.sin(rot_rad));
-					gofast("z", speedy_speed_XZ * math.cos(rot_rad));
-				end
-			else
-				if joypad_pressed["P1 DPad U"] then
-					gofast("x", speedy_speed_XZ * math.sin(rot_rad));
-					gofast("z", speedy_speed_XZ * math.cos(rot_rad));
-				end
-				if joypad_pressed["P1 DPad D"] then
-					gofast("x", -1.0 * (speedy_speed_XZ * math.sin(rot_rad)));
-					gofast("z", -1.0 * (speedy_speed_XZ * math.cos(rot_rad)));
-				end
+			if joypad_pressed[dpad_binds.up] then
+				gofast("x", dpad_up_multiplier * (speedy_speed_XZ * math.sin(rot_rad)));
+				gofast("z", dpad_up_multiplier * (speedy_speed_XZ * math.cos(rot_rad)));
 			end
-			if joypad_pressed["P1 DPad L"] then
+			if joypad_pressed[dpad_binds.down] then
+				gofast("x", dpad_down_multiplier * (speedy_speed_XZ * math.sin(rot_rad)));
+				gofast("z", dpad_down_multiplier * (speedy_speed_XZ * math.cos(rot_rad)));
+			end
+			if joypad_pressed[dpad_binds.left] then
 				rotate("y", -Game.rot_speed);
 			end
-			if joypad_pressed["P1 DPad R"] then
+			if joypad_pressed[dpad_binds.right] then
 				rotate("y", Game.rot_speed);
 			end
 			if joypad_pressed["P1 L"] then
@@ -964,22 +978,40 @@ local function plot_pos()
 				local value = Game.OSD[i][2];
 
 				if label ~= "Separator" then
+					local labelLower = string.lower(label);
+
 					-- Detect special keywords
-					if label == "dY" or label == "DY" then
+					if labelLower == "dx" then
+						value = dx or 0;
+					end
+					if labelLower == "dy" then
 						value = dy or 0;
 					end
-					if label == "dXZ" or label == "DXZ" then
+					if labelLower == "dz" then
+						value = dz or 0;
+					end
+					if labelLower == "dxz" or labelLower == "d" then
 						value = d or 0;
 					end
 
-					if label == "Max dY" or label == "Max DY" then
+					if labelLower == "max dx" then
+						value = max_dx or 0;
+					end
+					if labelLower == "max dy" then
 						value = max_dy or 0;
 					end
-					if label == "Max dXZ" or label == "Max DXZ" then
+					if labelLower == "max dz" then
+						value = max_dz or 0;
+					end
+					if labelLower == "max dxz" or labelLower == "max d" then
 						value = max_d or 0;
 					end
-					if label == "Odometer" then
+					if labelLower == "odometer" then
 						value = odometer or 0;
+					end
+
+					if labelLower == "moving angle" and value == nil then -- TODO: This has some name conflicts, "moving"
+						value = round(ScriptHawk.getMovingAngle())..string.char(0xB0);
 					end
 
 					-- Get the value
