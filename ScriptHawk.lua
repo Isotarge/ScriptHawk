@@ -261,7 +261,10 @@ local supportedGames = {
 	["4CBADD3C4E0729DEC46AF64AD018050EADA4F47A"] = {["moduleName"] = "games.cbfd", ["friendlyName"] = "Conker's Bad Fur Day (USA)"},
 
 	-- Crash Bandicoot 3: Warped
+	["05E3012B"] = {["moduleName"] = "games.crash3", ["friendlyName"] = "Crash Bandicoot - Warped (USA)"},
 	["9BF37B2C"] = {["moduleName"] = "games.crash3", ["friendlyName"] = "Crash Bandicoot - Warped (USA)"},
+	["7E59A4CE"] = {["moduleName"] = "games.crash3", ["friendlyName"] = "Crash Bandicoot 3 - Buttobi! Sekai Isshuu (Japan)"},
+	["A2E93AEC"] = {["moduleName"] = "games.crash3", ["friendlyName"] = "Crash Bandicoot 3 - Buttobi! Sekai Isshuu (Japan)"},
 
 	-- Diddy Kong Racing
 	["B7F628073237B3D211D40406AA0884FF8FDD70D5"] = {["moduleName"] = "games.dkr", ["friendlyName"] = "Diddy Kong Racing (Europe) (En,Fr,De) (Rev A)"},
@@ -767,6 +770,18 @@ end
 -- Core functions --
 --------------------
 
+if type(Game.eachFrame) ~= "function" then
+	--print("Warning: This module does not implement Game.eachFrame()");
+	function Game.eachFrame()
+	end
+end
+
+if type(Game.realTime) ~= "function" then
+	--print("Warning: This module does not implement Game.realTime());
+	function Game.realTime()
+	end
+end
+
 if type(Game.setPosition) ~= "function" then
 	function Game.setPosition(x, y, z)
 		Game.setXPosition(x);
@@ -783,9 +798,8 @@ if type(Game.setRotation) ~= "function" then
 	end
 end
 
--- Default Game.isPhysicsFrame function
--- uses emu.islagged() as a fallback if the game module does not implement it
 if type(Game.isPhysicsFrame) ~= "function" then
+	--print("Warning: This module does not implement Game.isPhysicsFrame());
 	function Game.isPhysicsFrame()
 		return not emu.islagged();
 	end
@@ -911,9 +925,7 @@ end
 local function plot_pos()
 	ScriptHawk.processKeybinds(ScriptHawk.keybindsFrame);
 	ScriptHawk.processKeybinds(ScriptHawk.joypadBindsFrame);
-	if type(Game.eachFrame) == "function" then
-		Game.eachFrame();
-	end
+	Game.eachFrame();
 
 	previous_frame = current_frame;
 	current_frame = emu.framecount();
@@ -1155,8 +1167,6 @@ while true do
 	ScriptHawk.UI.updateReadouts();
 	ScriptHawk.processKeybinds(ScriptHawk.keybindsRealtime);
 	ScriptHawk.processJoypadBinds(ScriptHawk.joypadBindsRealtime);
-	if type(Game.realTime) == "function" then
-		Game.realTime();
-	end
+	Game.realTime();
 	emu.yield();
 end
