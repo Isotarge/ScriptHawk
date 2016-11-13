@@ -263,6 +263,8 @@ local supportedGames = {
 	-- Crash Bandicoot 3: Warped
 	["05E3012B"] = {["moduleName"] = "games.crash3", ["friendlyName"] = "Crash Bandicoot - Warped (USA)"},
 	["9BF37B2C"] = {["moduleName"] = "games.crash3", ["friendlyName"] = "Crash Bandicoot - Warped (USA)"},
+	["39B868A1"] = {["moduleName"] = "games.crash3", ["friendlyName"] = "Crash Bandicoot 3 - Warped (Europe) (En,Fr,De,Es,It)"},
+	["A91BEA0E"] = {["moduleName"] = "games.crash3", ["friendlyName"] = "Crash Bandicoot 3 - Warped (Europe) (En,Fr,De,Es,It)"},
 	["7E59A4CE"] = {["moduleName"] = "games.crash3", ["friendlyName"] = "Crash Bandicoot 3 - Buttobi! Sekai Isshuu (Japan)"},
 	["A2E93AEC"] = {["moduleName"] = "games.crash3", ["friendlyName"] = "Crash Bandicoot 3 - Buttobi! Sekai Isshuu (Japan)"},
 

@@ -4,7 +4,6 @@
 -- TODO: Uh yeah this script needs a lot of cleanup and fixes
 	-- vScale and pScale are annoying hacks :(
 	-- Scale Game.speedy_speeds
-	-- Support European Version
 	-- Take me there implementation
 	-- D-Pad binds are annoying to use, this needs to be fixed in ScriptHawk.lua
 
@@ -16,11 +15,11 @@ Game = {
 		0.001, 0.01, 0.1, 1, 5, 10, 20, 50, 100
 	},
 	Memory = { -- Version order: USA, Europe, Japan
-		akuaku_mask_pointer = {0x68F38, nil, 0x69388}, -- TODO: Europe
-		global_timer = {0x69034, nil, 0x69484}, -- TODO: Europe
+		akuaku_mask_pointer = {0x68F38, 0x690E8, 0x69388},
+		global_timer = {0x69034, 0x691E4, 0x69484},
 		level = {0x618DC, nil, nil}, -- TODO: This doesn't seem to work
-		player_pointer = {0x60A90, nil, 0x60E90}, -- TODO: Europe
-		total_boxes = {0x69148, nil, 0x69598}, -- TODO: Europe
+		player_pointer = {0x60A90, 0x60BF0, 0x60E90},
+		total_boxes = {0x69148, 0x692F8, 0x69598},
 	},
 };
 
@@ -44,6 +43,9 @@ local vScale = 100000;
 function Game.detectVersion(romName, romHash)
 	if romHash == "05E3012B" or romHash == "9BF37B2C" then -- USA
 		version = 1;
+		return true;
+	elseif romHash == "39B868A1" or romHash == "A91BEA0E" then -- Europe
+		version = 2;
 		return true;
 	elseif romHash == "7E59A4CE" or romHash == "A2E93AEC" then -- Japan
 		version = 3;
