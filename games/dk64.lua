@@ -3075,7 +3075,7 @@ end
 chunkArrayPointer = 0x7F6C18; -- TODO: Find on all versions
 chunkSize = 0x1C8;
 chunk = {
-	["visible"] = 0x06, -- Byte, 0x02 = visible, everything else = invisible
+	["visible"] = 0x05, -- Byte, 0x02 = visible, everything else = invisible
 	["deload1"] = 0x68, -- u32_be
 	["deload2"] = 0x6C, -- u32_be
 	["deload3"] = 0x70, -- u32_be
@@ -4613,6 +4613,14 @@ local function grabObject(pointer)
 end
 
 local function grabSelectedObject()
+	if grab_script_mode == "Chunks" then
+		local loaded = mainmemory.readbyte(object_pointers[object_index] + chunk.visible);
+		if loaded == 2 then
+			mainmemory.writebyte(object_pointers[object_index] + chunk.visible, 0);
+		else
+			mainmemory.writebyte(object_pointers[object_index] + chunk.visible, 2);
+		end
+	end
 	if string.contains(grab_script_mode, "Model 1") then
 		grabObject(object_pointers[object_index]);
 	end
@@ -4997,7 +5005,7 @@ local function drawGrabScriptUI()
 			for i = #object_pointers, 1, -1 do
 				local color = nil;
 				if object_index == i then
-					color = green_highlight
+					color = green_highlight;
 				end
 
 				local base = object_pointers[i];
@@ -5031,11 +5039,16 @@ local function drawGrabScriptUI()
 
 		if grab_script_mode == "Chunks" then
 			for i = #object_pointers, 1, -1 do
+				local color = nil;
+				if object_index == i then
+					color = green_highlight;
+				end
 				local d1 = mainmemory.read_u32_be(object_pointers[i] + chunk.deload1);
 				local d2 = mainmemory.read_u32_be(object_pointers[i] + chunk.deload2);
 				local d3 = mainmemory.read_u32_be(object_pointers[i] + chunk.deload3);
 				local d4 = mainmemory.read_u32_be(object_pointers[i] + chunk.deload4);
-				gui.text(gui_x, gui_y + height * row, toHexString(d1).." "..toHexString(d2).." "..toHexString(d3).." "..toHexString(d4).." - "..i.." "..toHexString(object_pointers[i] or 0, 6), nil, 'bottomright');
+				local v = mainmemory.readbyte(object_pointers[i] + chunk.visible);
+				gui.text(gui_x, gui_y + height * row, toHexString(d1).." "..toHexString(d2).." "..toHexString(d3).." "..toHexString(d4).." "..v.." - "..i.." "..toHexString(object_pointers[i] or 0, 6), color, 'bottomright');
 				row = row + 1;
 			end
 		end
