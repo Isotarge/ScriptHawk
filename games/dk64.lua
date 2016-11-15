@@ -14,6 +14,7 @@ local grab_script_modes = {
 	"Examine (Object Model 2)",
 	"List (Loading Zones)",
 	"Examine (Loading Zones)",
+	"Chunks",
 };
 local grab_script_mode_index = 1;
 grab_script_mode = grab_script_modes[grab_script_mode_index];
@@ -111,6 +112,11 @@ function Game.getCurrentMode()
 		return Game.modes[modeValue];
 	end
 	return "Unknown "..modeValue;
+end
+
+-- Don't trust anything on the heap if this is true
+function Game.isLoading()
+	return mainmemory.read_u32_be(Game.Memory.obj_model2_timer[version]) == 0;
 end
 
 local flag_array = {};
@@ -3062,6 +3068,55 @@ function setWaterSurfaceTimers(value)
 	end
 end
 
+------------------
+-- Chunk Deload --
+------------------
+
+chunkArrayPointer = 0x7F6C18; -- TODO: Find on all versions
+chunkSize = 0x1C8;
+chunk = {
+	["visible"] = 0x06, -- Byte, 0x02 = visible, everything else = invisible
+	["deload1"] = 0x68, -- u32_be
+	["deload2"] = 0x6C, -- u32_be
+	["deload3"] = 0x70, -- u32_be
+	["deload4"] = 0x74, -- u32_be
+};
+
+function fixChunkDeload()
+	local chunkArray = dereferencePointer(chunkArrayPointer);
+	if isRDRAM(chunkArray) then
+		local numChunks = math.floor(mainmemory.read_u32_be(chunkArray + object_size) / chunkSize);
+		for i = 0, numChunks - 1 do
+			local chunkBase = chunkArray + i * chunkSize;
+			mainmemory.write_u32_be(chunkBase + chunk.deload1, 0xA);
+			mainmemory.write_u32_be(chunkBase + chunk.deload2, 0xA);
+			mainmemory.write_u32_be(chunkBase + chunk.deload3, 0x135);
+			mainmemory.write_u32_be(chunkBase + chunk.deload4, 0xE5);
+		end
+		print_deferred();
+	end
+end
+--event.onframestart(fixChunkDeload);
+
+function populateChunkPointers()
+	object_pointers = {};
+	if Game.isLoading() then
+		object_index = 1;
+		return;
+	end
+	local chunkArray = dereferencePointer(chunkArrayPointer);
+	if isRDRAM(chunkArray) then
+		local numChunks = math.floor(mainmemory.read_u32_be(chunkArray + object_size) / chunkSize);
+		for i = 0, numChunks - 1 do
+			local chunkBase = chunkArray + i * chunkSize;
+			table.insert(object_pointers, chunkBase);
+		end
+
+		-- Clamp index
+		object_index = math.min(object_index, math.max(1, #object_pointers));
+	end
+end
+
 -------------------
 -- Physics/Scale --
 -------------------
@@ -4449,7 +4504,7 @@ function ohWrongnana(verbose)
 		return;
 	end
 
-	if mainmemory.read_u32_be(Game.Memory.obj_model2_timer[version]) == 0 then -- Check model 2 timer to make sure we're not patching through loading zones
+	if Game.isLoading() then
 		return;
 	end
 
@@ -4819,6 +4874,10 @@ local function drawGrabScriptUI()
 		populateLoadingZonePointers();
 	end
 
+	if grab_script_mode == "Chunks" then
+		populateChunkPointers();
+	end
+
 	if rat_enabled then
 		local renderingParams = dereferencePointer(playerObject + obj_model1.rendering_parameters_pointer);
 		if isRDRAM(renderingParams) then
@@ -4967,6 +5026,17 @@ local function drawGrabScriptUI()
 						row = row + 1;
 					end
 				end
+			end
+		end
+
+		if grab_script_mode == "Chunks" then
+			for i = #object_pointers, 1, -1 do
+				local d1 = mainmemory.read_u32_be(object_pointers[i] + chunk.deload1);
+				local d2 = mainmemory.read_u32_be(object_pointers[i] + chunk.deload2);
+				local d3 = mainmemory.read_u32_be(object_pointers[i] + chunk.deload3);
+				local d4 = mainmemory.read_u32_be(object_pointers[i] + chunk.deload4);
+				gui.text(gui_x, gui_y + height * row, toHexString(d1).." "..toHexString(d2).." "..toHexString(d3).." "..toHexString(d4).." - "..i.." "..toHexString(object_pointers[i] or 0, 6), nil, 'bottomright');
+				row = row + 1;
 			end
 		end
 	end

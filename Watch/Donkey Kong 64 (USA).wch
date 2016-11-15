@@ -338,6 +338,7 @@ SystemID N64
 7F6000	d	h	1	RDRAM	Object Model 2 Array Pointer
 7F6004	d	u	1	RDRAM	Object Model 2 Array Count
 7F6010	d	h	1	RDRAM	Setup File Pointer
+7F6C18	d	h	1	RDRAM	Chunk Deload Pointer Thingy
 7F8E88	b	u	1	RDRAM	Object Count?
 7F93C0	d	h	1	RDRAM	Water Surface List Pointer
 7F9680	d	u	1	RDRAM	Texture Index?
