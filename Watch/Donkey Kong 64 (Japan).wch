@@ -108,6 +108,7 @@ SystemID N64
 7F6470	d	h	1	RDRAM	Object Model 2 Array Pointer
 7F6474	d	u	1	RDRAM	Object Model 2 Array Size
 7F6480	d	h	1	RDRAM	Setup File Pointer
+7F7088	d	h	1	RDRAM	Chunk Array Pointer
 7F9830	d	h	1	RDRAM	Water Surface List Pointer
 7FBFBC	d	h	1	RDRAM	Player Pointer
 7FBFD2	b	b	1	RDRAM	Zipper Bitfield

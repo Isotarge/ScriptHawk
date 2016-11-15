@@ -86,6 +86,7 @@ Game.Memory = {
 	["map_base"] = {0x7F5DE0, 0x7F5D00, 0x7F6250, 0x7A1E90},
 	["vert_base"] = {0x7F5DE8, 0x7F5D08, 0x7F6258, 0x7A1E98},
 	["water_surface_list"] = {0x7F93C0, 0x7F92E0, 0x7F9830, 0x7B48A0},
+	["chunk_array_pointer"] = {0x7F6C18, 0x7F6B38, 0x7F7088, nil}; -- TODO: Kiosk
 };
 
 Game.modes = {
@@ -3072,7 +3073,6 @@ end
 -- Chunk Deload --
 ------------------
 
-chunkArrayPointer = 0x7F6C18; -- TODO: Find on all versions
 chunkSize = 0x1C8;
 chunk = {
 	["visible"] = 0x05, -- Byte, 0x02 = visible, everything else = invisible
@@ -3083,7 +3083,7 @@ chunk = {
 };
 
 function fixChunkDeload()
-	local chunkArray = dereferencePointer(chunkArrayPointer);
+	local chunkArray = dereferencePointer(Game.Memory.chunk_array_pointer[version]);
 	if isRDRAM(chunkArray) then
 		local numChunks = math.floor(mainmemory.read_u32_be(chunkArray + object_size) / chunkSize);
 		for i = 0, numChunks - 1 do
@@ -3104,7 +3104,7 @@ function populateChunkPointers()
 		object_index = 1;
 		return;
 	end
-	local chunkArray = dereferencePointer(chunkArrayPointer);
+	local chunkArray = dereferencePointer(Game.Memory.chunk_array_pointer[version]);
 	if isRDRAM(chunkArray) then
 		local numChunks = math.floor(mainmemory.read_u32_be(chunkArray + object_size) / chunkSize);
 		for i = 0, numChunks - 1 do
@@ -4532,7 +4532,7 @@ function ohWrongnana(verbose)
 				if scriptName == "gunswitches" or scriptName == "buttons" then
 					-- Get part 2
 					activationScript = dereferencePointer(activationScript + 0xA0);
-					
+
 					while isRDRAM(activationScript) do
 						for j = 0x04, 0x48, 8 do
 							if isSafePreceedingCommand(mainmemory.readbyte(activationScript + j - 1)) then
