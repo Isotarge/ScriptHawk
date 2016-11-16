@@ -53,6 +53,7 @@ SystemID N64
 7A1E98	d	h	1	RDRAM	Map Verts Pointer
 7A1E9C	d	h	1	RDRAM	Map Model Pointer?
 7B17C4	d	h	1	RDRAM	Setup File Pointer
+7B20F8	d	h	1	RDRAM	Chunk Array Pointer
 7B48A0	d	h	1	RDRAM	Water Surface List Pointer
 7B5918	d	h	1	RDRAM	Camera Pointer
 7B5AFC	d	h	1	RDRAM	Player Pointer
