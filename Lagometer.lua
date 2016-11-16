@@ -1,3 +1,6 @@
+-- TODO: This script needs a refactor
+require "lib.LibScriptHawk";
+
 local maxResolution = 250;
 local resolution = 60;
 local ignore = 30;
@@ -16,8 +19,8 @@ local frameCount = 0;
 local lagCount = 0;
 
 local maxTrackedPeriods = 50;
-local trackedPeriods = 10;
-local previous = {};
+trackedPeriods = 10;
+previous = {};
 
 local function shufflePrevious()
 	local temp = {};
@@ -35,36 +38,20 @@ local function getHighestLagCount()
 	return highest;
 end
 
+local function getAverageLag()
+	local sum = 0;
+	for i = 1, #previous do
+		sum = sum + previous[i].lag;
+	end
+	return sum / #previous;
+end
+
 local function recalculateRatios()
 	for i = 1, #previous do
 		if previous[i].mode == "vframe" then
 			previous[i].ratio = math.min(1, math.max(0, previous[i].lag - 1) / math.max(1, redzone));
 		end
 	end
-end
-
-local function round(num, idp)
-	return tonumber(string.format("%." .. (idp or 0) .. "f", (num or 0)));
-end
-
---       a  r  g  b
--- 0.0 = 7F 00 FF 00 = Green
--- 0.5 = 7F FF FF 00 = Yellow
--- 1.0 = 7F FF 00 00 = Red
-
-local function getColour(ratio)
-	local green = 255;
-	local red = 255;
-
-	if ratio > 0.5 then
-		green = 255 - round(((ratio - 0.5) * 2) * 255);
-		red = 255;
-	elseif ratio < 0.5 then
-		red = round((ratio * 2) * 255);
-		green = 255;
-	end
-
-	return 0x7F000000 + (red * 0x00010000) + (green * 0x00000100);
 end
 
 -------------------
@@ -190,6 +177,8 @@ local options_height_value_label =              forms.label(options_form,  heigh
 
 local options_toggle_vframe_mode =              forms.checkbox(options_form, "VFrame mode",                            col(0),      row(6));
 
+local options_average_lag_label =               forms.label(options_form,  height,                                     col(0),      row(7) + label_offset, label_width,      14);
+
 function updateUIReadouts_lagometer()
 	forms.settext(options_resolution_value_label, resolution);
 	forms.settext(options_ignore_value_label, ignore);
@@ -197,6 +186,7 @@ function updateUIReadouts_lagometer()
 	forms.settext(options_width_value_label, width);
 	forms.settext(options_height_value_label, height);
 	forms.settext(options_tracked_periods_value_label, trackedPeriods);
+	forms.settext(options_average_lag_label, getAverageLag());
 end
 
 local function drawGraphicalRepresentation()
@@ -217,7 +207,7 @@ local function drawGraphicalRepresentation()
 				gui.drawText(gui_x + width * column, gui_y + 16, round(previous[i].dxz));
 			end
 		end
-		gui.drawRectangle(gui_x + width * column, gui_y + height - (height * previous[i].ratio) + 32, width, height * previous[i].ratio, 0, getColour(previous[i].ratio));
+		gui.drawRectangle(gui_x + width * column, gui_y + height - (height * previous[i].ratio) + 32, width, height * previous[i].ratio, 0, getColour(previous[i].ratio, 0x7F));
 		column = column + 1;
 	end
 
