@@ -78,8 +78,27 @@
 
 [PauseMenu]: 0x80313380
 
-[SpawnActor]: 0x8032813C ;Inputs: (word $a0 ActorIndex), (float* $a1 LocationXPtr), (??? $a2 ???)
+[GetJiggiesCollectedBitfield]:  0x80320F70  ;Outputs: [word $v0]
 
+[IsJiggyCollected]: 0x80320FF0  ;Inputs: (word $a0 JiggyIndex)
+                                ;Outputs: [bool $v0]
+[ZeroJiggyCollectedBitfield]: 0x8032103C
+[SetJiggyCollectedBit]:    0x8032108C  ;Inputs: (word $a0 JiggyIndex), (bool $a1 collected)
+
+[IsEmptyHoneycombCollected]:    0x803212E4  ;Inputs: (word $a0 EmptyHoneycombIndex)
+                                            ;Outputs: [bool $v0]
+[ZeroEmptyHoneycombCollectedBitfield]:  0x80321340
+[SetEmptyHoneycombCollectedBit]:    0x80321364  ;Inputs: (word $a0 EmptyHoneycombIndex), (bool $a1 collected)
+
+[IsMumboTokenCollected]:    0x80321364  ;Inputs: (word $a0 MumboTokenIndex)
+                                        ;Outpus: [bool $v0]
+[ZeroMumboTokenCollectedBitfield]:  0x803215A0
+[SetMumboTokenCollectedBit]:    0x803215D0  ;Inputs: (word $a0 MumboTokenIndex), (bool $a1 collected)
+[GetTotalMumboTokensCollected]: 0x80321664  ;Outputs: [byte $v0]
+
+[SpawnActor]: 0x8032813C ;Inputs: (word $a0 ActorIndex), (float* $a1 LocationXPtr), (float $a2 rotation)
+
+//STRING LIBRARY
 [AppendString]: 0x8033D660  ;Inputs: (char* $a0 destinationStr), (char* $a1 srcStr)
 [AppendChar]:   0x8033D6A8  ;Inputs: (char* $a0 destinationStr), (char $a1 inputChar)
 [FToA_2Dec]:    0x8033D6E0  ;Inputs: (char* $a0 destStr),        (float $a1 inputFloat)
