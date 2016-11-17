@@ -22,12 +22,8 @@ local maxTrackedPeriods = 50;
 trackedPeriods = 10;
 previous = {};
 
-local function shufflePrevious()
-	local temp = {};
-	for i = 2, #previous do
-		temp[i - 1] = previous[i];
-	end
-	previous = temp;
+function shufflePrevious()
+	table.remove(previous, 1);
 end
 
 local function getHighestLagCount()
