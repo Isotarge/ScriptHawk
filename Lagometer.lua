@@ -255,4 +255,11 @@ local function mainloop()
 	drawGraphicalRepresentation();
 end
 
+local function clearPrevious()
+	lagCount = 0;
+	frameCount = 0;
+	previous = {};
+end
+
 event.onframestart(mainloop, "ScriptHawk - Lagometer");
+event.onloadstate(clearPrevious, "ScriptHawk - Clear Lag History");
