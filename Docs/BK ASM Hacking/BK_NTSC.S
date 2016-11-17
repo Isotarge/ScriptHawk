@@ -80,16 +80,20 @@
 
 [SpawnActor]: 0x8032813C ;Inputs: (word $a0 ActorIndex), (float* $a1 LocationXPtr), (??? $a2 ???)
 
-[AppendString]: 0x8033D660 ;Inputs: (char* $a0 destinationStr), (char* $a1 srcStr)
-[AppendChar]: 0x8033D6A8 ;Inputs: (char* $a0 destinationStr), (char $a1 inputChar)
-
-[FToA]: 0x8033D7B0 ;Inputs: (char* $a0 destinationStr), (float $a1 inputFloat), (int $a2 float precision) //appends to destination string
-[IToA_10]: 0x8033D884 ;Inputs: (char* $a0 destinationStr), (word $a1 inputInt) //base 10
-[IToA]: 0x8033D884 ;Inputs: (char* $a0 destinationStr), (word $a1 inputInt), (word $a2 Radix)
+[AppendString]: 0x8033D660  ;Inputs: (char* $a0 destinationStr), (char* $a1 srcStr)
+[AppendChar]:   0x8033D6A8  ;Inputs: (char* $a0 destinationStr), (char $a1 inputChar)
+[FToA_2Dec]:    0x8033D6E0  ;Inputs: (char* $a0 destStr),        (float $a1 inputFloat)
+[FToA]:         0x8033D7B0  ;Inputs: (char* $a0 destinationStr), (float $a1 inputFloat), (int $a2 float precision) //appends to destination string
+[IToA_10]:      0x8033D884  ;Inputs: (char* $a0 destinationStr), (word $a1 inputInt) //base 10
+[IToA]:         0x8033D884  ;Inputs: (char* $a0 destinationStr), (word $a1 inputInt), (word $a2 Radix)
 [CompareStrings]: 0x8033D9D4 ;Inputs: (char* $a0 str1), (char* $a1 str2)
                              ;Output: byte $v0 //$v0 = 0 if (strings are the same),-1 if (str1 < str2), 1 if (str1 > str2)
-[CopyString]: 0x8033DA54 ;Inputs: (char* $a0 destinationStr), (char* $a1 srcStr)
+[CopyString]:   0x8033DA54 ;Inputs: (char* $a0 destinationStr), (char* $a1 srcStr)
 [GetStringSize]: 0x8033DA80 ;Inputs: (char* $a0 string)
                             ;Outputs: [word $v0]
-
+[DoTokensMatch]: 0x8033DAB0 ;Inputs: (char* $a0 delimiter), (char* $a1 str1), (char* $a2 str2)
+                            ;Outpus: [bool $v0]
+[NextToken]:    0x8033DB18  ;Inputs: (char* $a0 delimiter), (char* $a1 str)
+                            ;Outputs: [char* $v0]
+[StrToken]:     0x8033DB60  ;Inputs: (char* $a0 delimiter), (char* $a1 destinationStr), (char* $a2 srcStr)
 [ToUpper]: 0x8033DBA4 ;Inputs: (char* $a0 string)
