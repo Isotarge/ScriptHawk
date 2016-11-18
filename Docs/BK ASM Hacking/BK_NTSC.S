@@ -81,6 +81,9 @@
 [GetXZVelocity]: 0x80297AB8 ;Outputs: [float $f0]
 
 
+[TakeMeThere]:  0x802E4078  ;I: (word $a0 Map, word $a1 exit, word $a2 loadTransitionTypeIndex)
+
+
 [Print_TotalMenuFont]: 0x802F7870 ;Inputs: (word $a0 XPos), (word $a1 YPos), (word $a3 fontSize), (char* $a3 str)      
 
 
