@@ -81,6 +81,7 @@
 [GetXZVelocity]: 0x80297AB8 ;Outputs: [float $f0]
 
 
+[TakeMeThere_DisplayHealth]:    0x802E4048  ;I: (word $a0 Map, word $a1 exit, word $a2 loadTransitionTypeIndex)
 [TakeMeThere]:  0x802E4078  ;I: (word $a0 Map, word $a1 exit, word $a2 loadTransitionTypeIndex)
 
 
