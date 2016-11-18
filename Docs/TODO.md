@@ -1,11 +1,13 @@
 #ScriptHawk TODO list
 ##High Priority
-- General: Rework input/keybinds, multiple profiles like wasd/arrow keys
-- General: 2D game support
-	- Integrate SMS object viewers into ScriptHawk.lua
-		- Currently they share a lot of code that would work well as a game module
-		- I think it'd be fun to bulk support SMS games since the object layout is so simple :P
-	- Move from x, y, z variables to position/rotation/velocity etc. tables with x, y, z indexes
+- Save and Load settings from a config file on disk
+	- Joypad/Keyboard binds for D-Pad and L Button
+	- Rounding precision
+	- Rotation units
+	- Mode? Arguable
+- Integrate SMS object viewers into ScriptHawk.lua
+	- Currently they share a lot of code that would work well as a game module
+	- I think it'd be fun to bulk support SMS games since the object layout is so simple :P
 - General: UI to load ASM patches, can currently only be done by calling loadASMPatch(filename, suppressprint) in the lua console
 - DK64:
 	- Find menu cutscene flags

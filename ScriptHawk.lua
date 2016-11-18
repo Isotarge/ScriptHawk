@@ -133,20 +133,38 @@ function ScriptHawk.processJoypadBinds(joypadBinds)
 end
 
 -- Default to N64 binds
-local dpad_binds = {
-	up = "P1 DPad U",
-	down = "P1 DPad D",
-	left = "P1 DPad L",
-	right = "P1 DPad R",
+ScriptHawk.dpad = {
+	joypad = {
+		up = "P1 DPad U",
+		down = "P1 DPad D",
+		left = "P1 DPad L",
+		right = "P1 DPad R",
+		enabled = true,
+	},
+	key = {
+		up = "W",
+		down = "S",
+		left = "A",
+		right = "D",
+		enabled = true,
+	},
 };
 
+ScriptHawk.lbutton = {
+	joypad = "P1 L",
+	key = "E",
+};
+
+-- PSX Joypad binds
 if emu.getsystemid() == "PSX" then
-	dpad_binds = {
+	ScriptHawk.dpad.joypad = {
 		up = "P1 Up",
 		down = "P1 Down",
 		left = "P1 Left",
 		right = "P1 Right",
+		enabled = false,
 	};
+	ScriptHawk.lbutton.joypad = "P1 L1";
 end
 
 ----------------
@@ -458,12 +476,22 @@ function ScriptHawk.practice.save()
 end
 
 -- Practice mode JoypadBinds
--- TODO: Move bind/unbind to togglemode
-ScriptHawk.bindJoypadRealtime(dpad_binds.left, ScriptHawk.practice.decreaseSlot, true);
-ScriptHawk.bindJoypadRealtime(dpad_binds.right, ScriptHawk.practice.increaseSlot, true);
-ScriptHawk.bindJoypadRealtime(dpad_binds.up, ScriptHawk.practice.save, true);
-ScriptHawk.bindJoypadRealtime(dpad_binds.down, ScriptHawk.practice.load, true);
-ScriptHawk.bindJoypadRealtime("P1 L", ScriptHawk.practice.load, true);
+-- TODO: Move bind and unbind to togglemode?
+if ScriptHawk.dpad.joypad.enabled then
+	ScriptHawk.bindJoypadRealtime(ScriptHawk.dpad.joypad.left, ScriptHawk.practice.decreaseSlot, true);
+	ScriptHawk.bindJoypadRealtime(ScriptHawk.dpad.joypad.right, ScriptHawk.practice.increaseSlot, true);
+	ScriptHawk.bindJoypadRealtime(ScriptHawk.dpad.joypad.up, ScriptHawk.practice.save, true);
+	ScriptHawk.bindJoypadRealtime(ScriptHawk.dpad.joypad.down, ScriptHawk.practice.load, true);
+	ScriptHawk.bindJoypadRealtime(ScriptHawk.lbutton.joypad, ScriptHawk.practice.load, true);
+end
+
+if ScriptHawk.dpad.key.enabled then
+	ScriptHawk.bindKeyRealtime(ScriptHawk.dpad.key.left, ScriptHawk.practice.decreaseSlot, true);
+	ScriptHawk.bindKeyRealtime(ScriptHawk.dpad.key.right, ScriptHawk.practice.increaseSlot, true);
+	ScriptHawk.bindKeyRealtime(ScriptHawk.dpad.key.up, ScriptHawk.practice.save, true);
+	ScriptHawk.bindKeyRealtime(ScriptHawk.dpad.key.down, ScriptHawk.practice.load, true);
+	ScriptHawk.bindKeyRealtime(ScriptHawk.lbutton.key, ScriptHawk.practice.load, true);
+end
 
 --------------
 -- Rotation --
@@ -508,7 +536,7 @@ local function toggleMode()
 		mode = 'YRotation';
 	elseif mode == 'YRotation' then
 		mode = 'Practice';
-		-- TODO: Bind and unbind the joypadbinds for practice mode here, saves some CPU
+		-- TODO: Bind and unbind the joypadbinds for practice mode here, saves some CPU for the mode checks and we can re-check ScriptHawk.dpad.*.enabled
 	elseif mode == 'Practice' then
 		mode = 'TAS';
 	else
@@ -827,10 +855,38 @@ local function rotate(axis, amount)
 	end
 end
 
+local lbutton_pressed = false;
+local dpad_pressed = {
+	up = false,
+	down = false,
+	left = false,
+	right = false
+};
+
 local function mainloop()
+	if ScriptHawk.UI.form_controls["Toggle Infinites Checkbox"] ~= nil and forms.ischecked(ScriptHawk.UI.form_controls["Toggle Infinites Checkbox"]) then
+		Game.applyInfinites();
+	end
+
+	if type(Game.maps) == "table" and Game.takeMeThereType == "Checkbox" and forms.ischecked(ScriptHawk.UI.form_controls["Map Checkbox"]) then
+		Game.setMap(previous_map_value);
+	end
+
 	if Game.isPhysicsFrame() then
 		joypad_pressed = joypad.getimmediate();
-		rot_rad = rotation_to_radians(Game.getYRotation());
+		input_pressed = input.get();
+
+		-- Check for D-Pad and L button pressed
+		lbutton_pressed = joypad_pressed[ScriptHawk.lbutton.joypad] or input_pressed[ScriptHawk.lbutton.key];
+		dpad_pressed.up = (ScriptHawk.dpad.joypad.enabled and joypad_pressed[ScriptHawk.dpad.joypad.up]) or (ScriptHawk.dpad.key.enabled and input_pressed[ScriptHawk.dpad.key.up]);
+		dpad_pressed.down = (ScriptHawk.dpad.joypad.enabled and joypad_pressed[ScriptHawk.dpad.joypad.down]) or (ScriptHawk.dpad.key.enabled and input_pressed[ScriptHawk.dpad.key.down]);
+		dpad_pressed.left = (ScriptHawk.dpad.joypad.enabled and joypad_pressed[ScriptHawk.dpad.joypad.left]) or (ScriptHawk.dpad.key.enabled and input_pressed[ScriptHawk.dpad.key.left]);
+		dpad_pressed.right = (ScriptHawk.dpad.joypad.enabled and joypad_pressed[ScriptHawk.dpad.joypad.right]) or (ScriptHawk.dpad.key.enabled and input_pressed[ScriptHawk.dpad.key.right]);
+
+		-- Speed things up by returning early if no inputs are pressed
+		if not (lbutton_pressed or dpad_pressed.up or dpad_pressed.down or dpad_pressed.left or dpad_pressed.right) then
+			return;
+		end
 
 		-- Calculate speed for D-Pad and L button
 		local speedy_speed_XZ = Game.speedy_speeds[Game.speedy_index];
@@ -857,70 +913,62 @@ local function mainloop()
 		end
 
 		if mode == 'Position' then
-			if joypad_pressed[dpad_binds.up] then
+			local rot_rad = rotation_to_radians(Game.getYRotation());
+			if dpad_pressed.up then
 				gofast("x", dpad_up_multiplier * (speedy_speed_XZ * math.sin(rot_rad)));
 				gofast("z", dpad_up_multiplier * (speedy_speed_XZ * math.cos(rot_rad)));
 			end
-			if joypad_pressed[dpad_binds.down] then
+			if dpad_pressed.down then
 				gofast("x", dpad_down_multiplier * (speedy_speed_XZ * math.sin(rot_rad)));
 				gofast("z", dpad_down_multiplier * (speedy_speed_XZ * math.cos(rot_rad)));
 			end
-			if joypad_pressed[dpad_binds.left] then
+			if dpad_pressed.left then
 				gofast("x", dpad_left_multiplier * (speedy_speed_XZ * math.cos(rot_rad)));
 				gofast("z", dpad_right_multiplier * (speedy_speed_XZ * math.sin(rot_rad)));
 			end
-			if joypad_pressed[dpad_binds.right] then
+			if dpad_pressed.right then
 				gofast("x", dpad_right_multiplier * (speedy_speed_XZ * math.cos(rot_rad)));
 				gofast("z", dpad_left_multiplier * (speedy_speed_XZ * math.sin(rot_rad)));
 			end
-			if joypad_pressed["P1 L"] then
+			if lbutton_pressed then
 				gofast("y", speedy_speed_Y);
 			end
-		end
-		if mode == 'Rotation' then
-			if joypad_pressed[dpad_binds.up] then
+		elseif mode == 'Rotation' then
+			if dpad_pressed.up then
 				rotate("x", Game.rot_speed);
 			end
-			if joypad_pressed[dpad_binds.down] then
+			if dpad_pressed.down then
 				rotate("x", -Game.rot_speed);
 			end
-			if joypad_pressed[dpad_binds.left] then
+			if dpad_pressed.left then
 				rotate("z", -Game.rot_speed);
 			end
-			if joypad_pressed[dpad_binds.right] then
+			if dpad_pressed.right then
 				rotate("z", Game.rot_speed);
 			end
-			if joypad_pressed["P1 L"] then
+			if lbutton_pressed then
 				gofast("y", speedy_speed_Y);
 			end
-		end
-		if mode == 'YRotation' then
-			if joypad_pressed[dpad_binds.up] then
+		elseif mode == 'YRotation' then
+			local rot_rad = rotation_to_radians(Game.getYRotation());
+			if dpad_pressed.up then
 				gofast("x", dpad_up_multiplier * (speedy_speed_XZ * math.sin(rot_rad)));
 				gofast("z", dpad_up_multiplier * (speedy_speed_XZ * math.cos(rot_rad)));
 			end
-			if joypad_pressed[dpad_binds.down] then
+			if dpad_pressed.down then
 				gofast("x", dpad_down_multiplier * (speedy_speed_XZ * math.sin(rot_rad)));
 				gofast("z", dpad_down_multiplier * (speedy_speed_XZ * math.cos(rot_rad)));
 			end
-			if joypad_pressed[dpad_binds.left] then
+			if dpad_pressed.left then
 				rotate("y", -Game.rot_speed);
 			end
-			if joypad_pressed[dpad_binds.right] then
+			if dpad_pressed.right then
 				rotate("y", Game.rot_speed);
 			end
-			if joypad_pressed["P1 L"] then
+			if lbutton_pressed then
 				gofast("y", speedy_speed_Y);
 			end
 		end
-	end
-
-	if ScriptHawk.UI.form_controls["Toggle Infinites Checkbox"] ~= nil and forms.ischecked(ScriptHawk.UI.form_controls["Toggle Infinites Checkbox"]) then
-		Game.applyInfinites();
-	end
-
-	if type(Game.maps) == "table" and Game.takeMeThereType == "Checkbox" and forms.ischecked(ScriptHawk.UI.form_controls["Map Checkbox"]) then
-		Game.setMap(previous_map_value);
 	end
 end
 
