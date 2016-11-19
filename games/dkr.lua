@@ -887,7 +887,7 @@ function Game.eachFrame()
 	outputBoostStats();
 end
 
-function Game.realTime()
+function Game.drawUI()
 	forms.settext(ScriptHawk.UI.form_controls.get_ready_blue_min_value_label, get_ready_blue_min);
 	forms.settext(ScriptHawk.UI.form_controls.get_ready_blue_max_value_label, get_ready_blue_max);
 	forms.settext(ScriptHawk.UI.form_controls.get_ready_yellow_min_value_label, get_ready_yellow_min);

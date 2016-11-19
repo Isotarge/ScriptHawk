@@ -258,9 +258,9 @@ function getExamineData(objectBase)
 	return examineData;
 end
 
-function drawObjectViewerOSD()
+function Game.drawUI()
 	forms.settext(ScriptHawk.UI.form_controls["Object Index Label"], "Index: "..objectIndex);
-	if forms.ischecked(ScriptHawk.UI.form_controls["Enable Object Analyzer"]) then -- TODO: Switch to standard keybinds?
+	if forms.ischecked(ScriptHawk.UI.form_controls["Enable Object Analyzer"]) then
 		local gui_x = 2;
 		local gui_y = 2;
 		local row = 0;
@@ -416,13 +416,6 @@ end
 ScriptHawk.bindKeyRealtime("Z", zipToSelectedObject, true);
 ScriptHawk.bindKeyRealtime("N", decrementObjectIndex, true);
 ScriptHawk.bindKeyRealtime("M", incrementObjectIndex, true);
-
-function Game.realTime()
-	drawObjectViewerOSD();
-end
-
-function Game.eachFrame()
-end
 
 Game.OSD = {
 	{"X", Game.getXPosition},

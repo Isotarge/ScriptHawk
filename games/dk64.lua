@@ -3839,8 +3839,6 @@ function Game.drawMJMinimap()
 
 		local x, y, color;
 
-		gui.clearGraphics();
-
 		-- Calculate where the kong is on the MJ Board
 		local colseg = position_to_rowcol(Game.getZPosition());
 		local rowseg = position_to_rowcol(Game.getXPosition());
@@ -5363,18 +5361,15 @@ function readTimestamp(address)
 	return major + minor; -- Seconds
 end
 
-function Game.realTime()
+function Game.drawUI()
 	updateCurrentInvisify();
 	forms.settext(ScriptHawk.UI.form_controls["Lag Factor Value Label"], lag_factor);
 	forms.settext(ScriptHawk.UI.form_controls["Toggle Visibility Button"], current_invisify);
 	forms.settext(ScriptHawk.UI.form_controls["Moon Mode Button"], moon_mode);
 	drawGrabScriptUI();
 
-	-- Force STVW
-	--local yRot = Game.getYRotation();
-	--if yRot < Game.max_rot_units then
-	--	Game.setYRotation(yRot + Game.max_rot_units);
-	--end
+	-- Mad Jack
+	Game.drawMJMinimap();
 
 	if version ~= 4 then
 		-- Draw ISG timer
@@ -5389,6 +5384,14 @@ function Game.realTime()
 			--gui.text(16, 16, "Waiting for ISG", nil, 'topright');
 		end
 	end
+end
+
+function Game.realTime()
+	-- Force STVW
+	--local yRot = Game.getYRotation();
+	--if yRot < Game.max_rot_units then
+	--	Game.setYRotation(yRot + Game.max_rot_units);
+	--end
 end
 
 local vertSize = 0x10;
@@ -5480,9 +5483,6 @@ function Game.eachFrame()
 	if type(ScriptHawk.UI.form_controls["Toggle OhWrongnana"]) ~= "nil" and forms.ischecked(ScriptHawk.UI.form_controls["Toggle OhWrongnana"]) then
 		ohWrongnana();
 	end
-
-	-- Mad Jack
-	Game.drawMJMinimap();
 
 	-- As of BizHawk 1.11.8, ScriptHawk's Bone Displacement fix is integrated in to the emulator, as such the UI surrounding the bug is no longer needed
 	--if type(ScriptHawk.UI.form_controls["Toggle Detect Displacement Checkbox"]) ~= "nil" and forms.ischecked(ScriptHawk.UI.form_controls["Toggle Detect Displacement Checkbox"]) then

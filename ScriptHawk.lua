@@ -800,6 +800,12 @@ end
 -- Core functions --
 --------------------
 
+if type(Game.drawUI) ~= "function" then
+	--print("Warning: This module does not implement Game.drawUI()");
+	function Game.drawUI()
+	end
+end
+
 if type(Game.eachFrame) ~= "function" then
 	--print("Warning: This module does not implement Game.eachFrame()");
 	function Game.eachFrame()
@@ -1099,6 +1105,13 @@ local function plot_pos()
 			table.insert(telemetryData, tempTelemetryData);
 		end
 	end
+
+	if not client.ispaused() then
+		--gui.cleartext();
+		--gui.clearGraphics();
+		ScriptHawk.UI.updateReadouts();
+		Game.drawUI();
+	end
 end
 
 event.onframestart(mainloop, "ScriptHawk - Controller input handler");
@@ -1213,8 +1226,12 @@ angleCalc.open = function()
 end
 
 while true do
-	gui.cleartext();
-	ScriptHawk.UI.updateReadouts();
+	if client.ispaused() then
+		gui.cleartext();
+		gui.clearGraphics();
+		ScriptHawk.UI.updateReadouts();
+		Game.drawUI();
+	end
 	ScriptHawk.processKeybinds(ScriptHawk.keybindsRealtime);
 	ScriptHawk.processJoypadBinds(ScriptHawk.joypadBindsRealtime);
 	Game.realTime();

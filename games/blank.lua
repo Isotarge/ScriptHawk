@@ -156,12 +156,19 @@ function Game.initUI() -- Optional: Init any UI state here, mainly useful for se
 	ScriptHawk.UI.form_controls["Example Checkbox"] = forms.checkbox(ScriptHawk.UI.options_form, "Label", ScriptHawk.UI.col(10) + ScriptHawk.UI.dropdown_offset, ScriptHawk.UI.row(6) + ScriptHawk.UI.dropdown_offset);
 end
 
+-- Optional: This function should be used to draw to the screen or update form controls
+-- When emulation is running it will be called once per frame
+-- When emulation is paused it will be called as fast as possible
+function Game.drawUI()
+	forms.settext(ScriptHawk.UI.form_controls["Example Value Label"], labelValue);
+end
+
 function Game.eachFrame() -- Optional: This function will be executed once per frame
 	-- TODO
 end
 
-function Game.realTime() -- Optional: This function will be executed as fast as possible, useful for OSD/UI that needs to be updated while emulation is paused
-	forms.settext(ScriptHawk.UI.form_controls["Example Value Label"], labelValue);
+function Game.realTime() -- Optional: This function will be executed as fast as possible
+	-- TODO
 end
 
 Game.OSDPosition = {2, 70}; -- Optional: OSD position in pixels from the top left corner of the screen, defaults to 2, 70 if not set by a game module

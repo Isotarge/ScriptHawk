@@ -1236,7 +1236,7 @@ local movementStates = {
 	[64] = "Locked", -- Pumpkin: Pipe
 	[65] = "Death",
 	[66] = "Dingpot",
-    [67] = "Death", --Termite
+	[67] = "Death", -- Termite
 	[68] = "Jig", -- Jiggy
 	[69] = "Slipping", -- Talon Trot
 
@@ -1288,14 +1288,14 @@ local movementStates = {
 	[122] = "Creeping", -- In damaging water etc
 	[123] = "Damaged", -- Talon Trot
 	[124] = "Locked", -- Sled in FP sliding down scarf
-    [125] = "Idle", --Walrus Sled
-	[126] = "Jumping" --Walrus Sled
-    [127] = "Damaged", -- Swimming
-    [128] = "Locked", --Walrus Sled losing race
-    [129] = "Locked", --Walrus Sled
-    [130] = "Locked", --Walrus Sled In Air when losing race
-	
-    [133] = "Idle", -- Bee
+	[125] = "Idle", -- Walrus Sled
+	[126] = "Jumping", -- Walrus Sled
+	[127] = "Damaged", -- Swimming
+	[128] = "Locked", -- Walrus Sled losing race
+	[129] = "Locked", -- Walrus Sled
+	[130] = "Locked", -- Walrus Sled In Air when losing race
+
+	[133] = "Idle", -- Bee
 	[134] = "Walking", -- Bee
 	[135] = "Jumping", -- Bee
 	[136] = "Falling", -- Bee
@@ -1728,7 +1728,7 @@ function getExamineData(slot_base) -- TODO: Improve this based on SM64 module im
 	return current_slot_variables;
 end
 
-function draw_ui() -- TODO: Refactor to something about object analysis tools
+function Game.drawUI()
 	if script_mode == "Disabled" then
 		return;
 	end
@@ -2639,10 +2639,6 @@ function Game.eachFrame()
 			eep_checksum[i].value = checksum_value;
 		end
 	end
-end
-
-function Game.realTime()
-	draw_ui();
 end
 
 Game.OSDPosition = {2, 70};
