@@ -1,6 +1,7 @@
 local Game = {};
 
 Game.Memory = { -- Version order: France, Europe, USA, German 1.1, German 1.0
+	["global_timer"] = {0x0A3A00, 0x0A3360, 0x0A3040, 0x0A3A20, 0x0A3A00}, -- u32_be
 	["x_position"] = {0x0BBB40, 0x0BB460, 0x0BB070, 0x0BBB60, 0x0BBB40}, -- s32_be
 	["y_position"] = {0x0BBB44, 0x0BB464, 0x0BB074, 0x0BBB64, 0x0BBB44}, -- s32_be
 	["z_position"] = {0x0BBB48, 0x0BB468, 0x0BB078, 0x0BBB68, 0x0BBB48}, -- s32_be
@@ -45,8 +46,13 @@ Game.speedy_invert_Y = true;
 Game.rot_speed = 10;
 Game.max_rot_units = 4096;
 
+local global_timer = {
+	previous = -1,
+	current = -1,
+};
+
 function Game.isPhysicsFrame()
-	return not emu.islagged(); -- TODO: Research lag in this game
+	return global_timer.current ~= global_timer.previous;
 end
 
 --------------
@@ -103,6 +109,11 @@ end
 
 function Game.setZRotation(value)
 	-- TODO
+end
+
+function Game.eachFrame()
+	global_timer.previous = global_timer.current;
+	global_timer.current = mainmemory.read_u32_be(Game.Memory.global_timer[version]);
 end
 
 Game.OSD = {
