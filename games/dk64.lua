@@ -4527,6 +4527,8 @@ function ohWrongnana(verbose)
 			activationScript = dereferencePointer(slotBase + 0x7C);
 			if isRDRAM(activationScript) then
 				scriptName = getScriptName(slotBase);
+				--if scriptName == "gunswitches" then
+				--if scriptName == "buttons" then
 				if scriptName == "gunswitches" or scriptName == "buttons" then
 					-- Get part 2
 					activationScript = dereferencePointer(activationScript + 0xA0);
@@ -4535,12 +4537,12 @@ function ohWrongnana(verbose)
 						for j = 0x04, 0x48, 8 do
 							if isSafePreceedingCommand(mainmemory.readbyte(activationScript + j - 1)) then
 								local commandParam = mainmemory.read_u16_be(activationScript + j);
-								if isKong(commandParam) then
+								if isKong(commandParam) and scriptName == "buttons" then
 									mainmemory.write_u16_be(activationScript + j, SimSlamChecks[currentKong]);
 									if verbose then
 										ohWrongnanaDebugOut(scriptName, slotBase, activationScript, j);
 									end
-								elseif isBulletCheck(commandParam) then
+								elseif isBulletCheck(commandParam) and scriptName == "gunswitches" then
 									mainmemory.write_u16_be(activationScript + j, BulletChecks[currentKong]);
 									if verbose then
 										ohWrongnanaDebugOut(scriptName, slotBase, activationScript, j);
