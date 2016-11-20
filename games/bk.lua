@@ -234,6 +234,7 @@ Game.maps = {
 Game.Memory = {
 	["fb_pointer"] = {0x282E00, 0x281E20, 0x281E20, 0x282FE0},
 	["frame_timer"] = {0x280700, 0x27F718, 0x27F718, 0x2808D8},
+	["floor_object_pointer"] = {0x37CBD0, 0x37CD00, 0x37B400, 0x37C200},
 	["slope_timer"] = {0x37CCB4, 0x37CDE4, 0x37B4E4, 0x37C2E4},
 	["player_grounded"] = {0x37C930, 0x37CA60, 0x37B160, 0x37BF60},
 	["moves_bitfield"] = {0x37CD70, 0x37CEA0, 0x37B5A0, 0x37C3A0},
@@ -2344,6 +2345,14 @@ end
 -- Position --
 --------------
 
+function Game.getFloor()
+	local floorObject = dereferencePointer(Game.Memory.floor_object_pointer[version]);
+	if isRDRAM(floorObject) then
+		return mainmemory.readfloat(floorObject + 0x40, true);
+	end
+	return 0;
+end
+
 function Game.getXPosition()
 	return mainmemory.readfloat(Game.Memory.x_position[version], true);
 end
@@ -2650,23 +2659,26 @@ Game.OSD = {
 	{"Y", Game.getYPosition},
 	{"Z", Game.getZPosition},
 	{"Separator", 1},
+	{"Floor", Game.getFloor},
+	{"Separator", 1},
+	{"Y Velocity", Game.getYVelocity, Game.colorYVelocity},
+	{"Velocity", Game.getVelocity};
 	{"dY"},
 	{"dXZ"},
-	{"Velocity", Game.getVelocity};
-	{"Y Velocity", Game.getYVelocity, Game.colorYVelocity},
 	{"Separator", 1},
 	{"Max dY"},
 	{"Max dXZ"},
 	{"Odometer"},
+	{"Separator", 1},
+	{"Movement", Game.getCurrentMovementState, Game.colorCurrentMovementState},
+	{"Slope Timer", Game.getSlopeTimer, Game.colorSlopeTimer},
+	{"Grounded", Game.getGroundState},
 	{"Separator", 1},
 	{"Facing", Game.getFacingAngle},
 	{"Moving", Game.getYRotation},
 	{"Rot. X", Game.getXRotation},
 	{"Rot. Z", Game.getZRotation},
 	{"Separator", 1},
-	{"Movement", Game.getCurrentMovementState, Game.colorCurrentMovementState},
-	{"Slope Timer", Game.getSlopeTimer, Game.colorSlopeTimer},
-	{"Grounded", Game.getGroundState},
 	--{"FF Answer", getCorrectFFAnswer},
 	{"FF Pattern", Game.getFFPattern},
 };

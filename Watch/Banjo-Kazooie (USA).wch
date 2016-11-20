@@ -108,6 +108,7 @@ SystemID N64
 37C128	d	f	1	RDRAM	Z Disjoint Amount
 37C1D1	b	u	1	RDRAM	Standing on Fly Pad
 37C1D2	b	u	1	RDRAM	Standing on Shock Spring Pad
+37C200	d	h	1	RDRAM	Floor Object Pointer
 37C274	d	u	1	RDRAM	Enable Collision State
 37C278	b	h	1	RDRAM	Water Collision
 37C279	b	h	1	RDRAM	Ground Collision 1

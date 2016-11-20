@@ -18,15 +18,15 @@
 /*-------------------------------
 | Functions
 ---------------------------------*/
-/* 
-	NOTE: Consecutive functions identify no unknown functions in between 
+/*
+	NOTE: Consecutive functions identify no unknown functions in between
 	NOTE 2: If inputs or outputs are not listed, assume they are void
 */
 
 [GetPIStatusReg]: 0x800020E0 ;Outputs: [word $v0]
 
 
-[SetCOP0StatusRegister]: 0x80002190 ;Inputs: (word $a0 input)                                 
+[SetCOP0StatusRegister]: 0x80002190 ;Inputs: (word $a0 input)
 [GetCOP0StatusRegister]: 0x800021A0 ;Outputs: [word $v0]
 
 
@@ -41,13 +41,13 @@
 [DecrementGlobalOnCounter]: 0x8023DCF4
 
 
-[MainLoop]: 0x8023DF9C 
+[MainLoop]: 0x8023DF9C
 
 
 [SetApplyButtonInputsToBanjoFlag]: 0x8023E06C
 
 
-[SetFrameSkip]: 0x8024BF94 ;Inputs: (word $a0 input) 
+[SetFrameSkip]: 0x8024BF94 ;Inputs: (word $a0 input)
 [GetFrameSkip]: 0x8024BFA0 ;Outputs: [word $v0] //normally 2 but sometimes 3 eg. GV lobby
 
 
@@ -85,7 +85,7 @@
 [TakeMeThere]:  0x802E4078  ;I: (word $a0 Map, word $a1 exit, word $a2 loadTransitionTypeIndex)
 
 
-[Print_TotalMenuFont]: 0x802F7870 ;Inputs: (word $a0 XPos), (word $a1 YPos), (word $a3 fontSize), (char* $a3 str)      
+[Print_TotalMenuFont]: 0x802F7870 ;Inputs: (word $a0 XPos), (word $a1 YPos), (word $a3 fontSize), (char* $a3 str)
 
 
 [Print_CharFont]: 0x802F78FC ;Inputs: (word $a0 XPos), (word $a1 YPos), (char* $a2 str)
