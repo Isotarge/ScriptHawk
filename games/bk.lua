@@ -1402,19 +1402,20 @@ function outputSlot(index)
 	if type(slot_data[index]) ~= "nil" then
 		local previous_type = "";
 		local current_slot = slot_data[index + 1];
-		print("Starting output of slot "..index + 1);
+		dprint("Starting output of slot "..index + 1);
 		for i = 0, slot_size do
 			if type(slot_variables[i]) == "table" then
 				if slot_variables[i].Type ~= "Z4_Unknown" then
 					if slot_variables[i].Type ~= previous_type then
 						previous_type = slot_variables[i].Type;
-						print("");
+						dprint("");
 					end
 					local variableName = getVariableName(i);
-					print(toHexString(i).." "..variableName.." ("..(slot_variables[i].Type).."): "..formatForOutput(slot_variables[i].Type, current_slot[i]));
+					dprint(toHexString(i).." "..variableName.." ("..(slot_variables[i].Type).."): "..formatForOutput(slot_variables[i].Type, current_slot[i]));
 				end
 			end
 		end
+		print_deferred();
 	end
 end
 
@@ -1423,9 +1424,9 @@ function outputStats()
 		print("Error: Slot data is empty, please run parseSlotData()");
 		return;
 	end
-	print("------------------------------");
-	print("-- Starting output of stats --");
-	print("------------------------------");
+	dprint("------------------------------");
+	dprint("-- Starting output of stats --");
+	dprint("------------------------------");
 	local min, max;
 	local previous_type = "";
 	for i = 0, slot_size do
@@ -1435,13 +1436,14 @@ function outputStats()
 				max = getMaximumValue(i);
 				if slot_variables[i].Type ~= previous_type then
 					previous_type = slot_variables[i].Type;
-					print("");
+					dprint("");
 				end
 				local variableName = getVariableName(i);
-				print(toHexString(i).." "..(slot_variables[i].Type)..": "..formatForOutput(slot_variables[i].Type, min).. " to "..formatForOutput(slot_variables[i].Type, max).." - "..variableName);
+				dprint(toHexString(i).." "..(slot_variables[i].Type)..": "..formatForOutput(slot_variables[i].Type, min).. " to "..formatForOutput(slot_variables[i].Type, max).." - "..variableName);
 			end
 		end
 	end
+	print_deferred();
 end
 
 --------------------
@@ -1559,10 +1561,11 @@ function getAllUnique(variable)
 		end
 
 		-- Output the findings
-		print("Starting output of variable "..toHexString(variable));
+		dprint("Starting output of variable "..toHexString(variable));
 		for value, count in pairs(unique_values) do
-			print(""..value.." appears "..count.." times");
+			dprint(""..value.." appears "..count.." times");
 		end
+		print_deferred();
 	end
 end
 
