@@ -5,8 +5,10 @@
 	- Rounding precision
 	- Rotation units
 	- Mode? Arguable
+	- Verbosity/Debug mode?
 - Integrate SMS object viewers into ScriptHawk.lua
-	- Currently they share a lot of code that would work well as a game module
+	- Allow modules to turn off the standard ScriptHawk OSD and plot_pos features
+	- They share a lot of code that would work well as a game module
 	- I think it'd be fun to bulk support SMS games since the object layout is so simple :P
 - General: UI to load ASM patches, can currently only be done by calling loadASMPatch(filename, suppressprint) in the lua console
 - DK64:
@@ -27,7 +29,7 @@
 	- [List of Games](http://www.speedrun.com/puzzle_league)
 	- [Pokémon Puzzle League Info here](https://github.com/mupen64plus/mupen64plus-user-issues/issues/567)
 - Keep [lips](https://github.com/notwa/lips) up to date
-- Support both BizHawk and m64p
+- Support both BizHawk and m64p?
 	- [Info here](https://github.com/notwa/mm/commit/90d30e218f3128fb130e54bd8662527bdd73f40f)
 	- Squish remaining calls to bizstring library
 		- Ledge Clip.lua
