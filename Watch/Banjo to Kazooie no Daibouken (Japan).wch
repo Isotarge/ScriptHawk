@@ -14,6 +14,7 @@ SystemID N64
 36CB2C	w	u	1	RDRAM	Pause Menu Item 4 Y Position
 36CB2E	b	u	1	RDRAM	Pause Menu Item 4 Portrait
 36F260	d	h	1	RDRAM	Object Array pointer
+36F4C8	d	h	1	RDRAM	Struct Array Pointer
 37CA60	b	u	1	RDRAM	Player is on ground
 37CA61	b	u	1	RDRAM	Player is swimming
 37CBB0	d	f	1	RDRAM	Wading Boots Timer

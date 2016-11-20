@@ -257,7 +257,7 @@ Game.Memory = {
 	["ff_pattern"] = {0x383BA2, 0x383D02, 0x3823E2, 0x3831C2},
 	["collectable_base"] = {0x386910, 0x386A70, 0x385150, 0x385F30},
 	["object_array_pointer"] = {0x36EAE0, 0x36F260, 0x36D760, 0x36E560},
-	["struct_array_pointer"] = {nil, nil, nil, 0x36E7C8}, -- TODO: Other versions
+	["struct_array_pointer"] = {0x36ED48, 0x36F4C8, 0x36D9C8, 0x36E7C8},
 	["board_base"] = {0x394140, 0x394350, 0x3929C0, 0x393760},
 	["pause_menu_strings_base"] = {0x36C99C, 0x36CAF0, 0x36B6E0, 0x36C4E0},
 	["return_to_lair_enabled"] = {0x383A60, 0x383BC0, 0x3822A0, 0x383080},
@@ -1284,6 +1284,7 @@ local movementStates = {
 	[116] = "Locked", -- Jiggy pad, Mumbo transformation, Bottles
 	[117] = "Locked", -- Bottles
 
+	[119] = "Locked", -- Water Surface
 	[120] = "Locked", -- Underwater
 	[121] = "Locked", -- Holding Jiggy, Talon Trot
 	[122] = "Creeping", -- In damaging water etc
@@ -1577,11 +1578,9 @@ function getNumSlots()
 			return math.min(max_slots, mainmemory.read_u32_be(objectArray));
 		end
 	else -- Model 2
-		if version == 4 then -- TODO: Other versions
-			local structArray = dereferencePointer(Game.Memory.struct_array_pointer[version]);
-			if isRDRAM(structArray) then
-				return ((mainmemory.read_u32_be(structArray - 0x0C) - RDRAMBase) - structArray) / struct_slot_size;
-			end
+		local structArray = dereferencePointer(Game.Memory.struct_array_pointer[version]);
+		if isRDRAM(structArray) then
+			return ((mainmemory.read_u32_be(structArray - 0x0C) - RDRAMBase) - structArray) / struct_slot_size;
 		end
 	end
 	return 0;
@@ -1674,19 +1673,17 @@ function zipToSelectedObject()
 			Game.setZPosition(z);
 		end
 	else
-		if version == 4 then -- TODO: Other versions
-			local structArray = dereferencePointer(Game.Memory.struct_array_pointer[version]);
-			if isRDRAM(structArray) then
-				local rendererPointer = dereferencePointer(structArray + object_index * struct_slot_size);
-				if isRDRAM(rendererPointer) then
-					local x = mainmemory.read_s16_be(rendererPointer + 0x10);
-					local y = mainmemory.read_s16_be(rendererPointer + 0x12);
-					local z = mainmemory.read_s16_be(rendererPointer + 0x14);
+		local structArray = dereferencePointer(Game.Memory.struct_array_pointer[version]);
+		if isRDRAM(structArray) then
+			local rendererPointer = dereferencePointer(structArray + object_index * struct_slot_size);
+			if isRDRAM(rendererPointer) then
+				local x = mainmemory.read_s16_be(rendererPointer + 0x10);
+				local y = mainmemory.read_s16_be(rendererPointer + 0x12);
+				local z = mainmemory.read_s16_be(rendererPointer + 0x14);
 
-					Game.setXPosition(x);
-					Game.setYPosition(y);
-					Game.setZPosition(z);
-				end
+				Game.setXPosition(x);
+				Game.setYPosition(y);
+				Game.setZPosition(z);
 			end
 		end
 	end
@@ -1740,10 +1737,7 @@ function Game.drawUI()
 	local row = 0;
 
 	local objectArray = dereferencePointer(Game.Memory.object_array_pointer[version]);
-	local structArray;
-	if version == 4 then -- TODO: Other versions
-		structArray = dereferencePointer(Game.Memory.struct_array_pointer[version]);
-	end
+	local structArray = dereferencePointer(Game.Memory.struct_array_pointer[version]);
 	local numSlots = getNumSlots();
 
 	gui.text(Game.OSDPosition[1], 2 + Game.OSDRowHeight * row, "Mode: "..script_mode, nil, 'bottomright');
