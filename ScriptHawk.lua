@@ -343,6 +343,12 @@ local supportedGames = {
 	["8A20A5C83D6CEB0F0506CFC9FA20D8F438CAFE51"] = {["moduleName"] = "games.sm64", ["friendlyName"] = "Super Mario 64 (Japan)"},
 	["9BEF1128717F958171A4AFAC3ED78EE2BB4E86CE"] = {["moduleName"] = "games.sm64", ["friendlyName"] = "Super Mario 64 (USA)"},
 
+	-- Smash 64
+	["4B71F0E01878696733EEFA9C80D11C147ECB4984"] = {["moduleName"] = "games.smash64", ["friendlyName"] = "Nintendo All-Star! Dairantou Smash Brothers (Japan)"},
+	["A9BF83FE73361E8D042C33ED48B3851D7D46712C"] = {["moduleName"] = "games.smash64", ["friendlyName"] = "Super Smash Bros. (Australia)"},
+	["6EE8A41FEF66280CE3E3F0984D00B96079442FB9"] = {["moduleName"] = "games.smash64", ["friendlyName"] = "Super Smash Bros. (Europe) (En,Fr,De)"},
+	["E2929E10FCCC0AA84E5776227E798ABC07CEDABF"] = {["moduleName"] = "games.smash64", ["friendlyName"] = "Super Smash Bros. (USA)"},
+
 	-- Tetris Attack
 	-- TODO: Support more versions of this game
 	["EAD855D774C9943F7FFB5B4F429B2DD07FB6F606"] = {["moduleName"] = "Tetris Attack Bot", ["selfContained"] = true, ["friendlyName"] = "Panel de Pon (Japan)"}, -- SNES
