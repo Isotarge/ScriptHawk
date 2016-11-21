@@ -62,6 +62,9 @@ A collection of Lua scripts and RAM watches for [BizHawk](https://github.com/TAS
 - All known versions supported
 - [Object analysis tools](Docs/Object%20Analysis%20Tools.txt): List, Examine
 
+###Super Smash Bros.
+- All known versions supported
+
 ###Toy Story 2: Buzz Lightyear to the Rescue
 - Europe (N64)
 - France (N64)

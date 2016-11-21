@@ -5,7 +5,6 @@
 	-- vScale and pScale are annoying hacks :(
 	-- Scale Game.speedy_speeds
 	-- Take me there implementation
-	-- D-Pad binds are annoying to use, this needs to be fixed in ScriptHawk.lua
 
 Game = {
 	max_rot_units = 4096,

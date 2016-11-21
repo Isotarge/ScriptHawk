@@ -17,10 +17,11 @@ function Game.detectVersion(romName, romHash)
 	elseif romHash == "6EE8A41FEF66280CE3E3F0984D00B96079442FB9" then -- Europe
 		version = 3;
 		return true;
-	elseif romHash == "E2929E10FCCC0AA84E5776227E798ABC07CEDABF" then -- USA
+	elseif romHash == "E2929E10FCCC0AA84E5776227E798ABC07CEDABF" then -- USA -- TODO: 19XXTE?
 		version = 4;
 		return true;
 	end
+	return false;
 end
 
 local characters = {
