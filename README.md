@@ -53,7 +53,7 @@ A collection of Lua scripts and RAM watches for [BizHawk](https://github.com/TAS
 - All known versions supported
 
 ###Crash Bandicoot 3: Warped
-- All known versions supoorted
+- All known versions supported
 
 ###Diddy Kong Racing
 - All known versions supported
