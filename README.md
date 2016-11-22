@@ -12,6 +12,7 @@ A collection of Lua scripts and RAM watches for [BizHawk](https://github.com/TAS
 ###Basic functionality
 - Player position, rotation and speed will be displayed on screen
 - Use L to levitate and the D-Pad to move quickly around the map
+- Alternatively, press the E key to levitate and WASD to move quickly around the map
 - Press / to reset max velocity, odometer etc.
 
 ###Advanced functionality
@@ -51,6 +52,9 @@ A collection of Lua scripts and RAM watches for [BizHawk](https://github.com/TAS
 ###Conker's Bad Fur Day
 - All known versions supported
 
+###Crash Bandicoot 3: Warped
+- All known versions supoorted
+
 ###Diddy Kong Racing
 - All known versions supported
 - [Object analysis tools](Docs/Object%20Analysis%20Tools.txt): List, Examine, Encircle, Zip
@@ -79,7 +83,6 @@ While ScriptHawk does have basic support for OoT and MM there are people who are
 - [glankk/gz](https://github.com/glankk/gz)
 
 ##Partially Supported Games
-- Crash Bandicoot 3: Warped
 - Elmo's Number Journey (N64 only)
 - Elmo's Letter Adventure (N64 only)
 - Rayman 2 (N64 USA only)
