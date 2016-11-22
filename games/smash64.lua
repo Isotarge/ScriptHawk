@@ -67,7 +67,9 @@ local playerFields = {
 	["NextPlayerPointer"] = 0x00, -- Pointer
 	["Character"] = 0x0B, -- Byte?
 	["Costume"] = 0x10, -- Byte?
+	["ShieldSize"] = 0x34, -- s32_be
 	["FacingDirection"] = 0x44, -- s32_be -- -1 = left, 1 = right
+	["XVelocity"] = 0x48, -- Float
 	["YVelocity"] = 0x4C, -- Float
 	["PositionDataPointer"] = 0x78, -- Pointer
 	["PositionData"] = {
@@ -75,7 +77,12 @@ local playerFields = {
 		["YPosition"] = 0x04, -- Float
 	},
 	["JumpCounter"] = 0x148, -- Byte
+	["ShieldBreakerRecoveryTimer"] = 0x26C, -- s32_be
 	["InvinvibilityState"] = 0x5AC, -- u16_be
+	["CharacterConstantsPointer"] = 0x9C8,
+	["CharacterConstants"] = {
+		["NumberOfJumps"] = 0x64,
+	},
 };
 
 function Game.getPlayer(player)
@@ -114,6 +121,14 @@ function Game.getCharacter(player)
 		return mainmemory.readbyte(playerActor + playerFields.Character);
 	end
 	return 0x1C; -- Default to none selected
+end
+
+function Game.getShieldSize(player)
+	local playerActor = Game.getPlayer(player);
+	if isRDRAM(playerActor) then
+		return mainmemory.read_s32_be(playerActor + playerFields.ShieldSize);
+	end
+	return 0;
 end
 
 function Game.getPlayerOSD(player)
@@ -189,6 +204,14 @@ function Game.getYRotation(player)
 	return 0;
 end
 
+function Game.getXVelocity(player)
+	local playerActor = Game.getPlayer(player);
+	if isRDRAM(playerActor) then
+		return mainmemory.readfloat(playerActor + playerFields.XVelocity, true);
+	end
+	return 0;
+end
+
 function Game.getYVelocity(player)
 	local playerActor = Game.getPlayer(player);
 	if isRDRAM(playerActor) then
@@ -206,32 +229,36 @@ end
 
 Game.OSD = {
 	{"P1", Game.getPlayerOSD, playerColors[1]},
-	--{"Separator", 1},
 	{"X", Game.getXPosition},
 	{"Y", Game.getYPosition},
+	{"X Velocity", Game.getXVelocity},
 	{"Y Velocity", Game.getYVelocity},
 	{"Facing", Game.getYRotation},
+	{"Shield", Game.getShieldSize},
 	{"Separator", 1},
 	{"P2", function() return Game.getPlayerOSD(2) end, playerColors[2]},
-	--{"Separator", 1},
 	{"X", function() return Game.getXPosition(2) end},
 	{"Y", function() return Game.getYPosition(2) end},
+	{"X Velocity", function() return Game.getXVelocity(2) end},
 	{"Y Velocity", function() return Game.getYVelocity(2) end},
 	{"Facing", function() return Game.getYRotation(2) end},
+	{"Shield", function() return Game.getShieldSize(2) end},
 	{"Separator", 1},
 	{"P3", function() return Game.getPlayerOSD(3) end, playerColors[3]},
-	--{"Separator", 1},
 	{"X", function() return Game.getXPosition(3) end},
 	{"Y", function() return Game.getYPosition(3) end},
+	{"X Velocity", function() return Game.getXVelocity(3) end},
 	{"Y Velocity", function() return Game.getYVelocity(3) end},
 	{"Facing", function() return Game.getYRotation(3) end},
+	{"Shield", function() return Game.getShieldSize(3) end},
 	{"Separator", 1},
 	{"P4", function() return Game.getPlayerOSD(4) end, playerColors[4]},
-	--{"Separator", 1},
 	{"X", function() return Game.getXPosition(4) end},
 	{"Y", function() return Game.getYPosition(4) end},
+	{"X Velocity", function() return Game.getXVelocity(4) end},
 	{"Y Velocity", function() return Game.getYVelocity(4) end},
 	{"Facing", function() return Game.getYRotation(4) end},
+	{"Shield", function() return Game.getShieldSize(4) end},
 };
 
 return Game;
