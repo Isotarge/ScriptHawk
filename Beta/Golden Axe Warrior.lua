@@ -1,3 +1,26 @@
+--[[
+RNG Solver Design:
+Path points A -> B -> C pass through all points and all enemies
+Collision maps: 160 tile array
+Spawn maps: 160 tile array
+Start index
+Middle index
+End index
+Coordinate you're supposed to reach on a certain frame
+Run path and make sure coordinate reached on that frame
+Number of positions required
+For example minimum 3/6 positions
+Enemies can take a variable number of hits
+Condition to check for the lower number of hits
+If there's a vertical gap in the middle of you and an enemy you can hit it from the bottom but not the top
+2 checks, spawn inside area and spawn by frame x
+Always the up button that manipulates RNG
+Other directions don't affect it?
+Press direction once every 4 frames to move
+Can start moving on any frame
+Button press then Next 4 frames are free to do w/e
+]]
+
 -- Configuration
 showList = false;
 showHitbox = true;
@@ -40,6 +63,33 @@ local mouseClickedLastFrame = false;
 local startDragPosition = {0,0};
 local draggedObjects = {};
 
+RNGSolver = {
+	collisionArray = {}, -- 160 tile array
+	spawnArray = {
+		0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+		0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+		0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+		0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+		0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+		0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+		0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+		0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+		0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+		0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+	}, -- 160 tile array
+	positionRequired = 6, -- Minimum number of positions required
+	mode = "SetSpawn", -- SetSpawn || SetCollision || Solve
+	enabled = false,
+};
+
+function toggle01(value)
+	if value ~= 0 then
+		return 0;
+	else
+		return 1;
+	end
+end
+
 function drawObjects()
 	local height = 16; -- Text row height
 	local width = 8; -- Text column width
@@ -60,12 +110,10 @@ function drawObjects()
 			startDrag = true;
 			startDragPosition = {mouse.X, mouse.Y};
 		end
-		mouseClickedLastFrame = true;
 		dragging = true;
 		dragTransform = {mouse.X - startDragPosition[1], mouse.Y - startDragPosition[2]};
 	else
 		draggedObjects = {};
-		mouseClickedLastFrame = false;
 		dragging = false;
 	end
 
@@ -113,7 +161,7 @@ function drawObjects()
 					hitboxHeight = objectTypeTable.hitbox_height;
 				end
 			else
-				color = black;
+				color = pink;
 				objectType = "Unknown ("..toHexString(objectType)..")";
 			end
 
@@ -137,7 +185,7 @@ function drawObjects()
 
 					local mouseOverText = {
 						objectType,
-						toHexString(objectBase).." "..xPosition..","..yPosition,
+						toHexString(objectBase).." "..round(xPosition)..","..round(yPosition),
 					};
 
 					local maxLength = -math.huge;
@@ -155,14 +203,46 @@ function drawObjects()
 			end
 
 			if showList then
-				gui.text(2, 2 + height * row, xPosition..", "..yPosition.." - "..objectType.." "..toHexString(objectBase), color, 'bottomright');
+				gui.text(2, 2 + height * row, round(xPosition)..", "..round(yPosition).." - "..objectType.." "..toHexString(objectBase), color, 'bottomright');
 				row = row + 1;
 			end
 		end
 	end
+
+	if RNGSolver.enabled then
+		local tileWidth = 16;
+		local tileHeight = 16;
+		if RNGSolver.mode == "SetSpawn" then
+			local toggling = false;
+			local togglePosition = {0, 0};
+			if mouse.Left then
+				if not mouseClickedLastFrame then
+					togglePosition.x = math.floor(mouse.X / tileWidth);
+					togglePosition.y = math.floor(mouse.Y / tileHeight);
+					print("booping the doogley "..togglePosition.x..", "..togglePosition.y);
+					RNGSolver.spawnArray[1 + (togglePosition.y * 16 + togglePosition.x)] = toggle01(RNGSolver.spawnArray[1 + (togglePosition.y * 16 + togglePosition.x)]);
+				end
+			end
+			for x = 0, 16 do
+				for y = 0, 9 do
+					local color = 0x7FFF0000;
+					if RNGSolver.spawnArray[1 + (y * 16 + x)] == 1 then
+						color = 0x7F00FF00;
+					end
+					gui.drawRectangle(x * tileWidth, y * tileHeight, tileWidth, tileHeight, color, color);
+				end
+			end
+		end
+	end
+
+	-- Draw Mouse Cursor
+	gui.drawImage("cursor.png", mouse.X, mouse.Y);
+
+	if mouse.Left then
+		mouseClickedLastFrame = true;
+	else
+		mouseClickedLastFrame = false;
+	end
 end
 
-while true do
-	drawObjects();
-	emu.yield();
-end
+event.onframestart(drawObjects);
