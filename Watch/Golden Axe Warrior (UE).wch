@@ -1,0 +1,22 @@
+SystemID SMS
+00B9	b	u	0	Main RAM	Map Index
+00CF	b	h	0	Main RAM	Crystal 1 Collected
+00D0	b	h	0	Main RAM	Crystal 2 Collected
+00D1	b	h	0	Main RAM	Crystal 3 Collected
+00D2	b	h	0	Main RAM	Crystal 4 Collected
+00D3	b	h	0	Main RAM	Crystal 5 Collected
+00D4	b	h	0	Main RAM	Crystal 6 Collected
+00D5	b	h	0	Main RAM	Crystal 7 Collected
+00D6	b	h	0	Main RAM	Crystal 8 Collected
+00D7	b	h	0	Main RAM	Crystal 9 Collected
+00DA	b	u	0	Main RAM	Max HP
+00DB	b	u	0	Main RAM	Magic
+00DC	b	u	0	Main RAM	Max Magic
+00DD	b	u	0	Main RAM	Horns
+00DE	b	u	0	Main RAM	Keys
+00DF	b	u	0	Main RAM	Equipped Weapon
+0311	b	h	0	Main RAM	Y
+0313	b	u	0	Main RAM	X
+0318	b	u	0	Main RAM	HP
+0618	b	u	0	Main RAM	Boss HP
+
