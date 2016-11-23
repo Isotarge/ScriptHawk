@@ -14,16 +14,18 @@ Enemies can take a variable number of hits
 Condition to check for the lower number of hits
 If there's a vertical gap in the middle of you and an enemy you can hit it from the bottom but not the top
 2 checks, spawn inside area and spawn by frame x
+Trace out movement into room, on frame they should spawn by check that they're vulnerable and check their position
 Always the up button that manipulates RNG
 Other directions don't affect it?
-Press direction once every 4 frames to move
 Can start moving on any frame
 Button press then Next 4 frames are free to do w/e
+Figure out damage boosts, keep manipulating RNG until you're further along than is possible with normal movement
 ]]
 
 -- Configuration
 showList = false;
 showHitbox = true;
+drawCursor = true;
 
 local red = 0xFFFF0000;
 local yellow = 0xFFFFFF00;
@@ -36,11 +38,21 @@ local object_array_base = 0x300;
 local object_size = 0x30;
 local object_array_capacity = 31;
 
+local tileWidth = 16;
+local tileHeight = 16;
+
+local textWidth = 8; -- Text column width
+local textHeight = 16; -- Text row height
+
 local object_fields = {
 	["object_type"] = 0x00, -- Byte
 	["object_types"] = {
 		[0x02] = {["name"] = "Player", ["color"] = yellow},
+		[0x10] = {["name"] = "Spear", ["color"] = yellow}, -- Projectile
+		[0x20] = {["name"] = "Pig Guy", ["color"] = red},
+		[0x26] = {["name"] = "Slime Guy", ["color"] = red},
 	},
+	["vulnerable"] = 0x0C, -- Dying = 0x05, Spawning = 0x04, Vulnerable = 0x02,
 	["y_position"] = 0x10, -- u16_le
 	["x_position"] = 0x12, -- u16_le
 };
@@ -59,7 +71,11 @@ function round(num, idp)
 	return tonumber(string.format("%."..(idp or 0).."f", num));
 end
 
-local mouseClickedLastFrame = false;
+local mouseLastFrame = {
+	Left = false,
+	Middle = false,
+	Right = false,
+};
 local startDragPosition = {0,0};
 local draggedObjects = {};
 
@@ -82,6 +98,16 @@ RNGSolver = {
 	enabled = false,
 };
 
+function isVulnerable(object)
+	return mainmemory.readbyte(object + object_fields.vulnerable) == 0x02;
+end
+
+function getTileIndex(object)
+	local xPos = math.floor(mainmemory.read_u16_le(objectBase + object_fields.x_position) / 256 / tileWidth);
+	local yPos = math.floor(mainmemory.read_u16_le(objectBase + object_fields.y_position) / 256 / tileHeight);
+	return 1 + (yPos * 16 + xPos);
+end
+
 function toggle01(value)
 	if value ~= 0 then
 		return 0;
@@ -91,22 +117,18 @@ function toggle01(value)
 end
 
 function drawObjects()
-	local height = 16; -- Text row height
-	local width = 8; -- Text column width
+
 	local mouse = input.getmouse();
 
 	if showHitbox then
 		gui.clearGraphics();
 	end
 
-	-- Draw mouse pixel
-	--gui.drawPixel(mouse.X, mouse.Y, red);
-
 	local startDrag = false;
 	local dragging = false;
 	local dragTransform = {0, 0};
 	if mouse.Left then
-		if not mouseClickedLastFrame then
+		if not mouseLastFrame.Left then
 			startDrag = true;
 			startDragPosition = {mouse.X, mouse.Y};
 		end
@@ -192,34 +214,29 @@ function drawObjects()
 					for t = 1, #mouseOverText do
 						maxLength = math.max(maxLength, string.len(mouseOverText[t]));
 					end
-					local safeX = math.min(xPosition + hitboxXOffset, 256 - (maxLength * width));
-					local safeY = math.min(yPosition + hitboxYOffset, 192 - (#mouseOverText * height));
+					local safeX = math.min(xPosition + hitboxXOffset, 256 - (maxLength * textWidth));
+					local safeY = math.min(yPosition + hitboxYOffset, 192 - (#mouseOverText * textHeight));
 
 					for t = 1, #mouseOverText do
-						gui.drawText(safeX, safeY + ((t - 1) * height), mouseOverText[t], color);
+						gui.drawText(safeX, safeY + ((t - 1) * textHeight), mouseOverText[t], color);
 					end
 				end
 				gui.drawRectangle(xPosition + hitboxXOffset, yPosition + hitboxYOffset, hitboxWidth, hitboxHeight, color); -- Draw the object's hitbox
 			end
 
 			if showList then
-				gui.text(2, 2 + height * row, round(xPosition)..", "..round(yPosition).." - "..objectType.." "..toHexString(objectBase), color, 'bottomright');
+				gui.text(2, 2 + textHeight * row, round(xPosition)..", "..round(yPosition).." - "..objectType.." "..toHexString(objectBase), color, 'bottomright');
 				row = row + 1;
 			end
 		end
 	end
 
 	if RNGSolver.enabled then
-		local tileWidth = 16;
-		local tileHeight = 16;
 		if RNGSolver.mode == "SetSpawn" then
-			local toggling = false;
-			local togglePosition = {0, 0};
 			if mouse.Left then
-				if not mouseClickedLastFrame then
+				if not mouseLastFrame.Left then
 					togglePosition.x = math.floor(mouse.X / tileWidth);
 					togglePosition.y = math.floor(mouse.Y / tileHeight);
-					print("booping the doogley "..togglePosition.x..", "..togglePosition.y);
 					RNGSolver.spawnArray[1 + (togglePosition.y * 16 + togglePosition.x)] = toggle01(RNGSolver.spawnArray[1 + (togglePosition.y * 16 + togglePosition.x)]);
 				end
 			end
@@ -235,14 +252,18 @@ function drawObjects()
 		end
 	end
 
-	-- Draw Mouse Cursor
-	gui.drawImage("cursor.png", mouse.X, mouse.Y);
-
-	if mouse.Left then
-		mouseClickedLastFrame = true;
-	else
-		mouseClickedLastFrame = false;
+	if mouse.Middle and not mouseLastFrame.Middle then
+		drawCursor = not drawCursor;
 	end
+
+	-- Draw Mouse Cursor
+	if drawCursor then
+		gui.drawImage("cursor.png", mouse.X, mouse.Y - 4);
+	end
+
+	mouseLastFrame.Left = mouse.Left;
+	mouseLastFrame.Middle = mouse.Middle;
+	mouseLastFrame.Right = mouse.Right;
 end
 
 event.onframestart(drawObjects);
