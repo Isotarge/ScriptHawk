@@ -359,7 +359,10 @@ local max_slots = 0x100;
 
 -- Relative to slot start
 slot_variables = {
-	[0x00] = {["Type"] = "Pointer"}, -- TODO: Does this have anything to do with that huge linked list? Doesn't seem to
+	[0x00] = {["Type"] = "Pointer", ["Name"] = "Unknown Object Struct 1", ["Fields"] = {
+            [0x00] = {["Type"] = "Pointer"},
+        },
+    }, -- TODO: Does this have anything to do with that huge linked list? Doesn't seem to
 	[0x04] = {["Type"] = "Float", ["Name"] = {"X", "X Pos", "X Position"}},
 	[0x08] = {["Type"] = "Float", ["Name"] = {"Y", "Y Pos", "Y Position"}},
 	[0x0C] = {["Type"] = "Float", ["Name"] = {"Z", "Z Pos", "Z Position"}},
@@ -372,25 +375,22 @@ slot_variables = {
 		},
 	},
 	[0x18] = {["Type"] = "Pointer"},
-
 	[0x1C] = {["Type"] = "Float"},
 	[0x20] = {["Type"] = "Float"},
 	[0x24] = {["Type"] = "Float"},
-
 	[0x28] = {["Type"] = "Float", ["Name"] = "Chase Velocity"},
 	[0x2C] = {["Type"] = "Float"},
 	[0x30] = {["Type"] = "Float"},
 
 	[0x38] = {["Type"] = "u16_be", ["Name"] = "Movement Timer"},
 	[0x3B] = {["Type"] = "Byte", ["Name"] = "Movement State"},
-
+    [0x44] = {["Type"] = "Byte"},
 	[0x48] = {["Type"] = "Float", ["Name"] = "Race path progression"},
 	[0x4C] = {["Type"] = "Float", ["Name"] = "Speed (rubberband)"},
 
 	[0x50] = {["Type"] = "Float", ["Name"] = {"Facing Angle", "Facing", "Rot Y", "Rot. Y", "Y Rotation"}},
 
 	[0x60] = {["Type"] = "Float", ["Name"] = "Recovery Timer"}, -- TTC Crab
-
 	[0x64] = {["Type"] = "Float", ["Name"] = {"Moving Angle", "Moving", "Rot Y", "Rot. Y", "Y Rotation"}},
 	[0x68] = {["Type"] = "Float", ["Name"] = {"Rot X", "Rot. X", "X Rotation"}},
 
@@ -408,7 +408,8 @@ slot_variables = {
 	[0x100] = {["Type"] = "Pointer"},
 	[0x104] = {["Type"] = "Pointer"},
 
-	[0x114] = {["Type"] = "Float", ["Name"] = "Sound timer?"}, -- Also used by Conga to decide when to throw orange
+    [0x110] = {["Type"] = "Float", ["Name"] = {"Rot Z", "Rot. Z", "Z Rotation"}},
+	[0x114] = {["Type"] = "Float", ["Name"] = "Sound timer?"}, -- Also used by Conga to decide when to throw orange --copy of timer from animation substruct
 	[0x118] = {["Type"] = "Float"},
 	[0x11C] = {["Type"] = "Float"},
 	[0x120] = {["Type"] = "Float"},
@@ -419,6 +420,8 @@ slot_variables = {
 
 	[0x12C] = {["Type"] = "Pointer"},
 	[0x130] = {["Type"] = "Pointer"},
+    [0x13B] = {["Type"] = "Byte"},
+    [0x148] = {["Type"] = "Pointer"},
 	[0x14C] = {["Type"] = "Pointer", ["Name"] = "Bone Array 1 Pointer"},
 	[0x150] = {["Type"] = "Pointer", ["Name"] = "Bone Array 2 Pointer"},
 

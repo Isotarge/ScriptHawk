@@ -15,9 +15,9 @@ JAL 0x80400000
 NOP
 
 ;NORMAL MODE JUMP LOCATION: 0x80334FFC
-;.org 0x80334FFC
-;JAL NormalMode
-;NOP
+.org 0x80334FFC
+JAL NormalModeCode
+NOP
 
 //EXISTING FUNCTIONS
 .include "Docs/BK ASM Hacking/BK_NTSC.S"
@@ -190,8 +190,8 @@ MOV v0 zero
 B HouseKeeping
 
 NotInPracMenu:
-    JAL BetaPauseMenu
-    NOP
+    LA a0 @ReturnToLairEnabled
+    SB zero 0(a0)
 	JAL @PauseMenu
 	NOP
 	;check if entering practice menu
@@ -353,6 +353,14 @@ PUSH a1
 PUSH a2
 PUSH at
 
+;if beatMenuNotSetUp
+LB a0 PracMenuSetup
+BEQ a0 zero NormalModeCode_MenuSetup
+NOP
+    JAL BetaPauseMenu
+    NOP
+    MOV a0 zero
+NormalModeCode_MenuSetup:
 
 ;If Press-L to levitate ste
 	;JAL PressLToLevitate ;Press-L to levitate code
@@ -433,7 +441,8 @@ NOP
 ; Global Variables
 ; BitFlags
 ;----------------------------------------------------------------
-
+PracMenuSetup:
+.byte 1
 InPracMenu:
 .byte 0
 PracMenuCursorPos:
@@ -446,7 +455,7 @@ InfinitesState:
 .byte 0
 ResetOnEnterState:
 .byte 0
-MoveSet
+MoveSet:
 .byte 0
 TakeMeThereState:
 .byte 0
