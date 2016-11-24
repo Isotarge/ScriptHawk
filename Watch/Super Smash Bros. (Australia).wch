@@ -1,0 +1,7 @@
+SystemID N64
+0A54B4	d	u	1	RDRAM	P1 Damage VS
+0A5528	d	u	1	RDRAM	P2 Damage VS
+0A5828	d	h	1	RDRAM	Match Settings Pointer
+131594	d	h	1	RDRAM	P1 Pointer
+131E17	b	u	1	RDRAM	P2 Damage (UI)
+
