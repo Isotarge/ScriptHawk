@@ -66,7 +66,7 @@ local function plot_pos()
 			mainmemory.write_u16_be(playerObject + angle, current_yrot + currentAngle);
 
 			-- Set Position
-			memory.writefloat(playerObject + x_pos, currentX, true);
+			mainmemory.writefloat(playerObject + x_pos, currentX, true);
 
 			-- Update angle and position for next test
 			currentAngle = currentAngle + angle_increments;
