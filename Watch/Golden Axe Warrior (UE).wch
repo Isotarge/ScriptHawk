@@ -1,5 +1,6 @@
 SystemID SMS
-00B9	b	u	0	Main RAM	Map Index
+00B9	b	h	0	Main RAM	Map Index
+00BA	b	u	0	Main RAM	Map Type
 00CF	b	h	0	Main RAM	Crystal 1 Collected
 00D0	b	h	0	Main RAM	Crystal 2 Collected
 00D1	b	h	0	Main RAM	Crystal 3 Collected

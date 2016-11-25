@@ -308,6 +308,9 @@ local supportedGames = {
 	["FA7A34B92D06013625C2FE155A9DB5A8"] = {["moduleName"] = "beta.Galahad", ["selfContained"] = true, ["friendlyName"] = "Legend of Galahad, The (UE) [t1+C]"},
 	["3F183BD8A7360E3BE3CF65AE8FF9810C"] = {["moduleName"] = "beta.Galahad", ["selfContained"] = true, ["friendlyName"] = "Legend of Galahad, The (UE) [t1]"},
 
+	-- Golden Axe Warrior
+	["D46E40BBB729BA233F171AD7BF6169F5"] = {["moduleName"] = "beta.Golden Axe Warrior", ["selfContained"] = true, ["friendlyName"] = "Golden Axe Warrior (UE)"},
+
 	-- MM
 	["B38B71D2961DFFB523020A67F4807A4B704E347A"] = {["moduleName"] = "games.mm", ["friendlyName"] = "Legend of Zelda, The - Majora's Mask (Europe) (En,Fr,De,Es) (Beta)"},
 	["BB4E4757D10727C7584C59C1F2E5F44196E9C293"] = {["moduleName"] = "games.mm", ["friendlyName"] = "Legend of Zelda, The - Majora's Mask (Europe) (En,Fr,De,Es) (Rev A)"},
