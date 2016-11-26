@@ -17,7 +17,7 @@ local object_array_capacity = 16;
 local object_fields = {
 	["object_type"] = 0x00, -- Byte
 	["object_types"] = {
-		[0xAA] = {name = "Red Snake", gold = 10, color = red},
+		[0xAA] = {name = "Red Snake", gold = 10, max_hp = 1, color = red},
 	},
 	["y_position"] = 0x01, -- u8
 	["x_position"] = 0x02, -- u8
@@ -152,7 +152,7 @@ function drawObjects()
 			end
 
 			if showList then
-				gui.text(2, 2 + height * row, xPosition..", "..yPosition.." - "..objectType.." "..toHexString(objectBase), color, 'bottomright');
+				gui.text(2, 2 + height * row, xPosition..", "..yPosition.." - "..hp.."/? HP - "..objectType.." "..toHexString(objectBase), color, 'bottomright');
 				row = row + 1;
 			end
 		end
