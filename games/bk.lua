@@ -359,18 +359,56 @@ local max_slots = 0x100;
 
 -- Relative to slot start
 slot_variables = {
-	[0x00] = {["Type"] = "Pointer", ["Name"] = "Unknown Object Struct 1", ["Fields"] = {
-            [0x00] = {["Type"] = "Pointer"},
-        },
-    }, -- TODO: Does this have anything to do with that huge linked list? Doesn't seem to
+	[0x00] = {["Type"] = "Pointer", ["Name"] = "Struct Array Object Pointer", ["Fields"] = {
+            [0x00] = {["Name"] = "Renderer Pointer", ["Type"] = "Pointer", ["Fields"] = {
+                    [0x0E] = {["Name"] = "scale", ["Type"] = "u16_be"},
+			        [0x10] = {["Name"] = "x_pos", ["Type"] = "s16_be"},
+			        [0x12] = {["Name"] = "y_pos", ["Type"] = "s16_be"},
+			        [0x14] = {["Name"] = "z_pos", ["Type"] = "s16_be"},
+                },   
+            },
+            [0x04] = {["Name"] = "Unknown Pointer 0x04", ["Type"] = "Pointer"},
+	        [0x08] = {["Name"] = "Unknown Pointer 0x08", ["Type"] = "Pointer"},
+        }, -- TODO: Does this have anything to do with that huge linked list? Doesn't seem to
+    },
 	[0x04] = {["Type"] = "Float", ["Name"] = {"X", "X Pos", "X Position"}},
 	[0x08] = {["Type"] = "Float", ["Name"] = {"Y", "Y Pos", "Y Position"}},
 	[0x0C] = {["Type"] = "Float", ["Name"] = {"Z", "Z Pos", "Z Position"}},
 	[0x10] = {["Type"] = "u8", ["Name"] = "State"},
-	[0x14] = {["Type"] = "Pointer", ["Name"] = "Animation Object Pointer", ["Fields"] = {
-			[0x00] = {["Type"] = "Pointer"},
-			[0x38] = {["Type"] = "u16_be", ["Name"] = "Animation Type"},
-			[0x3C] = {["Type"] = "Float", ["Name"] = "Animation Timer"},
+	[0x14] = {["Type"] = "Pointer", ["Name"] = "Movement Object Pointer", ["Fields"] = {
+			[0x00] = {["Type"] = "Pointer", ["Name"] = "Animation Object Pointer", ["Fields"] = {
+                        [0x00] = {["Type"] = "Pointer"},
+                        
+                        [0x08] = {["Type"] = "u16_be"},
+                        [0x0A] = {["Type"] = "u16_be"},
+                        [0x0C] = {["Type"] = "u16_be"},
+                        
+                        [0x10] = {["Type"] = "u32_be", ["Name"] = "Animation Type"},
+                        [0x14] = {["Type"] = "Float", ["Name"] = "Animation Timer Copy"},
+                        [0x18] = {["Type"] = "Float"},
+                        [0x1C] = {["Type"] = "Byte"},
+                        [0x1D] = {["Type"] = "Byte"},
+                        [0x1E] = {["Type"] = "Byte"},
+                        [0x1F] = {["Type"] = "Byte"},
+                        [0x20] = {["Type"] = "Byte"},
+                        [0x21] = {["Type"] = "Byte"},
+                     },
+            },
+            [0x04] = {["Type"] = "Float", ["Name"] = "Animation Timer"},
+            [0x08] = {["Type"] = "Float"},
+            [0x0C] = {["Type"] = "Float", ["Name"] = "Movement Duration"},
+            [0x10] = {["Type"] = "Float", ["Name"] = "Animation Duration"},
+            [0x14] = {["Type"] = "Float", ["Name"] = "Bone Transition Duration"},
+            [0x18] = {["Type"] = "u32_be"},
+			[0x1C] = {["Type"] = "u32_be", ["Name"] = "Movement State"},
+			[0x20] = {["Type"] = "Byte", ["Name"] = "Movement SubState"},
+            [0x21] = {["Type"] = "Byte"},
+            [0x22] = {["Type"] = "Byte"},
+            [0x23] = {["Type"] = "Byte"},
+            [0x24] = {["Type"] = "Byte"},
+            [0x25] = {["Type"] = "Byte"},
+            [0x26] = {["Type"] = "Byte"},
+            [0x27] = {["Type"] = "Byte"},
 		},
 	},
 	[0x18] = {["Type"] = "Pointer"},
@@ -385,8 +423,10 @@ slot_variables = {
     
 	[0x3B] = {["Type"] = "Byte", ["Name"] = "Movement State"},
     
+    [0x40] = {["Type"] = "u32_be"},
     [0x44] = {["Type"] = "Byte"},
-	[0x48] = {["Type"] = "Float", ["Name"] = "Race path progression"},
+	
+    [0x48] = {["Type"] = "Float", ["Name"] = "Race path progression"},
 	[0x4C] = {["Type"] = "Float", ["Name"] = "Speed (rubberband)"},
 	[0x50] = {["Type"] = "Float", ["Name"] = {"Facing Angle", "Facing", "Rot Y", "Rot. Y", "Y Rotation"}},
 
@@ -394,7 +434,7 @@ slot_variables = {
 	[0x64] = {["Type"] = "Float", ["Name"] = {"Moving Angle", "Moving", "Rot Y", "Rot. Y", "Y Rotation"}},
 	[0x68] = {["Type"] = "Float", ["Name"] = {"Rot X", "Rot. X", "X Rotation"}},
 
-	[0x78] = {["Type"] = "u32_be"},
+    [0x78] = {["Type"] = "u32_be"},
 	[0x7C] = {["Type"] = "Float", ["Name"] = "Popped Amount"},
 	[0x80] = {["Type"] = "Float"},
 	[0x84] = {["Type"] = "Float", ["Name"] = "Countdown timer?"},
@@ -404,30 +444,41 @@ slot_variables = {
 	[0x98] = {["Type"] = "Float"},
 
 	[0xBC] = {["Type"] = "u32_be", ["Name"] = "Spawn Actor ID"}, -- TODO: Better name for this, lifted from Runehero's C source
-
-	[0xEB] = {["Type"] = "Byte", ["Name"] = "Flag 2"}, -- TODO: Better name for this, lifted from Runehero's C source
-	[0xEC] = {["Type"] = "float", ["Name"] = "AnimationTimer_Copy"},
-	[0x100] = {["Type"] = "Pointer"},
+	
+    [0xEB] = {["Type"] = "Byte", ["Name"] = "Flag 2"}, -- TODO: Better name for this, lifted from Runehero's C source
+    [0xEC] = {["Type"] = "Float", ["Name"] = "AnimationTimer_Copy"},
+	[0xF0] = {["Type"] = "Float", ["Name"] = "AnimationDuration_Copy"},
+    
+    [0xF8] = {["Type"] = "Float"},
+    [0xFC] = {["Type"] = "Float", ["Name"] = "MovementTimer_Copy"},
+    [0x100] = {["Type"] = "Pointer"},
 	[0x104] = {["Type"] = "Pointer"},
 
-	[0x110] = {["Type"] = "Float", ["Name"] = {"Rot Z", "Rot. Z", "Z Rotation"}},
+    [0x110] = {["Type"] = "Float", ["Name"] = {"Rot Z", "Rot. Z", "Z Rotation"}},
 	[0x114] = {["Type"] = "Float", ["Name"] = "Sound timer?"}, -- Also used by Conga to decide when to throw orange --copy of timer from animation substruct
 	[0x118] = {["Type"] = "Float"},
 	[0x11C] = {["Type"] = "Float"},
 	[0x120] = {["Type"] = "Float"},
 
 	[0x125] = {["Type"] = "Byte", ["Name"] = "Transparancy"},
-
+    
 	[0x127] = {["Type"] = "Byte", ["Name"] = "Eye State"},
 	[0x128] = {["Type"] = "Float", ["Name"] = "Scale"},
-
 	[0x12C] = {["Type"] = "Pointer"},
 	[0x130] = {["Type"] = "Pointer"},
-	[0x13B] = {["Type"] = "Byte"},
-	[0x148] = {["Type"] = "Pointer"},
+    
+    [0x138] = {["Type"] = "Byte"},
+    
+    [0x13B] = {["Type"] = "Byte"},
+    
+    [0x148] = {["Type"] = "Pointer"},
 	[0x14C] = {["Type"] = "Pointer", ["Name"] = "Bone Array 1 Pointer"},
 	[0x150] = {["Type"] = "Pointer", ["Name"] = "Bone Array 2 Pointer"},
 
+    [0x158] = {["Type"] = "u32_be"},
+    [0x15C] = {["Type"] = "u32_be"},
+    
+    [0x16F] = {["Type"] = "Byte"},
 	[0x170] = {["Type"] = "Float"},
 	[0x174] = {["Type"] = "Float"},
 	[0x178] = {["Type"] = "Float"},
@@ -474,8 +525,8 @@ end
 ----------------
 
 local animation_object_unknown_pointer = 0x00; -- TODO: Stop using local constants for this stuff, they're in the slot_variables array now
-local animation_object_animation_type = 0x38;
-local animation_object_animation_timer = 0x3C;
+local animation_object_animation_type = 0x10;
+local animation_object_animation_timer = 0x14;
 
 local animation_types = {
 	[0x01] = "Banjo Ducking",
@@ -1284,14 +1335,14 @@ local movementStates = {
 	[108] = "Knockback", -- Walrus
 	[109] = "Death", -- Walrus
 	[110] = "Biting", -- Croc
-	[111] = "EatingWrongThing", --Croc
-	[112] = "EatingCorrectThing", --Croc
+    [111] = "EatingWrongThing", --Croc
+    [112] = "EatingCorrectThing", --Croc
 	[113] = "Falling", -- Talon Trot
 	[114] = "Recovering", -- Getting up after taking damage, eg. fall famage
 	[115] = "Locked", -- Cutscene
 	[116] = "Locked", -- Jiggy pad, Mumbo transformation, Bottles
 	[117] = "Locked", -- Bottles
-	[118] = "Locked", --Flying
+    [118] = "Locked", --Flying
 	[119] = "Locked", -- Water Surface
 	[120] = "Locked", -- Underwater
 	[121] = "Locked", -- Holding Jiggy, Talon Trot
@@ -1788,15 +1839,18 @@ function Game.drawUI()
 			local currentSlotBase = objectArray + getSlotBase(i);
 
 			local animationType = "Unknown";
-			local animationObjectPointer = dereferencePointer(currentSlotBase + 0x14); -- TODO: Get this constant from variable name somehow
-			if isRDRAM(animationObjectPointer) then
-				animationType = mainmemory.read_u32_be(animationObjectPointer + animation_object_animation_type);
-				if type(animation_types[animationType]) == "string" then
-					animationType = animation_types[animationType];
-				else
-					animationType = toHexString(animationType);
-				end
-			end
+			local movementObjectPointer = dereferencePointer(currentSlotBase + 0x14); -- TODO: Get this constant from variable name somehow
+			if isRDRAM(movementObjectPointer) then
+                local animationObjectPointer = dereferencePointer(movementObjectPointer + 0x00);
+                if isRDRAM(animationObjectPointer) then
+				    animationType = mainmemory.read_u32_be(animationObjectPointer + animation_object_animation_type);
+				    if type(animation_types[animationType]) == "string" then
+					   animationType = animation_types[animationType];
+				    else
+					   animationType = toHexString(animationType);
+				    end
+			    end
+            end
 
 			local color = nil;
 			if object_index == i then
