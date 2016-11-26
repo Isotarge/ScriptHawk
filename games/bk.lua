@@ -394,7 +394,7 @@ slot_variables = {
 	[0x64] = {["Type"] = "Float", ["Name"] = {"Moving Angle", "Moving", "Rot Y", "Rot. Y", "Y Rotation"}},
 	[0x68] = {["Type"] = "Float", ["Name"] = {"Rot X", "Rot. X", "X Rotation"}},
 
-    [0x78] = {["Type"] = "u32_be"},
+	[0x78] = {["Type"] = "u32_be"},
 	[0x7C] = {["Type"] = "Float", ["Name"] = "Popped Amount"},
 	[0x80] = {["Type"] = "Float"},
 	[0x84] = {["Type"] = "Float", ["Name"] = "Countdown timer?"},
@@ -404,27 +404,27 @@ slot_variables = {
 	[0x98] = {["Type"] = "Float"},
 
 	[0xBC] = {["Type"] = "u32_be", ["Name"] = "Spawn Actor ID"}, -- TODO: Better name for this, lifted from Runehero's C source
-	
-    [0xEB] = {["Type"] = "Byte", ["Name"] = "Flag 2"}, -- TODO: Better name for this, lifted from Runehero's C source
-    [0xEC] = {["Type"] = "float", ["Name"] = "AnimationTimer_Copy"}
+
+	[0xEB] = {["Type"] = "Byte", ["Name"] = "Flag 2"}, -- TODO: Better name for this, lifted from Runehero's C source
+	[0xEC] = {["Type"] = "float", ["Name"] = "AnimationTimer_Copy"},
 	[0x100] = {["Type"] = "Pointer"},
 	[0x104] = {["Type"] = "Pointer"},
 
-    [0x110] = {["Type"] = "Float", ["Name"] = {"Rot Z", "Rot. Z", "Z Rotation"}},
+	[0x110] = {["Type"] = "Float", ["Name"] = {"Rot Z", "Rot. Z", "Z Rotation"}},
 	[0x114] = {["Type"] = "Float", ["Name"] = "Sound timer?"}, -- Also used by Conga to decide when to throw orange --copy of timer from animation substruct
 	[0x118] = {["Type"] = "Float"},
 	[0x11C] = {["Type"] = "Float"},
 	[0x120] = {["Type"] = "Float"},
 
 	[0x125] = {["Type"] = "Byte", ["Name"] = "Transparancy"},
-    
+
 	[0x127] = {["Type"] = "Byte", ["Name"] = "Eye State"},
 	[0x128] = {["Type"] = "Float", ["Name"] = "Scale"},
 
 	[0x12C] = {["Type"] = "Pointer"},
 	[0x130] = {["Type"] = "Pointer"},
-    [0x13B] = {["Type"] = "Byte"},
-    [0x148] = {["Type"] = "Pointer"},
+	[0x13B] = {["Type"] = "Byte"},
+	[0x148] = {["Type"] = "Pointer"},
 	[0x14C] = {["Type"] = "Pointer", ["Name"] = "Bone Array 1 Pointer"},
 	[0x150] = {["Type"] = "Pointer", ["Name"] = "Bone Array 2 Pointer"},
 
@@ -1284,14 +1284,14 @@ local movementStates = {
 	[108] = "Knockback", -- Walrus
 	[109] = "Death", -- Walrus
 	[110] = "Biting", -- Croc
-    [111] = "EatingWrongThing" --Croc
-    [112] = "EatingCorrectThing" --Croc
+	[111] = "EatingWrongThing", --Croc
+	[112] = "EatingCorrectThing", --Croc
 	[113] = "Falling", -- Talon Trot
 	[114] = "Recovering", -- Getting up after taking damage, eg. fall famage
 	[115] = "Locked", -- Cutscene
 	[116] = "Locked", -- Jiggy pad, Mumbo transformation, Bottles
 	[117] = "Locked", -- Bottles
-    [118] = "Locked", --Flying
+	[118] = "Locked", --Flying
 	[119] = "Locked", -- Water Surface
 	[120] = "Locked", -- Underwater
 	[121] = "Locked", -- Holding Jiggy, Talon Trot
