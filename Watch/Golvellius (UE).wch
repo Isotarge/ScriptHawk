@@ -1,0 +1,12 @@
+SystemID SMS
+0101	b	u	0	Main RAM	Y Position
+0102	b	u	0	Main RAM	X Position
+0109	b	s	0	Main RAM	Y Velocity
+010B	b	s	0	Main RAM	X Velocity
+083F	b	h	0	Main RAM	Gold 100000s
+0840	b	h	0	Main RAM	Gold 1000s
+0841	b	h	0	Main RAM	Gold 10s
+0842	b	h	0	Main RAM	Max Gold 100000s
+0843	b	h	0	Main RAM	Max Gold 1000s
+0844	b	h	0	Main RAM	Max Gold 10s
+
