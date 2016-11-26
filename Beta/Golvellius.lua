@@ -4,7 +4,7 @@ showHitbox = true;
 
 local red = 0xFFFF0000;
 local yellow = 0xFFFFFF00;
-local green = 0xFF00FF00;
+local green = 0xFF00AA00; -- Hair Color
 local pink = 0xFFFF00FF;
 local black = 0xFF000000;
 local white = 0xFFFFFFFF;
@@ -17,12 +17,103 @@ local object_array_capacity = 16;
 local object_fields = {
 	["object_type"] = 0x00, -- Byte
 	["object_types"] = {
-		[0xAA] = {name = "Red Snake", gold = 10, max_hp = 1, color = red},
+		[0x87] = {name = "Snakelet", gold = 10, color = red, max_hp = 1},
+		[0x88] = {name = "Fire Spirit", gold = 40, color = red, max_hp = 2},
+		[0x89] = {name = "Flea", gold = 30, color = red, max_hp = 2},
+		[0x8A] = {name = "Basketworm", gold = 20, color = red, max_hp = 2},
+		[0x8B] = {name = "Spider", gold = 100, color = red, max_hp = 3},
+		[0x8C] = {name = "Health", color = pink},
+		--
+		[0x90] = {name = "Fly", gold = 80, color = red, max_hp = 1},
+		[0x91] = {name = "Tick", gold = 60, color = red, max_hp = 1},
+		[0x92] = {name = "Dark Blue Bat", gold = 30, color = red, max_hp = 1},
+		[0x93] = {name = "Little Big Bat", gold = 0, color = red, max_hp = 0},
+		[0x94] = {name = "Big Bat", gold = 0, color = red, max_hp = 16},
+		--
+		[0x99] = {name = "Black Crow", gold = 40, color = red, max_hp = 1},
+		[0x9A] = {name = "Blue Crow", gold = 90, color = red, max_hp = 2},
+		[0x9B] = {name = "Red Crow", gold = 210, color = red, max_hp = 3},
+		--
+		[0x9D] = {name = "Dark Blue Bat", gold = 30, color = red, max_hp = 1},
+		[0x9E] = {name = "Light Blue Bat", gold = 50, color = red, max_hp = 2},
+		[0x9F] = {name = "Red Bat", gold = 200, color = red, max_hp = 2},
+		[0xA0] = {name = "White Bat", gold = 300, color = red, max_hp = 6},
+		[0xA1] = {name = "Red Bat", gold = 200, color = red, max_hp = 6},
+		[0xA2] = {name = "Yellow Bee", gold = 100, color = red, max_hp = 1},
+		[0xA3] = {name = "Red Bee", gold = 200, color = red, max_hp = 2},
+		[0xA4] = {name = "Light Blue Spider", gold = 80, color = red, max_hp = 2},
+		[0xA5] = {name = "Dark Blue Spider", gold = 180, color = red, max_hp = 5},
+		[0xA6] = {name = "Red Spider", gold = 280, color = red, max_hp = 5},
+		--
+		[0xA8] = {name = "Green Frog", gold = 40, color = red, max_hp = 2},
+		[0xA9] = {name = "Red Frog", gold = 200, color = red, max_hp = 3},
+		[0xAA] = {name = "Red Snake", gold = 10, color = red, max_hp = 1},
+		[0xAB] = {name = "Blue Snake", gold = 40, color = red, max_hp = 2},
+		[0xAC] = {name = "Green Snake", gold = 180, color = red, max_hp = 3},
+		[0xAD] = {name = "White Snake", gold = 220, color = red, max_hp = 6},
+		[0xAE] = {name = "Red Jellyfish", gold = 300, color = red, max_hp = 9},
+		--
+		[0xB0] = {name = "Green Potato Bug", gold = 100, color = red, max_hp = 4},
+		[0xB1] = {name = "White Potato Bug", gold = 240, color = red, max_hp = 9},
+		[0xB2] = {name = "Red Porcupig", gold = 30, color = red, max_hp = 2},
+		[0xB3] = {name = "Blue Porcupig", gold = 100, color = red, max_hp = 4},
+		--
+		[0xB5] = {name = "Red Troll", gold = 120, color = red, max_hp = 6},
+		[0xB6] = {name = "Blue Troll", gold = 330, color = red, max_hp = 6},
+		--
+		[0xB8] = {name = "Blue Knight", gold = 100, color = red, max_hp = 6},
+		[0xB9] = {name = "Red Knight", gold = 200, color = red, max_hp = 9},
+		--
+		[0xBB] = {name = "Skeleton", gold = 120, color = red, max_hp = 4},
+		[0xBC] = {name = "Black Skeleton", gold = 330, color = red, max_hp = 9},
+		[0xBD] = {name = "Blue Mouse", gold = 200, color = red, max_hp = 6},
+		--
+		[0xBF] = {name = "Red Mole", gold = 60, color = red, max_hp = 2},
+		[0xC0] = {name = "Blue Mole", gold = 120, color = red, max_hp = 5},
+		--
+		[0xD0] = {name = "Boss 1", color = red, max_hp = 20},
+		[0xD1] = {name = "Boss 2", color = red, max_hp = 36},
+		[0xD2] = {name = "Boss 3", color = red, max_hp = 40},
+		[0xD3] = {name = "Boss 4", color = red, max_hp = 66},
+		[0xD4] = {name = "Boss 5", color = red, max_hp = 56},
+		--
+		[0xDB] = {name = "Projectile", color = yellow},
+		--
+		[0xE0] = {name = "Boss 1 Projectile", color = yellow},
+		[0xE1] = {name = "Boss 3 Projectile", color = yellow},
+		[0xE2] = {name = "Boss 4 Projectile", color = yellow},
+		--
+		[0xE5] = {name = "Giant Snake", gold = 0, color = red, max_hp = 5},
+		--
+		[0xEF] = {name = "Projectile", color = yellow},
 	},
 	["y_position"] = 0x01, -- u8
 	["x_position"] = 0x02, -- u8
 	["health"] = 0x15, -- byte
 };
+
+-- Map data
+local map_base = 0xA00;
+local map_width = 0x0F;
+local map_height = 0x0C;
+
+function getHoleTile()
+	return mainmemory.readbyte(0xAD2);
+end
+
+function getHolePosition()
+	local holeTile = getHoleTile();
+	local xTile = holeTile % map_width;
+	local yTile = math.floor(holeTile / map_width);
+	return {xTile * 16 + 8, yTile * 16};
+end
+
+function renderHolePosition()
+	local holePosition = getHolePosition();
+	gui.drawRectangle(holePosition[1], holePosition[2], 16, 16, green, 0x66666666);
+	gui.drawText(holePosition[1] + 3, holePosition[2], "H", white, 0x00000000);
+end
+event.onframestart(renderHolePosition);
 
 function toHexString(value, desiredLength, prefix)
 	value = string.format("%X", value or 0);

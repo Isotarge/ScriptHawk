@@ -311,7 +311,10 @@ local supportedGames = {
 	-- Golden Axe Warrior
 	["D46E40BBB729BA233F171AD7BF6169F5"] = {["moduleName"] = "beta.Golden Axe Warrior", ["selfContained"] = true, ["friendlyName"] = "Golden Axe Warrior (UE)"},
 
-	-- MM
+	-- Golvellius
+	["2101295C258CB6B845BDB72BE617691D"] = {["moduleName"] = "beta.Golvellius", ["selfContained"] = true, ["friendlyName"] = "Golvellius (UE)"},
+
+	-- Majora's Mask
 	["B38B71D2961DFFB523020A67F4807A4B704E347A"] = {["moduleName"] = "games.mm", ["friendlyName"] = "Legend of Zelda, The - Majora's Mask (Europe) (En,Fr,De,Es) (Beta)"},
 	["BB4E4757D10727C7584C59C1F2E5F44196E9C293"] = {["moduleName"] = "games.mm", ["friendlyName"] = "Legend of Zelda, The - Majora's Mask (Europe) (En,Fr,De,Es) (Rev A)"},
 	["C04599CDAFEE1C84A7AF9A71DF68F139179ADA84"] = {["moduleName"] = "games.mm", ["friendlyName"] = "Legend of Zelda, The - Majora's Mask (Europe) (En,Fr,De,Es)"},
@@ -323,7 +326,7 @@ local supportedGames = {
 	-- Mr. Driller
 	["E7009DD8418303343C4AAC2558538B8CAA28B694"] = {["moduleName"] = "beta.Drillbot", ["selfContained"] = true, ["friendlyName"] = "Mr. Driller 2 (USA)"},
 
-	-- OoT
+	-- Ocarina of Time
 	["CFBB98D392E4A9D39DA8285D10CBEF3974C2F012"] = {["moduleName"] = "games.oot", ["friendlyName"] = "Legend of Zelda, The - Ocarina of Time (Europe) (En,Fr,De) (Rev A)"},
 	["328A1F1BEBA30CE5E178F031662019EB32C5F3B5"] = {["moduleName"] = "games.oot", ["friendlyName"] = "Legend of Zelda, The - Ocarina of Time (Europe) (En,Fr,De)"},
 	["D3ECB253776CD847A5AA63D859D8C89A2F37B364"] = {["moduleName"] = "games.oot", ["friendlyName"] = "Legend of Zelda, The - Ocarina of Time (USA) (Rev A)"},
