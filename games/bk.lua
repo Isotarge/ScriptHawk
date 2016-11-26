@@ -1842,18 +1842,33 @@ function Game.drawUI()
 			local currentSlotBase = objectArray + getSlotBase(i);
 
 			local animationType = "Unknown";
-			local movementObjectPointer = dereferencePointer(currentSlotBase + 0x14); -- TODO: Get this constant from variable name somehow
-			if isRDRAM(movementObjectPointer) then
-                local animationObjectPointer = dereferencePointer(movementObjectPointer + 0x00);
-                if isRDRAM(animationObjectPointer) then
+			local actorTypes =  require "games.bk_objects_USA";
+			local objectIDPointer = dereferencePointer(currentSlotBase + 0x12C);
+			if isRDRAM(objectIDPointer) then
+				objectType = mainmemory.read_u16_be(objectIDPointer + 0x02);
+				for k, v in pairs(actorTypes) do
+					if v.id == objectType then
+						animationType = v.name;
+					end
+				end
+				if animationType == "Unknown" then
+			    	animationType = toHexString(objectType);
+				end
+			end
+			
+			--local animationType = "Unknown";
+			--local movementObjectPointer = dereferencePointer(currentSlotBase + 0x14); -- TODO: Get this constant from variable name somehow
+			--if isRDRAM(movementObjectPointer) then
+                --local animationObjectPointer = dereferencePointer(movementObjectPointer + 0x00);
+                --if isRDRAM(animationObjectPointer) then
 				    animationType = mainmemory.read_u32_be(animationObjectPointer + animation_object_animation_type);
-				    if type(animation_types[animationType]) == "string" then
+				    --if type(animation_types[animationType]) == "string" then
 					   animationType = animation_types[animationType];
-				    else
+				   -- else
 					   animationType = toHexString(animationType);
-				    end
-			    end
-            end
+				    --end
+			    --end
+            --end
 
 			local color = nil;
 			if object_index == i then
