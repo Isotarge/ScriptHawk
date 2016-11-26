@@ -275,23 +275,22 @@ function Game.detectVersion(romName, romHash)
 	elseif romHash == "DED6EE166E740AD1BC810FD678A84B48E245AB80" then -- USA 1.1
 		version = 3;
 	elseif romHash == "1FE1632098865F639E22C11B9A81EE8F29C75D7A" then -- USA 1.0
-		version = 4;	
+		version = 4;
 	else
 		return false;
 	end
-	
-	Game.objectList =  require "games.bk_objects_USA";
+
+	Game.objectList = require "games.bk_objects_USA";
 	Game.actorArray = {};
 	for k, v in pairs(Game.objectList) do
 		Game.actorArray[v.id] = v.name;
 	end
-	
+
 	-- Read EEPROM checksums
 	for i = 1, #eep_checksum do
 		eep_checksum[i].value = memory.read_u32_be(eep_checksum[i].address, "EEPROM");
 	end
 
-	
 	return true;
 end
 
@@ -367,17 +366,17 @@ local max_slots = 0x100;
 -- Relative to slot start
 slot_variables = {
 	[0x00] = {["Type"] = "Pointer", ["Name"] = "Struct Array Object Pointer", ["Fields"] = {
-            [0x00] = {["Name"] = "Renderer Pointer", ["Type"] = "Pointer", ["Fields"] = {
-			        [0x04] = {["Name"] = "x_pos", ["Type"] = "s16_be"},
-			        [0x06] = {["Name"] = "y_pos", ["Type"] = "s16_be"},
-			        [0x08] = {["Name"] = "z_pos", ["Type"] = "s16_be"},
-					--[0x0A] = {["Name"] = "scale", ["Type"] = "u16_be"},
-                },   
-            },
-            [0x04] = {["Name"] = "Unknown Pointer 0x04", ["Type"] = "Pointer"},
-	        [0x08] = {["Name"] = "Unknown Pointer 0x08", ["Type"] = "Pointer"},
-        }, -- TODO: Does this have anything to do with that huge linked list? Doesn't seem to
-    },
+		[0x00] = {["Name"] = "Renderer Pointer", ["Type"] = "Pointer", ["Fields"] = {
+				[0x04] = {["Name"] = "x_pos", ["Type"] = "s16_be"},
+				[0x06] = {["Name"] = "y_pos", ["Type"] = "s16_be"},
+				[0x08] = {["Name"] = "z_pos", ["Type"] = "s16_be"},
+				--[0x0A] = {["Name"] = "scale", ["Type"] = "u16_be"},
+			},
+		},
+		[0x04] = {["Name"] = "Unknown Pointer 0x04", ["Type"] = "Pointer"},
+		[0x08] = {["Name"] = "Unknown Pointer 0x08", ["Type"] = "Pointer"},
+		},
+	},
 	[0x04] = {["Type"] = "Float", ["Name"] = {"X", "X Pos", "X Position"}},
 	[0x08] = {["Type"] = "Float", ["Name"] = {"Y", "Y Pos", "Y Position"}},
 	[0x0C] = {["Type"] = "Float", ["Name"] = {"Z", "Z Pos", "Z Position"}},
@@ -385,7 +384,7 @@ slot_variables = {
 	[0x14] = {["Type"] = "Pointer", ["Name"] = "Movement Object Pointer", ["Fields"] = {
 			[0x00] = {["Type"] = "Pointer", ["Name"] = "Animation Object Pointer", ["Fields"] = {
 					[0x00] = {["Type"] = "Pointer"},
-                    	[0x08] = {["Type"] = "u16_be"},
+					[0x08] = {["Type"] = "u16_be"},
 						[0x0A] = {["Type"] = "u16_be"},
 						[0x0C] = {["Type"] = "u16_be"},
 
@@ -398,7 +397,7 @@ slot_variables = {
 						[0x1F] = {["Type"] = "Byte"},
 						[0x20] = {["Type"] = "Byte"},
 						[0x21] = {["Type"] = "Byte"},
-                		},
+				},
 			},
 			[0x04] = {["Type"] = "Float", ["Name"] = "Animation Timer"},
 			[0x08] = {["Type"] = "Float"},
@@ -415,7 +414,7 @@ slot_variables = {
 			[0x25] = {["Type"] = "Byte"},
 			[0x26] = {["Type"] = "Byte"},
 			[0x27] = {["Type"] = "Byte"},
-			},
+		},
 	},
 	[0x18] = {["Type"] = "Pointer"},
 	[0x1C] = {["Type"] = "Float"},
@@ -426,13 +425,13 @@ slot_variables = {
 	[0x30] = {["Type"] = "Float"},
 
 	[0x38] = {["Type"] = "u16_be", ["Name"] = "Movement Timer"},
-    
+
 	[0x3B] = {["Type"] = "Byte", ["Name"] = "Movement State"},
-    
-    [0x40] = {["Type"] = "u32_be"},
-    [0x44] = {["Type"] = "Byte"},
-	
-    [0x48] = {["Type"] = "Float", ["Name"] = "Race path progression"},
+
+	[0x40] = {["Type"] = "u32_be"},
+	[0x44] = {["Type"] = "Byte"},
+
+	[0x48] = {["Type"] = "Float", ["Name"] = "Race path progression"},
 	[0x4C] = {["Type"] = "Float", ["Name"] = "Speed (rubberband)"},
 	[0x50] = {["Type"] = "Float", ["Name"] = {"Facing Angle", "Facing", "Rot Y", "Rot. Y", "Y Rotation"}},
 
@@ -440,7 +439,7 @@ slot_variables = {
 	[0x64] = {["Type"] = "Float", ["Name"] = {"Moving Angle", "Moving", "Rot Y", "Rot. Y", "Y Rotation"}},
 	[0x68] = {["Type"] = "Float", ["Name"] = {"Rot X", "Rot. X", "X Rotation"}},
 
-    [0x78] = {["Type"] = "u32_be"},
+	[0x78] = {["Type"] = "u32_be"},
 	[0x7C] = {["Type"] = "Float", ["Name"] = "Popped Amount"},
 	[0x80] = {["Type"] = "Float"},
 	[0x84] = {["Type"] = "Float", ["Name"] = "Countdown timer?"},
@@ -450,45 +449,45 @@ slot_variables = {
 	[0x98] = {["Type"] = "Float"},
 
 	[0xBC] = {["Type"] = "u32_be", ["Name"] = "Spawn Actor ID"}, -- TODO: Better name for this, lifted from Runehero's C source
-	
-    [0xEB] = {["Type"] = "Byte", ["Name"] = "Flag 2"}, -- TODO: Better name for this, lifted from Runehero's C source
-    [0xEC] = {["Type"] = "Float", ["Name"] = "AnimationTimer_Copy"},
+
+	[0xEB] = {["Type"] = "Byte", ["Name"] = "Flag 2"}, -- TODO: Better name for this, lifted from Runehero's C source
+	[0xEC] = {["Type"] = "Float", ["Name"] = "AnimationTimer_Copy"},
 	[0xF0] = {["Type"] = "Float", ["Name"] = "AnimationDuration_Copy"},
-    
-    [0xF8] = {["Type"] = "Float"},
-    [0xFC] = {["Type"] = "Float", ["Name"] = "MovementTimer_Copy"},
-    [0x100] = {["Type"] = "Pointer"},
+
+	[0xF8] = {["Type"] = "Float"},
+	[0xFC] = {["Type"] = "Float", ["Name"] = "MovementTimer_Copy"},
+	[0x100] = {["Type"] = "Pointer"},
 	[0x104] = {["Type"] = "Pointer"},
 
-    [0x110] = {["Type"] = "Float", ["Name"] = {"Rot Z", "Rot. Z", "Z Rotation"}},
+	[0x110] = {["Type"] = "Float", ["Name"] = {"Rot Z", "Rot. Z", "Z Rotation"}},
 	[0x114] = {["Type"] = "Float", ["Name"] = "Sound timer?"}, -- Also used by Conga to decide when to throw orange --copy of timer from animation substruct
 	[0x118] = {["Type"] = "Float"},
 	[0x11C] = {["Type"] = "Float"},
 	[0x120] = {["Type"] = "Float"},
 
 	[0x125] = {["Type"] = "Byte", ["Name"] = "Transparancy"},
-    
+
 	[0x127] = {["Type"] = "Byte", ["Name"] = "Eye State"},
 	[0x128] = {["Type"] = "Float", ["Name"] = "Scale"},
 	[0x12C] = {["Type"] = "Pointer", ["Name"] = "Identifier", ["Fields"] = {
 			[0x02] = {["Type"] = "u16_be", ["Name"] = "Object Index"},
-			[0x04] = {["Type"] = "u16_be", ["Name"] = "Model Index"},	
-			},
+			[0x04] = {["Type"] = "u16_be", ["Name"] = "Model Index"},
+		},
 	},
 	[0x130] = {["Type"] = "Pointer"},
-    
-    [0x138] = {["Type"] = "Byte"},
-    
-    [0x13B] = {["Type"] = "Byte"},
-    
-    [0x148] = {["Type"] = "Pointer"},
+
+	[0x138] = {["Type"] = "Byte"},
+
+	[0x13B] = {["Type"] = "Byte"},
+
+	[0x148] = {["Type"] = "Pointer"},
 	[0x14C] = {["Type"] = "Pointer", ["Name"] = "Bone Array 1 Pointer"},
 	[0x150] = {["Type"] = "Pointer", ["Name"] = "Bone Array 2 Pointer"},
 
-    [0x158] = {["Type"] = "u32_be"},
-    [0x15C] = {["Type"] = "u32_be"},
-    
-    [0x16F] = {["Type"] = "Byte"},
+	[0x158] = {["Type"] = "u32_be"},
+	[0x15C] = {["Type"] = "u32_be"},
+
+	[0x16F] = {["Type"] = "Byte"},
 	[0x170] = {["Type"] = "Float"},
 	[0x174] = {["Type"] = "Float"},
 	[0x178] = {["Type"] = "Float"},
@@ -1251,7 +1250,7 @@ local movementStates = {
 	[10] = "Pooping Egg",
 
 	[12] = "Skidding",
-    
+
 	[14] = "Damaged",
 	[15] = "Beak Buster",
 	[16] = "Feathery Flap",
@@ -1345,14 +1344,14 @@ local movementStates = {
 	[108] = "Knockback", -- Walrus
 	[109] = "Death", -- Walrus
 	[110] = "Biting", -- Croc
-    [111] = "EatingWrongThing", --Croc
-    [112] = "EatingCorrectThing", --Croc
+	[111] = "EatingWrongThing", --Croc
+	[112] = "EatingCorrectThing", --Croc
 	[113] = "Falling", -- Talon Trot
 	[114] = "Recovering", -- Getting up after taking damage, eg. fall famage
 	[115] = "Locked", -- Cutscene
 	[116] = "Locked", -- Jiggy pad, Mumbo transformation, Bottles
 	[117] = "Locked", -- Bottles
-    [118] = "Locked", --Flying
+	[118] = "Locked", --Flying
 	[119] = "Locked", -- Water Surface
 	[120] = "Locked", -- Underwater
 	[121] = "Locked", -- Holding Jiggy, Talon Trot
@@ -1386,16 +1385,16 @@ local movementStates = {
 	[152] = "Locked", -- Loading zone, Mumbo transformation
 	[153] = "Locked", -- Flying
 	[154] = "Locked", -- Talon Trot
-    --[155] = "Locked??", -- In WadingBoots Set
-    --[156] = "Locked??", -- In WalrusSled Set
+	--[155] = "Locked??", -- In WadingBoots Set
+	--[156] = "Locked??", -- In WalrusSled Set
 	[157] = "Locked", -- Bee?
-    [158] = "Locked", -- Climbing
+	[158] = "Locked", -- Climbing
 	[159] = "Knockback", -- Termite, not damaged
 	[160] = "Knockback", -- Pumpkin, not damaged
 	[161] = "Knockback", -- Croc, not damaged
 	[162] = "Knockback", -- Walrus, not damaged
 	[163] = "Knockback", -- Bee, not damaged
-    --[164] = "???", --Wonderwing
+	--[164] = "???", --Wonderwing
 	[165] = "Locked", -- Wonderwing
 };
 
@@ -1855,7 +1854,7 @@ function Game.drawUI()
 				if type(Game.actorArray[objectType]) == "string" then
 					animationType = Game.actorArray[objectType];
 				else
-			        animationType = toHexString(objectType);
+					animationType = toHexString(objectType);
 				end
 			end
 
