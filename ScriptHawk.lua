@@ -313,6 +313,7 @@ local supportedGames = {
 
 	-- Golvellius
 	["2101295C258CB6B845BDB72BE617691D"] = {["moduleName"] = "beta.Golvellius", ["selfContained"] = true, ["friendlyName"] = "Golvellius (UE)"},
+	["6BD9879AF39E248D149761014EBF5639"] = {["moduleName"] = "beta.Golvellius", ["selfContained"] = true, ["friendlyName"] = "Golvellius (J)"},
 
 	-- Majora's Mask
 	["B38B71D2961DFFB523020A67F4807A4B704E347A"] = {["moduleName"] = "games.mm", ["friendlyName"] = "Legend of Zelda, The - Majora's Mask (Europe) (En,Fr,De,Es) (Beta)"},

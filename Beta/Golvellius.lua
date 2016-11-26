@@ -170,6 +170,7 @@ function drawObjects()
 			local xPosition = mainmemory.readbyte(objectBase + object_fields.x_position);
 			local yPosition = mainmemory.readbyte(objectBase + object_fields.y_position);
 			local hp = mainmemory.readbyte(objectBase + object_fields.health);
+			local gold = -1;
 
 			if type(object_fields.object_types[objectType]) == "table" then
 				objectTypeTable = object_fields.object_types[objectType];
@@ -196,6 +197,10 @@ function drawObjects()
 				end
 				if type(objectTypeTable.hitbox_height) == "number" then
 					hitboxHeight = objectTypeTable.hitbox_height;
+				end
+
+				if type(objectTypeTable.gold) == "number" then
+					gold = objectTypeTable.gold;
 				end
 			else
 				color = white;
@@ -237,6 +242,10 @@ function drawObjects()
 
 					for t = 1, #mouseOverText do
 						gui.drawText(safeX, safeY + ((t - 1) * height), mouseOverText[t], color);
+					end
+				else
+					if gold > -1 then
+						gui.drawText(xPosition + hitboxXOffset, yPosition + hitboxYOffset, ""..gold, 0xFFFFD700);
 					end
 				end
 				gui.drawRectangle(xPosition + hitboxXOffset, yPosition + hitboxYOffset, hitboxWidth, hitboxHeight, color); -- Draw the object's hitbox
