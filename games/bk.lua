@@ -463,7 +463,8 @@ slot_variables = {
     
 	[0x127] = {["Type"] = "Byte", ["Name"] = "Eye State"},
 	[0x128] = {["Type"] = "Float", ["Name"] = "Scale"},
-	[0x12C] = {["Type"] = "Pointer", ["Name"] = "Model Identifier", ["Fields"] = {
+	[0x12C] = {["Type"] = "Pointer", ["Name"] = "Identifier", ["Fields"] = {
+			[0x02] = {["Type"] = "u16_be", ["Name"] = "Object Index"},
 			[0x04] = {["Type"] = "u16_be", ["Name"] = "Model Index"},	
 			},
 	},
