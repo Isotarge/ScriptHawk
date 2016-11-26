@@ -275,10 +275,15 @@ function Game.detectVersion(romName, romHash)
 	elseif romHash == "DED6EE166E740AD1BC810FD678A84B48E245AB80" then -- USA 1.1
 		version = 3;
 	elseif romHash == "1FE1632098865F639E22C11B9A81EE8F29C75D7A" then -- USA 1.0
-		version = 4;
-		Game.actorTypes =  require "games.bk_objects_USA";
+		version = 4;	
 	else
 		return false;
+	end
+	
+	Game.objectList =  require "games.bk_objects_USA";
+	Game.actorArray = {};
+	for k, v in pairs(Game.objectList) do
+		Game.actorArray[v.id] = v.name;
 	end
 	
 	-- Read EEPROM checksums
@@ -1847,13 +1852,10 @@ function Game.drawUI()
 			local objectIDPointer = dereferencePointer(currentSlotBase + 0x12C);
 			if isRDRAM(objectIDPointer) then
 				objectType = mainmemory.read_u16_be(objectIDPointer + 0x02);
-				for k, v in pairs(Game.actorTypes) do
-					if v.id == objectType then
-						animationType = v.name;
-					end
-				end
-				if animationType == "Unknown" then
-			    	animationType = toHexString(objectType);
+				if type(Game.actorArray[objectType]) == "string" then
+					animationType = Game.actorArray[objectType];
+				else
+			        animationType = toHexString(objectType);
 				end
 			end
 
