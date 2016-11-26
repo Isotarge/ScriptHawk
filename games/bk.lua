@@ -276,15 +276,17 @@ function Game.detectVersion(romName, romHash)
 		version = 3;
 	elseif romHash == "1FE1632098865F639E22C11B9A81EE8F29C75D7A" then -- USA 1.0
 		version = 4;
+		Game.actorTypes =  require "games.bk_objects_USA";
 	else
 		return false;
 	end
-
+	
 	-- Read EEPROM checksums
 	for i = 1, #eep_checksum do
 		eep_checksum[i].value = memory.read_u32_be(eep_checksum[i].address, "EEPROM");
 	end
 
+	
 	return true;
 end
 
@@ -1842,11 +1844,10 @@ function Game.drawUI()
 			local currentSlotBase = objectArray + getSlotBase(i);
 
 			local animationType = "Unknown";
-			local actorTypes =  require "games.bk_objects_USA";
 			local objectIDPointer = dereferencePointer(currentSlotBase + 0x12C);
 			if isRDRAM(objectIDPointer) then
 				objectType = mainmemory.read_u16_be(objectIDPointer + 0x02);
-				for k, v in pairs(actorTypes) do
+				for k, v in pairs(Game.actorTypes) do
 					if v.id == objectType then
 						animationType = v.name;
 					end
@@ -1855,20 +1856,6 @@ function Game.drawUI()
 			    	animationType = toHexString(objectType);
 				end
 			end
-			
-			--local animationType = "Unknown";
-			--local movementObjectPointer = dereferencePointer(currentSlotBase + 0x14); -- TODO: Get this constant from variable name somehow
-			--if isRDRAM(movementObjectPointer) then
-                --local animationObjectPointer = dereferencePointer(movementObjectPointer + 0x00);
-                --if isRDRAM(animationObjectPointer) then
-				    animationType = mainmemory.read_u32_be(animationObjectPointer + animation_object_animation_type);
-				    --if type(animation_types[animationType]) == "string" then
-					   animationType = animation_types[animationType];
-				   -- else
-					   animationType = toHexString(animationType);
-				    --end
-			    --end
-            --end
 
 			local color = nil;
 			if object_index == i then
