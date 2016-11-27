@@ -2,9 +2,18 @@
 showList = false;
 showHitbox = true;
 enableDragAndDrop = false;
+alwaysHP = true;
+
+print("Settings:");
+print();
+print("showList = "..tostring(showList));
+print("showHitbox = "..tostring(showHitbox));
+print("enableDragAndDrop = "..tostring(enableDragAndDrop));
+print("alwaysHP = "..tostring(alwaysHP));
 
 local red = 0xFFFF0000;
 local yellow = 0xFFFFFF00;
+local gold = 0xFFFFD700;
 local green = 0xFF00AA00; -- Hair Color
 local pink = 0xFFFF00FF;
 local black = 0xFF000000;
@@ -195,7 +204,7 @@ function drawObjects()
 			local yPosition = mainmemory.readbyte(objectBase + object_fields.y_position);
 			local hp = mainmemory.readbyte(objectBase + object_fields.health);
 			local maxHP = "?";
-			local gold = -1;
+			local goldOnKill = -1;
 
 			if type(object_fields.object_types[objectType]) == "table" then
 				objectTypeTable = object_fields.object_types[objectType];
@@ -225,7 +234,7 @@ function drawObjects()
 				end
 
 				if type(objectTypeTable.gold) == "number" then
-					gold = objectTypeTable.gold;
+					goldOnKill = objectTypeTable.gold;
 				end
 				if type(objectTypeTable.max_hp) == "number" then
 					maxHP = objectTypeTable.max_hp;
@@ -272,14 +281,24 @@ function drawObjects()
 						gui.drawText(safeX, safeY + ((t - 1) * height), mouseOverText[t], color);
 					end
 				else
-					if objectTypeNumeric == 0x95 then -- Spawning enemy should show countdown to spawn
-						gui.drawText(xPosition + hitboxXOffset, yPosition + hitboxYOffset, mainmemory.readbyte(objectBase + object_fields.spawn_timer), 0xFFFFD700);
-					elseif objectTypeNumeric == 0x84 then -- Sword should show Sword Timer
-						gui.drawText(xPosition + hitboxXOffset, yPosition + hitboxYOffset, mainmemory.readbyte(objectBase + object_fields.sword_timer), 0xFFFFD700);
-					elseif gold > 0 then
-						gui.drawText(xPosition + hitboxXOffset, yPosition + hitboxYOffset, ""..gold, 0xFFFFD700);
-					elseif objectBase ~= 0x100 then -- Everyone without a gold value should show their current/max HP (except the player)
-						gui.drawText(xPosition + hitboxXOffset, yPosition + hitboxYOffset, hp.."/"..maxHP, 0xFFFFD700);
+					if alwaysHP then
+						if objectTypeNumeric == 0x95 then -- Spawning enemy should show countdown to spawn
+							gui.drawText(xPosition + hitboxXOffset, yPosition + hitboxYOffset, mainmemory.readbyte(objectBase + object_fields.spawn_timer), gold);
+						elseif objectTypeNumeric == 0x84 then -- Sword should show Sword Timer
+							gui.drawText(xPosition + hitboxXOffset, yPosition + hitboxYOffset, mainmemory.readbyte(objectBase + object_fields.sword_timer), gold);
+						elseif objectBase ~= 0x100 then -- Everyone without a gold value should show their current/max HP (except the player)
+							gui.drawText(xPosition + hitboxXOffset, yPosition + hitboxYOffset, hp.."/"..maxHP, gold);
+						end
+					else
+						if objectTypeNumeric == 0x95 then -- Spawning enemy should show countdown to spawn
+							gui.drawText(xPosition + hitboxXOffset, yPosition + hitboxYOffset, mainmemory.readbyte(objectBase + object_fields.spawn_timer), gold);
+						elseif objectTypeNumeric == 0x84 then -- Sword should show Sword Timer
+							gui.drawText(xPosition + hitboxXOffset, yPosition + hitboxYOffset, mainmemory.readbyte(objectBase + object_fields.sword_timer), gold);
+						elseif goldOnKill > 0 then
+							gui.drawText(xPosition + hitboxXOffset, yPosition + hitboxYOffset, ""..goldOnKill, gold);
+						elseif objectBase ~= 0x100 then -- Everyone without a gold value should show their current/max HP (except the player)
+							gui.drawText(xPosition + hitboxXOffset, yPosition + hitboxYOffset, hp.."/"..maxHP, gold);
+						end
 					end
 				end
 				gui.drawRectangle(xPosition + hitboxXOffset, yPosition + hitboxYOffset, hitboxWidth, hitboxHeight, color); -- Draw the object's hitbox
@@ -302,7 +321,7 @@ end
 
 function drawOSD()
 	gui.drawRectangle(156, 2, 92, 13, 0, 0x7F000000);
-	gui.drawText(156, 1, getGold().." Gold", 0xFFFFD700, 0);
+	gui.drawText(156, 1, getGold().." Gold", gold, 0);
 	drawObjects();
 end
 
