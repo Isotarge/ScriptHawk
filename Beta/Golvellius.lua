@@ -110,7 +110,7 @@ end
 
 function renderHolePosition()
 	local holePosition = getHolePosition();
-	gui.drawRectangle(holePosition[1], holePosition[2], 16, 16, green, 0x66666666);
+	gui.drawRectangle(holePosition[1], holePosition[2], 16, 16, green, 0x7F000000);
 	gui.drawText(holePosition[1] + 3, holePosition[2], "H", white, 0x00000000);
 end
 event.onframestart(renderHolePosition);
@@ -170,6 +170,7 @@ function drawObjects()
 			local xPosition = mainmemory.readbyte(objectBase + object_fields.x_position);
 			local yPosition = mainmemory.readbyte(objectBase + object_fields.y_position);
 			local hp = mainmemory.readbyte(objectBase + object_fields.health);
+			local maxHP = "?";
 			local gold = -1;
 
 			if type(object_fields.object_types[objectType]) == "table" then
@@ -202,6 +203,9 @@ function drawObjects()
 				if type(objectTypeTable.gold) == "number" then
 					gold = objectTypeTable.gold;
 				end
+				if type(objectTypeTable.max_hp) == "number" then
+					maxHP = objectTypeTable.max_hp;
+				end
 			else
 				color = white;
 				objectType = "Unknown ("..toHexString(objectType)..")";
@@ -229,7 +233,7 @@ function drawObjects()
 					end
 
 					local mouseOverText = {
-						objectType.." "..hp.."/? HP",
+						objectType.." "..hp.."/"..maxHP.." HP",
 						toHexString(objectBase).." "..xPosition..","..yPosition,
 					};
 
@@ -252,7 +256,7 @@ function drawObjects()
 			end
 
 			if showList then
-				gui.text(2, 2 + height * row, xPosition..", "..yPosition.." - "..hp.."/? HP - "..objectType.." "..toHexString(objectBase), color, 'bottomright');
+				gui.text(2, 2 + height * row, xPosition..", "..yPosition.." - "..hp.."/"..maxHP.." HP - "..objectType.." "..toHexString(objectBase), color, 'bottomright');
 				row = row + 1;
 			end
 		end
@@ -267,14 +271,8 @@ function getGold()
 end
 
 function drawOSD()
-	local OSDX = 2;
-	local OSDY = 70;
-	local row = 0;
-	local height = 16;
-
-	gui.text(OSDX, OSDY + height * row, "Gold: "..getGold());
-	row = row + 1;
-
+	gui.drawRectangle(156, 2, 92, 13, 0, 0x7F000000);
+	gui.drawText(156, 1, getGold().." Gold", 0xFFFFD700, 0);
 	drawObjects();
 end
 
