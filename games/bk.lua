@@ -435,7 +435,7 @@ slot_variables = {
 	[0x4C] = {["Type"] = "Float", ["Name"] = "Speed (rubberband)"},
 	[0x50] = {["Type"] = "Float", ["Name"] = {"Facing Angle", "Facing", "Rot Y", "Rot. Y", "Y Rotation"}},
 
-	[0x60] = {["Type"] = "Float", ["Name"] = "Recovery Timer"}, -- TTC Crab
+	[0x60] = {["Type"] = "Float", ["Name"] = "Rotation Speed"}, --Atleast for honeycomb pieces
 	[0x64] = {["Type"] = "Float", ["Name"] = {"Moving Angle", "Moving", "Rot Y", "Rot. Y", "Y Rotation"}},
 	[0x68] = {["Type"] = "Float", ["Name"] = {"Rot X", "Rot. X", "X Rotation"}},
 
@@ -472,6 +472,10 @@ slot_variables = {
 	[0x12C] = {["Type"] = "Pointer", ["Name"] = "Identifier", ["Fields"] = {
 			[0x02] = {["Type"] = "u16_be", ["Name"] = "Object Index"},
 			[0x04] = {["Type"] = "u16_be", ["Name"] = "Model Index"},
+			
+			[0x0C] = {["Type"] = "Pointer", ["Name"] = "Object Behavior Function"},
+			[0x10] = {["Type"] = "Pointer"},
+			[0x14] = {["Type"] = "Pointer"},
 		},
 	},
 	[0x130] = {["Type"] = "Pointer"},
