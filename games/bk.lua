@@ -440,9 +440,9 @@ slot_variables = {
 	[0x68] = {["Type"] = "Float", ["Name"] = {"Rot X", "Rot. X", "X Rotation"}},
 
 	[0x78] = {["Type"] = "u32_be"},
-	[0x7C] = {["Type"] = "Float", ["Name"] = "Popped Amount"},
-	[0x80] = {["Type"] = "Float"},
-	[0x84] = {["Type"] = "Float", ["Name"] = "Countdown timer?"},
+	[0x7C] = {["Type"] = "Float", ["Name"] = "Top X", "Top X Pos" "Top X Position"}, --Pole Top XPos
+	[0x80] = {["Type"] = "Float", ["Name"] = "Top Y", "Top Y Pos" "Top Y Position"}, --Pole Top YPos
+	[0x84] = {["Type"] = "Float", ["Name"] = "Top Z", "Top Z Pos" "Top Z Position"}, --Pole Top Zpos
 
 	[0x90] = {["Type"] = "Float"},
 	[0x94] = {["Type"] = "Float"},
