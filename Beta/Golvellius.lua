@@ -1,6 +1,7 @@
 -- Configuration
 showList = false;
 showHitbox = true;
+enableDragAndDrop = false;
 
 local red = 0xFFFF0000;
 local yellow = 0xFFFFFF00;
@@ -17,6 +18,8 @@ local object_array_capacity = 16;
 local object_fields = {
 	["object_type"] = 0x00, -- Byte
 	["object_types"] = {
+		[0x84] = {name = "Sword", color = yellow}, -- Player Sword
+		--
 		[0x87] = {name = "Snakelet", gold = 10, color = red, max_hp = 1},
 		[0x88] = {name = "Fire Spirit", gold = 40, color = red, max_hp = 2},
 		[0x89] = {name = "Flea", gold = 30, color = red, max_hp = 2},
@@ -29,6 +32,7 @@ local object_fields = {
 		[0x92] = {name = "Dark Blue Bat", gold = 30, color = red, max_hp = 1},
 		[0x93] = {name = "Little Big Bat", gold = 0, color = red, max_hp = 0},
 		[0x94] = {name = "Big Bat", gold = 0, color = red, max_hp = 16},
+		[0x95] = {name = "Spawning Enemy"},
 		--
 		[0x99] = {name = "Black Crow", gold = 40, color = red, max_hp = 1},
 		[0x9A] = {name = "Blue Crow", gold = 90, color = red, max_hp = 2},
@@ -89,6 +93,7 @@ local object_fields = {
 	},
 	["y_position"] = 0x01, -- u8
 	["x_position"] = 0x02, -- u8
+	["spawn_timer"] = 0x08, -- u8
 	["health"] = 0x15, -- byte
 };
 
@@ -114,6 +119,22 @@ function renderHolePosition()
 	gui.drawText(holePosition[1] + 3, holePosition[2], "H", white, 0x00000000);
 end
 event.onframestart(renderHolePosition);
+
+-- Lag Detection
+local prevLag = -1;
+function detectLag()
+	local currentLag = mainmemory.readbyte(0x57);
+	if currentLag < prevLag then
+		if prevLag - currentLag < 2 then
+			tastudio.setlag(emu.framecount(), true);
+		else
+			tastudio.setlag(emu.framecount(), false);
+		end
+	else
+		-- TODO
+	end
+	prevLag = currentLag;
+end
 
 function toHexString(value, desiredLength, prefix)
 	value = string.format("%X", value or 0);
@@ -159,6 +180,7 @@ function drawObjects()
 	for i = 0, object_array_capacity do
 		local objectBase = object_array_base + (i * object_size);
 		local objectType = mainmemory.readbyte(objectBase + object_fields.object_type);
+		local objectTypeNumeric = objectType;
 		local objectTypeTable = nil;
 		local color = nil;
 		if objectType ~= 0 then
@@ -215,7 +237,7 @@ function drawObjects()
 			local hitboxYOffset = -(hitboxHeight / 2);
 
 			if showHitbox then
-				if dragging then
+				if enableDragAndDrop and dragging then
 					for d = 1, #draggedObjects do
 						if draggedObjects[d][1] == objectBase then
 							xPosition = draggedObjects[d][2] + dragTransform[1];
@@ -248,8 +270,12 @@ function drawObjects()
 						gui.drawText(safeX, safeY + ((t - 1) * height), mouseOverText[t], color);
 					end
 				else
-					if gold > -1 then
+					if objectTypeNumeric == 0x95 then -- Spawning enemy should show countdown to spawn
+						gui.drawText(xPosition + hitboxXOffset, yPosition + hitboxYOffset, mainmemory.readbyte(objectBase + object_fields.spawn_timer), 0xFFFFD700);
+					elseif gold > 0 then
 						gui.drawText(xPosition + hitboxXOffset, yPosition + hitboxYOffset, ""..gold, 0xFFFFD700);
+					elseif objectBase ~= 0x100 and objectTypeNumeric ~= 0x84 then -- Everyone without a gold value should show their current/max HP (except the player and sword)
+						gui.drawText(xPosition + hitboxXOffset, yPosition + hitboxYOffset, hp.."/"..maxHP, 0xFFFFD700);
 					end
 				end
 				gui.drawRectangle(xPosition + hitboxXOffset, yPosition + hitboxYOffset, hitboxWidth, hitboxHeight, color); -- Draw the object's hitbox

@@ -12,6 +12,8 @@ SystemID SMS
 0843	b	h	0	Main RAM	Max Gold 1000s
 0844	b	h	0	Main RAM	Max Gold 10s
 0847	b	b	0	Main RAM	Crystal Bitfield
+0848	b	u	0	Main RAM	Sword Damage
+086F	b	b	0	Main RAM	Bible Bitfield
 0870	b	b	0	Main RAM	Bible Bitfield
 0AD2	b	h	0	Main RAM	Hole Tile Index
 
