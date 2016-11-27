@@ -135,6 +135,7 @@ function detectLag()
 	end
 	prevLag = currentLag;
 end
+--event.onframestart(detectLag); -- TODO: Too many false positives here
 
 function toHexString(value, desiredLength, prefix)
 	value = string.format("%X", value or 0);
