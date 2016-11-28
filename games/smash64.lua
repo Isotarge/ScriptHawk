@@ -3,6 +3,8 @@ Game = {
 	speedy_index = 6;
 	max_rot_units = 4,
 	Memory = { -- Versions: Japan, Australia, Europe, USA
+		["music"] = {0x098BD3, 0x099833, 0x0A2E63, 0x099113},
+		["unlocked_stuff"] = {0x0A28F4, 0x0A5074, 0x0AD194, 0x0A4934},
 		["match_settings_pointer"] = {0x0A30A8, 0x0A5828, 0x0AD948, 0x0A50E8},
 		["hurtbox_color_RG"] = {nil, nil, nil, 0x0F2786},
 		["hurtbox_color_BA"] = {nil, nil, nil, 0x0F279E},
@@ -86,6 +88,55 @@ Game = {
 		"Platforms - Pikachu",
 		"Platforms - Jigglypuff",
 		"Platforms - Ness", -- 0x28
+	},
+	music = {
+		"Dream Land", -- 0x00
+		"Planet Zebes",
+		"Mushroom Kingdom",
+		"Mushroom Kingdom (Fast)",
+		"Sector Z",
+		"Congo Jungle",
+		"Peach's Castle",
+		"Saffron City",
+		"Yoshi's Island",
+		"Hyrule Castle",
+		"Character Select",
+		"Beta Fanfare",
+		"Mario/Luigi Wins",
+		"Samus Wins",
+		"DK Wins",
+		"Kirby Wins",
+		"Fox Wins", -- 0x10
+		"Ness Wins",
+		"Yoshi Wins",
+		"Captain Falcon Wins",
+		"Pikachu/Jigglypuff Wins",
+		"Link Wins",
+		"Results Screen",
+		"Pre-Master Hand",
+		"Pre-Master Hand #2",
+		"Master Hand Battle",
+		"Bonus Stage",
+		"Stage Clear",
+		"Bonus Stage Clear",
+		"Master Hand Clear",
+		"Bonus Stage Failure",
+		"Continue?",
+		"Game Over", -- 0x20
+		"Intro",
+		"How to Play",
+		"Pre-1P Battle",
+		"Fighting Polygon Team Stage",
+		"Metal Mario Stage",
+		"Beat the Game",
+		"Credits",
+		"Found a Secret!",
+		"Hidden Character",
+		"Training Mode",
+		"VS Record",
+		"Main Menu",
+		"Hammer",
+		"Invincibility", -- 0x2E
 	},
 };
 
@@ -293,6 +344,32 @@ function Game.setYVelocity(value, player)
 	if isRDRAM(playerActor) then
 		mainmemory.writefloat(playerActor + player_fields.YVelocity, value, true);
 	end
+end
+
+function Game.unlockEverything()
+	local firstByte = mainmemory.readbyte(Game.Memory.unlocked_stuff[version] + 3);
+	firstByte = set_bit(firstByte, 4); -- Mushroom Kingdom
+	firstByte = set_bit(firstByte, 5); -- Sound Test
+	firstByte = set_bit(firstByte, 6); -- Item Switch
+	mainmemory.writebyte(Game.Memory.unlocked_stuff[version] + 3, firstByte);
+
+	local secondByte = mainmemory.readbyte(Game.Memory.unlocked_stuff[version] + 4);
+	secondByte = set_bit(secondByte, 2); -- Jigglypuff
+	secondByte = set_bit(secondByte, 3); -- Ness
+	mainmemory.writebyte(Game.Memory.unlocked_stuff[version] + 4, secondByte);
+
+	local thirdByte = mainmemory.readbyte(Game.Memory.unlocked_stuff[version] + 5);
+	thirdByte = set_bit(thirdByte, 4); -- Luigi
+	thirdByte = set_bit(thirdByte, 7); -- Captain Falcon
+	mainmemory.writebyte(Game.Memory.unlocked_stuff[version] + 5, thirdByte);
+end
+
+function Game.setMusic(value)
+	mainmemory.writebyte(Game.Memory.music[version], value);
+end
+
+function Game.initUI()
+	ScriptHawk.UI.form_controls.moves_button = forms.button(ScriptHawk.UI.options_form, "Unlock Everything", Game.unlockEverything, ScriptHawk.UI.col(10), ScriptHawk.UI.row(0), ScriptHawk.UI.col(4) + 10, ScriptHawk.UI.button_height);
 end
 
 Game.OSD = {

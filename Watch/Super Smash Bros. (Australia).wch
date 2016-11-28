@@ -1,4 +1,7 @@
 SystemID N64
+099833	b	u	1	RDRAM	Music
+0A5074	d	h	1	RDRAM	Unlocked Stuff
+0A5078	d	h	1	RDRAM	Unlocked Stuff
 0A54B4	d	u	1	RDRAM	P1 Damage VS
 0A5528	d	u	1	RDRAM	P2 Damage VS
 0A5828	d	h	1	RDRAM	Match Settings Pointer

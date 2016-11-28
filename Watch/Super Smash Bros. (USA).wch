@@ -1,4 +1,5 @@
 SystemID N64
+099113	b	u	1	RDRAM	Music
 0A4934	d	h	1	RDRAM	Unlocked Stuff
 0A4938	d	h	1	RDRAM	Unlocked Stuff
 0A4B38	b	h	1	RDRAM	P1 Default CPU Level 1 Player Mode
@@ -36,6 +37,9 @@ SystemID N64
 1317CD	b	u	1	RDRAM	P2 Stock (UI)
 1317CE	b	u	1	RDRAM	P3 Stock (UI)
 1317CF	b	u	1	RDRAM	P4 Stock (UI)
+13434A	w	u	1	RDRAM	Sound Test Music
+13434E	w	u	1	RDRAM	Sound Test Sound
+134352	w	u	1	RDRAM	Sound Test Voice
 13D503	b	u	1	RDRAM	Invincibility Timer After Respawn
 144773	b	u	1	RDRAM	Tech Frame Window
 150A3F	b	u	1	RDRAM	Z Cancel Frame Window

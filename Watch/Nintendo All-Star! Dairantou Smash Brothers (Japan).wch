@@ -1,3 +1,6 @@
 SystemID N64
+098BD3	b	u	1	RDRAM	Music
+0A28F4	d	h	1	RDRAM	Unlocked Stuff
+0A28F8	d	h	1	RDRAM	Unlocked Stuff
 0A30A8	d	h	1	RDRAM	Match Settings Pointer
 
