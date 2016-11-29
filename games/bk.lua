@@ -22,7 +22,6 @@ local framebuffer = { -- Larger on PAL
 
 local clip_vel = -3500; -- Minimum velocity required to clip on the Y axis -- TODO: This seems to be different for different geometry
 
--- Relative to notes
 local collectable_offsets = {
 	skull_hourglass_timer = 4,
 	propellor_timer = 12,
@@ -882,7 +881,7 @@ local animation_types = {
 
 	[0x16B] = "Snare-Bear Snapping",
 	[0x16C] = "Snare-Bear",
-	[0x16D] = "Twinklie Present Opening",
+	[0x16D] = "Twinkly Present Opening",
 	[0x16E] = "Mumbo Reclining", -- CCW Summer
 	[0x16F] = "Zubba Flying Moving",
 	[0x170] = "Zubba Flying",
@@ -893,11 +892,11 @@ local animation_types = {
 	[0x175] = "Flower Sprouting (Autumn)",
 	[0x176] = "Gobi Yawning",
 	[0x177] = "Gobi Sleeping",
-	[0x178] = "Twinklie Spawning",
+	[0x178] = "Twinkly Spawning",
 	[0x179] = "Boggy Signaling (Speed up slowpoke!)",
 	[0x17A] = "Boggy Lookingback (On sled)",
 	-- [0x17B] = "Boggy Something.." -- TODO: What is this?
-	[0x17C] = "Twinklie Twinkling",
+	[0x17C] = "Twinkly Twinkling",
 	[0x17D] = "Spawn of Boggy Happy", -- Groggy, Moggy, Soggy
 	[0x17E] = "Spawn of Boggy Sad", -- Groggy, Moggy, Soggy
 	[0x17F] = "Mumbo Sweeping",
@@ -948,9 +947,9 @@ local animation_types = {
 	[0x1AD] = "Wozza Handing Jiggy",
 	[0x1AE] = "Wozza Hopping Away",
 	[0x1AF] = "Twinkly Muncher Dying",
-	[0x1B0] = "Twinkly Muncher Appearing", -- NAME
-	[0x1B1] = "Twinklie Muncher",
-	[0x1B2] = "Twinklie Muncher Munching",
+	[0x1B0] = "Twinkly Muncher Appearing",
+	[0x1B1] = "Twinkly Muncher",
+	[0x1B2] = "Twinkly Muncher Munching",
 	[0x1B3] = "Wozza Before Stop", -- TODO: Better name
 	[0x1B4] = "Wozza Bodyblocking",
 	[0x1B5] = "Wozza Giving Jiggy",
@@ -1082,7 +1081,7 @@ local animation_types = {
 	[0x234] = "Snare-Bear (Winter)",
 	[0x235] = "Sarcophagus (GV Lobby)",
 	[0x236] = "Pumpkin Banjo Hurt",
-	[0x237] = "Twinklie Present",
+	[0x237] = "Twinkly Present",
 	[0x238] = "Loggo Hop",
 	[0x239] = "Leaky Hop",
 	[0x23A] = "Gobi Fly", -- TODO: Is this Scabby
@@ -2082,18 +2081,6 @@ function Game.getFFPattern()
 	return EEPROMToPattern(mainmemory.read_u16_be(Game.Memory.ff_pattern[version]));
 end
 
--- The original method of detecting FF pattern index, written by BonaparteZ
--- Writes the pattern in to the player's Gold Feather count upon generation
--- Only works with US 1.0
-local function applyFurnaceFunPatch()
-	mainmemory.write_u32_be(0x320064, 0x080A1840);
-
-	mainmemory.write_u32_be(0x286100, 0xAC862DC8); -- sw a2, 11720(a0)
-	mainmemory.write_u32_be(0x286104, 0x0C0C8072); -- jal 803201C8
-
-	mainmemory.write_u32_be(0x28610C, 0x080C801B);
-end
-
 -- Relative to question object
 local ff_current_answer = 0x13;
 local ff_correct_answer = 0x1D;
@@ -2121,7 +2108,6 @@ function getCorrectFFAnswer()
 end
 
 -- FF Board State
---Europe, Japan, US 1.1, US 1.0
 local squareSize = 0x20;
 local numSquares = 95;
 
@@ -2145,11 +2131,15 @@ local questionTypes = {
 
 -- 0x10 Float - Brightness?
 
-function randomizeBrightness()
+function randomizeFFBoardBrightness()
 	for i = 0, numSquares do
-		--mainmemory.writefloat(Game.Memory.board_base[version] + i * squareSize + 0x10, math.random(), true);
-		--mainmemory.writefloat(Game.Memory.board_base[version] + i * squareSize + 0x10, i / numSquares, true);
-		dprint(i..": "..questionTypes[mainmemory.readbyte(Game.Memory.board_base[version] + i * squareSize + 0x08)]);
+		mainmemory.writefloat(Game.Memory.board_base[version] + i * squareSize + 0x10, math.random(), true);
+	end
+end
+
+function dumpFFBoard()
+	for i = 0, numSquares do
+		dprint(toHexString(Game.Memory.board_base[version] + i * squareSize)..": "..i..": "..questionTypes[mainmemory.readbyte(Game.Memory.board_base[version] + i * squareSize + 0x08)]);
 	end
 	print_deferred();
 end
@@ -2237,7 +2227,7 @@ local waveFrames = {
 	{ {1, 3}, {3, 4}, {5, 4} },
 	{ {2, 4}, {4, 4}, {6, 4} },
 	{ {3, 5}, {5, 5} }
-}
+};
 
 function getSlotIndex(row, col)
 	row = math.max(row, 1);
