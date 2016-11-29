@@ -126,9 +126,9 @@ Game = {
 		"Intro",
 		"How to Play",
 		"Pre-1P Battle",
-		"Fighting Polygon Team Stage",
+		"Fighting Polygon Team",
 		"Metal Mario Stage",
-		"Beat the Game",
+		"Game Complete",
 		"Credits",
 		"Found a Secret!",
 		"Hidden Character",
@@ -166,10 +166,15 @@ local player_fields = {
 	["FacingDirection"] = 0x44, -- s32_be -- -1 = left, 1 = right
 	["XVelocity"] = 0x48, -- Float
 	["YVelocity"] = 0x4C, -- Float
+	["ZVelocity"] = 0x50, -- Float
+	["XAcceleration"] = 0x60, -- Float
+	["YAcceleration"] = 0x64, -- Float
+	["ZAcceleration"] = 0x68, -- Float
 	["PositionDataPointer"] = 0x78, -- Pointer
 	["PositionData"] = {
 		["XPosition"] = 0x00, -- Float
 		["YPosition"] = 0x04, -- Float
+		["ZPosition"] = 0x08, -- Float
 	},
 	["JumpCounter"] = 0x148, -- Byte
 	["ShieldBreakerRecoveryTimer"] = 0x26C, -- s32_be
@@ -287,6 +292,13 @@ function Game.getYPosition(player)
 end
 
 function Game.getZPosition(player)
+	local playerActor = Game.getPlayer(player);
+	if isRDRAM(playerActor) then
+		local positionData = dereferencePointer(playerActor + player_fields.PositionDataPointer);
+		if isRDRAM(positionData) then
+			return mainmemory.readfloat(positionData + player_fields.PositionData.ZPosition, true);
+		end
+	end
 	return 0;
 end
 
@@ -312,7 +324,14 @@ function Game.setYPosition(value, player)
 end
 
 function Game.setZPosition(value, player)
-	return;
+	local playerActor = Game.getPlayer(player);
+	if isRDRAM(playerActor) then
+		Game.setYVelocity(0, player);
+		local positionData = dereferencePointer(playerActor + player_fields.PositionDataPointer);
+		if isRDRAM(positionData) then
+			mainmemory.writefloat(positionData + player_fields.PositionData.ZPosition, value, true);
+		end
+	end
 end
 
 function Game.getYRotation(player)
@@ -347,21 +366,25 @@ function Game.setYVelocity(value, player)
 end
 
 function Game.unlockEverything()
-	local firstByte = mainmemory.readbyte(Game.Memory.unlocked_stuff[version] + 3);
-	firstByte = set_bit(firstByte, 4); -- Mushroom Kingdom
-	firstByte = set_bit(firstByte, 5); -- Sound Test
-	firstByte = set_bit(firstByte, 6); -- Item Switch
-	mainmemory.writebyte(Game.Memory.unlocked_stuff[version] + 3, firstByte);
+	local value = mainmemory.readbyte(Game.Memory.unlocked_stuff[version] + 3);
+	value = set_bit(value, 0); -- Luigi Unlock Battle Completed
+	value = set_bit(value, 1); -- Ness Unlock Battle Completed
+	value = set_bit(value, 2); -- Captain Falcon Unlock Battle Completed
+	value = set_bit(value, 3); -- Jigglypuff Unlock Battle Completed
+	value = set_bit(value, 4); -- Mushroom Kingdom Available
+	value = set_bit(value, 5); -- Sound Test Unlocked
+	value = set_bit(value, 6); -- Item Switch Unlocked
+	mainmemory.writebyte(Game.Memory.unlocked_stuff[version] + 3, value);
 
-	local secondByte = mainmemory.readbyte(Game.Memory.unlocked_stuff[version] + 4);
-	secondByte = set_bit(secondByte, 2); -- Jigglypuff
-	secondByte = set_bit(secondByte, 3); -- Ness
-	mainmemory.writebyte(Game.Memory.unlocked_stuff[version] + 4, secondByte);
+	value = mainmemory.readbyte(Game.Memory.unlocked_stuff[version] + 4);
+	value = set_bit(value, 2); -- Jigglypuff Selectable
+	value = set_bit(value, 3); -- Ness Selectable
+	mainmemory.writebyte(Game.Memory.unlocked_stuff[version] + 4, value);
 
-	local thirdByte = mainmemory.readbyte(Game.Memory.unlocked_stuff[version] + 5);
-	thirdByte = set_bit(thirdByte, 4); -- Luigi
-	thirdByte = set_bit(thirdByte, 7); -- Captain Falcon
-	mainmemory.writebyte(Game.Memory.unlocked_stuff[version] + 5, thirdByte);
+	value = mainmemory.readbyte(Game.Memory.unlocked_stuff[version] + 5);
+	value = set_bit(value, 4); -- Luigi Selectable
+	value = set_bit(value, 7); -- Captain Falcon Selectable
+	mainmemory.writebyte(Game.Memory.unlocked_stuff[version] + 5, value);
 end
 
 function Game.setMusic(value)
@@ -369,7 +392,23 @@ function Game.setMusic(value)
 end
 
 function Game.initUI()
-	ScriptHawk.UI.form_controls.moves_button = forms.button(ScriptHawk.UI.options_form, "Unlock Everything", Game.unlockEverything, ScriptHawk.UI.col(10), ScriptHawk.UI.row(0), ScriptHawk.UI.col(4) + 10, ScriptHawk.UI.button_height);
+	-- Unlock Everything Button
+	ScriptHawk.UI.form_controls.unlock_everything_button = forms.button(ScriptHawk.UI.options_form, "Unlock Everything", Game.unlockEverything, ScriptHawk.UI.col(10), ScriptHawk.UI.row(0), ScriptHawk.UI.col(4) + 10, ScriptHawk.UI.button_height);
+
+	-- Music
+	ScriptHawk.UI.form_controls["Music Dropdown"] = forms.dropdown(ScriptHawk.UI.options_form, Game.music, ScriptHawk.UI.col(0) + ScriptHawk.UI.dropdown_offset, ScriptHawk.UI.row(6) + ScriptHawk.UI.dropdown_offset, ScriptHawk.UI.col(9) + 8, ScriptHawk.UI.button_height);
+	ScriptHawk.UI.form_controls["Music Checkbox"] = forms.checkbox(ScriptHawk.UI.options_form, "Set Music", ScriptHawk.UI.col(0) + ScriptHawk.UI.dropdown_offset, ScriptHawk.UI.row(7) + ScriptHawk.UI.dropdown_offset);
+end
+
+function Game.eachFrame()
+	if forms.ischecked(ScriptHawk.UI.form_controls["Music Checkbox"]) then
+		local musicString = forms.gettext(ScriptHawk.UI.form_controls["Music Dropdown"]);
+		for i = 1, #Game.music do
+			if Game.music[i] == musicString then
+				Game.setMusic(i - 1);
+			end
+		end
+	end
 end
 
 Game.OSD = {
