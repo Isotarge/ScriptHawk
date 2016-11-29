@@ -355,6 +355,7 @@ local supportedGames = {
 	["A9BF83FE73361E8D042C33ED48B3851D7D46712C"] = {["moduleName"] = "games.smash64", ["friendlyName"] = "Super Smash Bros. (Australia)"},
 	["6EE8A41FEF66280CE3E3F0984D00B96079442FB9"] = {["moduleName"] = "games.smash64", ["friendlyName"] = "Super Smash Bros. (Europe) (En,Fr,De)"},
 	["E2929E10FCCC0AA84E5776227E798ABC07CEDABF"] = {["moduleName"] = "games.smash64", ["friendlyName"] = "Super Smash Bros. (USA)"},
+	["88C8FED5ECD5ED901CB5FC4B5BBEFFA3EA022DF7"] = {["moduleName"] = "games.smash64", ["friendlyName"] = "19XXTE 0.11"},
 
 	-- Tetris Attack
 	-- TODO: Support more versions of this game
