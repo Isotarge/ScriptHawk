@@ -2,6 +2,7 @@
 showList = false;
 showHitbox = true;
 enableDragAndDrop = false;
+enableLagDetection = false;
 alwaysHP = true;
 
 print("Settings:");
@@ -9,6 +10,7 @@ print();
 print("showList = "..tostring(showList));
 print("showHitbox = "..tostring(showHitbox));
 print("enableDragAndDrop = "..tostring(enableDragAndDrop));
+print("enableLagDetection = "..tostring(enableLagDetection));
 print("alwaysHP = "..tostring(alwaysHP));
 
 local red = 0xFFFF0000;
@@ -124,28 +126,28 @@ function getHolePosition()
 end
 
 function renderHolePosition()
-	local holePosition = getHolePosition();
-	gui.drawRectangle(holePosition[1], holePosition[2], 16, 16, green, 0x7F000000);
-	gui.drawText(holePosition[1] + 3, holePosition[2], "H", white, 0x00000000);
+	if mainmemory.readbyte(0x100) == 0x81 then -- Don't render hole position in dungeons
+		local holePosition = getHolePosition();
+		gui.drawRectangle(holePosition[1], holePosition[2], 16, 16, green, 0x7F000000);
+		gui.drawText(holePosition[1] + 3, holePosition[2], "H", white, 0x00000000);
+	end
 end
 event.onframestart(renderHolePosition);
 
 -- Lag Detection
 local prevLag = -1;
 function detectLag()
-	local currentLag = mainmemory.readbyte(0x57);
-	if currentLag < prevLag then
-		if prevLag - currentLag < 2 then
+	local currentLag = mainmemory.readbyte(0x808);
+	if enableLagDetection and mainmemory.readbyte(0x100) == 0x83 then -- Only detect lag for vertical dungeons
+		if currentLag == prevLag then
 			tastudio.setlag(emu.framecount(), true);
 		else
 			tastudio.setlag(emu.framecount(), false);
 		end
-	else
-		-- TODO
 	end
 	prevLag = currentLag;
 end
---event.onframestart(detectLag); -- TODO: Too many false positives here
+event.onframestart(detectLag);
 
 function toHexString(value, desiredLength, prefix)
 	value = string.format("%X", value or 0);
