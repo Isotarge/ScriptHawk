@@ -1,9 +1,18 @@
 -- Written by Isotarge
 -- Angle calculator by The8bitbeast
 
+-- For calculated moving angle
+local x = 0.0;
+local z = 0.0;
+local dx = 0.0;
+local dz = 0.0;
+local prev_x = 0.0;
+local prev_z = 0.0;
+
 local Game = {
 	["Memory"] = {
 		-- Version order: Europe, Japan, US 1.1, US 1.0
+		["frame_timer"] = {0x280700, 0x27F718, 0x27F718, 0x2808D8},
 		["slope_timer"] = {0x37CCB4, 0x37CDE4, 0x37B4E4, 0x37C2E4},
 		["player_grounded"] = {0x37C930, 0x37CA60, 0x37B160, 0x37BF60},
 		["x_velocity"] = {0x37CE88, 0x37CFB8, 0x37B6B8, 0x37C4B8},
@@ -102,6 +111,18 @@ end
 
 function Game.getSlopeTimer()
 	return mainmemory.readfloat(Game.Memory.slope_timer[Game.version], true);
+end
+
+function Game.isPhysicsFrame()
+	local frameTimerValue = mainmemory.read_s32_be(Game.Memory.frame_timer[Game.version]);
+	return frameTimerValue <= 0 and not emu.islagged();
+end
+
+function Game.getCalculatedMovingAngle()
+	if dx == 0 and dz == 0 then
+		return 0;
+	end
+	return angleBetweenPoints(prev_x, prev_z, x, z);
 end
 
 local movementStates = {
@@ -347,6 +368,7 @@ local OSD = {
 	{"Separator", 1},
 	{"X Rotation", Game.getXRotation},
 	{"Angle", Game.getMovingAngle},
+	{"Moving Angle", Game.getCalculatedMovingAngle},
 	{"Separator", 1},
 	{"Movement", Game.getCurrentMovementState},
 	{"On Ground", Game.getGroundState},
@@ -443,6 +465,15 @@ end
 angleCalc.open();
 
 local function drawOSD()
+	if Game.isPhysicsFrame() then
+		prev_x = x;
+		prev_z = z;
+		x = Game.getXPosition();
+		z = Game.getZPosition();
+		dx = x - prev_x;
+		dz = z - prev_z;
+	end
+
 	local row = 0;
 	local OSDX = 2;
 	local OSDY = 70;
