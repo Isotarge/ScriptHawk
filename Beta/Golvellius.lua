@@ -1,6 +1,6 @@
 -- Configuration
 alwaysHP = true;
-enableDamageTimer = false;
+enableDamageTimer = true;
 enableDragAndDrop = false;
 enableLagDetection = false;
 showList = false;
