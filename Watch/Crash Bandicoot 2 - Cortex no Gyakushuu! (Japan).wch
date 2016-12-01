@@ -1,0 +1,5 @@
+SystemID PSX
+0614F0	d	h	0	MainRAM	Player Pointer
+062D98	d	u	0	MainRAM	Global Timer
+06DBBC	d	h	0	MainRAM	Total Boxes
+

@@ -278,6 +278,16 @@ local supportedGames = {
 	["EE7BC6656FD1E1D9FFB3D19ADD759F28B88DF710"] = {["moduleName"] = "games.cbfd", ["friendlyName"] = "Conker's Bad Fur Day (Europe)"},
 	["4CBADD3C4E0729DEC46AF64AD018050EADA4F47A"] = {["moduleName"] = "games.cbfd", ["friendlyName"] = "Conker's Bad Fur Day (USA)"},
 
+	-- Crash Bandicoot 2: Cortex Strikes Back
+	["149A203B"] = {["moduleName"] = "games.crash2", ["friendlyName"] = "Crash Bandicoot 2 - Cortex Strikes Back (USA)"},
+	["395C0916"] = {["moduleName"] = "games.crash2", ["friendlyName"] = "Crash Bandicoot 2 - Cortex Strikes Back (USA)"},
+	["5F65CF0F"] = {["moduleName"] = "games.crash2", ["friendlyName"] = "Crash Bandicoot 2 - Cortex Strikes Back (Europe) (En,Fr,De,Es,It) (No EDC)"},
+	["F5E2EC49"] = {["moduleName"] = "games.crash2", ["friendlyName"] = "Crash Bandicoot 2 - Cortex Strikes Back (Europe) (En,Fr,De,Es,It) (No EDC)"},
+	["97395614"] = {["moduleName"] = "games.crash2", ["friendlyName"] = "Crash Bandicoot 2 - Cortex Strikes Back (Europe) (En,Fr,De,Es,It) (EDC)"},
+	["74C85B1E"] = {["moduleName"] = "games.crash2", ["friendlyName"] = "Crash Bandicoot 2 - Cortex Strikes Back (Europe) (En,Fr,De,Es,It) (EDC)"},
+	["B0A92BAF"] = {["moduleName"] = "games.crash2", ["friendlyName"] = "Crash Bandicoot 2 - Cortex no Gyakushuu! (Japan)"},
+	["14591AE9"] = {["moduleName"] = "games.crash2", ["friendlyName"] = "Crash Bandicoot 2 - Cortex no Gyakushuu! (Japan)"},
+
 	-- Crash Bandicoot 3: Warped
 	["05E3012B"] = {["moduleName"] = "games.crash3", ["friendlyName"] = "Crash Bandicoot - Warped (USA)"},
 	["9BF37B2C"] = {["moduleName"] = "games.crash3", ["friendlyName"] = "Crash Bandicoot - Warped (USA)"},
@@ -446,6 +456,7 @@ local function increaseSpeed()
 	Game.speedy_index = math.min(#Game.speedy_speeds, Game.speedy_index + 1);
 end
 
+ScriptHawk.movingAngle = 0.0;
 function ScriptHawk.getMovingAngle()
 	if dx == 0 and dz == 0 then
 		return 0;
@@ -776,7 +787,7 @@ function ScriptHawk.UI.updateReadouts()
 			end
 
 			if labelLower == "moving angle" and value == nil then -- TODO: This has some name conflicts, "moving"
-				value = round(ScriptHawk.getMovingAngle())..string.char(0xB0);
+				value = round(ScriptHawk.movingAngle)..string.char(0xB0);
 			end
 
 			-- Get the value
@@ -1047,6 +1058,8 @@ local function plot_pos()
 			end
 			if d > max_d then max_d = d end
 		end
+
+		ScriptHawk.movingAngle = ScriptHawk.getMovingAngle();
 
 		prev_x = x;
 		prev_y = y;
