@@ -24,6 +24,8 @@ local black = 0xFF000000;
 local white = 0xFFFFFFFF;
 
 -- Game state
+local gamemode = "overworld"; -- overworld, vertical, horizontal, shop
+
 local object_array_base = 0x100;
 local object_size = 0x20;
 local object_array_capacity = 16;
@@ -31,23 +33,28 @@ local object_array_capacity = 16;
 local object_fields = {
 	["object_type"] = 0x00, -- Byte
 	["object_types"] = {
-		[0x4C] = {name = "Player"}, -- Damaged, Vertical Dungeon
+		[0x4C] = {name = "Player", color = red}, -- Damaged, Vertical Dungeon
 		--
-		[0x59] = {name = "Player"}, -- Damaged, Side Scroller
+		[0x59] = {name = "Player", color = red}, -- Damaged, Side Scroller
 		--
-		[0x5E] = {name = "Player"}, -- Damaged, Overworld
+		[0x5C] = {name = "Dying Boss?", particle = true},
+		--
+		[0x5E] = {name = "Player", color = red}, -- Damaged, Overworld
+		--
+		[0x60] = {name = "Despa Particle Spawning", particle = true},
 		--
 		[0x81] = {name = "Player"}, -- Overworld
 		[0x82] = {name = "Player"}, -- Dungeon, Side Scroller
 		[0x83] = {name = "Player"}, -- Dungeon, Vertical
 		[0x84] = {name = "Sword", color = yellow}, -- Player Sword
 		--
+		[0x86] = {name = "Dying Enemy", particle = true},
 		[0x87] = {name = "Snakelet", gold = 10, color = red, max_hp = 1},
 		[0x88] = {name = "Fire Spirit", gold = 40, color = red, max_hp = 2},
 		[0x89] = {name = "Flea", gold = 30, color = red, max_hp = 2},
 		[0x8A] = {name = "Basketworm", gold = 20, color = red, max_hp = 2},
 		[0x8B] = {name = "Spider", gold = 100, color = red, max_hp = 3},
-		[0x8C] = {name = "Health", color = pink},
+		[0x8C] = {name = "Health", color = pink, particle = true},
 		--
 		[0x90] = {name = "Fly", gold = 80, color = red, max_hp = 1},
 		[0x91] = {name = "Tick", gold = 60, color = red, max_hp = 1},
@@ -70,7 +77,7 @@ local object_fields = {
 		[0xA4] = {name = "Light Blue Spider", gold = 80, color = red, max_hp = 2},
 		[0xA5] = {name = "Dark Blue Spider", gold = 180, color = red, max_hp = 5},
 		[0xA6] = {name = "Red Spider", gold = 280, color = red, max_hp = 5},
-		--
+		[0xA7] = {name = "Health", color = pink, particle = true},
 		[0xA8] = {name = "Green Frog", gold = 40, color = red, max_hp = 2},
 		[0xA9] = {name = "Red Frog", gold = 200, color = red, max_hp = 3},
 		[0xAA] = {name = "Red Snake", gold = 10, color = red, max_hp = 1},
@@ -97,21 +104,26 @@ local object_fields = {
 		[0xBF] = {name = "Red Mole", gold = 60, color = red, max_hp = 2},
 		[0xC0] = {name = "Blue Mole", gold = 120, color = red, max_hp = 5},
 		--
-		[0xD0] = {name = "Boss 1", color = red, max_hp = 20},
-		[0xD1] = {name = "Boss 2", color = red, max_hp = 36},
-		[0xD2] = {name = "Boss 3", color = red, max_hp = 40},
-		[0xD3] = {name = "Boss 4", color = red, max_hp = 66},
-		[0xD4] = {name = "Boss 5", color = red, max_hp = 56},
+		[0xD0] = {name = "Despa", color = red, max_hp = 20},
+		[0xD1] = {name = "Rolick", color = red, max_hp = 36},
+		[0xD2] = {name = "Bachular", color = red, max_hp = 40},
+		[0xD3] = {name = "Fosbus", color = red, max_hp = 66},
+		[0xD4] = {name = "Warlic", color = red, max_hp = 56},
+		-- 0xD5 Crawky
+		-- 0xD6 Haidee
+		-- 0xD7 Golvellius
+		[0xD8] = {name = "Dying Boss?", particle = true},
 		--
-		[0xDB] = {name = "Projectile", color = yellow},
+		[0xDB] = {name = "Projectile", color = yellow, particle = true},
+		[0xDC] = {name = "Dying Boss?", particle = true},
 		--
-		[0xE0] = {name = "Boss 1 Projectile", color = yellow},
-		[0xE1] = {name = "Boss 3 Projectile", color = yellow},
-		[0xE2] = {name = "Boss 4 Projectile", color = yellow},
+		[0xE0] = {name = "Despa Projectile", color = yellow, particle = true},
+		[0xE1] = {name = "Bachular Projectile", color = yellow, particle = true},
+		[0xE2] = {name = "Fosbus Projectile", color = yellow, particle = true},
 		--
 		[0xE5] = {name = "Giant Snake", gold = 0, color = red, max_hp = 5},
 		--
-		[0xEF] = {name = "Projectile", color = yellow},
+		[0xEF] = {name = "Projectile", color = yellow, particle = true},
 	},
 	["y_position"] = 0x01, -- u8
 	["x_position"] = 0x02, -- u8
@@ -138,20 +150,18 @@ function getHolePosition()
 end
 
 function renderHolePosition()
-	local playerType = mainmemory.readbyte(0x100);
-	if playerType == 0x5E or playerType == 0x81 then -- Don't render hole position in dungeons
+	if gamemode == "overworld" then -- Don't render hole position in dungeons
 		local holePosition = getHolePosition();
 		gui.drawRectangle(holePosition[1], holePosition[2], 16, 16, green, 0x7F000000);
 		gui.drawText(holePosition[1] + 3, holePosition[2], "H", white, 0x00000000);
 	end
 end
-event.onframestart(renderHolePosition);
 
 -- Lag Detection
 local prevLag = -1;
 function detectLag()
 	local currentLag = mainmemory.readbyte(0x808);
-	if enableLagDetection and mainmemory.readbyte(0x100) == 0x83 then -- Only detect lag for vertical dungeons
+	if enableLagDetection and gamemode == "vertical" then -- Only detect lag for vertical dungeons
 		if currentLag == prevLag then
 			tastudio.setlag(emu.framecount(), true);
 		else
@@ -160,7 +170,6 @@ function detectLag()
 	end
 	prevLag = currentLag;
 end
-event.onframestart(detectLag);
 
 function toHexString(value, desiredLength, prefix)
 	value = string.format("%X", value or 0);
@@ -203,7 +212,7 @@ function drawObjects()
 	end
 
 	local row = 0;
-	for i = 0, object_array_capacity do
+	for i = object_array_capacity, 0, -1 do
 		local objectBase = object_array_base + (i * object_size);
 		local objectType = mainmemory.readbyte(objectBase + object_fields.object_type);
 		local objectTypeNumeric = objectType;
@@ -220,6 +229,7 @@ function drawObjects()
 			local hp = mainmemory.readbyte(objectBase + object_fields.health);
 			local maxHP = "?";
 			local goldOnKill = -1;
+			local isParticle = false;
 
 			if type(object_fields.object_types[objectType]) == "table" then
 				objectTypeTable = object_fields.object_types[objectType];
@@ -254,6 +264,8 @@ function drawObjects()
 				if type(objectTypeTable.max_hp) == "number" then
 					maxHP = objectTypeTable.max_hp;
 				end
+
+				isParticle = type(objectTypeTable.particle) ~= "nil" and objectTypeTable.particle;
 			else
 				color = white;
 				objectType = "Unknown ("..toHexString(objectType)..")";
@@ -280,9 +292,14 @@ function drawObjects()
 						table.insert(draggedObjects, {objectBase, xPosition, yPosition});
 					end
 
+					local goldString = "";
+					if goldOnKill > 0 then
+						goldString = " "..goldOnKill.."G";
+					end
+
 					local mouseOverText = {
 						objectType.." "..hp.."/"..maxHP.." HP",
-						toHexString(objectBase).." "..xPosition..","..yPosition,
+						toHexString(objectBase).." "..xPosition..","..yPosition..goldString,
 					};
 
 					local maxLength = -math.huge;
@@ -302,7 +319,7 @@ function drawObjects()
 						gui.drawText(xPosition + hitboxXOffset, yPosition + hitboxYOffset, mainmemory.readbyte(objectBase + object_fields.sword_timer), gold);
 					elseif (not alwaysHP) and goldOnKill > 0 then
 						gui.drawText(xPosition + hitboxXOffset, yPosition + hitboxYOffset, ""..goldOnKill, gold);
-					elseif objectBase ~= 0x100 then -- Everyone without a gold value should show their current/max HP (except the player)
+					elseif objectBase ~= 0x100 and not isParticle then -- Everyone without a gold value should show their current/max HP (except the player)
 						local damageTimerString = "";
 						if enableDamageTimer then
 							local damageTimer = mainmemory.readbyte(objectBase + object_fields.damage_timer);
@@ -317,7 +334,11 @@ function drawObjects()
 			end
 
 			if showList then
-				gui.text(2, 2 + height * row, xPosition..", "..yPosition.." - "..hp.."/"..maxHP.." HP - "..objectType.." "..toHexString(objectBase), color, 'bottomright');
+				local goldString = " ";
+				if goldOnKill > 0 then
+					goldString = " - "..goldOnKill.."G - ";
+				end
+				gui.text(2, 2 + height * row, xPosition..", "..yPosition.." - "..hp.."/"..maxHP.." HP - "..objectType..goldString..toHexString(objectBase), color, 'bottomright');
 				row = row + 1;
 			end
 		end
@@ -331,9 +352,37 @@ function getGold()
 	return hundred_thousands..thousands..tens.."0";
 end
 
+function getScreen()
+	if gamemode == "vertical" then
+		return toHexString(mainmemory.readbyte(0x808), 2, "");
+	end
+	return toHexString(mainmemory.readbyte(0x809), 2, "");
+end
+
 function drawOSD()
-	gui.drawRectangle(156, 2, 92, 13, 0, 0x7F000000);
-	gui.drawText(156, 1, getGold().." Gold", gold, 0);
+	-- Detect game mode
+	local playerType = mainmemory.readbyte(0x100);
+	if playerType == 0x5E or playerType == 0x81 then
+		gamemode = "overworld";
+	elseif playerType == 0x4C or playerType == 0x83 then
+		gamemode = "vertical";
+	elseif playerType == 0x59 or playerType == 0x82 then
+		gamemode = "horizontal";
+	end
+
+	if gamemode == "vertical" then
+		gui.drawText(197, 1, getScreen().." ScrY", 0xFF000000, 0);
+	else
+		if gamemode == "horizontal" then
+			gui.drawRectangle(156, 15, 92, 13, 0, 0x7F000000);
+			gui.drawText(156, 14, getScreen().." Screen X", gold, 0);
+		end
+		gui.drawRectangle(156, 2, 92, 13, 0, 0x7F000000);
+		gui.drawText(156, 1, getGold().." Gold", gold, 0);
+	end
+
+	detectLag();
+	renderHolePosition();
 	drawObjects();
 end
 

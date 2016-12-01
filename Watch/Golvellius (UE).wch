@@ -3,6 +3,8 @@ SystemID SMS
 0102	b	u	0	Main RAM	X Position
 0109	b	s	0	Main RAM	Y Velocity
 010B	b	s	0	Main RAM	X Velocity
+0808	b	h	0	Main RAM	Screen Y
+0809	b	h	0	Main RAM	Screen X
 080D	b	h	0	Main RAM	Map Index
 0836	b	h	0	Main RAM	Health Orbs
 083F	b	h	0	Main RAM	Gold 100000s
