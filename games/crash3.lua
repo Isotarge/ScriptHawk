@@ -18,7 +18,7 @@ Game = {
 		global_timer = {0x69034, 0x691E4, 0x69484},
 		level = {0x618DC, nil, nil}, -- TODO: This doesn't seem to work
 		player_pointer = {0x60A90, 0x60BF0, 0x60E90},
-		total_boxes = {0x69148, 0x692F8, 0x69598},
+		total_boxes = {0x69148, 0x692F8, 0x69598}, -- Signed 24.8 fixed point
 	},
 };
 
@@ -102,7 +102,7 @@ function Game.getBoxesSmashed()
 end
 
 function Game.getTotalBoxes()
-	return math.floor(mainmemory.read_u32_le(Game.Memory.total_boxes[version]) / 256);
+	return math.floor(mainmemory.read_s32_le(Game.Memory.total_boxes[version]) / 256);
 end
 
 function Game.getBoxString()
