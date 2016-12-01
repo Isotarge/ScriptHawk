@@ -52,6 +52,9 @@ A collection of Lua scripts and RAM watches for [BizHawk](https://github.com/TAS
 ###Conker's Bad Fur Day
 - All known versions supported
 
+###Crash Bandicoot 2: Cortex Strikes Back
+- All known versions supported
+
 ###Crash Bandicoot 3: Warped
 - All known versions supported
 
