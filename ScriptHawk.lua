@@ -278,6 +278,16 @@ local supportedGames = {
 	["EE7BC6656FD1E1D9FFB3D19ADD759F28B88DF710"] = {["moduleName"] = "games.cbfd", ["friendlyName"] = "Conker's Bad Fur Day (Europe)"},
 	["4CBADD3C4E0729DEC46AF64AD018050EADA4F47A"] = {["moduleName"] = "games.cbfd", ["friendlyName"] = "Conker's Bad Fur Day (USA)"},
 
+	-- Crash Bandicoot
+	["41B5F211"] = {["moduleName"] = "games.crash1", ["friendlyName"] = "Crash Bandicoot (USA)"},
+	["249FC147"] = {["moduleName"] = "games.crash1", ["friendlyName"] = "Crash Bandicoot (USA)"},
+	["D6172125"] = {["moduleName"] = "games.crash1", ["friendlyName"] = "Crash Bandicoot (Europe) (EDC)"},
+	["2033243A"] = {["moduleName"] = "games.crash1", ["friendlyName"] = "Crash Bandicoot (Europe) (EDC)"},
+	["FD11EB1E"] = {["moduleName"] = "games.crash1", ["friendlyName"] = "Crash Bandicoot (Europe) (No EDC)"},
+	["0B9EB02B"] = {["moduleName"] = "games.crash1", ["friendlyName"] = "Crash Bandicoot (Europe) (No EDC)"},
+	["D9BA797E"] = {["moduleName"] = "games.crash1", ["friendlyName"] = "Crash Bandicoot (Japan)"},
+	["F5B95131"] = {["moduleName"] = "games.crash1", ["friendlyName"] = "Crash Bandicoot (Japan)"},
+
 	-- Crash Bandicoot 2: Cortex Strikes Back
 	["149A203B"] = {["moduleName"] = "games.crash2", ["friendlyName"] = "Crash Bandicoot 2 - Cortex Strikes Back (USA)"},
 	["395C0916"] = {["moduleName"] = "games.crash2", ["friendlyName"] = "Crash Bandicoot 2 - Cortex Strikes Back (USA)"},
