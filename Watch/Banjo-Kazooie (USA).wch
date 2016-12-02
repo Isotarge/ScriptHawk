@@ -73,7 +73,7 @@ SystemID N64
 364AE4	d	f	1	RDRAM	Wonderwing Jump Gravity
 364D44	d	f	1	RDRAM	Surface Swimming Speed
 364D80	d	f	1	RDRAM	Walking Speed
-36A9B4	d	h	1	RDRAM	Pointer to linked list? of pointers
+36A9B4	d	h	1	RDRAM	IDStruct List
 36C4EC	w	u	1	RDRAM	Pause Menu Item 1 Y Position
 36C4EE	b	u	1	RDRAM	Pause Menu Item 1 Portrait
 36C4FC	w	u	1	RDRAM	Pause Menu Item 2 Y Position
@@ -83,7 +83,6 @@ SystemID N64
 36C51C	w	u	1	RDRAM	Pause Menu Item 4 Y Position
 36C51E	b	u	1	RDRAM	Pause Menu Item 4 Portrait
 36E560	d	h	1	RDRAM	Object Array pointer
-36E7C8	d	h	1	RDRAM	Struct Array Pointer
 371E20	d	f	1	RDRAM	Game Speed Coefficient
 371F00	b	h	1	RDRAM	MM Demo Input File Index
 371F06	b	h	1	RDRAM	CC Demo Input File Index
@@ -201,7 +200,7 @@ SystemID N64
 380974	d	f	1	RDRAM	Water Something?
 380AE0	d	h	1	RDRAM	Print List Pointer
 3810B8	d	f	1	RDRAM	FF Answer Timer
-381FA0	d	h	1	RDRAM	Note renderer block pointer?
+381FA0	d	h	1	RDRAM	Struct Array Pointer
 38214B	b	u	1	RDRAM	Standing on switch
 382360	d	h	1	RDRAM	Map Vert List Pointer?
 382364	d	h	1	RDRAM	Water Vert List Pointer?

@@ -14,7 +14,6 @@ SystemID N64
 36B71C	w	u	1	RDRAM	Pause Menu Item 4 Y Position
 36B71E	b	u	1	RDRAM	Pause Menu Item 4 Portrait
 36D760	d	h	1	RDRAM	Object Array pointer
-36D9C8	d	h	1	RDRAM	Struct Array Pointer
 37B160	b	u	1	RDRAM	Player is on ground
 37B161	b	u	1	RDRAM	Player is swimming
 37B3D1	b	u	1	RDRAM	Standing on Fly Pad
@@ -55,6 +54,7 @@ SystemID N64
 37DAF4	b	h	1	RDRAM	Map Load State
 37DAF5	b	h	1	RDRAM	Map
 37DAF6	b	h	1	RDRAM	Exit
+3811A0	d	h	1	RDRAM	Struct Array Pointer
 382240	d	h	1	RDRAM	"Return to Game" Pointer
 382244	d	h	1	RDRAM	"Return to Lair" Pointer
 382248	d	h	1	RDRAM	"View Totals" Pointer

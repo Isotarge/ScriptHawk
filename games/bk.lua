@@ -256,7 +256,7 @@ Game.Memory = {
 	["ff_pattern"] = {0x383BA2, 0x383D02, 0x3823E2, 0x3831C2},
 	["collectable_base"] = {0x386910, 0x386A70, 0x385150, 0x385F30},
 	["object_array_pointer"] = {0x36EAE0, 0x36F260, 0x36D760, 0x36E560},
-	["struct_array_pointer"] = {0x36ED48, 0x36F4C8, 0x36D9C8, 0x36E7C8},
+	["struct_array_pointer"] = {0x382970, 0x382AB0, 0x3811A0, 0x381FA0},
 	["board_base"] = {0x394140, 0x394350, 0x3929C0, 0x393760},
 	["pause_menu_strings_base"] = {0x36C99C, 0x36CAF0, 0x36B6E0, 0x36C4E0},
 	["return_to_lair_enabled"] = {0x383A60, 0x383BC0, 0x3822A0, 0x383080},
@@ -1529,7 +1529,7 @@ end
 
 local structPointers = {};
 function getStructPointers()
-	local block = dereferencePointer(0x381FA0);
+	local block = dereferencePointer(Game.Memory.struct_array_pointer[version]);
 	local pointers = {};
 	if isRDRAM(block) then
 		local blockend = dereferencePointer(block - 0x0C);
@@ -1889,12 +1889,17 @@ function Game.drawUI()
 
 	if script_mode == "List Struct" then
 		for i = #structPointers, 1, -1 do
-			local color = nil;
 			if object_index == i then
-				color = yellow_highlight;
+				local x = mainmemory.read_s16_be(structPointers[i] + 0x10);
+				local y = mainmemory.read_s16_be(structPointers[i] + 0x12);
+				local z = mainmemory.read_s16_be(structPointers[i] + 0x14);
+				gui.text(Game.OSDPosition[1], 2 + Game.OSDRowHeight * row, x..", "..y..", "..z.." "..i..": "..toHexString(structPointers[i]), yellow_highlight, 'bottomright');
+				row = row + 1;
+			else
+				gui.text(Game.OSDPosition[1], 2 + Game.OSDRowHeight * row, i..": "..toHexString(structPointers[i]), color, 'bottomright');
+				row = row + 1;
 			end
-			gui.text(Game.OSDPosition[1], 2 + Game.OSDRowHeight * row, i..": "..toHexString(structPointers[i]), color, 'bottomright');
-			row = row + 1;
+
 		end
 	end
 end
@@ -2759,36 +2764,5 @@ Game.OSD = {
 	--{"FF Answer", getCorrectFFAnswer},
 	{"FF Pattern", Game.getFFPattern},
 };
-
-function dumpPointers()
-	local block = dereferencePointer(0x381FA0);
-	if isRDRAM(block) then
-		local blockend = dereferencePointer(block - 0x0C);
-		if isRDRAM(blockend) then
-			for address = block, blockend - 0x10, 0x0C do
-				local pointercheck = mainmemory.read_u16_be(address + 2);
-				if pointercheck ~= 0 then
-					local pointer1 = dereferencePointer(address + 4);
-					local pointer2 = dereferencePointer(address + 8);
-					if isRDRAM(pointer1) then
-						local x = mainmemory.read_s16_be(pointer1 + 0x10);
-						local y = mainmemory.read_s16_be(pointer1 + 0x12);
-						local z = mainmemory.read_s16_be(pointer1 + 0x14);
-						local scale = mainmemory.read_u16_be(pointer1 + 0x0E);
-						dprint(toHexString(pointer1, 6).." position: "..x..","..y..","..z.." scale: "..scale);
-					end
-					if isRDRAM(pointer2) then
-						local x = mainmemory.read_s16_be(pointer2 + 0x10);
-						local y = mainmemory.read_s16_be(pointer2 + 0x12);
-						local z = mainmemory.read_s16_be(pointer2 + 0x14);
-						local scale = mainmemory.read_u16_be(pointer2 + 0x0E);
-						dprint(toHexString(pointer2, 6).." position: "..x..","..y..","..z.." scale: "..scale);
-					end
-				end
-			end
-			print_deferred();
-		end
-	end
-end
 
 return Game;

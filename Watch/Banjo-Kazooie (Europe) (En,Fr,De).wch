@@ -30,7 +30,6 @@ SystemID N64
 36C9D8	w	u	1	RDRAM	Pause Menu Item 4 Y Position
 36C9DA	b	u	1	RDRAM	Pause Menu Item 4 Portrait
 36EAE0	d	h	1	RDRAM	Object Array Pointer
-36ED48	d	h	1	RDRAM	Struct Array Pointer
 3723A0	d	f	1	RDRAM	Game Speed Coefficient
 372480	b	h	1	RDRAM	MM Demo Input File Index
 372486	b	h	1	RDRAM	CC Demo Input File Index
@@ -104,6 +103,7 @@ SystemID N64
 37F2C5	b	h	1	RDRAM	Map
 37F2C6	b	h	1	RDRAM	Exit
 3814B0	d	h	1	RDRAM	Print List Pointer
+382970	d	h	1	RDRAM	Struct Array Pointer
 383A00	d	h	1	RDRAM	"Return to Game" Pointer
 383A04	d	h	1	RDRAM	"Return to Lair" Pointer
 383A08	d	h	1	RDRAM	"View Totals" Pointer
