@@ -31,7 +31,7 @@ local player_data = {
 	z_velocity = 0x8C,
 	y_rotation = 0x94,
 	velocity = 0x104,
-	lives = 0x144,
+	lives = 0x144, -- Signed 24.8 fixed point
 	boxes_smashed = 0x168,
 	jumps = 0x1B5, -- TODO: How do misaligned addresses work on PSX?
 };
@@ -89,7 +89,7 @@ end
 function Game.setLives(value)
 	local player = Game.getPlayerActor();
 	if isRAM(player) then
-		mainmemory.write_u32_le(player + player_data.lives, value * 256);
+		mainmemory.write_s32_le(player + player_data.lives, value * 256);
 	end
 end
 
