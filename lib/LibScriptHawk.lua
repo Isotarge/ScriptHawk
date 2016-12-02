@@ -351,6 +351,27 @@ function searchPointers(base, range, allowLater)
 	return foundPointers;
 end
 
+function searchPointersLE(base, range, allowLater) -- Little Endian Version (PSX etc) TODO: Endianness as a param? Or ifdef it out with same signature
+	local foundPointers = {};
+	allowLater = allowLater or false;
+	for address = 0, RAMSize - 4, 4 do
+		local value = mainmemory.read_u32_le(address);
+		if allowLater then
+			if value >= base - range and value <= base + range then
+				table.insert(foundPointers, {["Address"] = toHexString(address), ["Value"] = toHexString(value)});
+				dprint(toHexString(address).." -> "..toHexString(value));
+			end
+		else
+			if value >= base - range and value <= base then
+				table.insert(foundPointers, {["Address"] = toHexString(address), ["Value"] = toHexString(value)});
+				dprint(toHexString(address).." -> "..toHexString(value));
+			end
+		end
+	end
+	print_deferred();
+	return foundPointers;
+end
+
 function getMemoryStats(object)
 	local size = 0;
 	local prev = 0;
