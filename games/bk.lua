@@ -1527,39 +1527,52 @@ end
 -- "Struct" stuff --
 --------------------
 
-struct_slot_size = 0x60;
+local structPointers = {};
+function getStructPointers()
+	local block = dereferencePointer(0x381FA0);
+	local pointers = {};
+	if isRDRAM(block) then
+		local blockend = dereferencePointer(block - 0x0C);
+		if isRDRAM(blockend) then
+			for address = block, blockend - 0x10, 0x0C do
+				local pointercheck = mainmemory.read_u16_be(address + 2);
+				if pointercheck ~= 0 then
+					local pointer1 = dereferencePointer(address + 4);
+					local pointer2 = dereferencePointer(address + 8);
+					if isRDRAM(pointer1) then
+						table.insert(pointers, pointer1);
+					end
+					if isRDRAM(pointer2) then
+						table.insert(pointers, pointer2);
+					end
+				end
+			end
+		end
+	end
+	return pointers;
+end
+
+struct_slot_size = 0x60; -- TODO: How big is a "renderer"?
 struct_array_variables = {
-	[0x00] = {["Name"] = "Renderer Pointer", ["Type"] = "Pointer", ["Fields"] = {
-			[0x0E] = {["Name"] = "scale", ["Type"] = "u16_be"},
-			[0x10] = {["Name"] = "x_pos", ["Type"] = "s16_be"},
-			[0x12] = {["Name"] = "y_pos", ["Type"] = "s16_be"},
-			[0x14] = {["Name"] = "z_pos", ["Type"] = "s16_be"},
-		}},
-	[0x04] = {["Name"] = "Unknown Pointer 0x04", ["Type"] = "Pointer"},
-	[0x08] = {["Name"] = "Unknown Pointer 0x08", ["Type"] = "Pointer"},
+	[0x0E] = {["Name"] = "scale", ["Type"] = "u16_be"},
+	[0x10] = {["Name"] = "x_pos", ["Type"] = "s16_be"},
+	[0x12] = {["Name"] = "y_pos", ["Type"] = "s16_be"},
+	[0x14] = {["Name"] = "z_pos", ["Type"] = "s16_be"},
 };
 
 function getStructData(pointer)
 	local structData = {};
-	table.insert(structData, {"Slot Base", toHexString(pointer)});
-	table.insert(structData, {"Separator", 1});
 
-	local rendererPointer = mainmemory.read_u32_be(pointer);
-	if isPointer(rendererPointer) then
-		rendererPointer = rendererPointer - RDRAMBase;
-		table.insert(structData, {"Renderer Pointer", toHexString(rendererPointer)});
+	if isRDRAM(pointer) then
+		table.insert(structData, {"Slot Base", toHexString(pointer)});
 		table.insert(structData, {"Separator", 1});
-		table.insert(structData, {"X", mainmemory.read_s16_be(rendererPointer + 0x10)});
-		table.insert(structData, {"Y", mainmemory.read_s16_be(rendererPointer + 0x12)});
-		table.insert(structData, {"Z", mainmemory.read_s16_be(rendererPointer + 0x14)});
-		table.insert(structData, {"Scale", mainmemory.read_u16_be(rendererPointer + 0x0E)});
-		table.insert(structData, {"Separator", 1});
+
+		table.insert(structData, {"X", mainmemory.read_s16_be(pointer + 0x10)});
+		table.insert(structData, {"Y", mainmemory.read_s16_be(pointer + 0x12)});
+		table.insert(structData, {"Z", mainmemory.read_s16_be(pointer + 0x14)});
+		table.insert(structData, {"Scale", mainmemory.read_u16_be(pointer + 0x0E)});
 	end
-	table.insert(structData, {"Unknown Pointer 0x04", toHexString(mainmemory.read_u32_be(pointer + 0x04))});
-	table.insert(structData, {"Unknown Pointer 0x08", toHexString(mainmemory.read_u32_be(pointer + 0x08))});
-	table.insert(structData, {"Unknown Pointer 0x10", toHexString(mainmemory.read_u32_be(pointer + 0x10))});
-	table.insert(structData, {"Unknown Pointer 0x1C", toHexString(mainmemory.read_u32_be(pointer + 0x1C))});
-	table.insert(structData, {"Unknown Pointer 0x54", toHexString(mainmemory.read_u32_be(pointer + 0x54))});
+
 	return structData;
 end
 
@@ -1653,10 +1666,7 @@ function getNumSlots()
 			return math.min(max_slots, mainmemory.read_u32_be(objectArray));
 		end
 	else -- Model 2
-		local structArray = dereferencePointer(Game.Memory.struct_array_pointer[version]);
-		if isRDRAM(structArray) then
-			return ((mainmemory.read_u32_be(structArray - 0x0C) - RDRAMBase) - structArray) / struct_slot_size;
-		end
+		return #structPointers;
 	end
 	return 0;
 end
@@ -1748,18 +1758,15 @@ function zipToSelectedObject()
 			Game.setZPosition(z);
 		end
 	else
-		local structArray = dereferencePointer(Game.Memory.struct_array_pointer[version]);
-		if isRDRAM(structArray) then
-			local rendererPointer = dereferencePointer(structArray + object_index * struct_slot_size);
-			if isRDRAM(rendererPointer) then
-				local x = mainmemory.read_s16_be(rendererPointer + 0x10);
-				local y = mainmemory.read_s16_be(rendererPointer + 0x12);
-				local z = mainmemory.read_s16_be(rendererPointer + 0x14);
+		local rendererPointer = structPointers[object_index];
+		if isRDRAM(rendererPointer) then
+			local x = mainmemory.read_s16_be(rendererPointer + 0x10);
+			local y = mainmemory.read_s16_be(rendererPointer + 0x12);
+			local z = mainmemory.read_s16_be(rendererPointer + 0x14);
 
-				Game.setXPosition(x);
-				Game.setYPosition(y);
-				Game.setZPosition(z);
-			end
+			Game.setXPosition(x);
+			Game.setYPosition(y);
+			Game.setZPosition(z);
 		end
 	end
 end
@@ -1812,7 +1819,9 @@ function Game.drawUI()
 	local row = 0;
 
 	local objectArray = dereferencePointer(Game.Memory.object_array_pointer[version]);
-	local structArray = dereferencePointer(Game.Memory.struct_array_pointer[version]);
+	if string.contains(script_mode, "Struct") then
+		structPointers = getStructPointers();
+	end
 	local numSlots = getNumSlots();
 
 	gui.text(Game.OSDPosition[1], 2 + Game.OSDRowHeight * row, "Mode: "..script_mode, nil, 'bottomright');
@@ -1833,15 +1842,13 @@ function Game.drawUI()
 	end
 
 	if script_mode == "Examine Struct" then
-		if isRDRAM(structArray) then
-			local structData = getStructData(structArray + object_index * struct_slot_size)
-			for i = #structData, 1, -1 do
-				if structData[i][1] ~= "Separator" then
-					gui.text(Game.OSDPosition[1], 2 + Game.OSDRowHeight * row, structData[i][2].." - "..structData[i][1], nil, 'bottomright');
-					row = row + 1;
-				else
-					row = row + structData[i][2];
-				end
+		local structData = getStructData(structPointers[object_index]);
+		for i = #structData, 1, -1 do
+			if structData[i][1] ~= "Separator" then
+				gui.text(Game.OSDPosition[1], 2 + Game.OSDRowHeight * row, structData[i][2].." - "..structData[i][1], nil, 'bottomright');
+				row = row + 1;
+			else
+				row = row + structData[i][2];
 			end
 		end
 	end
@@ -1881,14 +1888,13 @@ function Game.drawUI()
 	end
 
 	if script_mode == "List Struct" then
-		if isRDRAM(structArray) then
-			for i = 0, numSlots - 1 do
-				local rendererPointer = dereferencePointer(structArray + i * struct_slot_size);
-				if isRDRAM(rendererPointer) then
-					gui.text(Game.OSDPosition[1], 2 + Game.OSDRowHeight * row, i..": "..toHexString(structArray + i * struct_slot_size), nil, 'bottomright');
-					row = row + 1;
-				end
+		for i = #structPointers, 1, -1 do
+			local color = nil;
+			if object_index == i then
+				color = yellow_highlight;
 			end
+			gui.text(Game.OSDPosition[1], 2 + Game.OSDRowHeight * row, i..": "..toHexString(structPointers[i]), color, 'bottomright');
+			row = row + 1;
 		end
 	end
 end
@@ -2742,5 +2748,36 @@ Game.OSD = {
 	--{"FF Answer", getCorrectFFAnswer},
 	{"FF Pattern", Game.getFFPattern},
 };
+
+function dumpPointers()
+	local block = dereferencePointer(0x381FA0);
+	if isRDRAM(block) then
+		local blockend = dereferencePointer(block - 0x0C);
+		if isRDRAM(blockend) then
+			for address = block, blockend - 0x10, 0x0C do
+				local pointercheck = mainmemory.read_u16_be(address + 2);
+				if pointercheck ~= 0 then
+					local pointer1 = dereferencePointer(address + 4);
+					local pointer2 = dereferencePointer(address + 8);
+					if isRDRAM(pointer1) then
+						local x = mainmemory.read_s16_be(pointer1 + 0x10);
+						local y = mainmemory.read_s16_be(pointer1 + 0x12);
+						local z = mainmemory.read_s16_be(pointer1 + 0x14);
+						local scale = mainmemory.read_u16_be(pointer1 + 0x0E);
+						dprint(toHexString(pointer1, 6).." position: "..x..","..y..","..z.." scale: "..scale);
+					end
+					if isRDRAM(pointer2) then
+						local x = mainmemory.read_s16_be(pointer2 + 0x10);
+						local y = mainmemory.read_s16_be(pointer2 + 0x12);
+						local z = mainmemory.read_s16_be(pointer2 + 0x14);
+						local scale = mainmemory.read_u16_be(pointer2 + 0x0E);
+						dprint(toHexString(pointer2, 6).." position: "..x..","..y..","..z.." scale: "..scale);
+					end
+				end
+			end
+			print_deferred();
+		end
+	end
+end
 
 return Game;
