@@ -2565,11 +2565,12 @@ end
 -- Actor Spawner --
 -------------------
 
-local spawner = {
+spawner = {
 	enabled = false,
 	actorFlag = 0, -- Memory address of the flag that is checked to decide whether to spawn an actor
 	actorID = 0, -- Memory address of the ID of the actor that will be spawned
 	actorPosition = 0, -- Memory address of the array of coordinates to spawn the actor at
+	staticPosition = false, -- Boolean to toggle updating spawner position to player position each frame
 };
 
 function spawner.enable()
@@ -2590,14 +2591,24 @@ function spawner.enable()
 			spawner.actorFlag = i + 4;
 			spawner.actorID = i + 6;
 			spawner.actorPosition = i + 8;
+			spawner.staticPosition = false;
 			spawner.enabled = true;
 			break;
 		end
 	end
 end
 
-function spawner.updatePosition()
+function spawner.setPosition(x, y, z)
 	if spawner.enabled then
+		spawner.staticPosition = true;
+		mainmemory.writefloat(spawner.actorPosition, x, true);
+		mainmemory.writefloat(spawner.actorPosition + 4, y, true);
+		mainmemory.writefloat(spawner.actorPosition + 8, z, true);
+	end
+end
+
+function spawner.updatePosition()
+	if spawner.enabled and not spawner.staticPosition then
 		mainmemory.writefloat(spawner.actorPosition, Game.getXPosition(), true);
 		mainmemory.writefloat(spawner.actorPosition + 4, Game.getYPosition(), true);
 		mainmemory.writefloat(spawner.actorPosition + 8, Game.getZPosition(), true);
