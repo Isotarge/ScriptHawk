@@ -1,6 +1,7 @@
 SystemID PSX
 056390	d	h	0	MainRAM	Player Pointer
 057640	d	u	0	MainRAM	Global Timer
+0615AC	d	h	0	MainRAM	Aku Aku Object Pointer
 0615BC	d	u	0	MainRAM	Level
 061664	d	h	0	MainRAM	Boxes Smashed
 

@@ -1,5 +1,6 @@
 SystemID PSX
 060BF0	d	h	0	MainRAM	Player Pointer
+060C04	d	h	0	MainRAM	Map Geometry Pointer
 0690E8	d	h	0	MainRAM	Aku Aku Object Pointer
 0691E4	d	u	0	MainRAM	Global Timer
 0692F8	d	h	0	MainRAM	Total Boxes

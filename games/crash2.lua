@@ -14,7 +14,7 @@ Game = {
 		0.001, 0.01, 0.1, 1, 5, 10, 20, 50, 100
 	},
 	Memory = { -- Version order: USA, Europe, Japan
-		akuaku_mask_pointer = {nil, nil, nil}, -- TODO
+		akuaku_mask_pointer = {0x6CBB0, 0x6CE48, 0x6D9AC},
 		global_timer = {0x60944, 0x60BDC, 0x62D98},
 		level = {nil, nil, nil}, -- TODO
 		player_pointer = {0x5F38C, 0x5F624, 0x614F0},
@@ -250,7 +250,7 @@ function Game.applyInfinites()
 	Game.setLives(99);
 	local maskObject = dereferencePointer(Game.Memory.akuaku_mask_pointer[version]);
 	if isRAM(maskObject) then
-		mainmemory.writebyte(maskObject + 0x19D, 0x02);
+		mainmemory.writebyte(maskObject + 0x175, 0x02);
 	end
 end
 

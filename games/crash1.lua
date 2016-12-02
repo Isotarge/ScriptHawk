@@ -14,7 +14,7 @@ Game = {
 		0.001, 0.01, 0.1, 1, 5, 10, 20, 50, 100
 	},
 	Memory = { -- Version order: USA, Europe, Japan
-		akuaku_mask_pointer = {nil, nil, nil}, -- TODO
+		akuaku_mask_pointer = {0x618CC, 0x615AC, 0x618B4},
 		global_timer = {0x57960, 0x57640, 0x57948},
 		level = {0x618DC, 0x615BC, 0x618C4},
 		player_pointer = {0x566B4, 0x56390, 0x56698},
@@ -42,10 +42,10 @@ function Game.detectVersion(romName, romHash)
 	if romHash == "41B5F211" or romHash == "249FC147" then -- USA
 		version = 1;
 		return true;
-	elseif romHash == "D6172125" or romHash == "2033243A" then -- Europe EDC
+	elseif romHash == "D6172125" or romHash == "2033243A" then -- Europe (EDC)
 		version = 2;
 		return true;
-	elseif romHash == "FD11EB1E" or romHash == "0B9EB02B" then -- Europe No EDC
+	elseif romHash == "FD11EB1E" or romHash == "0B9EB02B" then -- Europe (No EDC)
 		version = 2;
 		return true;
 	elseif romHash == "D9BA797E" or romHash == "F5B95131" then -- Japan
@@ -244,9 +244,9 @@ end
 
 function Game.applyInfinites()
 	Game.setLives(99);
-	local maskObject = dereferencePointer(Game.Memory.akuaku_mask_pointer[version]); -- TODO
+	local maskObject = dereferencePointer(Game.Memory.akuaku_mask_pointer[version]);
 	if isRAM(maskObject) then
-		mainmemory.writebyte(maskObject + 0x19D, 0x02);
+		mainmemory.writebyte(maskObject + 0x189, 0x02);
 	end
 end
 
