@@ -83,7 +83,7 @@ end
 function Game.getLives()
 	local player = Game.getPlayerActor();
 	if isRAM(player) then
-		return math.floor(mainmemory.read_u32_le(player + player_data.lives) / 256);
+		return math.floor(mainmemory.read_s32_le(player + player_data.lives) / 256);
 	end
 	return 0;
 end
