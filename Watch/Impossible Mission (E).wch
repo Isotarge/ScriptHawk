@@ -59,6 +59,7 @@ SystemID SMS
 0065	w	h	1	Main RAM	Score 14 - Digits 2 & 3
 0067	b	h	1	Main RAM	Score 14 - Name 1
 0068	w	h	1	Main RAM	Score 14 - Name 2 & 3
+0097	b	h	0	Main RAM	Current Map Index
 0099	w	u	0	Main RAM	Elevator Y
 00A5	b	u	0	Main RAM	Memory Selected
 00B5	b	u	0	Main RAM	Lift Resets
@@ -77,6 +78,7 @@ SystemID SMS
 040D	b	u	0	Main RAM	Search timer 2
 040E	b	u	0	Main RAM	Search timer 3
 040F	b	u	0	Main RAM	Search timer 4
+1237	b	h	0	Main RAM	
 1B12	d	h	1	Main RAM	Puzzle Memory 0-3 Rotation & Colour
 1B16	d	h	1	Main RAM	Puzzle Memory 4-7 Rotation & Colour
 1B1A	d	h	1	Main RAM	Puzzle Memory 8-11 Rotation & Colour
@@ -95,5 +97,4 @@ SystemID SMS
 1B4E	d	h	1	Main RAM	Puzzle Memory 24-27 Piece
 1B52	d	h	1	Main RAM	Puzzle Memory 28-31 Piece
 1B56	d	h	1	Main RAM	Puzzle Memory 32-35 Piece
-1237	b	h	0	Main RAM	
 
