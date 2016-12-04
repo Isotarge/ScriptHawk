@@ -13,7 +13,7 @@ function toHexString(value, desiredLength, prefix)
 end
 
 local map_base = 0x1B5A;
-local num_maps = 10 * 10;
+local num_maps = 9 * 6;
 
 local gametime = {
 	hours = 0x00CA,
@@ -88,12 +88,12 @@ object_arrays = { -- Use indexes from maps array
 
 function dumpMaps()
 	local value;
-	for i = 0, num_maps do
-		value = bit.bxor(mainmemory.readbyte(map_base + i), 0x80);
+	for i = 0, num_maps - 1 do
+		value = bit.bxor(mainmemory.readbyte(map_base + i * 2), 0x80);
 		if type(maps[value]) == "string" then
-			print(i.." ("..toHexString(map_base + i).."): "..maps[value]);
+			print((i + 1).." ("..toHexString(map_base + i * 2).."): "..maps[value]);
 		else
-			print(i.." ("..toHexString(map_base + i).."): "..toHexString(value));
+			print((i + 1).." ("..toHexString(map_base + i * 2).."): "..toHexString(value));
 		end
 	end
 end
@@ -105,9 +105,11 @@ local function fillMinimap()
 	end
 
 	local value;
-	for i = 0, num_maps do
-		value = mainmemory.readbyte(map_base + i);
-		mainmemory.writebyte(map_base + i, bit.bor(value, 0x80));
+	for i = 0, num_maps - 1 do
+		value = mainmemory.readbyte(map_base + i * 2);
+		mainmemory.writebyte(map_base + i * 2, bit.bor(value, 0x80));
+		value = mainmemory.readbyte(map_base + i * 2 + 1);
+		mainmemory.writebyte(map_base + i * 2 + 1, bit.bor(value, 0x80));
 	end
 end
 event.onframestart(fillMinimap, "ScriptHawk - Fill minimap");
