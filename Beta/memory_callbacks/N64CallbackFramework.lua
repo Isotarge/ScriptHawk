@@ -126,38 +126,38 @@ end
 
 local N64Registers = {
 	"PC",
-	--"REG0_lo", "REG0_hi", -- r0 or zero
-	"REG1_lo", --"REG1_hi", -- at
-	"REG2_lo", --"REG2_hi", -- v0
-	"REG3_lo", --"REG3_hi", -- v1
-	"REG4_lo", --"REG4_hi", -- a0
-	"REG5_lo", --"REG5_hi", -- a1
-	"REG6_lo", --"REG6_hi", -- a2
-	"REG7_lo", --"REG7_hi", -- a3
-	"REG8_lo", --"REG8_hi", -- t0
-	"REG9_lo", --"REG9_hi", -- t1
-	"REG10_lo", --"REG10_hi", -- t2
-	"REG11_lo", --"REG11_hi", -- t3
-	"REG12_lo", --"REG12_hi", -- t4
-	"REG13_lo", --"REG13_hi", -- t5
-	"REG14_lo", --"REG14_hi", -- t6
-	"REG15_lo", --"REG15_hi", -- t7
-	"REG16_lo", --"REG16_hi", -- s0
-	"REG17_lo", --"REG17_hi", -- s1
-	"REG18_lo", --"REG18_hi", -- s2
-	"REG19_lo", --"REG19_hi", -- s3
-	"REG20_lo", --"REG20_hi", -- s4
-	"REG21_lo", --"REG21_hi", -- s5
-	"REG22_lo", --"REG22_hi", -- s6
-	"REG23_lo", --"REG23_hi", -- s7
-	"REG24_lo", --"REG24_hi", -- t8
-	"REG25_lo", --"REG25_hi", -- t9
-	"REG26_lo", --"REG26_hi", -- k0
-	"REG27_lo", --"REG27_hi", -- k1
-	"REG28_lo", --"REG28_hi", -- gp
-	"REG29_lo", --"REG29_hi", -- sp
-	"REG30_lo", --"REG30_hi", -- s8
-	"REG31_lo", --"REG31_hi", -- ra
+	"r0_lo", "r0_hi", -- zero
+	"at_lo", --"at_hi",
+	"v0_lo", --"v0_hi",
+	"v1_lo", --"v1_hi",
+	"a0_lo", --"a0_hi",
+	"a1_lo", --"a1_hi",
+	"a2_lo", --"a2_hi",
+	"a3_lo", --"a3_hi",
+	"t0_lo", --"t0_hi",
+	"t1_lo", --"t1_hi",
+	"t2_lo", --"t2_hi",
+	"t3_lo", --"t3_hi",
+	"t4_lo", --"t4_hi",
+	"t5_lo", --"t5_hi",
+	"t6_lo", --"t6_hi",
+	"t7_lo", --"t7_hi",
+	"s0_lo", --"s0_hi",
+	"s1_lo", --"s1_hi",
+	"s2_lo", --"s2_hi",
+	"s3_lo", --"s3_hi",
+	"s4_lo", --"s4_hi",
+	"s5_lo", --"s5_hi",
+	"s6_lo", --"s6_hi",
+	"s7_lo", --"s7_hi",
+	"t8_lo", --"t8_hi",
+	"t9_lo", --"t9_hi",
+	"k0_lo", --"k0_hi",
+	"k1_lo", --"k1_hi",
+	"gp_lo", --"gp_hi",
+	"sp_lo", --"sp_hi",
+	"s8_lo", --"s8_hi",
+	"ra_lo", --"ra_hi",
 	"LL",
 	"LO_lo", "LO_hi",
 	"HI_lo", "HI_hi",
@@ -227,38 +227,38 @@ local N64Registers = {
 };
 
 local friendlyNames = {
-	["REG0_lo"] = "zero", ["REG0_hi"] = "zero_hi",
-	["REG1_lo"] = "at", ["REG1_hi"] = "at_hi",
-	["REG2_lo"] = "v0", ["REG2_hi"] = "v0_hi",
-	["REG3_lo"] = "v1", ["REG3_hi"] = "v1_hi",
-	["REG4_lo"] = "a0", ["REG4_hi"] = "a0_hi",
-	["REG5_lo"] = "a1", ["REG5_hi"] = "a1_hi",
-	["REG6_lo"] = "a2", ["REG6_hi"] = "a2_hi",
-	["REG7_lo"] = "a3", ["REG7_hi"] = "a3_hi",
-	["REG8_lo"] = "t0", ["REG8_hi"] = "t0_hi",
-	["REG9_lo"] = "t1", ["REG9_hi"] = "t1_hi",
-	["REG10_lo"] = "t2", ["REG10_hi"] = "t2_hi",
-	["REG11_lo"] = "t3", ["REG11_hi"] = "t3_hi",
-	["REG12_lo"] = "t4", ["REG12_hi"] = "t4_hi",
-	["REG13_lo"] = "t5", ["REG13_hi"] = "t5_hi",
-	["REG14_lo"] = "t6", ["REG14_hi"] = "t6_hi",
-	["REG15_lo"] = "t7", ["REG15_hi"] = "t7_hi",
-	["REG16_lo"] = "s0", ["REG16_hi"] = "s0_hi",
-	["REG17_lo"] = "s1", ["REG17_hi"] = "s1_hi",
-	["REG18_lo"] = "s2", ["REG18_hi"] = "s2_hi",
-	["REG19_lo"] = "s3", ["REG19_hi"] = "s3_hi",
-	["REG20_lo"] = "s4", ["REG20_hi"] = "s4_hi",
-	["REG21_lo"] = "s5", ["REG21_hi"] = "s5_hi",
-	["REG22_lo"] = "s6", ["REG22_hi"] = "s6_hi",
-	["REG23_lo"] = "s7", ["REG23_hi"] = "s7_hi",
-	["REG24_lo"] = "t8", ["REG24_hi"] = "t8_hi",
-	["REG25_lo"] = "t9", ["REG25_hi"] = "t9_hi",
-	["REG26_lo"] = "k0", ["REG26_hi"] = "k0_hi",
-	["REG27_lo"] = "k1", ["REG27_hi"] = "k1_hi",
-	["REG28_lo"] = "gp", ["REG28_hi"] = "gp_hi",
-	["REG29_lo"] = "sp", ["REG29_hi"] = "sp_hi",
-	["REG30_lo"] = "s8", ["REG30_hi"] = "s8_hi",
-	["REG31_lo"] = "ra", ["REG31_hi"] = "ra_hi",
+	["r0_lo"] = "zero", ["r0_hi"] = "zero_hi",
+	["at_lo"] = "at", ["at_hi"] = "at_hi",
+	["v0_lo"] = "v0", ["v0_hi"] = "v0_hi",
+	["v1_lo"] = "v1", ["v1_hi"] = "v1_hi",
+	["a0_lo"] = "a0", ["a0_hi"] = "a0_hi",
+	["a1_lo"] = "a1", ["a1_hi"] = "a1_hi",
+	["a2_lo"] = "a2", ["a2_hi"] = "a2_hi",
+	["a3_lo"] = "a3", ["a3_hi"] = "a3_hi",
+	["t0_lo"] = "t0", ["t0_hi"] = "t0_hi",
+	["t1_lo"] = "t1", ["t1_hi"] = "t1_hi",
+	["t2_lo"] = "t2", ["t2_hi"] = "t2_hi",
+	["t3_lo"] = "t3", ["t3_hi"] = "t3_hi",
+	["t4_lo"] = "t4", ["t4_hi"] = "t4_hi",
+	["t5_lo"] = "t5", ["t5_hi"] = "t5_hi",
+	["t6_lo"] = "t6", ["t6_hi"] = "t6_hi",
+	["t7_lo"] = "t7", ["t7_hi"] = "t7_hi",
+	["s0_lo"] = "s0", ["s0_hi"] = "s0_hi",
+	["s1_lo"] = "s1", ["s1_hi"] = "s1_hi",
+	["s2_lo"] = "s2", ["s2_hi"] = "s2_hi",
+	["s3_lo"] = "s3", ["s3_hi"] = "s3_hi",
+	["s4_lo"] = "s4", ["s4_hi"] = "s4_hi",
+	["s5_lo"] = "s5", ["s5_hi"] = "s5_hi",
+	["s6_lo"] = "s6", ["s6_hi"] = "s6_hi",
+	["s7_lo"] = "s7", ["s7_hi"] = "s7_hi",
+	["t8_lo"] = "t8", ["t8_hi"] = "t8_hi",
+	["t9_lo"] = "t9", ["t9_hi"] = "t9_hi",
+	["k0_lo"] = "k0", ["k0_hi"] = "k0_hi",
+	["k1_lo"] = "k1", ["k1_hi"] = "k1_hi",
+	["gp_lo"] = "gp", ["gp_hi"] = "gp_hi",
+	["sp_lo"] = "sp", ["sp_hi"] = "sp_hi",
+	["s8_lo"] = "s8", ["s8_hi"] = "s8_hi",
+	["ra_lo"] = "ra", ["ra_hi"] = "ra_hi",
 };
 
 function isFunction(address)
@@ -290,7 +290,7 @@ end
 function callback()
 	local registers = emu.getregisters();
 
-	local stackPointer = registers["REG29_lo"];
+	local stackPointer = registers["sp_lo"];
 	local PC = registers["PC"];
 
 	-- DK64 Stack
