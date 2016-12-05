@@ -170,10 +170,6 @@ end
 -- Rotation --
 --------------
 
-function Game.getXRotation()
-	return 0; -- TODO: Get X Rotation
-end
-
 function Game.getYRotation()
 	local player = Game.getPlayerActor();
 	if isRAM(player) then
@@ -182,23 +178,11 @@ function Game.getYRotation()
 	return 0;
 end
 
-function Game.getZRotation()
-	return 0; -- TODO: Get Z Rotation
-end
-
-function Game.setXRotation(value)
-	return; -- TODO: Set X Rotation
-end
-
 function Game.setYRotation(value)
 	local player = Game.getPlayerActor();
 	if isRAM(player) then
 		mainmemory.write_s32_le(player + player_data.y_rotation, value);
 	end
-end
-
-function Game.setZRotation(value)
-	return; -- TODO: Set Z Rotation
 end
 
 --------------

@@ -87,28 +87,12 @@ end
 -- Rotation --
 --------------
 
-function Game.getXRotation()
-	return 0; -- TODO
-end
-
 function Game.getYRotation()
 	return mainmemory.read_u16_be(Game.Memory.facing_angle[version]);
 end
 
-function Game.getZRotation()
-	return 0; -- TODO
-end
-
-function Game.setXRotation(value)
-	-- TODO
-end
-
 function Game.setYRotation(value)
 	mainmemory.write_u16_be(Game.Memory.facing_angle[version], value);
-end
-
-function Game.setZRotation(value)
-	-- TODO
 end
 
 function Game.eachFrame()

@@ -532,6 +532,45 @@ end
 -- Rotation --
 --------------
 
+if type(Game.getXRotation) ~= "function" then
+	--print("Warning: This module does not implement Game.getXRotation()");
+	function Game.getXRotation()
+		return 0;
+	end
+end
+
+if type(Game.getYRotation) ~= "function" then
+	--print("Warning: This module does not implement Game.getYRotation()");
+	function Game.getYRotation()
+		return 0;
+	end
+end
+
+if type(Game.getZRotation) ~= "function" then
+	--print("Warning: This module does not implement Game.getZRotation()");
+	function Game.getZRotation()
+		return 0;
+	end
+end
+
+if type(Game.setXRotation) ~= "function" then
+	--print("Warning: This module does not implement Game.setXRotation()");
+	function Game.setXRotation(value)
+	end
+end
+
+if type(Game.setYRotation) ~= "function" then
+	--print("Warning: This module does not implement Game.setYRotation()");
+	function Game.setYRotation(value)
+	end
+end
+
+if type(Game.setZRotation) ~= "function" then
+	--print("Warning: This module does not implement Game.setZRotation()");
+	function Game.setZRotation(value)
+	end
+end
+
 function rotation_to_degrees(num)
 	return ((num % Game.max_rot_units) / Game.max_rot_units) * 360;
 end

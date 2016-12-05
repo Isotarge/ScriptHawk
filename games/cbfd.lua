@@ -167,28 +167,12 @@ end
 Game.rot_speed = 16;
 Game.max_rot_units = 0xFFFF;
 
-function Game.getXRotation()
-	return 0; -- TODO
-end
-
 function Game.getYRotation()
 	return (mainmemory.read_u16_be(Game.Memory.moving_angle[version]) + Game.max_rot_units / 4) % Game.max_rot_units; -- TODO: Fix this for all modules with a dpad angle offset
 end
 
-function Game.getZRotation()
-	return 0; -- TODO
-end
-
-function Game.setXRotation(value)
-	-- TODO
-end
-
 function Game.setYRotation(value)
 	mainmemory.write_u16_be(Game.Memory.moving_angle[version], (value - Game.max_rot_units / 4) % Game.max_rot_units);
-end
-
-function Game.setZRotation(value)
-	-- TODO
 end
 
 ------------

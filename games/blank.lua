@@ -15,6 +15,9 @@ Game.Memory = {
 	["x_position"] = {0x100000, 0x200000, 0x300000}, -- Example addresses
 	["y_position"] = {0x100004, 0x200004, 0x300004},
 	["z_position"] = {0x100008, 0x200008, 0x300008},
+	["x_rotation"] = {0x100010, 0x200010, 0x300010},
+	["y_rotation"] = {0x100014, 0x200014, 0x300014},
+	["z_rotation"] = {0x100018, 0x200018, 0x300018},
 	["map_index"] = {0x10000C, 0x20000C, 0x30000C},
 };
 
@@ -92,28 +95,28 @@ Game.max_rot_units = 360; -- Maximum value of the Game's native rotation units
 -- These functions can return any number as long as it's consistent between get & set.
 -- If the Game.max_rot_units value is correct (and minimum is 0) ScriptHawk will correctly convert in game units to both degrees (default) and radians
 
-function Game.getXRotation()
-	return 0; -- TODO: Read X rotation from memory
+function Game.getXRotation() -- Optional
+	return mainmemory.readfloat(Game.Memory.x_rotation[version], true);
 end
 
-function Game.getYRotation()
-	return 0; -- TODO: Read Y rotation from memory
+function Game.getYRotation() -- Optional
+	return mainmemory.readfloat(Game.Memory.y_rotation[version], true);
 end
 
-function Game.getZRotation()
-	return 0; -- TODO: Read Z rotation from memory
+function Game.getZRotation() -- Optional
+	return mainmemory.readfloat(Game.Memory.z_rotation[version], true);
 end
 
-function Game.setXRotation(value)
-	-- TODO: Write X rotation to memory
+function Game.setXRotation(value) -- Optional
+	mainmemory.writefloat(Game.Memory.x_rotation[version], value, true);
 end
 
-function Game.setYRotation(value)
-	-- TODO: Write Y rotation to memory
+function Game.setYRotation(value) -- Optional
+	mainmemory.writefloat(Game.Memory.y_rotation[version], value, true);
 end
 
-function Game.setZRotation(value)
-	-- TODO: Write Z rotation to memory
+function Game.setZRotation(value) -- Optional
+	mainmemory.writefloat(Game.Memory.z_rotation[version], value, true);
 end
 
 ------------

@@ -93,10 +93,6 @@ end
 -- Rotation --
 --------------
 
-function Game.getXRotation()
-	return 0; -- TODO
-end
-
 function Game.getYRotation()
 	local elmoObject = dereferencePointer(elmo_pointer);
 	if isRDRAM(elmoObject) then
@@ -105,23 +101,11 @@ function Game.getYRotation()
 	return 0;
 end
 
-function Game.getZRotation()
-	return 0; -- TODO
-end
-
-function Game.setXRotation(value)
-	-- TODO
-end
-
 function Game.setYRotation(value)
 	local elmoObject = dereferencePointer(elmo_pointer);
 	if isRDRAM(elmoObject) then
 		return mainmemory.writefloat(elmoObject + facing_angle, value - 1, true);
 	end
-end
-
-function Game.setZRotation(value)
-	-- TODO
 end
 
 return Game;
