@@ -159,9 +159,9 @@ local match_settings = {
 };
 
 local player_fields = {
-	["NextPlayerPointer"] = 0x00, -- Pointer
 	["Character"] = 0x0B, -- Byte?
 	["Costume"] = 0x10, -- Byte?
+	["MovementState"] = 0x26, -- u16_be
 	["ShieldSize"] = 0x34, -- s32_be
 	["FacingDirection"] = 0x44, -- s32_be -- -1 = left, 1 = right
 	["XVelocity"] = 0x48, -- Float
@@ -182,6 +182,227 @@ local player_fields = {
 	["CharacterConstantsPointer"] = 0x9C8,
 	["CharacterConstants"] = {
 		["NumberOfJumps"] = 0x64,
+	},
+};
+
+movement_states = {
+	[0x00] = "Dying (Down)", [0x01] = "Dying (Side)", [0x02] = "Dying (Up far)", [0x03] = "Dying (Up near)", [0x05] = "Appearing",
+	[0x07] = "Reviving", [0x08] = "Spawning", [0x09] = "Standing on Spawning Platform",
+	[0x0A] = "Standing", [0x0B] = "Walking slowly", [0x0C] = "Walking", [0x0D] = "Walking quickly",
+	[0x0F] = "InitialDash", [0x10] = "Running", [0x11] = "End of Running",
+	[0x12] = "Switching direction", [0x13] = "Switching Running direction",
+	[0x14] = "Start of Jumping", [0x15] = "Shield Jumping", [0x16] = "Jumping +YVel",
+	[0x17] = "Jumping Backwards", [0x18] = "Air Jumping", [0x19] = "Air Jumping Backwards",
+	[0x1A] = "Jumping -YVel", [0x1B] = "Air Jumping while -YVel",
+	[0x1C] = "Crouching (Start)", [0x1D] = "Crouching", [0x1E] = "Crouching (End)",
+	[0x1F] = "Landing", [0x20] = "Landing hardly",
+	[0x21] = "Dropping through platform", [0x22] = "Shield Dropping through platform",
+	[0x23] = "Teeter", [0x24] = "Start of Teeter",
+	[0x25] = "No Down Damaged", [0x26] = "No Down Damaged", [0x27] = "No Down Damaged",
+	[0x28] = "No Down Damaged", [0x29] = "No Down Damaged", [0x2A] = "No Down Damaged",
+	[0x2B] = "Damaged", [0x2C] = "Damaged", [0x2D] = "Damaged", [0x2E] = "Damaged", [0x2F] = "Damaged",
+	[0x30] = "Damaged", [0x31] = "Damaged", [0x32] = "Damaged", [0x33] = "Damaged",
+	[0x34] = "Damaged", [0x35] = "Damaged", [0x36] = "Damaged", [0x37] = "Damaged",
+	[0x39] = "End of Stun",
+	[0x3A] = "Falling After Up-Special (Aerial)", [0x3B] = "Landing after Up-Special (Aerial)",
+	[0x3C] = "Damaged (Tornado)", [0x3D] = "Getting into the Barrel",
+	[0x3E] = "Entering the Pipe", [0x3F] = "Moving inside the Pipe", [0x40] = "Coming out of the Pipe", [0x41] = "Coming out of the Abyth",
+	[0x43] = "Facedown N Down", [0x44] = "Faceup N Down", [0x45] = "Facedown Downing", [0x46] = "Faceup Downing",
+	[0x47] = "Getting Recovery from Facedown Down", [0x48] = "Getting Recovery from Faceup Down",
+	[0x49] = "Forwards Teching", [0x4A] = "Backwards Teching",
+	[0x4B] = "Rolling Forwards from Facedown Down", [0x4C] = "Rolling Forwards from Faceup Down",
+	[0x4D] = "Rolling Backwards from Faceup Down", [0x4E] = "Rolling Backwards from Faceup Down",
+	[0x4F] = "Attack from Facedown Down", [0x50] = "Attack from Faceup Down", [0x51] = "Teching",
+	[0x54] = "Start of Grabbing Edge", [0x55] = "Grabbing Edge",
+	[0x56] = "Start of Rising Edge", [0x57] = "Rising Edge", [0x58] = "End of Rising Edge",
+	[0x59] = "Start of Rising Edge (100%)", [0x5A] = "Rising Edge (100%)", [0x5B] = "End of Rising Edge (100%)",
+	[0x5C] = "Start of Edge Attack", [0x5D] = "Edge Attack",
+	[0x5E] = "Start of Edge Attack (100%)", [0x5F] = "Edge Attack (100%)",
+	[0x60] = "Start of Edge Rolling", [0x61] = "Edge Rolling",
+	[0x62] = "Start of Edge Rolling (100%)", [0x63] = "Edge Rolling (100%)", [0x64] = "Getting an Item",
+	[0x65] = "Picking up an Item", [0x66] = "Holding an Item", [0x67] = "Switching Direction During Holding an Item",
+	[0x68] = "Throw", [0x69] = "Dash Throw", [0x6A] = "Forward Throw", [0x6B] = "Back Throw", [0x6C] = "Up Throw", [0x6D] = "Down Throw",
+	[0x6E] = "Forward Throw(Smash)", [0x6F] = "Back Throw(Smash)", [0x70] = "Up Throw (Smash)", [0x71] = "Down Throw (Smash)",
+	[0x72] = "Throw-Air", [0x73] = "Back Throw-Air", [0x74] = "Up Throw-Air", [0x75] = "Down Throw-Air",
+	[0x76] = "Throw-Air (Smash)", [0x77] = "Back Throw-Air (Smash)", [0x78] = "Up Throw-Air (Smash)", [0x79] = "Down Throw-Air (Smash)",
+	[0x7E] = "Beam Sword (Jab)", [0x7F] = "Beam Sword (Tilt)", [0x80] = "Beam Sword (Smash)", [0x81] = "Beam Sword (Dash)",
+	[0x7A] = "Crate Throw", [0x7B] = "Reverse Crate Throw", [0x7C] = "Crate Throw (Smash)", [0x7D] = "Reverse Crate Throw (Smash)",
+	[0x82] = "Home-Run Bat (Jab)", [0x83] = "Home-Run Bat (Tilt)", [0x84] = "Home-Run Bat (Smash)", [0x85] = "Home-Run Bat (Dash)",
+	[0x86] = "Harisen (Jab)", [0x87] = "Harisen (Tilt)", [0x88] = "Harisen (Smash)", [0x89] = "Harisen (Dash)",
+	[0x8A] = "Star Rod (Jab)", [0x8B] = "Star Rod (Tilt)", [0x8C] = "Star Rod (Smash)", [0x8D] = "Star Rod (Dash)",
+	[0x8E] = "Ray Gun", [0x8F] = "Ray Gun (Aerial)", [0x90] = "Fire Flower", [0x91] = "Fire Flower (Aerial)",
+	[0x92] = "Hammer (Stand)", [0x93] = "Hammer (Walk)", [0x94] = "Hammer (Switch)",
+	[0x95] = "Hammer (Jump)", [0x96] = "Hammer (Air)", [0x97] = "Hammer (Land)",
+	[0x98] = "Start of Shielding", [0x99] = "Shielding", [0x9A] = "End of Shielding",
+	[0x9B] = "Stunning During Shielding",
+	[0x9C] = "Rolling Forwards", [0x9D] = "Rolling Backwards",
+	[0x9E] = "Shield Breaking",
+	[0xA1] = "SB Downing", [0xA3] = "Start of SB Stunning", [0xA4] = "SB Stunning", [0xA5] = "Sleep Stunning",
+	[0xA6] = "Grab", [0xA7] = "Start of Grabbing", [0xA8] = "Grabbing", [0xA9] = "Throwing", [0xAA] = "Back Throwing",
+	[0xAB] = "Start of Getting Grabbed", [0xAC] = "Getting Grabbed",
+	[0xAD] = "Getting Vacuumed", [0xAE] = "Getting Stuffed", [0xAF] = "Getting spitted", [0xB0] = "Getting Copied",
+	[0xB1] = "Getting Tongue", [0xB2] = "Being Egg",
+	[0xB3] = "Getting FalconDive",
+	[0xB5] = "Start of Getting Mounted", [0xB8] = "Getting Mounted",
+	[0xBA] = "End of Getting Grabbed",
+	[0xBD] = "Taunt", [0xBE] = "Jab1", [0xBF] = "Jab2",
+	[0xC0] = "Dash Attack",
+	[0xC1] = "Forward Tilt (high)", [0xC2] = "Forward Tilt (mid-high)", [0xC3] = "Forward Tilt", [0xC4] = "Forward Tilt (mid-low)", [0xC5] = "Forward Tilt (low)",
+	[0xC7] = "Up Tilt", [0xC9] = "Down Tilt",
+	[0xCA] = "Forward Smash (high)", [0xCB] = "Forward Smash (mid-high)", [0xCC] = "Forward Smash", [0xCD] = "Forward Smash (mid-low)", [0xCE] = "Forward Smash (low)",
+	[0xCF] = "Up Smash", [0xD0] = "Down Smash",
+	[0xD1] = "Neutral Air", [0xD2] = "Forward Air", [0xD3] = "Back Air", [0xD4] = "Up Air", [0xD5] = "Down Air",
+	[0xD7] = "Forward Air Landing", [0xD8] = "Backward Air Landing", [0xD9] = "Miss Landing",
+	[0xDA] = "Miss Landing hardly", [0xDB] = "Miss Landing softly",
+};
+
+character_states = {
+	[0x00] = { -- Mario
+		[0xDC] = "Jab3",
+		[0xDE] = "Appearing1",
+		[0xDF] = "Fireball", [0xE0] = "Fireball (Aerial)",
+		[0xE1] = "Up-Special", [0xE2] = "Up-Special (Aerial)",
+		[0xE3] = "Down-Special", [0xE4] = "Down-Special (Aerial)",
+	},
+	[0x01] = { -- Fox
+		[0xE0] = "Arwing",
+		[0xE1] = "Laser", [0xE2] = "Laser (Aerial)",
+		[0xE3] = "Start of Fire Fox", [0xE4] = "Start of Fire Fox (Aerial)",
+		[0xE5] = "Readying Fire Fox", [0xE6] = "Readying Fire Fox (Aerial)",
+		[0xE7] = "Fire Fox", [0xE8] = "Fire Fox (Aerial)",
+		[0xE9] = "End of Fire Fox", [0xEA] = "End of Fire Fox (Aerial)",
+		[0xEB] = "Landing while Fire Fox (Aerial)",
+		[0xEC] = "Start of Shine", [0xED] = "Reflecting", [0xEE] = "End of Shine", [0xEF] = "Shine",
+		[0xF0] = "Switching Direction while Shine",
+		[0xF1] = "Start of Shine (Aerial)", [0xF3] = "End of Shine (Aerial)", [0xF4] = "Shine (Aerial)",
+		[0xF5] = "Switching Direction while Shine (Aerial)",
+	},
+	[0x02] = { -- DK
+		[0xDD] = "Appearing1",
+		[0xDE] = "Start of Charge", [0xDF] = "Start of Charge (Aerial)",
+		[0xE0] = "Charging", [0xE1] = "Charging (Aerial)",
+		[0xE2] = "Punching", [0xE3] = "Punching (Aerial)",
+		[0xE4] = "Maximum Punching", [0xE5] = "Maximum Punching (Aerial)",
+		[0xE6] = "Up-Special", [0xE7] = "Up-Special (Aerial)",
+		[0xE8] = "Start of Down-Special", [0xE9] = "Down-Special", [0xEA] = "End of Down-Special",
+		[0xEB] = "Standing (Mounting)", [0xEC] = "Walking slowly (Mounting)", [0xED] = "Walking (Mounting)",
+		[0xEE] = "Walking quickly (Mounting)", [0xEF] = "Switching direction (Mounting)",
+		[0xF0] = "Start of Jump (Mounting)", [0xF1] = "Jumping (Mounting)", [0xF2] = "Landing (Mounting)",
+		[0xF4] = "After Throw (Mounting)", [0xF5] = "Throw (Mounting)",
+	},
+	[0x03] = { -- Samus
+		[0xDD] = "Appearing1",
+		[0xDE] = "Start of Charge Shoot", [0xDF] = "Charging", [0xE0] = "Shooting",
+		[0xE1] = "Start of Charge Shoot (Aerial)", [0xE2] = "Shooting (Aerial)",
+		[0xE3] = "Up-Special", [0xE4] = "Up-Special (Aerial)",
+		[0xE5] = "Down-Special", [0xE6] = "Down-Special (Aerial)",
+	},
+	[0x04] = { -- Luigi
+		[0xDC] = "Jab3",
+		[0xDE] = "Appearing1",
+		[0xDF] = "Fireball", [0xE0] = "Fireball (Aerial)",
+		[0xE1] = "Up-Special", [0xE2] = "Up-Special (Aerial)",
+		[0xE3] = "Down-Special", [0xE4] = "Down-Special (Aerial)",
+	},
+	[0x05] = { -- Link
+		[0xDC] = "Jab3", [0xDD] = "Start of Jab loop", [0xDE] = "Jab loop", [0xDF] = "End of Jab loop",
+		[0xE2] = "Up-Special", [0xE3] = "End of Up-Special", [0xE4] = "Up-Special (Aerial)",
+		[0xE5] = "Boomerang", [0xE6] = "Catching Boomerang", [0xE7] = "Missing Boomerang",
+		[0xE8] = "Boomerang (Aerial)", [0xE9] = "Catching Boomerang (Aerial)", [0xEA] = "Missing Boomerang (Aerial)",
+		[0xEB] = "Down-Special", [0xEC] = "Down-Special (Aerial)",
+	},
+	[0x06] = { -- Yoshi
+		[0xDD] = "Appearing1",
+		[0xDE] = "Up-Special", [0xDF] = "Up-Special (Aerial)",
+		[0xE0] = "Start Down-Special", [0xE1] = "Landing while Down-Special",
+		[0xE2] = "Start Down-Special(Aerial)", [0xE3] = "Falling while Down-Special",
+		[0xE4] = "N-Special", [0xE5] = "Succeeding N-Special", [0xE6] = "End of N-Special",
+		[0xE7] = "N-Special (Aerial)", [0xE8] = "Succeeding N-Special (Aerial)", [0xE9] = "End of N-Special (Aerial)",
+	},
+	[0x07] = { -- Captain Falcon
+		[0xDC] = "Jab3", [0xDD] = "Start of Jab loop", [0xDE] = "Jab loop", [0xDF] = "End of Jab loop",
+		[0xE1] = "Appearing (Aerial)", [0xE2] = "Blue Falcon", [0xE3] = "Blue Falcon",
+		[0xE4] = "N-Special", [0xE5] = "N-Special (Aerial)",
+		[0xE6] = "Down-Special", [0xE7] = "Velocity X Down-Special (Aerial)",
+		[0xE8] = "Landing while Down-Special", [0xE9] = "Down-Special (Aerial)", [0xEA] = "Bumping while Down-Special",
+		[0xEB] = "Falcon Dive", [0xEC] = "Cathing Enemy while F Dive", [0xED] = "End of Falcon Dive",
+		[0xEE] = "Falcon Dive (Aerial)",
+	},
+	[0x08] = { -- Kirby
+		[0xFA] = "Staring", [0xFB] = "Staring",
+		[0xDC] = "Start of Jab loop", [0xDD] = "Jab loop", [0xDE] = "End of Jab loop",
+		[0xDF] = "Jumping (Aerial) [4]", [0xE0] = "Jumping (Aerial) [3]",
+		[0xE1] = "Jumping (Aerial) [2]", [0xE2] = "Jumping (Aerial) [1]", [0xE3] = "Jumping (Aerial) [0]",
+		-- Mario
+		[0xE7] = "Red Fireball", [0xE8] = "Red Fireball (Aerial)",
+		-- Luigi
+		[0xE9] = "Green Fireball", [0xEA] = "Green Fireball (Aerial)",
+		-- Fox
+		[0xEB] = "Laser", [0xEC] = "Laser (Aerial)",
+		-- Samus
+		[0xED] = "Start of Charge Shoot", [0xEE] = "Charging", [0xEF] = "Shooting",
+		[0xF0] = "Start of Charge Shoot (Aerial)", [0xF1] = "Shooting (Aerial)",
+		-- DK
+		[0xF2] = "Start of Charge", [0xF3] = "Start of Charge (Aerial)",
+		[0xF4] = "Charging", [0xF5] = "Charging (Aerial)",
+		[0xF6] = "Punching", [0xF7] = "Punching (Aerial)",
+		[0xF8] = "Maximum Punching", [0xF9] = "Maxmum Punching (Aerial)",
+		-- Pikachu
+		[0xFC] = "Lightning", [0xFD] = "Lightning (Aerial)",
+		-- Ness
+		[0xFE] = "PK Fire", [0xFF] = "PK Fire (Aerial)",
+
+		[0x100] = "Up-Special", [0x101] = "Landing while Up-Special",
+		[0x102] = "Up-Special (Aerial)", [0x103] = "Falling while Up-Special",
+		[0x104] = "Start of Down-Special",
+		[0x106] = "Down-Special", [0x107] = "Canceling Down-Special",
+		[0x108] = "Start of Down-Special (Aerial)", [0x109] = "Falling while Down-Special (Aerial)",
+		[0x10A] = "Landing while Down-Special", [0x10B] = "Falling while Down-Special", [0x10C] = "Cancelling Down-Special (Aerial)",
+		[0x10D] = "Start of N-Special", [0x10E] = "N-Special", [0x10F] = "End of N-Special",
+		[0x110] = "Start of Inhaling while N-Special", [0x111] = "Inhaling while N-Special",
+		[0x112] = "Spitting while N-Special",
+		[0x113] = "Stuffing while N-Special", [0x114] = "Switching Direction while Stuffing while N-Special",
+		[0x115] = "Copying",
+		[0x116] = "Start of N-Special (Aerial)", [0x117] = "N-Special(Aerial)", [0x118] = "End of N-Special (Aerial)",
+		[0x119] = "Start of Inhaling while N-Special (Aerial)", [0x11A] = "Inhaling while N-Special (Aerial)",
+		[0x11C] = "Spitting while N-Special", [0x11D] = "Stuffing while N-Special (Aerial)", [0x11E] = "Copying (Aerial)",
+
+		-- Link
+		[0x11F] = "Boomerang", [0x120] = "Catching Boomerang", [0x121] = "Missing Boomerang",
+		[0x122] = "Boomerang (Aerial)", [0x123] = "Catching Boomerang (Aerial)", [0x124] = "Missing Boomerang (Aerial)",
+		-- Jigglypuff
+		[0x125] = "Pound", [0x126] = "Pound (Aerial)",
+		-- Captain Falcon
+		[0x127] = "Falcon Punching", [0x128] = "Falcon Punching (Aerial)",
+		-- Yoshi
+		[0x129] = "N-Special", [0x12A] = "Succeeding N-Special", [0x12B] = "End of N-Special",
+		[0x12C] = "N-Special (Aerial)", [0x12D] = "Succeeding N-Special (Aerial)", [0x12E] = "End of N-Special (Aerial)",
+	},
+	[0x09] = { -- Pikachu
+		[0xDD] = "Appearing1",
+		[0xDE] = "N-Special", [0xDF] = "N-Special (Aerial)",
+		[0xE0] = "Start of Down-Special", [0xE1] = "Down-Special", [0xE2] = "Getting Thundered", [0xE3] = "End of Down-Special",
+		[0xE4] = "Start of Down-Special (Aerial)", [0xE5] = "Down-Special (Aerial)", [0xE6] = "Getting Thundered (Aerial)", [0xE7] = "End of Down-Special (Aerial)",
+		[0xE8] = "Start of Up-Special", [0xE9] = "Up-Special", [0xEA] = "End of Up-Special",
+		[0xEB] = "Start of Up-Special (Aerial)", [0xEC] = "Up-Special (Aerial)", [0xED] = "End of Up-Special (Aerial)",
+	},
+	[0x0A] = { -- Jigglypuff
+		[0xDF] = "Jumping (Aerial) [4]", [0xE0] = "Jumping (Aerial) [3]",
+		[0xE1] = "Jumping (Aerial) [2]", [0xE2] = "Jumping (Aerial) [1]", [0xE3] = "Jumping (Aerial) [0]",
+		[0xE5] = "Appearing1",
+		[0xE6] = "Slapping", [0xE7] = "Slapping(Aerial)",
+		[0xE8] = "Up-Special", [0xE9] = "Up-Special(Aerial)",
+		[0xEA] = "Down-Special", [0xEB] = "Down-Special(Aerial)",
+	},
+	[0x0B] = { -- Ness
+		[0xDC] = "Jab3",
+		[0xDE] = "Appearing1", [0xDF] = "Appearing2", [0xE1] = "Appearing3",
+		[0xE2] = "PK Fire", [0xE3] = "PK Fire (Aerial)",
+		[0xE4] = "Start of Up-Special", [0xE5] = "Up-Special", [0xE6] = "End of Up-Special", [0xE7] = "PKTA",
+		[0xE8] = "Start of Up-Special (Aerial)", [0xE9] = "Up-Special (Aerial)", [0xEA] = "End of Up-Special (Aerial)",
+		[0xEB] = "Clashing during PKTA", [0xEC] = "PKTA (Aerial)",
+		[0xED] = "Start of Down-Special", [0xEE] = "Down-Special", [0xEF] = "Cureing", [0xF0] = "End of Down-Special",
+		[0xF1] = "Start of Down-Special (Aerial)", [0xF2] = "Down-Special (Aerial)", [0xF3] = "Cureing (Aerial)", [0xF4] = "End of Down-Special (Aerial)",
 	},
 };
 
@@ -215,30 +436,10 @@ end
 function Game.getPlayer(player)
 	if type(player) ~= "number" or player == 1 then
 		return dereferencePointer(Game.Memory.player_list_pointer[version]);
-	elseif player == 2 then
-		local playerList = dereferencePointer(Game.Memory.player_list_pointer[version]);
-		if isRDRAM(playerList) then
-			return dereferencePointer(playerList);
-		end
-	elseif player == 3 then
-		local playerList = dereferencePointer(Game.Memory.player_list_pointer[version]);
-		if isRDRAM(playerList) then
-			playerList = dereferencePointer(playerList);
-			if isRDRAM(playerList) then
-				return dereferencePointer(playerList);
-			end
-		end
-	elseif player == 4 then
-		local playerList = dereferencePointer(Game.Memory.player_list_pointer[version]);
-		if isRDRAM(playerList) then
-			playerList = dereferencePointer(playerList);
-			if isRDRAM(playerList) then
-				playerList = dereferencePointer(playerList);
-				if isRDRAM(playerList) then
-					return dereferencePointer(playerList);
-				end
-			end
-		end
+	end
+	local playerList = dereferencePointer(Game.Memory.player_list_pointer[version]);
+	if isRDRAM(playerList) then
+		return playerList + (player - 1) * 0xB50;
 	end
 end
 
@@ -248,6 +449,35 @@ function Game.getCharacter(player)
 		return mainmemory.readbyte(playerActor + player_fields.Character);
 	end
 	return 0x1C; -- Default to none selected
+end
+
+function Game.setCharacter(character, player) -- TODO: I think this needs to set a byte in match settings aswell
+	local playerActor = Game.getPlayer(player);
+	if isRDRAM(playerActor) then
+		mainmemory.writebyte(playerActor + player_fields.Character, character);
+	end
+end
+
+function Game.getMovementState(player)
+	local playerActor = Game.getPlayer(player);
+	if isRDRAM(playerActor) then
+		local movementState = mainmemory.read_u16_be(playerActor + player_fields.MovementState);
+		return movementState;
+	end
+	return 0;
+end
+
+function Game.getMovementString(player)
+	local movementState = Game.getMovementState(player);
+	if type(movement_states[movementState]) == "string" then
+		return movement_states[movementState];
+	else
+		local characterIndex = Game.getCharacter(player);
+		if type(character_states[characterIndex]) == "table" and type(character_states[characterIndex][movementState]) == "string" then
+			return character_states[characterIndex][movementState];
+		end
+	end
+	return "Unknown "..toHexString(movementState);
 end
 
 function Game.getShieldSize(player)
@@ -416,6 +646,7 @@ end
 
 Game.OSD = {
 	{"P1", Game.getPlayerOSD, playerColors[1]},
+	{"Movement", Game.getMovementString},
 	{"X", Game.getXPosition},
 	{"Y", Game.getYPosition},
 	{"X Velocity", Game.getXVelocity},
@@ -424,6 +655,7 @@ Game.OSD = {
 	{"Shield", Game.getShieldSize},
 	{"Separator", 1},
 	{"P2", function() return Game.getPlayerOSD(2) end, playerColors[2]},
+	{"Movement", function() return Game.getMovementString(2) end},
 	{"X", function() return Game.getXPosition(2) end},
 	{"Y", function() return Game.getYPosition(2) end},
 	{"X Velocity", function() return Game.getXVelocity(2) end},
@@ -432,6 +664,7 @@ Game.OSD = {
 	{"Shield", function() return Game.getShieldSize(2) end},
 	{"Separator", 1},
 	{"P3", function() return Game.getPlayerOSD(3) end, playerColors[3]},
+	{"Movement", function() return Game.getMovementString(3) end},
 	{"X", function() return Game.getXPosition(3) end},
 	{"Y", function() return Game.getYPosition(3) end},
 	{"X Velocity", function() return Game.getXVelocity(3) end},
@@ -440,6 +673,7 @@ Game.OSD = {
 	{"Shield", function() return Game.getShieldSize(3) end},
 	{"Separator", 1},
 	{"P4", function() return Game.getPlayerOSD(4) end, playerColors[4]},
+	{"Movement", function() return Game.getMovementString(4) end},
 	{"X", function() return Game.getXPosition(4) end},
 	{"Y", function() return Game.getYPosition(4) end},
 	{"X Velocity", function() return Game.getXVelocity(4) end},
