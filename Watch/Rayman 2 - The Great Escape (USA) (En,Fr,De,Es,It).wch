@@ -1,9 +1,12 @@
 SystemID N64
-1BC64C	w	u	1	RDRAM	Health
+1BC64D	b	u	1	RDRAM	Health
 1C69BC	d	f	1	RDRAM	Sine
 1C69C0	d	f	1	RDRAM	Cosine
 1C69C8	d	f	1	RDRAM	Inverse Cosine
-1C69CC	d	f	1	RDRAM	Sine
+1C69CC	d	f	1	RDRAM	Sine Mirror
+1C6AF4	d	f	1	RDRAM	X Velocity
+1C6AF8	d	f	1	RDRAM	Z Velocity
+1C6AFC	d	f	1	RDRAM	Y Velocity
 1C6B34	d	f	1	RDRAM	X Position
 1C6B38	d	f	1	RDRAM	Z Position
 1C6B3C	d	f	1	RDRAM	Y Position
