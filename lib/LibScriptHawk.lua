@@ -219,7 +219,7 @@ function deepcompare(t1, t2, ignore_mt)
 	return true;
 end
 
-function array_contains(array, value)
+function table.contains(array, value)
 	if type(array) == "table" then
 		-- TODO: Special check for index zero because ipairs doesn't support starting from 0?
 		if type(array[0]) ~= "nil" then
@@ -237,7 +237,21 @@ function array_contains(array, value)
 	end
 	return false;
 end
-arrayContains = array_contains;
+
+function table.join(t1, t2)
+	local t3 = {};
+	if type(t1) == "table" then
+		for k, v in ipairs(t1) do
+			table.insert(t3, v);
+		end
+	end
+	if type(t2) == "table" then
+		for k, v in ipairs(t2) do
+			table.insert(t3, v);
+		end
+	end
+	return t3;
+end
 
 function fileExists(name)
 	if type(name) == 'string' then

@@ -130,7 +130,7 @@ planes = {
 
 function isVehicle(objectBase)
 	local name = getObjectName(objectBase);
-	return arrayContains(cars, name) or arrayContains(hovers, name) or arrayContains(planes, name); -- TODO: Faster method of detection, object size?
+	return table.contains(cars, name) or table.contains(hovers, name) or table.contains(planes, name); -- TODO: Faster method of detection, object size?
 end
 
 function getExamineData(objectBase)

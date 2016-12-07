@@ -8,12 +8,9 @@ Game = {
 		["match_settings_pointer"] = {0x0A30A8, 0x0A5828, 0x0AD948, 0x0A50E8},
 		["hurtbox_color_RG"] = {nil, nil, nil, 0x0F2786},
 		["hurtbox_color_BA"] = {nil, nil, nil, 0x0F279E},
-		["hitbox_patch"] = {nil, nil, nil, 0x0F2C04}, -- 2400
 		["red_hitbox_patch"] = {nil, nil, nil, 0x0F33BC}, -- 2400
 		["purple_hurtbox_patch"] = {nil, nil, nil, 0x0F2FD0}, -- 2400
 		["player_list_pointer"] = {0x12E914, 0x131594, 0x139A74, 0x130D84},
-		["red_projectile_hurtbox_patch"] = {nil, nil, nil, 0x166F34},
-		["projectile_hitbox_patch"] = {nil, nil, nil, 0x167578}, -- 2400
 	},
 	characters = {
 		[0x00] = "Mario",
@@ -183,6 +180,7 @@ local player_fields = {
 	["CharacterConstants"] = {
 		["NumberOfJumps"] = 0x64,
 	},
+	["ShowHitbox"] = 0xB4C, -- u32_be
 };
 
 movement_states = {
@@ -620,6 +618,34 @@ function Game.unlockEverything()
 	mainmemory.writebyte(Game.Memory.unlocked_stuff[version] + 5, value);
 end
 
+function Game.showHitbox(player)
+	local playerActor = Game.getPlayer(player);
+	if isRDRAM(playerActor) then
+		mainmemory.write_u32_be(playerActor + player_fields.ShowHitbox, 1);
+	end
+end
+
+function Game.hideHitbox(player)
+	local playerActor = Game.getPlayer(player);
+	if isRDRAM(playerActor) then
+		mainmemory.write_u32_be(playerActor + player_fields.ShowHitbox, 0);
+	end
+end
+
+function Game.showHitboxes()
+	Game.showHitbox(1);
+	Game.showHitbox(2);
+	Game.showHitbox(3);
+	Game.showHitbox(4);
+end
+
+function Game.hideHitboxes()
+	Game.hideHitbox(1);
+	Game.hideHitbox(2);
+	Game.hideHitbox(3);
+	Game.hideHitbox(4);
+end
+
 function Game.setMusic(value)
 	mainmemory.writebyte(Game.Memory.music[version], value);
 end
@@ -628,12 +654,19 @@ function Game.initUI()
 	-- Unlock Everything Button
 	ScriptHawk.UI.form_controls.unlock_everything_button = forms.button(ScriptHawk.UI.options_form, "Unlock Everything", Game.unlockEverything, ScriptHawk.UI.col(10), ScriptHawk.UI.row(0), ScriptHawk.UI.col(4) + 10, ScriptHawk.UI.button_height);
 
+	-- Hitbox Toggle
+	ScriptHawk.UI.form_controls.toggle_hitboxes = forms.checkbox(ScriptHawk.UI.options_form, "Hitboxes", ScriptHawk.UI.col(10) + ScriptHawk.UI.dropdown_offset, ScriptHawk.UI.row(1) + ScriptHawk.UI.dropdown_offset);
+
 	-- Music
 	ScriptHawk.UI.form_controls["Music Dropdown"] = forms.dropdown(ScriptHawk.UI.options_form, Game.music, ScriptHawk.UI.col(0) + ScriptHawk.UI.dropdown_offset, ScriptHawk.UI.row(6) + ScriptHawk.UI.dropdown_offset, ScriptHawk.UI.col(9) + 8, ScriptHawk.UI.button_height);
 	ScriptHawk.UI.form_controls["Music Checkbox"] = forms.checkbox(ScriptHawk.UI.options_form, "Set Music", ScriptHawk.UI.col(0) + ScriptHawk.UI.dropdown_offset, ScriptHawk.UI.row(7) + ScriptHawk.UI.dropdown_offset);
 end
 
 function Game.eachFrame()
+	if forms.ischecked(ScriptHawk.UI.form_controls.toggle_hitboxes) then
+		Game.showHitboxes();
+	end
+
 	if forms.ischecked(ScriptHawk.UI.form_controls["Music Checkbox"]) then
 		local musicString = forms.gettext(ScriptHawk.UI.form_controls["Music Dropdown"]);
 		for i = 1, #Game.music do
@@ -644,42 +677,70 @@ function Game.eachFrame()
 	end
 end
 
-Game.OSD = {
-	{"P1", Game.getPlayerOSD, playerColors[1]},
-	{"Movement", Game.getMovementString},
-	{"X", Game.getXPosition},
-	{"Y", Game.getYPosition},
-	{"X Velocity", Game.getXVelocity},
-	{"Y Velocity", Game.getYVelocity},
-	{"Facing", Game.getYRotation},
-	{"Shield", Game.getShieldSize},
-	{"Separator", 1},
-	{"P2", function() return Game.getPlayerOSD(2) end, playerColors[2]},
-	{"Movement", function() return Game.getMovementString(2) end},
-	{"X", function() return Game.getXPosition(2) end},
-	{"Y", function() return Game.getYPosition(2) end},
-	{"X Velocity", function() return Game.getXVelocity(2) end},
-	{"Y Velocity", function() return Game.getYVelocity(2) end},
-	{"Facing", function() return Game.getYRotation(2) end},
-	{"Shield", function() return Game.getShieldSize(2) end},
-	{"Separator", 1},
-	{"P3", function() return Game.getPlayerOSD(3) end, playerColors[3]},
-	{"Movement", function() return Game.getMovementString(3) end},
-	{"X", function() return Game.getXPosition(3) end},
-	{"Y", function() return Game.getYPosition(3) end},
-	{"X Velocity", function() return Game.getXVelocity(3) end},
-	{"Y Velocity", function() return Game.getYVelocity(3) end},
-	{"Facing", function() return Game.getYRotation(3) end},
-	{"Shield", function() return Game.getShieldSize(3) end},
-	{"Separator", 1},
-	{"P4", function() return Game.getPlayerOSD(4) end, playerColors[4]},
-	{"Movement", function() return Game.getMovementString(4) end},
-	{"X", function() return Game.getXPosition(4) end},
-	{"Y", function() return Game.getYPosition(4) end},
-	{"X Velocity", function() return Game.getXVelocity(4) end},
-	{"Y Velocity", function() return Game.getYVelocity(4) end},
-	{"Facing", function() return Game.getYRotation(4) end},
-	{"Shield", function() return Game.getShieldSize(4) end},
+local playerOSD = {
+	[1] = {
+		{"P1", Game.getPlayerOSD, playerColors[1]},
+		{"Movement", Game.getMovementString},
+		{"X", Game.getXPosition},
+		{"Y", Game.getYPosition},
+		{"X Velocity", Game.getXVelocity},
+		{"Y Velocity", Game.getYVelocity},
+		{"Facing", Game.getYRotation},
+		{"Shield", Game.getShieldSize},
+		{"Separator", 1},
+	},
+	[2] = {
+		{"P2", function() return Game.getPlayerOSD(2) end, playerColors[2]},
+		{"Movement", function() return Game.getMovementString(2) end},
+		{"X", function() return Game.getXPosition(2) end},
+		{"Y", function() return Game.getYPosition(2) end},
+		{"X Velocity", function() return Game.getXVelocity(2) end},
+		{"Y Velocity", function() return Game.getYVelocity(2) end},
+		{"Facing", function() return Game.getYRotation(2) end},
+		{"Shield", function() return Game.getShieldSize(2) end},
+		{"Separator", 1},
+	},
+	[3] = {
+		{"P3", function() return Game.getPlayerOSD(3) end, playerColors[3]},
+		{"Movement", function() return Game.getMovementString(3) end},
+		{"X", function() return Game.getXPosition(3) end},
+		{"Y", function() return Game.getYPosition(3) end},
+		{"X Velocity", function() return Game.getXVelocity(3) end},
+		{"Y Velocity", function() return Game.getYVelocity(3) end},
+		{"Facing", function() return Game.getYRotation(3) end},
+		{"Shield", function() return Game.getShieldSize(3) end},
+		{"Separator", 1},
+	},
+	[4] = {
+		{"P4", function() return Game.getPlayerOSD(4) end, playerColors[4]},
+		{"Movement", function() return Game.getMovementString(4) end},
+		{"X", function() return Game.getXPosition(4) end},
+		{"Y", function() return Game.getYPosition(4) end},
+		{"X Velocity", function() return Game.getXVelocity(4) end},
+		{"Y Velocity", function() return Game.getYVelocity(4) end},
+		{"Facing", function() return Game.getYRotation(4) end},
+		{"Shield", function() return Game.getShieldSize(4) end},
+		{"Separator", 1},
+	},
 };
+
+function buildOSD(p1, p2, p3, p4)
+	local OSD = {};
+	if p1 then
+		OSD = table.join(OSD, playerOSD[1]);
+	end
+	if p2 then
+		OSD = table.join(OSD, playerOSD[2]);
+	end
+	if p3 then
+		OSD = table.join(OSD, playerOSD[3]);
+	end
+	if p4 then
+		OSD = table.join(OSD, playerOSD[4]);
+	end
+	return OSD;
+end
+
+Game.OSD = buildOSD(true, true, true, true);
 
 return Game;

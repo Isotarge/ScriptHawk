@@ -28,6 +28,8 @@ SystemID N64
 12FE8C	d	f	1	RDRAM	Crouch Cancel Knockback Multiplier
 12FF50	d	f	1	RDRAM	Hitlag Multiplier
 130D84	d	h	1	RDRAM	P1 Pointer
+131464	d	f	1	RDRAM	Camera Rot
+131468	d	f	1	RDRAM	Camera Rot
 13159A	w	u	1	RDRAM	P1 Damage (UI)
 131606	w	u	1	RDRAM	P2 Damage (UI)
 131672	w	u	1	RDRAM	P3 Damage (UI)

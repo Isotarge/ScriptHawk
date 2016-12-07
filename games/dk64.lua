@@ -4314,7 +4314,7 @@ local BalloonStates = {
 };
 
 function isBalloon(actorType)
-	return array_contains(BalloonStates, actorType)
+	return table.contains(BalloonStates, actorType)
 end
 
 local KasplatStates = { -- Not actually used by the check function for speed reasons, really just here for documentation
@@ -4339,7 +4339,7 @@ local BulletChecks = {
 };
 
 function isBulletCheck(value)
-	return array_contains(BulletChecks, value);
+	return table.contains(BulletChecks, value);
 end
 
 local GBStates = {
@@ -4351,7 +4351,7 @@ local GBStates = {
 };
 
 function isGB(collectableState)
-	return array_contains(GBStates, collectableState);
+	return table.contains(GBStates, collectableState);
 end
 
 local SimSlamChecks = { -- Not actually used by the check function for speed reasons, really just here for documentation
@@ -4384,7 +4384,7 @@ local safePreceedingCommands = {
 };
 
 function isSafePreceedingCommand(preceedingCommand)
-	return array_contains(safePreceedingCommands, preceedingCommand);
+	return table.contains(safePreceedingCommands, preceedingCommand);
 end
 
 -- Potentially unsafe:
