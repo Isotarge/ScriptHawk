@@ -455,7 +455,7 @@ local function decreasePrecision()
 end
 
 local function increasePrecision()
-	precision = math.min(5, precision + 1);
+	precision = math.min(12, precision + 1);
 end
 
 local function decreaseSpeed()
