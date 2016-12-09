@@ -1528,6 +1528,9 @@ end
 --------------------
 
 local structPointers = {};
+
+hide_unknown_structs = true;
+
 function getStructPointers()
 	local block = dereferencePointer(Game.Memory.struct_array_pointer[version]);
 	local pointers = {};
@@ -1540,10 +1543,14 @@ function getStructPointers()
 					local pointer1 = dereferencePointer(address + 4);
 					local pointer2 = dereferencePointer(address + 8);
 					if isRDRAM(pointer1) then
-						table.insert(pointers, pointer1);
+						if not hide_unknown_structs or isKnownStruct(pointer1) then
+							table.insert(pointers, pointer1);
+						end
 					end
 					if isRDRAM(pointer2) then
-						table.insert(pointers, pointer2);
+						if not hide_unknown_structs or isKnownStruct(pointer2) then
+							table.insert(pointers, pointer2);
+						end
 					end
 				end
 			end
@@ -1552,25 +1559,91 @@ function getStructPointers()
 	return pointers;
 end
 
-struct_slot_size = 0x60; -- TODO: How big is a "renderer"?
-struct_array_variables = {
-	[0x0E] = {["Name"] = "scale", ["Type"] = "u16_be"},
-	[0x10] = {["Name"] = "x_pos", ["Type"] = "s16_be"},
-	[0x12] = {["Name"] = "y_pos", ["Type"] = "s16_be"},
-	[0x14] = {["Name"] = "z_pos", ["Type"] = "s16_be"},
+struct_array_types = {
+	[0] = { -- Game takes low 12-bits and adds 0x572 for comparisons
+		[0x00E] = "Red Feather", -- + 0x572 = 0x580
+		[0x15F] = "Gold Feather", -- + 0x572 = 0x6D1
+		[0x164] = "Note", -- + 0x572 = 0x6D6
+		[0x165] = "Egg", -- + 0x572 = 0x6D7
+	},
+	[2] = {
+		[0x0C] = "Shock spring pad", -- = 0x2DD
+		[0x17] = "Flight pad", -- = 0x2E8
+	},
+	[3] = {
+		-- Enemy collisions
+	},
 };
+
+struct_array_variables = {
+	[0x00] = {["Name"] = "item_index", ["Type"] = "u16_be"}, -- Game takes low 12-bits and adds 0x572 for comparisons
+	[0x02] = {["Name"] = "scale", ["Type"] = "u16_be"},
+	[0x04] = {["Name"] = "x_pos", ["Type"] = "s16_be"},
+	[0x06] = {["Name"] = "y_pos", ["Type"] = "s16_be"},
+	[0x08] = {["Name"] = "z_pos", ["Type"] = "s16_be"},
+	[0x0B] = {["Name"] = "struct_type", ["Type"] = "byte"} -- Check the last 2 bits of the (Struct[0x08] & 0x03), if both bits are 0, it a collectable object
+};
+
+function getStructType(pointer)
+	if isRDRAM(pointer) then
+		return bit.band(mainmemory.readbyte(pointer + 0x0B), 0x03);
+	end
+	return 0;
+end
+
+function getItemType(pointer)
+	if isRDRAM(pointer) then
+		return bit.rshift(mainmemory.read_u16_be(pointer), 4);
+	end
+	return 0;
+end
+
+function getStructName(pointer)
+	local structType = getStructType(pointer);
+	local itemType = getItemType(pointer);
+	if structType == 0 then
+		if type(struct_array_types[structType][itemType]) == "string" then
+			return struct_array_types[structType][itemType];
+		--else
+		--	return "Unknown Collectable ("..toHexString(itemType)..")";
+		end
+	elseif structType == 2 then
+		if type(struct_array_types[structType][itemType]) == "string" then
+			return struct_array_types[structType][itemType];
+		end
+	end
+	return "Unknown ("..structType.."->"..toHexString(itemType)..")";
+end
+
+function isKnownStruct(pointer)
+	local structType = getStructType(pointer);
+	local itemType = getItemType(pointer);
+	if structType == 0 then
+		if type(struct_array_types[0][itemType]) == "string" then
+			return true;
+		end
+	elseif structType == 2 then
+		if type(struct_array_types[2][itemType]) == "string" then
+			return true;
+		end
+	end
+	return false;
+end
 
 function getStructData(pointer)
 	local structData = {};
 
 	if isRDRAM(pointer) then
 		table.insert(structData, {"Slot Base", toHexString(pointer)});
+		table.insert(structData, {"Name", getStructName(pointer)});
+		table.insert(structData, {"Struct Type", getStructType(pointer)});
+		table.insert(structData, {"Item Type", getItemType(pointer)});
 		table.insert(structData, {"Separator", 1});
 
-		table.insert(structData, {"X", mainmemory.read_s16_be(pointer + 0x10)});
-		table.insert(structData, {"Y", mainmemory.read_s16_be(pointer + 0x12)});
-		table.insert(structData, {"Z", mainmemory.read_s16_be(pointer + 0x14)});
-		table.insert(structData, {"Scale", mainmemory.read_u16_be(pointer + 0x0E)});
+		table.insert(structData, {"X", mainmemory.read_s16_be(pointer + 0x04)});
+		table.insert(structData, {"Y", mainmemory.read_s16_be(pointer + 0x06)});
+		table.insert(structData, {"Z", mainmemory.read_s16_be(pointer + 0x08)});
+		table.insert(structData, {"Scale", mainmemory.read_u16_be(pointer + 0x02)});
 	end
 
 	return structData;
@@ -1749,7 +1822,7 @@ function zipToSelectedObject()
 		if isRDRAM(objectArray) then
 			local slotBase = objectArray + getSlotBase(object_index);
 
-			local x = mainmemory.readfloat(slotBase + 0x04, true);
+			local x = mainmemory.readfloat(slotBase + 0x04, true); -- TODO: Get these constants from somewhere
 			local y = mainmemory.readfloat(slotBase + 0x08, true);
 			local z = mainmemory.readfloat(slotBase + 0x0C, true);
 
@@ -1760,9 +1833,9 @@ function zipToSelectedObject()
 	else
 		local rendererPointer = structPointers[object_index];
 		if isRDRAM(rendererPointer) then
-			local x = mainmemory.read_s16_be(rendererPointer + 0x10);
-			local y = mainmemory.read_s16_be(rendererPointer + 0x12);
-			local z = mainmemory.read_s16_be(rendererPointer + 0x14);
+			local x = mainmemory.read_s16_be(rendererPointer + 0x04); -- TODO: Get these constants from somewhere
+			local y = mainmemory.read_s16_be(rendererPointer + 0x06);
+			local z = mainmemory.read_s16_be(rendererPointer + 0x08);
 
 			Game.setXPosition(x);
 			Game.setYPosition(y);
@@ -1889,14 +1962,15 @@ function Game.drawUI()
 
 	if script_mode == "List Struct" then
 		for i = #structPointers, 1, -1 do
+			local structName = getStructName(structPointers[i]).." - ";
 			if object_index == i then
-				local x = mainmemory.read_s16_be(structPointers[i] + 0x10);
-				local y = mainmemory.read_s16_be(structPointers[i] + 0x12);
-				local z = mainmemory.read_s16_be(structPointers[i] + 0x14);
-				gui.text(Game.OSDPosition[1], 2 + Game.OSDRowHeight * row, x..", "..y..", "..z.." "..i..": "..toHexString(structPointers[i]), yellow_highlight, 'bottomright');
+				local x = mainmemory.read_s16_be(structPointers[i] + 0x04); -- TODO: Get these constants from somewhere
+				local y = mainmemory.read_s16_be(structPointers[i] + 0x06);
+				local z = mainmemory.read_s16_be(structPointers[i] + 0x08);
+				gui.text(Game.OSDPosition[1], 2 + Game.OSDRowHeight * row, structName..x..", "..y..", "..z.." "..i..": "..toHexString(structPointers[i]), yellow_highlight, 'bottomright');
 				row = row + 1;
 			else
-				gui.text(Game.OSDPosition[1], 2 + Game.OSDRowHeight * row, i..": "..toHexString(structPointers[i]), color, 'bottomright');
+				gui.text(Game.OSDPosition[1], 2 + Game.OSDRowHeight * row, structName..i..": "..toHexString(structPointers[i]), color, 'bottomright');
 				row = row + 1;
 			end
 
@@ -2350,37 +2424,61 @@ local slot_x_pos = 0x04; -- TODO: These are in slot_vars now
 local slot_y_pos = 0x08;
 local slot_z_pos = 0x0C;
 
-local function encircle_banjo()
+function getObjectModel1Pointers()
+	local pointers = {};
 	local objectArray = dereferencePointer(Game.Memory.object_array_pointer[version]);
 	if isRDRAM(objectArray) then
-		local current_banjo_x = Game.getXPosition();
-		local current_banjo_y = Game.getYPosition();
-		local current_banjo_z = Game.getZPosition();
-		local currentPointers = {};
-
-		num_slots = mainmemory.read_u32_be(objectArray);
-
-		radius = 1000;
-		if forms.ischecked(ScriptHawk.UI.form_controls.dynamic_radius_checkbox) then
-			radius = num_slots * dynamic_radius_factor;
-		end
-
-		-- Fill and sort pointer list
+		local num_slots = mainmemory.read_u32_be(objectArray);
 		for i = 0, num_slots - 1 do
-			-- TODO: Check for bone arrays before adding to table, we don't want to move stuff we can't see
-			table.insert(currentPointers, objectArray + getSlotBase(i));
+			table.insert(currentPointers, objectArray + getSlotBase(i)); -- TODO: Check for bone arrays before adding to table, we don't want to move stuff we can't see
 		end
 		table.sort(currentPointers);
+	end
+	return pointers;
+end
 
-		-- Iterate and set position
-		local x, z;
+function setStructPosition(pointer, x, y, z)
+	if isRDRAM(pointer) then
+		mainmemory.write_s16_be(pointer + 0x04, x);
+		mainmemory.write_s16_be(pointer + 0x06, y);
+		mainmemory.write_s16_be(pointer + 0x08, z);
+	end
+end
+
+function setObjectModel1Position(pointer, x, y, z)
+	if isRDRAM(pointer) then
+		mainmemory.writefloat(pointer + 0x04, x, true);
+		mainmemory.writefloat(pointer + 0x08, y, true);
+		mainmemory.writefloat(pointer + 0x0C, z, true);
+	end
+end
+
+local function encircle_banjo()
+	local current_banjo_x = Game.getXPosition();
+	local current_banjo_y = Game.getYPosition();
+	local current_banjo_z = Game.getZPosition();
+	local x, y, z;
+
+	radius = 1000;
+	if forms.ischecked(ScriptHawk.UI.form_controls.dynamic_radius_checkbox) then
+		radius = getNumSlots() * dynamic_radius_factor;
+	end
+
+	if string.contains(script_mode, "Struct") then
+		structPointers = getStructPointers(); -- This prevents crashes
+		for i = 1, #structPointers do
+			x = current_banjo_x + math.cos(math.pi * 2 * i / #structPointers) * radius;
+			y = current_banjo_y + i * y_stagger_amount;
+			z = current_banjo_z + math.sin(math.pi * 2 * i / #structPointers) * radius;
+			setStructPosition(structPointers[i], x, y, z);
+		end
+	else
+		local currentPointers = getObjectModel1Pointers();
 		for i = 1, #currentPointers do
 			x = current_banjo_x + math.cos(math.pi * 2 * i / #currentPointers) * radius;
+			y = current_banjo_y + i * y_stagger_amount;
 			z = current_banjo_z + math.sin(math.pi * 2 * i / #currentPointers) * radius;
-
-			mainmemory.writefloat(currentPointers[i] + slot_x_pos, x, true);
-			mainmemory.writefloat(currentPointers[i] + slot_y_pos, current_banjo_y + i * y_stagger_amount, true);
-			mainmemory.writefloat(currentPointers[i] + slot_z_pos, z, true);
+			setObjectModel1Position(currentPointers[i], x, y, z);
 		end
 	end
 end

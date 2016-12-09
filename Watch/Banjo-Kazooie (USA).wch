@@ -201,6 +201,7 @@ SystemID N64
 380AE0	d	h	1	RDRAM	Print List Pointer
 3810B8	d	f	1	RDRAM	FF Answer Timer
 381FA0	d	h	1	RDRAM	Struct Array Pointer
+3820B8	d	h	1	RDRAM	Struct Collision Pointer
 38214B	b	u	1	RDRAM	Standing on switch
 382360	d	h	1	RDRAM	Map Vert List Pointer?
 382364	d	h	1	RDRAM	Water Vert List Pointer?
