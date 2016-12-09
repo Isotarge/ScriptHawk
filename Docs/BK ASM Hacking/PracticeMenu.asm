@@ -44,6 +44,7 @@ PUSH a1
 PUSH a2
 PUSH at
 PUSH s3
+PUSH s2
 
 LB a0 InPracMenu
 BEQ a0 zero NotInPracMenu
@@ -52,42 +53,40 @@ NOP
 InPracMenu:
     /*UPDATE DISPLAY*/
 
-    ;Calculate Text
-    LA a0 MenuLabelStrings
-    LB a1 PageTopPos
-    SLL a1 a1 4 
-    ADD a1 a0 a1
-    LA a0 MenuItemStr
-    PUSH a0
-    PUSH a1
-    JAL @CopyString
-    NOP
-    //append option1's current state
-    POP a1
-    POP a0
-    ADDIU a1 0x10
-    ADDIU a0 0x20
-    PUSH a0
-    PUSH a1
-    JAL @CopyString
-    NOP
-    //append option2's current state
-    POP a1
-    POP a0
-    ADDIU a1 0x10
-    ADDIU a0 0x20
-    PUSH a0
-    PUSH a1
-    JAL @CopyString
-    NOP
-    //append option3's current state
-    POP a1
-    POP a0
-    ADDIU a1 0x10
-    ADDIU a0 0x20
-    JAL @CopyString
-    NOP
-    //append option4's current state
+	MOV s3 zero
+//for(s3=0; s3<4; s3++)
+	PracticeMenuText_Loop:
+    	LA a1 MenuLabelStrings
+    	LB a0 PageTopPos
+		ADDU a0 a0 s3
+		SLL s2 a0 4
+		ADDU a1 a1 s2
+		
+    	LA a0 MenuItemStr 
+		SLL s2 s3 5
+		ADDU a0 a0 s2
+		
+    	JAL @CopyString
+		NOP
+		
+		LA a1 MenuOptionStates
+		ADDU a1 a1 s3
+		LB a0 PageTopPos
+		ADDU a1 a1 a0
+		LB a1 0(a1)
+		
+		LA a0 MenuItemStr 
+		SLL s2 s3 5
+		ADDU a0 a0 s2
+		
+		JAL @IToA_10
+		NOP
+		
+		ADDIU s3 s3 1 ;s3++
+		LI a0 0x04
+		BNE s3 a0 PracticeMenuText_Loop
+		NOP
+	
 	JAL PrintPracMenuText
 
 	;Highlight cursor position
@@ -137,7 +136,7 @@ InPracMenu:
             LB a1 PageTopPos
             ADDI a0 a1 1
             JAL @SelectMinInt
-            LI a1 0x01  ;PageTopMax
+            LI a1 0x02  ;PageTopMax!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
             POP a0
             SB v0 PageTopPos
             B NoDPadDownPress
@@ -152,14 +151,50 @@ InPracMenu:
 	LA a0 @P1DPadLeft ;left - previous option
 	LW a0 0(a0)
 	XORI a0, a0, 1
-    //decrement current option's state
+	BNEZ a0 NoDPadLeftPress 
+		NOP
+		//Get CurrentHighlighted Option
+		LB a0 PageTopPos
+		LB a1 PracMenuCursorPos
+		ADDU a0 a0 a1
+		LA a1 MenuOptionStates
+		ADDU a1 a1 a0
+		LB a0 0(a1)
+		//increment current option's state
+		BEQZ a0 ClampToZeroOptionState
+		NOP
+			ADDI a0 a0 -1
+		ClampToZeroOptionState:
+		SB a0 0(a1)
+		
+		//Need to clamp
+		
+	NoDPadLeftPress:
+    
 		
 
 	LA a0 @P1DPadRight ;right - next option
 	LW a0 0(a0)
 	XORI a0, a0, 1
-    //increment current option's state
-
+    
+	BNEZ a0 NoDPadRightPress 
+		NOP
+		//Get CurrentHighlighted Option
+		LB a0 PageTopPos
+		LB a1 PracMenuCursorPos
+		ADDU a0 a0 a1
+		LA a1 MenuOptionStates
+		ADDU a1 a1 a0
+		LB a0 0(a1)
+		//increment current option's state
+		ADDIU a0 a0 1
+		SB a0 0(a1)
+		//Need to clamp
+		
+		
+	NoDPadRightPress:
+	
+	
 
 	;check if exiting practice menu
 	LA a0 @P1Start
@@ -169,15 +204,48 @@ InPracMenu:
 	MOV a0 zero
 		SB a0 InPracMenu ;set InPracMenu
 		
-		;;One Shot Codes
-		;If TakeMeThere
-			;JAL TakeMeThere
-			NOP
+		//ONE SHOT EXITING MENU CODES
 		;If GiveMoveSet
-			;JAL GiveMoveSet
+		LB s3 MoveSet
+		BEQZ s3 KeepCurrentMoveSet
+		LI a1 0x01
+			//NONE
+			JAL @LockAllMoves
 			NOP
-		;Transform Me
-			;JAL
+			BEQ s3 a1 KeepCurrentMoveSet
+			LI a1 0x02
+			
+			//SM Set
+			LUI a0 0x000B
+			ADDIU a0 a0 0xFDBF
+			JAL @SetMovesUnlockedBitfield
+			NOP
+			BEQ s3 a1 KeepCurrentMoveSet
+			LI a1 0x03
+			
+			//FFM
+			LUI a0 0x000B
+			ADDIU a0 a0 0xFDBF
+			JAL @SetMovesUnlockedBitfield
+			NOP
+			BEQ s3 a1 KeepCurrentMoveSet
+			LI a1 0x03
+			
+			//FFM + EGGS
+			LUI a0 0x000B
+			ADDIU a0 a0 0xFDFF
+			JAL @SetMovesUnlockedBitfield
+			NOP
+			BEQ s3 a1 KeepCurrentMoveSet
+			
+			//ALL
+			LUI a0 0x000F
+			ADDIU a0 a0 0xFFFF
+			JAL @SetMovesUnlockedBitfield
+			NOP
+			
+		KeepCurrentMoveSet:
+		SB zero MoveSet
 
 		;Copy real menu strings back
 		JAL RestoreMainMenuText
@@ -211,6 +279,7 @@ NotInPracMenu:
 NOP
 
 HouseKeeping:
+POP s2
 POP s3
 POP at
 POP a2
@@ -320,12 +389,12 @@ PUSH s3
 
 	PrintPracMenuTextLoop:
 		LA a3 @PauseMenuState
-		SLL s3 s2 2
-		ADDU s3 a3 s3
+		SLL s3 s2 2    ; i*4
+		ADDU s3 a3 s3  ; i*4
 		LW a0 0x10(s3)
 		SLL a3 s2 5
 		LA s3 MenuItemStr
-		ADDU a1 s3 a3
+		ADDU a1 s3 a3 ;menuItemStr + i<<5
 		JAL @CopyString
 		NOP
 		ADDIU s2 s2 1
@@ -353,7 +422,7 @@ PUSH a1
 PUSH a2
 PUSH at
 
-;if beatMenuNotSetUp
+//cheatMenuNotSetUp
 LB a0 PracMenuSetup
 BEQ a0 zero NormalModeCode_MenuSetup
 NOP
@@ -362,9 +431,52 @@ NOP
     MOV a0 zero
 NormalModeCode_MenuSetup:
 
+//Take Me There
+LB a0 TakeMeThereState
+BEQ a0 zero NormalModeCode_TakeMeThereEnd
+	
+	LB a0 TakeMeThereState
+	JAL @GetMainExitFromLevelIndex
+	LB a0 TakeMeThereState
+	JAL @GetMainMapFromLevelIndex
+	MOV a1 v0
+	LI a2 1
+	JAL @TakeMeThere_LevelReset
+	MOV a0 v0
+	SB zero TakeMeThereState
+	
+NormalModeCode_TakeMeThereEnd:
+
+//Take Me There
+LB a0 TransformMeState
+BEQ a0 zero NormalModeCode_TransformMeEnd
+
+	LB a0 TransformMeState
+	JAL @SetMumboTransformation
+	NOP
+	JAL @UpdatePlayerModelToMumboTransFormation
+	NOP
+	SB zero TransformMeState
+	
+NormalModeCode_TransformMeEnd:
+
 ;If Press-L to levitate ste
 	;JAL PressLToLevitate ;Press-L to levitate code
-    NOP
+//LB a0 L2LevitateState
+//BEQZ a0 NormalModeCode_LToLevitateNormal
+	//LUI a0 0x4528
+	//ADDIU a0 a0 0xc000
+	//BEQ zero zero NormalModeCode_LToLevitateEnd
+	//NOP
+NormalModeCode_LToLevitateNormal:
+	//LUI a0 0xC528
+	//ADDIU a0 a0 0xc000
+	
+//NormalModeCode_LToLevitateEnd:
+//JAL @SetGravitationalAcceleration
+//NOP
+
+
 ;If Ingame-Timer/AutoSplitter
 	;JAL Ingame-Timer
 	NOP
@@ -451,15 +563,19 @@ PracMenuOptionNumber:
 .byte 0
 PageTopPos:
 .byte 0
+
+MenuOptionStates:
 InfinitesState:
 .byte 0
 ResetOnEnterState:
 .byte 0
-MoveSet:
-.byte 0
 TakeMeThereState:
 .byte 0
+MoveSet:
+.byte 0
 L2LevitateState:
+.byte 0
+TransformMeState:
 .byte 0
 
 MenuItemStr:
@@ -471,11 +587,28 @@ MenuItemStr:
 MenuLabelStrings:
 .asciiz "INFINITES: \0\0\0\0"     ; OFF, ON
 .asciiz "RESET ON ENTER:"         ; OFF, ON
-.asciiz "MOVE SET: \0\0\0\0\0"    ; OFF, NONE, FFM, ALL
 .asciiz "TAKE ME THERE: "         ; OFF, SM, MM, TTC, CC, BGS, FP, GV, MMM, RBB, CCW, FF, DOG, GRUNTY
-.asciiz "L 2 LEVITATE: \0\0"      ;ON, OFF
-.asciiz "\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0"
+.asciiz "MOVE SET: \0\0\0\0\0"    ; OFF, NONE, FFM, ALL
+.asciiz "L 2 LEVITATE: \0"      ;ON, OFF
+.asciiz "TRANSFORM ME: \0"	  ;OFF, BANJO, TERMITE, CROC, WALRUS, PUMPKIN, BEE, WASHY
+.asciiz "\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0"
 
+
+TakeMeThereOptions:
+.asciiz "OFF"
+.asciiz " SM"
+.asciiz " MM"
+.asciiz "TTC"
+.asciiz " CC"
+.asciiz "BGS"
+.asciiz " FP"
+.asciiz " GV"
+.asciiz "MMM"
+.asciiz "RBB"
+.asciiz "CCW"
+.asciiz " FF"
+.asciiz "DOG"
+.asciiz "END"
 
 
 

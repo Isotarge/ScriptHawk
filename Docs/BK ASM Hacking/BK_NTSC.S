@@ -73,15 +73,22 @@
 [AbsInt]:                   0x802589CC  ;I: (word $a0)                                 O: [word $v0]
 
 
+[UpdatePlayerModelToMumboTransFormation]: 0x80291D04
+
 [GetPlayerModel]:   0x80291FAC  ;Outputs:   [half $v0]
 [SetPlayerTransparency]:    0x80291FB8 ;Inputs: (byte $a0 input)
 [SetPlayerModel]:   0x80291FC4  ;Inputs: (half $a0 modelIndex)
 
+[LockAllMoves]: 0x80295804
+[SetMovesUnlockedBitfield]: 0x8029586C
 
 [GetXZVelocity]: 0x80297AB8 ;Outputs: [float $f0]
 
+[SetGravitationalAcceleration]:0x80297BEC
 
-[TakeMeThere_DisplayHealth]:    0x802E4048  ;I: (word $a0 Map, word $a1 exit, word $a2 loadTransitionTypeIndex)
+[SetMumboTransformation]: 0x8029A960
+
+[TakeMeThere_LevelReset]:    0x802E4048  ;I: (word $a0 Map, word $a1 exit, word $a2 loadTransitionTypeIndex)
 [TakeMeThere]:  0x802E4078  ;I: (word $a0 Map, word $a1 exit, word $a2 loadTransitionTypeIndex)
 
 
@@ -90,6 +97,8 @@
 
 [Print_CharFont]: 0x802F78FC ;Inputs: (word $a0 XPos), (word $a1 YPos), (char* $a2 str)
 
+[GetMainMapFromLevelIndex]: 0x8030ADD8;
+[GetMainExitFromLevelIndex]: 0x8030AE24;
 
 [PauseMenu]: 0x80313380
 
