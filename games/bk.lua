@@ -1531,6 +1531,25 @@ local structPointers = {};
 
 hide_unknown_structs = true;
 
+function getStructsFromBlock(pointer)
+	local pointers = {};
+	if isRDRAM(pointer) then
+		local blockEnd = dereferencePointer(pointer - 0x0C);
+		if isRDRAM(blockEnd) then
+			local blockSize = blockEnd - pointer;
+			local nStructs = math.floor(blockSize / 0x0C);
+			for i = 0, nStructs - 1 do
+				if not hide_unknown_structs or isKnownStruct(pointer + i * 0x0C) then
+					table.insert(pointers, pointer + i * 0x0C);
+				end
+			end
+			--dprint(toHexString(pointer)..": "..nStructs.." structs");
+			return pointers;
+		end
+	end
+	return pointers;
+end
+
 function getStructPointers()
 	local block = dereferencePointer(Game.Memory.struct_array_pointer[version]);
 	local pointers = {};
@@ -1543,17 +1562,14 @@ function getStructPointers()
 					local pointer1 = dereferencePointer(address + 4);
 					local pointer2 = dereferencePointer(address + 8);
 					if isRDRAM(pointer1) then
-						if not hide_unknown_structs or isKnownStruct(pointer1) then
-							table.insert(pointers, pointer1);
-						end
+						pointers = table.join(pointers, getStructsFromBlock(pointer1));
 					end
 					if isRDRAM(pointer2) then
-						if not hide_unknown_structs or isKnownStruct(pointer2) then
-							table.insert(pointers, pointer2);
-						end
+						pointers = table.join(pointers, getStructsFromBlock(pointer2));
 					end
 				end
 			end
+			--print_deferred();
 		end
 	end
 	return pointers;
@@ -2435,7 +2451,7 @@ y_stagger_amount = 10;
 
 -- Relative to objectArray
 local max_slots = 0x100;
-local radius = 1000;
+radius = 1000;
 
 -- Relative to slot
 local slot_x_pos = 0x04; -- TODO: These are in slot_vars now
@@ -2448,9 +2464,9 @@ function getObjectModel1Pointers()
 	if isRDRAM(objectArray) then
 		local num_slots = mainmemory.read_u32_be(objectArray);
 		for i = 0, num_slots - 1 do
-			table.insert(currentPointers, objectArray + getSlotBase(i)); -- TODO: Check for bone arrays before adding to table, we don't want to move stuff we can't see
+			table.insert(pointers, objectArray + getSlotBase(i)); -- TODO: Check for bone arrays before adding to table, we don't want to move stuff we can't see
 		end
-		table.sort(currentPointers);
+		table.sort(pointers);
 	end
 	return pointers;
 end
@@ -2477,7 +2493,7 @@ local function encircle_banjo()
 	local current_banjo_z = Game.getZPosition();
 	local x, y, z;
 
-	radius = 1000;
+	--radius = 1000
 	if forms.ischecked(ScriptHawk.UI.form_controls.dynamic_radius_checkbox) then
 		radius = getNumSlots() * dynamic_radius_factor;
 	end
