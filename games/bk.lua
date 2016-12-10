@@ -1543,7 +1543,6 @@ function getStructsFromBlock(pointer)
 					table.insert(pointers, pointer + i * 0x0C);
 				end
 			end
-			--dprint(toHexString(pointer)..": "..nStructs.." structs");
 			return pointers;
 		end
 	end
@@ -1562,14 +1561,19 @@ function getStructPointers()
 					local pointer1 = dereferencePointer(address + 4);
 					local pointer2 = dereferencePointer(address + 8);
 					if isRDRAM(pointer1) then
-						pointers = table.join(pointers, getStructsFromBlock(pointer1));
+						local blockPointers = getStructsFromBlock(pointer1);
+						for i = 1, #blockPointers do
+							table.insert(pointers, blockPointers[i]);
+						end
 					end
 					if isRDRAM(pointer2) then
-						pointers = table.join(pointers, getStructsFromBlock(pointer2));
+						local blockPointers = getStructsFromBlock(pointer2);
+						for i = 1, #blockPointers do
+							table.insert(pointers, blockPointers[i]);
+						end
 					end
 				end
 			end
-			--print_deferred();
 		end
 	end
 	return pointers;
