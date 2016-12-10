@@ -1537,7 +1537,7 @@ function getStructPointers()
 	if isRDRAM(block) then
 		local blockend = dereferencePointer(block - 0x0C);
 		if isRDRAM(blockend) then
-			for address = block, blockend - 0x10, 0x0C do
+			for address = block, blockend, 0x0C do
 				local pointercheck = mainmemory.read_u16_be(address + 2);
 				if pointercheck ~= 0 then
 					local pointer1 = dereferencePointer(address + 4);
@@ -1591,6 +1591,22 @@ function getStructType(pointer)
 	return 0;
 end
 
+function getStructCollectable(pointer)
+	if isRDRAM(pointer) then
+		return bit.band(mainmemory.readbyte(pointer + 0x0B), 0x10)/16;
+	end
+end
+
+function getStructRotationDirection(pointer)
+	if isRDRAM(pointer) then
+		if bit.band(mainmemory.readbyte(pointer + 0x0B), 0x80) ~= 0 then
+			return "ClockWise"
+		else
+			return "CounterClockWise"
+		end
+	end
+end
+
 function getItemType(pointer)
 	if isRDRAM(pointer) then
 		return bit.rshift(mainmemory.read_u16_be(pointer), 4);
@@ -1636,6 +1652,7 @@ function getStructData(pointer)
 	if isRDRAM(pointer) then
 		table.insert(structData, {"Slot Base", toHexString(pointer)});
 		table.insert(structData, {"Name", getStructName(pointer)});
+		table.insert(structData, {"Collectable", getStructCollectable(pointer)});
 		table.insert(structData, {"Struct Type", getStructType(pointer)});
 		table.insert(structData, {"Item Type", getItemType(pointer)});
 		table.insert(structData, {"Separator", 1});
@@ -1644,6 +1661,7 @@ function getStructData(pointer)
 		table.insert(structData, {"Y", mainmemory.read_s16_be(pointer + 0x06)});
 		table.insert(structData, {"Z", mainmemory.read_s16_be(pointer + 0x08)});
 		table.insert(structData, {"Scale", mainmemory.read_u16_be(pointer + 0x02)});
+		table.insert(structData, {"Rot Dir", getStructRotationDirection(pointer)});
 	end
 
 	return structData;
