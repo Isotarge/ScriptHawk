@@ -79,12 +79,18 @@
 [SetPlayerTransparency]:    0x80291FB8 ;Inputs: (byte $a0 input)
 [SetPlayerModel]:   0x80291FC4  ;Inputs: (half $a0 modelIndex)
 
+[GetButtonPressTimer]: 0x8029557C ;I: byte $a0 ButtonIndex
+
 [LockAllMoves]: 0x80295804
 [SetMovesUnlockedBitfield]: 0x8029586C
+
+[SetYVelocity]: 0x802979A0 ;I: (float $f12)
 
 [GetXZVelocity]: 0x80297AB8 ;Outputs: [float $f0]
 
 [SetGravitationalAcceleration]:0x80297BEC
+
+[AddToYPos]: 0x80298528 ;I: (float $f12)
 
 [SetMumboTransformation]: 0x8029A960
 

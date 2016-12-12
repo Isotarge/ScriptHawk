@@ -31,6 +31,10 @@ NOP
 [PauseMenuData]:0x8036C4E0
 [PauseMenuState]:0x80383010
 
+//Variables
+[NumberOfOptions]: 0x06
+[PageTopMax]: 0x02
+
 ;----------------------------------------------------------------
 ; Code Run from Pause Mode
 ; 
@@ -136,7 +140,7 @@ InPracMenu:
             LB a1 PageTopPos
             ADDI a0 a1 1
             JAL @SelectMinInt
-            LI a1 0x02  ;PageTopMax!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+            LI a1 @PageTopMax
             POP a0
             SB v0 PageTopPos
             B NoDPadDownPress
@@ -462,20 +466,20 @@ NormalModeCode_TransformMeEnd:
 
 ;If Press-L to levitate ste
 	;JAL PressLToLevitate ;Press-L to levitate code
-//LB a0 L2LevitateState
-//BEQZ a0 NormalModeCode_LToLevitateNormal
-	//LUI a0 0x4528
-	//ADDIU a0 a0 0xc000
-	//BEQ zero zero NormalModeCode_LToLevitateEnd
-	//NOP
+LB a0 L2LevitateState
+BEQ a0 zero NormalModeCode_LToLevitateNormal
+NOP
+	JAL @GetButtonPressTimer
+	LI a0 0x02 ;L button Index
+	BEQ v0 zero NormalModeCode_LToLevitateNormal
+	LUI a0 0x4220
+		MTC1 zero f12
+		JAl @SetYVelocity ;Vel increases while airborn, if Vel > pos change then banjo still falls
+		LUI a0 0x41a0
+		MTC1 a0 f12
+		JAl @AddToYPos
+		NOP
 NormalModeCode_LToLevitateNormal:
-	//LUI a0 0xC528
-	//ADDIU a0 a0 0xc000
-	
-//NormalModeCode_LToLevitateEnd:
-//JAL @SetGravitationalAcceleration
-//NOP
-
 
 ;If Ingame-Timer/AutoSplitter
 	;JAL Ingame-Timer
@@ -584,6 +588,8 @@ MenuItemStr:
 .asciiz "PRACTICE MENU 3: \0\0\0\0\0\0\0\0\0\0\0\0\0\0"
 .asciiz "PRACTICE MENU 4: \0\0\0\0\0\0\0\0\0\0\0\0\0\0"
 
+/*Option string*/
+/*TO DO: CHANGE TO STUCT {ascii, MaxOptions, Pointer to Option Sting}*/ 
 MenuLabelStrings:
 .asciiz "INFINITES: \0\0\0\0"     ; OFF, ON
 .asciiz "RESET ON ENTER:"         ; OFF, ON
@@ -593,6 +599,17 @@ MenuLabelStrings:
 .asciiz "TRANSFORM ME: \0"	  ;OFF, BANJO, TERMITE, CROC, WALRUS, PUMPKIN, BEE, WASHY
 .asciiz "\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0"
 
+OnOffOptionSting:
+.asciiz "OFF"
+.asciiz " ON"
+
+MoveSetOptionString: ;6
+.asciiz "OFF"
+.asciiz "NON"
+.asciiz " SM"
+.asciiz "FF1" ;FFM no Eggs
+.asciiz "FF2" ;FFM Eggs
+.asciiz "ALL"
 
 TakeMeThereOptions:
 .asciiz "OFF"
