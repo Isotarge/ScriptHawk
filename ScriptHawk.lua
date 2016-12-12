@@ -180,14 +180,14 @@ function outputGamesharkCode(bytes, skipZeroes)
 			if not nextByteHandled then
 				if i < #bytes and bytes[i][1] == (bytes[i + 1][1] - 1) then
 					if not (skipZeroes and bytes[i][2] == 0x00 and bytes[i + 1] == 0x00) then
-						dprint(toHexString(bytes[i][1], 6, "81")..toHexString(bytes[i][2], 2, " ")..toHexString(bytes[i + 1][2], 2, ""));
+						dprint(toHexString(bytes[i][1], 6, "  - 81")..toHexString(bytes[i][2], 2, " ")..toHexString(bytes[i + 1][2], 2, ""));
 					else
 						skippedZeroes = skippedZeroes + 2;
 					end
 					nextByteHandled = true;
 				else
 					if not (skipZeroes and bytes[i][2] == 0x00) then
-						dprint(toHexString(bytes[i][1], 6, "80")..toHexString(bytes[i][2], 2, " 00"));
+						dprint(toHexString(bytes[i][1], 6, "  - 80")..toHexString(bytes[i][2], 2, " 00"));
 					else
 						skippedZeroes = skippedZeroes + 1;
 					end
