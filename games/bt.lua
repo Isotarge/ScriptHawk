@@ -823,15 +823,29 @@ local movementStates = {
 	[0x2F] = "Falling",
 	[0x30] = "Diving",
 	[0x31] = "Rolling",
+	[0x32] = "Idle", -- Washing Machine
+	[0x33] = "Rolling", -- Washing Machine
 
+	[0x35] = "Jumping", -- Washing Machine
+	[0x36] = "Falling", -- Washing Machine
+	[0x37] = "Cleaning", -- Washing Machine
+	[0x38] = "Launching Underwear", -- Washing Machine
 	[0x39] = "Swimming (A)",
 
 	[0x3D] = "Falling (Splat)",
+	[0x3E] = "Damaged", -- Washing Machine
 
 	[0x41] = "Death",
+	[0x42] = "Locked", -- Silo
+	[0x43] = "Death", -- Washing Machine
 
 	[0x45] = "Locked", -- Talon Trot, sliding
-
+	[0x46] = "Knockback", -- Submarine
+	[0x47] = "Entering Stilt Stride", -- Solo Kazooie
+	[0x48] = "Idle", -- Solo Kazooie, Stilt Stride
+	[0x49] = "Walking", -- Solo Kazooie, Stilt Stride
+	[0x4A] = "Jumping", -- Solo Kazooie, Stilt Stride
+	[0x4B] = "Exiting Stilt Stride", -- Solo Kazooie
 	[0x4C] = "Landing", -- Water Surface
 
 	[0x4F] = "Idle", -- Climbing
@@ -840,29 +854,30 @@ local movementStates = {
 	[0x54] = "Drowning",
 
 	[0x56] = "Knockback", -- Solo Banjo
+	[0x57] = "Exiting Beak Bomb", -- BK
 
 	[0x59] = "Damaged", -- Beak Bomb
 
 	[0x5B] = "Throwing Object", -- Glowbo
 	[0x5C] = "Knockback",
-
+	[0x5D] = "Locked", -- Washing Machine, Loading Zones & Sliding
 	[0x5E] = "Locked", -- Shack Pack, Talking, moving to target
 	[0x5F] = "Locked", -- Shack pack, Talking
 	[0x60] = "Locked", -- Snooze Pack, Talking, moving to target
 	[0x61] = "Locked", -- Snooze Pack, Talking
 
+	[0x65] = "Locked", -- Solo Kazooie, Swimming, Text Boxes
 	[0x66] = "Locked", -- Solo Kazooie - Water surface?
 	[0x67] = "Shooting Egg", -- Solo Kazooie
 	[0x68] = "Pooping Egg", -- Solo Kazooie
 	[0x69] = "Joining", -- Split up pad
 	[0x6A] = "Joining", -- Split up pad
-
+	[0x6B] = "Locked", -- Bee, Text Boxes
 	[0x6C] = "Failed Flip", -- Solo Banjo Z+A
 	[0x6D] = "Diving", -- Solo Banjo
-
 	[0x6E] = "Locked", -- Sack Pack, Talking, moving to target
 	[0x6F] = "Floating", -- Solo Banjo, CCL
-
+	[0x70] = "Locked", -- Golden Goliath
 	[0x71] = "Falling", -- Talon Trot
 	[0x72] = "Recovering", -- Splat
 	[0x73] = "Locked",
@@ -874,6 +889,7 @@ local movementStates = {
 
 	[0x7A] = "Walking", -- Damaging Ground, eg. quicksand
 
+	[0x7C] = "Clockwork Mouse", -- Canary Mary 3 & 4
 	[0x7D] = "Damaged", -- Solo Banjo - Sack Pack
 
 	[0x7F] = "Damaged", -- Underwater
@@ -881,12 +897,21 @@ local movementStates = {
 	[0x81] = "Swimming (A)", -- Solo Banjo
 	[0x82] = "Swimming (B)", -- Solo Banjo
 	[0x83] = "Knockback", -- Submarine on land
+	[0x84] = "Joining", -- Talon Torpedo
+	[0x85] = "Idle", -- Bee
+	[0x86] = "Walking", -- Bee
+	[0x87] = "Jumping", -- Bee
+	[0x88] = "Falling", -- Bee
+	[0x89] = "Damaged", -- Bee
+	[0x8A] = "Death", -- Bee
 
+	[0x8C] = "Flying", -- Bee
+	[0x8D] = "Locked", -- Bee, Eyeball Plant FTT
+	[0x8E] = "Knockback", -- Washing Machine
 	[0x8F] = "Locked", -- Solo Kazooie
-
 	[0x90] = "Swimming (A+B)", -- Solo Banjo
 	[0x91] = "Damaged", -- Flying
-
+	[0x92] = "Locked", -- Washing Machine, Elevators & Text Boxes
 	[0x93] = "Locked", -- Solo Kazooie, Loading Zone, First Person Camera, Slipping
 
 	[0x95] = "Jumping", -- Claw Clamber
@@ -897,6 +922,9 @@ local movementStates = {
 	[0x9A] = "Locked", -- Talon Trot, loading zone etc
 
 	[0x9C] = "Jumping", -- Springy Step Shoes
+	[0x9D] = "Locked", -- Bee, Loading Zones
+
+	[0xA3] = "Knockback", -- Bee
 
 	[0xA6] = "Idle", -- Grip Grab
 	[0xA7] = "Moving", -- Grip Grab
@@ -915,7 +943,7 @@ local movementStates = {
 	[0xB4] = "Diving", -- Stony
 
 	[0xB6] = "Bill Drill",
-
+	[0xB7] = "Pushcart", -- Canary Mary 1 & 2
 	[0xB8] = "Splitting", -- Split up pad
 	[0xB9] = "Splitting", -- Split up pad
 
@@ -930,8 +958,11 @@ local movementStates = {
 	[0xC5] = "Hatching", -- Solo Kazooie
 	[0xC6] = "Leg Spring", -- Solo Kazooie
 	[0xC7] = "Walking", -- Solo Kazooie
-
+	[0xC8] = "Entering Beak Bayonet",
+	[0xC9] = "Exiting Beak Bayonet",	
 	[0xCA] = "Idle", -- Breegull Blaster
+
+	[0xCE] = "Locked", -- Beak Bayonet, Loading Zone
 
 	[0xD1] = "Walking", -- Breegull Blaster
 	[0xD2] = "Beak Bayonet",
@@ -941,6 +972,7 @@ local movementStates = {
 	[0xD8] = "Firing Egg", -- Breegull Blaster
 
 	[0xDA] = "Damaged", -- Breegull Blaster
+	[0xDB] = "Death", -- Beak Bayonet
 
 	[0xDD] = "Crouching", -- Solo Kazooie
 	[0xDE] = "Landing", -- Solo Kazooie
@@ -956,28 +988,29 @@ local movementStates = {
 	[0xEA] = "Damaged", -- Mumbo
 	[0xEB] = "Death", -- Mumbo
 
+	[0xED] = "Exiting Talon Torpedo",
 	[0xEE] = "Falling (Splat)", -- Mumbo
 	[0xEF] = "Landing", -- Mumbo
 	[0xF0] = "Idle", -- Mumbo - Water Surface
 	[0xF1] = "Paddling", -- Mumbo
-
+	[0xF2] = "Locked", -- Mumbo, Swimming, Text Boxes
 	[0xF3] = "Locked", -- Mumbo first person camera water surface
 	[0xF4] = "Landing", -- Mumbo - Water Surface
 	[0xF5] = "Locked", -- Mumbo
 	[0xF6] = "Locked", -- Mumbo
 	[0xF7] = "Attacking", -- Mumbo's Wand
-
+	[0xF8] = "Failure", -- Golden Goliath, Premature Failure
 	[0xF9] = "Idle", -- Golden Goliath
 	[0xFA] = "Walking", -- Golden Goliath
 	[0xFB] = "Jumping", -- Golden Goliath
 	[0xFC] = "Kicking", -- Golden Goliath
+	[0xFD] = "Failure", -- Golden Goliath, Run out of time
 
 	[0xFF] = "Recovering", -- Mumbo
 	[0x100] = "Damaged", -- Solo Kazooie
 	[0x101] = "Death", -- Solo Kazooie
 	[0x102] = "Death", -- Solo Banjo - Sack Pack
 	[0x103] = "Death", -- Solo Banjo
-
 	[0x104] = "Death", -- Detonator
 	[0x105] = "Locked", -- Detonator, Loading Zone, First Person Camera
 
@@ -1014,6 +1047,7 @@ local movementStates = {
 	[0x126] = "Jumping", -- Taxi Pack
 	[0x127] = "Leaving Taxi Pack",
 
+	[0x12B] = "Saucer of Peril",
 	[0x12C] = "Swimming", -- Submarine
 	[0x12D] = "Damaged", -- Submarine
 	[0x12E] = "Death", -- Submarine
@@ -1021,6 +1055,7 @@ local movementStates = {
 	[0x130] = "Locked", -- Submarine - Loading Zone, Transforming etc
 	[0x131] = "Idle", -- Submarine
 	[0x132] = "Landing", -- Clockwork Kazooie
+	[0x133] = "Falling", -- Clockwork Kazooie
 	[0x134] = "Jumping", -- Clockwork Kazooie
 	[0x135] = "Walking", -- Clockwork Kazooie
 	[0x136] = "Idle", -- Clockwork Kazooie
@@ -1046,6 +1081,7 @@ local movementStates = {
 	[0x14A] = "Falling", -- Big T-Rex
 	[0x14B] = "Jumping", -- Big T-Rex
 
+	[0x14D] = "Knockback", -- Big T-Rex
 	[0x14E] = "Locked", -- Big T-Rex, Talking
 	[0x14F] = "Roar", -- Big T-Rex
 	[0x150] = "Walking", -- Big T-Rex
@@ -1064,7 +1100,8 @@ local movementStates = {
 	[0x15E] = "Paddling", -- Solo Kazooie
 	[0x15F] = "Diving", -- Solo Kazooie
 	[0x160] = "Landing", -- Solo Kazooie - Water Surface
-
+	[0x161] = "Entering Flight", -- Solo Kazooie
+	[0x162] = "Flying", -- Solo Kazooie
 	[0x163] = "Entering Sack Pack",
 	[0x164] = "Leaving Sack Pack",
 	[0x165] = "Idle", -- Sack Pack
@@ -1081,6 +1118,8 @@ local movementStates = {
 	[0x171] = "Entering Snooze Pack",
 	[0x172] = "Leaving Snooze Pack",
 
+	[0x174] = "Beak Bomb", -- Solo Kazooie
+	[0x175] = "Exiting Beak Bomb", -- Solo Kazooie
 	[0x176] = "Recovering", -- Solo Kazooie, post splat
 
 	[0x17B] = "Idle", -- On Wall, Claw Clamber
@@ -1088,9 +1127,12 @@ local movementStates = {
 	[0x17D] = "Idle", -- Snowball
 	[0x17E] = "Rolling", -- Snowball
 	[0x17F] = "Jumping", -- Snowball
-
+	[0x180] = "Falling", -- Snowball
 	[0x181] = "Damaged", -- Snowball
-
+	[0x182] = "Death", -- Snowball
+	[0x183] = "Locked", -- Snowball, Loading Zone
+	[0x184] = "Knockback", -- Snowball
+	[0x185] = "Locked", -- Snowball, Text Boxes
 	[0x186] = "Jumping", -- Solo Kazooie - Springy Step Shoes
 	[0x187] = "Idle", -- Solo Kazooie - On Wall, Claw Clamber
 	[0x188] = "Walking", -- Solo Kazooie - On Wall, Claw Clamber
