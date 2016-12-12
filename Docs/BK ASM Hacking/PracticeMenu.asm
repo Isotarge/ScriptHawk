@@ -74,16 +74,23 @@ InPracMenu:
 		NOP
 		
 		LA a1 MenuOptionStates
+		LA a2 MenuOptionStringSet
 		ADDU a1 a1 s3
 		LB a0 PageTopPos
 		ADDU a1 a1 a0
 		LB a1 0(a1)
+		ADDU a0 a0 s3
+		SLL a0 a0 2
+		ADDU a2 a2 a0		
+		LW a2 0(a2)
+		SLL a1 a1 3
+		ADDU a1 a1 a2
 		
 		LA a0 MenuItemStr 
 		SLL s2 s3 5
 		ADDU a0 a0 s2
 		
-		JAL @IToA_10
+		JAL @AppendString
 		NOP
 		
 		ADDIU s3 s3 1 ;s3++
@@ -189,10 +196,20 @@ InPracMenu:
 		ADDU a0 a0 a1
 		LA a1 MenuOptionStates
 		ADDU a1 a1 a0
+		MOV s3 a0 ;option number
 		LB a0 0(a1)
 		//increment current option's state
 		ADDIU a0 a0 1
-		SB a0 0(a1)
+		LA s2 MenuOptionMaxStates
+		ADDU s2 s2 s3
+		LB a2 0(s2)
+		ADDI a2 a2 -1
+		MOV a1 zero
+		JAL @ClampInt
+		NOP
+		LA a1 MenuOptionStates
+		ADDU a1 a1 s3
+		SB v0 0(a1)
 		//Need to clamp
 		
 		
@@ -438,12 +455,39 @@ NormalModeCode_MenuSetup:
 //Take Me There
 LB a0 TakeMeThereState
 BEQ a0 zero NormalModeCode_TakeMeThereEnd
+	;convert from option number  to level index
 	
-	LB a0 TakeMeThereState
+	LI at 0x01
+	//TO DO: reorder levels, add DoG and FF
+	BEQL a0 at TakeMeThereWorkLoad
+	LI a0 0x0B
+		LI at 0x08
+		BEQL a0 at TakeMeThereWorkLoad
+		LI a0 0x0A
+			LI at 0x0A
+			BEQL a0 at TakeMeThereWorkLoad
+			LI a0 0x08
+				LI at 0x0D
+				BEQL a0 at TakeMeThereWorkLoad
+				LI a0 0x0C
+					LI at 0x06
+					SUB at a0 at
+					BLEZL at TakeMeThereWorkLoad
+					SUBI a0 a0 1
+						LI a1 0x01
+						LI at 0x0B
+						BEQL a0 at TakeMeThereNotLevel
+						LI v0 0x8E
+							LI a1 0x0A
+							LI at 0x0C
+							BEQL a0 at TakeMeThereNotLevel
+							LI v0 0x93
+	TakeMeThereWorkLoad:
 	JAL @GetMainExitFromLevelIndex
-	LB a0 TakeMeThereState
+	NOP
 	JAL @GetMainMapFromLevelIndex
 	MOV a1 v0
+	TakeMeThereNotLevel:
 	LI a2 1
 	JAL @TakeMeThere_LevelReset
 	MOV a0 v0
@@ -451,7 +495,6 @@ BEQ a0 zero NormalModeCode_TakeMeThereEnd
 	
 NormalModeCode_TakeMeThereEnd:
 
-//Take Me There
 LB a0 TransformMeState
 BEQ a0 zero NormalModeCode_TransformMeEnd
 
@@ -599,33 +642,62 @@ MenuLabelStrings:
 .asciiz "TRANSFORM ME: \0"	  ;OFF, BANJO, TERMITE, CROC, WALRUS, PUMPKIN, BEE, WASHY
 .asciiz "\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0"
 
-OnOffOptionSting:
-.asciiz "OFF"
-.asciiz " ON"
+MenuOptionMaxStates:
+InfinitesMaxState:
+.byte 2
+ResetOnEnterMaxState:
+.byte 2
+TakeMeThereMaxState:
+.byte 14
+MoveSetMaxState:
+.byte 6
+L2LevitateMaxState:
+.byte 2
+TransformMeMaxState:
+.byte 1
+
+.align 2 0
+MenuOptionStringSet:
+InfinitesStringSet:
+.word OnOffOptionString
+ResetOnEnterStringSet:
+.word OnOffOptionString
+TakeMeThereStringSet:
+.word TakeMeThereOptionString
+MoveSetStringSet:
+.word MoveSetOptionString
+L2LevitateStringSet:
+.word OnOffOptionString
+TransformMeStringSet:
+.word OnOffOptionString
+
+OnOffOptionString:
+.asciiz "OFF\0\0\0\0"
+.asciiz "ON\0\0\0\0\0"
 
 MoveSetOptionString: ;6
-.asciiz "OFF"
-.asciiz "NON"
-.asciiz " SM"
-.asciiz "FF1" ;FFM no Eggs
-.asciiz "FF2" ;FFM Eggs
-.asciiz "ALL"
+.asciiz "OFF\0\0\0\0"
+.asciiz "NONE\0\0\0"
+.asciiz "SM\0\0\0\0\0"
+.asciiz "FFM\0\0\0\0" ;FFM no Eggs
+.asciiz "FFM EGG" ;FFM Eggs
+.asciiz "ALL\0\0\0\0"
 
-TakeMeThereOptions:
-.asciiz "OFF"
-.asciiz " SM"
-.asciiz " MM"
-.asciiz "TTC"
-.asciiz " CC"
-.asciiz "BGS"
-.asciiz " FP"
-.asciiz " GV"
-.asciiz "MMM"
-.asciiz "RBB"
-.asciiz "CCW"
-.asciiz " FF"
-.asciiz "DOG"
-.asciiz "END"
+TakeMeThereOptionString:
+.asciiz "OFF\0\0\0\0"
+.asciiz "SM\0\0\0\0\0"
+.asciiz "MM\0\0\0\0\0"
+.asciiz "TTC\0\0\0\0"
+.asciiz "CC\0\0\0\0\0"
+.asciiz "BGS\0\0\0\0"
+.asciiz "FP\0\0\0\0\0"
+.asciiz "GV\0\0\0\0\0"
+.asciiz "MMM\0\0\0\0"
+.asciiz "RBB\0\0\0\0"
+.asciiz "CCW\0\0\0\0"
+.asciiz "FF\0\0\0\0\0"
+.asciiz "DOG\0\0\0\0"
+.asciiz "GRUNTY\0"
 
 
 
