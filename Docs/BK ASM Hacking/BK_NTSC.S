@@ -1,4 +1,39 @@
 /*-------------------------------
+| ENUMS
+---------------------------------*/
+[ItemIndex_Timer_Skull]: 0x01
+[ItemIndex_Timer_Propellor]: 0x03
+[ItemIndex_Timer_ChristmasTree]: 0x05
+[ItemIndex_Timer_Hourglass]: 0x06
+[ItemIndex_Notes]: 0x0C
+[ItemIndex_Eggs]: 0x0D
+[ItemIndex_Jiggies_CurrentLevel]: 0x12
+[ItemIndex_RedFeather]: 0x0F
+[ItemIndex_GoldFeather]:0x10
+[ItemIndex_Jinjos_CurrentLevel]: 0x12
+[ItemIndex_EmptyHoneycombPiece]: 0x13
+[ItemIndex_Health]: 0x14
+[ItemIndex_HealthContainers]:0x15
+[ItemIndex_Lives]:0x16
+[ItemIndex_Air]:0x17
+[ItemIndex_GoldBullions]:0x18
+[ItemIndex_Orange]:0x19
+[ItemIndex_PlayerVileScore]:0x1A
+[ItemIndex_VileVileScore]:0x1B
+[ItemIndex_MumboTokens_OnHand]:0x1C
+[ItemIndex_Grumblie]:0x1D
+[ItemIndex_Yumblie]:0x1E
+[ItemIndex_GreenPresent]:0x1F
+[ItemIndex_BluePresent]:0x20
+[ItemIndex_RedPresent]:0x21
+[ItemIndex_Caterpillar]:0x22
+[ItemIndex_Acorn]:0x23
+[ItemIndex_Twinklie]:0x24
+[ItemIndex_MumboTokens]:0x25
+[ItemIndex_Jiggies]:0x26
+[ItemIndex_JokerCard]:0x27
+
+/*-------------------------------
 | VARIABLES
 ---------------------------------*/
 [PauseMenuStringsBase]: 0x8036C4E0
@@ -14,6 +49,8 @@
 [PauseMenuState]: 0x80383010
 
 [ReturnToLairEnabled]: 0x80383080
+
+[ItemBase]: 0x80385F30
 
 /*-------------------------------
 | Functions

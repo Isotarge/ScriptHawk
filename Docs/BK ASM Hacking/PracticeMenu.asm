@@ -458,7 +458,7 @@ BEQ a0 zero NormalModeCode_TakeMeThereEnd
 	;convert from option number  to level index
 	
 	LI at 0x01
-	//TO DO: reorder levels, add DoG and FF
+	;Reorder levels
 	BEQL a0 at TakeMeThereWorkLoad
 	LI a0 0x0B
 		LI at 0x08
@@ -527,9 +527,35 @@ NormalModeCode_LToLevitateNormal:
 ;If Ingame-Timer/AutoSplitter
 	;JAL Ingame-Timer
 	NOP
+
 ;If Infinites
-	;JAL Infinites
-	NOP
+LB a0 InfinitesState
+BEQ a0 zero NormalModeCode_InfinitesNormal
+NOP
+	LI a1 @ItemBase  
+	LI a0 900
+	SW a0 0x30(a1) ;Notes
+	LI a0 100
+	SW a0 0x34(a1) ;Eggs
+	SW a0 0x98(a1) ;Jiggies
+	LI a0 50
+	SW a0 0x3C(a1) ;Reds
+	LI a0 50
+	SW a0 0x40(a1) ;Golds
+	LI a0 5
+	SW a0 0x50(a1) ;Health
+	LI a0 9
+	SW a0 0x58(a1) ;Lives
+	LI a0 0xE10
+	SW a0 0x5C(a1) ;Air
+	LI a0 99
+	SW a0 0x70(a1) ;MumboTokens_OnHand
+	SW a0 0x94(a1) ;MumboTokens
+	SW a0 0x9C(a1) ;JokerCards
+	
+	
+NormalModeCode_InfinitesNormal:
+
 ;If resetUponEnteringLevel
 	;JAL ResetUponEnteringLevel
 	NOP

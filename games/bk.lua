@@ -64,6 +64,7 @@ local max_lives = 9;
 local max_air = 6 * 600; -- 6 * 500 on PAL
 local max_mumbo_tokens = 99;
 local max_jiggies = 100;
+local max_joker_cards = 99;
 
 local eep_checksum = {
 	{ address = 0x74, value = 0 }, -- Save Slot 1
@@ -2819,6 +2820,7 @@ function Game.applyInfinites()
 	mainmemory.write_s32_be(collectable_base + collectable_offsets.mumbo_tokens, max_mumbo_tokens);
 	mainmemory.write_s32_be(collectable_base + collectable_offsets.mumbo_tokens_on_hand, max_mumbo_tokens);
 	mainmemory.write_s32_be(collectable_base + collectable_offsets.jiggies, max_jiggies);
+	mainmemory.write_s32_be(collectable_base + collectable_offsets.joker_cards, max_joker_cards);
 end
 
 function Game.initUI()
