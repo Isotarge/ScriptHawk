@@ -291,10 +291,10 @@ character_states = {
 	},
 	[0x03] = { -- Samus
 		[0xDD] = "Appearing 1",
-		[0xDE] = "Start of Charge Shoot", [0xDF] = "Charging", [0xE0] = "Shooting",
-		[0xE1] = "Start of Charge Shoot (Aerial)", [0xE2] = "Shooting (Aerial)",
-		[0xE3] = "Up-Special", [0xE4] = "Up-Special (Aerial)",
-		[0xE5] = "Down-Special", [0xE6] = "Down-Special (Aerial)",
+		[0xDE] = "Starting Charge Shot", [0xDF] = "Charging", [0xE0] = "Shooting",
+		[0xE1] = "Starting Charge Shot (Aerial)", [0xE2] = "Shooting (Aerial)",
+		[0xE3] = "Screw Attack", [0xE4] = "Screw Attack (Aerial)",
+		[0xE5] = "Bomb", [0xE6] = "Bomb (Aerial)",
 	},
 	[0x04] = { -- Luigi
 		[0xDC] = "Jab 3",
@@ -321,7 +321,7 @@ character_states = {
 	[0x07] = { -- Captain Falcon
 		[0xDC] = "Jab 3", [0xDD] = "Start of Jab loop", [0xDE] = "Jab loop", [0xDF] = "End of Jab loop",
 		[0xE1] = "Appearing (Aerial)", [0xE2] = "Blue Falcon", [0xE3] = "Blue Falcon",
-		[0xE4] = "N-Special", [0xE5] = "N-Special (Aerial)",
+		[0xE4] = "Falcon Punch", [0xE5] = "Falcon Punch (Aerial)",
 		[0xE6] = "Down-Special", [0xE7] = "Velocity X Down-Special (Aerial)",
 		[0xE8] = "Landing while Down-Special", [0xE9] = "Down-Special (Aerial)", [0xEA] = "Bumping while Down-Special",
 		[0xEB] = "Falcon Dive", [0xEC] = "Cathing Enemy while F Dive", [0xED] = "End of Falcon Dive",
@@ -333,14 +333,14 @@ character_states = {
 		[0xDF] = "Jumping (Aerial) [4]", [0xE0] = "Jumping (Aerial) [3]",
 		[0xE1] = "Jumping (Aerial) [2]", [0xE2] = "Jumping (Aerial) [1]", [0xE3] = "Jumping (Aerial) [0]",
 		-- Mario
-		[0xE7] = "Red Fireball", [0xE8] = "Red Fireball (Aerial)",
+		[0xE7] = "Fireball", [0xE8] = "Fireball (Aerial)",
 		-- Luigi
-		[0xE9] = "Green Fireball", [0xEA] = "Green Fireball (Aerial)",
+		[0xE9] = "Fireball", [0xEA] = "Fireball (Aerial)",
 		-- Fox
 		[0xEB] = "Laser", [0xEC] = "Laser (Aerial)",
 		-- Samus
-		[0xED] = "Start of Charge Shoot", [0xEE] = "Charging", [0xEF] = "Shooting",
-		[0xF0] = "Start of Charge Shoot (Aerial)", [0xF1] = "Shooting (Aerial)",
+		[0xED] = "Start of Charge Shot", [0xEE] = "Charging", [0xEF] = "Shooting",
+		[0xF0] = "Start of Charge Shot (Aerial)", [0xF1] = "Shooting (Aerial)",
 		-- DK
 		[0xF2] = "Start of Charge", [0xF3] = "Start of Charge (Aerial)",
 		[0xF4] = "Charging", [0xF5] = "Charging (Aerial)",
@@ -372,7 +372,7 @@ character_states = {
 		-- Jigglypuff
 		[0x125] = "Pound", [0x126] = "Pound (Aerial)",
 		-- Captain Falcon
-		[0x127] = "Falcon Punching", [0x128] = "Falcon Punching (Aerial)",
+		[0x127] = "Falcon Punch", [0x128] = "Falcon Punch (Aerial)",
 		-- Yoshi
 		[0x129] = "N-Special", [0x12A] = "Succeeding N-Special", [0x12B] = "End of N-Special",
 		[0x12C] = "N-Special (Aerial)", [0x12D] = "Succeeding N-Special (Aerial)", [0x12E] = "End of N-Special (Aerial)",
@@ -667,21 +667,6 @@ function Game.initUI()
 	ScriptHawk.UI.form_controls["Music Checkbox"] = forms.checkbox(ScriptHawk.UI.options_form, "Set Music", ScriptHawk.UI.col(0) + ScriptHawk.UI.dropdown_offset, ScriptHawk.UI.row(7) + ScriptHawk.UI.dropdown_offset);
 end
 
-function Game.eachFrame()
-	if forms.ischecked(ScriptHawk.UI.form_controls.toggle_hitboxes) then
-		Game.showHitboxes();
-	end
-
-	if forms.ischecked(ScriptHawk.UI.form_controls["Music Checkbox"]) then
-		local musicString = forms.gettext(ScriptHawk.UI.form_controls["Music Dropdown"]);
-		for i = 1, #Game.music do
-			if Game.music[i] == musicString then
-				Game.setMusic(i - 1);
-			end
-		end
-	end
-end
-
 local playerOSD = {
 	[1] = {
 		{"P1", Game.getPlayerOSD, playerColors[1]},
@@ -748,7 +733,36 @@ function buildOSD(p1, p2, p3, p4)
 	return OSD;
 end
 
---Game.OSD = buildOSD(true, false, false, false);
-Game.OSD = buildOSD(true, true, true, true);
+-- Used to dynamically update OSD based on which players are in the battle
+local currentOSDBools = {true, false, false, false};
+Game.OSD = buildOSD(true, false, false, false);
+
+function Game.eachFrame()
+	if forms.ischecked(ScriptHawk.UI.form_controls.toggle_hitboxes) then
+		Game.showHitboxes();
+	end
+
+	if forms.ischecked(ScriptHawk.UI.form_controls["Music Checkbox"]) then
+		local musicString = forms.gettext(ScriptHawk.UI.form_controls["Music Dropdown"]);
+		for i = 1, #Game.music do
+			if Game.music[i] == musicString then
+				Game.setMusic(i - 1);
+			end
+		end
+	end
+
+	-- Dynamically update OSD based on which players are in the battle
+	local OSDBools = {};
+	for i = 1, 4 do
+		local playerActor = Game.getPlayer(i);
+		if isRDRAM(playerActor) then
+			OSDBools[i] = isRDRAM(dereferencePointer(playerActor + player_fields.PositionDataPointer));
+		end
+	end
+	if OSDBools[1] ~= currentOSDBools[1] or OSDBools[2] ~= currentOSDBools[2] or OSDBools[3] ~= currentOSDBools[3] or OSDBools[4] ~= currentOSDBools[4] then
+		Game.OSD = buildOSD(OSDBools[1], OSDBools[2], OSDBools[3], OSDBools[4]);
+		currentOSDBools = OSDBools;
+	end
+end
 
 return Game;
