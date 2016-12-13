@@ -479,6 +479,21 @@ function Game.getMovementString(player)
 	return "Unknown "..toHexString(movementState);
 end
 
+function Game.getJumpCounter(player)
+	local playerActor = Game.getPlayer(player);
+	if isRDRAM(playerActor) then
+		return mainmemory.readbyte(playerActor + player_fields.JumpCounter);
+	end
+	return 0;
+end
+
+function Game.setJumpCounter(value, player)
+	local playerActor = Game.getPlayer(player);
+	if isRDRAM(playerActor) then
+		mainmemory.writebyte(playerActor + player_fields.JumpCounter, value);
+	end
+end
+
 function Game.getShieldSize(player)
 	local playerActor = Game.getPlayer(player);
 	if isRDRAM(playerActor) then
@@ -671,6 +686,7 @@ local playerOSD = {
 	[1] = {
 		{"P1", Game.getPlayerOSD, playerColors[1]},
 		{"Movement", Game.getMovementString},
+		{"Jumps", Game.getJumpCounter},
 		{"X", Game.getXPosition},
 		{"Y", Game.getYPosition},
 		{"dX"},
@@ -684,6 +700,7 @@ local playerOSD = {
 	[2] = {
 		{"P2", function() return Game.getPlayerOSD(2) end, playerColors[2]},
 		{"Movement", function() return Game.getMovementString(2) end},
+		{"Jumps", function() return Game.getJumpCounter(2) end},
 		{"X", function() return Game.getXPosition(2) end},
 		{"Y", function() return Game.getYPosition(2) end},
 		{"X Velocity", function() return Game.getXVelocity(2) end},
@@ -695,6 +712,7 @@ local playerOSD = {
 	[3] = {
 		{"P3", function() return Game.getPlayerOSD(3) end, playerColors[3]},
 		{"Movement", function() return Game.getMovementString(3) end},
+		{"Jumps", function() return Game.getJumpCounter(3) end},
 		{"X", function() return Game.getXPosition(3) end},
 		{"Y", function() return Game.getYPosition(3) end},
 		{"X Velocity", function() return Game.getXVelocity(3) end},
@@ -706,6 +724,7 @@ local playerOSD = {
 	[4] = {
 		{"P4", function() return Game.getPlayerOSD(4) end, playerColors[4]},
 		{"Movement", function() return Game.getMovementString(4) end},
+		{"Jumps", function() return Game.getJumpCounter(4) end},
 		{"X", function() return Game.getXPosition(4) end},
 		{"Y", function() return Game.getYPosition(4) end},
 		{"X Velocity", function() return Game.getXVelocity(4) end},
