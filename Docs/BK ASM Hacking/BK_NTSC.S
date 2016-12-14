@@ -46,6 +46,10 @@
 
 [SlopeTimer]: 0x8037C2E4
 
+[MapLoadState]:0x8037E8F4
+[Map]: 0x8037E8F5
+[Exit]: 0x8037E8F6
+
 [PauseMenuState]: 0x80383010
 
 [ReturnToLairEnabled]: 0x80383080
@@ -118,6 +122,8 @@
 
 [GetButtonPressTimer]: 0x8029557C ;I: byte $a0 ButtonIndex
 
+[GetMovesUnlockedBitfield]: 0x802957F0
+
 [LockAllMoves]: 0x80295804
 [SetMovesUnlockedBitfield]: 0x8029586C
 
@@ -140,11 +146,22 @@
 
 [Print_CharFont]: 0x802F78FC ;Inputs: (word $a0 XPos), (word $a1 YPos), (char* $a2 str)
 
+[GetLevelAssociatedWithMap]: 0x8030AD48
+
 [GetMainMapFromLevelIndex]: 0x8030ADD8;
 [GetMainExitFromLevelIndex]: 0x8030AE24;
 
+
 [PauseMenu]: 0x80313380
 
+
+[ClearSomeProgressThing]: 0x8032048C
+
+
+[GetCurrentLevel]: 0x80321900
+
+[ClearAllGameProgress]: 0x8031FBA0
+[ClearGameProgressFlags]: 0x8031FFAC
 
 [GetJiggiesCollectedBitfield]:  0x80320F70  ;Outputs: [word $v0]
 
@@ -156,6 +173,12 @@
 
 [GetTotalJiggiesCollectedinLevel]:  0x803211AC  ;I: (byte $a0 LevelIndex)   O: [word $v0]
 [GetTotalJiggiesCollected]:         0x8032123C  ;                           O: [word $v0]
+
+
+[ClearEmptyHoneyCombsCollectedBitfield]: 0x80321340
+
+
+[ClearCollectedMumboTokenFlags]:	0x803215A0 
 
 
 [IsEmptyHoneycombCollected]:                0x803212E4  ;I: (word $a0 EmptyHoneycombIndex)  O: [bool $v0]
@@ -193,3 +216,8 @@
 [NextTokenStart]:   0x8033DB18  ;I: (char* $a0 delimiter, char* $a1 str) O: [char* $v0]
 [StrToken]:         0x8033DB60  ;I: (char* $a0 delimiter, char* $a1 destStr, char* $a2 srcStr)
 [ToUpper]:          0x8033DBA4  ;I: (char* $a0 string)
+
+
+[ClearLevelNoteScores]: 0x80346D78
+
+[ClearInGameLevelTimer]: 0x80347060

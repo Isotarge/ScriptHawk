@@ -31,6 +31,8 @@ NOP
 [PauseMenuData]:0x8036C4E0
 [PauseMenuState]:0x80383010
 
+[TEST]: 0x8037C3A0
+
 //Variables
 [NumberOfOptions]: 0x06
 [PageTopMax]: 0x02
@@ -233,38 +235,34 @@ InPracMenu:
 			//NONE
 			JAL @LockAllMoves
 			NOP
+			SW zero CurrentMoveSet
 			BEQ s3 a1 KeepCurrentMoveSet
 			LI a1 0x02
 			
 			//SM Set
-			LUI a0 0x000B
-			ADDIU a0 a0 0xFDBF
+			LI a0 0x00009DB9
 			JAL @SetMovesUnlockedBitfield
 			NOP
 			BEQ s3 a1 KeepCurrentMoveSet
 			LI a1 0x03
 			
 			//FFM
-			LUI a0 0x000B
-			ADDIU a0 a0 0xFDBF
+			LI a0 0x000BFDBF
 			JAL @SetMovesUnlockedBitfield
 			NOP
 			BEQ s3 a1 KeepCurrentMoveSet
 			LI a1 0x03
 			
 			//FFM + EGGS
-			LUI a0 0x000B
-			ADDIU a0 a0 0xFDFF
+			LI a0 0x000BFDFF
 			JAL @SetMovesUnlockedBitfield
 			NOP
 			BEQ s3 a1 KeepCurrentMoveSet
 			
-			//ALL
-			LUI a0 0x000F
-			ADDIU a0 a0 0xFFFF
+			//ALL 
+			LI a0 0x000FFFFF
 			JAL @SetMovesUnlockedBitfield
 			NOP
-			
 		KeepCurrentMoveSet:
 		SB zero MoveSet
 
@@ -557,8 +555,41 @@ NOP
 NormalModeCode_InfinitesNormal:
 
 ;If resetUponEnteringLevel
-	;JAL ResetUponEnteringLevel
+LB a0 ResetOnEnterState
+BEQ a0 zero NormalModeCode_ResetOnEnter
+LB a2 @MapLoadState
+	BEQ a2 zero NormalModeCode_ResetOnEnter
 	NOP
+		LB a0 @Map
+		JAL @GetLevelAssociatedWithMap
+		MOV a1 a0
+		JAL @GetMainMapFromLevelIndex
+		MOV a0 v0
+		BNE a1 v0 NormalModeCode_ResetOnEnter
+			NOP
+			JAL @GetMainExitFromLevelIndex
+			NOP
+			MOV a0 a1
+			LB a1 @Exit
+			BNE a1 v0 NormalModeCode_ResetOnEnter
+			NOP	
+				;@ClearAllGameProgress clears everything below AND note scores, item counts, and moves 
+				JAL @ClearGameProgressFlags
+				NOP
+				;JAL @ClearLevelNoteScores
+				;NOP
+				JAL @ClearInGameLevelTimer
+				NOP
+				JAL @ZeroJiggyCollectedBitfield
+				NOP
+				JAL @ClearEmptyHoneyCombsCollectedBitfield
+				NOP
+				JAL @ClearCollectedMumboTokenFlags
+				NOP
+				JAL @ClearSomeProgressThing
+				NOP
+NormalModeCode_ResetOnEnter:
+	
 ;If FastWarp
 	;JAL FastWarp
 	NOP
@@ -724,6 +755,13 @@ TakeMeThereOptionString:
 .asciiz "FF\0\0\0\0\0"
 .asciiz "DOG\0\0\0\0"
 .asciiz "GRUNTY\0"
+
+CurrentMoveSet:
+.word 0
+Temp1:
+.word 0
+Temp2:
+.byte 0
 
 
 
