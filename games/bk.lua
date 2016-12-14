@@ -2426,12 +2426,10 @@ function findConga()
 		if isRDRAM(objectArray) then
 			local numObjects = mainmemory.read_u32_be(objectArray);
 			for i = 0, numObjects do
-				local slotBase = objectArray + slot_base + (i * slot_size);
-				local x = mainmemory.readfloat(slotBase + 0x04, true);
-				local y = mainmemory.readfloat(slotBase + 0x08, true);
-				local z = mainmemory.readfloat(slotBase + 0x0C, true);
-				if x == -4100 and y == 236 and z == 4650 then -- TODO: Base this off of animation type, rather than position
-					return slotBase;
+				local currentSlotBase = objectArray + getSlotBase(i);
+				local objectIDPointer = dereferencePointer(currentSlotBase + 0x12C);
+				if isRDRAM(objectIDPointer) and mainmemory.read_u16_be(objectIDPointer + 0x02) == 0x0008 then
+					return currentSlotBase;
 				end
 			end
 		end
