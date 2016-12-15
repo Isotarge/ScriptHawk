@@ -214,7 +214,7 @@ movement_states = {
 	[0x3C] = "Damaged (Tornado)", [0x3D] = "Getting into the Barrel",
 	[0x3E] = "Entering the Pipe", [0x3F] = "Moving inside the Pipe", [0x40] = "Coming out of the Pipe", [0x41] = "Coming out of the Abyth",
 	[0x42] = "Bonk Ceiling",
-	[0x43] = "Facedown N Down", [0x44] = "Faceup N Down", [0x45] = "Facedown Downing", [0x46] = "Faceup Downing",
+	[0x43] = "Facedown N Down", [0x44] = "Faceup N Down", [0x45] = "Facedown Downed", [0x46] = "Faceup Downed",
 	[0x47] = "Getting Recovery from Facedown Down", [0x48] = "Getting Recovery from Faceup Down",
 	[0x49] = "Forwards Teching", [0x4A] = "Backwards Teching",
 	[0x4B] = "Rolling Forwards from Facedown Down", [0x4C] = "Rolling Forwards from Faceup Down",
@@ -240,14 +240,14 @@ movement_states = {
 	[0x8E] = "Ray Gun", [0x8F] = "Ray Gun (Aerial)", [0x90] = "Fire Flower", [0x91] = "Fire Flower (Aerial)",
 	[0x92] = "Hammer (Stand)", [0x93] = "Hammer (Walk)", [0x94] = "Hammer (Switch)",
 	[0x95] = "Hammer (Jump)", [0x96] = "Hammer (Air)", [0x97] = "Hammer (Land)",
-	[0x98] = "Shielding (Start)", [0x99] = "Shielding", [0x9A] = "Shielding (End)",
-	[0x9B] = "Stunning During Shielding",
+	[0x98] = "Shield (Start)", [0x99] = "Shield", [0x9A] = "Shield (End)",
+	[0x9B] = "Stunned During Shield",
 	[0x9C] = "Rolling Forwards", [0x9D] = "Rolling Backwards",
 	[0x9E] = "Shield Breaking",
-	[0xA1] = "SB Downing", [0xA3] = "SB Stunning (Start)", [0xA4] = "SB Stunning", [0xA5] = "Sleep Stunning",
+	[0xA1] = "SB Downed", [0xA3] = "SB Stunned (Start)", [0xA4] = "SB Stunned", [0xA5] = "Sleeping",
 	[0xA6] = "Grab", [0xA7] = "Grabbing (Start)", [0xA8] = "Grabbing", [0xA9] = "Throwing", [0xAA] = "Back Throwing",
 	[0xAB] = "Getting Grabbed (Start)", [0xAC] = "Getting Grabbed",
-	[0xAD] = "Getting Vacuumed", [0xAE] = "Getting Stuffed", [0xAF] = "Getting spitted", [0xB0] = "Getting Copied",
+	[0xAD] = "Getting Vacuumed", [0xAE] = "Getting Stuffed", [0xAF] = "Getting Spat", [0xB0] = "Getting Copied",
 	[0xB1] = "Getting Tongue", [0xB2] = "Being Egg",
 	[0xB3] = "Getting FalconDive",
 	[0xB5] = "Getting Mounted (Start)", [0xB8] = "Getting Mounted",
@@ -413,6 +413,22 @@ character_states = {
 		[0xED] = "Down-Special (Start)", [0xEE] = "Down-Special", [0xEF] = "Cureing", [0xF0] = "Down-Special (End)",
 		[0xF1] = "Down-Special (Aerial) (Start)", [0xF2] = "Down-Special (Aerial)", [0xF3] = "Cureing (Aerial)", [0xF4] = "Down-Special (Aerial) (End)",
 	},
+	[0x0C] = { -- Master Hand
+		[0xDD] = "Idle", [0xDE] = "Selecting Move",
+		[0xDF] = "Slapping",
+		[0xE0] = "Shooing",
+		[0xE1] = "Launching", [0xE2] = "Flying", [0xE3] = "Landing",
+		[0xE4] = "Walking (Start)", [0xE5] = "Walking", [0xE7] = "Flicking",
+		[0xE8] = "Charging (Start)", [0xE9] = "Charging", [0xEA] = "Landing", [0xEB] = "Punching",
+		[0xEC] = "Pointing (Start)", [0xED] = "Poking", [0xEE] = "Pointing",
+		[0xEF] = "Drilling",
+		[0xF0] = "Punching",
+		[0xF1] = "Pulling Gun", [0xF2] = "Shooting Gun", [0xF3] = "Aiming Gun",
+		[0xF4] = "Punching (Start)", [0xF5] = "Punching", [0xF6] = "Punching (End)",
+		[0xF7] = "Slamming", [0xF8] = "Slamming (Start)",
+		[0xF9] = "Dying (Start)", [0xFA] = "Dying",
+		[0xFC] = "Appearing",
+	},
 	[0x0D] = { -- Metal Mario
 		[0xDC] = "Jab 3",
 		[0xDE] = "Appearing",
@@ -509,6 +525,14 @@ function Game.getMovementState(player)
 		return mainmemory.read_u16_be(playerActor + player_fields.MovementState);
 	end
 	return 0;
+end
+
+function Game.setMovementState(value, player)
+	local playerActor = Game.getPlayer(player);
+	if isRDRAM(playerActor) then
+		mainmemory.write_u16_be(playerActor + player_fields.MovementState, value);
+		mainmemory.write_u32_be(playerActor + player_fields.MovementFrame, 0);
+	end
 end
 
 function Game.getMovementString(player)
@@ -641,7 +665,6 @@ end
 function Game.setZPosition(value, player)
 	local playerActor = Game.getPlayer(player);
 	if isRDRAM(playerActor) then
-		Game.setYVelocity(0, player);
 		local positionData = dereferencePointer(playerActor + player_fields.PositionDataPointer);
 		if isRDRAM(positionData) then
 			mainmemory.writefloat(positionData + player_fields.PositionData.ZPosition, value, true);
