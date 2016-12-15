@@ -158,6 +158,7 @@ local match_settings = {
 local player_fields = {
 	["Character"] = 0x0B, -- Byte?
 	["Costume"] = 0x10, -- Byte?
+	["MovementFrame"] = 0x1C, -- u32_be
 	["MovementState"] = 0x26, -- u16_be
 	["ShieldSize"] = 0x34, -- s32_be
 	["FacingDirection"] = 0x44, -- s32_be -- -1 = left, 1 = right
@@ -462,8 +463,7 @@ end
 function Game.getMovementState(player)
 	local playerActor = Game.getPlayer(player);
 	if isRDRAM(playerActor) then
-		local movementState = mainmemory.read_u16_be(playerActor + player_fields.MovementState);
-		return movementState;
+		return mainmemory.read_u16_be(playerActor + player_fields.MovementState);
 	end
 	return 0;
 end
@@ -479,6 +479,14 @@ function Game.getMovementString(player)
 		end
 	end
 	return "Unknown "..toHexString(movementState);
+end
+
+function Game.getMovementFrame(player)
+	local playerActor = Game.getPlayer(player);
+	if isRDRAM(playerActor) then
+		return mainmemory.read_u32_be(playerActor + player_fields.MovementFrame);
+	end
+	return 0;
 end
 
 function Game.getJumpCounter(player)
@@ -688,6 +696,7 @@ local playerOSD = {
 	[1] = {
 		{"P1", Game.getPlayerOSD, playerColors[1]},
 		{"Movement", Game.getMovementString},
+		{"Frame", Game.getMovementFrame},
 		{"Jumps", Game.getJumpCounter},
 		{"X", Game.getXPosition},
 		{"Y", Game.getYPosition},
@@ -702,6 +711,7 @@ local playerOSD = {
 	[2] = {
 		{"P2", function() return Game.getPlayerOSD(2) end, playerColors[2]},
 		{"Movement", function() return Game.getMovementString(2) end},
+		{"Frame", function() return Game.getMovementFrame(2) end},
 		{"Jumps", function() return Game.getJumpCounter(2) end},
 		{"X", function() return Game.getXPosition(2) end},
 		{"Y", function() return Game.getYPosition(2) end},
@@ -714,6 +724,7 @@ local playerOSD = {
 	[3] = {
 		{"P3", function() return Game.getPlayerOSD(3) end, playerColors[3]},
 		{"Movement", function() return Game.getMovementString(3) end},
+		{"Frame", function() return Game.getMovementFrame(3) end},
 		{"Jumps", function() return Game.getJumpCounter(3) end},
 		{"X", function() return Game.getXPosition(3) end},
 		{"Y", function() return Game.getYPosition(3) end},
@@ -726,6 +737,7 @@ local playerOSD = {
 	[4] = {
 		{"P4", function() return Game.getPlayerOSD(4) end, playerColors[4]},
 		{"Movement", function() return Game.getMovementString(4) end},
+		{"Frame", function() return Game.getMovementFrame(4) end},
 		{"Jumps", function() return Game.getJumpCounter(4) end},
 		{"X", function() return Game.getXPosition(4) end},
 		{"Y", function() return Game.getYPosition(4) end},
