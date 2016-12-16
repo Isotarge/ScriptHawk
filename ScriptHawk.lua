@@ -377,6 +377,9 @@ local supportedGames = {
 	["E2929E10FCCC0AA84E5776227E798ABC07CEDABF"] = {["moduleName"] = "games.smash64", ["friendlyName"] = "Super Smash Bros. (USA)"},
 	["88C8FED5ECD5ED901CB5FC4B5BBEFFA3EA022DF7"] = {["moduleName"] = "games.smash64", ["friendlyName"] = "19XXTE 0.11"},
 
+	--Space Station Silicon Valley
+	["E5E09205AA743A9E5043A42DF72ADC379C746B0B"] = {["moduleName"] = "games.sssv", ["friendlyName"] = "Space Station Silicon Valley (USA)"},
+	["BB359A75941DF74BF7290212C89FBC6E2C5601FE"] = {["moduleName"] = "games.sssv", ["friendlyName"] = "Space Station Silicon Valley (Europe) (En,Fr,De)"},
 	-- Tetris Attack
 	-- TODO: Support more versions of this game
 	["EAD855D774C9943F7FFB5B4F429B2DD07FB6F606"] = {["moduleName"] = "Tetris Attack Bot", ["selfContained"] = true, ["friendlyName"] = "Panel de Pon (Japan)"}, -- SNES

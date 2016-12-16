@@ -1,0 +1,9 @@
+SystemID N64
+3F28E8	d	h	1	RDRAM	Camera X Pos
+3F28EC	d	f	1	RDRAM	Camera Y Pos
+3F28F0	d	f	1	RDRAM	Camera Z Pos
+3F2900	d	f	1	RDRAM	Camera Z Rotation
+3F2904	d	f	1	RDRAM	Target Camera Z Rotation
+3F2D30	d	h	1	RDRAM	Score
+3D5534	w	u	1	RDRAM	CurrentAnimalObject
+
