@@ -159,7 +159,9 @@ end
 
 function Game.setYPosition(value)
 	local animalPointer = Game.getCurrentAnimalVariablePointer();
-	return mainmemory.write_u32_be(animalPointer+animal_variable_offsets.y_position, value*0xFFFF);
+	mainmemory.write_u32_be(animalPointer+animal_variable_offsets.y_position, value*0xFFFF);
+	Game.setYVelocity(0);
+	return;
 end
 
 function Game.setZPosition(value)
@@ -199,10 +201,9 @@ function Game.setXRotation(value) -- Optional
 end
 
 function Game.setYRotation(value) -- Optional
-	function Game.getYRotation() -- Optional
 	local animalPointer = Game.getCurrentAnimalVariablePointer();
-	return mainmemory.write_u16_be(animalPointer+animal_variable_offsets.y_rotation, value);
-end
+	mainmemory.write_u16_be(animalPointer+animal_variable_offsets.y_rotation, value);
+	return;
 end
 
 function Game.setZRotation(value) -- Optional
@@ -242,12 +243,12 @@ end
 
 function Game.setYVelocity(value)
 	local animalPointer = Game.getCurrentAnimalVariablePointer();
-	return mainmemory.write_u32_be(animalPointer+animal_variable_offsets.x_velocity, value*0xFFFF);
+	return mainmemory.write_u32_be(animalPointer+animal_variable_offsets.y_velocity, value*0xFFFF);
 end
 
 function Game.setZVelocity(value)
 	local animalPointer = Game.getCurrentAnimalVariablePointer();
-	return mainmemory.write_u32_be(animalPointer+animal_variable_offsets.x_velocity, value*0xFFFF);
+	return mainmemory.write_u32_be(animalPointer+animal_variable_offsets.z_velocity, value*0xFFFF);
 end
 
 function Game.getVelocity() -- Calculated VXZ
