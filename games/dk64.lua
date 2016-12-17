@@ -3200,7 +3200,8 @@ end
 function Game.colorNoclipByte()
 	local playerObject = Game.getPlayerObject();
 	if isRDRAM(playerObject) then
-		if mainmemory.readbyte(playerObject + obj_model1.noclip_byte) == 0x01 then
+		local value = mainmemory.readbyte(playerObject + obj_model1.noclip_byte);
+		if not (check_bit(value, 2) and check_bit(value, 3)) then
 			return 0xFF007FFF; -- Blue
 		end
 	end
