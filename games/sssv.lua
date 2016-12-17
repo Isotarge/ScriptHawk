@@ -186,7 +186,7 @@ function Game.getXPosition()
 	local animalPointer = Game.getCurrentAnimalVariablePointer();
 	if isRDRAM(animalPointer) then
 		animalPointer = animalPointer + animal_variable_offsets.x_position;
-		return mainmemory.read_u32_be(animalPointer)/0xFFFF;
+		return mainmemory.read_u32_be(animalPointer)/0x10000;
 	else
 		return 0;	
 	end
@@ -196,7 +196,7 @@ function Game.getYPosition()
 	local animalPointer = Game.getCurrentAnimalVariablePointer();
 	if isRDRAM(animalPointer) then
 		animalPointer = animalPointer + animal_variable_offsets.y_position;
-		return mainmemory.read_u32_be(animalPointer)/0xFFFF;
+		return mainmemory.read_u32_be(animalPointer)/0x10000;
 	else
 		return 0;	
 	end
@@ -215,7 +215,7 @@ function Game.getZPosition()
 	local animalPointer = Game.getCurrentAnimalVariablePointer();
 	if isRDRAM(animalPointer) then
 		animalPointer = animalPointer + animal_variable_offsets.z_position;
-		return mainmemory.read_u32_be(animalPointer)/0xFFFF;
+		return mainmemory.read_u32_be(animalPointer)/0x10000;
 	else
 		return 0;	
 	end
@@ -225,7 +225,7 @@ function Game.setXPosition(value)
 	local animalPointer = Game.getCurrentAnimalVariablePointer();
 	if isRDRAM(animalPointer) then
 		animalPointer = animalPointer + animal_variable_offsets.x_position;
-		mainmemory.write_u32_be(animalPointer, value*0xFFFF);
+		mainmemory.write_u32_be(animalPointer, value*0x10000);
 	end
 	return;
 end
@@ -234,7 +234,7 @@ function Game.setYPosition(value)
 	local animalPointer = Game.getCurrentAnimalVariablePointer();
 	if isRDRAM(animalPointer) then
 		animalPointer = animalPointer + animal_variable_offsets.y_position;
-		mainmemory.write_u32_be(animalPointer, value*0xFFFF);
+		mainmemory.write_u32_be(animalPointer, value*0x10000);
 		Game.setYVelocity(0);
 	end
 	return;
@@ -244,7 +244,7 @@ function Game.setZPosition(value)
 	local animalPointer = Game.getCurrentAnimalVariablePointer();
 	if isRDRAM(animalPointer) then
 		animalPointer = animalPointer + animal_variable_offsets.z_position;
-		mainmemory.write_u32_be(animalPointer, value*0xFFFF);
+		mainmemory.write_u32_be(animalPointer, value*0x10000);
 	end
 	return;
 end
@@ -288,7 +288,7 @@ function Game.getXVelocity()
 	local animalPointer = Game.getCurrentAnimalVariablePointer();
 	if isRDRAM(animalPointer) then
 		animalPointer = animalPointer + animal_variable_offsets.x_velocity;
-		return mainmemory.read_u16_be(animalPointer)/0xFFFF;
+		return mainmemory.read_u16_be(animalPointer)/0x10000;
 	else
 		return 0;
 	end
@@ -299,7 +299,7 @@ function Game.getYVelocity()
 	local animalPointer = Game.getCurrentAnimalVariablePointer();
 	if isRDRAM(animalPointer) then
 		animalPointer = animalPointer + animal_variable_offsets.y_velocity;
-		return mainmemory.read_u16_be(animalPointer)/0xFFFF;
+		return mainmemory.read_u16_be(animalPointer)/0x10000;
 	else
 		return 0;
 	end
@@ -315,7 +315,7 @@ function Game.getZVelocity()
 	local animalPointer = Game.getCurrentAnimalVariablePointer();
 	if isRDRAM(animalPointer) then
 		animalPointer = animalPointer + animal_variable_offsets.z_velocity;
-		return mainmemory.read_u16_be(animalPointer)/0xFFFF;
+		return mainmemory.read_u16_be(animalPointer)/0x10000;
 	else
 		return 0;
 	end
@@ -325,7 +325,7 @@ function Game.setXVelocity(value)
 	local animalPointer = Game.getCurrentAnimalVariablePointer();
 	if isRDRAM(animalPointer) then
 		animalPointer = animalPointer + animal_variable_offsets.x_velocity;
-		mainmemory.write_u32_be(animalPointer, value*0xFFFF);
+		mainmemory.write_u32_be(animalPointer, value*0x10000);
 	end
 	return
 end
@@ -334,7 +334,7 @@ function Game.setYVelocity(value)
 	local animalPointer = Game.getCurrentAnimalVariablePointer();
 	if isRDRAM(animalPointer) then
 		animalPointer = animalPointer + animal_variable_offsets.y_velocity;
-		mainmemory.write_u32_be(animalPointer, value*0xFFFF);
+		mainmemory.write_u32_be(animalPointer, value*0x10000);
 	end
 	return
 end
@@ -343,7 +343,7 @@ function Game.setZVelocity(value)
 	local animalPointer = Game.getCurrentAnimalVariablePointer();
 	if isRDRAM(animalPointer) then
 		animalPointer = animalPointer + animal_variable_offsets.z_velocity;
-		mainmemory.write_u32_be(animalPointer, value*0xFFFF);
+		mainmemory.write_u32_be(animalPointer, value*0x10000);
 	end
 	return
 end
@@ -385,11 +385,11 @@ function Game.applyInfinites() -- Optional: Toggled by a checkbox. If this funct
 	local animalPointer = Game.getCurrentAnimalVariablePointer();
 	if isRDRAM(animalPointer) then
 		local value = max_health;
-		mainmemory.write_u32_be(animalPointer + animal_variable_offsets.health, value*0xFFFF);
+		mainmemory.write_u32_be(animalPointer + animal_variable_offsets.health, value*0x10000);
 		value = max_A_skill;
-		mainmemory.write_u32_be(animalPointer + animal_variable_offsets.A_skill_energy, value*0xFFFF);
+		mainmemory.write_u32_be(animalPointer + animal_variable_offsets.A_skill_energy, value*0x10000);
 		value = max_B_skill;
-		mainmemory.write_u32_be(animalPointer + animal_variable_offsets.B_skill_energy, value*0xFFFF);
+		mainmemory.write_u32_be(animalPointer + animal_variable_offsets.B_skill_energy, value*0x10000);
 	end
 	
 	return;
