@@ -2296,6 +2296,7 @@ function Game.detectVersion(romName, romHash)
 		obj_model1.velocity = 0xB0;
 		obj_model1.y_velocity = 0xB8;
 		obj_model1.y_acceleration = 0xBC;
+		obj_model1.noclip_byte = 0x134;
 		obj_model1.hand_state = 0x137;
 		obj_model1.control_state_byte = 0x144;
 		obj_model1.control_states = { -- TODO: Fill this in
