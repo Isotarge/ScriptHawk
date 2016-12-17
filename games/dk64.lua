@@ -3197,6 +3197,22 @@ function Game.getNoclipByte()
 	return "Unknown";
 end
 
+function Game.colorNoclipByte()
+	local playerObject = Game.getPlayerObject();
+	if isRDRAM(playerObject) then
+		if mainmemory.readbyte(playerObject + obj_model1.noclip_byte) == 0x01 then
+			return 0xFF007FFF; -- Blue
+		end
+	end
+end
+
+function Game.setNoclipByte(value)
+	local playerObject = Game.getPlayerObject();
+	if isRDRAM(playerObject) then
+		mainmemory.writebyte(playerObject + obj_model1.noclip_byte, value);
+	end
+end
+
 function Game.getAnimationTimer1()
 	local playerObject = Game.getPlayerObject();
 	if isRDRAM(playerObject) then
@@ -5136,6 +5152,7 @@ function Game.initUI()
 
 	-- Checkboxes
 	ScriptHawk.UI.form_controls["Toggle Homing Ammo Checkbox"] = forms.checkbox(ScriptHawk.UI.options_form, "Homing Ammo", ScriptHawk.UI.col(0) + ScriptHawk.UI.dropdown_offset, ScriptHawk.UI.row(6) + ScriptHawk.UI.dropdown_offset);
+	ScriptHawk.UI.form_controls["Toggle Noclip Checkbox"] = forms.checkbox(ScriptHawk.UI.options_form, "Noclip", ScriptHawk.UI.col(10) + ScriptHawk.UI.dropdown_offset, ScriptHawk.UI.row(5) + ScriptHawk.UI.dropdown_offset);
 	--ScriptHawk.UI.form_controls["Toggle Neverslip Checkbox"] = forms.checkbox(ScriptHawk.UI.options_form, "Never Slip", ScriptHawk.UI.col(10) + ScriptHawk.UI.dropdown_offset, ScriptHawk.UI.row(5) + ScriptHawk.UI.dropdown_offset);
 	ScriptHawk.UI.form_controls["Toggle Paper Mode Checkbox"] = forms.checkbox(ScriptHawk.UI.options_form, "Paper Mode", ScriptHawk.UI.col(5) + ScriptHawk.UI.dropdown_offset, ScriptHawk.UI.row(5) + ScriptHawk.UI.dropdown_offset);
 	ScriptHawk.UI.form_controls["Toggle OhWrongnana"] = forms.checkbox(ScriptHawk.UI.options_form, "OhWrongnana", ScriptHawk.UI.col(5) + ScriptHawk.UI.dropdown_offset, ScriptHawk.UI.row(6) + ScriptHawk.UI.dropdown_offset);
@@ -5490,6 +5507,10 @@ function Game.eachFrame()
 		Game.paperMode();
 	end
 
+	if type(ScriptHawk.UI.form_controls["Toggle Noclip Checkbox"]) ~= "nil" and forms.ischecked(ScriptHawk.UI.form_controls["Toggle Noclip Checkbox"]) then
+		Game.setNoclipByte(0x01);
+	end
+
 	-- OhWrongnana
 	if type(ScriptHawk.UI.form_controls["Toggle OhWrongnana"]) ~= "nil" and forms.ischecked(ScriptHawk.UI.form_controls["Toggle OhWrongnana"]) then
 		ohWrongnana();
@@ -5580,7 +5601,7 @@ Game.standardOSD = {
 	{"Mode", Game.getCurrentMode},
 	{"File", Game.getFileIndex},
 	{"EEPROM Slot", Game.getCurrentEEPROMSlot},
-	{"Noclip", Game.getNoclipByte},
+	{"Noclip", Game.getNoclipByte, Game.colorNoclipByte},
 	{"Separator", 1},
 	{"X", Game.getXPosition},
 	{"Y", Game.getYPosition},
