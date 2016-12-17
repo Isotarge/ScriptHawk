@@ -780,6 +780,7 @@ obj_model1 = {
 		["bone_array_1_pointer"] = 0x74, -- Pointer: Used for enemy eye position, bullets & oranges, telegrabs & tree warps
 		["bone_array_2_pointer"] = 0x78, -- Pointer: Used for enemy eye position, bullets & oranges, telegrabs & tree warps
 	},
+	["noclip_byte"] = 0x144, -- Byte? Bitfield?
 	["hand_state"] = 0x147, -- Bitfield
 	["control_state_byte"] = 0x154,
 	["control_states"] = {
@@ -3188,6 +3189,14 @@ function Game.setMovementState(value)
 end
 Game.setControlState = Game.setMovementState;
 
+function Game.getNoclipByte()
+	local playerObject = Game.getPlayerObject();
+	if isRDRAM(playerObject) then
+		return toHexString(mainmemory.readbyte(playerObject + obj_model1.noclip_byte));
+	end
+	return "Unknown";
+end
+
 function Game.getAnimationTimer1()
 	local playerObject = Game.getPlayerObject();
 	if isRDRAM(playerObject) then
@@ -5571,6 +5580,7 @@ Game.standardOSD = {
 	{"Mode", Game.getCurrentMode},
 	{"File", Game.getFileIndex},
 	{"EEPROM Slot", Game.getCurrentEEPROMSlot},
+	{"Noclip", Game.getNoclipByte},
 	{"Separator", 1},
 	{"X", Game.getXPosition},
 	{"Y", Game.getYPosition},
