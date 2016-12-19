@@ -9,29 +9,29 @@
 [ItemIndex_Eggs]: 0x0D
 [ItemIndex_Jiggies_CurrentLevel]: 0x12
 [ItemIndex_RedFeather]: 0x0F
-[ItemIndex_GoldFeather]:0x10
+[ItemIndex_GoldFeather]: 0x10
 [ItemIndex_Jinjos_CurrentLevel]: 0x12
 [ItemIndex_EmptyHoneycombPiece]: 0x13
 [ItemIndex_Health]: 0x14
-[ItemIndex_HealthContainers]:0x15
-[ItemIndex_Lives]:0x16
-[ItemIndex_Air]:0x17
-[ItemIndex_GoldBullions]:0x18
-[ItemIndex_Orange]:0x19
-[ItemIndex_PlayerVileScore]:0x1A
-[ItemIndex_VileVileScore]:0x1B
-[ItemIndex_MumboTokens_OnHand]:0x1C
-[ItemIndex_Grumblie]:0x1D
-[ItemIndex_Yumblie]:0x1E
-[ItemIndex_GreenPresent]:0x1F
-[ItemIndex_BluePresent]:0x20
-[ItemIndex_RedPresent]:0x21
-[ItemIndex_Caterpillar]:0x22
-[ItemIndex_Acorn]:0x23
-[ItemIndex_Twinklie]:0x24
-[ItemIndex_MumboTokens]:0x25
-[ItemIndex_Jiggies]:0x26
-[ItemIndex_JokerCard]:0x27
+[ItemIndex_HealthContainers]: 0x15
+[ItemIndex_Lives]: 0x16
+[ItemIndex_Air]: 0x17
+[ItemIndex_GoldBullions]: 0x18
+[ItemIndex_Orange]: 0x19
+[ItemIndex_PlayerVileScore]: 0x1A
+[ItemIndex_VileVileScore]: 0x1B
+[ItemIndex_MumboTokens_OnHand]: 0x1C
+[ItemIndex_Grumblie]: 0x1D
+[ItemIndex_Yumblie]: 0x1E
+[ItemIndex_GreenPresent]: 0x1F
+[ItemIndex_BluePresent]: 0x20
+[ItemIndex_RedPresent]: 0x21
+[ItemIndex_Caterpillar]: 0x22
+[ItemIndex_Acorn]: 0x23
+[ItemIndex_Twinklie]: 0x24
+[ItemIndex_MumboTokens]: 0x25
+[ItemIndex_Jiggies]: 0x26
+[ItemIndex_JokerCard]: 0x27
 
 /*-------------------------------
 | VARIABLES
@@ -46,7 +46,7 @@
 
 [SlopeTimer]: 0x8037C2E4
 
-[MapLoadState]:0x8037E8F4
+[MapLoadState]: 0x8037E8F4
 [Map]: 0x8037E8F5
 [Exit]: 0x8037E8F6
 
@@ -116,72 +116,65 @@
 
 [UpdatePlayerModelToMumboTransFormation]: 0x80291D04
 
-[GetPlayerModel]:   0x80291FAC  ;Outputs:   [half $v0]
-[SetPlayerTransparency]:    0x80291FB8 ;Inputs: (byte $a0 input)
-[SetPlayerModel]:   0x80291FC4  ;Inputs: (half $a0 modelIndex)
+[GetPlayerModel]:        0x80291FAC ;Outputs:   [half $v0]
+[SetPlayerTransparency]: 0x80291FB8 ;Inputs: (byte $a0 input)
+[SetPlayerModel]:        0x80291FC4 ;Inputs: (half $a0 modelIndex)
 
 [GetButtonPressTimer]: 0x8029557C ;I: byte $a0 ButtonIndex
+[GetButtonReleaseTimer]: 0x80295590 ;I: byte $a0 ButtonIndex
 
 [GetMovesUnlockedBitfield]: 0x802957F0
 
 [LockAllMoves]: 0x80295804
-[SetMovesUnlockedBitfield]: 0x8029586C
+
+[SetMovesUnlockedBitfield]: 0x80295864
+[SetHasUsedMovesBitfield]:  0x80295870
 
 [SetYVelocity]: 0x802979A0 ;I: (float $f12)
 
 [GetXZVelocity]: 0x80297AB8 ;Outputs: [float $f0]
 
-[SetGravitationalAcceleration]:0x80297BEC
+[SetGravitationalAcceleration]: 0x80297BEC
+[SetTerminalVelocity]:          0x80297BF8
 
 [AddToYPos]: 0x80298528 ;I: (float $f12)
 
 [SetMumboTransformation]: 0x8029A960
 
-[TakeMeThere_LevelReset]:    0x802E4048  ;I: (word $a0 Map, word $a1 exit, word $a2 loadTransitionTypeIndex)
-[TakeMeThere]:  0x802E4078  ;I: (word $a0 Map, word $a1 exit, word $a2 loadTransitionTypeIndex)
+[TakeMeThere_LevelReset]: 0x802E4048  ;I: (word $a0 Map, word $a1 exit, word $a2 loadTransitionTypeIndex)
+[TakeMeThere]:            0x802E4078  ;I: (word $a0 Map, word $a1 exit, word $a2 loadTransitionTypeIndex)
 
 
 [Print_TotalMenuFont]: 0x802F7870 ;Inputs: (word $a0 XPos), (word $a1 YPos), (word $a3 fontSize), (char* $a3 str)
-
 
 [Print_CharFont]: 0x802F78FC ;Inputs: (word $a0 XPos), (word $a1 YPos), (char* $a2 str)
 
 [GetLevelAssociatedWithMap]: 0x8030AD48
 
-[GetMainMapFromLevelIndex]: 0x8030ADD8;
-[GetMainExitFromLevelIndex]: 0x8030AE24;
+[GetMainMapFromLevelIndex]: 0x8030ADD8
+[GetMainExitFromLevelIndex]: 0x8030AE24
 
 
 [PauseMenu]: 0x80313380
 
+[ClearAllGameProgress]: 0x8031FBA0
+
+[ClearGameProgressFlags]: 0x8031FFAC
 
 [ClearSomeProgressThing]: 0x8032048C
 
-
-[GetCurrentLevel]: 0x80321900
-
-[ClearAllGameProgress]: 0x8031FBA0
-[ClearGameProgressFlags]: 0x8031FFAC
-
 [GetJiggiesCollectedBitfield]:  0x80320F70  ;Outputs: [word $v0]
-
 
 [IsJiggyCollected]:                 0x80320FF0  ;I: (word $a0 JiggyIndex)   O: [bool $v0]
 [ZeroJiggyCollectedBitfield]:       0x8032103C
 [SetJiggyCollectedBit]:             0x8032108C  ;I: (word $a0 JiggyIndex, bool $a1 collected)
 
-
 [GetTotalJiggiesCollectedinLevel]:  0x803211AC  ;I: (byte $a0 LevelIndex)   O: [word $v0]
 [GetTotalJiggiesCollected]:         0x8032123C  ;                           O: [word $v0]
 
 
-[ClearEmptyHoneyCombsCollectedBitfield]: 0x80321340
-
-
-[ClearCollectedMumboTokenFlags]:	0x803215A0 
-
-
 [IsEmptyHoneycombCollected]:                0x803212E4  ;I: (word $a0 EmptyHoneycombIndex)  O: [bool $v0]
+[ClearEmptyHoneyCombsCollectedBitfield]:    0x80321340
 [ZeroEmptyHoneycombCollectedBitfield]:      0x80321340
 [SetEmptyHoneycombCollectedBit]:            0x80321364  ;I: (word $a0 EmptyHoneycombIndex, bool $a1 collected)
 [GetTotalEmptyHoneycombsCollectedInLevel]:  0x803213F8  ;I: (word $a0 levelIndex)           O: [byte $v0]
@@ -189,12 +182,13 @@
 
 
 [IsMumboTokenCollected]:            0x80321364  ;Inputs: (word $a0 MumboTokenIndex) //Outputs: [bool $v0]
+[ClearCollectedMumboTokenFlags]:    0x803215A0
 [ZeroMumboTokenCollectedBitfield]:  0x803215A0
 [SetMumboTokenCollectedBit]:        0x803215D0  ;Inputs: (word $a0 MumboTokenIndex), (bool $a1 collected)
 [GetTotalMumboTokensCollected]:     0x80321664  ;Outputs: [byte $v0]
 
 
-[GetCurrentLevel]:  0x80321900  ;   O: [byte $v0]
+[GetCurrentLevel]:      0x80321900  ;   O: [byte $v0]
 [GetEnteringLevelFlag]: 0x8032190C  ;   O: [byte $v0]
 [SetEnteringLevelFlag]: 0x80321918  ;I: (byte $a0 input)
 
