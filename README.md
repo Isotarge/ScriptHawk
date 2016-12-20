@@ -92,6 +92,7 @@ While ScriptHawk does have basic support for OoT and MM there are people who are
 - Elmo's Number Journey (N64 only)
 - Elmo's Letter Adventure (N64 only)
 - Rayman 2 (N64 only)
+- Space Station Silicon Valley (N64 only)
 
 ##Other Notable Scripts
 - Alex Kidd in Miracle World object viewer with drag and drop support

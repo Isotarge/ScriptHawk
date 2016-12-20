@@ -43,7 +43,6 @@
 - THPS 1/2/3
 - Mickey's Speedway USA
 - Mischief Makers
-- Space Station Silicon Valley
 - Pokémon Snap
 - Doubutsu no Mori (Animal Crossing)
 - Monster Truck Madness 64
