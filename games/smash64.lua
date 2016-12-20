@@ -167,6 +167,7 @@ local player_fields = {
 	["Costume"] = 0x10, -- Byte?
 	["MovementFrame"] = 0x1C, -- u32_be
 	["MovementState"] = 0x26, -- u16_be
+	--0x2C = Health (2 Bytes)
 	["ShieldSize"] = 0x34, -- s32_be
 	["FacingDirection"] = 0x44, -- s32_be -- -1 = left, 1 = right
 	["XVelocity"] = 0x48, -- Float
@@ -182,12 +183,60 @@ local player_fields = {
 		["ZPosition"] = 0x08, -- Float
 	},
 	["JumpCounter"] = 0x148, -- Byte
+	["Grounded"] = 0x14C, -- Byte
+	["ControllerInputPointer"] = 0x1B0,
 	["ShieldBreakerRecoveryTimer"] = 0x26C, -- s32_be
+	--0x39C = Something to do with Attack Hitbox (4 Bytes)
 	["InvinvibilityState"] = 0x5AC, -- u16_be
+	["hurtbox_lower_Stomach"] = 0x5BC,
+	["hurtbox_head"] = 0x5E8,
+	["hurtbox_upper_right_arm"] = 0x614,
+	["hurtbox_upper_right_arm"] = 0x640,
+	["hurtbox_upper_left_arm"] = 0x66C,
+	["hurtbox_lower_right_arm"] = 0x698,
+	["hurtbox_lower_left_arm"] = 0x6C4,
+	["hurtbox_upper_right_leg"] = 0x6F0,
+	["hurtbox_upper_left_leg"] = 0x71C,
+	["hurtbox_lower_right_leg"] = 0x748,
+	["hurtbox_lower_left_leg"] = 0x774,
+	hurtbox = {
+		state = 0x00, -- 4 bytes
+		id = 0x04, -- 4 bytes
+		pointer = 0x08, -- 4 bytes
+		x_position = 0x14, -- Float
+		y_position = 0x18, -- Float
+		z_position = 0x1C, -- Float
+		width = 0x20, -- Float
+		length = 0x24, -- Float
+		height = 0x28, -- Float
+	},
 	["CharacterConstantsPointer"] = 0x9C8,
 	["CharacterConstants"] = {
+		["WalkSpeedMultiplier"] = 0x20, -- Float [Usually Multiplies with 80]
+		["BrakeForce"] = 0x24, -- Float
+		["InitialDashSpeed"] = 0x28, -- Float
+		["DashDeceleration"] = 0x2C, -- Float
+		["RunningSpeed"] = 0x30, -- Float
+		["JumpFrameDelay"] = 0x34, -- Float
+		--0x38 = Starting X-Air Velocity Multiplier after moving before 1st jump (Multiplied by 80)
+		--0x3C = Jumping Height Multiplier (for both jumps) (Float)
+		--0x40 = Jumping Height Variable (for both jumps) (Float)
+		--0x44 = Starting X-Air Velocity Multiplier after moving before 2nd jump (Multiplied by 80)
+		["SecondJumpMultiplier"] = 0x48, -- Float
+		--0x4C = X-Air Acceleration (Float)
+		--0x50 = X-Air Maximum Speed (Float)
+		--0x54 = X-Air Resistance (Float)
+		--0x58 = Fall Speed Acceleration (Float)
+		["TerminalVelocity"] = 0x5C, -- Float
+		["TerminalVelocity_FastFall"] = 0x60, -- Float
 		["NumberOfJumps"] = 0x64,
+		["Weight"] = 0x68, -- Float
+		--0x6C = Small combo connection F (Float)
+		--0x70 = Dash traveling connection F (Float)
+		["ShieldRadius"] = 0x74, -- Float
 	},
+	["CameraZoom"] = 0x864, -- Float
+	["ShieldJump_FrameDelayCounter"] = 0xB1C, -- 4 Bytes
 	["ShowHitbox"] = 0xB4C, -- u32_be
 };
 
@@ -356,7 +405,7 @@ character_states = {
 		[0xF2] = "Charge (Start)", [0xF3] = "Charge (Aerial) (Start)",
 		[0xF4] = "Charging", [0xF5] = "Charging (Aerial)",
 		[0xF6] = "Punching", [0xF7] = "Punching (Aerial)",
-		[0xF8] = "Maximum Punching", [0xF9] = "Maxmum Punching (Aerial)",
+		[0xF8] = "Maximum Punching", [0xF9] = "Maximum Punching (Aerial)",
 		-- Pikachu
 		[0xFC] = "Lightning", [0xFD] = "Lightning (Aerial)",
 		-- Ness
