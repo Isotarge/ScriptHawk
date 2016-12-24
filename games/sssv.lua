@@ -58,18 +58,30 @@ local animal_struct_offsets = {
 	animal_type = 0x9C,
 };
 
-function Game.getCurrentAnimalVariablePointer()
-	local animalObjectPointer = dereferencePointer(mainmemory.read_u16_be(Game.Memory.current_animal_list_index[version]) * 0x08 + Game.Memory.animal_list_pointer_base[version] + 0x04);
+function Game.getCurrentAnimalIndex()
+    return mainmemory.read_u16_be(Game.Memory.current_animal_list_index[version]);
+end
+
+function Game.getAnimalVariablePointer(levelAnimalIndex)
+    local animalObjectPointer = dereferencePointer(levelAnimalIndex * 0x08 + Game.Memory.animal_list_pointer_base[version] + 0x04);
 	if isRDRAM(animalObjectPointer) then
 		return animalObjectPointer;
 	end
 end
 
-function Game.getCurrentAnimalInfoPointer()
-	local animalObjectPointer = dereferencePointer(mainmemory.read_u16_be(Game.Memory.current_animal_list_index[version]) * 0x08 + Game.Memory.animal_list_pointer_base[version]);
+function Game.getCurrentAnimalVariablePointer()
+    return Game.getAnimalVariablePointer(Game.getCurrentAnimalIndex());
+end
+
+function Game.getAnimalInfoPointer(levelAnimalIndex)
+	local animalObjectPointer = dereferencePointer(levelAnimalIndex * 0x08 + Game.Memory.animal_list_pointer_base[version]);
 	if isRDRAM(animalObjectPointer) then
 		return animalObjectPointer;
 	end
+end    
+    
+function Game.getCurrentAnimalInfoPointer()
+	return Game.getAnimalInfoPointer(Game.getCurrentAnimalIndex());
 end
 
 -----------------
@@ -140,88 +152,132 @@ local animalTypes = {
 	[0x43] = "Evo Robot",
 };
 
-function Game.getCurrentAnimalType()
-	local currentAnimalType = Game.getCurrentAnimalInfoPointer();
-	if isRDRAM(currentAnimalType) then
-		currentAnimalType = mainmemory.read_u16_be(currentAnimalType + animal_struct_offsets.animal_type);
-		if type(animalTypes[currentAnimalType]) ~= "nil" then
-			return animalTypes[currentAnimalType];
+function Game.getAnimalType(levelAnimalIndex)
+	local animalType = Game.getAnimalInfoPointer(levelAnimalIndex);
+	if isRDRAM(animalType) then
+		animalType = mainmemory.read_u16_be(animalType + animal_struct_offsets.animal_type);
+		if type(animalTypes[animalType]) ~= "nil" then
+			return animalTypes[animalType];
 		else
-			return "Unknown ("..toHexString(currentAnimalType)..")";
+			return "Unknown ("..toHexString(animalType)..")";
 		end
 	else
 		return " ";
 	end
 end
 
+function Game.getCurrentAnimalType()
+    return Game.getAnimalType(Game.getCurrentAnimalIndex());
+end
+
 --------------
 -- Position --
 --------------
 
+--Player Specific
 function Game.getXPosition()
-	local animalPointer = Game.getCurrentAnimalVariablePointer();
+    return Game.getAnimalXPosition(Game.getCurrentAnimalIndex());
+end
+
+function Game.getYPosition()
+    return Game.getAnimalYPosition(Game.getCurrentAnimalIndex());
+end
+
+function Game.getZPosition()
+    return Game.getAnimalZPosition(Game.getCurrentAnimalIndex());
+end
+
+function Game.setXPosition(value)
+    return Game.setAnimalXPosition(value, Game.getCurrentAnimalIndex());
+end
+
+function Game.setYPosition(value)
+    return Game.setAnimalYPosition(value, Game.getCurrentAnimalIndex());
+end
+
+function Game.setZPosition(value)
+    return Game.setAnimalZPosition(value, Game.getCurrentAnimalIndex());
+end
+
+--General Animal on Map
+function Game.getAnimalXPosition(levelAnimalIndex)
+	local animalPointer = Game.getAnimalVariablePointer(levelAnimalIndex);
 	if isRDRAM(animalPointer) then
 		return mainmemory.read_u32_be(animalPointer + animal_variable_offsets.x_position) / 0x10000;
 	end
 	return 0;
 end
 
-function Game.getYPosition()
-	local animalPointer = Game.getCurrentAnimalVariablePointer();
+function Game.getAnimalYPosition(levelAnimalIndex)
+	local animalPointer = Game.getAnimalVariablePointer(levelAnimalIndex);
 	if isRDRAM(animalPointer) then
 		return mainmemory.read_u32_be(animalPointer + animal_variable_offsets.y_position) / 0x10000;
 	end
 	return 0;
 end
 
-function Game.getZPosition()
-	local animalPointer = Game.getCurrentAnimalVariablePointer();
+function Game.getAnimalZPosition(levelAnimalIndex)
+	local animalPointer = Game.getAnimalVariablePointer(levelAnimalIndex);
 	if isRDRAM(animalPointer) then
 		return mainmemory.read_u32_be(animalPointer + animal_variable_offsets.z_position) / 0x10000;
 	end
 	return 0;
 end
 
-function Game.setXPosition(value)
-	local animalPointer = Game.getCurrentAnimalVariablePointer();
+function Game.setAnimalXPosition(value,levelAnimalIndex)
+	local animalPointer = Game.getAnimalVariablePointer(levelAnimalIndex);
 	if isRDRAM(animalPointer) then
 		mainmemory.write_u32_be(animalPointer + animal_variable_offsets.x_position, value * 0x10000);
 	end
 end
 
-function Game.setYPosition(value)
-	local animalPointer = Game.getCurrentAnimalVariablePointer();
+function Game.setAnimalYPosition(value,levelAnimalIndex)
+	local animalPointer = Game.getAnimalVariablePointer(levelAnimalIndex);
 	if isRDRAM(animalPointer) then
 		mainmemory.write_u32_be(animalPointer + animal_variable_offsets.y_position, value * 0x10000);
 		Game.setYVelocity(0);
 	end
 end
 
-function Game.setZPosition(value)
-	local animalPointer = Game.getCurrentAnimalVariablePointer();
+function Game.setAnimalZPosition(value,levelAnimalIndex)
+	local animalPointer = Game.getAnimalVariablePointer(levelAnimalIndex);
 	if isRDRAM(animalPointer) then
 		mainmemory.write_u32_be(animalPointer + animal_variable_offsets.z_position, value * 0x10000);
 	end
 end
 
+
 --------------
 -- Rotation --
 --------------
 
+--Player specific
 function Game.getYRotation()
-	local animalPointer = Game.getCurrentAnimalVariablePointer();
+	return Game.getAnimalYRotation(Game.getCurrentAnimalIndex());
+end
+
+function Game.setYRotation(value)
+	 return Game.setAnimalYRotation(value, Game.getCurrentAnimalIndex());
+end
+
+--current map animals
+function Game.getAnimalYRotation(levelAnimalIndex)
+	local animalPointer = Game.getAnimalVariablePointer(levelAnimalIndex);
 	if isRDRAM(animalPointer) then
 		return mainmemory.read_u16_be(animalPointer + animal_variable_offsets.y_rotation);
 	end
 	return 0;
 end
 
-function Game.setYRotation(value)
-	local animalPointer = Game.getCurrentAnimalVariablePointer();
+function Game.setAnimalYRotation(value, levelAnimalIndex)
+	local animalPointer = Game.getAnimalVariablePointer(levelAnimalIndex);
 	if isRDRAM(animalPointer) then
 		mainmemory.write_u16_be(animalPointer + animal_variable_offsets.y_rotation, value);
 	end
 end
+
+
+
 
 --------------
 -- Velocity --
@@ -262,7 +318,7 @@ function Game.setYVelocity(value)
 	local animalPointer = Game.getCurrentAnimalVariablePointer();
 	if isRDRAM(animalPointer) then
 		animalPointer = animalPointer + animal_variable_offsets.y_velocity;
-		mainmemory.write_u32_be(animalPointer + animal_variable_offsets.y_velocity, value * 0x10000);
+		mainmemory.write_u32_be(animalPointer, value * 0x10000);
 	end
 end
 
