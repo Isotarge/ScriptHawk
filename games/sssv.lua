@@ -234,8 +234,8 @@ end
 function Game.setAnimalYPosition(value,levelAnimalIndex)
 	local animalPointer = Game.getAnimalVariablePointer(levelAnimalIndex);
 	if isRDRAM(animalPointer) then
-		mainmemory.write_u32_be(animalPointer + animal_variable_offsets.y_position, value * 0x10000);
-		Game.setYVelocity(0);
+        mainmemory.write_u32_be(animalPointer + animal_variable_offsets.y_position, value * 0x10000);
+		Game.setAnimalYVelocity(0, levelAnimalIndex);
 	end
 end
 
@@ -283,47 +283,78 @@ end
 -- Velocity --
 --------------
 
+--Player specific
 function Game.getXVelocity()
-	local animalPointer = Game.getCurrentAnimalVariablePointer();
+    return Game.getAnimalXVelocity(Game.getCurrentAnimalIndex());
+end
+
+function Game.getYVelocity()
+    return Game.getAnimalYVelocity(Game.getCurrentAnimalIndex());
+end
+
+function Game.getZVelocity()
+    return Game.getAnimalZVelocity(Game.getCurrentAnimalIndex());
+end
+
+function Game.setXVelocity(value)
+    return Game.setAnimalXVelocity(value, Game.getCurrentAnimalIndex());
+end
+
+function Game.setYVelocity(value)
+    return Game.setAnimalYVelocity(value, Game.getCurrentAnimalIndex());
+end
+
+function Game.setZVelocity(value)
+    return Game.setAnimalZVelocity(value, Game.getCurrentAnimalIndex());
+end
+
+function Game.getVelocity() -- Calculated VXZ
+	return Game.getAnimalVelocity(Game.getCurrentAnimalIndex());
+end
+
+
+--current map animals
+function Game.getAnimalXVelocity(levelAnimalIndex)
+	local animalPointer = Game.getAnimalVariablePointer(levelAnimalIndex);
 	if isRDRAM(animalPointer) then
 		return mainmemory.read_u16_be(animalPointer + animal_variable_offsets.x_velocity) / 0x10000;
 	end
 	return 0;
 end
 
-function Game.getYVelocity()
-	local animalPointer = Game.getCurrentAnimalVariablePointer();
+function Game.getAnimalYVelocity(levelAnimalIndex)
+	local animalPointer = Game.getAnimalVariablePointer(levelAnimalIndex);
 	if isRDRAM(animalPointer) then
 		return mainmemory.read_u16_be(animalPointer + animal_variable_offsets.y_velocity) / 0x10000;
 	end
 	return 0;
 end
 
-function Game.getZVelocity()
-	local animalPointer = Game.getCurrentAnimalVariablePointer();
+function Game.getAnimalZVelocity(levelAnimalIndex)
+	local animalPointer = Game.getAnimalVariablePointer(levelAnimalIndex);
 	if isRDRAM(animalPointer) then
 		return mainmemory.read_u16_be(animalPointer + animal_variable_offsets.z_velocity) / 0x10000;
 	end
 	return 0;
 end
 
-function Game.setXVelocity(value)
-	local animalPointer = Game.getCurrentAnimalVariablePointer();
+function Game.setAnimalXVelocity(value, levelAnimalIndex)
+	local animalPointer = Game.getAnimalVariablePointer(levelAnimalIndex);
 	if isRDRAM(animalPointer) then
 		mainmemory.write_u32_be(animalPointer + animal_variable_offsets.x_velocity, value * 0x10000);
 	end
 end
 
-function Game.setYVelocity(value)
-	local animalPointer = Game.getCurrentAnimalVariablePointer();
+function Game.setAnimalYVelocity(value, levelAnimalIndex)
+	local animalPointer = Game.getAnimalVariablePointer(levelAnimalIndex);
 	if isRDRAM(animalPointer) then
 		animalPointer = animalPointer + animal_variable_offsets.y_velocity;
 		mainmemory.write_u32_be(animalPointer, value * 0x10000);
 	end
 end
 
-function Game.setZVelocity(value)
-	local animalPointer = Game.getCurrentAnimalVariablePointer();
+function Game.setAnimalZVelocity(value, levelAnimalIndex)
+	local animalPointer = Game.getAnimalVariablePointer(levelAnimalIndex);
 	if isRDRAM(animalPointer) then
 		animalPointer = animalPointer + animal_variable_offsets.z_velocity;
 		mainmemory.write_u32_be(animalPointer, value*0x10000);
@@ -331,9 +362,9 @@ function Game.setZVelocity(value)
 	return
 end
 
-function Game.getVelocity() -- Calculated VXZ
-	local vX = Game.getXVelocity();
-	local vZ = Game.getZVelocity();
+function Game.getAnimalVelocity(levelAnimalIndex) -- Calculated VXZ
+	local vX = Game.getAnimalXVelocity(levelAnimalIndex);
+	local vZ = Game.getAnimalZVelocity(levelAnimalIndex);
 	return math.sqrt(vX*vX + vZ*vZ);
 end
 
