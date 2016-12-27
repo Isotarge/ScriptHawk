@@ -253,6 +253,29 @@ function table.join(t1, t2)
 	return t3;
 end
 
+-- Recursive Print (structure, limit, indent)
+function table.print(s, l, i)
+	l = (l) or 100;
+	i = i or "";
+	if (l < 1) then
+		print("ERROR: Item limit reached.");
+		return l - 1;
+	end
+	local ts = type(s);
+	if (ts ~= "table") then
+		print(i, ts, s);
+		return l - 1;
+	end
+	print(i, ts);
+	for k,v in pairs(s) do
+		l = table.print(v, l, i.."\t["..tostring(k).."]");
+		if (l < 0) then
+			break;
+		end
+	end
+	return l;
+end
+
 function fileExists(name)
 	if type(name) == 'string' then
 		local f = io.open(name, "r");
