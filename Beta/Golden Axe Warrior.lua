@@ -149,7 +149,7 @@ local object_fields = {
 		[0x64] = {name = "Dragon", color = red}, -- Dungeon 6
 		[0x65] = {name = "Big Skull Boss", color = red}, -- Dungeon ??? -- TODO: Proper Name
 		[0x66] = {name = "Magic", color = yellow}, -- Projecitle, Big Skull Boss -- TODO: Proper Name
-		[0x67] = {name = "Boss - Fake Fire Fhingy", color = red}, -- TODO: Proper Name
+		[0x67] = {name = "Boss - Fake Fire Thingy", color = red}, -- TODO: Proper Name
 		[0x68] = {name = "Boss 1", color = red}, -- Dungeon 1
 		--
 		[0x6A] = {name = "Boss Cloaky Magey Deathy Guy", color = red}, -- Dungeon ??? -- TODO: Proper Name

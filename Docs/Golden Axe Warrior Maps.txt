@@ -1,0 +1,19 @@
+10 Chest - Torch
+12 Chest - Ice Bell
+15 Boss - Red Dragon
+1D Chest - Golden Axe
+1E Boss Rush - Magey Deathy Guy
+44 Boss - Green Dragon
+4C Boss - Red Knight
+57 Chest - Speed Shoes
+5E Boss Rush - Red Knight
+71 Entrance - II
+79 Boss - Fake Fire Thingy
+80 Boss - Green Magey Deathy Guy
+A2 Chest - Canoe
+D5 Chest - ?
+DB Entrance - VII
+F0 Entrance - IV
+F4 Chest - Magic Rope
+F8 Entrance - III 
+FC Entrance - IX

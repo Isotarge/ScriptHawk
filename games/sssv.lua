@@ -59,18 +59,15 @@ local animal_struct_offsets = {
 };
 
 function Game.getCurrentAnimalIndex()
-    return mainmemory.read_u16_be(Game.Memory.current_animal_list_index[version]);
+	return mainmemory.read_u16_be(Game.Memory.current_animal_list_index[version]);
 end
 
 function Game.getAnimalVariablePointer(levelAnimalIndex)
-    local animalObjectPointer = dereferencePointer(levelAnimalIndex * 0x08 + Game.Memory.animal_list_pointer_base[version] + 0x04);
-	if isRDRAM(animalObjectPointer) then
-		return animalObjectPointer;
-	end
+	return dereferencePointer(levelAnimalIndex * 0x08 + Game.Memory.animal_list_pointer_base[version] + 0x04);
 end
 
 function Game.getCurrentAnimalVariablePointer()
-    return Game.getAnimalVariablePointer(Game.getCurrentAnimalIndex());
+	return Game.getAnimalVariablePointer(Game.getCurrentAnimalIndex());
 end
 
 function Game.getAnimalInfoPointer(levelAnimalIndex)
@@ -78,8 +75,8 @@ function Game.getAnimalInfoPointer(levelAnimalIndex)
 	if isRDRAM(animalObjectPointer) then
 		return animalObjectPointer;
 	end
-end    
-    
+end
+
 function Game.getCurrentAnimalInfoPointer()
 	return Game.getAnimalInfoPointer(Game.getCurrentAnimalIndex());
 end
@@ -167,39 +164,39 @@ function Game.getAnimalType(levelAnimalIndex)
 end
 
 function Game.getCurrentAnimalType()
-    return Game.getAnimalType(Game.getCurrentAnimalIndex());
+	return Game.getAnimalType(Game.getCurrentAnimalIndex());
 end
 
 --------------
 -- Position --
 --------------
 
---Player Specific
+-- Player Specific
 function Game.getXPosition()
-    return Game.getAnimalXPosition(Game.getCurrentAnimalIndex());
+	return Game.getAnimalXPosition(Game.getCurrentAnimalIndex());
 end
 
 function Game.getYPosition()
-    return Game.getAnimalYPosition(Game.getCurrentAnimalIndex());
+	return Game.getAnimalYPosition(Game.getCurrentAnimalIndex());
 end
 
 function Game.getZPosition()
-    return Game.getAnimalZPosition(Game.getCurrentAnimalIndex());
+	return Game.getAnimalZPosition(Game.getCurrentAnimalIndex());
 end
 
 function Game.setXPosition(value)
-    return Game.setAnimalXPosition(value, Game.getCurrentAnimalIndex());
+	return Game.setAnimalXPosition(value, Game.getCurrentAnimalIndex());
 end
 
 function Game.setYPosition(value)
-    return Game.setAnimalYPosition(value, Game.getCurrentAnimalIndex());
+	return Game.setAnimalYPosition(value, Game.getCurrentAnimalIndex());
 end
 
 function Game.setZPosition(value)
-    return Game.setAnimalZPosition(value, Game.getCurrentAnimalIndex());
+	return Game.setAnimalZPosition(value, Game.getCurrentAnimalIndex());
 end
 
---General Animal on Map
+-- Current map animals
 function Game.getAnimalXPosition(levelAnimalIndex)
 	local animalPointer = Game.getAnimalVariablePointer(levelAnimalIndex);
 	if isRDRAM(animalPointer) then
@@ -234,7 +231,7 @@ end
 function Game.setAnimalYPosition(value,levelAnimalIndex)
 	local animalPointer = Game.getAnimalVariablePointer(levelAnimalIndex);
 	if isRDRAM(animalPointer) then
-        mainmemory.write_u32_be(animalPointer + animal_variable_offsets.y_position, value * 0x10000);
+		mainmemory.write_u32_be(animalPointer + animal_variable_offsets.y_position, value * 0x10000);
 		Game.setAnimalYVelocity(0, levelAnimalIndex);
 	end
 end
@@ -246,7 +243,6 @@ function Game.setAnimalZPosition(value,levelAnimalIndex)
 	end
 end
 
-
 --------------
 -- Rotation --
 --------------
@@ -257,10 +253,10 @@ function Game.getYRotation()
 end
 
 function Game.setYRotation(value)
-	 return Game.setAnimalYRotation(value, Game.getCurrentAnimalIndex());
+	return Game.setAnimalYRotation(value, Game.getCurrentAnimalIndex());
 end
 
---current map animals
+-- Current map animals
 function Game.getAnimalYRotation(levelAnimalIndex)
 	local animalPointer = Game.getAnimalVariablePointer(levelAnimalIndex);
 	if isRDRAM(animalPointer) then
@@ -276,44 +272,40 @@ function Game.setAnimalYRotation(value, levelAnimalIndex)
 	end
 end
 
-
-
-
 --------------
 -- Velocity --
 --------------
 
---Player specific
+-- Player specific
 function Game.getXVelocity()
-    return Game.getAnimalXVelocity(Game.getCurrentAnimalIndex());
+	return Game.getAnimalXVelocity(Game.getCurrentAnimalIndex());
 end
 
 function Game.getYVelocity()
-    return Game.getAnimalYVelocity(Game.getCurrentAnimalIndex());
+	return Game.getAnimalYVelocity(Game.getCurrentAnimalIndex());
 end
 
 function Game.getZVelocity()
-    return Game.getAnimalZVelocity(Game.getCurrentAnimalIndex());
+	return Game.getAnimalZVelocity(Game.getCurrentAnimalIndex());
 end
 
 function Game.setXVelocity(value)
-    return Game.setAnimalXVelocity(value, Game.getCurrentAnimalIndex());
+	return Game.setAnimalXVelocity(value, Game.getCurrentAnimalIndex());
 end
 
 function Game.setYVelocity(value)
-    return Game.setAnimalYVelocity(value, Game.getCurrentAnimalIndex());
+	return Game.setAnimalYVelocity(value, Game.getCurrentAnimalIndex());
 end
 
 function Game.setZVelocity(value)
-    return Game.setAnimalZVelocity(value, Game.getCurrentAnimalIndex());
+	return Game.setAnimalZVelocity(value, Game.getCurrentAnimalIndex());
 end
 
-function Game.getVelocity() -- Calculated VXZ
+function Game.getVelocity() -- Calculated vXZ
 	return Game.getAnimalVelocity(Game.getCurrentAnimalIndex());
 end
 
-
---current map animals
+-- Current map animals
 function Game.getAnimalXVelocity(levelAnimalIndex)
 	local animalPointer = Game.getAnimalVariablePointer(levelAnimalIndex);
 	if isRDRAM(animalPointer) then
@@ -356,13 +348,11 @@ end
 function Game.setAnimalZVelocity(value, levelAnimalIndex)
 	local animalPointer = Game.getAnimalVariablePointer(levelAnimalIndex);
 	if isRDRAM(animalPointer) then
-		animalPointer = animalPointer + animal_variable_offsets.z_velocity;
-		mainmemory.write_u32_be(animalPointer, value*0x10000);
+		mainmemory.write_u32_be(animalPointer + animal_variable_offsets.z_velocity, value * 0x10000);
 	end
-	return
 end
 
-function Game.getAnimalVelocity(levelAnimalIndex) -- Calculated VXZ
+function Game.getAnimalVelocity(levelAnimalIndex) -- Calculated vXZ
 	local vX = Game.getAnimalXVelocity(levelAnimalIndex);
 	local vZ = Game.getAnimalZVelocity(levelAnimalIndex);
 	return math.sqrt(vX*vX + vZ*vZ);
