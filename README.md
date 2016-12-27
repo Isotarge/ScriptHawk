@@ -75,6 +75,10 @@ A collection of Lua scripts and RAM watches for [BizHawk](https://github.com/TAS
 ###Super Smash Bros.
 - All known versions supported
 
+![Smash 64 Support](Images/Promo/smash64.png)
+
+![Smash 64 Support](Images/Promo/smash64_ui.png)
+
 ###Toy Story 2: Buzz Lightyear to the Rescue
 - Europe (N64)
 - France (N64)
