@@ -927,4 +927,38 @@ function Game.eachFrame()
 	end
 end
 
+function dumpCharacterConstants(player)
+	local playerActor = Game.getPlayer(player);
+	if isRDRAM(playerActor) then
+		local characterConstants = dereferencePointer(playerActor + player_fields.CharacterConstantsPointer);
+		if isRDRAM(characterConstants) then
+			local constants = {
+				WalkSpeedMultiplier = mainmemory.readfloat(characterConstants + player_fields.CharacterConstants.WalkSpeedMultiplier, true),
+				BrakeForce = mainmemory.readfloat(characterConstants + player_fields.CharacterConstants.BrakeForce, true),
+				InitialDashSpeed = mainmemory.readfloat(characterConstants + player_fields.CharacterConstants.InitialDashSpeed, true),
+				DashDeceleration = mainmemory.readfloat(characterConstants + player_fields.CharacterConstants.DashDeceleration, true),
+				RunningSpeed = mainmemory.readfloat(characterConstants + player_fields.CharacterConstants.RunningSpeed, true),
+				JumpFrameDelay = mainmemory.readfloat(characterConstants + player_fields.CharacterConstants.JumpFrameDelay, true),
+				--0x38 = Starting X-Air Velocity Multiplier after moving before 1st jump (Multiplied by 80)
+				--0x3C = Jumping Height Multiplier (for both jumps) (Float)
+				--0x40 = Jumping Height Variable (for both jumps) (Float)
+				--0x44 = Starting X-Air Velocity Multiplier after moving before 2nd jump (Multiplied by 80)
+				SecondJumpMultiplier = mainmemory.readfloat(characterConstants + player_fields.CharacterConstants.SecondJumpMultiplier, true),
+				--0x4C = X-Air Acceleration (Float)
+				--0x50 = X-Air Maximum Speed (Float)
+				--0x54 = X-Air Resistance (Float)
+				--0x58 = Fall Speed Acceleration (Float)
+				TerminalVelocity = mainmemory.readfloat(characterConstants + player_fields.CharacterConstants.TerminalVelocity, true),
+				TerminalVelocity_FastFall = mainmemory.readfloat(characterConstants + player_fields.CharacterConstants.TerminalVelocity_FastFall, true),
+				NumberOfJumps = mainmemory.read_u32_be(characterConstants + player_fields.CharacterConstants.NumberOfJumps),
+				Weight = mainmemory.readfloat(characterConstants + player_fields.CharacterConstants.Weight, true),
+				--0x6C = Small combo connection F (Float)
+				--0x70 = Dash traveling connection F (Float)
+				ShieldRadius = mainmemory.readfloat(characterConstants + player_fields.CharacterConstants.ShieldRadius, true),
+			};
+			return constants;
+		end
+	end
+end
+
 return Game;
