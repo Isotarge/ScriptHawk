@@ -224,8 +224,8 @@ local player_fields = {
 		["RunningSpeed"] = 0x30, -- Float
 		["JumpFrameDelay"] = 0x34, -- Float
 		--0x38 = Starting X-Air Velocity Multiplier after moving before 1st jump (Multiplied by 80)
-		--0x3C = Jumping Height Multiplier (for both jumps) (Float)
-		--0x40 = Jumping Height Variable (for both jumps) (Float)
+		["JumpHeightMultiplier"] = 0x3C, -- Float
+		["JumpHeight"] = 0x40, -- Float
 		--0x44 = Starting X-Air Velocity Multiplier after moving before 2nd jump (Multiplied by 80)
 		["SecondJumpMultiplier"] = 0x48, -- Float
 		["XAirAcceleration"] = 0x4C, -- Float
@@ -823,6 +823,71 @@ function Game.initUI()
 	ScriptHawk.UI.form_controls["Music Checkbox"] = forms.checkbox(ScriptHawk.UI.options_form, "Set Music", ScriptHawk.UI.col(0) + ScriptHawk.UI.dropdown_offset, ScriptHawk.UI.row(7) + ScriptHawk.UI.dropdown_offset);
 end
 
+function dumpCharacterConstants(player)
+	local playerActor = Game.getPlayer(player);
+	if isRDRAM(playerActor) then
+		local characterConstants = dereferencePointer(playerActor + player_fields.CharacterConstantsPointer);
+		if isRDRAM(characterConstants) then
+			local constants = {
+				CharacterName = Game.characters[Game.getCharacter(player)],
+				CharacterAddress = toHexString(playerActor),
+				CharacterConstantsAddress = toHexString(characterConstants),
+				--
+				BodySizeMultiplier = mainmemory.readfloat(characterConstants + player_fields.CharacterConstants.BodySizeMultiplier, true),
+				["UnknownFloat_0x04"] = mainmemory.readfloat(characterConstants + 0x04, true),
+				["UnknownFloat_0x08"] = mainmemory.readfloat(characterConstants + 0x08, true),
+				["UnknownFloat_0x0C"] = mainmemory.readfloat(characterConstants + 0x0C, true),
+				["UnknownFloat_0x1C"] = mainmemory.readfloat(characterConstants + 0x1C, true),
+				WalkSpeedMultiplier = mainmemory.readfloat(characterConstants + player_fields.CharacterConstants.WalkSpeedMultiplier, true),
+				BrakeForce = mainmemory.readfloat(characterConstants + player_fields.CharacterConstants.BrakeForce, true),
+				InitialDashSpeed = mainmemory.readfloat(characterConstants + player_fields.CharacterConstants.InitialDashSpeed, true),
+				DashDeceleration = mainmemory.readfloat(characterConstants + player_fields.CharacterConstants.DashDeceleration, true),
+				RunningSpeed = mainmemory.readfloat(characterConstants + player_fields.CharacterConstants.RunningSpeed, true),
+				JumpFrameDelay = mainmemory.readfloat(characterConstants + player_fields.CharacterConstants.JumpFrameDelay, true),
+				--0x38 = Starting X-Air Velocity Multiplier after moving before 1st jump (Multiplied by 80)
+				JumpHeightMultiplier = mainmemory.readfloat(characterConstants + player_fields.CharacterConstants.JumpHeightMultiplier, true),
+				JumpHeight = mainmemory.readfloat(characterConstants + player_fields.CharacterConstants.JumpHeight, true),
+				--0x44 = Starting X-Air Velocity Multiplier after moving before 2nd jump (Multiplied by 80)
+				SecondJumpMultiplier = mainmemory.readfloat(characterConstants + player_fields.CharacterConstants.SecondJumpMultiplier, true),
+				XAirAcceleration = mainmemory.readfloat(characterConstants + player_fields.CharacterConstants.XAirAcceleration, true),
+				XAirMaximumSpeed = mainmemory.readfloat(characterConstants + player_fields.CharacterConstants.XAirMaximumSpeed, true),
+				XAirResistance = mainmemory.readfloat(characterConstants + player_fields.CharacterConstants.XAirResistance, true),
+				YFallAcceleration = mainmemory.readfloat(characterConstants + player_fields.CharacterConstants.YFallAcceleration, true),
+				TerminalVelocity = mainmemory.readfloat(characterConstants + player_fields.CharacterConstants.TerminalVelocity, true),
+				TerminalVelocity_FastFall = mainmemory.readfloat(characterConstants + player_fields.CharacterConstants.TerminalVelocity_FastFall, true),
+				NumberOfJumps = mainmemory.read_u32_be(characterConstants + player_fields.CharacterConstants.NumberOfJumps),
+				Weight = mainmemory.readfloat(characterConstants + player_fields.CharacterConstants.Weight, true),
+				SmallComboConnection = mainmemory.readfloat(characterConstants + player_fields.CharacterConstants.SmallComboConnection, true),
+				DashToRunConnection = mainmemory.readfloat(characterConstants + player_fields.CharacterConstants.DashToRunConnection, true),
+				ShieldRadius = mainmemory.readfloat(characterConstants + player_fields.CharacterConstants.ShieldRadius, true),
+			};
+			return constants;
+		end
+	end
+end
+
+function dump()
+	table.print(dumpCharacterConstants(1));
+	table.print(dumpCharacterConstants(2));
+	table.print(dumpCharacterConstants(3));
+	table.print(dumpCharacterConstants(4));
+end
+
+function setCharacterAttribute(offset, value, player)
+	if type(offset) == "string" and type(player_fields.CharacterConstants[offset]) == "number" then
+		offset = player_fields.CharacterConstants[offset];
+	end
+	if type(offset) == "number" then
+		local playerActor = Game.getPlayer(player);
+		if isRDRAM(playerActor) then
+			local characterConstants = dereferencePointer(playerActor + player_fields.CharacterConstantsPointer);
+			if isRDRAM(characterConstants) then
+				mainmemory.writefloat(characterConstants + offset, value, true);
+			end
+		end
+	end
+end
+
 local playerOSD = {
 	[1] = {
 		{"P1", Game.getPlayerOSD, playerColors[1]},
@@ -930,56 +995,6 @@ function Game.eachFrame()
 		Game.OSD = buildOSD(OSDBools[1], OSDBools[2], OSDBools[3], OSDBools[4]);
 		currentOSDBools = OSDBools;
 	end
-end
-
-function dumpCharacterConstants(player)
-	local playerActor = Game.getPlayer(player);
-	if isRDRAM(playerActor) then
-		local characterConstants = dereferencePointer(playerActor + player_fields.CharacterConstantsPointer);
-		if isRDRAM(characterConstants) then
-			local constants = {
-				CharacterName = Game.characters[Game.getCharacter(player)],
-				CharacterAddress = toHexString(playerActor),
-				CharacterConstantsAddress = toHexString(characterConstants),
-				--
-				BodySizeMultiplier = mainmemory.readfloat(characterConstants + player_fields.CharacterConstants.BodySizeMultiplier, true),
-				["UnknownFloat_0x04"] = mainmemory.readfloat(characterConstants + 0x04, true),
-				["UnknownFloat_0x08"] = mainmemory.readfloat(characterConstants + 0x08, true),
-				["UnknownFloat_0x0C"] = mainmemory.readfloat(characterConstants + 0x0C, true),
-				["UnknownFloat_0x1C"] = mainmemory.readfloat(characterConstants + 0x1C, true),
-				WalkSpeedMultiplier = mainmemory.readfloat(characterConstants + player_fields.CharacterConstants.WalkSpeedMultiplier, true),
-				BrakeForce = mainmemory.readfloat(characterConstants + player_fields.CharacterConstants.BrakeForce, true),
-				InitialDashSpeed = mainmemory.readfloat(characterConstants + player_fields.CharacterConstants.InitialDashSpeed, true),
-				DashDeceleration = mainmemory.readfloat(characterConstants + player_fields.CharacterConstants.DashDeceleration, true),
-				RunningSpeed = mainmemory.readfloat(characterConstants + player_fields.CharacterConstants.RunningSpeed, true),
-				JumpFrameDelay = mainmemory.readfloat(characterConstants + player_fields.CharacterConstants.JumpFrameDelay, true),
-				--0x38 = Starting X-Air Velocity Multiplier after moving before 1st jump (Multiplied by 80)
-				--0x3C = Jumping Height Multiplier (for both jumps) (Float)
-				--0x40 = Jumping Height Variable (for both jumps) (Float)
-				--0x44 = Starting X-Air Velocity Multiplier after moving before 2nd jump (Multiplied by 80)
-				SecondJumpMultiplier = mainmemory.readfloat(characterConstants + player_fields.CharacterConstants.SecondJumpMultiplier, true),
-				XAirAcceleration = mainmemory.readfloat(characterConstants + player_fields.CharacterConstants.XAirAcceleration, true),
-				XAirMaximumSpeed = mainmemory.readfloat(characterConstants + player_fields.CharacterConstants.XAirMaximumSpeed, true),
-				XAirResistance = mainmemory.readfloat(characterConstants + player_fields.CharacterConstants.XAirResistance, true),
-				YFallAcceleration = mainmemory.readfloat(characterConstants + player_fields.CharacterConstants.YFallAcceleration, true),
-				TerminalVelocity = mainmemory.readfloat(characterConstants + player_fields.CharacterConstants.TerminalVelocity, true),
-				TerminalVelocity_FastFall = mainmemory.readfloat(characterConstants + player_fields.CharacterConstants.TerminalVelocity_FastFall, true),
-				NumberOfJumps = mainmemory.read_u32_be(characterConstants + player_fields.CharacterConstants.NumberOfJumps),
-				Weight = mainmemory.readfloat(characterConstants + player_fields.CharacterConstants.Weight, true),
-				SmallComboConnection = mainmemory.readfloat(characterConstants + player_fields.CharacterConstants.SmallComboConnection, true),
-				DashToRunConnection = mainmemory.readfloat(characterConstants + player_fields.CharacterConstants.DashToRunConnection, true),
-				ShieldRadius = mainmemory.readfloat(characterConstants + player_fields.CharacterConstants.ShieldRadius, true),
-			};
-			return constants;
-		end
-	end
-end
-
-function dump()
-	table.print(dumpCharacterConstants(1));
-	table.print(dumpCharacterConstants(2));
-	table.print(dumpCharacterConstants(3));
-	table.print(dumpCharacterConstants(4));
 end
 
 return Game;
