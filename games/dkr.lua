@@ -1,4 +1,17 @@
-local Game = {};
+local Game = {
+	speedy_speeds = { .001, .01, .1, 1, 5, 10, 20, 50, 100 },
+	speedy_invert_XZ = true,
+	speedy_index = 7,
+	rot_speed = 100,
+	max_rot_units = 65535,
+	Memory = { -- Version order: PAL 1.1, PAL 1.0, Japan, US 1.1, US 1.0
+		["is_paused"] = {0x123B24, 0x1235A4, 0x124F84, 0x123A94, 0x123514},
+		["get_ready"] = {0x11B3C3, 0x11AE43, 0x11C823, 0x11B333, 0x11ADB3},
+		["cheat_menu"] = {0x0E03AC, 0x0DFE2C, 0x0E17FC, 0x0E031C, 0x0DFD9C},
+		["pointer_list"] = {0x11B468, 0x11AEE8, 0x11C8C8, 0x11B3D8, 0x11AE58},
+		["num_objects"] = {0x11B46C, 0x11AEEC, 0x11C8CC, 0x11B3DC, 0x11AE5C},
+	},
+};
 
 local player_object_pointer = 0x3FFFC0; -- Seems to be the same for all versions
 
@@ -72,7 +85,7 @@ local object_fields = {
 		[0x07] = "Green 2",
 		[0x08] = "Green 3", -- TODO: There are more of these
 	},
-	["bananas"] = 0x21D, -- Byte, max 99
+	["bananas"] = 0x21D, -- s8, capped at 99
 	["x_rot"] = 0x23A, -- 16_be
 	["y_rot"] = 0x238, -- 16_be
 	["facing_angle"] = 0x238, -- 16_be
@@ -296,15 +309,6 @@ Game.maps = {
 -- Region/Version --
 --------------------
 
--- Version order: PAL 1.1, PAL 1.0, Japan, US 1.1, US 1.0
-Game.Memory = {
-	["is_paused"] = {0x123B24, 0x1235A4, 0x124F84, 0x123A94, 0x123514},
-	["get_ready"] = {0x11B3C3, 0x11AE43, 0x11C823, 0x11B333, 0x11ADB3},
-	["cheat_menu"] = {0x0E03AC, 0x0DFE2C, 0x0E17FC, 0x0E031C, 0x0DFD9C},
-	["pointer_list"] = {0x11B468, 0x11AEE8, 0x11C8C8, 0x11B3D8, 0x11AE58},
-	["num_objects"] = {0x11B46C, 0x11AEEC, 0x11C8CC, 0x11B3DC, 0x11AE5C},
-};
-
 function Game.detectVersion(romName, romHash)
 	if romHash == "B7F628073237B3D211D40406AA0884FF8FDD70D5" then -- Europe 1.1
 		version = 1;
@@ -342,12 +346,9 @@ end
 -- Physics/Scale --
 -------------------
 
-Game.speedy_speeds = { .001, .01, .1, 1, 5, 10, 20, 50, 100 };
-Game.speedy_invert_XZ = true;
-Game.speedy_index = 7;
-
-Game.rot_speed = 100;
-Game.max_rot_units = 65535;
+function Game.getCharacter()
+	return 8; -- TODO: Default to TT for now
+end
 
 function Game.getVelocity()
 	local playerObject = dereferencePointer(player_object_pointer);
@@ -432,9 +433,16 @@ end
 function Game.getBananas()
 	local playerObject = dereferencePointer(player_object_pointer);
 	if isRDRAM(playerObject) then
-		return mainmemory.readbyte(playerObject + object_fields.bananas);
+		return mainmemory.read_s8(playerObject + object_fields.bananas);
 	end
 	return 0;
+end
+
+function Game.setBananas(value)
+	local playerObject = dereferencePointer(player_object_pointer);
+	if isRDRAM(playerObject) then
+		mainmemory.writebyte(playerObject + object_fields.bananas, value);
+	end
 end
 
 --------------
@@ -596,13 +604,31 @@ local otap_enabled = false;
 local otap_startFrame;
 local otap_startLag;
 
--- TODO: Adjust velocity thresholds based on lateral velocity
--- TODO: Adjust velocity thresholds based on bananas
--- TODO: Adjust velocity thresholds based on character
--- Numbers optimized for TT with 0 bananas
+-- Threshold for switching between A press modulo
 velocity_min = -9.212730408;
 velocity_med = -12.34942532;
 velocity_max = -14.22209072;
+
+function adjustVelMin(value)
+	velocity_min = velocity_min + value;
+	velocity_min = math.min(0, velocity_min); -- Clamp to 0
+	velocity_min = math.max(velocity_med, velocity_min); -- Clamp to velocity_med
+end
+
+function adjustVelMed(value)
+	velocity_med = velocity_med + value;
+	velocity_med = math.min(velocity_min, velocity_med); -- Clamp to velocity_min
+	velocity_med = math.max(velocity_max, velocity_med); -- Clamp to velocity_max
+end
+
+function adjustVelMax(value)
+	velocity_max = velocity_max + value;
+	velocity_max = math.min(velocity_max, velocity_med); -- Clamp to velocity_med
+end
+
+function dumpVelocityValues()
+	return "min: "..round(velocity_min, 3).." med: "..round(velocity_med, 3).." max: "..round(velocity_max, 3);
+end
 
 local function enableOptimalTap()
 	otap_startFrame = emu.framecount();
@@ -618,7 +644,8 @@ end
 
 local function optimalTap()
 	local velocity = Game.getVelocity();
-	local bananas = Game.getBananas();
+	local character = Game.getCharacter();
+	local bananas = math.max(math.min(Game.getBananas(), 10), 0);
 	local boost = Game.getBoost();
 	local getReady = mainmemory.readbyte(Game.Memory.get_ready[version]);
 	local isPaused = mainmemory.read_u16_be(Game.Memory.is_paused[version]);
@@ -656,7 +683,6 @@ local function optimalTap()
 
 	-- Bot taps A once every modulo frames
 	local modulo = 1;
-
 	if velocity >= velocity_min then
 		modulo = 1;
 	elseif velocity >= velocity_med and velocity < velocity_min then
@@ -865,6 +891,17 @@ function Game.initUI()
 	ScriptHawk.UI.form_controls.get_ready_yellow_max_value_label = forms.label(ScriptHawk.UI.options_form, get_ready_yellow_max, ScriptHawk.UI.col(yellow_col_base + 4), ScriptHawk.UI.row(7) + ScriptHawk.UI.label_offset, 32, 14);
 end
 
+--[[
+--Game.setPosition(-1740.12133789063, 28.9976959228516, -7824.4384765625);
+--Game.setYRotation(32768);
+testState = 0;
+testSpace = {
+	min = 0,
+	med = 0,
+	max = 0,
+};
+--]]
+
 function Game.eachFrame()
 	populateObjectPointerList();
 
@@ -885,6 +922,37 @@ function Game.eachFrame()
 	end
 
 	outputBoostStats();
+
+	--[[
+	local zPos = Game.getZPosition();
+	if zPos >= -3800 then
+		local velocity = Game.getVelocity();
+		local character = Game.getCharacter();
+		local bananas = math.max(math.min(Game.getBananas(), 10), 0);
+		print("frame "..emu.framecount().." pos "..round(zPos, 3).." vel "..round(velocity, 3).." || "..dumpVelocityValues());
+		adjustVelMin(testSpace.min);
+		adjustVelMed(testSpace.med);
+		adjustVelMax(testSpace.max);
+
+		if velocity_min >= 0 then
+			print("Warning: Min "..velocity_min.." >= 0");
+		end
+		if velocity_med >= 0 then
+			print("Warning: Med "..velocity_med.." >= 0");
+		end
+		if velocity_max >= 0 then
+			print("Warning: Max "..velocity_max.." >= 0");
+		end
+		if velocity_min <= velocity_med then
+			print("Warning: Min "..velocity_min.." <= Med "..velocity_med);
+		end
+		if velocity_med <= velocity_max then
+			print("Warning: Med "..velocity_med.." <= Max "..velocity_max);
+		end
+
+		savestate.loadslot(testState);
+	end
+	--]]
 end
 
 function Game.drawUI()
