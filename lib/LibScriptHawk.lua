@@ -221,15 +221,7 @@ end
 
 function table.contains(array, value)
 	if type(array) == "table" then
-		-- TODO: Special check for index zero because ipairs doesn't support starting from 0?
-		if type(array[0]) ~= "nil" then
-			if array[0] == value then
-				return true;
-			end
-		end
-
-		-- Carry on
-		for i, v in ipairs(array) do
+		for k, v in pairs(array) do
 			if v == value then
 				return true;
 			end
