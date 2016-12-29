@@ -605,29 +605,33 @@ local otap_startFrame;
 local otap_startLag;
 
 -- Threshold for switching between A press modulo
-velocity_min = -9.212730408;
-velocity_med = -12.34942532;
-velocity_max = -14.22209072;
+--velocity_min = -9.212730408;
+--velocity_med = -12.34942532;
+--velocity_max = -14.22209072;
 
-function adjustVelMin(value)
-	velocity_min = velocity_min + value;
-	velocity_min = math.min(0, velocity_min); -- Clamp to 0
-	velocity_min = math.max(velocity_med, velocity_min); -- Clamp to velocity_med
+velocity_min = {[0] = -9.39,  [1] = -9.44,  [2] = -9.44,  [3] = -9.44,  [4] = -9.44,  [5] = -9.44,  [6] = -9.44,  [7] = -9.44,  [8] = -9.44,  [9] = -9.44,  [10] = -9.44};
+velocity_med = {[0] = -13.16, [1] = -13.17, [2] = -13.17, [3] = -13.17, [4] = -13.17, [5] = -13.17, [6] = -13.17, [7] = -13.17, [8] = -13.17, [9] = -13.17, [10] = -13.17};
+velocity_max = {[0] = -13.29. [1] = -13.28, [2] = -13.28, [3] = -13.28, [4] = -13.28, [5] = -13.28, [6] = -13.28, [7] = -13.28, [8] = -13.28, [9] = -13.28, [10] = -13.28};
+
+function adjustVelMin(value, bananas)
+	velocity_min[bananas] = velocity_min[bananas] + value;
+	velocity_min[bananas] = math.min(0, velocity_min[bananas]); -- Clamp to 0
+	velocity_min[bananas] = math.max(velocity_med[bananas], velocity_min[bananas]); -- Clamp to velocity_med
 end
 
-function adjustVelMed(value)
-	velocity_med = velocity_med + value;
-	velocity_med = math.min(velocity_min, velocity_med); -- Clamp to velocity_min
-	velocity_med = math.max(velocity_max, velocity_med); -- Clamp to velocity_max
+function adjustVelMed(value, bananas)
+	velocity_med[bananas] = velocity_med[bananas] + value;
+	velocity_med[bananas] = math.min(velocity_min[bananas], velocity_med[bananas]); -- Clamp to velocity_min
+	velocity_med[bananas] = math.max(velocity_max[bananas], velocity_med[bananas]); -- Clamp to velocity_max
 end
 
-function adjustVelMax(value)
-	velocity_max = velocity_max + value;
-	velocity_max = math.min(velocity_max, velocity_med); -- Clamp to velocity_med
+function adjustVelMax(value, bananas)
+	velocity_max[bananas] = velocity_max[bananas] + value;
+	velocity_max[bananas] = math.min(velocity_max[bananas], velocity_med[bananas]); -- Clamp to velocity_med
 end
 
 function dumpVelocityValues()
-	return "min: "..round(velocity_min, 3).." med: "..round(velocity_med, 3).." max: "..round(velocity_max, 3);
+	return "min: "..round(velocity_min[bananas], 3).." med: "..round(velocity_med[bananas], 3).." max: "..round(velocity_max[bananas], 3);
 end
 
 local function enableOptimalTap()
@@ -683,13 +687,13 @@ local function optimalTap()
 
 	-- Bot taps A once every modulo frames
 	local modulo = 1;
-	if velocity >= velocity_min then
+	if velocity >= velocity_min[bananas] then
 		modulo = 1;
-	elseif velocity >= velocity_med and velocity < velocity_min then
+	elseif velocity >= velocity_med[bananas] and velocity < velocity_min[bananas] then
 		modulo = 2;
-	elseif velocity >= velocity_max and velocity < velocity_med then
+	elseif velocity >= velocity_max[bananas] and velocity < velocity_med[bananas] then
 		modulo = 3;
-	elseif velocity < velocity_max then
+	elseif velocity < velocity_max[bananas] then
 		modulo = 4;
 	end
 
@@ -924,30 +928,35 @@ function Game.eachFrame()
 	outputBoostStats();
 
 	--[[
+	local velocity = Game.getVelocity();
+	if velocity >= -12 then
+		Game.setXPosition(-1740.12133789063);
+		Game.setZPosition(-7824.4384765625);
+	end
+
 	local zPos = Game.getZPosition();
 	if zPos >= -3800 then
-		local velocity = Game.getVelocity();
 		local character = Game.getCharacter();
 		local bananas = math.max(math.min(Game.getBananas(), 10), 0);
 		print("frame "..emu.framecount().." pos "..round(zPos, 3).." vel "..round(velocity, 3).." || "..dumpVelocityValues());
-		adjustVelMin(testSpace.min);
-		adjustVelMed(testSpace.med);
-		adjustVelMax(testSpace.max);
+		adjustVelMin(testSpace.min, bananas);
+		adjustVelMed(testSpace.med, bananas);
+		adjustVelMax(testSpace.max, bananas);
 
-		if velocity_min >= 0 then
-			print("Warning: Min "..velocity_min.." >= 0");
+		if velocity_min[bananas] >= 0 then
+			print("Warning: Min "..velocity_min[bananas].." >= 0");
 		end
-		if velocity_med >= 0 then
-			print("Warning: Med "..velocity_med.." >= 0");
+		if velocity_med[bananas] >= 0 then
+			print("Warning: Med "..velocity_med[bananas].." >= 0");
 		end
-		if velocity_max >= 0 then
-			print("Warning: Max "..velocity_max.." >= 0");
+		if velocity_max[bananas] >= 0 then
+			print("Warning: Max "..velocity_max[bananas].." >= 0");
 		end
-		if velocity_min <= velocity_med then
-			print("Warning: Min "..velocity_min.." <= Med "..velocity_med);
+		if velocity_min[bananas] <= velocity_med[bananas] then
+			print("Warning: Min "..velocity_min[bananas].." <= Med "..velocity_med[bananas]);
 		end
-		if velocity_med <= velocity_max then
-			print("Warning: Med "..velocity_med.." <= Max "..velocity_max);
+		if velocity_med[bananas] <= velocity_max[bananas] then
+			print("Warning: Med "..velocity_med[bananas].." <= Max "..velocity_max[bananas]);
 		end
 
 		savestate.loadslot(testState);
