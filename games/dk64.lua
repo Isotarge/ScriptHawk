@@ -44,6 +44,7 @@ Game.Memory = {
 	["jumpman_position_y"] = {0x04BD74, 0x03ECD4, 0x03EB04, nil},
 	["jumpman_velocity_x"] = {0x04BD78, 0x03ECD8, 0x03EB08, nil},
 	["jumpman_velocity_y"] = {0x04BD7C, 0x03ECDC, 0x03EB0C, nil},
+	["RNG"] = {0x746A40, 0x7411A0, 0x746300, 0x6F36E0},
 	["mode"] = {0x755318, 0x74FB98, 0x7553D8, 0x6FFE6C}, -- See Game.modes for values
 	["current_map"] = {0x76A0A8, 0x764BC8, 0x76A298, 0x72CDE4}, -- See Game.maps for values
 	["current_exit"] = {0x76A0AC, 0x764BCC, 0x76A29C, 0x72CDE8},
@@ -5416,7 +5417,24 @@ function Game.drawUI()
 	end
 end
 
+--[[
+RNGLock = 0;
+function increaseRNGLock()
+	RNGLock = RNGLock + 1;
+end
+
+function decreaseRNGLock()
+	RNGLock = RNGLock - 1;
+end
+
+ScriptHawk.bindKeyFrame("K", decreaseRNGLock, false);
+ScriptHawk.bindKeyFrame("L", increaseRNGLock, false);
+--]]
+
 function Game.realTime()
+	-- Lock RNG at constant value
+	--mainmemory.write_u32_be(Game.Memory.RNG[version], RNGLock);
+
 	-- Force STVW
 	--local yRot = Game.getYRotation();
 	--if yRot < Game.max_rot_units then
