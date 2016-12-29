@@ -2253,6 +2253,8 @@ local questionTypes = {
 	-- TODO: Finish this table
 };
 
+-- 0x08 Byte - Square Type
+-- 0x09 Byte - Square State - 0x00 Not completed, 0x01 Completed, 0x02 Active
 -- 0x10 Float - Brightness?
 
 function randomizeFFBoardBrightness()
@@ -2263,7 +2265,9 @@ end
 
 function dumpFFBoard()
 	for i = 0, numSquares do
-		dprint(toHexString(Game.Memory.board_base[version] + i * squareSize)..": "..i..": "..questionTypes[mainmemory.readbyte(Game.Memory.board_base[version] + i * squareSize + 0x08)]);
+		local brightness = round(mainmemory.readfloat(Game.Memory.board_base[version] + i * squareSize + 0x10, true), 3);
+		local questionType = questionTypes[mainmemory.readbyte(Game.Memory.board_base[version] + i * squareSize + 0x08)];
+		dprint(toHexString(Game.Memory.board_base[version] + i * squareSize)..": "..i..": brightness "..brightness.." "..questionType);
 	end
 	print_deferred();
 end
