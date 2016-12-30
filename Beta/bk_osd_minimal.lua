@@ -15,6 +15,7 @@ local Game = {
 		["frame_timer"] = {0x280700, 0x27F718, 0x27F718, 0x2808D8},
 		["slope_timer"] = {0x37CCB4, 0x37CDE4, 0x37B4E4, 0x37C2E4},
 		["player_grounded"] = {0x37C930, 0x37CA60, 0x37B160, 0x37BF60},
+		["floor_object_pointer"] = {0x37CBD0, 0x37CD00, 0x37B400, 0x37C200},
 		["x_velocity"] = {0x37CE88, 0x37CFB8, 0x37B6B8, 0x37C4B8},
 		["y_velocity"] = {0x37CE8C, 0x37CFBC, 0x37B6BC, 0x37C4BC},
 		["z_velocity"] = {0x37CE90, 0x37CFC0, 0x37B6C0, 0x37C4C0},
@@ -73,6 +74,14 @@ end
 function angleBetweenPoints(x1, y1, x2, y2)
 	local angle = 180 * (math.atan2(x2 - x1, y2 - y1)) / math.pi;
 	return (angle + 360) % 360;
+end
+
+function Game.getFloor()
+	local floorObject = dereferencePointer(Game.Memory.floor_object_pointer[Game.version]);
+	if isRDRAM(floorObject) then
+		return mainmemory.readfloat(floorObject + 0x40, true);
+	end
+	return 0;
 end
 
 function Game.getXPosition()
@@ -362,6 +371,8 @@ local OSD = {
 	{"X", Game.getXPosition},
 	{"Y", Game.getYPosition},
 	{"Z", Game.getZPosition},
+	{"Separator", 1},
+	{"Floor", Game.getFloor},
 	{"Separator", 1},
 	{"Velocity", Game.getVelocity};
 	{"Y Velocity", Game.getYVelocity},
