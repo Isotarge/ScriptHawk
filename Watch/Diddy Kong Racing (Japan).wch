@@ -1,6 +1,11 @@
 SystemID N64
+0519B4	d	h	1	RDRAM	Velocity Scale (Cap) Write
+051EC0	d	h	1	RDRAM	Forward Velocity Write
+051F2C	d	h	1	RDRAM	Pipsy Unknown Velocity Write
+0520D0	d	h	1	RDRAM	Pipsy Unknown Velocity Write
 0DEDD4	d	h	1	RDRAM	Particle RNG
 0E17FC	d	h	1	RDRAM	Cheat Menu
+0E81F0	d	f	1	RDRAM	Brake Force
 11C823	b	u	1	RDRAM	Get Ready (real)
 11C8C8	d	h	1	RDRAM	Object Pointer List
 11C8CC	d	u	1	RDRAM	Number of Objects
@@ -8,7 +13,7 @@ SystemID N64
 122BD7	b	u	1	RDRAM	Map
 122CC2	b	u	1	RDRAM	Map
 124F60	b	u	1	RDRAM	Map?
-124F67	b	u	1	RDRAM	Map
+124F67	b	u	1	RDRAM	Map (Restart)
 124F85	b	u	1	RDRAM	Is Paused
 127EF0	b	u	1	RDRAM	Character?
 127EF8	b	u	1	RDRAM	Character?
