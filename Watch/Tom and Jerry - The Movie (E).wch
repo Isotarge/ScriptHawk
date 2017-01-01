@@ -1,0 +1,10 @@
+SystemID SMS
+0401	b	u	0	Main RAM	Tom X
+0403	b	u	0	Main RAM	Tom Y
+042B	b	h	0	Main RAM	Invulnerability Timer
+0439	b	h	0	Main RAM	Health
+0441	b	u	0	Main RAM	Jerry X
+0B0F	b	u	0	Main RAM	Stage
+0B13	b	u	1	Main RAM	Screen X
+0B80	b	u	0	Main RAM	Continues
+
