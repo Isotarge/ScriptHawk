@@ -8,8 +8,17 @@ SystemID N64
 1212E2	b	u	1	RDRAM	Map
 123587	b	u	1	RDRAM	Map
 1235A4	w	u	1	RDRAM	Is Paused
+126478	b	u	1	RDRAM	Character P1
+126479	b	u	1	RDRAM	Character P2
+12647A	b	u	1	RDRAM	Character P3
+12647B	b	u	1	RDRAM	Character P4
+126A50	b	u	1	RDRAM	Vehicle P1
+126A51	b	u	1	RDRAM	Vehicle P2
+126A52	b	u	1	RDRAM	Vehicle P3
+126A53	b	u	1	RDRAM	Vehicle P4
 206BB5	b	u	1	RDRAM	Map
 206C3B	b	u	1	RDRAM	Map
 207EA9	b	u	1	RDRAM	Map
 20807C	w	u	1	RDRAM	Balloons
+3FFFC0	d	h	1	RDRAM	Player Object Pointer
 

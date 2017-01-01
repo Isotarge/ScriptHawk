@@ -1,4 +1,8 @@
 SystemID N64
+04687A	w	h	1	RDRAM	Hovercraft Max Speed?
+046882	w	h	1	RDRAM	Hovercraft Drag
+04A1D6	w	h	1	RDRAM	Plane Max Speed?
+0A39BE	w	h	1	RDRAM	Speedometer Offset
 0DF4C7	b	h	1	RDRAM	Track List Map Modifier
 0DFD9C	d	h	1	RDRAM	Cheat Menu
 11ADB3	b	u	1	RDRAM	Get Ready
@@ -8,8 +12,14 @@ SystemID N64
 121252	b	h	1	RDRAM	Map
 1234F7	b	h	1	RDRAM	Map
 123514	w	u	1	RDRAM	Is Paused
-1263E8	b	u	1	RDRAM	Character
-1269C0	b	u	1	RDRAM	Vehicle
+1263E8	b	u	1	RDRAM	Character P1
+1263E9	b	u	1	RDRAM	Character P2
+1263EA	b	u	1	RDRAM	Character P3
+1263EB	b	u	1	RDRAM	Character P4
+1269C0	b	u	1	RDRAM	Vehicle P1
+1269C1	b	u	1	RDRAM	Vehicle P2
+1269C2	b	u	1	RDRAM	Vehicle P3
+1269C3	b	u	1	RDRAM	Vehicle P4
 1FCA19	b	h	1	RDRAM	Map
 1FCBEC	w	u	1	RDRAM	Balloons
 3FFFC0	d	h	1	RDRAM	Player Object Pointer

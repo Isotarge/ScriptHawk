@@ -3,8 +3,11 @@ SystemID N64
 051EC0	d	h	1	RDRAM	Forward Velocity Write
 051F2C	d	h	1	RDRAM	Pipsy Unknown Velocity Write
 0520D0	d	h	1	RDRAM	Pipsy Unknown Velocity Write
-0DEDD4	d	h	1	RDRAM	Particle RNG
+0DEAE8	d	h	1	RDRAM	VI Register Value
+0DEAF0	d	h	1	RDRAM	VI Register Value
+0DEDD4	d	h	1	RDRAM	RNG
 0E17FC	d	h	1	RDRAM	Cheat Menu
+0E4234	b	h	1	RDRAM	Map/Speedometer Toggle P1
 0E81F0	d	f	1	RDRAM	Brake Force
 11C823	b	u	1	RDRAM	Get Ready (real)
 11C8C8	d	h	1	RDRAM	Object Pointer List
@@ -15,14 +18,20 @@ SystemID N64
 124F60	b	u	1	RDRAM	Map?
 124F67	b	u	1	RDRAM	Map (Restart)
 124F85	b	u	1	RDRAM	Is Paused
-127EF0	b	u	1	RDRAM	Character?
-127EF8	b	u	1	RDRAM	Character?
-127F18	b	u	1	RDRAM	Character Select Cursor
-127F20	b	u	1	RDRAM	Character?
-127F22	b	u	1	RDRAM	Character?
-130D1A	b	u	1	RDRAM	Character?
+127F18	b	u	1	RDRAM	Character P1
+127F19	b	u	1	RDRAM	Character P2
+127F1A	b	u	1	RDRAM	Character P3
+127F1B	b	u	1	RDRAM	Character P4
+128508	b	u	1	RDRAM	Vehicle P1
+128509	b	u	1	RDRAM	Vehicle P2
+12850A	b	u	1	RDRAM	Vehicle P3
+12850B	b	u	1	RDRAM	Vehicle P4
+128538	d	h	1	RDRAM	Map Name Pointer
+1287BC	d	u	1	RDRAM	Player Index
 1DB388	d	h	1	RDRAM	TT Interaction State (Dino Domain)
 1DB38C	d	u	1	RDRAM	TT Activation timer (Dino Domain)
+1E4C24	d	f	1	RDRAM	
+1E4CC4	d	f	1	RDRAM	
 1FD4A5	b	u	1	RDRAM	Map
 1FD52B	b	u	1	RDRAM	Map
 1FE6E8	w	b	1	RDRAM	Keys Collected
@@ -30,7 +39,7 @@ SystemID N64
 1FE6EE	w	b	1	RDRAM	Trophies Collected
 1FE6F6	b	u	1	RDRAM	TT Amulet Pieces
 1FE6F7	b	u	1	RDRAM	Wizpig Amulet Pieces
-1FE729	b	u	1	RDRAM	Map (Menu)
+1FE739	b	u	1	RDRAM	Character?
 1FE8FC	w	u	1	RDRAM	Balloons
 3FFFC0	d	h	1	RDRAM	Player object pointer
 

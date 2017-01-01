@@ -6,6 +6,15 @@ SystemID N64
 121777	b	h	1	RDRAM	Map
 123B07	b	h	1	RDRAM	Map
 123B24	w	u	1	RDRAM	Is Paused
+126A18	b	u	1	RDRAM	Character P1
+126A19	b	u	1	RDRAM	Character P2
+126A1A	b	u	1	RDRAM	Character P3
+126A1B	b	u	1	RDRAM	Character P4
+127010	b	u	1	RDRAM	Vehicle P1
+127011	b	u	1	RDRAM	Vehicle P2
+127012	b	u	1	RDRAM	Vehicle P3
+127013	b	u	1	RDRAM	Vehicle P4
 208699	b	h	1	RDRAM	Map
 20886C	w	u	1	RDRAM	Balloons
+3FFFC0	d	h	1	RDRAM	Player Object Pointer
 
