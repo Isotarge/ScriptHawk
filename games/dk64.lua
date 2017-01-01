@@ -4132,7 +4132,7 @@ local function toggle_moonmode()
 	end
 end
 
-function everythingIsKong()
+function everythingIsKong(unsafe)
 	local playerObject = Game.getPlayerObject();
 	if not isRDRAM(playerObject) then
 		return false;
@@ -4153,7 +4153,7 @@ function everythingIsKong()
 			local modelPointer = dereferencePointer(pointer + obj_model1.model_pointer);
 			if isRDRAM(modelPointer) then
 				local numBones = mainmemory.readbyte(modelPointer + obj_model1.model.num_bones);
-				if numBones >= kongNumBones then
+				if unsafe or numBones >= kongNumBones then
 					mainmemory.write_u32_be(pointer + obj_model1.model_pointer, kongSharedModel + RDRAMBase);
 					print("Wrote: "..toHexString(pointer).." Bones: "..numBones.." Type: "..getActorName(pointer));
 				end
