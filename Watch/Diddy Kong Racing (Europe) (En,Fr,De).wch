@@ -1,4 +1,5 @@
 SystemID N64
+0DFE28	d	h	1	RDRAM	Cheats Enabled
 0DFE2C	d	h	1	RDRAM	Cheat Menu
 11AE43	b	u	1	RDRAM	Get Ready
 11AEE8	d	h	1	RDRAM	Object Pointer List
@@ -7,7 +8,8 @@ SystemID N64
 1211F7	b	u	1	RDRAM	Map
 1212E2	b	u	1	RDRAM	Map
 123587	b	u	1	RDRAM	Map
-1235A4	w	u	1	RDRAM	Is Paused
+1235A0	d	h	1	RDRAM	Game Settings Pointer
+1235A5	b	u	1	RDRAM	Is Paused
 126478	b	u	1	RDRAM	Character P1
 126479	b	u	1	RDRAM	Character P2
 12647A	b	u	1	RDRAM	Character P3
@@ -18,7 +20,6 @@ SystemID N64
 126A53	b	u	1	RDRAM	Vehicle P4
 206BB5	b	u	1	RDRAM	Map
 206C3B	b	u	1	RDRAM	Map
-207EA9	b	u	1	RDRAM	Map
 20807C	w	u	1	RDRAM	Balloons
 3FFFC0	d	h	1	RDRAM	Player Object Pointer
 

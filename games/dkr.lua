@@ -5,9 +5,11 @@ local Game = {
 	rot_speed = 100,
 	max_rot_units = 65535,
 	Memory = { -- Version order: PAL 1.1, PAL 1.0, Japan, US 1.1, US 1.0
-		["is_paused"] = {0x123B24, 0x1235A4, 0x124F84, 0x123A94, 0x123514},
-		["get_ready"] = {0x11B3C3, 0x11AE43, 0x11C823, 0x11B333, 0x11ADB3},
-		["cheat_menu"] = {0x0E03AC, 0x0DFE2C, 0x0E17FC, 0x0E031C, 0x0DFD9C},
+		["game_settings"] = {0x123B20, 0x1235A0, 0x124F80, 0x123A90, 0x123510}, -- Pointer
+		["is_paused"] = {0x123B25, 0x1235A5, 0x124F85, 0x123A95, 0x123515}, -- Byte
+		["get_ready"] = {0x11B3C3, 0x11AE43, 0x11C823, 0x11B333, 0x11ADB3}, -- Byte?
+		["cheats_enabled"] = {0x0E03A8, 0x0DFE28, 0x0E17F8, 0x0E0318, 0x0DFD98}, -- Bitfield u32_be
+		["cheat_menu"] = {0x0E03AC, 0x0DFE2C, 0x0E17FC, 0x0E031C, 0x0DFD9C}, -- Bitfield u32_be
 		["pointer_list"] = {0x11B468, 0x11AEE8, 0x11C8C8, 0x11B3D8, 0x11AE58},
 		["num_objects"] = {0x11B46C, 0x11AEEC, 0x11C8CC, 0x11B3DC, 0x11AE5C},
 	},
@@ -92,6 +94,12 @@ local object_fields = {
 	["z_rot"] = 0x23C, -- 16_be
 	["boost_timer"] = 0x26B, -- s8
 	["silver_coins"] = 0x29A,
+};
+
+-- Game settings fields, relative to dereferencePointer(Game.Memory.game_settings[version])
+game_settings_fields = {
+	map = 0x49,
+	p1_character = 0x59,
 };
 
 -- Boost size: 0x90
@@ -251,12 +259,12 @@ Game.maps = {
 	"0x2C - TT amulet cutscene",
 	"0x2D - Overworld (FFL opening cutscene)",
 	"0x2E - Dino 2",
-	"0x2F - Toufool",
+	"0x2F - Dino Trophy",
 
-	"0x30 - Snowfool",
-	"0x31 - Toufool again",
-	"0x32 - Toufool again again",
-	"0x33 - Toufool in space",
+	"0x30 - Snowflake Trophy",
+	"0x31 - Sherbert Trophy",
+	"0x32 - Dragon Trophy",
+	"0x33 - FFL Trophy",
 	"0x34 - Bluey 2",
 	"0x35 - Bubbler 2",
 	"0x36 - Smokey 2",
@@ -271,38 +279,7 @@ Game.maps = {
 	"0x3F - Overworld (Credits 1)",
 
 	"0x40 - Overworld (Credits 2)",
-	"0x41 - Overworld (misc cutscene 1)",
-	"0x42 - Overworld (misc cutscene 2)",
-	"0x43 - Overworld (misc cutscene 3)",
-	"0x44 - Overworld (misc cutscene 4)",
-	"0x45 - Overworld (misc cutscene 5)",
-	"0x46 - ...",
-	"0x47 - ...",
-	"0x48 - ...",
-	"0x49 - ...",
-	"0x4A - ...",
-	"0x4B - ...",
-	"0x4C - ...",
-	"0x4D - ",
-	"0x4E - ",
-	"0x4F - ",
-
-	"0x50 - ",
-	"0x51 - ",
-	"0x52 - ",
-	"0x53 - ",
-	"0x54 - ",
-	"0x55 - ",
-	"0x56 - ",
-	"0x57 - ",
-	"0x58 - ",
-	"0x59 - ",
-	"0x5A - ",
-	"0x5B - ",
-	"0x5C - ",
-	"0x5D - ",
-	"0x5E - ",
-	"0x5F - ",
+	-- Anything higher sends the player to the overworld
 };
 
 --------------------
@@ -313,27 +290,27 @@ function Game.detectVersion(romName, romHash)
 	if romHash == "B7F628073237B3D211D40406AA0884FF8FDD70D5" then -- Europe 1.1
 		version = 1;
 		map_freeze_values = {
-			0x121777, 0x123B07, 0x208699 -- TODO: Double check these
+			0x121777, 0x123B07 -- TODO: Double check these
 		};
 	elseif romHash == "DD5D64DD140CB7AA28404FA35ABDCABA33C29260" then -- Europe 1.0
 		version = 2;
 		map_freeze_values = {
-			0x11AF3B, 0x1211F7, 0x1212E2, 0x123587, 0x206BB5, 0x206C3B, 0x207EA9 -- TODO: Double check these
+			0x11AF3B, 0x1211F7, 0x1212E2, 0x123587, 0x206BB5, 0x206C3B -- TODO: Double check these
 		};
 	elseif romHash == "23BA3D302025153D111416E751027CEF11213A19" then -- Japan
 		version = 3;
 		map_freeze_values = {
-			0x11C91B, 0x122BD7, 0x122CC2, 0x124F67, 0x1FD4A5, 0x1FD52B, 0x1FE729 -- TODO: Double check these
+			0x11C91B, 0x122BD7, 0x122CC2, 0x124F67, 0x1FD4A5, 0x1FD52B -- TODO: Double check these
 		};
 	elseif romHash == "6D96743D46F8C0CD0EDB0EC5600B003C89B93755" then -- USA 1.1
 		version = 4;
 		map_freeze_values = {
-			0x1216E7, 0x123A77, 0x1FD209 -- TODO: Double check these
+			0x1216E7, 0x123A77 -- TODO: Double check these
 		};
 	elseif romHash == "0CB115D8716DBBC2922FDA38E533B9FE63BB9670" then -- USA 1.0
 		version = 5;
 		map_freeze_values = {
-			0x121167, 0x121252, 0x1234F7, 0x1FCA19 -- TODO: Double check these
+			0x121167, 0x121252, 0x1234F7 -- TODO: Double check these
 		};
 	else
 		return false;
@@ -347,7 +324,20 @@ end
 -------------------
 
 function Game.getCharacter()
-	return 8; -- TODO: Default to TT for now
+	local playerObject = dereferencePointer(player_object_pointer);
+	if isRDRAM(playerObject) then
+		return mainmemory.readbyte(playerObject + object_fields.map_color);
+	end
+	return 8; -- Default is TT, of course
+end
+
+-- TODO: Set character selection screen index
+-- TODO: Add player parameter
+function Game.setCharacter(index)
+	local gameSettings = dereferencePointer(Game.Memory.game_settings[version]);
+	if isRDRAM(gameSettings) then
+		mainmemory.writebyte(gameSettings + game_settings_fields.p1_character, index);
+	end
 end
 
 function Game.getVelocity()
@@ -604,6 +594,12 @@ local otap_enabled = false;
 local otap_startFrame;
 local otap_startLag;
 
+-- Velocity writes
+-- 0x800519B4 - Scale velocity down to character specific top speed
+-- 0x80051EC0 - Main velocity write (forward)
+-- 0x80051F30
+-- 0x800520D4
+
 -- Threshold for switching between A press modulo
 --velocity_min = -9.212730408;
 --velocity_med = -12.34942532;
@@ -652,7 +648,7 @@ local function optimalTap()
 	local bananas = math.max(math.min(Game.getBananas(), 10), 0);
 	local boost = Game.getBoost();
 	local getReady = mainmemory.readbyte(Game.Memory.get_ready[version]);
-	local isPaused = mainmemory.read_u16_be(Game.Memory.is_paused[version]);
+	local isPaused = mainmemory.readbyte(Game.Memory.is_paused[version]);
 
 	local boostType = forms.getproperty(ScriptHawk.UI.form_controls.otap_boost_dropdown, "SelectedItem");
 
@@ -841,14 +837,28 @@ ScriptHawk.bindKeyRealtime("C", switchObjectAnalysisToolsMode, true);
 
 function Game.setMap(value)
 	value = value - 1;
+
+	-- Legacy method of doing this, I hope to obsolete this one day
 	for i = 1, #map_freeze_values do
 		mainmemory.writebyte(map_freeze_values[i], value);
+	end
+
+	-- This write sets the menu options, much closer to what the game actually does
+	local gameSettings = dereferencePointer(Game.Memory.game_settings[version]);
+	if isRDRAM(gameSettings) then
+		mainmemory.writebyte(gameSettings + game_settings_fields.map, value);
 	end
 end
 
 function Game.applyInfinites()
-	-- Unlock cheat menu
+	-- Unlock all magic code toggles
 	mainmemory.write_u32_be(Game.Memory.cheat_menu[version], 0xFFFFFFFF);
+
+	-- Turn on TT & Drumstick magic codes
+	local cheatsEnabled = mainmemory.read_u32_be(Game.Memory.cheats_enabled[version]);
+	cheatsEnabled = setBit(cheatsEnabled, 0); -- TT
+	cheatsEnabled = setBit(cheatsEnabled, 1); -- Drumstick
+	mainmemory.write_u32_be(Game.Memory.cheats_enabled[version], cheatsEnabled);
 
 	-- Player object bizzo
 	local playerObject = dereferencePointer(player_object_pointer);
@@ -907,6 +917,7 @@ testSpace = {
 --]]
 
 function Game.eachFrame()
+	--Game.setCharacter(8);
 	populateObjectPointerList();
 
 	if not otap_enabled and forms.ischecked(ScriptHawk.UI.form_controls.otap_checkbox) then

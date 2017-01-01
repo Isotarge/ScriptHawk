@@ -6,17 +6,20 @@ SystemID N64
 0DEAE8	d	h	1	RDRAM	VI Register Value
 0DEAF0	d	h	1	RDRAM	VI Register Value
 0DEDD4	d	h	1	RDRAM	RNG
+0E17F8	d	h	1	RDRAM	Cheats Enabled
 0E17FC	d	h	1	RDRAM	Cheat Menu
-0E4234	b	h	1	RDRAM	Map/Speedometer Toggle P1
+0E4234	b	h	1	RDRAM	Map/Speedometer Toggle
+0E4235	b	h	1	RDRAM	Map Toggle Multiplayer?
 0E81F0	d	f	1	RDRAM	Brake Force
 11C823	b	u	1	RDRAM	Get Ready (real)
 11C8C8	d	h	1	RDRAM	Object Pointer List
 11C8CC	d	u	1	RDRAM	Number of Objects
 11C91B	b	u	1	RDRAM	Map (actual?)
-122BD7	b	u	1	RDRAM	Map
-122CC2	b	u	1	RDRAM	Map
+122BD7	b	u	1	RDRAM	Map?
+122CC2	b	u	1	RDRAM	Map?
 124F60	b	u	1	RDRAM	Map?
 124F67	b	u	1	RDRAM	Map (Restart)
+124F80	d	h	1	RDRAM	Game Settings Pointer
 124F85	b	u	1	RDRAM	Is Paused
 127F18	b	u	1	RDRAM	Character P1
 127F19	b	u	1	RDRAM	Character P2
@@ -27,19 +30,18 @@ SystemID N64
 12850A	b	u	1	RDRAM	Vehicle P3
 12850B	b	u	1	RDRAM	Vehicle P4
 128538	d	h	1	RDRAM	Map Name Pointer
-1287BC	d	u	1	RDRAM	Player Index
+1287BC	d	u	1	RDRAM	HUD Settings Index?
 1DB388	d	h	1	RDRAM	TT Interaction State (Dino Domain)
 1DB38C	d	u	1	RDRAM	TT Activation timer (Dino Domain)
 1E4C24	d	f	1	RDRAM	
 1E4CC4	d	f	1	RDRAM	
-1FD4A5	b	u	1	RDRAM	Map
-1FD52B	b	u	1	RDRAM	Map
+1FD4A5	b	u	1	RDRAM	Map?
+1FD52B	b	u	1	RDRAM	Map?
 1FE6E8	w	b	1	RDRAM	Keys Collected
 1FE6ED	b	b	1	RDRAM	Bosses Beaten
 1FE6EE	w	b	1	RDRAM	Trophies Collected
 1FE6F6	b	u	1	RDRAM	TT Amulet Pieces
 1FE6F7	b	u	1	RDRAM	Wizpig Amulet Pieces
-1FE739	b	u	1	RDRAM	Character?
 1FE8FC	w	u	1	RDRAM	Balloons
 3FFFC0	d	h	1	RDRAM	Player object pointer
 
