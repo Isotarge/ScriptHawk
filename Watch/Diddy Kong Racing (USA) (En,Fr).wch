@@ -14,6 +14,7 @@ SystemID N64
 1234F7	b	h	1	RDRAM	Map
 123510	d	h	1	RDRAM	Game Settings Pointer
 123515	b	u	1	RDRAM	Is Paused
+123516	b	u	1	RDRAM	Show Results Screen
 126309	b	h	1	RDRAM	FPS Nonsense
 126310	b	h	1	RDRAM	FPS Nonsense
 1263E8	b	u	1	RDRAM	Character P1

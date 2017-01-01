@@ -8,6 +8,7 @@ SystemID N64
 123A77	b	h	1	RDRAM	Map
 123A90	d	h	1	RDRAM	Game Settings Pointer
 123A95	b	u	1	RDRAM	Is Paused
+123A96	b	u	1	RDRAM	Show Results Screen
 126988	b	u	1	RDRAM	Character P1
 126989	b	u	1	RDRAM	Character P2
 12698A	b	u	1	RDRAM	Character P3

@@ -21,6 +21,7 @@ SystemID N64
 124F67	b	u	1	RDRAM	Map (Restart)
 124F80	d	h	1	RDRAM	Game Settings Pointer
 124F85	b	u	1	RDRAM	Is Paused
+124F86	b	u	1	RDRAM	Show Results Screen
 127F18	b	u	1	RDRAM	Character P1
 127F19	b	u	1	RDRAM	Character P2
 127F1A	b	u	1	RDRAM	Character P3
