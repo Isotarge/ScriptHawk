@@ -114,7 +114,7 @@ SystemID N64
 37C278	b	h	1	RDRAM	Water Collision
 37C279	b	h	1	RDRAM	Ground Collision 1
 37C27B	b	h	1	RDRAM	Ground Collision 2
-37C27D	b	h	1	RDRAM	Wall Collision
+37C27D	b	h	1	RDRAM	Wall Collisions
 37C27E	b	h	1	RDRAM	Enable Jumping From Water Surface
 37C284	d	u	1	RDRAM	Friction State
 37C2D3	b	u	1	RDRAM	Mumbo Transformation

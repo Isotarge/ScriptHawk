@@ -49,6 +49,7 @@ SystemID N64
 37CBA2	b	u	1	RDRAM	Standing on Shock Spring Pad
 37CBB3	b	u	1	RDRAM	Standing on Damaging Ground?
 37CBD0	d	h	1	RDRAM	Floor Object Pointer
+37CC4D	b	u	1	RDRAM	Wall Collisions
 37CCB4	d	f	1	RDRAM	Slope Timer
 37CD70	d	h	1	RDRAM	Moves Unlocked (Bitfield)
 37CE88	d	f	1	RDRAM	X Velocity

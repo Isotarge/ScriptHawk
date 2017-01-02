@@ -237,6 +237,7 @@ Game.Memory = {
 	["floor_object_pointer"] = {0x37CBD0, 0x37CD00, 0x37B400, 0x37C200},
 	["slope_timer"] = {0x37CCB4, 0x37CDE4, 0x37B4E4, 0x37C2E4},
 	["player_grounded"] = {0x37C930, 0x37CA60, 0x37B160, 0x37BF60},
+	["wall_collisions"] = {0x37CC4D, 0x37CD7D, 0x37B47D, 0x37C27D},
 	["moves_bitfield"] = {0x37CD70, 0x37CEA0, 0x37B5A0, 0x37C3A0},
 	["x_velocity"] = {0x37CE88, 0x37CFB8, 0x37B6B8, 0x37C4B8},
 	["y_velocity"] = {0x37CE8C, 0x37CFBC, 0x37B6BC, 0x37C4BC},
@@ -296,6 +297,10 @@ end
 
 function Game.getGroundState()
 	return tostring(mainmemory.read_u32_be(Game.Memory.player_grounded[version]) > 0);
+end
+
+function Game.getWallCollisions()
+	return mainmemory.readbyte(Game.Memory.wall_collisions[version]);
 end
 
 local function neverSlip()
@@ -2895,6 +2900,7 @@ Game.OSD = {
 	{"Movement", Game.getCurrentMovementState, Game.colorCurrentMovementState},
 	{"Slope Timer", Game.getSlopeTimer, Game.colorSlopeTimer},
 	{"Grounded", Game.getGroundState},
+	{"Wall Collisions", Game.getWallCollisions},
 	{"Separator", 1},
 	{"Facing", Game.getFacingAngle},
 	{"Moving", Game.getYRotation},

@@ -15,6 +15,7 @@ local Game = {
 		["frame_timer"] = {0x280700, 0x27F718, 0x27F718, 0x2808D8},
 		["slope_timer"] = {0x37CCB4, 0x37CDE4, 0x37B4E4, 0x37C2E4},
 		["player_grounded"] = {0x37C930, 0x37CA60, 0x37B160, 0x37BF60},
+		["wall_collisions"] = {0x37CC4D, 0x37CD7D, 0x37B47D, 0x37C27D},
 		["floor_object_pointer"] = {0x37CBD0, 0x37CD00, 0x37B400, 0x37C200},
 		["x_velocity"] = {0x37CE88, 0x37CFB8, 0x37B6B8, 0x37C4B8},
 		["y_velocity"] = {0x37CE8C, 0x37CFBC, 0x37B6BC, 0x37C4BC},
@@ -116,6 +117,10 @@ end
 
 function Game.getGroundState()
 	return tostring(mainmemory.read_u32_be(Game.Memory.player_grounded[Game.version]) > 0);
+end
+
+function Game.getWallCollisions()
+	return mainmemory.readbyte(Game.Memory.wall_collisions[Game.version]);
 end
 
 function Game.getSlopeTimer()
@@ -367,31 +372,55 @@ function Game.getGruntyState()
 	return "Unknown";
 end
 
-local OSD = {
-	{"X", Game.getXPosition},
-	{"Y", Game.getYPosition},
-	{"Z", Game.getZPosition},
-	{"Separator", 1},
-	{"Floor", Game.getFloor},
-	{"Separator", 1},
-	{"Velocity", Game.getVelocity};
-	{"Y Velocity", Game.getYVelocity},
-	{"Separator", 1},
-	{"X Rotation", Game.getXRotation},
-	{"Angle", Game.getMovingAngle},
-	{"Moving Angle", Game.getCalculatedMovingAngle},
-	{"Separator", 1},
-	{"Movement", Game.getCurrentMovementState},
-	{"On Ground", Game.getGroundState},
-	{"Slope Timer", Game.getSlopeTimer},
-	{"Separator", 1},
-	{"Grunty State", Game.getGruntyState},
-	{"Separator", 1},
-	{"Grunty X", Game.getGruntyXPosition},
-	{"Grunty Y", Game.getGruntyYPosition},
-	{"Grunty Z", Game.getGruntyZPosition},
-	{"Grunty Facing", Game.getGruntyFacingAngle},
+local OSDs = {
+	["WithGrunty"] = {
+		{"X", Game.getXPosition},
+		{"Y", Game.getYPosition},
+		{"Z", Game.getZPosition},
+		{"Separator", 1},
+		{"Floor", Game.getFloor},
+		{"Separator", 1},
+		{"Velocity", Game.getVelocity};
+		{"Y Velocity", Game.getYVelocity},
+		{"Separator", 1},
+		{"X Rotation", Game.getXRotation},
+		{"Angle", Game.getMovingAngle},
+		{"Moving Angle", Game.getCalculatedMovingAngle},
+		{"Separator", 1},
+		{"Movement", Game.getCurrentMovementState},
+		{"Wall Collisions", Game.getWallCollisions},
+		{"Grounded", Game.getGroundState},
+		{"Slope Timer", Game.getSlopeTimer},
+		{"Separator", 1},
+		{"Grunty State", Game.getGruntyState},
+		{"Separator", 1},
+		{"Grunty X", Game.getGruntyXPosition},
+		{"Grunty Y", Game.getGruntyYPosition},
+		{"Grunty Z", Game.getGruntyZPosition},
+		{"Grunty Facing", Game.getGruntyFacingAngle},
+	},
+	["WithoutGrunty"] = {
+		{"X", Game.getXPosition},
+		{"Y", Game.getYPosition},
+		{"Z", Game.getZPosition},
+		{"Separator", 1},
+		{"Floor", Game.getFloor},
+		{"Separator", 1},
+		{"Velocity", Game.getVelocity};
+		{"Y Velocity", Game.getYVelocity},
+		{"Separator", 1},
+		{"X Rotation", Game.getXRotation},
+		{"Angle", Game.getMovingAngle},
+		{"Moving Angle", Game.getCalculatedMovingAngle},
+		{"Separator", 1},
+		{"Movement", Game.getCurrentMovementState},
+		{"Wall Collisions", Game.getWallCollisions},
+		{"Grounded", Game.getGroundState},
+		{"Slope Timer", Game.getSlopeTimer},
+	},
 };
+
+local OSD = OSDs.WithoutGrunty;
 
 angleCalc = {
 	["buttonX"] = 220,
@@ -476,6 +505,12 @@ end
 angleCalc.open();
 
 local function drawOSD()
+	if Game.getGruntyState() == "Unknown" then
+		OSD = OSDs.WithoutGrunty;
+	else
+		OSD = OSDs.WithGrunty;
+	end
+
 	if Game.isPhysicsFrame() then
 		prev_x = x;
 		prev_z = z;
