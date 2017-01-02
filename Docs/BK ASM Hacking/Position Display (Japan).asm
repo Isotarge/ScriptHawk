@@ -8,6 +8,8 @@ JAL 0x80400000
 |          the hook will not catch when game it paused
 */
 
+//ENUMERATIONS
+.include "Docs/BK ASM Hacking/BK_Enum.S"
 //FUNCTIONS & VARIABLES
 .include "Docs/BK ASM Hacking/BK_Japan.S"
 .include "Docs/BK ASM Hacking/Position Display.asm"

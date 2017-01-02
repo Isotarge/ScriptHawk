@@ -4,6 +4,8 @@ JAL 0x80400000
 
 [Return]: 0x8024E420
 .include "Docs/BK ASM Hacking/BK_NTSC.S"
+//ENUMERATIONS
+.include "Docs/BK ASM Hacking/BK_Enum.S"
 
 .org 0x80400000
 PUSH ra

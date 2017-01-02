@@ -1,39 +1,4 @@
 /*-------------------------------
-| ENUMS
----------------------------------*/
-[ItemIndex_Timer_Skull]: 0x01
-[ItemIndex_Timer_Propellor]: 0x03
-[ItemIndex_Timer_ChristmasTree]: 0x05
-[ItemIndex_Timer_Hourglass]: 0x06
-[ItemIndex_Notes]: 0x0C
-[ItemIndex_Eggs]: 0x0D
-[ItemIndex_Jiggies_CurrentLevel]: 0x12
-[ItemIndex_RedFeather]: 0x0F
-[ItemIndex_GoldFeather]: 0x10
-[ItemIndex_Jinjos_CurrentLevel]: 0x12
-[ItemIndex_EmptyHoneycombPiece]: 0x13
-[ItemIndex_Health]: 0x14
-[ItemIndex_HealthContainers]: 0x15
-[ItemIndex_Lives]: 0x16
-[ItemIndex_Air]: 0x17
-[ItemIndex_GoldBullions]: 0x18
-[ItemIndex_Orange]: 0x19
-[ItemIndex_PlayerVileScore]: 0x1A
-[ItemIndex_VileVileScore]: 0x1B
-[ItemIndex_MumboTokens_OnHand]: 0x1C
-[ItemIndex_Grumblie]: 0x1D
-[ItemIndex_Yumblie]: 0x1E
-[ItemIndex_GreenPresent]: 0x1F
-[ItemIndex_BluePresent]: 0x20
-[ItemIndex_RedPresent]: 0x21
-[ItemIndex_Caterpillar]: 0x22
-[ItemIndex_Acorn]: 0x23
-[ItemIndex_Twinklie]: 0x24
-[ItemIndex_MumboTokens]: 0x25
-[ItemIndex_Jiggies]: 0x26
-[ItemIndex_JokerCard]: 0x27
-
-/*-------------------------------
 | VARIABLES
 ---------------------------------*/
 [PauseMenuStringsBase]: 0x8036C4E0
@@ -66,42 +31,76 @@
 
 [GetPIStatusReg]: 0x800020E0 ;Outputs: [word $v0]
 
+[SetCOP0StatusRegister]: 0x80002190 ;I: (word $a0 input)
+[GetCOP0StatusRegister]: 0x800021A0 ;O: [word $v0]
 
-[SetCOP0StatusRegister]: 0x80002190 ;Inputs: (word $a0 input)
-[GetCOP0StatusRegister]: 0x800021A0 ;Outputs: [word $v0]
+[SetStatusRegister]: 0x80003FE0 ;I: (word $a0 input)
 
-
-[SetStatusRegister]: 0x80003FE0 ;Inputs: (word $a0 input)
-
-
-[GetGlobalOnCounter]: 0x8023DB5C ;Outputs: [word $v0]
+[GetMaskedGlobalOnCounter]: 0x8023DB4C	;I:	(word $a0 bitMask)	O: [word $v0]
+[GetGlobalOnCounter]: 0x8023DB5C ;O: [word $v0]
 [ResetGlobalOnCounter]: 0x8023DB68
-
 
 [IncrementGlobalOnCounter]: 0x8023DCDC
 [DecrementGlobalOnCounter]: 0x8023DCF4
 
-
+[Main]:	0x8023DD0C
 [MainLoop]: 0x8023DF9C
-
 
 [SetApplyButtonInputsToBanjoFlag]: 0x8023E06C
 
+[SetFrameSkip]: 0x8024BF94 ;I: (word $a0 input)
+[GetFrameSkip]: 0x8024BFA0 ;O: [word $v0] //normally 2 but sometimes 3 eg. GV lobby
 
-[SetFrameSkip]: 0x8024BF94 ;Inputs: (word $a0 input)
-[GetFrameSkip]: 0x8024BFA0 ;Outputs: [word $v0] //normally 2 but sometimes 3 eg. GV lobby
-
-
-[CopyCameraXYZRotation]: 0x8024C764 ;Inputs: (float* $a0 destinationXPtr)
-[GetCamera_YRotation]: 0x8024C788 ;Outputs: [float $f0]
+[GetFrameTimer]: 0x8024C4E8	;O: [word $v0]
+[SetFrameTimer]: 0x8024C4F8	;I: (word $a0 input)
 
 
-[SetCamera_XYZPosition]: 0x8024CD88 ;Inputs: (float* $a0 xPosPtr)
+//NOTE: Camera_ is the render camera for Objects and Terrain containing Transparencies 
+[GetDistanceToCamera_]:	0x8024C584	;I: (float* $a0 destinationXPtr)
+[GetCamera_Position]: 0x8024C5CC	;I:	(float* $a0 destinationXPtr)
 
+[CopyCamera_XYZRotation]:	0x8024C764	;I: (float* $a0 destinationXPtr)
+[GetCamera_YRotation]:		0x8024C788	;O: [float $f0]
+[CopyCamera_XYZRotation_0]: 0x8024C794	;I: (float* $a0 destXPtr, float* $a1 destYPtr, float* $a2 destZPtr)
+
+[SetCamera_XYZPosition]:	0x8024CD88	;I: (float* $a0 XPosPtr)
+[SetCamera_XYZPosition_0]: 	0x8024CDB0	;I: (float* $a0 XPosPtr)
+[SetCamera_XYZPosition_1]: 	0x8024CDF8	;I: (float $f12 XPos, float $f14 YPos, float $a2 ZPos)
+[SetCamera_XYZRotation]:	0x8024CE18	;I: (float* $a0 XPosPtr)
+[SetCamera_XYZRotation_0]:	0x8024CE40	;I: (float $f12 XPos, float $f14 YPos, float $a2 ZPos)
+
+
+[IncreaseGlobalOnTimerby50]: 80254F90	
+
+[IncrementGlobalOnTimer]:	80255ACC
+
+[ArcCos]:	0x80255D70	;I: (float $f12 input)	O: [ float $f0 ]
+
+[CrossProduct]:	0x80255F74	;I: (float* $a0 resultXPtr, float* $a1 inputXPtr1, float* $a2 inputXPtr2 )
+[GetPointIfTravelingScaledDistanceFromPointATowardsPointB]:	0x80255FE4	;I: (float* $a0 resultXPtr, float* $a1 pointAXPtr, float* $a2 pointBXPtr, float $a3 travelDistance) 
+[DotProduct]: 0x80256034	;I: (float* $a0 input1XPtr, float* $a1 input2XPtr)	O: [float $f0]
+[GetDistance3D]: 0x80256064	;I: (float* $a0 input1XPtr, float* $a1 input2XPtr)	O: [float $f0]
+
+[GetDistanceSquared3D]:	0x80256280	;I:	(float* $a0 input1XPtr, float* $a1 input2XPtr)	O: [float $f0]
+
+[GetDistanceToOrigin3D]:	0x80256378	;I:	(float* $a0 inputXPtr)	O: [float $f0]
+
+[ArcSin]:	0x80256FE0	;I: ( float $f12 inputDegrees )	O: [ float $f0 ]
 
 [ClampInt]:     0x80257EA8  ;I: (word $a0 input, word $a1 lowerLimit, word $a2 upperLimit)      O: [word $v0]
 [ClampFloat]:   0x80257ED8  ;I: (float $f12 input, float $f14 lowerLimit, float $a2 upperLimit) O: [float $f0]
+[GetYRotationFromPointAToB]:	0x80257F18	;I: (float* $a0 pointAXPtr, float* $a1 BXPtr, float* $a2 result)
 
+
+[IsNotAtOrigin]:		0x80258368	;I:	(float* $a0 inputXPtr)	O: [byte $v0 bool]
+[IsNotOnYAxisToOrigin]:	0x802583D8	;I:	(float* $a0 inputXPtr)	O: [byte $v0 bool]
+
+[IsPointInRectVol]:		0x802584FC	;I: (float* $a0 inputXptr, float* $a1 minXPtr, float* $a2 maxXPtr)	O: [byte $v0 bool]
+
+
+[GetDistanceSquared2D_XZ]:	0x802586B0	;I:	(float* $a0 input1XPtr, float* $a1 input2XPtr)	O: [float $f0]
+
+[GetSumOfDifferencesSquared]:	0x80258780	;I:	(float* $a0 input1XPtr, float* $a1 input2XPtr)	O: [float $f0]
 
 [GetAngleBetween0And360]:   0x8025881C  ;I: ( float $f12 inputDegrees)                 O: [float $f0]
 [RemainderFloat]:           0x802588D0  ;I: (float $f12 dividend, float $f14 divisor)  O: [float $f0]
@@ -113,47 +112,133 @@
 [SumOfAbsXZ]:               0x80258994  ;I: (float* $a0 Xptr)                          O: [float $f0]
 [AbsInt]:                   0x802589CC  ;I: (word $a0)                                 O: [word $v0]
 
+[ClearXYZData]:			0x80258B8C	;I: (float* $a0 xPtr)
+[CopyXYZData]:			0x80258BA4 	;I: (float* $a0 destXPtr, float* $a1 srcXPtr)
+[CopyXYZDifference]:	0x80258BC0	;I: (float* $a0 resultXPtr, float* $a1 minuendXPtr, float* $a2 subtraendXPtr)
+[SubtractVectorXYZ]:	0x80258BF4	;I: (float* $a0 destMinuendXPtr, float* $a1 subtraendXPtr)
+[SetXYZData]:			0x80258C28	;I: (float* $a0 destXPtr, float $a1 xInput, float $a2 yInput, float $a3 ZInput)
+[CopyXYZSum]:			0x80258C48	;I: (float* $a0 destXPtr, float* $a1 src1XPtr, float* $a2 src2XPtr) 
+[ScaleXYZ]:				0x80258C7C	;I:	(float* $a0 XPtr, float $a1 scalingFactor)
+[ScaleCopyXYZ]: 		0x80258CB0	;I:	(float *$a0 destXPtr, float* $a1 srcXPtr, float $a2 scalingFactor)
+[SumOfAbsoluteValueXYZ]:	0x80258CDC	;I: (float* $a0 destAndSrc1Xptr, float* $a1 src2Ptr)
+[ConvertXYZFloatToWord]:	0x80258D58 	;I: (word* $a0 destXPtr, float* srcXPtr)
+[ConvertXYZFloatToHalf]:	0x80258DA8 	;I: (half* $a0 destXPtr, float* srcXPtr)
+[TruncXYZFloatToWord]:	0x80258DE8	;I:	(word* $a0 destXPtr, float* srcXPtr)
+[TruncXYZFloatToHalf]:	0x80258E24	;I: (half* $a0 destXPtr, float* srcXPtr)
+
+[ClampToAbsValue_Float]:	0x80269190	;I: (float $f12 input, float $f14 clampValue)	O: [float $f0]
+[GetDifferenceOfAngles]:	0x802591D8	;I:	(float $f12 minuend, float $f14 subtrend)	O: [float $f0]
+
+[Are2PointsWithinDistance_2D_XZ]:	0x80259328	;I: (float* $a0 XPtr1, float* $a1 XPtr2, float $a2 distance)	O: [byte $v0 bool]
+[Are2PointsWithinDistance]:			0x80259328	;I: (float* $a0 XPtr1, float* $a1 XPtr2, float $a2 distance)	O: [byte $v0 bool]
+
+[DecrementTimerByOneFrame]:	0x8025943C	;I: ( float* $a0 timerPtr )
+
+[SquareRoot]:	0x80265350	;I: (float $f12 input)	O: [float $f0]
+
+
+/* ****************
+ * Movement Struct (size:0x28):
+ * 0x00: [word]		AnimationStructPtr
+ * 0x04: [float]	AnimationTimer
+ * 0x08: [float]	???
+ * 0x0C: [float]	MovementDuration
+ * 0x10: [float]	AnimationDuration
+ * 0x14: [float]	TransistionDuration
+ * 0x18: [word?]	???
+ * 0x1C: [word]		MovementState
+ * 0x20: [byte]		MovementSubstate
+ */
+[SetMovementStruct_MovementState]:					0x80287460	;I: (struct* $a0 movementStruct, word $a1 input)
+[GetMovementStruct_AnimationStructPtr]:				0x80287464	;I: (struct* $a0 movementStruct)	O: [word $v0]
+
+[SetMovementStruct_AnimationStruct_AnimationTimer]:	0x8028764C	;I: (struct* $a0 movementStruct, float $a1 input)
+[SetMovementStruct_MovementSubstate]:				0x80287474	;I: (struct* $a0 movementStruct, byte $a1 input)
+
+[SetMovementStruct_AnimationDuration]:				0x8028768C	;I: (struct* $a0 movementStruct, float $a1 input)
+[SetMovementStruct_TransitionDuration]:				0x802876C0	;I: (struct* $a0 movementStruct, float $a1 input)
+
+[SetMovementStruct_AnimationStruct_AnimationState]:	0x80287790	;I:	(struct* $a0 movementStruct)	O: [word $v0]
+[GetMovementStruct_MovementSubstate]:				0x802877B0	;I: (struct* $a0 movementStruct)	O: [byte $v0]
+
+[GetMovementStruct_AnimationDuration]:				0x802877CC	;I: (struct* $a0 movementStruct)	O: [float $f0]
+[GetMovementStruct_TransitionDuration]:				0x802877D0	;I: (struct* $a0 movementStruct)	O: [float $f0]
+[GetMovementStruct_AnimationStruct_AnimationTimer]:	0x802877D8	;I: (struct* $a0 movementStruct)	O: [float $f0]
+[GetMovementStruct_AnimationTimer]:					0x802877F8	;I: (struct* $a0 movementStruct)	O: [float $f0]
+[SetMovementStruct_AnimationTimer]:					0x80287800	;I: (struct* $a0 movementStruct)	O: [float $f0]
+
+[IsMovementStruct_MovementSubstate3]:				0x802878C4	;I: (struct* $a0 movementStruct, float $a1 input)
+
+
+/* ****************
+ * Animation Struct (size:0x24):
+ * 0x00: [word]		???
+ * 0x04: [float]	???
+ * 0x08: [byte?]	???
+ * 0x09: [byte?]	???
+ * 0x0A: [half]		???
+ * 0x0C: [half?]	???
+ * 0x0E: [half?]	???
+ * 0x10: [word]		AnimationState
+ * 0x14: [float]	AnimationTimer
+ * 0x18: [float]	???
+ */
+[GetAnimationStruct_AnimationState]:	0x80289688	;I: (struct* $a0 animationStruct)	O: [word $v0]
+[GetAnimationStruct_AnimationTimer]:	0x80289690	;I: (struct* $a0 animationStruct)	O: [float $f0]
+
+[SetAnimationStruct_AnimationState]:	0x8028977C	;I: (struct* $a0 animationStruct, word $a1 input)
+[SetAnimationStruct_AnimationTimer]:	0x80289690	;I: (struct* $a0 animationStruct, float $a1 input)
+
+
+
+[SetPlayerBounceRate]:	0x80289820	;I:	(word $a0 input)
+
+[GetPlayerBounceRate]:	0x80289EA4	;O:	[word $v0]
+
+[SetPlayerBounceRate_0]:	0x80289F10	;I:	(word $a0 input)
+
+[GetPlayerMovementStructPtr]:	0x80289F64	;O:	[struct* $v0]
+
 
 [UpdatePlayerModelToMumboTransFormation]: 0x80291D04
 
-[GetPlayerModel]:        0x80291FAC ;Outputs:   [half $v0]
-[SetPlayerTransparency]: 0x80291FB8 ;Inputs: (byte $a0 input)
-[SetPlayerModel]:        0x80291FC4 ;Inputs: (half $a0 modelIndex)
+[GetPlayerModel]:        	0x80291FAC 	;O: [half $v0]
+[SetPlayerTransparency]: 	0x80291FB8 	;I: (byte $a0 input)
+[SetPlayerModel]:        	0x80291FC4 	;I: (half $a0 modelIndex)
 
-[GetButtonPressTimer]: 0x8029557C ;I: byte $a0 ButtonIndex
-[GetButtonReleaseTimer]: 0x80295590 ;I: byte $a0 ButtonIndex
+[GetButtonPressTimer]: 		0x8029557C 	;I: (byte $a0 ButtonIndex)
+[GetButtonReleaseTimer]: 	0x80295590 	;I: (byte $a0 ButtonIndex)
 
-[GetMovesUnlockedBitfield]: 0x802957F0
+[GetMovesUnlockedBitfield]: 0x802957F0 	;O: [word $a0]
 
-[LockAllMoves]: 0x80295804
+[LockAllMoves]: 			0x80295804
 
 [SetMovesUnlockedBitfield]: 0x80295864
 [SetHasUsedMovesBitfield]:  0x80295870
 
-[SetYVelocity]: 0x802979A0 ;I: (float $f12)
+[SetYVelocity]: 			0x802979A0 ;I: (float $f12)
 
-[GetXZVelocity]: 0x80297AB8 ;Outputs: [float $f0]
+[GetXZVelocity]: 			0x80297AB8 ;O: [float $f0]
 
 [SetGravitationalAcceleration]: 0x80297BEC
-[SetTerminalVelocity]:          0x80297BF8
+[SetTerminalVelocity]:      0x80297BF8
 
-[AddToYPos]: 0x80298528 ;I: (float $f12)
+[AddToYPos]: 				0x80298528 ;I: (float $f12)
 
-[SetMumboTransformation]: 0x8029A960
+[SetMumboTransformation]: 	0x8029A960
 
-[TakeMeThere_LevelReset]: 0x802E4048  ;I: (word $a0 Map, word $a1 exit, word $a2 loadTransitionTypeIndex)
-[TakeMeThere]:            0x802E4078  ;I: (word $a0 Map, word $a1 exit, word $a2 loadTransitionTypeIndex)
+[TakeMeThere_LevelReset]: 	0x802E4048	;I: (word $a0 Map, word $a1 exit, word $a2 loadTransitionTypeIndex)
+[TakeMeThere]:            	0x802E4078  ;I: (word $a0 Map, word $a1 exit, word $a2 loadTransitionTypeIndex)
 
 
-[Print_TotalMenuFont]: 0x802F7870 ;Inputs: (word $a0 XPos), (word $a1 YPos), (word $a3 fontSize), (char* $a3 str)
+[Print_TotalMenuFont]: 		0x802F7870 ;I: (word $a0 XPos, word $a1 YPos, word $a3 fontSize, char* $a3 str)
 
-[Print_CharFont]: 0x802F78FC ;Inputs: (word $a0 XPos), (word $a1 YPos), (char* $a2 str)
+[Print_CharFont]: 			0x802F78FC ;I: (word $a0 XPos, word $a1 YPos, char* $a2 str)
 
-[GetLevelAssociatedWithMap]: 0x8030AD48
+[GetLevelAssociatedWithMap]: 	0x8030AD48	;I: (byte $a0 MapIndex)	O: [byte $v0]
 
-[GetMainMapFromLevelIndex]: 0x8030ADD8
-[GetMainExitFromLevelIndex]: 0x8030AE24
-
+[GetMainMapFromLevelIndex]: 	0x8030ADD8	;I: (byte $a0 LevelIndex)	O:[byte $v0]
+[GetMainExitFromLevelIndex]: 	0x8030AE24	;I: (byte $a0 LevelIndex)	O:[byte $v0]
 
 [PauseMenu]: 0x80313380
 

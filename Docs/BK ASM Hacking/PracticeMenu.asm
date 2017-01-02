@@ -19,6 +19,8 @@ NOP
 JAL NormalModeCode
 NOP
 
+//ENUMERATIONS
+.include "Docs/BK ASM Hacking/BK_Enum.S"
 //EXISTING FUNCTIONS
 .include "Docs/BK ASM Hacking/BK_NTSC.S"
 

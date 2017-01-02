@@ -2,6 +2,8 @@
 .org 0x80334FFC
 JAL 0x80400000
 
+//ENUMERATIONS
+.include "Docs/BK ASM Hacking/BK_Enum.S"
 //FUNCTIONS AND VARIABLES
 .include "Docs/BK ASM Hacking/BK_NTSC.S"
 
