@@ -5,8 +5,11 @@ local Game = {
 	rot_speed = 100,
 	max_rot_units = 65535,
 	Memory = { -- Version order: PAL 1.1, PAL 1.0, Japan, US 1.1, US 1.0
+		["CSS_character"] = {0x126A18, 0x126478, 0x127F18, 0x126988, 0x1263E8}, -- Character select screen
+		["CSS_vehicle"] = {0x127010, 0x126A50, 0x128508, 0x126F80, 0x1269C0}, -- Track select screen
 		["game_settings"] = {0x123B20, 0x1235A0, 0x124F80, 0x123A90, 0x123510}, -- Pointer
 		["is_paused"] = {0x123B25, 0x1235A5, 0x124F85, 0x123A95, 0x123515}, -- Byte
+		["show_results"] = {0x123B26, 0x1235A6, 0x124F86, 0x123A96, 0x123516}, -- Byte
 		["get_ready"] = {0x11B3C3, 0x11AE43, 0x11C823, 0x11B333, 0x11ADB3}, -- Byte?
 		["cheats_enabled"] = {0x0E03A8, 0x0DFE28, 0x0E17F8, 0x0E0318, 0x0DFD98}, -- Bitfield u32_be
 		["cheat_menu"] = {0x0E03AC, 0x0DFE2C, 0x0E17FC, 0x0E031C, 0x0DFD9C}, -- Bitfield u32_be
@@ -334,12 +337,25 @@ function Game.getCharacter()
 	return 8; -- Default is TT, of course
 end
 
--- TODO: Set character selection screen index
--- TODO: Add player parameter
-function Game.setCharacter(index)
+local charToCSS = { -- Table to convert character selection screen index to in game character index
+	[0] = 0, -- Krunch
+	[9] = 1, -- Diddy
+	[1] = 2, -- Bumper
+	[5] = 3, -- Banjo
+	[3] = 4, -- Conker
+	[2] = 5, -- Tiptup
+	[7] = 6, -- Pipsy
+	[4] = 7, -- Timber
+	[6] = 8, -- Drumstick
+	[8] = 9, -- T. T.
+};
+
+function Game.setCharacter(index, player)
+	player = player or 1;
+	mainmemory.writebyte(Game.Memory.CSS_character[version] + player - 1, charToCSS[index] or 9);
 	local gameSettings = dereferencePointer(Game.Memory.game_settings[version]);
 	if isRDRAM(gameSettings) then
-		mainmemory.writebyte(gameSettings + game_settings_fields.p1_character, index);
+		mainmemory.writebyte(gameSettings + game_settings_fields.p1_character, index); -- TODO: Correctly set P2, P3, P4
 	end
 end
 
@@ -652,12 +668,18 @@ local function optimalTap()
 	local boost = Game.getBoost();
 	local getReady = mainmemory.readbyte(Game.Memory.get_ready[version]);
 	local isPaused = mainmemory.readbyte(Game.Memory.is_paused[version]);
+	local showResults = mainmemory.readbyte(Game.Memory.show_results[version]);
 
 	local boostType = forms.getproperty(ScriptHawk.UI.form_controls.otap_boost_dropdown, "SelectedItem");
 
 	-- Don't press A if we're paused
 	if isPaused ~= 0 then -- TODO: This check isn't perfect, it's still possible that it'll tap A and close the menu, I think we need a menu object pointer or something
 		--print("Don't press A, we're paused.");
+		return;
+	end
+
+	-- Don't press A if the race is finished
+	if showResults ~= 0 then
 		return;
 	end
 
