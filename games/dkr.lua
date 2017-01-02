@@ -74,19 +74,16 @@ local object_fields = {
 	["camera_zoom"] = 0x12C, -- Float
 	["throttle"] = 0x14C, -- Float 0-1
 	["spin_timer"] = 0x206, -- s16_be
-	["powerup_quantity"] = 0x20B, -- Byte, Max 10
-	["powerup_type"] = 0x20C, -- Byte
-	["powerup_types"] = {
-		[0x00] = "Blue 1",
-		[0x01] = "Blue 2",
-		[0x02] = "Blue 3",
-		[0x03] = "Red 1",
-		[0x04] = "Red 2",
-		[0x05] = "Red 3",
-		[0x06] = "Green 1",
-		[0x07] = "Green 2",
-		[0x08] = "Green 3", -- TODO: There are more of these
+	["powerup_color"] = 0x20A, -- Byte, 0-4
+	["powerup_colors"] = {
+		[0x00] = "Blue",
+		[0x01] = "Red",
+		[0x02] = "Green",
+		[0x03] = "Yellow",
+		[0x04] = "Rainbow",
 	},
+	["powerup_quantity"] = 0x20B, -- Byte, Max 10
+	["powerup_level"] = 0x20C, -- Byte, 0-2
 	["bananas"] = 0x21D, -- s8, capped at 99
 	["x_rot"] = 0x23A, -- 16_be
 	["y_rot"] = 0x238, -- 16_be
@@ -98,8 +95,14 @@ local object_fields = {
 
 -- Game settings fields, relative to dereferencePointer(Game.Memory.game_settings[version])
 game_settings_fields = {
-	map = 0x49,
-	p1_character = 0x59,
+	keys_collected = 0x08, -- u16_be? bitfield
+	bosses_beaten = 0x0D, -- byte? bitfield
+	trophies_collected = 0x0E, -- u16_be? bitfield
+	tt_amulet_pieces = 0x16, -- u8
+	wizpig_amulet_pieces = 0x17, -- u8
+	balloons = 0x1C, -- u8
+	map = 0x49, -- Byte
+	p1_character = 0x59, -- Byte
 };
 
 -- Boost size: 0x90
