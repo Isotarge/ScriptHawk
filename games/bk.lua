@@ -1888,6 +1888,16 @@ function zipToSelectedObject()
 	end
 end
 
+function despawnSelectedObject()
+	if script_mode == "Examine" or script_mode == "List" then -- Model 1
+		local objectArray = dereferencePointer(Game.Memory.object_array_pointer[version]);
+		if isRDRAM(objectArray) then
+			local slotBase = objectArray + getSlotBase(object_index);
+			mainmemory.writebyte(slotBase + 0x47, 0xFF); -- TODO: Ask Mittenz which bit actually despawns stuff and only set that :^)
+		end
+	end
+end
+
 ---------------
 -- OSD Stuff --
 ---------------
@@ -2043,6 +2053,7 @@ end
 ScriptHawk.bindKeyRealtime("N", decrementObjectIndex, true);
 ScriptHawk.bindKeyRealtime("M", incrementObjectIndex, true);
 ScriptHawk.bindKeyRealtime("Z", zipToSelectedObject, true);
+ScriptHawk.bindKeyRealtime("X", despawnSelectedObject, true);
 ScriptHawk.bindKeyRealtime("C", toggleObjectAnalysisToolsMode, true);
 
 ---------------
