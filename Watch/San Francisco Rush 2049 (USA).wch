@@ -1,4 +1,14 @@
 SystemID N64
+11648C	d	h	1	RDRAM	Cheats Unlocked
+116490	d	h	1	RDRAM	Cheats Unlocked
+116494	d	h	1	RDRAM	Cheats Unlocked
+116498	d	h	1	RDRAM	Cheats Unlocked
+11649C	d	h	1	RDRAM	Cheats Unlocked
+1164A0	w	h	1	RDRAM	Cheats Unlocked
+13A0B4	d	h	1	RDRAM	Coin Collected Thingy
+13A110	d	h	1	RDRAM	Coin Collected Thingy
+13A350	d	h	1	RDRAM	Coin Collected Thingy
+14978C	b	h	1	RDRAM	Map Index?
 14A298	d	f	1	RDRAM	Velocity
 14A47C	d	f	1	RDRAM	X Position
 14A480	d	f	1	RDRAM	Y Position
@@ -12,4 +22,5 @@ SystemID N64
 14A554	d	f	1	RDRAM	Rotation?
 14A558	d	f	1	RDRAM	Rotation?
 14A55C	d	f	1	RDRAM	Rotation?
+15201C	d	h	1	RDRAM	Map Collision Data Pointer
 
