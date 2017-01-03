@@ -20,6 +20,11 @@ local Game = {
 
 local player_object_pointer = 0x3FFFC0; -- Seems to be the same for all versions
 
+function Game.getPlayerObject(player)
+	player = player or 1;
+	return dereferencePointer(player_object_pointer + (player - 1) * 4);
+end
+
 currentPointers = {};
 object_index = 1; -- TODO: Grab script stuff up top for because of reasons, fix w/refactor please
 
@@ -106,6 +111,13 @@ game_settings_fields = {
 	balloons = 0x1C, -- u8
 	map = 0x49, -- Byte
 	p1_character = 0x59, -- Byte
+	p2_character = 0x71, -- Byte
+	p3_character = 0x89, -- Byte
+	p4_character = 0xA1, -- Byte
+	p5_character = 0xB9, -- Byte
+	p6_character = 0xD1, -- Byte
+	p7_character = 0xE9, -- Byte
+	p8_character = 0x101, -- Byte
 };
 
 -- Boost size: 0x90
@@ -329,8 +341,8 @@ end
 -- Physics/Scale --
 -------------------
 
-function Game.getCharacter()
-	local playerObject = dereferencePointer(player_object_pointer);
+function Game.getCharacter(player)
+	local playerObject = Game.getPlayerObject(player);
 	if isRDRAM(playerObject) then
 		return mainmemory.readbyte(playerObject + object_fields.map_color);
 	end
@@ -355,42 +367,42 @@ function Game.setCharacter(index, player)
 	mainmemory.writebyte(Game.Memory.CSS_character[version] + player - 1, charToCSS[index] or 9);
 	local gameSettings = dereferencePointer(Game.Memory.game_settings[version]);
 	if isRDRAM(gameSettings) then
-		mainmemory.writebyte(gameSettings + game_settings_fields.p1_character, index); -- TODO: Correctly set P2, P3, P4
+		mainmemory.writebyte(gameSettings + game_settings_fields.p1_character + ((player - 1) * 0x18), index);
 	end
 end
 
-function Game.getVelocity()
-	local playerObject = dereferencePointer(player_object_pointer);
+function Game.getVelocity(player)
+	local playerObject = Game.getPlayerObject(player);
 	if isRDRAM(playerObject) then
 		return mainmemory.readfloat(playerObject + object_fields.velocity, true);
 	end
 	return 0;
 end
 
-function Game.setVelocity(value)
-	local playerObject = dereferencePointer(player_object_pointer);
+function Game.setVelocity(value, player)
+	local playerObject = Game.getPlayerObject(player);
 	if isRDRAM(playerObject) then
 		mainmemory.writefloat(playerObject + object_fields.velocity, value, true);
 	end
 end
 
-function Game.getLateralVelocity()
-	local playerObject = dereferencePointer(player_object_pointer);
+function Game.getLateralVelocity(player)
+	local playerObject = Game.getPlayerObject(player);
 	if isRDRAM(playerObject) then
 		return mainmemory.readfloat(playerObject + object_fields.lateral_velocity, true);
 	end
 	return 0;
 end
 
-function Game.setLateralVelocity(value)
-	local playerObject = dereferencePointer(player_object_pointer);
+function Game.setLateralVelocity(value, player)
+	local playerObject = Game.getPlayerObject(player);
 	if isRDRAM(playerObject) then
 		mainmemory.writefloat(playerObject + object_fields.lateral_velocity, value, true);
 	end
 end
 
-function Game.getSpinTimer()
-	local playerObject = dereferencePointer(player_object_pointer);
+function Game.getSpinTimer(player)
+	local playerObject = Game.getPlayerObject(player);
 	if isRDRAM(playerObject) then
 		return mainmemory.read_s16_be(playerObject + object_fields.spin_timer);
 	end
@@ -408,47 +420,47 @@ function Game.colorSpinTimer()
 	return getColor(spinTimer);
 end
 
-function Game.getYVelocity()
-	local playerObject = dereferencePointer(player_object_pointer);
+function Game.getYVelocity(player)
+	local playerObject = Game.getPlayerObject(player);
 	if isRDRAM(playerObject) then
 		return mainmemory.readfloat(playerObject + object_fields.y_velocity, true);
 	end
 	return 0;
 end
 
-function Game.setYVelocity(value)
-	local playerObject = dereferencePointer(player_object_pointer);
+function Game.setYVelocity(value, player)
+	local playerObject = Game.getPlayerObject(player);
 	if isRDRAM(playerObject) then
 		mainmemory.writefloat(playerObject + object_fields.y_velocity, value, true);
 	end
 end
 
-function Game.getBoost()
-	local playerObject = dereferencePointer(player_object_pointer);
+function Game.getBoost(player)
+	local playerObject = Game.getPlayerObject(player);
 	if isRDRAM(playerObject) then
 		return mainmemory.read_s8(playerObject + object_fields.boost_timer);
 	end
 	return 0;
 end
 
-function Game.getThrottle()
-	local playerObject = dereferencePointer(player_object_pointer);
+function Game.getThrottle(player)
+	local playerObject = Game.getPlayerObject(player);
 	if isRDRAM(playerObject) then
 		return mainmemory.readfloat(playerObject + object_fields.throttle, true);
 	end
 	return 0;
 end
 
-function Game.getBananas()
-	local playerObject = dereferencePointer(player_object_pointer);
+function Game.getBananas(player)
+	local playerObject = Game.getPlayerObject(player);
 	if isRDRAM(playerObject) then
 		return mainmemory.read_s8(playerObject + object_fields.bananas);
 	end
 	return 0;
 end
 
-function Game.setBananas(value)
-	local playerObject = dereferencePointer(player_object_pointer);
+function Game.setBananas(value, player)
+	local playerObject = Game.getPlayerObject(player);
 	if isRDRAM(playerObject) then
 		mainmemory.writebyte(playerObject + object_fields.bananas, value);
 	end
@@ -458,32 +470,32 @@ end
 -- Position --
 --------------
 
-function Game.getXPosition()
-	local playerObject = dereferencePointer(player_object_pointer);
+function Game.getXPosition(player)
+	local playerObject = Game.getPlayerObject(player);
 	if isRDRAM(playerObject) then
 		return mainmemory.readfloat(playerObject + object_fields.x_pos, true);
 	end
 	return 0;
 end
 
-function Game.getYPosition()
-	local playerObject = dereferencePointer(player_object_pointer);
+function Game.getYPosition(player)
+	local playerObject = Game.getPlayerObject(player);
 	if isRDRAM(playerObject) then
 		return mainmemory.readfloat(playerObject + object_fields.y_pos, true);
 	end
 	return 0;
 end
 
-function Game.getZPosition()
-	local playerObject = dereferencePointer(player_object_pointer);
+function Game.getZPosition(player)
+	local playerObject = Game.getPlayerObject(player);
 	if isRDRAM(playerObject) then
 		return mainmemory.readfloat(playerObject + object_fields.z_pos, true);
 	end
 	return 0;
 end
 
-function Game.setXPosition(value)
-	local playerObject = dereferencePointer(player_object_pointer);
+function Game.setXPosition(value, player)
+	local playerObject = Game.getPlayerObject(player);
 	if isRDRAM(playerObject) then
 		mainmemory.writefloat(playerObject + object_fields.x_pos, value, true);
 		local wheelArray = dereferencePointer(playerObject + object_fields.wheel_array_pointer);
@@ -499,16 +511,16 @@ function Game.setXPosition(value)
 	end
 end
 
-function Game.setYPosition(value)
-	local playerObject = dereferencePointer(player_object_pointer);
+function Game.setYPosition(value, player)
+	local playerObject = Game.getPlayerObject(player);
 	if isRDRAM(playerObject) then
 		mainmemory.writefloat(playerObject + object_fields.y_pos, value, true);
 		Game.setYVelocity(0);
 	end
 end
 
-function Game.setZPosition(value)
-	local playerObject = dereferencePointer(player_object_pointer);
+function Game.setZPosition(value, player)
+	local playerObject = Game.getPlayerObject(player);
 	if isRDRAM(playerObject) then
 		mainmemory.writefloat(playerObject + object_fields.z_pos, value, true);
 	end
@@ -518,46 +530,46 @@ end
 -- Rotation --
 --------------
 
-function Game.getXRotation()
-	local playerObject = dereferencePointer(player_object_pointer);
+function Game.getXRotation(player)
+	local playerObject = Game.getPlayerObject(player);
 	if isRDRAM(playerObject) then
 		return mainmemory.read_u16_be(playerObject + object_fields.x_rot);
 	end
 	return 0;
 end
 
-function Game.getYRotation()
-	local playerObject = dereferencePointer(player_object_pointer);
+function Game.getYRotation(player)
+	local playerObject = Game.getPlayerObject(player);
 	if isRDRAM(playerObject) then
 		return mainmemory.read_u16_be(playerObject + object_fields.facing_angle);
 	end
 	return 0;
 end
 
-function Game.getZRotation()
-	local playerObject = dereferencePointer(player_object_pointer);
+function Game.getZRotation(player)
+	local playerObject = Game.getPlayerObject(player);
 	if isRDRAM(playerObject) then
 		return mainmemory.read_u16_be(playerObject + object_fields.z_rot);
 	end
 	return 0;
 end
 
-function Game.setXRotation(value)
-	local playerObject = dereferencePointer(player_object_pointer);
+function Game.setXRotation(value, player)
+	local playerObject = Game.getPlayerObject(player);
 	if isRDRAM(playerObject) then
 		mainmemory.write_u16_be(playerObject + object_fields.x_rot, value);
 	end
 end
 
-function Game.setYRotation(value)
-	local playerObject = dereferencePointer(player_object_pointer);
+function Game.setYRotation(value, player)
+	local playerObject = Game.getPlayerObject(player);
 	if isRDRAM(playerObject) then
 		mainmemory.write_u16_be(playerObject + object_fields.facing_angle, value);
 	end
 end
 
-function Game.setZRotation(value)
-	local playerObject = dereferencePointer(player_object_pointer);
+function Game.setZRotation(value, player)
+	local playerObject = Game.getPlayerObject(player);
 	if isRDRAM(playerObject) then
 		mainmemory.write_u16_be(playerObject + object_fields.z_rot, value);
 	end
@@ -566,7 +578,7 @@ end
 ----------------------------------------
 -- Optimal tapping script             --
 -- Written by Faschz, 2015            --
--- Enhancements by Isotarge 2015-2016 --
+-- Enhancements by Isotarge 2015-2017 --
 ----------------------------------------
 
 -- Boost Thresholds
@@ -755,8 +767,8 @@ end
 
 local radius = 1000;
 
-local function encircle_player()
-	local playerObject = dereferencePointer(player_object_pointer);
+local function encircle_player(player)
+	local playerObject = Game.getPlayerObject(player);
 	if not isRDRAM(playerObject) then
 		return;
 	end
@@ -800,7 +812,7 @@ function drawAnalysisToolsOSD()
 		return;
 	end
 	local row = 0;
-	local playerObject = dereferencePointer(player_object_pointer);
+	local playerObject = Game.getPlayerObject();
 
 	gui.text(Game.OSDPosition[1], 0 + Game.OSDRowHeight * row, "Index: "..object_index.."/"..#currentPointers, nil, 'bottomright');
 	row = row + 1;
@@ -886,7 +898,7 @@ function Game.applyInfinites()
 	mainmemory.write_u32_be(Game.Memory.cheats_enabled[version], cheatsEnabled);
 
 	-- Player object bizzo
-	local playerObject = dereferencePointer(player_object_pointer);
+	local playerObject = Game.getPlayerObject();
 	if isRDRAM(playerObject) then
 		mainmemory.writebyte(playerObject + object_fields.bananas, 10);
 		mainmemory.writebyte(playerObject + object_fields.powerup_quantity, 1);
@@ -942,7 +954,15 @@ testSpace = {
 --]]
 
 function Game.eachFrame()
-	--Game.setCharacter(8);
+	--Game.setCharacter(8, 1);
+	--Game.setCharacter(8, 2);
+	--Game.setCharacter(8, 3);
+	--Game.setCharacter(8, 4);
+	--Game.setCharacter(8, 5);
+	--Game.setCharacter(8, 6);
+	--Game.setCharacter(8, 7);
+	--Game.setCharacter(8, 8);
+
 	populateObjectPointerList();
 
 	if not otap_enabled and forms.ischecked(ScriptHawk.UI.form_controls.otap_checkbox) then
