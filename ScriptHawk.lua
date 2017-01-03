@@ -364,6 +364,10 @@ local supportedGames = {
 	["619AB27EA1645399439AD324566361D3E7FF020E"] = {["moduleName"] = "games.rayman_2", ["friendlyName"] = "Rayman 2 - The Great Escape (Europe) (En,Fr,De,Es,It)"},
 	["50558356B059AD3FBAF5FE95380512B9DCEAAF52"] = {["moduleName"] = "games.rayman_2", ["friendlyName"] = "Rayman 2 - The Great Escape (USA) (En,Fr,De,Es,It)"},
 
+	-- San Francisco Rush 2049
+	["3F99351D7BB61656614BDB2AA1A90CFE55D1922C"] = {["moduleName"] = "games.rush_2049", ["friendlyName"] = "San Francisco Rush 2049 (USA)"},
+	["61373D4758ECA3FA831BEAC27B4D4C250845F80C"] = {["moduleName"] = "games.rush_2049", ["friendlyName"] = "San Francisco Rush 2049 (Europe) (En,Fr,De,Es,It,Nl)"},
+
 	-- SM64
 	["4AC5721683D0E0B6BBB561B58A71740845DCEEA9"] = {["moduleName"] = "games.sm64", ["friendlyName"] = "Super Mario 64 (Europe) (En,Fr,De)"},
 	["3F319AE697533A255A1003D09202379D78D5A2E0"] = {["moduleName"] = "games.sm64", ["friendlyName"] = "Super Mario 64 (Japan) (Rev A) (Shindou Edition)"},

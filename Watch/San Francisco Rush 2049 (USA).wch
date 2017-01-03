@@ -1,0 +1,15 @@
+SystemID N64
+14A298	d	f	1	RDRAM	Velocity
+14A47C	d	f	1	RDRAM	X Position
+14A480	d	f	1	RDRAM	Y Position
+14A484	d	f	1	RDRAM	Z Position
+14A53C	d	f	1	RDRAM	Rotation?
+14A540	d	f	1	RDRAM	Rotation?
+14A544	d	f	1	RDRAM	Rotation?
+14A548	d	f	1	RDRAM	Rotation?
+14A54C	d	f	1	RDRAM	Rotation?
+14A550	d	f	1	RDRAM	Rotation?
+14A554	d	f	1	RDRAM	Rotation?
+14A558	d	f	1	RDRAM	Rotation?
+14A55C	d	f	1	RDRAM	Rotation?
+

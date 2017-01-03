@@ -1,0 +1,6 @@
+SystemID N64
+170D70	d	f	1	RDRAM	Velocity
+170F54	d	f	1	RDRAM	X Position
+170F58	d	f	1	RDRAM	Y Position
+170F5C	d	f	1	RDRAM	Z Position
+
