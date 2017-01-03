@@ -1,10 +1,10 @@
 SystemID N64
-118E84	d	h	1	RDRAM	Cheats Enabled
-118E88	d	h	1	RDRAM	Cheats Enabled
-118E8C	d	h	1	RDRAM	Cheats Enabled
-118E90	d	h	1	RDRAM	Cheats Enabled
-118E94	d	h	1	RDRAM	Cheats Enabled
-118E98	d	h	1	RDRAM	Cheats Enabled
+118E84	d	h	1	RDRAM	Cheats Unlocked
+118E88	d	h	1	RDRAM	Cheats Unlocked
+118E8C	d	h	1	RDRAM	Cheats Unlocked
+118E90	d	h	1	RDRAM	Cheats Unlocked
+118E94	d	h	1	RDRAM	Cheats Unlocked
+118E98	d	h	1	RDRAM	Cheats Unlocked
 170D70	d	f	1	RDRAM	Velocity
 170F54	d	f	1	RDRAM	X Position
 170F58	d	f	1	RDRAM	Y Position
