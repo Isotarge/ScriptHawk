@@ -386,6 +386,12 @@ function Game.setVelocity(value, player)
 	end
 end
 
+local previous_velocity = 0;
+local current_velocity = 0;
+function Game.getAcceleration(player)
+	return current_velocity - previous_velocity;
+end
+
 function Game.getLateralVelocity(player)
 	local playerObject = Game.getPlayerObject(player);
 	if isRDRAM(playerObject) then
@@ -954,6 +960,11 @@ testSpace = {
 --]]
 
 function Game.eachFrame()
+	if Game.isPhysicsFrame() then
+		previous_velocity = current_velocity;
+		current_velocity = Game.getVelocity();
+	end
+	
 	--Game.setCharacter(8, 1);
 	--Game.setCharacter(8, 2);
 	--Game.setCharacter(8, 3);
@@ -1040,9 +1051,10 @@ Game.OSD = {
 	{"Spin Timer", Game.getSpinTimer, Game.colorSpinTimer},
 	{"Boost", Game.getBoost},
 	{"Velocity", Game.getVelocity},
+	{"Acceleration", Game.getAcceleration},
 	{"Y Velocity", Game.getYVelocity},
 	{"Lateral Velocity", Game.getLateralVelocity},
-	--{"Lateral Acceleration", Game.getLateralAcceleration}, -- TODO: Is this a thing?
+	--{"Lateral Acceleration", Game.getLateralAcceleration},
 	{"Throttle", Game.getThrottle},
 	{"Separator", 1},
 	{"Max dY"},
@@ -1051,7 +1063,7 @@ Game.OSD = {
 	{"Separator", 1},
 	{"Rot. X", Game.getXRotation},
 	{"Facing", Game.getYRotation},
-	--{"Moving", Game.getMovingRotation}, -- TODO: Game.getMovingRotation
+	--{"Moving", Game.getMovingRotation},
 	{"Rot. Z", Game.getZRotation},
 };
 
