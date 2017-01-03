@@ -3,72 +3,16 @@ SLOWLY MOVING TO BK_NTSC.S
 
 0x8024E55C [ void ]	CopyP1InputTimers( word $a0 srcInputSetIndex, float* $a1 destinationSetPtr )
 
-0x8024E7C8 [ void ] UpdateButtonInputs( void )
-
 0x80255D04 [ $v0 ] 	GetZero( void )
 
 
-
- 
-
 0x8025C100 [ ??? ]	CheckSum( ??? )????
 
-
-0x8028745C [ void ]	SetPlayerMovementState( struct* $a0 playerStructPtr, word $a1 movementState )
-
-0x80287674 [ void ]	SetPlayerMovementSubstate( struct* $a0 playerStructPtr, word $a1 movementSubState )
-
-0x80287674 [ byte $v0 ]	GetPlayerMovementSubstate( struct* $a0 playerStructPtr )
-
-0x802878C4 [ bool $v0 ] IsCharacterMovmentSubstate3(  struct* $a0 playerStructPtr )
-
-0x80289688 [ word $v0 ] GetPlayerAnimationState( struct* $a0 playerAnimationStructPtr )
-0x80289688 [ float $f0 ]GetPlayerAnimationTimer( struct* $a0 playerAnimationStructPtr )
-
-0x8028977C [ void ]	SetPlayerAnimationState( struct* $a0 playerAnimationStructPtr, word $a1 animationState )
-
-0x80289820 [ void ]	SetPlayerBounceRate_( word $a0 input)
-
-0x80289E00 [ void ] 	UpdateMovementAnimationFrame( void )
-
-0x80289F10 [ void ]	SetPlayerBounceRate( word $a0 input)
-
-0x80289F64 [ word $v0 ] GetPlayerPointer( void )
-
-0x8028A960 [ word $v0 ]	GetBeakBargeUnlockedFlag( void )
-0x8028A980 [ word $v0 ]	GetBeakBombUnlockedFlag( void )
-0x8028A9A0 [ word $v0 ]	GetBeakBusterUnlockedFlag( void )
-0x8028A9C0 [ word $v0 ]	GetCameraControlsUnlockedFlag( void )
-0x8028A9E0 [ word $v0 ]	GetBearPunchUnlockedFlag( void )
-0x8028AA00 [ word $v0 ]	GetClimbTreesUnlockedFlag( void )
-
-0x8028AA98 [ word $v0 ]	GetEggMovesUnlockedFlag( void )
-
-0x8028AB08 [ word $v0 ]	GetFlapFlipUnlockedFlag( void )
-0x8028AB28 [ word $v0 ]	GetFlyingUnlockedFlag( void )
-0x8028AB48 [ word $v0 ]	GetHoldAToJumpHigherUnlockedFlag( void )
-
-0x8028AC18 [ word $v0 ]	GetRollUnlockedFlag( void )
-0x8028AC38 [ word $v0 ]	GetShockSpringJumpUnlockedFlag( void )
-0x8028AC58 [ word $v0 ]	GetWadingBootsUnlockedFlag( void )
-0x8028AC78 [ word $v0 ]	GetTalonTrotUnlockedFlag( void )
-0x8028AC98 [ word $v0 ]	GetTalonTrotUnlockedFlag_Copy( void )
-0x8028ACB8 [ word $v0 ]	GetWonderwingUnlockedFlag_Copy( void )
-
-0x8028AD8C [ bool $v0 ] InPumpkinMovementSet( void )
-
-0x8028B094 [ bool $v0 ] IsPlayerMoreThan60AboveGround( void ) //height falling begins
-
-0x8028B51C [ byte $v0 ] GetPlayerIsInWaterFlag( void 0)
-
-0x8028B6FC [ void ] 	SetPlayerAsGrounded( void )
 0x8028B71C [ void ] 	UpdatePossibleMovementStates( void )
 
-0x8028D2E4 [ void ] 	ItemAndEnemyCollision( void )
 
-0x8028E71C [ void ] 	UpdateBanjo ( void )
 
-0x8028E7CC [ byte $v0 ] GetMumboTransformation( void )
+
 
 0x8028E9A4 [ void ]	CopyXYZPosition_wrapper( float $a0 destinationXPtr )
 

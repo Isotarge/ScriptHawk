@@ -42,7 +42,6 @@
 
 [IncrementGlobalOnCounter]: 0x8023DCDC
 [DecrementGlobalOnCounter]: 0x8023DCF4
-
 [Main]:	0x8023DD0C
 [MainLoop]: 0x8023DF9C
 
@@ -70,6 +69,8 @@
 [SetCamera_XYZRotation_0]:	0x8024CE40	;I: (float $f12 XPos, float $f14 YPos, float $a2 ZPos)
 
 
+[UpdateButtonInputs]:	0x8024E7C8
+
 [IncreaseGlobalOnTimerby50]: 80254F90	
 
 [IncrementGlobalOnTimer]:	80255ACC
@@ -91,7 +92,7 @@
 [ClampFloat]:   0x80257ED8  ;I: (float $f12 input, float $f14 lowerLimit, float $a2 upperLimit) O: [float $f0]
 [GetYRotationFromPointAToB]:	0x80257F18	;I: (float* $a0 pointAXPtr, float* $a1 BXPtr, float* $a2 result)
 
-
+[IsAtOrigin]:			0x802582EC	;I:	(float* $a0 inputXPtr)	O: [byte $v0 bool]
 [IsNotAtOrigin]:		0x80258368	;I:	(float* $a0 inputXPtr)	O: [byte $v0 bool]
 [IsNotOnYAxisToOrigin]:	0x802583D8	;I:	(float* $a0 inputXPtr)	O: [byte $v0 bool]
 
@@ -154,13 +155,15 @@
 
 [SetMovementStruct_AnimationStruct_AnimationTimer]:	0x8028764C	;I: (struct* $a0 movementStruct, float $a1 input)
 [SetMovementStruct_MovementSubstate]:				0x80287474	;I: (struct* $a0 movementStruct, byte $a1 input)
-
+[SetMovementStruct_Byte_0x21]:						0x8028767C	;I: (struct* $a0 movementStruct, byte $a1 input)
+[SetMovementStruct_Byte_0x22]:						0x80287684	;I: (struct* $a0 movementStruct, byte $a1 input)
 [SetMovementStruct_AnimationDuration]:				0x8028768C	;I: (struct* $a0 movementStruct, float $a1 input)
 [SetMovementStruct_TransitionDuration]:				0x802876C0	;I: (struct* $a0 movementStruct, float $a1 input)
 
 [SetMovementStruct_AnimationStruct_AnimationState]:	0x80287790	;I:	(struct* $a0 movementStruct)	O: [word $v0]
 [GetMovementStruct_MovementSubstate]:				0x802877B0	;I: (struct* $a0 movementStruct)	O: [byte $v0]
-
+[GetMovementStruct_Byte_0x21]:						0x802877B8	;I: (struct* $a0 movementStruct)	O: [byte $v0]
+[GetMovementStruct_Byte_0x22]:						0x802877C0	;I: (struct* $a0 movementStruct)	O: [byte $v0]
 [GetMovementStruct_AnimationDuration]:				0x802877CC	;I: (struct* $a0 movementStruct)	O: [float $f0]
 [GetMovementStruct_TransitionDuration]:				0x802877D0	;I: (struct* $a0 movementStruct)	O: [float $f0]
 [GetMovementStruct_AnimationStruct_AnimationTimer]:	0x802877D8	;I: (struct* $a0 movementStruct)	O: [float $f0]
@@ -173,31 +176,104 @@
 /* ****************
  * Animation Struct (size:0x24):
  * 0x00: [word]		???
- * 0x04: [float]	???
+ * 0x04: [word]		???
  * 0x08: [byte?]	???
  * 0x09: [byte?]	???
  * 0x0A: [half]		???
- * 0x0C: [half?]	???
- * 0x0E: [half?]	???
+ * 0x0C: [half]		???
+ * 0x0E: [half]		???
  * 0x10: [word]		AnimationState
  * 0x14: [float]	AnimationTimer
  * 0x18: [float]	???
+ * 0x1C: [byte]     ???
+ * 0x1D: [byte]		???
+ * 0x1E: [byte]		???
  */
+[SetTo1AnimationStruct_Byte_0x1C]:		0x80289674	;I:	(struct* $a0 animationStruct)
+//[Get0x20]: 0x80289674  
 [GetAnimationStruct_AnimationState]:	0x80289688	;I: (struct* $a0 animationStruct)	O: [word $v0]
 [GetAnimationStruct_AnimationTimer]:	0x80289690	;I: (struct* $a0 animationStruct)	O: [float $f0]
+[GetAnimationStruct_Float_0x18]:		0x80289698	;I:	(struct* $a0 animationStruct)	O: [float $f0]
 
 [SetAnimationStruct_AnimationState]:	0x8028977C	;I: (struct* $a0 animationStruct, word $a1 input)
 [SetAnimationStruct_AnimationTimer]:	0x80289690	;I: (struct* $a0 animationStruct, float $a1 input)
+[SetAnimationStruct_Word_0x00]:			0x80289790	;I: (struct* $a0 animationStruct, word $a1 input)
+[SetAnimationStruct_Word_0x04]:			0x80289798	;I: (struct* $a0 animationStruct, word $a1 input)
+[GetAnimationStruct_Float_0x18]:		0x802897C8	;I: (struct* $a0 animationStruct, float $a1 input)
 
-
-
+[SetTo2ObjectAnimationStruct_Byte_0x1C]: 0x8028980C	;I:	(struct* $a0 animationStruct)
 [SetPlayerBounceRate]:	0x80289820	;I:	(word $a0 input)
 
 [GetPlayerBounceRate]:	0x80289EA4	;O:	[word $v0]
 
 [SetPlayerBounceRate_0]:	0x80289F10	;I:	(word $a0 input)
 
-[GetPlayerMovementStructPtr]:	0x80289F64	;O:	[struct* $v0]
+[GetPlayerMovementStructPtr]:				0x80289F64	;O:	[struct* $v0]
+[GetPlayerAnimationStruct_AnimationTimer]:	0x80289F70	;O: [float $a0]
+[IsPlayerInAnimationState]:					0x80289F94	;I:	(word $a0 inputState)	O: [byte $v0 bool]
+[IsPlayerMovementStruct_Substate3]:			0x80289FC4	;O:	[byte $vo bool]
+
+[SetPlayerMovementState]:	0x8028A180	;I:	(word $a0 animationIndex, float $a1 animationDuration)
+
+
+[GetBeakBargeUnlockedFlag]:			0x8028A960	;O: [word $v0]
+[GetBeakBombUnlockedFlag]:			0x8028A980	;O: [word $v0]
+[GetBeakBusterUnlockedFlag]:		0x8028A9A0	;O: [word $v0]
+[GetCameraControlsUnlockedFlag]:	0x8028A9C0	;O: [word $v0]
+[GetBearPunchUnlockedFlag]:			0x8028A9E0	;O: [word $v0]
+[GetClimbTreesUnlockedFlag]:		0x8028AA00	;O: [word $v0]
+[IsAbleToDive]:						0x8028AA20	;O:	[byte $v0 bool]
+[GetEggMovesUnlockedFlag]:			0x8028AA98	;O: [word $v0]
+[IsAbleToUseFeatheryFlap]:			0x8028AAB8	;O:	[byte $v0 bool]
+[GetFlapFlipUnlockedFlag]:			0x8028AB08	;O: [word $v0]
+[GetFlyingUnlockedFlag]:			0x8028AB28	;O: [word $v0]
+[GetHoldAToJumpHigherUnlockedFlag]:	0x8028AB48	;O: [word $v0]
+[IsAbleToUseFeatheryFlap]:			0x8028AB68	;O:	[byte $v0 bool]
+
+[GetRollUnlockedFlag]:				0x8028AC18	;O: [word $v0]
+[GetShockSpringJumpUnlockedFlag]:	0x8028AC38	;O: [word $v0]
+[GetWadingBootsUnlockedFlag]:		0x8028AC58	;O: [word $v0]
+[GetTalonTrotUnlockedFlag]:			0x8028AC78	;O: [word $v0]
+[GetTalonTrotUnlockedFlag_0]:		0x8028AC98	;O: [word $v0]
+[GetWonderWingUnlockedFlag]:		0x8028ACB8	;O: [word $v0]
+
+
+[IsCurrentlyInTermiteMovementState]:	0x8028AD64	;O: [byte $v0 bool]
+[IsCurrentlyInPumpkinMovementState]:	0x8028AD8C	;O: [byte $v0 bool]
+[IsEnteringLevelOtherThanSM]:			0x8028ADBC	;O:	[byte $v0 bool]
+
+
+[IsPlayerMoreThan60AboveGround]:	0x8028B094	;O: [byte $v0 bool]
+
+//[Get0]: 0x8028B120
+[IsInSwampWaterOrSand]:	0x8028B128	;O: [byte $v0 bool]
+[IsCurrentLevelRBB]:	0x8028B128	;O: [byte $v0 bool]
+
+[IsInIceFrictionState]:	0x8028B2E8	;O: [byte $v0 bool]
+
+[IsPlayerMovementStateinSwimmingSet]:	0x8028B470	;O: [byte $v0 bool]
+[IsDifferenceBetweenMovingAndFacingAngleMoreThan135]:	0x8028B4C4	;O: [byte $v0 bool]
+[IsPlayerInWater]:	0x8028B51C	;O: [byte $v0 bool]
+[IsPlayerSwimming]:	0x8028B528	;O: [byte $v0 bool]
+
+[SetPlayerAsGrounded]:	0x8028B6FC	
+
+[UpdateItemAndEnemyCollision]:	0x8028D2E4
+
+[SetCarriedObject_ModelIndex]:	0x8028D658	;I:	(word $a0 modelIndex)
+
+[GetCarriedObject_ModelIndex]:	0x8028D670	;O:	[word $v0]
+
+[UpdateBanjo]:	0x8028E71C
+
+[GetPlayerMovementStructPtr_0]:	0x8028E78C	;O:	[struct* $v0]
+
+[GetMumboTransformation_0]:			0x8028E7D4	;O:	[byte $v0]
+[GetClimbingPole_Bottom_Pos_0]:		0x8028E7EC	;I: (float* $a0 destXPtr)
+[GetShoesTimer_0]:					0x8028E80C	;I:	(byte $a0 shoeIndex)	O: [float $f0]
+[GetHeightOfGroundBeneathPlayer_0]:	0x8028E82C	;O: [float $f0]
+[GetFloorObjectNormalRotation_0]:	0x8028E84C	;I: (float* $a0 destXPtr)
+[GetCarriedObject_UnknownStruct2Ptr_0]:	0x8028E86C	;[struct* $v0]
 
 
 [UpdatePlayerModelToMumboTransFormation]: 0x80291D04
