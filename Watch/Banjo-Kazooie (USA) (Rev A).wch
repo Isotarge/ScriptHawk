@@ -20,6 +20,8 @@ SystemID N64
 37B3D2	b	u	1	RDRAM	Standing on Shock Spring Pad
 37B400	d	h	1	RDRAM	Floor Object Pointer
 37B47D	b	u	1	RDRAM	Wall Collisions
+37B498	d	h	1	RDRAM	Carried Object Pointer
+37B49C	b	u	1	RDRAM	Carried Object Position Update Toggle
 37B4E4	d	f	1	RDRAM	Slope Timer
 37B5A0	d	h	1	RDRAM	Moves Unlocked (Bitfield)
 37B5D0	d	f	1	RDRAM	Unknown Float
@@ -27,6 +29,9 @@ SystemID N64
 37B6B8	d	f	1	RDRAM	X Velocity
 37B6BC	d	f	1	RDRAM	Y Velocity
 37B6C0	d	f	1	RDRAM	Z Velocity
+37B6E8	d	f	1	RDRAM	Gravity
+37B6EC	d	f	1	RDRAM	Terminal Velocity
+37B6F0	d	f	1	RDRAM	Target XZ Velocity
 37B740	d	f	1	RDRAM	X Rotation - Current
 37B744	d	f	1	RDRAM	X Rotation - Target
 37B748	d	f	1	RDRAM	X Rotation - Update speed

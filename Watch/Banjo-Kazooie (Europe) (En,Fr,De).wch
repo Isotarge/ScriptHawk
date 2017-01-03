@@ -50,11 +50,16 @@ SystemID N64
 37CBB3	b	u	1	RDRAM	Standing on Damaging Ground?
 37CBD0	d	h	1	RDRAM	Floor Object Pointer
 37CC4D	b	u	1	RDRAM	Wall Collisions
+37CC68	d	h	1	RDRAM	Carried Object Pointer
+37CC6C	b	u	1	RDRAM	Carried Object Position Update Toggle
 37CCB4	d	f	1	RDRAM	Slope Timer
 37CD70	d	h	1	RDRAM	Moves Unlocked (Bitfield)
 37CE88	d	f	1	RDRAM	X Velocity
 37CE8C	d	f	1	RDRAM	Y Velocity
 37CE90	d	f	1	RDRAM	Z Velocity
+37CEB8	d	f	1	RDRAM	Gravity
+37CEBC	d	f	1	RDRAM	Terminal Velocity
+37CEC0	d	f	1	RDRAM	Target XZ Velocity
 37CF10	d	f	1	RDRAM	X Rotation - Current
 37CF14	d	f	1	RDRAM	X Rotation - Moving to
 37CF18	d	f	1	RDRAM	X Rotation - Update speed

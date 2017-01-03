@@ -117,6 +117,8 @@ SystemID N64
 37C27D	b	h	1	RDRAM	Wall Collisions
 37C27E	b	h	1	RDRAM	Enable Jumping From Water Surface
 37C284	d	u	1	RDRAM	Friction State
+37C298	d	h	1	RDRAM	Carried Object Pointer
+37C29C	b	u	1	RDRAM	Carried Object Position Update Toggle
 37C2D3	b	u	1	RDRAM	Mumbo Transformation
 37C2E4	d	f	1	RDRAM	Slope Timer
 37C397	b	u	1	RDRAM	Standing on Mumbo Pad
@@ -156,6 +158,7 @@ SystemID N64
 37D2B7	b	u	1	RDRAM	Ground Pound Active
 37D2BA	b	u	1	RDRAM	Ground Pound Progress
 37D3A4	b	u	1	RDRAM	Talon Trot Skid State
+37D580	b	h	1	RDRAM	Carried Object is being thrown
 37D5A4	b	h	1	RDRAM	Roll Stuff
 37D5A5	b	h	1	RDRAM	Roll Stuff
 37D958	d	f	1	RDRAM	Camera X Position
