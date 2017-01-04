@@ -2918,10 +2918,8 @@ function Game.eachFrame()
 		end
 	end
 
-	if spawner.enabled then
-		if forms.ischecked(ScriptHawk.UI.form_controls.spawner_carry_checkbox) then
-			mainmemory.writebyte(Game.Memory.carried_object_pointer[version] + 4, 1);
-		end
+	if forms.ischecked(ScriptHawk.UI.form_controls.spawner_carry_checkbox) then
+		mainmemory.writebyte(Game.Memory.carried_object_pointer[version] + 4, 1);
 	end
 end
 
