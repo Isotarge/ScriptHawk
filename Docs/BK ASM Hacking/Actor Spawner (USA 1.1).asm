@@ -3,6 +3,7 @@
 JAL 0x80400000
 
 [Return]: 0x8024D170
-[SpawnActor]: 0x80327334 ;Inputs: (word $a0 ActorIndex), (float* $a1 LocationXPtr), (??? $a2 ???)
+[SpawnActor]: 0x80327334 ;Inputs: (word $a0 ActorIndex), (float* $a1 LocationXPtr), (float $a2 rotation)
+[SpawnAndCarryActor]: 0x80327334 ;Inputs: (word $a0 ActorIndex), (float* $a1 LocationXPtr) ;TODO: Find this function
 
 .include "Actor Spawner.asm"

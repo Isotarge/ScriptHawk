@@ -256,13 +256,15 @@
 [IsPlayerInWater]:	0x8028B51C	;O: [byte $v0 bool]
 [IsPlayerSwimming]:	0x8028B528	;O: [byte $v0 bool]
 
-[SetPlayerAsGrounded]:	0x8028B6FC	
+[SetPlayerAsGrounded]:	0x8028B6FC
 
 [UpdateItemAndEnemyCollision]:	0x8028D2E4
 
 [SetCarriedObject_ModelIndex]:	0x8028D658	;I:	(word $a0 modelIndex)
 
 [GetCarriedObject_ModelIndex]:	0x8028D670	;O:	[word $v0]
+
+[SpawnAndCarryActor]: 0x8028DE0C ;Inputs: (word $a0 ActorIndex), (float* $a1 LocationXPtr)
 
 [UpdateBanjo]:	0x8028E71C
 

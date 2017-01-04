@@ -4,19 +4,31 @@ PUSH a0
 PUSH a1
 PUSH v0
 
-LH a0 SpawnActivationFlag
+LB a0 SpawnActivationFlag
 BEQZ a0 SkipSpawn
 NOP
 	LH a0 SpawnActorID
 	LA a1 SpawnLocationArray
-	JAL @SpawnActor //SpawnActor(u16 id, float[] position)
-	NOP
 
+	LB t0 SpawnCarryFlag
+	BNEZ t0 SpawnCarry
+	NOP
+		Spawn:
+		JAL @SpawnActor //SpawnActor(u16 id, float[] position)
+		NOP
+		B FinishedSpawn
+		NOP
+
+		SpawnCarry:
+		JAL @SpawnAndCarryActor
+		NOP
+
+	FinishedSpawn:
 	// Output the pointer to global memory so ScriptHawk can see it
 	SW v0 SpawnedActorPointer
 
 	// Kill the spawn flag
-	SH r0 SpawnActivationFlag
+	SB r0 SpawnActivationFlag
 
 SkipSpawn:
 POP v0
@@ -29,7 +41,9 @@ NOP
 MagicHeader:
 .word 0xABCDEF12
 SpawnActivationFlag:
-.halfword 0
+.byte 0
+SpawnCarryFlag:
+.byte 0
 SpawnActorID:
 .halfword 4 // Bull
 SpawnLocationArray:

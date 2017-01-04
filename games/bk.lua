@@ -235,6 +235,7 @@ Game.Memory = {
 	["fb_pointer"] = {0x282E00, 0x281E20, 0x281E20, 0x282FE0},
 	["frame_timer"] = {0x280700, 0x27F718, 0x27F718, 0x2808D8},
 	["floor_object_pointer"] = {0x37CBD0, 0x37CD00, 0x37B400, 0x37C200},
+	["carried_object_pointer"] = {0x37CC68, 0x37CD98, 0x37B498, 0x37C298},
 	["slope_timer"] = {0x37CCB4, 0x37CDE4, 0x37B4E4, 0x37C2E4},
 	["player_grounded"] = {0x37C930, 0x37CA60, 0x37B160, 0x37BF60},
 	["wall_collisions"] = {0x37CC4D, 0x37CD7D, 0x37B47D, 0x37C27D},
@@ -347,11 +348,11 @@ end
 -----------------
 
 local move_levels = {
-	["0. None"]                 = 0x00000000,
-	["1. Spiral Mountain 100%"] = 0x00009DB9,
+	["4. None"]                 = 0x00000000,
+	["3. Spiral Mountain 100%"] = 0x00009DB9,
 	["2. FFM Setup"]            = 0x000BFDBF,
-	["3. All"]                  = 0x000FFFFF,
-	["3. Demo"]                 = 0xFFFFFFFF
+	["1. All"]                  = 0x000FFFFF,
+	["0. Demo"]                 = 0xFFFFFFFF
 };
 
 local function unlock_moves()
@@ -1898,6 +1899,21 @@ function despawnSelectedObject()
 	end
 end
 
+function grabSelectedObject()
+	if script_mode == "Examine" or script_mode == "List" then -- Model 1
+		local objectArray = dereferencePointer(Game.Memory.object_array_pointer[version]);
+		if isRDRAM(objectArray) then
+			local slotBase = objectArray + getSlotBase(object_index);
+			local unknownStructAddress = dereferencePointer(slotBase);
+			if isRDRAM(unknownStructAddress) then
+				mainmemory.write_u32_be(Game.Memory.carried_object_pointer[version], RDRAMBase + unknownStructAddress);
+				mainmemory.writebyte(Game.Memory.carried_object_pointer[version] + 4, 1); -- Force update position
+				mainmemory.write_u32_be(Game.Memory.current_movement_state[version], 58); -- Force movement state
+			end
+		end
+	end
+end
+
 ---------------
 -- OSD Stuff --
 ---------------
@@ -2050,11 +2066,12 @@ end
 
 -- Keybinds
 -- For full list go here http://slimdx.org/docs/html/T_SlimDX_DirectInput_Key.htm
-ScriptHawk.bindKeyRealtime("N", decrementObjectIndex, true);
-ScriptHawk.bindKeyRealtime("M", incrementObjectIndex, true);
 ScriptHawk.bindKeyRealtime("Z", zipToSelectedObject, true);
 ScriptHawk.bindKeyRealtime("X", despawnSelectedObject, true);
 ScriptHawk.bindKeyRealtime("C", toggleObjectAnalysisToolsMode, true);
+ScriptHawk.bindKeyRealtime("V", grabSelectedObject, true);
+ScriptHawk.bindKeyRealtime("N", decrementObjectIndex, true);
+ScriptHawk.bindKeyRealtime("M", incrementObjectIndex, true);
 
 ---------------
 -- Autopound --
@@ -2728,6 +2745,7 @@ end
 spawner = {
 	enabled = false,
 	actorFlag = 0, -- Memory address of the flag that is checked to decide whether to spawn an actor
+	carryFlag = 0, -- Memory address of the flag that is checked to decide whether to carry the spawned actor
 	actorID = 0, -- Memory address of the ID of the actor that will be spawned
 	actorPosition = 0, -- Memory address of the array of coordinates to spawn the actor at
 	staticPosition = false, -- Boolean to toggle updating spawner position to player position each frame
@@ -2749,6 +2767,7 @@ function spawner.enable()
 		if mainmemory.read_u32_be(i) == 0xABCDEF12 then
 			print("Actor Spawner enabled successfully!");
 			spawner.actorFlag = i + 4;
+			spawner.carryFlag = i + 5;
 			spawner.actorID = i + 6;
 			spawner.actorPosition = i + 8;
 			spawner.staticPosition = false;
@@ -2799,7 +2818,12 @@ function spawner.spawn(id)
 			id = getActorID(forms.gettext(ScriptHawk.UI.form_controls.actor_dropdown));
 		end
 		spawner.updatePosition();
-		mainmemory.write_u16_be(spawner.actorFlag, 1);
+		mainmemory.writebyte(spawner.actorFlag, 1);
+		if forms.ischecked(ScriptHawk.UI.form_controls.spawner_carry_checkbox) then
+			mainmemory.writebyte(spawner.carryFlag, 1);
+		else
+			mainmemory.writebyte(spawner.carryFlag, 0);
+		end
 		mainmemory.write_u16_be(spawner.actorID, id);
 	else
 		print("Error enabling the Actor Spawner :(");
@@ -2843,16 +2867,17 @@ end
 
 function Game.initUI()
 	ScriptHawk.UI.form_controls.toggle_neverslip = forms.checkbox(ScriptHawk.UI.options_form, "Never Slip", ScriptHawk.UI.col(0) + ScriptHawk.UI.dropdown_offset, ScriptHawk.UI.row(6) + ScriptHawk.UI.dropdown_offset);
+	ScriptHawk.UI.form_controls.beta_pause_menu_checkbox = forms.checkbox(ScriptHawk.UI.options_form, "Beta Pause", ScriptHawk.UI.col(0) + ScriptHawk.UI.dropdown_offset, ScriptHawk.UI.row(7) + ScriptHawk.UI.dropdown_offset);
 
 	ScriptHawk.UI.form_controls.encircle_checkbox = forms.checkbox(ScriptHawk.UI.options_form, "Encircle (Beta)", ScriptHawk.UI.col(5) + ScriptHawk.UI.dropdown_offset, ScriptHawk.UI.row(4) + ScriptHawk.UI.dropdown_offset);
 	ScriptHawk.UI.form_controls.dynamic_radius_checkbox = forms.checkbox(ScriptHawk.UI.options_form, "Dynamic Radius", ScriptHawk.UI.col(5) + ScriptHawk.UI.dropdown_offset, ScriptHawk.UI.row(5) + ScriptHawk.UI.dropdown_offset);
 	ScriptHawk.UI.form_controls.freeze_clip_velocity = forms.checkbox(ScriptHawk.UI.options_form, "Freeze Clip Vel.", ScriptHawk.UI.col(5) + ScriptHawk.UI.dropdown_offset, ScriptHawk.UI.row(6) + ScriptHawk.UI.dropdown_offset);
 	ScriptHawk.UI.form_controls.autopound_checkbox = forms.checkbox(ScriptHawk.UI.options_form, "Auto Pound", ScriptHawk.UI.col(10) + ScriptHawk.UI.dropdown_offset, ScriptHawk.UI.row(6) + ScriptHawk.UI.dropdown_offset);
-	ScriptHawk.UI.form_controls.beta_pause_menu_checkbox = forms.checkbox(ScriptHawk.UI.options_form, "Beta Pause Menu", ScriptHawk.UI.col(10) + ScriptHawk.UI.dropdown_offset, ScriptHawk.UI.row(2) + ScriptHawk.UI.dropdown_offset);
 
 	-- Actor spawner
 	ScriptHawk.UI.form_controls.actor_dropdown = forms.dropdown(ScriptHawk.UI.options_form, actorNames, ScriptHawk.UI.col(10) + ScriptHawk.UI.dropdown_offset, ScriptHawk.UI.row(0) + ScriptHawk.UI.dropdown_offset);
 	ScriptHawk.UI.form_controls.spawn_actor_button = forms.button(ScriptHawk.UI.options_form, "Spawn", spawner.spawn, ScriptHawk.UI.col(10), ScriptHawk.UI.row(1), ScriptHawk.UI.col(2), ScriptHawk.UI.button_height);
+	ScriptHawk.UI.form_controls.spawner_carry_checkbox = forms.checkbox(ScriptHawk.UI.options_form, "Carry?", ScriptHawk.UI.col(12) + 10 + ScriptHawk.UI.dropdown_offset, ScriptHawk.UI.row(1) + ScriptHawk.UI.dropdown_offset);
 
 	-- Vile
 	ScriptHawk.UI.form_controls.wave_button =     forms.button(ScriptHawk.UI.options_form, "Wave", initWave,         ScriptHawk.UI.col(10), ScriptHawk.UI.row(4), ScriptHawk.UI.col(2), ScriptHawk.UI.button_height);
@@ -2860,7 +2885,7 @@ function Game.initUI()
 	ScriptHawk.UI.form_controls.fire_all_button = forms.button(ScriptHawk.UI.options_form, "Fire all", fireAllSlots, ScriptHawk.UI.col(10), ScriptHawk.UI.row(5), ScriptHawk.UI.col(4) + 8, ScriptHawk.UI.button_height);
 
 	-- Moves
-	ScriptHawk.UI.form_controls.moves_dropdown = forms.dropdown(ScriptHawk.UI.options_form, { "0. None", "1. Spiral Mountain 100%", "2. FFM Setup", "3. All", "3. Demo" }, ScriptHawk.UI.col(10) + ScriptHawk.UI.dropdown_offset, ScriptHawk.UI.row(7) + ScriptHawk.UI.dropdown_offset);
+	ScriptHawk.UI.form_controls.moves_dropdown = forms.dropdown(ScriptHawk.UI.options_form, { "4. None", "3. Spiral Mountain 100%", "2. FFM Setup", "1. All", "0. Demo" }, ScriptHawk.UI.col(10) + ScriptHawk.UI.dropdown_offset, ScriptHawk.UI.row(7) + ScriptHawk.UI.dropdown_offset);
 	ScriptHawk.UI.form_controls.moves_button = forms.button(ScriptHawk.UI.options_form, "Unlock Moves", unlock_moves, ScriptHawk.UI.col(5), ScriptHawk.UI.row(7), ScriptHawk.UI.col(4) + 8, ScriptHawk.UI.button_height);
 end
 
@@ -2887,6 +2912,12 @@ function Game.eachFrame()
 		if eep_checksum[i].value ~= checksum_value then
 			print("Slot "..i.." Checksum: "..toHexString(eep_checksum[i].value, 8).." -> "..toHexString(checksum_value, 8));
 			eep_checksum[i].value = checksum_value;
+		end
+	end
+
+	if spawner.enabled then
+		if forms.ischecked(ScriptHawk.UI.form_controls.spawner_carry_checkbox) then
+			mainmemory.writebyte(Game.Memory.carried_object_pointer[version] + 4, 1);
 		end
 	end
 end
