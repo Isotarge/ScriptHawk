@@ -1912,6 +1912,7 @@ function grabSelectedObject()
 				mainmemory.write_u32_be(Game.Memory.carried_object_pointer[version], RDRAMBase + unknownStructAddress);
 				mainmemory.writebyte(Game.Memory.carried_object_pointer[version] + 4, 1); -- Force update position
 				mainmemory.write_u32_be(Game.Memory.current_movement_state[version], 58); -- Force movement state
+				forms.setproperty(ScriptHawk.UI.form_controls.spawner_carry_checkbox, "Checked", true);
 			end
 		end
 	end
