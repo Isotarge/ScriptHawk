@@ -105,6 +105,8 @@
 [AbsInt]: 0x8025771C ;Inputs: (word $a0)
                      ;Outputs: [word $v0]
 
+[SpawnAndCarryActor]: 0x8028CC6C ;Inputs: (word $a0 ActorIndex), (float* $a1 LocationXPtr)
+
 [GetXZVelocity]: 0x80296958 ;Outputs: [float $f0]
 
 [Print_TotalMenuFont]: 0x802F6CA4 ;Inputs: (word $a0 XPos), (word $a1 YPos), (word $a3 fontSize), (char* $a3 str)

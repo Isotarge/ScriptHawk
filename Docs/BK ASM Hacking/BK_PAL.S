@@ -113,6 +113,7 @@
 [SumOfAbsXZ]:               0x802585E4  ;I: (float* $a0 Xptr)                          O: [float $f0]
 [AbsInt]:                   0x8025861C  ;I: (word $a0)                                 O: [word $v0]
 
+[SpawnAndCarryActor]: 0x8028DC2C ;Inputs: (word $a0 ActorIndex), (float* $a1 LocationXPtr)
 
 [UpdatePlayerModelToMumboTransFormation]: 0x80291B24
 
