@@ -1906,6 +1906,9 @@ function grabSelectedObject()
 			local slotBase = objectArray + getSlotBase(object_index);
 			local unknownStructAddress = dereferencePointer(slotBase);
 			if isRDRAM(unknownStructAddress) then
+				local tempBitField = mainmemory.readbyte(slotBase + 0x139);
+				tempBitField = bit.bor(tempBitField, 0x40);
+				mainmemory.writebyte(slotBase + 0x139, tempBitField);
 				mainmemory.write_u32_be(Game.Memory.carried_object_pointer[version], RDRAMBase + unknownStructAddress);
 				mainmemory.writebyte(Game.Memory.carried_object_pointer[version] + 4, 1); -- Force update position
 				mainmemory.write_u32_be(Game.Memory.current_movement_state[version], 58); -- Force movement state
