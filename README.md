@@ -96,17 +96,20 @@ While ScriptHawk does have basic support for OoT and MM there are people who are
 - Elmo's Number Journey (N64 only)
 - Elmo's Letter Adventure (N64 only)
 - Rayman 2 (N64 only)
+- San Francisco Rush 2049 (N64 only)
 - Space Station Silicon Valley (N64 only)
 
-##Other Notable Scripts
-- Alex Kidd in Miracle World object viewer with drag and drop support
-- The Ninja (SMS) object viewer with drag and drop support
-- Tetris Attack bot, plays the game quite well using a simple sorting algorithm
-- Mr. Driller 2 bot
+##Other Included Scripts
+- [Alex Kidd in Miracle World](Beta/Miracle%20World.lua) object viewer with drag and drop support
+- [Golden Axe Warrior](Beta/Golden%20Axe%20Warrior.lua) object viewer with drag and drop support
+- [Golvellius](Beta/Golvellius.lua) object viewer with drag and drop support
+- [The Ninja](Beta/The%20Ninja.lua) (SMS) object viewer with drag and drop support
+- [Tetris Attack](Tetris%20Attack%20Bot.lua) bot, plays the game quite well using a simple sorting algorithm
+- [Mr. Driller 2](Beta/Drillbot.lua) bot
+- [remove_klump.lua](Beta/remove_klump.lua), [code golf](https://en.wikipedia.org/wiki/Code_golf) that removes Klumps from DK64 USA version
+- [Legend of Galahad](Beta/Galahad.lua) object viewer, written by [The8bitbeast](https://twitter.com/the8bitbeast)
+- [Wonder Boy III](Beta/Wonder%20Boy%20III%20RNG%20Watch.lua) RNG watch, written by [The8bitbeast](https://twitter.com/the8bitbeast)
 - Dega .MMV reader
-- remove_klump.lua, [code golf](https://en.wikipedia.org/wiki/Code_golf) that removes Klumps from DK64 USA version
-- Legend of Galahad object viewer, written by [The8bitbeast](https://twitter.com/the8bitbeast)
-- Wonder Boy III RNG watch, written by [The8bitbeast](https://twitter.com/the8bitbeast)
 
 ##Other Notable BizHawk + Lua Projects
 - Banjo-Kazooie [MittenzHugg/Banjo-KazooC](https://github.com/MittenzHugg/Banjo-KazooC)
