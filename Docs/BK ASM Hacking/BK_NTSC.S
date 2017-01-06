@@ -29,7 +29,7 @@
 	NOTE 2: If inputs or outputs are not listed, assume they are void
 */
 
-[GetPIStatusReg]: 0x800020E0 ;Outputs: [word $v0]
+[GetPIStatusReg]: 0x800020E0 ;O: [word $v0]
 
 [SetCOP0StatusRegister]: 0x80002190 ;I: (word $a0 input)
 [GetCOP0StatusRegister]: 0x800021A0 ;O: [word $v0]
@@ -71,7 +71,7 @@
 
 [UpdateButtonInputs]:	0x8024E7C8
 
-[IncreaseGlobalOnTimerby50]: 80254F90	
+[IncreaseGlobalOnTimerby50]: 80254F90
 
 [IncrementGlobalOnTimer]:	80255ACC
 
@@ -190,7 +190,7 @@
  * 0x1E: [byte]		???
  */
 [SetTo1AnimationStruct_Byte_0x1C]:		0x80289674	;I:	(struct* $a0 animationStruct)
-//[Get0x20]: 0x80289674  
+//[Get0x20]: 0x80289674
 [GetAnimationStruct_AnimationState]:	0x80289688	;I: (struct* $a0 animationStruct)	O: [word $v0]
 [GetAnimationStruct_AnimationTimer]:	0x80289690	;I: (struct* $a0 animationStruct)	O: [float $f0]
 [GetAnimationStruct_Float_0x18]:		0x80289698	;I:	(struct* $a0 animationStruct)	O: [float $f0]

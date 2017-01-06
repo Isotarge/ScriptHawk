@@ -1,39 +1,4 @@
 /*-------------------------------
-| ENUMS
----------------------------------*/
-[ItemIndex_Timer_Skull]: 0x01
-[ItemIndex_Timer_Propellor]: 0x03
-[ItemIndex_Timer_ChristmasTree]: 0x05
-[ItemIndex_Timer_Hourglass]: 0x06
-[ItemIndex_Notes]: 0x0C
-[ItemIndex_Eggs]: 0x0D
-[ItemIndex_Jiggies_CurrentLevel]: 0x12
-[ItemIndex_RedFeather]: 0x0F
-[ItemIndex_GoldFeather]: 0x10
-[ItemIndex_Jinjos_CurrentLevel]: 0x12
-[ItemIndex_EmptyHoneycombPiece]: 0x13
-[ItemIndex_Health]: 0x14
-[ItemIndex_HealthContainers]: 0x15
-[ItemIndex_Lives]: 0x16
-[ItemIndex_Air]: 0x17
-[ItemIndex_GoldBullions]: 0x18
-[ItemIndex_Orange]: 0x19
-[ItemIndex_PlayerVileScore]: 0x1A
-[ItemIndex_VileVileScore]: 0x1B
-[ItemIndex_MumboTokens_OnHand]: 0x1C
-[ItemIndex_Grumblie]: 0x1D
-[ItemIndex_Yumblie]: 0x1E
-[ItemIndex_GreenPresent]: 0x1F
-[ItemIndex_BluePresent]: 0x20
-[ItemIndex_RedPresent]: 0x21
-[ItemIndex_Caterpillar]: 0x22
-[ItemIndex_Acorn]: 0x23
-[ItemIndex_Twinklie]: 0x24
-[ItemIndex_MumboTokens]: 0x25
-[ItemIndex_Jiggies]: 0x26
-[ItemIndex_JokerCard]: 0x27
-
-/*-------------------------------
 | VARIABLES
 ---------------------------------*/
 [PauseMenuStringsBase]: 0x8036CAF0
@@ -46,34 +11,43 @@
 
 [SlopeTimer]: 0x8037CDE4
 
+[MapLoadState]: 0x8037F404
+[Map]: 0x8037F405
+[Exit]: 0x8037F406
+
 [PauseMenuState]: 0x80383B50
 
 [ReturnToLairEnabled]: 0x80383BC0
+
+[ItemBase]: 0x80386A70
 
 /*-------------------------------
 | Functions
 ---------------------------------*/
 /*
-	NOTE: Consecutive functions identify no unknown functions in between 
+	NOTE: Consecutive functions identify no unknown functions in between
 	NOTE 2: If inputs or outputs are not listed, assume they are void
 */
 
-[GetPIStatusReg]: 0x800020E0 ;Outputs: [word $v0]
+[GetPIStatusReg]: 0x800020E0 ;O: [word $v0]
 
-[SetCOP0StatusRegister]: 0x80002190 ;Inputs: (word $a0 input)
-[GetCOP0StatusRegister]: 0x800021A0 ;Outputs: [word $v0]
+[SetCOP0StatusRegister]: 0x80002190 ;I: (word $a0 input)
+[GetCOP0StatusRegister]: 0x800021A0 ;O: [word $v0]
 
-[SetStatusRegister]: 0x80003FE0 ;Inputs: (word $a0 input)
+[SetStatusRegister]: 0x80003FE0 ;I: (word $a0 input)
 
-[GetGlobalOnCounter]: 0x8023D7BC ;Outputs: [word $v0]
+[GetMaskedGlobalOnCounter]: 0x8023D7AC	;I:	(word $a0 bitMask)	O: [word $v0]
+[GetGlobalOnCounter]: 0x8023D7BC ;O: [word $v0]
 [ResetGlobalOnCounter]: 0x8023D7C8
 
 [IncrementGlobalOnCounter]: 0x8023D93C
 [DecrementGlobalOnCounter]: 0x8023D954
+[Main]:	0x8023D96C
+[MainLoop]: 0x8023DBFC
 
 [SetApplyButtonInputsToBanjoFlag]: 0x8023DCCC
 
-[SetFrameSkip]: 0x8024AD18 ;Inputs: (word $a0 input)
+[SetFrameSkip]: 0x8024AD18 ;I: (word $a0 input)
 [GetFrameSkip]: 0x8024AD24 ;Outputs: [word $v0] //normally 2 but sometimes 3 eg. GV lobby
 
 [CopyCameraXYZRotation]: 0x8024B4B4 ;Inputs: (float* $a0 destinationXPtr)
