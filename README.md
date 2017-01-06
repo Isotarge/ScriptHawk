@@ -3,16 +3,16 @@ A collection of Lua scripts and RAM watches for [BizHawk](https://github.com/TAS
 
 ##How to use
 ###Setup
-1. Set up [BizHawk](https://github.com/TASVideos/BizHawk) and run the prerequisite installer, the latest version is always recommended but a bare minimum of 1.11.7 is required
-2. [Clone this repository](https://help.github.com/articles/cloning-a-repository/) or download and extract a [zipped copy](https://github.com/Isotarge/ScriptHawk/archive/master.zip) into a ScriptHawk folder inside the Lua folder that comes with BizHawk
+1. Set up [BizHawk](https://github.com/TASVideos/BizHawk), the latest version is always recommended (and probably required)
+2. [Clone this repository](https://help.github.com/articles/cloning-a-repository/) or download and extract a [zipped copy](https://github.com/Isotarge/ScriptHawk/archive/master.zip)
 3. Open BizHawk and your (supported) game of choice
 4. Click Tools -> Lua Console
 5. Open ScriptHawk.lua
 
 ###Basic functionality
 - Player position, rotation and speed will be displayed on screen
-- Use L to levitate and the D-Pad to move quickly around the map
-- Alternatively, press the E key to levitate and WASD to move quickly around the map
+- Press L to levitate and use the D-Pad to move quickly around the map
+- Press the E key to levitate and use WASD keys to move quickly around the map
 - Press / to reset max velocity, odometer etc.
 
 ###Advanced functionality
@@ -42,7 +42,7 @@ A collection of Lua scripts and RAM watches for [BizHawk](https://github.com/TAS
 ###Banjo-Kazooie
 - All known versions supported
 - Spawn objects
-- [Object analysis tools](Docs/Object%20Analysis%20Tools.txt): List, Examine, Encircle, Zip
+- [Object analysis tools](Docs/Object%20Analysis%20Tools.txt): List, Examine, Grab, Encircle, Zip
 
 ![Banjo-Kazooie Support](Images/Promo/bk_ui.png)
 
@@ -68,9 +68,12 @@ A collection of Lua scripts and RAM watches for [BizHawk](https://github.com/TAS
 
 ![DKR Support](Images/Promo/dkr_ui.png)
 
+###Space Station Silicon Valley
+- All N64 versions supported
+
 ###Super Mario 64
 - All known versions supported
-- [Object analysis tools](Docs/Object%20Analysis%20Tools.txt): List, Examine
+- [Object analysis tools](Docs/Object%20Analysis%20Tools.txt): List, Examine, Zip
 
 ###Super Smash Bros.
 - All known versions supported
@@ -97,7 +100,6 @@ While ScriptHawk does have basic support for OoT and MM there are people who are
 - Elmo's Letter Adventure (N64 only)
 - Rayman 2 (N64 only)
 - San Francisco Rush 2049 (N64 only)
-- Space Station Silicon Valley (N64 only)
 
 ##Other Included Scripts
 - [Alex Kidd in Miracle World](Beta/Miracle%20World.lua) object viewer with drag and drop support
