@@ -50,6 +50,8 @@
 [SetFrameSkip]: 0x8024BC00 ;I: (word $a0 input)
 [GetFrameSkip]: 0x8024BC0C ;Outputs: [word $v0] //normally 2 but sometimes 3 eg. GV lobby
 
+[GetFrameTimer]: 0x8024C138	;O: [word $v0]
+[SetFrameTimer]: 0x8024C148	;I: (word $a0 input)
 
 [CopyCameraXYZRotation]: 0x8024C3B4 ;Inputs: (float* $a0 destinationXPtr)
 [GetCamera_YRotation]: 0x8024C3D8 ;Outputs: [float $f0]

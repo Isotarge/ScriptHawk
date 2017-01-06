@@ -54,7 +54,7 @@
 [SetFrameTimer]: 0x8024C4F8	;I: (word $a0 input)
 
 
-//NOTE: Camera_ is the render camera for Objects and Terrain containing Transparencies 
+//NOTE: Camera_ is the render camera for Objects and Terrain containing Transparencies
 [GetDistanceToCamera_]:	0x8024C584	;I: (float* $a0 destinationXPtr)
 [GetCamera_Position]: 0x8024C5CC	;I:	(float* $a0 destinationXPtr)
 
@@ -344,7 +344,7 @@
 [GetTotalEmptyHoneycombsCollected]:         0x8032149C  ;                                   O: [byte $v0]
 
 
-[IsMumboTokenCollected]:            0x80321364  ;Inputs: (word $a0 MumboTokenIndex) //Outputs: [bool $v0]
+[IsMumboTokenCollected]:            0x80321544  ;Inputs: (word $a0 MumboTokenIndex) //Outputs: [bool $v0]
 [ClearCollectedMumboTokenFlags]:    0x803215A0
 [ZeroMumboTokenCollectedBitfield]:  0x803215A0
 [SetMumboTokenCollectedBit]:        0x803215D0  ;Inputs: (word $a0 MumboTokenIndex), (bool $a1 collected)

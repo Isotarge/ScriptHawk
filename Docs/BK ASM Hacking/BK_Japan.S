@@ -50,34 +50,26 @@
 [SetFrameSkip]: 0x8024AD18 ;I: (word $a0 input)
 [GetFrameSkip]: 0x8024AD24 ;Outputs: [word $v0] //normally 2 but sometimes 3 eg. GV lobby
 
+[GetFrameTimer]: 0x8024B238	;O: [word $v0]
+[SetFrameTimer]: 0x8024B248	;I: (word $a0 input)
+
 [CopyCameraXYZRotation]: 0x8024B4B4 ;Inputs: (float* $a0 destinationXPtr)
 [GetCamera_YRotation]: 0x8024B4D8 ;Outputs: [float $f0]
 
 [SetCamera_XYZPosition]: 0x8024BAD8 ;Inputs: (float* $a0 xPosPtr)
 
-[ClampInt]: 0x80256BF8 ;Inputs: (word $a0 input), (word $a1 lowerLimit), (word $a2 upperLimit)
-                       ;Outputs: [word $v0]
-[ClampFloat]: 0x80256C28 ;Inputs: (float $f12 input), (float $f14 lowerLimit), (float $a2 upperLimit)
-                         ;Outputs: [float $f0]
+[ClampInt]:     0x80256BF8  ;I: (word $a0 input, word $a1 lowerLimit, word $a2 upperLimit)      O: [word $v0]
+[ClampFloat]:   0x80256C28  ;I: (float $f12 input, float $f14 lowerLimit, float $a2 upperLimit) O: [float $f0]
 
-[GetAngleBetween0And360]: 0x8025756C ;Inputs: ( float $f12 inputDegrees)
-                                     ;Outputs: [ float $f0 ]
-[RemainderFloat]: 0x80257600 ;Inputs: (float $f12 dividend), (float $f14 divisor)
-                             ;Outputs: [float $f0]
-[SelectMaxFloat]: 0x8025762C ;Inputs: (float $f12 input1), (float $f14 input2)
-                             ;Outputs: [float $f0]
-[SelectMinFloat]: 0x80257654 ;Inputs: (float $f12 input1), (float $f14 input2)
-                             ;Outputs: [float $f0]
-[SelectMaxInt]: 0x8025767C ;Inputs: (word $a0 input1), (word $a1 input2)
-                           ;Outputs: [word $v0]
-[SelectMinInt]: 0x80257698 ;Inputs: (word $a0 input1), (word $a1 input2)
-                           ;Outputs: [word $v0]
-[AbsFloat]: 0x802576B4 ;Inputs: (float $f12)
-                       ;Outputs: [float $f0]
-[SumOfAbsXZ]: 0x802576E4 ;Inputs: (float* $a0 Xptr)
-                         ;Outputs: [float $f0]
-[AbsInt]: 0x8025771C ;Inputs: (word $a0)
-                     ;Outputs: [word $v0]
+[GetAngleBetween0And360]:   0x8025756C  ;I: ( float $f12 inputDegrees)                 O: [float $f0]
+[RemainderFloat]:           0x80257600  ;I: (float $f12 dividend, float $f14 divisor)  O: [float $f0]
+[SelectMaxFloat]:           0x8025762C  ;I: (float $f12 input1, float $f14 input2)     O: [float $f0]
+[SelectMinFloat]:           0x80257654  ;I: (float $f12 input1, float $f14 input2)     O: [float $f0]
+[SelectMaxInt]:             0x8025767C  ;I: (word $a0 input1, word $a1 input2)         O: [word $v0]
+[SelectMinInt]:             0x80257698  ;I: (word $a0 input1, word $a1 input2)         O: [word $v0]
+[AbsFloat]:                 0x802576B4  ;I: (float $f12)                               O: [float $f0]
+[SumOfAbsXZ]:               0x802576E4  ;I: (float* $a0 Xptr)                          O: [float $f0]
+[AbsInt]:                   0x8025771C  ;I: (word $a0)                                 O: [word $v0]
 
 [SpawnAndCarryActor]: 0x8028CC6C ;Inputs: (word $a0 ActorIndex), (float* $a1 LocationXPtr)
 
@@ -89,18 +81,61 @@
 
 [PauseMenu]: 0x80312B88
 
+[ClearAllGameProgress]: 0x80320010
+
+[ClearGameProgressFlags]: 0x8032041C
+
+[ClearSomeProgressThing]: 0x803208FC
+
+[GetJiggiesCollectedBitfield]:  0x803213E0  ;Outputs: [word $v0]
+
+[IsJiggyCollected]:                 0x80321450  ;I: (word $a0 JiggyIndex)   O: [bool $v0]
+[ZeroJiggyCollectedBitfield]:       0x803214AC
+[SetJiggyCollectedBit]:             0x803214FC  ;I: (word $a0 JiggyIndex, bool $a1 collected)
+
+[GetTotalJiggiesCollectedinLevel]:  0x8032161C  ;I: (byte $a0 LevelIndex)   O: [word $v0]
+[GetTotalJiggiesCollected]:         0x803216AC  ;                           O: [word $v0]
+
+
+[IsEmptyHoneycombCollected]:                0x80321754  ;I: (word $a0 EmptyHoneycombIndex)  O: [bool $v0]
+[ClearEmptyHoneyCombsCollectedBitfield]:    0x803217B0
+[ZeroEmptyHoneycombCollectedBitfield]:      0x803217B0
+[SetEmptyHoneycombCollectedBit]:            0x803217D4  ;I: (word $a0 EmptyHoneycombIndex, bool $a1 collected)
+[GetTotalEmptyHoneycombsCollectedInLevel]:  0x80321868  ;I: (word $a0 levelIndex)           O: [byte $v0]
+[GetTotalEmptyHoneycombsCollected]:         0x8032190C  ;                                   O: [byte $v0]
+
+
+[IsMumboTokenCollected]:            0x803219B4  ;Inputs: (word $a0 MumboTokenIndex) //Outputs: [bool $v0]
+[ClearCollectedMumboTokenFlags]:    0x80321A10
+[ZeroMumboTokenCollectedBitfield]:  0x80321A10
+[SetMumboTokenCollectedBit]:        0x80321A40  ;Inputs: (word $a0 MumboTokenIndex), (bool $a1 collected)
+[GetTotalMumboTokensCollected]:     0x80321AD4  ;Outputs: [byte $v0]
+
+
+[GetCurrentLevel]:      0x80321D70  ;   O: [byte $v0]
+[GetEnteringLevelFlag]: 0x80321D7C  ;   O: [byte $v0]
+[SetEnteringLevelFlag]: 0x80321D88  ;I: (byte $a0 input)
+
+
 [SpawnActor]: 0x803285C4 ;Inputs: (word $a0 ActorIndex), (float* $a1 LocationXPtr), (float $a2 rotation)
 
-[AppendString]: 0x8033DAE0 ;Inputs: (char* $a0 destinationStr), (char* $a1 srcStr)
-[AppendChar]: 0x8033DB28 ;Inputs: (char* $a0 destinationStr), (char $a1 inputChar)
 
-[FToA]: 0x8033DC30 ;Inputs: (char* $a0 destinationStr), (float $a1 inputFloat), (int $a2 float precision) //appends to destination string
-[IToA_10]: 0x8033DD04 ;Inputs: (char* $a0 destinationStr), (word $a1 inputInt) //base 10
-[IToA]: 0x8033DD24 ;Inputs: (char* $a0 destinationStr), (word $a1 inputInt), (word $a2 Radix)
-[CompareStrings]: 0x8033DE54 ;Inputs: (char* $a0 str1), (char* $a1 str2)
-                             ;Output: byte $v0 //$v0 = 0 if (strings are the same),-1 if (str1 < str2), 1 if (str1 > str2)
-[CopyString]: 0x8033DED4 ;Inputs: (char* $a0 destinationStr), (char* $a1 srcStr)
-[GetStringSize]: 0x8033DF00 ;Inputs: (char* $a0 string)
-							;Outputs: [word $v0]
+//STRING LIBRARY
+[AppendString]:     0x8033DAE0  ;I: (char* $a0 destStr, char* $a1 srcStr)
+[AppendChar]:       0x8033DB28  ;I: (char* $a0 destStr, char $a1 inputChar)
+[FToA_2Dec]:        0x8033DB30  ;I: (char* $a0 destStr, float $a1 inputFloat)
+[FToA]:             0x8033DC30  ;I: (char* $a0 destStr, float $a1 inputFloat, int $a2 float precision) //appends to destination string
+[IToA_10]:          0x8033DD04  ;I: (char* $a0 destStr, word $a1 inputInt) //base 10
+[IToA]:             0x8033DD24  ;I: (char* $a0 destStr, word $a1 inputInt), (word $a2 Radix)
+[CompareStrings]:   0x8033DE54  ;I: (char* $a0 str1, char* $a1 str2)    O: [byte $v0] //$v0 = 0 if (strings are the same),-1 if (str1 < str2), 1 if (str1 > str2)
+[CopyString]:       0x8033DED4  ;I: (char* $a0 destStr, char* $a1 srcStr)
+[GetStringSize]:    0x8033DF00  ;I: (char* $a0 string)                  O: [word $v0]
+[DoTokensMatch]:    0x8033DF30  ;I: (char* $a0 delimiter, char* $a1 str1, char* $a2 str2)   O: [bool $v0]
+[NextTokenStart]:   0x8033DF98  ;I: (char* $a0 delimiter, char* $a1 str) O: [char* $v0]
+[StrToken]:         0x8033DFE0  ;I: (char* $a0 delimiter, char* $a1 destStr, char* $a2 srcStr)
+[ToUpper]:          0x8033E024  ;I: (char* $a0 string)
 
-[ToUpper]: 0x8033E024 ;Inputs: (char* $a0 string)
+
+[ClearLevelNoteScores]: 0x80347298
+
+[ClearInGameLevelTimer]: 0x80347580
