@@ -7,7 +7,7 @@ return { -- TODO: Add field for where the object can be spawned
 	{["id"] = 0x0009, ["name"] = "MM Hut"},
 	{["id"] = 0x000A, ["name"] = "Fish"},
 	{["id"] = 0x000B, ["name"] = "Shock Spring Pad"},
-	
+	{["id"] = 0x000C, ["name"] = "Mud Hut"},
 	{["id"] = 0x000D, ["name"] = "Wood demolished"},
 	{["id"] = 0x000E, ["name"] = "Bull 2"},
 	{["id"] = 0x000F, ["name"] = "Chimpy"},
@@ -548,6 +548,8 @@ return { -- TODO: Add field for where the object can be spawned
 	{["id"] = 0x0375, ["name"] = "Grublin Hood"},
 	{["id"] = 0x0376, ["name"] = "Boss Boom Box"},
 	--{["id] = 0x037A, ["name"] = "Assosiated with MoleHill"}, --talk volume?
+	
+	{["id"] = 0x037C, ["name"] = "Dust or Steam Cloud"},
 	{["id"] = 0x037D, ["name"] = "Ice Cube"},
 	{["id"] = 0x037E, ["name"] = "Dead Venus Flytrap"},
 	{["id"] = 0x037F, ["name"] = "Loggo"},
