@@ -92,6 +92,105 @@
 [MapIndex_MMM_Church2]: 0x2B
 [MapIndex_MMM_Bathroom]: 0x2C
 [MapIndex_MMM_Bedroom]: 0x2D
+[MapIndex_MMM_Room6Floorboards]: 0x2E
+[MapIndex_MMM_RainBarrel]: 0x2F
+[MapIndex_MMM_MumbosSkull]: 0x30
+[MapIndex_RBB_Main]: 0x31
+
+[MapIndex_RBB_EngineRoom]: 	0x34
+[MapIndex_RBB_Warehouse1]: 	0x35
+[MapIndex_RBB_Warehouse2]: 	0x36
+[MapIndex_RBB_Container1]: 	0x37
+[MapIndex_RBB_Container3]: 	0x38
+[MapIndex_RBB_BunkRoom]: 	0x39
+[MapIndex_RBB_BossBoomBox]:	0x3A
+[MapIndex_RBB_StoreRoom]:	0x3B
+[MapIndex_RBB_Kitchen]:		0x3C
+[MapIndex_RBB_NavigationRoom]:	0x3D
+[MapIndex_RBB_Container2]:	0x3E
+[MapIndex_RBB_CaptainsCabin]:	0x3F
+[MapIndex_CCW_SeasonHub]:	0x40
+[MapIndex_FP_BoggysIgloo]:	0x41
+
+[MapIndex_CCW_Spring]:	0x43
+[MapIndex_CCW_Summer]:	0x44
+[MapIndex_CCW_Autumn]:	0x45
+[MapIndex_CCW_Winter]:	0x46
+[MapIndex_BGS_MumbosSkull]:	0x47
+[MapIndex_FP_MumbosSkull]:	0x48
+[MapIndex_CCW_MumbosSkull_Spring]:	0x4A
+[MapIndex_CCW_MumbosSkull_Summer]:	0x4B
+[MapIndex_CCW_MumbosSkull_Autumn]:	0x4C
+[MapIndex_CCW_MumbosSkull_Winter]:	0x4D
+
+[MapIndex_FP_XmasTree]:	0x53
+
+[MapIndex_CCW_Zubbas_Summer]:	0x5A
+[MapIndex_CCW_Zubbas_Spring]:	0x5B
+[MapIndex_CCW_Zubbas_Autumn]:	0x5C
+
+[MapIndex_CCW_Nabnuts_Spring]:	0x5E
+[MapIndex_CCW_Nabnuts_Summer]:	0x5F
+[MapIndex_CCW_Nabnuts_Autumn]:	0x60
+[MapIndex_CCW_Nabnuts_Winter]:	0x61
+[MapIndex_CCW_Nabnuts_Room1_Winter]:	0x62
+[MapIndex_CCW_Nabnuts_Room1_Autumn]:	0x63
+[MapIndex_CCW_Nabnuts_Room2_Winter]:	0x64 
+[MapIndex_CCW_TopRoom_Spring]:	0x65
+[MapIndex_CCW_TopRoom_Summer]:	0x66
+[MapIndex_CCW_TopRoom_Autumn]:	0x67
+[MapIndex_CCW_TopRoom_Winter]:	0x68
+[MapIndex_Lair_MMLobby]:	0x69
+[MapIndex_Lair_TTCPuzzle]:	0x6A
+[MapIndex_Lair_CCWPuzzle]:	0x6B
+[MapIndex_Lair_RedCauldron]:	0x6C
+[MapIndex_Lair_TTCLobby]:	0x6D
+[MapIndex_Lair_GVLobby]:	0x6E
+[MapIndex_Lair_FPLobby]:	0x6F
+[MapIndex_Lair_CCLobby]:	0x70
+[MapIndex_Lair_Statue]:	0x71
+[MapIndex_Lair_BGSLobby]:	0x72
+
+[MapIndex_Lair_GVLobby]:	0x74
+[MapIndex_Lair_GVPuzzle]:	0x74
+[MapIndex_Lair_MMMLobby]:	0x75
+[MapIndex_Lair_640NoteDoorRoom]:	0x76
+[MapIndex_Lair_RBBLobby]:	0x77
+[MapIndex_Lair_RBBPuzzle]:	0x78
+[MapIndex_Lair_CCWLobby]:	0x79
+[MapIndex_Lair_Crypt]:	0x7A
+[MapIndex_Intro_Lair1_Scene1]:	0x7B
+[MapIndex_Intro_BanjosHouse1_Scenes_3_7]:	0x7C
+[MapIndex_Intro_SpiralA_Scenes_2_4]:	0x7D
+[MapIndex_Intro_SpiralB_Scenes_5_6]:	0x7E
+[MapIndex_FP_WozzasCave]:	0x7F
+[MapIndex_Lair_Floor3_AreaA4]:	0x80
+[MapIndex_Intro_Lair2]:	0x81
+[MapIndex_Intro_Lair3_Machine1]:	0x82
+[MapIndex_Intro_Lair4_GameOver]:	0x83
+[MapIndex_Intro_Lair5]:	0x84
+[MapIndex_Intro_SpiralC]:	0x85
+[MapIndex_Intro_SpiralD]:	0x86
+[MapIndex_Intro_SpiralE]:	0x87
+[MapIndex_Intro_spiralE]:	0x88
+[MapIndex_Intro_SpiralF]:	0x89
+[MapIndex_Intro_BanjosHouse2]:	0x8A
+[MapIndex_Intro_BanjosHouse3]:	0x8B
+[MapIndex_Lair_RBB_AnchorRoom]:	0x8C
+[MapIndex_SM_BanjosHouse]:	0x8D
+[MapIndex_MMM_Loggo]:	0x8E
+[MapIndex_Lair_FurnaceFun]:	0x8F
+[MapIndex_TTC_SharkfoodIsland]:	0x90
+[MapIndex_Lair_Battlements]:	0x91
+[MapIndex_FileSelectScreen]:	0x92
+[MapIndex_GV_SecretChamber]:	0x93
+[MapIndex_Lair_Dingpot]:	0x94
+[MapIndex_Intro_SpiralG]:	0x95
+[MapIndex_EndScene3_All100]:	0x96
+[MapIndex_EndScene]:	0x97
+[MapIndex_EndScene4]:	0x98
+[MapIndex_Intro_GruntyThreat1]:	0x99
+[MapIndex_Intro_GruntyThreat2]:	0x9A
 
 //
 
