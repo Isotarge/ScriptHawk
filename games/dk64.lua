@@ -975,7 +975,7 @@ obj_model1 = {
 			[9] = "Tag Barrel",
 			[11] = "Fairy",
 			[12] = "Vine", -- Swinging
-			[13] = "Aiming", -- Gun, thirf person
+			[13] = "Aiming", -- Gun, third person
 		},
 	},
 	["tag_barrel"] = {
