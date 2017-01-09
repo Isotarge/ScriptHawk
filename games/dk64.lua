@@ -1903,14 +1903,15 @@ function getObjectModel2ModelBase(index)
 	end
 end
 
-function getScriptName(objectModel2Base)
-	-- Old method, reads internal name from behavior data, slow
-	--local behaviorTypePointer = dereferencePointer(objectModel2Base + obj_model2.behavior_type_pointer);
-	--if isRDRAM(behaviorTypePointer) then
-	--	return readNullTerminatedString(behaviorTypePointer + 0x0C);
-	--end
+function getInternalName(objectModel2Base)
+	local behaviorTypePointer = dereferencePointer(objectModel2Base + obj_model2.behavior_type_pointer);
+	if isRDRAM(behaviorTypePointer) then
+		return readNullTerminatedString(behaviorTypePointer + 0x0C);
+	end
+	return "unknown";
+end
 
-	-- New method
+function getScriptName(objectModel2Base)
 	local model2ID = mainmemory.read_u16_be(objectModel2Base + 0x84);
 	if type(collisionTypes[model2ID]) == "string" then
 		return collisionTypes[model2ID];
@@ -1981,7 +1982,7 @@ function offsetObjectModel2(x, y, z)
 	-- Iterate and set position
 	local behaviorType, modelPointer, currentX, currentY, currentZ;
 	for i = 1, #object_pointers do
-		behaviorType = getScriptName(object_pointers[i]);
+		behaviorType = getInternalName(object_pointers[i]);
 		if behaviorType == "pickups" then
 			-- Read hitbox X, Y, Z
 			currentX = mainmemory.readfloat(object_pointers[i] + obj_model2.x_pos, true);
@@ -4629,7 +4630,7 @@ function ohWrongnana(verbose)
 			-- Get activation script
 			activationScript = dereferencePointer(slotBase + 0x7C);
 			if isRDRAM(activationScript) then
-				scriptName = getScriptName(slotBase);
+				scriptName = getInternalName(slotBase);
 				--if scriptName == "gunswitches" then
 				--if scriptName == "buttons" then
 				if scriptName == "gunswitches" or scriptName == "buttons" then
