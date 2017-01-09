@@ -1904,11 +1904,18 @@ function getObjectModel2ModelBase(index)
 end
 
 function getScriptName(objectModel2Base)
-	local behaviorTypePointer = dereferencePointer(objectModel2Base + obj_model2.behavior_type_pointer);
-	if isRDRAM(behaviorTypePointer) then
-		return readNullTerminatedString(behaviorTypePointer + 0x0C);
+	-- Old method, reads internal name from behavior data, slow
+	--local behaviorTypePointer = dereferencePointer(objectModel2Base + obj_model2.behavior_type_pointer);
+	--if isRDRAM(behaviorTypePointer) then
+	--	return readNullTerminatedString(behaviorTypePointer + 0x0C);
+	--end
+
+	-- New method
+	local model2ID = mainmemory.read_u16_be(objectModel2Base + 0x84);
+	if type(collisionTypes[model2ID]) == "string" then
+		return collisionTypes[model2ID];
 	end
-	return "unknown";
+	return "unknown "..toHexString(model2ID);
 end
 
 object_model2_filter = nil; -- String, internal name eg. "buttons", "gunswitches", "pickups"
@@ -2021,7 +2028,7 @@ local function getExamineDataModelTwo(pointer)
 	table.insert(examine_data, { "Slot base", toHexString(pointer, 6) });
 
 	local behaviorTypePointer = dereferencePointer(pointer + obj_model2.behavior_type_pointer);
-	local behaviorType = getScriptName(pointer); 
+	local behaviorType = getScriptName(pointer);
 	if isRDRAM(behaviorTypePointer) then
 		table.insert(examine_data, { "Behavior Type", behaviorType });
 		table.insert(examine_data, { "Behavior Type Pointer", toHexString(behaviorTypePointer, 6) });
