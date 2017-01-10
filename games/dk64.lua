@@ -1372,7 +1372,7 @@ local collisionTypes = { -- TODO: Refactor, these are the model 2 equivalent to 
 
 	[0x70] = "Primate Punch Switch", -- Factory
 	[0x71] = "Hi-Lo toggle machine",
-	[0x72] = "Breakable Metal Grate or Door",
+	[0x72] = "Breakable Metal Grate", -- Factory
 	[0x73] = "Cranky's Lab",
 	[0x74] = "Golden Banana",
 	[0x75] = "Metal Platform",
@@ -1558,7 +1558,7 @@ local collisionTypes = { -- TODO: Refactor, these are the model 2 equivalent to 
 	[0x11F] = "Metal Door", -- Factory or Car Race
 
 	[0x120] = "Toyz Box",
-	[0x121] = "O Pad", -- Aztec chunky puzzle
+	[0x121] = "O Pad", -- Aztec Chunky Puzzle
 	[0x122] = "Bonus Barrel Trap", -- Aztec
 	[0x123] = "Sun Idol", -- Aztec, top of "feed me" totem
 	[0x124] = "Candy's Shop",
@@ -1711,7 +1711,7 @@ local collisionTypes = { -- TODO: Refactor, these are the model 2 equivalent to 
 	[0x1B4] = "Pearl", -- Galleon
 	[0x1B5] = "Small Door", -- Fungi
 	--[0x1B6] = "Crash?",
-	--[0x1B7] = "Unknown", -- Fungi
+	[0x1B7] = "Cloud", -- Castle, Fungi?
 	[0x1B8] = "Blinking Red Light Panel",
 	[0x1B9] = "Door", -- Fungi
 	[0x1BA] = "Mushroom (Yellow)",
@@ -1811,19 +1811,35 @@ local collisionTypes = { -- TODO: Refactor, these are the model 2 equivalent to 
 	[0x212] = "Warp 4 Pad",
 	[0x213] = "Warp 2 Pad",
 	[0x214] = "Warp 1 Pad",
+	[0x219] = "Wooden Platform", -- Castle
+	[0x21A] = "Wooden Bridge", -- Castle
+	[0x21B] = "Wooden Door", -- Castle
+	[0x21C] = "Metal Grate", -- Castle Pipe
+	[0x21D] = "Metal Door", -- Castle Greenhouse
 
 	[0x221] = "Large Aztec Door",
 	[0x222] = "Large Aztec Door",
-	[0x228] = "+ Pad (Aztec Chunky Puzzle)",
+	[0x226] = ": Pad", -- Aztec Chunky Puzzle
+	[0x227] = "Triangle Pad", -- Aztec Chunky Puzzle
+	[0x228] = "+ Pad", -- Aztec Chunky Puzzle
 	[0x22C] = "Door", -- Caves Beetle Race
 
+	[0x231] = "Metal Grate", -- Factory, above crown pad
+	[0x232] = "Treasure Chest", -- Galleon
+	[0x233] = "Up Switch", -- Galleon
 	[0x234] = "Down Switch",
+	[0x235] = "DK Star", -- Caves
 
 	--[0x241] = "Unknown", -- Internal name is "torches"
 	[0x24C] = "Pound The X Platform", -- DK Isles
+	[0x24D] = "Wooden Door", -- Castle Shed
 
+	[0x250] = "Metal Bard", -- Galleon
+	[0x251] = "4 Door (5DS)",
+	[0x252] = "5 Door (5DS)",
 	[0x253] = "Door (Llama Temple)", -- Aztec
 	[0x255] = "Metal Bars",
+	[0x256] = "Metal Grate", -- Galleon
 
 	[0x266] = "Boulder", -- DK Isles, covering cannon to Fungi
 	[0x267] = "Boulder", -- DK Isles
@@ -1919,7 +1935,7 @@ function getScriptName(objectModel2Base)
 	return "unknown "..toHexString(model2ID);
 end
 
-object_model2_filter = nil; -- String, internal name eg. "buttons", "gunswitches", "pickups"
+object_model2_filter = nil; -- String
 function populateObjectModel2Pointers()
 	object_pointers = {};
 	local objModel2Array = getObjectModel2Array();
@@ -1939,7 +1955,7 @@ function populateObjectModel2Pointers()
 			-- Fill and sort pointer list
 			for i = 1, numSlots do
 				base = objModel2Array + (i - 1) * obj_model2_slot_size;
-				if getScriptName(base) == object_model2_filter then
+				if string.contains(getScriptName(base), object_model2_filter) then
 					table.insert(object_pointers, base);
 				end
 			end
