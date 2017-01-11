@@ -55,7 +55,15 @@ Game.Memory = {
 	["loading_zone_array_size"] = {0x7FDCB0, 0x7FDBF0, 0x7FE140, nil}, -- u16_be -- TODO: Kiosk?
 	["file"] = {0x7467C8, 0x740F18, 0x746088, nil},
 	["character"] = {0x74E77C, 0x748EDC, 0x74E05C, 0x6F9EB8},
-	["tb_void_byte"] = {0x7FBB63, 0x7FBA83, 0x7FBFD3, 0x7B5B13}, -- byte, bitfield -- TODO: Document values
+	-- 1000 0000 - ????
+	-- 0100 0000 - ????
+	-- 0010 0000 - Tag Barrel Void
+	-- 0001 0000 - Show Model 1 Objects
+	-- 0000 1000 - ????
+	-- 0000 0100 - ????
+	-- 0000 0010 - ????
+	-- 0000 0001 - Pausing
+	["tb_void_byte"] = {0x7FBB63, 0x7FBA83, 0x7FBFD3, 0x7B5B13}, -- byte, bitfield -- TODO: Document remaining values
 	["player_pointer"] = {0x7FBB4C, 0x7FBA6C, 0x7FBFBC, 0x7B5AFC},
 	["camera_pointer"] = {0x7FB968, 0x7FB888, 0x7FBDD8, 0x7B5918},
 	["pointer_list"] = {0x7FBFF0, 0x7FBF10, 0x7FC460, 0x7B5E58},
@@ -585,7 +593,7 @@ obj_model1 = {
 		[103] = "4 Pad (Diddy 5DI)",
 		[104] = "5 Pad (Diddy 5DI)",
 		[105] = "6 Pad (Diddy 5DI)",
-		[106] = "5DI Controller?", -- TODO: Investigate, also I saw this somewhere else
+		[106] = "5DI Controller?", -- TODO: Investigate, might be something to do with Kong shadow?
 		[107] = "Bonus Barrel (Hideout Helm)",
 		--[109] = "Unknown", -- Spawned by Fungi Forest setup but seems to disappear immediately
 		[110] = "CB Bunch", -- Unused? Doesn't seem to work, these are normally model 2
@@ -1238,12 +1246,14 @@ obj_model2 = {
 	["behavior_type_pointer"] = 0x24, -- TODO: Fields for this object
 	["unknown_counter"] = 0x3A, -- u16_be
 	["behavior_pointer"] = 0x7C,
-	-- 0x00 Seen in game, but currently unknown
-	-- 0x01 Seen in game, but currently unknown
-	-- 0x02 Seen in game, but currently unknown
-	-- 0x04 Seen in game, but currently unknown
-	-- 0x08 Seen in game, but currently unknown
-	-- 0x20 Seen in game, but currently unknown
+	-- 0x00 000000 Seen in game, but currently unknown
+	-- 0x01 000001 GB - Chunky can collect
+	-- 0x02 000010 GB - Diddy can collect
+	-- 0x04 000100 GB - Tiny can collect
+	-- 0x08 001000 GB - DK can collect
+	-- 0x10 010000 GB - Lanky can collect
+	-- 0x1F 011111 GB - Anyone can collect?
+	-- 0x20 100000 Seen in game, but currently unknown
 	-- 0x21 100001 GB - Chunky can collect
 	-- 0x22 100010 GB - Diddy can collect
 	-- 0x24 100100 GB - Tiny can collect
@@ -3925,9 +3935,12 @@ function detonateLiveOranges()
 		if isRDRAM(pointer) then
 			local actorType = mainmemory.read_u32_be(pointer + obj_model1.actor_type);
 			if actorType == 41 then -- Orange
+				mainmemory.writebyte(pointer + 0x6D, 1); -- Set grounded bit?
 				mainmemory.writefloat(pointer + obj_model1.y_pos, mainmemory.readfloat(pointer + obj_model1.floor, true), true);
+				mainmemory.writefloat(pointer + obj_model1.distance_from_floor, 0, true);
+				mainmemory.writefloat(pointer + obj_model1.y_acceleration, -50, true);
 				mainmemory.writefloat(pointer + obj_model1.y_velocity, -50, true);
-				mainmemory.writebyte(pointer + obj_model1.orange.bounce_counter, 5);
+				mainmemory.writebyte(pointer + obj_model1.orange.bounce_counter, 3);
 			end
 		end
 	end
