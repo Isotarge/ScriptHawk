@@ -1005,6 +1005,9 @@ obj_model1 = {
 		["current_direction"] = 0x180, -- Float
 		["ticks_til_direction_change"] = 0x184, -- u32_be
 	},
+	["orange"] = {
+		["bounce_counter"] = 0x17C,
+	},
 };
 
 local function getActorName(pointer)
@@ -3915,6 +3918,21 @@ end
 gain_control = gainControl;
 Game.gainControl = gainControl;
 
+-- TODO: Fix the frame delay for this
+function detonateLiveOranges()
+	for actorListIndex = 0, getObjectModel1Count() do
+		local pointer = dereferencePointer(Game.Memory.pointer_list[version] + (actorListIndex * 4));
+		if isRDRAM(pointer) then
+			local actorType = mainmemory.read_u32_be(pointer + obj_model1.actor_type);
+			if actorType == 41 then -- Orange
+				mainmemory.writefloat(pointer + obj_model1.y_pos, mainmemory.readfloat(pointer + obj_model1.floor, true), true);
+				mainmemory.writefloat(pointer + obj_model1.y_velocity, -50, true);
+				mainmemory.writebyte(pointer + obj_model1.orange.bounce_counter, 5);
+			end
+		end
+	end
+end
+
 -----------------------------------
 -- DK64 - Mad Jack Minimap
 -- Written by Isotarge, 2014-2015
@@ -5323,6 +5341,7 @@ function Game.initUI()
 	-- Buttons
 	ScriptHawk.UI.form_controls["Unlock Moves Button"] = forms.button(ScriptHawk.UI.options_form, "Unlock Moves", Game.unlockMoves, ScriptHawk.UI.col(10), ScriptHawk.UI.row(0), ScriptHawk.UI.col(4) + 10, ScriptHawk.UI.button_height);
 	ScriptHawk.UI.form_controls["Toggle Visibility Button"] = forms.button(ScriptHawk.UI.options_form, "Invisify", toggle_invisify, ScriptHawk.UI.col(7), ScriptHawk.UI.row(1), 64, ScriptHawk.UI.button_height);
+	ScriptHawk.UI.form_controls["Detonate Button"] = forms.button(ScriptHawk.UI.options_form, "Detonate", detonateLiveOranges, ScriptHawk.UI.col(7), ScriptHawk.UI.row(2), 64, ScriptHawk.UI.button_height);
 	ScriptHawk.UI.form_controls["Toggle TB Void Button"] = forms.button(ScriptHawk.UI.options_form, "Toggle TB Void", toggle_tb_void, ScriptHawk.UI.col(10), ScriptHawk.UI.row(1), ScriptHawk.UI.col(4) + 10, ScriptHawk.UI.button_height);
 	ScriptHawk.UI.form_controls["Gain Control Button"] = forms.button(ScriptHawk.UI.options_form, "Gain Control", Game.gainControl, ScriptHawk.UI.col(10), ScriptHawk.UI.row(4), ScriptHawk.UI.col(4) + 10, ScriptHawk.UI.button_height);
 
