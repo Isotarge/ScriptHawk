@@ -371,13 +371,15 @@ local max_slots = 0x100;
 
 -- Relative to slot start
 slot_variables = {
-	[0x00] = {["Type"] = "Pointer", ["Name"] = "Struct Array Object Pointer", ["Fields"] = {
+	[0x00] = {["Type"] = "Pointer", ["Name"] = "Behavior Struct Pointer", ["Fields"] = {
 		[0x00] = {["Name"] = "Renderer Pointer", ["Type"] = "Pointer", ["Fields"] = {
 				[0x04] = {["Name"] = "x_pos", ["Type"] = "s16_be"},
 				[0x06] = {["Name"] = "y_pos", ["Type"] = "s16_be"},
 				[0x08] = {["Name"] = "z_pos", ["Type"] = "s16_be"},
 				--[0x0A] = {["Name"] = "scale", ["Type"] = "u16_be"},
 			},
+		[0x2C] = {["Name"] = "Object Array Index (doubled)", ["Type"] = "u16_be"},
+		[0x2E] = {["Name"] = "Collide Able Bitfield", ["Type"] = "u16_be"},
 		},
 		[0x04] = {["Name"] = "Unknown Pointer 0x04", ["Type"] = "Pointer"},
 		[0x08] = {["Name"] = "Unknown Pointer 0x08", ["Type"] = "Pointer"},
@@ -1432,6 +1434,9 @@ end
 ---------------------------
 
 object_index = 1;
+object_top_index = 1;
+--ToDo: set object_max_slots based on screen size 
+object_max_slots = 50;
 hide_non_animated = false;
 
 --------------------
@@ -2001,7 +2006,7 @@ function Game.drawUI()
 	end
 
 	if script_mode == "List" and isRDRAM(objectArray) then
-		for i = numSlots, 1, -1 do
+		for i = math.min(numSlots, object_top_index+object_max_slots), object_top_index, -1 do
 			local currentSlotBase = objectArray + getSlotBase(i);
 
 			local animationType = "Unknown";
@@ -2035,7 +2040,7 @@ function Game.drawUI()
 	end
 
 	if script_mode == "List Struct" then
-		for i = #structPointers, 1, -1 do
+		for i = math.min(#structPointers, object_top_index+object_max_slots), object_top_index, -1 do
 			local structName = getStructName(structPointers[i]).." - ";
 			if object_index == i then
 				local x = mainmemory.read_s16_be(structPointers[i] + 0x04); -- TODO: Get these constants from somewhere
@@ -2058,6 +2063,11 @@ local function incrementObjectIndex() -- TODO: These functions need to take hide
 	if object_index > numSlots then
 		object_index = 1;
 	end
+	if object_index > object_top_index + object_max_slots then
+		object_top_index = object_index - object_max_slots;
+	elseif object_index < object_top_index then
+		object_top_index = object_index;
+	end
 end
 
 local function decrementObjectIndex()
@@ -2065,6 +2075,11 @@ local function decrementObjectIndex()
 	if object_index <= 0 then
 		local numSlots = getNumSlots();
 		object_index = numSlots;
+	end
+	if object_index > object_top_index + object_max_slots then
+		object_top_index = object_index - object_max_slots;
+	elseif object_index < object_top_index then
+		object_top_index = object_index;
 	end
 end
 
