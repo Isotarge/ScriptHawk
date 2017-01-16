@@ -1894,6 +1894,48 @@ function zipToSelectedObject()
 	end
 end
 
+function setSelectedObjectModel(model_index)
+	if script_mode == "Examine" or script_mode == "List" then -- Model 1
+		local objectArray = dereferencePointer(Game.Memory.object_array_pointer[version]);
+		if isRDRAM(objectArray) then
+			local slotBase = objectArray + getSlotBase(object_index);
+			local behavior_pointer = dereferencePointer(slotBase);
+			if isRDRAM(behavior_pointer) then
+				objectModel = mainmemory.read_u16_be(behavior_pointer + 0x3E);
+				objectModel = bit.band(objectModel, 0x0003);
+				objectModel = bit.bor(objectModel, bit.lshift(model_index, 2));
+				mainmemory.write_u16_be(behavior_pointer + 0x3E, objectModel);
+			end
+		end
+	end
+end
+
+function turnOffSelectedObjectCollision()
+	if script_mode == "Examine" or script_mode == "List" then -- Model 1
+		local objectArray = dereferencePointer(Game.Memory.object_array_pointer[version]);
+		if isRDRAM(objectArray) then
+			local slotBase = objectArray + getSlotBase(object_index);
+			local behavior_pointer = dereferencePointer(slotBase);
+			if isRDRAM(behavior_pointer) then
+				mainmemory.write_u16_be(behavior_pointer + 0x2E, 0);
+			end
+		end
+	end
+end
+
+function turnOnSelectedObjectCollision()
+	if script_mode == "Examine" or script_mode == "List" then -- Model 1
+		local objectArray = dereferencePointer(Game.Memory.object_array_pointer[version]);
+		if isRDRAM(objectArray) then
+			local slotBase = objectArray + getSlotBase(object_index);
+			local behavior_pointer = dereferencePointer(slotBase);
+			if isRDRAM(behavior_pointer) then
+				mainmemory.write_u16_be(behavior_pointer + 0x2E, 1);
+			end
+		end
+	end
+end
+
 function despawnSelectedObject()
 	if script_mode == "Examine" or script_mode == "List" then -- Model 1
 		local objectArray = dereferencePointer(Game.Memory.object_array_pointer[version]);
