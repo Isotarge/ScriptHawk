@@ -3033,7 +3033,6 @@ function checkFlag(flagType, index)
 			bitfield_pointer = Game.Memory.jiggy_bitfield[version];
 		end
 	end
-	print(toHexString(bitfield_pointer));
 	if isRDRAM(bitfield_pointer) then
 		flagByte = mainmemory.readbyte(bitfield_pointer + ((index-1)/8));
 		flagByte = bit.band(flagByte, bit.lshift(1,index%8));
@@ -3061,12 +3060,10 @@ function setFlag(flagType, index)
 			bitfield_pointer = Game.Memory.jiggy_bitfield[version];
 		end
 	end
-	print(toHexString(bitfield_pointer));
 	if isRDRAM(bitfield_pointer) then
 		flagByte = mainmemory.readbyte(bitfield_pointer + ((index-1)/8));
 		flagByte = bit.bor(flagByte, bit.lshift(1,index%8));
 		mainmemory.writebyte(bitfield_pointer + ((index-1)/8),flagByte);
-		flagByte = mainmemory.readbyte(bitfield_pointer + ((index-1)/8));
 	end
 end
 
@@ -3089,7 +3086,6 @@ function clearFlag(flagType, index)
 		flagByte = mainmemory.readbyte(bitfield_pointer + ((index-1)/8));
 		flagByte = bit.band(flagByte, bit.bnot(bit.lshift(1,index%8)));
 		mainmemory.writebyte(bitfield_pointer + ((index-1)/8),flagByte);
-		flagByte = mainmemory.readbyte(bitfield_pointer + ((index-1)/8));
 	end
 end
 
@@ -3244,7 +3240,7 @@ local flag_array = {
 	{["name"] = "MM: Jig: Huts",			["index"] = 0x05,	["type"] = "Jig"},
 	{["name"] = "MM: Jig: Ruins",			["index"] = 0x06,	["type"] = "Jig"},
 	{["name"] = "MM: Jig: Hill",			["index"] = 0x07,	["type"] = "Jig"},
-	--Orange Switch
+	{["name"] = "MM: Jig: Orange Switch",	["index"] = 0x08,	["type"] = "Jig"},
 	{["name"] = "MM: Jig: Chimpy",			["index"] = 0x09,	["type"] = "Jig"},
 	{["name"] = "MM: Jig: Conga",			["index"] = 0x0A,	["type"] = "Jig"},
 	{["name"] = "TTC: Jig: Jinjo",			["index"] = 0x0B,	["type"] = "Jig"},
