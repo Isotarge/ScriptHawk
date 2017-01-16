@@ -296,6 +296,7 @@ return { -- TODO: Add field for where the object can be spawned
 	{["id"] = 0x01F8, ["name"] = "Unknown 0x01F8"},
 	{["id"] = 0x01F9, ["name"] = "Cactus"},
 	{["id"] = 0x01FA, ["name"] = "Croctus"},
+	{["id"] = 0x01FB, ["name"] = "BGS Maze Jiggy Switch"},
 	{["id"] = 0x01FD, ["name"] = "Clock Switch"},
 	{["id"] = 0x01FE, ["name"] = "Gate"},
 	{["id"] = 0x01FF, ["name"] = "Red Feather"},

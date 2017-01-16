@@ -263,7 +263,10 @@ Game.Memory = {
 	["board_base"] = {0x394140, 0x394350, 0x3929C0, 0x393760},
 	["pause_menu_strings_base"] = {0x36C99C, 0x36CAF0, 0x36B6E0, 0x36C4E0},
 	["return_to_lair_enabled"] = {0x383A60, 0x383BC0, 0x3822A0, 0x383080},
-};
+	["jiggy_bitfield"] = {0x383CA0,0x383E00,0x3824E0,0x3832C0},
+	["honeycomb_bitfield"] = {0x383CC0,0x383E20,0x382500,0x3832E0},
+	["mumbo_token_bitfield"] = {0x383CD0,0x383E30,0x382510,0x3832F0},
+ };
 
 function Game.detectVersion(romName, romHash)
 	if romHash == "BB359A75941DF74BF7290212C89FBC6E2C5601FE" then -- Europe
@@ -3013,3 +3016,74 @@ Game.OSD = {
 };
 
 return Game;
+
+function setFlag(flagType, index)
+	if flagType == "H" then
+		if index < 0x19 then
+			local bitfield_pointer = Game.Memory.honeycomb_bitfield[version];
+		end
+	elseif flagType == "MT" then
+		if index < 0x7E then
+			local bitfield_pointer = Game.Memory.mumbo_token_bitfield[version];
+		end
+	elseif flagType == "Jig" then
+		if index < 0x65 then
+			local bitfield_pointer = Game.Memory.jiggy_bitfield[version];
+		end
+	--[[
+	elseif flagType == "Lair Progress" then
+
+	]]
+	end
+	if isRDRAM(bitfield_pointer) then
+		flagByte = mainmemory.readbyte(bitfield_pointer + ((index-1)/8));
+		flagByte = bit.band(flagByte, bit.rshift(1,index%8));
+		mainmemory.writebyte(bitfield_pointer + ((index-1)/8),flagByte);
+	end
+end
+
+local flag_array = {
+	{["level"] = "MM",	["name"] = "By Conga", 			["index"] = 0x01,	["type"] = "MT" },
+	{["level"] = "MM", 	["name"] = "Behind Ruins",		["index"] = 0x02,	["type"] = "MT" },
+	{["level"] = "MM", 	["name"] = "Mumbos Hut Ramp", 	["index"] = 0x03,	["type"] = "MT" },
+	{["level"] = "MM", 	["name"] = "By Purple Jinjo", 	["index"] = 0x04,	["type"] = "MT" },
+	{["level"] = "MM", 	["name"] = "Ticker Tower", 		["index"] = 0x05,	["type"] = "MT" },
+	{["level"] = "TTC",	["name"] = "In Ship",		 	["index"] = 0x06,	["type"] = "MT" },
+	{["level"] = "TTC",	["name"] = "In Lockup 1",		["index"] = 0x07,	["type"] = "MT" },
+	{["level"] = "TTC",	["name"] = "In Lockup 2",		["index"] = 0x08,	["type"] = "MT" },
+	{["level"] = "TTC",	["name"] = "Ship Mast",			["index"] = 0x09,	["type"] = "MT" },
+	{["level"] = "TTC",	["name"] = "Lighthouse",		["index"] = 0x0A,	["type"] = "MT" },
+	{["level"] = "TTC",	["name"] = "Floating Box",		["index"] = 0x0B,	["type"] = "MT" },
+	{["level"] = "TTC",	["name"] = "By Last X",			["index"] = 0x0C,	["type"] = "MT" },
+	{["level"] = "TTC",	["name"] = "Pool",				["index"] = 0x0D,	["type"] = "MT" },
+	{["level"] = "TTC",	["name"] = "Shock Spring Pad",	["index"] = 0x0E,	["type"] = "MT" },
+	{["level"] = "TTC",	["name"] = "Behind Nipper",		["index"] = 0x0F,	["type"] = "MT" },
+	{["level"] = "CC",	["name"] = "Tail Chompa",		["index"] = 0x10,	["type"] = "MT" },
+	{["level"] = "CC",	["name"] = "Above World Exit",	["index"] = 0x11,	["type"] = "MT" },
+	{["level"] = "CC",	["name"] = "Underwater Alcove",	["index"] = 0x12,	["type"] = "MT" },
+	{["level"] = "CC",	["name"] = "Window",			["index"] = 0x13,	["type"] = "MT" },
+	{["level"] = "CC",	["name"] = "Clanker's Mouth",	["index"] = 0x14,	["type"] = "MT" },
+	{["level"] = "BGS",	["name"] = "Under Mud Huts 1",	["index"] = 0x15,	["type"] = "MT" },
+	{["level"] = "BGS",	["name"] = "Under Mud Huts 2",	["index"] = 0x16,	["type"] = "MT" },
+	{["level"] = "BGS",	["name"] = "Above Cattail",		["index"] = 0x17,	["type"] = "MT" },
+	{["level"] = "BGS",	["name"] = "By Yellow Jinjo",	["index"] = 0x18,	["type"] = "MT" },
+	{["level"] = "BGS",	["name"] = "Above Mud Huts",	["index"] = 0x19,	["type"] = "MT" },
+	{["level"] = "BGS",	["name"] = "Behind Mumbo's",	["index"] = 0x1A,	["type"] = "MT" },
+	{["level"] = "BGS",	["name"] = "Elevated Walkway",	["index"] = 0x1B,	["type"] = "MT" },
+	{["level"] = "BGS",	["name"] = "In Tanktup",		["index"] = 0x1C,	["type"] = "MT" },
+	{["level"] = "BGS",	["name"] = "Mr. Vile",			["index"] = 0x1D,	["type"] = "MT" },
+	
+	{["level"] = "Lair",["name"] = "By CCW Puzzle",		["index"] = 0x52,	["type"] = "MT" },
+	
+	{["level"] = "Lair",["name"] = "Above CC Entrance",	["index"] = 0x54,	["type"] = "MT" },
+	
+	
+	{["level"] = "MM",	["name"] = "Hill",				["index"] = 0x01,	["type"] = "H" },
+	{["level"] = "MM",	["name"] = "JuJu",				["index"] = 0x02,	["type"] = "H" },
+	
+	{["level"] = "TTC",	["name"] = "Floating Box",		["index"] = 0x04,	["type"] = "H" },
+	
+	{["level"] = "BGS",	["name"] = "In Tanktup",		["index"] = 0x08,	["type"] = "H" },
+	
+	{["level"] = "MMM",	["name"] = "Floorboard",		["index"] = 0x13,	["type"] = "H" },
+}
