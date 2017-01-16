@@ -3015,24 +3015,81 @@ Game.OSD = {
 	{"FF Pattern", Game.getFFPattern},
 };
 
-function setFlag(flagType, index)
+--[[
+	FLAG CONTROLLER!!
+]]
+function checkFlag(flagType, index)
+	local bitfield_pointer
 	if flagType == "H" then
 		if index < 0x19 then
-			local bitfield_pointer = Game.Memory.honeycomb_bitfield[version];
+			 bitfield_pointer = Game.Memory.honeycomb_bitfield[version];
 		end
 	elseif flagType == "MT" then
 		if index < 0x7E then
-			local bitfield_pointer = Game.Memory.mumbo_token_bitfield[version];
+			bitfield_pointer = Game.Memory.mumbo_token_bitfield[version];
 		end
 	elseif flagType == "Jig" then
 		if index < 0x65 then
-			local bitfield_pointer = Game.Memory.jiggy_bitfield[version];
+			bitfield_pointer = Game.Memory.jiggy_bitfield[version];
+		end
+	end
+	print(toHexString(bitfield_pointer));
+	if isRDRAM(bitfield_pointer) then
+		flagByte = mainmemory.readbyte(bitfield_pointer + ((index-1)/8));
+		flagByte = bit.band(flagByte, bit.lshift(1,index%8));
+		if flagByte == 0 then
+			return false;
+		else
+			return true;
+		end
+	end
+	return nil;
+end
+
+function setFlag(flagType, index)
+	local bitfield_pointer
+	if flagType == "H" then
+		if index < 0x19 then
+			 bitfield_pointer = Game.Memory.honeycomb_bitfield[version];
+		end
+	elseif flagType == "MT" then
+		if index < 0x7E then
+			bitfield_pointer = Game.Memory.mumbo_token_bitfield[version];
+		end
+	elseif flagType == "Jig" then
+		if index < 0x65 then
+			bitfield_pointer = Game.Memory.jiggy_bitfield[version];
+		end
+	end
+	print(toHexString(bitfield_pointer));
+	if isRDRAM(bitfield_pointer) then
+		flagByte = mainmemory.readbyte(bitfield_pointer + ((index-1)/8));
+		flagByte = bit.bor(flagByte, bit.lshift(1,index%8));
+		mainmemory.writebyte(bitfield_pointer + ((index-1)/8),flagByte);
+		flagByte = mainmemory.readbyte(bitfield_pointer + ((index-1)/8));
+	end
+end
+
+function clearFlag(flagType, index)
+	local bitfield_pointer
+	if flagType == "H" then
+		if index < 0x19 then
+			 bitfield_pointer = Game.Memory.honeycomb_bitfield[version];
+		end
+	elseif flagType == "MT" then
+		if index < 0x7E then
+			bitfield_pointer = Game.Memory.mumbo_token_bitfield[version];
+		end
+	elseif flagType == "Jig" then
+		if index < 0x65 then
+			bitfield_pointer = Game.Memory.jiggy_bitfield[version];
 		end
 	end
 	if isRDRAM(bitfield_pointer) then
 		flagByte = mainmemory.readbyte(bitfield_pointer + ((index-1)/8));
-		flagByte = bit.band(flagByte, bit.rshift(1,index%8));
+		flagByte = bit.band(flagByte, bit.bnot(bit.lshift(1,index%8)));
 		mainmemory.writebyte(bitfield_pointer + ((index-1)/8),flagByte);
+		flagByte = mainmemory.readbyte(bitfield_pointer + ((index-1)/8));
 	end
 end
 
@@ -3084,24 +3141,24 @@ local flag_array = {
 	{["name"] = "GV: MT: Water Temple Door",	["index"] = 0x2D,	["type"] = "MT" },
 	{["name"] = "GV: MT: Matching Pyramid",		["index"] = 0x2E,	["type"] = "MT" },
 	{["name"] = "GV: MT: In Maze Pyramid",		["index"] = 0x2F,	["type"] = "MT" },
-	{["name"] = "GV: MT: Unknown 0x30",			["index"] = 0x30,	["type"] = "MT" }, --Inside Jinxy? 
+	{["name"] = "GV: MT: In Water Pyramid",		["index"] = 0x30,	["type"] = "MT" },
 	{["name"] = "GV: MT: Rubee's Pyramid",		["index"] = 0x31,	["type"] = "MT" },
-	{["name"] = "GV: MT: Unknown 0x32",			["index"] = 0x32,	["type"] = "MT" }, --Water Pyramid?
+	{["name"] = "GV: MT: In Jinxy",				["index"] = 0x32,	["type"] = "MT" },
 	{["name"] = "MMM: MT: By Fountain",			["index"] = 0x33,	["type"] = "MT" },
 	{["name"] = "MMM: MT: By Tumblar Shed",		["index"] = 0x34,	["type"] = "MT" },
 	{["name"] = "MMM: MT: Church Roof",			["index"] = 0x35,	["type"] = "MT" },
 	{["name"] = "MMM: MT: Hedges By Ramp",		["index"] = 0x36,	["type"] = "MT" },
 	{["name"] = "MMM: MT: Hedge Maze",			["index"] = 0x37,	["type"] = "MT" },
-	{["name"] = "MMM: MT: Unknown 0x38",		["index"] = 0x38,	["type"] = "MT" }, --Napper?
+	{["name"] = "MMM: MT: Cemetary",			["index"] = 0x38,	["type"] = "MT" }, 
 	{["name"] = "MMM: MT: In Fountain Whip",	["index"] = 0x39,	["type"] = "MT" },
 	{["name"] = "MMM: MT: Church Rafters",		["index"] = 0x3A,	["type"] = "MT" },
 	{["name"] = "MMM: MT: Organ Stool",			["index"] = 0x3B,	["type"] = "MT" },
 	{["name"] = "MMM: MT: Tumblar Shed Roof",	["index"] = 0x3C,	["type"] = "MT" },
 	{["name"] = "MMM: MT: Cellar/Loggo",		["index"] = 0x3D,	["type"] = "MT" },
-	{["name"] = "MMM: MT: Unknown 0x3E",		["index"] = 0x3E,	["type"] = "MT" }, --Bathroom?
+	{["name"] = "MMM: MT: Dinning Room",		["index"] = 0x3E,	["type"] = "MT" },
 	{["name"] = "MMM: MT: Well",				["index"] = 0x3F,	["type"] = "MT" },
 	{["name"] = "MMM: MT: Bedroom",				["index"] = 0x40,	["type"] = "MT" },
-	{["name"] = "MMM: MT: Unknown 0x41",		["index"] = 0x41,	["type"] = "MT" }, --Cemetary
+	{["name"] = "MMM: MT: Bathroom",			["index"] = 0x41,	["type"] = "MT" }, 
 	{["name"] = "RBB: MT: Top Of Funnel",		["index"] = 0x42,	["type"] = "MT" },
 	{["name"] = "RBB: MT: Front Of Ship",		["index"] = 0x43,	["type"] = "MT" },
 	{["name"] = "RBB: MT: Lifeboat",			["index"] = 0x44,	["type"] = "MT" },
@@ -3109,10 +3166,10 @@ local flag_array = {
 	{["name"] = "RBB: MT: Toxic Pool",			["index"] = 0x46,	["type"] = "MT" },
 	{["name"] = "RBB: MT: In front Of Chompa",	["index"] = 0x47,	["type"] = "MT" },
 	{["name"] = "RBB: MT: Left Container",		["index"] = 0x48,	["type"] = "MT" },
-	{["name"] = "RBB: MT: Unknown 0x49",		["index"] = 0x49,	["type"] = "MT" }, --Middle Container?
-	{["name"] = "RBB: MT: Unknown 0x4A",		["index"] = 0x4A,	["type"] = "MT" }, --Bunk Room?
-	{["name"] = "RBB: MT: Unknown 0x4B",		["index"] = 0x4B,	["type"] = "MT" }, --Kitchen Oven?
-	{["name"] = "RBB: MT: Unknown 0x4C",		["index"] = 0x4C,	["type"] = "MT" }, --Navigation Room?
+	{["name"] = "RBB: MT: Middle Container",	["index"] = 0x49,	["type"] = "MT" },
+	{["name"] = "RBB: MT: Crew Cabin",			["index"] = 0x4A,	["type"] = "MT" },
+	{["name"] = "RBB: MT: Navigation Room",		["index"] = 0x4B,	["type"] = "MT" },
+	{["name"] = "RBB: MT: Kitchen Oven",		["index"] = 0x4C,	["type"] = "MT" },
 	{["name"] = "RBB: MT: Engine Room Left",	["index"] = 0x4D,	["type"] = "MT" },
 	{["name"] = "RBB: MT: Engine Room Right",	["index"] = 0x4E,	["type"] = "MT" },
 	{["name"] = "RBB: MT: Engine Room Mid",		["index"] = 0x4F,	["type"] = "MT" },
@@ -3129,12 +3186,12 @@ local flag_array = {
 	{["name"] = "Lair: MT: MMM Puzzle",			["index"] = 0x5A,	["type"] = "MT" },
 	{["name"] = "CCW: MT: Spring House",		["index"] = 0x5B,	["type"] = "MT" },
 	{["name"] = "CCW: MT: Spring Low Branch",	["index"] = 0x5C,	["type"] = "MT" },
-	{["name"] = "CCW: MT: Spring Unknown 0x5D",	["index"] = 0x5D,	["type"] = "MT" }, --Nabnut's house?
+	--0x5D Unused. Supposed to be brambles or eeyrie???
 	{["name"] = "CCW: MT: Spring Brambles/Eeyrie",	["index"] = 0x5E,	["type"] = "MT" },
 	{["name"] = "CCW: MT: Spring Garden Snare",	["index"] = 0x5F,	["type"] = "MT" },
 	{["name"] = "CCW: MT: Spring Entrance",		["index"] = 0x60,	["type"] = "MT" },
 	{["name"] = "CCW: MT: Spring Hive",			["index"] = 0x61,	["type"] = "MT" },
-	--Unused? Supposed to be bramble or eeyrie???
+	{["name"] = "CCW: MT: Nabnut's House",		["index"] = 0x62,	["type"] = "MT" },
 	{["name"] = "CCW: MT: Summer Eeyrie",		["index"] = 0x63,	["type"] = "MT" },
 	{["name"] = "CCW: MT: Summer Garden Corner",	["index"] = 0x64,	["type"] = "MT" },
 	{["name"] = "CCW: MT: Summer Bramble Snare",	["index"] = 0x65,	["type"] = "MT" },
@@ -3179,7 +3236,68 @@ local flag_array = {
 	{["name"] = "SM: H: Coliwobble",		["index"] = 0x17,	["type"] = "H" },
 	{["name"] = "SM: H: Quarries",			["index"] = 0x18,	["type"] = "H" },
 	
-	{["name"] = "MM: Jig: ",	["index"] = 0x0, ["type"] = "Jig"},
+	
+	{["name"] = "MM: Jig: Jinjo",			["index"] = 0x01,	["type"] = "Jig"},
+	{["name"] = "MM: Jig: Ticker's Tower",	["index"] = 0x02,	["type"] = "Jig"},
+	{["name"] = "MM: Jig: Mumbo's Skull",	["index"] = 0x03,	["type"] = "Jig"},
+	{["name"] = "MM: Jig: JuJu",			["index"] = 0x03,	["type"] = "Jig"},
+	{["name"] = "MM: Jig: Huts",			["index"] = 0x05,	["type"] = "Jig"},
+	{["name"] = "MM: Jig: Ruins",			["index"] = 0x06,	["type"] = "Jig"},
+	{["name"] = "MM: Jig: Hill",			["index"] = 0x07,	["type"] = "Jig"},
+	--Orange Switch
+	{["name"] = "MM: Jig: Chimpy",			["index"] = 0x09,	["type"] = "Jig"},
+	{["name"] = "MM: Jig: Conga",			["index"] = 0x0A,	["type"] = "Jig"},
+	{["name"] = "TTC: Jig: Jinjo",			["index"] = 0x0B,	["type"] = "Jig"},
+	{["name"] = "TTC: Jig: Lighthouse",		["index"] = 0x0C,	["type"] = "Jig"},
+	{["name"] = "TTC: Jig: Alcove 1",		["index"] = 0x0D,	["type"] = "Jig"},
+	{["name"] = "TTC: Jig: Alcove 2",		["index"] = 0x0E,	["type"] = "Jig"},
+	{["name"] = "TTC: Jig: Pool",			["index"] = 0x0F,	["type"] = "Jig"},
+	{["name"] = "TTC: Jig: Sandcastle",		["index"] = 0x10,	["type"] = "Jig"},
+	{["name"] = "TTC: Jig: Red X's",		["index"] = 0x11,	["type"] = "Jig"},
+	{["name"] = "TTC: Jig: Nipper",			["index"] = 0x12, 	["type"] = "Jig"},
+	{["name"] = "TTC: Jig: Lockup",			["index"] = 0x13,	["type"] = "Jig"},
+	{["name"] = "TTC: Jig: Blubber",		["index"] = 0x14,	["type"] = "Jig"},
+	{["name"] = "CC: Jig: Jinjo",			["index"] = 0x15,	["type"] = "Jig"},
+	{["name"] = "CC: Jig: Snippets",		["index"] = 0x16,	["type"] = "Jig"},
+	{["name"] = "CC: Jig: Back",			["index"] = 0x17,	["type"] = "Jig"},
+	{["name"] = "CC: Jig: Bolt",			["index"] = 0x18,	["type"] = "Jig"},
+	{["name"] = "CC: Jig: Tail",			["index"] = 0x19,	["type"] = "Jig"},
+	{["name"] = "CC: Jig: Long Pipe",		["index"] = 0x1A,	["type"] = "Jig"},
+	{["name"] = "CC: Jig: Tooth",			["index"] = 0x1B,	["type"] = "Jig"},
+	{["name"] = "CC: Jig: Rings",			["index"] = 0x1C,	["type"] = "Jig"},
+	{["name"] = "CC: Jig: Slow Sawblades",	["index"] = 0x1D,	["type"] = "Jig"},
+	{["name"] = "CC: Jig: Fast Sawblades",	["index"] = 0x1E,	["type"] = "Jig"},
+	{["name"] = "BGS: Jig: Jinjo",			["index"] = 0x1F,	["type"] = "Jig"},
+	{["name"] = "BGS: Jig: Elevated Walkway",	["index"] = 0x20,	["type"] = "Jig"},
+	{["name"] = "BGS: Jig: Egg",			["index"] = 0x21,	["type"] = "Jig"},
+	{["name"] = "BGS: Jig: Croctus",		["index"] = 0x22,	["type"] = "Jig"},
+	{["name"] = "BGS: Jig: Mud Huts",		["index"] = 0x23,	["type"] = "Jig"},
+	{["name"] = "BGS: Jig: Flibbits",		["index"] = 0x24,	["type"] = "Jig"},
+	{["name"] = "BGS: Jig: Maze",			["index"] = 0x25,	["type"] = "Jig"},
+	{["name"] = "BGS: Jig: Tanktup",		["index"] = 0x26,	["type"] = "Jig"},
+	{["name"] = "BGS: Jig: Tiptup",			["index"] = 0x27,	["type"] = "Jig"},
+	{["name"] = "BGS: Jig: Mr. Vile",		["index"] = 0x28,	["type"] = "Jig"},
+	{["name"] = "FP: Jig: Jinjo",			["index"] = 0x29,	["type"] = "Jig"},
+	{["name"] = "FP: Jig: Boggy 1",			["index"] = 0x2A,	["type"] = "Jig"},
+	{["name"] = "FP: Jig: Pipe",			["index"] = 0x2B,	["type"] = "Jig"},
+	{["name"] = "FP: Jig: Boggy 3",			["index"] = 0x2B,	["type"] = "Jig"},
+	{["name"] = "FP: Jig: Snowman Buttons",	["index"] = 0x2D,	["type"] = "Jig"},
+	{["name"] = "FP: Jig: Presents",		["index"] = 0x2E,	["type"] = "Jig"},
+	{["name"] = "FP: Jig: XMas Tree",		["index"] = 0x2F,	["type"] = "Jig"},
+	{["name"] = "FP: Jig: Boggy 2",			["index"] = 0x30,	["type"] = "Jig"},
+	{["name"] = "FP: Jig: Sir Slush",		["index"] = 0x31,	["type"] = "Jig"},
+	{["name"] = "FP: Jig: Wozza",			["index"] = 0x32,	["type"] = "Jig"},
+	{["name"] = "Lair: Jig: 1st Jiggy",		["index"] = 0x33,	["type"] = "Jig"},
+	{["name"] = "Lair: Jig: MM Witch Switch",	["index"] = 0x34,	["type"] = "Jig"},
+	{["name"] = "Lair: Jig: CC Witch Switch",	["index"] = 0x35,	["type"] = "Jig"},
+	{["name"] = "Lair: Jig: TTC Witch Switch",	["index"] = 0x36,	["type"] = "Jig"},
+	{["name"] = "Lair: Jig: BGS Witch Switch",	["index"] = 0x37,	["type"] = "Jig"},
+	{["name"] = "Lair: Jig: FP Witch Switch",	["index"] = 0x38,	["type"] = "Jig"},
+	{["name"] = "Lair: Jig: MMM Witch Switch",	["index"] = 0x39,	["type"] = "Jig"},
+	{["name"] = "Lair: Jig: GV Witch Switch",	["index"] = 0x3A,	["type"] = "Jig"},
+	
+	{["name"] = "Lair: MMM: Cellar",			["index"] = 0x5E,	["type"] = "Jig"},
+	{["name"] = "Lair: MMM: Church Roof",		["index"] = 0x5F,	["type"] = "Jig"},
 }
 
 return Game;
