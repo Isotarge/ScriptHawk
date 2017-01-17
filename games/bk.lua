@@ -2204,6 +2204,7 @@ local sandcastlePositions = {
 function gotoSandcastleLetter(letter)
 	if type(letter) ~= "string" then
 		print("Letter not a string.");
+		return;
 	end
 
 	-- Convert the letter to uppercase
@@ -2211,6 +2212,7 @@ function gotoSandcastleLetter(letter)
 
 	if type(sandcastlePositions[letter]) ~= "table" then
 		print("Letter not found.");
+		return;
 	end
 
 	Game.setXPosition(sandcastlePositions[letter][1] * sandcastle_square_size);
