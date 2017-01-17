@@ -1,0 +1,172 @@
+--3831A8
+08 00 00 00 = 1st Note Text
+10 00 00 00 = 1st Mumbo Token Text
+20 00 00 00 = 1st Egg Text
+40 00 00 00 = 1st Red Feather Text
+80 00 00 00 = 1st Gold Feather Text
+
+00 04 00 00 = 1st Honeycomb Text
+00 08 00 00 = 1st Empty Honeycomb Text
+00 10 00 00 = 1st Extra Life Text
+00 20 00 00 = 1st Bee Hive Text
+00 40 00 00 = 1st Jinjo Text
+00 80 00 00 = 1st Time in Pirahana Water Text
+00 00 01 00 = 1st Time in Sand Eel Text
+
+00 00 10 00 = 1st Time in Icy Water Text
+
+00 00 40 00 = 1st Time in Jigsaw puzzle
+00 00 80 00 = 1st Time in jisaw puzzle with puzzle piece
+00 00 00 01 = MM WS Jiggy Spawned
+00 00 00 02 = MMM WS Jiggy Spawned
+00 00 00 04 = TTC WS Jiggy Spawned
+00 00 00 08 = CC WS Jiggy Spawned
+00 00 00 10 = CC RBB Jiggy Spawned
+
+
+
+--3831AC
+04 00 00 00 = Water Level 1 switch pressed
+08 00 00 00 = Water at level 1
+10 00 00 00 = Water Level 2 switch pressed
+20 00 00 00 = water at level 2
+40 00 00 00 = Water Level 3 switch pressed
+80 00 00 00 = water at level 3
+
+00 00 02 00 = MM open & sign Visible
+00 00 04 00 = TTC sign Visible
+00 00 08 00 = CC Open & sign Visible
+00 00 10 00 = BGS open & sign Visible
+00 00 20 00 = FP open & sign Visible
+00 00 40 00 = GV open & sign Visible
+00 00 80 00 = MMM open & sign Visible
+00 00 00 01 = RBB open & sign Visible
+00 00 00 02 = CCW open & sign Visible
+00 00 00 04 = 50 Note Door Open
+00 00 00 08 = 180 Note Door Open
+00 00 00 10 = 260 Note Door Open
+00 00 00 20 = 350 Note Door Open
+00 00 00 40 = 450 Note Door Open
+00 00 00 80 = 640 Note Door Open
+
+
+
+
+--3831B0
+01 00 00 00 = 765 Note Door Open
+02 00 00 00 = 810 Note Door Open
+04 00 00 00 = 828 Note Door Open
+08 00 00 00 = 846 Note Door Open
+10 00 00 00 = 864 Note Door Open
+20 00 00 00 = 882 Note Door Open 
+40 00 00 00 = CCW Ws Jiggy Spawned 
+
+00 01 00 00 = FP WS Advent Calendar Open
+00 02 00 00 = Purple Cauldron 1 Activated
+00 04 00 00 = PUrple Cauldron 2 Activated
+00 08 00 00 = Green Cauldron 1 Activated
+00 10 00 00 = Green Cauldron 2 Activated
+00 20 00 00 = Red Cauldron 1 Activated
+00 40 00 00 = Red Cauldron 2 Activated
+
+00 00 02 00 = Yellow Cauldron 1 Activated
+00 00 04 00 = Yellow Cauldron 2 Activated
+00 00 08 00 = CCW Puzzle Podium Switch Pressed
+00 00 10 00 = CCW Puzzle Podium Activated
+00 00 20 00 = 1st FF BK square text
+00 00 40 00 = 1st FF Picture square text
+00 00 80 00 = 1st FF Music square text
+00 00 00 01 = 1st FF Mini-game square text
+00 00 00 02 = 1st FF Grunty square text
+00 00 00 04 = 1st FF Death square text
+00 00 00 08 = 1st FF Joker square text
+
+00 00 00 20 = # of pieces placed in MM Puzzle
+00 00 00 C0 = # of pieces placed in TTC Puzzle
+
+
+
+
+--3831B4
+07 00 00 00 = # of pieces placed in CC Puzzle
+38 00 00 00 = # of pieces placed in BGS Puzzle
+C0 03 00 00 = # of pieces placed in FP Puzzle
+00 3C 00 00 = # of pieces placed in FP Puzzle
+00 C0 03 00 = # of pieces placed in MMM Puzzle
+00 00 3C 00 = # of pieces placed in RBB Puzzle
+00 00 C0 03 = # of pieces placed in CCW Puzzle
+00 00 00 7C = # of pieces placed in DoG Puzzle
+00 00 00 80 03= # of pieces placed in double health Puzzle
+
+
+
+
+
+--3831B8
+20 00 00 00 = Gate to Crypt broken
+
+00 08 00 00 = CCW Spring Open
+00 10 00 00 = CCW Summer Open
+00 20 00 00 = CCW Autumn Open
+00 40 00 00 = CCW Winter Open
+
+00 00 40 00 = 1st time talking to brentilda text
+00 00 80 00 = 1st time in lair text
+00 00 00 01 = 1st time exiting level text
+00 00 00 02 = 1st time through 50 Note Door text
+
+00 00 00 08 = CC WS Eyes Activated
+00 00 00 10 = CC WS Left Eye Pressed 
+00 00 00 20 = CC WS Right Eye Pressed
+00 00 00 40 = Crypt Water Switch Coffin Lid Broken
+
+
+
+
+
+
+--3831BC
+02 00 00 00 = BGS WS Statue Hat Broken
+04 00 00 00 = GV WS Coffin Open
+
+80 00 00 00 = 1st time near jiggy puzzle podium text
+00 01 00 00 = 1st time dying text
+00 02 00 00 = 1st time taking oven damage text
+
+00 20 00 00 = Talked to BLUEEGGS Cheato
+00 40 00 00 = Talked to REDFEATHERS Cheato
+00 80 00 00 = Talked to GOLDFEATHERS Cheato
+00 00 01 00 = 1st time in MM
+00 00 04 00 = 1st time in TTC
+
+00 00 00 20 = 1st time in lair cutscene
+
+
+
+
+
+--3831C0
+04 00 00 00 = Grate to RBB Puzzle Broken
+08 00 00 00 = Ice Block by FP Puzzle Broken 
+10 00 00 00 = Statue Eye Broken
+20 00 00 00 = Rareware box RBB Lobby broken
+40 00 00 00 = Gobi Lobby Shock Pad Switch Pressed
+80 00 00 00 = Gobi Lobby Shock Pad Active
+00 01 00 00 = Wall to Gobi Lobby Wading Boots Broken
+00 02 00 00 = Wall to Gobi Lobby Shock Pad switch broken
+00 04 00 00 = Cobweb to purple cauldron Broken
+00 08 00 00 = Cobweb to Flight Pad Broken
+00 10 00 00 = Cobweb to Green Cauldron Broken
+00 20 00 00 = Grate to Water Switch 3 Broken
+00 40 00 00 = Grate to MMM Puzzle to RBB Puzzle Broken
+
+
+
+
+
+--3831C4
+08 00 00 00 = CCW Flower Spring State 
+10 00 00 00 = CCW Flower Summer State
+20 00 00 00 = CCW Flower Autumn State
+
+00 00 10 00 = 1st time FF cutscene
