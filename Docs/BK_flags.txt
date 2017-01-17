@@ -12,17 +12,19 @@
 00 40 00 00 = 1st Jinjo Text
 00 80 00 00 = 1st Time in Pirahana Water Text
 00 00 01 00 = 1st Time in Sand Eel Text
+00 00 02 00 = 1st time Meeting Mumbo text
+00 00 04 00 = Mumbo Text after 1st Transformation
 
 00 00 10 00 = 1st Time in Icy Water Text
-
+00 00 20 00 = 1st Time entering MMM Mansion Text
 00 00 40 00 = 1st Time in Jigsaw puzzle
 00 00 80 00 = 1st Time in jisaw puzzle with puzzle piece
 00 00 00 01 = MM WS Jiggy Spawned
 00 00 00 02 = MMM WS Jiggy Spawned
 00 00 00 04 = TTC WS Jiggy Spawned
 00 00 00 08 = CC WS Jiggy Spawned
-00 00 00 10 = CC RBB Jiggy Spawned
-
+00 00 00 10 = RBB WS Jiggy Spawned
+00 00 00 20 = 1st Time entering MMM Diningroom cutscene
 
 
 --3831AC
@@ -105,10 +107,19 @@ C0 03 00 00 = # of pieces placed in FP Puzzle
 --3831B8
 20 00 00 00 = Gate to Crypt broken
 
+00 01 00 00 = Exiting Loggo Grunty Text
+ 
 00 08 00 00 = CCW Spring Open
 00 10 00 00 = CCW Summer Open
 00 20 00 00 = CCW Autumn Open
 00 40 00 00 = CCW Winter Open
+
+*00 80 00 00* ???Banjo Transform State???
+00 00 01 00 Termite Transform Payed For
+00 00 02 00 Pumpkin Transform Payed For
+00 00 03 00 Walrus Transform Payed For
+00 00 04 00 Croc Transform Payed For
+00 00 08 00 Bee Transform Payed For
 
 00 00 40 00 = 1st time talking to brentilda text
 00 00 80 00 = 1st time in lair text
@@ -136,12 +147,18 @@ C0 03 00 00 = # of pieces placed in FP Puzzle
 00 20 00 00 = Talked to BLUEEGGS Cheato
 00 40 00 00 = Talked to REDFEATHERS Cheato
 00 80 00 00 = Talked to GOLDFEATHERS Cheato
-00 00 01 00 = 1st time in MM
-00 00 04 00 = 1st time in TTC
+00 00 01 00 = 1st time in MM - main map
+00 00 02 00 = 1st time in BGS - main map
+00 00 04 00 = 1st time in TTC - main map
+00 00 08 00 = 1st time in GV - main map
+00 00 10 00 = 1st time in RBB - main map
 
-00 00 00 20 = 1st time in lair cutscene
+00 00 40 00 = 1st time in FP - main map
 
+00 00 00 01 = 1st time in CC - main map
+00 00 00 02 = Double Health
 
+00 00 00 20 = 1st time in lair cutscene - entering from SM
 
 
 
@@ -160,13 +177,25 @@ C0 03 00 00 = # of pieces placed in FP Puzzle
 00 20 00 00 = Grate to Water Switch 3 Broken
 00 40 00 00 = Grate to MMM Puzzle to RBB Puzzle Broken
 
+00 00 02 00 = Final Battle Jinjo Statue Activated Cutscene
+00 00 04 00 = Final Battle Jinjo Statue Cutscene
 
+00 00 00 10 = 1st Time in Mumbo's With enough tokensText
+00 00 00 80 = Remove Buzzle Piece
 
 
 
 --3831C4
+01 00 00 00 = 'Z' to place all pieces
+
+04 00 00 00 = DoG Open
 08 00 00 00 = CCW Flower Spring State 
 10 00 00 00 = CCW Flower Summer State
 20 00 00 00 = CCW Flower Autumn State
 
+00 00 08 00 = Talked to Dingpot
 00 00 10 00 = 1st time FF cutscene
+
+00 00 40 00 = 1st time near DoG Puzzle Podium
+
+00 00 00 10 = Defeated Grunty
