@@ -42,7 +42,7 @@ A collection of Lua scripts and RAM watches for [BizHawk](https://github.com/TAS
 ###Banjo-Kazooie
 - All known versions supported
 - Spawn objects
-- [Object analysis tools](Docs/Object%20Analysis%20Tools.txt): List, Examine, Grab, Encircle, Zip
+- [Object analysis tools](Docs/Object%20Analysis%20Tools.txt): List, Examine, Grab, Encircle, Zip, Despawn
 
 ![Banjo-Kazooie Support](Images/Promo/bk_ui.png)
 

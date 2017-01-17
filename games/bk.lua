@@ -1944,7 +1944,8 @@ function despawnSelectedObject()
 		local objectArray = dereferencePointer(Game.Memory.object_array_pointer[version]);
 		if isRDRAM(objectArray) then
 			local slotBase = objectArray + getSlotBase(object_index);
-			mainmemory.writebyte(slotBase + 0x47, 0xFF); -- TODO: Ask Mittenz which bit actually despawns stuff and only set that :^)
+			local bitfieldValue = mainmemory.readbyte(slotBase + 0x47);
+			mainmemory.writebyte(slotBase + 0x47, set_bit(bitfieldValue, 3));
 		end
 	end
 end
