@@ -263,6 +263,7 @@ Game.Memory = {
 	["board_base"] = {0x394140, 0x394350, 0x3929C0, 0x393760},
 	["pause_menu_strings_base"] = {0x36C99C, 0x36CAF0, 0x36B6E0, 0x36C4E0},
 	["return_to_lair_enabled"] = {0x383A60, 0x383BC0, 0x3822A0, 0x383080},
+	["game_progress_bitfield"] = {0,0,0,0x3831A8},
 	["jiggy_bitfield"] = {0x383CA0,0x383E00,0x3824E0,0x3832C0},
 	["honeycomb_bitfield"] = {0x383CC0,0x383E20,0x382500,0x3832E0},
 	["mumbo_token_bitfield"] = {0x383CD0,0x383E30,0x382510,0x3832F0},
@@ -270,16 +271,20 @@ Game.Memory = {
 
 function Game.detectVersion(romName, romHash)
 	if romHash == "BB359A75941DF74BF7290212C89FBC6E2C5601FE" then -- Europe
+		flag_array = require("games.dk64_flags");
 		version = 1;
 		framebuffer.width = 292;
 		framebuffer.height = 216;
 		clip_vel = -2900;
 		max_air = 6 * 500;
 	elseif romHash == "90726D7E7CD5BF6CDFD38F45C9ACBF4D45BD9FD8" then -- Japan
+		flag_array = require("games.dk64_flags");
 		version = 2;
 	elseif romHash == "DED6EE166E740AD1BC810FD678A84B48E245AB80" then -- USA 1.1
+		flag_array = require("games.dk64_flags");
 		version = 3;
 	elseif romHash == "1FE1632098865F639E22C11B9A81EE8F29C75D7A" then -- USA 1.0
+		flag_array = require("games.dk64_flags");
 		version = 4;
 	else
 		return false;
@@ -3035,9 +3040,20 @@ function checkFlag(flagType, index)
 		if index < 0x65 then
 			bitfield_pointer = Game.Memory.jiggy_bitfield[version];
 		end
+	elseif flagType == "Prog" then
+		if index < 0x100 then
+			bitfield_pointer = Game.Memory.game_progress_bitfield[version];
+		end
 	end
+	
 	if isRDRAM(bitfield_pointer) then
-		flagByte = mainmemory.readbyte(bitfield_pointer + ((index-1)/8));
+		local containingByte = bitfield_pointer;
+		if flagType ~= "Prog" then
+			containingByte = containingByte + ((index-1)/8);
+		else
+			containingByte = containingByte + (index/8);
+		end
+		flagByte = mainmemory.readbyte(containingByte);
 		flagByte = bit.band(flagByte, bit.lshift(1,index%8));
 		if flagByte == 0 then
 			return false;
@@ -3062,13 +3078,25 @@ function setFlag(flagType, index)
 		if index < 0x65 then
 			bitfield_pointer = Game.Memory.jiggy_bitfield[version];
 		end
+	elseif flagType == "Prog" then
+		if index < 0x100 then
+			bitfield_pointer = Game.Memory.game_progress_bitfield[version];
+		end
 	end
+	
 	if isRDRAM(bitfield_pointer) then
-		flagByte = mainmemory.readbyte(bitfield_pointer + ((index-1)/8));
+		local containingByte = bitfield_pointer;
+		if flagType ~= "Prog" then
+			containingByte = containingByte + ((index-1)/8);
+		else
+			containingByte = containingByte + (index/8);
+		end
+		flagByte = mainmemory.readbyte(containingByte);
 		flagByte = bit.bor(flagByte, bit.lshift(1,index%8));
-		mainmemory.writebyte(bitfield_pointer + ((index-1)/8),flagByte);
+		mainmemory.writebyte(containingByte,flagByte);
 	end
 end
+
 
 function clearFlag(flagType, index)
 	local bitfield_pointer
@@ -3084,11 +3112,22 @@ function clearFlag(flagType, index)
 		if index < 0x65 then
 			bitfield_pointer = Game.Memory.jiggy_bitfield[version];
 		end
+	elseif flagType == "Prog" then
+		if index < 0x100 then
+			bitfield_pointer = Game.Memory.game_progress_bitfield[version];
+		end
 	end
+
 	if isRDRAM(bitfield_pointer) then
-		flagByte = mainmemory.readbyte(bitfield_pointer + ((index-1)/8));
+		local containingByte = bitfield_pointer;
+		if flagType ~= "Prog" then
+			containingByte = containingByte + ((index-1)/8);
+		else
+			containingByte = containingByte + (index/8);
+		end
+		flagByte = mainmemory.readbyte(containingByte);
 		flagByte = bit.band(flagByte, bit.bnot(bit.lshift(1,index%8)));
-		mainmemory.writebyte(bitfield_pointer + ((index-1)/8),flagByte);
+		mainmemory.writebyte(containingByte,flagByte);
 	end
 end
 
