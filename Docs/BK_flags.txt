@@ -117,9 +117,9 @@ C0 03 00 00 = # of pieces placed in FP Puzzle
 *00 80 00 00* ???Banjo Transform State???
 00 00 01 00 Termite Transform Payed For
 00 00 02 00 Pumpkin Transform Payed For
-00 00 03 00 Walrus Transform Payed For
-00 00 04 00 Croc Transform Payed For
-00 00 08 00 Bee Transform Payed For
+00 00 04 00 Walrus Transform Payed For
+00 00 08 00 Croc Transform Payed For
+00 00 10 00 Bee Transform Payed For
 
 00 00 40 00 = 1st time talking to brentilda text
 00 00 80 00 = 1st time in lair text
@@ -181,7 +181,7 @@ C0 03 00 00 = # of pieces placed in FP Puzzle
 00 00 04 00 = Final Battle Jinjo Statue Cutscene
 
 00 00 00 10 = 1st Time in Mumbo's With enough tokensText
-00 00 00 80 = Remove Buzzle Piece
+00 00 00 80 = Remove Puzzle Piece
 
 
 
