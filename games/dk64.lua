@@ -5745,7 +5745,7 @@ function Game.eachFrame()
 	end
 end
 
-function Game.crankyCutsceneMininumRequirements()
+function Game.crankyCutsceneMinimumRequirements()
 	setFlagsByType("Crown");
 	setFlagsByType("Fairy");
 	setFlagsByType("Key");
