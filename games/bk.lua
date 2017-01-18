@@ -66,6 +66,8 @@ local max_mumbo_tokens = 99;
 local max_jiggies = 100;
 local max_joker_cards = 99;
 
+local flag_array = {};
+
 local eep_checksum = {
 	{ address = 0x74, value = 0 }, -- Save Slot 1
 	{ address = 0xEC, value = 0 }, -- Save Slot 2
@@ -271,20 +273,20 @@ Game.Memory = {
 
 function Game.detectVersion(romName, romHash)
 	if romHash == "BB359A75941DF74BF7290212C89FBC6E2C5601FE" then -- Europe
-		flag_array = require("games.dk64_flags");
+		flag_array = require("games.bk_flags");
 		version = 1;
 		framebuffer.width = 292;
 		framebuffer.height = 216;
 		clip_vel = -2900;
 		max_air = 6 * 500;
 	elseif romHash == "90726D7E7CD5BF6CDFD38F45C9ACBF4D45BD9FD8" then -- Japan
-		flag_array = require("games.dk64_flags");
+		flag_array = require("games.bk_flags");
 		version = 2;
 	elseif romHash == "DED6EE166E740AD1BC810FD678A84B48E245AB80" then -- USA 1.1
-		flag_array = require("games.dk64_flags");
+		flag_array = require("games.bk_flags");
 		version = 3;
 	elseif romHash == "1FE1632098865F639E22C11B9A81EE8F29C75D7A" then -- USA 1.0
-		flag_array = require("games.dk64_flags");
+		flag_array = require("games.bk_flags");
 		version = 4;
 	else
 		return false;
@@ -3023,47 +3025,28 @@ Game.OSD = {
 	{"FF Pattern", Game.getFFPattern},
 };
 
---[[
-	FLAG CONTROLLER!!
-]]
-function checkFlag(flagType, index)
-	local bitfield_pointer
-	if flagType == "H" then
-		if index < 0x19 then
-			 bitfield_pointer = Game.Memory.honeycomb_bitfield[version];
-		end
-	elseif flagType == "MT" then
-		if index < 0x7E then
-			bitfield_pointer = Game.Memory.mumbo_token_bitfield[version];
-		end
-	elseif flagType == "Jig" then
-		if index < 0x65 then
-			bitfield_pointer = Game.Memory.jiggy_bitfield[version];
-		end
-	elseif flagType == "Prog" then
-		if index < 0x100 then
-			bitfield_pointer = Game.Memory.game_progress_bitfield[version];
+----------------
+--Flag Stuff --
+----------------
+local function getFlagByName(flagName)
+	for i = 1, #flag_array do
+		if flagName == flag_array[i]["name"] then
+			return flag_array[i];
 		end
 	end
-	
-	if isRDRAM(bitfield_pointer) then
-		local containingByte = bitfield_pointer;
-		if flagType ~= "Prog" then
-			containingByte = containingByte + ((index-1)/8);
-		else
-			containingByte = containingByte + (index/8);
-		end
-		flagByte = mainmemory.readbyte(containingByte);
-		flagByte = bit.band(flagByte, bit.lshift(1,index%8));
-		if flagByte == 0 then
-			return false;
-		else
-			return true;
-		end
-	end
-	return nil;
 end
 
+function getFlagName(flagType, flagIndex)
+	for i = 1, #flag_array do
+		if flagType == flag_array[i]["type"] and flagIndex == flag_array[i]["index"] then
+			return flag_array[i]["name"];
+		end
+	end
+end
+
+------------------------
+-- Set Flag Functions --
+------------------------
 function setFlag(flagType, index)
 	local bitfield_pointer
 	if flagType == "H" then
@@ -3094,10 +3077,44 @@ function setFlag(flagType, index)
 		flagByte = mainmemory.readbyte(containingByte);
 		flagByte = bit.bor(flagByte, bit.lshift(1,index%8));
 		mainmemory.writebyte(containingByte,flagByte);
+		print();
 	end
 end
 
+function setFlagByName(flagName)
+	local flag = getFlagByName(flagName);
+	if type(flag) == "table" then
+		setFlag(flag["type"], flag["index"]);
+	end
+end
 
+function setFlagsByType(flagType)
+	for i = 1, #flag_array do
+		local flag = flag_array[i];
+		if flag["type"] == flagType then
+			setFlag(flagType, flag["index"]);
+		end
+	end
+end
+
+function setFlagsByLevel(levelIndex)
+	for i = 1, #flag_array do
+		local flag = flag_array[i];
+		if flag["level"] == levelIndex then
+			setFlag(flag["type"], flag["index"]);
+		end
+	end
+end
+
+function setAllFlags()
+	for i = 1, #flag_array do
+		setFlag(flag_array[i]["type"], flag_array[i]["index"]);
+	end
+end
+
+--------------------------
+-- Clear Flag Functions --
+--------------------------
 function clearFlag(flagType, index)
 	local bitfield_pointer
 	if flagType == "H" then
@@ -3130,5 +3147,37 @@ function clearFlag(flagType, index)
 		mainmemory.writebyte(containingByte,flagByte);
 	end
 end
+
+function clearFlagByName(flagName)
+	local flag = getFlagByName(flagName);
+	if type(flag) == "table" then
+		clearFlag(flag["type"], flag["index"]);
+	end
+end
+
+function clearFlagsByType(flagType)
+	for i = 1, #flag_array do
+		local flag = flag_array[i];
+		if flag["type"] == flagType then
+			clearFlag(flagType, flag["index"]);
+		end
+	end
+end
+
+function clearFlagsByLevel(levelIndex)
+	for i = 1, #flag_array do
+		local flag = flag_array[i];
+		if flag["level"] == levelIndex then
+			clearFlag(flag["type"], flag["index"]);
+		end
+	end
+end
+
+function clearAllFlags()
+	for i = 1, #flag_array do
+		clearFlag(flag_array[i]["type"], flag_array[i]["index"]);
+	end
+end
+
 
 return Game;
