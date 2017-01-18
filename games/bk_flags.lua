@@ -404,3 +404,5 @@ local flag_array = {
 	
 	{["name"] = "Defeated Grunty",	["index"] = 0xFC,	["type"] = "Prog",	["level"] = 12},
 }
+
+return flag_array;
