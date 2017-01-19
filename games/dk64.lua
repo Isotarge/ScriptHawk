@@ -1085,6 +1085,7 @@ local function getExamineDataModelOne(pointer)
 
 	table.insert(examine_data, { "Health", mainmemory.read_s16_be(pointer + obj_model1.health) });
 	table.insert(examine_data, { "Hand state", mainmemory.readbyte(pointer + obj_model1.hand_state) });
+	table.insert(examine_data, { "NoClip Byte", mainmemory.readbyte(pointer + obj_model1.noclip_byte) });
 	table.insert(examine_data, { "Specular highlight", mainmemory.readbyte(pointer + obj_model1.specular_highlight) });
 	table.insert(examine_data, { "Separator", 1 });
 
