@@ -67,6 +67,7 @@ local max_jiggies = 100;
 local max_joker_cards = 99;
 
 local flag_array = {};
+local flag_names = {};
 
 local eep_checksum = {
 	{ address = 0x74, value = 0 }, -- Save Slot 1
@@ -303,6 +304,15 @@ function Game.detectVersion(romName, romHash)
 		eep_checksum[i].value = memory.read_u32_be(eep_checksum[i].address, "EEPROM");
 	end
 
+	if #flag_array > 0 then
+		for i = 1, #flag_array do
+			flag_names[i] = flag_array[i]["name"];
+		end
+	else
+		print("Warning: No flags found");
+		flag_names = {"None"};
+	end
+	
 	return true;
 end
 
@@ -359,7 +369,7 @@ end
 
 local move_levels = {
 	["4. None"]                 = 0x00000000,
-	["3. Spiral Mountain 100%"] = 0x00009DB9,
+	["3. SM 100%"] = 0x00009DB9,
 	["2. FFM Setup"]            = 0x000BFDBF,
 	["1. All"]                  = 0x000FFFFF,
 	["0. Demo"]                 = 0xFFFFFFFF
@@ -2940,13 +2950,18 @@ function Game.applyInfinites()
 end
 
 function Game.initUI()
+	ScriptHawk.UI.form_controls["Flag Dropdown"] = forms.dropdown(ScriptHawk.UI.options_form, flag_names, ScriptHawk.UI.col(0) + ScriptHawk.UI.dropdown_offset, ScriptHawk.UI.row(7) + ScriptHawk.UI.dropdown_offset, ScriptHawk.UI.col(9) + 8, ScriptHawk.UI.button_height);
+	--ScriptHawk.UI.form_controls["Set Flag Button"] = forms.button(ScriptHawk.UI.options_form, "Set", flagSetButtonHandler, ScriptHawk.UI.col(10), ScriptHawk.UI.row(7), 46, ScriptHawk.UI.button_height);
+	--ScriptHawk.UI.form_controls["Check Flag Button"] = forms.button(ScriptHawk.UI.options_form, "Check", flagCheckButtonHandler, ScriptHawk.UI.col(12), ScriptHawk.UI.row(7), 46, ScriptHawk.UI.button_height);
+	--ScriptHawk.UI.form_controls["Clear Flag Button"] = forms.button(ScriptHawk.UI.options_form, "Clear", flagClearButtonHandler, ScriptHawk.UI.col(14), ScriptHawk.UI.row(7), 46, ScriptHawk.UI.button_height);
+	
 	ScriptHawk.UI.form_controls.toggle_neverslip = forms.checkbox(ScriptHawk.UI.options_form, "Never Slip", ScriptHawk.UI.col(0) + ScriptHawk.UI.dropdown_offset, ScriptHawk.UI.row(6) + ScriptHawk.UI.dropdown_offset);
-	ScriptHawk.UI.form_controls.beta_pause_menu_checkbox = forms.checkbox(ScriptHawk.UI.options_form, "Beta Pause", ScriptHawk.UI.col(0) + ScriptHawk.UI.dropdown_offset, ScriptHawk.UI.row(7) + ScriptHawk.UI.dropdown_offset);
+	ScriptHawk.UI.form_controls.beta_pause_menu_checkbox = forms.checkbox(ScriptHawk.UI.options_form, "Beta Pause", ScriptHawk.UI.col(10) + ScriptHawk.UI.dropdown_offset, ScriptHawk.UI.row(2) + ScriptHawk.UI.dropdown_offset);
 
 	ScriptHawk.UI.form_controls.encircle_checkbox = forms.checkbox(ScriptHawk.UI.options_form, "Encircle (Beta)", ScriptHawk.UI.col(5) + ScriptHawk.UI.dropdown_offset, ScriptHawk.UI.row(4) + ScriptHawk.UI.dropdown_offset);
 	ScriptHawk.UI.form_controls.dynamic_radius_checkbox = forms.checkbox(ScriptHawk.UI.options_form, "Dynamic Radius", ScriptHawk.UI.col(5) + ScriptHawk.UI.dropdown_offset, ScriptHawk.UI.row(5) + ScriptHawk.UI.dropdown_offset);
 	ScriptHawk.UI.form_controls.freeze_clip_velocity = forms.checkbox(ScriptHawk.UI.options_form, "Freeze Clip Vel.", ScriptHawk.UI.col(5) + ScriptHawk.UI.dropdown_offset, ScriptHawk.UI.row(6) + ScriptHawk.UI.dropdown_offset);
-	ScriptHawk.UI.form_controls.autopound_checkbox = forms.checkbox(ScriptHawk.UI.options_form, "Auto Pound", ScriptHawk.UI.col(10) + ScriptHawk.UI.dropdown_offset, ScriptHawk.UI.row(6) + ScriptHawk.UI.dropdown_offset);
+	ScriptHawk.UI.form_controls.autopound_checkbox = forms.checkbox(ScriptHawk.UI.options_form, "Auto Pound", ScriptHawk.UI.col(10) + ScriptHawk.UI.dropdown_offset, ScriptHawk.UI.row(4) + ScriptHawk.UI.dropdown_offset);
 
 	-- Actor spawner
 	ScriptHawk.UI.form_controls.actor_dropdown = forms.dropdown(ScriptHawk.UI.options_form, actorNames, ScriptHawk.UI.col(10) + ScriptHawk.UI.dropdown_offset, ScriptHawk.UI.row(0) + ScriptHawk.UI.dropdown_offset);
@@ -2954,13 +2969,13 @@ function Game.initUI()
 	ScriptHawk.UI.form_controls.spawner_carry_checkbox = forms.checkbox(ScriptHawk.UI.options_form, "Carry?", ScriptHawk.UI.col(12) + 10 + ScriptHawk.UI.dropdown_offset, ScriptHawk.UI.row(1) + ScriptHawk.UI.dropdown_offset);
 
 	-- Vile
-	ScriptHawk.UI.form_controls.wave_button =     forms.button(ScriptHawk.UI.options_form, "Wave", initWave,         ScriptHawk.UI.col(10), ScriptHawk.UI.row(4), ScriptHawk.UI.col(2), ScriptHawk.UI.button_height);
-	ScriptHawk.UI.form_controls.heart_button =    forms.button(ScriptHawk.UI.options_form, "Heart", doHeart,         ScriptHawk.UI.col(12) + 8, ScriptHawk.UI.row(4), ScriptHawk.UI.col(2), ScriptHawk.UI.button_height);
-	ScriptHawk.UI.form_controls.fire_all_button = forms.button(ScriptHawk.UI.options_form, "Fire all", fireAllSlots, ScriptHawk.UI.col(10), ScriptHawk.UI.row(5), ScriptHawk.UI.col(4) + 8, ScriptHawk.UI.button_height);
+	--ScriptHawk.UI.form_controls.wave_button =     forms.button(ScriptHawk.UI.options_form, "Wave", initWave,         ScriptHawk.UI.col(10), ScriptHawk.UI.row(4), ScriptHawk.UI.col(2), ScriptHawk.UI.button_height);
+	--ScriptHawk.UI.form_controls.heart_button =    forms.button(ScriptHawk.UI.options_form, "Heart", doHeart,         ScriptHawk.UI.col(12) + 8, ScriptHawk.UI.row(4), ScriptHawk.UI.col(2), ScriptHawk.UI.button_height);
+	--ScriptHawk.UI.form_controls.fire_all_button = forms.button(ScriptHawk.UI.options_form, "Fire all", fireAllSlots, ScriptHawk.UI.col(10), ScriptHawk.UI.row(5), ScriptHawk.UI.col(4) + 8, ScriptHawk.UI.button_height);
 
 	-- Moves
-	ScriptHawk.UI.form_controls.moves_dropdown = forms.dropdown(ScriptHawk.UI.options_form, { "4. None", "3. Spiral Mountain 100%", "2. FFM Setup", "1. All", "0. Demo" }, ScriptHawk.UI.col(10) + ScriptHawk.UI.dropdown_offset, ScriptHawk.UI.row(7) + ScriptHawk.UI.dropdown_offset);
-	ScriptHawk.UI.form_controls.moves_button = forms.button(ScriptHawk.UI.options_form, "Unlock Moves", unlock_moves, ScriptHawk.UI.col(5), ScriptHawk.UI.row(7), ScriptHawk.UI.col(4) + 8, ScriptHawk.UI.button_height);
+	ScriptHawk.UI.form_controls.moves_dropdown = forms.dropdown(ScriptHawk.UI.options_form, { "4. None", "3. SM 100%", "2. FFM Setup", "1. All", "0. Demo" }, ScriptHawk.UI.col(10) + ScriptHawk.UI.dropdown_offset, ScriptHawk.UI.row(5) + ScriptHawk.UI.dropdown_offset, ScriptHawk.UI.col(4) + 8, ScriptHawk.UI.button_height);
+	ScriptHawk.UI.form_controls.moves_button = forms.button(ScriptHawk.UI.options_form, "Unlock Moves", unlock_moves, ScriptHawk.UI.col(10), ScriptHawk.UI.row(6), ScriptHawk.UI.col(4) + 8, ScriptHawk.UI.button_height);
 end
 
 function Game.eachFrame()
@@ -3177,6 +3192,21 @@ function clearAllFlags()
 	for i = 1, #flag_array do
 		clearFlag(flag_array[i]["type"], flag_array[i]["index"]);
 	end
+end
+
+--------------------------
+-- Other flag functions --
+--------------------------
+local function flagSetButtonHandler()
+	setFlagByName(forms.getproperty(ScriptHawk.UI.form_controls["Flag Dropdown"], "SelectedItem"));
+end
+
+local function flagClearButtonHandler()
+	clearFlagByName(forms.getproperty(ScriptHawk.UI.form_controls["Flag Dropdown"], "SelectedItem"));
+end
+
+local function flagCheckButtonHandler()
+	--checkFlag(forms.getproperty(ScriptHawk.UI.form_controls["Flag Dropdown"], "SelectedItem"));
 end
 
 
