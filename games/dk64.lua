@@ -96,6 +96,8 @@ Game.Memory = {
 	["vert_base"] = {0x7F5DE8, 0x7F5D08, 0x7F6258, 0x7A1E98},
 	["water_surface_list"] = {0x7F93C0, 0x7F92E0, 0x7F9830, 0x7B48A0},
 	["chunk_array_pointer"] = {0x7F6C18, 0x7F6B38, 0x7F7088, 0x7B20F8},
+	["num_enemies"] = {0x7FDC88, 0x7FDBC8, 0x7FE118, 0x7B73D8},
+	["enemy_respawn_object"] = {0x7FDC8C, 0x7FDBCC, 0x7FE11C, 0x7B73DC},
 };
 
 Game.modes = {
@@ -5701,11 +5703,11 @@ function Game.eachFrame()
 	end
 
 	--[[
-	local enemyRespawnObject = dereferencePointer(0x7FDC8C); -- TODO: Find for all versions
+	local enemyRespawnObject = dereferencePointer(Game.Memory.enemy_respawn_object[version]);
 	if isRDRAM(enemyRespawnObject) then
-		local numberOfEnemies = mainmemory.read_u16_be(0x7FDC88); -- TODO: Find for all versions
+		local numberOfEnemies = mainmemory.read_u16_be(Game.Memory.num_enemies[version]);
 		for i = 1, numberOfEnemies do
-			--mainmemory.write_u16_be(enemyRespawnObject + (i - 1) * 0x48 + 0x24, 1); -- Force respawn
+			mainmemory.write_u16_be(enemyRespawnObject + (i - 1) * 0x48 + 0x24, 1); -- Force respawn
 			--mainmemory.writefloat(enemyRespawnObject + (i - 1) * 0x48 + 0x2C, testfloatvalue, true);
 			--mainmemory.writefloat(enemyRespawnObject + (i - 1) * 0x48 + 0x30, testfloatvalue, true);
 			--mainmemory.writefloat(enemyRespawnObject + (i - 1) * 0x48 + 0x34, testfloatvalue, true);

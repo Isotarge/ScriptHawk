@@ -89,4 +89,6 @@ SystemID N64
 7B6D00	w	u	1	RDRAM	Transferred Actor Type
 7B6DA0	d	u	1	RDRAM	Idle Timer
 7B71C4	d	h	1	RDRAM	Object Model 2 Array Pointer?
+7B73D8	w	h	1	RDRAM	Number of Enemies
+7B73DC	d	h	1	RDRAM	Enemy Respawn Array Pointer
 
