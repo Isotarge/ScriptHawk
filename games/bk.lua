@@ -266,10 +266,10 @@ Game.Memory = {
 	["board_base"] = {0x394140, 0x394350, 0x3929C0, 0x393760},
 	["pause_menu_strings_base"] = {0x36C99C, 0x36CAF0, 0x36B6E0, 0x36C4E0},
 	["return_to_lair_enabled"] = {0x383A60, 0x383BC0, 0x3822A0, 0x383080},
-	["game_progress_bitfield"] = {0,0,0,0x3831A8},
-	["jiggy_bitfield"] = {0x383CA0,0x383E00,0x3824E0,0x3832C0},
-	["honeycomb_bitfield"] = {0x383CC0,0x383E20,0x382500,0x3832E0},
-	["mumbo_token_bitfield"] = {0x383CD0,0x383E30,0x382510,0x3832F0},
+	["game_progress_bitfield"] = {0x383BB8, 0x383D18, 0x3823F8, 0x3831A8},
+	["jiggy_bitfield"] = {0x383CA0, 0x383E00, 0x3824E0, 0x3832C0},
+	["honeycomb_bitfield"] = {0x383CC0, 0x383E20, 0x382500, 0x3832E0},
+	["mumbo_token_bitfield"] = {0x383CD0, 0x383E30, 0x382510, 0x3832F0},
  };
 
 function Game.detectVersion(romName, romHash)
@@ -312,7 +312,7 @@ function Game.detectVersion(romName, romHash)
 		print("Warning: No flags found");
 		flag_names = {"None"};
 	end
-	
+
 	return true;
 end
 
@@ -500,7 +500,7 @@ slot_variables = {
 	[0x12C] = {["Type"] = "Pointer", ["Name"] = "Identifier", ["Fields"] = {
 			[0x02] = {["Type"] = "u16_be", ["Name"] = "Object Index"},
 			[0x04] = {["Type"] = "u16_be", ["Name"] = "Model Index"},
-			
+
 			[0x0C] = {["Type"] = "Pointer", ["Name"] = "Object Behavior Function"},
 			[0x10] = {["Type"] = "Pointer"},
 			[0x14] = {["Type"] = "Pointer"},
@@ -1455,7 +1455,7 @@ end
 
 object_index = 1;
 object_top_index = 1;
---ToDo: set object_max_slots based on screen size 
+--TODO: Set object_max_slots based on screen size
 object_max_slots = 50;
 hide_non_animated = false;
 
@@ -2972,7 +2972,7 @@ end
 -- Set Flag Functions --
 ------------------------
 function setFlag(flagType, index)
-	local bitfield_pointer
+	local bitfield_pointer;
 	if flagType == "H" then
 		if index < 0x19 then
 			 bitfield_pointer = Game.Memory.honeycomb_bitfield[version];
@@ -2990,17 +2990,17 @@ function setFlag(flagType, index)
 			bitfield_pointer = Game.Memory.game_progress_bitfield[version];
 		end
 	end
-	
+
 	if isRDRAM(bitfield_pointer) then
 		local containingByte = bitfield_pointer;
 		if flagType ~= "Prog" then
-			containingByte = containingByte + ((index-1)/8);
+			containingByte = containingByte + ((index - 1) / 8);
 		else
-			containingByte = containingByte + (index/8);
+			containingByte = containingByte + (index / 8);
 		end
 		flagByte = mainmemory.readbyte(containingByte);
-		flagByte = bit.bor(flagByte, bit.lshift(1,index%8));
-		mainmemory.writebyte(containingByte,flagByte);
+		flagByte = bit.bor(flagByte, bit.lshift(1, index % 8));
+		mainmemory.writebyte(containingByte, flagByte);
 		print();
 	end
 end
@@ -3040,7 +3040,7 @@ end
 -- Clear Flag Functions --
 --------------------------
 function clearFlag(flagType, index)
-	local bitfield_pointer
+	local bitfield_pointer;
 	if flagType == "H" then
 		if index < 0x19 then
 			 bitfield_pointer = Game.Memory.honeycomb_bitfield[version];
@@ -3062,13 +3062,13 @@ function clearFlag(flagType, index)
 	if isRDRAM(bitfield_pointer) then
 		local containingByte = bitfield_pointer;
 		if flagType ~= "Prog" then
-			containingByte = containingByte + ((index-1)/8);
+			containingByte = containingByte + ((index - 1) / 8);
 		else
-			containingByte = containingByte + (index/8);
+			containingByte = containingByte + (index / 8);
 		end
 		flagByte = mainmemory.readbyte(containingByte);
-		flagByte = bit.band(flagByte, bit.bnot(bit.lshift(1,index%8)));
-		mainmemory.writebyte(containingByte,flagByte);
+		flagByte = bit.band(flagByte, bit.bnot(bit.lshift(1, index % 8)));
+		mainmemory.writebyte(containingByte, flagByte);
 	end
 end
 
@@ -3115,6 +3115,7 @@ local function flagClearButtonHandler()
 end
 
 local function flagCheckButtonHandler()
+	print("Sorry, this function is not yet implemented");
 	--checkFlag(forms.getproperty(ScriptHawk.UI.form_controls["Flag Dropdown"], "SelectedItem"));
 end
 
@@ -3123,7 +3124,7 @@ function Game.initUI()
 	ScriptHawk.UI.form_controls["Set Flag Button"] = forms.button(ScriptHawk.UI.options_form, "Set", flagSetButtonHandler, ScriptHawk.UI.col(10), ScriptHawk.UI.row(7), 46, ScriptHawk.UI.button_height);
 	ScriptHawk.UI.form_controls["Check Flag Button"] = forms.button(ScriptHawk.UI.options_form, "Check", flagCheckButtonHandler, ScriptHawk.UI.col(12), ScriptHawk.UI.row(7), 46, ScriptHawk.UI.button_height);
 	ScriptHawk.UI.form_controls["Clear Flag Button"] = forms.button(ScriptHawk.UI.options_form, "Clear", flagClearButtonHandler, ScriptHawk.UI.col(14), ScriptHawk.UI.row(7), 46, ScriptHawk.UI.button_height);
-	
+
 	ScriptHawk.UI.form_controls.toggle_neverslip = forms.checkbox(ScriptHawk.UI.options_form, "Never Slip", ScriptHawk.UI.col(0) + ScriptHawk.UI.dropdown_offset, ScriptHawk.UI.row(6) + ScriptHawk.UI.dropdown_offset);
 	ScriptHawk.UI.form_controls.beta_pause_menu_checkbox = forms.checkbox(ScriptHawk.UI.options_form, "Beta Pause", ScriptHawk.UI.col(10) + ScriptHawk.UI.dropdown_offset, ScriptHawk.UI.row(2) + ScriptHawk.UI.dropdown_offset);
 
@@ -3208,8 +3209,5 @@ Game.OSD = {
 	--{"FF Answer", getCorrectFFAnswer},
 	{"FF Pattern", Game.getFFPattern},
 };
-
-
-
 
 return Game;
