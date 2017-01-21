@@ -48,7 +48,7 @@
 [SetApplyButtonInputsToBanjoFlag]: 0x8023EC6C
 
 [SetFrameSkip]: 0x8024BC00 ;I: (word $a0 input)
-[GetFrameSkip]: 0x8024BC0C ;Outputs: [word $v0] //normally 2 but sometimes 3 eg. GV lobby
+[GetFrameSkip]: 0x8024BC0C ;O: [word $v0] //normally 2 but sometimes 3 eg. GV lobby
 
 [GetFrameTimer]: 0x8024C138	;O: [word $v0]
 [SetFrameTimer]: 0x8024C148	;I: (word $a0 input)
@@ -76,46 +76,57 @@
 
 [SpawnAndCarryActor]: 0x8028DC2C ;Inputs: (word $a0 ActorIndex), (float* $a1 LocationXPtr)
 
+[UpdateBanjo]:	0x8028E53C
+
+[GetPlayerMovementStructPtr_0]:	0x8028E5AC	;O:	[struct* $v0]
+
+[GetMumboTransformation_0]:			0x8028E5EC	;O:	[byte $v0]
+[GetClimbingPole_Bottom_Pos_0]:		0x8028E60C	;I: (float* $a0 destXPtr)
+[GetShoesTimer_0]:					0x8028E62C	;I:	(byte $a0 shoeIndex)	O: [float $f0]
+[GetHeightOfGroundBeneathPlayer_0]:	0x8028E64C	;O: [float $f0]
+[GetFloorObjectNormalRotation_0]:	0x8028E66C	;I: (float* $a0 destXPtr)
+[GetCarriedObject_UnknownStruct2Ptr_0]:	0x8028E68C	;[struct* $v0]
+
+
 [UpdatePlayerModelToMumboTransFormation]: 0x80291B24
 
-[GetPlayerModel]:        0x80291DCC ;Outputs:   [half $v0]
-[SetPlayerTransparency]: 0x80291DD8 ;Inputs: (byte $a0 input)
-[SetPlayerModel]:        0x80291DE4 ;Inputs: (half $a0 modelIndex)
+[GetPlayerModel]:        	0x80291DCC 	;O: [half $v0]
+[SetPlayerTransparency]: 	0x80291DD8 	;I: (byte $a0 input)
+[SetPlayerModel]:        	0x80291DE4 	;I: (half $a0 modelIndex)
 
-[GetButtonPressTimer]: 0x8029539C ;I: byte $a0 ButtonIndex
-[GetButtonReleaseTimer]: 0x802953B0 ;I: byte $a0 ButtonIndex
+[GetButtonPressTimer]: 		0x8029539C 	;I: (byte $a0 ButtonIndex)
+[GetButtonReleaseTimer]: 	0x802953B0 	;I: (byte $a0 ButtonIndex)
 
-[GetMovesUnlockedBitfield]: 0x80295630
+[GetMovesUnlockedBitfield]: 0x80295630 	;O: [word $a0]
 
-[LockAllMoves]: 0x80295644
+[LockAllMoves]: 			0x80295644
 
 [SetMovesUnlockedBitfield]: 0x802956A4
 [SetHasUsedMovesBitfield]:  0x802956B0
 
-[SetYVelocity]: 0x802977E0 ;I: (float $f12)
+[SetYVelocity]: 			0x802977E0 ;I: (float $f12)
 
-[GetXZVelocity]: 0x802978F8 ;Outputs: [float $f0]
+[GetXZVelocity]: 			0x802978F8 ;O: [float $f0]
 
 [SetGravitationalAcceleration]: 0x80297A2C
 [SetTerminalVelocity]:          0x80297A38
 
-[AddToYPos]: 0x80298368 ;I: (float $f12)
+[AddToYPos]: 				0x80298368 ;I: (float $f12)
 
-[SetMumboTransformation]: 0x8029A79C
+[SetMumboTransformation]: 	0x8029A79C
 
-[TakeMeThere_LevelReset]: 0x802E4238  ;I: (word $a0 Map, word $a1 exit, word $a2 loadTransitionTypeIndex)
-[TakeMeThere]:            0x802E4268  ;I: (word $a0 Map, word $a1 exit, word $a2 loadTransitionTypeIndex)
+[TakeMeThere_LevelReset]: 	0x802E4238  ;I: (word $a0 Map, word $a1 exit, word $a2 loadTransitionTypeIndex)
+[TakeMeThere]:            	0x802E4268  ;I: (word $a0 Map, word $a1 exit, word $a2 loadTransitionTypeIndex)
 
 
-[Print_TotalMenuFont]: 0x802F7A50 ;Inputs: (word $a0 XPos), (word $a1 YPos), (word $a3 fontSize), (char* $a3 str)
+[Print_TotalMenuFont]: 		0x802F7A50 ;I: (word $a0 XPos, word $a1 YPos, word $a3 fontSize, char* $a3 str)
 
-[Print_CharFont]: 0x802F7ADC ;Inputs: (word $a0 XPos), (word $a1 YPos), (char* $a2 str)
+[Print_CharFont]: 			0x802F7ADC ;I: (word $a0 XPos, word $a1 YPos, char* $a2 str)
 
-[GetLevelAssociatedWithMap]: 0x8030AEE8
+[GetLevelAssociatedWithMap]: 	0x8030AEE8	;I: (byte $a0 MapIndex)	O: [byte $v0]
 
-[GetMainMapFromLevelIndex]: 0x8030AF78
-[GetMainExitFromLevelIndex]: 0x8030AFC4
-
+[GetMainMapFromLevelIndex]: 	0x8030AF78	;I: (byte $a0 LevelIndex)	O:[byte $v0]
+[GetMainExitFromLevelIndex]: 	0x8030AFC4	;I: (byte $a0 LevelIndex)	O:[byte $v0]
 
 [PauseMenu]: 0x803136B4
 

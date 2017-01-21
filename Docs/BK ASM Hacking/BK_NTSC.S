@@ -78,7 +78,7 @@
 [ArcCos]:	0x80255D70	;I: (float $f12 input)	O: [ float $f0 ]
 
 [CrossProduct]:	0x80255F74	;I: (float* $a0 resultXPtr, float* $a1 inputXPtr1, float* $a2 inputXPtr2 )
-[GetPointIfTravelingScaledDistanceFromPointATowardsPointB]:	0x80255FE4	;I: (float* $a0 resultXPtr, float* $a1 pointAXPtr, float* $a2 pointBXPtr, float $a3 travelDistance) 
+[GetPointIfTravelingScaledDistanceFromPointATowardsPointB]:	0x80255FE4	;I: (float* $a0 resultXPtr, float* $a1 pointAXPtr, float* $a2 pointBXPtr, float $a3 travelDistance)
 [DotProduct]: 0x80256034	;I: (float* $a0 input1XPtr, float* $a1 input2XPtr)	O: [float $f0]
 [GetDistance3D]: 0x80256064	;I: (float* $a0 input1XPtr, float* $a1 input2XPtr)	O: [float $f0]
 
@@ -118,7 +118,7 @@
 [CopyXYZDifference]:	0x80258BC0	;I: (float* $a0 resultXPtr, float* $a1 minuendXPtr, float* $a2 subtraendXPtr)
 [SubtractVectorXYZ]:	0x80258BF4	;I: (float* $a0 destMinuendXPtr, float* $a1 subtraendXPtr)
 [SetXYZData]:			0x80258C28	;I: (float* $a0 destXPtr, float $a1 xInput, float $a2 yInput, float $a3 ZInput)
-[CopyXYZSum]:			0x80258C48	;I: (float* $a0 destXPtr, float* $a1 src1XPtr, float* $a2 src2XPtr) 
+[CopyXYZSum]:			0x80258C48	;I: (float* $a0 destXPtr, float* $a1 src1XPtr, float* $a2 src2XPtr)
 [ScaleXYZ]:				0x80258C7C	;I:	(float* $a0 XPtr, float $a1 scalingFactor)
 [ScaleCopyXYZ]: 		0x80258CB0	;I:	(float *$a0 destXPtr, float* $a1 srcXPtr, float $a2 scalingFactor)
 [SumOfAbsoluteValueXYZ]:	0x80258CDC	;I: (float* $a0 destAndSrc1Xptr, float* $a1 src2Ptr)
@@ -270,7 +270,7 @@
 
 [GetPlayerMovementStructPtr_0]:	0x8028E78C	;O:	[struct* $v0]
 
-[GetMumboTransformation_0]:			0x8028E7D4	;O:	[byte $v0]
+[GetMumboTransformation_0]:			0x8028E7CC	;O:	[byte $v0]
 [GetClimbingPole_Bottom_Pos_0]:		0x8028E7EC	;I: (float* $a0 destXPtr)
 [GetShoesTimer_0]:					0x8028E80C	;I:	(byte $a0 shoeIndex)	O: [float $f0]
 [GetHeightOfGroundBeneathPlayer_0]:	0x8028E82C	;O: [float $f0]
