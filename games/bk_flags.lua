@@ -322,7 +322,8 @@ local flag_array = {
 	{["name"] = "1st FF Joker Square Text",	["index"] = 0x5A,	["type"] = "Prog",	["level"] = 6},
 	
 	--pieces places in puzzles info
-	
+	--{["name"] = "Mumbo runs of magic",		["index"] = 0x83,	["type"] = "Prog",	["level"] = 6},
+	--{["name"] = "Mumbo runs of magic",		["index"] = 0x84,	["type"] = "Prog",	["level"] = 6},
 	{["name"] = "Lair Crypt Gate Open",		["index"] = 0x85,	["type"] = "Prog",	["level"] = 6},
 	
 	{["name"] = "1st Exiting Loggo Text",	["index"] = 0x88,	["type"] = "Prog",	["level"] = 10},
@@ -330,7 +331,7 @@ local flag_array = {
 	{["name"] = "CCW Summer Open",			["index"] = 0x8C,	["type"] = "Prog",	["level"] = 8},
 	{["name"] = "CCW Autumn Open",			["index"] = 0x8D,	["type"] = "Prog",	["level"] = 8},
 	{["name"] = "CCW Winter Open",			["index"] = 0x8E,	["type"] = "Prog",	["level"] = 8},
-	
+	{["name"] = "CCW Autumn Mumbo Text",	["index"] = 0x8F,	["type"] = "Prog",	["level"] = 8},
 	{["name"] = "Termite Payed",			["index"] = 0x90,	["type"] = "Prog",	["level"] = 1},
 	{["name"] = "Pumpkin Payed",			["index"] = 0x91,	["type"] = "Prog",	["level"] = 10},
 	{["name"] = "Walrus Payed",				["index"] = 0x92,	["type"] = "Prog",	["level"] = 5},
@@ -368,6 +369,7 @@ local flag_array = {
 	{["name"] = "Has Been in CC",			["index"] = 0xB8,	["type"] = "Prog",	["level"] = 2},
 	{["name"] = "Double Health",			["index"] = 0xB9,	["type"] = "Prog",	["level"] = 6},
 	
+	{["name"] = "1st Time T-Rex",			["index"] = 0xBA,	["type"] = "Prog",	["level"] = 6},
 	{["name"] = "1st Time in Lair Cutscene",	["index"] = 0xBD,	["type"] = "Prog",	["level"] = 6},
 	
 	{["name"] = "Grate to RBB Puzzle Open",	["index"] = 0xC2,	["type"] = "Prog",	["level"] = 6},
@@ -401,6 +403,7 @@ local flag_array = {
 	{["name"] = "1st Time FF Cutscene",		["index"] = 0xF4,	["type"] = "Prog",	["level"] = 6},
 	
 	{["name"] = "1st Time Near DoG Puzzle Podium",	["index"] = 0xF6,	["type"] = "Prog",	["level"] = 6},
+	{["name"] = "Pumpkin Making Mumbo Hungry Text",	["index"] = 0xF7,	["type"] = "Prog",	["level"] = 10},
 	
 	{["name"] = "Defeated Grunty",	["index"] = 0xFC,	["type"] = "Prog",	["level"] = 12},
 }

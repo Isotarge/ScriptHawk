@@ -1,0 +1,203 @@
+A12 - Sandcastle Crab, Solve my puzzle
+A13 - Sandcastle Crab, the gate opens
+
+A16 - 
+
+A21
+
+A29
+
+A7E - 
+
+A87 - 
+A88 - 
+
+ADC -
+
+AE1 - 
+AE2 - 
+
+B36 - 
+B37 - Conga, Me safe here
+B38 - Conga, clever bear beat conga , me give prize
+B39 - Conga, Egg hurt Conga
+B3A - Conga, Conga good shot
+B3B - Conga, Cleaver Bear find Conga's gold
+B3C - Conga, This Conga's Tree. Me hit bear w oranges
+B3D - Conga, Don't touch Conga's blocks
+B3E - Conga, Me hit termite with oranges
+B3F - Chimpy, Chipmpy hungry
+B40 - Chimpy, Chimpy likes Conga's Orange
+B41 - Ticker, Where did you get those shorts
+B42 - Ticker, Give me that cool backpack
+B43 - Ticker, No bears allowed in ticker's tower
+B44 - Juju, We Juju Mumbo's totem pole
+B45 - 1st Jiggy in MM Text
+B46 - Conga/Orange - Grabbing Orange
+B47 - Bottles, teaching eggs
+B48 - Bottles, teaching beak bust
+B49 - Bottles, teaching talon trot
+B4A - Bottles, explaining talon trot
+B4B - Bottles, explaining eggs
+B4C - Bottles, explaining beakbust
+B4D - Bottles, first time slipping down slope
+B4E - Bottles, nothing more to teach in world
+B4F - Bottles, koozie can carry 100 of these
+B50 - Bottles, item stored in bag till needed
+B51 - Bottles, how to exit world
+B52 - CRASH
+B53 - CRASH
+B54 - CrASH 
+
+bA0
+
+bA2
+
+c11
+
+c85
+
+C8B
+C8C
+
+cc7 - catepillar?
+cc8 - 
+cc9 -
+
+ccb - acorn?
+ccc -
+ccd - 
+
+ccf -
+cd0 -
+
+cd6 - 
+
+cd8 -
+cd9 -
+
+cdb - 
+  
+cdd - 
+
+ce2 - 
+ce3 - 
+ce4 - 
+
+ce6 -
+ce7 -
+ce8 - Grunty, I made water icy cold
+
+d2d
+
+d32 - Mutant Snippets, jigsaw is ours
+
+d34 - Gloop, Hi I'm gloop
+
+d39
+
+d82 crash
+d83 crash
+d84 crash
+d85 crash
+d86 crash
+d87 crash
+d88 crash
+d89 crash
+d8a crash
+d8b crash
+d8c crash
+d8d crash
+d8e crash
+d8f me mumbo best shaman....
+d90 mumbo's magic free to change back
+d91 termite bit small but not bad for first spell
+d92 ahh mumbo proud of pumpkin spell
+d93 banjo gone all fat, got big teeth..
+d94 wait mumbo need new boots
+d95 mumbo magic much good bee best yet
+d96 beehive - go away yo (ftt)
+d97 yellow jinjo first time text
+d98 blue jinjo first time text
+d99 green jinjo first time text
+d9a pink jinjo first time text
+d9b orange jinjo first time text
+d9c first time note pickup text
+d9d first time mumbo token pickup text
+d9e first time blue egg pickup text
+d9f first time red feather pickup text
+da0 first time gold feather pickup text
+da1 first time health pickup text
+da2 first time empty honeycomb pickup text
+da3 first time extra life pickup text
+da4 ha don't think you can use these until you find out how (turbo trainers)
+da5 hey keep your feet out (wading boots)
+da6 touch my honey and this time you'll be sorry (angry beehive)
+da7 too hot for magic, mumbo want sun tan
+da8 mumbo busy, sweep many leaves
+da9 mumbo's on vacation hairy fool (beehive)
+daa ahh banjo has plenty of tokens
+dab banjo not got enough tokens for mumbo magic
+dac can't have magic, look at sign, go away, bring more
+dad pumpkin making mumbo hungry, get pot ready
+dae ahh you find big hidden feature spell (T-Rex)
+daf changed mind, t-rex spell too good for this game
+db0 umm... spell went wrong. mumbo's loincloth all dirty, you wash?
+db1 banjo must stand still or spell go all funny
+db2 mumbo get new stick, this one not work
+db3 ooh an egg! I'm sure we'll find a use for this somewhere
+db4 wow... another one of those special eggs!
+db5 cool... an enormous ice key
+db6 hey, that much bad magic! washer not as good as bear
+db7 crash
+
+
+e20
+e21
+e22 Bottles, bottle's bonus controls
+e23 Bottles, 'z' = read instructions, start to quit 
+e24 Bottles, bottle's bonus controls
+e25 Bottles, is my game too hard for you?
+e26 Bottles, tough luck guys you're out of time, try again
+
+e35
+e36
+
+f57 - first time jiggy text
+
+f5b - Mumbo, Magic get weak. Animal turn back 
+f5C - Mumbo, Magic get weak
+f5d - Mumbo, Magic all gone
+f5E - Mumbo, Magic run out
+
+f74
+
+f76
+
+f78
+
+f7b
+
+f7f
+
+f80
+f81 - First death text
+f82 - when you open a world door baddies escape
+
+fa8
+fa9
+faa
+
+fbd
+
+1032 - Grunty, FF, Lucky guess
+1033
+1034
+1035
+1036
+1037
+1038
+1039
+103A
+103C
+103D
