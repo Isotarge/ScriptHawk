@@ -5294,6 +5294,15 @@ function Game.getMap()
 	return mainmemory.read_u32_be(Game.Memory.current_map[version]);
 end
 
+function Game.getMapOSD()
+	local currentMap = Game.getMap();
+	local currentMapName = "Unknown";
+	if Game.maps[currentMap + 1] ~= nil then
+		currentMapName = Game.maps[currentMap + 1];
+	end
+	return currentMapName.." ("..currentMap..")";
+end
+
 function Game.setMap(value)
 	if value >= 1 and value <= #Game.maps then
 		if version == 4 then
@@ -5691,6 +5700,20 @@ function Game.eachFrame()
 		forceTBS();
 	end
 
+	--[[
+	local enemyRespawnObject = dereferencePointer(0x7FDC8C); -- TODO: Find for all versions
+	if isRDRAM(enemyRespawnObject) then
+		local numberOfEnemies = mainmemory.read_u16_be(0x7FDC88); -- TODO: Find for all versions
+		for i = 1, numberOfEnemies do
+			--mainmemory.write_u16_be(enemyRespawnObject + (i - 1) * 0x48 + 0x24, 1); -- Force respawn
+			--mainmemory.writefloat(enemyRespawnObject + (i - 1) * 0x48 + 0x2C, testfloatvalue, true);
+			--mainmemory.writefloat(enemyRespawnObject + (i - 1) * 0x48 + 0x30, testfloatvalue, true);
+			--mainmemory.writefloat(enemyRespawnObject + (i - 1) * 0x48 + 0x34, testfloatvalue, true);
+			--mainmemory.writefloat(enemyRespawnObject + (i - 1) * 0x48 + 0x38, testfloatvalue, true);
+		end
+	end
+	--]]
+
 	-- TODO: This is really slow and doesn't cover all memory domains
 	--memoryStatCache = getMemoryStats(dereferencePointer(Game.Memory.linked_list_pointer[version]));
 
@@ -5803,10 +5826,10 @@ function Game.completeFile()
 end
 
 Game.standardOSD = {
+	{"Map", Game.getMapOSD},
 	{"Mode", Game.getCurrentMode},
 	{"File", Game.getFileIndex},
 	{"EEPROM Slot", Game.getCurrentEEPROMSlot},
-	{"Noclip", Game.getNoclipByte, Game.colorNoclipByte},
 	{"Separator", 1},
 	{"X", Game.getXPosition},
 	{"Y", Game.getYPosition},
@@ -5831,6 +5854,7 @@ Game.standardOSD = {
 	{"Rot. Z", Game.getZRotation},
 	{"Movement", Game.getMovementState},
 	--{"Camera", Game.getCameraState},
+	{"Noclip", Game.getNoclipByte, Game.colorNoclipByte},
 	--{"Separator", 1},
 	--{"Anim Timer 1", Game.getAnimationTimer1},
 	--{"Anim Timer 2", Game.getAnimationTimer2},
