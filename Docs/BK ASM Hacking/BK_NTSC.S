@@ -71,9 +71,9 @@
 
 [UpdateButtonInputs]:	0x8024E7C8
 
-[IncreaseGlobalOnTimerby50]: 80254F90
+[IncreaseGlobalOnTimerby50]: 0x80254F90
 
-[IncrementGlobalOnTimer]:	80255ACC
+[IncrementGlobalOnTimer]:	0x80255ACC
 
 [ArcCos]:	0x80255D70	;I: (float $f12 input)	O: [ float $f0 ]
 
@@ -299,13 +299,13 @@
 [GetXZVelocity]: 			0x80297AB8 ;O: [float $f0]
 
 [SetGravitationalAcceleration]: 0x80297BEC
-[SetTerminalVelocity]:      0x80297BF8
+[SetTerminalVelocity]:          0x80297BF8
 
 [AddToYPos]: 				0x80298528 ;I: (float $f12)
 
 [SetMumboTransformation]: 	0x8029A960
 
-[TakeMeThere_LevelReset]: 	0x802E4048	;I: (word $a0 Map, word $a1 exit, word $a2 loadTransitionTypeIndex)
+[TakeMeThere_LevelReset]: 	0x802E4048  ;I: (word $a0 Map, word $a1 exit, word $a2 loadTransitionTypeIndex)
 [TakeMeThere]:            	0x802E4078  ;I: (word $a0 Map, word $a1 exit, word $a2 loadTransitionTypeIndex)
 
 

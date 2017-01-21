@@ -75,7 +75,7 @@
 [MapIndex_GV_Sphinx]: 0x1A
 [MapIndex_MMM_Main]: 0x1B
 [MapIndex_MMM_Church]: 0x1C
-[MapIndex_MMM)Cellar]: 0x1D
+[MapIndex_MMM_Cellar]: 0x1D
 [MapIndex_Intro_Nintendo]: 0x1E
 [MapIndex_Intro_Rareware]: 0x1F
 [MapIndex_End_Not100]: 0x20
