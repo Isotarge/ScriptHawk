@@ -675,6 +675,8 @@ SystemID N64
 7FCC4C	b	u	1	RDRAM	Melons
 7FD570	w	h	1	RDRAM	Transferred Actor Type
 7FD888	d	f	1	RDRAM	Loading Zone Fadeout Progress
+7FDC88	w	h	1	RDRAM	Number of Enemies
+7FDC8C	d	h	1	RDRAM	Enemy Respawn Array Pointer
 7FDC90	d	h	1	RDRAM	Boss pointer
 7FDCB0	w	u	1	RDRAM	Loading Zone Array Size
 7FDCB4	d	h	1	RDRAM	Loading Zone Array Pointer
