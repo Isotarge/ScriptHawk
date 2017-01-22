@@ -2452,6 +2452,7 @@ function Game.detectVersion(romName, romHash)
 		MJ_offsets["blue_switch_position"]    = 0x6D;
 	elseif romHash == "B4717E602F07CA9BE0D4822813C658CD8B99F993" then -- Kiosk
 		version = 4;
+		realtime_flags = false;
 		-- flag_array = require("games.dk64_flags_Kiosk"); -- TODO: Flags?
 
 		-- Kiosk specific Object Model 1 offsets
