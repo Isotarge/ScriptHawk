@@ -3019,6 +3019,7 @@ function flagStats(verbose)
 	local medals_known = 0;
 	local untypedFlags = 0;
 	local flagsWithUnknownType = 0;
+	local flagsWithMap = 0;
 
 	-- Setting this to true warns the user of flags without types
 	verbose = verbose or false;
@@ -3089,6 +3090,9 @@ function flagStats(verbose)
 				end
 			end
 		end
+		if flag["map"] ~= nil then
+			flagsWithMap = flagsWithMap + 1;
+		end
 	end
 
 	local knownFlags = #flag_array;
@@ -3098,6 +3102,7 @@ function flagStats(verbose)
 	dprint(formatOutputString("Flags known: ", knownFlags, totalFlags));
 	dprint(formatOutputString("Without types: ", untypedFlags, knownFlags));
 	dprint(formatOutputString("Unknown types: ", flagsWithUnknownType, knownFlags));
+	dprint(formatOutputString("With map tag: ", flagsWithMap, knownFlags));
 	dprint("");
 	dprint(formatOutputString("CB: ", cb_known, max_cb));
 	dprint(formatOutputString("GB: ", gb_known, max_gb));
