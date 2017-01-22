@@ -2732,6 +2732,11 @@ end
 local flag_block_size = 0x13B; -- TODO: Find exact size, absolute maximum is 0x1A8 based on physical EEPROM slot size but it's likely much smaller than this
 flag_block_cache = {};
 
+function clearFlagCache()
+	flag_block_cache = {};
+end
+event.onloadstate(clearFlagCache, "ScriptHawk - Clear Flag Cache");
+
 function adjustBlockSize(value)
 	flag_block_cache = {};
 	flag_block_size = value;
