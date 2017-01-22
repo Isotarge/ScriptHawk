@@ -1,11 +1,16 @@
 local Game = {};
 
+crumbling = false;
+encircle_enabled = false;
+force_tbs = false;
+object_model2_filter = nil; -- String, see obj_model2.object_types
+realtime_flags = true;
+
 -- TODO: Need to put some grab script state up here because encircle uses it before they would normally be defined
 -- This can probably be fixed with a clever reshuffle of grab script state/functions
 local object_index = 1;
 local object_pointers = {};
 local radius = 100;
-encircle_enabled = false;
 local grab_script_modes = {
 	"Disabled",
 	"List (Object Model 1)",
@@ -2010,7 +2015,6 @@ function getScriptName(objectModel2Base)
 	return "unknown "..toHexString(model2ID);
 end
 
-object_model2_filter = nil; -- String
 function populateObjectModel2Pointers()
 	object_pointers = {};
 	local objModel2Array = getObjectModel2Array();
@@ -2760,25 +2764,33 @@ local function getFlagName(byte, bit)
 	return "Unknown at "..toHexString(byte)..">"..bit;
 end
 
-function checkFlags(_type)
+function checkFlags(showKnown)
 	local flags = Game.getFlagBlockAddress();
 
 	if #flag_block_cache > 0 then
 		local flagFound = false;
 		local knownFlagsFound = 0;
-		_type = _type or "Type";
 
 		for i = 0, #flag_block_cache do
 			currentValue = mainmemory.readbyte(flags + i);
 			previousValue = flag_block_cache[i];
 			if currentValue ~= previousValue then
 				for bit = 0, 7 do
-					if get_bit(currentValue, bit) and not get_bit(previousValue, bit) then
+					local isSetNow = get_bit(currentValue, bit);
+					local wasSet = get_bit(previousValue, bit);
+					if isSetNow and not wasSet then
 						if not isFound(i, bit) then
 							flagFound = true;
-							dprint("{[\"byte\"] = "..toHexString(i)..", [\"bit\"] = "..bit..", [\"name\"] = \"Name\", [\"type\"] = \"".._type.."\", [\"map\"] = "..map_value.."},");
+							dprint("{[\"byte\"] = "..toHexString(i, 2)..", [\"bit\"] = "..bit..", [\"name\"] = \"Name\", [\"type\"] = \"Type\", [\"map\"] = "..map_value.."},");
 						else
+							if showKnown then
+								dprint("Flag "..toHexString(i, 2)..">"..bit..": \""..getFlagName(i, bit).."\" was set.");
+							end
 							knownFlagsFound = knownFlagsFound + 1;
+						end
+					elseif not isSetNow and wasSet then
+						if showKnown then
+							dprint("Flag "..toHexString(i, 2)..">"..bit..": \""..getFlagName(i, bit).."\" was cleared.");
 						end
 					end
 				end
@@ -2787,11 +2799,13 @@ function checkFlags(_type)
 				flag_block_cache[i] = currentValue;
 			end
 		end
-		if knownFlagsFound > 0 then
-			dprint(knownFlagsFound.." Known flags skipped.")
-		end
-		if not flagFound then
-			dprint("No unknown flags were changed.")
+		if not showKnown then
+			if knownFlagsFound > 0 then
+				dprint(knownFlagsFound.." Known flags skipped.")
+			end
+			if not flagFound then
+				dprint("No unknown flags were changed.")
+			end
 		end
 	else
 		-- Fill flag block cache
@@ -3121,7 +3135,7 @@ end
 -- TBS Nonsense --
 ------------------
 
-force_tbs = false; -- Set this through lua console for now -- TODO: Add some kind of UI for it
+
 function forceTBS()
 	local playerObject = Game.getPlayerObject();
 	if isRDRAM(playerObject) then
@@ -5779,6 +5793,11 @@ function Game.eachFrame()
 	end
 	if slotChanged then
 		print_deferred();
+	end
+
+	-- Check for new flags being set
+	if realtime_flags then
+		checkFlags(true);
 	end
 end
 
