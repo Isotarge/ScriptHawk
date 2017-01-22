@@ -31,7 +31,8 @@ A collection of Lua scripts and RAM watches for [BizHawk](https://github.com/TAS
 ###Donkey Kong 64
 - All known versions supported
 - [Object analysis tools](Docs/Object%20Analysis%20Tools.txt): List, Examine, Grab, Focus, Encircle, Zip
-- Documentation of over 95% of permanent flags in USA save files
+- Documentation for over 95% of permanent flags in USA save files
+- Realtime feedback for flags being set/cleared
 - Mad Jack minimap
 - Automatic [ISG](http://dk64.wikia.com/wiki/Intro_Story_Glitch) timer
 
@@ -41,8 +42,9 @@ A collection of Lua scripts and RAM watches for [BizHawk](https://github.com/TAS
 
 ###Banjo-Kazooie
 - All known versions supported
-- Spawn objects
 - [Object analysis tools](Docs/Object%20Analysis%20Tools.txt): List, Examine, Grab, Encircle, Zip, Despawn
+- Spawn objects
+- Documentation for the majority of flags
 
 ![Banjo-Kazooie Support](Images/Promo/bk_ui.png)
 

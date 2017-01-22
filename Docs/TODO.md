@@ -12,11 +12,9 @@
 	- I think it'd be fun to bulk support SMS games since the object layout is so simple :P
 - General: UI to load ASM patches, can currently only be done by calling loadASMPatch(filename, suppressprint) in the lua console
 - DK64:
-	- Find menu cutscene flags
+	- Find menu cutscene nonsense
 	- Finish flag documentation
-	- Implement framework to detect when flags are set/cleared & print to console
 	- Exception when gui.cleargraphics() is called on first frame (by MJ minimap)
-- BK: Integrate flags (and many other finds) from Bitalive's research https://docs.google.com/document/d/1Gek6Bkfcy1RHSDTBa3L3fEzJhaWROX3hfcmOrcekTV0/edit
 
 ##Low priority, recurring, or waiting:
 - Object Analysis Tools:
