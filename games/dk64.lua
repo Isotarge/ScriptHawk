@@ -405,10 +405,10 @@ function arcadeObjectBaseToDraggableObject(objectBase)
 		yPosition = mainmemory.readfloat(objectBase + arcadeObject.y_position, true),
 	};
 
-	draggableObjetc.leftX = (draggableObject.xPosition + arcadeHitboxXOffset) * arcadeXMultiplier;
-	draggableObjetc.rightX = draggableObject.leftX + arcadeHitboxWidth;
-	draggableObjetc.topY = (draggableObject.yPosition + arcadeHitboxYOffset) * arcadeYMultiplier;
-	draggableObjetc.bottomY = draggableObject.topY + arcadeHitboxHeight;
+	draggableObject.leftX = (draggableObject.xPosition + arcadeHitboxXOffset) * arcadeXMultiplier;
+	draggableObject.rightX = draggableObject.leftX + arcadeHitboxWidth;
+	draggableObject.topY = (draggableObject.yPosition + arcadeHitboxYOffset) * arcadeYMultiplier;
+	draggableObject.bottomY = draggableObject.topY + arcadeHitboxHeight;
 
 	return draggableObject;
 end
