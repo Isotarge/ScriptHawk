@@ -11,3 +11,240 @@ Examples:
 16: Aztec Room? with Banana Medal on ground
 17: Torches in center of arena
 22: Normally DK Isles overworld, but actually Jungle Japes in the Kiosk
+
+--
+
+RuneHero's notes
+http://www.therwp.com/forums/showthread.php?t=14543
+
+Level's you can play: NP = Not playable  F = Fully playable  P = Partially  playable (no cosmetics) B = Blank
+
+?? = Scene Value
+
+V 1.0 
+8159319C 2004
+815FE58C 2005
+805FE58E 00??
+815C5690 2004
+815C5692 00??
+815931B8 2005
+815931BA 00??
+815931B0 2004
+815931B2 00??
+815C8DFC 2004
+815C8DFE 00??
+8159319E 00??
+
+V3.0
+815F5E5C 2004
+815F5E5E 00??
+8159319C 2004
+8159319E 00??
+8166815C 0C1F
+8166815E FC00
+817FF000 3C1B
+817FF002 8073
+817FF004 277B
+817FF006 CDE4
+817FF008 AF64
+817FF00C AFA4
+817FF00E 0018
+817FF010 03E0
+817FF012 0008
+
+
+8FA5 
+0018
+
+
+
+
+Tested with V1.0
+0004 - P
+0005 - NP
+0009 - NP
+000A - NP
+000B - NP
+000C - NP
+000D - NP
+000E - P
+000F - NP
+0010 - NP
+0011 - NP
+0012 - NP
+0013 - NP
+0014 - NP
+0030 - P
+0057 - P
+0059 - F 
+005A - P
+005B - P
+005C - P
+005D - P
+005E - P
+005F - P
+
+
+Tested with V2.0 & v3.0
+
+0005 - P
+0007 - B
+0009 - B
+0010 - P
+0011 - P (Beta mermaid place?)
+0012 - NP
+0013 - P
+0019 - P(Candy music store)
+001A - P(Frantic Factory)
+0020 - NP
+0021 - P
+0022 - P (Gloomy Galleon Boss)
+0023 - B
+0024 - P
+0025 - P 
+0026 - P (Angry Aztec level)
+0027 - B
+0029 - B
+002A - P (Troff N Scoff)
+002B - B
+002C - B
+002d - B
+002E - B
+002F - B
+0030 - P
+0031 - P
+0032 - P (Beta room)
+0033 - P
+0034 - P
+0035 - NP
+0036 - P/Laggy
+0036 - B
+0038 - P
+0039 - P
+003A - P
+003B - P
+003C - P (Fungi forest Spider Boss, fully playable)
+003D - P
+003E - P
+003F - P
+0040 - NP
+0042 - NP
+0045 - NP
+0046 - B
+0047 - P
+0048 - P (Crystal Caves)
+0049 - NP
+004A - NP
+004B - NP
+004C - P
+004D - NP
+004E - NP
+004F - NP
+0052 - B
+0055 - P
+0059 - F
+005A - P
+005B - P
+005C - P
+005D - P
+005E - P
+005F - P
+0060 - NP
+0061 - P
+0062 - B
+0063 - NP
+0064 - P
+0065 - NP
+0066 - NP
+0068 - NP
+0069 - P
+006A - B (Choppy Lag)
+006B - B
+006C - P (Just exploding ooze.)
+006D - B
+006E - P (Dk Barrel minigame)
+006F - B (???)
+0071 - P
+0072 - P
+0073 - NP
+0074 - NP
+0075 - NP
+0076 - NP
+007A - NP
+007B - NP
+007C - NP
+007D - NP
+007E - NP
+007F - NP
+0080 - NP
+0081 - B
+0082 - B
+0083 - NP
+0084 - NP
+0085 - NP
+0086 - NP
+0087 - NP
+0088 - NP
+0089 - NP
+008A - NP
+008B - NP
+008C - NP
+008D - NP
+008E - NP
+008F - NP
+0092 - NP
+0093 - NP
+0094 - NP
+0095 - NP
+0096 - NP
+0097 - P (Not listed in final version scene list!)
+0098 - P
+0099 - P
+009A - P (Jack in the box boss, partly playable)
+009B - NP
+009C - NP
+009D - NP
+009E - NP
+009F - NP
+00A2 - NP
+00A6 - B
+00A7 - B
+00C1 - B
+00C4 - B
+
+
+815C5690 2004
+
+
+=========================================================================== =========================================
+Cosmetic Only Research. 
+
+*This section is to study the ASM and find out how the COSMETIC's are  actually loaded into a scene.
+
+80593168 LW A1, 0xCDE4(A1) Load current scene value into register A1. 
+80603D30 SW A1, 0x0044(SP) Store Current scene value to memory at  0x807111FC
+
+	<----------Branch 1 sub0------------->
+	80603DE8 LW A1, 0x0044(SP) Load Current scene value from memory at  0x807111FC into register A1.
+	806041AC SW A1, 0x004C(SP) Store Current scene value to memory at  0x807111BC
+
+		<--------Branch 1 sub1------->
+		806041B8 LW T6, 0x004C(SP) Load Current scene value from  memory at 0x807111BC into register T6.
+		806041c4 sLL t0, t6, 0X2 Perform Shift Left Logical.
+		806041D4 SW T6, 0x003C(SP) Store Current scene value to  memory at 0x807111AC.
+		806041d8 ADDU T1, T9, T0 Addition command. 
+		(!)806041DC LW T2, 0x0000(T1) Load Value from 8049F200 +  T0. Value MAY be important.(!)
+		806042D8 LW V0, 0x003C(SP) Load current scene value from  memory at 0x807111AC into register V0.
+		80603DFC SW V0, 0x002C(SP) Store Current scene value to  memory at 0x807111E4
+
+		<--------Branch 1 sub2------->
+		8060427C LW T4, 0x004C(SP) Load Current scene value from  memory at 0x807111BC into register T4
+		8060428C SLL T2, T4, 0x2  Perform Shift Left Logical.
+		
+		
+
+	<----------Branch 2 sub0------------->
+	80603E3C LW T5, 0x0044(SP) Load Current scene value from memory at  0x807111FC into register T5.
+
+	<----------Branch 3 sub0------------->
+	8060409C LW A1,0x0055(SP) Load Current scene value from memory at  0x807111FC into register T5.

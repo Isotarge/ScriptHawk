@@ -5476,6 +5476,7 @@ end
 function Game.setMap(value)
 	if value >= 1 and value <= #Game.maps then
 		if version == 4 then
+			mainmemory.write_u16_be(0x5931B8, 0x2005);
 			mainmemory.write_u16_be(0x5931BA, value - 1); -- Replace object model 2, rather than loading the map since basically everything crashes on kiosk
 		else
 			mainmemory.write_u32_be(Game.Memory.destination_map[version], value - 1);
