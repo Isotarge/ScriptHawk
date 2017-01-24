@@ -2660,7 +2660,7 @@ function Game.detectVersion(romName, romHash)
 			[0x3B] = "Walking", -- Orangstand
 			[0x3C] = "Jumping", -- Orangstand
 			[0x3D] = "Barrel",
-
+			[0x3E] = "Baboon Blast Shot",
 			[0x3F] = "Leaving Barrel",
 			[0x40] = "Cannon Shot",
 
@@ -5475,11 +5475,42 @@ end
 
 function Game.setMap(value)
 	if value >= 1 and value <= #Game.maps then
-		if version == 4 then
+		value = value - 1;
+		if version == 4 then -- Replace setup, rather than the scene index since basically everything crashes on Kiosk
+			-- RuneHero's v1.0 code
+			mainmemory.write_u16_be(0x59319C, 0x2004);
+			mainmemory.write_u16_be(0x59319E, value);
 			mainmemory.write_u16_be(0x5931B8, 0x2005);
-			mainmemory.write_u16_be(0x5931BA, value - 1); -- Replace object model 2, rather than loading the map since basically everything crashes on kiosk
+			mainmemory.write_u16_be(0x5931BA, value);
+			mainmemory.write_u16_be(0x5931B0, 0x2004);
+			mainmemory.write_u16_be(0x5931B2, value);
+			mainmemory.write_u16_be(0x5FE58C, 0x2005);
+			mainmemory.write_u16_be(0x5FE58E, value);
+			mainmemory.write_u16_be(0x5C5690, 0x2004);
+			mainmemory.write_u16_be(0x5C5692, value);
+			mainmemory.write_u16_be(0x5C8DFC, 0x2004);
+			mainmemory.write_u16_be(0x5C8DFE, value);
+
+			-- RuneHero's v3.0 code, kinda crashy
+			--[[
+			mainmemory.write_u16_be(0x59319C, 0x2004);
+			mainmemory.write_u16_be(0x59319E, value - 1);
+
+			mainmemory.write_u16_be(0x5F5E5C, 0x2004);
+			mainmemory.write_u16_be(0x5F5E5E, value - 1);
+
+			-- A hook, methinks
+			mainmemory.write_u32_be(0x66815C, 0x0C1FFC00);
+
+			-- Some kind of ASM patch, will research what this does eventually
+			mainmemory.write_u32_be(0x7FF000, 0x3C1B8073);
+			mainmemory.write_u32_be(0x7FF004, 0x277BCDE4);
+			mainmemory.write_u16_be(0x7FF008, 0xAF64);
+			mainmemory.write_u32_be(0x7FF00C, 0xAFA40018);
+			mainmemory.write_u32_be(0x7FF010, 0x03E00008);
+			--]]
 		else
-			mainmemory.write_u32_be(Game.Memory.destination_map[version], value - 1);
+			mainmemory.write_u32_be(Game.Memory.destination_map[version], value);
 		end
 	end
 end
