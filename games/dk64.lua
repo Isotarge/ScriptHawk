@@ -45,6 +45,7 @@ Game.Memory = {
 	["jetman_position_y"] = {0x02F054, 0x022104, 0x022064, nil},
 	["jetman_velocity_x"] = {0x02F058, 0x022108, 0x022068, nil},
 	["jetman_velocity_y"] = {0x02F05C, 0x02210C, 0x02206C, nil},
+	["arcade_object_base"] = {0x04BCD0, 0x03EC30, 0x03EA60, nil},
 	["jumpman_position_x"] = {0x04BD70, 0x03ECD0, 0x03EB00, nil},
 	["jumpman_position_y"] = {0x04BD74, 0x03ECD4, 0x03EB04, nil},
 	["jumpman_velocity_x"] = {0x04BD78, 0x03ECD8, 0x03EB08, nil},
@@ -366,6 +367,85 @@ Game.maps = {
 
 local arcade_map = 2;
 local jetpac_map = 9;
+
+local arcadeObjectSize = 0x20;
+local arcadeNumObjects = 61; -- TODO: Figure out actual value
+
+local arcadeObject = {
+	x_position = 0x00, -- Float
+	y_position = 0x04, -- Float
+	x_velocity = 0x08, -- Float
+	y_velocity = 0x0C, -- Float
+};
+
+arcadeHitboxWidth = 16;
+arcadeHitboxHeight = 16;
+
+arcadeHitboxXOffset = 0;
+arcadeHitboxYOffset = 0;
+
+arcadeXMultiplier = 1;
+arcadeYMultiplier = 0.9;
+
+local mouseClickedLastFrame = false;
+local startDragPosition = {0,0};
+local draggedObjects = {};
+
+function drawArcadeHitboxes()
+	if version == 4 then
+		return;
+	end
+
+	local startDrag = false;
+	local dragging = false;
+	local dragTransform = {0, 0};
+	local mouse = input.getmouse();
+
+	-- Draw mouse pixel
+	gui.drawPixel(mouse.X, mouse.Y, 0xFFFFFFFF);
+
+	if mouse.Left then
+		if not mouseClickedLastFrame then
+			startDrag = true;
+			startDragPosition = {mouse.X, mouse.Y};
+		end
+		mouseClickedLastFrame = true;
+		dragging = true;
+		dragTransform = {mouse.X - startDragPosition[1], mouse.Y - startDragPosition[2]};
+	else
+		draggedObjects = {};
+		mouseClickedLastFrame = false;
+		dragging = false;
+	end
+
+	for i = 0, arcadeNumObjects - 1 do
+		local objectBase = Game.Memory.arcade_object_base[version] + (i * arcadeObjectSize);
+		local xPosition = mainmemory.readfloat(objectBase + arcadeObject.x_position, true);
+		local yPosition = mainmemory.readfloat(objectBase + arcadeObject.y_position, true);
+		if dragging then
+			for d = 1, #draggedObjects do
+				if draggedObjects[d][1] == i then
+					xPosition = draggedObjects[d][2] + dragTransform[1];
+					yPosition = draggedObjects[d][3] + dragTransform[2];
+					mainmemory.writefloat(objectBase + arcadeObject.x_position, xPosition, true);
+					mainmemory.writefloat(objectBase + arcadeObject.y_position, yPosition, true);
+					break;
+				end
+			end
+		end
+		local leftX = (xPosition + arcadeHitboxXOffset) * arcadeXMultiplier;
+		local rightX = leftX + arcadeHitboxWidth;
+		local topY = (yPosition + arcadeHitboxYOffset) * arcadeYMultiplier;
+		local bottomY = topY + arcadeHitboxHeight;
+		gui.drawRectangle(leftX, topY, arcadeHitboxWidth, arcadeHitboxHeight, 0xFFFFFFFF);
+		if (mouse.X >= leftX and mouse.X <= rightX) and (mouse.Y >= topY and mouse.Y <= bottomY) then
+			if startDrag then
+				table.insert(draggedObjects, {i, xPosition, yPosition});
+				--console.log("starting drag for object "..i);
+			end
+		end
+	end
+end
 
 --------------
 -- Mad Jack --
@@ -5622,6 +5702,11 @@ function Game.drawUI()
 
 	-- Mad Jack
 	Game.drawMJMinimap();
+
+	-- Arcade hitboxes
+	if map_value == arcade_map then
+		drawArcadeHitboxes();
+	end
 
 	if version ~= 4 then
 		-- Draw ISG timer
