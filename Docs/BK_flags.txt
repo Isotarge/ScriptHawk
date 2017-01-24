@@ -93,7 +93,7 @@
 07 00 00 00 = # of pieces placed in CC Puzzle
 38 00 00 00 = # of pieces placed in BGS Puzzle
 C0 03 00 00 = # of pieces placed in FP Puzzle
-00 3C 00 00 = # of pieces placed in FP Puzzle
+00 3C 00 00 = # of pieces placed in GV Puzzle
 00 C0 03 00 = # of pieces placed in MMM Puzzle
 00 00 3C 00 = # of pieces placed in RBB Puzzle
 00 00 C0 03 = # of pieces placed in CCW Puzzle
@@ -105,7 +105,9 @@ C0 03 00 00 = # of pieces placed in FP Puzzle
 
 
 --3831B8
+10 00 00 00 = Mumbo's Magic All Gone
 20 00 00 00 = Gate to Crypt broken
+40 00 00 00 = Thorny Hedges Text
 
 00 01 00 00 = Exiting Loggo Grunty Text
  
@@ -113,8 +115,7 @@ C0 03 00 00 = # of pieces placed in FP Puzzle
 00 10 00 00 = CCW Summer Open
 00 20 00 00 = CCW Autumn Open
 00 40 00 00 = CCW Winter Open
-
-*00 80 00 00* ???Banjo Transform State???
+00 80 00 00 = Mumbo's Magic Getting Weak, animal turn back 
 00 00 01 00 Termite Transform Payed For
 00 00 02 00 Pumpkin Transform Payed For
 00 00 04 00 Walrus Transform Payed For
@@ -143,7 +144,9 @@ C0 03 00 00 = # of pieces placed in FP Puzzle
 80 00 00 00 = 1st time near jiggy puzzle podium text
 00 01 00 00 = 1st time dying text
 00 02 00 00 = 1st time taking oven damage text
-
+00 04 00 00 = 1st CCW bramble field text
+00 08 00 00 = Oily Water Surface Text
+00 10 00 00 = Oily Water Underwater Text
 00 20 00 00 = Talked to BLUEEGGS Cheato
 00 40 00 00 = Talked to REDFEATHERS Cheato
 00 80 00 00 = Talked to GOLDFEATHERS Cheato
@@ -152,9 +155,9 @@ C0 03 00 00 = # of pieces placed in FP Puzzle
 00 00 04 00 = 1st time in TTC - main map
 00 00 08 00 = 1st time in GV - main map
 00 00 10 00 = 1st time in RBB - main map
-
+00 00 20 00 = 1st time in CCW - world hub
 00 00 40 00 = 1st time in FP - main map
-
+00 00 80 00 = 1st time in MMM - world hub
 00 00 00 01 = 1st time in CC - main map
 00 00 00 02 = Double Health
 
@@ -181,6 +184,8 @@ C0 03 00 00 = # of pieces placed in FP Puzzle
 00 00 04 00 = Final Battle Jinjo Statue Cutscene
 
 00 00 00 10 = 1st Time in Mumbo's With enough tokensText
+00 00 00 20 = 1st Time in CCW Icy Water Text
+
 00 00 00 80 = Remove Puzzle Piece
 
 
@@ -192,10 +197,15 @@ C0 03 00 00 = # of pieces placed in FP Puzzle
 08 00 00 00 = CCW Flower Spring State 
 10 00 00 00 = CCW Flower Summer State
 20 00 00 00 = CCW Flower Autumn State
+40 00 00 00 = Spring Eeyrie Egg Broken
+80 00 00 00 = Summer Eeyrie Fed
+00 01 00 00 = Fall Eeyrie Fed
 
 00 00 08 00 = Talked to Dingpot
 00 00 10 00 = 1st time FF cutscene
 
 00 00 40 00 = 1st time near DoG Puzzle Podium
+00 00 80 00 = 1st time pumpkin transform
+00 00 00 03 = Sandybutt maze state
 
 00 00 00 10 = Defeated Grunty
