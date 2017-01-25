@@ -804,6 +804,7 @@ obj_model1 = {
 		[191] = "Candy",
 		[192] = "Beetle", -- Race
 		[193] = "Mermaid",
+		[194] = "Vulture",
 		[195] = "Squawks",
 		[196] = "DK (Rap)",
 		[197] = "Trapped Diddy",
@@ -818,6 +819,8 @@ obj_model1 = {
 		[206] = "Zinger",
 		[207] = "Vulture (Race)",
 		[208] = "Klaptrap (Purple)",
+		[209] = "Klaptrap (Red)",
+		[210] = "GETOUT Controller",
 		[211] = "Klaptrap (Skeleton)",
 		[212] = "Beaver (Gold)",
 		[214] = "TNT Minecart", -- Minecart Mayhem
@@ -830,6 +833,7 @@ obj_model1 = {
 		[230] = "Ruler",
 		[231] = "Toy Box",
 		[232] = "Text Overlay",
+		[233] = "Squawks",
 		[234] = "Scoff",
 		[235] = "Robo-Kremling",
 		[236] = "Dogadon",
@@ -843,7 +847,7 @@ obj_model1 = {
 		[245] = "Kasplat (Chunky)",
 		[247] = "Seal",
 		[248] = "Banana Fairy",
-		[249] = "Squawks w/spotlight",
+		[249] = "Squawks with spotlight",
 		[251] = "Spider miniBoss",
 		[252] = "Rabbit", -- Fungi
 		[254] = "Static Object", -- Used in TONS of places, mainly for objects animated by cutscenes
@@ -859,8 +863,10 @@ obj_model1 = {
 		[266] = "DK Rap Controller", -- Handles the lyrics etc
 		[267] = "Shuri",
 		[268] = "Gimpfish",
+		[269] = "Mr. Dice",
 		[270] = "Sir Domino",
 		[271] = "Mr. Dice",
+		[273] = "Fireball (With Glasses)",
 		[275] = "K. Lumsy",
 		[276] = "Spiderling",
 		[278] = "Projectile", -- Spider miniBoss
@@ -2725,7 +2731,7 @@ function Game.detectVersion(romName, romHash)
 			[40] = "Orange",
 			[41] = "Grape", -- Projectile
 			[42] = "Feather", -- Projectile
-			[44] = "Gold Banana", -- Unusued? Normally these are object model 2
+			[44] = "Gold Banana", -- Held by Vulture
 			--[45] = "Unknown", -- Crash
 			[46] = "Watermelon Slice",
 			[47] = "Coconut", -- Projectile
@@ -5886,6 +5892,153 @@ function crumble()
 				end
 			end
 		end
+	end
+end
+
+local enemyTypes = {
+	[0x00] = "Beaver",
+	[0x01] = "Giant Clam",
+	--[0x02] = "Actor Index 180", -- Crash
+	[0x03] = "Book", -- Castle Library
+	--[0x04] = "Actor Index 0", -- Crash
+	[0x05] = "Zinger",
+	[0x06] = "Barrel Enemy (Normal)", -- Croc in a barrel, Galleon
+	[0x07] = "Snide",
+	[0x08] = "Army Dillo",
+	[0x09] = "Klump",
+	--[0x0A] = "Actor Index 0", -- Crash
+	[0x0B] = "Cranky",
+	[0x0C] = "Funky",
+	[0x0D] = "Candy",
+	[0x0E] = "Beetle",
+	[0x0F] = "Mermaid",
+	[0x10] = "Barrel Enemy (TNT)",
+	[0x11] = "Vulture", -- Holding GB
+	[0x12] = "Squawks",
+	[0x13] = "DK (Rap)",
+	[0x14] = "Trapped Diddy", -- Probably also DK Rap
+	[0x15] = "Trapped Lanky", -- Probably also DK Rap
+	[0x16] = "Trapped Tiny", -- Probably also DK Rap
+	[0x17] = "Trapped Chunky", -- Probably also DK Rap
+	[0x18] = "Padlock (T&S)",
+	[0x19] = "Llama",
+	[0x1A] = "Mad Jack",
+	[0x1B] = "Klaptrap",
+	[0x1C] = "Zinger",
+	[0x1D] = "Vulture (Race)",
+	[0x1E] = "Klaptrap (Purple/Red)",
+	[0x1F] = "Klaptrap (Red)",
+	[0x20] = "GETOUT",
+	[0x21] = "Beaver (Gold)",
+	--[0x22] = "Actor Index 0", -- Crash
+	[0x23] = "Firewall? Lava? (Invisible)", -- TODO: What is this (actor type 213)
+	[0x24] = "TNT Minecart",
+	[0x25] = "TNT Minecart",
+	[0x26] = "Pufftoss",
+	[0x27] = "Actor Index 220", -- TODO: Cannon Galleon Ship?
+	--[0x28] = "Crash",
+	--[0x29] = "Actor Index 0", -- Crash
+	[0x2A] = "Actor Index 223", -- TODO: Cannon Galleon Ship?
+	--[0x2B] = "Actor Index 0", -- Crash
+	[0x2C] = "Mushroom Man",
+	--[0x2D] = "Actor Index 0", -- Crash
+	[0x2E] = "Troff",
+	--[0x2F] = "Actor Index 0", -- Crash
+	[0x30] = "Bad Hit Detection Man",
+	--[0x31] = "Actor Index 0", -- Crash
+	--[0x32] = "Actor Index 0", -- Crash
+	[0x33] = "Ruler",
+	[0x34] = "Toy Box",
+	[0x35] = "Squawks",
+	--[0x36] = "Actor Index 308", -- Crash
+	[0x37] = "Scoff",
+	[0x38] = "Robo-Kremling",
+	[0x39] = "Dogadon",
+	--[0x3A] = "Actor Index 0", -- Crash
+	[0x3B] = "Kremling",
+	[0x3C] = "Fish with headlamp",
+	[0x3D] = "Kasplat (DK)",
+	[0x3E] = "Kasplat (Diddy)",
+	[0x3F] = "Kasplat (Lanky)",
+	[0x40] = "Kasplat (Tiny)",
+	[0x41] = "Kasplat (Chunky)",
+	[0x42] = "Actor Type 246 + Timer", -- TODO: No idea what this is
+	[0x43] = "Seal",
+	[0x44] = "Banana Fairy",
+	[0x45] = "Squawks with spotlight",
+	--[0x46] = "Actor Index 0", -- Crash
+	--[0x47] = "Actor Index 0", -- Crash
+	[0x48] = "Rabbit", -- Race
+	[0x49] = "Actor Type 250", -- TODO: What is this? Instantly despawns
+	--[0x4A] = "Crash",
+	[0x4B] = "Actor Type 257", -- TODO: What is this?
+	--[0x4C] = "Actor Index 256", -- Crash
+	--[0x4D] = "Something todo with battle crown finishing?",
+	--[0x4E] = "Actor Index 303", -- Crash
+	--[0x4F] = "Actor Index 312", -- Crash
+	[0x50] = "Static Object (Llama Model?)",
+	[0x51] = "Guard", -- Stealthy Snoop
+	--[0x52] = "Crash",
+	[0x53] = "Robo-Zinger",
+	[0x54] = "Krossbones",
+	[0x55] = "Shuri",
+	[0x56] = "Gimpfish",
+	[0x57] = "Mr. Dice",
+	[0x58] = "Sir Domino",
+	[0x59] = "Mr. Dice",
+	[0x5A] = "Rabbit + TNT", -- Chris P. Bacon
+	--[0x5B] = "Actor Index 0", -- Crash
+	[0x5C] = "Fireball (With Glasses)",
+	[0x5D] = "K. Lumsy + Cage + Padlocks",
+	[0x5E] = "Spider miniBoss",
+	[0x5F] = "Spiderling",
+	[0x60] = "Actor Type 277", -- TODO: What is this?
+	[0x61] = "K. Rool (DK Phase)",
+	--[0x62] = "Crash",
+	[0x63] = "Bat",
+	[0x64] = "Tomato",
+	[0x65] = "Kritter-in-a-sheet",
+	[0x66] = "Pufftup",
+	[0x67] = "Kosha",
+	--[0x68] = "Actor Index 0", -- Crash
+	[0x69] = "Enemy Car",
+	[0x6A] = "K. Rool (Diddy Phase)",
+	[0x6B] = "K. Rool (Lanky Phase)",
+	[0x6C] = "K. Rool (Tiny Phase)",
+	[0x6D] = "K. Rool (Chunky Phase)",
+	[0x6E] = "Bug", -- Big Bug Bash
+	[0x6F] = "Banana Fairy (BFI)",
+	[0x70] = "Ice Tomato",
+	--[0x71] = "Actor Type 16457", -- Crash
+	--[0x72] = "Crash",
+	--[0x73] = "Crash",
+	--[0x74] = "Crash",
+	--[0x75] = "Actor Type 15502", -- Crash
+	--[0x76] = "Actor Type 16585", -- Crash
+	--[0x77] = "Crash",
+	--[0x78] = "Actor Type 16495", -- Crash
+	--[0x79] = "Crash",
+	--[0x7A] = "Crash",
+	--[0x7B] = "Crash",
+	--[0x7C] = "Crash",
+	--[0x7D] = "Crash",
+	--[0x7E] = "Crash",
+	--[0x7F] = "Crash",
+};
+
+function dumpEnemies()
+	local enemyRespawnObject = dereferencePointer(Game.Memory.enemy_respawn_object[version]);
+	if isRDRAM(enemyRespawnObject) then
+		local numberOfEnemies = mainmemory.read_u16_be(Game.Memory.num_enemies[version]);
+		for i = 1, numberOfEnemies do
+			local enemyType = mainmemory.readbyte(enemyRespawnObject + (i - 1) * 0x48);
+			local enemyName = "Unknown "..toHexString(enemyType);
+			if type(enemyTypes[enemyType]) == "string" then
+				enemyName = enemyTypes[enemyType];
+			end
+			dprint(i.." "..toHexString(enemyRespawnObject + (i - 1) * 0x48)..": "..enemyName);
+		end
+		print_deferred();
 	end
 end
 
