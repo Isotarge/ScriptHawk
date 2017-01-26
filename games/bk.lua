@@ -1855,8 +1855,8 @@ end
 local viewport_YAngleRange = 52.5;
 local viewport_XAngleRange = 47.5;
 local screen = {
-	width = client.bufferwidth() / client.getwindowsize();
-	height = client.bufferheight() / client.getwindowsize();
+	width = client.bufferwidth() / client.getwindowsize(),
+	height = client.bufferheight() / client.getwindowsize(),
 };
 
 function drawObjectPositions()
