@@ -255,6 +255,11 @@ Game.Memory = {
 	["moving_angle"] = {0x37D064, 0x37D194, 0x37B894, 0x37C694},
 	["z_rotation"] = {0x37D050, 0x37D180, 0x37B880, 0x37C680},
 	["camera_rotation"] = {0x37E578, 0x37E6A8, 0x37CDA8, 0x37D96C},
+	["camera_x_position"] = {0x37E564, 0x37E694, 0x37CD94, 0x37D958},
+	["camera_y_position"] = {0x37E568, 0x37E698, 0x37CD98, 0x37D95C},
+	["camera_z_position"] = {0x37E56C, 0x37E69C, 0x37CD9C, 0x37D960},
+	["camera_x_rotation"] = {0x37E574, 0x37E6A4, 0x37CDA4, 0x37D968},
+	["camera_y_rotation"] = {0x37E578, 0x37E6A8, 0x37CDA8, 0x37D96C},
 	["previous_movement_state"] = {0x37DB30, 0x37DC60, 0x37C360, 0x37D160},
 	["current_movement_state"] = {0x37DB34, 0x37DC64, 0x37C364, 0x37D164},
 	["map"] = {0x37F2C5, 0x37F405, 0x37DAF5, 0x37E8F5},
@@ -1843,6 +1848,83 @@ function setAll(variable, value)
 	end
 end
 
+
+--------------------
+-- Object Overlay --
+--------------------
+local viewport_YAngleRange = 52.5;
+local viewport_XAngleRange = 47.5;
+local screen = {
+	width = 640;
+	height = 480;
+}
+
+function drawObjectPositions()
+	
+	local objectArray = dereferencePointer(Game.Memory.object_array_pointer[version]);
+	
+	if isRDRAM(objectArray) then
+		local numSlots = math.min(max_slots, mainmemory.read_u32_be(objectArray));
+		
+		for i = math.min(numSlots, object_top_index+object_max_slots), object_top_index, -1 do
+			local slotBase = objectArray + getSlotBase(i);
+			local objectData = {
+				xPos = mainmemory.readfloat(slotBase + 0x04, true),
+				yPos = mainmemory.readfloat(slotBase + 0x08, true),
+				zPos = mainmemory.readfloat(slotBase + 0x0C, true),
+			};
+			-- get objectPosition
+			
+			-- calc local_angle to camera facing angle
+			local cameraData = {
+				xPos = mainmemory.readfloat(Game.Memory.camera_x_position[version], true),
+				yPos = mainmemory.readfloat(Game.Memory.camera_y_position[version], true),
+				zPos = mainmemory.readfloat(Game.Memory.camera_z_position[version], true),
+				xRot = mainmemory.readfloat(Game.Memory.camera_x_rotation[version], true),
+				yRot = mainmemory.readfloat(Game.Memory.camera_y_rotation[version], true),
+			};
+			
+			local xDifference = (objectData.xPos - cameraData.xPos)
+			local yDifference = (objectData.yPos - cameraData.yPos)
+			local zDifference = (objectData.zPos - cameraData.zPos)
+		
+			local YAngle_local = (cameraData.yRot) - math.atan(xDifference/zDifference)*180/math.pi; --Horizontal Angle
+			if zDifference >= 0 then --compensates for using tangent
+				YAngle_local = YAngle_local+180
+			end
+		
+			local XAngle_local = math.atan((yDifference)/(xDifference))*180/math.pi - cameraData.xRot; --Vertical Angle
+			--if xDifference >= 0 then --compensates for using tangent
+			--	YAngle_local = YAngle_local+180
+			--end
+		
+			YAngle_local = ((YAngle_local + 180)%360)-180; --get angle between -180 and +180
+			XAngle_local = ((XAngle_local + 180)%360)-180; --get angle between -180 and +180
+
+			if YAngle_local <= (viewport_YAngleRange/2) and YAngle_local > (-viewport_YAngleRange/2) then
+				--if ZAngle_local <= (viewport_XAngleRange/2) and XAngle_local > (-viewport_XAngleRange/2) then --inside viewport angle
+					local drawXPos = (screen.width/2)*math.sin(YAngle_local*math.pi/180)/math.sin(viewport_YAngleRange*math.pi/360) + screen.width/2;
+					local drawYPos = (screen.height/2);
+					--local drawYPos = -(screen.height/2)*math.sin(XAngle_local*math.pi/180)/math.sin(viewport_XAngleRange*math.pi/360) + screen.width/2;
+					
+				
+					--calc scaling factor -- current calc might be incorrect
+					--distanceAlongNormal = cos(Yangle_local)*cos(Xangle_local)*sqrt((objectData.xPos - cameraData.xPos)^2 + (objectData.yPos - cameraData.yPos)^2 + (objectData.zPos - cameraData.zPos)^2);
+					--scaling_factor = (screen_width/2)/(distanceAnlongNormal*tan(viewport_YAngleRange/2)); --???
+	
+					
+					-- draw to screen
+					gui.drawLine(drawXPos, 0, drawXPos, 20, 0xFFFFFFFF);
+					--print("Object "..i.." in Horz view angle range:"..YAngle_local);
+				--end
+			end
+			
+			
+		end
+	end
+end
+
+
 ----------------------
 -- Data acquisition --
 ----------------------
@@ -2044,6 +2126,9 @@ function Game.drawUI()
 	gui.text(Game.OSDPosition[1], 2 + Game.OSDRowHeight * row, "Index: "..(object_index).."/"..(numSlots), nil, 'bottomright');
 	row = row + 1;
 
+	drawObjectPositions();
+
+	
 	if script_mode == "Examine" and isRDRAM(objectArray) then
 		local examine_data = getExamineData(objectArray + getSlotBase(object_index));
 		for i = #examine_data, 1, -1 do
