@@ -1855,49 +1855,52 @@ end
 local viewport_YAngleRange = 52.5;
 local viewport_XAngleRange = 47.5;
 local screen = {
-	width = 640;
-	height = 480;
-}
+	width = client.bufferwidth() / client.getwindowsize();
+	height = client.bufferheight() / client.getwindowsize();
+};
 
 function drawObjectPositions()
-	
+	screen.width = client.bufferwidth() / client.getwindowsize();
+	screen.height = client.bufferheight() / client.getwindowsize();
+
 	local objectArray = dereferencePointer(Game.Memory.object_array_pointer[version]);
-	
+
 	if isRDRAM(objectArray) then
 		local numSlots = math.min(max_slots, mainmemory.read_u32_be(objectArray));
-		
-		for i = math.min(numSlots, object_top_index+object_max_slots), object_top_index, -1 do
+
+		local cameraData = {
+			xPos = mainmemory.readfloat(Game.Memory.camera_x_position[version], true),
+			yPos = mainmemory.readfloat(Game.Memory.camera_y_position[version], true),
+			zPos = mainmemory.readfloat(Game.Memory.camera_z_position[version], true),
+			xRot = mainmemory.readfloat(Game.Memory.camera_x_rotation[version], true),
+			yRot = mainmemory.readfloat(Game.Memory.camera_y_rotation[version], true),
+		};
+
+		for i = math.min(numSlots, object_top_index + object_max_slots), object_top_index, -1 do
 			local slotBase = objectArray + getSlotBase(i);
+
+			-- get objectPosition
 			local objectData = {
 				xPos = mainmemory.readfloat(slotBase + 0x04, true),
 				yPos = mainmemory.readfloat(slotBase + 0x08, true),
 				zPos = mainmemory.readfloat(slotBase + 0x0C, true),
 			};
-			-- get objectPosition
-			
+
 			-- calc local_angle to camera facing angle
-			local cameraData = {
-				xPos = mainmemory.readfloat(Game.Memory.camera_x_position[version], true),
-				yPos = mainmemory.readfloat(Game.Memory.camera_y_position[version], true),
-				zPos = mainmemory.readfloat(Game.Memory.camera_z_position[version], true),
-				xRot = mainmemory.readfloat(Game.Memory.camera_x_rotation[version], true),
-				yRot = mainmemory.readfloat(Game.Memory.camera_y_rotation[version], true),
-			};
-			
-			local xDifference = (objectData.xPos - cameraData.xPos)
-			local yDifference = (objectData.yPos - cameraData.yPos)
-			local zDifference = (objectData.zPos - cameraData.zPos)
-		
+			local xDifference = (objectData.xPos - cameraData.xPos);
+			local yDifference = (objectData.yPos - cameraData.yPos);
+			local zDifference = (objectData.zPos - cameraData.zPos);
+
 			local YAngle_local = (cameraData.yRot) - math.atan(xDifference/zDifference)*180/math.pi; --Horizontal Angle
 			if zDifference >= 0 then --compensates for using tangent
 				YAngle_local = YAngle_local+180
 			end
-		
+
 			local XAngle_local = math.atan((yDifference)/(xDifference))*180/math.pi - cameraData.xRot; --Vertical Angle
 			--if xDifference >= 0 then --compensates for using tangent
 			--	YAngle_local = YAngle_local+180
 			--end
-		
+
 			YAngle_local = ((YAngle_local + 180)%360)-180; --get angle between -180 and +180
 			XAngle_local = ((XAngle_local + 180)%360)-180; --get angle between -180 and +180
 
@@ -1906,24 +1909,19 @@ function drawObjectPositions()
 					local drawXPos = (screen.width/2)*math.sin(YAngle_local*math.pi/180)/math.sin(viewport_YAngleRange*math.pi/360) + screen.width/2;
 					local drawYPos = (screen.height/2);
 					--local drawYPos = -(screen.height/2)*math.sin(XAngle_local*math.pi/180)/math.sin(viewport_XAngleRange*math.pi/360) + screen.width/2;
-					
-				
+
 					--calc scaling factor -- current calc might be incorrect
 					--distanceAlongNormal = cos(Yangle_local)*cos(Xangle_local)*sqrt((objectData.xPos - cameraData.xPos)^2 + (objectData.yPos - cameraData.yPos)^2 + (objectData.zPos - cameraData.zPos)^2);
-					--scaling_factor = (screen_width/2)/(distanceAnlongNormal*tan(viewport_YAngleRange/2)); --???
-	
-					
+					--scaling_factor = (screen.width/2)/(distanceAnlongNormal*tan(viewport_YAngleRange/2)); --???
+
 					-- draw to screen
 					gui.drawLine(drawXPos, 0, drawXPos, 20, 0xFFFFFFFF);
 					--print("Object "..i.." in Horz view angle range:"..YAngle_local);
 				--end
 			end
-			
-			
 		end
 	end
 end
-
 
 ----------------------
 -- Data acquisition --
