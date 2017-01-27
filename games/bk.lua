@@ -1921,9 +1921,13 @@ function drawObjectPositions()
 						--scaling_factor = (screen.width/2)/(distanceAnlongNormal*tan(viewport_YAngleRange/2)); --???
 
 						-- draw to screen
-						gui.drawLine(drawYPos-5, drawXPos, drawYPos+5, drawXPos, 0xFFFFFFFF);
-						gui.drawLine(drawYPos, drawXPos-5, drawYPos, drawXPos+5, 0xFFFFFFFF);
-						gui.drawText(drawYPos, drawXPos, string.format("%d",i));
+						local color = 0xFFFFFFFF;
+						if object_index == i then
+							color = 0xFFFFFF00;
+						end
+						gui.drawLine(drawYPos-5, drawXPos, drawYPos+5, drawXPos, color);
+						gui.drawLine(drawYPos, drawXPos-5, drawYPos, drawXPos+5, color);
+						gui.drawText(drawYPos, drawXPos, string.format("%d",i), color);
 					end
 				end
 			end
