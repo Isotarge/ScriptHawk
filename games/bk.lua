@@ -1852,16 +1852,18 @@ end
 --------------------
 -- Object Overlay --
 --------------------
-local viewport_YAngleRange = 52.5;
-local viewport_XAngleRange = 47.5;
+local viewport_YAngleRange = 60;
+local viewport_XAngleRange = 45;
 local screen = {
-	width = client.bufferwidth() / client.getwindowsize(),
-	height = client.bufferheight() / client.getwindowsize(),
+	width = 640;
+	height = 480;
+	--width = client.bufferwidth() / client.getwindowsize(),
+	--height = client.bufferheight() / client.getwindowsize(),
 };
 
 function drawObjectPositions()
-	screen.width = client.bufferwidth() / client.getwindowsize();
-	screen.height = client.bufferheight() / client.getwindowsize();
+	--screen.width = client.bufferwidth() / client.getwindowsize();
+	--screen.height = client.bufferheight() / client.getwindowsize();
 
 	local objectArray = dereferencePointer(Game.Memory.object_array_pointer[version]);
 
@@ -1872,52 +1874,58 @@ function drawObjectPositions()
 			xPos = mainmemory.readfloat(Game.Memory.camera_x_position[version], true),
 			yPos = mainmemory.readfloat(Game.Memory.camera_y_position[version], true),
 			zPos = mainmemory.readfloat(Game.Memory.camera_z_position[version], true),
-			xRot = mainmemory.readfloat(Game.Memory.camera_x_rotation[version], true),
-			yRot = mainmemory.readfloat(Game.Memory.camera_y_rotation[version], true),
+			xRot = mainmemory.readfloat(Game.Memory.camera_x_rotation[version], true)*math.pi/180,
+			yRot = mainmemory.readfloat(Game.Memory.camera_y_rotation[version], true)*math.pi/180,
 		};
 
+		local i = 12	
 		for i = math.min(numSlots, object_top_index + object_max_slots), object_top_index, -1 do
 			local slotBase = objectArray + getSlotBase(i);
 
-			-- get objectPosition
+			-- translate origin to camera position
+			local xDifference = (mainmemory.readfloat(slotBase + 0x04, true) - cameraData.xPos); 
+			local yDifference = (mainmemory.readfloat(slotBase + 0x08, true) - cameraData.yPos);
+			local zDifference = (mainmemory.readfloat(slotBase + 0x0C, true) - cameraData.zPos);
+
+            
+            --transform object point to point in coordinate system based on camera normal 
+			--rotation transform 1
+            local tempData = {
+                xPos = math.cos(cameraData.yRot)*xDifference - math.sin(cameraData.yRot)*zDifference;
+                yPos = yDifference;
+                zPos = math.sin(cameraData.yRot)*xDifference + math.cos(cameraData.yRot)*zDifference;
+            }
+		
+			--rotation transform 2
 			local objectData = {
-				xPos = mainmemory.readfloat(slotBase + 0x04, true),
-				yPos = mainmemory.readfloat(slotBase + 0x08, true),
-				zPos = mainmemory.readfloat(slotBase + 0x0C, true),
-			};
+                xPos = tempData.xPos;
+                yPos = math.sin(cameraData.xRot)*tempData.zPos + math.cos(cameraData.xRot)*tempData.yPos;
+                zPos = -math.cos(cameraData.xRot)*tempData.zPos + math.sin(cameraData.xRot)*tempData.yPos;
+            }
+            
+            if objectData.zPos > 0 then
+				local XAngle_local = math.atan(objectData.yPos/objectData.zPos)*180/math.pi; --Horizontal Angle
+				local YAngle_local = math.atan(objectData.xPos/objectData.zPos)*180/math.pi; --Horizontal Angle
+				--don't need to compentate for tan since angle between
 
-			-- calc local_angle to camera facing angle
-			local xDifference = (objectData.xPos - cameraData.xPos);
-			local yDifference = (objectData.yPos - cameraData.yPos);
-			local zDifference = (objectData.zPos - cameraData.zPos);
+				YAngle_local = ((YAngle_local + 180)%360)-180; --get angle between -180 and +180
+				XAngle_local = ((XAngle_local + 180)%360)-180;
 
-			local YAngle_local = (cameraData.yRot) - math.atan(xDifference/zDifference)*180/math.pi; --Horizontal Angle
-			if zDifference >= 0 then --compensates for using tangent
-				YAngle_local = YAngle_local+180
-			end
+				if YAngle_local <= (viewport_YAngleRange/2) and YAngle_local > (-viewport_XAngleRange/2) then
+					if XAngle_local <= (viewport_XAngleRange/2) and XAngle_local > (-viewport_YAngleRange/2) then					
+						local drawYPos = (screen.width/2)*math.sin(YAngle_local*math.pi/180)/math.sin(viewport_YAngleRange*math.pi/360) + screen.width/2;
+						local drawXPos = -(screen.height/2)*math.sin(XAngle_local*math.pi/180)/math.sin(viewport_XAngleRange*math.pi/360) + screen.height/2;
 
-			local XAngle_local = math.atan((yDifference)/(xDifference))*180/math.pi - cameraData.xRot; --Vertical Angle
-			--if xDifference >= 0 then --compensates for using tangent
-			--	YAngle_local = YAngle_local+180
-			--end
+						--calc scaling factor -- current calc might be incorrect
+						--distanceAlongNormal = cos(Yangle_local)*cos(Xangle_local)*sqrt((objectData.xPos - cameraData.xPos)^2 + (objectData.yPos - cameraData.yPos)^2 + (objectData.zPos - cameraData.zPos)^2);
+						--scaling_factor = (screen.width/2)/(distanceAnlongNormal*tan(viewport_YAngleRange/2)); --???
 
-			YAngle_local = ((YAngle_local + 180)%360)-180; --get angle between -180 and +180
-			XAngle_local = ((XAngle_local + 180)%360)-180; --get angle between -180 and +180
-
-			if YAngle_local <= (viewport_YAngleRange/2) and YAngle_local > (-viewport_YAngleRange/2) then
-				--if ZAngle_local <= (viewport_XAngleRange/2) and XAngle_local > (-viewport_XAngleRange/2) then --inside viewport angle
-					local drawXPos = (screen.width/2)*math.sin(YAngle_local*math.pi/180)/math.sin(viewport_YAngleRange*math.pi/360) + screen.width/2;
-					local drawYPos = (screen.height/2);
-					--local drawYPos = -(screen.height/2)*math.sin(XAngle_local*math.pi/180)/math.sin(viewport_XAngleRange*math.pi/360) + screen.width/2;
-
-					--calc scaling factor -- current calc might be incorrect
-					--distanceAlongNormal = cos(Yangle_local)*cos(Xangle_local)*sqrt((objectData.xPos - cameraData.xPos)^2 + (objectData.yPos - cameraData.yPos)^2 + (objectData.zPos - cameraData.zPos)^2);
-					--scaling_factor = (screen.width/2)/(distanceAnlongNormal*tan(viewport_YAngleRange/2)); --???
-
-					-- draw to screen
-					gui.drawLine(drawXPos, 0, drawXPos, 20, 0xFFFFFFFF);
-					--print("Object "..i.." in Horz view angle range:"..YAngle_local);
-				--end
+						-- draw to screen
+						gui.drawLine(drawYPos-5, drawXPos, drawYPos+5, drawXPos, 0xFFFFFFFF);
+						gui.drawLine(drawYPos, drawXPos-5, drawYPos, drawXPos+5, 0xFFFFFFFF);
+						gui.drawText(drawYPos, drawXPos, string.format("%d",i));
+					end
+				end
 			end
 		end
 	end
