@@ -1879,7 +1879,7 @@ function drawObjectPositions()
 		};
 
 		local i = 12	
-		for i = math.min(numSlots, object_top_index + object_max_slots), object_top_index, -1 do
+		for i = math.min(numSlots), object_top_index, -1 do
 			local slotBase = objectArray + getSlotBase(i);
 
 			-- translate origin to camera position
