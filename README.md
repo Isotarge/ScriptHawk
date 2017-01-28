@@ -42,6 +42,7 @@ A collection of Lua scripts and RAM watches for [BizHawk](https://github.com/TAS
 
 ###Banjo-Kazooie
 - All known versions supported
+- [Object tracking overlay](https://www.youtube.com/watch?v=m42wiHEdEbU), written by [Mittenz](https://twitter.com/mittenzhugg)
 - [Object analysis tools](Docs/Object%20Analysis%20Tools.txt): List, Examine, Grab, Encircle, Zip, Despawn
 - Spawn objects
 - Documentation for the majority of flags
