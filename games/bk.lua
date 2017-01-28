@@ -1854,6 +1854,9 @@ end
 --------------------
 local viewport_YAngleRange = 60;
 local viewport_XAngleRange = 45;
+local object_selectable_size = 10;
+local reference_distance = 2000;
+
 local screen = {
 	width = 640;
 	height = 480;
@@ -1887,21 +1890,22 @@ function drawObjectPositions()
 			local yDifference = (mainmemory.readfloat(slotBase + 0x08, true) - cameraData.yPos);
 			local zDifference = (mainmemory.readfloat(slotBase + 0x0C, true) - cameraData.zPos);
 
-            
+            local draggableObject= {};
+			
             --transform object point to point in coordinate system based on camera normal 
 			--rotation transform 1
             local tempData = {
                 xPos = math.cos(cameraData.yRot)*xDifference - math.sin(cameraData.yRot)*zDifference;
                 yPos = yDifference;
                 zPos = math.sin(cameraData.yRot)*xDifference + math.cos(cameraData.yRot)*zDifference;
-            }
+            };
 		
 			--rotation transform 2
 			local objectData = {
                 xPos = tempData.xPos;
                 yPos = math.sin(cameraData.xRot)*tempData.zPos + math.cos(cameraData.xRot)*tempData.yPos;
                 zPos = -math.cos(cameraData.xRot)*tempData.zPos + math.sin(cameraData.xRot)*tempData.yPos;
-            }
+            };
             
             if objectData.zPos > 0 then
 				local XAngle_local = math.atan(objectData.yPos/objectData.zPos)*180/math.pi; --Horizontal Angle
@@ -1913,25 +1917,26 @@ function drawObjectPositions()
 
 				if YAngle_local <= (viewport_YAngleRange/2) and YAngle_local > (-viewport_XAngleRange/2) then
 					if XAngle_local <= (viewport_XAngleRange/2) and XAngle_local > (-viewport_YAngleRange/2) then					
-						local drawYPos = (screen.width/2)*math.sin(YAngle_local*math.pi/180)/math.sin(viewport_YAngleRange*math.pi/360) + screen.width/2;
-						local drawXPos = -(screen.height/2)*math.sin(XAngle_local*math.pi/180)/math.sin(viewport_XAngleRange*math.pi/360) + screen.height/2;
+						local drawXPos = (screen.width/2)*math.sin(YAngle_local*math.pi/180)/math.sin(viewport_YAngleRange*math.pi/360) + screen.width/2;
+						local drawYPos = -(screen.height/2)*math.sin(XAngle_local*math.pi/180)/math.sin(viewport_XAngleRange*math.pi/360) + screen.height/2;
 
 						--calc scaling factor -- current calc might be incorrect
-						--distanceAlongNormal = cos(Yangle_local)*cos(Xangle_local)*sqrt((objectData.xPos - cameraData.xPos)^2 + (objectData.yPos - cameraData.yPos)^2 + (objectData.zPos - cameraData.zPos)^2);
-						--scaling_factor = (screen.width/2)/(distanceAnlongNormal*tan(viewport_YAngleRange/2)); --???
+						scaling_factor = reference_distance/objectData.zPos;
 
 						-- draw to screen
 						local color = 0xFFFFFFFF;
 						if object_index == i then
 							color = 0xFFFFFF00;
 						end
-						gui.drawLine(drawYPos-5, drawXPos, drawYPos+5, drawXPos, color);
-						gui.drawLine(drawYPos, drawXPos-5, drawYPos, drawXPos+5, color);
-						gui.drawText(drawYPos, drawXPos, string.format("%d",i), color);
+						gui.drawLine(drawXPos-scaling_factor*object_selectable_size/2, drawYPos, drawXPos+scaling_factor*object_selectable_size/2, drawYPos, color);
+						gui.drawLine(drawXPos, drawYPos-scaling_factor*object_selectable_size/2, drawXPos, drawYPos+scaling_factor*object_selectable_size/2, color);
+						gui.drawText(drawXPos, drawYPos, string.format("%d",i), color,nil,9+3*scaling_factor);
 					end
 				end
 			end
 		end
+		
+		
 	end
 end
 
