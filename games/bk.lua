@@ -1935,20 +1935,20 @@ function drawObjectPositions()
             };
             
             if objectData.zPos > 0 then
-				local XAngle_local = math.atan(objectData.yPos/objectData.zPos)*180/math.pi; --Horizontal Angle
-				local YAngle_local = math.atan(objectData.xPos/objectData.zPos)*180/math.pi; --Horizontal Angle
+				local XAngle_local = math.atan(objectData.yPos/objectData.zPos); --Horizontal Angle
+				local YAngle_local = math.atan(objectData.xPos/objectData.zPos); --Horizontal Angle
 				--don't need to compentate for tan since angle between
 
-				YAngle_local = ((YAngle_local + 180)%360)-180; --get angle between -180 and +180
-				XAngle_local = ((XAngle_local + 180)%360)-180;
+				YAngle_local = ((YAngle_local + math.pi)%(2*math.pi))-math.pi; --get angle between -180 and +180
+				XAngle_local = ((XAngle_local + math.pi)%(2*math.pi))-math.pi;
 
 				if YAngle_local <= (viewport_YAngleRange/2) and YAngle_local > (-viewport_XAngleRange/2) then
 					if XAngle_local <= (viewport_XAngleRange/2) and XAngle_local > (-viewport_YAngleRange/2) then
 						
 						--at this point object is selectable/draggable
 						
-						drawXPos = (screen.width/2)*math.sin(YAngle_local*math.pi/180)/math.sin(viewport_YAngleRange*math.pi/360) + screen.width/2;
-						drawYPos = -(screen.height/2)*math.sin(XAngle_local*math.pi/180)/math.sin(viewport_XAngleRange*math.pi/360) + screen.height/2;
+						drawXPos = (screen.width/2)*math.sin(YAngle_local)/math.sin(viewport_YAngleRange*math.pi/360) + screen.width/2;
+						drawYPos = -(screen.height/2)*math.sin(XAngle_local)/math.sin(viewport_XAngleRange*math.pi/360) + screen.height/2;
 						
 						--calc scaling factor -- current calc might be incorrect
 						scaling_factor = reference_distance/objectData.zPos;
