@@ -1857,9 +1857,9 @@ local viewport_XAngleRange = 45;
 local object_selectable_size = 10;
 local reference_distance = 2000;
 
---local mouseClickedLastFrame = false;
---local startDragPosition = {0,0};
---local draggedObjects = {};
+local mouseClickedLastFrame = false;
+local startDragPosition = {0,0};
+local draggedObjects = {};
 
 local screen = {
 	width = 640;
@@ -1872,7 +1872,25 @@ function drawObjectPositions()
 	--screen.width = client.bufferwidth() / client.getwindowsize();
 	--screen.height = client.bufferheight() / client.getwindowsize();	
 	
+	local draggableObject = {};
+	local startDrag = false;
+	local dragging = false;
+	local dragTransform = {0, 0};
 	local mouse = input.getmouse();
+	
+	if mouse.Left then --if mouse clicked object is being dragged
+		if not mouseClickedLastFrame then
+			startDrag = true;
+			startDragPosition = {mouse.X, mouse.Y};
+		end
+		mouseClickedLastFrame = true;
+		dragging = true;
+		dragTransform = {mouse.X - startDragPosition[1], mouse.Y - startDragPosition[2]};
+	else
+		draggedObjects = {};
+		mouseClickedLastFrame = false;
+		dragging = false;
+	end
 	
 	local objectArray = dereferencePointer(Game.Memory.object_array_pointer[version]);
 
@@ -1899,7 +1917,7 @@ function drawObjectPositions()
 			local drawYPos = 0;
 			local scaling_factor = 0;
             
-			local draggableObjects= {};
+			
 			
             --transform object point to point in coordinate system based on camera normal 
 			--rotation transform 1
@@ -1925,17 +1943,53 @@ function drawObjectPositions()
 				XAngle_local = ((XAngle_local + 180)%360)-180;
 
 				if YAngle_local <= (viewport_YAngleRange/2) and YAngle_local > (-viewport_XAngleRange/2) then
-					if XAngle_local <= (viewport_XAngleRange/2) and XAngle_local > (-viewport_YAngleRange/2) then					
+					if XAngle_local <= (viewport_XAngleRange/2) and XAngle_local > (-viewport_YAngleRange/2) then
+						
+						--at this point object is selectable/draggable
+						
 						drawXPos = (screen.width/2)*math.sin(YAngle_local*math.pi/180)/math.sin(viewport_YAngleRange*math.pi/360) + screen.width/2;
 						drawYPos = -(screen.height/2)*math.sin(XAngle_local*math.pi/180)/math.sin(viewport_XAngleRange*math.pi/360) + screen.height/2;
-
+						
 						--calc scaling factor -- current calc might be incorrect
 						scaling_factor = reference_distance/objectData.zPos;
+						
+	
+						if draggedObjects[1] ~= nil then
+							if i == draggedObjects[1][1] then
+								if dragging then
+									drawXPos = draggedObjects[1][2] + dragTransform[1];
+									drawYPos = draggedObjects[1][3] + dragTransform[2];
+									
+									-- transform screen-to-game coords
+									YAngle_local = math.asin(math.sin(viewport_YAngleRange*math.pi/360)*(2*drawXPos/screen.width - 1));
+									XAngle_local = math.asin(math.sin(viewport_XAngleRange*math.pi/360)*(1 - 2*drawYPos/screen.height));
+
+									objectData.yPos = objectData.zPos*math.tan(XAngle_local); --Horizontal Angle
+									objectData.xPos = objectData.zPos*math.tan(YAngle_local);
+
+									tempData.xPos = objectData.xPos;
+									tempData.yPos = math.cos(cameraData.xRot)*objectData.yPos + math.sin(cameraData.xRot)*objectData.zPos;
+									tempData.zPos = math.sin(cameraData.xRot)*objectData.yPos - math.cos(cameraData.xRot)*objectData.zPos;
+
+									xDifference = math.cos(cameraData.yRot)*tempData.xPos + math.sin(cameraData.yRot)*tempData.zPos;
+									yDifference = tempData.yPos;
+									zDifference = -math.sin(cameraData.yRot)*tempData.xPos + math.cos(cameraData.yRot)*tempData.zPos;
+
+									--saveToObjectPosition
+										mainmemory.writefloat(slotBase + 0x04, cameraData.xPos + xDifference, true); 
+									mainmemory.writefloat(slotBase + 0x08, cameraData.yPos + yDifference, true);
+									mainmemory.writefloat(slotBase + 0x0C, cameraData.zPos + zDifference, true);	
+								end
+							end
+						end
 						
 						-- draw to screen
 						local color = 0xFFFFFFFF;
 						if object_index == i then
 							color = 0xFFFFFF00;
+							if startDrag then
+								table.insert(draggedObjects, {i, drawXPos, drawYPos});
+							end
 						end
 						gui.drawLine(drawXPos-scaling_factor*object_selectable_size/2, drawYPos, drawXPos+scaling_factor*object_selectable_size/2, drawYPos, color);
 						gui.drawLine(drawXPos, drawYPos-scaling_factor*object_selectable_size/2, drawXPos, drawYPos+scaling_factor*object_selectable_size/2, color);
@@ -1944,6 +1998,7 @@ function drawObjectPositions()
 				end
 			end
 			
+			--object selecting
 			if mouse.Left then
 				if (mouse.X >= drawXPos-scaling_factor*object_selectable_size/2 and mouse.X <= drawXPos+scaling_factor*object_selectable_size/2) 
 					and (mouse.Y >= drawYPos-scaling_factor*object_selectable_size/2 and mouse.Y <= drawYPos+scaling_factor*object_selectable_size/2) then
