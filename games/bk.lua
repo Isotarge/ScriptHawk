@@ -1959,6 +1959,7 @@ function drawObjectPositions()
 								if dragging then
 									drawXPos = draggedObjects[1][2] + dragTransform[1];
 									drawYPos = draggedObjects[1][3] + dragTransform[2];
+									objectData.zPos = draggedObjects[1][4];
 									
 									-- transform screen-to-game coords
 									YAngle_local = math.asin(math.sin(viewport_YAngleRange*math.pi/360)*(2*drawXPos/screen.width - 1));
@@ -1988,7 +1989,7 @@ function drawObjectPositions()
 						if object_index == i then
 							color = 0xFFFFFF00;
 							if startDrag then
-								table.insert(draggedObjects, {i, drawXPos, drawYPos});
+								table.insert(draggedObjects, {i, drawXPos, drawYPos, objectData.zPos});
 							end
 						end
 						gui.drawLine(drawXPos-scaling_factor*object_selectable_size/2, drawYPos, drawXPos+scaling_factor*object_selectable_size/2, drawYPos, color);
