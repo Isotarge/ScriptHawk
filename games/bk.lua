@@ -546,6 +546,19 @@ function getSlotBase(index)
 	return slot_base + index * slot_size;
 end
 
+function getObjectModel1Pointers()
+	local pointers = {};
+	local objectArray = dereferencePointer(Game.Memory.object_array_pointer[version]);
+	if isRDRAM(objectArray) then
+		local num_slots = mainmemory.read_u32_be(objectArray);
+		for i = 0, num_slots - 1 do
+			table.insert(pointers, objectArray + getSlotBase(i)); -- TODO: Check for bone arrays before adding to table, we don't want to move stuff we can't see
+		end
+		table.sort(pointers);
+	end
+	return pointers;
+end
+
 function addressToSlot(address)
 	address = address or 0;
 	if not isRDRAM(address) then
@@ -563,6 +576,14 @@ function addressToSlot(address)
 		else
 			print("Address: "..toHexString(address).." is out of range of the object array.");
 		end
+	end
+end
+
+function setObjectModel1Position(pointer, x, y, z)
+	if isRDRAM(pointer) then
+		mainmemory.writefloat(pointer + 0x04, x, true);
+		mainmemory.writefloat(pointer + 0x08, y, true);
+		mainmemory.writefloat(pointer + 0x0C, z, true);
 	end
 end
 
@@ -1724,6 +1745,14 @@ function getStructData(pointer)
 	return structData;
 end
 
+function setStructPosition(pointer, x, y, z)
+	if isRDRAM(pointer) then
+		mainmemory.write_s16_be(pointer + 0x04, x);
+		mainmemory.write_s16_be(pointer + 0x06, y);
+		mainmemory.write_s16_be(pointer + 0x08, z);
+	end
+end
+
 --------------
 -- Analysis --
 --------------
@@ -1871,7 +1900,16 @@ function drawObjectPositions()
 	--screen.width = client.bufferwidth() / client.getwindowsize();
 	--screen.height = client.bufferheight() / client.getwindowsize();
 
-	local draggableObject = {};
+	local draggableObjects = {};
+	local objectModel;
+	if string.contains(script_mode, "Struct") then
+		objectModel = 2;
+		draggableObjects = getStructPointers();
+	else
+		objectModel = 1;
+		draggableObjects = getObjectModel1Pointers();
+	end
+
 	local startDrag = false;
 	local dragging = false;
 	local dragTransform = {0, 0};
@@ -1891,117 +1929,120 @@ function drawObjectPositions()
 		dragging = false;
 	end
 
-	local objectArray = dereferencePointer(Game.Memory.object_array_pointer[version]);
+	local cameraData = {
+		xPos = mainmemory.readfloat(Game.Memory.camera_x_position[version], true),
+		yPos = mainmemory.readfloat(Game.Memory.camera_y_position[version], true),
+		zPos = mainmemory.readfloat(Game.Memory.camera_z_position[version], true),
+		xRot = mainmemory.readfloat(Game.Memory.camera_x_rotation[version], true) * math.pi / 180,
+		yRot = mainmemory.readfloat(Game.Memory.camera_y_rotation[version], true) * math.pi / 180,
+	};
 
-	if isRDRAM(objectArray) then
-		local numSlots = math.min(max_slots, mainmemory.read_u32_be(objectArray));
+	for i = 1, #draggableObjects do
+		local slotBase = draggableObjects[i];
 
-		local cameraData = {
-			xPos = mainmemory.readfloat(Game.Memory.camera_x_position[version], true),
-			yPos = mainmemory.readfloat(Game.Memory.camera_y_position[version], true),
-			zPos = mainmemory.readfloat(Game.Memory.camera_z_position[version], true),
-			xRot = mainmemory.readfloat(Game.Memory.camera_x_rotation[version], true) * math.pi / 180,
-			yRot = mainmemory.readfloat(Game.Memory.camera_y_rotation[version], true) * math.pi / 180,
+		-- Translate origin to camera position
+		local xDifference, yDifference, zDifference;
+		if objectModel == 1 then
+			xDifference = mainmemory.readfloat(slotBase + 0x04, true) - cameraData.xPos;
+			yDifference = mainmemory.readfloat(slotBase + 0x08, true) - cameraData.yPos;
+			zDifference = mainmemory.readfloat(slotBase + 0x0C, true) - cameraData.zPos;
+		else
+			xDifference = mainmemory.read_u16_be(slotBase + 0x04) - cameraData.xPos;
+			yDifference = mainmemory.read_u16_be(slotBase + 0x06) - cameraData.yPos;
+			zDifference = mainmemory.read_u16_be(slotBase + 0x08) - cameraData.zPos;
+		end
+
+		local drawXPos = 0;
+		local drawYPos = 0;
+		local scaling_factor = 0;
+
+		-- Transform object point to point in coordinate system based on camera normal
+		-- Rotation transform 1
+		local tempData = {
+			xPos = math.cos(cameraData.yRot)*xDifference - math.sin(cameraData.yRot) * zDifference,
+			yPos = yDifference,
+			zPos = math.sin(cameraData.yRot)*xDifference + math.cos(cameraData.yRot) * zDifference,
 		};
 
-		for i = numSlots, object_top_index, -1 do
-			local slotBase = objectArray + getSlotBase(i);
+		-- Rotation transform 2
+		local objectData = {
+			xPos = tempData.xPos,
+			yPos = math.sin(cameraData.xRot) * tempData.zPos + math.cos(cameraData.xRot) * tempData.yPos,
+			zPos = -math.cos(cameraData.xRot) * tempData.zPos + math.sin(cameraData.xRot) * tempData.yPos,
+		};
 
-			-- Translate origin to camera position
-			local xDifference = (mainmemory.readfloat(slotBase + 0x04, true) - cameraData.xPos);
-			local yDifference = (mainmemory.readfloat(slotBase + 0x08, true) - cameraData.yPos);
-			local zDifference = (mainmemory.readfloat(slotBase + 0x0C, true) - cameraData.zPos);
+		if objectData.zPos > 0 then
+			local XAngle_local = math.atan(objectData.yPos / objectData.zPos); -- Horizontal Angle
+			local YAngle_local = math.atan(objectData.xPos / objectData.zPos); -- Horizontal Angle
+			-- Don't need to compentate for tan since angle between
 
-			local drawXPos = 0;
-			local drawYPos = 0;
-			local scaling_factor = 0;
+			YAngle_local = ((YAngle_local + math.pi) % (2 * math.pi)) - math.pi; -- Get angle between -180 and +180
+			XAngle_local = ((XAngle_local + math.pi) % (2 * math.pi)) - math.pi;
 
-			-- Transform object point to point in coordinate system based on camera normal
-			-- Rotation transform 1
-			local tempData = {
-				xPos = math.cos(cameraData.yRot)*xDifference - math.sin(cameraData.yRot) * zDifference,
-				yPos = yDifference,
-				zPos = math.sin(cameraData.yRot)*xDifference + math.cos(cameraData.yRot) * zDifference,
-			};
+			if YAngle_local <= (viewport_YAngleRange / 2) and YAngle_local > (-viewport_XAngleRange / 2) then
+				if XAngle_local <= (viewport_XAngleRange / 2) and XAngle_local > (-viewport_YAngleRange / 2) then
 
-			-- Rotation transform 2
-			local objectData = {
-				xPos = tempData.xPos,
-				yPos = math.sin(cameraData.xRot) * tempData.zPos + math.cos(cameraData.xRot) * tempData.yPos,
-				zPos = -math.cos(cameraData.xRot) * tempData.zPos + math.sin(cameraData.xRot) * tempData.yPos,
-			};
+					-- At this point object is selectable/draggable
+					drawXPos = (screen.width / 2) * math.sin(YAngle_local) / math.sin(viewport_YAngleRange * math.pi / 360) + screen.width / 2;
+					drawYPos = -(screen.height / 2) * math.sin(XAngle_local) / math.sin(viewport_XAngleRange * math.pi / 360) + screen.height / 2;
 
-			if objectData.zPos > 0 then
-				local XAngle_local = math.atan(objectData.yPos / objectData.zPos); -- Horizontal Angle
-				local YAngle_local = math.atan(objectData.xPos / objectData.zPos); -- Horizontal Angle
-				-- Don't need to compentate for tan since angle between
+					--calc scaling factor -- current calc might be incorrect
+					scaling_factor = reference_distance / objectData.zPos;
 
-				YAngle_local = ((YAngle_local + math.pi) % (2 * math.pi)) - math.pi; -- Get angle between -180 and +180
-				XAngle_local = ((XAngle_local + math.pi) % (2 * math.pi)) - math.pi;
+					if draggedObjects[1] ~= nil then
+						if i == draggedObjects[1][1] then
+							if dragging then
+								drawXPos = draggedObjects[1][2] + dragTransform[1];
+								drawYPos = draggedObjects[1][3] + dragTransform[2];
+								objectData.zPos = draggedObjects[1][4];
 
-				if YAngle_local <= (viewport_YAngleRange / 2) and YAngle_local > (-viewport_XAngleRange / 2) then
-					if XAngle_local <= (viewport_XAngleRange / 2) and XAngle_local > (-viewport_YAngleRange / 2) then
+								-- Transform screen-to-game coords
+								YAngle_local = math.asin(math.sin(viewport_YAngleRange * math.pi / 360) * (2 * drawXPos / screen.width - 1));
+								XAngle_local = math.asin(math.sin(viewport_XAngleRange * math.pi / 360) * (1 - 2 * drawYPos / screen.height));
 
-						-- At this point object is selectable/draggable
-						drawXPos = (screen.width / 2) * math.sin(YAngle_local) / math.sin(viewport_YAngleRange * math.pi / 360) + screen.width / 2;
-						drawYPos = -(screen.height / 2) * math.sin(XAngle_local) / math.sin(viewport_XAngleRange * math.pi / 360) + screen.height / 2;
+								objectData.yPos = objectData.zPos * math.tan(XAngle_local); -- Horizontal Angle
+								objectData.xPos = objectData.zPos * math.tan(YAngle_local);
 
-						--calc scaling factor -- current calc might be incorrect
-						scaling_factor = reference_distance / objectData.zPos;
+								tempData.xPos = objectData.xPos;
+								tempData.yPos = math.cos(cameraData.xRot)*objectData.yPos + math.sin(cameraData.xRot)*objectData.zPos;
+								tempData.zPos = math.sin(cameraData.xRot)*objectData.yPos - math.cos(cameraData.xRot)*objectData.zPos;
 
-						if draggedObjects[1] ~= nil then
-							if i == draggedObjects[1][1] then
-								if dragging then
-									drawXPos = draggedObjects[1][2] + dragTransform[1];
-									drawYPos = draggedObjects[1][3] + dragTransform[2];
-									objectData.zPos = draggedObjects[1][4];
+								xDifference = math.cos(cameraData.yRot)*tempData.xPos + math.sin(cameraData.yRot)*tempData.zPos;
+								yDifference = tempData.yPos;
+								zDifference = -math.sin(cameraData.yRot)*tempData.xPos + math.cos(cameraData.yRot)*tempData.zPos;
 
-									-- transform screen-to-game coords
-									YAngle_local = math.asin(math.sin(viewport_YAngleRange * math.pi / 360) * (2 * drawXPos / screen.width - 1));
-									XAngle_local = math.asin(math.sin(viewport_XAngleRange * math.pi / 360) * (1 - 2 * drawYPos / screen.height));
-
-									objectData.yPos = objectData.zPos*math.tan(XAngle_local); -- Horizontal Angle
-									objectData.xPos = objectData.zPos*math.tan(YAngle_local);
-
-									tempData.xPos = objectData.xPos;
-									tempData.yPos = math.cos(cameraData.xRot)*objectData.yPos + math.sin(cameraData.xRot)*objectData.zPos;
-									tempData.zPos = math.sin(cameraData.xRot)*objectData.yPos - math.cos(cameraData.xRot)*objectData.zPos;
-
-									xDifference = math.cos(cameraData.yRot)*tempData.xPos + math.sin(cameraData.yRot)*tempData.zPos;
-									yDifference = tempData.yPos;
-									zDifference = -math.sin(cameraData.yRot)*tempData.xPos + math.cos(cameraData.yRot)*tempData.zPos;
-
-									-- Save new object position to RDRAM
-									mainmemory.writefloat(slotBase + 0x04, cameraData.xPos + xDifference, true);
-									mainmemory.writefloat(slotBase + 0x08, cameraData.yPos + yDifference, true);
-									mainmemory.writefloat(slotBase + 0x0C, cameraData.zPos + zDifference, true);
+								-- Save new object position to RDRAM
+								if objectModel == 1 then
+									setObjectModel1Position(slotBase, cameraData.xPos + xDifference, cameraData.yPos + yDifference, cameraData.zPos + zDifference);
+								else
+									setStructPosition(slotBase, cameraData.xPos + xDifference, cameraData.yPos + yDifference, cameraData.zPos + zDifference);
 								end
 							end
 						end
-
-						-- Draw to screen
-						local color = 0xFFFFFFFF;
-						if object_index == i then
-							color = 0xFFFFFF00;
-							if startDrag then
-								table.insert(draggedObjects, {i, drawXPos, drawYPos, objectData.zPos});
-							end
-						end
-						gui.drawLine(drawXPos - scaling_factor * object_selectable_size / 2, drawYPos, drawXPos + scaling_factor * object_selectable_size / 2, drawYPos, color);
-						gui.drawLine(drawXPos, drawYPos - scaling_factor * object_selectable_size / 2, drawXPos, drawYPos + scaling_factor * object_selectable_size / 2, color);
-						gui.drawText(drawXPos, drawYPos, string.format("%d", i), color, nil, 9 + 3 * scaling_factor);
 					end
-				end
-			end
 
-			--object selecting
-			if mouse.Left then
-				if (mouse.X >= drawXPos - scaling_factor * object_selectable_size / 2 and mouse.X <= drawXPos + scaling_factor * object_selectable_size / 2) 
-					and (mouse.Y >= drawYPos - scaling_factor * object_selectable_size / 2 and mouse.Y <= drawYPos + scaling_factor * object_selectable_size / 2) then
-					object_index = i;
+					-- Draw to screen
+					local color = 0xFFFFFFFF;
+					if object_index == i then
+						color = 0xFFFFFF00;
+						if startDrag then
+							table.insert(draggedObjects, {i, drawXPos, drawYPos, objectData.zPos});
+						end
+					end
+					gui.drawLine(drawXPos - scaling_factor * object_selectable_size / 2, drawYPos, drawXPos + scaling_factor * object_selectable_size / 2, drawYPos, color);
+					gui.drawLine(drawXPos, drawYPos - scaling_factor * object_selectable_size / 2, drawXPos, drawYPos + scaling_factor * object_selectable_size / 2, color);
+					gui.drawText(drawXPos, drawYPos, string.format("%d", i), color, nil, 9 + 3 * scaling_factor);
 				end
 			end
-		end -- end for loop
+		end
+
+		-- Object selection
+		if mouse.Left then
+			if (mouse.X >= drawXPos - scaling_factor * object_selectable_size / 2 and mouse.X <= drawXPos + scaling_factor * object_selectable_size / 2) 
+				and (mouse.Y >= drawYPos - scaling_factor * object_selectable_size / 2 and mouse.Y <= drawYPos + scaling_factor * object_selectable_size / 2) then
+				object_index = i;
+			end
+		end
 	end
 end
 
@@ -2746,35 +2787,6 @@ radius = 1000;
 local slot_x_pos = 0x04; -- TODO: These are in slot_vars now
 local slot_y_pos = 0x08;
 local slot_z_pos = 0x0C;
-
-function getObjectModel1Pointers()
-	local pointers = {};
-	local objectArray = dereferencePointer(Game.Memory.object_array_pointer[version]);
-	if isRDRAM(objectArray) then
-		local num_slots = mainmemory.read_u32_be(objectArray);
-		for i = 0, num_slots - 1 do
-			table.insert(pointers, objectArray + getSlotBase(i)); -- TODO: Check for bone arrays before adding to table, we don't want to move stuff we can't see
-		end
-		table.sort(pointers);
-	end
-	return pointers;
-end
-
-function setStructPosition(pointer, x, y, z)
-	if isRDRAM(pointer) then
-		mainmemory.write_s16_be(pointer + 0x04, x);
-		mainmemory.write_s16_be(pointer + 0x06, y);
-		mainmemory.write_s16_be(pointer + 0x08, z);
-	end
-end
-
-function setObjectModel1Position(pointer, x, y, z)
-	if isRDRAM(pointer) then
-		mainmemory.writefloat(pointer + 0x04, x, true);
-		mainmemory.writefloat(pointer + 0x08, y, true);
-		mainmemory.writefloat(pointer + 0x0C, z, true);
-	end
-end
 
 local function encircle_banjo()
 	local current_banjo_x = Game.getXPosition();
