@@ -1947,9 +1947,9 @@ function drawObjectPositions()
 			yDifference = mainmemory.readfloat(slotBase + 0x08, true) - cameraData.yPos;
 			zDifference = mainmemory.readfloat(slotBase + 0x0C, true) - cameraData.zPos;
 		else
-			xDifference = mainmemory.read_u16_be(slotBase + 0x04) - cameraData.xPos;
-			yDifference = mainmemory.read_u16_be(slotBase + 0x06) - cameraData.yPos;
-			zDifference = mainmemory.read_u16_be(slotBase + 0x08) - cameraData.zPos;
+			xDifference = mainmemory.read_s16_be(slotBase + 0x04) - cameraData.xPos;
+			yDifference = mainmemory.read_s16_be(slotBase + 0x06) - cameraData.yPos;
+			zDifference = mainmemory.read_s16_be(slotBase + 0x08) - cameraData.zPos;
 		end
 
 		local drawXPos = 0;
