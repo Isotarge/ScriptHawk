@@ -120,6 +120,7 @@ SystemID N64
 74FF00	w	h	1	RDRAM	Tag Barrel (Kutout) Behavior
 74FF02	w	h	1	RDRAM	Tag Barrel (Kutout) Model
 7502E4	d	f	1	RDRAM	Orange Y Acceleration
+750402	w	h	1	RDRAM	Beaver Drop
 750AC0	b	u	1	RDRAM	Number of Players
 7530B0	w	u	1	RDRAM	DK Invulnerability Timer
 7530B2	w	u	1	RDRAM	Diddy Invulnerability Timer

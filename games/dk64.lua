@@ -554,7 +554,7 @@ local max_oranges        = 20;
 local max_musical_energy = 10;
 
 local max_blueprints = 40;
-local max_cb = 3512; -- 3500 in levels, 10 in test room balloon, 2 out of bounds in Japes
+local max_cb = 3513; -- 3500 in levels, 10 in test room balloon, 2 out of bounds in Japes, 1 out of bounds in Galleon
 local max_crowns = 10;
 local max_fairies = 20;
 local max_gb = 201;
@@ -761,6 +761,7 @@ obj_model1 = {
 		[121] = "Crystal Coconut", -- Unused? Doesn't seem to work, these are normally model 2
 		[122] = "DK Coin", -- Unused? Doesn't seem to work, these are normally model 2
 		[124] = "Peril Path Panic Controller?", -- TODO: Verify, used anywhere else?
+		[125] = "Krazy Kong Klamour Kontroller?",
 		[126] = "Fly Swatter",
 		[128] = "Headphones",
 		[129] = "Enguarde Box",
@@ -845,6 +846,7 @@ obj_model1 = {
 		[243] = "Kasplat (Lanky)",
 		[244] = "Kasplat (Tiny)",
 		[245] = "Kasplat (Chunky)",
+		[246] = "Mechanical Fish",
 		[247] = "Seal",
 		[248] = "Banana Fairy",
 		[249] = "Squawks with spotlight",
@@ -896,6 +898,7 @@ obj_model1 = {
 		[323] = "Enemy Car", -- Car Race, aka George
 		[325] = "Shockwave", -- Simian Slam
 		[326] = "Main Menu Controller",
+		[327] = "Kong (Krazy Kong Klamour)",
 		[328] = "Klaptrap", -- Peril Path Panic
 		[329] = "Fairy", -- Peril Path Panic
 		[330] = "Bug", -- Big Bug Bash
@@ -1494,7 +1497,7 @@ obj_model2 = {
 		[0x54] = "-",
 		[0x55] = "-",
 		[0x56] = "Orange",
-		[0x57] = "Watermellon Slice",
+		[0x57] = "Watermelon Slice",
 		[0x58] = "Tree", -- Unused?
 		[0x59] = "Tree", -- Unused
 		[0x5A] = "Tree",
@@ -2554,6 +2557,8 @@ function dumpSetup(hideKnown)
 			end
 		end
 		print_deferred();
+	else
+		print("Couldn't find setup file in RDRAM :(");
 	end
 end
 
@@ -2893,13 +2898,16 @@ function adjustBlockSize(value)
 	checkFlags();
 end
 
-function isFound(byte, bit)
+function getFlag(byte, bit)
 	for i = 1, #flag_array do
 		if byte == flag_array[i]["byte"] and bit == flag_array[i]["bit"] then
-			return true;
+			return flag_array[i];
 		end
 	end
-	return false;
+end
+
+function isFound(byte, bit)
+	return getFlag(byte, bit) ~= nil;
 end
 
 local function getFlagByName(flagName)
@@ -2939,13 +2947,18 @@ function checkFlags(showKnown)
 							dprint("{[\"byte\"] = "..toHexString(i, 2)..", [\"bit\"] = "..bit..", [\"name\"] = \"Name\", [\"type\"] = \"Type\", [\"map\"] = "..map_value.."},");
 						else
 							if showKnown then
-								dprint("Flag "..toHexString(i, 2)..">"..bit..": \""..getFlagName(i, bit).."\" was set.");
+								local currentFlag = getFlag(i, bit);
+								if currentFlag.map ~= nil then
+									dprint("Flag "..toHexString(i, 2)..">"..bit..": \""..getFlagName(i, bit).."\" was set");
+								else
+									dprint("Flag "..toHexString(i, 2)..">"..bit..": \""..getFlagName(i, bit).."\" was set ADD MAP "..map_value.." PLEASE");
+								end
 							end
 							knownFlagsFound = knownFlagsFound + 1;
 						end
 					elseif not isSetNow and wasSet then
 						if showKnown then
-							dprint("Flag "..toHexString(i, 2)..">"..bit..": \""..getFlagName(i, bit).."\" was cleared.");
+							dprint("Flag "..toHexString(i, 2)..">"..bit..": \""..getFlagName(i, bit).."\" was cleared");
 						end
 					end
 				end
@@ -2956,10 +2969,10 @@ function checkFlags(showKnown)
 		end
 		if not showKnown then
 			if knownFlagsFound > 0 then
-				dprint(knownFlagsFound.." Known flags skipped.")
+				dprint(knownFlagsFound.." Known flags skipped")
 			end
 			if not flagFound then
-				dprint("No unknown flags were changed.")
+				dprint("No unknown flags were changed")
 			end
 		end
 	else
@@ -2967,7 +2980,7 @@ function checkFlags(showKnown)
 		for i = 0, flag_block_size do
 			flag_block_cache[i] = mainmemory.readbyte(flags + i);
 		end
-		dprint("Populated flag block cache.")
+		dprint("Populated flag block cache")
 	end
 	print_deferred();
 end
@@ -6065,7 +6078,8 @@ function Game.eachFrame()
 	if isRDRAM(enemyRespawnObject) then
 		local numberOfEnemies = mainmemory.read_u16_be(Game.Memory.num_enemies[version]);
 		for i = 1, numberOfEnemies do
-			mainmemory.write_u16_be(enemyRespawnObject + (i - 1) * 0x48 + 0x24, 1); -- Force respawn
+			mainmemory.writebyte(enemyRespawnObject + (i - 1) * 0x48 + 0x00, 0x15); -- Force Lanky
+			--mainmemory.write_u16_be(enemyRespawnObject + (i - 1) * 0x48 + 0x24, 1); -- Force respawn
 			--mainmemory.writefloat(enemyRespawnObject + (i - 1) * 0x48 + 0x2C, testfloatvalue, true);
 			--mainmemory.writefloat(enemyRespawnObject + (i - 1) * 0x48 + 0x30, testfloatvalue, true);
 			--mainmemory.writefloat(enemyRespawnObject + (i - 1) * 0x48 + 0x34, testfloatvalue, true);
