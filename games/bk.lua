@@ -260,6 +260,12 @@ Game.Memory = {
 	["camera_z_position"] = {0x37E56C, 0x37E69C, 0x37CD9C, 0x37D960},
 	["camera_x_rotation"] = {0x37E574, 0x37E6A4, 0x37CDA4, 0x37D968},
 	["camera_y_rotation"] = {0x37E578, 0x37E6A8, 0x37CDA8, 0x37D96C},
+	["first_person_flag"] = {0x37CBB0, 0, 0, 0x37C1E7}, --Mittenz: I need to get a JP and v1.1 rom
+	["first_person_cam_x_pos"] = {0x37E630, 0, 0, 0x37DC60},
+	["first_person_cam_y_pos"] = {0x37E634, 0, 0, 0x37DC64},
+	["first_person_cam_z_pos"] = {0x37E638, 0, 0, 0x37DC68},
+	["first_person_cam_x_rot"] = {0x37E63C, 0, 0, 0x37DC6C},
+	["first_person_cam_y_rot"] = {0x37E640, 0, 0, 0x37DC70},
 	["previous_movement_state"] = {0x37DB30, 0x37DC60, 0x37C360, 0x37D160},
 	["current_movement_state"] = {0x37DB34, 0x37DC64, 0x37C364, 0x37D164},
 	["map"] = {0x37F2C5, 0x37F405, 0x37DAF5, 0x37E8F5},
@@ -1929,14 +1935,24 @@ function drawObjectPositions()
 		dragging = false;
 	end
 
-	local cameraData = {
-		xPos = mainmemory.readfloat(Game.Memory.camera_x_position[version], true),
-		yPos = mainmemory.readfloat(Game.Memory.camera_y_position[version], true),
-		zPos = mainmemory.readfloat(Game.Memory.camera_z_position[version], true),
-		xRot = mainmemory.readfloat(Game.Memory.camera_x_rotation[version], true) * math.pi / 180,
-		yRot = mainmemory.readfloat(Game.Memory.camera_y_rotation[version], true) * math.pi / 180,
-	};
-
+	local cameraData = {};
+	if(mainmemory.readbyte(Game.Memory.first_person_flag[version]) ~= 0) then
+		cameraData = {--in first person
+			xPos = mainmemory.readfloat(Game.Memory.first_person_cam_x_pos[version], true),
+			yPos = mainmemory.readfloat(Game.Memory.first_person_cam_y_pos[version], true),
+			zPos = mainmemory.readfloat(Game.Memory.first_person_cam_z_pos[version], true),
+			xRot = mainmemory.readfloat(Game.Memory.first_person_cam_x_rot[version], true) * math.pi / 180,
+			yRot = mainmemory.readfloat(Game.Memory.first_person_cam_y_rot[version], true) * math.pi / 180,
+		};
+	else
+		cameraData = {--not first person
+			xPos = mainmemory.readfloat(Game.Memory.camera_x_position[version], true),
+			yPos = mainmemory.readfloat(Game.Memory.camera_y_position[version], true),
+			zPos = mainmemory.readfloat(Game.Memory.camera_z_position[version], true),
+			xRot = mainmemory.readfloat(Game.Memory.camera_x_rotation[version], true) * math.pi / 180,
+			yRot = mainmemory.readfloat(Game.Memory.camera_y_rotation[version], true) * math.pi / 180,
+		};
+	end
 	for i = 1, #draggableObjects do
 		local slotBase = draggableObjects[i];
 
