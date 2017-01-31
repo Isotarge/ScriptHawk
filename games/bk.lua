@@ -560,7 +560,7 @@ function getObjectModel1Pointers()
 		for i = 0, num_slots - 1 do
 			table.insert(pointers, objectArray + getSlotBase(i)); -- TODO: Check for bone arrays before adding to table, we don't want to move stuff we can't see
 		end
-		table.sort(pointers);
+		--table.sort(pointers); -- I don't think we need to sort them since getSlotBase isn't reading anything
 	end
 	return pointers;
 end
@@ -2109,7 +2109,7 @@ function zipToSelectedObject()
 	if script_mode == "Examine" or script_mode == "List" then -- Model 1
 		local objectArray = dereferencePointer(Game.Memory.object_array_pointer[version]);
 		if isRDRAM(objectArray) then
-			local slotBase = objectArray + getSlotBase(object_index);
+			local slotBase = objectArray + getSlotBase(object_index - 1);
 
 			local x = mainmemory.readfloat(slotBase + 0x04, true); -- TODO: Get these constants from somewhere
 			local y = mainmemory.readfloat(slotBase + 0x08, true);
@@ -2264,7 +2264,6 @@ function Game.drawUI()
 	row = row + 1;
 
 	drawObjectPositions();
-
 	
 	if script_mode == "Examine" and isRDRAM(objectArray) then
 		local examine_data = getExamineData(objectArray + getSlotBase(object_index));
@@ -2291,8 +2290,8 @@ function Game.drawUI()
 	end
 
 	if script_mode == "List" and isRDRAM(objectArray) then
-		for i = math.min(numSlots, object_top_index+object_max_slots), object_top_index, -1 do
-			local currentSlotBase = objectArray + getSlotBase(i);
+		for i = math.min(numSlots, object_top_index + object_max_slots), object_top_index, -1 do
+			local currentSlotBase = objectArray + getSlotBase(i - 1);
 
 			local animationType = "Unknown";
 			local objectIDPointer = dereferencePointer(currentSlotBase + 0x12C);
@@ -2325,7 +2324,7 @@ function Game.drawUI()
 	end
 
 	if script_mode == "List Struct" then
-		for i = math.min(#structPointers, object_top_index+object_max_slots), object_top_index, -1 do
+		for i = math.min(#structPointers, object_top_index + object_max_slots), object_top_index, -1 do
 			local structName = getStructName(structPointers[i]).." - ";
 			if object_index == i then
 				local x = mainmemory.read_s16_be(structPointers[i] + 0x04); -- TODO: Get these constants from somewhere
@@ -2337,7 +2336,6 @@ function Game.drawUI()
 				gui.text(Game.OSDPosition[1], 2 + Game.OSDRowHeight * row, structName..i..": "..toHexString(structPointers[i]), color, 'bottomright');
 				row = row + 1;
 			end
-
 		end
 	end
 end
