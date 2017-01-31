@@ -2944,7 +2944,7 @@ function checkFlags(showKnown)
 					if isSetNow and not wasSet then
 						if not isFound(i, bit) then
 							flagFound = true;
-							dprint("{[\"byte\"] = "..toHexString(i, 2)..", [\"bit\"] = "..bit..", [\"name\"] = \"Name\", [\"type\"] = \"Type\", [\"map\"] = "..map_value.."},");
+							dprint("{byte="..toHexString(i, 2)..", bit="..bit..", name=\"Name\", type=\"Type\", map="..map_value.."},");
 						else
 							if showKnown then
 								local currentFlag = getFlag(i, bit);
