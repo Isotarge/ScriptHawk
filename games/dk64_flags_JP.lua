@@ -1,4 +1,4 @@
-local flag_array = {
+return {
 	{byte=0x00, bit=0, name="Japes: First Gate Opened"},
 	{byte=0x00, bit=1, name="Japes: Mad Maze Maul GB", type="Bunch"},
 	{byte=0x00, bit=2, name="Japes: Splish Splash Salvage GB", type="GB"},
@@ -147,7 +147,7 @@ local flag_array = {
 	{byte=0x29, bit=2, name="Castle: Warp 2 (Base)", type="Warp"},
 	{byte=0x29, bit=3, name="Castle: Warp 2 (Upper)", type="Warp"},
 	{byte=0x29, bit=4, name="Castle: Warp 3 (Base)", type="Warp"},
-	{byte=0x29, bit=4, name="Castle: Warp 3 (Upper)", type="Warp"},
+	{byte=0x29, bit=5, name="Castle: Warp 3 (Upper)", type="Warp"},
 	{byte=0x29, bit=6, name="Castle: Warp 4 (Base)", type="Warp"},
 	{byte=0x29, bit=7, name="Castle: Warp 4 (Upper)", type="Warp"},
 
@@ -701,5 +701,3 @@ local flag_array = {
 
 	{byte=0x101, bit=2, name="Caves: Warp 1 Bunch (Base)", type="Bunch"},
 };
-
-return flag_array;

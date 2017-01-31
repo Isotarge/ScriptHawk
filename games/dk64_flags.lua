@@ -126,9 +126,9 @@ return {
 
 	{byte=0x0E, bit=0, name="Factory: DK GB: Power shed", type="GB", map=29},
 	{byte=0x0E, bit=1, name="Factory: Diddy GB: Production Room", type="GB", map=26},
-	{byte=0x0E, bit=4, name="Factory: Tiny GB: Production Room", type="GB", map=26},
 	{byte=0x0E, bit=2, name="Factory: Chunky GB: Production Room", type="GB", map=26},
 	{byte=0x0E, bit=3, name="Factory: Lanky GB: Production Room", type="GB", map=26},
+	{byte=0x0E, bit=4, name="Factory: Tiny GB: Production Room", type="GB", map=26},
 	{byte=0x0E, bit=5, name="Kong Unlocked: Chunky", type="Kong"},
 	{byte=0x0E, bit=6, name="Factory: Lanky GB: Free Chunky", type="GB", map=26},
 	{byte=0x0E, bit=7, name="Factory: Dark Room Gate", map=26},
@@ -196,6 +196,7 @@ return {
 	{byte=0x15, bit=6, name="Galleon: W3: Cranky", type="Warp", map=30},
 	{byte=0x15, bit=7, name="Galleon: W4: Seal Race", type="Warp", map=30},
 
+	-- 0x16 > 0
 	{byte=0x16, bit=1, name="Galleon: W1: Lighthouse", type="Warp", map=30},
 	{byte=0x16, bit=2, name="Galleon: W1: Cranky", type="Warp", map=30},
 	{byte=0x16, bit=3, name="Galleon: Chunky Chest Broken (Headphones)", map=30},
@@ -302,6 +303,8 @@ return {
 	{byte=0x21, bit=6, name="Caves: Chunky GB: Chunky Igloo", type="GB", map=72},
 	{byte=0x21, bit=7, name="Caves: Lanky GB: Ice Tomato", type="GB"},
 
+	-- 0x22 > 0
+	-- 0x22 > 1
 	{byte=0x22, bit=2, name="Caves: Diddy GB: 5DI", type="GB"},
 	{byte=0x22, bit=3, name="Caves: DK GB: 5DI", type="GB"},
 	{byte=0x22, bit=4, name="Caves: DK GB: Rotating Room", type="GB"},
@@ -683,8 +686,8 @@ return {
 	{byte=0x4D, bit=0, name="Caves: Crown", type="Crown", map=160},
 	{byte=0x4D, bit=1, name="Castle: Crown", type="Crown", map=161},
 	{byte=0x4D, bit=2, name="Helm: Crown", type="Crown", map=162},
-	{byte=0x4D, bit=4, name="Japes: Diddy CB: Inside Mountain Balloon", type="Balloon", map=4},
 	{byte=0x4D, bit=3, name="Test Room: DK CB: Balloon", type="Balloon", map=0},
+	{byte=0x4D, bit=4, name="Japes: Diddy CB: Inside Mountain Balloon", type="Balloon", map=4},
 	{byte=0x4D, bit=5, name="Japes: Rainbow Coin (Slope by painting Room)", type="Rainbow Coin", map=7},
 	{byte=0x4D, bit=6, name="Japes: Diddy CB: Balloon in Cave", type="Balloon", map=7},
 	{byte=0x4D, bit=7, name="Japes: DK CB: Balloon by Snide", type="Balloon", map=7},
@@ -819,7 +822,40 @@ return {
 	{byte=0x5C, bit=1, name="Castle: Diddy CB: Crypt Balloon", type="Balloon", map=183},
 	{byte=0x5C, bit=2, name="Castle: Tiny CB: Funky Balloon", type="Balloon", map=183},
 	{byte=0x5C, bit=3, name="Castle Lobby: Rainbow Coin", type="Rainbow Coin", map=193},
+	-- 0x5C > 4
+	-- 0x5C > 5
+	-- 0x5C > 6
+	-- 0x5C > 7
 
+	-- 0x5D > 0
+	-- 0x5D > 1
+	-- 0x5D > 2
+	-- 0x5D > 3
+	-- 0x5D > 4
+	-- 0x5D > 5
+	-- 0x5D > 6
+	-- 0x5D > 7
+
+	-- 0x5E > 0
+	-- 0x5E > 1
+	-- 0x5E > 2
+	-- 0x5E > 3
+	-- 0x5E > 4
+	-- 0x5E > 5
+	-- 0x5E > 6
+	-- 0x5E > 7
+
+	-- 0x5F > 0
+	-- 0x5F > 1
+	-- 0x5F > 2
+	-- 0x5F > 3
+	-- 0x5F > 4
+	-- 0x5F > 5
+	-- 0x5F > 6
+	-- 0x5F > 7
+
+	-- 0x60 > 0
+	-- 0x60 > 1
 	{byte=0x60, bit=2, name="Helm: BoM off", map=17},
 	{byte=0x60, bit=3, name="Helm: Key 8 Door Open", map=17},
 	{byte=0x60, bit=4, name="Helm: Crown Door Open", map=17},
@@ -840,6 +876,19 @@ return {
 	{byte=0x62, bit=1, name="T&S FTT", type="FTT", map=42},
 	{byte=0x62, bit=2, name="Helm: FTT", type="FTT", map=17},
 	{byte=0x62, bit=3, name="Aztec: FTT", type="FTT", map=38},
+	-- 0x62 > 4
+	-- 0x62 > 5
+	-- 0x62 > 6
+	-- 0x62 > 7
+
+	-- 0x63 > 0
+	-- 0x63 > 1
+	-- 0x63 > 2
+	-- 0x63 > 3
+	-- 0x63 > 4
+	-- 0x63 > 5
+	-- 0x63 > 6
+	-- 0x63 > 7
 
 	{byte=0x64, bit=0, name="Japes: Chunky Coin: By Portal (1)", type="Coin", map=7},
 	{byte=0x64, bit=1, name="Japes: Chunky Coin: In Water (1)", type="Coin", map=7},

@@ -3032,6 +3032,33 @@ function checkDuplicateFlagNames()
 	end
 end
 
+function checkFlagOrder()
+	local previousByte = 0x00;
+	local previousBit = 0;
+	local invalidCount = 0;
+
+	for i = 1, #flag_array do
+		local flag = flag_array[i];
+		if flag.byte == previousByte and flag.bit > previousBit then
+			-- All good
+		elseif flag.byte == previousByte + 1 and flag.bit == 0 then
+			-- All good
+		else
+			-- No bueno
+			invalidCount = invalidCount + 1;
+			dprint("Flag "..toHexString(flag.byte, 2)..">"..flag.bit.." may be out of order...");
+		end
+		previousByte = flag.byte;
+		previousBit = flag.bit;
+	end
+
+	if invalidCount > 0 then
+		print_deferred();
+	else
+		print("All good!");
+	end
+end
+
 ------------------------
 -- Set flag functions --
 ------------------------
