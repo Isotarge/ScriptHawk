@@ -3286,21 +3286,23 @@ function flagStats(verbose)
 		if flagType == nil then
 			untypedFlags = untypedFlags + 1;
 			if verbose then
-				dprint("Warning: Flag without type at "..toHexString(flag["byte"])..">"..flag["bit"].." with name: \""..name.."\"");
+				dprint("Warning: Flag without type at "..toHexString(flag["byte"], 2)..">"..flag["bit"].." with name: \""..name.."\"");
 			end
 		else
-			if flagType == "B. Locker" or flagType == "Cutscene" or flagType == "FTT" or flagType == "Key" or flagType == "Kong" or flagType == "T&S" or flagType == "Unknown" then
+			if flagType == "B. Locker" or flagType == "Cutscene" or flagType == "FTT" or flagType == "Key" or flagType == "Kong" or flagType == "Physical" or flagType == "T&S" or flagType == "Unknown" then
 				validType = true;
 			end
 			if not validType then
 				flagsWithUnknownType = flagsWithUnknownType + 1;
 				if verbose then
-					dprint("Warning: Flag with unknown type at "..toHexString(flag["byte"])..">"..flag["bit"].." with name: \""..name.."\"".." and type: \""..flagType.."\"");
+					dprint("Warning: Flag with unknown type at "..toHexString(flag["byte"], 2)..">"..flag["bit"].." with name: \""..name.."\"".." and type: \""..flagType.."\"");
 				end
 			end
 		end
-		if flag["map"] ~= nil then
+		if flag["map"] ~= nil or flag["nomap"] == true then
 			flagsWithMap = flagsWithMap + 1;
+		elseif verbose then
+			dprint("Warning: Flag without map tag at "..toHexString(flag["byte"], 2)..">"..flag["bit"].." with name: \""..name.."\"");
 		end
 	end
 
