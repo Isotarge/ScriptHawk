@@ -2845,7 +2845,9 @@ function Game.detectVersion(romName, romHash)
 	-- Fill the flag names
 	if #flag_array > 0 then
 		for i = 1, #flag_array do
-			flag_names[i] = flag_array[i]["name"];
+			if not flag_array[i].ignore then
+				flag_names[i] = flag_array[i].name;
+			end
 		end
 	else
 		print("Warning: No flags found");
@@ -2900,7 +2902,7 @@ end
 
 function getFlag(byte, bit)
 	for i = 1, #flag_array do
-		if byte == flag_array[i]["byte"] and bit == flag_array[i]["bit"] then
+		if byte == flag_array[i].byte and bit == flag_array[i].bit then
 			return flag_array[i];
 		end
 	end
@@ -2912,7 +2914,7 @@ end
 
 local function getFlagByName(flagName)
 	for i = 1, #flag_array do
-		if flagName == flag_array[i]["name"] then
+		if not flag_array[i].ignore and flagName == flag_array[i].name then
 			return flag_array[i];
 		end
 	end
@@ -2920,8 +2922,8 @@ end
 
 local function getFlagName(byte, bit)
 	for i = 1, #flag_array do
-		if byte == flag_array[i]["byte"] and bit == flag_array[i]["bit"] then
-			return flag_array[i]["name"];
+		if byte == flag_array[i].byte and bit == flag_array[i].bit and not flag_array[i].ignore then
+			return flag_array[i].name;
 		end
 	end
 	return "Unknown at "..toHexString(byte)..">"..bit;
@@ -2948,17 +2950,22 @@ function checkFlags(showKnown)
 						else
 							if showKnown then
 								local currentFlag = getFlag(i, bit);
-								if currentFlag.map ~= nil then
-									dprint("Flag "..toHexString(i, 2)..">"..bit..": \""..getFlagName(i, bit).."\" was set");
-								else
-									dprint("Flag "..toHexString(i, 2)..">"..bit..": \""..getFlagName(i, bit).."\" was set ADD MAP "..map_value.." PLEASE");
+								if not currentFlag.ignore then
+									if currentFlag.map ~= nil or currentFlag.nomap == true then
+										dprint("Flag "..toHexString(i, 2)..">"..bit..": \""..getFlagName(i, bit).."\" was set");
+									else
+										dprint("Flag "..toHexString(i, 2)..">"..bit..": \""..getFlagName(i, bit).."\" was set ADD MAP "..map_value.." PLEASE");
+									end
 								end
 							end
 							knownFlagsFound = knownFlagsFound + 1;
 						end
 					elseif not isSetNow and wasSet then
 						if showKnown then
-							dprint("Flag "..toHexString(i, 2)..">"..bit..": \""..getFlagName(i, bit).."\" was cleared");
+							local currentFlag = getFlag(i, bit);
+							if not currentFlag.ignore then
+								dprint("Flag "..toHexString(i, 2)..">"..bit..": \""..getFlagName(i, bit).."\" was cleared");
+							end
 						end
 					end
 				end
@@ -3014,7 +3021,7 @@ local function checkDuplicatedName(flagName)
 	local count = 0;
 	local flags = {};
 	for i = 1, #flag_array do
-		if flagName == flag_array[i]["name"] then
+		if flagName == flag_array[i].name and not flag_array[i].ignore then
 			count = count + 1;
 			table.insert(flags, flag_array[i]);
 		end
@@ -3026,13 +3033,13 @@ local function checkDuplicatedName(flagName)
 	end
 end
 
-function checkDuplicateFlagNames()
+function checkDuplicateFlagNames() -- TODO: Add this to flagStats(true) output
 	for i = 1, #flag_array do
 		checkDuplicatedName(flag_array[i]["name"]);
 	end
 end
 
-function checkFlagOrder()
+function checkFlagOrder() -- TODO: Add this to flagStats(true) output
 	local previousByte = 0x00;
 	local previousBit = 0;
 	local invalidCount = 0;
@@ -3299,7 +3306,7 @@ function flagStats(verbose)
 				end
 			end
 		end
-		if flag["map"] ~= nil or flag["nomap"] == true then
+		if flag.map ~= nil or flag.nomap == true then
 			flagsWithMap = flagsWithMap + 1;
 		elseif verbose then
 			dprint("Warning: Flag without map tag at "..toHexString(flag["byte"], 2)..">"..flag["bit"].." with name: \""..name.."\"");
