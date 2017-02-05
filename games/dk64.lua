@@ -2894,12 +2894,6 @@ function clearFlagCache()
 end
 event.onloadstate(clearFlagCache, "ScriptHawk - Clear Flag Cache");
 
-function adjustBlockSize(value)
-	flag_block_cache = {};
-	flag_block_size = value;
-	checkFlags();
-end
-
 function getFlag(byte, bit)
 	for i = 1, #flag_array do
 		if byte == flag_array[i].byte and bit == flag_array[i].bit then
@@ -2961,9 +2955,11 @@ function checkFlags(showKnown)
 							knownFlagsFound = knownFlagsFound + 1;
 						end
 					elseif not isSetNow and wasSet then
-						if showKnown then
+						if not isFound(i, bit) then
+							dprint("Flag "..toHexString(i, 2)..">"..bit..": \"Unknown\" was cleared");
+						elseif showKnown then
 							local currentFlag = getFlag(i, bit);
-							if not currentFlag.ignore then
+							if type(currentFlag) == "table" and not currentFlag.ignore then
 								dprint("Flag "..toHexString(i, 2)..">"..bit..": \""..getFlagName(i, bit).."\" was cleared");
 							end
 						end
@@ -2976,10 +2972,10 @@ function checkFlags(showKnown)
 		end
 		if not showKnown then
 			if knownFlagsFound > 0 then
-				dprint(knownFlagsFound.." Known flags skipped")
+				dprint(knownFlagsFound.." Known flags skipped");
 			end
 			if not flagFound then
-				dprint("No unknown flags were changed")
+				dprint("No unknown flags were changed");
 			end
 		end
 	else
@@ -2987,7 +2983,7 @@ function checkFlags(showKnown)
 		for i = 0, flag_block_size do
 			flag_block_cache[i] = mainmemory.readbyte(flags + i);
 		end
-		dprint("Populated flag block cache")
+		dprint("Populated flag block cache");
 	end
 	print_deferred();
 end
@@ -2996,8 +2992,8 @@ function checkFlag(byte, bit)
 	if type(byte) == "string" then
 		local flag = getFlagByName(byte);
 		if type(flag) == "table" then
-			byte = flag["byte"];
-			bit = flag["bit"];
+			byte = flag.byte;
+			bit = flag.bit;
 		end
 	end
 	if type(byte) == "number" and type(bit) == "number" and bit >= 0 and bit < 8 then
@@ -3028,7 +3024,7 @@ local function checkDuplicatedName(flagName)
 	end
 	if #flags > 1 then
 		for i = 1, #flags do
-			print("Warning: Duplicate flag name found for '"..flags[i]["name"].."' at "..toHexString(flags[i]["byte"])..">"..flags[i]["bit"]);
+			print("Warning: Duplicate flag name found for '"..flags[i]["name"].."' at "..toHexString(flags[i].byte)..">"..flags[i].bit);
 		end
 	end
 end
@@ -3088,7 +3084,7 @@ end
 function setFlagByName(name)
 	local flag = getFlagByName(name);
 	if type(flag) == "table" then
-		setFlag(flag["byte"], flag["bit"]);
+		setFlag(flag.byte, flag.bit);
 	end
 end
 
@@ -3097,7 +3093,7 @@ function setFlagsByType(_type)
 		local numSet = 0;
 		for i = 1, #flag_array do
 			if flag_array[i]["type"] == _type then
-				setFlag(flag_array[i]["byte"], flag_array[i]["bit"], true);
+				setFlag(flag_array[i].byte, flag_array[i].bit, true);
 				numSet = numSet + 1;
 			end
 		end
@@ -3112,8 +3108,8 @@ end
 function setFlagsByMap(mapIndex)
 	for i = 1, #flag_array do
 		local flag = flag_array[i];
-		if flag["map"] == mapIndex then
-			setFlag(flag["byte"], flag["bit"], true);
+		if not flag.nomap and flag.map == mapIndex then
+			setFlag(flag.byte, flag.bit, true);
 		end
 	end
 end
@@ -3121,8 +3117,8 @@ end
 function setKnownFlags()
 	for i = 1, #flag_array do
 		local flag = flag_array[i];
-		if flag["type"] ~= "Unknown" then
-			setFlag(flag["byte"], flag["bit"], true);
+		if flag.type ~= "Unknown" then
+			setFlag(flag.byte, flag.bit, true);
 		end
 	end
 end
@@ -3157,7 +3153,7 @@ end
 function clearFlagByName(name)
 	local flag = getFlagByName(name);
 	if type(flag) == "table" then
-		clearFlag(flag["byte"], flag["bit"]);
+		clearFlag(flag.byte, flag.bit);
 	end
 end
 
@@ -3166,7 +3162,7 @@ function clearFlagsByType(_type)
 		local numCleared = 0;
 		for i = 1, #flag_array do
 			if flag_array[i]["type"] == _type then
-				clearFlag(flag_array[i]["byte"], flag_array[i]["bit"], true);
+				clearFlag(flag_array[i].byte, flag_array[i].bit, true);
 				numCleared = numCleared + 1;
 			end
 		end
@@ -3181,8 +3177,8 @@ end
 function clearFlagsByMap(mapIndex)
 	for i = 1, #flag_array do
 		local flag = flag_array[i];
-		if flag["map"] == mapIndex then
-			clearFlag(flag["byte"], flag["bit"], true);
+		if not flag.nomap and flag.map == mapIndex then
+			clearFlag(flag.byte, flag.bit, true);
 		end
 	end
 end
@@ -3191,7 +3187,7 @@ function clearKnownFlags()
 	for i = 1, #flag_array do
 		local flag = flag_array[i];
 		if flag["type"] ~= "Unknown" then
-			clearFlag(flag["byte"], flag["bit"], true);
+			clearFlag(flag.byte, flag.bit, true);
 		end
 	end
 end
@@ -3293,23 +3289,23 @@ function flagStats(verbose)
 		if flagType == nil then
 			untypedFlags = untypedFlags + 1;
 			if verbose then
-				dprint("Warning: Flag without type at "..toHexString(flag["byte"], 2)..">"..flag["bit"].." with name: \""..name.."\"");
+				dprint("Warning: Flag without type at "..toHexString(flag.byte, 2)..">"..flag["bit"].." with name: \""..name.."\"");
 			end
 		else
-			if flagType == "B. Locker" or flagType == "Cutscene" or flagType == "FTT" or flagType == "Key" or flagType == "Kong" or flagType == "Physical" or flagType == "T&S" or flagType == "Unknown" then
+			if flagType == "B. Locker" or flagType == "Cutscene" or flagType == "FTT" or flagType == "Key" or flagType == "Kong" or flagType == "Physical" or flagType == "Progress" or flagType == "Special Coin" or flagType == "T&S" or flagType == "Unknown" then
 				validType = true;
 			end
 			if not validType then
 				flagsWithUnknownType = flagsWithUnknownType + 1;
 				if verbose then
-					dprint("Warning: Flag with unknown type at "..toHexString(flag["byte"], 2)..">"..flag["bit"].." with name: \""..name.."\"".." and type: \""..flagType.."\"");
+					dprint("Warning: Flag with unknown type at "..toHexString(flag.byte, 2)..">"..flag["bit"].." with name: \""..name.."\"".." and type: \""..flagType.."\"");
 				end
 			end
 		end
 		if flag.map ~= nil or flag.nomap == true then
 			flagsWithMap = flagsWithMap + 1;
 		elseif verbose then
-			dprint("Warning: Flag without map tag at "..toHexString(flag["byte"], 2)..">"..flag["bit"].." with name: \""..name.."\"");
+			dprint("Warning: Flag without map tag at "..toHexString(flag.byte, 2)..">"..flag["bit"].." with name: \""..name.."\"");
 		end
 	end
 

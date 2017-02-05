@@ -66,7 +66,7 @@ return {
 	{byte=0x07, bit=2, name="Aztec: Tiny GB: 5DT", type="GB", map=22},
 	{byte=0x07, bit=3, name="Aztec: Chunky GB: 5DT", type="GB", map=24},
 	{byte=0x07, bit=4, name="Aztec: Lanky GB: 5DT", type="GB", map=23},
-	{byte=0x07, bit=5, name="Aztec: Instrument Pad in front of Beetle Tower Spawned", type="Physical"},
+	{byte=0x07, bit=5, name="Aztec: Instrument Pad in front of Beetle Tower Spawned", type="Physical", map=38},
 	{byte=0x07, bit=6, name="Aztec: DK GB: W5", type="GB", map=38}, -- Note: This flag also spawns the warp
 	{byte=0x07, bit=7, name="Aztec: Diddy GB: Vulture Race", type="GB", map=38},
 
@@ -145,8 +145,8 @@ return {
 	{byte=0x10, bit=0, name="Factory: DK GB: Crusher Room", type="GB", map=36},
 	{byte=0x10, bit=1, name="Factory: Arcade Lever", type="Physical", map=26},
 	{byte=0x10, bit=2, name="Factory: DK GB: Arcade", type="GB", map=26},
-	{byte=0x10, bit=3, name="Factory: Arcade LV3", map=26},
-	{byte=0x10, bit=4, name="Nintendo Coin", map=26},
+	{byte=0x10, bit=3, name="Factory: Arcade LV3", type="Progress", map=26},
+	{byte=0x10, bit=4, name="Nintendo Coin", type="Special Coin", map=26},
 	{byte=0x10, bit=5, name="Factory: Chunky R&D Gate Open", type="Physical", map=26},
 	{byte=0x10, bit=6, name="Factory: Diddy GB: Beaver Bother", type="GB", map=26},
 	{byte=0x10, bit=7, name="Factory: Diddy GB: Block Tower", type="GB", map=26},
@@ -217,8 +217,8 @@ return {
 	{byte=0x18, bit=0, name="Galleon: Lanky GB: Chest", type="GB", map=30},
 	{byte=0x18, bit=1, name="Galleon: DK GB: Seal", type="GB", map=30},
 	{byte=0x18, bit=2, name="Galleon: First Time Cutscene", type="Cutscene", map=30},
-	{byte=0x18, bit=3, name="Galleon: Water level raised CS", type="Cutscene", map=30},
-	{byte=0x18, bit=4, name="Galleon: Water level lowered CS", type="Cutscene", map=30},
+	{byte=0x18, bit=3, name="Galleon: Water Level Raised CS", type="Cutscene", map=30},
+	{byte=0x18, bit=4, name="Galleon: Water Level Lowered CS", type="Cutscene", map=30},
 	{byte=0x18, bit=5, name="Galleon: Chunky GB: 5DS", type="GB", map=43},
 	{byte=0x18, bit=6, name="Galleon: Diddy GB: 5DS", type="GB", map=43},
 	{byte=0x18, bit=7, name="Galleon: Lanky GB: 5DS (Bed)", type="GB", map=43},
@@ -228,7 +228,7 @@ return {
 	{byte=0x19, bit=2, name="Galleon: Tiny GB: Submarine", type="GB", map=179},
 	{byte=0x19, bit=3, name="Galleon: T&S Cleared", type="T&S", nomap=true},
 	{byte=0x19, bit=4, name="Galleon: Diddy GB: Lighthouse", type="GB", map=30},
-	{byte=0x19, bit=5, name="Fungi: Tiny GB: Anthill", type="GB"},
+	{byte=0x19, bit=5, name="Fungi: Tiny GB: Anthill", type="GB", map=52},
 	{byte=0x19, bit=6, name="Fungi: Nighttime", type="Physical", map=48},
 	{byte=0x19, bit=7, name="Fungi: Green Tunnel (Feather Side)", type="Physical", map=48},
 
@@ -246,7 +246,7 @@ return {
 	{byte=0x1B, bit=2, name="Fungi: Mill Crate Broken (1)", type="Physical", map=61},
 	{byte=0x1B, bit=3, name="Fungi: DK GB: Mill", type="GB", map=48},
 	{byte=0x1B, bit=4, name="Fungi: Conveyor Belt On", type="Physical", map=61},
-	{byte=0x1B, bit=5, name="Fungi: Chunky GB: Mill", type="GB"},
+	{byte=0x1B, bit=5, name="Fungi: Chunky GB: Mill", type="GB", map=61},
 	{byte=0x1B, bit=6, name="Fungi: Mill Crate Broken (2)", type="Physical", map=62},
 	{byte=0x1B, bit=7, name="Fungi: Mill Crate Broken (3)", type="Physical", map=62},
 
@@ -277,13 +277,13 @@ return {
 	{byte=0x1E, bit=6, name="Fungi: W5 (High)", type="Warp", map=48},
 	{byte=0x1E, bit=7, name="Fungi: Tiny GB: Spider miniBoss", type="GB", map=60},
 
-	{byte=0x1F, bit=0, name="Fungi: Rabbit Race Round 1 Completed", map=48},
+	{byte=0x1F, bit=0, name="Fungi: Rabbit Race Round 1 Completed", type="Progress", map=48},
 	{byte=0x1F, bit=1, name="Fungi: Lanky GB: Rabbit Race", type="GB", map=48},
 	{byte=0x1F, bit=2, name="Fungi: Diddy GB: Owl Race", type="GB", map=48},
 	{byte=0x1F, bit=3, name="Fungi: Beanstalk Spawned", type="Physical", map=48},
 	{byte=0x1F, bit=4, name="Fungi: Apple Placed", type="Physical", map=48},
 	{byte=0x1F, bit=5, name="Fungi: Chunky GB: Apple", type="GB", map=48},
-	{byte=0x1F, bit=6, name="Fungi: DK GB: Baboon Blast", type="GB"},
+	{byte=0x1F, bit=6, name="Fungi: DK GB: Baboon Blast", type="GB", map=48},
 	{byte=0x1F, bit=7, name="Fungi: Clock CS", type="Cutscene", map=48},
 
 	{byte=0x20, bit=0, name="Fungi: Day First Time CS", type="Cutscene", map=48},
@@ -300,8 +300,9 @@ return {
 	{byte=0x21, bit=2, name="Caves: Entrance Ice Wall Cleared", type="Physical", map=72},
 	{byte=0x21, bit=3, name="Caves: Snide Ice Wall Cleared", type="Physical", map=72},
 	{byte=0x21, bit=4, name="Caves: Chunky GB: Entrance Ice Wall", type="GB", map=72},
+	-- 0x21 > 5
 	{byte=0x21, bit=6, name="Caves: Chunky GB: Chunky Igloo", type="GB", map=72},
-	{byte=0x21, bit=7, name="Caves: Lanky GB: Ice Tomato", type="GB"},
+	{byte=0x21, bit=7, name="Caves: Lanky GB: Ice Tomato", type="GB", map=98},
 
 	-- 0x22 > 0
 	-- 0x22 > 1
@@ -328,7 +329,7 @@ return {
 	{byte=0x24, bit=4, name="Key 6", type="Key", map=196},
 	{byte=0x24, bit=5, name="Caves: Diddy GB: Cabin (Upper)", type="GB", map=200},
 	{byte=0x24, bit=6, name="Caves: Diddy GB: Mad Maze Maul", type="GB", map=72},
-	{byte=0x24, bit=7, name="Caves: Tiny GB: W3", type="GB"}, -- Note: This flag doubles as the warp 3 spawned flag
+	{byte=0x24, bit=7, name="Caves: Tiny GB: W3", type="GB", map=72}, -- Note: This flag doubles as the warp 3 spawned flag
 
 	{byte=0x25, bit=0, name="Caves: 5DI Pads Spawned", type="Physical", map=72},
 	{byte=0x25, bit=1, name="Caves: Tiny GB: Mini Monkey Igloo", type="GB", map=72},
@@ -342,7 +343,7 @@ return {
 	{byte=0x26, bit=0, name="Castle: Ballroom Rocketbarrel Spawn", type="Physical", map=88},
 	{byte=0x26, bit=1, name="Castle: Diddy GB: Ballroom", type="GB", map=88},
 	{byte=0x26, bit=2, name="Castle: Lanky GB: Lanky tower", type="GB", map=105},
-	{byte=0x26, bit=3, name="Castle: Lanky Tower Baboon Balloon Pad Spawned", map=105},
+	{byte=0x26, bit=3, name="Castle: Lanky Tower Baboon Balloon Pad Spawned", type="Physical", map=105},
 	{byte=0x26, bit=4, name="Castle: Lanky GB: Orangstand GB", type="GB", map=108},
 	{byte=0x26, bit=5, name="Castle: Tiny GB: Goo Hands", type="GB", map=108},
 	{byte=0x26, bit=6, name="Castle: Diddy GB: Crypt", type="GB", map=112},
@@ -419,20 +420,20 @@ return {
 	{byte=0x2E, bit=7, name="Cranky's Lab FTSomething...?", type="FTT", map=5}, -- TODO: What is this?
 
 	{byte=0x2F, bit=0, name="Wrinkly FTT", type="FTT", nomap=true},
-	{byte=0x2F, bit=1, name="Camera/Shockwave", map=189},
-	{byte=0x2F, bit=2, name="Training Grounds: Treehouse Squawks Cutscene", type="Cutscene"},
-	{byte=0x2F, bit=3, name="Rareware Coin", map=5},
+	{byte=0x2F, bit=1, name="Camera/Shockwave", type="Progress", map=189},
+	{byte=0x2F, bit=2, name="Training Grounds: Treehouse Squawks Cutscene", type="Cutscene", map=176},
+	{byte=0x2F, bit=3, name="Rareware Coin", type="Special Coin", map=5},
 	{byte=0x2F, bit=4, name="Key 8", type="Key", map=17},
 	{byte=0x2F, bit=5, name="Isles: DK GB: Japes Boulder", type="GB", map=34},
 	{byte=0x2F, bit=6, name="B. Locker FTT", type="FTT", nomap=true},
-	{byte=0x2F, bit=7, name="Training Grounds: Barrels spwaned", map=176},
+	{byte=0x2F, bit=7, name="Training Grounds: Barrels spwaned", type="Physical", map=176},
 
 	{byte=0x30, bit=0, name="Cranky's Lab FTSomething..?", type="FTT", map=5}, -- TODO: What is this?
 	{byte=0x30, bit=1, name="Kong Unlocked: DK", type="Kong", nomap=true}, -- Note: Set both when Simian Slamming the switch in training grounds and entering tag barrel for the first time
-	{byte=0x30, bit=2, name="Training Grounds: Dive Barrel Completed", map=176},
-	{byte=0x30, bit=3, name="Training Grounds: Vine Barrel Completed", map=176},
-	{byte=0x30, bit=4, name="Training Grounds: Orange Barrel Completed", map=176},
-	{byte=0x30, bit=5, name="Training Grounds: Barrel Barrel Completed", map=176},
+	{byte=0x30, bit=2, name="Training Grounds: Dive Barrel Completed", type="Progress", map=176},
+	{byte=0x30, bit=3, name="Training Grounds: Vine Barrel Completed", type="Progress", map=176},
+	{byte=0x30, bit=4, name="Training Grounds: Orange Barrel Completed", type="Progress", map=176},
+	{byte=0x30, bit=5, name="Training Grounds: Barrel Barrel Completed", type="Progress", map=176},
 	{byte=0x30, bit=6, name="Isles: Escape Cutscene", type="Cutscene", map=34},
 	{byte=0x30, bit=7, name="Training Grounds: All training barrels Complete CS", type="Cutscene", map=176},
 
@@ -478,7 +479,7 @@ return {
 	{byte=0x35, bit=6, name="Isles: Pound the X", type="Physical", map=34},
 	{byte=0x35, bit=7, name="Isles: Chunky GB: Pound the X", type="GB", map=34},
 
-	{byte=0x36, bit=0, name="K. Rool Defeated", map=207},
+	{byte=0x36, bit=0, name="K. Rool Defeated", type="Progress", map=207},
 	{byte=0x36, bit=1, name="Isles: W1 (Ring)", type="Warp", map=34},
 	{byte=0x36, bit=2, name="Isles: W1 (Far)", type="Warp", map=34},
 	{byte=0x36, bit=3, name="Isles: W2 (Ring)", type="Warp", map=34},
@@ -546,16 +547,16 @@ return {
 	{byte=0x3D, bit=3, name="Fungi: Blueprint - Lanky", type="Blueprint", map=48},
 	{byte=0x3D, bit=4, name="Fungi: Blueprint - Tiny", type="Blueprint", map=48},
 	{byte=0x3D, bit=5, name="Fungi: Blueprint - Chunky", type="Blueprint", map=48},
-	{byte=0x3D, bit=6, name="Caves: Blueprint - DK", type="Blueprint"},
+	{byte=0x3D, bit=6, name="Caves: Blueprint - DK", type="Blueprint", map=72},
 	{byte=0x3D, bit=7, name="Caves: Blueprint - Diddy", type="Blueprint", map=72},
 
-	{byte=0x3E, bit=0, name="Caves: Blueprint - Lanky", type="Blueprint"},
+	{byte=0x3E, bit=0, name="Caves: Blueprint - Lanky", type="Blueprint", map=72},
 	{byte=0x3E, bit=1, name="Caves: Blueprint - Tiny", type="Blueprint", map=72},
 	{byte=0x3E, bit=2, name="Caves: Blueprint - Chunky", type="Blueprint", map=72},
 	{byte=0x3E, bit=3, name="Castle: Blueprint - DK", type="Blueprint", map=164},
 	{byte=0x3E, bit=4, name="Castle: Blueprint - Diddy", type="Blueprint", map=183},
 	{byte=0x3E, bit=5, name="Castle: Blueprint - Lanky", type="Blueprint", map=87},
-	{byte=0x3E, bit=6, name="Castle: Blueprint - Tiny", type="Blueprint"},
+	{byte=0x3E, bit=6, name="Castle: Blueprint - Tiny", type="Blueprint", map=87},
 	{byte=0x3E, bit=7, name="Castle: Blueprint - Chunky", type="Blueprint", map=151},
 
 	{byte=0x3F, bit=0, name="Isles: Blueprint - DK", type="Blueprint", map=170},
@@ -747,8 +748,8 @@ return {
 	{byte=0x53, bit=6, name="Galleon: Diddy CB: Gold tower Balloon", type="Balloon", map=30},
 	{byte=0x53, bit=7, name="Galleon: Chunky CB: Cannon Game Balloon", type="Balloon", map=30},
 
-	{byte=0x54, bit=0, name="Galleon: Chunky CB: 2DS Balloon", type="Balloon"},
-	{byte=0x54, bit=1, name="Galleon: Lanky CB: 5DS Balloon", type="Balloon"},
+	{byte=0x54, bit=0, name="Galleon: Chunky CB: 2DS Balloon", type="Balloon", map=30},
+	{byte=0x54, bit=1, name="Galleon: Lanky CB: 5DS Balloon", type="Balloon", map=30},
 	{byte=0x54, bit=2, name="Galleon: Tiny CB: Snide's Balloon", type="Balloon", map=30},
 	{byte=0x54, bit=3, name="Galleon: Tiny CB: Gold tower Balloon", type="Balloon", map=30},
 	{byte=0x54, bit=4, name="Isles: Rainbow Coin (Fungi Lobby Entrance)", type="Rainbow Coin", map=34},
@@ -770,7 +771,7 @@ return {
 	{byte=0x56, bit=2, name="Fungi: Rainbow Coin (Beanstalk)", type="Rainbow Coin", map=48},
 	{byte=0x56, bit=3, name="Fungi: Chunky CB: Kasplat Balloon", type="Balloon", map=48},
 	{byte=0x56, bit=4, name="Fungi: Tiny CB: Behind DK Barn", type="Balloon", map=48},
-	{byte=0x56, bit=5, name="Galleon: DK CB: Lighthouse Balloon", type="Balloon"},
+	{byte=0x56, bit=5, name="Galleon: DK CB: Lighthouse Balloon", type="Balloon", map=49},
 	{byte=0x56, bit=6, name="Galleon: Rainbow Coin (Lighthouse)", type="Rainbow Coin", map=49},
 	{byte=0x56, bit=7, name="Fungi: Diddy CB: Attic Balloon", type="Balloon", map=57},
 
@@ -778,33 +779,33 @@ return {
 	{byte=0x57, bit=1, name="Fungi: Lanky CB: Balloon in Upper Mushroom", type="Balloon", map=64},
 	{byte=0x57, bit=2, name="Fungi: Lanky CB: Balloon in Lower Mushroom", type="Balloon", map=64},
 	{byte=0x57, bit=3, name="Fungi: Chunky CB: Face Game Balloon", type="Balloon", map=71},
-	{byte=0x57, bit=4, name="Caves: Diddy CB: W4 Balloon", type="Balloon"},
+	{byte=0x57, bit=4, name="Caves: Diddy CB: W4 Balloon", type="Balloon", map=72},
 	{byte=0x57, bit=5, name="Caves: Chunky CB: Snide Balloon", type="Balloon", map=72},
 	{byte=0x57, bit=6, name="Caves: Tiny CB: Candy Balloon", type="Balloon", map=72},
-	{byte=0x57, bit=7, name="Caves: Rainbow Coin", type="Rainbow Coin"},
+	{byte=0x57, bit=7, name="Caves: Rainbow Coin", type="Rainbow Coin", map=72},
 
 	{byte=0x58, bit=0, name="Caves: Lanky CB: Outside Cabin Balloon", type="Balloon", map=72},
 	{byte=0x58, bit=1, name="Caves: DK CB: Entrance Ice Wall Balloon", type="Balloon", map=72},
-	{byte=0x58, bit=2, name="Caves: Diddy CB: 5DC Balloon", type="Balloon"},
-	{byte=0x58, bit=3, name="Caves: Chunky CB: W3 Balloon", type="Balloon"},
+	{byte=0x58, bit=2, name="Caves: Diddy CB: Outside 5DC Balloon", type="Balloon", map=72},
+	{byte=0x58, bit=3, name="Caves: Chunky CB: W3 Balloon", type="Balloon", map=72},
 	{byte=0x58, bit=4, name="Caves: Tiny CB: W2 Kasplat Balloon", type="Balloon", map=72},
 	{byte=0x58, bit=5, name="Caves: DK CB: Giant Rock Balloon", type="Balloon", map=72},
 	{byte=0x58, bit=6, name="Caves: Tiny CB: 5DI Balloon", type="Balloon", map=84},
 	{byte=0x58, bit=7, name="Caves: Lanky CB: 5DI Balloon", type="Balloon", map=85},
 
-	{byte=0x59, bit=0, name="Caves: DK CB: 5DI Balloon", type="Balloon"},
+	{byte=0x59, bit=0, name="Caves: DK CB: 5DI Balloon", type="Balloon", map=86},
 	{byte=0x59, bit=1, name="Castle: Rainbow Coin (Snide's)", type="Rainbow Coin", map=87},
 	{byte=0x59, bit=2, name="Castle: Diddy CB: W1 Balloon", type="Balloon", map=87},
 	{byte=0x59, bit=3, name="Castle: Diddy CB: Ballroom Balloon", type="Balloon", map=88},
 	{byte=0x59, bit=4, name="Caves: Tiny CB: 5DC Balloon", type="Balloon", map=93},
 	{byte=0x59, bit=5, name="Caves: Chunky CB: 5DI Balloon", type="Balloon", map=95},
 	{byte=0x59, bit=6, name="Isles: Rainbow Coin (K. Lumsy)", type="Rainbow Coin", map=97},
-	{byte=0x59, bit=7, name="Caves: Lanky CB: Ice Tomato Balloon", type="Balloon"},
+	{byte=0x59, bit=7, name="Caves: Lanky CB: Ice Tomato Balloon", type="Balloon", map=98},
 
 	{byte=0x5A, bit=0, name="Caves: Diddy CB: 5DI Balloon", type="Balloon", map=100},
 	{byte=0x5A, bit=1, name="Castle: Lanky CB: Lanky Tower Balloon", type="Balloon", map=105},
 	{byte=0x5A, bit=2, name="Castle: Lanky CB: Crypt Balloon", type="Balloon", map=108},
-	{byte=0x5A, bit=3, name="Castle: Diddy CB: Coffin Balloon", type="Balloon"},
+	{byte=0x5A, bit=3, name="Castle: Diddy CB: Coffin Balloon", type="Balloon", map=112},
 	{byte=0x5A, bit=4, name="Castle: DK CB: Crypt Balloon", type="Balloon", map=112},
 	{byte=0x5A, bit=5, name="Castle: Tiny CB: Museum Display Balloon", type="Balloon", map=113},
 	{byte=0x5A, bit=6, name="Castle: Chunky CB: Museum Balloon", type="Balloon", map=113},
@@ -2475,8 +2476,8 @@ return {
 	{byte=0x113, bit=6, name="Caves: Chunky Coin: W3 (4)", type="Coin", map=72},
 	{byte=0x113, bit=7, name="Caves: Chunky Coin: W3 (5)", type="Coin", map=72},
 
-	{byte=0x114, bit=0, name="Caves: Lanky Coin: Ice Tomato (1)", type="Coin"},
-	{byte=0x114, bit=1, name="Caves: Lanky Coin: Ice Tomato (2)", type="Coin"},
+	{byte=0x114, bit=0, name="Caves: Lanky Coin: Ice Tomato (1)", type="Coin", map=98},
+	{byte=0x114, bit=1, name="Caves: Lanky Coin: Ice Tomato (2)", type="Coin", map=98},
 	{byte=0x114, bit=2, name="Caves: DK CB: Baboon Blast (1)", type="Bunch", map=186},
 	{byte=0x114, bit=3, name="Caves: DK Coin: Baboon Blast (1)", type="Coin", map=186},
 	{byte=0x114, bit=4, name="Caves: DK CB: Baboon Blast (2)", type="Bunch", map=186},
