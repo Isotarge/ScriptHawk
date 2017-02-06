@@ -672,7 +672,7 @@ SystemID N64
 7FCC44	w	u	1	RDRAM	Oranges
 7FCC46	w	u	1	RDRAM	Crystals
 7FCC48	w	u	1	RDRAM	Film
-7FCC4B	b	u	1	RDRAM	Health
+7FCC4B	b	s	1	RDRAM	Health
 7FCC4C	b	u	1	RDRAM	Melons
 7FD570	w	h	1	RDRAM	Transferred Actor Type
 7FD888	d	f	1	RDRAM	Loading Zone Fadeout Progress

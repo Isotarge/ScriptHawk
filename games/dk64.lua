@@ -1378,6 +1378,14 @@ function Game.getPlayerObject() -- TODO: Cache this
 	return dereferencePointer(Game.Memory.player_pointer[version]);
 end
 
+function setObjectModel1Position(pointer, x, y, z)
+	if isRDRAM(pointer) then
+		mainmemory.writefloat(pointer + obj_model1.x_pos, x, true);
+		mainmemory.writefloat(pointer + obj_model1.y_pos, y, true);
+		mainmemory.writefloat(pointer + obj_model1.z_pos, z, true);
+	end
+end
+
 ----------------------------------
 -- Object Model 2 Documentation --
 ----------------------------------
@@ -2230,6 +2238,20 @@ local function encirclePlayerObjectModel2()
 					mainmemory.writefloat(modelPointer + obj_model2.model.z_pos, z, true);
 				end
 			end
+		end
+	end
+end
+
+function setObjectModel2Position(pointer, x, y, z)
+	if isRDRAM(pointer) then
+		mainmemory.writefloat(pointer + obj_model2.x_pos, x, true);
+		mainmemory.writefloat(pointer + obj_model2.y_pos, y, true);
+		mainmemory.writefloat(pointer + obj_model2.z_pos, z, true);
+		modelPointer = dereferencePointer(pointer + obj_model2.model_pointer);
+		if isRDRAM(modelPointer) then
+			mainmemory.writefloat(modelPointer + obj_model2.model.x_pos, x, true);
+			mainmemory.writefloat(modelPointer + obj_model2.model.y_pos, y, true);
+			mainmemory.writefloat(modelPointer + obj_model2.model.z_pos, z, true);
 		end
 	end
 end
@@ -5647,6 +5669,177 @@ function Game.applyInfinites()
 	end
 end
 
+--------------------
+-- Object Overlay --
+--------------------
+local viewport_YAngleRange = 60;
+local viewport_XAngleRange = 45;
+local object_selectable_size = 10;
+local reference_distance = 2000;
+
+local screen = {
+	--width = 640,
+	--height = 480,
+	width = client.bufferwidth() / client.getwindowsize(),
+	height = client.bufferheight() / client.getwindowsize(),
+};
+
+function drawObjectPositions()
+	screen.width = client.bufferwidth() / client.getwindowsize();
+	screen.height = client.bufferheight() / client.getwindowsize();
+
+	local objectModel;
+	if string.contains(grab_script_mode, "Model 2") then
+		objectModel = 2;
+		populateObjectModel2Pointers();
+	elseif string.contains(grab_script_mode, "Model 1") then
+		objectModel = 1;
+		populateObjectModel1Pointers();
+	else
+		return;
+	end
+
+	local startDrag = false;
+	local dragging = false;
+	local dragTransform = {0, 0};
+	local mouse = input.getmouse();
+
+	if mouse.Left then --if mouse clicked object is being dragged
+		if not mouseClickedLastFrame then
+			startDrag = true;
+			startDragPosition = {mouse.X, mouse.Y};
+		end
+		mouseClickedLastFrame = true;
+		dragging = true;
+		dragTransform = {mouse.X - startDragPosition[1], mouse.Y - startDragPosition[2]};
+	else
+		draggedObjects = {};
+		mouseClickedLastFrame = false;
+		dragging = false;
+	end
+
+	local camera = dereferencePointer(Game.Memory.camera_pointer[version]);
+	local cameraData = {};
+	if isRDRAM(camera) then
+		cameraData.xPos = mainmemory.readfloat(camera + obj_model1.camera.viewport_x_position, true);
+		cameraData.yPos = mainmemory.readfloat(camera + obj_model1.camera.viewport_y_position, true);
+		cameraData.zPos = mainmemory.readfloat(camera + obj_model1.camera.viewport_z_position, true);
+		--cameraData.xRot = (mainmemory.read_u16_be(camera + obj_model1.x_rot) / Game.max_rot_units * 360) * math.pi / 180;
+		cameraData.xRot = 0;
+		cameraData.yRot = (mainmemory.read_u16_be(camera + obj_model1.camera.viewport_y_rotation) / Game.max_rot_units * 360) * math.pi / 180;
+	else
+		return;
+	end
+
+	for i = 1, #object_pointers do
+		local slotBase = object_pointers[i];
+
+		-- Translate origin to camera position
+		local xDifference, yDifference, zDifference;
+		if objectModel == 1 then
+			xDifference = mainmemory.readfloat(slotBase + obj_model1.x_pos, true) - cameraData.xPos;
+			yDifference = mainmemory.readfloat(slotBase + obj_model1.y_pos, true) - cameraData.yPos;
+			zDifference = mainmemory.readfloat(slotBase + obj_model1.z_pos, true) - cameraData.zPos;
+		else
+			xDifference = mainmemory.readfloat(slotBase + obj_model2.x_pos, true) - cameraData.xPos;
+			yDifference = mainmemory.readfloat(slotBase + obj_model2.y_pos, true) - cameraData.yPos;
+			zDifference = mainmemory.readfloat(slotBase + obj_model2.z_pos, true) - cameraData.zPos;
+		end
+
+		local drawXPos = 0;
+		local drawYPos = 0;
+		local scaling_factor = 0;
+
+		-- Transform object point to point in coordinate system based on camera normal
+		-- Rotation transform 1
+		local tempData = {
+			xPos = math.cos(cameraData.yRot) * xDifference - math.sin(cameraData.yRot) * zDifference,
+			yPos = yDifference,
+			zPos = math.sin(cameraData.yRot) * xDifference + math.cos(cameraData.yRot) * zDifference,
+		};
+
+		-- Rotation transform 2
+		local objectData = {
+			xPos = tempData.xPos,
+			yPos = math.sin(cameraData.xRot) * tempData.zPos + math.cos(cameraData.xRot) * tempData.yPos,
+			zPos = -math.cos(cameraData.xRot) * tempData.zPos + math.sin(cameraData.xRot) * tempData.yPos,
+		};
+
+		if objectData.zPos > 0 then
+			local XAngle_local = math.atan(objectData.yPos / objectData.zPos); -- Horizontal Angle
+			local YAngle_local = math.atan(objectData.xPos / objectData.zPos); -- Horizontal Angle
+			-- Don't need to compentate for tan since angle between
+
+			YAngle_local = ((YAngle_local + math.pi) % (2 * math.pi)) - math.pi; -- Get angle between -180 and +180
+			XAngle_local = ((XAngle_local + math.pi) % (2 * math.pi)) - math.pi;
+
+			if YAngle_local <= (viewport_YAngleRange / 2) and YAngle_local > (-viewport_XAngleRange / 2) then
+				if XAngle_local <= (viewport_XAngleRange / 2) and XAngle_local > (-viewport_YAngleRange / 2) then
+
+					-- At this point object is selectable/draggable
+					drawXPos = (screen.width / 2) * math.sin(YAngle_local) / math.sin(viewport_YAngleRange * math.pi / 360) + screen.width / 2;
+					drawYPos = -(screen.height / 2) * math.sin(XAngle_local) / math.sin(viewport_XAngleRange * math.pi / 360) + screen.height / 2;
+
+					--calc scaling factor -- current calc might be incorrect
+					scaling_factor = reference_distance / objectData.zPos;
+
+					if draggedObjects[1] ~= nil then
+						if i == draggedObjects[1][1] then
+							if dragging then
+								drawXPos = draggedObjects[1][2] + dragTransform[1];
+								drawYPos = draggedObjects[1][3] + dragTransform[2];
+								objectData.zPos = draggedObjects[1][4];
+
+								-- Transform screen-to-game coords
+								YAngle_local = math.asin(math.sin(viewport_YAngleRange * math.pi / 360) * (2 * drawXPos / screen.width - 1));
+								XAngle_local = math.asin(math.sin(viewport_XAngleRange * math.pi / 360) * (1 - 2 * drawYPos / screen.height));
+
+								objectData.yPos = objectData.zPos * math.tan(XAngle_local); -- Horizontal Angle
+								objectData.xPos = objectData.zPos * math.tan(YAngle_local);
+
+								tempData.xPos = objectData.xPos;
+								tempData.yPos = math.cos(cameraData.xRot)*objectData.yPos + math.sin(cameraData.xRot)*objectData.zPos;
+								tempData.zPos = math.sin(cameraData.xRot)*objectData.yPos - math.cos(cameraData.xRot)*objectData.zPos;
+
+								xDifference = math.cos(cameraData.yRot)*tempData.xPos + math.sin(cameraData.yRot)*tempData.zPos;
+								yDifference = tempData.yPos;
+								zDifference = -math.sin(cameraData.yRot)*tempData.xPos + math.cos(cameraData.yRot)*tempData.zPos;
+
+								-- Save new object position to RDRAM
+								if objectModel == 1 then
+									setObjectModel1Position(slotBase, cameraData.xPos + xDifference, cameraData.yPos + yDifference, cameraData.zPos + zDifference);
+								else
+									setObjectModel2Position(slotBase, cameraData.xPos + xDifference, cameraData.yPos + yDifference, cameraData.zPos + zDifference);
+								end
+							end
+						end
+					end
+
+					-- Draw to screen
+					local color = 0xFFFFFFFF;
+					if object_index == i then
+						color = 0xFFFFFF00;
+						if startDrag then
+							table.insert(draggedObjects, {i, drawXPos, drawYPos, objectData.zPos});
+						end
+					end
+					gui.drawLine(drawXPos - scaling_factor * object_selectable_size / 2, drawYPos, drawXPos + scaling_factor * object_selectable_size / 2, drawYPos, color);
+					gui.drawLine(drawXPos, drawYPos - scaling_factor * object_selectable_size / 2, drawXPos, drawYPos + scaling_factor * object_selectable_size / 2, color);
+					gui.drawText(drawXPos, drawYPos, string.format("%d", i), color, nil, 9 + 3 * scaling_factor);
+				end
+			end
+		end
+
+		-- Object selection
+		if mouse.Left then
+			if (mouse.X >= drawXPos - scaling_factor * object_selectable_size / 2 and mouse.X <= drawXPos + scaling_factor * object_selectable_size / 2) 
+				and (mouse.Y >= drawYPos - scaling_factor * object_selectable_size / 2 and mouse.Y <= drawYPos + scaling_factor * object_selectable_size / 2) then
+				object_index = i;
+			end
+		end
+	end
+end
+
 -------------------
 -- Color setters --
 -------------------
@@ -5859,6 +6052,8 @@ function Game.drawUI()
 	-- Arcade hitboxes
 	if isInSubGame() then
 		drawSubGameHitboxes();
+	else
+		--drawObjectPositions();
 	end
 
 	if version ~= 4 then
