@@ -1,7 +1,11 @@
 SystemID PSX
+060A18	d	u	0	MainRAM	SFX Volume
 060A90	d	h	0	MainRAM	Player Pointer
 060AA4	d	h	0	MainRAM	Map Geometry Pointer
+065D70	d	u	0	MainRAM	Level Progress
+065D74	d	u	0	MainRAM	Max Level Progress
 068F38	d	h	0	MainRAM	Aku Aku Object Pointer
+068F80	d	u	0	MainRAM	SFX Volume
 069034	d	u	0	MainRAM	Global Timer
 069148	d	h	0	MainRAM	Total Boxes
 

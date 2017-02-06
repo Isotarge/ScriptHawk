@@ -19,6 +19,7 @@ Game = {
 		level = {0x618DC, nil, nil}, -- TODO: This doesn't seem to work
 		player_pointer = {0x60A90, 0x60BF0, 0x60E90},
 		total_boxes = {0x69148, 0x692F8, 0x69598}, -- Signed 24.8 fixed point
+		level_progress = {0x065D70, 0x065ED0, 0x066170}, -- 24.8 fixed point
 	},
 };
 
@@ -115,6 +116,18 @@ function Game.getJumps()
 		return mainmemory.read_u32_le(player + player_data.jumps);
 	end
 	return 0;
+end
+
+function Game.getLevelProgress()
+	return mainmemory.read_u32_le(Game.Memory.level_progress[version]) / 256;
+end
+
+function Game.getMaxLevelProgress()
+	return mainmemory.read_u32_le(Game.Memory.level_progress[version] + 4) / 256;
+end
+
+function Game.getLevelProgressOSD()
+	return round(Game.getLevelProgress(), precision).." / "..round(Game.getMaxLevelProgress(), precision);
 end
 
 --------------
@@ -244,6 +257,7 @@ Game.OSD = {
 	{"Player", playerPointerOSD},
 	--{"Level", Game.getLevel},
 	{"Box", Game.getBoxString},
+	{"Progress", Game.getLevelProgressOSD},
 	{"Separator", 1},
 	{"X", Game.getXPosition},
 	{"Y", Game.getYPosition},
@@ -251,9 +265,9 @@ Game.OSD = {
 	{"Separator", 1},
 	{"dY"},
 	{"dXZ"},
-	{"Max dY"},
-	{"Max dXZ"},
-	{"Odometer"},
+	--{"Max dY"},
+	--{"Max dXZ"},
+	--{"Odometer"},
 	{"Separator", 1},
 	{"Facing", Game.getYRotation},
 	{"Moving Angle"},
