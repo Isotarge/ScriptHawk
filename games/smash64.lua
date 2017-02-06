@@ -1,3 +1,10 @@
+if type(ScriptHawk) ~= "table" then
+	print("This script is not designed to run by itself");
+	print("Please run ScriptHawk.lua from the parent directory instead");
+	print("Thanks for using ScriptHawk :)");
+	return;
+end
+
 Game = {
 	speedy_speeds = { .1, 1, 5, 10, 20, 35, 50, 75, 100 };
 	speedy_index = 6;

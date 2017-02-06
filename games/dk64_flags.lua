@@ -458,7 +458,9 @@ return {
 	{byte=0x33, bit=1, name="Caves Lobby: Ice Wall GB Room", type="Physical", map=194},
 	{byte=0x33, bit=2, name="Isles: Diddy GB: Caves Lobby Instrument Pad", type="GB", map=194},
 	{byte=0x33, bit=3, name="Isles: DK GB: Caves Lobby", type="GB", map=194},
+	-- 0x33 > 4
 	{byte=0x33, bit=5, name="Caves Lobby: Boulder on Pad", type="Physical", map=194},
+	-- 0x33 > 6
 	{byte=0x33, bit=7, name="Castle Lobby: Lanky GB: Searchlight seek", type="GB", map=193},
 
 	{byte=0x34, bit=0, name="Isles: Diddy GB: Batty Barrel Bandit", type="GB", map=195},
@@ -501,6 +503,7 @@ return {
 	{byte=0x38, bit=1, name="Key 6 Turned", type="Key", map=34},
 	{byte=0x38, bit=2, name="Key 7 Turned", type="Key", map=34},
 	{byte=0x38, bit=3, name="Key 8 Turned", type="Key", map=97},
+	-- 0x38 > 4
 	{byte=0x38, bit=5, name="Story: Japes Intro", type="Cutscene", map=169},
 	{byte=0x38, bit=6, name="Story: Aztec Intro", type="Cutscene", map=173},
 	{byte=0x38, bit=7, name="Story: Factory Intro", type="Cutscene", map=175},

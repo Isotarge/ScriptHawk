@@ -1,3 +1,10 @@
+if type(ScriptHawk) ~= "table" then
+	print("This script is not designed to run by itself");
+	print("Please run ScriptHawk.lua from the parent directory instead");
+	print("Thanks for using ScriptHawk :)");
+	return;
+end
+
 local Game = {};
 
 local script_modes = { -- TODO: Object analysis tools state needs to be up here for reasons, can probably be somewhere else with a clever reshuffle

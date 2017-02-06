@@ -1,3 +1,10 @@
+if type(ScriptHawk) ~= "table" then
+	print("This script is not designed to run by itself");
+	print("Please run ScriptHawk.lua from the parent directory instead");
+	print("Thanks for using ScriptHawk :)");
+	return;
+end
+
 local Game = {};
 
 Game.Memory = { -- Version order: France, Europe, USA, German 1.1, German 1.0

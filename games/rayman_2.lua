@@ -1,3 +1,10 @@
+if type(ScriptHawk) ~= "table" then
+	print("This script is not designed to run by itself");
+	print("Please run ScriptHawk.lua from the parent directory instead");
+	print("Thanks for using ScriptHawk :)");
+	return;
+end
+
 local Game = {
 	Memory = { -- Version order: Europe N64, USA N64
 		health = {0x1BC54D, 0x1BC64D}, -- Byte

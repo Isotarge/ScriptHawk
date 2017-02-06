@@ -1,3 +1,10 @@
+if type(ScriptHawk) ~= "table" then -- An error message to inform the user that this is a game module, not a standalone script
+	print("This script is not designed to run by itself");
+	print("Please run ScriptHawk.lua from the parent directory instead");
+	print("Thanks for using ScriptHawk :)");
+	return;
+end
+
 local Game = {}; -- This table stores the module's API function implementations and game state, it's returned to ScriptHawk at the end of the module code
 
 --------------------
