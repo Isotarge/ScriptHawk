@@ -429,7 +429,7 @@ end
 -- State --
 -----------
 
-local mode = "Position";
+mode = "Position";
 local rotation_units = "Degrees";
 
 -- Stops garbage min/max dx/dy/dz values
@@ -1309,15 +1309,19 @@ angleCalc.open = function()
 	end
 end
 
-while true do
-	if client.ispaused() then
-		gui.cleartext();
-		gui.clearGraphics();
-		ScriptHawk.UI.updateReadouts();
-		Game.drawUI();
+if not TASSafe then
+	while true do
+		if client.ispaused() then
+			gui.cleartext();
+			gui.clearGraphics();
+			ScriptHawk.UI.updateReadouts();
+			Game.drawUI();
+		end
+		ScriptHawk.processKeybinds(ScriptHawk.keybindsRealtime);
+		ScriptHawk.processJoypadBinds(ScriptHawk.joypadBindsRealtime);
+		Game.realTime();
+		emu.yield();
 	end
-	ScriptHawk.processKeybinds(ScriptHawk.keybindsRealtime);
-	ScriptHawk.processJoypadBinds(ScriptHawk.joypadBindsRealtime);
-	Game.realTime();
-	emu.yield();
+else
+	return true;
 end
