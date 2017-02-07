@@ -3018,7 +3018,7 @@ function checkFlags(showKnown)
 	print_deferred();
 end
 
-function checkFlag(byte, bit)
+function checkFlag(byte, bit, suppressPrint)
 	if type(byte) == "string" then
 		local flag = getFlagByName(byte);
 		if type(flag) == "table" then
@@ -3030,13 +3030,22 @@ function checkFlag(byte, bit)
 		local flags = Game.getFlagBlockAddress();
 		currentValue = mainmemory.readbyte(flags + byte);
 		if check_bit(currentValue, bit) then
-			print(getFlagName(byte, bit).." is SET");
+			if not suppressPrint then
+				print(getFlagName(byte, bit).." is SET");
+			end
+			return true;
 		else
-			print(getFlagName(byte, bit).." is NOT set");
+			if not suppressPrint then
+				print(getFlagName(byte, bit).." is NOT set");
+			end
+			return false;
 		end
 	else
-		print("Warning: Flag not found");
+		if not suppressPrint then
+			print("Warning: Flag not found");
+		end
 	end
+	return false;
 end
 
 ----------------------------------
@@ -3233,6 +3242,42 @@ end
 --------------------------
 -- Other flag functions --
 --------------------------
+
+function countFlagsOnMap(mapIndex)
+	local flagsOnMap = 0;
+	for i = 1, #flag_array do
+		local flag = flag_array[i];
+		if not flag.ignore and not flag.nomap and flag.map == mapIndex then
+			flagsOnMap = flagsOnMap + 1;
+		end
+	end
+	return flagsOnMap;
+end
+
+function countFlagsOnCurrentMap()
+	return countFlagsOnMap(map_value);
+end
+
+function checkFlagsOnMap(mapIndex)
+	local flagsOnMap = 0;
+	for i = 1, #flag_array do
+		local flag = flag_array[i];
+		if not flag.ignore and not flag.nomap and flag.map == mapIndex then
+			if checkFlag(flag.byte, flag.bit, true) then
+				flagsOnMap = flagsOnMap + 1;
+			end
+		end
+	end
+	return flagsOnMap;
+end
+
+function checkFlagsOnCurrentMap()
+	return checkFlagsOnMap(map_value);
+end
+
+function getFlagStatsOSD() -- TODO: Slow, optimize this
+	return checkFlagsOnCurrentMap().."/"..countFlagsOnCurrentMap();
+end
 
 local function flagSetButtonHandler()
 	setFlagByName(forms.getproperty(ScriptHawk.UI.form_controls["Flag Dropdown"], "SelectedItem"));
@@ -6455,6 +6500,7 @@ Game.standardOSD = {
 	{"Mode", Game.getCurrentMode},
 	{"File", Game.getFileIndex},
 	{"EEPROM Slot", Game.getCurrentEEPROMSlot},
+	--{"Flags", getFlagStatsOSD},
 	{"Separator", 1},
 	{"X", Game.getXPosition},
 	{"Y", Game.getYPosition},
