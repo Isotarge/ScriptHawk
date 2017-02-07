@@ -1134,7 +1134,8 @@ obj_model1 = {
 		["viewport_y_position"] = 0x200, -- 32 bit float big endian
 		["viewport_z_position"] = 0x204, -- 32 bit float big endian
 		["tracking_distance"] = 0x21C, -- 32 bit float big endian
-		["viewport_y_rotation"] = 0x22A,
+		["viewport_y_rotation"] = 0x22A, -- u16_be
+		["viewport_x_rotation"] = 0x230, -- 32 bit float big endian
 		["tracking_angle"] = 0x230,
 		["zoom_level_c_down"] = 0x266, -- u8
 		["zoom_level_current"] = 0x267, -- u8
@@ -5724,8 +5725,7 @@ function drawObjectPositions()
 		cameraData.xPos = mainmemory.readfloat(camera + obj_model1.camera.viewport_x_position, true);
 		cameraData.yPos = mainmemory.readfloat(camera + obj_model1.camera.viewport_y_position, true);
 		cameraData.zPos = mainmemory.readfloat(camera + obj_model1.camera.viewport_z_position, true);
-		--cameraData.xRot = (mainmemory.read_u16_be(camera + obj_model1.x_rot) / Game.max_rot_units * 360) * math.pi / 180;
-		cameraData.xRot = 0;
+		cameraData.xRot = (mainmemory.readfloat(camera + obj_model1.camera.viewport_x_rotation, true) / 360) * math.pi / 180;
 		cameraData.yRot = (mainmemory.read_u16_be(camera + obj_model1.camera.viewport_y_rotation) / Game.max_rot_units * 360) * math.pi / 180;
 	else
 		return;
@@ -5745,7 +5745,7 @@ function drawObjectPositions()
 			yDifference = mainmemory.readfloat(slotBase + obj_model2.y_pos, true) - cameraData.yPos;
 			zDifference = mainmemory.readfloat(slotBase + obj_model2.z_pos, true) - cameraData.zPos;
 		end
-        
+
 		local drawXPos = 0;
 		local drawYPos = 0;
 		local scaling_factor = 0;
@@ -5759,19 +5759,18 @@ function drawObjectPositions()
 		};
 
 		-- Rotation transform 2
-		local objectData = { --NEED TO DOUBLE CHECK ONCE RELIABLE X ROTATION FOUND
+		local objectData = { -- NEED TO DOUBLE CHECK ONCE RELIABLE X ROTATION FOUND
 			xPos = tempData.xPos,
 			yPos = -math.sin(cameraData.xRot) * tempData.zPos + math.cos(cameraData.xRot) * tempData.yPos,
-            zPos = math.cos(cameraData.xRot) * tempData.zPos + math.sin(cameraData.xRot) * tempData.yPos,
+			zPos = math.cos(cameraData.xRot) * tempData.zPos + math.sin(cameraData.xRot) * tempData.yPos,
 		};
-        
-        --fix for first person view
-        if mainmemory.readbyte(camera + obj_model1.camera.state_type) == 0x03 then
-            objectData.xPos = -objectData.xPos;
-            objectData.zPos = -objectData.zPos;
-        end
-        
-        
+
+		-- Fix for first person view
+		if mainmemory.readbyte(camera + obj_model1.camera.state_type) == 0x03 then
+			objectData.xPos = -objectData.xPos;
+			objectData.zPos = -objectData.zPos;
+		end
+
 		if objectData.zPos > 50 then
 			local XAngle_local = math.atan(objectData.yPos / objectData.zPos); -- Horizontal Angle
 			local YAngle_local = math.atan(objectData.xPos / objectData.zPos); -- Horizontal Angle
@@ -5786,12 +5785,12 @@ function drawObjectPositions()
 					-- At this point object is selectable/draggable
 					drawXPos = (screen.width / 2) * math.sin(YAngle_local) / math.sin(viewport_YAngleRange * math.pi / 360) + screen.width / 2;
 					drawYPos = -(screen.height / 2) * math.sin(XAngle_local) / math.sin(viewport_XAngleRange * math.pi / 360) + screen.height / 2;
-                    --drawYPos = -(screen.height) * math.sin(XAngle_local) / math.sin(viewport_XAngleRange * math.pi / 360);
-                    
+					--drawYPos = -(screen.height) * math.sin(XAngle_local) / math.sin(viewport_XAngleRange * math.pi / 360);
+
 					--calc scaling factor -- current calc might be incorrect
 					scaling_factor = reference_distance / objectData.zPos;
-                    
-                    --[[
+
+					--[[
 					if draggedObjects[1] ~= nil then
 						if i == draggedObjects[1][1] then
 							if dragging then
@@ -5823,8 +5822,8 @@ function drawObjectPositions()
 							end
 						end
 					end
-                    ]]
-                    
+					--]]
+
 					-- Draw to screen
 					local color = 0xFFFFFFFF;
 					if object_index == i then
@@ -5833,7 +5832,7 @@ function drawObjectPositions()
 							table.insert(draggedObjects, {i, drawXPos, drawYPos, objectData.zPos});
 						end
 					end
-                    
+
 					gui.drawLine(drawXPos, 0, drawXPos, 20, color);
 					gui.drawText(drawXPos, 0, string.format("%d", i), color, nil, 12);
 					--gui.drawLine(drawXPos - scaling_factor * object_selectable_size / 2, drawYPos, drawXPos + scaling_factor * object_selectable_size / 2, drawYPos, color);
