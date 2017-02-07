@@ -5672,8 +5672,8 @@ end
 --------------------
 -- Object Overlay --
 --------------------
-local viewport_YAngleRange = 60;
-local viewport_XAngleRange = 45;
+local viewport_YAngleRange = 75;
+local viewport_XAngleRange = 70;
 local object_selectable_size = 10;
 local reference_distance = 2000;
 
@@ -5745,7 +5745,7 @@ function drawObjectPositions()
 			yDifference = mainmemory.readfloat(slotBase + obj_model2.y_pos, true) - cameraData.yPos;
 			zDifference = mainmemory.readfloat(slotBase + obj_model2.z_pos, true) - cameraData.zPos;
 		end
-
+        
 		local drawXPos = 0;
 		local drawYPos = 0;
 		local scaling_factor = 0;
@@ -5753,19 +5753,26 @@ function drawObjectPositions()
 		-- Transform object point to point in coordinate system based on camera normal
 		-- Rotation transform 1
 		local tempData = {
-			xPos = math.cos(cameraData.yRot) * xDifference - math.sin(cameraData.yRot) * zDifference,
+			xPos = -math.cos(cameraData.yRot) * xDifference + math.sin(cameraData.yRot) * zDifference,
 			yPos = yDifference,
 			zPos = math.sin(cameraData.yRot) * xDifference + math.cos(cameraData.yRot) * zDifference,
 		};
 
 		-- Rotation transform 2
-		local objectData = {
+		local objectData = { --NEED TO DOUBLE CHECK ONCE RELIABLE X ROTATION FOUND
 			xPos = tempData.xPos,
-			yPos = math.sin(cameraData.xRot) * tempData.zPos + math.cos(cameraData.xRot) * tempData.yPos,
-			zPos = -math.cos(cameraData.xRot) * tempData.zPos + math.sin(cameraData.xRot) * tempData.yPos,
+			yPos = -math.sin(cameraData.xRot) * tempData.zPos + math.cos(cameraData.xRot) * tempData.yPos,
+            zPos = math.cos(cameraData.xRot) * tempData.zPos + math.sin(cameraData.xRot) * tempData.yPos,
 		};
-
-		if objectData.zPos > 0 then
+        
+        --fix for first person view
+        if mainmemory.readbyte(camera + obj_model1.camera.state_type) == 0x03 then
+            objectData.xPos = -objectData.xPos;
+            objectData.zPos = -objectData.zPos;
+        end
+        
+        
+		if objectData.zPos > 50 then
 			local XAngle_local = math.atan(objectData.yPos / objectData.zPos); -- Horizontal Angle
 			local YAngle_local = math.atan(objectData.xPos / objectData.zPos); -- Horizontal Angle
 			-- Don't need to compentate for tan since angle between
@@ -5779,10 +5786,12 @@ function drawObjectPositions()
 					-- At this point object is selectable/draggable
 					drawXPos = (screen.width / 2) * math.sin(YAngle_local) / math.sin(viewport_YAngleRange * math.pi / 360) + screen.width / 2;
 					drawYPos = -(screen.height / 2) * math.sin(XAngle_local) / math.sin(viewport_XAngleRange * math.pi / 360) + screen.height / 2;
-
+                    --drawYPos = -(screen.height) * math.sin(XAngle_local) / math.sin(viewport_XAngleRange * math.pi / 360);
+                    
 					--calc scaling factor -- current calc might be incorrect
 					scaling_factor = reference_distance / objectData.zPos;
-
+                    
+                    --[[
 					if draggedObjects[1] ~= nil then
 						if i == draggedObjects[1][1] then
 							if dragging then
@@ -5799,11 +5808,11 @@ function drawObjectPositions()
 
 								tempData.xPos = objectData.xPos;
 								tempData.yPos = math.cos(cameraData.xRot)*objectData.yPos + math.sin(cameraData.xRot)*objectData.zPos;
-								tempData.zPos = math.sin(cameraData.xRot)*objectData.yPos - math.cos(cameraData.xRot)*objectData.zPos;
+								tempData.zPos = - math.sin(cameraData.xRot)*objectData.yPos + math.cos(cameraData.xRot)*objectData.zPos;
 
-								xDifference = math.cos(cameraData.yRot)*tempData.xPos + math.sin(cameraData.yRot)*tempData.zPos;
+								xDifference = -math.cos(cameraData.yRot)*tempData.xPos + math.sin(cameraData.yRot)*tempData.zPos;
 								yDifference = tempData.yPos;
-								zDifference = -math.sin(cameraData.yRot)*tempData.xPos + math.cos(cameraData.yRot)*tempData.zPos;
+								zDifference = math.sin(cameraData.yRot)*tempData.xPos + math.cos(cameraData.yRot)*tempData.zPos;
 
 								-- Save new object position to RDRAM
 								if objectModel == 1 then
@@ -5814,7 +5823,8 @@ function drawObjectPositions()
 							end
 						end
 					end
-
+                    ]]
+                    
 					-- Draw to screen
 					local color = 0xFFFFFFFF;
 					if object_index == i then
@@ -5823,9 +5833,12 @@ function drawObjectPositions()
 							table.insert(draggedObjects, {i, drawXPos, drawYPos, objectData.zPos});
 						end
 					end
-					gui.drawLine(drawXPos - scaling_factor * object_selectable_size / 2, drawYPos, drawXPos + scaling_factor * object_selectable_size / 2, drawYPos, color);
-					gui.drawLine(drawXPos, drawYPos - scaling_factor * object_selectable_size / 2, drawXPos, drawYPos + scaling_factor * object_selectable_size / 2, color);
-					gui.drawText(drawXPos, drawYPos, string.format("%d", i), color, nil, 9 + 3 * scaling_factor);
+                    
+					gui.drawLine(drawXPos, 0, drawXPos, 20, color);
+					gui.drawText(drawXPos, 0, string.format("%d", i), color, nil, 12);
+					--gui.drawLine(drawXPos - scaling_factor * object_selectable_size / 2, drawYPos, drawXPos + scaling_factor * object_selectable_size / 2, drawYPos, color);
+					--gui.drawLine(drawXPos, drawYPos - scaling_factor * object_selectable_size / 2, drawXPos, drawYPos + scaling_factor * object_selectable_size / 2, color);
+					--gui.drawText(drawXPos, drawYPos, string.format("%d", i), color, nil, 9 + 3 * scaling_factor);
 				end
 			end
 		end
@@ -6053,7 +6066,7 @@ function Game.drawUI()
 	if isInSubGame() then
 		drawSubGameHitboxes();
 	else
-		--drawObjectPositions();
+		drawObjectPositions();
 	end
 
 	if version ~= 4 then
