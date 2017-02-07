@@ -1,5 +1,9 @@
 SystemID PSX
 05F38C	d	h	0	MainRAM	Player Pointer
+0608E0	d	u	0	MainRAM	Level Progress
+0608E4	d	u	0	MainRAM	Max Level Progress
+0608E8	d	u	0	MainRAM	Level Progress
+0608EC	d	u	0	MainRAM	Max Level Progress
 060944	d	u	0	MainRAM	Global Timer
 06CBB0	d	h	0	MainRAM	Aku Aku Object Pointer
 06CDC0	d	h	0	MainRAM	Total Boxes

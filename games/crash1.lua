@@ -274,6 +274,8 @@ Game.OSD = {
 	{"Player", playerPointerOSD},
 	{"Level", Game.getLevel},
 	{"Box", Game.getBoxesSmashed},
+	{"Progress", Game.getProgress},
+	{"Progress Vel", Game.getProgressVel},
 	{"Separator", 1},
 	{"X", Game.getXPosition},
 	{"Y", Game.getYPosition},
@@ -293,9 +295,6 @@ Game.OSD = {
 	{"Velocity", Game.getVelocity},
 	{"Separator", 1},
 	{"Jumps", Game.getJumps},
-	{"Separator", 1},
-	{"Progress", Game.getProgress},
-	{"Progress Vel", Game.getProgressVel},
 };
 
 return Game;

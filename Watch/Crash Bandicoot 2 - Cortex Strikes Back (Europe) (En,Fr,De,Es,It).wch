@@ -1,5 +1,9 @@
 SystemID PSX
 05F624	d	h	0	MainRAM	Player Pointer
+060B78	d	u	0	MainRAM	Level Progress
+060B7C	d	u	0	MainRAM	Max Level Progress
+060B80	d	u	0	MainRAM	Level Progress
+060B84	d	u	0	MainRAM	Max Level Progress
 060BDC	d	u	0	MainRAM	Global Timer
 06CE48	d	h	0	MainRAM	Aku Aku Object Pointer
 06D058	d	h	0	MainRAM	Total Boxes

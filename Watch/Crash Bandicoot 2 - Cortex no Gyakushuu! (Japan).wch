@@ -1,5 +1,9 @@
 SystemID PSX
 0614F0	d	h	0	MainRAM	Player Pointer
+062D34	d	u	0	MainRAM	Level Progress
+062D38	d	u	0	MainRAM	Max Level Progress
+062D3C	d	u	0	MainRAM	Level Progress
+062D40	d	u	0	MainRAM	Max Level Progress
 062D98	d	u	0	MainRAM	Global Timer
 06D9AC	d	h	0	MainRAM	Aku Aku Object Pointer
 06DBBC	d	h	0	MainRAM	Total Boxes

@@ -255,9 +255,10 @@ end
 
 Game.OSD = {
 	{"Player", playerPointerOSD},
-	--{"Level", Game.getLevel},
+	--{"Level", Game.getLevel}, -- TODO: Level
 	{"Box", Game.getBoxString},
 	{"Progress", Game.getLevelProgressOSD},
+	--{"Progress Vel", Game.getProgressVel}, -- TODO: Progress velocity
 	{"Separator", 1},
 	{"X", Game.getXPosition},
 	{"Y", Game.getYPosition},
