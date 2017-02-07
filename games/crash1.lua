@@ -1,3 +1,7 @@
+local oldP = {0,0}
+local P = {0,0}
+local oldPV = 0
+
 if type(ScriptHawk) ~= "table" then
 	print("This script is not designed to run by itself");
 	print("Please run ScriptHawk.lua from the parent directory instead");
@@ -121,6 +125,31 @@ function Game.getJumps()
 		return mainmemory.read_u32_le(player + player_data.jumps);
 	end
 	return 0;
+end
+
+--------------
+-- Progress --
+--------------
+
+function Game.getProgress()
+	if version == 1 then
+		return mainmemory.read_s32_le(0x057920) / pScale;
+	end
+	if version == 3 then
+		return mainmemory.read_s32_le(0x057908) / pScale;
+	end
+	return 0;
+end
+
+function Game.getProgressVel()
+	P = {Game.getProgress(),emu.framecount()}
+	if oldP[2] == P[2] then
+		return oldPV
+	end
+	local PV = P[1]-oldP[1]
+	oldPV = PV
+	oldP = P
+	return PV
 end
 
 --------------
@@ -269,6 +298,9 @@ Game.OSD = {
 	{"Velocity", Game.getVelocity},
 	{"Separator", 1},
 	{"Jumps", Game.getJumps},
+	{"Separator", 1},
+	{"Progress", Game.getProgress},
+	{"Progress Vel", Game.getProgressVel}
 };
 
 return Game;
