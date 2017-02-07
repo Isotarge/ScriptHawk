@@ -1,7 +1,3 @@
-local oldP = {0,0}
-local P = {0,0}
-local oldPV = 0
-
 if type(ScriptHawk) ~= "table" then
 	print("This script is not designed to run by itself");
 	print("Please run ScriptHawk.lua from the parent directory instead");
@@ -17,6 +13,10 @@ end
 	-- Scale Game.speedy_speeds
 	-- Take me there implementation
 
+local oldP = {0, 0};
+local P = {0, 0};
+local oldPV = 0;
+
 Game = {
 	max_rot_units = 4096,
 	rot_speed = 16,
@@ -30,6 +30,7 @@ Game = {
 		level = {0x618DC, 0x615BC, 0x618C4},
 		player_pointer = {0x566B4, 0x56390, 0x56698},
 		boxes_smashed = {0x61984, 0x61664, 0x6196C}, -- Signed 24.8 fixed point
+		level_progress = {0x57920, 0x57600, 0x57908}, -- 24.8 fixed point
 	},
 };
 
@@ -132,24 +133,18 @@ end
 --------------
 
 function Game.getProgress()
-	if version == 1 then
-		return mainmemory.read_s32_le(0x057920) / pScale;
-	end
-	if version == 3 then
-		return mainmemory.read_s32_le(0x057908) / pScale;
-	end
-	return 0;
+	return mainmemory.read_s32_le(Game.Memory.level_progress[version]) / 256;
 end
 
 function Game.getProgressVel()
-	P = {Game.getProgress(),emu.framecount()}
+	P = {Game.getProgress(), emu.framecount()};
 	if oldP[2] == P[2] then
-		return oldPV
+		return oldPV;
 	end
-	local PV = P[1]-oldP[1]
-	oldPV = PV
-	oldP = P
-	return PV
+	local PV = P[1] - oldP[1];
+	oldPV = PV;
+	oldP = P;
+	return PV;
 end
 
 --------------
@@ -286,9 +281,9 @@ Game.OSD = {
 	{"Separator", 1},
 	{"dY"},
 	{"dXZ"},
-	{"Max dY"},
-	{"Max dXZ"},
-	{"Odometer"},
+	--{"Max dY"},
+	--{"Max dXZ"},
+	--{"Odometer"},
 	{"Separator", 1},
 	{"Facing", Game.getYRotation},
 	{"Moving Angle"},
@@ -300,7 +295,7 @@ Game.OSD = {
 	{"Jumps", Game.getJumps},
 	{"Separator", 1},
 	{"Progress", Game.getProgress},
-	{"Progress Vel", Game.getProgressVel}
+	{"Progress Vel", Game.getProgressVel},
 };
 
 return Game;

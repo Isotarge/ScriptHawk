@@ -1,5 +1,6 @@
 SystemID PSX
 0566B4	d	h	0	MainRAM	Player Pointer
+057920	d	u	0	MainRAM	Level Progress
 057960	d	u	0	MainRAM	Global Timer
 0618CC	d	h	0	MainRAM	Aku Aku Object Pointer
 0618DC	d	u	0	MainRAM	Level
