@@ -6362,7 +6362,7 @@ function Game.eachFrame()
 
 	if enable_phase then
 		local currentCameraState = Game.getCameraState();
-		if (currentCameraState == "Normal" or currentCameraState == "Water") and (previousCameraState == "Fairy" or previousCameraState == "First Person") then
+		if (currentCameraState == "Normal" or currentCameraState == "Locked" or currentCameraState == "Water") and (previousCameraState == "Fairy" or previousCameraState == "First Person") then
 			local yRot = Game.getYRotation();
 			if yRot < 2048 then
 				Game.setYRotation(yRot + Game.max_rot_units);
