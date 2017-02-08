@@ -11,6 +11,7 @@ crumbling = false;
 encircle_enabled = false;
 force_tbs = false;
 object_model2_filter = nil; -- String, see obj_model2.object_types
+enable_phase = false; -- To enable the phase glitches on Europe and Japan set this to true
 realtime_flags = true;
 
 -- TODO: Need to put some grab script state up here because encircle uses it before they would normally be defined
@@ -148,6 +149,7 @@ end
 
 local flag_array = {};
 local flag_names = {};
+local previousCameraState = "Unknown";
 local prev_map = 0;
 local map_value = 0;
 
@@ -6145,12 +6147,6 @@ ScriptHawk.bindKeyFrame("L", increaseRNGLock, false);
 function Game.realTime()
 	-- Lock RNG at constant value
 	--mainmemory.write_u32_be(Game.Memory.RNG[version], RNGLock);
-
-	-- Force STVW
-	--local yRot = Game.getYRotation();
-	--if yRot < Game.max_rot_units then
-	--	Game.setYRotation(yRot + Game.max_rot_units);
-	--end
 end
 
 local vertSize = 0x10;
@@ -6362,6 +6358,17 @@ function Game.eachFrame()
 
 	if force_tbs then
 		forceTBS();
+	end
+
+	if enable_phase then
+		local currentCameraState = Game.getCameraState();
+		if (currentCameraState == "Normal" or currentCameraState == "Water") and (previousCameraState == "Fairy" or previousCameraState == "First Person") then
+			local yRot = Game.getYRotation();
+			if yRot < 2048 then
+				Game.setYRotation(yRot + Game.max_rot_units);
+			end
+		end
+		previousCameraState = currentCameraState;
 	end
 
 	--[[
