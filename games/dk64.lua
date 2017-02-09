@@ -8,10 +8,11 @@ end
 local Game = {};
 
 crumbling = false;
+displacement_detection = false;
+enable_phase = false; -- To enable the phase glitches on Europe and Japan set this to true
 encircle_enabled = false;
 force_tbs = false;
 object_model2_filter = nil; -- String, see obj_model2.object_types
-enable_phase = false; -- To enable the phase glitches on Europe and Japan set this to true
 realtime_flags = true;
 
 -- TODO: Need to put some grab script state up here because encircle uses it before they would normally be defined
@@ -4564,8 +4565,8 @@ local function detectDisplacement(objectPointer)
 		local completedBoneRatio = completedBones / numberOfBones;
 
 		if completedBoneRatio < print_threshold or print_every_frame then
-			print(toHexString(objectPointer).." ("..getActorName(objectPointer)..") updated "..completedBones.."/"..numberOfBones.." bones.");
-			outputBones(currentBoneArrayBase, numberOfBones);
+			--print(toHexString(objectPointer).." ("..getActorName(objectPointer)..") updated "..completedBones.."/"..numberOfBones.." bones.");
+			--outputBones(currentBoneArrayBase, numberOfBones);
 		end
 	end
 end
@@ -6451,10 +6452,9 @@ function Game.eachFrame()
 		ohWrongnana();
 	end
 
-	-- As of BizHawk 1.11.8, ScriptHawk's Bone Displacement fix is integrated in to the emulator, as such the UI surrounding the bug is no longer needed
-	--if type(ScriptHawk.UI.form_controls["Toggle Detect Displacement Checkbox"]) ~= "nil" and forms.ischecked(ScriptHawk.UI.form_controls["Toggle Detect Displacement Checkbox"]) then
-	--	displacementDetection();
-	--end
+	if displacement_detection then
+		displacementDetection();
+	end
 
 	doBRB();
 
