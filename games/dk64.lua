@@ -3257,10 +3257,6 @@ function countFlagsOnMap(mapIndex)
 	return flagsOnMap;
 end
 
-function countFlagsOnCurrentMap()
-	return countFlagsOnMap(map_value);
-end
-
 function checkFlagsOnMap(mapIndex)
 	local flagsOnMap = 0;
 	for i = 1, #flag_array do
@@ -3274,12 +3270,19 @@ function checkFlagsOnMap(mapIndex)
 	return flagsOnMap;
 end
 
-function checkFlagsOnCurrentMap()
-	return checkFlagsOnMap(map_value);
-end
-
 function getFlagStatsOSD() -- TODO: Slow, optimize this
-	return checkFlagsOnCurrentMap().."/"..countFlagsOnCurrentMap();
+	local flagsOnMap = 0;
+	local flagsSetOnMap = 0;
+	for i = 1, #flag_array do
+		local flag = flag_array[i];
+		if not flag.ignore and not flag.nomap and flag.map == map_value then
+			flagsOnMap = flagsOnMap + 1;
+			if checkFlag(flag.byte, flag.bit, true) then
+				flagsSetOnMap = flagsSetOnMap + 1;
+			end
+		end
+	end
+	return flagsSetOnMap.."/"..flagsOnMap;
 end
 
 local function flagSetButtonHandler()
