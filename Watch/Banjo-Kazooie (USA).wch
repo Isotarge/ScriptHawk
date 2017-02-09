@@ -2,6 +2,7 @@ SystemID N64
 02D500	d	h	1	RDRAM	Huge linked list root, investigate further
 054B50	d	h	1	RDRAM	Level Struct Linked List Start?
 27597C	d	h	1	RDRAM	Framebuffer Pointer (Copy)
+275D20	d	f	1	RDRAM	FOV
 2808D8	d	s	1	RDRAM	Frame timer
 2808DC	d	s	1	RDRAM	Frameskip
 281138	d	u	1	RDRAM	P1 A Button Held Timer
