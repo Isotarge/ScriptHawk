@@ -5092,6 +5092,33 @@ function fillFB()
 	end
 end
 
+function fillFBNative()
+	local image_filename = forms.openfile(nil, nil, "All Files (*.*)|*.*");
+	if not fileExists(image_filename) then
+		print("No image selected. Exiting.");
+		return;
+	end
+
+	local frameBufferLocation = dereferencePointer(Game.Memory.framebuffer_pointer[version]);
+	if isRDRAM(frameBufferLocation) then
+		local frameBuffer = frameBufferLocation;
+		local backBuffer = frameBufferLocation + 320 * 240 * 2;
+
+		local input_file = io.open(image_filename, "rb");
+		for i = 0, 320 * 240 * 2 - 1, 2 do
+			local byte1 = string.byte(input_file:read(1));
+			local byte2 = string.byte(input_file:read(1));
+
+			mainmemory.writebyte(frameBuffer + i + 0, byte2);
+			mainmemory.writebyte(frameBuffer + i + 1, byte1);
+
+			mainmemory.writebyte(backBuffer + i + 0, byte2);
+			mainmemory.writebyte(backBuffer + i + 1, byte1);
+		end
+		input_file:close();
+	end
+end
+
 -----------------
 -- Grab Script --
 -----------------
@@ -5715,6 +5742,14 @@ function Game.applyInfinites()
 		mainmemory.write_u16_be(base + coins, max_coins);
 		mainmemory.write_u16_be(base + lives, max_musical_energy);
 	end
+
+	--[[
+	-- Make sure all fairy pics succeed
+	local playerObject = Game.getPlayerObject();
+	if isRDRAM(playerObject) then
+		mainmemory.writebyte(playerObject + obj_model1.player.fairy_active, 0x01);
+	end
+	--]]
 end
 
 --------------------

@@ -396,8 +396,10 @@ return {
 
 	{byte=0x2C, bit=0, name="Castle: T&S Cleared", type="T&S", nomap=true},
 	{byte=0x2C, bit=1, name="Castle: Diddy GB: Chain Room", type="GB", map=163},
+	-- 0x2C > 2
 	{byte=0x2C, bit=3, name="Bananaporter FTT", type="FTT", nomap=true},
 	{byte=0x2C, bit=4, name="Japes: Baboon Blast Cranky CS", type="Cutscene", map=7},
+	-- 0x2C > 6
 	{byte=0x2C, bit=6, name="Crown Pad FTT", type="FTT", nomap=true},
 	{byte=0x2C, bit=7, name="T&S FTT (1)", type="FTT", map=42},
 

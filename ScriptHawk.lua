@@ -41,7 +41,7 @@ function replaceTextureRGBA5551(filename, base, width, height)
 		end
 	end
 
-	img = pngImage(filename);
+	local img = pngImage(filename);
 
 	for y = 1, math.min(img.height, height) do
 		for x = 1, math.min(img.width, width) do
@@ -51,7 +51,7 @@ function replaceTextureRGBA5551(filename, base, width, height)
 			local b = math.floor(pixel.B / img.depth) * rgba5551_color_constants["Blue"];
 			local a = 0;
 			if pixel.A > 0 then
-				a = 1
+				a = 1;
 			end
 
 			mainmemory.write_u16_be(base + ((y - 1) * width * 2) + ((x - 1) * 2), r + g + b + a);
