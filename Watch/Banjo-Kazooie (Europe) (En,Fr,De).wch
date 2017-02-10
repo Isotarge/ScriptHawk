@@ -2,6 +2,10 @@ SystemID N64
 2757DC	d	h	1	RDRAM	Framebuffer Pointer (Copy)
 275A70	d	f	1	RDRAM	FOV
 275A74	d	f	1	RDRAM	Aspect Ratio
+27773C	d	f	1	RDRAM	Culling Angle (Left)
+277740	d	f	1	RDRAM	Culling Angle (Right)
+277748	d	f	1	RDRAM	Culling Angle (Top)
+277750	d	f	1	RDRAM	Culling Angle (Bottom)
 280700	d	s	1	RDRAM	Frame timer
 280704	d	s	1	RDRAM	Frameskip
 2816BA	w	h	1	RDRAM	Music Track

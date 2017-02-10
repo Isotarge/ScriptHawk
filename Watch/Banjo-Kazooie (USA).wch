@@ -4,6 +4,10 @@ SystemID N64
 27597C	d	h	1	RDRAM	Framebuffer Pointer (Copy)
 275D20	d	f	1	RDRAM	FOV
 275D24	d	f	1	RDRAM	Aspect Ratio
+277A0C	d	f	1	RDRAM	Culling Angle (Left)
+277A10	d	f	1	RDRAM	Culling Angle (Right)
+277A18	d	f	1	RDRAM	Culling Angle (Top)
+277A20	d	f	1	RDRAM	Culling Angle (Bottom)
 2808D8	d	s	1	RDRAM	Frame timer
 2808DC	d	s	1	RDRAM	Frameskip
 281138	d	u	1	RDRAM	P1 A Button Held Timer
