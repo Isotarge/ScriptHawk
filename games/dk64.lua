@@ -6306,7 +6306,7 @@ local enemyTypes = {
 	--[0x4D] = "Something todo with battle crown finishing?",
 	--[0x4E] = "Actor Index 303", -- Crash
 	--[0x4F] = "Actor Index 312", -- Crash
-	[0x50] = "Static Object (Llama Model?)",
+	[0x50] = "Static Object",
 	[0x51] = "Guard", -- Stealthy Snoop
 	--[0x52] = "Crash",
 	[0x53] = "Robo-Zinger",
@@ -6356,19 +6356,115 @@ local enemyTypes = {
 	--[0x7F] = "Crash",
 };
 
+local staticObjectModels = {
+	[0x00] = "Llama",
+	[0x01] = "Padlock",
+	[0x02] = "Klaptrap (Green)",
+	[0x03] = "Klaptrap (Purple)",
+	[0x04] = "Klaptrap (Red)",
+	[0x05] = "Klump",
+	[0x06] = "Cranky",
+	[0x07] = "Turntable (DK Rap)",
+	[0x08] = "Boulder",
+	[0x09] = "Chunky",
+	[0x0A] = "Zinger",
+	[0x0B] = "Pufftoss",
+	[0x0C] = "Dogadon",
+	[0x0D] = "Mad Jack",
+	[0x0E] = "Spiderling",
+	[0x0F] = "K. Rool",
+	[0x10] = "Klump",
+	[0x11] = "Kasplat (Tiny?)",
+	[0x12] = "Kremling (Green)",
+	[0x13] = "Squawks",
+	[0x14] = "Ship's Wheel",
+	[0x15] = "Diddy",
+	[0x16] = "Chunky",
+	[0x17] = "Lanky",
+	[0x18] = "Tiny",
+	[0x19] = "DK",
+	[0x1A] = "Seal",
+	[0x1B] = "Cuckoo Bird",
+	[0x1C] = "Army Dillo (No Shell)",
+	[0x1D] = "Golden Banana",
+	[0x1E] = "Mermaid",
+	[0x1F] = "K. Lumsy",
+	[0x20] = "Escape Ship",
+	[0x21] = "Boulder",
+	[0x22] = "Enguarde",
+	[0x23] = "Army Dillo",
+	[0x24] = "Army Dillo's Gun",
+	[0x25] = "Boat",
+	[0x26] = "Candy",
+	[0x27] = "Funky",
+	[0x28] = "Banana Fairy",
+	[0x29] = "Troff",
+	[0x2A] = "Scoff",
+	[0x2B] = "Rambi",
+	[0x2C] = "K. Rool (Tiny Phase)",
+	[0x2D] = "Golden Banana",
+	[0x2E] = "DK Smoke Trail",
+	[0x2F] = "Kosha",
+	[0x30] = "King Kutout (Body)",
+	[0x31] = "King Kutout (Head)",
+	[0x32] = "King Kutout (Arm, Left)",
+	[0x33] = "King Kutout (Arm, Right)",
+	[0x34] = "Light (K. Rool Arena)",
+	[0x35] = "Robo-Kremling",
+	[0x36] = "Microphone",
+	[0x37] = "Bell (K. Rool Arena)",
+	[0x38] = "Bell (K. Rool Arena)",
+	[0x39] = "Boxing Glove",
+	[0x3A] = "Barrel", -- Sideways
+	[0x3B] = "Butterfly",
+	[0x3C] = "Beaver",
+	[0x3D] = "Beaver (Gold)",
+	[0x3E] = "Gimpfish",
+	[0x3F] = "Chain", -- Vine
+	[0x40] = "Boot",
+	[0x41] = "Funky's Gun",
+	[0x42] = "Lever", -- Gorilla Grab
+	-- Crash from here on I think, haven't tested all though
+};
+
 function dumpEnemies()
 	local enemyRespawnObject = dereferencePointer(Game.Memory.enemy_respawn_object[version]);
 	if isRDRAM(enemyRespawnObject) then
 		local numberOfEnemies = mainmemory.read_u16_be(Game.Memory.num_enemies[version]);
 		for i = 1, numberOfEnemies do
-			local enemyType = mainmemory.readbyte(enemyRespawnObject + (i - 1) * 0x48);
+			local slotBase = enemyRespawnObject + (i - 1) * 0x48;
+			local enemyType = mainmemory.readbyte(slotBase);
 			local enemyName = "Unknown "..toHexString(enemyType);
+			local model = 0;
 			if type(enemyTypes[enemyType]) == "string" then
 				enemyName = enemyTypes[enemyType];
 			end
-			dprint(i.." "..toHexString(enemyRespawnObject + (i - 1) * 0x48)..": "..enemyName);
+			if enemyType == 0x50 then
+				model = mainmemory.readbyte(slotBase + 0x0A);
+				if type(staticObjectModels[model]) == "string" then
+					model = staticObjectModels[model];
+				else
+					model = "Unknown "..toHexString(model);
+				end
+				enemyName = enemyName.." ("..model..")";
+			end
+			dprint(i.." "..toHexString(slotBase)..": "..enemyName);
 		end
 		print_deferred();
+	end
+end
+
+function everythingIsLlama()
+	local enemyRespawnObject = dereferencePointer(Game.Memory.enemy_respawn_object[version]);
+	if isRDRAM(enemyRespawnObject) then
+		local numberOfEnemies = mainmemory.read_u16_be(Game.Memory.num_enemies[version]);
+		for i = 1, numberOfEnemies do
+			local slotBase = enemyRespawnObject + (i - 1) * 0x48;
+			local enemyType = mainmemory.readbyte(slotBase);
+			if enemyType == 0x50 then
+				mainmemory.writebyte(slotBase + 0x0A, 0);
+			end
+		end
 	end
 end
 
