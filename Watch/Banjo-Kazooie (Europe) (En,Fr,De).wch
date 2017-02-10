@@ -1,6 +1,7 @@
 SystemID N64
 2757DC	d	h	1	RDRAM	Framebuffer Pointer (Copy)
 275A70	d	f	1	RDRAM	FOV
+275A74	d	f	1	RDRAM	Aspect Ratio
 280700	d	s	1	RDRAM	Frame timer
 280704	d	s	1	RDRAM	Frameskip
 2816BA	w	h	1	RDRAM	Music Track
