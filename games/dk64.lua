@@ -150,6 +150,7 @@ end
 
 local flag_array = {};
 local flag_names = {};
+local flags_by_map = {};
 local previousCameraState = "Unknown";
 local prev_map = 0;
 local map_value = 0;
@@ -2875,11 +2876,17 @@ function Game.detectVersion(romName, romHash)
 		eep_checksum[i].value = memory.read_u32_be(eep_checksum[i].address, "EEPROM");
 	end
 
-	-- Fill the flag names
+	-- Fill flag names and flags by map
 	if #flag_array > 0 then
 		for i = 1, #flag_array do
 			if not flag_array[i].ignore then
 				flag_names[i] = flag_array[i].name;
+				if not flag_array[i].nomap then
+					if not flags_by_map[flag_array[i].map] then
+						flags_by_map[flag_array[i].map] = {};
+					end
+					table.insert(flags_by_map[flag_array[i].map], flag_array[i]);
+				end
 			end
 		end
 	else
@@ -3247,42 +3254,26 @@ end
 --------------------------
 
 function countFlagsOnMap(mapIndex)
-	local flagsOnMap = 0;
-	for i = 1, #flag_array do
-		local flag = flag_array[i];
-		if not flag.ignore and not flag.nomap and flag.map == mapIndex then
-			flagsOnMap = flagsOnMap + 1;
-		end
+	if type(flags_by_map[mapIndex]) == "table" then
+		return #flags_by_map[mapIndex];
 	end
-	return flagsOnMap;
+	return 0;
 end
 
 function checkFlagsOnMap(mapIndex)
-	local flagsOnMap = 0;
-	for i = 1, #flag_array do
-		local flag = flag_array[i];
-		if not flag.ignore and not flag.nomap and flag.map == mapIndex then
-			if checkFlag(flag.byte, flag.bit, true) then
-				flagsOnMap = flagsOnMap + 1;
-			end
-		end
-	end
-	return flagsOnMap;
-end
-
-function getFlagStatsOSD() -- TODO: Slow, optimize this
-	local flagsOnMap = 0;
 	local flagsSetOnMap = 0;
-	for i = 1, #flag_array do
-		local flag = flag_array[i];
-		if not flag.ignore and not flag.nomap and flag.map == map_value then
-			flagsOnMap = flagsOnMap + 1;
+	if type(flags_by_map[mapIndex]) == "table" then
+		for k, flag in pairs(flags_by_map[mapIndex]) do
 			if checkFlag(flag.byte, flag.bit, true) then
 				flagsSetOnMap = flagsSetOnMap + 1;
 			end
 		end
 	end
-	return flagsSetOnMap.."/"..flagsOnMap;
+	return flagsSetOnMap;
+end
+
+function getFlagStatsOSD() -- TODO: This is a lot faster but still too slow to be always enabled
+	return checkFlagsOnMap(map_value).."/"..countFlagsOnMap(map_value);
 end
 
 local function flagSetButtonHandler()
