@@ -6436,6 +6436,10 @@ function dumpEnemies()
 			local enemyType = mainmemory.readbyte(slotBase);
 			local enemyName = "Unknown "..toHexString(enemyType);
 			local model = 0;
+			--local yRot = mainmemory.read_u16_be(slotBase + 0x02);
+			local xPos = mainmemory.read_s16_be(slotBase + 0x04);
+			local yPos = mainmemory.read_s16_be(slotBase + 0x06);
+			local zPos = mainmemory.read_s16_be(slotBase + 0x08);
 			if type(enemyTypes[enemyType]) == "string" then
 				enemyName = enemyTypes[enemyType];
 			end
@@ -6448,7 +6452,7 @@ function dumpEnemies()
 				end
 				enemyName = enemyName.." ("..model..")";
 			end
-			dprint(i.." "..toHexString(slotBase)..": "..enemyName);
+			dprint(i.." "..toHexString(slotBase)..": "..enemyName.." at "..xPos..", "..yPos..", "..zPos);
 		end
 		print_deferred();
 	end
