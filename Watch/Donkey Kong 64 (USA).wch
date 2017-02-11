@@ -52,7 +52,7 @@ SystemID N64
 6E256A	w	h	1	RDRAM	Diddy Shot SFX
 6EAC74	d	h	1	RDRAM	STVW Write, 0 to patch
 6F33E6	w	h	1	RDRAM	Lanky Long Arms Map Index
-6F33E8	d	h	1	RDRAM	Lanky Long Arems Map Check (0 for any map)
+6F33E8	d	h	1	RDRAM	Lanky Long Arms Map Check (0 for any map)
 744470	d	h	1	RDRAM	Framebuffer Pointer
 744478	d	u	1	RDRAM	Current Lag Speed Boost
 74447C	b	u	1	RDRAM	Squish Screen (Left)

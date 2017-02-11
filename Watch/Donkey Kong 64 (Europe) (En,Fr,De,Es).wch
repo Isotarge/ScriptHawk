@@ -30,6 +30,10 @@ SystemID N64
 73EBD8	b	h	1	RDRAM	Squish Screen (Bottom)
 73EC34	d	u	1	RDRAM	Next Map
 73EC38	d	u	1	RDRAM	Next Exit
+73EC74	w	s	1	RDRAM	Multiplayer P1 Score
+73EC76	w	s	1	RDRAM	Multiplayer P2 Score
+73EC78	w	s	1	RDRAM	Multiplayer P3 Score
+73EC7A	w	s	1	RDRAM	Multiplayer P4 Score
 73EC98	w	s	1	RDRAM	Rambi Score 1
 73EC9A	d	h	1	RDRAM	Rambi Score 1 Name
 73EC9E	w	s	1	RDRAM	Rambi Score 2

@@ -31,6 +31,10 @@ SystemID N64
 743D48	b	u	1	RDRAM	Squish Screen (Bottom)
 743DA4	d	u	1	RDRAM	Next Map
 743DA8	d	u	1	RDRAM	Next Exit
+743DE4	w	s	1	RDRAM	Multiplayer P1 Score
+743DE6	w	s	1	RDRAM	Multiplayer P2 Score
+743DE8	w	s	1	RDRAM	Multiplayer P3 Score
+743DEA	w	s	1	RDRAM	Multiplayer P4 Score
 743E08	w	s	1	RDRAM	Rambi Score 1
 743E0A	d	h	1	RDRAM	Rambi Score 1 Name
 743E0E	w	s	1	RDRAM	Rambi Score 2
