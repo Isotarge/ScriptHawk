@@ -2315,6 +2315,7 @@ local function getExamineDataModelTwo(pointer)
 	local behaviorType = getScriptName(pointer);
 	if isRDRAM(behaviorTypePointer) then
 		table.insert(examine_data, { "Behavior Type", behaviorType });
+		table.insert(examine_data, { "Internal Name", getInternalName(pointer) });
 		table.insert(examine_data, { "Behavior Type Pointer", toHexString(behaviorTypePointer, 6) });
 	end
 	local behaviorPointer = dereferencePointer(pointer + obj_model2.behavior_pointer);
@@ -5065,6 +5066,16 @@ function ohWrongnana(verbose)
 		freeTradeObjectModel1(currentKong);
 		freeTradeCollisionList();
 	end
+end
+
+function fixMonkeyHead()
+	mainmemory.writebyte(0x41F8C8, 0x0B);
+	mainmemory.writebyte(0x41F8CB, 0x0B);
+	mainmemory.writebyte(0x41F8D4, 0x00);
+	mainmemory.writebyte(0x41F8DC, 0x00);
+	mainmemory.writebyte(0x41F8DE, 0x01);
+	mainmemory.writebyte(0x41F8DF, 0x2A);
+	mainmemory.writebyte(0x41F8E0, 0x00);
 end
 
 ----------------------
