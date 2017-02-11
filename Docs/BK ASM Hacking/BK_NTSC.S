@@ -47,15 +47,17 @@
 
 [SetApplyButtonInputsToBanjoFlag]: 0x8023E06C
 
+[NormalizeVector]: 0x80245FA4 ;I: (float* $a0 XPtr, float* $a1 YPtr, float* $a2 ZPtr)
+
 [SetFrameSkip]: 0x8024BF94 ;I: (word $a0 input)
 [GetFrameSkip]: 0x8024BFA0 ;O: [word $v0] //normally 2 but sometimes 3 eg. GV lobby
 
 [GetFrameTimer]: 0x8024C4E8	;O: [word $v0]
 [SetFrameTimer]: 0x8024C4F8	;I: (word $a0 input)
 
-
 //NOTE: Camera_ is the render camera for Objects and Terrain containing Transparencies
 [GetDistanceToCamera_]:	0x8024C584	;I: (float* $a0 destinationXPtr)
+
 [GetCamera_Position]: 0x8024C5CC	;I:	(float* $a0 destinationXPtr)
 
 [CopyCamera_XYZRotation]:	0x8024C764	;I: (float* $a0 destinationXPtr)
@@ -68,6 +70,9 @@
 [SetCamera_XYZRotation]:	0x8024CE18	;I: (float* $a0 XPosPtr)
 [SetCamera_XYZRotation_0]:	0x8024CE40	;I: (float $f12 XPos, float $f14 YPos, float $a2 ZPos)
 
+[GetFieldOfView]:   0x8024DDA8  ;O: [float $f0]
+[SetFieldOfView]:   0x8024DDB4  ;I: (float $f12 input)
+[GetAspectRatio]:   0x8024DDC0  ;O: [float $f0]
 
 [UpdateButtonInputs]:	0x8024E7C8
 
@@ -97,7 +102,6 @@
 [IsNotOnYAxisToOrigin]:	0x802583D8	;I:	(float* $a0 inputXPtr)	O: [byte $v0 bool]
 
 [IsPointInRectVol]:		0x802584FC	;I: (float* $a0 inputXptr, float* $a1 minXPtr, float* $a2 maxXPtr)	O: [byte $v0 bool]
-
 
 [GetDistanceSquared2D_XZ]:	0x802586B0	;I:	(float* $a0 input1XPtr, float* $a1 input2XPtr)	O: [float $f0]
 
@@ -129,13 +133,15 @@
 
 [ClampToAbsValue_Float]:	0x80269190	;I: (float $f12 input, float $f14 clampValue)	O: [float $f0]
 [GetDifferenceOfAngles]:	0x802591D8	;I:	(float $f12 minuend, float $f14 subtrend)	O: [float $f0]
-
-[Are2PointsWithinDistance_2D_XZ]:	0x80259328	;I: (float* $a0 XPtr1, float* $a1 XPtr2, float $a2 distance)	O: [byte $v0 bool]
+[Are2PointsWithinDistance_2D_XZ]:	0x80259254	;I: (float* $a0 XPtr1, float $a1 X2, float $a2 Z2, float $a3 distance)	O: [byte $v0 bool]
+[Are2PointsWithinDistance_2D_XZ_1]:	0x802592C4	;I: (float* $a0 XPtr1, float* $a1 XPtr2, float $a2 distance)	O: [byte $v0 bool]
+[Are2PointsWithinDistance_2D_XZ_2]:	0x80259328	;I: (float* $a0 XPtr1, float* $a1 XPtr2, float $a2 distance)	O: [byte $v0 bool]
 [Are2PointsWithinDistance]:			0x80259328	;I: (float* $a0 XPtr1, float* $a1 XPtr2, float $a2 distance)	O: [byte $v0 bool]
 
 [DecrementTimerByOneFrame]:	0x8025943C	;I: ( float* $a0 timerPtr )
 
 [SquareRoot]:	0x80265350	;I: (float $f12 input)	O: [float $f0]
+
 
 
 /* ****************
@@ -199,12 +205,16 @@
 [SetAnimationStruct_AnimationTimer]:	0x80289690	;I: (struct* $a0 animationStruct, float $a1 input)
 [SetAnimationStruct_Word_0x00]:			0x80289790	;I: (struct* $a0 animationStruct, word $a1 input)
 [SetAnimationStruct_Word_0x04]:			0x80289798	;I: (struct* $a0 animationStruct, word $a1 input)
-[GetAnimationStruct_Float_0x18]:		0x802897C8	;I: (struct* $a0 animationStruct, float $a1 input)
+
+[SetAnimationStruct_Float_0x18]:		0x802897C8	;I: (struct* $a0 animationStruct, float $a1 input)
 
 [SetTo2ObjectAnimationStruct_Byte_0x1C]: 0x8028980C	;I:	(struct* $a0 animationStruct)
 [SetPlayerBounceRate]:	0x80289820	;I:	(word $a0 input)
 
+[UpdateMovementAnimationFrame]: 0x80289E00  ;
+
 [GetPlayerBounceRate]:	0x80289EA4	;O:	[word $v0]
+[SetLimitsOfPlayerWalkingCycleTime]: 0x80289EA8 ;I: (float $f12 minTime, float $f14 maxTime)
 
 [SetPlayerBounceRate_0]:	0x80289F10	;I:	(word $a0 input)
 
@@ -214,7 +224,6 @@
 [IsPlayerMovementStruct_Substate3]:			0x80289FC4	;O:	[byte $vo bool]
 
 [SetPlayerMovementState]:	0x8028A180	;I:	(word $a0 animationIndex, float $a1 animationDuration)
-
 
 [GetBeakBargeUnlockedFlag]:			0x8028A960	;O: [word $v0]
 [GetBeakBombUnlockedFlag]:			0x8028A980	;O: [word $v0]
@@ -237,14 +246,12 @@
 [GetTalonTrotUnlockedFlag_0]:		0x8028AC98	;O: [word $v0]
 [GetWonderWingUnlockedFlag]:		0x8028ACB8	;O: [word $v0]
 
-
 [IsCurrentlyInTermiteMovementState]:	0x8028AD64	;O: [byte $v0 bool]
 [IsCurrentlyInPumpkinMovementState]:	0x8028AD8C	;O: [byte $v0 bool]
 [IsEnteringLevelOtherThanSM]:			0x8028ADBC	;O:	[byte $v0 bool]
 
-
 [IsPlayerMoreThan60AboveGround]:	0x8028B094	;O: [byte $v0 bool]
-
+[IsPlayerWithinDistanceOfPoint_XZ]: 0x8028B0E0  ;I: (float* $a0 pointXPtr, float $a1 distance)  O: [byte $v0 bool]
 //[Get0]: 0x8028B120
 [IsInSwampWaterOrSand]:	0x8028B128	;O: [byte $v0 bool]
 [IsCurrentLevelRBB]:	0x8028B128	;O: [byte $v0 bool]
@@ -258,13 +265,19 @@
 
 [SetPlayerAsGrounded]:	0x8028B6FC
 
+[ObjectCollisionSwitchCases]:   0x8028B724
+
 [UpdateItemAndEnemyCollision]:	0x8028D2E4
 
 [SetCarriedObject_ModelIndex]:	0x8028D658	;I:	(word $a0 modelIndex)
 
 [GetCarriedObject_ModelIndex]:	0x8028D670	;O:	[word $v0]
 
-[SpawnAndCarryActor]: 0x8028DE0C ;Inputs: (word $a0 ActorIndex), (float* $a1 LocationXPtr)
+[SpawnAndCarryActor]: 0x8028DE0C ;I: (word $a0 ActorIndex), (float* $a1 LocationXPtr)
+
+[IncrementAndDisplayCarriedObject]: 0x8028DF20
+
+[SetCarriedItemCountToZeroAndDisplay]: 0x8028DFB8
 
 [UpdateBanjo]:	0x8028E71C
 
@@ -277,6 +290,65 @@
 [GetFloorObjectNormalRotation_0]:	0x8028E84C	;I: (float* $a0 destXPtr)
 [GetCarriedObject_UnknownStruct2Ptr_0]:	0x8028E86C	;[struct* $v0]
 
+[CopyXYZPosition_1]:    0x8028E9A4  ;I: (float* $a0 destXPtr)
+
+[GetFacingAngle_1]: 0x8028EBA4  ;O: [float $f0]
+[GetWalkingVelocity_1]: 0x8028EBC4  ;O: [float $f0]
+[GetXRotation_1]:   0x8028EBE4  ;O: [float $f0]
+
+[GetRotations]:  0x8028EC24    ;I: (float* $a0 DestinationXRot)
+
+[GetMovingAngle_1]: 0x8028EF08  ;O: [float $f0]
+
+[CopyXYZVelocity_1]: 0x8028EF70 ;I: (float* $a0 DestXPtr)
+
+[IncrementAndDisplayCarriedObject_1]: 0x8028F030
+[SetCarriedItemCountToZeroAndDisplay_!]: 0x8028F050
+[IsPlayerAndShadowVisible]: 0x8028F070  ;O: [byte $v0 bool]
+
+[IsMumboTransformBanjoOrWashingMachine]:    0x8028F0D4  ;O: [byte $v0 bool]
+[InJiggyJigMovementState]:  0x8028F108  ;O: [byte $v0 bool]
+[InMovementState0x0B]:  0x8028F140  ;O: [byte $v0 bool]
+[GetPlayerIsVisibleFlag]:  0x8028F158  ;O: [byte $v0]
+[InFirstPersonView]:  0x8028F170  ;O: [byte $v0 bool]
+[GetSpecificMoveUnlockedFlag]:  0x8028F190  ;O: [byte $v0]
+
+[GetPlayersShadowIsVisibleFlag]:  0x8028F1D4  ;O: [byte $v0]
+
+[InDeathMovementState]: 0x8028F22C  ;O: [byte $v0 bool]
+
+[IsPlayerSwimming_1]:   0x8028F2FC  ;O: [byte $v0 bool]
+
+[UnlockMove]:   0x8028F3B8  ;I: (word $a0 moveUnlockedIndex)
+
+[WritePlayerIsFrozenFlag]:  0x8028F7C8  ;I: (byte $a0 input)
+
+[SetCurrentLevelMainMapAndExit_0]:	0x8028FA14	;I: (word $a0 MapIndex, word $a1 ExitIndex)
+
+[SetXYZRotationTargets]:	0x8028FAEC	;I	(float* $a0 RotXPtr)
+[ClearCarriedObjectBehaviorStructPointer]:	0x8028FB28
+
+[EnablePlayerIsVisibleFlag]:	0x8028FCAC
+[ClearPlayerIsVisibleFlag]:	0x8028FCBC
+[WritePlayerIsVisibleFlag_1]:	0x8028FCC8	;I: (byte $a0 input)
+
+[ClearIdleTimerEnabledFlag]:	0x802900FC
+
+[SetCameraZoomState]:	0x80290B60	;I: (byte $a0 input)
+
+[UpdateCameraPositionRotationAndZoom]:	0x80291358
+[GetCameraRotationState]:	0x8029147C	;O: [byte $v0]
+
+[GetShoeTimer]:	0x80291670	;I: (byte $a0 shoeTimerIndex)	O: [float $f0]
+
+[IsShoeTimerZero]:	0x80291698	;I: (byte $a0 shoeTimerIndex)	O: [byte $f0 bool]
+[IsShoeTimerNotZero]:	0x802916CC	;I: (byte $a0 shoeTimerIndex)	O: [byte $f0 bool]
+[IsValueBetweenShoeTimerAndTimerCopy]:	0x80291710	;I: (byte $a0 shoeTimerIndex, float $a1 input)	O: [byte $f0 bool]
+
+[ClearShoeTimer]:	0x802917C4	;I: (byte $a0 shoeTimerIndex)
+[SetShoeTimer]:	0x802917E4	;I: (byte $a0 shoeTimerIndex, float $a1 input)
+
+[UpdatePlayerModelFacingAngle]: 0x802919F0
 
 [UpdatePlayerModelToMumboTransFormation]: 0x80291D04
 
@@ -284,10 +356,16 @@
 [SetPlayerTransparency]: 	0x80291FB8 	;I: (byte $a0 input)
 [SetPlayerModel]:        	0x80291FC4 	;I: (half $a0 modelIndex)
 
+[UpdateFacingAngleForDominantModelChange]:	0x80292090
+[SetPlayerModelScale]:	0x802920FC	;I:	(float $f12 input)
+[SetBanjoFacingAngle]:	0x80292134	;I:	(float $f12 input)
+
+
+
 [GetButtonPressTimer]: 		0x8029557C 	;I: (byte $a0 ButtonIndex)
 [GetButtonReleaseTimer]: 	0x80295590 	;I: (byte $a0 ButtonIndex)
 
-[GetMovesUnlockedBitfield]: 0x802957F0 	;O: [word $a0]
+[GetMovesUnlockedBitfield]: 0x802957F0 	;O: [word $v0]
 
 [LockAllMoves]: 			0x80295804
 
