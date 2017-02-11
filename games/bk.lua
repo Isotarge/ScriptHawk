@@ -2144,7 +2144,7 @@ function setSelectedObjectModel(model_index)
 	if script_mode == "Examine" or script_mode == "List" then -- Model 1
 		local objectArray = dereferencePointer(Game.Memory.object_array_pointer[version]);
 		if isRDRAM(objectArray) then
-			local slotBase = objectArray + getSlotBase(object_index);
+			local slotBase = objectArray + getSlotBase(object_index-1);
 			local behavior_pointer = dereferencePointer(slotBase);
 			if isRDRAM(behavior_pointer) then
 				objectModel = mainmemory.read_u16_be(behavior_pointer + 0x3E);
@@ -2160,7 +2160,7 @@ function turnOffSelectedObjectCollision()
 	if script_mode == "Examine" or script_mode == "List" then -- Model 1
 		local objectArray = dereferencePointer(Game.Memory.object_array_pointer[version]);
 		if isRDRAM(objectArray) then
-			local slotBase = objectArray + getSlotBase(object_index);
+			local slotBase = objectArray + getSlotBase(object_index-1);
 			local behavior_pointer = dereferencePointer(slotBase);
 			if isRDRAM(behavior_pointer) then
 				mainmemory.write_u16_be(behavior_pointer + 0x2E, 0);
@@ -2173,7 +2173,7 @@ function turnOnSelectedObjectCollision()
 	if script_mode == "Examine" or script_mode == "List" then -- Model 1
 		local objectArray = dereferencePointer(Game.Memory.object_array_pointer[version]);
 		if isRDRAM(objectArray) then
-			local slotBase = objectArray + getSlotBase(object_index);
+			local slotBase = objectArray + getSlotBase(object_index-1);
 			local behavior_pointer = dereferencePointer(slotBase);
 			if isRDRAM(behavior_pointer) then
 				mainmemory.write_u16_be(behavior_pointer + 0x2E, 1);
@@ -2186,7 +2186,7 @@ function despawnSelectedObject()
 	if script_mode == "Examine" or script_mode == "List" then -- Model 1
 		local objectArray = dereferencePointer(Game.Memory.object_array_pointer[version]);
 		if isRDRAM(objectArray) then
-			local slotBase = objectArray + getSlotBase(object_index);
+			local slotBase = objectArray + getSlotBase(object_index-1);
 			local bitfieldValue = mainmemory.readbyte(slotBase + 0x47);
 			mainmemory.writebyte(slotBase + 0x47, set_bit(bitfieldValue, 3));
 		end
@@ -2197,7 +2197,7 @@ function grabSelectedObject()
 	if script_mode == "Examine" or script_mode == "List" then -- Model 1
 		local objectArray = dereferencePointer(Game.Memory.object_array_pointer[version]);
 		if isRDRAM(objectArray) then
-			local slotBase = objectArray + getSlotBase(object_index);
+			local slotBase = objectArray + getSlotBase(object_index-1);
 			local unknownStructAddress = dereferencePointer(slotBase);
 			if isRDRAM(unknownStructAddress) then
 				local tempBitField = mainmemory.readbyte(slotBase + 0x139);
