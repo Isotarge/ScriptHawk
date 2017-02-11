@@ -1994,7 +1994,7 @@ function drawObjectPositions()
 			zPos = -math.cos(cameraData.xRot) * tempData.zPos + math.sin(cameraData.xRot) * tempData.yPos,
 		};
 
-		if objectData.zPos > 0 then
+		if objectData.zPos > 30 then
 			local XAngle_local = math.atan(objectData.yPos / objectData.zPos); -- Horizontal Angle
 			local YAngle_local = math.atan(objectData.xPos / objectData.zPos); -- Horizontal Angle
 			-- Don't need to compentate for tan since angle between
