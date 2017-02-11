@@ -703,7 +703,7 @@ obj_model1 = {
 		[42] = "Grape",
 		[43] = "Feather",
 		[44] = "Laser", -- Projectile
-		[45] = "Golden Banana", -- TODO: Unused? These are normally model 2
+		[45] = "Golden Banana", -- Vulture, possibly some other places
 		[47] = "Watermelon Slice",
 		[48] = "Coconut",
 		[49] = "Rocketbarrel",
@@ -758,7 +758,7 @@ obj_model1 = {
 		[105] = "6 Pad (Diddy 5DI)",
 		[106] = "5DI Controller?", -- TODO: Investigate, might be something to do with Kong shadow?
 		[107] = "Bonus Barrel (Hideout Helm)",
-		--[109] = "Unknown", -- Spawned by Fungi Forest setup but seems to disappear immediately
+		[109] = "Rabbit Race Checkpoint",
 		[110] = "CB Bunch", -- Unused? Doesn't seem to work, these are normally model 2
 		[111] = "Balloon (Chunky)",
 		[112] = "Balloon (Tiny)",
@@ -771,6 +771,7 @@ obj_model1 = {
 		[120] = "CB Single (Yellow)", -- Unused? Doesn't seem to work, these are normally model 2
 		[121] = "Crystal Coconut", -- Unused? Doesn't seem to work, these are normally model 2
 		[122] = "DK Coin", -- Unused? Doesn't seem to work, these are normally model 2
+		[123] = "Kong Mirror", -- Creepy Castle Museum
 		[124] = "Peril Path Panic Controller?", -- TODO: Verify, used anywhere else?
 		[125] = "Krazy Kong Klamour Kontroller?",
 		[126] = "Fly Swatter",
@@ -2883,10 +2884,12 @@ function Game.detectVersion(romName, romHash)
 			if not flag_array[i].ignore then
 				flag_names[i] = flag_array[i].name;
 				if not flag_array[i].nomap then
-					if not flags_by_map[flag_array[i].map] then
-						flags_by_map[flag_array[i].map] = {};
+					if type(flag_array[i].map) == "number" then
+						if not flags_by_map[flag_array[i].map] then
+							flags_by_map[flag_array[i].map] = {};
+						end
+						table.insert(flags_by_map[flag_array[i].map], flag_array[i]);
 					end
-					table.insert(flags_by_map[flag_array[i].map], flag_array[i]);
 				end
 			end
 		end

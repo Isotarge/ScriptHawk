@@ -51,6 +51,8 @@ SystemID N64
 6E253A	w	h	1	RDRAM	DK Shot SFX
 6E256A	w	h	1	RDRAM	Diddy Shot SFX
 6EAC74	d	h	1	RDRAM	STVW Write, 0 to patch
+6F33E6	w	h	1	RDRAM	Lanky Long Arms Map Index
+6F33E8	d	h	1	RDRAM	Lanky Long Arems Map Check (0 for any map)
 744470	d	h	1	RDRAM	Framebuffer Pointer
 744478	d	u	1	RDRAM	Current Lag Speed Boost
 74447C	b	u	1	RDRAM	Squish Screen (Left)
@@ -62,6 +64,10 @@ SystemID N64
 7444E8	d	u	1	RDRAM	Next Exit
 744508	w	u	1	RDRAM	Enemies Killed
 744518	w	u	1	RDRAM	Arena Current Score
+744524	w	s	1	RDRAM	Multiplayer P1 Score
+744526	w	s	1	RDRAM	Multiplayer P2 Score
+744528	w	s	1	RDRAM	Multiplayer P3 Score
+74452A	w	s	1	RDRAM	Multiplayer P4 Score
 74452C	b	u	1	RDRAM	Story skip
 744530	b	u	1	RDRAM	Chimpy Cam
 744538	b	u	1	RDRAM	Monkey Smash Map
