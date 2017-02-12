@@ -429,7 +429,7 @@ end
 -- State --
 -----------
 
-override_lag_detection = true;
+override_lag_detection = (type(Game.isPhysicsFrame) == "function"); -- Default to true if the game implements custom lag detection
 mode = "Position";
 local rotation_units = "Degrees";
 
@@ -907,7 +907,7 @@ if type(Game.eachFrame) ~= "function" then
 end
 
 if type(Game.realTime) ~= "function" then
-	--print("Warning: This module does not implement Game.realTime());
+	--print("Warning: This module does not implement Game.realTime()");
 	function Game.realTime()
 	end
 end
@@ -929,7 +929,7 @@ if type(Game.setRotation) ~= "function" then
 end
 
 if type(Game.isPhysicsFrame) ~= "function" then
-	--print("Warning: This module does not implement Game.isPhysicsFrame());
+	--print("Warning: This module does not implement Game.isPhysicsFrame()");
 	function Game.isPhysicsFrame()
 		return not emu.islagged();
 	end
