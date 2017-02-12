@@ -429,6 +429,7 @@ end
 -- State --
 -----------
 
+override_lag_detection = true;
 mode = "Position";
 local rotation_units = "Degrees";
 
@@ -700,40 +701,48 @@ end
 ScriptHawk.UI.options_form = forms.newform(ScriptHawk.UI.col(17), ScriptHawk.UI.row(10), "ScriptHawk Options");
 
 -- Handle, Type, Caption, Callback, X position, Y position, Width, Height
-ScriptHawk.UI.form_controls["Mode Label"] = forms.label(ScriptHawk.UI.options_form, "Mode:", ScriptHawk.UI.col(0), ScriptHawk.UI.row(0) + ScriptHawk.UI.label_offset, 44, ScriptHawk.UI.button_height);
-ScriptHawk.UI.form_controls["Mode Button"] = forms.button(ScriptHawk.UI.options_form, mode, toggleMode, ScriptHawk.UI.col(2), ScriptHawk.UI.row(0), 64, ScriptHawk.UI.button_height);
+if not TASSafe then
+	ScriptHawk.UI.form_controls["Mode Label"] = forms.label(ScriptHawk.UI.options_form, "Mode:", ScriptHawk.UI.col(0), ScriptHawk.UI.row(0) + ScriptHawk.UI.label_offset, 44, ScriptHawk.UI.button_height);
+	ScriptHawk.UI.form_controls["Mode Button"] = forms.button(ScriptHawk.UI.options_form, mode, toggleMode, ScriptHawk.UI.col(2), ScriptHawk.UI.row(0), 64, ScriptHawk.UI.button_height);
+else
+	ScriptHawk.UI.form_controls["Override Lag Detection"] = forms.checkbox(ScriptHawk.UI.options_form, "Override Lag Detection", ScriptHawk.UI.col(0) + ScriptHawk.UI.dropdown_offset, ScriptHawk.UI.row(2) + ScriptHawk.UI.dropdown_offset);
+	forms.setproperty(ScriptHawk.UI.form_controls["Override Lag Detection"], "Width", 140);
+	forms.setproperty(ScriptHawk.UI.form_controls["Override Lag Detection"], "Checked", override_lag_detection);
+end
 
 ScriptHawk.UI.form_controls["Precision Label"] = forms.label(ScriptHawk.UI.options_form, "Precision:", ScriptHawk.UI.col(0), ScriptHawk.UI.row(1) + ScriptHawk.UI.label_offset, 54, 14);
 ScriptHawk.UI.form_controls["Decrease Precision Button"] = forms.button(ScriptHawk.UI.options_form, "-", decreasePrecision, ScriptHawk.UI.col(4) - 28, ScriptHawk.UI.row(1), ScriptHawk.UI.button_height, ScriptHawk.UI.button_height);
 ScriptHawk.UI.form_controls["Increase Precision Button"] = forms.button(ScriptHawk.UI.options_form, "+", increasePrecision, ScriptHawk.UI.col(5) - 28, ScriptHawk.UI.row(1), ScriptHawk.UI.button_height, ScriptHawk.UI.button_height);
 ScriptHawk.UI.form_controls["Precision Value Label"] = forms.label(ScriptHawk.UI.options_form, precision, ScriptHawk.UI.col(5), ScriptHawk.UI.row(1) + ScriptHawk.UI.label_offset, 44, 14);
 
-ScriptHawk.UI.form_controls["Speed Label"] = forms.label(ScriptHawk.UI.options_form, "Speed:", ScriptHawk.UI.col(0), ScriptHawk.UI.row(2) + ScriptHawk.UI.label_offset, 54, 14);
-ScriptHawk.UI.form_controls["Decrease Speed Button"] = forms.button(ScriptHawk.UI.options_form, "-", decreaseSpeed, ScriptHawk.UI.col(4) - 28, ScriptHawk.UI.row(2), ScriptHawk.UI.button_height, ScriptHawk.UI.button_height);
-ScriptHawk.UI.form_controls["Increase Speed Button"] = forms.button(ScriptHawk.UI.options_form, "+", increaseSpeed, ScriptHawk.UI.col(5) - 28, ScriptHawk.UI.row(2), ScriptHawk.UI.button_height, ScriptHawk.UI.button_height);
-ScriptHawk.UI.form_controls["Speed Value Label"] = forms.label(ScriptHawk.UI.options_form, "0", ScriptHawk.UI.col(5), ScriptHawk.UI.row(2) + ScriptHawk.UI.label_offset, 47, 14);
+if not TASSafe then
+	ScriptHawk.UI.form_controls["Speed Label"] = forms.label(ScriptHawk.UI.options_form, "Speed:", ScriptHawk.UI.col(0), ScriptHawk.UI.row(2) + ScriptHawk.UI.label_offset, 54, 14);
+	ScriptHawk.UI.form_controls["Decrease Speed Button"] = forms.button(ScriptHawk.UI.options_form, "-", decreaseSpeed, ScriptHawk.UI.col(4) - 28, ScriptHawk.UI.row(2), ScriptHawk.UI.button_height, ScriptHawk.UI.button_height);
+	ScriptHawk.UI.form_controls["Increase Speed Button"] = forms.button(ScriptHawk.UI.options_form, "+", increaseSpeed, ScriptHawk.UI.col(5) - 28, ScriptHawk.UI.row(2), ScriptHawk.UI.button_height, ScriptHawk.UI.button_height);
+	ScriptHawk.UI.form_controls["Speed Value Label"] = forms.label(ScriptHawk.UI.options_form, "0", ScriptHawk.UI.col(5), ScriptHawk.UI.row(2) + ScriptHawk.UI.label_offset, 47, 14);
 
-if type(Game.maps) == "table" then
-	local filteredMaps = {};
-	for i = 1, #Game.maps do
-		if string.sub(Game.maps[i],1,1) ~= "!" then
-			table.insert(filteredMaps, Game.maps[i]);
+	if type(Game.maps) == "table" then
+		local filteredMaps = {};
+		for i = 1, #Game.maps do
+			if string.sub(Game.maps[i],1,1) ~= "!" then
+				table.insert(filteredMaps, Game.maps[i]);
+			end
+		end
+		ScriptHawk.UI.form_controls["Map Dropdown"] = forms.dropdown(ScriptHawk.UI.options_form, filteredMaps, ScriptHawk.UI.col(0) + ScriptHawk.UI.dropdown_offset, ScriptHawk.UI.row(3) + ScriptHawk.UI.dropdown_offset, ScriptHawk.UI.col(9) + 8, ScriptHawk.UI.button_height);
+		if Game.takeMeThereType == nil or Game.takeMeThereType == "Checkbox" then
+			Game.takeMeThereType = "Checkbox";
+			ScriptHawk.UI.form_controls["Map Checkbox"] = forms.checkbox(ScriptHawk.UI.options_form, "Take me there", ScriptHawk.UI.col(0) + ScriptHawk.UI.dropdown_offset, ScriptHawk.UI.row(4) + ScriptHawk.UI.dropdown_offset);
+		elseif Game.takeMeThereType == "Button" then
+			ScriptHawk.UI.form_controls["Map Button"] = forms.button(ScriptHawk.UI.options_form, "Take me there", function() Game.setMap(previous_map_value); end, ScriptHawk.UI.col(0), ScriptHawk.UI.row(4), ScriptHawk.UI.col(4) + 10, ScriptHawk.UI.button_height);
 		end
 	end
-	ScriptHawk.UI.form_controls["Map Dropdown"] = forms.dropdown(ScriptHawk.UI.options_form, filteredMaps, ScriptHawk.UI.col(0) + ScriptHawk.UI.dropdown_offset, ScriptHawk.UI.row(3) + ScriptHawk.UI.dropdown_offset, ScriptHawk.UI.col(9) + 8, ScriptHawk.UI.button_height);
-	if Game.takeMeThereType == nil or Game.takeMeThereType == "Checkbox" then
-		Game.takeMeThereType = "Checkbox";
-		ScriptHawk.UI.form_controls["Map Checkbox"] = forms.checkbox(ScriptHawk.UI.options_form, "Take me there", ScriptHawk.UI.col(0) + ScriptHawk.UI.dropdown_offset, ScriptHawk.UI.row(4) + ScriptHawk.UI.dropdown_offset);
-	elseif Game.takeMeThereType == "Button" then
-		ScriptHawk.UI.form_controls["Map Button"] = forms.button(ScriptHawk.UI.options_form, "Take me there", function() Game.setMap(previous_map_value); end, ScriptHawk.UI.col(0), ScriptHawk.UI.row(4), ScriptHawk.UI.col(4) + 10, ScriptHawk.UI.button_height);
+
+	if type(Game.applyInfinites) == "function" then
+		ScriptHawk.UI.form_controls["Toggle Infinites Checkbox"] = forms.checkbox(ScriptHawk.UI.options_form, "Infinites", ScriptHawk.UI.col(0) + ScriptHawk.UI.dropdown_offset, ScriptHawk.UI.row(5) + ScriptHawk.UI.dropdown_offset);
 	end
 end
 
 ScriptHawk.UI.form_controls["Toggle Telemetry Button"] = forms.button(ScriptHawk.UI.options_form, "Start Telemetry", toggleTelemetry, ScriptHawk.UI.col(10), ScriptHawk.UI.row(3), ScriptHawk.UI.col(4) + 10, ScriptHawk.UI.button_height);
-
-if type(Game.applyInfinites) == "function" then
-	ScriptHawk.UI.form_controls["Toggle Infinites Checkbox"] = forms.checkbox(ScriptHawk.UI.options_form, "Infinites", ScriptHawk.UI.col(0) + ScriptHawk.UI.dropdown_offset, ScriptHawk.UI.row(5) + ScriptHawk.UI.dropdown_offset);
-end
 
 ScriptHawk.UI.form_controls["Rotation Units Label"] = forms.label(ScriptHawk.UI.options_form, "Units:", ScriptHawk.UI.col(5), ScriptHawk.UI.row(0) + ScriptHawk.UI.label_offset, 44, 14);
 ScriptHawk.UI.form_controls["Toggle Rotation Units Button"] = forms.button(ScriptHawk.UI.options_form, rotation_units, toggleRotationUnits, ScriptHawk.UI.col(7), ScriptHawk.UI.row(0), 64, ScriptHawk.UI.button_height);
@@ -791,13 +800,16 @@ local angleKeywords = {
 
 function ScriptHawk.UI.updateReadouts()
 	-- Update form buttons etc
-	forms.settext(ScriptHawk.UI.form_controls["Speed Value Label"], Game.speedy_speeds[Game.speedy_index]);
 	forms.settext(ScriptHawk.UI.form_controls["Precision Value Label"], precision);
-	forms.settext(ScriptHawk.UI.form_controls["Mode Button"], mode);
 	forms.settext(ScriptHawk.UI.form_controls["Toggle Rotation Units Button"], rotation_units);
-	if type(Game.maps) == "table" and previous_map ~= forms.gettext(ScriptHawk.UI.form_controls["Map Dropdown"]) then
-		previous_map = forms.gettext(ScriptHawk.UI.form_controls["Map Dropdown"]);
-		previous_map_value = ScriptHawk.UI.findMapValue();
+	if not TASSafe then
+		forms.settext(ScriptHawk.UI.form_controls["Speed Value Label"], Game.speedy_speeds[Game.speedy_index]);
+		forms.settext(ScriptHawk.UI.form_controls["Mode Button"], mode);
+
+		if type(Game.maps) == "table" and previous_map ~= forms.gettext(ScriptHawk.UI.form_controls["Map Dropdown"]) then
+			previous_map = forms.gettext(ScriptHawk.UI.form_controls["Map Dropdown"]);
+			previous_map_value = ScriptHawk.UI.findMapValue();
+		end
 	end
 
 	-- Draw OSD
@@ -952,6 +964,10 @@ local dpad_pressed = {
 };
 
 local function mainloop()
+	if TASSafe then
+		return; -- If we're in TAS mode, don't even bother checking DPad/L inputs
+	end
+
 	if ScriptHawk.UI.form_controls["Toggle Infinites Checkbox"] ~= nil and forms.ischecked(ScriptHawk.UI.form_controls["Toggle Infinites Checkbox"]) then
 		Game.applyInfinites();
 	end
@@ -1061,6 +1077,10 @@ local function mainloop()
 end
 
 local function plot_pos()
+	if TASSafe then
+		override_lag_detection = forms.ischecked(ScriptHawk.UI.form_controls["Override Lag Detection"]);
+	end
+
 	ScriptHawk.processKeybinds(ScriptHawk.keybindsFrame);
 	ScriptHawk.processKeybinds(ScriptHawk.joypadBindsFrame);
 	Game.eachFrame();
@@ -1087,7 +1107,15 @@ local function plot_pos()
 		end
 	end
 
-	if Game.isPhysicsFrame() then
+	local isLagged = not Game.isPhysicsFrame();
+	if override_lag_detection then
+		emu.setislagged(isLagged);
+		if tastudio.engaged() then
+			tastudio.setlag(current_frame, isLagged);
+		end
+	end
+
+	if not isLagged then
 		if math.abs(current_frame - previous_frame) > 1 then
 			dx = 0;
 			dy = 0;
