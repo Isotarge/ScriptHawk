@@ -5,6 +5,8 @@ if type(ScriptHawk) ~= "table" then
 	return;
 end
 
+realtime_flags = true;
+
 local Game = {};
 
 Game.maps = {
@@ -294,7 +296,7 @@ Game.maps = {
 Game.Memory = {
 	["player_pointer"] = {0x13A210, 0x13A4A0, 0x12F660, 0x135490},
 	["player_pointer_index"] = {0x13A25F, 0x13A4EF, 0x12F6AF, 0x1354DF},
-	["moves_pointer"] = {0x1314F0, 0x131780, 0x126940, 0x12C770},
+	["flag_block_pointer"] = {0x1314F0, 0x131780, 0x126940, 0x12C770},
 	["air"] = {0x12FDC0, 0x12FFD0, 0x125220, 0x12B050},
 	["frame_timer"] = {0x083550, 0x083550, 0x0788F8, 0x079138},
 	["linked_list_root"] = {0x13C380, 0x13C680, 0x131850, 0x137800},
@@ -445,7 +447,7 @@ JinjoAddresses = {
 	{{0x11FAA1, 0x11FC61, 0x114E31, 0x11AB71}, "JRL: Blubber"},
 	{{0x11FAA4, 0x11FC64, 0x114E34, 0x11AB74}, "JRL: Big Fish"},
 	{{0x11FAA7, 0x11FC67, 0x114E37, 0x11AB77}, "JRL: Seaweed Sanctum"},
-	{{0x11FAAA, 0x11FC6A, 0x114E3A, 0x11AB7A}, "JRL: Sunken Ship"},	
+	{{0x11FAAA, 0x11FC6A, 0x114E3A, 0x11AB7A}, "JRL: Sunken Ship"},
 	{{0x11FAAD, 0x11FC6D, 0x114E3D, 0x11AB7D}, "TDL: Talon Torpedo"},
 	{{0x11FAB0, 0x11FC70, 0x114E40, 0x11AB80}, "TDL: Cutscene Skip"},
 	{{0x11FAB3, 0x11FC73, 0x114E43, 0x11AB83}, "TDL: Beside Rocknut"},
@@ -768,7 +770,7 @@ local move_levels = {
 
 local function unlock_moves()
 	local level = forms.gettext(ScriptHawk.UI.form_controls.moves_dropdown);
-	local movesObject = dereferencePointer(Game.Memory.moves_pointer[version]);
+	local movesObject = dereferencePointer(Game.Memory.flag_block_pointer[version]);
 	if isRDRAM(movesObject) then
 		mainmemory.write_u32_be(movesObject + 0x18, move_levels[level][1]);
 		mainmemory.write_u32_be(movesObject + 0x1C, move_levels[level][2]);
@@ -895,7 +897,7 @@ local movementStates = {
 	[0x78] = "Locked", -- Underwater
 
 	[0x7A] = "Walking", -- Damaging Ground, eg. quicksand
-
+	[0x7B] = "Damaged", -- Talon Trot
 	[0x7C] = "Clockwork Mouse", -- Canary Mary 3 & 4
 	[0x7D] = "Damaged", -- Solo Banjo - Sack Pack
 
@@ -966,7 +968,7 @@ local movementStates = {
 	[0xC6] = "Leg Spring", -- Solo Kazooie
 	[0xC7] = "Walking", -- Solo Kazooie
 	[0xC8] = "Entering Beak Bayonet",
-	[0xC9] = "Exiting Beak Bayonet",	
+	[0xC9] = "Exiting Beak Bayonet",
 	[0xCA] = "Idle", -- Breegull Blaster
 
 	[0xCE] = "Locked", -- Beak Bayonet, Loading Zone
@@ -1243,6 +1245,248 @@ function dumpPointerListStrings()
 	until not isRDRAM(object);
 end
 
+-----------
+-- Flags --
+-----------
+
+local flag_block_cache = {};
+function clearFlagCache()
+	flag_block_cache = {};
+end
+event.onloadstate(clearFlagCache, "ScriptHawk - Clear Flag Cache");
+
+local flag_block_size = 0xB0;
+local flag_array = {
+	{byte=0x00, bit=3, name="First Time Egg Collection", type="FTT"},
+	{byte=0x00, bit=4, name="First Time Red Feather Collection", type="FTT"},
+	{byte=0x00, bit=5, name="First Time Gold Feather Collection", type="FTT"},
+	{byte=0x00, bit=6, name="First Time Treble Clef Collection", type="FTT"},
+	{byte=0x00, bit=7, name="First Time Health Collection", type="FTT"},
+
+	{byte=0x01, bit=5, name="First Time Jinjo Collection", type="FTT"},
+	
+	{byte=0x02, bit=4, name="Klungo Intro Cutscene"},
+
+	{byte=0x13, bit=1, name="Klungo 1 Potion Chosen?"},
+
+	{byte=0x1E, bit=0, name="Amaze-O-Gaze Goggles"},
+
+	{byte=0x2F, bit=5, name="FT Jiggy Collection?"},
+	{byte=0x2F, bit=7, name="Mrs. Bottles Intro Cutscene"},
+
+	{byte=0x30, bit=0, name="Speccy Intro Text Seen"},
+	{byte=0x30, bit=1, name="Amaze-O-Gaze Goggles Instructions Seen"},
+
+	{byte=0x38, bit=4, name="FT Enter Jinjo Village?"},
+
+	{byte=0x39, bit=4, name="Jinjo: ???", type="Jinjo"},
+	{byte=0x39, bit=5, name="Jinjo: ???", type="Jinjo"},
+	{byte=0x39, bit=6, name="Jinjo: ???", type="Jinjo"},
+	{byte=0x39, bit=7, name="Jinjo: ???", type="Jinjo"},
+
+	{byte=0x3A, bit=0, name="Jinjo: ???", type="Jinjo"},
+	{byte=0x3A, bit=1, name="Jinjo: ???", type="Jinjo"},
+	{byte=0x3A, bit=2, name="Jinjo: ???", type="Jinjo"},
+	{byte=0x3A, bit=3, name="Jinjo: ???", type="Jinjo"},
+	{byte=0x3A, bit=4, name="Jinjo: ???", type="Jinjo"},
+	{byte=0x3A, bit=5, name="Jinjo: ???", type="Jinjo"},
+	{byte=0x3A, bit=6, name="Jinjo: ???", type="Jinjo"},
+	{byte=0x3A, bit=7, name="Jinjo: ???", type="Jinjo"},
+
+	{byte=0x3B, bit=0, name="Jinjo: ???", type="Jinjo"},
+	{byte=0x3B, bit=1, name="Jinjo: ???", type="Jinjo"},
+	{byte=0x3B, bit=2, name="Jinjo: ???", type="Jinjo"},
+	{byte=0x3B, bit=3, name="Jinjo: ???", type="Jinjo"},
+	{byte=0x3B, bit=4, name="Jinjo: ???", type="Jinjo"},
+	{byte=0x3B, bit=5, name="Jinjo: ???", type="Jinjo"},
+	{byte=0x3B, bit=6, name="Jinjo: ???", type="Jinjo"},
+	{byte=0x3B, bit=7, name="Jinjo: ???", type="Jinjo"},
+
+	{byte=0x3C, bit=0, name="Jinjo: ???", type="Jinjo"},
+	{byte=0x3C, bit=1, name="Jinjo: ???", type="Jinjo"},
+	{byte=0x3C, bit=2, name="Jinjo: ???", type="Jinjo"},
+	{byte=0x3C, bit=3, name="Jinjo: ???", type="Jinjo"},
+	{byte=0x3C, bit=4, name="Jinjo: ???", type="Jinjo"},
+	{byte=0x3C, bit=5, name="Jinjo: ???", type="Jinjo"},
+	{byte=0x3C, bit=6, name="Jinjo: ???", type="Jinjo"},
+	{byte=0x3C, bit=7, name="Jinjo: ???", type="Jinjo"},
+
+	{byte=0x3D, bit=0, name="Jinjo: ???", type="Jinjo"},
+	{byte=0x3D, bit=1, name="Jinjo: ???", type="Jinjo"},
+	{byte=0x3D, bit=2, name="Jinjo: ???", type="Jinjo"},
+	{byte=0x3D, bit=3, name="Jinjo: ???", type="Jinjo"},
+	{byte=0x3D, bit=4, name="Jinjo: ???", type="Jinjo"},
+	{byte=0x3D, bit=5, name="Jinjo: ???", type="Jinjo"},
+	{byte=0x3D, bit=6, name="Jinjo: ???", type="Jinjo"},
+	{byte=0x3D, bit=7, name="Jinjo: ???", type="Jinjo"},
+
+	{byte=0x3E, bit=0, name="Jinjo: ???", type="Jinjo"},
+	{byte=0x3E, bit=1, name="Jinjo: ???", type="Jinjo"},
+	{byte=0x3E, bit=2, name="Jinjo: ???", type="Jinjo"},
+	{byte=0x3E, bit=3, name="Jinjo: ???", type="Jinjo"},
+	{byte=0x3E, bit=4, name="Jinjo: IoH: Wooded Hollow", type="Jinjo"},
+	{byte=0x3E, bit=5, name="Jinjo: IoH: ???", type="Jinjo"},
+	{byte=0x3E, bit=6, name="Jinjo: IoH: ???", type="Jinjo"},
+	{byte=0x3E, bit=7, name="Jinjo: IoH: ???", type="Jinjo"},
+
+	{byte=0x3F, bit=0, name="Jinjo: IoH: Spiral Mountain", type="Jinjo"},
+	-- 0x3F > 1
+	{byte=0x3F, bit=2, name="Honeycomb: ???", type="Honeycomb"},
+	{byte=0x3F, bit=3, name="Honeycomb: ???", type="Honeycomb"},
+	{byte=0x3F, bit=4, name="Honeycomb: ???", type="Honeycomb"},
+	{byte=0x3F, bit=5, name="Honeycomb: ???", type="Honeycomb"},
+	{byte=0x3F, bit=6, name="Honeycomb: ???", type="Honeycomb"},
+	{byte=0x3F, bit=7, name="Honeycomb: ???", type="Honeycomb"},
+
+	{byte=0x40, bit=0, name="Honeycomb: ???", type="Honeycomb"},
+	{byte=0x40, bit=1, name="Honeycomb: ???", type="Honeycomb"},
+	{byte=0x40, bit=2, name="Honeycomb: ???", type="Honeycomb"},
+	{byte=0x40, bit=3, name="Honeycomb: ???", type="Honeycomb"},
+	{byte=0x40, bit=4, name="Honeycomb: ???", type="Honeycomb"},
+	{byte=0x40, bit=5, name="Honeycomb: ???", type="Honeycomb"},
+	{byte=0x40, bit=6, name="Honeycomb: ???", type="Honeycomb"},
+	{byte=0x40, bit=7, name="Honeycomb: ???", type="Honeycomb"},
+
+	{byte=0x41, bit=0, name="Honeycomb: ???", type="Honeycomb"},
+	{byte=0x41, bit=1, name="Honeycomb: ???", type="Honeycomb"},
+	{byte=0x41, bit=2, name="Honeycomb: ???", type="Honeycomb"},
+	{byte=0x41, bit=3, name="Honeycomb: ???", type="Honeycomb"},
+	{byte=0x41, bit=4, name="Honeycomb: ???", type="Honeycomb"},
+	{byte=0x41, bit=5, name="Honeycomb: ???", type="Honeycomb"},
+	{byte=0x41, bit=6, name="Honeycomb: ???", type="Honeycomb"},
+	{byte=0x41, bit=7, name="Honeycomb: ???", type="Honeycomb"},
+
+	{byte=0x42, bit=0, name="Honeycomb: ???", type="Honeycomb"},
+	{byte=0x42, bit=1, name="Honeycomb: ???", type="Honeycomb"},
+	{byte=0x42, bit=2, name="Honeycomb: ???", type="Honeycomb"},
+
+	{byte=0x50, bit=1, name="Jiggy: King Jingaling FT Cutscene", type="Jiggy"},
+
+	{byte=0x53, bit=6, name="FT Jiggy Collection??"},
+
+	{byte=0x5D, bit=5, name="FT Enter Digger Tunnel (Klungo 1)?"},
+	{byte=0x5D, bit=7, name="FT Enter Digger Tunnel (Klungo 1)??"},
+
+	{byte=0x5E, bit=0, name="Klungo 1 Defeated"},
+
+	{byte=0x60, bit=5, name="Silo: Jinjo Village", type="Silo"},
+	{byte=0x60, bit=6, name="Silo: Wooded Hollow", type="Silo"},
+	{byte=0x60, bit=7, name="Silo: Plateau", type="Silo"},
+
+	{byte=0x61, bit=0, name="Silo: Pine Grove", type="Silo"},
+	{byte=0x61, bit=1, name="Silo: Clifftop", type="Silo"},
+	{byte=0x61, bit=2, name="Silo: Wasteland", type="Silo"},
+	{byte=0x61, bit=3, name="Silo: Quagmire", type="Silo"},
+	{byte=0x61, bit=4, name="FT Silo Text", type="FTT"},
+
+	{byte=0x62, bit=7, name="Roysten Help Me Text"},
+
+	{byte=0x67, bit=0, name="King Jingaling Life Sapped"},
+	{byte=0x67, bit=7, name="Jiggywiggy Temple Is Over There CS Seen"},
+
+	{byte=0x82, bit=4, name="Jinjo Family FT Cutscene?"},
+
+	{byte=0x97, bit=7, name="Treble Clef: Jinjo Village"},
+
+	{byte=0xA2, bit=7, name="First Time Enter Banjo's House"},
+
+	{byte=0xA3, bit=0, name="Klungo 1 Potion Chosen??"},
+
+	{byte=0xA6, bit=5, name="FT Enter Wooded Hollow"},
+	{byte=0xA6, bit=6, name="FT Enter Jinjo Village??"},
+
+	{byte=0xA7, bit=1, name="FT Enter King Jingaling Cutscene"},
+	{byte=0xA7, bit=3, name="FT Enter Bottles' House?"},
+	{byte=0xA7, bit=7, name="First Time Turbo Trainers"},
+
+	{byte=0xA8, bit=0, name="First Time Wading Boots"},
+	{byte=0xA8, bit=4, name="Klungo 1 Intro Cutscene"},
+};
+
+function isKnown(byte, bit)
+	for i = 1, #flag_array do
+		if flag_array[i].byte == byte and flag_array[i].bit == bit then
+			return true;
+		end
+	end
+	return false;
+end
+
+function getFlagName(byte, bit)
+	for i = 1, #flag_array do
+		if byte == flag_array[i].byte and bit == flag_array[i].bit and not flag_array[i].ignore then
+			return flag_array[i].name;
+		end
+	end
+	return "Unknown at "..toHexString(byte)..">"..bit;
+end
+
+function clearFlag(byte, bit)
+	if type(byte) == "number" and type(bit) == "number" and bit >= 0 and bit < 8 then
+		local flags = dereferencePointer(Game.Memory.flag_block_pointer[version]);
+		if isRDRAM(flags) then
+			currentValue = mainmemory.readbyte(flags + byte);
+			mainmemory.writebyte(flags + byte, clear_bit(currentValue, bit));
+		end
+	end
+end
+
+function setFlag(byte, bit)
+	if type(byte) == "number" and type(bit) == "number" and bit >= 0 and bit < 8 then
+		local flags = dereferencePointer(Game.Memory.flag_block_pointer[version]);
+		if isRDRAM(flags) then
+			currentValue = mainmemory.readbyte(flags + byte);
+			mainmemory.writebyte(flags + byte, set_bit(currentValue, bit));
+		end
+	end
+end
+
+function clearAllFlags()
+	local flagBlock = dereferencePointer(Game.Memory.flag_block_pointer[version]);
+	if isRDRAM(flagBlock) then
+		for byte = 0, flag_block_size - 1 do
+			mainmemory.writebyte(flagBlock + byte, 0x00);
+		end
+	end
+end
+
+function setAllFlags()
+	local flagBlock = dereferencePointer(Game.Memory.flag_block_pointer[version]);
+	if isRDRAM(flagBlock) then
+		for byte = 0, flag_block_size - 1 do
+			mainmemory.writebyte(flagBlock + byte, 0xFF);
+		end
+	end
+end
+
+function checkFlags()
+	local flagBlock = dereferencePointer(Game.Memory.flag_block_pointer[version]);
+	if isRDRAM(flagBlock) then
+		for byte = 0, flag_block_size - 1 do
+			local currentValue = mainmemory.readbyte(flagBlock + byte);
+			local previousValue = flag_block_cache[byte];
+			if previousValue == nil then
+				previousValue = currentValue;
+			end
+			for bit = 0, 7 do
+				local isSet = check_bit(currentValue, bit);
+				local wasSet = check_bit(previousValue, bit);
+				if isSet and not wasSet then
+					if isKnown(byte, bit) then
+						dprint("Flag "..toHexString(byte, 2)..">"..bit..": \""..getFlagName(byte, bit).."\" was set on frame "..emu.framecount());
+					else
+						dprint("{byte="..toHexString(byte, 2)..", bit="..bit..", name=\"Name\"},");
+					end
+				elseif not isSet and wasSet then
+					dprint("Flag "..toHexString(byte, 2)..">"..bit..": \""..getFlagName(byte, bit).."\" was cleared on frame "..emu.framecount());
+				end
+			end
+			flag_block_cache[byte] = currentValue;
+		end
+		print_deferred();
+	end
+end
+
 ------------
 -- Events --
 ------------
@@ -1280,6 +1524,9 @@ end
 function Game.eachFrame()
 	if forms.ischecked(ScriptHawk.UI.form_controls.toggle_neverslip) then
 		neverSlip();
+	end
+	if realtime_flags then
+		checkFlags();
 	end
 end
 

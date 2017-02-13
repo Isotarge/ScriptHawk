@@ -72,7 +72,7 @@ SystemID N64
 12C5A2	w	h	1	RDRAM	Map Load Trigger
 12FFD0	d	f	1	RDRAM	Air (Real)
 12FFD4	d	f	1	RDRAM	Air
-131780	d	h	1	RDRAM	Moves Pointer
+131780	d	h	1	RDRAM	Flag Block Pointer
 1317B4	d	f	1	RDRAM	Game Time (GGM)
 1317B8	d	f	1	RDRAM	Game Time (MT)
 1317C0	d	f	1	RDRAM	Game Time (WW)
