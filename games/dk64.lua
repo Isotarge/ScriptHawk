@@ -2990,9 +2990,9 @@ function checkFlags(showKnown)
 								local currentFlag = getFlag(i, bit);
 								if not currentFlag.ignore then
 									if currentFlag.map ~= nil or currentFlag.nomap == true then
-										dprint("Flag "..toHexString(i, 2)..">"..bit..": \""..getFlagName(i, bit).."\" was set");
+										dprint("Flag "..toHexString(i, 2)..">"..bit..": \""..getFlagName(i, bit).."\" was set on frame "..emu.framecount());
 									else
-										dprint("Flag "..toHexString(i, 2)..">"..bit..": \""..getFlagName(i, bit).."\" was set ADD MAP "..map_value.." PLEASE");
+										dprint("Flag "..toHexString(i, 2)..">"..bit..": \""..getFlagName(i, bit).."\" was set on frame "..emu.framecount().." ADD MAP "..map_value.." PLEASE");
 									end
 								end
 							end
@@ -3000,11 +3000,11 @@ function checkFlags(showKnown)
 						end
 					elseif not isSetNow and wasSet then
 						if not isFound(i, bit) then
-							dprint("Flag "..toHexString(i, 2)..">"..bit..": \"Unknown\" was cleared");
+							dprint("Flag "..toHexString(i, 2)..">"..bit..": \"Unknown\" was cleared on frame "..emu.framecount());
 						elseif showKnown then
 							local currentFlag = getFlag(i, bit);
 							if type(currentFlag) == "table" and not currentFlag.ignore then
-								dprint("Flag "..toHexString(i, 2)..">"..bit..": \""..getFlagName(i, bit).."\" was cleared");
+								dprint("Flag "..toHexString(i, 2)..">"..bit..": \""..getFlagName(i, bit).."\" was cleared on frame "..emu.framecount());
 							end
 						end
 					end

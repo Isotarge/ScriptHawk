@@ -441,6 +441,7 @@ return {
 
 	{byte=0x31, bit=0, name="Troff 'n' Scoff FT Something?", type="FTT", map=42}, -- TODO: What is this?
 	{byte=0x31, bit=1, name="Isles: Rareware GB Room Open", type="Physical", map=189},
+	-- 0x31 > 2
 	{byte=0x31, bit=3, name="First Ammo/CB/Bunch Collection", type="FTT", nomap=true},
 	{byte=0x31, bit=4, name="First Coin Collection", type="FTT", nomap=true},
 	{byte=0x31, bit=5, name="Factory Lobby: Lever Pulled", type="Physical", map=175},
