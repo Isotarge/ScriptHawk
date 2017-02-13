@@ -89,7 +89,7 @@ Game.maps = {
 
 	"!Crash 0x00F0",
 
-	"HP - Inside the UFO",
+	"HFP - Inside the UFO",
 
 	"!Unknown 0x00F2", "!Crash 0x00F3",
 
@@ -150,21 +150,21 @@ Game.maps = {
 	"WW - Saucer of Peril",
 	"GI - Water Supply Pipe",
 	"GGM - Water Supply Pipe",
-	"HP - Lava Side",
-	"HP - Icy Side",
-	"HP - Lava Train Station",
-	"HP - Ice Train Station",
-	"HP - Chilli Billi",
-	"HP - Chilly Willy",
-	"HP - Kickball Stadium lobby",
-	"HP - Kickball Stadium 1",
-	"HP - Kickball Stadium 2",
-	"HP - Kickball Stadium 3",
-	"HP - Boggy's Igloo",
-	"HP - Icicle Grotto",
-	"HP - Inside the Volcano",
-	"HP - Mumbo's Skull",
-	"HP - Wumba's Wigwam",
+	"HFP - Lava Side",
+	"HFP - Icy Side",
+	"HFP - Lava Train Station",
+	"HFP - Ice Train Station",
+	"HFP - Chilli Billi",
+	"HFP - Chilly Willy",
+	"HFP - Kickball Stadium lobby",
+	"HFP - Kickball Stadium 1",
+	"HFP - Kickball Stadium 2",
+	"HFP - Kickball Stadium 3",
+	"HFP - Boggy's Igloo",
+	"HFP - Icicle Grotto",
+	"HFP - Inside the Volcano",
+	"HFP - Mumbo's Skull",
+	"HFP - Wumba's Wigwam",
 	"CCL",
 	"CCL - Inside the Trash Can",
 	"CCL - Inside the Cheese Wedge",
@@ -198,8 +198,8 @@ Game.maps = {
 	"IoH - Plateau",
 	"IoH - Plateau - Honey B's Hive",
 	"IoH - Pine Grove",
-	"IoH - Clifftop",
-	"IoH - Clifftop - Mumbo's Skull",
+	"IoH - Cliff Top",
+	"IoH - Cliff Top - Mumbo's Skull",
 	"IoH - Pine Grove - Wumba's Wigwam",
 	"Game Select Screen",
 	"Cutscene - Opening cutscene",
@@ -217,7 +217,7 @@ Game.maps = {
 	"GGM - Ordnance Storage (multiplayer)",
 	"MT - Targitzan's Temple (multiplayer)",
 	"MT - (still)",
-	"HP - Icy Side (still)",
+	"HFP - Icy Side (still)",
 	"JV - Bottles' House (still)",
 	"CK - Gun Room (still)",
 
@@ -241,7 +241,7 @@ Game.maps = {
 	"GI - Packing Game",
 	"Cutscene - Zombified Throne Room",
 	"MT - Kickball Arena 4",
-	"HP - Kickball Arena",
+	"HFP - Kickball Arena",
 	"JRL - Sea Bottom Cavern",
 	"JRL - Submarine (multiplayer)",
 	"TDL - Chompa's Belly (multiplayer)",
@@ -1263,13 +1263,17 @@ local flag_array = {
 	{byte=0x00, bit=6, name="First Time Treble Clef Collection", type="FTT"},
 	{byte=0x00, bit=7, name="First Time Health Collection", type="FTT"},
 
+	{byte=0x01, bit=2, name="First Time Empty Honeycomb Collection", type="FTT"},
 	{byte=0x01, bit=5, name="First Time Jinjo Collection", type="FTT"},
-	
+
+	{byte=0x02, bit=2, name="Signpost: FTT", type="FTT"},
 	{byte=0x02, bit=4, name="Klungo Intro Cutscene"},
+
+	{byte=0x07, bit=7, name="First Time Cheato Page", type="FTT"},
 
 	{byte=0x13, bit=1, name="Klungo 1 Potion Chosen?"},
 
-	{byte=0x1E, bit=0, name="Amaze-O-Gaze Goggles"},
+	{byte=0x1E, bit=0, name="Amaze-O-Gaze Goggles", type="Ability"},
 
 	{byte=0x2F, bit=5, name="FT Jiggy Collection?"},
 	{byte=0x2F, bit=7, name="Mrs. Bottles Intro Cutscene"},
@@ -1313,21 +1317,21 @@ local flag_array = {
 
 	{byte=0x3D, bit=0, name="Jinjo: ???", type="Jinjo"},
 	{byte=0x3D, bit=1, name="Jinjo: ???", type="Jinjo"},
-	{byte=0x3D, bit=2, name="Jinjo: ???", type="Jinjo"},
-	{byte=0x3D, bit=3, name="Jinjo: ???", type="Jinjo"},
-	{byte=0x3D, bit=4, name="Jinjo: ???", type="Jinjo"},
-	{byte=0x3D, bit=5, name="Jinjo: ???", type="Jinjo"},
-	{byte=0x3D, bit=6, name="Jinjo: ???", type="Jinjo"},
-	{byte=0x3D, bit=7, name="Jinjo: ???", type="Jinjo"},
+	{byte=0x3D, bit=2, name="Jinjo: HFP: Lava Waterfall", type="Jinjo"},
+	{byte=0x3D, bit=3, name="Jinjo: HFP: Boiling Hot Pool", type="Jinjo"},
+	{byte=0x3D, bit=4, name="Jinjo: HFP: Windy Hole", type="Jinjo"},
+	{byte=0x3D, bit=5, name="Jinjo: HFP: Icicle Grotto", type="Jinjo"},
+	{byte=0x3D, bit=6, name="Jinjo: HFP: Mildred Ice Cube", type="Jinjo"},
+	{byte=0x3D, bit=7, name="Jinjo: CCL: Trash Can", type="Jinjo"},
 
-	{byte=0x3E, bit=0, name="Jinjo: ???", type="Jinjo"},
-	{byte=0x3E, bit=1, name="Jinjo: ???", type="Jinjo"},
-	{byte=0x3E, bit=2, name="Jinjo: ???", type="Jinjo"},
-	{byte=0x3E, bit=3, name="Jinjo: ???", type="Jinjo"},
+	{byte=0x3E, bit=0, name="Jinjo: CCL: Cheese Wedge", type="Jinjo"},
+	{byte=0x3E, bit=1, name="Jinjo: CCL: Central Cavern", type="Jinjo"},
+	{byte=0x3E, bit=2, name="Jinjo: CCL: Mingy Jongo", type="Jinjo"},
+	{byte=0x3E, bit=3, name="Jinjo: CCL: Wumba's", type="Jinjo"},
 	{byte=0x3E, bit=4, name="Jinjo: IoH: Wooded Hollow", type="Jinjo"},
-	{byte=0x3E, bit=5, name="Jinjo: IoH: ???", type="Jinjo"},
-	{byte=0x3E, bit=6, name="Jinjo: IoH: ???", type="Jinjo"},
-	{byte=0x3E, bit=7, name="Jinjo: IoH: ???", type="Jinjo"},
+	{byte=0x3E, bit=5, name="Jinjo: IoH: Wasteland", type="Jinjo"},
+	{byte=0x3E, bit=6, name="Jinjo: IoH: Cliff Top", type="Jinjo"},
+	{byte=0x3E, bit=7, name="Jinjo: IoH: Plateau", type="Jinjo"},
 
 	{byte=0x3F, bit=0, name="Jinjo: IoH: Spiral Mountain", type="Jinjo"},
 	-- 0x3F > 1
@@ -1349,7 +1353,7 @@ local flag_array = {
 
 	{byte=0x41, bit=0, name="Honeycomb: ???", type="Honeycomb"},
 	{byte=0x41, bit=1, name="Honeycomb: ???", type="Honeycomb"},
-	{byte=0x41, bit=2, name="Honeycomb: ???", type="Honeycomb"},
+	{byte=0x41, bit=2, name="Honeycomb: GI: Chimney", type="Honeycomb"},
 	{byte=0x41, bit=3, name="Honeycomb: ???", type="Honeycomb"},
 	{byte=0x41, bit=4, name="Honeycomb: ???", type="Honeycomb"},
 	{byte=0x41, bit=5, name="Honeycomb: ???", type="Honeycomb"},
@@ -1360,37 +1364,159 @@ local flag_array = {
 	{byte=0x42, bit=1, name="Honeycomb: ???", type="Honeycomb"},
 	{byte=0x42, bit=2, name="Honeycomb: ???", type="Honeycomb"},
 
-	{byte=0x50, bit=1, name="Jiggy: King Jingaling FT Cutscene", type="Jiggy"},
+	{byte=0x45, bit=0, name="Jiggy: ???", type="Jiggy"},
+	{byte=0x45, bit=1, name="Jiggy: ???", type="Jiggy"},
+	{byte=0x45, bit=2, name="Jiggy: ???", type="Jiggy"},
+	{byte=0x45, bit=3, name="Jiggy: ???", type="Jiggy"},
+	{byte=0x45, bit=4, name="Jiggy: ???", type="Jiggy"},
+	{byte=0x45, bit=5, name="Jiggy: ???", type="Jiggy"},
+	{byte=0x45, bit=6, name="Jiggy: ???", type="Jiggy"},
+	{byte=0x45, bit=7, name="Jiggy: ???", type="Jiggy"},
+
+	{byte=0x46, bit=0, name="Jiggy: MT: Top of Temple", type="Jiggy"},
+	{byte=0x46, bit=1, name="Jiggy: ???", type="Jiggy"},
+	{byte=0x46, bit=2, name="Jiggy: ???", type="Jiggy"},
+	{byte=0x46, bit=3, name="Jiggy: ???", type="Jiggy"},
+	{byte=0x46, bit=4, name="Jiggy: ???", type="Jiggy"},
+	{byte=0x46, bit=5, name="Jiggy: ???", type="Jiggy"},
+	{byte=0x46, bit=6, name="Jiggy: ???", type="Jiggy"},
+	{byte=0x46, bit=7, name="Jiggy: ???", type="Jiggy"},
+
+	{byte=0x47, bit=0, name="Jiggy: ???", type="Jiggy"},
+	{byte=0x47, bit=1, name="Jiggy: ???", type="Jiggy"},
+	{byte=0x47, bit=2, name="Jiggy: ???", type="Jiggy"},
+	{byte=0x47, bit=3, name="Jiggy: ???", type="Jiggy"},
+	{byte=0x47, bit=4, name="Jiggy: ???", type="Jiggy"},
+	{byte=0x47, bit=5, name="Jiggy: ???", type="Jiggy"},
+	{byte=0x47, bit=6, name="Jiggy: ???", type="Jiggy"},
+	{byte=0x47, bit=7, name="Jiggy: ???", type="Jiggy"},
+
+	{byte=0x48, bit=0, name="Jiggy: ???", type="Jiggy"},
+	{byte=0x48, bit=1, name="Jiggy: ???", type="Jiggy"},
+	{byte=0x48, bit=2, name="Jiggy: ???", type="Jiggy"},
+	{byte=0x48, bit=3, name="Jiggy: ???", type="Jiggy"},
+	{byte=0x48, bit=4, name="Jiggy: ???", type="Jiggy"},
+	{byte=0x48, bit=5, name="Jiggy: ???", type="Jiggy"},
+	{byte=0x48, bit=6, name="Jiggy: ???", type="Jiggy"},
+	{byte=0x48, bit=7, name="Jiggy: ???", type="Jiggy"},
+
+	{byte=0x49, bit=0, name="Jiggy: ???", type="Jiggy"},
+	{byte=0x49, bit=1, name="Jiggy: ???", type="Jiggy"},
+	{byte=0x49, bit=2, name="Jiggy: ???", type="Jiggy"},
+	{byte=0x49, bit=3, name="Jiggy: ???", type="Jiggy"},
+	{byte=0x49, bit=4, name="Jiggy: ???", type="Jiggy"},
+	{byte=0x49, bit=5, name="Jiggy: ???", type="Jiggy"},
+	{byte=0x49, bit=6, name="Jiggy: ???", type="Jiggy"},
+	{byte=0x49, bit=7, name="Jiggy: ???", type="Jiggy"},
+
+	{byte=0x4A, bit=0, name="Jiggy: ???", type="Jiggy"},
+	{byte=0x4A, bit=1, name="Jiggy: ???", type="Jiggy"},
+	{byte=0x4A, bit=2, name="Jiggy: ???", type="Jiggy"},
+	{byte=0x4A, bit=3, name="Jiggy: ???", type="Jiggy"},
+	{byte=0x4A, bit=4, name="Jiggy: ???", type="Jiggy"},
+	{byte=0x4A, bit=5, name="Jiggy: ???", type="Jiggy"},
+	{byte=0x4A, bit=6, name="Jiggy: ???", type="Jiggy"},
+	{byte=0x4A, bit=7, name="Jiggy: ???", type="Jiggy"},
+
+	{byte=0x4B, bit=0, name="Jiggy: ???", type="Jiggy"},
+	{byte=0x4B, bit=1, name="Jiggy: ???", type="Jiggy"},
+	{byte=0x4B, bit=2, name="Jiggy: ???", type="Jiggy"},
+	{byte=0x4B, bit=3, name="Jiggy: ???", type="Jiggy"},
+	{byte=0x4B, bit=4, name="Jiggy: ???", type="Jiggy"},
+	{byte=0x4B, bit=5, name="Jiggy: ???", type="Jiggy"},
+	{byte=0x4B, bit=6, name="Jiggy: ???", type="Jiggy"},
+	{byte=0x4B, bit=7, name="Jiggy: ???", type="Jiggy"},
+
+	{byte=0x4C, bit=0, name="Jiggy: ???", type="Jiggy"},
+	{byte=0x4C, bit=1, name="Jiggy: ???", type="Jiggy"},
+	{byte=0x4C, bit=2, name="Jiggy: ???", type="Jiggy"},
+	{byte=0x4C, bit=3, name="Jiggy: ???", type="Jiggy"},
+	{byte=0x4C, bit=4, name="Jiggy: ???", type="Jiggy"},
+	{byte=0x4C, bit=5, name="Jiggy: ???", type="Jiggy"},
+	{byte=0x4C, bit=6, name="Jiggy: ???", type="Jiggy"},
+	{byte=0x4C, bit=7, name="Jiggy: ???", type="Jiggy"},
+
+	{byte=0x4D, bit=0, name="Jiggy: ???", type="Jiggy"},
+	{byte=0x4D, bit=1, name="Jiggy: ???", type="Jiggy"},
+	{byte=0x4D, bit=2, name="Jiggy: ???", type="Jiggy"},
+	{byte=0x4D, bit=3, name="Jiggy: ???", type="Jiggy"},
+	{byte=0x4D, bit=4, name="Jiggy: ???", type="Jiggy"},
+	{byte=0x4D, bit=5, name="Jiggy: HFP: Lava Waterfall", type="Jiggy"},
+	{byte=0x4D, bit=6, name="Jiggy: ???", type="Jiggy"},
+	{byte=0x4D, bit=7, name="Jiggy: ???", type="Jiggy"},
+
+	{byte=0x4E, bit=0, name="Jiggy: ???", type="Jiggy"},
+	{byte=0x4E, bit=1, name="Jiggy: ???", type="Jiggy"},
+	{byte=0x4E, bit=2, name="Jiggy: ???", type="Jiggy"},
+	{byte=0x4E, bit=3, name="Jiggy: ???", type="Jiggy"},
+	{byte=0x4E, bit=4, name="Jiggy: ???", type="Jiggy"},
+	{byte=0x4E, bit=5, name="Jiggy: ???", type="Jiggy"},
+	{byte=0x4E, bit=6, name="Jiggy: ???", type="Jiggy"},
+	{byte=0x4E, bit=7, name="Jiggy: ???", type="Jiggy"},
+
+	{byte=0x4F, bit=0, name="Jiggy: ???", type="Jiggy"},
+	{byte=0x4F, bit=1, name="Jiggy: ???", type="Jiggy"},
+	{byte=0x4F, bit=2, name="Jiggy: ???", type="Jiggy"},
+	{byte=0x4F, bit=3, name="Jiggy: ???", type="Jiggy"},
+	{byte=0x4F, bit=4, name="Jiggy: ???", type="Jiggy"},
+	{byte=0x4F, bit=5, name="Jiggy: ???", type="Jiggy"},
+	{byte=0x4F, bit=6, name="Jiggy: ???", type="Jiggy"},
+	{byte=0x4F, bit=7, name="Jiggy: ???", type="Jiggy"},
+
+	{byte=0x50, bit=0, name="Jiggy: ???", type="Jiggy"},
+	{byte=0x50, bit=1, name="Jiggy: IoH: King Jingaling Intro", type="Jiggy"},
 
 	{byte=0x53, bit=6, name="FT Jiggy Collection??"},
+
+	{byte=0x56, bit=3, name="Cheato Page: MT: Snake Heads", type="Cheato Page"},
+
+	{byte=0x58, bit=0, name="Cheato Page: ???", type="Cheato Page"},
+	{byte=0x58, bit=1, name="Cheato Page: ???", type="Cheato Page"},
+	{byte=0x58, bit=2, name="Cheato Page: ???", type="Cheato Page"},
+	{byte=0x58, bit=3, name="Cheato Page: ???", type="Cheato Page"},
+	{byte=0x58, bit=4, name="Cheato Page: ???", type="Cheato Page"},
+	{byte=0x58, bit=5, name="Cheato Page: HFP: Lava Side", type="Cheato Page"},
+	{byte=0x58, bit=6, name="Cheato Page: HFP: Icicle Grotto", type="Cheato Page"},
+	{byte=0x58, bit=7, name="Cheato Page: HFP: Icy Side", type="Cheato Page"},
+
+	{byte=0x59, bit=0, name="Cheato Page: ???", type="Cheato Page"},
+	{byte=0x59, bit=1, name="Cheato Page: ???", type="Cheato Page"},
+	{byte=0x59, bit=2, name="Cheato Page: ???", type="Cheato Page"},
+	{byte=0x59, bit=3, name="Cheato Page: Spiral Mountain", type="Cheato Page"},
 
 	{byte=0x5D, bit=5, name="FT Enter Digger Tunnel (Klungo 1)?"},
 	{byte=0x5D, bit=7, name="FT Enter Digger Tunnel (Klungo 1)??"},
 
-	{byte=0x5E, bit=0, name="Klungo 1 Defeated"},
+	{byte=0x5E, bit=0, name="Klungo 1 Defeated", type="Progress"},
 
 	{byte=0x60, bit=5, name="Silo: Jinjo Village", type="Silo"},
 	{byte=0x60, bit=6, name="Silo: Wooded Hollow", type="Silo"},
 	{byte=0x60, bit=7, name="Silo: Plateau", type="Silo"},
 
 	{byte=0x61, bit=0, name="Silo: Pine Grove", type="Silo"},
-	{byte=0x61, bit=1, name="Silo: Clifftop", type="Silo"},
+	{byte=0x61, bit=1, name="Silo: Cliff Top", type="Silo"},
 	{byte=0x61, bit=2, name="Silo: Wasteland", type="Silo"},
 	{byte=0x61, bit=3, name="Silo: Quagmire", type="Silo"},
 	{byte=0x61, bit=4, name="FT Silo Text", type="FTT"},
 
-	{byte=0x62, bit=7, name="Roysten Help Me Text"},
+	{byte=0x62, bit=7, name="Roysten Help Me Text", type="FTT"},
 
 	{byte=0x67, bit=0, name="King Jingaling Life Sapped"},
 	{byte=0x67, bit=7, name="Jiggywiggy Temple Is Over There CS Seen"},
 
 	{byte=0x82, bit=4, name="Jinjo Family FT Cutscene?"},
+	{byte=0x82, bit=7, name="Chilli Billi Intro Text?", type="FTT"},
 
-	{byte=0x97, bit=7, name="Treble Clef: Jinjo Village"},
+	{byte=0x91, bit=4, name="Treble Clef: Grunty Industries", type="Treble Clef"},
+
+	{byte=0x97, bit=7, name="Treble Clef: Jinjo Village", type="Treble Clef"},
 
 	{byte=0xA2, bit=7, name="First Time Enter Banjo's House"},
 
 	{byte=0xA3, bit=0, name="Klungo 1 Potion Chosen??"},
+	{byte=0xA3, bit=1, name="FT Enter MT?"},
+
+	{byte=0xA5, bit=4, name="FT Enter HFP Lava Side?"},
 
 	{byte=0xA6, bit=5, name="FT Enter Wooded Hollow"},
 	{byte=0xA6, bit=6, name="FT Enter Jinjo Village??"},
@@ -1400,7 +1526,7 @@ local flag_array = {
 	{byte=0xA7, bit=7, name="First Time Turbo Trainers"},
 
 	{byte=0xA8, bit=0, name="First Time Wading Boots"},
-	{byte=0xA8, bit=4, name="Klungo 1 Intro Cutscene"},
+	{byte=0xA8, bit=4, name="First boss fight? Klungo 1 Intro Cutscene??"},
 };
 
 function isKnown(byte, bit)
@@ -1419,6 +1545,38 @@ function getFlagName(byte, bit)
 		end
 	end
 	return "Unknown at "..toHexString(byte)..">"..bit;
+end
+
+local function getFlagByName(flagName)
+	for i = 1, #flag_array do
+		if not flag_array[i].ignore and flagName == flag_array[i].name then
+			return flag_array[i];
+		end
+	end
+end
+
+function setFlagByName(name)
+	local flag = getFlagByName(name);
+	if type(flag) == "table" then
+		setFlag(flag.byte, flag.bit);
+	end
+end
+
+function setFlagsByType(_type)
+	if type(_type) == "string" then
+		local numSet = 0;
+		for i = 1, #flag_array do
+			if flag_array[i]["type"] == _type then
+				setFlag(flag_array[i].byte, flag_array[i].bit, true);
+				numSet = numSet + 1;
+			end
+		end
+		if numSet > 0 then
+			print("Set "..numSet.." flags of type '".._type.."'");
+		else
+			print("No flags found of type '".._type.."'");
+		end
+	end
 end
 
 function clearFlag(byte, bit)
@@ -1487,6 +1645,123 @@ function checkFlags()
 	end
 end
 
+local function formatOutputString(caption, value, max)
+	return caption..value.."/"..max.." or "..round(value / max * 100, 2).."%";
+end
+
+function flagStats(verbose)
+	local abilitiesKnown = 0;
+	local cheatoPagesKnown = 0; local maxCheatoPages = 25;
+	local glowbosKnown = 0; local maxGlowbos = 17;
+	local honeycombsKnown = 0; local maxHoneycombs = 25;
+	local jiggiesKnown = 0; local maxJiggies = 90;
+	local jinjosKnown = 0; local maxJinjos = 45;
+	local notesKnown = 0; local maxNotes = 900;
+	local silosKnown = 0; local maxSilos = 7;
+	local warpsKnown = 0; local maxWarps = 0; -- TODO
+
+	local untypedFlags = 0;
+	local flagsWithUnknownType = 0;
+	local flagsWithMap = 0;
+
+	-- Setting this to true warns the user of flags without types
+	verbose = verbose or false;
+
+	local flag, name, flagType, validType;
+	for i = 1, #flag_array do
+		flag = flag_array[i];
+		name = flag["name"];
+		flagType = flag["type"];
+		validType = false;
+		if flagType == "Ability" then
+			abilitiesKnown = abilitiesKnown + 1;
+			validType = true;
+		end
+		if flagType == "Cheato Page" then
+			cheatoPagesKnown = cheatoPagesKnown + 1;
+			validType = true;
+		end
+		if flagType == "Glowbo" then
+			glowbosKnown = glowbosKnown + 1;
+			validType = true;
+		end
+		if flagType == "Honeycomb" then
+			honeycombsKnown = honeycombsKnown + 1;
+			validType = true;
+		end
+		if flagType == "Jiggy" then
+			jiggiesKnown = jiggiesKnown + 1;
+			validType = true;
+		end
+		if flagType == "Jinjo" then
+			jinjosKnown = jinjosKnown + 1;
+			validType = true;
+		end
+		if flagType == "Nest" then
+			notesKnown = notesKnown + 5;
+			validType = true;
+		end
+		if flagType == "Silo" then
+			silosKnown = silosKnown + 1;
+			validType = true;
+		end
+		if flagType == "Treble Clef" then
+			notesKnown = notesKnown + 20;
+			validType = true;
+		end
+		if flagType == "Warp" then
+			warpsKnown = warpsKnown + 1;
+			validType = true;
+		end
+		if flagType == nil then
+			untypedFlags = untypedFlags + 1;
+			if verbose then
+				dprint("Warning: Flag without type at "..toHexString(flag.byte, 2)..">"..flag["bit"].." with name: \""..name.."\"");
+			end
+		else
+			if flagType == "Unknown" then
+				validType = true;
+			end
+			if flagType == "Progress" then
+				validType = true;
+			end
+			if not validType then
+				flagsWithUnknownType = flagsWithUnknownType + 1;
+				if verbose then
+					dprint("Warning: Flag with unknown type at "..toHexString(flag.byte, 2)..">"..flag["bit"].." with name: \""..name.."\"".." and type: \""..flagType.."\"");
+				end
+			end
+		end
+		if flag.map ~= nil or flag.nomap == true then
+			flagsWithMap = flagsWithMap + 1;
+		elseif verbose then
+			dprint("Warning: Flag without map tag at "..toHexString(flag.byte, 2)..">"..flag["bit"].." with name: \""..name.."\"");
+		end
+	end
+
+	local knownFlags = #flag_array;
+	local totalFlags = flag_block_size * 8;
+
+	dprint("Block size: "..toHexString(flag_block_size));
+	dprint(formatOutputString("Flags known: ", knownFlags, totalFlags));
+	dprint(formatOutputString("Without types: ", untypedFlags, knownFlags));
+	dprint(formatOutputString("Unknown types: ", flagsWithUnknownType, knownFlags));
+	dprint(formatOutputString("With map tag: ", flagsWithMap, knownFlags));
+	dprint("");
+	dprint(formatOutputString("Jiggies: ", jiggiesKnown, maxJiggies));
+	dprint(formatOutputString("Jinjos: ", jinjosKnown, maxJinjos));
+	dprint(formatOutputString("Notes: ", notesKnown, maxNotes));
+	dprint("");
+	dprint("Abilities: "..abilitiesKnown);
+	dprint(formatOutputString("Cheato Pages: ", cheatoPagesKnown, maxCheatoPages));
+	dprint(formatOutputString("Honeycombs: ", honeycombsKnown, maxHoneycombs));
+	dprint(formatOutputString("Glowbos: ", glowbosKnown, maxGlowbos));
+	dprint(formatOutputString("Silos: ", silosKnown, maxSilos));
+	dprint(formatOutputString("Warps: ", warpsKnown, maxWarps));
+	dprint("");
+	print_deferred();
+end
+
 ------------
 -- Events --
 ------------
@@ -1519,6 +1794,8 @@ function Game.initUI()
 	-- Moves
 	ScriptHawk.UI.form_controls.moves_dropdown = forms.dropdown(ScriptHawk.UI.options_form, { "0. None", "1. All", "2. All + Dragon Kazooie" }, ScriptHawk.UI.col(10) + ScriptHawk.UI.dropdown_offset, ScriptHawk.UI.row(7) + ScriptHawk.UI.dropdown_offset);
 	ScriptHawk.UI.form_controls.moves_button = forms.button(ScriptHawk.UI.options_form, "Unlock Moves", unlock_moves, ScriptHawk.UI.col(5), ScriptHawk.UI.row(7), ScriptHawk.UI.col(4) + 10, ScriptHawk.UI.button_height);
+
+	flagStats();
 end
 
 function Game.eachFrame()

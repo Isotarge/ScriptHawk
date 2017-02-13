@@ -83,7 +83,7 @@ SystemID N64
 131538	d	f	1	RDRAM	Game Time (JRL)
 13153C	d	f	1	RDRAM	Game Time (TDL)
 131540	d	f	1	RDRAM	Game Time (GI)
-131544	d	f	1	RDRAM	Game Time (HP)
+131544	d	f	1	RDRAM	Game Time (HFP)
 131548	d	f	1	RDRAM	Game Time (CCL)
 13154C	d	f	1	RDRAM	Game Time (CK)
 131550	d	f	1	RDRAM	Game Time (Isle'o'Hags)

@@ -144,7 +144,7 @@ SystemID N64
 12C7B8	d	f	1	RDRAM	Game Time (JRL)
 12C7BC	d	f	1	RDRAM	Game Time (TDL)
 12C7C0	d	f	1	RDRAM	Game Time (GI)
-12C7C4	d	f	1	RDRAM	Game Time (HP)
+12C7C4	d	f	1	RDRAM	Game Time (HFP)
 12C7C8	d	f	1	RDRAM	Game Time (CCL)
 12C7CC	d	f	1	RDRAM	Game Time (CK)
 12C7D0	d	f	1	RDRAM	Game Time (Isle'o'Hags)
