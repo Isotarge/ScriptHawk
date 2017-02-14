@@ -83,7 +83,7 @@ SystemID N64
 126994	d	f	1	RDRAM	Game Time (HFP)
 126998	d	f	1	RDRAM	Game Time (CCL)
 12699C	d	f	1	RDRAM	Game Time (CK)
-1269A0	d	f	1	RDRAM	Game Time (Isle'o'Hags)
+1269A0	d	f	1	RDRAM	Game Time (Isle o' Hags)
 1269C0	d	h	1	RDRAM	RNG
 1269C4	d	h	1	RDRAM	RNG
 1269C8	d	h	1	RDRAM	RNG
