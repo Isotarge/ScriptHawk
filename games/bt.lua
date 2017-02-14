@@ -1257,17 +1257,30 @@ event.onloadstate(clearFlagCache, "ScriptHawk - Clear Flag Cache");
 
 local flag_block_size = 0xB0;
 local flag_array = {
+	-- 0x00 > 0
+	-- 0x00 > 1
+	-- 0x00 > 2
 	{byte=0x00, bit=3, name="First Time Egg Collection", type="FTT"},
 	{byte=0x00, bit=4, name="First Time Red Feather Collection", type="FTT"},
 	{byte=0x00, bit=5, name="First Time Gold Feather Collection", type="FTT"},
 	{byte=0x00, bit=6, name="First Time Treble Clef Collection", type="FTT"},
 	{byte=0x00, bit=7, name="First Time Health Collection", type="FTT"},
-
+	-- 0x01 > 0
+	-- 0x01 > 1
 	{byte=0x01, bit=2, name="First Time Empty Honeycomb Collection", type="FTT"},
+	-- 0x01 > 3
+	-- 0x01 > 4
 	{byte=0x01, bit=5, name="First Time Jinjo Collection", type="FTT"},
-
+	-- 0x01 > 6
+	-- 0x01 > 7
+	-- 0x02 > 0
+	-- 0x02 > 1
 	{byte=0x02, bit=2, name="Signpost: FTT", type="FTT"},
+	-- 0x02 > 3
 	{byte=0x02, bit=4, name="Klungo Intro Cutscene"},
+	-- 0x02 > 5
+	-- 0x02 > 6
+	-- 0x02 > 7
 
 	{byte=0x04, bit=4, name="Cheat Active: Open Up All World Doors", type="Cheat"},
 
@@ -1285,47 +1298,42 @@ local flag_array = {
 
 	{byte=0x38, bit=4, name="FT Enter Jinjo Village?"},
 
-	{byte=0x39, bit=4, name="Jinjo: ???", type="Jinjo"},
-	{byte=0x39, bit=5, name="Jinjo: ???", type="Jinjo"},
-	{byte=0x39, bit=6, name="Jinjo: ???", type="Jinjo"},
-	{byte=0x39, bit=7, name="Jinjo: ???", type="Jinjo"},
-
-	{byte=0x3A, bit=0, name="Jinjo: ???", type="Jinjo"},
-	{byte=0x3A, bit=1, name="Jinjo: ???", type="Jinjo"},
-	{byte=0x3A, bit=2, name="Jinjo: ???", type="Jinjo"},
-	{byte=0x3A, bit=3, name="Jinjo: ???", type="Jinjo"},
-	{byte=0x3A, bit=4, name="Jinjo: ???", type="Jinjo"},
-	{byte=0x3A, bit=5, name="Jinjo: ???", type="Jinjo"},
-	{byte=0x3A, bit=6, name="Jinjo: ???", type="Jinjo"},
-	{byte=0x3A, bit=7, name="Jinjo: ???", type="Jinjo"},
-
-	{byte=0x3B, bit=0, name="Jinjo: ???", type="Jinjo"},
-	{byte=0x3B, bit=1, name="Jinjo: ???", type="Jinjo"},
-	{byte=0x3B, bit=2, name="Jinjo: ???", type="Jinjo"},
-	{byte=0x3B, bit=3, name="Jinjo: ???", type="Jinjo"},
-	{byte=0x3B, bit=4, name="Jinjo: ???", type="Jinjo"},
-	{byte=0x3B, bit=5, name="Jinjo: ???", type="Jinjo"},
-	{byte=0x3B, bit=6, name="Jinjo: ???", type="Jinjo"},
-	{byte=0x3B, bit=7, name="Jinjo: ???", type="Jinjo"},
-
-	{byte=0x3C, bit=0, name="Jinjo: ???", type="Jinjo"},
-	{byte=0x3C, bit=1, name="Jinjo: ???", type="Jinjo"},
-	{byte=0x3C, bit=2, name="Jinjo: ???", type="Jinjo"},
-	{byte=0x3C, bit=3, name="Jinjo: ???", type="Jinjo"},
-	{byte=0x3C, bit=4, name="Jinjo: ???", type="Jinjo"},
-	{byte=0x3C, bit=5, name="Jinjo: ???", type="Jinjo"},
-	{byte=0x3C, bit=6, name="Jinjo: ???", type="Jinjo"},
-	{byte=0x3C, bit=7, name="Jinjo: ???", type="Jinjo"},
-
-	{byte=0x3D, bit=0, name="Jinjo: ???", type="Jinjo"},
-	{byte=0x3D, bit=1, name="Jinjo: ???", type="Jinjo"},
+	{byte=0x39, bit=4, name="Jinjo: MT: ???", type="Jinjo"},
+	{byte=0x39, bit=5, name="Jinjo: MT: ???", type="Jinjo"},
+	{byte=0x39, bit=6, name="Jinjo: MT: ???", type="Jinjo"},
+	{byte=0x39, bit=7, name="Jinjo: MT: ???", type="Jinjo"},
+	{byte=0x3A, bit=0, name="Jinjo: MT: ???", type="Jinjo"},
+	{byte=0x3A, bit=1, name="Jinjo: GGM: ???", type="Jinjo"},
+	{byte=0x3A, bit=2, name="Jinjo: GGM: ???", type="Jinjo"},
+	{byte=0x3A, bit=3, name="Jinjo: GGM: ???", type="Jinjo"},
+	{byte=0x3A, bit=4, name="Jinjo: GGM: ???", type="Jinjo"},
+	{byte=0x3A, bit=5, name="Jinjo: GGM: ???", type="Jinjo"},
+	{byte=0x3A, bit=6, name="Jinjo: WW: ???", type="Jinjo"},
+	{byte=0x3A, bit=7, name="Jinjo: WW: ???", type="Jinjo"},
+	{byte=0x3B, bit=0, name="Jinjo: WW: ???", type="Jinjo"},
+	{byte=0x3B, bit=1, name="Jinjo: WW: ???", type="Jinjo"},
+	{byte=0x3B, bit=2, name="Jinjo: WW: ???", type="Jinjo"},
+	{byte=0x3B, bit=3, name="Jinjo: JRL: ???", type="Jinjo"},
+	{byte=0x3B, bit=4, name="Jinjo: JRL: ???", type="Jinjo"},
+	{byte=0x3B, bit=5, name="Jinjo: JRL: ???", type="Jinjo"},
+	{byte=0x3B, bit=6, name="Jinjo: JRL: ???", type="Jinjo"},
+	{byte=0x3B, bit=7, name="Jinjo: JRL: ???", type="Jinjo"},
+	{byte=0x3C, bit=0, name="Jinjo: TDL: ???", type="Jinjo"},
+	{byte=0x3C, bit=1, name="Jinjo: TDL: ???", type="Jinjo"},
+	{byte=0x3C, bit=2, name="Jinjo: TDL: ???", type="Jinjo"},
+	{byte=0x3C, bit=3, name="Jinjo: TDL: ???", type="Jinjo"},
+	{byte=0x3C, bit=4, name="Jinjo: TDL: ???", type="Jinjo"},
+	{byte=0x3C, bit=5, name="Jinjo: GI: ???", type="Jinjo"},
+	{byte=0x3C, bit=6, name="Jinjo: GI: ???", type="Jinjo"},
+	{byte=0x3C, bit=7, name="Jinjo: GI: ???", type="Jinjo"},
+	{byte=0x3D, bit=0, name="Jinjo: GI: ???", type="Jinjo"},
+	{byte=0x3D, bit=1, name="Jinjo: GI: ???", type="Jinjo"},
 	{byte=0x3D, bit=2, name="Jinjo: HFP: Lava Waterfall", type="Jinjo"},
 	{byte=0x3D, bit=3, name="Jinjo: HFP: Boiling Hot Pool", type="Jinjo"},
 	{byte=0x3D, bit=4, name="Jinjo: HFP: Windy Hole", type="Jinjo"},
 	{byte=0x3D, bit=5, name="Jinjo: HFP: Icicle Grotto", type="Jinjo"},
 	{byte=0x3D, bit=6, name="Jinjo: HFP: Mildred Ice Cube", type="Jinjo"},
 	{byte=0x3D, bit=7, name="Jinjo: CCL: Trash Can", type="Jinjo"},
-
 	{byte=0x3E, bit=0, name="Jinjo: CCL: Cheese Wedge", type="Jinjo"},
 	{byte=0x3E, bit=1, name="Jinjo: CCL: Central Cavern", type="Jinjo"},
 	{byte=0x3E, bit=2, name="Jinjo: CCL: Mingy Jongo", type="Jinjo"},
@@ -1334,37 +1342,54 @@ local flag_array = {
 	{byte=0x3E, bit=5, name="Jinjo: IoH: Wasteland", type="Jinjo"},
 	{byte=0x3E, bit=6, name="Jinjo: IoH: Cliff Top", type="Jinjo"},
 	{byte=0x3E, bit=7, name="Jinjo: IoH: Plateau", type="Jinjo"},
-
 	{byte=0x3F, bit=0, name="Jinjo: IoH: Spiral Mountain", type="Jinjo"},
 	-- 0x3F > 1
-	{byte=0x3F, bit=2, name="Honeycomb: ???", type="Honeycomb"},
-	{byte=0x3F, bit=3, name="Honeycomb: ???", type="Honeycomb"},
-	{byte=0x3F, bit=4, name="Honeycomb: ???", type="Honeycomb"},
-	{byte=0x3F, bit=5, name="Honeycomb: ???", type="Honeycomb"},
-	{byte=0x3F, bit=6, name="Honeycomb: ???", type="Honeycomb"},
-	{byte=0x3F, bit=7, name="Honeycomb: ???", type="Honeycomb"},
-
-	{byte=0x40, bit=0, name="Honeycomb: ???", type="Honeycomb"},
-	{byte=0x40, bit=1, name="Honeycomb: ???", type="Honeycomb"},
-	{byte=0x40, bit=2, name="Honeycomb: ???", type="Honeycomb"},
-	{byte=0x40, bit=3, name="Honeycomb: ???", type="Honeycomb"},
-	{byte=0x40, bit=4, name="Honeycomb: ???", type="Honeycomb"},
-	{byte=0x40, bit=5, name="Honeycomb: ???", type="Honeycomb"},
-	{byte=0x40, bit=6, name="Honeycomb: ???", type="Honeycomb"},
-	{byte=0x40, bit=7, name="Honeycomb: ???", type="Honeycomb"},
-
-	{byte=0x41, bit=0, name="Honeycomb: ???", type="Honeycomb"},
-	{byte=0x41, bit=1, name="Honeycomb: ???", type="Honeycomb"},
+	{byte=0x3F, bit=2, name="Honeycomb: MT: ???", type="Honeycomb"},
+	{byte=0x3F, bit=3, name="Honeycomb: MT: ???", type="Honeycomb"},
+	{byte=0x3F, bit=4, name="Honeycomb: MT: ???", type="Honeycomb"},
+	{byte=0x3F, bit=5, name="Honeycomb: GGM: ???", type="Honeycomb"},
+	{byte=0x3F, bit=6, name="Honeycomb: GGM: ???", type="Honeycomb"},
+	{byte=0x3F, bit=7, name="Honeycomb: GGM: ???", type="Honeycomb"},
+	{byte=0x40, bit=0, name="Honeycomb: WW: ???", type="Honeycomb"},
+	{byte=0x40, bit=1, name="Honeycomb: WW: ???", type="Honeycomb"},
+	{byte=0x40, bit=2, name="Honeycomb: WW: ???", type="Honeycomb"},
+	{byte=0x40, bit=3, name="Honeycomb: JRL: ???", type="Honeycomb"},
+	{byte=0x40, bit=4, name="Honeycomb: JRL: ???", type="Honeycomb"},
+	{byte=0x40, bit=5, name="Honeycomb: JRL: ???", type="Honeycomb"},
+	{byte=0x40, bit=6, name="Honeycomb: TDL: ???", type="Honeycomb"},
+	{byte=0x40, bit=7, name="Honeycomb: TDL: ???", type="Honeycomb"},
+	{byte=0x41, bit=0, name="Honeycomb: TDL: ???", type="Honeycomb"},
+	{byte=0x41, bit=1, name="Honeycomb: GI: ???", type="Honeycomb"},
 	{byte=0x41, bit=2, name="Honeycomb: GI: Chimney", type="Honeycomb"},
-	{byte=0x41, bit=3, name="Honeycomb: ???", type="Honeycomb"},
-	{byte=0x41, bit=4, name="Honeycomb: ???", type="Honeycomb"},
-	{byte=0x41, bit=5, name="Honeycomb: ???", type="Honeycomb"},
-	{byte=0x41, bit=6, name="Honeycomb: ???", type="Honeycomb"},
-	{byte=0x41, bit=7, name="Honeycomb: ???", type="Honeycomb"},
-
-	{byte=0x42, bit=0, name="Honeycomb: ???", type="Honeycomb"},
-	{byte=0x42, bit=1, name="Honeycomb: ???", type="Honeycomb"},
-	{byte=0x42, bit=2, name="Honeycomb: ???", type="Honeycomb"},
+	{byte=0x41, bit=3, name="Honeycomb: GI: ???", type="Honeycomb"},
+	{byte=0x41, bit=4, name="Honeycomb: HFP: ???", type="Honeycomb"},
+	{byte=0x41, bit=5, name="Honeycomb: HFP: ???", type="Honeycomb"},
+	{byte=0x41, bit=6, name="Honeycomb: HFP: ???", type="Honeycomb"},
+	{byte=0x41, bit=7, name="Honeycomb: CCL: ???", type="Honeycomb"},
+	{byte=0x42, bit=0, name="Honeycomb: CCL: ???", type="Honeycomb"},
+	{byte=0x42, bit=1, name="Honeycomb: CCL: ???", type="Honeycomb"},
+	{byte=0x42, bit=2, name="Honeycomb: IoH: Plateau", type="Honeycomb"},
+	-- 0x42 > 3
+	-- 0x42 > 4
+	-- 0x42 > 5
+	-- 0x42 > 6
+	{byte=0x42, bit=7, name="Glowbo: MT: ???", type="Glowbo"},
+	{byte=0x43, bit=0, name="Glowbo: MT: ???", type="Glowbo"},
+	{byte=0x43, bit=1, name="Glowbo: GGM: ???", type="Glowbo"},
+	{byte=0x43, bit=2, name="Glowbo: GGM: ???", type="Glowbo"},
+	{byte=0x43, bit=3, name="Glowbo: WW: ???", type="Glowbo"},
+	{byte=0x43, bit=4, name="Glowbo: WW: ???", type="Glowbo"},
+	{byte=0x43, bit=5, name="Glowbo: JRL: ???", type="Glowbo"},
+	{byte=0x43, bit=6, name="Glowbo: JRL: ???", type="Glowbo"},
+	{byte=0x43, bit=7, name="Glowbo: TDL: ???", type="Glowbo"},
+	{byte=0x44, bit=0, name="Glowbo: TDL: ???", type="Glowbo"},
+	{byte=0x44, bit=1, name="Glowbo: GI: ???", type="Glowbo"},
+	{byte=0x44, bit=2, name="Glowbo: GI: ???", type="Glowbo"},
+	{byte=0x44, bit=3, name="Glowbo: HFP: ???", type="Glowbo"},
+	{byte=0x44, bit=4, name="Glowbo: HFP: ???", type="Glowbo"},
+	{byte=0x44, bit=5, name="Glowbo: CCL: ???", type="Glowbo"},
+	{byte=0x44, bit=6, name="Glowbo: CCL: ???", type="Glowbo"},
+	{byte=0x44, bit=7, name="Glowbo: IoH: ???", type="Glowbo"},
 
 	{byte=0x45, bit=0, name="Jiggy: MT: ???", type="Jiggy"},
 	{byte=0x45, bit=1, name="Jiggy: MT: ???", type="Jiggy"},
@@ -1374,7 +1399,6 @@ local flag_array = {
 	{byte=0x45, bit=5, name="Jiggy: MT: ???", type="Jiggy"},
 	{byte=0x45, bit=6, name="Jiggy: MT: ???", type="Jiggy"},
 	{byte=0x45, bit=7, name="Jiggy: MT: ???", type="Jiggy"},
-
 	{byte=0x46, bit=0, name="Jiggy: MT: Top of Temple", type="Jiggy"},
 	{byte=0x46, bit=1, name="Jiggy: MT: ???", type="Jiggy"},
 	{byte=0x46, bit=2, name="Jiggy: GGM: ???", type="Jiggy"},
@@ -1383,7 +1407,6 @@ local flag_array = {
 	{byte=0x46, bit=5, name="Jiggy: GGM: ???", type="Jiggy"},
 	{byte=0x46, bit=6, name="Jiggy: GGM: ???", type="Jiggy"},
 	{byte=0x46, bit=7, name="Jiggy: GGM: ???", type="Jiggy"},
-
 	{byte=0x47, bit=0, name="Jiggy: GGM: ???", type="Jiggy"},
 	{byte=0x47, bit=1, name="Jiggy: GGM: ???", type="Jiggy"},
 	{byte=0x47, bit=2, name="Jiggy: GGM: ???", type="Jiggy"},
@@ -1392,7 +1415,6 @@ local flag_array = {
 	{byte=0x47, bit=5, name="Jiggy: WW: ???", type="Jiggy"},
 	{byte=0x47, bit=6, name="Jiggy: WW: ???", type="Jiggy"},
 	{byte=0x47, bit=7, name="Jiggy: WW: ???", type="Jiggy"},
-
 	{byte=0x48, bit=0, name="Jiggy: WW: ???", type="Jiggy"},
 	{byte=0x48, bit=1, name="Jiggy: WW: ???", type="Jiggy"},
 	{byte=0x48, bit=2, name="Jiggy: WW: ???", type="Jiggy"},
@@ -1401,7 +1423,6 @@ local flag_array = {
 	{byte=0x48, bit=5, name="Jiggy: WW: ???", type="Jiggy"},
 	{byte=0x48, bit=6, name="Jiggy: JRL: ???", type="Jiggy"},
 	{byte=0x48, bit=7, name="Jiggy: JRL: ???", type="Jiggy"},
-
 	{byte=0x49, bit=0, name="Jiggy: JRL: ???", type="Jiggy"},
 	{byte=0x49, bit=1, name="Jiggy: JRL: ???", type="Jiggy"},
 	{byte=0x49, bit=2, name="Jiggy: JRL: ???", type="Jiggy"},
@@ -1410,7 +1431,6 @@ local flag_array = {
 	{byte=0x49, bit=5, name="Jiggy: JRL: ???", type="Jiggy"},
 	{byte=0x49, bit=6, name="Jiggy: JRL: ???", type="Jiggy"},
 	{byte=0x49, bit=7, name="Jiggy: JRL: ???", type="Jiggy"},
-
 	{byte=0x4A, bit=0, name="Jiggy: TDL: ???", type="Jiggy"},
 	{byte=0x4A, bit=1, name="Jiggy: TDL: ???", type="Jiggy"},
 	{byte=0x4A, bit=2, name="Jiggy: TDL: ???", type="Jiggy"},
@@ -1419,7 +1439,6 @@ local flag_array = {
 	{byte=0x4A, bit=5, name="Jiggy: TDL: ???", type="Jiggy"},
 	{byte=0x4A, bit=6, name="Jiggy: TDL: ???", type="Jiggy"},
 	{byte=0x4A, bit=7, name="Jiggy: TDL: ???", type="Jiggy"},
-
 	{byte=0x4B, bit=0, name="Jiggy: TDL: ???", type="Jiggy"},
 	{byte=0x4B, bit=1, name="Jiggy: TDL: ???", type="Jiggy"},
 	{byte=0x4B, bit=2, name="Jiggy: GI: ???", type="Jiggy"},
@@ -1428,7 +1447,6 @@ local flag_array = {
 	{byte=0x4B, bit=5, name="Jiggy: GI: ???", type="Jiggy"},
 	{byte=0x4B, bit=6, name="Jiggy: GI: ???", type="Jiggy"},
 	{byte=0x4B, bit=7, name="Jiggy: GI: ???", type="Jiggy"},
-
 	{byte=0x4C, bit=0, name="Jiggy: GI: ???", type="Jiggy"},
 	{byte=0x4C, bit=1, name="Jiggy: GI: ???", type="Jiggy"},
 	{byte=0x4C, bit=2, name="Jiggy: GI: ???", type="Jiggy"},
@@ -1437,7 +1455,6 @@ local flag_array = {
 	{byte=0x4C, bit=5, name="Jiggy: HFP: ???", type="Jiggy"},
 	{byte=0x4C, bit=6, name="Jiggy: HFP: ???", type="Jiggy"},
 	{byte=0x4C, bit=7, name="Jiggy: HFP: ???", type="Jiggy"},
-
 	{byte=0x4D, bit=0, name="Jiggy: HFP: ???", type="Jiggy"},
 	{byte=0x4D, bit=1, name="Jiggy: HFP: ???", type="Jiggy"},
 	{byte=0x4D, bit=2, name="Jiggy: HFP: ???", type="Jiggy"},
@@ -1446,7 +1463,6 @@ local flag_array = {
 	{byte=0x4D, bit=5, name="Jiggy: HFP: Lava Waterfall", type="Jiggy"},
 	{byte=0x4D, bit=6, name="Jiggy: CCL: ???", type="Jiggy"},
 	{byte=0x4D, bit=7, name="Jiggy: CCL: ???", type="Jiggy"},
-
 	{byte=0x4E, bit=0, name="Jiggy: CCL: ???", type="Jiggy"},
 	{byte=0x4E, bit=1, name="Jiggy: CCL: ???", type="Jiggy"},
 	{byte=0x4E, bit=2, name="Jiggy: CCL: ???", type="Jiggy"},
@@ -1455,7 +1471,6 @@ local flag_array = {
 	{byte=0x4E, bit=5, name="Jiggy: CCL: ???", type="Jiggy"},
 	{byte=0x4E, bit=6, name="Jiggy: CCL: ???", type="Jiggy"},
 	{byte=0x4E, bit=7, name="Jiggy: CCL: ???", type="Jiggy"},
-
 	{byte=0x4F, bit=0, name="Jiggy: IoH: ???", type="Jiggy"},
 	{byte=0x4F, bit=1, name="Jiggy: IoH: ???", type="Jiggy"},
 	{byte=0x4F, bit=2, name="Jiggy: IoH: ???", type="Jiggy"},
@@ -1464,26 +1479,35 @@ local flag_array = {
 	{byte=0x4F, bit=5, name="Jiggy: IoH: ???", type="Jiggy"},
 	{byte=0x4F, bit=6, name="Jiggy: IoH: ???", type="Jiggy"},
 	{byte=0x4F, bit=7, name="Jiggy: IoH: ???", type="Jiggy"},
-
 	{byte=0x50, bit=0, name="Jiggy: IoH: ???", type="Jiggy"},
 	{byte=0x50, bit=1, name="Jiggy: IoH: King Jingaling Intro", type="Jiggy"},
 
 	{byte=0x53, bit=6, name="FT Jiggy Collection??"},
 
 	{byte=0x56, bit=3, name="Cheato Page: MT: Snake Heads", type="Cheato Page"},
-
-	{byte=0x58, bit=0, name="Cheato Page: ???", type="Cheato Page"},
-	{byte=0x58, bit=1, name="Cheato Page: ???", type="Cheato Page"},
-	{byte=0x58, bit=2, name="Cheato Page: ???", type="Cheato Page"},
-	{byte=0x58, bit=3, name="Cheato Page: ???", type="Cheato Page"},
-	{byte=0x58, bit=4, name="Cheato Page: ???", type="Cheato Page"},
+	{byte=0x56, bit=4, name="Cheato Page: MT: ???", type="Cheato Page"},
+	{byte=0x56, bit=5, name="Cheato Page: MT: ???", type="Cheato Page"},
+	{byte=0x56, bit=6, name="Cheato Page: GGM: ???", type="Cheato Page"},
+	{byte=0x56, bit=7, name="Cheato Page: GGM: ???", type="Cheato Page"},
+	{byte=0x57, bit=0, name="Cheato Page: GGM: ???", type="Cheato Page"},
+	{byte=0x57, bit=1, name="Cheato Page: WW: ???", type="Cheato Page"},
+	{byte=0x57, bit=2, name="Cheato Page: WW: ???", type="Cheato Page"},
+	{byte=0x57, bit=3, name="Cheato Page: WW: ???", type="Cheato Page"},
+	{byte=0x57, bit=4, name="Cheato Page: JRL: ???", type="Cheato Page"},
+	{byte=0x57, bit=5, name="Cheato Page: JRL: ???", type="Cheato Page"},
+	{byte=0x57, bit=6, name="Cheato Page: JRL: ???", type="Cheato Page"},
+	{byte=0x57, bit=7, name="Cheato Page: TDL: ???", type="Cheato Page"},
+	{byte=0x58, bit=0, name="Cheato Page: TDL: ???", type="Cheato Page"},
+	{byte=0x58, bit=1, name="Cheato Page: TDL: ???", type="Cheato Page"},
+	{byte=0x58, bit=2, name="Cheato Page: GI: ???", type="Cheato Page"},
+	{byte=0x58, bit=3, name="Cheato Page: GI: ???", type="Cheato Page"},
+	{byte=0x58, bit=4, name="Cheato Page: GI: ???", type="Cheato Page"},
 	{byte=0x58, bit=5, name="Cheato Page: HFP: Lava Side", type="Cheato Page"},
 	{byte=0x58, bit=6, name="Cheato Page: HFP: Icicle Grotto", type="Cheato Page"},
 	{byte=0x58, bit=7, name="Cheato Page: HFP: Icy Side", type="Cheato Page"},
-
-	{byte=0x59, bit=0, name="Cheato Page: ???", type="Cheato Page"},
-	{byte=0x59, bit=1, name="Cheato Page: ???", type="Cheato Page"},
-	{byte=0x59, bit=2, name="Cheato Page: ???", type="Cheato Page"},
+	{byte=0x59, bit=0, name="Cheato Page: CCL: ???", type="Cheato Page"},
+	{byte=0x59, bit=1, name="Cheato Page: CCL: ???", type="Cheato Page"},
+	{byte=0x59, bit=2, name="Cheato Page: CCL: ???", type="Cheato Page"},
 	{byte=0x59, bit=3, name="Cheato Page: Spiral Mountain", type="Cheato Page"},
 
 	{byte=0x5D, bit=5, name="FT Enter Digger Tunnel (Klungo 1)?"},
@@ -1494,7 +1518,6 @@ local flag_array = {
 	{byte=0x60, bit=5, name="Silo: Jinjo Village", type="Silo"},
 	{byte=0x60, bit=6, name="Silo: Wooded Hollow", type="Silo"},
 	{byte=0x60, bit=7, name="Silo: Plateau", type="Silo"},
-
 	{byte=0x61, bit=0, name="Silo: Pine Grove", type="Silo"},
 	{byte=0x61, bit=1, name="Silo: Cliff Top", type="Silo"},
 	{byte=0x61, bit=2, name="Silo: Wasteland", type="Silo"},
@@ -1513,11 +1536,12 @@ local flag_array = {
 
 	{byte=0x97, bit=7, name="Treble Clef: Jinjo Village", type="Treble Clef"},
 
+	{byte=0x99, bit=4, name="First Time Split Up Pad Text", type="FTT"},
+
 	{byte=0xA1, bit=4, name="Cheat Active: Double Maximum Feathers", type="Cheat"},
 	{byte=0xA1, bit=5, name="Cheat Active: Double Maximum Eggs", type="Cheat"},
 	{byte=0xA1, bit=6, name="Cheat Active: No Energy Loss From Falling", type="Cheat"},
 	{byte=0xA1, bit=7, name="Cheat Active: Automatic Energy Regain", type="Cheat"},
-
 	{byte=0xA2, bit=0, name="Cheat Active: Jolly's Jukebox", type="Cheat"},
 	{byte=0xA2, bit=1, name="Cheat Active: Jiggywiggy Temple Signposts", type="Cheat"},
 	{byte=0xA2, bit=2, name="Cheat Active: Fast Banjo", type="Cheat"},
@@ -1525,14 +1549,14 @@ local flag_array = {
 	{byte=0xA2, bit=4, name="Cheat Active: No Energy Or Air Loss", type="Cheat"},
 	{byte=0xA2, bit=5, name="Cheat Active: Infinite Eggs And Feathers", type="Cheat"},
 
-	{byte=0xA2, bit=7, name="First Time Enter Banjo's House"},
+	{byte=0xA2, bit=7, name="FT Enter Banjo's House"},
 
 	{byte=0xA3, bit=0, name="Klungo 1 Potion Chosen??"},
-	{byte=0xA3, bit=1, name="FT Enter MT?"},
+	{byte=0xA3, bit=1, name="FT Enter MT"},
 
-	{byte=0xA5, bit=4, name="FT Enter HFP Lava Side?"},
+	{byte=0xA5, bit=4, name="FT Enter HFP"},
 
-	{byte=0xA6, bit=5, name="FT Enter Wooded Hollow"},
+	{byte=0xA6, bit=5, name="FT Enter IoH"},
 	{byte=0xA6, bit=6, name="FT Enter Jinjo Village??"},
 
 	{byte=0xA7, bit=1, name="FT Enter King Jingaling Cutscene"},
@@ -1540,7 +1564,7 @@ local flag_array = {
 	{byte=0xA7, bit=7, name="First Time Turbo Trainers"},
 
 	{byte=0xA8, bit=0, name="First Time Wading Boots"},
-	{byte=0xA8, bit=4, name="First boss fight? Klungo 1 Intro Cutscene??"},
+	{byte=0xA8, bit=4, name="First Boss Fight?"},
 
 	{byte=0xAF, bit=3, name="Cheat Active: Enable Homing Eggs", type="Cheat"},
 };
@@ -1580,6 +1604,11 @@ end
 
 function setFlagsByType(_type)
 	if type(_type) == "string" then
+		if _type == "Note" then
+			setFlagsByType("Nest");
+			setFlagsByType("Treble Clef");
+			return;
+		end
 		local numSet = 0;
 		for i = 1, #flag_array do
 			if flag_array[i]["type"] == _type then
@@ -1607,6 +1636,11 @@ end
 
 function clearFlagsByType(_type)
 	if type(_type) == "string" then
+		if _type == "Note" then
+			clearFlagsByType("Nest");
+			clearFlagsByType("Treble Clef");
+			return;
+		end
 		local numSet = 0;
 		for i = 1, #flag_array do
 			if flag_array[i]["type"] == _type then
@@ -1752,13 +1786,16 @@ function flagStats(verbose)
 				dprint("Warning: Flag without type at "..toHexString(flag.byte, 2)..">"..flag["bit"].." with name: \""..name.."\"");
 			end
 		else
-			if flagType == "Unknown" then
+			if flagType == "Cheat" then
+				validType = true;
+			end
+			if flagType == "FTT" then
 				validType = true;
 			end
 			if flagType == "Progress" then
 				validType = true;
 			end
-			if flagType == "Cheat" then
+			if flagType == "Unknown" then
 				validType = true;
 			end
 			if not validType then
