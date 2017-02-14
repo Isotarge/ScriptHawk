@@ -895,7 +895,7 @@ local movementStates = {
 
 	[0x77] = "Locked", -- Water Surface
 	[0x78] = "Locked", -- Underwater
-
+	[0x79] = "Locked", -- Talon Trot
 	[0x7A] = "Walking", -- Damaging Ground, eg. quicksand
 	[0x7B] = "Damaged", -- Talon Trot
 	[0x7C] = "Clockwork Mouse", -- Canary Mary 3 & 4
@@ -1269,6 +1269,8 @@ local flag_array = {
 	{byte=0x02, bit=2, name="Signpost: FTT", type="FTT"},
 	{byte=0x02, bit=4, name="Klungo Intro Cutscene"},
 
+	{byte=0x04, bit=4, name="Cheat Active: Open Up All World Doors", type="Cheat"},
+
 	{byte=0x07, bit=7, name="First Time Cheato Page", type="FTT"},
 
 	{byte=0x13, bit=1, name="Klungo 1 Potion Chosen?"},
@@ -1364,106 +1366,106 @@ local flag_array = {
 	{byte=0x42, bit=1, name="Honeycomb: ???", type="Honeycomb"},
 	{byte=0x42, bit=2, name="Honeycomb: ???", type="Honeycomb"},
 
-	{byte=0x45, bit=0, name="Jiggy: ???", type="Jiggy"},
-	{byte=0x45, bit=1, name="Jiggy: ???", type="Jiggy"},
-	{byte=0x45, bit=2, name="Jiggy: ???", type="Jiggy"},
-	{byte=0x45, bit=3, name="Jiggy: ???", type="Jiggy"},
-	{byte=0x45, bit=4, name="Jiggy: ???", type="Jiggy"},
-	{byte=0x45, bit=5, name="Jiggy: ???", type="Jiggy"},
-	{byte=0x45, bit=6, name="Jiggy: ???", type="Jiggy"},
-	{byte=0x45, bit=7, name="Jiggy: ???", type="Jiggy"},
+	{byte=0x45, bit=0, name="Jiggy: MT: ???", type="Jiggy"},
+	{byte=0x45, bit=1, name="Jiggy: MT: ???", type="Jiggy"},
+	{byte=0x45, bit=2, name="Jiggy: MT: ???", type="Jiggy"},
+	{byte=0x45, bit=3, name="Jiggy: MT: ???", type="Jiggy"},
+	{byte=0x45, bit=4, name="Jiggy: MT: ???", type="Jiggy"},
+	{byte=0x45, bit=5, name="Jiggy: MT: ???", type="Jiggy"},
+	{byte=0x45, bit=6, name="Jiggy: MT: ???", type="Jiggy"},
+	{byte=0x45, bit=7, name="Jiggy: MT: ???", type="Jiggy"},
 
 	{byte=0x46, bit=0, name="Jiggy: MT: Top of Temple", type="Jiggy"},
-	{byte=0x46, bit=1, name="Jiggy: ???", type="Jiggy"},
-	{byte=0x46, bit=2, name="Jiggy: ???", type="Jiggy"},
-	{byte=0x46, bit=3, name="Jiggy: ???", type="Jiggy"},
-	{byte=0x46, bit=4, name="Jiggy: ???", type="Jiggy"},
-	{byte=0x46, bit=5, name="Jiggy: ???", type="Jiggy"},
-	{byte=0x46, bit=6, name="Jiggy: ???", type="Jiggy"},
-	{byte=0x46, bit=7, name="Jiggy: ???", type="Jiggy"},
+	{byte=0x46, bit=1, name="Jiggy: MT: ???", type="Jiggy"},
+	{byte=0x46, bit=2, name="Jiggy: GGM: ???", type="Jiggy"},
+	{byte=0x46, bit=3, name="Jiggy: GGM: ???", type="Jiggy"},
+	{byte=0x46, bit=4, name="Jiggy: GGM: ???", type="Jiggy"},
+	{byte=0x46, bit=5, name="Jiggy: GGM: ???", type="Jiggy"},
+	{byte=0x46, bit=6, name="Jiggy: GGM: ???", type="Jiggy"},
+	{byte=0x46, bit=7, name="Jiggy: GGM: ???", type="Jiggy"},
 
-	{byte=0x47, bit=0, name="Jiggy: ???", type="Jiggy"},
-	{byte=0x47, bit=1, name="Jiggy: ???", type="Jiggy"},
-	{byte=0x47, bit=2, name="Jiggy: ???", type="Jiggy"},
-	{byte=0x47, bit=3, name="Jiggy: ???", type="Jiggy"},
-	{byte=0x47, bit=4, name="Jiggy: ???", type="Jiggy"},
-	{byte=0x47, bit=5, name="Jiggy: ???", type="Jiggy"},
-	{byte=0x47, bit=6, name="Jiggy: ???", type="Jiggy"},
-	{byte=0x47, bit=7, name="Jiggy: ???", type="Jiggy"},
+	{byte=0x47, bit=0, name="Jiggy: GGM: ???", type="Jiggy"},
+	{byte=0x47, bit=1, name="Jiggy: GGM: ???", type="Jiggy"},
+	{byte=0x47, bit=2, name="Jiggy: GGM: ???", type="Jiggy"},
+	{byte=0x47, bit=3, name="Jiggy: GGM: ???", type="Jiggy"},
+	{byte=0x47, bit=4, name="Jiggy: WW: ???", type="Jiggy"},
+	{byte=0x47, bit=5, name="Jiggy: WW: ???", type="Jiggy"},
+	{byte=0x47, bit=6, name="Jiggy: WW: ???", type="Jiggy"},
+	{byte=0x47, bit=7, name="Jiggy: WW: ???", type="Jiggy"},
 
-	{byte=0x48, bit=0, name="Jiggy: ???", type="Jiggy"},
-	{byte=0x48, bit=1, name="Jiggy: ???", type="Jiggy"},
-	{byte=0x48, bit=2, name="Jiggy: ???", type="Jiggy"},
-	{byte=0x48, bit=3, name="Jiggy: ???", type="Jiggy"},
-	{byte=0x48, bit=4, name="Jiggy: ???", type="Jiggy"},
-	{byte=0x48, bit=5, name="Jiggy: ???", type="Jiggy"},
-	{byte=0x48, bit=6, name="Jiggy: ???", type="Jiggy"},
-	{byte=0x48, bit=7, name="Jiggy: ???", type="Jiggy"},
+	{byte=0x48, bit=0, name="Jiggy: WW: ???", type="Jiggy"},
+	{byte=0x48, bit=1, name="Jiggy: WW: ???", type="Jiggy"},
+	{byte=0x48, bit=2, name="Jiggy: WW: ???", type="Jiggy"},
+	{byte=0x48, bit=3, name="Jiggy: WW: ???", type="Jiggy"},
+	{byte=0x48, bit=4, name="Jiggy: WW: ???", type="Jiggy"},
+	{byte=0x48, bit=5, name="Jiggy: WW: ???", type="Jiggy"},
+	{byte=0x48, bit=6, name="Jiggy: JRL: ???", type="Jiggy"},
+	{byte=0x48, bit=7, name="Jiggy: JRL: ???", type="Jiggy"},
 
-	{byte=0x49, bit=0, name="Jiggy: ???", type="Jiggy"},
-	{byte=0x49, bit=1, name="Jiggy: ???", type="Jiggy"},
-	{byte=0x49, bit=2, name="Jiggy: ???", type="Jiggy"},
-	{byte=0x49, bit=3, name="Jiggy: ???", type="Jiggy"},
-	{byte=0x49, bit=4, name="Jiggy: ???", type="Jiggy"},
-	{byte=0x49, bit=5, name="Jiggy: ???", type="Jiggy"},
-	{byte=0x49, bit=6, name="Jiggy: ???", type="Jiggy"},
-	{byte=0x49, bit=7, name="Jiggy: ???", type="Jiggy"},
+	{byte=0x49, bit=0, name="Jiggy: JRL: ???", type="Jiggy"},
+	{byte=0x49, bit=1, name="Jiggy: JRL: ???", type="Jiggy"},
+	{byte=0x49, bit=2, name="Jiggy: JRL: ???", type="Jiggy"},
+	{byte=0x49, bit=3, name="Jiggy: JRL: ???", type="Jiggy"},
+	{byte=0x49, bit=4, name="Jiggy: JRL: ???", type="Jiggy"},
+	{byte=0x49, bit=5, name="Jiggy: JRL: ???", type="Jiggy"},
+	{byte=0x49, bit=6, name="Jiggy: JRL: ???", type="Jiggy"},
+	{byte=0x49, bit=7, name="Jiggy: JRL: ???", type="Jiggy"},
 
-	{byte=0x4A, bit=0, name="Jiggy: ???", type="Jiggy"},
-	{byte=0x4A, bit=1, name="Jiggy: ???", type="Jiggy"},
-	{byte=0x4A, bit=2, name="Jiggy: ???", type="Jiggy"},
-	{byte=0x4A, bit=3, name="Jiggy: ???", type="Jiggy"},
-	{byte=0x4A, bit=4, name="Jiggy: ???", type="Jiggy"},
-	{byte=0x4A, bit=5, name="Jiggy: ???", type="Jiggy"},
-	{byte=0x4A, bit=6, name="Jiggy: ???", type="Jiggy"},
-	{byte=0x4A, bit=7, name="Jiggy: ???", type="Jiggy"},
+	{byte=0x4A, bit=0, name="Jiggy: TDL: ???", type="Jiggy"},
+	{byte=0x4A, bit=1, name="Jiggy: TDL: ???", type="Jiggy"},
+	{byte=0x4A, bit=2, name="Jiggy: TDL: ???", type="Jiggy"},
+	{byte=0x4A, bit=3, name="Jiggy: TDL: ???", type="Jiggy"},
+	{byte=0x4A, bit=4, name="Jiggy: TDL: ???", type="Jiggy"},
+	{byte=0x4A, bit=5, name="Jiggy: TDL: ???", type="Jiggy"},
+	{byte=0x4A, bit=6, name="Jiggy: TDL: ???", type="Jiggy"},
+	{byte=0x4A, bit=7, name="Jiggy: TDL: ???", type="Jiggy"},
 
-	{byte=0x4B, bit=0, name="Jiggy: ???", type="Jiggy"},
-	{byte=0x4B, bit=1, name="Jiggy: ???", type="Jiggy"},
-	{byte=0x4B, bit=2, name="Jiggy: ???", type="Jiggy"},
-	{byte=0x4B, bit=3, name="Jiggy: ???", type="Jiggy"},
-	{byte=0x4B, bit=4, name="Jiggy: ???", type="Jiggy"},
-	{byte=0x4B, bit=5, name="Jiggy: ???", type="Jiggy"},
-	{byte=0x4B, bit=6, name="Jiggy: ???", type="Jiggy"},
-	{byte=0x4B, bit=7, name="Jiggy: ???", type="Jiggy"},
+	{byte=0x4B, bit=0, name="Jiggy: TDL: ???", type="Jiggy"},
+	{byte=0x4B, bit=1, name="Jiggy: TDL: ???", type="Jiggy"},
+	{byte=0x4B, bit=2, name="Jiggy: GI: ???", type="Jiggy"},
+	{byte=0x4B, bit=3, name="Jiggy: GI: ???", type="Jiggy"},
+	{byte=0x4B, bit=4, name="Jiggy: GI: ???", type="Jiggy"},
+	{byte=0x4B, bit=5, name="Jiggy: GI: ???", type="Jiggy"},
+	{byte=0x4B, bit=6, name="Jiggy: GI: ???", type="Jiggy"},
+	{byte=0x4B, bit=7, name="Jiggy: GI: ???", type="Jiggy"},
 
-	{byte=0x4C, bit=0, name="Jiggy: ???", type="Jiggy"},
-	{byte=0x4C, bit=1, name="Jiggy: ???", type="Jiggy"},
-	{byte=0x4C, bit=2, name="Jiggy: ???", type="Jiggy"},
-	{byte=0x4C, bit=3, name="Jiggy: ???", type="Jiggy"},
-	{byte=0x4C, bit=4, name="Jiggy: ???", type="Jiggy"},
-	{byte=0x4C, bit=5, name="Jiggy: ???", type="Jiggy"},
-	{byte=0x4C, bit=6, name="Jiggy: ???", type="Jiggy"},
-	{byte=0x4C, bit=7, name="Jiggy: ???", type="Jiggy"},
+	{byte=0x4C, bit=0, name="Jiggy: GI: ???", type="Jiggy"},
+	{byte=0x4C, bit=1, name="Jiggy: GI: ???", type="Jiggy"},
+	{byte=0x4C, bit=2, name="Jiggy: GI: ???", type="Jiggy"},
+	{byte=0x4C, bit=3, name="Jiggy: GI: ???", type="Jiggy"},
+	{byte=0x4C, bit=4, name="Jiggy: HFP: ???", type="Jiggy"},
+	{byte=0x4C, bit=5, name="Jiggy: HFP: ???", type="Jiggy"},
+	{byte=0x4C, bit=6, name="Jiggy: HFP: ???", type="Jiggy"},
+	{byte=0x4C, bit=7, name="Jiggy: HFP: ???", type="Jiggy"},
 
-	{byte=0x4D, bit=0, name="Jiggy: ???", type="Jiggy"},
-	{byte=0x4D, bit=1, name="Jiggy: ???", type="Jiggy"},
-	{byte=0x4D, bit=2, name="Jiggy: ???", type="Jiggy"},
-	{byte=0x4D, bit=3, name="Jiggy: ???", type="Jiggy"},
-	{byte=0x4D, bit=4, name="Jiggy: ???", type="Jiggy"},
+	{byte=0x4D, bit=0, name="Jiggy: HFP: ???", type="Jiggy"},
+	{byte=0x4D, bit=1, name="Jiggy: HFP: ???", type="Jiggy"},
+	{byte=0x4D, bit=2, name="Jiggy: HFP: ???", type="Jiggy"},
+	{byte=0x4D, bit=3, name="Jiggy: HFP: ???", type="Jiggy"},
+	{byte=0x4D, bit=4, name="Jiggy: HFP: ???", type="Jiggy"},
 	{byte=0x4D, bit=5, name="Jiggy: HFP: Lava Waterfall", type="Jiggy"},
-	{byte=0x4D, bit=6, name="Jiggy: ???", type="Jiggy"},
-	{byte=0x4D, bit=7, name="Jiggy: ???", type="Jiggy"},
+	{byte=0x4D, bit=6, name="Jiggy: CCL: ???", type="Jiggy"},
+	{byte=0x4D, bit=7, name="Jiggy: CCL: ???", type="Jiggy"},
 
-	{byte=0x4E, bit=0, name="Jiggy: ???", type="Jiggy"},
-	{byte=0x4E, bit=1, name="Jiggy: ???", type="Jiggy"},
-	{byte=0x4E, bit=2, name="Jiggy: ???", type="Jiggy"},
-	{byte=0x4E, bit=3, name="Jiggy: ???", type="Jiggy"},
-	{byte=0x4E, bit=4, name="Jiggy: ???", type="Jiggy"},
-	{byte=0x4E, bit=5, name="Jiggy: ???", type="Jiggy"},
-	{byte=0x4E, bit=6, name="Jiggy: ???", type="Jiggy"},
-	{byte=0x4E, bit=7, name="Jiggy: ???", type="Jiggy"},
+	{byte=0x4E, bit=0, name="Jiggy: CCL: ???", type="Jiggy"},
+	{byte=0x4E, bit=1, name="Jiggy: CCL: ???", type="Jiggy"},
+	{byte=0x4E, bit=2, name="Jiggy: CCL: ???", type="Jiggy"},
+	{byte=0x4E, bit=3, name="Jiggy: CCL: ???", type="Jiggy"},
+	{byte=0x4E, bit=4, name="Jiggy: CCL: ???", type="Jiggy"},
+	{byte=0x4E, bit=5, name="Jiggy: CCL: ???", type="Jiggy"},
+	{byte=0x4E, bit=6, name="Jiggy: CCL: ???", type="Jiggy"},
+	{byte=0x4E, bit=7, name="Jiggy: CCL: ???", type="Jiggy"},
 
-	{byte=0x4F, bit=0, name="Jiggy: ???", type="Jiggy"},
-	{byte=0x4F, bit=1, name="Jiggy: ???", type="Jiggy"},
-	{byte=0x4F, bit=2, name="Jiggy: ???", type="Jiggy"},
-	{byte=0x4F, bit=3, name="Jiggy: ???", type="Jiggy"},
-	{byte=0x4F, bit=4, name="Jiggy: ???", type="Jiggy"},
-	{byte=0x4F, bit=5, name="Jiggy: ???", type="Jiggy"},
-	{byte=0x4F, bit=6, name="Jiggy: ???", type="Jiggy"},
-	{byte=0x4F, bit=7, name="Jiggy: ???", type="Jiggy"},
+	{byte=0x4F, bit=0, name="Jiggy: IoH: ???", type="Jiggy"},
+	{byte=0x4F, bit=1, name="Jiggy: IoH: ???", type="Jiggy"},
+	{byte=0x4F, bit=2, name="Jiggy: IoH: ???", type="Jiggy"},
+	{byte=0x4F, bit=3, name="Jiggy: IoH: ???", type="Jiggy"},
+	{byte=0x4F, bit=4, name="Jiggy: IoH: ???", type="Jiggy"},
+	{byte=0x4F, bit=5, name="Jiggy: IoH: ???", type="Jiggy"},
+	{byte=0x4F, bit=6, name="Jiggy: IoH: ???", type="Jiggy"},
+	{byte=0x4F, bit=7, name="Jiggy: IoH: ???", type="Jiggy"},
 
-	{byte=0x50, bit=0, name="Jiggy: ???", type="Jiggy"},
+	{byte=0x50, bit=0, name="Jiggy: IoH: ???", type="Jiggy"},
 	{byte=0x50, bit=1, name="Jiggy: IoH: King Jingaling Intro", type="Jiggy"},
 
 	{byte=0x53, bit=6, name="FT Jiggy Collection??"},
@@ -1511,6 +1513,18 @@ local flag_array = {
 
 	{byte=0x97, bit=7, name="Treble Clef: Jinjo Village", type="Treble Clef"},
 
+	{byte=0xA1, bit=4, name="Cheat Active: Double Maximum Feathers", type="Cheat"},
+	{byte=0xA1, bit=5, name="Cheat Active: Double Maximum Eggs", type="Cheat"},
+	{byte=0xA1, bit=6, name="Cheat Active: No Energy Loss From Falling", type="Cheat"},
+	{byte=0xA1, bit=7, name="Cheat Active: Automatic Energy Regain", type="Cheat"},
+
+	{byte=0xA2, bit=0, name="Cheat Active: Jolly's Jukebox", type="Cheat"},
+	{byte=0xA2, bit=1, name="Cheat Active: Jiggywiggy Temple Signposts", type="Cheat"},
+	{byte=0xA2, bit=2, name="Cheat Active: Fast Banjo", type="Cheat"},
+	{byte=0xA2, bit=3, name="Cheat Active: Fast Baddies", type="Cheat"},
+	{byte=0xA2, bit=4, name="Cheat Active: No Energy Or Air Loss", type="Cheat"},
+	{byte=0xA2, bit=5, name="Cheat Active: Infinite Eggs And Feathers", type="Cheat"},
+
 	{byte=0xA2, bit=7, name="First Time Enter Banjo's House"},
 
 	{byte=0xA3, bit=0, name="Klungo 1 Potion Chosen??"},
@@ -1527,6 +1541,8 @@ local flag_array = {
 
 	{byte=0xA8, bit=0, name="First Time Wading Boots"},
 	{byte=0xA8, bit=4, name="First boss fight? Klungo 1 Intro Cutscene??"},
+
+	{byte=0xAF, bit=3, name="Cheat Active: Enable Homing Eggs", type="Cheat"},
 };
 
 function isKnown(byte, bit)
@@ -1585,6 +1601,23 @@ function clearFlag(byte, bit)
 		if isRDRAM(flags) then
 			currentValue = mainmemory.readbyte(flags + byte);
 			mainmemory.writebyte(flags + byte, clear_bit(currentValue, bit));
+		end
+	end
+end
+
+function clearFlagsByType(_type)
+	if type(_type) == "string" then
+		local numSet = 0;
+		for i = 1, #flag_array do
+			if flag_array[i]["type"] == _type then
+				clearFlag(flag_array[i].byte, flag_array[i].bit, true);
+				numSet = numSet + 1;
+			end
+		end
+		if numSet > 0 then
+			print("Cleared "..numSet.." flags of type '".._type.."'");
+		else
+			print("No flags found of type '".._type.."'");
 		end
 	end
 end
@@ -1723,6 +1756,9 @@ function flagStats(verbose)
 				validType = true;
 			end
 			if flagType == "Progress" then
+				validType = true;
+			end
+			if flagType == "Cheat" then
 				validType = true;
 			end
 			if not validType then
