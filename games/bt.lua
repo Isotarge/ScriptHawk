@@ -1288,7 +1288,27 @@ local flag_array = {
 
 	{byte=0x13, bit=1, name="Klungo 1 Potion Chosen?"},
 
-	{byte=0x1E, bit=0, name="Amaze-O-Gaze Goggles", type="Ability"},
+	{byte=0x18, bit=5, name="Ability: Beak Barge", type="Ability"},
+	{byte=0x18, bit=6, name="Ability: Beak Bomb", type="Ability"},
+	{byte=0x18, bit=7, name="Ability: Beak Buster", type="Ability"},
+	-- 0x19 > 0 (Seen Camera Tutorial?)
+	{byte=0x19, bit=1, name="Ability: Bear Punch Replacement Peck", type="Ability"},
+	{byte=0x19, bit=2, name="Ability: Climb Trees", type="Ability"},
+	{byte=0x19, bit=3, name="Ability: Blue Eggs", type="Ability"},
+	{byte=0x19, bit=4, name="Ability: Feathery Flap", type="Ability"},
+	{byte=0x19, bit=5, name="Ability: Flap Flip", type="Ability"},
+	{byte=0x19, bit=6, name="Ability: Fly Pad", type="Ability"},
+	{byte=0x19, bit=7, name="Ability: Full Jump Height", type="Ability"},
+	{byte=0x1A, bit=0, name="Ability: Rat-a-tat Rap", type="Ability"},
+	{byte=0x1A, bit=1, name="Ability: Roll", type="Ability"},
+	{byte=0x1A, bit=2, name="Ability: Shock Spring Pad", type="Ability"},
+	{byte=0x1A, bit=3, name="Ability: Wading Boots", type="Ability"},
+	{byte=0x1A, bit=4, name="Ability: Dive", type="Ability"},
+	{byte=0x1A, bit=5, name="Ability: Talon Trot", type="Ability"},
+	{byte=0x1A, bit=6, name="Ability: Turbo Trainers", type="Ability"},
+	{byte=0x1A, bit=7, name="Ability: Wonderwing"},
+
+	{byte=0x1E, bit=0, name="Ability: Amaze-O-Gaze Goggles", type="Ability"},
 
 	{byte=0x2F, bit=5, name="FT Jiggy Collection?"},
 	{byte=0x2F, bit=7, name="Mrs. Bottles Intro Cutscene"},
@@ -1719,6 +1739,14 @@ local flag_array = {
 	{byte=0xAF, bit=3, name="Cheat Active: Enable Homing Eggs", type="Cheat"},
 };
 
+local flag_names = {};
+
+for i = 1, #flag_array do
+	if not flag_array[i].ignore then
+		flag_names[i] = flag_array[i].name;
+	end
+end
+
 function isKnown(byte, bit)
 	for i = 1, #flag_array do
 		if flag_array[i].byte == byte and flag_array[i].bit == bit then
@@ -1749,6 +1777,13 @@ function setFlagByName(name)
 	local flag = getFlagByName(name);
 	if type(flag) == "table" then
 		setFlag(flag.byte, flag.bit);
+	end
+end
+
+function clearFlagByName(name)
+	local flag = getFlagByName(name);
+	if type(flag) == "table" then
+		clearFlag(flag.byte, flag.bit);
 	end
 end
 
@@ -1832,6 +1867,38 @@ function setAllFlags()
 			mainmemory.writebyte(flagBlock + byte, 0xFF);
 		end
 	end
+end
+
+function checkFlag(byte, bit, suppressPrint)
+	if type(byte) == "string" then
+		local flag = getFlagByName(byte);
+		if type(flag) == "table" then
+			byte = flag.byte;
+			bit = flag.bit;
+		end
+	end
+	if type(byte) == "number" and type(bit) == "number" and bit >= 0 and bit < 8 then
+		local flagBlock = dereferencePointer(Game.Memory.flag_block_pointer[version]);
+		if isRDRAM(flagBlock) then
+			local currentValue = mainmemory.readbyte(flagBlock + byte);
+			if check_bit(currentValue, bit) then
+				if not suppressPrint then
+					print(getFlagName(byte, bit).." is SET");
+				end
+				return true;
+			else
+				if not suppressPrint then
+					print(getFlagName(byte, bit).." is NOT set");
+				end
+				return false;
+			end
+		end
+	else
+		if not suppressPrint then
+			print("Warning: Flag not found");
+		end
+	end
+	return false;
 end
 
 function checkFlags()
@@ -1985,6 +2052,18 @@ function flagStats(verbose)
 	print_deferred();
 end
 
+local function flagSetButtonHandler()
+	setFlagByName(forms.getproperty(ScriptHawk.UI.form_controls["Flag Dropdown"], "SelectedItem"));
+end
+
+local function flagClearButtonHandler()
+	clearFlagByName(forms.getproperty(ScriptHawk.UI.form_controls["Flag Dropdown"], "SelectedItem"));
+end
+
+local function flagCheckButtonHandler()
+	checkFlag(forms.getproperty(ScriptHawk.UI.form_controls["Flag Dropdown"], "SelectedItem"));
+end
+
 ------------
 -- Events --
 ------------
@@ -2012,11 +2091,17 @@ function Game.applyInfinites()
 end
 
 function Game.initUI()
+	-- Flag stuff
+	ScriptHawk.UI.form_controls["Flag Dropdown"] = forms.dropdown(ScriptHawk.UI.options_form, flag_names, ScriptHawk.UI.col(0) + ScriptHawk.UI.dropdown_offset, ScriptHawk.UI.row(7) + ScriptHawk.UI.dropdown_offset, ScriptHawk.UI.col(9) + 8, ScriptHawk.UI.button_height);
+	ScriptHawk.UI.form_controls["Set Flag Button"] = forms.button(ScriptHawk.UI.options_form, "Set", flagSetButtonHandler, ScriptHawk.UI.col(10), ScriptHawk.UI.row(7), 46, ScriptHawk.UI.button_height);
+	ScriptHawk.UI.form_controls["Check Flag Button"] = forms.button(ScriptHawk.UI.options_form, "Check", flagCheckButtonHandler, ScriptHawk.UI.col(12), ScriptHawk.UI.row(7), 46, ScriptHawk.UI.button_height);
+	ScriptHawk.UI.form_controls["Clear Flag Button"] = forms.button(ScriptHawk.UI.options_form, "Clear", flagClearButtonHandler, ScriptHawk.UI.col(14), ScriptHawk.UI.row(7), 46, ScriptHawk.UI.button_height);
+
 	ScriptHawk.UI.form_controls.toggle_neverslip = forms.checkbox(ScriptHawk.UI.options_form, "Never Slip", ScriptHawk.UI.col(0) + ScriptHawk.UI.dropdown_offset, ScriptHawk.UI.row(6) + ScriptHawk.UI.dropdown_offset);
 
 	-- Moves
-	ScriptHawk.UI.form_controls.moves_dropdown = forms.dropdown(ScriptHawk.UI.options_form, { "0. None", "1. All", "2. All + Dragon Kazooie" }, ScriptHawk.UI.col(10) + ScriptHawk.UI.dropdown_offset, ScriptHawk.UI.row(7) + ScriptHawk.UI.dropdown_offset);
-	ScriptHawk.UI.form_controls.moves_button = forms.button(ScriptHawk.UI.options_form, "Unlock Moves", unlock_moves, ScriptHawk.UI.col(5), ScriptHawk.UI.row(7), ScriptHawk.UI.col(4) + 10, ScriptHawk.UI.button_height);
+	ScriptHawk.UI.form_controls.moves_dropdown = forms.dropdown(ScriptHawk.UI.options_form, { "0. None", "1. All", "2. All + Dragon Kazooie" }, ScriptHawk.UI.col(10) + ScriptHawk.UI.dropdown_offset, ScriptHawk.UI.row(6) + ScriptHawk.UI.dropdown_offset);
+	ScriptHawk.UI.form_controls.moves_button = forms.button(ScriptHawk.UI.options_form, "Unlock Moves", unlock_moves, ScriptHawk.UI.col(5), ScriptHawk.UI.row(6), ScriptHawk.UI.col(4) + 10, ScriptHawk.UI.button_height);
 
 	flagStats();
 end
