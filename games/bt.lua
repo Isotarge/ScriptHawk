@@ -1258,8 +1258,8 @@ event.onloadstate(clearFlagCache, "ScriptHawk - Clear Flag Cache");
 local flag_block_size = 0xB0;
 local flag_array = {
 	-- 0x00 > 0
-	-- 0x00 > 1
-	-- 0x00 > 2
+	{byte=0x00, bit=1, name="First Time Note Collection", type="FTT"},
+	{byte=0x00, bit=2, name="First Time Glowbo Collection", type="FTT"},
 	{byte=0x00, bit=3, name="First Time Egg Collection", type="FTT"},
 	{byte=0x00, bit=4, name="First Time Red Feather Collection", type="FTT"},
 	{byte=0x00, bit=5, name="First Time Gold Feather Collection", type="FTT"},
@@ -1284,6 +1284,8 @@ local flag_array = {
 
 	{byte=0x04, bit=4, name="Cheat Active: Open Up All World Doors", type="Cheat"},
 
+	{byte=0x05, bit=7, name="First Time Minjo Aggro", type="FTT"},
+
 	{byte=0x07, bit=7, name="First Time Cheato Page", type="FTT"},
 
 	{byte=0x13, bit=1, name="Klungo 1 Potion Chosen?"},
@@ -1306,9 +1308,36 @@ local flag_array = {
 	{byte=0x1A, bit=4, name="Ability: Dive", type="Ability"},
 	{byte=0x1A, bit=5, name="Ability: Talon Trot", type="Ability"},
 	{byte=0x1A, bit=6, name="Ability: Turbo Trainers", type="Ability"},
-	{byte=0x1A, bit=7, name="Ability: Wonderwing"},
-
+	{byte=0x1A, bit=7, name="Ability: Wonderwing", type="Ability"},
+	-- 0x1B > 0
+	{byte=0x1B, bit=1, name="Ability: Grip Grab", type="Ability"},
+	-- 0x1B > 2
+	{byte=0x1B, bit=3, name="Ability: Egg Aim", type="Ability"},
+	-- 0x1B > 4
+	--{byte=0x1B, bit=5, name="Ability: Fire/Grenade Eggs???", type="Ability"},
+	{byte=0x1B, bit=6, name="Ability: Bill Drill", type="Ability"},
+	-- 0x1B > 7
+	-- 0x1C > 0
+	{byte=0x1C, bit=1, name="Ability: Split Up", type="Ability"},
+	-- 0x1C > 2
+	-- 0x1C > 3
+	-- 0x1C > 4
+	-- 0x1C > 5
+	-- 0x1C > 6
+	-- 0x1C > 7
+	-- 0x1D > 0
+	-- 0x1D > 1
+	-- 0x1D > 2
+	{byte=0x1D, bit=3, name="Ability: Springy Step Shoes", type="Ability"},
+	-- 0x1D > 4
+	-- 0x1D > 5
+	-- 0x1D > 6
+	-- 0x1D > 7
 	{byte=0x1E, bit=0, name="Ability: Amaze-O-Gaze Goggles", type="Ability"},
+	{byte=0x1E, bit=1, name="Ability: Fire Eggs", type="Ability"},
+	{byte=0x1E, bit=2, name="Ability: Grenade Eggs", type="Ability"},
+	{byte=0x1E, bit=3, name="Ability: Clockwork Kazooie Eggs", type="Ability"},
+	{byte=0x1E, bit=4, name="Ability: Ice Eggs", type="Ability"},
 
 	{byte=0x2F, bit=5, name="FT Jiggy Collection?"},
 	{byte=0x2F, bit=7, name="Mrs. Bottles Intro Cutscene"},
@@ -1316,9 +1345,11 @@ local flag_array = {
 	{byte=0x30, bit=0, name="Speccy Intro Text Seen"},
 	{byte=0x30, bit=1, name="Amaze-O-Gaze Goggles Instructions Seen"},
 
+	--{byte=0x32, bit=2, name="Klungo 2 Something?"},
+
 	{byte=0x38, bit=4, name="FT Enter Jinjo Village?"},
 
-	{byte=0x39, bit=4, name="Jinjo: MT: ???", type="Jinjo"},
+	{byte=0x39, bit=4, name="Jinjo: MT: Jade Snake Grove", type="Jinjo"},
 	{byte=0x39, bit=5, name="Jinjo: MT: ???", type="Jinjo"},
 	{byte=0x39, bit=6, name="Jinjo: MT: ???", type="Jinjo"},
 	{byte=0x39, bit=7, name="Jinjo: MT: ???", type="Jinjo"},
@@ -1394,8 +1425,8 @@ local flag_array = {
 	-- 0x42 > 5
 	-- 0x42 > 6
 	{byte=0x42, bit=7, name="Glowbo: MT: ???", type="Glowbo"},
-	{byte=0x43, bit=0, name="Glowbo: MT: ???", type="Glowbo"},
-	{byte=0x43, bit=1, name="Glowbo: GGM: ???", type="Glowbo"},
+	{byte=0x43, bit=0, name="Glowbo: MT: Behind Wigwam", type="Glowbo"},
+	{byte=0x43, bit=1, name="Glowbo: GGM: Near Entrance", type="Glowbo"},
 	{byte=0x43, bit=2, name="Glowbo: GGM: ???", type="Glowbo"},
 	{byte=0x43, bit=3, name="Glowbo: WW: ???", type="Glowbo"},
 	{byte=0x43, bit=4, name="Glowbo: WW: ???", type="Glowbo"},
@@ -1416,11 +1447,11 @@ local flag_array = {
 	{byte=0x45, bit=2, name="Jiggy: MT: ???", type="Jiggy"},
 	{byte=0x45, bit=3, name="Jiggy: MT: ???", type="Jiggy"},
 	{byte=0x45, bit=4, name="Jiggy: MT: ???", type="Jiggy"},
-	{byte=0x45, bit=5, name="Jiggy: MT: ???", type="Jiggy"},
+	{byte=0x45, bit=5, name="Jiggy: MT: Jade Snake Grove: Gold Statue", type="Jiggy"},
 	{byte=0x45, bit=6, name="Jiggy: MT: ???", type="Jiggy"},
-	{byte=0x45, bit=7, name="Jiggy: MT: ???", type="Jiggy"},
+	{byte=0x45, bit=7, name="Jiggy: MT: Pillars", type="Jiggy"},
 	{byte=0x46, bit=0, name="Jiggy: MT: Top of Temple", type="Jiggy"},
-	{byte=0x46, bit=1, name="Jiggy: MT: ???", type="Jiggy"},
+	{byte=0x46, bit=1, name="Jiggy: MT: Jade Snake Grove: Snake", type="Jiggy"},
 	{byte=0x46, bit=2, name="Jiggy: GGM: ???", type="Jiggy"},
 	{byte=0x46, bit=3, name="Jiggy: GGM: ???", type="Jiggy"},
 	{byte=0x46, bit=4, name="Jiggy: GGM: ???", type="Jiggy"},
@@ -1428,7 +1459,7 @@ local flag_array = {
 	{byte=0x46, bit=6, name="Jiggy: GGM: ???", type="Jiggy"},
 	{byte=0x46, bit=7, name="Jiggy: GGM: ???", type="Jiggy"},
 	{byte=0x47, bit=0, name="Jiggy: GGM: ???", type="Jiggy"},
-	{byte=0x47, bit=1, name="Jiggy: GGM: ???", type="Jiggy"},
+	{byte=0x47, bit=1, name="Jiggy: GGM: Waterfall", type="Jiggy"},
 	{byte=0x47, bit=2, name="Jiggy: GGM: ???", type="Jiggy"},
 	{byte=0x47, bit=3, name="Jiggy: GGM: ???", type="Jiggy"},
 	{byte=0x47, bit=4, name="Jiggy: WW: ???", type="Jiggy"},
@@ -1491,7 +1522,7 @@ local flag_array = {
 	{byte=0x4E, bit=5, name="Jiggy: CCL: ???", type="Jiggy"},
 	{byte=0x4E, bit=6, name="Jiggy: CCL: ???", type="Jiggy"},
 	{byte=0x4E, bit=7, name="Jiggy: CCL: ???", type="Jiggy"},
-	{byte=0x4F, bit=0, name="Jiggy: IoH: ???", type="Jiggy"},
+	{byte=0x4F, bit=0, name="Jiggy: IoH: White Jinjo Family", type="Jiggy"},
 	{byte=0x4F, bit=1, name="Jiggy: IoH: ???", type="Jiggy"},
 	{byte=0x4F, bit=2, name="Jiggy: IoH: ???", type="Jiggy"},
 	{byte=0x4F, bit=3, name="Jiggy: IoH: ???", type="Jiggy"},
@@ -1505,10 +1536,10 @@ local flag_array = {
 	{byte=0x53, bit=6, name="FT Jiggy Collection??"},
 
 	{byte=0x56, bit=3, name="Cheato Page: MT: Snake Heads", type="Cheato Page"},
-	{byte=0x56, bit=4, name="Cheato Page: MT: ???", type="Cheato Page"},
-	{byte=0x56, bit=5, name="Cheato Page: MT: ???", type="Cheato Page"},
+	{byte=0x56, bit=4, name="Cheato Page: MT: Prison Compound", type="Cheato Page"},
+	{byte=0x56, bit=5, name="Cheato Page: MT: Jade Snake Grove", type="Cheato Page"},
 	{byte=0x56, bit=6, name="Cheato Page: GGM: ???", type="Cheato Page"},
-	{byte=0x56, bit=7, name="Cheato Page: GGM: ???", type="Cheato Page"},
+	{byte=0x56, bit=7, name="Cheato Page: GGM: Level Entrance", type="Cheato Page"},
 	{byte=0x57, bit=0, name="Cheato Page: GGM: ???", type="Cheato Page"},
 	{byte=0x57, bit=1, name="Cheato Page: WW: ???", type="Cheato Page"},
 	{byte=0x57, bit=2, name="Cheato Page: WW: ???", type="Cheato Page"},
@@ -1530,10 +1561,11 @@ local flag_array = {
 	{byte=0x59, bit=2, name="Cheato Page: CCL: ???", type="Cheato Page"},
 	{byte=0x59, bit=3, name="Cheato Page: Spiral Mountain", type="Cheato Page"},
 
-	{byte=0x5D, bit=5, name="FT Enter Digger Tunnel (Klungo 1)?"},
-	{byte=0x5D, bit=7, name="FT Enter Digger Tunnel (Klungo 1)??"},
+	{byte=0x5D, bit=5, name="FT Enter Digger Tunnel?"},
+	{byte=0x5D, bit=7, name="FT Enter Digger Tunnel??"},
 
 	{byte=0x5E, bit=0, name="Klungo 1 Defeated", type="Progress"},
+	{byte=0x5E, bit=1, name="Klungo 2 Defeated", type="Progress"},
 
 	{byte=0x60, bit=5, name="Silo: Jinjo Village", type="Silo"},
 	{byte=0x60, bit=6, name="Silo: Wooded Hollow", type="Silo"},
@@ -1549,7 +1581,61 @@ local flag_array = {
 	{byte=0x67, bit=0, name="King Jingaling Life Sapped"},
 	{byte=0x67, bit=7, name="Jiggywiggy Temple Is Over There CS Seen", type="FTT"},
 
+	--{byte=0x6E, bit=6, name="FT Complete Jinjo Family?"},
+
+	{byte=0x70, bit=4, name="Warp: MT: World Entry And Exit", type="Warp"},
+	{byte=0x70, bit=5, name="Warp: MT: Outside Mumbo's Skull", type="Warp"},
+	{byte=0x70, bit=6, name="Warp: MT: Prison Compound", type="Warp"},
+	{byte=0x70, bit=7, name="Warp: MT: Near Wumba's Wigwam", type="Warp"},
+	{byte=0x71, bit=0, name="Warp: MT: Kickball Stadium Lobby", type="Warp"},
+	{byte=0x71, bit=1, name="Warp: GGM: World Entry And Exit", type="Warp"},
+	{byte=0x71, bit=2, name="Warp: GGM: Outside Mumbo's Skull", type="Warp"},
+	{byte=0x71, bit=3, name="Warp: GGM: Inside Wumba's Wigwam", type="Warp"},
+	{byte=0x71, bit=4, name="Warp: GGM: Outside The Crushing Shed", type="Warp"},
+	{byte=0x71, bit=5, name="Warp: GGM: Near The Train Station", type="Warp"},
+	{byte=0x71, bit=6, name="Warp: WW: World Entry And Exit", type="Warp"},
+	{byte=0x71, bit=7, name="Warp: WW: Behind The Big Top Tent", type="Warp"},
+	{byte=0x72, bit=0, name="Warp: WW: Space Zone", type="Warp"},
+	{byte=0x72, bit=1, name="Warp: WW: Outside Wumba's Wigwam", type="Warp"},
+	{byte=0x72, bit=2, name="Warp: WW: Outside Mumbo's Skull", type="Warp"},
+	{byte=0x72, bit=3, name="Warp: JRL: Town Center", type="Warp"},
+	{byte=0x72, bit=4, name="Warp: JRL: Atlantis", type="Warp"},
+	{byte=0x72, bit=5, name="Warp: JRL: Sunken Ship", type="Warp"},
+	{byte=0x72, bit=6, name="Warp: JRL: Big Fish Cavern", type="Warp"},
+	{byte=0x72, bit=7, name="Warp: JRL: Lockers Cavern", type="Warp"},
+	{byte=0x73, bit=0, name="Warp: TDL: World Entry And Exit", type="Warp"},
+	{byte=0x73, bit=1, name="Warp: TDL: Stomping Plains", type="Warp"},
+	{byte=0x73, bit=2, name="Warp: TDL: Outside Mumbo's Skull", type="Warp"},
+	{byte=0x73, bit=3, name="Warp: TDL: Outside Wumba's Wigwam", type="Warp"},
+	{byte=0x73, bit=4, name="Warp: TDL: Top Of The Mountain", type="Warp"},
+	{byte=0x73, bit=5, name="Warp: GI: Floor 1 - Entrance Door", type="Warp"},
+	{byte=0x73, bit=6, name="Warp: GI: Floor 2 - Outside Wumba's Wigwam", type="Warp"},
+	{byte=0x73, bit=7, name="Warp: GI: Floor 3 - Outside Mumbo's Skull", type="Warp"},
+	{byte=0x74, bit=0, name="Warp: GI: Floor 4 - Near The Crushers", type="Warp"},
+	{byte=0x74, bit=1, name="Warp: GI: On The Roof Outside", type="Warp"},
+	{byte=0x74, bit=2, name="Warp: HFP: Fire Side - Lower Area (Mumbo)", type="Warp"},
+	{byte=0x74, bit=3, name="Warp: HFP: Fire Side - Upper Area", type="Warp"},
+	{byte=0x74, bit=4, name="Warp: HFP: Ice Side - Upper Area", type="Warp"},
+	{byte=0x74, bit=5, name="Warp: HFP: Ice Side - Lower Area (Wumba)", type="Warp"},
+	{byte=0x74, bit=6, name="Warp: HFP: Ice Side - Inside Icicle Grotto", type="Warp"},
+	{byte=0x74, bit=7, name="Warp: CCL: World Entry And Exit", type="Warp"},
+	{byte=0x75, bit=0, name="Warp: CCL: Central Cavern", type="Warp"},
+	-- 0x75 > 1
+	-- 0x75 > 2
+	-- 0x75 > 3
+	{byte=0x75, bit=4, name="Warp: CK: Bottom Of The Tower", type="Warp"},
+	{byte=0x75, bit=5, name="Warp: CK: Top Of The Tower", type="Warp"},
+
+	{byte=0x78, bit=6, name="First Warp Available", type="FTT"},
+
+	{byte=0x7C, bit=4, name="Jamjars First Time Text", type="FTT"},
+
+	--{byte=0x7F, bit=2, name="Jamjars FTSomething?"},
+	--{byte=0x7F, bit=4, name="Jamjars FTSomething?"},
+
 	{byte=0x82, bit=4, name="Jinjo Family FT Cutscene?"},
+	--{byte=0x82, bit=5, name="FT Complete Jinjo Family?"},
+	-- 0x82 > 6
 	{byte=0x82, bit=7, name="Chilli Billi Intro Text?", type="FTT"},
 
 	{byte=0x84, bit=7, name="Nest: MT: ???", type="Nest"},
@@ -1569,10 +1655,10 @@ local flag_array = {
 	{byte=0x86, bit=5, name="Nest: MT: ???", type="Nest"},
 	{byte=0x86, bit=6, name="Nest: MT: ???", type="Nest"},
 	{byte=0x86, bit=7, name="Treble Clef: MT", type="Treble Clef"},
-	{byte=0x87, bit=0, name="Nest: GGM: ???", type="Nest"},
-	{byte=0x87, bit=1, name="Nest: GGM: ???", type="Nest"},
-	{byte=0x87, bit=2, name="Nest: GGM: ???", type="Nest"},
-	{byte=0x87, bit=3, name="Nest: GGM: ???", type="Nest"},
+	{byte=0x87, bit=0, name="Nest: GGM: Hill by Crusher Shed (1)", type="Nest"},
+	{byte=0x87, bit=1, name="Nest: GGM: Hill by Crusher Shed (2)", type="Nest"},
+	{byte=0x87, bit=2, name="Nest: GGM: Hill by Crusher Shed (3)", type="Nest"},
+	{byte=0x87, bit=3, name="Nest: GGM: Hill by Crusher Shed (4)", type="Nest"},
 	{byte=0x87, bit=4, name="Nest: GGM: ???", type="Nest"},
 	{byte=0x87, bit=5, name="Nest: GGM: ???", type="Nest"},
 	{byte=0x87, bit=6, name="Nest: GGM: ???", type="Nest"},
@@ -1708,6 +1794,8 @@ local flag_array = {
 
 	{byte=0x99, bit=4, name="First Time Split Up Pad Text", type="FTT"},
 
+	{byte=0x9B, bit=6, name="First Time Jamjars Cutscene", type="FTT"},
+
 	{byte=0xA1, bit=4, name="Cheat Active: Double Maximum Feathers", type="Cheat"},
 	{byte=0xA1, bit=5, name="Cheat Active: Double Maximum Eggs", type="Cheat"},
 	{byte=0xA1, bit=6, name="Cheat Active: No Energy Loss From Falling", type="Cheat"},
@@ -1718,22 +1806,48 @@ local flag_array = {
 	{byte=0xA2, bit=3, name="Cheat Active: Fast Baddies", type="Cheat"},
 	{byte=0xA2, bit=4, name="Cheat Active: No Energy Or Air Loss", type="Cheat"},
 	{byte=0xA2, bit=5, name="Cheat Active: Infinite Eggs And Feathers", type="Cheat"},
-
+	-- 0xA2 > 6
 	{byte=0xA2, bit=7, name="FT Enter Banjo's House"},
-
-	{byte=0xA3, bit=0, name="Klungo 1 Potion Chosen??"},
+	{byte=0xA3, bit=0, name="Klungo Potion Chosen??"},
 	{byte=0xA3, bit=1, name="FT Enter MT"},
-
+	-- 0xA3 > 2
+	{byte=0xA3, bit=3, name="FT Enter GGM"},
+	-- 0xA3 > 4
+	-- 0xA3 > 5
+	-- 0xA3 > 6
+	-- 0xA3 > 7
+	-- 0xA4 > 0
+	-- 0xA4 > 1
+	{byte=0xA4, bit=2, name="FT Enter JRL"},
+	-- 0xA4 > 3
+	-- 0xA4 > 4
+	-- 0xA4 > 5
+	-- 0xA4 > 6
+	-- 0xA4 > 7
+	{byte=0xA5, bit=0, name="FT Enter TDL"},
+	-- 0xA5 > 1
+	{byte=0xA5, bit=2, name="FT Enter GI"},
+	-- 0xA5 > 3
 	{byte=0xA5, bit=4, name="FT Enter HFP"},
-
+	-- 0xA5 > 5
+	{byte=0xA5, bit=6, name="FT Enter CCL"},
+	-- 0xA5 > 7
+	-- 0xA6 > 0
+	{byte=0xA6, bit=1, name="FT Enter CK"},
+	-- 0xA6 > 2
+	-- 0xA6 > 3
+	-- 0xA6 > 4
 	{byte=0xA6, bit=5, name="FT Enter IoH"},
 	{byte=0xA6, bit=6, name="FT Enter Jinjo Village??"},
-
+	-- 0xA6 > 7
+	-- 0xA7 > 0
 	{byte=0xA7, bit=1, name="FT Enter King Jingaling Cutscene"},
 	{byte=0xA7, bit=3, name="FT Enter Bottles' House?"},
 	{byte=0xA7, bit=7, name="First Time Turbo Trainers"},
-
 	{byte=0xA8, bit=0, name="First Time Wading Boots"},
+	-- 0xA8 > 1
+	-- 0xA8 > 2
+	-- 0xA8 > 3
 	{byte=0xA8, bit=4, name="First Boss Fight?"},
 
 	{byte=0xAF, bit=3, name="Cheat Active: Enable Homing Eggs", type="Cheat"},
@@ -1942,7 +2056,7 @@ function flagStats(verbose)
 	local jinjosKnown = 0; local maxJinjos = 45;
 	local notesKnown = 0; local maxNotes = 900;
 	local silosKnown = 0; local maxSilos = 7;
-	local warpsKnown = 0; local maxWarps = 0; -- TODO
+	local warpsKnown = 0; local maxWarps = 39; -- I think this is right?
 
 	local untypedFlags = 0;
 	local flagsWithUnknownType = 0;
