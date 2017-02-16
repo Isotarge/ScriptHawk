@@ -4,7 +4,8 @@
 20 00 00 00 = 1st Egg Text
 40 00 00 00 = 1st Red Feather Text
 80 00 00 00 = 1st Gold Feather Text
-
+00 01 00 00 = 1st Orange/Conga Text
+00 02 00 00 = 1st Gold Bullion Text
 00 04 00 00 = 1st Honeycomb Text
 00 08 00 00 = 1st Empty Honeycomb Text
 00 10 00 00 = 1st Extra Life Text
@@ -18,16 +19,19 @@
 00 00 10 00 = 1st Time in Icy Water Text
 00 00 20 00 = 1st Time entering MMM Mansion Text
 00 00 40 00 = 1st Time in Jigsaw puzzle
-00 00 80 00 = 1st Time in jisaw puzzle with puzzle piece
+00 00 80 00 = 1st Time in jigsaw puzzle with puzzle piece
 00 00 00 01 = MM WS Jiggy Spawned
 00 00 00 02 = MMM WS Jiggy Spawned
 00 00 00 04 = TTC WS Jiggy Spawned
 00 00 00 08 = CC WS Jiggy Spawned
 00 00 00 10 = RBB WS Jiggy Spawned
 00 00 00 20 = 1st Time entering MMM Diningroom cutscene
-
+00 00 00 40 = Grate to BGS Puzzle
+00 00 00 80 = CC Lobby Underwater Pipe 1
 
 --3831AC
+01 00 00 00 = CC Lobby Underwater Pipe 2
+02 00 00 00 = CC Lobby Pipe 3
 04 00 00 00 = Water Level 1 switch pressed
 08 00 00 00 = Water at level 1
 10 00 00 00 = Water Level 2 switch pressed
@@ -160,6 +164,7 @@ C0 03 00 00 = # of pieces placed in FP Puzzle
 00 00 80 00 = 1st time in MMM - world hub
 00 00 00 01 = 1st time in CC - main map
 00 00 00 02 = Double Health
+00 00 00 04 = 1st time TRex
 
 00 00 00 20 = 1st time in lair cutscene - entering from SM
 
@@ -181,7 +186,7 @@ C0 03 00 00 = # of pieces placed in FP Puzzle
 00 40 00 00 = Grate to MMM Puzzle to RBB Puzzle Broken
 
 00 00 02 00 = Final Battle Jinjo Statue Activated Cutscene
-00 00 04 00 = Final Battle Jinjo Statue Cutscene
+00 00 04 00 = Final Battle Jinjo Statue Rising Cutscene
 
 00 00 00 10 = 1st Time in Mumbo's With enough tokensText
 00 00 00 20 = 1st Time in CCW Icy Water Text

@@ -250,7 +250,8 @@ local flag_array = {
 	{["name"] = "1st Egg Text",				["index"] = 0x05,	["type"] = "Prog",	["level"] = 6},
 	{["name"] = "1st Red Feather Text",		["index"] = 0x06,	["type"] = "Prog",	["level"] = 6},
 	{["name"] = "1st Gold Feather Text",	["index"] = 0x07,	["type"] = "Prog",	["level"] = 6},
-	
+	{["name"] = "1st Gold Bullion Text",	["index"] = 0x08,	["type"] = "Prog",	["level"] = 6},
+	{["name"] = "1st Orange Text",			["index"] = 0x09,	["type"] = "Prog",	["level"] = 6},
 	{["name"] = "1st Honeycomb Text",		["index"] = 0x0A,	["type"] = "Prog",	["level"] = 6},
 	{["name"] = "1st Empty Honeycomb Text",	["index"] = 0x0B,	["type"] = "Prog",	["level"] = 6},
 	{["name"] = "1st Extra Life Text",		["index"] = 0x0C,	["type"] = "Prog",	["level"] = 6},
@@ -271,7 +272,10 @@ local flag_array = {
 	{["name"] = "CC WS Jiggy Spawned",		["index"] = 0x1B,	["type"] = "Prog",	["level"] = 6},
 	{["name"] = "RBB WS Jiggy Spawned",		["index"] = 0x1C,	["type"] = "Prog",	["level"] = 6},
 	{["name"] = "MMM Diningroom Cutscene",	["index"] = 0x1D,	["type"] = "Prog",	["level"] = 10},
-	
+	{["name"] = "Grate to BGS Puzzle Open",	["index"] = 0x1E,	["type"] = "Prog",	["level"] = 6},
+	{["name"] = "CC Lobby Pipe 1 Raised",	["index"] = 0x1F,	["type"] = "Prog",	["level"] = 6},
+	{["name"] = "CC Lobby Pipe 2 Raised",	["index"] = 0x20,	["type"] = "Prog",	["level"] = 6},
+	{["name"] = "CC Lobby Pipe 3 Raised",	["index"] = 0x21,	["type"] = "Prog",	["level"] = 6},
 	{["name"] = "Water Switch 1 Pressed",	["index"] = 0x22,	["type"] = "Prog",	["level"] = 6},
 	{["name"] = "Lair Water Level 1",		["index"] = 0x23,	["type"] = "Prog",	["level"] = 6},
 	{["name"] = "Water Switch 2 Pressed",	["index"] = 0x24,	["type"] = "Prog",	["level"] = 6},
@@ -366,6 +370,7 @@ local flag_array = {
 	{["name"] = "1st Thorn Hedge Text",		["index"] = 0x86,	["type"] = "Prog",	["level"] = 10},
 	
 	{["name"] = "1st Exiting Loggo Text",	["index"] = 0x88,	["type"] = "Prog",	["level"] = 10},
+
 	{["name"] = "CCW Spring Open",			["index"] = 0x8B,	["type"] = "Prog",	["level"] = 8},
 	{["name"] = "CCW Summer Open",			["index"] = 0x8C,	["type"] = "Prog",	["level"] = 8},
 	{["name"] = "CCW Autumn Open",			["index"] = 0x8D,	["type"] = "Prog",	["level"] = 8},

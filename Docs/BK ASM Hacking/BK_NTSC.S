@@ -303,7 +303,7 @@
 [CopyXYZVelocity_1]: 0x8028EF70 ;I: (float* $a0 DestXPtr)
 
 [IncrementAndDisplayCarriedObject_1]: 0x8028F030
-[SetCarriedItemCountToZeroAndDisplay_!]: 0x8028F050
+[SetCarriedItemCountToZeroAndDisplay_1]: 0x8028F050
 [IsPlayerAndShadowVisible]: 0x8028F070  ;O: [byte $v0 bool]
 
 [IsMumboTransformBanjoOrWashingMachine]:    0x8028F0D4  ;O: [byte $v0 bool]
