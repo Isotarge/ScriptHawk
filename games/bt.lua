@@ -2235,9 +2235,27 @@ end
 -- Object Model 1 --
 --------------------
 
-local slot_base = 0x14;
+local slot_base = 0x10;
 local slot_size = 0x9C;
 object_index = 1;
+
+object_model1 = {
+	["id_struct"] = 0x00, -- Pointer
+	["x_position"] = 0x04, -- Float
+	["y_position"] = 0x08, -- Float
+	["z_position"] = 0x0C, -- Float
+	["scale"] = 0x38, -- Float
+	["y_rotation"] = 0x48, -- Float
+	["z_rotation"] = 0x4C, -- Float
+	["models"] = {
+		[0x629] = "Molehill",
+		[0x6EA] = "Nest (Blue Eggs)",
+		[0x6EF] = "Nest (Red Feathers)",
+		[0x7A2] = "Signpost",
+		[0x913] = "Targitzan Idol",
+		[0x977] = "Jiggywiggy's Altar of Knowledge",
+	},
+};
 
 function getNumSlots()
 	local objectArray = dereferencePointer(Game.Memory.object_array_pointer[version]);
@@ -2302,9 +2320,9 @@ end
 
 function setObjectModel1Position(pointer, x, y, z)
 	if isRDRAM(pointer) then
-		mainmemory.writefloat(pointer + 0x00, x, true);
-		mainmemory.writefloat(pointer + 0x04, y, true);
-		mainmemory.writefloat(pointer + 0x08, z, true);
+		mainmemory.writefloat(pointer + object_model1.x_position, x, true);
+		mainmemory.writefloat(pointer + object_model1.y_position, y, true);
+		mainmemory.writefloat(pointer + object_model1.z_position, z, true);
 	end
 end
 
@@ -2312,15 +2330,15 @@ function zipTo(index)
 	local objectArray = dereferencePointer(Game.Memory.object_array_pointer[version]);
 	if isRDRAM(objectArray) then
 		local objectPointer = objectArray + getSlotBase(index);
-		local xPos = mainmemory.readfloat(objectPointer + 0x00, true);
-		local yPos = mainmemory.readfloat(objectPointer + 0x04, true);
-		local zPos = mainmemory.readfloat(objectPointer + 0x08, true);
+		local xPos = mainmemory.readfloat(objectPointer + object_model1.x_position, true);
+		local yPos = mainmemory.readfloat(objectPointer + object_model1.y_position, true);
+		local zPos = mainmemory.readfloat(objectPointer + object_model1.z_position, true);
 		Game.setPosition(xPos, yPos, zPos);
 	end
 end
 
 function zipToSelectedObject()
-	zipTo(object_index);
+	zipTo(object_index - 1);
 end
 
 local green_highlight = 0xFF00FF00;
@@ -2358,26 +2376,26 @@ function Game.drawUI()
 			local currentSlotBase = objectArray + getSlotBase(i - 1);
 
 			local animationType = "Unknown";
-			--local objectIDPointer = dereferencePointer(currentSlotBase + 0x12C);
-			--if isRDRAM(objectIDPointer) then
-			--	objectType = mainmemory.read_u16_be(objectIDPointer + 0x02);
-			--	if type(Game.actorArray[objectType]) == "string" then
-			--		animationType = Game.actorArray[objectType];
-			--	else
-			--		animationType = toHexString(objectType);
-			--	end
-			--end
+			local objectIDPointer = dereferencePointer(currentSlotBase + object_model1.id_struct);
+			if isRDRAM(objectIDPointer) then
+				local modelIndex = mainmemory.read_u16_be(objectIDPointer + 0x14);
+				if type(object_model1.models[modelIndex]) == "string" then
+					animationType = object_model1.models[modelIndex];
+				else
+					animationType = toHexString(modelIndex);
+				end
+			end
 
 			local color = nil;
 			if object_index == i then
 				color = yellow_highlight;
 			end
 
-			local xPos = mainmemory.readfloat(currentSlotBase + 0x00, true);
-			local yPos = mainmemory.readfloat(currentSlotBase + 0x04, true);
-			local zPos = mainmemory.readfloat(currentSlotBase + 0x08, true);
+			local xPos = mainmemory.readfloat(currentSlotBase + object_model1.x_position, true);
+			local yPos = mainmemory.readfloat(currentSlotBase + object_model1.y_position, true);
+			local zPos = mainmemory.readfloat(currentSlotBase + object_model1.z_position, true);
 
-			gui.text(Game.OSDPosition[1], 2 + Game.OSDRowHeight * row, round(xPos, precision)..", "..round(yPos, precision)..", "..round(zPos, precision).." - "..i..": "..toHexString(currentSlotBase or 0), color, 'bottomright');
+			gui.text(Game.OSDPosition[1], 2 + Game.OSDRowHeight * row, round(xPos, precision)..", "..round(yPos, precision)..", "..round(zPos, precision).." - "..animationType.." "..i..": "..toHexString(currentSlotBase or 0), color, 'bottomright');
 			row = row + 1;
 		end
 	end

@@ -2271,7 +2271,7 @@ function Game.drawUI()
 	row = row + 1;
 
 	drawObjectPositions();
-	
+
 	if script_mode == "Examine" and isRDRAM(objectArray) then
 		local examine_data = getExamineData(objectArray + getSlotBase(object_index));
 		for i = #examine_data, 1, -1 do
@@ -2303,7 +2303,7 @@ function Game.drawUI()
 			local animationType = "Unknown";
 			local objectIDPointer = dereferencePointer(currentSlotBase + 0x12C);
 			if isRDRAM(objectIDPointer) then
-				objectType = mainmemory.read_u16_be(objectIDPointer + 0x02);
+				local objectType = mainmemory.read_u16_be(objectIDPointer + 0x02);
 				if type(Game.actorArray[objectType]) == "string" then
 					animationType = Game.actorArray[objectType];
 				else
