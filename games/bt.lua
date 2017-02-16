@@ -2239,7 +2239,25 @@ local slot_base = 0x14;
 local slot_size = 0x9C;
 object_index = 1;
 
-local function incrementObjectIndex() -- TODO: These functions need to take hide_non_animated into account
+function getNumSlots()
+	local objectArray = dereferencePointer(Game.Memory.object_array_pointer[version]);
+	if isRDRAM(objectArray) then
+		local blockEnd = dereferencePointer(objectArray - 0x0C);
+		if isRDRAM(blockEnd) then
+			return math.floor(((blockEnd - objectArray) - slot_base) / slot_size);
+		end
+	end
+	return 0;
+end
+
+function getSlotBase(index)
+	--if index < 0 or index > getNumSlots() then
+	--	print("Warning: OOB call to getSlotBase() with index"..index);
+	--end
+	return slot_base + index * slot_size;
+end
+
+local function incrementObjectIndex()
 	object_index = object_index + 1;
 	if object_index > getNumSlots() then
 		object_index = 1;
@@ -2268,21 +2286,6 @@ local function toggleObjectAnalysisToolsMode()
 		script_mode_index = 1;
 	end
 	script_mode = script_modes[script_mode_index];
-end
-
-function getNumSlots()
-	local objectArray = dereferencePointer(Game.Memory.object_array_pointer[version]);
-	if isRDRAM(objectArray) then
-		local blockEnd = dereferencePointer(objectArray - 0x0C);
-		if isRDRAM(blockEnd) then
-			return math.floor(((blockEnd - objectArray) - slot_base) / slot_size);
-		end
-	end
-	return 0;
-end
-
-function getSlotBase(index)
-	return slot_base + index * slot_size;
 end
 
 function getObjectModel1Pointers()
@@ -2320,6 +2323,9 @@ function zipToSelectedObject()
 	zipTo(object_index);
 end
 
+local green_highlight = 0xFF00FF00;
+local yellow_highlight = 0xFFFFFF00;
+
 function Game.drawUI()
 	if script_mode == "Disabled" then
 		return;
@@ -2328,9 +2334,6 @@ function Game.drawUI()
 	local row = 0;
 
 	local objectArray = dereferencePointer(Game.Memory.object_array_pointer[version]);
-	if string.contains(script_mode, "Struct") then
-		structPointers = getStructPointers();
-	end
 	local numSlots = getNumSlots();
 
 	gui.text(Game.OSDPosition[1], 2 + Game.OSDRowHeight * row, "Mode: "..script_mode, nil, 'bottomright');
@@ -2351,7 +2354,7 @@ function Game.drawUI()
 	end
 
 	if script_mode == "List" and isRDRAM(objectArray) then
-		for i = numSlots, 0, -1 do
+		for i = numSlots, 1, -1 do
 			local currentSlotBase = objectArray + getSlotBase(i - 1);
 
 			local animationType = "Unknown";
@@ -2370,7 +2373,11 @@ function Game.drawUI()
 				color = yellow_highlight;
 			end
 
-			gui.text(Game.OSDPosition[1], 2 + Game.OSDRowHeight * row, i..": "..toHexString(currentSlotBase or 0), color, 'bottomright');
+			local xPos = mainmemory.readfloat(currentSlotBase + 0x00, true);
+			local yPos = mainmemory.readfloat(currentSlotBase + 0x04, true);
+			local zPos = mainmemory.readfloat(currentSlotBase + 0x08, true);
+
+			gui.text(Game.OSDPosition[1], 2 + Game.OSDRowHeight * row, round(xPos, precision)..", "..round(yPos, precision)..", "..round(zPos, precision).." - "..i..": "..toHexString(currentSlotBase or 0), color, 'bottomright');
 			row = row + 1;
 		end
 	end
