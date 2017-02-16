@@ -294,6 +294,7 @@ Game.maps = {
 
 -- Version order: Australia, Europe, Japan, USA
 Game.Memory = {
+	["object_array_pointer"] = {0x13BBD0, 0x13BE60, 0x131020, 0x136EE0},
 	["player_pointer"] = {0x13A210, 0x13A4A0, 0x12F660, 0x135490},
 	["player_pointer_index"] = {0x13A25F, 0x13A4EF, 0x12F6AF, 0x1354DF},
 	["flag_block_pointer"] = {0x1314F0, 0x131780, 0x126940, 0x12C770},
@@ -1288,6 +1289,8 @@ local flag_array = {
 
 	{byte=0x07, bit=7, name="First Time Cheato Page", type="FTT"},
 
+	{byte=0x0A, bit=5, name="Mumbo FTT", type="FTT"},
+
 	{byte=0x13, bit=1, name="Klungo 1 Potion Chosen?"},
 
 	{byte=0x18, bit=5, name="Ability: Beak Barge", type="Ability"},
@@ -1311,7 +1314,7 @@ local flag_array = {
 	{byte=0x1A, bit=7, name="Ability: Wonderwing", type="Ability"},
 	-- 0x1B > 0
 	{byte=0x1B, bit=1, name="Ability: Grip Grab", type="Ability"},
-	-- 0x1B > 2
+	{byte=0x1B, bit=2, name="Ability: Breegull Blaster", type="Ability"},
 	{byte=0x1B, bit=3, name="Ability: Egg Aim", type="Ability"},
 	-- 0x1B > 4
 	--{byte=0x1B, bit=5, name="Ability: Fire/Grenade Eggs???", type="Ability"},
@@ -1332,7 +1335,7 @@ local flag_array = {
 	-- 0x1D > 4
 	-- 0x1D > 5
 	-- 0x1D > 6
-	-- 0x1D > 7
+	{byte=0x1D, bit=7, name="Ability: Sack Pack", type="Ability"},
 	{byte=0x1E, bit=0, name="Ability: Amaze-O-Gaze Goggles", type="Ability"},
 	{byte=0x1E, bit=1, name="Ability: Fire Eggs", type="Ability"},
 	{byte=0x1E, bit=2, name="Ability: Grenade Eggs", type="Ability"},
@@ -1350,10 +1353,10 @@ local flag_array = {
 	{byte=0x38, bit=4, name="FT Enter Jinjo Village?"},
 
 	{byte=0x39, bit=4, name="Jinjo: MT: Jade Snake Grove", type="Jinjo"},
-	{byte=0x39, bit=5, name="Jinjo: MT: ???", type="Jinjo"},
-	{byte=0x39, bit=6, name="Jinjo: MT: ???", type="Jinjo"},
-	{byte=0x39, bit=7, name="Jinjo: MT: ???", type="Jinjo"},
-	{byte=0x3A, bit=0, name="Jinjo: MT: ???", type="Jinjo"},
+	{byte=0x39, bit=5, name="Jinjo: MT: Roof of Stadium", type="Jinjo"},
+	{byte=0x39, bit=6, name="Jinjo: MT: Targitzan's Temple", type="Jinjo"},
+	{byte=0x39, bit=7, name="Jinjo: MT: Pool of Water", type="Jinjo"},
+	{byte=0x3A, bit=0, name="Jinjo: MT: Bridge", type="Jinjo"},
 	{byte=0x3A, bit=1, name="Jinjo: GGM: ???", type="Jinjo"},
 	{byte=0x3A, bit=2, name="Jinjo: GGM: ???", type="Jinjo"},
 	{byte=0x3A, bit=3, name="Jinjo: GGM: ???", type="Jinjo"},
@@ -1395,8 +1398,8 @@ local flag_array = {
 	{byte=0x3E, bit=7, name="Jinjo: IoH: Plateau", type="Jinjo"},
 	{byte=0x3F, bit=0, name="Jinjo: IoH: Spiral Mountain", type="Jinjo"},
 	-- 0x3F > 1
-	{byte=0x3F, bit=2, name="Honeycomb: MT: ???", type="Honeycomb"},
-	{byte=0x3F, bit=3, name="Honeycomb: MT: ???", type="Honeycomb"},
+	{byte=0x3F, bit=2, name="Honeycomb: MT: Entrance", type="Honeycomb"},
+	{byte=0x3F, bit=3, name="Honeycomb: MT: Bovina", type="Honeycomb"},
 	{byte=0x3F, bit=4, name="Honeycomb: MT: ???", type="Honeycomb"},
 	{byte=0x3F, bit=5, name="Honeycomb: GGM: ???", type="Honeycomb"},
 	{byte=0x3F, bit=6, name="Honeycomb: GGM: ???", type="Honeycomb"},
@@ -1520,7 +1523,7 @@ local flag_array = {
 	{byte=0x4E, bit=3, name="Jiggy: CCL: ???", type="Jiggy"},
 	{byte=0x4E, bit=4, name="Jiggy: CCL: ???", type="Jiggy"},
 	{byte=0x4E, bit=5, name="Jiggy: CCL: ???", type="Jiggy"},
-	{byte=0x4E, bit=6, name="Jiggy: CCL: ???", type="Jiggy"},
+	{byte=0x4E, bit=6, name="Jiggy: CCL: Superstash", type="Jiggy"},
 	{byte=0x4E, bit=7, name="Jiggy: CCL: ???", type="Jiggy"},
 	{byte=0x4F, bit=0, name="Jiggy: IoH: White Jinjo Family", type="Jiggy"},
 	{byte=0x4F, bit=1, name="Jiggy: IoH: ???", type="Jiggy"},
@@ -1560,13 +1563,63 @@ local flag_array = {
 	{byte=0x59, bit=1, name="Cheato Page: CCL: ???", type="Cheato Page"},
 	{byte=0x59, bit=2, name="Cheato Page: CCL: ???", type="Cheato Page"},
 	{byte=0x59, bit=3, name="Cheato Page: Spiral Mountain", type="Cheato Page"},
-
+	-- 0x59 > 4
+	-- 0x59 > 5
+	-- 0x59 > 6
+	-- 0x59 > 7
+	-- 0x5A > 0
+	-- 0x5A > 1
+	-- 0x5A > 2
+	-- 0x5A > 3
+	-- 0x5A > 4
+	-- 0x5A > 5
+	{byte=0x5A, bit=6, name="Targitzan Statue (1)"},
+	{byte=0x5A, bit=7, name="Targitzan Statue (2)"},
+	-- 0x5B > 0
+	{byte=0x5B, bit=1, name="Targitzan Statue (3)"},
+	{byte=0x5B, bit=2, name="Targitzan Statue (4)"},
+	{byte=0x5B, bit=3, name="Targitzan Statue (5)"},
+	{byte=0x5B, bit=4, name="Targitzan Statue (6)"},
+	{byte=0x5B, bit=5, name="Targitzan Statue (7)"},
+	{byte=0x5B, bit=6, name="Targitzan Statue (8)"},
+	{byte=0x5B, bit=7, name="Targitzan Statue (9)"},
+	{byte=0x5C, bit=0, name="Targitzan Statue (10)"},
+	{byte=0x5C, bit=1, name="Targitzan Statue (11)"},
+	{byte=0x5C, bit=2, name="Targitzan Statue (12)"},
+	{byte=0x5C, bit=3, name="Targitzan Statue (13)"},
+	{byte=0x5C, bit=4, name="Targitzan Statue (14)"},
+	{byte=0x5C, bit=5, name="Targitzan Statue (15)"},
+	{byte=0x5C, bit=6, name="Targitzan Statue (16)"},
+	{byte=0x5C, bit=7, name="Targitzan Statue (17)"},
+	{byte=0x5D, bit=0, name="Targitzan Statue (18)"},
+	{byte=0x5D, bit=1, name="Targitzan Statue (19)"},
+	{byte=0x5D, bit=2, name="Targitzan Statue (20)"},
+	-- 0x5D > 3
+	-- 0x5D > 4
 	{byte=0x5D, bit=5, name="FT Enter Digger Tunnel?"},
+	-- 0x5D > 6
 	{byte=0x5D, bit=7, name="FT Enter Digger Tunnel??"},
-
 	{byte=0x5E, bit=0, name="Klungo 1 Defeated", type="Progress"},
 	{byte=0x5E, bit=1, name="Klungo 2 Defeated", type="Progress"},
-
+	-- 0x5E > 2
+	-- 0x5E > 3
+	-- 0x5E > 4
+	-- 0x5E > 5
+	-- 0x5E > 6
+	-- 0x5E > 7
+	-- 0x5F > 0
+	-- 0x5F > 1
+	-- 0x5F > 2
+	-- 0x5F > 3
+	-- 0x5F > 4
+	-- 0x5F > 5
+	-- 0x5F > 6
+	-- 0x5F > 7
+	-- 0x60 > 0
+	-- 0x60 > 1
+	-- 0x60 > 2
+	-- 0x60 > 3
+	-- 0x60 > 4
 	{byte=0x60, bit=5, name="Silo: Jinjo Village", type="Silo"},
 	{byte=0x60, bit=6, name="Silo: Wooded Hollow", type="Silo"},
 	{byte=0x60, bit=7, name="Silo: Plateau", type="Silo"},
@@ -1631,7 +1684,7 @@ local flag_array = {
 	{byte=0x7C, bit=4, name="Jamjars First Time Text", type="FTT"},
 
 	--{byte=0x7F, bit=2, name="Jamjars FTSomething?"},
-	--{byte=0x7F, bit=4, name="Jamjars FTSomething?"},
+	{byte=0x7F, bit=4, name="Jamjars First Lesson Intro", type="FTT"},
 
 	{byte=0x82, bit=4, name="Jinjo Family FT Cutscene?"},
 	--{byte=0x82, bit=5, name="FT Complete Jinjo Family?"},
@@ -2178,6 +2231,189 @@ local function flagCheckButtonHandler()
 	checkFlag(forms.getproperty(ScriptHawk.UI.form_controls["Flag Dropdown"], "SelectedItem"));
 end
 
+--------------------
+-- Object Model 1 --
+--------------------
+
+local slot_base = 0x14;
+local slot_size = 0x9C;
+object_index = 1;
+
+local function incrementObjectIndex() -- TODO: These functions need to take hide_non_animated into account
+	object_index = object_index + 1;
+	if object_index > getNumSlots() then
+		object_index = 1;
+	end
+end
+
+local function decrementObjectIndex()
+	object_index = object_index - 1;
+	if object_index <= 0 then
+		object_index = getNumSlots();
+	end
+end
+
+local script_modes = {
+	"Disabled",
+	"List",
+	--"Examine"
+};
+
+local script_mode_index = 1;
+script_mode = script_modes[script_mode_index];
+
+local function toggleObjectAnalysisToolsMode()
+	script_mode_index = script_mode_index + 1;
+	if script_mode_index > #script_modes then
+		script_mode_index = 1;
+	end
+	script_mode = script_modes[script_mode_index];
+end
+
+function getNumSlots()
+	local objectArray = dereferencePointer(Game.Memory.object_array_pointer[version]);
+	if isRDRAM(objectArray) then
+		local blockEnd = dereferencePointer(objectArray - 0x0C);
+		if isRDRAM(blockEnd) then
+			return math.floor(((blockEnd - objectArray) - slot_base) / slot_size);
+		end
+	end
+	return 0;
+end
+
+function getSlotBase(index)
+	return slot_base + index * slot_size;
+end
+
+function getObjectModel1Pointers()
+	local pointers = {};
+	local objectArray = dereferencePointer(Game.Memory.object_array_pointer[version]);
+	if isRDRAM(objectArray) then
+		local num_slots = getNumSlots();
+		for i = 0, num_slots - 1 do
+			table.insert(pointers, objectArray + getSlotBase(i)); -- TODO: Check for bone arrays before adding to table, we don't want to move stuff we can't see
+		end
+	end
+	return pointers;
+end
+
+function setObjectModel1Position(pointer, x, y, z)
+	if isRDRAM(pointer) then
+		mainmemory.writefloat(pointer + 0x00, x, true);
+		mainmemory.writefloat(pointer + 0x04, y, true);
+		mainmemory.writefloat(pointer + 0x08, z, true);
+	end
+end
+
+function zipTo(index)
+	local objectArray = dereferencePointer(Game.Memory.object_array_pointer[version]);
+	if isRDRAM(objectArray) then
+		local objectPointer = objectArray + getSlotBase(index);
+		local xPos = mainmemory.readfloat(objectPointer + 0x00, true);
+		local yPos = mainmemory.readfloat(objectPointer + 0x04, true);
+		local zPos = mainmemory.readfloat(objectPointer + 0x08, true);
+		Game.setPosition(xPos, yPos, zPos);
+	end
+end
+
+function zipToSelectedObject()
+	zipTo(object_index);
+end
+
+function Game.drawUI()
+	if script_mode == "Disabled" then
+		return;
+	end
+
+	local row = 0;
+
+	local objectArray = dereferencePointer(Game.Memory.object_array_pointer[version]);
+	if string.contains(script_mode, "Struct") then
+		structPointers = getStructPointers();
+	end
+	local numSlots = getNumSlots();
+
+	gui.text(Game.OSDPosition[1], 2 + Game.OSDRowHeight * row, "Mode: "..script_mode, nil, 'bottomright');
+	row = row + 1;
+	gui.text(Game.OSDPosition[1], 2 + Game.OSDRowHeight * row, "Index: "..(object_index).."/"..(numSlots), nil, 'bottomright');
+	row = row + 1;
+
+	if script_mode == "Examine" and isRDRAM(objectArray) then
+		local examine_data = getExamineData(objectArray + getSlotBase(object_index));
+		for i = #examine_data, 1, -1 do
+			if examine_data[i][1] ~= "Separator" then
+				gui.text(Game.OSDPosition[1], 2 + Game.OSDRowHeight * row, examine_data[i][2].." - "..examine_data[i][1], nil, 'bottomright');
+				row = row + 1;
+			else
+				row = row + examine_data[i][2];
+			end
+		end
+	end
+
+	if script_mode == "List" and isRDRAM(objectArray) then
+		for i = numSlots, 0, -1 do
+			local currentSlotBase = objectArray + getSlotBase(i - 1);
+
+			local animationType = "Unknown";
+			--local objectIDPointer = dereferencePointer(currentSlotBase + 0x12C);
+			--if isRDRAM(objectIDPointer) then
+			--	objectType = mainmemory.read_u16_be(objectIDPointer + 0x02);
+			--	if type(Game.actorArray[objectType]) == "string" then
+			--		animationType = Game.actorArray[objectType];
+			--	else
+			--		animationType = toHexString(objectType);
+			--	end
+			--end
+
+			local color = nil;
+			if object_index == i then
+				color = yellow_highlight;
+			end
+
+			gui.text(Game.OSDPosition[1], 2 + Game.OSDRowHeight * row, i..": "..toHexString(currentSlotBase or 0), color, 'bottomright');
+			row = row + 1;
+		end
+	end
+end
+
+-- Keybinds
+-- For full list go here http://slimdx.org/docs/html/T_SlimDX_DirectInput_Key.htm
+ScriptHawk.bindKeyRealtime("Z", zipToSelectedObject, true);
+ScriptHawk.bindKeyRealtime("C", toggleObjectAnalysisToolsMode, true);
+ScriptHawk.bindKeyRealtime("N", decrementObjectIndex, true);
+ScriptHawk.bindKeyRealtime("M", incrementObjectIndex, true);
+
+--------------
+-- Encircle --
+--------------
+
+local dynamic_radius_factor = 15;
+y_stagger_amount = 10;
+
+-- Relative to objectArray
+local max_slots = 0x100;
+radius = 1000;
+
+local function encircle_banjo()
+	local current_banjo_x = Game.getXPosition();
+	local current_banjo_y = Game.getYPosition();
+	local current_banjo_z = Game.getZPosition();
+	local x, y, z;
+
+	--radius = 1000
+	--if forms.ischecked(ScriptHawk.UI.form_controls.dynamic_radius_checkbox) then
+	--	radius = getNumSlots() * dynamic_radius_factor;
+	--end
+
+	local currentPointers = getObjectModel1Pointers();
+	for i = 1, #currentPointers do
+		x = current_banjo_x + math.cos(math.pi * 2 * i / #currentPointers) * radius;
+		y = current_banjo_y + i * y_stagger_amount;
+		z = current_banjo_z + math.sin(math.pi * 2 * i / #currentPointers) * radius;
+		setObjectModel1Position(currentPointers[i], x, y, z);
+	end
+end
+
 ------------
 -- Events --
 ------------
@@ -2226,6 +2462,9 @@ function Game.eachFrame()
 	end
 	if realtime_flags then
 		checkFlags();
+	end
+	if encircle_enabled then
+		encircle_banjo();
 	end
 end
 

@@ -163,4 +163,5 @@ SystemID N64
 1354AC	d	h	1	RDRAM	Player Pointer 7
 1354DF	b	h	1	RDRAM	Player Pointer Index
 1354F8	b	h	1	RDRAM	Split up: IsSplit?
+136EE0	d	h	1	RDRAM	Object Array Pointer
 

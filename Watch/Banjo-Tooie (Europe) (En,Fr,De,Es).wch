@@ -97,4 +97,5 @@ SystemID N64
 13A4B8	d	h	1	RDRAM	Player Pointer 6
 13A4BC	d	h	1	RDRAM	Player Pointer 7
 13A4EF	b	h	1	RDRAM	Player Pointer Index
+13BE60	d	h	1	RDRAM	Object Array Pointer
 
