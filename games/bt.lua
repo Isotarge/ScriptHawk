@@ -2248,11 +2248,34 @@ object_model1 = {
 	["y_rotation"] = 0x48, -- Float
 	["z_rotation"] = 0x4C, -- Float
 	["models"] = {
+		--TODO: Import list from
+			-- http://thumbsupmaster.blogspot.com.au/p/banjo-tooie-image-modifications.html
+			-- http://bsfree.shadowflareindustries.com/index.php?s=39&d=6&g=15729&c=72210
+			-- https://www.youtube.com/watch?v=9DDV52RXyiM
+			-- Possibly other sources
 		[0x629] = "Molehill",
+		[0x616] = "Wading Boots",
+		[0x617] = "Turbo Trainers",
+		[0x635] = "Shock Spring Pad",
+		[0x636] = "Fly Pad",
+		[0x643] = "Jinjo",
+		[0x644] = "Star Pad", -- Prison Compound
+		[0x645] = "Moon Pad", -- Prison Compound
+		[0x646] = "Sun Pad", -- Prison Compound
+		[0x666] = "Snapdragon",
+		[0x671] = "Ugger",
+		[0x6A2] = "Fragile Box", -- SM
 		[0x6EA] = "Nest (Blue Eggs)",
 		[0x6EF] = "Nest (Red Feathers)",
+		[0x704] = "Honeycomb",
+		[0x705] = "Honeycomb (!)",
+		[0x707] = "Klungo",
 		[0x7A2] = "Signpost",
+		[0x7F3] = "Cheato Page",
+		[0x898] = "Throne", -- King Jingaling
+		[0x910] = "B-K Cartridge",
 		[0x913] = "Targitzan Idol",
+		[0x917] = "Warp Silo",
 		[0x977] = "Jiggywiggy's Altar of Knowledge",
 	},
 };
@@ -2339,6 +2362,18 @@ end
 
 function zipToSelectedObject()
 	zipTo(object_index - 1);
+end
+
+function everythingIs(modelIndex)
+	local model1Pointers = getObjectModel1Pointers();
+	if #model1Pointers > 0 then
+		for i = 1, #model1Pointers do
+			local objectIDPointer = dereferencePointer(model1Pointers[i] + object_model1.id_struct);
+			if isRDRAM(objectIDPointer) then
+				mainmemory.write_u16_be(objectIDPointer + 0x14, modelIndex);
+			end
+		end
+	end
 end
 
 local green_highlight = 0xFF00FF00;
