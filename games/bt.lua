@@ -295,7 +295,8 @@ local Game = {
 		["air"] = {0x12FDC0, 0x12FFD0, 0x125220, 0x12B050},
 		["frame_timer"] = {0x083550, 0x083550, 0x0788F8, 0x079138},
 		["linked_list_root"] = {0x13C380, 0x13C680, 0x131850, 0x137800},
-		["map"] = {0x12C390, 0x12C5A0, 0x1217F0, 0x127640},
+		["map"] = {0x137B42, 0x137DD2, 0x12CF92, 0x132DC2},
+		["map_trigger_target"] = {0x12C390, 0x12C5A0, 0x1217F0, 0x127640},
 		["map_trigger"] = {0x12C392, 0x12C5A2, 0x1217F2, 0x127642},
 		["iconAddress"] = {0x11FF95, 0x120155, 0x115325, 0x11B065},
 		["healthAddresses"] = {
@@ -2254,27 +2255,53 @@ object_model1 = {
 		[0x5EE] = "Boggy's Sled",
 		[0x629] = "Molehill",
 		[0x610] = "Jiggy",
+		[0x612] = "Empty Honeycomb",
 		[0x615] = "Beehive",
 		[0x616] = "Wading Boots",
 		[0x617] = "Turbo Trainers",
 		[0x635] = "Shock Spring Pad",
 		[0x636] = "Fly Pad",
 		[0x63B] = "Ice Key",
+		[0x641] = "Warp Pad",
 		[0x643] = "Jinjo",
 		[0x644] = "Star Pad", -- Prison Compound
 		[0x645] = "Moon Pad", -- Prison Compound
 		[0x646] = "Sun Pad", -- Prison Compound
+		[0x650] = "Old King Coal",
 		[0x65E] = "Gruntydactyl",
+		[0x65F] = "Ssslumber",
 		[0x660] = "Bovina",
+		[0x661] = "Officer Unogopaz",
 		[0x662] = "Globble", -- Fly, Bovina
+		[0x663] = "Sput Sput",
 		[0x664] = "Blowdart",
+		[0x665] = "Mingy Jongo",
 		[0x666] = "Snapdragon",
 		[0x667] = "Moggy",
+		[0x66B] = "Chief Bloatazin",
 		[0x66D] = "Dilberta",
+		[0x66E] = "Dragunda",
+		[0x66F] = "Diggit",
+		--[0x670] = "!Crash",
 		[0x671] = "Ugger",
+		--[0x672] = "!Crash",
+		[0x673] = "Golden Goliath",
 		[0x675] = "Humba Wumba",
+		[0x676] = "Stony", -- NPC
+		--[0x677] = "!Crash",
+		--[0x678] = "!Crash",
+		--[0x679] = "!Crash",
 		[0x67B] = "Canary Mary",
+		[0x67C] = "Minecart", -- Canary Mary Race
+		[0x67D] = "Cage", -- Canary Mary
+		--[0x67E] = "!Crash",
+		--[0x67F] = "!Crash",
+		[0x680] = "Waterfall Grate Switch", -- GGM
+		[0x681] = "Waterfall Grate", -- GGM
+		[0x682] = "Boulder", -- Bill Drill
+		[0x68F] = "Bang Box",
 		[0x693] = "Conga",
+		[0x6A1] = "TNT",
 		[0x6A2] = "Rareware Box", -- SM
 		[0x6A9] = "Chuffy", -- Train
 		[0x6AD] = "Joe",
@@ -2284,15 +2311,23 @@ object_model1 = {
 		[0x6B7] = "Mrs. Boggy",
 		[0x6BD] = "Bouncy Castle",
 		[0x6C3] = "Pawno",
+		[0x6C7] = "Tiptup Jr.",
 		[0x6C8] = "Tiptup",
+		[0x6C9] = "Fruity",
 		[0x6D1] = "Chris P. Bacon",
+		[0x6D3] = "Stomponadon",
 		[0x6D4] = "Captain Blackeye",
+		[0x6D6] = "Jolly Roger",
+		[0x6D8] = "Merry Maggie Malpass",
+		[0x6DA] = "Terry",
 		[0x6DB] = "Captain Blubber",
 		[0x6EA] = "Nest (Eggs)",
 		[0x6EC] = "Nest (Note)",
 		[0x6ED] = "Nest (Treble Clef)",
 		[0x6EF] = "Nest (Feathers)",
 		[0x6FA] = "Roysten",
+		[0x6FE] = "Rareware Box",
+		[0x700] = "Rareware Box",
 		[0x704] = "Honeycomb",
 		[0x705] = "Honeycomb (Skill/Random)",
 		[0x707] = "Klungo",
@@ -2306,11 +2341,17 @@ object_model1 = {
 		[0x776] = "Boxing Glove", -- Mr. Patch Fight
 		[0x787] = "Cheato",
 		[0x788] = "Gobi",
+		[0x789] = "Billy Bob",
+		[0x78A] = "Billy Bob (Inactive)",
 		[0x7A2] = "Signpost",
-		[0x7C0] = "Dubloon",
-		[0x7C5] = "Blue Twinkly",
-		[0x7C6] = "Green Twinkly",
-		[0x7C7] = "Red Twinkly",
+		[0x7A7] = "Dingpot",
+		[0x7BF] = "Ticket", -- Big Top
+		[0x7C0] = "Doubloon",
+		[0x7C5] = "Twinkly (Blue)",
+		[0x7C6] = "Twinkly (Green)",
+		[0x7C7] = "Twinkly (Red)",
+		[0x7D4] = "Piggles", -- JRL Piglet
+		[0x7D5] = "Trotty", -- JRL Piglet
 		[0x7D6] = "Jamjars",
 		[0x7D7] = "Silo", -- Jamjars
 		[0x7D8] = "Green Mumbo Pad",
@@ -2325,26 +2366,35 @@ object_model1 = {
 		[0x7E1] = "Kazooie Split Pad",
 		[0x7E2] = "Banjo Split Pad",
 		[0x7E4] = "Bazza",
+		[0x7E5] = "Oogle Boogle",
+		[0x7EF] = "Sabreman",
 		[0x7F3] = "Cheato Page",
 		[0x7F4] = "Targitzan",
+		[0x7FC] = "Chilli Billi",
+		[0x7FE] = "Keelhaul",
+		[0x801] = "Cannon", -- Dragon Fights
 		[0x803] = "Skivvy", -- GI Worker
 		[0x854] = "Mumbo Jumbo",
 		[0x85F] = "Zubba",
 		[0x862] = "Banjo's Hand", -- File Select
 		[0x896] = "King Jingaling",
 		[0x898] = "Throne", -- King Jingaling
+		[0x89C] = "Weldar Fireball",
 		[0x8C3] = "Bottles (Burnt)",
 		[0x8C8] = "BOB Control Panel",
 		[0x8FE] = "HAG 1",
+		[0x8FF] = "Rocknut",
 		[0x90E] = "Bottles (Angel)",
 		[0x90F] = "Bottles (Devil)",
 		[0x910] = "B-K Cartridge",
-		[0x913] = "Targitzan Idol",
+		[0x911] = "Gold Idol",
+		[0x913] = "Jade Idol", -- Targitzan's Temple
 		[0x917] = "Warp Silo",
 		[0x918] = "Honey B.",
 		[0x92B] = "Jelly", -- CCL
 		[0x92D] = "Jelly Castle", -- CCL
 		[0x935] = "Master Jiggywiggy",
+		[0x93D] = "Fries Button",
 		[0x977] = "Jiggywiggy's Altar of Knowledge",
 		[0x99C] = "Jukebox",
 		[0x9A2] = "Applause Sign",
@@ -2553,11 +2603,24 @@ Game.takeMeThereType = "Button";
 function Game.setMap(value)
 	local trigger_value = mainmemory.read_u16_be(Game.Memory.map_trigger[version]);
 	if trigger_value == 0 then
-		mainmemory.write_u16_be(Game.Memory.map[version], value);
+		mainmemory.write_u16_be(Game.Memory.map_trigger_target[version], value);
 
 		-- Force game to reload with desired map
 		mainmemory.write_u16_be(Game.Memory.map_trigger[version], 0x0101);
 	end
+end
+
+function Game.getMap()
+	return mainmemory.read_u16_be(Game.Memory.map[version]);
+end
+
+function Game.getMapOSD()
+	local currentMap = Game.getMap();
+	local currentMapName = "Unknown";
+	if Game.maps[currentMap] ~= nil then
+		currentMapName = Game.maps[currentMap];
+	end
+	return currentMapName.." ("..toHexString(currentMap)..")";
 end
 
 local max_air = 60; -- TODO: This changes once you finish Roysten's quest, how to you get this information out of the game?
@@ -2601,6 +2664,8 @@ end
 
 Game.OSDPosition = {2, 70}
 Game.OSD = {
+	{"Map", Game.getMapOSD},
+	{"Separator", 1},
 	{"X", Game.getXPosition},
 	{"Y", Game.getYPosition},
 	{"Z", Game.getZPosition},

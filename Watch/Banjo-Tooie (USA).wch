@@ -136,6 +136,7 @@ SystemID N64
 12B050	d	f	1	RDRAM	Air (Real)
 12B054	d	f	1	RDRAM	Air
 12B3F2	b	h	1	RDRAM	Bottles' Revenge Toggle
+12B402	w	h	1	RDRAM	Current Map?
 12C770	d	h	1	RDRAM	Flag Block Pointer
 12C7A4	d	f	1	RDRAM	Game Time (GGM)
 12C7A8	d	f	1	RDRAM	Game Time (MT)
@@ -153,6 +154,7 @@ SystemID N64
 12C7F8	d	h	1	RDRAM	RNG
 12C7FC	d	h	1	RDRAM	RNG
 12C830	d	f	1	RDRAM	Unknown Float
+132DC2	w	h	1	RDRAM	Current Map
 135490	d	h	1	RDRAM	Player Pointer 0
 135494	d	h	1	RDRAM	Player Pointer 1
 135498	d	h	1	RDRAM	Player Pointer 2

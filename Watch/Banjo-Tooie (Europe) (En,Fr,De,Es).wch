@@ -88,6 +88,7 @@ SystemID N64
 131804	d	h	1	RDRAM	RNG
 131808	d	h	1	RDRAM	RNG
 13180C	d	h	1	RDRAM	RNG
+137DD2	w	h	1	RDRAM	Current Map
 13A4A0	d	h	1	RDRAM	Player Pointer 0
 13A4A4	d	h	1	RDRAM	Player Pointer 1
 13A4A8	d	h	1	RDRAM	Player Pointer 2

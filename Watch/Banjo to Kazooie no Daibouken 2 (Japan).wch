@@ -88,6 +88,7 @@ SystemID N64
 1269C4	d	h	1	RDRAM	RNG
 1269C8	d	h	1	RDRAM	RNG
 1269CC	d	h	1	RDRAM	RNG
+12CF92	w	h	1	RDRAM	Current Map
 12F660	d	h	1	RDRAM	Player Pointer 0
 12F664	d	h	1	RDRAM	Player Pointer 1
 12F668	d	h	1	RDRAM	Player Pointer 2
