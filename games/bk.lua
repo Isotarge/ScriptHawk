@@ -7,7 +7,7 @@ end
 
 local Game = {};
 
-local script_modes = { -- TODO: Object analysis tools state needs to be up here for reasons, can probably be somewhere else with a clever reshuffle
+local script_modes = { --TODO: Object analysis tools state needs to be up here for reasons, can probably be somewhere else with a clever reshuffle
 	"Disabled",
 	"List",
 	"Examine",
@@ -407,20 +407,41 @@ local slot_base = 0x08;
 local slot_size = 0x180;
 local max_slots = 0x100;
 
--- Relative to slot start
+
+--BEHAVIOR STRUCTURE
+behavior_struct = {
+	[0x00] = {["Name"] = "Renderer Pointer", ["Type"] = "Pointer", ["Fields"] = {
+		[0x04] = {["Name"] = "x_pos", ["Type"] = "s16_be"},
+		[0x06] = {["Name"] = "y_pos", ["Type"] = "s16_be"},
+		[0x08] = {["Name"] = "z_pos", ["Type"] = "s16_be"},
+		--[0x0A] = {["Name"] = "scale", ["Type"] = "u16_be"},
+		},
+	},
+	[0x2C] = {["Name"] = "Object Array Index (doubled)", ["Type"] = "u16_be"},
+	[0x2E] = {["Name"] = "Collide Able Bitfield", ["Type"] = "u16_be"},
+}
+		
+--MOVEMENT STRUCTURE
+movement_struct = {
+	[0x00] = {["Type"] = "Pointer", ["Name"] = "Animation Object Pointer", ["Fields"] = {
+			[0x10] = {["Type"] = "u32_be", ["Name"] = "Animation Type"},
+			[0x14] = {["Type"] = "Float", ["Name"] = "Animation Timer Copy"},
+			},
+		},
+	[0x04] = {["Type"] = "Float", ["Name"] = "Animation Timer"},
+
+	[0x0C] = {["Type"] = "Float", ["Name"] = "Movement Duration"},
+	[0x10] = {["Type"] = "Float", ["Name"] = "Animation Duration"},
+	[0x14] = {["Type"] = "Float", ["Name"] = "Bone Transition Duration"},
+
+	[0x1C] = {["Type"] = "u32_be", ["Name"] = "Movement State"},
+	[0x20] = {["Type"] = "Byte", ["Name"] = "Movement SubState"},
+}
+
+--OBJECT1 STRUCTURE
 slot_variables = {
 	[0x00] = {["Type"] = "Pointer", ["Name"] = "Behavior Struct Pointer", ["Fields"] = {
-		[0x00] = {["Name"] = "Renderer Pointer", ["Type"] = "Pointer", ["Fields"] = {
-				[0x04] = {["Name"] = "x_pos", ["Type"] = "s16_be"},
-				[0x06] = {["Name"] = "y_pos", ["Type"] = "s16_be"},
-				[0x08] = {["Name"] = "z_pos", ["Type"] = "s16_be"},
-				--[0x0A] = {["Name"] = "scale", ["Type"] = "u16_be"},
-			},
-		[0x2C] = {["Name"] = "Object Array Index (doubled)", ["Type"] = "u16_be"},
-		[0x2E] = {["Name"] = "Collide Able Bitfield", ["Type"] = "u16_be"},
-		},
-		[0x04] = {["Name"] = "Unknown Pointer 0x04", ["Type"] = "Pointer"},
-		[0x08] = {["Name"] = "Unknown Pointer 0x08", ["Type"] = "Pointer"},
+		behavior_struct
 		},
 	},
 	[0x04] = {["Type"] = "Float", ["Name"] = {"X", "X Pos", "X Position"}},
@@ -428,54 +449,14 @@ slot_variables = {
 	[0x0C] = {["Type"] = "Float", ["Name"] = {"Z", "Z Pos", "Z Position"}},
 	[0x10] = {["Type"] = "u8", ["Name"] = "State"},
 	[0x14] = {["Type"] = "Pointer", ["Name"] = "Movement Object Pointer", ["Fields"] = {
-			[0x00] = {["Type"] = "Pointer", ["Name"] = "Animation Object Pointer", ["Fields"] = {
-					[0x00] = {["Type"] = "Pointer"},
-					[0x08] = {["Type"] = "u16_be"},
-						[0x0A] = {["Type"] = "u16_be"},
-						[0x0C] = {["Type"] = "u16_be"},
-
-						[0x10] = {["Type"] = "u32_be", ["Name"] = "Animation Type"},
-						[0x14] = {["Type"] = "Float", ["Name"] = "Animation Timer Copy"},
-						[0x18] = {["Type"] = "Float"},
-						[0x1C] = {["Type"] = "Byte"},
-						[0x1D] = {["Type"] = "Byte"},
-						[0x1E] = {["Type"] = "Byte"},
-						[0x1F] = {["Type"] = "Byte"},
-						[0x20] = {["Type"] = "Byte"},
-						[0x21] = {["Type"] = "Byte"},
-				},
-			},
-			[0x04] = {["Type"] = "Float", ["Name"] = "Animation Timer"},
-			[0x08] = {["Type"] = "Float"},
-			[0x0C] = {["Type"] = "Float", ["Name"] = "Movement Duration"},
-			[0x10] = {["Type"] = "Float", ["Name"] = "Animation Duration"},
-			[0x14] = {["Type"] = "Float", ["Name"] = "Bone Transition Duration"},
-			[0x18] = {["Type"] = "u32_be"},
-			[0x1C] = {["Type"] = "u32_be", ["Name"] = "Movement State"},
-			[0x20] = {["Type"] = "Byte", ["Name"] = "Movement SubState"},
-			[0x21] = {["Type"] = "Byte"},
-			[0x22] = {["Type"] = "Byte"},
-			[0x23] = {["Type"] = "Byte"},
-			[0x24] = {["Type"] = "Byte"},
-			[0x25] = {["Type"] = "Byte"},
-			[0x26] = {["Type"] = "Byte"},
-			[0x27] = {["Type"] = "Byte"},
+			movement_struct
 		},
 	},
-	[0x18] = {["Type"] = "Pointer"},
-	[0x1C] = {["Type"] = "Float"},
-	[0x20] = {["Type"] = "Float"},
-	[0x24] = {["Type"] = "Float"},
 	[0x28] = {["Type"] = "Float", ["Name"] = "Chase Velocity"},
-	[0x2C] = {["Type"] = "Float"},
-	[0x30] = {["Type"] = "Float"},
 
 	[0x38] = {["Type"] = "u16_be", ["Name"] = "Movement Timer"},
 
 	[0x3B] = {["Type"] = "Byte", ["Name"] = "Movement State"},
-
-	[0x40] = {["Type"] = "u32_be"},
-	[0x44] = {["Type"] = "Byte"},
 
 	[0x48] = {["Type"] = "Float", ["Name"] = "Race path progression"},
 	[0x4C] = {["Type"] = "Float", ["Name"] = "Speed (rubberband)"},
@@ -485,31 +466,31 @@ slot_variables = {
 	[0x64] = {["Type"] = "Float", ["Name"] = {"Moving Angle", "Moving", "Rot Y", "Rot. Y", "Y Rotation"}},
 	[0x68] = {["Type"] = "Float", ["Name"] = {"Rot X", "Rot. X", "X Rotation"}},
 
-	[0x78] = {["Type"] = "u32_be"},
-	[0x7C] = {["Type"] = "Float", ["Name"] = "Top X", "Top X Pos", "Top X Position"}, --Pole Top XPos
-	[0x80] = {["Type"] = "Float", ["Name"] = "Top Y", "Top Y Pos", "Top Y Position"}, --Pole Top YPos
-	[0x84] = {["Type"] = "Float", ["Name"] = "Top Z", "Top Z Pos", "Top Z Position"}, --Pole Top Zpos
-
-	[0x90] = {["Type"] = "Float"},
-	[0x94] = {["Type"] = "Float"},
-	[0x98] = {["Type"] = "Float"},
-
+	--[[
+	[0x7C] = {
+		["Climbable Pole"] = {["Type"] = "Float", ["Name"] = "Top X", "Top X Pos", "Top X Position"},
+		["Mumbo Token"] = {["Type"] = "u32_be", ["Name"] = "Mumbo Token Index"},
+		["Empty Honeycomb Piece"] = {["Type"] = "u32_be", ["Name"] = "Empty Honeycomb Index"},
+	}, --Pole Top XPos
+	[0x80] = {
+		["Climbable Pole"] = {["Type"] = "Float", ["Name"] = "Top Y", "Top Y Pos", "Top Y Position"},
+		["Jiggy"] = {["Type"] = "u32_be", ["Name"] = "Mumbo Token Index"},
+	},
+	[0x84] = {
+		["Climbable Pole"] = {["Type"] = "Float", ["Name"] = "Top Z", "Top Z Pos", "Top Z Position"},
+	},
+	--]]
+	
 	[0xBC] = {["Type"] = "u32_be", ["Name"] = "Spawn Actor ID"}, -- TODO: Better name for this, lifted from Runehero's C source
 
 	[0xEB] = {["Type"] = "Byte", ["Name"] = "Flag 2"}, -- TODO: Better name for this, lifted from Runehero's C source
 	[0xEC] = {["Type"] = "Float", ["Name"] = "AnimationTimer_Copy"},
 	[0xF0] = {["Type"] = "Float", ["Name"] = "AnimationDuration_Copy"},
 
-	[0xF8] = {["Type"] = "Float"},
 	[0xFC] = {["Type"] = "Float", ["Name"] = "MovementTimer_Copy"},
-	[0x100] = {["Type"] = "Pointer"},
-	[0x104] = {["Type"] = "Pointer"},
 
 	[0x110] = {["Type"] = "Float", ["Name"] = {"Rot Z", "Rot. Z", "Z Rotation"}},
 	[0x114] = {["Type"] = "Float", ["Name"] = "Sound timer?"}, -- Also used by Conga to decide when to throw orange --copy of timer from animation substruct
-	[0x118] = {["Type"] = "Float"},
-	[0x11C] = {["Type"] = "Float"},
-	[0x120] = {["Type"] = "Float"},
 
 	[0x125] = {["Type"] = "Byte", ["Name"] = "Transparancy"},
 
@@ -520,28 +501,13 @@ slot_variables = {
 			[0x04] = {["Type"] = "u16_be", ["Name"] = "Model Index"},
 
 			[0x0C] = {["Type"] = "Pointer", ["Name"] = "Object Behavior Function"},
-			[0x10] = {["Type"] = "Pointer"},
-			[0x14] = {["Type"] = "Pointer"},
 		},
 	},
-	[0x130] = {["Type"] = "Pointer"},
-
-	[0x138] = {["Type"] = "Byte"},
-
-	[0x13B] = {["Type"] = "Byte"},
-
-	[0x148] = {["Type"] = "Pointer"},
 	[0x14C] = {["Type"] = "Pointer", ["Name"] = "Bone Array 1 Pointer"},
 	[0x150] = {["Type"] = "Pointer", ["Name"] = "Bone Array 2 Pointer"},
-
-	[0x158] = {["Type"] = "u32_be"},
-	[0x15C] = {["Type"] = "u32_be"},
-
-	[0x16F] = {["Type"] = "Byte"},
-	[0x170] = {["Type"] = "Float"},
-	[0x174] = {["Type"] = "Float"},
-	[0x178] = {["Type"] = "Float"},
 };
+
+
 
 local function fillBlankVariableSlots()
 	local data_size = 0x04;
