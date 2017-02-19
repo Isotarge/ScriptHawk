@@ -778,7 +778,7 @@ local movementStates = {
 
 	[0x0E] = "Damaged",
 	[0x0F] = "Beak Buster",
-	[0x10] = "Featherty Flap",
+	[0x10] = "Feathery Flap",
 	[0x11] = "Rat-a-tat Rap",
 	[0x12] = "Flap Flip",
 	[0x13] = "Beak Barge",
@@ -795,7 +795,8 @@ local movementStates = {
 	[0x1E] = "Leaving Wonderwing",
 
 	[0x20] = "Landing",
-
+	[0x21] = "Charging Shock Spring Jump",
+	[0x22] = "Shock Spring Jump",
 	[0x23] = "Taking Flight",
 	[0x24] = "Flying",
 	[0x25] = "Entering Stilt Stride",
@@ -940,14 +941,15 @@ local movementStates = {
 	[0xBD] = "Jumping", -- Solo Kazooie
 	[0xBE] = "Gliding", -- Solo Kazooie
 
+	[0xC1] = "Shock Spring Jump", -- Solo Kazooie
 	[0xC2] = "Wing Whack", -- Solo Kazooie
-
+	[0xC3] = "Charging Shock Spring Jump", -- Solo Kazooie
 	[0xC4] = "Wing Whack", -- Solo Kazooie - Moving
 	[0xC5] = "Hatching", -- Solo Kazooie
 	[0xC6] = "Leg Spring", -- Solo Kazooie
 	[0xC7] = "Walking", -- Solo Kazooie
-	[0xC8] = "Entering Beak Bayonet",
-	[0xC9] = "Exiting Beak Bayonet",
+	[0xC8] = "Entering Breegull Blaster",
+	[0xC9] = "Exiting Breegull Blaster",
 	[0xCA] = "Idle", -- Breegull Blaster
 
 	[0xCE] = "Locked", -- Beak Bayonet, Loading Zone
@@ -960,7 +962,7 @@ local movementStates = {
 	[0xD8] = "Firing Egg", -- Breegull Blaster
 
 	[0xDA] = "Damaged", -- Breegull Blaster
-	[0xDB] = "Death", -- Beak Bayonet
+	[0xDB] = "Death", -- Breegull Blaster
 
 	[0xDD] = "Crouching", -- Solo Kazooie
 	[0xDE] = "Landing", -- Solo Kazooie
@@ -1254,7 +1256,7 @@ local flag_array = {
 	-- 0x01 > 7
 	-- 0x02 > 0
 	-- 0x02 > 1
-	{byte=0x02, bit=2, name="Signpost: FTT", type="FTT"},
+	{byte=0x02, bit=2, name="Signpost FTT", type="FTT"},
 	-- 0x02 > 3
 	{byte=0x02, bit=4, name="Klungo Intro Cutscene"},
 	-- 0x02 > 5
@@ -1266,8 +1268,13 @@ local flag_array = {
 	{byte=0x05, bit=7, name="First Time Minjo Aggro", type="FTT"},
 
 	{byte=0x07, bit=7, name="First Time Cheato Page", type="FTT"},
+	{byte=0x08, bit=0, name="Cheato FTT", type="FTT"},
 
 	{byte=0x0A, bit=5, name="Mumbo FTT", type="FTT"},
+
+	{byte=0x0C, bit=7, name="Humba Wumba FTT", type="FTT"},
+
+	{byte=0x0E, bit=2, name="First Time Mumbo Pad Text", type="FTT"},
 
 	{byte=0x13, bit=1, name="Klungo 1 Potion Chosen?"},
 
@@ -1320,10 +1327,43 @@ local flag_array = {
 	{byte=0x1E, bit=3, name="Ability: Clockwork Kazooie Eggs", type="Ability"},
 	{byte=0x1E, bit=4, name="Ability: Ice Eggs", type="Ability"},
 
-	{byte=0x2F, bit=5, name="FT Jiggy Collection?"},
-	{byte=0x2F, bit=7, name="Mrs. Bottles Intro Cutscene"},
+	{byte=0x22, bit=7, name="Doubloon: Town Center Pole (1)", type="Doubloon"},
+	{byte=0x23, bit=0, name="Doubloon: Town Center Pole (2)", type="Doubloon"},
+	{byte=0x23, bit=1, name="Doubloon: Town Center Pole (3)", type="Doubloon"},
+	{byte=0x23, bit=2, name="Doubloon: Town Center Pole (4)", type="Doubloon"},
+	{byte=0x23, bit=3, name="Doubloon: Town Center Pole (5)", type="Doubloon"},
+	{byte=0x23, bit=4, name="Doubloon: Town Center Pole (6)", type="Doubloon"},
+	{byte=0x23, bit=5, name="Doubloon: Silo (1)", type="Doubloon"},
+	{byte=0x23, bit=6, name="Doubloon: Silo (2)", type="Doubloon"},
+	{byte=0x23, bit=7, name="Doubloon: Silo (3)", type="Doubloon"},
+	{byte=0x24, bit=0, name="Doubloon: Silo (4)", type="Doubloon"},
+	{byte=0x24, bit=1, name="Doubloon: Toxic Pool (1)", type="Doubloon"},
+	{byte=0x24, bit=2, name="Doubloon: Toxic Pool (2)", type="Doubloon"},
+	{byte=0x24, bit=3, name="Doubloon: Toxic Pool (3)", type="Doubloon"},
+	{byte=0x24, bit=4, name="Doubloon: Toxic Pool (4)", type="Doubloon"},
+	{byte=0x24, bit=5, name="Doubloon: Mumbo's Skull (1)", type="Doubloon"},
+	{byte=0x24, bit=6, name="Doubloon: Mumbo's Skull (2)", type="Doubloon"},
+	{byte=0x24, bit=7, name="Doubloon: Mumbo's Skull (3)", type="Doubloon"},
+	{byte=0x25, bit=0, name="Doubloon: Mumbo's Skull (4)", type="Doubloon"},
+	{byte=0x25, bit=1, name="Doubloon: Underground (1)", type="Doubloon"},
+	{byte=0x25, bit=2, name="Doubloon: Underground (2)", type="Doubloon"},
+	{byte=0x25, bit=3, name="Doubloon: Underground (3)", type="Doubloon"},
+	{byte=0x25, bit=4, name="Doubloon: Shock Spring Alcove (1)", type="Doubloon"},
+	{byte=0x25, bit=5, name="Doubloon: Shock Spring Alcove (2)", type="Doubloon"},
+	{byte=0x25, bit=6, name="Doubloon: Shock Spring Alcove (3)", type="Doubloon"},
+	-- 0x25 > 7
+	-- 0x26 > 0
+	{byte=0x26, bit=1, name="Doubloon: Near Jinjo (1)", type="Doubloon"},
+	{byte=0x26, bit=2, name="Doubloon: Near Jinjo (2)", type="Doubloon"},
+	{byte=0x26, bit=3, name="Doubloon: Near Jinjo (3)", type="Doubloon"},
+	{byte=0x26, bit=4, name="Doubloon: Near Jinjo (4)", type="Doubloon"},
 
-	{byte=0x30, bit=0, name="Speccy Intro Text Seen"},
+	{byte=0x27, bit=5, name="FT Doubloon Collection", type="FTT"},
+
+	{byte=0x2F, bit=5, name="FT Jiggy Collection?"},
+	{byte=0x2F, bit=7, name="Mrs. Bottles Intro Cutscene", type="FTT"},
+
+	{byte=0x30, bit=0, name="Speccy Intro Text Seen", type="FTT"},
 	{byte=0x30, bit=1, name="Amaze-O-Gaze Goggles Instructions Seen"},
 
 	--{byte=0x32, bit=2, name="Klungo 2 Something?"},
@@ -1432,7 +1472,7 @@ local flag_array = {
 	{byte=0x45, bit=6, name="Jiggy: MT: ???", type="Jiggy"},
 	{byte=0x45, bit=7, name="Jiggy: MT: Pillars", type="Jiggy"},
 	{byte=0x46, bit=0, name="Jiggy: MT: Top of Temple", type="Jiggy"},
-	{byte=0x46, bit=1, name="Jiggy: MT: Jade Snake Grove: Snake", type="Jiggy"},
+	{byte=0x46, bit=1, name="Jiggy: MT: Ssslumber", type="Jiggy"},
 	{byte=0x46, bit=2, name="Jiggy: GGM: ???", type="Jiggy"},
 	{byte=0x46, bit=3, name="Jiggy: GGM: ???", type="Jiggy"},
 	{byte=0x46, bit=4, name="Jiggy: GGM: ???", type="Jiggy"},
@@ -1457,7 +1497,7 @@ local flag_array = {
 	{byte=0x48, bit=7, name="Jiggy: JRL: ???", type="Jiggy"},
 	{byte=0x49, bit=0, name="Jiggy: JRL: ???", type="Jiggy"},
 	{byte=0x49, bit=1, name="Jiggy: JRL: ???", type="Jiggy"},
-	{byte=0x49, bit=2, name="Jiggy: JRL: ???", type="Jiggy"},
+	{byte=0x49, bit=2, name="Jiggy: JRL: Smuggler's Cavern", type="Jiggy"},
 	{byte=0x49, bit=3, name="Jiggy: JRL: ???", type="Jiggy"},
 	{byte=0x49, bit=4, name="Jiggy: JRL: ???", type="Jiggy"},
 	{byte=0x49, bit=5, name="Jiggy: JRL: ???", type="Jiggy"},
@@ -1722,22 +1762,22 @@ local flag_array = {
 	{byte=0x8A, bit=7, name="Nest: WW: ???", type="Nest"},
 	{byte=0x8B, bit=0, name="Nest: WW: ???", type="Nest"},
 	{byte=0x8B, bit=1, name="Treble Clef: WW", type="Treble Clef"},
-	{byte=0x8B, bit=2, name="Nest: JRL: ???", type="Nest"},
-	{byte=0x8B, bit=3, name="Nest: JRL: ???", type="Nest"},
-	{byte=0x8B, bit=4, name="Nest: JRL: ???", type="Nest"},
+	{byte=0x8B, bit=2, name="Nest: JRL: Town Center (1)", type="Nest"},
+	{byte=0x8B, bit=3, name="Nest: JRL: Town Center (2)", type="Nest"},
+	{byte=0x8B, bit=4, name="Nest: JRL: Town Center (3)", type="Nest"},
 	{byte=0x8B, bit=5, name="Nest: JRL: ???", type="Nest"},
 	{byte=0x8B, bit=6, name="Nest: JRL: ???", type="Nest"},
 	{byte=0x8B, bit=7, name="Nest: JRL: ???", type="Nest"},
 	{byte=0x8C, bit=0, name="Nest: JRL: ???", type="Nest"},
-	{byte=0x8C, bit=1, name="Nest: JRL: ???", type="Nest"},
-	{byte=0x8C, bit=2, name="Nest: JRL: ???", type="Nest"},
-	{byte=0x8C, bit=3, name="Nest: JRL: ???", type="Nest"},
-	{byte=0x8C, bit=4, name="Nest: JRL: ???", type="Nest"},
-	{byte=0x8C, bit=5, name="Nest: JRL: ???", type="Nest"},
-	{byte=0x8C, bit=6, name="Nest: JRL: ???", type="Nest"},
-	{byte=0x8C, bit=7, name="Nest: JRL: ???", type="Nest"},
-	{byte=0x8D, bit=0, name="Nest: JRL: ???", type="Nest"},
-	{byte=0x8D, bit=1, name="Nest: JRL: ???", type="Nest"},
+	{byte=0x8C, bit=1, name="Nest: JRL: Blubber's Hire (1)", type="Nest"},
+	{byte=0x8C, bit=2, name="Nest: JRL: Blubber's Hire (2)", type="Nest"},
+	{byte=0x8C, bit=3, name="Nest: JRL: Blubber's Hire (3)", type="Nest"},
+	{byte=0x8C, bit=4, name="Nest: JRL: Pawno's Emporium (1)", type="Nest"},
+	{byte=0x8C, bit=5, name="Nest: JRL: Pawno's Emporium (2)", type="Nest"},
+	{byte=0x8C, bit=6, name="Nest: JRL: Pawno's Emporium (3)", type="Nest"},
+	{byte=0x8C, bit=7, name="Nest: JRL: Jolly's Bar (1)", type="Nest"},
+	{byte=0x8D, bit=0, name="Nest: JRL: Jolly's Bar (2)", type="Nest"},
+	{byte=0x8D, bit=1, name="Nest: JRL: Jolly's Bar (3)", type="Nest"},
 	{byte=0x8D, bit=2, name="Treble Clef: JRL", type="Treble Clef"},
 	{byte=0x8D, bit=3, name="Nest: TDL: ???", type="Nest"},
 	{byte=0x8D, bit=4, name="Nest: TDL: ???", type="Nest"},
@@ -1877,6 +1917,9 @@ local flag_array = {
 	-- 0xA7 > 0
 	{byte=0xA7, bit=1, name="FT Enter King Jingaling Cutscene"},
 	{byte=0xA7, bit=3, name="FT Enter Bottles' House?"},
+	-- 0xA7 > 4
+	-- 0xA7 > 5
+	{byte=0xA7, bit=6, name="Honey B. FTT", type="FTT"},
 	{byte=0xA7, bit=7, name="First Time Turbo Trainers"},
 	{byte=0xA8, bit=0, name="First Time Wading Boots"},
 	-- 0xA8 > 1
@@ -2152,6 +2195,9 @@ function flagStats(verbose)
 			end
 		else
 			if flagType == "Cheat" then
+				validType = true;
+			end
+			if flagType == "Doubloon" then
 				validType = true;
 			end
 			if flagType == "FTT" then
@@ -2652,7 +2698,7 @@ function Game.applyInfinites()
 	--if version == 4 then -- TODO: Other versions
 		--mainmemory.write_u16_be(0x0D1A58, 0x0000); -- Janky infinite egg/feather code, I don't like this
 	--end
-	setFlagsByType("Glowbo");
+	--setFlagsByType("Glowbo");
 	mainmemory.writefloat(Game.Memory.air[version], max_air, true);
 	Game.setCurrentHealth(Game.getMaxHealth());
 end
