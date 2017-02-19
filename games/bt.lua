@@ -761,26 +761,6 @@ end
 -- Moves stuff --
 -----------------
 
-local move_levels = {
-	["0. None"] = {0xE0FFFF01, 0x00004000, false},
-	["1. All"]  = {0xFFFFFFFF, 0xFFFFFFFF, false},
-	["2. All + Dragon Kazooie"]  = {0xFFFFFFFF, 0xFFFFFFFF, true},
-};
-
-local function unlock_moves()
-	local level = forms.gettext(ScriptHawk.UI.form_controls.moves_dropdown);
-	local movesObject = dereferencePointer(Game.Memory.flag_block_pointer[version]);
-	if isRDRAM(movesObject) then
-		mainmemory.write_u32_be(movesObject + 0x18, move_levels[level][1]);
-		mainmemory.write_u32_be(movesObject + 0x1C, move_levels[level][2]);
-		if move_levels[level][3] then
-			mainmemory.writebyte(movesObject + 0x78, 0xFF); -- Unlock dragon kazooie
-		else
-			mainmemory.writebyte(movesObject + 0x78, 0x00); -- Lock dragon kazooie
-		end
-	end
-end
-
 local movementStates = {
 	[0x00] = "Null",
 	[0x01] = "Idle",
@@ -1317,22 +1297,22 @@ local flag_array = {
 	-- 0x1B > 4
 	--{byte=0x1B, bit=5, name="Ability: Fire/Grenade Eggs???", type="Ability"},
 	{byte=0x1B, bit=6, name="Ability: Bill Drill", type="Ability"},
-	-- 0x1B > 7
-	-- 0x1C > 0
+	{byte=0x1B, bit=7, name="Ability: Beak Bayonet", type="Ability"},
+	{byte=0x1C, bit=0, name="Ability: Airborne Egg Aiming", type="Ability"},
 	{byte=0x1C, bit=1, name="Ability: Split Up", type="Ability"},
-	-- 0x1C > 2
-	-- 0x1C > 3
-	-- 0x1C > 4
+	{byte=0x1C, bit=2, name="Ability: Wing Whack", type="Ability"},
+	{byte=0x1C, bit=3, name="Ability: Talon Torpedo", type="Ability"},
+	{byte=0x1C, bit=4, name="Ability: Sub-Aqua Egg Aiming", type="Ability"},
 	-- 0x1C > 5
-	-- 0x1C > 6
-	-- 0x1C > 7
-	-- 0x1D > 0
-	-- 0x1D > 1
-	-- 0x1D > 2
+	{byte=0x1C, bit=6, name="Ability: Shack Pack", type="Ability"},
+	{byte=0x1C, bit=7, name="Ability: Glide", type="Ability"},
+	{byte=0x1D, bit=0, name="Ability: Snooze Pack", type="Ability"},
+	{byte=0x1D, bit=1, name="Ability: Leg Spring", type="Ability"},
+	{byte=0x1D, bit=2, name="Ability: Claw Clamber Boots", type="Ability"},
 	{byte=0x1D, bit=3, name="Ability: Springy Step Shoes", type="Ability"},
-	-- 0x1D > 4
-	-- 0x1D > 5
-	-- 0x1D > 6
+	{byte=0x1D, bit=4, name="Ability: Taxi Pack", type="Ability"},
+	{byte=0x1D, bit=5, name="Ability: Hatch", type="Ability"},
+	{byte=0x1D, bit=6, name="Ability: Pack Whack", type="Ability"},
 	{byte=0x1D, bit=7, name="Ability: Sack Pack", type="Ability"},
 	{byte=0x1E, bit=0, name="Ability: Amaze-O-Gaze Goggles", type="Ability"},
 	{byte=0x1E, bit=1, name="Ability: Fire Eggs", type="Ability"},
@@ -1677,6 +1657,8 @@ local flag_array = {
 	{byte=0x75, bit=4, name="Warp: CK: Bottom Of The Tower", type="Warp"},
 	{byte=0x75, bit=5, name="Warp: CK: Top Of The Tower", type="Warp"},
 
+	{byte=0x78, bit=4, name="Ability: Dragon Kazooie", type="Ability"},
+
 	{byte=0x78, bit=6, name="First Warp Available", type="FTT"},
 
 	{byte=0x7C, bit=4, name="Jamjars First Time Text", type="FTT"},
@@ -1686,8 +1668,8 @@ local flag_array = {
 
 	{byte=0x82, bit=4, name="Jinjo Family FT Cutscene?"},
 	--{byte=0x82, bit=5, name="FT Complete Jinjo Family?"},
-	-- 0x82 > 6
-	{byte=0x82, bit=7, name="Chilli Billi Intro Text?", type="FTT"},
+	{byte=0x82, bit=6, name="Chilly Willy Intro Text", type="FTT"},
+	{byte=0x82, bit=7, name="Chilli Billi Intro Text", type="FTT"},
 
 	{byte=0x84, bit=7, name="Nest: MT: ???", type="Nest"},
 	{byte=0x85, bit=0, name="Nest: MT: ???", type="Nest"},
@@ -1844,6 +1826,7 @@ local flag_array = {
 	{byte=0x97, bit=7, name="Treble Clef: IoH: Jinjo Village", type="Treble Clef"},
 
 	{byte=0x99, bit=4, name="First Time Split Up Pad Text", type="FTT"},
+	{byte=0x99, bit=5, name="First Time Split Up Text", type="FTT"},
 
 	{byte=0x9B, bit=6, name="First Time Jamjars Cutscene", type="FTT"},
 
@@ -2665,12 +2648,33 @@ end
 local max_air = 60; -- TODO: This changes once you finish Roysten's quest, how to you get this information out of the game?
 
 function Game.applyInfinites()
-	-- TODO: Eggs, feathers, glowbos etc
+	-- TODO: Eggs, Feathers etc
 	--if version == 4 then -- TODO: Other versions
 		--mainmemory.write_u16_be(0x0D1A58, 0x0000); -- Janky infinite egg/feather code, I don't like this
 	--end
+	setFlagsByType("Glowbo");
 	mainmemory.writefloat(Game.Memory.air[version], max_air, true);
 	Game.setCurrentHealth(Game.getMaxHealth());
+end
+
+local move_levels = {
+	["0. All + Dragon Kazooie"]  = {0xFFFFFFFF, 0xFFFFFFFF, true},
+	["1. All"]  = {0xFFFFFFFF, 0xFFFFFFFF, false},
+	["2. None"] = {0xE0FFFF01, 0x00004000, false},
+};
+
+local function unlock_moves()
+	local level = forms.gettext(ScriptHawk.UI.form_controls.moves_dropdown);
+	local flagBlock = dereferencePointer(Game.Memory.flag_block_pointer[version]);
+	if isRDRAM(flagBlock) then
+		mainmemory.write_u32_be(flagBlock + 0x18, move_levels[level][1]);
+		mainmemory.write_u32_be(flagBlock + 0x1C, move_levels[level][2]);
+		if move_levels[level][3] then
+			setFlagByName("Ability: Dragon Kazooie");
+		else
+			clearFlagByName("Ability: Dragon Kazooie");
+		end
+	end
 end
 
 function Game.initUI()
@@ -2683,7 +2687,7 @@ function Game.initUI()
 	ScriptHawk.UI.form_controls.toggle_neverslip = forms.checkbox(ScriptHawk.UI.options_form, "Never Slip", ScriptHawk.UI.col(0) + ScriptHawk.UI.dropdown_offset, ScriptHawk.UI.row(6) + ScriptHawk.UI.dropdown_offset);
 
 	-- Moves
-	ScriptHawk.UI.form_controls.moves_dropdown = forms.dropdown(ScriptHawk.UI.options_form, { "0. None", "1. All", "2. All + Dragon Kazooie" }, ScriptHawk.UI.col(10) + ScriptHawk.UI.dropdown_offset, ScriptHawk.UI.row(6) + ScriptHawk.UI.dropdown_offset);
+	ScriptHawk.UI.form_controls.moves_dropdown = forms.dropdown(ScriptHawk.UI.options_form, { "0. All + Dragon Kazooie", "1. All", "2. None" }, ScriptHawk.UI.col(10) + ScriptHawk.UI.dropdown_offset, ScriptHawk.UI.row(6) + ScriptHawk.UI.dropdown_offset);
 	ScriptHawk.UI.form_controls.moves_button = forms.button(ScriptHawk.UI.options_form, "Unlock Moves", unlock_moves, ScriptHawk.UI.col(5), ScriptHawk.UI.row(6), ScriptHawk.UI.col(4) + 10, ScriptHawk.UI.button_height);
 
 	flagStats();
