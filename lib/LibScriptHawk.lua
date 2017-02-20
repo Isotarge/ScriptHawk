@@ -4,6 +4,47 @@
 
 -- For developers who want access to ScriptHawk's helper functions without the commitment of a full fat game module
 
+-------------
+-- Texture --
+-------------
+
+image_directory_root = ".\\Images\\";
+
+-- Pixel format: 16bit RGBA 5551
+-- RRRR RGGG GGBB BBBA
+local rgba5551_color_constants = {
+	["Red"] = 0x0800,
+	["Green"] = 0x0040,
+	["Blue"] = 0x0002,
+};
+
+function replaceTextureRGBA5551(filename, base, width, height)
+	if not fileExists(filename) then
+		filename = forms.openfile(nil, nil, "PNG Image (*.png)|*.png");
+		if not fileExists(filename) then
+			print("No image selected. Exiting.");
+			return;
+		end
+	end
+
+	local img = pngImage(filename);
+
+	for y = 1, math.min(img.height, height) do
+		for x = 1, math.min(img.width, width) do
+			local pixel = img:getPixel(x, y);
+			local r = math.floor(pixel.R / img.depth) * rgba5551_color_constants["Red"];
+			local g = math.floor(pixel.G / img.depth) * rgba5551_color_constants["Green"];
+			local b = math.floor(pixel.B / img.depth) * rgba5551_color_constants["Blue"];
+			local a = 0;
+			if pixel.A > 0 then
+				a = 1;
+			end
+
+			mainmemory.write_u16_be(base + ((y - 1) * width * 2) + ((x - 1) * 2), r + g + b + a);
+		end
+	end
+end
+
 --------------------
 -- Deferred print --
 -- Thanks, Notwa  --
