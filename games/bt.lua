@@ -2454,6 +2454,22 @@ function clearFlagByName(name)
 	end
 end
 
+function checkFlagByName(name, suppressPrint)
+	local flag = getFlagByName(name);
+	if type(flag) == "table" then
+		return checkFlag(flag.byte, flag.bit, suppressPrint);
+	end
+	return false;
+end
+
+function toggleFlagByName(name)
+	if checkFlagByName(name, true) then
+		clearFlagByName(name);
+	else
+		setFlagByName(name);
+	end
+end
+
 function setFlagsByType(_type)
 	if type(_type) == "string" then
 		if _type == "Note" then
@@ -3171,9 +3187,8 @@ function Game.applyInfinites()
 end
 
 local move_levels = {
-	["0. All + Dragon Kazooie"]  = {0xFFFFFFFF, 0xFFFFFFFF, true},
-	["1. All"]  = {0xFFFFFFFF, 0xFFFFFFFF, false},
-	["2. None"] = {0xE0FFFF01, 0x00004000, false},
+	["1. All"]  = {0xFFFFFFFF, 0xFFFFFFFF},
+	["2. None"] = {0xE0FFFF01, 0x00004000},
 };
 
 local function unlock_moves()
@@ -3182,12 +3197,11 @@ local function unlock_moves()
 	if isRDRAM(flagBlock) then
 		mainmemory.write_u32_be(flagBlock + 0x18, move_levels[level][1]);
 		mainmemory.write_u32_be(flagBlock + 0x1C, move_levels[level][2]);
-		if move_levels[level][3] then
-			setFlagByName("Ability: Dragon Kazooie");
-		else
-			clearFlagByName("Ability: Dragon Kazooie");
-		end
 	end
+end
+
+function toggleDragonKazooie()
+	toggleFlagByName("Ability: Dragon Kazooie");
 end
 
 function Game.initUI()
@@ -3200,8 +3214,9 @@ function Game.initUI()
 	ScriptHawk.UI.form_controls.toggle_neverslip = forms.checkbox(ScriptHawk.UI.options_form, "Never Slip", ScriptHawk.UI.col(0) + ScriptHawk.UI.dropdown_offset, ScriptHawk.UI.row(6) + ScriptHawk.UI.dropdown_offset);
 
 	-- Moves
-	ScriptHawk.UI.form_controls.moves_dropdown = forms.dropdown(ScriptHawk.UI.options_form, { "0. All + Dragon Kazooie", "1. All", "2. None" }, ScriptHawk.UI.col(10) + ScriptHawk.UI.dropdown_offset, ScriptHawk.UI.row(6) + ScriptHawk.UI.dropdown_offset);
-	ScriptHawk.UI.form_controls.moves_button = forms.button(ScriptHawk.UI.options_form, "Unlock Moves", unlock_moves, ScriptHawk.UI.col(5), ScriptHawk.UI.row(6), ScriptHawk.UI.col(4) + 10, ScriptHawk.UI.button_height);
+	ScriptHawk.UI.form_controls.moves_dropdown = forms.dropdown(ScriptHawk.UI.options_form, { "1. All", "2. None" }, ScriptHawk.UI.col(5) - ScriptHawk.UI.dropdown_offset, ScriptHawk.UI.row(6) + ScriptHawk.UI.dropdown_offset, ScriptHawk.UI.col(4) + 10, ScriptHawk.UI.button_height);
+	ScriptHawk.UI.form_controls.moves_button = forms.button(ScriptHawk.UI.options_form, "Unlock Moves", unlock_moves, ScriptHawk.UI.col(10), ScriptHawk.UI.row(6), ScriptHawk.UI.col(4) + 10, ScriptHawk.UI.button_height);
+	ScriptHawk.UI.form_controls.dragon_button = forms.button(ScriptHawk.UI.options_form, "Toggle Dragon Kazooie", toggleDragonKazooie, ScriptHawk.UI.col(10), ScriptHawk.UI.row(5), ScriptHawk.UI.col(4) + 10, ScriptHawk.UI.button_height);
 
 	flagStats();
 end
