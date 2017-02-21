@@ -1537,6 +1537,7 @@ local flag_array = {
 	{byte=0x30, bit=1, name="Amaze-O-Gaze Goggles Instructions Seen"},
 
 	--{byte=0x32, bit=2, name="Klungo 2 Something?"},
+	{byte=0x32, bit=7, name="Roysten Rescued", type="Ability"},
 
 	{byte=0x35, bit=1, name="Humba Wumba: No Glowbo Needed FTT", type="FTT"},
 
@@ -1558,7 +1559,7 @@ local flag_array = {
 	{byte=0x3A, bit=1, name="Jinjo: GGM: Water Storage", type="Jinjo"},
 	{byte=0x3A, bit=2, name="Jinjo: GGM: Jail", type="Jinjo"},
 	{byte=0x3A, bit=3, name="Jinjo: GGM: ??? (3)", type="Jinjo"},
-	{byte=0x3A, bit=4, name="Jinjo: GGM: ??? (4)", type="Jinjo"},
+	{byte=0x3A, bit=4, name="Jinjo: GGM: Boulder", type="Jinjo"},
 	{byte=0x3A, bit=5, name="Jinjo: GGM: Mine Tracks", type="Jinjo"},
 	{byte=0x3A, bit=6, name="Jinjo: WW: Big Top", type="Jinjo"},
 	{byte=0x3A, bit=7, name="Jinjo: WW: Cave of Horrors", type="Jinjo"},
@@ -2955,9 +2956,10 @@ object_model1 = {
 function getNumSlots()
 	local objectArray = dereferencePointer(Game.Memory.object_array_pointer[version]);
 	if isRDRAM(objectArray) then
-		local blockEnd = dereferencePointer(objectArray - 0x0C);
-		if isRDRAM(blockEnd) then
-			return math.floor(((blockEnd - objectArray) - slot_base) / slot_size);
+		local firstObject = dereferencePointer(objectArray + 0x04);
+		local lastObject = dereferencePointer(objectArray + 0x08);
+		if isRDRAM(firstObject) and isRDRAM(lastObject) then
+			return math.floor((lastObject - firstObject) / slot_size) + 1;
 		end
 	end
 	return 0;
@@ -3048,6 +3050,19 @@ function everythingIs(modelIndex)
 	end
 end
 
+function getAnimationType(model1Base)
+	local objectIDPointer = dereferencePointer(model1Base + object_model1.id_struct);
+	if isRDRAM(objectIDPointer) then
+		local modelIndex = mainmemory.read_u16_be(objectIDPointer + 0x14);
+		if type(object_model1.models[modelIndex]) == "string" then
+			return object_model1.models[modelIndex];
+		else
+			return toHexString(modelIndex);
+		end
+	end
+	return "Unknown";
+end
+
 local green_highlight = 0xFF00FF00;
 local yellow_highlight = 0xFFFFFF00;
 
@@ -3082,17 +3097,6 @@ function Game.drawUI()
 		for i = numSlots, 1, -1 do
 			local currentSlotBase = objectArray + getSlotBase(i - 1);
 
-			local animationType = "Unknown";
-			local objectIDPointer = dereferencePointer(currentSlotBase + object_model1.id_struct);
-			if isRDRAM(objectIDPointer) then
-				local modelIndex = mainmemory.read_u16_be(objectIDPointer + 0x14);
-				if type(object_model1.models[modelIndex]) == "string" then
-					animationType = object_model1.models[modelIndex];
-				else
-					animationType = toHexString(modelIndex);
-				end
-			end
-
 			local color = nil;
 			if object_index == i then
 				color = yellow_highlight;
@@ -3102,7 +3106,7 @@ function Game.drawUI()
 			local yPos = mainmemory.readfloat(currentSlotBase + object_model1.y_position, true);
 			local zPos = mainmemory.readfloat(currentSlotBase + object_model1.z_position, true);
 
-			gui.text(Game.OSDPosition[1], 2 + Game.OSDRowHeight * row, round(xPos, precision)..", "..round(yPos, precision)..", "..round(zPos, precision).." - "..animationType.." "..i..": "..toHexString(currentSlotBase or 0), color, 'bottomright');
+			gui.text(Game.OSDPosition[1], 2 + Game.OSDRowHeight * row, round(xPos, precision)..", "..round(yPos, precision)..", "..round(zPos, precision).." - "..getAnimationType(currentSlotBase).." "..i..": "..toHexString(currentSlotBase or 0), color, 'bottomright');
 			row = row + 1;
 		end
 	end
@@ -3174,15 +3178,20 @@ function Game.getMapOSD()
 	return currentMapName.." ("..toHexString(currentMap)..")";
 end
 
-local max_air = 60; -- TODO: This changes once you finish Roysten's quest, how to you get this information out of the game?
+function Game.getMaxAir()
+	if checkFlagByName("Roysten Rescued", true) then
+		return 100;
+	end
+	return 60;
+end
 
 function Game.applyInfinites()
 	-- TODO: Eggs, Feathers etc
 	--if version == 4 then -- TODO: Other versions
 		--mainmemory.write_u16_be(0x0D1A58, 0x0000); -- Janky infinite egg/feather code, I don't like this
 	--end
-	--setFlagsByType("Glowbo");
-	mainmemory.writefloat(Game.Memory.air[version], max_air, true);
+	--setFlagsByType("Glowbo"); -- TODO: Turns out the counter is stored separately
+	mainmemory.writefloat(Game.Memory.air[version], Game.getMaxAir(), true);
 	Game.setCurrentHealth(Game.getMaxHealth());
 end
 
