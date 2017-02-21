@@ -414,7 +414,7 @@ local flag_array = {
 	{["name"] = "Has Been in MMM",			["index"] = 0xB7,	["type"] = "Prog",	["level"] = 10},
 	{["name"] = "Has Been in CC",			["index"] = 0xB8,	["type"] = "Prog",	["level"] = 2},
 	{["name"] = "Double Health",			["index"] = 0xB9,	["type"] = "Prog",	["level"] = 6},
-	{["name"] = "1st Time T-Rex",			["index"] = 0xBA,	["type"] = "Prog",	["level"] = 6},
+	{["name"] = "1st Time T. Rex",			["index"] = 0xBA,	["type"] = "Prog",	["level"] = 6},
 	
 	{["name"] = "1st Time in Lair Cutscene",	["index"] = 0xBD,	["type"] = "Prog",	["level"] = 6},
 	

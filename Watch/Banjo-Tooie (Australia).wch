@@ -24,7 +24,7 @@ SystemID N64
 11FAAD	b	u	1	RDRAM	Jinjo: TDL: Talon Torpedo
 11FAB0	b	u	1	RDRAM	Jinjo: TDL: Cutscene Skip
 11FAB3	b	u	1	RDRAM	Jinjo: TDL: Beside Rocknut
-11FAB6	b	u	1	RDRAM	Jinjo: TDL: Big T-Rex Skip
+11FAB6	b	u	1	RDRAM	Jinjo: TDL: Big T. Rex Skip
 11FAB9	b	u	1	RDRAM	Jinjo: TDL: Stomping Plains
 11FABC	b	u	1	RDRAM	Jinjo: GI: Floor 5
 11FABF	b	u	1	RDRAM	Jinjo: GI: Leg Spring
@@ -69,8 +69,8 @@ SystemID N64
 1205A9	b	u	1	RDRAM	Mumbo: Max Health
 1205AE	b	u	1	RDRAM	Detonator: Current Health
 1205AF	b	u	1	RDRAM	Detonator: Max Health
-1205B7	b	u	1	RDRAM	T-Rex: Current Health
-1205B8	b	u	1	RDRAM	T-Rex: Max Health
+1205B7	b	u	1	RDRAM	T. Rex: Current Health
+1205B8	b	u	1	RDRAM	T. Rex: Max Health
 12C390	w	h	1	RDRAM	Map
 12C392	w	h	1	RDRAM	Map Load Trigger
 12FDC0	d	f	1	RDRAM	Air (Real)

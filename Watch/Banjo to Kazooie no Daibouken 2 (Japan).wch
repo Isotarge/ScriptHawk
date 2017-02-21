@@ -24,7 +24,7 @@ SystemID N64
 114E3D	b	u	1	RDRAM	Jinjo: TDL: Talon Torpedo
 114E40	b	u	1	RDRAM	Jinjo: TDL: Cutscene Skip
 114E43	b	u	1	RDRAM	Jinjo: TDL: Beside Rocknut
-114E46	b	u	1	RDRAM	Jinjo: TDL: Big T-Rex Skip
+114E46	b	u	1	RDRAM	Jinjo: TDL: Big T. Rex Skip
 114E49	b	u	1	RDRAM	Jinjo: TDL: Stomping Plains
 114E4C	b	u	1	RDRAM	Jinjo: GI: Floor 5
 114E4F	b	u	1	RDRAM	Jinjo: GI: Leg Spring
@@ -66,8 +66,8 @@ SystemID N64
 115A26	b	u	1	RDRAM	Submarine: Max Health
 115A28	b	u	1	RDRAM	Mumbo: Current Health
 115A29	b	u	1	RDRAM	Mumbo: Max Health
-115A37	b	u	1	RDRAM	T-Rex: Current Health
-115A38	b	u	1	RDRAM	T-Rex: Max Health
+115A37	b	u	1	RDRAM	T. Rex: Current Health
+115A38	b	u	1	RDRAM	T. Rex: Max Health
 1217E8	d	f	1	RDRAM	Game Runtime
 1217EC	d	f	1	RDRAM	Map Runtime
 125220	d	f	1	RDRAM	Air (Real)

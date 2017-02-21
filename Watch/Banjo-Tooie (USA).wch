@@ -31,7 +31,7 @@ SystemID N64
 11AB7D	b	u	1	RDRAM	Jinjo: TDL: Talon Torpedo
 11AB80	b	u	1	RDRAM	Jinjo: TDL: Cutscene Skip
 11AB83	b	u	1	RDRAM	Jinjo: TDL: Beside Rocknut
-11AB86	b	u	1	RDRAM	Jinjo: TDL: Big T-Rex Skip
+11AB86	b	u	1	RDRAM	Jinjo: TDL: Big T. Rex Skip
 11AB89	b	u	1	RDRAM	Jinjo: TDL: Stomping Plains
 11AB8C	b	u	1	RDRAM	Jinjo: GI: Floor 5
 11AB8F	b	u	1	RDRAM	Jinjo: GI: Leg Spring
@@ -110,14 +110,16 @@ SystemID N64
 11B66D	b	h	1	RDRAM	Detonator: Health Icon
 11B66E	b	u	1	RDRAM	Detonator: Current Health
 11B66F	b	u	1	RDRAM	Detonator: Max Health
-11B676	b	h	1	RDRAM	T-Rex: Health Icon
-11B677	b	u	1	RDRAM	T-Rex: Current Health
-11B678	b	u	1	RDRAM	T-Rex: Max Health
+11B676	b	h	1	RDRAM	T. Rex: Health Icon
+11B677	b	u	1	RDRAM	T. Rex: Current Health
+11B678	b	u	1	RDRAM	T. Rex: Max Health
 1254B0	d	f	1	RDRAM	Banjo Brightness Doodad
 126738	d	h	1	RDRAM	Beginning of pointer list
+127600	d	h	1	RDRAM	Text Script Pointer
 127638	d	f	1	RDRAM	Game Runtime
 12763C	d	f	1	RDRAM	Map Runtime
 127690	d	f	1	RDRAM	FOV
+1289D0	d	h	1	RDRAM	Text Buffer Pointer
 12A990	d	f	1	RDRAM	Unknown Float
 12A9F0	d	f	1	RDRAM	Unknown Float
 12A9F4	d	f	1	RDRAM	Unknown Float
