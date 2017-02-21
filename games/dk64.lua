@@ -3321,44 +3321,37 @@ function flagStats(verbose)
 		if flagType == "Fairy" then
 			fairies_known = fairies_known + 1;
 			validType = true;
-		end
-		if flagType == "Blueprint" then
+		elseif flagType == "Blueprint" then
 			blueprints_known = blueprints_known + 1;
 			validType = true;
-		end
-		if flagType == "Warp" or name == "Caves: Tiny GB: W3" or name == "Aztec: DK GB: W5" or name == "Galleon: Diddy GB: W4" then
+		elseif flagType == "Warp" then
 			warps_known = warps_known + 1;
 			validType = true;
-		end
-		if flagType == "GB" then
+		elseif flagType == "GB" then
+			if name == "Caves: Tiny GB: W3" or name == "Aztec: DK GB: W5" or name == "Galleon: Diddy GB: W4" then
+				warps_known = warps_known + 1;
+			end
 			gb_known = gb_known + 1;
 			validType = true;
-		end
-		if flagType == "CB" then
+		elseif flagType == "CB" then
 			cb_known = cb_known + 1;
 			validType = true;
-		end
-		if flagType == "Bunch" then
+		elseif flagType == "Bunch" then
 			cb_known = cb_known + 5;
 			validType = true;
-		end
-		if flagType == "Balloon" then
+		elseif flagType == "Balloon" then
 			cb_known = cb_known + 10;
 			validType = true;
-		end
-		if flagType == "Crown" then
+		elseif flagType == "Crown" then
 			crowns_known = crowns_known + 1;
 			validType = true;
-		end
-		if flagType == "Coin" then
+		elseif flagType == "Coin" then
 			coins_known = coins_known + 1;
 			validType = true;
-		end
-		if flagType == "Medal" then
+		elseif flagType == "Medal" then
 			medals_known = medals_known + 1;
 			validType = true;
-		end
-		if flagType == "Rainbow Coin" then
+		elseif flagType == "Rainbow Coin" then
 			coins_known = coins_known + 25;
 			validType = true;
 		end
