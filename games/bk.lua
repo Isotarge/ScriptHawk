@@ -1867,6 +1867,7 @@ local reference_distance = 2000;
 local mouseClickedLastFrame = false;
 local startDragPosition = {0,0};
 local draggedObjects = {};
+local dragging = false;
 
 local screen = {
 	width = 640;
@@ -1890,22 +1891,27 @@ function drawObjectPositions()
 	end
 
 	local startDrag = false;
-	local dragging = false;
 	local dragTransform = {0, 0};
 	local mouse = input.getmouse();
 
 	if mouse.Left then --if mouse clicked object is being dragged
 		if not mouseClickedLastFrame then
-			startDrag = true;
-			startDragPosition = {mouse.X, mouse.Y};
+			if dragging ~= true then
+				startDrag = true;
+				dragging = true;
+				startDragPosition = {mouse.X, mouse.Y, mouse.Wheel};
+			else
+				draggedObjects = {};
+				dragging = false;
+			end
 		end
 		mouseClickedLastFrame = true;
-		dragging = true;
-		dragTransform = {mouse.X - startDragPosition[1], mouse.Y - startDragPosition[2]};
 	else
-		draggedObjects = {};
 		mouseClickedLastFrame = false;
-		dragging = false;
+	end
+	
+	if dragging then
+		dragTransform = {mouse.X - startDragPosition[1], mouse.Y - startDragPosition[2],mouse.Wheel - startDragPosition[3]};
 	end
 
 	local cameraData = {};
@@ -1983,7 +1989,7 @@ function drawObjectPositions()
 							if dragging then
 								drawXPos = draggedObjects[1][2] + dragTransform[1];
 								drawYPos = draggedObjects[1][3] + dragTransform[2];
-								objectData.zPos = draggedObjects[1][4];
+								objectData.zPos = draggedObjects[1][4] + dragTransform[3];
 
 								-- Transform screen-to-game coords
 								YAngle_local = math.asin(math.sin(viewport_YAngleRange * math.pi / 360) * (2 * drawXPos / screen.width - 1));
@@ -2016,6 +2022,10 @@ function drawObjectPositions()
 						color = 0xFFFFFF00;
 						if startDrag then
 							table.insert(draggedObjects, {i, drawXPos, drawYPos, objectData.zPos});
+						end
+						if dragging then
+							print(i);
+							color = 0xFF42D4FF;
 						end
 					end
 					gui.drawLine(drawXPos - scaling_factor * object_selectable_size / 2, drawYPos, drawXPos + scaling_factor * object_selectable_size / 2, drawYPos, color);
