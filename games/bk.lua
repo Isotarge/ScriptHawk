@@ -1879,7 +1879,7 @@ local screen = {
 function drawObjectPositions()
 	--screen.width = client.bufferwidth() / client.getwindowsize();
 	--screen.height = client.bufferheight() / client.getwindowsize();
-
+	
 	local draggableObjects = {};
 	local objectModel;
 	if string.contains(script_mode, "Struct") then
@@ -1901,6 +1901,7 @@ function drawObjectPositions()
 				dragging = true;
 				startDragPosition = {mouse.X, mouse.Y, mouse.Wheel};
 			else
+				draggedObjects[1] = nil;
 				draggedObjects = {};
 				dragging = false;
 			end
@@ -1983,7 +1984,7 @@ function drawObjectPositions()
 
 					--calc scaling factor -- current calc might be incorrect
 					scaling_factor = reference_distance / objectData.zPos;
-
+					-- Object selection
 					if draggedObjects[1] ~= nil then
 						if i == draggedObjects[1][1] then
 							if dragging then
@@ -2012,15 +2013,23 @@ function drawObjectPositions()
 								else
 									setStructPosition(slotBase, cameraData.xPos + xDifference, cameraData.yPos + yDifference, cameraData.zPos + zDifference);
 								end
+
 							end
+							
 						end
 					end
-
+					if mouse.Left then
+						if (mouse.X >= drawXPos - scaling_factor * object_selectable_size / 2 and mouse.X <= drawXPos + scaling_factor * object_selectable_size / 2) 
+						and (mouse.Y >= drawYPos - scaling_factor * object_selectable_size / 2 and mouse.Y <= drawYPos + scaling_factor * object_selectable_size / 2) then
+							object_index = i;
+						end
+					end
 					-- Draw to screen
 					local color = 0xFFFFFFFF;
 					if object_index == i then
 						color = 0xFFFFFF00;
 						if startDrag then
+							draggedObjects = {};
 							table.insert(draggedObjects, {i, drawXPos, drawYPos, objectData.zPos});
 						end
 						if dragging then
@@ -2034,13 +2043,7 @@ function drawObjectPositions()
 			end
 		end
 
-		-- Object selection
-		if mouse.Left then
-			if (mouse.X >= drawXPos - scaling_factor * object_selectable_size / 2 and mouse.X <= drawXPos + scaling_factor * object_selectable_size / 2) 
-				and (mouse.Y >= drawYPos - scaling_factor * object_selectable_size / 2 and mouse.Y <= drawYPos + scaling_factor * object_selectable_size / 2) then
-				object_index = i;
-			end
-		end
+		
 	end
 end
 
