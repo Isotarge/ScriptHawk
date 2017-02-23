@@ -1861,7 +1861,7 @@ end
 --------------------
 local viewport_YAngleRange = 60;
 local viewport_XAngleRange = 45;
-local object_selectable_size = 10;
+local object_selectable_size = 10*client.bufferwidth()/640;
 local reference_distance = 2000;
 
 local mouseClickedLastFrame = false;
@@ -1870,15 +1870,12 @@ local draggedObjects = {};
 local dragging = false;
 
 local screen = {
-	width = 640;
-	height = 480;
-	--width = client.bufferwidth() / client.getwindowsize(),
-	--height = client.bufferheight() / client.getwindowsize(),
+	width = client.bufferwidth(),
+	height = client.bufferheight(),
 };
 
+
 function drawObjectPositions()
-	--screen.width = client.bufferwidth() / client.getwindowsize();
-	--screen.height = client.bufferheight() / client.getwindowsize();
 	
 	local draggableObjects = {};
 	local objectModel;
