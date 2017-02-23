@@ -2024,7 +2024,6 @@ function drawObjectPositions()
 							table.insert(draggedObjects, {i, drawXPos, drawYPos, objectData.zPos});
 						end
 						if dragging then
-							print(i);
 							color = 0xFF42D4FF;
 						end
 					end
