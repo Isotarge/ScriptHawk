@@ -137,6 +137,7 @@ SystemID N64
 12B010	d	f	1	RDRAM	Frameskip Factor?
 12B050	d	f	1	RDRAM	Air (Real)
 12B054	d	f	1	RDRAM	Air
+12B250	d	h	1	RDRAM	Consumables Pointer
 12B3F2	b	h	1	RDRAM	Bottles' Revenge Toggle
 12B402	w	h	1	RDRAM	Current Map?
 12C770	d	h	1	RDRAM	Flag Block Pointer

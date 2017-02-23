@@ -290,6 +290,8 @@ local Game = {
 		"JRL - Seabottom",
 	},
 	Memory = { -- Version order: Australia, Europe, Japan, USA
+		["consumable_base"] = {0x11FFB0, 0x120170, 0x115340, 0x11B080},
+		["consumable_pointer"] = {0x12FFC0, 0x1301D0, 0x125420, 0x12B250},
 		["object_array_pointer"] = {0x13BBD0, 0x13BE60, 0x131020, 0x136EE0},
 		["player_pointer"] = {0x13A210, 0x13A4A0, 0x12F660, 0x135490},
 		["player_pointer_index"] = {0x13A25F, 0x13A4EF, 0x12F6AF, 0x1354DF},
@@ -2588,7 +2590,7 @@ local flag_array = {
 	{byte=0xA8, bit=0, name="First Time Wading Boots"},
 	{byte=0xA8, bit=1, name="First Time Springy Step Shoes"},
 	-- 0xA8 > 2
-	-- 0xA8 > 3
+	{byte=0xA8, bit=3, name="First Time CWK Shot"},
 	{byte=0xA8, bit=4, name="First Boss Fight?"},
 	-- 0xA8 > 5
 	-- 0xA8 > 6
@@ -3441,12 +3443,69 @@ function Game.getMaxAir()
 	return 60;
 end
 
+local obfuscatedConsumables = { -- TODO: Extract keys directly from the game
+	[0] = {key=0x27BD, name="Blue Eggs"},
+	[1] = {key=0x0C03, name="Fire Eggs"},
+	[2] = {key=0x0002, name="Ice Eggs"},
+	[3] = {key=0x01EE, name="Grenade Eggs"},
+	[4] = {key=0x2401, name="CWK Eggs"},
+	[5] = {key=0x15E0, name="Jiggies?"},
+	[6] = {key=0x1000, name="Red Feathers"},
+	[7] = {key=0x3C18, name="Gold Feathers"},
+	[8] = {key=0x0003, name="Glowbos"},
+	[9] = {key=0x3C0C, name="Empty Honeycombs"},
+	[10] = {key=0x0319, name="Cheato Pages"},
+	[11] = {key=0x858C, name="Burgers"},
+	[12] = {key=0x03E0, name="Fries"},
+	[13] = {key=0x27BD, name="Tickets"},
+	[14] = {key=0x0C03, name="Doubloons"},
+	[15] = {key=0x3C05, name="Gold Idols"},
+	[16] = {key=0xFFFD, name="Beans"}, -- CCL
+	[17] = {key=0x7A1C, name="Fish"}, -- HFP
+	[18] = {key=0xFFBF, name="Eggs"}, -- Stop'n'Swop
+	[19] = {key=0x7040, name="Ice Keys"}, -- Stop'n'Swop
+	[20] = {key=0xEB9E, name="Mega Glowbos"},
+	[21] = {key=0xB363, name="???"},
+	[22] = {key=0x0900, name="???"},
+	[23] = {key=0xFAFF, name="???"},
+};
+
+function Game.setConsumable(index, value)
+	if type(obfuscatedConsumables[index]) == "table" then
+		local consumablesBlock = dereferencePointer(Game.Memory.consumable_pointer[version]);
+		if isRDRAM(consumablesBlock) then
+			mainmemory.write_u16_be(consumablesBlock + index * 2, bit.bxor(value, obfuscatedConsumables[index].key));
+		end
+	end
+end
+
+function Game.getConsumable(index)
+	local consumablesBlock = dereferencePointer(Game.Memory.consumable_pointer[version]);
+	if isRDRAM(consumablesBlock) then
+		local normalValue = mainmemory.read_u16_be(Game.Memory.consumable_base[version] + index * 0x0C);
+		local obfuscatedValue = mainmemory.read_u16_be(consumablesBlock + index * 2);
+		local key = bit.bxor(obfuscatedValue, normalValue);
+		return toHexString(obfuscatedValue, 4, "").." XOR "..toHexString(key, 4, "").." = "..normalValue;
+	end
+	return "Unknown";
+end
+
 function Game.applyInfinites()
-	-- TODO: Eggs, Feathers etc
-	--if version == 4 then -- TODO: Other versions
-		--mainmemory.write_u16_be(0x0D1A58, 0x0000); -- Janky infinite egg/feather code, I don't like this
-	--end
-	--setFlagsByType("Glowbo"); -- TODO: Turns out the counter is stored separately
+	Game.setConsumable(0, 999); -- Blue Eggs
+	Game.setConsumable(1, 999); -- Fire Eggs
+	Game.setConsumable(2, 999); -- Ice Eggs
+	Game.setConsumable(3, 999); -- Grenade Eggs
+	Game.setConsumable(4, 999); -- CWK Eggs
+	Game.setConsumable(6, 999); -- Red Feathers
+	Game.setConsumable(7, 999); -- Gold Feathers
+	Game.setConsumable(8, 999); -- Glowbos
+	Game.setConsumable(9, 999); -- Empty Honeycombs
+	Game.setConsumable(10, 999); -- Cheato Pages
+	Game.setConsumable(11, 999); -- Burgers
+	Game.setConsumable(12, 999); -- Fries
+	Game.setConsumable(13, 999); -- Tickets
+	Game.setConsumable(14, 999); -- Doubloons
+	Game.setConsumable(15, 999); -- Gold Idols
 	mainmemory.writefloat(Game.Memory.air[version], Game.getMaxAir(), true);
 	Game.setCurrentHealth(Game.getMaxHealth());
 end

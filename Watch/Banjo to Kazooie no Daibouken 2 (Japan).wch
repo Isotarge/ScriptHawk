@@ -48,6 +48,7 @@ SystemID N64
 114E85	b	u	1	RDRAM	Jinjo: IoH: Spiral Mountain
 11530D	b	h	1	RDRAM	HUD Icon (Air)
 115325	b	h	1	RDRAM	HUD Icon (Health)
+115340	w	u	1	RDRAM	Blue Eggs (HUD)
 115A04	b	u	1	RDRAM	BK: Current Health
 115A05	b	u	1	RDRAM	BK: Max Health
 115A07	b	u	1	RDRAM	Snowball: Current Health
@@ -72,6 +73,7 @@ SystemID N64
 1217EC	d	f	1	RDRAM	Map Runtime
 125220	d	f	1	RDRAM	Air (Real)
 125224	d	f	1	RDRAM	Air
+125420	d	h	1	RDRAM	Consumables Pointer
 126940	d	h	1	RDRAM	Flag Block Pointer
 126974	d	f	1	RDRAM	Game Time (GGM)
 126978	d	f	1	RDRAM	Game Time (MT)
