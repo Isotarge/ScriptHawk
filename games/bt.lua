@@ -956,12 +956,13 @@ local movementStates = {
 	[0xC9] = "Exiting Breegull Blaster",
 	[0xCA] = "Idle", -- Breegull Blaster
 
-	[0xCE] = "Locked", -- Beak Bayonet, Loading Zone
+	[0xCE] = "Locked", -- Breegull Blaster, Loading Zone
 
+	[0xD0] = "Locked", -- Breegull Blaster
 	[0xD1] = "Walking", -- Breegull Blaster
 	[0xD2] = "Beak Bayonet",
 
-	[0xD6] = "Firing CK Egg", -- Breegull Blaster
+	[0xD6] = "Firing Egg", -- Breegull Blaster
 	[0xD7] = "Clockwork Kazooie", -- Breegull Blaster
 	[0xD8] = "Firing Egg", -- Breegull Blaster
 
@@ -1270,8 +1271,8 @@ local flag_array = {
 	-- 0x03 > 0
 	-- 0x03 > 1
 	-- 0x03 > 2
-	-- 0x03 > 3
-	-- 0x03 > 4
+	{byte=0x03, bit=3, name="Hag 1 Defeated", type="Progress"},
+	{byte=0x03, bit=4, name="Hag 1 Intro Cutscene", type="FTT"},
 	-- 0x03 > 5
 	-- 0x03 > 6
 	-- 0x03 > 7
@@ -1294,8 +1295,8 @@ local flag_array = {
 	{byte=0x06, bit=0, name="MT: Officer Unogopaz FTT", type="FTT"},
 	-- 0x06 > 1
 	{byte=0x06, bit=2, name="MT: Gold Relic Returned", type="Physical"},
-	-- 0x06 > 3
-	-- 0x06 > 4
+	{byte=0x06, bit=3, name="MT: Dilberta Intro", type="FTT"},
+	{byte=0x06, bit=4, name="MT: Dilberta in GGM", type="Progress"},
 	-- 0x06 > 5
 	-- 0x06 > 6
 	-- 0x06 > 7
@@ -1305,7 +1306,7 @@ local flag_array = {
 	-- 0x07 > 3
 	-- 0x07 > 4
 	-- 0x07 > 5
-	-- 0x07 > 6
+	{byte=0x07, bit=6, name="GGM: Canary Mary Freed (1)", type="Progress"},
 	{byte=0x07, bit=7, name="First Time Cheato Page", type="FTT"},
 	{byte=0x08, bit=0, name="Cheato FTT", type="FTT"},
 	-- 0x08 > 1
@@ -1329,15 +1330,15 @@ local flag_array = {
 	-- 0x0A > 3
 	-- 0x0A > 4
 	{byte=0x0A, bit=5, name="Mumbo FTT", type="FTT"},
-	-- 0x0A > 6
+	{byte=0x0A, bit=6, name="GGM: Canary Cave Entrance Cleared", type="Physical"},
 	-- 0x0A > 7
 	-- 0x0B > 0
 	-- 0x0B > 1
-	-- 0x0B > 2
-	-- 0x0B > 3
+	{byte=0x0B, bit=2, name="GGM: Bullion Bill Intro", type="FTT"},
+	{byte=0x0B, bit=3, name="GGM: Dilberta Quest Complete", type="Progress"},
 	-- 0x0B > 4
 	-- 0x0B > 5
-	-- 0x0B > 6
+	{byte=0x0B, bit=6, name="GGM: Old King Coal Defeated?", type="Progress"},
 	-- 0x0B > 7
 	-- 0x0C > 0 Targitzan Fight?
 	-- 0x0C > 1
@@ -1352,7 +1353,7 @@ local flag_array = {
 	-- 0x0D > 2
 	-- 0x0D > 3
 	-- 0x0D > 4
-	-- 0x0D > 5
+	{byte=0x0D, bit=5, name="GGM: Levitate Chuffy (1)", type="Mumbo's Magic"},
 	-- 0x0D > 6
 	-- 0x0D > 7
 	-- 0x0E > 0
@@ -1383,9 +1384,9 @@ local flag_array = {
 	{byte=0x11, bit=1, name="MT: Jade Snake Grove Door Smashed", type="Physical"},
 	-- 0x11 > 2
 	-- 0x11 > 3
-	-- 0x11 > 4
-	-- 0x11 > 5
-	-- 0x11 > 6
+	{byte=0x11, bit=4, name="JRL: Pawno's Jiggy Purchased", type="Progress"},
+	{byte=0x11, bit=5, name="JRL: Pawno's Cheato Page Purchased", type="Progress"},
+	{byte=0x11, bit=6, name="JRL: UFO Leaves JRL", type="Progress"},
 	{byte=0x11, bit=7, name="Klungo 3 Something??"},
 	-- 0x12 > 0
 	-- 0x12 > 1
@@ -1395,11 +1396,11 @@ local flag_array = {
 	-- 0x12 > 5
 	-- 0x12 > 6
 	-- 0x12 > 7
-	-- 0x13 > 0
+	{byte=0x13, bit=0, name="JRL: Merry Maggie Malpass Rescued", type="Progress"},
 	{byte=0x13, bit=1, name="Klungo 1 Potion Chosen?"},
-	{byte=0x13, bit=2, name="Jolly's Room Rented", type="Physical"},
-	{byte=0x13, bit=3, name="Jolly FTT", type="FTT"},
-	-- 0x13 > 4
+	{byte=0x13, bit=2, name="JRL: Jolly's Room Rented", type="Physical"},
+	{byte=0x13, bit=3, name="JRL: Jolly FTT", type="FTT"},
+	{byte=0x13, bit=4, name="JRL: Merry Maggie Malpass in Jolly's FTT", type="FTT"},
 	{byte=0x13, bit=5, name="TDL: Stomponadon Intro Cutscene", type="Cutscene"},
 	-- 0x13 > 6
 	-- 0x13 > 7
@@ -1407,7 +1408,7 @@ local flag_array = {
 	{byte=0x14, bit=1, name="MT: Prison Compound Door Smashed", type="Physical"},
 	-- 0x14 > 2
 	-- 0x14 > 3
-	-- 0x14 > 4
+	{byte=0x14, bit=4, name="JRL: Water Supply Pipe Grate Smashed", type="Physical"},
 	{byte=0x14, bit=5, name="JRL: Waste Pipe Drilled", type="Physical"},
 	-- 0x14 > 6
 	-- 0x14 > 7
@@ -1431,7 +1432,7 @@ local flag_array = {
 	-- 0x17 > 1
 	{byte=0x17, bit=2, name="Humba Wumba: Detransform Instructions", type="FTT"},
 	{byte=0x17, bit=3, name="MT: Treasure Chamber > TDL Door Open", type="Physical"},
-	{byte=0x17, bit=4, name="Captain Blackeye FTT", type="FTT"},
+	{byte=0x17, bit=4, name="JRL: Captain Blackeye FTT", type="FTT"},
 	-- 0x17 > 5
 	-- 0x17 > 6
 	-- 0x17 > 7
@@ -1546,8 +1547,8 @@ local flag_array = {
 	{byte=0x25, bit=4, name="Doubloon: Shock Spring Alcove (1)", type="Doubloon"},
 	{byte=0x25, bit=5, name="Doubloon: Shock Spring Alcove (2)", type="Doubloon"},
 	{byte=0x25, bit=6, name="Doubloon: Shock Spring Alcove (3)", type="Doubloon"},
-	-- 0x25 > 7 Doubloon: Captain Blackeye?
-	-- 0x26 > 0 Doubloon: Captain Blackeye?
+	{byte=0x25, bit=7, name="Doubloon: Captain Blackeye (1)", type="Doubloon"},
+	{byte=0x26, bit=0, name="Doubloon: Captain Blackeye (2)", type="Doubloon"},
 	{byte=0x26, bit=1, name="Doubloon: Near Jinjo (1)", type="Doubloon"},
 	{byte=0x26, bit=2, name="Doubloon: Near Jinjo (2)", type="Doubloon"},
 	{byte=0x26, bit=3, name="Doubloon: Near Jinjo (3)", type="Doubloon"},
@@ -1564,7 +1565,7 @@ local flag_array = {
 	-- 0x27 > 6
 	-- 0x27 > 7
 	-- 0x28 > 0
-	-- 0x28 > 1
+	{byte=0x28, bit=1, name="GI: Loggo FTT", type="FTT"},
 	-- 0x28 > 2
 	-- 0x28 > 3
 	-- 0x28 > 4
@@ -1575,12 +1576,12 @@ local flag_array = {
 	-- 0x29 > 1
 	-- 0x29 > 2
 	-- 0x29 > 3
-	-- 0x29 > 4
+	{byte=0x29, bit=4, name="GI: Weldar Intro Cutscene", type="FTT"},
 	-- 0x29 > 5
 	-- 0x29 > 6
 	-- 0x29 > 7
 	-- 0x2A > 0
-	-- 0x2A > 1
+	{byte=0x2A, bit=1, name="GGM: Old King Coal Intro Cutscene", type="FTT"},
 	-- 0x2A > 2
 	-- 0x2A > 3
 	-- 0x2A > 4
@@ -1588,7 +1589,7 @@ local flag_array = {
 	-- 0x2A > 6
 	-- 0x2A > 7
 	-- 0x2B > 0
-	-- 0x2B > 1
+	{byte=0x2B, bit=1, name="GI: Bathroom Door Smashed", type="Physical"},
 	{byte=0x2B, bit=2, name="MT: Kickball Stadium Link Open", type="Physical"},
 	-- 0x2B > 3
 	-- 0x2B > 4
@@ -1599,9 +1600,9 @@ local flag_array = {
 	-- 0x2C > 1
 	{byte=0x2C, bit=2, name="TDL: Wigwam Enlarged", type="Physical"},
 	{byte=0x2C, bit=3, name="MR: Treasure Chamber Open", type="Physical"},
-	-- 0x2C > 4
+	{byte=0x2C, bit=4, name="GI: Weldar Defeated", type="Progress"},
 	-- 0x2C > 5
-	-- 0x2C > 6
+	{byte=0x2C, bit=6, name="GI: Toxic Waste Pool Raised", type="Physical"},
 	-- 0x2C > 7
 	-- 0x2D > 0
 	-- 0x2D > 1
@@ -1619,38 +1620,38 @@ local flag_array = {
 	-- 0x2E > 5
 	-- 0x2E > 6
 	-- 0x2E > 7
-	-- 0x2F > 0
+	{byte=0x2F, bit=0, name="GI: Trash Compactor FTT", type="FTT"},
 	-- 0x2F > 1
 	-- 0x2F > 2
 	-- 0x2F > 3
 	-- 0x2F > 4
 	{byte=0x2F, bit=5, name="FT Jiggy Collection?"},
 	-- 0x2F > 6
-	{byte=0x2F, bit=7, name="Mrs. Bottles Intro Cutscene", type="FTT"},
-	{byte=0x30, bit=0, name="Speccy Intro Text Seen", type="FTT"},
-	{byte=0x30, bit=1, name="Amaze-O-Gaze Goggles Instructions Seen"},
+	{byte=0x2F, bit=7, name="IoH: Mrs. Bottles Intro Cutscene", type="FTT"},
+	{byte=0x30, bit=0, name="IoH: Speccy Intro Text Seen", type="FTT"},
+	{byte=0x30, bit=1, name="IoH: Amaze-O-Gaze Goggles Instructions Seen"},
 	-- 0x30 > 2
-	-- 0x30 > 3
-	{byte=0x30, bit=4, name="Dingpot FTT", type="FTT"},
+	{byte=0x30, bit=3, name="GI: Main Entrance Open", type="Physical"},
+	{byte=0x30, bit=4, name="CK: Dingpot FTT", type="FTT"},
 	-- 0x30 > 5
 	-- 0x30 > 6
 	-- 0x30 > 7
-	-- 0x31 > 0
+	{byte=0x31, bit=0, name="GI: Toxic Waste Plant Battery?", type="Progress"},
 	-- 0x31 > 1
 	-- 0x31 > 2
 	-- 0x31 > 3
-	-- 0x31 > 4
+	{byte=0x31, bit=4, name="GI: Toxic Waste Plant Battery??", type="Progress"},
 	-- 0x31 > 5
 	-- 0x31 > 6
 	-- 0x31 > 7
 	-- 0x32 > 0
 	-- 0x32 > 1
 	{byte=0x32, bit=2, name="Klungo 2 Something?"},
-	-- 0x32 > 3
+	{byte=0x32, bit=3, name="GI: Floor 1: Backup Defeated", type="Progress"},
 	-- 0x32 > 4
 	-- 0x32 > 5
 	-- 0x32 > 6
-	{byte=0x32, bit=7, name="Roysten Rescued", type="Ability"},
+	{byte=0x32, bit=7, name="SM: Roysten Rescued", type="Ability"},
 	-- 0x33 > 0
 	-- 0x33 > 1
 	-- 0x33 > 2
@@ -1678,14 +1679,14 @@ local flag_array = {
 	-- 0x36 > 0
 	-- 0x36 > 1
 	-- 0x36 > 2
-	-- 0x36 > 3
+	{byte=0x36, bit=3, name="CCL: Pot o' Gold Activated", type="Physical"},
 	-- 0x36 > 4
 	-- 0x36 > 5
 	-- 0x36 > 6
 	-- 0x36 > 7
 	-- 0x37 > 0
 	{byte=0x37, bit=1, name="CCL: Rainbow Spawned", type="Physical"},
-	-- 0x37 > 2
+	{byte=0x37, bit=2, name="CCL: FT Attempt Pot o' Gold?"},
 	-- 0x37 > 3
 	-- 0x37 > 4
 	-- 0x37 > 5
@@ -1771,8 +1772,8 @@ local flag_array = {
 	{byte=0x41, bit=5, name="Honeycomb: HFP: Train Station", type="Honeycomb"},
 	{byte=0x41, bit=6, name="Honeycomb: HFP: Lava Side", type="Honeycomb"},
 	{byte=0x41, bit=7, name="Honeycomb: CCL: Underground", type="Honeycomb"},
-	{byte=0x42, bit=0, name="Honeycomb: CCL: ??? (2)", type="Honeycomb"},
-	{byte=0x42, bit=1, name="Honeycomb: CCL: ??? (3)", type="Honeycomb"},
+	{byte=0x42, bit=0, name="Honeycomb: CCL: Trash Can", type="Honeycomb"},
+	{byte=0x42, bit=1, name="Honeycomb: CCL: Pot o' Gold", type="Honeycomb"},
 	{byte=0x42, bit=2, name="Honeycomb: IoH: Plateau", type="Honeycomb"},
 	-- 0x42 > 3 JRL Sea Bottom Location?
 	-- 0x42 > 4
@@ -1805,13 +1806,13 @@ local flag_array = {
 	{byte=0x45, bit=7, name="Jiggy: MT: Pillars", type="Jiggy"},
 	{byte=0x46, bit=0, name="Jiggy: MT: Top of Temple", type="Jiggy"},
 	{byte=0x46, bit=1, name="Jiggy: MT: Ssslumber", type="Jiggy"},
-	{byte=0x46, bit=2, name="Jiggy: GGM: ??? (1)", type="Jiggy"},
+	{byte=0x46, bit=2, name="Jiggy: GGM: Old King Coal", type="Jiggy"},
 	{byte=0x46, bit=3, name="Jiggy: GGM: ??? (2)", type="Jiggy"},
 	{byte=0x46, bit=4, name="Jiggy: GGM: Generator Cavern", type="Jiggy"},
-	{byte=0x46, bit=5, name="Jiggy: GGM: ??? (4)", type="Jiggy"},
+	{byte=0x46, bit=5, name="Jiggy: GGM: Waterfall Cavern", type="Jiggy"},
 	{byte=0x46, bit=6, name="Jiggy: GGM: Ordnance Storage", type="Jiggy"},
-	{byte=0x46, bit=7, name="Jiggy: GGM: ??? (6)", type="Jiggy"},
-	{byte=0x47, bit=0, name="Jiggy: GGM: ??? (7)", type="Jiggy"},
+	{byte=0x46, bit=7, name="Jiggy: GGM: Dilberta", type="Jiggy"},
+	{byte=0x47, bit=0, name="Jiggy: GGM: Crushing Shed", type="Jiggy"},
 	{byte=0x47, bit=1, name="Jiggy: GGM: Waterfall", type="Jiggy"},
 	{byte=0x47, bit=2, name="Jiggy: GGM: Power Hut Basement", type="Jiggy"},
 	{byte=0x47, bit=3, name="Jiggy: GGM: Flooded Caves", type="Jiggy"},
@@ -1830,11 +1831,11 @@ local flag_array = {
 	{byte=0x49, bit=0, name="Jiggy: JRL: ??? (3)", type="Jiggy"},
 	{byte=0x49, bit=1, name="Jiggy: JRL: ??? (4)", type="Jiggy"},
 	{byte=0x49, bit=2, name="Jiggy: JRL: Smuggler's Cavern", type="Jiggy"},
-	{byte=0x49, bit=3, name="Jiggy: JRL: ??? (6)", type="Jiggy"},
+	{byte=0x49, bit=3, name="Jiggy: JRL: Merry Maggie Malpass", type="Jiggy"},
 	{byte=0x49, bit=4, name="Jiggy: JRL: ??? (7)", type="Jiggy"},
 	{byte=0x49, bit=5, name="Jiggy: JRL: Seemee", type="Jiggy"},
-	{byte=0x49, bit=6, name="Jiggy: JRL: ??? (9)", type="Jiggy"},
-	{byte=0x49, bit=7, name="Jiggy: JRL: ??? (10)", type="Jiggy"},
+	{byte=0x49, bit=6, name="Jiggy: JRL: Pawno's", type="Jiggy"},
+	{byte=0x49, bit=7, name="Jiggy: JRL: UFO", type="Jiggy"},
 	{byte=0x4A, bit=0, name="Jiggy: TDL: ??? (1)", type="Jiggy"},
 	{byte=0x4A, bit=1, name="Jiggy: TDL: ??? (2)", type="Jiggy"},
 	{byte=0x4A, bit=2, name="Jiggy: TDL: ??? (3)", type="Jiggy"},
@@ -1846,13 +1847,13 @@ local flag_array = {
 	{byte=0x4B, bit=0, name="Jiggy: TDL: ??? (9)", type="Jiggy"},
 	{byte=0x4B, bit=1, name="Jiggy: TDL: ??? (10)", type="Jiggy"},
 	{byte=0x4B, bit=2, name="Jiggy: GI: Waste Disposal Underwater", type="Jiggy"},
-	{byte=0x4B, bit=3, name="Jiggy: GI: Giant Fan", type="Jiggy"},
+	{byte=0x4B, bit=3, name="Jiggy: GI: Weldar", type="Jiggy"},
 	{byte=0x4B, bit=4, name="Jiggy: GI: ??? (3)", type="Jiggy"},
 	{byte=0x4B, bit=5, name="Jiggy: GI: ??? (4)", type="Jiggy"},
 	{byte=0x4B, bit=6, name="Jiggy: GI: ??? (5)", type="Jiggy"},
 	{byte=0x4B, bit=7, name="Jiggy: GI: ??? (6)", type="Jiggy"},
-	{byte=0x4C, bit=0, name="Jiggy: GI: ??? (7)", type="Jiggy"},
-	{byte=0x4C, bit=1, name="Jiggy: GI: ??? (8)", type="Jiggy"},
+	{byte=0x4C, bit=0, name="Jiggy: GI: Floor 1 Guarded", type="Jiggy"},
+	{byte=0x4C, bit=1, name="Jiggy: GI: Trash Compactor", type="Jiggy"},
 	{byte=0x4C, bit=2, name="Jiggy: GI: ??? (9)", type="Jiggy"},
 	{byte=0x4C, bit=3, name="Jiggy: GI: Waste Disposal Box", type="Jiggy"},
 	{byte=0x4C, bit=4, name="Jiggy: HFP: ??? (1)", type="Jiggy"},
@@ -1867,7 +1868,7 @@ local flag_array = {
 	{byte=0x4D, bit=5, name="Jiggy: HFP: Lava Waterfall", type="Jiggy"},
 	{byte=0x4D, bit=6, name="Jiggy: CCL: Mingy Jongo", type="Jiggy"},
 	{byte=0x4D, bit=7, name="Jiggy: CCL: ??? (2)", type="Jiggy"},
-	{byte=0x4E, bit=0, name="Jiggy: CCL: ??? (3)", type="Jiggy"},
+	{byte=0x4E, bit=0, name="Jiggy: CCL: Pot o' Gold", type="Jiggy"},
 	{byte=0x4E, bit=1, name="Jiggy: CCL: ??? (4)", type="Jiggy"},
 	{byte=0x4E, bit=2, name="Jiggy: CCL: ??? (5)", type="Jiggy"},
 	{byte=0x4E, bit=3, name="Jiggy: CCL: ??? (6)", type="Jiggy"},
@@ -1890,7 +1891,7 @@ local flag_array = {
 	-- 0x50 > 4 MT Jade Snake Grove Something
 	{byte=0x50, bit=5, name="MT: Gold Relic Jiggy Spawned", type="Physical"},
 	-- 0x50 > 6
-	-- 0x50 > 7
+	{byte=0x50, bit=7, name="GGM: Old King Coal Jiggy Spawned?", type="Physical"},
 	-- 0x51 > 0
 	-- 0x51 > 1
 	-- 0x51 > 2
@@ -1898,13 +1899,13 @@ local flag_array = {
 	-- 0x51 > 4
 	-- 0x51 > 5
 	-- 0x51 > 6
-	-- 0x51 > 7
+	{byte=0x51, bit=7, name="JRL: Merry Maggie Malpass Jiggy Spawned", type="Physical"},
 	-- 0x52 > 0
 	-- 0x52 > 1
 	-- 0x52 > 2
 	-- 0x52 > 3
 	-- 0x52 > 4
-	-- 0x52 > 5
+	{byte=0x52, bit=5, name="GGM: Dilberta Jiggy Spawned", type="Physical"},
 	-- 0x52 > 6
 	-- 0x52 > 7
 	-- 0x53 > 0
@@ -1912,13 +1913,13 @@ local flag_array = {
 	-- 0x53 > 2
 	-- 0x53 > 3
 	-- 0x53 > 4
-	-- 0x53 > 5
-	{byte=0x53, bit=6, name="FT Jiggy Collection??"},
+	{byte=0x53, bit=5, name="CCL: Pot o' Gold Jiggy Spawned", type="Physical"},
+	{byte=0x53, bit=6, name="FT Jiggy Collection??"}, -- King Jingaling Intro Jiggy Spawned?
 	-- 0x53 > 7
 	-- 0x54 > 0
 	-- 0x54 > 1
 	-- 0x54 > 2
-	-- 0x54 > 3
+	{byte=0x54, bit=3, name="JRL: UFO Jiggy Spawned?", type="Physical"},
 	-- 0x54 > 4
 	-- 0x54 > 5
 	-- 0x54 > 6
@@ -1943,28 +1944,28 @@ local flag_array = {
 	{byte=0x57, bit=1, name="Cheato Page: WW: ??? (1)", type="Cheato Page"},
 	{byte=0x57, bit=2, name="Cheato Page: WW: The Inferno (Van)", type="Cheato Page"},
 	{byte=0x57, bit=3, name="Cheato Page: WW: ??? (3)", type="Cheato Page"},
-	{byte=0x57, bit=4, name="Cheato Page: JRL: ??? (1)", type="Cheato Page"},
+	{byte=0x57, bit=4, name="Cheato Page: JRL: Pawno's", type="Cheato Page"},
 	{byte=0x57, bit=5, name="Cheato Page: JRL: ??? (2)", type="Cheato Page"},
 	{byte=0x57, bit=6, name="Cheato Page: JRL: Ancient Swimming Baths", type="Cheato Page"},
 	{byte=0x57, bit=7, name="Cheato Page: TDL: Dippy's Pool", type="Cheato Page"},
 	{byte=0x58, bit=0, name="Cheato Page: TDL: ??? (2)", type="Cheato Page"},
 	{byte=0x58, bit=1, name="Cheato Page: TDL: ??? (3)", type="Cheato Page"},
-	{byte=0x58, bit=2, name="Cheato Page: GI: ??? (1)", type="Cheato Page"},
+	{byte=0x58, bit=2, name="Cheato Page: GI: Loggo", type="Cheato Page"},
 	{byte=0x58, bit=3, name="Cheato Page: GI: ??? (2)", type="Cheato Page"},
-	{byte=0x58, bit=4, name="Cheato Page: GI: ??? (3)", type="Cheato Page"},
+	{byte=0x58, bit=4, name="Cheato Page: GI: Repair Depot", type="Cheato Page"},
 	{byte=0x58, bit=5, name="Cheato Page: HFP: Lava Side", type="Cheato Page"},
 	{byte=0x58, bit=6, name="Cheato Page: HFP: Icicle Grotto", type="Cheato Page"},
 	{byte=0x58, bit=7, name="Cheato Page: HFP: Icy Side", type="Cheato Page"},
 	{byte=0x59, bit=0, name="Cheato Page: CCL: ??? (1)", type="Cheato Page"},
-	{byte=0x59, bit=1, name="Cheato Page: CCL: ??? (2)", type="Cheato Page"},
+	{byte=0x59, bit=1, name="Cheato Page: CCL: Pot o' Gold", type="Cheato Page"},
 	{byte=0x59, bit=2, name="Cheato Page: CCL: ??? (3)", type="Cheato Page"},
 	{byte=0x59, bit=3, name="Cheato Page: Spiral Mountain", type="Cheato Page"},
-	-- 0x59 > 4
+	{byte=0x59, bit=4, name="JRL: Pawno's Cheato Page Spawned?", type="Physical"},
 	-- 0x59 > 5
 	-- 0x59 > 6
 	-- 0x59 > 7
-	-- 0x5A > 0
-	-- 0x5A > 1
+	{byte=0x5A, bit=0, name="CCL: Pot o' Gold Cheato Page Spawned", type="Physical"},
+	{byte=0x5A, bit=1, name="GI: Loggo Cheato Page Spawned", type="Physical"},
 	-- 0x5A > 2
 	-- 0x5A > 3
 	{byte=0x5A, bit=4, name="Targitzan Statue (1)", type="Targitzan Statue"},
@@ -2039,7 +2040,7 @@ local flag_array = {
 	-- 0x63 > 1
 	-- 0x63 > 2
 	-- 0x63 > 3
-	-- 0x63 > 4
+	{byte=0x63, bit=4, name="JRL: Jukebox is Broken FTT", type="FTT"},
 	-- 0x63 > 5
 	{byte=0x63, bit=6, name="Humba Wumba: Big T. Rex FTT", type="FTT"},
 	{byte=0x63, bit=7, name="Humba Wumba: Stony FTT", type="FTT"},
@@ -2108,11 +2109,11 @@ local flag_array = {
 	-- 0x6B > 6
 	{byte=0x6B, bit=7, name="Mumbo: Glowbo Paid (GI)", type="Glowbo Paid"},
 	{byte=0x6C, bit=0, name="CCL: Superstash FTT", type="FTT"},
-	-- 0x6C > 1
-	-- 0x6C > 2
-	-- 0x6C > 3
-	-- 0x6C > 4
-	-- 0x6C > 5
+	{byte=0x6C, bit=1, name="CCL: Superstash: 1 Switch Hit", type="Physical"},
+	{byte=0x6C, bit=2, name="CCL: Superstash: 9 Switch Hit", type="Physical"},
+	{byte=0x6C, bit=3, name="CCL: Superstash: 8 Switch Hit", type="Physical"},
+	{byte=0x6C, bit=4, name="CCL: Superstash: 4 Switch Hit", type="Physical"},
+	{byte=0x6C, bit=5, name="CCL: Superstash: Opened", type="Physical"},
 	-- 0x6C > 6
 	-- 0x6C > 7
 	-- 0x6D > 0
@@ -2142,7 +2143,7 @@ local flag_array = {
 	-- 0x70 > 0
 	-- 0x70 > 1
 	-- 0x70 > 2
-	-- 0x70 > 3
+	{byte=0x70, bit=3, name="JRL: UFO Door Smashed", type="Physical"},
 	{byte=0x70, bit=4, name="Warp: MT: World Entry And Exit", type="Warp"},
 	{byte=0x70, bit=5, name="Warp: MT: Outside Mumbo's Skull", type="Warp"},
 	{byte=0x70, bit=6, name="Warp: MT: Prison Compound", type="Warp"},
@@ -2242,8 +2243,10 @@ local flag_array = {
 	{byte=0x7C, bit=4, name="Jamjars First Time Text", type="FTT"},
 	-- 0x7C > 5
 	-- 0x7C > 6
-	-- 0x7C > 7
-	-- 0x7D > 0
+	-- 0x7C > 7 Jiggy Boulder Crushed?
+	{byte=0x7D, bit=0, name="GGM: Jiggy Boulder Piece Collected (1)", type="Physical"},
+	{byte=0x7D, bit=1, name="GGM: Jiggy Boulder Piece Collected (2)", type="Physical"},
+	{byte=0x7D, bit=2, name="GGM: Jiggy Boulder Piece Collected (3)", type="Physical"},
 	-- 0x7D > 1
 	-- 0x7D > 2
 	-- 0x7D > 3
@@ -2272,7 +2275,7 @@ local flag_array = {
 	-- 0x80 > 2
 	{byte=0x80, bit=2, name="Canary Mary Intro Cutscene", type="FTT"}, -- Canary Cave
 	-- 0x80 > 3
-	-- 0x80 > 4
+	{byte=0x80, bit=4, name="GI: Skivvy FTT", type="FTT"},
 	-- 0x80 > 5
 	-- 0x80 > 6
 	-- 0x80 > 7
@@ -2392,20 +2395,20 @@ local flag_array = {
 	{byte=0x8F, bit=1, name="Nest: TDL: ??? (15)", type="Nest"},
 	{byte=0x8F, bit=2, name="Nest: TDL: ??? (16)", type="Nest"},
 	{byte=0x8F, bit=3, name="Treble Clef: TDL", type="Treble Clef"},
-	{byte=0x8F, bit=4, name="Nest: GI: ??? (1)", type="Nest"},
-	{byte=0x8F, bit=5, name="Nest: GI: ??? (2)", type="Nest"},
-	{byte=0x8F, bit=6, name="Nest: GI: ??? (3)", type="Nest"},
-	{byte=0x8F, bit=7, name="Nest: GI: ??? (4)", type="Nest"},
-	{byte=0x90, bit=0, name="Nest: GI: ??? (5)", type="Nest"},
+	{byte=0x8F, bit=4, name="Nest: GI: Train Station (1)", type="Nest"},
+	{byte=0x8F, bit=5, name="Nest: GI: Train Station (2)", type="Nest"},
+	{byte=0x8F, bit=6, name="Nest: GI: Train Station (3)", type="Nest"},
+	{byte=0x8F, bit=7, name="Nest: GI: Floor 1 (1)", type="Nest"},
+	{byte=0x90, bit=0, name="Nest: GI: Floor 1 (2)", type="Nest"},
 	{byte=0x90, bit=1, name="Nest: GI: ??? (6)", type="Nest"},
 	{byte=0x90, bit=2, name="Nest: GI: ??? (7)", type="Nest"},
 	{byte=0x90, bit=3, name="Nest: GI: ??? (8)", type="Nest"},
 	{byte=0x90, bit=4, name="Nest: GI: ??? (9)", type="Nest"},
 	{byte=0x90, bit=5, name="Nest: GI: ??? (10)", type="Nest"},
-	{byte=0x90, bit=6, name="Nest: GI: ??? (11)", type="Nest"},
-	{byte=0x90, bit=7, name="Nest: GI: ??? (12)", type="Nest"},
-	{byte=0x91, bit=0, name="Nest: GI: ??? (13)", type="Nest"},
-	{byte=0x91, bit=1, name="Nest: GI: ??? (14)", type="Nest"},
+	{byte=0x90, bit=6, name="Nest: GI: Waste Disposal (1)", type="Nest"},
+	{byte=0x90, bit=7, name="Nest: GI: Waste Disposal (2)", type="Nest"},
+	{byte=0x91, bit=0, name="Nest: GI: Air Conditioning Plant (1)", type="Nest"},
+	{byte=0x91, bit=1, name="Nest: GI: Air Conditioning Plant (2)", type="Nest"},
 	{byte=0x91, bit=2, name="Nest: GI: ??? (15)", type="Nest"},
 	{byte=0x91, bit=3, name="Nest: GI: ??? (16)", type="Nest"},
 	{byte=0x91, bit=4, name="Treble Clef: GI", type="Treble Clef"},
@@ -2465,7 +2468,7 @@ local flag_array = {
 	-- 0x98 > 2
 	-- 0x98 > 3
 	-- 0x98 > 4
-	-- 0x98 > 5
+	{byte=0x98, bit=5, name="GGML: Levitate Chuffy (2)", type="Mumbo's Magic"},
 	-- 0x98 > 6
 	-- 0x98 > 7
 	-- 0x99 > 0
@@ -2479,19 +2482,19 @@ local flag_array = {
 	-- 0x9A > 0
 	-- 0x9A > 1
 	-- 0x9A > 2
-	-- 0x9A > 3
+	{byte=0x9A, bit=3, name="GGM: Crushing Shed Active? (1)"},
 	{byte=0x9A, bit=4, name="Mumbo's Magic: Levitate: Jiggy Boulder (Levitated?)", type="Mumbo's Magic"},
 	{byte=0x9A, bit=5, name="Mumbo's Magic: Levitate: Jiggy Boulder (Placed?)", type="Mumbo's Magic"},
 	-- 0x9A > 6
-	-- 0x9A > 7
-	-- 0x9B > 0
+	{byte=0x9A, bit=7, name="GGM: Crushing Shed Active? (2)"},
+	{byte=0x9B, bit=0, name="GGM: Jiggy Boulder Crushed?"},
 	-- 0x9B > 1
 	-- 0x9B > 2
-	-- 0x9B > 3
+	{byte=0x9B, bit=3, name="FT Enter Waterfall Cavern?"},
 	-- 0x9B > 4
 	{byte=0x9B, bit=5, name="First Time Mumbo in Wumba's Wigwam", type="FTT"},
 	{byte=0x9B, bit=6, name="First Time Jamjars Cutscene", type="FTT"},
-	-- 0x9B > 7
+	{byte=0x9B, bit=7, name="GGM: Canary Mary Freed (2)", type="Progress"},
 	-- 0x9C > 0
 	{byte=0x9C, bit=1, name="JRL: Underground Doubloon Spawned (1)", type="Physical"},
 	{byte=0x9C, bit=2, name="JRL: Underground Doubloon Spawned (2)", type="Physical"},
@@ -2504,11 +2507,11 @@ local flag_array = {
 	-- 0x9D > 1
 	-- 0x9D > 2
 	-- 0x9D > 3
-	-- 0x9D > 4
+	{byte=0x9D, bit=4, name="MT: Dilberta Boulder Drilled", type="Physical"},
 	-- 0x9D > 5
 	{byte=0x9D, bit=6, name="MT: Fly Pad Boulder Drilled", type="Physical"},
 	{byte=0x9D, bit=7, name="GGM: Ordnance Storage Boulder Drilled", type="Physical"},
-	-- 0x9E > 0
+	{byte=0x9E, bit=0, name="GGM: Boulder Drilled Near Prospector's Hut"},
 	{byte=0x9E, bit=1, name="GGM: Gloomy Caverns Entrance Boulder Drilled", type="Physical"},
 	{byte=0x9E, bit=2, name="GGM: Gloomy Caverns Boulder Drilled (1)", type="Physical"},
 	{byte=0x9E, bit=3, name="GGM: Gloomy Caverns Boulder Drilled (2)", type="Physical"},
@@ -2516,7 +2519,7 @@ local flag_array = {
 	-- 0x9E > 5
 	-- 0x9E > 6
 	-- 0x9E > 7
-	-- 0x9F > 0
+	{byte=0x9F, bit=0, name="GGM: Jinjo Boulder Drilled", type="Physical"},
 	-- 0x9F > 1
 	-- 0x9F > 2
 	-- 0x9F > 3
@@ -2548,26 +2551,26 @@ local flag_array = {
 	{byte=0xA2, bit=5, name="Cheat Active: Infinite Eggs And Feathers", type="Cheat"},
 	-- 0xA2 > 6
 	{byte=0xA2, bit=7, name="FT Enter Banjo's House"},
-	{byte=0xA3, bit=0, name="Klungo Potion Chosen??"},
+	{byte=0xA3, bit=0, name="FT Fight Klungo?"},
 	{byte=0xA3, bit=1, name="FT Enter MT"},
-	-- 0xA3 > 2 Targitzan Fight?
+	{byte=0xA3, bit=2, name="FT Fight Targitzan?"},
 	{byte=0xA3, bit=3, name="FT Enter GGM"},
 	-- 0xA3 > 4
-	-- 0xA3 > 5
+	{byte=0xA3, bit=5, name="GGM: FT Fight Old King Coal?"},
 	{byte=0xA3, bit=6, name="FT Enter WW"},
-	-- 0xA3 > 7
+	{byte=0xA3, bit=7, name="CCL: FT Attempt Pot o' Gold??"},
 	-- 0xA4 > 0
 	-- 0xA4 > 1
 	{byte=0xA4, bit=2, name="FT Enter JRL"},
 	-- 0xA4 > 3
-	-- 0xA4 > 4
-	-- 0xA4 > 5
+	{byte=0xA4, bit=4, name="JRL: FT Enter UFO"},
+	{byte=0xA4, bit=5, name="JRL: UFO Refuelled", type="Progress"},
 	-- 0xA4 > 6
 	-- 0xA4 > 7
 	{byte=0xA5, bit=0, name="FT Enter TDL"},
 	-- 0xA5 > 1
 	{byte=0xA5, bit=2, name="FT Enter GI"},
-	-- 0xA5 > 3
+	{byte=0xA5, bit=3, name="GI: FT Fight Weldar?"},
 	{byte=0xA5, bit=4, name="FT Enter HFP"},
 	-- 0xA5 > 5
 	{byte=0xA5, bit=6, name="FT Enter CCL"},
@@ -2576,7 +2579,7 @@ local flag_array = {
 	{byte=0xA6, bit=1, name="FT Enter CK"},
 	{byte=0xA6, bit=2, name="FT Enter ToT"},
 	{byte=0xA6, bit=3, name="FT Watch Fake Credits"},
-	-- 0xA6 > 4
+	{byte=0xA6, bit=4, name="FT Fight Hag 1?"},
 	{byte=0xA6, bit=5, name="FT Enter IoH"},
 	{byte=0xA6, bit=6, name="FT Enter Jinjo Village??"},
 	-- 0xA6 > 7
@@ -2589,7 +2592,7 @@ local flag_array = {
 	{byte=0xA7, bit=7, name="First Time Turbo Trainers"},
 	{byte=0xA8, bit=0, name="First Time Wading Boots"},
 	{byte=0xA8, bit=1, name="First Time Springy Step Shoes"},
-	-- 0xA8 > 2
+	{byte=0xA8, bit=2, name="First Time Claw Clamber Boots"},
 	{byte=0xA8, bit=3, name="First Time CWK Shot"},
 	{byte=0xA8, bit=4, name="First Boss Fight?"},
 	-- 0xA8 > 5
@@ -2605,7 +2608,7 @@ local flag_array = {
 	-- 0xA9 > 7
 	{byte=0xAA, bit=0, name="Bottles' Energy Restored", type="Progress"},
 	-- 0xAA > 1
-	-- 0xAA > 2
+	{byte=0xAA, bit=2, name="GGM: Canary Mary Freed (3)", type="Progress"},
 	-- 0xAA > 3
 	{byte=0xAA, bit=4, name="Mumbo's Magic: Summon: Golden Goliath", type="Mumbo's Magic"},
 	{byte=0xAA, bit=5, name="Mumbo's Magic: Enlarge: Wumba's Wigwam", type="Mumbo's Magic"}, -- FT only, this doesn't actually enlarge the Wigwam
@@ -3076,6 +3079,7 @@ object_model1 = {
 		[0x6B7] = "Mrs. Boggy",
 		[0x6BD] = "Bouncy Castle",
 		[0x6C3] = "Pawno",
+		[0x6C4] = "Cash Register", -- Pawno's Emporium
 		[0x6C7] = "Tiptup Jr.",
 		[0x6C8] = "Tiptup",
 		[0x6C9] = "Fruity",
@@ -3151,14 +3155,32 @@ object_model1 = {
 		[0x7F6] = "Alien Child (Blue)",
 		[0x7F7] = "Alien Child (Yellow)",
 		[0x7F9] = "Lord Woo Fak Fak",
+		[0x7FA] = "Baby T. Rex",
 		[0x7FC] = "Chilli Billi",
+		[0x7FD] = "Chilly Willy",
 		[0x7FE] = "Keelhaul",
 		[0x7FF] = "Guvnor", -- GI Worker Enemy
+		[0x800] = "Washing Machine",
 		[0x801] = "Cannon", -- Dragon Fights
+		[0x802] = "Skivvy", -- GI Worker
 		[0x803] = "Skivvy", -- GI Worker
-		[0x806] = "Germ",
+		[0x804] = "Germ", -- Green
+		[0x805] = "Germ", -- Red
+		[0x806] = "Germ", -- Blue
 		[0x807] = "Alien Dad",
 		[0x808] = "Guffo",
+		[0x809] = "Big T. Rex",
+		[0x80A] = "Clockwork Kazooie",
+		[0x80C] = "File Select (1)",
+		[0x80D] = "File Select (2)",
+		[0x80E] = "File Select (3)",
+		[0x80F] = "Camera",
+		[0x811] = "Honeycomb Television",
+		[0x812] = "N64 Console",
+		[0x817] = "Weldar",
+		[0x818] = "Flatso", -- Green
+		[0x819] = "Flatso", -- Blue
+		[0x81A] = "Flatso", -- Pink
 		[0x81C] = "Bigfoot",
 		[0x81E] = "Biggafoot",
 		[0x83D] = "Overalls", -- GI Worker
