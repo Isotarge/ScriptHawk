@@ -225,8 +225,8 @@ local Game = {
 
 		"!Crash 0x016B", "!Crash 0x016C", "!Crash 0x016D", "!Crash 0x016E",
 
-		"GGM - Testing 1",
-		"GGM - Testing 2",
+		"GGM - Canary Mary Race (1)",
+		"GGM - Canary Mary Race (2)",
 		"TDL - Mumbo's Skull",
 		"GI - Mumbo's Skull",
 		"SM - Banjo's House",
@@ -902,7 +902,7 @@ local movementStates = {
 	[0x73] = "Locked",
 	[0x74] = "Locked", -- Mumbo's Skull
 	[0x75] = "Locked", -- Signpost
-
+	[0x76] = "Locked", -- Flying
 	[0x77] = "Locked", -- Water Surface
 	[0x78] = "Locked", -- Underwater
 	[0x79] = "Locked", -- Talon Trot
@@ -1314,7 +1314,7 @@ local flag_array = {
 	-- 0x05 > 1 MT Prison Compound Something?
 	-- 0x05 > 2
 	-- 0x05 > 3
-	-- 0x05 > 4
+	{byte=0x05, bit=4, name="GGM: FT Detonator Talk To Canary Mary", type="FTT"},
 	{byte=0x05, bit=5, name="FT Enter Wumba's Wigwam Pine Grove", type="FTT"},
 	{byte=0x05, bit=6, name="Mega Glowbo"},
 	{byte=0x05, bit=7, name="First Time Minjo Aggro", type="FTT"},
@@ -1335,24 +1335,24 @@ local flag_array = {
 	{byte=0x07, bit=6, name="GGM: Canary Mary Freed (1)", type="Progress"},
 	{byte=0x07, bit=7, name="First Time Cheato Page", type="FTT"},
 	{byte=0x08, bit=0, name="Cheato FTT", type="FTT"},
-	-- 0x08 > 1
-	{byte=0x08, bit=2, name="Cheato Podium FTT", type="FTT"},
-	-- 0x08 > 3
-	-- 0x08 > 4
-	-- 0x08 > 5
-	-- 0x08 > 6
-	-- 0x08 > 7
-	-- 0x09 > 0
-	-- 0x09 > 1
-	-- 0x09 > 2
-	-- 0x09 > 3
-	-- 0x09 > 4
-	-- 0x09 > 5
-	-- 0x09 > 6
-	-- 0x09 > 7
-	-- 0x0A > 0
-	-- 0x0A > 1
-	-- 0x0A > 2
+	{byte=0x08, bit=1, name="Cheato: Code Chamber Clue Given", type="FTT"},
+	{byte=0x08, bit=2, name="Cheato: Podium FTT", type="FTT"},
+	{byte=0x08, bit=3, name="Cheato: Code Chamber Instructions Given", type="FTT"},
+	{byte=0x08, bit=4, name="Cheato: Feathers", type="Cheato"},
+	{byte=0x08, bit=5, name="Cheato: Eggs", type="Cheato"},
+	{byte=0x08, bit=6, name="Cheato: Fallproof", type="Cheato"},
+	{byte=0x08, bit=7, name="Cheato: Honeyback", type="Cheato"},
+	{byte=0x09, bit=0, name="Cheato: Jukebox", type="Cheato"},
+	{byte=0x09, bit=1, name="Cheat Available: Feathers", type="Cheat Available"},
+	{byte=0x09, bit=2, name="Cheat Available: Eggs", type="Cheat Available"},
+	{byte=0x09, bit=3, name="Cheat Available: Fallproof", type="Cheat Available"},
+	{byte=0x09, bit=4, name="Cheat Available: Honeyback", type="Cheat Available"},
+	{byte=0x09, bit=5, name="Cheat Available: Jukebox", type="Cheat Available"},
+	{byte=0x09, bit=6, name="Cheato: Getjiggy", type="Cheato"},
+	{byte=0x09, bit=7, name="Cheat Available: Getjiggy", type="Cheat Available"},
+	{byte=0x0A, bit=0, name="Cheat Available: Superbanjo", type="Cheat Available"},
+	{byte=0x0A, bit=1, name="Cheat Available: Superbaddy", type="Cheat Available"},
+	{byte=0x0A, bit=2, name="Cheat Available: Honeyking", type="Cheat Available"},
 	-- 0x0A > 3
 	-- 0x0A > 4
 	{byte=0x0A, bit=5, name="Mumbo FTT", type="FTT"},
@@ -1367,7 +1367,7 @@ local flag_array = {
 	{byte=0x0B, bit=6, name="GGM: Old King Coal Defeated?", type="Progress"},
 	-- 0x0B > 7
 	-- 0x0C > 0 Targitzan Fight?
-	-- 0x0C > 1
+	--{byte=0x0C, bit=1, name="WW: Dino Door Smashed?"},
 	-- 0x0C > 2
 	-- 0x0C > 3
 	-- 0x0C > 4
@@ -1381,9 +1381,9 @@ local flag_array = {
 	-- 0x0D > 4
 	{byte=0x0D, bit=5, name="GGM: Levitate Chuffy (1)", type="Mumbo's Magic"},
 	-- 0x0D > 6
-	-- 0x0D > 7
-	-- 0x0E > 0
-	-- 0x0E > 1
+	{byte=0x0D, bit=7, name="WW: Gobi Freed", type="Progress"},
+	--{byte=0x0E, bit=0, name="WW: Dino Door Smashed?"},
+	{byte=0x0E, bit=1, name="WW: Cave of Horrors: Jinjo Door Smashed", type="Physical"},
 	{byte=0x0E, bit=2, name="First Time Mumbo Pad Text", type="FTT"},
 	{byte=0x0E, bit=3, name="First Time Mumbo Pad Instructions", type="FTT"},
 	-- 0x0E > 4
@@ -1408,13 +1408,13 @@ local flag_array = {
 	-- 0x10 > 7
 	-- 0x11 > 0
 	{byte=0x11, bit=1, name="MT: Jade Snake Grove Door Smashed", type="Physical"},
-	-- 0x11 > 2
+	{byte=0x11, bit=2, name="WW: Crazy Castle Pump Activated", type="Physical"},
 	-- 0x11 > 3
 	{byte=0x11, bit=4, name="JRL: Pawno's Jiggy Purchased", type="Progress"},
 	{byte=0x11, bit=5, name="JRL: Pawno's Cheato Page Purchased", type="Progress"},
 	{byte=0x11, bit=6, name="JRL: UFO Leaves JRL", type="Progress"},
 	{byte=0x11, bit=7, name="Klungo 3 Something??"},
-	-- 0x12 > 0
+	{byte=0x12, bit=0, name="WW: Moggy FTT", type="FTT"},
 	-- 0x12 > 1
 	-- 0x12 > 2
 	-- 0x12 > 3
@@ -1584,7 +1584,7 @@ local flag_array = {
 	-- 0x26 > 7
 	-- 0x27 > 0
 	-- 0x27 > 1
-	-- 0x27 > 2
+	{byte=0x27, bit=2, name="WW: Pump Room Grate Smashed", type="Physical"},
 	-- 0x27 > 3
 	{byte=0x27, bit=4, name="Chuffy: TDL Station Open", type="Physical"},
 	{byte=0x27, bit=5, name="FT Doubloon Collection", type="FTT"},
@@ -1625,7 +1625,7 @@ local flag_array = {
 	-- 0x2C > 0
 	-- 0x2C > 1
 	{byte=0x2C, bit=2, name="TDL: Wigwam Enlarged", type="Physical"},
-	{byte=0x2C, bit=3, name="MR: Treasure Chamber Open", type="Physical"},
+	{byte=0x2C, bit=3, name="MT: Treasure Chamber Open", type="Physical"},
 	{byte=0x2C, bit=4, name="GI: Weldar Defeated", type="Progress"},
 	-- 0x2C > 5
 	{byte=0x2C, bit=6, name="GI: Toxic Waste Pool Raised", type="Physical"},
@@ -1659,8 +1659,8 @@ local flag_array = {
 	-- 0x30 > 2
 	{byte=0x30, bit=3, name="GI: Main Entrance Open", type="Physical"},
 	{byte=0x30, bit=4, name="CK: Dingpot FTT", type="FTT"},
-	-- 0x30 > 5
-	-- 0x30 > 6
+	{byte=0x30, bit=5, name="WW: First Time Enter Hoop Hurry"},
+	{byte=0x30, bit=6, name="WW: First Time Enter Balloon Burst"},
 	-- 0x30 > 7
 	{byte=0x31, bit=0, name="GI: Toxic Waste Plant Battery?", type="Progress"},
 	-- 0x31 > 1
@@ -1833,7 +1833,7 @@ local flag_array = {
 	{byte=0x46, bit=0, name="Jiggy: MT: Top of Temple", type="Jiggy"},
 	{byte=0x46, bit=1, name="Jiggy: MT: Ssslumber", type="Jiggy"},
 	{byte=0x46, bit=2, name="Jiggy: GGM: Old King Coal", type="Jiggy"},
-	{byte=0x46, bit=3, name="Jiggy: GGM: ??? (2)", type="Jiggy"},
+	{byte=0x46, bit=3, name="Jiggy: GGM: Canary Mary Race", type="Jiggy"},
 	{byte=0x46, bit=4, name="Jiggy: GGM: Generator Cavern", type="Jiggy"},
 	{byte=0x46, bit=5, name="Jiggy: GGM: Waterfall Cavern", type="Jiggy"},
 	{byte=0x46, bit=6, name="Jiggy: GGM: Ordnance Storage", type="Jiggy"},
@@ -1842,16 +1842,16 @@ local flag_array = {
 	{byte=0x47, bit=1, name="Jiggy: GGM: Waterfall", type="Jiggy"},
 	{byte=0x47, bit=2, name="Jiggy: GGM: Power Hut Basement", type="Jiggy"},
 	{byte=0x47, bit=3, name="Jiggy: GGM: Flooded Caves", type="Jiggy"},
-	{byte=0x47, bit=4, name="Jiggy: WW: ??? (1)", type="Jiggy"},
+	{byte=0x47, bit=4, name="Jiggy: WW: Hoop Hurry", type="Jiggy"},
 	{byte=0x47, bit=5, name="Jiggy: WW: ??? (2)", type="Jiggy"},
 	{byte=0x47, bit=6, name="Jiggy: WW: ??? (3)", type="Jiggy"},
 	{byte=0x47, bit=7, name="Jiggy: WW: ??? (4)", type="Jiggy"},
-	{byte=0x48, bit=0, name="Jiggy: WW: ??? (5)", type="Jiggy"},
+	{byte=0x48, bit=0, name="Jiggy: WW: Balloon Burst", type="Jiggy"},
 	{byte=0x48, bit=1, name="Jiggy: WW: Dive of Death", type="Jiggy"},
 	{byte=0x48, bit=2, name="Jiggy: WW: ??? (7)", type="Jiggy"},
 	{byte=0x48, bit=3, name="Jiggy: WW: Star Spinner", type="Jiggy"},
 	{byte=0x48, bit=4, name="Jiggy: WW: The Inferno", type="Jiggy"},
-	{byte=0x48, bit=5, name="Jiggy: WW: ??? (10)", type="Jiggy"},
+	{byte=0x48, bit=5, name="Jiggy: WW: Cactus of Strength", type="Jiggy"},
 	{byte=0x48, bit=6, name="Jiggy: JRL: ??? (1)", type="Jiggy"},
 	{byte=0x48, bit=7, name="Jiggy: JRL: ??? (2)", type="Jiggy"},
 	{byte=0x49, bit=0, name="Jiggy: JRL: ??? (3)", type="Jiggy"},
@@ -1916,14 +1916,14 @@ local flag_array = {
 	-- 0x50 > 3
 	-- 0x50 > 4 MT Jade Snake Grove Something
 	{byte=0x50, bit=5, name="MT: Gold Relic Jiggy Spawned", type="Physical"},
-	-- 0x50 > 6
+	{byte=0x50, bit=6, name="GGM: Canary Mary Jiggy Spawned", type="Physical"},
 	{byte=0x50, bit=7, name="GGM: Old King Coal Jiggy Spawned?", type="Physical"},
 	-- 0x51 > 0
 	-- 0x51 > 1
 	-- 0x51 > 2
 	-- 0x51 > 3
-	-- 0x51 > 4
-	-- 0x51 > 5
+	{byte=0x51, bit=0, name="WW: Cactus of Strength Jiggy Spawned", type="Physical"},
+	{byte=0x51, bit=5, name="WW: Hoop Hurry Jiggy Spawned", type="Physical"},
 	-- 0x51 > 6
 	{byte=0x51, bit=7, name="JRL: Merry Maggie Malpass Jiggy Spawned", type="Physical"},
 	-- 0x52 > 0
@@ -1952,7 +1952,7 @@ local flag_array = {
 	-- 0x54 > 7 Set and cleared upon entering/exiting CCL overworld
 	{byte=0x55, bit=0, name="CCL: Mingy Jongo Defeated", type="Progress"},
 	-- 0x55 > 1
-	-- 0x55 > 2
+	{byte=0x55, bit=2, name="WW: Balloon Burst Jiggy Spawned", type="Physical"},
 	-- 0x55 > 3
 	-- 0x55 > 4
 	-- 0x55 > 5
@@ -1964,7 +1964,7 @@ local flag_array = {
 	{byte=0x56, bit=3, name="Cheato Page: MT: Snake Heads", type="Cheato Page"},
 	{byte=0x56, bit=4, name="Cheato Page: MT: Prison Compound", type="Cheato Page"},
 	{byte=0x56, bit=5, name="Cheato Page: MT: Jade Snake Grove", type="Cheato Page"},
-	{byte=0x56, bit=6, name="Cheato Page: GGM: ??? (1)", type="Cheato Page"},
+	{byte=0x56, bit=6, name="Cheato Page: GGM: Canary Mary Race", type="Cheato Page"},
 	{byte=0x56, bit=7, name="Cheato Page: GGM: Level Entrance", type="Cheato Page"},
 	{byte=0x57, bit=0, name="Cheato Page: GGM: Water Storage", type="Cheato Page"},
 	{byte=0x57, bit=1, name="Cheato Page: WW: ??? (1)", type="Cheato Page"},
@@ -1989,7 +1989,7 @@ local flag_array = {
 	{byte=0x59, bit=4, name="JRL: Pawno's Cheato Page Spawned?", type="Physical"},
 	-- 0x59 > 5
 	-- 0x59 > 6
-	-- 0x59 > 7
+	{byte=0x59, bit=7, name="GGM: Canary Mary Cheato Page Spawned", type="Physical"},
 	{byte=0x5A, bit=0, name="CCL: Pot o' Gold Cheato Page Spawned", type="Physical"},
 	{byte=0x5A, bit=1, name="GI: Loggo Cheato Page Spawned", type="Physical"},
 	-- 0x5A > 2
@@ -2089,7 +2089,7 @@ local flag_array = {
 	-- 0x66 > 0
 	-- 0x66 > 1
 	-- 0x66 > 2
-	-- 0x66 > 3
+	{byte=0x66, bit=3, name="IoH: Jiggywiggy's Temple Intro Cutscene", type="FTT"},
 	-- 0x66 > 4
 	-- 0x66 > 5
 	-- 0x66 > 6
@@ -2235,7 +2235,7 @@ local flag_array = {
 	{byte=0x78, bit=2, name="IoH: Pine Grove Door Open", type="Physical"},
 	-- 0x78 > 3
 	{byte=0x78, bit=4, name="Ability: Dragon Kazooie", type="Ability"},
-	-- 0x78 > 5
+	{byte=0x78, bit=5, name="IoH: Disciple of Jiggywiggy FTT", type="FTT"},
 	{byte=0x78, bit=6, name="First Warp Available", type="FTT"},
 	-- 0x78 > 7
 	{byte=0x79, bit=0, name="IoH: Pine Grove: Kazooie Boulder Smashed", type="Physical"},
@@ -2521,7 +2521,7 @@ local flag_array = {
 	{byte=0x9B, bit=5, name="First Time Mumbo in Wumba's Wigwam", type="FTT"},
 	{byte=0x9B, bit=6, name="First Time Jamjars Cutscene", type="FTT"},
 	{byte=0x9B, bit=7, name="GGM: Canary Mary Freed (2)", type="Progress"},
-	-- 0x9C > 0
+	{byte=0x9C, bit=0, name="GGM: Canary Mary Race Intro FTT", type="FTT"},
 	{byte=0x9C, bit=1, name="JRL: Underground Doubloon Spawned (1)", type="Physical"},
 	{byte=0x9C, bit=2, name="JRL: Underground Doubloon Spawned (2)", type="Physical"},
 	{byte=0x9C, bit=3, name="JRL: Underground Doubloon Spawned (3)", type="Physical"},
@@ -2563,8 +2563,8 @@ local flag_array = {
 	-- 0xA0 > 7
 	-- 0xA1 > 0
 	-- 0xA1 > 1
-	-- 0xA1 > 2
-	-- 0xA1 > 3
+	{byte=0xA1, bit=2, name="IoH: Jiggywiggy's Temple FT Open?", type="FTT"},
+	{byte=0xA1, bit=3, name="IoH: Jiggywiggy's Temple Podium Instructions", type="FTT"},
 	{byte=0xA1, bit=4, name="Cheat Active: Double Maximum Feathers", type="Cheat"},
 	{byte=0xA1, bit=5, name="Cheat Active: Double Maximum Eggs", type="Cheat"},
 	{byte=0xA1, bit=6, name="Cheat Active: No Energy Loss From Falling", type="Cheat"},
@@ -2581,7 +2581,7 @@ local flag_array = {
 	{byte=0xA3, bit=1, name="FT Enter MT"},
 	{byte=0xA3, bit=2, name="FT Fight Targitzan?"},
 	{byte=0xA3, bit=3, name="FT Enter GGM"},
-	-- 0xA3 > 4
+	{byte=0xA3, bit=4, name="GGM: FT Enter Canary Race"},
 	{byte=0xA3, bit=5, name="GGM: FT Fight Old King Coal?"},
 	{byte=0xA3, bit=6, name="FT Enter WW"},
 	{byte=0xA3, bit=7, name="CCL: FT Attempt Pot o' Gold??"},
@@ -2621,7 +2621,7 @@ local flag_array = {
 	{byte=0xA8, bit=2, name="First Time Claw Clamber Boots"},
 	{byte=0xA8, bit=3, name="First Time CWK Shot"},
 	{byte=0xA8, bit=4, name="First Boss Fight?"},
-	-- 0xA8 > 5
+	{byte=0xA7, bit=5, name="IoH: First Time Enter Jiggywiggy's Temple"},
 	-- 0xA8 > 6
 	-- 0xA8 > 7
 	-- 0xA9 > 0
