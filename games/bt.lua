@@ -322,6 +322,27 @@ local Game = {
 	max_rot_units = 360,
 };
 
+function checksumToString(checksum)
+	return toHexString(checksum[1], 8)..toHexString(checksum[2], 8, "");
+end
+
+function readChecksum(address)
+	return {memory.read_u32_be(address, "EEPROM"), memory.read_u32_be(address + 4, "EEPROM")};
+end
+
+function checksumsMatch(checksum1, checksum2)
+	return checksum1[1] == checksum2[1] and checksum1[2] == checksum2[2];
+end
+
+local eep_checksum = {
+	{ address = 0x78, value = {0, 0} }, -- Global Flags (1)
+	{ address = 0xF8, value = {0, 0} }, -- Global Flags (2)
+	{ address = 0x2B8, value = {0, 0} }, -- Save Slot 1
+	{ address = 0x478, value = {0, 0} }, -- Save Slot 2
+	{ address = 0x638, value = {0, 0} }, -- Save Slot 3
+	{ address = 0x7F8, value = {0, 0} }, -- Save Slot 4
+};
+
 --------------------
 -- Region/Version --
 --------------------
@@ -337,6 +358,11 @@ function Game.detectVersion(romName, romHash)
 		version = 4;
 	else
 		return false;
+	end
+
+	-- Read EEPROM checksums
+	for i = 1, #eep_checksum do
+		eep_checksum[i].value = readChecksum(eep_checksum[i].address);
 	end
 
 	return true;
@@ -3576,6 +3602,20 @@ function Game.eachFrame()
 	end
 	if encircle_enabled then
 		encircle_banjo();
+	end
+
+	-- Check EEPROM checksums
+	local checksum_value, checksum_value_2;
+	for i = 1, #eep_checksum do
+		checksum_value = readChecksum(eep_checksum[i].address);
+		if not checksumsMatch(checksum_value, eep_checksum[i].value) then
+			if i > 2 then
+				print("Slot "..(i - 2).." Checksum: "..checksumToString(eep_checksum[i].value).." -> "..checksumToString(checksum_value));
+			else
+				print("Global Flags "..i.." Checksum: "..checksumToString(eep_checksum[i].value).." -> "..checksumToString(checksum_value));
+			end
+			eep_checksum[i].value = checksum_value;
+		end
 	end
 end
 
