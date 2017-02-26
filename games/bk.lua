@@ -330,8 +330,9 @@ function Game.detectVersion(romName, romHash)
 		print("Warning: No flags found");
 		flag_names = {"None"};
 	end
-
+	
 	return true;
+	
 end
 
 function Game.getGroundState()
@@ -481,7 +482,7 @@ slot_variables = {
 	},
 	--]]
 	
-	[0xBC] = {["Type"] = "u32_be", ["Name"] = "Spawn Actor ID"}, -- TODO: Better name for this, lifted from Runehero's C source
+	[0xBC] = {["Type"] = "u32_be", ["Name"] = "Spawn Index"},
 
 	[0xEB] = {["Type"] = "Byte", ["Name"] = "Flag 2"}, -- TODO: Better name for this, lifted from Runehero's C source
 	[0xEC] = {["Type"] = "Float", ["Name"] = "AnimationTimer_Copy"},
@@ -506,6 +507,7 @@ slot_variables = {
 	[0x14C] = {["Type"] = "Pointer", ["Name"] = "Bone Array 1 Pointer"},
 	[0x150] = {["Type"] = "Pointer", ["Name"] = "Bone Array 2 Pointer"},
 };
+local slot_variables_inv = {};
 
 
 
@@ -2093,9 +2095,9 @@ function zipToSelectedObject()
 		if isRDRAM(objectArray) then
 			local slotBase = objectArray + getSlotBase(object_index - 1);
 
-			local x = mainmemory.readfloat(slotBase + 0x04, true); -- TODO: Get these constants from somewhere
-			local y = mainmemory.readfloat(slotBase + 0x08, true);
-			local z = mainmemory.readfloat(slotBase + 0x0C, true);
+			local x = mainmemory.readfloat(slotBase + slot_variables_inv["X"], true);
+			local y = mainmemory.readfloat(slotBase + slot_variables_inv["Y"], true);
+			local z = mainmemory.readfloat(slotBase + slot_variables_inv["Z"], true);
 
 			Game.setXPosition(x);
 			Game.setYPosition(y);
@@ -2292,8 +2294,8 @@ function Game.drawUI()
 			end
 
 			if animationType == "Unknown" then
-				local boneArray1 = dereferencePointer(currentSlotBase + 0x14C); -- TODO: Get this constant from variable name somehow
-				local boneArray2 = dereferencePointer(currentSlotBase + 0x150);
+				local boneArray1 = dereferencePointer(currentSlotBase + slot_variables_inv["Bone Array 1 Pointer"]);
+				local boneArray2 = dereferencePointer(currentSlotBase + slot_variables_inv["Bone Array 2 Pointer"]);
 				if not hide_non_animated or (isRDRAM(boneArray1) or isRDRAM(boneArray2)) then
 					gui.text(Game.OSDPosition[1], 2 + Game.OSDRowHeight * row, i..": "..toHexString(currentSlotBase or 0), color, 'bottomright');
 					row = row + 1;
@@ -2778,11 +2780,6 @@ y_stagger_amount = 10;
 -- Relative to objectArray
 local max_slots = 0x100;
 radius = 1000;
-
--- Relative to slot
-local slot_x_pos = 0x04; -- TODO: These are in slot_vars now
-local slot_y_pos = 0x08;
-local slot_z_pos = 0x0C;
 
 local function encircle_banjo()
 	local current_banjo_x = Game.getXPosition();
@@ -3319,6 +3316,20 @@ function Game.initUI()
 	-- Moves
 	ScriptHawk.UI.form_controls.moves_dropdown = forms.dropdown(ScriptHawk.UI.options_form, { "4. None", "3. SM 100%", "2. FFM Setup", "1. All", "0. Demo" }, ScriptHawk.UI.col(10) + ScriptHawk.UI.dropdown_offset, ScriptHawk.UI.row(5) + ScriptHawk.UI.dropdown_offset, ScriptHawk.UI.col(4) + 8, ScriptHawk.UI.button_height);
 	ScriptHawk.UI.form_controls.moves_button = forms.button(ScriptHawk.UI.options_form, "Unlock Moves", unlock_moves, ScriptHawk.UI.col(10), ScriptHawk.UI.row(6), ScriptHawk.UI.col(4) + 8, ScriptHawk.UI.button_height);
+
+	--Create Inverse Object_Slot_Variables
+	for k,v in pairs(slot_variables) do
+		if v["Name"] then
+			if type(v["Name"]) == 'table' then
+				for l,w in pairs(v["Name"]) do
+					slot_variables_inv[v["Name"][l]] = k;
+				end
+			else
+				slot_variables_inv[v["Name"]] = k;
+			end
+		end
+	end
+	
 end
 
 function Game.eachFrame()
