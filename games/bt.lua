@@ -115,7 +115,7 @@ local Game = {
 		"GI",
 		"GI - Floor 1",
 		"GI - Train Station",
-		"GI - Workers Quarters",
+		"GI - Workers' Quarters",
 		"GI - Trash Compactor",
 		"GI - Elevator shaft",
 		"GI - Floor 2",
@@ -133,8 +133,8 @@ local Game = {
 		"TDL",
 		"TDL - Terry's Nest",
 		"TDL - Train Station",
-		"TDL - Oogle Boogles cave",
-		"TDL - Inside the mountain",
+		"TDL - Oogle Boogles' Cave",
+		"TDL - Inside the Mountain",
 		"TDL - River Passage",
 		"TDL - Styracosaurus Family Cave",
 		"TDL - Unga Bunga's Cave",
@@ -170,7 +170,7 @@ local Game = {
 		"CCL",
 		"CCL - Inside the Trash Can",
 		"CCL - Inside the Cheese Wedge",
-		"CCL - Zubba's Nest",
+		"CCL - Zubbas' Nest",
 		"CCL - Central Cavern",
 		"WW - Crazy Castle Stockade (Saucer)",
 		"WW - Star Spinner (Saucer)",
@@ -253,7 +253,7 @@ local Game = {
 		"CCL - Trash Can Mini",
 		"WW - Dodgems",
 		"GI - Sewer Entrance",
-		"CCL - Zubba's Nest (multiplayer)",
+		"CCL - Zubbas' Nest (multiplayer)",
 
 		"!Crash 0x0189",
 
@@ -295,6 +295,7 @@ local Game = {
 		["object_array_pointer"] = {0x13BBD0, 0x13BE60, 0x131020, 0x136EE0},
 		["player_pointer"] = {0x13A210, 0x13A4A0, 0x12F660, 0x135490},
 		["player_pointer_index"] = {0x13A25F, 0x13A4EF, 0x12F6AF, 0x1354DF},
+		["global_flag_base"] = {0x131500, 0x131790, 0x126950, 0x12C780},
 		["flag_block_pointer"] = {0x1314F0, 0x131780, 0x126940, 0x12C770},
 		["air"] = {0x12FDC0, 0x12FFD0, 0x125220, 0x12B050},
 		["frame_timer"] = {0x083550, 0x083550, 0x0788F8, 0x079138},
@@ -1262,11 +1263,89 @@ end
 -- Flags --
 -----------
 
+local global_flag_block_cache = {};
 local flag_block_cache = {};
 function clearFlagCache()
+	global_flag_block_cache = {};
 	flag_block_cache = {};
 end
 event.onloadstate(clearFlagCache, "ScriptHawk - Clear Flag Cache");
+
+local global_flag_block_size = 0x10;
+local global_flag_array = {
+	-- 0x00 > 0
+	{byte=0x00, bit=1, name="Widescreen Enabled"},
+	{byte=0x00, bit=2, name="Screen Alignment X", ignore=true},
+	{byte=0x00, bit=3, name="Screen Alignment X", ignore=true},
+	{byte=0x00, bit=4, name="Screen Alignment X", ignore=true},
+	{byte=0x00, bit=5, name="Screen Alignment X", ignore=true},
+	{byte=0x00, bit=6, name="Screen Alignment X", ignore=true},
+	{byte=0x00, bit=7, name="Screen Alignment X", ignore=true},
+	{byte=0x01, bit=0, name="Screen Alignment Y", ignore=true},
+	{byte=0x01, bit=1, name="Screen Alignment Y", ignore=true},
+	{byte=0x01, bit=2, name="Screen Alignment Y", ignore=true},
+	{byte=0x01, bit=3, name="Screen Alignment Y", ignore=true},
+	{byte=0x01, bit=4, name="Screen Alignment Y", ignore=true},
+	{byte=0x01, bit=5, name="Screen Alignment Y", ignore=true},
+	{byte=0x01, bit=6, name="Screen Alignment Y", ignore=true},
+	{byte=0x01, bit=7, name="Screen Alignment Y", ignore=true},
+	{byte=0x02, bit=0, name="Boss Replay: Klungo 1", type="Boss Replay"},
+	{byte=0x02, bit=1, name="Boss Replay: Klungo 2", type="Boss Replay"},
+	{byte=0x02, bit=2, name="Boss Replay: Klungo 3", type="Boss Replay"},
+	{byte=0x02, bit=3, name="Boss Replay: Targitzan", type="Boss Replay"},
+	{byte=0x02, bit=4, name="Boss Replay: Old King Coal", type="Boss Replay"},
+	{byte=0x02, bit=5, name="Boss Replay: Mr. Patch", type="Boss Replay"},
+	{byte=0x02, bit=6, name="Boss Replay: Lord Woo Fak Fak", type="Boss Replay"},
+	{byte=0x02, bit=7, name="Boss Replay: Terry", type="Boss Replay"},
+	{byte=0x03, bit=0, name="Boss Replay: Weldar", type="Boss Replay"},
+	{byte=0x03, bit=1, name="Boss Replay: Chilly Willy", type="Boss Replay"},
+	{byte=0x03, bit=2, name="Boss Replay: Chilli Billi", type="Boss Replay"},
+	{byte=0x03, bit=3, name="Boss Replay: Mingy Jongo", type="Boss Replay"},
+	{byte=0x03, bit=4, name="Boss Replay: Hag 1", type="Boss Replay"},
+	-- 0x03 > 5
+	-- 0x03 > 6
+	-- 0x03 > 7
+	-- 0x04 > 0
+	-- 0x04 > 1
+	-- 0x04 > 2
+	-- 0x04 > 3
+	-- 0x04 > 4
+	-- 0x04 > 5
+	-- 0x04 > 6
+	-- 0x04 > 7
+	-- 0x05 > 0
+	-- 0x05 > 1
+	-- 0x05 > 2
+	{byte=0x05, bit=3, name="Minigame Replay: Mayan Kickball (Quarterfinal)", type="Minigame Replay"},
+	{byte=0x05, bit=4, name="Minigame Replay: Mayan Kickball (Semifinal)", type="Minigame Replay"},
+	{byte=0x05, bit=5, name="Minigame Replay: Mayan Kickball (Final)", type="Minigame Replay"},
+	{byte=0x05, bit=6, name="Minigame Replay: Ordnance Storage", type="Minigame Replay"},
+	{byte=0x05, bit=7, name="Minigame Replay: Dodgems Challenge (1-on-1)", type="Minigame Replay"},
+	{byte=0x06, bit=0, name="Minigame Replay: Dodgems Challenge (2-on-1)", type="Minigame Replay"},
+	{byte=0x06, bit=1, name="Minigame Replay: Dodgems Challenge (3-on-1)", type="Minigame Replay"},
+	{byte=0x06, bit=2, name="Minigame Replay: Hoop Hurry Challenge", type="Minigame Replay"},
+	{byte=0x06, bit=3, name="Minigame Replay: Balloon Burst Challenge", type="Minigame Replay"},
+	{byte=0x06, bit=4, name="Minigame Replay: Saucer of Peril Ride", type="Minigame Replay"},
+	{byte=0x06, bit=5, name="Minigame Replay: Mini-Sub Challenge", type="Minigame Replay"},
+	{byte=0x06, bit=6, name="Minigame Replay: Chompa's Belly", type="Minigame Replay"},
+	{byte=0x06, bit=7, name="Minigame Replay: Clinker's Cavern", type="Minigame Replay"},
+	{byte=0x07, bit=0, name="Minigame Replay: Twinklies Packing", type="Minigame Replay"},
+	{byte=0x07, bit=1, name="Minigame Replay: Colosseum Kickball (Quarterfinal)", type="Minigame Replay"},
+	{byte=0x07, bit=2, name="Minigame Replay: Colosseum Kickball (Semifinal)", type="Minigame Replay"},
+	{byte=0x07, bit=3, name="Minigame Replay: Colosseum Kickball (Final)", type="Minigame Replay"},
+	{byte=0x07, bit=4, name="Minigame Replay: Pot o' Gold", type="Minigame Replay"},
+	{byte=0x07, bit=5, name="Minigame Replay: Trash Can Germs", type="Minigame Replay"},
+	{byte=0x07, bit=6, name="Minigame Replay: Zubbas' Hive", type="Minigame Replay"},
+	{byte=0x07, bit=7, name="Minigame Replay: Tower of Tragedy Quiz (Round 1)", type="Minigame Replay"},
+	{byte=0x08, bit=0, name="Minigame Replay: Tower of Tragedy Quiz (Round 2)", type="Minigame Replay"},
+	{byte=0x08, bit=1, name="Minigame Replay: Tower of Tragedy Quiz (Round 3)", type="Minigame Replay"},
+	{byte=0x08, bit=2, name="Cinema Replay: Opening Story", type="Cinema Replay"},
+	{byte=0x08, bit=3, name="Cinema Replay: King Jingaling Gets Zapped", type="Cinema Replay"},
+	{byte=0x08, bit=4, name="Cinema Replay: Bottles and Jingaling Restored", type="Cinema Replay"},
+	{byte=0x08, bit=5, name="Cinema Replay: Grunty Defeated", type="Cinema Replay"},
+	{byte=0x08, bit=6, name="Cinema Replay: Credits", type="Cinema Replay"},
+	{byte=0x08, bit=7, name="Cinema Replay: Character Parade", type="Cinema Replay"},
+};
 
 local flag_block_size = 0xB0;
 local flag_array = {
@@ -1967,33 +2046,33 @@ local flag_array = {
 	{byte=0x56, bit=6, name="Cheato Page: GGM: Canary Mary Race", type="Cheato Page"},
 	{byte=0x56, bit=7, name="Cheato Page: GGM: Level Entrance", type="Cheato Page"},
 	{byte=0x57, bit=0, name="Cheato Page: GGM: Water Storage", type="Cheato Page"},
-	{byte=0x57, bit=1, name="Cheato Page: WW: ??? (1)", type="Cheato Page"},
+	{byte=0x57, bit=1, name="Cheato Page: WW: Haunted Cavern", type="Cheato Page"},
 	{byte=0x57, bit=2, name="Cheato Page: WW: The Inferno (Van)", type="Cheato Page"},
-	{byte=0x57, bit=3, name="Cheato Page: WW: ??? (3)", type="Cheato Page"},
+	{byte=0x57, bit=3, name="Cheato Page: WW: Saucer of Peril", type="Cheato Page"},
 	{byte=0x57, bit=4, name="Cheato Page: JRL: Pawno's", type="Cheato Page"},
-	{byte=0x57, bit=5, name="Cheato Page: JRL: ??? (2)", type="Cheato Page"},
+	{byte=0x57, bit=5, name="Cheato Page: JRL: Seemee", type="Cheato Page"},
 	{byte=0x57, bit=6, name="Cheato Page: JRL: Ancient Swimming Baths", type="Cheato Page"},
 	{byte=0x57, bit=7, name="Cheato Page: TDL: Dippy's Pool", type="Cheato Page"},
-	{byte=0x58, bit=0, name="Cheato Page: TDL: ??? (2)", type="Cheato Page"},
-	{byte=0x58, bit=1, name="Cheato Page: TDL: ??? (3)", type="Cheato Page"},
+	{byte=0x58, bit=0, name="Cheato Page: TDL: Inside the Mountain", type="Cheato Page"},
+	{byte=0x58, bit=1, name="Cheato Page: TDL: Boulder", type="Cheato Page"},
 	{byte=0x58, bit=2, name="Cheato Page: GI: Loggo", type="Cheato Page"},
-	{byte=0x58, bit=3, name="Cheato Page: GI: ??? (2)", type="Cheato Page"},
+	{byte=0x58, bit=3, name="Cheato Page: GI: Floor 2", type="Cheato Page"},
 	{byte=0x58, bit=4, name="Cheato Page: GI: Repair Depot", type="Cheato Page"},
 	{byte=0x58, bit=5, name="Cheato Page: HFP: Lava Side", type="Cheato Page"},
 	{byte=0x58, bit=6, name="Cheato Page: HFP: Icicle Grotto", type="Cheato Page"},
 	{byte=0x58, bit=7, name="Cheato Page: HFP: Icy Side", type="Cheato Page"},
-	{byte=0x59, bit=0, name="Cheato Page: CCL: ??? (1)", type="Cheato Page"},
+	{byte=0x59, bit=0, name="Cheato Page: CCL: Canary Mary", type="Cheato Page"},
 	{byte=0x59, bit=1, name="Cheato Page: CCL: Pot o' Gold", type="Cheato Page"},
-	{byte=0x59, bit=2, name="Cheato Page: CCL: ??? (3)", type="Cheato Page"},
+	{byte=0x59, bit=2, name="Cheato Page: CCL: Zubbas' Nest", type="Cheato Page"},
 	{byte=0x59, bit=3, name="Cheato Page: Spiral Mountain", type="Cheato Page"},
 	{byte=0x59, bit=4, name="JRL: Pawno's Cheato Page Spawned?", type="Physical"},
 	-- 0x59 > 5
-	-- 0x59 > 6
+	{byte=0x59, bit=6, name="WW: Saucer of Peril Cheato Page Spawned", type="Physical"},
 	{byte=0x59, bit=7, name="GGM: Canary Mary Cheato Page Spawned", type="Physical"},
 	{byte=0x5A, bit=0, name="CCL: Pot o' Gold Cheato Page Spawned", type="Physical"},
 	{byte=0x5A, bit=1, name="GI: Loggo Cheato Page Spawned", type="Physical"},
-	-- 0x5A > 2
-	-- 0x5A > 3
+	{byte=0x5A, bit=2, name="CCL: Zubbas' Nest Cheato Page Spawned", type="Physical"},
+	{byte=0x5A, bit=3, name="CCL: Canary Mary Cheato Page Spawned", type="Physical"},
 	{byte=0x5A, bit=4, name="Targitzan Statue (1)", type="Targitzan Statue"},
 	{byte=0x5A, bit=5, name="Targitzan Statue (2)", type="Targitzan Statue"},
 	{byte=0x5A, bit=6, name="Targitzan Statue (3)", type="Targitzan Statue"},
@@ -2682,11 +2761,18 @@ local flag_array = {
 	-- 0xAF > 7
 };
 
+local global_flag_names = {};
 local flag_names = {};
 
 for i = 1, #flag_array do
 	if not flag_array[i].ignore then
 		flag_names[i] = flag_array[i].name;
+	end
+end
+
+for i = 1, #global_flag_array do
+	if not global_flag_array[i].ignore then
+		global_flag_names[i] = global_flag_array[i].name;
 	end
 end
 
@@ -3021,6 +3107,86 @@ end
 
 local function flagCheckButtonHandler()
 	checkFlag(forms.getproperty(ScriptHawk.UI.form_controls["Flag Dropdown"], "SelectedItem"));
+end
+
+------------------
+-- Global Flags --
+------------------
+
+function isKnown(byte, bit)
+	for i = 1, #global_flag_array do
+		if global_flag_array[i].byte == byte and global_flag_array[i].bit == bit then
+			return true;
+		end
+	end
+	return false;
+end
+
+function getGlobalFlag(byte, bit)
+	for i = 1, #global_flag_array do
+		if byte == global_flag_array[i].byte and bit == global_flag_array[i].bit then
+			return global_flag_array[i];
+		end
+	end
+end
+
+function setGlobalFlag(byte, bit)
+	if type(byte) == "number" and type(bit) == "number" and bit >= 0 and bit < 8 then
+		local flags = Game.Memory.global_flag_base[version];
+		if isRDRAM(flags) then
+			currentValue = mainmemory.readbyte(flags + byte);
+			mainmemory.writebyte(flags + byte, set_bit(currentValue, bit));
+		end
+	end
+end
+
+function clearGlobalFlag(byte, bit)
+	if type(byte) == "number" and type(bit) == "number" and bit >= 0 and bit < 8 then
+		local flags = Game.Memory.global_flag_base[version];
+		if isRDRAM(flags) then
+			currentValue = mainmemory.readbyte(flags + byte);
+			mainmemory.writebyte(flags + byte, clear_bit(currentValue, bit));
+		end
+	end
+end
+
+function getGlobalFlagName(byte, bit)
+	for i = 1, #global_flag_array do
+		if byte == global_flag_array[i].byte and bit == global_flag_array[i].bit and not global_flag_array[i].ignore then
+			return global_flag_array[i].name;
+		end
+	end
+	return "Unknown at "..toHexString(byte)..">"..bit;
+end
+
+function checkGlobalFlags()
+	local flagBlock = Game.Memory.global_flag_base[version];
+	for byte = 0, global_flag_block_size - 1 do
+		local currentValue = mainmemory.readbyte(flagBlock + byte);
+		local previousValue = global_flag_block_cache[byte];
+		if previousValue == nil then
+			previousValue = currentValue;
+		end
+		for bit = 0, 7 do
+			local isSet = check_bit(currentValue, bit);
+			local wasSet = check_bit(previousValue, bit);
+			local flag = getGlobalFlag(byte, bit);
+			local ignore = type(flag) == "table" and flag.ignore;
+			if not ignore then
+				if isSet and not wasSet then
+					if isKnownGlobal(byte, bit) then
+						dprint("Global Flag "..toHexString(byte, 2)..">"..bit..": \""..getGlobalFlagName(byte, bit).."\" was set on frame "..emu.framecount());
+					else
+						dprint("{byte="..toHexString(byte, 2)..", bit="..bit..", name=\"Name\"}, (GLOBAL)");
+					end
+				elseif not isSet and wasSet then
+					dprint("Global Flag "..toHexString(byte, 2)..">"..bit..": \""..getGlobalFlagName(byte, bit).."\" was cleared on frame "..emu.framecount());
+				end
+			end
+		end
+		global_flag_block_cache[byte] = currentValue;
+	end
+	print_deferred();
 end
 
 --------------------
@@ -3599,6 +3765,7 @@ function Game.eachFrame()
 	end
 	if realtime_flags then
 		checkFlags();
+		checkGlobalFlags();
 	end
 	if encircle_enabled then
 		encircle_banjo();
