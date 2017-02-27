@@ -1,5 +1,6 @@
 #ScriptHawk TODO list
 ##High Priority
+- Hotkey for onMouseScrollUp/Down
 - Save and Load settings from a config file on disk
 	- Joypad/Keyboard binds for D-Pad and L Button
 	- Rounding precision
