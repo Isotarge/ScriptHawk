@@ -1076,7 +1076,7 @@ obj_model1 = {
 		[0x6F] = "Updraft", -- Castle tower
 		[0x70] = "GB Dance",
 		[0x71] = "Key Dance",
-
+		[0x72] = "Crown Dance",
 		[0x73] = "Loss Dance",
 		[0x74] = "Victory Dance",
 		[0x75] = "Vehicle", -- Castle Car Race

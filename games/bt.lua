@@ -3113,7 +3113,7 @@ end
 -- Global Flags --
 ------------------
 
-function isKnown(byte, bit)
+function isKnownGlobal(byte, bit)
 	for i = 1, #global_flag_array do
 		if global_flag_array[i].byte == byte and global_flag_array[i].bit == bit then
 			return true;
