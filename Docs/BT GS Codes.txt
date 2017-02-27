@@ -54,21 +54,21 @@ Australia (not yet tested)
 [JINJO MANIPULATION FILE USED IN THE 3 MAJOR CATEGORIES]
 Created by Isotarge
 
-US:
+USA
 8112C7F0 0000
 8112C7F2 0006
 
-JP:
+Japan
 811269C0 0000
 811269C2 0006
 
-AUS:
-81131570 0000
-81131572 0006
-
-PAL:
+Europe
 81131800 0000
 81131802 0006
+
+Australia
+81131570 0000
+81131572 0006
 
 Note: Do NOT do a run with these cheats active. It locks the RNG. This is only useful for getting a Jinjo Manipulation file.
 
