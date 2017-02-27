@@ -1302,9 +1302,9 @@ local global_flag_array = {
 	{byte=0x03, bit=2, name="Boss Replay: Chilli Billi", type="Boss Replay"},
 	{byte=0x03, bit=3, name="Boss Replay: Mingy Jongo", type="Boss Replay"},
 	{byte=0x03, bit=4, name="Boss Replay: Hag 1", type="Boss Replay"},
-	-- 0x03 > 5
-	-- 0x03 > 6
-	-- 0x03 > 7
+	-- 0x03 > 5 ???
+	-- 0x03 > 6 ???
+	-- 0x03 > 7 ???
 	-- 0x04 > 0
 	-- 0x04 > 1
 	-- 0x04 > 2
@@ -1313,9 +1313,9 @@ local global_flag_array = {
 	-- 0x04 > 5
 	-- 0x04 > 6
 	-- 0x04 > 7
-	-- 0x05 > 0
-	-- 0x05 > 1
-	-- 0x05 > 2
+	-- 0x05 > 0 ???
+	-- 0x05 > 1 ???
+	-- 0x05 > 2 ???
 	{byte=0x05, bit=3, name="Minigame Replay: Mayan Kickball (Quarterfinal)", type="Minigame Replay"},
 	{byte=0x05, bit=4, name="Minigame Replay: Mayan Kickball (Semifinal)", type="Minigame Replay"},
 	{byte=0x05, bit=5, name="Minigame Replay: Mayan Kickball (Final)", type="Minigame Replay"},
@@ -1345,6 +1345,41 @@ local global_flag_array = {
 	{byte=0x08, bit=5, name="Cinema Replay: Grunty Defeated", type="Cinema Replay"},
 	{byte=0x08, bit=6, name="Cinema Replay: Credits", type="Cinema Replay"},
 	{byte=0x08, bit=7, name="Cinema Replay: Character Parade", type="Cinema Replay"},
+	-- 0x09 > 0
+	-- 0x09 > 1
+	-- 0x09 > 2
+	-- 0x09 > 3
+	-- 0x09 > 4
+	-- 0x09 > 5
+	-- 0x09 > 6
+	-- 0x09 > 7
+	-- 0x0A > 0
+	-- 0x0A > 1
+	-- 0x0A > 2
+	{byte=0x0A, bit=3, name="Jinjo in Multiplayer"},
+	-- 0x0A > 4
+	-- 0x0A > 5
+	-- 0x0A > 6
+	-- 0x0A > 7
+	-- 0x0B > 0
+	-- 0x0B > 1
+	-- 0x0B > 2
+	-- 0x0B > 3
+	-- 0x0B > 4
+	-- 0x0B > 5
+	-- 0x0B > 6
+	-- 0x0B > 7
+	-- 0x0C > 0
+	{byte=0x0C, bit=1, name="Screen Scale", ignore=true},
+	{byte=0x0C, bit=2, name="Screen Scale", ignore=true},
+	{byte=0x0C, bit=3, name="Screen Scale", ignore=true},
+	{byte=0x0C, bit=4, name="Screen Scale", ignore=true},
+	{byte=0x0C, bit=5, name="Screen Scale", ignore=true},
+	{byte=0x0C, bit=7, name="Screen Scale", ignore=true},
+	{byte=0x0D, bit=0, name="Screen Scale", ignore=true},
+	{byte=0x0D, bit=1, name="Screen Scale", ignore=true},
+	{byte=0x0D, bit=2, name="Screen Scale", ignore=true},
+	{byte=0x0D, bit=3, name="Screen Scale", ignore=true},
 };
 
 local flag_block_size = 0xB0;
