@@ -1,0 +1,102 @@
+[LOCK UNNEEDED REPLAY MENU OPTIONS]
+Created by Isotarge with help from TJ and Mittenz
+
+The replay menu state that this code provides is as follows:
+
+Mini-Game:
+- ToT 1
+- ToT 2
+- ToT 3
+
+Boss:
+- Klungo 1
+- Klungo 2
+- Klungo 3
+- Hag 1
+
+Cinema:
+- Opening Story
+- King Jingaling Gets Zapped
+- Credits
+
+This setup is suitable for Any%, 100%, and Cheato% with the current routes
+
+To force the game to save this menu setup to EEPROM:
+1. Toggle widescreen on
+2. Exit settings menu
+3. Toggle widescreen off
+4. Exiting settings menu
+
+USA
+8112C782 07F0
+8012C785 0007
+8112C786 0080
+8012C788 004F
+
+Japan (not yet tested)
+81126952 07F0
+80126955 0007
+81126956 0080
+80126958 004F
+
+Europe (not yet tested)
+81131792 07F0
+80131795 0007
+81131796 0080
+80131798 004F
+
+Australia (not yet tested)
+81131502 07F0
+80131505 0007
+81131506 0080
+80131508 004F
+
+[JINJO MANIPULATION FILE USED IN THE 3 MAJOR CATEGORIES]
+Created by Isotarge
+
+US:
+8112C7F0 0000
+8112C7F2 0006
+
+JP:
+811269C0 0000
+811269C2 0006
+
+AUS:
+81131570 0000
+81131572 0006
+
+PAL:
+81131800 0000
+81131802 0006
+
+Note: Do NOT do a run with these cheats active. It locks the RNG. This is only useful for getting a Jinjo Manipulation file.
+
+----------------------------------
+-- Technical details below here --
+----------------------------------
+
+0x2 > 0 Klungo 1
+0x2 > 1 Klungo 2
+0x2 > 2 Klungo 3
+
+0x3 > 4 Hag 1
+
+0x7 > 7 ToT 1
+
+0x8 > 0 ToT 2
+0x8 > 1 ToT 3
+0x8 > 2 Opening Story
+0x8 > 3 King Jingaling Gets Zapped
+0x8 > 6 Credits
+
+Mingy Jongo Legit
+
+Opening Story
+King Jingaling Gets Zapped
+Klungo 1
+Klungo 2
+Mingy Jongo
+
+TODO: All Honeycombs
+Mingy
