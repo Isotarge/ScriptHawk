@@ -5215,6 +5215,9 @@ local function zipToSelectedObject()
 	end
 end
 
+ScriptHawk.bindMouse("mousewheelup", decrementObjectIndex);
+ScriptHawk.bindMouse("mousewheeldown", incrementObjectIndex);
+
 ScriptHawk.bindKeyRealtime("N", decrementObjectIndex, true);
 ScriptHawk.bindKeyRealtime("M", incrementObjectIndex, true);
 ScriptHawk.bindKeyRealtime("Z", zipToSelectedObject, true);
@@ -6146,7 +6149,7 @@ function Game.drawUI()
 	if isInSubGame() then
 		drawSubGameHitboxes();
 	else
-		drawObjectPositions();
+		--drawObjectPositions(); -- TODO: Get the Y position working properly for this
 	end
 
 	if version ~= 4 then

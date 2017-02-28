@@ -33,11 +33,26 @@ lips = require "lips.init";
 -- Keybind framework --
 -----------------------
 
+local mouse_state = {
+	previous = {},
+	current = {},
+};
+local joypad_pressed = {};
+local lbutton_pressed = false;
+local dpad_pressed = {
+	up = false,
+	down = false,
+	left = false,
+	right = false
+};
+
 ScriptHawk.keybindsFrame = {};
 ScriptHawk.keybindsRealtime = {};
 
 ScriptHawk.joypadBindsFrame = {};
 ScriptHawk.joypadBindsRealtime = {};
+
+ScriptHawk.mouseBinds = {};
 
 function ScriptHawk.bind(keybindArray, key, callback, preventHold)
 	if type(keybindArray) == "table" and type(key) == "string" and type(callback) == "function" then
@@ -62,6 +77,10 @@ end
 
 function ScriptHawk.bindJoypadRealtime(key, callback, preventHold)
 	ScriptHawk.bind(ScriptHawk.joypadBindsRealtime, key, callback, preventHold);
+end
+
+function ScriptHawk.bindMouse(key, callback)
+	ScriptHawk.bind(ScriptHawk.mouseBinds, key, callback);
 end
 
 function ScriptHawk.unbind(keybinds, key)
@@ -100,6 +119,26 @@ function ScriptHawk.processJoypadBinds(joypadBinds)
 			joypadBind.pressed = true;
 		end
 	end
+end
+
+function ScriptHawk.processMouseBinds(mouseBinds)
+	mouse_state.current = input.getmouse();
+	if type(mouse_state.current.Wheel) == "number" and type(mouse_state.previous.Wheel) == "number" then
+		if mouse_state.current.Wheel > mouse_state.previous.Wheel then
+			for i = 1, #mouseBinds do
+				if mouseBinds[i].key == "mousewheelup" then
+					mouseBinds[i].callback();
+				end
+			end
+		elseif mouse_state.current.Wheel < mouse_state.previous.Wheel then
+			for i = 1, #mouseBinds do
+				if mouseBinds[i].key == "mousewheeldown" then
+					mouseBinds[i].callback();
+				end
+			end
+		end
+	end
+	mouse_state.previous = mouse_state.current;
 end
 
 -- Default to N64 binds
@@ -925,15 +964,6 @@ local function rotate(axis, amount)
 	end
 end
 
-local joypad_pressed = {};
-local lbutton_pressed = false;
-local dpad_pressed = {
-	up = false,
-	down = false,
-	left = false,
-	right = false
-};
-
 local function mainloop()
 	if TASSafe then
 		return; -- If we're in TAS mode, don't even bother checking DPad/L inputs
@@ -1318,6 +1348,7 @@ if not TASSafe then
 		end
 		ScriptHawk.processKeybinds(ScriptHawk.keybindsRealtime);
 		ScriptHawk.processJoypadBinds(ScriptHawk.joypadBindsRealtime);
+		ScriptHawk.processMouseBinds(ScriptHawk.mouseBinds);
 		Game.realTime();
 		emu.yield();
 	end

@@ -57,6 +57,7 @@ if result == true then
 		end
 		ScriptHawk.processKeybinds(ScriptHawk.keybindsRealtime);
 		ScriptHawk.processJoypadBinds(ScriptHawk.joypadBindsRealtime);
+		ScriptHawk.processMouseBinds(ScriptHawk.mouseBinds);
 		Game.realTime();
 		emu.yield();
 	end
