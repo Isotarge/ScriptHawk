@@ -26,7 +26,7 @@ To force the game to save this menu setup to EEPROM:
 1. Toggle widescreen on
 2. Exit settings menu
 3. Toggle widescreen off
-4. Exiting settings menu
+4. Exit settings menu
 
 USA
 8112C782 07F0
@@ -34,19 +34,19 @@ USA
 8112C786 0080
 8012C788 005F
 
-Japan (not yet tested)
+Japan
 81126952 07F0
 80126955 0007
 81126956 0080
 80126958 005F
 
-Europe (not yet tested)
+Europe
 81131792 07F0
 80131795 0007
 81131796 0080
 80131798 005F
 
-Australia (not yet tested)
+Australia
 81131502 07F0
 80131505 0007
 81131506 0080
