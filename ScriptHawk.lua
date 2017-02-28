@@ -125,17 +125,19 @@ function ScriptHawk.processMouseBinds(mouseBinds)
 	mouse_state.current = input.getmouse();
 	if type(mouse_state.current.Wheel) == "number" and type(mouse_state.previous.Wheel) == "number" then
 		if mouse_state.current.Wheel > mouse_state.previous.Wheel then
-			for i = 1, #mouseBinds do
-				if mouseBinds[i].key == "mousewheelup" then
-					mouseBinds[i].callback();
-				end
-			end
+			mouse_state.current.mousewheelup = true;
+			mouse_state.current.mousewheeldown = false;
 		elseif mouse_state.current.Wheel < mouse_state.previous.Wheel then
-			for i = 1, #mouseBinds do
-				if mouseBinds[i].key == "mousewheeldown" then
-					mouseBinds[i].callback();
-				end
-			end
+			mouse_state.current.mousewheelup = false;
+			mouse_state.current.mousewheeldown = true;
+		end
+	else
+		mouse_state.current.mousewheelup = false;
+		mouse_state.current.mousewheeldown = false;
+	end
+	for i = 1, #mouseBinds do
+		if mouse_state.current[mouseBinds[i].key] then
+			mouseBinds[i].callback();
 		end
 	end
 	mouse_state.previous = mouse_state.current;
