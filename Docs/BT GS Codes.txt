@@ -17,6 +17,7 @@ Boss:
 Cinema:
 - Opening Story
 - King Jingaling Gets Zapped
+- Bottles and Jingaling Restored
 - Credits
 
 This setup is suitable for Any%, 100%, and Cheato% with the current routes
@@ -31,25 +32,25 @@ USA
 8112C782 07F0
 8012C785 0007
 8112C786 0080
-8012C788 004F
+8012C788 005F
 
 Japan (not yet tested)
 81126952 07F0
 80126955 0007
 81126956 0080
-80126958 004F
+80126958 005F
 
 Europe (not yet tested)
 81131792 07F0
 80131795 0007
 81131796 0080
-80131798 004F
+80131798 005F
 
 Australia (not yet tested)
 81131502 07F0
 80131505 0007
 81131506 0080
-80131508 004F
+80131508 005F
 
 [JINJO MANIPULATION FILE USED IN THE 3 MAJOR CATEGORIES]
 Created by Isotarge
@@ -88,6 +89,7 @@ Note: Do NOT do a run with these cheats active. It locks the RNG. This is only u
 0x8 > 1 ToT 3
 0x8 > 2 Opening Story
 0x8 > 3 King Jingaling Gets Zapped
+0x8 > 4 Bottles and Jingaling Restored
 0x8 > 6 Credits
 
 Mingy Jongo Legit
