@@ -925,6 +925,7 @@ local function rotate(axis, amount)
 	end
 end
 
+local joypad_pressed = {};
 local lbutton_pressed = false;
 local dpad_pressed = {
 	up = false,

@@ -3807,7 +3807,7 @@ function Game.eachFrame()
 	end
 
 	-- Check EEPROM checksums
-	local checksum_value, checksum_value_2;
+	local checksum_value;
 	for i = 1, #eep_checksum do
 		checksum_value = readChecksum(eep_checksum[i].address);
 		if not checksumsMatch(checksum_value, eep_checksum[i].value) then

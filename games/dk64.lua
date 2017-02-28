@@ -2496,7 +2496,7 @@ function dumpModel2Positions()
 	local objModel2Array = dereferencePointer(Game.Memory.obj_model2_array_pointer[version]);
 	if isRDRAM(objModel2Array) then
 		local numSlots = mainmemory.read_u32_be(Game.Memory.obj_model2_array_count[version]);
-		local scriptName, slotBase, currentValue, activationScript;
+		local scriptName, slotBase;
 		-- Fill and sort pointer list
 		for i = 0, numSlots - 1 do
 			slotBase = objModel2Array + i * obj_model2_slot_size;
@@ -2969,13 +2969,15 @@ end
 
 function checkFlags(showKnown)
 	local flags = Game.getFlagBlockAddress();
+	local flagBlock = mainmemory.readbyterange(flags, flag_block_size + 1);
 
-	if #flag_block_cache > 0 then
+	if #flag_block_cache == flag_block_size then
 		local flagFound = false;
 		local knownFlagsFound = 0;
+		local currentValue, previousValue;
 
 		for i = 0, #flag_block_cache do
-			currentValue = mainmemory.readbyte(flags + i);
+			currentValue = flagBlock[i];
 			previousValue = flag_block_cache[i];
 			if currentValue ~= previousValue then
 				for bit = 0, 7 do
@@ -2990,9 +2992,9 @@ function checkFlags(showKnown)
 								local currentFlag = getFlag(i, bit);
 								if not currentFlag.ignore then
 									if currentFlag.map ~= nil or currentFlag.nomap == true then
-										dprint("Flag "..toHexString(i, 2)..">"..bit..": \""..getFlagName(i, bit).."\" was set on frame "..emu.framecount());
+										dprint("Flag "..toHexString(i, 2)..">"..bit..": \""..currentFlag.name.."\" was set on frame "..emu.framecount());
 									else
-										dprint("Flag "..toHexString(i, 2)..">"..bit..": \""..getFlagName(i, bit).."\" was set on frame "..emu.framecount().." ADD MAP "..map_value.." PLEASE");
+										dprint("Flag "..toHexString(i, 2)..">"..bit..": \""..currentFlag.name.."\" was set on frame "..emu.framecount().." ADD MAP "..map_value.." PLEASE");
 									end
 								end
 							end
@@ -3003,17 +3005,15 @@ function checkFlags(showKnown)
 							dprint("Flag "..toHexString(i, 2)..">"..bit..": \"Unknown\" was cleared on frame "..emu.framecount());
 						elseif showKnown then
 							local currentFlag = getFlag(i, bit);
-							if type(currentFlag) == "table" and not currentFlag.ignore then
-								dprint("Flag "..toHexString(i, 2)..">"..bit..": \""..getFlagName(i, bit).."\" was cleared on frame "..emu.framecount());
+							if not currentFlag.ignore then
+								dprint("Flag "..toHexString(i, 2)..">"..bit..": \""..currentFlag.name.."\" was cleared on frame "..emu.framecount());
 							end
 						end
 					end
 				end
-
-				-- Update entry in cache
-				flag_block_cache[i] = currentValue;
 			end
 		end
+		flag_block_cache = flagBlock;
 		if not showKnown then
 			if knownFlagsFound > 0 then
 				dprint(knownFlagsFound.." Known flags skipped");
@@ -3023,10 +3023,7 @@ function checkFlags(showKnown)
 			end
 		end
 	else
-		-- Fill flag block cache
-		for i = 0, flag_block_size do
-			flag_block_cache[i] = mainmemory.readbyte(flags + i);
-		end
+		flag_block_cache = flagBlock;
 		dprint("Populated flag block cache");
 	end
 	print_deferred();
@@ -3531,7 +3528,7 @@ end
 -- Chunk Deload --
 ------------------
 
-chunkSize = 0x1C8;
+local chunkSize = 0x1C8;
 chunk = {
 	["visible"] = 0x05, -- Byte, 0x02 = visible, everything else = invisible
 	["deload1"] = 0x68, -- u32_be
@@ -6566,6 +6563,7 @@ function Game.eachFrame()
 
 	-- Check EEPROM checksums
 	local slotChanged = false;
+	local checksum_value;
 	for i = 1, #eep_checksum do
 		checksum_value = memory.read_u32_be(eep_checksum[i].address, "EEPROM");
 		if eep_checksum[i].value ~= checksum_value then

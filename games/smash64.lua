@@ -248,6 +248,12 @@ local player_fields = {
 		["ShieldRadius"] = 0x74, -- Float
 	},
 	["CameraZoom"] = 0x864, -- Float
+	-- 0xA28 = Flash State Pointer? (Pointer)
+	-- 0xA2B = Flash State Index? (Byte)
+	-- 0xA68 = Flash Color Red (Byte)
+	-- 0xA69 = Flash Color Green (Byte)
+	-- 0xA6A = Flash Color Blue (Byte)
+	-- 0xA6B = Flash Color Alpha (Byte)
 	["ShieldJump_FrameDelayCounter"] = 0xB1C, -- 4 Bytes
 	["ShowHitbox"] = 0xB4C, -- u32_be
 };
