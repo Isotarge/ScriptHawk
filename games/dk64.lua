@@ -12,8 +12,9 @@ displacement_detection = false;
 enable_phase = false; -- To enable the phase glitches on Europe and Japan set this to true
 encircle_enabled = false;
 force_tbs = false;
+never_slip = false;
 object_model2_filter = nil; -- String, see obj_model2.object_types
-realtime_flags = true;
+paper_mode = false;
 
 -- TODO: Need to put some grab script state up here because encircle uses it before they would normally be defined
 -- This can probably be fixed with a clever reshuffle of grab script state/functions
@@ -2642,7 +2643,6 @@ function Game.detectVersion(romName, romHash)
 		MJ_offsets["blue_switch_position"]    = 0x6D;
 	elseif romHash == "B4717E602F07CA9BE0D4822813C658CD8B99F993" then -- Kiosk
 		version = 4;
-		realtime_flags = false;
 		-- flag_array = require("games.dk64_flags_Kiosk"); -- TODO: Flags?
 
 		-- Kiosk specific Object Model 1 offsets
@@ -4679,6 +4679,9 @@ end
 -- BRB Stuff --
 ---------------
 
+brb_message = "BRB";
+is_brb = false;
+
 local japan_charset = {
 --   0    1    2    3    4    5    6    7    8    9
 	"\0", "\0", "$", "(", ")", "\0", "%", "「", "」", "`", -- 0
@@ -4732,9 +4735,6 @@ function Game.toJapaneseString(value)
 	return tempString;
 end
 
-brb_message = "BRB";
-is_brb = false;
-
 function brb(value)
 	local message = value or "BRB";
 	if version == 3 then -- Japan
@@ -4755,14 +4755,12 @@ function back()
 end
 
 local function doBRB()
-	if is_brb then
-		mainmemory.writebyte(Game.Memory.security_byte[version], 0x01);
-		local messageLength = math.min(string.len(brb_message), 79); -- 79 bytes appears to be the maximum length we can write here without crashing
-		for i = 1, messageLength do
-			mainmemory.writebyte(Game.Memory.security_message[version] + i - 1, string.byte(brb_message, i));
-		end
-		mainmemory.writebyte(Game.Memory.security_message[version] + messageLength, 0x00);
+	mainmemory.writebyte(Game.Memory.security_byte[version], 0x01);
+	local messageLength = math.min(string.len(brb_message), 79); -- 79 bytes appears to be the maximum length we can write here without crashing
+	for i = 1, messageLength do
+		mainmemory.writebyte(Game.Memory.security_message[version] + i - 1, string.byte(brb_message, i));
 	end
+	mainmemory.writebyte(Game.Memory.security_message[version] + messageLength, 0x00);
 end
 
 -------------------
@@ -5674,10 +5672,14 @@ end
 
 function Game.initUI()
 	-- Flag stuff
-	ScriptHawk.UI.form_controls["Flag Dropdown"] = forms.dropdown(ScriptHawk.UI.options_form, flag_names, ScriptHawk.UI.col(0) + ScriptHawk.UI.dropdown_offset, ScriptHawk.UI.row(7) + ScriptHawk.UI.dropdown_offset, ScriptHawk.UI.col(9) + 8, ScriptHawk.UI.button_height);
-	ScriptHawk.UI.form_controls["Set Flag Button"] = forms.button(ScriptHawk.UI.options_form, "Set", flagSetButtonHandler, ScriptHawk.UI.col(10), ScriptHawk.UI.row(7), 46, ScriptHawk.UI.button_height);
-	ScriptHawk.UI.form_controls["Check Flag Button"] = forms.button(ScriptHawk.UI.options_form, "Check", flagCheckButtonHandler, ScriptHawk.UI.col(12), ScriptHawk.UI.row(7), 46, ScriptHawk.UI.button_height);
-	ScriptHawk.UI.form_controls["Clear Flag Button"] = forms.button(ScriptHawk.UI.options_form, "Clear", flagClearButtonHandler, ScriptHawk.UI.col(14), ScriptHawk.UI.row(7), 46, ScriptHawk.UI.button_height);
+	if version < 4 then
+		ScriptHawk.UI.form_controls["Flag Dropdown"] = forms.dropdown(ScriptHawk.UI.options_form, flag_names, ScriptHawk.UI.col(0) + ScriptHawk.UI.dropdown_offset, ScriptHawk.UI.row(7) + ScriptHawk.UI.dropdown_offset, ScriptHawk.UI.col(9) + 8, ScriptHawk.UI.button_height);
+		ScriptHawk.UI.form_controls["Set Flag Button"] = forms.button(ScriptHawk.UI.options_form, "Set", flagSetButtonHandler, ScriptHawk.UI.col(10), ScriptHawk.UI.row(7), 46, ScriptHawk.UI.button_height);
+		ScriptHawk.UI.form_controls["Check Flag Button"] = forms.button(ScriptHawk.UI.options_form, "Check", flagCheckButtonHandler, ScriptHawk.UI.col(12), ScriptHawk.UI.row(7), 46, ScriptHawk.UI.button_height);
+		ScriptHawk.UI.form_controls["Clear Flag Button"] = forms.button(ScriptHawk.UI.options_form, "Clear", flagClearButtonHandler, ScriptHawk.UI.col(14), ScriptHawk.UI.row(7), 46, ScriptHawk.UI.button_height);
+		ScriptHawk.UI.form_controls["realtime_flags"] = forms.checkbox(ScriptHawk.UI.options_form, "Realtime Flags", ScriptHawk.UI.col(10) + ScriptHawk.UI.dropdown_offset, ScriptHawk.UI.row(6) + ScriptHawk.UI.dropdown_offset);
+		forms.setproperty(ScriptHawk.UI.form_controls.realtime_flags, "Checked", true);
+	end
 
 	-- Moon stuff
 	ScriptHawk.UI.form_controls["Moon Mode Label"] = forms.label(ScriptHawk.UI.options_form, "Moon:", ScriptHawk.UI.col(10), ScriptHawk.UI.row(2) + ScriptHawk.UI.label_offset, 48, ScriptHawk.UI.button_height);
@@ -5708,9 +5710,9 @@ function Game.initUI()
 
 	-- Checkboxes
 	ScriptHawk.UI.form_controls["Toggle Homing Ammo Checkbox"] = forms.checkbox(ScriptHawk.UI.options_form, "Homing Ammo", ScriptHawk.UI.col(0) + ScriptHawk.UI.dropdown_offset, ScriptHawk.UI.row(6) + ScriptHawk.UI.dropdown_offset);
-	ScriptHawk.UI.form_controls["Toggle Noclip Checkbox"] = forms.checkbox(ScriptHawk.UI.options_form, "Noclip", ScriptHawk.UI.col(10) + ScriptHawk.UI.dropdown_offset, ScriptHawk.UI.row(6) + ScriptHawk.UI.dropdown_offset);
+	ScriptHawk.UI.form_controls["Toggle Noclip Checkbox"] = forms.checkbox(ScriptHawk.UI.options_form, "Noclip", ScriptHawk.UI.col(5) + ScriptHawk.UI.dropdown_offset, ScriptHawk.UI.row(5) + ScriptHawk.UI.dropdown_offset);
 	--ScriptHawk.UI.form_controls["Toggle Neverslip Checkbox"] = forms.checkbox(ScriptHawk.UI.options_form, "Never Slip", ScriptHawk.UI.col(10) + ScriptHawk.UI.dropdown_offset, ScriptHawk.UI.row(5) + ScriptHawk.UI.dropdown_offset);
-	ScriptHawk.UI.form_controls["Toggle Paper Mode Checkbox"] = forms.checkbox(ScriptHawk.UI.options_form, "Paper Mode", ScriptHawk.UI.col(5) + ScriptHawk.UI.dropdown_offset, ScriptHawk.UI.row(5) + ScriptHawk.UI.dropdown_offset);
+	--ScriptHawk.UI.form_controls["Toggle Paper Mode Checkbox"] = forms.checkbox(ScriptHawk.UI.options_form, "Paper Mode", ScriptHawk.UI.col(5) + ScriptHawk.UI.dropdown_offset, ScriptHawk.UI.row(5) + ScriptHawk.UI.dropdown_offset);
 	ScriptHawk.UI.form_controls["Toggle OhWrongnana"] = forms.checkbox(ScriptHawk.UI.options_form, "OhWrongnana", ScriptHawk.UI.col(5) + ScriptHawk.UI.dropdown_offset, ScriptHawk.UI.row(6) + ScriptHawk.UI.dropdown_offset);
 
 	-- Output flag statistics
@@ -6530,17 +6532,15 @@ function Game.eachFrame()
 	--koshBotLoop(); -- TODO: This probably stops the virtual pad from working
 	--Game.unlockMenus(); -- TODO: Allow user to toggle this
 
-	-- Lag fix
 	if forms.ischecked(ScriptHawk.UI.form_controls["Toggle Lag Fix Checkbox"]) then
 		fixLag();
 	end
 
-	if neverSlip then
-	--if forms.ischecked(ScriptHawk.UI.form_controls["Toggle Neverslip Checkbox"]) then
+	if never_slip then
 		Game.neverSlip();
 	end
 
-	if type(ScriptHawk.UI.form_controls["Toggle Paper Mode Checkbox"]) ~= "nil" and forms.ischecked(ScriptHawk.UI.form_controls["Toggle Paper Mode Checkbox"]) then
+	if paper_mode then
 		Game.paperMode();
 	end
 
@@ -6548,7 +6548,6 @@ function Game.eachFrame()
 		Game.setNoclipByte(0x01);
 	end
 
-	-- OhWrongnana
 	if type(ScriptHawk.UI.form_controls["Toggle OhWrongnana"]) ~= "nil" and forms.ischecked(ScriptHawk.UI.form_controls["Toggle OhWrongnana"]) then
 		ohWrongnana();
 	end
@@ -6557,7 +6556,9 @@ function Game.eachFrame()
 		displacementDetection();
 	end
 
-	doBRB();
+	if is_brb then
+		doBRB();
+	end
 
 	-- Moonkick
 	if moon_mode == 'All' or (moon_mode == 'Kick' and isRDRAM(playerObject) and mainmemory.readbyte(playerObject + obj_model1.player.animation_type) == 0x29) then
@@ -6584,7 +6585,7 @@ function Game.eachFrame()
 	end
 
 	-- Check for new flags being set
-	if realtime_flags then
+	if type(ScriptHawk.UI.form_controls["realtime_flags"]) ~= "nil" and forms.ischecked(ScriptHawk.UI.form_controls["realtime_flags"]) then
 		checkFlags(true);
 	end
 end
