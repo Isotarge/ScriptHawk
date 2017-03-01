@@ -2325,28 +2325,32 @@ function Game.drawUI()
 end
 
 local function incrementObjectIndex() -- TODO: These functions need to take hide_non_animated into account
-	local numSlots = getNumSlots();
-	object_index = object_index + 1;
-	if object_index > numSlots then
-		object_index = 1;
-	end
-	if object_index > object_top_index + object_max_slots then
-		object_top_index = object_index - object_max_slots;
-	elseif object_index < object_top_index then
-		object_top_index = object_index;
+	if dragging == false then
+		local numSlots = getNumSlots();
+		object_index = object_index + 1;
+		if object_index > numSlots then
+			object_index = 1;
+		end
+		if object_index > object_top_index + object_max_slots then
+			object_top_index = object_index - object_max_slots;
+		elseif object_index < object_top_index then
+			object_top_index = object_index;
+		end
 	end
 end
 
 local function decrementObjectIndex()
-	object_index = object_index - 1;
-	if object_index <= 0 then
-		local numSlots = getNumSlots();
-		object_index = numSlots;
-	end
-	if object_index > object_top_index + object_max_slots then
-		object_top_index = object_index - object_max_slots;
-	elseif object_index < object_top_index then
-		object_top_index = object_index;
+	if dragging == false then
+		object_index = object_index - 1;
+		if object_index <= 0 then
+			local numSlots = getNumSlots();
+			object_index = numSlots;
+		end
+		if object_index > object_top_index + object_max_slots then
+			object_top_index = object_index - object_max_slots;
+		elseif object_index < object_top_index then
+			object_top_index = object_index;
+		end
 	end
 end
 
@@ -2358,6 +2362,8 @@ ScriptHawk.bindKeyRealtime("C", toggleObjectAnalysisToolsMode, true);
 ScriptHawk.bindKeyRealtime("V", grabSelectedObject, true);
 ScriptHawk.bindKeyRealtime("N", decrementObjectIndex, true);
 ScriptHawk.bindKeyRealtime("M", incrementObjectIndex, true);
+ScriptHawk.bindMouse("mousewheelup", decrementObjectIndex);
+ScriptHawk.bindMouse("mousewheeldown", incrementObjectIndex);
 
 ---------------
 -- Autopound --
