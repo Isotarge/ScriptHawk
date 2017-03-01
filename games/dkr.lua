@@ -876,6 +876,8 @@ function zipToSelectedObject()
 	end
 end
 
+ScriptHawk.bindMouse("mousewheelup", decrementObjectIndex);
+ScriptHawk.bindMouse("mousewheeldown", incrementObjectIndex);
 ScriptHawk.bindKeyRealtime("N", decrementObjectIndex, true);
 ScriptHawk.bindKeyRealtime("M", incrementObjectIndex, true);
 ScriptHawk.bindKeyRealtime("Z", zipToSelectedObject, true);

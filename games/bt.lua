@@ -3625,6 +3625,8 @@ ScriptHawk.bindKeyRealtime("Z", zipToSelectedObject, true);
 ScriptHawk.bindKeyRealtime("C", toggleObjectAnalysisToolsMode, true);
 ScriptHawk.bindKeyRealtime("N", decrementObjectIndex, true);
 ScriptHawk.bindKeyRealtime("M", incrementObjectIndex, true);
+ScriptHawk.bindMouse("mousewheelup", decrementObjectIndex);
+ScriptHawk.bindMouse("mousewheeldown", incrementObjectIndex);
 
 --------------
 -- Encircle --

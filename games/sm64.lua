@@ -423,6 +423,8 @@ end
 ScriptHawk.bindKeyRealtime("Z", zipToSelectedObject, true);
 ScriptHawk.bindKeyRealtime("N", decrementObjectIndex, true);
 ScriptHawk.bindKeyRealtime("M", incrementObjectIndex, true);
+ScriptHawk.bindMouse("mousewheelup", decrementObjectIndex);
+ScriptHawk.bindMouse("mousewheeldown", incrementObjectIndex);
 
 Game.OSD = {
 	{"X", Game.getXPosition},
