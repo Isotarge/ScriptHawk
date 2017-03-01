@@ -1266,8 +1266,8 @@ local function getExamineDataModelOne(pointer)
 	table.insert(examine_data, { "Shadow width", mainmemory.readbyte(pointer + obj_model1.shadow_width) });
 	table.insert(examine_data, { "Shadow height", mainmemory.readbyte(pointer + obj_model1.shadow_height) });
 	local controlStateValue = mainmemory.readbyte(pointer + obj_model1.control_state_byte);
-	if obj_model1.control_states[controlStateValue] ~= nil then
-		controlStateValue = obj_model1.control_states[controlStateValue]
+	if isKong(currentActorTypeNumeric) and obj_model1.control_states[controlStateValue] ~= nil then
+		controlStateValue = obj_model1.control_states[controlStateValue];
 	else
 		controlStateValue = toHexString(controlStateValue);
 	end
