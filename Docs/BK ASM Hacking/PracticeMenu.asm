@@ -364,13 +364,13 @@ NOP
 ; Inputs: void
 ;----------------------------------------------------------------
 RestoreMainMenuText:
-ADDIU sp -0x2C
-SW ra 0x28(sp)
-SW a0 0x24(sp)
-SW a1 0x20(sp)
-SW a2 0x1C(sp)
-SW a3 0x18(sp)
-SW s2 0x14(sp)
+ADDIU sp -0x30
+SW ra 0x2C(sp)
+SW a0 0x28(sp)
+SW a1 0x24(sp)
+SW a2 0x20(sp)
+SW a3 0x1C(sp)
+SW s2 0x18(sp)
 
 	MOV s2 zero
 	LI a2 0x04
@@ -391,13 +391,13 @@ SW s2 0x14(sp)
 		NOP
 
 
-LW ra 0x28(sp)
-LW a0 0x24(sp)
-LW a1 0x20(sp)
-LW a2 0x1C(sp)
-LW a3 0x18(sp)
-LW s2 0x14(sp)
-ADDIU sp 0x2C
+LW ra 0x2C(sp)
+LW a0 0x28(sp)
+LW a1 0x24(sp)
+LW a2 0x20(sp)
+LW a3 0x1C(sp)
+LW s2 0x18(sp)
+ADDIU sp 0x30
 JR
 NOP
 
@@ -634,7 +634,7 @@ NOP
 ;
 ;----------------------------------------------------------------
 BetaPauseMenu:
-ADDIU sp -0x1C
+ADDIU sp -0x20
 SW a0 0x18(sp)
 SW a1 0x14(sp)
 
@@ -673,7 +673,7 @@ SH a1 0x0C(a0) ;YPos4
 
 LW a0 0x14(sp)
 LW a1 0x18(sp)
-ADDIU sp 0x1C
+ADDIU sp 0x20
 JR
 NOP
 
