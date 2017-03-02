@@ -1,5 +1,4 @@
 SystemID N64
-00EFD2	w	h	1	RDRAM	Counter Factor?
 010134	d	h	1	RDRAM	Framebuffer Pointer
 010138	d	h	1	RDRAM	Render Mode Pointer
 010164	d	h	1	RDRAM	Framebuffer Pointer
@@ -24,10 +23,6 @@ SystemID N64
 02F054	d	f	1	RDRAM	Jetman Y Position
 02F058	d	f	1	RDRAM	Jetman X Velocity
 02F05C	d	f	1	RDRAM	Jetman Y Velocity
-0337E0	d	h	1	RDRAM	Diddy ? colour (Main Menu)
-0337E4	d	h	1	RDRAM	Lanky ? colour (Main Menu)
-0337E8	d	h	1	RDRAM	Tiny ? colour (Main Menu)
-0337EC	d	h	1	RDRAM	Chunky ? colour (Main Menu)
 03380C	d	s	1	RDRAM	GB counter (Main Menu)
 033810	d	s	1	RDRAM	IGT hours (Main Menu)
 033814	d	s	1	RDRAM	IGT minutes (Main Menu)
@@ -42,17 +37,6 @@ SystemID N64
 04C71C	b	u	1	RDRAM	Jumpman Lives (HUD)
 46E680	b	u	1	RDRAM	Key 8 enabled
 4B2904	b	h	1	RDRAM	FF for voidout on main menu?!?
-5FF2D8	d	h	1	RDRAM	JAL to void out function
-678050	b	h	1	RDRAM	loadActor() function start?
-6E234B	b	h	1	RDRAM	Freeze at 3 for infinite shots out
-6E2492	w	h	1	RDRAM	Chunky Shot SFX
-6E24D6	w	h	1	RDRAM	Lanky Shot SFX
-6E250A	w	h	1	RDRAM	Tiny Shot SFX
-6E253A	w	h	1	RDRAM	DK Shot SFX
-6E256A	w	h	1	RDRAM	Diddy Shot SFX
-6EAC74	d	h	1	RDRAM	STVW Write, 0 to patch
-6F33E6	w	h	1	RDRAM	Lanky Long Arms Map Index
-6F33E8	d	h	1	RDRAM	Lanky Long Arms Map Check (0 for any map)
 744470	d	h	1	RDRAM	Framebuffer Pointer
 744478	d	u	1	RDRAM	Current Lag Speed Boost
 74447C	b	u	1	RDRAM	Squish Screen (Left)
@@ -102,131 +86,12 @@ SystemID N64
 7458F4	d	f	1	RDRAM	Volume?
 7458F8	d	f	1	RDRAM	Volume?
 7458FC	d	f	1	RDRAM	Volume?
-746344	w	h	1	RDRAM	Footstep SFX
-74634A	w	h	1	RDRAM	Footstep SFX
-746350	w	h	1	RDRAM	Footstep SFX
-746356	w	h	1	RDRAM	Footstep SFX
-74635C	w	h	1	RDRAM	Footstep SFX
-746362	w	h	1	RDRAM	Footstep SFX
-746368	w	h	1	RDRAM	Footstep SFX
-74636E	w	h	1	RDRAM	Footstep SFX
-746374	w	h	1	RDRAM	Footstep SFX
-74637A	w	h	1	RDRAM	Footstep SFX
-746380	w	h	1	RDRAM	Footstep SFX
-746392	w	h	1	RDRAM	Footstep SFX
 7467C8	b	u	1	RDRAM	File
 746A40	d	h	1	RDRAM	RNG
 7476F4	w	u	1	RDRAM	Cutscene
 747CD0	d	f	1	RDRAM	FOV
 74E77C	b	u	1	RDRAM	Character
-74E808	d	f	1	RDRAM	Rambi Walk Maximum Velocity
-74E8B0	d	h	1	RDRAM	Interesting block related to scripts
-74FDB0	w	h	1	RDRAM	Tag Barrel Behavior
-74FDB2	w	h	1	RDRAM	Tag Barrel Model
-74FF00	w	h	1	RDRAM	Tag Barrel (Kutout) Behavior
-74FF02	w	h	1	RDRAM	Tag Barrel (Kutout) Model
-7502E4	d	f	1	RDRAM	Orange Y Acceleration
-750402	w	h	1	RDRAM	Beaver Drop
 750AC0	b	u	1	RDRAM	Number of Players
-7530B0	w	u	1	RDRAM	DK Invulnerability Timer
-7530B2	w	u	1	RDRAM	Diddy Invulnerability Timer
-7530B4	w	u	1	RDRAM	Lanky Invulnerability Timer
-7530B6	w	u	1	RDRAM	Tiny Invulnerability Timer
-7530B8	w	u	1	RDRAM	Chunky Invulnerability Timer
-7530D0	w	u	1	RDRAM	DK Invulnerability Timer
-7530D2	w	u	1	RDRAM	Diddy Invulnerability Timer
-7530D4	w	u	1	RDRAM	Lanky Invulnerability Timer
-7530D6	w	u	1	RDRAM	Tiny Invulnerability Timer
-7530D8	w	u	1	RDRAM	Chunky Invulnerability Timer
-753160	w	u	1	RDRAM	DK Invulnerability Timer
-753162	w	u	1	RDRAM	Diddy Invulnerability Timer
-753164	w	u	1	RDRAM	Lanky Invulnerability Timer
-753166	w	u	1	RDRAM	Tiny Invulnerability Timer
-753168	w	u	1	RDRAM	Chunky Invulnerability Timer
-7531FC	d	f	1	RDRAM	DK Walk Maximum Velocity
-753200	d	f	1	RDRAM	Diddy Walk Maximum Velocity
-753204	d	f	1	RDRAM	Lanky Walk Maximum Velocity
-753208	d	f	1	RDRAM	Tiny Walk Maximum Velocity
-75320C	d	f	1	RDRAM	Chunky Walk Maximum Velocity
-7532D4	d	f	1	RDRAM	DK Carrying Object Maximum Velocity
-7532D8	d	f	1	RDRAM	Diddy Carrying Object Maximum Velocity
-7532DC	d	f	1	RDRAM	Lanky Carrying Object Maximum Velocity
-7532E0	d	f	1	RDRAM	Tiny Carrying Object Maximum Velocity
-7532E4	d	f	1	RDRAM	Chunky Carrying Object Maximum Velocity
-753578	d	f	1	RDRAM	DK Idle, Kick, Crouch, Fall Y Acceleration
-753590	d	f	1	RDRAM	Rambi Idle Y Acceleration
-7535B0	d	f	1	RDRAM	DK Jump Y Acceleration
-7535B4	d	f	1	RDRAM	Diddy Jump Y Acceleration
-7535B8	d	f	1	RDRAM	Lanky Jump Y Acceleration
-7535BC	d	f	1	RDRAM	Tiny Jump Y Acceleration
-7535C0	d	f	1	RDRAM	Chunky Jump Y Acceleration
-7535C4	d	f	1	RDRAM	Krusha Jump Y Acceleration
-7535C8	d	f	1	RDRAM	Rambi Jump Y Acceleration
-7535CC	d	f	1	RDRAM	DK Jump Initial Y Velocity
-7535D0	d	f	1	RDRAM	Diddy Jump Initial Y Velocity
-7535D4	d	f	1	RDRAM	Lanky Jump Initial Y Velocity
-7535D8	d	f	1	RDRAM	Tiny Jump Initial Y Velocity
-7535DC	d	f	1	RDRAM	Chunky Jump Initial Y Velocity
-7535E0	d	f	1	RDRAM	Krusha Jump Initial Y Velocity
-7535E4	d	f	1	RDRAM	Rambi Jump Initial Y Velocity
-7535E8	d	f	1	RDRAM	DK Terminal Velocity
-7535EC	d	f	1	RDRAM	Diddy Terminal Velocity
-7535F0	d	f	1	RDRAM	Lanky Terminal Velocity
-7535F4	d	f	1	RDRAM	Tiny Terminal Velocity
-7535F8	d	f	1	RDRAM	Chunky Terminal Velocity
-7535FC	d	f	1	RDRAM	Krusha Terminal Velocity
-753600	d	f	1	RDRAM	Rambi Terminal Velocity
-75371C	d	f	1	RDRAM	DK Backflip Initial Y Velocity
-753720	d	f	1	RDRAM	Diddy Backflip Initial Y Velocity
-753724	d	f	1	RDRAM	Lanky Backflip Initial Y Velocity
-753728	d	f	1	RDRAM	Tiny Backflip Initial Y Velocity
-75372C	d	f	1	RDRAM	Chunky Backflip Initial Y Velocity
-753730	d	f	1	RDRAM	Krusha Backflip Initial Y Velocity
-753738	d	f	1	RDRAM	DK Backflip Y Acceleration
-75373C	d	f	1	RDRAM	Diddy Backflip Y Acceleration
-753740	d	f	1	RDRAM	Lanky Backflip Y Acceleration
-753744	d	f	1	RDRAM	Tiny Backflip Y Acceleration
-753748	d	f	1	RDRAM	Chunky Backflip Y Acceleration
-75374C	d	f	1	RDRAM	Krusha Backflip Y Acceleration
-753770	d	f	1	RDRAM	DK Long Jump Velocity
-753774	d	f	1	RDRAM	Diddy Long Jump Velocity
-753778	d	f	1	RDRAM	Lanky Long Jump Velocity
-75377C	d	f	1	RDRAM	Tiny Long Jump Velocity
-753780	d	f	1	RDRAM	Chunky Long Jump Velocity
-753784	d	f	1	RDRAM	Krusha Long Jump Velocity
-75378C	d	f	1	RDRAM	DK Long Jump Initial Y Velocity
-753790	d	f	1	RDRAM	Diddy Long Jump Initial Y Velocity
-753794	d	f	1	RDRAM	Lanky Long Jump Initial Y Velocity
-753798	d	f	1	RDRAM	Tiny Long Jump Initial Y Velocity
-75379C	d	f	1	RDRAM	Chunky Long Jump Initial Y Velocity
-7537A0	d	f	1	RDRAM	Krusha Long Jump Initial Y Velocity
-75388C	w	s	1	RDRAM	DK Water Surface Offset
-75388E	w	s	1	RDRAM	Diddy Water Surface Offset
-753890	w	s	1	RDRAM	Lanky Water Surface Offset
-753892	w	s	1	RDRAM	Tiny Water Surface Offset
-753894	w	s	1	RDRAM	Chunky Water Surface Offset
-753896	w	s	1	RDRAM	Krusha Water Surface Offset
-753898	w	s	1	RDRAM	Rambi Water Surface Offset
-753988	d	f	1	RDRAM	DK Surface Swim Terminal X Velocity
-75398C	d	f	1	RDRAM	Diddy Surface Swim Terminal X Velocity
-753990	d	f	1	RDRAM	Lanky Surface Swim Terminal X Velocity
-753994	d	f	1	RDRAM	Tiny Surface Swim Terminal X Velocity
-753998	d	f	1	RDRAM	Chunky Surface Swim Terminal X Velocity
-75399C	d	f	1	RDRAM	Krusha Surface Swim Terminal Velocity
-7539A0	d	f	1	RDRAM	Rambi Surface Swim Terminal X Velocity
-753AE0	d	f	1	RDRAM	DK Swim Terminal Velocity
-753AE4	d	f	1	RDRAM	Diddy Swim Terminal Velocity
-753AE8	d	f	1	RDRAM	Lanky Swim Terminal Velocity
-753AEC	d	f	1	RDRAM	Tiny Swim Terminal Velocity
-753AF0	d	f	1	RDRAM	Chunky Swim Terminal Velocity
-753AF4	d	f	1	RDRAM	Krusha Swim Terminal Velocity
-753AF8	d	f	1	RDRAM	Rambi Swim Terminal Velocity
-753E2C	d	f	1	RDRAM	DK Coconut Velocity
-753E30	d	f	1	RDRAM	Diddy Peanut Velocity
-753E34	d	f	1	RDRAM	Lanky Grape Velocity
-753E38	d	f	1	RDRAM	Tiny Feather Velocity
-753E3C	d	f	1	RDRAM	Chunky Pineapple Velocity
-753E40	d	f	1	RDRAM	Krusha Orange Velocity (Gun)
 754244	d	h	1	RDRAM	Collision Linked List Pointer
 754280	d	h	1	RDRAM	HUD Pointer
 754F4C	b	h	1	RDRAM	Main Menu Background Top Red
@@ -258,40 +123,6 @@ SystemID N64
 755348	d	s	1	RDRAM	Helm Timer
 75534C	d	s	1	RDRAM	Initial Helm Time
 755350	b	u	1	RDRAM	Helm Timer Enabled
-757360	d	f	1	RDRAM	Object Model 1 Scale
-758C60	d	f	1	RDRAM	Map Scale
-758EC0	d	f	1	RDRAM	Pad Fake Floor Y
-758F10	d	f	1	RDRAM	Water Fake Floor Y
-759C80	d	f	1	RDRAM	Object Model 1 Scale (Double Precision)
-75C412	w	h	1	RDRAM	DK Behavior
-75C41A	w	h	1	RDRAM	DK Model
-75C422	w	h	1	RDRAM	Diddy Behavior
-75C42A	w	h	1	RDRAM	Diddy Model
-75C432	w	h	1	RDRAM	Lanky Behavior
-75C43A	w	h	1	RDRAM	Lanky Model
-75C442	w	h	1	RDRAM	Tiny Behavior
-75C44A	w	h	1	RDRAM	Tiny Model
-75C452	w	h	1	RDRAM	Chunky Behavior
-75C45A	w	h	1	RDRAM	Chunky Model
-75C462	w	h	1	RDRAM	Krusha Behavior
-75C46A	w	h	1	RDRAM	Krusha Model
-75C472	w	h	1	RDRAM	Rambi Behavior
-75C47A	w	h	1	RDRAM	Rambi Model
-75C482	w	h	1	RDRAM	Enguarde Behavior
-75C48A	w	h	1	RDRAM	Enguarde Model
-75C492	w	h	1	RDRAM	Squawks Behavior
-75C49A	w	h	1	RDRAM	Squawks Model
-75C4A2	w	h	1	RDRAM	Squawks Behavior
-75C4AA	w	h	1	RDRAM	Squawks Model
-75D16C	d	f	1	RDRAM	Feather Scale
-75D170	d	f	1	RDRAM	Coconut Scale
-75D174	d	f	1	RDRAM	Peanut Scale
-75EC28	w	h	1	RDRAM	Snide Behavior
-75EC2A	w	h	1	RDRAM	Snide Model
-75EC58	w	h	1	RDRAM	Klump Behavior
-75EC5A	w	h	1	RDRAM	Klump Model
-75EDF0	w	h	1	RDRAM	Mad Jack Behavior
-75EDF2	w	h	1	RDRAM	Mad Jack Model
 767CC4	d	u	1	RDRAM	Frames (Real)
 76A050	d	h	1	RDRAM	2D Renderer Array Pointer?
 76A064	d	u	1	RDRAM	Object Timer
@@ -325,7 +156,7 @@ SystemID N64
 7F02C8	d	s	1	RDRAM	Max File ID?
 7F07F4	d	h	1	RDRAM	Framebuffer Pointer
 7F0828	d	h	1	RDRAM	2D Renderer Array Pointer?
-7F0990	d	h	1	RDRAM	Backbone Pointer
+7F0990	d	h	1	RDRAM	Heap Pointer
 7F09A0	d	h	1	RDRAM	Size 0x10 Linked List Pointer
 7F09B4	d	h	1	RDRAM	Object Model 2 Collision Linked List Pointer
 7F09C8	d	h	1	RDRAM	Size 0x30 Linked List Pointer
