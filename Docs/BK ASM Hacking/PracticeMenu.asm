@@ -46,13 +46,14 @@ NOP
 
 .org 0x80400000
 PauseMode:
-PUSH ra
-PUSH a0
-PUSH a1
-PUSH a2
-PUSH at
-PUSH s3
-PUSH s2
+ADDIU sp -0x30
+SW ra 0x2C(sp)
+SW a0 0x28(sp)
+SW a1 0x24(sp)
+SW a2 0x20(sp)
+SW at 0x1C(sp)
+SW s3 0x18(sp)
+SW s2 0x14(sp)
 
 LB a0 InPracMenu
 BEQ a0 zero NotInPracMenu
@@ -294,19 +295,22 @@ NotInPracMenu:
 	    XORI a0, a0, 1
 	    BNEZ a0 StayInNormPause ;If d-left press
 	    LI a0 0x01
-		   SB a0 InPracMenu ;set InPracMenu
-		   NOP
+		SB a0 InPracMenu ;set InPracMenu
+		NOP
 	StayInNormPause:
 NOP
 
+
+
 HouseKeeping:
-POP s2
-POP s3
-POP at
-POP a2
-POP a1
-POP a0
-POP ra
+LW s2 0x14(sp)
+LW s3 0x18(sp)
+LW at 0x1C(sp)
+LW a2 0x20(sp)
+LW a1 0x24(sp)
+LW a0 0x28(sp)
+LW ra 0x2C(sp)
+ADDIU sp 0x30
 JR
 NOP
 
@@ -316,11 +320,12 @@ NOP
 ; Inputs: byte $a0 Cursor Position
 ;----------------------------------------------------------------
 HighlightCursorPosition:
-PUSH ra
-PUSH a1
-PUSH a2
-PUSH a3
-PUSH s3
+ADDIU sp -0x28
+SW ra 0x24(sp)
+SW a1 0x20(sp)
+SW a2 0x1C(sp)
+SW a3 0x18(sp)
+SW s3 0x14(sp)
 
 	MOV a1 zero
 	LI a2 0x04
@@ -343,11 +348,14 @@ PUSH s3
 		NOP
 	;set opacity matching cursor position to FF
 
-POP s3
-POP a3
-POP a2
-POP a1
-POP ra
+
+
+LW ra 0x24(sp)
+LW a1 0x20(sp)
+LW a2 0x1C(sp)
+LW a3 0x18(sp)
+LW s3 0x14(sp)
+ADDIU sp 0x28
 JR
 NOP
 
@@ -356,12 +364,13 @@ NOP
 ; Inputs: void
 ;----------------------------------------------------------------
 RestoreMainMenuText:
-PUSH ra
-PUSH a0
-PUSH a1
-PUSH a2
-PUSH a3
-PUSH s2
+ADDIU sp -0x2C
+SW ra 0x28(sp)
+SW a0 0x24(sp)
+SW a1 0x20(sp)
+SW a2 0x1C(sp)
+SW a3 0x18(sp)
+SW s2 0x14(sp)
 
 	MOV s2 zero
 	LI a2 0x04
@@ -381,12 +390,14 @@ PUSH s2
 		BNE s2 a2 RestoreMainMenuTextLoop
 		NOP
 
-POP s2
-POP a3
-POP a2
-POP a1
-POP a0
-POP ra
+
+LW ra 0x28(sp)
+LW a0 0x24(sp)
+LW a1 0x20(sp)
+LW a2 0x1C(sp)
+LW a3 0x18(sp)
+LW s2 0x14(sp)
+ADDIU sp 0x2C
 JR
 NOP
 
@@ -397,13 +408,15 @@ NOP
 ;----------------------------------------------------------------
 
 PrintPracMenuText:
-PUSH ra
-PUSH a0
-PUSH a1
-PUSH a2
-PUSH a3
-PUSH s2
-PUSH s3
+ADDIU sp -0x30
+SW ra 0x2C(sp)
+SW a0 0x28(sp)
+SW a1 0x24(sp)
+SW a2 0x20(sp)
+SW a3 0x1C(sp)
+SW s3 0x18(sp)
+SW s2 0x14(sp)
+
 
 	MOV s2 zero
 	LI a2 0x04
@@ -422,13 +435,15 @@ PUSH s3
 		BNE s2 a2 PrintPracMenuTextLoop
 		NOP
 
-POP s3
-POP s2
-POP a3
-POP a2
-POP a1
-POP a0
-POP ra
+
+LW ra 0x2C(sp)
+LW a0 0x28(sp)
+LW a1 0x24(sp)
+LW a2 0x20(sp)
+LW a3 0x1C(sp)
+LW s3 0x18(sp)
+LW s2 0x14(sp)
+ADDIU sp 0x30
 JR
 NOP
 
@@ -437,11 +452,13 @@ NOP
 ;
 ;----------------------------------------------------------------
 NormalModeCode:
-PUSH ra
-PUSH a0
-PUSH a1
-PUSH a2
-PUSH at
+ADDIU sp -0x28
+SW ra 0x24(sp)
+SW a0 0x20(sp)
+SW a1 0x1C(sp)
+SW a2 0x18(sp)
+SW at 0x14(sp)
+
 
 //cheatMenuNotSetUp
 LB a0 PracMenuSetup
@@ -602,11 +619,13 @@ NormalModeCode_ResetOnEnter:
 	;JAL PositionDisplay
 	NOP
 
-POP at
-POP a2
-POP a1
-POP a0
-POP ra
+
+LW ra 0x24(sp)
+LW a0 0x20(sp)
+LW a1 0x1C(sp)
+LW a2 0x18(sp)
+LW at 0x14(sp)
+ADDIU sp 0x28
 JR
 NOP
 
@@ -615,8 +634,9 @@ NOP
 ;
 ;----------------------------------------------------------------
 BetaPauseMenu:
-PUSH a0
-PUSH a1
+ADDIU sp -0x1C
+SW a0 0x18(sp)
+SW a1 0x14(sp)
 
 ;Enable "Exit to lair
 LA a0 @ReturnToLairEnabled
@@ -650,8 +670,10 @@ SW a1 0(a0)    ;timing
 LI a1 135
 SH a1 0x0C(a0) ;YPos4
 
-POP a1
-POP a0
+
+LW a0 0x14(sp)
+LW a1 0x18(sp)
+ADDIU sp 0x1C
 JR
 NOP
 
