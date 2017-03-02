@@ -1263,7 +1263,7 @@ end
 -----------
 
 local global_flag_block_cache = {};
-local flag_block_cache = {};
+flag_block_cache = {};
 function clearFlagCache()
 	global_flag_block_cache = {};
 	flag_block_cache = {};
@@ -2981,30 +2981,35 @@ function checkFlag(byte, bit, suppressPrint)
 end
 
 function checkFlags()
-	local flagBlock = dereferencePointer(Game.Memory.flag_block_pointer[version]);
-	if isRDRAM(flagBlock) then
-		for byte = 0, flag_block_size - 1 do
-			local currentValue = mainmemory.readbyte(flagBlock + byte);
-			local previousValue = flag_block_cache[byte];
-			if previousValue == nil then
-				previousValue = currentValue;
-			end
-			for bit = 0, 7 do
-				local isSet = check_bit(currentValue, bit);
-				local wasSet = check_bit(previousValue, bit);
-				if isSet and not wasSet then
-					if isKnown(byte, bit) then
-						dprint("Flag "..toHexString(byte, 2)..">"..bit..": \""..getFlagName(byte, bit).."\" was set on frame "..emu.framecount());
-					else
-						dprint("{byte="..toHexString(byte, 2)..", bit="..bit..", name=\"Name\"},");
+	local flags = dereferencePointer(Game.Memory.flag_block_pointer[version]);
+	if isRDRAM(flags) then
+		local flagBlock = mainmemory.readbyterange(flags, flag_block_size);
+
+		if #flag_block_cache == flag_block_size - 1 then
+			local currentValue, previousValue, isSet, wasSet;
+			for byte = 0, flag_block_size - 1 do
+				currentValue = flagBlock[byte];
+				previousValue = flag_block_cache[byte];
+				for _bit = 0, 7 do
+					isSet = bit.check(currentValue, _bit);
+					wasSet = bit.check(previousValue, _bit);
+					if isSet and not wasSet then
+						if isKnown(byte, _bit) then
+							dprint("Flag "..toHexString(byte, 2)..">".._bit..": \""..getFlagName(byte, _bit).."\" was set on frame "..emu.framecount());
+						else
+							dprint("{byte="..toHexString(byte, 2)..", bit=".._bit..", name=\"Name\"},");
+						end
+					elseif not isSet and wasSet then
+						dprint("Flag "..toHexString(byte, 2)..">".._bit..": \""..getFlagName(byte, _bit).."\" was cleared on frame "..emu.framecount());
 					end
-				elseif not isSet and wasSet then
-					dprint("Flag "..toHexString(byte, 2)..">"..bit..": \""..getFlagName(byte, bit).."\" was cleared on frame "..emu.framecount());
 				end
 			end
-			flag_block_cache[byte] = currentValue;
+			flag_block_cache = flagBlock;
+			print_deferred();
+		else
+			flag_block_cache = flagBlock;
+			print("Populated flag block cache");
 		end
-		print_deferred();
 	end
 end
 
@@ -3194,22 +3199,24 @@ function getGlobalFlagName(byte, bit)
 end
 
 function checkGlobalFlags()
-	local flagBlock = Game.Memory.global_flag_base[version];
+	local flags = Game.Memory.global_flag_base[version];
+	local flagBlock = mainmemory.readbyterange(flags, global_flag_block_size);
+	local currentValue, previousValue, isSet, wasSet, flag, ignore;
 	for byte = 0, global_flag_block_size - 1 do
-		local currentValue = mainmemory.readbyte(flagBlock + byte);
-		local previousValue = global_flag_block_cache[byte];
+		currentValue = flagBlock[byte];
+		previousValue = global_flag_block_cache[byte];
 		if previousValue == nil then
 			previousValue = currentValue;
 		end
 		for bit = 0, 7 do
-			local isSet = check_bit(currentValue, bit);
-			local wasSet = check_bit(previousValue, bit);
-			local flag = getGlobalFlag(byte, bit);
-			local ignore = type(flag) == "table" and flag.ignore;
+			isSet = check_bit(currentValue, bit);
+			wasSet = check_bit(previousValue, bit);
+			flag = getGlobalFlag(byte, bit);
+			ignore = type(flag) == "table" and flag.ignore;
 			if not ignore then
 				if isSet and not wasSet then
 					if isKnownGlobal(byte, bit) then
-						dprint("Global Flag "..toHexString(byte, 2)..">"..bit..": \""..getGlobalFlagName(byte, bit).."\" was set on frame "..emu.framecount());
+						dprint("Global Flag "..toHexString(byte, 2)..">"..bit..": \""..flag.name.."\" was set on frame "..emu.framecount());
 					else
 						dprint("{byte="..toHexString(byte, 2)..", bit="..bit..", name=\"Name\"}, (GLOBAL)");
 					end
@@ -3218,8 +3225,8 @@ function checkGlobalFlags()
 				end
 			end
 		end
-		global_flag_block_cache[byte] = currentValue;
 	end
+	global_flag_block_cache = flagBlock;
 	print_deferred();
 end
 
