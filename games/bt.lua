@@ -2796,11 +2796,22 @@ local flag_array = {
 };
 
 local global_flag_names = {};
+local flags_by_address = {};
 local flag_names = {};
 
 for i = 1, #flag_array do
 	if not flag_array[i].ignore then
 		flag_names[i] = flag_array[i].name;
+	end
+	if flags_by_address[flag_array[i].byte] == nil then
+		flags_by_address[flag_array[i].byte] = {};
+	end
+	flags_by_address[flag_array[i].byte][flag_array[i].bit] = flag_array[i];
+end
+
+for i = 0, flag_block_size - 1 do
+	if type(flags_by_address[i]) ~= "table" then
+		flags_by_address[i] = {};
 	end
 end
 
@@ -2811,18 +2822,14 @@ for i = 1, #global_flag_array do
 end
 
 function isKnown(byte, bit)
-	for i = 1, #flag_array do
-		if flag_array[i].byte == byte and flag_array[i].bit == bit then
-			return true;
-		end
-	end
-	return false;
+	return flags_by_address[byte][bit] ~= nil;
 end
 
 function getFlagName(byte, bit)
-	for i = 1, #flag_array do
-		if byte == flag_array[i].byte and bit == flag_array[i].bit and not flag_array[i].ignore then
-			return flag_array[i].name;
+	local flag = flags_by_address[byte][bit];
+	if type(flag) == "table" then
+		if not flag.ignore then
+			return flag.name;
 		end
 	end
 	return "Unknown at "..toHexString(byte)..">"..bit;
