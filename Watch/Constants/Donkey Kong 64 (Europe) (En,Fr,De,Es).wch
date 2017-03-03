@@ -16,6 +16,12 @@ SystemID N64
 74DA30	d	f	1	RDRAM	Tiny Carrying Object Maximum Velocity
 74DA34	d	f	1	RDRAM	Chunky Carrying Object Maximum Velocity
 74DA38	d	f	1	RDRAM	Krusha Carrying Object Maximum Velocity
+74DD00	d	f	1	RDRAM	DK Jump Y Acceleration
+74DD04	d	f	1	RDRAM	Diddy Jump Y Acceleration
+74DD08	d	f	1	RDRAM	Lanky Jump Y Acceleration
+74DD0C	d	f	1	RDRAM	Tiny Jump Y Acceleration
+74DD10	d	f	1	RDRAM	Chunky Jump Y Acceleration
+74DD14	d	f	1	RDRAM	Krusha Jump Y Acceleration
 74DD1C	d	f	1	RDRAM	DK Jump Initial Y Velocity
 74DD20	d	f	1	RDRAM	Diddy Jump Initial Y Velocity
 74DD24	d	f	1	RDRAM	Lanky Jump Initial Y Velocity
@@ -27,6 +33,43 @@ SystemID N64
 74DD40	d	f	1	RDRAM	Lanky Terminal Velocity
 74DD44	d	f	1	RDRAM	Tiny Terminal Velocity
 74DD48	d	f	1	RDRAM	Chunky Terminal Velocity
+74DE6C	d	f	1	RDRAM	DK Backflip Initial Y Velocity
+74DE70	d	f	1	RDRAM	Diddy Backflip Initial Y Velocity
+74DE74	d	f	1	RDRAM	Lanky Backflip Initial Y Velocity
+74DE78	d	f	1	RDRAM	Tiny Backflip Initial Y Velocity
+74DE7C	d	f	1	RDRAM	Chunky Backflip Initial Y Velocity
+74DE80	d	f	1	RDRAM	Krusha Backflip Initial Y Velocity
+74DE88	d	f	1	RDRAM	DK Backflip Y Acceleration
+74DE8C	d	f	1	RDRAM	Diddy Backflip Y Acceleration
+74DE90	d	f	1	RDRAM	Lanky Backflip Y Acceleration
+74DE94	d	f	1	RDRAM	Tiny Backflip Y Acceleration
+74DE98	d	f	1	RDRAM	Chunky Backflip Y Acceleration
+74DE9C	d	f	1	RDRAM	Krusha Backflip Y Acceleration
+74DEC0	d	f	1	RDRAM	DK Long Jump Velocity
+74DEC4	d	f	1	RDRAM	Diddy Long Jump Velocity
+74DEC8	d	f	1	RDRAM	Lanky Long Jump Velocity
+74DECC	d	f	1	RDRAM	Tiny Long Jump Velocity
+74DED0	d	f	1	RDRAM	Chunky Long Jump Velocity
+74DED4	d	f	1	RDRAM	Krusha Long Jump Velocity
+74DEDC	d	f	1	RDRAM	DK Long Jump Initial Y Velocity
+74DEE0	d	f	1	RDRAM	Diddy Long Jump Initial Y Velocity
+74DEE4	d	f	1	RDRAM	Lanky Long Jump Initial Y Velocity
+74DEE8	d	f	1	RDRAM	Tiny Long Jump Initial Y Velocity
+74DEEC	d	f	1	RDRAM	Chunky Long Jump Initial Y Velocity
+74DEF0	d	f	1	RDRAM	Krusha Long Jump Initial Y Velocity
+74DFDC	w	s	1	RDRAM	DK Water Surface Offset
+74DFDE	w	s	1	RDRAM	Diddy Water Surface Offset
+74DFE0	w	s	1	RDRAM	Lanky Water Surface Offset
+74DFE2	w	s	1	RDRAM	Tiny Water Surface Offset
+74DFE4	w	s	1	RDRAM	Chunky Water Surface Offset
+74DFE6	w	s	1	RDRAM	Krusha Water Surface Offset
+74DFE8	w	s	1	RDRAM	Rambi Water Surface Offset
+74E57C	d	f	1	RDRAM	DK Coconut Velocity
+74E580	d	f	1	RDRAM	Diddy Peanut Velocity
+74E584	d	f	1	RDRAM	Lanky Grape Velocity
+74E588	d	f	1	RDRAM	Tiny Feather Velocity
+74E58C	d	f	1	RDRAM	Chunky Pineapple Velocity
+74E590	d	f	1	RDRAM	Krusha Orange Velocity (Gun)
 753840	d	f	1	RDRAM	Object Model 2 Floor Something?
 756E72	w	h	1	RDRAM	DK Behavior
 756E7A	w	h	1	RDRAM	DK Model
