@@ -1,8 +1,4 @@
 SystemID N64
-010364	d	h	1	RDRAM	Framebuffer Pointer
-010368	d	h	1	RDRAM	Render Mode Pointer
-010394	d	h	1	RDRAM	Framebuffer Pointer
-010398	d	h	1	RDRAM	Render Mode Pointer
 0153A4	d	h	1	RDRAM	Controller Input P1
 0153A6	b	s	1	RDRAM	Joystick X (P1)
 0153A7	b	s	1	RDRAM	Joystick Y (P1)
@@ -58,11 +54,6 @@ SystemID N64
 7411A0	d	h	1	RDRAM	RNG
 742430	d	f	1	RDRAM	FOV
 748EDC	b	u	1	RDRAM	Character
-74D94C	d	f	1	RDRAM	DK Walk Maximum Velocity
-74D950	d	f	1	RDRAM	Diddy Walk Maximum Velocity
-74D954	d	f	1	RDRAM	Lanky Walk Maximum Velocity
-74D958	d	f	1	RDRAM	Tiny Walk Maximum Velocity
-74D95C	d	f	1	RDRAM	Chunky Walk Maximum Velocity
 74E9A4	d	h	1	RDRAM	Object Model 2 Collision Linked List Pointer
 74E9E0	d	h	1	RDRAM	HUD Pointer
 74F8F0	b	h	1	RDRAM	Intro Story is Playing
@@ -76,26 +67,6 @@ SystemID N64
 74FB90	b	b	1	RDRAM	Joystick Y Bits Enabled
 74FB94	b	u	1	RDRAM	Mode (Copy)
 74FB98	b	u	1	RDRAM	Mode
-756E72	w	h	1	RDRAM	DK Behavior
-756E7A	w	h	1	RDRAM	DK Model
-756E82	w	h	1	RDRAM	Diddy Behavior
-756E8A	w	h	1	RDRAM	Diddy Model
-756E92	w	h	1	RDRAM	Lanky Behavior
-756E9A	w	h	1	RDRAM	Lanky Model
-756EA2	w	h	1	RDRAM	Tiny Behavior
-756EAA	w	h	1	RDRAM	Tiny Model
-756EB2	w	h	1	RDRAM	Chunky Behavior
-756EBA	w	h	1	RDRAM	Chunky Model
-756EC2	w	h	1	RDRAM	Krusha Behavior
-756ECA	w	h	1	RDRAM	Krusha Model
-756ED2	w	h	1	RDRAM	Rambi Behavior
-756EDA	w	h	1	RDRAM	Rambi Model
-756EE2	w	h	1	RDRAM	Enguarde Behavior
-756EEA	w	h	1	RDRAM	Enguarde Model
-756EF2	w	h	1	RDRAM	Squawks Behavior
-756EFA	w	h	1	RDRAM	Squawks Model
-756F02	w	h	1	RDRAM	Squawks Behavior
-756F0A	w	h	1	RDRAM	Squawks Model
 764B84	d	u	1	RDRAM	Object Model 2 Timer
 764BC8	d	u	1	RDRAM	Current Map
 764BCC	d	u	1	RDRAM	Current Exit
@@ -106,7 +77,7 @@ SystemID N64
 7EDDCA	b	h	1	RDRAM	EEPROM Slot 2 File Index
 7EDDCB	b	h	1	RDRAM	EEPROM Slot 3 File Index
 7F0480	d	u	1	RDRAM	Frames (Real)
-7F08B0	d	h	1	RDRAM	Backbone Pointer
+7F08B0	d	h	1	RDRAM	Heap Pointer
 7F5C00	d	h	1	RDRAM	ISG Start Time Major
 7F5C04	d	h	1	RDRAM	ISG Start Time Minor
 7F5D00	d	h	1	RDRAM	Map Block Pointer

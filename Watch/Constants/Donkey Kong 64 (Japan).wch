@@ -1,0 +1,27 @@
+SystemID N64
+00F292	b	h	1	RDRAM	Counter Factor?
+0103A4	d	h	1	RDRAM	Framebuffer Pointer
+0103A8	d	h	1	RDRAM	Render Mode Pointer
+0103D4	d	h	1	RDRAM	Framebuffer Pointer
+0103D8	d	h	1	RDRAM	Render Mode Pointer
+75C5D2	w	h	1	RDRAM	DK Behavior
+75C5DA	w	h	1	RDRAM	DK Model
+75C5E2	w	h	1	RDRAM	Diddy Behavior
+75C5EA	w	h	1	RDRAM	Diddy Model
+75C5F2	w	h	1	RDRAM	Lanky Behavior
+75C5FA	w	h	1	RDRAM	Lanky Model
+75C602	w	h	1	RDRAM	Tiny Behavior
+75C60A	w	h	1	RDRAM	Tiny Model
+75C612	w	h	1	RDRAM	Chunky Behavior
+75C61A	w	h	1	RDRAM	Chunky Model
+75C622	w	h	1	RDRAM	Krusha Behavior
+75C62A	w	h	1	RDRAM	Krusha Model
+75C632	w	h	1	RDRAM	Rambi Behavior
+75C63A	w	h	1	RDRAM	Rambi Model
+75C642	w	h	1	RDRAM	Enguarde Behavior
+75C64A	w	h	1	RDRAM	Enguarde Model
+75C652	w	h	1	RDRAM	Squawks Behavior
+75C65A	w	h	1	RDRAM	Squawks Model
+75C662	w	h	1	RDRAM	Squawks Behavior
+75C66A	w	h	1	RDRAM	Squawks Model
+

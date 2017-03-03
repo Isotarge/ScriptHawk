@@ -1,13 +1,10 @@
 SystemID N64
-5931B8	w	h	1	RDRAM	Object Model 2 "Room Replacement"
-5931BA	w	h	1	RDRAM	Object Model 2 "Room Replacement"
 6F1CC4	d	u	1	RDRAM	Destination Map
 6F1CC8	d	u	1	RDRAM	Destination Exit
 6F3448	w	h	1	RDRAM	Music Track
 6F36E0	d	h	1	RDRAM	RNG
 6F4464	w	h	1	RDRAM	Cutscene
 6F9EB8	b	u	1	RDRAM	Character
-6FB9D0	d	h	1	RDRAM	Start of pointers to strings
 6FF054	d	h	1	RDRAM	Object Model 2 Collision Linked List Pointer
 6FF080	d	h	1	RDRAM	HUD Pointer
 6FFE5C	w	b	1	RDRAM	Buttons Enabled (Bitfield)
@@ -17,29 +14,6 @@ SystemID N64
 6FFE6C	b	u	1	RDRAM	Mode
 6FFE70	w	u	1	RDRAM	Demo Fadeout Timer
 6FFE74	d	u	1	RDRAM	Frames in current map
-704E30	d	f	1	RDRAM	Lava & Cutscene Floor/Y (Upwarp)
-707DD2	w	h	1	RDRAM	DK Behavior
-707DDA	w	h	1	RDRAM	DK Model
-707DE2	w	h	1	RDRAM	Diddy Behavior
-707DEA	w	h	1	RDRAM	Diddy Model
-707DF2	w	h	1	RDRAM	Lanky Behavior
-707DFA	w	h	1	RDRAM	Lanky Model
-707E02	w	h	1	RDRAM	Tiny Behavior
-707E0A	w	h	1	RDRAM	Tiny Model
-707E12	w	h	1	RDRAM	Chunky Behavior
-707E1A	w	h	1	RDRAM	Chunky Model
-707E22	w	h	1	RDRAM	Rambi Behavior
-707E2A	w	h	1	RDRAM	Rambi Model
-707E32	w	h	1	RDRAM	Enguarde Behavior
-707E3A	w	h	1	RDRAM	Enguarde Model
-707E42	w	h	1	RDRAM	Squawks Behavior
-707E4A	w	h	1	RDRAM	Squawks Model
-707E52	w	h	1	RDRAM	Squawks Behavior
-707E5A	w	h	1	RDRAM	Squawks Model
-70A540	w	h	1	RDRAM	Army Dillo Behavior
-70A542	w	h	1	RDRAM	Army Dillo Model
-70AA9C	w	h	1	RDRAM	Dogadon Behavior
-70AA9E	w	h	1	RDRAM	Dogadon Model
 72CDA0	d	h	1	RDRAM	Framebuffer Pointer
 72CDAC	d	u	1	RDRAM	Object Model 2 Timer
 72CDE4	d	u	1	RDRAM	Current Map
@@ -47,7 +21,7 @@ SystemID N64
 72CDED	b	h	1	RDRAM	Map State
 72D140	d	u	1	RDRAM	Frames (Lag) (TODO: Seems to work for Diddy's map but not for any others)
 7A106C	d	h	1	RDRAM	Framebuffer Pointer (Copy)
-7A12C0	d	h	1	RDRAM	Backbone Pointer
+7A12C0	d	h	1	RDRAM	Heap Pointer
 7A1E14	d	h	1	RDRAM	Camera Pointer
 7A1E90	d	h	1	RDRAM	Map Block Pointer
 7A1E94	d	h	1	RDRAM	Map Model Pointer?
