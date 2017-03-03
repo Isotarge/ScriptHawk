@@ -3,9 +3,10 @@
 //  Press D-Right to return to main menu
 //
 //
-// TO DO: Append Each menu item's current state to end of sting
-//        Create functions for setting enable bits/states for each
-//        Create normal mode code section
+// TO DO: Update Progress flags on reset
+//        Save State Code
+//        Map ghosts
+//
 
 //Variables
 [NumberOfOptions]: 0x06

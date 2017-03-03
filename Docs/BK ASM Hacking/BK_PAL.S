@@ -87,6 +87,8 @@
 [GetFloorObjectNormalRotation_0]:	0x8028E66C	;I: (float* $a0 destXPtr)
 [GetCarriedObject_UnknownStruct2Ptr_0]:	0x8028E68C	;[struct* $v0]
 
+[TransformMe]: 0x8028F9A8 ;I (byte $a0 transformationIndex)
+
 
 [UpdatePlayerModelToMumboTransFormation]: 0x80291B24
 

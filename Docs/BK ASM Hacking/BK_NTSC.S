@@ -327,6 +327,7 @@
 
 [SetXYZRotationTargets]:	0x8028FAEC	;I	(float* $a0 RotXPtr)
 [ClearCarriedObjectBehaviorStructPointer]:	0x8028FB28
+
 [TransformMe]: 0x8028FB88 ;I (byte $a0 transformationIndex)
 
 [EnablePlayerIsVisibleFlag]:	0x8028FCAC
