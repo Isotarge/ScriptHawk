@@ -470,17 +470,19 @@ BEQ a0 zero NormalModeCode_TakeMeThereEnd
 
 NormalModeCode_TakeMeThereEnd:
 
+
+;Transform Me
 LB a0 TransformMeState
 BEQ a0 zero NormalModeCode_TransformMeEnd
 
 	LB a0 TransformMeState
-	JAL @SetMumboTransformation
-	NOP
-	JAL @UpdatePlayerModelToMumboTransFormation
+	JAL @Transform Me
 	NOP
 	SB zero TransformMeState
 
 NormalModeCode_TransformMeEnd:
+
+
 
 ;If Press-L to levitate ste
 	;JAL PressLToLevitate ;Press-L to levitate code
@@ -705,7 +707,7 @@ MoveSetStringSet:
 L2LevitateStringSet:
 .word OnOffOptionString
 TransformMeStringSet:
-.word OnOffOptionString
+.word TransformMeOptionString
 
 OnOffOptionString:
 .asciiz "OFF\0\0\0\0"
@@ -734,6 +736,16 @@ TakeMeThereOptionString:
 .asciiz "FF\0\0\0\0\0"
 .asciiz "DOG\0\0\0\0"
 .asciiz "GRUNTY\0"
+
+TransformMeOptionString:
+.asciiz "OFF\0\0\0\0"
+.asciiz "BANJO\0\0"
+.asciiz "TRMITE\0"
+.asciiz "CROC\0\0\0"
+.asciiz "WALRUS\0"
+.asciiz "PUMPKN\0"
+.asciiz "BEE\0\0\0\0"
+.asciiz "WASHY\0\0"
 
 CurrentMoveSet:
 .word 0
