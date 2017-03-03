@@ -7,41 +7,12 @@
 //        Create functions for setting enable bits/states for each
 //        Create normal mode code section
 
-// HOOKS
-
-;PAUSE MODE JUMP LOCATION: 0x802E47F4
-.org 0x802E47F4
-JAL 0x80400000
-NOP
-
-;NORMAL MODE JUMP LOCATION: 0x80334FFC
-.org 0x80334FFC
-JAL NormalModeCode
-NOP
-
-//ENUMERATIONS
-.include "Docs/BK ASM Hacking/BK_Enum.S"
-//EXISTING FUNCTIONS
-.include "Docs/BK ASM Hacking/BK_NTSC.S"
-
-//EXISTING VARIABLES
-[P1DPadUp]:0x8028115C
-[P1DPadDown]:0x80281160
-[P1DPadLeft]:0x80281164
-[P1DPadRight]:0x80281168
-[P1Start]:0x8028116C
-[PauseMenuData]:0x8036C4E0
-[PauseMenuState]:0x80383010
-
-[TEST]: 0x8037C3A0
-
 //Variables
 [NumberOfOptions]: 0x06
 [PageTopMax]: 0x02
 
 ;----------------------------------------------------------------
 ; Code Run from Pause Mode
-; 
 ;----------------------------------------------------------------
 
 .org 0x80400000
@@ -57,27 +28,27 @@ SW s2 0x14(sp)
 
 LB a0 InPracMenu
 BEQ a0 zero NotInPracMenu
-NOP 
+NOP
 
 InPracMenu:
-    /*UPDATE DISPLAY*/
+	/*UPDATE DISPLAY*/
 
 	MOV s3 zero
 //for(s3=0; s3<4; s3++)
 	PracticeMenuText_Loop:
-    	LA a1 MenuLabelStrings
-    	LB a0 PageTopPos
+		LA a1 MenuLabelStrings
+		LB a0 PageTopPos
 		ADDU a0 a0 s3
 		SLL s2 a0 4
 		ADDU a1 a1 s2
-		
-    	LA a0 MenuItemStr 
+
+		LA a0 MenuItemStr
 		SLL s2 s3 5
 		ADDU a0 a0 s2
-		
-    	JAL @CopyString
+
+		JAL @CopyString
 		NOP
-		
+
 		LA a1 MenuOptionStates
 		LA a2 MenuOptionStringSet
 		ADDU a1 a1 s3
@@ -86,23 +57,23 @@ InPracMenu:
 		LB a1 0(a1)
 		ADDU a0 a0 s3
 		SLL a0 a0 2
-		ADDU a2 a2 a0		
+		ADDU a2 a2 a0
 		LW a2 0(a2)
 		SLL a1 a1 3
 		ADDU a1 a1 a2
-		
-		LA a0 MenuItemStr 
+
+		LA a0 MenuItemStr
 		SLL s2 s3 5
 		ADDU a0 a0 s2
-		
+
 		JAL @AppendString
 		NOP
-		
+
 		ADDIU s3 s3 1 ;s3++
 		LI a0 0x04
 		BNE s3 a0 PracticeMenuText_Loop
 		NOP
-	
+
 	JAL PrintPracMenuText
 
 	;Highlight cursor position
@@ -110,28 +81,28 @@ InPracMenu:
 	JAL HighlightCursorPosition
 	NOP
 
-    
-    /* UPDATE OPTION BASED ON BUTTON INPUTS*/
-    
-	;;;ChangeCursor and topPos based on controls
+
+	/* UPDATE OPTION BASED ON BUTTON INPUTS*/
+
+	;ChangeCursor and topPos based on controls
 	LA a0 @P1DPadUp ;Up - up one pos
 	LW a0 0(a0)
 	XORI a0, a0, 1
-	BNEZ a0 NoDPadUpPress 
+	BNEZ a0 NoDPadUpPress
 	LB a0 PracMenuCursorPos
-        BNEZ a0 NotAtPageTop ;if(cursor on bottom option)
-        NOP
-            PUSH a0
-            LB a1 PageTopPos
-            ADDI a0 a1 -1
-            JAL @SelectMaxInt
-            MOV a1 zero  ;PageTopMin
-            POP a0
-            SB v0 PageTopPos
-            B NoDPadUpPress
-            NOP
-            
-        NotAtPageTop:
+		BNEZ a0 NotAtPageTop ;if(cursor on bottom option)
+		NOP
+			PUSH a0
+			LB a1 PageTopPos
+			ADDI a0 a1 -1
+			JAL @SelectMaxInt
+			MOV a1 zero  ;PageTopMin
+			POP a0
+			SB v0 PageTopPos
+			B NoDPadUpPress
+			NOP
+
+		NotAtPageTop:
 		ADDI a0 a0 -1
 		JAL @SelectMaxInt
 		LI a1 0
@@ -143,21 +114,21 @@ InPracMenu:
 	LA a0 @P1DPadDown ;Down - down one pos
 	LW a0 0(a0)
 	XORI a0, a0, 1
-	BNEZ a0 NoDPadDownPress 
+	BNEZ a0 NoDPadDownPress
 	LB a0 PracMenuCursorPos
-        LI a1 0x03
-        BNE a0 a1 NotAtPageBottom
-        NOP
-            PUSH a0
-            LB a1 PageTopPos
-            ADDI a0 a1 1
-            JAL @SelectMinInt
-            LI a1 @PageTopMax
-            POP a0
-            SB v0 PageTopPos
-            B NoDPadDownPress
-            POP a0
-        NotAtPageBottom:
+		LI a1 0x03
+		BNE a0 a1 NotAtPageBottom
+		NOP
+			PUSH a0
+			LB a1 PageTopPos
+			ADDI a0 a1 1
+			JAL @SelectMinInt
+			LI a1 @PageTopMax
+			POP a0
+			SB v0 PageTopPos
+			B NoDPadDownPress
+			POP a0
+			NotAtPageBottom:
 		ADDIU a0 a0 1
 		JAL @SelectMinInt
 		LI a1 0x03
@@ -167,7 +138,7 @@ InPracMenu:
 	LA a0 @P1DPadLeft ;left - previous option
 	LW a0 0(a0)
 	XORI a0, a0, 1
-	BNEZ a0 NoDPadLeftPress 
+	BNEZ a0 NoDPadLeftPress
 		NOP
 		//Get CurrentHighlighted Option
 		LB a0 PageTopPos
@@ -186,14 +157,13 @@ InPracMenu:
 		//Need to clamp
 		
 	NoDPadLeftPress:
-    
-		
+
 
 	LA a0 @P1DPadRight ;right - next option
 	LW a0 0(a0)
 	XORI a0, a0, 1
-    
-	BNEZ a0 NoDPadRightPress 
+
+	BNEZ a0 NoDPadRightPress
 		NOP
 		//Get CurrentHighlighted Option
 		LB a0 PageTopPos
@@ -216,11 +186,8 @@ InPracMenu:
 		ADDU a1 a1 s3
 		SB v0 0(a1)
 		//Need to clamp
-		
-		
+
 	NoDPadRightPress:
-	
-	
 
 	;check if exiting practice menu
 	LA a0 @P1Start
@@ -229,7 +196,7 @@ InPracMenu:
 	BNEZ a0 StayInPracPause ;If start press
 	MOV a0 zero
 		SB a0 InPracMenu ;set InPracMenu
-		
+
 		//ONE SHOT EXITING MENU CODES
 		;If GiveMoveSet
 		LB s3 MoveSet
@@ -241,28 +208,28 @@ InPracMenu:
 			SW zero CurrentMoveSet
 			BEQ s3 a1 KeepCurrentMoveSet
 			LI a1 0x02
-			
+
 			//SM Set
 			LI a0 0x00009DB9
 			JAL @SetMovesUnlockedBitfield
 			NOP
 			BEQ s3 a1 KeepCurrentMoveSet
 			LI a1 0x03
-			
+
 			//FFM
 			LI a0 0x000BFDBF
 			JAL @SetMovesUnlockedBitfield
 			NOP
 			BEQ s3 a1 KeepCurrentMoveSet
 			LI a1 0x03
-			
+
 			//FFM + EGGS
 			LI a0 0x000BFDFF
 			JAL @SetMovesUnlockedBitfield
 			NOP
 			BEQ s3 a1 KeepCurrentMoveSet
-			
-			//ALL 
+
+			//ALL
 			LI a0 0x000FFFFF
 			JAL @SetMovesUnlockedBitfield
 			NOP
@@ -276,32 +243,30 @@ InPracMenu:
 		NOP
 
 	StayInPracPause:
-MOV v0 zero 
+MOV v0 zero
 B HouseKeeping
 
 NotInPracMenu:
-    LA a0 @ReturnToLairEnabled
-    SB zero 0(a0)
+	LA a0 @ReturnToLairEnabled
+	SB zero 0(a0)
 	JAL @PauseMenu
 	NOP
 	;check if entering practice menu
-    LA a0 @PauseMenuState
-    LB a0 0(a0)
-    LI a1 0x02 ;main pause menu screen open
-    BNE a0 a1 StayInNormPause
+	LA a0 @PauseMenuState
+	LB a0 0(a0)
+	LI a1 0x02 ;main pause menu screen open
+	BNE a0 a1 StayInNormPause
 	NOP
-        LA a0 @P1DPadLeft
-        LW a0 0(a0)
-	    XORI a0, a0, 1
-	    BNEZ a0 StayInNormPause ;If d-left press
-	    LI a0 0x01
+		LA a0 @P1DPadLeft
+		LW a0 0(a0)
+		XORI a0, a0, 1
+		BNEZ a0 StayInNormPause ;If d-left press
+		LI a0 0x01
 		LA a1 InPracMenu
 		SB a0 0(a1) ;set InPracMenu
 		NOP
 	StayInNormPause:
 NOP
-
-
 
 HouseKeeping:
 LW s2 0x14(sp)
@@ -314,7 +279,6 @@ LW ra 0x2C(sp)
 ADDIU sp 0x30
 JR
 NOP
-
 
 ;----------------------------------------------------------------
 ; Highlight Cursor Position
@@ -333,7 +297,7 @@ SW s3 0x14(sp)
 
 	;set all 4 opacities to 80
 	HighlightCursorPositionLoop:
-	
+
 		LA a3 @PauseMenuState
 		SLL s3 a1 2
 		ADDU s3 a3 s3
@@ -343,13 +307,11 @@ SW s3 0x14(sp)
 			LI s3 0xFF
 		HighlightCursorPositionNotCursorPos:
 		SB s3 0x169(a3)
-		
+
 		ADDIU a1 a1 1
 		BNE a2 a1 HighlightCursorPositionLoop
 		NOP
 	;set opacity matching cursor position to FF
-
-
 
 LW ra 0x24(sp)
 LW a1 0x20(sp)
@@ -384,13 +346,12 @@ SW s2 0x18(sp)
 
 		SLL a3 s2 5
 		LA a0 MenuItemStr
-		ADDU a0 a0 a3 
+		ADDU a0 a0 a3
 		JAL @CopyString
 		NOP
 		ADDIU s2 s2 1
 		BNE s2 a2 RestoreMainMenuTextLoop
 		NOP
-
 
 LW ra 0x2C(sp)
 LW a0 0x28(sp)
@@ -401,7 +362,6 @@ LW s2 0x18(sp)
 ADDIU sp 0x30
 JR
 NOP
-
 
 ;----------------------------------------------------------------
 ; Print practice Menu Text
@@ -417,7 +377,6 @@ SW a2 0x20(sp)
 SW a3 0x1C(sp)
 SW s3 0x18(sp)
 SW s2 0x14(sp)
-
 
 	MOV s2 zero
 	LI a2 0x04
@@ -435,7 +394,6 @@ SW s2 0x14(sp)
 		ADDIU s2 s2 1
 		BNE s2 a2 PrintPracMenuTextLoop
 		NOP
-
 
 LW ra 0x2C(sp)
 LW a0 0x28(sp)
@@ -460,21 +418,20 @@ SW a1 0x1C(sp)
 SW a2 0x18(sp)
 SW at 0x14(sp)
 
-
 //cheatMenuNotSetUp
 LB a0 PracMenuSetup
 BEQ a0 zero NormalModeCode_MenuSetup
 NOP
-    JAL BetaPauseMenu
-    NOP
-    MOV a0 zero
+	JAL BetaPauseMenu
+	NOP
+	MOV a0 zero
 NormalModeCode_MenuSetup:
 
 //Take Me There
 LB a0 TakeMeThereState
 BEQ a0 zero NormalModeCode_TakeMeThereEnd
 	;convert from option number  to level index
-	
+
 	LI at 0x01
 	;Reorder levels
 	BEQL a0 at TakeMeThereWorkLoad
@@ -510,7 +467,7 @@ BEQ a0 zero NormalModeCode_TakeMeThereEnd
 	JAL @TakeMeThere_LevelReset
 	MOV a0 v0
 	SB zero TakeMeThereState
-	
+
 NormalModeCode_TakeMeThereEnd:
 
 LB a0 TransformMeState
@@ -522,7 +479,7 @@ BEQ a0 zero NormalModeCode_TransformMeEnd
 	JAL @UpdatePlayerModelToMumboTransFormation
 	NOP
 	SB zero TransformMeState
-	
+
 NormalModeCode_TransformMeEnd:
 
 ;If Press-L to levitate ste
@@ -550,7 +507,7 @@ NormalModeCode_LToLevitateNormal:
 LB a0 InfinitesState
 BEQ a0 zero NormalModeCode_InfinitesNormal
 NOP
-	LI a1 @ItemBase  
+	LI a1 @ItemBase
 	LI a0 900
 	SW a0 0x30(a1) ;Notes
 	LI a0 100
@@ -570,8 +527,7 @@ NOP
 	SW a0 0x70(a1) ;MumboTokens_OnHand
 	SW a0 0x94(a1) ;MumboTokens
 	SW a0 0x9C(a1) ;JokerCards
-	
-	
+
 NormalModeCode_InfinitesNormal:
 
 ;If resetUponEnteringLevel
@@ -592,8 +548,8 @@ LB a2 @MapLoadState
 			MOV a0 a1
 			LB a1 @Exit
 			BNE a1 v0 NormalModeCode_ResetOnEnter
-			NOP	
-				;@ClearAllGameProgress clears everything below AND note scores, item counts, and moves 
+			NOP
+				;@ClearAllGameProgress clears everything below AND note scores, item counts, and moves
 				JAL @ClearGameProgressFlags
 				NOP
 				;JAL @ClearLevelNoteScores
@@ -619,7 +575,6 @@ NormalModeCode_ResetOnEnter:
 ;If PositionDisplay
 	;JAL PositionDisplay
 	NOP
-
 
 LW ra 0x24(sp)
 LW a0 0x20(sp)
@@ -671,7 +626,6 @@ SW a1 0(a0)    ;timing
 LI a1 135
 SH a1 0x0C(a0) ;YPos4
 
-
 LW a0 0x14(sp)
 LW a1 0x18(sp)
 ADDIU sp 0x20
@@ -714,7 +668,7 @@ MenuItemStr:
 .asciiz "PRACTICE MENU 4: \0\0\0\0\0\0\0\0\0\0\0\0\0\0"
 
 /*Option string*/
-/*TO DO: CHANGE TO STUCT {ascii, MaxOptions, Pointer to Option Sting}*/ 
+/*TO DO: CHANGE TO STUCT {ascii, MaxOptions, Pointer to Option Sting}*/
 MenuLabelStrings:
 .asciiz "INFINITES: \0\0\0\0"     ; OFF, ON
 .asciiz "RESET ON ENTER:"         ; OFF, ON
@@ -787,7 +741,3 @@ Temp1:
 .word 0
 Temp2:
 .byte 0
-
-
-
-
