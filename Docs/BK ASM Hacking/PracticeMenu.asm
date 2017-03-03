@@ -295,7 +295,8 @@ NotInPracMenu:
 	    XORI a0, a0, 1
 	    BNEZ a0 StayInNormPause ;If d-left press
 	    LI a0 0x01
-		SB a0 InPracMenu ;set InPracMenu
+		LA a1 InPracMenu
+		SB a0 0(a1) ;set InPracMenu
 		NOP
 	StayInNormPause:
 NOP
