@@ -3,11 +3,31 @@ SystemID N64
 010368	d	h	1	RDRAM	Render Mode Pointer
 010394	d	h	1	RDRAM	Framebuffer Pointer
 010398	d	h	1	RDRAM	Render Mode Pointer
+74AA44	d	f	1	RDRAM	Orange Y Acceleration
 74D94C	d	f	1	RDRAM	DK Walk Maximum Velocity
 74D950	d	f	1	RDRAM	Diddy Walk Maximum Velocity
 74D954	d	f	1	RDRAM	Lanky Walk Maximum Velocity
 74D958	d	f	1	RDRAM	Tiny Walk Maximum Velocity
 74D95C	d	f	1	RDRAM	Chunky Walk Maximum Velocity
+74D960	d	f	1	RDRAM	Krusha Walk Maximum Velocity
+74DA24	d	f	1	RDRAM	DK Carrying Object Maximum Velocity
+74DA28	d	f	1	RDRAM	Diddy Carrying Object Maximum Velocity
+74DA2C	d	f	1	RDRAM	Lanky Carrying Object Maximum Velocity
+74DA30	d	f	1	RDRAM	Tiny Carrying Object Maximum Velocity
+74DA34	d	f	1	RDRAM	Chunky Carrying Object Maximum Velocity
+74DA38	d	f	1	RDRAM	Krusha Carrying Object Maximum Velocity
+74DD1C	d	f	1	RDRAM	DK Jump Initial Y Velocity
+74DD20	d	f	1	RDRAM	Diddy Jump Initial Y Velocity
+74DD24	d	f	1	RDRAM	Lanky Jump Initial Y Velocity
+74DD28	d	f	1	RDRAM	Tiny Jump Initial Y Velocity
+74DD2C	d	f	1	RDRAM	Chunky Jump Initial Y Velocity
+74DD30	d	f	1	RDRAM	Krusha Jump Initial Y Velocity
+74DD38	d	f	1	RDRAM	DK Terminal Velocity
+74DD3C	d	f	1	RDRAM	Diddy Terminal Velocity
+74DD40	d	f	1	RDRAM	Lanky Terminal Velocity
+74DD44	d	f	1	RDRAM	Tiny Terminal Velocity
+74DD48	d	f	1	RDRAM	Chunky Terminal Velocity
+753840	d	f	1	RDRAM	Object Model 2 Floor Something?
 756E72	w	h	1	RDRAM	DK Behavior
 756E7A	w	h	1	RDRAM	DK Model
 756E82	w	h	1	RDRAM	Diddy Behavior
