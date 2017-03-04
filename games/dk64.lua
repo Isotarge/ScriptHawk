@@ -993,7 +993,7 @@ obj_model1 = {
 		[0x18] = "Baboon Blast Pad",
 		[0x19] = "Bouncing", -- Mushroom
 		[0x1A] = "Double Jump", -- Diddy
-
+		[0x1B] = "Simian Spring",
 		[0x1C] = "Simian Slam",
 		[0x1D] = "Long Jumping",
 		[0x1E] = "Falling",

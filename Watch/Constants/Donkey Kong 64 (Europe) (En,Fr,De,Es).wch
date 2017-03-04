@@ -3,6 +3,8 @@ SystemID N64
 010368	d	h	1	RDRAM	Render Mode Pointer
 010394	d	h	1	RDRAM	Framebuffer Pointer
 010398	d	h	1	RDRAM	Render Mode Pointer
+6EDAE6	w	h	1	RDRAM	Lanky Long Arms Map Index
+6EDAE8	d	h	1	RDRAM	Lanky Long Arms Map Check (0 for any map)
 74AA44	d	f	1	RDRAM	Orange Y Acceleration
 74D94C	d	f	1	RDRAM	DK Walk Maximum Velocity
 74D950	d	f	1	RDRAM	Diddy Walk Maximum Velocity
@@ -64,12 +66,28 @@ SystemID N64
 74DFE4	w	s	1	RDRAM	Chunky Water Surface Offset
 74DFE6	w	s	1	RDRAM	Krusha Water Surface Offset
 74DFE8	w	s	1	RDRAM	Rambi Water Surface Offset
+74E0D8	d	f	1	RDRAM	DK Surface Swim Terminal X Velocity
+74E0DC	d	f	1	RDRAM	Diddy Surface Swim Terminal X Velocity
+74E0E0	d	f	1	RDRAM	Lanky Surface Swim Terminal X Velocity
+74E0E4	d	f	1	RDRAM	Tiny Surface Swim Terminal X Velocity
+74E0E8	d	f	1	RDRAM	Chunky Surface Swim Terminal X Velocity
+74E0EC	d	f	1	RDRAM	Krusha Surface Swim Terminal X Velocity
+74E0F0	d	f	1	RDRAM	Rambi Surface Swim Terimal X Velocity
+74E230	d	f	1	RDRAM	DK Swim Terminal Velocity
+74E234	d	f	1	RDRAM	Diddy Swim Terminal Velocity
+74E238	d	f	1	RDRAM	Lanky Swim Terminal Velocity
+74E23C	d	f	1	RDRAM	Tiny Swim Terminal Velocity
+74E240	d	f	1	RDRAM	Chunky Swim Termnial Velocity
+74E244	d	f	1	RDRAM	Krusha Swim Terminal Velocity
+74E248	d	f	1	RDRAM	Rambi Swim Terminal Velocity
 74E57C	d	f	1	RDRAM	DK Coconut Velocity
 74E580	d	f	1	RDRAM	Diddy Peanut Velocity
 74E584	d	f	1	RDRAM	Lanky Grape Velocity
 74E588	d	f	1	RDRAM	Tiny Feather Velocity
 74E58C	d	f	1	RDRAM	Chunky Pineapple Velocity
 74E590	d	f	1	RDRAM	Krusha Orange Velocity (Gun)
+751C00	d	f	1	RDRAM	Object Model 1 Scale
+753530	d	f	1	RDRAM	Map Scale
 753840	d	f	1	RDRAM	Object Model 2 Floor Something?
 756E72	w	h	1	RDRAM	DK Behavior
 756E7A	w	h	1	RDRAM	DK Model
@@ -91,4 +109,10 @@ SystemID N64
 756EFA	w	h	1	RDRAM	Squawks Model
 756F02	w	h	1	RDRAM	Squawks Behavior
 756F0A	w	h	1	RDRAM	Squawks Model
+759738	w	h	1	RDRAM	Snide Behavior
+75973A	w	h	1	RDRAM	Snide Model
+759768	w	h	1	RDRAM	Klump Behavior
+75976A	w	h	1	RDRAM	Klump Model
+759900	w	h	1	RDRAM	Mad Jack Behavior
+759902	w	h	1	RDRAM	Mad Jack Model
 
