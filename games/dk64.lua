@@ -73,6 +73,7 @@ Game.Memory = {
 	["loading_zone_array"] = {0x7FDCB4, 0x7FDBF4, 0x7FE144, 0x7B7414},
 	["file"] = {0x7467C8, 0x740F18, 0x746088, nil},
 	["character"] = {0x74E77C, 0x748EDC, 0x74E05C, 0x6F9EB8},
+	["enemy_drop_table"] = {0x750400, 0x74AB20, 0x74FCE0, 0x6FB630},
 	-- 1000 0000 - ????
 	-- 0100 0000 - ????
 	-- 0010 0000 - Tag Barrel Void
@@ -1193,13 +1194,17 @@ obj_model1 = {
 	},
 };
 
+local function getActorNameFromBehavior(actorBehavior)
+	if type(obj_model1.actor_types[actorBehavior]) ~= "nil" then
+		return obj_model1.actor_types[actorBehavior];
+	end
+	return actorBehavior;
+end
+
 local function getActorName(pointer)
 	if isRDRAM(pointer) then
 		local actorBehavior = mainmemory.read_u32_be(pointer + obj_model1.actor_type) % 0x10000;
-		if type(obj_model1.actor_types[actorBehavior]) ~= "nil" then
-			return obj_model1.actor_types[actorBehavior];
-		end
-		return actorBehavior;
+		return getActorNameFromBehavior(actorBehavior);
 	end
 	return "Unknown";
 end
@@ -6479,6 +6484,21 @@ function everythingIsLlama()
 			end
 		end
 	end
+end
+
+function dumpEnemyDrops()
+	local object = 0;
+	local index = 0;
+	repeat
+		local objectBase = Game.Memory.enemy_drop_table[version] + index * 0x06;
+		object = mainmemory.read_u16_be(objectBase);
+		local droppedObject = mainmemory.read_u16_be(objectBase + 0x02);
+		local dropMusic = mainmemory.readbyte(objectBase + 0x04);
+		local dropCount = mainmemory.readbyte(objectBase + 0x05);
+		dprint(getActorNameFromBehavior(object).." drops "..dropCount.." "..getActorNameFromBehavior(droppedObject).." and plays "..toHexString(dropMusic));
+		index = index + 1;
+	until object == 0;
+	print_deferred();
 end
 
 function Game.eachFrame()
