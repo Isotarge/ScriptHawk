@@ -4,6 +4,21 @@ SystemID N64
 0103A8	d	h	1	RDRAM	Render Mode Pointer
 0103D4	d	h	1	RDRAM	Framebuffer Pointer
 0103D8	d	h	1	RDRAM	Render Mode Pointer
+6F29A6	w	h	1	RDRAM	Lanky Long Arms Map Index
+6F29A8	d	h	1	RDRAM	Lanky Long Arms Map Check (0 for any map)
+74F6D0	w	h	1	RDRAM	Tag Barrel Behavior
+74F6D2	w	h	1	RDRAM	Tag Barrel Model
+74F820	w	h	1	RDRAM	Tag Barrel (Kutout) Behavior
+74F822	w	h	1	RDRAM	Tag Barrel (Kutout) Model
+74FC04	d	f	1	RDRAM	Orange Y Acceleration
+75370C	d	f	1	RDRAM	DK Coconut Velocity
+753710	d	f	1	RDRAM	Diddy Peanut Velocity
+753714	d	f	1	RDRAM	Lanky Grape Velocity
+753718	d	f	1	RDRAM	Tiny Feather Velocity
+75371C	d	f	1	RDRAM	Chunky Pineapple Velocity
+753720	d	f	1	RDRAM	Krusha Orange Velocity (Gun)
+757460	d	f	1	RDRAM	Object Model 1 Scale
+758D80	d	f	1	RDRAM	Map Scale
 75C5D2	w	h	1	RDRAM	DK Behavior
 75C5DA	w	h	1	RDRAM	DK Model
 75C5E2	w	h	1	RDRAM	Diddy Behavior
@@ -24,4 +39,10 @@ SystemID N64
 75C65A	w	h	1	RDRAM	Squawks Model
 75C662	w	h	1	RDRAM	Squawks Behavior
 75C66A	w	h	1	RDRAM	Squawks Model
+75EDE8	w	h	1	RDRAM	Snide Behavior
+75EDEA	w	h	1	RDRAM	Snide Model
+75EE18	w	h	1	RDRAM	Klump Behavior
+75EE1A	w	h	1	RDRAM	Klump Model
+75EFB0	w	h	1	RDRAM	Mad Jack Behavior
+75EFB2	w	h	1	RDRAM	Mad Jack Model
 
