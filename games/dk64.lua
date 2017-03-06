@@ -107,8 +107,8 @@ Game.Memory = {
 	["isg_active"] = {0x755070, 0x74F8F0, 0x755130, nil},
 	["isg_timestamp"] = {0x7F5CE0, 0x7F5C00, 0x7F6150, nil},
 	["timestamp"] = {0x14FE0, 0x155C0, 0x15300, nil}, -- TODO: Kiosk
-	["obj_model2_array_pointer"] = {0x7F6000, 0x7F5F20, 0x7F6470, 0x6F4470},
-	["obj_model2_array_count"] = {0x7F6004, 0x7F5F24, 0x7F6474, nil}, -- TODO: Kiosk
+	["obj_model2_array_pointer"] = {0x7F6000, 0x7F5F20, 0x7F6470, 0x7A20B0}, -- 0x6F4470 has something to do with obj model 2 on Kiosk, not sure what yet
+	["obj_model2_array_count"] = {0x7F6004, 0x7F5F24, 0x7F6474, 0x7B17B8},
 	["obj_model2_setup_pointer"] = {0x7F6010, 0x7F5F30, 0x7F6480, 0x7B17C4},
 	["obj_model2_timer"] = {0x76A064, 0x764B84, 0x76A254, 0x72CDAC},
 	["obj_model2_collision_linked_list_pointer"] = {0x754244, 0x74E9A4, 0x753B34, 0x6FF054},
@@ -2201,11 +2201,7 @@ function populateObjectModel2Pointers()
 	object_pointers = {};
 	local objModel2Array = getObjectModel2Array();
 	if isRDRAM(objModel2Array) then
-		if version ~= 4 then
-			numSlots = mainmemory.read_u32_be(Game.Memory.obj_model2_array_count[version]);
-		else
-			numSlots = 430;
-		end
+		numSlots = mainmemory.read_u32_be(Game.Memory.obj_model2_array_count[version]);
 
 		if object_model2_filter == nil then
 			-- Fill and sort pointer list
@@ -2846,6 +2842,10 @@ function Game.detectVersion(romName, romHash)
 			[281] = "Kong (Tag Barrel)",
 			[282] = "Locked Kong (Tag Barrel)",
 		};
+
+		obj_model2_slot_size = 0x88;
+		obj_model2.behavior_pointer = 0x70;
+		obj_model2.object_type = 0x7C;
 
 		-- Kiosk version maps
 		--0 Crash

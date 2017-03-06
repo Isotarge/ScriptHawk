@@ -27,6 +27,7 @@ SystemID N64
 7A1E94	d	h	1	RDRAM	Map Model Pointer?
 7A1E98	d	h	1	RDRAM	Map Verts Pointer
 7A1E9C	d	h	1	RDRAM	Map Model Pointer?
+7B17B8	d	h	1	RDRAM	Object Model 2 Count
 7B17C4	d	h	1	RDRAM	Setup File Pointer
 7B20F8	d	h	1	RDRAM	Chunk Array Pointer
 7B48A0	d	h	1	RDRAM	Water Surface List Pointer
@@ -62,7 +63,7 @@ SystemID N64
 7B675F	b	u	1	RDRAM	Melons
 7B6D00	w	u	1	RDRAM	Transferred Actor Type
 7B6DA0	d	u	1	RDRAM	Idle Timer
-7B71C4	d	h	1	RDRAM	Object Model 2 Array Pointer?
+7B7088	d	f	1	RDRAM	Loading Zone Fadeout Progress
 7B73D8	w	h	1	RDRAM	Number of Enemies
 7B73DC	d	h	1	RDRAM	Enemy Respawn Array Pointer
 7B7410	w	h	1	RDRAM	Loading Zone Array Size
