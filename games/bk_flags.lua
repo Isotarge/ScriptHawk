@@ -255,7 +255,7 @@ local flag_array = {
 	{["name"] = "1st Honeycomb Text",		["index"] = 0x0A,	["type"] = "Prog",	["level"] = 6},
 	{["name"] = "1st Empty Honeycomb Text",	["index"] = 0x0B,	["type"] = "Prog",	["level"] = 6},
 	{["name"] = "1st Extra Life Text",		["index"] = 0x0C,	["type"] = "Prog",	["level"] = 6},
-	{["name"] = "1st Behive Text",			["index"] = 0x0D,	["type"] = "Prog",	["level"] = 6},
+	{["name"] = "1st Beehive Text",			["index"] = 0x0D,	["type"] = "Prog",	["level"] = 6},
 	{["name"] = "1st Jinjo Text",			["index"] = 0x0E,	["type"] = "Prog",	["level"] = 6},
 	{["name"] = "1st Time Pirahana Text",	["index"] = 0x0F,	["type"] = "Prog",	["level"] = 6},
 	{["name"] = "1st Sand Eel Text",		["index"] = 0x10,	["type"] = "Prog",	["level"] = 6},

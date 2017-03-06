@@ -9,8 +9,8 @@
 //
 
 //Variables
-[NumberOfOptions]: 0x06
-[PageTopMax]: 0x02
+[NumberOfOptions]: 0x07
+[PageTopMax]: 0x03
 
 ;----------------------------------------------------------------
 ; Code Run from Pause Mode
@@ -472,12 +472,12 @@ BEQ a0 zero NormalModeCode_TakeMeThereEnd
 NormalModeCode_TakeMeThereEnd:
 
 
-;Transform Me
+//Transform Me
 LB a0 TransformMeState
 BEQ a0 zero NormalModeCode_TransformMeEnd
 
 	LB a0 TransformMeState
-	JAL @Transform Me
+	JAL @TransformMe
 	NOP
 	SB zero TransformMeState
 
@@ -485,8 +485,7 @@ NormalModeCode_TransformMeEnd:
 
 
 
-;If Press-L to levitate ste
-	;JAL PressLToLevitate ;Press-L to levitate code
+//Press-L to Levitate
 LB a0 L2LevitateState
 BEQ a0 zero NormalModeCode_LToLevitateNormal
 NOP
@@ -502,11 +501,15 @@ NOP
 		NOP
 NormalModeCode_LToLevitateNormal:
 
+
+//Ingame-Timer
 ;If Ingame-Timer/AutoSplitter
 	;JAL Ingame-Timer
 	NOP
 
-;If Infinites
+
+
+//Infinites
 LB a0 InfinitesState
 BEQ a0 zero NormalModeCode_InfinitesNormal
 NOP
@@ -533,7 +536,8 @@ NOP
 
 NormalModeCode_InfinitesNormal:
 
-;If resetUponEnteringLevel
+
+//ResetUponEnter
 LB a0 ResetOnEnterState
 BEQ a0 zero NormalModeCode_ResetOnEnter
 LB a2 @MapLoadState
@@ -579,6 +583,96 @@ NormalModeCode_ResetOnEnter:
 	;JAL PositionDisplay
 	NOP
 
+
+//Map Ghost
+LB a0 GhostState
+BEQ a0 zero NormalModeCode_MapGhosts
+LB a0 @MapLoadState
+	BEQ a0 zero NormalModeCode_MapGhosts_NotInLZ
+	NOP
+		LB a1 PreviousLoadzoneState
+	    BEQ a0 a1 NormalModeCode_MapGhosts_InLZ_NoTransition //just left Entered
+		NOP
+		
+			//despawn ghost
+			LW a1 GhostObjectPointer
+			BEQ a1 zero NormalModeCode_MapGhosts_InLZ_NoTransition
+			NOP
+				;LB a2 0x47(a1)
+				;ORI a2 a2 0x08
+				;SB a2 0x47(a1)
+				;SW zero GhostObjectPointer
+				
+			//If prevMap != 0
+			//for i in range of ghosts
+				//If Ghost[i].map/exit = prev map/exit
+					//If newRecord.Frames < ghost.frames
+						//remove ghost[i]
+						//add newRecord to ghost
+		//newRecordMap = loadzone map/exit
+		//prevLoadzoneState = loadzone state
+		//prevMap/Exit = map/exit
+		
+		NormalModeCode_MapGhosts_InLZ_NoTransition:
+		
+		SB a0 PreviousLoadzoneState
+		B NormalModeCode_MapGhosts
+		NOP
+		
+	NormalModeCode_MapGhosts_NotInLZ:
+		LB a1 PreviousLoadzoneState
+	    BEQ a0 a1 NormalModeCode_MapGhosts_NotInLZ_NoTransition //just left loadzone
+		NOP
+			SB a0 PreviousLoadzoneState
+			//set Address of currentGhost
+			
+			MOV a2 zero ;spawn ghost
+			LA a1 @XPos
+			JAL @SpawnActor 
+			;LI a0 0x12
+			LI a0 0xCA
+			
+			SW v0 GhostObjectPointer
+			
+			//set ghost opacity
+			
+			//set ghost scale
+			
+			SW zero GhostCurrentFrame
+			//currentFrame = 0
+			B NormalModeCode_MapGhosts
+			NOP
+			
+		NormalModeCode_MapGhosts_NotInLZ_NoTransition: 
+			SB a0 PreviousLoadzoneState
+			
+			LW a0 GhostCurrentFrame
+			LI a1 0x02
+			BGE a0 a1 Ghost_Collision_Off
+			NOP
+				LW v0 GhostObjectPointer
+				BEQ v0 zero  NormalModeCode_MapGhosts
+				NOP
+					LW a1 0(v0) ;turn off ghost collision
+					SB zero 0x2F(a1)
+			
+			
+			Ghost_Collision_Off:
+			
+			
+			ADDIU a0 a0 0x01
+			SW a0 GhostCurrentFrame
+				
+			
+			//if currentFrame < currentGhost.Frames
+				//record player position/rotation as half to newRecord[currentFrame]
+				//set ghostModel position/rotation to currentGhost[currentFrame]
+				//if currentFrame == currentGhost.Frames
+					//despawn ghostModel
+			//currentFrame ++
+		
+NormalModeCode_MapGhosts:
+		
 LW ra 0x24(sp)
 LW a0 0x20(sp)
 LW a1 0x1C(sp)
@@ -663,6 +757,19 @@ L2LevitateState:
 .byte 0
 TransformMeState:
 .byte 0
+GhostState:
+.byte 1
+
+PreviousLoadzoneState:
+.byte 0
+.byte 0
+.byte 0
+.byte 0
+
+GhostObjectPointer:
+.word 0
+GhostCurrentFrame:
+.word 0
 
 MenuItemStr:
 .asciiz "PRACTICE MENU 1: \0\0\0\0\0\0\0\0\0\0\0\0\0\0"
@@ -679,6 +786,7 @@ MenuLabelStrings:
 .asciiz "MOVE SET: \0\0\0\0\0"    ; OFF, NONE, FFM, ALL
 .asciiz "L 2 LEVITATE: \0"      ;ON, OFF
 .asciiz "TRANSFORM ME: \0"	  ;OFF, BANJO, TERMITE, CROC, WALRUS, PUMPKIN, BEE, WASHY
+.asciiz "MAP GHOSTS: \0\0\0"	  ;OFF, BANJO, TERMITE, CROC, WALRUS, PUMPKIN, BEE, WASHY
 .asciiz "\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0"
 
 MenuOptionMaxStates:
@@ -693,7 +801,9 @@ MoveSetMaxState:
 L2LevitateMaxState:
 .byte 2
 TransformMeMaxState:
-.byte 1
+.byte 8
+GhostMaxState:
+.byte 2
 
 .align 2 0
 MenuOptionStringSet:
@@ -709,6 +819,8 @@ L2LevitateStringSet:
 .word OnOffOptionString
 TransformMeStringSet:
 .word TransformMeOptionString
+GhostStringSet:
+.word OnOffOptionString
 
 OnOffOptionString:
 .asciiz "OFF\0\0\0\0"
@@ -753,4 +865,6 @@ CurrentMoveSet:
 Temp1:
 .word 0
 Temp2:
+.byte 0
+Temp3:
 .byte 0
