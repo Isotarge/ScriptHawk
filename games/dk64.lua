@@ -6477,20 +6477,6 @@ function dumpEnemies()
 	end
 end
 
-function everythingIsLlama()
-	local enemyRespawnObject = dereferencePointer(Game.Memory.enemy_respawn_object[version]);
-	if isRDRAM(enemyRespawnObject) then
-		local numberOfEnemies = mainmemory.read_u16_be(Game.Memory.num_enemies[version]);
-		for i = 1, numberOfEnemies do
-			local slotBase = enemyRespawnObject + (i - 1) * 0x48;
-			local enemyType = mainmemory.readbyte(slotBase);
-			if enemyType == 0x50 then
-				mainmemory.writebyte(slotBase + 0x0A, 0);
-			end
-		end
-	end
-end
-
 function dumpEnemyDrops()
 	local object = 0;
 	local index = 0;
@@ -6507,7 +6493,7 @@ function dumpEnemyDrops()
 end
 
 function dumpObjectSpawnTable()
-	print("Index,Behavior,Model,Name,Internal Name,")
+	print("Index,Behavior,Model,Name,Internal Name,");
 	for i = 0, 127 do
 		local base = Game.Memory.object_spawn_table[version] + i * 0x30;
 		local behavior = mainmemory.read_u16_be(base + 0x00);
@@ -6547,21 +6533,6 @@ function Game.eachFrame()
 		end
 		previousCameraState = currentCameraState;
 	end
-
-	--[[
-	local enemyRespawnObject = dereferencePointer(Game.Memory.enemy_respawn_object[version]);
-	if isRDRAM(enemyRespawnObject) then
-		local numberOfEnemies = mainmemory.read_u16_be(Game.Memory.num_enemies[version]);
-		for i = 1, numberOfEnemies do
-			mainmemory.writebyte(enemyRespawnObject + (i - 1) * 0x48 + 0x00, 0x15); -- Force Lanky
-			--mainmemory.write_u16_be(enemyRespawnObject + (i - 1) * 0x48 + 0x24, 1); -- Force respawn
-			--mainmemory.writefloat(enemyRespawnObject + (i - 1) * 0x48 + 0x2C, testfloatvalue, true);
-			--mainmemory.writefloat(enemyRespawnObject + (i - 1) * 0x48 + 0x30, testfloatvalue, true);
-			--mainmemory.writefloat(enemyRespawnObject + (i - 1) * 0x48 + 0x34, testfloatvalue, true);
-			--mainmemory.writefloat(enemyRespawnObject + (i - 1) * 0x48 + 0x38, testfloatvalue, true);
-		end
-	end
-	--]]
 
 	-- TODO: This is really slow and doesn't cover all memory domains
 	--memoryStatCache = getMemoryStats(dereferencePointer(Game.Memory.linked_list_pointer[version]));
