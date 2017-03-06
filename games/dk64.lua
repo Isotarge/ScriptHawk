@@ -73,6 +73,7 @@ Game.Memory = {
 	["loading_zone_array"] = {0x7FDCB4, 0x7FDBF4, 0x7FE144, 0x7B7414},
 	["file"] = {0x7467C8, 0x740F18, 0x746088, nil},
 	["character"] = {0x74E77C, 0x748EDC, 0x74E05C, 0x6F9EB8},
+	["object_spawn_table"] = {0x74E8B0, 0x749010, 0x74E1D0, 0x6F9F80},
 	["enemy_drop_table"] = {0x750400, 0x74AB20, 0x74FCE0, 0x6FB630},
 	-- 1000 0000 - ????
 	-- 0100 0000 - ????
@@ -6498,6 +6499,17 @@ function dumpEnemyDrops()
 		dprint(getActorNameFromBehavior(object).." drops "..dropCount.." "..getActorNameFromBehavior(droppedObject).." and plays "..toHexString(dropMusic));
 		index = index + 1;
 	until object == 0;
+	print_deferred();
+end
+
+function dumpObjectSpawnTable()
+	for i = 0, 127 do
+		local base = Game.Memory.object_spawn_table[version] + i * 0x30;
+		local behavior = mainmemory.read_u16_be(base + 0x00);
+		local model = mainmemory.read_u16_be(base + 0x02);
+		local internalName = readNullTerminatedString(base + 0x14);
+		dprint(i..": "..toHexString(behavior, 4).." "..toHexString(model, 4).." "..internalName);
+	end
 	print_deferred();
 end
 

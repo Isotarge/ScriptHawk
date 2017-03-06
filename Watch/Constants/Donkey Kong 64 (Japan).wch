@@ -6,11 +6,27 @@ SystemID N64
 0103D8	d	h	1	RDRAM	Render Mode Pointer
 6F29A6	w	h	1	RDRAM	Lanky Long Arms Map Index
 6F29A8	d	h	1	RDRAM	Lanky Long Arms Map Check (0 for any map)
-74F6D0	w	h	1	RDRAM	Tag Barrel Behavior
-74F6D2	w	h	1	RDRAM	Tag Barrel Model
-74F820	w	h	1	RDRAM	Tag Barrel (Kutout) Behavior
-74F822	w	h	1	RDRAM	Tag Barrel (Kutout) Model
 74FC04	d	f	1	RDRAM	Orange Y Acceleration
+752ADC	d	f	1	RDRAM	DK Walk Maximum Velocity
+752AE0	d	f	1	RDRAM	Diddy Walk Maximum Velocity
+752AE4	d	f	1	RDRAM	Lanky Walk Maximum Velocity
+752AE8	d	f	1	RDRAM	Tiny Walk Maximum Velocity
+752AEC	d	f	1	RDRAM	Chunky Walk Maximum Velocity
+752AF0	d	f	1	RDRAM	Krusha Walk Maximum Velocity
+752B4C	w	u	1	RDRAM	DK Angle Update Speed (Land)
+752B4E	w	u	1	RDRAM	Diddy Angle Update Speed (Land)
+752B50	w	u	1	RDRAM	Lanky Angle Update Speed (Land)
+752B52	w	u	1	RDRAM	Tiny Angle Update Speed (Land)
+752B54	w	u	1	RDRAM	Chunky Angle Update Speed (Land)
+752B56	w	u	1	RDRAM	Krusha Angle Update Speed (Land)
+752B58	w	u	1	RDRAM	Rambi Angle Update Speed (Land)
+752BB4	d	f	1	RDRAM	DK Carrying Object Maximum Velocity
+752BB8	d	f	1	RDRAM	Diddy Carrying Object Maximum Velocity
+752BBC	d	f	1	RDRAM	Lanky Carrying Object Maximum Velocity
+752BC0	d	f	1	RDRAM	Tiny Carrying Object Maximum Velocity
+752BC4	d	f	1	RDRAM	Chunky Carrying Object Maximum Velocity
+752BC8	d	f	1	RDRAM	Krusha Carrying Object Maximum Velocity
+752BCC	d	f	1	RDRAM	Rambi Carrying Object Maximum Velocity
 75370C	d	f	1	RDRAM	DK Coconut Velocity
 753710	d	f	1	RDRAM	Diddy Peanut Velocity
 753714	d	f	1	RDRAM	Lanky Grape Velocity

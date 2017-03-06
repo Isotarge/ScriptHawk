@@ -28,38 +28,49 @@ SystemID N64
 74637A	w	h	1	RDRAM	Footstep SFX
 746380	w	h	1	RDRAM	Footstep SFX
 746392	w	h	1	RDRAM	Footstep SFX
-74E808	d	f	1	RDRAM	Rambi Walk Maximum Velocity
-74E8B0	d	h	1	RDRAM	Interesting block related to scripts
-74FDB0	w	h	1	RDRAM	Tag Barrel Behavior
-74FDB2	w	h	1	RDRAM	Tag Barrel Model
-74FF00	w	h	1	RDRAM	Tag Barrel (Kutout) Behavior
-74FF02	w	h	1	RDRAM	Tag Barrel (Kutout) Model
 7502E4	d	f	1	RDRAM	Orange Y Acceleration
 7530B0	w	u	1	RDRAM	DK Invulnerability Timer
 7530B2	w	u	1	RDRAM	Diddy Invulnerability Timer
 7530B4	w	u	1	RDRAM	Lanky Invulnerability Timer
 7530B6	w	u	1	RDRAM	Tiny Invulnerability Timer
 7530B8	w	u	1	RDRAM	Chunky Invulnerability Timer
+7530BA	w	u	1	RDRAM	Krusha Invulnerability Timer
+7530BC	w	u	1	RDRAM	Rambi Invulnerability Timer
 7530D0	w	u	1	RDRAM	DK Invulnerability Timer
 7530D2	w	u	1	RDRAM	Diddy Invulnerability Timer
 7530D4	w	u	1	RDRAM	Lanky Invulnerability Timer
 7530D6	w	u	1	RDRAM	Tiny Invulnerability Timer
 7530D8	w	u	1	RDRAM	Chunky Invulnerability Timer
+7530DA	w	u	1	RDRAM	Krusha Invulnerability Timer
+7530DC	w	u	1	RDRAM	Rambi Invulnerability Timer
 753160	w	u	1	RDRAM	DK Invulnerability Timer
 753162	w	u	1	RDRAM	Diddy Invulnerability Timer
 753164	w	u	1	RDRAM	Lanky Invulnerability Timer
 753166	w	u	1	RDRAM	Tiny Invulnerability Timer
 753168	w	u	1	RDRAM	Chunky Invulnerability Timer
+75316A	w	u	1	RDRAM	Krusha Invulnerability Timer
+75316C	w	u	1	RDRAM	Rambi Invulnerability Timer
 7531FC	d	f	1	RDRAM	DK Walk Maximum Velocity
 753200	d	f	1	RDRAM	Diddy Walk Maximum Velocity
 753204	d	f	1	RDRAM	Lanky Walk Maximum Velocity
 753208	d	f	1	RDRAM	Tiny Walk Maximum Velocity
 75320C	d	f	1	RDRAM	Chunky Walk Maximum Velocity
+753210	d	f	1	RDRAM	Krusha Walk Maximum Velocity
+753214	d	f	1	RDRAM	Rambi Walk Maximum Velocity
+75326C	w	u	1	RDRAM	DK Angle Update Speed (Land)
+75326E	w	u	1	RDRAM	Diddy Angle Update Speed (Land)
+753270	w	u	1	RDRAM	Lanky Angle Update Speed (Land)
+753272	w	u	1	RDRAM	Tiny Angle Update Speed (Land)
+753274	w	u	1	RDRAM	Chunky Angle Update Speed (Land)
+753276	w	u	1	RDRAM	Krusha Angle Update Speed (Land)
+753278	w	u	1	RDRAM	Rambi Angle Update Speed (Land)
 7532D4	d	f	1	RDRAM	DK Carrying Object Maximum Velocity
 7532D8	d	f	1	RDRAM	Diddy Carrying Object Maximum Velocity
 7532DC	d	f	1	RDRAM	Lanky Carrying Object Maximum Velocity
 7532E0	d	f	1	RDRAM	Tiny Carrying Object Maximum Velocity
 7532E4	d	f	1	RDRAM	Chunky Carrying Object Maximum Velocity
+7532E8	d	f	1	RDRAM	Krusha Carrying Object Maximum Velocity
+7532EC	d	f	1	RDRAM	Rambi Carrying Object Maximum Velocity
 753578	d	f	1	RDRAM	DK Idle, Kick, Crouch, Fall Y Acceleration
 753590	d	f	1	RDRAM	Rambi Idle Y Acceleration
 7535B0	d	f	1	RDRAM	DK Jump Y Acceleration
@@ -89,24 +100,28 @@ SystemID N64
 753728	d	f	1	RDRAM	Tiny Backflip Initial Y Velocity
 75372C	d	f	1	RDRAM	Chunky Backflip Initial Y Velocity
 753730	d	f	1	RDRAM	Krusha Backflip Initial Y Velocity
+753734	d	f	1	RDRAM	Rambi Backflip Initial Y Velocity?
 753738	d	f	1	RDRAM	DK Backflip Y Acceleration
 75373C	d	f	1	RDRAM	Diddy Backflip Y Acceleration
 753740	d	f	1	RDRAM	Lanky Backflip Y Acceleration
 753744	d	f	1	RDRAM	Tiny Backflip Y Acceleration
 753748	d	f	1	RDRAM	Chunky Backflip Y Acceleration
 75374C	d	f	1	RDRAM	Krusha Backflip Y Acceleration
+753750	d	f	1	RDRAM	Rambi Backflip Y Acceleration?
 753770	d	f	1	RDRAM	DK Long Jump Velocity
 753774	d	f	1	RDRAM	Diddy Long Jump Velocity
 753778	d	f	1	RDRAM	Lanky Long Jump Velocity
 75377C	d	f	1	RDRAM	Tiny Long Jump Velocity
 753780	d	f	1	RDRAM	Chunky Long Jump Velocity
 753784	d	f	1	RDRAM	Krusha Long Jump Velocity
+753788	d	f	1	RDRAM	Rambi Long Jump Velocity?
 75378C	d	f	1	RDRAM	DK Long Jump Initial Y Velocity
 753790	d	f	1	RDRAM	Diddy Long Jump Initial Y Velocity
 753794	d	f	1	RDRAM	Lanky Long Jump Initial Y Velocity
 753798	d	f	1	RDRAM	Tiny Long Jump Initial Y Velocity
 75379C	d	f	1	RDRAM	Chunky Long Jump Initial Y Velocity
 7537A0	d	f	1	RDRAM	Krusha Long Jump Initial Y Velocity
+7537A4	d	f	1	RDRAM	Rambi Long Jump Initial Y Velocity?
 75388C	w	s	1	RDRAM	DK Water Surface Offset
 75388E	w	s	1	RDRAM	Diddy Water Surface Offset
 753890	w	s	1	RDRAM	Lanky Water Surface Offset
@@ -134,6 +149,7 @@ SystemID N64
 753E38	d	f	1	RDRAM	Tiny Feather Velocity
 753E3C	d	f	1	RDRAM	Chunky Pineapple Velocity
 753E40	d	f	1	RDRAM	Krusha Orange Velocity (Gun)
+753E44	d	f	1	RDRAM	Rambi Gun Velocity?
 757360	d	f	1	RDRAM	Object Model 1 Scale
 758C60	d	f	1	RDRAM	Map Scale
 758EC0	d	f	1	RDRAM	Pad Fake Floor Y
