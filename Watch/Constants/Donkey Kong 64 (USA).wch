@@ -184,4 +184,8 @@ SystemID N64
 75EC5A	w	h	1	RDRAM	Klump Model
 75EDF0	w	h	1	RDRAM	Mad Jack Behavior
 75EDF2	w	h	1	RDRAM	Mad Jack Model
+7F5FE4	w	s	1	RDRAM	Map Void Corner
+7F5FE6	w	s	1	RDRAM	Map Void Corner
+7F5FE8	w	s	1	RDRAM	Map Void Corner
+7F5FEA	w	s	1	RDRAM	Map Void Corner
 

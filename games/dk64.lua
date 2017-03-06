@@ -2676,6 +2676,7 @@ function Game.detectVersion(romName, romHash)
 
 			[0x0F] = "Skidding",
 
+			[0x17] = "Slipping",
 			[0x18] = "Jumping",
 
 			[0x1A] = "Double Jump", -- Diddy
