@@ -6444,10 +6444,14 @@ local staticObjectModels = {
 
 function dumpEnemies()
 	local enemyRespawnObject = dereferencePointer(Game.Memory.enemy_respawn_object[version]);
+	local enemySlotSize = 0x48;
+	if version == 4 then
+		enemySlotSize = 0x44;
+	end
 	if isRDRAM(enemyRespawnObject) then
 		local numberOfEnemies = mainmemory.read_u16_be(Game.Memory.num_enemies[version]);
 		for i = 1, numberOfEnemies do
-			local slotBase = enemyRespawnObject + (i - 1) * 0x48;
+			local slotBase = enemyRespawnObject + (i - 1) * enemySlotSize;
 			local enemyType = mainmemory.readbyte(slotBase);
 			local enemyName = "Unknown "..toHexString(enemyType);
 			local model = 0;
@@ -6503,12 +6507,14 @@ function dumpEnemyDrops()
 end
 
 function dumpObjectSpawnTable()
+	print("Index,Behavior,Model,Name,Internal Name,")
 	for i = 0, 127 do
 		local base = Game.Memory.object_spawn_table[version] + i * 0x30;
 		local behavior = mainmemory.read_u16_be(base + 0x00);
 		local model = mainmemory.read_u16_be(base + 0x02);
+		local name = getActorNameFromBehavior(behavior);
 		local internalName = readNullTerminatedString(base + 0x14);
-		dprint(i..": "..toHexString(behavior, 4).." "..toHexString(model, 4).." "..internalName);
+		dprint(i..","..toHexString(behavior, 4)..","..toHexString(model, 4)..","..name..","..internalName..",");
 	end
 	print_deferred();
 end
