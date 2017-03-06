@@ -3,6 +3,8 @@
 ---------------------------------*/
 [PauseMenuStringsBase]: 0x8036C4E0
 
+[ObjectArrayPointer]: 0x8036E560
+
 [PlayerPointer]: 0x8037BF20
 
 [XPos]: 0x8037C5A0
@@ -438,6 +440,7 @@
 
 [SpawnActor]: 0x8032813C ;Inputs: (word $a0 ActorIndex), (float* $a1 LocationXPtr), (float $a2 rotation)
 
+[GetBehaviorStruct_ObjectStructOffset]: 0x80329958
 
 //STRING LIBRARY
 [AppendString]:     0x8033D660  ;I: (char* $a0 destStr, char* $a1 srcStr)
