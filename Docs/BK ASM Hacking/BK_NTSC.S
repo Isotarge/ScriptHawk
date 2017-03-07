@@ -383,6 +383,8 @@
 [SetGravitationalAcceleration]: 0x80297BEC
 [SetTerminalVelocity]:          0x80297BF8
 
+[CopyXYZPosition]:			0x802984D4
+
 [AddToYPos]: 				0x80298528 ;I: (float $f12)
 
 [SetMumboTransformation]: 	0x8029A960

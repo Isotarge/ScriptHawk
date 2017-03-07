@@ -206,7 +206,6 @@ InPracMenu:
 			//NONE
 			JAL @LockAllMoves
 			NOP
-			SW zero CurrentMoveSet
 			BEQ s3 a1 KeepCurrentMoveSet
 			LI a1 0x02
 
@@ -593,21 +592,43 @@ LB a0 @MapLoadState
 		LB a1 PreviousLoadzoneState
 	    BEQ a1 a0 NormalModeCode_MapGhosts_InLZ_NoTransition //just left Entered
 		NOP
-			SW zero GhostCurrentFrame
-			//despawn ghost
-			
 			SB a0 PreviousLoadzoneState	
+			
+			LW a0 GhostRecordPointer
+			LW a1 GhostCurrentFrame
+			BEQ a0 zero Ghost_InLZ_Transition_End
+			NOP	
+				SW a1 0x04(a0)
+				SW zero GhostCurrentFrame
+				ADDIU a1 0x01
+				SLL a1 a1 0x02
+				SLL a2 a1 0x01
+				ADDU a1 a1 a2
+				ADDU a1 a1 a0
+				ADDIU a1 a1 0x10
+				SW a1 0x08(a0)
+				SW a0 0x0C(a1)
+				SW a1 GhostCurrentTailPointer
+				
+				LW a0 GhostCurrentPlaybackPointer
+				BEQ a0 zero Ghost_InLZ_Transition_End
+				NOP
+					LW a1 0x08(a0) ;Remove old ghost from list
+					LW a2 0x0C(a0)
+					SW a2 0x0C(a1)
+					BEQ a2 zero Ghost_InLZ_Transition_End
+					NOP
+						SW a1 0x08(a2)
+					
+					//TODO: Defrag list
+				
+			Ghost_InLZ_Transition_End:
+			SW zero GhostRecordPointer
+			SW zero GhostCurrentPlaybackPointer
+			SW zero GhostCurrentFrame
+			
 			B NormalModeCode_MapGhosts
 			NOP
-			
-			//If prevMap != 0
-			//for i in range of ghosts
-				//If Ghost[i].map/exit = prev map/exit
-					//If newRecord.Frames < ghost.frames
-						//remove ghost[i]
-						//add newRecord to ghost
-			//newRecordMap = loadzone map/exit
-			//prevMap/Exit = map/exit
 		
 		NormalModeCode_MapGhosts_InLZ_NoTransition:
 		SB a0 PreviousLoadzoneState
@@ -642,22 +663,59 @@ LB a0 @MapLoadState
 			SB a0 PreviousLoadzoneState
 			//set Address of currentGhost
 			
-			MOV a2 zero ;spawn ghost
-			LA a1 @XPos
-			JAL @SpawnActor 
-			LI a0 0xCA
+			//check if current map has ghost
+			LA a0 GhostArray
+			GhostFindGhostPlayback:
+			LW a1 GhostCurrentTailPointer
+			BEQ a0 a1 GhostPlaybackSet
+			NOP
 			
-			SW v0 GhostObjectPointer
-			LW v0 @ObjectArrayPointer
-			SW v0 GhostPrevObjectArray
+			LB a1 @Map
+			LH a2 0(a0)
+			BNEL a1 a2 GhostFindGhostPlayback
+			LW a0 0x08(a0)
 			
-			//set ghost opacity
+			LB a1 @Exit
+			LH a2 2(a0)
+			BNEL a1 a2 GhostFindGhostPlayback
+			LW a0 0x08(a0)
+			
+			SW a0 GhostCurrentPlaybackPointer
+			
+			;set record Position
+			//if ghost exists for map/exit
+			
+				;set ghost playback		
+	
+				MOV a2 zero ;spawn ghost
+				ADDIU a1 a0 0x10
+				JAL @SpawnActor 
+				LI a0 0xCA
+			
+				SW v0 GhostObjectPointer
+				LW v0 @ObjectArrayPointer
+				SW v0 GhostPrevObjectArray
+			
+				//set ghost opacity
 			
 			
-			//set ghost scale
+				//set ghost scale
+				
+			GhostPlaybackSet:
+			LW a0 GhostCurrentTailPointer
+			SW a0 GhostRecordPointer
+			LB a1 @Map 
+			SH a1 0(a0)
+			LB a1 @Exit 
+			SH a1 0x02(a0)
 			
 			SW zero GhostCurrentFrame
 			//currentFrame = 0
+			
+			ADDIU a0 a0 0x10
+			JAL @CopyXYZPosition
+			NOP
+			
 			B NormalModeCode_MapGhosts
 			NOP
 			
@@ -665,54 +723,101 @@ LB a0 @MapLoadState
 			SB a0 PreviousLoadzoneState
 			
 			LW a0 GhostCurrentFrame
-			LI a1 0x02
-			BGE a0 a1 Ghost_Collision_Off
+			ADDIU a0 a0 0x01
+			SW a0 GhostCurrentFrame
+			
+			;If playback ghost found
+			LW a0 GhostCurrentPlaybackPointer
+			BEQ a0 zero GhostPlaybackNotSet
 			NOP
-				LW v0 GhostObjectPointer
-				BEQ v0 zero  NormalModeCode_MapGhosts
-				NOP
-					LW a1 0(v0) ;turn off ghost collision
-					SB zero 0x2F(a1)
-					LW a0 0(v0)
-					JAL @GetBehaviorStruct_ObjectStructOffset
-					NOP
-					SW v0 GhostObjectPointer
-					LW v0 @ObjectArrayPointer
-					SW v0 GhostPrevObjectArray
-				
-				
-			Ghost_Collision_Off:
-				LW a0 @ObjectArrayPointer
-				LW a1 GhostPrevObjectArray ;if object array changed
-				BEQ a0 a1 Ghost_No_ObjectArrayMove
-				NOP
-					SW a0 GhostPrevObjectArray
-					SUBU a0 a0 a1
-					LW a1 GhostObjectPointer
-					ADDU a0 a0 a1
-					SW a0 GhostObjectPointer
-				
-				Ghost_No_ObjectArrayMove:
-				LW v0 GhostObjectPointer
-				BEQ v0 zero  NormalModeCode_MapGhosts
-				NOP
-					LW a0 0(v0)
-					JAL @GetBehaviorStruct_ObjectStructOffset
-					NOP
-					SW v0 GhostObjectPointer
 			
+				;IF GHOST NEEDS TO BE DESPAWNED
 				LW a0 GhostCurrentFrame
-				ADDIU a0 a0 0x01
-				SW a0 GhostCurrentFrame
+				LW a1 GhostCurrentPlaybackPointer
+				LW a1 0x04(a1)
+				BLE a0 a1 RecordNotBehindGhost
+				NOP
 				
+					SW zero GhostCurrentPlaybackPointer
+					SW zero GhostRecordPointer
+				
+					LW a1 GhostObjectPointer ;Set Despawn Bit
+					BEQ a1 zero NormalModeCode_MapGhosts
+						NOP
+						LB a2 0x47(a1)
+						ORI a2 a2 0x08
+						SB a2 0x47(a1)
+						SW zero GhostObjectPointer
+						B GhostStopRecording
+						NOP
+				//ELSE
+				RecordNotBehindGhost:
+					
+				LW a0 GhostCurrentFrame
+				LI a1 0x02
+				BGE a0 a1 Ghost_Collision_Off
+				NOP
+					LW v0 GhostObjectPointer
+					BEQ v0 zero  NormalModeCode_MapGhosts
+					NOP
+						LW a1 0(v0) ;turn off ghost collision
+						SB zero 0x2F(a1)
+						LW a0 0(v0)
+						JAL @GetBehaviorStruct_ObjectStructOffset
+						NOP
+						SW v0 GhostObjectPointer
+						LW v0 @ObjectArrayPointer
+						SW v0 GhostPrevObjectArray
+	
+				Ghost_Collision_Off:
+					LW a0 @ObjectArrayPointer
+					LW a1 GhostPrevObjectArray ;if object array changed
+					BEQ a0 a1 Ghost_No_ObjectArrayMove
+					NOP
+						SW a0 GhostPrevObjectArray
+						SUBU a0 a0 a1
+						LW a1 GhostObjectPointer
+						ADDU a0 a0 a1
+						SW a0 GhostObjectPointer
+				
+					Ghost_No_ObjectArrayMove:
+					LW v0 GhostObjectPointer
+					BEQ v0 zero  NormalModeCode_MapGhosts
+					NOP
+						LW a0 0(v0)
+						JAL @GetBehaviorStruct_ObjectStructOffset
+						NOP
+						SW v0 GhostObjectPointer
+						
+				;UPDATE GHOST POSITION
+				LW a0 GhostCurrentFrame
+				LW a1 GhostCurrentPlaybackPointer
+				ADDIU a1 a1 0x10
+				SLL a0 a0 0x02
+				SLL a2 a0 0x01
+				ADDU a0 a0 a2
+				ADDU a1 a1 a0
+				LW a2 GhostObjectPointer
+				ADDIU a0 a2 0x04
+				JAL @CopyXYZData
+				NOP
 			
-			//if currentFrame < currentGhost.Frames
-				//record player position/rotation as half to newRecord[currentFrame]
-				//set ghostModel position/rotation to currentGhost[currentFrame]
-				//if currentFrame == currentGhost.Frames
-					//despawn ghostModel
-			//currentFrame ++
-		
+			GhostPlaybackNotSet:
+			;RECORD FRAME
+			LW a1 GhostRecordPointer
+			BEQ a1 zero GhostStopRecording
+			NOP
+				LW a0 GhostCurrentFrame
+				ADDIU a1 a1 0x10
+				SLL a0 a0 0x02
+				SLL a2 a0 0x01
+				ADDU a0 a0 a2
+				ADDU a0 a1 a0
+				JAL @CopyXYZPosition
+				NOP
+				
+			GhostStopRecording:
+			
 NormalModeCode_MapGhosts:
 		
 LW ra 0x24(sp)
@@ -816,6 +921,12 @@ GhostPrevObjectArray:
 .word 0
 GhostObjectArrayIndex:
 .word 0
+GhostCurrentPlaybackPointer:
+.word 0
+GhostRecordPointer:
+.word 0
+GhostCurrentTailPointer:
+.word GhostArray
 
 MenuItemStr:
 .asciiz "PRACTICE MENU 1: \0\0\0\0\0\0\0\0\0\0\0\0\0\0"
@@ -906,11 +1017,19 @@ TransformMeOptionString:
 .asciiz "BEE\0\0\0\0"
 .asciiz "WASHY\0\0"
 
-CurrentMoveSet:
-.word 0
-Temp1:
-.word 0
-Temp2:
-.byte 0
-Temp3:
-.byte 0
+GhostArray:
+//ghost struct:
+//	half Map
+//	half Exit
+//	word TotalFrames
+//	word PrevGhostStruct
+//  word NextGhostStruct
+//  frame[0]:
+//  	float XPos
+//		float YPos
+//		float ZPos
+//  frame[1]:
+//  	float XPos
+//		float YPos
+//		float ZPos
+//	etc...
