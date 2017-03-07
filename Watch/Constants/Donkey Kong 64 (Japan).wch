@@ -61,4 +61,8 @@ SystemID N64
 75EE1A	w	h	1	RDRAM	Klump Model
 75EFB0	w	h	1	RDRAM	Mad Jack Behavior
 75EFB2	w	h	1	RDRAM	Mad Jack Model
+7F6454	w	s	1	RDRAM	Map Void - Minimum X
+7F6456	w	s	1	RDRAM	Map Void - Minimum Z
+7F6458	w	s	1	RDRAM	Map Void - Maximum X
+7F645A	w	s	1	RDRAM	Map Void - Maximum Z
 

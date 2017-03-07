@@ -5,13 +5,12 @@ if type(ScriptHawk) ~= "table" then
 	return;
 end
 
-local Game = {};
-
 crumbling = false;
 displacement_detection = false;
 enable_phase = false; -- To enable the phase glitches on Europe and Japan set this to true
 encircle_enabled = false;
 force_tbs = false;
+koshbot_enabled = false;
 never_slip = false;
 object_model2_filter = nil; -- String, see obj_model2.object_types
 paper_mode = false;
@@ -19,7 +18,7 @@ paper_mode = false;
 -- TODO: Need to put some grab script state up here because encircle uses it before they would normally be defined
 -- This can probably be fixed with a clever reshuffle of grab script state/functions
 local object_index = 1;
-local object_pointers = {};
+local object_pointers = {}; -- TODO: I'd love to get rid of this eventually, replace with some kind of getObjectPointers() system
 local radius = 100;
 local grab_script_modes = {
 	"Disabled",
@@ -50,92 +49,315 @@ end
 	-- 2 pointers
 	-- 1 u32_be
 local version; -- 1 USA, 2 Europe, 3 Japan, 4 Kiosk
-Game.Memory = {
-	["jetpac_object_base"] = {0x02EC68, 0x021D18, 0x021C78, nil},
-	["jetpac_enemy_base"] = {0x02F09C, 0x02214C, 0x0220AC, nil},
-	["jetman_position_x"] = {0x02F050, 0x022100, 0x022060, nil},
-	["jetman_position_y"] = {0x02F054, 0x022104, 0x022064, nil},
-	["jetman_velocity_x"] = {0x02F058, 0x022108, 0x022068, nil},
-	["jetman_velocity_y"] = {0x02F05C, 0x02210C, 0x02206C, nil},
-	["arcade_object_base"] = {0x04BCD0, 0x03EC30, 0x03EA60, nil},
-	["jumpman_position_x"] = {0x04BD70, 0x03ECD0, 0x03EB00, nil},
-	["jumpman_position_y"] = {0x04BD74, 0x03ECD4, 0x03EB04, nil},
-	["jumpman_velocity_x"] = {0x04BD78, 0x03ECD8, 0x03EB08, nil},
-	["jumpman_velocity_y"] = {0x04BD7C, 0x03ECDC, 0x03EB0C, nil},
-	["RNG"] = {0x746A40, 0x7411A0, 0x746300, 0x6F36E0},
-	["mode"] = {0x755318, 0x74FB98, 0x7553D8, 0x6FFE6C}, -- See Game.modes for values
-	["current_map"] = {0x76A0A8, 0x764BC8, 0x76A298, 0x72CDE4}, -- See Game.maps for values
-	["current_exit"] = {0x76A0AC, 0x764BCC, 0x76A29C, 0x72CDE8},
-	["destination_map"] = {0x7444E4, 0x73EC34, 0x743DA4, 0x6F1CC4}, -- See Game.maps for values
-	["destination_exit"] = {0x7444E8, 0x73EC38, 0x743DA8, 0x6F1CC8},
-	["map_state"] = {0x76A0B1, 0x764BD1, 0x76A2A1, 0x72CDED}, -- byte, bitfield -- TODO: Document values
-	["loading_zone_array_size"] = {0x7FDCB0, 0x7FDBF0, 0x7FE140, 0x7B7410}, -- u16_be
-	["loading_zone_array"] = {0x7FDCB4, 0x7FDBF4, 0x7FE144, 0x7B7414},
-	["file"] = {0x7467C8, 0x740F18, 0x746088, nil},
-	["character"] = {0x74E77C, 0x748EDC, 0x74E05C, 0x6F9EB8},
-	["object_spawn_table"] = {0x74E8B0, 0x749010, 0x74E1D0, 0x6F9F80},
-	["enemy_drop_table"] = {0x750400, 0x74AB20, 0x74FCE0, 0x6FB630},
-	-- 1000 0000 - ????
-	-- 0100 0000 - ????
-	-- 0010 0000 - Tag Barrel Void
-	-- 0001 0000 - Show Model 2 Objects
-	-- 0000 1000 - ????
-	-- 0000 0100 - ????
-	-- 0000 0010 - ????
-	-- 0000 0001 - Pausing
-	["tb_void_byte"] = {0x7FBB63, 0x7FBA83, 0x7FBFD3, 0x7B5B13}, -- byte, bitfield -- TODO: Document remaining values
-	["player_pointer"] = {0x7FBB4C, 0x7FBA6C, 0x7FBFBC, 0x7B5AFC},
-	["camera_pointer"] = {0x7FB968, 0x7FB888, 0x7FBDD8, 0x7B5918},
-	["pointer_list"] = {0x7FBFF0, 0x7FBF10, 0x7FC460, 0x7B5E58},
-	["actor_count"] = {0x7FC3F0, 0x7FC310, 0x7FC860, 0x7B6258},
-	["linked_list_pointer"] = {0x7F0990, 0x7F08B0, 0x7F0E00, 0x7A12C0}, -- TODO: Refactor to something about heap
-	["shared_collectables"] = {0x7FCC40, 0x7FCB80, 0x7FD0D0, 0x7B6752},
-	["kong_base"] = {0x7FC950, 0x7FC890, 0x7FCDE0, 0x7B6590},
-	["kong_size"] = {0x5E, 0x5E, 0x5E, 0x5A},
-	["framebuffer_pointer"] = {0x7F07F4, 0x73EBC0, 0x743D30, 0x72CDA0},
-	["eeprom_copy_base"] = {0x7ECEA8, 0x7ECDC8, 0x7ED318, nil},
-	["menu_flags"] = {0x7ED558, 0x7ED478, 0x7ED9C8, nil},
-	["eeprom_file_mapping"] = {0x7EDEA8, 0x7EDDC8, 0x7EE318, nil},
-	["security_byte"] = {0x7552E0, 0x74FB60, 0x7553A0, nil}, -- As far as I am aware this function is not present in the Kiosk version
-	["security_message"] = {0x75E5DC, 0x7590F0, 0x75E790, nil}, -- As far as I am aware this function is not present in the Kiosk version
-	["buttons_enabled_bitfield"] = {0x755308, 0x74FB88, 0x7553C8, 0x6FFE5C},
-	["joystick_enabled_x"] = {0x75530C, 0x74FB8C, 0x7553CC, 0x6FFE60},
-	["joystick_enabled_y"] = {0x755310, 0x74FB90, 0x7553D0, 0x6FFE64},
-	["bone_displacement_cop0_write"] = {0x61963C, 0x6128EC, 0x6170AC, 0x5AFB1C},
-	["frames_lag"] = {0x76AF10, 0x765A30, 0x76B100, 0x72D140}, -- TODO: Kiosk only works for minecart?
-	["frames_real"] = {0x7F0560, 0x7F0480, 0x7F09D0, nil}, -- TODO: Make sure freezing these stalls the main thread -- TODO: Kiosk
-	["isg_active"] = {0x755070, 0x74F8F0, 0x755130, nil},
-	["isg_timestamp"] = {0x7F5CE0, 0x7F5C00, 0x7F6150, nil},
-	["timestamp"] = {0x14FE0, 0x155C0, 0x15300, nil}, -- TODO: Kiosk
-	["obj_model2_array_pointer"] = {0x7F6000, 0x7F5F20, 0x7F6470, 0x7A20B0}, -- 0x6F4470 has something to do with obj model 2 on Kiosk, not sure what yet
-	["obj_model2_array_count"] = {0x7F6004, 0x7F5F24, 0x7F6474, 0x7B17B8},
-	["obj_model2_setup_pointer"] = {0x7F6010, 0x7F5F30, 0x7F6480, 0x7B17C4},
-	["obj_model2_timer"] = {0x76A064, 0x764B84, 0x76A254, 0x72CDAC},
-	["obj_model2_collision_linked_list_pointer"] = {0x754244, 0x74E9A4, 0x753B34, 0x6FF054},
-	["map_base"] = {0x7F5DE0, 0x7F5D00, 0x7F6250, 0x7A1E90},
-	["vert_base"] = {0x7F5DE8, 0x7F5D08, 0x7F6258, 0x7A1E98},
-	["water_surface_list"] = {0x7F93C0, 0x7F92E0, 0x7F9830, 0x7B48A0},
-	["chunk_array_pointer"] = {0x7F6C18, 0x7F6B38, 0x7F7088, 0x7B20F8},
-	["num_enemies"] = {0x7FDC88, 0x7FDBC8, 0x7FE118, 0x7B73D8},
-	["enemy_respawn_object"] = {0x7FDC8C, 0x7FDBCC, 0x7FE11C, 0x7B73DC},
-};
-
-Game.modes = {
-	[0] = "Nintendo Logo",
-	[1] = "Opening Cutscene",
-	[2] = "DK Rap",
-	[3] = "DK TV",
-	-- 4 is unknown
-	[5] = "Main Menu",
-	[6] = "Adventure",
-	[7] = "Quit Game",
-	-- 8 is unknown
-	[9] = "Game Over",
-	[10] = "End Sequence",
-	[11] = "DK Theatre",
-	[12] = "Mystery Menu Minigame",
-	[13] = "Snide's Bonus Game",
-	[14] = "End Sequence (DK Theatre)",
+local Game = {
+	Memory = {
+		["jetpac_object_base"] = {0x02EC68, 0x021D18, 0x021C78, nil},
+		["jetpac_enemy_base"] = {0x02F09C, 0x02214C, 0x0220AC, nil},
+		["jetman_position_x"] = {0x02F050, 0x022100, 0x022060, nil},
+		["jetman_position_y"] = {0x02F054, 0x022104, 0x022064, nil},
+		["jetman_velocity_x"] = {0x02F058, 0x022108, 0x022068, nil},
+		["jetman_velocity_y"] = {0x02F05C, 0x02210C, 0x02206C, nil},
+		["arcade_object_base"] = {0x04BCD0, 0x03EC30, 0x03EA60, nil},
+		["jumpman_position_x"] = {0x04BD70, 0x03ECD0, 0x03EB00, nil},
+		["jumpman_position_y"] = {0x04BD74, 0x03ECD4, 0x03EB04, nil},
+		["jumpman_velocity_x"] = {0x04BD78, 0x03ECD8, 0x03EB08, nil},
+		["jumpman_velocity_y"] = {0x04BD7C, 0x03ECDC, 0x03EB0C, nil},
+		["RNG"] = {0x746A40, 0x7411A0, 0x746300, 0x6F36E0},
+		["mode"] = {0x755318, 0x74FB98, 0x7553D8, 0x6FFE6C}, -- See Game.modes for values
+		["current_map"] = {0x76A0A8, 0x764BC8, 0x76A298, 0x72CDE4}, -- See Game.maps for values
+		["current_exit"] = {0x76A0AC, 0x764BCC, 0x76A29C, 0x72CDE8},
+		["destination_map"] = {0x7444E4, 0x73EC34, 0x743DA4, 0x6F1CC4}, -- See Game.maps for values
+		["destination_exit"] = {0x7444E8, 0x73EC38, 0x743DA8, 0x6F1CC8},
+		["map_state"] = {0x76A0B1, 0x764BD1, 0x76A2A1, 0x72CDED}, -- byte, bitfield -- TODO: Document values
+		["loading_zone_array_size"] = {0x7FDCB0, 0x7FDBF0, 0x7FE140, 0x7B7410}, -- u16_be
+		["loading_zone_array"] = {0x7FDCB4, 0x7FDBF4, 0x7FE144, 0x7B7414},
+		["file"] = {0x7467C8, 0x740F18, 0x746088, nil},
+		["character"] = {0x74E77C, 0x748EDC, 0x74E05C, 0x6F9EB8},
+		["object_spawn_table"] = {0x74E8B0, 0x749010, 0x74E1D0, 0x6F9F80},
+		["enemy_drop_table"] = {0x750400, 0x74AB20, 0x74FCE0, 0x6FB630},
+		-- 1000 0000 - ????
+		-- 0100 0000 - ????
+		-- 0010 0000 - Tag Barrel Void
+		-- 0001 0000 - Show Model 2 Objects
+		-- 0000 1000 - ????
+		-- 0000 0100 - ????
+		-- 0000 0010 - ????
+		-- 0000 0001 - Pausing
+		["tb_void_byte"] = {0x7FBB63, 0x7FBA83, 0x7FBFD3, 0x7B5B13}, -- byte, bitfield -- TODO: Document remaining values
+		["player_pointer"] = {0x7FBB4C, 0x7FBA6C, 0x7FBFBC, 0x7B5AFC},
+		["camera_pointer"] = {0x7FB968, 0x7FB888, 0x7FBDD8, 0x7B5918},
+		["pointer_list"] = {0x7FBFF0, 0x7FBF10, 0x7FC460, 0x7B5E58},
+		["actor_count"] = {0x7FC3F0, 0x7FC310, 0x7FC860, 0x7B6258},
+		["heap_pointer"] = {0x7F0990, 0x7F08B0, 0x7F0E00, 0x7A12C0},
+		["shared_collectables"] = {0x7FCC40, 0x7FCB80, 0x7FD0D0, 0x7B6752},
+		["kong_base"] = {0x7FC950, 0x7FC890, 0x7FCDE0, 0x7B6590},
+		["kong_size"] = {0x5E, 0x5E, 0x5E, 0x5A},
+		["framebuffer_pointer"] = {0x7F07F4, 0x73EBC0, 0x743D30, 0x72CDA0},
+		["eeprom_copy_base"] = {0x7ECEA8, 0x7ECDC8, 0x7ED318, nil},
+		["menu_flags"] = {0x7ED558, 0x7ED478, 0x7ED9C8, nil},
+		["eeprom_file_mapping"] = {0x7EDEA8, 0x7EDDC8, 0x7EE318, nil},
+		["security_byte"] = {0x7552E0, 0x74FB60, 0x7553A0, nil}, -- As far as I am aware this function is not present in the Kiosk version
+		["security_message"] = {0x75E5DC, 0x7590F0, 0x75E790, nil}, -- As far as I am aware this function is not present in the Kiosk version
+		["buttons_enabled_bitfield"] = {0x755308, 0x74FB88, 0x7553C8, 0x6FFE5C},
+		["joystick_enabled_x"] = {0x75530C, 0x74FB8C, 0x7553CC, 0x6FFE60},
+		["joystick_enabled_y"] = {0x755310, 0x74FB90, 0x7553D0, 0x6FFE64},
+		["bone_displacement_cop0_write"] = {0x61963C, 0x6128EC, 0x6170AC, 0x5AFB1C},
+		["frames_lag"] = {0x76AF10, 0x765A30, 0x76B100, 0x72D140}, -- TODO: Kiosk only works for minecart?
+		["frames_real"] = {0x7F0560, 0x7F0480, 0x7F09D0, nil}, -- TODO: Make sure freezing these stalls the main thread -- TODO: Kiosk
+		["isg_active"] = {0x755070, 0x74F8F0, 0x755130, nil},
+		["isg_timestamp"] = {0x7F5CE0, 0x7F5C00, 0x7F6150, nil},
+		["timestamp"] = {0x14FE0, 0x155C0, 0x15300, nil}, -- TODO: Kiosk
+		["obj_model2_array_pointer"] = {0x7F6000, 0x7F5F20, 0x7F6470, 0x7A20B0}, -- 0x6F4470 has something to do with obj model 2 on Kiosk, not sure what yet
+		["obj_model2_array_count"] = {0x7F6004, 0x7F5F24, 0x7F6474, 0x7B17B8},
+		["obj_model2_setup_pointer"] = {0x7F6010, 0x7F5F30, 0x7F6480, 0x7B17C4},
+		["obj_model2_timer"] = {0x76A064, 0x764B84, 0x76A254, 0x72CDAC},
+		["obj_model2_collision_linked_list_pointer"] = {0x754244, 0x74E9A4, 0x753B34, 0x6FF054},
+		["map_base"] = {0x7F5DE0, 0x7F5D00, 0x7F6250, 0x7A1E90},
+		["vert_base"] = {0x7F5DE8, 0x7F5D08, 0x7F6258, 0x7A1E98},
+		["water_surface_list"] = {0x7F93C0, 0x7F92E0, 0x7F9830, 0x7B48A0},
+		["chunk_array_pointer"] = {0x7F6C18, 0x7F6B38, 0x7F7088, 0x7B20F8},
+		["num_enemies"] = {0x7FDC88, 0x7FDBC8, 0x7FE118, 0x7B73D8},
+		["enemy_respawn_object"] = {0x7FDC8C, 0x7FDBCC, 0x7FE11C, 0x7B73DC},
+	},
+	modes = {
+		[0] = "Nintendo Logo",
+		[1] = "Opening Cutscene",
+		[2] = "DK Rap",
+		[3] = "DK TV",
+		-- 4 is unknown
+		[5] = "Main Menu",
+		[6] = "Adventure",
+		[7] = "Quit Game",
+		-- 8 is unknown
+		[9] = "Game Over",
+		[10] = "End Sequence",
+		[11] = "DK Theatre",
+		[12] = "Mystery Menu Minigame",
+		[13] = "Snide's Bonus Game",
+		[14] = "End Sequence (DK Theatre)",
+	},
+	maps = {
+		"Test Map", -- 0
+		"Funky's Store",
+		"DK Arcade",
+		"K. Rool Barrel: Lanky's Maze",
+		"Jungle Japes: Mountain",
+		"Cranky's Lab",
+		"Jungle Japes: Minecart",
+		"Jungle Japes",
+		"Jungle Japes: Army Dillo",
+		"Jetpac",
+		"Kremling Kosh! (very easy)", -- 10
+		"Stealthy Snoop! (normal, no logo)",
+		"Jungle Japes: Shell",
+		"Jungle Japes: Lanky's Cave",
+		"Angry Aztec: Beetle Race",
+		"Snide's H.Q.",
+		"Angry Aztec: Tiny's Temple",
+		"Hideout Helm",
+		"Teetering Turtle Trouble! (very easy)",
+		"Angry Aztec: Five Door Temple (DK)",
+		"Angry Aztec: Llama Temple", -- 20
+		"Angry Aztec: Five Door Temple (Diddy)",
+		"Angry Aztec: Five Door Temple (Tiny)",
+		"Angry Aztec: Five Door Temple (Lanky)",
+		"Angry Aztec: Five Door Temple (Chunky)",
+		"Candy's Music Shop",
+		"Frantic Factory",
+		"Frantic Factory: Car Race",
+		"Hideout Helm (Level Intros, Game Over)",
+		"Frantic Factory: Power Shed",
+		"Gloomy Galleon", -- 30
+		"Gloomy Galleon: K. Rool's Ship",
+		"Batty Barrel Bandit! (easy)",
+		"Jungle Japes: Chunky's Cave",
+		"DK Isles Overworld",
+		"K. Rool Barrel: DK's Target Game",
+		"Frantic Factory: Crusher Room",
+		"Jungle Japes: Barrel Blast",
+		"Angry Aztec",
+		"Gloomy Galleon: Seal Race",
+		"Nintendo Logo", -- 40
+		"Angry Aztec: Barrel Blast",
+		"Troff 'n' Scoff", -- 42
+		"Gloomy Galleon: Shipwreck (Diddy, Lanky, Chunky)",
+		"Gloomy Galleon: Treasure Chest",
+		"Gloomy Galleon: Mermaid",
+		"Gloomy Galleon: Shipwreck (DK, Tiny)",
+		"Gloomy Galleon: Shipwreck (Lanky, Tiny)",
+		"Fungi Forest",
+		"Gloomy Galleon: Lighthouse",
+		"K. Rool Barrel: Tiny's Mushroom Game", -- 50
+		"Gloomy Galleon: Mechanical Fish",
+		"Fungi Forest: Ant Hill",
+		"Battle Arena: Beaver Brawl!",
+		"Gloomy Galleon: Barrel Blast",
+		"Fungi Forest: Minecart",
+		"Fungi Forest: Diddy's Barn",
+		"Fungi Forest: Diddy's Attic",
+		"Fungi Forest: Lanky's Attic",
+		"Fungi Forest: DK's Barn",
+		"Fungi Forest: Spider", -- 60
+		"Fungi Forest: Front Part of Mill",
+		"Fungi Forest: Rear Part of Mill",
+		"Fungi Forest: Mushroom Puzzle",
+		"Fungi Forest: Giant Mushroom",
+		"Stealthy Snoop! (normal)",
+		"Mad Maze Maul! (hard)",
+		"Stash Snatch! (normal)",
+		"Mad Maze Maul! (easy)",
+		"Mad Maze Maul! (normal)", -- 69
+		"Fungi Forest: Mushroom Leap", -- 70
+		"Fungi Forest: Shooting Game",
+		"Crystal Caves",
+		"Battle Arena: Kritter Karnage!",
+		"Stash Snatch! (easy)",
+		"Stash Snatch! (hard)",
+		"DK Rap",
+		"Minecart Mayhem! (easy)", -- 77
+		"Busy Barrel Barrage! (easy)",
+		"Busy Barrel Barrage! (normal)",
+		"Main Menu", -- 80
+		"Title Screen (Not For Resale Version)",
+		"Crystal Caves: Beetle Race",
+		"Fungi Forest: Dogadon",
+		"Crystal Caves: Igloo (Tiny)",
+		"Crystal Caves: Igloo (Lanky)",
+		"Crystal Caves: Igloo (DK)",
+		"Creepy Castle",
+		"Creepy Castle: Ballroom",
+		"Crystal Caves: Rotating Room",
+		"Crystal Caves: Shack (Chunky)", -- 90
+		"Crystal Caves: Shack (DK)",
+		"Crystal Caves: Shack (Diddy, middle part)",
+		"Crystal Caves: Shack (Tiny)",
+		"Crystal Caves: Lanky's Hut",
+		"Crystal Caves: Igloo (Chunky)",
+		"Splish-Splash Salvage! (normal)",
+		"K. Lumsy",
+		"Crystal Caves: Ice Castle",
+		"Speedy Swing Sortie! (easy)",
+		"Crystal Caves: Igloo (Diddy)", -- 100
+		"Krazy Kong Klamour! (easy)",
+		"Big Bug Bash! (very easy)",
+		"Searchlight Seek! (very easy)",
+		"Beaver Bother! (easy)",
+		"Creepy Castle: Tower",
+		"Creepy Castle: Minecart",
+		"Kong Battle: Battle Arena",
+		"Creepy Castle: Crypt (Lanky, Tiny)",
+		"Kong Battle: Arena 1",
+		"Frantic Factory: Barrel Blast", -- 110
+		"Gloomy Galleon: Pufftoss",
+		"Creepy Castle: Crypt (DK, Diddy, Chunky)",
+		"Creepy Castle: Museum",
+		"Creepy Castle: Library",
+		"Kremling Kosh! (easy)",
+		"Kremling Kosh! (normal)",
+		"Kremling Kosh! (hard)",
+		"Teetering Turtle Trouble! (easy)",
+		"Teetering Turtle Trouble! (normal)",
+		"Teetering Turtle Trouble! (hard)", -- 120
+		"Batty Barrel Bandit! (easy)",
+		"Batty Barrel Bandit! (normal)",
+		"Batty Barrel Bandit! (hard)",
+		"Mad Maze Maul! (insane)",
+		"Stash Snatch! (insane)",
+		"Stealthy Snoop! (very easy)",
+		"Stealthy Snoop! (easy)",
+		"Stealthy Snoop! (hard)",
+		"Minecart Mayhem! (normal)",
+		"Minecart Mayhem! (hard)", -- 130
+		"Busy Barrel Barrage! (hard)",
+		"Splish-Splash Salvage! (hard)",
+		"Splish-Splash Salvage! (easy)",
+		"Speedy Swing Sortie! (normal)",
+		"Speedy Swing Sortie! (hard)",
+		"Beaver Bother! (normal)",
+		"Beaver Bother! (hard)",
+		"Searchlight Seek! (easy)",
+		"Searchlight Seek! (normal)",
+		"Searchlight Seek! (hard)", -- 140
+		"Krazy Kong Klamour! (normal)",
+		"Krazy Kong Klamour! (hard)",
+		"Krazy Kong Klamour! (insane)",
+		"Peril Path Panic! (very easy)",
+		"Peril Path Panic! (easy)",
+		"Peril Path Panic! (normal)",
+		"Peril Path Panic! (hard)",
+		"Big Bug Bash! (easy)",
+		"Big Bug Bash! (normal)",
+		"Big Bug Bash! (hard)", -- 150
+		"Creepy Castle: Dungeon",
+		"Hideout Helm (Intro Story)",
+		"DK Isles (DK Theatre)",
+		"Frantic Factory: Mad Jack",
+		"Battle Arena: Arena Ambush!",
+		"Battle Arena: More Kritter Karnage!",
+		"Battle Arena: Forest Fracas!",
+		"Battle Arena: Bish Bash Brawl!",
+		"Battle Arena: Kamikaze Kremlings!",
+		"Battle Arena: Plinth Panic!", -- 160
+		"Battle Arena: Pinnacle Palaver!",
+		"Battle Arena: Shockwave Showdown!",
+		"Creepy Castle: Basement",
+		"Creepy Castle: Tree",
+		"K. Rool Barrel: Diddy's Kremling Game",
+		"Creepy Castle: Chunky's Toolshed",
+		"Creepy Castle: Trash Can",
+		"Creepy Castle: Greenhouse",
+		"Jungle Japes Lobby",
+		"Hideout Helm Lobby", -- 170
+		"DK's House",
+		"Rock (Intro Story)",
+		"Angry Aztec Lobby",
+		"Gloomy Galleon Lobby",
+		"Frantic Factory Lobby",
+		"Training Grounds",
+		"Dive Barrel",
+		"Fungi Forest Lobby",
+		"Gloomy Galleon: Submarine",
+		"Orange Barrel", -- 180
+		"Barrel Barrel",
+		"Vine Barrel",
+		"Creepy Castle: Crypt",
+		"Enguarde Arena",
+		"Creepy Castle: Car Race",
+		"Crystal Caves: Barrel Blast",
+		"Creepy Castle: Barrel Blast",
+		"Fungi Forest: Barrel Blast",
+		"Fairy Island",
+		"Kong Battle: Arena 2", -- 190
+		"Rambi Arena",
+		"Kong Battle: Arena 3",
+		"Creepy Castle Lobby",
+		"Crystal Caves Lobby",
+		"DK Isles: Snide's Room",
+		"Crystal Caves: Army Dillo",
+		"Angry Aztec: Dogadon",
+		"Training Grounds (End Sequence)",
+		"Creepy Castle: King Kutout",
+		"Crystal Caves: Shack (Diddy, upper part)", -- 200
+		"K. Rool Barrel: Diddy's Rocketbarrel Game",
+		"K. Rool Barrel: Lanky's Shooting Game",
+		"K. Rool Fight: DK Phase",
+		"K. Rool Fight: Diddy Phase",
+		"K. Rool Fight: Lanky Phase",
+		"K. Rool Fight: Tiny Phase",
+		"K. Rool Fight: Chunky Phase",
+		"Bloopers Ending",
+		"K. Rool Barrel: Chunky's Hidden Kremling Game",
+		"K. Rool Barrel: Tiny's Pony Tail Twirl Game", -- 210
+		"K. Rool Barrel: Chunky's Shooting Game",
+		"K. Rool Barrel: DK's Rambi Game",
+		"K. Lumsy Ending",
+		"K. Rool's Shoe",
+		"K. Rool's Arena", -- 215
+	},
+	speedy_speeds = { .001, .01, .1, 1, 5, 10, 15, 20, 35, 50, 100, 250, 500, 1000 },
+	speedy_index = 8,
+	rot_speed = 10,
+	max_rot_units = 4096,
 };
 
 function Game.getCurrentMode()
@@ -158,225 +380,6 @@ local previousCameraState = "Unknown";
 local prev_map = 0;
 local map_value = 0;
 
-Game.maps = {
-	"Test Map", -- 0
-	"Funky's Store",
-	"DK Arcade",
-	"K. Rool Barrel: Lanky's Maze",
-	"Jungle Japes: Mountain",
-	"Cranky's Lab",
-	"Jungle Japes: Minecart",
-	"Jungle Japes",
-	"Jungle Japes: Army Dillo",
-	"Jetpac",
-	"Kremling Kosh! (very easy)", -- 10
-	"Stealthy Snoop! (normal, no logo)",
-	"Jungle Japes: Shell",
-	"Jungle Japes: Lanky's Cave",
-	"Angry Aztec: Beetle Race",
-	"Snide's H.Q.",
-	"Angry Aztec: Tiny's Temple",
-	"Hideout Helm",
-	"Teetering Turtle Trouble! (very easy)",
-	"Angry Aztec: Five Door Temple (DK)",
-	"Angry Aztec: Llama Temple", -- 20
-	"Angry Aztec: Five Door Temple (Diddy)",
-	"Angry Aztec: Five Door Temple (Tiny)",
-	"Angry Aztec: Five Door Temple (Lanky)",
-	"Angry Aztec: Five Door Temple (Chunky)",
-	"Candy's Music Shop",
-	"Frantic Factory",
-	"Frantic Factory: Car Race",
-	"Hideout Helm (Level Intros, Game Over)",
-	"Frantic Factory: Power Shed",
-	"Gloomy Galleon", -- 30
-	"Gloomy Galleon: K. Rool's Ship",
-	"Batty Barrel Bandit! (easy)",
-	"Jungle Japes: Chunky's Cave",
-	"DK Isles Overworld",
-	"K. Rool Barrel: DK's Target Game",
-	"Frantic Factory: Crusher Room",
-	"Jungle Japes: Barrel Blast",
-	"Angry Aztec",
-	"Gloomy Galleon: Seal Race",
-	"Nintendo Logo", -- 40
-	"Angry Aztec: Barrel Blast",
-	"Troff 'n' Scoff", -- 42
-	"Gloomy Galleon: Shipwreck (Diddy, Lanky, Chunky)",
-	"Gloomy Galleon: Treasure Chest",
-	"Gloomy Galleon: Mermaid",
-	"Gloomy Galleon: Shipwreck (DK, Tiny)",
-	"Gloomy Galleon: Shipwreck (Lanky, Tiny)",
-	"Fungi Forest",
-	"Gloomy Galleon: Lighthouse",
-	"K. Rool Barrel: Tiny's Mushroom Game", -- 50
-	"Gloomy Galleon: Mechanical Fish",
-	"Fungi Forest: Ant Hill",
-	"Battle Arena: Beaver Brawl!",
-	"Gloomy Galleon: Barrel Blast",
-	"Fungi Forest: Minecart",
-	"Fungi Forest: Diddy's Barn",
-	"Fungi Forest: Diddy's Attic",
-	"Fungi Forest: Lanky's Attic",
-	"Fungi Forest: DK's Barn",
-	"Fungi Forest: Spider", -- 60
-	"Fungi Forest: Front Part of Mill",
-	"Fungi Forest: Rear Part of Mill",
-	"Fungi Forest: Mushroom Puzzle",
-	"Fungi Forest: Giant Mushroom",
-	"Stealthy Snoop! (normal)",
-	"Mad Maze Maul! (hard)",
-	"Stash Snatch! (normal)",
-	"Mad Maze Maul! (easy)",
-	"Mad Maze Maul! (normal)", -- 69
-	"Fungi Forest: Mushroom Leap", -- 70
-	"Fungi Forest: Shooting Game",
-	"Crystal Caves",
-	"Battle Arena: Kritter Karnage!",
-	"Stash Snatch! (easy)",
-	"Stash Snatch! (hard)",
-	"DK Rap",
-	"Minecart Mayhem! (easy)", -- 77
-	"Busy Barrel Barrage! (easy)",
-	"Busy Barrel Barrage! (normal)",
-	"Main Menu", -- 80
-	"Title Screen (Not For Resale Version)",
-	"Crystal Caves: Beetle Race",
-	"Fungi Forest: Dogadon",
-	"Crystal Caves: Igloo (Tiny)",
-	"Crystal Caves: Igloo (Lanky)",
-	"Crystal Caves: Igloo (DK)",
-	"Creepy Castle",
-	"Creepy Castle: Ballroom",
-	"Crystal Caves: Rotating Room",
-	"Crystal Caves: Shack (Chunky)", -- 90
-	"Crystal Caves: Shack (DK)",
-	"Crystal Caves: Shack (Diddy, middle part)",
-	"Crystal Caves: Shack (Tiny)",
-	"Crystal Caves: Lanky's Hut",
-	"Crystal Caves: Igloo (Chunky)",
-	"Splish-Splash Salvage! (normal)",
-	"K. Lumsy",
-	"Crystal Caves: Ice Castle",
-	"Speedy Swing Sortie! (easy)",
-	"Crystal Caves: Igloo (Diddy)", -- 100
-	"Krazy Kong Klamour! (easy)",
-	"Big Bug Bash! (very easy)",
-	"Searchlight Seek! (very easy)",
-	"Beaver Bother! (easy)",
-	"Creepy Castle: Tower",
-	"Creepy Castle: Minecart",
-	"Kong Battle: Battle Arena",
-	"Creepy Castle: Crypt (Lanky, Tiny)",
-	"Kong Battle: Arena 1",
-	"Frantic Factory: Barrel Blast", -- 110
-	"Gloomy Galleon: Pufftoss",
-	"Creepy Castle: Crypt (DK, Diddy, Chunky)",
-	"Creepy Castle: Museum",
-	"Creepy Castle: Library",
-	"Kremling Kosh! (easy)",
-	"Kremling Kosh! (normal)",
-	"Kremling Kosh! (hard)",
-	"Teetering Turtle Trouble! (easy)",
-	"Teetering Turtle Trouble! (normal)",
-	"Teetering Turtle Trouble! (hard)", -- 120
-	"Batty Barrel Bandit! (easy)",
-	"Batty Barrel Bandit! (normal)",
-	"Batty Barrel Bandit! (hard)",
-	"Mad Maze Maul! (insane)",
-	"Stash Snatch! (insane)",
-	"Stealthy Snoop! (very easy)",
-	"Stealthy Snoop! (easy)",
-	"Stealthy Snoop! (hard)",
-	"Minecart Mayhem! (normal)",
-	"Minecart Mayhem! (hard)", -- 130
-	"Busy Barrel Barrage! (hard)",
-	"Splish-Splash Salvage! (hard)",
-	"Splish-Splash Salvage! (easy)",
-	"Speedy Swing Sortie! (normal)",
-	"Speedy Swing Sortie! (hard)",
-	"Beaver Bother! (normal)",
-	"Beaver Bother! (hard)",
-	"Searchlight Seek! (easy)",
-	"Searchlight Seek! (normal)",
-	"Searchlight Seek! (hard)", -- 140
-	"Krazy Kong Klamour! (normal)",
-	"Krazy Kong Klamour! (hard)",
-	"Krazy Kong Klamour! (insane)",
-	"Peril Path Panic! (very easy)",
-	"Peril Path Panic! (easy)",
-	"Peril Path Panic! (normal)",
-	"Peril Path Panic! (hard)",
-	"Big Bug Bash! (easy)",
-	"Big Bug Bash! (normal)",
-	"Big Bug Bash! (hard)", -- 150
-	"Creepy Castle: Dungeon",
-	"Hideout Helm (Intro Story)",
-	"DK Isles (DK Theatre)",
-	"Frantic Factory: Mad Jack",
-	"Battle Arena: Arena Ambush!",
-	"Battle Arena: More Kritter Karnage!",
-	"Battle Arena: Forest Fracas!",
-	"Battle Arena: Bish Bash Brawl!",
-	"Battle Arena: Kamikaze Kremlings!",
-	"Battle Arena: Plinth Panic!", -- 160
-	"Battle Arena: Pinnacle Palaver!",
-	"Battle Arena: Shockwave Showdown!",
-	"Creepy Castle: Basement",
-	"Creepy Castle: Tree",
-	"K. Rool Barrel: Diddy's Kremling Game",
-	"Creepy Castle: Chunky's Toolshed",
-	"Creepy Castle: Trash Can",
-	"Creepy Castle: Greenhouse",
-	"Jungle Japes Lobby",
-	"Hideout Helm Lobby", -- 170
-	"DK's House",
-	"Rock (Intro Story)",
-	"Angry Aztec Lobby",
-	"Gloomy Galleon Lobby",
-	"Frantic Factory Lobby",
-	"Training Grounds",
-	"Dive Barrel",
-	"Fungi Forest Lobby",
-	"Gloomy Galleon: Submarine",
-	"Orange Barrel", -- 180
-	"Barrel Barrel",
-	"Vine Barrel",
-	"Creepy Castle: Crypt",
-	"Enguarde Arena",
-	"Creepy Castle: Car Race",
-	"Crystal Caves: Barrel Blast",
-	"Creepy Castle: Barrel Blast",
-	"Fungi Forest: Barrel Blast",
-	"Fairy Island",
-	"Kong Battle: Arena 2", -- 190
-	"Rambi Arena",
-	"Kong Battle: Arena 3",
-	"Creepy Castle Lobby",
-	"Crystal Caves Lobby",
-	"DK Isles: Snide's Room",
-	"Crystal Caves: Army Dillo",
-	"Angry Aztec: Dogadon",
-	"Training Grounds (End Sequence)",
-	"Creepy Castle: King Kutout",
-	"Crystal Caves: Shack (Diddy, upper part)", -- 200
-	"K. Rool Barrel: Diddy's Rocketbarrel Game",
-	"K. Rool Barrel: Lanky's Shooting Game",
-	"K. Rool Fight: DK Phase",
-	"K. Rool Fight: Diddy Phase",
-	"K. Rool Fight: Lanky Phase",
-	"K. Rool Fight: Tiny Phase",
-	"K. Rool Fight: Chunky Phase",
-	"Bloopers Ending",
-	"K. Rool Barrel: Chunky's Hidden Kremling Game",
-	"K. Rool Barrel: Tiny's Pony Tail Twirl Game", -- 210
-	"K. Rool Barrel: Chunky's Shooting Game",
-	"K. Rool Barrel: DK's Rambi Game",
-	"K. Lumsy Ending",
-	"K. Rool's Shoe",
-	"K. Rool's Arena", -- 215
-};
-
 ------------------
 -- Subgame maps --
 ------------------
@@ -384,45 +387,44 @@ Game.maps = {
 local arcade_map = 2;
 local jetpac_map = 9;
 
-local arcadeObjectSize = 0x20;
-local arcadeNumObjects = 61; -- TODO: Figure out actual value
-
-local arcadeObject = {
+local arcade_object = {
 	x_position = 0x00, -- Float
 	y_position = 0x04, -- Float
 	x_velocity = 0x08, -- Float
 	y_velocity = 0x0C, -- Float
+	size = 0x20,
+	count = 61, -- TODO: Figure out actual value
+	hitbox = {
+		width = 16,
+		height = 16,
+		x_offset = 0,
+		y_offset = 0,
+	},
 };
 
-arcadeHitboxWidth = 16;
-arcadeHitboxHeight = 16;
+local arcadeXMultiplier = 1;
+local arcadeYMultiplier = 0.9;
 
-arcadeHitboxXOffset = 0;
-arcadeHitboxYOffset = 0;
-
-arcadeXMultiplier = 1;
-arcadeYMultiplier = 0.9;
-
-jetpacHitboxXOffset = 26;
-jetpacHitboxYOffset = 18;
+local jetpacHitboxXOffset = 26;
+local jetpacHitboxYOffset = 18;
 
 local mouseClickedLastFrame = false;
-local startDragPosition = {0,0};
+local startDragPosition = {0, 0};
 local draggedObjects = {};
 
 function arcadeObjectBaseToDraggableObject(objectBase)
 	local draggableObject = {
 		["objectBase"] = objectBase,
-		xPositionAddress = objectBase + arcadeObject.x_position,
-		yPositionAddress = objectBase + arcadeObject.y_position,
-		xPosition = mainmemory.readfloat(objectBase + arcadeObject.x_position, true),
-		yPosition = mainmemory.readfloat(objectBase + arcadeObject.y_position, true),
+		xPositionAddress = objectBase + arcade_object.x_position,
+		yPositionAddress = objectBase + arcade_object.y_position,
+		xPosition = mainmemory.readfloat(objectBase + arcade_object.x_position, true),
+		yPosition = mainmemory.readfloat(objectBase + arcade_object.y_position, true),
 	};
 
-	draggableObject.leftX = (draggableObject.xPosition + arcadeHitboxXOffset) * arcadeXMultiplier;
-	draggableObject.rightX = draggableObject.leftX + arcadeHitboxWidth;
-	draggableObject.topY = (draggableObject.yPosition + arcadeHitboxYOffset) * arcadeYMultiplier;
-	draggableObject.bottomY = draggableObject.topY + arcadeHitboxHeight;
+	draggableObject.leftX = (draggableObject.xPosition + arcade_object.hitbox.x_offset) * arcadeXMultiplier;
+	draggableObject.rightX = draggableObject.leftX + arcade_object.hitbox.width;
+	draggableObject.topY = (draggableObject.yPosition + arcade_object.hitbox.y_offset) * arcadeYMultiplier;
+	draggableObject.bottomY = draggableObject.topY + arcade_object.hitbox.height;
 
 	return draggableObject;
 end
@@ -470,8 +472,8 @@ function drawSubGameHitboxes()
 	end
 
 	if map_value == arcade_map then
-		for i = 0, arcadeNumObjects - 1 do
-			local objectBase = Game.Memory.arcade_object_base[version] + (i * arcadeObjectSize);
+		for i = 0, arcade_object.count - 1 do
+			local objectBase = Game.Memory.arcade_object_base[version] + (i * arcade_object.size);
 			table.insert(draggableObjects, arcadeObjectBaseToDraggableObject(objectBase));
 		end
 	end
@@ -631,16 +633,15 @@ Game.getMaxHomingAmmo = Game.getMaxStandardAmmo;
 -- Object Model 1 Documentation --
 ----------------------------------
 
--- Relative to objects found in the backbone (and similar linked lists)
+-- Relative to objects found in the heap (and similar linked lists)
 local previous_object = -0x10; -- Pointer
 local object_size = -0x0C; -- u32_be
 local next_free_block = -0x08; -- Pointer
 local prev_free_block = -0x04; -- Pointer
 
-local max_objects = 0xFF; -- This only applies to the model 1 pointer list used to check collisions
-
+-- Theoretical max is 255 actors, but the game crashes well before that limit
 local function getObjectModel1Count()
-	return math.min(max_objects, mainmemory.read_u16_be(Game.Memory.actor_count[version]));
+	return math.min(255, mainmemory.read_u16_be(Game.Memory.actor_count[version]));
 end
 
 -- Relative to Model 1 Objects
@@ -672,12 +673,12 @@ obj_model1 = {
 		[7] = "Krusha",
 		[8] = "Rambi",
 		[9] = "Enguarde",
-		--[10] = "Unknown", -- Always loaded -- TODO: What is this?
-		--[11] = "Unknown", -- Always loaded -- TODO: What is this?
+		--[10] = "Unknown", -- Always loaded -- TODO: Figure out what actors 10-15 do
+		--[11] = "Unknown", -- Always loaded -- What is this?
 		[12] = "Loading Zone Controller", -- Always loaded
 		[13] = "Object Model 2 Controller", -- Always loaded
-		--[14] = "Unknown", -- Always loaded -- TODO: What is this?
-		--[15] = "Unknown", -- Always loaded -- TODO: What is this?
+		--[14] = "Unknown", -- Always loaded -- What is this?
+		--[15] = "Unknown", -- Always loaded -- What is this?
 		[17] = "Cannon Barrel",
 		[18] = "Rambi Box",
 		[19] = "Barrel (Diddy 5DI)",
@@ -1414,7 +1415,7 @@ end
 -- Wrinkly doors
 -- Shops (Snide's, Cranky's, Funky's, Candy's)
 
-local obj_model2_slot_size = 0x90;
+local obj_model2_slot_size = 0x90; -- 0x88 on Kiosk, handled by Game.detectVersion()
 
 -- Relative to objects in model 2 array
 obj_model2 = {
@@ -1435,7 +1436,7 @@ obj_model2 = {
 	["behavior_type_pointer"] = 0x24, -- TODO: Fields for this object
 	["unknown_counter"] = 0x3A, -- u16_be
 	["behavior_pointer"] = 0x7C,
-	["object_type"] = 0x84,
+	["object_type"] = 0x84, -- u16_be
 	["object_types"] = { -- "-" means that spawning this object crashes the game
 		[0x00] = "Nothing", -- "test" internal name
 		[0x01] = "Thin Flame?", -- 2D
@@ -2159,6 +2160,9 @@ function getObjectModel2Array()
 end
 
 function getObjectModel2ArraySize()
+	if version == 4 then
+		return 430; -- TODO: Find maximum size for Kiosk object model 2 array
+	end
 	local objModel2Array = getObjectModel2Array();
 	if isRDRAM(objModel2Array) then
 		return mainmemory.read_u32_be(objModel2Array + object_size) / obj_model2_slot_size;
@@ -2495,7 +2499,7 @@ function dumpLoadingZones()
 end
 
 function dumpModel2Positions()
-	local objModel2Array = dereferencePointer(Game.Memory.obj_model2_array_pointer[version]);
+	local objModel2Array = getObjectModel2Array();
 	if isRDRAM(objModel2Array) then
 		local numSlots = mainmemory.read_u32_be(Game.Memory.obj_model2_array_count[version]);
 		local scriptName, slotBase;
@@ -2726,6 +2730,8 @@ function Game.detectVersion(romName, romHash)
 
 			[0x4F] = "Bananaporter",
 
+			[0x52] = "Swinging on Vine",
+			[0x53] = "Leaving Vine",
 			[0x54] = "Climbing Tree",
 
 			[0x56] = "Grabbed Ledge",
@@ -2754,7 +2760,13 @@ function Game.detectVersion(romName, romHash)
 			[5] = "Tiny",
 			[6] = "Chunky",
 			[7] = "Rambi",
-			[11] = "Loading Zone Controller",
+
+			--[9] = "Unknown", -- Always loaded -- TODO: Figure out what actors 9-14 do
+			--[10] = "Unknown", -- Always loaded -- What is this?
+			[11] = "Loading Zone Controller", -- Always loaded
+			[12] = "Object Model 2 Controller", -- Always loaded
+			--[13] = "Unknown", -- Always loaded -- What is this?
+			--[14] = "Unknown", -- Always loaded -- What is this?
 			[16] = "Cannon Barrel",
 			[17] = "Rambi Crate",
 			[18] = "Barrel",
@@ -2769,6 +2781,7 @@ function Game.detectVersion(romName, romHash)
 			[29] = "Fireball", -- Army Dillo, Dogadon
 			[30] = "Bridge", -- Creepy Castle?
 			[31] = "Swinging Light", -- Grey
+			[32] = "Vine", -- Brown
 
 			[35] = "Peanut", -- Projectile
 			[37] = "Pineapple", -- Projectile
@@ -2792,6 +2805,10 @@ function Game.detectVersion(romName, romHash)
 			[56] = "Strong Kong Barrel",
 			[57] = "Swinging Light", -- Green
 
+			[62] = "Vase (O)",
+			[63] = "Vase (:)",
+			[64] = "Vase (Triangle)",
+			[65] = "Vase (+)",
 			[66] = "Cannonball?", -- Fungi Minigame
 			[68] = "Vine", -- Green
 			[69] = "Counter", -- Unused?
@@ -3584,12 +3601,6 @@ end
 -------------------
 -- Physics/Scale --
 -------------------
-
-Game.speedy_speeds = { .001, .01, .1, 1, 5, 10, 15, 20, 35, 50, 100, 250, 500, 1000 };
-Game.speedy_index = 8;
-
-Game.rot_speed = 10;
-Game.max_rot_units = 4096;
 
 function isInSubGame()
 	return map_value == arcade_map or map_value == jetpac_map;
@@ -4785,12 +4796,12 @@ function setText(pointer, message)
 end
 
 function setDKTV(message)
-	local linkedListRoot = derferencePointer(Game.Memory.linked_list_pointer[version]);
+	local linkedListRoot = derferencePointer(Game.Memory.heap_pointer[version]);
 	if not isRDRAM(linkedListRoot) then
 		return; -- Something went hilariously wrong here
 	end
 
-	local linkedListSize = mainmemory.read_u32_be(Game.Memory.linked_list_pointer[version] + 4);
+	local linkedListSize = mainmemory.read_u32_be(Game.Memory.heap_pointer[version] + 4);
 	local totalSize = 0;
 	local currentPointer = linkedListRoot;
 	while totalSize < linkedListSize do
@@ -5017,7 +5028,7 @@ function ohWrongnana(verbose)
 
 	local currentKong = mainmemory.readbyte(Game.Memory.character[version]);
 
-	local objModel2Array = dereferencePointer(Game.Memory.obj_model2_array_pointer[version]);
+	local objModel2Array = getObjectModel2Array();
 	if isRDRAM(objModel2Array) and currentKong >= DK and currentKong <= Chunky then
 		local numSlots = mainmemory.read_u32_be(Game.Memory.obj_model2_array_count[version]);
 		local scriptName, slotBase, currentValue, activationScript;
@@ -5605,7 +5616,7 @@ end
 ------------
 
 function Game.unlockMoves()
-	for kong = DK, Krusha do -- TODO: Double check Kiosk offsets
+	for kong = DK, Krusha do
 		local base = Game.Memory.kong_base[version] + kong * Game.Memory.kong_size[version];
 		mainmemory.writebyte(base + moves, 3);
 		mainmemory.writebyte(base + sim_slam, 3);
@@ -6283,10 +6294,10 @@ local enemyTypes = {
 	[0x24] = "TNT Minecart",
 	[0x25] = "TNT Minecart",
 	[0x26] = "Pufftoss",
-	[0x27] = "Actor Index 220", -- TODO: Cannon Galleon Ship?
+	[0x27] = "Actor Index 220", -- TODO: Actor 220, Cannon Galleon Ship?
 	--[0x28] = "Crash",
 	--[0x29] = "Actor Index 0", -- Crash
-	[0x2A] = "Actor Index 223", -- TODO: Cannon Galleon Ship?
+	[0x2A] = "Actor Index 223", -- TODO: Actor 223, Cannon Galleon Ship?
 	--[0x2B] = "Actor Index 0", -- Crash
 	[0x2C] = "Mushroom Man",
 	--[0x2D] = "Actor Index 0", -- Crash
@@ -6310,7 +6321,7 @@ local enemyTypes = {
 	[0x3F] = "Kasplat (Lanky)",
 	[0x40] = "Kasplat (Tiny)",
 	[0x41] = "Kasplat (Chunky)",
-	[0x42] = "Actor Type 246 + Timer", -- TODO: No idea what this is
+	[0x42] = "Actor Type 246 + Timer", -- TODO: Actor 246 + Timer, no idea what this is
 	[0x43] = "Seal",
 	[0x44] = "Banana Fairy",
 	[0x45] = "Squawks with spotlight",
@@ -6538,14 +6549,17 @@ function Game.eachFrame()
 	end
 
 	-- TODO: This is really slow and doesn't cover all memory domains
-	--memoryStatCache = getMemoryStats(dereferencePointer(Game.Memory.linked_list_pointer[version]));
+	--memoryStatCache = getMemoryStats(dereferencePointer(Game.Memory.heap_pointer[version]));
 
 	--setWaterSurfaceTimers(surfaceTimerHack);
-	--koshBotLoop(); -- TODO: This probably stops the virtual pad from working
 	--Game.unlockMenus(); -- TODO: Allow user to toggle this
 
 	if forms.ischecked(ScriptHawk.UI.form_controls["Toggle Lag Fix Checkbox"]) then
 		fixLag();
+	end
+
+	if koshbot_enabled == true then
+		koshBotLoop(); -- TODO: This probably stops the virtual pad from working
 	end
 
 	if never_slip then

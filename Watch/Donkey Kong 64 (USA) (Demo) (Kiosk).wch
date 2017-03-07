@@ -36,29 +36,48 @@ SystemID N64
 7B5B12	b	b	1	RDRAM	Zipper Byte
 7B5B13	b	b	1	RDRAM	Tag Barrel Void Byte
 7B6258	w	u	1	RDRAM	Actor Count
-7B6590	b	h	1	RDRAM	DK Moves
-7B6591	b	h	1	RDRAM	DK Simian Slam
+7B6590	b	u	1	RDRAM	DK Moves
+7B6591	b	u	1	RDRAM	DK Simian Slam
+7B6592	b	b	1	RDRAM	DK Weapon
+7B6594	b	b	1	RDRAM	DK Instrument
 7B6596	w	u	1	RDRAM	DK Coins
 7B6598	w	u	1	RDRAM	DK Instrument Ammo
 7B659A	w	u	1	RDRAM	DK CBs (Japes?)
 7B65B2	w	u	1	RDRAM	DK CBs
 7B65CE	w	u	1	RDRAM	DK GBs (Japes?)
-7B65EA	b	h	1	RDRAM	Diddy Moves
-7B65EB	b	h	1	RDRAM	Diddy Simian Slam
+7B65EA	b	u	1	RDRAM	Diddy Moves
+7B65EB	b	u	1	RDRAM	Diddy Simian Slam
+7B65EC	b	b	1	RDRAM	Diddy Weapon
+7B65EE	b	b	1	RDRAM	Diddy Instrument
+7B65F0	w	u	1	RDRAM	Diddy Coins
+7B65F2	w	u	1	RDRAM	Diddy Instrument Ammo
 7B660C	w	u	1	RDRAM	Diddy CBs
-7B6644	b	h	1	RDRAM	Lanky Moves
-7B6645	b	h	1	RDRAM	Lanky Simian Slam
+7B6644	b	u	1	RDRAM	Lanky Moves
+7B6645	b	u	1	RDRAM	Lanky Simian Slam
+7B6646	b	b	1	RDRAM	Lanky Weapon
+7B6648	b	b	1	RDRAM	Lanky Instrument
+7B664A	w	u	1	RDRAM	Lanky Coins
+7B664C	w	u	1	RDRAM	Lanky Instrument Ammo
 7B6666	w	u	1	RDRAM	Lanky CBs
-7B669E	b	h	1	RDRAM	Tiny Moves
-7B669F	b	h	1	RDRAM	Tiny Simian Slam
-7B66F8	b	h	1	RDRAM	Chunky Moves
-7B66F9	b	h	1	RDRAM	Chunky Simian Slam
+7B669E	b	u	1	RDRAM	Tiny Moves
+7B669F	b	u	1	RDRAM	Tiny Simian Slam
+7B66A0	b	b	1	RDRAM	Tiny Weapon
+7B66A2	b	b	1	RDRAM	Tiny Instrument
+7B66A4	w	u	1	RDRAM	Tiny Coins
+7B66A6	w	u	1	RDRAM	Tiny Instrument Ammo
+7B66F8	b	u	1	RDRAM	Chunky Moves
+7B66F9	b	u	1	RDRAM	Chunky Simian Slam
+7B66FA	b	b	1	RDRAM	Chunky Weapon
+7B66FC	b	b	1	RDRAM	Chunky Instrument
+7B66FE	w	u	1	RDRAM	Chunky Coins
+7B6700	w	u	1	RDRAM	Chunky Instrument Ammo
 7B671A	w	u	1	RDRAM	Chunky CBs
 7B6752	w	u	1	RDRAM	Normal Ammo
 7B6754	w	u	1	RDRAM	Homing Ammo
 7B6756	w	u	1	RDRAM	Oranges
 7B6758	w	u	1	RDRAM	Crystal Coconuts
 7B675A	w	u	1	RDRAM	Film
+7B675C	b	s	1	RDRAM	Silver Balloons
 7B675E	b	u	1	RDRAM	Health
 7B675F	b	u	1	RDRAM	Melons
 7B6D00	w	u	1	RDRAM	Transferred Actor Type

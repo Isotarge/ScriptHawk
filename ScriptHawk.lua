@@ -449,8 +449,8 @@ local firstframe = true;
 previous_frame = emu.framecount();
 current_frame = emu.framecount();
 
-previous_map = "";
-previous_map_value = 0;
+local previous_map = "";
+local previous_map_value = 0;
 
 local dx = 0.0;
 local dy = 0.0;
@@ -735,7 +735,7 @@ if not TASSafe then
 	if type(Game.maps) == "table" then
 		local filteredMaps = {};
 		for i = 1, #Game.maps do
-			if string.sub(Game.maps[i],1,1) ~= "!" then
+			if string.sub(Game.maps[i], 1, 1) ~= "!" then
 				table.insert(filteredMaps, Game.maps[i]);
 			end
 		end
