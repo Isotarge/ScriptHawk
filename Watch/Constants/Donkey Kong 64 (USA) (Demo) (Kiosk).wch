@@ -2,6 +2,50 @@ SystemID N64
 5931B8	w	h	1	RDRAM	Object Model 2 "Room Replacement"
 5931BA	w	h	1	RDRAM	Object Model 2 "Room Replacement"
 6FB9D0	d	h	1	RDRAM	Start of pointers to strings
+6FE3A0	d	f	1	RDRAM	DK Walk Maximum Velocity
+6FE3A4	d	f	1	RDRAM	Diddy Walk Maximum Velocity
+6FE3A8	d	f	1	RDRAM	Lanky Walk Maximum Velocity
+6FE3AC	d	f	1	RDRAM	Tiny Walk Maximum Velocity
+6FE3B0	d	f	1	RDRAM	Chunky Walk Maximum Velocity
+6FE3B4	d	f	1	RDRAM	Rambi Walk Maximum Velocity
+6FE454	d	f	1	RDRAM	DK Carrying Object Maximum Velocity
+6FE458	d	f	1	RDRAM	Diddy Carrying Object Maximum Velocity
+6FE45C	d	f	1	RDRAM	Lanky Carrying Object Maximum Velocity
+6FE460	d	f	1	RDRAM	Tiny Carrying Object Maximum Velocity
+6FE464	d	f	1	RDRAM	Chunky Carrying Object Maximum Velocity
+6FE468	d	f	1	RDRAM	Rambi Carrying Object Maximum Velocity
+6FE6D0	d	f	1	RDRAM	DK Terminal Velocity
+6FE6D4	d	f	1	RDRAM	Diddy Terminal Velocity
+6FE6D8	d	f	1	RDRAM	Lanky Terminal Velocity
+6FE6DC	d	f	1	RDRAM	Tiny Terminal Velocity
+6FE6E0	d	f	1	RDRAM	Chunky Terminal Velocity
+6FE6E4	d	f	1	RDRAM	Rambi Terminal Velocity
+6FE7D8	d	f	1	RDRAM	DK Backflip Initial Y Velocity
+6FE7DC	d	f	1	RDRAM	Diddy Backflip Initial Y Velocity
+6FE7E0	d	f	1	RDRAM	Lanky Backflip Initial Y Velocity
+6FE7E4	d	f	1	RDRAM	Tiny Backflip Initial Y Velocity
+6FE7E8	d	f	1	RDRAM	Chunky Backflip Initial Y Velocity
+6FE7EC	d	f	1	RDRAM	Rambi Backflip Initial Y Velocity?
+6FE820	d	f	1	RDRAM	DK Long Jump Velocity
+6FE824	d	f	1	RDRAM	Diddy Long Jump Velocity
+6FE828	d	f	1	RDRAM	Lanky Long Jump Velocity
+6FE82C	d	f	1	RDRAM	Tiny Long Jump Velocity
+6FE830	d	f	1	RDRAM	Chunky Long Jump Velocity
+6FE834	d	f	1	RDRAM	Rambi Long Jump Velocity?
+6FE838	d	f	1	RDRAM	DK Long Jump Initial Y Velocity
+6FE83C	d	f	1	RDRAM	Diddy Long Jump Initial Y Velocity
+6FE840	d	f	1	RDRAM	Lanky Long Jump Initial Y velocity
+6FE844	d	f	1	RDRAM	Tiny Long Jump Initial Y Velocity
+6FE848	d	f	1	RDRAM	Chunky Long Jump Initial Y Velocity
+6FE84C	d	f	1	RDRAM	Rambi Long Jump Initial Y Velocity?
+6FED48	d	f	1	RDRAM	DK Coconut Velocity
+6FED4C	d	f	1	RDRAM	Diddy Peanut Velocity
+6FED50	d	f	1	RDRAM	Lanky Grape Velocity
+6FED54	d	f	1	RDRAM	Tiny Feather Velocity
+6FED58	d	f	1	RDRAM	Chunky Pineapple Velocity
+703464	d	f	1	RDRAM	Object Model 1 Z Scale
+703468	d	f	1	RDRAM	Object Model 1 Y Scale
+70346C	d	f	1	RDRAM	Object Model 1 X Scale
 704E30	d	f	1	RDRAM	Lava & Cutscene Floor/Y (Upwarp)
 707DD2	w	h	1	RDRAM	DK Behavior
 707DDA	w	h	1	RDRAM	DK Model

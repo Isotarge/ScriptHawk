@@ -89,7 +89,7 @@ Game.Memory = {
 	["pointer_list"] = {0x7FBFF0, 0x7FBF10, 0x7FC460, 0x7B5E58},
 	["actor_count"] = {0x7FC3F0, 0x7FC310, 0x7FC860, 0x7B6258},
 	["linked_list_pointer"] = {0x7F0990, 0x7F08B0, 0x7F0E00, 0x7A12C0}, -- TODO: Refactor to something about heap
-	["shared_collectables"] = {0x7FCC41, 0x7FCB81, 0x7FD0D1, 0x7B6754},
+	["shared_collectables"] = {0x7FCC40, 0x7FCB80, 0x7FD0D0, 0x7B6752},
 	["kong_base"] = {0x7FC950, 0x7FC890, 0x7FCDE0, 0x7B6590},
 	["kong_size"] = {0x5E, 0x5E, 0x5E, 0x5A},
 	["framebuffer_pointer"] = {0x7F07F4, 0x73EBC0, 0x743D30, 0x72CDA0},
@@ -576,14 +576,13 @@ local max_medals = 40;
 local max_warps = (5 * 2 * 8) + 4 + 2 + 2 + 6;
 
 -- Relative to shared_collectables
--- TODO: Different on Kiosk
 local standard_ammo = 0; -- u16_be
 local homing_ammo   = 2; -- u16_be
 local oranges       = 4; -- u16_be
-local crystals      = 5; -- u16_be, 150 ticks per crystal or 125 in European version
+local crystals      = 6; -- u16_be, 150 ticks per crystal or 125 in European version
 local film          = 8; -- u16_be
-local health        = 10; -- unknown, possibly u16_be
-local melons        = 11; -- u8
+local health        = 11; -- s8 -- 12 on Kiosk, handled in Game.detectVersion()
+local melons        = 12; -- u8? -- 13 on Kiosk, handled in Game.detectVersion()
 
 -- Kong index
 local DK     = 0;
@@ -2646,6 +2645,9 @@ function Game.detectVersion(romName, romHash)
 	elseif romHash == "B4717E602F07CA9BE0D4822813C658CD8B99F993" then -- Kiosk
 		version = 4;
 		-- flag_array = require("games.dk64_flags_Kiosk"); -- TODO: Flags?
+
+		health = 12;
+		melons = 13;
 
 		-- Kiosk specific Object Model 1 offsets
 		obj_model1.floor = 0x9C;
@@ -5736,17 +5738,17 @@ end
 function Game.applyInfinites()
 	local shared_collectables = Game.Memory.shared_collectables[version];
 
-	mainmemory.writebyte(shared_collectables + standard_ammo, Game.getMaxStandardAmmo());
+	mainmemory.write_u16_be(shared_collectables + standard_ammo, Game.getMaxStandardAmmo());
 	if forms.ischecked(ScriptHawk.UI.form_controls["Toggle Homing Ammo Checkbox"]) then
-		mainmemory.writebyte(shared_collectables + homing_ammo, Game.getMaxHomingAmmo());
+		mainmemory.write_u16_be(shared_collectables + homing_ammo, Game.getMaxHomingAmmo());
 	else
-		mainmemory.writebyte(shared_collectables + homing_ammo, 0);
+		mainmemory.write_u16_be(shared_collectables + homing_ammo, 0);
 	end
 
-	mainmemory.writebyte(shared_collectables + oranges, max_oranges);
+	mainmemory.write_u16_be(shared_collectables + oranges, max_oranges);
 	mainmemory.write_u16_be(shared_collectables + crystals, max_crystals * ticks_per_crystal);
-	mainmemory.writebyte(shared_collectables + film, max_film);
-	mainmemory.writebyte(shared_collectables + health, mainmemory.readbyte(shared_collectables + melons) * 4);
+	mainmemory.write_u16_be(shared_collectables + film, max_film);
+	mainmemory.write_s8(shared_collectables + health, mainmemory.read_u8(shared_collectables + melons) * 4);
 
 	for kong = DK, Krusha do
 		local base = Game.Memory.kong_base[version] + kong * Game.Memory.kong_size[version];

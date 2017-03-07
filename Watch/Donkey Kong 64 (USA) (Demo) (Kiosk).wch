@@ -64,6 +64,7 @@ SystemID N64
 7B6D00	w	u	1	RDRAM	Transferred Actor Type
 7B6DA0	d	u	1	RDRAM	Idle Timer
 7B7088	d	f	1	RDRAM	Loading Zone Fadeout Progress
+7B72C0	d	u	1	RDRAM	Idle Timer (Void)
 7B73D8	w	h	1	RDRAM	Number of Enemies
 7B73DC	d	h	1	RDRAM	Enemy Respawn Array Pointer
 7B7410	w	h	1	RDRAM	Loading Zone Array Size
