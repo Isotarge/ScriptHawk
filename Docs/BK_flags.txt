@@ -167,10 +167,14 @@ C0 03 00 00 = # of pieces placed in FP Puzzle
 00 00 00 04 = 1st time TRex
 
 00 00 00 20 = 1st time in lair cutscene - entering from SM
+00 00 00 40 = BLUEEGGS
+00 00 00 80 = REDFEATHERS
 
 
 
 --3831C0
+01 00 00 00 = GOLDFEATHERS
+
 04 00 00 00 = Grate to RBB Puzzle Broken
 08 00 00 00 = Ice Block by FP Puzzle Broken 
 10 00 00 00 = Statue Eye Broken
@@ -212,7 +216,7 @@ C0 03 00 00 = # of pieces placed in FP Puzzle
 00 00 40 00 = 1st time near DoG Puzzle Podium
 00 00 80 00 = 1st time pumpkin transform
 00 00 00 03 = Sandybutt maze state
-
+00 00 00 04 = Sandcastle Door Open
 00 00 00 10 = Defeated Grunty
 
 
@@ -232,7 +236,7 @@ GLOBAL CHEAT FLAGS
 
 --3831E4
 01 00 00 00
-02 00 00 00 = 
+02 00 00 00 = CHEATS ACTIVE????
 04 00 00 00 = 
 08 00 00 00 = 
 10 00 00 00 = 
@@ -243,18 +247,26 @@ GLOBAL CHEAT FLAGS
 00 02 00 00 = CHEAT Open 450 Note Door
 00 04 00 00 = CHEAT Open 640 Note Door
 00 08 00 00 = CHEAT Open 765 Note Door
-00 10 00 00 = 
-00 20 00 00 = 
-00 40 00 00 = 
-00 80 00 00 = 
-00 00 01 00 = 
-00 00 02 00 = CHEAT Infinite Lives
-00 00 04 00 = CHEAT Infinite Eggs
-00 00 08 00 = CHEAT Infinite Red Feathers
-00 00 10 00 = CHEAT Infinite Gold Feathers
-00 00 20 00 = CHEAT BOTH PIPES ARE THERE TO CLANKERS LAIR
-00 00 40 00 = CHEAT YOULL CEASE TO GRIPE WHEN UP GOES A PIPE
-00 00 80 00 = CHEAT Open Clankers
+00 10 00 00 = CHEAT Complete CC Jigsaw puzzle
+00 20 00 00 = CHEAT Complete BGS Jigsaw puzzle
+00 40 00 00 = CHEAT Complete FP Jigsaw puzzle
+00 80 00 00 = CHEAT Complete GV Jigsaw puzzle
+00 00 01 00 = CHEAT Complete MMM Jigsaw puzzle
+00 00 02 00 = CHEAT Complete RBB Jigsaw puzzle
+00 00 04 00 = CHEAT Complete CCW Jigsaw puzzle
+00 00 08 00 = CHEAT Infinite Lives
+00 00 10 00 = CHEAT Infinite Eggs
+00 00 20 00 = CHEAT Infinite Red Feathers
+00 00 40 00 = CHEAT Infinite Gold Feathers
+00 00 80 00 = 
+00 00 00 01 = BOTTLES BONUS Active
+00 00 00 02 = 
+00 00 00 04 = 
+00 00 00 08 = 
+00 00 00 10 =
+00 00 00 20 = CHEAT BOTH PIPES ARE THERE TO CLANKERS LAIR
+00 00 00 40 = CHEAT YOULL CEASE TO GRIPE WHEN UP GOES A PIPE
+00 00 00 80 = CHEAT Open Clankers
 
 --3831E8
 01 00 00 00 = CHEAT YOULL BE AMAZED NOW THE SWAMP PICCY GRILLE IS RAISED
@@ -280,9 +292,15 @@ GLOBAL CHEAT FLAGS
 00 00 10 00 = CHEAT 8 Health
 00 00 20 00 = CHEAT Infinite Mumbo Tokens 
 00 00 40 00 = CHEAT Infinite Air
-00 00 80 00
-
-
+00 00 80 00 = BOTTLES BONUS 1
+00 00 00 01 = BOTTLES BONUS 2
+00 00 00 02 = BOTTLES BONUS 3
+00 00 00 04 = BOTTLES BONUS 4 
+00 00 00 08 = BOTTLES BONUS 5
+00 00 00 10 = BIG BOTTLES BONUS 
+00 00 00 20 = WISHY WASHY BANJO
+00 00 00 40 = 
+00 00 00 80 = 
 
 
 
