@@ -52,6 +52,8 @@ A collection of Lua scripts and RAM watches for [BizHawk](https://github.com/TAS
 ###Banjo-Tooie
 - All known versions supported
 - [Object analysis tools](Docs/Object%20Analysis%20Tools.txt): List, Encircle, Zip
+- Documentation for over 60% of permanent flags in USA save files
+- Realtime feedback for flags being set/cleared
 
 ###Conker's Bad Fur Day
 - All known versions supported

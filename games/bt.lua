@@ -286,7 +286,7 @@ local Game = {
 		"JRL - Smuggler's cavern",
 		"JRL",
 		"JRL - Atlantis",
-		"JRL - Seabottom",
+		"JRL - Sea Bottom",
 	},
 	Memory = { -- Version order: Australia, Europe, Japan, USA
 		["consumable_base"] = {0x11FFB0, 0x120170, 0x115340, 0x11B080},
@@ -981,6 +981,7 @@ local movementStates = {
 	[0xC8] = "Entering Breegull Blaster",
 	[0xC9] = "Exiting Breegull Blaster",
 	[0xCA] = "Idle", -- Breegull Blaster
+	[0xCB] = "Entering First Person", -- Breegull Blaster
 
 	[0xCE] = "Locked", -- Breegull Blaster, Loading Zone
 
@@ -1301,9 +1302,9 @@ local global_flag_array = {
 	{byte=0x03, bit=2, name="Boss Replay: Chilli Billi", type="Boss Replay"},
 	{byte=0x03, bit=3, name="Boss Replay: Mingy Jongo", type="Boss Replay"},
 	{byte=0x03, bit=4, name="Boss Replay: Hag 1", type="Boss Replay"},
-	-- 0x03 > 5 ???
-	-- 0x03 > 6 ???
-	-- 0x03 > 7 ???
+	-- 0x03 > 5 Unknown, but cleared by GS code
+	-- 0x03 > 6 Unknown, but cleared by GS code
+	-- 0x03 > 7 Unknown, but cleared by GS code
 	-- 0x04 > 0
 	-- 0x04 > 1
 	-- 0x04 > 2
@@ -1312,9 +1313,9 @@ local global_flag_array = {
 	-- 0x04 > 5
 	-- 0x04 > 6
 	-- 0x04 > 7
-	-- 0x05 > 0 ???
-	-- 0x05 > 1 ???
-	-- 0x05 > 2 ???
+	-- 0x05 > 0 Unknown, but cleared by GS code
+	-- 0x05 > 1 Unknown, but cleared by GS code
+	-- 0x05 > 2 Unknown, but cleared by GS code
 	{byte=0x05, bit=3, name="Minigame Replay: Mayan Kickball (Quarterfinal)", type="Minigame Replay"},
 	{byte=0x05, bit=4, name="Minigame Replay: Mayan Kickball (Semifinal)", type="Minigame Replay"},
 	{byte=0x05, bit=5, name="Minigame Replay: Mayan Kickball (Final)", type="Minigame Replay"},
@@ -1384,24 +1385,24 @@ local global_flag_array = {
 local flag_block_size = 0xB0;
 local flag_array = {
 	-- 0x00 > 0
-	{byte=0x00, bit=1, name="First Time Note Collection", type="FTT"},
-	{byte=0x00, bit=2, name="First Time Glowbo Collection", type="FTT"},
-	{byte=0x00, bit=3, name="First Time Egg Collection", type="FTT"},
-	{byte=0x00, bit=4, name="First Time Red Feather Collection", type="FTT"},
-	{byte=0x00, bit=5, name="First Time Gold Feather Collection", type="FTT"},
-	{byte=0x00, bit=6, name="First Time Treble Clef Collection", type="FTT"},
-	{byte=0x00, bit=7, name="First Time Health Collection", type="FTT"},
+	{byte=0x00, bit=1, name="First Time Note Collection", nomap=true, type="FTT"},
+	{byte=0x00, bit=2, name="First Time Glowbo Collection", nomap=true, type="FTT"},
+	{byte=0x00, bit=3, name="First Time Egg Collection", nomap=true, type="FTT"},
+	{byte=0x00, bit=4, name="First Time Red Feather Collection", nomap=true, type="FTT"},
+	{byte=0x00, bit=5, name="First Time Gold Feather Collection", nomap=true, type="FTT"},
+	{byte=0x00, bit=6, name="First Time Treble Clef Collection", nomap=true, type="FTT"},
+	{byte=0x00, bit=7, name="First Time Health Collection", nomap=true, type="FTT"},
 	-- 0x01 > 0
 	-- 0x01 > 1
-	{byte=0x01, bit=2, name="First Time Empty Honeycomb Collection", type="FTT"},
+	{byte=0x01, bit=2, name="First Time Empty Honeycomb Collection", nomap=true, type="FTT"},
 	-- 0x01 > 3
 	-- 0x01 > 4
-	{byte=0x01, bit=5, name="First Time Jinjo Collection", type="FTT"},
+	{byte=0x01, bit=5, name="First Time Jinjo Collection", nomap=true, type="FTT"},
 	-- 0x01 > 6
 	-- 0x01 > 7
 	-- 0x02 > 0
 	-- 0x02 > 1
-	{byte=0x02, bit=2, name="Signpost FTT", type="FTT"},
+	{byte=0x02, bit=2, name="Signpost FTT", nomap=true, type="FTT"},
 	{byte=0x02, bit=3, name="ToT Completed?", type="Progress"},
 	{byte=0x02, bit=4, name="Klungo Intro Cutscene"},
 	-- 0x02 > 5
@@ -1412,7 +1413,7 @@ local flag_array = {
 	-- 0x03 > 2
 	{byte=0x03, bit=3, name="Hag 1 Defeated", type="Progress"},
 	{byte=0x03, bit=4, name="Hag 1 Intro Cutscene", type="FTT"},
-	-- 0x03 > 5
+	{byte=0x03, bit=5, name="JRL: Sunken Ship Jinjo Chest Smashed", type="Physical"},
 	-- 0x03 > 6
 	-- 0x03 > 7
 	-- 0x04 > 0
@@ -1479,7 +1480,7 @@ local flag_array = {
 	-- 0x0B > 5
 	{byte=0x0B, bit=6, name="GGM: Old King Coal Defeated?", type="Progress"},
 	-- 0x0B > 7
-	-- 0x0C > 0 Targitzan Fight?
+	-- 0x0C > 0 Start of Targitzan Fight?
 	--{byte=0x0C, bit=1, name="WW: Dino Door Smashed?"},
 	-- 0x0C > 2
 	-- 0x0C > 3
@@ -1546,8 +1547,8 @@ local flag_array = {
 	-- 0x14 > 0
 	{byte=0x14, bit=1, name="MT: Prison Compound Door Smashed", type="Physical"},
 	-- 0x14 > 2
-	-- 0x14 > 3
-	{byte=0x14, bit=4, name="JRL: Water Supply Pipe Grate Smashed", type="Physical"},
+	{byte=0x14, bit=3, name="JRL: Water Supply Pipe Grate Smashed (Sunken Ship)", type="Physical"},
+	{byte=0x14, bit=4, name="JRL: Water Supply Pipe Grate Smashed (Smuggler's Cavern)", type="Physical"},
 	{byte=0x14, bit=5, name="JRL: Waste Pipe Drilled", type="Physical"},
 	-- 0x14 > 6
 	-- 0x14 > 7
@@ -1572,7 +1573,7 @@ local flag_array = {
 	{byte=0x17, bit=2, name="Humba Wumba: Detransform Instructions", type="FTT"},
 	{byte=0x17, bit=3, name="MT: Treasure Chamber > TDL Door Open", type="Physical"},
 	{byte=0x17, bit=4, name="JRL: Captain Blackeye FTT", type="FTT"},
-	-- 0x17 > 5
+	{byte=0x17, bit=5, name="TDL: Terry Defeated", type="Progress"},
 	-- 0x17 > 6
 	-- 0x17 > 7
 	-- 0x18 > 0
@@ -1580,31 +1581,31 @@ local flag_array = {
 	{byte=0x18, bit=2, name="Mumbo's Magic: Power: Star Spinner", type="Mumbo's Magic"},
 	{byte=0x18, bit=3, name="Mumbo's Magic: Power: Saucer of Peril", type="Mumbo's Magic"},
 	{byte=0x18, bit=4, name="Mumbo's Magic: Power: Dodgem Dome", type="Mumbo's Magic"},
-	{byte=0x18, bit=5, name="Ability: Beak Barge", type="Ability"},
-	{byte=0x18, bit=6, name="Ability: Beak Bomb", type="Ability"},
-	{byte=0x18, bit=7, name="Ability: Beak Buster", type="Ability"},
-	--{byte=0x19, bit=0, name="Ability: Seen Camera Tutorial???"}, -- Set on boot
-	{byte=0x19, bit=1, name="Ability: Bear Punch Replacement Peck", type="Ability"},
-	{byte=0x19, bit=2, name="Ability: Climb Trees", type="Ability"},
-	{byte=0x19, bit=3, name="Ability: Blue Eggs", type="Ability"},
-	{byte=0x19, bit=4, name="Ability: Feathery Flap", type="Ability"},
-	{byte=0x19, bit=5, name="Ability: Flap Flip", type="Ability"},
-	{byte=0x19, bit=6, name="Ability: Fly Pad", type="Ability"},
-	{byte=0x19, bit=7, name="Ability: Full Jump Height", type="Ability"},
-	{byte=0x1A, bit=0, name="Ability: Rat-a-tat Rap", type="Ability"},
-	{byte=0x1A, bit=1, name="Ability: Roll", type="Ability"},
-	{byte=0x1A, bit=2, name="Ability: Shock Spring Pad", type="Ability"},
-	{byte=0x1A, bit=3, name="Ability: Wading Boots", type="Ability"},
-	{byte=0x1A, bit=4, name="Ability: Dive", type="Ability"},
-	{byte=0x1A, bit=5, name="Ability: Talon Trot", type="Ability"},
-	{byte=0x1A, bit=6, name="Ability: Turbo Trainers", type="Ability"},
-	{byte=0x1A, bit=7, name="Ability: Wonderwing", type="Ability"},
+	{byte=0x18, bit=5, name="Ability: Beak Barge", nomap=true, type="Ability"},
+	{byte=0x18, bit=6, name="Ability: Beak Bomb", nomap=true, type="Ability"},
+	{byte=0x18, bit=7, name="Ability: Beak Buster", nomap=true, type="Ability"},
+	--{byte=0x19, bit=0, name="Ability: Seen Camera Tutorial?"}, -- Set on boot
+	{byte=0x19, bit=1, name="Ability: Bear Punch Replacement Peck", nomap=true, type="Ability"},
+	{byte=0x19, bit=2, name="Ability: Climb Trees", nomap=true, type="Ability"},
+	{byte=0x19, bit=3, name="Ability: Blue Eggs", nomap=true, type="Ability"},
+	{byte=0x19, bit=4, name="Ability: Feathery Flap", nomap=true, type="Ability"},
+	{byte=0x19, bit=5, name="Ability: Flap Flip", nomap=true, type="Ability"},
+	{byte=0x19, bit=6, name="Ability: Fly Pad", nomap=true, type="Ability"},
+	{byte=0x19, bit=7, name="Ability: Full Jump Height", nomap=true, type="Ability"},
+	{byte=0x1A, bit=0, name="Ability: Rat-a-tat Rap", nomap=true, type="Ability"},
+	{byte=0x1A, bit=1, name="Ability: Roll", nomap=true, type="Ability"},
+	{byte=0x1A, bit=2, name="Ability: Shock Spring Pad", nomap=true, type="Ability"},
+	{byte=0x1A, bit=3, name="Ability: Wading Boots", nomap=true, type="Ability"},
+	{byte=0x1A, bit=4, name="Ability: Dive", nomap=true, type="Ability"},
+	{byte=0x1A, bit=5, name="Ability: Talon Trot", nomap=true, type="Ability"},
+	{byte=0x1A, bit=6, name="Ability: Turbo Trainers", nomap=true, type="Ability"},
+	{byte=0x1A, bit=7, name="Ability: Wonderwing", nomap=true, type="Ability"},
 	--{byte=0x1B, bit=0, name="FT Note Door Molehill Seen?", type="FTT"}, -- Set on boot
 	{byte=0x1B, bit=1, name="Ability: Grip Grab", type="Ability"},
 	{byte=0x1B, bit=2, name="Ability: Breegull Blaster", type="Ability"},
 	{byte=0x1B, bit=3, name="Ability: Egg Aim", type="Ability"},
 	-- 0x1B > 4
-	--{byte=0x1B, bit=5, name="Ability: Fire/Grenade Eggs???", type="Ability"},
+	--{byte=0x1B, bit=5, name="Ability: Fire/Grenade Eggs?", type="Ability"},
 	{byte=0x1B, bit=6, name="Ability: Bill Drill", type="Ability"},
 	{byte=0x1B, bit=7, name="Ability: Beak Bayonet", type="Ability"},
 	{byte=0x1C, bit=0, name="Ability: Airborne Egg Aiming", type="Ability"},
@@ -1714,7 +1715,7 @@ local flag_array = {
 	-- 0x29 > 0
 	-- 0x29 > 1
 	-- 0x29 > 2
-	-- 0x29 > 3
+	{byte=0x29, bit=3, name="TDL: Terry's Nest Drilled", type="Physical"},
 	{byte=0x29, bit=4, name="GI: Weldar Intro Cutscene", type="FTT"},
 	-- 0x29 > 5
 	-- 0x29 > 6
@@ -1758,7 +1759,7 @@ local flag_array = {
 	-- 0x2E > 4
 	-- 0x2E > 5
 	-- 0x2E > 6
-	-- 0x2E > 7
+	{byte=0x2E, bit=7, name="WW: FT Pick Up Big Top Ticket", type="FTT"},
 	{byte=0x2F, bit=0, name="GI: Trash Compactor FTT", type="FTT"},
 	-- 0x2F > 1
 	-- 0x2F > 2
@@ -1797,7 +1798,7 @@ local flag_array = {
 	-- 0x33 > 3
 	-- 0x33 > 4
 	-- 0x33 > 5
-	-- 0x33 > 6
+	{byte=0x33, bit=6, name="HFP: Gobi in Train Station", type="Progress"},
 	-- 0x33 > 7
 	-- 0x34 > 0
 	-- 0x34 > 1
@@ -1888,7 +1889,7 @@ local flag_array = {
 	{byte=0x3E, bit=6, name="Jinjo: IoH: Cliff Top", type="Jinjo"},
 	{byte=0x3E, bit=7, name="Jinjo: IoH: Plateau", type="Jinjo"},
 	{byte=0x3F, bit=0, name="Jinjo: IoH: Spiral Mountain", type="Jinjo"},
-	-- 0x3F > 1
+	{byte=0x3F, bit=1, name="JRL: Sunken Ship Jinjo Spawned", type="Physical"},
 	{byte=0x3F, bit=2, name="Honeycomb: MT: Entrance", type="Honeycomb"},
 	{byte=0x3F, bit=3, name="Honeycomb: MT: Bovina", type="Honeycomb"},
 	{byte=0x3F, bit=4, name="Honeycomb: MT: Treasure Chamber", type="Honeycomb"},
@@ -1917,7 +1918,7 @@ local flag_array = {
 	-- 0x42 > 3 JRL Sea Bottom Location?
 	-- 0x42 > 4
 	-- 0x42 > 5
-	-- 0x42 > 6
+	{byte=0x42, bit=6, name="GGM: Toxic Gas Cave Boulder Drilled (Empty Honeycomb)", type="Physical"},
 	{byte=0x42, bit=7, name="Glowbo: MT: Mumbo's Skull", type="Glowbo"},
 	{byte=0x43, bit=0, name="Glowbo: MT: Behind Wumba's Wigwam", type="Glowbo"},
 	{byte=0x43, bit=1, name="Glowbo: GGM: Near Entrance", type="Glowbo"},
@@ -1937,7 +1938,7 @@ local flag_array = {
 	{byte=0x44, bit=7, name="Glowbo: IoH: Cliff Top", type="Glowbo"},
 	{byte=0x45, bit=0, name="Jiggy: MT: Targitzan", type="Jiggy"},
 	{byte=0x45, bit=1, name="Jiggy: MT: Targitzan's Slightly Sacred Chamber", type="Jiggy"},
-	{byte=0x45, bit=2, name="Jiggy: MT: ??? (3)", type="Jiggy"},
+	{byte=0x45, bit=2, name="Jiggy: MT: Kickball", type="Jiggy"},
 	{byte=0x45, bit=3, name="Jiggy: MT: Bovina", type="Jiggy"},
 	{byte=0x45, bit=4, name="Jiggy: MT: Treasure Chamber", type="Jiggy"},
 	{byte=0x45, bit=5, name="Jiggy: MT: Jade Snake Grove: Golden Goliath", type="Jiggy"},
@@ -1956,86 +1957,86 @@ local flag_array = {
 	{byte=0x47, bit=2, name="Jiggy: GGM: Power Hut Basement", type="Jiggy"},
 	{byte=0x47, bit=3, name="Jiggy: GGM: Flooded Caves", type="Jiggy"},
 	{byte=0x47, bit=4, name="Jiggy: WW: Hoop Hurry", type="Jiggy"},
-	{byte=0x47, bit=5, name="Jiggy: WW: ??? (2)", type="Jiggy"},
-	{byte=0x47, bit=6, name="Jiggy: WW: ??? (3)", type="Jiggy"},
-	{byte=0x47, bit=7, name="Jiggy: WW: ??? (4)", type="Jiggy"},
+	{byte=0x47, bit=5, name="Jiggy: WW: Dodgems", type="Jiggy"},
+	{byte=0x47, bit=6, name="Jiggy: WW: Mr. Patch", type="Jiggy"},
+	{byte=0x47, bit=7, name="Jiggy: WW: Saucer of Peril", type="Jiggy"},
 	{byte=0x48, bit=0, name="Jiggy: WW: Balloon Burst", type="Jiggy"},
 	{byte=0x48, bit=1, name="Jiggy: WW: Dive of Death", type="Jiggy"},
-	{byte=0x48, bit=2, name="Jiggy: WW: ??? (7)", type="Jiggy"},
+	{byte=0x48, bit=2, name="Jiggy: WW: Mrs. Boggy", type="Jiggy"},
 	{byte=0x48, bit=3, name="Jiggy: WW: Star Spinner", type="Jiggy"},
 	{byte=0x48, bit=4, name="Jiggy: WW: The Inferno", type="Jiggy"},
 	{byte=0x48, bit=5, name="Jiggy: WW: Cactus of Strength", type="Jiggy"},
-	{byte=0x48, bit=6, name="Jiggy: JRL: ??? (1)", type="Jiggy"},
-	{byte=0x48, bit=7, name="Jiggy: JRL: ??? (2)", type="Jiggy"},
-	{byte=0x49, bit=0, name="Jiggy: JRL: ??? (3)", type="Jiggy"},
-	{byte=0x49, bit=1, name="Jiggy: JRL: ??? (4)", type="Jiggy"},
+	{byte=0x48, bit=6, name="Jiggy: JRL: Mini-Sub Challenge", type="Jiggy"},
+	{byte=0x48, bit=7, name="Jiggy: JRL: Tiptup", type="Jiggy"},
+	{byte=0x49, bit=0, name="Jiggy: JRL: Chris P. Bacon", type="Jiggy"},
+	{byte=0x49, bit=1, name="Jiggy: JRL: Piglet's Pool", type="Jiggy"},
 	{byte=0x49, bit=2, name="Jiggy: JRL: Smuggler's Cavern", type="Jiggy"},
 	{byte=0x49, bit=3, name="Jiggy: JRL: Merry Maggie Malpass", type="Jiggy"},
-	{byte=0x49, bit=4, name="Jiggy: JRL: ??? (7)", type="Jiggy"},
+	{byte=0x49, bit=4, name="Jiggy: JRL: Lord Woo Fak Fak", type="Jiggy"},
 	{byte=0x49, bit=5, name="Jiggy: JRL: Seemee", type="Jiggy"},
 	{byte=0x49, bit=6, name="Jiggy: JRL: Pawno's", type="Jiggy"},
 	{byte=0x49, bit=7, name="Jiggy: JRL: UFO", type="Jiggy"},
-	{byte=0x4A, bit=0, name="Jiggy: TDL: ??? (1)", type="Jiggy"},
-	{byte=0x4A, bit=1, name="Jiggy: TDL: ??? (2)", type="Jiggy"},
-	{byte=0x4A, bit=2, name="Jiggy: TDL: ??? (3)", type="Jiggy"},
-	{byte=0x4A, bit=3, name="Jiggy: TDL: ??? (4)", type="Jiggy"},
-	{byte=0x4A, bit=4, name="Jiggy: TDL: ??? (5)", type="Jiggy"},
-	{byte=0x4A, bit=5, name="Jiggy: TDL: ??? (6)", type="Jiggy"},
-	{byte=0x4A, bit=6, name="Jiggy: TDL: ??? (7)", type="Jiggy"},
-	{byte=0x4A, bit=7, name="Jiggy: TDL: ??? (8)", type="Jiggy"},
-	{byte=0x4B, bit=0, name="Jiggy: TDL: ??? (9)", type="Jiggy"},
-	{byte=0x4B, bit=1, name="Jiggy: TDL: ??? (10)", type="Jiggy"},
+	{byte=0x4A, bit=0, name="Jiggy: TDL: Under Terry's Nest", type="Jiggy"},
+	{byte=0x4A, bit=1, name="Jiggy: TDL: Dippy", type="Jiggy"},
+	{byte=0x4A, bit=2, name="Jiggy: TDL: Scrotty", type="Jiggy"},
+	{byte=0x4A, bit=3, name="Jiggy: TDL: Terry Defeated", type="Jiggy"},
+	{byte=0x4A, bit=4, name="Jiggy: TDL: Oogle Boogle Tribe", type="Jiggy"},
+	{byte=0x4A, bit=5, name="Jiggy: TDL: Chompa's Belly", type="Jiggy"},
+	{byte=0x4A, bit=6, name="Jiggy: TDL: Terry's Babies Hatched", type="Jiggy"},
+	{byte=0x4A, bit=7, name="Jiggy: TDL: Stomping Plains", type="Jiggy"},
+	{byte=0x4B, bit=0, name="Jiggy: TDL: Rocknut Tribe", type="Jiggy"},
+	{byte=0x4B, bit=1, name="Jiggy: TDL: Code of the Dinosaurs", type="Jiggy"},
 	{byte=0x4B, bit=2, name="Jiggy: GI: Waste Disposal Underwater", type="Jiggy"},
 	{byte=0x4B, bit=3, name="Jiggy: GI: Weldar", type="Jiggy"},
-	{byte=0x4B, bit=4, name="Jiggy: GI: ??? (3)", type="Jiggy"},
-	{byte=0x4B, bit=5, name="Jiggy: GI: ??? (4)", type="Jiggy"},
-	{byte=0x4B, bit=6, name="Jiggy: GI: ??? (5)", type="Jiggy"},
-	{byte=0x4B, bit=7, name="Jiggy: GI: ??? (6)", type="Jiggy"},
+	{byte=0x4B, bit=4, name="Jiggy: GI: Clinker's Cavern", type="Jiggy"},
+	{byte=0x4B, bit=5, name="Jiggy: GI: Laundry", type="Jiggy"},
+	{byte=0x4B, bit=6, name="Jiggy: GI: Floor 5", type="Jiggy"},
+	{byte=0x4B, bit=7, name="Jiggy: GI: Quality Control", type="Jiggy"},
 	{byte=0x4C, bit=0, name="Jiggy: GI: Floor 1 Guarded", type="Jiggy"},
 	{byte=0x4C, bit=1, name="Jiggy: GI: Trash Compactor", type="Jiggy"},
-	{byte=0x4C, bit=2, name="Jiggy: GI: ??? (9)", type="Jiggy"},
+	{byte=0x4C, bit=2, name="Jiggy: GI: Packing Room", type="Jiggy"},
 	{byte=0x4C, bit=3, name="Jiggy: GI: Waste Disposal Box", type="Jiggy"},
-	{byte=0x4C, bit=4, name="Jiggy: HFP: ??? (1)", type="Jiggy"},
-	{byte=0x4C, bit=5, name="Jiggy: HFP: ??? (2)", type="Jiggy"},
-	{byte=0x4C, bit=6, name="Jiggy: HFP: ??? (3)", type="Jiggy"},
-	{byte=0x4C, bit=7, name="Jiggy: HFP: ??? (4)", type="Jiggy"},
-	{byte=0x4D, bit=0, name="Jiggy: HFP: ??? (5)", type="Jiggy"},
-	{byte=0x4D, bit=1, name="Jiggy: HFP: ??? (6)", type="Jiggy"},
-	{byte=0x4D, bit=2, name="Jiggy: HFP: ??? (7)", type="Jiggy"},
-	{byte=0x4D, bit=3, name="Jiggy: HFP: ??? (8)", type="Jiggy"},
-	{byte=0x4D, bit=4, name="Jiggy: HFP: ??? (9)", type="Jiggy"},
+	{byte=0x4C, bit=4, name="Jiggy: HFP: Dragon Brothers Defeated", type="Jiggy"},
+	{byte=0x4C, bit=5, name="Jiggy: HFP: Inside the Volcano", type="Jiggy"},
+	{byte=0x4C, bit=6, name="Jiggy: HFP: Sabreman", type="Jiggy"},
+	{byte=0x4C, bit=7, name="Jiggy: HFP: Boggy", type="Jiggy"},
+	{byte=0x4D, bit=0, name="Jiggy: HFP: Icy Side Train Station", type="Jiggy"},
+	{byte=0x4D, bit=1, name="Jiggy: HFP: Oil Drill", type="Jiggy"},
+	{byte=0x4D, bit=2, name="Jiggy: HFP: Stomping Plains Connection", type="Jiggy"},
+	{byte=0x4D, bit=3, name="Jiggy: HFP: Kickball", type="Jiggy"},
+	{byte=0x4D, bit=4, name="Jiggy: HFP: Alien", type="Jiggy"},
 	{byte=0x4D, bit=5, name="Jiggy: HFP: Lava Waterfall", type="Jiggy"},
 	{byte=0x4D, bit=6, name="Jiggy: CCL: Mingy Jongo", type="Jiggy"},
-	{byte=0x4D, bit=7, name="Jiggy: CCL: ??? (2)", type="Jiggy"},
+	{byte=0x4D, bit=7, name="Jiggy: CCL: Mr. Fit", type="Jiggy"},
 	{byte=0x4E, bit=0, name="Jiggy: CCL: Pot o' Gold", type="Jiggy"},
-	{byte=0x4E, bit=1, name="Jiggy: CCL: ??? (4)", type="Jiggy"},
-	{byte=0x4E, bit=2, name="Jiggy: CCL: ??? (5)", type="Jiggy"},
-	{byte=0x4E, bit=3, name="Jiggy: CCL: ??? (6)", type="Jiggy"},
+	{byte=0x4E, bit=1, name="Jiggy: CCL: Canary Mary", type="Jiggy"},
+	{byte=0x4E, bit=2, name="Jiggy: CCL: Zubba's Nest", type="Jiggy"},
+	{byte=0x4E, bit=3, name="Jiggy: CCL: Eyeballus Jiggium Plant", type="Jiggy"},
 	{byte=0x4E, bit=4, name="Jiggy: CCL: Cheese Wedge", type="Jiggy"},
-	{byte=0x4E, bit=5, name="Jiggy: CCL: ??? (8)", type="Jiggy"},
+	{byte=0x4E, bit=5, name="Jiggy: CCL: Trash Can", type="Jiggy"},
 	{byte=0x4E, bit=6, name="Jiggy: CCL: Superstash", type="Jiggy"},
 	{byte=0x4E, bit=7, name="Jiggy: CCL: Jelly Castle", type="Jiggy"},
 	{byte=0x4F, bit=0, name="Jiggy: IoH: White Jinjo Family", type="Jiggy"},
-	{byte=0x4F, bit=1, name="Jiggy: IoH: ??? (2)", type="Jiggy"},
-	{byte=0x4F, bit=2, name="Jiggy: IoH: ??? (3)", type="Jiggy"},
-	{byte=0x4F, bit=3, name="Jiggy: IoH: ??? (4)", type="Jiggy"},
-	{byte=0x4F, bit=4, name="Jiggy: IoH: ??? (5)", type="Jiggy"},
-	{byte=0x4F, bit=5, name="Jiggy: IoH: ??? (6)", type="Jiggy"},
-	{byte=0x4F, bit=6, name="Jiggy: IoH: ??? (7)", type="Jiggy"},
-	{byte=0x4F, bit=7, name="Jiggy: IoH: ??? (8)", type="Jiggy"},
-	{byte=0x50, bit=0, name="Jiggy: IoH: ??? (9)", type="Jiggy"},
+	{byte=0x4F, bit=1, name="Jiggy: IoH: Orange Jinjo Family", type="Jiggy"},
+	{byte=0x4F, bit=2, name="Jiggy: IoH: Yellow Jinjo Family", type="Jiggy"},
+	{byte=0x4F, bit=3, name="Jiggy: IoH: Brown Jinjo Family", type="Jiggy"},
+	{byte=0x4F, bit=4, name="Jiggy: IoH: Green Jinjo Family", type="Jiggy"},
+	{byte=0x4F, bit=5, name="Jiggy: IoH: Red Jinjo Family", type="Jiggy"},
+	{byte=0x4F, bit=6, name="Jiggy: IoH: Blue Jinjo Family", type="Jiggy"},
+	{byte=0x4F, bit=7, name="Jiggy: IoH: Purple Jinjo Family", type="Jiggy"},
+	{byte=0x50, bit=0, name="Jiggy: IoH: Black Jinjo Family", type="Jiggy"},
 	{byte=0x50, bit=1, name="Jiggy: IoH: King Jingaling Intro", type="Jiggy"},
 	{byte=0x50, bit=2, name="MT: Bovina Jiggy Spawned", type="Physical"},
-	-- 0x50 > 3
-	-- 0x50 > 4 MT Jade Snake Grove Something
+	{byte=0x50, bit=3, name="MT: Kickball Jiggy Spawned", type="Physical"},
+	{byte=0x50, bit=4, name="MT: Ssslumber Jiggy Spawned", type="Physical"},
 	{byte=0x50, bit=5, name="MT: Gold Relic Jiggy Spawned", type="Physical"},
 	{byte=0x50, bit=6, name="GGM: Canary Mary Jiggy Spawned", type="Physical"},
 	{byte=0x50, bit=7, name="GGM: Old King Coal Jiggy Spawned?", type="Physical"},
-	-- 0x51 > 0
+	{byte=0x51, bit=0, name="WW: Cactus of Strength Jiggy Spawned", type="Physical"},
 	-- 0x51 > 1
 	-- 0x51 > 2
 	-- 0x51 > 3
-	{byte=0x51, bit=0, name="WW: Cactus of Strength Jiggy Spawned", type="Physical"},
+	-- 0x51 > 4
 	{byte=0x51, bit=5, name="WW: Hoop Hurry Jiggy Spawned", type="Physical"},
 	-- 0x51 > 6
 	{byte=0x51, bit=7, name="JRL: Merry Maggie Malpass Jiggy Spawned", type="Physical"},
@@ -2048,7 +2049,7 @@ local flag_array = {
 	-- 0x52 > 6
 	-- 0x52 > 7
 	-- 0x53 > 0
-	-- 0x53 > 1
+	{byte=0x53, bit=1, name="TDL: Terry Defeated Jiggy Spawned", type="Physical"},
 	-- 0x53 > 2
 	-- 0x53 > 3
 	-- 0x53 > 4
@@ -2150,8 +2151,8 @@ local flag_array = {
 	-- 0x5F > 4
 	-- 0x5F > 5
 	-- 0x5F > 6
-	-- 0x5F > 7
-	-- 0x60 > 0
+	-- 0x5F > 7 Dippy Something
+	-- 0x60 > 0 Dippy Something
 	-- 0x60 > 1
 	-- 0x60 > 2
 	-- 0x60 > 3
@@ -2222,13 +2223,13 @@ local flag_array = {
 	-- 0x68 > 4
 	-- 0x68 > 5
 	-- 0x68 > 6
-	-- 0x68 > 7
+	{byte=0x68, bit=7, name="MT: Targitzan Defeated", type="Progress"},
 	-- 0x69 > 0
 	-- 0x69 > 1
 	-- 0x69 > 2
 	-- 0x69 > 3
 	-- 0x69 > 4
-	-- 0x69 > 5
+	{byte=0x69, bit=5, name="HFP: UFO Landed", type="Progress"},
 	-- 0x69 > 6
 	-- 0x69 > 7
 	-- 0x6A > 0
@@ -2268,8 +2269,8 @@ local flag_array = {
 	-- 0x6E > 2
 	-- 0x6E > 3
 	-- 0x6E > 4
-	-- 0x6E > 5
-	--{byte=0x6E, bit=6, name="FT Complete Jinjo Family?"},
+	{byte=0x6E, bit=5, name="JRL: Mumbo's Skull Wall Smashed", type="Physical"},
+	{byte=0x6E, bit=6, name="FT Complete Jinjo Family?"},
 	-- 0x6E > 7
 	-- 0x6F > 0 JRL Sea Bottom Location?
 	-- 0x6F > 1 JRL Sea Bottom Location?
@@ -2281,7 +2282,7 @@ local flag_array = {
 	-- 0x6F > 7
 	-- 0x70 > 0
 	-- 0x70 > 1
-	-- 0x70 > 2
+	{byte=0x70, bit=2, name="SM: Jinjo Door Smashed", type="Physical"},
 	{byte=0x70, bit=3, name="JRL: UFO Door Smashed", type="Physical"},
 	{byte=0x70, bit=4, name="Warp: MT: World Entry And Exit", type="Warp"},
 	{byte=0x70, bit=5, name="Warp: MT: Outside Mumbo's Skull", type="Warp"},
@@ -2422,7 +2423,7 @@ local flag_array = {
 	-- 0x81 > 1
 	-- 0x81 > 2
 	-- 0x81 > 3
-	-- 0x81 > 4
+	{byte=0x81, bit=4, name="MT: Ssslumber FTT", type="FTT"},
 	-- 0x81 > 5
 	{byte=0x81, bit=6, name="CK: Drawbridge Open", type="Physical"},
 	-- 0x81 > 7
@@ -2431,7 +2432,7 @@ local flag_array = {
 	-- 0x82 > 2
 	-- 0x82 > 3
 	{byte=0x82, bit=4, name="Jinjo Family FT Cutscene?"},
-	--{byte=0x82, bit=5, name="FT Complete Jinjo Family?"},
+	{byte=0x82, bit=5, name="FT Complete Jinjo Family??"},
 	{byte=0x82, bit=6, name="Chilly Willy Intro Text", type="FTT"},
 	{byte=0x82, bit=7, name="Chilli Billi Intro Text", type="FTT"},
 	{byte=0x83, bit=0, name="ToT: Set After Round 3 (1)"},
@@ -2491,22 +2492,22 @@ local flag_array = {
 	{byte=0x89, bit=6, name="Nest: WW: Big Top Path (6)", type="Nest"},
 	{byte=0x89, bit=7, name="Nest: WW: Big Top Path (7)", type="Nest"},
 	{byte=0x8A, bit=0, name="Nest: WW: Big Top Path (8)", type="Nest"},
-	{byte=0x8A, bit=1, name="Nest: WW: ??? (9)", type="Nest"},
-	{byte=0x8A, bit=2, name="Nest: WW: ??? (10)", type="Nest"},
-	{byte=0x8A, bit=3, name="Nest: WW: ??? (11)", type="Nest"},
-	{byte=0x8A, bit=4, name="Nest: WW: ??? (12)", type="Nest"},
+	{byte=0x8A, bit=1, name="Nest: WW: Area 51 Gate (1)", type="Nest"},
+	{byte=0x8A, bit=2, name="Nest: WW: Area 51 Gate (2)", type="Nest"},
+	{byte=0x8A, bit=3, name="Nest: WW: Dodgem Dome Entrance (1)", type="Nest"},
+	{byte=0x8A, bit=4, name="Nest: WW: Dodgem Dome Entrance (2)", type="Nest"},
 	{byte=0x8A, bit=5, name="Nest: WW: Dive of Death (1)", type="Nest"},
 	{byte=0x8A, bit=6, name="Nest: WW: Dive of Death (2)", type="Nest"},
-	{byte=0x8A, bit=7, name="Nest: WW: ??? (15)", type="Nest"},
-	{byte=0x8B, bit=0, name="Nest: WW: ??? (16)", type="Nest"},
+	{byte=0x8A, bit=7, name="Nest: WW: Crazy Castle Entrance (1)", type="Nest"},
+	{byte=0x8B, bit=0, name="Nest: WW: Crazy Castle Entrance (2)", type="Nest"},
 	{byte=0x8B, bit=1, name="Treble Clef: WW", type="Treble Clef"},
 	{byte=0x8B, bit=2, name="Nest: JRL: Town Center (1)", type="Nest"},
 	{byte=0x8B, bit=3, name="Nest: JRL: Town Center (2)", type="Nest"},
 	{byte=0x8B, bit=4, name="Nest: JRL: Town Center (3)", type="Nest"},
-	{byte=0x8B, bit=5, name="Nest: JRL: ??? (4)", type="Nest"},
-	{byte=0x8B, bit=6, name="Nest: JRL: ??? (5)", type="Nest"},
-	{byte=0x8B, bit=7, name="Nest: JRL: ??? (6)", type="Nest"},
-	{byte=0x8C, bit=0, name="Nest: JRL: ??? (7)", type="Nest"},
+	{byte=0x8B, bit=5, name="Nest: JRL: Blubbul (1)", type="Nest"},
+	{byte=0x8B, bit=6, name="Nest: JRL: Blubbul (2)", type="Nest"},
+	{byte=0x8B, bit=7, name="Nest: JRL: Eel's Lair Entrance (1)", type="Nest"},
+	{byte=0x8C, bit=0, name="Nest: JRL: Eel's Lair Entrance (2)", type="Nest"},
 	{byte=0x8C, bit=1, name="Nest: JRL: Blubber's Hire (1)", type="Nest"},
 	{byte=0x8C, bit=2, name="Nest: JRL: Blubber's Hire (2)", type="Nest"},
 	{byte=0x8C, bit=3, name="Nest: JRL: Blubber's Hire (3)", type="Nest"},
@@ -2517,73 +2518,73 @@ local flag_array = {
 	{byte=0x8D, bit=0, name="Nest: JRL: Jolly's Bar (2)", type="Nest"},
 	{byte=0x8D, bit=1, name="Nest: JRL: Jolly's Bar (3)", type="Nest"},
 	{byte=0x8D, bit=2, name="Treble Clef: JRL", type="Treble Clef"},
-	{byte=0x8D, bit=3, name="Nest: TDL: ??? (1)", type="Nest"},
-	{byte=0x8D, bit=4, name="Nest: TDL: ??? (2)", type="Nest"},
-	{byte=0x8D, bit=5, name="Nest: TDL: ??? (3)", type="Nest"},
-	{byte=0x8D, bit=6, name="Nest: TDL: ??? (4)", type="Nest"},
-	{byte=0x8D, bit=7, name="Nest: TDL: ??? (5)", type="Nest"},
-	{byte=0x8E, bit=0, name="Nest: TDL: ??? (6)", type="Nest"},
-	{byte=0x8E, bit=1, name="Nest: TDL: ??? (7)", type="Nest"},
-	{byte=0x8E, bit=2, name="Nest: TDL: ??? (8)", type="Nest"},
-	{byte=0x8E, bit=3, name="Nest: TDL: ??? (9)", type="Nest"},
-	{byte=0x8E, bit=4, name="Nest: TDL: ??? (10)", type="Nest"},
-	{byte=0x8E, bit=5, name="Nest: TDL: ??? (11)", type="Nest"},
-	{byte=0x8E, bit=6, name="Nest: TDL: ??? (12)", type="Nest"},
-	{byte=0x8E, bit=7, name="Nest: TDL: ??? (13)", type="Nest"},
-	{byte=0x8F, bit=0, name="Nest: TDL: ??? (14)", type="Nest"},
-	{byte=0x8F, bit=1, name="Nest: TDL: ??? (15)", type="Nest"},
-	{byte=0x8F, bit=2, name="Nest: TDL: ??? (16)", type="Nest"},
+	{byte=0x8D, bit=3, name="Nest: TDL: Near Train Station (1)", type="Nest"},
+	{byte=0x8D, bit=4, name="Nest: TDL: Near Train Station (2)", type="Nest"},
+	{byte=0x8D, bit=5, name="Nest: TDL: Near Train Station (3)", type="Nest"},
+	{byte=0x8D, bit=6, name="Nest: TDL: Near Waterfall (1)", type="Nest"},
+	{byte=0x8D, bit=7, name="Nest: TDL: Near Waterfall (2)", type="Nest"},
+	{byte=0x8E, bit=0, name="Nest: TDL: Near Waterfall (3)", type="Nest"},
+	{byte=0x8E, bit=1, name="Nest: TDL: Climbing to Nest (1)", type="Nest"},
+	{byte=0x8E, bit=2, name="Nest: TDL: Climbing to Nest (2)", type="Nest"},
+	{byte=0x8E, bit=3, name="Nest: TDL: Climbing to Nest (3)", type="Nest"},
+	{byte=0x8E, bit=4, name="Nest: TDL: Climbing to Nest (4)", type="Nest"},
+	{byte=0x8E, bit=5, name="Nest: TDL: Climbing to Nest (5)", type="Nest"},
+	{byte=0x8E, bit=6, name="Nest: TDL: Climbing to Nest (6)", type="Nest"},
+	{byte=0x8E, bit=7, name="Nest: TDL: River Passage (1)", type="Nest"},
+	{byte=0x8F, bit=0, name="Nest: TDL: River Passage (2)", type="Nest"},
+	{byte=0x8F, bit=1, name="Nest: TDL: River Passage (3)", type="Nest"},
+	{byte=0x8F, bit=2, name="Nest: TDL: River Passage (4)", type="Nest"},
 	{byte=0x8F, bit=3, name="Treble Clef: TDL", type="Treble Clef"},
 	{byte=0x8F, bit=4, name="Nest: GI: Train Station (1)", type="Nest"},
 	{byte=0x8F, bit=5, name="Nest: GI: Train Station (2)", type="Nest"},
 	{byte=0x8F, bit=6, name="Nest: GI: Train Station (3)", type="Nest"},
 	{byte=0x8F, bit=7, name="Nest: GI: Floor 1 (1)", type="Nest"},
 	{byte=0x90, bit=0, name="Nest: GI: Floor 1 (2)", type="Nest"},
-	{byte=0x90, bit=1, name="Nest: GI: ??? (6)", type="Nest"},
-	{byte=0x90, bit=2, name="Nest: GI: ??? (7)", type="Nest"},
-	{byte=0x90, bit=3, name="Nest: GI: ??? (8)", type="Nest"},
-	{byte=0x90, bit=4, name="Nest: GI: ??? (9)", type="Nest"},
-	{byte=0x90, bit=5, name="Nest: GI: ??? (10)", type="Nest"},
+	{byte=0x90, bit=1, name="Nest: GI: Floor 2 (1)", type="Nest"},
+	{byte=0x90, bit=2, name="Nest: GI: Floor 2 (2)", type="Nest"},
+	{byte=0x90, bit=3, name="Nest: GI: Floor 2 (3)", type="Nest"},
+	{byte=0x90, bit=4, name="Nest: GI: Floor 2 (4)", type="Nest"},
+	{byte=0x90, bit=5, name="Nest: GI: Floor 2 (5)", type="Nest"},
 	{byte=0x90, bit=6, name="Nest: GI: Waste Disposal (1)", type="Nest"},
 	{byte=0x90, bit=7, name="Nest: GI: Waste Disposal (2)", type="Nest"},
 	{byte=0x91, bit=0, name="Nest: GI: Air Conditioning Plant (1)", type="Nest"},
 	{byte=0x91, bit=1, name="Nest: GI: Air Conditioning Plant (2)", type="Nest"},
-	{byte=0x91, bit=2, name="Nest: GI: ??? (15)", type="Nest"},
-	{byte=0x91, bit=3, name="Nest: GI: ??? (16)", type="Nest"},
+	{byte=0x91, bit=2, name="Nest: GI: Floor 3 (1)", type="Nest"},
+	{byte=0x91, bit=3, name="Nest: GI: Floor 3 (2)", type="Nest"},
 	{byte=0x91, bit=4, name="Treble Clef: GI", type="Treble Clef"},
-	{byte=0x91, bit=5, name="Nest: HFP: ??? (1)", type="Nest"},
-	{byte=0x91, bit=6, name="Nest: HFP: ??? (2)", type="Nest"},
-	{byte=0x91, bit=7, name="Nest: HFP: ??? (3)", type="Nest"},
-	{byte=0x92, bit=0, name="Nest: HFP: ??? (4)", type="Nest"},
-	{byte=0x92, bit=1, name="Nest: HFP: ??? (5)", type="Nest"},
-	{byte=0x92, bit=2, name="Nest: HFP: ??? (6)", type="Nest"},
-	{byte=0x92, bit=3, name="Nest: HFP: ??? (7)", type="Nest"},
-	{byte=0x92, bit=4, name="Nest: HFP: ??? (8)", type="Nest"},
-	{byte=0x92, bit=5, name="Nest: HFP: ??? (9)", type="Nest"},
-	{byte=0x92, bit=6, name="Nest: HFP: ??? (10)", type="Nest"},
-	{byte=0x92, bit=7, name="Nest: HFP: ??? (11)", type="Nest"},
-	{byte=0x93, bit=0, name="Nest: HFP: ??? (12)", type="Nest"},
-	{byte=0x93, bit=1, name="Nest: HFP: ??? (13)", type="Nest"},
-	{byte=0x93, bit=2, name="Nest: HFP: ??? (14)", type="Nest"},
-	{byte=0x93, bit=3, name="Nest: HFP: ??? (15)", type="Nest"},
-	{byte=0x93, bit=4, name="Nest: HFP: ??? (16)", type="Nest"},
+	{byte=0x91, bit=5, name="Nest: HFP: Lava Side: Cliff (1)", type="Nest"},
+	{byte=0x91, bit=6, name="Nest: HFP: Lava Side: Cliff (2)", type="Nest"},
+	{byte=0x91, bit=7, name="Nest: HFP: Lava Side: Cliff (3)", type="Nest"},
+	{byte=0x92, bit=0, name="Nest: HFP: Lava Side: Cliff (4)", type="Nest"},
+	{byte=0x92, bit=1, name="Nest: HFP: Lava Side: Cliff (5)", type="Nest"},
+	{byte=0x92, bit=2, name="Nest: HFP: Lava Side: Cliff (6)", type="Nest"},
+	{byte=0x92, bit=3, name="Nest: HFP: Lava Side: Near Ladder (1)", type="Nest"},
+	{byte=0x92, bit=4, name="Nest: HFP: Lava Side: Near Ladder (2)", type="Nest"},
+	{byte=0x92, bit=5, name="Nest: HFP: Ice Cube (Oil Drill) (1)", type="Nest"},
+	{byte=0x92, bit=6, name="Nest: HFP: Ice Cube (Oil Drill) (2)", type="Nest"},
+	{byte=0x92, bit=7, name="Nest: HFP: Ice Cube (Upper Area Warp Pad) (1)", type="Nest"},
+	{byte=0x93, bit=0, name="Nest: HFP: Ice Cube (Upper Area Warp Pad) (2)", type="Nest"},
+	{byte=0x93, bit=1, name="Nest: HFP: Ice Cube (Boggy's Igloo) (1)", type="Nest"},
+	{byte=0x93, bit=2, name="Nest: HFP: Ice Cube (Boggy's Igloo) (2)", type="Nest"},
+	{byte=0x93, bit=3, name="Nest: HFP: Ice Cube (Lower Area Warp Pad) (1)", type="Nest"},
+	{byte=0x93, bit=4, name="Nest: HFP: Ice Cube (Lower Area Warp Pad) (2)", type="Nest"},
 	{byte=0x93, bit=5, name="Treble Clef: HFP", type="Treble Clef"},
-	{byte=0x93, bit=6, name="Nest: CCL: ??? (1)", type="Nest"},
-	{byte=0x93, bit=7, name="Nest: CCL: ??? (2)", type="Nest"},
-	{byte=0x94, bit=0, name="Nest: CCL: ??? (3)", type="Nest"},
-	{byte=0x94, bit=1, name="Nest: CCL: ??? (4)", type="Nest"},
-	{byte=0x94, bit=2, name="Nest: CCL: ??? (5)", type="Nest"},
-	{byte=0x94, bit=3, name="Nest: CCL: ??? (6)", type="Nest"},
-	{byte=0x94, bit=4, name="Nest: CCL: ??? (7)", type="Nest"},
-	{byte=0x94, bit=5, name="Nest: CCL: ??? (8)", type="Nest"},
-	{byte=0x94, bit=6, name="Nest: CCL: ??? (9)", type="Nest"},
-	{byte=0x94, bit=7, name="Nest: CCL: ??? (10)", type="Nest"},
-	{byte=0x95, bit=0, name="Nest: CCL: ??? (11)", type="Nest"},
-	{byte=0x95, bit=1, name="Nest: CCL: ??? (12)", type="Nest"},
-	{byte=0x95, bit=2, name="Nest: CCL: ??? (13)", type="Nest"},
-	{byte=0x95, bit=3, name="Nest: CCL: ??? (14)", type="Nest"},
-	{byte=0x95, bit=4, name="Nest: CCL: ??? (15)", type="Nest"},
-	{byte=0x95, bit=5, name="Nest: CCL: ??? (16)", type="Nest"},
+	{byte=0x93, bit=6, name="Nest: CCL: Central Cavern (1)", map=0x13A, type="Nest"},
+	{byte=0x93, bit=7, name="Nest: CCL: Central Cavern (2)", map=0x13A, type="Nest"},
+	{byte=0x94, bit=0, name="Nest: CCL: Central Cavern (3)", map=0x13A, type="Nest"},
+	{byte=0x94, bit=1, name="Nest: CCL: Central Cavern (4)", map=0x13A, type="Nest"},
+	{byte=0x94, bit=2, name="Nest: CCL: Central Cavern (5)", map=0x13A, type="Nest"},
+	{byte=0x94, bit=3, name="Nest: CCL: Central Cavern (6)", map=0x13A, type="Nest"},
+	{byte=0x94, bit=4, name="Nest: CCL: Central Cavern (7)", map=0x13A, type="Nest"},
+	{byte=0x94, bit=5, name="Nest: CCL: Central Cavern (8)", map=0x13A, type="Nest"},
+	{byte=0x94, bit=6, name="Nest: CCL: Central Cavern (9)", map=0x13A, type="Nest"},
+	{byte=0x94, bit=7, name="Nest: CCL: Central Cavern (10)", map=0x13A, type="Nest"},
+	{byte=0x95, bit=0, name="Nest: CCL: Central Cavern (11)", map=0x13A, type="Nest"},
+	{byte=0x95, bit=1, name="Nest: CCL: Central Cavern (12)", map=0x13A, type="Nest"},
+	{byte=0x95, bit=2, name="Nest: CCL: Central Cavern (13)", map=0x13A, type="Nest"},
+	{byte=0x95, bit=3, name="Nest: CCL: Central Cavern (14)", map=0x13A, type="Nest"},
+	{byte=0x95, bit=4, name="Nest: CCL: Central Cavern (15)", map=0x13A, type="Nest"},
+	{byte=0x95, bit=5, name="Nest: CCL: Central Cavern (16)", map=0x13A, type="Nest"},
 	{byte=0x95, bit=6, name="Treble Clef: CCL", type="Treble Clef"},
 	{byte=0x95, bit=7, name="Nest: IoH: Plateau GGM Sign (1)", type="Nest"},
 	{byte=0x96, bit=0, name="Nest: IoH: Plateau GGM Sign (2)", type="Nest"},
@@ -2607,15 +2608,15 @@ local flag_array = {
 	-- 0x98 > 2
 	-- 0x98 > 3
 	-- 0x98 > 4
-	{byte=0x98, bit=5, name="GGML: Levitate Chuffy (2)", type="Mumbo's Magic"},
+	{byte=0x98, bit=5, name="GGM: Levitate Chuffy (2)", type="Mumbo's Magic"},
 	-- 0x98 > 6
 	-- 0x98 > 7
 	-- 0x99 > 0
 	-- 0x99 > 1
 	-- 0x99 > 2
 	-- 0x99 > 3
-	{byte=0x99, bit=4, name="First Time Split Up Pad Text", type="FTT"},
-	{byte=0x99, bit=5, name="First Time Split Up Text", type="FTT"},
+	{byte=0x99, bit=4, name="First Time Split Up Pad Text", nomap=true, type="FTT"},
+	{byte=0x99, bit=5, name="First Time Split Up Text", nomap=true, type="FTT"},
 	-- 0x99 > 6
 	-- 0x99 > 7
 	-- 0x9A > 0
@@ -2638,14 +2639,14 @@ local flag_array = {
 	{byte=0x9C, bit=1, name="JRL: Underground Doubloon Spawned (1)", type="Physical"},
 	{byte=0x9C, bit=2, name="JRL: Underground Doubloon Spawned (2)", type="Physical"},
 	{byte=0x9C, bit=3, name="JRL: Underground Doubloon Spawned (3)", type="Physical"},
-	-- 0x9C > 4
-	-- 0x9C > 5
-	-- 0x9C > 6
-	-- 0x9C > 7
-	-- 0x9D > 0
-	-- 0x9D > 1
-	-- 0x9D > 2
-	-- 0x9D > 3
+	{byte=0x9C, bit=4, name="WW: Big Top Ticket Collected (1)"},
+	{byte=0x9C, bit=5, name="WW: Big Top Ticket Collected (2)"},
+	{byte=0x9C, bit=6, name="WW: Big Top Ticket Collected (3)"},
+	{byte=0x9C, bit=7, name="WW: Big Top Ticket Collected (4)"},
+	{byte=0x9D, bit=0, name="WW: Big Top Ticket Spawned (1)", type="Physical"},
+	{byte=0x9D, bit=1, name="WW: Big Top Ticket Spawned (2)", type="Physical"},
+	{byte=0x9D, bit=2, name="WW: Big Top Ticket Spawned (3)", type="Physical"},
+	{byte=0x9D, bit=3, name="WW: Big Top Ticket Spawned (4)", type="Physical"},
 	{byte=0x9D, bit=4, name="MT: Dilberta Boulder Drilled", type="Physical"},
 	-- 0x9D > 5
 	{byte=0x9D, bit=6, name="MT: Fly Pad Boulder Drilled", type="Physical"},
@@ -2654,8 +2655,8 @@ local flag_array = {
 	{byte=0x9E, bit=1, name="GGM: Gloomy Caverns Entrance Boulder Drilled", type="Physical"},
 	{byte=0x9E, bit=2, name="GGM: Gloomy Caverns Boulder Drilled (1)", type="Physical"},
 	{byte=0x9E, bit=3, name="GGM: Gloomy Caverns Boulder Drilled (2)", type="Physical"},
-	-- 0x9E > 4
-	-- 0x9E > 5
+	{byte=0x9E, bit=4, name="GGM: Toxic Gas Cave Boulder Drilled (Health)", type="Physical"},
+	{byte=0x9E, bit=5, name="GGM: Toxic Gas Cave Boulder Drilled (Eggs)", type="Physical"},
 	-- 0x9E > 6
 	-- 0x9E > 7
 	{byte=0x9F, bit=0, name="GGM: Jinjo Boulder Drilled", type="Physical"},
@@ -2667,7 +2668,7 @@ local flag_array = {
 	{byte=0x9F, bit=6, name="IoH: Pleteau: Jinjo Boulder Drilled", type="Physical"},
 	-- 0x9F > 7
 	-- 0xA0 > 0
-	-- 0xA0 > 1
+	{byte=0xA0, bit=1, name="GGM: Toxic Gas Cave Boulder Drilled (Feathers)", type="Physical"},
 	-- 0xA0 > 2
 	-- 0xA0 > 3
 	-- 0xA0 > 4
@@ -2707,7 +2708,7 @@ local flag_array = {
 	-- 0xA4 > 6
 	-- 0xA4 > 7
 	{byte=0xA5, bit=0, name="FT Enter TDL"},
-	-- 0xA5 > 1
+	{byte=0xA5, bit=1, name="TDL: FT Terry Fight?"},
 	{byte=0xA5, bit=2, name="FT Enter GI"},
 	{byte=0xA5, bit=3, name="GI: FT Fight Weldar?"},
 	{byte=0xA5, bit=4, name="FT Enter HFP"},
@@ -3261,14 +3262,15 @@ object_model1 = {
 			-- Wumba's Wigwam https://banjosbackpack.com/forums/showthread.php?8165-Wumba-s-Wigwam-BT-Setup-Viewer
 			-- Possibly other sources
 		[0x5EE] = "Boggy's Sled",
-		[0x629] = "Molehill",
 		[0x610] = "Jiggy",
 		[0x612] = "Empty Honeycomb",
 		[0x615] = "Beehive",
 		[0x616] = "Wading Boots",
 		[0x617] = "Turbo Trainers",
+		[0x629] = "Molehill",
 		[0x635] = "Shock Spring Pad",
 		[0x636] = "Fly Pad",
+		[0x637] = "Shadow",
 		[0x63B] = "Ice Key",
 		[0x641] = "Warp Pad",
 		[0x643] = "Jinjo",
