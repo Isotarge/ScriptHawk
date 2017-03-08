@@ -3105,13 +3105,13 @@ local function checkDuplicatedName(flagName)
 	end
 end
 
-function checkDuplicateFlagNames() -- TODO: Add this to flagStats(true) output
+function checkDuplicateFlagNames()
 	for i = 1, #flag_array do
 		checkDuplicatedName(flag_array[i]["name"]);
 	end
 end
 
-function checkFlagOrder() -- TODO: Add this to flagStats(true) output
+function checkFlagOrder()
 	local previousByte = 0x00;
 	local previousBit = 0;
 	local invalidCount = 0;
@@ -3125,7 +3125,7 @@ function checkFlagOrder() -- TODO: Add this to flagStats(true) output
 		else
 			-- No bueno
 			invalidCount = invalidCount + 1;
-			dprint("Flag "..toHexString(flag.byte, 2)..">"..flag.bit.." may be out of order...");
+			dprint("Warning: Flag "..toHexString(flag.byte, 2)..">"..flag.bit.." may be out of order");
 		end
 		previousByte = flag.byte;
 		previousBit = flag.bit;
@@ -3134,7 +3134,7 @@ function checkFlagOrder() -- TODO: Add this to flagStats(true) output
 	if invalidCount > 0 then
 		print_deferred();
 	else
-		print("All good!");
+		print("Flags appear to be in correct order!");
 	end
 end
 
@@ -3334,6 +3334,11 @@ function flagStats(verbose)
 
 	-- Setting this to true warns the user of flags without types
 	verbose = verbose or false;
+
+	if verbose then
+		checkFlagOrder();
+		checkDuplicateFlagNames();
+	end
 
 	local flag, name, flagType, validType;
 	for i = 1, #flag_array do
