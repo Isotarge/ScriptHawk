@@ -401,9 +401,9 @@ local flag_array = {
 	{["name"] = "1st CCW Bramble Field Text",	["index"] = 0xAA,	["type"] = "Prog",	["level"] = 8},
 	{["name"] = "Oily Water Surface Text",	["index"] = 0xAB,	["type"] = "Prog", 	["level"] = 9},
 	{["name"] = "Oily Water Underwater Text",	["index"] = 0xAC,	["type"] = "Prog", 	["level"] = 9},
-	{["name"] = "BLUEEGGS Cheato",			["index"] = 0xAD,	["type"] = "Prog",	["level"] = 6},
-	{["name"] = "REDFEATHERS Cheato",		["index"] = 0xAE,	["type"] = "Prog",	["level"] = 6},
-	{["name"] = "GOLDFEATHERS Cheato",		["index"] = 0xAF,	["type"] = "Prog",	["level"] = 6},
+	{["name"] = "Cheato: BLUEEGGS Unlocked",	["index"] = 0xAD,	["type"] = "Prog",	["level"] = 6},
+	{["name"] = "Cheato: REDFEATHERS Unlocked",	["index"] = 0xAE,	["type"] = "Prog",	["level"] = 6},
+	{["name"] = "Cheato: GOLDFEATHERS Unlocked",	["index"] = 0xAF,	["type"] = "Prog",	["level"] = 6},
 	{["name"] = "Has Been in MM",			["index"] = 0xB0,	["type"] = "Prog",	["level"] = 1},
 	{["name"] = "Has Been in BGS",			["index"] = 0xB1,	["type"] = "Prog",	["level"] = 4},
 	{["name"] = "Has Been in TTC",			["index"] = 0xB2,	["type"] = "Prog",	["level"] = 2},
@@ -417,6 +417,9 @@ local flag_array = {
 	{["name"] = "1st Time T. Rex",			["index"] = 0xBA,	["type"] = "Prog",	["level"] = 6},
 	
 	{["name"] = "1st Time in Lair Cutscene",	["index"] = 0xBD,	["type"] = "Prog",	["level"] = 6},
+	{["name"] = "Cheato: BLUEEGGS Active",	["index"] = 0xBE,	["type"] = "Cheat",	},
+	{["name"] = "Cheato: REDFEATHERS Active",	["index"] = 0xBF,	["type"] = "Cheat",	},
+	{["name"] = "Cheato: GOLDFEATHERS Active",	["index"] = 0xC0,	["type"] = "Cheat",	},
 	
 	{["name"] = "Grate to RBB Puzzle Open",	["index"] = 0xC2,	["type"] = "Prog",	["level"] = 6},
 	{["name"] = "Ice Ball To Cheato Broken",	["index"] = 0xC3,	["type"] = "Prog",	["level"] = 6},
