@@ -302,6 +302,7 @@ local Game = {
 		["map"] = {0x137B42, 0x137DD2, 0x12CF92, 0x132DC2},
 		["map_trigger_target"] = {0x12C390, 0x12C5A0, 0x1217F0, 0x127640},
 		["map_trigger"] = {0x12C392, 0x12C5A2, 0x1217F2, 0x127642},
+		["character_state"] = {0x13BC53, 0x13BEE3, 0x1310A3, 0x136F63},
 		["iconAddress"] = {0x11FF95, 0x120155, 0x115325, 0x11B065},
 		["healthAddresses"] = {
 			[0x01] = {0x120584, 0x120794, 0x115A04, 0x11B644}, -- BK
@@ -320,6 +321,28 @@ local Game = {
 	speedy_index = 7,
 	rot_speed = 10,
 	max_rot_units = 360,
+	character_states = {
+		-- 0 Occurs during game boot-up
+		[1] = "Banjo-Kazooie", -- Doesn't matter if you're Dragon Kazooie
+		[2] = "Snowball",
+		-- 3 is Unknown
+		[4] = "Cutscene", -- Cutscene happening in another map to activation point
+		-- 5 is Unknown
+		[6] = "Bee",
+		[7] = "Washing Machine",
+		[8] = "Stony",
+		[9] = "Breegull Blaster",
+		[10] = "Banjo",
+		[11] = "Kazooie", -- Doesn't matter if you're Dragon Kazooie
+		[12] = "Submarine",
+		[13] = "Mumbo",
+		[14] = "Golden Goliath",
+		[15] = "Detonator",
+		[16] = "Van",
+		[17] = "Clockwork Kazooie",
+		[18] = "Small T-Rex",
+		[19] = "Big T-Rex"
+	},
 };
 
 function checksumToString(checksum)
@@ -3709,6 +3732,14 @@ function Game.getMaxAir()
 	return 60;
 end
 
+function Game.getCharacterState()
+	local characterStateValue = mainmemory.readbyte(Game.Memory.character_state[version]);
+	if Game.character_states[characterStateValue] ~= nil then
+		return Game.character_states[characterStateValue];
+	end
+	return characterStateValue;
+end
+
 local obfuscatedConsumables = { -- TODO: Extract keys directly from the game
 	[0] = {key=0x27BD, name="Blue Eggs"},
 	[1] = {key=0x0C03, name="Fire Eggs"},
@@ -3862,6 +3893,7 @@ Game.OSD = {
 	{"Moving", Game.getMovingAngle},
 	{"Rot. Z", Game.getZRotation},
 	{"Separator", 1},
+	{"Character", Game.getCharacterState},
 	{"Movement", Game.getCurrentMovementState},
 	{"Slope Timer", Game.getSlopeTimer, Game.colorSlopeTimer},
 };
