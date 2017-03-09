@@ -29,6 +29,7 @@ local grab_script_modes = {
 	"List (Loading Zones)",
 	"Examine (Loading Zones)",
 	"Chunks",
+	"Exits",
 };
 local grab_script_mode_index = 1;
 grab_script_mode = grab_script_modes[grab_script_mode_index];
@@ -3456,7 +3457,6 @@ end
 -- TBS Nonsense --
 ------------------
 
-
 function forceTBS()
 	local playerObject = Game.getPlayerObject();
 	if isRDRAM(playerObject) then
@@ -5247,10 +5247,24 @@ local function zipToSelectedObject()
 				desiredY = mainmemory.read_s16_be(selectedLoadingZoneBase + loading_zone_fields.y_position);
 				desiredZ = mainmemory.read_s16_be(selectedLoadingZoneBase + loading_zone_fields.z_position);
 			end
+		elseif grab_script_mode == "Exits" then
+			local selectedExitBase = object_pointers[object_index];
+			if isRDRAM(selectedExitBase) then
+				desiredX = mainmemory.read_s16_be(selectedExitBase + 0);
+				desiredY = mainmemory.read_s16_be(selectedExitBase + 2);
+				desiredZ = mainmemory.read_s16_be(selectedExitBase + 4);
+			end
 		end
 
 		-- Update player position
 		if type(desiredX) == "number" and type(desiredY) == "number" and type(desiredZ) == "number" then
+			-- Check whether we need to lower floor
+			local currentFloor = mainmemory.readfloat(playerObject + obj_model1.floor, true);
+			if currentFloor > desiredY then
+				mainmemory.writefloat(playerObject + obj_model1.floor, desiredY, true);
+			end
+
+			-- Write position
 			mainmemory.writefloat(playerObject + obj_model1.x_pos, desiredX, true);
 			mainmemory.writefloat(playerObject + obj_model1.y_pos, desiredY, true);
 			mainmemory.writefloat(playerObject + obj_model1.z_pos, desiredZ, true);
@@ -5471,6 +5485,10 @@ local function drawGrabScriptUI()
 		populateChunkPointers();
 	end
 
+	if grab_script_mode == "Exits" then
+		populateExitPointers();
+	end
+
 	if rat_enabled then
 		local renderingParams = dereferencePointer(playerObject + obj_model1.rendering_parameters_pointer);
 		if isRDRAM(renderingParams) then
@@ -5637,6 +5655,21 @@ local function drawGrabScriptUI()
 				row = row + 1;
 			end
 		end
+
+		if grab_script_mode == "Exits" then
+			for i = #object_pointers, 1, -1 do
+				local exitBase = object_pointers[i];
+				local color = nil;
+				if object_index == i then
+					color = green_highlight;
+				end
+				local xPos = mainmemory.read_s16_be(exitBase + 0);
+				local yPos = mainmemory.read_s16_be(exitBase + 2);
+				local zPos = mainmemory.read_s16_be(exitBase + 4);
+				gui.text(gui_x, gui_y + height * row, xPos..", "..yPos..", "..zPos.." - "..i.." "..toHexString(exitBase or 0, 6), color, 'bottomright');
+				row = row + 1;
+			end
+		end
 	end
 end
 
@@ -5688,6 +5721,18 @@ function dumpExits()
 			dprint("Exit "..i..": "..xPos..", "..yPos..", "..zPos);
 		end
 		print_deferred();
+	end
+end
+
+function populateExitPointers()
+	local exitArray = dereferencePointer(Game.Memory.exit_array_pointer[version]);
+	object_pointers = {};
+	if isRDRAM(exitArray) then
+		local numberOfExits = Game.getNumberOfExits();
+		for i = 0, numberOfExits - 1 do
+			local exitBase = exitArray + i * 0x0A;
+			table.insert(object_pointers, exitBase);
+		end
 	end
 end
 
