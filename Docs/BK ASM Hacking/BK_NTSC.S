@@ -409,6 +409,7 @@
 [ClearGameProgressFlags]: 0x8031FFAC
 
 [ClearSomeProgressThing]: 0x8032048C
+[SetCheatFlag]: 0x803204E4
 
 [GetJiggiesCollectedBitfield]:  0x80320F70  ;Outputs: [word $v0]
 

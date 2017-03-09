@@ -236,6 +236,18 @@ InPracMenu:
 		KeepCurrentMoveSet:
 		SB zero MoveSet
 
+		LB s3 GhostState
+		BNE s3 zero KeepCurrentGhostActive
+		LW a1 GhostObjectPointer
+			BEQ a1 zero KeepCurrentGhostActive
+			NOP
+				LB a2 0x47(a1)
+				ORI a2 a2 0x08
+				SB a2 0x47(a1)
+				SW zero GhostCurrentFrame
+
+		KeepCurrentGhostActive:
+
 		;Copy real menu strings back
 		JAL RestoreMainMenuText
 		NOP
@@ -475,6 +487,14 @@ NormalModeCode_TakeMeThereEnd:
 LB a0 TransformMeState
 BEQ a0 zero NormalModeCode_TransformMeEnd
 
+	LUI a1 0x07
+	BNE a0 a1 TransformMe_notWishyWashy
+	LUI a1 0x01
+	JAL @SetCheatFlag
+	LUI a0 0x9D 
+	LUI a0 0x01
+	
+	TransformMe_notWishyWashy:
 	LB a0 TransformMeState
 	JAL @TransformMe
 	NOP
@@ -616,11 +636,20 @@ LB a0 @MapLoadState
 					LW a1 0x08(a0) ;Remove old ghost from list
 					LW a2 0x0C(a0)
 					SW a2 0x0C(a1)
-					BEQ a2 zero Ghost_InLZ_Transition_End
-					NOP
-						SW a1 0x08(a2)
 					
-					//TODO: Defrag list
+					//Defragment data
+					LW at GhostCurrentTailPointer
+					
+					Ghost_Defragment_Loop:
+					LW a2 0x00(a1)
+					SW a2 0x00(a0)
+					ADDIU a1 a1 0x04
+					ADDIU a0 a0 0x04
+					BNE a1 at Ghost_Defragment_Loop
+					NOP
+					
+					SW a1 GhostCurrentTailPointer
+					
 				
 			Ghost_InLZ_Transition_End:
 			SW zero GhostRecordPointer
@@ -905,7 +934,7 @@ L2LevitateState:
 TransformMeState:
 .byte 0
 GhostState:
-.byte 1
+.byte 0
 
 PreviousLoadzoneState:
 .byte 0
@@ -1022,8 +1051,8 @@ GhostArray:
 //	half Map
 //	half Exit
 //	word TotalFrames
-//	word PrevGhostStruct
-//  word NextGhostStruct
+//	word NextGhostStruct
+//  word PrevGhostStruct
 //  frame[0]:
 //  	float XPos
 //		float YPos
