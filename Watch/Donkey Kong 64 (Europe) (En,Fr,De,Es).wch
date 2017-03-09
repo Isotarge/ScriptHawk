@@ -52,6 +52,7 @@ SystemID N64
 73ECD2	d	h	1	RDRAM	Enguarde Score 5 Name
 740F18	b	u	1	RDRAM	File
 7411A0	d	h	1	RDRAM	RNG
+741E54	w	u	1	RDRAM	Cutscene
 742430	d	f	1	RDRAM	FOV
 748EDC	b	u	1	RDRAM	Character
 74E9A4	d	h	1	RDRAM	Object Model 2 Collision Linked List Pointer
@@ -78,6 +79,7 @@ SystemID N64
 7EDDCB	b	h	1	RDRAM	EEPROM Slot 3 File Index
 7F0480	d	u	1	RDRAM	Frames (Real)
 7F08B0	d	h	1	RDRAM	Heap Pointer
+7F5AFC	w	u	1	RDRAM	Number of Cutscenes
 7F5C00	d	h	1	RDRAM	ISG Start Time Major
 7F5C04	d	h	1	RDRAM	ISG Start Time Minor
 7F5D00	d	h	1	RDRAM	Map Block Pointer
@@ -96,6 +98,8 @@ SystemID N64
 7FBA85	b	b	1	RDRAM	Unknown Bitfield
 7FBA86	b	b	1	RDRAM	Long Distance Actor Spawn
 7FC310	w	u	1	RDRAM	Actor Count
+7FC840	d	h	1	RDRAM	Exit Coordinate Array
+7FC844	b	u	1	RDRAM	Number of Exits
 7FC870	w	u	1	RDRAM	Japes T&S CBs (Total)
 7FC872	w	u	1	RDRAM	Aztec T&S CBs (Total)
 7FC874	w	u	1	RDRAM	Factory T&S CBs (Total)

@@ -150,6 +150,9 @@ SystemID N64
 753E3C	d	f	1	RDRAM	Chunky Pineapple Velocity
 753E40	d	f	1	RDRAM	Krusha Orange Velocity (Gun)
 753E44	d	f	1	RDRAM	Rambi Gun Velocity?
+755384	d	u	1	RDRAM	Arena 1 Map Index
+755388	d	u	1	RDRAM	Arena 2 Map Index
+75538C	d	u	1	RDRAM	Arena 3 Map Index
 757360	d	f	1	RDRAM	Object Model 1 Scale
 758C60	d	f	1	RDRAM	Map Scale
 758EC0	d	f	1	RDRAM	Pad Fake Floor Y

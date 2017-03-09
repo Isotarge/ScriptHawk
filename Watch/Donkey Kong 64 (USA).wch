@@ -117,7 +117,8 @@ SystemID N64
 755320	d	u	1	RDRAM	Frames in current demo
 755328	b	u	1	RDRAM	DK TV Counter
 75532C	b	u	1	RDRAM	DK Rap Fadeout Counter
-755338	d	h	1	RDRAM	Play CS 1 Next Map Load
+755338	d	u	1	RDRAM	Play CS Next Map Load
+75533C	d	u	1	RDRAM	Play CS Next Map Load Index
 755340	d	u	1	RDRAM	Helm Timer Start Time Major
 755344	d	u	1	RDRAM	Helm Timer Start Time Minor
 755348	d	s	1	RDRAM	Helm Timer
@@ -132,6 +133,10 @@ SystemID N64
 76A0B3	b	h	1	RDRAM	Cutscene Bar State
 76A0CD	b	u	1	RDRAM	Adventure
 76A0DA	b	h	1	RDRAM	Mystery Menu
+76A0E4	b	s	1	RDRAM	Player 1 Character (Multiplayer Selection)
+76A0E5	b	s	1	RDRAM	Player 2 Character (Multiplayer Selection)
+76A0E6	b	s	1	RDRAM	Player 3 Character (Multiplayer Selection)
+76A0E7	b	s	1	RDRAM	Player 4 Character (Multiplayer Selection)
 76AEF3	b	h	1	RDRAM	Previous Map
 76AF00	w	h	1	RDRAM	Some kind of frameskip value?
 76AF02	w	h	1	RDRAM	Some kind of frameskip value?
@@ -161,6 +166,7 @@ SystemID N64
 7F09B4	d	h	1	RDRAM	Object Model 2 Collision Linked List Pointer
 7F09C8	d	h	1	RDRAM	Size 0x30 Linked List Pointer
 7F09DC	d	h	1	RDRAM	Size 0x1000 Texture Linked List Pointer
+7F5BDC	w	h	1	RDRAM	Number of Cutscenes
 7F5CE0	d	u	1	RDRAM	ISG Start Time Major
 7F5CE4	d	u	1	RDRAM	ISG Start Time Minor
 7F5CEC	w	u	1	RDRAM	Camera State Change Timer
@@ -196,6 +202,8 @@ SystemID N64
 7FBB66	b	b	1	RDRAM	Long Distance Actor Spawn
 7FC3F0	w	u	1	RDRAM	Actor Count
 7FC400	d	h	1	RDRAM	
+7FC900	d	h	1	RDRAM	Exit Coordinate Array
+7FC904	b	u	1	RDRAM	Number of Exits
 7FC930	w	u	1	RDRAM	Japes T&S CBs (Total)
 7FC932	w	u	1	RDRAM	Aztec T&S CBs (Total)
 7FC934	w	u	1	RDRAM	Factory T&S CBs (Total)

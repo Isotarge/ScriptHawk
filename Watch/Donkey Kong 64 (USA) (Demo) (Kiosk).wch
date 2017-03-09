@@ -22,6 +22,7 @@ SystemID N64
 72D140	d	u	1	RDRAM	Frames (Lag) (TODO: Seems to work for Diddy's map but not for any others)
 7A106C	d	h	1	RDRAM	Framebuffer Pointer (Copy)
 7A12C0	d	h	1	RDRAM	Heap Pointer
+7A1CCC	w	u	1	RDRAM	Number of Cutscenes
 7A1E14	d	h	1	RDRAM	Camera Pointer
 7A1E90	d	h	1	RDRAM	Map Block Pointer
 7A1E94	d	h	1	RDRAM	Map Model Pointer?
@@ -36,6 +37,8 @@ SystemID N64
 7B5B12	b	b	1	RDRAM	Zipper Byte
 7B5B13	b	b	1	RDRAM	Tag Barrel Void Byte
 7B6258	w	u	1	RDRAM	Actor Count
+7B6520	d	h	1	RDRAM	Exit Coordinate Array
+7B6524	b	u	1	RDRAM	Number of Exits
 7B6590	b	u	1	RDRAM	DK Moves
 7B6591	b	u	1	RDRAM	DK Simian Slam
 7B6592	b	b	1	RDRAM	DK Weapon

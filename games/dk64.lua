@@ -65,7 +65,9 @@ local Game = {
 		["RNG"] = {0x746A40, 0x7411A0, 0x746300, 0x6F36E0},
 		["mode"] = {0x755318, 0x74FB98, 0x7553D8, 0x6FFE6C}, -- See Game.modes for values
 		["current_map"] = {0x76A0A8, 0x764BC8, 0x76A298, 0x72CDE4}, -- See Game.maps for values
-		["current_exit"] = {0x76A0AC, 0x764BCC, 0x76A29C, 0x72CDE8},
+		["current_exit"] = {0x76A0AC, 0x764BCC, 0x76A29C, 0x72CDE8}, -- u32_be
+		["exit_array_pointer"] = {0x7FC900, 0x7FC840, 0x7FCD90, 0x7B6520}, -- Pointer
+		["number_of_exits"] = {0x7FC904, 0x7FC844, 0x7FCD94, 0x7B6524}, -- Byte
 		["destination_map"] = {0x7444E4, 0x73EC34, 0x743DA4, 0x6F1CC4}, -- See Game.maps for values
 		["destination_exit"] = {0x7444E8, 0x73EC38, 0x743DA8, 0x6F1CC8},
 		["map_state"] = {0x76A0B1, 0x764BD1, 0x76A2A1, 0x72CDED}, -- byte, bitfield -- TODO: Document values
@@ -107,6 +109,8 @@ local Game = {
 		["isg_active"] = {0x755070, 0x74F8F0, 0x755130, nil},
 		["isg_timestamp"] = {0x7F5CE0, 0x7F5C00, 0x7F6150, nil},
 		["timestamp"] = {0x14FE0, 0x155C0, 0x15300, nil}, -- TODO: Kiosk
+		["cutscene"] = {0x7476F4, 0x741E54, 0x746FB4, 0x6F4464},
+		["number_of_cutscenes"] = {0x7F5BDC, 0x7F5AFC, 0x7F604C, 0x7A1CCC},
 		["obj_model2_array_pointer"] = {0x7F6000, 0x7F5F20, 0x7F6470, 0x7A20B0}, -- 0x6F4470 has something to do with obj model 2 on Kiosk, not sure what yet
 		["obj_model2_array_count"] = {0x7F6004, 0x7F5F24, 0x7F6474, 0x7B17B8},
 		["obj_model2_setup_pointer"] = {0x7F6010, 0x7F5F30, 0x7F6480, 0x7B17C4},
@@ -371,6 +375,22 @@ end
 -- Don't trust anything on the heap if this is true
 function Game.isLoading()
 	return mainmemory.read_u32_be(Game.Memory.obj_model2_timer[version]) == 0;
+end
+
+function Game.getCutsceneIndex()
+	return mainmemory.read_u16_be(Game.Memory.cutscene[version]);
+end
+
+function Game.getNumberOfCutscenes()
+	return mainmemory.read_u16_be(Game.Memory.number_of_cutscenes[version]);
+end
+
+function Game.getCutsceneOSD()
+	local numberOfCutscenes = Game.getNumberOfCutscenes() - 1;
+	if numberOfCutscenes == -1 then
+		numberOfCutscenes = "None";
+	end
+	return Game.getCutsceneIndex().."/"..numberOfCutscenes;
 end
 
 local flag_array = {};
@@ -2946,6 +2966,10 @@ function Game.getCurrentEEPROMSlot()
 		end
 	end
 	return 0; -- Default
+end
+
+function Game.getFileOSD()
+	return Game.getFileIndex().." (Slot "..Game.getCurrentEEPROMSlot()..")";
 end
 
 function Game.getFlagBlockAddress()
@@ -5640,6 +5664,51 @@ function Game.unlockMoves()
 	setFlagsByType("Kong");
 end
 
+function Game.getDestinationExit()
+	return mainmemory.read_u32_be(Game.Memory.destination_exit[version]);
+end
+
+function Game.getNumberOfExits()
+	return mainmemory.readbyte(Game.Memory.number_of_exits[version]);
+end
+
+function Game.getExitOSD()
+	return Game.getDestinationExit().."/"..Game.getNumberOfExits();
+end
+
+function dumpExits()
+	local exitArray = dereferencePointer(Game.Memory.exit_array_pointer[version]);
+	local numberOfExits = Game.getNumberOfExits();
+	if isRDRAM(exitArray) then
+		for i = 0, numberOfExits - 1 do
+			local exitBase = exitArray + i * 0x0A;
+			local xPos = mainmemory.read_s16_be(exitBase + 0);
+			local yPos = mainmemory.read_s16_be(exitBase + 2);
+			local zPos = mainmemory.read_s16_be(exitBase + 4);
+			dprint("Exit "..i..": "..xPos..", "..yPos..", "..zPos);
+		end
+		print_deferred();
+	end
+end
+
+function zipToExit(index)
+	local exitArray = dereferencePointer(Game.Memory.exit_array_pointer[version]);
+	local numberOfExits = Game.getNumberOfExits();
+	if isRDRAM(exitArray) then
+		if index >= numberOfExits then
+			index = 0;
+			print("Warning: Exit index "..index.." is greater than the maximum exit for this map");
+		end
+		if index < numberOfExits then
+			local exitBase = exitArray + index * 0x0A;
+			local xPos = mainmemory.read_s16_be(exitBase + 0);
+			local yPos = mainmemory.read_s16_be(exitBase + 2);
+			local zPos = mainmemory.read_s16_be(exitBase + 4);
+			Game.setPosition(xPos, yPos, zPos);
+		end
+	end
+end
+
 function Game.getMap()
 	return mainmemory.read_u32_be(Game.Memory.current_map[version]);
 end
@@ -6673,9 +6742,11 @@ end
 
 Game.standardOSD = {
 	{"Map", Game.getMapOSD},
+	{"Cutscene", Game.getCutsceneOSD},
+	{"Exit", Game.getExitOSD},
+	{"Separator", 1},
 	{"Mode", Game.getCurrentMode},
-	{"File", Game.getFileIndex},
-	{"EEPROM Slot", Game.getCurrentEEPROMSlot},
+	{"File", Game.getFileOSD},
 	--{"Flags", getFlagStatsOSD},
 	{"Separator", 1},
 	{"X", Game.getXPosition},
