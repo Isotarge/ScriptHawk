@@ -1258,8 +1258,17 @@ local function getExamineDataModelOne(pointer)
 	if hasModel then
 		table.insert(examine_data, { "Model", toHexString(modelPointer, 6) });
 		table.insert(examine_data, { "Rendering Params", toHexString(renderingParametersPointer, 6) });
-		table.insert(examine_data, { "Bone Array", toHexString(boneArrayPointer, 6) });
 		table.insert(examine_data, { "Texture Renderer", toHexString(dereferencePointer(pointer + obj_model1.texture_renderer_pointer) or 0)});
+		table.insert(examine_data, { "Separator", 1 });
+		table.insert(examine_data, { "Bone Array 1", Game.getBoneArray1PrettyPrint(pointer) });
+		table.insert(examine_data, { "Stored X1", Game.getStoredX1(pointer) });
+		table.insert(examine_data, { "Stored Y1", Game.getStoredY1(pointer) });
+		table.insert(examine_data, { "Stored Z1", Game.getStoredZ1(pointer) });
+		table.insert(examine_data, { "Separator", 1 });
+		table.insert(examine_data, { "Bone Array 2", Game.getBoneArray2PrettyPrint(pointer) });
+		table.insert(examine_data, { "Stored X2", Game.getStoredX2(pointer) });
+		table.insert(examine_data, { "Stored Y2", Game.getStoredY2(pointer) });
+		table.insert(examine_data, { "Stored Z2", Game.getStoredZ2(pointer) });
 		table.insert(examine_data, { "Separator", 1 });
 	end
 
@@ -1287,7 +1296,7 @@ local function getExamineDataModelOne(pointer)
 
 	table.insert(examine_data, { "Health", mainmemory.read_s16_be(pointer + obj_model1.health) });
 	table.insert(examine_data, { "Hand state", mainmemory.readbyte(pointer + obj_model1.hand_state) });
-	table.insert(examine_data, { "NoClip Byte", mainmemory.readbyte(pointer + obj_model1.noclip_byte) });
+	table.insert(examine_data, { "Noclip Byte", mainmemory.readbyte(pointer + obj_model1.noclip_byte) });
 	table.insert(examine_data, { "Specular highlight", mainmemory.readbyte(pointer + obj_model1.specular_highlight) });
 	table.insert(examine_data, { "Separator", 1 });
 
@@ -1598,8 +1607,8 @@ obj_model2 = {
 		[0x88] = "Mushroom",
 		[0x89] = "-",
 		[0x8A] = "Disco Ball",
-		[0x8B] = "2 Gate", -- Galleon
-		[0x8C] = "3 Gate", -- Galleon
+		[0x8B] = "2 Door (5DS)", -- Galleon
+		[0x8C] = "3 Door (5DS)", -- Galleon
 		[0x8D] = "Map of DK island",
 		[0x8E] = "Crystal Coconut",
 		[0x8F] = "Ammo Crate",
@@ -2051,7 +2060,7 @@ obj_model2 = {
 		[0x24D] = "Wooden Door", -- Castle Shed
 		[0x24E] = "Chandelier", -- Castle
 		[0x24F] = "Bone Door", -- Castle
-		[0x250] = "Metal Bard", -- Galleon
+		[0x250] = "Metal Bars", -- Galleon
 		[0x251] = "4 Door (5DS)",
 		[0x252] = "5 Door (5DS)",
 		[0x253] = "Door (Llama Temple)", -- Aztec
@@ -3912,60 +3921,61 @@ local bone = {
 	['scale_z'] = 0x34, -- uint 16 be
 };
 
-function Game.getActiveBoneArray()
+function Game.getActiveBoneArray(actorPointer)
 	if not isInSubGame() then
-		local playerObject = Game.getPlayerObject();
-		if isRDRAM(playerObject) then
-			return mainmemory.read_u32_be(playerObject + obj_model1.current_bone_array_pointer);
+		if isRDRAM(actorPointer) then
+			return mainmemory.read_u32_be(actorPointer + obj_model1.current_bone_array_pointer);
 		end
 	end
 	return 0;
 end
 
-function Game.getBoneArray1()
-	if not isInSubGame() then
-		local playerObject = Game.getPlayerObject();
-		if isRDRAM(playerObject) then
-			local animationParamObject = dereferencePointer(playerObject + obj_model1.rendering_parameters_pointer);
-			if isRDRAM(animationParamObject) then
-				return mainmemory.read_u32_be(animationParamObject + obj_model1.rendering_parameters.bone_array_1);
-			end
+function Game.getBoneArray1(actorPointer)
+	if isRDRAM(actorPointer) then
+		local animationParamObject = dereferencePointer(actorPointer + obj_model1.rendering_parameters_pointer);
+		if isRDRAM(animationParamObject) then
+			return mainmemory.read_u32_be(animationParamObject + obj_model1.rendering_parameters.bone_array_1);
 		end
 	end
 	return 0;
 end
 
-function Game.getBoneArray2()
-	if not isInSubGame() then
-		local playerObject = Game.getPlayerObject();
-		if isRDRAM(playerObject) then
-			local animationParamObject = dereferencePointer(playerObject + obj_model1.rendering_parameters_pointer);
-			if isRDRAM(animationParamObject) then
-				return mainmemory.read_u32_be(animationParamObject + obj_model1.rendering_parameters.bone_array_2);
-			end
+function Game.getBoneArray2(actorPointer)
+	if isRDRAM(actorPointer) then
+		local animationParamObject = dereferencePointer(actorPointer + obj_model1.rendering_parameters_pointer);
+		if isRDRAM(animationParamObject) then
+			return mainmemory.read_u32_be(animationParamObject + obj_model1.rendering_parameters.bone_array_2);
 		end
 	end
 	return 0;
 end
 
-function Game.getOSDBoneArray1()
-	local suffix = "";
-	if Game.getActiveBoneArray() == Game.getBoneArray1() then
-		suffix = "*";
+function Game.getBoneArray1PrettyPrint(actorPointer)
+	if isRDRAM(actorPointer) then
+		local suffix = " ";
+		local boneArray1 = Game.getBoneArray1(actorPointer);
+		if Game.getActiveBoneArray(actorPointer) == boneArray1 then
+			suffix = "*";
+		end
+		return toHexString(boneArray1)..suffix;
 	end
-	return toHexString(Game.getBoneArray1())..suffix;
+	return "Not found";
 end
 
-function Game.getOSDBoneArray2()
-	local suffix = "";
-	if Game.getActiveBoneArray() == Game.getBoneArray2() then
-		suffix = "*";
+function Game.getBoneArray2PrettyPrint(actorPointer)
+	if isRDRAM(actorPointer) then
+		local suffix = " ";
+		local boneArray2 = Game.getBoneArray2(actorPointer);
+		if Game.getActiveBoneArray(actorPointer) == boneArray2 then
+			suffix = "*";
+		end
+		return toHexString(boneArray2)..suffix;
 	end
-	return toHexString(Game.getBoneArray2())..suffix;
+	return "Not found";
 end
 
-function Game.getStoredX1()
-	local boneArray1 = Game.getBoneArray1();
+function Game.getStoredX1(actorPointer)
+	local boneArray1 = Game.getBoneArray1(actorPointer);
 	if isPointer(boneArray1) then
 		boneArray1 = boneArray1 - RDRAMBase;
 		return mainmemory.read_s16_be(boneArray1 + bone_size + bone.position_x);
@@ -3973,8 +3983,8 @@ function Game.getStoredX1()
 	return 0;
 end
 
-function Game.getStoredX2()
-	local boneArray2 = Game.getBoneArray2();
+function Game.getStoredX2(actorPointer)
+	local boneArray2 = Game.getBoneArray2(actorPointer);
 	if isPointer(boneArray2) then
 		boneArray2 = boneArray2 - RDRAMBase;
 		return mainmemory.read_s16_be(boneArray2 + bone_size + bone.position_x);
@@ -3982,8 +3992,8 @@ function Game.getStoredX2()
 	return 0;
 end
 
-function Game.getStoredY1()
-	local boneArray1 = Game.getBoneArray1();
+function Game.getStoredY1(actorPointer)
+	local boneArray1 = Game.getBoneArray1(actorPointer);
 	if isPointer(boneArray1) then
 		boneArray1 = boneArray1 - RDRAMBase;
 		return mainmemory.read_s16_be(boneArray1 + bone_size + bone.position_y);
@@ -3991,8 +4001,8 @@ function Game.getStoredY1()
 	return 0;
 end
 
-function Game.getStoredY2()
-	local boneArray2 = Game.getBoneArray2();
+function Game.getStoredY2(actorPointer)
+	local boneArray2 = Game.getBoneArray2(actorPointer);
 	if isPointer(boneArray2) then
 		boneArray2 = boneArray2 - RDRAMBase;
 		return mainmemory.read_s16_be(boneArray2 + bone_size + bone.position_y);
@@ -4000,8 +4010,8 @@ function Game.getStoredY2()
 	return 0;
 end
 
-function Game.getStoredZ1()
-	local boneArray1 = Game.getBoneArray1();
+function Game.getStoredZ1(actorPointer)
+	local boneArray1 = Game.getBoneArray1(actorPointer);
 	if isPointer(boneArray1) then
 		boneArray1 = boneArray1 - RDRAMBase;
 		return mainmemory.read_s16_be(boneArray1 + bone_size + bone.position_z);
@@ -4009,8 +4019,8 @@ function Game.getStoredZ1()
 	return 0;
 end
 
-function Game.getStoredZ2()
-	local boneArray2 = Game.getBoneArray2();
+function Game.getStoredZ2(actorPointer)
+	local boneArray2 = Game.getBoneArray2(actorPointer);
 	if isPointer(boneArray2) then
 		boneArray2 = boneArray2 - RDRAMBase;
 		return mainmemory.read_s16_be(boneArray2 + bone_size + bone.position_z);
@@ -5071,17 +5081,23 @@ function ohWrongnana(verbose)
 			-- Get activation script
 			activationScript = dereferencePointer(slotBase + 0x7C);
 			if isRDRAM(activationScript) then
+				--currentValue = mainmemory.read_u16_be(slotBase + obj_model2.object_type);
 				scriptName = getInternalName(slotBase);
 				--if scriptName == "gunswitches" then
 				--if scriptName == "buttons" then
+				--if scriptName == "gunswitches" or scriptName == "buttons" or currentValue == 0x131 then -- 0x131 is K. Rool's Ship (Galleon)
 				if scriptName == "gunswitches" or scriptName == "buttons" then
 					-- Get part 2
 					activationScript = dereferencePointer(activationScript + 0xA0);
 
 					while isRDRAM(activationScript) do
+						--if currentValue == 0x131 then
+							--print(toHexString(activationScript));
+						--end
 						for j = 0x04, 0x48, 8 do
 							if isSafePreceedingCommand(mainmemory.readbyte(activationScript + j - 1)) then
 								local commandParam = mainmemory.read_u16_be(activationScript + j);
+								--if isKong(commandParam) and (scriptName == "buttons" or currentValue == 0x131) then
 								if isKong(commandParam) and scriptName == "buttons" then
 									mainmemory.write_u16_be(activationScript + j, SimSlamChecks[currentKong]);
 									if verbose then
@@ -6824,15 +6840,15 @@ Game.standardOSD = {
 	--{"Anim Timer 3", Game.getAnimationTimer3},
 	--{"Anim Timer 4", Game.getAnimationTimer4},
 	{"Separator", 1},
-	{"Bone Array 1", Game.getOSDBoneArray1},
-	{"Stored X1", Game.getStoredX1},
-	{"Stored Y1", Game.getStoredY1},
-	{"Stored Z1", Game.getStoredZ1},
+	{"Bone Array 1", function() return Game.getBoneArray1PrettyPrint(Game.getPlayerObject()) end},
+	{"Stored X1", function() return Game.getStoredX1(Game.getPlayerObject()) end},
+	{"Stored Y1", function() return Game.getStoredY1(Game.getPlayerObject()) end},
+	{"Stored Z1", function() return Game.getStoredZ1(Game.getPlayerObject()) end},
 	{"Separator", 1},
-	{"Bone Array 2", Game.getOSDBoneArray2},
-	{"Stored X2", Game.getStoredX2},
-	{"Stored Y2", Game.getStoredY2},
-	{"Stored Z2", Game.getStoredZ2},
+	{"Bone Array 2", function() return Game.getBoneArray2PrettyPrint(Game.getPlayerObject()) end},
+	{"Stored X2", function() return Game.getStoredX2(Game.getPlayerObject()) end},
+	{"Stored Y2", function() return Game.getStoredY2(Game.getPlayerObject()) end},
+	{"Stored Z2", function() return Game.getStoredZ2(Game.getPlayerObject()) end},
 	--{"Separator", 1},
 	--{"Free", getFreeMemory},
 	--{"Used", getUsedMemory},
