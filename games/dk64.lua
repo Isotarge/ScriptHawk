@@ -5081,23 +5081,27 @@ function ohWrongnana(verbose)
 			-- Get activation script
 			activationScript = dereferencePointer(slotBase + 0x7C);
 			if isRDRAM(activationScript) then
-				--currentValue = mainmemory.read_u16_be(slotBase + obj_model2.object_type);
+				currentValue = mainmemory.read_u16_be(slotBase + obj_model2.object_type);
 				scriptName = getInternalName(slotBase);
-				--if scriptName == "gunswitches" then
-				--if scriptName == "buttons" then
-				--if scriptName == "gunswitches" or scriptName == "buttons" or currentValue == 0x131 then -- 0x131 is K. Rool's Ship (Galleon)
-				if scriptName == "gunswitches" or scriptName == "buttons" then
+				if scriptName == "gunswitches" or scriptName == "buttons" or currentValue == 0x131 then -- 0x131 is K. Rool's Ship (Galleon)
 					-- Get part 2
 					activationScript = dereferencePointer(activationScript + 0xA0);
 
 					while isRDRAM(activationScript) do
-						--if currentValue == 0x131 then
-							--print(toHexString(activationScript));
-						--end
 						for j = 0x04, 0x48, 8 do
-							if isSafePreceedingCommand(mainmemory.readbyte(activationScript + j - 1)) then
+							local preceedingCommand = mainmemory.readbyte(activationScript + j - 1);
+							if currentValue == 0x131 then -- K. Rool's Ship (Galleon)
+								if preceedingCommand == 0x12 then
+									local commandParam = mainmemory.read_u16_be(activationScript + j);
+									if isKong(commandParam) then
+										mainmemory.write_u16_be(activationScript + j, SimSlamChecks[currentKong]);
+										if verbose then
+											ohWrongnanaDebugOut(scriptName, slotBase, activationScript, j);
+										end
+									end
+								end
+							elseif isSafePreceedingCommand(preceedingCommand) then
 								local commandParam = mainmemory.read_u16_be(activationScript + j);
-								--if isKong(commandParam) and (scriptName == "buttons" or currentValue == 0x131) then
 								if isKong(commandParam) and scriptName == "buttons" then
 									mainmemory.write_u16_be(activationScript + j, SimSlamChecks[currentKong]);
 									if verbose then
