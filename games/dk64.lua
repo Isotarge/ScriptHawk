@@ -6328,6 +6328,17 @@ function Game.drawUI()
 	end
 end
 
+function Game.getISG()
+	if version == 4 then
+		return;
+	end
+	local ts1 = mainmemory.read_u32_be(Game.Memory.timestamp[version]);
+	local ts2 = mainmemory.read_u32_be(Game.Memory.timestamp[version] + 4);
+	mainmemory.write_u32_be(Game.Memory.isg_timestamp[version], ts1);
+	mainmemory.write_u32_be(Game.Memory.isg_timestamp[version] + 4, ts2);
+	mainmemory.writebyte(Game.Memory.isg_active[version], 1);
+end
+
 --[[
 RNGLock = 0;
 function increaseRNGLock()
