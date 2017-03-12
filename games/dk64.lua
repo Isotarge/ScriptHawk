@@ -77,6 +77,7 @@ local Game = {
 		["file"] = {0x7467C8, 0x740F18, 0x746088, nil},
 		["character"] = {0x74E77C, 0x748EDC, 0x74E05C, 0x6F9EB8},
 		["object_spawn_table"] = {0x74E8B0, 0x749010, 0x74E1D0, 0x6F9F80},
+		["cutscene_model_table"] = {0x75570C, 0x74FF8C, 0x7557CC, 0x7001F0},
 		["enemy_drop_table"] = {0x750400, 0x74AB20, 0x74FCE0, 0x6FB630},
 		-- 1000 0000 - ????
 		-- 0100 0000 - ????
@@ -701,7 +702,7 @@ obj_model1 = {
 		--[14] = "Unknown", -- Always loaded -- What is this?
 		--[15] = "Unknown", -- Always loaded -- What is this?
 		[17] = "Cannon Barrel",
-		[18] = "Rambi Box",
+		[18] = "Rambi Crate",
 		[19] = "Barrel (Diddy 5DI)",
 		--[20] = "Unknown", -- Possibily some kind of cutscene controller
 		[21] = "Pushable Box",
@@ -722,7 +723,7 @@ obj_model1 = {
 		--[37] = "Unknown - Factory Intro", -- TODO: What is this?
 		[38] = "Pineapple",
 		[39] = "Large Brown Bridge", -- TODO: Unused?
-		[40] = "Mini Monkey barrel",
+		[40] = "Mini Monkey Barrel",
 		[41] = "Orange",
 		[42] = "Grape",
 		[43] = "Feather",
@@ -743,6 +744,7 @@ obj_model1 = {
 		[59] = "Fireball", -- Mad Jack etc.
 		--[60] = "Unknown", -- Spawns during bananaporter
 		[61] = "Boulder",
+		[62] = "Minecart", -- DK?
 		[63] = "Vase (O)",
 		[64] = "Vase (:)",
 		[65] = "Vase (Triangle)",
@@ -750,7 +752,7 @@ obj_model1 = {
 		[67] = "Cannon Ball",
 		[69] = "Vine", -- Green
 		[70] = "Counter", -- TODO: Unused?
-		[71] = "Red Kremling", -- Lanky's Keyboard Game in R&D
+		[71] = "Kremling (Red)", -- Lanky's Keyboard Game in R&D
 		[72] = "Boss Key",
 		[73] = "Cannon", -- Galleon Minigame
 		[74] = "Cannon Ball", -- Galleon Minigame Projectile
@@ -759,12 +761,14 @@ obj_model1 = {
 		[77] = "Blueprint (Lanky)",
 		[78] = "Blueprint (DK)",
 		[79] = "Blueprint (Tiny)",
+		[80] = "Minecart", -- Chunky?
 		[81] = "Fire Spawner? (Dogadon)", -- TODO: Verify
-		[82] = "Small Grey Rock", -- Minecart
+		[82] = "Boulder Debris", -- Minecart
 		[83] = "Spider Web", -- Fungi miniBoss
 		[84] = "Steel Keg Spawner",
 		[85] = "Steel Keg",
 		[86] = "Crown",
+		[87] = "Minecart", -- BONUS
 		[89] = "Fire", -- Unused?
 		[91] = "Balloon (Diddy)",
 		[92] = "Stalactite",
@@ -782,7 +786,7 @@ obj_model1 = {
 		[105] = "6 Pad (Diddy 5DI)",
 		[106] = "5DI Controller?", -- TODO: Investigate, might be something to do with Kong shadow?
 		[107] = "Bonus Barrel (Hideout Helm)",
-		[109] = "Rabbit Race Checkpoint",
+		[109] = "Race Checkpoint",
 		[110] = "CB Bunch", -- Unused? Doesn't seem to work, these are normally model 2
 		[111] = "Balloon (Chunky)",
 		[112] = "Balloon (Tiny)",
@@ -790,6 +794,7 @@ obj_model1 = {
 		[114] = "Balloon (DK)",
 		[115] = "K. Lumsy's Cage", -- TODO: Also rabbit race finish line?
 		[116] = "Chain",
+		[117] = "Beanstalk",
 		[118] = "Yellow ?", -- TODO: Unused?
 		[119] = "CB Single (Blue)", -- Unused? Doesn't seem to work, these are normally model 2
 		[120] = "CB Single (Yellow)", -- Unused? Doesn't seem to work, these are normally model 2
@@ -800,17 +805,19 @@ obj_model1 = {
 		[125] = "Krazy Kong Klamour Kontroller?",
 		[126] = "Fly Swatter",
 		[128] = "Headphones",
-		[129] = "Enguarde Box",
+		[129] = "Enguarde Crate",
 		[130] = "Apple", -- Fungi
-		[132] = "Enguarde Box (Unused?)",
+		[131] = "Worm", -- Fungi
+		[132] = "Enguarde Crate (Unused?)",
 		[133] = "Barrel",
 		[134] = "Training Barrel",
-		[135] = "Boombox (Treehouse)",
+		[135] = "Boombox", -- Treehouse
 		[136] = "Tag Barrel",
 		[137] = "Tag Barrel", -- Troff'n'Scoff
 		[138] = "B. Locker",
 		[139] = "Rainbow Coin Patch",
 		[140] = "Rainbow Coin",
+		[145] = "Cannon (Seasick Chunky)", -- Internal name "Puffer cannon"
 		[147] = "K. Rool Banana Balloon", -- TODO: This is the internal name, what to heck does this do? Maybe used in Lanky phase?
 		[148] = "Rope", -- K. Rool's Arena
 		[149] = "Banana Barrel", -- Lanky Phase
@@ -821,7 +828,7 @@ obj_model1 = {
 		[165] = "Tag Barrel (King Kutout)",
 		[166] = "King Kutout Part",
 		[167] = "Cannon",
-		[170] = "Damage Source", -- TODO?
+		[170] = "Damage Source", -- K. Rool's Glove
 		[171] = "Orange", -- Krusha's Gun
 		[173] = "Cutscene Controller",
 		[175] = "Barrel Enemy (TNT)",
@@ -888,7 +895,7 @@ obj_model1 = {
 		[249] = "Squawks with spotlight",
 		[251] = "Spider miniBoss",
 		[252] = "Rabbit", -- Fungi
-		[254] = "Static Object", -- Used in TONS of places, mainly for objects animated by cutscenes
+		[254] = "Cutscene Object", -- Used in TONS of places, mainly for objects animated by cutscenes
 		[255] = "Shockwave",
 		[258] = "Shockwave", -- Boss
 		[259] = "Guard", -- Stealthy Snoop
@@ -904,7 +911,7 @@ obj_model1 = {
 		[269] = "Mr. Dice",
 		[270] = "Sir Domino",
 		[271] = "Mr. Dice",
-		[273] = "Fireball (With Glasses)",
+		[273] = "Fireball (With Glasses)", -- From Chunky 5DI
 		[275] = "K. Lumsy",
 		[276] = "Spiderling",
 		[278] = "Projectile", -- Spider miniBoss
@@ -925,9 +932,9 @@ obj_model1 = {
 		[305] = "Missile", -- Car Race
 		[309] = "Kong Logo (Instrument)", -- DK for DK, Star for Diddy, DK for Lanky, Flower for Tiny, DK for Chunky
 		[310] = "Spotlight", -- Tag barrel, instrument etc.
-		[311] = "Checkpoint (Race)", -- Seal race & Castle car race
+		[311] = "Race Checkpoint", -- Seal race & Castle car race
 		[313] = "Idle Particle",
-		[314] = "Rareware logo",
+		[314] = "Rareware Logo",
 		[316] = "Kong (Tag Barrel)",
 		[317] = "Locked Kong (Tag Barrel)",
 		[322] = "Car", -- Car Race
@@ -1064,7 +1071,7 @@ obj_model1 = {
 		[0x4B] = "Throwing Object",
 		[0x4C] = "Jumping", -- Carrying Object
 		[0x4D] = "Throwing Object", -- In Air
-		[0x4E] = "Surface swimming",
+		[0x4E] = "Surface Swimming",
 		[0x4F] = "Underwater",
 		[0x50] = "Leaving Water",
 		[0x51] = "Jumping", -- Out of water
@@ -1427,6 +1434,267 @@ function setObjectModel1Position(pointer, x, y, z)
 		mainmemory.writefloat(pointer + obj_model1.y_pos, y, true);
 		mainmemory.writefloat(pointer + obj_model1.z_pos, z, true);
 	end
+end
+
+local model_indexes = {
+	[0x0000] = "No Model",
+	[0x0001] = "Diddy",
+	[0x0002] = "Diddy (Instrument)",
+	[0x0003] = "Diddy (Gun)",
+	[0x0004] = "DK",
+	[0x0005] = "DK",
+	[0x0006] = "Lanky",
+	[0x0007] = "Lanky (Instrument)",
+	[0x0008] = "Lanky",
+	[0x0009] = "Tiny",
+	[0x000A] = "Tiny (Instrument)",
+	[0x000B] = "Tiny",
+	[0x000C] = "Chunky",
+	[0x000D] = "Chunky (Instrument)",
+	[0x000E] = "Disco Chunky",
+	[0x000F] = "Chunky",
+
+	[0x0010] = "Invisible Chunky",
+	[0x0011] = "Cranky",
+	[0x0012] = "Funky",
+	[0x0013] = "Candy",
+	[0x0014] = "Rambi",
+	[0x0015] = "Snake", -- Teetering Turtles
+	[0x0016] = "Turtle", -- Teetering Turtles
+	[0x0017] = "Seal",
+	[0x0018] = "Enguarde",
+	[0x0019] = "Beaver",
+	[0x001A] = "Beaver",
+	[0x001B] = "Beaver",
+	[0x001C] = "Zinger",
+	[0x001D] = "Squawks",
+	[0x001E] = "Barrelloom (?!?)",
+	[0x001F] = "Snide",
+
+	[0x0020] = "Kaboom",
+	[0x0021] = "Klaptrap (Green)",
+	[0x0022] = "Klaptrap (Purple)",
+	[0x0023] = "Klaptrap (Red)",
+	[0x0024] = "Klaptrap (Teeth)",
+	[0x0025] = "Mad Jack",
+	[0x0026] = "Krash", -- Minecart club guy
+	[0x0027] = "Troff",
+	[0x0028] = "Nothing?",
+	[0x0029] = "Sir Domino",
+	[0x002A] = "Red dice thing",
+	[0x002B] = "Ruler", -- Shape puzzle enemy thing toy thing enemy
+	[0x002C] = "Robo-Kremling",
+	[0x002D] = "Scoff",
+	[0x002E] = "Beetle",
+	[0x002F] = "Klaptrap (Teeth?)",
+
+	[0x0030] = "Nintendo Logo",
+	[0x0031] = "Kremling",
+	[0x0032] = "Kremling (Red)",
+	[0x0033] = "Kremling",
+	[0x0034] = "Mechanical Fish",
+	[0x0035] = "Toy Car",
+	[0x0036] = "Clam",
+	[0x0037] = "Kasplat",
+	[0x0038] = "Army Dillo", -- With shell
+	[0x0039] = "Mr. Dice",
+	[0x003A] = "Klump",
+	[0x003B] = "Pufftoss",
+	[0x003C] = "Dogadon",
+	[0x003D] = "Banana Fairy",
+	[0x003E] = "Llama",
+	[0x003F] = "Security Guard", -- Stealthy snoop
+
+	[0x0040] = "Robo-Zinger",
+	[0x0041] = "Turntable", -- DK Rap
+	[0x0042] = "Krossbones",
+	[0x0043] = "Starfish",
+	[0x0044] = "Gimpfish",
+	[0x0045] = "K. Lumsy",
+	[0x0046] = "Spider",
+	[0x0047] = "Rabbit",
+	[0x0048] = "Beanstalk",
+	[0x0049] = "K. Rool",
+	[0x004A] = "Fireball (With Glasses)", -- From Chunky 5DI
+	[0x004B] = "Skeleton Head", -- DK minecart
+	[0x004C] = "Skeleton Hand", -- DK minecart
+	[0x004D] = "Vulture",
+	[0x004E] = "Vulture",
+	[0x004F] = "Bat",
+
+	[0x0050] = "Skull", -- DK Minecart
+	[0x0051] = "Tomato",
+	[0x0052] = "Kritter-in-a-sheet",
+	[0x0053] = "Fly",
+	[0x0054] = "Fly Swatter",
+	[0x0055] = "Fly Swatter",
+	[0x0056] = "Owl",
+	[0x0057] = "Book", -- Cactle
+	[0x0058] = "Ship's Wheel",
+	[0x0059] = "Spotlight Fish", -- What the heck is his name?
+	[0x005A] = "Pufferfish",
+	[0x005B] = "Mermaid",
+	[0x005C] = "Mushroom",
+	[0x005D] = "Shockwave (Mad Jack)",
+	[0x005E] = "Squawks",
+	[0x005F] = "Worm (apple)",
+
+	[0x0060] = "Cuckoo Bird",
+	[0x0061] = "Kosha",
+	[0x0062] = "Ice tomato man?",
+	[0x0063] = "Army Dillo (No Shell)",
+	[0x0064] = "Boombox",
+	[0x0065] = "B. Locker",
+	[0x0066] = "Escape Ship",
+	[0x0067] = "Army Dillo's Cannon",
+	[0x0068] = "K. Rool", -- Tiny Phase?
+	[0x0069] = "Golden Banana",
+	[0x006A] = "Shockwave",
+	[0x006B] = "K. Rool's Glove",
+	[0x006C] = "K. Rool's Foot",
+	[0x006D] = "K. Rool's Toe",
+	[0x006E] = "K. Rool's Toe",
+	[0x006F] = "K. Rool's Toe",
+
+	[0x0070] = "Microphone", -- K. Rool Fight
+	[0x0071] = "Desk (K. Rool)",
+	[0x0072] = "Bell",
+	[0x0073] = "Clapper Board", -- Bloopers Ending
+	[0x0074] = "Cannon",
+	[0x0075] = "Barrel?",
+	[0x0076] = "Bonus Barrel",
+	[0x0077] = "Hunky Chunky Barrel",
+	[0x0078] = "Mini Monkey Barrel",
+	[0x0079] = "Barrel",
+	[0x007A] = "Pushable Box",
+	[0x007B] = "TNT Barrel Spawner",
+	[0x007C] = "Cannon",
+	[0x007D] = "TNT Barrel",
+	[0x007E] = "Rambi Crate",
+	[0x007F] = "Enguarde Crate",
+
+	[0x0080] = "Chain", -- Diddy, Castle
+	[0x0081] = "Swinging Light", -- Lobby Roof
+	[0x0082] = "Minecart",
+	[0x0083] = "Barrel",
+	[0x0084] = "Bridge (Castle)",
+	[0x0085] = "Large Brown Bridge",
+	[0x0086] = "Feather",
+	[0x0087] = "Laser ", -- Castle Boss
+	[0x0088] = "Golden Banana",
+	[0x0089] = "Rocketbarrel",
+	[0x008A] = "Strong Kong Barrel",
+	[0x008B] = "Orangstand Sprint Barrel",
+	[0x008C] = "Diddy's Jetpack",
+	[0x008D] = "Photo",
+	[0x008E] = "Minecart (TNT)",
+	[0x008F] = "Weird glitch texture (computer screen?)",
+
+	[0x0090] = "BBB Slot",
+	[0x0091] = "BBB Slot",
+	[0x0092] = "BBB Slot",
+	[0x0093] = "BBB Slot",
+	[0x0094] = "BBB Lever",
+	[0x0095] = "Tiny's Car",
+	[0x0096] = "Missile", -- Car Race
+	[0x0097] = "Swinging light", -- Green
+	[0x0098] = "Bananaporter Zipper",
+	[0x0099] = "Boulder",
+	[0x009A] = "Vase (O)",
+	[0x009B] = "Vase (:)",
+	[0x009C] = "Vase (Triangle)",
+	[0x009D] = "Vase (+)",
+	[0x009E] = "Toy box",
+	[0x009F] = "Boat",
+
+	[0x00A0] = "Padlock",
+	[0x00A1] = "Cannon Ball",
+	[0x00A2] = "Vine", -- Brown
+	[0x00A3] = "Vine",
+	[0x00A4] = "Counter",
+	[0x00A5] = "Key",
+	[0x00A6] = "Bongos",
+	[0x00A7] = "DK Star",
+	[0x00A8] = "Spotlight",
+	[0x00A9] = "Cannon (Seasick Chunky)",
+	[0x00AA] = "Boulder Debris", -- K. Lumsy Cutscene
+	[0x00AB] = "Web",
+	[0x00AC] = "Steel Keg",
+	[0x00AD] = "Shockwave",
+	[0x00AE] = "Shockwave",
+	[0x00AF] = "Crown",
+
+	[0x00B0] = "Buoy",
+	[0x00B1] = "Buoy (Green)",
+	[0x00B2] = "Nothing?",
+	[0x00B3] = "DK Banana Counter",
+	[0x00B4] = "Diddy Banana Counter",
+	[0x00B5] = "Tiny Banana Counter",
+	[0x00B6] = "Lanky Banana Counter",
+	[0x00B7] = "Chunky Banana Counter",
+	[0x00B8] = "Shockwave (Green)",
+	[0x00B9] = "Potion",
+	[0x00BA] = "Missile (Army Dillo)",
+	[0x00BB] = "Shockwave (Red)",
+	[0x00BC] = "Ice wall?", -- in caves? Too thick? Texture on wall Army Dillo 2?
+	[0x00BD] = "Rareware Logo",
+	[0x00BE] = "Stalactite",
+	[0x00BF] = "Rock Debris",
+
+	[0x00C0] = "Spotlight (BONUS)",
+	[0x00C1] = "Tag Barrel",
+	[0x00C2] = "Castle minecart thing",
+	[0x00C3] = "Lever", -- Gorilla Grab
+	[0x00C4] = "K. Lumsy's Cage",
+	[0x00C5] = "Freeze Attack", -- Multiplayer Battle Arena
+	[0x00C6] = "1 Pad (Diddy 5DI)",
+	[0x00C7] = "2 Pad (Diddy 5DI)",
+	[0x00C8] = "3 Pad (Diddy 5DI)",
+	[0x00C9] = "4 Pad (Diddy 5DI)",
+	[0x00CA] = "5 Pad (Diddy 5DI)",
+	[0x00CB] = "6 Pad (Diddy 5DI)",
+	[0x00CC] = "Race Checkpoint", -- Rabbit Race
+	[0x00CD] = "Padlock & Key",
+	[0x00CE] = "Finish Line", -- Rabbit Race
+	[0x00CF] = "Shockwave (Green)",
+
+	[0x00D0] = "Shockwave (Blue)",
+	[0x00D1] = "Shockwave (Purple)",
+	[0x00D2] = "Question Mark", -- Tag Barrel
+	[0x00D3] = "Flower from tiny's instrument cutscene",
+	[0x00D4] = "DK",
+	[0x00D5] = "Golden Banana",
+	[0x00D6] = "Apple",
+	[0x00D7] = "Barrel",
+	[0x00D8] = "Flag", -- Car Race?
+	[0x00D9] = "Flag", -- Car Race?
+	[0x00DA] = "Boat",
+	[0x00DB] = "Krusha (Gun)",
+	[0x00DC] = "King Kut Out Body",
+	[0x00DD] = "King Kut Out Head",
+	[0x00DE] = "King Kut Out Arm",
+	[0x00DF] = "King Kut Out Arm",
+
+	[0x00E0] = "Rainbow Coin Patch",
+	[0x00E1] = "Rope", -- K. Rool Fight
+	[0x00E2] = "DK Smoke Trail", -- End Sequence
+	[0x00E3] = "Light (K. Rool fight)",
+	[0x00E4] = "Bonus Barrel (Hideout Helm)",
+	[0x00E5] = "Banana", -- Lanky phase
+	[0x00E6] = "Banana Barrel ", -- Lanky phase
+	[0x00E7] = "Training Barrel",
+	[0x00E8] = "Pirate Photo",
+	[0x00E9] = "Butterfly",
+	[0x00EA] = "Barrel",
+	[0x00EB] = "Funky's Gun", -- K. Rool Cutscene
+	[0x00EC] = "Boot", -- K. Rool Cutscene
+};
+
+local function getModelNameFromModelIndex(modelIndex)
+	if type(model_indexes[modelIndex]) ~= "nil" then
+		return model_indexes[modelIndex];
+	end
+	return modelIndex;
 end
 
 ----------------------------------
@@ -2820,7 +3088,7 @@ function Game.detectVersion(romName, romHash)
 			[40] = "Orange",
 			[41] = "Grape", -- Projectile
 			[42] = "Feather", -- Projectile
-			[44] = "Gold Banana", -- Held by Vulture
+			[44] = "Golden Banana", -- Held by Vulture
 			--[45] = "Unknown", -- Crash
 			[46] = "Watermelon Slice",
 			[47] = "Coconut", -- Projectile
@@ -2839,7 +3107,7 @@ function Game.detectVersion(romName, romHash)
 			[63] = "Vase (:)",
 			[64] = "Vase (Triangle)",
 			[65] = "Vase (+)",
-			[66] = "Cannonball?", -- Fungi Minigame
+			[66] = "Cannon Ball", -- Fungi Minigame
 			[68] = "Vine", -- Green
 			[69] = "Counter", -- Unused?
 			[71] = "Boss Key",
@@ -2883,7 +3151,7 @@ function Game.detectVersion(romName, romHash)
 			[201] = "Dogadon",
 			[214] = "Banana Fairy",
 			[222] = "Shockwave",
-			[221] = "Static Object", -- Fake Chunky in Dogadon 2 opening cutscene
+			[221] = "Cutscene Object", -- Fake Chunky in Dogadon 2 opening cutscene
 			[230] = "Fireball Shockwave", -- Dogadon
 			[232] = "Light Beam", -- Boss fights etc
 			[272] = "Kong Logo (Instrument)",
@@ -6404,7 +6672,7 @@ function crumble()
 	end
 end
 
-local enemyTypes = {
+local enemy_types = {
 	[0x00] = "Beaver",
 	[0x01] = "Giant Clam",
 	--[0x02] = "Actor Index 180", -- Crash
@@ -6485,7 +6753,7 @@ local enemyTypes = {
 	--[0x4D] = "Something todo with battle crown finishing?",
 	--[0x4E] = "Actor Index 303", -- Crash
 	--[0x4F] = "Actor Index 312", -- Crash
-	[0x50] = "Static Object",
+	[0x50] = "Cutscene Object",
 	[0x51] = "Guard", -- Stealthy Snoop
 	--[0x52] = "Crash",
 	[0x53] = "Robo-Zinger",
@@ -6497,7 +6765,7 @@ local enemyTypes = {
 	[0x59] = "Mr. Dice",
 	[0x5A] = "Rabbit + TNT", -- Chris P. Bacon
 	--[0x5B] = "Actor Index 0", -- Crash
-	[0x5C] = "Fireball (With Glasses)",
+	[0x5C] = "Fireball (With Glasses)", -- From Chunky 5DI
 	[0x5D] = "K. Lumsy + Cage + Padlocks",
 	[0x5E] = "Spider miniBoss",
 	[0x5F] = "Spiderling",
@@ -6535,76 +6803,34 @@ local enemyTypes = {
 	--[0x7F] = "Crash",
 };
 
-local staticObjectModels = {
-	[0x00] = "Llama",
-	[0x01] = "Padlock",
-	[0x02] = "Klaptrap (Green)",
-	[0x03] = "Klaptrap (Purple)",
-	[0x04] = "Klaptrap (Red)",
-	[0x05] = "Klump",
-	[0x06] = "Cranky",
-	[0x07] = "Turntable (DK Rap)",
-	[0x08] = "Boulder",
-	[0x09] = "Chunky",
-	[0x0A] = "Zinger",
-	[0x0B] = "Pufftoss",
-	[0x0C] = "Dogadon",
-	[0x0D] = "Mad Jack",
-	[0x0E] = "Spiderling",
-	[0x0F] = "K. Rool",
-	[0x10] = "Klump",
-	[0x11] = "Kasplat (Tiny?)",
-	[0x12] = "Kremling (Green)",
-	[0x13] = "Squawks",
-	[0x14] = "Ship's Wheel",
-	[0x15] = "Diddy",
-	[0x16] = "Chunky",
-	[0x17] = "Lanky",
-	[0x18] = "Tiny",
-	[0x19] = "DK",
-	[0x1A] = "Seal",
-	[0x1B] = "Cuckoo Bird",
-	[0x1C] = "Army Dillo (No Shell)",
-	[0x1D] = "Golden Banana",
-	[0x1E] = "Mermaid",
-	[0x1F] = "K. Lumsy",
-	[0x20] = "Escape Ship",
-	[0x21] = "Boulder",
-	[0x22] = "Enguarde",
-	[0x23] = "Army Dillo",
-	[0x24] = "Army Dillo's Gun",
-	[0x25] = "Boat",
-	[0x26] = "Candy",
-	[0x27] = "Funky",
-	[0x28] = "Banana Fairy",
-	[0x29] = "Troff",
-	[0x2A] = "Scoff",
-	[0x2B] = "Rambi",
-	[0x2C] = "K. Rool (Tiny Phase)",
-	[0x2D] = "Golden Banana",
-	[0x2E] = "DK Smoke Trail",
-	[0x2F] = "Kosha",
-	[0x30] = "King Kutout (Body)",
-	[0x31] = "King Kutout (Head)",
-	[0x32] = "King Kutout (Arm, Left)",
-	[0x33] = "King Kutout (Arm, Right)",
-	[0x34] = "Light (K. Rool Arena)",
-	[0x35] = "Robo-Kremling",
-	[0x36] = "Microphone",
-	[0x37] = "Bell (K. Rool Arena)",
-	[0x38] = "Bell (K. Rool Arena)",
-	[0x39] = "Boxing Glove",
-	[0x3A] = "Barrel", -- Sideways
-	[0x3B] = "Butterfly",
-	[0x3C] = "Beaver",
-	[0x3D] = "Beaver (Gold)",
-	[0x3E] = "Gimpfish",
-	[0x3F] = "Chain", -- Vine
-	[0x40] = "Boot",
-	[0x41] = "Funky's Gun",
-	[0x42] = "Lever", -- Gorilla Grab
-	-- Crash from here on I think, haven't tested all though
-};
+function replaceCutsceneModels(index)
+	local max_index = 0x42;
+	if version == 4 then
+		max_index = 0x1B;
+	end
+	for i = 0, max_index do
+		mainmemory.write_u16_be(Game.Memory.cutscene_model_table[version] + i * 2, index);
+	end
+end
+
+function dumpCutsceneModelTable()
+	local max_index = 0x42;
+	if version == 4 then
+		max_index = 0x1B;
+	end
+	dprint("Index,Address,Model,Model Name");
+	for i = 0, max_index do
+		local base = Game.Memory.cutscene_model_table[version] + i * 2;
+		local model = mainmemory.read_u16_be(base);
+		dprint(i..","..toHexString(base, 6)..","..toHexString(model, 4)..","..getModelNameFromModelIndex(model));
+	end
+	print_deferred();
+end
+
+function getModelNameFromCutsceneIndex(index)
+	local modelIndex = mainmemory.read_u16_be(Game.Memory.cutscene_model_table[version] + index * 2);
+	return getModelNameFromModelIndex(modelIndex);
+end
 
 function dumpEnemies()
 	local enemyRespawnObject = dereferencePointer(Game.Memory.enemy_respawn_object[version]);
@@ -6623,17 +6849,12 @@ function dumpEnemies()
 			local xPos = mainmemory.read_s16_be(slotBase + 0x04);
 			local yPos = mainmemory.read_s16_be(slotBase + 0x06);
 			local zPos = mainmemory.read_s16_be(slotBase + 0x08);
-			if type(enemyTypes[enemyType]) == "string" then
-				enemyName = enemyTypes[enemyType];
+			if type(enemy_types[enemyType]) == "string" then
+				enemyName = enemy_types[enemyType];
 			end
 			if enemyType == 0x50 then
-				model = mainmemory.readbyte(slotBase + 0x0A);
-				if type(staticObjectModels[model]) == "string" then
-					model = staticObjectModels[model];
-				else
-					model = "Unknown "..toHexString(model);
-				end
-				enemyName = enemyName.." ("..model..")";
+				cutsceneModelIndex = mainmemory.readbyte(slotBase + 0x0A);
+				enemyName = enemyName.." ("..getModelNameFromCutsceneIndex(cutsceneModelIndex)..")";
 			end
 			dprint(i.." "..toHexString(slotBase)..": "..enemyName.." at "..xPos..", "..yPos..", "..zPos);
 		end
@@ -6657,14 +6878,15 @@ function dumpEnemyDrops()
 end
 
 function dumpObjectSpawnTable()
-	print("Index,Behavior,Model,Name,Internal Name,");
+	print("Index,Behavior,Model,Name,Model Name,Internal Name,");
 	for i = 0, 127 do
 		local base = Game.Memory.object_spawn_table[version] + i * 0x30;
 		local behavior = mainmemory.read_u16_be(base + 0x00);
 		local model = mainmemory.read_u16_be(base + 0x02);
 		local name = getActorNameFromBehavior(behavior);
+		local modelName = getModelNameFromModelIndex(model);
 		local internalName = readNullTerminatedString(base + 0x14);
-		dprint(i..","..toHexString(behavior, 4)..","..toHexString(model, 4)..","..name..","..internalName..",");
+		dprint(i..","..toHexString(behavior, 4)..","..toHexString(model, 4)..","..name..","..modelName..","..internalName..",");
 	end
 	print_deferred();
 end
