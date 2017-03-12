@@ -7,6 +7,7 @@ SystemID N64
 4B2904	b	h	1	RDRAM	FF for voidout on main menu?!?
 5FF2D8	d	h	1	RDRAM	JAL to void out function
 678050	b	h	1	RDRAM	loadActor() function start?
+68A840	d	h	1	RDRAM	JAL to spawnEnemies()
 6E234B	b	h	1	RDRAM	Freeze at 3 for infinite shots out
 6E2492	w	h	1	RDRAM	Chunky Shot SFX
 6E24D6	w	h	1	RDRAM	Lanky Shot SFX
