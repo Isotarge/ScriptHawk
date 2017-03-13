@@ -707,14 +707,14 @@ obj_model1 = {
 		[19] = "Barrel (Diddy 5DI)",
 		--[20] = "Unknown", -- Possibily some kind of cutscene controller
 		[21] = "Pushable Box",
-		[22] = "Barrel Spawner", -- TODO: Unused?
+		[22] = "Barrel Spawner", -- Normal barrel on a star pad, unused?
 		[23] = "Cannon",
 		[25] = "Hunky Chunky Barrel",
 		[26] = "TNT Barrel",
 		[27] = "TNT Barrel Spawner", -- Army Dillo
 		[28] = "Bonus Barrel",
-		--[29] = "Unknown - Japes Minecart", -- TODO
-		[30] = "Fireball", -- Boss fights TODO: where else is this used?
+		[29] = "Minecart",
+		[30] = "Fireball", -- Boss fights
 		[31] = "Bridge (Castle)",
 		[32] = "Swinging Light",
 		[33] = "Vine", -- Brown
@@ -723,7 +723,7 @@ obj_model1 = {
 		[36] = "Peanut",
 		--[37] = "Unknown - Factory Intro", -- TODO: What is this?
 		[38] = "Pineapple",
-		[39] = "Large Brown Bridge", -- TODO: Unused?
+		[39] = "Large Brown Bridge", -- Unused?
 		[40] = "Mini Monkey Barrel",
 		[41] = "Orange",
 		[42] = "Grape",
@@ -736,9 +736,9 @@ obj_model1 = {
 		[50] = "Lime",
 		[51] = "Ammo Crate", -- Dropped by Red Klaptrap
 		[52] = "Orange Pickup", -- Dropped by Klump & Purple Klaptrap
-		[53] = "Banana Coin", -- TODO: Unused? Doesn't seem to work, these are normally model 2
-		[54] = "DK Coin", -- TODO: Unused? Doesn't seem to work, these are normally model 2
-		[55] = "Small Explosion", -- TODO: Unused?
+		[53] = "Banana Coin", -- Dropped by "Diddy", otherwise unused?
+		[54] = "DK Coin (54)", -- Unused?
+		[55] = "Small Explosion", -- Seasick Chunky
 		[56] = "Orangstand Sprint Barrel",
 		[57] = "Strong Kong Barrel",
 		[58] = "Swinging Light",
@@ -752,7 +752,7 @@ obj_model1 = {
 		[66] = "Vase (+)",
 		[67] = "Cannon Ball",
 		[69] = "Vine", -- Green
-		[70] = "Counter", -- TODO: Unused?
+		[70] = "Counter", -- Unused?
 		[71] = "Kremling (Red)", -- Lanky's Keyboard Game in R&D
 		[72] = "Boss Key",
 		[73] = "Cannon", -- Galleon Minigame
@@ -796,11 +796,11 @@ obj_model1 = {
 		[115] = "K. Lumsy's Cage", -- TODO: Also rabbit race finish line?
 		[116] = "Chain",
 		[117] = "Beanstalk",
-		[118] = "Yellow ?", -- TODO: Unused?
+		[118] = "Yellow ?", -- Unused?
 		[119] = "CB Single (Blue)", -- Unused? Doesn't seem to work, these are normally model 2
 		[120] = "CB Single (Yellow)", -- Unused? Doesn't seem to work, these are normally model 2
 		[121] = "Crystal Coconut", -- Unused? Doesn't seem to work, these are normally model 2
-		[122] = "DK Coin", -- Unused? Doesn't seem to work, these are normally model 2
+		[122] = "DK Coin", -- Multiplayer
 		[123] = "Kong Mirror", -- Creepy Castle Museum
 		[124] = "Peril Path Panic Controller?", -- TODO: Verify, used anywhere else?
 		[125] = "Krazy Kong Klamour Kontroller?",
@@ -902,7 +902,7 @@ obj_model1 = {
 		[251] = "Spider miniBoss",
 		[252] = "Rabbit", -- Fungi
 		[253] = "Nintendo Logo",
-		[254] = "Cutscene Object", -- Used in TONS of places, mainly for objects animated by cutscenes
+		[254] = "Cutscene Object", -- For objects animated by Cutscenes
 		[255] = "Shockwave",
 		[258] = "Shockwave", -- Boss
 		[259] = "Guard", -- Stealthy Snoop
@@ -1517,7 +1517,7 @@ local model_indexes = { -- Different on Kiosk, handled in Game.detectVersion
 	[0x0040] = "Robo-Zinger",
 	[0x0041] = "Turntable", -- DK Rap
 	[0x0042] = "Krossbones",
-	[0x0043] = "Starfish",
+	[0x0043] = "Shuri",
 	[0x0044] = "Gimpfish",
 	[0x0045] = "K. Lumsy",
 	[0x0046] = "Spider",
@@ -1540,7 +1540,7 @@ local model_indexes = { -- Different on Kiosk, handled in Game.detectVersion
 	[0x0057] = "Book", -- Cactle
 	[0x0058] = "Ship's Wheel",
 	[0x0059] = "Spotlight Fish", -- What the heck is his name?
-	[0x005A] = "Pufferfish",
+	[0x005A] = "Puffetup",
 	[0x005B] = "Mermaid",
 	[0x005C] = "Mushroom",
 	[0x005D] = "Shockwave (Mad Jack)",
@@ -3087,6 +3087,7 @@ function Game.detectVersion(romName, romHash)
 			[40] = "Orange",
 			[41] = "Grape", -- Projectile
 			[42] = "Feather", -- Projectile
+			[43] = "Laser",
 			[44] = "Golden Banana", -- Held by Vulture
 			--[45] = "Unknown", -- Crash
 			[46] = "Watermelon Slice",
@@ -3102,6 +3103,8 @@ function Game.detectVersion(romName, romHash)
 			[56] = "Strong Kong Barrel",
 			[57] = "Swinging Light", -- Green
 
+			[60] = "Boulder",
+
 			[62] = "Vase (O)",
 			[63] = "Vase (:)",
 			[64] = "Vase (Triangle)",
@@ -3109,14 +3112,15 @@ function Game.detectVersion(romName, romHash)
 			[66] = "Cannon Ball", -- Fungi Minigame
 			[68] = "Vine", -- Green
 			[69] = "Counter", -- Unused?
+
 			[71] = "Boss Key",
 			[72] = "Cannon", -- Fungi Minigame
 
-			[74] = "Blueprint (74)", -- Diddy?
-			[75] = "Blueprint (75)", -- Chunky?
-			[76] = "Blueprint (76)", -- Lanky?
-			[77] = "Blueprint (77)", -- DK?
-			[78] = "Blueprint (78)", -- Tiny?
+			[74] = "Blueprint (Diddy)",
+			[75] = "Blueprint (Chunky)",
+			[76] = "Blueprint (Lanky)",
+			[77] = "Blueprint (DK)",
+			[78] = "Blueprint (Tiny)",
 			--[79] = "Unknown", -- Crash
 			[81] = "Boulder", -- Unused
 			[82] = "Spider Web",
@@ -3145,6 +3149,9 @@ function Game.detectVersion(romName, romHash)
 			[111] = "Balloon (Tiny)",
 			[112] = "Balloon (Lanky)",
 			[113] = "Balloon (DK)",
+			[114] = "Padlock", -- K. Lumsy
+			[127] = "Headphones",
+			[128] = "Enguarde Crate",
 			[134] = "Kaboom",
 			[137] = "Beaver",
 			[139] = "Krash",
@@ -3164,6 +3171,11 @@ function Game.detectVersion(romName, romHash)
 			[154] = "Mermaid",
 			[155] = "Vulture",
 			[156] = "Squawks",
+			[157] = "Cutscene DK",
+			[158] = "Cutscene Diddy",
+			[159] = "Cutscene Lanky",
+			[160] = "Cutscene Tiny",
+			[161] = "Cutscene Chunky",
 			[162] = "Llama",
 			[165] = "Mad Jack",
 			[164] = "Padlock & Key",
@@ -3196,11 +3208,11 @@ function Game.detectVersion(romName, romHash)
 			[202] = "Bug (Beta)",
 			[204] = "Kremling",
 			[206] = "Spotlight Fish",
-			[207] = "Kasplat (207)", -- Which Kong?
-			[208] = "Kasplat (208)", -- Which Kong?
-			[209] = "Kasplat (209)", -- Which Kong?
-			[210] = "Kasplat (210)", -- Which Kong?
-			[211] = "Kasplat (211)", -- Which Kong?
+			[207] = "Kasplat (DK)",
+			[208] = "Kasplat (Diddy)",
+			[209] = "Kasplat (Lanky)",
+			[210] = "Kasplat (Tiny)",
+			[211] = "Kasplat (Chunky)",
 			[212] = "Mechanical Fish",
 			[213] = "Seal",
 			[214] = "Banana Fairy",
@@ -3216,7 +3228,7 @@ function Game.detectVersion(romName, romHash)
 			[229] = "Krossbones",
 			[230] = "Fireball Shockwave", -- Dogadon
 			[232] = "Light Beam", -- Boss fights etc
-			[234] = "Starfish",
+			[234] = "Shuri",
 			[235] = "Gimpfish",
 			[236] = "Mr. Dice",
 			[237] = "Sir Domino",
@@ -3345,7 +3357,7 @@ function Game.detectVersion(romName, romHash)
 			[0x0040] = "Robo-Zinger",
 			[0x0041] = "Turntable",
 			[0x0042] = "Krossbones",
-			[0x0043] = "Starfish",
+			[0x0043] = "Shuri",
 			[0x0044] = "Gimpfish",
 			[0x0045] = "K. Lumsy",
 			[0x0046] = "Spider",
@@ -6975,6 +6987,26 @@ function dumpEnemyTypes()
 	print_deferred();
 end
 
+function everyEnemyIs(index)
+	local enemyTypeSize = 0x18;
+	local maxEnemyType = 0x70;
+	if version == 4 then
+		enemyTypeSize = 0x1C;
+		maxEnemyType = 0x66;
+	end
+	local chosenSlotData = {};
+	local chosenSlotBase = Game.Memory.enemy_table[version] + index * enemyTypeSize;
+	for i = 0, enemyTypeSize - 1 do
+		chosenSlotData[i] = mainmemory.readbyte(chosenSlotBase + i);
+	end
+	for i = 0, maxEnemyType do
+		local base = Game.Memory.enemy_table[version] + i * enemyTypeSize;
+		for j = 0, enemyTypeSize - 1 do
+			mainmemory.writebyte(base + j, chosenSlotData[j]);
+		end
+	end
+end
+
 function replaceModels(index)
 	-- Cutscene
 	local max_index = 0x42;
@@ -6995,6 +7027,16 @@ function replaceModels(index)
 	for i = 0, max_index do
 		local base = Game.Memory.enemy_table[version] + i * enemyTypeSize;
 		local model = mainmemory.write_u16_be(base + 2, index);
+	end
+
+	-- Object Spawn Table
+	max_index = 127;
+	if version == 4 then
+		max_index = 110;
+	end
+	for i = 0, max_index do
+		local base = Game.Memory.object_spawn_table[version] + i * 0x30;
+		local model = mainmemory.write_u16_be(base + 0x02, index);
 	end
 end
 
@@ -7055,22 +7097,43 @@ end
 
 function dumpEnemyDrops()
 	local object = 0;
-	local index = 0;
+	local index = -1;
 	repeat
+		index = index + 1;
 		local objectBase = Game.Memory.enemy_drop_table[version] + index * 0x06;
 		object = mainmemory.read_u16_be(objectBase);
-		local droppedObject = mainmemory.read_u16_be(objectBase + 0x02);
-		local dropMusic = mainmemory.readbyte(objectBase + 0x04);
-		local dropCount = mainmemory.readbyte(objectBase + 0x05);
-		dprint(getActorNameFromBehavior(object).." drops "..dropCount.." "..getActorNameFromBehavior(droppedObject).." and plays "..toHexString(dropMusic));
-		index = index + 1;
+		if object ~= 0 then
+			local droppedObject = mainmemory.read_u16_be(objectBase + 0x02);
+			local dropMusic = mainmemory.readbyte(objectBase + 0x04);
+			local dropCount = mainmemory.readbyte(objectBase + 0x05);
+			dprint(toHexString(objectBase)..": "..getActorNameFromBehavior(object).." drops "..dropCount.." "..getActorNameFromBehavior(droppedObject).." and plays "..toHexString(dropMusic));
+		end
 	until object == 0;
 	print_deferred();
 end
 
+function everyEnemyDrops(actorType, count, music)
+	local object = 0;
+	local index = -1;
+	repeat
+		index = index + 1;
+		local objectBase = Game.Memory.enemy_drop_table[version] + index * 0x06;
+		object = mainmemory.read_u16_be(objectBase);
+		if object ~= 0 then
+			mainmemory.write_u16_be(objectBase + 0x02, actorType);
+			mainmemory.writebyte(objectBase + 0x04, music);
+			mainmemory.writebyte(objectBase + 0x05, count);
+		end
+	until object == 0;
+end
+
 function dumpObjectSpawnTable()
 	print("Index,Behavior,Model,Name,Model Name,Internal Name,");
-	for i = 0, 127 do
+	local max_index = 127;
+	if version == 4 then
+		max_index = 110;
+	end
+	for i = 0, max_index do
 		local base = Game.Memory.object_spawn_table[version] + i * 0x30;
 		local behavior = mainmemory.read_u16_be(base + 0x00);
 		local model = mainmemory.read_u16_be(base + 0x02);

@@ -55,6 +55,7 @@ SystemID N64
 746FB4	w	u	1	RDRAM	Cutscene
 747590	d	f	1	RDRAM	FOV
 74E05C	b	u	1	RDRAM	Character
+7503A4	w	u	1	RDRAM	DK Coins (Minecart etc.)
 753B34	d	h	1	RDRAM	Object Model 2 Collision Linked List Pointer
 753B70	d	h	1	RDRAM	HUD Pointer
 755130	b	h	1	RDRAM	Intro Story is Playing

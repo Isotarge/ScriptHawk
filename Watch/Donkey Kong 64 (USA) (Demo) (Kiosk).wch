@@ -5,6 +5,7 @@ SystemID N64
 6F36E0	d	h	1	RDRAM	RNG
 6F4464	w	h	1	RDRAM	Cutscene
 6F9EB8	b	u	1	RDRAM	Character
+6FBF44	w	u	1	RDRAM	DK Coins (Minecart etc.)
 6FF054	d	h	1	RDRAM	Object Model 2 Collision Linked List Pointer
 6FF080	d	h	1	RDRAM	HUD Pointer
 6FFE5C	w	b	1	RDRAM	Buttons Enabled (Bitfield)
