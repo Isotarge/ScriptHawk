@@ -184,9 +184,9 @@ end
 
 function outputGamesharkCode(bytes, skipZeroes)
 	skipZeroes = skipZeroes or false;
-	skippedZeroes = 0;
+	local skippedZeroes = 0;
 	if type(bytes) == "table" and #bytes > 0 then
-		nextByteHandled = false;
+		local nextByteHandled = false;
 		for i = 1, #bytes do
 			if not nextByteHandled then
 				if i < #bytes and bytes[i][1] == (bytes[i + 1][1] - 1) then
@@ -211,9 +211,9 @@ function outputGamesharkCode(bytes, skipZeroes)
 	return skippedZeroes;
 end
 
-code = {};
+local code = {};
 
-function codeWriter(...)
+local function codeWriter(...)
 	if isPointer(arg[1]) then
 		table.insert(code, {arg[1] - RDRAMBase, arg[2]});
 	else
@@ -395,7 +395,7 @@ local supportedGames = {
 	--Space Station Silicon Valley
 	["E5E09205AA743A9E5043A42DF72ADC379C746B0B"] = {["moduleName"] = "games.sssv", ["friendlyName"] = "Space Station Silicon Valley (USA)"},
 	["23710541BB3394072740B0F0236A7CB1A7D41531"] = {["moduleName"] = "games.sssv", ["friendlyName"] = "Space Station Silicon Valley (Europe) (En,Fr,De)"},
-	
+
 	-- Tetris Attack
 	-- TODO: Support more versions of this game
 	["EAD855D774C9943F7FFB5B4F429B2DD07FB6F606"] = {["moduleName"] = "Tetris Attack Bot", ["selfContained"] = true, ["friendlyName"] = "Panel de Pon (Japan)"}, -- SNES
@@ -1259,14 +1259,14 @@ ScriptHawk.bindKeyRealtime("Slash", ScriptHawk.resetMax, true);
 ----------------------------------------
 
 angleCalc = {
-	["buttonX"] = 220,
-	["visible"] = false,
-	["form"] = nil,
-	["p1xbox"] = nil,
-	["p1zbox"] = nil,
-	["p2xbox"] = nil,
-	["p2zbox"] = nil,
-	["anglebox"] = nil,
+	buttonX = 220,
+	visible = false,
+	form = nil,
+	p1xbox = nil,
+	p1zbox = nil,
+	p2xbox = nil,
+	p2zbox = nil,
+	anglebox = nil,
 };
 
 angleCalc.setPoint1 = function()

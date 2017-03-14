@@ -3,7 +3,7 @@
 
 string.lpad = function(str, len, char)
 	if char == nil then char = ' ' end
-	return string.rep(char, len - #str) .. str
+	return string.rep(char, len - #str) .. str;
 end
 
 function toHexString(value, desiredLength, prefix)
@@ -84,7 +84,7 @@ object_arrays = { -- Use indexes from maps array
 	[0x05] = {start=0x1244, finish=0x1267, objects=9, exits="ul"},
 	[0x06] = {start=0x126D, finish=0x1280, objects=5, exits="dl,ur"},
 	[0x07] = {start=0x1286, finish=0x1299, objects=5, exits="dr"},
-}; 
+};
 
 function dumpMaps()
 	local value;

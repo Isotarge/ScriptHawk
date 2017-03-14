@@ -90,7 +90,7 @@ return {
 	{byte=0x12, bit=2, name="Factory: Warp 3 (Lobby)", type="Warp"},
 	{byte=0x12, bit=3, name="Factory: Warp 3 (Snide)", type="Warp"},
 	{byte=0x12, bit=4, name="Factory: Warp 4 (Upper)", type="Warp"},
-	{byte=0x12, bit=5, name="Factory: Warp 4 (Lower)", type="Warp"},	
+	{byte=0x12, bit=5, name="Factory: Warp 4 (Lower)", type="Warp"},
 	{byte=0x12, bit=6, name="Factory: Warp 5 (Funky)", type="Warp"},
 	{byte=0x12, bit=7, name="Factory: Warp 5 (Arcade)", type="Warp"},
 

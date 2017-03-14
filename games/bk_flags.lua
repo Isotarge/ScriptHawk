@@ -55,7 +55,7 @@ local flag_array = {
 	{["name"] = "MMM: MT: Church Roof",			["index"] = 0x35,	["type"] = "MT",	["level"] = 10 },
 	{["name"] = "MMM: MT: Hedges By Ramp",		["index"] = 0x36,	["type"] = "MT",	["level"] = 10 },
 	{["name"] = "MMM: MT: Hedge Maze",			["index"] = 0x37,	["type"] = "MT",	["level"] = 10 },
-	{["name"] = "MMM: MT: Cemetary",			["index"] = 0x38,	["type"] = "MT",	["level"] = 10 }, 
+	{["name"] = "MMM: MT: Cemetary",			["index"] = 0x38,	["type"] = "MT",	["level"] = 10 },
 	{["name"] = "MMM: MT: In Fountain Whip",	["index"] = 0x39,	["type"] = "MT",	["level"] = 10 },
 	{["name"] = "MMM: MT: Church Rafters",		["index"] = 0x3A,	["type"] = "MT",	["level"] = 10 },
 	{["name"] = "MMM: MT: Organ Stool",			["index"] = 0x3B,	["type"] = "MT",	["level"] = 10 },
@@ -64,7 +64,7 @@ local flag_array = {
 	{["name"] = "MMM: MT: Dinning Room",		["index"] = 0x3E,	["type"] = "MT",	["level"] = 10 },
 	{["name"] = "MMM: MT: Well",				["index"] = 0x3F,	["type"] = "MT",	["level"] = 10 },
 	{["name"] = "MMM: MT: Bedroom",				["index"] = 0x40,	["type"] = "MT",	["level"] = 10 },
-	{["name"] = "MMM: MT: Bathroom",			["index"] = 0x41,	["type"] = "MT",	["level"] = 10 }, 
+	{["name"] = "MMM: MT: Bathroom",			["index"] = 0x41,	["type"] = "MT",	["level"] = 10 },
 	{["name"] = "RBB: MT: Top Of Funnel",		["index"] = 0x42,	["type"] = "MT",	["level"] = 9 },
 	{["name"] = "RBB: MT: Front Of Ship",		["index"] = 0x43,	["type"] = "MT",	["level"] = 9 },
 	{["name"] = "RBB: MT: Lifeboat",			["index"] = 0x44,	["type"] = "MT",	["level"] = 9 },
@@ -115,7 +115,7 @@ local flag_array = {
 	{["name"] = "CCW: MT: Winter Hive",			["index"] = 0x71,	["type"] = "MT",	["level"] = 8 },
 	{["name"] = "CCW: MT: Winter Nabnut",		["index"] = 0x72,	["type"] = "MT",	["level"] = 8 },
 	{["name"] = "CCW: MT: Winter Sir Slush",	["index"] = 0x73,	["type"] = "MT",	["level"] = 8 },
-	
+
 --HoneyCombs
 	{["name"] = "MM: H: Hill",				["index"] = 0x01,	["type"] = "H",	["level"] = 1 },
 	{["name"] = "MM: H: JuJu",				["index"] = 0x02,	["type"] = "H",	["level"] = 1 },
@@ -141,7 +141,7 @@ local flag_array = {
 	{["name"] = "SM: H: Tree",				["index"] = 0x16,	["type"] = "H",	["level"] = 11 },
 	{["name"] = "SM: H: Coliwobble",		["index"] = 0x17,	["type"] = "H",	["level"] = 11 },
 	{["name"] = "SM: H: Quarries",			["index"] = 0x18,	["type"] = "H",	["level"] = 11 },
-	
+
 --Jiggies
 	{["name"] = "MM: Jig: Jinjo",			["index"] = 0x01,	["type"] = "Jig",	["level"] = 1},
 	{["name"] = "MM: Jig: Ticker's Tower",	["index"] = 0x02,	["type"] = "Jig",	["level"] = 1},
@@ -243,7 +243,7 @@ local flag_array = {
 	{["name"] = "MMM: Jig: Tumblar",		["index"] = 0x62,	["type"] = "Jig",	["level"] = 10},
 	{["name"] = "MMM: Jig: Flower Pots",	["index"] = 0x63,	["type"] = "Jig",	["level"] = 10},
 	{["name"] = "MMM: Jig: Loggo",			["index"] = 0x64,	["type"] = "Jig",	["level"] = 10},
-	
+
 --Game Progress
 	{["name"] = "1st Note Text",			["index"] = 0x03,	["type"] = "Prog",	["level"] = 6},
 	{["name"] = "1st Mumbo Token Text",		["index"] = 0x04,	["type"] = "Prog",	["level"] = 6},
@@ -261,7 +261,7 @@ local flag_array = {
 	{["name"] = "1st Sand Eel Text",		["index"] = 0x10,	["type"] = "Prog",	["level"] = 6},
 	{["name"] = "1st Meeting Mumbo Text",	["index"] = 0x11,	["type"] = "Prog",	["level"] = 6},
 	{["name"] = "1st Post XForm Mumbo Text",	["index"] = 0x12,	["type"] = "Prog",	["level"] = 6},
-	
+
 	{["name"] = "1st FP Icy Water Text",		["index"] = 0x14,	["type"] = "Prog",	["level"] = 6},
 	{["name"] = "1st Time in Mansion Text",	["index"] = 0x15,	["type"] = "Prog",	["level"] = 6},
 	{["name"] = "1st Time in Jigsaw Text",	["index"] = 0x16,	["type"] = "Prog",	["level"] = 6},
@@ -282,7 +282,7 @@ local flag_array = {
 	{["name"] = "Lair Water Level 2",		["index"] = 0x25,	["type"] = "Prog",	["level"] = 6},
 	{["name"] = "Water Switch 3 Pressed",	["index"] = 0x26,	["type"] = "Prog",	["level"] = 6},
 	{["name"] = "Lair Water Level 3",		["index"] = 0x27,	["type"] = "Prog",	["level"] = 6},
-	
+
 	{["name"] = "MM Open",					["index"] = 0x31,	["type"] = "Prog",	["level"] = 6},
 	{["name"] = "TTC Open",					["index"] = 0x32,	["type"] = "Prog",	["level"] = 6},
 	{["name"] = "CC Open",					["index"] = 0x33,	["type"] = "Prog",	["level"] = 6},
@@ -305,7 +305,7 @@ local flag_array = {
 	{["name"] = "864 Note Door Open",		["index"] = 0x44,	["type"] = "Prog",	["level"] = 6},
 	{["name"] = "882 Note Door Open",		["index"] = 0x45,	["type"] = "Prog",	["level"] = 6},
 	{["name"] = "CCW WS Jiggy Spawned",		["index"] = 0x46,	["type"] = "Prog",	["level"] = 6},
-	
+
 	{["name"] = "FP WS Advent Door Open",	["index"] = 0x48,	["type"] = "Prog",	["level"] = 6},
 	{["name"] = "Pink Cauldron 1 Active",	["index"] = 0x49,	["type"] = "Prog",	["level"] = 6},
 	{["name"] = "Pink Cauldron 2 Active",	["index"] = 0x4A,	["type"] = "Prog",	["level"] = 6},
@@ -313,7 +313,7 @@ local flag_array = {
 	{["name"] = "Green Cauldron 2 Active",	["index"] = 0x4C,	["type"] = "Prog",	["level"] = 6},
 	{["name"] = "Red Cauldron 1 Active",	["index"] = 0x4D,	["type"] = "Prog",	["level"] = 6},
 	{["name"] = "Red Cauldron 2 Active",	["index"] = 0x4E,	["type"] = "Prog",	["level"] = 6},
-	
+
 	{["name"] = "Yellow Cauldron 1 Active",	["index"] = 0x51,	["type"] = "Prog",	["level"] = 6},
 	{["name"] = "Yellow Cauldron 2 Active",	["index"] = 0x52,	["type"] = "Prog",	["level"] = 6},
 	{["name"] = "CCW Puzzle Podium Switch Pressed",	["index"] = 0x53,	["type"] = "Prog",	["level"] = 6},
@@ -325,7 +325,7 @@ local flag_array = {
 	{["name"] = "1st FF Grunty Square Text",	["index"] = 0x59,	["type"] = "Prog",	["level"] = 6},
 	{["name"] = "1st FF Death Square Text",	["index"] = 0x5A,	["type"] = "Prog",	["level"] = 6},
 	{["name"] = "1st FF Joker Square Text",	["index"] = 0x5B,	["type"] = "Prog",	["level"] = 6},
-	
+
 	--pieces places in puzzles info
 	--{["name"] = "# Pieces in MM Puzzle (2^0)",	["index"] = 0x5D,	["type"] = "Prog",	["level"] = 6},
 	--{["name"] = "# Pieces in TTC Puzzle (2^0)",	["index"] = 0x5E,	["type"] = "Prog",	["level"] = 6},
@@ -364,11 +364,11 @@ local flag_array = {
 	--{["name"] = "# Pieces in Double Health Puzzle (2^0)",	["index"] = 0x7F,	["type"] = "Prog",	["level"] = 6},
 	--{["name"] = "# Pieces in Double Health Puzzle (2^1)",	["index"] = 0x80,	["type"] = "Prog",	["level"] = 6},
 	--{["name"] = "# Pieces in Double Health Puzzle (2^2)",	["index"] = 0x81,	["type"] = "Prog",	["level"] = 6},
-	
+
 	{["name"] = "Mumbo's Magic All Gone Text",	["index"] = 0x84,	["type"] = "Prog",	["level"] = 6},
 	{["name"] = "Lair Crypt Gate Open",		["index"] = 0x85,	["type"] = "Prog",	["level"] = 6},
 	{["name"] = "1st Thorn Hedge Text",		["index"] = 0x86,	["type"] = "Prog",	["level"] = 10},
-	
+
 	{["name"] = "1st Exiting Loggo Text",	["index"] = 0x88,	["type"] = "Prog",	["level"] = 10},
 
 	{["name"] = "CCW Spring Open",			["index"] = 0x8B,	["type"] = "Prog",	["level"] = 8},
@@ -381,20 +381,20 @@ local flag_array = {
 	{["name"] = "Walrus Payed",				["index"] = 0x92,	["type"] = "Prog",	["level"] = 5},
 	{["name"] = "Croc Payed",				["index"] = 0x93,	["type"] = "Prog",	["level"] = 4},
 	{["name"] = "Bee Payed",				["index"] = 0x94,	["type"] = "Prog",	["level"] = 8},
-	
+
 	{["name"] = "1st Time Brentilda Text",	["index"] = 0x96,	["type"] = "Prog",	["level"] = 6},
 	{["name"] = "1st Time In Lair Text",	["index"] = 0x97,	["type"] = "Prog",	["level"] = 6},
 	{["name"] = "1st Time Exit Level Text",	["index"] = 0x98,	["type"] = "Prog",	["level"] = 6},
 	{["name"] = "1st Time Past 50 ND Text",	["index"] = 0x99,	["type"] = "Prog",	["level"] = 6},
-	
+
 	{["name"] = "CC WS Eyes Active",		["index"] = 0x9B,	["type"] = "Prog",	["level"] = 6},
 	{["name"] = "CC WS Left Eye Pressed",	["index"] = 0x9C,	["type"] = "Prog",	["level"] = 6},
 	{["name"] = "CC WS Right Eye Pressed",	["index"] = 0x9D,	["type"] = "Prog",	["level"] = 6},
 	{["name"] = "Crypt Coffin Lid Open",	["index"] = 0x9E,	["type"] = "Prog",	["level"] = 6},
-	
+
 	{["name"] = "Statue Hat Open",			["index"] = 0xA1,	["type"] = "Prog",	["level"] = 6},
 	{["name"] = "GV Lobby Coffin Open",		["index"] = 0xA2,	["type"] = "Prog",	["level"] = 6},
-	
+
 	{["name"] = "Near Puzzle Podium Text",	["index"] = 0xA7,	["type"] = "Prog",	["level"] = 6},
 	{["name"] = "1st Death Text",			["index"] = 0xA8,	["type"] = "Prog",	["level"] = 6},
 	{["name"] = "1st RBB Oven Text",		["index"] = 0xA9,	["type"] = "Prog",	["level"] = 9},
@@ -415,12 +415,12 @@ local flag_array = {
 	{["name"] = "Has Been in CC",			["index"] = 0xB8,	["type"] = "Prog",	["level"] = 2},
 	{["name"] = "Double Health",			["index"] = 0xB9,	["type"] = "Prog",	["level"] = 6},
 	{["name"] = "1st Time T. Rex",			["index"] = 0xBA,	["type"] = "Prog",	["level"] = 6},
-	
+
 	{["name"] = "1st Time in Lair Cutscene",	["index"] = 0xBD,	["type"] = "Prog",	["level"] = 6},
 	{["name"] = "Cheato: BLUEEGGS Active",	["index"] = 0xBE,	["type"] = "Cheat",	},
 	{["name"] = "Cheato: REDFEATHERS Active",	["index"] = 0xBF,	["type"] = "Cheat",	},
 	{["name"] = "Cheato: GOLDFEATHERS Active",	["index"] = 0xC0,	["type"] = "Cheat",	},
-	
+
 	{["name"] = "Grate to RBB Puzzle Open",	["index"] = 0xC2,	["type"] = "Prog",	["level"] = 6},
 	{["name"] = "Ice Ball To Cheato Broken",	["index"] = 0xC3,	["type"] = "Prog",	["level"] = 6},
 	{["name"] = "Statue Eye Broken",		["index"] = 0xC4,	["type"] = "Prog",	["level"] = 6},
@@ -434,16 +434,16 @@ local flag_array = {
 	{["name"] = "Cobweb to Green Cauldron Broken",	["index"] = 0xCC,	["type"] = "Prog",	["level"] = 6},
 	{["name"] = "Grate to Water Switch 3 Open",		["index"] = 0xCD,	["type"] = "Prog",	["level"] = 6},
 	{["name"] = "Grate by MMM Puzzle Open",	["index"] = 0xCE,	["type"] = "Prog",	["level"] = 6},
-	
+
 	{["name"] = "Fight 1st Jinjo Statue Activated Cutscene",	["index"] = 0xD1,	["type"] = "Prog",	["level"] = 12},
 	{["name"] = "Fight 1st Jinjo Statue Rising Cutscene",	["index"] = 0xD2,	["type"] = "Prog",	["level"] = 12},
-	
+
 	{["name"] = "In Mumbo's With Enough Tokens Text",	["index"] = 0xDC,	["type"] = "Prog",	["level"] = 6},
 	{["name"] = "1st CCW Icy Water Text",	["index"] = 0xDD,	["type"] = "Prog",	["level"] = 8},
-	
+
 	{["name"] = "Remove Puzzle Piece Text",	["index"] = 0xDF,	["type"] = "Prog",	["level"] = 6},
 	{["name"] = "Place All Puzzle Pieces Text",	["index"] = 0xE0,	["type"] = "Prog",	["level"] = 6},
-	
+
 	{["name"] = "DoG Open",					["index"] = 0xE2,	["type"] = "Prog",	["level"] = 6},
 	{["name"] = "CCW Flower Spring",		["index"] = 0xE3,	["type"] = "Prog",	["level"] = 8},
 	{["name"] = "CCW Flower Summer",		["index"] = 0xE4,	["type"] = "Prog",	["level"] = 8},
@@ -451,15 +451,15 @@ local flag_array = {
 	{["name"] = "Spring Eeyrie Hatched",	["index"] = 0xE6,	["type"] = "Prog",	["level"] = 8},
 	{["name"] = "Summer Eeyrie Fed",		["index"] = 0xE7,	["type"] = "Prog",	["level"] = 8},
 	{["name"] = "Autumn Eeyrie Fed",		["index"] = 0xE8,	["type"] = "Prog",	["level"] = 8},
-	
+
 	{["name"] = "Talked to Dingpot",		["index"] = 0xF3,	["type"] = "Prog",	["level"] = 6},
 	{["name"] = "1st Time FF Cutscene",		["index"] = 0xF4,	["type"] = "Prog",	["level"] = 6},
-	
+
 	{["name"] = "1st Time Near DoG Puzzle Podium",	["index"] = 0xF6,	["type"] = "Prog",	["level"] = 6},
 	{["name"] = "Pumpkin Making Mumbo Hungry Text",	["index"] = 0xF7,	["type"] = "Prog",	["level"] = 10},
 	--{["name"] = "King Sandybutt Pyramid State (2^0)",	["index"] = 0xF8,	["type"] = "Prog",	["level"] = 12},
 	--{["name"] = "King Sandybutt Pyramid State (2^1)",	["index"] = 0xF9,	["type"] = "Prog",	["level"] = 12},
-	
+
 	{["name"] = "Defeated Grunty",			["index"] = 0xFC,	["type"] = "Prog",	["level"] = 12},
 }
 

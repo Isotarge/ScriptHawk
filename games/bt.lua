@@ -2923,7 +2923,7 @@ function clearFlag(byte, bit)
 	if type(byte) == "number" and type(bit) == "number" and bit >= 0 and bit < 8 then
 		local flags = dereferencePointer(Game.Memory.flag_block_pointer[version]);
 		if isRDRAM(flags) then
-			currentValue = mainmemory.readbyte(flags + byte);
+			local currentValue = mainmemory.readbyte(flags + byte);
 			mainmemory.writebyte(flags + byte, clear_bit(currentValue, bit));
 		end
 	end
@@ -2955,7 +2955,7 @@ function setFlag(byte, bit)
 	if type(byte) == "number" and type(bit) == "number" and bit >= 0 and bit < 8 then
 		local flags = dereferencePointer(Game.Memory.flag_block_pointer[version]);
 		if isRDRAM(flags) then
-			currentValue = mainmemory.readbyte(flags + byte);
+			local currentValue = mainmemory.readbyte(flags + byte);
 			mainmemory.writebyte(flags + byte, set_bit(currentValue, bit));
 		end
 	end
@@ -3204,7 +3204,7 @@ function setGlobalFlag(byte, bit)
 	if type(byte) == "number" and type(bit) == "number" and bit >= 0 and bit < 8 then
 		local flags = Game.Memory.global_flag_base[version];
 		if isRDRAM(flags) then
-			currentValue = mainmemory.readbyte(flags + byte);
+			local currentValue = mainmemory.readbyte(flags + byte);
 			mainmemory.writebyte(flags + byte, set_bit(currentValue, bit));
 		end
 	end
@@ -3214,7 +3214,7 @@ function clearGlobalFlag(byte, bit)
 	if type(byte) == "number" and type(bit) == "number" and bit >= 0 and bit < 8 then
 		local flags = Game.Memory.global_flag_base[version];
 		if isRDRAM(flags) then
-			currentValue = mainmemory.readbyte(flags + byte);
+			local currentValue = mainmemory.readbyte(flags + byte);
 			mainmemory.writebyte(flags + byte, clear_bit(currentValue, bit));
 		end
 	end

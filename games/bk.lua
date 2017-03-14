@@ -509,8 +509,6 @@ slot_variables = {
 };
 local slot_variables_inv = {};
 
-
-
 local function fillBlankVariableSlots()
 	local data_size = 0x04;
 	for i = 0, slot_size - data_size, data_size do
@@ -1909,7 +1907,7 @@ function drawObjectPositions()
 	else
 		mouseClickedLastFrame = false;
 	end
-	
+
 	if dragging then
 		dragTransform = {mouse.X - startDragPosition[1], mouse.Y - startDragPosition[2],mouse.Wheel - startDragPosition[3]};
 	end

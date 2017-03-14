@@ -400,7 +400,6 @@ local flag_array = {};
 local flag_names = {};
 local flags_by_map = {};
 local previousCameraState = "Unknown";
-local prev_map = 0;
 local map_value = 0;
 
 ------------------
@@ -519,7 +518,7 @@ function drawSubGameHitboxes()
 	end
 
 	for i = 1, #draggableObjects do
-		local objectBase = draggableObjects[i].objectBase;
+		--local objectBase = draggableObjects[i].objectBase;
 		local xPosition = draggableObjects[i].xPosition;
 		local yPosition = draggableObjects[i].yPosition;
 		local leftX = draggableObjects[i].leftX;
@@ -570,7 +569,7 @@ local MJ_offsets = { -- US Defaults
 -- Other state --
 -----------------
 
-local eeprom_size = 0x800;
+--local eeprom_size = 0x800;
 local eeprom_slot_size = 0x1AC;
 local eep_checksum = {
 	{ address = 0x1A8, value = 0 }, -- Save Slot 1
@@ -829,11 +828,13 @@ obj_model1 = {
 		[165] = "Tag Barrel (King Kut Out)",
 		[166] = "King Kut Out Part",
 		[167] = "Cannon",
+		[169] = "Pufftup", -- Pufftoss Fight
 		[170] = "Damage Source", -- K. Rool's Glove
 		[171] = "Orange", -- Krusha's Gun
 		[173] = "Cutscene Controller",
 		[175] = "Kaboom",
 		[176] = "Timer",
+		--[177] = "Unknown", -- Pufftoss Fight
 		[178] = "Beaver", -- Blue
 		[179] = "Shockwave (Mad Jack)",
 		[180] = "Krash", -- Minecart Club Guy
@@ -950,6 +951,7 @@ obj_model1 = {
 		[314] = "Rareware Logo",
 		[316] = "Kong (Tag Barrel)",
 		[317] = "Locked Kong (Tag Barrel)",
+		--[319] = "Unknown", -- Pufftoss Fight
 		[322] = "Car", -- Car Race
 		[323] = "Enemy Car", -- Car Race, aka George
 		[325] = "Shockwave", -- Simian Slam
@@ -1134,6 +1136,7 @@ obj_model1 = {
 		[0x7D] = "Klaptrap Kong", -- Beaver Bother
 		[0x7E] = "Surface Swimming", -- Enguarde
 		[0x7F] = "Underwater", -- Enguarde
+		[0x80] = "Attacking", -- Enguarde, surface
 		[0x81] = "Attacking", -- Enguarde
 		[0x82] = "Leaving Water", -- Enguarde
 		[0x83] = "Fairy Refill",
@@ -1540,7 +1543,7 @@ local model_indexes = { -- Different on Kiosk, handled in Game.detectVersion
 	[0x0057] = "Book", -- Cactle
 	[0x0058] = "Ship's Wheel",
 	[0x0059] = "Spotlight Fish", -- What the heck is his name?
-	[0x005A] = "Puffetup",
+	[0x005A] = "Pufftup",
 	[0x005B] = "Mermaid",
 	[0x005C] = "Mushroom",
 	[0x005D] = "Shockwave (Mad Jack)",
@@ -2800,6 +2803,7 @@ function dumpModel2Positions()
 	if isRDRAM(objModel2Array) then
 		local numSlots = mainmemory.read_u32_be(Game.Memory.obj_model2_array_count[version]);
 		local scriptName, slotBase;
+		local xPos, yPos, zPos;
 		-- Fill and sort pointer list
 		for i = 0, numSlots - 1 do
 			slotBase = objModel2Array + i * obj_model2_slot_size;
@@ -3665,7 +3669,7 @@ function checkFlag(byte, bit, suppressPrint)
 	end
 	if type(byte) == "number" and type(bit) == "number" and bit >= 0 and bit < 8 then
 		local flags = Game.getFlagBlockAddress();
-		currentValue = mainmemory.readbyte(flags + byte);
+		local currentValue = mainmemory.readbyte(flags + byte);
 		if check_bit(currentValue, bit) then
 			if not suppressPrint then
 				print(getFlagName(byte, bit).." is SET");
@@ -3745,7 +3749,7 @@ end
 function setFlag(byte, bit, suppressPrint)
 	local flags = Game.getFlagBlockAddress();
 	if type(byte) == "number" and type(bit) == "number" and bit >= 0 and bit < 8 then
-		currentValue = mainmemory.readbyte(flags + byte);
+		local currentValue = mainmemory.readbyte(flags + byte);
 		mainmemory.writebyte(flags + byte, set_bit(currentValue, bit));
 		if not suppressPrint then
 			if isFound(byte, bit) then
@@ -3814,7 +3818,7 @@ end
 function clearFlag(byte, bit, suppressPrint)
 	local flags = Game.getFlagBlockAddress();
 	if type(byte) == "number" and type(bit) == "number" and bit >= 0 and bit < 8 then
-		currentValue = mainmemory.readbyte(flags + byte);
+		local currentValue = mainmemory.readbyte(flags + byte);
 		mainmemory.writebyte(flags + byte, clear_bit(currentValue, bit));
 		if not suppressPrint then
 			if isFound(byte, bit) then
@@ -5929,19 +5933,25 @@ end
 -- Kremling Kosh Bot --
 -----------------------
 
-local kremling_kosh_joypad_angles = {
-	[0] = {["X Axis"] = 0,    ["Y Axis"] = 0},
-	[1] = {["X Axis"] = -128, ["Y Axis"] = 0},
-	[2] = {["X Axis"] = -128, ["Y Axis"] = -128},
-	[3] = {["X Axis"] = 0,    ["Y Axis"] = -128},
-	[4] = {["X Axis"] = 127,  ["Y Axis"] = -128},
-	[5] = {["X Axis"] = 127,  ["Y Axis"] = 0},
-	[6] = {["X Axis"] = 127,  ["Y Axis"] = 127},
-	[7] = {["X Axis"] = 0,    ["Y Axis"] = 127},
-	[8] = {["X Axis"] = -128, ["Y Axis"] = 127},
+local koshBot = {
+	joypad_angles = {
+		[0] = {["X Axis"] = 0,    ["Y Axis"] = 0},
+		[1] = {["X Axis"] = -128, ["Y Axis"] = 0},
+		[2] = {["X Axis"] = -128, ["Y Axis"] = -128},
+		[3] = {["X Axis"] = 0,    ["Y Axis"] = -128},
+		[4] = {["X Axis"] = 127,  ["Y Axis"] = -128},
+		[5] = {["X Axis"] = 127,  ["Y Axis"] = 0},
+		[6] = {["X Axis"] = 127,  ["Y Axis"] = 127},
+		[7] = {["X Axis"] = 0,    ["Y Axis"] = 127},
+		[8] = {["X Axis"] = -128, ["Y Axis"] = 127},
+	},
+	shots_fired = {
+		0, 0, 0, 0, 0, 0, 0, 0
+	},
+	previousFrameMelonCount = 0,
 };
 
-function getKoshController()
+koshBot.getKoshController = function()
 	for object_no = 0, getObjectModel1Count() do
 		local pointer = dereferencePointer(Game.Memory.pointer_list[version] + (object_no * 4));
 		if isRDRAM(pointer) and getActorName(pointer) == "Kremling Kosh Controller" then
@@ -5950,7 +5960,7 @@ function getKoshController()
 	end
 end
 
-function countMelonProjectiles()
+koshBot.countMelonProjectiles = function()
 	local melonCount = 0;
 	for object_no = 0, getObjectModel1Count() do
 		local pointer = dereferencePointer(Game.Memory.pointer_list[version] + (object_no * 4));
@@ -5961,23 +5971,19 @@ function countMelonProjectiles()
 	return melonCount;
 end
 
-function getSlotPointer(koshController, slotIndex)
+koshBot.getSlotPointer = function(koshController, slotIndex)
 	return dereferencePointer(koshController + obj_model1.kosh_kontroller.slot_pointer_base + (slotIndex - 1) * 4);
 end
 
-function getCurrentSlot()
-	local koshController = getKoshController();
+koshBot.getCurrentSlot = function()
+	local koshController = koshBot.getKoshController();
 	if type(koshController) ~= "nil" then
 		return mainmemory.readbyte(koshController + obj_model1.kosh_kontroller.slot_location);
 	end
 end
 
-local shots_fired = {
-	0, 0, 0, 0, 0, 0, 0, 0
-};
-
-function getDesiredSlot()
-	local koshController = getKoshController();
+koshBot.getDesiredSlot = function()
+	local koshController = koshBot.getKoshController();
 	if type(koshController) ~= "nil" then
 		local currentSlot = mainmemory.readbyte(koshController + obj_model1.kosh_kontroller.slot_location);
 		local melonsRemaining = mainmemory.readbyte(koshController + obj_model1.kosh_kontroller.melons_remaining);
@@ -5989,12 +5995,12 @@ function getDesiredSlot()
 		local slotIndex = 0;
 		local desiredSlot = 0;
 		for slotIndex = 1, 8 do
-			local slotPointer = getSlotPointer(koshController, slotIndex);
-			if isRDRAM(slotPointer) and slotPointer ~= shots_fired[slotIndex] then
+			local slotPointer = koshBot.getSlotPointer(koshController, slotIndex);
+			if isRDRAM(slotPointer) and slotPointer ~= koshBot.shots_fired[slotIndex] then
 				desiredSlot = slotIndex;
 			end
 			if slotPointer == 0 then
-				shots_fired[slotIndex] = 0;
+				koshBot.shots_fired[slotIndex] = 0;
 			end
 		end
 
@@ -6004,22 +6010,21 @@ function getDesiredSlot()
 	end
 end
 
-local previousFrameMelonCount = 0;
-function koshBotLoop()
-	local koshController = getKoshController();
+koshBot.Loop = function()
+	local koshController = koshBot.getKoshController();
 	if koshController ~= nil then
-		local currentSlot = getCurrentSlot();
-		local desiredSlot = getDesiredSlot();
+		local currentSlot = koshBot.getCurrentSlot();
+		local desiredSlot = koshBot.getDesiredSlot();
 		if type(desiredSlot) ~= "nil" then
-			joypad.setanalog(kremling_kosh_joypad_angles[desiredSlot], 1);
+			joypad.setanalog(koshBot.joypad_angles[desiredSlot], 1);
 			--print("Moving to slot "..desiredSlot);
 			if currentSlot == desiredSlot then
 				joypad.set({["B"] = emu.framecount() % 5 == 0}, 1);
 				--print("Firing!");
-				if desiredSlot > 0 and countMelonProjectiles() > previousFrameMelonCount then
-					shots_fired[desiredSlot] = getSlotPointer(koshController, desiredSlot);
+				if desiredSlot > 0 and koshBot.countMelonProjectiles() > koshBot.previousFrameMelonCount then
+					koshBot.shots_fired[desiredSlot] = koshBot.getSlotPointer(koshController, desiredSlot);
 				end
-				previousFrameMelonCount = countMelonProjectiles();
+				koshBot.previousFrameMelonCount = koshBot.countMelonProjectiles();
 			end
 		else
 			joypad.setanalog({["X Axis"] = false, ["Y Axis"] = false}, 1);
@@ -6856,7 +6861,7 @@ function Game.setKongColor()
 	end
 end
 
-function readTimestamp(address)
+local function readTimestamp(address)
 	local major = mainmemory.read_u32_be(address) * secs_per_major_tick;
 	local minor = mainmemory.read_u32_be(address + 4) * nano_per_minor_tick / 1000000000;
 	return major + minor; -- Seconds
@@ -7019,7 +7024,7 @@ function replaceModels(index)
 
 	-- Enemy
 	local enemyTypeSize = 0x18;
-	local max_index = 0x70;
+	max_index = 0x70;
 	if version == 4 then
 		enemyTypeSize = 0x1C;
 		max_index = 0x66;
@@ -7080,7 +7085,6 @@ function dumpEnemies()
 			local slotBase = enemyRespawnObject + (i - 1) * enemySlotSize;
 			local enemyType = mainmemory.readbyte(slotBase);
 			local enemyName = getBehaviorNameFromEnemyIndex(enemyType);
-			local model = 0;
 			--local yRot = mainmemory.read_u16_be(slotBase + 0x02);
 			local xPos = mainmemory.read_s16_be(slotBase + 0x04);
 			local yPos = mainmemory.read_s16_be(slotBase + 0x06);
@@ -7185,7 +7189,7 @@ function Game.eachFrame()
 	end
 
 	if koshbot_enabled == true then
-		koshBotLoop(); -- TODO: This probably stops the virtual pad from working
+		koshBot.Loop(); -- TODO: This probably stops the virtual pad from working
 	end
 
 	if never_slip then
