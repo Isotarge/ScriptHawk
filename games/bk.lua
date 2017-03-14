@@ -330,9 +330,8 @@ function Game.detectVersion(romName, romHash)
 		print("Warning: No flags found");
 		flag_names = {"None"};
 	end
-	
+
 	return true;
-	
 end
 
 function Game.getGroundState()
@@ -408,8 +407,7 @@ local slot_base = 0x08;
 local slot_size = 0x180;
 local max_slots = 0x100;
 
-
---BEHAVIOR STRUCTURE
+-- BEHAVIOR STRUCTURE
 behavior_struct = {
 	[0x00] = {["Name"] = "Renderer Pointer", ["Type"] = "Pointer", ["Fields"] = {
 		[0x04] = {["Name"] = "x_pos", ["Type"] = "s16_be"},
@@ -420,9 +418,9 @@ behavior_struct = {
 	},
 	[0x2C] = {["Name"] = "Object Array Index (doubled)", ["Type"] = "u16_be"},
 	[0x2E] = {["Name"] = "Collide Able Bitfield", ["Type"] = "u16_be"},
-}
-		
---MOVEMENT STRUCTURE
+};
+
+-- MOVEMENT STRUCTURE
 movement_struct = {
 	[0x00] = {["Type"] = "Pointer", ["Name"] = "Animation Object Pointer", ["Fields"] = {
 			[0x10] = {["Type"] = "u32_be", ["Name"] = "Animation Type"},
@@ -437,9 +435,9 @@ movement_struct = {
 
 	[0x1C] = {["Type"] = "u32_be", ["Name"] = "Movement State"},
 	[0x20] = {["Type"] = "Byte", ["Name"] = "Movement SubState"},
-}
+};
 
---OBJECT1 STRUCTURE
+-- OBJECT1 STRUCTURE
 slot_variables = {
 	[0x00] = {["Type"] = "Pointer", ["Name"] = "Behavior Struct Pointer", ["Fields"] = {
 		behavior_struct
@@ -481,7 +479,7 @@ slot_variables = {
 		["Climbable Pole"] = {["Type"] = "Float", ["Name"] = "Top Z", "Top Z Pos", "Top Z Position"},
 	},
 	--]]
-	
+
 	[0xBC] = {["Type"] = "u32_be", ["Name"] = "Spawn Index"},
 
 	[0xEB] = {["Type"] = "Byte", ["Name"] = "Flag 2"}, -- TODO: Better name for this, lifted from Runehero's C source
@@ -1260,7 +1258,6 @@ local animation_types = {
 function setAnimationType(index, animationType)
 	local objectArray = dereferencePointer(Game.Memory.object_array_pointer[version]);
 	if isRDRAM(objectArray) then
-		local numSlots = math.min(max_slots, mainmemory.read_u32_be(objectArray));
 		local objectSlotBase = objectArray + getSlotBase(index);
 		local animationObjectPointer = dereferencePointer(objectSlotBase + 0x14);
 		if isRDRAM(animationObjectPointer) then
@@ -1874,9 +1871,7 @@ local screen = {
 	height = client.bufferheight(),
 };
 
-
 function drawObjectPositions()
-	
 	local draggableObjects = {};
 	local objectModel;
 	if string.contains(script_mode, "Struct") then
@@ -2012,7 +2007,6 @@ function drawObjectPositions()
 								end
 
 							end
-							
 						end
 					end
 					if mouse.Left then
@@ -2039,8 +2033,6 @@ function drawObjectPositions()
 				end
 			end
 		end
-
-		
 	end
 end
 
@@ -2780,9 +2772,6 @@ end
 
 local dynamic_radius_factor = 15;
 y_stagger_amount = 10;
-
--- Relative to objectArray
-local max_slots = 0x100;
 radius = 1000;
 
 local function encircle_banjo()
@@ -3333,7 +3322,6 @@ function Game.initUI()
 			end
 		end
 	end
-	
 end
 
 function Game.eachFrame()
