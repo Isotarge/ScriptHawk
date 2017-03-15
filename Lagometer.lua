@@ -1,28 +1,50 @@
--- TODO: This script needs a refactor
 require "lib.LibScriptHawk";
 
-local maxResolution = 250;
-local resolution = 60;
-local ignore = 30;
-local maxRedzone = 100;
-local redzone = 5;
+local Lagometer = {
+	UI = {},
+	Settings = {
+		resolution = {
+			value = 60,
+			min = 1,
+			max = 250,
+		},
+		ignore = {
+			value = 30,
+			min = 0,
+			max = 60,
+		},
+		redzone = {
+			value = 5,
+			min = 1,
+			max = 100,
+		},
+		height = {
+			value = 60,
+			min = 16,
+			max = 128,
+		},
+		width = {
+			value = 16,
+			min = 16,
+			max = 128,
+		},
+		trackedPeriods = {
+			value = 10,
+			min = 1,
+			max = 50,
+		},
+	},
+};
 
-local minHeight = 16;
-local maxHeight = 128;
-local height = 60;
-
-local minWidth = 16;
-local maxWidth = 128;
-local width = 16;
+local function getSetting(value)
+	return Lagometer.Settings[value].value;
+end
 
 local frameCount = 0;
 local lagCount = 0;
+local previous = {};
 
-local maxTrackedPeriods = 50;
-trackedPeriods = 10;
-previous = {};
-
-function shufflePrevious()
+local function shufflePrevious()
 	table.remove(previous, 1);
 end
 
@@ -45,77 +67,51 @@ end
 local function recalculateRatios()
 	for i = 1, #previous do
 		if previous[i].mode == "vframe" then
-			previous[i].ratio = math.min(1, math.max(0, previous[i].lag - 1) / math.max(1, redzone));
+			previous[i].ratio = math.min(1, math.max(0, previous[i].lag - 1) / math.max(1, getSetting("redzone")));
 		end
 	end
+end
+
+Lagometer.UI.update = function()
+	forms.settext(Lagometer.UI.resolution_value_label, getSetting("resolution"));
+	forms.settext(Lagometer.UI.ignore_value_label, getSetting("ignore"));
+	forms.settext(Lagometer.UI.redzone_value_label, getSetting("redzone"));
+	forms.settext(Lagometer.UI.width_value_label, getSetting("width"));
+	forms.settext(Lagometer.UI.height_value_label, getSetting("height"));
+	forms.settext(Lagometer.UI.tracked_periods_value_label, getSetting("trackedPeriods"));
+	forms.settext(Lagometer.UI.average_lag_label, getAverageLag());
 end
 
 -------------------
 -- GUI Callbacks --
 -------------------
 
-local function increaseResolution()
-	resolution = math.min(maxResolution, resolution + 1);
-	updateUIReadouts_lagometer();
+local function increaseSetting(value)
+	Lagometer.Settings[value].value = math.min(Lagometer.Settings[value].max, getSetting(value) + 1);
+	Lagometer.UI.update();
+end
+
+local function decreaseSetting(value)
+	Lagometer.Settings[value].value = math.max(Lagometer.Settings[value].min, getSetting(value) - 1);
+	Lagometer.UI.update();
 end
 
 local function decreaseResolution()
-	resolution = math.max(1, resolution - 1);
-	ignore = math.min(resolution, ignore);
-	updateUIReadouts_lagometer();
+	Lagometer.Settings.resolution.value = math.max(1, getSetting("resolution") - 1);
+	Lagometer.Settings.ignore.value = math.min(getSetting("resolution"), getSetting("ignore"));
+	Lagometer.UI.update();
 end
 
 local function increaseIgnore()
-	ignore = math.min(resolution, ignore + 1);
-	updateUIReadouts_lagometer();
-end
-
-local function decreaseIgnore()
-	ignore = math.max(0, ignore - 1);
-	updateUIReadouts_lagometer();
-end
-
-local function increaseRedzone()
-	redzone = math.min(maxRedzone, redzone + 1);
-	updateUIReadouts_lagometer();
-end
-
-local function decreaseRedzone()
-	redzone = math.max(1, redzone - 1);
-	updateUIReadouts_lagometer();
-end
-
-local function increaseWidth()
-	width = math.min(maxWidth, width + 1);
-	updateUIReadouts_lagometer();
-end
-
-local function decreaseWidth()
-	width = math.max(minWidth, width - 1);
-	updateUIReadouts_lagometer();
-end
-
-local function increaseHeight()
-	height = math.min(maxHeight, height + 1);
-	updateUIReadouts_lagometer();
-end
-
-local function decreaseHeight()
-	height = math.max(minHeight, height - 1);
-	updateUIReadouts_lagometer();
-end
-
-local function increaseTrackedPeriods()
-	trackedPeriods = math.min(maxTrackedPeriods, trackedPeriods + 1);
-	updateUIReadouts_lagometer();
+	Lagometer.Settings.ignore.value = math.min(getSetting("resolution"), getSetting("ignore") + 1);
+	Lagometer.UI.update();
 end
 
 local function decreaseTrackedPeriods()
-	trackedPeriods = math.max(0, trackedPeriods - 1);
-	while #previous > trackedPeriods do
+	decreaseSetting("trackedPeriods");
+	while #previous > getSetting("trackedPeriods") do
 		shufflePrevious();
 	end
-	updateUIReadouts_lagometer();
 end
 
 --------------
@@ -124,7 +120,6 @@ end
 
 local form_padding = 8;
 local label_offset = 4;
-local long_label_width = 140;
 local button_height = 24;
 local label_width = 64;
 
@@ -136,54 +131,44 @@ local function col(col_num)
 	return row(col_num);
 end
 
-local options_form = forms.newform(col(10), row(11), "Lagometer");
+Lagometer.UI.form = forms.newform(col(10), row(11), "Lagometer");
 
 --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
---    Handle                                    Type                       Caption             Callback                X position   Y position             Width             Height --
+--           Handle                                  Type                     Caption             Callback                X position   Y position             Width             Height --
 --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
-local options_resolution_label =                forms.label(options_form,  "Resolution:",                              col(0),      row(0) + label_offset, label_width,      14);
-local options_decrease_resolution_button =      forms.button(options_form, "-",                decreaseResolution,     col(4) - 32, row(0),                button_height,    button_height);
-local options_increase_resolution_button =      forms.button(options_form, "+",                increaseResolution,     col(5) - 32, row(0),                button_height,    button_height);
-local options_resolution_value_label =          forms.label(options_form,  resolution,                                 col(5),      row(0) + label_offset, label_width,      14);
+Lagometer.UI.resolution_label =                forms.label(Lagometer.UI.form, "Resolution:",                              col(0),      row(0) + label_offset, label_width,      14);
+Lagometer.UI.decrease_resolution_button =      forms.button(Lagometer.UI.form,"-",                decreaseResolution,     col(4) - 32, row(0),                button_height,    button_height);
+Lagometer.UI.increase_resolution_button =      forms.button(Lagometer.UI.form,"+",     function() increaseSetting("resolution") end, col(5) - 32, row(0),     button_height,    button_height);
+Lagometer.UI.resolution_value_label =          forms.label(Lagometer.UI.form, getSetting("resolution"),                   col(5),      row(0) + label_offset, label_width,      14);
 
-local options_ignore_label =                    forms.label(options_form,  "Ignore:",                                  col(0),      row(1) + label_offset, label_width,      14);
-local options_decrease_ignore_button =          forms.button(options_form, "-",                decreaseIgnore,         col(4) - 32, row(1),                button_height,    button_height);
-local options_increase_ignore_button =          forms.button(options_form, "+",                increaseIgnore,         col(5) - 32, row(1),                button_height,    button_height);
-local options_ignore_value_label =              forms.label(options_form,  ignore,                                     col(5),      row(1) + label_offset, label_width,      14);
+Lagometer.UI.ignore_label =                    forms.label(Lagometer.UI.form, "Ignore:",                                  col(0),      row(1) + label_offset, label_width,      14);
+Lagometer.UI.decrease_ignore_button =          forms.button(Lagometer.UI.form,"-",     function() decreaseSetting("ignore") end, col(4) - 32, row(1),         button_height,    button_height);
+Lagometer.UI.increase_ignore_button =          forms.button(Lagometer.UI.form,"+",                increaseIgnore,         col(5) - 32, row(1),                button_height,    button_height);
+Lagometer.UI.ignore_value_label =              forms.label(Lagometer.UI.form, getSetting("ignore"),                       col(5),      row(1) + label_offset, label_width,      14);
 
-local options_tracked_periods_label =           forms.label(options_form,  "Tracked Periods:",                         col(0),      row(2) + label_offset, label_width,      14);
-local options_decrease_tracked_periods_button = forms.button(options_form, "-",                decreaseTrackedPeriods, col(4) - 32, row(2),                button_height,    button_height);
-local options_increase_tracked_periods_button = forms.button(options_form, "+",                increaseTrackedPeriods, col(5) - 32, row(2),                button_height,    button_height);
-local options_tracked_periods_value_label =     forms.label(options_form,  trackedPeriods,                             col(5),      row(2) + label_offset, label_width,      14);
+Lagometer.UI.tracked_periods_label =           forms.label(Lagometer.UI.form, "Tracked Periods:",                         col(0),      row(2) + label_offset, label_width,      14);
+Lagometer.UI.decrease_tracked_periods_button = forms.button(Lagometer.UI.form,"-",                decreaseTrackedPeriods, col(4) - 32, row(2),                button_height,    button_height);
+Lagometer.UI.increase_tracked_periods_button = forms.button(Lagometer.UI.form,"+",     function() increaseSetting("trackedPeriods") end, col(5) - 32, row(2), button_height,    button_height);
+Lagometer.UI.tracked_periods_value_label =     forms.label(Lagometer.UI.form, getSetting("trackedPeriods"),               col(5),      row(2) + label_offset, label_width,      14);
 
-local options_redzone_label =                   forms.label(options_form,  "Redzone:",                                 col(0),      row(3) + label_offset, label_width,      14);
-local options_decrease_redzone_button =         forms.button(options_form, "-",                decreaseRedzone,        col(4) - 32, row(3),                button_height,    button_height);
-local options_increase_redzone_button =         forms.button(options_form, "+",                increaseRedzone,        col(5) - 32, row(3),                button_height,    button_height);
-local options_redzone_value_label =             forms.label(options_form,  redzone,                                    col(5),      row(3) + label_offset, label_width,      14);
+Lagometer.UI.redzone_label =                   forms.label(Lagometer.UI.form, "Redzone:",                                 col(0),      row(3) + label_offset, label_width,      14);
+Lagometer.UI.decrease_redzone_button =         forms.button(Lagometer.UI.form,"-",     function() decreaseSetting("redzone") end, col(4) - 32, row(3),        button_height,    button_height);
+Lagometer.UI.increase_redzone_button =         forms.button(Lagometer.UI.form,"+",     function() increaseSetting("redzone") end, col(5) - 32, row(3),        button_height,    button_height);
+Lagometer.UI.redzone_value_label =             forms.label(Lagometer.UI.form, getSetting("redzone"),                      col(5),      row(3) + label_offset, label_width,      14);
 
-local options_width_label =                     forms.label(options_form,  "Width:",                                   col(0),      row(4) + label_offset, label_width,      14);
-local options_decrease_width_button =           forms.button(options_form, "-",                decreaseWidth,          col(4) - 32, row(4),                button_height,    button_height);
-local options_increase_width_button =           forms.button(options_form, "+",                increaseWidth,          col(5) - 32, row(4),                button_height,    button_height);
-local options_width_value_label =               forms.label(options_form,  width,                                      col(5),      row(4) + label_offset, label_width,      14);
+Lagometer.UI.width_label =                     forms.label(Lagometer.UI.form, "Width:",                                   col(0),      row(4) + label_offset, label_width,      14);
+Lagometer.UI.decrease_width_button =           forms.button(Lagometer.UI.form,"-",     function() decreaseSetting("width") end, col(4) - 32, row(4),          button_height,    button_height);
+Lagometer.UI.increase_width_button =           forms.button(Lagometer.UI.form,"+",     function() increaseSetting("width") end, col(5) - 32, row(4),          button_height,    button_height);
+Lagometer.UI.width_value_label =               forms.label(Lagometer.UI.form, getSetting("width"),                        col(5),      row(4) + label_offset, label_width,      14);
 
-local options_height_label =                    forms.label(options_form,  "Height:",                                  col(0),      row(5) + label_offset, label_width,      14);
-local options_decrease_height_button =          forms.button(options_form, "-",                decreaseHeight,         col(4) - 32, row(5),                button_height,    button_height);
-local options_increase_height_button =          forms.button(options_form, "+",                increaseHeight,         col(5) - 32, row(5),                button_height,    button_height);
-local options_height_value_label =              forms.label(options_form,  height,                                     col(5),      row(5) + label_offset, label_width,      14);
+Lagometer.UI.height_label =                    forms.label(Lagometer.UI.form, "Height:",                                  col(0),      row(5) + label_offset, label_width,      14);
+Lagometer.UI.decrease_height_button =          forms.button(Lagometer.UI.form,"-",     function() decreaseSetting("height") end, col(4) - 32, row(5),         button_height,    button_height);
+Lagometer.UI.increase_height_button =          forms.button(Lagometer.UI.form,"+",     function() increaseSetting("height") end, col(5) - 32, row(5),         button_height,    button_height);
+Lagometer.UI.height_value_label =              forms.label(Lagometer.UI.form, getSetting("height"),                       col(5),      row(5) + label_offset, label_width,      14);
 
-local options_toggle_vframe_mode =              forms.checkbox(options_form, "VFrame mode",                            col(0),      row(6));
+Lagometer.UI.toggle_vframe_mode =              forms.checkbox(Lagometer.UI.form,"VFrame mode",                            col(0),      row(6));
 
-local options_average_lag_label =               forms.label(options_form,  height,                                     col(0),      row(7) + label_offset, label_width,      14);
-
-function updateUIReadouts_lagometer()
-	forms.settext(options_resolution_value_label, resolution);
-	forms.settext(options_ignore_value_label, ignore);
-	forms.settext(options_redzone_value_label, redzone);
-	forms.settext(options_width_value_label, width);
-	forms.settext(options_height_value_label, height);
-	forms.settext(options_tracked_periods_value_label, trackedPeriods);
-	forms.settext(options_average_lag_label, getAverageLag());
-end
+Lagometer.UI.average_lag_label =               forms.label(Lagometer.UI.form, getSetting("height"),                       col(0),      row(7) + label_offset, label_width,      14);
 
 local function drawGraphicalRepresentation()
 	local gui_x = 8;
@@ -192,22 +177,22 @@ local function drawGraphicalRepresentation()
 
 	for i = #previous, 1, -1 do
 		if previous[i].mode == "vframe" then
-			gui.drawText(gui_x + width * column, gui_y, previous[i].lag - 1);
+			gui.drawText(gui_x + getSetting("width") * column, gui_y, previous[i].lag - 1);
 		else
-			gui.drawText(gui_x + width * column, gui_y, previous[i].lag - ignore);
+			gui.drawText(gui_x + getSetting("width") * column, gui_y, previous[i].lag - getSetting("ignore"));
 		end
 		if type(previous[i].dxz) ~= "nil" then
 			if type(precision) ~= "nil" then
-				gui.drawText(gui_x + width * column, gui_y + 16, round(previous[i].dxz, precision));
+				gui.drawText(gui_x + getSetting("width") * column, gui_y + 16, round(previous[i].dxz, precision));
 			else
-				gui.drawText(gui_x + width * column, gui_y + 16, round(previous[i].dxz));
+				gui.drawText(gui_x + getSetting("width") * column, gui_y + 16, round(previous[i].dxz));
 			end
 		end
-		gui.drawRectangle(gui_x + width * column, gui_y + height - (height * previous[i].ratio) + 32, width, height * previous[i].ratio, 0, getColour(previous[i].ratio, 0x7F));
+		gui.drawRectangle(gui_x + getSetting("width") * column, gui_y + getSetting("height") - (getSetting("height") * previous[i].ratio) + 32, getSetting("width"), getSetting("height") * previous[i].ratio, 0, getColour(previous[i].ratio, 0x7F));
 		column = column + 1;
 	end
 
-	updateUIReadouts_lagometer();
+	Lagometer.UI.update();
 end
 
 local function islagged()
@@ -218,13 +203,13 @@ local function islagged()
 end
 
 local function mainloop()
-	if forms.ischecked(options_toggle_vframe_mode) then
+	if forms.ischecked(Lagometer.UI.toggle_vframe_mode) then
 		if islagged() then
 			lagCount = lagCount + 1;
 		else
-			ratio = math.min(1, math.max(0, lagCount - 1) / math.max(1, redzone));
+			local ratio = math.min(1, math.max(0, lagCount - 1) / math.max(1, getSetting("redzone")));
 			table.insert(previous, {['lag'] = lagCount, ['ratio'] = ratio, ['mode'] = "vframe"});
-			if #previous > trackedPeriods then
+			if #previous > getSetting("trackedPeriods") then
 				shufflePrevious();
 				recalculateRatios();
 			end
@@ -237,10 +222,10 @@ local function mainloop()
 		end
 		frameCount = frameCount + 1;
 
-		if frameCount >= resolution then
-			ratio = (lagCount - ignore) / (frameCount - ignore);
+		if frameCount >= getSetting("resolution") then
+			local ratio = (lagCount - getSetting("ignore")) / (frameCount - getSetting("ignore"));
 			table.insert(previous, {['lag'] = lagCount, ['frames'] = frameCount, ['ratio'] = ratio, ['mode'] = "normal"});
-			if #previous > trackedPeriods then
+			if #previous > getSetting("trackedPeriods") then
 				shufflePrevious();
 			end
 			lagCount = 0;
