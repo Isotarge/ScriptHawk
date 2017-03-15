@@ -4051,23 +4051,23 @@ end
 -- Memory usage stuff --
 ------------------------
 
-memoryStatCache = nil;
+local memoryStatCache = nil;
 
-function getFreeMemory()
+function Game.getFreeMemory()
 	if memoryStatCache ~= nil then
 		return toHexString(memoryStatCache.free).." bytes";
 	end
 	return "Unknown";
 end
 
-function getUsedMemory()
+function Game.getUsedMemory()
 	if memoryStatCache ~= nil then
 		return toHexString(memoryStatCache.used).." bytes";
 	end
 	return "Unknown";
 end
 
-function getTotalMemory()
+function Game.getTotalMemory()
 	if memoryStatCache ~= nil then
 		return toHexString(memoryStatCache.free + memoryStatCache.used).." bytes";
 	end
@@ -4079,17 +4079,17 @@ end
 ----------------------------
 
 local dynamicWaterSurfaceKiosk = {
-	["timer_1"] = 0x24,
-	["timer_2"] = 0x28,
-	["timer_3"] = 0x2C,
-	["timer_4"] = 0x30,
-	["next_surface_pointer"] = 0x44,
+	timer_1 = 0x24,
+	timer_2 = 0x28,
+	timer_3 = 0x2C,
+	timer_4 = 0x30,
+	next_surface_pointer = 0x44,
 };
 
 local dynamicWaterSurface = {
-	["timer_1"] = 0x30,
-	["timer_2"] = 0x34,
-	["next_surface_pointer"] = 0x50,
+	timer_1 = 0x30,
+	timer_2 = 0x34,
+	next_surface_pointer = 0x50,
 };
 
 function dumpWaterSurfaces()
@@ -4126,6 +4126,7 @@ end
 surfaceTimerHack = 0;
 surfaceTimerHackInterval = 100;
 
+--[[
 function increaseSurfaceTimerHack()
 	surfaceTimerHack = surfaceTimerHack + surfaceTimerHackInterval;
 end
@@ -4134,8 +4135,9 @@ function decreaseSurfaceTimerHack()
 	surfaceTimerHack = surfaceTimerHack - surfaceTimerHackInterval;
 end
 
---ScriptHawk.bindKeyFrame("K", decreaseSurfaceTimerHack, false);
---ScriptHawk.bindKeyFrame("L", increaseSurfaceTimerHack, false);
+ScriptHawk.bindKeyFrame("K", decreaseSurfaceTimerHack, false);
+ScriptHawk.bindKeyFrame("L", increaseSurfaceTimerHack, false);
+]]--
 
 function setWaterSurfaceTimers(value)
 	if version == 4 then
@@ -4187,7 +4189,7 @@ function fixChunkDeload()
 end
 --event.onframestart(fixChunkDeload);
 
-function populateChunkPointers()
+local function populateChunkPointers()
 	object_pointers = {};
 	if Game.isLoading() then
 		object_index = 1;
@@ -4210,7 +4212,7 @@ end
 -- Physics/Scale --
 -------------------
 
-function isInSubGame()
+local function isInSubGame()
 	return map_value == arcade_map or map_value == jetpac_map;
 end
 
@@ -6672,7 +6674,7 @@ end
 -- Color setters --
 -------------------
 
-function getNextTextureRenderer(texturePointer)
+local function getNextTextureRenderer(texturePointer)
 	return dereferencePointer(texturePointer + obj_model1.texture_renderer.next_renderer);
 end
 
@@ -7345,9 +7347,9 @@ Game.standardOSD = {
 	{"Stored Y2", function() return Game.getStoredY2(Game.getPlayerObject()) end},
 	{"Stored Z2", function() return Game.getStoredZ2(Game.getPlayerObject()) end},
 	--{"Separator", 1},
-	--{"Free", getFreeMemory},
-	--{"Used", getUsedMemory},
-	--{"Total", getTotalMemory},
+	--{"Free", Game.getFreeMemory},
+	--{"Used", Game.getUsedMemory},
+	--{"Total", Game.getTotalMemory},
 };
 
 Game.subgameOSD = {
