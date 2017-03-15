@@ -9,15 +9,16 @@ if emu.setislagged == nil then -- 1.11.5 (Feb 2016)
 	return false;
 end
 
-ScriptHawk = {};
-
-ScriptHawk.UI = {
-	["form_controls"] = {}, -- TODO: Detect UI position problems using this array
-	["form_padding"] = 8,
-	["label_offset"] = 5,
-	["dropdown_offset"] = 1,
-	["long_label_width"] = 140,
-	["button_height"] = 23,
+ScriptHawk = {
+	mode = "Position",
+	UI = {
+		form_controls = {}, -- TODO: Detect UI position problems using this array
+		form_padding = 8,
+		label_offset = 5,
+		dropdown_offset = 1,
+		long_label_width = 140,
+		button_height = 23,
+	},
 };
 
 ---------------
@@ -441,7 +442,6 @@ end
 -----------
 
 override_lag_detection = (type(Game.isPhysicsFrame) == "function"); -- Default to true if the game implements custom lag detection
-mode = "Position";
 local rotation_units = "Degrees";
 
 -- Stops garbage min/max dx/dy/dz values
@@ -505,27 +505,27 @@ ScriptHawk.practice = {
 };
 
 function ScriptHawk.practice.decreaseSlot()
-	if mode == "Practice" then
+	if ScriptHawk.mode == "Practice" then
 		ScriptHawk.practice.slot = math.max(ScriptHawk.practice.minSlot, ScriptHawk.practice.slot - 1);
 		gui.addmessage("Switched to practice slot "..ScriptHawk.practice.slot);
 	end
 end
 
 function ScriptHawk.practice.increaseSlot()
-	if mode == "Practice" then
+	if ScriptHawk.mode == "Practice" then
 		ScriptHawk.practice.slot = math.min(ScriptHawk.practice.maxSlot, ScriptHawk.practice.slot + 1);
 		gui.addmessage("Switched to practice slot "..ScriptHawk.practice.slot);
 	end
 end
 
 function ScriptHawk.practice.load()
-	if mode == "Practice" then
+	if ScriptHawk.mode == "Practice" then
 		savestate.loadslot(ScriptHawk.practice.slot);
 	end
 end
 
 function ScriptHawk.practice.save()
-	if mode == "Practice" then
+	if ScriptHawk.mode == "Practice" then
 		savestate.saveslot(ScriptHawk.practice.slot);
 	end
 end
@@ -624,17 +624,17 @@ function ScriptHawk.UI.formatRotation(num)
 end
 
 local function toggleMode()
-	if mode == 'Position' then
-		mode = 'Rotation';
-	elseif mode == 'Rotation' then
-		mode = 'YRotation';
-	elseif mode == 'YRotation' then
-		mode = 'Practice';
+	if ScriptHawk.mode == 'Position' then
+		ScriptHawk.mode = 'Rotation';
+	elseif ScriptHawk.mode == 'Rotation' then
+		ScriptHawk.mode = 'YRotation';
+	elseif ScriptHawk.mode == 'YRotation' then
+		ScriptHawk.mode = 'Practice';
 		-- TODO: Bind and unbind the joypadbinds for practice mode here, saves some CPU for the mode checks and we can re-check ScriptHawk.dpad.*.enabled
-	elseif mode == 'Practice' then
-		mode = 'TAS';
+	elseif ScriptHawk.mode == 'Practice' then
+		ScriptHawk.mode = 'TAS';
 	else
-		mode = 'Position';
+		ScriptHawk.mode = 'Position';
 	end
 end
 
@@ -714,7 +714,7 @@ ScriptHawk.UI.options_form = forms.newform(ScriptHawk.UI.col(17), ScriptHawk.UI.
 -- Handle, Type, Caption, Callback, X position, Y position, Width, Height
 if not TASSafe then
 	ScriptHawk.UI.form_controls["Mode Label"] = forms.label(ScriptHawk.UI.options_form, "Mode:", ScriptHawk.UI.col(0), ScriptHawk.UI.row(0) + ScriptHawk.UI.label_offset, 44, ScriptHawk.UI.button_height);
-	ScriptHawk.UI.form_controls["Mode Button"] = forms.button(ScriptHawk.UI.options_form, mode, toggleMode, ScriptHawk.UI.col(2), ScriptHawk.UI.row(0), 64, ScriptHawk.UI.button_height);
+	ScriptHawk.UI.form_controls["Mode Button"] = forms.button(ScriptHawk.UI.options_form, ScriptHawk.mode, toggleMode, ScriptHawk.UI.col(2), ScriptHawk.UI.row(0), 64, ScriptHawk.UI.button_height);
 else
 	ScriptHawk.UI.form_controls["Override Lag Detection"] = forms.checkbox(ScriptHawk.UI.options_form, "Override Lag Detection", ScriptHawk.UI.col(0) + ScriptHawk.UI.dropdown_offset, ScriptHawk.UI.row(2) + ScriptHawk.UI.dropdown_offset);
 	forms.setproperty(ScriptHawk.UI.form_controls["Override Lag Detection"], "Width", 140);
@@ -815,7 +815,7 @@ function ScriptHawk.UI.updateReadouts()
 	forms.settext(ScriptHawk.UI.form_controls["Toggle Rotation Units Button"], rotation_units);
 	if not TASSafe then
 		forms.settext(ScriptHawk.UI.form_controls["Speed Value Label"], Game.speedy_speeds[Game.speedy_index]);
-		forms.settext(ScriptHawk.UI.form_controls["Mode Button"], mode);
+		forms.settext(ScriptHawk.UI.form_controls["Mode Button"], ScriptHawk.mode);
 
 		if type(Game.maps) == "table" and previous_map ~= forms.gettext(ScriptHawk.UI.form_controls["Map Dropdown"]) then
 			previous_map = forms.gettext(ScriptHawk.UI.form_controls["Map Dropdown"]);
@@ -1019,7 +1019,7 @@ local function mainloop()
 			dpad_right_multiplier = 1.0;
 		end
 
-		if mode == 'Position' then
+		if ScriptHawk.mode == 'Position' then
 			local rot_rad = rotation_to_radians(Game.getYRotation());
 			if dpad_pressed.up then
 				gofast("x", dpad_up_multiplier * (speedy_speed_XZ * math.sin(rot_rad)));
@@ -1040,7 +1040,7 @@ local function mainloop()
 			if lbutton_pressed then
 				gofast("y", speedy_speed_Y);
 			end
-		elseif mode == 'Rotation' then
+		elseif ScriptHawk.mode == 'Rotation' then
 			if dpad_pressed.up then
 				rotate("x", Game.rot_speed);
 			end
@@ -1056,7 +1056,7 @@ local function mainloop()
 			if lbutton_pressed then
 				gofast("y", speedy_speed_Y);
 			end
-		elseif mode == 'YRotation' then
+		elseif ScriptHawk.mode == 'YRotation' then
 			local rot_rad = rotation_to_radians(Game.getYRotation());
 			if dpad_pressed.up then
 				gofast("x", dpad_up_multiplier * (speedy_speed_XZ * math.sin(rot_rad)));
