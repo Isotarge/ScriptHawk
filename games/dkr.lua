@@ -23,6 +23,78 @@ local Game = {
 		["pointer_list"] = {0x11B468, 0x11AEE8, 0x11C8C8, 0x11B3D8, 0x11AE58},
 		["num_objects"] = {0x11B46C, 0x11AEEC, 0x11C8CC, 0x11B3DC, 0x11AE5C},
 	},
+	maps = {
+		"0x00 - Overworld",
+		"0x01 - Bluey 1",
+		"0x02 - Dragon Forest (Hub)",
+		"0x03 - Fossil Canyon",
+		"0x04 - Pirate Lagoon",
+		"0x05 - Ancient lake",
+		"0x06 - Walrus Cove",
+		"0x07 - Hot Top Volcano",
+		"0x08 - Whale Bay",
+		"0x09 - Snowball Valley",
+		"0x0A - Crescent Island",
+		"0x0B - Fire Mountain",
+		"0x0C - Dino Domain (Hub)",
+		"0x0D - Everfrost Peak",
+		"0x0E - Sherbert Island (Hub)",
+		"0x0F - Spaceport Alpha",
+
+		"0x10 - Horseshoe Gulch (Unused)",
+		"0x11 - Spacedust Alley",
+		"0x12 - Greenwood Village",
+		"0x13 - Boulder Canyon",
+		"0x14 - Windmill Plains",
+		"0x15 - Intro",
+		"0x16 - Character Select",
+		"0x17 - Title Screen",
+		"0x18 - Snowflake Mountain",
+		"0x19 - Smokey Castle",
+		"0x1A - Darkwater Beach",
+		"0x1B - Icicle Pyramid",
+		"0x1C - Frosty Village",
+		"0x1D - Jungle Falls",
+		"0x1E - Treasure Caves",
+		"0x1F - Haunted Woods",
+
+		"0x20 - Darkmoon Caverns",
+		"0x21 - Star City",
+		"0x22 - Trophy Race Results Screen",
+		"0x23 - Future Fun Land (Hub)",
+		"0x24 - Overworld (Opening Cutscene)",
+		"0x25 - Wizpig 1",
+		"0x26 - Dino 1",
+		"0x27 - Menu Screen",
+		"0x28 - Bubbler 1",
+		"0x29 - Smokey 1",
+		"0x2A - Overworld (Wizpig 1 opening cutscene)",
+		"0x2B - Wizpig amulet cutscene",
+		"0x2C - TT amulet cutscene",
+		"0x2D - Overworld (FFL opening cutscene)",
+		"0x2E - Dino 2",
+		"0x2F - Dino Trophy",
+
+		"0x30 - Snowflake Trophy",
+		"0x31 - Sherbert Trophy",
+		"0x32 - Dragon Trophy",
+		"0x33 - FFL Trophy",
+		"0x34 - Bluey 2",
+		"0x35 - Bubbler 2",
+		"0x36 - Smokey 2",
+		"0x37 - Wizpig 2",
+		"0x38 - Overworld (Fake credits)",
+		"0x39 - Tricky's map (cutscene version)",
+		"0x3A - Smokey's map (cutscene version)",
+		"0x3B - Bluey's map (cutscene version)",
+		"0x3C - Wizpig 1 cutscene",
+		"0x3D - Bubbler's map (cutscene version)",
+		"0x3E - Wizpig 2 cutscene",
+		"0x3F - Overworld (Credits 1)",
+
+		"0x40 - Overworld (Credits 2)",
+		-- Anything higher sends the player to the overworld
+	},
 };
 
 local player_object_pointer = 0x3FFFC0; -- Seems to be the same for all versions
@@ -32,8 +104,8 @@ function Game.getPlayerObject(player)
 	return dereferencePointer(player_object_pointer + (player - 1) * 4);
 end
 
-currentPointers = {};
-object_index = 1; -- TODO: Grab script stuff up top for because of reasons, fix w/refactor please
+local currentPointers = {};
+local object_index = 1; -- TODO: Grab script stuff up top for because of reasons, fix w/refactor please
 
 local function incrementObjectIndex()
 	object_index = object_index + 1;
@@ -49,20 +121,20 @@ local function decrementObjectIndex()
 	end
 end
 
-local grab_script_modes = {
+local object_analysis_tools_modes = {
 	"Disabled",
 	"List",
 	"Examine",
 };
-local grab_script_mode_index = 1;
-grab_script_mode = grab_script_modes[grab_script_mode_index];
+local object_analysis_tools_mode_index = 1;
+local object_analysis_tools_mode = object_analysis_tools_modes[object_analysis_tools_mode_index];
 
 local function switchObjectAnalysisToolsMode()
-	grab_script_mode_index = grab_script_mode_index + 1;
-	if grab_script_mode_index > #grab_script_modes then
-		grab_script_mode_index = 1;
+	object_analysis_tools_mode_index = object_analysis_tools_mode_index + 1;
+	if object_analysis_tools_mode_index > #object_analysis_tools_modes then
+		object_analysis_tools_mode_index = 1;
 	end
-	grab_script_mode = grab_script_modes[grab_script_mode_index];
+	object_analysis_tools_mode = object_analysis_tools_modes[object_analysis_tools_mode_index];
 end
 
 -- Relative to objects in pointer list
@@ -135,7 +207,7 @@ game_settings_fields = {
 -- setuppoint size: 0x90
 -- WorldGate size: 0x1E0
 
-cars = { -- Indexed by character
+local cars = { -- Indexed by character
 	[0] = "KremCar",
 	[1] = "BadgerCar",
 	[2] = "TortCar",
@@ -148,7 +220,7 @@ cars = { -- Indexed by character
 	[9] = "diddycar",
 };
 
-hovers = {
+local hovers = {
 	[0] = "KremlinHover",
 	[1] = "BadgerHover",
 	[2] = "TortHover",
@@ -161,7 +233,7 @@ hovers = {
 	[9] = "diddyhover",
 };
 
-planes = {
+local planes = {
 	[0] = "KremPlane",
 	[1] = "BadgerPlane",
 	[2] = "TortPlane",
@@ -174,7 +246,7 @@ planes = {
 	[9] = "diddyplane",
 };
 
-function isVehicle(objectBase)
+local function isVehicle(objectBase)
 	local name = getObjectName(objectBase);
 	return table.contains(cars, name) or table.contains(hovers, name) or table.contains(planes, name); -- TODO: Faster method of detection, object size?
 end
@@ -233,79 +305,6 @@ function populateObjectPointerList()
 end
 
 local map_freeze_values = {};
-
-Game.maps = {
-	"0x00 - Overworld",
-	"0x01 - Bluey 1",
-	"0x02 - Dragon Forest (Hub)",
-	"0x03 - Fossil Canyon",
-	"0x04 - Pirate Lagoon",
-	"0x05 - Ancient lake",
-	"0x06 - Walrus Cove",
-	"0x07 - Hot Top Volcano",
-	"0x08 - Whale Bay",
-	"0x09 - Snowball Valley",
-	"0x0A - Crescent Island",
-	"0x0B - Fire Mountain",
-	"0x0C - Dino Domain (Hub)",
-	"0x0D - Everfrost Peak",
-	"0x0E - Sherbert Island (Hub)",
-	"0x0F - Spaceport Alpha",
-
-	"0x10 - Horseshoe Gulch (Unused)",
-	"0x11 - Spacedust Alley",
-	"0x12 - Greenwood Village",
-	"0x13 - Boulder Canyon",
-	"0x14 - Windmill Plains",
-	"0x15 - Intro",
-	"0x16 - Character Select",
-	"0x17 - Title Screen",
-	"0x18 - Snowflake Mountain",
-	"0x19 - Smokey Castle",
-	"0x1A - Darkwater Beach",
-	"0x1B - Icicle Pyramid",
-	"0x1C - Frosty Village",
-	"0x1D - Jungle Falls",
-	"0x1E - Treasure Caves",
-	"0x1F - Haunted Woods",
-
-	"0x20 - Darkmoon Caverns",
-	"0x21 - Star City",
-	"0x22 - Trophy Race Results Screen",
-	"0x23 - Future Fun Land (Hub)",
-	"0x24 - Overworld (Opening Cutscene)",
-	"0x25 - Wizpig 1",
-	"0x26 - Dino 1",
-	"0x27 - Menu Screen",
-	"0x28 - Bubbler 1",
-	"0x29 - Smokey 1",
-	"0x2A - Overworld (Wizpig 1 opening cutscene)",
-	"0x2B - Wizpig amulet cutscene",
-	"0x2C - TT amulet cutscene",
-	"0x2D - Overworld (FFL opening cutscene)",
-	"0x2E - Dino 2",
-	"0x2F - Dino Trophy",
-
-	"0x30 - Snowflake Trophy",
-	"0x31 - Sherbert Trophy",
-	"0x32 - Dragon Trophy",
-	"0x33 - FFL Trophy",
-	"0x34 - Bluey 2",
-	"0x35 - Bubbler 2",
-	"0x36 - Smokey 2",
-	"0x37 - Wizpig 2",
-	"0x38 - Overworld (Fake credits)",
-	"0x39 - Tricky's map (cutscene version)",
-	"0x3A - Smokey's map (cutscene version)",
-	"0x3B - Bluey's map (cutscene version)",
-	"0x3C - Wizpig 1 cutscene",
-	"0x3D - Bubbler's map (cutscene version)",
-	"0x3E - Wizpig 2 cutscene",
-	"0x3F - Overworld (Credits 1)",
-
-	"0x40 - Overworld (Credits 2)",
-	-- Anything higher sends the player to the overworld
-};
 
 --------------------
 -- Region/Version --
@@ -820,8 +819,8 @@ function checkFor(objectName)
 	end
 end
 
-function drawAnalysisToolsOSD()
-	if grab_script_mode == "Disabled" then
+local function drawAnalysisToolsOSD()
+	if object_analysis_tools_mode == "Disabled" then
 		return;
 	end
 	local row = 0;
@@ -830,7 +829,7 @@ function drawAnalysisToolsOSD()
 	gui.text(Game.OSDPosition[1], 0 + Game.OSDRowHeight * row, "Index: "..object_index.."/"..#currentPointers, nil, 'bottomright');
 	row = row + 1;
 
-	if grab_script_mode == "List" then
+	if object_analysis_tools_mode == "List" then
 		row = row + 1;
 
 		for i = #currentPointers, 1, -1 do
@@ -846,7 +845,7 @@ function drawAnalysisToolsOSD()
 		end
 	end
 
-	if grab_script_mode == "Examine" then
+	if object_analysis_tools_mode == "Examine" then
 		local examine_data = getExamineData(currentPointers[object_index]);
 		for i = #examine_data, 1, -1 do
 			if examine_data[i][1] ~= "Separator" then
@@ -973,7 +972,7 @@ function Game.eachFrame()
 		previous_velocity = current_velocity;
 		current_velocity = Game.getVelocity();
 	end
-	
+
 	--Game.setCharacter(8, 1);
 	--Game.setCharacter(8, 2);
 	--Game.setCharacter(8, 3);

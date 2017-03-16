@@ -322,7 +322,7 @@ local slot_base = 0x08;
 local slot_size = 0x180;
 local max_slots = 0x100;
 
-function getSlotBase(index)
+local function getSlotBase(index)
 	return slot_base + index * slot_size;
 end
 
@@ -359,7 +359,7 @@ function Game.getGruntyState()
 		local currentSlotBase = levelObjectArray + getSlotBase(i);
 		local animationObjectPointer = dereferencePointer(currentSlotBase + 0x14);
 		if isRDRAM(animationObjectPointer) then
-			animationType = mainmemory.read_u32_be(animationObjectPointer + 0x38);
+			local animationType = mainmemory.read_u32_be(animationObjectPointer + 0x38);
 			if type(gruntyStates[animationType]) == "string" then
 				gruntyPosition.x = mainmemory.readfloat(currentSlotBase + 0x04, true);
 				gruntyPosition.y = mainmemory.readfloat(currentSlotBase + 0x08, true);

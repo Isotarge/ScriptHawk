@@ -1,4 +1,4 @@
-colors = {
+local colors = {
 	[0x00] = "Empty",
 	[0x06] = "Empty",
 	[0x07] = "Empty",
@@ -12,7 +12,7 @@ colors = {
 	[0x0F] = "Yellow",
 };
 
-states = {
+local states = {
 	[0x00] = "Empty",
 	[0x03] = "Falling",
 	[0x04] = "Active",
@@ -22,11 +22,11 @@ states = {
 	[0x0C] = "Drilled", -- Checkpoint reached
 };
 
-facingDirection = {
-	["Left"] = 0x00,
-	["Right"] = 0x01,
-	["Down"] = 0x02,
-	["Up"] = 0x03,
+local facingDirection = {
+	Left = 0x00,
+	Right = 0x01,
+	Down = 0x02,
+	Up = 0x03,
 };
 
 local gridBase = 0x1320;
@@ -35,11 +35,11 @@ local gridHeight = 32;
 local blockSize = 0x20;
 local rowSize = (gridWidth + 3) * blockSize;
 
-function getOSDXPos(x)
+local function getOSDXPos(x)
 	return 10 + (x - 1) * 16;
 end
 
-function getOSDYPos(y)
+local function getOSDYPos(y)
 	return -264 + (y * 16);
 end
 
@@ -127,10 +127,10 @@ function columnContainsReachableAir(x)
 end
 
 weight = {
-	["Air"] = 5,
-	["Safe"] = -50,
-	["Brown"] = -5,
-	["Distance"] = -2,
+	Air = 5,
+	Safe = -50,
+	Brown = -5,
+	Distance = -2,
 };
 
 function getColumnScore(x) -- TODO: Needs tons of work & weighting
@@ -174,7 +174,7 @@ function getMaxScoredColumn()
 	return maxScored;
 end
 
-function drawUI()
+local function drawUI()
 	gui.cleartext();
 	for x = 1, gridWidth do
 		if isSafe(x) then
@@ -182,10 +182,12 @@ function drawUI()
 		else
 			gui.drawText(getOSDXPos(x), getOSDYPos(21), "N", 0xFFFF0000); -- Red
 		end
+		--[[
 		local columnScore = getColumnScore(x);
-		--if columnScore ~= -math.huge then -- Only draw if it's actually possible to move there
-		--	gui.drawText(getOSDXPos(x), getOSDYPos(22), columnScore);
-		--end
+		if columnScore ~= -math.huge then -- Only draw if it's actually possible to move there
+			gui.drawText(getOSDXPos(x), getOSDYPos(22), columnScore);
+		end
+		--]]
 		for y = 1, 32 do
 			if states[getState(x, y)] == "Falling" then
 				gui.drawText(getOSDXPos(x), getOSDYPos(y), getTimer(x, y));
@@ -194,7 +196,7 @@ function drawUI()
 	end
 end
 
-function eachFrame()
+local function eachFrame()
 	local maxScored = getMaxScoredColumn();
 	local xPos = getXPosition();
 	if maxScored < xPos then

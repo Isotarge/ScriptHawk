@@ -47,7 +47,7 @@ if result == true then
 	print("This is a special version of ScriptHawk designed to be used while TASing");
 	print("All memory writes are blocked");
 	print("Some features may be unavailable in this mode");
-	mode = "TAS";
+	ScriptHawk.mode = "TAS";
 	while true do
 		if client.ispaused() then
 			gui.cleartext();

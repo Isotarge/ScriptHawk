@@ -3,7 +3,7 @@ local number_of_slots = 3;
 
 local slot_data = {};
 
-function toHexString(value, desiredLength, prefix)
+local function toHexString(value, desiredLength, prefix)
 	value = string.format("%X", value or 0);
 	prefix = prefix or "0x";
 	desiredLength = desiredLength or string.len(value);
@@ -13,7 +13,7 @@ function toHexString(value, desiredLength, prefix)
 	return prefix..value;
 end
 
-function checksum_16(b, start)
+local function checksum_16(b, start)
 	local sum = 0;
 	local i = start or 1;
 

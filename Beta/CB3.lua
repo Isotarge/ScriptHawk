@@ -8,9 +8,9 @@ local HEADER = 0x60A90;
 local pScale = 3000;
 local vScale = 100000;
 
-oldX = nil;
-oldZ = nil;
-movementAngle = nil;
+local oldX = nil;
+local oldZ = nil;
+local movingAngle = 0;
 
 function round(num, idp)
 	local mult = 10 ^ (idp or 0);
@@ -114,7 +114,7 @@ function Game.getVelocity()
 	return 0;
 end
 
-function drawOSD()
+local function drawOSD()
 	local row = 0;
 	local xOffset = 2;
 	local yOffset = 70;
@@ -142,11 +142,11 @@ function drawOSD()
 	gui.text(xOffset, yOffset + row * height, string.format("%4d/%3d : Box", BOXi, BOXs));
 	row = row + 2;
 
-	gui.text(xOffset, yOffset + row * height, string.format("%8.2f : X Pos", Game.getXPosition()));
+	gui.text(xOffset, yOffset + row * height, string.format("%8.2f : X Pos", X));
 	row = row + 1;
-	gui.text(xOffset, yOffset + row * height, string.format("%8.2f : Y Pos", Game.getYPosition()));
+	gui.text(xOffset, yOffset + row * height, string.format("%8.2f : Y Pos", Y));
 	row = row + 1;
-	gui.text(xOffset, yOffset + row * height, string.format("%8.2f : Z Pos", Game.getZPosition()));
+	gui.text(xOffset, yOffset + row * height, string.format("%8.2f : Z Pos", Z));
 	row = row + 1;
 	gui.text(xOffset, yOffset + row * height, string.format("%8.2f : Facing", D));
 	row = row + 2;
@@ -165,12 +165,13 @@ function drawOSD()
 	row = row + 2;
 
 	if type(oldX) == "number" then
-		movingAngle2 = angleBetweenPoints(oldX, oldZ, X, Z);
-
-		if movingAngle2 ~= 0 then
-			movingAngle = movingAngle2;
-		elseif Game.getVelocity() == 0 then
+		if Game.getVelocity() == 0 then
 			movingAngle = 0;
+		else
+			local possibleMovingAngle = angleBetweenPoints(oldX, oldZ, X, Z);
+			if possibleMovingAngle ~= 0 then
+				movingAngle = possibleMovingAngle;
+			end
 		end
 
 		gui.text(xOffset, yOffset + row * height, string.format("%8.2f : Moving Angle", movingAngle));
@@ -181,23 +182,23 @@ function drawOSD()
 	oldZ = Z;
 end
 
-function loadclear()
+event.onframestart(drawOSD);
+
+local function loadclear()
 	oldX = nil;
 	oldZ = nil;
 end
-
-event.onframestart(drawOSD);
 event.onloadstate(loadclear);
 
 angleCalc = {
-	["buttonX"] = 220,
-	["visible"] = false,
-	["form"] = nil,
-	["p1xbox"] = nil,
-	["p1zbox"] = nil,
-	["p2xbox"] = nil,
-	["p2zbox"] = nil,
-	["anglebox"] = nil,
+	buttonX = 220,
+	visible = false,
+	form = nil,
+	p1xbox = nil,
+	p1zbox = nil,
+	p2xbox = nil,
+	p2zbox = nil,
+	anglebox = nil,
 };
 
 angleCalc.setPoint1 = function()

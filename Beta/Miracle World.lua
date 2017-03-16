@@ -13,11 +13,11 @@ local object_array_base = 0x300;
 local object_size = 0x20;
 local object_array_capacity = 30;
 
-function isActiveEnemy(objectBase)
+local function isActiveEnemy(objectBase)
 	return (mainmemory.readbyte(objectBase + 0x09) == 0) and (mainmemory.readbyte(objectBase + 0x0A) == 0);
 end
 
-function isActiveBoss(objectBase)
+local function isActiveBoss(objectBase)
 	return isActiveEnemy(objectBase) and (mainmemory.readbyte(objectBase + 0x1A) > 1);
 end
 
@@ -126,7 +126,7 @@ local object_fields = {
 	},
 };
 
-function toHexString(value, desiredLength, prefix)
+local function toHexString(value, desiredLength, prefix)
 	value = string.format("%X", value or 0);
 	prefix = prefix or "0x";
 	desiredLength = desiredLength or string.len(value);
@@ -140,7 +140,7 @@ local mouseClickedLastFrame = false;
 local startDragPosition = {0,0};
 local draggedObjects = {};
 
-function draw_ui()
+local function draw_ui()
 	local height = 16; -- Text row height
 	local width = 8; -- Text column width
 	local mouse = input.getmouse();
