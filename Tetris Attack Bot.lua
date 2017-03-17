@@ -59,7 +59,7 @@ local colors = {
 -- 0x40 Popping
 local unmoveableStates = {
 	0x01, 0x04, 0x08, 0x40
-}
+};
 
 num_players = 2;
 panic_threshold = grid_height - 3;
@@ -69,7 +69,7 @@ speedUp = true;
 verbose = false;
 warnings = false;
 moveQueue = {};
-previousHeightTickerValues = {};
+local previousHeightTickerValues = {};
 
 --------------------
 -- The good stuff --
@@ -167,7 +167,6 @@ local function rowIsEmpty(y, player)
 end
 
 local function rowContains(y, color, player)
-	local x;
 	for x = 1, grid_width do
 		if getColor(x, y, player) == color then
 			return true;
@@ -222,9 +221,8 @@ local function isSortedMode(y, player)
 		getMostCommonColumn(7, player)
 	};
 
-	local currentColor = -1;
 	for x = 1, grid_width do
-		currentColor = getColor(x, y, player);
+		local currentColor = getColor(x, y, player);
 
 		-- TODO: improve this
 		if not isMoveable(x, y, player) then
@@ -443,7 +441,6 @@ local function checkVertical3(x, y, player)
 	local canMoveRight = x < grid_width;
 	local canMoveLeft = x > 1;
 	local columnColors = {};
-	local currentColor, i, j;
 
 	for i = 1, 4 do
 		table.insert(columnColors, getColor(x, y + i, player));
@@ -492,7 +489,6 @@ local function findMoveGreedy(player)
 	if verbose then
 		print("Running find move greedy for player "..player);
 	end
-	local x, y;
 	-- Work from the bottom up
 	for y = grid_height - 2, 1, -1 do
 		-- TODO: Allow moveable blocks on top of unmoveable rows to be processed
@@ -542,7 +538,6 @@ local function drawUI(player)
 		print("Drawing grid UI for player "..player);
 	end
 
-	local x, y;
 	for x = 1, grid_width do
 		drawGridText(x, 0, x);
 		if verbose then
