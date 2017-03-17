@@ -119,7 +119,7 @@ local Game = {
 		["frames_real"] = {0x7F0560, 0x7F0480, 0x7F09D0, nil}, -- TODO: Make sure freezing these stalls the main thread -- TODO: Kiosk
 		["isg_active"] = {0x755070, 0x74F8F0, 0x755130, nil},
 		["isg_timestamp"] = {0x7F5CE0, 0x7F5C00, 0x7F6150, nil},
-		["timestamp"] = {0x14FE0, 0x155C0, 0x15300, nil}, -- TODO: Kiosk
+		["timestamp"] = {0x14FE0, 0x155C0, 0x15300, 0x72F880},
 		["cutscene"] = {0x7476F4, 0x741E54, 0x746FB4, 0x6F4464},
 		["number_of_cutscenes"] = {0x7F5BDC, 0x7F5AFC, 0x7F604C, 0x7A1CCC},
 		["obj_model2_array_pointer"] = {0x7F6000, 0x7F5F20, 0x7F6470, 0x7A20B0}, -- 0x6F4470 has something to do with obj model 2 on Kiosk, not sure what yet
@@ -779,6 +779,7 @@ obj_model1 = {
 		[86] = "Crown",
 		[87] = "Minecart", -- BONUS
 		[89] = "Fire", -- Unused?
+		[90] = "Ice Wall?",
 		[91] = "Balloon (Diddy)",
 		[92] = "Stalactite",
 		[93] = "Rock Debris", -- Rotating, Unused?
@@ -810,8 +811,8 @@ obj_model1 = {
 		[121] = "Crystal Coconut", -- Unused? Doesn't seem to work, these are normally model 2
 		[122] = "DK Coin", -- Multiplayer
 		[123] = "Kong Mirror", -- Creepy Castle Museum
-		[124] = "Peril Path Panic Controller?", -- TODO: Verify, used anywhere else?
-		[125] = "Krazy Kong Klamour Kontroller?",
+		[124] = "Barrel Gun", -- Peril Path Panic
+		[125] = "Barrel Gun", -- Krazy Kong Klamour
 		[126] = "Fly Swatter",
 		[128] = "Headphones",
 		[129] = "Enguarde Crate",
@@ -830,7 +831,7 @@ obj_model1 = {
 		[147] = "K. Rool Banana Balloon", -- TODO: This is the internal name, what to heck does this do? Maybe used in Lanky phase?
 		[148] = "Rope", -- K. Rool's Arena
 		[149] = "Banana Barrel", -- Lanky Phase
-		[150] = "Banana Barrel Spawner", -- Lanky Phase -- TODO: Verify
+		[150] = "Banana Barrel Spawner", -- Lanky Phase, internal name "Skin barrel generator"
 		[156] = "Wrinkly",
 		[163] = "Banana Fairy (BFI)",
 		[164] = "Ice Tomato",
@@ -6373,6 +6374,7 @@ function Game.setMap(value)
 	if value >= 1 and value <= #Game.maps then
 		value = value - 1;
 		if version == 4 then -- Replace setup, rather than the scene index since basically everything crashes on Kiosk
+			----[[
 			-- RuneHero's v1.0 code
 			mainmemory.write_u16_be(0x59319C, 0x2004);
 			mainmemory.write_u16_be(0x59319E, value);
@@ -6386,6 +6388,7 @@ function Game.setMap(value)
 			mainmemory.write_u16_be(0x5C5692, value);
 			mainmemory.write_u16_be(0x5C8DFC, 0x2004);
 			mainmemory.write_u16_be(0x5C8DFE, value);
+			--]]
 
 			-- RuneHero's v3.0 code, kinda crashy
 			--[[
