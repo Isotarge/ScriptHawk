@@ -519,7 +519,7 @@ fillBlankVariableSlots();
 
 slot_data = {};
 
-function getSlotBase(index)
+local function getSlotBase(index)
 	return slot_base + index * slot_size;
 end
 
@@ -1441,7 +1441,6 @@ function Game.getCurrentMovementState()
 end
 
 function Game.colorCurrentMovementState()
-	local currentMovementState = mainmemory.read_u32_be(Game.Memory.current_movement_state[version]);
 	local stringMovementState = Game.getCurrentMovementState();
 	if stringMovementState == "Slipping" or stringMovementState == "Skidding" or stringMovementState == "Recovering" or stringMovementState == "Knockback" then
 		return 0xFFFFFF00; -- Yellow
@@ -1465,15 +1464,15 @@ hide_non_animated = false;
 -- Output Helpers --
 --------------------
 
-function isBinary(var_type)
+local function isBinary(var_type)
 	return var_type == "Binary" or var_type == "Bitfield" or var_type == "Byte" or var_type == "Flag" or var_type == "Boolean";
 end
 
-function isHex(var_type)
+local function isHex(var_type)
 	return var_type == "Hex" or var_type == "Pointer" or var_type == "Z4_Unknown";
 end
 
-function formatForOutput(var_type, value)
+local function formatForOutput(var_type, value)
 	if isBinary(var_type) then
 		local binstring = toBinaryString(value);
 		if binstring ~= "" then
@@ -1486,13 +1485,13 @@ function formatForOutput(var_type, value)
 	return ""..value;
 end
 
-function isInteresting(variable)
+local function isInteresting(variable)
 	local min = getMinimumValue(variable);
 	local max = getMaximumValue(variable);
 	return slot_variables[variable].Type ~= "Z4_Unknown" or min ~= max;
 end
 
-function getVariableName(address)
+local function getVariableName(address)
 	local variable = slot_variables[address];
 	local nameType = type(variable.Name);
 
@@ -1565,7 +1564,123 @@ local structPointers = {};
 
 hide_unknown_structs = true;
 
-function getStructsFromBlock(pointer)
+struct_array_types = {
+	[0] = { -- Game takes low 12-bits and adds 0x572 for comparisons
+		[0x00E] = "Red Feather", -- + 0x572 = 0x580
+		[0x15F] = "Gold Feather", -- + 0x572 = 0x6D1
+		[0x164] = "Note", -- + 0x572 = 0x6D6
+		[0x165] = "Egg", -- + 0x572 = 0x6D7
+	},
+	[2] = {
+		[0x0C] = "Shock spring pad", -- = 0x2DD
+		[0x17] = "Flight pad", -- = 0x2E8
+	},
+	[3] = {
+		-- Enemy collisions
+	},
+};
+
+struct_array_variables = {
+	[0x00] = {Name = "item_index", Type = "u16_be"}, -- Game takes low 12-bits and adds 0x572 for comparisons
+	[0x02] = {Name = "scale", Type = "u16_be"},
+	[0x04] = {Name = "x_pos", Type = "s16_be"},
+	[0x06] = {Name = "y_pos", Type = "s16_be"},
+	[0x08] = {Name = "z_pos", Type = "s16_be"},
+	[0x0B] = {Name = "struct_type", Type = "byte"} -- Check the last 2 bits of the (Struct[0x08] & 0x03), if both bits are 0, it a collectable object
+};
+
+local function getStructType(pointer)
+	if isRDRAM(pointer) then
+		return bit.band(mainmemory.readbyte(pointer + 0x0B), 0x03);
+	end
+	return 0;
+end
+
+local function getStructCollectable(pointer)
+	if isRDRAM(pointer) then
+		return bit.band(mainmemory.readbyte(pointer + 0x0B), 0x10)/16;
+	end
+end
+
+local function getStructRotationDirection(pointer)
+	if isRDRAM(pointer) then
+		if bit.band(mainmemory.readbyte(pointer + 0x0B), 0x80) ~= 0 then
+			return "Clockwise";
+		else
+			return "Counter Clockwise";
+		end
+	end
+end
+
+local function getItemType(pointer)
+	if isRDRAM(pointer) then
+		return bit.rshift(mainmemory.read_u16_be(pointer), 4);
+	end
+	return 0;
+end
+
+local function getStructName(pointer)
+	local structType = getStructType(pointer);
+	local itemType = getItemType(pointer);
+	if structType == 0 then
+		if type(struct_array_types[structType][itemType]) == "string" then
+			return struct_array_types[structType][itemType];
+		--else
+		--	return "Unknown Collectable ("..toHexString(itemType)..")";
+		end
+	elseif structType == 2 then
+		if type(struct_array_types[structType][itemType]) == "string" then
+			return struct_array_types[structType][itemType];
+		end
+	end
+	return "Unknown ("..structType.."->"..toHexString(itemType)..")";
+end
+
+local function isKnownStruct(pointer)
+	local structType = getStructType(pointer);
+	local itemType = getItemType(pointer);
+	if structType == 0 then
+		if type(struct_array_types[0][itemType]) == "string" then
+			return true;
+		end
+	elseif structType == 2 then
+		if type(struct_array_types[2][itemType]) == "string" then
+			return true;
+		end
+	end
+	return false;
+end
+
+local function getStructData(pointer)
+	local structData = {};
+
+	if isRDRAM(pointer) then
+		table.insert(structData, {"Slot Base", toHexString(pointer)});
+		table.insert(structData, {"Name", getStructName(pointer)});
+		table.insert(structData, {"Collectable", getStructCollectable(pointer)});
+		table.insert(structData, {"Struct Type", getStructType(pointer)});
+		table.insert(structData, {"Item Type", getItemType(pointer)});
+		table.insert(structData, {"Separator", 1});
+
+		table.insert(structData, {"X", mainmemory.read_s16_be(pointer + 0x04)});
+		table.insert(structData, {"Y", mainmemory.read_s16_be(pointer + 0x06)});
+		table.insert(structData, {"Z", mainmemory.read_s16_be(pointer + 0x08)});
+		table.insert(structData, {"Scale", mainmemory.read_u16_be(pointer + 0x02)});
+		table.insert(structData, {"Rot Dir", getStructRotationDirection(pointer)});
+	end
+
+	return structData;
+end
+
+local function setStructPosition(pointer, x, y, z)
+	if isRDRAM(pointer) then
+		mainmemory.write_s16_be(pointer + 0x04, x);
+		mainmemory.write_s16_be(pointer + 0x06, y);
+		mainmemory.write_s16_be(pointer + 0x08, z);
+	end
+end
+
+local function getStructsFromBlock(pointer)
 	local pointers = {};
 	if isRDRAM(pointer) then
 		local blockEnd = dereferencePointer(pointer - 0x0C);
@@ -1583,7 +1698,7 @@ function getStructsFromBlock(pointer)
 	return pointers;
 end
 
-function getStructPointers()
+local function getStructPointers()
 	local block = dereferencePointer(Game.Memory.struct_array_pointer[version]);
 	local pointers = {};
 	if isRDRAM(block) then
@@ -1613,122 +1728,6 @@ function getStructPointers()
 	return pointers;
 end
 
-struct_array_types = {
-	[0] = { -- Game takes low 12-bits and adds 0x572 for comparisons
-		[0x00E] = "Red Feather", -- + 0x572 = 0x580
-		[0x15F] = "Gold Feather", -- + 0x572 = 0x6D1
-		[0x164] = "Note", -- + 0x572 = 0x6D6
-		[0x165] = "Egg", -- + 0x572 = 0x6D7
-	},
-	[2] = {
-		[0x0C] = "Shock spring pad", -- = 0x2DD
-		[0x17] = "Flight pad", -- = 0x2E8
-	},
-	[3] = {
-		-- Enemy collisions
-	},
-};
-
-struct_array_variables = {
-	[0x00] = {["Name"] = "item_index", ["Type"] = "u16_be"}, -- Game takes low 12-bits and adds 0x572 for comparisons
-	[0x02] = {["Name"] = "scale", ["Type"] = "u16_be"},
-	[0x04] = {["Name"] = "x_pos", ["Type"] = "s16_be"},
-	[0x06] = {["Name"] = "y_pos", ["Type"] = "s16_be"},
-	[0x08] = {["Name"] = "z_pos", ["Type"] = "s16_be"},
-	[0x0B] = {["Name"] = "struct_type", ["Type"] = "byte"} -- Check the last 2 bits of the (Struct[0x08] & 0x03), if both bits are 0, it a collectable object
-};
-
-function getStructType(pointer)
-	if isRDRAM(pointer) then
-		return bit.band(mainmemory.readbyte(pointer + 0x0B), 0x03);
-	end
-	return 0;
-end
-
-function getStructCollectable(pointer)
-	if isRDRAM(pointer) then
-		return bit.band(mainmemory.readbyte(pointer + 0x0B), 0x10)/16;
-	end
-end
-
-function getStructRotationDirection(pointer)
-	if isRDRAM(pointer) then
-		if bit.band(mainmemory.readbyte(pointer + 0x0B), 0x80) ~= 0 then
-			return "ClockWise"
-		else
-			return "CounterClockWise"
-		end
-	end
-end
-
-function getItemType(pointer)
-	if isRDRAM(pointer) then
-		return bit.rshift(mainmemory.read_u16_be(pointer), 4);
-	end
-	return 0;
-end
-
-function getStructName(pointer)
-	local structType = getStructType(pointer);
-	local itemType = getItemType(pointer);
-	if structType == 0 then
-		if type(struct_array_types[structType][itemType]) == "string" then
-			return struct_array_types[structType][itemType];
-		--else
-		--	return "Unknown Collectable ("..toHexString(itemType)..")";
-		end
-	elseif structType == 2 then
-		if type(struct_array_types[structType][itemType]) == "string" then
-			return struct_array_types[structType][itemType];
-		end
-	end
-	return "Unknown ("..structType.."->"..toHexString(itemType)..")";
-end
-
-function isKnownStruct(pointer)
-	local structType = getStructType(pointer);
-	local itemType = getItemType(pointer);
-	if structType == 0 then
-		if type(struct_array_types[0][itemType]) == "string" then
-			return true;
-		end
-	elseif structType == 2 then
-		if type(struct_array_types[2][itemType]) == "string" then
-			return true;
-		end
-	end
-	return false;
-end
-
-function getStructData(pointer)
-	local structData = {};
-
-	if isRDRAM(pointer) then
-		table.insert(structData, {"Slot Base", toHexString(pointer)});
-		table.insert(structData, {"Name", getStructName(pointer)});
-		table.insert(structData, {"Collectable", getStructCollectable(pointer)});
-		table.insert(structData, {"Struct Type", getStructType(pointer)});
-		table.insert(structData, {"Item Type", getItemType(pointer)});
-		table.insert(structData, {"Separator", 1});
-
-		table.insert(structData, {"X", mainmemory.read_s16_be(pointer + 0x04)});
-		table.insert(structData, {"Y", mainmemory.read_s16_be(pointer + 0x06)});
-		table.insert(structData, {"Z", mainmemory.read_s16_be(pointer + 0x08)});
-		table.insert(structData, {"Scale", mainmemory.read_u16_be(pointer + 0x02)});
-		table.insert(structData, {"Rot Dir", getStructRotationDirection(pointer)});
-	end
-
-	return structData;
-end
-
-function setStructPosition(pointer, x, y, z)
-	if isRDRAM(pointer) then
-		mainmemory.write_s16_be(pointer + 0x04, x);
-		mainmemory.write_s16_be(pointer + 0x06, y);
-		mainmemory.write_s16_be(pointer + 0x08, z);
-	end
-end
-
 --------------
 -- Analysis --
 --------------
@@ -1738,7 +1737,6 @@ function resolveVariableName(name) -- TODO: Get this function working for any ob
 	name = string.upper(name);
 
 	-- Comparison loop
-	local relative_address, variable_data;
 	for relative_address, variable_data in pairs(slot_variables) do
 		if type(variable_data) == "table" then
 			if type(variable_data.Name) == "string" and string.upper(variable_data.Name) == name then
@@ -1790,12 +1788,11 @@ function getAllUnique(variable)
 	end
 	if type(slot_variables[variable]) == "table" then
 		local unique_values = {};
-		local value, count;
 		if type(slot_data) ~= "table" or #slot_data == 0 then
 			parseSlotData();
 		end
 		for i = 1, #slot_data do
-			value = formatForOutput(slot_variables[variable].Type, slot_data[i][variable]);
+			local value = formatForOutput(slot_variables[variable].Type, slot_data[i][variable]);
 			if type(unique_values[value]) ~= "nil" then
 				unique_values[value] = unique_values[value] + 1;
 			else
@@ -1812,7 +1809,7 @@ function getAllUnique(variable)
 	end
 end
 
-function getNumSlots()
+local function getNumSlots()
 	if script_mode == "Examine" or script_mode == "List" then -- Model 1
 		local objectArray = dereferencePointer(Game.Memory.object_array_pointer[version]);
 		if isRDRAM(objectArray) then
@@ -1940,10 +1937,6 @@ function drawObjectPositions()
 			zDifference = mainmemory.read_s16_be(slotBase + 0x08) - cameraData.zPos;
 		end
 
-		local drawXPos = 0;
-		local drawYPos = 0;
-		local scaling_factor = 0;
-
 		-- Transform object point to point in coordinate system based on camera normal
 		-- Rotation transform 1
 		local tempData = {
@@ -1971,11 +1964,11 @@ function drawObjectPositions()
 				if XAngle_local <= (viewport_XAngleRange / 2) and XAngle_local > (-viewport_YAngleRange / 2) then
 
 					-- At this point object is selectable/draggable
-					drawXPos = (screen.width / 2) * math.sin(YAngle_local) / math.sin(viewport_YAngleRange * math.pi / 360) + screen.width / 2;
-					drawYPos = -(screen.height / 2) * math.sin(XAngle_local) / math.sin(viewport_XAngleRange * math.pi / 360) + screen.height / 2;
+					local drawXPos = (screen.width / 2) * math.sin(YAngle_local) / math.sin(viewport_YAngleRange * math.pi / 360) + screen.width / 2;
+					local drawYPos = -(screen.height / 2) * math.sin(XAngle_local) / math.sin(viewport_XAngleRange * math.pi / 360) + screen.height / 2;
 
 					--calc scaling factor -- current calc might be incorrect
-					scaling_factor = reference_distance / objectData.zPos;
+					local scaling_factor = reference_distance / objectData.zPos;
 					-- Object selection
 					if draggedObjects[1] ~= nil then
 						if i == draggedObjects[1][1] then
@@ -2040,21 +2033,20 @@ end
 -- Data acquisition --
 ----------------------
 
-function processSlot(slot_base) -- TODO: Improve this based on the SM64 module implementation
+function processSlot(slotBase) -- TODO: Improve this based on the SM64 module implementation
 	local current_slot_variables = {};
-	local relative_address, variable_data;
 	for relative_address, variable_data in pairs(slot_variables) do
 		if type(variable_data) == "table" then
 			if variable_data.Type == "Byte" then
-				current_slot_variables[relative_address] = mainmemory.readbyte(slot_base + relative_address);
+				current_slot_variables[relative_address] = mainmemory.readbyte(slotBase + relative_address);
 			elseif variable_data.Type == "u16_be" then
-				current_slot_variables[relative_address] = mainmemory.read_u16_be(slot_base + relative_address);
+				current_slot_variables[relative_address] = mainmemory.read_u16_be(slotBase + relative_address);
 			elseif variable_data.Type == "u8" then
-				current_slot_variables[relative_address] = mainmemory.read_u8(slot_base + relative_address);
+				current_slot_variables[relative_address] = mainmemory.read_u8(slotBase + relative_address);
 			elseif variable_data.Type == "Z4_Unknown" or variable_data.Type == "Pointer" or variable_data.Type == "u32_be" then
-				current_slot_variables[relative_address] = mainmemory.read_u32_be(slot_base + relative_address);
+				current_slot_variables[relative_address] = mainmemory.read_u32_be(slotBase + relative_address);
 			elseif variable_data.Type == "Float" then
-				current_slot_variables[relative_address] = mainmemory.readfloat(slot_base + relative_address, true);
+				current_slot_variables[relative_address] = mainmemory.readfloat(slotBase + relative_address, true);
 			end
 		end
 	end
@@ -2194,25 +2186,24 @@ local function toggleObjectAnalysisToolsMode()
 	script_mode = script_modes[script_mode_index];
 end
 
-function getExamineData(slot_base) -- TODO: Improve this based on SM64 module implementation
+function getExamineData(slotBase) -- TODO: Improve this based on SM64 module implementation
 	local current_slot_variables = {};
-	local relative_address, variable_data;
 	for relative_address = 0, slot_size do
-		variable_data = slot_variables[relative_address];
+		local variable_data = slot_variables[relative_address];
 		if type(variable_data) == "table" then
 			local variableName = getVariableName(relative_address);
 			if variable_data.Type == "Byte" then
-				table.insert(current_slot_variables, {variableName, formatForOutput(variable_data.Type, mainmemory.readbyte(slot_base + relative_address))});
+				table.insert(current_slot_variables, {variableName, formatForOutput(variable_data.Type, mainmemory.readbyte(slotBase + relative_address))});
 			elseif variable_data.Type == "u16_be" then
-				table.insert(current_slot_variables, {variableName, formatForOutput(variable_data.Type, mainmemory.read_u16_be(slot_base + relative_address))});
+				table.insert(current_slot_variables, {variableName, formatForOutput(variable_data.Type, mainmemory.read_u16_be(slotBase + relative_address))});
 			elseif variable_data.Type == "u8" then
-				table.insert(current_slot_variables, {variableName, formatForOutput(variable_data.Type, mainmemory.read_u8(slot_base + relative_address))});
+				table.insert(current_slot_variables, {variableName, formatForOutput(variable_data.Type, mainmemory.read_u8(slotBase + relative_address))});
 			elseif variable_data.Type == "Z4_Unknown" then
 				-- Don't print yo
 			elseif variable_data.Type == "Pointer" or variable_data.Type == "u32_be" then
-				table.insert(current_slot_variables, {variableName, formatForOutput(variable_data.Type, mainmemory.read_u32_be(slot_base + relative_address))});
+				table.insert(current_slot_variables, {variableName, formatForOutput(variable_data.Type, mainmemory.read_u32_be(slotBase + relative_address))});
 			elseif variable_data.Type == "Float" then
-				table.insert(current_slot_variables, {variableName, formatForOutput(variable_data.Type, mainmemory.readfloat(slot_base + relative_address, true))});
+				table.insert(current_slot_variables, {variableName, formatForOutput(variable_data.Type, mainmemory.readfloat(slotBase + relative_address, true))});
 			end
 		end
 	end
@@ -2553,7 +2544,7 @@ local squareSize = 0x20;
 local numSquares = 95;
 
 -- 0x08 Byte - Question Type
-local questionTypes = {
+local question_types = {
 	[0x00] = "None",
 	[0x01] = "BK",
 	[0x02] = "Screen",
@@ -2583,7 +2574,7 @@ end
 function dumpFFBoard()
 	for i = 0, numSquares do
 		local brightness = round(mainmemory.readfloat(Game.Memory.board_base[version] + i * squareSize + 0x10, true), 3);
-		local questionType = questionTypes[mainmemory.readbyte(Game.Memory.board_base[version] + i * squareSize + 0x08)];
+		local questionType = question_types[mainmemory.readbyte(Game.Memory.board_base[version] + i * squareSize + 0x08)];
 		dprint(toHexString(Game.Memory.board_base[version] + i * squareSize)..": "..i..": brightness "..brightness.." "..questionType);
 	end
 	print_deferred();
@@ -2637,12 +2628,12 @@ local function getVileSlotBase(objectArray, index)
 end
 
 local function fireSlot(objectArray, index, slotType)
-	current_slot_base = getVileSlotBase(objectArray, index);
-	if isRDRAM(current_slot_base) then
-		mainmemory.writebyte(current_slot_base + slot_state, 0x0C);
-		mainmemory.writebyte(current_slot_base + slot_type, slotType);
-		mainmemory.writefloat(current_slot_base + popped_amount, 1.0, true);
-		mainmemory.writefloat(current_slot_base + slot_timer, 0.1, true);
+	local currentSlotBase = getVileSlotBase(objectArray, index);
+	if isRDRAM(currentSlotBase) then
+		mainmemory.writebyte(currentSlotBase + slot_state, 0x0C);
+		mainmemory.writebyte(currentSlotBase + slot_type, slotType);
+		mainmemory.writefloat(currentSlotBase + popped_amount, 1.0, true);
+		mainmemory.writefloat(currentSlotBase + slot_timer, 0.1, true);
 	end
 end
 
@@ -3229,7 +3220,7 @@ function clearFlag(flagType, index)
 		else
 			containingByte = containingByte + (index / 8);
 		end
-		flagByte = mainmemory.readbyte(containingByte);
+		local flagByte = mainmemory.readbyte(containingByte);
 		flagByte = bit.band(flagByte, bit.bnot(bit.lshift(1, index % 8)));
 		mainmemory.writebyte(containingByte, flagByte);
 	end
