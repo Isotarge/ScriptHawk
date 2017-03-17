@@ -64,7 +64,7 @@ Game.Memory = {
 	["y_velocity"] = {0x33B1B8, 0x30947C, 0x31DA0C, 0x339E48}, -- Float
 	["map"] = {0x32DDF8, 0x2F9FC8, 0x30D528, 0x32CE98}, -- u16_be
 	["object_list"] = {0x33D488, 0x30B0B8, 0x31F648, 0x33C118},
-	["global_object_data"] = {nil, 0x386A20, nil, nil}, -- TODO: Find on all versions
+	["global_object_data"] = {0x38BD88, 0x386A20, 0x388980, 0x38BD88},
 };
 
 function Game.detectVersion(romName, romHash)
