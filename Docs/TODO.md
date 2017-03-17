@@ -14,7 +14,6 @@
 - DK64:
 	- Find menu cutscene nonsense
 	- Finish flag documentation
-	- Exception when gui.cleargraphics() is called on first frame (by MJ minimap)
 
 ##Low priority, recurring, or waiting:
 - Object Analysis Tools:

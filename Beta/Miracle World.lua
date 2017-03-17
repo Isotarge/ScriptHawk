@@ -145,10 +145,6 @@ local function draw_ui()
 	local width = 8; -- Text column width
 	local mouse = input.getmouse();
 
-	if showHitbox then
-		gui.clearGraphics();
-	end
-
 	-- Draw mouse pixel
 	--gui.drawPixel(mouse.X, mouse.Y, red);
 

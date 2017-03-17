@@ -6,7 +6,7 @@
 local slotAddress = {};
 local slotCount = 3
 
-function getSlots()
+local function getSlots()
 	local pointer = mainmemory.read_u8(0x10DC);
 	local slot = {};
 	for i = 1, slotCount do
@@ -19,7 +19,7 @@ function getSlots()
 	return slot;
 end
 
-function draw_ui()
+local function draw_ui()
 	local slot = getSlots();
 
 	local gui_x = 0;

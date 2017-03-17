@@ -51,7 +51,7 @@ if result == true then
 	while true do
 		if client.ispaused() then
 			gui.cleartext();
-			gui.clearGraphics();
+			--gui.clearGraphics();
 			ScriptHawk.UI.updateReadouts();
 			Game.drawUI();
 		end

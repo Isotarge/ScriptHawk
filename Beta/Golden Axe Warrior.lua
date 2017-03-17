@@ -249,12 +249,8 @@ function killAllEnemies()
 	end
 end
 
-function drawObjects()
+local function drawObjects()
 	local mouse = input.getmouse();
-
-	if showHitbox then
-		gui.clearGraphics();
-	end
 
 	local startDrag = false;
 	local dragging = false;

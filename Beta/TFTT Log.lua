@@ -1,4 +1,4 @@
-function toHexString(value, desiredLength, prefix)
+local function toHexString(value, desiredLength, prefix)
 	value = string.format("%X", value or 0);
 	prefix = prefix or "0x";
 	desiredLength = desiredLength or string.len(value);
@@ -8,22 +8,22 @@ function toHexString(value, desiredLength, prefix)
 	return prefix..value;
 end
 
---[[ rPrint(struct, [limit], [indent])   Recursively print arbitrary data. 
+--[[ rPrint(struct, [limit], [indent])   Recursively print arbitrary data.
 Set limit (default 100) to stanch infinite loops.
 Indents tables as [KEY] VALUE, nested tables as [KEY] [KEY]...[KEY] VALUE
 Set indent ("") to prefix each line:    Mytable [KEY] [KEY]...[KEY] VALUE
 --]]
-function rPrint(s, l, i) -- recursive Print (structure, limit, indent)
+local function rPrint(s, l, i) -- recursive Print (structure, limit, indent)
 	l = (l) or 100; i = i or "";	-- default item limit, indent string
-	if (l<1) then print "ERROR: Item limit reached."; return l-1 end;
+	if (l < 1) then print "ERROR: Item limit reached."; return l - 1; end
 	local ts = type(s);
-	if (ts ~= "table") then print (i,ts,s); return l-1 end
-	print (i,ts);           -- print "table"
-	for k,v in pairs(s) do  -- print "[KEY] VALUE"
+	if (ts ~= "table") then print (i, ts, s); return l - 1; end
+	print (i, ts);           -- print "table"
+	for k, v in pairs(s) do  -- print "[KEY] VALUE"
 		l = rPrint(v, l, i.."\t["..tostring(k).."]");
-		if (l < 0) then break end
+		if (l < 0) then break; end
 	end
-	return l
+	return l;
 end
 
 local displayModes = {
@@ -33,7 +33,7 @@ local displayModes = {
 };
 currentDisplayMode = 1;
 
-function toggleDisplayMode()
+local function toggleDisplayMode()
 	currentDisplayMode = currentDisplayMode + 1;
 	if currentDisplayMode > #displayModes then
 		currentDisplayMode = 1;
@@ -41,7 +41,7 @@ function toggleDisplayMode()
 end
 
 displayEmptySectors = true;
-function toggleDisplayEmptySectors()
+local function toggleDisplayEmptySectors()
 	displayEmptySectors = not displayEmptySectors;
 end
 
@@ -132,7 +132,7 @@ local researchTypes = {
 	},
 };
 
-function getResearchString(data)
+local function getResearchString(data)
 	local researchString = "lab: ";
 	if researchTypes[data.research_type] ~= nil then
 		if researchTypes[data.research_type][data.research_index] ~= nil then
@@ -146,74 +146,74 @@ function getResearchString(data)
 end
 
 local sectorData = {
-	["ticker"] = {
-		["pop"] = 0x00, -- u16_be
-		["ticker"] = 0x08, -- 12.4 fixed point (u16_be / 16)
-		["pop_scaled"] = 0x0A, -- u16_be
+	ticker = {
+		pop = 0x00, -- u16_be
+		ticker = 0x08, -- 12.4 fixed point (u16_be / 16)
+		pop_scaled = 0x0A, -- u16_be
 	},
-	["tickers"] = {
-		["tower_construction"] = {
-			["scarlet"] = 0x10,
-			["caesar"] = 0x28,
-			["oberon"] = 0x40,
-			["madcap"] = 0x58,
+	tickers = {
+		tower_construction = {
+			scarlet = 0x10,
+			caesar = 0x28,
+			oberon = 0x40,
+			madcap = 0x58,
 		},
-		["mine_construction"] = 0x70,
-		["lab_construction"] = 0x88,
-		["factory_construction"] = 0xA0,
-		["breed"] = 0xB2,
-		["research"] = 0xC4,
-		["factory"] = 0xD8,
-		["element1"] = 0x134,
-		["element2"] = 0x144,
-		["element3"] = 0x154,
-		["element4"] = 0x164,
+		mine_construction = 0x70,
+		lab_construction = 0x88,
+		factory_construction = 0xA0,
+		breed = 0xB2,
+		research = 0xC4,
+		factory = 0xD8,
+		element1 = 0x134,
+		element2 = 0x144,
+		element3 = 0x154,
+		element4 = 0x164,
 	},
-	["element1_index"] = 0x140, -- s16_be
-	["element2_index"] = 0x150, -- s16_be
-	["element3_index"] = 0x160, -- s16_be
-	["element4_index"] = 0x170, -- s16_be
-	["element_total_array"] = 0x174, -- 0x13 entries
-	["research_type"] = 0xBE, -- s16_be
-	["research_index"] = 0xC0, -- u16_be
-	["factory_quantity"] = 0xD6, -- u16_be, 0x00 = infinite
-	["recipe_base_shield"] = 0x1AC, -- Array of recipes, 10 elements, 0x0A each
-	["recipe_base_defense"] = 0x200, -- Array of recipes, 10 elements, 0x0A each
-	["recipe_base_weapon"] = 0x264, -- Array of recipes, 10 elements, 0x0A each
-	["army_bases"] = {
-		["scarlet"] = 0x2C8,
-		["caesar"] = 0x2D3,
-		["oberon"] = 0x2DE,
-		["madcap"] = 0x2E9,
+	element1_index = 0x140, -- s16_be
+	element2_index = 0x150, -- s16_be
+	element3_index = 0x160, -- s16_be
+	element4_index = 0x170, -- s16_be
+	element_total_array = 0x174, -- 0x13 entries
+	research_type = 0xBE, -- s16_be
+	research_index = 0xC0, -- u16_be
+	factory_quantity = 0xD6, -- u16_be, 0x00 = infinite
+	recipe_base_shield = 0x1AC, -- Array of recipes, 10 elements, 0x0A each
+	recipe_base_defense = 0x200, -- Array of recipes, 10 elements, 0x0A each
+	recipe_base_weapon = 0x264, -- Array of recipes, 10 elements, 0x0A each
+	army_bases = {
+		scarlet = 0x2C8,
+		caesar = 0x2D3,
+		oberon = 0x2DE,
+		madcap = 0x2E9,
 	},
-	["army"] = { -- Size 0x0B
-		["rocks"] = 0x00, -- u8
-		["catapaults"] = 0x01, -- u8
-		["pikes"] = 0x02, -- u8
-		["longbows"] = 0x03, -- u8
-		["giant_catapaults"] = 0x04, -- u8
-		["cannons"] = 0x05, -- u8
+	army = { -- Size 0x0B
+		rocks = 0x00, -- u8
+		catapaults = 0x01, -- u8
+		pikes = 0x02, -- u8
+		longbows = 0x03, -- u8
+		giant_catapaults = 0x04, -- u8
+		cannons = 0x05, -- u8
 		--["?"] = 0x06, -- u8 -- TODO
-		["planes"] = 0x07, -- u8
-		["jets"] = 0x08, -- u8
-		["UFOs"] = 0x09, -- u8
-		["unarmed"] = 0x0A, -- u8
+		planes = 0x07, -- u8
+		jets = 0x08, -- u8
+		UFOs = 0x09, -- u8
+		unarmed = 0x0A, -- u8
 	},
-	["army_totals"] = {
-		["scarlet"] = 0x2F4, -- u16_be
-		["caesar"] = 0x2F6, -- u16_be
-		["oberon"] = 0x2F8, -- u16_be
-		["madcap"] = 0x2FA, -- u16_be
+	army_totals = {
+		scarlet = 0x2F4, -- u16_be
+		caesar = 0x2F6, -- u16_be
+		oberon = 0x2F8, -- u16_be
+		madcap = 0x2FA, -- u16_be
 	},
-	["defenses"] = 0x3B8, -- Array, 10 bytes, TTTTMMLFFF
-	["tower_health"] = 0x3D6, -- u16_be
-	["mine_health"] = 0x3D8, -- u16_be
-	["lab_health"] = 0x3DA, -- u16_be
-	["factory_health"] = 0x3DC, -- u16_be
-	["owner"] = 0x3FE, -- u16_be
-	["population"] = 0x406, -- u16_be
-	["epoch"] = 0x418, -- u16_be
-	["status"] = 0x448, -- u16_be (0x0000 unusable, 0x8000 normal, 0x4000 nuked)
+	defenses = 0x3B8, -- Array, 10 bytes, TTTTMMLFFF
+	tower_health = 0x3D6, -- u16_be
+	mine_health = 0x3D8, -- u16_be
+	lab_health = 0x3DA, -- u16_be
+	factory_health = 0x3DC, -- u16_be
+	owner = 0x3FE, -- u16_be
+	population = 0x406, -- u16_be
+	epoch = 0x418, -- u16_be
+	status = 0x448, -- u16_be (0x0000 unusable, 0x8000 normal, 0x4000 nuked)
 };
 
 local OSDPosition = {2, 2};
@@ -221,48 +221,48 @@ local OSDRowHeight = 16;
 local OSDCharacterWidth = 10;
 
 local emptyArmy = {
-	["rocks"] = 0,
-	["catapaults"] = 0,
-	["pikes"] = 0,
-	["longbows"] = 0,
-	["giant_catapaults"] = 0,
-	["cannons"] = 0,
+	rocks = 0,
+	catapaults = 0,
+	pikes = 0,
+	longbows = 0,
+	giant_catapaults = 0,
+	cannons = 0,
 	-- TODO
-	["planes"] = 0,
-	["jets"] = 0,
-	["UFOs"] = 0,
-	["unarmed"] = 0,
-	["total"] = 0,
+	planes = 0,
+	jets = 0,
+	UFOs = 0,
+	unarmed = 0,
+	total = 0,
 };
 
-function getArmyData(sector, army, total)
+local function getArmyData(sector, army, total)
 	total = mainmemory.read_u16_be(sector + total);
 	if total > 0 then
 		army = sector + army;
 		return {
-			["rocks"] = mainmemory.read_u8(army + sectorData.army.rocks),
-			["catapaults"] = mainmemory.read_u8(army + sectorData.army.catapaults),
-			["pikes"] = mainmemory.read_u8(army + sectorData.army.pikes),
-			["longbows"] = mainmemory.read_u8(army + sectorData.army.longbows),
-			["giant_catapaults"] = mainmemory.read_u8(army + sectorData.army.giant_catapaults),
-			["cannons"] = mainmemory.read_u8(army + sectorData.army.cannons),
+			rocks = mainmemory.read_u8(army + sectorData.army.rocks),
+			catapaults = mainmemory.read_u8(army + sectorData.army.catapaults),
+			pikes = mainmemory.read_u8(army + sectorData.army.pikes),
+			longbows = mainmemory.read_u8(army + sectorData.army.longbows),
+			giant_catapaults = mainmemory.read_u8(army + sectorData.army.giant_catapaults),
+			cannons = mainmemory.read_u8(army + sectorData.army.cannons),
 			-- TODO
-			["planes"] = mainmemory.read_u8(army + sectorData.army.planes),
-			["jets"] = mainmemory.read_u8(army + sectorData.army.jets),
-			["UFOs"] = mainmemory.read_u8(army + sectorData.army.UFOs),
-			["unarmed"] = mainmemory.read_u8(army + sectorData.army.unarmed),
-			["total"] = total,
+			planes = mainmemory.read_u8(army + sectorData.army.planes),
+			jets = mainmemory.read_u8(army + sectorData.army.jets),
+			UFOs = mainmemory.read_u8(army + sectorData.army.UFOs),
+			unarmed = mainmemory.read_u8(army + sectorData.army.unarmed),
+			total = total,
 		};
 	else
 		return emptyArmy;
 	end
 end
 
-function getTickerData(ticker)
+local function getTickerData(ticker)
 	return {
-		["pop"] = mainmemory.read_u16_be(ticker + sectorData.ticker.pop),
-		["ticker"] = mainmemory.read_u16_be(ticker + sectorData.ticker.ticker) / 16,
-		["pop_scaled"] = mainmemory.read_u16_be(ticker + sectorData.ticker.pop_scaled),
+		pop = mainmemory.read_u16_be(ticker + sectorData.ticker.pop),
+		ticker = mainmemory.read_u16_be(ticker + sectorData.ticker.ticker) / 16,
+		pop_scaled = mainmemory.read_u16_be(ticker + sectorData.ticker.pop_scaled),
 	};
 end
 
@@ -289,15 +289,15 @@ local elementNames = {
 	[19] = "Alien",
 };
 
-function getRecipeData(sector, recipeArrayBase, recipeType)
+local function getRecipeData(sector, recipeArrayBase, recipeType)
 	local recipeData = {};
 	for i = 0, 9 do
 		local recipe = {};
 		local recipeBase = sector + recipeArrayBase + i * 10;
 		for elementIndex = 0, 4 do
 			local elementData = {
-				["element"] = mainmemory.readbyte(recipeBase + elementIndex * 2),
-				["quantity"] = mainmemory.readbyte(recipeBase + elementIndex * 2 + 1) / 2,
+				element = mainmemory.readbyte(recipeBase + elementIndex * 2),
+				quantity = mainmemory.readbyte(recipeBase + elementIndex * 2 + 1) / 2,
 			};
 			if elementData.element == 0 and elementData.quantity == 0 then
 				--Speed up this function by breaking out of fake recipes since we don't return them anyway
@@ -315,14 +315,14 @@ function getRecipeData(sector, recipeArrayBase, recipeType)
 	return recipeData;
 end
 
-function getElementData(sector, indexOffset)
+local function getElementData(sector, indexOffset)
 	local elementIndex = mainmemory.read_s16_be(sector + indexOffset);
 	local elementData = {
-		["index"] = elementIndex,
-		["name"] = "None",
-		["quantity"] = 0,
-		["remaining"] = 0,
-		["total"] = 0,
+		index = elementIndex,
+		name = "None",
+		quantity = 0,
+		remaining = 0,
+		total = 0,
 	};
 
 	if elementData.index >= 0 then
@@ -338,7 +338,7 @@ function getElementData(sector, indexOffset)
 	return elementData;
 end
 
-function getSectorData(sector)
+local function getSectorData(sector)
 	local data = {};
 
 	data.status = mainmemory.read_u16_be(sector + sectorData.status);
@@ -348,22 +348,22 @@ function getSectorData(sector)
 	end
 
 	data.tickers = {
-		["tower_construction"] = {
-			["scarlet"] = getTickerData(sector + sectorData.tickers.tower_construction.scarlet),
-			["caesar"] = getTickerData(sector + sectorData.tickers.tower_construction.caesar),
-			["oberon"] = getTickerData(sector + sectorData.tickers.tower_construction.oberon),
-			["madcap"] = getTickerData(sector + sectorData.tickers.tower_construction.madcap),
+		tower_construction = {
+			scarlet = getTickerData(sector + sectorData.tickers.tower_construction.scarlet),
+			caesar = getTickerData(sector + sectorData.tickers.tower_construction.caesar),
+			oberon = getTickerData(sector + sectorData.tickers.tower_construction.oberon),
+			madcap = getTickerData(sector + sectorData.tickers.tower_construction.madcap),
 		},
-		["mine_construction"] = getTickerData(sector + sectorData.tickers.mine_construction),
-		["lab_construction"] = getTickerData(sector + sectorData.tickers.lab_construction),
-		["factory_construction"] = getTickerData(sector + sectorData.tickers.factory_construction),
-		["breed"] = getTickerData(sector + sectorData.tickers.breed),
-		["research"] = getTickerData(sector + sectorData.tickers.research),
-		["factory"] = getTickerData(sector + sectorData.tickers.factory),
-		["element1"] = getTickerData(sector + sectorData.tickers.element1),
-		["element2"] = getTickerData(sector + sectorData.tickers.element2),
-		["element3"] = getTickerData(sector + sectorData.tickers.element3),
-		["element4"] = getTickerData(sector + sectorData.tickers.element4),
+		mine_construction = getTickerData(sector + sectorData.tickers.mine_construction),
+		lab_construction = getTickerData(sector + sectorData.tickers.lab_construction),
+		factory_construction = getTickerData(sector + sectorData.tickers.factory_construction),
+		breed = getTickerData(sector + sectorData.tickers.breed),
+		research = getTickerData(sector + sectorData.tickers.research),
+		factory = getTickerData(sector + sectorData.tickers.factory),
+		element1 = getTickerData(sector + sectorData.tickers.element1),
+		element2 = getTickerData(sector + sectorData.tickers.element2),
+		element3 = getTickerData(sector + sectorData.tickers.element3),
+		element4 = getTickerData(sector + sectorData.tickers.element4),
 	};
 
 	data.population = mainmemory.read_u16_be(sector + sectorData.population);
@@ -374,9 +374,9 @@ function getSectorData(sector)
 	data.research_index = mainmemory.read_u16_be(sector + sectorData.research_index);
 
 	data.recipes = {
-		["shield"] = getRecipeData(sector, sectorData.recipe_base_shield, 0),
-		["defense"] = getRecipeData(sector, sectorData.recipe_base_defense, 1),
-		["weapon"] = getRecipeData(sector, sectorData.recipe_base_weapon, 2),
+		shield = getRecipeData(sector, sectorData.recipe_base_shield, 0),
+		defense = getRecipeData(sector, sectorData.recipe_base_defense, 1),
+		weapon = getRecipeData(sector, sectorData.recipe_base_weapon, 2),
 	};
 
 	data.factory_quantity = mainmemory.read_u16_be(sector + sectorData.factory_quantity);
@@ -393,20 +393,20 @@ function getSectorData(sector)
 	data.element4 = getElementData(sector, sectorData.element4_index);
 
 	data.army = {
-		["scarlet"] = getArmyData(sector, sectorData.army_bases.scarlet, sectorData.army_totals.scarlet),
-		["caesar"] = getArmyData(sector, sectorData.army_bases.caesar, sectorData.army_totals.caesar),
-		["oberon"] = getArmyData(sector, sectorData.army_bases.oberon, sectorData.army_totals.oberon),
-		["madcap"] = getArmyData(sector, sectorData.army_bases.madcap, sectorData.army_totals.madcap),
+		scarlet = getArmyData(sector, sectorData.army_bases.scarlet, sectorData.army_totals.scarlet),
+		caesar = getArmyData(sector, sectorData.army_bases.caesar, sectorData.army_totals.caesar),
+		oberon = getArmyData(sector, sectorData.army_bases.oberon, sectorData.army_totals.oberon),
+		madcap = getArmyData(sector, sectorData.army_bases.madcap, sectorData.army_totals.madcap),
 	};
 
 	return data;
 end
 
-function printSectorData(sector)
+local function printSectorData(sector)
 	rPrint(getSectorData(sector), 10000);
 end
 
-function getArmyString(data)
+local function getArmyString(data)
 	local armyString = "armies: ";
 	armyString = armyString..data.army.scarlet.total..",";
 	armyString = armyString..data.army.caesar.total..",";
@@ -417,7 +417,7 @@ end
 
 local CPressed = false;
 local VPressed = false;
-function draw_OSD()
+local function draw_OSD()
 	local row = 0;
 
 	local input_table = input.get();
@@ -500,7 +500,7 @@ function dump()
 end
 
 function buildAll()
-	local character = mainmemory.read_u16_be(0xB364)
+	local character = mainmemory.read_u16_be(0xB364);
 	for i = 1, numSectors do
 		local sector = sectorBase + (i - 1) * sectorSize;
 		local data = getSectorData(sector);
@@ -510,6 +510,7 @@ function buildAll()
 	end
 end
 
+--[[
 function infiniteMen()
 	local character = mainmemory.read_u16_be(0xB364);
 	for i = 1, numSectors do
@@ -520,6 +521,7 @@ function infiniteMen()
 		end
 	end
 end
---event.onframestart(infiniteMen);
+event.onframestart(infiniteMen);
+]]--
 
 event.onframestart(draw_OSD);

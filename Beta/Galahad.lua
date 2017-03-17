@@ -10,7 +10,7 @@
 local object_index = 1;
 local max_objects = 51;
 
-function toHexString(value, desiredLength, prefix)
+local function toHexString(value, desiredLength, prefix)
 	value = string.format("%X", value or 0);
 	prefix = prefix or "0x";
 	desiredLength = desiredLength or string.len(value);
@@ -119,11 +119,11 @@ local held_item = {
 -- Code --
 ----------
 
-function getObjectBase(index)
+local function getObjectBase(index)
 	return object_start + object_size * (index - 1);
 end
 
-function getExamineData(objectBase)
+local function getExamineData(objectBase)
 	local examine_data = {};
 	table.insert(examine_data, {"Object Index", object_index.." ("..toHexString(objectBase)..")"});
 
@@ -184,8 +184,8 @@ function getExamineData(objectBase)
 	return examine_data;
 end
 
-function process_input()
-	input_table = input.get();
+local function process_input()
+	local input_table = input.get();
 
 	-- Hold down key prevention
 	if input_table[decrement_object_index_key] == nil then
@@ -208,7 +208,7 @@ function process_input()
 	end
 end
 
-function draw_ui()
+local function draw_ui()
 	local gui_x = 32;
 	local gui_y = 32;
 	local row = 0;

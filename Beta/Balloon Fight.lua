@@ -43,14 +43,10 @@ local mouseClickedLastFrame = false;
 local startDragPosition = {0,0};
 local draggedObjects = {};
 
-function drawObjects()
+local function drawObjects()
 	local height = 16; -- Text row height
 	local width = 8; -- Text column width
 	local mouse = input.getmouse();
-
-	if showHitbox then
-		gui.clearGraphics();
-	end
 
 	-- Draw mouse pixel
 	--gui.drawPixel(mouse.X, mouse.Y, red);

@@ -138,18 +138,18 @@ local map_base = 0xA00;
 local map_width = 0x0F;
 local map_height = 0x0C;
 
-function getHoleTile()
+local function getHoleTile()
 	return mainmemory.readbyte(0xAD2);
 end
 
-function getHolePosition()
+local function getHolePosition()
 	local holeTile = getHoleTile();
 	local xTile = holeTile % map_width;
 	local yTile = math.floor(holeTile / map_width);
 	return {xTile * 16 + 8, yTile * 16};
 end
 
-function renderHolePosition()
+local function renderHolePosition()
 	if gamemode == "overworld" then -- Don't render hole position in dungeons
 		local holePosition = getHolePosition();
 		gui.drawRectangle(holePosition[1], holePosition[2], 16, 16, green, 0x7F000000);
@@ -159,7 +159,7 @@ end
 
 -- Lag Detection
 local prevLag = -1;
-function detectLag()
+local function detectLag()
 	local currentLag = mainmemory.readbyte(0x808);
 	if enableLagDetection and gamemode == "vertical" then -- Only detect lag for vertical dungeons
 		if currentLag == prevLag then
@@ -171,7 +171,7 @@ function detectLag()
 	prevLag = currentLag;
 end
 
-function toHexString(value, desiredLength, prefix)
+local function toHexString(value, desiredLength, prefix)
 	value = string.format("%X", value or 0);
 	prefix = prefix or "0x";
 	desiredLength = desiredLength or string.len(value);
@@ -181,7 +181,7 @@ function toHexString(value, desiredLength, prefix)
 	return prefix..value;
 end
 
-function round(num, idp)
+local function round(num, idp)
 	return tonumber(string.format("%."..(idp or 0).."f", num));
 end
 
@@ -189,7 +189,7 @@ local mouseClickedLastFrame = false;
 local startDragPosition = {0,0};
 local draggedObjects = {};
 
-function drawObjects()
+local function drawObjects()
 	local height = 16; -- Text row height
 	local width = 8; -- Text column width
 	local mouse = input.getmouse();
@@ -345,21 +345,21 @@ function drawObjects()
 	end
 end
 
-function getGold()
+local function getGold()
 	local hundred_thousands = toHexString(mainmemory.readbyte(0x83F), 2, ""); -- 100000s
 	local thousands = toHexString(mainmemory.readbyte(0x840), 2, ""); -- 1000s
 	local tens = toHexString(mainmemory.readbyte(0x841), 2, ""); -- 10s
 	return hundred_thousands..thousands..tens.."0";
 end
 
-function getScreen()
+local function getScreen()
 	if gamemode == "vertical" then
 		return toHexString(mainmemory.readbyte(0x808), 2, "");
 	end
 	return toHexString(mainmemory.readbyte(0x809), 2, "");
 end
 
-function drawOSD()
+local function drawOSD()
 	-- Detect game mode
 	local playerType = mainmemory.readbyte(0x100);
 	if playerType == 0x5E or playerType == 0x81 then
