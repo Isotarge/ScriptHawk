@@ -130,15 +130,17 @@ SystemID N64
 76A064	d	u	1	RDRAM	Object Timer
 76A0A8	d	u	1	RDRAM	Current Map
 76A0AC	d	u	1	RDRAM	Current Exit
-76A0B1	b	h	1	RDRAM	Map State
+76A0B1	b	b	1	RDRAM	Map State
 76A0B3	b	h	1	RDRAM	Cutscene Bar State
 76A0CD	b	u	1	RDRAM	Adventure
-76A0DA	b	h	1	RDRAM	Mystery Menu
+76A0DA	b	u	1	RDRAM	Mystery Menu
 76A0E4	b	s	1	RDRAM	Player 1 Character (Multiplayer Selection)
 76A0E5	b	s	1	RDRAM	Player 2 Character (Multiplayer Selection)
 76A0E6	b	s	1	RDRAM	Player 3 Character (Multiplayer Selection)
 76A0E7	b	s	1	RDRAM	Player 4 Character (Multiplayer Selection)
-76AEF3	b	h	1	RDRAM	Previous Map
+76A173	b	u	1	RDRAM	Parent Map
+76A174	b	u	1	RDRAM	Parent Exit
+76AEF3	b	u	1	RDRAM	Previous Map
 76AF00	w	h	1	RDRAM	Some kind of frameskip value?
 76AF02	w	h	1	RDRAM	Some kind of frameskip value?
 76AF04	w	h	1	RDRAM	Some kind of frameskip value?

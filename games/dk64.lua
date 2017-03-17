@@ -71,7 +71,15 @@ local Game = {
 		["number_of_exits"] = {0x7FC904, 0x7FC844, 0x7FCD94, 0x7B6524}, -- Byte
 		["destination_map"] = {0x7444E4, 0x73EC34, 0x743DA4, 0x6F1CC4}, -- See Game.maps for values
 		["destination_exit"] = {0x7444E8, 0x73EC38, 0x743DA8, 0x6F1CC8},
-		["map_state"] = {0x76A0B1, 0x764BD1, 0x76A2A1, 0x72CDED}, -- byte, bitfield -- TODO: Document values
+		-- 1000 0000 - ????
+		-- 0100 0000 - ????
+		-- 0010 0000 - ????
+		-- 0001 0000 - In Cutscene
+		-- 0000 1000 - Always Set?
+		-- 0000 0100 - ????
+		-- 0000 0010 - ????
+		-- 0000 0001 - Reload Map
+		["map_state"] = {0x76A0B1, 0x764BD1, 0x76A2A1, 0x72CDED}, -- byte, bitfield -- TODO: Document remaining values
 		["loading_zone_array_size"] = {0x7FDCB0, 0x7FDBF0, 0x7FE140, 0x7B7410}, -- u16_be
 		["loading_zone_array"] = {0x7FDCB4, 0x7FDBF4, 0x7FE144, 0x7B7414},
 		["file"] = {0x7467C8, 0x740F18, 0x746088, nil},
@@ -736,13 +744,13 @@ obj_model1 = {
 		[51] = "Ammo Crate", -- Dropped by Red Klaptrap
 		[52] = "Orange Pickup", -- Dropped by Klump & Purple Klaptrap
 		[53] = "Banana Coin", -- Dropped by "Diddy", otherwise unused?
-		[54] = "DK Coin (54)", -- Unused?
+		[54] = "DK Coin", -- Minecart
 		[55] = "Small Explosion", -- Seasick Chunky
 		[56] = "Orangstand Sprint Barrel",
 		[57] = "Strong Kong Barrel",
 		[58] = "Swinging Light",
 		[59] = "Fireball", -- Mad Jack etc.
-		--[60] = "Unknown", -- Spawns during bananaporter
+		[60] = "Bananaporter",
 		[61] = "Boulder",
 		[62] = "Minecart", -- DK?
 		[63] = "Vase (O)",
