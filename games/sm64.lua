@@ -226,7 +226,7 @@ end
 
 function getExamineData(objectBase)
 	local examineData = {};
-	local relativeAddress, variable;
+	local variable;
 	for relativeAddress = 0, objectSize do
 		variable = object_vars[relativeAddress];
 		if type(variable) == "table" then

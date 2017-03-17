@@ -738,6 +738,7 @@ obj_model1 = {
 		[43] = "Feather",
 		[44] = "Laser", -- Projectile
 		[45] = "Golden Banana", -- Vulture, possibly some other places
+		[46] = "Barrel Gun", -- Teetering Turtle Trouble
 		[47] = "Watermelon Slice",
 		[48] = "Coconut",
 		[49] = "Rocketbarrel",
@@ -950,6 +951,8 @@ obj_model1 = {
 		[295] = "K. Rool (Chunky Phase)",
 		--[297] = "Unknown - Kritter Karnage",
 		[299] = "Textbox",
+		[300] = "Snake", -- Teetering Turtle Trouble
+		[301] = "Turtle", -- Teetering Turtle Trouble
 		[303] = "Toy Car",
 		[305] = "Missile", -- Car Race
 		[308] = "Seal",
@@ -966,7 +969,7 @@ obj_model1 = {
 		[323] = "Enemy Car", -- Car Race, aka George
 		[325] = "Shockwave", -- Simian Slam
 		[326] = "Main Menu Controller",
-		[327] = "Kong (Krazy Kong Klamour)",
+		[327] = "Kong", -- Krazy Kong Klamour
 		[328] = "Klaptrap", -- Peril Path Panic
 		[329] = "Fairy", -- Peril Path Panic
 		[330] = "Bug", -- Big Bug Bash
@@ -2514,7 +2517,7 @@ function populateObjectModel2Pointers()
 	object_pointers = {};
 	local objModel2Array = getObjectModel2Array();
 	if isRDRAM(objModel2Array) then
-		numSlots = mainmemory.read_u32_be(Game.Memory.obj_model2_array_count[version]);
+		local numSlots = mainmemory.read_u32_be(Game.Memory.obj_model2_array_count[version]);
 
 		if object_model2_filter == nil then
 			-- Fill and sort pointer list
@@ -2524,7 +2527,7 @@ function populateObjectModel2Pointers()
 		else
 			-- Fill and sort pointer list
 			for i = 1, numSlots do
-				base = objModel2Array + (i - 1) * obj_model2_slot_size;
+				local base = objModel2Array + (i - 1) * obj_model2_slot_size;
 				if string.contains(getScriptName(base), object_model2_filter) then
 					table.insert(object_pointers, base);
 				end
@@ -5301,7 +5304,6 @@ end
 
 function Game.paperMode()
 	local paper_thickness = 0.015;
-	local actorListIndex = 0;
 	local cameraObject = dereferencePointer(Game.Memory.camera_pointer[version]);
 
 	for actorListIndex = 0, getObjectModel1Count() do
@@ -6004,7 +6006,6 @@ koshBot.getDesiredSlot = function()
 		end
 
 		-- Check for kremlings
-		local slotIndex = 0;
 		local desiredSlot = 0;
 		for slotIndex = 1, 8 do
 			local slotPointer = koshBot.getSlotPointer(koshController, slotIndex);

@@ -100,7 +100,7 @@ local object_fields = {
 	["boss_health"] = 0x1E, -- byte
 };
 
-function toHexString(value, desiredLength, prefix)
+local function toHexString(value, desiredLength, prefix)
 	value = string.format("%X", value or 0);
 	prefix = prefix or "0x";
 	desiredLength = desiredLength or string.len(value);
@@ -110,11 +110,11 @@ function toHexString(value, desiredLength, prefix)
 	return prefix..value;
 end
 
-function round(num, idp)
+local function round(num, idp)
 	return tonumber(string.format("%."..(idp or 0).."f", num));
 end
 
-function countPlayerProjectiles()
+local function countPlayerProjectiles()
 	local num = 0;
 	for i = 0, object_array_capacity do
 		local objectBase = object_array_base + (i * object_size);
@@ -126,7 +126,7 @@ function countPlayerProjectiles()
 	return num;
 end
 
-function countEnemies()
+local function countEnemies()
 	local num = 0;
 	for i = 0, object_array_capacity do
 		local objectBase = object_array_base + (i * object_size);
@@ -140,7 +140,7 @@ function countEnemies()
 	return num;
 end
 
-function countObjects()
+local function countObjects()
 	local num = 0;
 	for i = 0, object_array_capacity do
 		local objectBase = object_array_base + (i * object_size);
@@ -152,30 +152,29 @@ function countObjects()
 	return num;
 end
 
-function getX()
+local function getX()
 	return mainmemory.read_s16_le(0xEB2);
 end
 
-function getY()
+local function getY()
 	return mainmemory.read_s16_le(0xEAF);
 end
 
-function getLevelX()
+local function getLevelX()
 	return mainmemory.read_u16_le(0xD72);
 end
 
-function getLevelY()
+local function getLevelY()
 	return mainmemory.read_u16_le(0xD2B);
 end
 
-local prevPosition = {0,0};
-local prevLevelPosition = {0,0};
+local prevPosition = {0, 0};
+local prevLevelPosition = {0, 0};
 local dx = 0;
 local dy = 0;
-local d = 0;
 local dcolor = white;
 
-function calculateDelta()
+local function calculateDelta()
 	local position = {getX(), getY()};
 	local levelPosition = {getLevelX(), getLevelY()};
 	dx = math.abs(prevLevelPosition[1] - levelPosition[1]) + math.abs(prevPosition[1] - position[1]);
@@ -190,19 +189,19 @@ function calculateDelta()
 end
 event.onframestart(calculateDelta, "ScriptHawk - Calculate Delta");
 
-function getHits()
+local function getHits()
 	return mainmemory.read_u16_le(0xDC4);
 end
 
-function getShots()
+local function getShots()
 	return mainmemory.read_u16_le(0xDC6);
 end
 
-function getOptimalShots()
+local function getOptimalShots()
 	return getHits() * 100 / 2 + 1;
 end
 
-function getHitRatio()
+local function getHitRatio()
 	local hits = getHits();
 	local shots = getShots();
 	if hits >= shots or (hits == 0 and shots == 0) then
@@ -211,7 +210,7 @@ function getHitRatio()
 	return round(hits / shots * 100, 2).."%";
 end
 
-function isBossLoaded()
+local function isBossLoaded()
 	for i = 0, object_array_capacity do
 		local objectBase = object_array_base + (i * object_size);
 		local objectType = mainmemory.readbyte(objectBase + object_fields.object_type);
@@ -222,7 +221,7 @@ function isBossLoaded()
 	return false;
 end
 
-function getBossHealth()
+local function getBossHealth()
 	for i = 0, object_array_capacity do
 		local objectBase = object_array_base + (i * object_size);
 		local objectType = mainmemory.readbyte(objectBase + object_fields.object_type);
@@ -234,17 +233,13 @@ function getBossHealth()
 end
 
 local mouseClickedLastFrame = false;
-local startDragPosition = {0,0};
+local startDragPosition = {0, 0};
 local draggedObjects = {};
 
-function drawObjects()
+local function drawObjects()
 	local height = 16; -- Text row height
 	local width = 8; -- Text column width
 	local mouse = input.getmouse();
-
-	if showHitbox then
-		gui.clearGraphics();
-	end
 
 	-- Draw mouse pixel
 	--gui.drawPixel(mouse.X, mouse.Y, red);
@@ -360,7 +355,7 @@ function drawObjects()
 	end
 end
 
-function drawOSD()
+local function drawOSD()
 	gui.cleartext();
 
 	local OSDX = 2;

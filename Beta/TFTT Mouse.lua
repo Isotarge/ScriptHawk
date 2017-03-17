@@ -1,7 +1,7 @@
 local cursorX = 0xB410;
 local cursorY = 0xB412;
 
-function doMouse()
+local function doMouse()
 	-- Make game cursor follow real cursor
 	local mousePos = input.getmouse();
 	mainmemory.write_u16_be(cursorX, mousePos.X * 2);
