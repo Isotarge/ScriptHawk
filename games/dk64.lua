@@ -522,7 +522,8 @@ function drawSubGameHitboxes()
 			local objectBase = Game.Memory.jetpac_enemy_base[version] + i * 0x50;
 			table.insert(draggableObjects, jetpacObjectBaseToDraggableObject(objectBase));
 		end
-		-- TODO: Player
+		-- Player
+		table.insert(draggableObjects, jetpacObjectBaseToDraggableObject(Game.Memory.jetman_position_x[version]));
 	end
 
 	for i = 1, #draggableObjects do
