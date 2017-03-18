@@ -3277,6 +3277,7 @@ object_model1 = {
 	["scale"] = 0x38, -- Float
 	["y_rotation"] = 0x48, -- Float
 	["z_rotation"] = 0x4C, -- Float
+	["transparency"] = 0x5B --Byte
 	["models"] = {
 		--TODO: Import list from
 			-- http://thumbsupmaster.blogspot.com.au/p/banjo-tooie-image-modifications.html
