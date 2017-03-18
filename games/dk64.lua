@@ -795,7 +795,7 @@ obj_model1 = {
 		[103] = "4 Pad (Diddy 5DI)",
 		[104] = "5 Pad (Diddy 5DI)",
 		[105] = "6 Pad (Diddy 5DI)",
-		[106] = "5DI Controller?", -- TODO: Investigate, might be something to do with Kong shadow?
+		[106] = "Kong Reflection",
 		[107] = "Bonus Barrel (Hideout Helm)",
 		[109] = "Race Checkpoint",
 		[110] = "CB Bunch", -- Unused? Doesn't seem to work, these are normally model 2
@@ -6740,7 +6740,7 @@ end
 function Game.setDiddyColors()
 	local playerObject = Game.getPlayerObject();
 	if isRDRAM(playerObject) then
-		local texturePointer = mainmemory.dereferencePointer(playerObject + obj_model1.texture_renderer_pointer);
+		local texturePointer = dereferencePointer(playerObject + obj_model1.texture_renderer_pointer);
 		if isRDRAM(texturePointer) then
 			local DiddyHatColors = {
 				{"Red (Normal)", 0},
@@ -6750,7 +6750,7 @@ function Game.setDiddyColors()
 				{"Purple", 19},
 				{"Dark Red", 24},
 				{"Green", 26},
-			}
+			};
 
 			texturePointer = getNextTextureRenderer(texturePointer); -- Skip Left eye
 			texturePointer = getNextTextureRenderer(texturePointer); -- Skip Right eye
