@@ -442,7 +442,7 @@ local mouseClickedLastFrame = false;
 local startDragPosition = {0, 0};
 local draggedObjects = {};
 
-function arcadeObjectBaseToDraggableObject(objectBase)
+local function arcadeObjectBaseToDraggableObject(objectBase)
 	local draggableObject = {
 		["objectBase"] = objectBase,
 		xPositionAddress = objectBase + arcade_object.x_position,
@@ -459,7 +459,7 @@ function arcadeObjectBaseToDraggableObject(objectBase)
 	return draggableObject;
 end
 
-function jetpacObjectBaseToDraggableObject(objectBase)
+local function jetpacObjectBaseToDraggableObject(objectBase)
 	local draggableObject = {
 		["objectBase"] = objectBase,
 		xPositionAddress = objectBase + 0x00,
@@ -476,7 +476,7 @@ function jetpacObjectBaseToDraggableObject(objectBase)
 	return draggableObject;
 end
 
-function drawSubGameHitboxes()
+local function drawSubGameHitboxes()
 	if version == 4 then
 		return;
 	end
@@ -565,13 +565,13 @@ end
 
 -- Relative to MJ state object
 local MJ_offsets = { -- US Defaults
-	["ticks_until_next_action"] = 0x2D,
-	["actions_remaining"] = 0x58,
-	["action_type"] = 0x59,
-	["current_position"] = 0x60,
-	["next_position"] = 0x61,
-	["white_switch_position"] = 0x64,
-	["blue_switch_position"] = 0x65
+	ticks_until_next_action = 0x2D,
+	actions_remaining = 0x58,
+	action_type = 0x59,
+	current_position = 0x60,
+	next_position = 0x61,
+	white_switch_position = 0x64,
+	blue_switch_position = 0x65
 };
 
 -----------------
@@ -1265,6 +1265,10 @@ local function getActorName(pointer)
 		return getActorNameFromBehavior(actorBehavior);
 	end
 	return "Unknown";
+end
+
+local function isKong(actorType)
+	return actorType >= 2 and actorType <= 6;
 end
 
 local function getExamineDataModelOne(pointer)
@@ -2465,14 +2469,14 @@ obj_model2 = {
 	["collectable_state"] = 0x8C, -- byte (bitfield)
 };
 
-function getObjectModel2Array()
+local function getObjectModel2Array()
 	if version ~= 4 then
 		return dereferencePointer(Game.Memory.obj_model2_array_pointer[version]);
 	end
 	return Game.Memory.obj_model2_array_pointer[version]; -- Kiosk doesn't move
 end
 
-function getObjectModel2ArraySize()
+local function getObjectModel2ArraySize()
 	if version == 4 then
 		return 430; -- TODO: Find maximum size for Kiosk object model 2 array
 	end
@@ -2483,21 +2487,21 @@ function getObjectModel2ArraySize()
 	return 0;
 end
 
-function getObjectModel2SlotBase(index) -- TODO: Can this be used anywhere?
+local function getObjectModel2SlotBase(index) -- TODO: Can this be used anywhere?
 	local objModel2Array = getObjectModel2Array();
 	if isRDRAM(objModel2Array) then
 		return objModel2Array + index * obj_model2_slot_size;
 	end
 end
 
-function getObjectModel2ModelBase(index)
+local function getObjectModel2ModelBase(index)
 	local objModel2Array = getObjectModel2Array();
 	if isRDRAM(objModel2Array) then
 		return dereferencePointer(objModel2Array + (index * obj_model2_slot_size) + obj_model2.model_pointer);
 	end
 end
 
-function getInternalName(objectModel2Base)
+local function getInternalName(objectModel2Base)
 	local behaviorTypePointer = dereferencePointer(objectModel2Base + obj_model2.behavior_type_pointer);
 	if isRDRAM(behaviorTypePointer) then
 		return readNullTerminatedString(behaviorTypePointer + 0x0C);
@@ -2505,7 +2509,7 @@ function getInternalName(objectModel2Base)
 	return "unknown";
 end
 
-function getScriptName(objectModel2Base)
+local function getScriptName(objectModel2Base)
 	local model2ID = mainmemory.read_u16_be(objectModel2Base + obj_model2.object_type);
 	if type(obj_model2.object_types[model2ID]) == "string" then
 		return obj_model2.object_types[model2ID];
@@ -2513,7 +2517,7 @@ function getScriptName(objectModel2Base)
 	return "unknown "..toHexString(model2ID);
 end
 
-function populateObjectModel2Pointers()
+local function populateObjectModel2Pointers()
 	object_pointers = {};
 	local objModel2Array = getObjectModel2Array();
 	if isRDRAM(objModel2Array) then
@@ -2572,7 +2576,7 @@ function setObjectModel2Position(pointer, x, y, z)
 		mainmemory.writefloat(pointer + obj_model2.x_pos, x, true);
 		mainmemory.writefloat(pointer + obj_model2.y_pos, y, true);
 		mainmemory.writefloat(pointer + obj_model2.z_pos, z, true);
-		modelPointer = dereferencePointer(pointer + obj_model2.model_pointer);
+		local modelPointer = dereferencePointer(pointer + obj_model2.model_pointer);
 		if isRDRAM(modelPointer) then
 			mainmemory.writefloat(modelPointer + obj_model2.model.x_pos, x, true);
 			mainmemory.writefloat(modelPointer + obj_model2.model.y_pos, y, true);
@@ -2698,11 +2702,11 @@ end
 
 local loading_zone_size = 0x3A;
 local loading_zone_fields = {
-	["x_position"] = 0x00, -- s16_be
-	["y_position"] = 0x02, -- s16_be
-	["z_position"] = 0x04, -- s16_be
-	["object_type"] = 0x10, -- u16_be
-	["object_types"] = {
+	x_position = 0x00, -- s16_be
+	y_position = 0x02, -- s16_be
+	z_position = 0x04, -- s16_be
+	object_type = 0x10, -- u16_be
+	object_types = {
 		[0x05] = "Cutscene Trigger",
 		[0x09] = "Loading Zone",
 		[0x0A] = "Cutscene Trigger",
@@ -2715,10 +2719,10 @@ local loading_zone_fields = {
 		[0x17] = "Cutscene Trigger",
 		-- [0x19] = "Trigger", -- Seal Race
 	},
-	["destination_map"] = 0x12, -- u16_be, index of Game.maps
-	["destination_exit"] = 0x14, -- u16_be
-	["fade_type"] = 0x16, -- u16_be?
-	["active"] = 0x39, -- Byte
+	destination_map = 0x12, -- u16_be, index of Game.maps
+	destination_exit = 0x14, -- u16_be
+	fade_type = 0x16, -- u16_be?
+	active = 0x39, -- Byte
 };
 
 function getExamineDataLoadingZone(base)
@@ -2761,7 +2765,7 @@ function getExamineDataLoadingZone(base)
 	return data;
 end
 
-function populateLoadingZonePointers()
+local function populateLoadingZonePointers()
 	object_pointers = {};
 	local loadingZoneArray = getLoadingZoneArray();
 	if isRDRAM(loadingZoneArray) then
@@ -2832,20 +2836,20 @@ end
 
 local model1SetupSize = 0x38;
 local model1Setup = {
-	["x_pos"] = 0x00, -- Float
-	["y_pos"] = 0x04, -- Float
-	["z_pos"] = 0x08, -- Float
-	["scale"] = 0x0C, -- Float
-	["behavior"] = 0x32, -- Short, see obj_model1.actor_types table
+	x_pos = 0x00, -- Float
+	y_pos = 0x04, -- Float
+	z_pos = 0x08, -- Float
+	scale = 0x0C, -- Float
+	behavior = 0x32, -- Short, see obj_model1.actor_types table
 };
 
 local model2SetupSize = 0x30;
 local model2Setup = {
-	["x_pos"] = 0x00, -- Float
-	["y_pos"] = 0x04, -- Float
-	["z_pos"] = 0x08, -- Float
-	["scale"] = 0x0C, -- Float
-	["behavior"] = 0x28, -- Short, see obj_model2.object_types table
+	x_pos = 0x00, -- Float
+	y_pos = 0x04, -- Float
+	z_pos = 0x08, -- Float
+	scale = 0x0C, -- Float
+	behavior = 0x28, -- Short, see obj_model2.object_types table
 };
 
 function dumpSetup(hideKnown)
@@ -2935,13 +2939,13 @@ function Game.detectVersion(romName, romHash)
 		flag_array = require("games.dk64_flags");
 
 		-- Mad Jack
-		MJ_offsets["ticks_until_next_action"] = 0x25;
-		MJ_offsets["actions_remaining"]       = 0x60;
-		MJ_offsets["action_type"]             = 0x61;
-		MJ_offsets["current_position"]        = 0x68;
-		MJ_offsets["next_position"]           = 0x69;
-		MJ_offsets["white_switch_position"]   = 0x6C;
-		MJ_offsets["blue_switch_position"]    = 0x6D;
+		MJ_offsets.ticks_until_next_action = 0x25;
+		MJ_offsets.actions_remaining       = 0x60;
+		MJ_offsets.action_type             = 0x61;
+		MJ_offsets.current_position        = 0x68;
+		MJ_offsets.next_position           = 0x69;
+		MJ_offsets.white_switch_position   = 0x6C;
+		MJ_offsets.blue_switch_position    = 0x6D;
 
 		ticks_per_crystal = 125;
 
@@ -2953,13 +2957,13 @@ function Game.detectVersion(romName, romHash)
 		flag_array = require("games.dk64_flags_JP");
 
 		-- Mad Jack
-		MJ_offsets["ticks_until_next_action"] = 0x25;
-		MJ_offsets["actions_remaining"]       = 0x60;
-		MJ_offsets["action_type"]             = 0x61;
-		MJ_offsets["current_position"]        = 0x68;
-		MJ_offsets["next_position"]           = 0x69;
-		MJ_offsets["white_switch_position"]   = 0x6C;
-		MJ_offsets["blue_switch_position"]    = 0x6D;
+		MJ_offsets.ticks_until_next_action = 0x25;
+		MJ_offsets.actions_remaining       = 0x60;
+		MJ_offsets.action_type             = 0x61;
+		MJ_offsets.current_position        = 0x68;
+		MJ_offsets.next_position           = 0x69;
+		MJ_offsets.white_switch_position   = 0x6C;
+		MJ_offsets.blue_switch_position    = 0x6D;
 	elseif romHash == "B4717E602F07CA9BE0D4822813C658CD8B99F993" then -- Kiosk
 		version = 4;
 		-- flag_array = require("games.dk64_flags_Kiosk"); -- TODO: Flags?
@@ -3574,9 +3578,9 @@ end
 ----------------
 
 local flag_block_size = 0x13B; -- TODO: Find exact size, absolute maximum is 0x1A8 based on physical EEPROM slot size but it's likely much smaller than this
-flag_block_cache = {};
+local flag_block_cache = {};
 
-function clearFlagCache()
+local function clearFlagCache()
 	flag_block_cache = {};
 end
 event.onloadstate(clearFlagCache, "ScriptHawk - Clear Flag Cache");
@@ -3589,7 +3593,7 @@ function getFlag(byte, bit)
 	end
 end
 
-function isFound(byte, bit)
+function isFlagFound(byte, bit)
 	return getFlag(byte, bit) ~= nil;
 end
 
@@ -3627,7 +3631,7 @@ function checkFlags(showKnown)
 					local isSetNow = get_bit(currentValue, bit);
 					local wasSet = get_bit(previousValue, bit);
 					if isSetNow and not wasSet then
-						if not isFound(i, bit) then
+						if not isFlagFound(i, bit) then
 							flagFound = true;
 							dprint("{byte="..toHexString(i, 2)..", bit="..bit..", name=\"Name\", type=\"Type\", map="..map_value.."},");
 						else
@@ -3644,7 +3648,7 @@ function checkFlags(showKnown)
 							knownFlagsFound = knownFlagsFound + 1;
 						end
 					elseif not isSetNow and wasSet then
-						if not isFound(i, bit) then
+						if not isFlagFound(i, bit) then
 							dprint("Flag "..toHexString(i, 2)..">"..bit..": \"Unknown\" was cleared on frame "..emu.framecount());
 						elseif showKnown then
 							local currentFlag = getFlag(i, bit);
@@ -3724,7 +3728,7 @@ end
 
 function checkDuplicateFlagNames()
 	for i = 1, #flag_array do
-		checkDuplicatedName(flag_array[i]["name"]);
+		checkDuplicatedName(flag_array[i].name);
 	end
 end
 
@@ -3765,7 +3769,7 @@ function setFlag(byte, bit, suppressPrint)
 		local currentValue = mainmemory.readbyte(flags + byte);
 		mainmemory.writebyte(flags + byte, set_bit(currentValue, bit));
 		if not suppressPrint then
-			if isFound(byte, bit) then
+			if isFlagFound(byte, bit) then
 				print("Set \""..getFlagName(byte, bit).."\" at "..toHexString(byte)..">"..bit);
 			else
 				print("Set "..getFlagName(byte, bit));
@@ -3834,7 +3838,7 @@ function clearFlag(byte, bit, suppressPrint)
 		local currentValue = mainmemory.readbyte(flags + byte);
 		mainmemory.writebyte(flags + byte, clear_bit(currentValue, bit));
 		if not suppressPrint then
-			if isFound(byte, bit) then
+			if isFlagFound(byte, bit) then
 				print("Cleared \""..getFlagName(byte, bit).."\" at "..toHexString(byte)..">"..bit);
 			else
 				print("Cleared "..getFlagName(byte, bit));
@@ -3916,7 +3920,7 @@ function checkFlagsOnMap(mapIndex)
 	return flagsSetOnMap;
 end
 
-function getFlagStatsOSD() -- TODO: This is a lot faster but still too slow to be always enabled
+local function getFlagStatsOSD() -- TODO: This is a lot faster but still too slow to be always enabled
 	return checkFlagsOnMap(map_value).."/"..countFlagsOnMap(map_value);
 end
 
@@ -4049,7 +4053,7 @@ end
 -- TBS Nonsense --
 ------------------
 
-function forceTBS()
+local function forceTBS()
 	local playerObject = Game.getPlayerObject();
 	if isRDRAM(playerObject) then
 		local pointer = dereferencePointer(playerObject + obj_model1.lock_method_1_pointer);
@@ -4136,10 +4140,10 @@ function dumpWaterSurfaces()
 	end
 end
 
+--[[
 surfaceTimerHack = 0;
 surfaceTimerHackInterval = 100;
 
---[[
 function increaseSurfaceTimerHack()
 	surfaceTimerHack = surfaceTimerHack + surfaceTimerHackInterval;
 end
@@ -4179,11 +4183,11 @@ end
 
 local chunkSize = 0x1C8;
 chunk = {
-	["visible"] = 0x05, -- Byte, 0x02 = visible, everything else = invisible
-	["deload1"] = 0x68, -- u32_be
-	["deload2"] = 0x6C, -- u32_be
-	["deload3"] = 0x70, -- u32_be
-	["deload4"] = 0x74, -- u32_be
+	visible = 0x05, -- Byte, 0x02 = visible, everything else = invisible
+	deload1 = 0x68, -- u32_be
+	deload2 = 0x6C, -- u32_be
+	deload3 = 0x70, -- u32_be
+	deload4 = 0x74, -- u32_be
 };
 
 function fixChunkDeload()
@@ -4498,12 +4502,12 @@ end
 -- Relative to objects in bone array
 local bone_size = 0x40;
 local bone = {
-	['position_x'] = 0x18, -- int 16 be
-	['position_y'] = 0x1A, -- int 16 be
-	['position_z'] = 0x1C, -- int 16 be
-	['scale_x'] = 0x20, -- uint 16 be
-	['scale_y'] = 0x2A, -- uint 16 be
-	['scale_z'] = 0x34, -- uint 16 be
+	position_x = 0x18, -- int 16 be
+	position_y = 0x1A, -- int 16 be
+	position_z = 0x1C, -- int 16 be
+	scale_x = 0x20, -- uint 16 be
+	scale_y = 0x2A, -- uint 16 be
+	scale_z = 0x34, -- uint 16 be
 };
 
 function Game.getActiveBoneArray(actorPointer)
@@ -4774,30 +4778,24 @@ local function updateCurrentInvisify()
 	end
 end
 
-local function toggle_tb_void()
+function Game.toggleTBVoid()
 	local tb_void_byte_val = mainmemory.readbyte(Game.Memory.tb_void_byte[version]);
 	tb_void_byte_val = toggle_bit(tb_void_byte_val, 4); -- Show Object Model 2 Objects
 	tb_void_byte_val = toggle_bit(tb_void_byte_val, 5); -- Turn on the lights
 	mainmemory.writebyte(Game.Memory.tb_void_byte[version], tb_void_byte_val);
 end
-toggleTBVoid = toggle_tb_void;
-Game.toggleTBVoid = toggleTBVoid;
 
-function force_pause()
+function Game.forcePause()
 	local voidByteValue = mainmemory.readbyte(Game.Memory.tb_void_byte[version]);
 	mainmemory.writebyte(Game.Memory.tb_void_byte[version], set_bit(voidByteValue, 0));
 end
-forcePause = force_pause;
-Game.forcePause = forcePause;
 
-function force_zipper()
+function Game.forceZipper()
 	local voidByteValue = mainmemory.readbyte(Game.Memory.tb_void_byte[version] - 1);
 	mainmemory.writebyte(Game.Memory.tb_void_byte[version] - 1, set_bit(voidByteValue, 0));
 end
-forceZipper = force_zipper;
-Game.forceZipper = forceZipper;
 
-function gainControl()
+function Game.gainControl()
 	local playerObject = Game.getPlayerObject();
 	local cameraObject = dereferencePointer(Game.Memory.camera_pointer[version]);
 	if isRDRAM(playerObject) then
@@ -4820,11 +4818,9 @@ function gainControl()
 	mainmemory.writebyte(Game.Memory.joystick_enabled_y[version], 0xFF); -- Enable Joystick X axis
 	mainmemory.writebyte(Game.Memory.map_state[version], 0x08); -- Patch map state byte to a value where the player has control, allows gaining control during death and some cutscenes
 end
-gain_control = gainControl;
-Game.gainControl = gainControl;
 
 -- TODO: Fix the frame delay for this
-function detonateLiveOranges()
+function Game.detonateLiveOranges()
 	for actorListIndex = 0, getObjectModel1Count() do
 		local pointer = dereferencePointer(Game.Memory.pointer_list[version] + (actorListIndex * 4));
 		if isRDRAM(pointer) then
@@ -4848,10 +4844,10 @@ end
 
 -- Colors (ARGB32)
 local MJ_colors = {
-	["blue"] = 0x7F00A2E8,
-	["blue_switch"] = 0xFF00A2E8,
-	["white"] = 0x7FFFFFFF,
-	["white_switch"] = 0xFFFFFFFF
+	blue = 0x7F00A2E8,
+	blue_switch = 0xFF00A2E8,
+	white = 0x7FFFFFFF,
+	white_switch = 0xFFFFFFFF
 };
 
 -- Minimap ui
@@ -4948,13 +4944,13 @@ end
 
 local function MJ_parse_position(position)
 	return {
-		["active"] = MJ_get_switch_active_mask(position),
-		["col"] = MJ_get_col_mask(position),
-		["row"] = MJ_get_row_mask(position),
+		active = MJ_get_switch_active_mask(position),
+		col = MJ_get_col_mask(position),
+		row = MJ_get_row_mask(position),
 	};
 end
 
-function getMadJack()
+local function getMadJack()
 	for object_no = 0, getObjectModel1Count() do
 		local pointer = dereferencePointer(Game.Memory.pointer_list[version] + (object_no * 4));
 		if isRDRAM(pointer) and getActorName(pointer) == "Mad Jack" then
@@ -4982,15 +4978,9 @@ function Game.drawMJMinimap()
 		local x, y, color;
 
 		-- Calculate where the kong is on the MJ Board
-		local colseg = position_to_rowcol(Game.getZPosition());
-		local rowseg = position_to_rowcol(Game.getXPosition());
-
-		local col = math.floor(colseg / 2);
-		local row = math.floor(rowseg / 2);
-
 		local kongPosition = {
-			["col"] = col, ["row"] = row,
-			["col_seg"] = colseg, ["row_seg"] = rowseg
+			col = math.floor(position_to_rowcol(Game.getZPosition()) / 2),
+			row = math.floor(position_to_rowcol(Game.getXPosition()) / 2),
 		};
 
 		for row = 0, 3 do
@@ -5036,9 +5026,9 @@ function Game.drawMJMinimap()
 		end
 
 		-- Text info
-		local phase_byte = mainmemory.readbyte(MJ_state + MJ_offsets["action_type"]);
-		local actions_remaining = mainmemory.readbyte(MJ_state + MJ_offsets["actions_remaining"]);
-		local time_until_next_action = mainmemory.readbyte(MJ_state + MJ_offsets["ticks_until_next_action"]);
+		local phase_byte = mainmemory.readbyte(MJ_state + MJ_offsets.action_type);
+		local actions_remaining = mainmemory.readbyte(MJ_state + MJ_offsets.actions_remaining);
+		local time_until_next_action = mainmemory.readbyte(MJ_state + MJ_offsets.ticks_until_next_action);
 
 		local phase = MJ_get_phase(phase_byte);
 		local action_type = MJ_get_action_type(phase_byte);
@@ -5112,14 +5102,14 @@ local function setNumberOfBones(modelBasePointer)
 end
 
 local function getBoneInfo(baseAddress)
-	local boneInfo = {};
-	boneInfo["positionX"] = mainmemory.read_s16_be(baseAddress + bone.position_x);
-	boneInfo["positionY"] = mainmemory.read_s16_be(baseAddress + bone.position_y);
-	boneInfo["positionZ"] = mainmemory.read_s16_be(baseAddress + bone.position_z);
-	boneInfo["scaleX"] = mainmemory.read_u16_be(baseAddress + bone.scale_x);
-	boneInfo["scaleY"] = mainmemory.read_u16_be(baseAddress + bone.scale_y);
-	boneInfo["scaleZ"] = mainmemory.read_u16_be(baseAddress + bone.scale_z);
-	return boneInfo;
+	return {
+		positionX = mainmemory.read_s16_be(baseAddress + bone.position_x),
+		positionY = mainmemory.read_s16_be(baseAddress + bone.position_y),
+		positionZ = mainmemory.read_s16_be(baseAddress + bone.position_z),
+		scaleX = mainmemory.read_u16_be(baseAddress + bone.scale_x),
+		scaleY = mainmemory.read_u16_be(baseAddress + bone.scale_y),
+		scaleZ = mainmemory.read_u16_be(baseAddress + bone.scale_z),
+	};
 end
 
 local function outputBones(boneArrayBase, numBones)
@@ -5529,11 +5519,7 @@ end
 -- Potentially unsafe:
 -- 0x0025
 
-function isKong(actorType)
-	return actorType >= 2 and actorType <= 6;
-end
-
-function freeTradeObjectModel1(currentKong)
+local function freeTradeObjectModel1(currentKong)
 	if currentKong >= DK and currentKong <= Chunky then
 		for object_no = 0, getObjectModel1Count() do
 			local pointer = dereferencePointer(Game.Memory.pointer_list[version] + (object_no * 4));
@@ -5554,7 +5540,7 @@ local function isKnownCollisionType(collisionType)
 	return obj_model2.object_types[collisionType] ~= nil;
 end
 
-function fixSingleCollision(objectBase)
+local function fixSingleCollision(objectBase)
 	local collisionType = mainmemory.read_u16_be(objectBase + 2);
 	local collisionValue = mainmemory.read_u16_be(objectBase + 4);
 	if isKnownCollisionType(collisionType) and isKong(collisionValue) then
@@ -5562,7 +5548,7 @@ function fixSingleCollision(objectBase)
 	end
 end
 
-function freeTradeCollisionList()
+local function freeTradeCollisionList()
 	local collisionLinkedListPointer = dereferencePointer(Game.Memory.obj_model2_collision_linked_list_pointer[version]);
 	if isRDRAM(collisionLinkedListPointer) then
 		local collisionListObjectSize = mainmemory.read_u32_be(collisionLinkedListPointer + object_size);
@@ -5631,7 +5617,7 @@ function replaceCollisionType(target, desired)
 	end
 end
 
-function ohWrongnanaDebugOut(objName, objBase, scriptBase, scriptOffset)
+local function ohWrongnanaDebugOut(objName, objBase, scriptBase, scriptOffset)
 	local preceedingCommand = mainmemory.read_u16_be(scriptBase + scriptOffset - 2);
 	print("patched "..objName.." at "..toHexString(objBase).." -> "..toHexString(scriptBase).." + "..toHexString(scriptOffset).." preceeding command "..toHexString(preceedingCommand));
 end
@@ -6433,8 +6419,8 @@ function Game.initUI()
 	-- Buttons
 	ScriptHawk.UI.form_controls["Unlock Moves Button"] = forms.button(ScriptHawk.UI.options_form, "Unlock Moves", Game.unlockMoves, ScriptHawk.UI.col(10), ScriptHawk.UI.row(0), ScriptHawk.UI.col(4) + 10, ScriptHawk.UI.button_height);
 	ScriptHawk.UI.form_controls["Toggle Visibility Button"] = forms.button(ScriptHawk.UI.options_form, "Invisify", toggle_invisify, ScriptHawk.UI.col(7), ScriptHawk.UI.row(1), 64, ScriptHawk.UI.button_height);
-	ScriptHawk.UI.form_controls["Detonate Button"] = forms.button(ScriptHawk.UI.options_form, "Detonate", detonateLiveOranges, ScriptHawk.UI.col(7), ScriptHawk.UI.row(2), 64, ScriptHawk.UI.button_height);
-	ScriptHawk.UI.form_controls["Toggle TB Void Button"] = forms.button(ScriptHawk.UI.options_form, "Toggle TB Void", toggle_tb_void, ScriptHawk.UI.col(10), ScriptHawk.UI.row(1), ScriptHawk.UI.col(4) + 10, ScriptHawk.UI.button_height);
+	ScriptHawk.UI.form_controls["Detonate Button"] = forms.button(ScriptHawk.UI.options_form, "Detonate", Game.detonateLiveOranges, ScriptHawk.UI.col(7), ScriptHawk.UI.row(2), 64, ScriptHawk.UI.button_height);
+	ScriptHawk.UI.form_controls["Toggle TB Void Button"] = forms.button(ScriptHawk.UI.options_form, "Toggle TB Void", Game.toggleTBVoid, ScriptHawk.UI.col(10), ScriptHawk.UI.row(1), ScriptHawk.UI.col(4) + 10, ScriptHawk.UI.button_height);
 	ScriptHawk.UI.form_controls["Gain Control Button"] = forms.button(ScriptHawk.UI.options_form, "Gain Control", Game.gainControl, ScriptHawk.UI.col(10), ScriptHawk.UI.row(4), ScriptHawk.UI.col(4) + 10, ScriptHawk.UI.button_height);
 
 	-- As of BizHawk 1.11.8, ScriptHawk's Bone Displacement fix is integrated in to the emulator, as such the UI surrounding the bug is no longer needed
@@ -6443,8 +6429,8 @@ function Game.initUI()
 
 	--ScriptHawk.UI.form_controls["Random Color"] = forms.button(ScriptHawk.UI.options_form, "Random Color", Game.setKongColor, ScriptHawk.UI.col(5), ScriptHawk.UI.row(5), ScriptHawk.UI.col(4) + 10, ScriptHawk.UI.button_height);
 	--ScriptHawk.UI.form_controls["Everything is Kong Button"] = forms.button(ScriptHawk.UI.options_form, "Kong", everythingIsKong, ScriptHawk.UI.col(10), ScriptHawk.UI.row(3), ScriptHawk.UI.col(4) + 10, ScriptHawk.UI.button_height);
-	--ScriptHawk.UI.form_controls["Force Pause Button"] = forms.button(ScriptHawk.UI.options_form, "Force Pause", force_pause, ScriptHawk.UI.col(10), ScriptHawk.UI.row(4), ScriptHawk.UI.col(4) + 10, ScriptHawk.UI.button_height);
-	ScriptHawk.UI.form_controls["Force Zipper Button"] = forms.button(ScriptHawk.UI.options_form, "Force Zipper", force_zipper, ScriptHawk.UI.col(5), ScriptHawk.UI.row(4), ScriptHawk.UI.col(4) + 10, ScriptHawk.UI.button_height);
+	--ScriptHawk.UI.form_controls["Force Pause Button"] = forms.button(ScriptHawk.UI.options_form, "Force Pause", Game.forcePause, ScriptHawk.UI.col(10), ScriptHawk.UI.row(4), ScriptHawk.UI.col(4) + 10, ScriptHawk.UI.button_height);
+	ScriptHawk.UI.form_controls["Force Zipper Button"] = forms.button(ScriptHawk.UI.options_form, "Force Zipper", Game.forceZipper, ScriptHawk.UI.col(5), ScriptHawk.UI.row(4), ScriptHawk.UI.col(4) + 10, ScriptHawk.UI.button_height);
 	--ScriptHawk.UI.form_controls["Random Effect Button"] = forms.button(ScriptHawk.UI.options_form, "Random effect", random_effect, ScriptHawk.UI.col(10), ScriptHawk.UI.row(6), ScriptHawk.UI.col(4) + 10, ScriptHawk.UI.button_height);
 
 	-- Lag fix
@@ -6946,13 +6932,13 @@ end
 
 local vertSize = 0x10;
 local vert = {
-	["x_position"] = 0x00, -- s16_be
-	["y_position"] = 0x02, -- s16_be
-	["z_position"] = 0x04, -- s16_be
-	["mapping_1"] = 0x08, -- Texture mapping, unknown datatype
-	["mapping_2"] = 0x0A, -- Texture mapping, unknown datatype
-	["shading_1"] = 0x0C, -- Unknown datatype
-	["shading_2"] = 0x0E, -- Unknown datatype
+	x_position = 0x00, -- s16_be
+	y_position = 0x02, -- s16_be
+	z_position = 0x04, -- s16_be
+	mapping_1 = 0x08, -- Texture mapping, unknown datatype
+	mapping_2 = 0x0A, -- Texture mapping, unknown datatype
+	shading_1 = 0x0C, -- Unknown datatype
+	shading_2 = 0x0E, -- Unknown datatype
 };
 
 function crumble()
