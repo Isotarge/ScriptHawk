@@ -1,5 +1,5 @@
-#ScriptHawk TODO list
-##High Priority
+# ScriptHawk TODO list
+## High Priority
 - Save and Load settings from a config file on disk
 	- Joypad/Keyboard binds for D-Pad and L Button
 	- Rounding precision
@@ -15,7 +15,7 @@
 	- Find menu cutscene nonsense
 	- Finish flag documentation
 
-##Low priority, recurring, or waiting:
+## Low priority, recurring, or waiting:
 - Object Analysis Tools:
 	- Find a decent object/struct format that has a good balance between documentation, useability, flexibility, and speed
 		- Metatable?
@@ -33,7 +33,7 @@
 		- Wonder Boy III RNG Watch.lua
 - DK64: ASM hook for other regions
 
-#Game support wishlist:
+# Game support wishlist:
 - Gex: Enter the Gecko
 - Gex 3: Deep Cover Gecko
 - Wave Race 64

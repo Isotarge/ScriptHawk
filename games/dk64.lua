@@ -32,7 +32,7 @@ local grab_script_modes = {
 	"Exits",
 };
 local grab_script_mode_index = 1;
-grab_script_mode = grab_script_modes[grab_script_mode_index];
+local grab_script_mode = grab_script_modes[grab_script_mode_index];
 
 local function switch_grab_script_mode()
 	grab_script_mode_index = grab_script_mode_index + 1;
@@ -1461,7 +1461,7 @@ function Game.getPlayerObject() -- TODO: Cache this
 	return dereferencePointer(Game.Memory.player_pointer[version]);
 end
 
-function setObjectModel1Position(pointer, x, y, z)
+local function setObjectModel1Position(pointer, x, y, z)
 	if isRDRAM(pointer) then
 		mainmemory.writefloat(pointer + obj_model1.x_pos, x, true);
 		mainmemory.writefloat(pointer + obj_model1.y_pos, y, true);
@@ -2571,7 +2571,7 @@ local function encirclePlayerObjectModel2()
 	end
 end
 
-function setObjectModel2Position(pointer, x, y, z)
+local function setObjectModel2Position(pointer, x, y, z)
 	if isRDRAM(pointer) then
 		mainmemory.writefloat(pointer + obj_model2.x_pos, x, true);
 		mainmemory.writefloat(pointer + obj_model2.y_pos, y, true);
@@ -2696,7 +2696,7 @@ end
 -- Loading Zone Documentation --
 --------------------------------
 
-function getLoadingZoneArray()
+local function getLoadingZoneArray()
 	return dereferencePointer(Game.Memory.loading_zone_array[version]);
 end
 
@@ -2725,7 +2725,7 @@ local loading_zone_fields = {
 	active = 0x39, -- Byte
 };
 
-function getExamineDataLoadingZone(base)
+local function getExamineDataLoadingZone(base)
 	local data = {};
 	if isRDRAM(base) then
 		local _type = mainmemory.read_u16_be(base + loading_zone_fields.object_type);
@@ -3585,7 +3585,7 @@ local function clearFlagCache()
 end
 event.onloadstate(clearFlagCache, "ScriptHawk - Clear Flag Cache");
 
-function getFlag(byte, bit)
+local function getFlag(byte, bit)
 	for i = 1, #flag_array do
 		if byte == flag_array[i].byte and bit == flag_array[i].bit then
 			return flag_array[i];
@@ -3593,7 +3593,7 @@ function getFlag(byte, bit)
 	end
 end
 
-function isFlagFound(byte, bit)
+local function isFlagFound(byte, bit)
 	return getFlag(byte, bit) ~= nil;
 end
 
@@ -4140,23 +4140,7 @@ function dumpWaterSurfaces()
 	end
 end
 
---[[
-surfaceTimerHack = 0;
-surfaceTimerHackInterval = 100;
-
-function increaseSurfaceTimerHack()
-	surfaceTimerHack = surfaceTimerHack + surfaceTimerHackInterval;
-end
-
-function decreaseSurfaceTimerHack()
-	surfaceTimerHack = surfaceTimerHack - surfaceTimerHackInterval;
-end
-
-ScriptHawk.bindKeyFrame("K", decreaseSurfaceTimerHack, false);
-ScriptHawk.bindKeyFrame("L", increaseSurfaceTimerHack, false);
-]]--
-
-function setWaterSurfaceTimers(value)
+local function setWaterSurfaceTimers(value)
 	if version == 4 then
 		local waterSurface = dereferencePointer(Game.Memory.water_surface_list[version]);
 		while isRDRAM(waterSurface) do
@@ -4177,6 +4161,22 @@ function setWaterSurfaceTimers(value)
 	end
 end
 
+--[[
+surfaceTimerHack = 0;
+surfaceTimerHackInterval = 100;
+
+local function increaseSurfaceTimerHack()
+	surfaceTimerHack = surfaceTimerHack + surfaceTimerHackInterval;
+end
+
+local function decreaseSurfaceTimerHack()
+	surfaceTimerHack = surfaceTimerHack - surfaceTimerHackInterval;
+end
+
+ScriptHawk.bindKeyFrame("K", decreaseSurfaceTimerHack, false);
+ScriptHawk.bindKeyFrame("L", increaseSurfaceTimerHack, false);
+]]--
+
 ------------------
 -- Chunk Deload --
 ------------------
@@ -4190,6 +4190,7 @@ chunk = {
 	deload4 = 0x74, -- u32_be
 };
 
+--[[
 function fixChunkDeload()
 	local chunkArray = dereferencePointer(Game.Memory.chunk_array_pointer[version]);
 	if isRDRAM(chunkArray) then
@@ -4204,7 +4205,8 @@ function fixChunkDeload()
 		print_deferred();
 	end
 end
---event.onframestart(fixChunkDeload);
+event.onframestart(fixChunkDeload);
+--]]
 
 local function populateChunkPointers()
 	object_pointers = {};
@@ -5060,8 +5062,9 @@ end
 -- Bone Displacement --
 -----------------------
 
+--[[
 local function fixBoneDisplacement()
-	-- NOP out a cop0 status register write at the start of the updateBonePosition function
+	-- NOP out a cop0 status register write at the start of the updateBonePositions() function
 	mainmemory.write_u32_be(Game.Memory.bone_displacement_cop0_write[version], 0);
 
 	-- Hacky, yes, but if we're using dynarec the patched code pages don't get marked as dirty
@@ -5070,10 +5073,7 @@ local function fixBoneDisplacement()
 	savestate.save(ss_fn);
 	savestate.load(ss_fn);
 end
-
----------------------------------
--- Bone Displacement Detection --
----------------------------------
+--]]
 
 print_every_frame = false;
 print_threshold = 1;
@@ -5312,8 +5312,8 @@ end
 -- BRB Stuff --
 ---------------
 
-brb_message = "BRB";
-is_brb = false;
+local brb_message = "BRB";
+local is_brb = false;
 
 local japan_charset = {
 --   0    1    2    3    4    5    6    7    8    9
@@ -5348,8 +5348,7 @@ local japan_charset = {
 function Game.toJapaneseString(value)
 	local length = string.len(value);
 	local tempString = "";
-	local char;
-	local charFound = false;
+	local char, charFound;
 	for i = 1, length do
 		char = string.sub(value, i, i);
 		charFound = false;
@@ -5400,14 +5399,6 @@ end
 -- For papa cfox --
 -------------------
 
-function setText(pointer, message)
-	local messageLength = math.min(string.len(message), 40); -- Maximum message length is 40
-	for i = 1, messageLength do
-		mainmemory.writebyte(pointer + i - 1, string.byte(message, i));
-	end
-	mainmemory.writebyte(pointer + messageLength, 0x00);
-end
-
 function setDKTV(message)
 	local linkedListRoot = derferencePointer(Game.Memory.heap_pointer[version]);
 	if not isRDRAM(linkedListRoot) then
@@ -5422,7 +5413,7 @@ function setDKTV(message)
 		currentPointer = currentPointer + 0x10;
 		if currentObjectSize == 0x40 then
 			if mainmemory.read_u32_be(currentPointer) == 0x444B2054 then -- TODO: Better method of detection
-				setText(currentPointer, message);
+				writeNullTerminatedString(currentPointer, message);
 			end
 		end
 		currentPointer = currentPointer + currentObjectSize;
@@ -5434,63 +5425,61 @@ end
 -- Free Trade Agreement --
 --------------------------
 
-local BalloonStates = {
-	[DK] = 114,
-	[Diddy] = 91,
-	[Lanky] = 113,
-	[Tiny] = 112,
-	[Chunky] = 111,
+local FTA = {
+	BalloonStates = {
+		[DK] = 114,
+		[Diddy] = 91,
+		[Lanky] = 113,
+		[Tiny] = 112,
+		[Chunky] = 111,
+	},
+	KasplatStates = { -- Not actually used by the check function for speed reasons, really just here for documentation
+		[DK] = 241,
+		[Diddy] = 242,
+		[Lanky] = 243,
+		[Tiny] = 244,
+		[Chunky] = 245,
+	},
+	BulletChecks = {
+		[DK] = 0x0030,
+		[Diddy] = 0x0024,
+		[Lanky] = 0x002A,
+		[Tiny] = 0x002B,
+		[Chunky] = 0x0026,
+		[Krusha] = 0x00AB,
+	},
+	GBStates = {
+		[DK] = 0x28,
+		[Diddy] = 0x22,
+		[Lanky] = 0x30,
+		[Tiny] = 0x24,
+		[Chunky] = 0x21,
+	},
+	SimSlamChecks = { -- Not actually used by the check function for speed reasons, really just here for documentation
+		[DK] = 0x0002,
+		[Diddy] = 0x0003,
+		[Lanky] = 0x0004,
+		[Tiny] = 0x0005,
+		[Chunky] = 0x0006,
+		[Krusha] = 0x0007,
+	},
 };
 
-function isBalloon(actorType)
-	return table.contains(BalloonStates, actorType)
+function FTA.isBalloon(actorType)
+	return table.contains(FTA.BalloonStates, actorType)
 end
 
-local KasplatStates = { -- Not actually used by the check function for speed reasons, really just here for documentation
-	[DK] = 241,
-	[Diddy] = 242,
-	[Lanky] = 243,
-	[Tiny] = 244,
-	[Chunky] = 245,
-};
-
-function isKasplat(actorType)
+function FTA.isKasplat(actorType)
 	return actorType >= 241 and actorType <= 245;
 end
 
-local BulletChecks = {
-	[DK] = 0x0030,
-	[Diddy] = 0x0024,
-	[Lanky] = 0x002A,
-	[Tiny] = 0x002B,
-	[Chunky] = 0x0026,
-	[Krusha] = 0x00AB,
-};
-
-function isBulletCheck(value)
-	return table.contains(BulletChecks, value);
+function FTA.isBulletCheck(value)
+	return table.contains(FTA.BulletChecks, value);
 end
 
-local GBStates = {
-	[DK] = 0x28,
-	[Diddy] = 0x22,
-	[Lanky] = 0x30,
-	[Tiny] = 0x24,
-	[Chunky] = 0x21,
-};
-
-function isGB(collectableState)
-	return table.contains(GBStates, collectableState);
+function FTA.isGB(collectableState)
+	return table.contains(FTA.GBStates, collectableState);
 end
-
-local SimSlamChecks = { -- Not actually used by the check function for speed reasons, really just here for documentation
-	[DK] = 0x0002,
-	[Diddy] = 0x0003,
-	[Lanky] = 0x0004,
-	[Tiny] = 0x0005,
-	[Chunky] = 0x0006,
-	[Krusha] = 0x0007,
-};
 
 -- Script Commands
 -- 0000 - nop
@@ -5512,7 +5501,7 @@ local safePreceedingCommands = {
 		-- Used in K. Lumsy Grape Switch to keep pressed, character check
 };
 
-function isSafePreceedingCommand(preceedingCommand)
+local function isSafePreceedingCommand(preceedingCommand)
 	return table.contains(safePreceedingCommands, preceedingCommand);
 end
 
@@ -5525,11 +5514,11 @@ local function freeTradeObjectModel1(currentKong)
 			local pointer = dereferencePointer(Game.Memory.pointer_list[version] + (object_no * 4));
 			if isRDRAM(pointer) then
 				local actorType = mainmemory.read_u32_be(pointer + obj_model1.actor_type);
-				if isKasplat(actorType) then
-					mainmemory.write_u32_be(pointer + obj_model1.actor_type, KasplatStates[currentKong]); -- Fix which blueprint the Kasplat drops
+				if FTA.isKasplat(actorType) then
+					mainmemory.write_u32_be(pointer + obj_model1.actor_type, FTA.KasplatStates[currentKong]); -- Fix which blueprint the Kasplat drops
 				end
-				if isBalloon(actorType) then
-					mainmemory.write_u32_be(pointer + obj_model1.actor_type, BalloonStates[currentKong]); -- Fix balloon color
+				if FTA.isBalloon(actorType) then
+					mainmemory.write_u32_be(pointer + obj_model1.actor_type, FTA.BalloonStates[currentKong]); -- Fix balloon color
 				end
 			end
 		end
@@ -5645,8 +5634,8 @@ function ohWrongnana(verbose)
 		for i = 0, numSlots - 1 do
 			slotBase = objModel2Array + i * obj_model2_slot_size;
 			currentValue = mainmemory.readbyte(slotBase + obj_model2.collectable_state);
-			if currentKong ~= Krusha and isGB(currentValue) then
-				mainmemory.writebyte(slotBase + obj_model2.collectable_state, GBStates[currentKong]);
+			if currentKong ~= Krusha and FTA.isGB(currentValue) then
+				mainmemory.writebyte(slotBase + obj_model2.collectable_state, FTA.GBStates[currentKong]);
 			end
 			-- Get activation script
 			activationScript = dereferencePointer(slotBase + 0x7C);
@@ -5664,7 +5653,7 @@ function ohWrongnana(verbose)
 								if preceedingCommand == 0x12 then
 									local commandParam = mainmemory.read_u16_be(activationScript + j);
 									if isKong(commandParam) then
-										mainmemory.write_u16_be(activationScript + j, SimSlamChecks[currentKong]);
+										mainmemory.write_u16_be(activationScript + j, FTA.SimSlamChecks[currentKong]);
 										if verbose then
 											ohWrongnanaDebugOut(scriptName, slotBase, activationScript, j);
 										end
@@ -5673,12 +5662,12 @@ function ohWrongnana(verbose)
 							elseif isSafePreceedingCommand(preceedingCommand) then
 								local commandParam = mainmemory.read_u16_be(activationScript + j);
 								if isKong(commandParam) and scriptName == "buttons" then
-									mainmemory.write_u16_be(activationScript + j, SimSlamChecks[currentKong]);
+									mainmemory.write_u16_be(activationScript + j, FTA.SimSlamChecks[currentKong]);
 									if verbose then
 										ohWrongnanaDebugOut(scriptName, slotBase, activationScript, j);
 									end
-								elseif isBulletCheck(commandParam) and scriptName == "gunswitches" then
-									mainmemory.write_u16_be(activationScript + j, BulletChecks[currentKong]);
+								elseif FTA.isBulletCheck(commandParam) and scriptName == "gunswitches" then
+									mainmemory.write_u16_be(activationScript + j, FTA.BulletChecks[currentKong]);
 									if verbose then
 										ohWrongnanaDebugOut(scriptName, slotBase, activationScript, j);
 									end
@@ -6180,7 +6169,7 @@ local function drawGrabScriptUI()
 					behaviorPointer = "";
 				end
 				local color = nil;
-				if isGB(collectableState) then
+				if FTA.isGB(collectableState) then
 					color = yellow_highlight;
 				end
 				if object_index == i then

@@ -557,3 +557,10 @@ function readNullTerminatedString(base, max_length)
 	end
 	return builtString;
 end
+
+function writeNullTerminatedString(pointer, message)
+	for i = 1, string.len(message) do
+		mainmemory.writebyte(pointer + i - 1, string.byte(message, i));
+	end
+	mainmemory.writebyte(pointer + string.len(message), 0x00);
+end
