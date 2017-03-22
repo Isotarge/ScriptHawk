@@ -43,42 +43,42 @@ local function getOSDYPos(y)
 	return -264 + (y * 16);
 end
 
-function getBlockAddress(x, y)
+local function getBlockAddress(x, y)
 	return gridBase + ((y - 1) * rowSize) + (x * blockSize);
 end
 
-function getColor(x, y)
+local function getColor(x, y)
 	return mainmemory.readbyte(getBlockAddress(x, y) + 0x0E);
 end
 
-function getTimer(x, y)
+local function getTimer(x, y)
 	return mainmemory.readbyte(getBlockAddress(x, y) + 0x16);
 end
 
-function setTimer(x, y, value)
+local function setTimer(x, y, value)
 	mainmemory.writebyte(getBlockAddress(x, y) + 0x16, value);
 end
 
-function getState(x, y)
+local function getState(x, y)
 	return mainmemory.readbyte(getBlockAddress(x, y));
 end
 
-function getXPosition()
+local function getXPosition()
 	return mainmemory.read_u16_le(0x1136);
 end
 
 -- y<=20 is above player
 -- y=21 is player level
 -- y>=22 is under the player
-function getYPosition()
+local function getYPosition()
 	return 21;
 end
 
-function getAir()
+local function getAir()
 	return mainmemory.readbyte(0x114E);
 end
 
-function isBlockSafe(x, y)
+local function isBlockSafe(x, y)
 	local color = colors[getColor(x, y)] or 'unknown';
 	local state = states[getState(x, y)] or 'unknown';
 	if state == "Empty" or state == "Drilled" or state == "Active" then
@@ -97,7 +97,7 @@ function isBlockSafe(x, y)
 end
 
 -- TODO: Pretty reliable but needs some work
-function isSafe(x)
+local function isSafe(x)
 	if x < 1 or x > gridWidth then
 		if verbose then
 			print("Warning: OOB call to isSafe() with x of "..x);
@@ -112,7 +112,7 @@ function isSafe(x)
 	return true;
 end
 
-function columnContainsReachableAir(x)
+local function columnContainsReachableAir(x)
 	for y = 1, 20 do
 		if colors[getColor(x, y)] == "Air" and states[getState(x, y)] == "Falling" then
 			return true;
@@ -133,7 +133,7 @@ weight = {
 	Distance = -2,
 };
 
-function getColumnScore(x) -- TODO: Needs tons of work & weighting
+local function getColumnScore(x) -- TODO: Needs tons of work & weighting
 	local score = 0;
 	if not isSafe(x) then
 		score = score + weight.Safe;
@@ -161,7 +161,7 @@ function getColumnScore(x) -- TODO: Needs tons of work & weighting
 	return score;
 end
 
-function getMaxScoredColumn()
+local function getMaxScoredColumn()
 	local maxScored = -math.huge;
 	local maxScore = -math.huge;
 	for x = 1, gridWidth do
