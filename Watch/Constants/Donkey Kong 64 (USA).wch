@@ -17,6 +17,20 @@ SystemID N64
 6EAC74	d	h	1	RDRAM	STVW Write, 0 to patch
 6F33E6	w	h	1	RDRAM	Lanky Long Arms Map Index
 6F33E8	d	h	1	RDRAM	Lanky Long Arms Map Check (0 for any map)
+744700	w	u	1	RDRAM	Japes Boss Door Destination
+744702	w	u	1	RDRAM	Aztec Boss Door Destination
+744704	w	u	1	RDRAM	Factory Boss Door Destination
+744706	w	u	1	RDRAM	Galleon Boss Door Destination
+744708	w	u	1	RDRAM	Fungi Boss Door Destination
+74470A	w	u	1	RDRAM	Caves Boss Door Destination
+74470C	w	u	1	RDRAM	Castle Boss Door Destination
+74470E	w	u	1	RDRAM	Isles Boss Door Destination
+744710	w	u	1	RDRAM	Helm Boss Door Destination
+744712	w	u	1	RDRAM	Bonus Boss Door Destination
+744714	w	u	1	RDRAM	Multiplayer Boss Door Destination
+744716	w	u	1	RDRAM	Cutscene Boss Door Destination
+744718	w	u	1	RDRAM	Test Map Boss Door Destination
+74471A	w	u	1	RDRAM	Global Boss Door Destination
 746344	w	h	1	RDRAM	Footstep SFX
 74634A	w	h	1	RDRAM	Footstep SFX
 746350	w	h	1	RDRAM	Footstep SFX
