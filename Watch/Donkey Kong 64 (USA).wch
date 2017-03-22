@@ -138,6 +138,7 @@ SystemID N64
 76A0E5	b	s	1	RDRAM	Player 2 Character (Multiplayer Selection)
 76A0E6	b	s	1	RDRAM	Player 3 Character (Multiplayer Selection)
 76A0E7	b	s	1	RDRAM	Player 4 Character (Multiplayer Selection)
+76A160	b	h	1	RDRAM	In Submap?
 76A173	b	u	1	RDRAM	Parent Map
 76A174	b	u	1	RDRAM	Parent Exit
 76AEF3	b	u	1	RDRAM	Previous Map
