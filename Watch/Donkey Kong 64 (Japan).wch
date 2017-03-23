@@ -73,7 +73,10 @@ SystemID N64
 76A254	d	u	1	RDRAM	Object Model 2 Timer
 76A298	d	u	1	RDRAM	Current Map
 76A29C	d	u	1	RDRAM	Current Exit
-76A2A1	b	h	1	RDRAM	Map State
+76A2A1	b	b	1	RDRAM	Map State
+76A350	b	u	1	RDRAM	In Submap
+76A362	w	u	1	RDRAM	Parent Map
+76A364	b	u	1	RDRAM	Parent Exit
 76B100	d	u	1	RDRAM	Frames (Lag)
 7EE318	b	h	1	RDRAM	EEPROM Slot 0 File Index
 7EE319	b	h	1	RDRAM	EEPROM Slot 1 File Index

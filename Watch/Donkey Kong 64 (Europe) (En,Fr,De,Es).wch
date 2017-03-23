@@ -72,7 +72,10 @@ SystemID N64
 764B84	d	u	1	RDRAM	Object Model 2 Timer
 764BC8	d	u	1	RDRAM	Current Map
 764BCC	d	u	1	RDRAM	Current Exit
-764BD1	b	h	1	RDRAM	Map State
+764BD1	b	b	1	RDRAM	Map State
+764C80	b	u	1	RDRAM	In Submap
+764C92	w	u	1	RDRAM	Parent Map
+764C94	b	u	1	RDRAM	Parent Exit
 765A30	d	u	1	RDRAM	Frames (Lag)
 7EDDC8	b	h	1	RDRAM	EEPROM Slot 0 File Index
 7EDDC9	b	h	1	RDRAM	EEPROM Slot 1 File Index

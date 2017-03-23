@@ -5,6 +5,20 @@ SystemID N64
 010398	d	h	1	RDRAM	Render Mode Pointer
 6EDAE6	w	h	1	RDRAM	Lanky Long Arms Map Index
 6EDAE8	d	h	1	RDRAM	Lanky Long Arms Map Check (0 for any map)
+73EE50	w	u	1	RDRAM	Japes Boss Door Destination
+73EE52	w	u	1	RDRAM	Aztec Boss Door Destination
+73EE54	w	u	1	RDRAM	Factory Boss Door Destination
+73EE56	w	u	1	RDRAM	Galleon Boss Door Destination
+73EE58	w	u	1	RDRAM	Fungi Boss Door Destination
+73EE5A	w	u	1	RDRAM	Caves Boss Door Destination
+73EE5C	w	u	1	RDRAM	Castle Boss Door Destination
+73EE5E	w	u	1	RDRAM	Isles Boss Door Destination
+73EE60	w	u	1	RDRAM	Helm Boss Door Destination
+73EE62	w	u	1	RDRAM	Bonus Boss Door Destination
+73EE64	w	u	1	RDRAM	Multiplayer Boss Door Destination
+73EE66	w	u	1	RDRAM	Cutscene Boss Door Destination
+73EE68	w	u	1	RDRAM	Test Map Boss Door Destination
+73EE6A	w	u	1	RDRAM	Global Boss Door Destination
 74AA44	d	f	1	RDRAM	Orange Y Acceleration
 74D94C	d	f	1	RDRAM	DK Walk Maximum Velocity
 74D950	d	f	1	RDRAM	Diddy Walk Maximum Velocity
