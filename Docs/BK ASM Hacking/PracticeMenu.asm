@@ -533,8 +533,6 @@ LB a0 InfinitesState
 BEQ a0 zero NormalModeCode_InfinitesNormal
 NOP
 	LI a1 @ItemBase
-	LI a0 900
-	SW a0 0x30(a1) ;Notes
 	LI a0 100
 	SW a0 0x34(a1) ;Eggs
 	SW a0 0x98(a1) ;Jiggies
@@ -571,37 +569,61 @@ LB a2 @MapLoadState
 			NOP
 			JAL @GetMainExitFromLevelIndex
 			NOP
-			MOV a0 a1
 			LB a1 @Exit
 			BNE a1 v0 NormalModeCode_ResetOnEnter
 			NOP
-				;@ClearAllGameProgress clears everything below AND note scores, item counts, and moves
-				JAL @ClearGameProgressFlags
-				NOP
-				;JAL @ClearLevelNoteScores
-				;NOP
-				JAL @ClearInGameLevelTimer
-				NOP
-				JAL @ZeroJiggyCollectedBitfield
-				NOP
-				JAL @ClearEmptyHoneyCombsCollectedBitfield
-				NOP
-				JAL @ClearCollectedMumboTokenFlags
-				NOP
-				JAL @ClearSomeProgressThing
-				NOP
-NormalModeCode_ResetOnEnter:
-	
-;If FastWarp
-	;JAL FastWarp
-	NOP
-;If SaveStateCode
-	;JAL SaveStateCode
-	NOP
-;If PositionDisplay
-	;JAL PositionDisplay
-	NOP
+				LI at 0x06 ;Entering Lair
+				BEQ a0 at NormalModeCode_ResetOnEnter
+					
+					;@ClearAllGameProgress clears everything below AND note scores, item counts, and moves
+					JAL @ClearGameProgressFlags
+					NOP
+					JAL @ClearInGameLevelTimer
+					NOP
+					JAL @ZeroJiggyCollectedBitfield
+					NOP
+					JAL @ClearEmptyHoneyCombsCollectedBitfield
+					NOP
+					JAL @ClearCollectedMumboTokenFlags
+					NOP
+					JAL @ClearSomeProgressThing
+					NOP
+				
+				LI a1 0x0B ;Entering SM
+				BEQ a0 a1 NormalModeCode_ResetOnEnter
+					
+					BLT a0 at NormalModeCode_ResetOnEnter_NoAdjust
+					NOP
+						ADDIU a0 a0 -1
+					NormalModeCode_ResetOnEnter_NoAdjust:
+					
+					ADDIU a0 a0 -1
+					
+					
+					LB a2 ResetOnEnterState ;get base address based on category
+					SLL a2 a2 2
+					LW a1 ResetPointers(a2)
 
+					MOV at a0
+					;a0 = level, a1 = baseadress, a2 = working reg
+					MOV a2 at
+					SLL a2 a2 2
+					ADDIU a2 a2 a1
+					LW a0 0(a2)
+					JAL @SetMovesUnlockedBitfield
+					NOP
+					JAL @SetHasUsedMovesBitfield
+					NOP
+					
+					
+					;Set Mumbo Token Bitfield
+					;Set Jiggy Bitfield
+					;Set Game Progress Flags
+					;Set Empty honeycomb bitfield
+				
+				
+				
+NormalModeCode_ResetOnEnter:
 
 //Map Ghost
 LB a0 GhostState
@@ -645,7 +667,7 @@ LB a0 @MapLoadState
 					SW a2 0x00(a0)
 					ADDIU a1 a1 0x04
 					ADDIU a0 a0 0x04
-					BNE a1 at Ghost_Defragment_Loop
+					BLT a1 at Ghost_Defragment_Loop
 					NOP
 					
 					SW a1 GhostCurrentTailPointer
@@ -967,12 +989,13 @@ MenuItemStr:
 /*TO DO: CHANGE TO STUCT {ascii, MaxOptions, Pointer to Option Sting}*/
 MenuLabelStrings:
 .asciiz "INFINITES: \0\0\0\0"     ; OFF, ON
-.asciiz "RESET ON ENTER:"         ; OFF, ON
+.asciiz "RESET ON ENTER:"         ; OFF, LEVEL, ROOM
+//.asciiz "LOOP: \0\0\0\0\0\0\0\0\0"	  ; OFF, 1-10
 .asciiz "TAKE ME THERE: "         ; OFF, SM, MM, TTC, CC, BGS, FP, GV, MMM, RBB, CCW, FF, DOG, GRUNTY
 .asciiz "MOVE SET: \0\0\0\0\0"    ; OFF, NONE, FFM, ALL
 .asciiz "L 2 LEVITATE: \0"      ;ON, OFF
 .asciiz "TRANSFORM ME: \0"	  ;OFF, BANJO, TERMITE, CROC, WALRUS, PUMPKIN, BEE, WASHY
-.asciiz "MAP GHOSTS: \0\0\0"	  ;OFF, BANJO, TERMITE, CROC, WALRUS, PUMPKIN, BEE, WASHY
+.asciiz "MAP GHOSTS: \0\0\0"	  ;OFF, ON, CLEAR?
 .asciiz "\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0"
 
 MenuOptionMaxStates:
@@ -1039,12 +1062,56 @@ TakeMeThereOptionString:
 TransformMeOptionString:
 .asciiz "OFF\0\0\0\0"
 .asciiz "BANJO\0\0"
-.asciiz "TRMITE\0"
+.asciiz "TERMITE"
 .asciiz "CROC\0\0\0"
 .asciiz "WALRUS\0"
 .asciiz "PUMPKN\0"
 .asciiz "BEE\0\0\0\0"
 .asciiz "WASHY\0\0"
+
+
+
+
+ResetPointers:
+.word Reset_100
+.word Reset_Any
+.word Reset_NoRBA
+
+Reset_100:
+;MM, TTC, CC, BGS, FP, GV, CCW, RBB, MMM
+.word 0x000BFDBF ;moves
+.word 0x000BFDFF
+.word 0x000BFFFF
+.word 0x000FFFFF
+.word 0x000FFFFF
+.word 0x000FFFFF
+.word 0x000FFFFF
+.word 0x000FFFFF
+.word 0x000FFFFF
+
+Reset_Any:
+.word 0x000BFDFF ;moves
+.word 0x000BFDFF
+.word 0x000BFFFF
+.word 0x000FFFFF
+.word 0x000FFFFF
+.word 0x000FFFFF
+.word 0x000FFFFF
+.word 0x000FFFFF
+.word 0x000FFFFF
+
+Reset_NoRBA:
+.word 0x000BFDBF ;moves
+.word 0x000BFDFF
+.word 0x000BFFFF
+.word 0x000FFFFF
+.word 0x000FFFFF
+.word 0x000FFFFF
+.word 0x000FFFFF
+.word 0x000FFFFF
+.word 0x000FFFFF
+
+
 
 GhostArray:
 //ghost struct:
