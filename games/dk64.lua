@@ -1826,7 +1826,7 @@ obj_model2 = {
 		[0x44] = "Blade of Grass Large",
 		[0x45] = "Lilypad?",
 		[0x46] = "Plant",
-		[0x47] = "Iron Bars",
+		[0x47] = "Iron Bars", -- Castle Lobby Coconut Switch
 		[0x48] = "Nintendo Coin", -- Not sure if this is collectable
 		[0x49] = "Metal Floor",
 		[0x4A] = "-",
@@ -5642,7 +5642,7 @@ function ohWrongnana(verbose)
 			if isRDRAM(activationScript) then
 				currentValue = mainmemory.read_u16_be(slotBase + obj_model2.object_type);
 				scriptName = getInternalName(slotBase);
-				if scriptName == "gunswitches" or scriptName == "buttons" or currentValue == 0x131 then -- 0x131 is K. Rool's Ship (Galleon)
+				if scriptName == "gunswitches" or scriptName == "buttons" or currentValue == 0x131 or currentValue == 0x47 then -- 0x131 is K. Rool's Ship (Galleon), 0x47 is Castle Lobby coconut switch
 					-- Get part 2
 					activationScript = dereferencePointer(activationScript + 0xA0);
 
@@ -5666,7 +5666,7 @@ function ohWrongnana(verbose)
 									if verbose then
 										ohWrongnanaDebugOut(scriptName, slotBase, activationScript, j);
 									end
-								elseif FTA.isBulletCheck(commandParam) and scriptName == "gunswitches" then
+								elseif FTA.isBulletCheck(commandParam) and (scriptName == "gunswitches" or currentValue == 0x47) then -- 0x47 is Castle Lobby coconut switch
 									mainmemory.write_u16_be(activationScript + j, FTA.BulletChecks[currentKong]);
 									if verbose then
 										ohWrongnanaDebugOut(scriptName, slotBase, activationScript, j);
