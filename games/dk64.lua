@@ -4179,7 +4179,7 @@ end
 
 ScriptHawk.bindKeyFrame("K", decreaseSurfaceTimerHack, false);
 ScriptHawk.bindKeyFrame("L", increaseSurfaceTimerHack, false);
-]]--
+--]]
 
 ------------------
 -- Chunk Deload --
@@ -5722,7 +5722,7 @@ function ohWrongnana(verbose)
 	local objModel2Array = getObjectModel2Array();
 	if isRDRAM(objModel2Array) and currentKong >= DK and currentKong <= Chunky then
 		local numSlots = mainmemory.read_u32_be(Game.Memory.obj_model2_array_count[version]);
-		local scriptName, slotBase, currentValue, activationScript;
+		local scriptName, slotBase, currentValue, activationScript, preceedingCommand;
 		-- Fill and sort pointer list
 		for i = 0, numSlots - 1 do
 			slotBase = objModel2Array + i * obj_model2_slot_size;
@@ -5736,14 +5736,11 @@ function ohWrongnana(verbose)
 				currentValue = mainmemory.read_u16_be(slotBase + obj_model2.object_type);
 				if FTA.isGunSwitch(currentValue) or FTA.isSimSlamSwitch(currentValue) or currentValue == 0x131 or currentValue == 0x47 then -- 0x131 is K. Rool's Ship (Galleon), 0x47 is Castle Lobby coconut switch
 					scriptName = getInternalName(slotBase);
-
-					-- Get part 2
-					activationScript = dereferencePointer(activationScript + 0xA0);
-
-					while isRDRAM(activationScript) do
-						for j = 0x04, 0x48, 8 do
-							local preceedingCommand = mainmemory.readbyte(activationScript + j - 1);
-							if currentValue == 0x131 then -- K. Rool's Ship (Galleon)
+					if currentValue == 0x131 then -- K. Rool's Ship (Galleon)
+						activationScript = dereferencePointer(activationScript + 0xA0);
+						while isRDRAM(activationScript) do
+							for j = 0x04, 0x48, 8 do
+								preceedingCommand = mainmemory.readbyte(activationScript + j - 1);
 								if preceedingCommand == 0x12 then
 									local commandParam = mainmemory.read_u16_be(activationScript + j);
 									if isKong(commandParam) then
@@ -5753,24 +5750,46 @@ function ohWrongnana(verbose)
 										end
 									end
 								end
-							elseif FTA.isSafePreceedingCommand(preceedingCommand) then
-								local commandParam = mainmemory.read_u16_be(activationScript + j);
-								if isKong(commandParam) and scriptName == "buttons" then
-									mainmemory.write_u16_be(activationScript + j, FTA.SimSlamChecks[currentKong]);
-									if verbose then
-										FTA.debugOut(scriptName, slotBase, activationScript, j);
-									end
-								elseif FTA.isBulletCheck(commandParam) and (scriptName == "gunswitches" or currentValue == 0x47) then -- 0x47 is Castle Lobby coconut switch
-									mainmemory.write_u16_be(activationScript + j, FTA.BulletChecks[currentKong]);
-									if verbose then
-										FTA.debugOut(scriptName, slotBase, activationScript, j);
+							end
+							-- Get next script chunk
+							activationScript = dereferencePointer(activationScript + 0x4C);
+						end
+					elseif scriptName == "buttons" then
+						activationScript = dereferencePointer(activationScript + 0xA0);
+						while isRDRAM(activationScript) do
+							for j = 0x04, 0x48, 8 do
+								preceedingCommand = mainmemory.readbyte(activationScript + j - 1);
+								if FTA.isSafePreceedingCommand(preceedingCommand) then
+									local commandParam = mainmemory.read_u16_be(activationScript + j);
+									if isKong(commandParam) then
+										mainmemory.write_u16_be(activationScript + j, FTA.SimSlamChecks[currentKong]);
+										if verbose then
+											FTA.debugOut(scriptName, slotBase, activationScript, j);
+										end
 									end
 								end
 							end
+							-- Get next script chunk
+							activationScript = dereferencePointer(activationScript + 0x4C);
 						end
-
-						-- Get next script chunk
-						activationScript = dereferencePointer(activationScript + 0x4C);
+					elseif scriptName == "gunswitches" or currentValue == 0x47 then
+						activationScript = dereferencePointer(activationScript + 0xA0);
+						while isRDRAM(activationScript) do
+							for j = 0x04, 0x48, 8 do
+								preceedingCommand = mainmemory.readbyte(activationScript + j - 1);
+								if FTA.isSafePreceedingCommand(preceedingCommand) then
+									local commandParam = mainmemory.read_u16_be(activationScript + j);
+									if FTA.isBulletCheck(commandParam) then
+										mainmemory.write_u16_be(activationScript + j, FTA.BulletChecks[currentKong]);
+										if verbose then
+											FTA.debugOut(scriptName, slotBase, activationScript, j);
+										end
+									end
+								end
+							end
+							-- Get next script chunk
+							activationScript = dereferencePointer(activationScript + 0x4C);
+						end
 					end
 				end
 			end
