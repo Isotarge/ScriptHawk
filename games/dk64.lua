@@ -10,10 +10,12 @@ displacement_detection = false;
 enable_phase = false; -- To enable the phase glitches on Europe and Japan set this to true
 encircle_enabled = false;
 force_tbs = false;
+hide_non_scripted = false;
 koshbot_enabled = false;
 never_slip = false;
 object_model2_filter = nil; -- String, see obj_model2.object_types
 paper_mode = false;
+rat_enabled = false; -- Randomize Animation Timers
 
 -- TODO: Need to put some grab script state up here because encircle uses it before they would normally be defined
 -- This can probably be fixed with a clever reshuffle of grab script state/functions
@@ -665,10 +667,12 @@ Game.getMaxHomingAmmo = Game.getMaxStandardAmmo;
 ----------------------------------
 
 -- Relative to objects found in the heap (and similar linked lists)
-local previous_object = -0x10; -- Pointer
-local object_size = -0x0C; -- u32_be
-local next_free_block = -0x08; -- Pointer
-local prev_free_block = -0x04; -- Pointer
+local heap = {
+	previous_object = -0x10, -- Pointer
+	object_size = -0x0C, -- u32_be
+	next_free_block = -0x08, -- Pointer
+	prev_free_block = -0x04, -- Pointer
+};
 
 -- Theoretical max is 255 actors, but the game crashes well before that limit
 local function getObjectModel1Count()
@@ -1289,7 +1293,7 @@ local function getExamineDataModelOne(pointer)
 	local hasPosition = hasModel or xPos ~= 0 or yPos ~= 0 or zPos ~= 0;
 
 	table.insert(examine_data, { "Actor base", toHexString(pointer, 6) });
-	table.insert(examine_data, { "Actor size", toHexString(mainmemory.read_u32_be(pointer + object_size)) });
+	table.insert(examine_data, { "Actor size", toHexString(mainmemory.read_u32_be(pointer + heap.object_size)) });
 	local currentActorTypeNumeric = mainmemory.read_u32_be(pointer + obj_model1.actor_type);
 	local currentActorType = getActorName(pointer); -- Needed for detecting special fields
 	table.insert(examine_data, { "Actor type", currentActorType });
@@ -2482,7 +2486,7 @@ local function getObjectModel2ArraySize()
 	end
 	local objModel2Array = getObjectModel2Array();
 	if isRDRAM(objModel2Array) then
-		return mainmemory.read_u32_be(objModel2Array + object_size) / obj_model2_slot_size;
+		return mainmemory.read_u32_be(objModel2Array + heap.object_size) / obj_model2_slot_size;
 	end
 	return 0;
 end
@@ -4194,7 +4198,7 @@ chunk = {
 function fixChunkDeload()
 	local chunkArray = dereferencePointer(Game.Memory.chunk_array_pointer[version]);
 	if isRDRAM(chunkArray) then
-		local numChunks = math.floor(mainmemory.read_u32_be(chunkArray + object_size) / chunkSize);
+		local numChunks = math.floor(mainmemory.read_u32_be(chunkArray + heap.object_size) / chunkSize);
 		for i = 0, numChunks - 1 do
 			local chunkBase = chunkArray + i * chunkSize;
 			mainmemory.write_u32_be(chunkBase + chunk.deload1, 0xA);
@@ -4216,7 +4220,7 @@ local function populateChunkPointers()
 	end
 	local chunkArray = dereferencePointer(Game.Memory.chunk_array_pointer[version]);
 	if isRDRAM(chunkArray) then
-		local numChunks = math.floor(mainmemory.read_u32_be(chunkArray + object_size) / chunkSize);
+		local numChunks = math.floor(mainmemory.read_u32_be(chunkArray + heap.object_size) / chunkSize);
 		for i = 0, numChunks - 1 do
 			local chunkBase = chunkArray + i * chunkSize;
 			table.insert(object_pointers, chunkBase);
@@ -4224,6 +4228,67 @@ local function populateChunkPointers()
 
 		-- Clamp index
 		object_index = math.min(object_index, math.max(1, #object_pointers));
+	end
+end
+
+-----------
+-- Exits --
+-----------
+
+function Game.getDestinationExit()
+	return mainmemory.read_u32_be(Game.Memory.destination_exit[version]);
+end
+
+function Game.getNumberOfExits()
+	return mainmemory.readbyte(Game.Memory.number_of_exits[version]);
+end
+
+function Game.getExitOSD()
+	return Game.getDestinationExit().."/"..Game.getNumberOfExits();
+end
+
+function dumpExits()
+	local exitArray = dereferencePointer(Game.Memory.exit_array_pointer[version]);
+	local numberOfExits = Game.getNumberOfExits();
+	if isRDRAM(exitArray) then
+		for i = 0, numberOfExits - 1 do
+			local exitBase = exitArray + i * 0x0A;
+			local xPos = mainmemory.read_s16_be(exitBase + 0);
+			local yPos = mainmemory.read_s16_be(exitBase + 2);
+			local zPos = mainmemory.read_s16_be(exitBase + 4);
+			dprint("Exit "..i..": "..xPos..", "..yPos..", "..zPos);
+		end
+		print_deferred();
+	end
+end
+
+local function populateExitPointers()
+	local exitArray = dereferencePointer(Game.Memory.exit_array_pointer[version]);
+	object_pointers = {};
+	if isRDRAM(exitArray) then
+		local numberOfExits = Game.getNumberOfExits();
+		for i = 0, numberOfExits - 1 do
+			local exitBase = exitArray + i * 0x0A;
+			table.insert(object_pointers, exitBase);
+		end
+	end
+end
+
+local function zipToExit(index)
+	local exitArray = dereferencePointer(Game.Memory.exit_array_pointer[version]);
+	local numberOfExits = Game.getNumberOfExits();
+	if isRDRAM(exitArray) then
+		if index >= numberOfExits then
+			index = 0;
+			print("Warning: Exit index "..index.." is greater than the maximum exit for this map");
+		end
+		if index < numberOfExits then
+			local exitBase = exitArray + index * 0x0A;
+			local xPos = mainmemory.read_s16_be(exitBase + 0);
+			local yPos = mainmemory.read_s16_be(exitBase + 2);
+			local zPos = mainmemory.read_s16_be(exitBase + 4);
+			Game.setPosition(xPos, yPos, zPos);
+		end
 	end
 end
 
@@ -5487,7 +5552,7 @@ end
 -- 0019 xxxx - Check actor sim slam collision, index xxxx
 -- 0025 xxxx - Play cutscene, index xxxx
 
-local safePreceedingCommands = {
+FTA.safePreceedingCommands = {
 	0x11,
 		-- Working, Aztec top of 5DT Diddy Switch (base + 0x0C, 2 blocks)
 	0x18,
@@ -5501,14 +5566,14 @@ local safePreceedingCommands = {
 		-- Used in K. Lumsy Grape Switch to keep pressed, character check
 };
 
-local function isSafePreceedingCommand(preceedingCommand)
-	return table.contains(safePreceedingCommands, preceedingCommand);
+function FTA.isSafePreceedingCommand(preceedingCommand)
+	return table.contains(FTA.safePreceedingCommands, preceedingCommand);
 end
 
 -- Potentially unsafe:
 -- 0x0025
 
-local function freeTradeObjectModel1(currentKong)
+function FTA.freeTradeObjectModel1(currentKong)
 	if currentKong >= DK and currentKong <= Chunky then
 		for object_no = 0, getObjectModel1Count() do
 			local pointer = dereferencePointer(Game.Memory.pointer_list[version] + (object_no * 4));
@@ -5525,27 +5590,27 @@ local function freeTradeObjectModel1(currentKong)
 	end
 end
 
-local function isKnownCollisionType(collisionType)
+function FTA.isKnownCollisionType(collisionType)
 	return obj_model2.object_types[collisionType] ~= nil;
 end
 
-local function fixSingleCollision(objectBase)
+function FTA.fixSingleCollision(objectBase)
 	local collisionType = mainmemory.read_u16_be(objectBase + 2);
 	local collisionValue = mainmemory.read_u16_be(objectBase + 4);
-	if isKnownCollisionType(collisionType) and isKong(collisionValue) then
+	if FTA.isKnownCollisionType(collisionType) and isKong(collisionValue) then
 		mainmemory.write_u16_be(objectBase + 4, 0); -- Set the collision to accept any Kong
 	end
 end
 
-local function freeTradeCollisionList()
+function FTA.freeTradeCollisionList()
 	local collisionLinkedListPointer = dereferencePointer(Game.Memory.obj_model2_collision_linked_list_pointer[version]);
 	if isRDRAM(collisionLinkedListPointer) then
-		local collisionListObjectSize = mainmemory.read_u32_be(collisionLinkedListPointer + object_size);
+		local collisionListObjectSize = mainmemory.read_u32_be(collisionLinkedListPointer + heap.object_size);
 		for i = 0, collisionListObjectSize, 4 do
 			local object = dereferencePointer(collisionLinkedListPointer + i);
 			local safety = nil;
 			while isRDRAM(object) do
-				fixSingleCollision(object);
+				FTA.fixSingleCollision(object);
 				safety = dereferencePointer(object + 0x18); -- Get next object
 				if safety == object then -- Prevent infinite loops
 					break;
@@ -5560,7 +5625,7 @@ function dumpCollisionTypes(kongFilter)
 	local kongCounts = {};
 	local collisionLinkedListPointer = dereferencePointer(Game.Memory.obj_model2_collision_linked_list_pointer[version]);
 	if isRDRAM(collisionLinkedListPointer) then
-		local collisionListObjectSize = mainmemory.read_u32_be(collisionLinkedListPointer + object_size);
+		local collisionListObjectSize = mainmemory.read_u32_be(collisionLinkedListPointer + heap.object_size);
 		for i = 0, collisionListObjectSize, 4 do
 			local object = dereferencePointer(collisionLinkedListPointer + i);
 			while isRDRAM(object) do
@@ -5592,7 +5657,7 @@ end
 function replaceCollisionType(target, desired)
 	local collisionLinkedListPointer = dereferencePointer(Game.Memory.obj_model2_collision_linked_list_pointer[version]);
 	if isRDRAM(collisionLinkedListPointer) then
-		local collisionListObjectSize = mainmemory.read_u32_be(collisionLinkedListPointer + object_size);
+		local collisionListObjectSize = mainmemory.read_u32_be(collisionLinkedListPointer + heap.object_size);
 		for i = 0, collisionListObjectSize, 4 do
 			local object = dereferencePointer(collisionLinkedListPointer + i);
 			while isRDRAM(object) do
@@ -5606,7 +5671,7 @@ function replaceCollisionType(target, desired)
 	end
 end
 
-local function ohWrongnanaDebugOut(objName, objBase, scriptBase, scriptOffset)
+function FTA.debugOut(objName, objBase, scriptBase, scriptOffset)
 	local preceedingCommand = mainmemory.read_u16_be(scriptBase + scriptOffset - 2);
 	print("patched "..objName.." at "..toHexString(objBase).." -> "..toHexString(scriptBase).." + "..toHexString(scriptOffset).." preceeding command "..toHexString(preceedingCommand));
 end
@@ -5651,21 +5716,21 @@ function ohWrongnana(verbose)
 									if isKong(commandParam) then
 										mainmemory.write_u16_be(activationScript + j, FTA.SimSlamChecks[currentKong]);
 										if verbose then
-											ohWrongnanaDebugOut(scriptName, slotBase, activationScript, j);
+											FTA.debugOut(scriptName, slotBase, activationScript, j);
 										end
 									end
 								end
-							elseif isSafePreceedingCommand(preceedingCommand) then
+							elseif FTA.isSafePreceedingCommand(preceedingCommand) then
 								local commandParam = mainmemory.read_u16_be(activationScript + j);
 								if isKong(commandParam) and scriptName == "buttons" then
 									mainmemory.write_u16_be(activationScript + j, FTA.SimSlamChecks[currentKong]);
 									if verbose then
-										ohWrongnanaDebugOut(scriptName, slotBase, activationScript, j);
+										FTA.debugOut(scriptName, slotBase, activationScript, j);
 									end
 								elseif FTA.isBulletCheck(commandParam) and (scriptName == "gunswitches" or currentValue == 0x47) then -- 0x47 is Castle Lobby coconut switch
 									mainmemory.write_u16_be(activationScript + j, FTA.BulletChecks[currentKong]);
 									if verbose then
-										ohWrongnanaDebugOut(scriptName, slotBase, activationScript, j);
+										FTA.debugOut(scriptName, slotBase, activationScript, j);
 									end
 								end
 							end
@@ -5678,8 +5743,8 @@ function ohWrongnana(verbose)
 			end
 		end
 
-		freeTradeObjectModel1(currentKong);
-		freeTradeCollisionList();
+		FTA.freeTradeObjectModel1(currentKong);
+		FTA.freeTradeCollisionList();
 	end
 end
 
@@ -5744,24 +5809,21 @@ end
 -- Grab Script --
 -----------------
 
-hide_non_scripted = false;
-rat_enabled = false;
-
-local function incrementObjectIndex()
+function Game.incrementObjectIndex()
 	object_index = object_index + 1;
 	if object_index > #object_pointers then
 		object_index = 1;
 	end
 end
 
-local function decrementObjectIndex()
+function Game.decrementObjectIndex()
 	object_index = object_index - 1;
 	if object_index <= 0 then
 		object_index = #object_pointers;
 	end
 end
 
-local function grabObject(pointer)
+function Game.grabObject(pointer)
 	local playerObject = Game.getPlayerObject();
 	if isRDRAM(playerObject) then
 		mainmemory.write_u32_be(playerObject + obj_model1.player.grab_pointer, pointer + RDRAMBase);
@@ -5769,7 +5831,7 @@ local function grabObject(pointer)
 	end
 end
 
-local function grabSelectedObject()
+function Game.grabSelectedObject()
 	if grab_script_mode == "Chunks" then
 		local loaded = mainmemory.readbyte(object_pointers[object_index] + chunk.visible);
 		if loaded == 2 then
@@ -5779,24 +5841,24 @@ local function grabSelectedObject()
 		end
 	end
 	if string.contains(grab_script_mode, "Model 1") then
-		grabObject(object_pointers[object_index]);
+		Game.grabObject(object_pointers[object_index]);
 	end
 end
 
-local function focusObject(pointer) -- TODO: There's more pointers to set here, mainly vehicle stuff
+function Game.focusObject(pointer) -- TODO: There's more pointers to set here, mainly vehicle stuff
 	local cameraObject = dereferencePointer(Game.Memory.camera_pointer[version]);
 	if isRDRAM(cameraObject) and isRDRAM(pointer) then
 		mainmemory.write_u32_be(cameraObject + obj_model1.camera.focused_actor_pointer, pointer + RDRAMBase);
 	end
 end
 
-local function focusSelectedObject()
+function Game.focusSelectedObject()
 	if string.contains(grab_script_mode, "Model 1") then
-		focusObject(object_pointers[object_index]);
+		Game.focusObject(object_pointers[object_index]);
 	end
 end
 
-local function zipToSelectedObject()
+function Game.zipToSelectedObject()
 	local playerObject = Game.getPlayerObject();
 	if isRDRAM(playerObject) then
 		local desiredX, desiredY, desiredZ;
@@ -5851,14 +5913,14 @@ local function zipToSelectedObject()
 	end
 end
 
-ScriptHawk.bindMouse("mousewheelup", decrementObjectIndex);
-ScriptHawk.bindMouse("mousewheeldown", incrementObjectIndex);
+ScriptHawk.bindMouse("mousewheelup", Game.decrementObjectIndex);
+ScriptHawk.bindMouse("mousewheeldown", Game.incrementObjectIndex);
 
-ScriptHawk.bindKeyRealtime("N", decrementObjectIndex, true);
-ScriptHawk.bindKeyRealtime("M", incrementObjectIndex, true);
-ScriptHawk.bindKeyRealtime("Z", zipToSelectedObject, true);
-ScriptHawk.bindKeyRealtime("V", grabSelectedObject, true);
-ScriptHawk.bindKeyRealtime("B", focusSelectedObject, true);
+ScriptHawk.bindKeyRealtime("N", Game.decrementObjectIndex, true);
+ScriptHawk.bindKeyRealtime("M", Game.incrementObjectIndex, true);
+ScriptHawk.bindKeyRealtime("Z", Game.zipToSelectedObject, true);
+ScriptHawk.bindKeyRealtime("V", Game.grabSelectedObject, true);
+ScriptHawk.bindKeyRealtime("B", Game.focusSelectedObject, true);
 ScriptHawk.bindKeyRealtime("C", switch_grab_script_mode, true);
 
 ------------------------------
@@ -6141,7 +6203,7 @@ local function drawGrabScriptUI()
 		if grab_script_mode == "List (Object Model 1)" then
 			row = row + 1;
 			for i = #object_pointers, 1, -1 do
-				local currentActorSize = mainmemory.read_u32_be(object_pointers[i] + object_size); -- TODO: Got an exception here while kiosk was booting
+				local currentActorSize = mainmemory.read_u32_be(object_pointers[i] + heap.object_size); -- TODO: Got an exception here while kiosk was booting
 				local color = nil;
 				if object_index == i then
 					color = yellow_highlight;
@@ -6270,63 +6332,6 @@ function Game.unlockMoves()
 
 	-- Unlock Kongs
 	setFlagsByType("Kong");
-end
-
-function Game.getDestinationExit()
-	return mainmemory.read_u32_be(Game.Memory.destination_exit[version]);
-end
-
-function Game.getNumberOfExits()
-	return mainmemory.readbyte(Game.Memory.number_of_exits[version]);
-end
-
-function Game.getExitOSD()
-	return Game.getDestinationExit().."/"..Game.getNumberOfExits();
-end
-
-function dumpExits()
-	local exitArray = dereferencePointer(Game.Memory.exit_array_pointer[version]);
-	local numberOfExits = Game.getNumberOfExits();
-	if isRDRAM(exitArray) then
-		for i = 0, numberOfExits - 1 do
-			local exitBase = exitArray + i * 0x0A;
-			local xPos = mainmemory.read_s16_be(exitBase + 0);
-			local yPos = mainmemory.read_s16_be(exitBase + 2);
-			local zPos = mainmemory.read_s16_be(exitBase + 4);
-			dprint("Exit "..i..": "..xPos..", "..yPos..", "..zPos);
-		end
-		print_deferred();
-	end
-end
-
-local function populateExitPointers()
-	local exitArray = dereferencePointer(Game.Memory.exit_array_pointer[version]);
-	object_pointers = {};
-	if isRDRAM(exitArray) then
-		local numberOfExits = Game.getNumberOfExits();
-		for i = 0, numberOfExits - 1 do
-			local exitBase = exitArray + i * 0x0A;
-			table.insert(object_pointers, exitBase);
-		end
-	end
-end
-
-local function zipToExit(index)
-	local exitArray = dereferencePointer(Game.Memory.exit_array_pointer[version]);
-	local numberOfExits = Game.getNumberOfExits();
-	if isRDRAM(exitArray) then
-		if index >= numberOfExits then
-			index = 0;
-			print("Warning: Exit index "..index.." is greater than the maximum exit for this map");
-		end
-		if index < numberOfExits then
-			local exitBase = exitArray + index * 0x0A;
-			local xPos = mainmemory.read_s16_be(exitBase + 0);
-			local yPos = mainmemory.read_s16_be(exitBase + 2);
-			local zPos = mainmemory.read_s16_be(exitBase + 4);
-			Game.setPosition(xPos, yPos, zPos);
-		end
-	end
 end
 
 function Game.getMap()
@@ -6931,7 +6936,7 @@ function crumble()
 	local vertBase = dereferencePointer(Game.Memory.vert_base[version]);
 
 	if isRDRAM(mapBase) and isRDRAM(vertBase) then
-		local mapSize = mainmemory.read_u32_be(mapBase + object_size);
+		local mapSize = mainmemory.read_u32_be(mapBase + heap.object_size);
 		for v = vertBase, mapBase + mapSize - 0x10, vertSize do
 			if math.random() > 0.9 then
 				local xPos = mainmemory.read_s16_be(v + vert.x_position);
