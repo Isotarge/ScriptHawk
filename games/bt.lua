@@ -345,15 +345,15 @@ local Game = {
 	},
 };
 
-function checksumToString(checksum)
+local function checksumToString(checksum)
 	return toHexString(checksum[1], 8)..toHexString(checksum[2], 8, "");
 end
 
-function readChecksum(address)
+local function readChecksum(address)
 	return {memory.read_u32_be(address, "EEPROM"), memory.read_u32_be(address + 4, "EEPROM")};
 end
 
-function checksumsMatch(checksum1, checksum2)
+local function checksumsMatch(checksum1, checksum2)
 	return checksum1[1] == checksum2[1] and checksum1[2] == checksum2[2];
 end
 
@@ -479,7 +479,7 @@ end
 -- Jinjo Dump --
 ----------------
 
-JinjoAddresses = {
+local JinjoAddresses = {
 	{{0x11FA71, 0x11FC31, 0x114E01, 0x11AB41}, "MT: Jade Snake Grove"},
 	{{0x11FA74, 0x11FC34, 0x114E04, 0x11AB44}, "MT: Roof of Stadium"},
 	{{0x11FA77, 0x11FC37, 0x114E07, 0x11AB47}, "MT: Targitzan's Temple"},
@@ -527,7 +527,7 @@ JinjoAddresses = {
 	{{0x11FAF5, 0x11FCB5, 0x114E85, 0x11ABC5}, "IoH: Spiral Mountain"},
 };
 
-JinjoColors = {
+local JinjoColors = {
 	[0] = "White",
 	[1] = "Orange",
 	[2] = "Yellow",
@@ -539,7 +539,7 @@ JinjoColors = {
 	[8] = "Black",
 };
 
-knownPatterns = { -- To test for more patterns: Freeze u32_be 0x12C7F0 at a desired value and create a new file then run isKnownPattern(), tested up to 0xFF inclusive
+local knownPatterns = { -- To test for more patterns: Freeze u32_be 0x12C7F0 at a desired value and create a new file then run isKnownPattern(), tested up to 0xFF inclusive
 	{0, 1, 8, 7, 1, 6, 6, 4, 2, 2, 2, 3, 4, 3, 6, 3, 4, 5, 4, 4, 3, 5, 6, 8, 5, 5, 5, 6, 7, 8, 6, 8, 8, 7, 7, 6, 7, 8, 5, 7, 7, 8, 8, 8, 7}, -- 1
 	{0, 2, 2, 4, 7, 3, 7, 2, 6, 4, 8, 3, 4, 3, 7, 6, 5, 5, 8, 6, 6, 4, 8, 3, 1, 5, 5, 5, 5, 1, 6, 7, 4, 6, 6, 7, 7, 7, 8, 7, 8, 8, 8, 8, 8},
 	{0, 2, 5, 2, 1, 1, 6, 3, 6, 3, 7, 3, 7, 2, 7, 6, 3, 8, 7, 6, 8, 7, 7, 7, 7, 4, 5, 5, 4, 6, 5, 8, 6, 4, 5, 8, 8, 6, 5, 8, 4, 4, 8, 8, 8},
@@ -1258,10 +1258,6 @@ function Game.setMaxHealth(value)
 	end
 end
 
-function outputHealth()
-	print("Health: "..Game.getCurrentHealth().."/"..Game.getMaxHealth());
-end
-
 function dumpPointerListStrings()
 	local object;
 	local index = 0;
@@ -1270,6 +1266,7 @@ function dumpPointerListStrings()
 		if isRDRAM(object) then
 			local string = "Unknown";
 			local checkPointerOffset = 0x3C;
+			local checkPointer = 0;
 			repeat
 				checkPointerOffset = checkPointerOffset + 4;
 				checkPointer = dereferencePointer(object + checkPointerOffset);
@@ -1287,7 +1284,7 @@ end
 -----------
 
 local global_flag_block_cache = {};
-flag_block_cache = {};
+local flag_block_cache = {};
 function clearFlagCache()
 	global_flag_block_cache = {};
 	flag_block_cache = {};
@@ -3494,7 +3491,7 @@ object_model1 = {
 	},
 };
 
-function getNumSlots()
+local function getNumSlots()
 	local objectArray = dereferencePointer(Game.Memory.object_array_pointer[version]);
 	if isRDRAM(objectArray) then
 		local firstObject = dereferencePointer(objectArray + 0x04);
@@ -3506,7 +3503,7 @@ function getNumSlots()
 	return 0;
 end
 
-function getSlotBase(index)
+local function getSlotBase(index)
 	--if index < 0 or index > getNumSlots() then
 	--	print("Warning: OOB call to getSlotBase() with index"..index);
 	--end
@@ -3544,7 +3541,7 @@ local function toggleObjectAnalysisToolsMode()
 	script_mode = script_modes[script_mode_index];
 end
 
-function getObjectModel1Pointers()
+local function getObjectModel1Pointers()
 	local pointers = {};
 	local objectArray = dereferencePointer(Game.Memory.object_array_pointer[version]);
 	if isRDRAM(objectArray) then
@@ -3556,7 +3553,7 @@ function getObjectModel1Pointers()
 	return pointers;
 end
 
-function setObjectModel1Position(pointer, x, y, z)
+local function setObjectModel1Position(pointer, x, y, z)
 	if isRDRAM(pointer) then
 		mainmemory.writefloat(pointer + object_model1.x_position, x, true);
 		mainmemory.writefloat(pointer + object_model1.y_position, y, true);
@@ -3564,7 +3561,7 @@ function setObjectModel1Position(pointer, x, y, z)
 	end
 end
 
-function zipTo(index)
+local function zipTo(index)
 	local objectArray = dereferencePointer(Game.Memory.object_array_pointer[version]);
 	if isRDRAM(objectArray) then
 		local objectPointer = objectArray + getSlotBase(index);
@@ -3575,7 +3572,7 @@ function zipTo(index)
 	end
 end
 
-function zipToSelectedObject()
+local function zipToSelectedObject()
 	zipTo(object_index - 1);
 end
 
@@ -3591,7 +3588,7 @@ function everythingIs(modelIndex)
 	end
 end
 
-function getAnimationType(model1Base)
+local function getAnimationType(model1Base)
 	local objectIDPointer = dereferencePointer(model1Base + object_model1.id_struct);
 	if isRDRAM(objectIDPointer) then
 		local modelIndex = mainmemory.read_u16_be(objectIDPointer + 0x14);
@@ -3822,7 +3819,7 @@ local function unlock_moves()
 	end
 end
 
-function toggleDragonKazooie()
+function Game.toggleDragonKazooie()
 	toggleFlagByName("Ability: Dragon Kazooie");
 end
 
@@ -3840,7 +3837,7 @@ function Game.initUI()
 	-- Moves
 	ScriptHawk.UI.form_controls.moves_dropdown = forms.dropdown(ScriptHawk.UI.options_form, { "1. All", "2. None" }, ScriptHawk.UI.col(5) - ScriptHawk.UI.dropdown_offset, ScriptHawk.UI.row(4) + ScriptHawk.UI.dropdown_offset, ScriptHawk.UI.col(4) + 10, ScriptHawk.UI.button_height);
 	ScriptHawk.UI.form_controls.moves_button = forms.button(ScriptHawk.UI.options_form, "Unlock Moves", unlock_moves, ScriptHawk.UI.col(10), ScriptHawk.UI.row(4), ScriptHawk.UI.col(4) + 10, ScriptHawk.UI.button_height);
-	ScriptHawk.UI.form_controls.dragon_button = forms.button(ScriptHawk.UI.options_form, "Toggle Dragon Kazooie", toggleDragonKazooie, ScriptHawk.UI.col(10), ScriptHawk.UI.row(5), ScriptHawk.UI.col(4) + 10, ScriptHawk.UI.button_height);
+	ScriptHawk.UI.form_controls.dragon_button = forms.button(ScriptHawk.UI.options_form, "Toggle Dragon Kazooie", Game.toggleDragonKazooie, ScriptHawk.UI.col(10), ScriptHawk.UI.row(5), ScriptHawk.UI.col(4) + 10, ScriptHawk.UI.button_height);
 
 	flagStats();
 end
