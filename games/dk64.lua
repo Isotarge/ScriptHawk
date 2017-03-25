@@ -5616,10 +5616,6 @@ function ohWrongnana(verbose)
 		return;
 	end
 
-	if Game.isLoading() then
-		return;
-	end
-
 	--if emu.framecount() % 100 ~= 0 then -- Only run this once every 100 frames
 	--	return;
 	--end
@@ -7149,66 +7145,68 @@ function Game.eachFrame()
 		Game.OSD = Game.standardOSD;
 	end
 
-	if crumbling then
-		crumble();
-	end
-
-	if force_tbs then
-		forceTBS();
-	end
-
-	if enable_phase then
-		local currentCameraState = Game.getCameraState();
-		if (currentCameraState == "Normal" or currentCameraState == "Locked" or currentCameraState == "Water") and (previousCameraState == "Fairy" or previousCameraState == "First Person") then
-			local yRot = Game.getYRotation();
-			if yRot < 2048 then
-				Game.setYRotation(yRot + Game.max_rot_units);
-			end
+	if not Game.isLoading() then
+		if crumbling then
+			crumble();
 		end
-		previousCameraState = currentCameraState;
-	end
 
-	-- TODO: This is really slow and doesn't cover all memory domains
-	--memoryStatCache = getMemoryStats(dereferencePointer(Game.Memory.heap_pointer[version]));
+		if force_tbs then
+			forceTBS();
+		end
 
-	--setWaterSurfaceTimers(surfaceTimerHack);
-	--Game.unlockMenus(); -- TODO: Allow user to toggle this
+		if enable_phase then
+			local currentCameraState = Game.getCameraState();
+			if (currentCameraState == "Normal" or currentCameraState == "Locked" or currentCameraState == "Water") and (previousCameraState == "Fairy" or previousCameraState == "First Person") then
+				local yRot = Game.getYRotation();
+				if yRot < 2048 then
+					Game.setYRotation(yRot + Game.max_rot_units);
+				end
+			end
+			previousCameraState = currentCameraState;
+		end
 
-	if forms.ischecked(ScriptHawk.UI.form_controls["Toggle Lag Fix Checkbox"]) then
-		fixLag();
-	end
+		-- TODO: This is really slow and doesn't cover all memory domains
+		--memoryStatCache = getMemoryStats(dereferencePointer(Game.Memory.heap_pointer[version]));
 
-	if koshbot_enabled == true then
-		koshBot.Loop(); -- TODO: This probably stops the virtual pad from working
-	end
+		--setWaterSurfaceTimers(surfaceTimerHack);
+		--Game.unlockMenus(); -- TODO: Allow user to toggle this
 
-	if never_slip then
-		Game.neverSlip();
-	end
+		if forms.ischecked(ScriptHawk.UI.form_controls["Toggle Lag Fix Checkbox"]) then
+			fixLag();
+		end
 
-	if paper_mode then
-		Game.paperMode();
-	end
+		if koshbot_enabled == true then
+			koshBot.Loop(); -- TODO: This probably stops the virtual pad from working
+		end
 
-	if type(ScriptHawk.UI.form_controls["Toggle Noclip Checkbox"]) ~= "nil" and forms.ischecked(ScriptHawk.UI.form_controls["Toggle Noclip Checkbox"]) then
-		Game.setNoclipByte(0x01);
-	end
+		if never_slip then
+			Game.neverSlip();
+		end
 
-	if type(ScriptHawk.UI.form_controls["Toggle OhWrongnana"]) ~= "nil" and forms.ischecked(ScriptHawk.UI.form_controls["Toggle OhWrongnana"]) then
-		ohWrongnana();
-	end
+		if paper_mode then
+			Game.paperMode();
+		end
 
-	if displacement_detection then
-		displacementDetection();
-	end
+		if type(ScriptHawk.UI.form_controls["Toggle Noclip Checkbox"]) ~= "nil" and forms.ischecked(ScriptHawk.UI.form_controls["Toggle Noclip Checkbox"]) then
+			Game.setNoclipByte(0x01);
+		end
 
-	if is_brb then
-		doBRB();
-	end
+		if type(ScriptHawk.UI.form_controls["Toggle OhWrongnana"]) ~= "nil" and forms.ischecked(ScriptHawk.UI.form_controls["Toggle OhWrongnana"]) then
+			ohWrongnana();
+		end
 
-	-- Moonkick
-	if moon_mode == 'All' or (moon_mode == 'Kick' and isRDRAM(playerObject) and mainmemory.readbyte(playerObject + obj_model1.player.animation_type) == 0x29) then
-		Game.setYAcceleration(-2.5);
+		if displacement_detection then
+			displacementDetection();
+		end
+
+		if is_brb then
+			doBRB();
+		end
+
+		-- Moonkick
+		if moon_mode == 'All' or (moon_mode == 'Kick' and isRDRAM(playerObject) and mainmemory.readbyte(playerObject + obj_model1.player.animation_type) == 0x29) then
+			Game.setYAcceleration(-2.5);
+		end
 	end
 
 	-- Check EEPROM checksums
