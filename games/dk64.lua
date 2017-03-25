@@ -5491,14 +5491,14 @@ end
 --------------------------
 
 local FTA = {
-	BalloonStates = {
+	Balloons = {
 		[DK] = 114,
 		[Diddy] = 91,
 		[Lanky] = 113,
 		[Tiny] = 112,
 		[Chunky] = 111,
 	},
-	KasplatStates = { -- Not actually used by the check function for speed reasons, really just here for documentation
+	Kasplats = { -- Not actually used by the check function for speed reasons, really just here for documentation
 		[DK] = 241,
 		[Diddy] = 242,
 		[Lanky] = 243,
@@ -5520,6 +5520,30 @@ local FTA = {
 		[Tiny] = 0x24,
 		[Chunky] = 0x21,
 	},
+	GunSwitches = {
+		0x125, -- Pineapple Switch
+		0x126, -- Peanut Switch
+		0x127, -- Feather Switch
+		0x128, -- Grape Switch
+		0x129, -- Coconut Switch
+	},
+	SimSlamSwitches = { -- Not actually used by the check function for speed reasons, really just here for documentation
+		0x92, -- Chunky, Green
+		0x93, -- Diddy, Green
+		0x94, -- DK, Green
+		0x95, -- Lanky, Green
+		0x96, -- Tiny, Green
+		0x165, -- Chunky, Red
+		0x166, -- Diddy, Red
+		0x167, -- DK, Red
+		0x168, -- Lanky, Red
+		0x169, -- Tiny, Red
+		0x16A, -- Chunky, Blue
+		0x16B, -- Diddy, Blue
+		0x16C, -- DK, Blue
+		0x16D, -- Lanky, Blue
+		0x16E, -- Tiny, Blue
+	},
 	SimSlamChecks = { -- Not actually used by the check function for speed reasons, really just here for documentation
 		[DK] = 0x0002,
 		[Diddy] = 0x0003,
@@ -5531,11 +5555,19 @@ local FTA = {
 };
 
 function FTA.isBalloon(actorType)
-	return table.contains(FTA.BalloonStates, actorType)
+	return table.contains(FTA.Balloons, actorType)
 end
 
 function FTA.isKasplat(actorType)
 	return actorType >= 241 and actorType <= 245;
+end
+
+function FTA.isSimSlamSwitch(value)
+	return (value >= 0x92 and value <= 0x96) or (value >= 0x165 and value <= 0x16E);
+end
+
+function FTA.isGunSwitch(value)
+	return value >= 0x125 and value <= 0x129;
 end
 
 function FTA.isBulletCheck(value)
@@ -5580,10 +5612,10 @@ function FTA.freeTradeObjectModel1(currentKong)
 			if isRDRAM(pointer) then
 				local actorType = mainmemory.read_u32_be(pointer + obj_model1.actor_type);
 				if FTA.isKasplat(actorType) then
-					mainmemory.write_u32_be(pointer + obj_model1.actor_type, FTA.KasplatStates[currentKong]); -- Fix which blueprint the Kasplat drops
+					mainmemory.write_u32_be(pointer + obj_model1.actor_type, FTA.Kasplats[currentKong]); -- Fix which blueprint the Kasplat drops
 				end
 				if FTA.isBalloon(actorType) then
-					mainmemory.write_u32_be(pointer + obj_model1.actor_type, FTA.BalloonStates[currentKong]); -- Fix balloon color
+					mainmemory.write_u32_be(pointer + obj_model1.actor_type, FTA.Balloons[currentKong]); -- Fix balloon color
 				end
 			end
 		end
@@ -5695,15 +5727,16 @@ function ohWrongnana(verbose)
 		for i = 0, numSlots - 1 do
 			slotBase = objModel2Array + i * obj_model2_slot_size;
 			currentValue = mainmemory.readbyte(slotBase + obj_model2.collectable_state);
-			if currentKong ~= Krusha and FTA.isGB(currentValue) then
+			if FTA.isGB(currentValue) then
 				mainmemory.writebyte(slotBase + obj_model2.collectable_state, FTA.GBStates[currentKong]);
 			end
 			-- Get activation script
 			activationScript = dereferencePointer(slotBase + 0x7C);
 			if isRDRAM(activationScript) then
 				currentValue = mainmemory.read_u16_be(slotBase + obj_model2.object_type);
-				scriptName = getInternalName(slotBase);
-				if scriptName == "gunswitches" or scriptName == "buttons" or currentValue == 0x131 or currentValue == 0x47 then -- 0x131 is K. Rool's Ship (Galleon), 0x47 is Castle Lobby coconut switch
+				if FTA.isGunSwitch(currentValue) or FTA.isSimSlamSwitch(currentValue) or currentValue == 0x131 or currentValue == 0x47 then -- 0x131 is K. Rool's Ship (Galleon), 0x47 is Castle Lobby coconut switch
+					scriptName = getInternalName(slotBase);
+
 					-- Get part 2
 					activationScript = dereferencePointer(activationScript + 0xA0);
 
