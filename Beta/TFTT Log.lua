@@ -522,6 +522,6 @@ function infiniteMen()
 	end
 end
 event.onframestart(infiniteMen);
-]]--
+--]]
 
 event.onframestart(draw_OSD);

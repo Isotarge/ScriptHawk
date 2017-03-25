@@ -121,7 +121,7 @@ end
 	Rotation is weird in this game
 	There's 4 addresses associated
 	Sine, cosine and their inverse
-]]--
+--]]
 
 function Game.getYRotation()
 	local currentSine = mainmemory.readfloat(Game.Memory.rot_base[version] + sine, true);
