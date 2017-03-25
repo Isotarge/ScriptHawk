@@ -5400,7 +5400,7 @@ end
 -------------------
 
 function setDKTV(message)
-	local linkedListRoot = derferencePointer(Game.Memory.heap_pointer[version]);
+	local linkedListRoot = dereferencePointer(Game.Memory.heap_pointer[version]);
 	if not isRDRAM(linkedListRoot) then
 		return; -- Something went hilariously wrong here
 	end
@@ -6299,7 +6299,7 @@ function dumpExits()
 	end
 end
 
-function populateExitPointers()
+local function populateExitPointers()
 	local exitArray = dereferencePointer(Game.Memory.exit_array_pointer[version]);
 	object_pointers = {};
 	if isRDRAM(exitArray) then
@@ -6311,7 +6311,7 @@ function populateExitPointers()
 	end
 end
 
-function zipToExit(index)
+local function zipToExit(index)
 	local exitArray = dereferencePointer(Game.Memory.exit_array_pointer[version]);
 	local numberOfExits = Game.getNumberOfExits();
 	if isRDRAM(exitArray) then
@@ -7356,5 +7356,7 @@ Game.subgameOSD = {
 
 Game.OSDPosition = {32, 70}; -- TODO: Adjust this for subgames & different regions
 Game.OSD = Game.standardOSD;
+
+--print("Local Variables: "..countLocals().."/200");
 
 return Game;

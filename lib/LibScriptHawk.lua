@@ -564,3 +564,30 @@ function writeNullTerminatedString(pointer, message)
 	end
 	mainmemory.writebyte(pointer + string.len(message), 0x00);
 end
+
+function locals()
+	local variables = {};
+	local idx = 1;
+	while true do
+		local ln, lv = debug.getlocal(2, idx);
+		if ln ~= nil then
+			variables[ln] = lv;
+		else
+			break;
+		end
+		idx = idx + 1;
+	end
+	return variables;
+end
+
+function countLocals()
+	local idx = 0;
+	while true do
+		local ln, lv = debug.getlocal(2, idx + 1);
+		if ln == nil then
+			break;
+		end
+		idx = idx + 1;
+	end
+	return idx;
+end
