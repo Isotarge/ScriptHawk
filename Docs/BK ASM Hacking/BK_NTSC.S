@@ -19,9 +19,15 @@
 
 [PauseMenuState]: 0x80383010
 
+[GameProgressBitfield]:0x803831A8
+[JiggyBitfield]: 0x803832C0
+[EmptyHoneycombBitfield]: 0x803832E0
+[MumboTokensBitfield]: 0x803832F0
+
 [ReturnToLairEnabled]: 0x80383080
 
 [ItemBase]: 0x80385F30
+
 
 /*-------------------------------
 | Functions

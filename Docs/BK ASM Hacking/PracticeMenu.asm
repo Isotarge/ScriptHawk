@@ -574,9 +574,11 @@ LB a2 @MapLoadState
 			NOP
 				LI at 0x06 ;Entering Lair
 				BEQ a0 at NormalModeCode_ResetOnEnter
-					
+				NOP
 					;@ClearAllGameProgress clears everything below AND note scores, item counts, and moves
 					JAL @ClearGameProgressFlags
+					NOP
+					JAL @LockAllMoves
 					NOP
 					JAL @ClearInGameLevelTimer
 					NOP
@@ -588,41 +590,78 @@ LB a2 @MapLoadState
 					NOP
 					JAL @ClearSomeProgressThing
 					NOP
+					LI at 0x05
+					LA a0 @ItemBase
+					SW at 0x54(a0)
+					SW zero 0x4C(a0)
 				
+				LB a0 @Map
+				JAL @GetLevelAssociatedWithMap
+				NOP
+				MOV a0 v0
 				LI a1 0x0B ;Entering SM
 				BEQ a0 a1 NormalModeCode_ResetOnEnter
-					
+				NOP
+				
+					LI at 0x06
 					BLT a0 at NormalModeCode_ResetOnEnter_NoAdjust
 					NOP
 						ADDIU a0 a0 -1
 					NormalModeCode_ResetOnEnter_NoAdjust:
-					
 					ADDIU a0 a0 -1
 					
+					SW a0 0x10(sp)
 					
 					LB a2 ResetOnEnterState ;get base address based on category
+					ADDIU a2 a2 -1
 					SLL a2 a2 2
 					LW a1 ResetPointers(a2)
 
-					MOV at a0
-					;a0 = level, a1 = baseadress, a2 = working reg
+					LW at 0x10(sp)
+					
+					;SET MOVES
+					;a0 = free, a1 = baseadress, a2 = working reg, at = level
 					MOV a2 at
 					SLL a2 a2 2
-					ADDIU a2 a2 a1
+					ADDU a2 a2 a1
 					LW a0 0(a2)
+					
 					JAL @SetMovesUnlockedBitfield
 					NOP
 					JAL @SetHasUsedMovesBitfield
 					NOP
 					
+					LW at 0x10(sp)
 					
-					;Set Mumbo Token Bitfield
-					;Set Jiggy Bitfield
-					;Set Game Progress Flags
-					;Set Empty honeycomb bitfield
-				
-				
-				
+					;SET GAME PROGRESS FLAGS
+					MOV a2 at
+					SLL a2 a2 5
+					ADDU a2 a2 a1
+					ADDIU a2 a2 0x24
+
+					ADDIU at a2 0x20
+					LA a1 @GameProgressBitfield
+
+					SetGameProgressBitfieldLoop: 
+						LW a0 0(a2)
+						SW a0 0(a1)
+						ADDIU a2 0x04
+						ADDIU a1 0x04
+						BNE at a2 SetGameProgressBitfieldLoop
+						NOP
+					
+					LB a0 ResetOnEnterState
+					LI a1 0x01
+					BNE a0 a1 NormalModeCode_ResetOnEnter
+						LW a2 0x10(sp)
+						LA a0 Reset_100HoneyCombs
+						SLL a2 a2 2
+						ADDU a2 a2 a0
+						LW a0 0(a2)
+						LA a1 @EmptyHoneycombBitfield
+						SW a0 0(a1)
+					
+						
 NormalModeCode_ResetOnEnter:
 
 //Map Ghost
@@ -634,7 +673,6 @@ LB a0 @MapLoadState
 		LB a1 PreviousLoadzoneState
 	    BEQ a1 a0 NormalModeCode_MapGhosts_InLZ_NoTransition //just left Entered
 		NOP
-			SB a0 PreviousLoadzoneState	
 			
 			LW a0 GhostRecordPointer
 			LW a1 GhostCurrentFrame
@@ -682,8 +720,6 @@ LB a0 @MapLoadState
 			NOP
 		
 		NormalModeCode_MapGhosts_InLZ_NoTransition:
-		SB a0 PreviousLoadzoneState
-		
 		LW a1 GhostCurrentFrame
 		ADDIU a1 a1 0x01
 		SW a1 GhostCurrentFrame
@@ -711,7 +747,6 @@ LB a0 @MapLoadState
 		LB a1 PreviousLoadzoneState
 	    BEQ a0 a1 NormalModeCode_MapGhosts_NotInLZ_NoTransition //just left loadzone
 		NOP
-			SB a0 PreviousLoadzoneState
 			//set Address of currentGhost
 			
 			//check if current map has ghost
@@ -771,7 +806,6 @@ LB a0 @MapLoadState
 			NOP
 			
 		NormalModeCode_MapGhosts_NotInLZ_NoTransition: 
-			SB a0 PreviousLoadzoneState
 			
 			LW a0 GhostCurrentFrame
 			ADDIU a0 a0 0x01
@@ -868,9 +902,15 @@ LB a0 @MapLoadState
 				NOP
 				
 			GhostStopRecording:
-			
+
 NormalModeCode_MapGhosts:
 		
+LB a0 @MapLoadState
+	BEQ a0 zero NormalModeCode_Housekeeping
+	SB zero PreviousLoadzoneState
+		SB a0 PreviousLoadzoneState
+	
+NormalModeCode_Housekeeping:	
 LW ra 0x24(sp)
 LW a0 0x20(sp)
 LW a1 0x1C(sp)
@@ -1002,7 +1042,7 @@ MenuOptionMaxStates:
 InfinitesMaxState:
 .byte 2
 ResetOnEnterMaxState:
-.byte 2
+.byte 4
 TakeMeThereMaxState:
 .byte 14
 MoveSetMaxState:
@@ -1019,7 +1059,7 @@ MenuOptionStringSet:
 InfinitesStringSet:
 .word OnOffOptionString
 ResetOnEnterStringSet:
-.word OnOffOptionString
+.word ResetOptionString
 TakeMeThereStringSet:
 .word TakeMeThereOptionString
 MoveSetStringSet:
@@ -1069,8 +1109,11 @@ TransformMeOptionString:
 .asciiz "BEE\0\0\0\0"
 .asciiz "WASHY\0\0"
 
-
-
+ResetOptionString:
+.asciiz " OFF\0\0\0"
+.asciiz " 100\0\0\0"
+.asciiz " ANY\0\0\0"
+.asciiz " NO RBA"
 
 ResetPointers:
 .word Reset_100
@@ -1079,15 +1122,90 @@ ResetPointers:
 
 Reset_100:
 ;MM, TTC, CC, BGS, FP, GV, CCW, RBB, MMM
-.word 0x000BFDBF ;moves
-.word 0x000BFDFF
-.word 0x000BFFFF
+.word 0x000BFDBF ;MM ;MOVES
+.word 0x000BFDFF ;TTC
+.word 0x000BFFFF ;CC
 .word 0x000FFFFF
 .word 0x000FFFFF
 .word 0x000FFFFF
 .word 0x000FFFFF
 .word 0x000FFFFF
 .word 0x000FFFFF
+
+;+0x24
+.word 0x0008C000;MM ; GAME PROGRESS
+.word 0x00010200
+.word 0x00000020
+.word 0x00000000
+.word 0x00008000
+.word 0x80000020
+.word 0x00000008
+.word 0x00000000
+.word 0x384DC001;TTC
+.word 0x00070E04
+.word 0x000000B0
+.word 0x05000000
+.word 0x00008003
+.word 0x80000120
+.word 0x0000D088
+.word 0x01000000
+.word 0x786FC085;CC
+.word 0x01070E04
+.word 0x002000B0
+.word 0x05000000
+.word 0x00008003
+.word 0x80010520
+.word 0x0200D088
+.word 0x01000004
+.word 0xF8FFC0C5;BGS 
+.word 0x031F3E0C
+.word 0x002000B0
+.word 0x3D020000
+.word 0x0000800F
+.word 0x80010521
+.word 0x0200D088
+.word 0x01000004
+.word 0xF8FFE7EF;FP
+.word 0x0F7FFE7C
+.word 0x002600B0
+.word 0x3DA60200
+.word 0x18868AFF
+.word 0xA2018F29
+.word 0xC206D098
+.word 0x0100A007
+.word 0xF8FFC7CD;GV
+.word 0x033F7E3C
+.word 0x002000B0
+.word 0x3D260000
+.word 0x1800888F
+.word 0x82010729
+.word 0xC202D098
+.word 0x01000004
+.word 0xF8FFFFFF;CCW
+.word 0x3FFFFFFF
+.word 0x006618B0
+.word 0x3DA6F203
+.word 0x1C868EFF
+.word 0xA21BDF29
+.word 0xF60ED098
+.word 0x0100A007
+.word 0xF8FFFFEF;RBB
+.word 0x3FFFFE7D
+.word 0x002600B0
+.word 0x3DA63200
+.word 0x1C868EFF
+.word 0xA201CF29
+.word 0xF60ED098
+.word 0x0100A007
+.word 0xF8FFC7CD;MMM
+.word 0x037FFE7C
+.word 0x002400B0
+.word 0x3DA60200
+.word 0x1880888F
+.word 0xA2010F29
+.word 0xC206D098
+.word 0x01000007
+
 
 Reset_Any:
 .word 0x000BFDFF ;moves
@@ -1111,7 +1229,21 @@ Reset_NoRBA:
 .word 0x000FFFFF
 .word 0x000FFFFF
 
+Reset_100HoneyCombs:
+.word 0x0000FC00 ;moves
+.word 0x0300FC00
+.word 0x0F00FC00
+.word 0x3F00FC00
+.word 0xFF0CFF00
+.word 0xFF00FC00
+.word 0xFFCFFF00
+.word 0xFF0FFF00
+.word 0xFF0CFC00
 
+temp1:
+.word 0
+temp2:
+.word 0
 
 GhostArray:
 //ghost struct:
