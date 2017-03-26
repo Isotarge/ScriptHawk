@@ -93,6 +93,7 @@ SystemID N64
 74E77C	b	u	1	RDRAM	Character
 750AC0	b	u	1	RDRAM	Number of Players
 750AC4	w	u	1	RDRAM	DK Coins (Minecart etc.)
+750AD4	b	u	1	RDRAM	K. Rool Round
 754244	d	h	1	RDRAM	Collision Linked List Pointer
 754280	d	h	1	RDRAM	HUD Pointer
 754F4C	b	h	1	RDRAM	Main Menu Background Top Red

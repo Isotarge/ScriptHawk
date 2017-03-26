@@ -56,6 +56,7 @@ SystemID N64
 742430	d	f	1	RDRAM	FOV
 748EDC	b	u	1	RDRAM	Character
 74B214	w	u	1	RDRAM	DK Coins (Minecart etc.)
+74B224	b	u	1	RDRAM	K. Rool Round
 74E9A4	d	h	1	RDRAM	Object Model 2 Collision Linked List Pointer
 74E9E0	d	h	1	RDRAM	HUD Pointer
 74F8F0	b	h	1	RDRAM	Intro Story is Playing
