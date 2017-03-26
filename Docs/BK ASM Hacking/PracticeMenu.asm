@@ -673,7 +673,7 @@ LB a0 @MapLoadState
 		LB a1 PreviousLoadzoneState
 	    BEQ a1 a0 NormalModeCode_MapGhosts_InLZ_NoTransition //just left Entered
 		NOP
-			
+			SB a0 PreviousLoadzoneState
 			LW a0 GhostRecordPointer
 			LW a1 GhostCurrentFrame
 			BEQ a0 zero Ghost_InLZ_Transition_End
@@ -720,6 +720,7 @@ LB a0 @MapLoadState
 			NOP
 		
 		NormalModeCode_MapGhosts_InLZ_NoTransition:
+		SB a0 PreviousLoadzoneState
 		LW a1 GhostCurrentFrame
 		ADDIU a1 a1 0x01
 		SW a1 GhostCurrentFrame
@@ -747,6 +748,7 @@ LB a0 @MapLoadState
 		LB a1 PreviousLoadzoneState
 	    BEQ a0 a1 NormalModeCode_MapGhosts_NotInLZ_NoTransition //just left loadzone
 		NOP
+			SB a0 PreviousLoadzoneState
 			//set Address of currentGhost
 			
 			//check if current map has ghost
@@ -806,6 +808,8 @@ LB a0 @MapLoadState
 			NOP
 			
 		NormalModeCode_MapGhosts_NotInLZ_NoTransition: 
+			
+			SB a0 PreviousLoadzoneState
 			
 			LW a0 GhostCurrentFrame
 			ADDIU a0 a0 0x01
@@ -905,10 +909,6 @@ LB a0 @MapLoadState
 
 NormalModeCode_MapGhosts:
 		
-LB a0 @MapLoadState
-	BEQ a0 zero NormalModeCode_Housekeeping
-	SB zero PreviousLoadzoneState
-		SB a0 PreviousLoadzoneState
 	
 NormalModeCode_Housekeeping:	
 LW ra 0x24(sp)
