@@ -5613,6 +5613,7 @@ function FTA.freeTradeObjectModel1(currentKong)
 				local actorType = mainmemory.read_u32_be(pointer + obj_model1.actor_type);
 				if FTA.isKasplat(actorType) then
 					mainmemory.write_u32_be(pointer + obj_model1.actor_type, FTA.Kasplats[currentKong]); -- Fix which blueprint the Kasplat drops
+					mainmemory.writebyte(pointer + 0x15F, 0x01); -- Make sure white-haired Kasplats still drop Blueprints
 				end
 				if FTA.isBalloon(actorType) then
 					mainmemory.write_u32_be(pointer + obj_model1.actor_type, FTA.Balloons[currentKong]); -- Fix balloon color

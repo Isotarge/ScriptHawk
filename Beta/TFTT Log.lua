@@ -31,7 +31,7 @@ local displayModes = {
 	"Element",
 	"Off",
 };
-currentDisplayMode = 1;
+local currentDisplayMode = 1;
 
 local function toggleDisplayMode()
 	currentDisplayMode = currentDisplayMode + 1;
