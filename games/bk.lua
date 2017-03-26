@@ -1888,7 +1888,7 @@ function drawObjectPositions()
 			if dragging ~= true then
 				startDrag = true;
 				dragging = true;
-				startDragPosition = {mouse.X, mouse.Y, mouse.Wheel};
+				startDragPosition = {mouse.X, mouse.Y, mouse.Wheel or 0};
 			else
 				draggedObjects[1] = nil;
 				draggedObjects = {};
@@ -1901,7 +1901,7 @@ function drawObjectPositions()
 	end
 
 	if dragging then
-		dragTransform = {mouse.X - startDragPosition[1], mouse.Y - startDragPosition[2],mouse.Wheel - startDragPosition[3]};
+		dragTransform = {mouse.X - startDragPosition[1], mouse.Y - startDragPosition[2], (mouse.Wheel or 0) - startDragPosition[3]};
 	end
 
 	local cameraData = {};
