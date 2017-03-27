@@ -1042,7 +1042,7 @@ MenuOptionMaxStates:
 InfinitesMaxState:
 .byte 2
 ResetOnEnterMaxState:
-.byte 4
+.byte 3
 TakeMeThereMaxState:
 .byte 14
 MoveSetMaxState:
@@ -1112,12 +1112,12 @@ TransformMeOptionString:
 ResetOptionString:
 .asciiz " OFF\0\0\0"
 .asciiz " 100\0\0\0"
-.asciiz " ANY\0\0\0"
+;.asciiz " ANY\0\0\0"
 .asciiz " NO RBA"
 
 ResetPointers:
 .word Reset_100
-.word Reset_Any
+;.word Reset_Any
 .word Reset_NoRBA
 
 Reset_100:
@@ -1218,6 +1218,8 @@ Reset_Any:
 .word 0x000FFFFF
 .word 0x000FFFFF
 
+
+
 Reset_NoRBA:
 .word 0x000BFDBF ;moves
 .word 0x000BFDFF
@@ -1228,6 +1230,79 @@ Reset_NoRBA:
 .word 0x000FFFFF
 .word 0x000FFFFF
 .word 0x000FFFFF
+
+.word 0x0000C000;MM ;GAME PROGRESS
+.word 0x00010200
+.word 0x00000020
+.word 0x00000000
+.word 0x00008000
+.word 0x80000020
+.word 0x00000008
+.word 0x00000000
+.word 0x3841C001;TTC
+.word 0x00070E04
+.word 0x000000B0
+.word 0x05000000
+.word 0x00008003
+.word 0x80000120
+.word 0x02002089
+.word 0x01000000
+.word 0x7867C085;CC
+.word 0x01070E04
+.word 0x002000B0
+.word 0x05000000
+.word 0x00008003
+.word 0x80010520
+.word 0x02002089
+.word 0x01000000
+.word 0xF8F7C0C5;BGS
+.word 0x030F1E0C
+.word 0x002000B0
+.word 0x3D000000
+.word 0x0000800F
+.word 0x80010521
+.word 0x02002089
+.word 0x01000000
+.word 0xF8F7C0CD;FP
+.word 0x030F1E1C
+.word 0x002000B0
+.word 0x3D000000
+.word 0x0000808F
+.word 0x82010721
+.word 0xC20A2089
+.word 0x01000000
+.word 0xF8F7F7ED;GV
+.word 0x0F6FDE7C
+.word 0x002600B0
+.word 0x3DA40200
+.word 0x408682FF
+.word 0xA201C721
+.word 0xC20E2099
+.word 0x01002000
+.word 0xF8F7F7ED;CCW
+.word 0x3FEFDFFF
+.word 0x006618B0
+.word 0x3DA4F203
+.word 0x408682FF
+.word 0xA209DF21
+.word 0xE60E2099
+.word 0x01002000
+.word 0xF8F7F7ED;RBB
+.word 0x3FEFDE7D
+.word 0x002600B0
+.word 0x3DA43200
+.word 0x408682FF
+.word 0xA201CF21
+.word 0xE60E2099
+.word 0x01002000
+.word 0xF8F7D0CD;MMM
+.word 0x036FDE7C
+.word 0x002400B0
+.word 0x3DA40200
+.word 0x0000808F
+.word 0xA2014721
+.word 0xC20E2089
+.word 0x01000000
 
 Reset_100HoneyCombs:
 .word 0x0000FC00 ;moves
