@@ -1,4 +1,5 @@
 SystemID N64
+00E096	w	u	1	RDRAM	Scanlines Per Frame
 010364	d	h	1	RDRAM	Framebuffer Pointer
 010368	d	h	1	RDRAM	Render Mode Pointer
 010394	d	h	1	RDRAM	Framebuffer Pointer
@@ -133,4 +134,10 @@ SystemID N64
 7F5F06	w	s	1	RDRAM	Map Void - Minimum Z
 7F5F08	w	s	1	RDRAM	Map Void - Maximum X
 7F5F0A	w	s	1	RDRAM	Map Void - Maximum Z
+7F944C	d	h	1	RDRAM	Map Geometry Table Pointer
+7F9450	d	h	1	RDRAM	Wall Collision Table Pointer
+7F9454	d	h	1	RDRAM	Ceiling Collision Table Pointer
+7F9458	d	h	1	RDRAM	Object Model 2 Model Table Pointer
+7F946C	d	h	1	RDRAM	Setup Table Pointer
+7F94AC	d	h	1	RDRAM	Texture Table Pointer
 

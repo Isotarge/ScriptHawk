@@ -43,6 +43,9 @@ SystemID N64
 379978	d	f	1	RDRAM	Game Speed
 37C930	b	u	1	RDRAM	Player is on ground
 37C931	b	u	1	RDRAM	Player is Swimming
+37C990	d	f	1	RDRAM	Cauldron Activation Position X
+37C994	d	f	1	RDRAM	Cauldron Activation Position Y
+37C998	d	f	1	RDRAM	Cauldron Activation Position Z
 37CABC	d	f	1	RDRAM	Player Scale
 37CAF0	d	f	1	RDRAM	X Disjoint Amount
 37CAF4	d	f	1	RDRAM	Y Disjoint Amount

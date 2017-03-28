@@ -1,5 +1,5 @@
 SystemID N64
-00EFD2	w	h	1	RDRAM	Counter Factor?
+00EFD2	w	u	1	RDRAM	Scanlines Per Frame
 0337E0	d	h	1	RDRAM	Diddy ? colour (Main Menu)
 0337E4	d	h	1	RDRAM	Lanky ? colour (Main Menu)
 0337E8	d	h	1	RDRAM	Tiny ? colour (Main Menu)
@@ -213,4 +213,5 @@ SystemID N64
 7F9538	d	h	1	RDRAM	Object Model 2 Model Table Pointer
 7F954C	d	h	1	RDRAM	Setup Table Pointer
 7F9564	d	h	1	RDRAM	Balloon Trajectory Table Pointer
+7F958C	d	h	1	RDRAM	Texture Table Pointer
 

@@ -69,4 +69,8 @@ SystemID N64
 70A542	w	h	1	RDRAM	Army Dillo Model
 70AA9C	w	h	1	RDRAM	Dogadon Behavior
 70AA9E	w	h	1	RDRAM	Dogadon Model
+7B49E8	d	h	1	RDRAM	Map Geometry Table Pointer
+7B49F4	d	h	1	RDRAM	Object Model 2 Model Table Pointer
+7B4A08	d	h	1	RDRAM	Setup Table Pointer
+7B4A48	d	h	1	RDRAM	Texture Table Pointer
 

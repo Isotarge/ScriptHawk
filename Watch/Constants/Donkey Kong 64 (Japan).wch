@@ -1,5 +1,5 @@
 SystemID N64
-00F292	b	h	1	RDRAM	Counter Factor?
+00F292	w	u	1	RDRAM	Scanlines Per Frame
 0103A4	d	h	1	RDRAM	Framebuffer Pointer
 0103A8	d	h	1	RDRAM	Render Mode Pointer
 0103D4	d	h	1	RDRAM	Framebuffer Pointer
@@ -79,4 +79,10 @@ SystemID N64
 7F6456	w	s	1	RDRAM	Map Void - Minimum Z
 7F6458	w	s	1	RDRAM	Map Void - Maximum X
 7F645A	w	s	1	RDRAM	Map Void - Maximum Z
+7F999C	d	h	1	RDRAM	Map Geometry Table Pointer
+7F99A0	d	h	1	RDRAM	Wall Collision Table Pointer
+7F99A4	d	h	1	RDRAM	Ceiling Collision Table Pointer
+7F99A8	d	h	1	RDRAM	Object Model 2 Model Table Pointer
+7F99BC	d	h	1	RDRAM	Setup Table Pointer
+7F99FC	d	h	1	RDRAM	Texture Table Pointer
 
