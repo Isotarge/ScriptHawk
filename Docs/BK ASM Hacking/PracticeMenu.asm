@@ -204,35 +204,33 @@ InPracMenu:
 		BEQZ s3 KeepCurrentMoveSet
 		LI a1 0x01
 			//NONE
-			JAL @LockAllMoves
-			NOP
-			BEQ s3 a1 KeepCurrentMoveSet
+            MOV a0 zero
+			BEQ s3 a1 DoNotKeepCurrentMoveSet
 			LI a1 0x02
 
 			//SM Set
 			LI a0 0x00009DB9
-			JAL @SetMovesUnlockedBitfield
-			NOP
-			BEQ s3 a1 KeepCurrentMoveSet
+			BEQ s3 a1 DoNotKeepCurrentMoveSet
 			LI a1 0x03
 
 			//FFM
-			LI a0 0x000BFDBF
-			JAL @SetMovesUnlockedBitfield
-			NOP
-			BEQ s3 a1 KeepCurrentMoveSet
-			LI a1 0x03
+            LI a0 0x000BFDBF
+			BEQ s3 a1 DoNotKeepCurrentMoveSet
+			LI a1 0x04
 
 			//FFM + EGGS
-			LI a0 0x000BFDFF
-			JAL @SetMovesUnlockedBitfield
-			NOP
-			BEQ s3 a1 KeepCurrentMoveSet
+			BEQ s3 a1 DoNotKeepCurrentMoveSet
+            LI a0 0x000BFDFF
 
 			//ALL
 			LI a0 0x000FFFFF
-			JAL @SetMovesUnlockedBitfield
+            
+        DoNotKeepCurrentMoveSet:
+            JAL @SetMovesUnlockedBitfield
 			NOP
+            JAL @SetHasUsedMovesBitfield
+            NOP
+            
 		KeepCurrentMoveSet:
 		SB zero MoveSet
 
@@ -1035,14 +1033,14 @@ MenuLabelStrings:
 .asciiz "MOVE SET: \0\0\0\0\0"    ; OFF, NONE, FFM, ALL
 .asciiz "L 2 LEVITATE: \0"      ;ON, OFF
 .asciiz "TRANSFORM ME: \0"	  ;OFF, BANJO, TERMITE, CROC, WALRUS, PUMPKIN, BEE, WASHY
-.asciiz "MAP GHOSTS: \0\0\0"	  ;OFF, ON, CLEAR?
+.asciiz "GHOST BETA: \0\0\0"	  ;OFF, ON, CLEAR?
 .asciiz "\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0"
 
 MenuOptionMaxStates:
 InfinitesMaxState:
 .byte 2
 ResetOnEnterMaxState:
-.byte 3
+.byte 4
 TakeMeThereMaxState:
 .byte 14
 MoveSetMaxState:
@@ -1103,21 +1101,21 @@ TransformMeOptionString:
 .asciiz "OFF\0\0\0\0"
 .asciiz "BANJO\0\0"
 .asciiz "TERMITE"
-.asciiz "CROC\0\0\0"
-.asciiz "WALRUS\0"
 .asciiz "PUMPKN\0"
+.asciiz "WALRUS\0"
+.asciiz "CROC\0\0\0"
 .asciiz "BEE\0\0\0\0"
 .asciiz "WASHY\0\0"
 
 ResetOptionString:
 .asciiz " OFF\0\0\0"
 .asciiz " 100\0\0\0"
-;.asciiz " ANY\0\0\0"
+.asciiz " ANY\0\0\0"
 .asciiz " NO RBA"
 
 ResetPointers:
 .word Reset_100
-;.word Reset_Any
+.word Reset_Any
 .word Reset_NoRBA
 
 Reset_100:
@@ -1217,6 +1215,79 @@ Reset_Any:
 .word 0x000FFFFF
 .word 0x000FFFFF
 .word 0x000FFFFF
+
+.word 0x0000C000 ;MM ; GAME PROGRESS
+.word 0x00010200
+.word 0x00000020
+.word 0x00000000
+.word 0x00008000
+.word 0x80000020
+.word 0x00000008
+.word 0x00000000
+.word 0x3845C000 ;TTC
+.word 0x00070E04
+.word 0x000000B0
+.word 0x05000000
+.word 0x00008003
+.word 0x80000120
+.word 0x0000588B
+.word 0x01000000
+.word 0x7867C084 ;CC
+.word 0x01070E04
+.word 0x002000B0
+.word 0x05000000
+.word 0x00008003
+.word 0x80010520
+.word 0x0200588B
+.word 0x01000000
+.word 0xF877F6A4;BGS
+.word 0x3D478F7E
+.word 0x006618B0
+.word 0x0580C203
+.word 0x50B8927F
+.word 0xA005FD21
+.word 0x222C589B
+.word 0x01002000
+.word 0xF877C084;FP
+.word 0x01070E1C
+.word 0x002000B0
+.word 0x05000000
+.word 0x0000800F
+.word 0x80010521
+.word 0x0208588B
+.word 0x01000000
+.word 0xF877F6A4;GV
+.word 0x3D478F7E
+.word 0x006618B0
+.word 0x0580C203
+.word 0x40B8927F
+.word 0xA005F521
+.word 0x222C589B
+.word 0x01002000
+.word 0xF877F6A4;CCW
+.word 0x3D478F7E
+.word 0x006618B0
+.word 0x0580C203
+.word 0x4080827F
+.word 0xA001C521
+.word 0x222C589B
+.word 0x01002000
+.word 0xF877F6A4;RBB
+.word 0x3D478F7E
+.word 0x006618B0
+.word 0x0580C203
+.word 0x40B8927F
+.word 0xA005E521
+.word 0x222C589B
+.word 0x01002000
+.word 0xF877D084;MMM
+.word 0x01478E3C
+.word 0x002400B0
+.word 0x05800200
+.word 0x0000800F
+.word 0xA0014521
+.word 0x020C588B
+.word 0x01000000
 
 
 
