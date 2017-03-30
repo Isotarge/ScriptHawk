@@ -129,8 +129,9 @@ local Game = {
 		["obj_model2_setup_pointer"] = {0x7F6010, 0x7F5F30, 0x7F6480, 0x7B17C4},
 		["obj_model2_timer"] = {0x76A064, 0x764B84, 0x76A254, 0x72CDAC},
 		["obj_model2_collision_linked_list_pointer"] = {0x754244, 0x74E9A4, 0x753B34, 0x6FF054},
-		["map_base"] = {0x7F5DE0, 0x7F5D00, 0x7F6250, 0x7A1E90},
-		["vert_base"] = {0x7F5DE8, 0x7F5D08, 0x7F6258, 0x7A1E98},
+		["map_block_pointer"] = {0x7F5DE0, 0x7F5D00, 0x7F6250, 0x7A1E90},
+		["map_vertex_pointer"] = {0x7F5DE8, 0x7F5D08, 0x7F6258, 0x7A1E98},
+		["map_displaylist_pointer"] = {0x7F5DEC, 0x7F5D0C, 0x7F625C, 0x7A1E9C},
 		["water_surface_list"] = {0x7F93C0, 0x7F92E0, 0x7F9830, 0x7B48A0},
 		["chunk_array_pointer"] = {0x7F6C18, 0x7F6B38, 0x7F7088, 0x7B20F8},
 		["num_enemies"] = {0x7FDC88, 0x7FDBC8, 0x7FE118, 0x7B73D8},
@@ -6985,8 +6986,8 @@ local vert = {
 };
 
 function crumble()
-	local mapBase = dereferencePointer(Game.Memory.map_base[version]);
-	local vertBase = dereferencePointer(Game.Memory.vert_base[version]);
+	local mapBase = dereferencePointer(Game.Memory.map_block_pointer[version]);
+	local vertBase = dereferencePointer(Game.Memory.map_vertex_pointer[version]);
 
 	if isRDRAM(mapBase) and isRDRAM(vertBase) then
 		local mapSize = mainmemory.read_u32_be(mapBase + heap.object_size);
@@ -7016,6 +7017,76 @@ function crumble()
 				end
 			end
 		end
+	end
+end
+
+function F3DEX2Trace()
+	local DLBase = dereferencePointer(Game.Memory.map_displaylist_pointer[version]);
+	local vertBase = dereferencePointer(Game.Memory.map_vertex_pointer[version]);
+	if isRDRAM(DLBase) and isRDRAM(vertBase) and vertBase > DLBase then
+		for commandBase = DLBase, vertBase - 8, 8 do
+			local command = mainmemory.readbyte(commandBase);
+			local commandStr = toHexString(commandBase)..": "..toHexString(command, 2)..": ";
+			if command == 0x00 then
+				dprint(commandStr.."NOP, Tag: "..mainmemory.read_u32_be(commandBase + 4));
+			elseif command == 0x01 then
+				local bank = mainmemory.readbyte(commandBase + 4);
+				local address = mainmemory.read_u24_be(commandBase + 5);
+				dprint(commandStr.."Loading Verts: Bank "..bank.." Address "..toHexString(address));
+			elseif command == 0x03 then
+				--dprint(commandStr.."G_CULLDL");
+			elseif command == 0x05 then
+				local v1 = mainmemory.readbyte(commandBase + 1) / 2;
+				local v2 = mainmemory.readbyte(commandBase + 2) / 2;
+				local v3 = mainmemory.readbyte(commandBase + 3) / 2;
+				dprint(commandStr.."Triangle, Verts: "..v1..","..v2..","..v3);
+			elseif command == 0x06 then
+				local v1 = mainmemory.readbyte(commandBase + 1) / 2;
+				local v2 = mainmemory.readbyte(commandBase + 2) / 2;
+				local v3 = mainmemory.readbyte(commandBase + 3) / 2;
+				local v4 = mainmemory.readbyte(commandBase + 5) / 2;
+				local v5 = mainmemory.readbyte(commandBase + 6) / 2;
+				local v6 = mainmemory.readbyte(commandBase + 7) / 2;
+				dprint(commandStr.."Triangles, Verts: "..v1..","..v2..","..v3.." and "..v4..","..v5..","..v6);
+			elseif command == 0x07 then
+				local v1 = mainmemory.readbyte(commandBase + 1) / 2;
+				local v2 = mainmemory.readbyte(commandBase + 2) / 2;
+				local v3 = mainmemory.readbyte(commandBase + 3) / 2;
+				local v4 = mainmemory.readbyte(commandBase + 5) / 2;
+				local v5 = mainmemory.readbyte(commandBase + 6) / 2;
+				local v6 = mainmemory.readbyte(commandBase + 7) / 2;
+				dprint(commandStr.."Quad, Verts: "..v1..","..v2..","..v3.." and "..v4..","..v5..","..v6);
+			elseif command == 0xD7 then
+				dprint(commandStr.."G_TEXTURE");
+			elseif command == 0xD9 then
+				dprint(commandStr.."G_GEOMETRYMODE");
+			elseif command == 0xDE then -- Check for DL start
+				local destination = mainmemory.read_u32_be(commandBase + 4);
+				dprint(commandStr.."Start DL: "..toHexString(destination));
+			elseif command == 0xDF then
+				dprint(commandStr.."End DL");
+			elseif command == 0xE2 then
+				dprint(commandStr.."G_SETOTHERMODE_L");
+			elseif command == 0xE3 then
+				dprint(commandStr.."G_SETOTHERMODE_H");
+			elseif command == 0xE6 then
+				--dprint(commandStr.."G_RDPLOADSYNC"); -- Synchronize with rendering to safely load texture
+			elseif command == 0xE7 then
+				--dprint(commandStr.."G_RDPPIPESYNC"); -- Synchronize with rendering to safely update RDP attributes
+			elseif command == 0xE8 then
+				--dprint(commandStr.."G_RDPTILESYNC"); -- Synchronize with rendering to safely update tile descriptor attributes
+			elseif command == 0xE9 then
+				--dprint(commandStr.."G_RDPFULLSYNC"); -- Indicates end of RDP processing; interrupts CPU when RDP has nothing more to do
+			elseif command == 0xFC then
+				dprint(commandStr.."G_SETCOMBINE");
+			elseif command == 0xFD then
+				local texturePointer = mainmemory.read_u32_be(commandBase + 4);
+				dprint(commandStr.."Set Texture "..toHexString(texturePointer));
+			else
+				dprint(commandStr.."Unknown");
+			end
+		end
+		print_deferred();
 	end
 end
 

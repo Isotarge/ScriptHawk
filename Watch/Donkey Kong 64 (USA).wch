@@ -183,7 +183,7 @@ SystemID N64
 7F5DE0	d	h	1	RDRAM	Map Block Pointer
 7F5DE4	d	h	1	RDRAM	Map Model Pointer?
 7F5DE8	d	h	1	RDRAM	Map Verts Pointer
-7F5DEC	d	h	1	RDRAM	Map Model Pointer?
+7F5DEC	d	h	1	RDRAM	Map Display List Start
 7F6000	d	h	1	RDRAM	Object Model 2 Array Pointer
 7F6004	d	u	1	RDRAM	Object Model 2 Array Count
 7F6010	d	h	1	RDRAM	Setup File Pointer
