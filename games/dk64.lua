@@ -6990,8 +6990,8 @@ function crumble()
 	local vertBase = dereferencePointer(Game.Memory.map_vertex_pointer[version]);
 
 	if isRDRAM(mapBase) and isRDRAM(vertBase) then
-		local mapSize = mainmemory.read_u32_be(mapBase + heap.object_size);
-		for v = vertBase, mapBase + mapSize - 0x10, vertSize do
+		local vertEnd = mapBase + mainmemory.read_u32_be(mapBase + 0x40);
+		for v = vertBase, vertEnd, vertSize do
 			if math.random() > 0.9 then
 				local xPos = mainmemory.read_s16_be(v + vert.x_position);
 				local yPos = mainmemory.read_s16_be(v + vert.y_position);
@@ -7032,7 +7032,8 @@ function F3DEX2Trace()
 			elseif command == 0x01 then
 				local bank = mainmemory.readbyte(commandBase + 4);
 				local address = mainmemory.read_u24_be(commandBase + 5);
-				dprint(commandStr.."Loading Verts: Bank "..bank.." Address "..toHexString(address));
+				local num = bit.rshift(bit.band(mainmemory.read_u32_be(commandBase), 0x000FF000), 12);
+				dprint(commandStr.."Loading "..num.." Verts: Bank "..bank.." Address "..toHexString(address));
 			elseif command == 0x03 then
 				--dprint(commandStr.."G_CULLDL");
 			elseif command == 0x05 then
@@ -7060,7 +7061,7 @@ function F3DEX2Trace()
 				dprint(commandStr.."G_TEXTURE");
 			elseif command == 0xD9 then
 				dprint(commandStr.."G_GEOMETRYMODE");
-			elseif command == 0xDE then -- Check for DL start
+			elseif command == 0xDE then
 				local destination = mainmemory.read_u32_be(commandBase + 4);
 				dprint(commandStr.."Start DL: "..toHexString(destination));
 			elseif command == 0xDF then
@@ -7077,6 +7078,16 @@ function F3DEX2Trace()
 				--dprint(commandStr.."G_RDPTILESYNC"); -- Synchronize with rendering to safely update tile descriptor attributes
 			elseif command == 0xE9 then
 				--dprint(commandStr.."G_RDPFULLSYNC"); -- Indicates end of RDP processing; interrupts CPU when RDP has nothing more to do
+			elseif command == 0xF0 then
+				dprint(commandStr.."G_LOADTLUT");
+			elseif command == 0xF2 then
+				dprint(commandStr.."G_SETTILESIZE");
+			elseif command == 0xF3 then
+				dprint(commandStr.."G_LOADBLOCK");
+			elseif command == 0xF5 then
+				dprint(commandStr.."G_SETTILE");
+			elseif command == 0xF6 then
+				dprint(commandStr.."G_FILLRECT");
 			elseif command == 0xFC then
 				dprint(commandStr.."G_SETCOMBINE");
 			elseif command == 0xFD then
