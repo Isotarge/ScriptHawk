@@ -71,6 +71,8 @@ SystemID N64
 115A38	b	u	1	RDRAM	T. Rex: Max Health
 1217E8	d	f	1	RDRAM	Game Runtime
 1217EC	d	f	1	RDRAM	Map Runtime
+121840	d	f	1	RDRAM	FOV
+1218D8	d	h	1	RDRAM	Camera Pointer Pointer
 125220	d	f	1	RDRAM	Air (Real)
 125224	d	f	1	RDRAM	Air
 125420	d	h	1	RDRAM	Consumables Pointer

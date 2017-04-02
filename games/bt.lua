@@ -295,6 +295,7 @@ local Game = {
 		["player_pointer"] = {0x13A210, 0x13A4A0, 0x12F660, 0x135490},
 		["player_pointer_index"] = {0x13A25F, 0x13A4EF, 0x12F6AF, 0x1354DF},
 		["global_flag_base"] = {0x131500, 0x131790, 0x126950, 0x12C780},
+		["camera_pointer_pointer"] = {0x12C478, 0x12C688, 0x1218D8, 0x127728},
 		["flag_block_pointer"] = {0x1314F0, 0x131780, 0x126940, 0x12C770},
 		["air"] = {0x12FDC0, 0x12FFD0, 0x125220, 0x12B050},
 		["frame_timer"] = {0x083550, 0x083550, 0x0788F8, 0x079138},
@@ -445,9 +446,13 @@ local z_velocity = 0x18;
 
 function Game.getPlayerObject()
 	local playerPointerIndex = mainmemory.readbyte(Game.Memory.player_pointer_index[version]);
-	local playerObject = dereferencePointer(Game.Memory.player_pointer[version] + 4 * playerPointerIndex);
-	if isRDRAM(playerObject) then
-		return playerObject;
+	return dereferencePointer(Game.Memory.player_pointer[version] + 4 * playerPointerIndex);
+end
+
+function Game.getCameraObject()
+	local cameraPointerPointer = dereferencePointer(Game.Memory.camera_pointer_pointer[version]);
+	if isRDRAM(cameraPointerPointer) then
+		return dereferencePointer(cameraPointerPointer + 4);
 	end
 end
 
@@ -455,6 +460,13 @@ function Game.getPlayerSubObject(index)
 	local player = Game.getPlayerObject();
 	if isRDRAM(player) then
 		return dereferencePointer(player + index);
+	end
+end
+
+function Game.getCameraSubObject(index)
+	local camera = Game.getCameraObject();
+	if isRDRAM(camera) then
+		return dereferencePointer(camera + index);
 	end
 end
 
@@ -810,6 +822,69 @@ function Game.colorSlopeTimer()
 	end
 end
 
+---------------------
+-- Camera Position --
+---------------------
+
+camera_lock = {
+	x = 0,
+	y = 0,
+	z = 0,
+	enabled = false,
+};
+
+function Game.enableCameraLock()
+	camera_lock.x = Game.getCameraXPosition();
+	camera_lock.y = Game.getCameraYPosition();
+	camera_lock.z = Game.getCameraZPosition();
+	camera_lock.enabled = true;
+end
+
+function Game.getCameraXPosition()
+	local cameraObject = Game.getCameraObject();
+	if isRDRAM(cameraObject) then
+		return mainmemory.readfloat(cameraObject + 0x74, true);
+	end
+	return 0;
+end
+
+function Game.getCameraYPosition()
+	local cameraObject = Game.getCameraObject();
+	if isRDRAM(cameraObject) then
+		return mainmemory.readfloat(cameraObject + 0x78, true);
+	end
+	return 0;
+end
+
+function Game.getCameraZPosition()
+	local cameraObject = Game.getCameraObject();
+	if isRDRAM(cameraObject) then
+		return mainmemory.readfloat(cameraObject + 0x7C, true);
+	end
+	return 0;
+end
+
+function Game.setCameraXPosition(value)
+	local cameraObject = Game.getCameraObject();
+	if isRDRAM(cameraObject) then
+		mainmemory.writefloat(cameraObject + 0x74, value, true);
+	end
+end
+
+function Game.setCameraYPosition(value)
+	local cameraObject = Game.getCameraObject();
+	if isRDRAM(cameraObject) then
+		mainmemory.writefloat(cameraObject + 0x78, value, true);
+	end
+end
+
+function Game.setCameraZPosition(value)
+	local cameraObject = Game.getCameraObject();
+	if isRDRAM(cameraObject) then
+		mainmemory.writefloat(cameraObject + 0x7C, value, true);
+	end
+end
+
 -----------------
 -- Moves stuff --
 -----------------
@@ -898,6 +973,7 @@ local movementStates = {
 	[0x56] = "Knockback", -- Solo Banjo
 	[0x57] = "Exiting Beak Bomb", -- BK
 
+	[0x58] = "Damaged", -- Crash Landing
 	[0x59] = "Damaged", -- Beak Bomb
 
 	[0x5B] = "Throwing Object", -- Glowbo
@@ -3867,6 +3943,12 @@ function Game.eachFrame()
 			eep_checksum[i].value = checksum_value;
 		end
 	end
+
+	if camera_lock.enabled then
+		Game.setCameraXPosition(camera_lock.x);
+		Game.setCameraYPosition(camera_lock.y);
+		Game.setCameraZPosition(camera_lock.z);
+	end
 end
 
 Game.OSDPosition = {2, 70};
@@ -3894,6 +3976,11 @@ Game.OSD = {
 	{"Character", Game.getCharacterState},
 	{"Movement", Game.getCurrentMovementState},
 	{"Slope Timer", Game.getSlopeTimer, Game.colorSlopeTimer},
+	{"Separator", 1},
+	{"Camera", function() return toHexString(Game.getCameraObject()) end},
+	{"Camera X", Game.getCameraXPosition},
+	{"Camera Y", Game.getCameraYPosition},
+	{"Camera Z", Game.getCameraZPosition},
 };
 
 return Game;

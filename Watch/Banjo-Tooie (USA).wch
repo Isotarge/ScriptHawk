@@ -119,6 +119,7 @@ SystemID N64
 127638	d	f	1	RDRAM	Game Runtime
 12763C	d	f	1	RDRAM	Map Runtime
 127690	d	f	1	RDRAM	FOV
+127728	d	h	1	RDRAM	Camera Pointer Pointer
 1289D0	d	h	1	RDRAM	Text Buffer Pointer
 12A990	d	f	1	RDRAM	Unknown Float
 12A9F0	d	f	1	RDRAM	Unknown Float

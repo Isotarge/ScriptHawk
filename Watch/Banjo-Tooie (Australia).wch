@@ -72,8 +72,12 @@ SystemID N64
 1205AF	b	u	1	RDRAM	Detonator: Max Health
 1205B7	b	u	1	RDRAM	T. Rex: Current Health
 1205B8	b	u	1	RDRAM	T. Rex: Max Health
+12C388	d	f	1	RDRAM	Game Runtime
+12C38C	d	f	1	RDRAM	Map Runtime
 12C390	w	h	1	RDRAM	Map
 12C392	w	h	1	RDRAM	Map Load Trigger
+12C3E0	d	f	1	RDRAM	FoV
+12C478	d	h	1	RDRAM	Camera Pointer Pointer
 12FDC0	d	f	1	RDRAM	Air (Real)
 12FDC4	d	f	1	RDRAM	Air
 12FFC0	d	h	1	RDRAM	Consumables Pointer
