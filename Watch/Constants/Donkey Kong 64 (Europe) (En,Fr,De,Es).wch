@@ -4,6 +4,11 @@ SystemID N64
 010368	d	h	1	RDRAM	Render Mode Pointer
 010394	d	h	1	RDRAM	Framebuffer Pointer
 010398	d	h	1	RDRAM	Render Mode Pointer
+0270EC	d	h	1	RDRAM	DK ? Color (Main Menu)
+0270F0	d	h	1	RDRAM	Diddy ? Color (Main Menu)
+0270F4	d	h	1	RDRAM	Lanky ? Color (Main Menu)
+0270F8	d	h	1	RDRAM	Tiny ? Color (Main Menu)
+0270FC	d	h	1	RDRAM	Chunky ? Color (Main Menu)
 6EDAE6	w	h	1	RDRAM	Lanky Long Arms Map Index
 6EDAE8	d	h	1	RDRAM	Lanky Long Arms Map Check (0 for any map)
 73EE50	w	u	1	RDRAM	Japes Boss Door Destination

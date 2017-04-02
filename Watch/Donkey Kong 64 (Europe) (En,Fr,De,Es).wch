@@ -11,10 +11,21 @@ SystemID N64
 0153BC	d	h	1	RDRAM	Controller Input P4
 0153BE	b	s	1	RDRAM	Joystick X (P4)
 0153BF	b	s	1	RDRAM	Joystick Y (P4)
+01CBD0	d	h	1	RDRAM	FFA Renderer Pointer
+021D00	d	s	1	RDRAM	Jetpac Score
+021D04	d	s	1	RDRAM	Jetman Lives
 022100	d	f	1	RDRAM	Jetman X Position
 022104	d	f	1	RDRAM	Jetman Y Position
 022108	d	f	1	RDRAM	Jetman X Velocity
 02210C	d	f	1	RDRAM	Jetman Y Velocity
+027114	b	h	1	RDRAM	DK Unlocked (Main Menu)
+027115	b	h	1	RDRAM	Diddy Unlocked (Main Menu)
+027116	b	h	1	RDRAM	Lanky Unlocked (Main Menu)
+027117	b	h	1	RDRAM	Tiny Unlocked (Main Menu)
+027118	b	h	1	RDRAM	Chunky Unlocked (Main Menu)
+02711C	d	s	1	RDRAM	GB Counter (Main Menu)
+027120	d	s	1	RDRAM	IGT Hours (Main Menu)
+027124	d	s	1	RDRAM	IGT Minutes (Main Menu)
 03ECD0	d	f	1	RDRAM	Jumpman X Position
 03ECD4	d	f	1	RDRAM	Jumpman Y Position
 03ECD8	d	f	1	RDRAM	Jumpman X Velocity
@@ -422,6 +433,7 @@ SystemID N64
 7FCB8C	b	u	1	RDRAM	Melons
 7FD4B0	w	h	1	RDRAM	Transferred Actor Type
 7FD550	d	u	1	RDRAM	Idle Timer
+7FD7C8	d	f	1	RDRAM	Loading Zone Fadeout Progress
 7FDBC8	w	h	1	RDRAM	Number of Enemies
 7FDBCC	d	h	1	RDRAM	Enemy Respawn Array Pointer
 7FDBF0	w	u	1	RDRAM	Loading Zone Array Size

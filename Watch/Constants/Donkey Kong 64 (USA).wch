@@ -1,10 +1,14 @@
 SystemID N64
 00EFD2	w	u	1	RDRAM	Scanlines Per Frame
-0337E0	d	h	1	RDRAM	Diddy ? colour (Main Menu)
-0337E4	d	h	1	RDRAM	Lanky ? colour (Main Menu)
-0337E8	d	h	1	RDRAM	Tiny ? colour (Main Menu)
-0337EC	d	h	1	RDRAM	Chunky ? colour (Main Menu)
-4B2904	b	h	1	RDRAM	FF for voidout on main menu?!?
+010134	d	h	1	RDRAM	Framebuffer Pointer
+010138	d	h	1	RDRAM	Render Mode Pointer
+010164	d	h	1	RDRAM	Framebuffer Pointer
+010168	d	h	1	RDRAM	Render Mode Pointer
+0337DC	d	h	1	RDRAM	DK ? Color (Main Menu)
+0337E0	d	h	1	RDRAM	Diddy ? Color (Main Menu)
+0337E4	d	h	1	RDRAM	Lanky ? Color (Main Menu)
+0337E8	d	h	1	RDRAM	Tiny ? Color (Main Menu)
+0337EC	d	h	1	RDRAM	Chunky ? Color (Main Menu)
 5FF2D8	d	h	1	RDRAM	JAL to void out function
 678050	b	h	1	RDRAM	loadActor() function start?
 68A840	d	h	1	RDRAM	JAL to spawnEnemies()
