@@ -7024,7 +7024,9 @@ function F3DEX2Trace()
 	local DLBase = dereferencePointer(Game.Memory.map_displaylist_pointer[version]);
 	local vertBase = dereferencePointer(Game.Memory.map_vertex_pointer[version]);
 	if isRDRAM(DLBase) and isRDRAM(vertBase) and vertBase > DLBase then
-		for commandBase = DLBase, vertBase - 8, 8 do
+		local returnStack = {};
+		local commandBase = DLBase;
+		while commandBase < vertBase - 8 do
 			local command = mainmemory.readbyte(commandBase);
 			local commandStr = toHexString(commandBase)..": "..toHexString(command, 2)..": ";
 			if command == 0x00 then
@@ -7062,10 +7064,21 @@ function F3DEX2Trace()
 			elseif command == 0xD9 then
 				dprint(commandStr.."G_GEOMETRYMODE");
 			elseif command == 0xDE then
-				local destination = mainmemory.read_u32_be(commandBase + 4);
-				dprint(commandStr.."Start DL: "..toHexString(destination));
+				local destination = mainmemory.read_u24_be(commandBase + 5);
+				local pushRA = mainmemory.readbyte(commandBase + 1);
+				if pushRA == 0x00 then
+					table.insert(returnStack, commandBase);
+				end
+				commandBase = DLBase + destination;
+				dprint(commandStr.."Start DL: "..toHexString(destination, 6));
 			elseif command == 0xDF then
-				dprint(commandStr.."End DL");
+				if #returnStack > 0 then
+					commandBase = returnStack[#returnStack];
+					table.remove(returnStack, 1);
+					dprint(commandStr.."End DL and returning to "..toHexString(commandBase, 6));
+				else
+					dprint(commandStr.."End DL");
+				end
 			elseif command == 0xE2 then
 				dprint(commandStr.."G_SETOTHERMODE_L");
 			elseif command == 0xE3 then
@@ -7096,6 +7109,7 @@ function F3DEX2Trace()
 			else
 				dprint(commandStr.."Unknown");
 			end
+			commandBase = commandBase + 8;
 		end
 		print_deferred();
 	end
