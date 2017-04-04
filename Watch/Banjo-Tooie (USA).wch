@@ -5,7 +5,6 @@ SystemID N64
 079AC0	d	u	1	RDRAM	Counter: A Button Pressed
 07E990	d	h	1	RDRAM	Linked list root pointer
 07E994	d	h	1	RDRAM	Linked list root pointer
-0D1A58	w	h	1	RDRAM	Set to 0000 for Infinite Eggs & Feathers (TODO: How does this work?)
 117DDA	w	h	1	RDRAM	Player Model Modifier
 117DEA	w	h	1	RDRAM	Player Model Modifier
 11AB41	b	u	1	RDRAM	Jinjo: MT: Jade Snake Grove
@@ -121,20 +120,9 @@ SystemID N64
 127690	d	f	1	RDRAM	FOV
 127728	d	h	1	RDRAM	Camera Pointer Pointer
 1289D0	d	h	1	RDRAM	Text Buffer Pointer
-12A990	d	f	1	RDRAM	Unknown Float
-12A9F0	d	f	1	RDRAM	Unknown Float
-12A9F4	d	f	1	RDRAM	Unknown Float
-12A9F8	d	f	1	RDRAM	Unknown Float
-12A9FC	d	f	1	RDRAM	Unknown Float
-12AA00	d	f	1	RDRAM	Unknown Float
 12AA04	d	f	1	RDRAM	Draw Distance
-12AA08	d	f	1	RDRAM	Unknown Float
-12AA0C	d	f	1	RDRAM	Unknown Float
-12AA10	d	f	1	RDRAM	Unknown Float
-12AA14	d	f	1	RDRAM	Unknown Float
 12AB2C	d	f	1	RDRAM	Unknown Float - Something todo with BK's lighting
 12AB30	d	f	1	RDRAM	Unknown Float - Something todo with BK's lighting
-12AB64	d	f	1	RDRAM	Unknown Float
 12B010	d	f	1	RDRAM	Frameskip Factor?
 12B050	d	f	1	RDRAM	Air (Real)
 12B054	d	f	1	RDRAM	Air
@@ -157,7 +145,6 @@ SystemID N64
 12C7F4	d	h	1	RDRAM	RNG
 12C7F8	d	h	1	RDRAM	RNG
 12C7FC	d	h	1	RDRAM	RNG
-12C830	d	f	1	RDRAM	Unknown Float
 132DC2	w	h	1	RDRAM	Current Map
 135490	d	h	1	RDRAM	Player Pointer 0
 135494	d	h	1	RDRAM	Player Pointer 1
@@ -170,4 +157,5 @@ SystemID N64
 1354DF	b	h	1	RDRAM	Player Pointer Index
 1354F8	b	h	1	RDRAM	Split up: IsSplit?
 136EE0	d	h	1	RDRAM	Object Array Pointer
+136F63	b	u	1	RDRAM	Character State
 

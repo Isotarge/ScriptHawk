@@ -49,24 +49,34 @@ SystemID N64
 12013D	b	h	1	RDRAM	HUD Icon (Air)
 120155	b	h	1	RDRAM	HUD Icon (Health)
 120170	w	u	1	RDRAM	Blue Eggs (HUD)
+120793	b	u	1	RDRAM	BK: Health Icon
 120794	b	u	1	RDRAM	BK: Current Health
 120795	b	u	1	RDRAM	BK: Max Health
+120796	b	u	1	RDRAM	Snowball: Health Icon
 120797	b	u	1	RDRAM	Snowball: Current Health
 120798	b	u	1	RDRAM	Snowball: Max Health
+1207A2	b	u	1	RDRAM	Bee: Health Icon
 1207A3	b	u	1	RDRAM	Bee: Current Health
 1207A4	b	u	1	RDRAM	Bee: Max Health
+1207A5	b	u	1	RDRAM	Washing Machine: Health Icon
 1207A6	b	u	1	RDRAM	Washing Machine: Current Health
 1207A7	b	u	1	RDRAM	Washing Machine: Max Health
+1207AE	b	u	1	RDRAM	Banjo: Health Icon
 1207AF	b	u	1	RDRAM	Banjo: Current Health
 1207B0	b	u	1	RDRAM	Banjo: Max Health
+1207B1	b	u	1	RDRAM	Kazooie: Health Icon
 1207B2	b	u	1	RDRAM	Kazooie: Current Health
 1207B3	b	u	1	RDRAM	Kazooie: Max Health
+1207B4	b	u	1	RDRAM	Submarine: Health Icon
 1207B5	b	u	1	RDRAM	Submarine: Current Health
 1207B6	b	u	1	RDRAM	Submarine: Max Health
+1207B7	b	u	1	RDRAM	Mumbo: Health Icon
 1207B8	b	u	1	RDRAM	Mumbo: Current Health
 1207B9	b	u	1	RDRAM	Mumbo: Max Health
+1207BD	b	u	1	RDRAM	Detonator: Health Icon
 1207BE	b	u	1	RDRAM	Detonator: Current Health
 1207BF	b	u	1	RDRAM	Detonator: Max Health
+1207C6	b	u	1	RDRAM	T. Rex: Health Icon
 1207C7	b	u	1	RDRAM	T. Rex: Current Health
 1207C8	b	u	1	RDRAM	T. Rex: Max Health
 12C598	d	f	1	RDRAM	Game Runtime
@@ -75,6 +85,7 @@ SystemID N64
 12C5A2	w	h	1	RDRAM	Map Load Trigger
 12C5F0	d	f	1	RDRAM	FOV
 12C688	d	h	1	RDRAM	Camera Pointer Pointer
+12F964	d	f	1	RDRAM	Draw Distance
 12FFD0	d	f	1	RDRAM	Air (Real)
 12FFD4	d	f	1	RDRAM	Air
 1301D0	d	h	1	RDRAM	Consumables Pointer
@@ -104,5 +115,7 @@ SystemID N64
 13A4B8	d	h	1	RDRAM	Player Pointer 6
 13A4BC	d	h	1	RDRAM	Player Pointer 7
 13A4EF	b	h	1	RDRAM	Player Pointer Index
+13A508	b	h	1	RDRAM	Split up: IsSplit?
 13BE60	d	h	1	RDRAM	Object Array Pointer
+13BEE3	b	u	1	RDRAM	Character State
 
