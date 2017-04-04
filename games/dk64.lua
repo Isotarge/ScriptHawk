@@ -5736,7 +5736,7 @@ function ohWrongnana(verbose)
 			activationScript = dereferencePointer(slotBase + 0x7C);
 			if isRDRAM(activationScript) then
 				currentValue = mainmemory.read_u16_be(slotBase + obj_model2.object_type);
-				if FTA.isGunSwitch(currentValue) or FTA.isSimSlamSwitch(currentValue) or currentValue == 0x131 or currentValue == 0x47 then -- 0x131 is K. Rool's Ship (Galleon), 0x47 is Castle Lobby coconut switch
+				if FTA.isGunSwitch(currentValue) or FTA.isSimSlamSwitch(currentValue) or currentValue == 0x131 or currentValue == 0x47 or currentValue == 0xDC then -- 0x131 is K. Rool's Ship (Galleon), 0x47 is Castle Lobby coconut switch, 0xDC is Question Mark Box (Sim Slam)
 					scriptName = getInternalName(slotBase);
 					if currentValue == 0x131 then -- K. Rool's Ship (Galleon)
 						activationScript = dereferencePointer(activationScript + 0xA0);
@@ -5756,7 +5756,7 @@ function ohWrongnana(verbose)
 							-- Get next script chunk
 							activationScript = dereferencePointer(activationScript + 0x4C);
 						end
-					elseif scriptName == "buttons" then
+					elseif scriptName == "buttons" or currentValue == 0xDC then -- Sim Slam Switches, Question Mark Boxes (Fungi)
 						activationScript = dereferencePointer(activationScript + 0xA0);
 						while isRDRAM(activationScript) do
 							for j = 0x04, 0x48, 8 do
