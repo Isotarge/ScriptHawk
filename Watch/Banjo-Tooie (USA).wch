@@ -1,12 +1,18 @@
 SystemID N64
-079138	d	s	1	RDRAM	Frame timer
+079138	d	s	1	RDRAM	Frame Timer
 07913C	d	s	1	RDRAM	Frameskip
-0799E0	d	u	1	RDRAM	Counter: A Button Pressed
-079AC0	d	u	1	RDRAM	Counter: A Button Pressed
-07E990	d	h	1	RDRAM	Linked list root pointer
-07E994	d	h	1	RDRAM	Linked list root pointer
-117DDA	w	h	1	RDRAM	Player Model Modifier
-117DEA	w	h	1	RDRAM	Player Model Modifier
+079B00	d	f	1	RDRAM	P1 Joystick X (Normalized)
+079B04	d	f	1	RDRAM	P1 Joystick Y (Normalized)
+079B40	w	h	1	RDRAM	P1 Button Bitfield
+079B42	b	s	1	RDRAM	P1 Joystick X
+079B43	b	s	1	RDRAM	P1 Joystick Y
+079B58	w	h	1	RDRAM	P1 Button Bitfield
+079B5A	b	s	1	RDRAM	P1 Joystick X
+079B5B	b	s	1	RDRAM	P1 Joystick Y
+07E990	d	h	1	RDRAM	Heap Pointer
+07E994	d	h	1	RDRAM	Heap Pointer
+117DDA	w	h	1	RDRAM	Player Model Index
+117DEA	w	h	1	RDRAM	Player Model Index
 11AB41	b	u	1	RDRAM	Jinjo: MT: Jade Snake Grove
 11AB44	b	u	1	RDRAM	Jinjo: MT: Roof of Stadium
 11AB47	b	u	1	RDRAM	Jinjo: MT: Targitzan's Temple
@@ -106,17 +112,25 @@ SystemID N64
 11B667	b	h	1	RDRAM	Mumbo: Health Icon
 11B668	b	u	1	RDRAM	Mumbo: Current Health
 11B669	b	u	1	RDRAM	Mumbo: Max Health
+11B66A	b	h	1	RDRAM	Golden Goliath: Health Icon
+11B66B	b	u	1	RDRAM	Golden Goliath: Current Health
+11B66C	b	u	1	RDRAM	Golden Goliath: Max Health
 11B66D	b	h	1	RDRAM	Detonator: Health Icon
 11B66E	b	u	1	RDRAM	Detonator: Current Health
 11B66F	b	u	1	RDRAM	Detonator: Max Health
+11B673	b	h	1	RDRAM	CWK: Health Icon
+11B674	b	u	1	RDRAM	CWK: Current Health
+11B675	b	u	1	RDRAM	CWK: Max Health
 11B676	b	h	1	RDRAM	T. Rex: Health Icon
 11B677	b	u	1	RDRAM	T. Rex: Current Health
 11B678	b	u	1	RDRAM	T. Rex: Max Health
 1254B0	d	f	1	RDRAM	Banjo Brightness Doodad
-126738	d	h	1	RDRAM	Beginning of pointer list
+126738	d	h	1	RDRAM	Beginning of Pointer List
 127600	d	h	1	RDRAM	Text Script Pointer
 127638	d	f	1	RDRAM	Game Runtime
 12763C	d	f	1	RDRAM	Map Runtime
+127640	w	h	1	RDRAM	Map
+127642	w	h	1	RDRAM	Map Load Trigger
 127690	d	f	1	RDRAM	FOV
 127728	d	h	1	RDRAM	Camera Pointer Pointer
 1289D0	d	h	1	RDRAM	Text Buffer Pointer

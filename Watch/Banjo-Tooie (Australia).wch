@@ -1,6 +1,18 @@
 SystemID N64
-083550	d	s	1	RDRAM	Frame timer
+083550	d	s	1	RDRAM	Frame Timer
 083554	d	s	1	RDRAM	Frameskip
+083F10	d	f	1	RDRAM	P1 Joystick X (Normalized)
+083F14	d	f	1	RDRAM	P1 Joystick Y (Normalized)
+083F50	w	h	1	RDRAM	P1 Button Bitfield
+083F52	b	s	1	RDRAM	P1 Joystick X
+083F53	b	s	1	RDRAM	P1 Joystick Y
+083F68	w	h	1	RDRAM	P1 Button Bitfield
+083F6A	b	s	1	RDRAM	P1 Joystick X
+083F6B	b	s	1	RDRAM	P1 Joystick Y
+088DA0	d	h	1	RDRAM	Heap Pointer
+088DA4	d	h	1	RDRAM	Heap Pointer
+11CD2A	w	h	1	RDRAM	Player Model Index
+11CD3A	w	h	1	RDRAM	Player Model Index
 11FA71	b	u	1	RDRAM	Jinjo: MT: Jade Snake Grove
 11FA74	b	u	1	RDRAM	Jinjo: MT: Roof of Stadium
 11FA77	b	u	1	RDRAM	Jinjo: MT: Targitzan's Temple
@@ -49,40 +61,72 @@ SystemID N64
 11FF7D	b	h	1	RDRAM	HUD Icon (Air)
 11FF95	b	h	1	RDRAM	HUD Icon (Health)
 11FF99	b	u	1	RDRAM	Health (HUD)
-11FFB0	w	u	1	RDRAM	Blue Eggs (HUD)
-120583	b	u	1	RDRAM	BK: Health Icon
+11FFA4	w	s	1	RDRAM	Notes (HUD)
+11FFA8	d	f	1	RDRAM	Notes (HUD)
+11FFB0	w	s	1	RDRAM	Blue Eggs (HUD)
+11FFB4	d	f	1	RDRAM	Blue Eggs (HUD)
+11FFBC	w	s	1	RDRAM	Fire Eggs (HUD)
+11FFC0	d	f	1	RDRAM	Fire Eggs (HUD)
+11FFC8	w	s	1	RDRAM	Ice Eggs (HUD)
+11FFCC	d	f	1	RDRAM	Ice Eggs (HUD)
+11FFD4	w	s	1	RDRAM	Grenade Eggs (HUD)
+11FFD8	d	f	1	RDRAM	Grenade Eggs (HUD)
+11FFE0	w	s	1	RDRAM	CWK Eggs (HUD)
+11FFE4	d	f	1	RDRAM	CWK Eggs (HUD)
+11FFEC	w	s	1	RDRAM	Jiggies (HUD)
+11FFF0	d	f	1	RDRAM	Jiggies (HUD)
+11FFF8	w	s	1	RDRAM	Red Feathers (HUD)
+11FFFC	d	f	1	RDRAM	Red Feathers (HUD)
+120004	w	s	1	RDRAM	Gold Feathers (HUD)
+120008	d	f	1	RDRAM	Gold Feathers (HUD)
+120010	w	s	1	RDRAM	Glowbos (HUD)
+120014	d	f	1	RDRAM	Glowbos (HUD)
+12001C	w	s	1	RDRAM	Empty Honeycombs (HUD)
+120020	d	f	1	RDRAM	Empty Honeycombs (HUD)
+120028	w	s	1	RDRAM	Cheato Pages (HUD)
+12002C	d	f	1	RDRAM	Cheato Pages (HUD)
+120583	b	h	1	RDRAM	BK: Health Icon
 120584	b	u	1	RDRAM	BK: Current Health
 120585	b	u	1	RDRAM	BK: Max Health
-120586	b	u	1	RDRAM	Snowball: Health Icon
+120586	b	h	1	RDRAM	Snowball: Health Icon
 120587	b	u	1	RDRAM	Snowball: Current Health
 120588	b	u	1	RDRAM	Snowball: Max Health
-120592	b	u	1	RDRAM	Bee: Health Icon
+120592	b	h	1	RDRAM	Bee: Health Icon
 120593	b	u	1	RDRAM	Bee: Current Health
 120594	b	u	1	RDRAM	Bee: Max Health
-120595	b	u	1	RDRAM	Washing Machine: Health Icon
+120595	b	h	1	RDRAM	Washing Machine: Health Icon
 120596	b	u	1	RDRAM	Washing Machine: Current Health
 120597	b	u	1	RDRAM	Washing Machine: Max Health
-120598	b	u	1	RDRAM	Stony: Health Icon
+120598	b	h	1	RDRAM	Stony: Health Icon
 120599	b	u	1	RDRAM	Stony: Current Health
 12059A	b	u	1	RDRAM	Stony: Max Health
-12059E	b	u	1	RDRAM	Banjo: Health Icon
+12059E	b	h	1	RDRAM	Banjo: Health Icon
 12059F	b	u	1	RDRAM	Banjo: Current Health
 1205A0	b	u	1	RDRAM	Banjo: Max Health
-1205A1	b	u	1	RDRAM	Kazooie: Health Icon
+1205A1	b	h	1	RDRAM	Kazooie: Health Icon
 1205A2	b	u	1	RDRAM	Kazooie: Current Health
 1205A3	b	u	1	RDRAM	Kazooie: Max Health
-1205A4	b	u	1	RDRAM	Submarine: Health Icon
+1205A4	b	h	1	RDRAM	Submarine: Health Icon
 1205A5	b	u	1	RDRAM	Submarine: Current Health
 1205A6	b	u	1	RDRAM	Submarine: Max Health
-1205A7	b	u	1	RDRAM	Mumbo: Health Icon
+1205A7	b	h	1	RDRAM	Mumbo: Health Icon
 1205A8	b	u	1	RDRAM	Mumbo: Current Health
 1205A9	b	u	1	RDRAM	Mumbo: Max Health
-1205AD	b	u	1	RDRAM	Detonator: Health Icon
+1205AA	b	h	1	RDRAM	Golden Goliath: Health Icon
+1205AB	b	u	1	RDRAM	Golden Goliath: Current Health
+1205AC	b	u	1	RDRAM	Golden Goliath: Max Health
+1205AD	b	h	1	RDRAM	Detonator: Health Icon
 1205AE	b	u	1	RDRAM	Detonator: Current Health
 1205AF	b	u	1	RDRAM	Detonator: Max Health
-1205B6	b	u	1	RDRAM	T. Rex: Health Icon
+1205B3	b	h	1	RDRAM	CWK: Health Icon
+1205B4	b	u	1	RDRAM	CWK: Current Health
+1205B5	b	u	1	RDRAM	CWK: Max Health
+1205B6	b	h	1	RDRAM	T. Rex: Health Icon
 1205B7	b	u	1	RDRAM	T. Rex: Current Health
 1205B8	b	u	1	RDRAM	T. Rex: Max Health
+12A320	d	f	1	RDRAM	Banjo Brightness Doodad
+12B488	d	h	1	RDRAM	Beginning of Pointer List
+12C350	d	h	1	RDRAM	Text Script Pointer
 12C388	d	f	1	RDRAM	Game Runtime
 12C38C	d	f	1	RDRAM	Map Runtime
 12C390	w	h	1	RDRAM	Map
@@ -93,6 +137,7 @@ SystemID N64
 12FDC0	d	f	1	RDRAM	Air (Real)
 12FDC4	d	f	1	RDRAM	Air
 12FFC0	d	h	1	RDRAM	Consumables Pointer
+130172	b	h	1	RDRAM	Bottles' Revenge Toggle
 1314F0	d	h	1	RDRAM	Flag Block Pointer
 131524	d	f	1	RDRAM	Game Time (GGM)
 131528	d	f	1	RDRAM	Game Time (MT)
