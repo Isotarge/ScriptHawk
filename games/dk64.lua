@@ -113,6 +113,7 @@ local Game = {
 		["eeprom_file_mapping"] = {0x7EDEA8, 0x7EDDC8, 0x7EE318, nil},
 		["security_byte"] = {0x7552E0, 0x74FB60, 0x7553A0, nil}, -- As far as I am aware this function is not present in the Kiosk version
 		["security_message"] = {0x75E5DC, 0x7590F0, 0x75E790, nil}, -- As far as I am aware this function is not present in the Kiosk version
+		["DKTV_pointer"] = {0x7550C0, 0x74F940, 0x755180, 0x709DA0},
 		["buttons_enabled_bitfield"] = {0x755308, 0x74FB88, 0x7553C8, 0x6FFE5C},
 		["joystick_enabled_x"] = {0x75530C, 0x74FB8C, 0x7553CC, 0x6FFE60},
 		["joystick_enabled_y"] = {0x755310, 0x74FB90, 0x7553D0, 0x6FFE64},
@@ -5466,24 +5467,22 @@ end
 -------------------
 
 function setDKTV(message)
-	local linkedListRoot = dereferencePointer(Game.Memory.heap_pointer[version]);
-	if not isRDRAM(linkedListRoot) then
-		return; -- Something went hilariously wrong here
+	if version == 4 then -- Kiosk text is static
+		writeNullTerminatedString(Game.Memory.DKTV_pointer[version], message);
 	end
-
-	local linkedListSize = mainmemory.read_u32_be(Game.Memory.heap_pointer[version] + 4);
-	local totalSize = 0;
-	local currentPointer = linkedListRoot;
-	while totalSize < linkedListSize do
-		local currentObjectSize = mainmemory.read_u32_be(currentPointer + 4);
-		currentPointer = currentPointer + 0x10;
-		if currentObjectSize == 0x40 then
-			if mainmemory.read_u32_be(currentPointer) == 0x444B2054 then -- TODO: Better method of detection
-				writeNullTerminatedString(currentPointer, message);
+	local pointer = dereferencePointer(Game.Memory.DKTV_pointer[version]);
+	if isRDRAM(pointer) then
+		pointer = dereferencePointer(pointer + 0x04);
+		if isRDRAM(pointer) then
+			pointer = dereferencePointer(pointer + 0x0C);
+			if isRDRAM(pointer) then
+				if version == 3 then
+					writeNullTerminatedString(pointer, Game.toJapaneseString(message)); -- TODO: This isn't working properly
+				else
+					writeNullTerminatedString(pointer, message);
+				end
 			end
 		end
-		currentPointer = currentPointer + currentObjectSize;
-		totalSize = currentPointer - linkedListRoot;
 	end
 end
 
