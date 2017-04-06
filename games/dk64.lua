@@ -5469,6 +5469,7 @@ end
 function setDKTV(message)
 	if version == 4 then -- Kiosk text is static
 		writeNullTerminatedString(Game.Memory.DKTV_pointer[version], message);
+		return;
 	end
 	local pointer = dereferencePointer(Game.Memory.DKTV_pointer[version]);
 	if isRDRAM(pointer) then
