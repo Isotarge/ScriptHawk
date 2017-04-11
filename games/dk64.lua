@@ -1087,6 +1087,7 @@ obj_model1 = {
 		[0x37] = "Damaged", -- Underwater
 		[0x38] = "Damaged", -- Vehicle (Boat?)
 		[0x39] = "Shrinking",
+		[0x3B] = "Death", -- Dogadon Lava
 		[0x3C] = "Crouching",
 		[0x3D] = "Uncrouching",
 		[0x3E] = "Backflip",
@@ -3033,6 +3034,7 @@ function Game.detectVersion(romName, romHash)
 
 			[0x2F] = "Damaged",
 
+			[0x36] = "Death", -- Dogadon Lava
 			[0x37] = "Crouching",
 			[0x38] = "Uncrouching",
 			[0x39] = "Backflip",
