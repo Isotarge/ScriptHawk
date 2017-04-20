@@ -770,6 +770,26 @@ function Game.setYVelocity(value, player)
 	end
 end
 
+function Game.colorDX()
+	local dx = math.abs(ScriptHawk.getDX());
+	local xVel = math.abs(Game.getXVelocity());
+	if dx < xVel then
+		return 0xFFFF0000; -- Red
+	elseif dx > xVel then
+		return 0xFF00FF00; -- Green
+	end
+end
+
+function Game.colorDY()
+	local dy = math.abs(ScriptHawk.getDY());
+	local yVel = math.abs(Game.getYVelocity());
+	if dy < yVel then
+		return 0xFFFF0000; -- Red
+	elseif dy > yVel then
+		return 0xFF00FF00; -- Green
+	end
+end
+
 function Game.unlockEverything()
 	local value = mainmemory.readbyte(Game.Memory.unlocked_stuff[version] + 3);
 	value = set_bit(value, 0); -- Luigi Unlock Battle Completed
@@ -909,8 +929,8 @@ local playerOSD = {
 		{"Jumps", Game.getJumpCounter},
 		{"X", Game.getXPosition},
 		{"Y", Game.getYPosition},
-		{"dX"},
-		{"dY"},
+		{"dX", ScriptHawk.getDX, Game.colorDX},
+		{"dY", ScriptHawk.getDY, Game.colorDY},
 		{"X Velocity", Game.getXVelocity},
 		{"Y Velocity", Game.getYVelocity},
 		{"Facing", Game.getYRotation},

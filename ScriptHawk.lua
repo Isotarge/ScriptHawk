@@ -467,6 +467,18 @@ local max_dy = 0.0;
 local max_dz = 0.0;
 local max_d  = 0.0;
 
+function ScriptHawk.getDX()
+	return dx;
+end
+
+function ScriptHawk.getDY()
+	return dy;
+end
+
+function ScriptHawk.getDZ()
+	return dz;
+end
+
 -- Rounding precision
 precision = 3;
 
