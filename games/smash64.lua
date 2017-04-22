@@ -770,24 +770,27 @@ function Game.setYVelocity(value, player)
 	end
 end
 
+local prev_x_vel = 0;
+local prev_y_vel = 0;
+
 function Game.colorDX()
 	local dx = math.abs(ScriptHawk.getDX());
-	local xVel = math.abs(Game.getXVelocity());
-	if dx < xVel then
+	if dx < prev_x_vel then
 		return 0xFFFF0000; -- Red
-	elseif dx > xVel then
+	elseif dx > prev_x_vel then
 		return 0xFF00FF00; -- Green
 	end
+	prev_x_vel = math.abs(Game.getXVelocity());
 end
 
 function Game.colorDY()
 	local dy = math.abs(ScriptHawk.getDY());
-	local yVel = math.abs(Game.getYVelocity());
-	if dy < yVel then
+	if dy < prev_y_vel then
 		return 0xFFFF0000; -- Red
-	elseif dy > yVel then
+	elseif dy > prev_y_vel then
 		return 0xFF00FF00; -- Green
 	end
+	prev_y_vel = math.abs(Game.getYVelocity());
 end
 
 function Game.unlockEverything()
