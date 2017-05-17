@@ -32,9 +32,7 @@ local Game = {
 		"MT - Mumbo's Skull",
 		"MT",
 		"MT - Prison Compound",
-
-		"!Unknown 0x00BA",
-
+		"MT - Columns Vault",
 		"MT - Mayan Kickball Stadium (Lobby)",
 		"MT - Code Chamber",
 
@@ -90,7 +88,7 @@ local Game = {
 
 		"!Crash 0x00F0",
 
-		"HFP - Inside the UFO",
+		"JRL - Inside the UFO",
 
 		"!Unknown 0x00F2", "!Crash 0x00F3",
 
@@ -253,14 +251,10 @@ local Game = {
 		"WW - Dodgems",
 		"GI - Sewer Entrance",
 		"CCL - Zubbas' Nest (multiplayer)",
-
-		"!Crash 0x0189",
-
+		"CK - Tower of Tragedy Quiz (Multiplayer)",
 		"CK - Inside HAG 1",
 		"Intro Screen",
-
-		"!Crash 0x018C",
-
+		"Cutscene - Introduction to B.O.B.",
 		"Cutscene - Jingaling Zapped",
 		"Cutscene - Meanwhile.... Jingaling Zapping",
 		"Cutscene - B.O.B preparing to fire",
@@ -279,7 +273,7 @@ local Game = {
 		"JV - Jingaling's Zombified Palace",
 
 		"Cutscene - Roll the credits",
-		"Cutscene - End of credits",
+		"Cutscene - Character Parade",
 
 		"!Crash 0x019E", "!Crash 0x019F", "!Unknown 0x01A0", "!Unknown 0x01A1", "!Unknown 0x01A2", "!Unknown 0x01A3", "!Unknown 0x01A4", "!Unknown 0x01A5",
 
@@ -303,6 +297,7 @@ local Game = {
 		["map"] = {0x137B42, 0x137DD2, 0x12CF92, 0x132DC2},
 		["map_trigger_target"] = {0x12C390, 0x12C5A0, 0x1217F0, 0x127640},
 		["map_trigger"] = {0x12C392, 0x12C5A2, 0x1217F2, 0x127642},
+		["DCW_location"] = {0x12C33A, 0x12C54A, 0x12179A, 0x1275EA},
 		["character_state"] = {0x13BC53, 0x13BEE3, 0x1310A3, 0x136F63},
 		["iconAddress"] = {0x11FF95, 0x120155, 0x115325, 0x11B065},
 		["healthAddresses"] = {
@@ -3799,6 +3794,15 @@ function Game.getMapOSD()
 	return currentMapName.." ("..toHexString(currentMap)..")";
 end
 
+function Game.getDCWLocation()
+	local DCW_locationMap = mainmemory.read_u16_be(Game.Memory.DCW_location[version]);
+	local DCW_locationMapName = "Unknown";
+	if Game.maps[DCW_locationMap] ~= nil then
+		DCW_locationMapName = Game.maps[DCW_locationMap];
+	end
+	return DCW_locationMapName.." ("..toHexString(DCW_locationMap)..")";
+end
+
 function Game.getMaxAir()
 	if checkFlagByName("Roysten Rescued", true) then
 		return 100;
@@ -3954,6 +3958,7 @@ end
 Game.OSDPosition = {2, 70};
 Game.OSD = {
 	{"Map", Game.getMapOSD},
+	{"DCW", Game.getDCWLocation},
 	{"Separator", 1},
 	{"X", Game.getXPosition},
 	{"Y", Game.getYPosition},
