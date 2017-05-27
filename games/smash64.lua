@@ -771,36 +771,31 @@ function Game.setYVelocity(value, player)
 	end
 end
 
-function Game.getBoomerangX(player)
+function Game.getBoomerang(player)
 	local playerActor = Game.getPlayer(player);
 	if isRDRAM(playerActor) then
 		local projectileObject = dereferencePointer(playerActor + player_fields.BoomerangPointer);
 		if isRDRAM(projectileObject) then
 			projectileObject = dereferencePointer(projectileObject + 0x84);
 			if isRDRAM(projectileObject) then
-				projectileObject = dereferencePointer(projectileObject + 0x2C);
-				if isRDRAM(projectileObject) then
-					return mainmemory.readfloat(projectileObject + 0x00, true);
-				end
+				return dereferencePointer(projectileObject + 0x2C);
 			end
 		end
+	end
+end
+
+function Game.getBoomerangX(player)
+	local boomerang = Game.getBoomerang(player);
+	if isRDRAM(boomerang) then
+		return mainmemory.readfloat(boomerang + 0x00, true);
 	end
 	return 0;
 end
 
 function Game.getBoomerangY(player)
-	local playerActor = Game.getPlayer(player);
-	if isRDRAM(playerActor) then
-		local projectileObject = dereferencePointer(playerActor + player_fields.BoomerangPointer, true);
-		if isRDRAM(projectileObject) then
-			projectileObject = dereferencePointer(projectileObject + 0x84);
-			if isRDRAM(projectileObject) then
-				projectileObject = dereferencePointer(projectileObject + 0x2C);
-				if isRDRAM(projectileObject) then
-					return mainmemory.readfloat(projectileObject + 0x04, true);
-				end
-			end
-		end
+	local boomerang = Game.getBoomerang(player);
+	if isRDRAM(boomerang) then
+		return mainmemory.readfloat(boomerang + 0x04, true);
 	end
 	return 0;
 end
