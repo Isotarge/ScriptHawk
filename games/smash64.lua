@@ -254,6 +254,7 @@ local player_fields = {
 	-- 0xA69 = Flash Color Green (Byte)
 	-- 0xA6A = Flash Color Blue (Byte)
 	-- 0xA6B = Flash Color Alpha (Byte)
+	["BoomerangPointer"] = 0xADC, -- Pointer
 	["ShieldJump_FrameDelayCounter"] = 0xB1C, -- 4 Bytes
 	["ShowHitbox"] = 0xB4C, -- u32_be
 };
@@ -770,6 +771,40 @@ function Game.setYVelocity(value, player)
 	end
 end
 
+function Game.getBoomerangX(player)
+	local playerActor = Game.getPlayer(player);
+	if isRDRAM(playerActor) then
+		local projectileObject = dereferencePointer(playerActor + player_fields.BoomerangPointer);
+		if isRDRAM(projectileObject) then
+			projectileObject = dereferencePointer(projectileObject + 0x84);
+			if isRDRAM(projectileObject) then
+				projectileObject = dereferencePointer(projectileObject + 0x2C);
+				if isRDRAM(projectileObject) then
+					return mainmemory.readfloat(projectileObject + 0x00, true);
+				end
+			end
+		end
+	end
+	return 0;
+end
+
+function Game.getBoomerangY(player)
+	local playerActor = Game.getPlayer(player);
+	if isRDRAM(playerActor) then
+		local projectileObject = dereferencePointer(playerActor + player_fields.BoomerangPointer, true);
+		if isRDRAM(projectileObject) then
+			projectileObject = dereferencePointer(projectileObject + 0x84);
+			if isRDRAM(projectileObject) then
+				projectileObject = dereferencePointer(projectileObject + 0x2C);
+				if isRDRAM(projectileObject) then
+					return mainmemory.readfloat(projectileObject + 0x04, true);
+				end
+			end
+		end
+	end
+	return 0;
+end
+
 local prev_x_vel = 0;
 local prev_y_vel = 0;
 
@@ -939,6 +974,9 @@ local playerOSD = {
 		{"Facing", Game.getYRotation},
 		{"Shield", Game.getShieldSize},
 		{"Separator", 1},
+		--{"Boomerang X", Game.getBoomerangX},
+		--{"Boomerang Y", Game.getBoomerangY},
+		--{"Separator", 1},
 	},
 	[2] = {
 		{"P2", function() return Game.getPlayerOSD(2) end, playerColors[2]},
