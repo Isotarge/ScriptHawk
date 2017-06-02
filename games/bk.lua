@@ -18,6 +18,8 @@ local script_modes = { --TODO: Object analysis tools state needs to be up here f
 local script_mode_index = 1;
 script_mode = script_modes[script_mode_index];
 
+print_flag_writes = false;
+
 --------------------
 -- Region/Version --
 --------------------
@@ -3155,7 +3157,9 @@ function setFlag(flagType, index)
 		flagByte = mainmemory.readbyte(containingByte);
 		flagByte = bit.bor(flagByte, bit.lshift(1, index % 8));
 		mainmemory.writebyte(containingByte, flagByte);
-		print();
+		if print_flag_writes then
+			print(toHexString(containingByte, 6, "80")..toHexString(flagByte, 2, " 00"));
+		end
 	end
 end
 
