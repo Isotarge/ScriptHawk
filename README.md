@@ -3,7 +3,7 @@ A collection of Lua scripts and RAM watches for [BizHawk](https://github.com/TAS
 
 ## How to use
 ### Setup
-1. Set up [BizHawk](https://github.com/TASVideos/BizHawk), the latest version is always recommended (and probably required)
+1. Set up [BizHawk](https://github.com/TASVideos/BizHawk), version 1.12.2 currently recommended (1.13.0 has a [bug](https://github.com/TASVideos/BizHawk/issues/867) that prevents ScriptHawk from working properly)
 2. [Clone this repository](https://help.github.com/articles/cloning-a-repository/) or download and extract a [zipped copy](https://github.com/Isotarge/ScriptHawk/archive/master.zip)
 3. Open BizHawk and your (supported) game of choice
 4. Click Tools -> Lua Console
