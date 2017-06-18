@@ -24,4 +24,4 @@ NOP
 [PauseMenuData]:0x8036C4E0
 [PauseMenuState]:0x80383010
 
-.include "Docs/BK ASM Hacking/PracticeMenu.asm"
+.include "Docs/BK ASM Hacking/PracticeMenu_struct.asm"

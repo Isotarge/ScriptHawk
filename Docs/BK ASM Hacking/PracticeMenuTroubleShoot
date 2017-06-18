@@ -1,0 +1,108 @@
+//Banjo-Kazooie Speedrunning Cheat Menu
+//Enter Main Menu by pressing start, then press D-left to switch to practice menu
+//  Press D-Right to return to main menu
+//
+//
+// TO DO: Append Each menu item's current state to end of sting
+//        Create functions for setting enable bits/states for each
+//        Create normal mode code section
+
+// HOOKS
+
+;PAUSE MODE JUMP LOCATION: 0x802E47F4
+.org 0x802E47F4
+JAL 0x80400000
+NOP
+
+//ENUMERATIONS
+.include "Docs/BK ASM Hacking/BK_Enum.S"
+//EXISTING FUNCTIONS
+.include "Docs/BK ASM Hacking/BK_NTSC.S"
+
+//EXISTING VARIABLES
+[P1DPadUp]:0x8028115C
+[P1DPadDown]:0x80281160
+[P1DPadLeft]:0x80281164
+[P1DPadRight]:0x80281168
+[P1Start]:0x8028116C
+[PauseMenuData]:0x8036C4E0
+[PauseMenuState]:0x80383010
+
+[TEST]: 0x8037C3A0
+
+//Variables
+[NumberOfOptions]: 0x06
+[PageTopMax]: 0x02
+
+;----------------------------------------------------------------
+; Code Run from Pause Mode
+; 
+;----------------------------------------------------------------
+
+.org 0x80400000
+PauseMode:
+PUSH ra
+PUSH a0
+PUSH a1
+
+
+LB a0 InPracMenu
+BEQ a0 zero NotInPracMenu
+NOP 
+
+InPracMenu:
+    /*UPDATE DISPLAY*/
+    /* UPDATE OPTION BASED ON BUTTON INPUTS*/
+	
+	;check if exiting practice menu
+	LA a0 @P1Start
+	LW a0 0(a0)
+	XORI a0, a0, 1
+	BNEZ a0 StayInPracPause ;If start press
+	MOV a0 zero
+		SB a0 InPracMenu ;set InPracMenu
+
+	StayInPracPause:
+MOV v0 zero 
+B HouseKeeping
+
+NotInPracMenu:
+    LA a0 @ReturnToLairEnabled
+    //SB zero 0(a0)
+	JAL @PauseMenu
+	NOP
+	;check if entering practice menu
+    LA a0 @PauseMenuState
+    LB a0 0(a0)
+    LI a1 0x02 ;main pause menu screen open
+    BNE a0 a1 StayInNormPause
+	NOP
+        LA a0 @P1DPadLeft
+        LW a0 0(a0)
+	    XORI a0, a0, 1
+	    BNEZ a0 StayInNormPause ;If d-left press
+	    LI a0 0x01
+		   SB a0 InPracMenu ;set InPracMenu
+		   NOP
+	StayInNormPause:
+NOP
+
+HouseKeeping:
+POP a1
+POP a0
+POP ra
+JR
+NOP
+
+
+;----------------------------------------------------------------
+; Global Variables
+; BitFlags
+;----------------------------------------------------------------
+InPracMenu:
+.byte 0
+
+
+
+
+

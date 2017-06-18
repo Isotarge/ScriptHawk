@@ -1,6 +1,7 @@
 /*-------------------------------
 | VARIABLES
 ---------------------------------*/
+[RawP1Buttons]: 0x802812B8
 [PauseMenuStringsBase]: 0x8036C4E0
 
 [ObjectArrayPointer]: 0x8036E560
@@ -402,12 +403,15 @@
 [Print_TotalMenuFont]: 		0x802F7870 ;I: (word $a0 XPos, word $a1 YPos, word $a3 fontSize, char* $a3 str)
 
 [Print_CharFont]: 			0x802F78FC ;I: (word $a0 XPos, word $a1 YPos, char* $a2 str)
+[Print_CharFont_Background]: 0x802F7938 ;I: (word $a0 XPos, word $a1 YPos, char* $a2 str)
+
 
 [GetLevelAssociatedWithMap]: 	0x8030AD48	;I: (byte $a0 MapIndex)	O: [byte $v0]
 
 [GetMainMapFromLevelIndex]: 	0x8030ADD8	;I: (byte $a0 LevelIndex)	O:[byte $v0]
 [GetMainExitFromLevelIndex]: 	0x8030AE24	;I: (byte $a0 LevelIndex)	O:[byte $v0]
 
+[TimeToString]: 0x80311C64
 [PauseMenu]: 0x80313380
 
 [ClearAllGameProgress]: 0x8031FBA0
@@ -470,3 +474,4 @@
 [ClearLevelNoteScores]: 0x80346D78
 
 [ClearInGameLevelTimer]: 0x80347060
+[GetInGameTimeInSeconds]: 0x803470A0
