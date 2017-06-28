@@ -288,6 +288,9 @@ local object_struct = {
     
     [0x24] = {["Type"] = "u16_le", ["Name"] = "XPosition"},
     [0x26] = {["Type"] = "u16_le", ["Name"] = "YPosition"},
+    
+    [0x56] = {["Type"] = "u16_le", ["Name"] = "Health"},
+    [0x58] = {["Type"] = "u16_le", ["Name"] = "Max Health"},
 };
 
 local object_indexes = {
@@ -314,6 +317,11 @@ local object_indexes = {
     
     [0x5C] = "Squrpion Tank",
     [0x5D] = "Squrpion Tank Tail Piece",
+    
+    [0x63] = "Breakable Box",
+    [0x6B] = "Police MechSuit",
+    
+    [0x6D] = "Police Shield MechSuit",
     
     [0x88] = "Skullker Minion",
     [0x89] = "Police Minion",
@@ -346,6 +354,9 @@ local object_indexes = {
     [0xE1] = "Regenerate Wall Wiggle",
     [0xE2] = "Diamond",
     [0xE3] = "Gold Pile",
+    
+    [0x117] = "Tank Dozer Wheel",
+    [0x118] = "Dust/Smoke",
     
     [0x11A] = "Crawling Bomb",
     
@@ -416,8 +427,6 @@ function Game.drawUI()
     
     gui.text(Game.OSDPosition[1], 2 + Game.OSDRowHeight * row, "Mode: "..script_mode, nil, 'bottomright');
 	row = row + 1;
-	gui.text(Game.OSDPosition[1], 2 + Game.OSDRowHeight * row, "Index: "..(object_index).."/"..(numSlots), nil, 'bottomright');
-	row = row + 1;
     if script_mode == "List" then
 		for i = numSlots, 1, -1 do
             local currentSlotBase = Game.Memory.object_array["Address"][version] + (i-1) * object_struct_size;
@@ -434,38 +443,31 @@ function Game.drawUI()
 			     if object_index == i then
 				    color = yellow_highlight;
                 end
-                if actorType == "Unknown" then
-                    --local xPos = memory.read_s16_le(currentSlotBase + 0x24, Game.Memory.objectArray["Domain"]);
-                    --local yPos = memory.read_s16_le(currentSlotBase + 0x26, Game.Memory.objectArray["Domain"]);
-                    gui.text(Game.OSDPosition[1], 2 + Game.OSDRowHeight * row, i..": "..toHexString(currentSlotBase or 0), color, 'bottomright');
-                    row = row + 1;
+                local object_health = memory.read_u16_le(currentSlotBase + 0x56, Game.Memory.object_array["Domain"]);
+                if object_health ~= 0 then
+                    local object_total_health = memory.read_u16_le(currentSlotBase + 0x58, Game.Memory.object_array["Domain"]);
+                    if actorType == "Unknown" then
+                        --local xPos = memory.read_s16_le(currentSlotBase + 0x24, Game.Memory.objectArray["Domain"]);
+                        --local yPos = memory.read_s16_le(currentSlotBase + 0x26, Game.Memory.objectArray["Domain"]);
+                        gui.text(Game.OSDPosition[1], 2 + Game.OSDRowHeight * row, i.." ("..object_health.."/"..object_total_health.."): "..toHexString(currentSlotBase or 0), color, 'bottomright');
+                        row = row + 1;
+                    else
+                        gui.text(Game.OSDPosition[1], 2 + Game.OSDRowHeight * row, actorType.." "..i.." ("..object_health.."/"..object_total_health.."): "..toHexString(currentSlotBase or 0), color, 'bottomright');
+                        row = row + 1;
+                    end 
                 else
-                    gui.text(Game.OSDPosition[1], 2 + Game.OSDRowHeight * row, actorType.." "..i..": "..toHexString(currentSlotBase or 0), color, 'bottomright');
-                    row = row + 1;
+                    if actorType == "Unknown" then
+                        --local xPos = memory.read_s16_le(currentSlotBase + 0x24, Game.Memory.objectArray["Domain"]);
+                        --local yPos = memory.read_s16_le(currentSlotBase + 0x26, Game.Memory.objectArray["Domain"]);
+                        gui.text(Game.OSDPosition[1], 2 + Game.OSDRowHeight * row, i..": "..toHexString(currentSlotBase or 0), color, 'bottomright');
+                        row = row + 1;
+                    else
+                        gui.text(Game.OSDPosition[1], 2 + Game.OSDRowHeight * row, actorType.." "..i..": "..toHexString(currentSlotBase or 0), color, 'bottomright');
+                        row = row + 1;
+                    end   
                 end
                 
             end
-            --[[
-            
-			
-
-			local color = nil;
-			if object_index == i then
-				color = yellow_highlight;
-			end
-
-			if animationType == "Unknown" then
-				local boneArray1 = dereferencePointer(currentSlotBase + slot_variables_inv["Bone Array 1 Pointer"]);
-				local boneArray2 = dereferencePointer(currentSlotBase + slot_variables_inv["Bone Array 2 Pointer"]);
-				if not hide_non_animated or (isRDRAM(boneArray1) or isRDRAM(boneArray2)) then
-					gui.text(Game.OSDPosition[1], 2 + Game.OSDRowHeight * row, i..": "..toHexString(currentSlotBase or 0), color, 'bottomright');
-					row = row + 1;
-				end
-			else
-				gui.text(Game.OSDPosition[1], 2 + Game.OSDRowHeight * row, animationType.." "..i..": "..toHexString(currentSlotBase or 0), color, 'bottomright');
-				row = row + 1;
-			end
-            ]]
 		end
 	end
 	--forms.settext(ScriptHawk.UI.form_controls["Example Value Label"], labelValue);
