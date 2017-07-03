@@ -12,7 +12,7 @@ function fileExists(name)
 end
 
 console.clear()
-if fileExists(mmv_filename) then
+if not fileExists(mmv_filename) then
 	print("No movie selected. Exiting.");
 	return;
 end
