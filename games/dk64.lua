@@ -123,7 +123,11 @@ local Game = {
 		["isg_active"] = {0x755070, 0x74F8F0, 0x755130, nil},
 		["isg_timestamp"] = {0x7F5CE0, 0x7F5C00, 0x7F6150, nil},
 		["timestamp"] = {0x14FE0, 0x155C0, 0x15300, 0x72F880},
+		["cutscene_active"] = {0x7444EC, 0x73EC3C, 0x743DAC, 0x6F1CCC},
 		["cutscene"] = {0x7476F4, 0x741E54, 0x746FB4, 0x6F4464},
+		["cutscene_type"] = {0x7476FC, 0x741E5C, 0x746FBC, 0x6F446C},
+		["cutscene_type_map"] = {0x7F5B10, 0x7F5A30, 0x7F5F80, 0x7A1C00},
+		["cutscene_type_kong"] = {0x7F5BF0, 0x7F5B10, 0x7F6060, 0x7A1CE0},
 		["number_of_cutscenes"] = {0x7F5BDC, 0x7F5AFC, 0x7F604C, 0x7A1CCC},
 		["obj_model2_array_pointer"] = {0x7F6000, 0x7F5F20, 0x7F6470, 0x7A20B0}, -- 0x6F4470 has something to do with obj model 2 on Kiosk, not sure what yet
 		["obj_model2_array_count"] = {0x7F6004, 0x7F5F24, 0x7F6474, 0x7B17B8},
@@ -401,11 +405,21 @@ function Game.getNumberOfCutscenes()
 end
 
 function Game.getCutsceneOSD()
+	if mainmemory.readbyte(Game.Memory.cutscene_active[version]) == 0 then
+		return "None";
+	end
 	local numberOfCutscenes = Game.getNumberOfCutscenes() - 1;
 	if numberOfCutscenes == -1 then
 		numberOfCutscenes = "None";
 	end
-	return Game.getCutsceneIndex().."/"..numberOfCutscenes;
+	local cutsceneType = dereferencePointer(Game.Memory.cutscene_type[version]);
+	if cutsceneType == Game.Memory.cutscene_type_kong[version] then
+		return Game.getCutsceneIndex().." (Kong)";
+	elseif cutsceneType == Game.Memory.cutscene_type_map[version] then
+		return Game.getCutsceneIndex().."/"..numberOfCutscenes.." (Map)";
+	else
+		return Game.getCutsceneIndex().." (Unknown Type: "..toHexString(cutsceneType)..")";
+	end
 end
 
 local flag_array = {};
@@ -1149,7 +1163,7 @@ obj_model1 = {
 		[0x76] = "Entering Battle Crown",
 		[0x77] = "Locked", -- Tons of cutscenes use this
 		[0x78] = "Gorilla Grab",
-
+		[0x79] = "Learning Move",
 		[0x7A] = "Locked", -- Car race loss, possibly elsewhere
 
 		[0x7C] = "Trapped", -- Spider miniBoss
@@ -7019,6 +7033,27 @@ function crumble()
 				end
 			end
 		end
+	end
+end
+
+function dumpSegments()
+	local mapBase = dereferencePointer(Game.Memory.map_block_pointer[version]);
+	local segmentBase = mapBase + mainmemory.read_u32_be(mapBase + 0x58);
+	if isRDRAM(segmentBase) then
+		local numSegments = mainmemory.read_u32_be(segmentBase)
+		dprint(numSegments.." segments at "..toHexString(segmentBase));
+		segmentBase = segmentBase + 4;
+		for i = 0, numSegments - 1 do
+			dprint("Segment ID: "..mainmemory.read_u16_be(segmentBase + 2));
+			dprint("Vert 0x08: "..toHexString(mainmemory.read_u16_be(segmentBase + 0x08)));
+			dprint("Vert 0x0A: "..toHexString(mainmemory.read_u16_be(segmentBase + 0x0A)));
+			dprint("Vert 0x0C: "..toHexString(mainmemory.read_u16_be(segmentBase + 0x0C)));
+			dprint("Vert 0x0E: "..toHexString(mainmemory.read_u16_be(segmentBase + 0x0E)));
+			dprint("Vert 0x10: "..toHexString(mainmemory.read_u16_be(segmentBase + 0x10)));
+			dprint();
+			segmentBase = segmentBase + 0x1C;
+		end
+		print_deferred();
 	end
 end
 

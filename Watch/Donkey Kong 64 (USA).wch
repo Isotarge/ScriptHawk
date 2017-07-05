@@ -44,6 +44,7 @@ SystemID N64
 7444C0	b	u	1	RDRAM	Widescreen Toggle
 7444E4	d	u	1	RDRAM	Next Map
 7444E8	d	u	1	RDRAM	Next Exit
+7444EC	b	u	1	RDRAM	Cutscene Active
 744508	w	u	1	RDRAM	Enemies Killed
 744518	w	u	1	RDRAM	Arena Current Score
 744524	w	s	1	RDRAM	Multiplayer P1 Score
@@ -87,6 +88,7 @@ SystemID N64
 7467C8	b	u	1	RDRAM	File
 746A40	d	h	1	RDRAM	RNG
 7476F4	w	u	1	RDRAM	Cutscene
+7476FC	d	h	1	RDRAM	Cutscene Type Pointer
 747CD0	d	f	1	RDRAM	FOV
 74E77C	b	u	1	RDRAM	Character
 750AC0	b	u	1	RDRAM	Number of Players

@@ -37,6 +37,7 @@ SystemID N64
 73EBD8	b	h	1	RDRAM	Squish Screen (Bottom)
 73EC34	d	u	1	RDRAM	Next Map
 73EC38	d	u	1	RDRAM	Next Exit
+73EC3C	b	u	1	RDRAM	Cutscene Active
 73EC74	w	s	1	RDRAM	Multiplayer P1 Score
 73EC76	w	s	1	RDRAM	Multiplayer P2 Score
 73EC78	w	s	1	RDRAM	Multiplayer P3 Score
@@ -64,6 +65,7 @@ SystemID N64
 740F18	b	u	1	RDRAM	File
 7411A0	d	h	1	RDRAM	RNG
 741E54	w	u	1	RDRAM	Cutscene
+741E5C	d	h	1	RDRAM	Cutscene Type Pointer
 742430	d	f	1	RDRAM	FOV
 748EDC	b	u	1	RDRAM	Character
 74B214	w	u	1	RDRAM	DK Coins (Minecart etc.)

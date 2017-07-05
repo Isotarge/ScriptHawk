@@ -1,9 +1,11 @@
 SystemID N64
 6F1CC4	d	u	1	RDRAM	Destination Map
 6F1CC8	d	u	1	RDRAM	Destination Exit
+6F1CCC	b	u	1	RDRAM	Cutscene Active
 6F3448	w	h	1	RDRAM	Music Track
 6F36E0	d	h	1	RDRAM	RNG
-6F4464	w	h	1	RDRAM	Cutscene
+6F4464	w	u	1	RDRAM	Cutscene
+6F446C	d	h	1	RDRAM	Cutscene Type Pointer
 6F9EB8	b	u	1	RDRAM	Character
 6FBF44	w	u	1	RDRAM	DK Coins (Minecart etc.)
 6FF054	d	h	1	RDRAM	Object Model 2 Collision Linked List Pointer
