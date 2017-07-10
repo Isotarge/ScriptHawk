@@ -6930,7 +6930,7 @@ end
 
 function Game.drawUI()
 	updateCurrentInvisify();
-	forms.settext(ScriptHawk.UI.form_controls["Lag Factor Value Label"], lag_factor);
+	forms.settext(ScriptHawk.UI.form_controls["Lag Factor Value Label"], ""..lag_factor);
 	forms.settext(ScriptHawk.UI.form_controls["Toggle Visibility Button"], current_invisify);
 	forms.settext(ScriptHawk.UI.form_controls["Moon Mode Button"], moon_mode);
 	drawGrabScriptUI();
