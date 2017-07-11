@@ -743,7 +743,7 @@ end
 ScriptHawk.UI.form_controls["Precision Label"] = forms.label(ScriptHawk.UI.options_form, "Precision:", ScriptHawk.UI.col(0), ScriptHawk.UI.row(1) + ScriptHawk.UI.label_offset, 54, 14);
 ScriptHawk.UI.form_controls["Decrease Precision Button"] = forms.button(ScriptHawk.UI.options_form, "-", decreasePrecision, ScriptHawk.UI.col(4) - 28, ScriptHawk.UI.row(1), ScriptHawk.UI.button_height, ScriptHawk.UI.button_height);
 ScriptHawk.UI.form_controls["Increase Precision Button"] = forms.button(ScriptHawk.UI.options_form, "+", increasePrecision, ScriptHawk.UI.col(5) - 28, ScriptHawk.UI.row(1), ScriptHawk.UI.button_height, ScriptHawk.UI.button_height);
-ScriptHawk.UI.form_controls["Precision Value Label"] = forms.label(ScriptHawk.UI.options_form, ""..precision, ScriptHawk.UI.col(5), ScriptHawk.UI.row(1) + ScriptHawk.UI.label_offset, 44, 14);
+ScriptHawk.UI.form_controls["Precision Value Label"] = forms.label(ScriptHawk.UI.options_form, precision, ScriptHawk.UI.col(5), ScriptHawk.UI.row(1) + ScriptHawk.UI.label_offset, 44, 14);
 
 if not TASSafe then
 	ScriptHawk.UI.form_controls["Speed Label"] = forms.label(ScriptHawk.UI.options_form, "Speed:", ScriptHawk.UI.col(0), ScriptHawk.UI.row(2) + ScriptHawk.UI.label_offset, 54, 14);
@@ -830,10 +830,10 @@ local angleKeywords = {
 
 function ScriptHawk.UI.updateReadouts()
 	-- Update form buttons etc
-	forms.settext(ScriptHawk.UI.form_controls["Precision Value Label"], ""..precision);
+	forms.settext(ScriptHawk.UI.form_controls["Precision Value Label"], precision);
 	forms.settext(ScriptHawk.UI.form_controls["Toggle Rotation Units Button"], rotation_units);
 	if not TASSafe then
-		forms.settext(ScriptHawk.UI.form_controls["Speed Value Label"], ""..Game.speedy_speeds[Game.speedy_index]);
+		forms.settext(ScriptHawk.UI.form_controls["Speed Value Label"], Game.speedy_speeds[Game.speedy_index]);
 		forms.settext(ScriptHawk.UI.form_controls["Mode Button"], ScriptHawk.mode);
 
 		if type(Game.maps) == "table" and previous_map ~= forms.gettext(ScriptHawk.UI.form_controls["Map Dropdown"]) then
