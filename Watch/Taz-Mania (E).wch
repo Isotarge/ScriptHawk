@@ -1,6 +1,7 @@
 SystemID SMS
 000F	b	u	0	Main RAM	P1 Input
 0100	b	s	0	Main RAM	Lives
+0103	b	u	0	Main RAM	L Meter
 0105	b	u	0	Main RAM	L Meter
 0106	b	u	0	Main RAM	P Meter
 0110	b	s	0	Main RAM	Aerial X Velocity

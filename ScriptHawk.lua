@@ -375,10 +375,10 @@ local supportedGames = {
 	["FA5F5942B27480D60243C2D52C0E93E26B9E6B86"] = {["moduleName"] = "games.oot", ["friendlyName"] = "Zelda no Densetsu - Toki no Ocarina (Japan) (Rev B)"},
 	["C892BBDA3993E66BD0D56A10ECD30B1EE612210F"] = {["moduleName"] = "games.oot", ["friendlyName"] = "Zelda no Densetsu - Toki no Ocarina (Japan)"},
 	["DD14E143C4275861FE93EA79D0C02E36AE8C6C2F"] = {["moduleName"] = "games.oot", ["friendlyName"] = "Zelda no Densetsu - Toki no Ocarina (Japan) (GC)"},
-	
+
 	--Rats!
 	["5E423DFAB8221B69A641D2E535EBFE1E3759A2E4"] = {["moduleName"] = "games.rats", ["friendlyName"] = "Rats! (USA) (En,Es)"},
-	
+
 	-- Rayman 2
 	["619AB27EA1645399439AD324566361D3E7FF020E"] = {["moduleName"] = "games.rayman_2", ["friendlyName"] = "Rayman 2 - The Great Escape (Europe) (En,Fr,De,Es,It)"},
 	["50558356B059AD3FBAF5FE95380512B9DCEAAF52"] = {["moduleName"] = "games.rayman_2", ["friendlyName"] = "Rayman 2 - The Great Escape (USA) (En,Fr,De,Es,It)"},
@@ -403,6 +403,10 @@ local supportedGames = {
 	--Space Station Silicon Valley
 	["E5E09205AA743A9E5043A42DF72ADC379C746B0B"] = {["moduleName"] = "games.sssv", ["friendlyName"] = "Space Station Silicon Valley (USA)"},
 	["23710541BB3394072740B0F0236A7CB1A7D41531"] = {["moduleName"] = "games.sssv", ["friendlyName"] = "Space Station Silicon Valley (Europe) (En,Fr,De)"},
+
+	-- Taz-Mania (SMS)
+	["AC98F23DDC24609CB77BB13102E0386F8C2A4A76"] = {["moduleName"] = "games.taz", ["friendlyName"] = "Taz-Mania (E)"},
+	["CFC878F0163933FCFCC89E134FBEB31F"] = {["moduleName"] = "games.taz", ["friendlyName"] = "Taz-Mania (E)"},
 
 	-- Tetris Attack
 	-- TODO: Support more versions of this game
