@@ -3,11 +3,16 @@ A collection of Lua scripts and RAM watches for [BizHawk](https://github.com/TAS
 
 ## How to use
 ### Setup
-1. Set up [BizHawk](https://github.com/TASVideos/BizHawk), version 1.12.2 currently recommended (1.13.0 has a [bug](https://github.com/TASVideos/BizHawk/issues/867) that prevents ScriptHawk from working properly)
+1. Set up [BizHawk](https://github.com/TASVideos/BizHawk), the latest version is recommended
 2. [Clone this repository](https://help.github.com/articles/cloning-a-repository/) or download and extract a [zipped copy](https://github.com/Isotarge/ScriptHawk/archive/master.zip)
 3. Open BizHawk and your (supported) game of choice
 4. Click Tools -> Lua Console
 5. Open ScriptHawk.lua
+
+
+- If you're experiencing poor performance in BizHawk 2.1.0 or later, try switching Lua cores to "LuaInterface + Lua" in the Config -> Customize -> Advanced menu
+- BizHawk versions 1.13.0, 1.13.1, 2.0.0, and 2.0.1 do not work with ScriptHawk due to a [bug](https://github.com/TASVideos/BizHawk/issues/867) that was fixed in 2.1.0
+- BizHawk versions prior to 1.11.5 are not supported by ScriptHawk
 
 ### Basic functionality
 - Player position, rotation and speed will be displayed on screen
