@@ -10,14 +10,16 @@ Game = {
 	speedy_index = 6;
 	max_rot_units = 4,
 	Memory = { -- Versions: Japan, Australia, Europe, USA
-		["music"] = {0x098BD3, 0x099833, 0x0A2E63, 0x099113},
-		["unlocked_stuff"] = {0x0A28F4, 0x0A5074, 0x0AD194, 0x0A4934},
-		["match_settings_pointer"] = {0x0A30A8, 0x0A5828, 0x0AD948, 0x0A50E8},
-		["hurtbox_color_RG"] = {nil, nil, nil, 0x0F2786},
-		["hurtbox_color_BA"] = {nil, nil, nil, 0x0F279E},
-		["red_hitbox_patch"] = {nil, nil, nil, 0x0F33BC}, -- 2400
-		["purple_hurtbox_patch"] = {nil, nil, nil, 0x0F2FD0}, -- 2400
+		["music"] = {0x98BD3, 0x99833, 0xA2E63, 0x99113},
+		["unlocked_stuff"] = {0xA28F4, 0xA5074, 0xAD194, 0xA4934},
+		["match_settings_pointer"] = {0xA30A8, 0xA5828, 0xAD948, 0xA50E8},
+		["hurtbox_color_RG"] = {nil, nil, nil, 0xF2786},
+		["hurtbox_color_BA"] = {nil, nil, nil, 0xF279E},
+		["red_hitbox_patch"] = {nil, nil, nil, 0xF33BC}, -- 2400
+		["purple_hurtbox_patch"] = {nil, nil, nil, 0xF2FD0}, -- 2400
 		["player_list_pointer"] = {0x12E914, 0x131594, 0x139A74, 0x130D84},
+		["item_list_pointer"] = {0x466F0, 0x46E20, 0x46E60, 0x46700},
+		["item_hitbox_offset"] = {0x370, nil, nil, 0x374}, -- TODO: I don't think this exists on PAL versions, should look into it at some point
 	},
 	characters = {
 		[0x00] = "Mario",
@@ -859,11 +861,27 @@ function Game.hideHitbox(player)
 	end
 end
 
+function Game.toggleItemHitboxes(value)
+	if version == 2 or version == 3 then
+		return;
+	end
+	local firstObj = dereferencePointer(Game.Memory.item_list_pointer[version]);
+	while isRDRAM(firstObj) do
+		local secondObj = dereferencePointer(firstObj + 0x84);
+		if isRDRAM(secondObj) then
+			mainmemory.write_u32_be(secondObj + Game.Memory.item_hitbox_offset[version], value);
+		end
+		firstObj = dereferencePointer(firstObj + 0x04);
+	end
+end
+
 function Game.showHitboxes()
 	Game.showHitbox(1);
 	Game.showHitbox(2);
 	Game.showHitbox(3);
 	Game.showHitbox(4);
+
+	Game.toggleItemHitboxes(1);
 end
 
 function Game.hideHitboxes()
@@ -871,6 +889,8 @@ function Game.hideHitboxes()
 	Game.hideHitbox(2);
 	Game.hideHitbox(3);
 	Game.hideHitbox(4);
+
+	Game.toggleItemHitboxes(0);
 end
 
 function Game.setMusic(value)
@@ -1038,9 +1058,15 @@ end
 local currentOSDBools = {true, false, false, false};
 Game.OSD = buildOSD(true, false, false, false);
 
+Game.hitboxWasChecked = false;
+
 function Game.eachFrame()
 	if forms.ischecked(ScriptHawk.UI.form_controls.toggle_hitboxes) then
+		Game.hitboxWasChecked = true;
 		Game.showHitboxes();
+	elseif Game.hitboxWasChecked then
+		Game.hitboxWasChecked = false;
+		Game.hideHitboxes();
 	end
 
 	if forms.ischecked(ScriptHawk.UI.form_controls["Music Checkbox"]) then
