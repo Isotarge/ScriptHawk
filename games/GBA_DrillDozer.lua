@@ -34,6 +34,7 @@ Game.Memory = {
 	["x_velocity"] = {["Domain"] = "IWRAM", ["Address"] = {0x0EA0}},
     ["y_velocity"] = {["Domain"] = "IWRAM", ["Address"] = {0x0EA4}},
     ["current_movement_state"] = {["Domain"] = "IWRAM", ["Address"] = {0x0F38}},
+    ["drill_gauge"] = {["Domain"] = "IWRAM", ["Address"] = {0x11A4}},
     
     ["object_array_end_ptr"] = {["Domain"] = "EWRAM", ["Address"] = {0x0004}},
     ["object_array"] = {["Domain"] = "EWRAM", ["Address"] = {0x0010}},
@@ -69,7 +70,7 @@ end
 -----------------------------------------
 function Game.read_16_16(address, domain)
     local value =  memory.read_u16_le(address, domain)/0x10000;
-    value = value + memory.read_s16_le(address+0x02);
+    value = value + memory.read_s16_le(address+0x02, domain);
     return value;
 end
 
@@ -140,6 +141,10 @@ end
 
 function Game.setYVelocity(value)
 	Game.write_16_16(Game.Memory.y_velocity["Address"][version],value, Game.Memory.y_velocity["Domain"]);
+end
+
+function Game.getDrillValue()
+    return toHexString(memory.read_u32_le(Game.Memory.drill_gauge["Address"][version], Game.Memory.drill_gauge["Domain"]));
 end
 
 --------------------
@@ -300,6 +305,8 @@ local object_indexes = {
     [0x03] = "Large Health",
     [0x04] = "Full Health",
     
+    [0x0A] = "Moving Platfrom",
+    
     [0x15] = "Moving Drill Socket",
     [0x16] = "Chandelier and Chain",
     [0x17] = "Chandelier",
@@ -317,14 +324,22 @@ local object_indexes = {
     
     [0x5C] = "Squrpion Tank",
     [0x5D] = "Squrpion Tank Tail Piece",
+    [0x5E] = "Bullet",
     
     [0x63] = "Breakable Box",
     [0x6B] = "Police MechSuit",
     
     [0x6D] = "Police Shield MechSuit",
+    [0x6E] = "Lock-Camera Room",
+    
+    [0x75] = "Number Bomb",
+    
+    [0x77] = "Number Bomb Screw",
     
     [0x88] = "Skullker Minion",
     [0x89] = "Police Minion",
+    [0x8A] = "Skeleton Minion",
+    [0x8B] = "Prison Minion",
 
     [0x8C] = "Small Block",
     
@@ -335,12 +350,17 @@ local object_indexes = {
     
     [0xA0] = "Robo-Doggo",
     
+    [0xAB] = "Giant Rolling Rock",
+    [0xAC] = "Metal Box",
+    
     [0xAE] = "Chip Item",
     
+    [0xB6] = "Turret",
     [0xB7] = "Slime Ball",
     [0xB8] = "Treasure Chest",
     [0xB9] = "Ghost Enemy",
-
+    [0xBA] = "Spirit Orb Boss",
+    
     [0xCE] = "Punching MechSuit Enemy",
     
     [0xD0] = "Lock-on Enemy",
@@ -443,8 +463,14 @@ function Game.drawUI()
 			     if object_index == i then
 				    color = yellow_highlight;
                 end
+                        
                 local object_health = memory.read_u16_le(currentSlotBase + 0x56, Game.Memory.object_array["Domain"]);
-                if object_health ~= 0 then
+                
+                if objectType == 0x77 then
+                    local object_health = memory.read_u16_le(currentSlotBase + 0x84, Game.Memory.object_array["Domain"]);
+                    gui.text(Game.OSDPosition[1], 2 + Game.OSDRowHeight * row, actorType.." "..i.." ("..object_health.."): "..toHexString(currentSlotBase or 0), color, 'bottomright');
+                    row = row + 1;
+                elseif object_health ~= 0 then
                     local object_total_health = memory.read_u16_le(currentSlotBase + 0x58, Game.Memory.object_array["Domain"]);
                     if actorType == "Unknown" then
                         --local xPos = memory.read_s16_le(currentSlotBase + 0x24, Game.Memory.objectArray["Domain"]);
@@ -484,6 +510,7 @@ end
 Game.OSDPosition = {2, 70}; -- Optional: OSD position in pixels from the top left corner of the screen, defaults to 2, 70 if not set by a game module
 Game.OSD = {
     {"Movement", Game.getCurrentMovementState, Game.colorCurrentMovementState},
+    {"Drill", Game.getDrillValue},
     {"Separator", 1},
 	{"X", Game.getXPosition},
 	{"Y", Game.getYPosition, Game.colorYPosition}, -- A third parameter can be added to these table entries, a function that returns a 32 bit int AARRGGBB color value for that OSD entry
