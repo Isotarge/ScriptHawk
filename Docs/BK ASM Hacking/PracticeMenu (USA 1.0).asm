@@ -2,7 +2,7 @@
 
 ;PAUSE MODE JUMP LOCATION: 0x802E47F4
 .org 0x802E47F4
-JAL 0x80400000
+JAL PauseMode
 NOP
 
 ;NORMAL MODE JUMP LOCATION: 0x80334FFC
@@ -24,4 +24,4 @@ NOP
 [PauseMenuData]:0x8036C4E0
 [PauseMenuState]:0x80383010
 
-.include "Docs/BK ASM Hacking/PracticeMenu_struct.asm"
+.include "Docs/BK ASM Hacking/PracticeMenu.asm"

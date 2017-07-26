@@ -16,7 +16,7 @@
 ;----------------------------------------------------------------
 
 .org 0x80400000
-.include "Docs/BK ASM Hacking/PracticeMenu_GUI.asm"
+.include "PracticeMenu_GUI.asm"
 
 ;----------------------------------------------------------------
 ; Upon Exiting Practice Menu
@@ -72,7 +72,7 @@ ExitingMenuCode: ;DO NOT CHANGE THIS NAME
 
 	KeepCurrentGhostActive:
 	JR	;IMPORTANT
-	NOP :IMPORTANT
+	NOP ;IMPORTANT
 
 ;----------------------------------------------------------------
 ; Code Run from Normal Mode
@@ -719,7 +719,7 @@ ResetOptionString:
 .asciiz " NO RBA"
 
 
-/
+
 
 ResetPointers:
 .word Reset_100
