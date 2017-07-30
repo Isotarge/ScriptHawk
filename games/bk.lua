@@ -3374,6 +3374,7 @@ Game.OSD = {
 	{"Separator", 1},
 	{"Facing", Game.getFacingAngle},
 	{"Moving", Game.getYRotation},
+	{"Moving Angle"},
 	{"Rot. X", Game.getXRotation},
 	{"Rot. Z", Game.getZRotation},
 	{"Separator", 1},

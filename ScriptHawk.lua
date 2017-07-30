@@ -11,6 +11,7 @@ end
 
 ScriptHawk = {
 	mode = "Position",
+	smooth_moving_angle = true,
 	UI = {
 		form_controls = {}, -- TODO: Detect UI position problems using this array
 		form_padding = 8,
@@ -511,8 +512,10 @@ end
 
 ScriptHawk.movingAngle = 0.0;
 function ScriptHawk.getMovingAngle()
-	if dx == 0 and dz == 0 then
-		return 0;
+	if ScriptHawk.smooth_moving_angle == true then
+		if dx == 0 and dz == 0 then
+			return 0;
+		end
 	end
 	return angleBetweenPoints(prev_x, prev_z, Game.getXPosition(), Game.getZPosition());
 end
@@ -890,7 +893,7 @@ function ScriptHawk.UI.updateReadouts()
 			end
 
 			if labelLower == "moving angle" and value == nil then -- TODO: This has some name conflicts, "moving"
-				value = round(ScriptHawk.movingAngle)..string.char(0xB0);
+				value = round(ScriptHawk.movingAngle, precision)..string.char(0xB0);
 			end
 
 			-- Get the value
@@ -1170,11 +1173,13 @@ local function plot_pos()
 			if d > max_d then max_d = d end
 		end
 
-		ScriptHawk.movingAngle = ScriptHawk.getMovingAngle();
+		if ScriptHawk.smooth_moving_angle == true then
+			ScriptHawk.movingAngle = ScriptHawk.getMovingAngle();
 
-		prev_x = x;
-		prev_y = y;
-		prev_z = z;
+			prev_x = x;
+			prev_y = y;
+			prev_z = z;
+		end
 
 		-- Telemetry
 		if collecting_telemetry then
@@ -1217,7 +1222,7 @@ local function plot_pos()
 					end
 
 					if labelLower == "moving angle" and value == nil then -- TODO: This has some name conflicts, "moving"
-						value = round(ScriptHawk.getMovingAngle())..string.char(0xB0);
+						value = round(ScriptHawk.movingAngle, precision)..string.char(0xB0);
 					end
 
 					-- Get the value
@@ -1242,6 +1247,14 @@ local function plot_pos()
 			end
 			table.insert(telemetryData, tempTelemetryData);
 		end
+	end
+
+	if ScriptHawk.smooth_moving_angle == false then
+		ScriptHawk.movingAngle = ScriptHawk.getMovingAngle();
+
+		prev_x = x;
+		prev_y = y;
+		prev_z = z;
 	end
 
 	if not client.ispaused() then
