@@ -55,7 +55,7 @@ Game = {
 	maps = {
 		"Peach's Castle", -- 0x00
 		"Sector Z",
-		"Congo Jungle",
+		"Kongo Jungle",
 		"Planet Zebes",
 		"Hyrule Castle",
 		"Yoshi's Island",
@@ -101,7 +101,7 @@ Game = {
 		"Mushroom Kingdom",
 		"Mushroom Kingdom (Fast)",
 		"Sector Z",
-		"Congo Jungle",
+		"Kongo Jungle",
 		"Peach's Castle",
 		"Saffron City",
 		"Yoshi's Island",
