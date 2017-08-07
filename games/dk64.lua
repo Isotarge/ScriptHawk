@@ -1828,8 +1828,8 @@ obj_model2 = {
 		[0x31] = "-",
 		[0x32] = "-",
 		[0x33] = "-",
-		[0x34] = "-",
-		[0x35] = "Large Blue Crystal",
+		[0x34] = "Metal Bridge", -- Helm Lobby
+		[0x35] = "Large Blue Crystal", -- Crystal Caves Lobby
 		[0x36] = "Plant",
 		[0x37] = "Plant",
 		[0x38] = "-",
@@ -2660,6 +2660,7 @@ local function getExamineDataModelTwo(pointer)
 	local behaviorType = getScriptName(pointer);
 	if isRDRAM(behaviorTypePointer) then
 		table.insert(examine_data, { "Behavior Type", behaviorType });
+		table.insert(examine_data, { "Behavior Index", toHexString(mainmemory.read_u16_be(pointer + obj_model2.object_type))});
 		table.insert(examine_data, { "Internal Name", getInternalName(pointer) });
 		table.insert(examine_data, { "Behavior Type Pointer", toHexString(behaviorTypePointer, 6) });
 	end
