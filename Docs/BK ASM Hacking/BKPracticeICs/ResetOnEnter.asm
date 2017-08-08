@@ -411,3 +411,13 @@ Reset_100HoneyCombs:
 .word 0xFFCFFF00
 .word 0xFF0FFF00
 .word 0xFF0CFC00
+
+
+
+
+.align
+ResetOptionString:
+.asciiz " OFF\0\0\0"
+.asciiz " 100\0\0\0"
+.asciiz " ANY\0\0\0"
+.asciiz " NO RBA"

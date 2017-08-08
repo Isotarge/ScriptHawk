@@ -13,13 +13,15 @@ NOP
 	LI a1 @ItemBase
 	LI a0 100
 	SW a0 0x34(a1) ;Eggs
-	SW a0 0x98(a1) ;Jiggies
+	;SW a0 0x98(a1) ;Jiggies
 	LI a0 50
 	SW a0 0x3C(a1) ;Reds
-	LI a0 50
+	LI a0 10
 	SW a0 0x40(a1) ;Golds
-	LI a0 5
+    
+	LW a0 0x54(a1) ;HealthContainers
 	SW a0 0x50(a1) ;Health
+    
 	LI a0 9
 	SW a0 0x58(a1) ;Lives
 	LI a0 0xE10
@@ -28,6 +30,8 @@ NOP
 	SW a0 0x70(a1) ;MumboTokens_OnHand
 	SW a0 0x94(a1) ;MumboTokens
 	SW a0 0x9C(a1) ;JokerCards
+
+    ;TODO: Set all world jiggies to 10?
 
 NormalModeCode_InfinitesNormal:
 

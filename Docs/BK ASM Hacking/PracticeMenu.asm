@@ -22,6 +22,7 @@
 ; Function Libraries
 ;----------------------------------------------------------------
 .include "BKPracticeICs/L2Levitate.asm"
+.include "BKPracticeICs/TakeOff.asm"
 .include "BKPracticeICs/TransformMe.asm"
 .include "BKPracticeICs/Infinites.asm"
 .include "BKPracticeICs/TakeMeThere.asm"
@@ -122,6 +123,9 @@ NOP
 JAL L2Levitate_NormalMode
 NOP
 
+JAL TakeOff_NormalMode
+NOP
+
 //Ingame-Timer
 JAL HUDTimer_NormalMode
 NOP
@@ -170,12 +174,14 @@ MoveSet:
 .byte 0
 L2LevitateState:
 .byte 0
+TakeOff_State:
+.byte 1
 TransformMeState:
 .byte 0
-GhostState:
-.byte 0
+//GhostState:
+//.byte 0
 InputDisplayState:
-.byte 1
+.byte 0
 
 .align
 MenuItemStr: ;DO NOT CHANGE THIS NAME
@@ -193,8 +199,9 @@ MenuLabelStrings: ;DO NOT CHANGE THIS NAME
 //.asciiz "LOOP: \0\0\0\0\0\0\0\0\0"
 .asciiz "MOVE SET: \0\0\0\0\0"
 .asciiz "L 2 LEVITATE: \0"
+.asciiz "FLY ANYWHERE: \0"
 .asciiz "TRANSFORM ME: \0"
-.asciiz "GHOST BETA: \0\0\0"
+//.asciiz "GHOST BETA: \0\0\0"
 .asciiz "INPUTS: \0\0\0\0\0\0\0"
 .asciiz "\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0"
 
@@ -212,10 +219,12 @@ MoveSetMaxState:
 .byte 6
 L2LevitateMaxState:
 .byte 2
+TakeOff_MaxState:
+.byte 2
 TransformMeMaxState:
 .byte 8
-GhostMaxState:
-.byte 2
+//GhostMaxState:
+//.byte 2
 InputDisplayMaxState:
 .byte 2
 
@@ -226,17 +235,19 @@ InfinitesStringSet:
 ResetOnEnterStringSet:
 .word ResetOptionString
 TakeMeThereStringSet:
-.word TakeMeThereOptionString
+.word TakeMeThere_OptionString
 HUDTimerOptionString:
 .word OnOffOptionString
 MoveSetStringSet:
 .word MoveSetOptionString
 L2LevitateStringSet:
 .word OnOffOptionString
+TakeOff_StringSet:
+.word OnOffOptionString
 TransformMeStringSet:
 .word TransformMe_OptionString
-GhostStringSet:
-.word OnOffOptionString
+//GhostStringSet:
+//.word OnOffOptionString
 InputDisplayStringSet:
 .word OnOffOptionString
 
@@ -245,21 +256,6 @@ PreviousLoadzoneState:
 .byte 0
 .byte 0
 .byte 0
-
-GhostObjectPointer:
-.word 0
-GhostCurrentFrame:
-.word 0
-GhostPrevObjectArray:
-.word 0
-GhostObjectArrayIndex:
-.word 0
-GhostCurrentPlaybackPointer:
-.word 0
-GhostRecordPointer:
-.word 0
-GhostCurrentTailPointer:
-.word GhostArray
 
 /*Option strings*/
 .align
@@ -275,28 +271,6 @@ MoveSetOptionString: ;6
 .asciiz "FFM EGG" ;FFM Eggs
 .asciiz "ALL\0\0\0\0"
 
-TakeMeThereOptionString:
-.asciiz "OFF\0\0\0\0"
-.asciiz "SM\0\0\0\0\0"
-.asciiz "MM\0\0\0\0\0"
-.asciiz "TTC\0\0\0\0"
-.asciiz "CC\0\0\0\0\0"
-.asciiz "BGS\0\0\0\0"
-.asciiz "FP\0\0\0\0\0"
-.asciiz "GV\0\0\0\0\0"
-.asciiz "MMM\0\0\0\0"
-.asciiz "RBB\0\0\0\0"
-.asciiz "CCW\0\0\0\0"
-.asciiz "FF\0\0\0\0\0"
-.asciiz "DOG\0\0\0\0"
-.asciiz "GRUNTY\0"
-
-ResetOptionString:
-.asciiz " OFF\0\0\0"
-.asciiz " 100\0\0\0"
-.asciiz " ANY\0\0\0"
-.asciiz " NO RBA"
-
 temp1:
 .word 0
 temp2:
@@ -311,7 +285,7 @@ TEMP2ValueStr:
 HUDTimerValueStr:
 .asciiz "\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0"
 
-GhostArray:
+//GhostArray:
 //ghost struct:
 //	half Map
 //	half Exit

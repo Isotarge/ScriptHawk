@@ -194,3 +194,4 @@
 
 //
 
+[MovementState_Flight_Entering]: 0x23

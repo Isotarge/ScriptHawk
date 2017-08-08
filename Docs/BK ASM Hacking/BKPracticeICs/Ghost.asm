@@ -298,3 +298,24 @@ LW at 0x14(sp)
 ADDIU sp 0x28
 JR
 NOP
+
+
+
+;--------------------------------
+; Variables
+;--------------------------------
+
+GhostObjectPointer:
+.word 0
+GhostCurrentFrame:
+.word 0
+GhostPrevObjectArray:
+.word 0
+GhostObjectArrayIndex:
+.word 0
+GhostCurrentPlaybackPointer:
+.word 0
+GhostRecordPointer:
+.word 0
+GhostCurrentTailPointer:
+.word GhostArray

@@ -14,6 +14,8 @@
 
 [SlopeTimer]: 0x8037C2E4
 
+[MovementState]: 0x8037D164
+
 [MapLoadState]: 0x8037E8F4
 [Map]: 0x8037E8F5
 [Exit]: 0x8037E8F6
@@ -371,7 +373,8 @@
 [SetPlayerModelScale]:	0x802920FC	;I:	(float $f12 input)
 [SetBanjoFacingAngle]:	0x80292134	;I:	(float $f12 input)
 
-
+[IsMiscFlagCleared]: 0x802933D0 ;I:	(byte $a0 byteIndex)
+[SetMiscFlag]: 0x802933E8 ;I: (byte $a0 byteIndex)
 
 [GetButtonPressTimer]: 		0x8029557C 	;I: (byte $a0 ButtonIndex)
 [GetButtonReleaseTimer]: 	0x80295590 	;I: (byte $a0 ButtonIndex)
@@ -393,6 +396,8 @@
 [CopyXYZPosition]:			0x802984D4
 
 [AddToYPos]: 				0x80298528 ;I: (float $f12)
+
+[SetMovementState]: 0x8029A72C ;I: (byte $a0 movementStateIndex)
 
 [SetMumboTransformation]: 	0x8029A960
 
