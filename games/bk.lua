@@ -263,18 +263,17 @@ Game.Memory = {
 	["facing_angle"] = {0x37D060, 0x37D190, 0x37B890, 0x37C690},
 	["moving_angle"] = {0x37D064, 0x37D194, 0x37B894, 0x37C694},
 	["z_rotation"] = {0x37D050, 0x37D180, 0x37B880, 0x37C680},
-	["camera_rotation"] = {0x37E578, 0x37E6A8, 0x37CDA8, 0x37D96C},
-	["camera_x_position"] = {0x37E328, 0x37E694, 0x37CD94, 0x37D958},
-	["camera_y_position"] = {0x37E32C, 0x37E698, 0x37CD98, 0x37D95C},
-	["camera_z_position"] = {0x37E330, 0x37E69C, 0x37CD9C, 0x37D960},
-	["camera_x_rotation"] = {0x37E338, 0x37E6A4, 0x37CDA4, 0x37D968},
-	["camera_y_rotation"] = {0x37E33C, 0x37E6A8, 0x37CDA8, 0x37D96C},
-	["first_person_flag"] = {0x37CBB4, 0, 0, 0x37C1E7}, --Mittenz: I need to get a JP and v1.1 rom
-	["first_person_cam_x_pos"] = {0x37E630, 0, 0, 0x37DC60},
-	["first_person_cam_y_pos"] = {0x37E634, 0, 0, 0x37DC64},
-	["first_person_cam_z_pos"] = {0x37E638, 0, 0, 0x37DC68},
-	["first_person_cam_x_rot"] = {0x37E63C, 0, 0, 0x37DC6C},
-	["first_person_cam_y_rot"] = {0x37E640, 0, 0, 0x37DC70},
+	["camera_x_position"] = {0x37E328, 0x37E458, 0x37CB58, 0x37D958},
+	["camera_y_position"] = {0x37E32C, 0x37E45C, 0x37CB5C, 0x37D95C},
+	["camera_z_position"] = {0x37E330, 0x37E460, 0x37CB60, 0x37D960},
+	["camera_x_rotation"] = {0x37E338, 0x37E468, 0x37CB68, 0x37D968},
+	["camera_y_rotation"] = {0x37E33C, 0x37E46C, 0x37CB6C, 0x37D96C},
+	["first_person_flag"] = {0x37CBB4, 0x37CCE4, 0x37B3E4, 0x37C1E7},
+	["first_person_cam_x_pos"] = {0x37E630, 0x37E760, 0x37CE60, 0x37DC60},
+	["first_person_cam_y_pos"] = {0x37E634, 0x37E764, 0x37CE64, 0x37DC64},
+	["first_person_cam_z_pos"] = {0x37E638, 0x37E768, 0x37CE68, 0x37DC68},
+	["first_person_cam_x_rot"] = {0x37E63C, 0x37E76C, 0x37CE6C, 0x37DC6C},
+	["first_person_cam_y_rot"] = {0x37E640, 0x37E770, 0x37CE70, 0x37DC70},
 	["previous_movement_state"] = {0x37DB30, 0x37DC60, 0x37C360, 0x37D160},
 	["current_movement_state"] = {0x37DB34, 0x37DC64, 0x37C364, 0x37D164},
 	["map"] = {0x37F2C5, 0x37F405, 0x37DAF5, 0x37E8F5},
@@ -290,7 +289,7 @@ Game.Memory = {
 	["jiggy_bitfield"] = {0x383CA0, 0x383E00, 0x3824E0, 0x3832C0},
 	["honeycomb_bitfield"] = {0x383CC0, 0x383E20, 0x382500, 0x3832E0},
 	["mumbo_token_bitfield"] = {0x383CD0, 0x383E30, 0x382510, 0x3832F0},
- };
+};
 
 function Game.detectVersion(romName, romHash)
 	if romHash == "BB359A75941DF74BF7290212C89FBC6E2C5601FE" then -- Europe
@@ -1907,8 +1906,8 @@ function drawObjectPositions()
 	end
 
 	local cameraData = {};
-	if(mainmemory.readbyte(Game.Memory.first_person_flag[version]) ~= 0) then
-		cameraData = {--in first person
+	if mainmemory.read_u32_be(Game.Memory.first_person_flag[version]) ~= 0 then
+		cameraData = { -- In first person
 			xPos = mainmemory.readfloat(Game.Memory.first_person_cam_x_pos[version], true),
 			yPos = mainmemory.readfloat(Game.Memory.first_person_cam_y_pos[version], true),
 			zPos = mainmemory.readfloat(Game.Memory.first_person_cam_z_pos[version], true),
@@ -1916,7 +1915,7 @@ function drawObjectPositions()
 			yRot = mainmemory.readfloat(Game.Memory.first_person_cam_y_rot[version], true) * math.pi / 180,
 		};
 	else
-		cameraData = {--not first person
+		cameraData = { -- In third person
 			xPos = mainmemory.readfloat(Game.Memory.camera_x_position[version], true),
 			yPos = mainmemory.readfloat(Game.Memory.camera_y_position[version], true),
 			zPos = mainmemory.readfloat(Game.Memory.camera_z_position[version], true),
