@@ -268,7 +268,7 @@ Game.Memory = {
 	["camera_z_position"] = {0x37E330, 0x37E460, 0x37CB60, 0x37D960},
 	["camera_x_rotation"] = {0x37E338, 0x37E468, 0x37CB68, 0x37D968},
 	["camera_y_rotation"] = {0x37E33C, 0x37E46C, 0x37CB6C, 0x37D96C},
-	["first_person_flag"] = {0x37CBB4, 0x37CCE4, 0x37B3E4, 0x37C1E7},
+	["first_person_flag"] = {0x37CBB7, 0x37CCE7, 0x37B3E7, 0x37C1E7},
 	["first_person_cam_x_pos"] = {0x37E630, 0x37E760, 0x37CE60, 0x37DC60},
 	["first_person_cam_y_pos"] = {0x37E634, 0x37E764, 0x37CE64, 0x37DC64},
 	["first_person_cam_z_pos"] = {0x37E638, 0x37E768, 0x37CE68, 0x37DC68},
@@ -1906,7 +1906,7 @@ function drawObjectPositions()
 	end
 
 	local cameraData = {};
-	if mainmemory.read_u32_be(Game.Memory.first_person_flag[version]) ~= 0 then
+	if mainmemory.readbyte(Game.Memory.first_person_flag[version]) ~= 0 then
 		cameraData = { -- In first person
 			xPos = mainmemory.readfloat(Game.Memory.first_person_cam_x_pos[version], true),
 			yPos = mainmemory.readfloat(Game.Memory.first_person_cam_y_pos[version], true),
