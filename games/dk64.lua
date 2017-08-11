@@ -907,6 +907,7 @@ obj_model1 = {
 		[216] = "Pufftoss",
 		[220] = "Cannon (Seasick Chunky)",
 		--[221] = "Lanky Phase", -- TODO: Not sure exactly what this is, maybe the light?
+		[222] = "Banana Peel", -- Lanky Phase
 		[224] = "Mushroom Man",
 		[226] = "Troff",
 		[227] = "K. Rool's Foot",
