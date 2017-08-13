@@ -75,19 +75,19 @@ function Game.colorYPosition()
 	end
 end
 
-function Game.getZPosition()
+function Game.getZPosition() -- Optional, 2D games don't need to implement this
 	return mainmemory.readfloat(Game.Memory.z_position[version], true);
 end
 
-function Game.setXPosition(value)
+function Game.setXPosition(value) -- Optional
 	mainmemory.writefloat(Game.Memory.x_position[version], value, true);
 end
 
-function Game.setYPosition(value)
+function Game.setYPosition(value) -- Optional
 	mainmemory.writefloat(Game.Memory.y_position[version], value, true);
 end
 
-function Game.setZPosition(value)
+function Game.setZPosition(value) -- Optional, 2D games don't need to implement this
 	mainmemory.writefloat(Game.Memory.z_position[version], value, true);
 end
 

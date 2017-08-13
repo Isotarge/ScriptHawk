@@ -31,14 +31,14 @@ Game -- Table containing all information and functions about a game that are vis
 
 		function Game.getXPosition()
 		function Game.getYPosition()
-		function Game.getZPosition()
+		function Game.getZPosition() -- Optional, 2D games don't need to implement this
 
 	function Game.setPosition(x, y, z) -- ScriptHawk.lua provides a simple method which calls Game.setXPosition(x), Game.setYpositon(y) and Game.setZPosition(z)
 									   -- I might update this to support passing in a table in the future
 
 		function Game.setXPosition(value)
 		function Game.setYPosition(value)
-		function Game.setZPosition(value)
+		function Game.setZPosition(value) -- Optional, 2D games don't need to implement this
 
 	function Game.getRotation() -- Return table of axis + value pairs
 

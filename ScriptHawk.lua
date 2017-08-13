@@ -332,10 +332,10 @@ local supportedGames = {
 	["B4717E602F07CA9BE0D4822813C658CD8B99F993"] = {["moduleName"] = "games.dk64", ["friendlyName"] = "Donkey Kong 64 (USA) (Demo) (Kiosk)"},
 	["CF806FF2603640A748FCA5026DED28802F1F4A50"] = {["moduleName"] = "games.dk64", ["friendlyName"] = "Donkey Kong 64 (USA)"},
 
-    -- Drill Dozer
-    ["C1058CC2482B91204100CC8515DA99AEB06773F5"] = {["moduleName"] = "games.GBA_DrillDozer", ["friendlyName"] = "Drill Dozer (USA)"},
-    ["84AFA7108E4D604E7B1A6D105DF5760869A247FA"] = {["moduleName"] = "games.GBA_DrillDozer", ["friendlyName"] = "Screw Breaker Goushin Dorirurero (Japan)"},
-    
+	-- Drill Dozer
+	["C1058CC2482B91204100CC8515DA99AEB06773F5"] = {["moduleName"] = "games.GBA_DrillDozer", ["friendlyName"] = "Drill Dozer (USA)"},
+	["84AFA7108E4D604E7B1A6D105DF5760869A247FA"] = {["moduleName"] = "games.GBA_DrillDozer", ["friendlyName"] = "Screw Breaker Goushin Dorirurero (Japan)"},
+
 	-- Elmo
 	["97777CA06F4E8AFF8F1E95033CC8D3833BE40F76"] = {["moduleName"] = "games.elmo", ["friendlyName"] = "Elmo's Letter Adventure (USA)"},
 	["7195EA96D9FE5DE065AF61F70D55C92C8EE905E6"] = {["moduleName"] = "games.elmo", ["friendlyName"] = "Elmo's Number Journey (USA)"},
@@ -572,6 +572,52 @@ if ScriptHawk.dpad.key.enabled then
 	ScriptHawk.bindKeyRealtime(ScriptHawk.dpad.key.up, ScriptHawk.practice.save, true);
 	ScriptHawk.bindKeyRealtime(ScriptHawk.dpad.key.down, ScriptHawk.practice.load, true);
 	ScriptHawk.bindKeyRealtime(ScriptHawk.lbutton.key, ScriptHawk.practice.load, true);
+end
+
+--------------
+-- Position --
+--------------
+
+if type(Game.getXPosition) ~= "function" then
+	print("Warning: This module does not implement Game.getXPosition()");
+	function Game.getXPosition()
+		return 0;
+	end
+end
+
+if type(Game.getYPosition) ~= "function" then
+	print("Warning: This module does not implement Game.getYPosition()");
+	function Game.getYPosition()
+		return 0;
+	end
+end
+
+if type(Game.getZPosition) ~= "function" then
+	--print("Warning: This module does not implement Game.getZPosition()");
+	function Game.getZPosition()
+		return 0;
+	end
+end
+
+if type(Game.setXPosition) ~= "function" then
+	--print("Warning: This module does not implement Game.setXPosition()");
+	function Game.setXPosition()
+		return;
+	end
+end
+
+if type(Game.setYPosition) ~= "function" then
+	--print("Warning: This module does not implement Game.setYPosition()");
+	function Game.setYPosition()
+		return;
+	end
+end
+
+if type(Game.setZPosition) ~= "function" then
+	--print("Warning: This module does not implement Game.setZPosition()");
+	function Game.setZPosition()
+		return;
+	end
 end
 
 --------------

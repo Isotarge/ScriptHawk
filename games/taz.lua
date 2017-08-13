@@ -41,22 +41,6 @@ function Game.getYPosition()
 	return viewportY;
 end
 
-function Game.getZPosition()
-	return 0;
-end
-
-function Game.setXPosition()
-	return; -- TODO
-end
-
-function Game.setYPosition()
-	return; -- TODO
-end
-
-function Game.setZPosition()
-	return;
-end
-
 function Game.getJumpHeight()
 	return mainmemory.read_u8(Game.Memory.jump_height);
 end
