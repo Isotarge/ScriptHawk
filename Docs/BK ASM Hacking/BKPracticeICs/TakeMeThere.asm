@@ -1,3 +1,41 @@
+;--------------------------------------------------
+; Function Definition Structure
+;--------------------------------------------------
+; This struct contains all the info needed for the 
+; practice menu to successfully run the function
+; in the practice menu
+;
+; Add X_DefStruct to the function list in PracticeMenu.asm
+; And adjust option [NumberOfOptions] & [PageTopMax]
+;--------------------------------------------------
+.align
+TakeMeThere_DefStruct:
+TakeMeThere_State:
+.byte 0
+TakeMeThere_MaxState:
+.byte  14
+
+.align
+TakeMeThere_MenuOptionString:
+.word TakeMeThere_OptionString
+TakeMeThere_PauseModePtr: ;set to 0 if no code is to be run upon exiting the pause menu
+.word 0
+TakeMeThere_NormalModePtr: ;set to 0 if no code is to be run during Normal menu
+.word TakeMeThere_NormalMode
+TakeMeThere_Label: 
+.asciiz "TAKE ME THERE: "
+
+.align
+;-------------------------------
+; Pause Mode Code
+;-------------------------------
+TakeMeThere_PauseMode:
+;YOUR PAUSE MODE CODE HERE
+
+
+;-------------------------------
+; Normal Mode Code
+;-------------------------------
 .align
 TakeMeThere_NormalMode:
 ADDIU sp -0x28
@@ -7,19 +45,18 @@ SW a1 0x1C(sp)
 SW a2 0x18(sp)
 SW at 0x14(sp)
 
-LB a0 TakeMeThereState
-BEQ a0 zero NormalModeCode_TakeMeThereEnd
-	;convert from option number  to level index
+LB a0 TakeMeThere_State
+;convert from option number  to level index
 
-    SUBI a0 a0 1
-    SLL a0 a0 1
-    LA a2 TakeMeThere_WarpLocations
-    ADDU a2 a2 a0
-    LB a1 0x01(a2) ;exit
-    LB a0 0x00(a2) ;level
-	JAL @TakeMeThere_LevelReset
-	LI a2 1
-	SB zero TakeMeThereState
+SUBI a0 a0 1
+SLL a0 a0 1
+LA a2 TakeMeThere_WarpLocations
+ADDU a2 a2 a0
+LB a1 0x01(a2) ;exit
+LB a0 0x00(a2) ;level
+JAL @TakeMeThere_LevelReset
+LI a2 1
+SB zero TakeMeThere_State
 
 NormalModeCode_TakeMeThereEnd:
 

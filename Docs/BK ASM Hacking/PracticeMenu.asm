@@ -9,8 +9,13 @@
 //
 
 //Variables
-[NumberOfOptions]: 0x09
-[PageTopMax]: 0x05
+[DefStruct_State]:0x00
+[DefStruct_MaxState]:0x01
+[DefStruct_MenuOptionString]:0x04
+[DefStruct_PauseModePtr]:0x08
+[DefStruct_NormalModePtr]:0x0C
+[DefStruct_Label]:0x10
+
 ;----------------------------------------------------------------
 ; Code Run from Pause Mode
 ;----------------------------------------------------------------
@@ -21,15 +26,36 @@
 ;----------------------------------------------------------------
 ; Function Libraries
 ;----------------------------------------------------------------
+.include "BKPracticeICs/TakeMeThere.asm"
+.include "BKPracticeICs/ResetOnEnter.asm"
+.include "BKPracticeICs/Infinites.asm"
+.include "BKPracticeICs/HUDInfo.asm"
+.include "BKPracticeICs/HUDTimer.asm"
+.include "BKPracticeICs/FreezeClip.asm" //MUST BE PRIOR TO L2Levitate
 .include "BKPracticeICs/L2Levitate.asm"
 .include "BKPracticeICs/TakeOff.asm"
 .include "BKPracticeICs/TransformMe.asm"
-.include "BKPracticeICs/Infinites.asm"
-.include "BKPracticeICs/TakeMeThere.asm"
 .include "BKPracticeICs/InputDisplay.asm"
-.include "BKPracticeICs/ResetOnEnter.asm"
-.include "BKPracticeICs/HUDTimer.asm"
-//.include "BKPracticeICs/Ghost.asm"
+
+//.include "BKPracticeICs/SetMoves.asm"
+
+.align
+;----------------------------------------------------------------
+; Function List
+;----------------------------------------------------------------
+MenuFunctionList:
+.word TakeMeThere_DefStruct
+.word ResetOnEnter_DefStruct
+.word Infinites_DefStruct
+.word HUDInfo_DefStruct
+.word HUDTimer_DefStruct
+.word FreezeClip_DefStruct
+.word L2Levitate_DefStruct
+.word TakeOff_DefStruct
+.word TransformMe_DefStruct
+.word InputDisplay_DefStruct
+//SetMoves
+.word 0 ;!!!functionListMust end with 0!!!
 
 ;----------------------------------------------------------------
 ; Upon Exiting Practice Menu
@@ -37,54 +63,41 @@
 ;----------------------------------------------------------------
 .align
 ExitingMenuCode: ;DO NOT CHANGE THIS NAME
-	ADDIU sp -0x20
+	ADDIU sp -0x28
 	SW ra 0x1C(sp)
 	SW a0 0x18(sp)
 	SW a1 0x14(sp)
-	SW s3 0x10(sp)
+	SW a2 0x10(sp)
 
-	LB s3 MoveSet
-	BEQZ s3 KeepCurrentMoveSet
-	LI a1 0x01
-		//NONE
-		MOV a0 zero
-		BEQ s3 a1 DoNotKeepCurrentMoveSet
-		LI a1 0x02
+	MOV a0 zero
+    PauseModeCode_Loop:
+    LB at NumberOfOptions
+    BEQ a0 at PauseModeCode_Housekeeping
+    NOP
+        LA a1 MenuFunctionList
+        SLL a2 a0 2
+        ADDU a2 a1 a2
+        LW a2 0(a2)
+        ;check if state not equal to 0
+        LB a1 @DefStruct_State(a2)
+        BEQ a1 zero PauseModeCode_Loop
+        ADDIU a0 a0 1
+            ;check if code has normal mode code
+            LW a1 @DefStruct_PauseModePtr(a2)
+            BEQ a1 zero PauseModeCode_Loop
+            ADDIU a0 a0 1
+                ;jump to function 
+                JALR ra a1
+                NOP
+        B PauseModeCode_Loop
+        ADDIU a0 a0 1
 
-		//SM Set
-		LI a0 0x00009DB9
-		BEQ s3 a1 DoNotKeepCurrentMoveSet
-		LI a1 0x03
-
-		//FFM
-		LI a0 0x000BFDBF
-		BEQ s3 a1 DoNotKeepCurrentMoveSet
-		LI a1 0x04
-
-		//FFM + EGGS
-		BEQ s3 a1 DoNotKeepCurrentMoveSet
-		LI a0 0x000BFDFF
-
-		//ALL
-		LI a0 0x000FFFFF
-
-	DoNotKeepCurrentMoveSet:
-	JAL @SetMovesUnlockedBitfield
-	NOP
-	JAL @SetHasUsedMovesBitfield
-	NOP
-
-	KeepCurrentMoveSet:
-	SB zero MoveSet
-	
-    //JAL Ghost_PauseMode
-    //NOP
-
+    PauseModeCode_Housekeeping:
 	LW ra 0x1C(sp)
 	LW a0 0x18(sp)
 	LW a1 0x14(sp)
-	LW s3 0x10(sp)
-	ADDIU sp 0x20
+	LW a2 0x10(sp)
+	ADDIU sp 0x28
 
 	JR	;IMPORTANT
 	NOP ;IMPORTANT
@@ -105,48 +118,55 @@ SW at 0x14(sp)
 LB a0 PracMenuSetup
 BEQ a0 zero NormalModeCode_MenuSetup
 NOP
-	JAL BetaPauseMenu
+    ;Menu Setup Code
+    
+    ;count menu items
+	MOV a0 zero
+    LA a1 MenuFunctionList
+    NormalModeCode_MenuSetup_Count:
+    LW a2 0(a1)   
+    BEQ a2 zero NormalModeCode_MenuSetup_Count_End
+    ADDIU a1 a1 0x04 
+        B NormalModeCode_MenuSetup_Count
+        ADDIU a0 a0 0x01 
+    NormalModeCode_MenuSetup_Count_End:
+    SB a0 NumberOfOptions
+    SUBI a0 a0 0x04
+    BGT a0 zero NormalModeCode_MenuSetup_Count_Fix
+        NOP
+        LI a0 0x01
+    NormalModeCode_MenuSetup_Count_Fix:
+    SB a0 PageTopMax
+    
+    ;asthetic setup
+    JAL BetaPauseMenu
 	NOP
 	MOV a0 zero
 NormalModeCode_MenuSetup:
 
-
-//Take Me There
-JAL TakeMeThere_NormalMode
+MOV a0 zero
+NormalModeCode_Loop:
+LB at NumberOfOptions
+BEQ a0 at NormalModeCode_Housekeeping
 NOP
-
-//Transform Me
-JAL TransformMe_NormalMode
-NOP
-
-//Press-L to Levitate
-JAL L2Levitate_NormalMode
-NOP
-
-JAL TakeOff_NormalMode
-NOP
-
-//Ingame-Timer
-JAL HUDTimer_NormalMode
-NOP
-
-//InputDisplay
-JAL InputDisplay_NormalMode
-NOP
-
-//Infinites
-JAL Infinites_NormalMode
-NOP
-
-//ResetUponEnter
-JAL ResetOnEnter_NormalMode
-NOP
-
-//JAL Ghost_NormalMode
-//NOP
-
-		
-	
+    LA a1 MenuFunctionList
+    SLL a2 a0 2
+    ADDU a2 a1 a2
+    LW a2 0(a2)
+    //check if state not equal to 0
+    LB a1 @DefStruct_State(a2)
+    BEQ a1 zero NormalModeCode_Loop
+    ADDIU a0 a0 1
+        //check if code has normal mode code
+        LW a1 @DefStruct_NormalModePtr(a2)
+        BEQ a1 zero NormalModeCode_Loop
+        NOP
+            //jump to function 
+            JALR ra a1
+            NOP
+    B NormalModeCode_Loop
+    NOP
+    
 NormalModeCode_Housekeeping:	
 LW ra 0x24(sp)
 LW a0 0x20(sp)
@@ -161,95 +181,36 @@ NOP
 ; Menu Variables
 ; BitFlags
 ;----------------------------------------------------------------
-MenuOptionStates: ;DO NOT CHANGE THIS NAME
-InfinitesState:
-.byte 0
-ResetOnEnterState:
-.byte 0
-TakeMeThereState:
-.byte 0
-HUDTimerState:
-.byte 0
-MoveSet:
-.byte 0
-L2LevitateState:
-.byte 0
-TakeOff_State:
-.byte 1
-TransformMeState:
-.byte 0
-//GhostState:
-//.byte 0
-InputDisplayState:
-.byte 0
+.align
+
+
 
 .align
-MenuItemStr: ;DO NOT CHANGE THIS NAME
-.asciiz "PRACTICE MENU 1: \0\0\0\0\0\0\0\0\0\0\0\0\0\0"
-.asciiz "PRACTICE MENU 2: \0\0\0\0\0\0\0\0\0\0\0\0\0\0"
-.asciiz "PRACTICE MENU 3: \0\0\0\0\0\0\0\0\0\0\0\0\0\0"
-.asciiz "PRACTICE MENU 4: \0\0\0\0\0\0\0\0\0\0\0\0\0\0"
+OnOffOptionString:
+.asciiz "OFF\0\0\0\0"
+.asciiz "ON\0\0\0\0\0"
+
+MenuOptionStates: ;DO NOT CHANGE THIS NAME
+
+MoveSet:
+.byte 0
 
 .align
 MenuLabelStrings: ;DO NOT CHANGE THIS NAME
-.asciiz "INFINITES: \0\0\0\0"
-.asciiz "RESET ON ENTER:"
-.asciiz "TAKE ME THERE: "
-.asciiz "HUD TIMER: \0\0\0\0"
-//.asciiz "LOOP: \0\0\0\0\0\0\0\0\0"
 .asciiz "MOVE SET: \0\0\0\0\0"
-.asciiz "L 2 LEVITATE: \0"
-.asciiz "FLY ANYWHERE: \0"
-.asciiz "TRANSFORM ME: \0"
-//.asciiz "GHOST BETA: \0\0\0"
-.asciiz "INPUTS: \0\0\0\0\0\0\0"
 .asciiz "\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0"
 
 
 MenuOptionMaxStates: ;DO NOT CHANGE THIS NAME
-InfinitesMaxState:
-.byte 2
-ResetOnEnterMaxState:
-.byte 4
-TakeMeThereMaxState:
-.byte 14
-HUDTimerMaxState:
-.byte 2
+
 MoveSetMaxState:
 .byte 6
-L2LevitateMaxState:
-.byte 2
-TakeOff_MaxState:
-.byte 2
-TransformMeMaxState:
-.byte 8
-//GhostMaxState:
-//.byte 2
-InputDisplayMaxState:
-.byte 2
 
 .align
 MenuOptionStringSet: ;DO NOT CHANGE THIS NAME
-InfinitesStringSet:
-.word OnOffOptionString
-ResetOnEnterStringSet:
-.word ResetOptionString
-TakeMeThereStringSet:
-.word TakeMeThere_OptionString
-HUDTimerOptionString:
-.word OnOffOptionString
+
 MoveSetStringSet:
 .word MoveSetOptionString
-L2LevitateStringSet:
-.word OnOffOptionString
-TakeOff_StringSet:
-.word OnOffOptionString
-TransformMeStringSet:
-.word TransformMe_OptionString
-//GhostStringSet:
-//.word OnOffOptionString
-InputDisplayStringSet:
-.word OnOffOptionString
 
 PreviousLoadzoneState:
 .byte 0
@@ -258,10 +219,7 @@ PreviousLoadzoneState:
 .byte 0
 
 /*Option strings*/
-.align
-OnOffOptionString:
-.asciiz "OFF\0\0\0\0"
-.asciiz "ON\0\0\0\0\0"
+
 
 MoveSetOptionString: ;6
 .asciiz "OFF\0\0\0\0"
@@ -284,20 +242,9 @@ TEMP2ValueStr:
 .align
 HUDTimerValueStr:
 .asciiz "\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0"
+.align
 
-//GhostArray:
-//ghost struct:
-//	half Map
-//	half Exit
-//	word TotalFrames
-//	word NextGhostStruct
-//  word PrevGhostStruct
-//  frame[0]:
-//  	float XPos
-//		float YPos
-//		float ZPos
-//  frame[1]:
-//  	float XPos
-//		float YPos
-//		float ZPos
-//	etc...
+NumberOfOptions:
+.byte 0
+PageTopMax:
+.byte 0

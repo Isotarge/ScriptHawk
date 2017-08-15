@@ -1,5 +1,5 @@
 PauseMode:
-ADDIU sp -0x30
+ADDIU sp -0x38
 SW ra 0x2C(sp)
 SW a0 0x28(sp)
 SW a1 0x24(sp)
@@ -18,11 +18,14 @@ InPracMenu:
 	MOV s3 zero
 //for(s3=0; s3<4; s3++)
 	PracticeMenuText_Loop:
-		LA a1 MenuLabelStrings
+        LA a1 MenuFunctionList
 		LB a0 PageTopPos
 		ADDU a0 a0 s3
-		SLL s2 a0 4
+		SLL s2 a0 2
 		ADDU a1 a1 s2
+        LW a1 0(a1)
+        SW a1 0x30(sp)
+        ADDIU a1 a1 @DefStruct_Label
 
 		LA a0 MenuItemStr
 		SLL s2 s3 5
@@ -31,16 +34,9 @@ InPracMenu:
 		JAL @CopyString
 		NOP
 
-		LA a1 MenuOptionStates
-		LA a2 MenuOptionStringSet
-		ADDU a1 a1 s3
-		LB a0 PageTopPos
-		ADDU a1 a1 a0
-		LB a1 0(a1)
-		ADDU a0 a0 s3
-		SLL a0 a0 2
-		ADDU a2 a2 a0
-		LW a2 0(a2)
+		LW a1 0x30(sp)
+        LW a2 @DefStruct_MenuOptionString(a1)
+		LB a1 @DefStruct_State(a1)
 		SLL a1 a1 3
 		ADDU a1 a1 a2
 
@@ -55,6 +51,8 @@ InPracMenu:
 		LI a0 0x04
 		BNE s3 a0 PracticeMenuText_Loop
 		NOP
+
+
 
 	JAL PrintPracMenuText
 
@@ -74,12 +72,12 @@ InPracMenu:
 	LB a0 PracMenuCursorPos
 		BNEZ a0 NotAtPageTop ;if(cursor on bottom option)
 		NOP
-			PUSH a0
+			SW a0 0x30(sp)
 			LB a1 PageTopPos
 			ADDI a0 a1 -1
 			JAL @SelectMaxInt
 			MOV a1 zero  ;PageTopMin
-			POP a0
+			LW a0 0x30(sp)
 			SB v0 PageTopPos
 			B NoDPadUpPress
 			NOP
@@ -101,15 +99,13 @@ InPracMenu:
 		LI a1 0x03
 		BNE a0 a1 NotAtPageBottom
 		NOP
-			PUSH a0
 			LB a1 PageTopPos
 			ADDI a0 a1 1
+            LB a1 PageTopMax
 			JAL @SelectMinInt
-			LI a1 @PageTopMax
-			POP a0
+			NOP
 			SB v0 PageTopPos
 			B NoDPadDownPress
-			POP a0
 			NotAtPageBottom:
 		ADDIU a0 a0 1
 		JAL @SelectMinInt
@@ -122,22 +118,22 @@ InPracMenu:
 	XORI a0, a0, 1
 	BNEZ a0 NoDPadLeftPress
 		NOP
-		//Get CurrentHighlighted Option
+        //Get CurrentHighlighted Option
 		LB a0 PageTopPos
 		LB a1 PracMenuCursorPos
 		ADDU a0 a0 a1
-		LA a1 MenuOptionStates
+		LA a1 MenuFunctionList
+        SLL a0 a0 2
 		ADDU a1 a1 a0
-		LB a0 0(a1)
+        LW a1 0(a1)
+		LB a0 @DefStruct_State(a1)
 		//increment current option's state
 		BEQZ a0 ClampToZeroOptionState
 		NOP
 			ADDI a0 a0 -1
 		ClampToZeroOptionState:
-		SB a0 0(a1)
-		
-		//Need to clamp
-		
+		SB a0 @DefStruct_State(a1)
+
 	NoDPadLeftPress:
 
 
@@ -147,27 +143,28 @@ InPracMenu:
 
 	BNEZ a0 NoDPadRightPress
 		NOP
-		//Get CurrentHighlighted Option
+
+        //Get CurrentHighlighted Option
 		LB a0 PageTopPos
 		LB a1 PracMenuCursorPos
 		ADDU a0 a0 a1
-		LA a1 MenuOptionStates
+		LA a1 MenuFunctionList
+        MOV s3 a0 ;option number
+        SLL a0 a0 2
 		ADDU a1 a1 a0
-		MOV s3 a0 ;option number
-		LB a0 0(a1)
+		LW a1 0(a1)
+        SW a1 0x30(sp)
+        LB a0 @DefStruct_State(a1)
 		//increment current option's state
 		ADDIU a0 a0 1
-		LA s2 MenuOptionMaxStates
-		ADDU s2 s2 s3
-		LB a2 0(s2)
+		LB a2 @DefStruct_MaxState(a1)
 		ADDI a2 a2 -1
-		MOV a1 zero
 		JAL @ClampInt
-		NOP
-		LA a1 MenuOptionStates
-		ADDU a1 a1 s3
-		SB v0 0(a1)
+		MOV a1 zero
+        LW a1 0x30(sp)
+        SB v0 @DefStruct_State(a1)
 		//Need to clamp
+
 
 	NoDPadRightPress:
 
@@ -222,7 +219,7 @@ LW a2 0x20(sp)
 LW a1 0x24(sp)
 LW a0 0x28(sp)
 LW ra 0x2C(sp)
-ADDIU sp 0x30
+ADDIU sp 0x38
 JR
 NOP
 
@@ -413,3 +410,10 @@ PracMenuOptionNumber:
 .byte 0
 PageTopPos:
 .byte 0
+
+.align
+MenuItemStr: ;DO NOT CHANGE THIS NAME
+.asciiz "PRACTICE MENU 1: \0\0\0\0\0\0\0\0\0\0\0\0\0\0"
+.asciiz "PRACTICE MENU 2: \0\0\0\0\0\0\0\0\0\0\0\0\0\0"
+.asciiz "PRACTICE MENU 3: \0\0\0\0\0\0\0\0\0\0\0\0\0\0"
+.asciiz "PRACTICE MENU 4: \0\0\0\0\0\0\0\0\0\0\0\0\0\0"

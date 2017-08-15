@@ -1,3 +1,8 @@
+/*------------------------------
+| Constants
+-------------------------------*/
+[Const_TeminalVelocity]: -4000
+
 /*-------------------------------
 | VARIABLES
 ---------------------------------*/
@@ -7,12 +12,15 @@
 [ObjectArrayPointer]: 0x8036E560
 
 [PlayerPointer]: 0x8037BF20
+[PlayerGrounded]: 0x8037BF60
 
 [XPos]: 0x8037C5A0
 
 [XVelocity]: 0x8037C4B8
 
 [SlopeTimer]: 0x8037C2E4
+
+[MaxFallVelocity]: 0x8037C4EC
 
 [MovementState]: 0x8037D164
 

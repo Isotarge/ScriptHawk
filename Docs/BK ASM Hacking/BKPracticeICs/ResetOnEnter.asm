@@ -1,12 +1,38 @@
+;--------------------------------------------------
+; Function Definition Structure
+;--------------------------------------------------
+; This struct contains all the info needed for the 
+; practice menu to successfully run the function
+; in the practice menu
+;
+; Add X_DefStruct to the function list in PracticeMenu.asm
+; And adjust option [NumberOfOptions] & [PageTopMax]
+;--------------------------------------------------
 .align
+ResetOnEnter_DefStruct:
+ResetOnEnter_State:
+.byte 0
+ResetOnEnter_MaxState:
+.byte 4
 
+.align
+ResetOnEnter_MenuOptionString:
+.word ResetOneEnter_OptionString
+ResetOnEnter_PauseModePtr: ;set to 0 if no code is to be run upon exiting the pause menu
+.word 0
+ResetOnEnter_NormalModePtr: ;set to 0 if no code is to be run during Normal menu
+.word ResetOnEnter_NormalMode
+ResetOnEnter_Label: 
+.asciiz "RESET ON ENTER:"
+
+.align
 ;-------------------------------
 ; Pause Mode Code
 ;-------------------------------
+Template_PauseMode:
+;YOUR PAUSE MODE CODE HERE
 
-;-------------------------------
-; Normal Mode Code
-;-------------------------------
+
 
 ResetOnEnter_NormalMode:
 ADDIU sp -0x28
@@ -16,113 +42,111 @@ SW a1 0x1C(sp)
 SW a2 0x18(sp)
 SW at 0x14(sp)
 
-LB a0 ResetOnEnterState
-BEQ a0 zero NormalModeCode_ResetOnEnter
 LB a2 @MapLoadState
-	BEQ a2 zero NormalModeCode_ResetOnEnter
-	NOP
-		LB a0 @Map
-		JAL @GetLevelAssociatedWithMap
-		MOV a1 a0
-		JAL @GetMainMapFromLevelIndex
-		MOV a0 v0
-		BNE a1 v0 NormalModeCode_ResetOnEnter
-			NOP
-			JAL @GetMainExitFromLevelIndex
-			NOP
-			LB a1 @Exit
-			BNE a1 v0 NormalModeCode_ResetOnEnter
-			NOP
-				LI at 0x06 ;Entering Lair
-				BEQ a0 at NormalModeCode_ResetOnEnter
-				NOP
-					;@ClearAllGameProgress clears everything below AND note scores, item counts, and moves
-					JAL @ClearGameProgressFlags
-					NOP
-					JAL @LockAllMoves
-					NOP
-					JAL @ClearInGameLevelTimer
-					NOP
-					JAL @ZeroJiggyCollectedBitfield
-					NOP
-					JAL @ClearEmptyHoneyCombsCollectedBitfield
-					NOP
-					JAL @ClearCollectedMumboTokenFlags
-					NOP
-					JAL @ClearSomeProgressThing
-					NOP
-					LI at 0x05
-					LA a0 @ItemBase
-					SW at 0x54(a0)
-					SW zero 0x4C(a0)
-				
-				LB a0 @Map
-				JAL @GetLevelAssociatedWithMap
-				NOP
-				MOV a0 v0
-				LI a1 0x0B ;Entering SM
-				BEQ a0 a1 NormalModeCode_ResetOnEnter
-				NOP
-				
-					LI at 0x06
-					BLT a0 at NormalModeCode_ResetOnEnter_NoAdjust
-					NOP
-						ADDIU a0 a0 -1
-					NormalModeCode_ResetOnEnter_NoAdjust:
-					ADDIU a0 a0 -1
-					
-					SW a0 0x10(sp)
-					
-					LB a2 ResetOnEnterState ;get base address based on category
-					ADDIU a2 a2 -1
-					SLL a2 a2 2
-					LW a1 ResetPointers(a2)
+BEQ a2 zero NormalModeCode_ResetOnEnter
+NOP
+    LB a0 @Map
+    JAL @GetLevelAssociatedWithMap
+    MOV a1 a0
+    JAL @GetMainMapFromLevelIndex
+    MOV a0 v0
+    BNE a1 v0 NormalModeCode_ResetOnEnter
+        NOP
+        JAL @GetMainExitFromLevelIndex
+        NOP
+        LB a1 @Exit
+        BNE a1 v0 NormalModeCode_ResetOnEnter
+        NOP
+            LI at 0x06 ;Entering Lair
+            BEQ a0 at NormalModeCode_ResetOnEnter
+            NOP
+                ;@ClearAllGameProgress clears everything below AND note scores, item counts, and moves
+                JAL @ClearGameProgressFlags
+                NOP
+                JAL @LockAllMoves
+                NOP
+                JAL @ClearInGameLevelTimer
+                NOP
+                JAL @ZeroJiggyCollectedBitfield
+                NOP
+                JAL @ClearEmptyHoneyCombsCollectedBitfield
+                NOP
+                JAL @ClearCollectedMumboTokenFlags
+                NOP
+                JAL @ClearSomeProgressThing
+                NOP
+                LI at 0x05
+                LA a0 @ItemBase
+                SW at 0x54(a0)
+                SW zero 0x4C(a0)
 
-					LW at 0x10(sp)
-					
-					;SET MOVES
-					;a0 = free, a1 = baseadress, a2 = working reg, at = level
-					MOV a2 at
-					SLL a2 a2 2
-					ADDU a2 a2 a1
-					LW a0 0(a2)
-					
-					JAL @SetMovesUnlockedBitfield
-					NOP
-					JAL @SetHasUsedMovesBitfield
-					NOP
-					
-					LW at 0x10(sp)
-					
-					;SET GAME PROGRESS FLAGS
-					MOV a2 at
-					SLL a2 a2 5
-					ADDU a2 a2 a1
-					ADDIU a2 a2 0x24
+            LB a0 @Map
+            JAL @GetLevelAssociatedWithMap
+            NOP
+            MOV a0 v0
+            LI a1 0x0B ;Entering SM
+            BEQ a0 a1 NormalModeCode_ResetOnEnter
+            NOP
 
-					ADDIU at a2 0x20
-					LA a1 @GameProgressBitfield
+                LI at 0x06
+                BLT a0 at NormalModeCode_ResetOnEnter_NoAdjust
+                NOP
+                    ADDIU a0 a0 -1
+                NormalModeCode_ResetOnEnter_NoAdjust:
+                ADDIU a0 a0 -1
 
-					SetGameProgressBitfieldLoop: 
-						LW a0 0(a2)
-						SW a0 0(a1)
-						ADDIU a2 0x04
-						ADDIU a1 0x04
-						BNE at a2 SetGameProgressBitfieldLoop
-						NOP
-					
-					LB a0 ResetOnEnterState
-					LI a1 0x01
-					BNE a0 a1 NormalModeCode_ResetOnEnter
-						LW a2 0x10(sp)
-						LA a0 Reset_100HoneyCombs
-						SLL a2 a2 2
-						ADDU a2 a2 a0
-						LW a0 0(a2)
-						LA a1 @EmptyHoneycombBitfield
-						SW a0 0(a1)
-					
-						
+                SW a0 0x10(sp)
+
+                LB a2 ResetOnEnter_State ;get base address based on category
+                ADDIU a2 a2 -1
+                SLL a2 a2 2
+                LW a1 ResetPointers(a2)
+
+                LW at 0x10(sp)
+
+                ;SET MOVES
+                ;a0 = free, a1 = baseadress, a2 = working reg, at = level
+                MOV a2 at
+                SLL a2 a2 2
+                ADDU a2 a2 a1
+                LW a0 0(a2)
+
+                JAL @SetMovesUnlockedBitfield
+                NOP
+                JAL @SetHasUsedMovesBitfield
+                NOP
+
+                LW at 0x10(sp)
+
+                ;SET GAME PROGRESS FLAGS
+                MOV a2 at
+                SLL a2 a2 5
+                ADDU a2 a2 a1
+                ADDIU a2 a2 0x24
+
+                ADDIU at a2 0x20
+                LA a1 @GameProgressBitfield
+
+                SetGameProgressBitfieldLoop: 
+                    LW a0 0(a2)
+                    SW a0 0(a1)
+                    ADDIU a2 0x04
+                    ADDIU a1 0x04
+                    BNE at a2 SetGameProgressBitfieldLoop
+                    NOP
+
+                LB a0 ResetOnEnter_State
+                LI a1 0x01
+                BNE a0 a1 NormalModeCode_ResetOnEnter
+                    LW a2 0x10(sp)
+                    LA a0 Reset_100HoneyCombs
+                    SLL a2 a2 2
+                    ADDU a2 a2 a0
+                    LW a0 0(a2)
+                    LA a1 @EmptyHoneycombBitfield
+                    SW a0 0(a1)
+
+
 NormalModeCode_ResetOnEnter:
 
 LW ra 0x24(sp)
@@ -139,6 +163,14 @@ NOP
 ;--------------------------------
 ; Variables
 ;--------------------------------
+.align
+ResetOneEnter_OptionString:
+.asciiz " OFF\0\0\0"
+.asciiz " 100\0\0\0"
+.asciiz " ANY\0\0\0"
+.asciiz " NO RBA"
+.align
+
 ResetPointers:
 .word Reset_100
 .word Reset_Any
@@ -415,9 +447,3 @@ Reset_100HoneyCombs:
 
 
 
-.align
-ResetOptionString:
-.asciiz " OFF\0\0\0"
-.asciiz " 100\0\0\0"
-.asciiz " ANY\0\0\0"
-.asciiz " NO RBA"
