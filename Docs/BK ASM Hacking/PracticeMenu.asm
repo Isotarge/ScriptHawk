@@ -35,7 +35,7 @@
 .include "BKPracticeICs/L2Levitate.asm"
 .include "BKPracticeICs/TakeOff.asm"
 .include "BKPracticeICs/TransformMe.asm"
-.include "BKPracticeICs/InputDisplay.asm"
+.include "BKPracticeICs/InputDisplay.asm" //TODO FIX
 
 //.include "BKPracticeICs/SetMoves.asm"
 
@@ -69,7 +69,8 @@ ExitingMenuCode: ;DO NOT CHANGE THIS NAME
 	SW a1 0x14(sp)
 	SW a2 0x10(sp)
 
-	MOV a0 zero
+
+    MOV a0 zero
     PauseModeCode_Loop:
     LB at NumberOfOptions
     BEQ a0 at PauseModeCode_Housekeeping
@@ -78,19 +79,19 @@ ExitingMenuCode: ;DO NOT CHANGE THIS NAME
         SLL a2 a0 2
         ADDU a2 a1 a2
         LW a2 0(a2)
-        ;check if state not equal to 0
+        //check if state not equal to 0
         LB a1 @DefStruct_State(a2)
         BEQ a1 zero PauseModeCode_Loop
         ADDIU a0 a0 1
-            ;check if code has normal mode code
+            //check if code has pause mode code
             LW a1 @DefStruct_PauseModePtr(a2)
             BEQ a1 zero PauseModeCode_Loop
-            ADDIU a0 a0 1
-                ;jump to function 
+            NOP
+                //jump to function 
                 JALR ra a1
                 NOP
         B PauseModeCode_Loop
-        ADDIU a0 a0 1
+        NOP
 
     PauseModeCode_Housekeeping:
 	LW ra 0x1C(sp)
@@ -182,43 +183,26 @@ NOP
 ; BitFlags
 ;----------------------------------------------------------------
 .align
-
-
-
-.align
 OnOffOptionString:
 .asciiz "OFF\0\0\0\0"
 .asciiz "ON\0\0\0\0\0"
 
-MenuOptionStates: ;DO NOT CHANGE THIS NAME
-
 MoveSet:
 .byte 0
-
 .align
 MenuLabelStrings: ;DO NOT CHANGE THIS NAME
 .asciiz "MOVE SET: \0\0\0\0\0"
-.asciiz "\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0"
-
-
-MenuOptionMaxStates: ;DO NOT CHANGE THIS NAME
-
 MoveSetMaxState:
 .byte 6
-
-.align
-MenuOptionStringSet: ;DO NOT CHANGE THIS NAME
-
 MoveSetStringSet:
 .word MoveSetOptionString
+
 
 PreviousLoadzoneState:
 .byte 0
 .byte 0
 .byte 0
 .byte 0
-
-/*Option strings*/
 
 
 MoveSetOptionString: ;6
