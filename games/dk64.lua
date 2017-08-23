@@ -9,6 +9,7 @@ crumbling = false;
 displacement_detection = false;
 enable_phase = false; -- To enable the phase glitches on Europe and Japan set this to true
 encircle_enabled = false;
+force_gb_load = false;
 force_tbs = false;
 hide_non_scripted = false;
 koshbot_enabled = false;
@@ -7426,6 +7427,22 @@ function Game.eachFrame()
 	-- Check for new flags being set
 	if type(ScriptHawk.UI.form_controls["realtime_flags"]) ~= "nil" and forms.ischecked(ScriptHawk.UI.form_controls["realtime_flags"]) then
 		checkFlags(true);
+	end
+
+	if force_gb_load then
+		local objModel2Array = getObjectModel2Array();
+		if isRDRAM(objModel2Array) then
+			local numSlots = mainmemory.read_u32_be(Game.Memory.obj_model2_array_count[version]);
+			for i = 1, numSlots do
+				local base = objModel2Array + (i - 1) * obj_model2_slot_size;
+				if string.contains(getScriptName(base), "Golden Banana") then
+					local behaviorPointer = dereferencePointer(base + obj_model2.behavior_pointer);
+					if isRDRAM(behaviorPointer) then
+						mainmemory.write_u16_be(behaviorPointer + 0x60, 0);
+					end
+				end
+			end
+		end
 	end
 end
 
