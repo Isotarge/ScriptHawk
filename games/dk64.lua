@@ -2663,7 +2663,7 @@ local function getExamineDataModelTwo(pointer)
 	if version ~= 4 then
 		local currentMap = Game.getMap();
 		local behaviorID = mainmemory.read_u16_be(pointer + 0x8A);
-		for i = 0, 0xA5 do
+		for i = 0, 0x70 do -- 0xA5 for extra cs etc flags
 			local base = Game.Memory.flag_mapping[version] + i * 8;
 			local map = mainmemory.readbyte(base + 0);
 			if map == currentMap then
@@ -4084,7 +4084,7 @@ function flagStats(verbose)
 end
 
 function dumpFlagMapping()
-	for i = 0, 0xA5 do
+	for i = 0, 0xA5 do -- 0x70 for model 2 flags only
 		local base = Game.Memory.flag_mapping[version] + i * 8;
 		local map = mainmemory.readbyte(base + 0);
 		local id = mainmemory.read_u16_be(base + 2);
