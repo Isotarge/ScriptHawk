@@ -90,6 +90,7 @@ local Game = {
 		["object_spawn_table"] = {0x74E8B0, 0x749010, 0x74E1D0, 0x6F9F80},
 		["enemy_drop_table"] = {0x750400, 0x74AB20, 0x74FCE0, 0x6FB630},
 		["cutscene_model_table"] = {0x75570C, 0x74FF8C, 0x7557CC, 0x7001F0},
+		["flag_mapping"] = {0x755A20, 0x7502B0, 0x755AF0, 0x7003D0},
 		["enemy_table"] = {0x75EB80, 0x759690, 0x75ED40, 0x70A460},
 		-- 1000 0000 - ????
 		-- 0100 0000 - ????
@@ -2512,20 +2513,6 @@ local function getObjectModel2ArraySize()
 	return 0;
 end
 
-local function getObjectModel2SlotBase(index) -- TODO: Can this be used anywhere?
-	local objModel2Array = getObjectModel2Array();
-	if isRDRAM(objModel2Array) then
-		return objModel2Array + index * obj_model2_slot_size;
-	end
-end
-
-local function getObjectModel2ModelBase(index)
-	local objModel2Array = getObjectModel2Array();
-	if isRDRAM(objModel2Array) then
-		return dereferencePointer(objModel2Array + (index * obj_model2_slot_size) + obj_model2.model_pointer);
-	end
-end
-
 local function getInternalName(objectModel2Base)
 	local behaviorTypePointer = dereferencePointer(objectModel2Base + obj_model2.behavior_type_pointer);
 	if isRDRAM(behaviorTypePointer) then
@@ -2796,7 +2783,7 @@ local function populateLoadingZonePointers()
 	local loadingZoneArray = getLoadingZoneArray();
 	if isRDRAM(loadingZoneArray) then
 		local arraySize = mainmemory.read_u16_be(Game.Memory.loading_zone_array_size[version]);
-		for i = 0, arraySize do
+		for i = 0, arraySize - 1 do
 			table.insert(object_pointers, loadingZoneArray + (i * loading_zone_size));
 		end
 
@@ -4073,6 +4060,24 @@ function flagStats(verbose)
 	dprint(formatOutputString("Warps: ", warps_known, max_warps));
 	dprint("Coins: "..coins_known); -- Just a note: Fungi Rabbit Race coins aren't flagged
 	dprint("");
+	print_deferred();
+end
+
+function dumpFlagMapping()
+	for i = 0, 0xA5 do
+		local base = Game.Memory.flag_mapping[version] + i * 8;
+		local map = mainmemory.readbyte(base + 0);
+		local id = mainmemory.read_u16_be(base + 2);
+		local flagIndex = mainmemory.read_u16_be(base + 4);
+		local flagByte = math.floor(flagIndex / 8);
+		local flagBit = flagIndex % 8;
+			local mapName = "Unknown";
+			if Game.maps[map + 1] ~= nil then
+				mapName = Game.maps[map + 1];
+			end
+			mapName = mapName.." ("..map..")";
+		dprint(mapName.." "..toHexString(id).." "..toHexString(flagByte)..">"..flagBit.." "..getFlagName(flagByte, flagBit));
+	end
 	print_deferred();
 end
 
@@ -6301,6 +6306,8 @@ local function drawGrabScriptUI()
 				else
 					behaviorPointer = "";
 				end
+				local behaviorID = mainmemory.read_u16_be(object_pointers[i] + 0x8A);
+				behaviorPointer = behaviorPointer.." ("..toHexString(behaviorID, 4)..")";
 				local color = nil;
 				if FTA.isGB(collectableState) then
 					color = yellow_highlight;
