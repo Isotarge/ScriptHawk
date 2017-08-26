@@ -2659,6 +2659,26 @@ local function getExamineDataModelTwo(pointer)
 	if isRDRAM(behaviorPointer) then
 		table.insert(examine_data, { "Behavior Pointer", toHexString(behaviorPointer, 6) });
 	end
+
+	if version ~= 4 then
+		local currentMap = Game.getMap();
+		local behaviorID = mainmemory.read_u16_be(pointer + 0x8A);
+		for i = 0, 0xA5 do
+			local base = Game.Memory.flag_mapping[version] + i * 8;
+			local map = mainmemory.readbyte(base + 0);
+			if map == currentMap then
+				local id = mainmemory.read_u16_be(base + 2);
+				if id == behaviorID then
+					local flagIndex = mainmemory.read_u16_be(base + 4);
+					local flagByte = math.floor(flagIndex / 8);
+					local flagBit = flagIndex % 8;
+					table.insert(examine_data, { "Associated Flag", Game.getFlagName(flagByte, flagBit) });
+					break;
+				end
+			end
+		end
+	end
+
 	table.insert(examine_data, { "Separator", 1 });
 
 	if behaviorType == "pads" then
@@ -3619,7 +3639,7 @@ local function getFlagByName(flagName)
 	end
 end
 
-local function getFlagName(byte, bit)
+function Game.getFlagName(byte, bit)
 	for i = 1, #flag_array do
 		if byte == flag_array[i].byte and bit == flag_array[i].bit and not flag_array[i].ignore then
 			return flag_array[i].name;
@@ -3703,12 +3723,12 @@ function checkFlag(byte, bit, suppressPrint)
 		local currentValue = mainmemory.readbyte(flags + byte);
 		if check_bit(currentValue, bit) then
 			if not suppressPrint then
-				print(getFlagName(byte, bit).." is SET");
+				print(Game.getFlagName(byte, bit).." is SET");
 			end
 			return true;
 		else
 			if not suppressPrint then
-				print(getFlagName(byte, bit).." is NOT set");
+				print(Game.getFlagName(byte, bit).." is NOT set");
 			end
 			return false;
 		end
@@ -3784,9 +3804,9 @@ function setFlag(byte, bit, suppressPrint)
 		mainmemory.writebyte(flags + byte, set_bit(currentValue, bit));
 		if not suppressPrint then
 			if isFlagFound(byte, bit) then
-				print("Set \""..getFlagName(byte, bit).."\" at "..toHexString(byte)..">"..bit);
+				print("Set \""..Game.getFlagName(byte, bit).."\" at "..toHexString(byte)..">"..bit);
 			else
-				print("Set "..getFlagName(byte, bit));
+				print("Set "..Game.getFlagName(byte, bit));
 			end
 		end
 	end
@@ -3853,9 +3873,9 @@ function clearFlag(byte, bit, suppressPrint)
 		mainmemory.writebyte(flags + byte, clear_bit(currentValue, bit));
 		if not suppressPrint then
 			if isFlagFound(byte, bit) then
-				print("Cleared \""..getFlagName(byte, bit).."\" at "..toHexString(byte)..">"..bit);
+				print("Cleared \""..Game.getFlagName(byte, bit).."\" at "..toHexString(byte)..">"..bit);
 			else
-				print("Cleared "..getFlagName(byte, bit));
+				print("Cleared "..Game.getFlagName(byte, bit));
 			end
 		end
 	end
@@ -4076,7 +4096,7 @@ function dumpFlagMapping()
 				mapName = Game.maps[map + 1];
 			end
 			mapName = mapName.." ("..map..")";
-		dprint(mapName.." "..toHexString(id).." "..toHexString(flagByte)..">"..flagBit.." "..getFlagName(flagByte, flagBit));
+		dprint(mapName.." "..toHexString(id).." "..toHexString(flagByte)..">"..flagBit.." "..Game.getFlagName(flagByte, flagBit));
 	end
 	print_deferred();
 end
