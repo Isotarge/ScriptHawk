@@ -6590,13 +6590,13 @@ local reference_distance = 2000;
 local screen = {
 	--width = 640,
 	--height = 480,
-	width = client.bufferwidth() / client.getwindowsize(),
-	height = client.bufferheight() / client.getwindowsize(),
+	width = client.bufferwidth(),
+	height = client.bufferheight(),
 };
 
 function drawObjectPositions()
-	screen.width = client.bufferwidth() / client.getwindowsize();
-	screen.height = client.bufferheight() / client.getwindowsize();
+	screen.width = client.bufferwidth();
+	screen.height = client.bufferheight();
 
 	local objectModel;
 	if string.contains(grab_script_mode, "Model 2") then

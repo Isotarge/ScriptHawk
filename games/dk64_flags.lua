@@ -72,11 +72,11 @@ return {
 
 	{byte=0x08, bit=0, name="Aztec: Chunky GB: Rotating Room", type="GB", map=16},
 	{byte=0x08, bit=1, name="Aztec: Tiny GB: Tiny Temple", type="GB", map=16},
-	{byte=0x08, bit=2, name="Kong Unlocked: Tiny", type="Kong", map=16},
+	{byte=0x08, bit=2, name="Kong Unlocked: Tiny", type="Kong", nomap=true},
 	{byte=0x08, bit=3, name="Aztec: Diddy GB: Tiny's Cage", type="GB", map=16},
 	{byte=0x08, bit=4, name="Aztec: Lanky GB: Vulture", type="GB", map=16},
 	{byte=0x08, bit=5, name="Aztec: Tiny Temple Ice Melted", type="Physical", map=16},
-	{byte=0x08, bit=6, name="Kong Unlocked: Lanky", type="Kong", map=20},
+	{byte=0x08, bit=6, name="Kong Unlocked: Lanky", type="Kong", nomap=true},
 	{byte=0x08, bit=7, name="Aztec: Tiny GB: Llama Temple", type="GB", map=20},
 
 	{byte=0x09, bit=0, name="Aztec: Lanky GB: Matching Game", type="GB", map=20},
@@ -181,7 +181,7 @@ return {
 	{byte=0x14, bit=0, name="Galleon: Water Level Raised", type="Physical", map=30},
 	{byte=0x14, bit=1, name="Galleon: Peanut Gate Open", type="Physical", map=30},
 	{byte=0x14, bit=2, name="Galleon: Gold Tower Gate Open", type="Physical", map=30},
-	{byte=0x14, bit=3, name="Galleon: Diddy GB: W4", type="GB", map=30}, -- Note: This flag is also used to spawn the warp
+	{byte=0x14, bit=3, name="Galleon: Diddy GB: W4", type="GB", map=30}, -- Note: This flag is also used to spawn W4
 	{byte=0x14, bit=4, name="Galleon: Lanky GB: Gold Tower", type="GB", map=30},
 	{byte=0x14, bit=5, name="Galleon: DK GB: Seal Race", type="GB", map=39},
 	{byte=0x14, bit=6, name="Galleon: Chunky GB: Seasick", type="GB", map=31},
@@ -329,7 +329,7 @@ return {
 	{byte=0x24, bit=4, name="Key 6", type="Key", map=196},
 	{byte=0x24, bit=5, name="Caves: Diddy GB: Cabin (Upper)", type="GB", map=200},
 	{byte=0x24, bit=6, name="Caves: Diddy GB: Mad Maze Maul", type="GB", map=72},
-	{byte=0x24, bit=7, name="Caves: Tiny GB: W3", type="GB", map=72}, -- Note: This flag doubles as the warp 3 spawned flag
+	{byte=0x24, bit=7, name="Caves: Tiny GB: W3", type="GB", map=72}, -- Note: This flag doubles as the W3 spawned flag
 
 	{byte=0x25, bit=0, name="Caves: 5DI Pads Spawned", type="Physical", map=72},
 	{byte=0x25, bit=1, name="Caves: Tiny GB: Mini Monkey Igloo", type="GB", map=72},
@@ -408,8 +408,8 @@ return {
 	{byte=0x2D, bit=2, name="Orangstand Sprint FTT", type="FTT", nomap=true},
 	{byte=0x2D, bit=3, name="Strong Kong FTT", type="FTT", nomap=true},
 	{byte=0x2D, bit=4, name="Rainbow Coin FTT", type="FTT", nomap=true},
-	{byte=0x2D, bit=5, name="Rambi FTT", type="FTT", map=7},
-	{byte=0x2D, bit=6, name="Enguarde FTT", type="FTT", map=30},
+	{byte=0x2D, bit=5, name="Rambi FTT", type="FTT", nomap=true},
+	{byte=0x2D, bit=6, name="Enguarde FTT", type="FTT", nomap=true},
 	{byte=0x2D, bit=7, name="Diddy FTT", type="FTT", nomap=true},
 
 	{byte=0x2E, bit=0, name="Lanky FTT", type="FTT", nomap=true},
@@ -437,7 +437,7 @@ return {
 	{byte=0x30, bit=4, name="Training Grounds: Orange Barrel Completed", type="Progress", map=176},
 	{byte=0x30, bit=5, name="Training Grounds: Barrel Barrel Completed", type="Progress", map=176},
 	{byte=0x30, bit=6, name="Isles: Escape Cutscene", type="Cutscene", map=34},
-	{byte=0x30, bit=7, name="Training Grounds: All training barrels Complete CS", type="Cutscene", map=176},
+	{byte=0x30, bit=7, name="Training Grounds: All Training Barrels Complete CS", type="Cutscene", map=176},
 
 	{byte=0x31, bit=0, name="Troff 'n' Scoff FT Something?", type="FTT", map=42}, -- TODO: What is this?
 	{byte=0x31, bit=1, name="Isles: Rareware GB Room Open", type="Physical", map=189},
@@ -478,7 +478,7 @@ return {
 	{byte=0x35, bit=0, name="Isles: Chunky GB: Instrument Pad", type="GB", map=34},
 	{byte=0x35, bit=1, name="Isles: Tiny GB: High instrument Pad", type="GB", map=34}, -- TODO: Test this
 	{byte=0x35, bit=2, name="Isles: Lanky Instrument Pad played", type="Physical", map=34},
-	{byte=0x35, bit=3, name="Isles: Tiny: High Instrument Pad played", type="Physical", map=34}, -- TODO: Test this
+	{byte=0x35, bit=3, name="Isles: Hunky Chunky Barrel Spawned", type="Physical", map=34},
 	{byte=0x35, bit=4, name="Isles: Diddy GB: Peril Path Panic!", type="GB", map=34},
 	{byte=0x35, bit=5, name="Isles: Lanky GB: Sprint", type="GB", map=97},
 	{byte=0x35, bit=6, name="Isles: Pound the X", type="Physical", map=34},
@@ -1398,7 +1398,7 @@ return {
 	{byte=0x9B, bit=2, name="Aztec: Tiny CB: 5DT Lane (3)", type="CB", map=38},
 	{byte=0x9B, bit=3, name="Aztec: Tiny CB: 5DT Lane (4)", type="CB", map=38},
 	{byte=0x9B, bit=4, name="Aztec: Tiny CB: 5DT Lane (5)", type="CB", map=38},
-	{byte=0x9B, bit=5, name="Aztec: Tiny CB: Warp 5", type="Bunch", map=38},
+	{byte=0x9B, bit=5, name="Aztec: Tiny CB: W5", type="Bunch", map=38},
 	{byte=0x9B, bit=6, name="Aztec: Tiny CB: 5DT Trees (4)", type="Bunch", map=38},
 	{byte=0x9B, bit=7, name="Aztec: Tiny CB: 5DT Trees (5)", type="Bunch", map=38},
 

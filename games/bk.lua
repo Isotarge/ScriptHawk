@@ -1856,7 +1856,7 @@ end
 --------------------
 local viewport_YAngleRange = 60;
 local viewport_XAngleRange = 45;
-local object_selectable_size = 10*client.bufferwidth()/640;
+local object_selectable_size = 10 * client.bufferwidth() / 640;
 local reference_distance = 2000;
 
 local mouseClickedLastFrame = false;
