@@ -7,6 +7,7 @@ end
 
 local Game = {
 	Memory = {
+		["level"] = 0xF00, --u8?
 		["lives"] = 0x100, -- s8
 		["p_meter"] = 0x106, -- u8?
 		["viewport_x_position"] = 0x120, -- u16_le
@@ -29,16 +30,16 @@ end
 
 function Game.getXPosition()
 	local viewportX = mainmemory.read_u16_le(Game.Memory.viewport_x_position);
-	local tazX = mainmemory.read_s16_le(Game.Memory.taz_x_position);
-	--return viewportX + tazX;
 	return viewportX;
+	--local tazX = mainmemory.read_s16_le(Game.Memory.taz_x_position);
+	--return viewportX + tazX;
 end
 
 function Game.getYPosition()
 	local viewportY = mainmemory.read_u16_le(Game.Memory.viewport_y_position);
-	local tazY = mainmemory.read_s16_le(Game.Memory.taz_y_position);
-	--return viewportY + tazY;
 	return viewportY;
+	--local tazY = mainmemory.read_s16_le(Game.Memory.taz_y_position);
+	--return viewportY + tazY;
 end
 
 function Game.getJumpHeight()
@@ -68,6 +69,13 @@ function Game.colorDX()
 	if dX == 0 then
 		return 0xFFFF0000; -- Red
 	end
+	if dX == 1 or dX == 5 or dX == 7 then
+		return 0xFFFFFF00; -- Yellow
+	end
+end
+
+function Game.getLevel()
+	return mainmemory.readbyte(Game.Memory.level);
 end
 
 Game.OSD = {
@@ -80,6 +88,7 @@ Game.OSD = {
 	{"Velocity (Gnd)", Game.getGroundVelocity},
 	{"Velocity (Air)", Game.getAerialVelocity},
 	{"Jump", Game.getJumpHeight, Game.colorJumpHeight},
+	{"Level", Game.getLevel},
 };
 
 Game.OSDPosition = {114, 208};

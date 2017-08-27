@@ -15,14 +15,16 @@ local viewport_x_position = 0x120;
 ---------
 
 local startFrame = 0;
+local endFrame = 16;
 local checkFrame = 32;
-local numFrames = 32;
+local numFrames = 16;
 
 -- State for current attempt
 local inputs = {};
 
 -- State for best attempt
 local bestInputs;
+local bestNumPresed;
 local bestXPosition;
 local bestVelocityGround;
 local bestVelocityAerial;
@@ -30,7 +32,7 @@ local bestP;
 local bestHealth;
 
 function generateInputsTable()
-	numFrames = checkFrame - startFrame;
+	numFrames = endFrame - startFrame;
 	inputs = {};
 	for i = 1, numFrames do
 		inputs[i] = false;
@@ -63,6 +65,16 @@ function printInputsTable(input_table)
 	print(inputString);
 end
 
+function countNumPressed(input_table)
+	local numPressed = 0;
+	for i = 1, #input_table do
+		if input_table[i] == true then
+			numPressed = numPressed + 1;
+		end
+	end
+	return numPressed;
+end
+
 function checkBestAttempt()
 	-- First attempt will be the baseline
 	if bestInputs == nil then
@@ -73,6 +85,7 @@ function checkBestAttempt()
 	local currentVelocityAerial = mainmemory.read_s8(velocity_aerial);
 	local currentVelocityGround = mainmemory.read_s8(velocity_ground);
 	local currentXPosition = mainmemory.read_u16_le(viewport_x_position);
+	local currentNumPressed = countNumPressed(inputs);
 
 	if currentXPosition > bestXPosition then
 		print("Best input beaten with new X position: "..currentXPosition);
@@ -86,8 +99,13 @@ function checkBestAttempt()
 				print("Best input beaten with new P meter: "..currentP);
 				return true;
 			elseif currentP == bestP then
-				print("Attempt tied previous best in every way... Not sure what to do here...");
-				return true; -- This attempt completely tied the previous best, I have no idea what to do with it
+				if currentNumPressed < bestNumPressed then
+					print("Best input beaten with fewer button presses!");
+					return true;
+				elseif currentNumPressed == bestNumPressed then
+					print("Attempt tied previous best in every way... Not sure what to do here...");
+					return true; -- This attempt completely tied the previous best, I have no idea what to do with it
+				end
 			end
 		end
 	end
@@ -105,6 +123,9 @@ function updateBestAttempt()
 	for i = 1, #inputs do
 		bestInputs[i] = inputs[i];
 	end
+
+	-- Count how many frames B1 is pressed in the best inputs
+	bestNumPressed = countNumPressed(bestInputs);
 end
 
 function clearBestAttempt()
@@ -140,7 +161,7 @@ function botLoop()
 				print("Best P Meter: "..bestP);
 			end
 			--printInputsTable(inputs);
-		else
+		elseif currentFrame < endFrame then
 			local relativeFrame = currentFrame - startFrame;
 			joypad.set({["B1"] = inputs[relativeFrame]}, 1);
 		end
@@ -149,7 +170,7 @@ function botLoop()
 		if currentFrame == checkFrame then
 			bot_is_outputting_best_input = false;
 			client.pause();
-		else
+		elseif currentFrame < endFrame then
 			local relativeFrame = currentFrame - startFrame;
 			joypad.set({["B1"] = bestInputs[relativeFrame]}, 1);
 		end
@@ -161,8 +182,8 @@ event.onframestart(botLoop);
 local UIControls = {};
 
 function startBot()
-	--startFrame = tonumber(forms.gettext(UIControls.startFrameBox));
 	startFrame = emu.framecount();
+	endFrame = tonumber(forms.gettext(UIControls.endFrameBox));
 	checkFrame = tonumber(forms.gettext(UIControls.checkFrameBox));
 	bot_is_running = true;
 	bot_is_outputting_best_input = false;
@@ -184,7 +205,7 @@ local function col(col_num)
 end
 
 UIControls.botForm = forms.newform(col(17), row(10), "TazBot Options");
---UIControls.startFrameBox = forms.textbox(UIControls.botForm, "Start Frame", 100, 20, "UNSIGNED", col(0), row(0), false, true, "None");
+UIControls.endFrameBox = forms.textbox(UIControls.botForm, "End Frame", 100, 20, "UNSIGNED", col(0), row(0), false, true, "None");
 UIControls.checkFrameBox = forms.textbox(UIControls.botForm, "Check Frame", 100, 20, "UNSIGNED", col(0), row(1), false, true, "None");
 UIControls.startBotButton = forms.button(UIControls.botForm, "Start TazBot", startBot, col(0), row(2), col(3), button_height);
 -- TODO: Label for N Combinations
