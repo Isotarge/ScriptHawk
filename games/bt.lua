@@ -212,7 +212,7 @@ local Game = {
 		"CCL - Canary Mary Race?",
 		"GI - Floor 4 - Clinker's cavern",
 		"GGM - Ordnance Storage Entrance",
-		"GGM - Ordnance Storage ",
+		"GI - Clinker's Cavern (multiplayer)",
 		"GGM - Ordnance Storage (multiplayer)",
 		"MT - Targitzan's Temple (multiplayer)",
 		"MT - (still)",
