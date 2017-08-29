@@ -4066,6 +4066,7 @@ end
 
 local green_highlight = 0xFF00FF00;
 local yellow_highlight = 0xFFFFFF00;
+local max_page_size = 40;
 
 function Game.drawUI()
 	if script_mode == "Disabled" then
@@ -4095,11 +4096,24 @@ function Game.drawUI()
 	end
 
 	if script_mode == "List" and isRDRAM(objectArray) then
-		for i = numSlots, 1, -1 do
-			local currentSlotBase = objectArray + getSlotBase(i - 1);
+		local page_total = math.ceil(getNumSlots() / max_page_size);
+		local page_pos = math.floor((object_index - 1) / max_page_size) + 1;
+		local page_index = max_page_size + object_index - (page_pos * max_page_size);
+
+		if page_pos < page_total
+			then page_size = max_page_size;
+		else
+			page_size = numSlots - ((page_total - 1) * max_page_size);
+		end
+
+		gui.text(Game.OSDPosition[1], 2 + Game.OSDRowHeight * row, "Page: "..(page_pos).."/"..(page_total), nil, 'bottomright');
+		row = row + 1;
+
+		for i = page_size, 1, -1 do
+			local currentSlotBase = objectArray + getSlotBase(i + ((page_pos - 1) * max_page_size) - 1);
 
 			local color = nil;
-			if object_index == i then
+			if page_index == i then
 				color = yellow_highlight;
 			end
 
