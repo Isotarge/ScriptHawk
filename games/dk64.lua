@@ -5599,6 +5599,18 @@ local FTA = {
 		[Chunky] = 0x0006,
 		[Krusha] = 0x0007,
 	},
+	CrownMaps = {
+		53,
+		73,
+		155,
+		156,
+		157,
+		158,
+		159,
+		160,
+		161,
+		162,
+	},
 };
 
 function FTA.isBalloon(actorType)
@@ -5623,6 +5635,10 @@ end
 
 function FTA.isGB(collectableState)
 	return table.contains(FTA.GBStates, collectableState);
+end
+
+function FTA.isCrownMap(value)
+	return table.contains(FTA.CrownMaps, value);
 end
 
 -- Script Commands
@@ -5659,8 +5675,11 @@ function FTA.freeTradeObjectModel1(currentKong)
 			if isRDRAM(pointer) then
 				local actorType = mainmemory.read_u32_be(pointer + obj_model1.actor_type);
 				if FTA.isKasplat(actorType) then
-					mainmemory.write_u32_be(pointer + obj_model1.actor_type, FTA.Kasplats[currentKong]); -- Fix which blueprint the Kasplat drops
-					mainmemory.writebyte(pointer + 0x15F, 0x01); -- Make sure white-haired Kasplats still drop Blueprints
+					local currentMap = Game.getMap();
+					if not FTA.isCrownMap(currentMap) then
+						mainmemory.write_u32_be(pointer + obj_model1.actor_type, FTA.Kasplats[currentKong]); -- Fix which blueprint the Kasplat drops
+						mainmemory.writebyte(pointer + 0x15F, 0x01); -- Make sure white-haired Kasplats still drop Blueprints
+					end
 				end
 				if FTA.isBalloon(actorType) then
 					mainmemory.write_u32_be(pointer + obj_model1.actor_type, FTA.Balloons[currentKong]); -- Fix balloon color
