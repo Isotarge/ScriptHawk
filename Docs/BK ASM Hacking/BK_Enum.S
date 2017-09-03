@@ -192,6 +192,16 @@
 [MapIndex_Intro_GruntyThreat1]:	0x99
 [MapIndex_Intro_GruntyThreat2]:	0x9A
 
-//
 
+
+//MOVEMENT STATES
 [MovementState_Flight_Entering]: 0x23
+
+
+
+//GAME PROGRESS FLAGS
+
+[GameProgressFlag_CCWSpringOpen]: 0x8B
+[GameProgressFlag_CCWSummerOpen]: 0x8C
+[GameProgressFlag_CCWAutumnOpen]: 0x8D
+[GameProgressFlag_CCWWinterOpen]: 0x8E

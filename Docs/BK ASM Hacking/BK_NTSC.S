@@ -430,6 +430,7 @@
 [ClearAllGameProgress]: 0x8031FBA0
 
 [ClearGameProgressFlags]: 0x8031FFAC
+[SetGameProgressFlag]: 0x80320004 ;I: (byte $a0 flagIndex, bool $a1 value) 
 
 [ClearSomeProgressThing]: 0x8032048C
 [SetCheatFlag]: 0x803204E4
@@ -483,6 +484,7 @@
 [StrToken]:         0x8033DB60  ;I: (char* $a0 delimiter, char* $a1 destStr, char* $a2 srcStr)
 [ToUpper]:          0x8033DBA4  ;I: (char* $a0 string)
 
+[GetGameTimeScaleFactor]: 0x8033DD90 ;  O;[word $v0]
 
 [ClearLevelNoteScores]: 0x80346D78
 

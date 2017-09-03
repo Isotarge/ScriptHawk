@@ -30,12 +30,15 @@
 .include "BKPracticeICs/ResetOnEnter.asm"
 .include "BKPracticeICs/Infinites.asm"
 .include "BKPracticeICs/HUDInfo.asm"
+.include "BKPracticeICs/Lag.asm"
 .include "BKPracticeICs/HUDTimer.asm"
 .include "BKPracticeICs/FreezeClip.asm" //MUST BE PRIOR TO L2Levitate
 .include "BKPracticeICs/L2Levitate.asm"
 .include "BKPracticeICs/TakeOff.asm"
 .include "BKPracticeICs/TransformMe.asm"
-.include "BKPracticeICs/InputDisplay.asm" //TODO FIX
+.include "BKPracticeICs/InputDisplay.asm"
+.include "BKPracticeICs/OpenSeasons.asm"
+
 
 //.include "BKPracticeICs/SetMoves.asm"
 
@@ -48,12 +51,15 @@ MenuFunctionList:
 .word ResetOnEnter_DefStruct
 .word Infinites_DefStruct
 .word HUDInfo_DefStruct
+.word Lag_DefStruct
 .word HUDTimer_DefStruct
 .word FreezeClip_DefStruct
 .word L2Levitate_DefStruct
 .word TakeOff_DefStruct
 .word TransformMe_DefStruct
+.word OpenSeasons_DefStruct
 .word InputDisplay_DefStruct
+
 //SetMoves
 .word 0 ;!!!functionListMust end with 0!!!
 
