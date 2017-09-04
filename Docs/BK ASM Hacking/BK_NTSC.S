@@ -7,6 +7,7 @@
 | VARIABLES
 ---------------------------------*/
 [RawP1Buttons]: 0x802812B8
+
 [PauseMenuStringsBase]: 0x8036C4E0
 
 [ObjectArrayPointer]: 0x8036E560
@@ -384,6 +385,8 @@
 [IsMiscFlagCleared]: 0x802933D0 ;I:	(byte $a0 byteIndex)
 [SetMiscFlag]: 0x802933E8 ;I: (byte $a0 byteIndex)
 
+[IsButtonNewlyPressed]:     0x80295544  ;I: (byte $a0 ButtonIndex)  O: [Bool $v0]
+[IsButtonNewlyReleased]:    0x80295560  ;I: (byte $a0 ButtonIndex)  O: [Bool $v0]
 [GetButtonPressTimer]: 		0x8029557C 	;I: (byte $a0 ButtonIndex)
 [GetButtonReleaseTimer]: 	0x80295590 	;I: (byte $a0 ButtonIndex)
 
@@ -486,7 +489,9 @@
 
 [GetGameTimeScaleFactor]: 0x8033DD90 ;  O;[word $v0]
 
+[GetItemCount]:         0x80345FA0 ;I: (byte $a0 itemIndex)
 [ClearLevelNoteScores]: 0x80346D78
+
 
 [ClearInGameLevelTimer]: 0x80347060
 [GetInGameTimeInSeconds]: 0x803470A0

@@ -1,6 +1,6 @@
 [Lag_OSDXOffset]: 0xC0
-[Lag_Drop_YOffset]: 0xC8
-[Lag_FPS_YOffset]: 0xD0
+[Lag_Drop_YOffset]: 0xC7
+[Lag_FPS_YOffset]: 0xD1
 [Lag_WindowSize]: 16
 
 
@@ -25,7 +25,7 @@ Lag_MenuOptionString: ;POINTER TO STRINGS CORRESPONDING TO EACH STATE
 .word OnOffOptionString ;set must be 7 character (8 including trailing 0), Must be all caps
 
 Lag_PauseModePtr: ;POINTER TO CODE TO RUN UPON EXITING THE PAUSE MENU
-.word 0 ;set to 0 if no code is to be run upon exiting the pause menu
+.word Lag_PauseMode ;set to 0 if no code is to be run upon exiting the pause menu
 
 Lag_NormalModePtr: ;POINTER TO CODE TO RUN DURING NORMAL GAME PLAY
 .word Lag_NormalMode ;set to 0 if no code is to be run during Normal menu
@@ -38,8 +38,17 @@ Lag_Label: ;LABEL IN MENU
 ; Pause Mode Code
 ;-------------------------------
 Lag_PauseMode:
-;YOUR PAUSE MODE CODE HERE
+ADDIU sp -0x20
+SW ra 0x1C(sp)
+SW a0 0x18(sp)
 
+SW zero Lag_Count
+
+LW ra 0x1C(sp)
+LW a0 0x18(sp)
+ADDIU sp 0x20
+JR
+NOP
 
 ;-------------------------------
 ; Normal Mode Code
@@ -158,7 +167,7 @@ Lag_Count:
 .word 0
 
 Lag_FPSWindow:
-.word 30,30,30,30,30,30,30,30, 30,30,30,30,30,30,30,30
+.word 30,30,30,30,30,30,30,30,30,30,30,30,30,30,30,30
 
 .align
 Lag_CountStr:

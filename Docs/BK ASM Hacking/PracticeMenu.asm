@@ -28,6 +28,7 @@
 ;----------------------------------------------------------------
 .include "BKPracticeICs/TakeMeThere.asm"
 .include "BKPracticeICs/ResetOnEnter.asm"
+.include "BKPracticeICs/Loop.asm"
 .include "BKPracticeICs/Infinites.asm"
 .include "BKPracticeICs/HUDInfo.asm"
 .include "BKPracticeICs/Lag.asm"
@@ -49,6 +50,7 @@
 MenuFunctionList:
 .word TakeMeThere_DefStruct
 .word ResetOnEnter_DefStruct
+.word Loop_DefStruct
 .word Infinites_DefStruct
 .word HUDInfo_DefStruct
 .word Lag_DefStruct

@@ -1,6 +1,22 @@
 /*-------------------------------
 | ENUMS
 ---------------------------------*/
+//Buttons
+[ButtonIndex_Start]:    0x00
+[ButtonIndex_Z]:        0x01
+[ButtonIndex_L]:        0x02
+[ButtonIndex_R]:        0x03
+[ButtonIndex_D_Up]:     0x04
+[ButtonIndex_D_Down]:   0x05
+[ButtonIndex_D_Left]:   0x06
+[ButtonIndex_D_Right]:  0x07
+[ButtonIndex_A]:        0x08
+[ButtonIndex_B]:        0x09
+[ButtonIndex_D_Left]:   0x0A
+[ButtonIndex_D_Down]:   0x0B
+[ButtonIndex_D_Up]:     0x0C
+[ButtonIndex_D_Right]:  0x0D
+
 //Items
 [ItemIndex_Timer_Skull]: 0x01
 [ItemIndex_Timer_Propellor]: 0x03
