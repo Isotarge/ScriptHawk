@@ -1186,7 +1186,7 @@ local function plot_pos()
 	if override_lag_detection then
 		emu.setislagged(isLagged);
 		if tastudio.engaged() then
-			tastudio.setlag(current_frame, isLagged);
+			tastudio.setlag(current_frame-1, isLagged);
 		end
 	end
 
