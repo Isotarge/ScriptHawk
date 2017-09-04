@@ -59,7 +59,7 @@ LI a1 0x35 // Y Pos
 LA a2 HUDTimerValueStr
 JAL @Print_CharFont_Background
 LI a0 0x10 //X Pos
-	
+
 NormalModeCode_HUDTimerNormal:
 
 LW ra 0x24(sp)

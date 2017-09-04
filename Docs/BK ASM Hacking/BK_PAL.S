@@ -7,9 +7,12 @@
 /*-------------------------------
 | VARIABLES
 ---------------------------------*/
+[RawP1Buttons]: 0x802814A0
+
 [PauseMenuStringsBase]: 0x8036C99C
 
 [PlayerPointer]: 0x8037C8F0
+[PlayerGrounded]:0x8037C930
 
 [XPos]: 0x8037CF70
 
@@ -17,11 +20,18 @@
 
 [SlopeTimer]: 0x8037CCB4
 
+[MaxFallVelocity]: 0x8037CEBC
+
 [MapLoadState]: 0x8037F2C4
 [Map]: 0x8037F2C5
 [Exit]: 0x8037F2C6
 
 [PauseMenuState]: 0x803839F0
+
+[GameProgressBitfield]: 0x80383B88
+[JiggyBitfield]: 0x80383CA0
+[EmptyHoneycombBitfield]: 0x80383CC0
+[MumboTokensBitfield]: 0x80383CD0
 
 [ReturnToLairEnabled]: 0x80383A60
 
@@ -102,6 +112,9 @@
 [SetPlayerTransparency]: 	0x80291DD8 	;I: (byte $a0 input)
 [SetPlayerModel]:        	0x80291DE4 	;I: (half $a0 modelIndex)
 
+
+[SetMiscFlag]: 0x80293208 ;I: (byte $a0 byteIndex)
+
 [GetButtonPressTimer]: 		0x8029539C 	;I: (byte $a0 ButtonIndex)
 [GetButtonReleaseTimer]: 	0x802953B0 	;I: (byte $a0 ButtonIndex)
 
@@ -130,19 +143,25 @@
 [Print_TotalMenuFont]: 		0x802F7A50 ;I: (word $a0 XPos, word $a1 YPos, word $a3 fontSize, char* $a3 str)
 
 [Print_CharFont]: 			0x802F7ADC ;I: (word $a0 XPos, word $a1 YPos, char* $a2 str)
+[Print_CharFont_Background]: 0x802F7BB0 ;I: (word $a0 XPos, word $a1 YPos, char* $a2 str)
 
 [GetLevelAssociatedWithMap]: 	0x8030AEE8	;I: (byte $a0 MapIndex)	O: [byte $v0]
 
 [GetMainMapFromLevelIndex]: 	0x8030AF78	;I: (byte $a0 LevelIndex)	O:[byte $v0]
 [GetMainExitFromLevelIndex]: 	0x8030AFC4	;I: (byte $a0 LevelIndex)	O:[byte $v0]
 
+
+[TimeToString]: 0x80311EB0
+
 [PauseMenu]: 0x803136B4
 
 [ClearAllGameProgress]: 0x8031FF90
 
 [ClearGameProgressFlags]: 0x8032039C
+[SetGameProgressFlag]: 0x803203F4 ;I: (byte $a0 flagIndex, bool $a1 value)
 
 [ClearSomeProgressThing]: 0x8032087C
+[SetCheatFlag]: 0x803208D4
 
 [GetJiggiesCollectedBitfield]:  0x80321360  ;Outputs: [word $v0]
 
@@ -192,7 +211,9 @@
 [StrToken]:         0x8033DFB0  ;I: (char* $a0 delimiter, char* $a1 destStr, char* $a2 srcStr)
 [ToUpper]:          0x8033DFF4  ;I: (char* $a0 string)
 
+[GetGameTimeScaleFactor]: 0x8033E1E0 ;  O;[word $v0]
 
 [ClearLevelNoteScores]: 0x803471C8
 
 [ClearInGameLevelTimer]: 0x803474B0
+[GetInGameTimeInSeconds]: 0x803474F0

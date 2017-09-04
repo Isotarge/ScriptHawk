@@ -428,6 +428,7 @@
 [GetMainExitFromLevelIndex]: 	0x8030AE24	;I: (byte $a0 LevelIndex)	O:[byte $v0]
 
 [TimeToString]: 0x80311C64
+
 [PauseMenu]: 0x80313380
 
 [ClearAllGameProgress]: 0x8031FBA0
