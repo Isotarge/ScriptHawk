@@ -5844,7 +5844,15 @@ function ohWrongnana(verbose)
 						while isRDRAM(activationScript) do
 							for j = 0x04, 0x48, 8 do
 								preceedingCommand = mainmemory.readbyte(activationScript + j - 1);
-								if FTA.isSafePreceedingCommand(preceedingCommand) then
+								if preceedingCommand == 0x19 then
+									local commandParam = mainmemory.read_u16_be(activationScript + j);
+									if isKong(commandParam) then
+										mainmemory.write_u16_be(activationScript + j, FTA.SimSlamChecks[currentKong]);
+										if verbose then
+											FTA.debugOut(scriptName, slotBase, activationScript, j);
+										end
+									end
+								elseif FTA.isSafePreceedingCommand(preceedingCommand) then
 									local commandParam = mainmemory.read_u16_be(activationScript + j);
 									if FTA.isBulletCheck(commandParam) then
 										mainmemory.write_u16_be(activationScript + j, FTA.BulletChecks[currentKong]);
