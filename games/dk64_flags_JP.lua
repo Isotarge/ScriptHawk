@@ -50,11 +50,11 @@ return {
 	{byte=0x05, bit=4, name="Japes: Mountain Bridge Cutscene", type="Cutscene", map=7},
 	{byte=0x05, bit=5, name="Japes: Rambi Coconut Switch", type="Physical", map=7},
 	{byte=0x05, bit=6, name="Japes: T&S Cleared", type="T&S", map=7},
-	{byte=0x05, bit=7, name="Japes: Cave Gate Opened", type="Physical", map=7},
+	{byte=0x05, bit=7, name="Japes: Cave Gate Opened", type="Physical", map=7}, -- Note: This flag is not present on the USA or European releases of the game
 
-	-- 0x06 > 0
-	-- 0x06 > 1
-	-- 0x06 > 2
+	{byte=0x06, bit=0, name="Aztec: Chunky Vase Room Open", type="Physical", map=38},
+	{byte=0x06, bit=1, name="Aztec: DK Blueprint Room Open", type="Physical", map=38},
+	{byte=0x06, bit=2, name="Aztec: Chunky GB: Vase", type="GB", map=38},
 	-- 0x06 > 3
 	-- 0x06 > 4
 	-- 0x06 > 5
@@ -86,7 +86,7 @@ return {
 	-- 0x09 > 4
 	-- 0x09 > 5
 	{byte=0x09, bit=6, name="Aztec: DK GB: Free Lanky", type="GB", map=20},
-	-- 0x09 > 7
+	{byte=0x09, bit=7, name="Aztec: Open Tunnel CS", type="Cutscene", map=38},
 
 	{byte=0x0A, bit=0, name="Aztec: W1 (DK Portal)", type="Warp", map=38},
 	{byte=0x0A, bit=1, name="Aztec: W1 (Oasis)", type="Warp", map=38},
@@ -106,7 +106,7 @@ return {
 	{byte=0x0B, bit=6, name="Aztec: Lanky's help me cutscene", type="Cutscene", map=20},
 	{byte=0x0B, bit=7, name="Aztec: Tiny's help me cutscene", type="Cutscene", map=16},
 
-	-- 0x0C > 0
+	{byte=0x0C, bit=0, name="Aztec: FT Cutscene", type="Cutscene", map=38},
 	-- 0x0C > 1
 	-- 0x0C > 2
 	-- 0x0C > 3
@@ -142,9 +142,20 @@ return {
 	-- 0x0F > 6
 	-- 0x0F > 7
 
+	-- 0x10 > 0
+	-- 0x10 > 1
+	-- 0x10 > 2
+	-- 0x10 > 3
+	-- 0x10 > 4
 	{byte=0x10, bit=5, name="Nintendo Coin", type="Special Coin", map=26},
+	-- 0x10 > 6
+	-- 0x10 > 7
 
+	-- 0x11 > 0
+	-- 0x11 > 1
+	-- 0x11 > 2
 	{byte=0x11, bit=3, name="Key 3", type="Key", map=154},
+	-- 0x11 > 4
 	{byte=0x11, bit=5, name="Factory: Chunky's help me cutscene", type="Cutscene", map=26},
 	{byte=0x11, bit=6, name="Factory: W1 (Lobby)", type="Warp", map=26},
 	{byte=0x11, bit=7, name="Factory: W1 (Storage Room)", type="Warp", map=26},
@@ -270,13 +281,13 @@ return {
 	{byte=0x2E, bit=3, name="Chunky FTT", type="FTT", nomap=true},
 	{byte=0x2E, bit=4, name="First Orange Collected", type="FTT", nomap=true},
 	-- 0x2E > 5
-	-- 0x2E > 6
-	-- 0x2E > 7
+	{byte=0x2E, bit=6, name="Buy Instruments", type="FTT", map=25},
+	{byte=0x2E, bit=7, name="Buy Guns", type="FTT", map=1},
 
 	-- 0x2F > 0
 	{byte=0x2F, bit=1, name="Wrinkly FTT", type="FTT", nomap=true},
 	{byte=0x2F, bit=2, name="Camera/Shockwave", type="Progress", map=189},
-	{byte=0x2F, bit=3, name="Intro Story Cleared", type="Cutscene"},
+	{byte=0x2F, bit=3, name="Training Grounds: Treehouse Squawks Cutscene", type="Cutscene", map=176},
 	{byte=0x2F, bit=4, name="Rareware Coin", type="Coin", map=5},
 	{byte=0x2F, bit=5, name="Key 8", type="Key", map=17},
 	{byte=0x2F, bit=6, name="Isles: DK GB: Japes Boulder", type="GB", map=34},
@@ -297,17 +308,17 @@ return {
 	-- 0x31 > 3
 	{byte=0x31, bit=4, name="First Banana Collected", type="FTT", nomap=true},
 	{byte=0x31, bit=5, name="First Coin Collected", type="FTT", nomap=true},
-	-- 0x31 > 6
-	{byte=0x31, bit=7, name="Isles: Lanky Instrument GB", type="GB"},
+	{byte=0x31, bit=6, name="Factory Lobby: Lever Pulled", type="Physical", map=175},
+	{byte=0x31, bit=7, name="Isles: Lanky Instrument GB", type="GB", map=169},
 
 	-- 0x32 > 0
 	-- 0x32 > 1
-	{byte=0x32, bit=2, name="Isles: Galleon Lobby Grate Opened", type="Physical"},
+	{byte=0x32, bit=2, name="Isles: Galleon Lobby Grate Opened", type="Physical", map=174},
 	{byte=0x32, bit=3, name="Isles: Big Bug Bash GB", type="GB"},
-	{byte=0x32, bit=4, name="Isles: Tiny GB: Galleon Lobby", type="GB"},
-	{byte=0x32, bit=5, name="Isles: DK GB: Factory Lobby Instrument Pad", type="GB"},
+	{byte=0x32, bit=4, name="Isles: Tiny GB: Galleon Lobby", type="GB", map=174},
+	{byte=0x32, bit=5, name="Isles: DK GB: Factory Lobby Instrument Pad", type="GB", map=175},
 	-- 0x32 > 6
-	{byte=0x32, bit=7, name="Isles: Kremling Kosh GB", type="GB"},
+	{byte=0x32, bit=7, name="Isles: Chunky GB: Kremling Kosh GB", type="GB", map=170},
 
 	{byte=0x33, bit=0, name="Helm Lobby: Bridge Spawned", type="Physical", map=170},
 	{byte=0x33, bit=1, name="Caves Lobby: Ice Wall BP Room", type="Physical", map=194},
@@ -319,7 +330,7 @@ return {
 	-- 0x33 > 7
 
 	{byte=0x34, bit=0, name="Isles: Castle Lobby GB", type="GB"},
-	{byte=0x34, bit=1, name="Isles: Batty Barrel Bandit GB", type="GB"},
+	{byte=0x34, bit=1, name="Isles: Diddy GB: Batty Barrel Bandit", type="GB", map=195},
 	{byte=0x34, bit=2, name="Isles: W1 (Helm Lobby - Near)", type="Warp", map=170},
 	{byte=0x34, bit=3, name="Isles: W1 (Helm Lobby - Far)", type="Warp", map=170},
 	{byte=0x34, bit=4, name="Isles: DK GB: Caged GB", type="GB", map=34},
@@ -328,8 +339,9 @@ return {
 	{byte=0x34, bit=7, name="Isles: Chunky GB: Caged GB", type="GB", map=34},
 
 	{byte=0x35, bit=0, name="Isles: Diddy GB: Caged GB", type="GB", map=34},
-	{byte=0x35, bit=1, name="Isles: Chunky GB: Instrument", type="GB"},
+	{byte=0x35, bit=1, name="Isles: Chunky GB: Instrument", type="GB", map=34},
 	{byte=0x35, bit=2, name="Isles: Tiny GB: Instrument", type="GB", map=34},
+	{byte=0x35, bit=3, name="Isles: Lanky Instrument Pad played", type="Physical", map=34},
 	{byte=0x35, bit=4, name="Isles: Hunky Chunky Barrel Spawned", type="Physical", map=34},
 	{byte=0x35, bit=5, name="Isles: Diddy GB: Peril Path Panic!", type="GB", map=34},
 	{byte=0x35, bit=6, name="Isles: Lanky GB: Sprint", type="GB", map=97},
@@ -360,7 +372,7 @@ return {
 	{byte=0x38, bit=4, name="Key 8 Turned", type="Key", map={34,97}},
 	-- 0x38 > 5
 	-- 0x38 > 6
-	-- 0x38 > 7
+	{byte=0x38, bit=7, name="Story: Aztec Intro", type="Cutscene", map=173},
 
 	-- 0x39 > 0
 	-- 0x39 > 1
@@ -369,7 +381,7 @@ return {
 	-- 0x39 > 4
 	-- 0x39 > 5
 	{byte=0x39, bit=6, name="Japes Lobby: B. Locker Cleared", type="B. Locker", map=169},
-	-- 0x39 > 7
+	{byte=0x39, bit=7, name="Aztec Lobby: B. Locker Cleared", type="B. Locker", map=173},
 
 	-- 0x3A > 0
 	-- 0x3A > 1
@@ -614,12 +626,12 @@ return {
 	{byte=0x54, bit=7, name="Isles: Rainbow Coin (Aztec Roof)", type="Rainbow Coin", map=34},
 
 	-- 0x55 > 0
-	{byte=0x55, bit=1, name="Aztec: Rainbow Coin (Oasis)", type="Rainbow Coin"},
+	{byte=0x55, bit=1, name="Aztec: Rainbow Coin (Oasis)", type="Rainbow Coin", map=38},
 	-- 0x55 > 2
-	-- 0x55 > 3
+	{byte=0x55, bit=3, name="Aztec: DK CB: Cranky Balloon (1)", type="Balloon", map=38},
 	-- 0x55 > 4
 	-- 0x55 > 5
-	-- 0x55 > 6
+	{byte=0x55, bit=6, name="Aztec: DK CB: Cranky Balloon (2)", type="Balloon", map=38},
 	-- 0x55 > 7
 
 	-- 0x56 > 0
@@ -665,10 +677,10 @@ return {
 	{byte=0x60, bit=6, name="Helm: W1 (Near)", type="Warp", map=17},
 	{byte=0x60, bit=7, name="Helm: W1 (Far)", type="Warp", map=17},
 
-	-- 0x61 > 0
-	-- 0x61 > 1
-	-- 0x61 > 2
-	-- 0x61 > 3
+	{byte=0x61, bit=0, name="Funky's Shop: FTT", type="FTT", map=1},
+	-- 0x61 > 1 Snide's FTT?
+	-- 0x61 > 2 Cranky's FTT?
+	{byte=0x61, bit=3, name="Candy's Shop: FTT", type="FTT", map=25},
 	{byte=0x61, bit=4, name="Japes: FTT", type="FTT", map=7},
 	-- 0x61 > 5 Factory FTT?
 	-- 0x61 > 6 Galleon FTT?
@@ -678,7 +690,7 @@ return {
 	-- 0x62 > 1 Castle FTT?
 	{byte=0x62, bit=2, name="T&S FTT (2)", type="FTT", map=42},
 	{byte=0x62, bit=3, name="Helm: FTT", type="FTT", map=17},
-	-- 0x62 > 4
+	{byte=0x62, bit=4, name="Aztec: FTT", type="FTT", map=38},
 	-- 0x62 > 5
 	-- 0x62 > 6
 	-- 0x62 > 7
@@ -979,15 +991,168 @@ return {
 	-- 0x83 > 6
 	-- 0x83 > 7
 
+	-- 0x8C > 0
+	{byte=0x8C, bit=1, name="Aztec: Chunky CB: Entrance Tunnel (1)", type="CB", map=38},
+	-- 0x8C > 2
+	-- 0x8C > 3
+	-- 0x8C > 4
+	-- 0x8C > 5
+	{byte=0x8C, bit=6, name="Aztec: Chunky CB: Entrance Tunnel (2)", type="CB", map=38},
+	{byte=0x8C, bit=7, name="Aztec: Diddy CB: Tunnel (1)", type="CB", map=38},
+
+	{byte=0x8D, bit=1, name="Aztec: Diddy CB: W2 Bunch", type="Bunch", map=38},
+	{byte=0x8D, bit=2, name="Aztec: Diddy CB: Tunnel (2)", type="CB", map=38},
+	{byte=0x8D, bit=3, name="Aztec: Diddy CB: Tunnel (3)", type="CB", map=38},
+	{byte=0x8D, bit=4, name="Aztec: Diddy CB: Tunnel (4)", type="CB", map=38},
+	-- 0x8D > 5
+	-- 0x8D > 6
+	-- 0x8D > 7
+
+	-- 0x8E > 0
+	-- 0x8E > 1
+	{byte=0x8E, bit=2, name="Aztec: Lanky Coin: Cranky (1)", type="Coin", map=38},
+	-- 0x8E > 3
+	{byte=0x8E, bit=4, name="Aztec: Lanky Coin: W4 Funky (1)", type="Coin", map=38},
+	{byte=0x8E, bit=5, name="Aztec: DK CB: Oasis (1)", type="Bunch", map=38},
+	{byte=0x8E, bit=6, name="Aztec: Diddy Coin: W2 (1)", type="Coin", map=38},
+	-- 0x8E > 7
+
+	{byte=0x90, bit=0, name="Aztec: DK Coin: Llama Cage (1)", type="Coin", map=38},
+	{byte=0x90, bit=1, name="Aztec: Diddy Coin: W2 (2)", type="Coin", map=38},
+	{byte=0x90, bit=2, name="Aztec: Diddy Coin: W2 (3)", type="Coin", map=38},
+	{byte=0x90, bit=3, name="Aztec: Diddy Coin: W2 (4)", type="Coin", map=38},
+	{byte=0x90, bit=4, name="Aztec: DK CB: Llama Cage (1)", type="CB", map=38},
+	{byte=0x90, bit=5, name="Aztec: DK CB: Llama Cage (2)", type="CB", map=38},
+	{byte=0x90, bit=6, name="Aztec: DK CB: Llama Cage (3)", type="CB", map=38},
+	-- 0x90 > 7
+
+	{byte=0x91, bit=0, name="Aztec: Chunky CB: Entrance Tunnel (3)", type="CB", map=38},
+	-- 0x91 > 1
+	-- 0x91 > 2
+	{byte=0x91, bit=3, name="Aztec: Lanky Coin: W4 Funky (2)", type="Coin", map=38},
+	{byte=0x91, bit=4, name="Aztec: Lanky Coin: W4 Funky (3)", type="Coin", map=38},
+	-- 0x91 > 5
+	-- 0x91 > 6
+	{byte=0x91, bit=7, name="Aztec: DK Coin: Llama Cage (2)", type="Coin", map=38},
+
+	{byte=0x92, bit=0, name="Aztec: DK CB: Oasis (2)", type="Bunch", map=38},
+	-- 0x92 > 1
+	-- 0x92 > 2
+	-- 0x92 > 3
+	{byte=0x92, bit=4, name="Aztec: Diddy Coin: W2 (5)", type="Coin", map=38},
+	{byte=0x92, bit=5, name="Aztec: Diddy CB: Tunnel (5)", type="CB", map=38},
+	-- 0x92 > 6
+	-- 0x92 > 7
+
+	{byte=0x93, bit=0, name="Aztec: Chunky CB: Entrance Tunnel (4)", type="CB", map=38},
+	-- 0x93 > 1
+	-- 0x93 > 2
+	{byte=0x93, bit=3, name="Aztec: Lanky CB: Entrance Tunnel (1)", type="CB", map=38},
+	{byte=0x93, bit=4, name="Aztec: Lanky CB: Entrance Tunnel (2)", type="CB", map=38},
+	{byte=0x93, bit=5, name="Aztec: Lanky CB: Entrance Tunnel (3)", type="CB", map=38},
+	{byte=0x93, bit=6, name="Aztec: Lanky CB: Entrance Tunnel (4)", type="CB", map=38},
+	{byte=0x93, bit=7, name="Aztec: Lanky CB: Entrance Tunnel (5)", type="CB", map=38},
+
+	{byte=0x96, bit=0, name="Aztec: DK CB: Kasplat Room (1)", type="Bunch", map=38},
+	{byte=0x96, bit=1, name="Aztec: DK CB: Kasplat Room (2)", type="Bunch", map=38},
+	{byte=0x96, bit=2, name="Aztec: DK CB: Oasis (3)", type="Bunch", map=38},
+	-- 0x96 > 3
+	-- 0x96 > 4
+	-- 0x96 > 5
+	{byte=0x96, bit=6, name="Aztec: Chunky CB: Entrance Tunnel (5)", type="CB", map=38},
+	-- 0x96 > 7
+
+	{byte=0x98, bit=0, name="Aztec: Lanky CB: Tree Bunch (1)", type="Bunch", map=38},
+	{byte=0x98, bit=1, name="Aztec: Lanky CB: Cranky Bunch", type="Bunch", map=38},
+	-- 0x98 > 2
+	-- 0x98 > 3
+	{byte=0x98, bit=4, name="Aztec: Tiny Coin: Oasis (1)", type="Coin", map=38},
+	{byte=0x98, bit=5, name="Aztec: Chunky CB: Totem (1)", type="CB", map=38},
+	{byte=0x98, bit=6, name="Aztec: Chunky CB: Totem (2)", type="CB", map=38},
+	{byte=0x98, bit=7, name="Aztec: Chunky CB: Totem (3)", type="CB", map=38},
+
+	{byte=0x99, bit=0, name="Aztec: Lanky CB: Snake Road (1)", type="CB", map=38},
+	{byte=0x99, bit=1, name="Aztec: Lanky Coin: W4 Funky (4)", type="Coin", map=38},
+	-- 0x99 > 2
+	-- 0x99 > 3
+	{byte=0x99, bit=4, name="Aztec: Lanky CB: Tree Bunch (2)", type="Bunch", map=38},
+	{byte=0x99, bit=5, name="Aztec: Lanky CB: Tree Bunch (3)", type="Bunch", map=38},
+	{byte=0x99, bit=6, name="Aztec: Lanky CB: Tree Bunch (4)", type="Bunch", map=38},
+	{byte=0x99, bit=7, name="Aztec: Lanky CB: Tree Bunch (5)", type="Bunch", map=38},
+
+	-- 0x9A > 0
+	-- 0x9A > 1
+	-- 0x9A > 2
+	-- 0x9A > 3
+	{byte=0x9A, bit=4, name="Aztec: Lanky CB: Snake Road (2)", type="CB", map=38},
+	{byte=0x9A, bit=5, name="Aztec: Lanky CB: Snake Road (3)", type="CB", map=38},
+	{byte=0x9A, bit=6, name="Aztec: Lanky CB: Snake Road (4)", type="CB", map=38},
+	{byte=0x9A, bit=7, name="Aztec: Lanky CB: Snake Road (5)", type="CB", map=38},
+
+	{byte=0x9B, bit=0, name="Aztec: Tiny CB: 5DT Lane (1)", type="CB", map=38},
+	{byte=0x9B, bit=1, name="Aztec: Tiny CB: 5DT Lane (2)", type="CB", map=38},
+	{byte=0x9B, bit=2, name="Aztec: Tiny CB: 5DT Lane (3)", type="CB", map=38},
+	{byte=0x9B, bit=3, name="Aztec: Tiny CB: 5DT Lane (4)", type="CB", map=38},
+	{byte=0x9B, bit=4, name="Aztec: Tiny CB: 5DT Lane (5)", type="CB", map=38},
+	-- 0x9B > 5
+	-- 0x9B > 6
+	-- 0x9B > 7
+
+	{byte=0x9C, bit=0, name="Aztec: Tiny Coin: Oasis (2)", type="Coin", map=38},
+	{byte=0x9C, bit=1, name="Aztec: Lanky Coin: Cranky (2)", type="Coin", map=38},
+	{byte=0x9C, bit=2, name="Aztec: Lanky Coin: Cranky (3)", type="Coin", map=38},
+	{byte=0x9C, bit=3, name="Aztec: Lanky Coin: Cranky (4)", type="Coin", map=38},
+	-- 0x9C > 4
+	-- 0x9C > 5
+	-- 0x9C > 6
+	-- 0x9C > 7
+
+	{byte=0x9D, bit=4, name="Aztec: Tiny Coin: Oasis (3)", type="Coin", map=38},
+	{byte=0x9D, bit=5, name="Aztec: Tiny Coin: Oasis (4)", type="Coin", map=38},
+	{byte=0x9D, bit=7, name="Aztec: Lanky Coin: W4 Funky (5)", type="Coin", map=38},
+
+	{byte=0x9E, bit=0, name="Aztec: Chunky CB: Vase Room Bunch (1)", type="Bunch", map=38},
+	{byte=0x9E, bit=1, name="Aztec: Chunky CB: Vase Room Bunch (2)", type="Bunch", map=38},
+	{byte=0x9E, bit=2, name="Aztec: Chunky CB: Vase Room Bunch (3)", type="Bunch", map=38},
+
+	{byte=0x9F, bit=0, name="Aztec: Chunky CB: Totem (4)", type="CB", map=38},
+	{byte=0x9F, bit=1, name="Aztec: Chunky CB: Totem (5)", type="CB", map=38},
+	{byte=0x9F, bit=2, name="Aztec: Chunky CB: Totem (6)", type="CB", map=38},
+	{byte=0x9F, bit=3, name="Aztec: Chunky CB: Totem (7)", type="CB", map=38},
+	{byte=0x9F, bit=4, name="Aztec: Chunky CB: Totem (8)", type="CB", map=38},
+	{byte=0x9F, bit=5, name="Aztec: Chunky CB: Totem (9)", type="CB", map=38},
+	{byte=0x9F, bit=6, name="Aztec: Chunky CB: Totem (10)", type="CB", map=38},
+	{byte=0x9F, bit=7, name="Aztec: Chunky CB: Vase Room Bunch (4)", type="Bunch", map=38},
+
+	{byte=0xA2, bit=0, name="Aztec: DK Coin: Near BP (1)", type="Coin", map=38},
+
+	{byte=0xA3, bit=2, name="Aztec: Chunky Coin: Outside Tiny Temple (1)", type="Coin", map=38},
+	{byte=0xA3, bit=3, name="Aztec: Chunky Coin: Outside Tiny Temple (2)", type="Coin", map=38},
+	{byte=0xA3, bit=4, name="Aztec: Chunky Coin: Outside Tiny Temple (3)", type="Coin", map=38},
+	{byte=0xA3, bit=5, name="Aztec: Chunky Coin: Outside Tiny Temple (4)", type="Coin", map=38},
+	{byte=0xA3, bit=6, name="Aztec: DK Coin: Near BP (2)", type="Coin", map=38},
+	{byte=0xA3, bit=7, name="Aztec: DK Coin: Near BP (3)", type="Coin", map=38},
+
 	{byte=0xE1, bit=2, name="Fungi: Upper W5 Bunch", type="Bunch"},
 	{byte=0xE1, bit=3, name="Fungi: Lower W5 Bunch", type="Bunch"},
 
 	{byte=0x101, bit=2, name="Caves: W1 Bunch (Base)", type="Bunch"},
 
+	{byte=0x139, bit=0, type="Unknown", nomap=true, ignore=true},
+
 	{byte=0x13A, bit=0, type="Unknown", nomap=true, ignore=true},
 	{byte=0x13A, bit=1, type="Unknown", nomap=true, ignore=true},
 	{byte=0x13A, bit=2, type="Unknown", nomap=true, ignore=true},
+	-- 0x13A > 3
+	{byte=0x13A, bit=4, type="Unknown", nomap=true, ignore=true},
+	{byte=0x13A, bit=5, type="Unknown", nomap=true, ignore=true},
+	{byte=0x13A, bit=6, type="Unknown", nomap=true, ignore=true},
+	{byte=0x13A, bit=7, type="Unknown", nomap=true, ignore=true},
 
+	-- 0x13B > 0
+	-- 0x13B > 1
+	-- 0x13B > 2
+	-- 0x13B > 3
 	{byte=0x13B, bit=4, type="Unknown", nomap=true, ignore=true},
 	{byte=0x13B, bit=5, type="Unknown", nomap=true, ignore=true},
 	{byte=0x13B, bit=6, type="Unknown", nomap=true, ignore=true},
