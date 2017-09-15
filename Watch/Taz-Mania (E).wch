@@ -1,5 +1,6 @@
 SystemID SMS
 000F	b	u	0	Main RAM	P1 Input
+00F9	b	u	0	Main RAM	Player Has Control
 0100	b	s	0	Main RAM	Lives
 0103	b	u	0	Main RAM	L Meter
 0105	b	u	0	Main RAM	L Meter
@@ -11,6 +12,7 @@ SystemID SMS
 0120	w	u	0	Main RAM	Viewport X Position
 0122	w	u	0	Main RAM	Viewport Y Position
 0126	w	u	0	Main RAM	
+0139	b	u	0	Main RAM	Player Cooldown Timer
 0141	b	u	0	Main RAM	Jump Height
 0150	w	s	0	Main RAM	X Position (Screen)
 0152	w	s	0	Main RAM	Y Position (Screen)
@@ -18,8 +20,9 @@ SystemID SMS
 01A0	w	u	0	Main RAM	Score
 01A2	w	u	0	Main RAM	Score
 01A4	w	u	0	Main RAM	Game time (Level)
-0F00	b	u	0	Main RAM	Related to current Level
-0F02	b	u	0	Main RAM	Related to current Level
-0F03	b	u	0	Main RAM	Related to current Level
-1103	b	u	0	Main RAM	Related to current Level
+0F00	b	u	0	Main RAM	Level
+1120	b	u	0	Main RAM	Boss HP
+1121	b	u	0	Main RAM	Boss HP (2)
+1130	b	u	0	Main RAM	Boss Cooldown Timer
+1131	b	u	0	Main RAM	Boss Cooldown Timer (2)
 
