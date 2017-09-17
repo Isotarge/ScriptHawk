@@ -718,7 +718,7 @@ telemetryData = {};
 local collecting_telemetry = false;
 
 function getTelemetryHeaderString()
-	local headerString = "Time (Frames),";
+	local headerString = "Frame,";
 	for i, v in ipairs(Game.OSD) do
 		if type(v) == "table" then
 			if v[1] ~= "Separator" then
@@ -736,12 +736,14 @@ local function outputTelemetry()
 	dprint(getTelemetryHeaderString());
 
 	-- Print CSV values
-	for i = 1, #telemetryData do
-		local outputString = i..",";
-		for k, v in ipairs(telemetryData[i]) do
-			outputString = outputString..(v)..",";
+	for i = 0, emu.framecount() do -- I know this isn't optimal, but unfortunately ipairs() doesn't like tables with gaps in them, and pairs() doesn't iterate through keys in numerical order
+		if type(telemetryData[i]) == "table" then
+			local outputString = i..",";
+			for k, v in ipairs(telemetryData[i]) do
+				outputString = outputString..(v)..",";
+			end
+			dprint(outputString);
 		end
-		dprint(outputString);
 	end
 
 	print_deferred();
@@ -750,7 +752,6 @@ end
 local function startTelemetry()
 	collecting_telemetry = true;
 	forms.settext(ScriptHawk.UI.form_controls["Toggle Telemetry Button"], "Stop Telemetry");
-	telemetryData = {};
 end
 
 local function stopTelemetry()
@@ -767,6 +768,10 @@ local function toggleTelemetry()
 	else
 		startTelemetry();
 	end
+end
+
+function clearTelemetry()
+	telemetryData = {};
 end
 
 -------------
@@ -895,6 +900,14 @@ function ScriptHawk.UI.updateReadouts()
 		end
 	end
 
+	local telemetryFound = false;
+	local telemetryIndex = 1;
+	local telemetryDataThisFrame = {};
+	if collecting_telemetry == false and type(telemetryData[emu.framecount()]) == "table" then
+		telemetryFound = true;
+		telemetryDataThisFrame = telemetryData[emu.framecount()];
+	end
+
 	-- Draw OSD
 	local row = 0;
 	local OSDX = Game.OSDPosition[1];
@@ -963,7 +976,12 @@ function ScriptHawk.UI.updateReadouts()
 				color = color();
 			end
 
-			gui.text(OSDX, OSDY + Game.OSDRowHeight * row, label..": "..value, color);
+			if telemetryFound then
+				gui.text(OSDX, OSDY + Game.OSDRowHeight * row, label..": "..value.." ("..telemetryDataThisFrame[telemetryIndex]..")", color);
+				telemetryIndex = telemetryIndex + 1;
+			else
+				gui.text(OSDX, OSDY + Game.OSDRowHeight * row, label..": "..value, color);
+			end
 		else
 			if type(value) == "number" and value > 1 then
 				row = row + value - 1;
@@ -1226,73 +1244,6 @@ local function plot_pos()
 			prev_y = y;
 			prev_z = z;
 		end
-
-		-- Telemetry
-		if collecting_telemetry then
-			local tempTelemetryData = {};
-			for i = 1, #Game.OSD do
-				local label = Game.OSD[i][1];
-				local value = Game.OSD[i][2];
-
-				if label ~= "Separator" then
-					local labelLower = string.lower(label);
-
-					-- Detect special keywords
-					if labelLower == "dx" then
-						value = dx or 0;
-					end
-					if labelLower == "dy" then
-						value = dy or 0;
-					end
-					if labelLower == "dz" then
-						value = dz or 0;
-					end
-					if labelLower == "dxz" or labelLower == "d" then
-						value = d or 0;
-					end
-
-					if labelLower == "max dx" then
-						value = max_dx or 0;
-					end
-					if labelLower == "max dy" then
-						value = max_dy or 0;
-					end
-					if labelLower == "max dz" then
-						value = max_dz or 0;
-					end
-					if labelLower == "max dxz" or labelLower == "max d" then
-						value = max_d or 0;
-					end
-					if labelLower == "odometer" then
-						value = odometer or 0;
-					end
-
-					if labelLower == "moving angle" and value == nil then -- TODO: This has some name conflicts, "moving"
-						value = round(ScriptHawk.movingAngle, precision)..string.char(0xB0);
-					end
-
-					-- Get the value
-					if type(value) == "function" then
-						value = value();
-					end
-
-					-- Round the value
-					if type(value) == "number" then
-						value = round(value, precision);
-					end
-
-					-- Detect and format rotation based on a keyword search
-					for j = 1, #angleKeywords do
-						if label == angleKeywords[j] then
-							value = ScriptHawk.UI.formatRotation(value);
-						end
-					end
-
-					table.insert(tempTelemetryData, value);
-				end
-			end
-			table.insert(telemetryData, tempTelemetryData);
-		end
 	end
 
 	if ScriptHawk.smooth_moving_angle == false then
@@ -1301,6 +1252,73 @@ local function plot_pos()
 		prev_x = x;
 		prev_y = y;
 		prev_z = z;
+	end
+
+	-- Telemetry
+	if collecting_telemetry then
+		local tempTelemetryData = {};
+		for i = 1, #Game.OSD do
+			local label = Game.OSD[i][1];
+			local value = Game.OSD[i][2];
+
+			if label ~= "Separator" then
+				local labelLower = string.lower(label);
+
+				-- Detect special keywords
+				if labelLower == "dx" then
+					value = dx or 0;
+				end
+				if labelLower == "dy" then
+					value = dy or 0;
+				end
+				if labelLower == "dz" then
+					value = dz or 0;
+				end
+				if labelLower == "dxz" or labelLower == "d" then
+					value = d or 0;
+				end
+
+				if labelLower == "max dx" then
+					value = max_dx or 0;
+				end
+				if labelLower == "max dy" then
+					value = max_dy or 0;
+				end
+				if labelLower == "max dz" then
+					value = max_dz or 0;
+				end
+				if labelLower == "max dxz" or labelLower == "max d" then
+					value = max_d or 0;
+				end
+				if labelLower == "odometer" then
+					value = odometer or 0;
+				end
+
+				if labelLower == "moving angle" and value == nil then -- TODO: This has some name conflicts, "moving"
+					value = round(ScriptHawk.movingAngle, precision)..string.char(0xB0);
+				end
+
+				-- Get the value
+				if type(value) == "function" then
+					value = value();
+				end
+
+				-- Round the value
+				if type(value) == "number" then
+					value = round(value, precision);
+				end
+
+				-- Detect and format rotation based on a keyword search
+				for j = 1, #angleKeywords do
+					if label == angleKeywords[j] then
+						value = ScriptHawk.UI.formatRotation(value);
+					end
+				end
+
+				table.insert(tempTelemetryData, value);
+			end
+		end
+		telemetryData[current_frame] = tempTelemetryData;
 	end
 
 	if not client.ispaused() then

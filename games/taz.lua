@@ -29,8 +29,6 @@ local Game = {
 	max_rot_units = 0,
 };
 
-Game.cache = {};
-
 function Game.detectVersion(romName, romHash)
 	return true;
 end
@@ -42,27 +40,11 @@ function Game.getXPosition()
 	--return viewportX + tazX;
 end
 
-function Game.getXPositionOSD()
-	local frameCount = emu.framecount();
-	if type(Game.cache[frameCount]) == "table" then
-		return Game.getXPosition().." ("..Game.cache[frameCount].x..")";
-	end
-	return Game.getXPosition();
-end
-
 function Game.getYPosition()
 	local viewportY = mainmemory.read_u16_le(Game.Memory.viewport_y_position);
 	return viewportY;
 	--local tazY = mainmemory.read_s16_le(Game.Memory.taz_y_position);
 	--return viewportY + tazY;
-end
-
-function Game.getYPositionOSD()
-	local frameCount = emu.framecount();
-	if type(Game.cache[frameCount]) == "table" then
-		return Game.getYPosition().." ("..Game.cache[frameCount].y..")";
-	end
-	return Game.getYPosition();
 end
 
 function Game.getJumpHeight()
@@ -82,36 +64,12 @@ function Game.getPMeter()
 	return mainmemory.read_u8(Game.Memory.p_meter);
 end
 
-function Game.getPMeterOSD()
-	local frameCount = emu.framecount();
-	if type(Game.cache[frameCount]) == "table" then
-		return Game.getPMeter().." ("..Game.cache[frameCount].p..")";
-	end
-	return Game.getPMeter();
-end
-
 function Game.getGroundVelocity()
 	return mainmemory.read_s8(Game.Memory.velocity_ground);
 end
 
-function Game.getGroundVelocityOSD()
-	local frameCount = emu.framecount();
-	if type(Game.cache[frameCount]) == "table" then
-		return Game.getGroundVelocity().." ("..Game.cache[frameCount].vg..")";
-	end
-	return Game.getGroundVelocity();
-end
-
 function Game.getAerialVelocity()
 	return mainmemory.read_s8(Game.Memory.velocity_aerial);
-end
-
-function Game.getAerialVelocityOSD()
-	local frameCount = emu.framecount();
-	if type(Game.cache[frameCount]) == "table" then
-		return Game.getAerialVelocity().." ("..Game.cache[frameCount].va..")";
-	end
-	return Game.getAerialVelocity();
 end
 
 function Game.colorDX()
@@ -132,10 +90,6 @@ function Game.getLevelTime()
 	return mainmemory.read_u16_le(Game.Memory.level_time);
 end
 
-function Game.getLevelOSD()
-	return Game.getLevel().." ("..Game.getLevelTime()..")";
-end
-
 function Game.applyInfinites()
 	if mainmemory.readbyte(Game.Memory.player_has_control) > 0 then
 		mainmemory.writebyte(Game.Memory.p_meter, 32);
@@ -145,38 +99,27 @@ end
 
 function Game.initUI()
 	ScriptHawk.UI.form_controls["Toggle Super Jump Checkbox"] = forms.checkbox(ScriptHawk.UI.options_form, "Super Jump", ScriptHawk.UI.col(0) + ScriptHawk.UI.dropdown_offset, ScriptHawk.UI.row(4) + ScriptHawk.UI.dropdown_offset);
-	ScriptHawk.UI.form_controls["Record Stats"] = forms.checkbox(ScriptHawk.UI.options_form, "Record Stats", ScriptHawk.UI.col(0) + ScriptHawk.UI.dropdown_offset, ScriptHawk.UI.row(3) + ScriptHawk.UI.dropdown_offset);
 end
 
 function Game.eachFrame()
 	if forms.ischecked(ScriptHawk.UI.form_controls["Toggle Super Jump Checkbox"]) then
 		mainmemory.write_u8(Game.Memory.jump_height, 0);
 	end
-	if forms.ischecked(ScriptHawk.UI.form_controls["Record Stats"]) then
-		Game.cache[emu.framecount()] = {
-			x = Game.getXPosition(),
-			y = Game.getYPosition(),
-			p = Game.getPMeter(),
-			vg = Game.getGroundVelocity(),
-			va = Game.getAerialVelocity(),
-			igt = Game.getLevelTime()
-		};
-	end
 end
 
 Game.OSD = {
-	{"X", Game.getXPositionOSD},
-	{"Y", Game.getYPositionOSD},
+	{"X", Game.getXPosition},
+	{"Y", Game.getYPosition},
 	{"dX", nil, Game.colorDX},
 	{"dY"},
 	{"Separator", 1},
-	{"P Meter", Game.getPMeterOSD},
-	{"Velocity (Gnd)", Game.getGroundVelocityOSD},
-	{"Velocity (Air)", Game.getAerialVelocityOSD},
+	{"P Meter", Game.getPMeter},
+	{"Velocity (Gnd)", Game.getGroundVelocity},
+	{"Velocity (Air)", Game.getAerialVelocity},
 	{"Jump", Game.getJumpHeight, Game.colorJumpHeight},
 	{"Separator", 1},
-	{"Level", Game.getLevelOSD},
-	--{"IGT", Game.getLevelTime},
+	{"Level", Game.getLevel},
+	{"IGT", Game.getLevelTime},
 };
 
 Game.OSDPosition = {114, 208};
