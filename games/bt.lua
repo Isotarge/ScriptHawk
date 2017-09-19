@@ -312,6 +312,7 @@ local Game = {
 		["map_trigger"] = {0x12C392, 0x12C5A2, 0x1217F2, 0x127642},
 		["DCW_location"] = {0x12C33A, 0x12C54A, 0x12179A, 0x1275EA},
 		["character_state"] = {0x13BC53, 0x13BEE3, 0x1310A3, 0x136F63},
+		["character_change"] = {0x12BD9C, 0x12BFAC, 0x1211FC, 0x12704C},
 		["iconAddress"] = {0x11FF95, 0x120155, 0x115325, 0x11B065},
 		["healthAddresses"] = {
 			[0x01] = {0x120584, 0x120794, 0x115A04, 0x11B644}, -- BK
@@ -352,6 +353,25 @@ local Game = {
 		[18] = "Small T-Rex",
 		[19] = "Big T-Rex"
 	},
+	character_change_lookup = {
+		["BK"] = 1,
+		["Snowball"] = 2,
+		["Cutscene"] = 4,
+		["Bee"] = 6,
+		["W. Machine"] = 7,
+		["Stony"] = 8,
+		["Breegull B."] = 9,
+		["Solo Banjo"] = 10,
+		["Solo Kazooie"] = 11,
+		["Submarine"] = 12,
+		["Mumbo"] = 13,
+		["G. Goliath"] = 14,
+		["Detonator"] = 15,
+		["Van"] = 16,
+		["Cwk Kazooie"] = 17,
+		["Small T-Rex"] = 18,
+		["Big T-Rex"] = 19
+	};
 };
 
 local function checksumToString(checksum)
@@ -956,10 +976,13 @@ local movementStates = {
 	[0x37] = "Cleaning", -- Washing Machine
 	[0x38] = "Launching Underwear", -- Washing Machine
 	[0x39] = "Swimming (A)",
+	[0x3A] = "Idle", -- With Gold Idol
+	[0x3B] = "Walking", -- With Gold Idol
 
 	[0x3D] = "Falling (Splat)",
 	[0x3E] = "Damaged", -- Washing Machine
 
+	[0x40] = "Locked", -- CWK Kazooie Explosion (under some conditions)
 	[0x41] = "Death",
 	[0x42] = "Locked", -- Silo
 	[0x43] = "Death", -- Washing Machine
@@ -1039,7 +1062,7 @@ local movementStates = {
 	[0x91] = "Damaged", -- Flying
 	[0x92] = "Locked", -- Washing Machine, Elevators & Text Boxes
 	[0x93] = "Locked", -- Solo Kazooie, Loading Zone, First Person Camera, Slipping
-
+	[0x94] = "Locked", -- CWK Kazooie Explosion (under some conditions)
 	[0x95] = "Jumping", -- Claw Clamber
 	[0x96] = "Locked", -- Transforming
 	[0x97] = "Locked", -- Underwater - Loading Zone
@@ -1049,6 +1072,9 @@ local movementStates = {
 
 	[0x9C] = "Jumping", -- Springy Step Shoes
 	[0x9D] = "Locked", -- Bee, Loading Zones
+
+	[0x9F] = "Creeping", -- With Gold Idol
+	[0xA0] = "Locked", -- With Gold Idol, Detection
 
 	[0xA3] = "Knockback", -- Bee
 
@@ -1134,7 +1160,7 @@ local movementStates = {
 	[0xFB] = "Jumping", -- Golden Goliath
 	[0xFC] = "Kicking", -- Golden Goliath
 	[0xFD] = "Failure", -- Golden Goliath, Run out of time
-
+	[0xFE] = "Locked", -- Golden Goliath, Loading Zone
 	[0xFF] = "Recovering", -- Mumbo
 	[0x100] = "Damaged", -- Solo Kazooie
 	[0x101] = "Death", -- Solo Kazooie
@@ -1163,7 +1189,7 @@ local movementStates = {
 	[0x118] = "Knockback", -- Van
 	[0x119] = "Locked", -- Van
 	[0x11A] = "Idle", -- Van
-
+	[0x11B] = "Idle", -- Van, Surface Swimming
 	[0x11C] = "Paddling", -- Van
 	[0x11D] = "Landing", -- Van - Water Surface
 	[0x11E] = "Casting Spell", -- Mumbo
@@ -1177,6 +1203,7 @@ local movementStates = {
 	[0x126] = "Jumping", -- Taxi Pack
 	[0x127] = "Leaving Taxi Pack",
 
+	[0x12A] = "Driving", -- Dodgem Car
 	[0x12B] = "Saucer of Peril",
 	[0x12C] = "Swimming", -- Submarine
 	[0x12D] = "Damaged", -- Submarine
@@ -1189,8 +1216,8 @@ local movementStates = {
 	[0x134] = "Jumping", -- Clockwork Kazooie
 	[0x135] = "Walking", -- Clockwork Kazooie
 	[0x136] = "Idle", -- Clockwork Kazooie
-
-	[0x138] = "Locked", -- Clockwork Kazooie, slipping, loading zones
+	[0x137] = "Locked", -- Clockwork Kazooie, Loading Zone
+	[0x138] = "Locked", -- Clockwork Kazooie, Slipping, Loading Zone
 
 	[0x13A] = "Knockback", -- Solo Kazooie
 	[0x13B] = "Landing", -- Small T. Rex
@@ -1523,7 +1550,7 @@ local flag_array = {
 	-- 0x04 > 0
 	{byte=0x04, bit=1, name="HFP: Stone Building Destroyed", type="Physical"},
 	-- 0x04 > 2
-	-- 0x04 > 3
+	{byte=0x04, bit=3, name="Cheat Available: Jiggywiggyspecial", type="Cheat Available"},
 	{byte=0x04, bit=4, name="Cheat Active: Open Up All World Doors", type="Cheat"},
 	{byte=0x04, bit=5, name="MT: Bovina FTT", type="FTT"},
 	-- 0x04 > 6
@@ -1735,7 +1762,7 @@ local flag_array = {
 	{byte=0x1E, bit=4, name="Ability: Ice Eggs", type="Ability"},
 	-- 0x1E > 5
 	{byte=0x1E, bit=6, name="FT Ability Use? (1)"}, -- Set on boot
-	-- 0x1E > 7
+	{byte=0x1E, bit=7, name="Ability: Breegull Bash", type="Ability"},
 	-- 0x1F > 0
 	-- 0x1F > 1
 	-- 0x1F > 2
@@ -2282,7 +2309,7 @@ local flag_array = {
 	{byte=0x62, bit=7, name="Roysten Help Me Text", type="FTT"},
 	-- 0x63 > 0
 	-- 0x63 > 1
-	-- 0x63 > 2
+	{byte=0x63, bit=2, name="First Time BK Cart Text", type="FTT"},
 	-- 0x63 > 3
 	{byte=0x63, bit=4, name="JRL: Jukebox is Broken FTT", type="FTT"},
 	-- 0x63 > 5
@@ -2443,10 +2470,10 @@ local flag_array = {
 	-- 0x77 > 0
 	{byte=0x77, bit=7, name="IoH: Heggy: Yellow Egg Hatched", type="Progress"},
 	-- 0x77 > 2
-	-- 0x77 > 3
-	-- 0x77 > 4
-	-- 0x77 > 5
-	-- 0x77 > 6
+	{byte=0x77, bit=3, name="Mystery Egg: Blue Acquired", type="Mystery Egg"},
+	{byte=0x77, bit=4, name="Mystery Egg: Blue Hatched", type="Mystery Egg"},
+	{byte=0x77, bit=5, name="Mystery Egg: Pink Acquired", type="Mystery Egg"},
+	{byte=0x77, bit=6, name="Mystery Egg: Pink Hatched", type="Mystery Egg"},
 	-- 0x77 > 7
 	{byte=0x78, bit=0, name="IoH: Heggy FTT", type="FTT"},
 	-- 0x78 > 1
@@ -2486,7 +2513,7 @@ local flag_array = {
 	-- 0x7C > 3
 	{byte=0x7C, bit=4, name="Jamjars First Time Text", type="FTT"},
 	-- 0x7C > 5
-	-- 0x7C > 6
+	{byte=0x7C, bit=6, name="First Time Skill Stop Text", type="FTT"},
 	-- 0x7C > 7 Jiggy Boulder Crushed?
 	{byte=0x7D, bit=0, name="GGM: Jiggy Boulder Piece Collected (1)", type="Physical"},
 	{byte=0x7D, bit=1, name="GGM: Jiggy Boulder Piece Collected (2)", type="Physical"},
@@ -2508,7 +2535,7 @@ local flag_array = {
 	-- 0x7E > 7
 	-- 0x7F > 0
 	-- 0x7F > 1
-	--{byte=0x7F, bit=2, name="Jamjars FTSomething?"},
+	{byte=0x7F, bit=2, name="First Time Jamjars Health Refill", type="FTT"},
 	-- 0x7F > 3 Something in the Mingy Jongo fight
 	{byte=0x7F, bit=4, name="Jamjars First Lesson Intro", type="FTT"},
 	-- 0x7F > 5
@@ -3385,9 +3412,12 @@ object_model1 = {
 		[0x615] = "Beehive",
 		[0x616] = "Wading Boots",
 		[0x617] = "Turbo Trainers",
+		[0x61C] = "Kazooie", -- Character Parade
 
+		[0x627] = "Missiles", -- Submarine Projectile
 		[0x629] = "Molehill",
 		[0x62A] = "Banjo-Kazooie", -- ToT
+		[0x62B] = "Banjo-Kazooie", -- ToT Multiplayer
 		[0x62C] = "Cheese Wedge",
 		[0x62D] = "Jelly", -- Heart
 
@@ -3417,6 +3447,7 @@ object_model1 = {
 		[0x655] = "Mayan Door (Right",
 		[0x656] = "Breakable Stone", -- Entrance to Prison Compound
 		[0x657] = "Door", -- Relic Temple
+		[0x658] = "Snake Head", -- MT
 		[0x65D] = "Door", -- MT Kickball
 		[0x65E] = "Gruntydactyl",
 		[0x65F] = "Ssslumber",
@@ -3454,28 +3485,33 @@ object_model1 = {
 		[0x680] = "Waterfall Grate Switch", -- GGM
 		[0x681] = "Waterfall Grate", -- GGM
 		[0x682] = "Boulder", -- Bill Drill
+		[0x683] = "Crusher", -- Crushing Shed
+		[0x684] = "Conveyor", -- Crushing Shed
 		[0x685] = "Button (Wall)", -- GGM Crushing Shed
 		[0x686] = "Grinder", -- GGM Crushing Shed
 		[0x687] = "Jiggy Rock",
 		[0x68B] = "Minecart", -- Broken
+		[0x68C] = "Gas", -- Eg. Cheese Wedge
 		[0x68F] = "Bang Box",
 
 		[0x691] = "Saucer of Peril", -- In Box
 		[0x692] = "Pile of Rocks", -- GGM
 		[0x693] = "Conga",
+		[0x697] = "Remains", -- Mingy Jongo
 		[0x690] = "Saucer of Peril", -- Stationary/Kick about
-
 		[0x698] = "Fish", -- Multiple
 		[0x69D] = "Spell", -- Projectile, Mingy Jongo
 
 		[0x6A1] = "TNT",
 		[0x6A2] = "Rareware Box", -- SM
+		[0x6A5] = "Jiggy Chunk", -- Crushed Jiggy Rock
 		[0x6A6] = "Invisibility Honey",
 		[0x6A7] = "Button (Floor)", -- Power Hut
 		[0x6A8] = "Wooden Hut", -- GGM
 		[0x6A9] = "Chuffy", -- Train
 		[0x6AA] = "Gun Powder", -- JRL
 		[0x6AB] = "Breakable Door", -- GGM Gloomy Caverns
+		[0x6AC] = "Shadow", -- Crusher, Crushing Shed
 		[0x6AD] = "Salty Joe",
 		[0x6AE] = "Big Al",
 		[0x6AF] = "Burger",
@@ -3485,6 +3521,7 @@ object_model1 = {
 		[0x6B2] = "Jippo Jim", -- Frankenstein
 		[0x6B3] = "Jippo Jim", -- Cowboy
 		[0x6B4] = "Jippo Jim", -- Alien
+		[0x6B6] = "Particles", -- Mumbo's Wand
 		[0x6B7] = "Mrs. Boggy",
 		[0x6B8] = "Hothead",
 		[0x6B9] = "Pole Electricity",
@@ -3495,9 +3532,11 @@ object_model1 = {
 		[0x6C3] = "Pawno",
 		[0x6C4] = "Cash Register", -- Pawno's Emporium
 		[0x6C5] = "Big Fish",
+		[0x6C6] = "Egg", -- Tiptup
 		[0x6C7] = "Tiptup Jr.",
 		[0x6C8] = "Tiptup",
 		[0x6C9] = "Fruity",
+		[0x6CA] = "Coin", -- Projectile, Fruity
 		[0x6CB] = "Frazzle",
 		[0x6CC] = "Scrut",
 		[0x6CD] = "Alien",
@@ -3509,11 +3548,14 @@ object_model1 = {
 		[0x6D2] = "Blubbul",
 		[0x6D3] = "Stomponadon",
 		[0x6D4] = "Captain Blackeye",
+		[0x6D5] = "Chompasaurus",
 		[0x6D6] = "Jolly Roger",
 		[0x6D7] = "Soarasaurs",
 		[0x6D8] = "Merry Maggie Malpass",
 		[0x6D9] = "Seemee Fish",
 		[0x6DA] = "Terry",
+		[0x6DC] = "Mucoid", -- Terry, Projectile
+		[0x6DD] = "Mucoid", -- Terry
 		[0x6DB] = "Captain Blubber",
 		[0x6DE] = "Fish",
 
@@ -3529,6 +3571,7 @@ object_model1 = {
 		[0x6F2] = "Wumba's Wigwam", -- TDL
 		[0x6F3] = "Cage", -- Chris P. Bacon
 		[0x6FA] = "Roysten",
+		[0x6FB] = "Interactive Object", -- Inc. Warp Clouds, Fire places, UFO Ice Hole
 		[0x6FC] = "UFO", -- Cutscene
 		[0x6FE] = "Rareware Box",
 		[0x6FF] = "Door", -- Chris P. Bacon entrance
@@ -3542,6 +3585,7 @@ object_model1 = {
 		[0x706] = "Stegosaurus", -- Small
 		[0x707] = "Klungo",
 		[0x708] = "Potion", -- Yellow
+		[0x709] = "Toxi-Gag",
 		[0x70A] = "Electomagnet",
 		[0x70B] = "Door", -- Electromagnet
 		[0x70C] = "Door", -- Restricted Access
@@ -3560,13 +3604,18 @@ object_model1 = {
 		[0x748] = "Door", -- Elevator GI
 		[0x749] = "Button (Wall)", -- GI
 		[0x74A] = "Crusher",
+		[0x74B] = "Bridge", -- TDL Inside the Mountain
 
 		[0x752] = "Button (Floor)", -- Shock Spring Spawn
+		[0x753] = "Breakable Dirt", -- Terry
+		[0x754] = "Button (Floor)", -- Cactus of Strength
 		[0x755] = "Stadium Light", -- Mr. Patch
+		[0x756] = "Shattered Shock Spring Pad",
 		[0x757] = "Glass Box", -- Pawno's
 		[0x759] = "Moggy", -- Boggy
 		[0x75A] = "Soggy", -- Boggy
 		[0x75B] = "Groggy", -- Boggy
+		[0x75D] = "Ice", -- Ice Eggs on Enemies
 		[0x75F] = "Breakable Gate", -- Talon Torpedo
 
 		[0x760] = "Button (Floor)", -- Al's Burger
@@ -3587,25 +3636,36 @@ object_model1 = {
 		[0x76F] = "Green Mine",
 
 		[0x770] = "Blue Mine",
+		[0x774] = "Big Al's (Top)",
+		[0x775] = "Salty Joe's (Top)",
 		[0x776] = "Boxing Glove", -- Mr. Patch Fight
 		[0x777] = "Planet", -- Star Spinner
 		[0x778] = "Ring", -- Star Spinner
 		[0x779] = "Spinning Star",
 		[0x77A] = "Breakable Circuit", -- Star Spinner
 		[0x77B] = "Door", -- GGM Old King Coal
+		[0x77C] = "Bell", -- Cactus of Strength
 		[0x77D] = "Cable Car",
 		[0x77E] = "Inferno Door",
 		[0x77F] = "Cable Car Button",
 
 		[0x780] = "Electric Gates",
 		[0x781] = "Gate", -- Bottle's House
+		[0x782] = "Doors", -- WW Train Station
+		[0x783] = "Doors", -- WW Train Station
 		[0x784] = "Button (Giant T-Rex)", -- Caged Jinjo
 		[0x786] = "Breakable Box", -- JRL
 		[0x787] = "Cheato",
 		[0x788] = "Gobi",
 		[0x789] = "Billy Bob",
 		[0x78A] = "Billy Bob (Inactive)",
+		[0x78B] = "Breakable Door", -- WW Cave of Horrors
+		[0x78C] = "Blue Balloon",
+		[0x78D] = "Green Balloon",
+		[0x78E] = "Cactus of Strength Bar",
 
+		[0x790] = "Prospector",
+		[0x791] = "Box", -- GGM Prospector's Hut
 		[0x793] = "Breakable Rock", -- MT
 		[0x794] = "Mr. Patch",
 		[0x795] = "Feet", -- Old King Coal
@@ -3617,7 +3677,9 @@ object_model1 = {
 		[0x7A1] = "Red Hoop", -- Hoop Hurry
 		[0x7A2] = "Signpost",
 		[0x7A3] = "Door", -- GI Trash Compactor
+		[0x7A4] = "Fries", -- Giving to Soggy/Caveman
 		[0x7A5] = "Van Door",
+		[0x7A6] = "Burger", -- Giving to Groggy/Caveman
 		[0x7A7] = "Dingpot",
 		[0x7A8] = "Falling Box",
 		[0x7A9] = "Falling Platform",
@@ -3649,12 +3711,18 @@ object_model1 = {
 		[0x7C5] = "Twinkly (Blue)",
 		[0x7C6] = "Twinkly (Green)",
 		[0x7C7] = "Twinkly (Red)",
+		[0x7C8] = "Targitzan (part)",
+		[0x7C9] = "Targitzan (part)",
+		[0x7CA] = "Targitzan (part)",
+		[0x7CB] = "Targitzan (part)",
+		[0x7CC] = "Targitzan (top)",
 		[0x7CD] = "Button (Floor)", -- Opens crossed gate
 		[0x7CE] = "Button (Wall)", -- Opens crossed gate
 		[0x7CF] = "Toxi-Klang", -- GI
 
 		[0x7D0] = "Klang",
 		[0x7D1] = "Tintup",
+		[0x7D2] = "Silver Coin", -- Van
 		[0x7D3] = "Toll Box", -- WW
 		[0x7D4] = "Piggles", -- JRL Piglet
 		[0x7D5] = "Trotty", -- JRL Piglet
@@ -3679,6 +3747,7 @@ object_model1 = {
 		[0x7EA] = "Nutta",
 		[0x7EB] = "Washup",
 		[0x7EC] = "Boltoid",
+		[0x7ED] = "Ice", -- Sabreman
 		[0x7EE] = "Unga Bunga",
 		[0x7EF] = "Sabreman",
 
@@ -3687,8 +3756,10 @@ object_model1 = {
 		[0x7F5] = "Alien Child (Pink)",
 		[0x7F6] = "Alien Child (Blue)",
 		[0x7F7] = "Alien Child (Yellow)",
+		[0x7F8] = "Ice", -- HFP
 		[0x7F9] = "Lord Woo Fak Fak",
 		[0x7FA] = "Baby T. Rex",
+		[0x7FB] = "Glowing Light", -- Lord Woo Projectile
 		[0x7FC] = "Chilli Billi",
 		[0x7FD] = "Chilly Willy",
 		[0x7FE] = "Keelhaul",
@@ -3716,19 +3787,32 @@ object_model1 = {
 		[0x813] = "Dustbin", -- Main Menu
 		[0x814] = "Ice Ball", -- Chilly Willy
 		[0x815] = "Fire Ball", -- Chilli Billi
+		[0x816] = "Mingy Jongo",
 		[0x817] = "Weldar",
 		[0x818] = "Flatso", -- Green
 		[0x819] = "Flatso", -- Blue
 		[0x81A] = "Flatso", -- Pink
+		[0x81B] = "Energy Beam", -- Jiggywiggy's Temple
 		[0x81C] = "Bigfoot",
 		[0x81E] = "Biggafoot",
 
 		[0x822] = "Klungo Shield",
+		[0x823] = "Floor", -- Mingy Jongo cover to exit
+		[0x824] = "Invisible Wall", -- Most Wumba's to cover secret passage
+		[0x825] = "Red Target", -- Saucer of Peril
+		[0x826] = "Green Target", -- Saucer of Peril
+		[0x827] = "Blue Target", -- Saucer of Peril
 		[0x828] = "Blue Dodgem Car",
+		[0x82C] = "Dirt", -- CCL
+		[0x82D] = "Pot O' Gold Button", -- CCL
+		[0x82E] = "Door", -- Pot O' Gold
 		[0x82F] = "Platform", -- Pot O'Gold
 
 		[0x830] = "Protection Screen", -- Quality Control
 		[0x832] = "Claw Clamber Boots",
+		[0x837] = "Dart", -- Bee
+		[0x83B] = "Skivvy", -- Embarrassed
+		[0x83C] = "Overalls", -- Clean
 		[0x83D] = "Overalls", -- GI Worker
 		[0x83E] = "Golden Goliath", -- In Ground
 		[0x83F] = "Door", -- Targitzan's Temple, Sacred
@@ -3739,25 +3823,39 @@ object_model1 = {
 		[0x843] = "Door", -- Targitzan's Temple, Brown
 		[0x844] = "Door", -- Targitzan's Temple, Grey
 		[0x845] = "Door", -- Targitzan's Temple, Blue
+		[0x846] = "Door", -- Targitzan's Temple, Brown
 		[0x847] = "Door", -- Targitzan's Temple, Red/Grey
 		[0x848] = "Door", -- Targitzan's Temple, Golden
+		[0x849] = "Door", -- Targitzan's Lobby
+		[0x84B] = "Dynamite Ticker", -- Ordnance Storage
+		[0x84C] = "Dynamite Remains", -- Ordnance Storage
 		[0x84D] = "Clinker",
 		[0x84F] = "Door", -- Entrance to Clinker's
 
 		[0x850] = "Door", -- Ordnance Storage
 		[0x854] = "Mumbo Jumbo",
+		[0x85A] = "Press Start", -- Title Demos
 		[0x85D] = "Big Tent",
 		[0x85F] = "Zubba",
 
 		[0x862] = "Banjo's Hand", -- File Select
+		[0x863] = "Puzzle", -- Jiggywiggy
+		[0x864]	= "Empty Puzzle", -- Jiggywiggy
 		[0x867] = "Red Skull",
-		[0x869] = "Door (Left)", 
+		[0x869] = "Door (Left)",
 		[0x86A] = "Door (Right)",
 		[0x86B] = "Weldar Head",
 		[0x86C] = "Electricity Box",
 		[0x86D] = "Train Station Switch", -- TDL
+		[0x86E] = "Weldar Part",
+		[0x86F] = "Weldar",
 
+		[0x870] = "Weldar Head",
+		[0x871] = "Electrical Component", -- Weldar
+		[0x872] = "Doors", -- HFP Ice Train Station
+		[0x873] = "Doors", -- HFP Ice Train Station
 		[0x874] = "Tintups Spawner",
+		[0x876] = "Goop", -- Terry
 		[0x877] = "Green Hoop", -- Hoop Hurry
 		[0x878] = "Blue Hoop", -- Hoop Hurry
 		[0x87B] = "Door", -- Electric Caution, GI
@@ -3790,6 +3888,10 @@ object_model1 = {
 		[0x89E] = "Mr. Fit",
 		[0x89F] = "Onion",
 
+		[0x8A0] = "Mouse", -- CCL, Fixed
+		[0x8A1] = "Mouse", -- CCL, Broken
+		[0x8A5] = "Sky", -- Opening Cutscene
+		[0x8A8] = "Logo", -- Title Demos
 		[0x8A9] = "Rock", -- Grunty's Rock
 		[0x8AE] = "Mumbo Jumbo", -- Kick About
 		[0x8AF] = "Playing Cards", -- Opening CS
@@ -3815,18 +3917,25 @@ object_model1 = {
 		[0x8CA] = "Power Beam", -- Jingaling/Bottles Restored, Blue
 		[0x8CC] = "Door", -- Inside Trash Can
 		[0x8CD] = "Door", -- Rear Door GI
+		[0x8CE] = "Rainbow", -- CCL
+		[0x8CF] = "Bean", -- CCL
 
 		[0x8D0] = "Zubba's Target",
 		[0x8D1] = "Door", -- Zubba's
-		[0x8D2] = "Candy Cane", -- Trash Can
+		[0x8D2] = "Glass Bottle", -- Trash Can
+		[0x8D4] = "Panel", -- HFP
+		[0x8D5] = "Button (Floor)", -- HFP
 		[0x8D6] = "Button (Floor)", -- HFP Kickball Lobby
 		[0x8D8] = "Gate", -- HFP
 		[0x8DA] = "Door", -- Superstash
 		[0x8DB] = "Button (Floor)", -- Superstash
 		[0x8DC] = "No Food Sign",
+		[0x8DD] = "Beanstalk", -- CCL
 
+		[0x8E0] = "Mumbo's Skull", -- TDL
 		[0x8E1] = "Blue Skull",
 		[0x8E2] = "Breakable Stone", -- JRL/HFP Mumbo's
+		[0x8E3] = "Panel", -- Most Mumbo's to hide secret passage
 		[0x8E4] = "Locker Door",
 		[0x8E5] = "Locker Door",
 		[0x8E6] = "Locker Door",
@@ -3869,6 +3978,7 @@ object_model1 = {
 
 		[0x910] = "B-K Cartridge",
 		[0x911] = "Gold Idol",
+		[0x912] = "Water", -- HFP Gobi
 		[0x913] = "Jade Idol", -- Targitzan's Temple
 		[0x914] = "Heggy",
 		[0x915] = "George", -- Ice Cube
@@ -3878,18 +3988,27 @@ object_model1 = {
 		[0x919] = "Speccy", -- Bottles' Child
 		[0x91A] = "Goggles", -- Bottles' Child
 		[0x91B] = "Buzzer", -- ToT
+		[0x91C] = "Pieces of HAG 1", -- CK
 		[0x91D] = "Buzzer", -- ToT
+		[0x91E] = "Buzzer", -- Jamjars ToT Multiplayer
 		[0x91F] = "Drill",
 
 		[0x923] = "Floatus Floatsum Egg",
+		[0x924] = "Floatus Floatsum", -- CCL
+		[0x925] = "Hothand", -- HFP Lava Side
+		[0x926] = "Flame", -- HFP Lava Side
+		[0x927] = "Flame", -- HFP Lava Side
 		[0x92A] = "Breakable Rock", -- Talon Torpedo
 		[0x92B] = "Jelly", -- CCL
+		[0x92C] = "Hothand", -- HFP Lava Side
 		[0x92D] = "Jelly Castle", -- CCL
 		[0x92E] = "Jelly", -- Landing pads in CCL
 
 		[0x930] = "Superstash",
 		[0x931] = "Chuffy Sign",
 		[0x932] = "Button (Floor)",  -- HFP Drill
+		[0x933] = "Buzzer", -- Mumbo ToT Multiplayer
+		[0x934] = "Buzzer", -- Humba ToT Multiplayer
 		[0x935] = "Master Jiggywiggy",
 		[0x936] = "Gruntilda", -- ToT
 		[0x937] = "Disciple of Jiggywiggy",
@@ -3903,20 +4022,31 @@ object_model1 = {
 		[0x943] = "Door", -- Mr. Patch
 		[0x944] = "Gate", -- Lord Woo
 		[0x945] = "Button (Floor)", -- HFP Volcano
+		[0x946] = "Hot Waterfall", -- HFP Lava Side
+		[0x947] = "Door", -- HFP to JRL
 		[0x948] = "Button (Talon Torpedo)", -- TDL
+		[0x949] = "Doors", -- TDL Train Station
+		[0x94A] = "Doors", -- TDL Train Station
 		[0x94B] = "Button (Wall)", -- Chompa
 		[0x94C] = "Electricity", -- Gatehouse
 		[0x94D] = "Electricity", -- Gatehouse
 		[0x94E] = "Electricity", -- ToT
+		[0x94F] = "Doors", -- IoH Train Station
 
+		[0x950] = "Doors", -- IoH Train Station
 		[0x951] = "Breakable Door", -- SM Talon Torpedo
 		[0x952] = "Breakable Grate", -- Rusted
+		[0x956] = "Red Hoop", -- Hoop Hurry
+		[0x957] = "Green Hoop", -- Hoop Hurry
+		[0x958] = "Blue Hoop", -- Hoop Hurry
 		[0x95A] = "Gate", -- HFP Kickball
 		[0x95B] = "Button (Floor)", -- HFP Bridge
 		[0x96E] = "Gate", -- IoH to JRL
 		[0x96F] = "Gate", -- IoH to HFP
 
 		[0x965] = "Door", -- Ice Key
+		[0x966] = "Energy Beam", -- Jiggywiggy's Temple
+		[0x967] = "Door", -- IoH to MT
 		[0x968] = "Door", -- To Jiggywiggy's Temple
 		[0x969] = "Grate", -- IoH to GGM
 		[0x96A] = "Gate", -- Plateau to Pine Grove
@@ -3928,6 +4058,8 @@ object_model1 = {
 		[0x971] = "Gate (Left)", -- IoH to GI
 		[0x972] = "Gate (Right)", -- IoH to GI
 		[0x973] = "No Entry Sign", -- GI
+		[0x974] = "Purple Mystery Egg",
+		[0x975] = "Blue Mystery Egg",
 		[0x976] = "Yellow Egg", -- Heggy
 		[0x977] = "Jiggywiggy's Altar of Knowledge",
 		[0x978] = "Electricty", -- IoH to CK/CK to Hag 1
@@ -3936,12 +4068,18 @@ object_model1 = {
 		[0x99A] = "1 Ton Weight", -- ToT
 		[0x99B] = "Button (Wall)", -- Fire Switch
 		[0x99C] = "Jukebox",
+		[0x99D] = "Red Germ", -- Chompa's Belly
+		[0x99E] = "Green Germ", -- Chompa's Belly
+		[0x99F] = "Blue Germ", -- Chompa's Belly
 
+		[0x9A0] = "Overlay", -- Credits/Character Parade
 		[0x9A2] = "Applause Sign",
 		[0x9A3] = "Bed", -- Jolly's
 		[0x9AF] = "Pointer", -- Grunty Life-Force Machine
 
 		[0x9B4] = "Klungo", -- Sad Party CS
+		[0x9BE] = "Red Feather Particles", -- Beak Bomb
+		[0x9BF] = "Gold Feath Particles", -- Wonderwing
 
 		[0x9C0] = "Ice Egg", -- Projectile
 		[0x9C1] = "Fire Egg", -- Projectile
@@ -3949,8 +4087,12 @@ object_model1 = {
 		[0x9C3] = "Golden Egg", -- Projectile
 		[0x9C4] = "Clockwork Kazooie Egg", -- Projectile
 		[0x9C5] = "Proximity Egg", -- Projectile/Wall
+		[0x9C7] = "Light (Wall)",
 
+		[0x9D1] = "Underwear", -- Washing Machine
 		[0x9D7] = "Blue Egg", -- Projectile
+
+		[0xFFFF] = "Player Model",
 	},
 };
 
@@ -4325,6 +4467,10 @@ function Game.initUI()
 	ScriptHawk.UI.form_controls.moves_button = forms.button(ScriptHawk.UI.options_form, "Unlock Moves", unlock_moves, ScriptHawk.UI.col(10), ScriptHawk.UI.row(4), ScriptHawk.UI.col(4) + 10, ScriptHawk.UI.button_height);
 	ScriptHawk.UI.form_controls.dragon_button = forms.button(ScriptHawk.UI.options_form, "Toggle Dragon Kazooie", Game.toggleDragonKazooie, ScriptHawk.UI.col(10), ScriptHawk.UI.row(5), ScriptHawk.UI.col(4) + 10, ScriptHawk.UI.button_height);
 
+	-- Character Dropdown
+	ScriptHawk.UI.form_controls["Character Dropdown"] = forms.dropdown(ScriptHawk.UI.options_form, { "BK", "Snowball", "Cutscene", "Bee", "W. Machine", "Stony", "Breegull B.", "Solo Banjo", "Solo Kazooie", "Submarine", "Mumbo", "G. Goliath", "Detonator", "Van", "Cwk Kazooie", "Small T-Rex", "Big T-Rex" }, ScriptHawk.UI.col(5) - ScriptHawk.UI.dropdown_offset, ScriptHawk.UI.row(5) + ScriptHawk.UI.dropdown_offset, ScriptHawk.UI.col(3) + 10, ScriptHawk.UI.button_height);
+	ScriptHawk.UI.form_controls["Character Checkbox"] = forms.checkbox(ScriptHawk.UI.options_form, "", ScriptHawk.UI.col(9) + ScriptHawk.UI.dropdown_offset, ScriptHawk.UI.row(5) + ScriptHawk.UI.dropdown_offset);
+
 	flagStats();
 end
 
@@ -4358,6 +4504,13 @@ function Game.eachFrame()
 		Game.setCameraXPosition(camera_lock.x);
 		Game.setCameraYPosition(camera_lock.y);
 		Game.setCameraZPosition(camera_lock.z);
+	end
+
+	if forms.ischecked(ScriptHawk.UI.form_controls["Character Checkbox"]) then
+		local characterString = forms.getproperty(ScriptHawk.UI.form_controls["Character Dropdown"], "SelectedItem");
+		if type(Game.character_change_lookup[characterString]) == "number" then
+			mainmemory.write_u8(Game.Memory.character_change[version], Game.character_change_lookup[characterString]);
+		end
 	end
 end
 
