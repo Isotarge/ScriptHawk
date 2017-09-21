@@ -38,7 +38,9 @@
 .include "BKPracticeICs/TakeOff.asm"
 .include "BKPracticeICs/TransformMe.asm"
 .include "BKPracticeICs/InputDisplay.asm"
-.include "BKPracticeICs/OpenSeasons.asm"
+.include "BKPracticeICs/SpeedControl.asm"
+//.include "BKPracticeICs/OpenSeasons.asm"
+//.include "BKPracticeICs/Music.asm"
 
 
 //.include "BKPracticeICs/SetMoves.asm"
@@ -59,8 +61,10 @@ MenuFunctionList:
 .word L2Levitate_DefStruct
 .word TakeOff_DefStruct
 .word TransformMe_DefStruct
-.word OpenSeasons_DefStruct
 .word InputDisplay_DefStruct
+.word SpeedCtrl_DefStruct
+//.word OpenSeasons_DefStruct
+//.word music_DefStruct
 
 //SetMoves
 .word 0 ;!!!functionListMust end with 0!!!
@@ -87,17 +91,15 @@ ExitingMenuCode: ;DO NOT CHANGE THIS NAME
         SLL a2 a0 2
         ADDU a2 a1 a2
         LW a2 0(a2)
-        //check if state not equal to 0
-        LB a1 @DefStruct_State(a2)
-        BEQ a1 zero PauseModeCode_Loop
         ADDIU a0 a0 1
-            //check if code has pause mode code
-            LW a1 @DefStruct_PauseModePtr(a2)
-            BEQ a1 zero PauseModeCode_Loop
+        
+        //check if code has pause mode code
+        LW a1 @DefStruct_PauseModePtr(a2)
+        BEQ a1 zero PauseModeCode_Loop
+        NOP
+            //jump to function 
+            JALR ra a1
             NOP
-                //jump to function 
-                JALR ra a1
-                NOP
         B PauseModeCode_Loop
         NOP
 

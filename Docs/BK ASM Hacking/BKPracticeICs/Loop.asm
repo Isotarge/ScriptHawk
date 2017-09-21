@@ -141,7 +141,7 @@ NOP
     
     
 Loop_Normal_NotLoad:
-    LW a0 0x80281254
+    LW a0 @P1NewlyPressedButtons
     LUI a1 0x0800
     AND a0 a0 a1 
     BEQ a0 zero Loop_Normal_HouseKeeping

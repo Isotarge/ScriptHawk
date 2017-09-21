@@ -13,7 +13,7 @@ TakeMeThere_DefStruct:
 TakeMeThere_State:
 .byte 0
 TakeMeThere_MaxState:
-.byte  14
+.byte  17
 
 .align
 TakeMeThere_MenuOptionString:
@@ -86,6 +86,9 @@ TakeMeThere_WarpLocations:
 .byte 0x1B, 0x14 ;MMM
 .byte 0x31, 0x10 ;RBB
 .byte 0x40, 0x07 ;CCW
+.byte 0x44, 0x01 ;CCW Summer
+.byte 0x45, 0x01 ;CCW Autumn
+.byte 0x46, 0x01 ;CCW Winter
 .byte 0x8E, 0x02 ;FF
 .byte 0x93, 0x0A ;DoG
 .byte 0x90, 0x01 ;Grunty
@@ -103,6 +106,9 @@ TakeMeThere_OptionString:
 .asciiz "MMM\0\0\0\0"
 .asciiz "RBB\0\0\0\0"
 .asciiz "CCW\0\0\0\0"
+.asciiz "CCW-SUM"
+.asciiz "CCW-AUT"
+.asciiz "CCW-WIN"
 .asciiz "FF\0\0\0\0\0"
 .asciiz "DOG\0\0\0\0"
 .asciiz "GRUNTY\0"

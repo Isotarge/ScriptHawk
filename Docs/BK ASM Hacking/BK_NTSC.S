@@ -6,7 +6,9 @@
 /*-------------------------------
 | VARIABLES
 ---------------------------------*/
+[P1NewlyPressedButtons]: 0x80281254
 [RawP1Buttons]: 0x802812B8
+
 
 [PauseMenuStringsBase]: 0x8036C4E0
 
@@ -489,6 +491,8 @@
 [ToUpper]:          0x8033DBA4  ;I: (char* $a0 string)
 
 [GetGameTimeScaleFactor]: 0x8033DD90 ;  O;[word $v0]
+
+[SetGameSpeedCoefficient]: 0x8033DE20; I: (float $f12 gameSpeedCoefficient)
 
 [GetItemCount]:         0x80345FA0 ;I: (byte $a0 itemIndex)
 [ClearLevelNoteScores]: 0x80346D78
