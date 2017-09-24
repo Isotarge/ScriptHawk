@@ -352,6 +352,9 @@ local supportedGames = {
 	["2101295C258CB6B845BDB72BE617691D"] = {["moduleName"] = "beta.Golvellius", ["selfContained"] = true, ["friendlyName"] = "Golvellius (UE)"},
 	["6BD9879AF39E248D149761014EBF5639"] = {["moduleName"] = "beta.Golvellius", ["selfContained"] = true, ["friendlyName"] = "Golvellius (J)"},
 
+	-- Impossible Mission
+	["AF51AB03A173DEC28C9241532227CD64"] = {["moduleName"] = "games.impossible_mission", ["friendlyName"] = "Impossible Mission (E)"},
+
 	-- Majora's Mask
 	["B38B71D2961DFFB523020A67F4807A4B704E347A"] = {["moduleName"] = "games.mm", ["friendlyName"] = "Legend of Zelda, The - Majora's Mask (Europe) (En,Fr,De,Es) (Beta)"},
 	["BB4E4757D10727C7584C59C1F2E5F44196E9C293"] = {["moduleName"] = "games.mm", ["friendlyName"] = "Legend of Zelda, The - Majora's Mask (Europe) (En,Fr,De,Es) (Rev A)"},
