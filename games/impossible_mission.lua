@@ -39,6 +39,7 @@ local Game = {
 	},
 	speedy_speeds = {},
 	max_rot_units = 0,
+	bestPieceDistribution = 100,
 };
 
 function Game.detectVersion(romName, romHash)
@@ -187,20 +188,6 @@ function draw_map()
 	end
 end
 
-function completeMinimap()
-	for i = 0x1B5A, 0x1BBF do
-		local value = mainmemory.readbyte(i);
-		if value < 0x80 then
-			value = value + 0x80;
-			mainmemory.writebyte(i, value);
-		end
-	end
-end
-
-function Game.initUI()
-	ScriptHawk.UI.form_controls["Complete Minimap Button"] = forms.button(ScriptHawk.UI.options_form, "Complete Minimap", completeMinimap, ScriptHawk.UI.col(10), ScriptHawk.UI.row(4), ScriptHawk.UI.col(4) + 10, ScriptHawk.UI.button_height);
-end
-
 function Game.getPieceDistribution()
 	local count = 0;
 	for index = 0x00, 0x1D do
@@ -216,7 +203,40 @@ function Game.getPieceDistribution()
 			end
 		end
 	end
+	if count > 0 and count < Game.bestPieceDistribution then
+		local pieceCount = 0;
+		for i = 0x00, 0x1D do
+			pieceCount = pieceCount + countPuzzlePieces(i);
+		end
+		if pieceCount == 36 then
+			print("New best puzzle distribution: "..count);
+			Game.bestPieceDistribution = count;
+		end
+	end
 	return count.." Rooms";
+end
+
+function Game.getBestPieceDistribution()
+	return Game.bestPieceDistribution;
+end
+
+local function resetBestDistribution()
+	Game.bestPieceDistribution = 100;
+end
+
+function completeMinimap()
+	for i = 0x1B5A, 0x1BBF do
+		local value = mainmemory.readbyte(i);
+		if value < 0x80 then
+			value = value + 0x80;
+			mainmemory.writebyte(i, value);
+		end
+	end
+end
+
+function Game.initUI()
+	ScriptHawk.UI.form_controls["Complete Minimap Button"] = forms.button(ScriptHawk.UI.options_form, "Complete Minimap", completeMinimap, ScriptHawk.UI.col(10), ScriptHawk.UI.row(4), ScriptHawk.UI.col(4) + 10, ScriptHawk.UI.button_height);
+	ScriptHawk.UI.form_controls["Reset Best Distribution"] = forms.button(ScriptHawk.UI.options_form, "Reset Best Dist.", resetBestDistribution, ScriptHawk.UI.col(10), ScriptHawk.UI.row(5), ScriptHawk.UI.col(4) + 10, ScriptHawk.UI.button_height);
 end
 
 function Game.drawUI()
@@ -231,6 +251,7 @@ Game.OSD = {
 	{"Map", Game.getCurrentMap},
 	{"IGT", Game.getIGT},
 	{"Piece Dist", Game.getPieceDistribution},
+	{"Best Dist", Game.getBestPieceDistribution},
 };
 
 return Game;
