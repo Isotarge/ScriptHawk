@@ -158,6 +158,14 @@ function countPuzzlePieces(index)
 	return count;
 end
 
+function Game.getTotalPieces()
+	local pieceCount = 0;
+	for i = 0x00, 0x1D do
+		pieceCount = pieceCount + countPuzzlePieces(i);
+	end
+	return pieceCount;
+end
+
 function draw_map()
 	local value;
 	local row_height = 8;
@@ -204,20 +212,20 @@ function Game.getPieceDistribution()
 		end
 	end
 	if count > 0 and count < Game.bestPieceDistribution then
-		local pieceCount = 0;
-		for i = 0x00, 0x1D do
-			pieceCount = pieceCount + countPuzzlePieces(i);
-		end
-		if pieceCount == 36 then
+		if Game.getTotalPieces() == 36 then
 			print("New best puzzle distribution: "..count);
 			Game.bestPieceDistribution = count;
 		end
 	end
-	return count.." Rooms";
+	return count;
+end
+
+function Game.getPieceDistributionOSD()
+	return Game.getPieceDistribution().." Rooms";
 end
 
 function Game.getBestPieceDistribution()
-	return Game.bestPieceDistribution;
+	return Game.bestPieceDistribution.." Rooms";
 end
 
 local function resetBestDistribution()
@@ -245,12 +253,18 @@ function Game.drawUI()
 	end
 end
 
+function Game.eachFrame()
+	if Game.getPieceDistribution() == 15 and Game.getTotalPieces() == 36 then
+		print("15 piece on frame "..emu.framecount());
+	end
+end
+
 Game.OSD = {
 	{"X", Game.getXPosition},
 	{"Y", Game.getYPosition},
 	{"Map", Game.getCurrentMap},
 	{"IGT", Game.getIGT},
-	{"Piece Dist", Game.getPieceDistribution},
+	{"Piece Dist", Game.getPieceDistributionOSD},
 	{"Best Dist", Game.getBestPieceDistribution},
 };
 
