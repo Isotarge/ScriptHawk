@@ -9,6 +9,9 @@ local Game = {
 	Memory = {
 		current_map = 0x97,
 		horizontal_map_position = 0x98,
+		lift_resets = 0xB5,
+		snoozes = 0xB6,
+		snooze_timer = 0xB7,
 		x_position = 0x180,
 		y_position = 0x181,
 		gametime = {
@@ -37,12 +40,15 @@ local Game = {
 			[0x7F] = "Empty",
 		},
 	},
-	speedy_speeds = {},
+	speedy_speeds = {0},
+	speedy_index = 1,
 	max_rot_units = 0,
 	bestPieceDistribution = 100,
 };
 
 function Game.detectVersion(romName, romHash)
+	ScriptHawk.dpad.joypad.enabled = false;
+	ScriptHawk.dpad.key.enabled = false;
 	return true;
 end
 
@@ -115,10 +121,14 @@ object = {
 	y_position = 0x02,
 	contents = 0x03,
 	content_types = {
-		[0x00] = "Nothing",
-		[0x40] = "Lift Init",
-		[0x80] = "Snooze",
-		[0xC0] = "Puzzle Piece",
+		[0x00] = "E", -- Empty
+		[0x10] = "E", -- Empty, Search Started
+		[0x40] = "L", -- Lift Reset
+		[0x50] = "L", -- Lift Reset, Search Started
+		[0x80] = "Z", -- Snooze
+		[0x90] = "Z", -- Snooze, Search Started
+		[0xC0] = "P", -- Puzzle Piece
+		[0xD0] = "P", -- Puzzle Piece, Search Started
 	},
 };
 
@@ -140,6 +150,10 @@ function Game.getIGT()
 	local seconds = mainmemory.readbyte(Game.Memory.gametime.seconds);
 	local centiseconds = mainmemory.readbyte(Game.Memory.gametime.centiseconds);
 	return toHexString(hours, 1, "")..":"..toHexString(minutes, 2, "")..":"..toHexString(seconds, 2, "").."."..(51 - centiseconds);
+end
+
+function Game.getSnoozeTimer()
+	return mainmemory.readbyte(Game.Memory.snooze_timer);
 end
 
 function countPuzzlePieces(index)
@@ -192,6 +206,41 @@ function draw_map()
 			gui.drawText(draw_x + ((i - 1) % 9) * column_width, draw_y + row * row_height - 3, ".", mapColor, 0x00000000);
 		else
 			gui.drawText(draw_x + ((i - 1) % 9) * column_width, draw_y + row * row_height, value, mapColor, 0x00000000);
+		end
+	end
+end
+
+local tile_width = 8;
+local tile_height = 8;
+local hitbox_width = 16;
+local hitbox_height = 16;
+
+function draw_objects()
+	local currentMap = mainmemory.readbyte(Game.Memory.current_map);
+	if type(object_arrays[currentMap]) == "table" then
+		local x_offset = 4;
+		local y_offset = 0;
+		if client.bufferheight() == 243 then -- Compensate for overscan
+			x_offset = 17;
+			y_offset = 27;
+		end
+		for i = 1, object_arrays[currentMap].objects do
+			local objectBase = object_arrays[currentMap].start + (i - 1) * 4;
+			local id = mainmemory.readbyte(objectBase + object.obj_type);
+			if id < 0x80 then
+				local xPos = mainmemory.readbyte(objectBase + object.x_position);
+				local yPos = mainmemory.readbyte(objectBase + object.y_position);
+				local contents = bit.band(mainmemory.readbyte(objectBase + object.contents), 0xF0);
+				if type(object.content_types[contents]) == "string" then
+					contents = object.content_types[contents];
+				else
+					contents = "U "..toHexString(contents);
+				end
+				--print(toHexString(objectBase).." at "..xPos..","..yPos.." is "..contents);
+				gui.drawRectangle(x_offset + xPos * tile_width, y_offset + yPos * tile_height, hitbox_width, hitbox_height);
+				--gui.drawText(x_offset + xPos * tile_width, y_offset + yPos * tile_height, toHexString(objectBase));
+				gui.drawText(x_offset + xPos * tile_width, y_offset + yPos * tile_height, contents);
+			end
 		end
 	end
 end
@@ -250,20 +299,35 @@ end
 function Game.drawUI()
 	if mainmemory.readbyte(Game.Memory.horizontal_map_position) % 2 == 1 then
 		draw_map();
+	else
+		draw_objects();
 	end
 end
 
 function Game.eachFrame()
+	--[[
 	if Game.getPieceDistribution() == 15 and Game.getTotalPieces() == 36 then
 		print("15 piece on frame "..emu.framecount());
 	end
+	--]]--
+end
+
+function Game.applyInfinites()
+	mainmemory.writebyte(Game.Memory.snoozes, 0xFF);
+	mainmemory.writebyte(Game.Memory.lift_resets, 0xFF);
 end
 
 Game.OSD = {
 	{"X", Game.getXPosition},
 	{"Y", Game.getYPosition},
+	{"Separator", 1},
+	{"dX"},
+	{"dY"},
+	{"Separator", 1},
 	{"Map", Game.getCurrentMap},
+	{"Snooze Timer", Game.getSnoozeTimer},
 	{"IGT", Game.getIGT},
+	{"Separator", 1},
 	{"Piece Dist", Game.getPieceDistributionOSD},
 	{"Best Dist", Game.getBestPieceDistribution},
 };
