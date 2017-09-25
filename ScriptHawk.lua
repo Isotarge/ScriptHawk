@@ -807,10 +807,12 @@ ScriptHawk.UI.form_controls["Increase Precision Button"] = forms.button(ScriptHa
 ScriptHawk.UI.form_controls["Precision Value Label"] = forms.label(ScriptHawk.UI.options_form, precision, ScriptHawk.UI.col(5), ScriptHawk.UI.row(1) + ScriptHawk.UI.label_offset, 44, 14);
 
 if not TASSafe then
-	ScriptHawk.UI.form_controls["Speed Label"] = forms.label(ScriptHawk.UI.options_form, "Speed:", ScriptHawk.UI.col(0), ScriptHawk.UI.row(2) + ScriptHawk.UI.label_offset, 54, 14);
-	ScriptHawk.UI.form_controls["Decrease Speed Button"] = forms.button(ScriptHawk.UI.options_form, "-", decreaseSpeed, ScriptHawk.UI.col(4) - 28, ScriptHawk.UI.row(2), ScriptHawk.UI.button_height, ScriptHawk.UI.button_height);
-	ScriptHawk.UI.form_controls["Increase Speed Button"] = forms.button(ScriptHawk.UI.options_form, "+", increaseSpeed, ScriptHawk.UI.col(5) - 28, ScriptHawk.UI.row(2), ScriptHawk.UI.button_height, ScriptHawk.UI.button_height);
-	ScriptHawk.UI.form_controls["Speed Value Label"] = forms.label(ScriptHawk.UI.options_form, "0", ScriptHawk.UI.col(5), ScriptHawk.UI.row(2) + ScriptHawk.UI.label_offset, 47, 14);
+	if ScriptHawk.dpad.joypad.enabled or ScriptHawk.dpad.key.enabled then
+		ScriptHawk.UI.form_controls["Speed Label"] = forms.label(ScriptHawk.UI.options_form, "Speed:", ScriptHawk.UI.col(0), ScriptHawk.UI.row(2) + ScriptHawk.UI.label_offset, 54, 14);
+		ScriptHawk.UI.form_controls["Decrease Speed Button"] = forms.button(ScriptHawk.UI.options_form, "-", decreaseSpeed, ScriptHawk.UI.col(4) - 28, ScriptHawk.UI.row(2), ScriptHawk.UI.button_height, ScriptHawk.UI.button_height);
+		ScriptHawk.UI.form_controls["Increase Speed Button"] = forms.button(ScriptHawk.UI.options_form, "+", increaseSpeed, ScriptHawk.UI.col(5) - 28, ScriptHawk.UI.row(2), ScriptHawk.UI.button_height, ScriptHawk.UI.button_height);
+		ScriptHawk.UI.form_controls["Speed Value Label"] = forms.label(ScriptHawk.UI.options_form, "0", ScriptHawk.UI.col(5), ScriptHawk.UI.row(2) + ScriptHawk.UI.label_offset, 47, 14);
+	end
 
 	if type(Game.maps) == "table" then
 		local filteredMaps = {};
@@ -894,7 +896,9 @@ function ScriptHawk.UI.updateReadouts()
 	forms.settext(ScriptHawk.UI.form_controls["Precision Value Label"], precision);
 	forms.settext(ScriptHawk.UI.form_controls["Toggle Rotation Units Button"], rotation_units);
 	if not TASSafe then
-		forms.settext(ScriptHawk.UI.form_controls["Speed Value Label"], Game.speedy_speeds[Game.speedy_index]);
+		if ScriptHawk.dpad.joypad.enabled or ScriptHawk.dpad.key.enabled then
+			forms.settext(ScriptHawk.UI.form_controls["Speed Value Label"], Game.speedy_speeds[Game.speedy_index]);
+		end
 		forms.settext(ScriptHawk.UI.form_controls["Mode Button"], ScriptHawk.mode);
 
 		if type(Game.maps) == "table" and previous_map ~= forms.gettext(ScriptHawk.UI.form_controls["Map Dropdown"]) then
@@ -1078,10 +1082,24 @@ local function mainloop()
 
 		-- Check for D-Pad and L button pressed
 		lbutton_pressed = joypad_pressed[ScriptHawk.lbutton.joypad] or input_pressed[ScriptHawk.lbutton.key];
-		dpad_pressed.up = (ScriptHawk.dpad.joypad.enabled and joypad_pressed[ScriptHawk.dpad.joypad.up]) or (ScriptHawk.dpad.key.enabled and input_pressed[ScriptHawk.dpad.key.up]);
-		dpad_pressed.down = (ScriptHawk.dpad.joypad.enabled and joypad_pressed[ScriptHawk.dpad.joypad.down]) or (ScriptHawk.dpad.key.enabled and input_pressed[ScriptHawk.dpad.key.down]);
-		dpad_pressed.left = (ScriptHawk.dpad.joypad.enabled and joypad_pressed[ScriptHawk.dpad.joypad.left]) or (ScriptHawk.dpad.key.enabled and input_pressed[ScriptHawk.dpad.key.left]);
-		dpad_pressed.right = (ScriptHawk.dpad.joypad.enabled and joypad_pressed[ScriptHawk.dpad.joypad.right]) or (ScriptHawk.dpad.key.enabled and input_pressed[ScriptHawk.dpad.key.right]);
+
+		dpad_pressed.up = false;
+		dpad_pressed.down = false;
+		dpad_pressed.left = false;
+		dpad_pressed.right = false;
+
+		if ScriptHawk.dpad.joypad.enabled then
+			dpad_pressed.up = dpad_pressed.up or joypad_pressed[ScriptHawk.dpad.joypad.up];
+			dpad_pressed.down = dpad_pressed.down or joypad_pressed[ScriptHawk.dpad.joypad.down];
+			dpad_pressed.left = dpad_pressed.left or joypad_pressed[ScriptHawk.dpad.joypad.left];
+			dpad_pressed.right = dpad_pressed.right or joypad_pressed[ScriptHawk.dpad.joypad.right];
+		end
+		if ScriptHawk.dpad.key.enabled then
+			dpad_pressed.up = dpad_pressed.up or input_pressed[ScriptHawk.dpad.key.up];
+			dpad_pressed.down = dpad_pressed.down or input_pressed[ScriptHawk.dpad.key.down];
+			dpad_pressed.left = dpad_pressed.left or input_pressed[ScriptHawk.dpad.key.left];
+			dpad_pressed.right = dpad_pressed.right or input_pressed[ScriptHawk.dpad.key.right];
+		end
 
 		-- Speed things up by returning early if no inputs are pressed
 		if not (lbutton_pressed or dpad_pressed.up or dpad_pressed.down or dpad_pressed.left or dpad_pressed.right) then
