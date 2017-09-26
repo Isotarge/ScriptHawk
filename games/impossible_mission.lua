@@ -52,7 +52,7 @@ function Game.detectVersion(romName, romHash)
 	return true;
 end
 
-object_arrays = { -- Use indexes from maps array
+local object_arrays = { -- Use indexes from maps array
 	[0x00] = {start=0x11D7, objects=4, exits="ur"},
 	[0x01] = {start=0x11EC, objects=3, exits="dr"},
 	[0x02] = {start=0x1201, objects=5, exits="dr"},
@@ -85,37 +85,34 @@ object_arrays = { -- Use indexes from maps array
 	[0x1D] = {start=0x1484, objects=4, exits="ur"},
 };
 
-object = {
+local object = {
 	obj_type = 0x00,
 	obj_types = {
 		--[0x00] = "??",
-		[0x01] = "Blue Computer",
-		[0x02] = "Printer",
-		[0x03] = "Oven",
-		[0x04] = "Desk",
-		[0x05] = "Bed",
-		[0x06] = "Drawers",
-		[0x07] = "Fireplace ",
-		[0x08] = "Sideways blue monitor",
-		[0x09] = "Pink Chair",
-		[0x0A] = "Flashing brown and blue rectangle",
-		[0x0B] = "Brown and blue box",
-		[0x0C] = "Bookshelf",
-		[0x0D] = "Roll on deodorant",
-		[0x0E] = "Lamp",
-		[0x0F] = "Lounge",
-		[0x10] = "Sink",
-		[0x11] = "Small Pink thing",
-		[0x12] = "Bathtub",
-		[0x13] = "Toilet",
-		[0x14] = "Candy",
-		[0x15] = "End of Game Object",
-		[0x16] = "Microwave",
-		[0x17] = "Desk 2",
-		[0x18] = "Fridge",
-		[0x19] = "*Crash",
-		--
-		[0x1D] = "A2600 mode crash",
+		[0x01] = {hitbox_width=24, hitbox_height=32, name="Blue Computer"},
+		[0x02] = {hitbox_width=24, hitbox_height=24, name="Printer"},
+		[0x03] = {hitbox_width=40, hitbox_height=32, name="Oven"},
+		[0x04] = {hitbox_width=40, hitbox_height=24, name="Desk"},
+		[0x05] = {hitbox_width=40, hitbox_height=16, name="Bed"},
+		[0x06] = {hitbox_width=16, hitbox_height=24, name="Drawers"},
+		[0x07] = {hitbox_width=56, hitbox_height=24, name="Fireplace"},
+		[0x08] = {hitbox_width=16, hitbox_height=24, name="Sideways blue monitor"},
+		[0x09] = {hitbox_width=16, hitbox_height=24, name="Pink Chair"},
+		[0x0A] = {hitbox_width=16, hitbox_height=24, name="Flashing brown and blue rectangle"},
+		[0x0B] = {hitbox_width=16, hitbox_height=16, name="Brown and blue box"},
+		[0x0C] = {hitbox_width=24, hitbox_height=32, name="Bookshelf"},
+		[0x0D] = {hitbox_width=16, hitbox_height=24, name="Roll on deodorant"},
+		[0x0E] = {hitbox_width=16, hitbox_height=24, name="Lamp"},
+		[0x0F] = {hitbox_width=40, hitbox_height=16, name="Lounge"},
+		[0x10] = {hitbox_width=16, hitbox_height=32, name="Sink"},
+		[0x11] = {hitbox_width=8, hitbox_height=8, name="Small Pink thing"},
+		[0x12] = {hitbox_width=40, hitbox_height=24, name="Bathtub"},
+		[0x13] = {hitbox_width=16, hitbox_height=16, name="Toilet"},
+		[0x14] = {hitbox_width=32, hitbox_height=32, name="Candy"},
+		[0x15] = {hitbox_width=40, hitbox_height=32, name="End of Game Object"},
+		[0x16] = {hitbox_width=24, hitbox_height=24, name="Microwave"},
+		[0x17] = {hitbox_width=32, hitbox_height=24, name="Desk 2"},
+		[0x18] = {hitbox_width=24, hitbox_height=32, name="Fridge"},
 	},
 	x_position = 0x01,
 	y_position = 0x02,
@@ -156,7 +153,7 @@ function Game.getSnoozeTimer()
 	return mainmemory.readbyte(Game.Memory.snooze_timer);
 end
 
-function countPuzzlePieces(index)
+function Game.countPuzzlePieces(index)
 	local count = 0;
 	if type(object_arrays[index]) == "table" then
 		for i = 1, object_arrays[index].objects do
@@ -175,12 +172,12 @@ end
 function Game.getTotalPieces()
 	local pieceCount = 0;
 	for i = 0x00, 0x1D do
-		pieceCount = pieceCount + countPuzzlePieces(i);
+		pieceCount = pieceCount + Game.countPuzzlePieces(i);
 	end
 	return pieceCount;
 end
 
-function draw_map()
+local function draw_map()
 	local value;
 	local row_height = 8;
 	local column_width = 16;
@@ -200,7 +197,7 @@ function draw_map()
 		if value == 0x0F then -- Color end map purple
 			mapColor = 0xFFFF00FF;
 		end
-		value = countPuzzlePieces(value);
+		value = Game.countPuzzlePieces(value);
 		if value == 0 then
 			mapColor = mapColor - 0x80000000; -- Halve alpha
 			gui.drawText(draw_x + ((i - 1) % 9) * column_width, draw_y + row * row_height - 3, ".", mapColor, 0x00000000);
@@ -212,10 +209,10 @@ end
 
 local tile_width = 8;
 local tile_height = 8;
-local hitbox_width = 16;
-local hitbox_height = 16;
+local default_hitbox_width = 16;
+local default_hitbox_height = 16;
 
-function draw_objects()
+local function draw_objects()
 	local currentMap = mainmemory.readbyte(Game.Memory.current_map);
 	if type(object_arrays[currentMap]) == "table" then
 		local x_offset = 4;
@@ -236,9 +233,13 @@ function draw_objects()
 				else
 					contents = "U "..toHexString(contents);
 				end
-				--print(toHexString(objectBase).." at "..xPos..","..yPos.." is "..contents);
+				local hitbox_width = default_hitbox_width;
+				local hitbox_height = default_hitbox_height;
+				if type(object.obj_types[id]) == "table" then
+					hitbox_width = object.obj_types[id].hitbox_width;
+					hitbox_height = object.obj_types[id].hitbox_height;
+				end
 				gui.drawRectangle(x_offset + xPos * tile_width, y_offset + yPos * tile_height, hitbox_width, hitbox_height);
-				--gui.drawText(x_offset + xPos * tile_width, y_offset + yPos * tile_height, toHexString(objectBase));
 				gui.drawText(x_offset + xPos * tile_width, y_offset + yPos * tile_height, contents);
 			end
 		end
@@ -277,11 +278,11 @@ function Game.getBestPieceDistribution()
 	return Game.bestPieceDistribution.." Rooms";
 end
 
-local function resetBestDistribution()
+function Game.resetBestDistribution()
 	Game.bestPieceDistribution = 100;
 end
 
-function completeMinimap()
+function Game.completeMinimap()
 	for i = 0x1B5A, 0x1BBF do
 		local value = mainmemory.readbyte(i);
 		if value < 0x80 then
@@ -292,8 +293,8 @@ function completeMinimap()
 end
 
 function Game.initUI()
-	ScriptHawk.UI.form_controls["Complete Minimap Button"] = forms.button(ScriptHawk.UI.options_form, "Complete Minimap", completeMinimap, ScriptHawk.UI.col(10), ScriptHawk.UI.row(4), ScriptHawk.UI.col(4) + 10, ScriptHawk.UI.button_height);
-	ScriptHawk.UI.form_controls["Reset Best Distribution"] = forms.button(ScriptHawk.UI.options_form, "Reset Best Dist.", resetBestDistribution, ScriptHawk.UI.col(10), ScriptHawk.UI.row(5), ScriptHawk.UI.col(4) + 10, ScriptHawk.UI.button_height);
+	ScriptHawk.UI.form_controls["Complete Minimap Button"] = forms.button(ScriptHawk.UI.options_form, "Complete Minimap", Game.completeMinimap, ScriptHawk.UI.col(10), ScriptHawk.UI.row(4), ScriptHawk.UI.col(4) + 10, ScriptHawk.UI.button_height);
+	ScriptHawk.UI.form_controls["Reset Best Distribution"] = forms.button(ScriptHawk.UI.options_form, "Reset Best Dist.", Game.resetBestDistribution, ScriptHawk.UI.col(10), ScriptHawk.UI.row(5), ScriptHawk.UI.col(4) + 10, ScriptHawk.UI.button_height);
 end
 
 function Game.drawUI()
