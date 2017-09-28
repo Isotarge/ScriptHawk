@@ -298,7 +298,8 @@ end
 
 local startFrame = 492;
 --local resetFrame = 544;
-local resetFrame = 580;
+--local resetFrame = 580;
+local resetFrame = 710;
 local checkFrame = resetFrame + 13;
 --local numFrames = 52;
 local numFrames = 88;
@@ -367,7 +368,7 @@ function botLoop()
 			if checkBestAttempt() == true then
 				updateBestAttempt();
 			end
-			tastudio.setplayback(startFrame - 1);
+			tastudio.setplayback(lastPauseFrame - 1);
 			if iterateBotInput() == false then
 				bot_is_running = false;
 				bot_is_outputting_best_input = true;
