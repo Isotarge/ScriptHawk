@@ -72,6 +72,7 @@ local Game = {
 		["current_exit"] = {0x76A0AC, 0x764BCC, 0x76A29C, 0x72CDE8}, -- u32_be
 		["exit_array_pointer"] = {0x7FC900, 0x7FC840, 0x7FCD90, 0x7B6520}, -- Pointer
 		["number_of_exits"] = {0x7FC904, 0x7FC844, 0x7FCD94, 0x7B6524}, -- Byte
+		["lag_boost"] = {0x744478, nil, nil, nil}, -- TODO: All versions
 		["destination_map"] = {0x7444E4, 0x73EC34, 0x743DA4, 0x6F1CC4}, -- See Game.maps for values
 		["destination_exit"] = {0x7444E8, 0x73EC38, 0x743DA8, 0x6F1CC8},
 		-- 1000 0000 - ????
@@ -94,8 +95,8 @@ local Game = {
 		["enemy_table"] = {0x75EB80, 0x759690, 0x75ED40, 0x70A460},
 		-- 1000 0000 - ????
 		-- 0100 0000 - ????
-		-- 0010 0000 - Tag Barrel Void
-		-- 0001 0000 - Show Model 2 Objects
+		-- 0010 0000 - Show Model 2 Objects
+		-- 0001 0000 - Tag Barrel Void
 		-- 0000 1000 - ????
 		-- 0000 0100 - ????
 		-- 0000 0010 - ????
@@ -4895,8 +4896,8 @@ end
 
 function Game.toggleTBVoid()
 	local tb_void_byte_val = mainmemory.readbyte(Game.Memory.tb_void_byte[version]);
-	tb_void_byte_val = toggle_bit(tb_void_byte_val, 4); -- Show Object Model 2 Objects
-	tb_void_byte_val = toggle_bit(tb_void_byte_val, 5); -- Turn on the lights
+	tb_void_byte_val = toggle_bit(tb_void_byte_val, 4); -- Turn on the lights
+	tb_void_byte_val = toggle_bit(tb_void_byte_val, 5); -- Show Object Model 2 Objects
 	mainmemory.writebyte(Game.Memory.tb_void_byte[version], tb_void_byte_val);
 end
 
@@ -5336,6 +5337,10 @@ local function fixLag()
 		local frames_real_value = mainmemory.read_u32_be(Game.Memory.frames_real[version]);
 		mainmemory.write_u32_be(Game.Memory.frames_lag[version], frames_real_value - lag_factor);
 	end
+end
+
+function Game.getLagFactor()
+	return mainmemory.read_u32_be(Game.Memory.lag_boost[version]);
 end
 
 local moon_mode = "None";
@@ -7565,6 +7570,7 @@ Game.standardOSD = {
 	{"Separator", 1},
 	{"Floor", Game.getFloor},
 	{"Separator", 1},
+	--{"Lag Factor", Game.getLagFactor},
 	{"dY"},
 	{"dXZ"},
 	{"Velocity", Game.getVelocity},
