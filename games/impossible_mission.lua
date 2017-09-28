@@ -297,12 +297,11 @@ end
 ---------
 
 local startFrame = 492;
+local start2Frame = 512;
 --local resetFrame = 544;
 local resetFrame = 580;
---local resetFrame = 710;
 local checkFrame = resetFrame + 13;
---local numFrames = 52;
-local numFrames = 88;
+local numFrames = 52;
 
 -- State for current attempt
 local lastPauseFrame;
@@ -317,16 +316,20 @@ local bestDistribution;
 function initBotInput()
 	numFrames = checkFrame - startFrame;
 	lastPauseFrame = startFrame - 2;
-	last2Frame = startFrame - 2;
+	last2Frame = start2Frame - 2;
 end
 
 function iterateBotInput()
 	last2Frame = last2Frame + 2;
 	if last2Frame > resetFrame then
-		last2Frame = startFrame - 2;
+		last2Frame = start2Frame - 2;
 		lastPauseFrame = lastPauseFrame + 2;
 	end
 	return not (lastPauseFrame > checkFrame);
+end
+
+function getSeekFrame(lastPauseFrame, last2Frame)
+	return math.min(lastPauseFrame, last2Frame) - 1;
 end
 
 function countNumPressed(lastPauseFrame, last2Frame)
@@ -352,10 +355,13 @@ end
 function updateBestAttempt()
 	bestDistribution = Game.getPieceDistribution();
 
-	-- Clone the lastPauseFrame table to bestLastPauseFrame
-	bestLastPauseFrame = lastPauseFrame;
-	bestLast2Frame = last2Frame;
+	-- Copy state for best attempt
+	bestLastPauseFrame = lastPauseFrame + 0;
+	bestLast2Frame = last2Frame + 0;
 
+	print("bestLastPauseFrame"..bestLastPauseFrame);
+	print("bestLast2Frame"..bestLast2Frame);
+	
 	-- Count how many inputs were made during the best attempt
 	bestNumPressed = countNumPressed(bestLastPauseFrame, bestLast2Frame);
 end
@@ -377,11 +383,14 @@ function botLoop()
 			if checkBestAttempt() == true then
 				updateBestAttempt();
 			end
-			tastudio.setplayback(last2Frame - 1);
+			tastudio.setplayback(getSeekFrame(lastPauseFrame, last2Frame));
 			if iterateBotInput() == false then
 				bot_is_running = false;
 				bot_is_outputting_best_input = true;
 				print("Finished! Best Distribution: "..bestDistribution);
+				print("bestLastPauseFrame"..bestLastPauseFrame);
+				print("bestLast2Frame"..bestLast2Frame);
+				tastudio.setplayback(startFrame - 1);
 			end
 		elseif currentFrame < checkFrame then
 			local relativeFrame = currentFrame - startFrame;
