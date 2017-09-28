@@ -298,32 +298,39 @@ end
 
 local startFrame = 492;
 --local resetFrame = 544;
---local resetFrame = 580;
-local resetFrame = 710;
+local resetFrame = 580;
+--local resetFrame = 710;
 local checkFrame = resetFrame + 13;
 --local numFrames = 52;
 local numFrames = 88;
 
 -- State for current attempt
 local lastPauseFrame;
+local last2Frame;
 
 -- State for best attempt
 local bestLastPauseFrame;
+local bestLast2Frame;
 local bestNumPresed;
 local bestDistribution;
 
 function initBotInput()
 	numFrames = checkFrame - startFrame;
 	lastPauseFrame = startFrame - 2;
+	last2Frame = startFrame - 2;
 end
 
 function iterateBotInput()
-	lastPauseFrame = lastPauseFrame + 2;
+	last2Frame = last2Frame + 2;
+	if last2Frame > resetFrame then
+		last2Frame = startFrame - 2;
+		lastPauseFrame = lastPauseFrame + 2;
+	end
 	return not (lastPauseFrame > checkFrame);
 end
 
-function countNumPressed(lastPauseFrame)
-	return (lastPauseFrame - startFrame) / 2;
+function countNumPressed(lastPauseFrame, last2Frame)
+	return ((lastPauseFrame - startFrame) / 2) + ((last2Frame - startFrame) / 2);
 end
 
 function checkBestAttempt()
@@ -333,7 +340,7 @@ function checkBestAttempt()
 	end
 
 	local currentDistribution = Game.getPieceDistribution();
-	local currentNumPressed = countNumPressed(lastPauseFrame);
+	local currentNumPressed = countNumPressed(lastPauseFrame, last2Frame);
 
 	if currentDistribution > 0 and currentDistribution < bestDistribution then
 		print("Best input beaten with new distribution: "..currentDistribution);
@@ -347,13 +354,15 @@ function updateBestAttempt()
 
 	-- Clone the lastPauseFrame table to bestLastPauseFrame
 	bestLastPauseFrame = lastPauseFrame;
+	bestLast2Frame = last2Frame;
 
-	-- Count how many frames pause is pressed in the best lastPauseFrame
-	bestNumPressed = countNumPressed(bestLastPauseFrame);
+	-- Count how many inputs were made during the best attempt
+	bestNumPressed = countNumPressed(bestLastPauseFrame, bestLast2Frame);
 end
 
 function clearBestAttempt()
 	bestLastPauseFrame = nil;
+	bestLast2Frame = nil;
 	bestDistribution = 100;
 end
 
@@ -368,7 +377,7 @@ function botLoop()
 			if checkBestAttempt() == true then
 				updateBestAttempt();
 			end
-			tastudio.setplayback(lastPauseFrame - 1);
+			tastudio.setplayback(last2Frame - 1);
 			if iterateBotInput() == false then
 				bot_is_running = false;
 				bot_is_outputting_best_input = true;
@@ -377,6 +386,7 @@ function botLoop()
 		elseif currentFrame < checkFrame then
 			local relativeFrame = currentFrame - startFrame;
 			joypad.set({["Pause"] = (relativeFrame >= 0) and (currentFrame < lastPauseFrame) and relativeFrame % 2 == 0});
+			joypad.set({["B2"] = (relativeFrame >= 0) and (currentFrame < last2Frame) and relativeFrame % 2 == 0}, 1);
 			if currentFrame == resetFrame then
 				joypad.set({["Reset"] = true});
 			end
@@ -395,6 +405,7 @@ function botLoop()
 		elseif currentFrame < checkFrame then
 			local relativeFrame = currentFrame - startFrame;
 			joypad.set({["Pause"] = (relativeFrame >= 0) and (currentFrame < bestLastPauseFrame) and relativeFrame % 2 == 0});
+			joypad.set({["B2"] = (relativeFrame >= 0) and (currentFrame < bestLast2Frame) and relativeFrame % 2 == 0}, 1);
 			if currentFrame == resetFrame then
 				joypad.set({["Reset"] = true});
 			end
@@ -408,6 +419,7 @@ function startBot()
 	bot_is_running = true;
 	bot_is_outputting_best_input = false;
 	lastPauseFrame = nil;
+	last2Frame = nil;
 	tastudio.setrecording(true);
 	tastudio.setplayback(startFrame - 1);
 	client.unpause();
