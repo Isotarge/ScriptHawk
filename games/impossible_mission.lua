@@ -9,6 +9,7 @@ local Game = {
 	Memory = {
 		current_map = 0x97,
 		horizontal_map_position = 0x98,
+		memory_selected = 0xA5,
 		lift_resets = 0xB5,
 		snoozes = 0xB6,
 		snooze_timer = 0xB7,
@@ -20,6 +21,8 @@ local Game = {
 			seconds = 0x00CC,
 			centiseconds = 0x00CD,
 		},
+		puzzle_rotation = 0x1B12,
+		puzzle_pieces = 0x1B36,
 		map_addresses = {
 			0x1B5A, 0x1B5C, 0x1B5E, 0x1B60, 0x1B62, 0x1B64, 0x1B66, 0x1B68, 0x1B6A,
 			0x1B6B, 0x1B6D, 0x1B6F, 0x1B71, 0x1B73, 0x1B75, 0x1B77, 0x1B79, 0x1B7B,
@@ -207,6 +210,28 @@ local function draw_map()
 	end
 end
 
+local function draw_puzzle()
+	local memorySelected = mainmemory.readbyte(Game.Memory.memory_selected);
+
+	local piece0 = mainmemory.readbyte(Game.Memory.puzzle_pieces + memorySelected);
+	local piece0Major = math.floor(piece0 / 4);
+	local piece0Minor = piece0 % 4;
+
+	local piece1 = mainmemory.readbyte(Game.Memory.puzzle_pieces + memorySelected + 1);
+	local piece1Major = math.floor(piece1 / 4);
+	local piece1Minor = piece1 % 4;
+
+	local puzzleX = 55;
+	local puzzleY = 123;
+	if client.bufferheight() == 243 then -- Compensate for overscan
+		puzzleX = 68;
+		puzzleY = 150;
+	end
+
+	gui.drawText(puzzleX, puzzleY, piece0Major.."-"..piece0Minor, 0xFFFFFFFF);
+	gui.drawText(puzzleX, puzzleY + 24, piece1Major.."-"..piece1Minor, 0xFFFFFFFF);
+end
+
 local tile_width = 8;
 local tile_height = 8;
 local default_hitbox_width = 16;
@@ -297,9 +322,10 @@ end
 ---------
 
 local startFrame = 492;
-local start2Frame = 512;
+local start2Frame = 580;
+--local start2Frame = 512;
 --local resetFrame = 544;
-local resetFrame = 580;
+local resetFrame = 589;
 local checkFrame = resetFrame + 13;
 local numFrames = 52;
 
@@ -316,20 +342,16 @@ local bestDistribution;
 function initBotInput()
 	numFrames = checkFrame - startFrame;
 	lastPauseFrame = startFrame - 2;
-	last2Frame = start2Frame - 2;
+	last2Frame = start2Frame - 1;
 end
 
 function iterateBotInput()
-	last2Frame = last2Frame + 2;
+	last2Frame = last2Frame + 1;
 	if last2Frame > resetFrame then
-		last2Frame = start2Frame - 2;
+		last2Frame = start2Frame - 1;
 		lastPauseFrame = lastPauseFrame + 2;
 	end
 	return not (lastPauseFrame > checkFrame);
-end
-
-function getSeekFrame(lastPauseFrame, last2Frame)
-	return math.min(lastPauseFrame, last2Frame) - 1;
 end
 
 function countNumPressed(lastPauseFrame, last2Frame)
@@ -356,11 +378,11 @@ function updateBestAttempt()
 	bestDistribution = Game.getPieceDistribution();
 
 	-- Copy state for best attempt
-	bestLastPauseFrame = lastPauseFrame + 0;
-	bestLast2Frame = last2Frame + 0;
+	bestLastPauseFrame = lastPauseFrame;
+	bestLast2Frame = last2Frame;
 
-	print("bestLastPauseFrame"..bestLastPauseFrame);
-	print("bestLast2Frame"..bestLast2Frame);
+	print("bestLastPauseFrame: "..bestLastPauseFrame);
+	print("bestLast2Frame: "..bestLast2Frame);
 	
 	-- Count how many inputs were made during the best attempt
 	bestNumPressed = countNumPressed(bestLastPauseFrame, bestLast2Frame);
@@ -383,19 +405,22 @@ function botLoop()
 			if checkBestAttempt() == true then
 				updateBestAttempt();
 			end
-			tastudio.setplayback(getSeekFrame(lastPauseFrame, last2Frame));
 			if iterateBotInput() == false then
 				bot_is_running = false;
 				bot_is_outputting_best_input = true;
 				print("Finished! Best Distribution: "..bestDistribution);
-				print("bestLastPauseFrame"..bestLastPauseFrame);
-				print("bestLast2Frame"..bestLast2Frame);
-				tastudio.setplayback(startFrame - 1);
+				print("bestLastPauseFrame: "..bestLastPauseFrame);
+				print("bestLast2Frame: "..bestLast2Frame);
+				tastudio.setplayback(startFrame);
+				botLoop();
+				return;
 			end
+			tastudio.setplayback(math.min(lastPauseFrame - 1, last2Frame));
+			botLoop();
 		elseif currentFrame < checkFrame then
 			local relativeFrame = currentFrame - startFrame;
-			joypad.set({["Pause"] = (relativeFrame >= 0) and (currentFrame < lastPauseFrame) and relativeFrame % 2 == 0});
-			joypad.set({["B2"] = (relativeFrame >= 0) and (currentFrame < last2Frame) and relativeFrame % 2 == 0}, 1);
+			joypad.set({["Pause"] = (currentFrame <= lastPauseFrame) and (relativeFrame >= 0) and (relativeFrame % 2 == 0)});
+			joypad.set({["B2"] = (relativeFrame >= 0) and (currentFrame <= last2Frame)}, 1);
 			if currentFrame == resetFrame then
 				joypad.set({["Reset"] = true});
 			end
@@ -408,17 +433,21 @@ function botLoop()
 			client.pause();
 			if Game.bestPieceDistribution > 15 then
 				resetFrame = resetFrame + 1;
-				print("15 didn't happen, restarting bot with reset frame "..resetFrame);
+				print("Didn't meet goal, restarting bot with reset frame "..resetFrame);
 				startBot();
+			else
+				print("Met goal, stopping bot!");
 			end
 		elseif currentFrame < checkFrame then
 			local relativeFrame = currentFrame - startFrame;
-			joypad.set({["Pause"] = (relativeFrame >= 0) and (currentFrame < bestLastPauseFrame) and relativeFrame % 2 == 0});
-			joypad.set({["B2"] = (relativeFrame >= 0) and (currentFrame < bestLast2Frame) and relativeFrame % 2 == 0}, 1);
+			joypad.set({["Pause"] = (currentFrame <= bestLastPauseFrame) and (relativeFrame >= 0) and (relativeFrame % 2 == 0)});
+			joypad.set({["B2"] = (relativeFrame >= 0) and (currentFrame <= bestLast2Frame)}, 1);
 			if currentFrame == resetFrame then
 				joypad.set({["Reset"] = true});
 			end
 		end
+	else
+		Game.OSD = Game.standardOSD;
 	end
 end
 
@@ -432,6 +461,7 @@ function startBot()
 	tastudio.setrecording(true);
 	tastudio.setplayback(startFrame - 1);
 	client.unpause();
+	Game.OSD = Game.botOSD;
 end
 
 function Game.initUI()
@@ -448,7 +478,11 @@ end
 function Game.drawUI()
 	if forms.ischecked(ScriptHawk.UI.form_controls["Toggle Overlay Checkbox"]) then
 		if mainmemory.readbyte(Game.Memory.horizontal_map_position) % 2 == 1 then
-			draw_map();
+			if mainmemory.readbyte(0x93) ~= 137 then
+				draw_map();
+			else
+				draw_puzzle();
+			end
 		else
 			draw_objects();
 		end
@@ -469,7 +503,7 @@ function Game.applyInfinites()
 	mainmemory.writebyte(Game.Memory.lift_resets, 0xFF);
 end
 
-Game.OSD = {
+Game.standardOSD = {
 	{"X", Game.getXPosition},
 	{"Y", Game.getYPosition},
 	{"Separator", 1},
@@ -483,5 +517,12 @@ Game.OSD = {
 	{"Piece Dist", Game.getPieceDistributionOSD},
 	{"Best Dist", Game.getBestPieceDistribution},
 };
+
+Game.botOSD = {
+	{"Piece Dist", Game.getPieceDistributionOSD},
+	{"Best Dist", Game.getBestPieceDistribution},
+};
+
+Game.OSD = Game.standardOSD;
 
 return Game;
