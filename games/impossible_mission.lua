@@ -216,20 +216,47 @@ local function draw_puzzle()
 	local piece0 = mainmemory.readbyte(Game.Memory.puzzle_pieces + memorySelected);
 	local piece0Major = math.floor(piece0 / 4);
 	local piece0Minor = piece0 % 4;
+	local piece0Rotation = mainmemory.readbyte(Game.Memory.puzzle_rotation + piece0);
+	local piece0VFlipped = bit.band(0x40, piece0Rotation);
+	local piece0HFlipped = bit.band(0x80, piece0Rotation);
+	if piece0VFlipped > 0 then
+		piece0VFlipped = "V";
+	else
+		piece0VFlipped = "";
+	end
+	
+	if piece0HFlipped > 0 then
+		piece0HFlipped = "H";
+	else
+		piece0HFlipped = "";
+	end
 
 	local piece1 = mainmemory.readbyte(Game.Memory.puzzle_pieces + memorySelected + 1);
 	local piece1Major = math.floor(piece1 / 4);
 	local piece1Minor = piece1 % 4;
+	local piece1Rotation = mainmemory.readbyte(Game.Memory.puzzle_rotation + piece1);
+	local piece1VFlipped = bit.band(0x40, piece1Rotation);
+	local piece1HFlipped = bit.band(0x80, piece1Rotation);
+	if piece1VFlipped > 0 then
+		piece1VFlipped = "V";
+	else
+		piece1VFlipped = "";
+	end
+	if piece1HFlipped > 0 then
+		piece1HFlipped = "H";
+	else
+		piece1HFlipped = "";
+	end
 
-	local puzzleX = 55;
+	local puzzleX = 44;
 	local puzzleY = 123;
 	if client.bufferheight() == 243 then -- Compensate for overscan
-		puzzleX = 68;
+		puzzleX = 57;
 		puzzleY = 150;
 	end
 
-	gui.drawText(puzzleX, puzzleY, piece0Major.."-"..piece0Minor, 0xFFFFFFFF);
-	gui.drawText(puzzleX, puzzleY + 24, piece1Major.."-"..piece1Minor, 0xFFFFFFFF);
+	gui.drawText(puzzleX, puzzleY, piece0Major.."-"..piece0Minor.." "..piece0HFlipped..piece0VFlipped, 0xFFFFFFFF, 0x00000000);
+	gui.drawText(puzzleX, puzzleY + 24, piece1Major.."-"..piece1Minor.." "..piece1HFlipped..piece1VFlipped, 0xFFFFFFFF, 0x00000000);
 end
 
 local tile_width = 8;
