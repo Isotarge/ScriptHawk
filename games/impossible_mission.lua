@@ -7,6 +7,13 @@ end
 
 local Game = {
 	Memory = {
+		score_table_start = 0x10,
+		score_size = 0x06,
+		num_scores = 15,
+		score = {
+			digits = 0x00, -- 3 Bytes, Binary Coded Decimal
+			initials = 0x03, -- 3 Bytes, ASCII
+		},
 		current_map = 0x97,
 		horizontal_map_position = 0x98,
 		memory_selected = 0xA5,
@@ -47,12 +54,24 @@ local Game = {
 	speedy_index = 1,
 	max_rot_units = 0,
 	bestPieceDistribution = 100,
+	bestFlipsRequired = 100,
+	bestColorChangesRequired = 100,
 };
 
 function Game.detectVersion(romName, romHash)
 	ScriptHawk.dpad.joypad.enabled = false;
 	ScriptHawk.dpad.key.enabled = false;
 	return true;
+end
+
+function Game.dumpScores()
+	for i = 1, Game.Memory.num_scores do
+		local scoreBase = Game.Memory.score_table_start + (i - 1) * Game.Memory.score_size;
+		local score = toHexString(bit.band(mainmemory.readbyte(scoreBase + 0), 0x0F), 1, "")..toHexString(mainmemory.readbyte(scoreBase + 1), 2, "")..toHexString(mainmemory.readbyte(scoreBase + 2), 2, "");
+		local initials = readNullTerminatedString(scoreBase + Game.Memory.score.initials, 3);
+		dprint(i..": "..score.." "..initials);
+	end
+	print_deferred();
 end
 
 local object_arrays = { -- Use indexes from maps array
@@ -180,6 +199,86 @@ function Game.getTotalPieces()
 	return pieceCount;
 end
 
+function Game.getPuzzleFlipsRequired()
+	local flipsRequired = 0;
+	for i = 0, 8 do
+		local hSpotted = false;
+		local vSpotted = false;
+		local hvSpotted = false;
+		for j = 0, 3 do
+			local rotationValue = mainmemory.readbyte(Game.Memory.puzzle_rotation + (i * 4) + j);
+			local pieceVFlipped = bit.band(0x40, rotationValue) > 0;
+			local pieceHFlipped = bit.band(0x80, rotationValue) > 0;
+			if pieceVFlipped then
+				vSpotted = true;
+			end
+			if pieceHFlipped then
+				hSpotted = true;
+			end
+			if pieceHFlipped and pieceVFlipped then
+				hvSpotted = true;
+			end
+		end
+		if not hSpotted and not vSpotted and not hvSpotted then -- 0 0 0
+			-- No flips required
+		elseif hSpotted and not vSpotted and not hvSpotted then -- 1 0 0
+			flipsRequired = flipsRequired + 1;
+		elseif not hSpotted and vSpotted and not hvSpotted then -- 0 1 0
+			flipsRequired = flipsRequired + 1;
+		elseif not hSpotted and not vSpotted and hvSpotted then -- 0 0 1
+			flipsRequired = flipsRequired + 2;
+		elseif hSpotted and not vSpotted and hvSpotted then -- 1 0 1
+			flipsRequired = flipsRequired + 2;
+		elseif not hSpotted and vSpotted and hvSpotted then -- 0 1 1
+			flipsRequired = flipsRequired + 2;
+		elseif hSpotted and vSpotted and not hvSpotted then -- 1 1 0
+			flipsRequired = flipsRequired + 2;
+		elseif hSpotted and vSpotted and hvSpotted then -- 1 1 1
+			flipsRequired = flipsRequired + 3;
+		end
+	end
+	if flipsRequired > 0 and flipsRequired < Game.bestFlipsRequired and Game.getTotalPieces() == 36 then
+		print("New best puzzle flips required: "..flipsRequired);
+		Game.bestFlipsRequired = flipsRequired;
+	end
+	return flipsRequired;
+end
+
+function Game.getPuzzleColorChangesRequired()
+	local changesRequired = 0;
+	for i = 0, 8 do
+		local redSpotted = false;
+		local greenSpotted = false;
+		local blueSpotted = false;
+		for j = 0, 3 do
+			local colorValue = bit.band(mainmemory.readbyte(Game.Memory.puzzle_rotation + (i * 4) + j), 0x0F);
+			if colorValue == 0x01 then
+				redSpotted = true;
+			elseif colorValue == 0x02 then
+				greenSpotted = true;
+			elseif colorValue == 0x03 then
+				blueSpotted = true;
+			end
+		end
+		local uniqueColors = 0;
+		if redSpotted then
+			uniqueColors = uniqueColors + 1;
+		end
+		if greenSpotted then
+			uniqueColors = uniqueColors + 1;
+		end
+		if blueSpotted then
+			uniqueColors = uniqueColors + 1;
+		end
+		changesRequired = changesRequired + (uniqueColors - 1);
+	end
+	if changesRequired > 0 and changesRequired < Game.bestColorChangesRequired and Game.getTotalPieces() == 36 then
+		print("New best puzzle color changes required: "..changesRequired);
+		Game.bestColorChangesRequired = changesRequired;
+	end
+	return changesRequired;
+end
+
 local function draw_map()
 	local value;
 	local row_height = 8;
@@ -224,7 +323,7 @@ local function draw_puzzle()
 	else
 		piece0VFlipped = "";
 	end
-	
+
 	if piece0HFlipped > 0 then
 		piece0HFlipped = "H";
 	else
@@ -279,7 +378,8 @@ local function draw_objects()
 			if id < 0x80 then
 				local xPos = mainmemory.readbyte(objectBase + object.x_position);
 				local yPos = mainmemory.readbyte(objectBase + object.y_position);
-				local contents = bit.band(mainmemory.readbyte(objectBase + object.contents), 0xF0);
+				local contentsRaw = mainmemory.readbyte(objectBase + object.contents);
+				local contents = bit.band(contentsRaw, 0xF0);
 				if type(object.content_types[contents]) == "string" then
 					contents = object.content_types[contents];
 				else
@@ -293,6 +393,7 @@ local function draw_objects()
 				end
 				gui.drawRectangle(x_offset + xPos * tile_width, y_offset + yPos * tile_height, hitbox_width, hitbox_height);
 				gui.drawText(x_offset + xPos * tile_width, y_offset + yPos * tile_height, contents);
+				--gui.drawText(x_offset + xPos * tile_width, y_offset + yPos * tile_height + 16, toHexString(contentsRaw));
 			end
 		end
 	end
@@ -313,11 +414,9 @@ function Game.getPieceDistribution()
 			end
 		end
 	end
-	if count > 0 and count < Game.bestPieceDistribution then
-		if Game.getTotalPieces() == 36 then
-			print("New best puzzle distribution: "..count);
-			Game.bestPieceDistribution = count;
-		end
+	if count > 0 and count < Game.bestPieceDistribution and Game.getTotalPieces() == 36 then
+		print("New best puzzle distribution: "..count);
+		Game.bestPieceDistribution = count;
 	end
 	return count;
 end
@@ -330,8 +429,18 @@ function Game.getBestPieceDistribution()
 	return Game.bestPieceDistribution.." Rooms";
 end
 
+function Game.getBestPuzzleFlipsRequired()
+	return Game.bestFlipsRequired;
+end
+
+function Game.getBestPuzzleColorChangesRequired()
+	return Game.bestColorChangesRequired;
+end
+
 function Game.resetBestDistribution()
 	Game.bestPieceDistribution = 100;
+	Game.bestFlipsRequired = 100;
+	Game.bestColorChangesRequired = 100;
 end
 
 function Game.completeMinimap()
@@ -493,7 +602,7 @@ end
 
 function Game.initUI()
 	ScriptHawk.UI.form_controls["Complete Minimap Button"] = forms.button(ScriptHawk.UI.options_form, "Complete Minimap", Game.completeMinimap, ScriptHawk.UI.col(10), ScriptHawk.UI.row(4), ScriptHawk.UI.col(4) + 10, ScriptHawk.UI.button_height);
-	ScriptHawk.UI.form_controls["Reset Best Distribution"] = forms.button(ScriptHawk.UI.options_form, "Reset Best Dist.", Game.resetBestDistribution, ScriptHawk.UI.col(10), ScriptHawk.UI.row(5), ScriptHawk.UI.col(4) + 10, ScriptHawk.UI.button_height);
+	ScriptHawk.UI.form_controls["Reset Best Distribution"] = forms.button(ScriptHawk.UI.options_form, "Reset Best", Game.resetBestDistribution, ScriptHawk.UI.col(10), ScriptHawk.UI.row(5), ScriptHawk.UI.col(4) + 10, ScriptHawk.UI.button_height);
 	ScriptHawk.UI.form_controls["Toggle Overlay Checkbox"] = forms.checkbox(ScriptHawk.UI.options_form, "Overlay", ScriptHawk.UI.col(0) + ScriptHawk.UI.dropdown_offset, ScriptHawk.UI.row(6) + ScriptHawk.UI.dropdown_offset);
 	forms.setproperty(ScriptHawk.UI.form_controls["Toggle Overlay Checkbox"], "Checked", true);
 
@@ -543,11 +652,22 @@ Game.standardOSD = {
 	{"Separator", 1},
 	{"Piece Dist", Game.getPieceDistributionOSD},
 	{"Best Dist", Game.getBestPieceDistribution},
+	{"Separator", 1},
+	{"Flips Requried", Game.getPuzzleFlipsRequired},
+	{"Best Flips Req", Game.getBestPuzzleFlipsRequired},
+	{"Separator", 1},
+	{"Color Required", Game.getPuzzleColorChangesRequired},
+	{"Best Color Req", Game.getBestPuzzleColorChangesRequired},
 };
 
 Game.botOSD = {
 	{"Piece Dist", Game.getPieceDistributionOSD},
 	{"Best Dist", Game.getBestPieceDistribution},
+	{"Flips Requried", Game.getPuzzleFlipsRequired},
+	{"Best Flips Req", Game.getBestPuzzleFlipsRequired},
+	{"Separator", 1},
+	{"Color Required", Game.getPuzzleColorChangesRequired},
+	{"Best Color Req", Game.getBestPuzzleColorChangesRequired},
 };
 
 Game.OSD = Game.standardOSD;

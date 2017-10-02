@@ -1,71 +1,11 @@
 SystemID SMS
-0010	b	h	0	Main RAM	Score 0 - Digit 1
-0011	w	h	1	Main RAM	Score 0 - Digits 2 & 3
-0013	b	h	1	Main RAM	Score 0 - Name 1
-0014	w	h	1	Main RAM	Score 0 - Name 2 & 3
-0016	b	h	0	Main RAM	Score 1 - Digit 1
-0017	w	h	1	Main RAM	Score 1 - Digits 2 & 3
-0019	b	h	1	Main RAM	Score 1 - Name 1
-001A	w	h	1	Main RAM	Score 1 - Name 2 & 3
-001C	b	h	0	Main RAM	Score 2 - Digit 1
-001D	w	h	1	Main RAM	Score 2 - Digits 2 & 3
-001F	b	h	1	Main RAM	Score 2 - Name 1
-0020	w	h	1	Main RAM	Score 2 - Name 2 & 3
-0022	b	h	0	Main RAM	Score 3 - Digit 1
-0023	w	h	1	Main RAM	Score 3 - Digits 2 & 3
-0025	b	h	1	Main RAM	Score 3 - Name 1
-0026	w	h	1	Main RAM	Score 3 - Name 2 & 3
-0028	b	h	0	Main RAM	Score 4 - Digit 1
-0029	w	h	1	Main RAM	Score 4 - Digits 2 & 3
-002B	b	h	1	Main RAM	Score 4 - Name 1
-002C	w	h	1	Main RAM	Score 4 - Name 2 & 3
-002E	b	h	0	Main RAM	Score 5 - Digit 1
-002F	w	h	1	Main RAM	Score 5 - Digits 2 & 3
-0031	b	h	1	Main RAM	Score 5 - Name 1
-0032	w	h	1	Main RAM	Score 5 - Name 2 & 3
-0034	b	h	0	Main RAM	Score 6 - Digit 1
-0035	w	h	1	Main RAM	Score 6 - Digits 2 & 3
-0037	b	h	1	Main RAM	Score 6 - Name 1
-0038	w	h	1	Main RAM	Score 6 - Name 2 & 3
-003A	b	h	0	Main RAM	Score 7 - Digit 1
-003B	w	h	1	Main RAM	Score 7 - Digits 2 & 3
-003D	b	h	1	Main RAM	Score 7 - Name 1
-003E	w	h	1	Main RAM	Score 7 - Name 2 & 3
-0040	b	h	0	Main RAM	Score 8 - Digit 1
-0041	w	h	1	Main RAM	Score 8 - Digits 2 & 3
-0043	b	h	1	Main RAM	Score 8 - Name 1
-0044	w	h	1	Main RAM	Score 8 - Name 2 & 3
-0046	b	h	0	Main RAM	Score 9 - Digit 1
-0047	w	h	1	Main RAM	Score 9 - Digits 2 & 3
-0049	b	h	1	Main RAM	Score 9 - Name 1
-004A	w	h	1	Main RAM	Score 9 - Name 2 & 3
-004C	b	h	0	Main RAM	Score 10 - Digit 1
-004D	w	h	1	Main RAM	Score 10 - Digits 2 & 3
-004F	b	h	1	Main RAM	Score 10 - Name 1
-0050	w	h	1	Main RAM	Score 10 - Name 2 & 3
-0052	b	h	0	Main RAM	Score 11 - Digit 1
-0053	w	h	1	Main RAM	Score 11 - Digits 2 & 3
-0055	b	h	1	Main RAM	Score 11 - Name 1
-0056	w	h	1	Main RAM	Score 11 - Name 2 & 3
-0058	b	h	0	Main RAM	Score 12 - Digit 1
-0059	w	h	1	Main RAM	Score 12 - Digits 2 & 3
-005B	b	h	1	Main RAM	Score 12 - Name 1
-005C	w	h	1	Main RAM	Score 12 - Name 2 & 3
-005E	b	h	0	Main RAM	Score 13 - Digit 1
-005F	w	h	1	Main RAM	Score 13 - Digits 2 & 3
-0061	b	h	1	Main RAM	Score 13 - Name 1
-0062	w	h	1	Main RAM	Score 13 - Name 2 & 3
-0064	b	h	0	Main RAM	Score 14 - Digit 1
-0065	w	h	1	Main RAM	Score 14 - Digits 2 & 3
-0067	b	h	1	Main RAM	Score 14 - Name 1
-0068	w	h	1	Main RAM	Score 14 - Name 2 & 3
 0097	b	h	0	Main RAM	Current Map Index
 0098	b	u	0	Main RAM	Horizontal Map Position
 0099	w	u	0	Main RAM	Elevator Y
 00A5	b	u	0	Main RAM	Memory Selected
 00B5	b	u	0	Main RAM	Lift Resets
 00B6	b	u	0	Main RAM	Snoozes
-00B7	b	u	0	Main RAM	Snooze cooldown timer
+00B7	b	u	0	Main RAM	Snooze Cooldown Timer
 00C7	b	u	0	Main RAM	Tile Arrow Selected
 00C8	b	u	0	Main RAM	Tile Arrow Selected
 00CA	b	h	0	Main RAM	Hours
@@ -75,20 +15,15 @@ SystemID SMS
 0180	b	u	0	Main RAM	Player X
 0181	b	u	0	Main RAM	Player Y
 0186	b	u	0	Main RAM	Player Facing Direction
-040C	b	u	0	Main RAM	Search timer 1
-040D	b	u	0	Main RAM	Search timer 2
-040E	b	u	0	Main RAM	Search timer 3
-040F	b	u	0	Main RAM	Search timer 4
-1237	b	h	0	Main RAM	
-1B12	d	h	1	Main RAM	Puzzle Memory 0-3 Rotation & Colour
-1B16	d	h	1	Main RAM	Puzzle Memory 4-7 Rotation & Colour
-1B1A	d	h	1	Main RAM	Puzzle Memory 8-11 Rotation & Colour
-1B1E	d	h	1	Main RAM	Puzzle Memory 12-15 Rotation & Colour
-1B22	d	h	1	Main RAM	Puzzle Memory 16-19 Rotation & Colour
-1B26	d	h	1	Main RAM	Puzzle Memory 20-23 Rotation & Colour
-1B2A	d	h	1	Main RAM	Puzzle Memory 24-27 Rotation & Colour
-1B2E	d	h	1	Main RAM	Puzzle Memory 28-31 Rotation & Colour
-1B32	d	h	1	Main RAM	Puzzle Memory 32-35 Rotation & Colour
+1B12	d	h	1	Main RAM	Puzzle Solution 0 Rotation & Colour
+1B16	d	h	1	Main RAM	Puzzle Solution 1 Rotation & Colour
+1B1A	d	h	1	Main RAM	Puzzle Solution 2 Rotation & Colour
+1B1E	d	h	1	Main RAM	Puzzle Solution 3 Rotation & Colour
+1B22	d	h	1	Main RAM	Puzzle Solution 4 Rotation & Colour
+1B26	d	h	1	Main RAM	Puzzle Solution 5 Rotation & Colour
+1B2A	d	h	1	Main RAM	Puzzle Solution 6 Rotation & Colour
+1B2E	d	h	1	Main RAM	Puzzle Solution 7 Rotation & Colour
+1B32	d	h	1	Main RAM	Puzzle Solution 8 Rotation & Colour
 1B36	d	h	1	Main RAM	Puzzle Memory 0-3 Piece
 1B3A	d	h	1	Main RAM	Puzzle Memory 4-7 Piece
 1B3E	d	h	1	Main RAM	Puzzle Memory 8-11 Piece
@@ -98,58 +33,4 @@ SystemID SMS
 1B4E	d	h	1	Main RAM	Puzzle Memory 24-27 Piece
 1B52	d	h	1	Main RAM	Puzzle Memory 28-31 Piece
 1B56	d	h	1	Main RAM	Puzzle Memory 32-35 Piece
-1B5A	b	h	0	Main RAM	
-1B5C	b	h	0	Main RAM	
-1B5E	b	h	0	Main RAM	
-1B60	b	h	0	Main RAM	
-1B62	b	h	0	Main RAM	
-1B64	b	h	0	Main RAM	
-1B66	b	h	0	Main RAM	
-1B68	b	h	0	Main RAM	
-1B6A	b	h	0	Main RAM	
-1B6B	b	h	0	Main RAM	
-1B6D	b	h	0	Main RAM	
-1B6F	b	h	0	Main RAM	
-1B71	b	h	0	Main RAM	
-1B73	b	h	0	Main RAM	
-1B75	b	h	0	Main RAM	
-1B77	b	h	0	Main RAM	
-1B79	b	h	0	Main RAM	
-1B7B	b	h	0	Main RAM	
-1B7C	b	h	0	Main RAM	
-1B7E	b	h	0	Main RAM	
-1B80	b	h	0	Main RAM	
-1B82	b	h	0	Main RAM	
-1B84	b	h	0	Main RAM	
-1B86	b	h	0	Main RAM	
-1B88	b	h	0	Main RAM	
-1B8A	b	h	0	Main RAM	
-1B8C	b	h	0	Main RAM	
-1B8D	b	h	0	Main RAM	
-1B8F	b	h	0	Main RAM	
-1B91	b	h	0	Main RAM	
-1B93	b	h	0	Main RAM	
-1B95	b	h	0	Main RAM	
-1B97	b	h	0	Main RAM	
-1B99	b	h	0	Main RAM	
-1B9B	b	h	0	Main RAM	
-1B9D	b	h	0	Main RAM	
-1B9E	b	h	0	Main RAM	
-1BA0	b	h	0	Main RAM	
-1BA2	b	h	0	Main RAM	
-1BA4	b	h	0	Main RAM	
-1BA6	b	h	0	Main RAM	
-1BA8	b	h	0	Main RAM	
-1BAA	b	h	0	Main RAM	
-1BAC	b	h	0	Main RAM	
-1BAE	b	h	0	Main RAM	
-1BAF	b	h	0	Main RAM	
-1BB1	b	h	0	Main RAM	
-1BB3	b	h	0	Main RAM	
-1BB5	b	h	0	Main RAM	
-1BB7	b	h	0	Main RAM	
-1BB9	b	h	0	Main RAM	
-1BBB	b	h	0	Main RAM	
-1BBD	b	h	0	Main RAM	
-1BBF	b	h	0	Main RAM	
 
