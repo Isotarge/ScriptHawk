@@ -8,9 +8,11 @@
 ; CONSTANTS & ADDRESSES
 ;************************************
 [ControllerInput]: 0x80014DC4
+[NewlyPressed]: 0x807ECD48
 [ZipperBitfield]: 0x807FBB62
  
 [L_Button]: 0x0020
+[ButtonPressed]: 0x0020
  
 [DestinationMap]: 0x807444E4
 ;(bitfield xxxx321i)
@@ -37,7 +39,13 @@ SW      t0 0x20(sp)
 SW      t1 0x1C(sp)
 SW      t2 0x18(sp)
 SW      at 0x14(sp)
- 
+
+;Check if Button is Newly Pressed
+;Zipperlock-fix
+LH		t0, @NewlyPressed
+LI		t1, @ButtonPressed
+BNE		t0, t1, Return
+
 ;Check for L Input
 LH      t0, @ControllerInput
 LI      t1, @L_Button
@@ -71,11 +79,6 @@ LA      at, @ZipperBitfield
 LB      t0, 0x00(at)
 ORI     t1, t0, 0x01
 SB      t1, 0x00(at)
-
-;Zipperlock-fix
-LA		t0, @ControllerInput
-LI		t1, 0x0000
-SH		t1, 0x00(t0)
  
 ;Clean-up
 J       Return
