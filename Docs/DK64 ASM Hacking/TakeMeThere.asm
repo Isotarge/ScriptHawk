@@ -46,13 +46,14 @@ BNE     t0, t1, Return
 ;Set Map
 LA      t2, @TinyInstrument                 ;t2 = *TinyInstrument
 LB      t0, 0x00(t2)                        ;t0 = *t2
-SRL     t1, t0, 0x4                         ;t1 = t0 >> 4 (GET ORIGINAL MAP CODE)
-ADDIU   t1, t1, 0x1                         ;t1++ (NEW MAP CODE)
+SRA     t1, t0, 0x4                         ;t1 = t0 >> 4 (GET ORIGINAL MAP CODE
+ANDI	t1, t1, 0xF							;make sure sign bit is in, and clear other 1s
+ADDI	t1, t1, 0x1                         ;t1++ (NEW MAP CODE)
 	;***TEST RESET MAP CODE***
-LA		at, TakeMeThere_MaxState
-LB      at, 0x00(at)
-BEQ     t1, at, ResetMapCode
-	ReturnFromMapReset:
+	LA		at, TakeMeThere_MaxState
+	LB      at, 0x00(at)
+	BEQ     t1, at, ResetMapCode
+ReturnFromMapReset:
 LA		at, @DestinationMap
 LA		t2, TakeMeThere_WarpLocations
 ADDU	t2, t1, t2
@@ -61,14 +62,20 @@ SW      t2, 0x00(at)           				;*DestinationMap = t2 (SET MAP TO NEW MAP FRO
 ANDI    t0, t0, 0xF                         ;t0 = t0 & 0xf (GET ORIGINAL TINY MOVES)
 SLL     t1, t1, 0x4                         ;t1 = t1 << 4 (NEW MAP CODE ON LEFT)
 OR      t0, t0, t1                          ;t0 = t0 | t1 (COMBINE NEW MAP CODE | TINY MOVES)
-	LA		at, @TinyInstrument
-    SB      t0, 0x00(at)       				;*TinyInstrument = t0 (TINY MOVES = RESULT)
+
+LA		at, @TinyInstrument
+SB      t0, 0x00(at)       					;*TinyInstrument = t0 (TINY MOVES = RESULT)
  
 ;Force Zipper
 LA      at, @ZipperBitfield
 LB      t0, 0x00(at)
 ORI     t1, t0, 0x01
 SB      t1, 0x00(at)
+
+;Zipperlock-fix
+LA		t0, @ControllerInput
+LI		t1, 0x0000
+SH		t1, 0x00(t0)
  
 ;Clean-up
 J       Return
@@ -86,13 +93,10 @@ ADDIU   sp 0x28
 JR      ra
 NOP
  
-	;***TEST RESET MAP CODE***
+;***TEST RESET MAP CODE***
 ResetMapCode:
-LA		at, TakeMeThere_WarpLocations
-LA		t2, TakeMeThere_MinState
-LB		t2, 0x00(t2)
-ADDU	at, t2, at
-LB      t1, 0x00(at)
+LA		t1, TakeMeThere_MinState
+LB		t1, 0x00(t1)
 J      	ReturnFromMapReset
 NOP
  
@@ -110,7 +114,6 @@ TakeMeThere_WarpLocations:
 .byte 0x48;Caves
 .byte 0x57;Castle
 .byte 0x11;Helm
-;.byte 0xCB;DK Phase
  
 .align
 TakeMeThere_MinState:
@@ -118,4 +121,4 @@ TakeMeThere_MinState:
  
 .align
 TakeMeThere_MaxState:
-.byte 2
+.byte 0x9
