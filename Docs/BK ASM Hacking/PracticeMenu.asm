@@ -40,7 +40,7 @@
 .include "BKPracticeICs/InputDisplay.asm"
 .include "BKPracticeICs/SpeedControl.asm"
 //.include "BKPracticeICs/OpenSeasons.asm"
-//.include "BKPracticeICs/Music.asm"
+.include "BKPracticeICs/Music.asm"
 
 
 //.include "BKPracticeICs/SetMoves.asm"
@@ -64,7 +64,7 @@ MenuFunctionList:
 .word InputDisplay_DefStruct
 .word SpeedCtrl_DefStruct
 //.word OpenSeasons_DefStruct
-//.word music_DefStruct
+.word music_DefStruct
 
 //SetMoves
 .word 0 ;!!!functionListMust end with 0!!!

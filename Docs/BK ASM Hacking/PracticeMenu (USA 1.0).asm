@@ -1,5 +1,8 @@
-// HOOKS
+//Boot map
+.org 0x8023DBAB
+.byte 0x91
 
+// HOOKS
 ;PAUSE MODE JUMP LOCATION: 0x802E47F4
 .org 0x802E47F4
 JAL PauseMode
