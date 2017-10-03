@@ -1,0 +1,121 @@
+;************************************
+; Written by GloriousLiar
+; 10/2/17
+; Template code by Isotarge & MittenzHugg
+;************************************
+ 
+;************************************
+; CONSTANTS & ADDRESSES
+;************************************
+[ControllerInput]: 0x80014DC4
+[ZipperBitfield]: 0x807FBB62
+ 
+[L_Button]: 0x0020
+ 
+[DestinationMap]: 0x807444E4
+;(bitfield xxxx321i)
+[TinyInstrument]: 0x807FCA6E
+ 
+;Hook
+.org 0x807140BC
+ 
+;Steal control flow
+jal 0x807FF500
+nop
+b 0x80714110;TESTING PUTTING THIS IN Return
+nop
+ 
+;************************************
+; TakeMeThere FUNCTION
+;************************************
+.org 0x807FF500
+ 
+;put previous values on the stack
+ADDIU   sp -0x28
+SW      ra 0x24(sp)
+SW      t0 0x20(sp)
+SW      t1 0x1C(sp)
+SW      t2 0x18(sp)
+SW      at 0x14(sp)
+ 
+;Check for L Input
+LH      t0, @ControllerInput
+LI      t1, @L_Button
+BNE     t0, t1, Return
+ 
+;Set Map
+LA      t2, @TinyInstrument                 ;t2 = *TinyInstrument
+LB      t0, 0x00(t2)                        ;t0 = *t2
+SRL     t1, t0, 0x4                         ;t1 = t0 >> 4 (GET ORIGINAL MAP CODE)
+ADDIU   t1, t1, 0x1                         ;t1++ (NEW MAP CODE)
+	;***TEST RESET MAP CODE***
+LA		at, TakeMeThere_MaxState
+LB      at, 0x00(at)
+BEQ     t1, at, ResetMapCode
+	ReturnFromMapReset:
+LA		at, @DestinationMap
+LA		t2, TakeMeThere_WarpLocations
+ADDU	t2, t1, t2
+LB		t2, 0x00(t2)
+SW      t2, 0x00(at)           				;*DestinationMap = t2 (SET MAP TO NEW MAP FROM OFFSET)
+ANDI    t0, t0, 0xF                         ;t0 = t0 & 0xf (GET ORIGINAL TINY MOVES)
+SLL     t1, t1, 0x4                         ;t1 = t1 << 4 (NEW MAP CODE ON LEFT)
+OR      t0, t0, t1                          ;t0 = t0 | t1 (COMBINE NEW MAP CODE | TINY MOVES)
+	LA		at, @TinyInstrument
+    SB      t0, 0x00(at)       				;*TinyInstrument = t0 (TINY MOVES = RESULT)
+ 
+;Force Zipper
+LA      at, @ZipperBitfield
+LB      t0, 0x00(at)
+ORI     t1, t0, 0x01
+SB      t1, 0x00(at)
+ 
+;Clean-up
+J       Return
+NOP
+ 
+;End
+Return:
+;take values back from the stack
+LW      ra 0x24(sp)
+LW      t0 0x20(sp)
+LW      t1 0x1C(sp)
+LW      t2 0x18(sp)
+LW      at 0x14(sp)
+ADDIU   sp 0x28
+JR      ra
+NOP
+ 
+	;***TEST RESET MAP CODE***
+ResetMapCode:
+LA		at, TakeMeThere_WarpLocations
+LA		t2, TakeMeThere_MinState
+LB		t2, 0x00(t2)
+ADDU	at, t2, at
+LB      t1, 0x00(at)
+J      	ReturnFromMapReset
+NOP
+ 
+;************************************
+; ADDITIONAL VARS
+;************************************
+.align
+TakeMeThere_WarpLocations:
+.byte 0x00;dummy
+.byte 0x07;Japes
+.byte 0x26;Aztec
+.byte 0x1A;Factory
+.byte 0x1E;Galleon
+.byte 0x30;Fungi
+.byte 0x48;Caves
+.byte 0x57;Castle
+.byte 0x11;Helm
+;.byte 0xCB;DK Phase
+ 
+.align
+TakeMeThere_MinState:
+.byte 1
+ 
+.align
+TakeMeThere_MaxState:
+.byte 2
