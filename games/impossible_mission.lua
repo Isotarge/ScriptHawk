@@ -56,6 +56,7 @@ local Game = {
 	bestPieceDistribution = 100,
 	bestFlipsRequired = 100,
 	bestColorChangesRequired = 100,
+	bestSearchLength = 1000,
 };
 
 function Game.detectVersion(romName, romHash)
@@ -111,30 +112,30 @@ local object = {
 	obj_type = 0x00,
 	obj_types = {
 		--[0x00] = "??",
-		[0x01] = {hitbox_width=24, hitbox_height=32, name="Blue Computer"},
-		[0x02] = {hitbox_width=24, hitbox_height=24, name="Printer"},
-		[0x03] = {hitbox_width=40, hitbox_height=32, name="Oven"},
-		[0x04] = {hitbox_width=40, hitbox_height=24, name="Desk"},
-		[0x05] = {hitbox_width=40, hitbox_height=16, name="Bed"},
-		[0x06] = {hitbox_width=16, hitbox_height=24, name="Drawers"},
-		[0x07] = {hitbox_width=56, hitbox_height=24, name="Fireplace"},
-		[0x08] = {hitbox_width=16, hitbox_height=24, name="Sideways blue monitor"},
-		[0x09] = {hitbox_width=16, hitbox_height=24, name="Pink Chair"},
-		[0x0A] = {hitbox_width=16, hitbox_height=24, name="Flashing brown and blue rectangle"},
-		[0x0B] = {hitbox_width=16, hitbox_height=16, name="Brown and blue box"},
-		[0x0C] = {hitbox_width=24, hitbox_height=32, name="Bookshelf"},
-		[0x0D] = {hitbox_width=16, hitbox_height=24, name="Roll on deodorant"},
-		[0x0E] = {hitbox_width=16, hitbox_height=24, name="Lamp"},
-		[0x0F] = {hitbox_width=40, hitbox_height=16, name="Lounge"},
-		[0x10] = {hitbox_width=16, hitbox_height=32, name="Sink"},
-		[0x11] = {hitbox_width=8, hitbox_height=8, name="Small Pink thing"},
-		[0x12] = {hitbox_width=40, hitbox_height=24, name="Bathtub"},
-		[0x13] = {hitbox_width=16, hitbox_height=16, name="Toilet"},
-		[0x14] = {hitbox_width=32, hitbox_height=32, name="Candy"},
-		[0x15] = {hitbox_width=40, hitbox_height=32, name="End of Game Object"},
-		[0x16] = {hitbox_width=24, hitbox_height=24, name="Microwave"},
-		[0x17] = {hitbox_width=32, hitbox_height=24, name="Desk 2"},
-		[0x18] = {hitbox_width=24, hitbox_height=32, name="Fridge"},
+		[0x01] = {hitbox_width=24, hitbox_height=32, search_length=0x08, name="Blue Computer"},
+		[0x02] = {hitbox_width=24, hitbox_height=24, search_length=0x08, name="Printer"},
+		[0x03] = {hitbox_width=40, hitbox_height=32, search_length=0x0F, name="Oven"},
+		[0x04] = {hitbox_width=40, hitbox_height=24, search_length=0x18, name="Desk"},
+		[0x05] = {hitbox_width=40, hitbox_height=16, search_length=0x0C, name="Bed"},
+		[0x06] = {hitbox_width=16, hitbox_height=24, search_length=0x1E, name="Drawers"},
+		[0x07] = {hitbox_width=56, hitbox_height=24, search_length=0x0C, name="Fireplace"},
+		[0x08] = {hitbox_width=16, hitbox_height=24, search_length=0x08, name="Sideways blue monitor"},
+		[0x09] = {hitbox_width=16, hitbox_height=24, search_length=0x0C, name="Pink Chair"},
+		[0x0A] = {hitbox_width=16, hitbox_height=24, search_length=0x00, name="Flashing brown and blue rectangle"},
+		[0x0B] = {hitbox_width=16, hitbox_height=16, search_length=0x08, name="Brown and blue box"},
+		[0x0C] = {hitbox_width=24, hitbox_height=32, search_length=0x1E, name="Bookshelf"},
+		[0x0D] = {hitbox_width=16, hitbox_height=24, search_length=0x14, name="Roll on deodorant"},
+		[0x0E] = {hitbox_width=16, hitbox_height=24, search_length=0x0C, name="Lamp"},
+		[0x0F] = {hitbox_width=40, hitbox_height=16, search_length=0x18, name="Lounge"},
+		[0x10] = {hitbox_width=16, hitbox_height=32, search_length=0x10, name="Sink"},
+		[0x11] = {hitbox_width=8, hitbox_height=8, search_length=0x14, name="Small Pink thing"},
+		[0x12] = {hitbox_width=40, hitbox_height=24, search_length=0x0C, name="Bathtub"},
+		[0x13] = {hitbox_width=16, hitbox_height=16, search_length=0x0C, name="Toilet"},
+		[0x14] = {hitbox_width=32, hitbox_height=32, search_length=0x1E, name="Candy"},
+		[0x15] = {hitbox_width=40, hitbox_height=32, search_length=0x00, name="End of Game Object"},
+		[0x16] = {hitbox_width=24, hitbox_height=24, search_length=0x13, name="Microwave"},
+		[0x17] = {hitbox_width=32, hitbox_height=24, search_length=0x1C, name="Desk 2"},
+		[0x18] = {hitbox_width=24, hitbox_height=32, search_length=0x1E, name="Fridge"},
 	},
 	x_position = 0x01,
 	y_position = 0x02,
@@ -316,15 +317,14 @@ local function draw_puzzle()
 	local piece0Major = math.floor(piece0 / 4);
 	local piece0Minor = piece0 % 4;
 	local piece0Rotation = mainmemory.readbyte(Game.Memory.puzzle_rotation + piece0);
-	local piece0VFlipped = bit.band(0x40, piece0Rotation);
-	local piece0HFlipped = bit.band(0x80, piece0Rotation);
-	if piece0VFlipped > 0 then
+	local piece0VFlipped = bit.band(0x40, piece0Rotation) > 0;
+	local piece0HFlipped = bit.band(0x80, piece0Rotation) > 0;
+	if piece0VFlipped then
 		piece0VFlipped = "V";
 	else
 		piece0VFlipped = "";
 	end
-
-	if piece0HFlipped > 0 then
+	if piece0HFlipped then
 		piece0HFlipped = "H";
 	else
 		piece0HFlipped = "";
@@ -334,14 +334,14 @@ local function draw_puzzle()
 	local piece1Major = math.floor(piece1 / 4);
 	local piece1Minor = piece1 % 4;
 	local piece1Rotation = mainmemory.readbyte(Game.Memory.puzzle_rotation + piece1);
-	local piece1VFlipped = bit.band(0x40, piece1Rotation);
-	local piece1HFlipped = bit.band(0x80, piece1Rotation);
-	if piece1VFlipped > 0 then
+	local piece1VFlipped = bit.band(0x40, piece1Rotation) > 0;
+	local piece1HFlipped = bit.band(0x80, piece1Rotation) > 0;
+	if piece1VFlipped then
 		piece1VFlipped = "V";
 	else
 		piece1VFlipped = "";
 	end
-	if piece1HFlipped > 0 then
+	if piece1HFlipped then
 		piece1HFlipped = "H";
 	else
 		piece1HFlipped = "";
@@ -394,9 +394,32 @@ local function draw_objects()
 				gui.drawRectangle(x_offset + xPos * tile_width, y_offset + yPos * tile_height, hitbox_width, hitbox_height);
 				gui.drawText(x_offset + xPos * tile_width, y_offset + yPos * tile_height, contents);
 				--gui.drawText(x_offset + xPos * tile_width, y_offset + yPos * tile_height + 16, toHexString(contentsRaw));
+				--gui.drawText(x_offset + xPos * tile_width, y_offset + yPos * tile_height + 32, toHexString(id));
 			end
 		end
 	end
+end
+
+function Game.getTotalSearchBarLength()
+	local count = 0;
+	for index = 0x00, 0x1D do
+		if type(object_arrays[index]) == "table" then
+			for i = 1, object_arrays[index].objects do
+				local id = bit.band(mainmemory.readbyte(object_arrays[index].start + (i - 1) * 4), 0x7F);
+				local contents = bit.band(mainmemory.readbyte(object_arrays[index].start + (i - 1) * 4 + 3), 0xF0);
+				if (contents == 0xC0 or contents == 0xD0) then
+					if type(object.obj_types[id]) == "table" then
+						count = count + object.obj_types[id].search_length;
+					end
+				end
+			end
+		end
+	end
+	if count > 0 and count < Game.bestSearchLength and Game.getTotalPieces() == 36 then
+		print("New best puzzle search length: "..count);
+		Game.bestSearchLength = count;
+	end
+	return count;
 end
 
 function Game.getPieceDistribution()
@@ -437,10 +460,15 @@ function Game.getBestPuzzleColorChangesRequired()
 	return Game.bestColorChangesRequired;
 end
 
+function Game.getBestSearchLength()
+	return Game.bestSearchLength;
+end
+
 function Game.resetBestDistribution()
 	Game.bestPieceDistribution = 100;
 	Game.bestFlipsRequired = 100;
 	Game.bestColorChangesRequired = 100;
+	Game.bestSearchLength = 1000;
 end
 
 function Game.completeMinimap()
@@ -457,11 +485,13 @@ end
 -- Bot --
 ---------
 
+local screenshot_next_frame = false;
+
 local startFrame = 492;
-local start2Frame = 580;
 --local start2Frame = 512;
 --local resetFrame = 544;
-local resetFrame = 589;
+local start2Frame = 580;
+local resetFrame = 580;
 local checkFrame = resetFrame + 13;
 local numFrames = 52;
 
@@ -531,6 +561,9 @@ function clearBestAttempt()
 end
 
 function botLoop()
+	if screenshot_next_frame then
+		return;
+	end
 	if bot_is_running then
 		if lastPauseFrame == nil then
 			initBotInput();
@@ -538,6 +571,12 @@ function botLoop()
 		end
 		local currentFrame = emu.framecount();
 		if currentFrame == checkFrame then
+			if Game.getPieceDistribution() <= 16 then
+				screenshot_next_frame = true;
+				return;
+			end
+		end
+		if currentFrame >= checkFrame then
 			if checkBestAttempt() == true then
 				updateBestAttempt();
 			end
@@ -564,6 +603,12 @@ function botLoop()
 	elseif bot_is_outputting_best_input then
 		local currentFrame = emu.framecount();
 		if currentFrame == checkFrame then
+			if Game.getPieceDistribution() <= 16 then
+				screenshot_next_frame = true;
+				return;
+			end
+		end
+		if currentFrame >= checkFrame then
 			bot_is_outputting_best_input = false;
 			tastudio.setrecording(false);
 			client.pause();
@@ -623,6 +668,16 @@ function Game.drawUI()
 			draw_objects();
 		end
 	end
+	if screenshot_next_frame then
+		local last2FrameSS = last2Frame;
+		local lastPauseFrameSS = lastPauseFrame;
+		if bot_is_outputting_best_input then
+			last2FrameSS = bestLast2Frame;
+			lastPauseFrameSS = bestLastPauseFrame;
+		end
+		client.screenshot(Game.getPieceDistribution().."rooms_"..resetFrame.."reset_"..last2FrameSS.."last2_"..lastPauseFrameSS.."lastPause_"..Game.getPuzzleFlipsRequired().."flips_"..Game.getPuzzleColorChangesRequired().."colors_"..Game.getTotalSearchBarLength().."search.png");
+		screenshot_next_frame = false;
+	end
 end
 
 function Game.eachFrame()
@@ -640,16 +695,16 @@ function Game.applyInfinites()
 end
 
 Game.standardOSD = {
+	{"Map", Game.getCurrentMap},
+	{"IGT", Game.getIGT},
+	{"Snooze Timer", Game.getSnoozeTimer},
+	{"Separator", 1},
 	{"X", Game.getXPosition},
 	{"Y", Game.getYPosition},
 	{"Separator", 1},
 	{"dX"},
 	{"dY"},
 	{"Separator", 1},
-	{"Map", Game.getCurrentMap},
-	{"Snooze Timer", Game.getSnoozeTimer},
-	{"IGT", Game.getIGT},
-	{"Separator", 1},
 	{"Piece Dist", Game.getPieceDistributionOSD},
 	{"Best Dist", Game.getBestPieceDistribution},
 	{"Separator", 1},
@@ -658,16 +713,23 @@ Game.standardOSD = {
 	{"Separator", 1},
 	{"Color Required", Game.getPuzzleColorChangesRequired},
 	{"Best Color Req", Game.getBestPuzzleColorChangesRequired},
+	{"Separator", 1},
+	{"Total Search Length", Game.getTotalSearchBarLength},
+	{"Best Search Length", Game.getBestSearchLength},
 };
 
 Game.botOSD = {
 	{"Piece Dist", Game.getPieceDistributionOSD},
 	{"Best Dist", Game.getBestPieceDistribution},
+	{"Separator", 1},
 	{"Flips Requried", Game.getPuzzleFlipsRequired},
 	{"Best Flips Req", Game.getBestPuzzleFlipsRequired},
 	{"Separator", 1},
 	{"Color Required", Game.getPuzzleColorChangesRequired},
 	{"Best Color Req", Game.getBestPuzzleColorChangesRequired},
+	{"Separator", 1},
+	{"Total Search Length", Game.getTotalSearchBarLength},
+	{"Best Search Length", Game.getBestSearchLength},
 };
 
 Game.OSD = Game.standardOSD;
