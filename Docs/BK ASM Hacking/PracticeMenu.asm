@@ -24,7 +24,7 @@
 .include "PracticeMenu_GUI.asm"
 
 ;----------------------------------------------------------------
-; Function Libraries
+; Function Modules
 ;----------------------------------------------------------------
 .include "BKPracticeICs/TakeMeThere.asm"
 .include "BKPracticeICs/ResetOnEnter.asm"
@@ -39,11 +39,9 @@
 .include "BKPracticeICs/TransformMe.asm"
 .include "BKPracticeICs/InputDisplay.asm"
 .include "BKPracticeICs/SpeedControl.asm"
-//.include "BKPracticeICs/OpenSeasons.asm"
 .include "BKPracticeICs/Music.asm"
+.include "BKPracticeICs/SetMoves.asm"
 
-
-//.include "BKPracticeICs/SetMoves.asm"
 
 .align
 ;----------------------------------------------------------------
@@ -54,17 +52,18 @@ MenuFunctionList:
 .word ResetOnEnter_DefStruct
 .word Loop_DefStruct
 .word Infinites_DefStruct
+.word L2Levitate_DefStruct
+.word SetMoves_DefStruct
 .word HUDInfo_DefStruct
 .word Lag_DefStruct
 .word HUDTimer_DefStruct
 .word FreezeClip_DefStruct
-.word L2Levitate_DefStruct
 .word TakeOff_DefStruct
 .word TransformMe_DefStruct
 .word InputDisplay_DefStruct
 .word SpeedCtrl_DefStruct
-//.word OpenSeasons_DefStruct
 .word music_DefStruct
+.word SetMoves_DefStruct
 
 //SetMoves
 .word 0 ;!!!functionListMust end with 0!!!
@@ -197,16 +196,6 @@ OnOffOptionString:
 .asciiz "OFF\0\0\0\0"
 .asciiz "ON\0\0\0\0\0"
 
-MoveSet:
-.byte 0
-.align
-MenuLabelStrings: ;DO NOT CHANGE THIS NAME
-.asciiz "MOVE SET: \0\0\0\0\0"
-MoveSetMaxState:
-.byte 6
-MoveSetStringSet:
-.word MoveSetOptionString
-
 
 PreviousLoadzoneState:
 .byte 0
@@ -214,25 +203,12 @@ PreviousLoadzoneState:
 .byte 0
 .byte 0
 
-
-MoveSetOptionString: ;6
-.asciiz "OFF\0\0\0\0"
-.asciiz "NONE\0\0\0"
-.asciiz "SM\0\0\0\0\0"
-.asciiz "FFM\0\0\0\0" ;FFM no Eggs
-.asciiz "FFM EGG" ;FFM Eggs
-.asciiz "ALL\0\0\0\0"
-
 temp1:
 .word 0
 temp2:
 .word 0
 
-.align
-TEMPValueStr:
-.asciiz "\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0"
-TEMP2ValueStr:
-.asciiz ".\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0"
+
 .align
 HUDTimerValueStr:
 .asciiz "\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0"

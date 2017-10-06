@@ -22,7 +22,7 @@ music_PauseModePtr: ;POINTER TO CODE TO RUN UPON EXITING THE PAUSE MENU
 .word music_PauseMode ;set to 0 if no code is to be run upon exiting the pause menu
 
 music_NormalModePtr: ;POINTER TO CODE TO RUN DURING NORMAL GAME PLAY
-.word 0 ;set to 0 if no code is to be run during Normal menu
+.word music_Normal_HouseKeeping ;set to 0 if no code is to be run during Normal menu
 
 music_Label: ;LABEL IN MENU
 .asciiz "MUSIC: \0\0\0\0\0\0\0\0" ;must be 15 character (16 including trailing 0), Must be all caps
@@ -66,8 +66,4 @@ NOP
 ;-------------------------------
 ; Variables
 ;-------------------------------
-.align
-musicOptionString:
-.asciiz " ON\0\0\0\0"
-.asciiz " OFF\0\0\0"
-.asciiz " DRUMS\0"
+

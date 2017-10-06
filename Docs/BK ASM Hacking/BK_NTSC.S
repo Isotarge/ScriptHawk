@@ -42,6 +42,8 @@
 
 [ItemBase]: 0x80385F30
 
+[NoteScore]: 0x80385FF0
+
 
 /*-------------------------------
 | Functions
@@ -414,6 +416,8 @@
 
 [SetMumboTransformation]: 	0x8029A960
 
+[GetIdleMovementStateIndex]: 0x8029BF78
+
 [TakeMeThere_LevelReset]: 	0x802E4048  ;I: (word $a0 Map, word $a1 exit, word $a2 loadTransitionTypeIndex)
 [TakeMeThere]:            	0x802E4078  ;I: (word $a0 Map, word $a1 exit, word $a2 loadTransitionTypeIndex)
 
@@ -497,6 +501,6 @@
 [GetItemCount]:         0x80345FA0 ;I: (byte $a0 itemIndex)
 [ClearLevelNoteScores]: 0x80346D78
 
-
+[SetAllLevelNotescoresTo100]: 0x80347018
 [ClearInGameLevelTimer]: 0x80347060
 [GetInGameTimeInSeconds]: 0x803470A0

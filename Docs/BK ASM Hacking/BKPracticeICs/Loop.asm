@@ -36,15 +36,13 @@ ADDIU sp -0x20
 SW ra 0x1C(sp)
 SW a0 0x18(sp)
 
-SB zero Loop_Start_Set
-SB zero Loop_Start_Map
-SB zero Loop_Start_Exit
-LI a0 1
-SB a0 Loop_End_Set
-SB zero Loop_End_Map
-SB zero Loop_End_Exit
 
+LB a0 Loop_State
+BNE a0 zero Loop_Pause_HouseKeeping
+NOP
+    SB zero Loop_Internal_State
 
+Loop_Pause_HouseKeeping:
 LW ra 0x1C(sp)
 LW a0 0x18(sp)
 ADDIU sp 0x20
@@ -63,35 +61,121 @@ SW a1 0x1C(sp)
 SW a2 0x18(sp)
 SW at 0x14(sp)
 
-LB a0 Loop_Start_Set
-BEQ a0 zero Loop_Normal_InLoad
+LB a0 Loop_Internal_State
+BNE a0 zero Loop_Normal_Not_0
 NOP
-    LI a0 0xE0
-    LA a2 Loop_MidSetStr
-    JAL @Print_CharFont
-    LI a1 0x06
-    B Loop_Normal_NotLoad
+
+//STATE0: Start/Off
+    ;If D-Pad up
+    LW a1 @P1NewlyPressedButtons
+    LUI a2 0x0800
+    AND a1 a1 a2 
+    BEQ a1 zero Loop_Normal_HouseKeeping 
     NOP
+        ;Set Start
+        LB a1 @Map
+        SB a1 Loop_Start_Map
+        LB a1 @Exit
+        SB a1 Loop_Start_Exit
+        
+        LI a1 @ItemBase
+        LI at 27
+        Loop_Normal_0_SaveItems:
+            SUBI at at 1
+            SLL a0 at 2
+            ADDIU a2 a0 0x0C
+            ADDU a2 a2 a1
+            LW a2 0(a2)
+            SW a2 0x28(sp)
+            LA a2 Loop_Start_Items
+            ADDU a0 a0 a2
+            LW a2 0x28(sp)
+            SW a2 0(a0)
+            BNE at zero Loop_Normal_0_SaveItems
+            NOP
 
+        
+        JAL @GetMovesUnlockedBitfield
+        NOP
+        SW v0 Loop_Start_Moves
 
-//Hitting loadzone
-Loop_Normal_InLoad:
-LB a0 @MapLoadState
-BEQ a0 zero Loop_Normal_NotLoad
+        LA a2 Loop_Start_ProgressFlags
+        ADDIU at a2 0x20
+        LA a1 @GameProgressBitfield
+        Loop_Normal_0_SaveGameProgressBitfieldLoop: 
+            LW a0 0(a1)
+            SW a0 0(a2)
+            ADDIU a2 0x04
+            ADDIU a1 0x04
+            BNE at a2 Loop_Normal_0_SaveGameProgressBitfieldLoop
+            NOP    
+        
+        ;Increment state
+        LI a0 0x01
+        SB a0 Loop_Internal_State
+        B Loop_Normal_HouseKeeping
+        NOP
+        
+Loop_Normal_Not_0:
+LI at 0x01
+BNE a0 at Loop_Normal_Not_1
 NOP
-    //IF LOADZONE = End Loadzone
-    LB a0 @Map
-    LB a1 Loop_End_Map
-    BNE a0 a1 Loop_Normal_HouseKeeping
+
+//STATE1: Start Set
+    ;If D-Pad up
+    LW a1 @P1NewlyPressedButtons
+    LUI a2 0x0800
+    AND a1 a1 a2 
+    BEQ a1 zero Loop_Normal_HouseKeeping 
     NOP
-        LB a0 @Exit
-        LB a1 Loop_End_Exit
-        BNE a0 a1 Loop_Normal_HouseKeeping
-        NOP 
-            
+        ;Increment state
+        LI a0 0x02
+        SB a0 Loop_Internal_State
+        B Loop_Normal_HouseKeeping
+        NOP
+
+Loop_Normal_Not_1:
+LI at 0x02
+BNE a0 at Loop_Normal_Not_2
+NOP
+
+//STATE2: Waiting for end loadzone
+    ;If Hitting Loadzone
+    LB a1 @MapLoadState
+    BEQ a1 zero Loop_Normal_HouseKeeping
+    NOP
+        ;Save as end point
+        LB a1 @Map
+        SB a1 Loop_End_Map
+        LB a2 @Exit
+        SB a2 Loop_End_Exit
+        
+        ;Increment State
+        LI a0 0x03
+        SB a0 Loop_Internal_State
+        B Loop_Normal_HouseKeeping
+        NOP
+
+Loop_Normal_Not_2:
+
+//STATE3: Loop Set
+    ;If Hitting Loadzone
+    LB a1 @MapLoadState
+    BEQ a1 zero Loop_Normal_3_Not_LZ
+    NOP
+        ;If Map == End_Map
+        LB a0 @Map
+        LB a1 Loop_End_Map
+        BNE a0 a1 Loop_Normal_3_Not_LZ
+        NOP
+        LB a0 @Exit ;If Exit = End_Exit
+            LB a1 Loop_End_Exit
+            BNE a0 a1 Loop_Normal_3_Not_LZ
+            NOP
             LI a1 @ItemBase
+            
             LI at 27
-            Loop_Normal_LoadItems:
+            Loop_Normal_3_LoadItems:
                 SUBI at at 1
                 SLL a0 at 2
                 LA a2 Loop_Start_Items
@@ -104,7 +188,7 @@ NOP
                 LW a2 0x28(sp)
                 SW a2 0(a0)
     
-                BNE at zero Loop_Normal_LoadItems
+                BNE at zero Loop_Normal_3_LoadItems
                 NOP
 
             JAL @ZeroJiggyCollectedBitfield
@@ -123,89 +207,39 @@ NOP
             LA a2 Loop_Start_ProgressFlags
             ADDIU at a2 0x20
             LA a1 @GameProgressBitfield
-            Loop_Normal_LoadGameProgressBitfieldLoop: 
+            Loop_Normal_3_LoadGameProgressBitfieldLoop: 
                 LW a0 0(a2)
                 SW a0 0(a1)
                 ADDIU a2 0x04
                 ADDIU a1 0x04
-                BNE at a2 Loop_Normal_LoadGameProgressBitfieldLoop
+                BNE at a2 Loop_Normal_3_LoadGameProgressBitfieldLoop
                 NOP   
             
             LB a0 Loop_Start_Map
             LB a1 Loop_Start_Exit
             JAL @TakeMeThere_LevelReset
-            LI a2 1
-            
-            B Loop_Normal_HouseKeeping
-    NOP
+            LI a2 0x01                
     
-    
-Loop_Normal_NotLoad:
-    LW a0 @P1NewlyPressedButtons
-    LUI a1 0x0800
-    AND a0 a0 a1 
-    BEQ a0 zero Loop_Normal_HouseKeeping
+    Loop_Normal_3_Not_LZ:
+    ;If D-Up
+    LW a1 @P1NewlyPressedButtons
+    LUI a2 0x0800
+    AND a1 a1 a2 
+    BEQ a1 zero Loop_Normal_HouseKeeping 
     NOP
-        LB a0 Loop_End_Set
-        BNE a0 zero Loop_Normal_SetStart
+        SB zero Loop_Internal_State
+        B Loop_Normal_HouseKeeping
         NOP
-            //Set End Point
-            SB zero Loop_Start_Set
-            LB a0 @Map
-            SB a0 Loop_End_Map
-            LB a0 @Exit
-            SB a0 Loop_End_Exit
-            LI a0 1
-            SB a0 Loop_End_Set
-            B Loop_Normal_HouseKeeping
-            NOP
         
-        //Set Start Point
-       Loop_Normal_SetStart:
-        SB zero Loop_End_Set
-        LB a0 @Map
-        SB a0 Loop_Start_Map
-        LB a0 @Exit
-        SB a0 Loop_Start_Exit
-        
-        LI a1 @ItemBase
-        LI at 27
-        Loop_Normal_SaveItems:
-            SUBI at at 1
-            SLL a0 at 2
-            ADDIU a2 a0 0x0C
-            ADDU a2 a2 a1
-            LW a2 0(a2)
-            SW a2 0x28(sp)
-            LA a2 Loop_Start_Items
-            ADDU a0 a0 a2
-            LW a2 0x28(sp)
-            SW a2 0(a0)
-            BNE at zero Loop_Normal_SaveItems
-            NOP
-
-        
-        JAL @GetMovesUnlockedBitfield
-        NOP
-        SW v0 Loop_Start_Moves
-
-        LA a2 Loop_Start_ProgressFlags
-        ADDIU at a2 0x20
-        LA a1 @GameProgressBitfield
-        Loop_Normal_SaveGameProgressBitfieldLoop: 
-            LW a0 0(a1)
-            SW a0 0(a2)
-            ADDIU a2 0x04
-            ADDIU a1 0x04
-            BNE at a2 Loop_Normal_SaveGameProgressBitfieldLoop
-            NOP        
-
-        LI a0 1
-        SB a0 Loop_Start_Set
-
-
-
 Loop_Normal_HouseKeeping:
+
+    LB a0 Loop_Internal_State
+    SLL a0 a0 4
+    LA a2 Loop_MidSetStr
+    ADDU a2 a2 a0
+    LI a0 0xE0
+    JAL @Print_CharFont
+    LI a1 0x06
 
 LW ra 0x24(sp)
 LW a0 0x20(sp)
@@ -219,8 +253,6 @@ NOP
 ;-------------------------------
 ; Variables
 ;-------------------------------
-Loop_Start_Set:
-.byte 0
 Loop_Start_Map:
 .byte 0
 Loop_Start_Exit:
@@ -235,10 +267,9 @@ Loop_Start_Items:
 Loop_Start_ProgressFlags:
 .word 0,0,0,0,0,0,0,0
 
+Loop_Internal_State:
+.byte 0
 
-
-Loop_End_Set:
-.byte 1
 Loop_End_Map:
 .byte 0
 Loop_End_Exit:
@@ -246,4 +277,7 @@ Loop_End_Exit:
 
 .align
 Loop_MidSetStr:
-.asciiz "START SET"
+.asciiz "\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0"
+.asciiz "START SET\0\0\0\0\0\0"
+.asciiz "WAITING...\0\0\0\0\0"
+.asciiz "LOOP SET\0\0\0\0\0\0\0"
