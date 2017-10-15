@@ -808,9 +808,9 @@ local prev_y_vel = 0;
 function Game.colorDX()
 	local dx = math.abs(ScriptHawk.getDX());
 	if dx < prev_x_vel then
-		return 0xFFFF0000; -- Red
+		return colors.red;
 	elseif dx > prev_x_vel then
-		return 0xFF00FF00; -- Green
+		return colors.green;
 	end
 	prev_x_vel = math.abs(Game.getXVelocity());
 end
@@ -818,9 +818,9 @@ end
 function Game.colorDY()
 	local dy = math.abs(ScriptHawk.getDY());
 	if dy < prev_y_vel then
-		return 0xFFFF0000; -- Red
+		return colors.red;
 	elseif dy > prev_y_vel then
-		return 0xFF00FF00; -- Green
+		return colors.green;
 	end
 	prev_y_vel = math.abs(Game.getYVelocity());
 end

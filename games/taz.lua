@@ -75,10 +75,10 @@ end
 function Game.colorDX()
 	local dX = ScriptHawk.getDX();
 	if dX == 0 then
-		return 0xFFFF0000; -- Red
+		return colors.red;
 	end
 	if dX == 1 or dX == 5 or dX == 7 then
-		return 0xFFFFFF00; -- Yellow
+		return colors.yellow;
 	end
 end
 
@@ -129,7 +129,7 @@ local hitboxWidth = 16;
 local hitboxHeight = 16;
 
 function Game.drawUI()
-	local color = 0xFFFF0000; -- White
+	local color = colors.red;
 
 	local hitboxXOffset = 0;
 	local hitboxYOffset = 0;
