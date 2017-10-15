@@ -10,6 +10,7 @@ if emu.setislagged == nil then -- 1.11.5 (Feb 2016)
 end
 
 ScriptHawk = {
+	warnings = false, -- Useful for debugging but annoying for end users, so default to false
 	mode = "Position",
 	smooth_moving_angle = true,
 	UI = {
@@ -621,42 +622,54 @@ end
 --------------
 
 if type(Game.getXPosition) ~= "function" then
-	print("Warning: This module does not implement Game.getXPosition()");
+	if ScriptHawk.warnings then
+		print("Warning: This module does not implement Game.getXPosition()");
+	end
 	function Game.getXPosition()
 		return 0;
 	end
 end
 
 if type(Game.getYPosition) ~= "function" then
-	print("Warning: This module does not implement Game.getYPosition()");
+	if ScriptHawk.warnings then
+		print("Warning: This module does not implement Game.getYPosition()");
+	end
 	function Game.getYPosition()
 		return 0;
 	end
 end
 
 if type(Game.getZPosition) ~= "function" then
-	--print("Warning: This module does not implement Game.getZPosition()");
+	if ScriptHawk.warnings then
+		print("Warning: This module does not implement Game.getZPosition()");
+	end
 	function Game.getZPosition()
 		return 0;
 	end
 end
 
 if type(Game.setXPosition) ~= "function" then
-	--print("Warning: This module does not implement Game.setXPosition()");
+	if ScriptHawk.warnings then
+		print("Warning: This module does not implement Game.setXPosition()");
+	end
 	function Game.setXPosition()
 		return;
 	end
 end
 
 if type(Game.setYPosition) ~= "function" then
-	--print("Warning: This module does not implement Game.setYPosition()");
+	if ScriptHawk.warnings then
+		print("Warning: This module does not implement Game.setYPosition()");
+	end
 	function Game.setYPosition()
 		return;
 	end
 end
 
 if type(Game.setZPosition) ~= "function" then
-	--print("Warning: This module does not implement Game.setZPosition()");
+	if ScriptHawk.warnings then
+		print("Warning: This module does not implement Game.setZPosition()");
+	end
 	function Game.setZPosition()
 		return;
 	end
@@ -667,40 +680,52 @@ end
 --------------
 
 if type(Game.getXRotation) ~= "function" then
-	--print("Warning: This module does not implement Game.getXRotation()");
+	if ScriptHawk.warnings then
+		print("Warning: This module does not implement Game.getXRotation()");
+	end
 	function Game.getXRotation()
 		return 0;
 	end
 end
 
 if type(Game.getYRotation) ~= "function" then
-	--print("Warning: This module does not implement Game.getYRotation()");
+	if ScriptHawk.warnings then
+		print("Warning: This module does not implement Game.getYRotation()");
+	end
 	function Game.getYRotation()
 		return 0;
 	end
 end
 
 if type(Game.getZRotation) ~= "function" then
-	--print("Warning: This module does not implement Game.getZRotation()");
+	if ScriptHawk.warnings then
+		print("Warning: This module does not implement Game.getZRotation()");
+	end
 	function Game.getZRotation()
 		return 0;
 	end
 end
 
 if type(Game.setXRotation) ~= "function" then
-	--print("Warning: This module does not implement Game.setXRotation()");
+	if ScriptHawk.warnings then
+		print("Warning: This module does not implement Game.setXRotation()");
+	end
 	function Game.setXRotation(value)
 	end
 end
 
 if type(Game.setYRotation) ~= "function" then
-	--print("Warning: This module does not implement Game.setYRotation()");
+	if ScriptHawk.warnings then
+		print("Warning: This module does not implement Game.setYRotation()");
+	end
 	function Game.setYRotation(value)
 	end
 end
 
 if type(Game.setZRotation) ~= "function" then
-	--print("Warning: This module does not implement Game.setZRotation()");
+	if ScriptHawk.warnings then
+		print("Warning: This module does not implement Game.setZRotation()");
+	end
 	function Game.setZRotation(value)
 	end
 end
@@ -882,6 +907,9 @@ ScriptHawk.UI.form_controls["Toggle Rotation Units Button"] = forms.button(Scrip
 -- Init any custom UI that the game module uses
 if type(Game.initUI) == "function" then
 	Game.initUI();
+	if ScriptHawk.warnings then
+		ScriptHawk.UI.checkControls();
+	end
 end
 
 function ScriptHawk.UI.findMapValue()
@@ -1042,19 +1070,25 @@ end
 --------------------
 
 if type(Game.drawUI) ~= "function" then
-	--print("Warning: This module does not implement Game.drawUI()");
+	if ScriptHawk.warnings then
+		print("Warning: This module does not implement Game.drawUI()");
+	end
 	function Game.drawUI()
 	end
 end
 
 if type(Game.eachFrame) ~= "function" then
-	--print("Warning: This module does not implement Game.eachFrame()");
+	if ScriptHawk.warnings then
+		print("Warning: This module does not implement Game.eachFrame()");
+	end
 	function Game.eachFrame()
 	end
 end
 
 if type(Game.realTime) ~= "function" then
-	--print("Warning: This module does not implement Game.realTime()");
+	if ScriptHawk.warnings then
+		print("Warning: This module does not implement Game.realTime()");
+	end
 	function Game.realTime()
 	end
 end
@@ -1076,7 +1110,9 @@ if type(Game.setRotation) ~= "function" then
 end
 
 if type(Game.isPhysicsFrame) ~= "function" then
-	--print("Warning: This module does not implement Game.isPhysicsFrame()");
+	if ScriptHawk.warnings then
+		print("Warning: This module does not implement Game.isPhysicsFrame()");
+	end
 	function Game.isPhysicsFrame()
 		return not emu.islagged();
 	end
