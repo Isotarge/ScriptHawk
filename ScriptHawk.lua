@@ -419,6 +419,12 @@ local supportedGames = {
 	["08E01F9AD5B6148E1A4355C80E2B23D8B2463443"] = {["moduleName"] = "Tetris Attack Bot", ["selfContained"] = true, ["friendlyName"] = "Tetris Attack (Europe) (En,Ja)"}, -- SNES
 	["2DC56EAB3E70C0910AE47119D8B69F494E6000DF"] = {["moduleName"] = "Tetris Attack Bot", ["selfContained"] = true, ["friendlyName"] = "Tetris Attack (USA) (En,Ja)"}, -- SNES
 
+	-- The Ninja (SMS)
+	["76396A25902700E18ADF6BC5C8668E2A8BDF03A9"] = {["moduleName"] = "games.the_ninja", ["friendlyName"] = "The Ninja (UE)"},
+	["E9ACDAE112A898F7DB090FC0B8F1CE9B86637234"] = {["moduleName"] = "games.the_ninja", ["friendlyName"] = "The Ninja (J)"},
+	["2C620BA64FCAAC940B4B1566733037B3"] = {["moduleName"] = "games.the_ninja", ["friendlyName"] = "The Ninja (UE)"},
+	["41E20AFE05C2FBE45AC5F3A9C8111047"] = {["moduleName"] = "games.the_ninja", ["friendlyName"] = "The Ninja (J)"},
+
 	-- Toy Story 2
 	["A9F97E22391313095D2C2FBAF81FB33BFA2BA7C6"] = {["moduleName"] = "games.ts2", ["friendlyName"] = "Toy Story 2 - Buzz l'Eclair a la Rescousse! (France)"},
 	["92015E5254CBBAD1BC668ECB13A4B568E5F55052"] = {["moduleName"] = "games.ts2", ["friendlyName"] = "Toy Story 2 - Buzz Lightyear to the Rescue! (Europe)"},
