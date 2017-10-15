@@ -5,12 +5,14 @@
 -- For developers who want access to ScriptHawk's helper functions without the commitment of a full fat game module
 
 colors = {
+	transparent = 0x00000000,
+	black = 0xFF000000,
+	white = 0xFFFFFFFF,
 	red = 0xFFFF0000,
 	yellow = 0xFFFFFF00,
 	green = 0xFF00FF00,
+	blue = 0xFF00FFFF,
 	pink = 0xFFFF00FF,
-	black = 0xFF000000,
-	white = 0xFFFFFFFF,
 };
 
 -------------

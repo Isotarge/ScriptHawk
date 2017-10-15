@@ -72,6 +72,8 @@ function Game.colorYPosition()
 		-- Color Y position values less than 0 red
 		-- Format 0xAARRGGBB
 		return 0xFFFF0000;
+		-- LibScriptHawk also provides some common colors in a colors table, for example:
+		-- return colors.red;
 	end
 end
 

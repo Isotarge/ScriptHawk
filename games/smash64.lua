@@ -147,10 +147,10 @@ Game = {
 };
 
 local playerColors = {
-	[1] = 0xFFFF0000, -- Red
-	[2] = 0xFF00FFFF, -- Blue
-	[3] = 0xFFFFFF00, -- Yellow
-	[4] = 0xFF00FF00, -- Green
+	[1] = colors.red,
+	[2] = colors.blue,
+	[3] = colors.yellow,
+	[4] = colors.green,
 };
 
 local match_settings = {
@@ -621,11 +621,11 @@ end
 function Game.colorMovementState(player)
 	local state = Game.getMovementString(player);
 	if string.contains(state, "Unknown") then
-		return 0xFFFF0000; -- Red
+		return colors.red;
 	elseif string.contains(state, "Damaged") then
-		return 0xFFFFFF00; -- Yellow
+		return colors.yellow;
 	elseif string.contains(state, "Missed") then
-		return 0xFFFFFF00; -- Yellow
+		return colors.yellow;
 	end
 end
 

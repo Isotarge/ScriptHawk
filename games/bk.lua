@@ -353,7 +353,7 @@ end
 
 function Game.colorSlopeTimer()
 	if forms.ischecked(ScriptHawk.UI.form_controls.toggle_neverslip) then
-		return 0xFF00FFFF; -- Light blue
+		return colors.blue;
 	end
 	local slopeTimer = Game.getSlopeTimer();
 		if slopeTimer >= 0.75 then
@@ -1444,10 +1444,10 @@ end
 function Game.colorCurrentMovementState()
 	local stringMovementState = Game.getCurrentMovementState();
 	if stringMovementState == "Slipping" or stringMovementState == "Skidding" or stringMovementState == "Recovering" or stringMovementState == "Knockback" then
-		return 0xFFFFFF00; -- Yellow
+		return colors.yellow;
 	end
 	if stringMovementState == "Damaged" or stringMovementState == "Death" then
-		return 0xFFFF0000; -- Red
+		return colors.red;
 	end
 end
 
@@ -2010,9 +2010,9 @@ function drawObjectPositions()
 						end
 					end
 					-- Draw to screen
-					local color = 0xFFFFFFFF;
+					local color = colors.white;
 					if object_index == i then
-						color = 0xFFFFFF00;
+						color = colors.yellow;
 						if startDrag then
 							draggedObjects = {};
 							table.insert(draggedObjects, {i, drawXPos, drawYPos, objectData.zPos});
@@ -2176,9 +2176,6 @@ end
 -- OSD Stuff --
 ---------------
 
-local green_highlight = 0xFF00FF00;
-local yellow_highlight = 0xFFFFFF00;
-
 local function toggleObjectAnalysisToolsMode()
 	script_mode_index = script_mode_index + 1;
 	if script_mode_index > #script_modes then
@@ -2272,7 +2269,7 @@ function Game.drawUI()
 
 			local color = nil;
 			if object_index == i then
-				color = yellow_highlight;
+				color = colors.yellow;
 			end
 
 			if animationType == "Unknown" then
@@ -2296,7 +2293,7 @@ function Game.drawUI()
 				local x = mainmemory.read_s16_be(structPointers[i] + 0x04); -- TODO: Get these constants from somewhere
 				local y = mainmemory.read_s16_be(structPointers[i] + 0x06);
 				local z = mainmemory.read_s16_be(structPointers[i] + 0x08);
-				gui.text(Game.OSDPosition[1], 2 + Game.OSDRowHeight * row, structName..x..", "..y..", "..z.." "..i..": "..toHexString(structPointers[i]), yellow_highlight, 'bottomright');
+				gui.text(Game.OSDPosition[1], 2 + Game.OSDRowHeight * row, structName..x..", "..y..", "..z.." "..i..": "..toHexString(structPointers[i]), colors.yellow, 'bottomright');
 				row = row + 1;
 			else
 				gui.text(Game.OSDPosition[1], 2 + Game.OSDRowHeight * row, structName..i..": "..toHexString(structPointers[i]), color, 'bottomright');
@@ -2918,7 +2915,7 @@ end
 
 function Game.colorYVelocity()
 	if Game.getYVelocity() <= clip_vel then
-		return 0xFF00FF00; -- Green
+		return colors.green;
 	end
 end
 

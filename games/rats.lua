@@ -76,7 +76,7 @@ function Game.drawUI() -- Optional: This function will be executed once per fram
 		local xVel = mainmemory.read_s16_le(objectBase + 0x06);
 		local yVel = mainmemory.read_s16_le(objectBase + 0x0C);
 
-		gui.text(2, i * row_height, "X:"..xPos..", Y:"..yPos..", X Velocity:"..xVel..", Y Velocity:"..yVel, 0xFFFFFFFF, "bottomright");
+		gui.text(2, i * row_height, "X:"..xPos..", Y:"..yPos..", X Velocity:"..xVel..", Y Velocity:"..yVel, colors.white, "bottomright");
 	end
 end
 

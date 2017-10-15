@@ -53,10 +53,10 @@ end
 
 function Game.colorJumpHeight()
 	if forms.ischecked(ScriptHawk.UI.form_controls["Toggle Super Jump Checkbox"]) then
-		return 0xFF00FFFF; -- Light Blue
+		return colors.blue;
 	end
 	if Game.getJumpHeight() ~= 0 then
-		return 0xFF00FF00; -- Green
+		return colors.green;
 	end
 end
 
@@ -149,7 +149,7 @@ function Game.drawUI()
 			--gui.text(2, 2 + row * Game.OSDRowHeight, toHexString(positionBase)..": ".."X: "..xPos..", Y:"..yPos, nil, "bottomright");
 			--row = row + 1;
 			gui.drawRectangle(xPos + hitboxXOffset, yPos + hitboxYOffset, hitboxWidth, hitboxHeight, color, 0x33000000); -- Draw the object's hitbox
-			gui.drawText(xPos + hitboxXOffset, yPos + hitboxYOffset, status, color, 0x00000000);
+			gui.drawText(xPos + hitboxXOffset, yPos + hitboxYOffset, status, color, colors.transparent);
 		end
 	end
 end

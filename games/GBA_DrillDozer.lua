@@ -236,13 +236,13 @@ end
 function Game.colorCurrentMovementState()
 	local stringMovementState = Game.getCurrentMovementState();
 	--if stringMovementState == "Slipping" or stringMovementState == "Skidding" or stringMovementState == "Recovering" or stringMovementState == "Knockback" then
-	--	return 0xFFFFFF00; -- Yellow
+	--	return colors.yellow;
 	--end
 	if stringMovementState == "Damaged (L)" 
 		or stringMovementState == "Damaged (R)" 
 		or stringMovementState == "Swimming: Damaged (L)" 
 		or stringMovementState == "Swimming: Damaged (R)" then
-		return 0xFFFF0000; -- Red
+		return colors.red;
 	end
 end
 

@@ -427,7 +427,7 @@ function Game.colorSpinTimer()
 	spinTimer = math.min(spinTimer, 80);
 	spinTimer = spinTimer / 80;
 	if spinTimer == 0 then
-		return 0xFFFFFFFF; -- White
+		return colors.white;
 	end
 	return getColor(spinTimer);
 end

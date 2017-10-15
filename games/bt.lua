@@ -842,7 +842,7 @@ end
 
 function Game.colorSlopeTimer()
 	if forms.ischecked(ScriptHawk.UI.form_controls.toggle_neverslip) then
-		return 0xFF00FFFF; -- Light blue
+		return colors.blue;
 	end
 	local slopeTimer = Game.getSlopeTimer();
 	if slopeTimer >= 0.75 then
@@ -4206,8 +4206,6 @@ local function getAnimationType(model1Base)
 	return "Unknown";
 end
 
-local green_highlight = 0xFF00FF00;
-local yellow_highlight = 0xFFFFFF00;
 local max_page_size = 40;
 
 function Game.drawUI()
@@ -4256,7 +4254,7 @@ function Game.drawUI()
 
 			local color = nil;
 			if page_index == i then
-				color = yellow_highlight;
+				color = colors.yellow;
 			end
 
 			local xPos = mainmemory.readfloat(currentSlotBase + object_model1.x_position, true);

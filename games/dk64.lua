@@ -566,7 +566,7 @@ local function drawSubGameHitboxes()
 				end
 			end
 		end
-		gui.drawBox(leftX, topY, rightX, bottomY, 0xFFFFFFFF);
+		gui.drawBox(leftX, topY, rightX, bottomY, colors.white);
 		if (mouse.X >= leftX and mouse.X <= rightX) and (mouse.Y >= topY and mouse.Y <= bottomY) then
 			if startDrag then
 				table.insert(draggedObjects, {i, xPosition, yPosition});
@@ -576,7 +576,7 @@ local function drawSubGameHitboxes()
 	end
 
 	-- Draw mouse
-	--gui.drawPixel(mouse.X, mouse.Y, 0xFFFFFFFF);
+	--gui.drawPixel(mouse.X, mouse.Y, colors.white);
 	gui.drawImage("beta/cursor.png", mouse.X, mouse.Y - 4);
 end
 
@@ -4963,7 +4963,7 @@ local MJ_colors = {
 	blue = 0x7F00A2E8,
 	blue_switch = 0xFF00A2E8,
 	white = 0x7FFFFFFF,
-	white_switch = 0xFFFFFFFF
+	white_switch = colors.white
 };
 
 -- Minimap ui
@@ -6220,9 +6220,6 @@ local function drawGrabScriptUI()
 	local row = 0;
 	local height = 16;
 
-	local green_highlight = 0xFF00FF00;
-	local yellow_highlight = 0xFFFFFF00;
-
 	gui.text(gui_x, gui_y + height * row, "Mode: "..grab_script_mode, nil, 'bottomright');
 	row = row + 1;
 
@@ -6338,10 +6335,10 @@ local function drawGrabScriptUI()
 				local currentActorSize = mainmemory.read_u32_be(object_pointers[i] + heap.object_size); -- TODO: Got an exception here while kiosk was booting
 				local color = nil;
 				if object_index == i then
-					color = yellow_highlight;
+					color = colors.yellow;
 				end
 				if object_pointers[i] == playerObject then
-					color = green_highlight;
+					color = colors.green;
 				end
 				gui.text(gui_x, gui_y + height * row, i..": "..getActorName(object_pointers[i]).." "..toHexString(object_pointers[i] or 0, 6).." ("..toHexString(currentActorSize)..")", color, 'bottomright');
 				row = row + 1;
@@ -6362,10 +6359,10 @@ local function drawGrabScriptUI()
 				behaviorPointer = behaviorPointer.." ("..toHexString(behaviorID, 4)..")";
 				local color = nil;
 				if FTA.isGB(collectableState) then
-					color = yellow_highlight;
+					color = colors.yellow;
 				end
 				if object_index == i then
-					color = green_highlight;
+					color = colors.green;
 				end
 
 				if not (behaviorPointer == "" and hide_non_scripted) then
@@ -6379,7 +6376,7 @@ local function drawGrabScriptUI()
 			for i = #object_pointers, 1, -1 do
 				local color = nil;
 				if object_index == i then
-					color = green_highlight;
+					color = colors.green;
 				end
 
 				local base = object_pointers[i];
@@ -6415,7 +6412,7 @@ local function drawGrabScriptUI()
 			for i = #object_pointers, 1, -1 do
 				local color = nil;
 				if object_index == i then
-					color = green_highlight;
+					color = colors.green;
 				end
 				local d1 = mainmemory.read_u32_be(object_pointers[i] + chunk.deload1);
 				local d2 = mainmemory.read_u32_be(object_pointers[i] + chunk.deload2);
@@ -6432,7 +6429,7 @@ local function drawGrabScriptUI()
 				local exitBase = object_pointers[i];
 				local color = nil;
 				if object_index == i then
-					color = green_highlight;
+					color = colors.green;
 				end
 				local xPos = mainmemory.read_s16_be(exitBase + 0);
 				local yPos = mainmemory.read_s16_be(exitBase + 2);
@@ -6766,9 +6763,9 @@ function drawObjectPositions()
 					--]]
 
 					-- Draw to screen
-					local color = 0xFFFFFFFF;
+					local color = colors.white;
 					if object_index == i then
-						color = 0xFFFFFF00;
+						color = colors.yellow;
 						if startDrag then
 							table.insert(draggedObjects, {i, drawXPos, drawYPos, objectData.zPos});
 						end

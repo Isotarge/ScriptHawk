@@ -296,16 +296,16 @@ local function draw_map()
 		if value > 0x80 then
 			value = value - 0x80;
 		end
-		local mapColor = 0xFFFFFFFF;
-		if value == 0x0F then -- Color end map purple
-			mapColor = 0xFFFF00FF;
+		local mapColor = colors.white;
+		if value == 0x0F then
+			mapColor = colors.pink;
 		end
 		value = Game.countPuzzlePieces(value);
 		if value == 0 then
 			mapColor = mapColor - 0x80000000; -- Halve alpha
-			gui.drawText(draw_x + ((i - 1) % 9) * column_width, draw_y + row * row_height - 3, ".", mapColor, 0x00000000);
+			gui.drawText(draw_x + ((i - 1) % 9) * column_width, draw_y + row * row_height - 3, ".", mapColor, colors.transparent);
 		else
-			gui.drawText(draw_x + ((i - 1) % 9) * column_width, draw_y + row * row_height, value, mapColor, 0x00000000);
+			gui.drawText(draw_x + ((i - 1) % 9) * column_width, draw_y + row * row_height, value, mapColor, colors.transparent);
 		end
 	end
 end
@@ -354,8 +354,8 @@ local function draw_puzzle()
 		puzzleY = 150;
 	end
 
-	gui.drawText(puzzleX, puzzleY, piece0Major.."-"..piece0Minor.." "..piece0HFlipped..piece0VFlipped, 0xFFFFFFFF, 0x00000000);
-	gui.drawText(puzzleX, puzzleY + 24, piece1Major.."-"..piece1Minor.." "..piece1HFlipped..piece1VFlipped, 0xFFFFFFFF, 0x00000000);
+	gui.drawText(puzzleX, puzzleY, piece0Major.."-"..piece0Minor.." "..piece0HFlipped..piece0VFlipped, colors.white, colors.transparent);
+	gui.drawText(puzzleX, puzzleY + 24, piece1Major.."-"..piece1Minor.." "..piece1HFlipped..piece1VFlipped, colors.white, colors.transparent);
 end
 
 function Game.dumpPuzzleInventory()
