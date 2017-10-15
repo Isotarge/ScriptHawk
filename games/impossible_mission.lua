@@ -254,11 +254,11 @@ function Game.getPuzzleColorChangesRequired()
 		for j = 0, 3 do
 			local colorValue = bit.band(mainmemory.readbyte(Game.Memory.puzzle_rotation + (i * 4) + j), 0x0F);
 			if colorValue == 0x01 then
-				redSpotted = true;
+				blueSpotted = true;
 			elseif colorValue == 0x02 then
 				greenSpotted = true;
 			elseif colorValue == 0x03 then
-				blueSpotted = true;
+				redSpotted = true;
 			end
 		end
 		local uniqueColors = 0;
@@ -356,6 +356,43 @@ local function draw_puzzle()
 
 	gui.drawText(puzzleX, puzzleY, piece0Major.."-"..piece0Minor.." "..piece0HFlipped..piece0VFlipped, 0xFFFFFFFF, 0x00000000);
 	gui.drawText(puzzleX, puzzleY + 24, piece1Major.."-"..piece1Minor.." "..piece1HFlipped..piece1VFlipped, 0xFFFFFFFF, 0x00000000);
+end
+
+function Game.dumpPuzzleInventory()
+	for i = 0, 35 do
+		local piece = mainmemory.readbyte(Game.Memory.puzzle_pieces + i);
+		if piece < 0xFF then
+			local pieceMajor = math.floor(piece / 4);
+			local pieceMinor = piece % 4;
+			local pieceRotation = mainmemory.readbyte(Game.Memory.puzzle_rotation + piece);
+			local pieceVFlipped = bit.band(0x40, pieceRotation) > 0;
+			local pieceHFlipped = bit.band(0x80, pieceRotation) > 0;
+			if pieceVFlipped then
+				pieceVFlipped = "V";
+			else
+				pieceVFlipped = "";
+			end
+			if pieceHFlipped then
+				pieceHFlipped = "H";
+			else
+				pieceHFlipped = "";
+			end
+
+			local pieceColor = bit.band(pieceRotation, 0x0F);
+			if pieceColor == 0x01 then
+				pieceColor = "B";
+			elseif pieceColor == 0x02 then
+				pieceColor = "G";
+			elseif pieceColor == 0x03 then
+				pieceColor = "R";
+			else
+				pieceColor = "U";
+			end
+
+			dprint(pieceMajor.."-"..pieceMinor.." "..pieceColor.." "..pieceHFlipped..pieceVFlipped);
+		end
+	end
+	print_deferred();
 end
 
 local tile_width = 8;
