@@ -925,6 +925,9 @@ end
 
 -- Check for missing OSD definitions
 if type(Game.OSD) ~= "table" then
+	if ScriptHawk.warnings then
+		print("Warning: This module does not define a custom Game.OSD");
+	end
 	Game.OSD = {
 		{"X", Game.getXPosition},
 		{"Y", Game.getYPosition},
