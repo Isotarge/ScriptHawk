@@ -1,14 +1,13 @@
 <html>
 <head>
-	<title>Key Priority Simulator 2015</title>
-	<script src="https://code.jquery.com/jquery-2.2.1.min.js"></script>
+	<title>Key Priority Simulator 2017</title>
 	<script>
 		var keys = [false, false, false, false, false, false, false, false],
 			queue = [];
 
 		function computePriority() {
 			for (var i = 0; i < 8; i++) {
-				keys[i] = $('#key' + (i + 1)).prop("checked");
+				keys[i] = document.getElementById('key' + (i + 1)).checked;
 			}
 
 			var selectedKeys = countSelectedKeys();
@@ -29,9 +28,9 @@
 				for (var i = 0; i < queue.length; i++) {
 					priorityString += queue[i] + (i < queue.length - 1 ? " &#8680; " : "");
 				}
-				$("#order").html(priorityString);
+				document.getElementById("order").innerHTML = priorityString;
 			} else {
-				$("#order").html("No keys selected.");
+				document.getElementById("order").innerHTML = "No keys selected.";
 			}
 		}
 
@@ -63,10 +62,15 @@
 			}
 		}
 
-		$(function() {
-			$('input').change(computePriority);
-			$('#year').html(new Date().getFullYear());
-		});
+		window.onload = function() {
+			var inputs = document.getElementsByTagName('input');
+			for (var i = 0; i < inputs.length; i++) {
+				inputs[i].addEventListener("change", computePriority);
+			}
+			var fullYear = new Date().getFullYear();
+			document.getElementById('year').innerHTML = fullYear;
+			document.title = "Key Priority Simulator " + fullYear;
+		};
 	</script>
 	<style>
 		* {
@@ -86,7 +90,7 @@
 	</style>
 </head>
 <body>
-	<h1>Key Priority Simulator <span id="year">2016</span></h1>
+	<h1>Key Priority Simulator <span id="year">2017</span></h1>
 	<h2>Select Keys in inventory</h2>
 	<table>
 		<tr>
@@ -115,6 +119,6 @@
 		If the Key plays a lobby opening cutscene (everything except Keys 3 and 8), the area reloads and the process starts again.<br>
 		If it's Key 3 or 8, the game then picks the lowest key from the player's inventory to turn next.<br>
 	</p>
-	<b>Based on research by <a href="http://www.twitch.tv/tiffanyfruit">TJ</a> &amp; <a href="http://www.twitch.tv/isotarge">Isotarge</a></b>
+	<b>Based on research by <a href="https://twitch.tv/tiffany_jane_">TJ</a> &amp; <a href="https://twitch.tv/isotarge">Isotarge</a></b>
 </body>
 </html>
