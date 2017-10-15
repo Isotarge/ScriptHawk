@@ -7,6 +7,8 @@ end
 
 local Game = {
 	speedy_speeds = {0},
+	speedy_index = 1,
+	max_rot_units = 0,
 	Memory = {
 		object_array_base = 0xE80,
 		player_x = 0xEB2, -- s16_le
@@ -19,6 +21,8 @@ local Game = {
 };
 
 function Game.detectVersion(romName, romHash)
+	ScriptHawk.dpad.joypad.enabled = false;
+	ScriptHawk.dpad.key.enabled = false;
 	return true;
 end
 
@@ -221,7 +225,7 @@ function Game.getBossHealth()
 end
 
 function Game.getDColor()
-	if ScriptHawk.getDX() > 0 or ScriptHawk.getDY() > 0 then
+	if math.abs(ScriptHawk.getDX()) > 0 or math.abs(ScriptHawk.getDY()) > 0 then
 		return colors.white;
 	end
 	return colors.red;
