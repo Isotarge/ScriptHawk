@@ -13,7 +13,7 @@ ScriptHawk = {
 	mode = "Position",
 	smooth_moving_angle = true,
 	UI = {
-		form_controls = {}, -- TODO: Detect UI position problems using this array
+		form_controls = {},
 		form_padding = 8,
 		label_offset = 5,
 		dropdown_offset = 1,
@@ -21,6 +21,39 @@ ScriptHawk = {
 		button_height = 23,
 	},
 };
+
+function ScriptHawk.UI.controlsOverlap(control1, control2)
+	local x1 = tonumber(forms.getproperty(control1, "Left"));
+	local y1 = tonumber(forms.getproperty(control1, "Top"));
+	local w1 = tonumber(forms.getproperty(control1, "Width"))
+	local h1 = tonumber(forms.getproperty(control1, "Height"));
+
+	local x2 = tonumber(forms.getproperty(control2, "Left"));
+	local y2 = tonumber(forms.getproperty(control2, "Top"));
+	local w2 = tonumber(forms.getproperty(control2, "Width"))
+	local h2 = tonumber(forms.getproperty(control2, "Height"));
+
+	--gui.drawRectangle(x1, y1, w1, h1);
+	--gui.drawRectangle(x2, y2, w2, h2);
+
+	return x1 < x2 + w2 and x2 < x1 + w1 and y1 < y2 + h2 and y2 < y1 + h1;
+end
+
+function ScriptHawk.UI.checkControls()
+	for k, v in pairs(ScriptHawk.UI.form_controls) do
+		--local x = forms.getproperty(v, "Left");
+		--local y = forms.getproperty(v, "Top");
+		--local w = forms.getproperty(v, "Width")
+		--local h = forms.getproperty(v, "Height");
+		--dprint(k.." ("..v.."): Position: "..x..", "..y.." Size: "..w..", "..h);
+		for l, u in pairs(ScriptHawk.UI.form_controls) do
+			if v ~= u and ScriptHawk.UI.controlsOverlap(v, u) then
+				dprint("Warning: Controls \""..k.."\" and \""..l.."\" may be overlapping!");
+			end
+		end
+	end
+	print_deferred();
+end
 
 ---------------
 -- Libraries --
