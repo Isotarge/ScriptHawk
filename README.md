@@ -123,7 +123,6 @@ While ScriptHawk does have basic support for OoT and MM there are people who are
 - [Alex Kidd in Miracle World](Beta/Miracle%20World.lua) object viewer with drag and drop support
 - [Golden Axe Warrior](Beta/Golden%20Axe%20Warrior.lua) object viewer with drag and drop support
 - [Golvellius](Beta/Golvellius.lua) object viewer with drag and drop support
-- [The Ninja](Beta/The%20Ninja.lua) (SMS) object viewer with drag and drop support
 - [Tetris Attack](Tetris%20Attack%20Bot.lua) bot, plays the game quite well using a simple sorting algorithm
 - [Mr. Driller 2](Beta/Drillbot.lua) bot
 - [remove_klump.lua](Beta/remove_klump.lua), [code golf](https://en.wikipedia.org/wiki/Code_golf) that removes Klumps from DK64 USA version
