@@ -106,6 +106,13 @@ While ScriptHawk does have basic support for OoT and MM there are people who are
 - [mattpilla/Majora-s-Mask-Lua-Scripts](https://github.com/mattpilla/Majora-s-Mask-Lua-Scripts)
 - [glankk/gz](https://github.com/glankk/gz)
 
+## Other Supported Games
+- Drill Dozer (GBA)
+- Impossible Mission (SMS)
+- Rats! (GBC)
+- Taz-Mania (SMS)
+- The Ninja (SMS)
+
 ## Partially Supported Games
 - Elmo's Number Journey (N64 only)
 - Elmo's Letter Adventure (N64 only)
@@ -124,12 +131,12 @@ While ScriptHawk does have basic support for OoT and MM there are people who are
 - [Wonder Boy III](Beta/Wonder%20Boy%20III%20RNG%20Watch.lua) RNG watch, written by [The8bitbeast](https://twitter.com/the8bitbeast)
 - Dega .MMV reader
 
-## Other Notable BizHawk + Lua Projects
-- Banjo-Kazooie [MittenzHugg/Banjo-KazooC](https://github.com/MittenzHugg/Banjo-KazooC)
+## Other Notable Projects
+- Banjo-Kazooie [MittenzHugg/Mr.Patcher](https://github.com/MittenzHugg/Mr.Patcher)
 - GoldenEye [Wyst3r/GoldenEye](https://bitbucket.org/Wyst3r/bizhawklua)
 - Mario Kart 64 [weatherton/BizHawkMarioKart64](https://github.com/weatherton/BizHawkMarioKart64)
+- Super Mario 64 [SM64-STROOP/STROOP](https://github.com/SM64-STROOP/STROOP)
 - Super Mario World [rodamaral/smw-tas](https://github.com/rodamaral/smw-tas)
-- Pokémon Red & Yellow [kylecoburn/PokéBot](https://github.com/kylecoburn/PokeBot)
 
 ## Support me
 If you like my work, consider [donating](https://streamtip.com/t/isotarge)
