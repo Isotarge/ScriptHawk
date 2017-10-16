@@ -1057,6 +1057,9 @@ function ScriptHawk.UI.updateReadouts()
 				gui.text(OSDX, OSDY + Game.OSDRowHeight * row, label..": "..value.." ("..telemetryDataThisFrame[telemetryIndex]..")", color);
 				telemetryIndex = telemetryIndex + 1;
 			else
+				if collecting_telemetry then
+					table.insert(telemetryDataThisFrame, value);
+				end
 				gui.text(OSDX, OSDY + Game.OSDRowHeight * row, label..": "..value, color);
 			end
 		else
@@ -1065,6 +1068,9 @@ function ScriptHawk.UI.updateReadouts()
 			end
 		end
 		row = row + 1;
+	end
+	if collecting_telemetry then
+		telemetryData[emu.framecount()] = telemetryDataThisFrame;
 	end
 end
 
@@ -1351,73 +1357,6 @@ local function plot_pos()
 		prev_x = x;
 		prev_y = y;
 		prev_z = z;
-	end
-
-	-- Telemetry
-	if collecting_telemetry then
-		local tempTelemetryData = {};
-		for i = 1, #Game.OSD do
-			local label = Game.OSD[i][1];
-			local value = Game.OSD[i][2];
-
-			if label ~= "Separator" then
-				local labelLower = string.lower(label);
-
-				-- Detect special keywords
-				if labelLower == "dx" then
-					value = dx or 0;
-				end
-				if labelLower == "dy" then
-					value = dy or 0;
-				end
-				if labelLower == "dz" then
-					value = dz or 0;
-				end
-				if labelLower == "dxz" or labelLower == "d" then
-					value = d or 0;
-				end
-
-				if labelLower == "max dx" then
-					value = max_dx or 0;
-				end
-				if labelLower == "max dy" then
-					value = max_dy or 0;
-				end
-				if labelLower == "max dz" then
-					value = max_dz or 0;
-				end
-				if labelLower == "max dxz" or labelLower == "max d" then
-					value = max_d or 0;
-				end
-				if labelLower == "odometer" then
-					value = odometer or 0;
-				end
-
-				if labelLower == "moving angle" and value == nil then -- TODO: This has some name conflicts, "moving"
-					value = round(ScriptHawk.movingAngle, precision)..string.char(0xB0);
-				end
-
-				-- Get the value
-				if type(value) == "function" then
-					value = value();
-				end
-
-				-- Round the value
-				if type(value) == "number" then
-					value = round(value, precision);
-				end
-
-				-- Detect and format rotation based on a keyword search
-				for j = 1, #angleKeywords do
-					if label == angleKeywords[j] then
-						value = ScriptHawk.UI.formatRotation(value);
-					end
-				end
-
-				table.insert(tempTelemetryData, value);
-			end
-		end
-		telemetryData[current_frame] = tempTelemetryData;
 	end
 
 	if not client.ispaused() then
