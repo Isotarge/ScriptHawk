@@ -1,4 +1,5 @@
 SystemID N64
+6F1C70	d	u	1	RDRAM	Current Lag Speed Boost
 6F1CC4	d	u	1	RDRAM	Destination Map
 6F1CC8	d	u	1	RDRAM	Destination Exit
 6F1CCC	b	u	1	RDRAM	Cutscene Active
