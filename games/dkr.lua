@@ -22,6 +22,7 @@ local Game = {
 		["cheat_menu"] = {0x0E03AC, 0x0DFE2C, 0x0E17FC, 0x0E031C, 0x0DFD9C}, -- Bitfield u32_be
 		["pointer_list"] = {0x11B468, 0x11AEE8, 0x11C8C8, 0x11B3D8, 0x11AE58},
 		["num_objects"] = {0x11B46C, 0x11AEEC, 0x11C8CC, 0x11B3DC, 0x11AE5C},
+		["hud_pointer_pointer"] = {0x11B4FC, 0x11AF7C, 0x11C95C, 0x11B46C, 0x11AEEC}, -- Pointer
 	},
 	maps = {
 		"0x00 - Overworld",
@@ -101,7 +102,11 @@ local player_object_pointer = 0x3FFFC0; -- Seems to be the same for all versions
 
 function Game.getPlayerObject(player)
 	player = player or 1;
-	return dereferencePointer(player_object_pointer + (player - 1) * 4);
+	local hud = dereferencePointer(Game.Memory.hud_pointer_pointer[version]);
+	if isRDRAM(hud) then
+		return dereferencePointer(hud + (player - 1) * 4);
+	end
+	--return dereferencePointer(player_object_pointer + (player - 1) * 4);
 end
 
 local currentPointers = {};
@@ -172,6 +177,9 @@ local object_fields = {
 	["powerup_quantity"] = 0x20B, -- Byte, Max 10
 	["powerup_level"] = 0x20C, -- Byte, 0-2
 	["bananas"] = 0x21D, -- s8, capped at 99
+	["checkpoint"] = 0x228, -- u16_be
+	["checkpoint_minor"] = 0x22A, -- byte
+	["checkpoint_lap"] = 0x22B, -- byte
 	["x_rot"] = 0x23A, -- 16_be
 	["y_rot"] = 0x238, -- 16_be
 	["facing_angle"] = 0x238, -- 16_be
@@ -180,7 +188,11 @@ local object_fields = {
 	["silver_coins"] = 0x29A,
 };
 
--- Game settings fields, relative to dereferencePointer(Game.Memory.game_settings[version])
+function Game.getGameSettings()
+	return dereferencePointer(Game.Memory.game_settings[version]);
+end
+
+-- Game settings fields, relative to Game.getGameSettings()
 game_settings_fields = {
 	keys_collected = 0x08, -- u16_be? bitfield
 	bosses_beaten = 0x0D, -- byte? bitfield
@@ -247,8 +259,13 @@ local planes = {
 };
 
 local function isVehicle(objectBase)
-	local name = getObjectName(objectBase);
-	return table.contains(cars, name) or table.contains(hovers, name) or table.contains(planes, name); -- TODO: Faster method of detection, object size?
+	for i = 0, 7 do
+		if dereferencePointer(player_object_pointer + i * 4) == objectBase then
+			local name = getObjectName(objectBase);
+			return table.contains(cars, name) or table.contains(hovers, name) or table.contains(planes, name);
+		end
+	end
+	return false;
 end
 
 function getExamineData(objectBase)
@@ -371,7 +388,7 @@ local charToCSS = { -- Table to convert character selection screen index to in g
 function Game.setCharacter(index, player)
 	player = player or 1;
 	mainmemory.writebyte(Game.Memory.CSS_character[version] + player - 1, charToCSS[index] or 9);
-	local gameSettings = dereferencePointer(Game.Memory.game_settings[version]);
+	local gameSettings = Game.getGameSettings();
 	if isRDRAM(gameSettings) then
 		mainmemory.writebyte(gameSettings + game_settings_fields.p1_character + ((player - 1) * 0x18), index);
 	end
@@ -421,8 +438,8 @@ function Game.getSpinTimer(player)
 	return 0;
 end
 
-function Game.colorSpinTimer()
-	local spinTimer = Game.getSpinTimer();
+function Game.colorSpinTimer(player)
+	local spinTimer = Game.getSpinTimer(player);
 	spinTimer = math.abs(spinTimer);
 	spinTimer = math.min(spinTimer, 80);
 	spinTimer = spinTimer / 80;
@@ -476,6 +493,17 @@ function Game.setBananas(value, player)
 	if isRDRAM(playerObject) then
 		mainmemory.writebyte(playerObject + object_fields.bananas, value);
 	end
+end
+
+function Game.getCheckpointOSD(player)
+	local playerObject = Game.getPlayerObject(player);
+	if isRDRAM(playerObject) then
+		local checkpoint = mainmemory.read_u16_be(playerObject + object_fields.checkpoint);
+		local checkpointMinor = mainmemory.readbyte(playerObject + object_fields.checkpoint_minor);
+		local checkpointLap = mainmemory.readbyte(playerObject + object_fields.checkpoint_lap);
+		return checkpoint.." ("..checkpointMinor..","..checkpointLap..")"
+	end
+	return "0 (0,0)";
 end
 
 --------------
@@ -895,7 +923,7 @@ function Game.setMap(value)
 	end
 
 	-- This write sets the menu options, much closer to what the game actually does
-	local gameSettings = dereferencePointer(Game.Memory.game_settings[version]);
+	local gameSettings = Game.getGameSettings();
 	if isRDRAM(gameSettings) then
 		mainmemory.writebyte(gameSettings + game_settings_fields.map, value);
 	end
@@ -1073,6 +1101,10 @@ Game.OSD = {
 	{"Facing", Game.getYRotation},
 	--{"Moving", Game.getMovingRotation},
 	{"Rot. Z", Game.getZRotation},
+	{"Separator", 1},
+	{"Game Settings", function() return toHexString(Game.getGameSettings()) end},
+	{"Player", function() return toHexString(Game.getPlayerObject()) end},
+	{"Checkpoint", Game.getCheckpointOSD},
 };
 
 return Game;
