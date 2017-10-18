@@ -444,6 +444,7 @@ local position_pointer_index = 57 * 4;
 local rot_z_pointer_index = 61 * 4;
 local rot_y_pointer_index = 62 * 4;
 local movement_state_pointer_index = 72 * 4;
+local grounded_pointer_index = 84 * 4;
 
 -- Relative to Position object
 local x_pos = 0x00;
@@ -1301,31 +1302,66 @@ local movementStates = {
 function Game.getCurrentMovementState()
 	local movementStateObject = Game.getPlayerSubObject(movement_state_pointer_index);
 	if isRDRAM(movementStateObject) then
-		local movementState = mainmemory.read_u32_be(movementStateObject + 4);
-		if type(movementStates[movementState]) == "string" then
-			return movementStates[movementState];
-		end
-		return toHexString(movementState);
+		return mainmemory.read_u32_be(movementStateObject + 4);
 	end
-	return "Unknown";
+	return 0;
+end
+
+function Game.getCurrentMovementStateOSD()
+	local movementState = Game.getCurrentMovementState();
+	if type(movementStates[movementState]) == "string" then
+		return movementStates[movementState];
+	end
+	return toHexString(movementState);
 end
 
 function Game.getPreviousMovementState()
 	local movementStateObject = Game.getPlayerSubObject(movement_state_pointer_index);
 	if isRDRAM(movementStateObject) then
-		local movementState = mainmemory.read_u32_be(movementStateObject + 0);
-		if type(movementStates[movementState]) == "string" then
-			return movementStates[movementState];
-		end
-		return toHexString(movementState);
+		return mainmemory.read_u32_be(movementStateObject + 0);
 	end
-	return "Unknown";
+	return 0;
+end
+
+function Game.getPreviousMovementStateOSD()
+	local movementState = Game.getPreviousMovementState();
+	if type(movementStates[movementState]) == "string" then
+		return movementStates[movementState];
+	end
+	return toHexString(movementState);
 end
 
 function Game.setMovementState(state)
 	local movementStateObject = Game.getPlayerSubObject(movement_state_pointer_index);
 	if isRDRAM(movementStateObject) then
 		mainmemory.write_u32_be(movementStateObject + 4, state);
+	end
+end
+
+function Game.playerIsGrounded()
+	local playerGroundedObject = Game.getPlayerSubObject(grounded_pointer_index);
+	if isRDRAM(playerGroundedObject) then
+		return mainmemory.readbyte(playerGroundedObject + 2) == 1;
+	end
+	return false;
+end
+
+--------------
+-- Autojump --
+--------------
+
+local holdingAPostJump = false;
+function autoJump()
+	local currentMovementState = Game.getCurrentMovementState();
+	local YVelocity = Game.getYVelocity();
+
+	-- Frame perfect mid air talon trot slide jump
+	if (currentMovementState == 0x15 and not Game.playerIsGrounded()) or holdingAPostJump then
+		holdingAPostJump = true;
+		if holdingAPostJump then
+			holdingAPostJump = holdingAPostJump and (currentMovementState == 0x15 or YVelocity > 0); -- TODO: Better method for detecting end of a jump, velocity > 0 is janky
+		end
+		joypad.set({["A"] = true}, 1);
 	end
 end
 
@@ -4459,6 +4495,7 @@ function Game.initUI()
 	--forms.setproperty(ScriptHawk.UI.form_controls.realtime_flags, "Checked", true);
 
 	ScriptHawk.UI.form_controls.toggle_neverslip = forms.checkbox(ScriptHawk.UI.options_form, "Never Slip", ScriptHawk.UI.col(0) + ScriptHawk.UI.dropdown_offset, ScriptHawk.UI.row(6) + ScriptHawk.UI.dropdown_offset);
+	ScriptHawk.UI.form_controls.toggle_autojump = forms.checkbox(ScriptHawk.UI.options_form, "Autojump", ScriptHawk.UI.col(5) + ScriptHawk.UI.dropdown_offset, ScriptHawk.UI.row(6) + ScriptHawk.UI.dropdown_offset);
 
 	-- Moves
 	ScriptHawk.UI.form_controls.moves_dropdown = forms.dropdown(ScriptHawk.UI.options_form, { "1. All", "2. None" }, ScriptHawk.UI.col(5) - ScriptHawk.UI.dropdown_offset, ScriptHawk.UI.row(4) + ScriptHawk.UI.dropdown_offset, ScriptHawk.UI.col(4) + 10, ScriptHawk.UI.button_height);
@@ -4476,7 +4513,10 @@ function Game.eachFrame()
 	if forms.ischecked(ScriptHawk.UI.form_controls.toggle_neverslip) then
 		neverSlip();
 	end
-	if type(ScriptHawk.UI.form_controls["realtime_flags"]) ~= "nil" and forms.ischecked(ScriptHawk.UI.form_controls["realtime_flags"]) then
+	if forms.ischecked(ScriptHawk.UI.form_controls.toggle_autojump) then
+		autoJump();
+	end
+	if forms.ischecked(ScriptHawk.UI.form_controls.realtime_flags) then
 		checkFlags();
 		checkGlobalFlags();
 	end
@@ -4535,9 +4575,11 @@ Game.OSD = {
 	{"Moving", Game.getMovingAngle},
 	{"Rot. Z", Game.getZRotation},
 	{"Separator", 1},
+	--{"Player", function() return toHexString(Game.getPlayerObject()) end},
 	{"Character", Game.getCharacterState},
-	{"Movement", Game.getCurrentMovementState},
+	{"Movement", Game.getCurrentMovementStateOSD},
 	{"Slope Timer", Game.getSlopeTimer, Game.colorSlopeTimer},
+	{"Grounded", Game.playerIsGrounded},
 	{"Separator", 1},
 	{"Camera", function() return toHexString(Game.getCameraObject()) end},
 	{"Camera X", Game.getCameraXPosition},
