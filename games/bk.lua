@@ -2352,26 +2352,23 @@ local holdingAPostJump = false;
 allowPound = false;
 allowTTrotJump = true;
 function autoPound()
-	if forms.ischecked(ScriptHawk.UI.form_controls.autopound_checkbox) then
-		local currentMovementState = mainmemory.read_u32_be(Game.Memory.current_movement_state[version]);
-		local YVelocity = Game.getYVelocity();
+	local currentMovementState = mainmemory.read_u32_be(Game.Memory.current_movement_state[version]);
+	local YVelocity = Game.getYVelocity();
 
-		-- First frame pound out of peck
-		if allowPound and currentMovementState == 17 and YVelocity == -272 and not Game.isPhysicsFrame() then -- TODO: YVelocity == -272 doesn't work for all versions
-			joypad.set({["Z"] = true}, 1);
-		end
+	-- First frame pound out of peck
+	if allowPound and currentMovementState == 17 and YVelocity == -272 and not Game.isPhysicsFrame() then -- TODO: YVelocity == -272 doesn't work for all versions
+		joypad.set({["Z"] = true}, 1);
+	end
 
-		-- Frame perfect mid air talon trot slide jump
-		if allowTTrotJump and (currentMovementState == 21 and mainmemory.readbyte(Game.Memory.player_grounded[version]) == 0 or holdingAPostJump) then
-			holdingAPostJump = true;
-			if holdingAPostJump then
-				holdingAPostJump = holdingAPostJump and (currentMovementState == 21 or YVelocity > 0); -- TODO: Better method for detecting end of a jump, velocity > 0 is janky
-			end
-			joypad.set({["A"] = true}, 1);
+	-- Frame perfect mid air talon trot slide jump
+	if allowTTrotJump and (currentMovementState == 21 and mainmemory.readbyte(Game.Memory.player_grounded[version]) == 0 or holdingAPostJump) then
+		holdingAPostJump = true;
+		if holdingAPostJump then
+			holdingAPostJump = holdingAPostJump and (currentMovementState == 21 or YVelocity > 0); -- TODO: Better method for detecting end of a jump, velocity > 0 is janky
 		end
+		joypad.set({["A"] = true}, 1);
 	end
 end
-event.onframestart(autoPound, "ScriptHawk - Auto Pound");
 
 --------------------------
 -- Sandcastle positions --
@@ -3329,6 +3326,10 @@ function Game.eachFrame()
 
 	if forms.ischecked(ScriptHawk.UI.form_controls.beta_pause_menu_checkbox) then
 		beta_menu_recreate();
+	end
+
+	if forms.ischecked(ScriptHawk.UI.form_controls.autopound_checkbox) then
+		autoPound();
 	end
 
 	-- Check EEPROM checksums
