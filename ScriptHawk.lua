@@ -564,60 +564,6 @@ function ScriptHawk.getMovingAngle()
 	return angleBetweenPoints(prev_x, prev_z, Game.getXPosition(), Game.getZPosition());
 end
 
--------------------------
--- Practice mode stuff --
--------------------------
-
-ScriptHawk.practice = {
-	slot = 0,
-	minSlot = 0,
-	maxSlot = 9, -- Limited to 9 by savestate.loadslot and savestate.saveslot
-};
-
-function ScriptHawk.practice.decreaseSlot()
-	if ScriptHawk.mode == "Practice" then
-		ScriptHawk.practice.slot = math.max(ScriptHawk.practice.minSlot, ScriptHawk.practice.slot - 1);
-		gui.addmessage("Switched to practice slot "..ScriptHawk.practice.slot);
-	end
-end
-
-function ScriptHawk.practice.increaseSlot()
-	if ScriptHawk.mode == "Practice" then
-		ScriptHawk.practice.slot = math.min(ScriptHawk.practice.maxSlot, ScriptHawk.practice.slot + 1);
-		gui.addmessage("Switched to practice slot "..ScriptHawk.practice.slot);
-	end
-end
-
-function ScriptHawk.practice.load()
-	if ScriptHawk.mode == "Practice" then
-		savestate.loadslot(ScriptHawk.practice.slot);
-	end
-end
-
-function ScriptHawk.practice.save()
-	if ScriptHawk.mode == "Practice" then
-		savestate.saveslot(ScriptHawk.practice.slot);
-	end
-end
-
--- Practice mode JoypadBinds
--- TODO: Move bind and unbind to togglemode?
-if ScriptHawk.dpad.joypad.enabled then
-	ScriptHawk.bindJoypadRealtime(ScriptHawk.dpad.joypad.left, ScriptHawk.practice.decreaseSlot, true);
-	ScriptHawk.bindJoypadRealtime(ScriptHawk.dpad.joypad.right, ScriptHawk.practice.increaseSlot, true);
-	ScriptHawk.bindJoypadRealtime(ScriptHawk.dpad.joypad.up, ScriptHawk.practice.save, true);
-	ScriptHawk.bindJoypadRealtime(ScriptHawk.dpad.joypad.down, ScriptHawk.practice.load, true);
-	ScriptHawk.bindJoypadRealtime(ScriptHawk.lbutton.joypad, ScriptHawk.practice.load, true);
-end
-
-if ScriptHawk.dpad.key.enabled then
-	ScriptHawk.bindKeyRealtime(ScriptHawk.dpad.key.left, ScriptHawk.practice.decreaseSlot, true);
-	ScriptHawk.bindKeyRealtime(ScriptHawk.dpad.key.right, ScriptHawk.practice.increaseSlot, true);
-	ScriptHawk.bindKeyRealtime(ScriptHawk.dpad.key.up, ScriptHawk.practice.save, true);
-	ScriptHawk.bindKeyRealtime(ScriptHawk.dpad.key.down, ScriptHawk.practice.load, true);
-	ScriptHawk.bindKeyRealtime(ScriptHawk.lbutton.key, ScriptHawk.practice.load, true);
-end
-
 --------------
 -- Position --
 --------------
@@ -769,9 +715,6 @@ local function toggleMode()
 	elseif ScriptHawk.mode == 'Rotation' then
 		ScriptHawk.mode = 'YRotation';
 	elseif ScriptHawk.mode == 'YRotation' then
-		ScriptHawk.mode = 'Practice';
-		-- TODO: Bind and unbind the joypadbinds for practice mode here, saves some CPU for the mode checks and we can re-check ScriptHawk.dpad.*.enabled
-	elseif ScriptHawk.mode == 'Practice' then
 		ScriptHawk.mode = 'TAS';
 	else
 		ScriptHawk.mode = 'Position';
