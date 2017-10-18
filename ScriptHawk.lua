@@ -388,6 +388,7 @@ local supportedGames = {
 
 	-- Impossible Mission
 	["AF51AB03A173DEC28C9241532227CD64"] = {["moduleName"] = "games.impossible_mission", ["friendlyName"] = "Impossible Mission (E)"},
+	["A26D40B6B7646C22D1F2DB7F746F0391"] = {["moduleName"] = "games.impossible_mission", ["friendlyName"] = "Impossible Mission (E) (Beta)"},
 
 	-- Majora's Mask
 	["B38B71D2961DFFB523020A67F4807A4B704E347A"] = {["moduleName"] = "games.mm", ["friendlyName"] = "Legend of Zelda, The - Majora's Mask (Europe) (En,Fr,De,Es) (Beta)"},
@@ -414,7 +415,7 @@ local supportedGames = {
 	["C892BBDA3993E66BD0D56A10ECD30B1EE612210F"] = {["moduleName"] = "games.oot", ["friendlyName"] = "Zelda no Densetsu - Toki no Ocarina (Japan)"},
 	["DD14E143C4275861FE93EA79D0C02E36AE8C6C2F"] = {["moduleName"] = "games.oot", ["friendlyName"] = "Zelda no Densetsu - Toki no Ocarina (Japan) (GC)"},
 
-	--Rats!
+	-- Rats!
 	["5E423DFAB8221B69A641D2E535EBFE1E3759A2E4"] = {["moduleName"] = "games.rats", ["friendlyName"] = "Rats! (USA) (En,Es)"},
 
 	-- Rayman 2
@@ -496,7 +497,7 @@ end
 -- State --
 -----------
 
-override_lag_detection = (type(Game.isPhysicsFrame) == "function"); -- Default to true if the game implements custom lag detection
+override_lag_detection = type(Game.isPhysicsFrame) == "function"; -- Default to true if the game implements custom lag detection
 local rotation_units = "Degrees";
 
 -- Stops garbage min/max dx/dy/dz values
@@ -1037,9 +1038,21 @@ function ScriptHawk.UI.updateReadouts()
 				value = value();
 			end
 
+			if value == nil then
+				if ScriptHawk.warnings then
+					print("Warning: When drawing the OSD, a value for label \""..label.."\" was nil");
+				end
+				value = "nil";
+			end
+
 			-- Round the value
 			if type(value) == "number" then
 				value = round(value, precision);
+			end
+
+			-- Convert booleans to strings
+			if type(value) == "boolean" then
+				value = tostring(value);
 			end
 
 			-- Detect and format rotation based on a keyword search
@@ -1309,7 +1322,7 @@ local function plot_pos()
 	if override_lag_detection then
 		emu.setislagged(isLagged);
 		if tastudio.engaged() then
-			tastudio.setlag(current_frame-1, isLagged);
+			tastudio.setlag(current_frame - 1, isLagged);
 		end
 	end
 
@@ -1367,8 +1380,8 @@ local function plot_pos()
 	end
 end
 
-event.onframestart(mainloop, "ScriptHawk - Controller input handler");
-event.onframestart(plot_pos, "ScriptHawk - Update position each frame");
+event.onframeend(mainloop, "ScriptHawk - Controller input handler");
+event.onframeend(plot_pos, "ScriptHawk - Update position each frame");
 event.onloadstate(plot_pos, "ScriptHawk - Update position on load state");
 
 --------------
