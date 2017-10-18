@@ -428,10 +428,10 @@ local function draw_objects()
 					hitbox_width = object.obj_types[id].hitbox_width;
 					hitbox_height = object.obj_types[id].hitbox_height;
 				end
-				gui.drawRectangle(x_offset + xPos * tile_width, y_offset + yPos * tile_height, hitbox_width, hitbox_height);
 				gui.drawText(x_offset + xPos * tile_width, y_offset + yPos * tile_height, contents);
 				--gui.drawText(x_offset + xPos * tile_width, y_offset + yPos * tile_height + 16, toHexString(contentsRaw));
 				--gui.drawText(x_offset + xPos * tile_width, y_offset + yPos * tile_height + 32, toHexString(id));
+				gui.drawRectangle(x_offset + xPos * tile_width, y_offset + yPos * tile_height, hitbox_width, hitbox_height);
 			end
 		end
 	end
@@ -624,10 +624,12 @@ function botLoop()
 				print("bestLastPauseFrame: "..bestLastPauseFrame);
 				print("bestLast2Frame: "..bestLast2Frame);
 				tastudio.setplayback(startFrame);
+				forms.setproperty(ScriptHawk.UI.form_controls["Toggle Overlay Checkbox"], "Checked", true);
 				botLoop();
 				return;
 			end
 			tastudio.setplayback(math.min(lastPauseFrame - 1, last2Frame));
+			forms.setproperty(ScriptHawk.UI.form_controls["Toggle Overlay Checkbox"], "Checked", false);
 			botLoop();
 		elseif currentFrame < checkFrame then
 			local relativeFrame = currentFrame - startFrame;
@@ -635,6 +637,7 @@ function botLoop()
 			joypad.set({["B2"] = (relativeFrame >= 0) and (currentFrame <= last2Frame)}, 1);
 			if currentFrame == resetFrame then
 				joypad.set({["Reset"] = true});
+				forms.setproperty(ScriptHawk.UI.form_controls["Toggle Overlay Checkbox"], "Checked", true);
 			end
 		end
 	elseif bot_is_outputting_best_input then
@@ -671,6 +674,7 @@ end
 
 function startBot()
 	--resetFrame = tonumber(forms.gettext(ScriptHawk.UI.form_controls.resetFrameBox));
+	forms.setproperty(ScriptHawk.UI.form_controls["Toggle Overlay Checkbox"], "Checked", false);
 	checkFrame = resetFrame + 13;
 	bot_is_running = true;
 	bot_is_outputting_best_input = false;
@@ -758,6 +762,7 @@ Game.standardOSD = {
 Game.botOSD = {
 	{"Piece Dist", Game.getPieceDistributionOSD},
 	{"Best Dist", Game.getBestPieceDistribution},
+	--[[
 	{"Separator", 1},
 	{"Flips Requried", Game.getPuzzleFlipsRequired},
 	{"Best Flips Req", Game.getBestPuzzleFlipsRequired},
@@ -767,6 +772,7 @@ Game.botOSD = {
 	{"Separator", 1},
 	{"Total Search Length", Game.getTotalSearchBarLength},
 	{"Best Search Length", Game.getBestSearchLength},
+	--]]
 };
 
 Game.OSD = Game.standardOSD;
