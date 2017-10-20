@@ -3099,8 +3099,9 @@ function Game.applyInfinites()
 end
 
 ----------------
---Flag Stuff --
+-- Flag Stuff --
 ----------------
+
 local function getFlagByName(flagName)
 	for i = 1, #flag_array do
 		if flagName == flag_array[i]["name"] then
@@ -3117,29 +3118,24 @@ function getFlagName(flagType, flagIndex)
 	end
 end
 
+function flagTypeToBitfieldPointer(flagType, index)
+	if flagType == "H" and index < 0x19 then
+		return Game.Memory.honeycomb_bitfield[version];
+	elseif flagType == "MT" and index < 0x7E then
+		return Game.Memory.mumbo_token_bitfield[version];
+	elseif flagType == "Jig" and index < 0x65 then
+		return Game.Memory.jiggy_bitfield[version];
+	elseif flagType == "Prog" and index < 0x100 then
+		return Game.Memory.game_progress_bitfield[version];
+	end
+end
+
 ------------------------
 -- Set Flag Functions --
 ------------------------
-function setFlag(flagType, index)
-	local bitfield_pointer;
-	if flagType == "H" then
-		if index < 0x19 then
-			 bitfield_pointer = Game.Memory.honeycomb_bitfield[version];
-		end
-	elseif flagType == "MT" then
-		if index < 0x7E then
-			bitfield_pointer = Game.Memory.mumbo_token_bitfield[version];
-		end
-	elseif flagType == "Jig" then
-		if index < 0x65 then
-			bitfield_pointer = Game.Memory.jiggy_bitfield[version];
-		end
-	elseif flagType == "Prog" then
-		if index < 0x100 then
-			bitfield_pointer = Game.Memory.game_progress_bitfield[version];
-		end
-	end
 
+function setFlag(flagType, index)
+	local bitfield_pointer = flagTypeToBitfieldPointer(flagType, index);
 	if isRDRAM(bitfield_pointer) then
 		local containingByte = bitfield_pointer;
 		if flagType ~= "Prog" then
@@ -3190,26 +3186,9 @@ end
 --------------------------
 -- Clear Flag Functions --
 --------------------------
-function clearFlag(flagType, index)
-	local bitfield_pointer;
-	if flagType == "H" then
-		if index < 0x19 then
-			 bitfield_pointer = Game.Memory.honeycomb_bitfield[version];
-		end
-	elseif flagType == "MT" then
-		if index < 0x7E then
-			bitfield_pointer = Game.Memory.mumbo_token_bitfield[version];
-		end
-	elseif flagType == "Jig" then
-		if index < 0x65 then
-			bitfield_pointer = Game.Memory.jiggy_bitfield[version];
-		end
-	elseif flagType == "Prog" then
-		if index < 0x100 then
-			bitfield_pointer = Game.Memory.game_progress_bitfield[version];
-		end
-	end
 
+function clearFlag(flagType, index)
+	local bitfield_pointer = flagTypeToBitfieldPointer(flagType, index);
 	if isRDRAM(bitfield_pointer) then
 		local containingByte = bitfield_pointer;
 		if flagType ~= "Prog" then
@@ -3255,8 +3234,40 @@ function clearAllFlags()
 end
 
 --------------------------
+-- Check flag functions --
+--------------------------
+
+function checkFlag(flagType, index)
+	local bitfield_pointer = flagTypeToBitfieldPointer(flagType, index);
+	if isRDRAM(bitfield_pointer) then
+		local containingByte = bitfield_pointer;
+		if flagType ~= "Prog" then
+			containingByte = containingByte + ((index - 1) / 8);
+		else
+			containingByte = containingByte + (index / 8);
+		end
+		flagByte = mainmemory.readbyte(containingByte);
+		flagByte = bit.band(flagByte, bit.lshift(1, index % 8));
+		return flagByte > 0;
+	end
+	return false;
+end
+
+function checkFlagByName(flagName)
+	local flag = getFlagByName(flagName);
+	if type(flag) == "table" then
+		if checkFlag(flag["type"], flag["index"]) then
+			print("The flag \""..flag["name"].."\" is SET");
+		else
+			print("The flag \""..flag["name"].."\" is NOT set");
+		end
+	end
+end
+
+--------------------------
 -- Other flag functions --
 --------------------------
+
 local function flagSetButtonHandler()
 	setFlagByName(forms.getproperty(ScriptHawk.UI.form_controls["Flag Dropdown"], "SelectedItem"));
 end
@@ -3266,8 +3277,7 @@ local function flagClearButtonHandler()
 end
 
 local function flagCheckButtonHandler()
-	print("Sorry, this function is not yet implemented");
-	--checkFlag(forms.getproperty(ScriptHawk.UI.form_controls["Flag Dropdown"], "SelectedItem"));
+	checkFlagByName(forms.getproperty(ScriptHawk.UI.form_controls["Flag Dropdown"], "SelectedItem"));
 end
 
 function Game.initUI()
@@ -3283,6 +3293,7 @@ function Game.initUI()
 	ScriptHawk.UI.form_controls.dynamic_radius_checkbox = forms.checkbox(ScriptHawk.UI.options_form, "Dynamic Radius", ScriptHawk.UI.col(5) + ScriptHawk.UI.dropdown_offset, ScriptHawk.UI.row(5) + ScriptHawk.UI.dropdown_offset);
 	ScriptHawk.UI.form_controls.freeze_clip_velocity = forms.checkbox(ScriptHawk.UI.options_form, "Freeze Clip Vel.", ScriptHawk.UI.col(5) + ScriptHawk.UI.dropdown_offset, ScriptHawk.UI.row(6) + ScriptHawk.UI.dropdown_offset);
 	ScriptHawk.UI.form_controls.autopound_checkbox = forms.checkbox(ScriptHawk.UI.options_form, "Auto Pound", ScriptHawk.UI.col(10) + ScriptHawk.UI.dropdown_offset, ScriptHawk.UI.row(4) + ScriptHawk.UI.dropdown_offset);
+	forms.setproperty(ScriptHawk.UI.form_controls.autopound_checkbox, "Height", 22);
 
 	-- Actor spawner
 	ScriptHawk.UI.form_controls.actor_dropdown = forms.dropdown(ScriptHawk.UI.options_form, actorNames, ScriptHawk.UI.col(10) + ScriptHawk.UI.dropdown_offset, ScriptHawk.UI.row(0) + ScriptHawk.UI.dropdown_offset);
