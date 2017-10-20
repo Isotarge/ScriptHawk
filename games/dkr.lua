@@ -177,7 +177,7 @@ local object_fields = {
 	["powerup_quantity"] = 0x20B, -- Byte, Max 10
 	["powerup_level"] = 0x20C, -- Byte, 0-2
 	["bananas"] = 0x21D, -- s8, capped at 99
-	["checkpoint"] = 0x228, -- u16_be
+	["checkpoint"] = 0x228, -- s16_be, capped at -32000
 	["checkpoint_minor"] = 0x22A, -- byte
 	["checkpoint_lap"] = 0x22B, -- byte
 	["x_rot"] = 0x23A, -- 16_be
@@ -185,6 +185,10 @@ local object_fields = {
 	["facing_angle"] = 0x238, -- 16_be
 	["z_rot"] = 0x23C, -- 16_be
 	["boost_timer"] = 0x26B, -- s8
+	["front_left_wheel_ground"] = 0x274, -- byte
+	["front_right_wheel_ground"] = 0x275, -- byte
+	["back_left_wheel_ground"] = 0x276, -- byte
+	["back_right_wheel_ground"] = 0x277, -- byte
 	["silver_coins"] = 0x29A,
 };
 
@@ -271,7 +275,8 @@ end
 function getExamineData(objectBase)
 	local examineData = {};
 	if isRDRAM(objectBase) then
-		table.insert(examineData, {getObjectName(objectBase), toHexString(objectBase, 6)});
+		local name = getObjectName(objectBase);
+		table.insert(examineData, {name, toHexString(objectBase, 6)});
 		table.insert(examineData, {"Descriptor", toHexString(mainmemory.read_u32_be(objectBase + object_fields.object_descriptor_pointer), 8)});
 		table.insert(examineData, {"isVehicle", tostring(isVehicle(objectBase))});
 		table.insert(examineData, {"Separator", 1});
@@ -296,6 +301,19 @@ function getExamineData(objectBase)
 			table.insert(examineData, {"Wheel Array", toHexString(mainmemory.read_u32_be(objectBase + object_fields.wheel_array_pointer), 8)});
 			table.insert(examineData, {"Separator", 1});
 		end
+
+		if name == "exit" then
+			local destinationPointer = dereferencePointer(objectBase + 0x3C);
+			if isRDRAM(destinationPointer) then
+				table.insert(examineData, {"Destination Pointer", toHexString(destinationPointer + RDRAMBase)});
+				local destination = mainmemory.readbyte(destinationPointer + 0x08);
+				if type(Game.maps[destination + 1]) == "string" then
+					table.insert(examineData, {"Destination", Game.maps[destination + 1]});
+				else
+					table.insert(examineData, {"Destination", toHexString(destination)});
+				end
+			end
+		end
 	end
 	return examineData;
 end
@@ -314,8 +332,15 @@ function populateObjectPointerList()
 	local num_slots = mainmemory.read_u32_be(Game.Memory.num_objects[version]);
 	for i = 0, num_slots - 1 do
 		local slotBase = get_slot_base(pointerList, i);
-		if isRDRAM(slotBase) and slotBase ~= playerObject then
-			table.insert(currentPointers, slotBase);
+		if isRDRAM(slotBase) then
+			if object_filter ~= nil then
+				local name = getObjectName(slotBase);
+				if name == object_filter then
+					table.insert(currentPointers, slotBase);
+				end
+			else
+				table.insert(currentPointers, slotBase);
+			end
 		end
 	end
 	table.sort(currentPointers);
@@ -498,12 +523,41 @@ end
 function Game.getCheckpointOSD(player)
 	local playerObject = Game.getPlayerObject(player);
 	if isRDRAM(playerObject) then
-		local checkpoint = mainmemory.read_u16_be(playerObject + object_fields.checkpoint);
+		local checkpoint = mainmemory.read_s16_be(playerObject + object_fields.checkpoint);
 		local checkpointMinor = mainmemory.readbyte(playerObject + object_fields.checkpoint_minor);
 		local checkpointLap = mainmemory.readbyte(playerObject + object_fields.checkpoint_lap);
-		return checkpoint.." ("..checkpointMinor..","..checkpointLap..")"
+		return checkpoint.." ("..checkpointMinor..","..checkpointLap..")";
 	end
 	return "0 (0,0)";
+end
+
+local groundTypes = {
+	[0x00] = "Tarmac",
+	[0x01] = "Grass",
+	[0x02] = "Dirt",
+	[0x04] = "Slope",
+	[0x0D] = "Ice", -- Hovercraft only?
+	[0xFF] = "Airborne",
+};
+
+function Game.getFrontWheelGroundOSD(player)
+	local playerObject = Game.getPlayerObject(player);
+	if isRDRAM(playerObject) then
+		local wheel1 = mainmemory.readbyte(playerObject + object_fields.front_left_wheel_ground);
+		local wheel2 = mainmemory.readbyte(playerObject + object_fields.front_right_wheel_ground);
+		return toHexString(wheel1, 2, "")..toHexString(wheel2, 2, "");
+	end
+	return "FFFF";
+end
+
+function Game.getBackWheelGroundOSD(player)
+	local playerObject = Game.getPlayerObject(player);
+	if isRDRAM(playerObject) then
+		local wheel1 = mainmemory.readbyte(playerObject + object_fields.back_left_wheel_ground);
+		local wheel2 = mainmemory.readbyte(playerObject + object_fields.back_right_wheel_ground);
+		return toHexString(wheel1, 2, "")..toHexString(wheel2, 2, "");
+	end
+	return "FFFF";
 end
 
 --------------
@@ -952,8 +1006,10 @@ end
 function Game.initUI()
 	ScriptHawk.UI.form_controls.boost_info_checkbox = forms.checkbox(ScriptHawk.UI.options_form, "Boost info", ScriptHawk.UI.col(5) + ScriptHawk.UI.dropdown_offset, ScriptHawk.UI.row(4) + ScriptHawk.UI.dropdown_offset);
 	ScriptHawk.UI.form_controls.encircle_checkbox = forms.checkbox(ScriptHawk.UI.options_form, "Encircle (beta)", ScriptHawk.UI.col(5) + ScriptHawk.UI.dropdown_offset, ScriptHawk.UI.row(5) + ScriptHawk.UI.dropdown_offset);
+	forms.setproperty(ScriptHawk.UI.form_controls.encircle_checkbox, "Height", 22);
 
 	ScriptHawk.UI.form_controls.otap_checkbox = forms.checkbox(ScriptHawk.UI.options_form, "Auto tapper", ScriptHawk.UI.col(0) + ScriptHawk.UI.dropdown_offset, ScriptHawk.UI.row(6) + ScriptHawk.UI.dropdown_offset);
+	forms.setproperty(ScriptHawk.UI.form_controls.otap_checkbox, "Height", 22);
 	ScriptHawk.UI.form_controls.otap_boost_dropdown = forms.dropdown(ScriptHawk.UI.options_form, {"Yellow", "Blue", "None"}, ScriptHawk.UI.col(0) + ScriptHawk.UI.dropdown_offset, ScriptHawk.UI.row(7) + ScriptHawk.UI.dropdown_offset, ScriptHawk.UI.col(4), ScriptHawk.UI.button_height);
 
 	local blue_col_base = 5;
@@ -1105,6 +1161,8 @@ Game.OSD = {
 	{"Game Settings", function() return toHexString(Game.getGameSettings()) end},
 	{"Player", function() return toHexString(Game.getPlayerObject()) end},
 	{"Checkpoint", Game.getCheckpointOSD},
+	{"Wheel Ground (F)", Game.getFrontWheelGroundOSD},
+	{"Wheel Ground (B)", Game.getBackWheelGroundOSD},
 };
 
 return Game;
