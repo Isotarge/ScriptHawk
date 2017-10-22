@@ -16,6 +16,8 @@ ScriptHawk = {
 	UI = {
 		form_controls = {},
 		form_padding = 8,
+		form_width = 17,
+		form_height = 10,
 		label_offset = 5,
 		dropdown_offset = 1,
 		long_label_width = 140,
@@ -797,7 +799,14 @@ function ScriptHawk.UI.col(col_num)
 	return ScriptHawk.UI.row(col_num);
 end
 
-ScriptHawk.UI.options_form = forms.newform(ScriptHawk.UI.col(17), ScriptHawk.UI.row(10), "ScriptHawk Options");
+if type(Game.form_width) == "number" then
+	ScriptHawk.UI.form_height = Game.form_width;
+end
+if type(Game.form_height) == "number" then
+	ScriptHawk.UI.form_height = Game.form_height;
+end
+
+ScriptHawk.UI.options_form = forms.newform(ScriptHawk.UI.col(ScriptHawk.UI.form_width), ScriptHawk.UI.row(ScriptHawk.UI.form_height), "ScriptHawk Options");
 
 -- Handle, Type, Caption, Callback, X position, Y position, Width, Height
 if not TASSafe then
