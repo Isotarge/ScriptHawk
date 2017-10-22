@@ -94,7 +94,7 @@ local Game = {
 		["flag_mapping"] = {0x755A20, 0x7502B0, 0x755AF0, 0x7003D0},
 		["enemy_table"] = {0x75EB80, 0x759690, 0x75ED40, 0x70A460},
 		-- 1000 0000 - ????
-		-- 0100 0000 - ????
+		-- 0100 0000 - Pause Cancel
 		-- 0010 0000 - Show Model 2 Objects
 		-- 0001 0000 - Tag Barrel Void
 		-- 0000 1000 - ????
@@ -978,7 +978,9 @@ obj_model1 = {
 		[299] = "Textbox",
 		[300] = "Snake", -- Teetering Turtle Trouble
 		[301] = "Turtle", -- Teetering Turtle Trouble
+		[302] = "Toy Car", -- Player in the Factory Toy Car Race
 		[303] = "Toy Car",
+		[304] = "Camera", -- Factory Toy Car Race
 		[305] = "Missile", -- Car Race
 		[308] = "Seal",
 		[309] = "Kong Logo (Instrument)", -- DK for DK, Star for Diddy, DK for Lanky, Flower for Tiny, DK for Chunky
@@ -4911,6 +4913,11 @@ function Game.forceZipper()
 	mainmemory.writebyte(Game.Memory.tb_void_byte[version] - 1, set_bit(voidByteValue, 0));
 end
 
+function Game.pauseCancel()
+	local pause_cancel_byte_val = mainmemory.readbyte(Game.Memory.tb_void_byte[version]);
+	mainmemory.writebyte(Game.Memory.tb_void_byte[version], set_bit(pause_cancel_byte_val, 6)); -- Gives Pause Cancel
+end
+
 function Game.gainControl()
 	local playerObject = Game.getPlayerObject();
 	local cameraObject = dereferencePointer(Game.Memory.camera_pointer[version]);
@@ -5343,7 +5350,7 @@ function Game.getLagFactor()
 	return mainmemory.read_u32_be(Game.Memory.lag_boost[version]);
 end
 
-local moon_mode = "None";
+moon_mode = "None";
 local function toggle_moonmode()
 	if moon_mode == 'None' then
 		moon_mode = 'Kick';
@@ -6534,8 +6541,8 @@ function Game.initUI()
 	end
 
 	-- Moon stuff
-	ScriptHawk.UI.form_controls["Moon Mode Label"] = forms.label(ScriptHawk.UI.options_form, "Moon:", ScriptHawk.UI.col(10), ScriptHawk.UI.row(2) + ScriptHawk.UI.label_offset, 48, ScriptHawk.UI.button_height);
-	ScriptHawk.UI.form_controls["Moon Mode Button"] = forms.button(ScriptHawk.UI.options_form, moon_mode, toggle_moonmode, ScriptHawk.UI.col(13) - 18, ScriptHawk.UI.row(2), 59, ScriptHawk.UI.button_height);
+	--ScriptHawk.UI.form_controls["Moon Mode Label"] = forms.label(ScriptHawk.UI.options_form, "Moon:", ScriptHawk.UI.col(10), ScriptHawk.UI.row(2) + ScriptHawk.UI.label_offset, 48, ScriptHawk.UI.button_height);
+	--ScriptHawk.UI.form_controls["Moon Mode Button"] = forms.button(ScriptHawk.UI.options_form, moon_mode, toggle_moonmode, ScriptHawk.UI.col(13) - 18, ScriptHawk.UI.row(2), 59, ScriptHawk.UI.button_height);
 
 	-- Buttons
 	ScriptHawk.UI.form_controls["Unlock Moves Button"] = forms.button(ScriptHawk.UI.options_form, "Unlock Moves", Game.unlockMoves, ScriptHawk.UI.col(10), ScriptHawk.UI.row(0), ScriptHawk.UI.col(4) + 10, ScriptHawk.UI.button_height);
@@ -6543,6 +6550,7 @@ function Game.initUI()
 	ScriptHawk.UI.form_controls["Detonate Button"] = forms.button(ScriptHawk.UI.options_form, "Detonate", Game.detonateLiveOranges, ScriptHawk.UI.col(7), ScriptHawk.UI.row(2), 64, ScriptHawk.UI.button_height);
 	ScriptHawk.UI.form_controls["Toggle TB Void Button"] = forms.button(ScriptHawk.UI.options_form, "Toggle TB Void", Game.toggleTBVoid, ScriptHawk.UI.col(10), ScriptHawk.UI.row(1), ScriptHawk.UI.col(4) + 10, ScriptHawk.UI.button_height);
 	ScriptHawk.UI.form_controls["Gain Control Button"] = forms.button(ScriptHawk.UI.options_form, "Gain Control", Game.gainControl, ScriptHawk.UI.col(10), ScriptHawk.UI.row(4), ScriptHawk.UI.col(4) + 10, ScriptHawk.UI.button_height);
+	ScriptHawk.UI.form_controls["Pause Cancel Button"] = forms.button(ScriptHawk.UI.options_form, "Pause Cancel", Game.pauseCancel, ScriptHawk.UI.col(10), ScriptHawk.UI.row(2), ScriptHawk.UI.col(4) + 10, ScriptHawk.UI.button_height);
 
 	-- As of BizHawk 1.11.8, ScriptHawk's Bone Displacement fix is integrated in to the emulator, as such the UI surrounding the bug is no longer needed
 	--ScriptHawk.UI.form_controls["Fix Bone Displacement Button"] = forms.button(ScriptHawk.UI.options_form, "Fix Spiking", fixBoneDisplacement, ScriptHawk.UI.col(10), ScriptHawk.UI.row(4), ScriptHawk.UI.col(4) + 10, ScriptHawk.UI.button_height);
@@ -6993,7 +7001,7 @@ function Game.drawUI()
 	updateCurrentInvisify();
 	forms.settext(ScriptHawk.UI.form_controls["Lag Factor Value Label"], lag_factor);
 	forms.settext(ScriptHawk.UI.form_controls["Toggle Visibility Button"], current_invisify);
-	forms.settext(ScriptHawk.UI.form_controls["Moon Mode Button"], moon_mode);
+	--forms.settext(ScriptHawk.UI.form_controls["Moon Mode Button"], moon_mode);
 	drawGrabScriptUI();
 
 	-- Mad Jack
