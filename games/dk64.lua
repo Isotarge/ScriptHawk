@@ -1487,6 +1487,9 @@ local function getExamineDataModelOne(pointer)
 end
 
 function Game.getPlayerObject() -- TODO: Cache this
+	if Game.isLoading() then
+		return;
+	end
 	return dereferencePointer(Game.Memory.player_pointer[version]);
 end
 

@@ -997,6 +997,13 @@ function ScriptHawk.UI.updateReadouts()
 				value = "nil";
 			end
 
+			if value ~= value then
+				if ScriptHawk.warnings then
+					print("Warning: When drawing the OSD, a value for label \""..label.."\" was NaN");
+				end
+				value = "NaN";
+			end
+
 			-- Round the value
 			if type(value) == "number" then
 				value = round(value, precision);
