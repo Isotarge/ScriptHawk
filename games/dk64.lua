@@ -3083,8 +3083,9 @@ function Game.detectVersion(romName, romHash)
 			[0x45] = "Idle", -- Carrying Object
 			[0x46] = "Walking", -- Carrying Object
 			[0x47] = "Dropping Object",
-
+			[0x48] = "Throwing Object",
 			[0x49] = "Jumping", -- Carrying Object
+			[0x4A] = "Throwing Object", -- In Air
 
 			[0x4F] = "Bananaporter",
 
