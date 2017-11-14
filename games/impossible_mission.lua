@@ -38,17 +38,6 @@ local Game = {
 			0x1B9E, 0x1BA0, 0x1BA2, 0x1BA4, 0x1BA6, 0x1BA8, 0x1BAA, 0x1BAC, 0x1BAE,
 			0x1BAF, 0x1BB1, 0x1BB3, 0x1BB5, 0x1BB7, 0x1BB9, 0x1BBB, 0x1BBD, 0x1BBF,
 		},
-		maps = {
-			[0x05] = "Good Room (9)",
-			[0x0F] = "Ending",
-			[0x1E] = "Puzzle", -- Light green
-			[0x1F] = "Puzzle", -- Dark Grey
-			[0x20] = "Glitchy Puzzle", -- Light Grey
-			[0x21] = "Glitchy Puzzle", -- Yellow
-			[0x22] = "Glitchy Puzzle", -- Green
-			[0x23] = "Glitchy Puzzle", -- Cyan
-			[0x7F] = "Empty",
-		},
 	},
 	speedy_speeds = {0},
 	speedy_index = 1,
@@ -524,13 +513,10 @@ end
 
 local screenshot_next_frame = false;
 
-local startFrame = 492;
---local start2Frame = 512;
---local resetFrame = 544;
+local startFrame = 1;
 local start2Frame = 580;
 local resetFrame = 580;
 local checkFrame = resetFrame + 13;
-local numFrames = 52;
 
 -- State for current attempt
 local lastPauseFrame;
@@ -543,7 +529,6 @@ local bestNumPresed;
 local bestDistribution;
 
 function initBotInput()
-	numFrames = checkFrame - startFrame;
 	lastPauseFrame = startFrame - 2;
 	last2Frame = start2Frame - 1;
 end
