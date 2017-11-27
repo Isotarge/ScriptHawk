@@ -7699,9 +7699,73 @@ addressColors = {
 	[8] = 0x03, -- DARKBLUE - EEPROM Copy
 };
 
-heapCache = nil;
-model2BehaviorScriptCache = nil;
-function identifyMemory(address, findReferences, suppressPrint)
+identifyMemoryCache = nil;
+
+function buildIdentifyMemoryCache()
+	identifyMemoryCache = {
+		heapCache = {},
+		heapBase = 0,
+		heapEnd = RDRAMSize,
+		model2BehaviorScriptCache = {},
+		textureCache = {},
+		frameBuffers = {},
+	};
+
+	-- Cache framebuffers
+	if not addressFound then
+		local frameBuffer = dereferencePointer(Game.Memory.framebuffer_pointer[version]);
+		if isRDRAM(frameBuffer) then
+			table.insert(identifyMemoryCache.frameBuffers, {base=frameBuffer, width=320, height=240, bpp=16});
+		end
+		frameBuffer = dereferencePointer(Game.Memory.framebuffer_pointer[version] + 4);
+		if isRDRAM(frameBuffer) then
+			table.insert(identifyMemoryCache.frameBuffers, {base=frameBuffer, width=320, height=240, bpp=16});
+		end
+	end
+
+	-- Cache heap
+	local heapBase = dereferencePointer(Game.Memory.heap_pointer[version]);
+	if isRDRAM(heapBase) then
+		local size = 0;
+		local prev = 0;
+		local nextFree = 0;
+		local prevFree = 0;
+		local header = heapBase;
+		local block;
+		repeat
+			block = header + 0x10;
+			size = mainmemory.read_u32_be(header + 4);
+			nextFree = dereferencePointer(header + 8);
+			prevFree = dereferencePointer(header + 12);
+			identifyMemoryCache.heapCache[block] = {header=header, block=block, size=size, next=block+size, prev=prev, isFree=(isRDRAM(nextFree) or isRDRAM(prevFree)), nextFree=nextFree, prevFree=prevFree};
+			header = block + size;
+			prev = mainmemory.read_u32_be(header);
+		until prev == 0 or not isRDRAM(header);
+		identifyMemoryCache.heapBase = heapBase;
+		identifyMemoryCache.heapEnd = header;
+	end
+
+	-- Cache texture list
+	local textureList = dereferencePointer(Game.Memory.texture_list_pointer[version]);
+	if isRDRAM(textureList) then
+		local size = 0;
+		local prev = 0;
+		local header = textureList;
+		local block;
+		repeat
+			block = header + 0x10;
+			size = mainmemory.read_u32_be(header + 4);
+			if size == 0 then
+				break;
+			end
+			identifyMemoryCache.textureCache[block] = {header=header, block=block, size=size};
+			header = block + size;
+			prev = mainmemory.read_u32_be(header);
+		until prev == 0 or not isRDRAM(header);
+	end
+end
+
+function identifyMemory(address, findReferences, reuseCache, suppressPrint)
 	findReferences = findReferences or false;
 	suppressPrint = suppressPrint or false;
 	addressInfo = {};
@@ -7727,6 +7791,11 @@ function identifyMemory(address, findReferences, suppressPrint)
 	table.insert(addressInfo, "Valid address detected, checking "..toHexString(address, 6));
 	if inExpansionPak then
 		table.insert(addressInfo, "This address is in the expansion pak.");
+	end
+
+	-- Cache stuff
+	if identifyMemoryCache == nil or not reuseCache then
+		buildIdentifyMemoryCache();
 	end
 
 	-- Detect RAM Watch
@@ -7808,103 +7877,50 @@ function identifyMemory(address, findReferences, suppressPrint)
 
 	-- Detect framebuffers
 	if not addressFound then
-		local frameBuffer = dereferencePointer(Game.Memory.framebuffer_pointer[version]);
-		--dprint("FB:"..toHexString(frameBuffer));
-		if isRDRAM(frameBuffer) then
-			--dprint("FBYA:"..toHexString(frameBuffer));
-			if address >= frameBuffer and address < frameBuffer + 320 * 240 * 2 then
-				--dprint("FBYAYA:"..toHexString(frameBuffer));
+		for k, frameBuffer in pairs(identifyMemoryCache.frameBuffers) do
+			if address >= frameBuffer.base and address < frameBuffer.base + frameBuffer.width * frameBuffer.height * (frameBuffer.bpp / 8) then
 				addressFound = true;
-				local fbOffset = address - frameBuffer;
-				xPixel = (fbOffset / 2) % 320;
-				yPixel = math.floor(fbOffset / 640);
+				local fbOffset = address - frameBuffer.base;
+				xPixel = (fbOffset / (frameBuffer.bpp / 8)) % frameBuffer.width;
+				yPixel = math.floor(fbOffset / (frameBuffer.width * (frameBuffer.bpp / 8)));
 				addressType = 2;
-				skipToAddress = frameBuffer + 320 * 240 * 2;
-				table.insert(addressInfo, "This address is in the first framebuffer! "..toHexString(frameBuffer).." + "..toHexString(fbOffset));
+				skipToAddress = frameBuffer.base + frameBuffer.width * frameBuffer.height * (frameBuffer.bpp / 8);
+				table.insert(addressInfo, "This address is in the first framebuffer! "..toHexString(frameBuffer.base).." + "..toHexString(fbOffset));
 				table.insert(addressInfo, "Pixel Coords: X: "..xPixel..", Y:"..yPixel);
-			end
-		end
-		frameBuffer = dereferencePointer(Game.Memory.framebuffer_pointer[version] + 4);
-		--dprint("FB2:"..toHexString(frameBuffer));
-		if isRDRAM(frameBuffer) then
-			--dprint("FB2YA:"..toHexString(frameBuffer));
-			if address >= frameBuffer and address < frameBuffer + 320 * 240 * 2 then
-				--dprint("FB2YAYA:"..toHexString(frameBuffer));
-				addressFound = true;
-				local fbOffset = address - frameBuffer;
-				xPixel = (fbOffset / 2) % 320;
-				yPixel = math.floor(fbOffset / 640);
-				addressType = 2;
-				skipToAddress = frameBuffer + 320 * 240 * 2;
-				table.insert(addressInfo, "This address is in the second framebuffer! "..toHexString(frameBuffer).." + "..toHexString(fbOffset));
-				table.insert(addressInfo, "Pixel Coords: X: "..xPixel..", Y:"..yPixel);
+				break;
 			end
 		end
 	end
 
 	-- Detect textures
 	if not addressFound then
-		local textureList = dereferencePointer(Game.Memory.texture_list_pointer[version]);
-		if isRDRAM(textureList) then
-			local size = 0;
-			local prev = 0;
-			local nextFree = 0;
-			local prevFree = 0;
-			local header = textureList;
-			local block;
-			repeat
-				block = header + 0x10;
-				size = mainmemory.read_u32_be(header + 4);
-				--nextFree = dereferencePointer(header + 8);
-				--prevFree = dereferencePointer(header + 12);
-				--dprint("Texture "..toHexString(header).." size: "..toHexString(size).." nextfree: "..toHexString(nextFree).." prevfree: "..toHexString(prevFree));
-				if size == 0 then
-					break;
+		for k, texture in pairs(identifyMemoryCache.textureCache) do
+			if withinHeapBlock(address, texture.block, texture.size, true) then
+				addressFound = true;
+				addressType = 2;
+				skipToAddress = texture.block + texture.size;
+				if address < texture.block then
+					table.insert(addressInfo, "This address is in a heap header for a texture block.");
+				else
+					table.insert(addressInfo, "This address is in a texture block: "..toHexString(texture.block, 6).." + "..toHexString(address - texture.block));
 				end
-				if address >= header and address < block + size then
-					--[[
-					nextFree = dereferencePointer(header + 8);
-					prevFree = dereferencePointer(header + 12);
-					if isRDRAM(nextFree) or isRDRAM(prevFree) then
-						addressFound = true;
-						addressType = 1;
-						if address < block then
-							table.insert(addressInfo, "This address is in a heap header for a texture block that is considered free memory by the game.");
-						else
-							table.insert(addressInfo, "This address is part of a texture block that is considered free memory by the game.");
-						end
-					else
-					]]--
-						addressFound = true;
-						addressType = 2;
-						skipToAddress = block + size;
-						if address < block then
-							table.insert(addressInfo, "This address is in a heap header for a texture block.");
-						else
-							table.insert(addressInfo, "This address is in a texture block: "..toHexString(block, 6).." + "..toHexString(address - block));
-						end
-					--end
 
-					table.insert(addressInfo, "Header: "..toHexString(header, 6));
-					table.insert(addressInfo, "Texture Block: "..toHexString(block, 6));
-					table.insert(addressInfo, "Block Size: "..toHexString(size));
+				table.insert(addressInfo, "Header: "..toHexString(texture.header, 6));
+				table.insert(addressInfo, "Block Size: "..toHexString(texture.size));
 
-					if findReferences then
-						table.insert(addressInfo, "");
-						table.insert(addressInfo, "Searching for references to this texture block:");
-						local references = searchPointers(block + size + RDRAMBase, size, false, true);
-						if #references > 0 then
-							for i = 1, #references do
-								table.insert(addressInfo, toHexString(references[i].Address).." -> "..toHexString(references[i].Value).." (Block + "..toHexString(references[i].Value - RDRAMBase - block)..")");
-							end
-							table.insert(addressInfo, #references.." references found.");
+				if findReferences then
+					table.insert(addressInfo, "");
+					table.insert(addressInfo, "Searching for references to this texture block:");
+					local references = searchPointers(texture.block + texture.size + RDRAMBase, texture.size, false, true);
+					if #references > 0 then
+						for i = 1, #references do
+							table.insert(addressInfo, toHexString(references[i].Address).." -> "..toHexString(references[i].Value).." (Block + "..toHexString(references[i].Value - RDRAMBase - texture.block)..")");
 						end
+						table.insert(addressInfo, #references.." references found.");
 					end
-					break;
 				end
-				header = block + size;
-				prev = mainmemory.read_u32_be(header);
-			until prev == 0 or not isRDRAM(header);
+				break;
+			end
 		end
 	end
 
@@ -7918,75 +7934,28 @@ function identifyMemory(address, findReferences, suppressPrint)
 		local heapHeader = 0;
 		local heapBlock = 0;
 		local heapBlockSize = 0;
-		local heapBase = dereferencePointer(Game.Memory.heap_pointer[version]);
-		local heapEnd = RDRAMSize
-		if heapCache ~= nil then
-			heapEnd = heapCache[#heapCache].block + heapCache[#heapCache].size;
-		end
 
-		if isRDRAM(heapBase) then
-			if address >= heapBase and address < heapEnd then
-				if heapCache == nil then
-					heapCache = {};
-					local size = 0;
-					local prev = 0;
-					local nextFree = 0;
-					local prevFree = 0;
-					local header = heapBase;
-					local block;
-					repeat
-						block = header + 0x10;
-						size = mainmemory.read_u32_be(header + 4);
-						if address >= header and address < block + size then
-							if address < block then
-								inHeapHeader = true;
-							else
-								inHeapBlock = true;
-							end
-							onHeap = true;
-							heapBlock = block;
-							heapBlockSize = size;
-							heapHeader = header;
-							nextFree = dereferencePointer(header + 8);
-							prevFree = dereferencePointer(header + 12);
-							if isRDRAM(nextFree) or isRDRAM(prevFree) then
-								addressFound = true;
-								addressType = 1;
-								skipToAddress = heapBlock + heapBlockSize;
-								inFreeMemory = true;
-							end
-							--break; -- Disabled so that we build full heap cache
-						end
-						table.insert(heapCache, {header=header, block=block, size=size});
-						header = block + size;
-						prev = mainmemory.read_u32_be(header);
-					until prev == 0 or not isRDRAM(header);
-				else
-					for i = 1, #heapCache do
-						local cachedBlock = heapCache[i];
-						if withinHeapBlock(address, cachedBlock.block, cachedBlock.size, true) then
-							onHeap = true;
-							if address < cachedBlock.block then
-								inHeapHeader = true;
-								inHeapBlock = false;
-							else
-								inHeapHeader = false;
-								inHeapBlock = true;
-							end
-							heapBlock = cachedBlock.block;
-							heapBlockSize = cachedBlock.size;
-							heapHeader = cachedBlock.header;
-							nextFree = dereferencePointer(cachedBlock.header + 8);
-							prevFree = dereferencePointer(cachedBlock.header + 12);
-							if isRDRAM(nextFree) or isRDRAM(prevFree) then
-								addressFound = true;
-								addressType = 1;
-								skipToAddress = heapBlock + heapBlockSize;
-								inFreeMemory = true;
-							end
-							break;
-						end
+		if address >= identifyMemoryCache.heapBase and address < identifyMemoryCache.heapEnd then
+			for k, cachedBlock in pairs(identifyMemoryCache.heapCache) do
+				if withinHeapBlock(address, cachedBlock.block, cachedBlock.size, true) then
+					onHeap = true;
+					if address < cachedBlock.block then
+						inHeapHeader = true;
+						inHeapBlock = false;
+					else
+						inHeapHeader = false;
+						inHeapBlock = true;
 					end
+					heapBlock = cachedBlock.block;
+					heapBlockSize = cachedBlock.size;
+					heapHeader = cachedBlock.header;
+					if cachedBlock.isFree then
+						addressFound = true;
+						addressType = 1;
+						skipToAddress = heapBlock + heapBlockSize;
+						inFreeMemory = true;
+					end
+					break;
 				end
 			end
 		end
@@ -8403,7 +8372,7 @@ function calculateKnownMemory(dumpBitmap)
 	local knownBytes = 0;
 	local i = 0;
 	while i < RDRAMSize do
-		local result = identifyMemory(i, false, true);
+		local result = identifyMemory(i, false, true, true);
 		if type(result) == "number" then
 			if dumpBitmap then
 				if type(addressColors[result]) == "number" then
