@@ -95,6 +95,8 @@ end
 if emu.getsystemid() == "N64" then
 	RDRAMBase = 0x80000000;
 	RDRAMSize = 0x800000; -- Halved with no expansion pak, can be read from 0x80000318
+	RAMBase = RDRAMBase;
+	RAMSize = RDRAMSize;
 
 	-- Checks whether a value falls within N64 RDRAM
 	function isRDRAM(value)
@@ -331,6 +333,51 @@ function fileExists(name)
 	return false;
 end
 
+function linesFrom(file)
+	if not fileExists(file) then
+		return {};
+	end
+	lines = {};
+	for line in io.lines(file) do
+		lines[#lines + 1] = line;
+	end
+	return lines;
+end
+
+function string.split(theString, delimiter)
+	local result = {};
+	local from = 1;
+	local delim_from, delim_to = string.find(theString, delimiter, from);
+	while delim_from do
+		table.insert(result, string.sub(theString, from , delim_from - 1));
+		from  = delim_to + 1;
+		delim_from, delim_to = string.find(theString, delimiter, from);
+	end
+	table.insert(result, string.sub(theString, from));
+	return result;
+end
+
+function parseRAMWatch(file)
+	local rawText = linesFrom(file);
+	local watches = {};
+	if #rawText > 1 then
+		for i = 2, #rawText do
+			local split = string.split(rawText[i], "	");
+			if #split == 6 then
+				table.insert(watches, {
+					address = tonumber(split[1], 16),
+					data_type = split[2],
+					display_type = split[3],
+					--split[4]
+					domain = split[5],
+					name = split[6]
+				});
+			end
+		end
+	end
+	return watches;
+end
+
 --       a  r  g  b
 -- 0.0 = 7F 00 FF 00 = Green
 -- 0.5 = 7F FF FF 00 = Yellow
@@ -411,45 +458,51 @@ function traverse(object)
 	print_deferred();
 end
 
-function searchPointers(base, range, allowLater)
+function searchPointers(base, range, allowLater, suppressPrint)
 	local foundPointers = {};
+	suppressPrint = suppressPrint or false;
 	allowLater = allowLater or false;
+	local startAddress = base - range;
+	local endAddress = base;
+	if allowLater then
+		endAddress = base + range;
+	end
 	for address = 0, RDRAMSize - 4, 4 do
 		local value = mainmemory.read_u32_be(address);
-		if allowLater then
-			if value >= base - range and value <= base + range then
-				table.insert(foundPointers, {["Address"] = toHexString(address), ["Value"] = toHexString(value)});
-				dprint(toHexString(address).." -> "..toHexString(value));
-			end
-		else
-			if value >= base - range and value <= base then
-				table.insert(foundPointers, {["Address"] = toHexString(address), ["Value"] = toHexString(value)});
+		if value >= startAddress and value < endAddress then
+			table.insert(foundPointers, {["Address"] = toHexString(address), ["Value"] = toHexString(value)});
+			if not suppressPrint then
 				dprint(toHexString(address).." -> "..toHexString(value));
 			end
 		end
 	end
-	print_deferred();
+	if not suppressPrint then
+		print_deferred();
+	end
 	return foundPointers;
 end
 
-function searchPointersLE(base, range, allowLater) -- Little Endian Version (PSX etc) TODO: Endianness as a param? Or ifdef it out with same signature
+function searchPointersLE(base, range, allowLater, suppressPrint) -- Little Endian Version (PSX etc) TODO: Endianness as a param? Or ifdef it out with same signature
 	local foundPointers = {};
+	suppressPrint = suppressPrint or false;
 	allowLater = allowLater or false;
+	local startAddress = base - range;
+	local endAddress = base;
+	if allowLater then
+	endAddress = base + range;
+	end
 	for address = 0, RAMSize - 4, 4 do
 		local value = mainmemory.read_u32_le(address);
-		if allowLater then
-			if value >= base - range and value <= base + range then
-				table.insert(foundPointers, {["Address"] = toHexString(address), ["Value"] = toHexString(value)});
-				dprint(toHexString(address).." -> "..toHexString(value));
-			end
-		else
-			if value >= base - range and value <= base then
-				table.insert(foundPointers, {["Address"] = toHexString(address), ["Value"] = toHexString(value)});
+		if value >= startAddress and value < endAddress then
+			table.insert(foundPointers, {["Address"] = toHexString(address), ["Value"] = toHexString(value)});
+			if not suppressPrint then
 				dprint(toHexString(address).." -> "..toHexString(value));
 			end
 		end
 	end
-	print_deferred();
+	if not suppressPrint then
+		print_deferred();
+	end
 	return foundPointers;
 end
 

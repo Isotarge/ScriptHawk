@@ -98,6 +98,7 @@ SystemID N64
 7EE31A	b	h	1	RDRAM	EEPROM Slot 2 File Index
 7EE31B	b	h	1	RDRAM	EEPROM Slot 3 File Index
 7F0E00	d	h	1	RDRAM	Heap Pointer
+7F0E4C	d	h	1	RDRAM	Texture Linked List Pointer
 7F604C	w	u	1	RDRAM	Number of Cutscenes
 7F6150	d	h	1	RDRAM	ISG Start Time Major
 7F6154	d	h	1	RDRAM	ISG Start Time Minor

@@ -26,6 +26,7 @@ SystemID N64
 72D140	d	u	1	RDRAM	Frames (Lag) (TODO: Seems to work for Diddy's map but not for any others)
 7A106C	d	h	1	RDRAM	Framebuffer Pointer (Copy)
 7A12C0	d	h	1	RDRAM	Heap Pointer
+7A130C	d	h	1	RDRAM	Texture Linked List Pointer
 7A1CCC	w	u	1	RDRAM	Number of Cutscenes
 7A1E14	d	h	1	RDRAM	Camera Pointer
 7A1E90	d	h	1	RDRAM	Map Block Pointer

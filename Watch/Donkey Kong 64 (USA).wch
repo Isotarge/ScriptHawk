@@ -36,6 +36,7 @@ SystemID N64
 46E680	b	u	1	RDRAM	Key 8 enabled
 4B2904	b	h	1	RDRAM	FF for voidout on main menu?!?
 744470	d	h	1	RDRAM	Framebuffer Pointer
+744474	d	h	1	RDRAM	Framebuffer Pointer
 744478	d	u	1	RDRAM	Current Lag Speed Boost
 74447C	b	u	1	RDRAM	Squish Screen (Left)
 744480	b	u	1	RDRAM	Squish Screen (Right)
@@ -170,7 +171,7 @@ SystemID N64
 7F09A0	d	h	1	RDRAM	Size 0x10 Linked List Pointer
 7F09B4	d	h	1	RDRAM	Object Model 2 Collision Linked List Pointer
 7F09C8	d	h	1	RDRAM	Size 0x30 Linked List Pointer
-7F09DC	d	h	1	RDRAM	Size 0x1000 Texture Linked List Pointer
+7F09DC	d	h	1	RDRAM	Texture Linked List Pointer
 7F5BDC	w	h	1	RDRAM	Number of Cutscenes
 7F5CE0	d	u	1	RDRAM	ISG Start Time Major
 7F5CE4	d	u	1	RDRAM	ISG Start Time Minor

@@ -54,6 +54,7 @@ end
 	-- 1 u32_be
 local version; -- 1 USA, 2 Europe, 3 Japan, 4 Kiosk
 local Game = {
+	RAMWatch = {},
 	Memory = {
 		["jetpac_object_base"] = {0x02EC68, 0x021D18, 0x021C78, nil},
 		["jetpac_enemy_base"] = {0x02F09C, 0x02214C, 0x0220AC, nil},
@@ -107,10 +108,12 @@ local Game = {
 		["pointer_list"] = {0x7FBFF0, 0x7FBF10, 0x7FC460, 0x7B5E58},
 		["actor_count"] = {0x7FC3F0, 0x7FC310, 0x7FC860, 0x7B6258},
 		["heap_pointer"] = {0x7F0990, 0x7F08B0, 0x7F0E00, 0x7A12C0},
+		["texture_list_pointer"] = {0x7F09DC, 0x7F08FC, 0x7F0E4C, 0x7A130C},
+		["hud_pointer"] = {0x754280, 0x74E9E0, 0x753B70, 0x6FF080},
 		["shared_collectables"] = {0x7FCC40, 0x7FCB80, 0x7FD0D0, 0x7B6752},
 		["kong_base"] = {0x7FC950, 0x7FC890, 0x7FCDE0, 0x7B6590},
 		["kong_size"] = {0x5E, 0x5E, 0x5E, 0x5A},
-		["framebuffer_pointer"] = {0x7F07F4, 0x73EBC0, 0x743D30, 0x72CDA0},
+		["framebuffer_pointer"] = {0x744470, 0x73EBC0, 0x743D30, 0x72CDA0},
 		["eeprom_copy_base"] = {0x7ECEA8, 0x7ECDC8, 0x7ED318, nil},
 		["menu_flags"] = {0x7ED558, 0x7ED478, 0x7ED9C8, nil},
 		["eeprom_file_mapping"] = {0x7EDEA8, 0x7EDDC8, 0x7EE318, nil},
@@ -144,6 +147,12 @@ local Game = {
 		["chunk_array_pointer"] = {0x7F6C18, 0x7F6B38, 0x7F7088, 0x7B20F8},
 		["num_enemies"] = {0x7FDC88, 0x7FDBC8, 0x7FE118, 0x7B73D8},
 		["enemy_respawn_object"] = {0x7FDC8C, 0x7FDBCC, 0x7FE11C, 0x7B73DC},
+		["os_code_start"] = {0x000400, nil, nil, nil}, -- TODO: Fill this in and hook up to identifyMemory()
+		["os_code_size"] = {0xD8A8, nil, nil, nil},
+		["game_code_start"] = {0x5FB300, nil, nil, nil},
+		["game_code_size"] = {0x149160, nil, nil, nil},
+		["game_constants_start"] = {0x744460, nil, nil, nil},
+		["game_constants_size"] = {0x1CBF0, nil, nil, nil},
 	},
 	modes = {
 		[0] = "Nintendo Logo",
@@ -2973,6 +2982,8 @@ function Game.detectVersion(romName, romHash)
 	if romHash == "CF806FF2603640A748FCA5026DED28802F1F4A50" then -- USA
 		version = 1;
 		flag_array = require("games.dk64_flags");
+		Game.RAMWatch = parseRAMWatch("./Watch/Donkey Kong 64 (USA).wch");
+		Game.RAMWatch = table.join(Game.RAMWatch, parseRAMWatch("./Watch/Constants/Donkey Kong 64 (USA).wch"));
 	elseif romHash == "F96AF883845308106600D84E0618C1A066DC6676" then -- Europe
 		version = 2;
 		flag_array = require("games.dk64_flags");
@@ -4154,45 +4165,24 @@ end
 -- Dynamic Water Surfaces --
 ----------------------------
 
-local dynamicWaterSurfaceKiosk = {
-	timer_1 = 0x24,
-	timer_2 = 0x28,
-	timer_3 = 0x2C,
-	timer_4 = 0x30,
-	next_surface_pointer = 0x44,
-};
-
 local dynamicWaterSurface = {
-	timer_1 = 0x30,
-	timer_2 = 0x34,
-	next_surface_pointer = 0x50,
+	timer_1 = {0x30, 0x30, 0x30, 0x24},
+	timer_2 = {0x34, 0x34, 0x34, 0x28},
+	timer_3 = {0x38, 0x38, 0x38, 0x2C},
+	timer_4 = {0x3C, 0x3C, 0x3C, 0x30},
+	next_surface_pointer = {0x50, 0x50, 0x50, 0x44},
 };
 
 function dumpWaterSurfaces()
-	if version == 4 then
-		local waterSurface = dereferencePointer(Game.Memory.water_surface_list[version]);
-		if isRDRAM(waterSurface) then
-			while isRDRAM(waterSurface) do
-				local t1Str = " timer1: "..mainmemory.read_u32_be(waterSurface + dynamicWaterSurfaceKiosk.timer_1);
-				local t2Str = " timer2: "..mainmemory.read_u32_be(waterSurface + dynamicWaterSurfaceKiosk.timer_2);
-				local t3Str = " timer3: "..mainmemory.read_u32_be(waterSurface + dynamicWaterSurfaceKiosk.timer_3);
-				local t4Str = " timer4: "..mainmemory.read_u32_be(waterSurface + dynamicWaterSurfaceKiosk.timer_4);
-				print(toHexString(waterSurface)..t1Str..t2Str..t3Str..t4Str);
-				waterSurface = dereferencePointer(waterSurface + dynamicWaterSurfaceKiosk.next_surface_pointer);
-			end
-		else
-			print("There is no dynamic water currently loaded.");
-		end
-		return;
-	end
-
 	local waterSurface = dereferencePointer(Game.Memory.water_surface_list[version]);
 	if isRDRAM(waterSurface) then
 		while isRDRAM(waterSurface) do
-			local t1Str = " timer1: "..mainmemory.read_u32_be(waterSurface + dynamicWaterSurface.timer_1);
-			local t2Str = " timer2: "..mainmemory.read_u32_be(waterSurface + dynamicWaterSurface.timer_2);
-			print(toHexString(waterSurface)..t1Str..t2Str);
-			waterSurface = dereferencePointer(waterSurface + dynamicWaterSurface.next_surface_pointer);
+			local t1Str = mainmemory.read_u32_be(waterSurface + dynamicWaterSurface.timer_1[version])..", ";
+			local t2Str = mainmemory.read_u32_be(waterSurface + dynamicWaterSurface.timer_2[version])..", ";
+			local t3Str = mainmemory.read_u32_be(waterSurface + dynamicWaterSurface.timer_3[version])..", ";
+			local t4Str = mainmemory.read_u32_be(waterSurface + dynamicWaterSurface.timer_4[version]);
+			print(toHexString(waterSurface).." Timers: {"..t1Str..t2Str..t3Str..t4Str.."}");
+			waterSurface = dereferencePointer(waterSurface + dynamicWaterSurface.next_surface_pointer[version]);
 		end
 	else
 		print("There is no dynamic water currently loaded.");
@@ -4200,23 +4190,13 @@ function dumpWaterSurfaces()
 end
 
 local function setWaterSurfaceTimers(value)
-	if version == 4 then
-		local waterSurface = dereferencePointer(Game.Memory.water_surface_list[version]);
-		while isRDRAM(waterSurface) do
-			mainmemory.write_u32_be(waterSurface + dynamicWaterSurfaceKiosk.timer_1, value);
-			mainmemory.write_u32_be(waterSurface + dynamicWaterSurfaceKiosk.timer_2, value);
-			mainmemory.write_u32_be(waterSurface + dynamicWaterSurfaceKiosk.timer_3, value);
-			mainmemory.write_u32_be(waterSurface + dynamicWaterSurfaceKiosk.timer_4, value);
-			waterSurface = dereferencePointer(waterSurface + dynamicWaterSurfaceKiosk.next_surface_pointer);
-		end
-		return;
-	end
-
 	local waterSurface = dereferencePointer(Game.Memory.water_surface_list[version]);
 	while isRDRAM(waterSurface) do
-		mainmemory.write_u32_be(waterSurface + dynamicWaterSurface.timer_1, value);
-		mainmemory.write_u32_be(waterSurface + dynamicWaterSurface.timer_2, value);
-		waterSurface = dereferencePointer(waterSurface + dynamicWaterSurface.next_surface_pointer);
+		mainmemory.write_u32_be(waterSurface + dynamicWaterSurface.timer_1[version], value);
+		mainmemory.write_u32_be(waterSurface + dynamicWaterSurface.timer_2[version], value);
+		mainmemory.write_u32_be(waterSurface + dynamicWaterSurface.timer_3[version], value);
+		mainmemory.write_u32_be(waterSurface + dynamicWaterSurface.timer_4[version], value);
+		waterSurface = dereferencePointer(waterSurface + dynamicWaterSurface.next_surface_pointer[version]);
 	end
 end
 
@@ -5576,6 +5556,13 @@ local FTA = {
 		[Chunky] = 0x0026,
 		[Krusha] = 0x00AB,
 	},
+	LowGBStates = {
+		[DK] = 0x08,
+		[Diddy] = 0x02,
+		[Lanky] = 0x10,
+		[Tiny] = 0x04,
+		[Chunky] = 0x01,
+	},
 	GBStates = {
 		[DK] = 0x28,
 		[Diddy] = 0x22,
@@ -5647,6 +5634,10 @@ end
 
 function FTA.isBulletCheck(value)
 	return table.contains(FTA.BulletChecks, value);
+end
+
+function FTA.isLowGB(collectableState)
+	return table.contains(FTA.LowGBStates, collectableState);
 end
 
 function FTA.isGB(collectableState)
@@ -5721,13 +5712,13 @@ function FTA.freeTradeCollisionList()
 	local collisionLinkedListPointer = dereferencePointer(Game.Memory.obj_model2_collision_linked_list_pointer[version]);
 	if isRDRAM(collisionLinkedListPointer) then
 		local collisionListObjectSize = mainmemory.read_u32_be(collisionLinkedListPointer + heap.object_size);
-		for i = 0, collisionListObjectSize, 4 do
+		for i = 0, collisionListObjectSize - 4, 4 do
 			local object = dereferencePointer(collisionLinkedListPointer + i);
 			local safety = nil;
 			while isRDRAM(object) do
 				FTA.fixSingleCollision(object);
 				safety = dereferencePointer(object + 0x18); -- Get next object
-				if safety == object then -- Prevent infinite loops
+				if safety == object or safety == collisionLinkedListPointer - 0x10 then -- Prevent infinite loops
 					break;
 				end
 				object = safety;
@@ -5741,11 +5732,11 @@ function dumpCollisionTypes(kongFilter)
 	local collisionLinkedListPointer = dereferencePointer(Game.Memory.obj_model2_collision_linked_list_pointer[version]);
 	if isRDRAM(collisionLinkedListPointer) then
 		local collisionListObjectSize = mainmemory.read_u32_be(collisionLinkedListPointer + heap.object_size);
-		for i = 0, collisionListObjectSize, 4 do
+		for i = 0, collisionListObjectSize - 4, 4 do
 			local object = dereferencePointer(collisionLinkedListPointer + i);
 			while isRDRAM(object) do
 				local kong = mainmemory.read_u16_be(object + 0x04);
-				if isKong(kong) and (kongFilter == nil or kong == kongFilter) then
+				--if isKong(kong) and (kongFilter == nil or kong == kongFilter) then
 					local collisionType = mainmemory.read_u16_be(object + 0x02);
 					if obj_model2.object_types[collisionType] ~= nil then
 						collisionType = obj_model2.object_types[collisionType];
@@ -5758,7 +5749,7 @@ function dumpCollisionTypes(kongFilter)
 						kongCounts[kong] = kongCounts[kong] + 1;
 					end
 					dprint(toHexString(object)..": "..collisionType..", Kong: "..toHexString(kong));
-				end
+				--end
 				object = dereferencePointer(object + 0x18);
 			end
 		end
@@ -5773,7 +5764,7 @@ function replaceCollisionType(target, desired)
 	local collisionLinkedListPointer = dereferencePointer(Game.Memory.obj_model2_collision_linked_list_pointer[version]);
 	if isRDRAM(collisionLinkedListPointer) then
 		local collisionListObjectSize = mainmemory.read_u32_be(collisionLinkedListPointer + heap.object_size);
-		for i = 0, collisionListObjectSize, 4 do
+		for i = 0, collisionListObjectSize - 4, 4 do
 			local object = dereferencePointer(collisionLinkedListPointer + i);
 			while isRDRAM(object) do
 				local collisionType = mainmemory.read_u16_be(object + 0x02);
@@ -5812,9 +5803,18 @@ function ohWrongnana(verbose)
 			currentValue = mainmemory.readbyte(slotBase + obj_model2.collectable_state);
 			if FTA.isGB(currentValue) then
 				mainmemory.writebyte(slotBase + obj_model2.collectable_state, FTA.GBStates[currentKong]);
+				if verbose then
+					FTA.debugOut(getScriptName(slotBase), slotBase, slotBase, 0);
+				end
+			end
+			if FTA.isLowGB(currentValue) then
+				mainmemory.writebyte(slotBase + obj_model2.collectable_state, FTA.LowGBStates[currentKong]);
+				if verbose then
+					FTA.debugOut(getScriptName(slotBase), slotBase, slotBase, 0);
+				end
 			end
 			-- Get activation script
-			activationScript = dereferencePointer(slotBase + 0x7C);
+			activationScript = dereferencePointer(slotBase + obj_model2.behavior_pointer);
 			if isRDRAM(activationScript) then
 				currentValue = mainmemory.read_u16_be(slotBase + obj_model2.object_type);
 				if FTA.isGunSwitch(currentValue) or FTA.isSimSlamSwitch(currentValue) or currentValue == 0x131 or currentValue == 0x47 or currentValue == 0xDC then -- 0x131 is K. Rool's Ship (Galleon), 0x47 is Castle Lobby coconut switch, 0xDC is Question Mark Box (Sim Slam)
@@ -6369,7 +6369,7 @@ local function drawGrabScriptUI()
 				local behaviorID = mainmemory.read_u16_be(object_pointers[i] + 0x8A);
 				behaviorPointer = behaviorPointer.." ("..toHexString(behaviorID, 4)..")";
 				local color = nil;
-				if FTA.isGB(collectableState) then
+				if FTA.isGB(collectableState) or FTA.isLowGB(collectableState) then
 					color = colors.yellow;
 				end
 				if object_index == i then
@@ -7639,5 +7639,804 @@ Game.OSDPosition = {32, 70}; -- TODO: Adjust this for subgames & different regio
 Game.OSD = Game.standardOSD;
 
 --print("Local Variables: "..countLocals().."/200");
+
+function traverseHeap()
+	local heapBase = dereferencePointer(Game.Memory.heap_pointer[version]);
+	if isRDRAM(heapBase) then
+		traverseSize(heapBase);
+	else
+		print("Invalid heap pointer... Hmm...");
+	end
+end
+
+function withinHeapBlock(address, block, size, includeHeader)
+	if isRDRAM(address) and isRDRAM(block) then
+		if type(size) ~= "number" then
+			size = mainmemory.read_u32_be(block + heap.object_size);
+		end
+		if includeHeader then
+			return address >= block - 0x10 and address < block + size;
+		else
+			return address >= block and address < block + size;
+		end
+	end
+	return false;
+end
+
+--[[
+Address Types:
+	0 30->00 Black       - Unknown
+	1 31->1C Green       - Free Memory
+	2 32->FC Yellow      - Framebuffer/Texture
+	3 33->E0 Red         - Object Model 1
+	4 34->E0 Red         - Object Model 2
+	5 35->E3 Pink        - Code
+	6 36->E3 Pink        - Data
+	7 37->03 Blue        - Map
+	8 xx->xx xxxx        - EEPROM Copy
+
+RGBA
+RRRGGGBB
+00000000 - 00 - Black
+11111111 - FF - White
+00011100 - 1C - Green
+11100000 - E0 - Red
+00000011 - 03 - Blue
+11100011 - E3 - Purple/Pink
+11111100 - FC - Yellow
+
+]]--
+
+addressColors = {
+	[0] = 0x00, -- BLACK    - Unknown
+	[1] = 0x1C, -- GREEN    - Free Memory
+	[2] = 0xFC, -- YELLOW   - Framebuffer/Textures
+	[3] = 0xF0, -- GOLD     - Object Model 1
+	[4] = 0xE0, -- RED      - Object Model 2
+	[5] = 0x83, -- PURPLE   - Code
+	[6] = 0xE3, -- PINK     - Data
+	[7] = 0x0F, -- BLUE     - Map
+	[8] = 0x03, -- DARKBLUE - EEPROM Copy
+};
+
+heapCache = nil;
+model2BehaviorScriptCache = nil;
+function identifyMemory(address, findReferences, suppressPrint)
+	findReferences = findReferences or false;
+	suppressPrint = suppressPrint or false;
+	addressInfo = {};
+
+	if type(address) ~= "number" then
+		table.insert(addressInfo, "Please enter a valid memory address");
+	end
+	if isPointer(address) then
+		address = address - RDRAMStart;
+	end
+	if not isRDRAM(address) then
+		table.insert(addressInfo, "Please enter a valid memory address");
+	end
+	local inExpansionPak = false;
+	if address >= RDRAMSize / 2 then
+		inExpansionPak = true;
+	end
+	local addressFound = false;
+	local addressType = 0;
+	local skipToAddress = nil;
+	local address_4byte_align = address - address % 4;
+
+	table.insert(addressInfo, "Valid address detected, checking "..toHexString(address, 6));
+	if inExpansionPak then
+		table.insert(addressInfo, "This address is in the expansion pak.");
+	end
+
+	-- Detect RAM Watch
+	for i = 1, #Game.RAMWatch do
+		local watch = Game.RAMWatch[i];
+		if watch.data_type == "b" then
+			if address == watch.address then
+				addressFound = true;
+				addressType = 6;
+				table.insert(addressInfo, "This address is in the RAM watch: "..watch.name.." (1 byte)");
+				break;
+			end
+		elseif watch.data_type == "w" then
+			if address >= watch.address and address < watch.address + 2 then
+				addressFound = true;
+				addressType = 6;
+				table.insert(addressInfo, "This address is in the RAM watch: "..watch.name.." (2 bytes)");
+				break;
+			end
+		elseif watch.data_type == "d" then
+			if address >= watch.address and address < watch.address + 4 then
+				addressFound = true;
+				addressType = 6;
+				table.insert(addressInfo, "This address is in the RAM watch: "..watch.name.." (4 bytes)");
+				break;
+			end
+		end
+	end
+
+	-- Detect OS Code
+	if not addressFound then
+		if Game.Memory.os_code_start[version] ~= nil then
+			if address >= Game.Memory.os_code_start[version] and address < Game.Memory.os_code_start[version] + Game.Memory.os_code_size[version] then
+				addressFound = true;
+				addressType = 5;
+				skipToAddress = Game.Memory.os_code_start[version] + Game.Memory.os_code_size[version];
+				table.insert(addressInfo, "This address is part of OS Code.");
+			end
+		end
+	end
+
+	-- Detect Game Code
+	if not addressFound then
+		if Game.Memory.game_code_start[version] ~= nil then
+			if address >= Game.Memory.game_code_start[version] and address < Game.Memory.game_code_start[version] + Game.Memory.game_code_size[version] then
+				addressFound = true;
+				addressType = 5;
+				skipToAddress = Game.Memory.game_code_start[version] + Game.Memory.game_code_size[version];
+				table.insert(addressInfo, "This address is part of Game Code.");
+			end
+		end
+	end
+
+	-- Detect Game Constants
+	if not addressFound then
+		if Game.Memory.game_constants_start[version] ~= nil then
+			if address >= Game.Memory.game_constants_start[version] and address < Game.Memory.game_constants_start[version] + Game.Memory.game_constants_size[version] then
+				addressFound = true;
+				addressType = 6;
+				skipToAddress = Game.Memory.game_constants_start[version] + Game.Memory.game_constants_size[version];
+				table.insert(addressInfo, "This address is part of the Game Constants file.");
+			end
+		end
+	end
+
+	-- Detect EEPROM copy
+	if not addressFound then
+		if address >= Game.Memory.eeprom_copy_base[version] and address < Game.Memory.eeprom_copy_base[version] + 4 * eeprom_slot_size then
+			addressFound = true;
+			addressType = 8;
+			skipToAddress = Game.Memory.eeprom_copy_base[version] + 4 * eeprom_slot_size;
+			local EEPROMOffset = address - Game.Memory.eeprom_copy_base[version];
+			local EEPROMSlot = math.floor(EEPROMOffset / eeprom_slot_size);
+			local EEPROMSlotOffset = EEPROMOffset % eeprom_slot_size;
+			table.insert(addressInfo, "This address is part of the EEPROM copy.");
+			table.insert(addressInfo, "EEPROM + "..toHexString(EEPROMOffset).." or Slot "..EEPROMSlot.." + "..toHexString(EEPROMSlotOffset));
+		end
+	end
+
+	-- Detect framebuffers
+	if not addressFound then
+		local frameBuffer = dereferencePointer(Game.Memory.framebuffer_pointer[version]);
+		--dprint("FB:"..toHexString(frameBuffer));
+		if isRDRAM(frameBuffer) then
+			--dprint("FBYA:"..toHexString(frameBuffer));
+			if address >= frameBuffer and address < frameBuffer + 320 * 240 * 2 then
+				--dprint("FBYAYA:"..toHexString(frameBuffer));
+				addressFound = true;
+				local fbOffset = address - frameBuffer;
+				xPixel = (fbOffset / 2) % 320;
+				yPixel = math.floor(fbOffset / 640);
+				addressType = 2;
+				skipToAddress = frameBuffer + 320 * 240 * 2;
+				table.insert(addressInfo, "This address is in the first framebuffer! "..toHexString(frameBuffer).." + "..toHexString(fbOffset));
+				table.insert(addressInfo, "Pixel Coords: X: "..xPixel..", Y:"..yPixel);
+			end
+		end
+		frameBuffer = dereferencePointer(Game.Memory.framebuffer_pointer[version] + 4);
+		--dprint("FB2:"..toHexString(frameBuffer));
+		if isRDRAM(frameBuffer) then
+			--dprint("FB2YA:"..toHexString(frameBuffer));
+			if address >= frameBuffer and address < frameBuffer + 320 * 240 * 2 then
+				--dprint("FB2YAYA:"..toHexString(frameBuffer));
+				addressFound = true;
+				local fbOffset = address - frameBuffer;
+				xPixel = (fbOffset / 2) % 320;
+				yPixel = math.floor(fbOffset / 640);
+				addressType = 2;
+				skipToAddress = frameBuffer + 320 * 240 * 2;
+				table.insert(addressInfo, "This address is in the second framebuffer! "..toHexString(frameBuffer).." + "..toHexString(fbOffset));
+				table.insert(addressInfo, "Pixel Coords: X: "..xPixel..", Y:"..yPixel);
+			end
+		end
+	end
+
+	-- Detect textures
+	if not addressFound then
+		local textureList = dereferencePointer(Game.Memory.texture_list_pointer[version]);
+		if isRDRAM(textureList) then
+			local size = 0;
+			local prev = 0;
+			local nextFree = 0;
+			local prevFree = 0;
+			local header = textureList;
+			local block;
+			repeat
+				block = header + 0x10;
+				size = mainmemory.read_u32_be(header + 4);
+				--nextFree = dereferencePointer(header + 8);
+				--prevFree = dereferencePointer(header + 12);
+				--dprint("Texture "..toHexString(header).." size: "..toHexString(size).." nextfree: "..toHexString(nextFree).." prevfree: "..toHexString(prevFree));
+				if size == 0 then
+					break;
+				end
+				if address >= header and address < block + size then
+					--[[
+					nextFree = dereferencePointer(header + 8);
+					prevFree = dereferencePointer(header + 12);
+					if isRDRAM(nextFree) or isRDRAM(prevFree) then
+						addressFound = true;
+						addressType = 1;
+						if address < block then
+							table.insert(addressInfo, "This address is in a heap header for a texture block that is considered free memory by the game.");
+						else
+							table.insert(addressInfo, "This address is part of a texture block that is considered free memory by the game.");
+						end
+					else
+					]]--
+						addressFound = true;
+						addressType = 2;
+						skipToAddress = block + size;
+						if address < block then
+							table.insert(addressInfo, "This address is in a heap header for a texture block.");
+						else
+							table.insert(addressInfo, "This address is in a texture block: "..toHexString(block, 6).." + "..toHexString(address - block));
+						end
+					--end
+
+					table.insert(addressInfo, "Header: "..toHexString(header, 6));
+					table.insert(addressInfo, "Texture Block: "..toHexString(block, 6));
+					table.insert(addressInfo, "Block Size: "..toHexString(size));
+
+					if findReferences then
+						table.insert(addressInfo, "");
+						table.insert(addressInfo, "Searching for references to this texture block:");
+						local references = searchPointers(block + size + RDRAMBase, size, false, true);
+						if #references > 0 then
+							for i = 1, #references do
+								table.insert(addressInfo, toHexString(references[i].Address).." -> "..toHexString(references[i].Value).." (Block + "..toHexString(references[i].Value - RDRAMBase - block)..")");
+							end
+							table.insert(addressInfo, #references.." references found.");
+						end
+					end
+					break;
+				end
+				header = block + size;
+				prev = mainmemory.read_u32_be(header);
+			until prev == 0 or not isRDRAM(header);
+		end
+	end
+
+	-- Detect heap
+	----[[
+	if not addressFound then
+		local onHeap = false;
+		local inHeapHeader = false;
+		local inHeapBlock = false;
+		local inFreeMemory = false;
+		local heapHeader = 0;
+		local heapBlock = 0;
+		local heapBlockSize = 0;
+		local heapBase = dereferencePointer(Game.Memory.heap_pointer[version]);
+		local heapEnd = RDRAMSize
+		if heapCache ~= nil then
+			heapEnd = heapCache[#heapCache].block + heapCache[#heapCache].size;
+		end
+
+		if isRDRAM(heapBase) then
+			if address >= heapBase and address < heapEnd then
+				if heapCache == nil then
+					heapCache = {};
+					local size = 0;
+					local prev = 0;
+					local nextFree = 0;
+					local prevFree = 0;
+					local header = heapBase;
+					local block;
+					repeat
+						block = header + 0x10;
+						size = mainmemory.read_u32_be(header + 4);
+						if address >= header and address < block + size then
+							if address < block then
+								inHeapHeader = true;
+							else
+								inHeapBlock = true;
+							end
+							onHeap = true;
+							heapBlock = block;
+							heapBlockSize = size;
+							heapHeader = header;
+							nextFree = dereferencePointer(header + 8);
+							prevFree = dereferencePointer(header + 12);
+							if isRDRAM(nextFree) or isRDRAM(prevFree) then
+								addressFound = true;
+								addressType = 1;
+								skipToAddress = heapBlock + heapBlockSize;
+								inFreeMemory = true;
+							end
+							--break; -- Disabled so that we build full heap cache
+						end
+						table.insert(heapCache, {header=header, block=block, size=size});
+						header = block + size;
+						prev = mainmemory.read_u32_be(header);
+					until prev == 0 or not isRDRAM(header);
+				else
+					for i = 1, #heapCache do
+						local cachedBlock = heapCache[i];
+						if withinHeapBlock(address, cachedBlock.block, cachedBlock.size, true) then
+							onHeap = true;
+							if address < cachedBlock.block then
+								inHeapHeader = true;
+								inHeapBlock = false;
+							else
+								inHeapHeader = false;
+								inHeapBlock = true;
+							end
+							heapBlock = cachedBlock.block;
+							heapBlockSize = cachedBlock.size;
+							heapHeader = cachedBlock.header;
+							nextFree = dereferencePointer(cachedBlock.header + 8);
+							prevFree = dereferencePointer(cachedBlock.header + 12);
+							if isRDRAM(nextFree) or isRDRAM(prevFree) then
+								addressFound = true;
+								addressType = 1;
+								skipToAddress = heapBlock + heapBlockSize;
+								inFreeMemory = true;
+							end
+							break;
+						end
+					end
+				end
+			end
+		end
+
+		if onHeap then
+			table.insert(addressInfo, "This address is on the heap!");
+			if inHeapHeader then
+				table.insert(addressInfo, "This address is in a heap header.");
+			end
+			if inHeapBlock then
+				table.insert(addressInfo, "This address is in a heap block: "..toHexString(heapBlock, 6).." + "..toHexString(address - heapBlock));
+			end
+			if inFreeMemory then
+				table.insert(addressInfo, "The heap block is considered free memory by the game.");
+			end
+			table.insert(addressInfo, "Heap Header: "..toHexString(heapHeader, 6));
+			table.insert(addressInfo, "Heap Block: "..toHexString(heapBlock, 6));
+			table.insert(addressInfo, "Block Size: "..toHexString(heapBlockSize));
+
+			if findReferences then
+				table.insert(addressInfo, "");
+				table.insert(addressInfo, "Searching for references to this heap block:");
+				local references = searchPointers(heapBlock + heapBlockSize + RDRAMBase, heapBlockSize, false, true);
+				if #references > 0 then
+					for i = 1, #references do
+						table.insert(addressInfo, toHexString(references[i].Address).." -> "..toHexString(references[i].Value).." (Block + "..toHexString(references[i].Value - RDRAMBase - heapBlock)..")");
+					end
+					table.insert(addressInfo, #references.." references found.");
+					if inFreeMemory then
+						table.insert(addressInfo, "Hmm, there's references to free memory here, possible use after free exploit?");
+					end
+				end
+			end
+
+			-- Detect model 1
+			if not addressFound then
+				local actorMatched = false;
+				for object_no = 0, 255 do
+					local pointerAddress = Game.Memory.pointer_list[version] + (object_no * 4);
+					if address_4byte_align == pointerAddress then
+						table.insert(addressInfo, "Pointer number "..object_no.." in the model 1 pointer list. Value is "..toHexString(pointerAddress, 8));
+						actorMatched = true;
+						addressFound = true;
+						addressType = 3;
+					end
+					local actor = dereferencePointer(pointerAddress);
+					if isRDRAM(actor) then
+						if actorMatched then
+							table.insert(addressInfo, "Points to "..getActorName(actor));
+							break;
+						end
+						if withinHeapBlock(address, actor, nil, true) then
+							table.insert(addressInfo, "This address is part of the Actor: "..getActorName(actor).." at "..toHexString(actor));
+							actorMatched = true;
+							addressFound = true;
+							addressType = 3;
+							skipToAddress = heapBlock + heapBlockSize;
+						end
+						local animationParamObject = dereferencePointer(actor + obj_model1.rendering_parameters_pointer);
+						if isRDRAM(animationParamObject) then
+							if withinHeapBlock(address, animationParamObject, nil, true) then
+								table.insert(addressInfo, "This address is part of the AnimationParam object for the actor: "..getActorName(actor).." at "..toHexString(actor));
+								actorMatched = true;
+								addressFound = true;
+								addressType = 3;
+								skipToAddress = heapBlock + heapBlockSize;
+							end
+							local sharedModelObject = dereferencePointer(actor + obj_model1.model_pointer);
+							if isRDRAM(sharedModelObject) then
+								if withinHeapBlock(address, sharedModelObject, nil, true) then
+									table.insert(addressInfo, "This address is part of the SharedModel object for the actor: "..getActorName(actor).." at "..toHexString(actor));
+									actorMatched = true;
+									addressFound = true;
+									addressType = 3;
+									skipToAddress = heapBlock + heapBlockSize;
+								end
+								local numBones = mainmemory.readbyte(sharedModelObject + obj_model1.model.num_bones);
+								if numBones > 0 then
+									local boneArraySize = numBones * bone_size;
+									local boneArray1 = dereferencePointer(animationParamObject + obj_model1.rendering_parameters.bone_array_1);
+									if isRDRAM(boneArray1) then
+										if address >= boneArray1 and address < boneArray1 + boneArraySize then
+											table.insert(addressInfo, "This address is part of the first BoneArray for the actor: "..getActorName(actor).." at "..toHexString(actor));
+											actorMatched = true;
+											addressFound = true;
+											addressType = 3;
+											skipToAddress = heapBlock + heapBlockSize;
+										end
+									end
+									local boneArray2 = dereferencePointer(animationParamObject + obj_model1.rendering_parameters.bone_array_2);
+									if isRDRAM(boneArray1) then
+										if address >= boneArray2 and address < boneArray2 + boneArraySize then
+											table.insert(addressInfo, "This address is part of the second BoneArray for the actor: "..getActorName(actor).." at "..toHexString(actor));
+											actorMatched = true;
+											addressFound = true;
+											addressType = 3;
+											skipToAddress = heapBlock + heapBlockSize;
+										end
+									end
+								end
+							end
+						end
+					end
+					if actorMatched then
+						break;
+					end
+				end
+			end
+
+			-- Detect model 2
+			if not addressFound then
+				local objModel2Array = getObjectModel2Array();
+				if isRDRAM(objModel2Array) then
+					local numSlots = mainmemory.read_u32_be(Game.Memory.obj_model2_array_count[version]);
+					local arraySize = getObjectModel2ArraySize();
+					for i = 0, numSlots - 1 do
+						local slotBase = objModel2Array + i * obj_model2_slot_size;
+						local modelPointer = dereferencePointer(slotBase + obj_model2.behavior_type_pointer);
+						if isRDRAM(modelPointer) then
+							if withinHeapBlock(address, modelPointer, nil, true) then
+								addressFound = true;
+								addressType = 4;
+								skipToAddress = heapBlock + heapBlockSize;
+								table.insert(addressInfo, "The address is in a DisplayList for the object: "..getScriptName(slotBase).." at "..toHexString(slotBase)..".");
+								table.insert(addressInfo, "Offset: DisplayList + "..toHexString(address - modelPointer));
+							end
+						end
+					end
+					if address >= objModel2Array and address < objModel2Array + arraySize * obj_model2_slot_size then
+						addressFound = true;
+						addressType = 4;
+						skipToAddress = objModel2Array + arraySize * obj_model2_slot_size;
+						local objectBase = address - (address - objModel2Array) % obj_model2_slot_size;
+						table.insert(addressInfo, "Oh man! The address is in the object model 2 array!");
+						table.insert(addressInfo, "Object Base: "..toHexString(objectBase));
+						if address >= objModel2Array and address <= objModel2Array + numSlots * obj_model2_slot_size then
+							table.insert(addressInfo, "It's in a proper object too, not just free space.");
+							table.insert(addressInfo, "Object Name: "..getScriptName(objectBase));
+							-- TODO: Position?
+						else
+							table.insert(addressInfo, "It's in an empty array element though, hmm...");
+						end
+					else
+						if model2BehaviorScriptCache == nil then
+							model2BehaviorScriptCache = {};
+							-- Get activation script
+							for i = 0, numSlots - 1 do
+								local slotBase = objModel2Array + i * obj_model2_slot_size;
+								local activationScript = dereferencePointer(slotBase + obj_model2.behavior_pointer);
+								if isRDRAM(activationScript) then
+									local scriptSize = mainmemory.read_u32_be(activationScript + heap.object_size);
+									table.insert(model2BehaviorScriptCache, {slotBase=slotBase, block=activationScript, scriptSize=scriptSize, topLevel=true});
+									if withinHeapBlock(address, activationScript, scriptSize, true) then
+										table.insert(addressInfo, "The address is in a BehaviorObject for the object: "..getScriptName(slotBase).." at "..toHexString(slotBase)..".");
+										table.insert(addressInfo, "Offset: BehaviorObject + "..toHexString(address - activationScript));
+										addressFound = true;
+										addressType = 4;
+										skipToAddress = heapBlock + heapBlockSize;
+										--break; -- Disabled so that we build full cache
+									--else -- Disabled so that we build full cache
+									end
+										activationScript = dereferencePointer(activationScript + 0xA0);
+										while isRDRAM(activationScript) do
+											scriptSize = mainmemory.read_u32_be(activationScript + heap.object_size);
+											table.insert(model2BehaviorScriptCache, {slotBase=slotBase, block=activationScript, scriptSize=scriptSize, topLevel=false});
+											if withinHeapBlock(address, activationScript, nil, true) then
+												table.insert(addressInfo, "The address is in a BehaviorScript for the object: "..getScriptName(slotBase).." at "..toHexString(slotBase)..".");
+												table.insert(addressInfo, "Offset: BehaviorScript + "..toHexString(address - activationScript));
+												addressFound = true;
+												addressType = 4;
+												skipToAddress = heapBlock + heapBlockSize;
+												--break; -- Disabled so that we build full cache
+											end
+											-- Get next script chunk
+											activationScript = dereferencePointer(activationScript + 0x4C);
+										end
+									--end -- Disabled so that we build full cache
+									if addressFound then
+										--break; -- Disabled so that we build full cache
+									end
+								end
+							end
+						else
+							for i = 1, #model2BehaviorScriptCache do
+								if withinHeapBlock(address, model2BehaviorScriptCache[i].block, model2BehaviorScriptCache[i].scriptSize, true) then
+									addressFound = true;
+									addressType = 4;
+									skipToAddress = model2BehaviorScriptCache[i].block + model2BehaviorScriptCache[i].scriptSize;
+									if model2BehaviorScriptCache[i].topLevel then
+										table.insert(addressInfo, "The address is in a BehaviorObject for the object: "..getScriptName(model2BehaviorScriptCache[i].slotBase).." at "..toHexString(model2BehaviorScriptCache[i].slotBase)..".");
+										table.insert(addressInfo, "Offset: BehaviorObject + "..toHexString(address - model2BehaviorScriptCache[i].block));
+										break;
+									else
+										table.insert(addressInfo, "The address is in a BehaviorScript for the object: "..getScriptName(model2BehaviorScriptCache[i].slotBase).." at "..toHexString(model2BehaviorScriptCache[i].slotBase)..".");
+										table.insert(addressInfo, "Offset: BehaviorScript + "..toHexString(address - model2BehaviorScriptCache[i].block));
+										break;
+									end
+								end
+							end
+						end
+					end
+				end
+			end
+
+			-- Detect HUD
+			if not addressFound then
+				local HUDObject = dereferencePointer(Game.Memory.hud_pointer[version]);
+				if isRDRAM(HUDObject) then
+					if withinHeapBlock(address, HUDObject, nil, true) then
+						table.insert(addressInfo, "This address is part of the HUD object!");
+						addressFound = true;
+						addressType = 6;
+						skipToAddress = heapBlock + heapBlockSize;
+					end
+				end
+			end
+
+			-- Detect enemies
+			if not addressFound then
+				local enemyRespawnObject = dereferencePointer(Game.Memory.enemy_respawn_object[version]);
+				if isRDRAM(enemyRespawnObject) then
+					if withinHeapBlock(address, enemyRespawnObject, nil, true) then
+						table.insert(addressInfo, "This address is part of the enemy array object!");
+						table.insert(addressInfo, "Run dumpEnemies() for more information.");
+						addressFound = true;
+						addressType = 3;
+						skipToAddress = heapBlock + heapBlockSize;
+					end
+				end
+			end
+
+			-- Detect map
+			if not addressFound then
+				local mapBase = dereferencePointer(Game.Memory.map_block_pointer[version]);
+				if withinHeapBlock(address, mapBase, nil, true) then
+					table.insert(addressInfo, "This address is part of the map block!");
+					table.insert(addressInfo, "Could be verts, displaylist etc.");
+					addressFound = true;
+					addressType = 7;
+					skipToAddress = heapBlock + heapBlockSize;
+				end
+			end
+
+			-- Detect chunks
+			if not addressFound then
+				local chunkArray = dereferencePointer(Game.Memory.chunk_array_pointer[version]);
+				if withinHeapBlock(address, chunkArray, nil, true) then
+					table.insert(addressInfo, "This address is part of the chunk array for the map!");
+					table.insert(addressInfo, "Use the Object Analysis Tools for more information.");
+					addressFound = true;
+					addressType = 7;
+					skipToAddress = heapBlock + heapBlockSize;
+				end
+			end
+
+			-- Detect dynamic water surfaces
+			if not addressFound then
+				local waterSurface = dereferencePointer(Game.Memory.water_surface_list[version]);
+				if isRDRAM(waterSurface) then
+					while isRDRAM(waterSurface) do
+						if withinHeapBlock(address, waterSurface, nil, true) then
+							local t1Str = mainmemory.read_u32_be(waterSurface + dynamicWaterSurface.timer_1[version])..", ";
+							local t2Str = mainmemory.read_u32_be(waterSurface + dynamicWaterSurface.timer_2[version])..", ";
+							local t3Str = mainmemory.read_u32_be(waterSurface + dynamicWaterSurface.timer_3[version])..", ";
+							local t4Str = mainmemory.read_u32_be(waterSurface + dynamicWaterSurface.timer_4[version]);
+							table.insert(addressInfo, "This address is part of a dynamic water surface!");
+							table.insert(addressInfo, toHexString(waterSurface).." Timers: {"..t1Str..t2Str..t3Str..t4Str.."}");
+							addressFound = true;
+							addressType = 7;
+							skipToAddress = heapBlock + heapBlockSize;
+							break;
+						end
+						waterSurface = dereferencePointer(waterSurface + dynamicWaterSurface.next_surface_pointer[version]);
+					end
+				end
+			end
+
+			-- Detect exits
+			if not addressFound then
+				local exitArray = dereferencePointer(Game.Memory.exit_array_pointer[version]);
+				if isRDRAM(exitArray) then
+					if withinHeapBlock(address, exitArray, nil, true) then
+						table.insert(addressInfo, "This address is part of the exit array!");
+						table.insert(addressInfo, "Use the Object Analysis Tools or run dumpExits() for more information.");
+						addressFound = true;
+						addressType = 7;
+						skipToAddress = heapBlock + heapBlockSize;
+					end
+				end
+			end
+
+			-- Detect loading zones
+			if not addressFound then
+				local lzArray = getLoadingZoneArray();
+				if isRDRAM(lzArray) then
+					if withinHeapBlock(address, lzArray, nil, true) then
+						table.insert(addressInfo, "This address is part of the loading zone array!");
+						table.insert(addressInfo, "Use the Object Analysis Tools or run dumpLoadingZones() for more information.");
+						addressFound = true;
+						addressType = 7;
+						skipToAddress = heapBlock + heapBlockSize;
+					end
+				end
+			end
+
+			-- Detect setup
+			if not addressFound then
+				local setupFile = dereferencePointer(Game.Memory.obj_model2_setup_pointer[version]);
+				if isRDRAM(setupFile) then
+					if withinHeapBlock(address, setupFile, nil, true) then
+						table.insert(addressInfo, "This address is part of the map setup!");
+						table.insert(addressInfo, "Run dumpSetup() for more information.");
+						addressFound = true;
+						addressType = 7;
+						skipToAddress = heapBlock + heapBlockSize;
+					end
+				end
+			end
+
+			if not addressFound then
+				skipToAddress = heapBlock + heapBlockSize;
+			end
+		end
+	end
+	--]]
+
+	-- Detect model 2 collisions
+	if not addressFound then
+		local collisionLinkedListPointer = dereferencePointer(Game.Memory.obj_model2_collision_linked_list_pointer[version]);
+		if isRDRAM(collisionLinkedListPointer) then
+			local collisionListObjectSize = mainmemory.read_u32_be(collisionLinkedListPointer + heap.object_size);
+			if withinHeapBlock(address, collisionLinkedListPointer, collisionListObjectSize, true) then
+				table.insert(addressInfo, "The address is in the object model 2 collision linked list pointer array!");
+				addressFound = true;
+				addressType = 4;
+				skipToAddress = collisionLinkedListPointer + collisionListObjectSize;
+				if address >= collisionLinkedListPointer then
+					local object = dereferencePointer(address);
+					if isRDRAM(object) then
+						table.insert(addressInfo, "The address you passed points to a collision linked list!");
+						table.insert(addressInfo, "Iterating through and checking what's in that list:");
+						local safety = nil;
+						while isRDRAM(object) do
+							local kong = mainmemory.read_u16_be(object + 0x04);
+							local collisionType = mainmemory.read_u16_be(object + 0x02);
+							if obj_model2.object_types[collisionType] ~= nil then
+								collisionType = obj_model2.object_types[collisionType];
+							else
+								collisionType = toHexString(collisionType, 4);
+							end
+							table.insert(addressInfo, toHexString(object)..": "..collisionType..", Kong: "..toHexString(kong));
+							safety = dereferencePointer(object + 0x18); -- Get next object
+							if safety == object or safety == collisionLinkedListPointer - 0x10 then -- Prevent infinite loops
+								break;
+							end
+							object = safety;
+						end
+					else
+						table.insert(addressInfo, "The address you passed isn't a pointer to a collision linked list though...");
+					end
+				end
+			else
+				for i = 0, collisionListObjectSize - 4, 4 do
+					local object = dereferencePointer(collisionLinkedListPointer + i);
+					local safety = nil;
+					while isRDRAM(object) do
+						if withinHeapBlock(address, object, nil, true) then
+							table.insert(addressInfo, "The address is part of an object model 2 collision!");
+							addressFound = true;
+							addressType = 4;
+							local kong = mainmemory.read_u16_be(object + 0x04);
+							local collisionType = mainmemory.read_u16_be(object + 0x02);
+							if obj_model2.object_types[collisionType] ~= nil then
+								collisionType = obj_model2.object_types[collisionType];
+							else
+								collisionType = toHexString(collisionType, 4);
+							end
+							table.insert(addressInfo, toHexString(object)..": "..collisionType..", Kong: "..toHexString(kong));
+							break;
+						end
+						safety = dereferencePointer(object + 0x18); -- Get next object
+						if safety == object or safety == collisionLinkedListPointer - 0x10 then -- Prevent infinite loops
+							break;
+						end
+						object = safety;
+					end
+				end
+			end
+		end
+	end
+
+	if not addressFound then
+		table.insert(addressInfo, "This address is currently unknown.");
+	end
+	if not suppressPrint then
+		for i = 1, #addressInfo do
+			dprint(addressInfo[i]);
+		end
+		print_deferred();
+		return addressFound;
+	end
+	if type(skipToAddress) == "number" then
+		return {addressType = addressType, skipToAddress = skipToAddress};
+	else
+		return addressType;
+	end
+end
+
+function calculateKnownMemory(dumpBitmap)
+	local output_file = nil;
+	if dumpBitmap then
+		output_file = io.open("./known_memory.bin", "wb");
+	end
+	local knownBytes = 0;
+	local i = 0;
+	while i < RDRAMSize do
+		local result = identifyMemory(i, false, true);
+		if type(result) == "number" then
+			if dumpBitmap then
+				if type(addressColors[result]) == "number" then
+					result = addressColors[result];
+				end
+				output_file:write(string.char(result));
+			end
+			if result > 0 then
+				knownBytes = knownBytes + 1;
+			end
+			if i % 0x1000 == 0 then
+				print(toHexString(i).." known: "..toHexString(knownBytes));
+			end
+			i = i + 1;
+		elseif type(result) == "table" then
+			local diff = result.skipToAddress - i;
+			i = result.skipToAddress;
+			if dumpBitmap then
+				if type(addressColors[result.addressType]) == "number" then
+					result.addressType = addressColors[result.addressType];
+				end
+				for j = 1, diff do
+					if result.addressType > 0 then
+						knownBytes = knownBytes + 1;
+					end
+					output_file:write(string.char(result.addressType));
+				end
+			end
+			--print(toHexString(i).." known: "..toHexString(knownBytes).." i: "..toHexString(i));
+		end
+	end
+	output_file:close();
+	print(formatOutputString("Bytes Known: ", knownBytes, RDRAMSize));
+end
 
 return Game;
