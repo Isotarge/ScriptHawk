@@ -7706,8 +7706,8 @@ function buildIdentifyMemoryCache()
 		heapCache = {},
 		heapBase = 0,
 		heapEnd = RDRAMSize,
-		model2BehaviorScriptCache = {},
 		textureCache = {},
+		model2CollisionCache = {},
 		frameBuffers = {},
 	};
 
@@ -7745,6 +7745,45 @@ function buildIdentifyMemoryCache()
 		identifyMemoryCache.heapEnd = header;
 	end
 
+	-- Detect model 2
+	if not addressFound then
+		local objModel2Array = getObjectModel2Array();
+		if isRDRAM(objModel2Array) then
+			local numSlots = mainmemory.read_u32_be(Game.Memory.obj_model2_array_count[version]);
+			local arraySize = getObjectModel2ArraySize();
+			identifyMemoryCache.heapCache[objModel2Array].isObjectModel2Array = true;
+			identifyMemoryCache.heapCache[objModel2Array].numSlots = numSlots;
+			identifyMemoryCache.heapCache[objModel2Array].arraySize = arraySize;
+			for i = 0, numSlots - 1 do
+				local slotBase = objModel2Array + i * obj_model2_slot_size;
+				local modelPointer = dereferencePointer(slotBase + obj_model2.behavior_type_pointer);
+				if isRDRAM(modelPointer) then
+					identifyMemoryCache.heapCache[modelPointer].isObjectModel2DisplayList = true;
+					identifyMemoryCache.heapCache[modelPointer].associatedModel2Object = slotBase;
+					identifyMemoryCache.heapCache[modelPointer].associatedModel2ObjectName = getScriptName(slotBase);
+				end
+				-- BehaviorObject
+				local activationScript = dereferencePointer(slotBase + obj_model2.behavior_pointer);
+				if isRDRAM(activationScript) then
+					identifyMemoryCache.heapCache[activationScript].isBehaviorScript = true;
+					identifyMemoryCache.heapCache[activationScript].topLevel = true;
+					identifyMemoryCache.heapCache[activationScript].associatedModel2Object = slotBase;
+					identifyMemoryCache.heapCache[activationScript].associatedModel2ObjectName = getScriptName(slotBase);
+					-- BehaviorScript
+					activationScript = dereferencePointer(activationScript + 0xA0);
+					while isRDRAM(activationScript) do
+						identifyMemoryCache.heapCache[activationScript].isBehaviorScript = true;
+						identifyMemoryCache.heapCache[activationScript].topLevel = false;
+						identifyMemoryCache.heapCache[activationScript].associatedModel2Object = slotBase;
+						identifyMemoryCache.heapCache[activationScript].associatedModel2ObjectName = getScriptName(slotBase);
+						-- Get next script chunk
+						activationScript = dereferencePointer(activationScript + 0x4C);
+					end
+				end
+			end
+		end
+	end
+
 	-- Cache texture list
 	local textureList = dereferencePointer(Game.Memory.texture_list_pointer[version]);
 	if isRDRAM(textureList) then
@@ -7762,6 +7801,34 @@ function buildIdentifyMemoryCache()
 			header = block + size;
 			prev = mainmemory.read_u32_be(header);
 		until prev == 0 or not isRDRAM(header);
+	end
+
+	-- Cache object model 2 collisions
+	if not addressFound then
+		local collisionLinkedListPointer = dereferencePointer(Game.Memory.obj_model2_collision_linked_list_pointer[version]);
+		if isRDRAM(collisionLinkedListPointer) then
+			local collisionListObjectSize = mainmemory.read_u32_be(collisionLinkedListPointer + heap.object_size);
+			identifyMemoryCache.heapCache[collisionLinkedListPointer].isCollisionLinkedListObject = true;
+			for i = 0, collisionListObjectSize - 4, 4 do
+				local object = dereferencePointer(collisionLinkedListPointer + i);
+				local safety = nil;
+				while isRDRAM(object) do
+					local kong = mainmemory.read_u16_be(object + 0x04);
+					local collisionType = mainmemory.read_u16_be(object + 0x02);
+					if obj_model2.object_types[collisionType] ~= nil then
+						collisionType = obj_model2.object_types[collisionType];
+					else
+						collisionType = toHexString(collisionType, 4);
+					end
+					safety = dereferencePointer(object + 0x18); -- Get next object
+					identifyMemoryCache.model2CollisionCache[object] = {block=object, next=safety, kong=kong, collisionType=collisionType};
+					if safety == object or safety == collisionLinkedListPointer - 0x10 then -- Prevent infinite loops
+						break;
+					end
+					object = safety;
+				end
+			end
+		end
 	end
 end
 
@@ -7812,6 +7879,7 @@ function identifyMemory(address, findReferences, reuseCache, suppressPrint)
 			if address >= watch.address and address < watch.address + 2 then
 				addressFound = true;
 				addressType = 6;
+				skipToAddress = watch.address + 2;
 				table.insert(addressInfo, "This address is in the RAM watch: "..watch.name.." (2 bytes)");
 				break;
 			end
@@ -7819,6 +7887,7 @@ function identifyMemory(address, findReferences, reuseCache, suppressPrint)
 			if address >= watch.address and address < watch.address + 4 then
 				addressFound = true;
 				addressType = 6;
+				skipToAddress = watch.address + 4;
 				table.insert(addressInfo, "This address is in the RAM watch: "..watch.name.." (4 bytes)");
 				break;
 			end
@@ -7925,20 +7994,16 @@ function identifyMemory(address, findReferences, reuseCache, suppressPrint)
 	end
 
 	-- Detect heap
-	----[[
 	if not addressFound then
-		local onHeap = false;
-		local inHeapHeader = false;
-		local inHeapBlock = false;
-		local inFreeMemory = false;
-		local heapHeader = 0;
-		local heapBlock = 0;
-		local heapBlockSize = 0;
-
 		if address >= identifyMemoryCache.heapBase and address < identifyMemoryCache.heapEnd then
+			local inHeapHeader = false;
+			local inHeapBlock = false;
+			local heapBlock = nil;
+
 			for k, cachedBlock in pairs(identifyMemoryCache.heapCache) do
 				if withinHeapBlock(address, cachedBlock.block, cachedBlock.size, true) then
-					onHeap = true;
+					heapBlock = cachedBlock;
+					skipToAddress = heapBlock.block + heapBlock.size;
 					if address < cachedBlock.block then
 						inHeapHeader = true;
 						inHeapBlock = false;
@@ -7946,45 +8011,38 @@ function identifyMemory(address, findReferences, reuseCache, suppressPrint)
 						inHeapHeader = false;
 						inHeapBlock = true;
 					end
-					heapBlock = cachedBlock.block;
-					heapBlockSize = cachedBlock.size;
-					heapHeader = cachedBlock.header;
 					if cachedBlock.isFree then
 						addressFound = true;
 						addressType = 1;
-						skipToAddress = heapBlock + heapBlockSize;
-						inFreeMemory = true;
 					end
 					break;
 				end
 			end
-		end
 
-		if onHeap then
 			table.insert(addressInfo, "This address is on the heap!");
 			if inHeapHeader then
 				table.insert(addressInfo, "This address is in a heap header.");
 			end
 			if inHeapBlock then
-				table.insert(addressInfo, "This address is in a heap block: "..toHexString(heapBlock, 6).." + "..toHexString(address - heapBlock));
+				table.insert(addressInfo, "This address is in a heap block: "..toHexString(heapBlock.block, 6).." + "..toHexString(address - heapBlock.block));
 			end
-			if inFreeMemory then
+			if heapBlock.isFree then
 				table.insert(addressInfo, "The heap block is considered free memory by the game.");
 			end
-			table.insert(addressInfo, "Heap Header: "..toHexString(heapHeader, 6));
-			table.insert(addressInfo, "Heap Block: "..toHexString(heapBlock, 6));
-			table.insert(addressInfo, "Block Size: "..toHexString(heapBlockSize));
+			table.insert(addressInfo, "Heap Header: "..toHexString(heapBlock.header, 6));
+			table.insert(addressInfo, "Heap Block: "..toHexString(heapBlock.block, 6));
+			table.insert(addressInfo, "Block Size: "..toHexString(heapBlock.size));
 
 			if findReferences then
 				table.insert(addressInfo, "");
 				table.insert(addressInfo, "Searching for references to this heap block:");
-				local references = searchPointers(heapBlock + heapBlockSize + RDRAMBase, heapBlockSize, false, true);
+				local references = searchPointers(heapBlock.block + heapBlock.size + RDRAMBase, heapBlock.size, false, true);
 				if #references > 0 then
 					for i = 1, #references do
-						table.insert(addressInfo, toHexString(references[i].Address).." -> "..toHexString(references[i].Value).." (Block + "..toHexString(references[i].Value - RDRAMBase - heapBlock)..")");
+						table.insert(addressInfo, toHexString(references[i].Address).." -> "..toHexString(references[i].Value).." (Block + "..toHexString(references[i].Value - RDRAMBase - heapBlock.block)..")");
 					end
 					table.insert(addressInfo, #references.." references found.");
-					if inFreeMemory then
+					if heapBlock.isFree then
 						table.insert(addressInfo, "Hmm, there's references to free memory here, possible use after free exploit?");
 					end
 				end
@@ -8012,7 +8070,6 @@ function identifyMemory(address, findReferences, reuseCache, suppressPrint)
 							actorMatched = true;
 							addressFound = true;
 							addressType = 3;
-							skipToAddress = heapBlock + heapBlockSize;
 						end
 						local animationParamObject = dereferencePointer(actor + obj_model1.rendering_parameters_pointer);
 						if isRDRAM(animationParamObject) then
@@ -8021,7 +8078,6 @@ function identifyMemory(address, findReferences, reuseCache, suppressPrint)
 								actorMatched = true;
 								addressFound = true;
 								addressType = 3;
-								skipToAddress = heapBlock + heapBlockSize;
 							end
 							local sharedModelObject = dereferencePointer(actor + obj_model1.model_pointer);
 							if isRDRAM(sharedModelObject) then
@@ -8030,7 +8086,6 @@ function identifyMemory(address, findReferences, reuseCache, suppressPrint)
 									actorMatched = true;
 									addressFound = true;
 									addressType = 3;
-									skipToAddress = heapBlock + heapBlockSize;
 								end
 								local numBones = mainmemory.readbyte(sharedModelObject + obj_model1.model.num_bones);
 								if numBones > 0 then
@@ -8042,7 +8097,6 @@ function identifyMemory(address, findReferences, reuseCache, suppressPrint)
 											actorMatched = true;
 											addressFound = true;
 											addressType = 3;
-											skipToAddress = heapBlock + heapBlockSize;
 										end
 									end
 									local boneArray2 = dereferencePointer(animationParamObject + obj_model1.rendering_parameters.bone_array_2);
@@ -8052,7 +8106,6 @@ function identifyMemory(address, findReferences, reuseCache, suppressPrint)
 											actorMatched = true;
 											addressFound = true;
 											addressType = 3;
-											skipToAddress = heapBlock + heapBlockSize;
 										end
 									end
 								end
@@ -8066,97 +8119,37 @@ function identifyMemory(address, findReferences, reuseCache, suppressPrint)
 			end
 
 			-- Detect model 2
-			if not addressFound then
-				local objModel2Array = getObjectModel2Array();
-				if isRDRAM(objModel2Array) then
-					local numSlots = mainmemory.read_u32_be(Game.Memory.obj_model2_array_count[version]);
-					local arraySize = getObjectModel2ArraySize();
-					for i = 0, numSlots - 1 do
-						local slotBase = objModel2Array + i * obj_model2_slot_size;
-						local modelPointer = dereferencePointer(slotBase + obj_model2.behavior_type_pointer);
-						if isRDRAM(modelPointer) then
-							if withinHeapBlock(address, modelPointer, nil, true) then
-								addressFound = true;
-								addressType = 4;
-								skipToAddress = heapBlock + heapBlockSize;
-								table.insert(addressInfo, "The address is in a DisplayList for the object: "..getScriptName(slotBase).." at "..toHexString(slotBase)..".");
-								table.insert(addressInfo, "Offset: DisplayList + "..toHexString(address - modelPointer));
-							end
-						end
-					end
-					if address >= objModel2Array and address < objModel2Array + arraySize * obj_model2_slot_size then
-						addressFound = true;
-						addressType = 4;
-						skipToAddress = objModel2Array + arraySize * obj_model2_slot_size;
-						local objectBase = address - (address - objModel2Array) % obj_model2_slot_size;
-						table.insert(addressInfo, "Oh man! The address is in the object model 2 array!");
-						table.insert(addressInfo, "Object Base: "..toHexString(objectBase));
-						if address >= objModel2Array and address <= objModel2Array + numSlots * obj_model2_slot_size then
-							table.insert(addressInfo, "It's in a proper object too, not just free space.");
-							table.insert(addressInfo, "Object Name: "..getScriptName(objectBase));
-							-- TODO: Position?
-						else
-							table.insert(addressInfo, "It's in an empty array element though, hmm...");
-						end
-					else
-						if model2BehaviorScriptCache == nil then
-							model2BehaviorScriptCache = {};
-							-- Get activation script
-							for i = 0, numSlots - 1 do
-								local slotBase = objModel2Array + i * obj_model2_slot_size;
-								local activationScript = dereferencePointer(slotBase + obj_model2.behavior_pointer);
-								if isRDRAM(activationScript) then
-									local scriptSize = mainmemory.read_u32_be(activationScript + heap.object_size);
-									table.insert(model2BehaviorScriptCache, {slotBase=slotBase, block=activationScript, scriptSize=scriptSize, topLevel=true});
-									if withinHeapBlock(address, activationScript, scriptSize, true) then
-										table.insert(addressInfo, "The address is in a BehaviorObject for the object: "..getScriptName(slotBase).." at "..toHexString(slotBase)..".");
-										table.insert(addressInfo, "Offset: BehaviorObject + "..toHexString(address - activationScript));
-										addressFound = true;
-										addressType = 4;
-										skipToAddress = heapBlock + heapBlockSize;
-										--break; -- Disabled so that we build full cache
-									--else -- Disabled so that we build full cache
-									end
-										activationScript = dereferencePointer(activationScript + 0xA0);
-										while isRDRAM(activationScript) do
-											scriptSize = mainmemory.read_u32_be(activationScript + heap.object_size);
-											table.insert(model2BehaviorScriptCache, {slotBase=slotBase, block=activationScript, scriptSize=scriptSize, topLevel=false});
-											if withinHeapBlock(address, activationScript, nil, true) then
-												table.insert(addressInfo, "The address is in a BehaviorScript for the object: "..getScriptName(slotBase).." at "..toHexString(slotBase)..".");
-												table.insert(addressInfo, "Offset: BehaviorScript + "..toHexString(address - activationScript));
-												addressFound = true;
-												addressType = 4;
-												skipToAddress = heapBlock + heapBlockSize;
-												--break; -- Disabled so that we build full cache
-											end
-											-- Get next script chunk
-											activationScript = dereferencePointer(activationScript + 0x4C);
-										end
-									--end -- Disabled so that we build full cache
-									if addressFound then
-										--break; -- Disabled so that we build full cache
-									end
-								end
-							end
-						else
-							for i = 1, #model2BehaviorScriptCache do
-								if withinHeapBlock(address, model2BehaviorScriptCache[i].block, model2BehaviorScriptCache[i].scriptSize, true) then
-									addressFound = true;
-									addressType = 4;
-									skipToAddress = model2BehaviorScriptCache[i].block + model2BehaviorScriptCache[i].scriptSize;
-									if model2BehaviorScriptCache[i].topLevel then
-										table.insert(addressInfo, "The address is in a BehaviorObject for the object: "..getScriptName(model2BehaviorScriptCache[i].slotBase).." at "..toHexString(model2BehaviorScriptCache[i].slotBase)..".");
-										table.insert(addressInfo, "Offset: BehaviorObject + "..toHexString(address - model2BehaviorScriptCache[i].block));
-										break;
-									else
-										table.insert(addressInfo, "The address is in a BehaviorScript for the object: "..getScriptName(model2BehaviorScriptCache[i].slotBase).." at "..toHexString(model2BehaviorScriptCache[i].slotBase)..".");
-										table.insert(addressInfo, "Offset: BehaviorScript + "..toHexString(address - model2BehaviorScriptCache[i].block));
-										break;
-									end
-								end
-							end
-						end
-					end
+			if heapBlock.isObjectModel2Array then
+				addressFound = true;
+				addressType = 4;
+				local objectBase = address - (address - heapBlock.block) % obj_model2_slot_size;
+				table.insert(addressInfo, "Oh man! The address is in the object model 2 array!");
+				table.insert(addressInfo, "Object Base: "..toHexString(objectBase));
+				if address >= heapBlock.block and address < heapBlock.block + heapBlock.numSlots * obj_model2_slot_size then
+					table.insert(addressInfo, "It's in a proper object too, not just free space.");
+					table.insert(addressInfo, "Object Name: "..getScriptName(objectBase));
+					-- TODO: Position?
+				else
+					table.insert(addressInfo, "It's in an empty array element though, hmm...");
+				end
+			end
+
+			if heapBlock.isObjectModel2DisplayList then
+				addressFound = true;
+				addressType = 4;
+				table.insert(addressInfo, "The address is in a DisplayList for the object: "..heapBlock.associatedModel2ObjectName.." at "..toHexString(heapBlock.associatedModel2Object));
+				table.insert(addressInfo, "Offset: DisplayList + "..toHexString(address - heapBlock.block));
+			end
+
+			if heapBlock.isBehaviorScript then
+				addressFound = true;
+				addressType = 4;
+				if heapBlock.topLevel then
+					table.insert(addressInfo, "The address is in a BehaviorObject for the object: "..heapBlock.associatedModel2ObjectName.." at "..toHexString(heapBlock.associatedModel2Object));
+					table.insert(addressInfo, "Offset: BehaviorObject + "..toHexString(address - heapBlock.block));
+				else
+					table.insert(addressInfo, "The address is in a BehaviorScript for the object: "..heapBlock.associatedModel2ObjectName.." at "..toHexString(heapBlock.associatedModel2Object));
+					table.insert(addressInfo, "Offset: BehaviorScript + "..toHexString(address - heapBlock.block));
 				end
 			end
 
@@ -8168,7 +8161,6 @@ function identifyMemory(address, findReferences, reuseCache, suppressPrint)
 						table.insert(addressInfo, "This address is part of the HUD object!");
 						addressFound = true;
 						addressType = 6;
-						skipToAddress = heapBlock + heapBlockSize;
 					end
 				end
 			end
@@ -8182,7 +8174,6 @@ function identifyMemory(address, findReferences, reuseCache, suppressPrint)
 						table.insert(addressInfo, "Run dumpEnemies() for more information.");
 						addressFound = true;
 						addressType = 3;
-						skipToAddress = heapBlock + heapBlockSize;
 					end
 				end
 			end
@@ -8195,7 +8186,6 @@ function identifyMemory(address, findReferences, reuseCache, suppressPrint)
 					table.insert(addressInfo, "Could be verts, displaylist etc.");
 					addressFound = true;
 					addressType = 7;
-					skipToAddress = heapBlock + heapBlockSize;
 				end
 			end
 
@@ -8207,7 +8197,6 @@ function identifyMemory(address, findReferences, reuseCache, suppressPrint)
 					table.insert(addressInfo, "Use the Object Analysis Tools for more information.");
 					addressFound = true;
 					addressType = 7;
-					skipToAddress = heapBlock + heapBlockSize;
 				end
 			end
 
@@ -8225,7 +8214,6 @@ function identifyMemory(address, findReferences, reuseCache, suppressPrint)
 							table.insert(addressInfo, toHexString(waterSurface).." Timers: {"..t1Str..t2Str..t3Str..t4Str.."}");
 							addressFound = true;
 							addressType = 7;
-							skipToAddress = heapBlock + heapBlockSize;
 							break;
 						end
 						waterSurface = dereferencePointer(waterSurface + dynamicWaterSurface.next_surface_pointer[version]);
@@ -8242,7 +8230,6 @@ function identifyMemory(address, findReferences, reuseCache, suppressPrint)
 						table.insert(addressInfo, "Use the Object Analysis Tools or run dumpExits() for more information.");
 						addressFound = true;
 						addressType = 7;
-						skipToAddress = heapBlock + heapBlockSize;
 					end
 				end
 			end
@@ -8256,7 +8243,6 @@ function identifyMemory(address, findReferences, reuseCache, suppressPrint)
 						table.insert(addressInfo, "Use the Object Analysis Tools or run dumpLoadingZones() for more information.");
 						addressFound = true;
 						addressType = 7;
-						skipToAddress = heapBlock + heapBlockSize;
 					end
 				end
 			end
@@ -8270,34 +8256,22 @@ function identifyMemory(address, findReferences, reuseCache, suppressPrint)
 						table.insert(addressInfo, "Run dumpSetup() for more information.");
 						addressFound = true;
 						addressType = 7;
-						skipToAddress = heapBlock + heapBlockSize;
 					end
 				end
 			end
 
-			if not addressFound then
-				skipToAddress = heapBlock + heapBlockSize;
-			end
-		end
-	end
-	--]]
-
-	-- Detect model 2 collisions
-	if not addressFound then
-		local collisionLinkedListPointer = dereferencePointer(Game.Memory.obj_model2_collision_linked_list_pointer[version]);
-		if isRDRAM(collisionLinkedListPointer) then
-			local collisionListObjectSize = mainmemory.read_u32_be(collisionLinkedListPointer + heap.object_size);
-			if withinHeapBlock(address, collisionLinkedListPointer, collisionListObjectSize, true) then
+			-- Detect Model 2 Collision Object
+			if heapBlock.isCollisionLinkedListObject then
 				table.insert(addressInfo, "The address is in the object model 2 collision linked list pointer array!");
 				addressFound = true;
 				addressType = 4;
-				skipToAddress = collisionLinkedListPointer + collisionListObjectSize;
-				if address >= collisionLinkedListPointer then
+				if inHeapBlock then
 					local object = dereferencePointer(address);
 					if isRDRAM(object) then
 						table.insert(addressInfo, "The address you passed points to a collision linked list!");
 						table.insert(addressInfo, "Iterating through and checking what's in that list:");
 						local safety = nil;
+						-- TODO: Use collision cache for this
 						while isRDRAM(object) do
 							local kong = mainmemory.read_u16_be(object + 0x04);
 							local collisionType = mainmemory.read_u16_be(object + 0x02);
@@ -8308,7 +8282,7 @@ function identifyMemory(address, findReferences, reuseCache, suppressPrint)
 							end
 							table.insert(addressInfo, toHexString(object)..": "..collisionType..", Kong: "..toHexString(kong));
 							safety = dereferencePointer(object + 0x18); -- Get next object
-							if safety == object or safety == collisionLinkedListPointer - 0x10 then -- Prevent infinite loops
+							if safety == object or safety == heapBlock.header then -- Prevent infinite loops
 								break;
 							end
 							object = safety;
@@ -8317,32 +8291,21 @@ function identifyMemory(address, findReferences, reuseCache, suppressPrint)
 						table.insert(addressInfo, "The address you passed isn't a pointer to a collision linked list though...");
 					end
 				end
-			else
-				for i = 0, collisionListObjectSize - 4, 4 do
-					local object = dereferencePointer(collisionLinkedListPointer + i);
-					local safety = nil;
-					while isRDRAM(object) do
-						if withinHeapBlock(address, object, nil, true) then
-							table.insert(addressInfo, "The address is part of an object model 2 collision!");
-							addressFound = true;
-							addressType = 4;
-							local kong = mainmemory.read_u16_be(object + 0x04);
-							local collisionType = mainmemory.read_u16_be(object + 0x02);
-							if obj_model2.object_types[collisionType] ~= nil then
-								collisionType = obj_model2.object_types[collisionType];
-							else
-								collisionType = toHexString(collisionType, 4);
-							end
-							table.insert(addressInfo, toHexString(object)..": "..collisionType..", Kong: "..toHexString(kong));
-							break;
-						end
-						safety = dereferencePointer(object + 0x18); -- Get next object
-						if safety == object or safety == collisionLinkedListPointer - 0x10 then -- Prevent infinite loops
-							break;
-						end
-						object = safety;
-					end
-				end
+			end
+		end
+	end
+
+	-- Detect model 2 collisions
+	if not addressFound then
+		for k, collision in pairs(identifyMemoryCache.model2CollisionCache) do
+			if withinHeapBlock(address, collision.block, nil, true) then
+				addressFound = true;
+				addressType = 4;
+				local kong = collision.kong;
+				local collisionType = collision.collisionType;
+				table.insert(addressInfo, "The address is part of an object model 2 collision!");
+				table.insert(addressInfo, toHexString(collision.block)..": "..collision.collisionType..", Kong: "..toHexString(collision.kong));
+				break;
 			end
 		end
 	end
