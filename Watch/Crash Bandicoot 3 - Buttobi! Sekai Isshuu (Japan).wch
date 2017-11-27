@@ -4,6 +4,6 @@ SystemID PSX
 066170	d	u	0	MainRAM	Level Progress
 066174	d	u	0	MainRAM	Max Level Progress
 069388	d	h	0	MainRAM	Aku Aku Object Pointer
-069484	d	u	0	MainRAM	Global Timer
+069484	d	s	0	MainRAM	Global Timer
 069598	d	h	0	MainRAM	Total Boxes
 
