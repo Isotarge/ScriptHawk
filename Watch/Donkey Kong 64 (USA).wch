@@ -191,6 +191,7 @@ SystemID N64
 7F6C18	d	h	1	RDRAM	Chunk Array Pointer
 7F8E88	b	u	1	RDRAM	Object Count?
 7F93C0	d	h	1	RDRAM	Water Surface List Pointer
+7F960C	d	h	1	RDRAM	Texture Index Object Pointer
 7F9680	d	u	1	RDRAM	Texture Index?
 7FB534	d	h	1	RDRAM	Collision Data Pointer?
 7FB940	d	h	1	RDRAM	Loading Zone Controller Pointer
