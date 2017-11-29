@@ -109,7 +109,11 @@ local Game = {
 		["actor_count"] = {0x7FC3F0, 0x7FC310, 0x7FC860, 0x7B6258},
 		["heap_pointer"] = {0x7F0990, 0x7F08B0, 0x7F0E00, 0x7A12C0},
 		["texture_list_pointer"] = {0x7F09DC, 0x7F08FC, 0x7F0E4C, 0x7A130C},
-		["texture_index_object_pointer"] = {0x7F960C, nil, nil, nil}, -- TODO: All versions
+		["texture_rom_map_object_pointer"] = {0x7F9544, nil, nil, nil}, -- TODO: All versions
+		["texture_rom_map_object_pointer_2"] = {0x7F958C, nil, nil, nil}, -- TODO: All versions
+		["texture_index_object_pointer"] = {0x7F95C4, nil, nil, nil}, -- TODO: All versions
+		["texture_index_object_pointer_2"] = {0x7F960C, nil, nil, nil}, -- TODO: All versions
+		["weather_particle_array_pointer"] = {0x7FD9E4, nil, nil, nil}, -- TODO: All versions
 		["hud_pointer"] = {0x754280, 0x74E9E0, 0x753B70, 0x6FF080},
 		["shared_collectables"] = {0x7FCC40, 0x7FCB80, 0x7FD0D0, 0x7B6752},
 		["kong_base"] = {0x7FC950, 0x7FC890, 0x7FCDE0, 0x7B6590},
@@ -7860,6 +7864,12 @@ function buildIdentifyMemoryCache()
 		identifyMemoryCache.heapCache[chunkArray].isMapChunkArray = true;
 	end
 
+	-- Cache weather particle array
+	local weatherParticleArray = dereferencePointer(Game.Memory.weather_particle_array_pointer[version]);
+	if isRDRAM(weatherParticleArray) then
+		identifyMemoryCache.heapCache[weatherParticleArray].isWeatherParticleArray = true;
+	end
+
 	-- Cache dynamic water surfaces
 	local waterSurface = dereferencePointer(Game.Memory.water_surface_list[version]);
 	while isRDRAM(waterSurface) do
@@ -7898,12 +7908,38 @@ function buildIdentifyMemoryCache()
 			if isRDRAM(texture) then
 				if type(identifyMemoryCache.heapCache[texture]) == "table" then
 					identifyMemoryCache.heapCache[texture].isTexture = true;
+					identifyMemoryCache.heapCache[texture].textureID = (i - identifyMemoryCache.heapCache[textureIndexObject].block) / 4;
 				else
 					--dprint("Warning: Texture "..toHexString(texture).." was not on the heap");
 				end
 			end
 		end
 		--print_deferred();
+	end
+	textureIndexObject = dereferencePointer(Game.Memory.texture_index_object_pointer_2[version]);
+	if isRDRAM(textureIndexObject) then
+		identifyMemoryCache.heapCache[textureIndexObject].isTextureIndexObject = true;
+		for i = identifyMemoryCache.heapCache[textureIndexObject].block, identifyMemoryCache.heapCache[textureIndexObject].block + identifyMemoryCache.heapCache[textureIndexObject].size - 4, 4 do
+			local texture = dereferencePointer(i);
+			if isRDRAM(texture) then
+				if type(identifyMemoryCache.heapCache[texture]) == "table" then
+					identifyMemoryCache.heapCache[texture].isTexture = true;
+					identifyMemoryCache.heapCache[texture].textureID = (i - identifyMemoryCache.heapCache[textureIndexObject].block) / 4;
+				else
+					--dprint("Warning: Texture "..toHexString(texture).." was not on the heap");
+				end
+			end
+		end
+		--print_deferred();
+	end
+
+	local textureROMMapObject = dereferencePointer(Game.Memory.texture_rom_map_object_pointer[version]);
+	if isRDRAM(textureROMMapObject) then
+		identifyMemoryCache.heapCache[textureROMMapObject].isTextureROMMapObject = true;
+	end
+	textureROMMapObject = dereferencePointer(Game.Memory.texture_rom_map_object_pointer_2[version]);
+	if isRDRAM(textureROMMapObject) then
+		identifyMemoryCache.heapCache[textureROMMapObject].isTextureROMMapObject = true;
 	end
 
 	-- Cache texture list
@@ -7950,6 +7986,37 @@ function buildIdentifyMemoryCache()
 					object = safety;
 				end
 			end
+		end
+	end
+end
+
+function dumpTexturesFromHeapCache()
+	for k, cachedBlock in pairs(identifyMemoryCache.heapCache) do
+		if cachedBlock.isTexture then
+			dprint(toHexString(cachedBlock.block).." textureID: "..toHexString(cachedBlock.textureID).." size: "..toHexString(cachedBlock.size));
+		end
+	end
+	print_deferred();
+end
+
+function randomizeTexturesFromHeapCache()
+	for k, cachedBlock in pairs(identifyMemoryCache.heapCache) do
+		if cachedBlock.isTexture then
+			for i = cachedBlock.block, cachedBlock.block + cachedBlock.size - 1, 1 do
+				mainmemory.writebyte(i, math.random(0, 255));
+			end
+			print("Randomized texture "..toHexString(cachedBlock.block));
+		end
+	end
+end
+
+function setTexturesFromHeapCache(value)
+	for k, cachedBlock in pairs(identifyMemoryCache.heapCache) do
+		if cachedBlock.isTexture then
+			for i = cachedBlock.block, cachedBlock.block + cachedBlock.size - 1, 1 do
+				mainmemory.writebyte(i, value);
+			end
+			print("Set texture "..toHexString(cachedBlock.block));
 		end
 	end
 end
@@ -8228,6 +8295,13 @@ function identifyMemory(address, findReferences, reuseCache, suppressPrint)
 				addressType = 7;
 			end
 
+			-- Detect weather particle array
+			if heapBlock.isWeatherParticleArray then
+				table.insert(addressInfo, "This address is part of the weather particle array!");
+				addressFound = true;
+				addressType = 7;
+			end
+
 			-- Detect dynamic water surfaces
 			if heapBlock.isDynamicWaterSurface then
 				local t1Str = heapBlock.timer1..", ";
@@ -8296,8 +8370,13 @@ function identifyMemory(address, findReferences, reuseCache, suppressPrint)
 			end
 
 			-- Detect textures (heap)
-			if heapBlock.isTextureIndex then
+			if heapBlock.isTextureIndexObject then
 				table.insert(addressInfo, "This address is in the TextureIndexObject.");
+				addressFound = true;
+				addressType = 2;
+			end
+			if heapBlock.isTextureROMMapObject then
+				table.insert(addressInfo, "This address is in the TextureROMMapObject.");
 				addressFound = true;
 				addressType = 2;
 			end
@@ -8310,6 +8389,12 @@ function identifyMemory(address, findReferences, reuseCache, suppressPrint)
 				addressFound = true;
 				addressType = 2;
 			end
+
+			--[[
+			if not addressFound then
+				dprint("Unknown Heap Block: "..toHexString(heapBlock.block, 6, "").." Size: "..toHexString(heapBlock.size));
+			end
+			--]]
 		end
 	end
 

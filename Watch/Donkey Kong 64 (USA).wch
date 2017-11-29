@@ -191,6 +191,9 @@ SystemID N64
 7F6C18	d	h	1	RDRAM	Chunk Array Pointer
 7F8E88	b	u	1	RDRAM	Object Count?
 7F93C0	d	h	1	RDRAM	Water Surface List Pointer
+7F9544	d	h	1	RDRAM	Texture ROM Map Object Pointer
+7F958C	d	h	1	RDRAM	Texture ROM Map Object Pointer
+7F95C4	d	h	1	RDRAM	Texture Index Object Pointer
 7F960C	d	h	1	RDRAM	Texture Index Object Pointer
 7F9680	d	u	1	RDRAM	Texture Index?
 7FB534	d	h	1	RDRAM	Collision Data Pointer?
@@ -529,6 +532,7 @@ SystemID N64
 7FD570	w	h	1	RDRAM	Transferred Actor Type
 7FD610	d	u	1	RDRAM	Idle Timer
 7FD888	d	f	1	RDRAM	Loading Zone Fadeout Progress
+7FD9E4	d	h	1	RDRAM	Weather Particle Array Pointer
 7FDC88	w	h	1	RDRAM	Number of Enemies
 7FDC8C	d	h	1	RDRAM	Enemy Respawn Array Pointer
 7FDCB0	w	u	1	RDRAM	Loading Zone Array Size
