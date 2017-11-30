@@ -7714,6 +7714,12 @@ addressColors = {
 
 identifyMemoryCache = nil;
 
+function addHeapMetadata(address, key, value)
+	if type(identifyMemoryCache.heapCache[address]) == "table" then
+		identifyMemoryCache.heapCache[address][key] = value;
+	end
+end
+
 function buildIdentifyMemoryCache()
 	identifyMemoryCache = {
 		heapCache = {},
@@ -7765,28 +7771,28 @@ function buildIdentifyMemoryCache()
 		local actor = dereferencePointer(pointerAddress);
 		if isRDRAM(actor) then
 			local actorName = getActorName(actor);
-			identifyMemoryCache.heapCache[actor].isActor = true;
-			identifyMemoryCache.heapCache[actor].actorName = actorName;
+			addHeapMetadata(actor, "isActor", true);
+			addHeapMetadata(actor, "actorName", actorName);
 			local animationParamObject = dereferencePointer(actor + obj_model1.rendering_parameters_pointer);
 			if isRDRAM(animationParamObject) then
-				identifyMemoryCache.heapCache[animationParamObject].isActorAnimationParamObject = true;
-				identifyMemoryCache.heapCache[animationParamObject].actor = actor;
-				identifyMemoryCache.heapCache[animationParamObject].actorName = actorName;
+				addHeapMetadata(animationParamObject, "isActorAnimationParamObject", true);
+				addHeapMetadata(animationParamObject, "actor", actor);
+				addHeapMetadata(animationParamObject, "actorName", actorName);
 				local sharedModelObject = dereferencePointer(actor + obj_model1.model_pointer);
 				if isRDRAM(sharedModelObject) then
 					local numBones = mainmemory.readbyte(sharedModelObject + obj_model1.model.num_bones);
-					identifyMemoryCache.heapCache[sharedModelObject].isActorSharedModelObject = true;
-					identifyMemoryCache.heapCache[sharedModelObject].numBones = numBones;
-					identifyMemoryCache.heapCache[sharedModelObject].actor = actor;
-					identifyMemoryCache.heapCache[sharedModelObject].actorName = actorName;
+					addHeapMetadata(sharedModelObject, "isActorSharedModelObject", true);
+					addHeapMetadata(sharedModelObject, "numBones", numBones);
+					addHeapMetadata(sharedModelObject, "actor", actor);
+					addHeapMetadata(sharedModelObject, "actorName", actorName);
 					if numBones > 0 then
 						local boneArraySize = numBones * bone_size;
 						local boneArray1 = dereferencePointer(animationParamObject + obj_model1.rendering_parameters.bone_array_1);
 						local boneArray2 = dereferencePointer(animationParamObject + obj_model1.rendering_parameters.bone_array_2);
-						identifyMemoryCache.heapCache[animationParamObject].numBones = numBones;
-						identifyMemoryCache.heapCache[animationParamObject].boneArraySize = boneArraySize;
-						identifyMemoryCache.heapCache[animationParamObject].boneArray1 = boneArray1;
-						identifyMemoryCache.heapCache[animationParamObject].boneArray2 = boneArray2;
+						addHeapMetadata(animationParamObject, "numBones", numBones);
+						addHeapMetadata(animationParamObject, "boneArraySize", boneArraySize);
+						addHeapMetadata(animationParamObject, "boneArray1", boneArray1);
+						addHeapMetadata(animationParamObject, "boneArray2", boneArray2);
 					end
 				end
 			end
@@ -7807,31 +7813,31 @@ function buildIdentifyMemoryCache()
 		if isRDRAM(objModel2Array) then
 			local numSlots = mainmemory.read_u32_be(Game.Memory.obj_model2_array_count[version]);
 			local arraySize = getObjectModel2ArraySize();
-			identifyMemoryCache.heapCache[objModel2Array].isObjectModel2Array = true;
-			identifyMemoryCache.heapCache[objModel2Array].numSlots = numSlots;
-			identifyMemoryCache.heapCache[objModel2Array].arraySize = arraySize;
+			addHeapMetadata(objModel2Array, "isObjectModel2Array", true);
+			addHeapMetadata(objModel2Array, "numSlots", numSlots);
+			addHeapMetadata(objModel2Array, "arraySize", arraySize);
 			for i = 0, numSlots - 1 do
 				local slotBase = objModel2Array + i * obj_model2_slot_size;
 				local modelPointer = dereferencePointer(slotBase + obj_model2.behavior_type_pointer);
 				if isRDRAM(modelPointer) then
-					identifyMemoryCache.heapCache[modelPointer].isObjectModel2DisplayList = true;
-					identifyMemoryCache.heapCache[modelPointer].associatedModel2Object = slotBase;
-					identifyMemoryCache.heapCache[modelPointer].associatedModel2ObjectName = getScriptName(slotBase);
+					addHeapMetadata(modelPointer, "isObjectModel2DisplayList", true);
+					addHeapMetadata(modelPointer, "associatedModel2Object", slotBase);
+					addHeapMetadata(modelPointer, "associatedModel2ObjectName", getScriptName(slotBase));
 				end
 				-- BehaviorObject
 				local activationScript = dereferencePointer(slotBase + obj_model2.behavior_pointer);
 				if isRDRAM(activationScript) then
-					identifyMemoryCache.heapCache[activationScript].isBehaviorScript = true;
-					identifyMemoryCache.heapCache[activationScript].topLevel = true;
-					identifyMemoryCache.heapCache[activationScript].associatedModel2Object = slotBase;
-					identifyMemoryCache.heapCache[activationScript].associatedModel2ObjectName = getScriptName(slotBase);
+					addHeapMetadata(activationScript, "isBehaviorScript", true);
+					addHeapMetadata(activationScript, "topLevel", true);
+					addHeapMetadata(activationScript, "associatedModel2Object", slotBase);
+					addHeapMetadata(activationScript, "associatedModel2ObjectName", getScriptName(slotBase));
 					-- BehaviorScript
 					activationScript = dereferencePointer(activationScript + 0xA0);
 					while isRDRAM(activationScript) do
-						identifyMemoryCache.heapCache[activationScript].isBehaviorScript = true;
-						identifyMemoryCache.heapCache[activationScript].topLevel = false;
-						identifyMemoryCache.heapCache[activationScript].associatedModel2Object = slotBase;
-						identifyMemoryCache.heapCache[activationScript].associatedModel2ObjectName = getScriptName(slotBase);
+						addHeapMetadata(activationScript, "isBehaviorScript", true);
+						addHeapMetadata(activationScript, "topLevel", false);
+						addHeapMetadata(activationScript, "associatedModel2Object", slotBase);
+						addHeapMetadata(activationScript, "associatedModel2ObjectName", getScriptName(slotBase));
 						-- Get next script chunk
 						activationScript = dereferencePointer(activationScript + 0x4C);
 					end
@@ -7843,60 +7849,60 @@ function buildIdentifyMemoryCache()
 	-- Cache HUD
 	local HUDObject = dereferencePointer(Game.Memory.hud_pointer[version]);
 	if isRDRAM(HUDObject) then
-		identifyMemoryCache.heapCache[HUDObject].isHUDObject = true;
+		addHeapMetadata(HUDObject, "isHUDObject", true);
 	end
 
 	-- Cache enemies
 	local enemyRespawnObject = dereferencePointer(Game.Memory.enemy_respawn_object[version]);
 	if isRDRAM(enemyRespawnObject) then
-		identifyMemoryCache.heapCache[enemyRespawnObject].isEnemyRespawnObject = true;
+		addHeapMetadata(enemyRespawnObject, "isEnemyRespawnObject", true);
 	end
 
 	-- Cache map
 	local mapBase = dereferencePointer(Game.Memory.map_block_pointer[version]);
 	if isRDRAM(mapBase) then
-		identifyMemoryCache.heapCache[mapBase].isMap = true;
+		addHeapMetadata(mapBase, "isMap", true);
 	end
 
 	-- Cache chunks
 	local chunkArray = dereferencePointer(Game.Memory.chunk_array_pointer[version]);
 	if isRDRAM(chunkArray) then
-		identifyMemoryCache.heapCache[chunkArray].isMapChunkArray = true;
+		addHeapMetadata(chunkArray, "isMapChunkArray", true);
 	end
 
 	-- Cache weather particle array
 	local weatherParticleArray = dereferencePointer(Game.Memory.weather_particle_array_pointer[version]);
 	if isRDRAM(weatherParticleArray) then
-		identifyMemoryCache.heapCache[weatherParticleArray].isWeatherParticleArray = true;
+		addHeapMetadata(weatherParticleArray, "isWeatherParticleArray", true);
 	end
 
 	-- Cache dynamic water surfaces
 	local waterSurface = dereferencePointer(Game.Memory.water_surface_list[version]);
 	while isRDRAM(waterSurface) do
-		identifyMemoryCache.heapCache[waterSurface].isDynamicWaterSurface = true;
-		identifyMemoryCache.heapCache[waterSurface].timer1 = mainmemory.read_u32_be(waterSurface + dynamicWaterSurface.timer_1[version]);
-		identifyMemoryCache.heapCache[waterSurface].timer2 = mainmemory.read_u32_be(waterSurface + dynamicWaterSurface.timer_2[version]);
-		identifyMemoryCache.heapCache[waterSurface].timer3 = mainmemory.read_u32_be(waterSurface + dynamicWaterSurface.timer_3[version]);
-		identifyMemoryCache.heapCache[waterSurface].timer4 = mainmemory.read_u32_be(waterSurface + dynamicWaterSurface.timer_4[version]);
+		addHeapMetadata(waterSurface, "isDynamicWaterSurface", true);
+		addHeapMetadata(waterSurface, "timer1", mainmemory.read_u32_be(waterSurface + dynamicWaterSurface.timer_1[version]));
+		addHeapMetadata(waterSurface, "timer2", mainmemory.read_u32_be(waterSurface + dynamicWaterSurface.timer_2[version]));
+		addHeapMetadata(waterSurface, "timer3", mainmemory.read_u32_be(waterSurface + dynamicWaterSurface.timer_3[version]));
+		addHeapMetadata(waterSurface, "timer4", mainmemory.read_u32_be(waterSurface + dynamicWaterSurface.timer_4[version]));
 		waterSurface = dereferencePointer(waterSurface + dynamicWaterSurface.next_surface_pointer[version]);
 	end
 
 	-- Cache exits
 	local exitArray = dereferencePointer(Game.Memory.exit_array_pointer[version]);
 	if isRDRAM(exitArray) then
-		identifyMemoryCache.heapCache[exitArray].isExitArray = true;
+		addHeapMetadata(exitArray, "isExitArray", true);
 	end
 
 	-- Cache loading zones
 	local lzArray = getLoadingZoneArray();
 	if isRDRAM(lzArray) then
-		identifyMemoryCache.heapCache[lzArray].isLoadingZoneArray = true;
+		addHeapMetadata(lzArray, "isLoadingZoneArray", true);
 	end
 
 	-- Cache setup
 	local setupFile = dereferencePointer(Game.Memory.obj_model2_setup_pointer[version]);
 	if isRDRAM(setupFile) then
-		identifyMemoryCache.heapCache[setupFile].isMapSetup = true;
+		addHeapMetadata(setupFile, "isMapSetup", true);
 	end
 
 	-- Cache textures (heap)
@@ -7935,11 +7941,11 @@ function buildIdentifyMemoryCache()
 
 	local textureROMMapObject = dereferencePointer(Game.Memory.texture_rom_map_object_pointer[version]);
 	if isRDRAM(textureROMMapObject) then
-		identifyMemoryCache.heapCache[textureROMMapObject].isTextureROMMapObject = true;
+		addHeapMetadata(textureROMMapObject, "isTextureROMMapObject", true);
 	end
 	textureROMMapObject = dereferencePointer(Game.Memory.texture_rom_map_object_pointer_2[version]);
 	if isRDRAM(textureROMMapObject) then
-		identifyMemoryCache.heapCache[textureROMMapObject].isTextureROMMapObject = true;
+		addHeapMetadata(textureROMMapObject, "isTextureROMMapObject", true);
 	end
 
 	-- Cache texture list
@@ -7966,7 +7972,7 @@ function buildIdentifyMemoryCache()
 		local collisionLinkedListPointer = dereferencePointer(Game.Memory.obj_model2_collision_linked_list_pointer[version]);
 		if isRDRAM(collisionLinkedListPointer) then
 			local collisionListObjectSize = mainmemory.read_u32_be(collisionLinkedListPointer + heap.object_size);
-			identifyMemoryCache.heapCache[collisionLinkedListPointer].isCollisionLinkedListObject = true;
+			addHeapMetadata(collisionLinkedListPointer, "isCollisionLinkedListObject", true);
 			for i = 0, collisionListObjectSize - 4, 4 do
 				local object = dereferencePointer(collisionLinkedListPointer + i);
 				local safety = nil;
@@ -8019,6 +8025,14 @@ function setTexturesFromHeapCache(value)
 			print("Set texture "..toHexString(cachedBlock.block));
 		end
 	end
+end
+
+local textval = 0;
+function bleh()
+	identifyMemory(0x400000, false, false, true);
+	setTexturesFromHeapCache(textval);
+	textval = textval + 1;
+	print(textval);
 end
 
 function identifyMemory(address, findReferences, reuseCache, suppressPrint)
