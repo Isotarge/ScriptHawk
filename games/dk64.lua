@@ -111,9 +111,11 @@ local Game = {
 		["texture_list_pointer"] = {0x7F09DC, 0x7F08FC, 0x7F0E4C, 0x7A130C},
 		["model2_dl_rom_map_object_pointer"] = {0x7F9538, nil, nil, nil}, -- TODO: All versions
 		["texture_rom_map_object_pointer"] = {0x7F9544, nil, nil, nil}, -- TODO: All versions
+		["ffa_texture_rom_map_object_pointer"] = {0x7F9560, nil, nil, nil}, -- TODO: All versions
 		["texture_rom_map_object_pointer_2"] = {0x7F958C, nil, nil, nil}, -- TODO: All versions
 		["model2_dl_index_object_pointer"] = {0x7F95B8, nil, nil, nil}, -- TODO: All versions
 		["texture_index_object_pointer"] = {0x7F95C4, nil, nil, nil}, -- TODO: All versions
+		["ffa_texture_index_object_pointer"] = {0x7F95E0, nil, nil, nil}, -- TODO: All versions
 		["texture_index_object_pointer_2"] = {0x7F960C, nil, nil, nil}, -- TODO: All versions
 		["weather_particle_array_pointer"] = {0x7FD9E4, nil, nil, nil}, -- TODO: All versions
 		["hud_pointer"] = {0x754280, 0x74E9E0, 0x753B70, 0x6FF080},
@@ -7727,9 +7729,12 @@ end
 
 function getHeapBlocksByFunction(comparator)
 	buildIdentifyMemoryCache();
-	for k, cachedBlock in pairs(identifyMemoryCache.heapCache) do
-		if comparator(cachedBlock) then
-			dprint(toHexString(cachedBlock.block, 6, "").." Size: "..toHexString(cachedBlock.size));
+	for i = identifyMemoryCache.heapBase, identifyMemoryCache.heapEnd, 0x10 do
+		if (identifyMemoryCache.heapCache[i] ~= nil) then
+			local cachedBlock = identifyMemoryCache.heapCache[i];
+			if comparator(cachedBlock) then
+				dprint(toHexString(cachedBlock.block, 6, "").." Size: "..toHexString(cachedBlock.size).." "..cachedBlock.description);
+			end
 		end
 	end
 	print_deferred();
@@ -7740,7 +7745,7 @@ function getHeapBlocksByMetadata(key, value)
 	print("Finding heap blocks with: "..tostring(key).." = "..tostring(value));
 	for k, cachedBlock in pairs(identifyMemoryCache.heapCache) do
 		if cachedBlock[key] == value then
-			dprint(toHexString(cachedBlock.block, 6, "").." Size: "..toHexString(cachedBlock.size));
+			dprint(toHexString(cachedBlock.block, 6, "").." Size: "..toHexString(cachedBlock.size).." "..cachedBlock.description);
 		end
 	end
 	print_deferred();
@@ -7785,8 +7790,9 @@ function buildIdentifyMemoryCache()
 			nextFree = dereferencePointer(header + 8);
 			prevFree = dereferencePointer(header + 12);
 			isFree = isRDRAM(nextFree) or isRDRAM(prevFree);
-			identifyMemoryCache.heapCache[block] = {header=header, block=block, size=size, next=block+size, prev=prev, isFree=isFree, nextFree=nextFree, prevFree=prevFree};
+			identifyMemoryCache.heapCache[block] = {description="", header=header, block=block, size=size, next=block+size, prev=prev, isFree=isFree, nextFree=nextFree, prevFree=prevFree};
 			if isFree then
+				identifyMemoryCache.heapCache[block].description = "Free";
 				identifyMemoryCache.heapCache[block].addressFound = true;
 				identifyMemoryCache.heapCache[block].addressType = 1;
 			end
@@ -7803,20 +7809,41 @@ function buildIdentifyMemoryCache()
 		local actor = dereferencePointer(pointerAddress);
 		if isRDRAM(actor) then
 			local actorName = getActorName(actor);
+			addHeapMetadata(actor, "description", "Actor: "..actorName);
 			addHeapMetadata(actor, "isActor", true);
 			addHeapMetadata(actor, "addressFound", true);
 			addHeapMetadata(actor, "addressType", 3);
 			addHeapMetadata(actor, "actorName", actorName);
 			local animationParamObject = dereferencePointer(actor + obj_model1.rendering_parameters_pointer);
 			if isRDRAM(animationParamObject) then
+				addHeapMetadata(animationParamObject, "description", "ActorAnimationParam: "..actorName);
 				addHeapMetadata(animationParamObject, "isActorAnimationParamObject", true);
 				addHeapMetadata(animationParamObject, "addressFound", true);
 				addHeapMetadata(animationParamObject, "addressType", 3);
 				addHeapMetadata(animationParamObject, "actor", actor);
 				addHeapMetadata(animationParamObject, "actorName", actorName);
+				local anim1Pointer = dereferencePointer(animationParamObject + 0x90);
+				if isRDRAM(anim1Pointer) then
+					addHeapMetadata(anim1Pointer, "description", "ActorAnimation: "..actorName);
+					addHeapMetadata(anim1Pointer, "isActorAnimation", true);
+					addHeapMetadata(anim1Pointer, "addressFound", true);
+					addHeapMetadata(anim1Pointer, "addressType", 3);
+					addHeapMetadata(anim1Pointer, "actor", actor);
+					addHeapMetadata(anim1Pointer, "actorName", actorName);
+				end
+				local anim2Pointer = dereferencePointer(animationParamObject + 0x100);
+				if isRDRAM(anim2Pointer) then
+					addHeapMetadata(anim2Pointer, "description", "ActorAnimation: "..actorName);
+					addHeapMetadata(anim2Pointer, "isActorAnimation", true);
+					addHeapMetadata(anim2Pointer, "addressFound", true);
+					addHeapMetadata(anim2Pointer, "addressType", 3);
+					addHeapMetadata(anim2Pointer, "actor", actor);
+					addHeapMetadata(anim2Pointer, "actorName", actorName);
+				end
 				local sharedModelObject = dereferencePointer(actor + obj_model1.model_pointer);
 				if isRDRAM(sharedModelObject) then
 					local numBones = mainmemory.readbyte(sharedModelObject + obj_model1.model.num_bones);
+					addHeapMetadata(sharedModelObject, "description", "ActorSharedModel: "..actorName);
 					addHeapMetadata(sharedModelObject, "isActorSharedModelObject", true);
 					addHeapMetadata(sharedModelObject, "addressFound", true);
 					addHeapMetadata(sharedModelObject, "addressType", 3);
@@ -7851,6 +7878,7 @@ function buildIdentifyMemoryCache()
 		if isRDRAM(objModel2Array) then
 			local numSlots = mainmemory.read_u32_be(Game.Memory.obj_model2_array_count[version]);
 			local arraySize = getObjectModel2ArraySize();
+			addHeapMetadata(objModel2Array, "description", "Object Model 2 Array ("..numSlots.."/"..arraySize..")");
 			addHeapMetadata(objModel2Array, "isObjectModel2Array", true);
 			addHeapMetadata(objModel2Array, "addressFound", true);
 			addHeapMetadata(objModel2Array, "addressType", 4);
@@ -7858,32 +7886,36 @@ function buildIdentifyMemoryCache()
 			addHeapMetadata(objModel2Array, "arraySize", arraySize);
 			for i = 0, numSlots - 1 do
 				local slotBase = objModel2Array + i * obj_model2_slot_size;
+				local objectName = getScriptName(slotBase);
 				local modelPointer = dereferencePointer(slotBase + obj_model2.behavior_type_pointer);
 				if isRDRAM(modelPointer) then
+					addHeapMetadata(modelPointer, "description", "Display List: "..objectName);
 					addHeapMetadata(modelPointer, "isObjectModel2DisplayList", true);
 					addHeapMetadata(modelPointer, "addressFound", true);
 					addHeapMetadata(modelPointer, "addressType", 4);
 					addHeapMetadata(modelPointer, "associatedModel2Object", slotBase);
-					addHeapMetadata(modelPointer, "associatedModel2ObjectName", getScriptName(slotBase));
+					addHeapMetadata(modelPointer, "associatedModel2ObjectName", objectName);
 				end
 				-- BehaviorObject
 				local activationScript = dereferencePointer(slotBase + obj_model2.behavior_pointer);
 				if isRDRAM(activationScript) then
+					addHeapMetadata(activationScript, "description", "Behavior Script (First): "..objectName);
 					addHeapMetadata(activationScript, "isBehaviorScript", true);
 					addHeapMetadata(activationScript, "addressFound", true);
 					addHeapMetadata(activationScript, "addressType", 4);
 					addHeapMetadata(activationScript, "topLevel", true);
 					addHeapMetadata(activationScript, "associatedModel2Object", slotBase);
-					addHeapMetadata(activationScript, "associatedModel2ObjectName", getScriptName(slotBase));
+					addHeapMetadata(activationScript, "associatedModel2ObjectName", objectName);
 					-- BehaviorScript
 					activationScript = dereferencePointer(activationScript + 0xA0);
 					while isRDRAM(activationScript) do
+						addHeapMetadata(activationScript, "description", "Behavior Script: "..objectName);
 						addHeapMetadata(activationScript, "isBehaviorScript", true);
 						addHeapMetadata(activationScript, "addressFound", true);
 						addHeapMetadata(activationScript, "addressType", 4);
 						addHeapMetadata(activationScript, "topLevel", false);
 						addHeapMetadata(activationScript, "associatedModel2Object", slotBase);
-						addHeapMetadata(activationScript, "associatedModel2ObjectName", getScriptName(slotBase));
+						addHeapMetadata(activationScript, "associatedModel2ObjectName", objectName);
 						-- Get next script chunk
 						activationScript = dereferencePointer(activationScript + 0x4C);
 					end
@@ -7895,6 +7927,7 @@ function buildIdentifyMemoryCache()
 	-- Cache HUD
 	local HUDObject = dereferencePointer(Game.Memory.hud_pointer[version]);
 	if isRDRAM(HUDObject) then
+		addHeapMetadata(HUDObject, "description", "HUD");
 		addHeapMetadata(HUDObject, "isHUDObject", true);
 		addHeapMetadata(HUDObject, "addressFound", true);
 		addHeapMetadata(HUDObject, "addressType", 6);
@@ -7903,6 +7936,7 @@ function buildIdentifyMemoryCache()
 	-- Cache enemies
 	local enemyRespawnObject = dereferencePointer(Game.Memory.enemy_respawn_object[version]);
 	if isRDRAM(enemyRespawnObject) then
+		addHeapMetadata(enemyRespawnObject, "description", "Enemy Respawn Object");
 		addHeapMetadata(enemyRespawnObject, "isEnemyRespawnObject", true);
 		addHeapMetadata(enemyRespawnObject, "addressFound", true);
 		addHeapMetadata(enemyRespawnObject, "addressType", 3);
@@ -7911,6 +7945,7 @@ function buildIdentifyMemoryCache()
 	-- Cache map
 	local mapBase = dereferencePointer(Game.Memory.map_block_pointer[version]);
 	if isRDRAM(mapBase) then
+		addHeapMetadata(mapBase, "description", "Map");
 		addHeapMetadata(mapBase, "isMap", true);
 		addHeapMetadata(mapBase, "addressFound", true);
 		addHeapMetadata(mapBase, "addressType", 7);
@@ -7919,6 +7954,7 @@ function buildIdentifyMemoryCache()
 	-- Cache chunks
 	local chunkArray = dereferencePointer(Game.Memory.chunk_array_pointer[version]);
 	if isRDRAM(chunkArray) then
+		addHeapMetadata(chunkArray, "description", "Map Chunk Array");
 		addHeapMetadata(chunkArray, "isMapChunkArray", true);
 		addHeapMetadata(chunkArray, "addressFound", true);
 		addHeapMetadata(chunkArray, "addressType", 7);
@@ -7927,6 +7963,7 @@ function buildIdentifyMemoryCache()
 	-- Cache weather particle array
 	local weatherParticleArray = dereferencePointer(Game.Memory.weather_particle_array_pointer[version]);
 	if isRDRAM(weatherParticleArray) then
+		addHeapMetadata(weatherParticleArray, "description", "Weather Particle Array");
 		addHeapMetadata(weatherParticleArray, "isWeatherParticleArray", true);
 		addHeapMetadata(weatherParticleArray, "addressFound", true);
 		addHeapMetadata(weatherParticleArray, "addressType", 7);
@@ -7935,6 +7972,7 @@ function buildIdentifyMemoryCache()
 	-- Cache dynamic water surfaces
 	local waterSurface = dereferencePointer(Game.Memory.water_surface_list[version]);
 	while isRDRAM(waterSurface) do
+		addHeapMetadata(waterSurface, "description", "Dynamic Water Surface");
 		addHeapMetadata(waterSurface, "isDynamicWaterSurface", true);
 		addHeapMetadata(waterSurface, "addressFound", true);
 		addHeapMetadata(waterSurface, "addressType", 7);
@@ -7948,6 +7986,7 @@ function buildIdentifyMemoryCache()
 	-- Cache exits
 	local exitArray = dereferencePointer(Game.Memory.exit_array_pointer[version]);
 	if isRDRAM(exitArray) then
+		addHeapMetadata(exitArray, "description", "Map Exit Array");
 		addHeapMetadata(exitArray, "isExitArray", true);
 		addHeapMetadata(exitArray, "addressFound", true);
 		addHeapMetadata(exitArray, "addressType", 7);
@@ -7956,6 +7995,7 @@ function buildIdentifyMemoryCache()
 	-- Cache loading zones
 	local lzArray = getLoadingZoneArray();
 	if isRDRAM(lzArray) then
+		addHeapMetadata(lzArray, "description", "Loading Zone Array");
 		addHeapMetadata(lzArray, "isLoadingZoneArray", true);
 		addHeapMetadata(lzArray, "addressFound", true);
 		addHeapMetadata(lzArray, "addressType", 7);
@@ -7964,6 +8004,7 @@ function buildIdentifyMemoryCache()
 	-- Cache setup
 	local setupFile = dereferencePointer(Game.Memory.obj_model2_setup_pointer[version]);
 	if isRDRAM(setupFile) then
+		addHeapMetadata(setupFile, "description", "Map Setup");
 		addHeapMetadata(setupFile, "isMapSetup", true);
 		addHeapMetadata(setupFile, "addressFound", true);
 		addHeapMetadata(setupFile, "addressType", 7);
@@ -7972,6 +8013,7 @@ function buildIdentifyMemoryCache()
 	-- Cache textures (heap)
 	local textureIndexObject = dereferencePointer(Game.Memory.texture_index_object_pointer[version]);
 	if isRDRAM(textureIndexObject) then
+		addHeapMetadata(textureIndexObject, "description", "Texture Index");
 		addHeapMetadata(textureIndexObject, "isTextureIndexObject", true);
 		addHeapMetadata(textureIndexObject, "addressFound", true);
 		addHeapMetadata(textureIndexObject, "addressType", 2);
@@ -7979,6 +8021,7 @@ function buildIdentifyMemoryCache()
 			local texture = dereferencePointer(i);
 			if isRDRAM(texture) then
 				if type(identifyMemoryCache.heapCache[texture]) == "table" then
+					addHeapMetadata(texture, "description", "Texture");
 					addHeapMetadata(texture, "isTexture", true);
 					addHeapMetadata(texture, "addressFound", true);
 					addHeapMetadata(texture, "addressType", 2);
@@ -7991,6 +8034,7 @@ function buildIdentifyMemoryCache()
 	end
 	textureIndexObject = dereferencePointer(Game.Memory.texture_index_object_pointer_2[version]);
 	if isRDRAM(textureIndexObject) then
+		addHeapMetadata(textureIndexObject, "description", "Texture Index");
 		addHeapMetadata(textureIndexObject, "isTextureIndexObject", true);
 		addHeapMetadata(textureIndexObject, "addressFound", true);
 		addHeapMetadata(textureIndexObject, "addressType", 2);
@@ -7998,7 +8042,29 @@ function buildIdentifyMemoryCache()
 			local texture = dereferencePointer(i);
 			if isRDRAM(texture) then
 				if type(identifyMemoryCache.heapCache[texture]) == "table" then
+					addHeapMetadata(texture, "description", "Texture");
 					addHeapMetadata(texture, "isTexture", true);
+					addHeapMetadata(texture, "addressFound", true);
+					addHeapMetadata(texture, "addressType", 2);
+					identifyMemoryCache.heapCache[texture].textureID = (i - identifyMemoryCache.heapCache[textureIndexObject].block) / 4;
+				else
+					--dprint("Warning: Texture "..toHexString(texture).." was not on the heap");
+				end
+			end
+		end
+	end
+	textureIndexObject = dereferencePointer(Game.Memory.ffa_texture_index_object_pointer[version]);
+	if isRDRAM(textureIndexObject) then
+		addHeapMetadata(textureIndexObject, "description", "FFA Texture Index");
+		addHeapMetadata(textureIndexObject, "isFFATextureIndexObject", true);
+		addHeapMetadata(textureIndexObject, "addressFound", true);
+		addHeapMetadata(textureIndexObject, "addressType", 2);
+		for i = identifyMemoryCache.heapCache[textureIndexObject].block, identifyMemoryCache.heapCache[textureIndexObject].block + identifyMemoryCache.heapCache[textureIndexObject].size - 4, 4 do
+			local texture = dereferencePointer(i);
+			if isRDRAM(texture) then
+				if type(identifyMemoryCache.heapCache[texture]) == "table" then
+					addHeapMetadata(texture, "description", "FFA Texture");
+					addHeapMetadata(texture, "isFFATexture", true);
 					addHeapMetadata(texture, "addressFound", true);
 					addHeapMetadata(texture, "addressType", 2);
 					identifyMemoryCache.heapCache[texture].textureID = (i - identifyMemoryCache.heapCache[textureIndexObject].block) / 4;
@@ -8011,13 +8077,22 @@ function buildIdentifyMemoryCache()
 
 	local textureROMMapObject = dereferencePointer(Game.Memory.texture_rom_map_object_pointer[version]);
 	if isRDRAM(textureROMMapObject) then
+		addHeapMetadata(textureROMMapObject, "description", "Texture ROM Map");
 		addHeapMetadata(textureROMMapObject, "isTextureROMMapObject", true);
 		addHeapMetadata(textureROMMapObject, "addressFound", true);
 		addHeapMetadata(textureROMMapObject, "addressType", 2);
 	end
 	textureROMMapObject = dereferencePointer(Game.Memory.texture_rom_map_object_pointer_2[version]);
 	if isRDRAM(textureROMMapObject) then
+		addHeapMetadata(textureROMMapObject, "description", "Texture ROM Map");
 		addHeapMetadata(textureROMMapObject, "isTextureROMMapObject", true);
+		addHeapMetadata(textureROMMapObject, "addressFound", true);
+		addHeapMetadata(textureROMMapObject, "addressType", 2);
+	end
+	textureROMMapObject = dereferencePointer(Game.Memory.ffa_texture_rom_map_object_pointer[version]);
+	if isRDRAM(textureROMMapObject) then
+		addHeapMetadata(textureROMMapObject, "description", "FFA Texture ROM Map");
+		addHeapMetadata(textureROMMapObject, "isFFATextureROMMapObject", true);
 		addHeapMetadata(textureROMMapObject, "addressFound", true);
 		addHeapMetadata(textureROMMapObject, "addressType", 2);
 	end
@@ -8043,12 +8118,14 @@ function buildIdentifyMemoryCache()
 
 	local model2DLIndexObject = dereferencePointer(Game.Memory.model2_dl_index_object_pointer[version]);
 	if isRDRAM(model2DLIndexObject) then
+		addHeapMetadata(model2DLIndexObject, "description", "Model 2 Display List Index");
 		addHeapMetadata(model2DLIndexObject, "isModel2DLIndexObject", true);
 		addHeapMetadata(model2DLIndexObject, "addressFound", true);
 		addHeapMetadata(model2DLIndexObject, "addressType", 4);
 	end
 	local model2DLROMMapObject = dereferencePointer(Game.Memory.model2_dl_rom_map_object_pointer[version]);
 	if isRDRAM(model2DLROMMapObject) then
+		addHeapMetadata(model2DLROMMapObject, "description", "Model 2 Display List ROM Map");
 		addHeapMetadata(model2DLROMMapObject, "isModel2DLROMMapObject", true);
 		addHeapMetadata(model2DLROMMapObject, "addressFound", true);
 		addHeapMetadata(model2DLROMMapObject, "addressType", 4);
@@ -8059,6 +8136,7 @@ function buildIdentifyMemoryCache()
 		local collisionLinkedListPointer = dereferencePointer(Game.Memory.obj_model2_collision_linked_list_pointer[version]);
 		if isRDRAM(collisionLinkedListPointer) then
 			local collisionListObjectSize = mainmemory.read_u32_be(collisionLinkedListPointer + heap.object_size);
+			addHeapMetadata(collisionLinkedListPointer, "description", "Collision Index");
 			addHeapMetadata(collisionLinkedListPointer, "isCollisionLinkedListObject", true);
 			addHeapMetadata(collisionLinkedListPointer, "addressFound", true);
 			addHeapMetadata(collisionLinkedListPointer, "addressType", 4);
@@ -8087,7 +8165,7 @@ end
 
 function dumpTexturesFromHeapCache()
 	for k, cachedBlock in pairs(identifyMemoryCache.heapCache) do
-		if cachedBlock.isTexture then
+		if cachedBlock.isTexture or cachedBlock.isFFATexture then
 			dprint(toHexString(cachedBlock.block).." textureID: "..toHexString(cachedBlock.textureID).." size: "..toHexString(cachedBlock.size));
 		end
 	end
@@ -8096,7 +8174,7 @@ end
 
 function randomizeTexturesFromHeapCache()
 	for k, cachedBlock in pairs(identifyMemoryCache.heapCache) do
-		if cachedBlock.isTexture then
+		if cachedBlock.isTexture or cachedBlock.isFFATexture then
 			for i = cachedBlock.block, cachedBlock.block + cachedBlock.size - 1, 1 do
 				mainmemory.writebyte(i, math.random(0, 255));
 			end
@@ -8107,7 +8185,7 @@ end
 
 function setTexturesFromHeapCache(value)
 	for k, cachedBlock in pairs(identifyMemoryCache.heapCache) do
-		if cachedBlock.isTexture then
+		if cachedBlock.isTexture or cachedBlock.isFFATexture then
 			for i = cachedBlock.block, cachedBlock.block + cachedBlock.size - 1, 1 do
 				mainmemory.writebyte(i, value);
 			end
@@ -8328,6 +8406,10 @@ function identifyMemory(address, findReferences, reuseCache, suppressPrint)
 				end
 			end
 
+			if heapBlock.isActorAnimation then
+				table.insert(addressInfo, "This address is part of an Animation object for the actor: "..heapBlock.actorName.." at "..toHexString(heapBlock.actor));
+			end
+
 			if heapBlock.isActorSharedModelObject then
 				table.insert(addressInfo, "This address is part of the SharedModel object for the actor: "..heapBlock.actorName.." at "..toHexString(heapBlock.actor));
 			end
@@ -8457,14 +8539,20 @@ function identifyMemory(address, findReferences, reuseCache, suppressPrint)
 			if heapBlock.isTextureIndexObject then
 				table.insert(addressInfo, "This address is in the TextureIndexObject.");
 			end
+			if heapBlock.isFFATextureIndexObject then
+				table.insert(addressInfo, "This address is in the FFATextureIndexObject.");
+			end
 			if heapBlock.isTextureROMMapObject then
 				table.insert(addressInfo, "This address is in the TextureROMMapObject.");
 			end
-			if heapBlock.isTexture then
+			if heapBlock.isFFATextureROMMapObject then
+				table.insert(addressInfo, "This address is in the FFATextureROMMapObject.");
+			end
+			if heapBlock.isTexture or heapBlock.isFFATexture then
 				if address < heapBlock.block then
-					table.insert(addressInfo, "This address is in a heap header for a texture.");
+					table.insert(addressInfo, "This address is in a heap header for texture ID "..heapBlock.textureID);
 				else
-					table.insert(addressInfo, "This address is in a texture: "..toHexString(heapBlock.block, 6).." + "..toHexString(address - heapBlock.block));
+					table.insert(addressInfo, "This address is in a texture: "..toHexString(heapBlock.block, 6).." + "..toHexString(address - heapBlock.block).." TextureID: "..heapBlock.textureID);
 				end
 			end
 
@@ -8595,21 +8683,23 @@ function calculateKnownMemory(dumpBitmap)
 		elseif type(result) == "table" then
 			local diff = result.skipToAddress - i;
 			i = result.skipToAddress;
+			if result.addressType > 0 then
+				knownBytes = knownBytes + diff;
+			end
 			if dumpBitmap then
 				if type(addressColors[result.addressType]) == "number" then
 					result.addressType = addressColors[result.addressType];
 				end
 				for j = 1, diff do
-					if result.addressType > 0 then
-						knownBytes = knownBytes + 1;
-					end
 					output_file:write(string.char(result.addressType));
 				end
 			end
 			--print(toHexString(i).." known: "..toHexString(knownBytes).." i: "..toHexString(i));
 		end
 	end
-	output_file:close();
+	if dumpBitmap then
+		output_file:close();
+	end
 	print(formatOutputString("Bytes Known: ", knownBytes, RDRAMSize));
 end
 
