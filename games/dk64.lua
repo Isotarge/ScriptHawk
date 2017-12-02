@@ -109,15 +109,15 @@ local Game = {
 		["actor_count"] = {0x7FC3F0, 0x7FC310, 0x7FC860, 0x7B6258},
 		["heap_pointer"] = {0x7F0990, 0x7F08B0, 0x7F0E00, 0x7A12C0},
 		["texture_list_pointer"] = {0x7F09DC, 0x7F08FC, 0x7F0E4C, 0x7A130C},
-		["model2_dl_rom_map_object_pointer"] = {0x7F9538, nil, nil, nil}, -- TODO: All versions
-		["texture_rom_map_object_pointer"] = {0x7F9544, nil, nil, nil}, -- TODO: All versions
-		["ffa_texture_rom_map_object_pointer"] = {0x7F9560, nil, nil, nil}, -- TODO: All versions
-		["texture_rom_map_object_pointer_2"] = {0x7F958C, nil, nil, nil}, -- TODO: All versions
-		["model2_dl_index_object_pointer"] = {0x7F95B8, nil, nil, nil}, -- TODO: All versions
-		["texture_index_object_pointer"] = {0x7F95C4, nil, nil, nil}, -- TODO: All versions
-		["ffa_texture_index_object_pointer"] = {0x7F95E0, nil, nil, nil}, -- TODO: All versions
-		["texture_index_object_pointer_2"] = {0x7F960C, nil, nil, nil}, -- TODO: All versions
-		["weather_particle_array_pointer"] = {0x7FD9E4, nil, nil, nil}, -- TODO: All versions
+		["model2_dl_rom_map_object_pointer"] = {0x7F9538, 0x7F9458, 0x7F99A8, 0x7B49F4},
+		["texture_rom_map_object_pointer"] = {0x7F9544, 0x7F9464, 0x7F99B4, 0x7B4A00},
+		["ffa_texture_rom_map_object_pointer"] = {0x7F9560, 0x7F9480, 0x7F99D0, 0x7B4A1C},
+		["texture_rom_map_object_pointer_2"] = {0x7F958C, 0x7F94AC, 0x7F99FC, 0x7B4A48},
+		["model2_dl_index_object_pointer"] = {0x7F95B8, 0x7F94D8, 0x7F9A28, 0x7B4A74},
+		["texture_index_object_pointer"] = {0x7F95C4, 0x7F94E4, 0x7F9A34, 0x7B4A80},
+		["ffa_texture_index_object_pointer"] = {0x7F95E0, 0x7F9500, 0x7F9A50, 0x7B4A9C},
+		["texture_index_object_pointer_2"] = {0x7F960C, 0x7F952C, 0x7F9A7C, 0x7B4AC8},
+		["weather_particle_array_pointer"] = {0x7FD9E4, 0x7FD924, 0x7FDE74, 0x7B71C4},
 		["hud_pointer"] = {0x754280, 0x74E9E0, 0x753B70, 0x6FF080},
 		["shared_collectables"] = {0x7FCC40, 0x7FCB80, 0x7FD0D0, 0x7B6752},
 		["kong_base"] = {0x7FC950, 0x7FC890, 0x7FCDE0, 0x7B6590},
@@ -156,9 +156,9 @@ local Game = {
 		["chunk_array_pointer"] = {0x7F6C18, 0x7F6B38, 0x7F7088, 0x7B20F8},
 		["num_enemies"] = {0x7FDC88, 0x7FDBC8, 0x7FE118, 0x7B73D8},
 		["enemy_respawn_object"] = {0x7FDC8C, 0x7FDBCC, 0x7FE11C, 0x7B73DC},
-		["os_code_start"] = {0x400, 0x400, 0x400, nil}, -- TODO: Fill this in and hook up to identifyMemory()
+		["os_code_start"] = {0x400, 0x400, 0x400, nil}, -- TODO: Fill this in
 		["os_code_size"] = {0xD8A8, 0xDAB8, 0xDB18, nil},
-		["game_code_start"] = {0x5FB300, 0x5F4300, 0x5F8B00, nil},
+		["game_code_start"] = {0x5FB300, 0x5F4300, 0x5F8B00, 0x590000},
 		["game_code_size"] = {0x149160, 0x14A8B0, 0x14B220, nil},
 		["game_constants_start"] = {0x744460, 0x73EBB0, 0x743D20, nil},
 		["game_constants_size"] = {0x1CBF0, 0x1CFC0, 0x1D520, nil},
@@ -2991,8 +2991,6 @@ function Game.detectVersion(romName, romHash)
 	if romHash == "CF806FF2603640A748FCA5026DED28802F1F4A50" then -- USA
 		version = 1;
 		flag_array = require("games.dk64_flags");
-		Game.RAMWatch = parseRAMWatch("./Watch/Donkey Kong 64 (USA).wch");
-		Game.RAMWatch = table.join(Game.RAMWatch, parseRAMWatch("./Watch/Constants/Donkey Kong 64 (USA).wch"));
 	elseif romHash == "F96AF883845308106600D84E0618C1A066DC6676" then -- Europe
 		version = 2;
 		flag_array = require("games.dk64_flags");
@@ -3576,6 +3574,9 @@ function Game.detectVersion(romName, romHash)
 	else
 		return false;
 	end
+
+	Game.RAMWatch = parseRAMWatch("./Watch/"..romName..".wch");
+	Game.RAMWatch = table.join(Game.RAMWatch, parseRAMWatch("./Watch/Constants/"..romName..".wch"));
 
 	-- Read EEPROM checksums
 	for i = 1, #eep_checksum do
@@ -7660,6 +7661,18 @@ Game.OSD = Game.standardOSD;
 
 --print("Local Variables: "..countLocals().."/200");
 
+function followYourNose(block, offset)
+	local safety = 0;
+	local ogblock = block;
+	while isRDRAM(block) do
+		print(toHexString(block));
+		block = dereferencePointer(block + offset);
+		if block == ogblock then
+			break;
+		end
+	end
+end
+
 function traverseHeap()
 	local heapBase = dereferencePointer(Game.Memory.heap_pointer[version]);
 	if isRDRAM(heapBase) then
@@ -7733,7 +7746,15 @@ function getHeapBlocksByFunction(comparator)
 		if (identifyMemoryCache.heapCache[i] ~= nil) then
 			local cachedBlock = identifyMemoryCache.heapCache[i];
 			if comparator(cachedBlock) then
-				dprint(toHexString(cachedBlock.block, 6, "").." Size: "..toHexString(cachedBlock.size).." "..cachedBlock.description);
+				if cachedBlock.references > 0 then
+					local refStr = "";
+					for j = 1, #cachedBlock.referenceAddresses do
+						refStr = refStr..toHexString(cachedBlock.referenceAddresses[j]).." ";
+					end
+					dprint(toHexString(cachedBlock.block, 6, "").." Size: "..toHexString(cachedBlock.size).." "..cachedBlock.description.." Ref: "..cachedBlock.references.." "..refStr);
+				else
+					dprint(toHexString(cachedBlock.block, 6, "").." Size: "..toHexString(cachedBlock.size).." "..cachedBlock.description);
+				end
 			end
 		end
 	end
@@ -7790,7 +7811,7 @@ function buildIdentifyMemoryCache()
 			nextFree = dereferencePointer(header + 8);
 			prevFree = dereferencePointer(header + 12);
 			isFree = isRDRAM(nextFree) or isRDRAM(prevFree);
-			identifyMemoryCache.heapCache[block] = {description="", header=header, block=block, size=size, next=block+size, prev=prev, isFree=isFree, nextFree=nextFree, prevFree=prevFree};
+			identifyMemoryCache.heapCache[block] = {description="", header=header, block=block, size=size, next=block+size, prev=prev, isFree=isFree, nextFree=nextFree, prevFree=prevFree, references=0, referenceAddresses={}};
 			if isFree then
 				identifyMemoryCache.heapCache[block].description = "Free";
 				identifyMemoryCache.heapCache[block].addressFound = true;
@@ -7802,6 +7823,17 @@ function buildIdentifyMemoryCache()
 		identifyMemoryCache.heapBase = heapBase;
 		identifyMemoryCache.heapEnd = header;
 	end
+
+	-- Find references to heap blocks
+	--[[
+	for address = 0, RDRAMSize - 4, 4 do
+		local value = dereferencePointer(address);
+		if isRDRAM(value) and type(identifyMemoryCache.heapCache[value]) == "table" then
+			identifyMemoryCache.heapCache[value].references = identifyMemoryCache.heapCache[value].references + 1;
+			table.insert(identifyMemoryCache.heapCache[value].referenceAddresses, address);
+		end
+	end
+	--]]
 
 	-- Cache model 1
 	for object_no = 0, 255 do
@@ -8507,21 +8539,15 @@ function identifyMemory(address, findReferences, reuseCache, suppressPrint)
 					table.insert(addressInfo, "The address you passed points to a collision linked list!");
 					table.insert(addressInfo, "Iterating through and checking what's in that list:");
 					local safety = nil;
-					-- TODO: Use collision cache for this
-					while isRDRAM(object) do
-						local kong = mainmemory.read_u16_be(object + 0x04);
-						local collisionType = mainmemory.read_u16_be(object + 0x02);
-						if obj_model2.object_types[collisionType] ~= nil then
-							collisionType = obj_model2.object_types[collisionType];
-						else
-							collisionType = toHexString(collisionType, 4);
-						end
-						table.insert(addressInfo, toHexString(object)..": "..collisionType..", Kong: "..toHexString(kong));
-						safety = dereferencePointer(object + 0x18); -- Get next object
+					local cachedCollision = identifyMemoryCache.model2CollisionCache[object];
+					while type(cachedCollision) == "table" do
+						table.insert(addressInfo, toHexString(object)..": "..cachedCollision.collisionType..", Kong: "..toHexString(cachedCollision.kong));
+						safety = cachedCollision.next;
 						if safety == object or safety == heapBlock.header then -- Prevent infinite loops
 							break;
 						end
 						object = safety;
+						cachedCollision = identifyMemoryCache.model2CollisionCache[object];
 					end
 				else
 					table.insert(addressInfo, "The address you passed isn't a pointer to a collision linked list though...");
@@ -8658,6 +8684,7 @@ function identifyMemory(address, findReferences, reuseCache, suppressPrint)
 end
 
 function calculateKnownMemory(dumpBitmap)
+	buildIdentifyMemoryCache();
 	local output_file = nil;
 	if dumpBitmap then
 		output_file = io.open("./known_memory.bin", "wb");

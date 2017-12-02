@@ -37,6 +37,14 @@ SystemID N64
 7B17C4	d	h	1	RDRAM	Setup File Pointer
 7B20F8	d	h	1	RDRAM	Chunk Array Pointer
 7B48A0	d	h	1	RDRAM	Water Surface List Pointer
+7B49F4	d	h	1	RDRAM	Model 2 DL ROM Map Object Pointer
+7B4A00	d	h	1	RDRAM	Texture ROM Map Object Pointer
+7B4A1C	d	h	1	RDRAM	FFA Texture ROM Map Object Pointer
+7B4A48	d	h	1	RDRAM	Texture ROM Map Object Pointer
+7B4A74	d	h	1	RDRAM	Model 2 DL Index Object Pointer
+7B4A80	d	h	1	RDRAM	Texture Index Object Pointer
+7B4A9C	d	h	1	RDRAM	FFA Texture Index Object Pointer
+7B4AC8	d	h	1	RDRAM	Texture Index Object Pointer
 7B5918	d	h	1	RDRAM	Camera Pointer
 7B5AFC	d	h	1	RDRAM	Player Pointer
 7B5B12	b	b	1	RDRAM	Zipper Byte
@@ -91,6 +99,7 @@ SystemID N64
 7B6D00	w	u	1	RDRAM	Transferred Actor Type
 7B6DA0	d	u	1	RDRAM	Idle Timer
 7B7088	d	f	1	RDRAM	Loading Zone Fadeout Progress
+7B71C4	d	h	1	RDRAM	Weather Particle Array Pointer
 7B72C0	d	u	1	RDRAM	Idle Timer (Void)
 7B73D8	w	h	1	RDRAM	Number of Enemies
 7B73DC	d	h	1	RDRAM	Enemy Respawn Array Pointer

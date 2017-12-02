@@ -193,9 +193,11 @@ SystemID N64
 7F93C0	d	h	1	RDRAM	Water Surface List Pointer
 7F9538	d	h	1	RDRAM	Model 2 DL ROM Map Object Pointer
 7F9544	d	h	1	RDRAM	Texture ROM Map Object Pointer
+7F9560	d	h	1	RDRAM	FFA Texture ROM Map Object Pointer
 7F958C	d	h	1	RDRAM	Texture ROM Map Object Pointer
 7F95B8	d	h	1	RDRAM	Model 2 DL Index Object Pointer
 7F95C4	d	h	1	RDRAM	Texture Index Object Pointer
+7F95E0	d	h	1	RDRAM	FFA Texture Index Object Pointer
 7F960C	d	h	1	RDRAM	Texture Index Object Pointer
 7F9680	d	u	1	RDRAM	Texture Index?
 7FB534	d	h	1	RDRAM	Collision Data Pointer?
