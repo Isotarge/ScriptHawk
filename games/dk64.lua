@@ -1771,13 +1771,15 @@ function getActorCollisions(actor)
 	local collision = dereferencePointer(actor + obj_model1.collision_queue_pointer);
 	while isRDRAM(collision) do
 		collisionCount = collisionCount + 1;
+		--[[
 		local collisionPosition = dereferencePointer(collision + 0x10);
 		if isRDRAM(collisionPosition) then
 			dprint(mainmemory.readfloat(collisionPosition + 0x00, true)..", "..mainmemory.readfloat(collisionPosition + 0x04, true)..", "..mainmemory.readfloat(collisionPosition + 0x08, true))
 		end
+		--]]
 		collision = dereferencePointer(collision + 0x14);
 	end
-	print_deferred();
+	--print_deferred();
 	return collisionCount;
 end
 
