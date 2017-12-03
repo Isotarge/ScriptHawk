@@ -1766,6 +1766,16 @@ local function getModelNameFromModelIndex(modelIndex)
 	return modelIndex;
 end
 
+function getActorCollisions(actor)
+	local collision = dereferencePointer(actor + obj_model1.lock_method_1_pointer);
+	collisionCount = 0;
+	while isRDRAM(collision) do
+		print(collisionCount..": "..toHexString(collision));
+		collisionCount = collisionCount + 1;
+		collision = dereferencePointer(collision + 0x14);
+	end
+end
+
 ----------------------------------
 -- Object Model 2 Documentation --
 ----------------------------------
@@ -6306,6 +6316,7 @@ local function drawGrabScriptUI()
 
 		local focusedActorType = "Unknown";
 		local grabbedActorType = "Unknown";
+		local collisionCount = 0;
 
 		if isRDRAM(focusedActor) then
 			focusedActorType = getActorName(focusedActor);
@@ -6313,6 +6324,11 @@ local function drawGrabScriptUI()
 
 		if isRDRAM(grabbedActor) then
 			grabbedActorType = getActorName(grabbedActor);
+			local collision = dereferencePointer(grabbedActor + obj_model1.lock_method_1_pointer);
+			while isRDRAM(collision) do
+				collisionCount = collisionCount + 1;
+				collision = dereferencePointer(collision + 0x14);
+			end
 		end
 
 		-- Display which object the camera is currently focusing on
@@ -6320,7 +6336,7 @@ local function drawGrabScriptUI()
 		row = row + 1;
 
 		-- Display which object is grabbed
-		gui.text(gui_x, gui_y + height * row, "Grabbed Actor: "..toHexString(grabbedActor, 6).." "..grabbedActorType, nil, 'bottomright');
+		gui.text(gui_x, gui_y + height * row, "Grabbed Actor: "..toHexString(grabbedActor, 6).." "..grabbedActorType.." Collisions: "..collisionCount, nil, 'bottomright');
 		row = row + 1;
 	end
 
@@ -7660,18 +7676,6 @@ Game.OSDPosition = {32, 70}; -- TODO: Adjust this for subgames & different regio
 Game.OSD = Game.standardOSD;
 
 --print("Local Variables: "..countLocals().."/200");
-
-function followYourNose(block, offset)
-	local safety = 0;
-	local ogblock = block;
-	while isRDRAM(block) do
-		print(toHexString(block));
-		block = dereferencePointer(block + offset);
-		if block == ogblock then
-			break;
-		end
-	end
-end
 
 function traverseHeap()
 	local heapBase = dereferencePointer(Game.Memory.heap_pointer[version]);
