@@ -63,7 +63,7 @@ local Game = {
 		["jetman_velocity_x"] = {0x02F058, 0x022108, 0x022068, nil},
 		["jetman_velocity_y"] = {0x02F05C, 0x02210C, 0x02206C, nil},
 		["arcade_object_base"] = {0x04BCD0, 0x03EC30, 0x03EA60, nil},
-		["jumpman_position_x"] = {0x04BD70, 0x03ECD0, 0x03EB00, nil},
+		["jumpman_position_x"] = {0x04BD70, 0x03ECD0, 0x03EB00, nil}, -- TODO: Not correct for levels 2 and 4
 		["jumpman_position_y"] = {0x04BD74, 0x03ECD4, 0x03EB04, nil},
 		["jumpman_velocity_x"] = {0x04BD78, 0x03ECD8, 0x03EB08, nil},
 		["jumpman_velocity_y"] = {0x04BD7C, 0x03ECDC, 0x03EB0C, nil},
@@ -1058,7 +1058,7 @@ obj_model1 = {
 	["locked_to_pad"] = 0x110, -- TODO: What datatype is this? code says byte but I'd think it'd be a pointer
 	["health"] = 0x134, -- s16_be
 	["takes_enemy_damage"] = 0x13B, -- TODO: put into examine method and double check datatype
-	["lock_method_1_pointer"] = 0x13C,
+	["collision_queue_pointer"] = 0x13C,
 	["ledge_info_pointer"] = 0x140, -- TODO: I don't quite know what to call this, it has 2 pointers to the bone arrays used for tree grab, telegrab, oranges & bullets
 	["ledge_info"] = {
 		["last_x"] = 0x1C, -- 32 bit float big endian
@@ -1407,7 +1407,7 @@ local function getExamineDataModelOne(pointer)
 	table.insert(examine_data, { "Destination", Game.maps[mainmemory.read_u16_be(pointer + obj_model1.destination_map) + 1] or "Unknown"});
 	table.insert(examine_data, { "Separator", 1 });
 
-	table.insert(examine_data, { "Lock Method 1 Pointer", toHexString(mainmemory.read_u32_be(pointer + obj_model1.lock_method_1_pointer), 8) });
+	table.insert(examine_data, { "Lock Method 1 Pointer", toHexString(mainmemory.read_u32_be(pointer + obj_model1.collision_queue_pointer), 8) });
 	table.insert(examine_data, { "Separator", 1 });
 
 	if isKong(currentActorTypeNumeric) then
@@ -1767,13 +1767,18 @@ local function getModelNameFromModelIndex(modelIndex)
 end
 
 function getActorCollisions(actor)
-	local collision = dereferencePointer(actor + obj_model1.lock_method_1_pointer);
-	collisionCount = 0;
+	local collisionCount = 0;
+	local collision = dereferencePointer(actor + obj_model1.collision_queue_pointer);
 	while isRDRAM(collision) do
-		print(collisionCount..": "..toHexString(collision));
 		collisionCount = collisionCount + 1;
+		local collisionPosition = dereferencePointer(collision + 0x10);
+		if isRDRAM(collisionPosition) then
+			dprint(mainmemory.readfloat(collisionPosition + 0x00, true)..", "..mainmemory.readfloat(collisionPosition + 0x04, true)..", "..mainmemory.readfloat(collisionPosition + 0x08, true))
+		end
 		collision = dereferencePointer(collision + 0x14);
 	end
+	print_deferred();
+	return collisionCount;
 end
 
 ----------------------------------
@@ -4146,10 +4151,10 @@ end
 local function forceTBS()
 	local playerObject = Game.getPlayerObject();
 	if isRDRAM(playerObject) then
-		local pointer = dereferencePointer(playerObject + obj_model1.lock_method_1_pointer);
+		local pointer = dereferencePointer(playerObject + obj_model1.collision_queue_pointer);
 		if isRDRAM(pointer) then
-			mainmemory.write_u32_be(playerObject + obj_model1.lock_method_1_pointer, 0);
-			print("Forcing TBS. Nulled pointer to "..toHexString(pointer));
+			mainmemory.write_u32_be(playerObject + obj_model1.collision_queue_pointer, 0);
+			--print("Forcing TBS. Nulled pointer to "..toHexString(pointer));
 		end
 	end
 end
@@ -4575,7 +4580,7 @@ function Game.setXPosition(value)
 			end
 			mainmemory.writefloat(playerObject + obj_model1.x_pos, value, true);
 			mainmemory.writebyte(playerObject + obj_model1.locked_to_pad, 0x00);
-			mainmemory.write_u32_be(playerObject + obj_model1.lock_method_1_pointer, 0x00);
+			mainmemory.write_u32_be(playerObject + obj_model1.collision_queue_pointer, 0x00);
 		end
 	end
 end
@@ -4616,7 +4621,7 @@ function Game.setZPosition(value)
 			end
 			mainmemory.writefloat(playerObject + obj_model1.z_pos, value, true);
 			mainmemory.writebyte(playerObject + obj_model1.locked_to_pad, 0x00);
-			mainmemory.write_u32_be(playerObject + obj_model1.lock_method_1_pointer, 0x00);
+			mainmemory.write_u32_be(playerObject + obj_model1.collision_queue_pointer, 0x00);
 		end
 	end
 end
@@ -4933,7 +4938,7 @@ function Game.gainControl()
 		if isRDRAM(vehiclePointer) then
 			mainmemory.write_u32_be(playerObject + obj_model1.player.vehicle_actor_pointer, playerObject + RDRAMBase);
 		end
-		--mainmemory.write_u32_be(playerObject + obj_model1.lock_method_1_pointer, 0);
+		--mainmemory.write_u32_be(playerObject + obj_model1.collision_queue_pointer, 0);
 		if isRDRAM(cameraObject) then
 			mainmemory.writebyte(cameraObject + obj_model1.camera.state_type, 1);
 			mainmemory.write_u32_be(cameraObject + obj_model1.camera.focused_vehicle_pointer, 0);
@@ -6074,7 +6079,7 @@ function Game.zipToSelectedObject()
 
 			-- Allow movement when locked to pads etc
 			mainmemory.writebyte(playerObject + obj_model1.locked_to_pad, 0x00);
-			mainmemory.write_u32_be(playerObject + obj_model1.lock_method_1_pointer, 0x00);
+			mainmemory.write_u32_be(playerObject + obj_model1.collision_queue_pointer, 0x00);
 		end
 	end
 end
@@ -6320,24 +6325,17 @@ local function drawGrabScriptUI()
 
 		if isRDRAM(focusedActor) then
 			focusedActorType = getActorName(focusedActor);
+			gui.text(gui_x, gui_y + height * row, "Focused Actor: "..toHexString(focusedActor, 6).." "..focusedActorType, nil, 'bottomright');
+			row = row + 1;
 		end
 
 		if isRDRAM(grabbedActor) then
 			grabbedActorType = getActorName(grabbedActor);
-			local collision = dereferencePointer(grabbedActor + obj_model1.lock_method_1_pointer);
-			while isRDRAM(collision) do
-				collisionCount = collisionCount + 1;
-				collision = dereferencePointer(collision + 0x14);
-			end
+			local collision = dereferencePointer(grabbedActor + obj_model1.collision_queue_pointer);
+			collisionCount = getActorCollisions(grabbedActor);
+			gui.text(gui_x, gui_y + height * row, "Grabbed Actor: "..toHexString(grabbedActor, 6).." "..grabbedActorType.." Collisions: "..collisionCount, nil, 'bottomright');
+			row = row + 1;
 		end
-
-		-- Display which object the camera is currently focusing on
-		gui.text(gui_x, gui_y + height * row, "Focused Actor: "..toHexString(focusedActor, 6).." "..focusedActorType, nil, 'bottomright');
-		row = row + 1;
-
-		-- Display which object is grabbed
-		gui.text(gui_x, gui_y + height * row, "Grabbed Actor: "..toHexString(grabbedActor, 6).." "..grabbedActorType.." Collisions: "..collisionCount, nil, 'bottomright');
-		row = row + 1;
 	end
 
 	-- Clamp index to number of objects
@@ -6381,6 +6379,7 @@ local function drawGrabScriptUI()
 					color = colors.green;
 				end
 				gui.text(gui_x, gui_y + height * row, i..": "..getActorName(object_pointers[i]).." "..toHexString(object_pointers[i] or 0, 6).." ("..toHexString(currentActorSize)..")", color, 'bottomright');
+				--gui.text(gui_x, gui_y + height * row, i..": "..getActorName(object_pointers[i]).." "..toHexString(object_pointers[i] or 0, 6).." ("..toHexString(currentActorSize)..")".." ("..getActorCollisions(object_pointers[i]).." cols)", color, 'bottomright');
 				row = row + 1;
 			end
 		end
@@ -7782,7 +7781,8 @@ function buildIdentifyMemoryCache()
 		heapBase = 0,
 		heapEnd = RDRAMSize,
 		textureCache = {},
-		model1TextureRenderers = {},
+		actorCollisions = {},
+		actorTextureRenderers = {},
 		model2CollisionCache = {},
 		frameBuffers = {},
 	};
@@ -7902,8 +7902,39 @@ function buildIdentifyMemoryCache()
 			while isRDRAM(textureRenderer) do
 				-- TODO: Can they be used by multiple actors?
 				-- TODO: Figure out which texture is being rendered
-				identifyMemoryCache.model1TextureRenderers[textureRenderer] = {block=textureRenderer, size=mainmemory.read_u32_be(textureRenderer + heap.object_size), actor=actor, actorName=actorName};
+				identifyMemoryCache.actorTextureRenderers[textureRenderer] = {block=textureRenderer, size=mainmemory.read_u32_be(textureRenderer + heap.object_size), actor=actor, actorName=actorName};
 				textureRenderer = getNextTextureRenderer(textureRenderer);
+			end
+			-- Collision Queue
+			local collision = dereferencePointer(actor + obj_model1.collision_queue_pointer);
+			local target = nil;
+			local targetName = "";
+			local size = 0;
+			local collisionCount = 0;
+			while isRDRAM(collision) do
+				size = mainmemory.read_u32_be(collision + heap.object_size);
+				target = dereferencePointer(collision + 0x08);
+				if isRDRAM(target) then
+					targetName = getActorName(target);
+				else
+					target = 0;
+					targetName = "";
+				end
+				if type(identifyMemoryCache.heapCache[collision]) == "table" then
+					addHeapMetadata(collision, "description", "ActorCollision "..collisionCount..": "..actorName..":"..targetName);
+					addHeapMetadata(collision, "isActorCollision", true);
+					addHeapMetadata(collision, "addressFound", true);
+					addHeapMetadata(collision, "addressType", 3);
+					addHeapMetadata(collision, "actor", actor);
+					addHeapMetadata(collision, "actorName", actorName);
+					addHeapMetadata(collision, "target", target);
+					addHeapMetadata(collision, "targetName", targetName);
+					addHeapMetadata(collision, "collisionCount", collisionCount);
+				else
+					identifyMemoryCache.actorCollisions[collision] = {block=collision, size=size, actor=actor, actorName=actorName, target=target, targetName=targetName, collisionCount=collisionCount};
+				end
+				collision = dereferencePointer(collision + 0x14);
+				collisionCount = collisionCount + 1;
 			end
 		end
 	end
@@ -8450,6 +8481,10 @@ function identifyMemory(address, findReferences, reuseCache, suppressPrint)
 				table.insert(addressInfo, "This address is part of the SharedModel object for the actor: "..heapBlock.actorName.." at "..toHexString(heapBlock.actor));
 			end
 
+			if heapBlock.isActorCollision then
+				table.insert(addressInfo, "This address is part of ActorCollision number "..heapBlock.collisionCount.." between : "..heapBlock.actorName.." at "..toHexString(heapBlock.actor).." and "..heapBlock.targetName.." at "..toHexString(heapBlock.target));
+			end
+
 			-- Detect model 2
 			if heapBlock.isObjectModel2Array then
 				local objectBase = address - (address - heapBlock.block) % obj_model2_slot_size;
@@ -8594,6 +8629,19 @@ function identifyMemory(address, findReferences, reuseCache, suppressPrint)
 		end
 	end
 
+	-- Detect ActorCollisions
+	if not addressFound then
+		for k, collision in pairs(identifyMemoryCache.actorCollisions) do
+			if withinHeapBlock(address, collision.block, collision.size, true) then
+				addressFound = true;
+				addressType = 3;
+				skipToAddress = collision.block + collision.size;
+				table.insert(addressInfo, "This address is part of ActorCollision number "..collision.collisionCount.." between : "..collision.actorName.." at "..toHexString(collision.actor).." and "..collision.targetName.." at "..toHexString(collision.target));
+				break;
+			end
+		end
+	end
+
 	-- Detect model 2 collisions
 	if not addressFound then
 		for k, collision in pairs(identifyMemoryCache.model2CollisionCache) do
@@ -8643,7 +8691,7 @@ function identifyMemory(address, findReferences, reuseCache, suppressPrint)
 
 	-- Detect actor texture renderers
 	if not addressFound then
-		for k, textureRenderer in pairs(identifyMemoryCache.model1TextureRenderers) do
+		for k, textureRenderer in pairs(identifyMemoryCache.actorTextureRenderers) do
 			if withinHeapBlock(address, textureRenderer.block, textureRenderer.size, true) then
 				table.insert(addressInfo, "This address is part of a TextureRenderer for the actor: "..textureRenderer.actorName.." at "..toHexString(textureRenderer.actor));
 				addressFound = true;
