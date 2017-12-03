@@ -3162,25 +3162,33 @@ function checkFlags()
 
 		if #flag_block_cache == flag_block_size - 1 then
 			local currentValue, previousValue, isSet, wasSet;
+			local changeDetected = false;
 			for byte = 0, flag_block_size - 1 do
 				currentValue = flagBlock[byte];
 				previousValue = flag_block_cache[byte];
-				for _bit = 0, 7 do
-					isSet = bit.check(currentValue, _bit);
-					wasSet = bit.check(previousValue, _bit);
-					if isSet and not wasSet then
-						if isKnown(byte, _bit) then
-							dprint("Flag "..toHexString(byte, 2)..">".._bit..": \""..getFlagName(byte, _bit).."\" was set on frame "..emu.framecount());
-						else
-							dprint("{byte="..toHexString(byte, 2)..", bit=".._bit..", name=\"Name\"},");
+				if currentValue ~= previousValue then
+					for _bit = 0, 7 do
+						isSet = bit.check(currentValue, _bit);
+						wasSet = bit.check(previousValue, _bit);
+						if isSet and not wasSet then
+							if isKnown(byte, _bit) then
+								changeDetected = true;
+								dprint("Flag "..toHexString(byte, 2)..">".._bit..": \""..getFlagName(byte, _bit).."\" was set on frame "..emu.framecount());
+							else
+								changeDetected = true;
+								dprint("{byte="..toHexString(byte, 2)..", bit=".._bit..", name=\"Name\"},");
+							end
+						elseif not isSet and wasSet then
+							changeDetected = true;
+							dprint("Flag "..toHexString(byte, 2)..">".._bit..": \""..getFlagName(byte, _bit).."\" was cleared on frame "..emu.framecount());
 						end
-					elseif not isSet and wasSet then
-						dprint("Flag "..toHexString(byte, 2)..">".._bit..": \""..getFlagName(byte, _bit).."\" was cleared on frame "..emu.framecount());
 					end
 				end
 			end
-			flag_block_cache = flagBlock;
-			print_deferred();
+			if changeDetected then
+				flag_block_cache = flagBlock;
+				print_deferred();
+			end
 		else
 			flag_block_cache = flagBlock;
 			print("Populated flag block cache");
