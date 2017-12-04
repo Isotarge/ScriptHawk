@@ -417,6 +417,12 @@ local supportedGames = {
 	["C892BBDA3993E66BD0D56A10ECD30B1EE612210F"] = {["moduleName"] = "games.oot", ["friendlyName"] = "Zelda no Densetsu - Toki no Ocarina (Japan)"},
 	["DD14E143C4275861FE93EA79D0C02E36AE8C6C2F"] = {["moduleName"] = "games.oot", ["friendlyName"] = "Zelda no Densetsu - Toki no Ocarina (Japan) (GC)"},
 
+	-- Penguin Land
+	["8762239C339A084DFB8443CC38515301476BDE28"] = {["moduleName"] = "games.penguin_land", ["friendlyName"] = "Penguin Land (UE)"},
+	["8DDEC589F72CDCF2CD4CAAFB075EC8E4"] = {["moduleName"] = "games.penguin_land", ["friendlyName"] = "Penguin Land (UE)"},
+	["C01CF44EEE335D509DC20A165ADD8514E7FBB7C4"] = {["moduleName"] = "games.penguin_land", ["friendlyName"] = "Doki Doki Penguin Land - Uchuu Daibouken (J)"},
+	["FF7502DD8A717DB5ADB42C711DDBC9F5"] = {["moduleName"] = "games.penguin_land", ["friendlyName"] = "Doki Doki Penguin Land - Uchuu Daibouken (J)"},
+
 	-- Rats!
 	["5E423DFAB8221B69A641D2E535EBFE1E3759A2E4"] = {["moduleName"] = "games.rats", ["friendlyName"] = "Rats! (USA) (En,Es)"},
 
