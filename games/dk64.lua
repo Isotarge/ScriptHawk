@@ -1774,7 +1774,7 @@ function getActorCollisions(actor)
 		--[[
 		local collisionPosition = dereferencePointer(collision + 0x10);
 		if isRDRAM(collisionPosition) then
-			dprint(mainmemory.readfloat(collisionPosition + 0x00, true)..", "..mainmemory.readfloat(collisionPosition + 0x04, true)..", "..mainmemory.readfloat(collisionPosition + 0x08, true))
+			dprint(toHexString(collisionPosition)..": "..mainmemory.readfloat(collisionPosition + 0x00, true)..", "..mainmemory.readfloat(collisionPosition + 0x04, true)..", "..mainmemory.readfloat(collisionPosition + 0x08, true))
 		end
 		--]]
 		collision = dereferencePointer(collision + 0x14);
@@ -7817,7 +7817,19 @@ function buildIdentifyMemoryCache()
 			nextFree = dereferencePointer(header + 8);
 			prevFree = dereferencePointer(header + 12);
 			isFree = isRDRAM(nextFree) or isRDRAM(prevFree);
-			identifyMemoryCache.heapCache[block] = {description="", header=header, block=block, size=size, next=block+size, prev=prev, isFree=isFree, nextFree=nextFree, prevFree=prevFree, references=0, referenceAddresses={}};
+			identifyMemoryCache.heapCache[block] = {
+				description = "",
+				header = header,
+				block = block,
+				size = size,
+				next = block+size,
+				prev = prev,
+				isFree = isFree,
+				nextFree = nextFree,
+				prevFree = prevFree,
+				references = 0,
+				referenceAddresses = {}
+			};
 			if isFree then
 				identifyMemoryCache.heapCache[block].description = "Free";
 				identifyMemoryCache.heapCache[block].addressFound = true;
@@ -7904,7 +7916,12 @@ function buildIdentifyMemoryCache()
 			while isRDRAM(textureRenderer) do
 				-- TODO: Can they be used by multiple actors?
 				-- TODO: Figure out which texture is being rendered
-				identifyMemoryCache.actorTextureRenderers[textureRenderer] = {block=textureRenderer, size=mainmemory.read_u32_be(textureRenderer + heap.object_size), actor=actor, actorName=actorName};
+				identifyMemoryCache.actorTextureRenderers[textureRenderer] = {
+					block = textureRenderer,
+					size = mainmemory.read_u32_be(textureRenderer + heap.object_size),
+					actor = actor,
+					actorName = actorName
+				};
 				textureRenderer = getNextTextureRenderer(textureRenderer);
 			end
 			-- Collision Queue
@@ -7913,6 +7930,7 @@ function buildIdentifyMemoryCache()
 			local targetName = "";
 			local size = 0;
 			local collisionCount = 0;
+			local collisionPosition = nil;
 			while isRDRAM(collision) do
 				size = mainmemory.read_u32_be(collision + heap.object_size);
 				target = dereferencePointer(collision + 0x08);
@@ -7922,6 +7940,7 @@ function buildIdentifyMemoryCache()
 					target = 0;
 					targetName = "";
 				end
+
 				if type(identifyMemoryCache.heapCache[collision]) == "table" then
 					addHeapMetadata(collision, "description", "ActorCollision "..collisionCount..": "..actorName..":"..targetName);
 					addHeapMetadata(collision, "isActorCollision", true);
@@ -7932,9 +7951,50 @@ function buildIdentifyMemoryCache()
 					addHeapMetadata(collision, "target", target);
 					addHeapMetadata(collision, "targetName", targetName);
 					addHeapMetadata(collision, "collisionCount", collisionCount);
-				else
-					identifyMemoryCache.actorCollisions[collision] = {block=collision, size=size, actor=actor, actorName=actorName, target=target, targetName=targetName, collisionCount=collisionCount};
+				elseif isRDRAM(collision) then
+					identifyMemoryCache.actorCollisions[collision] = {
+						isActorCollision = true,
+						block = collision,
+						size = size,
+						actor = actor,
+						actorName = actorName,
+						target = target,
+						targetName = targetName,
+						collisionCount = collisionCount
+					};
 				end
+
+				collisionPosition = dereferencePointer(collision + 0x10);
+				if type(identifyMemoryCache.heapCache[collisionPosition]) == "table" then
+					addHeapMetadata(collisionPosition, "description", "ActorCollisionPosition "..collisionCount..": "..actorName..":"..targetName);
+					addHeapMetadata(collisionPosition, "isActorCollisionPosition", true);
+					addHeapMetadata(collisionPosition, "addressFound", true);
+					addHeapMetadata(collisionPosition, "addressType", 3);
+					addHeapMetadata(collisionPosition, "actor", actor);
+					addHeapMetadata(collisionPosition, "actorName", actorName);
+					addHeapMetadata(collisionPosition, "target", target);
+					addHeapMetadata(collisionPosition, "targetName", targetName);
+					addHeapMetadata(collisionPosition, "collisionCount", collisionCount);
+					addHeapMetadata(collisionPosition, "x", mainmemory.readfloat(collisionPosition + 0x00, true));
+					addHeapMetadata(collisionPosition, "y", mainmemory.readfloat(collisionPosition + 0x04, true));
+					addHeapMetadata(collisionPosition, "z", mainmemory.readfloat(collisionPosition + 0x08, true));
+				elseif isRDRAM(collision) then
+					--dprint("ActorCollisionPosition "..toHexString(collisionPosition).." was not on the heap!");
+					identifyMemoryCache.actorCollisions[collisionPosition] = {
+						isActorCollisionPosition = true,
+						block = collisionPosition,
+						size = mainmemory.read_u32_be(collisionPosition + heap.object_size),
+						actor = actor,
+						actorName = actorName,
+						target = target,
+						targetName = targetName,
+						collisionCount = collisionCount,
+						x = mainmemory.readfloat(collisionPosition + 0x00, true),
+						y = mainmemory.readfloat(collisionPosition + 0x04, true),
+						z = mainmemory.readfloat(collisionPosition + 0x08, true)
+					};
+				end
+
 				collision = dereferencePointer(collision + 0x14);
 				collisionCount = collisionCount + 1;
 			end
@@ -8484,7 +8544,11 @@ function identifyMemory(address, findReferences, reuseCache, suppressPrint)
 			end
 
 			if heapBlock.isActorCollision then
-				table.insert(addressInfo, "This address is part of ActorCollision number "..heapBlock.collisionCount.." between : "..heapBlock.actorName.." at "..toHexString(heapBlock.actor).." and "..heapBlock.targetName.." at "..toHexString(heapBlock.target));
+				table.insert(addressInfo, "This address is part of ActorCollision number "..heapBlock.collisionCount.." between: "..heapBlock.actorName.." at "..toHexString(heapBlock.actor).." and "..heapBlock.targetName.." at "..toHexString(heapBlock.target));
+			end
+			if heapBlock.isActorCollisionPosition then
+				table.insert(addressInfo, "This address is part of the ActorCollisionPosition object for ActorCollision number "..heapBlock.collisionCount.." between: "..heapBlock.actorName.." at "..toHexString(heapBlock.actor).." and "..heapBlock.targetName.." at "..toHexString(heapBlock.target));
+				table.insert(addressInfo, "Position: "..heapBlock.x..", "..heapBlock.y..", "..heapBlock.z);
 			end
 
 			-- Detect model 2
@@ -8638,7 +8702,12 @@ function identifyMemory(address, findReferences, reuseCache, suppressPrint)
 				addressFound = true;
 				addressType = 3;
 				skipToAddress = collision.block + collision.size;
-				table.insert(addressInfo, "This address is part of ActorCollision number "..collision.collisionCount.." between : "..collision.actorName.." at "..toHexString(collision.actor).." and "..collision.targetName.." at "..toHexString(collision.target));
+				if collision.isActorCollision then
+					table.insert(addressInfo, "This address is part of ActorCollision number "..collision.collisionCount.." between: "..collision.actorName.." at "..toHexString(collision.actor).." and "..collision.targetName.." at "..toHexString(collision.target));
+				elseif collision.isActorCollisionPosition then
+					table.insert(addressInfo, "This address is part of the ActorCollisionPosition object for ActorCollision number "..collision.collisionCount.." between: "..collision.actorName.." at "..toHexString(collision.actor).." and "..collision.targetName.." at "..toHexString(collision.target));
+					table.insert(addressInfo, "Position: "..collision.x..", "..collision.y..", "..collision.z);
+				end
 				break;
 			end
 		end
