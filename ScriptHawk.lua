@@ -572,6 +572,34 @@ function ScriptHawk.getMovingAngle()
 	return angleBetweenPoints(prev_x, prev_z, Game.getXPosition(), Game.getZPosition());
 end
 
+if type(Game.speedy_speeds) ~= "table" then
+	if ScriptHawk.warnings then
+		print("Warning: This module does not have a Game.speedy_speeds table");
+	end
+	Game.speedy_speeds = {0};
+end
+
+if type(Game.speedy_index) ~= "number" then
+	if ScriptHawk.warnings then
+		print("Warning: This module does not have a Game.speedy_index value");
+	end
+	Game.speedy_index = 1;
+end
+
+if type(Game.max_rot_units) ~= "number" then
+	if ScriptHawk.warnings then
+		print("Warning: This module does not have a Game.max_rot_units value");
+	end
+	Game.max_rot_units = 0;
+end
+
+if type(Game.rot_speed) ~= "number" then
+	if ScriptHawk.warnings then
+		print("Warning: This module does not have a Game.rot_speed value");
+	end
+	Game.rot_speed = 0;
+end
+
 --------------
 -- Position --
 --------------

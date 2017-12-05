@@ -13,7 +13,6 @@ local Game = {
 		igt_screen = 0x11D, -- byte
 		lives = 0x119,
 		round = 0x10B,
-		movement_state = 0x113,
 		x_position = 0x408, -- Byte
 		y_position = 0x406, -- Byte
 		x_velocity = 0x40F, -- s16_le
@@ -23,9 +22,6 @@ local Game = {
 		egg_x_velocity = 0x44F, -- s16_le
 		egg_y_velocity = 0x44D, -- s16_le
 	},
-	speedy_speeds = {0},
-	speedy_index = 1,
-	max_rot_units = 0,
 };
 
 function Game.detectVersion(romName, romHash)
@@ -41,7 +37,7 @@ function Game.getRound()
 end
 
 function Game.getIGT()
-	return mainmemory.read_u16_le(Game.Memory.igt_precise);
+	return mainmemory.read_u16_le(Game.Memory.igt_precise) / 256;
 end
 
 function Game.getXPosition()

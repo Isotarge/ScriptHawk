@@ -23,10 +23,6 @@ local Game = {
 		["object_position_base"] = 0xC00,
 		["object_status_base"] = 0x1100,
 	},
-	speedy_speeds = {0},
-	speedy_index = 1,
-	rot_speed = 0,
-	max_rot_units = 0,
 };
 
 function Game.detectVersion(romName, romHash)

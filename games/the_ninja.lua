@@ -6,9 +6,6 @@ if type(ScriptHawk) ~= "table" then
 end
 
 local Game = {
-	speedy_speeds = {0},
-	speedy_index = 1,
-	max_rot_units = 0,
 	Memory = {
 		object_array_base = 0xE80,
 		player_x = 0xEB2, -- s16_le
