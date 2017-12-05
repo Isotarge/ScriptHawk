@@ -4,6 +4,8 @@ SystemID SMS
 0119	b	u	0	Main RAM	Egg Lives
 011C	w	u	0	Main RAM	Level timer (precise)
 011D	b	u	0	Main RAM	Level timer (on screen value)
+015A	b	u	0	Main RAM	Is Screen Scrolling?
+015C	b	u	0	Main RAM	Level Y
 0170	b	h	0	Main RAM	Death transition timer
 0181	w	u	0	Main RAM	Bird spawn timer
 02A7	b	h	0	Main RAM	> 0x00 for Smoking penguin and reversed controls?

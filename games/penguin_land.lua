@@ -9,23 +9,33 @@ local Game = {
 	Memory = {
 		death_timer = 0x170,
 		bird_spawn_timer = 0x181,
-		igt_precise = 0x11C, -- u16_le
+		igt_precise = 0x11C, -- unsigned fixed point 8.8 little endian
 		igt_screen = 0x11D, -- byte
 		lives = 0x119,
 		round = 0x10B,
-		x_position = 0x408, -- Byte
-		y_position = 0x406, -- Byte
-		x_velocity = 0x40F, -- s16_le
-		y_velocity = 0x40D, -- s16_le
-		egg_x_position = 0x448, -- Byte
-		egg_y_position = 0x446, -- Byte
-		egg_x_velocity = 0x44F, -- s16_le
-		egg_y_velocity = 0x44D, -- s16_le
+		level_is_scrolling = 0x15A,
+		level_y = 0x15C,
+		x_position = 0x407, -- unsigned fixed point 8.8 little endian
+		y_position = 0x405, -- unsigned fixed point 8.8 little endian
+		x_velocity = 0x40F, -- signed fixed point 8.8 little endian
+		y_velocity = 0x40D, -- signed fixed point 8.8 little endian
+		egg_x_position = 0x447, -- unsigned fixed point 8.8 little endian
+		egg_y_position = 0x445, -- unsigned fixed point 8.8 little endian
+		egg_x_velocity = 0x44F, -- signed fixed point 8.8 little endian
+		egg_y_velocity = 0x44D, -- signed fixed point 8.8 little endian
 	},
 };
 
 function Game.detectVersion(romName, romHash)
 	return true;
+end
+
+function Game.getLevelY()
+	return mainmemory.readbyte(Game.Memory.level_y);
+end
+
+function Game.isLevelScrolling()
+	return mainmemory.readbyte(Game.Memory.level_is_scrolling) ~= 0;
 end
 
 function Game.getLives()
@@ -41,11 +51,11 @@ function Game.getIGT()
 end
 
 function Game.getXPosition()
-	return mainmemory.readbyte(Game.Memory.x_position);
+	return mainmemory.read_u16_le(Game.Memory.x_position) / 256;
 end
 
 function Game.getYPosition()
-	return mainmemory.readbyte(Game.Memory.y_position);
+	return mainmemory.read_u16_le(Game.Memory.y_position) / 256;
 end
 
 function Game.getXVelocity()
@@ -57,11 +67,11 @@ function Game.getYVelocity()
 end
 
 function Game.getEggXPosition()
-	return mainmemory.readbyte(Game.Memory.egg_x_position);
+	return mainmemory.read_u16_le(Game.Memory.egg_x_position) / 256;
 end
 
 function Game.getEggYPosition()
-	return mainmemory.readbyte(Game.Memory.egg_y_position);
+	return mainmemory.read_u16_le(Game.Memory.egg_y_position) / 256;
 end
 
 function Game.getEggXVelocity()
@@ -78,10 +88,15 @@ Game.OSD = {
 	{"Lives", Game.getLives},
 	{"IGT", Game.getIGT},
 	{"Separator", 1},
+	{"Level Y", Game.getLevelY},
+	{"Scrolling", Game.isLevelScrolling},
+	{"Separator", 1},
 	{"X", Game.getXPosition},
 	{"Y", Game.getYPosition},
 	{"X Velocity", Game.getXVelocity},
 	{"Y Velocity", Game.getYVelocity},
+	{"dX"},
+	{"dY"},
 	{"Separator", 1},
 	{"Egg X", Game.getEggXPosition},
 	{"Egg Y", Game.getEggYPosition},
