@@ -8,7 +8,7 @@ end
 local Game = {
 	Memory = {
 		death_timer = 0x170,
-		bird_spawn_timer = 0x181,
+		bird_spawn_timer = 0x181, -- unsigned fixed point 8.8 little endian
 		igt_precise = 0x11C, -- unsigned fixed point 8.8 little endian
 		igt_screen = 0x11D, -- byte
 		lives = 0x119,
@@ -37,6 +37,14 @@ end
 
 function Game.setMap(index)
 	mainmemory.writebyte(Game.Memory.round, index);
+end
+
+function Game.applyInfinites()
+	mainmemory.writebyte(Game.Memory.lives, 3);
+	mainmemory.write_u16_le(Game.Memory.bird_spawn_timer, 2048);
+	mainmemory.writebyte(Game.Memory.death_timer, 1);
+	mainmemory.writebyte(0x299, 1);
+	mainmemory.writebyte(0x141, 1);
 end
 
 function Game.getLevelY()
