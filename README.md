@@ -109,6 +109,8 @@ While ScriptHawk does have basic support for OoT and MM there are people who are
 ## Other Supported Games
 - Drill Dozer (GBA)
 - Impossible Mission (SMS)
+- Penguin Land (SMS)
+- Psycho Fox (SMS)
 - Rats! (GBC)
 - Taz-Mania (SMS)
 - The Ninja (SMS)

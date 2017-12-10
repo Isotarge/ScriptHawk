@@ -27,6 +27,8 @@ local Game = {
 };
 
 function Game.detectVersion(romName, romHash)
+	ScriptHawk.dpad.joypad.enabled = false;
+	ScriptHawk.dpad.key.enabled = false;
 	return true;
 end
 

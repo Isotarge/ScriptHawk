@@ -423,6 +423,10 @@ local supportedGames = {
 	["C01CF44EEE335D509DC20A165ADD8514E7FBB7C4"] = {["moduleName"] = "games.penguin_land", ["friendlyName"] = "Doki Doki Penguin Land - Uchuu Daibouken (J)"},
 	["FF7502DD8A717DB5ADB42C711DDBC9F5"] = {["moduleName"] = "games.penguin_land", ["friendlyName"] = "Doki Doki Penguin Land - Uchuu Daibouken (J)"},
 
+	-- Psycho Fox
+	["278CC3853905626138E83B6CFA39C26BA8E4F632"] = {["moduleName"] = "games.psycho_fox", ["friendlyName"] = "Psycho Fox (UE)"},
+	["A9C2FACF9EF536D095414CE2E7CE2F4F"] = {["moduleName"] = "games.psycho_fox", ["friendlyName"] = "Psycho Fox (UE)"},
+
 	-- Rats!
 	["5E423DFAB8221B69A641D2E535EBFE1E3759A2E4"] = {["moduleName"] = "games.rats", ["friendlyName"] = "Rats! (USA) (En,Es)"},
 
