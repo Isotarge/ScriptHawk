@@ -43,6 +43,9 @@ end
 
 function Game.applyInfinites()
 	mainmemory.writebyte(Game.Memory.lives, 3);
+end
+
+function Game.fastMode()
 	mainmemory.write_u16_le(Game.Memory.bird_spawn_timer, 2048);
 	mainmemory.writebyte(Game.Memory.death_timer, 1);
 	mainmemory.writebyte(0x299, 1);
@@ -99,6 +102,16 @@ end
 
 function Game.getEggYVelocity()
 	return mainmemory.read_s16_le(Game.Memory.egg_y_velocity) / 256;
+end
+
+function Game.eachFrame()
+	if forms.ischecked(ScriptHawk.UI.form_controls["Fast Mode Checkbox"]) then
+		Game.fastMode();
+	end
+end
+
+function Game.initUI()
+	ScriptHawk.UI.form_controls["Fast Mode Checkbox"] = forms.checkbox(ScriptHawk.UI.options_form, "Fast Mode", ScriptHawk.UI.col(0) + ScriptHawk.UI.dropdown_offset, ScriptHawk.UI.row(6) + ScriptHawk.UI.dropdown_offset);
 end
 
 Game.OSDPosition = {2, 70};
