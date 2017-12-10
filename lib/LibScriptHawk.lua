@@ -188,13 +188,19 @@ string.contains = function(haystack, needle)
 end
 
 string.lpad = function(str, len, char)
+	if type(str) ~= "str" then
+		str = tostring(str);
+	end
 	if char == nil then char = ' ' end
-	return string.rep(char, len - #str) .. str
+	return string.rep(char, len - #str)..str;
 end
 
 string.rpad = function(str, len, char)
+	if type(str) ~= "str" then
+		str = tostring(str);
+	end
 	if char == nil then char = ' ' end
-	return str .. string.rep(char, len - #str)
+	return str..string.rep(char, len - #str);
 end
 
 function toHexString(value, desiredLength, prefix)

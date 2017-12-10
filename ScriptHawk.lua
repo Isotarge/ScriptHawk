@@ -438,7 +438,7 @@ local supportedGames = {
 	["3F99351D7BB61656614BDB2AA1A90CFE55D1922C"] = {["moduleName"] = "games.rush_2049", ["friendlyName"] = "San Francisco Rush 2049 (USA)"},
 	["61373D4758ECA3FA831BEAC27B4D4C250845F80C"] = {["moduleName"] = "games.rush_2049", ["friendlyName"] = "San Francisco Rush 2049 (Europe) (En,Fr,De,Es,It,Nl)"},
 
-	-- SM64
+	-- Super Mario 64
 	["4AC5721683D0E0B6BBB561B58A71740845DCEEA9"] = {["moduleName"] = "games.sm64", ["friendlyName"] = "Super Mario 64 (Europe) (En,Fr,De)"},
 	["3F319AE697533A255A1003D09202379D78D5A2E0"] = {["moduleName"] = "games.sm64", ["friendlyName"] = "Super Mario 64 (Japan) (Rev A) (Shindou Edition)"},
 	["8A20A5C83D6CEB0F0506CFC9FA20D8F438CAFE51"] = {["moduleName"] = "games.sm64", ["friendlyName"] = "Super Mario 64 (Japan)"},
@@ -451,7 +451,13 @@ local supportedGames = {
 	["E2929E10FCCC0AA84E5776227E798ABC07CEDABF"] = {["moduleName"] = "games.smash64", ["friendlyName"] = "Super Smash Bros. (USA)"},
 	["88C8FED5ECD5ED901CB5FC4B5BBEFFA3EA022DF7"] = {["moduleName"] = "games.smash64", ["friendlyName"] = "19XXTE 0.11"},
 
-	--Space Station Silicon Valley
+	-- Sonic The Hedgehog (SMS)
+	["6B9677E4A9ABB37765D6DB4658F4324251807E07"] = {["moduleName"] = "games.sonic1_sms", ["friendlyName"] = "Sonic The Hedgehog (UE)"},
+	["DC13A61EAFE75C13C15B5ECE419AC57B"] = {["moduleName"] = "games.sonic1_sms", ["friendlyName"] = "Sonic The Hedgehog (UE)"},
+	["6ACA0E3DFFE461BA1CB11A86CD4CAF5B97E1B8DF"] = {["moduleName"] = "games.sonic1_sms", ["friendlyName"] = "Sonic The Hedgehog (E) (BIOS)"},
+	["4187D96BEAF36385E681A3CF3BD1663D"] = {["moduleName"] = "games.sonic1_sms", ["friendlyName"] = "Sonic The Hedgehog (E) (BIOS)"},
+
+	-- Space Station Silicon Valley
 	["E5E09205AA743A9E5043A42DF72ADC379C746B0B"] = {["moduleName"] = "games.sssv", ["friendlyName"] = "Space Station Silicon Valley (USA)"},
 	["23710541BB3394072740B0F0236A7CB1A7D41531"] = {["moduleName"] = "games.sssv", ["friendlyName"] = "Space Station Silicon Valley (Europe) (En,Fr,De)"},
 

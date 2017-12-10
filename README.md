@@ -112,6 +112,7 @@ While ScriptHawk does have basic support for OoT and MM there are people who are
 - Penguin Land (SMS)
 - Psycho Fox (SMS)
 - Rats! (GBC)
+- Sonic The Hedgehog (SMS)
 - Taz-Mania (SMS)
 - The Ninja (SMS)
 
