@@ -1,0 +1,248 @@
+Lord of the Sword Events
+
+Main Quests:
+
+[HEADING TO AMON, TO GET BOOK]
+[HEADING TO TALKING TREE, ULMA]
+[TREE BOSS, WOODS OF NAMO]
+[GOBLIN BOSS, LEFT OF ITHLE]
+[PIRATE BOSS, RIGHT OF LINDIN]
+[ELDER CASTLE DUELS]
+[MT MORGOS, THE FIRE BEAST, UP RIGHT OF DWARLE]
+[STATUE LEFT OF HARFOOT]
+[RAGOAN]
+[SHAGART DUNGEON]
+
+Details:
+
+[HEADING TO AMON, TO GET BOOK]
+	Start village harfoot
+	Go right, blue gobliny level
+		- Lotsa fish
+	Go right, forest
+	Go right, Village Amon
+		- Staircase leads up left, to Pharazon
+		- Wizard gives book, restores a bit of health
+
+[HEADING TO TALKING TREE, ULMA]
+	Go right, castle varlin
+		- Has steps up left
+	Go up left (steps)
+	Go right on route
+	Go Up left on route (stairs)
+	Go left on route
+	Talk to tree fella in ulmo forest
+		- Says: "That race still exists, I'd venture. Perhaps they could still be found in the woods of Namo"
+		- Says stuff about woods of Namo
+		- Says to Destroy the book
+	Head back to village amon
+
+[TREE BOSS, WOODS OF NAMO]
+	Talk to wizard in amon to restore health (not compulsory)
+		- Talks about Tree of Marill in Namo woods
+	Go up left to Pharazon (town)
+	Go left to forest Namo
+	Beat tree
+		- Gives leaf thingy
+		- Restores health
+	Go right, back to Pharazon town
+		Talk to mario to restore health
+		- Talks about shaggart theives
+
+[GOBLIN BOSS, LEFT OF ITHLE]
+	Up left from pharizon (stairs) (starts on left of route)
+	Try up left from that route
+	Head left to Ithile
+		- Guy talks about swamp spirits (suspected goblin)
+	Left from Ithile, heading to goblin
+	Interesting note: Skeleton's projectiles in cave do not hurt you
+	Left to goblin
+	Beat goblin
+		- Doesn't give item
+		- Restores some health
+	Heading left, back to Ithile
+	Talk to guy in Ithile
+		- Gives bow as reward for killing goblin
+		- Restores health
+		- Shortcut from Shagart to Dwarle, come visit any time
+
+[PIRATE BOSS, RIGHT OF LINDIN]
+	Go right from Ithile
+	On route with up left, DON'T head right to Shagart
+		- Dead end at this point
+		- No health restoration
+		- All doors closed
+	Go left to Pharazon
+		- Talk to mario to restore health
+	Go back to Amon (head right from Pharazon)
+		- Talk to wizard to restore health
+		- Talks about book being destroyed
+	Go right from Amon to varlin
+		- CONSERVE ENERGY
+	Go up left from Varlin
+	Go right to Dwarle
+		- Talk to mario
+		- Restores health
+		- Daughter of Mayor of Lindon is missing
+	Go right to Lindon
+		- Talk to guy 4 times
+		- Restores health
+		- "My daughter has been taken by pirates to Falas
+		 Please save her and the reward will be great
+		 Follow coast to island"
+	Head Right from Lindon
+	Get to pirate
+		- Bow works nicely on pirate
+		- Crouch on the very top of slope and shoot arrows
+	Beat pirate
+		"My deepest thanks, I have heard the pirates know much of the lord of Elder castle in the far land of Yavanna"
+
+[ELDER CASTLE DUELS]
+	Go right to elder castle
+		- Fight five duels
+		- They're bloody hard
+			- First use bow and arrow when he comes close use sword
+			- Second guy can block arrow, use sword
+			- Third blocks arrow, use sword
+				- Let him jump over you, kick and turn around, then follow hit with sword
+			- Fourth, quick and throws projectiles
+				- Blocks bow
+			- Fifth guy jump up and hit on head
+
+[MT MORGOS, THE FIRE BEAST, UP RIGHT OF DWARLE]
+	After duel, king of castle elder says: "For the statue use this herb, a sword lies in the valley"
+		- King slightly restores health
+	Head left to Lindin to talk to mayor
+	Daughter appears in mayor house
+		- restores health
+	Head left from Lindin to Dwarle
+		- Mario says
+			"Mt. Morgos to the north is called the mountain of fire!"
+			"Thy weapons would not defeat the beast of Mt. Morgos!"
+		- Restores health
+		- "Brave Landau we pray for thy success"
+	Head up right from dwarle to Mt. Morgos
+	Arrive at mt morgos
+	Defeat dragon beastly dude
+		- Bow and arrow works, jump to dodge fire
+		- Two/Three arrows and then jump seems to work
+		- Takes alot of hits
+	"Thou hast fulfilled thy promise to the wizards? Go see him!"
+	Animation of book dropped into lake of fire
+	Book out of inventory, has been destroyed
+
+[STATUE LEFT OF HARFOOT]
+	Head left back to Dwarle on path back to Amon to talk to wizard
+	Arrive at Dwarle
+		- Mario says: "Shagart plans Ra Goan's restoration! Thou needst weapons"
+		- Restores health
+	Head left from Dwarle on path to Amon
+	Arrive amon
+	Wizard says:
+		- First time: "Hast thou destroyed the book? Do so and gain a reward"
+		- Second time: "On the way to Pharazon there is a road to a mountain"
+		- Third time: "Hast thou destroyed the book? This sword is thy reward!"
+		- Third message repeats
+		- Sword upgrades after 3'rd mesage
+		- Wizard restores health
+	Go left from Amon to Harfoot
+	Talk to mario at Harfoot 6 times
+		- 6'th time he says: "There's a strange statue on Mt. Ozgul to the west"
+	Go left to statue
+	Walk up to medusa statue
+	Jar/Bottle thingy disappears from inventory
+		- Corner the statue and use sword, can use bow but less effective
+		- Jump to avoid arrows
+	After beating statue, head right to Harfoot
+		Mario says "Congratulation! Thou hast done much so soons!"
+
+[RAGOAN]
+	Head right to Amon
+		Wizard says: "Go to varlin castle"
+		Restores health
+	[UNNECESARY?]
+		Head right to castle varlin
+			Guy says "Shagart has become strange, go and see for thy self"
+		Head back to Amon
+			Wizard says "Go to varlin castle"
+			IGNORE and head to Shagart
+	[/UNNECESARY?]
+	Head up left (Amon stairs) to Pharazon
+		Restore healh in Pharazon
+	Mario in Pharazon says:
+		- First time: "We pray for thy success brave Landau"
+		- Second time: "There is a path from here to Amon"
+		- After second time staircase up right (where house used to be) will appear
+		- Third time: "Strange people have gathered at Shagart, thieves and such. The daughter of the mayor of Lindon knows more details"
+	[UNNECESARY?]
+		Head right to Amon
+			Restore health
+			Wizard talks of Varlin castle
+			Ignore
+		Head right to Varlin
+		Dude at Varln does not restore health
+		Head up left onto route
+		Head right to Dwarle
+		Arrive Dwarle
+			Mario says: "People from Pharazon often visit Lindon via Shagart"
+			Restores health
+		Head right to Lindin
+		Arrive Lindin
+			Daughter says: "Thank thee kindly. Please rest here awhile"
+			Restores health
+			Talked 15 times, seems to be the only message
+		Head left to Dwarle
+			Restore health
+		Head left to Varlin
+		Head left to Amon
+		Restore health
+		Head up left (stairs) to Pharazon
+		Restore health
+	[/UNNECESARY?]
+	Head up right (stairs) of Pharazon
+	Head bottom left at steps into dungeon leadup route
+	Head left into dungeon
+	Attempt Ragoan's dungeon
+	Defeat Ragoan
+		- Use sword
+		- Cannot kill skulls
+		- Surprisingly little health
+	Sword drops from Ragoan
+		- Sword is same as original sword
+		- Does not appear in inventory
+		- Avoid if you can, jump over with precision
+[SHAGART DUNGEON]
+	Head back to Pharazon
+		- Heal up with Mario
+	Head right to Amon
+		- Heal up with Wizard
+		- He says: "Just one more right?"
+		- Then "Go to Varlin Castle repeats"
+	Head right to varlin
+	Head up left (stairs), then right to Dwarle
+	Head right to Lindin
+	Talk to Mayor's daugther, she says
+		- First time: "Thank thee kindly. Please rest here a while."
+		- Second time: Same as first
+		- Third time: "Go North from Dwarle and thou wilt find a path to the West."
+		- Restores health fully
+	Head left to Dwarle
+	Head up right (up stairs) to route
+	Head right on route
+	Head up left (up stairs) on mountainous route
+	Head left on following routes
+	Will come in on right of Shagart to open door.
+	Attempt dungeon in open Shagart door
+		- You will find arrow upgrade in first room of dungeon
+		- Dungeon is fairly linear
+	Boss strategy:
+		- Shoot arrows at him
+			- This will stop his projectiles temporarily
+			- He will also put up a shield and move towards you
+		- When he is within striking distance jump towards him and attack with your sword
+		- Make sure you strike at high chest, or neckish height
+	Head out of dungeon
+	Head left to Pharazon
+	Head right to Amon
+	Head right to Varlin
+	Win.

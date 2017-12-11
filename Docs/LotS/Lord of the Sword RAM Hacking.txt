@@ -1,0 +1,493 @@
+Lord of the sword RAM mapping
+
+By Isotarge and The8bitbeast
+
+To Check for stuff we haven't tested search for: UNTESTED
+
+The actual physical location in the SMS address space that the RAM starts at is: 0xC000
+
+The offsets in this document are relative to 0xC000, for example the actual location of the right score digit in the SMS address space is 0xC094 but in this document it would be 0x0094.
+
+When searching for pointers to check what writes to RAM, search relative to 0x0000.
+
+Search for 0xC094, not 0x0094 for example.
+
+--------------------------------------------------------------------------------
+
+SCORE
+
+--------------------------------------------------------------------------------
+
+0x0094 - Score, Right Digit (in hex)
+0x0095 - Score, Middle Digit (in hex)
+0x0096 - Score, Left Digit (in hex)
+
+Interestingly, the 6 changable digits of score are stored over 3 bytes as hex, the last number is hard coded to 0 at all times.
+
+The bytes are NOT converted to decimal before displaying, as such, values above 9 correspond to HUD elements rather than digits:
+
+	A - The letter 'S' in score
+	B - The letter 'C' in score
+	C - The letter 'O' in score (not the same as the digit '0')
+	D - The letter 'R' in score
+	E - The letter 'E' in score
+	F - Full health bar section
+
+EXAMPLES:
+
+To set the score to "SCORE=0" where = is a full health bar section
+
+The bytes should read:
+
+0x0094: EF
+0x0095: CD
+0x0096: AB
+
+To set the score to "ERROR10"
+
+The bytes should read:
+
+0x0094: D1
+0x0095: DC
+0x0096: ED
+
+To set the score to "1234560"
+
+The bytes should read:
+
+0x0094: 56
+0x0095: 34
+0x0096: 12
+
+--------------------------------------------------------------------------------
+
+MAP INFORMATION
+
+--------------------------------------------------------------------------------
+
+0x0098 - Current Checkpoint (1 byte)
+	- This byte stores the last checkpoint the player has activated
+	- Buildings do not affect this number
+	- Boss rooms and special rooms do not have a checkpoint [UNTESTED - ONLY TESTED SOME SPECIAL ROOMS]
+	- This byte is used to determine where to spawn the player after talking to someone in a building
+		- After interacting with the building, the game spawns the player at the building location for the map
+		- This doesn't take into account the spawn location specified by the checkpoint itself
+			- For example, after interacting with a building, the values 01 and 02 would spawn the player in the same location on the Swamp map located 1 route left of Shagart [UNTESTED]
+			- If no building location exists, I believe it spawns the player roughly in the middle of the map [UNTESTED]
+	- This byte is also used to check where the game should spawn the player after pressing continue
+		- This use of the checkpoint number does take into account the location on the map specified by the checkpoint
+	- Buildings can be used to warp to maps
+		1: Change the map code to desired code before entering a building
+		2: Enter building
+
+	- If byte 0x00A1 is set to 01, it will instantly warp you to the desired map. 01 at 0x00A1 is the "refresh map" byte.
+        - Values [INCOMPLETE, ?? = UNTESTED]:
+		00 - Resets Game
+		01 - Swamp 1 route left of Shagart, coming in from left
+		02 - Swamp 1 route left of Shagart, coming in from right
+		03 - Swamp 1 route bottom right of Dwarle (1 route left of Lindon), coming in from left
+		04 - Swamp 1 route bottom right of Dwarle (1 route left of Lindon), coming in from right
+		05 - Swamp 1 route right of Pharazon, coming in from left
+		06 - Swamp 1 route right of Pharazon, coming in from right
+		07 - Swamp 1 route right of Harfoot, coming in from left (Checkpoint used by demo)
+		08 - Swamp 1 route right of Harfoot, coming in from right
+		09 - Swamp 3 routes right of Ithile, coming in from left
+		0A - Swamp 3 routes right of Ithile, coming in from right
+		0B - Swamp 1 route up right of Dwarle, coming in from left
+		0C - Swamp 1 route up right of Dwarle, coming in from left
+		0D - Swamp 1 route left of Varlin, coming in from left
+		0E - Swamp 1 route left of Varlin, coming in from right
+		0F - Swamp 1 route bottom left of Pharazon, coming in from left
+		10 - Swamp 1 route bottom left of Pharazon, coming in from right
+		11 - Swamp 1 route right of Ithile, coming in from left
+		12 - Swamp 1 route right of Ithile, coming in from right
+		13 - Swamp 1 route left of Harfoot, coming in from left
+		14 - Swamp 1 route left of Harfoot, coming in from right
+		15 - Swamp 1 route up right of Pharazon, coming in from right
+		16 - Swamp 1 route up right of Pharazon, coming in from right
+		17 - ??
+		18 - ??
+		19 - Swamp 1 route right od Lindom, coming in from left
+		1A - Swamp 1 route right of Lindon, coming in from right
+		1B - Swamp 1 route up left of Pharazon, coming in from left
+		1C - Swamp 1 route up left of Pharazon, coming in from right
+		1D - ??
+		1E - ??
+		1F - Swamp 1 route left of Ithile, coming in from left
+		20 - Swamp 1 route left of Ithile, coming in from right
+		21 - Swamp 1 route top left of Varlin, coming in from left
+		22 - Swamp 1 route top left of Varlin, coming in from right
+		23 - Forest 1 route left of Amon, coming in from left
+		24 - Forest 1 route left of Amon, coming in from right
+		25 - Forest 1 route up left of Amon, coming in from left
+		26 - Forest 1 route up left of Amon, coming in from right
+		27 - Forest 2 routes bottom left of Pharazon (1 route right of Namo), coming in from left
+		28 - Forest 2 routes bottom left of Pharazon (1 route right of Namo), coming in from right
+		29 - Forest 1 route right of Ulmo, coming in from left
+		2A - Forest 1 route right of Ulmo, coming in from left
+		2B - Forest 2 routes left of Harfoot, coming in from left
+		2C - Forest 2 routes left of Harfoot, coming in from right
+		2D - Forest 1 route right of Amon, coming in from left
+		2E - Forest 1 route right of Amon, coming in from right
+		2F - ??
+		30 - ??
+		31 - ??
+		32 - ??
+		33 - ??
+		34 - Forest 2 routes left of Shagart, coming in from bottom left
+		35 - Forest 2 routes left of Shagart, coming in from right
+		36 - Forest 2 routes left of Shagart, coming in from top left (stairs)
+		37 - Forest 2 routes top left of Varlin (2 routes left of Dwarle), coming in from bottom left
+		38 - Forest 2 routes top left of Varlin (2 routes left of Dwarle), coming in from right
+		39 - Forest 2 routes top left of Varlin (2 routes left of Dwarle), coming in from top left (stairs)
+		3A - Coast 1 route left of Dwarle, coming in from left
+		3B - Coast 1 route left of Dwarle, coming in from right
+		3C - Coast 2 routes right of Ithile, coming in from left
+		3D - Coast 2 routes right of Ithile, coming in from right
+		3E - ??
+		3F - ??
+		40 - Cave 1 route right of Ragoan's dungeon, coming in from left
+		41 - Cave 1 route right of Ragoan's dungeon, coming in from right
+		42 - Cave 3 routes left of Ithile (1 route right of Goblin), coming in from left
+		43 - Cave 3 routes left of Ithile (1 route right of Goblin), coming in from right
+		44 - Mountains 2 routes up left of Amon (2 routes right of Pharazon), coming in from left
+		45 - Mountains 2 routes up left of Amon (2 routes right of Pharazon), coming in from right
+		46 - ??
+		47 - ??
+		48 - ??
+		49 - ??
+		4A - ??
+		4B - ??
+		4C - ??
+		4D - ??
+		4E - ??
+		4F - Mountains 2 routes up right of Pharazon, coming in from bottom left
+		50 - Mountains 2 routes up right of Pharazon, coming in from right
+		51 - Mountains 2 routes up right of Pharazon, coming in from top left (stairs)
+		52 - ??
+		53 - ??
+		54 - Mountains 3 routes left of Harfoot (1 route right of statue), coming in from left
+		55 - Mountains 3 routes left of Harfoot (1 route right of statue), coming in from right
+		56 - Mountains 3 Routes Left from the top left route in Pharazon, then the route up the staircase (up the staircase that you go under to fight the second to last boss), coming in from the left
+		57 - Mountains 3 Routes Left from the top left route in Pharazon, then the route up the staircase (up the staircase that you go under to fight the second to last boss), coming in from the right
+		58 - Mountains 2 routes right from Ragoan's dungeon, coming in from the left
+		59 - Mountains 2 routes right from Ragoan's dungeon, coming in from the right
+		5A - Dark Forest 2 routes left of Ithile, coming in from left
+		5B - Dark Forest 2 routes left of Ithile, coming in from right
+		5C - Dark Forest 1 route left of Pirate boss, coming in from left
+		5D - Dark Forest 1 route left of Pirate boss, coming in from right
+		5E - Harfoot, coming in from left
+		5F - Harfoot, coming in from right
+		60 - Ithile, coming in from left
+		61 - Ithile, coming in from right
+		62 - Amon, coming in from bottom left
+		63 - Amon, coming in from right
+		64 - Amon, coming in from top left (stairs)
+		65 - ??
+		66 - ??
+		67 - ??
+		68 - Dwarle, coming in from left
+		69 - Dwarle, coming in from bottom right
+		6A - Dwarle, coming in from top right (stairs)
+		6B - Pharazon, coming in from bottom left
+		6C - Pharazon, coming in from right
+		6D - Pharazon, coming in from top left (stairs)
+		6E - ??
+		6F - Pharazon, coming in from the bottom right (with stairs!)
+		70 - ??
+		71 - Pharazon, coming in from top right (stairs)
+		72 - Shagart, coming in from left
+		73 - Shagart, coming in from right
+		74 - ??
+		75 - ??
+		76 - Lindon, coming in from Left
+		77 - Lindon, coming in from right
+		78 - Castle guy speech, then crash [UNTESTED, HASN'T BEEN TESTED WITH CORRECT FLAGS SET]
+		79 - Glitched version of Varlin [UNTESTED, HASN'T BEEN TESTED WITH CORRECT FLAGS SET]
+		7A - Varlin, coming in from bottom left (door is closed)
+		7B - Varlin, coming in from top left (stairs, door is closed)
+		7C - Varlin, coming in from bottom left (door is open)
+		7D - Varlin, coming in from top left (stairs, door is open)
+		7E - Ragoan's dungeon, first room, coming in from bottom left
+		7F - Ragoan's dungeon, first room, coming in from top left (stairs)
+		80 - Ragoan's dungeon, second room (1 scroll vertical from enterance), coming in from any point
+		81 - Ragoan's dungeon, third room (2 scrolls vertical from enterance), coming in from any point
+		82 - Final boss dungeon, enterance, coming in from right
+		83 - Final boss dungeon, final room, coming in from left? (where you fight the final boss)
+		84 - Final boss dungeon, ? room, coming in from the top left (fall behind wall, glitched)
+		85 - Final boss dungeon, ? room, coming in from the top left (fall behind wall, glitched)
+
+		86 to FF - ??
+		
+--------------------------------------------------------------------------------
+
+0x00A0 - Map status byte
+	00 - Reset (loads title screen)
+	01 - In map (controllable)
+	02 - Sega logo
+	03 - Opening screen, switches to demo after a while
+	04 - In map, Demo (uncontrollable)
+	05 - Loads and Starts at Harfoot
+	06 - Opening story
+	07 - Reset?
+	08 - Reset?
+
+0x00A1: Building event byte
+	00 - Free Roam
+	01 - Reload (Between routes and in and out of buildings)
+		- Can be used to activate a warp
+			1: Set 0x0098 to the desired checkpoint value
+			2: Set 0x00A1 to 01 to force a map reload
+			3: The player will respawn in the correct location of the checkpoint
+	02 - In building
+	03 - Lock all left and right scrolling until reset
+		- Used for the 5 duels
+		- Used for final boss
+	04 - Map Screen?
+	05 - End Game Sequence
+
+0x00A2: Background repeat (Boolean)
+	00 - Do not repeat (Forest)
+	01 - Repeat (Mountainous route)
+
+--------------------------------------------------------------------------------
+
+PLAYER STATUS
+
+--------------------------------------------------------------------------------
+
+0x0129: Player health (1 byte)
+	0x00 - Min
+	0x30 - Max
+
+0x012B: Recovery status (Boolean)
+	00 - Normal
+	01 - Recovery
+
+0x012C: 2 byte timer for recovery time (little endian)
+
+--------------------------------------------------------------------------------
+
+OBJECT DATA 0x0400-0x09FF
+
+--------------------------------------------------------------------------------
+
+Each object is 0x40 (64) bytes long, meaning that in the allocated region of 0x0400 to 0x09ff, any given map can contain 24 objects at 1 time
+
+Objects include:
+	- The Player
+	- Sign (displayed when entering towns and such)
+	- Enemies
+	- Bosses
+
+The first byte of any 0x40 byte long object determines the object's type
+	- Values:
+		0x00 Null
+		0x01 Player
+		0x05 Sign
+		0x11 Unknown, lots of moving bytes though
+		0x13 Grey bird that flies and shoots
+		0x18 Spider in mountain route
+		0x19 White Jumping wolf enemy
+		0x1F Flying across screen (orange bat)
+		0x20 Floating up and down and shooting (forest plant killymajig)
+		0x21 Goblin (fall down from top)
+		0x2A Despawned (killed or off edge of screen)
+		0x34 Pirate boss
+		0x35 Pirate boss sword projectile (returns to boss)
+		0x37 Demon boss
+		0x39 4'th duel boss
+		0x3A 2'nd duel boss
+		0x3D Flying skull from second last boss
+		0x40 Sitting statue [UNTESTED]
+
+To place an object on a map, simply change the first byte along a 0x40 byte boundary within this memory region to the desired object code above.
+
+--------------------------------------------------------------------------------
+
+PLAYER OBJECT 0x0400-0x043F
+
+--------------------------------------------------------------------------------
+
+0x0400-0x043F: Player object
+	- This object in memory is the player's object
+	- It is similarly formatted to the enemy objects
+	- The first byte (0x0400) is the type of "enemy" which is set to 0x01 (the player)
+		- This type can be changed, which results in enemy object data being written to the player's object
+		- The player object can only be located in 0x0400 even though it is technically the same as any other level object
+		- Neither the player's health or score are stored in this object
+
+0x0401: Player status byte
+	- Changes as the player performs actions
+	- Values:
+		00 - Standing facing left
+		01 - Standing facing right
+		02 - Jumping facing left
+		03 - Jumping facing right
+		06 - Crouching facing left
+		07 - Crouching facing right
+		08 - Using sword facing left
+		09 - Using sword facing right
+		0A - Using bow facing left
+		0B - Using bow facing right
+		0C - Crouching using bow facing left
+		0D - Crouching using bow facing right
+		12 - Crouching using sword facing left
+		13 - Crouching using sword facing right
+
+0x0407: Player Y location
+	- Screen ranges from 00-ff (screen coords, not map coords)
+
+0x0409: Player X location
+	- Screen ranges from 00-ff (screen coords, not map coords)
+
+0x0421: Player direction
+	- Values:
+		00 - Player is facing left
+		01 - Player is facing right
+
+0x0422: Player is in air (boolean)
+	- Values:
+		00 - Player is on ground
+		01 - Player is in air (either jumping or coming down stairs)
+
+--------------------------------------------------------------------------------
+
+SIGN OBJECT 0x04C0-0x04FF
+
+--------------------------------------------------------------------------------
+
+0x04CE: Sign sprite
+	- Affects which type of sign is displayed
+	- Values:
+		00 - Village Harfoot
+		01 - Village Amon
+		02 - Village Dwarle
+		03 - Village Ithile
+		04 - Town Pharazon
+		05 - Town Shagart
+		06 - Town Lindon
+		07 - Castle Varlin
+		08 - Castle Elder
+		09-FF - Glitch [UNTESTED]
+
+0x04CF: Sign Display timer (1 byte)
+	- Decrements when a sign is being displayed
+
+--------------------------------------------------------------------------------
+
+ENEMY OBJECTS
+
+--------------------------------------------------------------------------------
+
+0x0500-0x09FF Enemy Object Data
+	- This data populates per route with several individual enemy objects
+	- Each enemy has several paramaters, the addresses below are relative to 0x0000 in the enemy object
+		- 0x0030 Respawn timer (2 bytes, little endian)
+			- Decrements from 0x00FF (could be 0x0100 [UNTESTED]) when the enemy is killed
+			- Locks at 01 if the enemy is too close to the player to respawn
+			- If the timer is at 01 and the player is far enough away, this will hit 00 and the enemy will respawn
+		- 0x0034 Boss health
+			- The health that the boss is currently on
+		- 0x003A Current Health
+			- After death, this resets to the maximum health of the enemy type, even if it has not yet respawned
+		- 0x003E Boss defeated
+			- After death, the boss object is deleted, apart from this byte which is then set to 01
+
+--------------------------------------------------------------------------------
+
+FLAGS
+
+--------------------------------------------------------------------------------
+
+0x0C10-0x0CAF Event flags
+
+0x0C12: Whether the wizard has given the player the book
+
+0x0C32: Whether the player has seen "Hast thou met the tree people"
+
+0x0CA8: Sword damage
+	01 - Default
+	02 - Post Morgor Beast (get from wizard)
+	03 - Post Ragoan (ragoan drops)
+
+0x0CA9: Bow damage
+	01 - Default
+	02 - Post Goblin (Ithile mario)
+	03 - Final boss dungeon (Left of enterance)
+
+0x0CAA: Whether the Book is in the inventory
+	00 - Not in inventory
+	01 - Is in inventory
+
+0x0CAB: Whether the Tree Limb is in the inventory
+	00 - Not in inventory
+	01 - Is in inventory
+
+0x0CAC: Whether the Herb is in the inventory
+	00 - Not in inventory
+	01 - Is in inventory
+
+0x0CAE: Continue checkpoint byte
+	- The checkpoint that the game will warp to after pressing continue
+	- Uses the same checkpoint values as 0x0098
+	- This byte can be used to warp (although it is an inefficient method, see 0x00A1 for a better warp method)
+		1: Die on any map
+		2: Change 0x0CAE to desired checkpoint value (See 0x0098) while on title screen
+		3: Press continue
+
+0x0CAF: Number of lives lost in current game
+	- Increments every time continue is pressed, not when death occurs
+	- When you die, if this byte is 0A the menu puts the cursor on start automatically
+		- Interestingly, If the byte is greater than 0A the screen will still point to continue
+	- If continue is pressed when byte >= 0A, it resets to 01
+	- Would be interesting to test what happens when it is set to FF and continue is pressed [UNTESTED]
+
+--------------------------------------------------------------------------------
+
+LEVEL LAYOUT
+
+--------------------------------------------------------------------------------
+
+0x1000+: Level Layout
+	- A level is comprised by a number of 16*16 tiles
+		- There are a constant 11 vertical 16*16 tiles in a level (the very top 16 pixels are reserved for the HUD)
+		- The level is variably sized horizontally
+		- A 16*16 tile is comprised of 4 8*8 tiles
+
+Tile Values in Amon:
+	- 0x00 Blue sky (empty tile)
+	- 0x01 Top left tile of big tree
+	- 0x02 
+
+--------------------------------------------------------------------------------
+
+SOUND
+
+--------------------------------------------------------------------------------
+
+0x1E00-0x1FFF: Sound state
+
+0x1E03: Music
+	- Values > 0x80 work
+
+0x1EB2: Drum channel 1 state
+	- Values (Harfoot):
+		- 0x3F Quiet closed Hi-Hat
+		- 0x40 Loud Snare
+		- 0x41 Quiet closed Hi-Hat
+		- 0x42 Bassdrum
+
+--------------------------------------------------------------------------------
+
+VRAM
+
+--------------------------------------------------------------------------------
+
+0x3800: Screen start in 8X8 tiles
+	- Used for the background layer
+	- 2 bytes per 8*8 tile on screen
+	- Format is [TILE MODIFICATIONS] [INDEX IN TILESET] in little endian
+		- Tile modifications can include:
+			- Vertical rotation
+			- Horizontal rotation

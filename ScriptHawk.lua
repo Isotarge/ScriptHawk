@@ -392,6 +392,12 @@ local supportedGames = {
 	["AF51AB03A173DEC28C9241532227CD64"] = {["moduleName"] = "games.impossible_mission", ["friendlyName"] = "Impossible Mission (E)"},
 	["A26D40B6B7646C22D1F2DB7F746F0391"] = {["moduleName"] = "games.impossible_mission", ["friendlyName"] = "Impossible Mission (E) (Beta)"},
 
+	-- Lord of the Sword
+	["6A08D913FD92A213B1ECF5AA7C5630362CCCC6B4"] = {["moduleName"] = "games.lots", ["friendlyName"] = "Lord of the Sword (J)"},
+	["A5736126ED7E8569A189065EC20ADF72"] = {["moduleName"] = "games.lots", ["friendlyName"] = "Lord of the Sword (J)"},
+	["A5326A0029F7C3101ADD3335A599A01CCD7634C5"] = {["moduleName"] = "games.lots", ["friendlyName"] = "Lord of the Sword (UE)"},
+	["B80F87887881343E5705FF3CCE93C5F1"] = {["moduleName"] = "games.lots", ["friendlyName"] = "Lord of the Sword (UE)"},
+
 	-- Majora's Mask
 	["B38B71D2961DFFB523020A67F4807A4B704E347A"] = {["moduleName"] = "games.mm", ["friendlyName"] = "Legend of Zelda, The - Majora's Mask (Europe) (En,Fr,De,Es) (Beta)"},
 	["BB4E4757D10727C7584C59C1F2E5F44196E9C293"] = {["moduleName"] = "games.mm", ["friendlyName"] = "Legend of Zelda, The - Majora's Mask (Europe) (En,Fr,De,Es) (Rev A)"},

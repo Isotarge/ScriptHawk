@@ -1,0 +1,29 @@
+Misc Lord of the Sword notes
+
+- Pirate has 30 health
+- Demon has 50 health
+
+- Warp to Harfoot, usable on actual hardware without memory editing or corruption.
+	- Can be used to bypass long travel sections, ie. back from Ithile or back from Pirate/Castle Elder
+	- Procedure:
+		1. Die or soft reset on any route
+		2. Wait for demo to begin
+		3. End demo by pressing a button
+		4. Press continue	
+		5. You will respawn on the same route as the demo (1 route right of Harfoot)
+
+- Buildings (that don't heal fully) heal for 1/6 of the players health
+	- Buildings that heal, cap the player at 47/48 health
+
+Enemy Damage:
+
+The flying sideways bats (the ones that don't swoop)
+	- 02 damage (1/24 max health)
+The floating eyes
+	- 08 damage (1/6 max health)
+The projectiles of the forest spitty things
+	- 01 damage (1/48 max health)
+The body of the forest spitty green things
+	- 03 damage (1/16 max health)
+The groudons 
+	- 06 damage (1/8 max health)

@@ -1,0 +1,55 @@
+JP ROUTE
+
+Start 01
+	Harfoot -> Wizard
+	Wizard -> Varlin -> Ulmo
+Reset (to Amon)
+	Amon -> Pharazon -> Namo
+Reset (to Pharazon?)
+	Ithile -> Swamp Spirit
+Reset (to Ithile)
+	Pharazon -> Lindon
+	Dwarle -> Pirate
+	Duels
+Reset (to Dwarle)
+	Wizard
+	Pharazon
+	Pharazon boss
+Reset (to Pharazon)
+	Pharazon
+	Lindon
+	Shagart
+	Ra Goan
+Reset (to Shagart?)
+	Varlin
+
+US Route
+
+Start 01
+	Wizard
+	Ulmo
+Reset 02 (demo glitch)
+	Namo
+Reset 03 (map skip, no demo glitch)
+	Don't talk to Pharazon
+	Talk to Ithile
+	Swamp Spirit
+Reset 04 (demo glitch)
+	Don't talk to Dwarle
+	Lindon
+	Pirate
+	Duels
+Reset 05 (demo glitch)
+	Talk to Wizard
+Reset 06 (Amon map skip)
+	Talk to Pharazon
+SKIPPED Reset 07 (Pharazon map skip due to continue shortage)
+	Pharazon boss
+Reset 07 (dungeon skip)
+	Talk to Pharazon
+Reset 08 (demo glitch)
+	Lindon
+	Shagart
+	Ra Goan (Pause glitch)
+Reset 09 (demo glitch)
+	Varlin

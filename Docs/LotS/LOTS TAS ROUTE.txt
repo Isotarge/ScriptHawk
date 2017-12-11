@@ -1,0 +1,52 @@
+Start 01
+	Wizard
+	Ulmo
+Reset 02 (demo glitch)
+	Namo
+Reset 03 (map skip, no demo glitch)
+	Don't talk to Pharazon
+	Talk to Ithile
+	Swamp Spirit
+Reset 04 (demo glitch)
+	Don't talk to Dwarle
+	Lindon
+	Pirate
+	Duels
+Reset 05 (demo glitch)
+	Talk to Wizard
+Reset 06 (Amon map skip)
+	Talk to Pharazon
+SKIPPED Reset 07 (Pharazon map skip due to continue shortage)
+	Pharazon boss
+Reset 07 (dungeon skip)
+	Talk to Pharazon
+Reset 08 (demo glitch)
+	Lindon
+	Shagart
+	Ra Goan (Pause glitch)
+Reset 09 (demo glitch)
+	Varlin
+
+0CAA 01 - 00 bk burn
+0C48 0C49 0C4A 0C4B 00-01
+0C1C 00-01
+0C01 00-01
+
+16:04.375 964.375
+14:25.764 865.764
+
+This is a tool assisted speedrun of Lord of the Sword for the Sega Master System completed in 14:07.424 by Isotarge.
+
+The speedrun is the result of well over 100 hours of work with 4 complete playthroughs of the game to improve optimization totaling 73,800 rerecords. I exclusively used TAStudio, a relatively new feature of BizHawk along with a RAM watch started in 2012 by myself and my brother, The8bitbeast.
+
+Firstly I will explain a few tricks and glitches used throughout this run, the most obvious of which I like to call "knockback cancelling" and "action chaining" or more specifically, "jump chaining". These glitches were found during my first pass through the game on the way to Pharazon when I noticed that getting damaged on the way down from a jump resulted in Landau receiving knockback but no damage since the knockback is cancelled when hitting the ground. This is the easiest way to achieve a knockback cancel and is the most commonly used setup throughout the run. I was searching for the earliest frame that I could jump after this phenomenon and noticed that the jump went a lot further than normal. I quickly found that hitting the earliest jump frame multiple times after the initial knockback cancel results in the horizontal velocity not being reset upon landing, eventually building up some serious speed. Normal glitchless movement has horizontal velocity of anywhere from 0 to 256 where as knockback cancelled jump chains often reach speeds upwards of 1500-2000. This quickly became the most common and usually the fastest form of movement used throughout the TAS.
+
+The most difficult part of optimizing this game is getting the knockback cancel as quickly as possible. Sometimes it's as simple as walking left or right and jumping but other times projectile cycles and inconvenient enemy placement means very tight jumps or unconventional setups are required. During my third optimization pass I realized that it's possible to cancel knockback simply by walking off of an edge while an enemy is under Landau meaning a jump was no longer required. This find resulted in many seconds saved over multiple maps.
+
+Another difficulty associated with jump chaining is avoiding additional knockback during the aerial sections as it resets Landau's horizontal velocity to -512 or 512 depending on which direction the enemy was in relation to Landau when the damage was taken, requiring a second knockback cancel to get the chain restarted and overall losing a lot of time. The most common way to avoid this is to use the sword during a jump to kill enemies blocking the path, but this has a consequence of locking horizontal velocity while the sword animation is playing, meaning that the chain is no longer gaining speed. The fastest strategy is to start sword attacks as late as possible to preserve acceleration. The sword can also be used in a few cases to move Landau's hurtbox forward very slightly which can result in clips through enemies, skipping frames where Landau would have taken damage to keep the chain going.
+
+Another significant glitch is one found by myself and my brother back in 2012. Upon dying or a soft reset the game allows the player to continue with their game without losing much progress. Normally this will respawn Landau on the map he died on but if the demo plays before the player presses continue Landau will spawn on the level to the right of Harfoot, regardless of where the player died or reset. This is used in multiple places during the run to skip extra backtracking. Unfortunately one instance of this trick had to be skipped since the game only allows the player to continue without losing their progress a total of 8 times.
+
+The last glitch I like to call "last frame pausing" or LFP for short. Pausing the game in a town or city shows a map screen. Doing this on the last frame before a map transition will spawn Landau at his current coordinates in the town but on the next map. This can be used to skip entire levels and is used after every town or city. I also use LFP when entering the door in Shagart to skip the majority of Ra Goan's dungeon.
+
+I would like to thank The8bitbeast for helping me route and discover many things about this game, this time would not have been possible without him. He also holds the RTA WR for this game at 44:39 which is available for your viewing pleasure here https://www.youtube.com/watch?v=_ZU-3PjF374

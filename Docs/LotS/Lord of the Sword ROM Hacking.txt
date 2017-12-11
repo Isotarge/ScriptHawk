@@ -1,0 +1,295 @@
+Lord of the Sword - ROM Hacking guide
+
+By Isotarge and The8bitbeast
+
+Sections:
+	- SYSTEM
+	- CODE
+	- MISC
+	- BOSS AND DUEL HEALTH
+	- TILESETS
+	- TEXT
+	- MAPS
+
+--------------------------------------------------------------------------------
+
+                                 SYSTEM
+
+--------------------------------------------------------------------------------
+
+Bankswitching:
+
+The ROM consists of 16 banks at 16 kilobytes each totalling 256 KB.
+
+Because the Master System had an 8 bit address space, a maximum of 128 Kilobytes of ROM data could be loaded at one time leaving no space for RAM or for the system.
+
+Because of this limitation, SEGA implemented a bankswitching scheme to allow more data to be loaded.
+
+The first bank contains boot code and most of the game logic, the rest contain small portions of code at the start followed by large chunks of game assets such as tiles, music and text.
+
+It is common to find free space at the end of each bank marked as 0xFF in the ROM which can be utilized by hackers to add extra data to the game in most cases.
+
+The bank borders in ROM are as follows:
+
+Bank 0:  0x00000 - 0x03FFF
+Bank 1:  0x04000 - 0x07FFF
+Bank 2:  0x08000 - 0x0BFFF
+Bank 3:  0x0C000 - 0x0FFFF
+
+Bank 4:  0x10000 - 0x13FFF
+Bank 5:  0x14000 - 0x17FFF
+Bank 6:  0x18000 - 0x1BFFF
+Bank 7:  0x1C000 - 0x1FFFF
+
+Bank 8:  0x20000 - 0x23FFF
+Bank 9:  0x24000 - 0x27FFF
+Bank 10: 0x28000 - 0x2BFFF
+Bank 11: 0x2C000 - 0x2FFFF
+
+Bank 12: 0x30000 - 0x33FFF
+Bank 13: 0x34000 - 0x37FFF
+Bank 14: 0x38000 - 0x3BFFF
+Bank 15: 0x3C000 - 0x3FFFF
+
+These values are useful to have when searching for pointers, because the code does not use the raw address in the ROM, but an address relative to a bank.
+
+For example, the font's compressed 8*8 tiles are located at 0x1806A in ROM, but when loading them, the code references this location relative to 0x10000 or relative to bank 4.
+
+Because of this relativity, the pointer is stored as 0x806A or the bytes 0x6A, 0x80 in ROM (Notice the endianness).
+
+--------------------------------------------------------------------------------
+
+                                   CODE
+
+--------------------------------------------------------------------------------
+
+This section contains the pointers to interesting functions in ROM
+
+Object process function
+	- Location in ROM 0x006C7
+	- Called during the main object loop if the first byte of the object is not zero
+
+--------------------------------------------------------------------------------
+
+                                   MISC
+
+--------------------------------------------------------------------------------
+
+Default checkpoint byte:
+	- Changing these bytes will change the checkpoint the player spawns on by default when the player presses start on the title screen
+	- The default value is 0x5E, or Harfoot, coming in from the left
+	- The bytes in ROM to change:
+		- 0x00BE
+		- 0x05EE
+		- 0x09A8
+
+Landau default coat Pallete colours
+	- This is the colour that is displayed when the player first starts the game, before he is hit
+	- The byte in ROM to change:
+		- 0x09D1 (outer coat?) (default 0x09, better 0x25)
+		- 0x09D2 (inner coat?) (default 0x05, better 0x10)
+
+Landau recovery (dark) Pallete colour:
+	- When the player is hit, the colour of Landau's coat flashes between 2 colours
+		- In this document, the two colours are labelled "dark" and "light"
+		- These bytes refer to the dark colour used during recovery
+	- This colour is also permanently used to colour Landau's coat after the player has been hit
+		- This will not reset until the player dies
+	- The bytes in ROM to change:
+		- 0x1511
+		- 0x1516
+
+Landau recovery (light) Pallete colour:
+	- When the player is hit, the colour of Landau's coat flashes between 2 colours
+		- In this document, the two colours are labelled "dark" and "light"
+		- This byte refers to the light colour used during recovery
+	- The byte in ROM to change:
+		- 0x151D
+
+Building health recovery cap
+	- When the player enters a building to be healed and the maximum health (0x30) is met or surpassed, the player's health is reverted back to the value located in this byte
+	- It is possible to set this byte higher than 0x30 (48, max health) but when the player is hit, the health will roll back to 0, not instantly killing the player, but leaving him 1 hit away from death
+	- The byte in ROM to change
+		0x1881
+
+--------------------------------------------------------------------------------
+
+                           BOSS AND DUEL HEALTH
+
+--------------------------------------------------------------------------------
+
+Tree boss health
+	- Default value 0x14 (20 decimal)
+	- The byte in ROM to change:
+		- 0x3F30
+
+Goblin boss health
+	- Default value 0x08 (8 decimal)
+	- The byte in ROM to change:
+		- 0x4266
+
+Pirate boss health
+	- Default value 0x1E (30 decimal)
+	- The byte in ROM to change:
+		- 0x485D
+
+Beast boss health
+	- Default value 0x32 (50 decimal)
+	- The byte in ROM to change:
+		- 0x459C
+
+Second last boss health
+	- Default value 0x14 (20 decimal)
+	- The byte in ROM to change:
+		- 0x4AA8 
+
+Last boss health
+	- Default Value 0x3C (60 decimal)
+	- The byte in ROM to change:
+		- 0x4EA2
+
+Medusa boss health
+	- Default value 0x64 (100 decimal)
+	- The byte in ROM to change:
+		- 0x67A0
+
+
+Duel 1-4 health
+	- Default value 0x10 (16 decimal)
+	- The bytes in ROM to change:
+		- Duel 1: 0x5E84
+		- Duel 2: 0x5FDD
+		- Duel 3: 0x619B
+		- Duel 4: 0x6444
+
+Duel 5 health
+	- Default value 0x0A (10 decimal)
+	- The byte in ROM to change
+		- 0x6642
+
+--------------------------------------------------------------------------------
+
+                                 TILESETS
+
+--------------------------------------------------------------------------------
+
+Sega logo: 0x0B603
+
+The top character tilesets (SCORE, health bar and inventory) are stored using a standard compression algorithm.
+
+It is known as "8-bit tile compression scheme A"
+
+The data for this tileset is located at 0x0EAED in ROM
+The pointer for the compressed data is located at: 0x009EB in ROM
+	- Pointer is relative to 0x04000 in ROM or the start of bank 1
+
+The icons for swords and bows dropped on the ground are also stored with this scheme at similar locations.
+
+The title screen is stored in this scheme, at 0x15549 in ROM.
+
+It appears that alot of art in the ROM is stored in this manner.
+
+Further investigation is needed.
+
+--------------------------------------------------------------------------------
+
+Font Tileset data:
+
+- The VRAM data for the font tiles (8*8) used in the game is loaded from the bank starting 0x18000, but the pointer is stored relative to 0x10000.
+
+2 byte little endian pointer to compressed font 8x8 data
+	- Default value: 0x6a 0x80 (points to 0x806a in bankswitched ROM relative to 0x10000 and 0x1806a in the ROM image)
+	- The bytes in rom to change
+		- 0x1F9D (House)
+		- 0x6B74 (Scroll at start of game)
+		- 0x6ED0
+
+The compression algorithm:
+
+Let's say we want to compress this data:
+
+	00 00 00 00 05 00 00 00
+
+The compressed form would be:
+
+	      01?
+	04 00 81 05 03 00
+
+Saving a total of 2 bytes in ROM.
+
+The format is:
+
+[NUMBER OF BYTES] [DATA BYTE]
+
+This long block of compressed data appears to be "00 12" terminated.
+
+Other tile data appears to follow this data in ROM but seems to use a different compression scheme.
+
+--------------------------------------------------------------------------------
+
+                                   TEXT
+
+--------------------------------------------------------------------------------
+
+LOTSCII Text scheme
+
+The text seen in the game is located between 1A030 and 1ABC5
+
+Most text in the ROM is encoded using this scheme:
+
+20 = SPACE
+21 = A
+22 = B
+23 = C
+24 = D
+25 = E
+26 = F
+27 = G
+28 = H
+29 = I
+2a = J
+2b = K
+2c = L
+2d = M
+2e = N
+2f = O
+30 = P
+31 = Q
+32 = R
+33 = S
+34 = T
+35 = U
+36 = V
+37 = W
+38 = X
+39 = Y
+3A = Z
+
+3B = ,
+3C = .
+3D = !
+3E = 5
+3F = '
+40 = ?
+41 = [DOT IN CENTER OF 8*8]
+42 = 1
+43 = 2
+44 = 3
+
+94 = Newline? [UNTESTED]
+
+P  L  A  Y  E  R
+30 2c 21 39 25 32
+
+L  A  N  D  A  U
+2c 21 2e 24 21 35
+
+--------------------------------------------------------------------------------
+
+                                   MAPS
+
+--------------------------------------------------------------------------------
+
+Maps are stored in the rom using the same compression scheme as font pixel data.
+
+The start of the actual map data for AMON is located at 0x314AC with the bytes: 0x05 0x00
