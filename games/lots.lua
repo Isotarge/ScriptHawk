@@ -27,15 +27,7 @@ local Game = {
 		sword_damage = 0xCA8,
 		bow_damage = 0xCA9,
 		--[[
-		0x44A	b	u	0	Main RAM	Arrow X Position (Screen)
-		0x507	b	u	0	Main RAM	Boss Y Position (Screen)
-		0x50A	b	u	0	Main RAM	Boss X Position (Screen)
-		0x511	b	s	0	Main RAM	Boss Y Velocity
-		0x522	b	u	0	Main RAM	Boss Teleport Timer
-		0x524	b	u	0	Main RAM	Boss Flash Timer
-		0x534	b	u	0	Main RAM	Boss Health
-		0x591	b	s	0	Main RAM	Skeleton Y Velocity
-		0x5B4	b	u	0	Main RAM	Boss Minion Health
+
 		0xCA0	b	u	0	Main RAM	Book is burnable
 		--]]
 	},
@@ -46,8 +38,8 @@ local Game = {
 		"04 - Swamp (Dwarle +1DR) (Lindon +1L) (Right)",
 		"05 - Swamp (Pharazon +1R) (Left)",
 		"06 - Swamp (Pharazon +1R) (Right)",
-		"07 - Swamp (Harfoot +1R) (Left) (Demo)",
-		"08 - Swamp (Harfoot +1R) (Right)",
+		"07 - Swamp (Harfoot +1R) (Amon +2L) (Left) (Demo)",
+		"08 - Swamp (Harfoot +1R) (Amon +2L) (Right)",
 		"09 - Swamp (Ithile +3R) (Left)",
 		"0A - Swamp (Ithile +3R) (Right)",
 		"0B - Swamp (Dwarle +1UR) (Left)",
@@ -58,32 +50,32 @@ local Game = {
 		"10 - Swamp (Pharazon +1DL) (Right)",
 		"11 - Swamp (Ithile +1R) (Left)",
 		"12 - Swamp (Ithile +1R) (Right)",
-		"13 - Swamp (Harfoot +1L) (Left)",
-		"14 - Swamp (Harfoot +1L) (Right)",
+		"13 - Swamp (Harfoot +1L) (Medusa +3R) (Left)",
+		"14 - Swamp (Harfoot +1L) (Medusa +3R) (Right)",
 		"15 - Swamp (Pharazon +1UR) (Right)",
 		"16 - Swamp (Pharazon +1UR) (Right)",
 		"17 - Swamp (Shagart +1R) (Left)",
 		"18 - Swamp (Shagart +1R) (Right)",
-		"19 - Swamp (Lindon +1R) (Left)",
-		"1A - Swamp (Lindon +1R) (Right)",
+		"19 - Swamp (Lindon +1R) (Pirate +2L) (Left)",
+		"1A - Swamp (Lindon +1R) (Pirate +2L) (Right)",
 		"1B - Swamp (Pharazon +1UL) (Left)",
 		"1C - Swamp (Pharazon +1UL) (Right)",
 		"1D - Swamp (Castle Elder +1L) (Left)",
 		"1E - Swamp (Castle Elder +1L) (Right)",
-		"1F - Swamp (Ithile +1L) (Left)",
-		"20 - Swamp (Ithile +1L) (Right)",
+		"1F - Swamp (Ithile +1L) (Goblin +3R) (Left)",
+		"20 - Swamp (Ithile +1L) (Goblin +3R) (Right)",
 		"21 - Swamp (Varlin +1UL) (Left)",
 		"22 - Swamp (Varlin +1UL) (Right)",
-		"23 - Forest (Amon +1L) (Left)",
-		"24 - Forest (Amon +1L) (Right)",
+		"23 - Forest (Amon +1L) (Harfoot +2R) (Left)",
+		"24 - Forest (Amon +1L) (Harfoot +2R) (Right)",
 		"25 - Forest (Amon +1UL) (Left)",
 		"26 - Forest (Amon +1UL) (Right)",
-		"27 - Forest (Pharazon +2DL) (Namo +1R) (Left)",
-		"28 - Forest (Pharazon +2DL) (Namo +1R) (Right)",
+		"27 - Forest (Namo +1R) (Pharazon +2DL) (Left)",
+		"28 - Forest (Namo +1R) (Pharazon +2DL) (Right)",
 		"29 - Forest (Ulmo +1R) (Left)",
-		"2A - Forest (Ulmo +1R) (Left)",
-		"2B - Forest (Harfoot +2L) (Left)",
-		"2C - Forest (Harfoot +2L) (Right)",
+		"2A - Forest (Ulmo +1R) (Right)",
+		"2B - Forest (Medusa +2R) (Harfoot +2L) (Left)",
+		"2C - Forest (Medusa +2R) (Harfoot +2L) (Right)",
 		"2D - Forest (Amon +1R) (Left)",
 		"2E - Forest (Amon +1R) (Right)",
 		"2F - Forest (???) (Left)",
@@ -103,10 +95,10 @@ local Game = {
 		"3D - Coast (Ithile +2R) (Right)",
 		"3E - Coast (???) (Left)",
 		"3F - Coast (???) (Right)",
-		"40 - Cave (Ragoan +1R) (Left)",
-		"41 - Cave (Ragoan +1R) (Right)",
-		"42 - Cave (Ithile +3L) (Goblin +1R) (Left)",
-		"43 - Cave (Ithile +3L) (Goblin +1R) (Right)",
+		"40 - Cave (Dark Suma +1R) (Left)",
+		"41 - Cave (Dark Suma +1R) (Right)",
+		"42 - Cave (Swamp Spirit +1R) (Ithile +3L) (Left)",
+		"43 - Cave (Swamp Spirit +1R) (Ithile +3L) (Right)",
 		"44 - Mountains (Amon +2UL) (Pharazon +2R) (Left)",
 		"45 - Mountains (Amon +2UL) (Pharazon +2R) (Right)",
 		"46 - Mountains (???) (Left)",
@@ -123,20 +115,20 @@ local Game = {
 		"51 - Mountains (Pharazon +2UR) (Top Left Stairs)",
 		"52 - Mountains (???) (Left)",
 		"53 - Mountains (???) (Right)",
-		"54 - Mountains 3 (Harfoot +3L) (Statue +1R) (left)",
-		"55 - Mountains 3 (Harfoot +3L) (Statue +1R) (right)",
-		"56 - Mountains 3 (Pharazon +1UL+3L+Stairs) (Left)",
-		"57 - Mountains 3 (Pharazon +1UL+3L+Stairs) (Right)",
-		"58 - Mountains 2 (Ra goan +2R) (Left)",
-		"59 - Mountains 2 (Ra goan +2R) (Right)",
-		"5A - Dark Forest (Ithile +2L) (Left)",
-		"5B - Dark Forest (Ithile +2L) (Right)",
-		"5C - Dark Forest (Pirate +1L) (Left)",
-		"5D - Dark Forest (Pirate +1L) (Right)",
+		"54 - Mountains (Medusa +1R) (Harfoot +3L) (Left)",
+		"55 - Mountains (Medusa +1R) (Harfoot +3L) (Right)",
+		"56 - Mountains (Pharazon +1UL+3L+Stairs) (Left)",
+		"57 - Mountains (Pharazon +1UL+3L+Stairs) (Right)",
+		"58 - Mountains (Dark Suma +2R) (Left)",
+		"59 - Mountains (Dark Suma +2R) (Right)",
+		"5A - Dark Forest (Ithile +2L) (Swamp Spirit +2R) (Left)",
+		"5B - Dark Forest (Ithile +2L) (Swamp Spirit +2R) (Right)",
+		"5C - Dark Forest (Pirate +1L) (Lindon +2R) (Left)",
+		"5D - Dark Forest (Pirate +1L) (Lindon +2R) (Right)",
 		"5E - Harfoot (Left)",
 		"5F - Harfoot (Right)",
-		"60 - Ithile (left)",
-		"61 - Ithile (right)",
+		"60 - Ithile (Left)",
+		"61 - Ithile (Right)",
 		"62 - Amon (Left)",
 		"63 - Amon (Right)",
 		"64 - Amon (Left Stairs)",
@@ -165,15 +157,15 @@ local Game = {
 		"7B - Varlin (Top Left, Closed)",
 		"7C - Varlin (Bottom Left, Open)",
 		"7D - Varlin (Top Left, Open)",
-		"7E - Ra Goan's dungeon 1F (Bottom Left)",
-		"7F - Ra Goan's dungeon 1F (Top Left)",
-		"80 - Ra Goan's dungeon 2F",
-		"81 - Ra Goan's dungeon 3F",
-		"82 - Shagart Dungeon, Entrance",
-		"83 - Shagart Dungeon, Boss Room",
-		"84 - Shagart Dungeon, B1F",
-		"85 - Shagart Dungeon, B2F",
-		"86 - Shagart Dungeon, B3F",
+		"7E - Dark Suma's Dungeon 1F (Bottom Left)",
+		"7F - Dark Suma's Dungeon 1F (Top Left)",
+		"80 - Dark Suma's Dungeon 2F",
+		"81 - Dark Suma's Dungeon 3F",
+		"82 - Ra Goan's Dungeon Entrance",
+		"83 - Ra Goan's Dungeon Boss Room",
+		"84 - Ra Goan's Dungeon B1F",
+		"85 - Ra Goan's Dungeon B2F",
+		"86 - Ra Goan's Dungeon B3F",
 	},
 	map_states = {
 		[0x00] = "Reset",
@@ -190,12 +182,12 @@ local Game = {
 		[0x02] = "Building",
 		[0x03] = "Boss Fight",
 		[0x04] = "Map Screen",
-		[0x05] = "Game End Sequence",
+		[0x05] = "Ending",
 		[0x06] = "Death",
 	},
 	movement_states = {
-		[0x00] = "Idle (L)",
-		[0x01] = "Idle (R)",
+		[0x00] = "Walking (L)",
+		[0x01] = "Walking (R)",
 		[0x02] = "Jumping (L)",
 		[0x03] = "Jumping (R)",
 		[0x04] = "Falling (L)",
@@ -320,24 +312,243 @@ function Game.getMovementState()
 	return "Unknown "..toHexString(state);
 end
 
-function Game.eachFrame()
+local object_size = 0x40;
+local object_array_base = 0x400;
+local object_array_capacity = 23;
+local object_fields = {
+	object_type = 0x00,
+	x_position = 0x0A,
+	y_position = 0x07,
+	object_loaded = 0x0B,
+	y_velocity = 0x11,
+	currentHP = 0x3A,
+	bossHP = 0x34,
+	boss_defeated = 0x3E,
+	boss_teleport_timer = 0x22,
+	boss_flash_timer = 0x24,
+	object_types = {
+		--[0x00] = "Null",
+		[0x01] = {name="Player"},
+		[0x02] = {name="Arrow"},
+		[0x04] = {name="Arrow Upgrade"},
+		[0x05] = {name="Sign"},
+		[0x10] = {name="Slime"}, -- Dungeon
+		[0x11] = {name="Eye Part"}, -- Forest
+		[0x12] = {name="Bat"},
+		[0x13] = {name="Bird"},
+		[0x14] = {name="Fish"},
+		[0x15] = {name="Clown"},
+		[0x16] = {name="Knight"},
+		[0x17] = {name="Scorpion"},
+		[0x18] = {name="Spider"}, -- Mountain
+		[0x19] = {name="Wolf"},
+		[0x1A] = {name="Caterpillar"},
+		[0x1B] = {name="Eye Part"}, -- Forest
+		[0x1C] = {name="Skeleton"},
+		[0x1D] = {name="Demon"}, -- Red Flying Thingy
+		[0x1E] = {name="Snake"},
+		[0x1F] = {name="Bat"},
+		[0x20] = {name="Plant"}, -- Floating up and down and shooting (forest plant killymajig)
+		[0x21] = {name="Goblin"}, -- Fall down from top, steal book
+		[0x23] = {name="Kicky Guy"}, -- Mountain
+		[0x24] = {name="Dinosaur"}, -- Red, forest, jumps
+		[0x25] = {name="Dinosaur"}, -- Green, jumps from bottom of screen
+		[0x26] = {name="Skeleton"}, -- Cave, shoots projectiles
+		[0x27] = {name="Damaged"}, -- Killed Knight
+		[0x28] = {name="Snake"}, -- Cave, shoots projectiles
+		[0x29] = {name="Projectile"}, -- Plant
+		[0x2A] = {name="Damaged"}, -- Killed or off edge of screen
+		[0x2B] = {name="Tree Spirit", isBoss=true},
+		[0x2C] = {name="Projectile"}, -- Tree Spirit
+		[0x2D] = {name="Projectile"}, -- Tree Spirit
+		[0x2E] = {name="Swamp Spirit", isBoss=true},
+		[0x2F] = {name="Stone Hammer", isBoss=true}, -- Second Duel
+		[0x31] = {name="Clone", isBoss=true}, -- Swamp Spirit's Minion
+		[0x32] = {name="Golden Guard", isBoss=true}, -- Third Duel
+		[0x33] = {name="Paradin", isBoss=true}, -- Fifth Duel
+		[0x34] = {name="Pirate", isBoss=true},
+		[0x35] = {name="Projectile"}, -- Pirate Boss' Sword
+		[0x36] = {name="Medusa", isBoss=true},
+		[0x37] = {name="Demon Boss", isBoss=true},
+		[0x39] = {name="Court Jester", isBoss=true}, -- Fourth Duel
+		[0x3A] = {name="The Ripper", isBoss=true}, -- First Duel
+		[0x3C] = {name="Projectile"}, -- Court Jester
+		[0x3D] = {name="Skull"}, -- Dark Suma
+		[0x40] = {name="Projectile"}, -- Ra Goan
+		[0x41] = {name="Projectile"}, -- Ra Goan
+		[0x42] = {name="Ra Goan", isBoss=true},
+	},
+};
+
+local draggedObjects = {};
+function Game.drawUI()
 	if Game.isRecovering() then
 		Game.OSD = Game.recoveryOSD;
 	else
 		Game.OSD = Game.standardOSD;
 	end
+	local row = 0;
+	local height = 16;
+
+	local drawHitboxes = forms.ischecked(ScriptHawk.UI.form_controls["Object Hitboxes Checkbox"]);
+	local drawList = forms.ischecked(ScriptHawk.UI.form_controls["Object List Checkbox"]);
+	local draggableHitboxes = forms.ischecked(ScriptHawk.UI.form_controls["Draggable Hitboxes Checkbox"]);
+
+	if drawHitboxes or drawList then
+		-- Draw Objects
+		local height = 16; -- Text row height
+		local width = 8; -- Text column width
+		local mouse = input.getmouse();
+
+		-- Draw mouse pixel
+		--gui.drawPixel(mouse.X, mouse.Y, colors.red);
+
+		local startDrag = false;
+		local dragging = false;
+		local dragTransform = {0, 0};
+
+		if draggableHitboxes then
+			if mouse.Left then
+				if not mouseClickedLastFrame then
+					startDrag = true;
+					startDragPosition = {mouse.X, mouse.Y};
+				end
+				mouseClickedLastFrame = true;
+				dragging = true;
+				dragTransform = {mouse.X - startDragPosition[1], mouse.Y - startDragPosition[2]};
+			else
+				draggedObjects = {};
+				mouseClickedLastFrame = false;
+				dragging = false;
+			end
+		end
+
+		local row = 0;
+		for i = 0, object_array_capacity do
+			local objectBase = object_array_base + (i * object_size);
+			local objectType = mainmemory.readbyte(objectBase + object_fields.object_type);
+			local objectLoaded = mainmemory.readbyte(objectBase + object_fields.object_loaded);
+			local objectTypeTable = nil;
+			local color = nil;
+			if objectType > 0 and objectLoaded == 0 then
+				-- Default to 16 width/height for hitbox
+				local hitboxWidth = 16;
+				local hitboxHeight = 16;
+
+				-- Get the X and Y position of the object
+				local xPosition = mainmemory.readbyte(objectBase + object_fields.x_position);
+				local yPosition = mainmemory.readbyte(objectBase + object_fields.y_position);
+
+				local currentHP = mainmemory.readbyte(objectBase + object_fields.currentHP);
+
+				if type(object_fields.object_types[objectType]) == "table" then
+					objectTypeTable = object_fields.object_types[objectType];
+
+					if type(objectTypeTable.name) == "string" then
+						objectType = object_fields.object_types[objectType].name;
+					else
+						objectType = "Unknown "..toHexString(objectType);
+					end
+
+					if type(objectTypeTablecolor) == "number" then
+						color = objectTypeTablecolor;
+					end
+
+					if objectTypeTable.isBoss then
+						currentHP = mainmemory.readbyte(objectBase + object_fields.bossHP);
+					elseif objectType == "Player" then
+						currentHP = Game.getHealth();
+					end
+
+					if type(objectTypeTable.hitbox_x_offset) == "number" then
+						hitboxXOffset = objectTypeTable.hitbox_x_offset;
+					end
+					if type(objectTypeTable.hitbox_y_offset) == "number" then
+						hitboxYOffset = objectTypeTable.hitbox_y_offset;
+					end
+
+					if type(objectTypeTable.hitbox_width) == "number" then
+						hitboxWidth = objectTypeTable.hitbox_width;
+					end
+					if type(objectTypeTable.hitbox_height) == "number" then
+						hitboxHeight = objectTypeTable.hitbox_height;
+					end
+				else
+					color = colors.red;
+					objectType = "Unknown "..toHexString(objectType);
+				end
+
+				local hitboxXOffset = -8;
+				local hitboxYOffset = -16;
+				if client.bufferheight() == 243 then -- Compensate for overscan
+					hitboxXOffset = hitboxXOffset + 13;
+					hitboxYOffset = hitboxYOffset + 27;
+				end
+
+				if drawHitboxes then
+					if dragging then
+						for d = 1, #draggedObjects do
+							if draggedObjects[d][1] == objectBase then
+								xPosition = draggedObjects[d][2] + dragTransform[1];
+								yPosition = draggedObjects[d][3] + dragTransform[2];
+								mainmemory.writebyte(objectBase + object_fields.x_position, xPosition);
+								mainmemory.writebyte(objectBase + object_fields.y_position, yPosition);
+								break;
+							end
+						end
+					end
+
+					if drawHitboxes then
+						if (mouse.X >= xPosition + hitboxXOffset and mouse.X <= xPosition + hitboxXOffset + hitboxWidth) and (mouse.Y >= yPosition + hitboxYOffset and mouse.Y <= yPosition + hitboxYOffset + hitboxHeight) then
+							if startDrag then
+								table.insert(draggedObjects, {objectBase, xPosition, yPosition});
+							end
+
+							local mouseOverText = {
+								objectType,
+								toHexString(objectBase).." "..xPosition..","..yPosition,
+								currentHP.."HP",
+							};
+
+							for t = 1, #mouseOverText do
+								gui.drawText(xPosition + hitboxXOffset, yPosition + hitboxYOffset + ((t - 1) * height), mouseOverText[t], color);
+							end
+						else
+							if currentHP > 0 then
+								gui.drawText(xPosition + hitboxXOffset, yPosition + hitboxYOffset, currentHP, color);
+							end
+						end
+						gui.drawRectangle(xPosition + hitboxXOffset, yPosition + hitboxYOffset, hitboxWidth, hitboxHeight, color); -- Draw the object's hitbox
+					end
+				end
+
+				if drawList then
+					gui.text(2, 2 + height * row, xPosition..", "..yPosition.." - "..objectType.." "..currentHP.."HP "..toHexString(objectBase), color, 'bottomright');
+					row = row + 1;
+				end
+			end
+		end
+	end
+end
+
+function Game.initUI()
+	ScriptHawk.UI.form_controls["Object List Checkbox"] = forms.checkbox(ScriptHawk.UI.options_form, "Object List", ScriptHawk.UI.col(0) + ScriptHawk.UI.dropdown_offset, ScriptHawk.UI.row(6) + ScriptHawk.UI.dropdown_offset);
+	ScriptHawk.UI.form_controls["Object Hitboxes Checkbox"] = forms.checkbox(ScriptHawk.UI.options_form, "Hitboxes (Beta)", ScriptHawk.UI.col(0) + ScriptHawk.UI.dropdown_offset, ScriptHawk.UI.row(7) + ScriptHawk.UI.dropdown_offset);
+	ScriptHawk.UI.form_controls["Draggable Hitboxes Checkbox"] = forms.checkbox(ScriptHawk.UI.options_form, "Draggable", ScriptHawk.UI.col(5) + ScriptHawk.UI.dropdown_offset, ScriptHawk.UI.row(7) + ScriptHawk.UI.dropdown_offset);
+	forms.setproperty(ScriptHawk.UI.form_controls["Object List Checkbox"], "Checked", true);
+	forms.setproperty(ScriptHawk.UI.form_controls["Object Hitboxes Checkbox"], "Checked", true);
+	forms.setproperty(ScriptHawk.UI.form_controls["Draggable Hitboxes Checkbox"], "Checked", true);
 end
 
 Game.OSDPosition = {2, 70};
 Game.standardOSD = {
 	{"Map", Game.getMap},
+	{"Continue", Game.getContinue},
+	{"Continues Used", function() return Game.getContinuesUsed().."/10"; end},
 	{"Status", Game.getMapStatus},
 	{"Status", Game.getBuildingStatus},
 	{"Separator", 1},
-	{"Continue", Game.getContinue},
-	{"Continues Used", function() return Game.getContinuesUsed().."/10"; end},
 	{"Health", function() return Game.getHealth().."/48"; end},
-	{"Separator", 1},
 	{"Movement", Game.getMovementState},
 	{"X", Game.getXPosition},
 	{"Y", Game.getYPosition},
@@ -349,13 +560,12 @@ Game.standardOSD = {
 };
 Game.recoveryOSD = {
 	{"Map", Game.getMap},
+	{"Continue", Game.getContinue},
+	{"Continues Used", function() return Game.getContinuesUsed().."/10"; end},
 	{"Status", Game.getMapStatus},
 	{"Status", Game.getBuildingStatus},
 	{"Separator", 1},
-	{"Continue", Game.getContinue},
-	{"Continues Used", function() return Game.getContinuesUsed().."/10"; end},
 	{"Health", function() return Game.getHealth().."/48"; end},
-	{"Separator", 1},
 	{"Movement", Game.getMovementState},
 	{"X", Game.getXPosition},
 	{"Y", Game.getYPosition},
