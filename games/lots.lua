@@ -11,7 +11,8 @@ local Game = {
 		map_status = 0xA0,
 		building_status = 0xA1,
 		demo_timer = 0x104, -- 2 bytes
-		screen_x_position = 0x10A,
+		screen_x_tile = 0x10A,
+		screen_x_pixel = 0x10F,
 		health = 0x129,
 		recovery_status = 0x12B,
 		recovery_timer = 0x12C, -- 2 bytes
@@ -26,10 +27,6 @@ local Game = {
 		in_air = 0x422,
 		sword_damage = 0xCA8,
 		bow_damage = 0xCA9,
-		--[[
-
-		0xCA0	b	u	0	Main RAM	Book is burnable
-		--]]
 	},
 	maps = {
 		"01 - Swamp (Shagart +1L) (Left)",
@@ -253,7 +250,7 @@ end
 
 function Game.applyInfinites()
 	mainmemory.writebyte(Game.Memory.health, 0x30);
-	mainmemory.writebyte(Game.Memory.continues_used, 0);
+	--mainmemory.writebyte(Game.Memory.continues_used, 1);
 end
 
 function Game.read_u16_8(base)
@@ -280,6 +277,13 @@ function Game.getRecoveryTimer()
 	return mainmemory.read_u16_le(Game.Memory.recovery_timer);
 end
 
+function Game.colorRecoveryTimer()
+	if Game.isRecovering() then
+		return colors.red;
+	end
+	return 0; -- Transparent, cheeky hack to hide the OSD entry without switching OSD tables
+end
+
 function Game.getHealth()
 	return mainmemory.readbyte(Game.Memory.health);
 end
@@ -288,8 +292,12 @@ function Game.getContinuesUsed()
 	return mainmemory.readbyte(Game.Memory.continues_used);
 end
 
+function Game.getMapX()
+	return mainmemory.readbyte(Game.Memory.screen_x_tile) * 8 + (7 - mainmemory.readbyte(Game.Memory.screen_x_pixel));
+end
+
 function Game.getXPosition()
-	return mainmemory.readbyte(Game.Memory.x_position);
+	return Game.getMapX() + mainmemory.readbyte(Game.Memory.x_position);
 end
 
 function Game.getYPosition()
@@ -298,6 +306,17 @@ end
 
 function Game.getXVelocity()
 	return Game.read_s16_8(Game.Memory.x_velocity);
+end
+
+function Game.colorXVelocity()
+	local xVel = math.abs(Game.getXVelocity());
+	if xVel >= 2 then
+		return colors.green;
+	end
+	if xVel > 0 and xVel < 1 then
+		return getColor(1 - xVel);
+	end
+	return colors.white;
 end
 
 function Game.getYVelocity()
@@ -330,6 +349,7 @@ local object_fields = {
 		--[0x00] = "Null",
 		[0x01] = {name="Player"},
 		[0x02] = {name="Arrow"},
+		[0x03] = {name="Sword Upgrade"},
 		[0x04] = {name="Arrow Upgrade"},
 		[0x05] = {name="Sign"},
 		[0x10] = {name="Slime"}, -- Dungeon
@@ -363,6 +383,7 @@ local object_fields = {
 		[0x2D] = {name="Projectile"}, -- Tree Spirit
 		[0x2E] = {name="Swamp Spirit", isBoss=true},
 		[0x2F] = {name="Stone Hammer", isBoss=true}, -- Second Duel
+		[0x30] = {name="Dark Suma", isBoss=true},
 		[0x31] = {name="Clone", isBoss=true}, -- Swamp Spirit's Minion
 		[0x32] = {name="Golden Guard", isBoss=true}, -- Third Duel
 		[0x33] = {name="Paradin", isBoss=true}, -- Fifth Duel
@@ -374,6 +395,8 @@ local object_fields = {
 		[0x3A] = {name="The Ripper", isBoss=true}, -- First Duel
 		[0x3C] = {name="Projectile"}, -- Court Jester
 		[0x3D] = {name="Skull"}, -- Dark Suma
+		[0x3E] = {name="Projectile"}, -- Dark Suma
+		[0x3F] = {name="Shield"}, -- Ra Goan
 		[0x40] = {name="Projectile"}, -- Ra Goan
 		[0x41] = {name="Projectile"}, -- Ra Goan
 		[0x42] = {name="Ra Goan", isBoss=true},
@@ -382,11 +405,6 @@ local object_fields = {
 
 local draggedObjects = {};
 function Game.drawUI()
-	if Game.isRecovering() then
-		Game.OSD = Game.recoveryOSD;
-	else
-		Game.OSD = Game.standardOSD;
-	end
 	local row = 0;
 	local height = 16;
 
@@ -531,17 +549,176 @@ function Game.drawUI()
 	end
 end
 
+function Game.killEnemies()
+	for i = 0, object_array_capacity do
+		local objectBase = object_array_base + (i * object_size);
+		local objectType = mainmemory.readbyte(objectBase + object_fields.object_type);
+		local objectLoaded = mainmemory.readbyte(objectBase + object_fields.object_loaded);
+		if objectType > 0 and objectLoaded == 0 then
+			if type(object_fields.object_types[objectType]) == "table" then
+				local objectTypeTable = object_fields.object_types[objectType];
+				if objectTypeTable.isBoss then
+					mainmemory.writebyte(objectBase + object_fields.bossHP, 0);
+				else
+					mainmemory.writebyte(objectBase + object_fields.currentHP, 0);
+				end
+			end
+		end
+	end
+end
+
+----------------
+-- Flag stuff --
+----------------
+
+flag_block_base = 0xC00;
+flag_array = {
+	-- c00 tree spirit defeated?
+	-- c03 swamp spirit defeated?
+	{byte=0xC04, name="Duels Defeated"},
+	{byte=0xC05, name="Pirate Defeated"},
+	-- c06 suma defeated
+	{byte=0xC11, name="Game Started"},
+	{byte=0xC13, name="Tree Spirit Spawned"}, -- Namo NPC End
+	-- c14 tree spirit defeated?
+	-- c15 swamp spirit defeated?
+	-- c17 duels defeated?
+	-- c18 suma defeated?
+	-- c1a Pharazon: daughter knows more details
+	{byte=0xC21, name="Harfoot FTT"},
+	{byte=0xC31, name="Amon FTT"},
+	{byte=0xC32, name="Amon: Tree People Text"},
+	{byte=0xC33, name="Amon: Namo Directions Text"},
+	{byte=0xC34, name="Amon: First of Three Tests Text"},
+	{byte=0xC35, name="Amon: Destroy Book Text"},
+	{byte=0xC37, name="Amon: Pharazon Path"},
+	{byte=0xC41, name="Dwarle FTT"},
+	{byte=0xC51, name="Ithile FTT"},
+	{byte=0xC52, name="Ithile: Brave Men Text"},
+	{byte=0xC53, name="Ithile: Brave Men Text 2"},
+	{byte=0xC54, name="Ithile: Swamp Spirit Text"},
+	{byte=0xC61, name="Pharazon FTT"},
+	{byte=0xC62, name="Pharazon: People of Ithile Text"},
+	{byte=0xC63, name="Pharazon: Tree Spirits Text"},
+	{byte=0xC64, name="Pharazon: Shagart Den of Thieves Text"},
+	{byte=0xC65, name="Pharazon: Shagart Den of Thieves Text (2)"},
+	{byte=0xC67, name="Pharazon: Path to Amon Text"},
+	{byte=0xC68, name="Pharazon: Shagart Strange People Text"},
+	{byte=0xC71, name="??? FTT"},
+	{byte=0xC81, name="Lindon FTT"},
+	{byte=0xC82, name="Lindon: Brave Men Text"},
+	{byte=0xC83, name="Lindon: Brave Men Text 2"},
+	{byte=0xC84, name="Lindon: Brave Men Text 3"},
+	{byte=0xC85, name="Lindon: Kidnapping Text"},
+	{byte=0xC87, name="Lindon: Rest Here Text"},
+	{byte=0xC91, name="Ulmo FTT"},
+	{byte=0xC92, name="Ulmo: Namo Directions Text"},
+	-- ca0 Book is burnable
+	{byte=0xCA1, name="Swamp Spirit Spawned"},
+	{byte=0xCA2, name="Pirate Spawned"}, -- Also lindon/dwarle open?
+	{byte=0xCA3, name="Path to Amon Open"}, -- Suma spawned?
+	{byte=0xCA8, name="Sword Damage"},
+	{byte=0xCA9, name="Bow Damage"},
+	{byte=0xCAA, name="Inventory: Book"},
+	{byte=0xCAB, name="Inventory: Tree Limb"},
+	{byte=0xCAC, name="Inventory: Herb"},
+};
+
+local flag_block_size = 0xAC;
+local flag_block_cache = {};
+
+local function clearFlagCache()
+	flag_block_cache = {};
+end
+event.onloadstate(clearFlagCache, "ScriptHawk - Clear Flag Cache");
+
+local function getFlag(byte)
+	for i = 1, #flag_array do
+		if byte == flag_array[i].byte then
+			return flag_array[i];
+		end
+	end
+	return {byte=byte, name="Unknown at "..toHexString(byte)};
+end
+
+local function isFlagFound(byte)
+	return getFlag(byte) ~= nil;
+end
+
+local function getFlagByName(flagName)
+	for i = 1, #flag_array do
+		if not flag_array[i].ignore and flagName == flag_array[i].name then
+			return flag_array[i];
+		end
+	end
+end
+
+function Game.getFlagName(byte)
+	for i = 1, #flag_array do
+		if byte == flag_array[i].byte and not flag_array[i].ignore then
+			return flag_array[i].name;
+		end
+	end
+	return "Unknown at "..toHexString(byte);
+end
+
+function checkFlags(showKnown)
+	local flagBlock = mainmemory.readbyterange(flag_block_base, flag_block_size + 1);
+
+	if #flag_block_cache == flag_block_size then
+		local flagFound = false;
+		local knownFlagsFound = 0;
+		local currentValue, previousValue;
+
+		for i = 0, #flag_block_cache do
+			currentValue = flagBlock[i];
+			previousValue = flag_block_cache[i];
+			if currentValue ~= previousValue then
+				local currentFlag = getFlag(flag_block_base + i);
+				if not currentFlag.ignore then
+					if currentValue == 0 then
+						dprint("Flag "..toHexString(currentFlag.byte, 2)..": \""..currentFlag.name.."\" was cleared on frame "..emu.framecount());
+					elseif previousValue == 0 then
+						dprint("Flag "..toHexString(currentFlag.byte, 2)..": \""..currentFlag.name.."\" was set with value "..toHexString(currentValue, 2).." on frame "..emu.framecount());
+					elseif currentValue > previousValue then
+						dprint("Flag "..toHexString(currentFlag.byte, 2)..": \""..currentFlag.name.."\" value increased from "..toHexString(previousValue, 2).." to "..toHexString(currentValue, 2).." on frame "..emu.framecount());
+					elseif currentValue < previousValue then
+						dprint("Flag "..toHexString(currentFlag.byte, 2)..": \""..currentFlag.name.."\" value decreased from "..toHexString(previousValue, 2).." to "..toHexString(currentValue, 2).." on frame "..emu.framecount());
+					end
+				end
+			end
+		end
+		flag_block_cache = flagBlock;
+		if not showKnown then
+			if knownFlagsFound > 0 then
+				dprint(knownFlagsFound.." Known flags skipped");
+			end
+			if not flagFound then
+				dprint("No unknown flags were changed");
+			end
+		end
+	else
+		flag_block_cache = flagBlock;
+		dprint("Populated flag block cache");
+	end
+	print_deferred();
+end
+
+function Game.eachFrame()
+	checkFlags(true);
+end
+
 function Game.initUI()
 	ScriptHawk.UI.form_controls["Object List Checkbox"] = forms.checkbox(ScriptHawk.UI.options_form, "Object List", ScriptHawk.UI.col(0) + ScriptHawk.UI.dropdown_offset, ScriptHawk.UI.row(6) + ScriptHawk.UI.dropdown_offset);
 	ScriptHawk.UI.form_controls["Object Hitboxes Checkbox"] = forms.checkbox(ScriptHawk.UI.options_form, "Hitboxes (Beta)", ScriptHawk.UI.col(0) + ScriptHawk.UI.dropdown_offset, ScriptHawk.UI.row(7) + ScriptHawk.UI.dropdown_offset);
 	ScriptHawk.UI.form_controls["Draggable Hitboxes Checkbox"] = forms.checkbox(ScriptHawk.UI.options_form, "Draggable", ScriptHawk.UI.col(5) + ScriptHawk.UI.dropdown_offset, ScriptHawk.UI.row(7) + ScriptHawk.UI.dropdown_offset);
 	forms.setproperty(ScriptHawk.UI.form_controls["Object List Checkbox"], "Checked", true);
 	forms.setproperty(ScriptHawk.UI.form_controls["Object Hitboxes Checkbox"], "Checked", true);
-	forms.setproperty(ScriptHawk.UI.form_controls["Draggable Hitboxes Checkbox"], "Checked", true);
+	--forms.setproperty(ScriptHawk.UI.form_controls["Draggable Hitboxes Checkbox"], "Checked", true);
 end
 
 Game.OSDPosition = {2, 70};
-Game.standardOSD = {
+Game.OSD = {
 	{"Map", Game.getMap},
 	{"Continue", Game.getContinue},
 	{"Continues Used", function() return Game.getContinuesUsed().."/10"; end},
@@ -552,30 +729,12 @@ Game.standardOSD = {
 	{"Movement", Game.getMovementState},
 	{"X", Game.getXPosition},
 	{"Y", Game.getYPosition},
-	{"X Velocity", Game.getXVelocity},
+	{"X Velocity", Game.getXVelocity, Game.colorXVelocity},
 	{"Y Velocity", Game.getYVelocity},
 	{"dX"},
 	{"dY"},
 	{"Grounded", Game.isGrounded},
+	{"Recovery", Game.getRecoveryTimer, Game.colorRecoveryTimer},
 };
-Game.recoveryOSD = {
-	{"Map", Game.getMap},
-	{"Continue", Game.getContinue},
-	{"Continues Used", function() return Game.getContinuesUsed().."/10"; end},
-	{"Status", Game.getMapStatus},
-	{"Status", Game.getBuildingStatus},
-	{"Separator", 1},
-	{"Health", function() return Game.getHealth().."/48"; end},
-	{"Movement", Game.getMovementState},
-	{"X", Game.getXPosition},
-	{"Y", Game.getYPosition},
-	{"X Velocity", Game.getXVelocity},
-	{"Y Velocity", Game.getYVelocity},
-	{"dX"},
-	{"dY"},
-	{"Grounded", Game.isGrounded},
-	{"Recovery", Game.getRecoveryTimer},
-};
-Game.OSD = Game.standardOSD;
 
 return Game;

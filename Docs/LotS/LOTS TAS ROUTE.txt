@@ -35,6 +35,17 @@ Reset 09 (demo glitch)
 16:04.375 964.375
 14:25.764 865.764
 
+Start
+Reset for Tree (Demo Glitch) Saves ???? frames
+Reset for Namo Tree Boss Saves ??? frames
+Reset for Swamp Spirit (Demo Glitch) Saves ???? frames
+Reset for Duel 1 skip saves 131 frames
+Reset after Duel 5 (Demo Glitch) Saves ???? frames
+Reset out of Amon Wizard to stairs left saves 206 frames
+Reset out of Suma saves ??? frames
+Reset out of Lindon saves 214 frames
+Reset out of Ra Goan (Demo Glitch) saves ???? frames
+
 This is a tool assisted speedrun of Lord of the Sword for the Sega Master System completed in 14:07.424 by Isotarge.
 
 The speedrun is the result of well over 100 hours of work with 4 complete playthroughs of the game to improve optimization totaling 73,800 rerecords. I exclusively used TAStudio, a relatively new feature of BizHawk along with a RAM watch started in 2012 by myself and my brother, The8bitbeast.
