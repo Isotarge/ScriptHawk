@@ -29,136 +29,136 @@ local Game = {
 		bow_damage = 0xCA9,
 	},
 	maps = {
-		"01 - Swamp (Shagart +1L) (Left)",
-		"02 - Swamp (Shagart +1L) (Right)",
-		"03 - Swamp (Dwarle +1DR) (Lindon +1L) (Left)",
-		"04 - Swamp (Dwarle +1DR) (Lindon +1L) (Right)",
-		"05 - Swamp (Pharazon +1R) (Left)",
-		"06 - Swamp (Pharazon +1R) (Right)",
-		"07 - Swamp (Harfoot +1R) (Amon +2L) (Left) (Demo)",
-		"08 - Swamp (Harfoot +1R) (Amon +2L) (Right)",
-		"09 - Swamp (Ithile +3R) (Left)",
-		"0A - Swamp (Ithile +3R) (Right)",
-		"0B - Swamp (Dwarle +1UR) (Left)",
-		"0C - Swamp (Dwarle +1UR) (Left)",
-		"0D - Swamp (Varlin +1L) (Left)",
-		"0E - Swamp (Varlin +1L) (Right)",
-		"0F - Swamp (Pharazon +1DL) (Left)",
-		"10 - Swamp (Pharazon +1DL) (Right)",
-		"11 - Swamp (Ithile +1R) (Left)",
-		"12 - Swamp (Ithile +1R) (Right)",
-		"13 - Swamp (Harfoot +1L) (Medusa +3R) (Left)",
-		"14 - Swamp (Harfoot +1L) (Medusa +3R) (Right)",
-		"15 - Swamp (Pharazon +1UR) (Right)",
-		"16 - Swamp (Pharazon +1UR) (Right)",
-		"17 - Swamp (Shagart +1R) (Left)",
-		"18 - Swamp (Shagart +1R) (Right)",
-		"19 - Swamp (Lindon +1R) (Pirate +2L) (Left)",
-		"1A - Swamp (Lindon +1R) (Pirate +2L) (Right)",
-		"1B - Swamp (Pharazon +1UL) (Left)",
-		"1C - Swamp (Pharazon +1UL) (Right)",
-		"1D - Swamp (Castle Elder +1L) (Left)",
-		"1E - Swamp (Castle Elder +1L) (Right)",
-		"1F - Swamp (Ithile +1L) (Goblin +3R) (Left)",
-		"20 - Swamp (Ithile +1L) (Goblin +3R) (Right)",
-		"21 - Swamp (Varlin +1UL) (Left)",
-		"22 - Swamp (Varlin +1UL) (Right)",
-		"23 - Forest (Amon +1L) (Harfoot +2R) (Left)",
-		"24 - Forest (Amon +1L) (Harfoot +2R) (Right)",
-		"25 - Forest (Amon +1UL) (Left)",
-		"26 - Forest (Amon +1UL) (Right)",
-		"27 - Forest (Namo +1R) (Pharazon +2DL) (Left)",
-		"28 - Forest (Namo +1R) (Pharazon +2DL) (Right)",
-		"29 - Forest (Ulmo +1R) (Left)",
-		"2A - Forest (Ulmo +1R) (Right)",
-		"2B - Forest (Medusa +2R) (Harfoot +2L) (Left)",
-		"2C - Forest (Medusa +2R) (Harfoot +2L) (Right)",
-		"2D - Forest (Amon +1R) (Left)",
-		"2E - Forest (Amon +1R) (Right)",
-		"2F - Forest (???) (Left)",
-		"30 - Forest (???) (Right)",
-		"31 - Forest (???) (Bottom Left)",
-		"32 - Forest (???) (Right)",
-		"33 - Forest (???) (Top Left)",
-		"34 - Forest (Shagart +2L) (Bottom Left)",
-		"35 - Forest (Shagart +2L) (Right)",
-		"36 - Forest (Shagart +2L) (Top Left, Stairs)",
-		"37 - Forest (Varlin +2UL) (Dwarle +2L) (Bottom Left)",
-		"38 - Forest (Varlin +2UL) (Dwarle +2L) (Right)",
-		"39 - Forest (Varlin +2UL) (Dwarle +2L) (Top Left, Stairs)",
-		"3A - Coast (Dwarle +1L) (Left)",
-		"3B - Coast (Dwarle +1L) (Right)",
-		"3C - Coast (Ithile +2R) (Left)",
-		"3D - Coast (Ithile +2R) (Right)",
-		"3E - Coast (???) (Left)",
-		"3F - Coast (???) (Right)",
-		"40 - Cave (Dark Suma +1R) (Left)",
-		"41 - Cave (Dark Suma +1R) (Right)",
-		"42 - Cave (Swamp Spirit +1R) (Ithile +3L) (Left)",
-		"43 - Cave (Swamp Spirit +1R) (Ithile +3L) (Right)",
-		"44 - Mountains (Amon +2UL) (Pharazon +2R) (Left)",
-		"45 - Mountains (Amon +2UL) (Pharazon +2R) (Right)",
-		"46 - Mountains (???) (Left)",
-		"47 - Mountains (???) (Right)",
-		"48 - Mountains (???) (Left)",
-		"49 - Mountains (???) (Right)",
-		"4A - Mountains (???) (Left)",
-		"4B - Mountains (???) (Right)",
-		"4C - Mountains (???) (Bottom Left)",
-		"4D - Mountains (???) (Right)",
-		"4E - Mountains (???) (Top Left)",
-		"4F - Mountains (Pharazon +2UR) (Bottom Left)",
-		"50 - Mountains (Pharazon +2UR) (Right)",
-		"51 - Mountains (Pharazon +2UR) (Top Left Stairs)",
-		"52 - Mountains (???) (Left)",
-		"53 - Mountains (???) (Right)",
-		"54 - Mountains (Medusa +1R) (Harfoot +3L) (Left)",
-		"55 - Mountains (Medusa +1R) (Harfoot +3L) (Right)",
-		"56 - Mountains (Pharazon +1UL+3L+Stairs) (Left)",
-		"57 - Mountains (Pharazon +1UL+3L+Stairs) (Right)",
-		"58 - Mountains (Dark Suma +2R) (Left)",
-		"59 - Mountains (Dark Suma +2R) (Right)",
-		"5A - Dark Forest (Ithile +2L) (Swamp Spirit +2R) (Left)",
-		"5B - Dark Forest (Ithile +2L) (Swamp Spirit +2R) (Right)",
-		"5C - Dark Forest (Pirate +1L) (Lindon +2R) (Left)",
-		"5D - Dark Forest (Pirate +1L) (Lindon +2R) (Right)",
-		"5E - Harfoot (Left)",
-		"5F - Harfoot (Right)",
-		"60 - Ithile (Left)",
-		"61 - Ithile (Right)",
-		"62 - Amon (Left)",
-		"63 - Amon (Right)",
-		"64 - Amon (Left Stairs)",
-		"65 - Amon (Left)", -- Unused?
-		"66 - Amon (Right)", -- Unused?
-		"67 - Amon (Left Stairs)", -- Unused?
-		"68 - Dwarle (Left)",
-		"69 - Dwarle (Right)",
-		"6A - Dwarle (Right Stairs)",
-		"6B - Pharazon (Left)",
-		"6C - Pharazon (Right)",
-		"6D - Pharazon (Left Stairs)",
-		"6E - Pharazon (Bottom Left, Stairs Spawned)",
-		"6F - Pharazon (Bottom Right, Stairs Spawned)",
-		"70 - Pharazon (Left Stairs, Stairs Spawned)",
-		"71 - Pharazon (Top Right, Stairs Spawned)",
-		"72 - Shagart (Left)",
+		"01 - Swamp (Shagart +1L) (L)",
+		"02 - Swamp (Shagart +1L) (R)",
+		"03 - Swamp (Dwarle +1DR) (Lindon +1L) (L)",
+		"04 - Swamp (Dwarle +1DR) (Lindon +1L) (R)",
+		"05 - Swamp (Pharazon +1R) (L)",
+		"06 - Swamp (Pharazon +1R) (R)",
+		"07 - Swamp (Harfoot +1R) (Amon +2L) (L) (Demo)",
+		"08 - Swamp (Harfoot +1R) (Amon +2L) (R)",
+		"09 - Swamp (Ithile +3R) (L)",
+		"0A - Swamp (Ithile +3R) (R)",
+		"0B - Swamp (Dwarle +1UR) (L)",
+		"0C - Swamp (Dwarle +1UR) (L)",
+		"0D - Swamp (Varlin +1L) (L)",
+		"0E - Swamp (Varlin +1L) (R)",
+		"0F - Swamp (Pharazon +1DL) (L)",
+		"10 - Swamp (Pharazon +1DL) (R)",
+		"11 - Swamp (Ithile +1R) (L)",
+		"12 - Swamp (Ithile +1R) (R)",
+		"13 - Swamp (Harfoot +1L) (Medusa +3R) (L)",
+		"14 - Swamp (Harfoot +1L) (Medusa +3R) (R)",
+		"15 - Swamp (Pharazon +1UR) (R)",
+		"16 - Swamp (Pharazon +1UR) (R)",
+		"17 - Swamp (Shagart +1R) (L)",
+		"18 - Swamp (Shagart +1R) (R)",
+		"19 - Swamp (Lindon +1R) (Pirate +2L) (L)",
+		"1A - Swamp (Lindon +1R) (Pirate +2L) (R)",
+		"1B - Swamp (Pharazon +1UL) (L)",
+		"1C - Swamp (Pharazon +1UL) (R)",
+		"1D - Swamp (Castle Elder +1L) (L)",
+		"1E - Swamp (Castle Elder +1L) (R)",
+		"1F - Swamp (Ithile +1L) (Goblin +3R) (L)",
+		"20 - Swamp (Ithile +1L) (Goblin +3R) (R)",
+		"21 - Swamp (Varlin +1UL) (L)",
+		"22 - Swamp (Varlin +1UL) (R)",
+		"23 - Forest (Amon +1L) (Harfoot +2R) (L)",
+		"24 - Forest (Amon +1L) (Harfoot +2R) (R)",
+		"25 - Forest (Amon +1UL) (L)",
+		"26 - Forest (Amon +1UL) (R)",
+		".27 - Forest (Namo +1R) (Pharazon +2DL) (L)",
+		"28 - Forest (Namo +1R) (Pharazon +2DL) (R)",
+		".29 - Forest (Ulmo +1R) (L)",
+		"2A - Forest (Ulmo +1R) (R)",
+		"2B - Forest (Medusa +2R) (Harfoot +2L) (L)",
+		"2C - Forest (Medusa +2R) (Harfoot +2L) (R)",
+		"2D - Forest (Amon +1R) (L)",
+		"2E - Forest (Amon +1R) (R)",
+		"2F - Forest (???) (L)",
+		"30 - Forest (???) (R)",
+		"31 - Forest (???) (DL)",
+		"32 - Forest (???) (R)",
+		"33 - Forest (???) (UL)",
+		"34 - Forest (Shagart +2L) (DL)",
+		"35 - Forest (Shagart +2L) (R)",
+		"36 - Forest (Shagart +2L) (UL, Stairs)",
+		"37 - Forest (Varlin +2UL) (Dwarle +2L) (DL)",
+		"38 - Forest (Varlin +2UL) (Dwarle +2L) (R)",
+		"39 - Forest (Varlin +2UL) (Dwarle +2L) (UL, Stairs)",
+		"3A - Coast (Dwarle +1L) (L)",
+		"3B - Coast (Dwarle +1L) (R)",
+		"3C - Coast (Ithile +2R) (L)",
+		"3D - Coast (Ithile +2R) (R)",
+		"3E - Coast (Shagart +2R) (L)",
+		"3F - Coast (Shagart +2R) (R)",
+		"40 - Cave (Dark Suma +1R) (L)",
+		"41 - Cave (Dark Suma +1R) (R)",
+		".42 - Cave (Swamp Spirit +1R) (Ithile +3L) (L)",
+		"43 - Cave (Swamp Spirit +1R) (Ithile +3L) (R)",
+		"44 - Mountains (Amon +2UL) (Pharazon +2R) (L)",
+		"45 - Mountains (Amon +2UL) (Pharazon +2R) (R)",
+		"46 - Mountains (Shagart +3R) (L)",
+		"47 - Mountains (Shagart +3R) (R)",
+		"48 - Mountains (???) (L)",
+		"49 - Mountains (???) (R)",
+		"4A - Mountains (???) (L)",
+		"4B - Mountains (???) (R)",
+		"4C - Mountains (???) (DL)",
+		".4D - Mountains (Demon +1L) (R)",
+		"4E - Mountains (???) (UL)",
+		"4F - Mountains (Pharazon +2UR) (DL)",
+		"50 - Mountains (Pharazon +2UR) (R)",
+		"51 - Mountains (Pharazon +2UR) (UL Stairs)",
+		"52 - Mountains (???) (L)",
+		"53 - Mountains (???) (R)",
+		".54 - Mountains (Medusa +1R) (Harfoot +3L) (L)",
+		"55 - Mountains (Medusa +1R) (Harfoot +3L) (R)",
+		"56 - Mountains (Pharazon +1UL+3L+Stairs) (L)",
+		"57 - Mountains (Pharazon +1UL+3L+Stairs) (R)",
+		"58 - Mountains (Dark Suma +2R) (L)",
+		"59 - Mountains (Dark Suma +2R) (R)",
+		"5A - Dark Forest (Ithile +2L) (Swamp Spirit +2R) (L)",
+		"5B - Dark Forest (Ithile +2L) (Swamp Spirit +2R) (R)",
+		"5C - Dark Forest (Pirate +1L) (Lindon +2R) (L)",
+		".5D - Dark Forest (Pirate +1L) (Lindon +2R) (R)",
+		".5E - Harfoot (L)",
+		".5F - Harfoot (R)",
+		".60 - Ithile (L)",
+		".61 - Ithile (R)",
+		".62 - Amon (L)",
+		".63 - Amon (R)",
+		".64 - Amon (L Stairs)",
+		".65 - Amon (L)", -- Unused?
+		".66 - Amon (R)", -- Unused?
+		".67 - Amon (L Stairs)", -- Unused?
+		".68 - Dwarle (L)",
+		".69 - Dwarle (R)",
+		".6A - Dwarle (R Stairs)",
+		".6B - Pharazon (L)",
+		".6C - Pharazon (R)",
+		".6D - Pharazon (L Stairs)",
+		".6E - Pharazon (DL, Stairs Spawned)",
+		".6F - Pharazon (DR, Stairs Spawned)",
+		".70 - Pharazon (L Stairs, Stairs Spawned)",
+		".71 - Pharazon (UR, Stairs Spawned)",
+		"72 - Shagart (L)",
 		"73 - Shagart (Door)",
-		"74 - Shagart (Open) (Left)",
-		"75 - Shagart (Open) (Door)",
-		"76 - Lindon (Left)",
-		"77 - Lindon (Right)",
-		"78 - Castle Elder",
-		"79 - Glitched version of Varlin [UNTESTED, HASN'T BEEN TESTED WITH CORRECT FLAGS SET]",
-		"7A - Varlin (Bottom Left, Closed)",
-		"7B - Varlin (Top Left, Closed)",
-		"7C - Varlin (Bottom Left, Open)",
-		"7D - Varlin (Top Left, Open)",
-		"7E - Dark Suma's Dungeon 1F (Bottom Left)",
-		"7F - Dark Suma's Dungeon 1F (Top Left)",
+		".74 - Shagart (Open) (L)",
+		".75 - Shagart (Open) (Door)",
+		".76 - Lindon (L)",
+		".77 - Lindon (R)",
+		".78 - Elder",
+		"79 - Varlin (Glitched)", -- Hasn't been tested with correct flags set
+		".7A - Varlin (DL, Closed)",
+		".7B - Varlin (UL, Closed)",
+		".7C - Varlin (DL, Open)",
+		".7D - Varlin (UL, Open)",
+		".7E - Dark Suma's Dungeon 1F (DL)",
+		"7F - Dark Suma's Dungeon 1F (UL)",
 		"80 - Dark Suma's Dungeon 2F",
 		"81 - Dark Suma's Dungeon 3F",
-		"82 - Ra Goan's Dungeon Entrance",
+		".82 - Ra Goan's Dungeon Entrance",
 		"83 - Ra Goan's Dungeon Boss Room",
 		"84 - Ra Goan's Dungeon B1F",
 		"85 - Ra Goan's Dungeon B2F",
@@ -208,7 +208,13 @@ local Game = {
 function Game.getMapStatus()
 	local status = mainmemory.readbyte(Game.Memory.map_status);
 	if type(Game.map_states[status]) == "string" then
-		return Game.map_states[status];
+		status = Game.map_states[status];
+	end
+	if status == "Title Screen" then
+		status = status.." ("..mainmemory.read_u16_le(Game.Memory.demo_timer)..")";
+	end
+	if type(status) == "string" then
+		return status;
 	end
 	return "Unknown "..toHexString(status);
 end
@@ -281,11 +287,19 @@ function Game.colorRecoveryTimer()
 	if Game.isRecovering() then
 		return colors.red;
 	end
-	return 0; -- Transparent, cheeky hack to hide the OSD entry without switching OSD tables
+	return colors.white;
 end
 
 function Game.getHealth()
 	return mainmemory.readbyte(Game.Memory.health);
+end
+
+function Game.getHealthOSD()
+	local healthString = Game.getHealth().."/48";
+	if Game.isRecovering() then
+		healthString = healthString.." ("..Game.getRecoveryTimer()..")";
+	end
+	return healthString;
 end
 
 function Game.getContinuesUsed()
@@ -315,6 +329,18 @@ function Game.colorXVelocity()
 	end
 	if xVel > 0 and xVel < 1 then
 		return getColor(1 - xVel);
+	end
+	return colors.white;
+end
+
+function Game.greenIfStartingJumpChain()
+	local xVel = math.abs(Game.getXVelocity());
+	if xVel >= 2 then
+		local movementState = Game.getMovementState();
+		local isGrounded = Game.isGrounded();
+		if movementState ~= "Damaged" and isGrounded then
+			return colors.green;
+		end
 	end
 	return colors.white;
 end
@@ -393,6 +419,7 @@ local object_fields = {
 		[0x37] = {name="Demon Boss", isBoss=true},
 		[0x39] = {name="Court Jester", isBoss=true}, -- Fourth Duel
 		[0x3A] = {name="The Ripper", isBoss=true}, -- First Duel
+		[0x3B] = {name="Projectile"}, -- Demon Boss
 		[0x3C] = {name="Projectile"}, -- Court Jester
 		[0x3D] = {name="Skull"}, -- Dark Suma
 		[0x3E] = {name="Projectile"}, -- Dark Suma
@@ -573,7 +600,9 @@ end
 
 flag_block_base = 0xC00;
 flag_array = {
-	-- c00 tree spirit defeated?
+	{byte=0xC00, name="Tree Spirit Defeated"},
+	{byte=0xC01, name="Demon Boss Defeated"},
+	{byte=0xC02, name="Medusa Defeated"},
 	-- c03 swamp spirit defeated?
 	{byte=0xC04, name="Duels Defeated"},
 	{byte=0xC05, name="Pirate Defeated"},
@@ -582,40 +611,75 @@ flag_array = {
 	{byte=0xC13, name="Tree Spirit Spawned"}, -- Namo NPC End
 	-- c14 tree spirit defeated?
 	-- c15 swamp spirit defeated?
+	{byte=0xC17, name="Daughter Returned To Lindon"}, -- After Pirate Boss
 	-- c17 duels defeated?
 	-- c18 suma defeated?
+	-- c19 medusa spawned?
 	-- c1a Pharazon: daughter knows more details
+	-- c1c Demon Boss Defeated? 0x01
+	-- c1d medusa defeated?
 	{byte=0xC21, name="Harfoot FTT"},
+	{byte=0xC22, name="Harfoot: Rest Here Text"},
+	{byte=0xC23, name="Harfoot: Rest Here Text 2"},
+	{byte=0xC24, name="Harfoot: Rest Here Text 3"},
+	{byte=0xC25, name="Harfoot: Rest Here Text 4"},
+	{byte=0xC27, name="Harfoot: Medusa Text"}, -- Max Value 0x81
+	{byte=0xC29, name="Harfoot: Persevere Text"},
+	{byte=0xC2D, name="Harfoot: Congratulation Text"}, -- After Medusa
 	{byte=0xC31, name="Amon FTT"},
 	{byte=0xC32, name="Amon: Tree People Text"},
 	{byte=0xC33, name="Amon: Namo Directions Text"},
 	{byte=0xC34, name="Amon: First of Three Tests Text"},
 	{byte=0xC35, name="Amon: Destroy Book Text"},
 	{byte=0xC37, name="Amon: Pharazon Path"},
+	{byte=0xC38, name="Amon: Just One More Text"},
+	{byte=0xC39, name="Amon: Destroy Book Text 2"},
+	{byte=0xC3D, name="Amon: Go To Varlin Text"},
 	{byte=0xC41, name="Dwarle FTT"},
+	{byte=0xC42, name="Dwarle: Daughter Missing Text"},
+	{byte=0xC43, name="Dwarle: Daughter Missing Text 2"},
+	{byte=0xC44, name="Dwarle: Daughter Missing Text 3"},
+	{byte=0xC45, name="Dwarle: Brave Landau Text"},
+	{byte=0xC47, name="Dwarle: Brave Landau Text 2"},
+	-- c48 Demon Boss Defeated? 0x01
+	{byte=0xC49, name="Dwarle: Kill The Beast Text"},
+	-- c4a Demon Boss Defeated? 0x01
+	-- c4b Demon Boss Defeated? 0x01
+	{byte=0xC4D, name="Dwarle: Lindon Via Shagart Text"},
 	{byte=0xC51, name="Ithile FTT"},
 	{byte=0xC52, name="Ithile: Brave Men Text"},
 	{byte=0xC53, name="Ithile: Brave Men Text 2"},
 	{byte=0xC54, name="Ithile: Swamp Spirit Text"},
+	{byte=0xC55, name="Ithile: Bow Upgrade Text"}, -- Also Shagart->Dwarle
+	{byte=0xC57, name="Ithile: Rest Here Text"}, -- After Medusa
+	{byte=0xC59, name="Ithile: Rest Here Text 2"}, -- After Medusa
+	{byte=0xC5D, name="Ithile: Rest Here Text 3"}, -- After Medusa
 	{byte=0xC61, name="Pharazon FTT"},
 	{byte=0xC62, name="Pharazon: People of Ithile Text"},
 	{byte=0xC63, name="Pharazon: Tree Spirits Text"},
 	{byte=0xC64, name="Pharazon: Shagart Den of Thieves Text"},
-	{byte=0xC65, name="Pharazon: Shagart Den of Thieves Text (2)"},
+	{byte=0xC65, name="Pharazon: Shagart Den of Thieves Text 2"},
 	{byte=0xC67, name="Pharazon: Path to Amon Text"},
 	{byte=0xC68, name="Pharazon: Shagart Strange People Text"},
-	{byte=0xC71, name="??? FTT"},
+	{byte=0xC69, name="Pharazon: Shagart Strange People Text 2"},
+	{byte=0xC6D, name="Pharazon: Shagart Strange People Text 3"},
+	{byte=0xC71, name="??? FTT"}, -- Maybe allows later text?
 	{byte=0xC81, name="Lindon FTT"},
 	{byte=0xC82, name="Lindon: Brave Men Text"},
 	{byte=0xC83, name="Lindon: Brave Men Text 2"},
 	{byte=0xC84, name="Lindon: Brave Men Text 3"},
 	{byte=0xC85, name="Lindon: Kidnapping Text"},
 	{byte=0xC87, name="Lindon: Rest Here Text"},
+	{byte=0xC89, name="Lindon: Rest Here Text 2"},
+	{byte=0xC8D, name="Lindon: Rest Here Text 3"},
 	{byte=0xC91, name="Ulmo FTT"},
 	{byte=0xC92, name="Ulmo: Namo Directions Text"},
-	-- ca0 Book is burnable
+	{byte=0xC93, name="Ulmo: Destroy Book Text"}, -- Max value: 0x81
+	{byte=0xC94, name="Ulmo: Destroy Book Text 2"},
+	{byte=0xC95, name="Ulmo: Destroy Book Text 3"},
+	{byte=0xCA0, name="Demon Boss Spawned"}, -- Book Burnable?
 	{byte=0xCA1, name="Swamp Spirit Spawned"},
-	{byte=0xCA2, name="Pirate Spawned"}, -- Also lindon/dwarle open?
+	{byte=0xCA2, name="Pirate Spawned"}, -- Also Lindon/Dwarle open?
 	{byte=0xCA3, name="Path to Amon Open"}, -- Suma spawned?
 	{byte=0xCA8, name="Sword Damage"},
 	{byte=0xCA9, name="Bow Damage"},
@@ -668,13 +732,13 @@ function checkFlags(showKnown)
 	if #flag_block_cache == flag_block_size then
 		local flagFound = false;
 		local knownFlagsFound = 0;
-		local currentValue, previousValue;
+		local currentFlag, currentValue, previousValue;
 
 		for i = 0, #flag_block_cache do
 			currentValue = flagBlock[i];
 			previousValue = flag_block_cache[i];
 			if currentValue ~= previousValue then
-				local currentFlag = getFlag(flag_block_base + i);
+				currentFlag = getFlag(flag_block_base + i);
 				if not currentFlag.ignore then
 					if currentValue == 0 then
 						dprint("Flag "..toHexString(currentFlag.byte, 2)..": \""..currentFlag.name.."\" was cleared on frame "..emu.framecount());
@@ -725,16 +789,15 @@ Game.OSD = {
 	{"Status", Game.getMapStatus},
 	{"Status", Game.getBuildingStatus},
 	{"Separator", 1},
-	{"Health", function() return Game.getHealth().."/48"; end},
-	{"Movement", Game.getMovementState},
+	{"Health", Game.getHealthOSD, Game.colorRecoveryTimer},
+	{"Movement", Game.getMovementState, Game.greenIfStartingJumpChain},
 	{"X", Game.getXPosition},
 	{"Y", Game.getYPosition},
 	{"X Velocity", Game.getXVelocity, Game.colorXVelocity},
 	{"Y Velocity", Game.getYVelocity},
 	{"dX"},
 	{"dY"},
-	{"Grounded", Game.isGrounded},
-	{"Recovery", Game.getRecoveryTimer, Game.colorRecoveryTimer},
+	{"Grounded", Game.isGrounded, Game.greenIfStartingJumpChain},
 };
 
 return Game;
