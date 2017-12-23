@@ -77,15 +77,15 @@ local Game = {
 		"2E - Forest (Amon +1R) (R)",
 		"2F - Forest (???) (L)",
 		"30 - Forest (???) (R)",
-		"31 - Forest (???) (DL)",
-		"32 - Forest (???) (R)",
-		"33 - Forest (???) (UL)",
+		"31 - Forest (Amon +1UL) (DL)",
+		"32 - Forest (Amon +1UL) (R)",
+		"33 - Forest (Amon +1UL) (UL)",
 		"34 - Forest (Shagart +2L) (DL)",
 		"35 - Forest (Shagart +2L) (R)",
-		"36 - Forest (Shagart +2L) (UL, Stairs)",
+		"36 - Forest (Shagart +2L) (UL)",
 		"37 - Forest (Varlin +2UL) (Dwarle +2L) (DL)",
 		"38 - Forest (Varlin +2UL) (Dwarle +2L) (R)",
-		"39 - Forest (Varlin +2UL) (Dwarle +2L) (UL, Stairs)",
+		"39 - Forest (Varlin +2UL) (Dwarle +2L) (UL)",
 		"3A - Coast (Dwarle +1L) (L)",
 		"3B - Coast (Dwarle +1L) (R)",
 		"3C - Coast (Ithile +2R) (L)",
@@ -94,22 +94,22 @@ local Game = {
 		"3F - Coast (Shagart +2R) (R)",
 		"40 - Cave (Dark Suma +1R) (L)",
 		"41 - Cave (Dark Suma +1R) (R)",
-		".42 - Cave (Swamp Spirit +1R) (Ithile +3L) (L)",
-		"43 - Cave (Swamp Spirit +1R) (Ithile +3L) (R)",
+		".42 - Cave (Necromancer +1R) (Ithile +3L) (L)",
+		"43 - Cave (Necromancer +1R) (Ithile +3L) (R)",
 		"44 - Mountains (Amon +2UL) (Pharazon +2R) (L)",
 		"45 - Mountains (Amon +2UL) (Pharazon +2R) (R)",
 		"46 - Mountains (Shagart +3R) (L)",
 		"47 - Mountains (Shagart +3R) (R)",
-		"48 - Mountains (???) (L)",
-		"49 - Mountains (???) (R)",
+		"48 - Mountains (Dwarle +1UR+1R) (L)",
+		"49 - Mountains (Dwarle +1UR+1R) (R)",
 		"4A - Mountains (???) (L)",
 		"4B - Mountains (???) (R)",
 		"4C - Mountains (???) (DL)",
-		".4D - Mountains (Demon +1L) (R)",
+		".4D - Mountains (Baruga +1L) (R)",
 		"4E - Mountains (???) (UL)",
 		"4F - Mountains (Pharazon +2UR) (DL)",
 		"50 - Mountains (Pharazon +2UR) (R)",
-		"51 - Mountains (Pharazon +2UR) (UL Stairs)",
+		"51 - Mountains (Pharazon +2UR) (UL)",
 		"52 - Mountains (???) (L)",
 		"53 - Mountains (???) (R)",
 		".54 - Mountains (Medusa +1R) (Harfoot +3L) (L)",
@@ -118,8 +118,8 @@ local Game = {
 		"57 - Mountains (Pharazon +1UL+3L+Stairs) (R)",
 		"58 - Mountains (Dark Suma +2R) (L)",
 		"59 - Mountains (Dark Suma +2R) (R)",
-		"5A - Dark Forest (Ithile +2L) (Swamp Spirit +2R) (L)",
-		"5B - Dark Forest (Ithile +2L) (Swamp Spirit +2R) (R)",
+		"5A - Dark Forest (Ithile +2L) (Necromancer +2R) (L)",
+		"5B - Dark Forest (Ithile +2L) (Necromancer +2R) (R)",
 		"5C - Dark Forest (Pirate +1L) (Lindon +2R) (L)",
 		".5D - Dark Forest (Pirate +1L) (Lindon +2R) (R)",
 		".5E - Harfoot (L)",
@@ -128,19 +128,19 @@ local Game = {
 		".61 - Ithile (R)",
 		".62 - Amon (L)",
 		".63 - Amon (R)",
-		".64 - Amon (L Stairs)",
-		".65 - Amon (L)", -- Unused?
-		".66 - Amon (R)", -- Unused?
-		".67 - Amon (L Stairs)", -- Unused?
+		".64 - Amon (UL)",
+		".65 - Amon (L) (Path Open)",
+		".66 - Amon (R) (Path Open)",
+		".67 - Amon (UL) (Path Open)",
 		".68 - Dwarle (L)",
 		".69 - Dwarle (R)",
 		".6A - Dwarle (R Stairs)",
 		".6B - Pharazon (L)",
 		".6C - Pharazon (R)",
-		".6D - Pharazon (L Stairs)",
+		".6D - Pharazon (UL)",
 		".6E - Pharazon (DL, Stairs Spawned)",
 		".6F - Pharazon (DR, Stairs Spawned)",
-		".70 - Pharazon (L Stairs, Stairs Spawned)",
+		".70 - Pharazon (UL, Stairs Spawned)",
 		".71 - Pharazon (UR, Stairs Spawned)",
 		"72 - Shagart (L)",
 		"73 - Shagart (Door)",
@@ -407,19 +407,19 @@ local object_fields = {
 		[0x2B] = {name="Tree Spirit", isBoss=true},
 		[0x2C] = {name="Projectile"}, -- Tree Spirit
 		[0x2D] = {name="Projectile"}, -- Tree Spirit
-		[0x2E] = {name="Swamp Spirit", isBoss=true},
+		[0x2E] = {name="Necromancer", isBoss=true},
 		[0x2F] = {name="Stone Hammer", isBoss=true}, -- Second Duel
 		[0x30] = {name="Dark Suma", isBoss=true},
-		[0x31] = {name="Clone", isBoss=true}, -- Swamp Spirit's Minion
+		[0x31] = {name="Clone", isBoss=true}, -- Necromancer's Minion
 		[0x32] = {name="Golden Guard", isBoss=true}, -- Third Duel
 		[0x33] = {name="Paradin", isBoss=true}, -- Fifth Duel
 		[0x34] = {name="Pirate", isBoss=true},
 		[0x35] = {name="Projectile"}, -- Pirate Boss' Sword
 		[0x36] = {name="Medusa", isBoss=true},
-		[0x37] = {name="Demon Boss", isBoss=true},
+		[0x37] = {name="Baruga", isBoss=true},
 		[0x39] = {name="Court Jester", isBoss=true}, -- Fourth Duel
 		[0x3A] = {name="The Ripper", isBoss=true}, -- First Duel
-		[0x3B] = {name="Projectile"}, -- Demon Boss
+		[0x3B] = {name="Projectile"}, -- Baruga
 		[0x3C] = {name="Projectile"}, -- Court Jester
 		[0x3D] = {name="Skull"}, -- Dark Suma
 		[0x3E] = {name="Projectile"}, -- Dark Suma
@@ -602,88 +602,141 @@ local flag_block_base = 0xC00;
 local flag_names = {};
 local flag_array = {
 	{byte=0xC00, name="Tree Spirit Defeated"},
-	{byte=0xC01, name="Demon Boss Defeated"},
+	{byte=0xC01, name="Baruga Defeated"},
 	{byte=0xC02, name="Medusa Defeated"},
-	-- c03 swamp spirit defeated?
+	{byte=0xC03, name="Necromancer Defeated"},
 	{byte=0xC04, name="Duels Defeated"},
 	{byte=0xC05, name="Pirate Defeated"},
-	-- c06 suma defeated
+	{byte=0xC06, name="Dark Suma Defeated"},
+	{byte=0xC07, name="Ra Goan Defeated"},
 	{byte=0xC11, name="Game Started"},
+	{byte=0xC12, name="Ulmo Tree Available"},
 	{byte=0xC13, name="Tree Spirit Spawned"}, -- Namo NPC End
-	-- c14 tree spirit defeated?
-	-- c15 swamp spirit defeated?
-	{byte=0xC17, name="Daughter Returned To Lindon"}, -- After Pirate Boss
-	-- c17 duels defeated?
-	-- c18 suma defeated?
-	-- c19 medusa spawned?
-	-- c1a Pharazon: daughter knows more details
-	-- c1c Demon Boss Defeated? 0x01
-	-- c1d medusa defeated?
+	-- {byte=0xC14, name="Tree Spirit defeated?"},
+	-- {byte=0xC15, name="Necromancer defeated?"},
+	{byte=0xC16, name="Daughter Returned To Lindon"}, -- After Pirate Boss
+	-- {byte=0xC17, name="duels defeated?"},
+	-- {byte=0xC18, name="suma defeated?"},
+	{byte=0xC19, name="Medusa Spawned"}, -- Also requires Herb
+	-- {byte=0xC1A, name="Pharazon: daughter knows more details"},
+	-- {byte=0xC1C, name="Baruga Defeated?"},
+	-- {byte=0xC1D, name="Medusa defeated?"},
+	-- {byte=0xC1E, name="Unknown - Set by Ra Goan"},
 	{byte=0xC21, name="Harfoot FTT"},
 	{byte=0xC22, name="Harfoot: Rest Here Text"},
 	{byte=0xC23, name="Harfoot: Rest Here Text 2"},
 	{byte=0xC24, name="Harfoot: Rest Here Text 3"},
 	{byte=0xC25, name="Harfoot: Rest Here Text 4"},
+	{byte=0xC26, name="Harfoot: Rest Here Text 5"},
 	{byte=0xC27, name="Harfoot: Medusa Text", max_value=0x81},
+	-- {byte=0xC28, name="Unknown - Set by Ra Goan"},
 	{byte=0xC29, name="Harfoot: Persevere Text"},
+	-- {byte=0xC2A, name="Unknown - Set by Ra Goan"},
+	-- {byte=0xC2B, name="Unknown - Set by Ra Goan"},
+	{byte=0xC2C, name="Harfoot: Persevere Text 2"}, -- After Baruga
 	{byte=0xC2D, name="Harfoot: Congratulation Text"}, -- After Medusa
+	{byte=0xC2E, name="Harfoot: Congratulation Text 2"}, -- After Ra Goan
 	{byte=0xC31, name="Amon FTT"},
 	{byte=0xC32, name="Amon: Tree People Text"},
 	{byte=0xC33, name="Amon: Namo Directions Text"},
 	{byte=0xC34, name="Amon: First of Three Tests Text"},
 	{byte=0xC35, name="Amon: Destroy Book Text"},
+	{byte=0xC36, name="Amon: Book Stolen Text"},
 	{byte=0xC37, name="Amon: Pharazon Path"},
 	{byte=0xC38, name="Amon: Just One More Text"},
 	{byte=0xC39, name="Amon: Destroy Book Text 2"},
+	-- {byte=0xC2A, name="Unknown - Set by Ra Goan"},
+	-- {byte=0xC2B, name="Unknown - Set by Ra Goan"},
+	{byte=0xC3C, name="Amon: Sword Upgrade Text"}, -- After Baruga
 	{byte=0xC3D, name="Amon: Go To Varlin Text"},
+	{byte=0xC3E, name="Amon: After Ra Goan Text"}, -- Book Stolen in my flag set, probably a real message though
 	{byte=0xC41, name="Dwarle FTT"},
 	{byte=0xC42, name="Dwarle: Daughter Missing Text"},
 	{byte=0xC43, name="Dwarle: Daughter Missing Text 2"},
 	{byte=0xC44, name="Dwarle: Daughter Missing Text 3"},
 	{byte=0xC45, name="Dwarle: Brave Landau Text"},
+	-- {byte=0xC46, name="Unknown - Set by Ra Goan"},
 	{byte=0xC47, name="Dwarle: Brave Landau Text 2"},
-	-- c48 Demon Boss Defeated? 0x01
+	-- {byte=0xC48, name="Baruga Defeated?"},
 	{byte=0xC49, name="Dwarle: Kill The Beast Text"},
-	-- c4a Demon Boss Defeated? 0x01
-	-- c4b Demon Boss Defeated? 0x01
+	-- {byte=0xC4A, name="Baruga Defeated?"},
+	-- {byte=0xC4B, name="Baruga Defeated?"},
+	{byte=0xC4C, name="Dwarle: Ra Goan Restoration Text"},
 	{byte=0xC4D, name="Dwarle: Lindon Via Shagart Text"},
+	{byte=0xC4E, name="Dwarle: Rule Our Country Well Text"}, -- After Ra Goan
 	{byte=0xC51, name="Ithile FTT"},
 	{byte=0xC52, name="Ithile: Brave Men Text"},
 	{byte=0xC53, name="Ithile: Brave Men Text 2"},
-	{byte=0xC54, name="Ithile: Swamp Spirit Text"},
+	{byte=0xC54, name="Ithile: Necromancer Text"},
 	{byte=0xC55, name="Ithile: Bow Upgrade Text"}, -- Also Shagart->Dwarle
-	{byte=0xC57, name="Ithile: Rest Here Text"}, -- After Medusa
-	{byte=0xC59, name="Ithile: Rest Here Text 2"}, -- After Medusa
-	{byte=0xC5D, name="Ithile: Rest Here Text 3"}, -- After Medusa
+	{byte=0xC56, name="Ithile: Rest Here Text"},
+	{byte=0xC57, name="Ithile: Rest Here Text 2"}, -- After Medusa
+	-- {byte=0xC58, name="Unknown - Set by Ra Goan"},
+	{byte=0xC59, name="Ithile: Rest Here Text 3"}, -- After Medusa
+	-- {byte=0xC5A, name="Unknown - Set by Ra Goan"},
+	-- {byte=0xC5B, name="Unknown - Set by Ra Goan"},
+	{byte=0xC5C, name="Ithile: Rest Here Text 4"}, -- After Baruga?
+	{byte=0xC5D, name="Ithile: Rest Here Text 5"}, -- After Medusa
+	{byte=0xC5E, name="Ithile: Rule Our Country Well Text"}, -- After Ra Goan
 	{byte=0xC61, name="Pharazon FTT"},
 	{byte=0xC62, name="Pharazon: People of Ithile Text"},
 	{byte=0xC63, name="Pharazon: Tree Spirits Text"},
 	{byte=0xC64, name="Pharazon: Shagart Den of Thieves Text"},
 	{byte=0xC65, name="Pharazon: Shagart Den of Thieves Text 2"},
+	{byte=0xC66, name="Pharazon: Brave Landau Text"},
 	{byte=0xC67, name="Pharazon: Path to Amon Text"},
 	{byte=0xC68, name="Pharazon: Shagart Strange People Text"},
 	{byte=0xC69, name="Pharazon: Shagart Strange People Text 2"},
-	{byte=0xC6D, name="Pharazon: Shagart Strange People Text 3"},
+	{byte=0xC6C, name="Pharazon: Shagart Strange People Text 3"}, -- After Baruga?
+	{byte=0xC6D, name="Pharazon: Shagart Strange People Text 4"},
+	{byte=0xC6E, name="Pharazon: Rule Our Country Well Text"}, -- After Ra Goan
 	{byte=0xC71, name="??? FTT"}, -- Maybe allows later text?
+	-- {byte=0xC72, name="Unknown - Set by Ra Goan"},
+	-- {byte=0xC73, name="Unknown - Set by Ra Goan"},
+	-- {byte=0xC74, name="Unknown - Set by Ra Goan"},
+	-- {byte=0xC75, name="Unknown - Set by Ra Goan"},
+	-- {byte=0xC76, name="Unknown - Set by Ra Goan"},
+	-- {byte=0xC77, name="Unknown - Set by Ra Goan"},
+	-- {byte=0xC78, name="Unknown - Set by Ra Goan"},
+	-- {byte=0xC79, name="Unknown - Set by Ra Goan"},
+	-- {byte=0xC7A, name="Unknown - Set by Ra Goan"},
+	-- {byte=0xC7B, name="Unknown - Set by Ra Goan"},
+	-- {byte=0xC7C, name="Unknown - Set by Ra Goan"},
+	-- {byte=0xC7D, name="Unknown - Set by Ra Goan"},
 	{byte=0xC81, name="Lindon FTT"},
 	{byte=0xC82, name="Lindon: Brave Men Text"},
 	{byte=0xC83, name="Lindon: Brave Men Text 2"},
 	{byte=0xC84, name="Lindon: Brave Men Text 3"},
 	{byte=0xC85, name="Lindon: Kidnapping Text"},
-	{byte=0xC87, name="Lindon: Rest Here Text"},
-	{byte=0xC89, name="Lindon: Rest Here Text 2"},
-	{byte=0xC8D, name="Lindon: Rest Here Text 3"},
+	{byte=0xC86, name="Lindon: Rest Here Text"},
+	{byte=0xC87, name="Lindon: Rest Here Text 2"},
+	-- {byte=0xC88, name="Unknown - Set by Ra Goan"},
+	{byte=0xC89, name="Lindon: Rest Here Text 3"},
+	-- {byte=0xC8A, name="Unknown - Set by Ra Goan"},
+	-- {byte=0xC8B, name="Unknown - Set by Ra Goan"},
+	-- {byte=0xC8C, name="Unknown - Set by Ra Goan"},
+	{byte=0xC8D, name="Lindon: Rest Here Text 4"},
+	{byte=0xC8E, name="Lindon: Rule Our Country Well Text"},
 	{byte=0xC91, name="Ulmo FTT"},
 	{byte=0xC92, name="Ulmo: Namo Directions Text"},
 	{byte=0xC93, name="Ulmo: Destroy Book Text", max_value=0x81},
 	{byte=0xC94, name="Ulmo: Destroy Book Text 2"},
 	{byte=0xC95, name="Ulmo: Destroy Book Text 3"},
-	{byte=0xCA0, name="Demon Boss Spawned"}, -- Book Burnable?
-	{byte=0xCA1, name="Swamp Spirit Spawned"},
+	-- {byte=0xC96, name="Unknown - Set by Ra Goan"},
+	{byte=0xC97, name="Ulmo: Destroy Book Text 4"}, -- After Duels
+	-- {byte=0xC98, name="Unknown - Set by Ra Goan"},
+	{byte=0xC99, name="Ulmo: Destroy Book Text 5"}, -- After Duels
+	-- {byte=0xC9A, name="Unknown - Set by Ra Goan"},
+	-- {byte=0xC9B, name="Unknown - Set by Ra Goan"},
+	{byte=0xC9C, name="Ulmo: Cast Book Into Fire Text"},
+	-- {byte=0xC9D, name="Unknown - Set by Ra Goan"},
+	{byte=0xCA0, name="Baruga Spawned"}, -- Book Burnable?
+	{byte=0xCA1, name="Necromancer Spawned"},
 	{byte=0xCA2, name="Pirate Spawned"}, -- Also Lindon/Dwarle open?
 	{byte=0xCA3, name="Path to Amon Open"}, -- Suma spawned?
-	{byte=0xCA8, name="Sword Damage"},
-	{byte=0xCA9, name="Bow Damage"},
+	-- {byte=0xCA4, name="Unknown - Set by Ra Goan"},
+	{byte=0xCA8, name="Sword Damage", max_value=0x03},
+	{byte=0xCA9, name="Bow Damage", max_value=0x03},
 	{byte=0xCAA, name="Inventory: Book"},
 	{byte=0xCAB, name="Inventory: Tree Limb"},
 	{byte=0xCAC, name="Inventory: Herb"},
