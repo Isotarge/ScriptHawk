@@ -598,8 +598,9 @@ end
 -- Flag stuff --
 ----------------
 
-flag_block_base = 0xC00;
-flag_array = {
+local flag_block_base = 0xC00;
+local flag_names = {};
+local flag_array = {
 	{byte=0xC00, name="Tree Spirit Defeated"},
 	{byte=0xC01, name="Demon Boss Defeated"},
 	{byte=0xC02, name="Medusa Defeated"},
@@ -623,7 +624,7 @@ flag_array = {
 	{byte=0xC23, name="Harfoot: Rest Here Text 2"},
 	{byte=0xC24, name="Harfoot: Rest Here Text 3"},
 	{byte=0xC25, name="Harfoot: Rest Here Text 4"},
-	{byte=0xC27, name="Harfoot: Medusa Text"}, -- Max Value 0x81
+	{byte=0xC27, name="Harfoot: Medusa Text", max_value=0x81},
 	{byte=0xC29, name="Harfoot: Persevere Text"},
 	{byte=0xC2D, name="Harfoot: Congratulation Text"}, -- After Medusa
 	{byte=0xC31, name="Amon FTT"},
@@ -674,7 +675,7 @@ flag_array = {
 	{byte=0xC8D, name="Lindon: Rest Here Text 3"},
 	{byte=0xC91, name="Ulmo FTT"},
 	{byte=0xC92, name="Ulmo: Namo Directions Text"},
-	{byte=0xC93, name="Ulmo: Destroy Book Text"}, -- Max value: 0x81
+	{byte=0xC93, name="Ulmo: Destroy Book Text", max_value=0x81},
 	{byte=0xC94, name="Ulmo: Destroy Book Text 2"},
 	{byte=0xC95, name="Ulmo: Destroy Book Text 3"},
 	{byte=0xCA0, name="Demon Boss Spawned"}, -- Book Burnable?
@@ -687,6 +688,18 @@ flag_array = {
 	{byte=0xCAB, name="Inventory: Tree Limb"},
 	{byte=0xCAC, name="Inventory: Herb"},
 };
+
+-- Fill flag names and flags by map
+if #flag_array > 0 then
+	for i = 1, #flag_array do
+		if not flag_array[i].ignore then
+			flag_names[i] = flag_array[i].name;
+		end
+	end
+else
+	print("Warning: No flags found");
+	flag_names = {"None"};
+end
 
 local flag_block_size = 0xAC;
 local flag_block_cache = {};
@@ -768,14 +781,77 @@ function checkFlags(showKnown)
 	print_deferred();
 end
 
+function setFlagByName(name)
+	local flag = getFlagByName(name);
+	if type(flag) == "table" then
+		if type(flag.max_value) == "number" then
+			mainmemory.writebyte(flag.byte, flag.max_value);
+		else
+			mainmemory.writebyte(flag.byte, 0x01);
+		end
+	end
+end
+
+function clearFlagByName(name)
+	local flag = getFlagByName(name);
+	if type(flag) == "table" then
+		mainmemory.writebyte(flag.byte, 0);
+	end
+end
+
+function checkFlag(name)
+	local flag = getFlagByName(name);
+	if type(flag) == "table" then
+		local value = mainmemory.readbyte(flag.byte);
+		if value > 0 then
+			if type(flag.max_value) == "number" then
+				if value == flag.max_value then
+					print("The flag "..flag.name.." is SET");
+					return true;
+				elseif value < flag.max_value then
+					print("The flag "..flag.name.." is SET (but at lower than maximum recorded value)");
+					return true;
+				elseif value > flag.max_value then
+					print("The flag "..flag.name.." is SET (but at greater than maximum recorded value)");
+					return true;
+				end
+			else
+				print("The flag "..flag.name.." is SET");
+				return true;
+			end
+		else
+			print("The flag "..flag.name.." is NOT SET");
+			return false;
+		end
+	end
+	print("The flag \""..name.."\" is currently unknown");
+end
+
+local function flagSetButtonHandler()
+	setFlagByName(forms.getproperty(ScriptHawk.UI.form_controls["Flag Dropdown"], "SelectedItem"));
+end
+
+local function flagClearButtonHandler()
+	clearFlagByName(forms.getproperty(ScriptHawk.UI.form_controls["Flag Dropdown"], "SelectedItem"));
+end
+
+local function flagCheckButtonHandler()
+	checkFlag(forms.getproperty(ScriptHawk.UI.form_controls["Flag Dropdown"], "SelectedItem"));
+end
+
 function Game.eachFrame()
 	checkFlags(true);
 end
 
 function Game.initUI()
+	ScriptHawk.UI.form_controls["Flag Dropdown"] = forms.dropdown(ScriptHawk.UI.options_form, flag_names, ScriptHawk.UI.col(0) + ScriptHawk.UI.dropdown_offset, ScriptHawk.UI.row(7) + ScriptHawk.UI.dropdown_offset, ScriptHawk.UI.col(9) + 8, ScriptHawk.UI.button_height);
+	ScriptHawk.UI.form_controls["Set Flag Button"] = forms.button(ScriptHawk.UI.options_form, "Set", flagSetButtonHandler, ScriptHawk.UI.col(10), ScriptHawk.UI.row(7), 46, ScriptHawk.UI.button_height);
+	ScriptHawk.UI.form_controls["Check Flag Button"] = forms.button(ScriptHawk.UI.options_form, "Check", flagCheckButtonHandler, ScriptHawk.UI.col(12), ScriptHawk.UI.row(7), 46, ScriptHawk.UI.button_height);
+	ScriptHawk.UI.form_controls["Clear Flag Button"] = forms.button(ScriptHawk.UI.options_form, "Clear", flagClearButtonHandler, ScriptHawk.UI.col(14), ScriptHawk.UI.row(7), 46, ScriptHawk.UI.button_height);
+
 	ScriptHawk.UI.form_controls["Object List Checkbox"] = forms.checkbox(ScriptHawk.UI.options_form, "Object List", ScriptHawk.UI.col(0) + ScriptHawk.UI.dropdown_offset, ScriptHawk.UI.row(6) + ScriptHawk.UI.dropdown_offset);
-	ScriptHawk.UI.form_controls["Object Hitboxes Checkbox"] = forms.checkbox(ScriptHawk.UI.options_form, "Hitboxes (Beta)", ScriptHawk.UI.col(0) + ScriptHawk.UI.dropdown_offset, ScriptHawk.UI.row(7) + ScriptHawk.UI.dropdown_offset);
-	ScriptHawk.UI.form_controls["Draggable Hitboxes Checkbox"] = forms.checkbox(ScriptHawk.UI.options_form, "Draggable", ScriptHawk.UI.col(5) + ScriptHawk.UI.dropdown_offset, ScriptHawk.UI.row(7) + ScriptHawk.UI.dropdown_offset);
+	ScriptHawk.UI.form_controls["Object Hitboxes Checkbox"] = forms.checkbox(ScriptHawk.UI.options_form, "Hitboxes (Beta)", ScriptHawk.UI.col(5) + ScriptHawk.UI.dropdown_offset, ScriptHawk.UI.row(6) + ScriptHawk.UI.dropdown_offset);
+	ScriptHawk.UI.form_controls["Draggable Hitboxes Checkbox"] = forms.checkbox(ScriptHawk.UI.options_form, "Draggable", ScriptHawk.UI.col(10) + ScriptHawk.UI.dropdown_offset, ScriptHawk.UI.row(6) + ScriptHawk.UI.dropdown_offset);
 	forms.setproperty(ScriptHawk.UI.form_controls["Object List Checkbox"], "Checked", true);
 	forms.setproperty(ScriptHawk.UI.form_controls["Object Hitboxes Checkbox"], "Checked", true);
 	--forms.setproperty(ScriptHawk.UI.form_controls["Draggable Hitboxes Checkbox"], "Checked", true);
