@@ -493,6 +493,10 @@ local supportedGames = {
 
 	-- Wonder Boy III
 	["E7F86C049E4BD8B26844FF62BD067D57"] = {["moduleName"] = "beta.Wonder Boy III RNG Watch", ["selfContained"] = true, ["friendlyName"] = "Wonder Boy III - The Dragon's Trap (UE)"},
+
+	-- Wonder Boy in Monster World (SMS)
+	["DA0ACDB1B9E806AA67A0216A675CB02ED24ABF8B"] = {["moduleName"] = "games.wonder_boy_monster_world", ["friendlyName"] = "Wonder Boy in Monster World (E)"},
+	["5837764C172C8C43C8C7B21F2144CF27"] = {["moduleName"] = "games.wonder_boy_monster_world", ["friendlyName"] = "Wonder Boy in Monster World (E)"},
 };
 
 local romName = gameinfo.getromname();
