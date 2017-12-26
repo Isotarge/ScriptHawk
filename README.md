@@ -117,6 +117,7 @@ While ScriptHawk does have basic support for OoT and MM there are people who are
 - Taz-Mania (SMS)
 - The Ninja (SMS)
 - Wonder Boy in Monster World (SMS)
+- Earthworm Jim 3D (N64)
 
 ## Partially Supported Games
 - Elmo's Number Journey (N64 only)

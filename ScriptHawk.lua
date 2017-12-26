@@ -371,6 +371,10 @@ local supportedGames = {
 	-- Drill Dozer
 	["C1058CC2482B91204100CC8515DA99AEB06773F5"] = {["moduleName"] = "games.GBA_DrillDozer", ["friendlyName"] = "Drill Dozer (USA)"},
 	["84AFA7108E4D604E7B1A6D105DF5760869A247FA"] = {["moduleName"] = "games.GBA_DrillDozer", ["friendlyName"] = "Screw Breaker Goushin Dorirurero (Japan)"},
+	
+	-- Earthworm Jim 3D
+	["EAB14F23640CD6148D4888902CDCC00DD6111BF9"] = {["moduleName"] = "games.ej3d", ["friendlyName"] = "Earthworm Jim 3D (USA)"},
+	["F02C1AFD18C1CBE309472CBE5B3B3F04B22DB7EE"] = {["moduleName"] = "games.ej3d", ["friendlyName"] = "Earthworm Jim 3D (Europe) (En,Fr,De,Es,It)"},
 
 	-- Elmo
 	["97777CA06F4E8AFF8F1E95033CC8D3833BE40F76"] = {["moduleName"] = "games.elmo", ["friendlyName"] = "Elmo's Letter Adventure (USA)"},
