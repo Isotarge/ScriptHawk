@@ -5,7 +5,7 @@ if type(ScriptHawk) ~= "table" then
 	return;
 end
 
-local Game = {}; -- This table stores the module's API function implementations and game state, it's returned to ScriptHawk at the end of the module code
+local Game = {};
 
 --------------------
 -- Region/Version --
@@ -13,13 +13,6 @@ local Game = {}; -- This table stores the module's API function implementations 
 
 -- 1 USA, 2 EU, 
 Game.Memory = {
-	-- Lua has a maximum of 200 local variables per function, we use a table to store memory addresses to get around this
-	-- It's a 2 dimensional table, the first dimension is the name of the address
-	-- the second dimension is an index for which version of the game was detected, set below by Game.detectVersion()
-	-- Examples of how to access the memory address for X Position:
-		-- Game.Memory.x_position[version] -- Preferred
-		-- Game.Memory["x_position"][version]
-		-- Game["Memory"]["x_position"][version]
 	["jim_pointer"] = {0x0C6810, 0x0C8670}, 
 	["current_map"] = {0x0E9EF9, 0x0EBD59},
 	["destination_map"] = {0x0E03E7, 0x0E2247},
@@ -35,10 +28,10 @@ function Game.detectVersion(romName, romHash)
 	elseif romHash == "F02C1AFD18C1CBE309472CBE5B3B3F04B22DB7EE" then -- Europe
 		version = 2;
 	else
-		return false; -- Return false if this version of the game is not supported
+		return false;
 	end
 
-	return true; -- Return true if version detection is successful
+	return true;
 end
 
 --------------------
@@ -90,11 +83,11 @@ gun = {
 -- Physics/Scale --
 -------------------
 
-Game.speedy_speeds = {.001, .01, .1, .5, 1, 2, 5, 10, 20 }; -- D-Pad speeds, scale these appropriately with your game's coordinate system
+Game.speedy_speeds = {.001, .01, .1, .5, 1, 2, 5, 10, 20 };
 Game.speedy_index = 7;
+Game.speedy_invert_LR = 1;
 
-function Game.isPhysicsFrame() -- Optional: If lag in your game is more complicated than a simple emu.islagged() call you should add the logic to detect it here
-	-- Implementing this logic will result in smooth dY/dXZ calculation (no more flickering between 0 and the correct value)
+function Game.isPhysicsFrame()
 	return not emu.islagged();
 end
 
@@ -130,8 +123,8 @@ end
 -- Rotation --
 --------------
 
-Game.rot_speed = 10; -- Determines how big a single step is when the D-Pad is in Rotation mode
-Game.max_rot_units = 360; -- Maximum value of the Game's native rotation units
+Game.rot_speed = 10;
+Game.max_rot_units = 360;
 
 -- Rotation units can be fiddly sometimes.
 -- These functions can return any number as long as it's consistent between get & set.
@@ -154,19 +147,19 @@ function Game.getYRotation() -- Optional
 	return angle;
 end
 
-function Game.getZRotation() -- Optional
+function Game.getZRotation()
 	return mainmemory.readfloat(Game.Memory.z_rotation[version], true);
 end
 
-function Game.setXRotation(value) -- Optional
+function Game.setXRotation(value)
 	mainmemory.writefloat(Game.Memory.x_rotation[version], value, true);
 end
 
-function Game.setYRotation(value) -- Optional
+function Game.setYRotation(value)
 	mainmemory.writefloat(Game.Memory.y_rotation[version], value / 180, true);
 end
 
-function Game.setZRotation(value) -- Optional
+function Game.setZRotation(value)
 	mainmemory.writefloat(Game.Memory.z_rotation[version], value, true);
 end
 
@@ -175,7 +168,6 @@ end
 ------------
 
 Game.maps = {
-	 -- Prefixing a map with '!' will hide it from the dropdown menu without misaligning the automatic index calculation
 	"The Brain",
 	"Memory Hub",
 	"Coop D'Etat",
@@ -219,7 +211,7 @@ Game.animations = {
 	[15] = "Grabbing Gun", -- Rope
 	[16] = "Retracting Gun", -- Rope
 	[17] = "Surfing", -- Pork Boarding, No Earthworm Turning
-	[18] = "Surfing", -- Pork Boarding, No Earthworm Turning 
+	[18] = "Surfing", -- Pork Boarding, Earthworm Turning 
 	[19] = "Grabbing Ledge",
 	[20] = "Damage", -- Laser Guns, Fall Damage
 	[21] = "Damage", -- Knockback
@@ -247,14 +239,7 @@ Game.animations = {
 	[43] = "Locked", -- Textbox
 }
 
--- Checkbox:
-	-- Will be called each frame while the checkbox is checked
-	-- Should not reload the map instantly
-	-- Should take effect after walking through a door
--- Button:
-	-- Will be called exacty once when the button is pressed
-	-- Should load the selected map as soon as possible after the button is pressed
-Game.takeMeThereType = "Checkbox"; -- Optional. If not present will default to checkbox
+Game.takeMeThereType = "Checkbox"; 
 
 function Game.setMap(index)
 	mainmemory.writebyte(Game.Memory.destination_map[version], index - 1);
@@ -311,8 +296,7 @@ function Game.getAnimationOSD()
 	return currentAnimationName;
 end
 	
-function Game.applyInfinites() -- Optional: Toggled by a checkbox. If this function is not present in the module, the checkbox will not appear
-	-- TODO: Give the player infinite consumables
+function Game.applyInfinites()
 	max_ammo_red_gun = 250;
 	max_ammo_bubble_gun = 50;
 	max_ammo_rockets = 25;
@@ -439,42 +423,32 @@ Game.flagBlock = {
 }
 
 local labelValue = 0;
-function Game.initUI() -- Optional: Init any UI state here, mainly useful for setting up your form controls. Runs once at startup after successful version detection.
-	-- Here are some examples for the most common UI control types
-	--ScriptHawk.UI.form_controls["Example Dropdown"] = forms.dropdown(ScriptHawk.UI.options_form, {"Option 1", "Option 2", "Option 3"}, ScriptHawk.UI.col(0) + ScriptHawk.UI.dropdown_offset, ScriptHawk.UI.row(7) + ScriptHawk.UI.dropdown_offset, ScriptHawk.UI.col(9) + 7, ScriptHawk.UI.button_height);
-	--ScriptHawk.UI.form_controls["Boss Kill Button"] = forms.button(ScriptHawk.UI.options_form, "Kill Boss", Game.killBoss, ScriptHawk.UI.col(10), ScriptHawk.UI.row(0), ScriptHawk.UI.col(4) + 10, ScriptHawk.UI.button_height);
+function Game.initUI()
 	ScriptHawk.UI.form_controls["Reload Map (Soft)"] = forms.button(ScriptHawk.UI.options_form, "Reload Map", Game.reloadMap, ScriptHawk.UI.col(5), ScriptHawk.UI.row(4), ScriptHawk.UI.col(4) + 10, ScriptHawk.UI.button_height);
 	ScriptHawk.UI.form_controls["Reload Map (Hard)"] = forms.button(ScriptHawk.UI.options_form, "Hard Reload", Game.reloadMapHard, ScriptHawk.UI.col(10), ScriptHawk.UI.row(0), ScriptHawk.UI.col(4) + 10, ScriptHawk.UI.button_height);
-	--ScriptHawk.UI.form_controls["Example Plus Button"] = forms.button(ScriptHawk.UI.options_form, "-", function() labelValue = labelValue + 1 end, ScriptHawk.UI.col(13) - 7, ScriptHawk.UI.row(6), ScriptHawk.UI.button_height, ScriptHawk.UI.button_height);
-	--ScriptHawk.UI.form_controls["Example Minus Button"] = forms.button(ScriptHawk.UI.options_form, "+", function() labelValue = labelValue - 1 end, ScriptHawk.UI.col(13) + ScriptHawk.UI.button_height - 7, ScriptHawk.UI.row(6), ScriptHawk.UI.button_height, ScriptHawk.UI.button_height);
-	--ScriptHawk.UI.form_controls["Example Value Label"] = forms.label(ScriptHawk.UI.options_form, "0", ScriptHawk.UI.col(13) + ScriptHawk.UI.button_height + 21, ScriptHawk.UI.row(6) + ScriptHawk.UI.label_offset, 54, 14);
-	--ScriptHawk.UI.form_controls["Fix Input Bug"] = forms.checkbox(ScriptHawk.UI.options_form, "Fix Input", ScriptHawk.UI.col(10) + ScriptHawk.UI.dropdown_offset, ScriptHawk.UI.row(0) + ScriptHawk.UI.dropdown_offset);
 end
 
--- Optional: This function should be used to draw to the screen or update form controls
--- When emulation is running it will be called once per frame
--- When emulation is paused it will be called as fast as possible
 function Game.drawUI()
-	--forms.settext(ScriptHawk.UI.form_controls["Example Value Label"], labelValue);
+	
 end
 
-function Game.eachFrame() -- Optional: This function will be executed once per frame
-	-- TODO
+function Game.eachFrame() 
+	
 end
 
-function Game.realTime() -- Optional: This function will be executed as fast as possible
+function Game.realTime()
 --	if forms.ischecked(ScriptHawk.UI.form_controls["Fix Input Bug"]) then
 --		Game.fixInputBug();
 --	end
 end
 
-Game.OSDPosition = {2, 70}; -- Optional: OSD position in pixels from the top left corner of the screen, defaults to 2, 70 if not set by a game module
+Game.OSDPosition = {2, 70};
 Game.OSD = {
 	{"Map", Game.getMapOSD},
 	{"Exit", Game.getExitOSD},
 	{"Separator", 1},
 	{"X", Game.getXPosition},
-	{"Y", Game.getYPosition}, -- A third parameter can be added to these table entries, a function that returns a 32 bit int AARRGGBB color value for that OSD entry
+	{"Y", Game.getYPosition},
 	{"Z", Game.getZPosition},
 	{"Separator", 1},
 	{"dY"},
@@ -490,4 +464,4 @@ Game.OSD = {
 	--{"Rot. Z", Game.getZRotation},
 };
 
-return Game; -- Return your Game table to ScriptHawk
+return Game;
