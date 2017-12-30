@@ -197,7 +197,30 @@ return {
 	{byte=0x1E, bit=7, name="Fungi: W5 (Upper)", type="Warp", map=48},
 
 	{byte=0x20, bit=2, name="Fungi: Pan Cutscene", type="Cutscene", map=48},
+	{byte=0x20, bit=4, name="Caves: Lanky GB: Beetle Race", type="GB", map=82},
+	{byte=0x20, bit=5, name="Caves: Tiny GB: 5DC", type="GB", map=93},
+	{byte=0x20, bit=6, name="Caves: DK GB: 5DC", type="GB", map=91},
+	{byte=0x20, bit=7, name="Caves: Diddy GB: Lower 5DC", type="GB", map=92},
 
+	{byte=0x21, bit=0, name="Caves: Chunky GB: 5DC", type="GB", map=90},
+	{byte=0x21, bit=1, name="Caves: Lanky GB: 1DC", type="GB", map=94},
+	{byte=0x21, bit=2, name="Caves: Giant Boulder Room Ice Wall Smashed", type="Physical", map=72},
+	{byte=0x21, bit=3, name="Caves: Near Ice Wall Smashed", type="Physical", map=72},
+	{byte=0x21, bit=4, name="Caves: Snide's Ice Wall Smashed", type="Physical", map=72},
+	{byte=0x21, bit=5, name="Caves: Chunky GB: Gorilla Gone", type="GB", map=72},
+	{byte=0x21, bit=7, name="Caves: Chunky GB: Ice Shield", type="GB", map=72},
+	
+	{byte=0x22, bit=0, name="Caves: Lanky GB: Ice Tomato", type="GB", map=98},
+	{byte=0x22, bit=3, name="Caves: Diddy GB: 5DI", type="GB", map=100},
+	{byte=0x22, bit=4, name="Caves: DK GB: 5DI", type="GB", map=86},
+	{byte=0x22, bit=5, name="Caves: DK GB: Rotating Room", type="GB", map=89},
+	{byte=0x22, bit=6, name="Caves: Rotating Room Intro CS", type="Cutscene", map=89},
+	{byte=0x22, bit=7, name="Caves: Chunky GB: 5DI", type="GB", map=95},
+	
+	{byte=0x23, bit=0, name="Caves: Tiny GB: 5DI", type="GB", map=84},
+	{byte=0x23, bit=1, name="Caves: Lanky 5DI Pads Spawned", type="Physical", map=85},
+	{byte=0x23, bit=2, name="Caves: Lanky GB: 5DI", type="GB", map=85},
+	{byte=0x23, bit=3, name="Caves: Intro", type="Cutscene", map=72},
 	{byte=0x23, bit=4, name="Caves: W1 (5DI)", type="Warp", map=72},
 	{byte=0x23, bit=5, name="Caves: W1 (Base)", type="Warp", map=72},
 	{byte=0x23, bit=6, name="Caves: W2 (Base)", type="Warp", map=72},
@@ -209,13 +232,13 @@ return {
 	{byte=0x24, bit=3, name="Caves: W5 (Lanky Kasplat)", type="Warp", map=72},
 	{byte=0x24, bit=4, name="Caves: W3 (5DI)", type="Warp", map=72},
 	{byte=0x24, bit=5, name="Key 6", type="Key", map=196},
-	-- 0x24 > 6
-	-- 0x24 > 7
+	{byte=0x24, bit=6, name="Caves: Diddy GB: Upper 5DC", type="GB", map=200},
+	{byte=0x24, bit=7, name="Caves: Diddy GB: Mad Maze Maul", type="GB", map=72},
 
-	-- 0x25 > 0
-	-- 0x25 > 1
-	-- 0x25 > 2
-	-- 0x25 > 3
+	{byte=0x25, bit=0, name="Caves: Tiny GB: Krazy Kong Klamour", type="GB", map=72},
+	{byte=0x25, bit=1, name="Caves: 5DI Pads Spawned", type="Physical", map=72},
+	{byte=0x25, bit=2, name="Caves: Tiny GB: Ice Shield", type="GB", map=72},
+	{byte=0x25, bit=3, name="Caves: DK GB: BBlast", type="gb", map=72},
 	{byte=0x25, bit=4, name="Caves: Giant Kosha Cutscene Cleared", type="Cutscene", map=72},
 	{byte=0x25, bit=5, name="Caves: Giant Kosha Dead", type="Physical", map=72},
 	{byte=0x25, bit=6, name="Isles: Tiny GB: Rareware GB", type="GB", map=189},
@@ -267,9 +290,9 @@ return {
 	{byte=0x2C, bit=7, name="Crown Pad FTT", type="FTT", nomap=true},
 
 	{byte=0x2D, bit=0, name="T&S FTT (1)", type="FTT", map=42},
-	-- 0x2D > 1 Mini Monkey FTT?
-	-- 0x2D > 2 Hunky Chunky FTT?
-	-- 0x2D > 3 Orangstand Sprint FTT?
+	{byte=0x2D, bit=1, name="Mini Monkey FTT", type="FTT", nomap=true},
+	{byte=0x2D, bit=2, name="Hunky Chunky FTT", type="FTT", nomap=true},
+	{byte=0x2D, bit=3, name="Orangstand Sprint FTT", type="FTT", nomap=true},
 	-- 0x2D > 4 Strong Kong FTT?
 	{byte=0x2D, bit=5, name="Rainbow Coin FTT", type="FTT", nomap=true},
 	{byte=0x2D, bit=6, name="Rambi FTT", type="FTT", nomap=true},
@@ -291,7 +314,7 @@ return {
 	{byte=0x2F, bit=4, name="Rareware Coin", type="Coin", map=5},
 	{byte=0x2F, bit=5, name="Key 8", type="Key", map=17},
 	{byte=0x2F, bit=6, name="Isles: DK GB: Japes Boulder", type="GB", map=34},
-	-- 0x2F > 7
+	{byte=0x2F, bit=7, name="B-Locker FTT", type="FTT", nomap=true},
 
 	{byte=0x30, bit=0, name="Training Grounds: Spawn Training Barrels Cutscene", type="Cutscene", map=176},
 	-- 0x30 > 1
@@ -311,8 +334,8 @@ return {
 	{byte=0x31, bit=6, name="Factory Lobby: Lever Pulled", type="Physical", map=175},
 	{byte=0x31, bit=7, name="Isles: Lanky Instrument GB", type="GB", map=169},
 
-	-- 0x32 > 0
-	-- 0x32 > 1
+	{byte=0x32, bit=0, name="Isles: Aztec Lobby: Tiny Door Open", type="Physical", map=173},
+	{byte=0x32, bit=1, name="Isles: Aztec Lobby: Chunky Wrinkly Turned", type="Physical", map=173},
 	{byte=0x32, bit=2, name="Isles: Galleon Lobby Grate Opened", type="Physical", map=174},
 	{byte=0x32, bit=3, name="Isles: Big Bug Bash GB", type="GB"},
 	{byte=0x32, bit=4, name="Isles: Tiny GB: Galleon Lobby", type="GB", map=174},
@@ -371,15 +394,15 @@ return {
 	{byte=0x38, bit=3, name="Key 7 Turned", type="Key", map={34,97}},
 	{byte=0x38, bit=4, name="Key 8 Turned", type="Key", map={34,97}},
 	-- 0x38 > 5
-	-- 0x38 > 6
+	{byte=0x38, bit=6, name="Story: Japes Intro", type="Cutscene", map=169},
 	{byte=0x38, bit=7, name="Story: Aztec Intro", type="Cutscene", map=173},
 
-	-- 0x39 > 0
-	-- 0x39 > 1
-	-- 0x39 > 2
-	-- 0x39 > 3
-	-- 0x39 > 4
-	-- 0x39 > 5
+	{byte=0x39, bit=0, name="Story: Factory Intro", type="Cutscene", map=175},
+	{byte=0x39, bit=1, name="Story: Galleon Intro", type="Cutscene", map=174},
+	{byte=0x39, bit=2, name="Story: Fungi Intro", type="Type", map=178},
+	{byte=0x39, bit=3, name="Story: Caves Intro", type="Cutscene", map=194},
+	{byte=0x39, bit=4, name="Story: Castle Intro", type="Cutscene", map=193},
+	{byte=0x39, bit=5, name="Story: Enter Hideout", type="Type", map=170},
 	{byte=0x39, bit=6, name="Japes Lobby: B. Locker Cleared", type="B. Locker", map=169},
 	{byte=0x39, bit=7, name="Aztec Lobby: B. Locker Cleared", type="B. Locker", map=173},
 
@@ -648,22 +671,29 @@ return {
 	-- 0x57 > 2
 	-- 0x57 > 3
 	-- 0x57 > 4
-	-- 0x57 > 5
-	-- 0x57 > 6
-	-- 0x57 > 7
+	{byte=0x57, bit=5, name="Caves: DK CB: Boulder Room Balloon", type="Balloon", map=72},
+	{byte=0x57, bit=6, name="Caves: Tiny CB: W4 Cavern Balloon", type="Balloon", map=72},
+	{byte=0x57, bit=7, name="Caves: Chunky CB: W3 Room Balloon", type="Balloon", map=72},
 
-	-- 0x58 > 0
-	-- 0x58 > 1
-	-- 0x58 > 2
-	{byte=0x58, bit=3, name="Caves: Rainbow Coin (Giant Kosha)", type="Rainbow Coin"},
-	-- 0x58 > 4
-	-- 0x58 > 5
-	-- 0x58 > 6
-	-- 0x58 > 7
+	{byte=0x58, bit=0, name="Caves: Diddy CB: 5DC Balloon", type="Balloon", map=72},
+	{byte=0x58, bit=1, name="Caves: DK CB: Gorilla Gone Room Balloon", type="Balloon", map=72},
+	{byte=0x58, bit=2, name="Caves: Lanky CB: Waterfall Balloon", type="Balloon", map=72},
+	{byte=0x58, bit=3, name="Caves: Rainbow Coin (Giant Kosha)", type="Rainbow Coin", map=72},
+	{byte=0x58, bit=4, name="Caves: Tiny CB: Kasplat Balloon", type="Balloon", map=72},
+	{byte=0x58, bit=5, name="Caves: Chunky CB: Snide's Balloon", type="Balloon", map=72},
+	{byte=0x58, bit=6, name="Caves: Diddy CB: W4 (Pillar) Balloon", type="Balloon", map=72},
+	{byte=0x58, bit=7, name="Caves: Tiny CB: 5DI Balloon", type="Balloon", map=84},
 
+	{byte=0x59, bit=0, name="Caves: Lanky CB: 5DI Balloon", type="Balloon", map=85},
+	{byte=0x59, bit=1, name="Caves: DK CB: 5DI Balloon", type="Balloon", map=86},
 	{byte=0x59, bit=2, name="Castle: Rainbow Coin (Snide's)", type="Rainbow Coin"},
+	{byte=0x59, bit=5, name="Caves: Tiny CB: 5DC Balloon", type="Balloon", map=93},
+	{byte=0x59, bit=6, name="Caves: Chunky CB: 5DI Balloon", type="Balloon", map=95},
 	{byte=0x59, bit=7, name="Isles: Rainbow Coin (K. Lumsy)", type="Rainbow Coin", map=97},
 
+	{byte=0x5A, bit=0, name="Caves: Lanky CB: Ice Castle Balloon", type="Balloon", map=98},
+	{byte=0x5A, bit=1, name="Caves: Diddy CB: 5DI Balloon", type="Balloon", map=100},
+	
 	{byte=0x5C, bit=0, name="Training Grounds: Rainbow Coin (Rear)", type="Rainbow Coin", map=176},
 	{byte=0x5C, bit=1, name="Training Grounds: Rainbow Coin (Banana Hoard)", type="Rainbow Coin", map=176},
 	{byte=0x5C, bit=4, name="Isles: Rainbow Coin (Castle Lobby)", type="Rainbow Coin"},
@@ -671,9 +701,9 @@ return {
 	-- 0x60 > 0
 	-- 0x60 > 1
 	-- 0x60 > 2
-	-- 0x60 > 3
-	-- 0x60 > 4
-	-- 0x60 > 5
+	{byte=0x60, bit=3, name="Helm: Blast-O-Matic Off", type="Physical", map=17},
+	{byte=0x60, bit=4, name="Helm: Coin Door Open", type="Type", map=17},
+	{byte=0x60, bit=5, name="Helm: Crown Door Open", type="Physical", map=17},
 	{byte=0x60, bit=6, name="Helm: W1 (Near)", type="Warp", map=17},
 	{byte=0x60, bit=7, name="Helm: W1 (Far)", type="Warp", map=17},
 
@@ -686,7 +716,7 @@ return {
 	-- 0x61 > 6 Galleon FTT?
 	{byte=0x61, bit=7, name="Fungi: FTT", type="FTT", map=48},
 
-	-- 0x62 > 0 Caves FTT?
+	{byte=0x62, bit=0, name="Caves: FTT", type="FTT", map=72},
 	-- 0x62 > 1 Castle FTT?
 	{byte=0x62, bit=2, name="T&S FTT (2)", type="FTT", map=42},
 	{byte=0x62, bit=3, name="Helm: FTT", type="FTT", map=17},
@@ -1136,8 +1166,200 @@ return {
 	{byte=0xE1, bit=2, name="Fungi: Upper W5 Bunch", type="Bunch"},
 	{byte=0xE1, bit=3, name="Fungi: Lower W5 Bunch", type="Bunch"},
 
-	{byte=0x101, bit=2, name="Caves: W1 Bunch (Base)", type="Bunch"},
+	{byte=0x100, bit=0, name="Caves: DK Coin: Giant Boulder Room (1)", type="Coin", map=72},
+	{byte=0x100, bit=1, name="Caves: DK Coin: Giant Boulder Room (2)", type="Coin", map=72},
+	{byte=0x100, bit=2, name="Caves: DK Coin: Giant Boulder Room (3)", type="Coin", map=72},
+	{byte=0x100, bit=3, name="Caves: Diddy CB: Around 5DI Bunch (1)", type="Bunch", map=72},
+	{byte=0x100, bit=4, name="Caves: Lanky CB: Near Cranky Bunch (1)", type="Bunch", map=72},
+	{byte=0x100, bit=5, name="Caves: Ice Castle Top Bunch", type="Bunch", map=72},
+	{byte=0x100, bit=6, name="Caves: Lanky CB: On 1DC Bunch", type="Bunch", map=72},
+	{byte=0x100, bit=7, name="Caves: Tiny Coin: Giant Kosha Room (1)", type="Coin", map=72},
+	
+	{byte=0x101, bit=0, name="Caves: DK CB: Outside BBlast (1)", type="CB", map=72},
+	{byte=0x101, bit=1, name="Caves: DK CB: Outside BBlast (2)", type="CB", map=72},
+	{byte=0x101, bit=2, name="Caves: DK CB: W1 Bunch (Base)", type="Bunch", map=72},
+	{byte=0x101, bit=3, name="Caves: DK CB: W1 Bunch (5DI)", type="Bunch", map=72},
+	{byte=0x101, bit=4, name="Caves: DK CB: Outside 5DC Bunch", type="Bunch", map=72},
+	{byte=0x101, bit=5, name="Caves: DK Coin: Gorilla Gone Room (1)", type="Coin", map=72},
+	{byte=0x101, bit=6, name="Caves: DK Coin: Gorilla Gone Room (2)", type="Coin", map=72},
+	{byte=0x101, bit=7, name="Caves: DK Coin: Gorilla Gone Room (3)", type="Coin", map=72},
+	
+	{byte=0x102, bit=0, name="Caves: DK CB: Around 5DI (1)", type="CB", map=72},
+	{byte=0x102, bit=1, name="Caves: DK CB: Around 5DI (2)", type="CB", map=72},
+	{byte=0x102, bit=2, name="Caves: DK CB: Around 5DI (3)", type="CB", map=72},
+	{byte=0x102, bit=3, name="Caves: DK CB: Around 5DI (4)", type="CB", map=72},
+	{byte=0x102, bit=4, name="Caves: DK CB: Around 5DI (5)", type="CB", map=72},
+	{byte=0x102, bit=5, name="Caves: DK CB: Outside BBlast (3)", type="CB", map=72},
+	{byte=0x102, bit=6, name="Caves: DK CB: Outside BBlast (4)", type="CB", map=72},
+	{byte=0x102, bit=7, name="Caves: DK CB: Outside BBlast (5)", type="CB", map=72},
 
+	{byte=0x103, bit=2, name="Caves: Diddy CB: Around 5DI Bunch (2)", type="Bunch", map=72},
+	{byte=0x103, bit=3, name="Caves: Chunky Coin: W3 Room (2)", type="Coin", map=72},
+	{byte=0x103, bit=4, name="Caves: Diddy CB: Waterfall Bunch", type="Bunch", map=72},
+	{byte=0x103, bit=5, name="Caves: Chunky CB: W2 Bunch (Base)", type="Bunch", map=72},
+	{byte=0x103, bit=6, name="Caves: Chunky CB: W2 Bunch (Far)", type="Bunch", map=72},
+	{byte=0x103, bit=7, name="Caves: Chunky CB: Giant Boulder Room (1)", type="CB", map=72},
+
+	{byte=0x104, bit=0, name="Caves: Chunky CB: Gorilla Gone Room (1)", type="CB", map=72},
+	{byte=0x104, bit=1, name="Caves: Chunky CB: Near DK BP (1)", type="CB", map=72},
+	{byte=0x104, bit=2, name="Caves: Chunky CB: Near DK BP (2)", type="CB", map=72},
+	{byte=0x104, bit=3, name="Caves: Chunky CB: Near DK BP (3)", type="CB", map=72},
+	{byte=0x104, bit=4, name="Caves: Chunky CB: Snide's (1)", type="CB", map=72},
+	{byte=0x104, bit=5, name="Caves: Chunky CB: Snide's (2)", type="CB", map=72},
+	{byte=0x104, bit=6, name="Caves: Chunky CB: Snide's (3)", type="CB", map=72},
+	{byte=0x104, bit=7, name="Caves: Chunky CB: Ice Shield (4)", type="CB", map=72},
+
+	{byte=0x105, bit=4, name="Caves: Lanky CB: Start (1)", type="CB", map=72},
+	{byte=0x105, bit=5, name="Caves: Diddy CB: Hidden W4 Room (1)", type="CB", map=72},
+	{byte=0x105, bit=6, name="Caves: Chunky CB: Gorilla Gone Room (2)", type="CB", map=72},
+	{byte=0x105, bit=7, name="Caves: Chunky CB: Gorilla Gone Room (3)", type="CB", map=72},
+
+	{byte=0x106, bit=0, name="Caves: Tiny Coin: Giant Kosha Room (2)", type="Coin", map=72},
+	{byte=0x106, bit=1, name="Caves: Diddy CB: W4 Bunch (Cavern)", type="Bunch", map=72},
+	{byte=0x106, bit=2, name="Caves: Diddy CB: W4 Bunch (Pillar)", type="Bunch", map=72},
+	{byte=0x106, bit=4, name="Caves: Diddy CB: Around 5DI Bunch (3)", type="Bunch", map=72},
+	{byte=0x106, bit=5, name="Caves: Chunky Coin: Snide's (1)", type="Coin", map=72},
+	{byte=0x106, bit=6, name="Caves: Chunky Coin: Snide's (2)", type="Coin", map=72},
+	{byte=0x106, bit=7, name="Caves: Chunky Coin: Snide's (3)", type="Coin", map=72},
+
+	{byte=0x107, bit=0, name="Caves: Lanky CB: Start (2)", type="CB", map=72},
+	{byte=0x107, bit=1, name="Caves: Lanky CB: Start (3)", type="CB", map=72},
+	{byte=0x107, bit=2, name="Caves: Lanky CB: Start (4)", type="CB", map=72},
+	{byte=0x107, bit=3, name="Caves: Lanky CB: Start (5)", type="CB", map=72},
+	{byte=0x107, bit=4, name="Caves: Diddy CB: Near Funky's (1)", type="CB", map=72},
+	{byte=0x107, bit=5, name="Caves: Diddy CB: Near Funky's (2)", type="CB", map=72},
+	{byte=0x107, bit=6, name="Caves: Diddy CB: Near Funky's (3)", type="CB", map=72},
+	{byte=0x107, bit=7, name="Caves: Diddy CB: Near Funky's (4)", type="CB", map=72},
+
+	{byte=0x108, bit=0, name="Caves: Chunky Coin: Cranky Slope (1)", type="Coin", map=72},
+	{byte=0x108, bit=1, name="Caves: Diddy CB: Hidden W4 Room (2)", type="CB", map=72},
+	{byte=0x108, bit=2, name="Caves: Diddy CB: Hidden W4 Room (3)", type="CB", map=72},
+	{byte=0x108, bit=3, name="Caves: Diddy CB: Hidden W4 Room (4)", type="CB", map=72},
+	{byte=0x108, bit=4, name="Caves: Diddy CB: Near Funky's (5)", type="CB", map=72},
+	{byte=0x108, bit=5, name="Caves: Diddy CB: Hidden W4 Room (5)", type="CB", map=72},
+
+	{byte=0x109, bit=0, name="Caves: Chunky Coin: Near Rotating Room (1)", type="Coin", map=72},
+	{byte=0x109, bit=1, name="Caves: Chunky Coin: Near Rotating Room (2)", type="Coin", map=72},
+	{byte=0x109, bit=2, name="Caves: Chunky Coin: Near Rotating Room (3)", type="Coin", map=72},
+	{byte=0x109, bit=3, name="Caves: Chunky Coin: Near 5DI Tag (1)", type="Coin", map=72},
+	{byte=0x109, bit=4, name="Caves: Chunky Coin: Near 5DI Tag (1)", type="Coin", map=72},
+	{byte=0x109, bit=5, name="Caves: Chunky Coin: Near 5DI Tag (1)", type="Coin", map=72},
+	{byte=0x109, bit=6, name="Caves: Chunky Coin: Cranky Slope (2)", type="Coin", map=72},
+	{byte=0x109, bit=7, name="Caves: Chunky Coin: Cranky Slope (3)", type="Coin", map=72},
+
+	{byte=0x10A, bit=0, name="Caves: Chunky CB: Giant Boulder Room (6)", type="CB", map=72},
+	{byte=0x10A, bit=1, name="Caves: DK CB: Giant Boulder Room (1)", type="CB", map=72},
+	{byte=0x10A, bit=2, name="Caves: DK CB: Giant Boulder Room (2)", type="CB", map=72},
+	{byte=0x10A, bit=3, name="Caves: DK CB: Giant Boulder Room (3)", type="CB", map=72},
+	{byte=0x10A, bit=4, name="Caves: Chunky CB: Gorilla Gone Room Bunch", type="Bunch", map=72},
+	{byte=0x10A, bit=5, name="Caves: Chunky CB: Near DK BP Bunch (2)", type="Bunch", map=72},
+	{byte=0x10A, bit=6, name="Caves: Chunky CB: Boulder Room Bunch", type="Bunch", map=72},
+	{byte=0x10A, bit=7, name="Caves: Tiny CB: W3 Room Bunch", type="Bunch", map=72},
+
+	{byte=0x10B, bit=0, name="Caves: Chunky CB: Ice Shield (3)", type="CB", map=72},
+	{byte=0x10B, bit=1, name="Caves: Chunky CB: Ice Shield (2)", type="CB", map=72},
+	{byte=0x10B, bit=2, name="Caves: Chunky CB: Ice Shield (1)", type="CB", map=72},
+	{byte=0x10B, bit=3, name="Caves: Chunky CB: Ice Shield (5)", type="CB", map=72},
+	{byte=0x10B, bit=4, name="Caves: Chunky CB: Giant Boulder Room (2)", type="CB", map=72},
+	{byte=0x10B, bit=5, name="Caves: Chunky CB: Giant Boulder Room (3)", type="CB", map=72},
+	{byte=0x10B, bit=6, name="Caves: Chunky CB: Giant Boulder Room (4)", type="CB", map=72},
+	{byte=0x10B, bit=7, name="Caves: Chunky CB: Giant Boulder Room (5)", type="CB", map=72},
+
+	{byte=0x10C, bit=0, name="Caves: Tiny CB: River (1)", type="CB", map=72},
+	{byte=0x10C, bit=1, name="Caves: Tiny CB: River (2)", type="CB", map=72},
+	{byte=0x10C, bit=2, name="Caves: Tiny CB: River (3)", type="CB", map=72},
+	{byte=0x10C, bit=3, name="Caves: Tiny CB: River (4)", type="CB", map=72},
+	{byte=0x10C, bit=4, name="Caves: Tiny CB: River (5)", type="CB", map=72},
+	{byte=0x10C, bit=5, name="Caves: Tiny CB: River (6)", type="CB", map=72},
+	{byte=0x10C, bit=6, name="Caves: Tiny CB: River (7)", type="CB", map=72},
+	{byte=0x10C, bit=7, name="Caves: Tiny CB: River (8)", type="CB", map=72},
+
+	{byte=0x10D, bit=7, name="Caves: Tiny CB: River (9)", type="CB", map=72},
+
+	{byte=0x10E, bit=0, name="Caves: Lanky CB: Near Cranky Bunch (2)", type="Bunch", map=72},
+	{byte=0x10E, bit=1, name="Caves: Lanky CB: Near Cranky Bunch (3)", type="Bunch", map=72},
+	{byte=0x10E, bit=2, name="Caves: Lanky CB: W5 Platform Bunch (1)", type="Bunch", map=72},
+	{byte=0x10E, bit=3, name="Caves: Lanky CB: W5 Platform Bunch (2)", type="Bunch", map=72},
+	{byte=0x10E, bit=4, name="Caves: Lanky CB: W5 Platform Bunch (3)", type="Bunch", map=72},
+	{byte=0x10E, bit=5, name="Caves: Lanky CB: W5 Platform Bunch (4)", type="Bunch", map=72},
+
+	{byte=0x110, bit=0, name="Caves: Lanky CB: 5DI (1)", type="CB", map=85},
+	{byte=0x110, bit=1, name="Caves: Lanky CB: 5DI (2)", type="CB", map=85},
+	{byte=0x110, bit=2, name="Caves: Lanky CB: 5DI (3)", type="CB", map=85},
+	{byte=0x110, bit=3, name="Caves: DK CB: 5DI (1)", type="CB", map=86},
+	{byte=0x110, bit=4, name="Caves: DK CB: 5DI (2)", type="CB", map=86},
+	{byte=0x110, bit=5, name="Caves: DK CB: 5DI (3)", type="CB", map=86},
+	{byte=0x110, bit=6, name="Caves: DK CB: 5DI (6)", type="CB", map=86},
+	{byte=0x110, bit=7, name="Caves: DK CB: 5DI (7)", type="CB", map=86},
+
+	{byte=0x111, bit=0, name="Caves: Tiny Coin: W4 Tunnel (1)", type="Coin", map=72},
+	{byte=0x111, bit=1, name="Caves: Tiny CB: Giant Kosha Room Bunch (1)", type="Bunch", map=72},
+	{byte=0x111, bit=2, name="Caves: Tiny CB: Giant Kosha Room Bunch (4)", type="Bunch", map=72},
+	{byte=0x111, bit=3, name="Caves: Tiny CB: Giant Kosha Room Bunch (3)", type="Bunch", map=72},
+	{byte=0x111, bit=4, name="Caves: Tiny CB: Giant Kosha Room Bunch (2)", type="Bunch", map=72},
+	{byte=0x111, bit=5, name="Caves: Tiny CB: 5DI Bunch", type="Bunch", map=84},
+	{byte=0x111, bit=6, name="Caves: Lanky CB: 5DI (4)", type="CB", map=85},
+	{byte=0x111, bit=7, name="Caves: Lanky CB: 5DI (5)", type="CB", map=85},
+
+	{byte=0x112, bit=0, name="Caves: Tiny Coin: Giant Kosha Room (3)", type="Coin", map=72},
+	{byte=0x112, bit=1, name="Caves: Tiny Coin: Pillar (1)", type="Coin", map=72},
+	{byte=0x112, bit=2, name="Caves: Tiny Coin: Pillar (2)", type="Coin", map=72},
+	{byte=0x112, bit=3, name="Caves: Tiny Coin: W1 (5DI) (1)", type="Coin", map=72},
+	{byte=0x112, bit=4, name="Caves: Tiny Coin: W1 (5DI) (2)", type="Coin", map=72},
+	{byte=0x112, bit=5, name="Caves: Tiny Coin: W1 (5DI) (3)", type="Coin", map=72},
+	{byte=0x112, bit=6, name="Caves: Tiny Coin: W4 Tunnel (2)", type="Coin", map=72},
+	{byte=0x112, bit=7, name="Caves: Tiny Coin: W4 Tunnel (3)", type="Coin", map=72},
+
+	{byte=0x113, bit=0, name="Caves: Tiny CB: River (10)", type="CB", map=72},
+	{byte=0x113, bit=1, name="Caves: Tiny CB: Ice Shield Bunch", type="Bunch", map=72},
+	{byte=0x113, bit=2, name="Caves: Chunky Coin: W3 Room (1)", type="Coin", map=72},
+	{byte=0x113, bit=3, name="Caves: Tiny CB: W3 Bunch (5DI)", type="Bunch", map=72},
+	{byte=0x113, bit=4, name="Caves: Chunky CB: Near DK BP Bunch (1)", type="Bunch", map=72},
+	{byte=0x113, bit=5, name="Caves: Chunky Coin: W3 Room (3)", type="Coin", map=72},
+	{byte=0x113, bit=6, name="Caves: Chunky Coin: W3 Room (4)", type="Coin", map=72},
+	{byte=0x113, bit=7, name="Caves: Chunky Coin: W3 Room (5)", type="Coin", map=72},
+
+	{byte=0x114, bit=0, name="Caves; Lanky Coin: Ice Castle (1)", type="Coin", map=98},
+	{byte=0x114, bit=1, name="Caves; Lanky Coin: Ice Castle (2)", type="Coin", map=98},
+	{byte=0x114, bit=2, name="Caves: DK CB: BBlast Bunch (1)", type="Bunch", map=186},
+	{byte=0x114, bit=3, name="Caves: DK Coin: BBlast (1)", type="Coin", map=186},
+	{byte=0x114, bit=4, name="Caves: DK CB: BBlast Bunch (2)", type="Bunch", map=186},
+	{byte=0x114, bit=5, name="Caves: DK Coin: BBlast (3)", type="Coin", map=186},
+	{byte=0x114, bit=6, name="Caves: DK CB: BBlast Bunch (4)", type="Bunch", map=186},
+	{byte=0x114, bit=7, name="Caves: DK Coin: BBlast (2)", type="Coin", map=186},
+
+	{byte=0x115, bit=0, name="Caves: Diddy CB: 5DC Enemies Bunch", type="Bunch", map=92},
+	{byte=0x115, bit=1, name="Caves: Diddy Coin: 5DC Enemies (1)", type="Coin", map=92},
+	{byte=0x115, bit=2, name="Caves: Diddy Coin: 5DC Enemies (2)", type="Coin", map=92},
+	{byte=0x115, bit=3, name="Caves: Diddy Coin: 5DC Enemies (3)", type="Coin"", map=92},
+	{byte=0x115, bit=4, name="Caves: Diddy Coin: 5DC Enemies (4)", type="Coin", map=92},
+	{byte=0x115, bit=5, name="Caves: Tiny CB: 5DC Bunch (1)", type="Bunch", map=93},
+	{byte=0x115, bit=6, name="Caves: Tiny CB: 5DC Bunch (1)", type="Bunch", map=93},
+	{byte=0x115, bit=7, name="Caves: Lanky CB: 1DC Bunch", type="Bunch", map=94},
+
+	{byte=0x116, bit=0, name="Caves: DK CB: 5DC Bunch", type="Bunch", map=91},
+	{byte=0x116, bit=1, name="Caves: DK Coin: 5DC (1)", type="Coin", map=91},
+	{byte=0x116, bit=2, name="Caves: DK Coin: 5DC (2)", type="Coin", map=91},
+	{byte=0x116, bit=3, name="Caves: Diddy CB: 5DC Enemies (1)", type="CB", map=92},
+	{byte=0x116, bit=4, name="Caves: Diddy CB: 5DC Enemies (2)", type="CB", map=92},
+	{byte=0x116, bit=5, name="Caves: Diddy CB: 5DC Enemies (3)", type="CB", map=92},
+	{byte=0x116, bit=6, name="Caves: Diddy CB: 5DC Enemies (4)", type="CB", map=92},
+	{byte=0x116, bit=7, name="Caves: Diddy CB: 5DC Enemies (5)", type="CB", map=92},
+
+	{byte=0x117, bit=0, name="Caves: DK CB: 5DI (4)", type="CB", map=86},
+	{byte=0x117, bit=1, name="Caves: DK CB: 5DI (5)", type="CB", map=86},
+	{byte=0x117, bit=2, name="Caves: DK CB: 5DI Bunch", type="Bunch", map=86},
+	{byte=0x117, bit=3, name="Caves: DK CB: Rotating Room Bunch", type="Bunch", map=89},
+	{byte=0x117, bit=4, name="Caves: Chunky CB: 5DC Bunch (1)", type="Bunch", map=90},
+	{byte=0x117, bit=5, name="Caves: Chunky CB: 5DC Bunch (2)", type="Bunch", map=90},
+	{byte=0x117, bit=6, name="Caves: Chunky CB: 5DC Bunch (3)", type="Bunch", map=90},
+	{byte=0x117, bit=7, name="Caves: Chunky CB: 5DC Bunch (4)", type="Bunch", map=90},
+
+	{byte=0x11B, bit=0, name="Caves: DK CB: BBlast Bunch (3)", type="Bunch", map=186},
+	{byte=0x11B, bit=1, name="Caves: Diddy CB: 5DC Candle Bunch (1)", type="Bunch", map=200},
+	{byte=0x11B, bit=2, name="Caves: Diddy CB: 5DC Candle Bunch (2)", type="Bunch", map=200},
+	{byte=0x11B, bit=3, name="Caves: Diddy CB: 5DC Candle Bunch (3)", type="Bunch", map=200},
+	
 	{byte=0x139, bit=0, type="Unknown", nomap=true, ignore=true},
 
 	{byte=0x13A, bit=0, type="Unknown", nomap=true, ignore=true},
