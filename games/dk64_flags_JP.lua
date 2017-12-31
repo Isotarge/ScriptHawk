@@ -1331,7 +1331,7 @@ return {
 	{byte=0x115, bit=0, name="Caves: Diddy CB: 5DC Enemies Bunch", type="Bunch", map=92},
 	{byte=0x115, bit=1, name="Caves: Diddy Coin: 5DC Enemies (1)", type="Coin", map=92},
 	{byte=0x115, bit=2, name="Caves: Diddy Coin: 5DC Enemies (2)", type="Coin", map=92},
-	{byte=0x115, bit=3, name="Caves: Diddy Coin: 5DC Enemies (3)", type="Coin"", map=92},
+	{byte=0x115, bit=3, name="Caves: Diddy Coin: 5DC Enemies (3)", type="Coin", map=92},
 	{byte=0x115, bit=4, name="Caves: Diddy Coin: 5DC Enemies (4)", type="Coin", map=92},
 	{byte=0x115, bit=5, name="Caves: Tiny CB: 5DC Bunch (1)", type="Bunch", map=93},
 	{byte=0x115, bit=6, name="Caves: Tiny CB: 5DC Bunch (1)", type="Bunch", map=93},
