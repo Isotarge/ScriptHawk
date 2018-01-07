@@ -116,6 +116,7 @@ While ScriptHawk does have basic support for OoT and MM there are people who are
 - Sonic The Hedgehog (SMS)
 - Taz-Mania (SMS)
 - The Ninja (SMS)
+- Ty the Tasmanian Tiger 2: Bush Rescue (GBA)
 - Wonder Boy in Monster World (SMS)
 - Earthworm Jim 3D (N64)
 
