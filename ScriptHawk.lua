@@ -495,6 +495,10 @@ local supportedGames = {
 	["EAE83C07E2E777D8E71A5BE6120AED03D7E67782"] = {["moduleName"] = "games.ts2", ["friendlyName"] = "Toy Story 2 - Captain Buzz Lightyear auf Rettungsmission! (Germany) (Rev A)"},
 	["F8FBB100227015BE8629243F53D70F29A2A14315"] = {["moduleName"] = "games.ts2", ["friendlyName"] = "Toy Story 2 - Captain Buzz Lightyear auf Rettungsmission! (Germany)"},
 
+    --Ty the Tasmanian Tiger 2: Bush Rescue(GBA)
+    ["84267CE3D86100688048A8D4F166FA1B2D50E6D5"] = {["moduleName"] = "games.GBA_Ty2", ["friendlyName"] = "Ty the Tasmanian Tiger 2 - Bush Rescue (USA,Europe) (En,Fr,De)"},
+
+    
 	-- Wonder Boy III
 	["E7F86C049E4BD8B26844FF62BD067D57"] = {["moduleName"] = "beta.Wonder Boy III RNG Watch", ["selfContained"] = true, ["friendlyName"] = "Wonder Boy III - The Dragon's Trap (UE)"},
 
