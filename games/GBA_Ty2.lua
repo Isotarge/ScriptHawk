@@ -13,6 +13,7 @@ local Game = {}; -- This table stores the module's API function implementations 
 
 Game.Memory = {
 	["player_ptr"] = {["Domain"] = "EWRAM", ["Address"] = 0x47EC},
+    ["rangCount"] = {["Domain"] = "IWRAM", ["Address"] = 0xB06},
     --["player_ptr"] = {["Domain"] = "EWRAM", ["Address"] = {0x5B08}}, --may be better?
 };
 
@@ -46,7 +47,7 @@ function parsePointer(inPtr)
         outPtr["Domain"] = "IWRAM";
         outPtr["Address"] = inPtr - 0x03000000;
     else
-        return false;
+        return nil;
     end
     return outPtr
 end
@@ -58,10 +59,56 @@ end
 Game.speedy_speeds = { .001, .01, .1, 1, 5, 10, 20, 50, 100 }; -- D-Pad speeds, scale these appropriately with your game's coordinate system
 Game.speedy_index = 7;
 
-function Game.isPhysicsFrame() -- Optional: If lag in your game is more complicated than a simple emu.islagged() call you should add the logic to detect it here
-	-- Implementing this logic will result in smooth dY/dXZ calculation (no more flickering between 0 and the correct value)
-	return not emu.islagged();
+local movementStates = {
+	[0x00] = "Idle",
+    [0x01] = "Run",
+    [0x02] = "Jump",
+    [0x03] = "Fall",
+    [0x04] = "Glide",
+    [0x05] = "Rang Throw",
+    [0x06] = "Damaged",
+    [0x07] = "Run Skid",
+    [0x09] = "Run Start",
+    [0x0A] = "Landing",
+    [0x0C] = "Bite",
+    [0x0D] = "Interacting",
+    [0x10] = "Fast Falling",
+    [0x11] = "Fall Damage",
+    [0x15] = "Platform Drop Through",
+    [0x17] = "Looking",
+    [0X19] = "Arial Bite",
+}
+function Game.getState()
+    local playerPtr = memory.read_u32_le(Game.Memory.player_ptr["Address"], Game.Memory.player_ptr["Domain"]);
+	playerPtr = parsePointer(playerPtr);
+    if playerPtr ~= nil then
+        local currentMovementState = memory.read_u8(playerPtr["Address"]+0x5D, playerPtr["Domain"]);
+        --local direction = memory.read_u8_le(playerPtr["Address"]+0x16, playerPtr["Domain"]);
+        if type(movementStates[currentMovementState]) ~= "nil" then
+          return movementStates[currentMovementState];
+	    else
+		  return "Unknown ("..currentMovementState..")";
+	   end
+    end
+    return nil
 end
+
+function Game.getRangCount()
+    return (2 - memory.read_u16_le(Game.Memory.rangCount["Address"], Game.Memory.rangCount["Domain"]));
+end
+function Game.colorRangCount()
+	local rangs = Game.getRangCount();
+	if rangs == 0 then
+		-- Color Y position values less than 0 red
+		-- Format 0xAARRGGBB
+		return 0xFFFF0000;
+		-- LibScriptHawk also provides some common colors in a colors table, for example:
+		-- return colors.red;
+    elseif rangs == 2 then
+        return 0xFF00FF00;
+	end
+end
+
 
 --------------
 -- Position --
@@ -70,7 +117,7 @@ end
 function Game.getXPosition()
     local playerPtr = memory.read_u32_le(Game.Memory.player_ptr["Address"], Game.Memory.player_ptr["Domain"])
 	playerPtr = parsePointer(playerPtr)
-    if playerPtr ~= false then
+    if playerPtr ~= nil then
         return memory.read_s32_le(playerPtr["Address"]+0xC, playerPtr["Domain"]);
     end
     return 0
@@ -79,14 +126,14 @@ end
 function Game.getYPosition()
     local playerPtr = memory.read_u32_le(Game.Memory.player_ptr["Address"], Game.Memory.player_ptr["Domain"])
 	playerPtr = parsePointer(playerPtr)
-    if playerPtr ~= false then
+    if playerPtr ~= nil then
         return -memory.read_s32_le(playerPtr["Address"]+0x10, playerPtr["Domain"]);
     end
     return 0
 end
 
-function Game.colorYPosition()
-	local yPosition = Game.getYPosition();
+function Game.colorYVelocity()
+	local yPosition = Game.getYVelocity();
 	if yPosition < 0 then
 		-- Color Y position values less than 0 red
 		-- Format 0xAARRGGBB
@@ -110,17 +157,19 @@ end
     function Game.getXVelocity()
         local playerPtr = memory.read_u32_le(Game.Memory.player_ptr["Address"], Game.Memory.player_ptr["Domain"])
         playerPtr = parsePointer(playerPtr)
-        if playerPtr ~= false then
+        if playerPtr ~= nil then
             return memory.read_s32_le(playerPtr["Address"]+0x18, playerPtr["Domain"]);
         end
+    return 0
     end
 
     function Game.getYVelocity()
         local playerPtr = memory.read_u32_le(Game.Memory.player_ptr["Address"], Game.Memory.player_ptr["Domain"])
         playerPtr = parsePointer(playerPtr)
-        if playerPtr ~= false then
+        if playerPtr ~= nil then
             return memory.read_s32_le(playerPtr["Address"]+0x1C, playerPtr["Domain"]);
         end
+    return 0
     end
 
 --------------
@@ -201,12 +250,13 @@ end
 
 Game.OSDPosition = {2, 70}; -- Optional: OSD position in pixels from the top left corner of the screen, defaults to 2, 70 if not set by a game module
 Game.OSD = {
+    {"State", Game.getState},
+    {"Rang #", Game.getRangCount,Game.colorRangCount},
 	{"X", Game.getXPosition},
-	--{"Y", Game.getYPosition, Game.colorYPosition}, -- A third parameter can be added to these table entries, a function that returns a 32 bit int AARRGGBB color value for that OSD entry
-	{"Y", Game.getYPosition},
+	{"Y", Game.getYPosition}, -- A third parameter can be added to these table entries, a function that returns a 32 bit int AARRGGBB color value for that OSD entry
     {"Separator", 1},
     {"X Vel", Game.getXVelocity},
-	{"Y Vel", Game.getYVelocity},
+	{"Y Vel", Game.getYVelocity, Game.colorYVelocity},
 	{"dY"},
 	{"dXZ"},
 	{"Separator", 1},
