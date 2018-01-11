@@ -45,7 +45,7 @@ jim = {
 	["y_position"] = 0x034; -- Float 
 	["z_position"] = 0x038; -- Float
 	["bagpipe_lock"] = 0x0C0; -- Byte
-	["animation_timer"] = 0x0CB; -- Byte
+	["animation_timer"] = 0x0CA; -- 2 Byte
 	["control_type"] = 0x0F4; -- 4 Byte (0 = Normal, 2 = Boss Fights, 4 = Void Process)
 	["Health"] = 0x0FC; -- 4 Byte
 	["Lives"] = 0x100; -- 4 Byte
@@ -295,6 +295,11 @@ function Game.getAnimationOSD()
 	end
 	return currentAnimationName;
 end
+
+function Game.getAnimationTimerOSD()
+	local anim_timer = mainmemory.read_u16_be(Game.Memory.jim_pointer[version] + jim.animation_timer);
+	return anim_timer;
+end
 	
 function Game.applyInfinites()
 	max_ammo_red_gun = 250;
@@ -460,6 +465,7 @@ Game.OSD = {
 	{"Separator", 1},
 	--{"Rot. X", Game.getXRotation},
 	{"Animation", Game.getAnimationOSD},
+	{"Animation Timer", Game.getAnimationTimerOSD},
 	{"Facing", Game.getYRotation},
 	--{"Rot. Z", Game.getZRotation},
 };
