@@ -22,6 +22,7 @@ local player_struct = {
     [0x10] = {["Type"] = "s32_le", ["Name"] = "YPosition"},
 	[0x18] = {["Type"] = "s32_le", ["Name"] = "XVelocity"},
 	[0x1C] = {["Type"] = "s32_le", ["Name"] = "YVelocity"},
+    [0x74] = {["Type"] = "u32_le", ["Name"] = "1st Glide"},
 };
 
 function Game.detectVersion(romName, romHash) -- Modules should ideally use ROM hash rather than name, but both are passed in by ScriptHawk
@@ -109,6 +110,28 @@ function Game.colorRangCount()
 	end
 end
 
+function Game.getGlideFlag()
+    local playerPtr = memory.read_u32_le(Game.Memory.player_ptr["Address"], Game.Memory.player_ptr["Domain"])
+	playerPtr = parsePointer(playerPtr)
+    if playerPtr ~= nil then
+        local glideFlag = memory.read_u32_le(playerPtr["Address"]+0x74, playerPtr["Domain"])
+        if  glideFlag == 0 then
+            return false
+        else
+            return true
+        end
+    end
+    return nil
+end
+
+function Game.colorGlideFlag()
+	local glideFlag = Game.getGlideFlag();
+	if glideFlag == true and Game.getRangCount() == 2 then
+		-- Color Y position values less than 0 red
+		-- Format 0xAARRGGBB
+		return 0xFF00FF00;
+	end
+end
 
 --------------
 -- Position --
@@ -252,6 +275,7 @@ Game.OSDPosition = {2, 70}; -- Optional: OSD position in pixels from the top lef
 Game.OSD = {
     {"State", Game.getState},
     {"Rang #", Game.getRangCount,Game.colorRangCount},
+    {"SuperJump", Game.getGlideFlag, Game.colorGlideFlag},
 	{"X", Game.getXPosition},
 	{"Y", Game.getYPosition}, -- A third parameter can be added to these table entries, a function that returns a 32 bit int AARRGGBB color value for that OSD entry
     {"Separator", 1},
