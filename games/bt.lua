@@ -310,6 +310,7 @@ local Game = {
 		["map"] = {0x137B42, 0x137DD2, 0x12CF92, 0x132DC2},
 		["map_trigger_target"] = {0x12C390, 0x12C5A0, 0x1217F0, 0x127640},
 		["map_trigger"] = {0x12C392, 0x12C5A2, 0x1217F2, 0x127642},
+		["map_destination"] = {0x044E32, 0x044E32, 0x044EB2, 0x045702},
 		["DCW_location"] = {0x12C33A, 0x12C54A, 0x12179A, 0x1275EA},
 		["character_state"] = {0x13BC53, 0x13BEE3, 0x1310A3, 0x136F63},
 		["character_change"] = {0x12BD9C, 0x12BFAC, 0x1211FC, 0x12704C},
@@ -4360,19 +4361,29 @@ end
 -- Events --
 ------------
 
-Game.takeMeThereType = "Button";
+Game.takeMeThereType = "Checkbox";
 function Game.setMap(value)
-	local trigger_value = mainmemory.read_u16_be(Game.Memory.map_trigger[version]);
-	if trigger_value == 0 then
-		mainmemory.write_u16_be(Game.Memory.map_trigger_target[version], value);
-
-		-- Force game to reload with desired map
-		mainmemory.write_u16_be(Game.Memory.map_trigger[version], 0x0101);
-	end
+	mainmemory.write_u16_be(Game.Memory.map_destination[version], value);	
 end
 
 function Game.getMap()
 	return mainmemory.read_u16_be(Game.Memory.map[version]);
+end
+
+function Game.forceReload()
+	local trigger_value = mainmemory.read_u16_be(Game.Memory.map_trigger[version]);
+	local currentMap = Game.getMap();
+	local dropdown_map_value = ScriptHawk.UI.findMapValue();
+	if trigger_value == 0 then
+		if forms.ischecked(ScriptHawk.UI.form_controls["Map Checkbox"]) then
+			mainmemory.write_u16_be(Game.Memory.map_trigger_target[version], dropdown_map_value);
+		else
+			mainmemory.write_u16_be(Game.Memory.map_trigger_target[version], currentMap);
+		end
+
+		-- Force game to reload with desired map
+		mainmemory.write_u16_be(Game.Memory.map_trigger[version], 0x0101);
+	end
 end
 
 function Game.getMapOSD()
@@ -4476,8 +4487,8 @@ function Game.applyInfinites()
 end
 
 local move_levels = {
-	["1. All"]  = {0xFFFFFFFF, 0xFFFFFFFF},
-	["2. None"] = {0xE0FFFF01, 0x00004000},
+	["All"]  = {0xFFFFFFFF, 0xFFFFFFFF},
+	["None"] = {0xE0FFFF01, 0x00004000},
 };
 
 local function unlock_moves()
@@ -4494,6 +4505,9 @@ function Game.toggleDragonKazooie()
 end
 
 function Game.initUI()
+	-- Force Reload
+	ScriptHawk.UI.form_controls.forcereload_button = forms.button(ScriptHawk.UI.options_form, "Force Reload", Game.forceReload, ScriptHawk.UI.col(5), ScriptHawk.UI.row(4), ScriptHawk.UI.col(4) + 10, ScriptHawk.UI.button_height);
+	
 	-- Flag stuff
 	ScriptHawk.UI.form_controls["Flag Dropdown"] = forms.dropdown(ScriptHawk.UI.options_form, flag_names, ScriptHawk.UI.col(0) + ScriptHawk.UI.dropdown_offset, ScriptHawk.UI.row(7) + ScriptHawk.UI.dropdown_offset, ScriptHawk.UI.col(9) + 8, ScriptHawk.UI.button_height);
 	ScriptHawk.UI.form_controls["Set Flag Button"] = forms.button(ScriptHawk.UI.options_form, "Set", flagSetButtonHandler, ScriptHawk.UI.col(10), ScriptHawk.UI.row(7), 46, ScriptHawk.UI.button_height);
@@ -4506,8 +4520,8 @@ function Game.initUI()
 	ScriptHawk.UI.form_controls.toggle_autojump = forms.checkbox(ScriptHawk.UI.options_form, "Autojump", ScriptHawk.UI.col(5) + ScriptHawk.UI.dropdown_offset, ScriptHawk.UI.row(6) + ScriptHawk.UI.dropdown_offset);
 
 	-- Moves
-	ScriptHawk.UI.form_controls.moves_dropdown = forms.dropdown(ScriptHawk.UI.options_form, { "1. All", "2. None" }, ScriptHawk.UI.col(5) - ScriptHawk.UI.dropdown_offset, ScriptHawk.UI.row(4) + ScriptHawk.UI.dropdown_offset, ScriptHawk.UI.col(4) + 10, ScriptHawk.UI.button_height);
-	ScriptHawk.UI.form_controls.moves_button = forms.button(ScriptHawk.UI.options_form, "Unlock Moves", unlock_moves, ScriptHawk.UI.col(10), ScriptHawk.UI.row(4), ScriptHawk.UI.col(4) + 10, ScriptHawk.UI.button_height);
+	ScriptHawk.UI.form_controls.moves_dropdown = forms.dropdown(ScriptHawk.UI.options_form, { "All", "None" }, ScriptHawk.UI.col(7) - ScriptHawk.UI.dropdown_offset, ScriptHawk.UI.row(2) + ScriptHawk.UI.dropdown_offset, ScriptHawk.UI.col(2) + 10, ScriptHawk.UI.button_height);
+	ScriptHawk.UI.form_controls.moves_button = forms.button(ScriptHawk.UI.options_form, "Unlock Moves", unlock_moves, ScriptHawk.UI.col(10), ScriptHawk.UI.row(2), ScriptHawk.UI.col(4) + 10, ScriptHawk.UI.button_height);
 	ScriptHawk.UI.form_controls.dragon_button = forms.button(ScriptHawk.UI.options_form, "Toggle Dragon Kazooie", Game.toggleDragonKazooie, ScriptHawk.UI.col(10), ScriptHawk.UI.row(5), ScriptHawk.UI.col(4) + 10, ScriptHawk.UI.button_height);
 
 	-- Character Dropdown
