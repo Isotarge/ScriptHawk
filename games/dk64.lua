@@ -63,10 +63,6 @@ local Game = {
 		["jetman_velocity_x"] = {0x02F058, 0x022108, 0x022068, nil},
 		["jetman_velocity_y"] = {0x02F05C, 0x02210C, 0x02206C, nil},
 		["arcade_object_base"] = {0x04BCD0, 0x03EC30, 0x03EA60, nil},
-		["jumpman_position_x"] = {0x04BD70, 0x03ECD0, 0x03EB00, nil}, -- TODO: Not correct for levels 2 and 4
-		["jumpman_position_y"] = {0x04BD74, 0x03ECD4, 0x03EB04, nil},
-		["jumpman_velocity_x"] = {0x04BD78, 0x03ECD8, 0x03EB08, nil},
-		["jumpman_velocity_y"] = {0x04BD7C, 0x03ECDC, 0x03EB0C, nil},
 		["RNG"] = {0x746A40, 0x7411A0, 0x746300, 0x6F36E0},
 		["mode"] = {0x755318, 0x74FB98, 0x7553D8, 0x6FFE6C}, -- See Game.modes for values
 		["current_map"] = {0x76A0A8, 0x764BC8, 0x76A298, 0x72CDE4}, -- See Game.maps for values
@@ -461,6 +457,7 @@ local arcade_object = {
 	y_position = 0x04, -- Float
 	x_velocity = 0x08, -- Float
 	y_velocity = 0x0C, -- Float
+	object_type = 0x18,
 	size = 0x20,
 	count = 61, -- TODO: Figure out actual value
 	hitbox = {
@@ -470,6 +467,15 @@ local arcade_object = {
 		y_offset = 0,
 	},
 };
+
+function Game.getJumpman()
+	for i = 0, arcade_object.count - 1 do
+		local objectBase = Game.Memory.arcade_object_base[version] + (i * arcade_object.size);
+		if mainmemory.readbyte(objectBase + arcade_object.object_type) == 0x0D then
+			return objectBase;
+		end
+	end
+end
 
 local arcadeXMultiplier = 1;
 local arcadeYMultiplier = 0.9;
@@ -490,10 +496,13 @@ local function arcadeObjectBaseToDraggableObject(objectBase)
 		yPosition = mainmemory.readfloat(objectBase + arcade_object.y_position, true),
 	};
 
+	local hbWidth = mainmemory.readbyte(objectBase + 0x1E);
+	local hbHeight = mainmemory.readbyte(objectBase + 0x1F);
+
 	draggableObject.leftX = (draggableObject.xPosition + arcade_object.hitbox.x_offset) * arcadeXMultiplier;
-	draggableObject.rightX = draggableObject.leftX + arcade_object.hitbox.width;
+	draggableObject.rightX = draggableObject.leftX + hbWidth;
 	draggableObject.topY = (draggableObject.yPosition + arcade_object.hitbox.y_offset) * arcadeYMultiplier;
-	draggableObject.bottomY = draggableObject.topY + arcade_object.hitbox.height;
+	draggableObject.bottomY = draggableObject.topY + hbHeight;
 
 	return draggableObject;
 end
@@ -4534,7 +4543,10 @@ end
 
 function Game.getXPosition()
 	if map_value == arcade_map then
-		return mainmemory.readfloat(Game.Memory.jumpman_position_x[version], true);
+		local jumpman = Game.getJumpman();
+		if isRDRAM(jumpman) then
+			return mainmemory.readfloat(jumpman + arcade_object.x_position, true);
+		end
 	elseif map_value == jetpac_map then
 		return mainmemory.readfloat(Game.Memory.jetman_position_x[version], true);
 	end
@@ -4547,7 +4559,10 @@ end
 
 function Game.getYPosition()
 	if map_value == arcade_map then
-		return mainmemory.readfloat(Game.Memory.jumpman_position_y[version], true);
+		local jumpman = Game.getJumpman();
+		if isRDRAM(jumpman) then
+			return mainmemory.readfloat(jumpman + arcade_object.y_position, true);
+		end
 	elseif map_value == jetpac_map then
 		return mainmemory.readfloat(Game.Memory.jetman_position_y[version], true);
 	end
@@ -4570,7 +4585,12 @@ end
 
 function Game.setXPosition(value)
 	if map_value == arcade_map then
-		--mainmemory.writefloat(Game.Memory.jumpman_position_x[version], value, true);
+		--[[
+		local jumpman = Game.getJumpman();
+		if isRDRAM(jumpman) then
+			mainmemory.writefloat(jumpman + arcade_object.x_position, value, true);
+		end
+		--]]
 	elseif map_value == jetpac_map then
 		--mainmemory.writefloat(Game.Memory.jetman_position_x[version], value, true);
 	else
@@ -4589,7 +4609,12 @@ end
 
 function Game.setYPosition(value)
 	if map_value == arcade_map then
-		--mainmemory.writefloat(Game.Memory.jumpman_position_y[version], value, true);
+		--[[
+		local jumpman = Game.getJumpman();
+		if isRDRAM(jumpman) then
+			mainmemory.writefloat(jumpman + arcade_object.y_position, value, true);
+		end
+		--]]
 	elseif map_value == jetpac_map then
 		--mainmemory.writefloat(Game.Memory.jetman_position_y[version], value, true);
 	else
@@ -4821,7 +4846,10 @@ end
 function Game.getVelocity()
 	local playerObject = Game.getPlayerObject();
 	if map_value == arcade_map then
-		return mainmemory.readfloat(Game.Memory.jumpman_velocity_x[version], true);
+		local jumpman = Game.getJumpman();
+		if isRDRAM(jumpman) then
+			return mainmemory.readfloat(jumpman + arcade_object.x_velocity, true);
+		end
 	elseif map_value == jetpac_map then
 		return mainmemory.readfloat(Game.Memory.jetman_velocity_x[version], true);
 	elseif isRDRAM(playerObject) then
@@ -4833,7 +4861,12 @@ end
 function Game.setVelocity(value)
 	local playerObject = Game.getPlayerObject();
 	if map_value == arcade_map then
-		mainmemory.writefloat(Game.Memory.jumpman_velocity_x[version], value, true);
+		--[[
+		local jumpman = Game.getJumpman();
+		if isRDRAM(jumpman) then
+			mainmemory.writefloat(jumpman + arcade_object.x_velocity, value, true);
+		end
+		--]]
 	elseif map_value == jetpac_map then
 		mainmemory.writefloat(Game.Memory.jetman_velocity_x[version], value, true);
 	elseif isRDRAM(playerObject) then
@@ -4844,7 +4877,10 @@ end
 function Game.getYVelocity()
 	local playerObject = Game.getPlayerObject();
 	if map_value == arcade_map then
-		return mainmemory.readfloat(Game.Memory.jumpman_velocity_y[version], true);
+		local jumpman = Game.getJumpman();
+		if isRDRAM(jumpman) then
+			return mainmemory.readfloat(jumpman + arcade_object.y_velocity, true);
+		end
 	elseif map_value == jetpac_map then
 		return mainmemory.readfloat(Game.Memory.jetman_velocity_y[version], true);
 	elseif isRDRAM(playerObject) then
@@ -4856,7 +4892,12 @@ end
 function Game.setYVelocity(value)
 	local playerObject = Game.getPlayerObject();
 	if map_value == arcade_map then
-		mainmemory.writefloat(Game.Memory.jumpman_velocity_y[version], value, true);
+		--[[
+		local jumpman = Game.getJumpman();
+		if isRDRAM(jumpman) then
+			mainmemory.writefloat(jumpman + arcade_object.y_velocity, value, true);
+		end
+		--]]
 	elseif map_value == jetpac_map then
 		mainmemory.writefloat(Game.Memory.jetman_velocity_y[version], value, true);
 	elseif isRDRAM(playerObject) then
@@ -7161,7 +7202,6 @@ function dumpSegments()
 end
 
 function F3DEX2Trace()
-	local textureCache = {};
 	local DLBase = dereferencePointer(Game.Memory.map_displaylist_pointer[version]);
 	local vertBase = dereferencePointer(Game.Memory.map_vertex_pointer[version]);
 	if isRDRAM(DLBase) and isRDRAM(vertBase) and vertBase > DLBase then
@@ -7247,17 +7287,10 @@ function F3DEX2Trace()
 			elseif command == 0xFD then
 				local texturePointer = mainmemory.read_u32_be(commandBase + 4);
 				dprint(commandStr.."Set Texture "..toHexString(texturePointer));
-				if isPointer(texturePointer) then
-					textureCache[texturePointer - RDRAMBase] = true;
-				end
 			else
 				dprint(commandStr.."Unknown");
 			end
 			commandBase = commandBase + 8;
-		end
-		print_deferred();
-		for k, v in pairs(textureCache) do
-			dprint(toHexString(k));
 		end
 		print_deferred();
 	end

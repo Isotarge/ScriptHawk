@@ -26,10 +26,6 @@ SystemID N64
 026E1C	d	s	1	RDRAM	GB Counter (Main Menu)
 026E20	d	s	1	RDRAM	IGT Hours (Main Menu)
 026E24	d	s	1	RDRAM	IGT Minutes (Main Menu)
-03EB00	d	f	1	RDRAM	Jumpman X Position
-03EB04	d	f	1	RDRAM	Jumpman Y Position
-03EB08	d	f	1	RDRAM	Jumpman X Velocity
-03EB0C	d	f	1	RDRAM	Jumpman Y Velocity
 743D30	d	h	1	RDRAM	Framebuffer Pointer
 743D38	d	u	1	RDRAM	Current Lag Speed Boost
 743D3C	b	u	1	RDRAM	Squish Screen (Left)
