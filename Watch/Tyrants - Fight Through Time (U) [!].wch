@@ -1,26 +1,23 @@
 SystemID GEN
-156A	w	u	1	68K RAM	Help Enabled
-156E	w	u	1	68K RAM	Population Available For Battle
-157A	w	u	1	68K RAM	Speech Enabled
-157C	w	u	1	68K RAM	SFX Enabled
-157E	w	u	1	68K RAM	Music Enabled
-1588	w	s	1	68K RAM	Island Index
-2300	w	u	1	68K RAM	Cursor Color
-A754	b	h	1	68K RAM	Alliance
-A760	b	b	1	68K RAM	Opponents
-B364	w	u	1	68K RAM	Character?
-B394	w	u	1	68K RAM	Counter Held Duration
-B396	b	u	1	68K RAM	Counter Speed 1
-B397	b	u	1	68K RAM	Counter Speed 2
-B410	w	u	1	68K RAM	Cursor X Position
-B412	w	u	1	68K RAM	Cursor Y Position
-B50E	w	h	1	68K RAM	RNG?
-B5B4	w	h	1	68K RAM	Selected Sector Pointer
-B5BC	w	u	1	68K RAM	Paused
-B5C0	w	u	1	68K RAM	Game Speed
-B602	w	u	1	68K RAM	Men allocated to Battle
-D144	w	h	1	68K RAM	Research
-D14E	w	h	1	68K RAM	Research
-E26C	w	h	1	68K RAM	Research
-E276	w	h	1	68K RAM	Research
+00156A	w	u	1	68K RAM	Help Enabled
+00156E	w	u	1	68K RAM	Population Available For Battle
+00157A	w	u	1	68K RAM	Speech Enabled
+00157C	w	u	1	68K RAM	SFX Enabled
+00157E	w	u	1	68K RAM	Music Enabled
+001588	w	s	1	68K RAM	Island Index
+001590	w	s	1	68K RAM	Epoch Index
+002300	w	u	1	68K RAM	Cursor Color
+00A754	b	h	1	68K RAM	Alliance
+00A760	b	b	1	68K RAM	Opponents
+00B364	w	u	1	68K RAM	Character
+00B394	w	u	1	68K RAM	Counter Held Duration
+00B396	b	u	1	68K RAM	Counter Speed 1
+00B397	b	u	1	68K RAM	Counter Speed 2
+00B410	w	u	1	68K RAM	Cursor X Position
+00B412	w	u	1	68K RAM	Cursor Y Position
+00B50E	w	h	1	68K RAM	RNG
+00B5B4	w	h	1	68K RAM	Selected Sector Pointer
+00B5BC	w	u	1	68K RAM	Paused
+00B5C0	w	u	1	68K RAM	Game Speed
+00B602	w	u	1	68K RAM	Men allocated to Battle
 

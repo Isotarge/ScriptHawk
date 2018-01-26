@@ -1,29 +1,88 @@
-local function toHexString(value, desiredLength, prefix)
-	value = string.format("%X", value or 0);
-	prefix = prefix or "0x";
-	desiredLength = desiredLength or string.len(value);
-	while string.len(value) < desiredLength do
-		value = "0"..value;
-	end
-	return prefix..value;
+if type(ScriptHawk) ~= "table" then
+	print("This script is not designed to run by itself");
+	print("Please run ScriptHawk.lua from the parent directory instead");
+	print("Thanks for using ScriptHawk :)");
+	return;
 end
 
---[[ rPrint(struct, [limit], [indent])   Recursively print arbitrary data.
-Set limit (default 100) to stanch infinite loops.
-Indents tables as [KEY] VALUE, nested tables as [KEY] [KEY]...[KEY] VALUE
-Set indent ("") to prefix each line:    Mytable [KEY] [KEY]...[KEY] VALUE
---]]
-local function rPrint(s, l, i) -- recursive Print (structure, limit, indent)
-	l = (l) or 100; i = i or "";	-- default item limit, indent string
-	if (l < 1) then print "ERROR: Item limit reached."; return l - 1; end
-	local ts = type(s);
-	if (ts ~= "table") then print (i, ts, s); return l - 1; end
-	print (i, ts);           -- print "table"
-	for k, v in pairs(s) do  -- print "[KEY] VALUE"
-		l = rPrint(v, l, i.."\t["..tostring(k).."]");
-		if (l < 0) then break; end
-	end
-	return l;
+local Game = {
+	Memory = {
+		island = 0x1588, -- s16_be
+		epoch = 0x1590, -- s16_be
+		password_cursor_index = 0x1574,
+		password_string = 0xABD8,
+		character = 0xB364,
+		cursorX = 0xB410,
+		cursorY = 0xB412,
+		ticker_held = 0xB394,
+		ticker_speed = 0xB396,
+		tick_timer = 0xA730,
+		RNG = 0xB50E,
+		selectedSectorPointer = 0xB5B4,
+		suspended_men = {
+			scarlet = 0xB604, -- u16_be, it appears to be divided by 10 until it crosses over 0x8000
+			caesar = 0xB606, -- u16_be, it appears to be divided by 10 until it crosses over 0x8000
+			oberon = 0xB608, -- u16_be, it appears to be divided by 10 until it crosses over 0x8000
+			madcap = 0xB60A, -- u16_be, it appears to be divided by 10 until it crosses over 0x8000
+		},
+	},
+	maps = {
+		"1-1 Aloha",
+		"1-2 Bazooka",
+		"1-3 Cilla",
+		"2-1 Dracula",
+		"2-2 Etcetra",
+		"2-3 Formica",
+		"3-1 Gazza",
+		"3-2 Hernia",
+		"3-3 Ibiza",
+		"4-1 Junta",
+		"4-2 Karma",
+		"4-3 Lada",
+		"5-1 Mascara",
+		"5-2 Nausea",
+		"5-3 Ocarina",
+		"6-1 Pyjama",
+		"6-2 Quota",
+		"6-3 Rumbaba",
+		"7-1 Sinatra",
+		"7-2 Tapioca",
+		"7-3 Utopia",
+		"8-1 Vespa",
+		"8-2 Wonka",
+		"8-3 Xtra",
+		"9-1 Yoga",
+		"9-2 Zappa",
+		"9-3 Ohm",
+		"10-1 Megalomania",
+	},
+};
+
+function Game.detectVersion(romName, romHash)
+	ScriptHawk.dpad.joypad.enabled = false;
+	ScriptHawk.dpad.key.enabled = false;
+	return true;
+end
+
+function Game.setMap(value)
+	mainmemory.write_s16_be(Game.Memory.island, value - 1);
+	mainmemory.write_s16_be(Game.Memory.epoch, math.floor((value - 1) / 3));
+end
+
+function Game.getXPosition()
+	return mainmemory.read_u16_be(Game.Memory.cursorX);
+end
+
+function Game.getYPosition()
+	return mainmemory.read_u16_be(Game.Memory.cursorY);
+end
+
+function Game.setXPosition(value)
+	mainmemory.write_u16_be(Game.Memory.cursorX, value);
+end
+
+function Game.setYPosition(value)
+	mainmemory.write_u16_be(Game.Memory.cursorY, value);
 end
 
 local displayModes = {
@@ -45,13 +104,9 @@ local function toggleDisplayEmptySectors()
 	displayEmptySectors = not displayEmptySectors;
 end
 
-local selectedSectorPointer = 0xB5B4;
 local sectorBase = 0xB6C4;
 local sectorSize = 0x44A;
 local numSectors = 16;
-
-local cursorX = 0xB410;
-local cursorY = 0xB412;
 
 local cursorColors = { -- Pattern repeats % 4
 	[0] = 0xFF66AAEE, -- Blue
@@ -213,7 +268,7 @@ local sectorData = {
 	owner = 0x3FE, -- u16_be
 	population = 0x406, -- u16_be
 	epoch = 0x418, -- u16_be
-	status = 0x448, -- u16_be (0x0000 unusable, 0x8000 normal, 0x4000 nuked)
+	status = 0x448, -- u16_be (0x0000 unusable, 0x8000 normal, 0x9000 2001AD?, 0xB000 shut down, 0x4000 nuked)
 };
 
 local OSDPosition = {2, 2};
@@ -255,6 +310,25 @@ local function getArmyData(sector, army, total)
 		};
 	else
 		return emptyArmy;
+	end
+end
+
+function clearArmyData(sector, army, total)
+	totalValue = mainmemory.read_u16_be(sector + total);
+	if totalValue > 0 then
+		army = sector + army;
+		mainmemory.write_u8(army + sectorData.army.rocks, 0);
+		mainmemory.write_u8(army + sectorData.army.catapaults, 0);
+		mainmemory.write_u8(army + sectorData.army.pikes, 0);
+		mainmemory.write_u8(army + sectorData.army.longbows, 0);
+		mainmemory.write_u8(army + sectorData.army.giant_catapaults, 0);
+		mainmemory.write_u8(army + sectorData.army.cannons, 0);
+		-- TODO
+		mainmemory.write_u8(army + sectorData.army.planes, 0);
+		mainmemory.write_u8(army + sectorData.army.jets, 0);
+		mainmemory.write_u8(army + sectorData.army.UFOs, 0);
+		mainmemory.write_u8(army + sectorData.army.unarmed, 0);
+		mainmemory.write_u16_be(sector + total, 0);
 	end
 end
 
@@ -338,12 +412,17 @@ local function getElementData(sector, indexOffset)
 	return elementData;
 end
 
+function isUsable(sector)
+	local status = mainmemory.read_u16_be(sector + sectorData.status);
+	return status == 0x8000 or status == 0x9000 or status == 0xB000;
+end
+
 local function getSectorData(sector)
 	local data = {};
 
 	data.status = mainmemory.read_u16_be(sector + sectorData.status);
 
-	if data.status ~= 0x8000 then -- Speedup: Don't get data for unusable or nuked sectors
+	if not displayEmptySectors and not isUsable(sector) then -- Speedup: Don't get data for unusable or nuked sectors
 		return data;
 	end
 
@@ -402,7 +481,7 @@ local function getSectorData(sector)
 	return data;
 end
 
-local function printSectorData(sector)
+function printSectorData(sector)
 	rPrint(getSectorData(sector), 10000);
 end
 
@@ -415,25 +494,11 @@ local function getArmyString(data)
 	return armyString;
 end
 
-local CPressed = false;
-local VPressed = false;
-local function draw_OSD()
+ScriptHawk.bindKeyRealtime("C", toggleDisplayMode, true);
+ScriptHawk.bindKeyRealtime("V", toggleDisplayEmptySectors, true);
+
+function Game.drawUI()
 	local row = 0;
-
-	local input_table = input.get();
-	if input_table["C"] and not CPressed then
-		CPressed = true;
-		toggleDisplayMode();
-	elseif not input_table["C"] then
-		CPressed = false;
-	end
-
-	if input_table["V"] and not VPressed then
-		VPressed = true;
-		toggleDisplayEmptySectors();
-	elseif not input_table["V"] then
-		VPressed = false;
-	end
 
 	if displayModes[currentDisplayMode] == "Off" then
 		return;
@@ -445,7 +510,7 @@ local function draw_OSD()
 	for i = numSectors, 1, -1 do
 		local sector = sectorBase + (i - 1) * sectorSize;
 		local data = getSectorData(sector);
-		if data.status == 0x8000 then
+		if isUsable(sector) then
 			if displayEmptySectors or data.owner < 4 then
 				gui.text(OSDPosition[1], OSDPosition[2] + row * OSDRowHeight, toHexString(sector), characterColors[data.owner], "bottomright");
 				local rowString = "";
@@ -456,7 +521,7 @@ local function draw_OSD()
 					rowString = rowString..getResearchString(data).." ";
 					rowString = rowString..data.tower_health.."/"..data.max_tower_health.."HP ";
 					--rowString = rowString.."owner: "..data.owner.." ";
-					--rowString = rowString.."status: "..toHexString(data.status, 4, "").." ";
+					rowString = rowString.."status: "..toHexString(data.status, 4, "").." ";
 					rowString = rowString..epochs[data.epoch].." ";
 				end
 
@@ -485,7 +550,7 @@ function dump()
 	for i = 1, numSectors do
 		local sector = sectorBase + (i - 1) * sectorSize;
 		local data = getSectorData(sector);
-		if data.status == 0x8000 then
+		if isUsable(sector) then
 			local rowString = toHexString(sector).." ";
 			rowString = rowString..(i - 1).." ";
 
@@ -499,29 +564,130 @@ function dump()
 	end
 end
 
-function buildAll()
-	local character = mainmemory.read_u16_be(0xB364);
+function Game.buildAll()
+	local you = mainmemory.read_u16_be(Game.Memory.character);
 	for i = 1, numSectors do
 		local sector = sectorBase + (i - 1) * sectorSize;
-		local data = getSectorData(sector);
-		if data.owner == 4 then
-			mainmemory.write_u16_be(sector + sectorData.owner, character);
+		local owner = mainmemory.read_u16_be(sector + sectorData.owner);
+		if owner == 4 then
+			mainmemory.write_u16_be(sector + sectorData.owner, you);
 		end
 	end
 end
 
---[[
-function infiniteMen()
-	local character = mainmemory.read_u16_be(0xB364);
+function Game.applyInfinites()
+	local you = mainmemory.read_u16_be(Game.Memory.character);
 	for i = 1, numSectors do
 		local sector = sectorBase + (i - 1) * sectorSize;
-		local data = getSectorData(sector);
-		if data.owner == character then
+		local owner = mainmemory.read_u16_be(sector + sectorData.owner);
+		if owner == you then
 			mainmemory.write_u16_be(sector + sectorData.population, 419);
 		end
 	end
 end
-event.onframestart(infiniteMen);
---]]
 
-event.onframestart(draw_OSD);
+function Game.setPassword(password)
+	writeNullTerminatedString(Game.Memory.password_string, password);
+	mainmemory.write_u16_be(Game.Memory.password_cursor_index, 0x0B);
+end
+
+function Game.getTickerSpeed()
+	if mainmemory.readbyte(Game.Memory.ticker_speed) == 0x01 then
+		if mainmemory.readbyte(Game.Memory.ticker_speed + 1) == 0x01 then
+			return 2;
+		end
+		return 1;
+	end
+	return 0;
+end
+
+function Game.getTickerHeld()
+	return mainmemory.read_u16_be(Game.Memory.ticker_held);
+end
+
+function Game.getRNG()
+	return toHexString(mainmemory.read_u16_be(Game.Memory.RNG), 4, "");
+end
+
+function Game.getTickTimer()
+	return mainmemory.read_u16_be(Game.Memory.tick_timer);
+end
+
+function readSuspendedMen(address)
+	local value = mainmemory.read_u16_be(address);
+	if value < 0x8000 then
+		return math.floor(value / 10);
+	end
+	return value;
+end
+
+function Game.getSuspendedMen()
+	local scarlet = readSuspendedMen(Game.Memory.suspended_men.scarlet);
+	local caesar = readSuspendedMen(Game.Memory.suspended_men.caesar);
+	local oberon = readSuspendedMen(Game.Memory.suspended_men.oberon);
+	local madcap = readSuspendedMen(Game.Memory.suspended_men.madcap);
+	return scarlet..","..caesar..","..oberon..","..madcap;
+end
+
+function Game.eachFrame()
+	if forms.ischecked(ScriptHawk.UI.form_controls["mouse_control"]) then
+		-- Make game cursor follow real cursor
+		local mousePos = input.getmouse();
+		if mousePos.X >= 0 and mousePos.X <= client.bufferwidth() and mousePos.Y >= 0 and mousePos.Y <= client.bufferheight() then
+			Game.setXPosition(mousePos.X * 2);
+			Game.setYPosition((mousePos.Y * 2) - 40); -- Minus 40 pixels to compensate for Overscan
+
+			if mousePos.Left then
+				joypad.set({["B"] = true}, 1);
+			end
+			if mousePos.Right then
+				joypad.set({["C"] = true}, 1);
+			end
+		end
+	end
+
+	if forms.ischecked(ScriptHawk.UI.form_controls["sandbox_mode"]) then
+		local you = mainmemory.read_u16_be(Game.Memory.character);
+		for i = numSectors, 1, -1 do
+			local sector = sectorBase + (i - 1) * sectorSize;
+			if isUsable(sector) then
+				local owner = mainmemory.read_u16_be(sector + sectorData.owner);
+				if owner ~= you then
+					mainmemory.write_u16_be(sector + sectorData.population, 0);
+				end
+				if you ~= 0 then
+					clearArmyData(sector, sectorData.army_bases.scarlet, sectorData.army_totals.scarlet);
+				end
+				if you ~= 1 then
+					clearArmyData(sector, sectorData.army_bases.caesar, sectorData.army_totals.caesar);
+				end
+				if you ~= 2 then
+					clearArmyData(sector, sectorData.army_bases.oberon, sectorData.army_totals.oberon);
+				end
+				if you ~= 3 then
+					clearArmyData(sector, sectorData.army_bases.madcap, sectorData.army_totals.madcap);
+				end
+			end
+		end
+	end
+end
+
+function Game.initUI()
+	ScriptHawk.UI.form_controls["build_all"] = forms.button(ScriptHawk.UI.options_form, "Build All", Game.buildAll, ScriptHawk.UI.col(10), ScriptHawk.UI.row(4), ScriptHawk.UI.col(4) + 10, ScriptHawk.UI.button_height);
+	ScriptHawk.UI.form_controls["mouse_control"] = forms.checkbox(ScriptHawk.UI.options_form, "Mouse Control", ScriptHawk.UI.col(0) + ScriptHawk.UI.dropdown_offset, ScriptHawk.UI.row(6) + ScriptHawk.UI.dropdown_offset);
+	ScriptHawk.UI.form_controls["sandbox_mode"] = forms.checkbox(ScriptHawk.UI.options_form, "Sandbox Mode", ScriptHawk.UI.col(0) + ScriptHawk.UI.dropdown_offset, ScriptHawk.UI.row(7) + ScriptHawk.UI.dropdown_offset);
+end
+
+Game.OSD = {
+	{"X", Game.getXPosition},
+	{"Y", Game.getYPosition},
+	{"dX"},
+	{"dY"},
+	{"Ticker Speed", Game.getTickerSpeed},
+	{"Ticker Held", Game.getTickerHeld},
+	{"Tick Timer", Game.getTickTimer},
+	{"RNG", Game.getRNG},
+	{"Suspended Men", Game.getSuspendedMen},
+};
+
+return Game;
