@@ -20,6 +20,7 @@ Game.Memory = {
 	["subhub_entrance_cs"] = {0x0C624A, nil},
 	--["controller_input"] = {0x0D4134, 0x0D5F94},
 	["reload_map"] = {0x0E03E2,0x0E2242},
+	["marble_pointer"] = {0x0C61E2,0x0C8042},
 };
 
 function Game.detectVersion(romName, romHash) 
@@ -353,6 +354,39 @@ function Game.applyInfinites()
 	-- Leprechaun Launcher
 	mainmemory.write_u32_be(Game.Memory.jim_pointer[version] + jim.gun_pointer + gun.leprechaun, max_ammo_leprechaun);
 	
+end
+
+function Game.completeFile()
+	local udder_pointer = Game.Memory.marble_pointer[version] + 0x14;
+	
+	-- UDDERS
+	mainmemory.writebyte(udder_pointer + 0x00,1); -- Brain
+	mainmemory.writebyte(udder_pointer + 0x02,3); -- Coop D'Etat
+	mainmemory.writebyte(udder_pointer + 0x03,7); -- Barn to be Wild
+	mainmemory.writebyte(udder_pointer + 0x04,5); -- Psycrow
+	mainmemory.writebyte(udder_pointer + 0x06,5); -- Lord of the Fries
+	mainmemory.writebyte(udder_pointer + 0x07,5); -- Hungry Tonite?
+	mainmemory.writebyte(udder_pointer + 0x08,5); -- Fatty Roswell
+	mainmemory.writebyte(udder_pointer + 0x0B,5); -- Poultrygeist
+	mainmemory.writebyte(udder_pointer + 0x0C,5); -- Poultrygeist Too
+	mainmemory.writebyte(udder_pointer + 0x0D,6); -- Death Wormed Up
+	mainmemory.writebyte(udder_pointer + 0x0E,5); -- Boogie Nights
+	mainmemory.writebyte(udder_pointer + 0x0F,5); -- Monkey for a Head
+	mainmemory.writebyte(udder_pointer + 0x11,6); -- Violent Death Valley
+	mainmemory.writebyte(udder_pointer + 0x12,6); -- Good Bad Elderly
+	mainmemory.writebyte(udder_pointer + 0x13,5); -- Bob & Number 4
+	
+	-- MARBLES
+	mainmemory.writebyte(Game.Memory.marble_pointer[version] + 0x00,100); -- Coop D'Etat
+	mainmemory.writebyte(Game.Memory.marble_pointer[version] + 0x01,100); -- Barn to be Wild
+	mainmemory.writebyte(Game.Memory.marble_pointer[version] + 0x04,100); -- Lord of the Fries
+	mainmemory.writebyte(Game.Memory.marble_pointer[version] + 0x05,100); -- Hungry Tonite
+	mainmemory.writebyte(Game.Memory.marble_pointer[version] + 0x09,100); -- Poultrygeist
+	mainmemory.writebyte(Game.Memory.marble_pointer[version] + 0x0A,100); -- Poultrygeist Too
+	mainmemory.writebyte(Game.Memory.marble_pointer[version] + 0x0B,100); -- Death Wormed Up
+	mainmemory.writebyte(Game.Memory.marble_pointer[version] + 0x0C,100); -- Boogie Nights
+	mainmemory.writebyte(Game.Memory.marble_pointer[version] + 0x0F,100); -- Violent Death Valley
+	mainmemory.writebyte(Game.Memory.marble_pointer[version] + 0x10,100); -- Good Bad Elderly
 end
 
 --function Game.killBoss()

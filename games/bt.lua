@@ -315,6 +315,7 @@ local Game = {
 		["character_state"] = {0x13BC53, 0x13BEE3, 0x1310A3, 0x136F63},
 		["character_change"] = {0x12BD9C, 0x12BFAC, 0x1211FC, 0x12704C},
 		["iconAddress"] = {0x11FF95, 0x120155, 0x115325, 0x11B065},
+		["animation_pointer"] = {0x13BB60, 0x13BDF0, 0x130FB0, 0x136E70},
 		["healthAddresses"] = {
 			[0x01] = {0x120584, 0x120794, 0x115A04, 0x11B644}, -- BK
 			[0x10] = {0x12059F, 0x1207AF, 0x115A1F, 0x11B65F}, -- Banjo (Solo)
@@ -1086,7 +1087,7 @@ local movementStates = {
 	[0x9F] = "Creeping", -- With Gold Idol
 	
 	[0xA0] = "Locked", -- With Gold Idol, Detection
-	-- 0xA2 Aquatic theme kicks in
+	[0xA2] = "Knockback", -- After transform from Sub to BK
 	[0xA3] = "Knockback", -- Bee
 	[0xA4] = "Locked", -- Wonderwing, Prison Compound Buttons etc
 	-- 0xA5 Leads into Leaving Wonderwing
@@ -1220,7 +1221,8 @@ local movementStates = {
 	[0x125] = "Idle", -- Taxi Pack
 	[0x126] = "Jumping", -- Taxi Pack
 	[0x127] = "Leaving Taxi Pack",
-	-- 0x128 Taking something out of taxi pack
+	[0x128] = "Grabbing", -- Taxi Pack, Successful
+	[0x129] = "Grabbing", -- Taxi Pack
 	[0x12A] = "Driving", -- Dodgem Car
 	[0x12B] = "Saucer of Peril",
 	[0x12C] = "Swimming", -- Submarine
@@ -1267,7 +1269,7 @@ local movementStates = {
 	[0x152] = "Walking", -- Big T. Rex, Slow
 	[0x153] = "Entering Talon Torpedo",
 	[0x154] = "Swimming", -- Talon Torpedo
-	-- 0x155 Something with Talon Torpedo, aquatic theme
+	[0x155] = "Locked", -- Talon Torpedo (Jinjo Collection)
 	[0x157] = "Deploying Talon Torpedo",
 
 	[0x159] = "Swimming (A)", -- Talon Torpedo
@@ -1298,11 +1300,12 @@ local movementStates = {
 	-- 0x170 leads into leaving snooze pack
 	[0x171] = "Entering Snooze Pack",
 	[0x172] = "Leaving Snooze Pack",
-
+	
 	[0x174] = "Beak Bomb", -- Solo Kazooie
 	[0x175] = "Exiting Beak Bomb", -- Solo Kazooie
 	[0x176] = "Recovering", -- Solo Kazooie, post splat
-
+	[0x177] = "Damaged", -- Solo Kazooie, Hitting Wall in Beak Bomb
+	
 	[0x17B] = "Idle", -- On Wall, Claw Clamber
 	[0x17C] = "Walking", -- On Wall, Claw Clamber
 	[0x17D] = "Idle", -- Snowball
@@ -1380,20 +1383,28 @@ end
 ---------------------
 
 local animationList = {
+	[0x00] = "Null",
 	[0x01] = "Crouching",
 	[0x02] = "Creeping",
 	[0x03] = "Walking",
+	[0x04] = "Swimming", -- IoH Wigwam Transformation
 	[0x05] = "Pecking",
-	[0x06] = "Climbing",
+	[0x06] = "Shuffling", -- Ledge Grab, Right
 	[0x07] = "Exiting Talon Trot",
 	[0x08] = "Jumping",
 	[0x09] = "Death",
+	[0x0A] = "Climbing",
 	[0x0B] = "Creeping",
 	[0x0C] = "Running",
 	[0x0D] = "Pecking", -- On Ledge
 	[0x0E] = "Skidding",
-	[0x11] = "Wonderwing",
+	[0x0F] = "Knockback", -- IoH Wigwam Transformation
+	
+	[0x10] = "Nodding", -- Solo Kazooie, Locked
+	[0x11] = "Walking", -- Wonderwing
 	[0x12] = "Grabbing Up", -- Ledge
+	[0x13] = "Grabbing Ledge",
+	[0x14] = "Damaged", -- Swimming
 	[0x15] = "Talon Trot",
 	[0x16] = "Entering Talon Trot",
 	[0x17] = "Feathery Flap",
@@ -1402,47 +1413,306 @@ local animationList = {
 	[0x1A] = "Rat-a-tat Rap",
 	[0x1C] = "Beak Barge",
 	[0x1D] = "Beak Buster",
+	[0x1F] = "Launching", -- Jinjo Collection Start
+	
 	[0x20] = "Breegull Bash",
 	[0x22] = "Entering Wonderwing",
-	-- 0x24 Jinjo whirl?
+	[0x23] = "Idle", -- Wonderwing
+	[0x24] = "Encircling", -- Jinjo Collection
+	[0x26] = "Idle", -- Talon Trot
+	[0x27] = "Jumping", -- Talon Trot
 	[0x2A] = "Shooting", -- 3rd Person Egg
 	[0x2B] = "Pooping", -- Egg
+	[0x2D] = "Idle", -- Jinjo/Minjo
+	[0x2F] = "Waving", -- Jinjo/Minjo Help
+	
+	[0x31] = "Jumping", -- Jinjo/Minjo
+	[0x32] = "Death", -- Washing Machine
+	[0x33] = "Death", -- Stony
 	[0x38] = "Flying",
 	[0x39] = "Paddling",
 	[0x3C] = "Diving",
+	[0x3D] = "Jumping", -- Stilt Stride
+	[0x3E] = "Splatting", -- Beak Bomb
 	[0x3F] = "Swimming", -- B Swimming
+	
+	[0x40] = "Entering Stilt Stride",
+	[0x41] = "Idle", -- Stilt Stride
+	[0x42] = "Wading", -- Stilt Stride
 	[0x43] = "Charging Beak Bomb",
+	[0x44] = "Sprinting", -- Turbo Trainers
 	[0x45] = "Launching", -- Taking Flight
+	[0x46] = "Splatting", -- BK, Falling too far
 	[0x47] = "Beak Bomb",
 	[0x4B] = "Flip Flap", -- Start
-	[0x4C] = "Flip Flap", -- Floating
+	[0x4C] = "Falling", -- Flip Flap
 	[0x4D] = "Damage",
 	[0x4F] = "Rolling",
-	[0x50] = "Locked", -- Thinking
+	
+	[0x50] = "Thinking", -- Locked
+	[0x51] = "Shuffling", -- Ledge Grab, Left
+	[0x52] = "Idle", -- Ledge Grab
+	[0x55] = "Idle", -- Ledge Grab, Looking Around
 	[0x57] = "Treading Water",
+	[0x5A] = "Slipping",
+	[0x5B] = "Listening", -- Talking to NPC (Eg. Jamjars, Jingaling)
+	[0x5E] = "Idle", -- Snowball
+	[0x5F] = "Rolling / Jumping", -- Snowball
+	
 	[0x61] = "Bill Drill",
+	[0x62] = "Waddling", -- Stony
+	[0x63] = "Idle", -- Stony
+	[0x64] = "Barging", -- Stony
+	[0x66] = "Damaged", -- Talon Trot
+	[0x68] = "Falling (Splat)", -- Falling too far
 	[0x6F] = "Idle", -- Normal
+	
 	[0x70] = "Idle", -- Swimming
 	[0x71] = "Swimming", -- A Swimming
+	[0x72] = "Idle", -- Holding Gold Idol
+	[0x73] = "Walking", -- Holding Gold Idol
+	
+	[0x83] = "Pushcart", -- Canary Mary 1/2
+	[0x86] = "Idle", -- Claw Clamber Boots
+	
 	[0x95] = "Idle", -- Kazooie pecking Banjo's head
+	[0x9C] = "Paddling", -- Mumbo
+	[0x9D] = "Treading Water", -- Mumbo
+	[0x9F] = "Attacking", -- Mumbo, Wand
+	
+	[0xA0] = "Entering Claw Clamber Boots",
+	[0xA1] = "Walking", -- Claw Clamber Boots
+	[0xA2] = "Splitting", -- Split Up
+	[0xA4] = "Idle", -- Cwk Kazooie
+	[0xA5] = "Idle", -- Solo Kazooie, Pecking
+	[0xA6] = "Walking", -- Kazooie
+	[0xA7] = "Creeping", -- Kazooie
+	[0xA8] = "Crouching", -- Solo Kazooie
+	[0xA9] = "Jumping", -- Kazooie
+	[0xAA] = "Flying", -- Solo Kazooie
+	[0xAB] = "Launching", -- Entering Flight, Solo Kazooie
+	[0xAC] = "Idle", -- Solo Kazooie, Looking under wing
+	[0xAD] = "Idle", -- Solo Kazooie, Flapping
 	[0xAF] = "Pack Whack",
+	
 	[0xB0] = "Falling",
+	[0xB1] = "Idle", -- Vine, Looking Around
+	[0xB2] = "Idle", -- Vine
+	[0xB3] = "Creeping", -- Mumbo
+	[0xB4] = "Walking", -- Mumbo
+	[0xB5] = "Idle", -- Mumbo
+	[0xB7] = "Damaged", -- Mumbo
+	[0xB8] = "Death", -- Mumbo
+	[0xB9] = "Drowning", -- BK
+	[0xBA] = "Slipping", -- Mumbo
+	[0xBB] = "Falling", -- Mumbo
+	[0xBC] = "Falling (Splat)", -- Mumbo
+	[0xBD] = "Jumping", -- Mumbo
+	
+	[0xC9] = "Damaged", -- Solo Kazooie
+	[0xCA] = "Death", -- Solo Kazooie
+	[0xCB] = "Splatting", -- Mumbo, Falling too far
 	[0xCC] = "Exiting Beak Bomb",
+	
+	[0xD2] = "Recovering",
 	[0xD3] = "Damage", -- Beak Bomb Recoil
 	[0xD7] = "Death", -- Solo Banjo
-	[0xEB] = "Swimming", -- A+B Swimming
-	[0xF6] = "Idle", -- Banjo choking/stretching Kazooie
-	[0x10C] = "Crouching", -- Idle
-	[0x116] = "Crouching", -- Looking Around
-	[0x270] = "Walking", -- Breegull Blaster, Faster
-	[0x271] = "Walking", -- Breegull Blaster, Slow
-	[0x272] = "Idle", -- Breegull Blaster
-	[0x273] = "Damage",
-	[0x27B] = "Failed Flip", -- Solo Banjo
-	[0x30C] = "Entering/Exiting Breegull Blaster",
-	[0x314] = "Beak Bayonet", -- Breegull Blaster
-	[0x315] = "Firing Egg", -- Breegull Blaster firing Cwk Kazooie
+	[0xD8] = "Death", -- Lava, Hotheads
 	
+	[0xE0] = "Breathing Fire", -- BK (Dragon)
+	[0xE1] = "Breathing Fire", -- Solo Kazooie (Dragon)
+	[0xE2] = "Hopping", -- Detonator
+	[0xE5] = "Idle", -- Detonator
+	[0xE6] = "Detonator", -- Detonator
+	[0xE7] = "Treading Water", -- Detonator/Van
+	[0xE8] = "Paddling", -- Detonator/Van
+	[0xE9] = "Damaged", -- Detonator
+	[0xEA] = "Splashing",
+	[0xEB] = "Swimming", -- A+B Swimming
+	[0xEC] = "Driving", -- Van
+	[0xED] = "Jumping", -- Van
+	[0xEE] = "Idle", -- Van
+	[0xEF] = "Knockback", -- Transform from Wigwam
+	
+	[0xF1] = "Opening Rear Doors", -- Van
+	[0xF2] = "Paying", -- Van
+	[0xF3] = "Entering Taxi Pack",
+	[0xF4] = "Walking", -- Taxi Pack
+	[0xF5] = "Scooping", -- Taxi Pack
+	[0xF6] = "Idle", -- Banjo choking/stretching Kazooie
+	[0xF7] = "Death", -- Minjo
+	[0xFB] = "Putting away Bag", -- Mumbo's Magic
+	[0xFC] = "Retrieving Bag", -- Mumbo's Magic
+	
+	[0x10C] = "Crouching", -- Idle
+	
+	[0x116] = "Crouching", -- Looking Around
+	[0x11B] = "Throwing",
+	[0x11C] = "Damaged", -- Solo Kazooie, Gliding
+	[0x11D] = "Splatting", -- Falling too far, Solo Kazooie
+	[0x11E] = "Recovering", -- Falling too far, Solo Kazooie
+	[0x11F] = "Jumping", -- Claw Clamber Boots
+	
+	[0x121] = "Grabbing", -- Taxi Pack
+	[0x122] = "Jumping", -- Stony
+	[0x124] = "Idle", -- Taxi Pack
+	[0x125] = "Jumping", -- Taxi Pack
+	[0x126] = "Stuffing", -- Taxi Pack, Successful Scoop
+	[0x128] = "Leaving Taxi Pack",
+	[0x129] = "Retrieving", -- Taxi Pack, Successful Retrieval
+	[0x12C] = "Putting on Backpack", -- Taxi Pack
+	[0x12E] = "Idle / Slow Moving", -- Submarine
+	[0x12F] = "Fast Moving", -- Submarine
+	
+	[0x130] = "Damaged", -- Submarine
+	[0x131] = "Deploying Talon Torpedo",
+	[0x132] = "Swimming", -- Talon Torpedo
+	[0x133] = "Entering Talon Torpedo",
+	[0x136] = "Joining", -- Talon Torpedo
+	[0x137] = "Wing Whack (Stationary)", -- Solo Kazooie
+	[0x138] = "Wing Whack",
+	[0x139] = "Paddling", -- Solo Kazooie
+	[0x13A] = "Diving", -- Solo Kazooie
+	[0x13B] = "Falling", -- Solo Kazooie
+	[0x13C] = "Falling (Splat)", -- Solo Kazooie
+	[0x13D] = "Gliding", -- Solo Kazooie
+	[0x13E] = "Feathery Flap", -- Solo Kazooie
+	[0x13F] = "Hatching", -- Solo Kazooie
+	
+	[0x140] = "Hatching (Success)", -- Solo Kazooie
+	[0x141] = "Crouching", -- Looking Around, Solo Kazooie
+	[0x142] = "Leg Spring", -- Solo Kazooie
+	[0x143] = "Entering Sack Pack",
+	[0x144] = "Hopping", -- Sack Pack
+	[0x145] = "Entering Shack Pack",
+	[0x146] = "Idle", -- Shack Pack
+	[0x147] = "Damaged", -- T-Rex
+	[0x148] = "Death", -- T-Rex
+	[0x149] = "Idle", -- Stilt Stride, Solo Kazooie
+	[0x14A] = "Jumping", -- Stilt Stride, Solo Kazooie
+	
+	[0x1AD] = "Charging", -- Minjo
+	
+	[0x1CE] = "Creeping", -- T-Rex
+	[0x1CF] = "Walking", -- T-Rex
+	[0x1D0] = "Roaring", -- T-Rex
+	[0x1D1] = "Jumping", -- T-Rex
+	[0x1D2] = "Idle", -- T-Rex
+	[0x1DC] = "Flying", -- Bee
+	[0x1DD] = "Walking", -- Bee
+	[0x1DE] = "Idle", -- Bee
+	
+	[0x1E0] = "Damaged", -- Bee
+	[0x1E1] = "Death", -- Bee
+	[0x1E2] = "Jumping", -- Bee
+	[0x1E5] = "Walking", -- Golden Goliath
+	[0x1EE] = "Idle", -- Golden Goliath
+	[0x1EF] = "Jumping", -- Golden Goliath
+	
+	[0x1F0] = "Kicking", -- Golden Goliath
+	[0x1F1] = "Deactivating", -- Golden Goliath
+	
+	[0x24A] = "Floating", -- Floatus Floatsum
+	[0x24B] = "Idle", -- Springy Step Shoes, Solo Kazooie
+	[0x24C] = "Springing", -- Springy Step Shoes, Solo Kazooie
+	[0x24D] = "Walking", -- Springy Step Shoes, Solo Kazooie
+	
+	[0x250] = "Turning (Sharp)", -- Dodgem Car
+	[0x251] = "Turning", -- Dodgem Car
+	[0x252] = "Bumping", -- Dodgem Car
+	[0x253] = "Bumping", -- Dodgem Car
+	[0x254] = "Bumping", -- Dodgem Car
+	[0x255] = "Bumping", -- Dodgem Car
+	
+	-- 0x267 Klungo Idle w/ Smashing?
+	
+	[0x270] = "Walking", -- Breegull Blaster, Banjo, Faster
+	[0x271] = "Walking", -- Breegull Blaster, Banjo, Slow
+	[0x272] = "Idle", -- Breegull Blaster, Banjo
+	[0x273] = "Damage",
+	[0x276] = "Entering Snooze Pack",
+	[0x277] = "Snoozing", -- Snooze Pack
+	[0x279] = "Leaving Snooze Pack",
+	[0x27B] = "Failed Flip", -- Solo Banjo
+	[0x27D] = "Diving", -- Solo Banjo
+	[0x27E] = "Swimming", -- Solo Banjo
+	[0x27F] = "Entering Stilt Stride", -- Solo Kazooie
+	
+	[0x280] = "Wading", -- Stilt Stride, Solo Kazooie
+	[0x281] = "Driving", -- Dodgem Car
+	[0x282] = "Celebrating", -- 10th Jiggy Jig from BK
+	[0x288] = "Falling", -- Leg Spring
+	[0x289] = "Idle", -- Sack Pack
+	[0x28A] = "Exiting Sack Pack",
+	[0x28D] = "Shooting", -- Solo Kazooie, Egg
+	[0x28E] = "Pooping", -- Solo Kazooie, Egg
+	[0x28F] = "Crouching", -- Idle, Solo Kazooie
+	
+	[0x293] = "Idle", -- Shack Pack
+	[0x294] = "Jumping", -- Shack Pack
+	[0x295] = "Exiting Shack Pack",
+	[0x296] = "Joining", -- Split Up
+	[0x298] = "Springing", -- Spring Step Shoes
+	[0x29B] = "Idle", -- Spring Step Shoes
+	[0x29C] = "Walking", -- Spring Step Shoes
+	[0x29D] = "Charging Beak Bomb", -- Solo Kazooie
+	[0x29E] = "Beak Bomb", -- Solo Kazooie
+	[0x29F] = "Entering Spring Step Shoes",
+	
+	[0x30C] = "Entering/Exiting Breegull Blaster",
+	
+	[0x314] = "Beak Bayonet", -- Breegull Blaster, Banjo
+	[0x315] = "Firing Egg", -- Breegull Blaster, Banjo, Grenade/Cwk Kazooie
+	[0x31A] = "Death", -- Breegull Blaster, Banjo
+	
+	[0x354] = "Cleaning", -- Washing Machine
+	[0x355] = "Falling", -- Washing Machine
+	[0x356] = "Idle", -- Washing Machine
+	[0x357] = "Firing", -- Washing Machine (Underwear)
+	[0x358] = "Damaged", -- Washing Machine
+	[0x359] = "Rolling", -- Washing Machine
+	
+	[0x44A] = "Idle", -- Grunty
+	
+	[0x459] = "Idle", -- Blobbelda
+	
+	[0x477] = "Idle", -- Breegull Blaster, Mumbo/Jinjo
+	[0x478] = "Walking", -- Breegull Blaster, Mumbo/Jinjo, Slow
+	[0x479] = "Walking", -- Breegull Blaster, Mumbo/Jinjo, Fast
+	[0x47A] = "Damaged", -- Breegull Blaster, Mumbo/Jinjo
+	[0x47B] = "Death", -- Breegull Blaster, Mumbo/Jinjo
+	[0x47C] = "Death", -- Breegull Blaster, Mumbo/Jinjo, Explosive
+	
+	[0x481] = "Controlling Saucer of Peril",
+	
+	[0x4A1] = "Performing Magic", -- Mumbo
+	[0x4A2] = "Beak Bayonet", -- Breegull Blaster, Mumbo/Jinjo
+	[0x4A3] = "Firing Egg", -- Breegull Blaster, Mumbo/Jinjo, Grenade/Cwk Kazooie
+	
+	[0x4D3] = "Firing Egg", -- Breegull Blaster, Grunty, Grenade/Cwk Kazooie
+	[0x4D4] = "Beak Bayonet", -- Breegull Blaster, Grunty
+	[0x4D5] = "Walking", -- Breegull Blaster, Grunty, Fast
+	[0x4D6] = "Idle", -- Breegull Blaster, Grunty
+	[0x4D7] = "Walking", -- Breegull Blaster, Grunty, Slow
+	[0x4D8] = "Damaged", -- Breegull Blaster, Grunty
+	[0x4D9] = "Death", -- Breegull Blaster, Grunty
+	[0x4DA] = "Death", -- Breegull Blaster, Grunty, Explosive
+	[0x4DE] = "Damaged", -- Breegull Blaster, Jamjars
+	[0x4DF] = "Firing Egg", -- Breegull Blaster, Jamjars, Grenade/Cwk Kazooie
+	
+	[0x4E0] = "Beak Bayonet", -- Breegull Blaster, Jamjars
+	[0x4E1] = "Walking", -- Breegull Blaster, Jamjars, Fast
+	[0x4E2] = "Idle", -- Breegull Blaster, Jamjars
+	[0x4E3] = "Walking", -- Breegull Blaster, Jamjars, Slow
+	[0x4E4] = "Death", -- Breegull Blaster, Jamjars
+	[0x4E5] = "Death", -- Breegull Blaster, Jamjars, Explosive
+	
+	[0x4F1] = "Laughing", -- Mingella
+	[0x4FE] = "Rubbing hands together", -- Grunty
+	[0x4FF] = "Dismissing", -- Grunty
+	
+	[0x500] = "Laughing", -- Grunty
+	[0x501] = "Laughing", -- Blobbelda
 };
 
 function Game.getAnimationValue()
@@ -1461,6 +1731,36 @@ function Game.getAnimationOSD()
 	return toHexString(animationValue);
 end
 
+function Game.setAnimationValue(value)
+	local animationPointer = Game.getPlayerSubObject(animation_pointer_index);
+	if isRDRAM(animationPointer) then
+		mainmemory.write_u16_be(animationPointer + 0x34, value);
+	end
+end
+
+function Game.getAnimationAddress()
+	local animationPointer = Game.getPlayerSubObject(animation_pointer_index);
+	if isRDRAM(animationPointer) then
+		return toHexString(animationPointer + 0x34);
+	end
+end
+
+function Game.getObjectAnimationValue(pointer)
+	local ObjAnimPointer = mainmemory.read_u16_be(pointer + object_model1.animation_index);
+	local ObjAnimPointer_global = dereferencePointer(Game.Memory.animation_pointer[version]);
+	if isRDRAM(ObjAnimPointer_global) and ObjAnimPointer ~= 0 then
+		return mainmemory.read_u16_be(ObjAnimPointer_global + 0x38 + (0x3C * ObjAnimPointer));
+	end
+	return 0;
+end
+
+function Game.getObjectAnimationOSD(pointer)
+	local ObjAnimValue = Game.getObjectAnimationValue(pointer);
+	if type(animationList[ObjAnimValue]) == "string" then
+		return animationList[ObjAnimValue];
+	end
+	return toHexString(ObjAnimValue);
+end
 
 --------------
 -- Autojump --
@@ -3546,6 +3846,8 @@ object_model1 = {
 	["y_rotation"] = 0x48, -- Float
 	["z_rotation"] = 0x4C, -- Float
 	["health"] = 0x5E; -- Byte
+	--["movement_state"] = 0x72; -- Byte
+	["animation_index"] = 0x8C; -- 2 Byte
 	["transparency"] = 0x9B, --Byte
 	["models"] = {
 		--TODO: Import list from
@@ -4445,7 +4747,10 @@ function Game.drawUI()
 			table.insert(examine_data, { "Rot Y", round(mainmemory.readfloat(pointer + object_model1.y_rotation, true),precision) });
 			table.insert(examine_data, { "Rot Z", round(mainmemory.readfloat(pointer + object_model1.z_rotation, true),precision) });
 			table.insert(examine_data, { "Separator", 1 });
+			table.insert(examine_data, { "Animation", Game.getObjectAnimationOSD(currentSlotBase) });
+			--table.insert(examine_data, { "Movement State", toHexString(mainmemory.readbyte(pointer + object_model1.movement_state)) });
 			
+			table.insert(examine_data, { "Separator", 1 });
 			if currentObjectName == "Nest (Eggs)" or currentObjectName == "Nest (Note)" or currentObjectName == "Nest (Treble Clef)" or currentObjectName == "Nest (Feathers)" then
 				table.insert(examine_data, { "Nest Contents", getNestContentsOSD(mainmemory.read_u16_be(pointer + object_model1.nest.contents)) });
 			end
