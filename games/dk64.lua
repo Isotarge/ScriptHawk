@@ -2779,7 +2779,7 @@ end
 -- Loading Zone Documentation --
 --------------------------------
 
-local function getLoadingZoneArray()
+function Game.getLoadingZoneArray()
 	return dereferencePointer(Game.Memory.loading_zone_array[version]);
 end
 
@@ -2850,7 +2850,7 @@ end
 
 local function populateLoadingZonePointers()
 	object_pointers = {};
-	local loadingZoneArray = getLoadingZoneArray();
+	local loadingZoneArray = Game.getLoadingZoneArray();
 	if isRDRAM(loadingZoneArray) then
 		local arraySize = mainmemory.read_u16_be(Game.Memory.loading_zone_array_size[version]);
 		for i = 0, arraySize - 1 do
@@ -2863,7 +2863,7 @@ local function populateLoadingZonePointers()
 end
 
 function dumpLoadingZones()
-	local loadingZoneArray = getLoadingZoneArray();
+	local loadingZoneArray = Game.getLoadingZoneArray();
 	if isRDRAM(loadingZoneArray) then
 		local arraySize = mainmemory.read_u16_be(Game.Memory.loading_zone_array_size[version]);
 		for i = 0, arraySize do
@@ -4265,9 +4265,13 @@ chunk = {
 	deload4 = 0x74, -- u32_be
 };
 
+function Game.getChunkArray()
+	return dereferencePointer(Game.Memory.chunk_array_pointer[version]);
+end
+
 --[[
 function fixChunkDeload()
-	local chunkArray = dereferencePointer(Game.Memory.chunk_array_pointer[version]);
+	local chunkArray = Game.getChunkArray();
 	if isRDRAM(chunkArray) then
 		local numChunks = math.floor(mainmemory.read_u32_be(chunkArray + heap.object_size) / chunkSize);
 		for i = 0, numChunks - 1 do
@@ -4289,7 +4293,7 @@ local function populateChunkPointers()
 		object_index = 1;
 		return;
 	end
-	local chunkArray = dereferencePointer(Game.Memory.chunk_array_pointer[version]);
+	local chunkArray = Game.getChunkArray();
 	if isRDRAM(chunkArray) then
 		local numChunks = math.floor(mainmemory.read_u32_be(chunkArray + heap.object_size) / chunkSize);
 		for i = 0, numChunks - 1 do
@@ -7145,12 +7149,31 @@ local vert = {
 	shading_2 = 0x0E, -- Unknown datatype
 };
 
+function Game.getMapBlock()
+	return dereferencePointer(Game.Memory.map_block_pointer[version]);
+end
+
+function Game.getMapVerts()
+	return dereferencePointer(Game.Memory.map_vertex_pointer[version]);
+end
+
+function Game.getMapVertsEnd()
+	local mapBase = Game.getMapBlock();
+	if isRDRAM(mapBase) then
+		return mapBase + mainmemory.read_u32_be(mapBase + 0x40);
+	end
+end
+
+function Game.getMapDLStart()
+	return dereferencePointer(Game.Memory.map_displaylist_pointer[version]);
+end
+
 function crumble()
-	local mapBase = dereferencePointer(Game.Memory.map_block_pointer[version]);
-	local vertBase = dereferencePointer(Game.Memory.map_vertex_pointer[version]);
+	local mapBase = Game.getMapBlock();
+	local vertBase = Game.getMapVerts();
 
 	if isRDRAM(mapBase) and isRDRAM(vertBase) then
-		local vertEnd = mapBase + mainmemory.read_u32_be(mapBase + 0x40);
+		local vertEnd = Game.getMapVertsEnd();
 		for v = vertBase, vertEnd, vertSize do
 			if math.random() > 0.9 then
 				local xPos = mainmemory.read_s16_be(v + vert.x_position);
@@ -7181,10 +7204,10 @@ function crumble()
 end
 
 function dumpSegments()
-	local mapBase = dereferencePointer(Game.Memory.map_block_pointer[version]);
+	local mapBase = Game.getMapBlock();
 	local segmentBase = mapBase + mainmemory.read_u32_be(mapBase + 0x58);
 	if isRDRAM(segmentBase) then
-		local numSegments = mainmemory.read_u32_be(segmentBase)
+		local numSegments = mainmemory.read_u32_be(segmentBase);
 		dprint(numSegments.." segments at "..toHexString(segmentBase));
 		segmentBase = segmentBase + 4;
 		for i = 0, numSegments - 1 do
@@ -7201,9 +7224,61 @@ function dumpSegments()
 	end
 end
 
+function fuckSegments()
+	local mapBase = Game.getMapBlock();
+	local segmentBase = mapBase + mainmemory.read_u32_be(mapBase + 0x58);
+	if isRDRAM(segmentBase) then
+		local numSegments = mainmemory.read_u32_be(segmentBase);
+		segmentBase = segmentBase + 4;
+		for i = 0, numSegments - 1 do
+			mainmemory.write_u16_be(segmentBase + 0x08, 0x0000);
+			mainmemory.write_u16_be(segmentBase + 0x0A, 0x0000);
+			mainmemory.write_u16_be(segmentBase + 0x0C, 0x0000);
+			mainmemory.write_u16_be(segmentBase + 0x0E, 0x0000);
+			mainmemory.write_u16_be(segmentBase + 0x10, 0x0000);
+			segmentBase = segmentBase + 0x1C;
+		end
+	end
+	dumpSegments();
+end
+
+function fuckSegmentIDs()
+	local mapBase = Game.getMapBlock();
+	local segmentBase = mapBase + mainmemory.read_u32_be(mapBase + 0x58);
+	if isRDRAM(segmentBase) then
+		local numSegments = mainmemory.read_u32_be(segmentBase);
+		segmentBase = segmentBase + 4;
+		for i = 0, numSegments - 1 do
+			mainmemory.write_u16_be(segmentBase + 2, 0x0000);
+			segmentBase = segmentBase + 0x1C;
+		end
+	end
+	dumpSegments();
+end
+
+function fuckSegment(segmentIndex)
+	local mapBase = Game.getMapBlock();
+	local segmentBase = mapBase + mainmemory.read_u32_be(mapBase + 0x58);
+	if isRDRAM(segmentBase) then
+		local numSegments = mainmemory.read_u32_be(segmentBase);
+		segmentBase = segmentBase + 4;
+		for i = 0, numSegments - 1 do
+			if mainmemory.read_u16_be(segmentBase + 2) == segmentIndex then
+				mainmemory.write_u16_be(segmentBase + 0x08, 0x0000);
+				mainmemory.write_u16_be(segmentBase + 0x0A, 0x0000);
+				mainmemory.write_u16_be(segmentBase + 0x0C, 0x0000);
+				mainmemory.write_u16_be(segmentBase + 0x0E, 0x0000);
+				mainmemory.write_u16_be(segmentBase + 0x10, 0x0000);
+			end
+			segmentBase = segmentBase + 0x1C;
+		end
+	end
+	dumpSegments();
+end
+
 function F3DEX2Trace()
-	local DLBase = dereferencePointer(Game.Memory.map_displaylist_pointer[version]);
-	local vertBase = dereferencePointer(Game.Memory.map_vertex_pointer[version]);
+	local DLBase = Game.getMapDLStart();
+	local vertBase = Game.getMapVerts();
 	if isRDRAM(DLBase) and isRDRAM(vertBase) and vertBase > DLBase then
 		local returnStack = {};
 		local commandBase = DLBase;
@@ -7244,6 +7319,8 @@ function F3DEX2Trace()
 				dprint(commandStr.."G_TEXTURE");
 			elseif command == 0xD9 then
 				dprint(commandStr.."G_GEOMETRYMODE");
+			elseif command == 0xDB then
+				dprint(commandStr.."G_MOVEWORD");
 			elseif command == 0xDE then
 				local destination = mainmemory.read_u24_be(commandBase + 5);
 				local pushRA = mainmemory.readbyte(commandBase + 1);
@@ -7478,6 +7555,9 @@ function Game.eachFrame()
 		Game.OSD = Game.subgameOSD;
 	else
 		Game.OSD = Game.standardOSD;
+		if string.contains(grab_script_mode, "Chunks") then
+			Game.OSD = Game.mapDebugOSD;
+		end
 	end
 
 	if not Game.isLoading() then
@@ -7688,6 +7768,23 @@ Game.standardOSD = {
 	--{"Free", Game.getFreeMemory},
 	--{"Used", Game.getUsedMemory},
 	--{"Total", Game.getTotalMemory},
+};
+
+Game.mapDebugOSD = {
+	{"Map", Game.getMapOSD},
+	{"X", Game.getXPosition},
+	{"Y", Game.getYPosition},
+	{"Z", Game.getZPosition},
+	{"Separator", 1},
+	{"dY"},
+	{"dXZ"},
+	{"Movement", Game.getMovementState},
+	{"Separator", 1},
+	{"Map Block", hexifyOSD(Game.getMapBlock, 6, "")},
+	{"Map Verts Start", hexifyOSD(Game.getMapVerts, 6, "")},
+	{"Map Verts End", hexifyOSD(Game.getMapVertsEnd, 6, "")},
+	{"Map DL Start", hexifyOSD(Game.getMapDLStart, 6, "")},
+	{"Chunk Array", hexifyOSD(Game.getChunkArray, 6, "")},
 };
 
 Game.subgameOSD = {
@@ -8105,7 +8202,7 @@ function buildIdentifyMemoryCache()
 	end
 
 	-- Cache map
-	local mapBase = dereferencePointer(Game.Memory.map_block_pointer[version]);
+	local mapBase = Game.getMapBlock();
 	if isRDRAM(mapBase) then
 		addHeapMetadata(mapBase, "description", "Map");
 		addHeapMetadata(mapBase, "isMap", true);
@@ -8114,7 +8211,7 @@ function buildIdentifyMemoryCache()
 	end
 
 	-- Cache chunks
-	local chunkArray = dereferencePointer(Game.Memory.chunk_array_pointer[version]);
+	local chunkArray = Game.getChunkArray();
 	if isRDRAM(chunkArray) then
 		addHeapMetadata(chunkArray, "description", "Map Chunk Array");
 		addHeapMetadata(chunkArray, "isMapChunkArray", true);
@@ -8155,7 +8252,7 @@ function buildIdentifyMemoryCache()
 	end
 
 	-- Cache loading zones
-	local lzArray = getLoadingZoneArray();
+	local lzArray = Game.getLoadingZoneArray();
 	if isRDRAM(lzArray) then
 		addHeapMetadata(lzArray, "description", "Loading Zone Array");
 		addHeapMetadata(lzArray, "isLoadingZoneArray", true);

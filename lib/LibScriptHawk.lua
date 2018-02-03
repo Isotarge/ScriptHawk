@@ -227,6 +227,10 @@ function toHexString(value, desiredLength, prefix)
 	return (prefix or "0x")..value;
 end
 
+function hexifyOSD(theFunction, desiredLength, prefix)
+	return function() return toHexString(theFunction(), desiredLength, prefix); end;
+end
+
 function toBinaryString(num, bits) -- TODO: Properly define behavior for negative numbers
 	if type(num) ~= "number" then
 		return "0";

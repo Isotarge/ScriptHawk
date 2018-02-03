@@ -7,13 +7,17 @@ end
 
 local Game = {
 	Memory = {
+		pop_available = 0x156E,
+		pop_allocated = 0xB602,
 		island = 0x1588, -- s16_be
 		epoch = 0x1590, -- s16_be
+		opponents = 0xA760, -- byte, bitfield
 		password_cursor_index = 0x1574,
 		password_string = 0xABD8,
 		character = 0xB364,
 		cursorX = 0xB410,
 		cursorY = 0xB412,
+		cursor_is_moving = 0xFBC6,
 		ticker_held = 0xB394,
 		ticker_speed = 0xB396,
 		tick_timer = 0xA730,
@@ -83,6 +87,17 @@ end
 
 function Game.setYPosition(value)
 	mainmemory.write_u16_be(Game.Memory.cursorY, value);
+end
+
+function Game.isCursorMoving()
+	return mainmemory.read_u16_be(Game.Memory.cursor_is_moving) ~= 0x0000;
+end
+
+function Game.colorCursorIsMoving()
+	if Game.isCursorMoving() then
+		return colors.red;
+	end
+	return colors.green;
 end
 
 local displayModes = {
@@ -521,7 +536,7 @@ function Game.drawUI()
 					rowString = rowString..getResearchString(data).." ";
 					rowString = rowString..data.tower_health.."/"..data.max_tower_health.."HP ";
 					--rowString = rowString.."owner: "..data.owner.." ";
-					rowString = rowString.."status: "..toHexString(data.status, 4, "").." ";
+					--rowString = rowString.."status: "..toHexString(data.status, 4, "").." ";
 					rowString = rowString..epochs[data.epoch].." ";
 				end
 
@@ -606,7 +621,25 @@ function Game.getTickerHeld()
 end
 
 function Game.getRNG()
-	return toHexString(mainmemory.read_u16_be(Game.Memory.RNG), 4, "");
+	return mainmemory.read_u16_be(Game.Memory.RNG);
+end
+
+function Game.getPopAllocated()
+	return mainmemory.read_u16_be(Game.Memory.pop_allocated);
+end
+
+function Game.getPopAvailable()
+	return mainmemory.read_u16_be(Game.Memory.pop_available);
+end
+
+function Game.getPopAllocatedOSD()
+	local allocated = Game.getPopAllocated();
+	local available = allocated + Game.getPopAvailable();
+	return allocated.."/"..available;
+end
+
+function Game.getOpponents()
+	return toBinaryString(mainmemory.readbyte(Game.Memory.opponents), 4);
 end
 
 function Game.getTickTimer()
@@ -679,14 +712,17 @@ function Game.initUI()
 end
 
 Game.OSD = {
-	{"X", Game.getXPosition},
-	{"Y", Game.getYPosition},
+	{"X", Game.getXPosition, Game.colorCursorIsMoving},
+	{"Y", Game.getYPosition, Game.colorCursorIsMoving},
 	{"dX"},
 	{"dY"},
 	{"Ticker Speed", Game.getTickerSpeed},
 	{"Ticker Held", Game.getTickerHeld},
 	{"Tick Timer", Game.getTickTimer},
-	{"RNG", Game.getRNG},
+	{"RNG", hexifyOSD(Game.getRNG, 4, "")},
+	{"Opponents", Game.getOpponents},
+	--{"Pop Available", Game.getPopAvailable},
+	{"Pop Allocated", Game.getPopAllocatedOSD},
 	{"Suspended Men", Game.getSuspendedMen},
 };
 

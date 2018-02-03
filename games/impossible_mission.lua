@@ -147,7 +147,7 @@ function Game.getYPosition()
 end
 
 function Game.getCurrentMap()
-	return toHexString(mainmemory.readbyte(Game.Memory.current_map));
+	return mainmemory.readbyte(Game.Memory.current_map);
 end
 
 function Game.getIGT()
@@ -718,7 +718,7 @@ function Game.applyInfinites()
 end
 
 Game.standardOSD = {
-	{"Map", Game.getCurrentMap},
+	{"Map", hexifyOSD(Game.getCurrentMap)},
 	{"IGT", Game.getIGT},
 	{"Snooze Timer", Game.getSnoozeTimer},
 	{"Separator", 1},

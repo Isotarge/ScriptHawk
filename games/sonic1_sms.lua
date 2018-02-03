@@ -105,7 +105,7 @@ function Game.getLives()
 end
 
 function Game.getRings()
-	return toHexString(mainmemory.readbyte(Game.Memory.rings), nil, "");
+	return mainmemory.readbyte(Game.Memory.rings);
 end
 
 function Game.getLevel()
@@ -166,7 +166,7 @@ Game.OSD = {
 	{"Level", Game.getLevel},
 	{"IGT", Game.getIGT},
 	{"Lives", Game.getLives},
-	{"Rings", Game.getRings},
+	{"Rings", hexifyOSD(Game.getRings, nil, "")},
 	{"Viewport X", Game.getViewportX},
 	{"Viewport Y", Game.getViewportY},
 	{"Separator", 1},
