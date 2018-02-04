@@ -524,7 +524,7 @@ end
 -- Jinjo Dump --
 ----------------
 
-local JinjoAddresses = {
+JinjoAddresses = {
 	{{0x11FA71, 0x11FC31, 0x114E01, 0x11AB41}, "MT: Jade Snake Grove"},
 	{{0x11FA74, 0x11FC34, 0x114E04, 0x11AB44}, "MT: Roof of Stadium"},
 	{{0x11FA77, 0x11FC37, 0x114E07, 0x11AB47}, "MT: Targitzan's Temple"},
@@ -572,7 +572,7 @@ local JinjoAddresses = {
 	{{0x11FAF5, 0x11FCB5, 0x114E85, 0x11ABC5}, "IoH: Spiral Mountain"},
 };
 
-local JinjoColors = {
+JinjoColors = {
 	[0] = "White",
 	[1] = "Orange",
 	[2] = "Yellow",
@@ -948,7 +948,7 @@ local movementStates = {
 	[0x15] = "Idle", -- Talon Trot
 	[0x16] = "Walking", -- Talon Trot
 	[0x17] = "Leaving Talon Trot",
-
+	[0x18] = "Recoil", -- Flying
 	[0x19] = "Swimming (A+B)",
 	[0x1A] = "Entering Wonderwing",
 	[0x1B] = "Idle", -- Wonderwing
@@ -1117,7 +1117,7 @@ local movementStates = {
 	[0xBC] = "Creeping", -- Solo Kazooie
 	[0xBD] = "Jumping", -- Solo Kazooie
 	[0xBE] = "Gliding", -- Solo Kazooie
-	-- 0xBF Aquatic theme for a bit
+	[0xBF] = "Stunned", -- Swimming
 	
 	-- 0xC0 Something with the bee?
 	[0xC1] = "Shock Spring Jump", -- Solo Kazooie
@@ -1444,6 +1444,9 @@ local animationList = {
 	[0x45] = "Launching", -- Taking Flight
 	[0x46] = "Splatting", -- BK, Falling too far
 	[0x47] = "Beak Bomb",
+	[0x48] = "Charging Shock Spring",
+	[0x49] = "Shock Spring",
+	[0x4A] = "Opening/Closing", -- Superstash Door
 	[0x4B] = "Flip Flap", -- Start
 	[0x4C] = "Falling", -- Flip Flap
 	[0x4D] = "Damage",
@@ -1452,8 +1455,10 @@ local animationList = {
 	[0x50] = "Thinking", -- Locked
 	[0x51] = "Shuffling", -- Ledge Grab, Left
 	[0x52] = "Idle", -- Ledge Grab
+	[0x54] = "Idle", -- Beehive
 	[0x55] = "Idle", -- Ledge Grab, Looking Around
 	[0x57] = "Treading Water",
+	[0x59] = "Slipping", -- BK
 	[0x5A] = "Slipping",
 	[0x5B] = "Listening", -- Talking to NPC (Eg. Jamjars, Jingaling)
 	[0x5E] = "Idle", -- Snowball
@@ -1464,6 +1469,7 @@ local animationList = {
 	[0x63] = "Idle", -- Stony
 	[0x64] = "Barging", -- Stony
 	[0x66] = "Damaged", -- Talon Trot
+	[0x67] = "Idle", -- Wading Boots Object
 	[0x68] = "Falling (Splat)", -- Falling too far
 	[0x6F] = "Idle", -- Normal
 	
@@ -1473,12 +1479,16 @@ local animationList = {
 	[0x73] = "Walking", -- Holding Gold Idol
 	
 	[0x83] = "Pushcart", -- Canary Mary 1/2
+	[0x85] = "Celebrating", -- Canary Mary
 	[0x86] = "Idle", -- Claw Clamber Boots
 	
+	[0x91] = "Idle", -- Saucer of Peril Object
 	[0x95] = "Idle", -- Kazooie pecking Banjo's head
+	[0x99] = "Departing", -- Chuffy
+	[0x9A] = "Arriving", -- Chuffy
 	[0x9C] = "Paddling", -- Mumbo
 	[0x9D] = "Treading Water", -- Mumbo
-	[0x9F] = "Attacking", -- Mumbo, Wand
+	[0x9F] = "Attacking", -- Mumbo/Mingy, Wand
 	
 	[0xA0] = "Entering Claw Clamber Boots",
 	[0xA1] = "Walking", -- Claw Clamber Boots
@@ -1508,16 +1518,30 @@ local animationList = {
 	[0xBB] = "Falling", -- Mumbo
 	[0xBC] = "Falling (Splat)", -- Mumbo
 	[0xBD] = "Jumping", -- Mumbo
+	[0xBF] = "Damaged", -- Old King Coal, Head taken off
 	
+	[0xC2] = "Damaged", -- Old King Coal, Right Arm taken off
+	[0xC3] = "Damaged", -- Old King Coal, Left Arm taken off
+	[0xC4] = "Stretching", -- Old King Coal
+	[0xC5] = "Arising", -- Old King Coal
+	[0xC6] = "Moving", -- Old King Coal
+	[0xC7] = "Damaged", -- Old King Coal
 	[0xC9] = "Damaged", -- Solo Kazooie
 	[0xCA] = "Death", -- Solo Kazooie
 	[0xCB] = "Splatting", -- Mumbo, Falling too far
 	[0xCC] = "Exiting Beak Bomb",
+	[0xCE] = "Getting Up", -- Mumbo/Mingy Jongo (in Chair)
+	[0xCF] = "Pulling out Wand", -- Mumbo/Mingy Jongo (in Chair)
 	
+	[0xD1] = "Sneezing", -- Salty Joe
 	[0xD2] = "Recovering",
 	[0xD3] = "Damage", -- Beak Bomb Recoil
+	[0xD6] = "Idle", -- Turbo Trainers Object
 	[0xD7] = "Death", -- Solo Banjo
-	[0xD8] = "Death", -- Lava, Hotheads
+	[0xD8] = "Death", -- Lava
+	[0xDC] = "Sneezing", -- Big Al
+	[0xDE] = "Walking", -- Jippo Jim
+	[0xDF] = "Alerted", -- Jippo Jim
 	
 	[0xE0] = "Breathing Fire", -- BK (Dragon)
 	[0xE1] = "Breathing Fire", -- Solo Kazooie (Dragon)
@@ -1540,12 +1564,17 @@ local animationList = {
 	[0xF4] = "Walking", -- Taxi Pack
 	[0xF5] = "Scooping", -- Taxi Pack
 	[0xF6] = "Idle", -- Banjo choking/stretching Kazooie
-	[0xF7] = "Death", -- Minjo
+	[0xF7] = "Death", -- Minjo/Jippo Jim
+	[0xF8] = "Running", -- Jippo Jim
 	[0xFB] = "Putting away Bag", -- Mumbo's Magic
 	[0xFC] = "Retrieving Bag", -- Mumbo's Magic
+	[0xFD] = "Sitting Down", -- Mumbo (Getting back in Chair)
+	[0xFE] = "Idle", -- Conga
 	
 	[0x10C] = "Crouching", -- Idle
+	[0x10D] = "Recoiling", -- Flying
 	
+	[0x115] = "Idle", -- Pawno
 	[0x116] = "Crouching", -- Looking Around
 	[0x11B] = "Throwing",
 	[0x11C] = "Damaged", -- Solo Kazooie, Gliding
@@ -1590,14 +1619,74 @@ local animationList = {
 	[0x148] = "Death", -- T-Rex
 	[0x149] = "Idle", -- Stilt Stride, Solo Kazooie
 	[0x14A] = "Jumping", -- Stilt Stride, Solo Kazooie
+	[0x14E] = "Idle", -- Blubbul
+	[0x14F] = "Stunned", -- Blubbul
 	
+	[0x150] = "Waking", -- Blubbul
+	[0x153] = "Idle", -- Captain Blackeye
+	[0x155] = "Celebrating", -- Jolly Roger
+	[0x156] = "Idle", -- Merry Maggie Malpass
+	[0x158] = "Swimming", -- Seemee Fish
+	[0x15A] = "Celebrating", -- Captain Blubber
+	[0x15C] = "Damaged", -- Terry
+	[0x15D] = "Falling", -- Terry
+	[0x15E] = "Critically Damaged", -- Terry
+	[0x15F] = "Firing", -- Terry
+	
+	[0x160] = "Flying", -- Terry (Able to be hit)
+	[0x161] = "Flying", -- Terry
+	[0x162] = "Taking Flight", -- Terry
+	[0x163] = "Idle", -- Terry
+	[0x169] = "Appearing", -- Chompasaurus
+	[0x16A] = "Stomping", -- Stomponadon
+	[0x16C] = "Celebrating", -- Chris P Bacon
+	
+	[0x172] = "Idle", -- Inky
+	
+	[0x180] = "Idle", -- Fruity
+	[0x181] = "Dispensing", -- Fruity
+	[0x182] = "Attacking", -- Fruity
+	[0x184] = "Hatching", -- Tiptup Jr
+	[0x185] = "On Back", -- Tiptup Jr
+	[0x189] = "Celebrating", -- Tiptup
+	[0x18D] = "Moving", -- Mucoid
+	
+	[0x190] = "Flying", -- Gruntydactyl
+	[0x193] = "Sleeping", -- Ssslumber
+	[0x194] = "Waking", -- Ssslumber
+	[0x195] = "Idle", -- Ssslumber
+	[0x196] = "Falling Asleep", -- Ssslumber
+	[0x198] = "Celebrating", -- Bovina
+	[0x199] = "Idle", -- Officer Unogopaz
+	
+	[0x1A5] = "Dormant", -- Snapdragon
+	[0x1A6] = "Attacking", -- Snapdragon
+	[0x1AB] = "Death", -- Snapdragon
 	[0x1AD] = "Charging", -- Minjo
+	[0x1AF] = "Sleeping", -- Mumbo/Mingy Jongo (in Chair)
 	
+	[0x1B0] = "Waking", -- Mumbo (in Chair)
+	[0x1B1] = "Holding Bag", -- Mumbo (in Chair)
+	[0x1B2] = "Holding Bag", -- Mumbo (in Chair)
+	[0x1B3] = "Receiving", -- Mumbo (in Chair)
+	[0x1B6] = "Celebrating", -- Chief Bloatazin
+	[0x1B9] = "Charging", -- Diggit
+	[0x1BA] = "Attacking", -- Diggit
+	[0x1BB] = "Stretching", -- Diggit
+	
+	[0x1C1] = "Recovering", -- Terry
+	[0x1C7] = "Charging", -- Demented Beehive
+	[0x1C8] = "Swimming", -- Swellbelly
+	[0x1C9] = "Changing Size", -- Swellbelly
+	[0x1CA] = "Attacking", -- Swellbelly
 	[0x1CE] = "Creeping", -- T-Rex
 	[0x1CF] = "Walking", -- T-Rex
+	
 	[0x1D0] = "Roaring", -- T-Rex
 	[0x1D1] = "Jumping", -- T-Rex
 	[0x1D2] = "Idle", -- T-Rex
+	[0x1D4] = "Idle", -- Stop 'n' Swop Eggs
+	[0x1DB] = "Celebrating", -- Dilberta
 	[0x1DC] = "Flying", -- Bee
 	[0x1DD] = "Walking", -- Bee
 	[0x1DE] = "Idle", -- Bee
@@ -1605,13 +1694,50 @@ local animationList = {
 	[0x1E0] = "Damaged", -- Bee
 	[0x1E1] = "Death", -- Bee
 	[0x1E2] = "Jumping", -- Bee
+	[0x1E4] = "Laughing", -- Dragunda, After being bitten
 	[0x1E5] = "Walking", -- Golden Goliath
+	[0x1E6] = "Roaming", -- Ugger
+	[0x1E7] = "Idle", -- Ugger
+	[0x1E8] = "Running", -- Ugger, Aggressive
+	[0x1E9] = "Alerted", -- Ugger
+	[0x1EA] = "Death", -- Ugger
+	[0x1EC] = "Idle", -- Bang Box
 	[0x1EE] = "Idle", -- Golden Goliath
 	[0x1EF] = "Jumping", -- Golden Goliath
 	
 	[0x1F0] = "Kicking", -- Golden Goliath
 	[0x1F1] = "Deactivating", -- Golden Goliath
+	[0x1F7] = "Idle", -- Terry
 	
+	[0x202] = "Idle", -- Mr Patch (Stage 2)
+	[0x203] = "Moving", -- Mr Patch
+	[0x204] = "Inflating", -- Mr Patch (To Stage 1)
+	[0x205] = "Inflating", -- Mr Patch (To Stage 2)
+	[0x206] = "Damaged", -- Mr Patch
+	[0x208] = "Idle", -- Mr Patch (Stage 1)
+	[0x209] = "Attacking", -- Mr Patch
+	[0x20A] = "Deflating", -- Mr Patch
+	
+	[0x212] = "Roaming", -- Glowbo
+	[0x218] = "Alerted", -- Billy Bob, Aggressive
+	[0x219] = "Hiding", -- Billy Bob, Transition to Inactive
+	[0x21A] = "Moving", -- Billy Bob
+	[0x21B] = "Death", -- Billy Bob
+	[0x21C] = "Idle", -- Billy Bob, Inactive
+	
+	[0x220] = "Idle", -- Cheato
+	[0x222] = "Celebrating", -- Gobi
+	[0x229] = "Closed", -- Silo
+	[0x22A] = "Closing", -- Silo
+	[0x22B] = "Opening", -- Silo (Move already learnt)
+	[0x22C] = "Closing", -- Silo (Move already learnt)
+	[0x22D] = "Open", -- Silo (Move already learnt)
+	
+	[0x238] = "Idle", -- Loggo
+	
+	[0x242] = "Idle", -- Moggy
+	[0x244] = "Celebrating", -- Soggy
+	[0x246] = "Idle", -- Groggy
 	[0x24A] = "Floating", -- Floatus Floatsum
 	[0x24B] = "Idle", -- Springy Step Shoes, Solo Kazooie
 	[0x24C] = "Springing", -- Springy Step Shoes, Solo Kazooie
@@ -1623,8 +1749,19 @@ local animationList = {
 	[0x253] = "Bumping", -- Dodgem Car
 	[0x254] = "Bumping", -- Dodgem Car
 	[0x255] = "Bumping", -- Dodgem Car
+	[0x25C] = "Idle", -- Klungo
+	[0x25D] = "Eating Potion", -- Klungo
+	[0x25E] = "Enlarging", -- Klungo
+	[0x25F] = "Attacking", -- Klungo (Enlarged)
 	
-	-- 0x267 Klungo Idle w/ Smashing?
+	[0x260] = "Damage", -- Klungo
+	[0x261] = "Throwing Potion", -- Klungo
+	[0x262] = "Critically Damaged", -- Klungo
+	[0x263] = "Recovering", -- Klungo
+	[0x264] = "Walking", -- Klungo
+	[0x266] = "Damage", -- Klungo (Duplication)
+	[0x267] = "Idle", -- Klungo (Enlarged)
+	[0x268] = "Shrinking", -- Klungo (Enlarged)
 	
 	[0x270] = "Walking", -- Breegull Blaster, Banjo, Faster
 	[0x271] = "Walking", -- Breegull Blaster, Banjo, Slow
@@ -1648,34 +1785,255 @@ local animationList = {
 	[0x28E] = "Pooping", -- Solo Kazooie, Egg
 	[0x28F] = "Crouching", -- Idle, Solo Kazooie
 	
+	[0x290] = "Slipping", -- Solo Kazooie
 	[0x293] = "Idle", -- Shack Pack
 	[0x294] = "Jumping", -- Shack Pack
 	[0x295] = "Exiting Shack Pack",
 	[0x296] = "Joining", -- Split Up
 	[0x298] = "Springing", -- Spring Step Shoes
+	[0x299] = "Idle", -- Claw Clamber Boots Object
 	[0x29B] = "Idle", -- Spring Step Shoes
 	[0x29C] = "Walking", -- Spring Step Shoes
 	[0x29D] = "Charging Beak Bomb", -- Solo Kazooie
 	[0x29E] = "Beak Bomb", -- Solo Kazooie
 	[0x29F] = "Entering Spring Step Shoes",
 	
+	[0x2A4] = "Celebrating", -- Bullion Bill
+	
+	[0x2B0] = "Idle", -- Dingpot
+	[0x2B4] = "Idle", -- Trotty
+	[0x2B8] = "Tapping Stick", -- Jamjars
+	[0x2BB] = "Saluting", -- Jamjars
+	[0x2BC] = "Teaching", -- Jamjars
+	[0x2BE] = "Appearing", -- Jamjars
+	
+	[0x2C0] = "Celebrating", -- Piggles
+	[0x2C1] = "Disappearing", -- Jamjars
+	[0x2C2] = "Lifting Lid", -- Jamjars
+	[0x2C3] = "Disappearing", -- Jamjars
+	[0x2C4] = "Peering", -- Jamjars
+	[0x2C5] = "Leering", -- Old King Coal
+	[0x2C6] = "Idle", -- Old King Coal
+	[0x2C8] = "Idle", -- Jamjars
+	[0x2C9] = "Bonking", -- Jamjars
+	
+	[0x2D6] = "Celebrating", -- Oogle Boogle
+	[0x2DC] = "Celebrating", -- Dippy
+	[0x2DE] = "Appearing", -- Dippy
+	
+	[0x2EE] = "Laughing", -- Unga Bunga
+	[0x2EF] = "Surprised", -- Unga Bunga
+	
+	[0x2F0] = "Running", -- Unga Bunga
+	[0x2F1] = "Sleeping", -- Unga Bunga
+	[0x2F2] = "Waking", -- Unga Bunga
+	[0x2F3] = "Raging", -- Unga Bunga
+	[0x2F4] = "Wailing", -- Unga Bunga
+	[0x2F5] = "Guarding", -- Unga Bunga
+	[0x2FC] = "Idle", -- Sabreman
+	
+	[0x301] = "Sitting", -- Mumbo/Mingy Jongo
+	[0x303] = "Raising", -- Targitzan
+	[0x304] = "Idle", -- Targitzan (5 Layers)
+	[0x305] = "Spinning", -- Targitzan (5 Layers)
+	[0x306] = "Spinning", -- Targitzan (4 Layers)
+	[0x307] = "Spinning", -- Targitzan (3 Layers)
+	[0x308] = "Spinning", -- Targitzan (2 Layers)
+	[0x309] = "Alerted", -- Targitzan
+	[0x30A] = "Idle", -- Targitzan (1 Layer)
+	[0x30B] = "Death", -- Targitzan
 	[0x30C] = "Entering/Exiting Breegull Blaster",
 	
 	[0x314] = "Beak Bayonet", -- Breegull Blaster, Banjo
 	[0x315] = "Firing Egg", -- Breegull Blaster, Banjo, Grenade/Cwk Kazooie
 	[0x31A] = "Death", -- Breegull Blaster, Banjo
 	
+	[0x320] = "Idle", -- Targitzan (4 Layers)
+	[0x321] = "Idle", -- Targitzan (3 Layers)
+	[0x322] = "Idle", -- Targitzan (2 Layers)
+	[0x325] = "Celebrating", -- Betette
+	[0x32C] = "Celebrating", -- Alphette/Gamette
+	
+	[0x330] = "Idle", -- Lord Woo Fak Fak
+	[0x334] = "Firing", -- Chilli Brothers
+	[0x335] = "Damage", -- Chilli Brothers
+	[0x336] = "Stunned", -- Chilli Brothers
+	[0x337] = "Licking", -- Chilli Brothers
+	[0x338] = "Flying", -- Chilli Brothers
+	[0x33E] = "Firing", -- Lord Woo Fak Fak
+	[0x33F] = "Damaged", -- Lord Woo Fak Fak
+	
+	[0x340] = "Death", -- Lord Woo Fak Fak
+	[0x341] = "Dead", -- Lord Woo Fak Fak
+	[0x342] = "Lowering Head", -- Chilli Brothers
+	[0x343] = "Extending Tongue", -- Chilli Brothers
+	[0x344] = "Waking", -- Chilli Brothers
+	[0x346] = "Idle", -- Chilli Brothers
+	[0x347] = "Retracting Tongue", -- Chilli Brothers
+	[0x348] = "Roaming", -- Guvnor
+	[0x349] = "Running", -- Guvnor, Aggressive
+	[0x34A] = "Alerted", -- Guvnor, Aggressive
+	[0x34B] = "Attacking", -- Guvnor, Aggressive
+	[0x34C] = "Death", -- Guvnor
+	[0x34D] = "Damage", -- Guvnor
+	[0x34E] = "Idle", -- Guvnor
+	
+	[0x351] = "Critically Damaged", -- Chilli Brothers 
+	[0x352] = "Idle", -- Chilli Brothers
+	[0x353] = "Idle", -- Chilli Brothers (Jiggy Spawn)
 	[0x354] = "Cleaning", -- Washing Machine
 	[0x355] = "Falling", -- Washing Machine
 	[0x356] = "Idle", -- Washing Machine
 	[0x357] = "Firing", -- Washing Machine (Underwear)
 	[0x358] = "Damaged", -- Washing Machine
 	[0x359] = "Rolling", -- Washing Machine
+	[0x35B] = "Shaking", -- Main Menu Items
+	[0x35C] = "Idle", -- Chilli Brothers
+	[0x35E] = "Celebrating", -- Skivvy
+	[0x35F] = "Taking Flight", -- Chilli Brothers
 	
+	[0x36B] = "Celebrating", -- Guffo
+	[0x36C] = "Disappearing", -- Mingy Jongo
+	[0x36D] = "Reappearing", -- Mingy Jongo
+	[0x36E] = "Laughing", -- Mingy Jongo
+	[0x36F] = "Idle", -- Weldar
+	
+	[0x370] = "Lowering Head", -- Weldar
+	[0x371] = "Crawling", -- Weldar
+	[0x372] = "Standing Up", -- Weldar
+	[0x373] = "Swallowing",
+	[0x374] = "Sucking", -- Weldar
+	[0x375] = "Jumping", -- Weldar
+	[0x376] = "Firing", -- Weldar
+	[0x377] = "Damaged", -- Mingy Jongo
+	[0x378] = "Malfunctioning", -- Mingy Jongo
+	[0x379] = "Death", -- Mingy Jongo
+	[0x37A] = "Idle", -- Weldar Head
+	
+	[0x389] = "Idle", -- Biggafoot
+	
+	[0x39B] = "Looking around", -- Klungo (Intro)
+	[0x39C] = "Idle", -- Klungo (Intro)
+
+	[0x3A6] = "Lumbering", -- Jingaling (Zombie)
+	[0x3AB] = "Crumbling", -- Pile of Rocks (Intro)
+	[0x3AD] = "Idle", -- Scrotty
+	
+	[0x3D0] = "Hovering", -- Banjo's Hand
+	[0x3D3] = "Holding", -- Banjo's Hand
+	[0x3D4] = "Thumbs Up", -- Banjo's Hand
+	[0x3D5] = "Placing", -- Banjo's Hand
+	[0x3DF] = "Attacking", -- Ugger
+	
+	[0x3E0] = "Damage", -- Ugger
+	[0x3E1] = "Attacking", -- Billy Bob, Aggressive
+	[0x3E2] = "Damaged", -- Billy Bob
+	[0x3E5] = "Launching", -- Weldar
+	[0x3E6] = "Landing", -- Weldar
+	[0x3E7] = "Spitting out", -- Weldar
+	[0x3EB] = "Sleeping", -- Lord Woo Fak Fak
+	[0x3EC] = "Waking", -- Lord Woo Fak Fak
+	[0x3EE] = "Celebrating", -- Mrs Boggy
+	[0x3EF] = "Idle", -- Angel Bottles
+	
+	[0x3F8] = "Celebrating", -- Styracosaurus Children
+	[0x3F9] = "Exercising", -- Mr. Fit
+	[0x3FD] = "Celebrating", -- Mr. Fit
+	
+	[0x408] = "Spinning", -- Hag 1 Drill (Intro)
+	[0x40F] = "Appearing", -- Hag 1 (Intro)
+	
+	[0x410] = "Crumbling", -- Pile of Rocks (Intro)
+	[0x411] = "Lifting Drill", -- Hag 1 (Intro)
+	[0x412] = "Idle", -- Hag 1 (Intro)
+	[0x413] = "Crumbled", -- Pile of Rocks (Intro)
+	[0x414] = "Walking", -- Mingella (Intro)
+	[0x415] = "Walking", -- Mingella (Intro)
+	[0x416] = "Idle", -- Mingella (Intro)
+	[0x417] = "Falling", -- Mingella (Intro)
+	[0x418] = "Fallen", -- Mingella (Intro)
+	[0x41A] = "Running", -- Blobbelda (Intro)
+	[0x41C] = "Examining", -- Mingella (Intro)
+	[0x41E] = "Tripping", -- Blobbelda (Intro)
+	[0x41F] = "Reading", -- Mingella (Intro)
+	
+	[0x420] = "Idle", -- Blobbelda (Intro)
+	[0x421] = "Casting Spell", -- Mingella (Intro)
+	[0x425] = "Closing Book", -- Mingella (Intro)
+	[0x428] = "Attacking", -- Jippo Jim
+	[0x429] = "Pulling out First Mortar", -- Hag 1
+	[0x42A] = "With Mortar", -- Hag 1
+	[0x42B] = "Pulling out Second Mortar", -- Hag 1
+	[0x42C] = "With Mortars", -- Hag 1
+	[0x42D] = "Retracting Both Mortars", -- Hag 1
+	[0x42E] = "Opening Exhaust Port", -- Hag 1
+	[0x42F] = "Opening 2nd Hatch", -- Hag 1
+	
+	[0x431] = "Laughing", -- Rocknut
+	[0x435] = "Opening Hatch", -- Grunty, Hag 1
+	[0x436] = "Reading", -- Grunty, Hag 1
+	[0x437] = "Idle (With Card)", -- Grunty, Hag 1
+	[0x438] = "Putting Card Away", -- Grunty, Hag 1
+	[0x439] = "Launching Spell", -- Grunty, Hag 1
+	[0x43A] = "Damaged", -- Grunty, Hag 1
+	[0x43B] = "Closing Hatch", -- Grunty, Hag 1
+	[0x43C] = "Weilding Purple Spell", -- Grunty, Hag 1
+	[0x43D] = "Holding Purple Spell", -- Grunty, Hag 1
+	[0x43E] = "Throwing Purple Spell", -- Grunty, Hag 1
+	[0x43F] = "Idle", -- Grunty, Hag 1
+	
+	[0x440] = "Dropping Spell", -- Grunty, Hag 1
+	[0x443] = "Idle", -- Boggy
+	[0x446] = "Getting up", -- Grunty (Intro)
+	[0x447] = "Closing Drill", -- Hag 1 (Intro)
+	[0x448] = "Hiding", -- Hag 1 (Intro)
+	[0x449] = "Inspecting", -- Grunty (Intro)
 	[0x44A] = "Idle", -- Grunty
+	[0x44B] = "Peering", -- Mumbo (Intro)
+	[0x44C] = "Cheering", -- Klungo (Intro)
+	[0x44D] = "Idle", -- Klungo (Intro)
+	[0x44E] = "Idle", -- Klungo (Intro)
+	[0x44F] = "Running", -- Grunty (Intro)
 	
+	[0x450] = "Attacking", -- Grunty (Intro, attacking Mumbo)
+	[0x451] = "Hit", -- Grunty (Intro, eye knocked out)
+	[0x453] = "Idle", -- Grunty (Intro)
+	[0x454] = "Summoning Spell", -- Grunty (Intro)
+	[0x455] = "Attacking", -- Klungo (Intro, knocking grunty's eye out)
+	[0x456] = "Idle", -- Klungo (Intro)
+	[0x457] = "Miming", -- Mingella (Intro)
+	[0x458] = "Angered", -- Grunty (Intro)
 	[0x459] = "Idle", -- Blobbelda
+	[0x45A] = "Idle", -- Mingella (Intro)
+	[0x45B] = "Waving", -- Blobbelda (Intro)
+	[0x45C] = "Cheering", -- Blobbelda (Intro)
+	[0x45D] = "Surprised", -- Mingella (Intro)
+	[0x45F] = "Limping", -- Burnt Bottles (Intro)
 	
+	[0x460] = "Death", -- Bottles (Intro)
+	[0x461] = "Panting", -- Mumbo (Intro)
+	[0x462] = "Running", -- Mumbo (Intro)
+	[0x463] = "Holding Cards", -- BK (Intro)
+	[0x464] = "Holding Cards", -- BK (Intro)
+	[0x465] = "Holding Cards", -- Mumbo (Intro)
+	[0x466] = "Holding Cards", -- BK (Intro)
+	[0x467] = "Surprised", -- Mumbo (Intro)
+	[0x468] = "Shaking", -- Mumbo (Intro)
+	[0x469] = "Holding Cards", -- BK (Intro)
+	[0x46A] = "Getting up", -- Mumbo (Intro)
+	[0x46B] = "Holding Cards", -- Bottles (Intro)
+	[0x46C] = "Surprised", -- Bottles (Intro)
+	[0x46D] = "Holding Cards", -- Bottles (Intro)
+	[0x46E] = "Shaking", -- Bottles (Intro)
+	[0x46F] = "Annoyed", -- Bottles (Intro)
+	
+	[0x470] = "Cheering", -- Mumbo (Intro)
+	[0x471] = "Holding Cards", -- BK (Intro)
+	[0x472] = "Shaking", -- BK (Intro)
+	[0x473] = "Confusion", -- Mumbo (Intro)
+	[0x474] = "Shaking", -- Grunty Rock
+	[0x475] = "Holding Cards", -- BK (Intro)
+	[0x476] = "Holding Cards", -- BK (Intro)
 	[0x477] = "Idle", -- Breegull Blaster, Mumbo/Jinjo
 	[0x478] = "Walking", -- Breegull Blaster, Mumbo/Jinjo, Slow
 	[0x479] = "Walking", -- Breegull Blaster, Mumbo/Jinjo, Fast
@@ -1683,11 +2041,38 @@ local animationList = {
 	[0x47B] = "Death", -- Breegull Blaster, Mumbo/Jinjo
 	[0x47C] = "Death", -- Breegull Blaster, Mumbo/Jinjo, Explosive
 	
+	[0x480] = "Idle", -- Mingy Jongo
 	[0x481] = "Controlling Saucer of Peril",
+	[0x48B] = "Escaping", -- BK (Intro)
+	[0x48C] = "Stealing", -- BK (Intro)
+	[0x48E] = "Holding Cards", -- BK (Intro)
+	
+	[0x490] = "Confused", -- BK (Intro)
+	[0x492] = "Cleaning", -- Grunty (Intro)
+	[0x493] = "Tripping", -- Blobbelda (Intro)
+	[0x495] = "Holding Cards", -- BK (Intro)
+	[0x498] = "Rising", -- Angel Bottles (Intro)
+	[0x499] = "Idle", -- Angel Bottles (Intro)
+	[0x49E] = "Moving", -- BK Cart
+	[0x49F] = "Idle", -- BK Cart
 	
 	[0x4A1] = "Performing Magic", -- Mumbo
 	[0x4A2] = "Beak Bayonet", -- Breegull Blaster, Mumbo/Jinjo
 	[0x4A3] = "Firing Egg", -- Breegull Blaster, Mumbo/Jinjo, Grenade/Cwk Kazooie
+	[0x4A5] = "Idle", -- Heggy
+	[0x4A8] = "Waking", -- Mildred/George
+	[0x4A9] = "Idle", -- Mildred/George
+	[0x4AA] = "Idle", -- Warp Silo
+	[0x4AD] = "Idle", -- Honey B
+	
+	[0x4B2] = "Falling", -- Klungo III
+	[0x4B3] = "Landing", -- Klungo III
+	[0x4B6] = "Idle", -- Chilli Brothers
+	
+	[0x4C1] = "Idle", -- Master Jiggywiggy
+	[0x4C9] = "Idle", -- Disciple of Jiggywiggy
+	[0x4CA] = "Preparing to Conjure", -- Master Jiggywiggy
+	[0x4CB] = "Conjuring", -- Master Jiggywiggy
 	
 	[0x4D3] = "Firing Egg", -- Breegull Blaster, Grunty, Grenade/Cwk Kazooie
 	[0x4D4] = "Beak Bayonet", -- Breegull Blaster, Grunty
@@ -1697,6 +2082,7 @@ local animationList = {
 	[0x4D8] = "Damaged", -- Breegull Blaster, Grunty
 	[0x4D9] = "Death", -- Breegull Blaster, Grunty
 	[0x4DA] = "Death", -- Breegull Blaster, Grunty, Explosive
+	[0x4DD] = "Running", -- Jingaling, Eating CS
 	[0x4DE] = "Damaged", -- Breegull Blaster, Jamjars
 	[0x4DF] = "Firing Egg", -- Breegull Blaster, Jamjars, Grenade/Cwk Kazooie
 	
@@ -1706,13 +2092,86 @@ local animationList = {
 	[0x4E3] = "Walking", -- Breegull Blaster, Jamjars, Slow
 	[0x4E4] = "Death", -- Breegull Blaster, Jamjars
 	[0x4E5] = "Death", -- Breegull Blaster, Jamjars, Explosive
+	[0x4EC] = "Explaining", -- Jingaling, Eating CS
+	[0x4ED] = "Celebrating", -- Jingaling, Eating CS
+	[0x4EE] = "Idle", -- Jingaling, Restoration
+	[0x4EF] = "Idle", -- Jingaling, Eating CS
 	
+	[0x4F0] = "Arguing", -- Mingella
 	[0x4F1] = "Laughing", -- Mingella
+	[0x4F2] = "Explaining", -- Klungo, Eating CS
+	[0x4F3] = "Idle", -- Klungo, Eating CS
+	[0x4F4] = "Sleeping", -- Klungo, Credits
+	[0x4F5] = "Idle", -- Mumbo, Credits
+	[0x4F6] = "Complaining", -- Mumbo, Credits
+	[0x4F7] = "Accepting", -- Grunty
+	[0x4F8] = "Demonstrating", -- Blobbelda
+	[0x4F9] = "Approving", -- Grunty
+	[0x4FA] = "Excited", -- Grunty
+	[0x4FB] = "Thinking", -- Grunty
+	[0x4FC] = "Pressing Button", -- Grunty
+	[0x4FD] = "Idle", -- Humba Wumba, Credits
 	[0x4FE] = "Rubbing hands together", -- Grunty
 	[0x4FF] = "Dismissing", -- Grunty
 	
 	[0x500] = "Laughing", -- Grunty
 	[0x501] = "Laughing", -- Blobbelda
+	[0x502] = "Picking Up Cake", -- Humba Wumba, Credits
+	[0x509] = "Arguing", -- Humba Wumba, Credits
+	[0x50A] = "Idle", -- Mrs Bottles, Eating CS
+	[0x50B] = "Surprised", -- Mrs Bottles, Eating CS
+	[0x50C] = "Idle", -- Mrs Bottles, Eating CS
+	[0x50D] = "Idle", -- Humba Wumba, Credits
+	[0x50E] = "Idle", -- Mingella
+	[0x50F] = "Arguing", -- Mumbo, Credits
+	
+	[0x510] = "Idle", -- Bottles, Eating CS
+	[0x511] = "Idle", -- Bottles, Eating CS
+	[0x512] = "Cutting", -- Bottles, Eating CS
+	[0x513] = "Sleeping", -- Bottles, Credits
+	[0x514] = "Arguing", -- Mumbo, Credits
+	[0x515] = "Waking Up", -- Bottles, Credits
+	[0x516] = "Shouting", -- Bottles, Credits
+	[0x518] = "Restoring", -- Burnt Bottles, Restortion
+	[0x519] = "Getting up", -- Burnt Bottles, Restoration
+	[0x51A] = "Panicking", -- Burnt Bottles, Restoration
+	[0x51B] = "Returning to Body", -- Angel Bottles, Restoration
+	[0x51C] = "Idle", -- Angel Bottles, Restoration
+	[0x51D] = "Running", -- Burnt Bottles, Restoration
+	[0x51E] = "Running", -- Jamjars, Credits
+	[0x51F] = "Kicking", -- Mumbo, Credits
+	
+	[0x520] = "Idle", -- BK At Controls
+	[0x521] = "Pressing Buttons", -- BK At Controls
+	[0x522] = "Anticipating", -- BK At Controls
+	[0x524] = "Idle", -- Jamjars, Credits
+	[0x525] = "Complaining", -- Jamjars, Credits
+	[0x526] = "Idle", -- Jamjars, Credits
+	[0x527] = "Surprised", -- Jamjars, Credits
+	[0x528] = "Alerted", -- Gruntydactyl, Aggressive
+	[0x529] = "Charging", -- Gruntydactyl, Aggressive
+	[0x52A] = "Damage", -- Gruntydactyl
+	[0x52B] = "Dying", -- Gruntydactyl
+	[0x52C] = "Death", -- Gruntydactyl
+	[0x52D] = "Idle", -- BK, Credits
+	[0x52E] = "Surprised", -- BK, Credits
+	[0x52F] = "Idle", -- BK, Credits
+	
+	[0x530] = "Arguing", -- BK, Credits
+	[0x531] = "Confusion", -- Jamjars, Credits
+	[0x532] = "Proposing", -- BK, Credits
+	[0x533] = "Kicking", -- Humba Wumba, Credits
+	[0x534] = "Idle", -- Bottles, Credits
+	[0x536] = "Kicking", -- BK, Credits
+	[0x537] = "Excited", -- Jamjars, Credits
+	[0x538] = "Kicking", -- Jamjars, Credits
+	[0x539] = "Riding", -- Captain Blubber, Credits
+	[0x53A] = "Floating", -- Saucer of Peril, Credits
+	[0x53B] = "Cheering", -- Captain Blubber, Credits
+	[0x53C] = "Idle", -- Saucer of Peril, Credits
+	[0x53F] = "Running", -- Humba Wumba, Credits
+	
+	[0x542] = "Surprised", -- Klungo, Eating CS
 };
 
 function Game.getAnimationValue()
@@ -3846,6 +4305,7 @@ object_model1 = {
 	["y_rotation"] = 0x48, -- Float
 	["z_rotation"] = 0x4C, -- Float
 	["health"] = 0x5E; -- Byte
+	["jinjo_identifier"] = 0x6F; -- Byte
 	--["movement_state"] = 0x72; -- Byte
 	["animation_index"] = 0x8C; -- 2 Byte
 	["transparency"] = 0x9B, --Byte
@@ -4127,7 +4587,7 @@ object_model1 = {
 		[0x78D] = "Green Balloon",
 		[0x78E] = "Cactus of Strength Bar",
 
-		[0x790] = "Prospector",
+		[0x790] = "Bullion Bill",
 		[0x791] = "Box", -- GGM Prospector's Hut
 		[0x793] = "Breakable Rock", -- MT
 		[0x794] = "Mr. Patch",
@@ -4216,9 +4676,9 @@ object_model1 = {
 
 		[0x7F3] = "Cheato Page",
 		[0x7F4] = "Targitzan",
-		[0x7F5] = "Alien Child (Pink)",
-		[0x7F6] = "Alien Child (Blue)",
-		[0x7F7] = "Alien Child (Yellow)",
+		[0x7F5] = "Betette",
+		[0x7F6] = "Alphette",
+		[0x7F7] = "Gamette",
 		[0x7F8] = "Ice", -- HFP
 		[0x7F9] = "Lord Woo Fak Fak",
 		[0x7FA] = "Baby T. Rex",
@@ -4423,7 +4883,7 @@ object_model1 = {
 		[0x8FF] = "Rocknut",
 
 		[0x900] = "Gobgoyle",
-		[0x901] = "HAG 1",
+		[0x901] = "Gruntilda (HAG 1)",
 		[0x902] = "Gobgoyle",
 		[0x903] = "Chuffy Pad",
 		[0x904] = "Mortar", -- Hag 1
@@ -4587,6 +5047,18 @@ function getNestContentsOSD(value)
 	return eggType;
 end
 
+function getJinjoIdentifierOSD(pointer)
+	local jinjo_value = mainmemory.readbyte(pointer + object_model1.jinjo_identifier);
+	if jinjo_value == 0 then
+		jinjo_ident = "Minjo (Random)";
+	elseif jinjo_value > 0 and jinjo_value < 46 then
+		jinjo_ident = JinjoAddresses[jinjo_value][2].." ("..JinjoColors[mainmemory.readbyte(JinjoAddresses[jinjo_value][1][version])]..")";
+	else
+		jinjo_ident = "Unknown";
+	end
+	return jinjo_ident;
+end
+
 local function getNumSlots()
 	local objectArray = dereferencePointer(Game.Memory.object_array_pointer[version]);
 	if isRDRAM(objectArray) then
@@ -4747,12 +5219,16 @@ function Game.drawUI()
 			table.insert(examine_data, { "Rot Y", round(mainmemory.readfloat(pointer + object_model1.y_rotation, true),precision) });
 			table.insert(examine_data, { "Rot Z", round(mainmemory.readfloat(pointer + object_model1.z_rotation, true),precision) });
 			table.insert(examine_data, { "Separator", 1 });
-			table.insert(examine_data, { "Animation", Game.getObjectAnimationOSD(currentSlotBase) });
+			table.insert(examine_data, { "Animation", Game.getObjectAnimationOSD(pointer) });
 			--table.insert(examine_data, { "Movement State", toHexString(mainmemory.readbyte(pointer + object_model1.movement_state)) });
 			
 			table.insert(examine_data, { "Separator", 1 });
 			if currentObjectName == "Nest (Eggs)" or currentObjectName == "Nest (Note)" or currentObjectName == "Nest (Treble Clef)" or currentObjectName == "Nest (Feathers)" then
 				table.insert(examine_data, { "Nest Contents", getNestContentsOSD(mainmemory.read_u16_be(pointer + object_model1.nest.contents)) });
+			end
+			
+			if currentObjectName == "Jinjo" then
+				table.insert(examine_data, { "Jinjo Identifier", getJinjoIdentifierOSD(pointer) });
 			end
 			
 			return examine_data;
