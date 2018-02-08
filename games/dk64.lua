@@ -1130,6 +1130,7 @@ obj_model1 = {
 		[0x30] = "Bouncing",
 		[0x31] = "Damaged",
 		[0x32] = "Stunlocked", -- Kasplat
+		[0x33] = "Damaged", -- Mad Jack Wrong Switch
 
 		[0x35] = "Damaged", -- Klump knockback
 		[0x36] = "Death",
@@ -2680,6 +2681,26 @@ function offsetObjectModel2(x, y, z)
 	end
 end
 
+function getSpawnSnagState(pointer)
+	local behaviorPointer = dereferencePointer(pointer + obj_model2.behavior_pointer);
+	if isRDRAM(behaviorPointer) then
+		SpawnSnagState = mainmemory.readbyte(behaviorPointer + 0x60);
+		if SpawnSnagState == 1 then
+			return "Uncollectable";
+		elseif SpawnSnagState == 0 then
+			return "Collectable";
+		end
+	end
+	return 0;
+end
+
+function unloadGoldenBanana(pointer)
+	local behaviorPointer = dereferencePointer(pointer + obj_model2.behavior_pointer);
+	if isRDRAM(behaviorPointer) then
+		mainmemory.writebyte(behaviorPointer + 0x60, 0);
+	end
+end
+
 local function getExamineDataModelTwo(pointer)
 	local examine_data = {};
 
@@ -2740,7 +2761,12 @@ local function getExamineDataModelTwo(pointer)
 		table.insert(examine_data, { "Gunswitch Texture", toHexString(mainmemory.read_u32_be(behaviorTypePointer + 0x22C), 8) }); -- TODO: figure out the format for behavior scripts
 		table.insert(examine_data, { "Separator", 1 });
 	end
-
+	
+	if behaviorType == "Golden Banana" then
+		table.insert(examine_data, { "Spawn Snag State", getSpawnSnagState(pointer)});
+		table.insert(examine_data, { "Separator", 1 });
+	end
+	
 	if hasPosition then
 		table.insert(examine_data, { "Hitbox X", xPos });
 		table.insert(examine_data, { "Hitbox Y", yPos });
