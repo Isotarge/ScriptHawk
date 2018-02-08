@@ -2694,7 +2694,7 @@ function getSpawnSnagState(pointer)
 	return 0;
 end
 
-function unloadGoldenBanana(pointer)
+function forceSnagState(pointer)
 	local behaviorPointer = dereferencePointer(pointer + obj_model2.behavior_pointer);
 	if isRDRAM(behaviorPointer) then
 		mainmemory.writebyte(behaviorPointer + 0x60, 0);
@@ -2762,7 +2762,7 @@ local function getExamineDataModelTwo(pointer)
 		table.insert(examine_data, { "Separator", 1 });
 	end
 	
-	if behaviorType == "Golden Banana" then
+	if behaviorType == "Golden Banana" or "Banana Medal" then
 		table.insert(examine_data, { "Spawn Snag State", getSpawnSnagState(pointer)});
 		table.insert(examine_data, { "Separator", 1 });
 	end
