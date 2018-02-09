@@ -2691,9 +2691,36 @@ function getSpawnSnagState(pointer)
 	return 0;
 end
 
-function forceSnagState(pointer)
+function getSpawnSnagCheck(pointer)
 	local behaviorPointer = dereferencePointer(pointer + obj_model2.behavior_pointer);
 	if isRDRAM(behaviorPointer) then
+		SpawnSnagCheck = mainmemory.readbyte(behaviorPointer + 0x54);
+		if SpawnSnagCheck == 2 then
+			return "Done";
+		elseif SpawnSnagCheck == 0 then
+			return "Not Done";
+		end
+	end
+	return 0;
+end
+
+function forceSnagState(pointer, value)
+	local behaviorPointer = dereferencePointer(pointer + obj_model2.behavior_pointer);
+	if isRDRAM(behaviorPointer) then
+		if value == 1 then
+			mainmemory.writebyte(behaviorPointer + 0x60, 1);
+			mainmemory.writebyte(behaviorPointer + 0x54, 0);
+		else
+			mainmemory.writebyte(behaviorPointer + 0x60, 0);
+			mainmemory.writebyte(behaviorPointer + 0x54, 2);
+		end
+	end
+end
+
+function resetSnagState(pointer)
+	local behaviorPointer = dereferencePointer(pointer + obj_model2.behavior_pointer);
+	if isRDRAM(behaviorPointer) then
+		mainmemory.writebyte(behaviorPointer + 0x54, 0);
 		mainmemory.writebyte(behaviorPointer + 0x60, 0);
 	end
 end
@@ -2760,7 +2787,8 @@ local function getExamineDataModelTwo(pointer)
 	end
 
 	if behaviorType == "Golden Banana" or "Banana Medal" then
-		table.insert(examine_data, { "Spawn Snag State", getSpawnSnagState(pointer)});
+		table.insert(examine_data, { "Snag State", getSpawnSnagState(pointer)});
+		table.insert(examine_data, { "Snag Check", getSpawnSnagCheck(pointer)});
 		table.insert(examine_data, { "Separator", 1 });
 	end
 
