@@ -69,6 +69,10 @@ local Game = {
 		["current_exit"] = {0x76A0AC, 0x764BCC, 0x76A29C, 0x72CDE8}, -- u32_be
 		["exit_array_pointer"] = {0x7FC900, 0x7FC840, 0x7FCD90, 0x7B6520}, -- Pointer
 		["number_of_exits"] = {0x7FC904, 0x7FC844, 0x7FCD94, 0x7B6524}, -- Byte
+		["level_index_mapping"] = {0x7445E0, 0x73ED30, 0x743EA0, nil}, -- TODO: Kiosk
+		["in_submap"] = {0x76A160, 0x764C80, 0x76A350, nil}, -- TODO: Kiosk
+		["parent_map"] = {0x76A172, 0x764C92, 0x76A362, nil}, -- TODO: Kiosk
+		["parent_exit"] = {0x76A174, 0x764C94, 0x76A364, nil}, -- TODO: Kiosk
 		["lag_boost"] = {0x744478, 0x73EBC8, 0x743D38, 0x6F1C70},
 		["destination_map"] = {0x7444E4, 0x73EC34, 0x743DA4, 0x6F1CC4}, -- See Game.maps for values
 		["destination_exit"] = {0x7444E8, 0x73EC38, 0x743DA8, 0x6F1CC8},
@@ -686,20 +690,22 @@ local TS_CB_Base = CB_Base + (14 * 2); -- u16_be array
 local GB_Base    = TS_CB_Base + (14 * 2); -- u16_be array
 
 -- For CB, T&S CB, GB level indexes are:
--- Japes
--- Aztec
--- Factory
--- Galleon
--- Fungi
--- Caves
--- Castle
--- Isles
--- Helm
--- Unknown 1
--- Unknown 2
--- Unknown 3
--- Unknown 4
--- Null
+local levelIndexes = {
+	[0x00] = "Japes",
+	[0x01] = "Aztec",
+	[0x02] = "Factory",
+	[0x03] = "Galleon",
+	[0x04] = "Fungi",
+	[0x05] = "Caves",
+	[0x06] = "Castle",
+	[0x07] = "Isles",
+	[0x08] = "Helm",
+	[0x09] = "Bonus", -- Submap
+	[0x0A] = "Multiplayer",
+	[0x0B] = "Cutscene",
+	[0x0C] = "Test Map",
+	[0x0D] = "Null", -- Submap
+};
 
 function Game.getMaxStandardAmmo()
 	local kong = mainmemory.readbyte(Game.Memory.character[version]);
@@ -1310,10 +1316,7 @@ obj_model1 = {
 };
 
 local function getActorNameFromBehavior(actorBehavior)
-	if type(obj_model1.actor_types[actorBehavior]) ~= "nil" then
-		return obj_model1.actor_types[actorBehavior];
-	end
-	return actorBehavior;
+	return obj_model1.actor_types[actorBehavior] or actorBehavior;
 end
 
 local function getActorName(pointer)
@@ -1770,10 +1773,7 @@ local model_indexes = { -- Different on Kiosk, handled in Game.detectVersion
 };
 
 local function getModelNameFromModelIndex(modelIndex)
-	if type(model_indexes[modelIndex]) ~= "nil" then
-		return model_indexes[modelIndex];
-	end
-	return modelIndex;
+	return model_indexes[modelIndex] or modelIndex;
 end
 
 function getActorCollisions(actor)
@@ -2574,10 +2574,7 @@ end
 
 local function getScriptName(objectModel2Base)
 	local model2ID = mainmemory.read_u16_be(objectModel2Base + obj_model2.object_type);
-	if type(obj_model2.object_types[model2ID]) == "string" then
-		return obj_model2.object_types[model2ID];
-	end
-	return "unknown "..toHexString(model2ID);
+	return obj_model2.object_types[model2ID] or "unknown "..toHexString(model2ID);
 end
 
 local function populateObjectModel2Pointers()
@@ -6634,6 +6631,36 @@ function Game.setMap(value)
 	end
 end
 
+function Game.getLevelIndex()
+	if version == 4 then -- TODO: Kiosk
+		return 0;
+	end
+	local currentMap = Game.getMap();
+	local levelIndex = mainmemory.readbyte(Game.Memory.level_index_mapping[version] + currentMap);
+	if levelIndex == 0x09 or levelIndex == 0x0D then -- "Bonus" or "Null"
+		if mainmemory.readbyte(Game.Memory.in_submap[version]) > 0 then
+			currentMap = mainmemory.read_u16_be(Game.Memory.parent_map[version]);
+			levelIndex = mainmemory.readbyte(Game.Memory.level_index_mapping[version] + currentMap);
+		end
+	end
+	return levelIndex;
+end
+
+function Game.getLevelIndexOSD()
+	local levelIndex = Game.getLevelIndex();
+	return levelIndexes[levelIndex] or "Unknown "..toHexString(levelIndex);
+end
+
+function Game.dumpLevelIndexMap()
+	for i = 1, #Game.maps do
+		local mapName = Game.maps[i] or "Unknown "..toHexString(i - 1);
+		local levelIndex = mainmemory.readbyte(Game.Memory.level_index_mapping[version] + i - 1);
+		local levelIndexName = levelIndexes[levelIndex] or "Unknown "..toHexString(levelIndex);
+		dprint(toHexString(i - 1)..","..levelIndexName..","..mapName);
+	end
+	print_deferred();
+end
+
 function Game.initUI()
 	-- Flag stuff
 	if version < 4 then
@@ -7302,6 +7329,36 @@ function fuckSegment(segmentIndex)
 	dumpSegments();
 end
 
+function dumpDLBases()
+	local chunkArray = Game.getChunkArray();
+	local DLBase = Game.getMapDLStart();
+	if isRDRAM(chunkArray) and isRDRAM(DLBase) then
+		local numChunks = math.floor(mainmemory.read_u32_be(chunkArray + heap.object_size) / chunkSize);
+		for i = 0, numChunks - 1 do
+			local chunkBase = chunkArray + i * chunkSize;
+			local chunkDLArrayHeap = dereferencePointer(chunkBase + 0x4C);
+			if isRDRAM(chunkDLArrayHeap) then
+				dprint("ChunkBase "..toHexString(chunkBase).." points to -> "..toHexString(chunkDLArrayHeap));
+				local chunkMappingBase = chunkDLArrayHeap;
+				local DLPointer1;
+				local DLPointer2;
+				repeat
+					DLPointer1 = dereferencePointer(chunkMappingBase + 0x04);
+					DLPointer2 = dereferencePointer(chunkMappingBase + 0x08);
+					if isRDRAM(DLPointer1) then
+						dprint("DLPointer1: "..toHexString(DLPointer1).." relative: "..toHexString(DLPointer1 - DLBase));
+					end
+					if isRDRAM(DLPointer2) then
+						dprint("DLPointer2: "..toHexString(DLPointer2).." relative: "..toHexString(DLPointer2 - DLBase));
+					end
+					chunkMappingBase = chunkMappingBase + 0x24;
+				until not isRDRAM(DLPointer1);
+			end
+		end
+		print_deferred();
+	end
+end
+
 function F3DEX2Trace()
 	local DLBase = Game.getMapDLStart();
 	local vertBase = Game.getMapVerts();
@@ -7743,6 +7800,7 @@ end
 
 Game.standardOSD = {
 	{"Map", Game.getMapOSD},
+	{"Level", Game.getLevelIndexOSD},
 	{"Cutscene", Game.getCutsceneOSD},
 	{"Exit", Game.getExitOSD},
 	{"Separator", 1},
