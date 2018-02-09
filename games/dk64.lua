@@ -2758,12 +2758,12 @@ local function getExamineDataModelTwo(pointer)
 		table.insert(examine_data, { "Gunswitch Texture", toHexString(mainmemory.read_u32_be(behaviorTypePointer + 0x22C), 8) }); -- TODO: figure out the format for behavior scripts
 		table.insert(examine_data, { "Separator", 1 });
 	end
-	
+
 	if behaviorType == "Golden Banana" or "Banana Medal" then
 		table.insert(examine_data, { "Spawn Snag State", getSpawnSnagState(pointer)});
 		table.insert(examine_data, { "Separator", 1 });
 	end
-	
+
 	if hasPosition then
 		table.insert(examine_data, { "Hitbox X", xPos });
 		table.insert(examine_data, { "Hitbox Y", yPos });
@@ -6169,25 +6169,27 @@ ScriptHawk.bindKeyRealtime("C", switch_grab_script_mode, true);
 -- Object Model 1 Functions --
 ------------------------------
 
-local function isValidModel1Object(pointer, playerObject, cameraObject)
-	local modelPointer = dereferencePointer(pointer + obj_model1.model_pointer);
-
-	if encircle_enabled then
-		return isRDRAM(modelPointer) and pointer ~= playerObject;
-	end
-
-	return true;
-end
-
 local function populateObjectModel1Pointers()
 	object_pointers = {};
 	local playerObject = Game.getPlayerObject();
 	local cameraObject = dereferencePointer(Game.Memory.camera_pointer[version]);
 	if isRDRAM(playerObject) and isRDRAM(cameraObject) then
-		for object_no = 0, getObjectModel1Count() do
-			local pointer = dereferencePointer(Game.Memory.pointer_list[version] + (object_no * 4));
-			if isRDRAM(pointer) and isValidModel1Object(pointer, playerObject, cameraObject) then
-				table.insert(object_pointers, pointer);
+		if encircle_enabled then
+			for object_no = 0, getObjectModel1Count() do
+				local pointer = dereferencePointer(Game.Memory.pointer_list[version] + (object_no * 4));
+				if isRDRAM(pointer) and pointer ~= playerObject then
+					local modelPointer = dereferencePointer(pointer + obj_model1.model_pointer);
+					if isRDRAM(modelPointer) then
+						table.insert(object_pointers, pointer);
+					end
+				end
+			end
+		else
+			for object_no = 0, getObjectModel1Count() do
+				local pointer = dereferencePointer(Game.Memory.pointer_list[version] + (object_no * 4));
+				if isRDRAM(pointer) then
+					table.insert(object_pointers, pointer);
+				end
 			end
 		end
 
