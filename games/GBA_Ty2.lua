@@ -7,12 +7,23 @@ end
 
 local Game = {}; -- This table stores the module's API function implementations and game state, it's returned to ScriptHawk at the end of the module code
 
+local script_modes = {
+	"Disabled",
+	"List",
+	"Examine",
+};
+
+local script_mode_index = 1;
+script_mode = script_modes[script_mode_index];
+
 --------------------
 -- Region/Version --
 --------------------
 
 Game.Memory = {
 	["player_ptr"] = {["Domain"] = "EWRAM", ["Address"] = 0x47EC},
+    ["object_array_size"] = {["Domain"] = "IWRAM", ["Address"] = 0x16F8},
+    ["object_array_ptr"] = {["Domain"] = "IWRAM", ["Address"] = 0x16FC},
     ["rangCount"] = {["Domain"] = "IWRAM", ["Address"] = 0xB06},
     --["player_ptr"] = {["Domain"] = "EWRAM", ["Address"] = {0x5B08}}, --may be better?
 };
@@ -141,7 +152,7 @@ function Game.getXPosition()
     local playerPtr = memory.read_u32_le(Game.Memory.player_ptr["Address"], Game.Memory.player_ptr["Domain"])
 	playerPtr = parsePointer(playerPtr)
     if playerPtr ~= nil then
-        return memory.read_s32_le(playerPtr["Address"]+0xC, playerPtr["Domain"]);
+        return memory.read_s32_le(playerPtr["Address"]+0x0C, playerPtr["Domain"]);
     end
     return 0
 end
@@ -167,11 +178,19 @@ function Game.colorYVelocity()
 end
 
 function Game.setXPosition(value) -- Optional
-	--mainmemory.writefloat(Game.Memory.x_position[version], value, true);
+    local playerPtr = memory.read_u32_le(Game.Memory.player_ptr["Address"], Game.Memory.player_ptr["Domain"])
+	playerPtr = parsePointer(playerPtr)
+    if playerPtr ~= nil then
+        memory.write_s32_le(playerPtr["Address"]+0x0C, value, playerPtr["Domain"]);
+    end
 end
 
 function Game.setYPosition(value) -- Optional
-	--mainmemory.writefloat(Game.Memory.y_position[version], value, true);
+    local playerPtr = memory.read_u32_le(Game.Memory.player_ptr["Address"], Game.Memory.player_ptr["Domain"])
+	playerPtr = parsePointer(playerPtr)
+    if playerPtr ~= nil then
+        memory.write_s32_le(playerPtr["Address"]+0x10, value, playerPtr["Domain"]);
+    end
 end
 
 --------------
@@ -230,6 +249,125 @@ function Game.setZRotation(value) -- Optional
 	--mainmemory.writefloat(Game.Memory.z_rotation[version], value, true);
 end
 
+-------------
+-- Objects --
+-------------
+object_index = 1;
+object_top_index = 1;
+object_max_slots = 50;
+local object_struct_size = 0xF8;
+
+local object_indexes = {
+    
+     [0x0B] = {["Name"] = "Moving Platform", ["Size"] = 0x108},
+    
+    [0x37] = {["Name"] = "Cricket Bat Enemy", ["Size"] = 0xF8},
+    [0x38] = {["Name"] = "Bird Enemy", ["Size"] = 0xF8},
+    [0x39] = {["Name"] = "Spider Enemy", ["Size"] = 0xF8},
+    
+    [0x3D] = {["Name"] = "Checkpoint", ["Size"] = 0xF8},
+    [0x3E] = {["Name"] = "Health Refill", ["Size"] = 0x148},
+    
+    [0x49] = {["Name"] = "Robot Enemy", ["Size"] = 0x148},
+    
+    [0x4B] = {["Name"] = "Opal Sack", ["Size"] = 0xF8},
+    
+    [0x59] = {["Name"] = "Breakable Crystals", ["Size"] = 0xF8},
+    
+    [0x5B] = {["Name"] = "Warp Mushrooms", ["Size"] = 0x148},
+    [0x5C] = {["Name"] = "Bilby", ["Size"] = 0xF8},
+    
+    [0x60] = {["Name"] = "Fish Enemy", ["Size"] = 0xF8},
+    
+    [0x62] = {["Name"] = "Tilting Platform", ["Size"] = 0xF8},
+    
+    [0x69] = {["Name"] = "Ranger Ken", ["Size"] = 0x120},
+    
+    [0x6E] = {["Name"] = "Wood Gate", ["Size"] = 0xF8},
+    [0x6F] = {["Name"] = "White Croc", ["Size"] = 0xF8},    
+    [0x70] = {["Name"] = "Button", ["Size"] = 0xF8},
+    
+    [0x72] = {["Name"] = "Moving Platform", ["Size"] = 0x108},
+    
+    [0x7D] = {["Name"] = "Breakable Rock Wall", ["Size"] = 0xF8},
+    
+    [0x81] = {["Name"] = "Liftable Rock", ["Size"] = 0xF8},
+    
+    [0x92] = {["Name"] = "Fire", ["Size"] = 0xF8},
+    [0x93] = {["Name"] = "Leech", ["Size"] = 0xF8},
+};
+
+local function incrementObjectIndex()
+    --local numSlots = getNumSlots();
+    object_index = object_index + 1;
+    if object_index > memory.read_u32_le(Game.Memory.object_array_size["Address"], Game.Memory.object_array_size["Domain"]) then
+        object_index = 1;
+    end
+    if object_index > memory.read_u32_le(Game.Memory.object_array_size["Address"], Game.Memory.object_array_size["Domain"]) then
+        object_top_index = object_index - object_max_slots;
+    elseif object_index < object_top_index then
+        object_top_index = object_index;
+    end
+end
+
+local function decrementObjectIndex()
+    object_index = object_index - 1;
+    if object_index <= 0 then
+        local numSlots = memory.read_u32_le(Game.Memory.object_array_size["Address"], Game.Memory.object_array_size["Domain"]);
+        object_index = numSlots;
+    end
+    if object_index > memory.read_u32_le(Game.Memory.object_array_size["Address"], Game.Memory.object_array_size["Domain"]) then
+        object_top_index = object_index - object_max_slots;
+    elseif object_index < object_top_index then
+        object_top_index = object_index;
+    end
+end
+
+function zipToSelectedObject()
+    local objectArray = memory.read_u32_le(Game.Memory.object_array_ptr["Address"], Game.Memory.object_array_ptr["Domain"]);
+    if objectArray ~= nil then
+        objectArray = parsePointer(objectArray);
+        local slotBase = getObjectSlotBase(object_index);
+
+        local x = memory.read_u32_le(slotBase + 0x0C, objectArray["Domain"]);
+        local y = memory.read_u32_le(slotBase + 0x10, objectArray["Domain"]);
+
+        Game.setXPosition(x);
+        Game.setYPosition(y);
+    end
+end
+
+local function getObjectSlotBase(index)
+     local object_array = memory.read_u32_le(Game.Memory.object_array_ptr["Address"], Game.Memory.object_array_ptr["Domain"]);
+        if object_array ~= nil then
+            currentSlotBase = parsePointer(object_array);
+            local objectcount = memory.read_u32_le(Game.Memory.object_array_size["Address"], Game.Memory.object_array_size["Domain"]);
+            for i = 1, math.min(index-1, objectcount-1), 1 do
+                local objectType = memory.read_u32_le(currentSlotBase["Address"] + 0x04, currentSlotBase["Domain"]);
+                if object_indexes[objectType] ~= nil then
+                    currentSlotBase["Address"] = currentSlotBase["Address"] + object_indexes[objectType]["Size"];
+                else
+                    currentSlotBase["Address"] = currentSlotBase["Address"] + 0xF8;
+                end
+            end
+        end
+    return currentSlotBase["Address"];
+end
+
+function zipToSelectedObject()
+    local objectArray = memory.read_u32_le(Game.Memory.object_array_ptr["Address"], Game.Memory.object_array_ptr["Domain"]);
+    if objectArray ~= nil then
+        objectArray = parsePointer(objectArray);
+        local slotBase = getObjectSlotBase(object_index);
+
+        local x = memory.read_u32_le(slotBase + 0x0C, objectArray["Domain"]);
+        local y = memory.read_u32_le(slotBase + 0x10, objectArray["Domain"]);
+
+        Game.setXPosition(x);
+        Game.setYPosition(y);
+    end
+end
+
 ------------
 -- Events --
 ------------
@@ -259,8 +397,73 @@ function Game.initUI() -- Optional: Init any UI state here, mainly useful for se
 end
 
 
+local function toggleObjectAnalysisToolsMode()
+	script_mode_index = script_mode_index + 1;
+	if script_mode_index > #script_modes then
+		script_mode_index = 1;
+	end
+	script_mode = script_modes[script_mode_index];
+end
+
 function Game.drawUI()
-	
+    local row = 0;
+	if script_mode == "Disabled" then
+		return;
+	elseif script_mode == "Examine" then
+        gui.text(Game.OSDPosition[1], 2 + Game.OSDRowHeight * row, "Mode: "..script_mode, nil, 'bottomright');
+        return;
+    else
+        gui.text(Game.OSDPosition[1], 2 + Game.OSDRowHeight * row, "Mode: "..script_mode, nil, 'bottomright');
+        row = row + 1;
+        if script_mode == "List" then
+            local object_array = memory.read_u32_le(Game.Memory.object_array_ptr["Address"], Game.Memory.object_array_ptr["Domain"]);
+            if object_array ~= nil then
+                object_array = parsePointer(object_array);
+                gui.text(Game.OSDPosition[1], 2 + Game.OSDRowHeight * row, object_index, nil, 'bottomright');
+                row = row + 1;
+                local objectcount = memory.read_u32_le(Game.Memory.object_array_size["Address"], Game.Memory.object_array_size["Domain"]);
+                local printlist = {};
+                local currentSlotBase = object_array;
+                for i = 1, objectcount do
+                    if memory.read_u32_le(currentSlotBase["Address"], currentSlotBase["Domain"]) ~= 0 then
+                        local actorType = "Unknown";    
+                        local objectType = memory.read_u32_le(currentSlotBase["Address"] + 0x04, currentSlotBase["Domain"]);
+                        if object_indexes[objectType] ~= nil then
+                            actorType = object_indexes[objectType]["Name"];
+                            printlist[i] = actorType.." "..i..": "..toHexString(currentSlotBase["Address"] or 0);
+                            currentSlotBase["Address"] = currentSlotBase["Address"] + object_indexes[objectType]["Size"];
+                        else
+                            actorType = "Unknown("..toHexString(objectType)..")";
+                            printlist[i] = actorType.." "..i..": "..toHexString(currentSlotBase["Address"] or 0);
+                            currentSlotBase["Address"] = currentSlotBase["Address"] + 0xF8;
+                        end
+
+                        
+                        local color = nil;
+                        if object_index == i then
+                            color = colors.yellow;
+                        end
+                        
+                        --printlist[i] = actorType.." "..i..": "..toHexString(currentSlotBase["Address"] or 0);
+                        --gui.text(Game.OSDPosition[1], 2 + Game.OSDRowHeight * row, printlist[i], color, 'bottomright');
+                        --row = row + 1;
+                        
+                        
+                    end
+                end
+                for i = objectcount,1,-1 do
+                    local color = nil;
+                    if object_index == i then
+                        color = colors.yellow;
+                    end
+                    if(printlist[i] ~= nil) then
+                        gui.text(Game.OSDPosition[1], 2 + Game.OSDRowHeight * row, printlist[i], color, 'bottomright');
+                        row = row + 1;
+                    end
+                end
+            end
+        end
+    end
 end
 
 function Game.eachFrame() -- Optional: This function will be executed once per frame
@@ -289,5 +492,11 @@ Game.OSD = {
 	{"Odometer"},
 	{"Separator", 1},
 };
+
+ScriptHawk.bindKeyRealtime("Z", zipToSelectedObject, true);
+ScriptHawk.bindKeyRealtime("C", toggleObjectAnalysisToolsMode, true);
+ScriptHawk.bindMouse("mousewheelup", decrementObjectIndex);
+ScriptHawk.bindMouse("mousewheeldown", incrementObjectIndex);
+
 
 return Game; -- Return your Game table to ScriptHawk
