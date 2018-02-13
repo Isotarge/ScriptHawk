@@ -297,6 +297,14 @@ local object_indexes = {
     [0x93] = {["Name"] = "Leech", ["Size"] = 0xF8},
 };
 
+--Object Structure
+slot_variables = {
+	[0x0C] = {["Type"] = "s32_le", ["Name"] = {"X", "X Pos", "X Position"}},
+    [0x10] = {["Type"] = "s32_le", ["Name"] = {"Y", "Y Pos", "Y Position"}},
+	[0x18] = {["Type"] = "s32_le", ["Name"] = {"dX", "X Vel", "X Velocity"}},
+    [0x1C] = {["Type"] = "s32_le", ["Name"] = {"dY", "Y Vel", "Y Velocity"}},
+};
+
 local function incrementObjectIndex()
     --local numSlots = getNumSlots();
     object_index = object_index + 1;
@@ -368,6 +376,64 @@ function zipToSelectedObject()
     end
 end
 
+local function getVariableName(address)
+	local variable = slot_variables[address];
+	local nameType = type(variable.Name);
+
+	if nameType == "string" then
+		return variable.Name;
+	elseif nameType == "table" then
+		return variable.Name[1];
+	end
+
+	return variable.Type.." "..toHexString(address);
+end
+
+local function isBinary(var_type)
+	return var_type == "Binary" or var_type == "Bitfield" or var_type == "Byte" or var_type == "Flag" or var_type == "Boolean";
+end
+
+local function isHex(var_type)
+	return var_type == "Hex" or var_type == "Pointer" or var_type == "Z4_Unknown";
+end
+
+local function formatForOutput(var_type, value)
+	if isBinary(var_type) then
+		local binstring = toBinaryString(value);
+		if binstring ~= "" then
+			return binstring;
+		end
+		return "0";
+	elseif isHex(var_type) then
+		return toHexString(value);
+	end
+	return ""..value;
+end
+
+function getExamineData(slotBase) -- TODO: Improve this based on SM64 module implementation
+	local current_slot_variables = {};
+    --get slot size
+    local objectType = memory.read_u32_le((slotBase["Address"]) + 0x04, slotBase["Domain"]);
+    local slot_size = 0xF8;
+    if object_indexes[objectType] ~= nil then
+        local slot_size = object_indexes[objectType]["Size"];
+    end
+    
+    
+    --generate table
+	for relative_address = 0, slot_size do
+		local variable_data = slot_variables[relative_address];
+		if type(variable_data) == "table" then
+			local variableName = getVariableName(relative_address);
+			if variable_data.Type == "s32_le" then
+				table.insert(current_slot_variables, {variableName, formatForOutput(variable_data.Type, memory.read_s32_le((slotBase["Address"]) + relative_address, slotBase["Domain"]))});
+                --table.insert(current_slot_variables, {variableName, "Test"});
+			end
+		end
+	end
+	return current_slot_variables;
+end
+
 ------------
 -- Events --
 ------------
@@ -411,6 +477,33 @@ function Game.drawUI()
 		return;
 	elseif script_mode == "Examine" then
         gui.text(Game.OSDPosition[1], 2 + Game.OSDRowHeight * row, "Mode: "..script_mode, nil, 'bottomright');
+        row = row + 1;
+        
+        local currentSlotBase = {["Address"] = getObjectSlotBase(object_index),["Domain"]="EWRAM"};
+        local examine_data = getExamineData(currentSlotBase);
+		for i = #examine_data, 1, -1 do
+			if examine_data[i][1] ~= "Separator" then
+				gui.text(Game.OSDPosition[1], 2 + Game.OSDRowHeight * row, examine_data[i][2].." - "..examine_data[i][1], nil, 'bottomright');
+				row = row + 1;
+			else
+				row = row + examine_data[i][2];
+			end
+		end
+        
+        
+        if memory.read_u32_le(currentSlotBase["Address"], currentSlotBase["Domain"]) ~= 0 then
+            local actorType = "Unknown";    
+            local objectType = memory.read_u32_le(currentSlotBase["Address"] + 0x04, currentSlotBase["Domain"]);
+            if object_indexes[objectType] ~= nil then
+                actorType = object_indexes[objectType]["Name"];
+            else
+                actorType = "Unknown("..toHexString(objectType)..")";
+            end
+            gui.text(Game.OSDPosition[1], 2 + Game.OSDRowHeight * row, actorType.." "..object_index..": "..toHexString(currentSlotBase["Address"] or 0), nil, 'bottomright');
+            row = row + 1;
+
+        end
+
         return;
     else
         gui.text(Game.OSDPosition[1], 2 + Game.OSDRowHeight * row, "Mode: "..script_mode, nil, 'bottomright');
