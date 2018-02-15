@@ -3654,8 +3654,9 @@ function Game.detectVersion(romName, romHash)
 		return false;
 	end
 
-	Game.RAMWatch = parseRAMWatch("./Watch/"..romName..".wch");
-	Game.RAMWatch = table.join(Game.RAMWatch, parseRAMWatch("./Watch/Constants/"..romName..".wch"));
+	-- TODO: RAM watch parser is disabled because it crashes out of the box with the NLua backend
+	--Game.RAMWatch = parseRAMWatch("./Watch/"..romName..".wch");
+	--Game.RAMWatch = table.join(Game.RAMWatch, parseRAMWatch("./Watch/Constants/"..romName..".wch"));
 
 	-- Read EEPROM checksums
 	for i = 1, #eep_checksum do
