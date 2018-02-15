@@ -7251,35 +7251,68 @@ function Game.getMapDLStart()
 	return dereferencePointer(Game.Memory.map_displaylist_pointer[version]);
 end
 
+function crumbleVerts(vertBase, vertEnd)
+	for v = vertBase, vertEnd, vertSize do
+		if math.random() > 0.9 then
+			local xPos = mainmemory.read_s16_be(v + vert.x_position);
+			local yPos = mainmemory.read_s16_be(v + vert.y_position);
+			local zPos = mainmemory.read_s16_be(v + vert.z_position);
+
+			local mapping1 = mainmemory.read_s16_be(v + vert.mapping_1);
+			local mapping2 = mainmemory.read_s16_be(v + vert.mapping_2);
+
+			if math.random() > 0.5 then
+				mainmemory.write_s16_be(v + vert.x_position, xPos - 1);
+				mainmemory.write_s16_be(v + vert.y_position, yPos - 1);
+				mainmemory.write_s16_be(v + vert.z_position, zPos - 1);
+
+				mainmemory.write_s16_be(v + vert.mapping_1, mapping1 + math.floor(math.random(50, 100)));
+				mainmemory.write_s16_be(v + vert.mapping_2, mapping2 + math.floor(math.random(50, 100)));
+			else
+				mainmemory.write_s16_be(v + vert.x_position, xPos + 1);
+				mainmemory.write_s16_be(v + vert.y_position, yPos + 1);
+				mainmemory.write_s16_be(v + vert.z_position, zPos + 1);
+
+				mainmemory.write_s16_be(v + vert.mapping_1, mapping1 - math.floor(math.random(50, 100)));
+				mainmemory.write_s16_be(v + vert.mapping_2, mapping2 - math.floor(math.random(50, 100)));
+			end
+		end
+	end
+end
+
 function crumble()
 	local mapBase = Game.getMapBlock();
 	local vertBase = Game.getMapVerts();
+	local vertEnd = Game.getMapVertsEnd();
 
-	if isRDRAM(mapBase) and isRDRAM(vertBase) then
-		local vertEnd = Game.getMapVertsEnd();
-		for v = vertBase, vertEnd, vertSize do
-			if math.random() > 0.9 then
-				local xPos = mainmemory.read_s16_be(v + vert.x_position);
-				local yPos = mainmemory.read_s16_be(v + vert.y_position);
-				local zPos = mainmemory.read_s16_be(v + vert.z_position);
+	if isRDRAM(mapBase) and isRDRAM(vertBase) and isRDRAM(vertEnd) then
+		crumbleVerts(vertBase, vertEnd);
 
-				local mapping1 = mainmemory.read_s16_be(v + vert.mapping_1);
-				local mapping2 = mainmemory.read_s16_be(v + vert.mapping_2);
-
-				if math.random() > 0.5 then
-					mainmemory.write_s16_be(v + vert.x_position, xPos - 1);
-					mainmemory.write_s16_be(v + vert.y_position, yPos - 1);
-					mainmemory.write_s16_be(v + vert.z_position, zPos - 1);
-
-					mainmemory.write_s16_be(v + vert.mapping_1, mapping1 + math.floor(math.random(50, 100)));
-					mainmemory.write_s16_be(v + vert.mapping_2, mapping2 + math.floor(math.random(50, 100)));
-				else
-					mainmemory.write_s16_be(v + vert.x_position, xPos + 1);
-					mainmemory.write_s16_be(v + vert.y_position, yPos + 1);
-					mainmemory.write_s16_be(v + vert.z_position, zPos + 1);
-
-					mainmemory.write_s16_be(v + vert.mapping_1, mapping1 - math.floor(math.random(50, 100)));
-					mainmemory.write_s16_be(v + vert.mapping_2, mapping2 - math.floor(math.random(50, 100)));
+		local chunkArray = Game.getChunkArray();
+		local DLBase = Game.getMapDLStart();
+		if isRDRAM(chunkArray) and isRDRAM(DLBase)then
+			local numChunks = math.floor(mainmemory.read_u32_be(chunkArray + heap.object_size) / chunkSize);
+			for i = 0, numChunks - 1 do
+				local chunkBase = chunkArray + i * chunkSize;
+				local chunkDLArrayHeap = dereferencePointer(chunkBase + 0x4C);
+				if isRDRAM(chunkDLArrayHeap) then
+					local chunkMappingSize = mainmemory.read_u32_be(chunkDLArrayHeap + heap.object_size);
+					local numChunkMappings = math.floor(chunkMappingSize / 0x24);
+					for j = 0, numChunkMappings - 1 do
+						local chunkMappingBase = chunkDLArrayHeap + j * 0x24;
+						local DLPointer1 = dereferencePointer(chunkMappingBase + 0x04);
+						local DLPointer2 = dereferencePointer(chunkMappingBase + 0x08);
+						local vertPointer1 = dereferencePointer(chunkMappingBase + 0x14);
+						local vertPointer2 = dereferencePointer(chunkMappingBase + 0x18);
+						local size1 = parseDLVertPointerPair(DLBase, vertBase, vertEnd, DLPointer1, vertPointer1, true);
+						local size2 = parseDLVertPointerPair(DLBase, vertBase, vertEnd, DLPointer2, vertPointer2, true);
+						if type(size1) == "number" and size1 > 0 then
+							crumbleVerts(vertPointer1, vertPointer1 + size1 - 0x40);
+						end
+						if type(size2) == "number" and size2 > 0 then
+							crumbleVerts(vertPointer2, vertPointer2 + size2 - 0x40);
+						end
+					end
 				end
 			end
 		end
