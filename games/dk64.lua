@@ -94,6 +94,8 @@ local Game = {
 		["cutscene_model_table"] = {0x75570C, 0x74FF8C, 0x7557CC, 0x7001F0},
 		["flag_mapping"] = {0x755A20, 0x7502B0, 0x755AF0, 0x7003D0},
 		["enemy_table"] = {0x75EB80, 0x759690, 0x75ED40, 0x70A460},
+		["num_enemy_types"] = {0x70, 0x70, 0x70, 0x66},
+		["enemy_type_size"] = {0x18, 0x18, 0x18, 0x1C},
 		-- 1000 0000 - ????
 		-- 0100 0000 - Pause Cancel
 		-- 0010 0000 - Show Model 2 Objects
@@ -6813,7 +6815,7 @@ function drawObjectPositions()
 	local dragTransform = {0, 0};
 	local mouse = input.getmouse();
 
-	if mouse.Left then --if mouse clicked object is being dragged
+	if mouse.Left then -- if mouse clicked object is being dragged
 		if not mouseClickedLastFrame then
 			startDrag = true;
 			startDragPosition = {mouse.X, mouse.Y};
@@ -7558,14 +7560,8 @@ end
 
 function dumpEnemyTypes()
 	dprint("Index,Address,Behavior,Model,Behavior Name,Model Name,");
-	local enemyTypeSize = 0x18;
-	local maxEnemyType = 0x70;
-	if version == 4 then
-		enemyTypeSize = 0x1C;
-		maxEnemyType = 0x66;
-	end
-	for i = 0, maxEnemyType do
-		local base = Game.Memory.enemy_table[version] + i * enemyTypeSize;
+	for i = 0, Game.Memory.num_enemy_types[version] do
+		local base = Game.Memory.enemy_table[version] + i * Game.Memory.enemy_type_size[version];
 		local behavior = mainmemory.read_u16_be(base);
 		local model = mainmemory.read_u16_be(base + 2);
 		dprint(toHexString(i)..","..toHexString(base)..","..toHexString(behavior, 4)..","..toHexString(model, 4)..","..getActorNameFromBehavior(behavior)..","..getModelNameFromModelIndex(model)..",");
@@ -7574,18 +7570,13 @@ function dumpEnemyTypes()
 end
 
 function everyEnemyIs(index)
-	local enemyTypeSize = 0x18;
-	local maxEnemyType = 0x70;
-	if version == 4 then
-		enemyTypeSize = 0x1C;
-		maxEnemyType = 0x66;
-	end
+	local enemyTypeSize = Game.Memory.enemy_type_size[version];
 	local chosenSlotData = {};
 	local chosenSlotBase = Game.Memory.enemy_table[version] + index * enemyTypeSize;
 	for i = 0, enemyTypeSize - 1 do
 		chosenSlotData[i] = mainmemory.readbyte(chosenSlotBase + i);
 	end
-	for i = 0, maxEnemyType do
+	for i = 0, Game.Memory.num_enemy_types[version] do
 		local base = Game.Memory.enemy_table[version] + i * enemyTypeSize;
 		for j = 0, enemyTypeSize - 1 do
 			mainmemory.writebyte(base + j, chosenSlotData[j]);
@@ -7604,14 +7595,9 @@ function replaceModels(index)
 	end
 
 	-- Enemy
-	local enemyTypeSize = 0x18;
-	max_index = 0x70;
-	if version == 4 then
-		enemyTypeSize = 0x1C;
-		max_index = 0x66;
-	end
+	max_index = Game.Memory.num_enemy_types[version];
 	for i = 0, max_index do
-		local base = Game.Memory.enemy_table[version] + i * enemyTypeSize;
+		local base = Game.Memory.enemy_table[version] + i * Game.Memory.enemy_type_size[version];
 		local model = mainmemory.write_u16_be(base + 2, index);
 	end
 
