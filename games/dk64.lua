@@ -1216,7 +1216,7 @@ obj_model1 = {
 		[0x81] = "Attacking", -- Enguarde
 		[0x82] = "Leaving Water", -- Enguarde
 		[0x83] = "Fairy Refill",
-
+		--[0x84] = "Unknown 0x84", -- Screen fades to black function at 806F007C sets it, pointer to that function in jump table at 80752DDC (near portal enter/exit functions)
 		[0x85] = "Main Menu",
 		[0x86] = "Entering Main Menu",
 		[0x87] = "Entering Portal",
@@ -7359,30 +7359,67 @@ function fuckSegment(segmentIndex)
 	dumpSegments();
 end
 
+function parseDLVertPointerPair(DLBase, vertBase, vertEnd, DLPointer, vertPointer, suppressPrint)
+	suppressPrint = suppressPrint or false;
+	if isRDRAM(DLPointer) then
+		local NOPTagString = "";
+		if mainmemory.read_u32_be(DLPointer - 0x08) == 0x00000000 then
+			NOPTagString = " NOPTag: "..toHexString(mainmemory.read_u32_be(DLPointer - 0x04));
+		end
+		if not suppressPrint then
+			dprint("DLPointer: "..toHexString(DLPointer).." relative: "..toHexString(DLPointer - DLBase)..NOPTagString);
+		end
+		if isRDRAM(vertPointer) then
+			local relativeString = "";
+			local size = 0;
+			if vertPointer >= vertBase and vertPointer < vertEnd then
+				local relativeActual = vertPointer - vertBase;
+				local relativeVert = relativeActual / vertSize;
+				relativeString = " relative: "..toHexString(relativeActual).." or vert no "..toHexString(relativeVert);
+			else
+				local prev = dereferencePointer(vertPointer - 0x30 + heap.previous_object);
+				local freeprev = mainmemory.read_u32_be(vertPointer - 0x30 + heap.prev_free_block);
+				local freenext = mainmemory.read_u32_be(vertPointer - 0x30 + heap.next_free_block);
+				if isRDRAM(prev) and freeprev == 0x00000000 and freenext == 0x00000000 then
+					size = mainmemory.read_u32_be(vertPointer - 0x30 + heap.object_size);
+					relativeString = " ON HEAP! Size: "..toHexString(size);
+				else
+					relativeString = " ON HEAP! Mid block, unknown size";
+				end
+			end
+			if not suppressPrint then
+				dprint("VertPointer: "..toHexString(vertPointer)..relativeString);
+			end
+			if suppressPrint and size > 0 then
+				return size;
+			end
+		end
+	end
+end
+
 function dumpDLBases()
 	local chunkArray = Game.getChunkArray();
 	local DLBase = Game.getMapDLStart();
-	if isRDRAM(chunkArray) and isRDRAM(DLBase) then
+	local vertBase = Game.getMapVerts();
+	local vertEnd = Game.getMapVertsEnd();
+	if isRDRAM(chunkArray) and isRDRAM(DLBase) and isRDRAM(vertBase) and isRDRAM(vertEnd) then
 		local numChunks = math.floor(mainmemory.read_u32_be(chunkArray + heap.object_size) / chunkSize);
 		for i = 0, numChunks - 1 do
 			local chunkBase = chunkArray + i * chunkSize;
 			local chunkDLArrayHeap = dereferencePointer(chunkBase + 0x4C);
 			if isRDRAM(chunkDLArrayHeap) then
 				dprint("ChunkBase "..toHexString(chunkBase).." points to -> "..toHexString(chunkDLArrayHeap));
-				local chunkMappingBase = chunkDLArrayHeap;
-				local DLPointer1;
-				local DLPointer2;
-				repeat
-					DLPointer1 = dereferencePointer(chunkMappingBase + 0x04);
-					DLPointer2 = dereferencePointer(chunkMappingBase + 0x08);
-					if isRDRAM(DLPointer1) then
-						dprint("DLPointer1: "..toHexString(DLPointer1).." relative: "..toHexString(DLPointer1 - DLBase));
-					end
-					if isRDRAM(DLPointer2) then
-						dprint("DLPointer2: "..toHexString(DLPointer2).." relative: "..toHexString(DLPointer2 - DLBase));
-					end
-					chunkMappingBase = chunkMappingBase + 0x24;
-				until not isRDRAM(DLPointer1);
+				local chunkMappingSize = mainmemory.read_u32_be(chunkDLArrayHeap + heap.object_size);
+				local numChunkMappings = math.floor(chunkMappingSize / 0x24);
+				for j = 0, numChunkMappings - 1 do
+					local chunkMappingBase = chunkDLArrayHeap + j * 0x24;
+					local DLPointer1 = dereferencePointer(chunkMappingBase + 0x04);
+					local DLPointer2 = dereferencePointer(chunkMappingBase + 0x08);
+					local vertPointer1 = dereferencePointer(chunkMappingBase + 0x14);
+					local vertPointer2 = dereferencePointer(chunkMappingBase + 0x18);
+					parseDLVertPointerPair(DLBase, vertBase, vertEnd, DLPointer1, vertPointer1);
+					parseDLVertPointerPair(DLBase, vertBase, vertEnd, DLPointer2, vertPointer2);
+				end
 			end
 		end
 		print_deferred();
@@ -8331,6 +8368,49 @@ function buildIdentifyMemoryCache()
 		addHeapMetadata(chunkArray, "isMapChunkArray", true);
 		addHeapMetadata(chunkArray, "addressFound", true);
 		addHeapMetadata(chunkArray, "addressType", 7);
+
+		local vertBase = Game.getMapVerts();
+		local vertEnd = Game.getMapVertsEnd();
+		if isRDRAM(vertBase) and isRDRAM(vertEnd) then
+			local numChunks = math.floor(mainmemory.read_u32_be(chunkArray + heap.object_size) / chunkSize);
+			for i = 0, numChunks - 1 do
+				local chunkBase = chunkArray + i * chunkSize;
+				local chunkDLArrayHeap = dereferencePointer(chunkBase + 0x4C);
+				if isRDRAM(chunkDLArrayHeap) then
+					addHeapMetadata(chunkDLArrayHeap, "description", "Map Chunk DL Vert Mapping Array");
+					addHeapMetadata(chunkDLArrayHeap, "isMapChunkDLVertMappingArray", true);
+					addHeapMetadata(chunkDLArrayHeap, "addressFound", true);
+					addHeapMetadata(chunkDLArrayHeap, "addressType", 7);
+					local chunkMappingSize = mainmemory.read_u32_be(chunkDLArrayHeap + heap.object_size);
+					local numChunkMappings = math.floor(chunkMappingSize / 0x24);
+					for j = 0, numChunkMappings - 1 do
+						local chunkMappingBase = chunkDLArrayHeap + j * 0x24;
+						local DLPointer1 = dereferencePointer(chunkMappingBase + 0x04);
+						local DLPointer2 = dereferencePointer(chunkMappingBase + 0x08);
+						local vertPointer1 = dereferencePointer(chunkMappingBase + 0x14);
+						local vertPointer2 = dereferencePointer(chunkMappingBase + 0x18);
+						local size1 = parseDLVertPointerPair(DLBase, vertBase, vertEnd, DLPointer1, vertPointer1, true);
+						local size2 = parseDLVertPointerPair(DLBase, vertBase, vertEnd, DLPointer2, vertPointer2, true);
+						if type(size1) == "number" then
+							vertPointer1 = vertPointer1 - 0x30;
+							addHeapMetadata(vertPointer1, "description", "Map Vert Block");
+							addHeapMetadata(vertPointer1, "DLPointer", DLPointer1);
+							addHeapMetadata(vertPointer1, "isMapVertBlock", true);
+							addHeapMetadata(vertPointer1, "addressFound", true);
+							addHeapMetadata(vertPointer1, "addressType", 7);
+						end
+						if type(size2) == "number" then
+							vertPointer2 = vertPointer2 - 0x30;
+							addHeapMetadata(vertPointer2, "description", "Map Vert Block");
+							addHeapMetadata(vertPointer2, "DLPointer", DLPointer2);
+							addHeapMetadata(vertPointer2, "isMapVertBlock", true);
+							addHeapMetadata(vertPointer2, "addressFound", true);
+							addHeapMetadata(vertPointer2, "addressType", 7);
+						end
+					end
+				end
+			end
+		end
 	end
 
 	-- Cache weather particle array
@@ -8845,6 +8925,16 @@ function identifyMemory(address, findReferences, reuseCache, suppressPrint)
 			if heapBlock.isMapChunkArray then
 				table.insert(addressInfo, "This address is part of the chunk array for the map!");
 				table.insert(addressInfo, "Use the Object Analysis Tools for more information.");
+			end
+
+			if heapBlock.isMapChunkDLVertMappingArray then
+				table.insert(addressInfo, "This address is part of the chunk:DL:vert mapping!");
+				table.insert(addressInfo, "Run dumpDLBases() for more information.");
+			end
+
+			if heapBlock.isMapVertBlock then
+				table.insert(addressInfo, "This address is part of a vert block for the DL at "..toHexString(heapBlock.DLPointer).."!");
+				table.insert(addressInfo, "Run dumpDLBases() for more information.");
 			end
 
 			-- Detect weather particle array
