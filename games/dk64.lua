@@ -33,6 +33,7 @@ local grab_script_modes = {
 	"Examine (Loading Zones)",
 	"Chunks",
 	"Exits",
+	"Enemies",
 };
 local grab_script_mode_index = 1;
 local grab_script_mode = grab_script_modes[grab_script_mode_index];
@@ -69,7 +70,7 @@ local Game = {
 		["current_exit"] = {0x76A0AC, 0x764BCC, 0x76A29C, 0x72CDE8}, -- u32_be
 		["exit_array_pointer"] = {0x7FC900, 0x7FC840, 0x7FCD90, 0x7B6520}, -- Pointer
 		["number_of_exits"] = {0x7FC904, 0x7FC844, 0x7FCD94, 0x7B6524}, -- Byte
-		["level_index_mapping"] = {0x7445E0, 0x73ED30, 0x743EA0, nil}, -- TODO: Kiosk
+		["level_index_mapping"] = {0x7445E0, 0x73ED30, 0x743EA0, 0x6F1D10},
 		["in_submap"] = {0x76A160, 0x764C80, 0x76A350, nil}, -- TODO: Kiosk
 		["parent_map"] = {0x76A172, 0x764C92, 0x76A362, nil}, -- TODO: Kiosk
 		["parent_exit"] = {0x76A174, 0x764C94, 0x76A364, nil}, -- TODO: Kiosk
@@ -691,7 +692,8 @@ local CB_Base    = 10; -- u16_be array
 local TS_CB_Base = CB_Base + (14 * 2); -- u16_be array
 local GB_Base    = TS_CB_Base + (14 * 2); -- u16_be array
 
--- For CB, T&S CB, GB level indexes are:
+-- For CB, T&S CB, GB
+-- Different on Kiosk, handled in Game.detectVersion()
 local levelIndexes = {
 	[0x00] = "Japes",
 	[0x01] = "Aztec",
@@ -704,9 +706,9 @@ local levelIndexes = {
 	[0x08] = "Helm",
 	[0x09] = "Bonus", -- Submap
 	[0x0A] = "Multiplayer",
-	[0x0B] = "Cutscene",
-	[0x0C] = "Test Map",
-	[0x0D] = "Null", -- Submap
+	[0x0B] = "Story",
+	[0x0C] = "Test",
+	[0x0D] = "Shared", -- Submap
 };
 
 function Game.getMaxStandardAmmo()
@@ -1534,7 +1536,7 @@ local function setObjectModel1Position(pointer, x, y, z)
 	end
 end
 
-local model_indexes = { -- Different on Kiosk, handled in Game.detectVersion
+local model_indexes = { -- Different on Kiosk, handled in Game.detectVersion()
 	[0x0000] = "No Model",
 	[0x0001] = "Diddy",
 	[0x0002] = "Diddy (Instrument)",
@@ -1811,7 +1813,7 @@ end
 -- Wrinkly doors
 -- Shops (Snide's, Cranky's, Funky's, Candy's)
 
-local obj_model2_slot_size = 0x90; -- 0x88 on Kiosk, handled by Game.detectVersion()
+local obj_model2_slot_size = 0x90; -- 0x88 on Kiosk, handled in Game.detectVersion()
 
 -- Relative to objects in model 2 array
 obj_model2 = {
@@ -3447,6 +3449,23 @@ function Game.detectVersion(romName, romHash)
 		--230-240 Crash
 		--241 Partially loads (kong position changes), then crashes
 		--242-255 Crash
+
+		-- 806FB6D0, pointer table to strings
+		levelIndexes = {
+			[0x00] = "JUNGLE",
+			[0x01] = "TEMPLE",
+			[0x02] = "TOY",
+			[0x03] = "WRECK",
+			[0x04] = "FOREST",
+			[0x05] = "CRYSTAL",
+			[0x06] = "SPOOKY",
+			[0x07] = "WORLD",
+			[0x08] = "HIDEOUT",
+			[0x09] = "BONUS",
+			[0x0A] = "MULTI",
+			[0x0B] = "TEST",
+			[0x0C] = "SHARED",
+		};
 
 		model_indexes = {
 			[0x0000] = "No Model",
@@ -6134,34 +6153,29 @@ function Game.zipToSelectedObject()
 	local playerObject = Game.getPlayerObject();
 	if isRDRAM(playerObject) then
 		local desiredX, desiredY, desiredZ;
-		-- Get selected object X,Y,Z position
-		if string.contains(grab_script_mode, "Model 1") then
-			local selectedActorBase = object_pointers[object_index];
-			if isRDRAM(selectedActorBase) then
-				desiredX = mainmemory.readfloat(selectedActorBase + obj_model1.x_pos, true);
-				desiredY = mainmemory.readfloat(selectedActorBase + obj_model1.y_pos, true);
-				desiredZ = mainmemory.readfloat(selectedActorBase + obj_model1.z_pos, true);
-			end
-		elseif string.contains(grab_script_mode, "Model 2") then
-			local selectedObjectBase = object_pointers[object_index];
-			if isRDRAM(selectedObjectBase) then
-				desiredX = mainmemory.readfloat(selectedObjectBase + obj_model2.x_pos, true);
-				desiredY = mainmemory.readfloat(selectedObjectBase + obj_model2.y_pos, true);
-				desiredZ = mainmemory.readfloat(selectedObjectBase + obj_model2.z_pos, true);
-			end
-		elseif string.contains(grab_script_mode, "Loading Zones") then
-			local selectedLoadingZoneBase = object_pointers[object_index];
-			if isRDRAM(selectedLoadingZoneBase) then
-				desiredX = mainmemory.read_s16_be(selectedLoadingZoneBase + loading_zone_fields.x_position);
-				desiredY = mainmemory.read_s16_be(selectedLoadingZoneBase + loading_zone_fields.y_position);
-				desiredZ = mainmemory.read_s16_be(selectedLoadingZoneBase + loading_zone_fields.z_position);
-			end
-		elseif grab_script_mode == "Exits" then
-			local selectedExitBase = object_pointers[object_index];
-			if isRDRAM(selectedExitBase) then
-				desiredX = mainmemory.read_s16_be(selectedExitBase + 0);
-				desiredY = mainmemory.read_s16_be(selectedExitBase + 2);
-				desiredZ = mainmemory.read_s16_be(selectedExitBase + 4);
+		local selectedObject = object_pointers[object_index];
+		if isRDRAM(selectedObject) then
+			-- Get selected object X,Y,Z position
+			if string.contains(grab_script_mode, "Model 1") then
+				desiredX = mainmemory.readfloat(selectedObject + obj_model1.x_pos, true);
+				desiredY = mainmemory.readfloat(selectedObject + obj_model1.y_pos, true);
+				desiredZ = mainmemory.readfloat(selectedObject + obj_model1.z_pos, true);
+			elseif string.contains(grab_script_mode, "Model 2") then
+				desiredX = mainmemory.readfloat(selectedObject + obj_model2.x_pos, true);
+				desiredY = mainmemory.readfloat(selectedObject + obj_model2.y_pos, true);
+				desiredZ = mainmemory.readfloat(selectedObject + obj_model2.z_pos, true);
+			elseif string.contains(grab_script_mode, "Loading Zones") then
+				desiredX = mainmemory.read_s16_be(selectedObject + loading_zone_fields.x_position);
+				desiredY = mainmemory.read_s16_be(selectedObject + loading_zone_fields.y_position);
+				desiredZ = mainmemory.read_s16_be(selectedObject + loading_zone_fields.z_position);
+			elseif grab_script_mode == "Exits" then
+				desiredX = mainmemory.read_s16_be(selectedObject + 0); -- TODO: Stop using magic numbers for this
+				desiredY = mainmemory.read_s16_be(selectedObject + 2);
+				desiredZ = mainmemory.read_s16_be(selectedObject + 4);
+			elseif grab_script_mode == "Enemies" then
+				desiredX = mainmemory.read_s16_be(selectedObject + 4); -- TODO: Stop using magic numbers for this
+				desiredY = mainmemory.read_s16_be(selectedObject + 6);
+				desiredZ = mainmemory.read_s16_be(selectedObject + 8);
 			end
 		end
 
@@ -6397,6 +6411,10 @@ local function drawGrabScriptUI()
 		populateExitPointers();
 	end
 
+	if grab_script_mode == "Enemies" then
+		Game.populateEnemyPointers();
+	end
+
 	if rat_enabled then
 		local renderingParams = dereferencePointer(playerObject + obj_model1.rendering_parameters_pointer);
 		if isRDRAM(renderingParams) then
@@ -6580,6 +6598,19 @@ local function drawGrabScriptUI()
 				row = row + 1;
 			end
 		end
+
+		if grab_script_mode == "Enemies" then
+			for i = #object_pointers, 1, -1 do
+				local slotBase = object_pointers[i];
+				local enemyData = Game.getEnemyData(slotBase);
+				local color = nil;
+				if object_index == i then
+					color = colors.green;
+				end
+				gui.text(gui_x, gui_y + height * row, i.." "..toHexString(slotBase)..": "..enemyData.enemyName.." at "..enemyData.xPos..", "..enemyData.yPos..", "..enemyData.zPos, color, 'bottomright');
+				row = row + 1;
+			end
+		end
 	end
 end
 
@@ -6665,15 +6696,19 @@ function Game.setMap(value)
 end
 
 function Game.getLevelIndex()
-	if version == 4 then -- TODO: Kiosk
-		return 0;
-	end
 	local currentMap = Game.getMap();
 	local levelIndex = mainmemory.readbyte(Game.Memory.level_index_mapping[version] + currentMap);
-	if levelIndex == 0x09 or levelIndex == 0x0D then -- "Bonus" or "Null"
-		if mainmemory.readbyte(Game.Memory.in_submap[version]) > 0 then
-			currentMap = mainmemory.read_u16_be(Game.Memory.parent_map[version]);
-			levelIndex = mainmemory.readbyte(Game.Memory.level_index_mapping[version] + currentMap);
+	if version == 4 then
+		if levelIndex == 0x09 or levelIndex == 0x0C then
+			-- TODO: Figure out exactly what Kiosk does for submaps
+			-- Kiosk is lacking the usual submap bytes it seems, compare "getLevelIndex" functions at 805FF030 (US 1.0) and 80593564 (US Kiosk)
+		end
+	else
+		if levelIndex == 0x09 or levelIndex == 0x0D then -- "Bonus" or "Shared"
+			if mainmemory.readbyte(Game.Memory.in_submap[version]) > 0 then
+				currentMap = mainmemory.read_u16_be(Game.Memory.parent_map[version]);
+				levelIndex = mainmemory.readbyte(Game.Memory.level_index_mapping[version] + currentMap);
+			end
 		end
 	end
 	return levelIndex;
@@ -7596,8 +7631,7 @@ function replaceModels(index)
 	end
 
 	-- Enemy
-	max_index = Game.Memory.num_enemy_types[version];
-	for i = 0, max_index do
+	for i = 0, Game.Memory.num_enemy_types[version] do
 		local base = Game.Memory.enemy_table[version] + i * Game.Memory.enemy_type_size[version];
 		local model = mainmemory.write_u16_be(base + 2, index);
 	end
@@ -7641,6 +7675,24 @@ function getBehaviorNameFromEnemyIndex(index)
 	return getActorNameFromBehavior(behaviorIndex);
 end
 
+function Game.getEnemyData(slotBase)
+	local enemyType = mainmemory.readbyte(slotBase);
+	local enemyName = getBehaviorNameFromEnemyIndex(enemyType);
+	if enemyType == 0x50 then
+		local cutsceneModelIndex = mainmemory.readbyte(slotBase + 0x0A);
+		enemyName = enemyName.." ("..getModelNameFromCutsceneIndex(cutsceneModelIndex)..")";
+	end
+	return {
+		slotBase = slotBase,
+		enemyType = enemyType,
+		enemyName = enemyName,
+		yRot = mainmemory.read_u16_be(slotBase + 0x02),
+		xPos = mainmemory.read_s16_be(slotBase + 0x04),
+		yPos = mainmemory.read_s16_be(slotBase + 0x06),
+		zPos = mainmemory.read_s16_be(slotBase + 0x08),
+	};
+end
+
 function dumpEnemies()
 	local enemyRespawnObject = dereferencePointer(Game.Memory.enemy_respawn_object[version]);
 	local enemySlotSize = 0x48;
@@ -7651,19 +7703,26 @@ function dumpEnemies()
 		local numberOfEnemies = mainmemory.read_u16_be(Game.Memory.num_enemies[version]);
 		for i = 1, numberOfEnemies do
 			local slotBase = enemyRespawnObject + (i - 1) * enemySlotSize;
-			local enemyType = mainmemory.readbyte(slotBase);
-			local enemyName = getBehaviorNameFromEnemyIndex(enemyType);
-			--local yRot = mainmemory.read_u16_be(slotBase + 0x02);
-			local xPos = mainmemory.read_s16_be(slotBase + 0x04);
-			local yPos = mainmemory.read_s16_be(slotBase + 0x06);
-			local zPos = mainmemory.read_s16_be(slotBase + 0x08);
-			if enemyType == 0x50 then
-				cutsceneModelIndex = mainmemory.readbyte(slotBase + 0x0A);
-				enemyName = enemyName.." ("..getModelNameFromCutsceneIndex(cutsceneModelIndex)..")";
-			end
-			dprint(i.." "..toHexString(slotBase)..": "..enemyName.." at "..xPos..", "..yPos..", "..zPos);
+			local enemyData = Game.getEnemyData(slotBase);
+			dprint(i.." "..toHexString(slotBase)..": "..enemyData.enemyName.." at "..enemyData.xPos..", "..enemyData.yPos..", "..enemyData.zPos);
 		end
 		print_deferred();
+	end
+end
+
+function Game.populateEnemyPointers()
+	local enemyRespawnObject = dereferencePointer(Game.Memory.enemy_respawn_object[version]);
+	local enemySlotSize = 0x48;
+	if version == 4 then
+		enemySlotSize = 0x44;
+	end
+	object_pointers = {};
+	if isRDRAM(enemyRespawnObject) then
+		local numberOfEnemies = mainmemory.read_u16_be(Game.Memory.num_enemies[version]);
+		for i = 1, numberOfEnemies do
+			local slotBase = enemyRespawnObject + (i - 1) * enemySlotSize;
+			table.insert(object_pointers, slotBase);
+		end
 	end
 end
 
