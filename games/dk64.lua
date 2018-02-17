@@ -57,26 +57,26 @@ local version; -- 1 USA, 2 Europe, 3 Japan, 4 Kiosk
 local Game = {
 	RAMWatch = {},
 	Memory = {
-		["jetpac_object_base"] = {0x02EC68, 0x021D18, 0x021C78, nil},
-		["jetpac_enemy_base"] = {0x02F09C, 0x02214C, 0x0220AC, nil},
-		["jetman_position_x"] = {0x02F050, 0x022100, 0x022060, nil},
-		["jetman_position_y"] = {0x02F054, 0x022104, 0x022064, nil},
-		["jetman_velocity_x"] = {0x02F058, 0x022108, 0x022068, nil},
-		["jetman_velocity_y"] = {0x02F05C, 0x02210C, 0x02206C, nil},
-		["arcade_object_base"] = {0x04BCD0, 0x03EC30, 0x03EA60, nil},
-		["RNG"] = {0x746A40, 0x7411A0, 0x746300, 0x6F36E0},
-		["mode"] = {0x755318, 0x74FB98, 0x7553D8, 0x6FFE6C}, -- See Game.modes for values
-		["current_map"] = {0x76A0A8, 0x764BC8, 0x76A298, 0x72CDE4}, -- See Game.maps for values
-		["current_exit"] = {0x76A0AC, 0x764BCC, 0x76A29C, 0x72CDE8}, -- u32_be
-		["exit_array_pointer"] = {0x7FC900, 0x7FC840, 0x7FCD90, 0x7B6520}, -- Pointer
-		["number_of_exits"] = {0x7FC904, 0x7FC844, 0x7FCD94, 0x7B6524}, -- Byte
-		["level_index_mapping"] = {0x7445E0, 0x73ED30, 0x743EA0, 0x6F1D10},
-		["in_submap"] = {0x76A160, 0x764C80, 0x76A350, nil}, -- TODO: Kiosk
-		["parent_map"] = {0x76A172, 0x764C92, 0x76A362, nil}, -- TODO: Kiosk
-		["parent_exit"] = {0x76A174, 0x764C94, 0x76A364, nil}, -- TODO: Kiosk
-		["lag_boost"] = {0x744478, 0x73EBC8, 0x743D38, 0x6F1C70},
-		["destination_map"] = {0x7444E4, 0x73EC34, 0x743DA4, 0x6F1CC4}, -- See Game.maps for values
-		["destination_exit"] = {0x7444E8, 0x73EC38, 0x743DA8, 0x6F1CC8},
+		jetpac_object_base = {0x02EC68, 0x021D18, 0x021C78, nil},
+		jetpac_enemy_base = {0x02F09C, 0x02214C, 0x0220AC, nil},
+		jetman_position_x = {0x02F050, 0x022100, 0x022060, nil},
+		jetman_position_y = {0x02F054, 0x022104, 0x022064, nil},
+		jetman_velocity_x = {0x02F058, 0x022108, 0x022068, nil},
+		jetman_velocity_y = {0x02F05C, 0x02210C, 0x02206C, nil},
+		arcade_object_base = {0x04BCD0, 0x03EC30, 0x03EA60, nil},
+		RNG = {0x746A40, 0x7411A0, 0x746300, 0x6F36E0},
+		mode = {0x755318, 0x74FB98, 0x7553D8, 0x6FFE6C}, -- See Game.modes for values
+		current_map = {0x76A0A8, 0x764BC8, 0x76A298, 0x72CDE4}, -- See Game.maps for values
+		current_exit = {0x76A0AC, 0x764BCC, 0x76A29C, 0x72CDE8}, -- u32_be
+		exit_array_pointer = {0x7FC900, 0x7FC840, 0x7FCD90, 0x7B6520}, -- Pointer
+		number_of_exits = {0x7FC904, 0x7FC844, 0x7FCD94, 0x7B6524}, -- Byte
+		level_index_mapping = {0x7445E0, 0x73ED30, 0x743EA0, 0x6F1D10},
+		in_submap = {0x76A160, 0x764C80, 0x76A350, nil}, -- TODO: Kiosk
+		parent_map = {0x76A172, 0x764C92, 0x76A362, nil}, -- TODO: Kiosk
+		parent_exit = {0x76A174, 0x764C94, 0x76A364, nil}, -- TODO: Kiosk
+		lag_boost = {0x744478, 0x73EBC8, 0x743D38, 0x6F1C70},
+		destination_map = {0x7444E4, 0x73EC34, 0x743DA4, 0x6F1CC4}, -- See Game.maps for values
+		destination_exit = {0x7444E8, 0x73EC38, 0x743DA8, 0x6F1CC8},
 		-- 1000 0000 - ????
 		-- 0100 0000 - ????
 		-- 0010 0000 - ????
@@ -85,18 +85,18 @@ local Game = {
 		-- 0000 0100 - ????
 		-- 0000 0010 - ????
 		-- 0000 0001 - Reload Map
-		["map_state"] = {0x76A0B1, 0x764BD1, 0x76A2A1, 0x72CDED}, -- byte, bitfield -- TODO: Document remaining values
-		["loading_zone_array_size"] = {0x7FDCB0, 0x7FDBF0, 0x7FE140, 0x7B7410}, -- u16_be
-		["loading_zone_array"] = {0x7FDCB4, 0x7FDBF4, 0x7FE144, 0x7B7414},
-		["file"] = {0x7467C8, 0x740F18, 0x746088, nil},
-		["character"] = {0x74E77C, 0x748EDC, 0x74E05C, 0x6F9EB8},
-		["object_spawn_table"] = {0x74E8B0, 0x749010, 0x74E1D0, 0x6F9F80},
-		["enemy_drop_table"] = {0x750400, 0x74AB20, 0x74FCE0, 0x6FB630},
-		["cutscene_model_table"] = {0x75570C, 0x74FF8C, 0x7557CC, 0x7001F0},
-		["flag_mapping"] = {0x755A20, 0x7502B0, 0x755AF0, 0x7003D0},
-		["enemy_table"] = {0x75EB80, 0x759690, 0x75ED40, 0x70A460},
-		["num_enemy_types"] = {0x70, 0x70, 0x70, 0x66},
-		["enemy_type_size"] = {0x18, 0x18, 0x18, 0x1C},
+		map_state = {0x76A0B1, 0x764BD1, 0x76A2A1, 0x72CDED}, -- byte, bitfield -- TODO: Document remaining values
+		loading_zone_array_size = {0x7FDCB0, 0x7FDBF0, 0x7FE140, 0x7B7410}, -- u16_be
+		loading_zone_array = {0x7FDCB4, 0x7FDBF4, 0x7FE144, 0x7B7414},
+		file = {0x7467C8, 0x740F18, 0x746088, nil},
+		character = {0x74E77C, 0x748EDC, 0x74E05C, 0x6F9EB8},
+		object_spawn_table = {0x74E8B0, 0x749010, 0x74E1D0, 0x6F9F80},
+		enemy_drop_table = {0x750400, 0x74AB20, 0x74FCE0, 0x6FB630},
+		cutscene_model_table = {0x75570C, 0x74FF8C, 0x7557CC, 0x7001F0},
+		flag_mapping = {0x755A20, 0x7502B0, 0x755AF0, 0x7003D0},
+		enemy_table = {0x75EB80, 0x759690, 0x75ED40, 0x70A460},
+		num_enemy_types = {0x70, 0x70, 0x70, 0x66},
+		enemy_type_size = {0x18, 0x18, 0x18, 0x1C},
 		-- 1000 0000 - ????
 		-- 0100 0000 - Pause Cancel
 		-- 0010 0000 - Show Model 2 Objects
@@ -105,66 +105,66 @@ local Game = {
 		-- 0000 0100 - ????
 		-- 0000 0010 - ????
 		-- 0000 0001 - Pausing
-		["tb_void_byte"] = {0x7FBB63, 0x7FBA83, 0x7FBFD3, 0x7B5B13}, -- byte, bitfield -- TODO: Document remaining values
-		["player_pointer"] = {0x7FBB4C, 0x7FBA6C, 0x7FBFBC, 0x7B5AFC},
-		["camera_pointer"] = {0x7FB968, 0x7FB888, 0x7FBDD8, 0x7B5918},
-		["pointer_list"] = {0x7FBFF0, 0x7FBF10, 0x7FC460, 0x7B5E58},
-		["actor_count"] = {0x7FC3F0, 0x7FC310, 0x7FC860, 0x7B6258},
-		["heap_pointer"] = {0x7F0990, 0x7F08B0, 0x7F0E00, 0x7A12C0},
-		["texture_list_pointer"] = {0x7F09DC, 0x7F08FC, 0x7F0E4C, 0x7A130C},
-		["model2_dl_rom_map_object_pointer"] = {0x7F9538, 0x7F9458, 0x7F99A8, 0x7B49F4},
-		["texture_rom_map_object_pointer"] = {0x7F9544, 0x7F9464, 0x7F99B4, 0x7B4A00},
-		["ffa_texture_rom_map_object_pointer"] = {0x7F9560, 0x7F9480, 0x7F99D0, 0x7B4A1C},
-		["texture_rom_map_object_pointer_2"] = {0x7F958C, 0x7F94AC, 0x7F99FC, 0x7B4A48},
-		["model2_dl_index_object_pointer"] = {0x7F95B8, 0x7F94D8, 0x7F9A28, 0x7B4A74},
-		["texture_index_object_pointer"] = {0x7F95C4, 0x7F94E4, 0x7F9A34, 0x7B4A80},
-		["ffa_texture_index_object_pointer"] = {0x7F95E0, 0x7F9500, 0x7F9A50, 0x7B4A9C},
-		["texture_index_object_pointer_2"] = {0x7F960C, 0x7F952C, 0x7F9A7C, 0x7B4AC8},
-		["weather_particle_array_pointer"] = {0x7FD9E4, 0x7FD924, 0x7FDE74, 0x7B71C4},
-		["hud_pointer"] = {0x754280, 0x74E9E0, 0x753B70, 0x6FF080},
-		["shared_collectables"] = {0x7FCC40, 0x7FCB80, 0x7FD0D0, 0x7B6752},
-		["kong_base"] = {0x7FC950, 0x7FC890, 0x7FCDE0, 0x7B6590},
-		["kong_size"] = {0x5E, 0x5E, 0x5E, 0x5A},
-		["framebuffer_pointer"] = {0x744470, 0x73EBC0, 0x743D30, 0x72CDA0},
-		["eeprom_copy_base"] = {0x7ECEA8, 0x7ECDC8, 0x7ED318, nil},
-		["menu_flags"] = {0x7ED558, 0x7ED478, 0x7ED9C8, nil},
-		["eeprom_file_mapping"] = {0x7EDEA8, 0x7EDDC8, 0x7EE318, nil},
-		["security_byte"] = {0x7552E0, 0x74FB60, 0x7553A0, nil}, -- As far as I am aware this function is not present in the Kiosk version
-		["security_message"] = {0x75E5DC, 0x7590F0, 0x75E790, nil}, -- As far as I am aware this function is not present in the Kiosk version
-		["DKTV_pointer"] = {0x7550C0, 0x74F940, 0x755180, 0x709DA0},
-		["buttons_enabled_bitfield"] = {0x755308, 0x74FB88, 0x7553C8, 0x6FFE5C},
-		["joystick_enabled_x"] = {0x75530C, 0x74FB8C, 0x7553CC, 0x6FFE60},
-		["joystick_enabled_y"] = {0x755310, 0x74FB90, 0x7553D0, 0x6FFE64},
-		["bone_displacement_cop0_write"] = {0x61963C, 0x6128EC, 0x6170AC, 0x5AFB1C},
-		["frames_lag"] = {0x76AF10, 0x765A30, 0x76B100, 0x72D140}, -- TODO: Kiosk only works for minecart?
-		["frames_real"] = {0x7F0560, 0x7F0480, 0x7F09D0, nil}, -- TODO: Make sure freezing these stalls the main thread -- TODO: Kiosk
-		["isg_active"] = {0x755070, 0x74F8F0, 0x755130, nil},
-		["isg_timestamp"] = {0x7F5CE0, 0x7F5C00, 0x7F6150, nil},
-		["timestamp"] = {0x14FE0, 0x155C0, 0x15300, 0x72F880},
-		["cutscene_active"] = {0x7444EC, 0x73EC3C, 0x743DAC, 0x6F1CCC},
-		["cutscene"] = {0x7476F4, 0x741E54, 0x746FB4, 0x6F4464},
-		["cutscene_type"] = {0x7476FC, 0x741E5C, 0x746FBC, 0x6F446C},
-		["cutscene_type_map"] = {0x7F5B10, 0x7F5A30, 0x7F5F80, 0x7A1C00},
-		["cutscene_type_kong"] = {0x7F5BF0, 0x7F5B10, 0x7F6060, 0x7A1CE0},
-		["number_of_cutscenes"] = {0x7F5BDC, 0x7F5AFC, 0x7F604C, 0x7A1CCC},
-		["obj_model2_array_pointer"] = {0x7F6000, 0x7F5F20, 0x7F6470, 0x7A20B0}, -- 0x6F4470 has something to do with obj model 2 on Kiosk, not sure what yet
-		["obj_model2_array_count"] = {0x7F6004, 0x7F5F24, 0x7F6474, 0x7B17B8},
-		["obj_model2_setup_pointer"] = {0x7F6010, 0x7F5F30, 0x7F6480, 0x7B17C4},
-		["obj_model2_timer"] = {0x76A064, 0x764B84, 0x76A254, 0x72CDAC},
-		["obj_model2_collision_linked_list_pointer"] = {0x754244, 0x74E9A4, 0x753B34, 0x6FF054},
-		["map_block_pointer"] = {0x7F5DE0, 0x7F5D00, 0x7F6250, 0x7A1E90},
-		["map_vertex_pointer"] = {0x7F5DE8, 0x7F5D08, 0x7F6258, 0x7A1E98},
-		["map_displaylist_pointer"] = {0x7F5DEC, 0x7F5D0C, 0x7F625C, 0x7A1E9C},
-		["water_surface_list"] = {0x7F93C0, 0x7F92E0, 0x7F9830, 0x7B48A0},
-		["chunk_array_pointer"] = {0x7F6C18, 0x7F6B38, 0x7F7088, 0x7B20F8},
-		["num_enemies"] = {0x7FDC88, 0x7FDBC8, 0x7FE118, 0x7B73D8},
-		["enemy_respawn_object"] = {0x7FDC8C, 0x7FDBCC, 0x7FE11C, 0x7B73DC},
-		["os_code_start"] = {0x400, 0x400, 0x400, nil}, -- TODO: Fill this in
-		["os_code_size"] = {0xD8A8, 0xDAB8, 0xDB18, nil},
-		["game_code_start"] = {0x5FB300, 0x5F4300, 0x5F8B00, 0x590000},
-		["game_code_size"] = {0x149160, 0x14A8B0, 0x14B220, nil},
-		["game_constants_start"] = {0x744460, 0x73EBB0, 0x743D20, nil},
-		["game_constants_size"] = {0x1CBF0, 0x1CFC0, 0x1D520, nil},
+		tb_void_byte = {0x7FBB63, 0x7FBA83, 0x7FBFD3, 0x7B5B13}, -- byte, bitfield -- TODO: Document remaining values
+		player_pointer = {0x7FBB4C, 0x7FBA6C, 0x7FBFBC, 0x7B5AFC},
+		camera_pointer = {0x7FB968, 0x7FB888, 0x7FBDD8, 0x7B5918},
+		pointer_list = {0x7FBFF0, 0x7FBF10, 0x7FC460, 0x7B5E58},
+		actor_count = {0x7FC3F0, 0x7FC310, 0x7FC860, 0x7B6258},
+		heap_pointer = {0x7F0990, 0x7F08B0, 0x7F0E00, 0x7A12C0},
+		texture_list_pointer = {0x7F09DC, 0x7F08FC, 0x7F0E4C, 0x7A130C},
+		model2_dl_rom_map_object_pointer = {0x7F9538, 0x7F9458, 0x7F99A8, 0x7B49F4},
+		texture_rom_map_object_pointer = {0x7F9544, 0x7F9464, 0x7F99B4, 0x7B4A00},
+		ffa_texture_rom_map_object_pointer = {0x7F9560, 0x7F9480, 0x7F99D0, 0x7B4A1C},
+		texture_rom_map_object_pointer_2 = {0x7F958C, 0x7F94AC, 0x7F99FC, 0x7B4A48},
+		model2_dl_index_object_pointer = {0x7F95B8, 0x7F94D8, 0x7F9A28, 0x7B4A74},
+		texture_index_object_pointer = {0x7F95C4, 0x7F94E4, 0x7F9A34, 0x7B4A80},
+		ffa_texture_index_object_pointer = {0x7F95E0, 0x7F9500, 0x7F9A50, 0x7B4A9C},
+		texture_index_object_pointer_2 = {0x7F960C, 0x7F952C, 0x7F9A7C, 0x7B4AC8},
+		weather_particle_array_pointer = {0x7FD9E4, 0x7FD924, 0x7FDE74, 0x7B71C4},
+		hud_pointer = {0x754280, 0x74E9E0, 0x753B70, 0x6FF080},
+		shared_collectables = {0x7FCC40, 0x7FCB80, 0x7FD0D0, 0x7B6752},
+		kong_base = {0x7FC950, 0x7FC890, 0x7FCDE0, 0x7B6590},
+		kong_size = {0x5E, 0x5E, 0x5E, 0x5A},
+		framebuffer_pointer = {0x744470, 0x73EBC0, 0x743D30, 0x72CDA0},
+		eeprom_copy_base = {0x7ECEA8, 0x7ECDC8, 0x7ED318, nil},
+		menu_flags = {0x7ED558, 0x7ED478, 0x7ED9C8, nil},
+		eeprom_file_mapping = {0x7EDEA8, 0x7EDDC8, 0x7EE318, nil},
+		security_byte = {0x7552E0, 0x74FB60, 0x7553A0, nil}, -- As far as I am aware this function is not present in the Kiosk version
+		security_message = {0x75E5DC, 0x7590F0, 0x75E790, nil}, -- As far as I am aware this function is not present in the Kiosk version
+		DKTV_pointer = {0x7550C0, 0x74F940, 0x755180, 0x709DA0},
+		buttons_enabled_bitfield = {0x755308, 0x74FB88, 0x7553C8, 0x6FFE5C},
+		joystick_enabled_x = {0x75530C, 0x74FB8C, 0x7553CC, 0x6FFE60},
+		joystick_enabled_y = {0x755310, 0x74FB90, 0x7553D0, 0x6FFE64},
+		bone_displacement_cop0_write = {0x61963C, 0x6128EC, 0x6170AC, 0x5AFB1C},
+		frames_lag = {0x76AF10, 0x765A30, 0x76B100, 0x72D140}, -- TODO: Kiosk only works for minecart?
+		frames_real = {0x7F0560, 0x7F0480, 0x7F09D0, nil}, -- TODO: Make sure freezing these stalls the main thread -- TODO: Kiosk
+		isg_active = {0x755070, 0x74F8F0, 0x755130, nil},
+		isg_timestamp = {0x7F5CE0, 0x7F5C00, 0x7F6150, nil},
+		timestamp = {0x14FE0, 0x155C0, 0x15300, 0x72F880},
+		cutscene_active = {0x7444EC, 0x73EC3C, 0x743DAC, 0x6F1CCC},
+		cutscene = {0x7476F4, 0x741E54, 0x746FB4, 0x6F4464},
+		cutscene_type = {0x7476FC, 0x741E5C, 0x746FBC, 0x6F446C},
+		cutscene_type_map = {0x7F5B10, 0x7F5A30, 0x7F5F80, 0x7A1C00},
+		cutscene_type_kong = {0x7F5BF0, 0x7F5B10, 0x7F6060, 0x7A1CE0},
+		number_of_cutscenes = {0x7F5BDC, 0x7F5AFC, 0x7F604C, 0x7A1CCC},
+		obj_model2_array_pointer = {0x7F6000, 0x7F5F20, 0x7F6470, 0x7A20B0}, -- 0x6F4470 has something to do with obj model 2 on Kiosk, not sure what yet
+		obj_model2_array_count = {0x7F6004, 0x7F5F24, 0x7F6474, 0x7B17B8},
+		obj_model2_setup_pointer = {0x7F6010, 0x7F5F30, 0x7F6480, 0x7B17C4},
+		obj_model2_timer = {0x76A064, 0x764B84, 0x76A254, 0x72CDAC},
+		obj_model2_collision_linked_list_pointer = {0x754244, 0x74E9A4, 0x753B34, 0x6FF054},
+		map_block_pointer = {0x7F5DE0, 0x7F5D00, 0x7F6250, 0x7A1E90},
+		map_vertex_pointer = {0x7F5DE8, 0x7F5D08, 0x7F6258, 0x7A1E98},
+		map_displaylist_pointer = {0x7F5DEC, 0x7F5D0C, 0x7F625C, 0x7A1E9C},
+		water_surface_list = {0x7F93C0, 0x7F92E0, 0x7F9830, 0x7B48A0},
+		chunk_array_pointer = {0x7F6C18, 0x7F6B38, 0x7F7088, 0x7B20F8},
+		num_enemies = {0x7FDC88, 0x7FDBC8, 0x7FE118, 0x7B73D8},
+		enemy_respawn_object = {0x7FDC8C, 0x7FDBCC, 0x7FE11C, 0x7B73DC},
+		os_code_start = {0x400, 0x400, 0x400, nil}, -- TODO: Fill this in
+		os_code_size = {0xD8A8, 0xDAB8, 0xDB18, nil},
+		game_code_start = {0x5FB300, 0x5F4300, 0x5F8B00, 0x590000},
+		game_code_size = {0x149160, 0x14A8B0, 0x14B220, nil},
+		game_constants_start = {0x744460, 0x73EBB0, 0x743D20, nil},
+		game_constants_size = {0x1CBF0, 0x1CFC0, 0x1D520, nil},
 	},
 	modes = {
 		[0] = "Nintendo Logo",
@@ -496,7 +496,7 @@ local draggedObjects = {};
 
 local function arcadeObjectBaseToDraggableObject(objectBase)
 	local draggableObject = {
-		["objectBase"] = objectBase,
+		objectBase = objectBase,
 		xPositionAddress = objectBase + arcade_object.x_position,
 		yPositionAddress = objectBase + arcade_object.y_position,
 		xPosition = mainmemory.readfloat(objectBase + arcade_object.x_position, true),
@@ -516,7 +516,7 @@ end
 
 local function jetpacObjectBaseToDraggableObject(objectBase)
 	local draggableObject = {
-		["objectBase"] = objectBase,
+		objectBase = objectBase,
 		xPositionAddress = objectBase + 0x00,
 		yPositionAddress = objectBase + 0x04,
 		xPosition = mainmemory.readfloat(objectBase + 0x00, true),
@@ -737,25 +737,25 @@ end
 
 -- Relative to Model 1 Objects
 obj_model1 = {
-	["model_pointer"] = 0x00,
-	["model"] = { -- Relative to model_pointer
-		["num_bones"] = 0x20,
+	model_pointer = 0x00,
+	model = { -- Relative to model_pointer
+		num_bones = 0x20,
 	},
-	["rendering_parameters_pointer"] = 0x04,
-	["rendering_parameters"] = { -- Relative to rendering_parameters_pointer
-		["bone_array_1"] = 0x14, -- Pointer: Used for camera, updating bone positions
-		["bone_array_2"] = 0x18, -- Pointer: Used for camera, updating bone positions
-		["scale_x"] = 0x34, -- 32 bit float big endian
-		["scale_y"] = 0x38, -- 32 bit float big endian
-		["scale_z"] = 0x3C, -- 32 bit float big endian
-		["anim_timer1"] = 0x94, -- 32 bit float big endian
-		["anim_timer2"] = 0x98, -- 32 bit float big endian
-		["anim_timer3"] = 0x104, -- 32 bit float big endian
-		["anim_timer4"] = 0x108, -- 32 bit float big endian
+	rendering_parameters_pointer = 0x04,
+	rendering_parameters = { -- Relative to rendering_parameters_pointer
+		bone_array_1 = 0x14, -- Pointer: Used for camera, updating bone positions
+		bone_array_2 = 0x18, -- Pointer: Used for camera, updating bone positions
+		scale_x = 0x34, -- 32 bit float big endian
+		scale_y = 0x38, -- 32 bit float big endian
+		scale_z = 0x3C, -- 32 bit float big endian
+		anim_timer1 = 0x94, -- 32 bit float big endian
+		anim_timer2 = 0x98, -- 32 bit float big endian
+		anim_timer3 = 0x104, -- 32 bit float big endian
+		anim_timer4 = 0x108, -- 32 bit float big endian
 	},
-	["current_bone_array_pointer"] = 0x08,
-	["actor_type"] = 0x58, -- u32 be
-	["actor_types"] = { -- These are different on Kiosk
+	current_bone_array_pointer = 0x08,
+	actor_type = 0x58, -- u32 be
+	actor_types = { -- These are different on Kiosk
 		[2] = "DK",
 		[3] = "Diddy",
 		[4] = "Lanky",
@@ -949,6 +949,7 @@ obj_model1 = {
 		[220] = "Cannon (Seasick Chunky)",
 		[221] = "Light Piece", -- Lanky Phase
 		[222] = "Banana Peel", -- Lanky Phase
+		[223] = "Fireball Spawner", -- Factory Crusher Room
 		[224] = "Mushroom Man",
 		[226] = "Troff",
 		[227] = "K. Rool's Foot",
@@ -1050,46 +1051,46 @@ obj_model1 = {
 		[342] = "Try Again Dialog",
 		[343] = "Pause Menu", -- Mystery menu bosses
 	},
-	["interactable"] = 0x5C, -- u16 be, bitfield
+	interactable = 0x5C, -- u16 be, bitfield
 	-- 0000 0010 = Block playing instrument
-	["object_properties_bitfield_1"] = 0x60, -- TODO: Document & rename this, probably lump into a u32_be bitfield
+	object_properties_bitfield_1 = 0x60, -- TODO: Document & rename this, probably lump into a u32_be bitfield
 	-- 0001 0000 = collides with terrain
 	-- 0000 0100 = visible
 	-- 0000 0001 = in water
-	["visibility"] = 0x63, -- Byte (bitfield) TODO: Fully document & rename this, probably lump into a u32_be bitfield
-	["specular_highlight"] = 0x6D, -- TODO: uh
-	["shadow_width"] = 0x6E, -- u8
-	["shadow_height"] = 0x6F, -- u8
-	["x_pos"] = 0x7C, -- 32 bit float big endian
-	["y_pos"] = 0x80, -- 32 bit float big endian
-	["z_pos"] = 0x84, -- 32 bit float big endian
-	["floor"] = 0xA4, -- 32 bit float big endian
-	["distance_from_floor"] = 0xB4, -- 32 bit float big endian
-	["velocity"] = 0xB8, -- 32 bit float big endian
-	--["acceleration"] = 0xBC, -- TODO: Seems wrong
-	["y_velocity"] = 0xC0, -- 32 bit float big endian
-	["y_acceleration"] = 0xC4, -- 32 bit float big endian
-	["terminal_velocity"] = 0xC8, -- 32 bit float big endian
-	["light_thing"] = 0xCC, -- Values 0x00->0x14
-	["x_rot"] = 0xE4, -- u16_be
-	["y_rot"] = 0xE6, -- u16_be
-	["z_rot"] = 0xE8, -- u16_be
-	["locked_to_pad"] = 0x110, -- TODO: What datatype is this? code says byte but I'd think it'd be a pointer
-	["health"] = 0x134, -- s16_be
-	["takes_enemy_damage"] = 0x13B, -- TODO: put into examine method and double check datatype
-	["collision_queue_pointer"] = 0x13C,
-	["ledge_info_pointer"] = 0x140, -- TODO: I don't quite know what to call this, it has 2 pointers to the bone arrays used for tree grab, telegrab, oranges & bullets
-	["ledge_info"] = {
-		["last_x"] = 0x1C, -- 32 bit float big endian
-		["last_z"] = 0x20, -- 32 bit float big endian
-		["is_locked"] = 0x21, -- Byte, setting this > 0 will send the player to last_x, player Y, last_z
-		["bone_array_1_pointer"] = 0x74, -- Pointer: Used for enemy eye position, bullets & oranges, telegrabs & tree warps
-		["bone_array_2_pointer"] = 0x78, -- Pointer: Used for enemy eye position, bullets & oranges, telegrabs & tree warps
+	visibility = 0x63, -- Byte (bitfield) TODO: Fully document & rename this, probably lump into a u32_be bitfield
+	specular_highlight = 0x6D, -- TODO: uh
+	shadow_width = 0x6E, -- u8
+	shadow_height = 0x6F, -- u8
+	x_pos = 0x7C, -- 32 bit float big endian
+	y_pos = 0x80, -- 32 bit float big endian
+	z_pos = 0x84, -- 32 bit float big endian
+	floor = 0xA4, -- 32 bit float big endian
+	distance_from_floor = 0xB4, -- 32 bit float big endian
+	velocity = 0xB8, -- 32 bit float big endian
+	--acceleration = 0xBC, -- TODO: Seems wrong
+	y_velocity = 0xC0, -- 32 bit float big endian
+	y_acceleration = 0xC4, -- 32 bit float big endian
+	terminal_velocity = 0xC8, -- 32 bit float big endian
+	light_thing = 0xCC, -- Values 0x00->0x14
+	x_rot = 0xE4, -- u16_be
+	y_rot = 0xE6, -- u16_be
+	z_rot = 0xE8, -- u16_be
+	locked_to_pad = 0x110, -- TODO: What datatype is this? code says byte but I'd think it'd be a pointer
+	health = 0x134, -- s16_be
+	takes_enemy_damage = 0x13B, -- TODO: put into examine method and double check datatype
+	collision_queue_pointer = 0x13C,
+	ledge_info_pointer = 0x140, -- TODO: I don't quite know what to call this, it has 2 pointers to the bone arrays used for tree grab, telegrab, oranges & bullets
+	ledge_info = {
+		last_x = 0x1C, -- 32 bit float big endian
+		last_z = 0x20, -- 32 bit float big endian
+		is_locked = 0x21, -- Byte, setting this > 0 will send the player to last_x, player Y, last_z
+		bone_array_1_pointer = 0x74, -- Pointer: Used for enemy eye position, bullets & oranges, telegrabs & tree warps
+		bone_array_2_pointer = 0x78, -- Pointer: Used for enemy eye position, bullets & oranges, telegrabs & tree warps
 	},
-	["noclip_byte"] = 0x144, -- Byte? Bitfield?
-	["hand_state"] = 0x147, -- Bitfield
-	["control_state_byte"] = 0x154,
-	["control_states"] = {
+	noclip_byte = 0x144, -- Byte? Bitfield?
+	hand_state = 0x147, -- Bitfield
+	control_state_byte = 0x154,
+	control_states = {
 		[0x01] = "Idle", -- Enemy
 		[0x02] = "First person camera",
 		[0x03] = "First person camera", -- Water
@@ -1226,56 +1227,56 @@ obj_model1 = {
 		[0x87] = "Entering Portal",
 		[0x88] = "Exiting Portal",
 	},
-	["control_state_progress"] = 0x155, -- Byte, describes how far through the action the actor is, for example simian slam is only active once this byte hits 0x04
-	["texture_renderer_pointer"] = 0x158, -- Pointer
-	["texture_renderer"] = {
-		["texture_index"] = 0x0C, -- u16_be
-		--["unknown_float"] = 0x10, -- Float -- TODO: What is this?
-		--["unknown_float"] = 0x14, -- Float -- TODO: What is this?
-		["next_renderer"] = 0x24, -- Pointer
+	control_state_progress = 0x155, -- Byte, describes how far through the action the actor is, for example simian slam is only active once this byte hits 0x04
+	texture_renderer_pointer = 0x158, -- Pointer
+	texture_renderer = {
+		texture_index = 0x0C, -- u16_be
+		--unknown_float = 0x10, -- Float -- TODO: What is this?
+		--unknown_float = 0x14, -- Float -- TODO: What is this?
+		next_renderer = 0x24, -- Pointer
 	},
-	["shade_byte"] = 0x16D,
-	["destination_map"] = 0x17E, -- u16_be, bonus barrels etc
-	["player"] = {
-		["animation_type"] = 0x181, -- Seems to be the same value as control_states
-		["velocity_uncrouch_aerial"] = 0x1A4, -- TODO: What is this?
-		["misc_acceleration_float"] = 0x1AC, -- TODO: What is this?
-		["horizontal_acceleration"] = 0x1B0, -- Set to a negative number to go fast
-		["misc_acceleration_float_2"] = 0x1B4, -- TODO: What is this?
-		["misc_acceleration_float_3"] = 0x1B8, -- TODO: What is this?
-		["velocity_ground"] = 0x1C0, -- TODO: What is this?
-		["vehicle_actor_pointer"] = 0x208, -- u32 be
-		["slope_timer"] = 0x243,
-		["shockwave_charge_timer"] = 0x248, -- s16 be
-		["shockwave_recovery_timer"] = 0x24A, -- byte
-		["grabbed_vine_pointer"] = 0x2B0, -- u32 be
-		["grab_pointer"] = 0x32C, -- u32 be
-		["scale"] = {
+	shade_byte = 0x16D,
+	destination_map = 0x17E, -- u16_be, bonus barrels etc
+	player = {
+		animation_type = 0x181, -- Seems to be the same value as control_states
+		velocity_uncrouch_aerial = 0x1A4, -- TODO: What is this?
+		misc_acceleration_float = 0x1AC, -- TODO: What is this?
+		horizontal_acceleration = 0x1B0, -- Set to a negative number to go fast
+		misc_acceleration_float_2 = 0x1B4, -- TODO: What is this?
+		misc_acceleration_float_3 = 0x1B8, -- TODO: What is this?
+		velocity_ground = 0x1C0, -- TODO: What is this?
+		vehicle_actor_pointer = 0x208, -- u32 be
+		slope_timer = 0x243,
+		shockwave_charge_timer = 0x248, -- s16 be
+		shockwave_recovery_timer = 0x24A, -- byte
+		grabbed_vine_pointer = 0x2B0, -- u32 be
+		grab_pointer = 0x32C, -- u32 be
+		scale = {
 			0x344, 0x348, 0x34C, 0x350, 0x354 -- 0x344 and 0x348 seem to be a target, the rest must be current value for each axis
 		},
-		["fairy_active"] = 0x36C, -- TODO: Find a pointer for the actor the camera is focusing on
-		["effect_byte"] = 0x372, -- Bitfield, TODO: Document bits
+		fairy_active = 0x36C, -- TODO: Find a pointer for the actor the camera is focusing on
+		effect_byte = 0x372, -- Bitfield, TODO: Document bits
 	},
-	["camera"] = {
+	camera = {
 		-- TODO: Focused vehicle pointers
 		-- TODO: Verify for all versions
-		["focused_actor_pointer"] = 0x178,
-		["focused_vehicle_pointer"] = 0x1BC,
-		["focused_vehicle_pointer_2"] = 0x1C0,
-		["viewport_x_position"] = 0x1FC, -- 32 bit float big endian
-		["viewport_y_position"] = 0x200, -- 32 bit float big endian
-		["viewport_z_position"] = 0x204, -- 32 bit float big endian
-		["tracking_distance"] = 0x21C, -- 32 bit float big endian
-		["viewport_y_rotation"] = 0x22A, -- u16_be
-		["viewport_x_rotation"] = 0x230, -- 32 bit float big endian
-		["tracking_angle"] = 0x230,
-		["zoom_level_c_down"] = 0x266, -- u8
-		["zoom_level_current"] = 0x267, -- u8
-		["zoom_level_after_c_up"] = 0x268, -- u8
-		["state_switch_timer_1"] = 0x269,
-		["state_switch_timer_2"] = 0x26E,
-		["state_type"] = 0x26B,
-		["state_values"] = {
+		focused_actor_pointer = 0x178,
+		focused_vehicle_pointer = 0x1BC,
+		focused_vehicle_pointer_2 = 0x1C0,
+		viewport_x_position = 0x1FC, -- 32 bit float big endian
+		viewport_y_position = 0x200, -- 32 bit float big endian
+		viewport_z_position = 0x204, -- 32 bit float big endian
+		tracking_distance = 0x21C, -- 32 bit float big endian
+		viewport_y_rotation = 0x22A, -- u16_be
+		viewport_x_rotation = 0x230, -- 32 bit float big endian
+		tracking_angle = 0x230,
+		zoom_level_c_down = 0x266, -- u8
+		zoom_level_current = 0x267, -- u8
+		zoom_level_after_c_up = 0x268, -- u8
+		state_switch_timer_1 = 0x269,
+		state_switch_timer_2 = 0x26E,
+		state_type = 0x26B,
+		state_values = {
 			[1] = "Normal",
 			[2] = "Locked",
 			[3] = "First Person",
@@ -1287,35 +1288,35 @@ obj_model1 = {
 			[13] = "Aiming", -- Gun, third person
 		},
 	},
-	["tag_barrel"] = {
-		["scroll_timer"] = 0x17D,
-		["current_index"] = 0x17E,
-		["previous_index"] = 0x17F,
-		["DK_actor_pointer"] = 0x180,
-		["Diddy_actor_pointer"] = 0x184,
-		["Lanky_actor_pointer"] = 0x188,
-		["Tiny_actor_pointer"] = 0x18C,
-		["Chunky_actor_pointer"] = 0x190,
-		["kickout_timer"] = 0x1B4, -- Kicks the player out of the tag barrel at >= 9000
+	tag_barrel = {
+		scroll_timer = 0x17D,
+		current_index = 0x17E,
+		previous_index = 0x17F,
+		DK_actor_pointer = 0x180,
+		Diddy_actor_pointer = 0x184,
+		Lanky_actor_pointer = 0x188,
+		Tiny_actor_pointer = 0x18C,
+		Chunky_actor_pointer = 0x190,
+		kickout_timer = 0x1B4, -- Kicks the player out of the tag barrel at >= 9000
 	},
-	["text_overlay"] = {
-		["text_shown"] = 0x1EE, -- u16 be
+	text_overlay = {
+		text_shown = 0x1EE, -- u16 be
 	},
-	["kosh_kontroller"] = {
-		["slot_location"] = 0x1A2,
-		["melons_remaining"] = 0x1A3,
-		["slot_pointer_base"] = 0x1A8,
+	kosh_kontroller = {
+		slot_location = 0x1A2,
+		melons_remaining = 0x1A3,
+		slot_pointer_base = 0x1A8,
 	},
-	["main_menu_controller"] = {
-		["menu_screen"] = 0x18A,
-		["menu_position"] = 0x18F,
+	main_menu_controller = {
+		menu_screen = 0x18A,
+		menu_position = 0x18F,
 	},
-	["bug"] = { -- Big Bug Bash -- TODO: These possibly apply to other AI objects
-		["current_direction"] = 0x180, -- Float
-		["ticks_til_direction_change"] = 0x184, -- u32_be
+	bug = { -- Big Bug Bash -- TODO: These possibly apply to other AI objects
+		current_direction = 0x180, -- Float
+		ticks_til_direction_change = 0x184, -- u32_be
 	},
-	["orange"] = {
-		["bounce_counter"] = 0x17C,
+	orange = {
+		bounce_counter = 0x17C,
 	},
 };
 
@@ -1817,25 +1818,25 @@ local obj_model2_slot_size = 0x90; -- 0x88 on Kiosk, handled in Game.detectVersi
 
 -- Relative to objects in model 2 array
 obj_model2 = {
-	["x_pos"] = 0x00, -- Float
-	["y_pos"] = 0x04, -- Float
-	["z_pos"] = 0x08, -- Float
-	["hitbox_scale"] = 0x0C, -- Float
-	["model_pointer"] = 0x20,
-	["model"] = {
-		["x_pos"] = 0x00, -- Float
-		["y_pos"] = 0x04, -- Float
-		["z_pos"] = 0x08, -- Float
-		["scale"] = 0x0C, -- Float
-		["rot_x"] = 0x10, -- Float
-		["rot_y"] = 0x14, -- Float
-		["rot_z"] = 0x18, -- Float
+	x_pos = 0x00, -- Float
+	y_pos = 0x04, -- Float
+	z_pos = 0x08, -- Float
+	hitbox_scale = 0x0C, -- Float
+	model_pointer = 0x20,
+	model = {
+		x_pos = 0x00, -- Float
+		y_pos = 0x04, -- Float
+		z_pos = 0x08, -- Float
+		scale = 0x0C, -- Float
+		rot_x = 0x10, -- Float
+		rot_y = 0x14, -- Float
+		rot_z = 0x18, -- Float
 	},
-	["behavior_type_pointer"] = 0x24, -- TODO: Fields for this object
-	["unknown_counter"] = 0x3A, -- u16_be
-	["behavior_pointer"] = 0x7C,
-	["object_type"] = 0x84, -- u16_be
-	["object_types"] = { -- "-" means that spawning this object crashes the game
+	behavior_type_pointer = 0x24, -- TODO: Fields for this object
+	unknown_counter = 0x3A, -- u16_be
+	behavior_pointer = 0x7C,
+	object_type = 0x84, -- u16_be
+	object_types = { -- "-" means that spawning this object crashes the game
 		[0x00] = "Nothing", -- "test" internal name
 		[0x01] = "Thin Flame?", -- 2D
 		[0x02] = "-",
@@ -2547,7 +2548,7 @@ obj_model2 = {
 	-- 0x28 101000 GB - DK can collect
 	-- 0x30 110000 GB - Lanky can collect
 	-- 0x3F 111111 GB - Anyone can collect?
-	["collectable_state"] = 0x8C, -- byte (bitfield)
+	collectable_state = 0x8C, -- byte (bitfield)
 };
 
 local function getObjectModel2Array()
@@ -3882,7 +3883,7 @@ local function checkDuplicatedName(flagName)
 	end
 	if #flags > 1 then
 		for i = 1, #flags do
-			print("Warning: Duplicate flag name found for '"..flags[i]["name"].."' at "..toHexString(flags[i].byte)..">"..flags[i].bit);
+			print("Warning: Duplicate flag name found for '"..flags[i].name.."' at "..toHexString(flags[i].byte)..">"..flags[i].bit);
 		end
 	end
 end
@@ -3950,7 +3951,7 @@ function setFlagsByType(_type)
 	if type(_type) == "string" then
 		local numSet = 0;
 		for i = 1, #flag_array do
-			if flag_array[i]["type"] == _type then
+			if flag_array[i].type == _type then
 				setFlag(flag_array[i].byte, flag_array[i].bit, true);
 				numSet = numSet + 1;
 			end
@@ -4019,7 +4020,7 @@ function clearFlagsByType(_type)
 	if type(_type) == "string" then
 		local numCleared = 0;
 		for i = 1, #flag_array do
-			if flag_array[i]["type"] == _type then
+			if flag_array[i].type == _type then
 				clearFlag(flag_array[i].byte, flag_array[i].bit, true);
 				numCleared = numCleared + 1;
 			end
@@ -4044,7 +4045,7 @@ end
 function clearKnownFlags()
 	for i = 1, #flag_array do
 		local flag = flag_array[i];
-		if flag["type"] ~= "Unknown" then
+		if flag.type ~= "Unknown" then
 			clearFlag(flag.byte, flag.bit, true);
 		end
 	end
@@ -4122,69 +4123,66 @@ function flagStats(verbose)
 		checkDuplicateFlagNames();
 	end
 
-	local flag, name, flagType, validType;
 	for i = 1, #flag_array do
-		flag = flag_array[i];
-		name = flag["name"];
-		flagType = flag["type"];
-		validType = false;
-		if flagType == "Fairy" then
+		local flag = flag_array[i];
+		local validType = false;
+		if flag.type == "Fairy" then
 			fairies_known = fairies_known + 1;
 			validType = true;
-		elseif flagType == "Blueprint" then
+		elseif flag.type == "Blueprint" then
 			blueprints_known = blueprints_known + 1;
 			validType = true;
-		elseif flagType == "Warp" then
+		elseif flag.type == "Warp" then
 			warps_known = warps_known + 1;
 			validType = true;
-		elseif flagType == "GB" then
-			if name == "Caves: Tiny GB: W3" or name == "Aztec: DK GB: W5" or name == "Galleon: Diddy GB: W4" then
+		elseif flag.type == "GB" then
+			if flag.name == "Caves: Tiny GB: W3" or flag.name == "Aztec: DK GB: W5" or flag.name == "Galleon: Diddy GB: W4" then
 				warps_known = warps_known + 1;
 			end
 			gb_known = gb_known + 1;
 			validType = true;
-		elseif flagType == "CB" then
+		elseif flag.type == "CB" then
 			cb_known = cb_known + 1;
 			validType = true;
-		elseif flagType == "Bunch" then
+		elseif flag.type == "Bunch" then
 			cb_known = cb_known + 5;
 			validType = true;
-		elseif flagType == "Balloon" then
+		elseif flag.type == "Balloon" then
 			cb_known = cb_known + 10;
 			validType = true;
-		elseif flagType == "Crown" then
+		elseif flag.type == "Crown" then
 			crowns_known = crowns_known + 1;
 			validType = true;
-		elseif flagType == "Coin" then
+		elseif flag.type == "Coin" then
 			coins_known = coins_known + 1;
 			validType = true;
-		elseif flagType == "Medal" then
+		elseif flag.type == "Medal" then
 			medals_known = medals_known + 1;
 			validType = true;
-		elseif flagType == "Rainbow Coin" then
+		elseif flag.type == "Rainbow Coin" then
 			coins_known = coins_known + 25;
 			validType = true;
 		end
-		if flagType == nil then
+		if flag.type == nil then
 			untypedFlags = untypedFlags + 1;
 			if verbose then
-				dprint("Warning: Flag without type at "..toHexString(flag.byte, 2)..">"..flag["bit"].." with name: \""..name.."\"");
+				dprint("Warning: Flag without type at "..toHexString(flag.byte, 2)..">"..flag.bit.." with name: \""..flag.name.."\"");
 			end
 		else
-			if flagType == "B. Locker" or flagType == "Cutscene" or flagType == "FTT" or flagType == "Key" or flagType == "Kong" or flagType == "Physical" or flagType == "Progress" or flagType == "Special Coin" or flagType == "T&S" or flagType == "Unknown" then
+			if flag.type == "B. Locker" or flag.type == "Cutscene" or flag.type == "FTT" or flag.type == "Key" or flag.type == "Kong" or flag.type == "Physical" or flag.type == "Progress" or flag.type == "Special Coin" or flag.type == "T&S" or flag.type == "Unknown" then
 				validType = true;
 			end
 			if not validType then
 				flagsWithUnknownType = flagsWithUnknownType + 1;
 				if verbose then
-					dprint("Warning: Flag with unknown type at "..toHexString(flag.byte, 2)..">"..flag["bit"].." with name: \""..name.."\"".." and type: \""..flagType.."\"");
+					dprint("Warning: Flag with unknown type at "..toHexString(flag.byte, 2)..">"..flag.bit.." with name: \""..flag.name.."\"".." and type: \""..flag.type.."\"");
 				end
 			end
 		end
 		if flag.map ~= nil or flag.nomap == true then
 			flagsWithMap = flagsWithMap + 1;
 		elseif verbose then
-			dprint("Warning: Flag without map tag at "..toHexString(flag.byte, 2)..">"..flag["bit"].." with name: \""..name.."\"");
+			dprint("Warning: Flag without map tag at "..toHexString(flag.byte, 2)..">"..flag.bit.." with name: \""..flag.name.."\"");
 		end
 	end
 
@@ -4383,6 +4381,21 @@ end
 -- Exits --
 -----------
 
+local exit = {
+	x_pos = 0x00, -- s16_be
+	y_pos = 0x02, -- s16_be
+	z_pos = 0x04, -- s16_be
+	size = 0x0A,
+};
+
+function Game.getExitData(exitBase)
+	return {
+		xPos = mainmemory.read_s16_be(exitBase + exit.x_pos),
+		yPos = mainmemory.read_s16_be(exitBase + exit.y_pos),
+		zPos = mainmemory.read_s16_be(exitBase + exit.z_pos),
+	};
+end
+
 function Game.getDestinationExit()
 	return mainmemory.read_u32_be(Game.Memory.destination_exit[version]);
 end
@@ -4400,11 +4413,9 @@ function dumpExits()
 	local numberOfExits = Game.getNumberOfExits();
 	if isRDRAM(exitArray) then
 		for i = 0, numberOfExits - 1 do
-			local exitBase = exitArray + i * 0x0A;
-			local xPos = mainmemory.read_s16_be(exitBase + 0);
-			local yPos = mainmemory.read_s16_be(exitBase + 2);
-			local zPos = mainmemory.read_s16_be(exitBase + 4);
-			dprint("Exit "..i..": "..xPos..", "..yPos..", "..zPos);
+			local exitBase = exitArray + i * exit.size;
+			local exitData = Game.getExitData(exitBase);
+			dprint("Exit "..i..": "..exitData.xPos..", "..exitData.yPos..", "..exitData.zPos);
 		end
 		print_deferred();
 	end
@@ -4416,28 +4427,192 @@ local function populateExitPointers()
 	if isRDRAM(exitArray) then
 		local numberOfExits = Game.getNumberOfExits();
 		for i = 0, numberOfExits - 1 do
-			local exitBase = exitArray + i * 0x0A;
+			local exitBase = exitArray + i * exit.size;
 			table.insert(object_pointers, exitBase);
 		end
 	end
 end
 
-local function zipToExit(index)
-	local exitArray = dereferencePointer(Game.Memory.exit_array_pointer[version]);
-	local numberOfExits = Game.getNumberOfExits();
-	if isRDRAM(exitArray) then
-		if index >= numberOfExits then
-			index = 0;
-			print("Warning: Exit index "..index.." is greater than the maximum exit for this map");
-		end
-		if index < numberOfExits then
-			local exitBase = exitArray + index * 0x0A;
-			local xPos = mainmemory.read_s16_be(exitBase + 0);
-			local yPos = mainmemory.read_s16_be(exitBase + 2);
-			local zPos = mainmemory.read_s16_be(exitBase + 4);
-			Game.setPosition(xPos, yPos, zPos);
+function dumpEnemyTypes()
+	dprint("Index,Address,Behavior,Model,Behavior Name,Model Name,");
+	for i = 0, Game.Memory.num_enemy_types[version] do
+		local base = Game.Memory.enemy_table[version] + i * Game.Memory.enemy_type_size[version];
+		local behavior = mainmemory.read_u16_be(base);
+		local model = mainmemory.read_u16_be(base + 2);
+		dprint(toHexString(i)..","..toHexString(base)..","..toHexString(behavior, 4)..","..toHexString(model, 4)..","..getActorNameFromBehavior(behavior)..","..getModelNameFromModelIndex(model)..",");
+	end
+	print_deferred();
+end
+
+function everyEnemyIs(index)
+	local enemyTypeSize = Game.Memory.enemy_type_size[version];
+	local chosenSlotData = {};
+	local chosenSlotBase = Game.Memory.enemy_table[version] + index * enemyTypeSize;
+	for i = 0, enemyTypeSize - 1 do
+		chosenSlotData[i] = mainmemory.readbyte(chosenSlotBase + i);
+	end
+	for i = 0, Game.Memory.num_enemy_types[version] do
+		local base = Game.Memory.enemy_table[version] + i * enemyTypeSize;
+		for j = 0, enemyTypeSize - 1 do
+			mainmemory.writebyte(base + j, chosenSlotData[j]);
 		end
 	end
+end
+
+function replaceModels(index)
+	-- Cutscene
+	local max_index = 0x42;
+	if version == 4 then
+		max_index = 0x1B;
+	end
+	for i = 0, max_index do
+		mainmemory.write_u16_be(Game.Memory.cutscene_model_table[version] + i * 2, index);
+	end
+
+	-- Enemy
+	for i = 0, Game.Memory.num_enemy_types[version] do
+		local base = Game.Memory.enemy_table[version] + i * Game.Memory.enemy_type_size[version];
+		local model = mainmemory.write_u16_be(base + 2, index);
+	end
+
+	-- Object Spawn Table
+	max_index = 127;
+	if version == 4 then
+		max_index = 110;
+	end
+	for i = 0, max_index do
+		local base = Game.Memory.object_spawn_table[version] + i * 0x30;
+		local model = mainmemory.write_u16_be(base + 0x02, index);
+	end
+end
+
+function dumpCutsceneModelTable()
+	local max_index = 0x42;
+	if version == 4 then
+		max_index = 0x1B;
+	end
+	dprint("Index,Address,Model,Model Name");
+	for i = 0, max_index do
+		local base = Game.Memory.cutscene_model_table[version] + i * 2;
+		local model = mainmemory.read_u16_be(base);
+		dprint(i..","..toHexString(base, 6)..","..toHexString(model, 4)..","..getModelNameFromModelIndex(model));
+	end
+	print_deferred();
+end
+
+function getModelNameFromCutsceneIndex(index)
+	local modelIndex = mainmemory.read_u16_be(Game.Memory.cutscene_model_table[version] + index * 2);
+	return getModelNameFromModelIndex(modelIndex);
+end
+
+function getBehaviorNameFromEnemyIndex(index)
+	local enemyTypeSize = 0x18;
+	if version == 4 then
+		enemyTypeSize = 0x1C;
+	end
+	local behaviorIndex = mainmemory.read_u16_be(Game.Memory.enemy_table[version] + index * enemyTypeSize);
+	return getActorNameFromBehavior(behaviorIndex);
+end
+
+function Game.getEnemyData(slotBase)
+	local enemyType = mainmemory.readbyte(slotBase);
+	local enemyName = getBehaviorNameFromEnemyIndex(enemyType);
+	if enemyType == 0x50 then
+		local cutsceneModelIndex = mainmemory.readbyte(slotBase + 0x0A);
+		enemyName = enemyName.." ("..getModelNameFromCutsceneIndex(cutsceneModelIndex)..")";
+	end
+	return {
+		slotBase = slotBase,
+		enemyType = enemyType,
+		enemyName = enemyName,
+		yRot = mainmemory.read_u16_be(slotBase + 0x02),
+		xPos = mainmemory.read_s16_be(slotBase + 0x04),
+		yPos = mainmemory.read_s16_be(slotBase + 0x06),
+		zPos = mainmemory.read_s16_be(slotBase + 0x08),
+	};
+end
+
+function dumpEnemies()
+	local enemyRespawnObject = dereferencePointer(Game.Memory.enemy_respawn_object[version]);
+	local enemySlotSize = 0x48;
+	if version == 4 then
+		enemySlotSize = 0x44;
+	end
+	if isRDRAM(enemyRespawnObject) then
+		local numberOfEnemies = mainmemory.read_u16_be(Game.Memory.num_enemies[version]);
+		for i = 1, numberOfEnemies do
+			local slotBase = enemyRespawnObject + (i - 1) * enemySlotSize;
+			local enemyData = Game.getEnemyData(slotBase);
+			dprint(i.." "..toHexString(slotBase)..": "..enemyData.enemyName.." at "..enemyData.xPos..", "..enemyData.yPos..", "..enemyData.zPos);
+		end
+		print_deferred();
+	end
+end
+
+function Game.populateEnemyPointers()
+	local enemyRespawnObject = dereferencePointer(Game.Memory.enemy_respawn_object[version]);
+	local enemySlotSize = 0x48;
+	if version == 4 then
+		enemySlotSize = 0x44;
+	end
+	object_pointers = {};
+	if isRDRAM(enemyRespawnObject) then
+		local numberOfEnemies = mainmemory.read_u16_be(Game.Memory.num_enemies[version]);
+		for i = 1, numberOfEnemies do
+			local slotBase = enemyRespawnObject + (i - 1) * enemySlotSize;
+			table.insert(object_pointers, slotBase);
+		end
+	end
+end
+
+function dumpEnemyDrops()
+	local object = 0;
+	local index = -1;
+	repeat
+		index = index + 1;
+		local objectBase = Game.Memory.enemy_drop_table[version] + index * 0x06;
+		object = mainmemory.read_u16_be(objectBase);
+		if object ~= 0 then
+			local droppedObject = mainmemory.read_u16_be(objectBase + 0x02);
+			local dropMusic = mainmemory.readbyte(objectBase + 0x04);
+			local dropCount = mainmemory.readbyte(objectBase + 0x05);
+			dprint(toHexString(objectBase)..": "..getActorNameFromBehavior(object).." drops "..dropCount.." "..getActorNameFromBehavior(droppedObject).." and plays "..toHexString(dropMusic));
+		end
+	until object == 0;
+	print_deferred();
+end
+
+function everyEnemyDrops(actorType, count, music)
+	local object = 0;
+	local index = -1;
+	repeat
+		index = index + 1;
+		local objectBase = Game.Memory.enemy_drop_table[version] + index * 0x06;
+		object = mainmemory.read_u16_be(objectBase);
+		if object ~= 0 then
+			mainmemory.write_u16_be(objectBase + 0x02, actorType);
+			mainmemory.writebyte(objectBase + 0x04, music);
+			mainmemory.writebyte(objectBase + 0x05, count);
+		end
+	until object == 0;
+end
+
+function dumpObjectSpawnTable()
+	print("Index,Behavior,Model,Name,Model Name,Internal Name,");
+	local max_index = 127;
+	if version == 4 then
+		max_index = 110;
+	end
+	for i = 0, max_index do
+		local base = Game.Memory.object_spawn_table[version] + i * 0x30;
+		local behavior = mainmemory.read_u16_be(base + 0x00);
+		local model = mainmemory.read_u16_be(base + 0x02);
+		local name = getActorNameFromBehavior(behavior);
+		local modelName = getModelNameFromModelIndex(model);
+		local internalName = readNullTerminatedString(base + 0x14);
+		dprint(i..","..toHexString(behavior, 4)..","..toHexString(model, 4)..","..name..","..modelName..","..internalName..",");
+	end
+	print_deferred();
 end
 
 -------------------
@@ -5219,11 +5394,11 @@ function Game.drawMJMinimap()
 			return;
 		end
 
-		local cur_pos = MJ_parse_position(mainmemory.readbyte(MJ_state + MJ_offsets["current_position"]));
-		local next_pos = MJ_parse_position(mainmemory.readbyte(MJ_state + MJ_offsets["next_position"]));
+		local cur_pos = MJ_parse_position(mainmemory.readbyte(MJ_state + MJ_offsets.current_position));
+		local next_pos = MJ_parse_position(mainmemory.readbyte(MJ_state + MJ_offsets.next_position));
 
-		local white_pos = MJ_parse_position(mainmemory.readbyte(MJ_state + MJ_offsets["white_switch_position"]));
-		local blue_pos = MJ_parse_position(mainmemory.readbyte(MJ_state + MJ_offsets["blue_switch_position"]));
+		local white_pos = MJ_parse_position(mainmemory.readbyte(MJ_state + MJ_offsets.white_switch_position));
+		local blue_pos = MJ_parse_position(mainmemory.readbyte(MJ_state + MJ_offsets.blue_switch_position));
 
 		local switches_active = white_pos.active or blue_pos.active;
 
@@ -5368,7 +5543,7 @@ local function outputBones(boneArrayBase, numBones)
 	for i = 0, numBones - 1 do
 		local boneInfo = getBoneInfo(boneArrayBase + i * bone_size);
 		table.insert(boneInfoTables, boneInfo);
-		dprint(toHexString(boneArrayBase + i * bone_size)..","..i..","..boneInfo["positionX"]..","..boneInfo["positionY"]..","..boneInfo["positionZ"]..","..boneInfo["scaleX"]..","..boneInfo["scaleY"]..","..boneInfo["scaleZ"]..",");
+		dprint(toHexString(boneArrayBase + i * bone_size)..","..i..","..boneInfo.positionX..","..boneInfo.positionY..","..boneInfo.positionZ..","..boneInfo.scaleX..","..boneInfo.scaleY..","..boneInfo.scaleZ..",");
 	end
 	print_deferred();
 	return boneInfoTables;
@@ -5384,22 +5559,22 @@ local function calculateCompleteBones(boneArrayBase, numberOfBones)
 		local boneDisplaced = false;
 
 		-- Detect basic zeroing, the bone displacement method method currently detailed in the document
-		if boneInfo["positionX"] == 0 and boneInfo["positionY"] == 0 and boneInfo["positionZ"] == 0 then
-			if boneInfo["scaleX"] == 0 and boneInfo["scaleY"] == 0 and boneInfo["scaleZ"] == 0 then
+		if boneInfo.positionX == 0 and boneInfo.positionY == 0 and boneInfo.positionZ == 0 then
+			if boneInfo.scaleX == 0 and boneInfo.scaleY == 0 and boneInfo.scaleZ == 0 then
 				boneDisplaced = true;
 			end
 		end
 
 		-- Detect position being set to -32768
-		if boneInfo["positionX"] == -32768 and boneInfo["positionY"] == -32768 and boneInfo["positionZ"] == -32768 then
+		if boneInfo.positionX == -32768 and boneInfo.positionY == -32768 and boneInfo.positionZ == -32768 then
 			boneDisplaced = true;
 		end
 
 		if boneDisplaced then
 			numberOfCompletedBones = numberOfCompletedBones - 1;
 		else
-			table.insert(statisticallySignificantX, boneInfo["positionX"]);
-			table.insert(statisticallySignificantZ, boneInfo["positionZ"]);
+			table.insert(statisticallySignificantX, boneInfo.positionX);
+			table.insert(statisticallySignificantZ, boneInfo.positionZ);
 		end
 	end
 
@@ -6169,9 +6344,9 @@ function Game.zipToSelectedObject()
 				desiredY = mainmemory.read_s16_be(selectedObject + loading_zone_fields.y_position);
 				desiredZ = mainmemory.read_s16_be(selectedObject + loading_zone_fields.z_position);
 			elseif grab_script_mode == "Exits" then
-				desiredX = mainmemory.read_s16_be(selectedObject + 0); -- TODO: Stop using magic numbers for this
-				desiredY = mainmemory.read_s16_be(selectedObject + 2);
-				desiredZ = mainmemory.read_s16_be(selectedObject + 4);
+				desiredX = mainmemory.read_s16_be(selectedObject + exit.x_pos);
+				desiredY = mainmemory.read_s16_be(selectedObject + exit.y_pos);
+				desiredZ = mainmemory.read_s16_be(selectedObject + exit.z_pos);
 			elseif grab_script_mode == "Enemies" then
 				desiredX = mainmemory.read_s16_be(selectedObject + 4); -- TODO: Stop using magic numbers for this
 				desiredY = mainmemory.read_s16_be(selectedObject + 6);
@@ -6591,9 +6766,9 @@ local function drawGrabScriptUI()
 				if object_index == i then
 					color = colors.green;
 				end
-				local xPos = mainmemory.read_s16_be(exitBase + 0);
-				local yPos = mainmemory.read_s16_be(exitBase + 2);
-				local zPos = mainmemory.read_s16_be(exitBase + 4);
+				local xPos = mainmemory.read_s16_be(exitBase + exit.x_pos);
+				local yPos = mainmemory.read_s16_be(exitBase + exit.y_pos);
+				local zPos = mainmemory.read_s16_be(exitBase + exit.z_pos);
 				gui.text(gui_x, gui_y + height * row, xPos..", "..yPos..", "..zPos.." - "..i.." "..toHexString(exitBase or 0, 6), color, 'bottomright');
 				row = row + 1;
 			end
@@ -7592,188 +7767,6 @@ function F3DEX2Trace()
 		end
 		print_deferred();
 	end
-end
-
-function dumpEnemyTypes()
-	dprint("Index,Address,Behavior,Model,Behavior Name,Model Name,");
-	for i = 0, Game.Memory.num_enemy_types[version] do
-		local base = Game.Memory.enemy_table[version] + i * Game.Memory.enemy_type_size[version];
-		local behavior = mainmemory.read_u16_be(base);
-		local model = mainmemory.read_u16_be(base + 2);
-		dprint(toHexString(i)..","..toHexString(base)..","..toHexString(behavior, 4)..","..toHexString(model, 4)..","..getActorNameFromBehavior(behavior)..","..getModelNameFromModelIndex(model)..",");
-	end
-	print_deferred();
-end
-
-function everyEnemyIs(index)
-	local enemyTypeSize = Game.Memory.enemy_type_size[version];
-	local chosenSlotData = {};
-	local chosenSlotBase = Game.Memory.enemy_table[version] + index * enemyTypeSize;
-	for i = 0, enemyTypeSize - 1 do
-		chosenSlotData[i] = mainmemory.readbyte(chosenSlotBase + i);
-	end
-	for i = 0, Game.Memory.num_enemy_types[version] do
-		local base = Game.Memory.enemy_table[version] + i * enemyTypeSize;
-		for j = 0, enemyTypeSize - 1 do
-			mainmemory.writebyte(base + j, chosenSlotData[j]);
-		end
-	end
-end
-
-function replaceModels(index)
-	-- Cutscene
-	local max_index = 0x42;
-	if version == 4 then
-		max_index = 0x1B;
-	end
-	for i = 0, max_index do
-		mainmemory.write_u16_be(Game.Memory.cutscene_model_table[version] + i * 2, index);
-	end
-
-	-- Enemy
-	for i = 0, Game.Memory.num_enemy_types[version] do
-		local base = Game.Memory.enemy_table[version] + i * Game.Memory.enemy_type_size[version];
-		local model = mainmemory.write_u16_be(base + 2, index);
-	end
-
-	-- Object Spawn Table
-	max_index = 127;
-	if version == 4 then
-		max_index = 110;
-	end
-	for i = 0, max_index do
-		local base = Game.Memory.object_spawn_table[version] + i * 0x30;
-		local model = mainmemory.write_u16_be(base + 0x02, index);
-	end
-end
-
-function dumpCutsceneModelTable()
-	local max_index = 0x42;
-	if version == 4 then
-		max_index = 0x1B;
-	end
-	dprint("Index,Address,Model,Model Name");
-	for i = 0, max_index do
-		local base = Game.Memory.cutscene_model_table[version] + i * 2;
-		local model = mainmemory.read_u16_be(base);
-		dprint(i..","..toHexString(base, 6)..","..toHexString(model, 4)..","..getModelNameFromModelIndex(model));
-	end
-	print_deferred();
-end
-
-function getModelNameFromCutsceneIndex(index)
-	local modelIndex = mainmemory.read_u16_be(Game.Memory.cutscene_model_table[version] + index * 2);
-	return getModelNameFromModelIndex(modelIndex);
-end
-
-function getBehaviorNameFromEnemyIndex(index)
-	local enemyTypeSize = 0x18;
-	if version == 4 then
-		enemyTypeSize = 0x1C;
-	end
-	local behaviorIndex = mainmemory.read_u16_be(Game.Memory.enemy_table[version] + index * enemyTypeSize);
-	return getActorNameFromBehavior(behaviorIndex);
-end
-
-function Game.getEnemyData(slotBase)
-	local enemyType = mainmemory.readbyte(slotBase);
-	local enemyName = getBehaviorNameFromEnemyIndex(enemyType);
-	if enemyType == 0x50 then
-		local cutsceneModelIndex = mainmemory.readbyte(slotBase + 0x0A);
-		enemyName = enemyName.." ("..getModelNameFromCutsceneIndex(cutsceneModelIndex)..")";
-	end
-	return {
-		slotBase = slotBase,
-		enemyType = enemyType,
-		enemyName = enemyName,
-		yRot = mainmemory.read_u16_be(slotBase + 0x02),
-		xPos = mainmemory.read_s16_be(slotBase + 0x04),
-		yPos = mainmemory.read_s16_be(slotBase + 0x06),
-		zPos = mainmemory.read_s16_be(slotBase + 0x08),
-	};
-end
-
-function dumpEnemies()
-	local enemyRespawnObject = dereferencePointer(Game.Memory.enemy_respawn_object[version]);
-	local enemySlotSize = 0x48;
-	if version == 4 then
-		enemySlotSize = 0x44;
-	end
-	if isRDRAM(enemyRespawnObject) then
-		local numberOfEnemies = mainmemory.read_u16_be(Game.Memory.num_enemies[version]);
-		for i = 1, numberOfEnemies do
-			local slotBase = enemyRespawnObject + (i - 1) * enemySlotSize;
-			local enemyData = Game.getEnemyData(slotBase);
-			dprint(i.." "..toHexString(slotBase)..": "..enemyData.enemyName.." at "..enemyData.xPos..", "..enemyData.yPos..", "..enemyData.zPos);
-		end
-		print_deferred();
-	end
-end
-
-function Game.populateEnemyPointers()
-	local enemyRespawnObject = dereferencePointer(Game.Memory.enemy_respawn_object[version]);
-	local enemySlotSize = 0x48;
-	if version == 4 then
-		enemySlotSize = 0x44;
-	end
-	object_pointers = {};
-	if isRDRAM(enemyRespawnObject) then
-		local numberOfEnemies = mainmemory.read_u16_be(Game.Memory.num_enemies[version]);
-		for i = 1, numberOfEnemies do
-			local slotBase = enemyRespawnObject + (i - 1) * enemySlotSize;
-			table.insert(object_pointers, slotBase);
-		end
-	end
-end
-
-function dumpEnemyDrops()
-	local object = 0;
-	local index = -1;
-	repeat
-		index = index + 1;
-		local objectBase = Game.Memory.enemy_drop_table[version] + index * 0x06;
-		object = mainmemory.read_u16_be(objectBase);
-		if object ~= 0 then
-			local droppedObject = mainmemory.read_u16_be(objectBase + 0x02);
-			local dropMusic = mainmemory.readbyte(objectBase + 0x04);
-			local dropCount = mainmemory.readbyte(objectBase + 0x05);
-			dprint(toHexString(objectBase)..": "..getActorNameFromBehavior(object).." drops "..dropCount.." "..getActorNameFromBehavior(droppedObject).." and plays "..toHexString(dropMusic));
-		end
-	until object == 0;
-	print_deferred();
-end
-
-function everyEnemyDrops(actorType, count, music)
-	local object = 0;
-	local index = -1;
-	repeat
-		index = index + 1;
-		local objectBase = Game.Memory.enemy_drop_table[version] + index * 0x06;
-		object = mainmemory.read_u16_be(objectBase);
-		if object ~= 0 then
-			mainmemory.write_u16_be(objectBase + 0x02, actorType);
-			mainmemory.writebyte(objectBase + 0x04, music);
-			mainmemory.writebyte(objectBase + 0x05, count);
-		end
-	until object == 0;
-end
-
-function dumpObjectSpawnTable()
-	print("Index,Behavior,Model,Name,Model Name,Internal Name,");
-	local max_index = 127;
-	if version == 4 then
-		max_index = 110;
-	end
-	for i = 0, max_index do
-		local base = Game.Memory.object_spawn_table[version] + i * 0x30;
-		local behavior = mainmemory.read_u16_be(base + 0x00);
-		local model = mainmemory.read_u16_be(base + 0x02);
-		local name = getActorNameFromBehavior(behavior);
-		local modelName = getModelNameFromModelIndex(model);
-		local internalName = readNullTerminatedString(base + 0x14);
-		dprint(i..","..toHexString(behavior, 4)..","..toHexString(model, 4)..","..name..","..modelName..","..internalName..",");
-	end
-	print_deferred();
 end
 
 function Game.eachFrame()
