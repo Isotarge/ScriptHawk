@@ -614,21 +614,6 @@ local function drawSubGameHitboxes()
 	gui.drawImage("beta/cursor.png", mouse.X, mouse.Y - 4);
 end
 
---------------
--- Mad Jack --
---------------
-
--- Relative to MJ state object
-local MJ_offsets = { -- US Defaults
-	ticks_until_next_action = 0x2D,
-	actions_remaining = 0x58,
-	action_type = 0x59,
-	current_position = 0x60,
-	next_position = 0x61,
-	white_switch_position = 0x64,
-	blue_switch_position = 0x65
-};
-
 -----------------
 -- Other state --
 -----------------
@@ -1318,6 +1303,15 @@ obj_model1 = {
 	orange = {
 		bounce_counter = 0x17C,
 	},
+	mad_jack = { -- TODO: Some of these might be wrong... hmm..
+		ticks_until_next_action = {0x1AD, 0x1A5, 0x1A5, nil},
+		actions_remaining =       {0x1D8, 0x1E0, 0x1E0, nil},
+		action_type =             {0x1D9, 0x1E1, 0x1E1, nil},
+		current_position =        {0x1E0, 0x1E8, 0x1E8, nil},
+		next_position =           {0x1E1, 0x1E9, 0x1E9, nil},
+		white_switch_position =   {0x1E4, 0x1EC, 0x1EC, nil},
+		blue_switch_position =    {0x1E5, 0x1ED, 0x1ED, nil},
+	};
 };
 
 local function getActorNameFromBehavior(actorBehavior)
@@ -3077,15 +3071,6 @@ function Game.detectVersion(romName, romHash)
 		version = 2;
 		flag_array = require("games.dk64_flags");
 
-		-- Mad Jack
-		MJ_offsets.ticks_until_next_action = 0x25;
-		MJ_offsets.actions_remaining       = 0x60;
-		MJ_offsets.action_type             = 0x61;
-		MJ_offsets.current_position        = 0x68;
-		MJ_offsets.next_position           = 0x69;
-		MJ_offsets.white_switch_position   = 0x6C;
-		MJ_offsets.blue_switch_position    = 0x6D;
-
 		ticks_per_crystal = 125;
 
 		-- PAL values
@@ -3094,15 +3079,6 @@ function Game.detectVersion(romName, romHash)
 	elseif romHash == "F0AD2B2BBF04D574ED7AFBB1BB6A4F0511DCD87D" then -- Japan
 		version = 3;
 		flag_array = require("games.dk64_flags_JP");
-
-		-- Mad Jack
-		MJ_offsets.ticks_until_next_action = 0x25;
-		MJ_offsets.actions_remaining       = 0x60;
-		MJ_offsets.action_type             = 0x61;
-		MJ_offsets.current_position        = 0x68;
-		MJ_offsets.next_position           = 0x69;
-		MJ_offsets.white_switch_position   = 0x6C;
-		MJ_offsets.blue_switch_position    = 0x6D;
 	elseif romHash == "B4717E602F07CA9BE0D4822813C658CD8B99F993" then -- Kiosk
 		version = 4;
 		-- flag_array = require("games.dk64_flags_Kiosk"); -- TODO: Flags?
@@ -5381,7 +5357,7 @@ local function getMadJack()
 	for object_no = 0, getObjectModel1Count() do
 		local pointer = dereferencePointer(Game.Memory.pointer_list[version] + (object_no * 4));
 		if isRDRAM(pointer) and getActorName(pointer) == "Mad Jack" then
-			return pointer + 0x180;
+			return pointer;
 		end
 	end
 end
@@ -5394,11 +5370,11 @@ function Game.drawMJMinimap()
 			return;
 		end
 
-		local cur_pos = MJ_parse_position(mainmemory.readbyte(MJ_state + MJ_offsets.current_position));
-		local next_pos = MJ_parse_position(mainmemory.readbyte(MJ_state + MJ_offsets.next_position));
+		local cur_pos = MJ_parse_position(mainmemory.readbyte(MJ_state + obj_model1.mad_jack.current_position[version]));
+		local next_pos = MJ_parse_position(mainmemory.readbyte(MJ_state + obj_model1.mad_jack.next_position[version]));
 
-		local white_pos = MJ_parse_position(mainmemory.readbyte(MJ_state + MJ_offsets.white_switch_position));
-		local blue_pos = MJ_parse_position(mainmemory.readbyte(MJ_state + MJ_offsets.blue_switch_position));
+		local white_pos = MJ_parse_position(mainmemory.readbyte(MJ_state + obj_model1.mad_jack.white_switch_position[version]));
+		local blue_pos = MJ_parse_position(mainmemory.readbyte(MJ_state + obj_model1.mad_jack.blue_switch_position[version]));
 
 		local switches_active = white_pos.active or blue_pos.active;
 
@@ -5453,9 +5429,9 @@ function Game.drawMJMinimap()
 		end
 
 		-- Text info
-		local phase_byte = mainmemory.readbyte(MJ_state + MJ_offsets.action_type);
-		local actions_remaining = mainmemory.readbyte(MJ_state + MJ_offsets.actions_remaining);
-		local time_until_next_action = mainmemory.readbyte(MJ_state + MJ_offsets.ticks_until_next_action);
+		local phase_byte = mainmemory.readbyte(MJ_state + obj_model1.mad_jack.action_type[version]);
+		local actions_remaining = mainmemory.readbyte(MJ_state + obj_model1.mad_jack.actions_remaining[version]);
+		local time_until_next_action = mainmemory.readbyte(MJ_state + obj_model1.mad_jack.ticks_until_next_action[version]);
 
 		local phase = MJ_get_phase(phase_byte);
 		local action_type = MJ_get_action_type(phase_byte);
