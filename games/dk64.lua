@@ -9,6 +9,7 @@ crumbling = false;
 displacement_detection = false;
 enable_phase = false; -- To enable the phase glitches on Europe and Japan set this to true
 encircle_enabled = false;
+fix_chunk_deload = false;
 force_gb_load = false;
 force_tbs = false;
 hide_non_scripted = false;
@@ -4316,8 +4317,8 @@ function Game.getChunkArray()
 	return dereferencePointer(Game.Memory.chunk_array_pointer[version]);
 end
 
---[[
-function fixChunkDeload()
+function Game.fixChunkDeload()
+	--[[
 	local chunkArray = Game.getChunkArray();
 	if isRDRAM(chunkArray) then
 		local numChunks = math.floor(mainmemory.read_u32_be(chunkArray + heap.object_size) / chunkSize);
@@ -4330,9 +4331,18 @@ function fixChunkDeload()
 		end
 		print_deferred();
 	end
+	--]]
+	local segmentBase = Game.getMapSegmentBase();
+	if isRDRAM(segmentBase) then
+		local numSegments = mainmemory.read_u32_be(segmentBase);
+		segmentBase = segmentBase + 4;
+		for i = 0, numSegments - 1 do
+			mainmemory.writebyte(segmentBase + 0x18, 1);
+			mainmemory.writebyte(segmentBase + 0x19, 1);
+			segmentBase = segmentBase + 0x1C;
+		end
+	end
 end
-event.onframestart(fixChunkDeload);
---]]
 
 local function populateChunkPointers()
 	object_pointers = {};
@@ -7425,6 +7435,13 @@ function Game.getMapBlock()
 	return dereferencePointer(Game.Memory.map_block_pointer[version]);
 end
 
+function Game.getMapSegmentBase()
+	local mapBase = Game.getMapBlock();
+	if isRDRAM(mapBase) then
+		return mapBase + mainmemory.read_u32_be(mapBase + 0x58);
+	end
+end
+
 function Game.getMapVerts()
 	return dereferencePointer(Game.Memory.map_vertex_pointer[version]);
 end
@@ -7509,8 +7526,7 @@ function crumble()
 end
 
 function dumpSegments()
-	local mapBase = Game.getMapBlock();
-	local segmentBase = mapBase + mainmemory.read_u32_be(mapBase + 0x58);
+	local segmentBase = Game.getMapSegmentBase();
 	if isRDRAM(segmentBase) then
 		local numSegments = mainmemory.read_u32_be(segmentBase);
 		dprint(numSegments.." segments at "..toHexString(segmentBase));
@@ -7522,6 +7538,8 @@ function dumpSegments()
 			dprint("Vert 0x0C: "..toHexString(mainmemory.read_u16_be(segmentBase + 0x0C)));
 			dprint("Vert 0x0E: "..toHexString(mainmemory.read_u16_be(segmentBase + 0x0E)));
 			dprint("Vert 0x10: "..toHexString(mainmemory.read_u16_be(segmentBase + 0x10)));
+			dprint("Loaded 0x18: "..mainmemory.readbyte(segmentBase + 0x18));
+			dprint("Loaded 0x19: "..mainmemory.readbyte(segmentBase + 0x19));
 			dprint();
 			segmentBase = segmentBase + 0x1C;
 		end
@@ -7530,8 +7548,7 @@ function dumpSegments()
 end
 
 function fuckSegments()
-	local mapBase = Game.getMapBlock();
-	local segmentBase = mapBase + mainmemory.read_u32_be(mapBase + 0x58);
+	local segmentBase = Game.getMapSegmentBase();
 	if isRDRAM(segmentBase) then
 		local numSegments = mainmemory.read_u32_be(segmentBase);
 		segmentBase = segmentBase + 4;
@@ -7548,8 +7565,7 @@ function fuckSegments()
 end
 
 function fuckSegmentIDs()
-	local mapBase = Game.getMapBlock();
-	local segmentBase = mapBase + mainmemory.read_u32_be(mapBase + 0x58);
+	local segmentBase = Game.getMapSegmentBase();
 	if isRDRAM(segmentBase) then
 		local numSegments = mainmemory.read_u32_be(segmentBase);
 		segmentBase = segmentBase + 4;
@@ -7562,8 +7578,7 @@ function fuckSegmentIDs()
 end
 
 function fuckSegment(segmentIndex)
-	local mapBase = Game.getMapBlock();
-	local segmentBase = mapBase + mainmemory.read_u32_be(mapBase + 0x58);
+	local segmentBase = Game.getMapSegmentBase();
 	if isRDRAM(segmentBase) then
 		local numSegments = mainmemory.read_u32_be(segmentBase);
 		segmentBase = segmentBase + 4;
@@ -7800,6 +7815,10 @@ function Game.eachFrame()
 			Game.paperMode();
 		end
 
+		if fix_chunk_deload then
+			Game.fixChunkDeload();
+		end
+
 		if type(ScriptHawk.UI.form_controls["Toggle Noclip Checkbox"]) ~= "nil" and forms.ischecked(ScriptHawk.UI.form_controls["Toggle Noclip Checkbox"]) then
 			Game.setNoclipByte(0x01);
 		end
@@ -8031,17 +8050,6 @@ function withinHeapBlock(address, block, size, includeHeader)
 end
 
 --[[
-Address Types:
-	0 30->00 Black       - Unknown
-	1 31->1C Green       - Free Memory
-	2 32->FC Yellow      - Framebuffer/Texture
-	3 33->E0 Red         - Object Model 1
-	4 34->E0 Red         - Object Model 2
-	5 35->E3 Pink        - Code
-	6 36->E3 Pink        - Data
-	7 37->03 Blue        - Map
-	8 xx->xx xxxx        - EEPROM Copy
-
 RGBA
 RRRGGGBB
 00000000 - 00 - Black
@@ -8051,7 +8059,6 @@ RRRGGGBB
 00000011 - 03 - Blue
 11100011 - E3 - Purple/Pink
 11111100 - FC - Yellow
-
 ]]--
 
 addressColors = {
