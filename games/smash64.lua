@@ -538,6 +538,9 @@ function Game.detectVersion(romName, romHash)
 	elseif romHash == "88C8FED5ECD5ED901CB5FC4B5BBEFFA3EA022DF7" then -- 19XXTE 0.11, based on USA ROM
 		version = 4;
 		return true;
+	elseif romHash == "1095F94D70216AC916A9DD8A9FD65DB13E7F9F17" then -- 19XXGE, based on USA ROM
+		version = 4;
+		return true;
 	end
 	return false;
 end

@@ -460,6 +460,7 @@ local supportedGames = {
 	["6EE8A41FEF66280CE3E3F0984D00B96079442FB9"] = {moduleName="games.smash64", friendlyName="Super Smash Bros. (Europe) (En,Fr,De)"},
 	["E2929E10FCCC0AA84E5776227E798ABC07CEDABF"] = {moduleName="games.smash64", friendlyName="Super Smash Bros. (USA)"},
 	["88C8FED5ECD5ED901CB5FC4B5BBEFFA3EA022DF7"] = {moduleName="games.smash64", friendlyName="19XXTE 0.11"},
+	["1095F94D70216AC916A9DD8A9FD65DB13E7F9F17"] = {moduleName="games.smash64", friendlyName="19XXGE"},
 
 	-- Sonic The Hedgehog (SMS)
 	["6B9677E4A9ABB37765D6DB4658F4324251807E07"] = {moduleName="games.sonic1_sms", friendlyName="Sonic The Hedgehog (UE)"},
