@@ -1,6 +1,6 @@
 class = require 'lib.pngLua.30log'
 Stream = class()
-Stream.data = ""
+Stream.data = {}
 Stream.position = 1
 Stream.__name = "Stream"
 
@@ -22,21 +22,26 @@ function Stream:bytesToNum(bytes)
 end
 
 function Stream:__init(param)
-	if (param.inputF ~= nil) then
-		self.data = io.open(param.inputF, "rb"):read("*all")
-	end
-	if (param.input ~= nil) then
-		self.data = param.input
-	end
+    local str = ""	
+    if (param.inputF ~= nil) then
+	str = io.open(param.inputF, "rb"):read("*all")
+    end
+    if (param.input ~= nil) then
+	str = param.input
+    end
+
+    for i=1,#str do
+	self.data[i] = str:byte(i, i)
+    end
 end
 
 function Stream:seek(amount)
 	self.position = self.position + amount
 end
 
-function Stream:readChar()
+function Stream:readByte()
 	if self.position <= 0 then self:seek(1) return nil end
-	local byte = self.data:sub(self.position, self.position)
+	local byte = self.data[self.position]
 	self:seek(1)
 	return byte
 end
@@ -52,9 +57,9 @@ function Stream:readChars(num)
 	return str, i-1
 end
 
-function Stream:readByte()
+function Stream:readChar()
 	if self.position <= 0 then self:seek(1) return nil end
-	return self:readChar():byte(1)
+	return string.char(self:readByte())
 end
 
 function Stream:readBytes(num)
@@ -77,22 +82,15 @@ function Stream:readInt(num)
 	return self:bytesToNum(bytes), count
 end
 
-function Stream:writeChar(char)
+function Stream:writeByte(byte)
 	if self.position <= 0 then self:seek(1) return end
-	self.data = table.concat{self.data:sub(1,self.position-1), char, self.data:sub(self.position+1)}
+	self.data[self.position] = byte
 	self:seek(1)
 end
 
-function writeChars(buffer)
+function Stream:writeChar(char)
 	if self.position <= 0 then self:seek(1) return end
-	local lenString = buffer:len()
-	self.data = ("%s%s%s"):format(self.data:sub(1,self.position-1), char, self.data:sub(self.position+lenString))
-	self.seek(lenString)
-end
-
-function Stream:writeByte(byte)
-	if self.position <= 0 then self:seek(1) return end
-	self:writeChar(string.char(byte))
+	self:writeByte(string.byte(char))
 end
 
 function Stream:writeBytes(buffer)
