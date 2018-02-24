@@ -411,6 +411,11 @@ local supportedGames = {
 	["41FDB879AB422EC158B4EAFEA69087F255EA8589"] = {moduleName="games.mm", friendlyName="Zelda no Densetsu - Mujura no Kamen (Japan) (Rev A)"},
 	["5FB2301AACBF85278AF30DCA3E4194AD48599E36"] = {moduleName="games.mm", friendlyName="Zelda no Densetsu - Mujura no Kamen (Japan)"},
 
+	-- Metroid
+	["166A5B1344B17F98B6B18794094F745F8A7435B8"] = {moduleName="games.metroid", friendlyName="Metroid (U)"},
+	["FDBFC7871962F72A1EF57E5A7E456164FB93430B"] = {moduleName="games.metroid", friendlyName="Metroid (U)"},
+	["B2D2D9ED68B3E5E0D29053EA525BD37C"] = {moduleName="games.metroid", friendlyName="Metroid (U)"},
+
 	-- Mr. Driller
 	["E7009DD8418303343C4AAC2558538B8CAA28B694"] = {moduleName="beta.Drillbot", selfContained=true, friendlyName="Mr. Driller 2 (USA)"},
 

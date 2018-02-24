@@ -1,0 +1,25 @@
+SystemID NES
+030E	b	h	0	RAM	X1
+0311	b	h	0	RAM	X2
+030D	b	h	0	RAM	Y1
+0310	b	h	0	RAM	Y2
+0107	b	u	0	RAM	HP1
+00FF	b	h	0	RAM	Other Y
+00FC	b	u	0	RAM	Screen Y
+040B	b	u	0	RAM	
+002C	b	u	0	RAM	Frame Rule
+0029	b	h	0	RAM	Sub Frame Rule
+0451	b	u	0	RAM	Bug X
+002D	b	u	0	RAM	Bug Timer
+03BF	b	u	0	RAM	Door Timer
+042B	b	u	0	RAM	
+0401	b	u	0	RAM	
+0308	b	u	0	RAM	Y Vel
+0312	b	h	0	RAM	Y Vel sub
+0309	b	h	0	RAM	X Vel
+0313	b	u	0	RAM	X vel sub
+039F	b	u	0	RAM	
+042D	b	h	0	RAM	Freeze
+0421	b	h	0	RAM	
+0420	b	h	0	RAM	
+

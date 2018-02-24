@@ -110,6 +110,7 @@ While ScriptHawk does have basic support for OoT and MM there are people who are
 - Drill Dozer (GBA)
 - Impossible Mission (SMS)
 - Lord of the Sword (SMS)
+- Metroid (NES)
 - Penguin Land (SMS)
 - Psycho Fox (SMS)
 - Rats! (GBC)
