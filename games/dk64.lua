@@ -60,11 +60,14 @@ local Game = {
 	Memory = {
 		jetpac_object_base = {0x02EC68, 0x021D18, 0x021C78, nil},
 		jetpac_enemy_base = {0x02F09C, 0x02214C, 0x0220AC, nil},
+		jetpac_level = {0x02EC4F, 0x21CFF, 0x021C5F, nil},
 		jetman_position_x = {0x02F050, 0x022100, 0x022060, nil},
 		jetman_position_y = {0x02F054, 0x022104, 0x022064, nil},
 		jetman_velocity_x = {0x02F058, 0x022108, 0x022068, nil},
 		jetman_velocity_y = {0x02F05C, 0x02210C, 0x02206C, nil},
 		arcade_object_base = {0x04BCD0, 0x03EC30, 0x03EA60, nil},
+		arcade_level = {0x04C723, 0x03F683, 0x03F4B3, nil},
+		arcade_reload = {0x04C724, 0x03F684, 0x03F4B4, nil},
 		RNG = {0x746A40, 0x7411A0, 0x746300, 0x6F36E0},
 		mode = {0x755318, 0x74FB98, 0x7553D8, 0x6FFE6C}, -- See Game.modes for values
 		current_map = {0x76A0A8, 0x764BC8, 0x76A298, 0x72CDE4}, -- See Game.maps for values
@@ -613,6 +616,43 @@ local function drawSubGameHitboxes()
 	-- Draw mouse
 	--gui.drawPixel(mouse.X, mouse.Y, colors.white);
 	gui.drawImage("beta/cursor.png", mouse.X, mouse.Y - 4);
+end
+
+function getSubgameLevel()
+	if map_value == arcade_map then
+		arcade_level = mainmemory.readbyte(Game.Memory.arcade_level[version]);
+		arcade_level_osd = ((math.fmod(arcade_level,3) + 1) * 25).."m ("..math.floor(arcade_level / 4)..")";
+		return arcade_level_osd;
+	elseif map_value == jetpac_map then
+		jetpac_level = mainmemory.readbyte(Game.Memory.jetpac_level[version]);
+		return jetpac_level;
+	end
+	return 0;
+end
+
+function arcadeTakeMeThere(level)
+	if map_value == arcade_map then
+		if level == "25m" then
+			level_value = 0;
+		elseif level == "50m" then
+			level_value = 1;
+		elseif level == "75m" then
+			level_value = 2;	
+		elseif level == "100m" then
+			level_value = 3;
+		end
+
+		if level == "25m" or level == "50m" or level == "75m" or level == "100m" then
+			mainmemory.writebyte(Game.Memory.arcade_level[1],level_value);
+			mainmemory.writebyte(Game.Memory.arcade_reload[1],2);
+		end
+	end
+end
+
+function jetpacTakeMeThere(level)
+	if map_value == jetpac_map then
+		mainmemory.writebyte(Game.Memory.jetpac_level[version],level);
+	end
 end
 
 -----------------
@@ -8006,6 +8046,8 @@ Game.mapDebugOSD = {
 };
 
 Game.subgameOSD = {
+	{"Level", getSubgameLevel},
+	{"Separator", 1},
 	{"X", Game.getXPosition},
 	{"Y", Game.getYPosition},
 	{"Separator", 1},
