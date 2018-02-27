@@ -7,21 +7,21 @@ end
 
 local Game = {
 	Memory = {
-		["level"] = 0xF00, --u8?
-		["level_time"] = 0x1A4, -- u16_le
-		["lives"] = 0x100, -- s8
-		["l_meter"] = 0x103, -- u8?
-		["p_meter"] = 0x106, -- u8?
-		["viewport_x_position"] = 0x120, -- u16_le
-		["viewport_y_position"] = 0x122, -- u16_le
-		["player_has_control"] = 0xF9, -- u8?
-		["taz_x_position"] = 0x150, -- s16_le
-		["taz_y_position"] = 0x152, -- s16_le
-		["velocity_aerial"] = 0x110, -- s8
-		["velocity_ground"] = 0x111, -- s8
-		["jump_height"] = 0x141, -- u8
-		["object_position_base"] = 0xC00,
-		["object_status_base"] = 0x1100,
+		level = 0xF00, --u8?
+		level_time = 0x1A4, -- u16_le
+		lives = 0x100, -- s8
+		l_meter = 0x103, -- u8?
+		p_meter = 0x106, -- u8?
+		viewport_x_position = 0x120, -- u16_le
+		viewport_y_position = 0x122, -- u16_le
+		player_has_control = 0xF9, -- u8?
+		taz_x_position = 0x150, -- s16_le
+		taz_y_position = 0x152, -- s16_le
+		velocity_aerial = 0x110, -- s8
+		velocity_ground = 0x111, -- s8
+		jump_height = 0x141, -- u8
+		object_position_base = 0xC00,
+		object_status_base = 0x1100,
 	},
 };
 

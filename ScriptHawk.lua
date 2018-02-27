@@ -1630,7 +1630,8 @@ function ScriptHawk.drawHitboxes()
 	local hitboxes = Game.getHitboxes();
 	for i = 1, #hitboxes do
 		local hitbox = hitboxes[i];
-		local color = hitboxes[i].color or ScriptHawk.hitboxDefaultColor;
+		local color = hitbox.color or ScriptHawk.hitboxDefaultColor or colors.white;
+		local bgcolor = hitbox.bgcolor or ScriptHawk.hitboxDefaultBGColor or 0x33000000;
 		if type(hitbox.draggable) ~= "boolean" then
 			hitbox.draggable = ScriptHawk.hitboxDefaultDraggable;
 		end
@@ -1639,8 +1640,8 @@ function ScriptHawk.drawHitboxes()
 		local x2 = x1;
 		local y2 = y1;
 		hitbox.mode = hitbox.mode or ScriptHawk.hitboxDefaultMode;
-		hitbox.width = hitbox.width or ScriptHawk.hitboxDefaultWidth;
-		hitbox.height = hitbox.height or ScriptHawk.hitboxDefaultHeight;
+		hitbox.width = hitbox.width or ScriptHawk.hitboxDefaultWidth or 0;
+		hitbox.height = hitbox.height or ScriptHawk.hitboxDefaultHeight or 0;
 		if hitbox.mode == ScriptHawk.hitboxModeWH then
 			x2 = x1 + hitbox.width;
 			y2 = y1 + hitbox.height;
@@ -1656,11 +1657,16 @@ function ScriptHawk.drawHitboxes()
 			hitbox.height = y2 - y1;
 		end
 
-		local hitboxXOffset = 0;
-		local hitboxYOffset = 0;
-		if isSMS and bufferHeight == 243 then -- Compensate for overscan (SMS)
-			hitboxXOffset = hitboxXOffset + 13;
-			hitboxYOffset = hitboxYOffset + 27;
+		local hitboxXOffset = hitbox.xOffset or ScriptHawk.hitboxDefaultXOffset or 0;
+		local hitboxYOffset = hitbox.yOffset or ScriptHawk.hitboxDefaultYOffset or 0;
+		if isSMS then -- Compensate for overscan (SMS)
+			if bufferHeight == 243 then -- NTSC
+				hitboxXOffset = hitboxXOffset + 13;
+				hitboxYOffset = hitboxYOffset + 27;
+			elseif bufferHeight == 288 then -- PAL
+				hitboxXOffset = hitboxXOffset + 13;
+				hitboxYOffset = hitboxYOffset + 48;
+			end
 		end
 
 		x1 = x1 + hitboxXOffset;
@@ -1707,11 +1713,11 @@ function ScriptHawk.drawHitboxes()
 					-- Don't render static text for hitboxes that are off screen
 				else
 					for t = 1, #renderedText do
-						gui.drawText(safeX, safeY + ((t - 1) * height), renderedText[t], color);
+						gui.drawText(safeX, safeY + ((t - 1) * height), renderedText[t], color, bgcolor);
 					end
 				end
 			end
-			gui.drawRectangle(x1, y1, hitbox.width, hitbox.height, color); -- Draw the object's hitbox
+			gui.drawRectangle(x1, y1, hitbox.width, hitbox.height, color);
 		end
 
 		--[[
