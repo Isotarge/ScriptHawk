@@ -20,6 +20,10 @@ local Game = {
 function Game.detectVersion(romName, romHash)
 	ScriptHawk.dpad.joypad.enabled = false;
 	ScriptHawk.dpad.key.enabled = false;
+	ScriptHawk.hitboxDefaultMode = ScriptHawk.hitboxModeWHCentered;
+	ScriptHawk.hitboxDefaultWidth = 16;
+	ScriptHawk.hitboxDefaultHeight = 16;
+	ScriptHawk.hitboxDefaultColor = colors.black;
 	return true;
 end
 
@@ -29,7 +33,7 @@ local object_array_capacity = 27;
 local max_player_projectiles = 3;
 local max_enemies = 7;
 
-local object_fields = {
+object_fields = {
 	object_type = 0x00, -- Byte
 	object_types = {
 		[0x01] = {name = "Player", color = colors.yellow},
@@ -265,15 +269,8 @@ Game.bossOSD = {
 Game.OSD = Game.standardOSD;
 
 function Game.initUI()
-	ScriptHawk.UI.form_controls["showList"] = forms.checkbox(ScriptHawk.UI.options_form, "Show List", ScriptHawk.UI.col(0) + ScriptHawk.UI.dropdown_offset, ScriptHawk.UI.row(4) + ScriptHawk.UI.dropdown_offset);
-	ScriptHawk.UI.form_controls["showHitbox"] = forms.checkbox(ScriptHawk.UI.options_form, "Show Hitbox", ScriptHawk.UI.col(0) + ScriptHawk.UI.dropdown_offset, ScriptHawk.UI.row(5) + ScriptHawk.UI.dropdown_offset);
-	forms.setproperty(ScriptHawk.UI.form_controls.showHitbox, "Checked", true);
-	ScriptHawk.UI.form_controls["draggableHitboxes"] = forms.checkbox(ScriptHawk.UI.options_form, "Draggable", ScriptHawk.UI.col(0) + ScriptHawk.UI.dropdown_offset, ScriptHawk.UI.row(6) + ScriptHawk.UI.dropdown_offset);
+	ScriptHawk.UI.form_controls["showList"] = forms.checkbox(ScriptHawk.UI.options_form, "Show List", ScriptHawk.UI.col(0) + ScriptHawk.UI.dropdown_offset, ScriptHawk.UI.row(5) + ScriptHawk.UI.dropdown_offset);
 end
-
-local mouseClickedLastFrame = false;
-local startDragPosition = {0, 0};
-local draggedObjects = {};
 
 function Game.drawUI()
 	if Game.isBossLoaded() then
@@ -281,131 +278,64 @@ function Game.drawUI()
 	else
 		Game.OSD = Game.standardOSD;
 	end
+end
 
-	-- Draw Objects
+function Game.getHitboxes()
+	local hitboxes = {};
+	local row = 0;
 	local height = 16; -- Text row height
 	local width = 8; -- Text column width
-	local mouse = input.getmouse();
-
-	-- Draw mouse pixel
-	--gui.drawPixel(mouse.X, mouse.Y, colors.red);
-
-	local startDrag = false;
-	local dragging = false;
-	local dragTransform = {0, 0};
-
-	if forms.ischecked(ScriptHawk.UI.form_controls.draggableHitboxes) then
-		if mouse.Left then
-			if not mouseClickedLastFrame then
-				startDrag = true;
-				startDragPosition = {mouse.X, mouse.Y};
-			end
-			mouseClickedLastFrame = true;
-			dragging = true;
-			dragTransform = {mouse.X - startDragPosition[1], mouse.Y - startDragPosition[2]};
-		else
-			draggedObjects = {};
-			mouseClickedLastFrame = false;
-			dragging = false;
-		end
-	end
-
-	local row = 0;
 	for i = 0, object_array_capacity do
-		local objectBase = Game.Memory.object_array_base + (i * object_size);
-		local objectType = mainmemory.readbyte(objectBase + object_fields.object_type);
-		local objectTypeTable = nil;
-		local color = nil;
+		local hitbox = {
+			objectBase = Game.Memory.object_array_base + (i * object_size),
+		};
+		local objectType = mainmemory.readbyte(hitbox.objectBase + object_fields.object_type);
 		if objectType ~= 0 then
-			-- Default to 16 width/height for hitbox
-			local hitboxWidth = 16;
-			local hitboxHeight = 16;
-
-			-- Get the X and Y position of the object
-			local xPosition = mainmemory.read_s16_le(objectBase + object_fields.x_position);
-			local yPosition = mainmemory.read_s16_le(objectBase + object_fields.y_position);
+			hitbox.dragTag = hitbox.objectBase;
+			hitbox.objectType = "Unknown ("..toHexString(objectType)..")";
+			hitbox.x = mainmemory.read_s16_le(hitbox.objectBase + object_fields.x_position);
+			hitbox.y = mainmemory.read_s16_le(hitbox.objectBase + object_fields.y_position);
 
 			if type(object_fields.object_types[objectType]) == "table" then
 				objectTypeTable = object_fields.object_types[objectType];
 
 				if type(objectTypeTable.name) == "string" then
-					objectType = object_fields.object_types[objectType].name.." "..toHexString(objectType);
+					hitbox.objectType = object_fields.object_types[objectType].name.." "..toHexString(objectType);
 				else
-					objectType = "Unknown ("..toHexString(objectType)..")";
+					hitbox.objectType = "Unknown ("..toHexString(objectType)..")";
 				end
 
-				if type(objectTypeTablecolor) == "number" then
-					color = objectTypeTablecolor;
-				end
+				hitbox.color = objectTypeTable.color or hitbox.color or colors.white;
 
-				if type(objectTypeTable.hitbox_x_offset) == "number" then
-					hitboxXOffset = objectTypeTable.hitbox_x_offset;
-				end
-				if type(objectTypeTable.hitbox_y_offset) == "number" then
-					hitboxYOffset = objectTypeTable.hitbox_y_offset;
-				end
+				hitbox.xOffset = objectTypeTable.hitbox_x_offset or hitbox.xOffset or 0;
+				hitbox.yOffset = objectTypeTable.hitbox_y_offset or hitbox.yOffset or 0;
 
-				if type(objectTypeTable.hitbox_width) == "number" then
-					hitboxWidth = objectTypeTable.hitbox_width;
-				end
-				if type(objectTypeTable.hitbox_height) == "number" then
-					hitboxHeight = objectTypeTable.hitbox_height;
-				end
+				hitbox.width = objectTypeTable.hitbox_width or hitbox.width;
+				hitbox.height = objectTypeTable.hitbox_height or hitbox.height;
 			else
-				color = colors.black;
-				objectType = "Unknown ("..toHexString(objectType)..")";
+				hitbox.color = colors.black;
 			end
-
-			local hitboxXOffset = -(hitboxWidth / 2);
-			local hitboxYOffset = -(hitboxHeight / 2);
-			if client.bufferheight() == 243 then -- Compensate for overscan
-				hitboxXOffset = hitboxXOffset + 13;
-				hitboxYOffset = hitboxYOffset + 27;
-			end
-
-			if forms.ischecked(ScriptHawk.UI.form_controls.showHitbox) then
-				if dragging then
-					for d = 1, #draggedObjects do
-						if draggedObjects[d][1] == objectBase then
-							xPosition = draggedObjects[d][2] + dragTransform[1];
-							yPosition = draggedObjects[d][3] + dragTransform[2];
-							mainmemory.write_s16_le(objectBase + object_fields.x_position, xPosition);
-							mainmemory.write_s16_le(objectBase + object_fields.y_position, yPosition);
-							break;
-						end
-					end
-				end
-
-				if (mouse.X >= xPosition + hitboxXOffset and mouse.X <= xPosition + hitboxXOffset + hitboxWidth) and (mouse.Y >= yPosition + hitboxYOffset and mouse.Y <= yPosition + hitboxYOffset + hitboxHeight) then
-					if startDrag then
-						table.insert(draggedObjects, {objectBase, xPosition, yPosition});
-					end
-
-					local mouseOverText = {
-						objectType,
-						toHexString(objectBase).." "..xPosition..","..yPosition,
-					};
-
-					local maxLength = -math.huge;
-					for t = 1, #mouseOverText do
-						maxLength = math.max(maxLength, string.len(mouseOverText[t]));
-					end
-					local safeX = math.max(0, math.min(xPosition + hitboxXOffset, 256 - (maxLength * width)));
-					local safeY = math.max(0, math.min(yPosition + hitboxYOffset, 192 - (#mouseOverText * height)));
-
-					for t = 1, #mouseOverText do
-						gui.drawText(safeX, safeY + ((t - 1) * height), mouseOverText[t], color);
-					end
-				end
-				gui.drawRectangle(xPosition + hitboxXOffset, yPosition + hitboxYOffset, hitboxWidth, hitboxHeight, color); -- Draw the object's hitbox
-			end
+			table.insert(hitboxes, hitbox);
 
 			if forms.ischecked(ScriptHawk.UI.form_controls.showList) then
-				gui.text(2, 2 + height * row, xPosition..", "..yPosition.." - "..objectType.." "..toHexString(objectBase), color, 'bottomright');
+				gui.text(2, 2 + height * row, hitbox.x..", "..hitbox.y.." - "..hitbox.objectType.." "..toHexString(hitbox.objectBase), hitbox.color, 'bottomright');
 				row = row + 1;
 			end
 		end
 	end
+	return hitboxes;
+end
+
+function Game.setHitboxPosition(hitbox, x, y)
+	mainmemory.write_s16_le(hitbox.objectBase + object_fields.x_position, x);
+	mainmemory.write_s16_le(hitbox.objectBase + object_fields.y_position, y);
+end
+
+function Game.getHitboxMouseOverText(hitbox)
+	return {
+		hitbox.objectType,
+		toHexString(hitbox.objectBase).." "..hitbox.x..","..hitbox.y,
+	};
 end
 
 return Game;

@@ -274,8 +274,8 @@ function Game.drawUI()
 						objectType = "Unknown "..toHexString(objectType);
 					end
 
-					if type(objectTypeTablecolor) == "number" then
-						color = objectTypeTablecolor;
+					if type(objectTypeTable.color) == "number" then
+						color = objectTypeTable.color;
 					end
 
 					if type(objectTypeTable.hitbox_x_offset) == "number" then
