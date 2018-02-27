@@ -23,7 +23,14 @@ ScriptHawk = {
 		long_label_width = 140,
 		button_height = 23,
 	},
+	hitboxModeWH = 0,
+	hitboxModeWHCentered = 1,
+	hitboxModeX2Y2 = 2,
+	hitboxDefaultColor = 0xFFFFFFFF, -- White
+	hitboxDefaultBGColor = 0x33000000, -- Translucent black
 };
+
+ScriptHawk.hitboxDefaultMode = ScriptHawk.hitboxModeWH;
 
 function ScriptHawk.UI.controlsOverlap(control1, control2)
 	local x1 = tonumber(forms.getproperty(control1, "Left"));
@@ -936,6 +943,13 @@ if not TASSafe then
 	if type(Game.applyInfinites) == "function" then
 		ScriptHawk.UI.form_controls["Toggle Infinites Checkbox"] = forms.checkbox(ScriptHawk.UI.options_form, "Infinites", ScriptHawk.UI.col(0) + ScriptHawk.UI.dropdown_offset, ScriptHawk.UI.row(5) + ScriptHawk.UI.dropdown_offset);
 	end
+	if type(Game.getHitboxes) == "function" then
+		ScriptHawk.UI.form_controls["Show Hitboxes Checkbox"] = forms.checkbox(ScriptHawk.UI.options_form, "Hitboxes", ScriptHawk.UI.col(0) + ScriptHawk.UI.dropdown_offset, ScriptHawk.UI.row(6) + ScriptHawk.UI.dropdown_offset);
+		forms.setproperty(ScriptHawk.UI.form_controls["Show Hitboxes Checkbox"], "Checked", true);
+		if type(Game.setHitboxPosition) == "function" then
+			ScriptHawk.UI.form_controls["Draggable Hitboxes Checkbox"] = forms.checkbox(ScriptHawk.UI.options_form, "Draggable", ScriptHawk.UI.col(0) + ScriptHawk.UI.dropdown_offset, ScriptHawk.UI.row(7) + ScriptHawk.UI.dropdown_offset);
+		end
+	end
 end
 
 ScriptHawk.UI.form_controls["Toggle Telemetry Button"] = forms.button(ScriptHawk.UI.options_form, "Start Telemetry", toggleTelemetry, ScriptHawk.UI.col(10), ScriptHawk.UI.row(3), ScriptHawk.UI.col(4) + 10, ScriptHawk.UI.button_height);
@@ -1421,6 +1435,7 @@ local function plot_pos()
 		--gui.cleartext();
 		--gui.clearGraphics();
 		ScriptHawk.UI.updateReadouts();
+		ScriptHawk.drawHitboxes();
 		Game.drawUI();
 	end
 end
@@ -1536,12 +1551,185 @@ angleCalc.open = function()
 	end
 end
 
+--------------
+-- Hitboxes --
+--------------
+
+ScriptHawk.hitboxDefaultDraggable = type(Game.setHitboxPosition) == "function";
+
+if type(Game.setHitboxPosition) ~= "function" then
+	if ScriptHawk.warnings then
+		print("Warning: This module does not implement Game.setHitboxPosition(hitbox, x, y)");
+	end
+	function Game.setHitboxPosition(hitbox, x, y)
+		return;
+	end
+end
+
+if type(Game.getHitboxMouseOverText) ~= "function" then
+	if ScriptHawk.warnings then
+		print("Warning: This module does not implement Game.getHitboxMouseOverText(hitbox)");
+	end
+	function Game.getHitboxMouseOverText(hitbox)
+		return;
+	end
+end
+
+if type(Game.getHitboxStaticText) ~= "function" then
+	if ScriptHawk.warnings then
+		print("Warning: This module does not implement Game.getHitboxStaticText(hitbox)");
+	end
+	function Game.getHitboxStaticText(hitbox)
+		return;
+	end
+end
+
+local mouseClickedLastFrame = false;
+local startDragPosition = {0, 0};
+local draggedObjects = {};
+
+function ScriptHawk.drawHitboxes()
+	if type(Game.getHitboxes) ~= "function" then
+		return;
+	end
+
+	local height = 16; -- Text row height
+	local width = 8; -- Text column width
+	local mouse = input.getmouse();
+	local bufferWidth = client.bufferwidth();
+	local bufferHeight = client.bufferheight();
+	local isSMS = emu.getsystemid() == "SMS";
+	local mouseIsOnScreen = (mouse.X >= 0 and mouse.X < bufferWidth) and (mouse.Y >= 0 and mouse.Y < bufferHeight);
+	local showHitboxes = type(ScriptHawk.UI.form_controls["Show Hitboxes Checkbox"]) ~= "nil" and forms.ischecked(ScriptHawk.UI.form_controls["Show Hitboxes Checkbox"]);
+	local enableDraggableHitboxes = type(ScriptHawk.UI.form_controls["Draggable Hitboxes Checkbox"]) ~= "nil" and forms.ischecked(ScriptHawk.UI.form_controls["Draggable Hitboxes Checkbox"]);
+
+	-- Draw mouse pixel
+	--gui.drawPixel(mouse.X, mouse.Y, colors.red);
+
+	local startDrag = false;
+	local dragging = false;
+	local dragTransform = {0, 0};
+
+	if enableDraggableHitboxes then
+		if mouse.Left then
+			if not mouseClickedLastFrame then
+				startDrag = true;
+				startDragPosition = {mouse.X, mouse.Y};
+			end
+			mouseClickedLastFrame = true;
+			dragging = true;
+			dragTransform = {mouse.X - startDragPosition[1], mouse.Y - startDragPosition[2]};
+		else
+			draggedObjects = {};
+			mouseClickedLastFrame = false;
+			dragging = false;
+		end
+	end
+
+	--local row = 0;
+	local hitboxes = Game.getHitboxes();
+	for i = 1, #hitboxes do
+		local hitbox = hitboxes[i];
+		local color = hitboxes[i].color or ScriptHawk.hitboxDefaultColor;
+		if type(hitbox.draggable) ~= "boolean" then
+			hitbox.draggable = ScriptHawk.hitboxDefaultDraggable;
+		end
+		local x1 = hitbox.x;
+		local y1 = hitbox.y;
+		local x2 = x1;
+		local y2 = y1;
+		hitbox.mode = hitbox.mode or ScriptHawk.hitboxDefaultMode;
+		hitbox.width = hitbox.width or ScriptHawk.hitboxDefaultWidth;
+		hitbox.height = hitbox.height or ScriptHawk.hitboxDefaultHeight;
+		if hitbox.mode == ScriptHawk.hitboxModeWH then
+			x2 = x1 + hitbox.width;
+			y2 = y1 + hitbox.height;
+		elseif hitbox.mode == ScriptHawk.hitboxModeWHCentered then
+			x1 = x1 - hitbox.width / 2;
+			x2 = x1 + hitbox.width;
+			y1 = y1 - hitbox.height / 2;
+			y2 = y1 + hitbox.height;
+		elseif hitbox.mode == ScriptHawk.hitboxModeX2Y2 then
+			x2 = hitbox.x2;
+			y2 = hitbox.y2;
+			hitbox.width = x2 - x1;
+			hitbox.height = y2 - y1;
+		end
+
+		local hitboxXOffset = 0;
+		local hitboxYOffset = 0;
+		if isSMS and bufferHeight == 243 then -- Compensate for overscan (SMS)
+			hitboxXOffset = hitboxXOffset + 13;
+			hitboxYOffset = hitboxYOffset + 27;
+		end
+
+		x1 = x1 + hitboxXOffset;
+		x2 = x2 + hitboxXOffset;
+		y1 = y1 + hitboxYOffset;
+		y2 = y2 + hitboxYOffset;
+
+		if showHitboxes then
+			if mouseIsOnScreen and hitbox.draggable and dragging then
+				for d = 1, #draggedObjects do
+					if draggedObjects[d][1] == hitbox.dragTag then
+						hitbox.x = draggedObjects[d][2] + dragTransform[1];
+						hitbox.y = draggedObjects[d][3] + dragTransform[2];
+						Game.setHitboxPosition(hitbox, hitbox.x, hitbox.y);
+						break;
+					end
+				end
+			end
+
+			local renderedText = nil;
+			local isStaticText = false;
+			if mouseIsOnScreen and (mouse.X >= x1 and mouse.X <= x2) and (mouse.Y >= y1 and mouse.Y <= y2) then
+				if hitbox.draggable and startDrag then
+					table.insert(draggedObjects, {hitbox.dragTag, hitbox.x, hitbox.y});
+				end
+				renderedText = Game.getHitboxMouseOverText(hitbox);
+			else
+				renderedText = Game.getHitboxStaticText(hitbox);
+				isStaticText = true;
+			end
+
+			if type(renderedText) == "string" then
+				renderedText = {renderedText};
+			end
+			if type(renderedText) == "table" then
+				local maxLength = -math.huge;
+				for t = 1, #renderedText do
+					maxLength = math.max(maxLength, string.len(renderedText[t]));
+				end
+				local safeX = math.max(0, math.min(x1, bufferWidth - (maxLength * width)));
+				local safeY = math.max(0, math.min(y1, bufferHeight - (#renderedText * height)));
+
+				if isStaticText and (safeX ~= x1 or safeY ~= y1) then
+					-- Don't render static text for hitboxes that are off screen
+				else
+					for t = 1, #renderedText do
+						gui.drawText(safeX, safeY + ((t - 1) * height), renderedText[t], color);
+					end
+				end
+			end
+			gui.drawRectangle(x1, y1, hitbox.width, hitbox.height, color); -- Draw the object's hitbox
+		end
+
+		--[[
+		if forms.ischecked(ScriptHawk.UI.form_controls["Show List Checkbox"]) then
+			gui.text(2, 2 + height * row, hitbox.x..", "..hitbox.y.." - "..objectType.." "..toHexString(objectBase), color, 'bottomright');
+			row = row + 1;
+		end
+		--]]
+	end
+end
+
 if not TASSafe then
 	while true do
 		if client.ispaused() then
 			gui.cleartext();
 			--gui.clearGraphics();
 			ScriptHawk.UI.updateReadouts();
+			ScriptHawk.drawHitboxes();
 			Game.drawUI();
 		end
 		ScriptHawk.processKeybinds(ScriptHawk.keybindsRealtime);

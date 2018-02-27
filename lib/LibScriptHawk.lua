@@ -367,7 +367,7 @@ function linesFrom(file)
 	end
 	lines = {};
 	for line in io.lines(file) do
-		lines[#lines + 1] = line;
+		table.insert(lines, line);
 	end
 	return lines;
 end

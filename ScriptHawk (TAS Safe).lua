@@ -53,6 +53,7 @@ if result == true then
 			gui.cleartext();
 			--gui.clearGraphics();
 			ScriptHawk.UI.updateReadouts();
+			ScriptHawk.drawHitboxes();
 			Game.drawUI();
 		end
 		ScriptHawk.processKeybinds(ScriptHawk.keybindsRealtime);

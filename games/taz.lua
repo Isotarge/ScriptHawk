@@ -26,6 +26,12 @@ local Game = {
 };
 
 function Game.detectVersion(romName, romHash)
+	ScriptHawk.dpad.joypad.enabled = false;
+	ScriptHawk.dpad.key.enabled = false;
+	ScriptHawk.hitboxDefaultMode = ScriptHawk.hitboxModeWH;
+	ScriptHawk.hitboxDefaultWidth = 16;
+	ScriptHawk.hitboxDefaultHeight = 16;
+	ScriptHawk.hitboxDefaultColor = colors.red;
 	return true;
 end
 
@@ -120,34 +126,32 @@ Game.OSD = {
 
 Game.OSDPosition = {114, 208};
 
--- Default to 16 width/height for hitbox
-local hitboxWidth = 16;
-local hitboxHeight = 16;
-
-function Game.drawUI()
-	local color = colors.red;
-
-	local hitboxXOffset = 0;
-	local hitboxYOffset = 0;
-	if client.bufferheight() == 243 then -- Compensate for overscan
-		hitboxXOffset = 13;
-		hitboxYOffset = 27;
-	end
-
-	local row = 0;
+function Game.getHitboxes()
+	local hitboxes = {};
 	for i = 0, 31 do
-		local statusBase = Game.Memory.object_status_base + i;
-		local status = mainmemory.read_s8(statusBase);
+		local status = mainmemory.read_s8(Game.Memory.object_status_base + i);
 		if status ~= -1 then
-			local positionBase = Game.Memory.object_position_base + i * 0x04;
-			local xPos = mainmemory.read_s16_le(positionBase + 0x00);
-			local yPos = mainmemory.read_s16_le(positionBase + 0x02);
-			--gui.text(2, 2 + row * Game.OSDRowHeight, toHexString(positionBase)..": ".."X: "..xPos..", Y:"..yPos, nil, "bottomright");
-			--row = row + 1;
-			gui.drawRectangle(xPos + hitboxXOffset, yPos + hitboxYOffset, hitboxWidth, hitboxHeight, color, 0x33000000); -- Draw the object's hitbox
-			gui.drawText(xPos + hitboxXOffset, yPos + hitboxYOffset, status, color, colors.transparent);
+			local hitbox = {
+				index = i,
+				status = status,
+				dragTag = Game.Memory.object_position_base + i * 0x04,
+			};
+			hitbox.x = mainmemory.read_s16_le(hitbox.dragTag + 0x00);
+			hitbox.y = mainmemory.read_s16_le(hitbox.dragTag + 0x02);
+			table.insert(hitboxes, hitbox);
 		end
 	end
+	return hitboxes;
 end
+
+function Game.setHitboxPosition(hitbox, x, y)
+	mainmemory.write_s16_le(hitbox.dragTag + 0x00, x);
+	mainmemory.write_s16_le(hitbox.dragTag + 0x02, y);
+end
+
+function Game.getHitboxMouseOverText(hitbox)
+	return {hitbox.status};
+end
+Game.getHitboxStaticText = Game.getHitboxMouseOverText;
 
 return Game;
