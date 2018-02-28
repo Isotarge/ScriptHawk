@@ -943,12 +943,13 @@ if not TASSafe then
 	if type(Game.applyInfinites) == "function" then
 		ScriptHawk.UI.form_controls["Toggle Infinites Checkbox"] = forms.checkbox(ScriptHawk.UI.options_form, "Infinites", ScriptHawk.UI.col(0) + ScriptHawk.UI.dropdown_offset, ScriptHawk.UI.row(5) + ScriptHawk.UI.dropdown_offset);
 	end
-	if type(Game.getHitboxes) == "function" then
-		ScriptHawk.UI.form_controls["Show Hitboxes Checkbox"] = forms.checkbox(ScriptHawk.UI.options_form, "Hitboxes", ScriptHawk.UI.col(0) + ScriptHawk.UI.dropdown_offset, ScriptHawk.UI.row(6) + ScriptHawk.UI.dropdown_offset);
-		forms.setproperty(ScriptHawk.UI.form_controls["Show Hitboxes Checkbox"], "Checked", true);
-		if type(Game.setHitboxPosition) == "function" then
-			ScriptHawk.UI.form_controls["Draggable Hitboxes Checkbox"] = forms.checkbox(ScriptHawk.UI.options_form, "Draggable", ScriptHawk.UI.col(0) + ScriptHawk.UI.dropdown_offset, ScriptHawk.UI.row(7) + ScriptHawk.UI.dropdown_offset);
-		end
+end
+
+if type(Game.getHitboxes) == "function" then
+	ScriptHawk.UI.form_controls["Show Hitboxes Checkbox"] = forms.checkbox(ScriptHawk.UI.options_form, "Hitboxes", ScriptHawk.UI.col(10) + ScriptHawk.UI.dropdown_offset, ScriptHawk.UI.row(0) + ScriptHawk.UI.dropdown_offset);
+	forms.setproperty(ScriptHawk.UI.form_controls["Show Hitboxes Checkbox"], "Checked", true);
+	if type(Game.setHitboxPosition) == "function" and not TASSafe then
+		ScriptHawk.UI.form_controls["Draggable Hitboxes Checkbox"] = forms.checkbox(ScriptHawk.UI.options_form, "Draggable", ScriptHawk.UI.col(10) + ScriptHawk.UI.dropdown_offset, ScriptHawk.UI.row(1) + ScriptHawk.UI.dropdown_offset);
 	end
 end
 
@@ -1555,7 +1556,7 @@ end
 -- Hitboxes --
 --------------
 
-ScriptHawk.hitboxDefaultDraggable = type(Game.setHitboxPosition) == "function";
+ScriptHawk.hitboxDefaultDraggable = type(Game.setHitboxPosition) == "function" and not TASSafe;
 
 if type(Game.setHitboxPosition) ~= "function" then
 	if ScriptHawk.warnings then
@@ -1698,6 +1699,9 @@ function ScriptHawk.drawHitboxes()
 				isStaticText = true;
 			end
 
+			if type(renderedText) == "boolean" or type(renderedText) == "number" then
+				renderedText = tostring(renderedText)
+			end
 			if type(renderedText) == "string" then
 				renderedText = {renderedText};
 			end

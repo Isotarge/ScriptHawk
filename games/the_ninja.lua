@@ -269,7 +269,7 @@ Game.bossOSD = {
 Game.OSD = Game.standardOSD;
 
 function Game.initUI()
-	ScriptHawk.UI.form_controls["showList"] = forms.checkbox(ScriptHawk.UI.options_form, "Show List", ScriptHawk.UI.col(0) + ScriptHawk.UI.dropdown_offset, ScriptHawk.UI.row(5) + ScriptHawk.UI.dropdown_offset);
+	ScriptHawk.UI.form_controls["showList"] = forms.checkbox(ScriptHawk.UI.options_form, "Show List", ScriptHawk.UI.col(10) + ScriptHawk.UI.dropdown_offset, ScriptHawk.UI.row(2) + ScriptHawk.UI.dropdown_offset);
 end
 
 function Game.drawUI()
