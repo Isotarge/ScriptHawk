@@ -1700,7 +1700,7 @@ function ScriptHawk.drawHitboxes()
 			end
 
 			if type(renderedText) == "boolean" or type(renderedText) == "number" then
-				renderedText = tostring(renderedText)
+				renderedText = tostring(renderedText);
 			end
 			if type(renderedText) == "string" then
 				renderedText = {renderedText};

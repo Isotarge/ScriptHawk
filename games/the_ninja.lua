@@ -133,10 +133,8 @@ function Game.countEnemies()
 	for i = 0, object_array_capacity do
 		local objectBase = Game.Memory.object_array_base + (i * object_size);
 		local objectType = mainmemory.readbyte(objectBase + object_fields.object_type);
-		if object_fields.object_types[objectType] ~= nil then
-			if object_fields.object_types[objectType].isEnemy == true then
-				num = num + 1;
-			end
+		if object_fields.object_types[objectType] ~= nil and object_fields.object_types[objectType].isEnemy == true then
+			num = num + 1;
 		end
 	end
 	return num.."/"..max_enemies;
@@ -300,7 +298,7 @@ function Game.getHitboxes()
 				objectTypeTable = object_fields.object_types[objectType];
 
 				if type(objectTypeTable.name) == "string" then
-					hitbox.objectType = object_fields.object_types[objectType].name.." "..toHexString(objectType);
+					hitbox.objectType = objectTypeTable.name.." "..toHexString(objectType);
 				else
 					hitbox.objectType = "Unknown ("..toHexString(objectType)..")";
 				end

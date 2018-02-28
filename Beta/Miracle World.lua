@@ -185,7 +185,7 @@ local function draw_ui()
 				objectTypeTable = object_fields.object_types[objectType];
 
 				if type(objectTypeTable.name) == "string" then
-					objectType = object_fields.object_types[objectType].name.." "..toHexString(objectType);
+					objectType = objectTypeTable.name.." "..toHexString(objectType);
 				else
 					objectType = "Unknown ("..toHexString(objectType)..")";
 				end
