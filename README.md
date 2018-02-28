@@ -123,13 +123,13 @@ While ScriptHawk does have basic support for OoT and MM there are people who are
 - Earthworm Jim 3D (N64)
 
 ## Partially Supported Games
+- Alex Kidd in Miracle World (SMS)
 - Elmo's Number Journey (N64 only)
 - Elmo's Letter Adventure (N64 only)
 - Rayman 2 (N64 only)
 - San Francisco Rush 2049 (N64 only)
 
 ## Other Included Scripts
-- [Alex Kidd in Miracle World](Beta/Miracle%20World.lua) object viewer with drag and drop support
 - [Golden Axe Warrior](Beta/Golden%20Axe%20Warrior.lua) object viewer with drag and drop support
 - [Golvellius](Beta/Golvellius.lua) object viewer with drag and drop support
 - [Tetris Attack](Tetris%20Attack%20Bot.lua) bot, plays the game quite well using a simple sorting algorithm

@@ -255,6 +255,7 @@ function Game.detectVersion(romName, romHash)
 	ScriptHawk.hitboxDefaultYOffset = -16;
 	ScriptHawk.hitboxDefaultWidth = 16;
 	ScriptHawk.hitboxDefaultHeight = 16;
+	ScriptHawk.hitboxDefaultColor = colors.red;
 	return true;
 end
 
@@ -435,11 +436,7 @@ local object_fields = {
 };
 
 function Game.getHitboxes()
-	local row = 0;
-	local height = 16; -- Text row height
-	local width = 8; -- Text column width
 	local hitboxes = {};
-	local drawList = forms.ischecked(ScriptHawk.UI.form_controls["Object List Checkbox"]);
 
 	for i = 0, object_array_capacity do
 		local hitbox = {
@@ -447,21 +444,18 @@ function Game.getHitboxes()
 		};
 		local objectType = mainmemory.readbyte(hitbox.objectBase + object_fields.object_type);
 		local objectLoaded = mainmemory.readbyte(hitbox.objectBase + object_fields.object_loaded);
-		local objectTypeTable = nil;
 		if objectType > 0 and objectLoaded == 0 then
 			hitbox.dragTag = hitbox.objectBase;
 			hitbox.x = mainmemory.readbyte(hitbox.objectBase + object_fields.x_position);
 			hitbox.y = mainmemory.readbyte(hitbox.objectBase + object_fields.y_position);
 			hitbox.currentHP = mainmemory.readbyte(hitbox.objectBase + object_fields.currentHP);
+			hitbox.objectType = "Unknown "..toHexString(objectType);
 
 			if type(object_fields.object_types[objectType]) == "table" then
-				objectTypeTable = object_fields.object_types[objectType];
+				local objectTypeTable = object_fields.object_types[objectType];
 
-				hitbox.objectType = objectTypeTable.name or "Unknown "..toHexString(objectType);
-
-				if type(objectTypeTable.color) == "number" then
-					hitbox.color = objectTypeTable.color;
-				end
+				hitbox.objectType = objectTypeTable.name or hitbox.objectType;
+				hitbox.color = objectTypeTable.color or colors.white;
 
 				if objectTypeTable.isBoss then
 					hitbox.currentHP = mainmemory.readbyte(hitbox.objectBase + object_fields.bossHP);
@@ -482,14 +476,6 @@ function Game.getHitboxes()
 				if type(objectTypeTable.hitbox_height) == "number" then
 					hitbox.height = objectTypeTable.hitbox_height;
 				end
-			else
-				hitbox.color = colors.red;
-				hitbox.objectType = "Unknown "..toHexString(objectType);
-			end
-
-			if drawList then
-				gui.text(2, 2 + height * row, hitbox.x..", "..hitbox.y.." - "..hitbox.objectType.." "..hitbox.currentHP.."HP "..toHexString(hitbox.objectBase), hitbox.color, 'bottomright');
-				row = row + 1;
 			end
 			table.insert(hitboxes, hitbox);
 		end
@@ -514,6 +500,10 @@ function Game.getHitboxStaticText(hitbox)
 	if hitbox.currentHP > 0 then
 		return hitbox.currentHP;
 	end
+end
+
+function Game.getHitboxListText(hitbox)
+	return hitbox.x..", "..hitbox.y.." - "..hitbox.objectType.." "..hitbox.currentHP.."HP "..toHexString(hitbox.objectBase);
 end
 
 function Game.killEnemies()
@@ -841,9 +831,6 @@ function Game.initUI()
 	ScriptHawk.UI.form_controls["Set Flag Button"] = forms.button(ScriptHawk.UI.options_form, "Set", flagSetButtonHandler, ScriptHawk.UI.col(10), ScriptHawk.UI.row(7), 46, ScriptHawk.UI.button_height);
 	ScriptHawk.UI.form_controls["Check Flag Button"] = forms.button(ScriptHawk.UI.options_form, "Check", flagCheckButtonHandler, ScriptHawk.UI.col(12), ScriptHawk.UI.row(7), 46, ScriptHawk.UI.button_height);
 	ScriptHawk.UI.form_controls["Clear Flag Button"] = forms.button(ScriptHawk.UI.options_form, "Clear", flagClearButtonHandler, ScriptHawk.UI.col(14), ScriptHawk.UI.row(7), 46, ScriptHawk.UI.button_height);
-
-	ScriptHawk.UI.form_controls["Object List Checkbox"] = forms.checkbox(ScriptHawk.UI.options_form, "Object List", ScriptHawk.UI.col(10) + ScriptHawk.UI.dropdown_offset, ScriptHawk.UI.row(2) + ScriptHawk.UI.dropdown_offset);
-	forms.setproperty(ScriptHawk.UI.form_controls["Object List Checkbox"], "Checked", true);
 end
 
 Game.OSDPosition = {2, 70};

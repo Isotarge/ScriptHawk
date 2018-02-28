@@ -151,6 +151,7 @@ function Game.detectVersion(romName, romHash)
 	ScriptHawk.dpad.key.enabled = false;
 	ScriptHawk.hitboxDefaultWidth = 16;
 	ScriptHawk.hitboxDefaultHeight = 16;
+	ScriptHawk.hitboxDefaultColor = colors.red;
 	return true;
 end
 
@@ -211,18 +212,11 @@ function Game.getYVelocity()
 	return mainmemory.read_s16_le(object_array_base + object_fields.y_velocity) / 256;
 end
 
-local draggedObjects = {};
 function Game.getHitboxes()
 	local hitboxes = {};
-	local row = 0;
-	local height = 16; -- Text row height
-	local width = 8; -- Text column width
-	local objectTypeTable = nil;
-
-	local drawList = forms.ischecked(ScriptHawk.UI.form_controls["Object List Checkbox"]);
-
 	local mapX = Game.getMapX();
 	local mapY = Game.getMapY();
+
 	for i = 0, object_array_capacity do
 		local hitbox = {
 			objectBase = object_array_base + (i * object_size),
@@ -230,6 +224,7 @@ function Game.getHitboxes()
 		local objectType = mainmemory.readbyte(hitbox.objectBase + object_fields.object_type);
 		if objectType > 0 then
 			hitbox.dragTag = hitbox.objectBase;
+			hitbox.objectType = "Unknown "..toHexString(objectType);
 			hitbox.xOffset = -mapX;
 			hitbox.yOffset = -mapY - 105;
 			hitbox.x = mainmemory.read_s16_le(hitbox.objectBase + object_fields.x_position);
@@ -237,29 +232,16 @@ function Game.getHitboxes()
 			hitbox.currentHP = mainmemory.readbyte(hitbox.objectBase + object_fields.currentHP);
 
 			if type(object_fields.object_types[objectType]) == "table" then
-				objectTypeTable = object_fields.object_types[objectType];
+				local objectTypeTable = object_fields.object_types[objectType];
+				hitbox.color = objectTypeTable.color or colors.white;
+				hitbox.width = objectTypeTable.hitbox_width;
+				hitbox.height = objectTypeTable.hitbox_height;
 
 				if type(objectTypeTable.name) == "string" then
 					hitbox.objectType = objectTypeTable.name;
-				else
-					hitbox.objectType = "Unknown "..toHexString(objectType);
 				end
-
-				if type(objectTypeTable.hitbox_width) == "number" then
-					hitbox.width = objectTypeTable.hitbox_width;
-				end
-				if type(objectTypeTable.hitbox_height) == "number" then
-					hitbox.height = objectTypeTable.hitbox_height;
-				end
-			else
-				hitbox.color = colors.red;
-				hitbox.objectType = "Unknown "..toHexString(objectType);
 			end
 
-			if drawList then
-				gui.text(2, 2 + height * row, hitbox.x..", "..hitbox.y.." - "..hitbox.objectType.." "..hitbox.currentHP.."HP "..toHexString(hitbox.objectBase), hitbox.color, 'bottomright');
-				row = row + 1;
-			end
 			table.insert(hitboxes, hitbox);
 		end
 	end
@@ -285,9 +267,8 @@ function Game.getHitboxStaticText(hitbox)
 	end
 end
 
-function Game.initUI()
-	ScriptHawk.UI.form_controls["Object List Checkbox"] = forms.checkbox(ScriptHawk.UI.options_form, "Object List", ScriptHawk.UI.col(10) + ScriptHawk.UI.dropdown_offset, ScriptHawk.UI.row(2) + ScriptHawk.UI.dropdown_offset);
-	forms.setproperty(ScriptHawk.UI.form_controls["Object List Checkbox"], "Checked", true);
+function Game.getHitboxListText(hitbox)
+	return hitbox.x..", "..hitbox.y.." - "..hitbox.objectType.." "..hitbox.currentHP.."HP "..toHexString(hitbox.objectBase);
 end
 
 Game.OSDPosition = {2, 70};

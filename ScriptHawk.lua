@@ -28,6 +28,11 @@ ScriptHawk = {
 	hitboxModeX2Y2 = 2,
 	hitboxDefaultColor = 0xFFFFFFFF, -- White
 	hitboxDefaultBGColor = 0x33000000, -- Translucent black
+	hitboxListPosition = {
+		x = 2,
+		y = 2,
+	},
+	hitboxListAnchor = "bottomright",
 };
 
 ScriptHawk.hitboxDefaultMode = ScriptHawk.hitboxModeWH;
@@ -315,10 +320,9 @@ end
 
 local supportedGames = {
 	-- Alex Kidd in Miracle World
-	-- TODO: Somehow support self contained modules with while true loops...
-	--["6E8E702E1D8A893EE698B93F5807972A"] = {moduleName="beta.Miracle World", selfContained=true, friendlyName="Alex Kidd in Miracle World (J)"},
-	--["3D9A8D5C2D6D3F8FF63A8F7C77FFA983"] = {moduleName="beta.Miracle World", selfContained=true, friendlyName="Alex Kidd in Miracle World (UE)"},
-	--["F43E74FFEC58DDF62F0B8667D31F22C0"] = {moduleName="beta.Miracle World", selfContained=true, friendlyName="Alex Kidd in Miracle World (UE) (Rev 1)"},
+	["6E8E702E1D8A893EE698B93F5807972A"] = {moduleName="games.miracle_world", friendlyName="Alex Kidd in Miracle World (J)"},
+	["3D9A8D5C2D6D3F8FF63A8F7C77FFA983"] = {moduleName="games.miracle_world", friendlyName="Alex Kidd in Miracle World (UE)"},
+	["F43E74FFEC58DDF62F0B8667D31F22C0"] = {moduleName="games.miracle_world", friendlyName="Alex Kidd in Miracle World (UE) (Rev 1)"},
 
 	-- Banjo
 	["90726D7E7CD5BF6CDFD38F45C9ACBF4D45BD9FD8"] = {moduleName="games.bk", friendlyName="Banjo to Kazooie no Daibouken (Japan)"},
@@ -948,8 +952,16 @@ end
 if type(Game.getHitboxes) == "function" then
 	ScriptHawk.UI.form_controls["Show Hitboxes Checkbox"] = forms.checkbox(ScriptHawk.UI.options_form, "Hitboxes", ScriptHawk.UI.col(10) + ScriptHawk.UI.dropdown_offset, ScriptHawk.UI.row(0) + ScriptHawk.UI.dropdown_offset);
 	forms.setproperty(ScriptHawk.UI.form_controls["Show Hitboxes Checkbox"], "Checked", true);
+	local showListRow = 2;
 	if type(Game.setHitboxPosition) == "function" and not TASSafe then
 		ScriptHawk.UI.form_controls["Draggable Hitboxes Checkbox"] = forms.checkbox(ScriptHawk.UI.options_form, "Draggable", ScriptHawk.UI.col(10) + ScriptHawk.UI.dropdown_offset, ScriptHawk.UI.row(1) + ScriptHawk.UI.dropdown_offset);
+	else
+		showListRow = 1; -- Move "Show List" checkbox up one row if Draggable checkbox is not drawn
+	end
+	if type(Game.getHitboxListText) == "function" then
+		ScriptHawk.UI.form_controls["Show List Checkbox"] = forms.checkbox(ScriptHawk.UI.options_form, "Show List", ScriptHawk.UI.col(10) + ScriptHawk.UI.dropdown_offset, ScriptHawk.UI.row(showListRow) + ScriptHawk.UI.dropdown_offset);
+		forms.setproperty(ScriptHawk.UI.form_controls["Show List Checkbox"], "Checked", true);
+		forms.setproperty(ScriptHawk.UI.form_controls["Show List Checkbox"], "Height", 22);
 	end
 end
 
@@ -1594,15 +1606,15 @@ function ScriptHawk.drawHitboxes()
 		return;
 	end
 
-	local height = 16; -- Text row height
-	local width = 8; -- Text column width
-	local mouse = input.getmouse();
-	local bufferWidth = client.bufferwidth();
-	local bufferHeight = client.bufferheight();
+	local row = 0; -- Text row
+	local mouse = input.getmouse(); -- TODO: Can we use mouse_state.current?
+	local bufferWidth = client.bufferwidth(); -- TODO: We should set up some once per frame stuff that calls this stuff to reduce overhead
+	local bufferHeight = client.bufferheight(); -- TODO: We should set up some once per frame stuff that calls this stuff to reduce overhead
 	local isSMS = emu.getsystemid() == "SMS";
 	local mouseIsOnScreen = (mouse.X >= 0 and mouse.X < bufferWidth) and (mouse.Y >= 0 and mouse.Y < bufferHeight);
 	local showHitboxes = type(ScriptHawk.UI.form_controls["Show Hitboxes Checkbox"]) ~= "nil" and forms.ischecked(ScriptHawk.UI.form_controls["Show Hitboxes Checkbox"]);
 	local enableDraggableHitboxes = type(ScriptHawk.UI.form_controls["Draggable Hitboxes Checkbox"]) ~= "nil" and forms.ischecked(ScriptHawk.UI.form_controls["Draggable Hitboxes Checkbox"]);
+	local drawList = type(ScriptHawk.UI.form_controls["Show List Checkbox"]) ~= "nil" and forms.ischecked(ScriptHawk.UI.form_controls["Show List Checkbox"]);
 
 	-- Draw mouse pixel
 	--gui.drawPixel(mouse.X, mouse.Y, colors.red);
@@ -1627,7 +1639,6 @@ function ScriptHawk.drawHitboxes()
 		end
 	end
 
-	--local row = 0;
 	local hitboxes = Game.getHitboxes();
 	for i = 1, #hitboxes do
 		local hitbox = hitboxes[i];
@@ -1710,26 +1721,24 @@ function ScriptHawk.drawHitboxes()
 				for t = 1, #renderedText do
 					maxLength = math.max(maxLength, string.len(renderedText[t]));
 				end
-				local safeX = math.max(0, math.min(x1, bufferWidth - (maxLength * width)));
-				local safeY = math.max(0, math.min(y1, bufferHeight - (#renderedText * height)));
+				local safeX = math.max(0, math.min(x1, bufferWidth - (maxLength * 8)));
+				local safeY = math.max(0, math.min(y1, bufferHeight - (#renderedText * 16)));
 
 				if isStaticText and (safeX ~= x1 or safeY ~= y1) then
 					-- Don't render static text for hitboxes that are off screen
 				else
 					for t = 1, #renderedText do
-						gui.drawText(safeX, safeY + ((t - 1) * height), renderedText[t], color, bgcolor);
+						gui.drawText(safeX, safeY + ((t - 1) * 16), renderedText[t], color, bgcolor);
 					end
 				end
 			end
 			gui.drawRectangle(x1, y1, hitbox.width, hitbox.height, color);
 		end
 
-		--[[
-		if forms.ischecked(ScriptHawk.UI.form_controls["Show List Checkbox"]) then
-			gui.text(2, 2 + height * row, hitbox.x..", "..hitbox.y.." - "..objectType.." "..toHexString(objectBase), color, 'bottomright');
+		if drawList then
+			gui.text(ScriptHawk.hitboxListPosition.x, ScriptHawk.hitboxListPosition.y + Game.OSDRowHeight * row, Game.getHitboxListText(hitbox), hitbox.color, ScriptHawk.hitboxListAnchor);
 			row = row + 1;
 		end
-		--]]
 	end
 end
 

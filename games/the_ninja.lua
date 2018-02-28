@@ -33,7 +33,7 @@ local object_array_capacity = 27;
 local max_player_projectiles = 3;
 local max_enemies = 7;
 
-object_fields = {
+local object_fields = {
 	object_type = 0x00, -- Byte
 	object_types = {
 		[0x01] = {name = "Player", color = colors.yellow},
@@ -223,6 +223,15 @@ function Game.getBossHealth()
 	return 0;
 end
 
+-- Hacky method to hide OSD row
+-- TODO: Figure out a way to do this without hacks in the OSD API
+function Game.colorBossHealth()
+	if Game.isBossLoaded() then
+		return colors.white;
+	end
+	return colors.transparent;
+end
+
 function Game.getDColor()
 	if math.abs(ScriptHawk.getDX()) > 0 or math.abs(ScriptHawk.getDY()) > 0 then
 		return colors.white;
@@ -230,23 +239,7 @@ function Game.getDColor()
 	return colors.red;
 end
 
-Game.standardOSD = {
-	{"X", Game.getPlayerXPosition},
-	{"Y", Game.getPlayerYPosition},
-	{"Level X", Game.getLevelXPosition},
-	{"Level Y", Game.getLevelYPosition},
-	{"dX", ScriptHawk.getDX, Game.getDColor},
-	{"dY", ScriptHawk.getDY, Game.getDColor},
-	{"Separator", 1},
-	{"Player Proj", Game.countPlayerProjectiles},
-	{"Hits", Game.getHitsOSD},
-	{"Ratio", Game.getHitRatio},
-	{"Separator", 1},
-	{"Objects", Game.countObjects},
-	{"Enemies", Game.countEnemies},
-};
-
-Game.bossOSD = {
+Game.OSD = {
 	{"X", Game.getPlayerXPosition},
 	{"Y", Game.getPlayerYPosition},
 	{"Level X", Game.getLevelXPosition},
@@ -261,28 +254,11 @@ Game.bossOSD = {
 	{"Objects", Game.countObjects},
 	{"Enemies", Game.countEnemies},
 	{"Separator", 1},
-	{"Boss Health", Game.getBossHealth},
+	{"Boss Health", Game.getBossHealth, Game.colorBossHealth},
 };
-
-Game.OSD = Game.standardOSD;
-
-function Game.initUI()
-	ScriptHawk.UI.form_controls["showList"] = forms.checkbox(ScriptHawk.UI.options_form, "Show List", ScriptHawk.UI.col(10) + ScriptHawk.UI.dropdown_offset, ScriptHawk.UI.row(2) + ScriptHawk.UI.dropdown_offset);
-end
-
-function Game.drawUI()
-	if Game.isBossLoaded() then
-		Game.OSD = Game.bossOSD;
-	else
-		Game.OSD = Game.standardOSD;
-	end
-end
 
 function Game.getHitboxes()
 	local hitboxes = {};
-	local row = 0;
-	local height = 16; -- Text row height
-	local width = 8; -- Text column width
 	for i = 0, object_array_capacity do
 		local hitbox = {
 			objectBase = Game.Memory.object_array_base + (i * object_size),
@@ -295,30 +271,19 @@ function Game.getHitboxes()
 			hitbox.y = mainmemory.read_s16_le(hitbox.objectBase + object_fields.y_position);
 
 			if type(object_fields.object_types[objectType]) == "table" then
-				objectTypeTable = object_fields.object_types[objectType];
+				local objectTypeTable = object_fields.object_types[objectType];
 
 				if type(objectTypeTable.name) == "string" then
 					hitbox.objectType = objectTypeTable.name.." "..toHexString(objectType);
-				else
-					hitbox.objectType = "Unknown ("..toHexString(objectType)..")";
 				end
 
-				hitbox.color = objectTypeTable.color or hitbox.color or colors.white;
-
-				hitbox.xOffset = objectTypeTable.hitbox_x_offset or hitbox.xOffset or 0;
-				hitbox.yOffset = objectTypeTable.hitbox_y_offset or hitbox.yOffset or 0;
-
-				hitbox.width = objectTypeTable.hitbox_width or hitbox.width;
-				hitbox.height = objectTypeTable.hitbox_height or hitbox.height;
-			else
-				hitbox.color = colors.black;
+				hitbox.color = objectTypeTable.color or colors.white;
+				hitbox.xOffset = objectTypeTable.hitbox_x_offset;
+				hitbox.yOffset = objectTypeTable.hitbox_y_offset;
+				hitbox.width = objectTypeTable.hitbox_width;
+				hitbox.height = objectTypeTable.hitbox_height;
 			end
 			table.insert(hitboxes, hitbox);
-
-			if forms.ischecked(ScriptHawk.UI.form_controls.showList) then
-				gui.text(2, 2 + height * row, hitbox.x..", "..hitbox.y.." - "..hitbox.objectType.." "..toHexString(hitbox.objectBase), hitbox.color, 'bottomright');
-				row = row + 1;
-			end
 		end
 	end
 	return hitboxes;
@@ -334,6 +299,10 @@ function Game.getHitboxMouseOverText(hitbox)
 		hitbox.objectType,
 		toHexString(hitbox.objectBase).." "..hitbox.x..","..hitbox.y,
 	};
+end
+
+function Game.getHitboxListText(hitbox)
+	return hitbox.x..", "..hitbox.y.." - "..hitbox.objectType.." "..toHexString(hitbox.objectBase);
 end
 
 return Game;
