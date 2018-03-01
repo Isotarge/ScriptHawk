@@ -113,8 +113,8 @@ local object_fields = {
 	},
 	state = 0x01, -- Byte
 	active = 0x09, -- u16, 0x0000
-	x_position = 0x0C, -- Byte
-	y_position = 0x0E, -- Byte
+	x_position = 0x0C, -- Byte -- TODO: Subpixel and screen wrap stuff, you know the drill
+	y_position = 0x0E, -- Byte -- TODO: Subpixel and screen wrap stuff, you know the drill
 	x_velocity = 0x10, -- S8
 	y_velocity = 0x12, -- S8
 	janken_decision = 0x17, -- Byte

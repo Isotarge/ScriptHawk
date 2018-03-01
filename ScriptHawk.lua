@@ -397,7 +397,7 @@ local supportedGames = {
 	["3F183BD8A7360E3BE3CF65AE8FF9810C"] = {moduleName="beta.Galahad", selfContained=true, friendlyName="Legend of Galahad, The (UE) [t1]"},
 
 	-- Golden Axe Warrior
-	["D46E40BBB729BA233F171AD7BF6169F5"] = {moduleName="beta.Golden Axe Warrior", selfContained=true, friendlyName="Golden Axe Warrior (UE)"},
+	["D46E40BBB729BA233F171AD7BF6169F5"] = {moduleName="games.golden_axe_warrior", friendlyName="Golden Axe Warrior (UE)"},
 
 	-- Golvellius
 	["2101295C258CB6B845BDB72BE617691D"] = {moduleName="beta.Golvellius", selfContained=true, friendlyName="Golvellius (UE)"},
