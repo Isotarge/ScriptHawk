@@ -44,8 +44,6 @@ function Game.getHitboxes()
 		table.insert(hitboxes, {
 			xPosAddress = object_fields.x_position + i,
 			yPosAddress = object_fields.y_position + i,
-			x = mainmemory.read_u8(object_fields.x_position + i),
-			y = mainmemory.read_u8(object_fields.y_position + i),
 			typeValue = mainmemory.readbyte(object_fields.object_type + i),
 		});
 	end
@@ -54,8 +52,6 @@ function Game.getHitboxes()
 		table.insert(hitboxes, {
 			xPosAddress = projectile_fields.x_position + i,
 			yPosAddress = projectile_fields.y_position + i,
-			x = mainmemory.read_u8(projectile_fields.x_position + i),
-			y = mainmemory.read_u8(projectile_fields.y_position + i),
 			typeValue = 1, -- TODO: need to find this
 		});
 	end
@@ -63,6 +59,8 @@ function Game.getHitboxes()
 	for i = 1, #hitboxes do
 		local hitbox = hitboxes[i];
 		hitbox.type = "Unknown ("..toHexString(hitbox.typeValue)..")";
+		hitbox.x = mainmemory.read_u8(hitbox.xPosAddress);
+		hitbox.y = mainmemory.read_u8(hitbox.yPosAddress);
 		hitbox.index = i;
 		hitbox.dragTag = i;
 

@@ -271,12 +271,8 @@ local function draw_map()
 	local row_height = 8;
 	local column_width = 16;
 	for i = 1, #Game.Memory.map_addresses do
-		local draw_x = 51;
-		local draw_y = 124;
-		if client.bufferheight() == 243 then -- Compensate for overscan
-			draw_x = 64;
-			draw_y = 151;
-		end
+		local draw_x = 51 + ScriptHawk.overscan_compensation.x;
+		local draw_y = 124 + ScriptHawk.overscan_compensation.y;
 		local row = math.floor((i - 1) / 9);
 		value = mainmemory.readbyte(Game.Memory.map_addresses[i]);
 		if value > 0x80 then
@@ -333,12 +329,8 @@ local function draw_puzzle()
 		piece1HFlipped = "";
 	end
 
-	local puzzleX = 44;
-	local puzzleY = 123;
-	if client.bufferheight() == 243 then -- Compensate for overscan
-		puzzleX = 57;
-		puzzleY = 150;
-	end
+	local puzzleX = 44 + ScriptHawk.overscan_compensation.x;
+	local puzzleY = 123 + ScriptHawk.overscan_compensation.y;
 
 	gui.drawText(puzzleX, puzzleY, piece0Major.."-"..piece0Minor.." "..piece0HFlipped..piece0VFlipped, colors.white, colors.transparent);
 	gui.drawText(puzzleX, puzzleY + 24, piece1Major.."-"..piece1Minor.." "..piece1HFlipped..piece1VFlipped, colors.white, colors.transparent);
@@ -389,12 +381,8 @@ local default_hitbox_height = 16;
 local function draw_objects()
 	local currentMap = mainmemory.readbyte(Game.Memory.current_map);
 	if type(object_arrays[currentMap]) == "table" then
-		local x_offset = 4;
-		local y_offset = 0;
-		if client.bufferheight() == 243 then -- Compensate for overscan
-			x_offset = 17;
-			y_offset = 27;
-		end
+		local x_offset = 4 + ScriptHawk.overscan_compensation.x;
+		local y_offset = 0 + ScriptHawk.overscan_compensation.y;
 		for i = 1, object_arrays[currentMap].objects do
 			local objectBase = object_arrays[currentMap].start + (i - 1) * 4;
 			local id = mainmemory.readbyte(objectBase + object.obj_type);

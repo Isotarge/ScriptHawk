@@ -666,7 +666,7 @@ function Game.eachFrame()
 	if forms.ischecked(ScriptHawk.UI.form_controls["mouse_control"]) then
 		-- Make game cursor follow real cursor
 		local mousePos = input.getmouse();
-		if mousePos.X >= 0 and mousePos.X <= client.bufferwidth() and mousePos.Y >= 0 and mousePos.Y <= client.bufferheight() then
+		if mousePos.X >= 0 and mousePos.X <= ScriptHawk.bufferWidth and mousePos.Y >= 0 and mousePos.Y <= ScriptHawk.bufferHeight then
 			Game.setXPosition(mousePos.X * 2);
 			Game.setYPosition((mousePos.Y * 2) - 40); -- Minus 40 pixels to compensate for Overscan
 

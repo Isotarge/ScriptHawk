@@ -33,6 +33,13 @@ ScriptHawk = {
 		y = 2,
 	},
 	hitboxListAnchor = "bottomright",
+	overscan_compensation = {
+		x = 0,
+		y = 0,
+	},
+	isSMS = emu.getsystemid() == "SMS",
+	bufferWidth = client.bufferwidth(),
+	bufferHeight = client.bufferheight(),
 };
 
 ScriptHawk.hitboxDefaultMode = ScriptHawk.hitboxModeWH;
@@ -405,8 +412,8 @@ local supportedGames = {
 	["D46E40BBB729BA233F171AD7BF6169F5"] = {moduleName="games.golden_axe_warrior", friendlyName="Golden Axe Warrior (UE)"},
 
 	-- Golvellius
-	["2101295C258CB6B845BDB72BE617691D"] = {moduleName="beta.Golvellius", selfContained=true, friendlyName="Golvellius (UE)"},
-	["6BD9879AF39E248D149761014EBF5639"] = {moduleName="beta.Golvellius", selfContained=true, friendlyName="Golvellius (J)"},
+	["2101295C258CB6B845BDB72BE617691D"] = {moduleName="games.golvellius", friendlyName="Golvellius (UE)"},
+	["6BD9879AF39E248D149761014EBF5639"] = {moduleName="games.golvellius", friendlyName="Golvellius (J)"},
 
 	-- Impossible Mission
 	["AF51AB03A173DEC28C9241532227CD64"] = {moduleName="games.impossible_mission", friendlyName="Impossible Mission (E)"},
@@ -1369,6 +1376,22 @@ local function plot_pos()
 		override_lag_detection = forms.ischecked(ScriptHawk.UI.form_controls["Override Lag Detection"]);
 	end
 
+	-- Compensate for overscan (SMS)
+	if ScriptHawk.isSMS then
+		ScriptHawk.bufferWidth = client.bufferwidth();
+		ScriptHawk.bufferHeight = client.bufferheight();
+		if ScriptHawk.bufferHeight == 243 then -- NTSC
+			ScriptHawk.overscan_compensation.x = 13;
+			ScriptHawk.overscan_compensation.y = 27;
+		elseif ScriptHawk.bufferHeight == 288 then -- PAL
+			ScriptHawk.overscan_compensation.x = 13;
+			ScriptHawk.overscan_compensation.y = 48;
+		else -- No Overscan
+			ScriptHawk.overscan_compensation.x = 0;
+			ScriptHawk.overscan_compensation.y = 0;
+		end
+	end
+
 	ScriptHawk.processKeybinds(ScriptHawk.keybindsFrame);
 	ScriptHawk.processKeybinds(ScriptHawk.joypadBindsFrame);
 	Game.eachFrame();
@@ -1613,10 +1636,7 @@ function ScriptHawk.drawHitboxes()
 
 	local row = 0; -- Text row
 	local mouse = input.getmouse(); -- TODO: Can we use mouse_state.current?
-	local bufferWidth = client.bufferwidth(); -- TODO: We should set up some once per frame stuff that calls this stuff to reduce overhead
-	local bufferHeight = client.bufferheight(); -- TODO: We should set up some once per frame stuff that calls this stuff to reduce overhead
-	local isSMS = emu.getsystemid() == "SMS";
-	local mouseIsOnScreen = (mouse.X >= 0 and mouse.X < bufferWidth) and (mouse.Y >= 0 and mouse.Y < bufferHeight);
+	local mouseIsOnScreen = (mouse.X >= 0 and mouse.X < ScriptHawk.bufferWidth) and (mouse.Y >= 0 and mouse.Y < ScriptHawk.bufferHeight);
 	local showHitboxes = type(ScriptHawk.UI.form_controls["Show Hitboxes Checkbox"]) ~= "nil" and forms.ischecked(ScriptHawk.UI.form_controls["Show Hitboxes Checkbox"]);
 	local enableDraggableHitboxes = type(ScriptHawk.UI.form_controls["Draggable Hitboxes Checkbox"]) ~= "nil" and forms.ischecked(ScriptHawk.UI.form_controls["Draggable Hitboxes Checkbox"]);
 	local drawList = type(ScriptHawk.UI.form_controls["Show List Checkbox"]) ~= "nil" and forms.ischecked(ScriptHawk.UI.form_controls["Show List Checkbox"]);
@@ -1676,15 +1696,8 @@ function ScriptHawk.drawHitboxes()
 
 		local hitboxXOffset = hitbox.xOffset or ScriptHawk.hitboxDefaultXOffset or 0;
 		local hitboxYOffset = hitbox.yOffset or ScriptHawk.hitboxDefaultYOffset or 0;
-		if isSMS then -- Compensate for overscan (SMS)
-			if bufferHeight == 243 then -- NTSC
-				hitboxXOffset = hitboxXOffset + 13;
-				hitboxYOffset = hitboxYOffset + 27;
-			elseif bufferHeight == 288 then -- PAL
-				hitboxXOffset = hitboxXOffset + 13;
-				hitboxYOffset = hitboxYOffset + 48;
-			end
-		end
+		hitboxXOffset = hitboxXOffset + ScriptHawk.overscan_compensation.x;
+		hitboxYOffset = hitboxYOffset + ScriptHawk.overscan_compensation.y;
 
 		x1 = x1 + hitboxXOffset;
 		x2 = x2 + hitboxXOffset;
@@ -1726,8 +1739,8 @@ function ScriptHawk.drawHitboxes()
 				for t = 1, #renderedText do
 					maxLength = math.max(maxLength, string.len(renderedText[t]));
 				end
-				local safeX = math.max(0, math.min(x1, bufferWidth - (maxLength * 8)));
-				local safeY = math.max(0, math.min(y1, bufferHeight - (#renderedText * 16)));
+				local safeX = math.max(0, math.min(x1, ScriptHawk.bufferWidth - (maxLength * 8)));
+				local safeY = math.max(0, math.min(y1, ScriptHawk.bufferHeight - (#renderedText * 16)));
 
 				if isStaticText and (safeX ~= x1 or safeY ~= y1) then
 					-- Don't render static text for hitboxes that are off screen
