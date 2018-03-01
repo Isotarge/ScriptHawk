@@ -108,6 +108,7 @@ While ScriptHawk does have basic support for OoT and MM there are people who are
 
 ## Other Supported Games
 - Alex Kidd in Miracle World (SMS)
+- Balloon Fight (NES)
 - Drill Dozer (GBA)
 - Golden Axe Warrior (SMS)
 - Impossible Mission (SMS)

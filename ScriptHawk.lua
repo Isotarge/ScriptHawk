@@ -324,6 +324,11 @@ local supportedGames = {
 	["3D9A8D5C2D6D3F8FF63A8F7C77FFA983"] = {moduleName="games.miracle_world", friendlyName="Alex Kidd in Miracle World (UE)"},
 	["F43E74FFEC58DDF62F0B8667D31F22C0"] = {moduleName="games.miracle_world", friendlyName="Alex Kidd in Miracle World (UE) (Rev 1)"},
 
+	-- Balloon Fight
+	["3F597CE54843187CCA85ADAA7E26F46FAE4992B5"] = {moduleName="games.balloon_fight", friendlyName="Balloon Fight"},
+	["BE2C30D69B1EBA76EAF1CC259DFA41F0F29B0FB2"] = {moduleName="games.balloon_fight", friendlyName="Balloon Fight"},
+	["F7E96381736E679C1E996283C2BE718025A02C0D"] = {moduleName="games.balloon_fight", friendlyName="Balloon Fight (PC10)"},
+
 	-- Banjo
 	["90726D7E7CD5BF6CDFD38F45C9ACBF4D45BD9FD8"] = {moduleName="games.bk", friendlyName="Banjo to Kazooie no Daibouken (Japan)"},
 	["5A5172383037D171F121790959962703BE1F373C"] = {moduleName="games.bt", friendlyName="Banjo to Kazooie no Daibouken 2 (Japan)"},
