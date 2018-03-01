@@ -107,7 +107,9 @@ While ScriptHawk does have basic support for OoT and MM there are people who are
 - [glankk/gz](https://github.com/glankk/gz)
 
 ## Other Supported Games
+- Alex Kidd in Miracle World (SMS)
 - Drill Dozer (GBA)
+- Golden Axe Warrior (SMS)
 - Impossible Mission (SMS)
 - Lord of the Sword (SMS)
 - Metroid (NES)
@@ -123,14 +125,12 @@ While ScriptHawk does have basic support for OoT and MM there are people who are
 - Earthworm Jim 3D (N64)
 
 ## Partially Supported Games
-- Alex Kidd in Miracle World (SMS)
 - Elmo's Number Journey (N64 only)
 - Elmo's Letter Adventure (N64 only)
 - Rayman 2 (N64 only)
 - San Francisco Rush 2049 (N64 only)
 
 ## Other Included Scripts
-- [Golden Axe Warrior](Beta/Golden%20Axe%20Warrior.lua) object viewer with drag and drop support
 - [Golvellius](Beta/Golvellius.lua) object viewer with drag and drop support
 - [Tetris Attack](Tetris%20Attack%20Bot.lua) bot, plays the game quite well using a simple sorting algorithm
 - [Mr. Driller 2](Beta/Drillbot.lua) bot
