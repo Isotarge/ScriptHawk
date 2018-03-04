@@ -208,7 +208,7 @@ local function mainloop()
 			lagCount = lagCount + 1;
 		else
 			local ratio = math.min(1, math.max(0, lagCount - 1) / math.max(1, getSetting("redzone")));
-			table.insert(previous, {['lag'] = lagCount, ['ratio'] = ratio, ['mode'] = "vframe"});
+			table.insert(previous, {lag = lagCount, ratio = ratio, mode = "vframe"});
 			if #previous > getSetting("trackedPeriods") then
 				shufflePrevious();
 				recalculateRatios();
@@ -224,7 +224,7 @@ local function mainloop()
 
 		if frameCount >= getSetting("resolution") then
 			local ratio = (lagCount - getSetting("ignore")) / (frameCount - getSetting("ignore"));
-			table.insert(previous, {['lag'] = lagCount, ['frames'] = frameCount, ['ratio'] = ratio, ['mode'] = "normal"});
+			table.insert(previous, {lag = lagCount, frames = frameCount, ratio = ratio, mode = "normal"});
 			if #previous > getSetting("trackedPeriods") then
 				shufflePrevious();
 			end

@@ -116,7 +116,7 @@ function ScriptHawk.bind(keybindArray, key, callback, preventHold)
 		if type(preventHold) ~= 'boolean' then
 			preventHold = true;
 		end
-		table.insert(keybindArray, {['key'] = key, ['callback'] = callback, ['pressed'] = false, ['preventHold'] = preventHold});
+		table.insert(keybindArray, {key = key, callback = callback, pressed = false, preventHold = preventHold});
 	end
 end
 
