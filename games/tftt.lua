@@ -663,7 +663,7 @@ function Game.getSuspendedMen()
 end
 
 function Game.eachFrame()
-	if forms.ischecked(ScriptHawk.UI.form_controls["mouse_control"]) then
+	if forms.ischecked(ScriptHawk.UI.form_controls.mouse_control) then
 		-- Make game cursor follow real cursor
 		local mousePos = input.getmouse();
 		if mousePos.X >= 0 and mousePos.X <= ScriptHawk.bufferWidth and mousePos.Y >= 0 and mousePos.Y <= ScriptHawk.bufferHeight then
@@ -671,15 +671,15 @@ function Game.eachFrame()
 			Game.setYPosition((mousePos.Y * 2) - 40); -- Minus 40 pixels to compensate for Overscan
 
 			if mousePos.Left then
-				joypad.set({["B"] = true}, 1);
+				joypad.set({B = true}, 1);
 			end
 			if mousePos.Right then
-				joypad.set({["C"] = true}, 1);
+				joypad.set({C = true}, 1);
 			end
 		end
 	end
 
-	if forms.ischecked(ScriptHawk.UI.form_controls["sandbox_mode"]) then
+	if forms.ischecked(ScriptHawk.UI.form_controls.sandbox_mode) then
 		local you = mainmemory.read_u16_be(Game.Memory.character);
 		for i = numSectors, 1, -1 do
 			local sector = sectorBase + (i - 1) * sectorSize;
@@ -706,14 +706,14 @@ function Game.eachFrame()
 end
 
 function Game.initUI()
-	ScriptHawk.UI.form_controls["build_all"] = forms.button(ScriptHawk.UI.options_form, "Build All", Game.buildAll, ScriptHawk.UI.col(10), ScriptHawk.UI.row(4), ScriptHawk.UI.col(4) + 10, ScriptHawk.UI.button_height);
-	ScriptHawk.UI.form_controls["mouse_control"] = forms.checkbox(ScriptHawk.UI.options_form, "Mouse Control", ScriptHawk.UI.col(0) + ScriptHawk.UI.dropdown_offset, ScriptHawk.UI.row(6) + ScriptHawk.UI.dropdown_offset);
-	ScriptHawk.UI.form_controls["sandbox_mode"] = forms.checkbox(ScriptHawk.UI.options_form, "Sandbox Mode", ScriptHawk.UI.col(0) + ScriptHawk.UI.dropdown_offset, ScriptHawk.UI.row(7) + ScriptHawk.UI.dropdown_offset);
+	ScriptHawk.UI.form_controls.build_all = forms.button(ScriptHawk.UI.options_form, "Build All", Game.buildAll, ScriptHawk.UI.col(10), ScriptHawk.UI.row(4), ScriptHawk.UI.col(4) + 10, ScriptHawk.UI.button_height);
+	ScriptHawk.UI.form_controls.mouse_control = forms.checkbox(ScriptHawk.UI.options_form, "Mouse Control", ScriptHawk.UI.col(0) + ScriptHawk.UI.dropdown_offset, ScriptHawk.UI.row(6) + ScriptHawk.UI.dropdown_offset);
+	ScriptHawk.UI.form_controls.sandbox_mode = forms.checkbox(ScriptHawk.UI.options_form, "Sandbox Mode", ScriptHawk.UI.col(0) + ScriptHawk.UI.dropdown_offset, ScriptHawk.UI.row(7) + ScriptHawk.UI.dropdown_offset);
 end
 
 Game.OSD = {
-	{"X", Game.getXPosition, Game.colorCursorIsMoving},
-	{"Y", Game.getYPosition, Game.colorCursorIsMoving},
+	{"X", nil, Game.colorCursorIsMoving},
+	{"Y", nil, Game.colorCursorIsMoving},
 	{"dX"},
 	{"dY"},
 	{"Ticker Speed", Game.getTickerSpeed},

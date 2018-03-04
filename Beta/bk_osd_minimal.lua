@@ -10,26 +10,26 @@ local prev_x = 0.0;
 local prev_z = 0.0;
 
 local Game = {
-	["Memory"] = {
+	Memory = {
 		-- Version order: Europe, Japan, US 1.1, US 1.0
-		["frame_timer"] = {0x280700, 0x27F718, 0x27F718, 0x2808D8},
-		["slope_timer"] = {0x37CCB4, 0x37CDE4, 0x37B4E4, 0x37C2E4},
-		["player_grounded"] = {0x37C930, 0x37CA60, 0x37B160, 0x37BF60},
-		["wall_collisions"] = {0x37CC4D, 0x37CD7D, 0x37B47D, 0x37C27D},
-		["floor_object_pointer"] = {0x37CBD0, 0x37CD00, 0x37B400, 0x37C200},
-		["x_velocity"] = {0x37CE88, 0x37CFB8, 0x37B6B8, 0x37C4B8},
-		["y_velocity"] = {0x37CE8C, 0x37CFBC, 0x37B6BC, 0x37C4BC},
-		["z_velocity"] = {0x37CE90, 0x37CFC0, 0x37B6C0, 0x37C4C0},
-		["x_position"] = {0x37CF70, 0x37D0A0, 0x37B7A0, 0x37C5A0},
-		["y_position"] = {0x37CF74, 0x37D0A4, 0x37B7A4, 0x37C5A4},
-		["z_position"] = {0x37CF78, 0x37D0A8, 0x37B7A8, 0x37C5A8},
-		["x_rotation"] = {0x37CF10, 0x37D040, 0x37B740, 0x37C540},
-		["y_rotation"] = {0x37D060, 0x37D190, 0x37B890, 0x37C690},
-		["facing_angle"] = {0x37D060, 0x37D190, 0x37B890, 0x37C690},
-		["moving_angle"] = {0x37D064, 0x37D194, 0x37B894, 0x37C694},
-		["z_rotation"] = {0x37D050, 0x37D180, 0x37B880, 0x37C680},
-		["current_movement_state"] = {0x37DB34, 0x37DC64, 0x37C364, 0x37D164},
-		["object_array_pointer"] = {0x36EAE0, 0x36F260, 0x36D760, 0x36E560},
+		frame_timer = {0x280700, 0x27F718, 0x27F718, 0x2808D8},
+		slope_timer = {0x37CCB4, 0x37CDE4, 0x37B4E4, 0x37C2E4},
+		player_grounded = {0x37C930, 0x37CA60, 0x37B160, 0x37BF60},
+		wall_collisions = {0x37CC4D, 0x37CD7D, 0x37B47D, 0x37C27D},
+		floor_object_pointer = {0x37CBD0, 0x37CD00, 0x37B400, 0x37C200},
+		x_velocity = {0x37CE88, 0x37CFB8, 0x37B6B8, 0x37C4B8},
+		y_velocity = {0x37CE8C, 0x37CFBC, 0x37B6BC, 0x37C4BC},
+		z_velocity = {0x37CE90, 0x37CFC0, 0x37B6C0, 0x37C4C0},
+		x_position = {0x37CF70, 0x37D0A0, 0x37B7A0, 0x37C5A0},
+		y_position = {0x37CF74, 0x37D0A4, 0x37B7A4, 0x37C5A4},
+		z_position = {0x37CF78, 0x37D0A8, 0x37B7A8, 0x37C5A8},
+		x_rotation = {0x37CF10, 0x37D040, 0x37B740, 0x37C540},
+		y_rotation = {0x37D060, 0x37D190, 0x37B890, 0x37C690},
+		facing_angle = {0x37D060, 0x37D190, 0x37B890, 0x37C690},
+		moving_angle = {0x37D064, 0x37D194, 0x37B894, 0x37C694},
+		z_rotation = {0x37D050, 0x37D180, 0x37B880, 0x37C680},
+		current_movement_state = {0x37DB34, 0x37DC64, 0x37C364, 0x37D164},
+		object_array_pointer = {0x36EAE0, 0x36F260, 0x36D760, 0x36E560},
 	},
 };
 
@@ -153,6 +153,7 @@ local movementStates = {
 	[10] = "Pooping Egg",
 
 	[12] = "Skidding",
+
 	[14] = "Damaged",
 	[15] = "Beak Buster",
 	[16] = "Feathery Flap",
@@ -206,7 +207,7 @@ local movementStates = {
 	[64] = "Locked", -- Pumpkin: Pipe
 	[65] = "Death",
 	[66] = "Dingpot",
-
+	[67] = "Death", -- Termite
 	[68] = "Jig", -- Jiggy
 	[69] = "Slipping", -- Talon Trot
 
@@ -222,7 +223,6 @@ local movementStates = {
 	[81] = "Leaving Climb",
 	[82] = "Tumblar", -- Standing on Tumblar
 	[83] = "Tumblar", -- Standing on Tumblar
-
 	[84] = "Death", -- Drowning
 	[85] = "Slipping", -- Wading Boots
 	[86] = "Knockback", -- Successful enemy damage
@@ -247,19 +247,26 @@ local movementStates = {
 	[108] = "Knockback", -- Walrus
 	[109] = "Death", -- Walrus
 	[110] = "Biting", -- Croc
-
+	[111] = "EatingWrongThing", -- Croc
+	[112] = "EatingCorrectThing", -- Croc
 	[113] = "Falling", -- Talon Trot
 	[114] = "Recovering", -- Getting up after taking damage, eg. fall famage
 	[115] = "Locked", -- Cutscene
 	[116] = "Locked", -- Jiggy pad, Mumbo transformation, Bottles
 	[117] = "Locked", -- Bottles
-
+	[118] = "Locked", -- Flying
+	[119] = "Locked", -- Water Surface
 	[120] = "Locked", -- Underwater
 	[121] = "Locked", -- Holding Jiggy, Talon Trot
 	[122] = "Creeping", -- In damaging water etc
 	[123] = "Damaged", -- Talon Trot
 	[124] = "Locked", -- Sled in FP sliding down scarf
+	[125] = "Idle", -- Walrus Sled
+	[126] = "Jumping", -- Walrus Sled
 	[127] = "Damaged", -- Swimming
+	[128] = "Locked", -- Walrus Sled losing race
+	[129] = "Locked", -- Walrus Sled
+	[130] = "Locked", -- Walrus Sled In Air when losing race
 
 	[133] = "Idle", -- Bee
 	[134] = "Walking", -- Bee
@@ -281,12 +288,16 @@ local movementStates = {
 	[152] = "Locked", -- Loading zone, Mumbo transformation
 	[153] = "Locked", -- Flying
 	[154] = "Locked", -- Talon Trot
+	--[155] = "Locked??", -- In WadingBoots Set
+	--[156] = "Locked??", -- In WalrusSled Set
 	[157] = "Locked", -- Bee?
+	[158] = "Locked", -- Climbing
 	[159] = "Knockback", -- Termite, not damaged
 	[160] = "Knockback", -- Pumpkin, not damaged
 	[161] = "Knockback", -- Croc, not damaged
 	[162] = "Knockback", -- Walrus, not damaged
 	[163] = "Knockback", -- Bee, not damaged
+	--[164] = "???", -- Wonderwing
 	[165] = "Locked", -- Wonderwing
 };
 
@@ -327,10 +338,10 @@ local function getSlotBase(index)
 end
 
 local gruntyPosition = {
-	["x"] = 0,
-	["y"] = 0,
-	["z"] = 0,
-	["facing"] = 0,
+	x = 0,
+	y = 0,
+	z = 0,
+	facing = 0,
 };
 
 function Game.getGruntyXPosition()
@@ -373,46 +384,46 @@ function Game.getGruntyState()
 end
 
 local OSDs = {
-	["WithGrunty"] = {
+	WithGrunty = {
 		{"X", Game.getXPosition},
 		{"Y", Game.getYPosition},
 		{"Z", Game.getZPosition},
-		{"Separator", 1},
+		{"Separator"},
 		{"Floor", Game.getFloor},
-		{"Separator", 1},
+		{"Separator"},
 		{"Velocity", Game.getVelocity};
 		{"Y Velocity", Game.getYVelocity},
-		{"Separator", 1},
+		{"Separator"},
 		{"X Rotation", Game.getXRotation},
 		{"Angle", Game.getMovingAngle},
 		{"Moving Angle", Game.getCalculatedMovingAngle},
-		{"Separator", 1},
+		{"Separator"},
 		{"Movement", Game.getCurrentMovementState},
 		{"Wall Collisions", Game.getWallCollisions},
 		{"Grounded", Game.getGroundState},
 		{"Slope Timer", Game.getSlopeTimer},
-		{"Separator", 1},
+		{"Separator"},
 		{"Grunty State", Game.getGruntyState},
-		{"Separator", 1},
+		{"Separator"},
 		{"Grunty X", Game.getGruntyXPosition},
 		{"Grunty Y", Game.getGruntyYPosition},
 		{"Grunty Z", Game.getGruntyZPosition},
 		{"Grunty Facing", Game.getGruntyFacingAngle},
 	},
-	["WithoutGrunty"] = {
+	WithoutGrunty = {
 		{"X", Game.getXPosition},
 		{"Y", Game.getYPosition},
 		{"Z", Game.getZPosition},
-		{"Separator", 1},
+		{"Separator"},
 		{"Floor", Game.getFloor},
-		{"Separator", 1},
+		{"Separator"},
 		{"Velocity", Game.getVelocity};
 		{"Y Velocity", Game.getYVelocity},
-		{"Separator", 1},
+		{"Separator"},
 		{"X Rotation", Game.getXRotation},
 		{"Angle", Game.getMovingAngle},
 		{"Moving Angle", Game.getCalculatedMovingAngle},
-		{"Separator", 1},
+		{"Separator"},
 		{"Movement", Game.getCurrentMovementState},
 		{"Wall Collisions", Game.getWallCollisions},
 		{"Grounded", Game.getGroundState},
@@ -423,14 +434,14 @@ local OSDs = {
 local OSD = OSDs.WithoutGrunty;
 
 angleCalc = {
-	["buttonX"] = 220,
-	["visible"] = false,
-	["form"] = nil,
-	["p1xbox"] = nil,
-	["p1zbox"] = nil,
-	["p2xbox"] = nil,
-	["p2zbox"] = nil,
-	["anglebox"] = nil,
+	buttonX = 220,
+	visible = false,
+	form = nil,
+	p1xbox = nil,
+	p1zbox = nil,
+	p2xbox = nil,
+	p2zbox = nil,
+	anglebox = nil,
 };
 
 angleCalc.setPoint1 = function()

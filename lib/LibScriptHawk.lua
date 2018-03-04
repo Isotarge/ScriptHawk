@@ -24,9 +24,9 @@ image_directory_root = ".\\Images\\";
 -- Pixel format: 16bit RGBA 5551
 -- RRRR RGGG GGBB BBBA
 local rgba5551_color_constants = {
-	["Red"] = 0x0800,
-	["Green"] = 0x0040,
-	["Blue"] = 0x0002,
+	Red = 0x0800,
+	Green = 0x0040,
+	Blue = 0x0002,
 };
 
 function replaceTextureRGBA5551(filename, base, width, height)
@@ -43,9 +43,9 @@ function replaceTextureRGBA5551(filename, base, width, height)
 	for y = 1, math.min(img.height, height) do
 		for x = 1, math.min(img.width, width) do
 			local pixel = img:getPixel(x, y);
-			local r = math.floor(pixel.R / img.depth) * rgba5551_color_constants["Red"];
-			local g = math.floor(pixel.G / img.depth) * rgba5551_color_constants["Green"];
-			local b = math.floor(pixel.B / img.depth) * rgba5551_color_constants["Blue"];
+			local r = math.floor(pixel.R / img.depth) * rgba5551_color_constants.Red;
+			local g = math.floor(pixel.G / img.depth) * rgba5551_color_constants.Green;
+			local b = math.floor(pixel.B / img.depth) * rgba5551_color_constants.Blue;
 			local a = 0;
 			if pixel.A > 0 then
 				a = 1;
@@ -498,7 +498,7 @@ function searchPointers(base, range, allowLater, suppressPrint)
 	for address = 0, RDRAMSize - 4, 4 do
 		local value = mainmemory.read_u32_be(address);
 		if value >= startAddress and value < endAddress then
-			table.insert(foundPointers, {["Address"] = toHexString(address), ["Value"] = toHexString(value)});
+			table.insert(foundPointers, {Address = toHexString(address), Value = toHexString(value)});
 			if not suppressPrint then
 				dprint(toHexString(address).." -> "..toHexString(value));
 			end
@@ -522,7 +522,7 @@ function searchPointersLE(base, range, allowLater, suppressPrint) -- Little Endi
 	for address = 0, RAMSize - 4, 4 do
 		local value = mainmemory.read_u32_le(address);
 		if value >= startAddress and value < endAddress then
-			table.insert(foundPointers, {["Address"] = toHexString(address), ["Value"] = toHexString(value)});
+			table.insert(foundPointers, {Address = toHexString(address), Value = toHexString(value)});
 			if not suppressPrint then
 				dprint(toHexString(address).." -> "..toHexString(value));
 			end
@@ -540,8 +540,8 @@ function getMemoryStats(object)
 	local nextFree = 0;
 	local prevFree = 0;
 	local memoryStats = {
-		["free"] = 0,
-		["used"] = 0,
+		free = 0,
+		used = 0,
 	};
 	if isRDRAM(object) then
 		repeat

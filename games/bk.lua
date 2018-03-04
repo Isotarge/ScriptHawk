@@ -5,7 +5,210 @@ if type(ScriptHawk) ~= "table" then
 	return;
 end
 
-local Game = {};
+local Game = {
+	Memory = { -- Version order: Europe, Japan, US 1.1, US 1.0
+		fb_pointer = {0x282E00, 0x281E20, 0x281E20, 0x282FE0},
+		frame_timer = {0x280700, 0x27F718, 0x27F718, 0x2808D8},
+		floor_object_pointer = {0x37CBD0, 0x37CD00, 0x37B400, 0x37C200},
+		carried_object_pointer = {0x37CC68, 0x37CD98, 0x37B498, 0x37C298},
+		slope_timer = {0x37CCB4, 0x37CDE4, 0x37B4E4, 0x37C2E4},
+		player_grounded = {0x37C930, 0x37CA60, 0x37B160, 0x37BF60},
+		wall_collisions = {0x37CC4D, 0x37CD7D, 0x37B47D, 0x37C27D},
+		moves_bitfield = {0x37CD70, 0x37CEA0, 0x37B5A0, 0x37C3A0},
+		x_velocity = {0x37CE88, 0x37CFB8, 0x37B6B8, 0x37C4B8},
+		y_velocity = {0x37CE8C, 0x37CFBC, 0x37B6BC, 0x37C4BC},
+		z_velocity = {0x37CE90, 0x37CFC0, 0x37B6C0, 0x37C4C0},
+		x_position = {0x37CF70, 0x37D0A0, 0x37B7A0, 0x37C5A0},
+		y_position = {0x37CF74, 0x37D0A4, 0x37B7A4, 0x37C5A4},
+		z_position = {0x37CF78, 0x37D0A8, 0x37B7A8, 0x37C5A8},
+		x_rotation = {0x37CF10, 0x37D040, 0x37B740, 0x37C540},
+		y_rotation = {0x37D060, 0x37D190, 0x37B890, 0x37C690},
+		facing_angle = {0x37D060, 0x37D190, 0x37B890, 0x37C690},
+		moving_angle = {0x37D064, 0x37D194, 0x37B894, 0x37C694},
+		z_rotation = {0x37D050, 0x37D180, 0x37B880, 0x37C680},
+		camera_x_position = {0x37E328, 0x37E458, 0x37CB58, 0x37D958},
+		camera_y_position = {0x37E32C, 0x37E45C, 0x37CB5C, 0x37D95C},
+		camera_z_position = {0x37E330, 0x37E460, 0x37CB60, 0x37D960},
+		camera_x_rotation = {0x37E338, 0x37E468, 0x37CB68, 0x37D968},
+		camera_y_rotation = {0x37E33C, 0x37E46C, 0x37CB6C, 0x37D96C},
+		first_person_flag = {0x37CBB7, 0x37CCE7, 0x37B3E7, 0x37C1E7},
+		first_person_cam_x_pos = {0x37E630, 0x37E760, 0x37CE60, 0x37DC60},
+		first_person_cam_y_pos = {0x37E634, 0x37E764, 0x37CE64, 0x37DC64},
+		first_person_cam_z_pos = {0x37E638, 0x37E768, 0x37CE68, 0x37DC68},
+		first_person_cam_x_rot = {0x37E63C, 0x37E76C, 0x37CE6C, 0x37DC6C},
+		first_person_cam_y_rot = {0x37E640, 0x37E770, 0x37CE70, 0x37DC70},
+		previous_movement_state = {0x37DB30, 0x37DC60, 0x37C360, 0x37D160},
+		current_movement_state = {0x37DB34, 0x37DC64, 0x37C364, 0x37D164},
+		map = {0x37F2C5, 0x37F405, 0x37DAF5, 0x37E8F5},
+		ff_question_pointer = {0x383AC0, 0x383C20, 0x382300, 0x3830E0},
+		ff_pattern = {0x383BA2, 0x383D02, 0x3823E2, 0x3831C2},
+		collectable_base = {0x386910, 0x386A70, 0x385150, 0x385F30},
+		object_array_pointer = {0x36EAE0, 0x36F260, 0x36D760, 0x36E560},
+		struct_array_pointer = {0x382970, 0x382AB0, 0x3811A0, 0x381FA0},
+		board_base = {0x394140, 0x394350, 0x3929C0, 0x393760},
+		pause_menu_strings_base = {0x36C99C, 0x36CAF0, 0x36B6E0, 0x36C4E0},
+		return_to_lair_enabled = {0x383A60, 0x383BC0, 0x3822A0, 0x383080},
+		game_progress_bitfield = {0x383B88, 0x383D18, 0x3823F8, 0x3831A8},
+		jiggy_bitfield = {0x383CA0, 0x383E00, 0x3824E0, 0x3832C0},
+		honeycomb_bitfield = {0x383CC0, 0x383E20, 0x382500, 0x3832E0},
+		mumbo_token_bitfield = {0x383CD0, 0x383E30, 0x382510, 0x3832F0},
+	},
+	maps = {
+		"SM - Spiral Mountain",
+		"MM - Mumbo's Mountain",
+		"!Unknown 0x03",
+		"!Unknown 0x04",
+		"TTC - Blubber's Ship",
+		"TTC - Nipper's Shell",
+		"TTC - Treasure Trove Cove",
+		"!Unknown 0x08",
+		"!Unknown 0x09",
+		"TTC - Sandcastle",
+		"CC - Clanker's Cavern",
+		"MM - Ticker's Tower",
+		"BGS - Bubblegloop Swamp",
+		"Mumbo's Skull (MM)",
+		"!Unknown 0x0F",
+		"BGS - Mr. Vile",
+		"BGS - Tiptup",
+		"GV - Gobi's Valley",
+		"GV - Matching Game",
+		"GV - Maze",
+		"GV - Water",
+		"GV - Rubee's Chamber",
+		"!Unknown 0x17",
+		"!Unknown 0x18",
+		"!Unknown 0x19",
+		"GV - Sphinx",
+		"MMM - Mad Monster Mansion",
+		"MMM - Church",
+		"MMM - Cellar",
+		"Start - Nintendo",
+		"Start - Rareware",
+		"End Scene 2: Not 100",
+		"CC - Witch Switch Room",
+		"CC - Inside Clanker",
+		"CC - Gold Feather Room",
+		"MMM - Tumblar's Shed",
+		"MMM - Well",
+		"MMM - Dining Room (Napper)",
+		"FP - Freezeezy Peak",
+		"MMM - Room 1",
+		"MMM - Room 2",
+		"MMM - Room 3: Fireplace",
+		"MMM - Church",
+		"MMM - Room 4: Bathroom",
+		"MMM - Room 5: Bedroom",
+		"MMM - Room 6: Floorboards",
+		"MMM - Barrel",
+		"Mumbo's Skull (MMM)",
+		"RBB - Rusty Bucket Bay",
+		"!Unknown 0x32",
+		"!Unknown 0x33",
+		"RBB - Engine Room",
+		"RBB - Warehouse 1",
+		"RBB - Warehouse 2",
+		"RBB - Container 1",
+		"RBB - Container 3",
+		"RBB - Crew Cabin",
+		"RBB - Boss Boom Box",
+		"RBB - Store Room",
+		"RBB - Kitchen",
+		"RBB - Navigation Room",
+		"RBB - Container 2",
+		"RBB - Captain's Cabin",
+		"CCW - Start",
+		"FP - Boggy's Igloo",
+		"!Unknown 0x42",
+		"CCW - Spring",
+		"CCW - Summer",
+		"CCW - Autumn",
+		"CCW - Winter",
+		"Mumbo's Skull (BGS)",
+		"Mumbo's Skull (FP)",
+		"!Unknown 0x49",
+		"Mumbo's Skull (CCW Spring)",
+		"Mumbo's Skull (CCW Summer)",
+		"Mumbo's Skull (CCW Autumn)",
+		"Mumbo's Skull (CCW Winter)",
+		"!Unknown 0x4E",
+		"!Unknown 0x4F",
+		"!Unknown 0x50",
+		"!Unknown 0x51",
+		"!Unknown 0x52",
+		"FP - Inside Xmas Tree",
+		"!Unknown 0x54",
+		"!Unknown 0x55",
+		"!Unknown 0x56",
+		"!Unknown 0x57",
+		"!Unknown 0x58",
+		"!Unknown 0x59",
+		"CCW - Zubba's Hive (Summer)",
+		"CCW - Zubba's Hive (Spring)",
+		"CCW - Zubba's Hive (Autumn)",
+		"!Unknown 0x5D",
+		"CCW - Nabnut's House (Spring)",
+		"CCW - Nabnut's House (Summer)",
+		"CCW - Nabnut's House (Autumn)",
+		"CCW - Nabnut's House (Winter)",
+		"CCW - Nabnut's Room 1 (Winter)",
+		"CCW - Nabnut's Room 2 (Autumn)",
+		"CCW - Nabnut's Room 2 (Winter)",
+		"CCW - Top (Spring)",
+		"CCW - Top (Summer)",
+		"CCW - Top (Autumn)",
+		"CCW - Top (Winter)",
+		"Lair - MM Lobby",
+		"Lair - TTC/CC Puzzle",
+		"Lair - CCW Puzzle & 180 Note Door",
+		"Lair - Red Cauldron Room",
+		"Lair - TTC Lobby",
+		"Lair - GV Lobby",
+		"Lair - FP Lobby",
+		"Lair - CC Lobby",
+		"Lair - Statue",
+		"Lair - BGS Lobby",
+		"!Unknown 0x73",
+		"Lair - GV Puzzle",
+		"Lair - MMM Lobby",
+		"Lair - 640 Note Door Room",
+		"Lair - RBB Lobby",
+		"Lair - RBB Puzzle",
+		"Lair - CCW Lobby",
+		"Lair - Floor 2, Area 5a: Crypt inside",
+		"Intro - Lair 1 - Scene 1",
+		"Intro - Banjo's House 1 - Scenes 3,7",
+		"Intro - Spiral 'A' - Scenes 2,4",
+		"Intro - Spiral 'B' - Scenes 5,6",
+		"FP - Wozza's Cave",
+		"Lair - Floor 3, Area 4a",
+		"Intro - Lair 2",
+		"Intro - Lair 3 - Machine 1",
+		"Intro - Lair 4 - Game Over",
+		"Intro - Lair 5",
+		"Intro - Spiral 'C'",
+		"Intro - Spiral 'D'",
+		"Intro - Spiral 'E'",
+		"Intro - Spiral 'F'",
+		"Intro - Banjo's House 2",
+		"Intro - Banjo's House 3",
+		"RBB - Anchor room",
+		"SM - Banjo's House",
+		"MMM - Inside Loggo",
+		"Lair - Furnace Fun",
+		"TTC - Sharkfood Island",
+		"Lair - Battlements",
+		"File Select Screen",
+		"GV - Secret Chamber",
+		"Lair - Dingpot",
+		"Intro - Spiral 'G'",
+		"End Scene 3: All 100",
+		"End Scene",
+		"End Scene 4",
+		"Intro - Grunty Threat 1",
+		"Intro - Grunty Threat 2"
+	},
+};
 
 local script_modes = { --TODO: Object analysis tools state needs to be up here for reasons, can probably be somewhere else with a clever reshuffle
 	"Disabled",
@@ -86,211 +289,6 @@ local eep_checksum = {
 	{ address = 0x1FC, value = 0 }, -- Global flags
 };
 
-Game.maps = {
-	"SM - Spiral Mountain",
-	"MM - Mumbo's Mountain",
-	"!Unknown 0x03",
-	"!Unknown 0x04",
-	"TTC - Blubber's Ship",
-	"TTC - Nipper's Shell",
-	"TTC - Treasure Trove Cove",
-	"!Unknown 0x08",
-	"!Unknown 0x09",
-	"TTC - Sandcastle",
-	"CC - Clanker's Cavern",
-	"MM - Ticker's Tower",
-	"BGS - Bubblegloop Swamp",
-	"Mumbo's Skull (MM)",
-	"!Unknown 0x0F",
-	"BGS - Mr. Vile",
-	"BGS - Tiptup",
-	"GV - Gobi's Valley",
-	"GV - Matching Game",
-	"GV - Maze",
-	"GV - Water",
-	"GV - Rubee's Chamber",
-	"!Unknown 0x17",
-	"!Unknown 0x18",
-	"!Unknown 0x19",
-	"GV - Sphinx",
-	"MMM - Mad Monster Mansion",
-	"MMM - Church",
-	"MMM - Cellar",
-	"Start - Nintendo",
-	"Start - Rareware",
-	"End Scene 2: Not 100",
-	"CC - Witch Switch Room",
-	"CC - Inside Clanker",
-	"CC - Gold Feather Room",
-	"MMM - Tumblar's Shed",
-	"MMM - Well",
-	"MMM - Dining Room (Napper)",
-	"FP - Freezeezy Peak",
-	"MMM - Room 1",
-	"MMM - Room 2",
-	"MMM - Room 3: Fireplace",
-	"MMM - Church",
-	"MMM - Room 4: Bathroom",
-	"MMM - Room 5: Bedroom",
-	"MMM - Room 6: Floorboards",
-	"MMM - Barrel",
-	"Mumbo's Skull (MMM)",
-	"RBB - Rusty Bucket Bay",
-	"!Unknown 0x32",
-	"!Unknown 0x33",
-	"RBB - Engine Room",
-	"RBB - Warehouse 1",
-	"RBB - Warehouse 2",
-	"RBB - Container 1",
-	"RBB - Container 3",
-	"RBB - Crew Cabin",
-	"RBB - Boss Boom Box",
-	"RBB - Store Room",
-	"RBB - Kitchen",
-	"RBB - Navigation Room",
-	"RBB - Container 2",
-	"RBB - Captain's Cabin",
-	"CCW - Start",
-	"FP - Boggy's Igloo",
-	"!Unknown 0x42",
-	"CCW - Spring",
-	"CCW - Summer",
-	"CCW - Autumn",
-	"CCW - Winter",
-	"Mumbo's Skull (BGS)",
-	"Mumbo's Skull (FP)",
-	"!Unknown 0x49",
-	"Mumbo's Skull (CCW Spring)",
-	"Mumbo's Skull (CCW Summer)",
-	"Mumbo's Skull (CCW Autumn)",
-	"Mumbo's Skull (CCW Winter)",
-	"!Unknown 0x4E",
-	"!Unknown 0x4F",
-	"!Unknown 0x50",
-	"!Unknown 0x51",
-	"!Unknown 0x52",
-	"FP - Inside Xmas Tree",
-	"!Unknown 0x54",
-	"!Unknown 0x55",
-	"!Unknown 0x56",
-	"!Unknown 0x57",
-	"!Unknown 0x58",
-	"!Unknown 0x59",
-	"CCW - Zubba's Hive (Summer)",
-	"CCW - Zubba's Hive (Spring)",
-	"CCW - Zubba's Hive (Autumn)",
-	"!Unknown 0x5D",
-	"CCW - Nabnut's House (Spring)",
-	"CCW - Nabnut's House (Summer)",
-	"CCW - Nabnut's House (Autumn)",
-	"CCW - Nabnut's House (Winter)",
-	"CCW - Nabnut's Room 1 (Winter)",
-	"CCW - Nabnut's Room 2 (Autumn)",
-	"CCW - Nabnut's Room 2 (Winter)",
-	"CCW - Top (Spring)",
-	"CCW - Top (Summer)",
-	"CCW - Top (Autumn)",
-	"CCW - Top (Winter)",
-	"Lair - MM Lobby",
-	"Lair - TTC/CC Puzzle",
-	"Lair - CCW Puzzle & 180 Note Door",
-	"Lair - Red Cauldron Room",
-	"Lair - TTC Lobby",
-	"Lair - GV Lobby",
-	"Lair - FP Lobby",
-	"Lair - CC Lobby",
-	"Lair - Statue",
-	"Lair - BGS Lobby",
-	"!Unknown 0x73",
-	"Lair - GV Puzzle",
-	"Lair - MMM Lobby",
-	"Lair - 640 Note Door Room",
-	"Lair - RBB Lobby",
-	"Lair - RBB Puzzle",
-	"Lair - CCW Lobby",
-	"Lair - Floor 2, Area 5a: Crypt inside",
-	"Intro - Lair 1 - Scene 1",
-	"Intro - Banjo's House 1 - Scenes 3,7",
-	"Intro - Spiral 'A' - Scenes 2,4",
-	"Intro - Spiral 'B' - Scenes 5,6",
-	"FP - Wozza's Cave",
-	"Lair - Floor 3, Area 4a",
-	"Intro - Lair 2",
-	"Intro - Lair 3 - Machine 1",
-	"Intro - Lair 4 - Game Over",
-	"Intro - Lair 5",
-	"Intro - Spiral 'C'",
-	"Intro - Spiral 'D'",
-	"Intro - Spiral 'E'",
-	"Intro - Spiral 'F'",
-	"Intro - Banjo's House 2",
-	"Intro - Banjo's House 3",
-	"RBB - Anchor room",
-	"SM - Banjo's House",
-	"MMM - Inside Loggo",
-	"Lair - Furnace Fun",
-	"TTC - Sharkfood Island",
-	"Lair - Battlements",
-	"File Select Screen",
-	"GV - Secret Chamber",
-	"Lair - Dingpot",
-	"Intro - Spiral 'G'",
-	"End Scene 3: All 100",
-	"End Scene",
-	"End Scene 4",
-	"Intro - Grunty Threat 1",
-	"Intro - Grunty Threat 2"
-};
-
--- Version order: Europe, Japan, US 1.1, US 1.0
-Game.Memory = {
-	["fb_pointer"] = {0x282E00, 0x281E20, 0x281E20, 0x282FE0},
-	["frame_timer"] = {0x280700, 0x27F718, 0x27F718, 0x2808D8},
-	["floor_object_pointer"] = {0x37CBD0, 0x37CD00, 0x37B400, 0x37C200},
-	["carried_object_pointer"] = {0x37CC68, 0x37CD98, 0x37B498, 0x37C298},
-	["slope_timer"] = {0x37CCB4, 0x37CDE4, 0x37B4E4, 0x37C2E4},
-	["player_grounded"] = {0x37C930, 0x37CA60, 0x37B160, 0x37BF60},
-	["wall_collisions"] = {0x37CC4D, 0x37CD7D, 0x37B47D, 0x37C27D},
-	["moves_bitfield"] = {0x37CD70, 0x37CEA0, 0x37B5A0, 0x37C3A0},
-	["x_velocity"] = {0x37CE88, 0x37CFB8, 0x37B6B8, 0x37C4B8},
-	["y_velocity"] = {0x37CE8C, 0x37CFBC, 0x37B6BC, 0x37C4BC},
-	["z_velocity"] = {0x37CE90, 0x37CFC0, 0x37B6C0, 0x37C4C0},
-	["x_position"] = {0x37CF70, 0x37D0A0, 0x37B7A0, 0x37C5A0},
-	["y_position"] = {0x37CF74, 0x37D0A4, 0x37B7A4, 0x37C5A4},
-	["z_position"] = {0x37CF78, 0x37D0A8, 0x37B7A8, 0x37C5A8},
-	["x_rotation"] = {0x37CF10, 0x37D040, 0x37B740, 0x37C540},
-	["y_rotation"] = {0x37D060, 0x37D190, 0x37B890, 0x37C690},
-	["facing_angle"] = {0x37D060, 0x37D190, 0x37B890, 0x37C690},
-	["moving_angle"] = {0x37D064, 0x37D194, 0x37B894, 0x37C694},
-	["z_rotation"] = {0x37D050, 0x37D180, 0x37B880, 0x37C680},
-	["camera_x_position"] = {0x37E328, 0x37E458, 0x37CB58, 0x37D958},
-	["camera_y_position"] = {0x37E32C, 0x37E45C, 0x37CB5C, 0x37D95C},
-	["camera_z_position"] = {0x37E330, 0x37E460, 0x37CB60, 0x37D960},
-	["camera_x_rotation"] = {0x37E338, 0x37E468, 0x37CB68, 0x37D968},
-	["camera_y_rotation"] = {0x37E33C, 0x37E46C, 0x37CB6C, 0x37D96C},
-	["first_person_flag"] = {0x37CBB7, 0x37CCE7, 0x37B3E7, 0x37C1E7},
-	["first_person_cam_x_pos"] = {0x37E630, 0x37E760, 0x37CE60, 0x37DC60},
-	["first_person_cam_y_pos"] = {0x37E634, 0x37E764, 0x37CE64, 0x37DC64},
-	["first_person_cam_z_pos"] = {0x37E638, 0x37E768, 0x37CE68, 0x37DC68},
-	["first_person_cam_x_rot"] = {0x37E63C, 0x37E76C, 0x37CE6C, 0x37DC6C},
-	["first_person_cam_y_rot"] = {0x37E640, 0x37E770, 0x37CE70, 0x37DC70},
-	["previous_movement_state"] = {0x37DB30, 0x37DC60, 0x37C360, 0x37D160},
-	["current_movement_state"] = {0x37DB34, 0x37DC64, 0x37C364, 0x37D164},
-	["map"] = {0x37F2C5, 0x37F405, 0x37DAF5, 0x37E8F5},
-	["ff_question_pointer"] = {0x383AC0, 0x383C20, 0x382300, 0x3830E0},
-	["ff_pattern"] = {0x383BA2, 0x383D02, 0x3823E2, 0x3831C2},
-	["collectable_base"] = {0x386910, 0x386A70, 0x385150, 0x385F30},
-	["object_array_pointer"] = {0x36EAE0, 0x36F260, 0x36D760, 0x36E560},
-	["struct_array_pointer"] = {0x382970, 0x382AB0, 0x3811A0, 0x381FA0},
-	["board_base"] = {0x394140, 0x394350, 0x3929C0, 0x393760},
-	["pause_menu_strings_base"] = {0x36C99C, 0x36CAF0, 0x36B6E0, 0x36C4E0},
-	["return_to_lair_enabled"] = {0x383A60, 0x383BC0, 0x3822A0, 0x383080},
-	["game_progress_bitfield"] = {0x383B88, 0x383D18, 0x3823F8, 0x3831A8},
-	["jiggy_bitfield"] = {0x383CA0, 0x383E00, 0x3824E0, 0x3832C0},
-	["honeycomb_bitfield"] = {0x383CC0, 0x383E20, 0x382500, 0x3832E0},
-	["mumbo_token_bitfield"] = {0x383CD0, 0x383E30, 0x382510, 0x3832F0},
-};
-
 function Game.detectVersion(romName, romHash)
 	if romHash == "BB359A75941DF74BF7290212C89FBC6E2C5601FE" then -- Europe
 		flag_array = require("games.bk_flags");
@@ -325,7 +323,7 @@ function Game.detectVersion(romName, romHash)
 
 	if #flag_array > 0 then
 		for i = 1, #flag_array do
-			flag_names[i] = flag_array[i]["name"];
+			flag_names[i] = flag_array[i].name;
 		end
 	else
 		print("Warning: No flags found");
@@ -387,11 +385,11 @@ end
 -----------------
 
 local move_levels = {
-	["4. None"]                 = 0x00000000,
-	["3. SM 100%"] = 0x00009DB9,
-	["2. FFM Setup"]            = 0x000BFDBF,
-	["1. All"]                  = 0x000FFFFF,
-	["0. Demo"]                 = 0xFFFFFFFF
+	["4. None"]      = 0x00000000,
+	["3. SM 100%"]   = 0x00009DB9,
+	["2. FFM Setup"] = 0x000BFDBF,
+	["1. All"]       = 0x000FFFFF,
+	["0. Demo"]      = 0xFFFFFFFF
 };
 
 local function unlock_moves()
@@ -410,101 +408,101 @@ local max_slots = 0x100;
 
 -- BEHAVIOR STRUCTURE
 behavior_struct = {
-	[0x00] = {["Name"] = "Renderer Pointer", ["Type"] = "Pointer", ["Fields"] = {
-		[0x04] = {["Name"] = "x_pos", ["Type"] = "s16_be"},
-		[0x06] = {["Name"] = "y_pos", ["Type"] = "s16_be"},
-		[0x08] = {["Name"] = "z_pos", ["Type"] = "s16_be"},
-		--[0x0A] = {["Name"] = "scale", ["Type"] = "u16_be"},
+	[0x00] = {Name="Renderer Pointer", Type="Pointer", Fields={
+		[0x04] = {Name="x_pos", Type="s16_be"},
+		[0x06] = {Name="y_pos", Type="s16_be"},
+		[0x08] = {Name="z_pos", Type="s16_be"},
+		--[0x0A] = {Name="scale", Type="u16_be"},
 		},
 	},
-	[0x2C] = {["Name"] = "Object Array Index (doubled)", ["Type"] = "u16_be"},
-	[0x2E] = {["Name"] = "Collide Able Bitfield", ["Type"] = "u16_be"},
+	[0x2C] = {Name="Object Array Index (doubled)", Type="u16_be"},
+	[0x2E] = {Name="Collide Able Bitfield", Type="u16_be"},
 };
 
 -- MOVEMENT STRUCTURE
 movement_struct = {
-	[0x00] = {["Type"] = "Pointer", ["Name"] = "Animation Object Pointer", ["Fields"] = {
-			[0x10] = {["Type"] = "u32_be", ["Name"] = "Animation Type"},
-			[0x14] = {["Type"] = "Float", ["Name"] = "Animation Timer Copy"},
+	[0x00] = {Type="Pointer", Name="Animation Object Pointer", Fields={
+			[0x10] = {Type="u32_be", Name="Animation Type"},
+			[0x14] = {Type="Float", Name="Animation Timer Copy"},
 			},
 		},
-	[0x04] = {["Type"] = "Float", ["Name"] = "Animation Timer"},
+	[0x04] = {Type="Float", Name="Animation Timer"},
 
-	[0x0C] = {["Type"] = "Float", ["Name"] = "Movement Duration"},
-	[0x10] = {["Type"] = "Float", ["Name"] = "Animation Duration"},
-	[0x14] = {["Type"] = "Float", ["Name"] = "Bone Transition Duration"},
+	[0x0C] = {Type="Float", Name="Movement Duration"},
+	[0x10] = {Type="Float", Name="Animation Duration"},
+	[0x14] = {Type="Float", Name="Bone Transition Duration"},
 
-	[0x1C] = {["Type"] = "u32_be", ["Name"] = "Movement State"},
-	[0x20] = {["Type"] = "Byte", ["Name"] = "Movement SubState"},
+	[0x1C] = {Type="u32_be", Name="Movement State"},
+	[0x20] = {Type="Byte", Name="Movement SubState"},
 };
 
 -- OBJECT1 STRUCTURE
 slot_variables = {
-	[0x00] = {["Type"] = "Pointer", ["Name"] = "Behavior Struct Pointer", ["Fields"] = {
+	[0x00] = {Type="Pointer", Name="Behavior Struct Pointer", Fields={
 		behavior_struct
 		},
 	},
-	[0x04] = {["Type"] = "Float", ["Name"] = {"X", "X Pos", "X Position"}},
-	[0x08] = {["Type"] = "Float", ["Name"] = {"Y", "Y Pos", "Y Position"}},
-	[0x0C] = {["Type"] = "Float", ["Name"] = {"Z", "Z Pos", "Z Position"}},
-	[0x10] = {["Type"] = "u8", ["Name"] = "State"},
-	[0x14] = {["Type"] = "Pointer", ["Name"] = "Movement Object Pointer", ["Fields"] = {
+	[0x04] = {Type="Float", Name={"X", "X Pos", "X Position"}},
+	[0x08] = {Type="Float", Name={"Y", "Y Pos", "Y Position"}},
+	[0x0C] = {Type="Float", Name={"Z", "Z Pos", "Z Position"}},
+	[0x10] = {Type="u8", Name="State"},
+	[0x14] = {Type="Pointer", Name="Movement Object Pointer", Fields={
 			movement_struct
 		},
 	},
-	[0x28] = {["Type"] = "Float", ["Name"] = "Chase Velocity"},
+	[0x28] = {Type="Float", Name="Chase Velocity"},
 
-	[0x38] = {["Type"] = "u16_be", ["Name"] = "Movement Timer"},
+	[0x38] = {Type="u16_be", Name="Movement Timer"},
 
-	[0x3B] = {["Type"] = "Byte", ["Name"] = "Movement State"},
+	[0x3B] = {Type="Byte", Name="Movement State"},
 
-	[0x48] = {["Type"] = "Float", ["Name"] = "Race path progression"},
-	[0x4C] = {["Type"] = "Float", ["Name"] = "Speed (rubberband)"},
-	[0x50] = {["Type"] = "Float", ["Name"] = {"Facing Angle", "Facing", "Rot Y", "Rot. Y", "Y Rotation"}},
+	[0x48] = {Type="Float", Name="Race path progression"},
+	[0x4C] = {Type="Float", Name="Speed (rubberband)"},
+	[0x50] = {Type="Float", Name={"Facing Angle", "Facing", "Rot Y", "Rot. Y", "Y Rotation"}},
 
-	[0x60] = {["Type"] = "Float", ["Name"] = "Rotation Speed"}, --Atleast for honeycomb pieces
-	[0x64] = {["Type"] = "Float", ["Name"] = {"Moving Angle", "Moving", "Rot Y", "Rot. Y", "Y Rotation"}},
-	[0x68] = {["Type"] = "Float", ["Name"] = {"Rot X", "Rot. X", "X Rotation"}},
+	[0x60] = {Type="Float", Name="Rotation Speed"}, -- Atleast for honeycomb pieces
+	[0x64] = {Type="Float", Name={"Moving Angle", "Moving", "Rot Y", "Rot. Y", "Y Rotation"}},
+	[0x68] = {Type="Float", Name={"Rot X", "Rot. X", "X Rotation"}},
 
 	--[[
 	[0x7C] = {
-		["Climbable Pole"] = {["Type"] = "Float", ["Name"] = "Top X", "Top X Pos", "Top X Position"},
-		["Mumbo Token"] = {["Type"] = "u32_be", ["Name"] = "Mumbo Token Index"},
-		["Empty Honeycomb Piece"] = {["Type"] = "u32_be", ["Name"] = "Empty Honeycomb Index"},
-	}, --Pole Top XPos
+		["Climbable Pole"] = {Type="Float", Name="Top X", "Top X Pos", "Top X Position"},
+		["Mumbo Token"] = {Type="u32_be", Name="Mumbo Token Index"},
+		["Empty Honeycomb Piece"] = {Type="u32_be", Name="Empty Honeycomb Index"},
+	}, -- Pole Top XPos
 	[0x80] = {
-		["Climbable Pole"] = {["Type"] = "Float", ["Name"] = "Top Y", "Top Y Pos", "Top Y Position"},
-		["Jiggy"] = {["Type"] = "u32_be", ["Name"] = "Mumbo Token Index"},
+		["Climbable Pole"] = {Type="Float", Name="Top Y", "Top Y Pos", "Top Y Position"},
+		["Jiggy"] = {Type="u32_be", Name="Mumbo Token Index"},
 	},
 	[0x84] = {
-		["Climbable Pole"] = {["Type"] = "Float", ["Name"] = "Top Z", "Top Z Pos", "Top Z Position"},
+		["Climbable Pole"] = {Type="Float", Name="Top Z", "Top Z Pos", "Top Z Position"},
 	},
 	--]]
 
-	[0xBC] = {["Type"] = "u32_be", ["Name"] = "Spawn Index"},
+	[0xBC] = {Type="u32_be", Name="Spawn Index"},
 
-	[0xEB] = {["Type"] = "Byte", ["Name"] = "Flag 2"}, -- TODO: Better name for this, lifted from Runehero's C source
-	[0xEC] = {["Type"] = "Float", ["Name"] = "AnimationTimer_Copy"},
-	[0xF0] = {["Type"] = "Float", ["Name"] = "AnimationDuration_Copy"},
+	[0xEB] = {Type="Byte", Name="Flag 2"}, -- TODO: Better name for this, lifted from Runehero's C source
+	[0xEC] = {Type="Float", Name="AnimationTimer_Copy"},
+	[0xF0] = {Type="Float", Name="AnimationDuration_Copy"},
 
-	[0xFC] = {["Type"] = "Float", ["Name"] = "MovementTimer_Copy"},
+	[0xFC] = {Type="Float", Name="MovementTimer_Copy"},
 
-	[0x110] = {["Type"] = "Float", ["Name"] = {"Rot Z", "Rot. Z", "Z Rotation"}},
-	[0x114] = {["Type"] = "Float", ["Name"] = "Sound timer?"}, -- Also used by Conga to decide when to throw orange --copy of timer from animation substruct
+	[0x110] = {Type="Float", Name={"Rot Z", "Rot. Z", "Z Rotation"}},
+	[0x114] = {Type="Float", Name="Sound timer?"}, -- Also used by Conga to decide when to throw orange -- Copy of timer from animation substruct
 
-	[0x125] = {["Type"] = "Byte", ["Name"] = "Transparancy"},
+	[0x125] = {Type="Byte", Name="Transparancy"},
 
-	[0x127] = {["Type"] = "Byte", ["Name"] = "Eye State"},
-	[0x128] = {["Type"] = "Float", ["Name"] = "Scale"},
-	[0x12C] = {["Type"] = "Pointer", ["Name"] = "Identifier", ["Fields"] = {
-			[0x02] = {["Type"] = "u16_be", ["Name"] = "Object Index"},
-			[0x04] = {["Type"] = "u16_be", ["Name"] = "Model Index"},
+	[0x127] = {Type="Byte", Name="Eye State"},
+	[0x128] = {Type="Float", Name="Scale"},
+	[0x12C] = {Type="Pointer", Name="Identifier", Fields={
+			[0x02] = {Type="u16_be", Name="Object Index"},
+			[0x04] = {Type="u16_be", Name="Model Index"},
 
-			[0x0C] = {["Type"] = "Pointer", ["Name"] = "Object Behavior Function"},
+			[0x0C] = {Type="Pointer", Name="Object Behavior Function"},
 		},
 	},
-	[0x14C] = {["Type"] = "Pointer", ["Name"] = "Bone Array 1 Pointer"},
-	[0x150] = {["Type"] = "Pointer", ["Name"] = "Bone Array 2 Pointer"},
+	[0x14C] = {Type="Pointer", Name="Bone Array 1 Pointer"},
+	[0x150] = {Type="Pointer", Name="Bone Array 2 Pointer"},
 };
 local slot_variables_inv = {};
 
@@ -512,7 +510,7 @@ local function fillBlankVariableSlots()
 	local data_size = 0x04;
 	for i = 0, slot_size - data_size, data_size do
 		if type(slot_variables[i]) == "nil" then
-			slot_variables[i] = {["Type"] = "Z4_Unknown"};
+			slot_variables[i] = {Type="Z4_Unknown"};
 		end
 	end
 end
@@ -1379,14 +1377,14 @@ local movementStates = {
 	[108] = "Knockback", -- Walrus
 	[109] = "Death", -- Walrus
 	[110] = "Biting", -- Croc
-	[111] = "EatingWrongThing", --Croc
-	[112] = "EatingCorrectThing", --Croc
+	[111] = "EatingWrongThing", -- Croc
+	[112] = "EatingCorrectThing", -- Croc
 	[113] = "Falling", -- Talon Trot
 	[114] = "Recovering", -- Getting up after taking damage, eg. fall famage
 	[115] = "Locked", -- Cutscene
 	[116] = "Locked", -- Jiggy pad, Mumbo transformation, Bottles
 	[117] = "Locked", -- Bottles
-	[118] = "Locked", --Flying
+	[118] = "Locked", -- Flying
 	[119] = "Locked", -- Water Surface
 	[120] = "Locked", -- Underwater
 	[121] = "Locked", -- Holding Jiggy, Talon Trot
@@ -1429,7 +1427,7 @@ local movementStates = {
 	[161] = "Knockback", -- Croc, not damaged
 	[162] = "Knockback", -- Walrus, not damaged
 	[163] = "Knockback", -- Bee, not damaged
-	--[164] = "???", --Wonderwing
+	--[164] = "???", -- Wonderwing
 	[165] = "Locked", -- Wonderwing
 };
 
@@ -1884,7 +1882,7 @@ function drawObjectPositions()
 	local dragTransform = {0, 0};
 	local mouse = input.getmouse();
 
-	if mouse.Left then --if mouse clicked object is being dragged
+	if mouse.Left then -- if mouse clicked object is being dragged
 		if not mouseClickedLastFrame then
 			if dragging ~= true then
 				startDrag = true;
@@ -1968,7 +1966,7 @@ function drawObjectPositions()
 					local drawXPos = (screen.width / 2) * math.sin(YAngle_local) / math.sin(viewport_YAngleRange * math.pi / 360) + screen.width / 2;
 					local drawYPos = -(screen.height / 2) * math.sin(XAngle_local) / math.sin(viewport_XAngleRange * math.pi / 360) + screen.height / 2;
 
-					--calc scaling factor -- current calc might be incorrect
+					-- Calc scaling factor -- current calc might be incorrect
 					local scaling_factor = reference_distance / objectData.zPos;
 					-- Object selection
 					if draggedObjects[1] ~= nil then
@@ -2078,9 +2076,9 @@ function zipToSelectedObject()
 		if isRDRAM(objectArray) then
 			local slotBase = objectArray + getSlotBase(object_index - 1);
 
-			local x = mainmemory.readfloat(slotBase + slot_variables_inv["X"], true);
-			local y = mainmemory.readfloat(slotBase + slot_variables_inv["Y"], true);
-			local z = mainmemory.readfloat(slotBase + slot_variables_inv["Z"], true);
+			local x = mainmemory.readfloat(slotBase + slot_variables_inv.X, true);
+			local y = mainmemory.readfloat(slotBase + slot_variables_inv.Y, true);
+			local z = mainmemory.readfloat(slotBase + slot_variables_inv.Z, true);
 
 			Game.setXPosition(x);
 			Game.setYPosition(y);
@@ -2357,7 +2355,7 @@ function autoPound()
 
 	-- First frame pound out of peck
 	if allowPound and currentMovementState == 17 and YVelocity == -272 and not Game.isPhysicsFrame() then -- TODO: YVelocity == -272 doesn't work for all versions
-		joypad.set({["Z"] = true}, 1);
+		joypad.set({Z=true}, 1);
 	end
 
 	-- Frame perfect mid air talon trot slide jump
@@ -2366,7 +2364,7 @@ function autoPound()
 		if holdingAPostJump then
 			holdingAPostJump = holdingAPostJump and (currentMovementState == 21 or YVelocity > 0); -- TODO: Better method for detecting end of a jump, velocity > 0 is janky
 		end
-		joypad.set({["A"] = true}, 1);
+		joypad.set({A=true}, 1);
 	end
 end
 
@@ -2376,32 +2374,32 @@ end
 
 local sandcastle_square_size = 90;
 local sandcastlePositions = {
-	["A"] = {2, -8},
-	["B"] = {0, 6},
-	["C"] = {4, -6},
-	["D"] = {-4, -2},
-	["E"] = {0, -6},
-	["F"] = {4, 2},
-	["G"] = {-2, -8},
-	["H"] = {-4, 6},
-	["I"] = {6, 0},
-	["J"] = {-6, -8},
-	["K"] = {4, 6},
-	["L"] = {6, -8},
-	["M"] = {-6, -4},
-	["N"] = {-2, -4},
-	["O"] = {0, -2},
-	["P"] = {6, -4},
+	A = {2, -8},
+	B = {0, 6},
+	C = {4, -6},
+	D = {-4, -2},
+	E = {0, -6},
+	F = {4, 2},
+	G = {-2, -8},
+	H = {-4, 6},
+	I = {6, 0},
+	J = {-6, -8},
+	K = {4, 6},
+	L = {6, -8},
+	M = {-6, -4},
+	N = {-2, -4},
+	O = {0, -2},
+	P = {6, -4},
 	-- There's no Q in the sandcastle
-	["R"] = {2, -4},
-	["S"] = {4, -2},
-	["T"] = {0, 2},
-	["U"] = {-2, 0},
-	["V"] = {-4, -6},
-	["W"] = {2, 4},
-	["X"] = {-4, 2},
-	["Y"] = {2, 0},
-	["Z"] = {-6, 0},
+	R = {2, -4},
+	S = {4, -2},
+	T = {0, 2},
+	U = {-2, 0},
+	V = {-4, -6},
+	W = {2, 4},
+	X = {-4, 2},
+	Y = {2, 0},
+	Z = {-6, 0},
 };
 
 function gotoSandcastleLetter(letter)
@@ -3104,7 +3102,7 @@ end
 
 local function getFlagByName(flagName)
 	for i = 1, #flag_array do
-		if flagName == flag_array[i]["name"] then
+		if flagName == flag_array[i].name then
 			return flag_array[i];
 		end
 	end
@@ -3112,8 +3110,8 @@ end
 
 function getFlagName(flagType, flagIndex)
 	for i = 1, #flag_array do
-		if flagType == flag_array[i]["type"] and flagIndex == flag_array[i]["index"] then
-			return flag_array[i]["name"];
+		if flagType == flag_array[i].type and flagIndex == flag_array[i].index then
+			return flag_array[i].name;
 		end
 	end
 end
@@ -3155,15 +3153,15 @@ end
 function setFlagByName(flagName)
 	local flag = getFlagByName(flagName);
 	if type(flag) == "table" then
-		setFlag(flag["type"], flag["index"]);
+		setFlag(flag.type, flag.index);
 	end
 end
 
 function setFlagsByType(flagType)
 	for i = 1, #flag_array do
 		local flag = flag_array[i];
-		if flag["type"] == flagType then
-			setFlag(flagType, flag["index"]);
+		if flag.type == flagType then
+			setFlag(flagType, flag.index);
 		end
 	end
 end
@@ -3171,15 +3169,15 @@ end
 function setFlagsByLevel(levelIndex)
 	for i = 1, #flag_array do
 		local flag = flag_array[i];
-		if flag["level"] == levelIndex then
-			setFlag(flag["type"], flag["index"]);
+		if flag.level == levelIndex then
+			setFlag(flag.type, flag.index);
 		end
 	end
 end
 
 function setAllFlags()
 	for i = 1, #flag_array do
-		setFlag(flag_array[i]["type"], flag_array[i]["index"]);
+		setFlag(flag_array[i].type, flag_array[i].index);
 	end
 end
 
@@ -3205,15 +3203,15 @@ end
 function clearFlagByName(flagName)
 	local flag = getFlagByName(flagName);
 	if type(flag) == "table" then
-		clearFlag(flag["type"], flag["index"]);
+		clearFlag(flag.type, flag.index);
 	end
 end
 
 function clearFlagsByType(flagType)
 	for i = 1, #flag_array do
 		local flag = flag_array[i];
-		if flag["type"] == flagType then
-			clearFlag(flagType, flag["index"]);
+		if flag.type == flagType then
+			clearFlag(flagType, flag.index);
 		end
 	end
 end
@@ -3221,15 +3219,15 @@ end
 function clearFlagsByLevel(levelIndex)
 	for i = 1, #flag_array do
 		local flag = flag_array[i];
-		if flag["level"] == levelIndex then
-			clearFlag(flag["type"], flag["index"]);
+		if flag.level == levelIndex then
+			clearFlag(flag.type, flag.index);
 		end
 	end
 end
 
 function clearAllFlags()
 	for i = 1, #flag_array do
-		clearFlag(flag_array[i]["type"], flag_array[i]["index"]);
+		clearFlag(flag_array[i].type, flag_array[i].index);
 	end
 end
 
@@ -3256,10 +3254,10 @@ end
 function checkFlagByName(flagName)
 	local flag = getFlagByName(flagName);
 	if type(flag) == "table" then
-		if checkFlag(flag["type"], flag["index"]) then
-			print("The flag \""..flag["name"].."\" is SET");
+		if checkFlag(flag.type, flag.index) then
+			print("The flag \""..flag.name.."\" is SET");
 		else
-			print("The flag \""..flag["name"].."\" is NOT set");
+			print("The flag \""..flag.name.."\" is NOT set");
 		end
 	end
 end
@@ -3309,15 +3307,15 @@ function Game.initUI()
 	ScriptHawk.UI.form_controls.moves_dropdown = forms.dropdown(ScriptHawk.UI.options_form, { "4. None", "3. SM 100%", "2. FFM Setup", "1. All", "0. Demo" }, ScriptHawk.UI.col(10) + ScriptHawk.UI.dropdown_offset, ScriptHawk.UI.row(5) + ScriptHawk.UI.dropdown_offset, ScriptHawk.UI.col(4) + 8, ScriptHawk.UI.button_height);
 	ScriptHawk.UI.form_controls.moves_button = forms.button(ScriptHawk.UI.options_form, "Unlock Moves", unlock_moves, ScriptHawk.UI.col(10), ScriptHawk.UI.row(6), ScriptHawk.UI.col(4) + 8, ScriptHawk.UI.button_height);
 
-	--Create Inverse Object_Slot_Variables
-	for k,v in pairs(slot_variables) do
-		if v["Name"] then
-			if type(v["Name"]) == 'table' then
-				for l,w in pairs(v["Name"]) do
-					slot_variables_inv[v["Name"][l]] = k;
+	-- Create Inverse Object_Slot_Variables
+	for k, v in pairs(slot_variables) do
+		if v.Name then
+			if type(v.Name) == 'table' then
+				for l, w in pairs(v.Name) do
+					slot_variables_inv[v.Name[l]] = k;
 				end
 			else
-				slot_variables_inv[v["Name"]] = k;
+				slot_variables_inv[v.Name] = k;
 			end
 		end
 	end
@@ -3360,32 +3358,32 @@ end
 
 Game.OSDPosition = {2, 70};
 Game.OSD = {
-	{"X", Game.getXPosition},
-	{"Y", Game.getYPosition},
-	{"Z", Game.getZPosition},
-	{"Separator", 1},
+	{"X"},
+	{"Y"},
+	{"Z"},
+	{"Separator"},
 	{"Floor", Game.getFloor},
-	{"Separator", 1},
+	{"Separator"},
 	{"Y Velocity", Game.getYVelocity, Game.colorYVelocity},
 	{"Velocity", Game.getVelocity};
 	{"dY"},
 	{"dXZ"},
-	{"Separator", 1},
+	{"Separator"},
 	{"Max dY"},
 	{"Max dXZ"},
 	{"Odometer"},
-	{"Separator", 1},
+	{"Separator"},
 	{"Movement", Game.getCurrentMovementState, Game.colorCurrentMovementState},
 	{"Slope Timer", Game.getSlopeTimer, Game.colorSlopeTimer},
 	{"Grounded", Game.getGroundState},
 	{"Wall Collisions", Game.getWallCollisions},
-	{"Separator", 1},
+	{"Separator"},
 	{"Facing", Game.getFacingAngle},
 	{"Moving", Game.getYRotation},
 	{"Moving Angle"},
 	{"Rot. X", Game.getXRotation},
 	{"Rot. Z", Game.getZRotation},
-	{"Separator", 1},
+	{"Separator"},
 	--{"FF Answer", getCorrectFFAnswer},
 	{"FF Pattern", Game.getFFPattern},
 };

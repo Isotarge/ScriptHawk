@@ -136,9 +136,9 @@ Game.OSDPosition = {2, 70};
 Game.OSD = {
 	{"Round", Game.getRound},
 	{"Lives", Game.getLives},
-	{"Separator", 1},
-	{"X", Game.getXPosition},
-	{"Y", Game.getYPosition},
+	{"Separator"},
+	{"X"},
+	{"Y"},
 	{"X Velocity", Game.getXVelocity},
 	{"Y Velocity", Game.getYVelocity},
 	{"dX"},

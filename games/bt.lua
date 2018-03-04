@@ -296,27 +296,27 @@ local Game = {
 		"JRL - Sea Bottom",
 	},
 	Memory = { -- Version order: Australia, Europe, Japan, USA
-		["consumable_base"] = {0x11FFB0, 0x120170, 0x115340, 0x11B080},
-		["consumable_pointer"] = {0x12FFC0, 0x1301D0, 0x125420, 0x12B250},
-		["object_array_pointer"] = {0x13BBD0, 0x13BE60, 0x131020, 0x136EE0},
-		["player_pointer"] = {0x13A210, 0x13A4A0, 0x12F660, 0x135490},
-		["player_pointer_index"] = {0x13A25F, 0x13A4EF, 0x12F6AF, 0x1354DF},
-		["global_flag_base"] = {0x131500, 0x131790, 0x126950, 0x12C780},
-		["camera_pointer_pointer"] = {0x12C478, 0x12C688, 0x1218D8, 0x127728},
-		["flag_block_pointer"] = {0x1314F0, 0x131780, 0x126940, 0x12C770},
-		["air"] = {0x12FDC0, 0x12FFD0, 0x125220, 0x12B050},
-		["frame_timer"] = {0x083550, 0x083550, 0x0788F8, 0x079138},
-		["linked_list_root"] = {0x13C380, 0x13C680, 0x131850, 0x137800},
-		["map"] = {0x137B42, 0x137DD2, 0x12CF92, 0x132DC2},
-		["map_trigger_target"] = {0x12C390, 0x12C5A0, 0x1217F0, 0x127640},
-		["map_trigger"] = {0x12C392, 0x12C5A2, 0x1217F2, 0x127642},
-		["map_destination"] = {0x044E32, 0x044E32, 0x044EB2, 0x045702},
-		["DCW_location"] = {0x12C33A, 0x12C54A, 0x12179A, 0x1275EA},
-		["character_state"] = {0x13BC53, 0x13BEE3, 0x1310A3, 0x136F63},
-		["character_change"] = {0x12BD9C, 0x12BFAC, 0x1211FC, 0x12704C},
-		["iconAddress"] = {0x11FF95, 0x120155, 0x115325, 0x11B065},
-		["animation_pointer"] = {0x13BB60, 0x13BDF0, 0x130FB0, 0x136E70},
-		["healthAddresses"] = {
+		consumable_base = {0x11FFB0, 0x120170, 0x115340, 0x11B080},
+		consumable_pointer = {0x12FFC0, 0x1301D0, 0x125420, 0x12B250},
+		object_array_pointer = {0x13BBD0, 0x13BE60, 0x131020, 0x136EE0},
+		player_pointer = {0x13A210, 0x13A4A0, 0x12F660, 0x135490},
+		player_pointer_index = {0x13A25F, 0x13A4EF, 0x12F6AF, 0x1354DF},
+		global_flag_base = {0x131500, 0x131790, 0x126950, 0x12C780},
+		camera_pointer_pointer = {0x12C478, 0x12C688, 0x1218D8, 0x127728},
+		flag_block_pointer = {0x1314F0, 0x131780, 0x126940, 0x12C770},
+		air = {0x12FDC0, 0x12FFD0, 0x125220, 0x12B050},
+		frame_timer = {0x083550, 0x083550, 0x0788F8, 0x079138},
+		linked_list_root = {0x13C380, 0x13C680, 0x131850, 0x137800},
+		map = {0x137B42, 0x137DD2, 0x12CF92, 0x132DC2},
+		map_trigger_target = {0x12C390, 0x12C5A0, 0x1217F0, 0x127640},
+		map_trigger = {0x12C392, 0x12C5A2, 0x1217F2, 0x127642},
+		map_destination = {0x044E32, 0x044E32, 0x044EB2, 0x045702},
+		DCW_location = {0x12C33A, 0x12C54A, 0x12179A, 0x1275EA},
+		character_state = {0x13BC53, 0x13BEE3, 0x1310A3, 0x136F63},
+		character_change = {0x12BD9C, 0x12BFAC, 0x1211FC, 0x12704C},
+		iconAddress = {0x11FF95, 0x120155, 0x115325, 0x11B065},
+		animation_pointer = {0x13BB60, 0x13BDF0, 0x130FB0, 0x136E70},
+		healthAddresses = {
 			[0x01] = {0x120584, 0x120794, 0x115A04, 0x11B644}, -- BK
 			[0x10] = {0x12059F, 0x1207AF, 0x115A1F, 0x11B65F}, -- Banjo (Solo)
 			[0x11] = {0x1205A8, 0x1207B8, 0x115A28, 0x11B668}, -- Mumbo
@@ -939,7 +939,7 @@ local movementStates = {
 	-- 0x0D Taken to JV
 	[0x0E] = "Damaged",
 	[0x0F] = "Beak Buster",
-	
+
 	[0x10] = "Feathery Flap",
 	[0x11] = "Rat-a-tat Rap",
 	[0x12] = "Flap Flip",
@@ -972,7 +972,7 @@ local movementStates = {
 	[0x2D] = "Idle", -- Water Surface
 	[0x2E] = "Paddling", -- Water Surface
 	[0x2F] = "Falling",
-	
+
 	[0x30] = "Diving",
 	[0x31] = "Rolling",
 	[0x32] = "Idle", -- Washing Machine
@@ -1004,7 +1004,7 @@ local movementStates = {
 	[0x4C] = "Landing", -- Water Surface
 
 	[0x4F] = "Idle", -- Climbing
-	
+
 	[0x50] = "Climbing",
 	-- 0x53 Taken to JV
 	[0x54] = "Drowning",
@@ -1019,10 +1019,10 @@ local movementStates = {
 	[0x5D] = "Locked", -- Washing Machine, Loading Zones & Sliding
 	[0x5E] = "Locked", -- Shack Pack, Talking, moving to target
 	[0x5F] = "Locked", -- Shack pack, Talking
-	
+
 	[0x60] = "Locked", -- Snooze Pack, Talking, moving to target
 	[0x61] = "Locked", -- Snooze Pack, Talking
-	
+
 	[0x65] = "Locked", -- Solo Kazooie, Swimming, Text Boxes
 	[0x66] = "Locked", -- Solo Kazooie - Water surface?
 	[0x67] = "Shooting Egg", -- Solo Kazooie
@@ -1034,7 +1034,7 @@ local movementStates = {
 	[0x6D] = "Diving", -- Solo Banjo
 	[0x6E] = "Locked", -- Sack Pack, Talking, moving to target
 	[0x6F] = "Floating", -- Solo Banjo, CCL
-	
+
 	[0x70] = "Locked", -- Golden Goliath
 	[0x71] = "Falling", -- Talon Trot
 	[0x72] = "Recovering", -- Splat
@@ -1051,7 +1051,7 @@ local movementStates = {
 	[0x7D] = "Damaged", -- Solo Banjo - Sack Pack
 
 	[0x7F] = "Damaged", -- Underwater
-	
+
 	[0x80] = "Locked", -- Sack Pack, Talking
 	[0x81] = "Swimming (A)", -- Solo Banjo
 	[0x82] = "Swimming (B)", -- Solo Banjo
@@ -1068,7 +1068,7 @@ local movementStates = {
 	[0x8D] = "Locked", -- Bee, Eyeball Plant FTT
 	[0x8E] = "Knockback", -- Washing Machine
 	[0x8F] = "Locked", -- Solo Kazooie
-	
+
 	[0x90] = "Swimming (A+B)", -- Solo Banjo
 	[0x91] = "Damaged", -- Flying
 	[0x92] = "Locked", -- Washing Machine, Elevators & Text Boxes
@@ -1078,14 +1078,14 @@ local movementStates = {
 	[0x96] = "Locked", -- Transforming
 	[0x97] = "Locked", -- Underwater - Loading Zone
 	[0x98] = "Locked", -- First person camera, some damage sources, loading zones
-	
+
 	[0x9A] = "Locked", -- Talon Trot, loading zone etc
 	[0x9B] = "Locked", -- Stilt Stride, Prison Compound Buttons etc
 	[0x9C] = "Jumping", -- Springy Step Shoes
 	[0x9D] = "Locked", -- Bee, Loading Zones
 	-- 0x9E Taken to 0,0,0
 	[0x9F] = "Creeping", -- With Gold Idol
-	
+
 	[0xA0] = "Locked", -- With Gold Idol, Detection
 	[0xA2] = "Knockback", -- After transform from Sub to BK
 	[0xA3] = "Knockback", -- Bee
@@ -1101,7 +1101,7 @@ local movementStates = {
 	[0xAD] = "Falling", -- Stony
 	[0xAE] = "Jumping", -- Stony
 	[0xAF] = "Damaged", -- Stony
-	
+
 	[0xB0] = "Knockback", -- Stony
 	[0xB1] = "Locked", -- Stony
 	[0xB2] = "Walking", -- Stony
@@ -1118,7 +1118,7 @@ local movementStates = {
 	[0xBD] = "Jumping", -- Solo Kazooie
 	[0xBE] = "Gliding", -- Solo Kazooie
 	[0xBF] = "Stunned", -- Swimming
-	
+
 	-- 0xC0 Something with the bee?
 	[0xC1] = "Shock Spring Jump", -- Solo Kazooie
 	[0xC2] = "Wing Whack", -- Solo Kazooie
@@ -1162,7 +1162,7 @@ local movementStates = {
 	[0xED] = "Exiting Talon Torpedo",
 	[0xEE] = "Falling (Splat)", -- Mumbo
 	[0xEF] = "Landing", -- Mumbo
-	
+
 	[0xF0] = "Idle", -- Mumbo - Water Surface
 	[0xF1] = "Paddling", -- Mumbo
 	[0xF2] = "Locked", -- Mumbo, Swimming, Text Boxes
@@ -1179,7 +1179,7 @@ local movementStates = {
 	[0xFD] = "Failure", -- Golden Goliath, Run out of time
 	[0xFE] = "Locked", -- Golden Goliath, Loading Zone
 	[0xFF] = "Recovering", -- Mumbo
-	
+
 	[0x100] = "Damaged", -- Solo Kazooie
 	[0x101] = "Death", -- Solo Kazooie
 	[0x102] = "Death", -- Solo Banjo - Sack Pack
@@ -1196,7 +1196,7 @@ local movementStates = {
 	[0x10D] = "Detonating", -- Detonator, Scripted
 	[0x10E] = "Detonating", -- Detonator
 	[0x10F] = "Idle", -- Detonator, Water Surface
-	
+
 	[0x110] = "Paddling", -- Detonator, Water Surface
 	[0x111] = "Landing", -- Detonator, Water Surface
 	-- 0x112 Det/Bee Death?
@@ -1229,7 +1229,7 @@ local movementStates = {
 	[0x12D] = "Damaged", -- Submarine
 	[0x12E] = "Death", -- Submarine
 	[0x12F] = "Locked", -- Submarine - Signpost etc
-	
+
 	[0x130] = "Locked", -- Submarine - Loading Zone, Transforming etc
 	[0x131] = "Idle", -- Submarine
 	[0x132] = "Landing", -- Clockwork Kazooie
@@ -1246,7 +1246,7 @@ local movementStates = {
 	[0x13D] = "Locked", -- Small T. Rex
 	[0x13E] = "Falling", -- Small T. Rex
 	[0x13F] = "Jumping", -- Small T. Rex
-	
+
 	[0x140] = "Damaged", -- Small T. Rex
 	[0x141] = "Knockback", -- Small T. Rex
 	[0x142] = "Locked", -- Small T. Rex, Talking
@@ -1263,7 +1263,7 @@ local movementStates = {
 	[0x14D] = "Knockback", -- Big T. Rex
 	[0x14E] = "Locked", -- Big T. Rex, Talking
 	[0x14F] = "Roar", -- Big T. Rex
-	
+
 	[0x150] = "Walking", -- Big T. Rex
 	[0x151] = "Idle", -- Big T. Rex
 	[0x152] = "Walking", -- Big T. Rex, Slow
@@ -1279,7 +1279,7 @@ local movementStates = {
 	[0x15D] = "Idle", -- Solo Kazooie - Water Surface
 	[0x15E] = "Paddling", -- Solo Kazooie
 	[0x15F] = "Diving", -- Solo Kazooie
-	
+
 	[0x160] = "Landing", -- Solo Kazooie - Water Surface
 	[0x161] = "Entering Flight", -- Solo Kazooie
 	[0x162] = "Flying", -- Solo Kazooie
@@ -1300,18 +1300,18 @@ local movementStates = {
 	-- 0x170 leads into leaving snooze pack
 	[0x171] = "Entering Snooze Pack",
 	[0x172] = "Leaving Snooze Pack",
-	
+
 	[0x174] = "Beak Bomb", -- Solo Kazooie
 	[0x175] = "Exiting Beak Bomb", -- Solo Kazooie
 	[0x176] = "Recovering", -- Solo Kazooie, post splat
 	[0x177] = "Damaged", -- Solo Kazooie, Hitting Wall in Beak Bomb
-	
+
 	[0x17B] = "Idle", -- On Wall, Claw Clamber
 	[0x17C] = "Walking", -- On Wall, Claw Clamber
 	[0x17D] = "Idle", -- Snowball
 	[0x17E] = "Rolling", -- Snowball
 	[0x17F] = "Jumping", -- Snowball
-	
+
 	[0x180] = "Falling", -- Snowball
 	[0x181] = "Damaged", -- Snowball
 	[0x182] = "Death", -- Snowball
@@ -1326,8 +1326,8 @@ local movementStates = {
 	[0x18B] = "Breathing Fire", -- Solo Kazooie
 	[0x18C] = "Damage", -- Bee, Flying
 	-- 0x18D Leads into gliding
-	-- 0x18f leads into landing
-	
+	-- 0x18F leads into landing
+
 	-- 0x190 likely the last animation
 };
 
@@ -1399,7 +1399,7 @@ local animationList = {
 	[0x0D] = "Pecking", -- On Ledge
 	[0x0E] = "Skidding",
 	[0x0F] = "Knockback", -- IoH Wigwam Transformation
-	
+
 	[0x10] = "Nodding", -- Solo Kazooie, Locked
 	[0x11] = "Walking", -- Wonderwing
 	[0x12] = "Grabbing Up", -- Ledge
@@ -1414,7 +1414,7 @@ local animationList = {
 	[0x1C] = "Beak Barge",
 	[0x1D] = "Beak Buster",
 	[0x1F] = "Launching", -- Jinjo Collection Start
-	
+
 	[0x20] = "Breegull Bash",
 	[0x22] = "Entering Wonderwing",
 	[0x23] = "Idle", -- Wonderwing
@@ -1425,7 +1425,7 @@ local animationList = {
 	[0x2B] = "Pooping", -- Egg
 	[0x2D] = "Idle", -- Jinjo/Minjo
 	[0x2F] = "Waving", -- Jinjo/Minjo Help
-	
+
 	[0x31] = "Jumping", -- Jinjo/Minjo
 	[0x32] = "Death", -- Washing Machine
 	[0x33] = "Death", -- Stony
@@ -1435,7 +1435,7 @@ local animationList = {
 	[0x3D] = "Jumping", -- Stilt Stride
 	[0x3E] = "Splatting", -- Beak Bomb
 	[0x3F] = "Swimming", -- B Swimming
-	
+
 	[0x40] = "Entering Stilt Stride",
 	[0x41] = "Idle", -- Stilt Stride
 	[0x42] = "Wading", -- Stilt Stride
@@ -1451,7 +1451,7 @@ local animationList = {
 	[0x4C] = "Falling", -- Flip Flap
 	[0x4D] = "Damage",
 	[0x4F] = "Rolling",
-	
+
 	[0x50] = "Thinking", -- Locked
 	[0x51] = "Shuffling", -- Ledge Grab, Left
 	[0x52] = "Idle", -- Ledge Grab
@@ -1463,7 +1463,7 @@ local animationList = {
 	[0x5B] = "Listening", -- Talking to NPC (Eg. Jamjars, Jingaling)
 	[0x5E] = "Idle", -- Snowball
 	[0x5F] = "Rolling / Jumping", -- Snowball
-	
+
 	[0x61] = "Bill Drill",
 	[0x62] = "Waddling", -- Stony
 	[0x63] = "Idle", -- Stony
@@ -1472,16 +1472,16 @@ local animationList = {
 	[0x67] = "Idle", -- Wading Boots Object
 	[0x68] = "Falling (Splat)", -- Falling too far
 	[0x6F] = "Idle", -- Normal
-	
+
 	[0x70] = "Idle", -- Swimming
 	[0x71] = "Swimming", -- A Swimming
 	[0x72] = "Idle", -- Holding Gold Idol
 	[0x73] = "Walking", -- Holding Gold Idol
-	
+
 	[0x83] = "Pushcart", -- Canary Mary 1/2
 	[0x85] = "Celebrating", -- Canary Mary
 	[0x86] = "Idle", -- Claw Clamber Boots
-	
+
 	[0x91] = "Idle", -- Saucer of Peril Object
 	[0x95] = "Idle", -- Kazooie pecking Banjo's head
 	[0x99] = "Departing", -- Chuffy
@@ -1489,7 +1489,7 @@ local animationList = {
 	[0x9C] = "Paddling", -- Mumbo
 	[0x9D] = "Treading Water", -- Mumbo
 	[0x9F] = "Attacking", -- Mumbo/Mingy, Wand
-	
+
 	[0xA0] = "Entering Claw Clamber Boots",
 	[0xA1] = "Walking", -- Claw Clamber Boots
 	[0xA2] = "Splitting", -- Split Up
@@ -1504,7 +1504,7 @@ local animationList = {
 	[0xAC] = "Idle", -- Solo Kazooie, Looking under wing
 	[0xAD] = "Idle", -- Solo Kazooie, Flapping
 	[0xAF] = "Pack Whack",
-	
+
 	[0xB0] = "Falling",
 	[0xB1] = "Idle", -- Vine, Looking Around
 	[0xB2] = "Idle", -- Vine
@@ -1519,7 +1519,7 @@ local animationList = {
 	[0xBC] = "Falling (Splat)", -- Mumbo
 	[0xBD] = "Jumping", -- Mumbo
 	[0xBF] = "Damaged", -- Old King Coal, Head taken off
-	
+
 	[0xC2] = "Damaged", -- Old King Coal, Right Arm taken off
 	[0xC3] = "Damaged", -- Old King Coal, Left Arm taken off
 	[0xC4] = "Stretching", -- Old King Coal
@@ -1532,7 +1532,7 @@ local animationList = {
 	[0xCC] = "Exiting Beak Bomb",
 	[0xCE] = "Getting Up", -- Mumbo/Mingy Jongo (in Chair)
 	[0xCF] = "Pulling out Wand", -- Mumbo/Mingy Jongo (in Chair)
-	
+
 	[0xD1] = "Sneezing", -- Salty Joe
 	[0xD2] = "Recovering",
 	[0xD3] = "Damage", -- Beak Bomb Recoil
@@ -1542,7 +1542,7 @@ local animationList = {
 	[0xDC] = "Sneezing", -- Big Al
 	[0xDE] = "Walking", -- Jippo Jim
 	[0xDF] = "Alerted", -- Jippo Jim
-	
+
 	[0xE0] = "Breathing Fire", -- BK (Dragon)
 	[0xE1] = "Breathing Fire", -- Solo Kazooie (Dragon)
 	[0xE2] = "Hopping", -- Detonator
@@ -1557,7 +1557,7 @@ local animationList = {
 	[0xED] = "Jumping", -- Van
 	[0xEE] = "Idle", -- Van
 	[0xEF] = "Knockback", -- Transform from Wigwam
-	
+
 	[0xF1] = "Opening Rear Doors", -- Van
 	[0xF2] = "Paying", -- Van
 	[0xF3] = "Entering Taxi Pack",
@@ -1570,10 +1570,10 @@ local animationList = {
 	[0xFC] = "Retrieving Bag", -- Mumbo's Magic
 	[0xFD] = "Sitting Down", -- Mumbo (Getting back in Chair)
 	[0xFE] = "Idle", -- Conga
-	
+
 	[0x10C] = "Crouching", -- Idle
 	[0x10D] = "Recoiling", -- Flying
-	
+
 	[0x115] = "Idle", -- Pawno
 	[0x116] = "Crouching", -- Looking Around
 	[0x11B] = "Throwing",
@@ -1581,7 +1581,7 @@ local animationList = {
 	[0x11D] = "Splatting", -- Falling too far, Solo Kazooie
 	[0x11E] = "Recovering", -- Falling too far, Solo Kazooie
 	[0x11F] = "Jumping", -- Claw Clamber Boots
-	
+
 	[0x121] = "Grabbing", -- Taxi Pack
 	[0x122] = "Jumping", -- Stony
 	[0x124] = "Idle", -- Taxi Pack
@@ -1592,7 +1592,7 @@ local animationList = {
 	[0x12C] = "Putting on Backpack", -- Taxi Pack
 	[0x12E] = "Idle / Slow Moving", -- Submarine
 	[0x12F] = "Fast Moving", -- Submarine
-	
+
 	[0x130] = "Damaged", -- Submarine
 	[0x131] = "Deploying Talon Torpedo",
 	[0x132] = "Swimming", -- Talon Torpedo
@@ -1607,7 +1607,7 @@ local animationList = {
 	[0x13D] = "Gliding", -- Solo Kazooie
 	[0x13E] = "Feathery Flap", -- Solo Kazooie
 	[0x13F] = "Hatching", -- Solo Kazooie
-	
+
 	[0x140] = "Hatching (Success)", -- Solo Kazooie
 	[0x141] = "Crouching", -- Looking Around, Solo Kazooie
 	[0x142] = "Leg Spring", -- Solo Kazooie
@@ -1621,7 +1621,7 @@ local animationList = {
 	[0x14A] = "Jumping", -- Stilt Stride, Solo Kazooie
 	[0x14E] = "Idle", -- Blubbul
 	[0x14F] = "Stunned", -- Blubbul
-	
+
 	[0x150] = "Waking", -- Blubbul
 	[0x153] = "Idle", -- Captain Blackeye
 	[0x155] = "Celebrating", -- Jolly Roger
@@ -1632,7 +1632,7 @@ local animationList = {
 	[0x15D] = "Falling", -- Terry
 	[0x15E] = "Critically Damaged", -- Terry
 	[0x15F] = "Firing", -- Terry
-	
+
 	[0x160] = "Flying", -- Terry (Able to be hit)
 	[0x161] = "Flying", -- Terry
 	[0x162] = "Taking Flight", -- Terry
@@ -1640,9 +1640,9 @@ local animationList = {
 	[0x169] = "Appearing", -- Chompasaurus
 	[0x16A] = "Stomping", -- Stomponadon
 	[0x16C] = "Celebrating", -- Chris P Bacon
-	
+
 	[0x172] = "Idle", -- Inky
-	
+
 	[0x180] = "Idle", -- Fruity
 	[0x181] = "Dispensing", -- Fruity
 	[0x182] = "Attacking", -- Fruity
@@ -1650,7 +1650,7 @@ local animationList = {
 	[0x185] = "On Back", -- Tiptup Jr
 	[0x189] = "Celebrating", -- Tiptup
 	[0x18D] = "Moving", -- Mucoid
-	
+
 	[0x190] = "Flying", -- Gruntydactyl
 	[0x193] = "Sleeping", -- Ssslumber
 	[0x194] = "Waking", -- Ssslumber
@@ -1658,13 +1658,13 @@ local animationList = {
 	[0x196] = "Falling Asleep", -- Ssslumber
 	[0x198] = "Celebrating", -- Bovina
 	[0x199] = "Idle", -- Officer Unogopaz
-	
+
 	[0x1A5] = "Dormant", -- Snapdragon
 	[0x1A6] = "Attacking", -- Snapdragon
 	[0x1AB] = "Death", -- Snapdragon
 	[0x1AD] = "Charging", -- Minjo
 	[0x1AF] = "Sleeping", -- Mumbo/Mingy Jongo (in Chair)
-	
+
 	[0x1B0] = "Waking", -- Mumbo (in Chair)
 	[0x1B1] = "Holding Bag", -- Mumbo (in Chair)
 	[0x1B2] = "Holding Bag", -- Mumbo (in Chair)
@@ -1673,7 +1673,7 @@ local animationList = {
 	[0x1B9] = "Charging", -- Diggit
 	[0x1BA] = "Attacking", -- Diggit
 	[0x1BB] = "Stretching", -- Diggit
-	
+
 	[0x1C1] = "Recovering", -- Terry
 	[0x1C7] = "Charging", -- Demented Beehive
 	[0x1C8] = "Swimming", -- Swellbelly
@@ -1681,7 +1681,7 @@ local animationList = {
 	[0x1CA] = "Attacking", -- Swellbelly
 	[0x1CE] = "Creeping", -- T-Rex
 	[0x1CF] = "Walking", -- T-Rex
-	
+
 	[0x1D0] = "Roaring", -- T-Rex
 	[0x1D1] = "Jumping", -- T-Rex
 	[0x1D2] = "Idle", -- T-Rex
@@ -1690,7 +1690,7 @@ local animationList = {
 	[0x1DC] = "Flying", -- Bee
 	[0x1DD] = "Walking", -- Bee
 	[0x1DE] = "Idle", -- Bee
-	
+
 	[0x1E0] = "Damaged", -- Bee
 	[0x1E1] = "Death", -- Bee
 	[0x1E2] = "Jumping", -- Bee
@@ -1704,11 +1704,11 @@ local animationList = {
 	[0x1EC] = "Idle", -- Bang Box
 	[0x1EE] = "Idle", -- Golden Goliath
 	[0x1EF] = "Jumping", -- Golden Goliath
-	
+
 	[0x1F0] = "Kicking", -- Golden Goliath
 	[0x1F1] = "Deactivating", -- Golden Goliath
 	[0x1F7] = "Idle", -- Terry
-	
+
 	[0x202] = "Idle", -- Mr Patch (Stage 2)
 	[0x203] = "Moving", -- Mr Patch
 	[0x204] = "Inflating", -- Mr Patch (To Stage 1)
@@ -1717,14 +1717,14 @@ local animationList = {
 	[0x208] = "Idle", -- Mr Patch (Stage 1)
 	[0x209] = "Attacking", -- Mr Patch
 	[0x20A] = "Deflating", -- Mr Patch
-	
+
 	[0x212] = "Roaming", -- Glowbo
 	[0x218] = "Alerted", -- Billy Bob, Aggressive
 	[0x219] = "Hiding", -- Billy Bob, Transition to Inactive
 	[0x21A] = "Moving", -- Billy Bob
 	[0x21B] = "Death", -- Billy Bob
 	[0x21C] = "Idle", -- Billy Bob, Inactive
-	
+
 	[0x220] = "Idle", -- Cheato
 	[0x222] = "Celebrating", -- Gobi
 	[0x229] = "Closed", -- Silo
@@ -1732,9 +1732,9 @@ local animationList = {
 	[0x22B] = "Opening", -- Silo (Move already learnt)
 	[0x22C] = "Closing", -- Silo (Move already learnt)
 	[0x22D] = "Open", -- Silo (Move already learnt)
-	
+
 	[0x238] = "Idle", -- Loggo
-	
+
 	[0x242] = "Idle", -- Moggy
 	[0x244] = "Celebrating", -- Soggy
 	[0x246] = "Idle", -- Groggy
@@ -1742,7 +1742,7 @@ local animationList = {
 	[0x24B] = "Idle", -- Springy Step Shoes, Solo Kazooie
 	[0x24C] = "Springing", -- Springy Step Shoes, Solo Kazooie
 	[0x24D] = "Walking", -- Springy Step Shoes, Solo Kazooie
-	
+
 	[0x250] = "Turning (Sharp)", -- Dodgem Car
 	[0x251] = "Turning", -- Dodgem Car
 	[0x252] = "Bumping", -- Dodgem Car
@@ -1753,7 +1753,7 @@ local animationList = {
 	[0x25D] = "Eating Potion", -- Klungo
 	[0x25E] = "Enlarging", -- Klungo
 	[0x25F] = "Attacking", -- Klungo (Enlarged)
-	
+
 	[0x260] = "Damage", -- Klungo
 	[0x261] = "Throwing Potion", -- Klungo
 	[0x262] = "Critically Damaged", -- Klungo
@@ -1762,7 +1762,7 @@ local animationList = {
 	[0x266] = "Damage", -- Klungo (Duplication)
 	[0x267] = "Idle", -- Klungo (Enlarged)
 	[0x268] = "Shrinking", -- Klungo (Enlarged)
-	
+
 	[0x270] = "Walking", -- Breegull Blaster, Banjo, Faster
 	[0x271] = "Walking", -- Breegull Blaster, Banjo, Slow
 	[0x272] = "Idle", -- Breegull Blaster, Banjo
@@ -1774,7 +1774,7 @@ local animationList = {
 	[0x27D] = "Diving", -- Solo Banjo
 	[0x27E] = "Swimming", -- Solo Banjo
 	[0x27F] = "Entering Stilt Stride", -- Solo Kazooie
-	
+
 	[0x280] = "Wading", -- Stilt Stride, Solo Kazooie
 	[0x281] = "Driving", -- Dodgem Car
 	[0x282] = "Celebrating", -- 10th Jiggy Jig from BK
@@ -1784,7 +1784,7 @@ local animationList = {
 	[0x28D] = "Shooting", -- Solo Kazooie, Egg
 	[0x28E] = "Pooping", -- Solo Kazooie, Egg
 	[0x28F] = "Crouching", -- Idle, Solo Kazooie
-	
+
 	[0x290] = "Slipping", -- Solo Kazooie
 	[0x293] = "Idle", -- Shack Pack
 	[0x294] = "Jumping", -- Shack Pack
@@ -1797,16 +1797,16 @@ local animationList = {
 	[0x29D] = "Charging Beak Bomb", -- Solo Kazooie
 	[0x29E] = "Beak Bomb", -- Solo Kazooie
 	[0x29F] = "Entering Spring Step Shoes",
-	
+
 	[0x2A4] = "Celebrating", -- Bullion Bill
-	
+
 	[0x2B0] = "Idle", -- Dingpot
 	[0x2B4] = "Idle", -- Trotty
 	[0x2B8] = "Tapping Stick", -- Jamjars
 	[0x2BB] = "Saluting", -- Jamjars
 	[0x2BC] = "Teaching", -- Jamjars
 	[0x2BE] = "Appearing", -- Jamjars
-	
+
 	[0x2C0] = "Celebrating", -- Piggles
 	[0x2C1] = "Disappearing", -- Jamjars
 	[0x2C2] = "Lifting Lid", -- Jamjars
@@ -1816,14 +1816,14 @@ local animationList = {
 	[0x2C6] = "Idle", -- Old King Coal
 	[0x2C8] = "Idle", -- Jamjars
 	[0x2C9] = "Bonking", -- Jamjars
-	
+
 	[0x2D6] = "Celebrating", -- Oogle Boogle
 	[0x2DC] = "Celebrating", -- Dippy
 	[0x2DE] = "Appearing", -- Dippy
-	
+
 	[0x2EE] = "Laughing", -- Unga Bunga
 	[0x2EF] = "Surprised", -- Unga Bunga
-	
+
 	[0x2F0] = "Running", -- Unga Bunga
 	[0x2F1] = "Sleeping", -- Unga Bunga
 	[0x2F2] = "Waking", -- Unga Bunga
@@ -1831,7 +1831,7 @@ local animationList = {
 	[0x2F4] = "Wailing", -- Unga Bunga
 	[0x2F5] = "Guarding", -- Unga Bunga
 	[0x2FC] = "Idle", -- Sabreman
-	
+
 	[0x301] = "Sitting", -- Mumbo/Mingy Jongo
 	[0x303] = "Raising", -- Targitzan
 	[0x304] = "Idle", -- Targitzan (5 Layers)
@@ -1843,17 +1843,17 @@ local animationList = {
 	[0x30A] = "Idle", -- Targitzan (1 Layer)
 	[0x30B] = "Death", -- Targitzan
 	[0x30C] = "Entering/Exiting Breegull Blaster",
-	
+
 	[0x314] = "Beak Bayonet", -- Breegull Blaster, Banjo
 	[0x315] = "Firing Egg", -- Breegull Blaster, Banjo, Grenade/Cwk Kazooie
 	[0x31A] = "Death", -- Breegull Blaster, Banjo
-	
+
 	[0x320] = "Idle", -- Targitzan (4 Layers)
 	[0x321] = "Idle", -- Targitzan (3 Layers)
 	[0x322] = "Idle", -- Targitzan (2 Layers)
 	[0x325] = "Celebrating", -- Betette
 	[0x32C] = "Celebrating", -- Alphette/Gamette
-	
+
 	[0x330] = "Idle", -- Lord Woo Fak Fak
 	[0x334] = "Firing", -- Chilli Brothers
 	[0x335] = "Damage", -- Chilli Brothers
@@ -1862,7 +1862,7 @@ local animationList = {
 	[0x338] = "Flying", -- Chilli Brothers
 	[0x33E] = "Firing", -- Lord Woo Fak Fak
 	[0x33F] = "Damaged", -- Lord Woo Fak Fak
-	
+
 	[0x340] = "Death", -- Lord Woo Fak Fak
 	[0x341] = "Dead", -- Lord Woo Fak Fak
 	[0x342] = "Lowering Head", -- Chilli Brothers
@@ -1877,8 +1877,8 @@ local animationList = {
 	[0x34C] = "Death", -- Guvnor
 	[0x34D] = "Damage", -- Guvnor
 	[0x34E] = "Idle", -- Guvnor
-	
-	[0x351] = "Critically Damaged", -- Chilli Brothers 
+
+	[0x351] = "Critically Damaged", -- Chilli Brothers
 	[0x352] = "Idle", -- Chilli Brothers
 	[0x353] = "Idle", -- Chilli Brothers (Jiggy Spawn)
 	[0x354] = "Cleaning", -- Washing Machine
@@ -1891,13 +1891,13 @@ local animationList = {
 	[0x35C] = "Idle", -- Chilli Brothers
 	[0x35E] = "Celebrating", -- Skivvy
 	[0x35F] = "Taking Flight", -- Chilli Brothers
-	
+
 	[0x36B] = "Celebrating", -- Guffo
 	[0x36C] = "Disappearing", -- Mingy Jongo
 	[0x36D] = "Reappearing", -- Mingy Jongo
 	[0x36E] = "Laughing", -- Mingy Jongo
 	[0x36F] = "Idle", -- Weldar
-	
+
 	[0x370] = "Lowering Head", -- Weldar
 	[0x371] = "Crawling", -- Weldar
 	[0x372] = "Standing Up", -- Weldar
@@ -1909,22 +1909,22 @@ local animationList = {
 	[0x378] = "Malfunctioning", -- Mingy Jongo
 	[0x379] = "Death", -- Mingy Jongo
 	[0x37A] = "Idle", -- Weldar Head
-	
+
 	[0x389] = "Idle", -- Biggafoot
-	
+
 	[0x39B] = "Looking around", -- Klungo (Intro)
 	[0x39C] = "Idle", -- Klungo (Intro)
 
 	[0x3A6] = "Lumbering", -- Jingaling (Zombie)
 	[0x3AB] = "Crumbling", -- Pile of Rocks (Intro)
 	[0x3AD] = "Idle", -- Scrotty
-	
+
 	[0x3D0] = "Hovering", -- Banjo's Hand
 	[0x3D3] = "Holding", -- Banjo's Hand
 	[0x3D4] = "Thumbs Up", -- Banjo's Hand
 	[0x3D5] = "Placing", -- Banjo's Hand
 	[0x3DF] = "Attacking", -- Ugger
-	
+
 	[0x3E0] = "Damage", -- Ugger
 	[0x3E1] = "Attacking", -- Billy Bob, Aggressive
 	[0x3E2] = "Damaged", -- Billy Bob
@@ -1935,14 +1935,14 @@ local animationList = {
 	[0x3EC] = "Waking", -- Lord Woo Fak Fak
 	[0x3EE] = "Celebrating", -- Mrs Boggy
 	[0x3EF] = "Idle", -- Angel Bottles
-	
+
 	[0x3F8] = "Celebrating", -- Styracosaurus Children
 	[0x3F9] = "Exercising", -- Mr. Fit
 	[0x3FD] = "Celebrating", -- Mr. Fit
-	
+
 	[0x408] = "Spinning", -- Hag 1 Drill (Intro)
 	[0x40F] = "Appearing", -- Hag 1 (Intro)
-	
+
 	[0x410] = "Crumbling", -- Pile of Rocks (Intro)
 	[0x411] = "Lifting Drill", -- Hag 1 (Intro)
 	[0x412] = "Idle", -- Hag 1 (Intro)
@@ -1956,7 +1956,7 @@ local animationList = {
 	[0x41C] = "Examining", -- Mingella (Intro)
 	[0x41E] = "Tripping", -- Blobbelda (Intro)
 	[0x41F] = "Reading", -- Mingella (Intro)
-	
+
 	[0x420] = "Idle", -- Blobbelda (Intro)
 	[0x421] = "Casting Spell", -- Mingella (Intro)
 	[0x425] = "Closing Book", -- Mingella (Intro)
@@ -1968,7 +1968,7 @@ local animationList = {
 	[0x42D] = "Retracting Both Mortars", -- Hag 1
 	[0x42E] = "Opening Exhaust Port", -- Hag 1
 	[0x42F] = "Opening 2nd Hatch", -- Hag 1
-	
+
 	[0x431] = "Laughing", -- Rocknut
 	[0x435] = "Opening Hatch", -- Grunty, Hag 1
 	[0x436] = "Reading", -- Grunty, Hag 1
@@ -1981,7 +1981,7 @@ local animationList = {
 	[0x43D] = "Holding Purple Spell", -- Grunty, Hag 1
 	[0x43E] = "Throwing Purple Spell", -- Grunty, Hag 1
 	[0x43F] = "Idle", -- Grunty, Hag 1
-	
+
 	[0x440] = "Dropping Spell", -- Grunty, Hag 1
 	[0x443] = "Idle", -- Boggy
 	[0x446] = "Getting up", -- Grunty (Intro)
@@ -1994,7 +1994,7 @@ local animationList = {
 	[0x44D] = "Idle", -- Klungo (Intro)
 	[0x44E] = "Idle", -- Klungo (Intro)
 	[0x44F] = "Running", -- Grunty (Intro)
-	
+
 	[0x450] = "Attacking", -- Grunty (Intro, attacking Mumbo)
 	[0x451] = "Hit", -- Grunty (Intro, eye knocked out)
 	[0x453] = "Idle", -- Grunty (Intro)
@@ -2009,7 +2009,7 @@ local animationList = {
 	[0x45C] = "Cheering", -- Blobbelda (Intro)
 	[0x45D] = "Surprised", -- Mingella (Intro)
 	[0x45F] = "Limping", -- Burnt Bottles (Intro)
-	
+
 	[0x460] = "Death", -- Bottles (Intro)
 	[0x461] = "Panting", -- Mumbo (Intro)
 	[0x462] = "Running", -- Mumbo (Intro)
@@ -2026,7 +2026,7 @@ local animationList = {
 	[0x46D] = "Holding Cards", -- Bottles (Intro)
 	[0x46E] = "Shaking", -- Bottles (Intro)
 	[0x46F] = "Annoyed", -- Bottles (Intro)
-	
+
 	[0x470] = "Cheering", -- Mumbo (Intro)
 	[0x471] = "Holding Cards", -- BK (Intro)
 	[0x472] = "Shaking", -- BK (Intro)
@@ -2040,13 +2040,13 @@ local animationList = {
 	[0x47A] = "Damaged", -- Breegull Blaster, Mumbo/Jinjo
 	[0x47B] = "Death", -- Breegull Blaster, Mumbo/Jinjo
 	[0x47C] = "Death", -- Breegull Blaster, Mumbo/Jinjo, Explosive
-	
+
 	[0x480] = "Idle", -- Mingy Jongo
 	[0x481] = "Controlling Saucer of Peril",
 	[0x48B] = "Escaping", -- BK (Intro)
 	[0x48C] = "Stealing", -- BK (Intro)
 	[0x48E] = "Holding Cards", -- BK (Intro)
-	
+
 	[0x490] = "Confused", -- BK (Intro)
 	[0x492] = "Cleaning", -- Grunty (Intro)
 	[0x493] = "Tripping", -- Blobbelda (Intro)
@@ -2055,7 +2055,7 @@ local animationList = {
 	[0x499] = "Idle", -- Angel Bottles (Intro)
 	[0x49E] = "Moving", -- BK Cart
 	[0x49F] = "Idle", -- BK Cart
-	
+
 	[0x4A1] = "Performing Magic", -- Mumbo
 	[0x4A2] = "Beak Bayonet", -- Breegull Blaster, Mumbo/Jinjo
 	[0x4A3] = "Firing Egg", -- Breegull Blaster, Mumbo/Jinjo, Grenade/Cwk Kazooie
@@ -2064,16 +2064,16 @@ local animationList = {
 	[0x4A9] = "Idle", -- Mildred/George
 	[0x4AA] = "Idle", -- Warp Silo
 	[0x4AD] = "Idle", -- Honey B
-	
+
 	[0x4B2] = "Falling", -- Klungo III
 	[0x4B3] = "Landing", -- Klungo III
 	[0x4B6] = "Idle", -- Chilli Brothers
-	
+
 	[0x4C1] = "Idle", -- Master Jiggywiggy
 	[0x4C9] = "Idle", -- Disciple of Jiggywiggy
 	[0x4CA] = "Preparing to Conjure", -- Master Jiggywiggy
 	[0x4CB] = "Conjuring", -- Master Jiggywiggy
-	
+
 	[0x4D3] = "Firing Egg", -- Breegull Blaster, Grunty, Grenade/Cwk Kazooie
 	[0x4D4] = "Beak Bayonet", -- Breegull Blaster, Grunty
 	[0x4D5] = "Walking", -- Breegull Blaster, Grunty, Fast
@@ -2085,7 +2085,7 @@ local animationList = {
 	[0x4DD] = "Running", -- Jingaling, Eating CS
 	[0x4DE] = "Damaged", -- Breegull Blaster, Jamjars
 	[0x4DF] = "Firing Egg", -- Breegull Blaster, Jamjars, Grenade/Cwk Kazooie
-	
+
 	[0x4E0] = "Beak Bayonet", -- Breegull Blaster, Jamjars
 	[0x4E1] = "Walking", -- Breegull Blaster, Jamjars, Fast
 	[0x4E2] = "Idle", -- Breegull Blaster, Jamjars
@@ -2096,7 +2096,7 @@ local animationList = {
 	[0x4ED] = "Celebrating", -- Jingaling, Eating CS
 	[0x4EE] = "Idle", -- Jingaling, Restoration
 	[0x4EF] = "Idle", -- Jingaling, Eating CS
-	
+
 	[0x4F0] = "Arguing", -- Mingella
 	[0x4F1] = "Laughing", -- Mingella
 	[0x4F2] = "Explaining", -- Klungo, Eating CS
@@ -2113,7 +2113,7 @@ local animationList = {
 	[0x4FD] = "Idle", -- Humba Wumba, Credits
 	[0x4FE] = "Rubbing hands together", -- Grunty
 	[0x4FF] = "Dismissing", -- Grunty
-	
+
 	[0x500] = "Laughing", -- Grunty
 	[0x501] = "Laughing", -- Blobbelda
 	[0x502] = "Picking Up Cake", -- Humba Wumba, Credits
@@ -2124,7 +2124,7 @@ local animationList = {
 	[0x50D] = "Idle", -- Humba Wumba, Credits
 	[0x50E] = "Idle", -- Mingella
 	[0x50F] = "Arguing", -- Mumbo, Credits
-	
+
 	[0x510] = "Idle", -- Bottles, Eating CS
 	[0x511] = "Idle", -- Bottles, Eating CS
 	[0x512] = "Cutting", -- Bottles, Eating CS
@@ -2140,7 +2140,7 @@ local animationList = {
 	[0x51D] = "Running", -- Burnt Bottles, Restoration
 	[0x51E] = "Running", -- Jamjars, Credits
 	[0x51F] = "Kicking", -- Mumbo, Credits
-	
+
 	[0x520] = "Idle", -- BK At Controls
 	[0x521] = "Pressing Buttons", -- BK At Controls
 	[0x522] = "Anticipating", -- BK At Controls
@@ -2156,7 +2156,7 @@ local animationList = {
 	[0x52D] = "Idle", -- BK, Credits
 	[0x52E] = "Surprised", -- BK, Credits
 	[0x52F] = "Idle", -- BK, Credits
-	
+
 	[0x530] = "Arguing", -- BK, Credits
 	[0x531] = "Confusion", -- Jamjars, Credits
 	[0x532] = "Proposing", -- BK, Credits
@@ -2170,7 +2170,7 @@ local animationList = {
 	[0x53B] = "Cheering", -- Captain Blubber, Credits
 	[0x53C] = "Idle", -- Saucer of Peril, Credits
 	[0x53F] = "Running", -- Humba Wumba, Credits
-	
+
 	[0x542] = "Surprised", -- Klungo, Eating CS
 };
 
@@ -2236,7 +2236,7 @@ function autoJump()
 		if holdingAPostJump then
 			holdingAPostJump = holdingAPostJump and (currentMovementState == 0x15 or YVelocity > 0); -- TODO: Better method for detecting end of a jump, velocity > 0 is janky
 		end
-		joypad.set({["A"] = true}, 1);
+		joypad.set({A=true}, 1);
 	end
 end
 
@@ -3925,7 +3925,7 @@ function setFlagsByType(_type)
 		end
 		local numSet = 0;
 		for i = 1, #flag_array do
-			if flag_array[i]["type"] == _type then
+			if flag_array[i].type == _type then
 				setFlag(flag_array[i].byte, flag_array[i].bit, true);
 				numSet = numSet + 1;
 			end
@@ -3957,7 +3957,7 @@ function clearFlagsByType(_type)
 		end
 		local numSet = 0;
 		for i = 1, #flag_array do
-			if flag_array[i]["type"] == _type then
+			if flag_array[i].type == _type then
 				clearFlag(flag_array[i].byte, flag_array[i].bit, true);
 				numSet = numSet + 1;
 			end
@@ -4096,8 +4096,8 @@ function flagStats(verbose)
 	local flag, name, flagType, validType;
 	for i = 1, #flag_array do
 		flag = flag_array[i];
-		name = flag["name"];
-		flagType = flag["type"];
+		name = flag.name;
+		flagType = flag.type;
 		validType = false;
 		if flagType == "Ability" then
 			abilitiesKnown = abilitiesKnown + 1;
@@ -4133,7 +4133,7 @@ function flagStats(verbose)
 		if flagType == nil then
 			untypedFlags = untypedFlags + 1;
 			if verbose then
-				dprint("Warning: Flag without type at "..toHexString(flag.byte, 2)..">"..flag["bit"].." with name: \""..name.."\"");
+				dprint("Warning: Flag without type at "..toHexString(flag.byte, 2)..">"..flag.bit.." with name: \""..name.."\"");
 			end
 		else
 			if flagType == "Cheat" then
@@ -4160,14 +4160,14 @@ function flagStats(verbose)
 			if not validType then
 				flagsWithUnknownType = flagsWithUnknownType + 1;
 				if verbose then
-					dprint("Warning: Flag with unknown type at "..toHexString(flag.byte, 2)..">"..flag["bit"].." with name: \""..name.."\"".." and type: \""..flagType.."\"");
+					dprint("Warning: Flag with unknown type at "..toHexString(flag.byte, 2)..">"..flag.bit.." with name: \""..name.."\"".." and type: \""..flagType.."\"");
 				end
 			end
 		end
 		if flag.map ~= nil or flag.nomap == true then
 			flagsWithMap = flagsWithMap + 1;
 		elseif verbose then
-			--dprint("Warning: Flag without map tag at "..toHexString(flag.byte, 2)..">"..flag["bit"].." with name: \""..name.."\"");
+			--dprint("Warning: Flag without map tag at "..toHexString(flag.byte, 2)..">"..flag.bit.." with name: \""..name.."\"");
 		end
 	end
 
@@ -4297,19 +4297,19 @@ local slot_size = 0x9C;
 object_index = 1;
 
 object_model1 = {
-	["id_struct"] = 0x00, -- Pointer
-	["x_position"] = 0x04, -- Float
-	["y_position"] = 0x08, -- Float
-	["z_position"] = 0x0C, -- Float
-	["scale"] = 0x38, -- Float
-	["y_rotation"] = 0x48, -- Float
-	["z_rotation"] = 0x4C, -- Float
-	["health"] = 0x5E; -- Byte
-	["jinjo_identifier"] = 0x6F; -- Byte
-	--["movement_state"] = 0x72; -- Byte
-	["animation_index"] = 0x8C; -- 2 Byte
-	["transparency"] = 0x9B, --Byte
-	["models"] = {
+	id_struct = 0x00, -- Pointer
+	x_position = 0x04, -- Float
+	y_position = 0x08, -- Float
+	z_position = 0x0C, -- Float
+	scale = 0x38, -- Float
+	y_rotation = 0x48, -- Float
+	z_rotation = 0x4C, -- Float
+	health = 0x5E; -- Byte
+	jinjo_identifier = 0x6F; -- Byte
+	--movement_state = 0x72; -- Byte
+	animation_index = 0x8C; -- 2 Byte
+	transparency = 0x9B, -- Byte
+	models = {
 		--TODO: Import list from
 			-- http://thumbsupmaster.blogspot.com.au/p/banjo-tooie-image-modifications.html
 			-- http://bsfree.shadowflareindustries.com/index.php?s=39&d=6&g=15729&c=72210
@@ -5017,10 +5017,10 @@ object_model1 = {
 
 		[0xFFFF] = "Player Model",
 	},
-	["nest"] = {
-		["contents"] = 0x1E -- 2 Byte
+	nest = {
+		contents = 0x1E -- 2 Byte
 	},
-	["nest_contents_list"] = {
+	nest_contents_list = {
 			[0] = "Normal Eggs",
 			[1] = "Fire Eggs",
 			[2] = "Grenade Eggs",
@@ -5169,6 +5169,49 @@ local function getAnimationType(model1Base)
 	return "Unknown";
 end
 
+local function getExamineData(pointer)
+	local examine_data = {};
+	if not isRDRAM(pointer) then
+		return examine_data;
+	end
+
+	local modelPointer = dereferencePointer(pointer + object_model1.id_struct);
+
+	local xPos = mainmemory.readfloat(pointer + object_model1.x_position, true);
+	local yPos = mainmemory.readfloat(pointer + object_model1.y_position, true);
+	local zPos = mainmemory.readfloat(pointer + object_model1.z_position, true);
+	local hasPosition = hasModel or xPos ~= 0 or yPos ~= 0 or zPos ~= 0;
+
+	local currentObjectName = getAnimationType(pointer); -- Required for special data
+
+	table.insert(examine_data, { "Separator", 1 });
+
+	table.insert(examine_data, { "X", round(xPos, precision) });
+	table.insert(examine_data, { "Y", round(yPos, precision) });
+	table.insert(examine_data, { "Z", round(zPos, precision) });
+	table.insert(examine_data, { "Health", mainmemory.readbyte(pointer + object_model1.health) });
+	table.insert(examine_data, { "Separator", 1 });
+
+	table.insert(examine_data, { "Scale", round(mainmemory.readfloat(pointer + object_model1.scale, true),precision) });
+	table.insert(examine_data, { "Opacity", mainmemory.readbyte(pointer + object_model1.transparency) });
+	table.insert(examine_data, { "Rot Y", round(mainmemory.readfloat(pointer + object_model1.y_rotation, true),precision) });
+	table.insert(examine_data, { "Rot Z", round(mainmemory.readfloat(pointer + object_model1.z_rotation, true),precision) });
+	table.insert(examine_data, { "Separator", 1 });
+	table.insert(examine_data, { "Animation", Game.getObjectAnimationOSD(pointer) });
+	--table.insert(examine_data, { "Movement State", toHexString(mainmemory.readbyte(pointer + object_model1.movement_state)) });
+
+	table.insert(examine_data, { "Separator", 1 });
+	if currentObjectName == "Nest (Eggs)" or currentObjectName == "Nest (Note)" or currentObjectName == "Nest (Treble Clef)" or currentObjectName == "Nest (Feathers)" then
+		table.insert(examine_data, { "Nest Contents", getNestContentsOSD(mainmemory.read_u16_be(pointer + object_model1.nest.contents)) });
+	end
+
+	if currentObjectName == "Jinjo" then
+		table.insert(examine_data, { "Jinjo Identifier", getJinjoIdentifierOSD(pointer) });
+	end
+
+	return examine_data;
+end
+
 local max_page_size = 40;
 
 function Game.drawUI()
@@ -5177,75 +5220,28 @@ function Game.drawUI()
 	end
 
 	local row = 0;
-
 	local objectArray = dereferencePointer(Game.Memory.object_array_pointer[version]);
 	local numSlots = getNumSlots();
-	
+
 	gui.text(Game.OSDPosition[1], 2 + Game.OSDRowHeight * row, "Mode: "..script_mode, nil, 'bottomright');
 	row = row + 1;
 	gui.text(Game.OSDPosition[1], 2 + Game.OSDRowHeight * row, "Index: "..(object_index).."/"..(numSlots), nil, 'bottomright');
 	row = row + 1;
 
-	if script_mode == "Examine" and isRDRAM(objectArray) then		
-		local currentSlotBase = objectArray + getSlotBase(object_index - 1);	
-		
+	if script_mode == "Examine" and isRDRAM(objectArray) then
+		local currentSlotBase = objectArray + getSlotBase(object_index - 1);
 		local objectName = getAnimationType(currentSlotBase);
-		
-		local function getExamineData(pointer)
-			local examine_data = {};
-			if not isRDRAM(pointer) then
-				return examine_data;
-			end
-			
-			local modelPointer = dereferencePointer(pointer + object_model1.id_struct);
 
-			local xPos = mainmemory.readfloat(pointer + object_model1.x_position, true);
-			local yPos = mainmemory.readfloat(pointer + object_model1.y_position, true);
-			local zPos = mainmemory.readfloat(pointer + object_model1.z_position, true);
-			local hasPosition = hasModel or xPos ~= 0 or yPos ~= 0 or zPos ~= 0;
-			
-			local currentObjectName = getAnimationType(currentSlotBase); -- Required for special data
-			
-			table.insert(examine_data, { "Separator", 1 });
-			
-			table.insert(examine_data, { "X", round(xPos, precision) });
-			table.insert(examine_data, { "Y", round(yPos, precision) });
-			table.insert(examine_data, { "Z", round(zPos, precision) });
-			table.insert(examine_data, { "Health", mainmemory.readbyte(pointer + object_model1.health) });
-			table.insert(examine_data, { "Separator", 1 });
-			
-			table.insert(examine_data, { "Scale", round(mainmemory.readfloat(pointer + object_model1.scale, true),precision) });
-			table.insert(examine_data, { "Opacity", mainmemory.readbyte(pointer + object_model1.transparency) });
-			table.insert(examine_data, { "Rot Y", round(mainmemory.readfloat(pointer + object_model1.y_rotation, true),precision) });
-			table.insert(examine_data, { "Rot Z", round(mainmemory.readfloat(pointer + object_model1.z_rotation, true),precision) });
-			table.insert(examine_data, { "Separator", 1 });
-			table.insert(examine_data, { "Animation", Game.getObjectAnimationOSD(pointer) });
-			--table.insert(examine_data, { "Movement State", toHexString(mainmemory.readbyte(pointer + object_model1.movement_state)) });
-			
-			table.insert(examine_data, { "Separator", 1 });
-			if currentObjectName == "Nest (Eggs)" or currentObjectName == "Nest (Note)" or currentObjectName == "Nest (Treble Clef)" or currentObjectName == "Nest (Feathers)" then
-				table.insert(examine_data, { "Nest Contents", getNestContentsOSD(mainmemory.read_u16_be(pointer + object_model1.nest.contents)) });
-			end
-			
-			if currentObjectName == "Jinjo" then
-				table.insert(examine_data, { "Jinjo Identifier", getJinjoIdentifierOSD(pointer) });
-			end
-			
-			return examine_data;
-		end
-		
 		local examine_data = getExamineData(objectArray + getSlotBase(object_index - 1));
 		for i = #examine_data, 1, -1 do
 			if examine_data[i][1] ~= "Separator" then
-				--local examine_data_1 = examine_data[i][1];
-				--local examine_data_2 = examine_data[i][2];
 				gui.text(Game.OSDPosition[1], 2 + Game.OSDRowHeight * row, examine_data[i][1]..": "..examine_data[i][2], nil, 'bottomright');
 				row = row + 1; -- Separator
 			else
 				row = row + examine_data[i][2];
 			end
 		end
-		
+
 		gui.text(Game.OSDPosition[1], 2 + Game.OSDRowHeight * row, "Object: "..objectName, nil, 'bottomright');
 		row = row + 1;
 		gui.text(Game.OSDPosition[1], 2 + Game.OSDRowHeight * row, "Address: "..toHexString(currentSlotBase or 0), nil, 'bottomright');
@@ -5253,7 +5249,7 @@ function Game.drawUI()
 	end
 
 	if script_mode == "List" and isRDRAM(objectArray) then
-		local page_total = math.ceil(getNumSlots() / max_page_size);
+		local page_total = math.ceil(numSlots / max_page_size);
 		local page_pos = math.floor((object_index - 1) / max_page_size) + 1;
 		local page_index = max_page_size + object_index - (page_pos * max_page_size);
 
@@ -5263,7 +5259,7 @@ function Game.drawUI()
 			page_size = numSlots - ((page_total - 1) * max_page_size);
 		end
 
-		gui.text(Game.OSDPosition[1], 2 + Game.OSDRowHeight * row, "Page: "..(page_pos).."/"..(page_total), nil, 'bottomright');
+		gui.text(Game.OSDPosition[1], 2 + Game.OSDRowHeight * row, "Page: "..page_pos.."/"..page_total, nil, 'bottomright');
 		row = row + 1;
 
 		for i = page_size, 1, -1 do
@@ -5335,7 +5331,7 @@ end
 
 Game.takeMeThereType = "Checkbox";
 function Game.setMap(value)
-	mainmemory.write_u16_be(Game.Memory.map_destination[version], value);	
+	mainmemory.write_u16_be(Game.Memory.map_destination[version], value);
 end
 
 function Game.getMap()
@@ -5459,8 +5455,8 @@ function Game.applyInfinites()
 end
 
 local move_levels = {
-	["All"]  = {0xFFFFFFFF, 0xFFFFFFFF},
-	["None"] = {0xE0FFFF01, 0x00004000},
+	All  = {0xFFFFFFFF, 0xFFFFFFFF},
+	None = {0xE0FFFF01, 0x00004000},
 };
 
 local function unlock_moves()
@@ -5479,14 +5475,14 @@ end
 function Game.initUI()
 	-- Force Reload
 	ScriptHawk.UI.form_controls.forcereload_button = forms.button(ScriptHawk.UI.options_form, "Force Reload", Game.forceReload, ScriptHawk.UI.col(5), ScriptHawk.UI.row(4), ScriptHawk.UI.col(4) + 10, ScriptHawk.UI.button_height);
-	
+
 	-- Flag stuff
 	ScriptHawk.UI.form_controls["Flag Dropdown"] = forms.dropdown(ScriptHawk.UI.options_form, flag_names, ScriptHawk.UI.col(0) + ScriptHawk.UI.dropdown_offset, ScriptHawk.UI.row(7) + ScriptHawk.UI.dropdown_offset, ScriptHawk.UI.col(9) + 8, ScriptHawk.UI.button_height);
 	ScriptHawk.UI.form_controls["Set Flag Button"] = forms.button(ScriptHawk.UI.options_form, "Set", flagSetButtonHandler, ScriptHawk.UI.col(10), ScriptHawk.UI.row(7), 46, ScriptHawk.UI.button_height);
 	ScriptHawk.UI.form_controls["Check Flag Button"] = forms.button(ScriptHawk.UI.options_form, "Check", flagCheckButtonHandler, ScriptHawk.UI.col(12), ScriptHawk.UI.row(7), 46, ScriptHawk.UI.button_height);
 	ScriptHawk.UI.form_controls["Clear Flag Button"] = forms.button(ScriptHawk.UI.options_form, "Clear", flagClearButtonHandler, ScriptHawk.UI.col(14), ScriptHawk.UI.row(7), 46, ScriptHawk.UI.button_height);
 	ScriptHawk.UI.form_controls["realtime_flags"] = forms.checkbox(ScriptHawk.UI.options_form, "Realtime Flags", ScriptHawk.UI.col(10) + ScriptHawk.UI.dropdown_offset, ScriptHawk.UI.row(6) + ScriptHawk.UI.dropdown_offset);
-	--forms.setproperty(ScriptHawk.UI.form_controls.realtime_flags, "Checked", true);
+	forms.setproperty(ScriptHawk.UI.form_controls.realtime_flags, "Checked", true);
 
 	ScriptHawk.UI.form_controls.toggle_neverslip = forms.checkbox(ScriptHawk.UI.options_form, "Never Slip", ScriptHawk.UI.col(0) + ScriptHawk.UI.dropdown_offset, ScriptHawk.UI.row(6) + ScriptHawk.UI.dropdown_offset);
 	ScriptHawk.UI.form_controls.toggle_autojump = forms.checkbox(ScriptHawk.UI.options_form, "Autojump", ScriptHawk.UI.col(5) + ScriptHawk.UI.dropdown_offset, ScriptHawk.UI.row(6) + ScriptHawk.UI.dropdown_offset);
@@ -5550,32 +5546,32 @@ Game.OSDPosition = {2, 70};
 Game.OSD = {
 	{"Map", Game.getMapOSD},
 	{"DCW", Game.getDCWLocation},
-	{"Separator", 1},
-	{"X", Game.getXPosition},
-	{"Y", Game.getYPosition},
-	{"Z", Game.getZPosition},
-	{"Separator", 1},
+	{"Separator"},
+	{"X"},
+	{"Y"},
+	{"Z"},
+	{"Separator"},
 	{"dY"},
 	{"dXZ"},
 	{"Velocity", Game.getVelocity},
 	{"Y Velocity", Game.getYVelocity},
-	{"Separator", 1},
+	{"Separator"},
 	{"Max dY"},
 	{"Max dXZ"},
 	{"Odometer"},
-	{"Separator", 1},
+	{"Separator"},
 	{"Rot. X", Game.getXRotation},
 	{"Facing", Game.getYRotation},
 	{"Moving", Game.getMovingAngle},
 	{"Rot. Z", Game.getZRotation},
-	{"Separator", 1},
+	{"Separator"},
 	--{"Player", hexifyOSD(Game.getPlayerObject)},
 	{"Character", Game.getCharacterState},
 	{"Movement", Game.getCurrentMovementStateOSD},
 	{"Animation", Game.getAnimationOSD},
 	{"Slope Timer", Game.getSlopeTimer, Game.colorSlopeTimer},
 	{"Grounded", Game.playerIsGrounded},
-	{"Separator", 1},
+	{"Separator"},
 	{"Camera", hexifyOSD(Game.getCameraObject)},
 	{"Camera X", Game.getCameraXPosition},
 	{"Camera Y", Game.getCameraYPosition},

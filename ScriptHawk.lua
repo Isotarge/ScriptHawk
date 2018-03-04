@@ -394,7 +394,7 @@ local supportedGames = {
 	-- Drill Dozer
 	["C1058CC2482B91204100CC8515DA99AEB06773F5"] = {moduleName="games.GBA_DrillDozer", friendlyName="Drill Dozer (USA)"},
 	["84AFA7108E4D604E7B1A6D105DF5760869A247FA"] = {moduleName="games.GBA_DrillDozer", friendlyName="Screw Breaker Goushin Dorirurero (Japan)"},
-	
+
 	-- Earthworm Jim 3D
 	["EAB14F23640CD6148D4888902CDCC00DD6111BF9"] = {moduleName="games.ej3d", friendlyName="Earthworm Jim 3D (USA)"},
 	["F02C1AFD18C1CBE309472CBE5B3B3F04B22DB7EE"] = {moduleName="games.ej3d", friendlyName="Earthworm Jim 3D (Europe) (En,Fr,De,Es,It)"},
@@ -590,6 +590,10 @@ current_frame = emu.framecount();
 
 local previous_map = "";
 local previous_map_value = 0;
+
+local x = 0.0;
+local y = 0.0;
+local z = 0.0;
 
 local dx = 0.0;
 local dy = 0.0;
@@ -1007,17 +1011,17 @@ if type(Game.OSD) ~= "table" then
 		print("Warning: This module does not define a custom Game.OSD");
 	end
 	Game.OSD = {
-		{"X", Game.getXPosition},
-		{"Y", Game.getYPosition},
-		{"Z", Game.getZPosition},
-		{"Separator", 1},
+		{"X"},
+		{"Y"},
+		{"Z"},
+		{"Separator"},
 		{"dY"},
 		{"dXZ"},
-		{"Separator", 1},
+		{"Separator"},
 		{"Max dY"},
 		{"Max dXZ"},
 		{"Odometer"},
-		{"Separator", 1},
+		{"Separator"},
 		{"Rot. X", Game.getXRotation},
 		{"Facing", Game.getYRotation},
 		{"Rot. Z", Game.getZRotation},
@@ -1076,38 +1080,41 @@ function ScriptHawk.UI.updateReadouts()
 		if label ~= "Separator" then
 			local labelLower = string.lower(label);
 
-			-- Detect special keywords
-			if labelLower == "dx" then
-				value = dx or 0;
-			end
-			if labelLower == "dy" then
-				value = dy or 0;
-			end
-			if labelLower == "dz" then
-				value = dz or 0;
-			end
-			if labelLower == "dxz" or labelLower == "d" then
-				value = d or 0;
-			end
+			if value == nil then
+				-- Detect special keywords
+				if labelLower == "x" or labelLower == "x pos" or labelLower == "x position" then
+					value = x or 0;
+				elseif labelLower == "y" or labelLower == "y pos" or labelLower == "y position" then
+					value = y or 0;
+				elseif labelLower == "z" or labelLower == "z pos" or labelLower == "z position" then
+					value = z or 0;
+				end
 
-			if labelLower == "max dx" then
-				value = max_dx or 0;
-			end
-			if labelLower == "max dy" then
-				value = max_dy or 0;
-			end
-			if labelLower == "max dz" then
-				value = max_dz or 0;
-			end
-			if labelLower == "max dxz" or labelLower == "max d" then
-				value = max_d or 0;
-			end
-			if labelLower == "odometer" then
-				value = odometer or 0;
-			end
+				if labelLower == "dx" then
+					value = dx or 0;
+				elseif labelLower == "dy" then
+					value = dy or 0;
+				elseif labelLower == "dz" then
+					value = dz or 0;
+				elseif labelLower == "dxz" or labelLower == "d" then
+					value = d or 0;
+				end
 
-			if labelLower == "moving angle" and value == nil then -- TODO: This has some name conflicts, "moving"
-				value = round(ScriptHawk.movingAngle, precision)..string.char(0xB0);
+				if labelLower == "max dx" then
+					value = max_dx or 0;
+				elseif labelLower == "max dy" then
+					value = max_dy or 0;
+				elseif labelLower == "max dz" then
+					value = max_dz or 0;
+				elseif labelLower == "max dxz" or labelLower == "max d" then
+					value = max_d or 0;
+				elseif labelLower == "odometer" then
+					value = odometer or 0;
+				end
+
+				if labelLower == "moving angle" then -- TODO: This has some name conflicts, "moving"
+					value = round(ScriptHawk.movingAngle, precision)..string.char(0xB0);
+				end
 			end
 
 			-- Get the value
@@ -1399,9 +1406,9 @@ local function plot_pos()
 	previous_frame = current_frame;
 	current_frame = emu.framecount();
 
-	local x = Game.getXPosition();
-	local y = Game.getYPosition();
-	local z = Game.getZPosition();
+	x = Game.getXPosition();
+	y = Game.getYPosition();
+	z = Game.getZPosition();
 
 	if firstframe then
 		prev_x = x;
@@ -1669,6 +1676,8 @@ function ScriptHawk.drawHitboxes()
 		local hitbox = hitboxes[i];
 		local color = hitbox.color or ScriptHawk.hitboxDefaultColor or colors.white;
 		local bgcolor = hitbox.bgcolor or ScriptHawk.hitboxDefaultBGColor or 0x33000000;
+		local textcolor = hitbox.textcolor or color;
+		local listcolor = hitbox.listcolor or color;
 		if type(hitbox.draggable) ~= "boolean" then
 			hitbox.draggable = ScriptHawk.hitboxDefaultDraggable;
 		end
@@ -1746,7 +1755,7 @@ function ScriptHawk.drawHitboxes()
 					-- Don't render static text for hitboxes that are off screen
 				else
 					for t = 1, #renderedText do
-						gui.drawText(safeX, safeY + ((t - 1) * 16), renderedText[t], color, bgcolor);
+						gui.drawText(safeX, safeY + ((t - 1) * 16), renderedText[t], textcolor, bgcolor);
 					end
 				end
 			end
@@ -1754,8 +1763,14 @@ function ScriptHawk.drawHitboxes()
 		end
 
 		if drawList then
-			gui.text(ScriptHawk.hitboxListPosition.x, ScriptHawk.hitboxListPosition.y + Game.OSDRowHeight * row, Game.getHitboxListText(hitbox), hitbox.color, ScriptHawk.hitboxListAnchor);
-			row = row + 1;
+			local listString = Game.getHitboxListText(hitbox);
+			if type(listString) == "boolean" or type(listString) == "number" then
+				listString = tostring(listString);
+			end
+			if type(listString) == "string" then
+				gui.text(ScriptHawk.hitboxListPosition.x, ScriptHawk.hitboxListPosition.y + Game.OSDRowHeight * row, listString, listcolor, ScriptHawk.hitboxListAnchor);
+				row = row + 1;
+			end
 		end
 	end
 end

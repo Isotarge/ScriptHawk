@@ -11,12 +11,12 @@ local Game = {
 	rot_speed = 100,
 	max_rot_units = 65535,
 	Memory = { -- Version order: N64 USA, N64 PAL
-		["cheat_base"] = {0x11648C, 0x118E84},
-		["number_of_cheats"] = {22, 24},
-		["velocity"] = {0x14A298, 0x170D70},
-		["x_position"] = {0x14A47C, 0x170F54},
-		["y_position"] = {0x14A480, 0x170F58},
-		["z_position"] = {0x14A484, 0x170F5C},
+		cheat_base = {0x11648C, 0x118E84},
+		number_of_cheats = {22, 24},
+		velocity = {0x14A298, 0x170D70},
+		x_position = {0x14A47C, 0x170F54},
+		y_position = {0x14A480, 0x170F58},
+		z_position = {0x14A484, 0x170F5C},
 	},
 };
 
@@ -27,13 +27,12 @@ local Game = {
 function Game.detectVersion(romName, romHash)
 	if romHash == "3F99351D7BB61656614BDB2AA1A90CFE55D1922C" then -- N64 USA
 		version = 1;
+		return true;
 	elseif romHash == "61373D4758ECA3FA831BEAC27B4D4C250845F80C" then -- N64 PAL
 		version = 2;
-	else
-		return false;
+		return true;
 	end
-
-	return true;
+	return false;
 end
 
 function Game.unlockCheats()
@@ -79,18 +78,18 @@ function Game.initUI()
 end
 
 Game.OSD = {
-	{"X", Game.getXPosition},
-	{"Y", Game.getYPosition},
-	{"Z", Game.getZPosition},
-	{"Separator", 1},
+	{"X"},
+	{"Y"},
+	{"Z"},
+	{"Separator"},
 	{"Velocity", Game.getVelocity},
 	{"dY"},
 	{"dXZ"},
-	{"Separator", 1},
+	{"Separator"},
 	{"Max dY"},
 	{"Max dXZ"},
 	{"Odometer"},
-	{"Separator", 1},
+	{"Separator"},
 	{"Rot. X", Game.getXRotation},
 	{"Facing", Game.getYRotation},
 	{"Rot. Z", Game.getZRotation},

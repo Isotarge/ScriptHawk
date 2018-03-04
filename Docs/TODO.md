@@ -6,10 +6,7 @@
 	- Rotation units
 	- Mode? Arguable
 	- Verbosity/Debug mode?
-- Integrate SMS object viewers into ScriptHawk.lua
-	- Allow modules to turn off the standard ScriptHawk OSD and plot_pos features
-	- They share a lot of code that would work well as a game module
-	- I think it'd be fun to bulk support SMS games since the object layout is so simple :P
+- Bulk support SMS games with new hitbox API
 - General: UI to load ASM patches, can currently only be done by calling loadASMPatch(filename, suppressprint) in the lua console
 - DK64:
 	- Find menu cutscene nonsense
@@ -33,14 +30,3 @@
 		- Ledge Clip.lua
 		- Wonder Boy III RNG Watch.lua
 - DK64: ASM hook for other regions
-
-# Game support wishlist:
-- Gex: Enter the Gecko
-- Gex 3: Deep Cover Gecko
-- Wave Race 64
-- THPS 1/2/3
-- Mickey's Speedway USA
-- Mischief Makers
-- Pokémon Snap
-- Doubutsu no Mori (Animal Crossing)
-- Monster Truck Madness 64

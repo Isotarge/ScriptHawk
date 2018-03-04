@@ -450,7 +450,7 @@ return { -- TODO: Add field for where the object can be spawned
 	{id=0x02E0, name="Stairs"},
 	{id=0x02E1, name="Underwater Ship Warp?"},
 	{id=0x02E2, name="Lighthouse Body"},
-	{id=0x02E3, name="World Entrance Sign"}, --MM, RBB
+	{id=0x02E3, name="World Entrance Sign"}, -- MM, RBB
 	{id=0x02E4, name="Level Entry/Exit"},
 	{id=0x02E5, name="Wooden Door"},
 	{id=0x02E6, name="Nabnut's Door"},
@@ -548,7 +548,7 @@ return { -- TODO: Add field for where the object can be spawned
 	{id=0x0374, name="Text Trigger (Mumbo's On Vacation)"},
 	{id=0x0375, name="Grublin Hood"},
 	{id=0x0376, name="Boss Boom Box"},
-	--{["id] = 0x037A, name="Assosiated with MoleHill"}, --talk volume?
+	--{id=0x037A, name="Assosiated with MoleHill"}, --talk volume?
 	{id=0x037C, name="Dust or Steam Cloud"},
 	{id=0x037D, name="Ice Cube"},
 	{id=0x037E, name="Dead Venus Flytrap"},

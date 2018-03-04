@@ -19,12 +19,12 @@ local function do_menu()
 	if isOnTitleScreen() then
 		frame = frame + 1;
 		if frame == distance then
-			joypad.set({["Up"] = input, ["Down"] = (not input)}, 1);
+			joypad.set({Up = input, Down = (not input)}, 1);
 			input = not input;
 			distance = distance + 1;
 			frame = 0;
 		else
-			joypad.set({["Up"] = false, ["Down"] = false}, 1);
+			joypad.set({Up = false, Down = false}, 1);
 		end
 	else
 		frame = 0;

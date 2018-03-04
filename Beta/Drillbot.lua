@@ -200,13 +200,13 @@ local function eachFrame()
 	local maxScored = getMaxScoredColumn();
 	local xPos = getXPosition();
 	if maxScored < xPos then
-		joypad.set({["Left"] = true});
+		joypad.set({Left = true});
 	elseif maxScored > xPos then
-		joypad.set({["Right"] = true});
+		joypad.set({Right = true});
 	else
-		joypad.set({["Down"] = true});
+		joypad.set({Down = true});
 	end
-	joypad.set({["A"] = (emu.framecount() % 2 == 0)}); -- Mash A like there's no tomorrow
+	joypad.set({A = (emu.framecount() % 2 == 0)}); -- Mash A like there's no tomorrow
 	drawUI();
 end
 

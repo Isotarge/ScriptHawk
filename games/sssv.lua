@@ -7,9 +7,9 @@ end
 
 local Game = {
 	Memory = { -- Version order: USA N64, Europe N64
-		["current_animal_list_index"] = {0x3D5534, 0x3D5624},
-		["animal_list_pointer_base"] = {0x1DDD88, 0x1DDDA8},
-		["map_index"] = {0x3F2D39, 0x3F2E29},
+		current_animal_list_index = {0x3D5534, 0x3D5624},
+		animal_list_pointer_base = {0x1DDD88, 0x1DDDA8},
+		map_index = {0x3F2D39, 0x3F2E29},
 	},
 	rot_speed = 10,
 	max_rot_units = 360,
@@ -254,7 +254,7 @@ end
 -- Rotation --
 --------------
 
---Player specific
+-- Player specific
 function Game.getYRotation()
 	return Game.getAnimalYRotation(Game.getCurrentAnimalIndex());
 end
@@ -424,21 +424,21 @@ end
 Game.OSDPosition = {2, 70};
 Game.OSD = {
 	{"Animal", Game.getCurrentAnimalType},
-	{"Separator", 1},
-	{"X", Game.getXPosition},
-	{"Y", Game.getYPosition},
-	{"Z", Game.getZPosition},
-	{"Separator", 1},
+	{"Separator"},
+	{"X"},
+	{"Y"},
+	{"Z"},
+	{"Separator"},
 	{"Y Velocity", Game.getYVelocity},
 	{"Velocity", Game.getVelocity},
-	{"Separator", 1},
+	{"Separator"},
 	{"dY"},
 	{"dXZ"},
-	{"Separator", 1},
+	{"Separator"},
 	{"Max dY"},
 	{"Max dXZ"},
 	{"Odometer"},
-	{"Separator", 1},
+	{"Separator"},
 	--{"Rot. X", Game.getXRotation},
 	{"Facing", Game.getYRotation},
 	--{"Rot. Z", Game.getZRotation},

@@ -10,16 +10,16 @@ Game = {
 	speedy_index = 6;
 	max_rot_units = 4,
 	Memory = { -- Versions: Japan, Australia, Europe, USA
-		["music"] = {0x98BD3, 0x99833, 0xA2E63, 0x99113},
-		["unlocked_stuff"] = {0xA28F4, 0xA5074, 0xAD194, 0xA4934},
-		["match_settings_pointer"] = {0xA30A8, 0xA5828, 0xAD948, 0xA50E8},
-		["hurtbox_color_RG"] = {nil, nil, nil, 0xF2786},
-		["hurtbox_color_BA"] = {nil, nil, nil, 0xF279E},
-		["red_hitbox_patch"] = {nil, nil, nil, 0xF33BC}, -- 2400
-		["purple_hurtbox_patch"] = {nil, nil, nil, 0xF2FD0}, -- 2400
-		["player_list_pointer"] = {0x12E914, 0x131594, 0x139A74, 0x130D84},
-		["item_list_pointer"] = {0x466F0, 0x46E20, 0x46E60, 0x46700},
-		["item_hitbox_offset"] = {0x370, nil, nil, 0x374}, -- TODO: I don't think this exists on PAL versions, should look into it at some point
+		music = {0x98BD3, 0x99833, 0xA2E63, 0x99113},
+		unlocked_stuff = {0xA28F4, 0xA5074, 0xAD194, 0xA4934},
+		match_settings_pointer = {0xA30A8, 0xA5828, 0xAD948, 0xA50E8},
+		hurtbox_color_RG = {nil, nil, nil, 0xF2786},
+		hurtbox_color_BA = {nil, nil, nil, 0xF279E},
+		red_hitbox_patch = {nil, nil, nil, 0xF33BC}, -- 2400
+		purple_hurtbox_patch = {nil, nil, nil, 0xF2FD0}, -- 2400
+		player_list_pointer = {0x12E914, 0x131594, 0x139A74, 0x130D84},
+		item_list_pointer = {0x466F0, 0x46E20, 0x46E60, 0x46700},
+		item_hitbox_offset = {0x370, nil, nil, 0x374}, -- TODO: I don't think this exists on PAL versions, should look into it at some point
 	},
 	characters = {
 		[0x00] = "Mario",
@@ -172,42 +172,42 @@ local match_settings = {
 };
 
 local player_fields = {
-	["Character"] = 0x0B, -- Byte?
-	["Costume"] = 0x10, -- Byte?
-	["MovementFrame"] = 0x1C, -- u32_be
-	["MovementState"] = 0x26, -- u16_be
+	Character = 0x0B, -- Byte?
+	Costume = 0x10, -- Byte?
+	MovementFrame = 0x1C, -- u32_be
+	MovementState = 0x26, -- u16_be
 	--0x2C = Health (2 Bytes)
-	["ShieldSize"] = 0x34, -- s32_be
-	["FacingDirection"] = 0x44, -- s32_be -- -1 = left, 1 = right
-	["XVelocity"] = 0x48, -- Float
-	["YVelocity"] = 0x4C, -- Float
-	["ZVelocity"] = 0x50, -- Float
-	["XAcceleration"] = 0x60, -- Float
-	["YAcceleration"] = 0x64, -- Float
-	["ZAcceleration"] = 0x68, -- Float
-	["PositionDataPointer"] = 0x78, -- Pointer
-	["PositionData"] = {
-		["XPosition"] = 0x00, -- Float
-		["YPosition"] = 0x04, -- Float
-		["ZPosition"] = 0x08, -- Float
+	ShieldSize = 0x34, -- s32_be
+	FacingDirection = 0x44, -- s32_be -- -1 = left, 1 = right
+	XVelocity = 0x48, -- Float
+	YVelocity = 0x4C, -- Float
+	ZVelocity = 0x50, -- Float
+	XAcceleration = 0x60, -- Float
+	YAcceleration = 0x64, -- Float
+	ZAcceleration = 0x68, -- Float
+	PositionDataPointer = 0x78, -- Pointer
+	PositionData = {
+		XPosition = 0x00, -- Float
+		YPosition = 0x04, -- Float
+		ZPosition = 0x08, -- Float
 	},
-	["JumpCounter"] = 0x148, -- Byte
-	["Grounded"] = 0x14C, -- Byte
-	["ControllerInputPointer"] = 0x1B0,
-	["ShieldBreakerRecoveryTimer"] = 0x26C, -- s32_be
+	JumpCounter = 0x148, -- Byte
+	Grounded = 0x14C, -- Byte
+	ControllerInputPointer = 0x1B0,
+	ShieldBreakerRecoveryTimer = 0x26C, -- s32_be
 	--0x39C = Something to do with Attack Hitbox (4 Bytes)
-	["InvinvibilityState"] = 0x5AC, -- u16_be
-	["hurtbox_lower_Stomach"] = 0x5BC,
-	["hurtbox_head"] = 0x5E8,
-	["hurtbox_upper_right_arm"] = 0x614,
-	["hurtbox_upper_right_arm"] = 0x640,
-	["hurtbox_upper_left_arm"] = 0x66C,
-	["hurtbox_lower_right_arm"] = 0x698,
-	["hurtbox_lower_left_arm"] = 0x6C4,
-	["hurtbox_upper_right_leg"] = 0x6F0,
-	["hurtbox_upper_left_leg"] = 0x71C,
-	["hurtbox_lower_right_leg"] = 0x748,
-	["hurtbox_lower_left_leg"] = 0x774,
+	InvinvibilityState = 0x5AC, -- u16_be
+	hurtbox_lower_Stomach = 0x5BC,
+	hurtbox_head = 0x5E8,
+	hurtbox_upper_right_arm = 0x614,
+	hurtbox_upper_right_arm = 0x640,
+	hurtbox_upper_left_arm = 0x66C,
+	hurtbox_lower_right_arm = 0x698,
+	hurtbox_lower_left_arm = 0x6C4,
+	hurtbox_upper_right_leg = 0x6F0,
+	hurtbox_upper_left_leg = 0x71C,
+	hurtbox_lower_right_leg = 0x748,
+	hurtbox_lower_left_leg = 0x774,
 	hurtbox = {
 		state = 0x00, -- 4 bytes
 		id = 0x04, -- 4 bytes
@@ -219,46 +219,46 @@ local player_fields = {
 		length = 0x24, -- Float
 		height = 0x28, -- Float
 	},
-	["CharacterConstantsPointer"] = 0x9C8,
-	["CharacterConstants"] = {
-		["BodySizeMultiplier"] = 0x00, -- Float
+	CharacterConstantsPointer = 0x9C8,
+	CharacterConstants = {
+		BodySizeMultiplier = 0x00, -- Float
 		--0x04 = Unknown Float
 		--0x08 = Unknown Float
 		--0x0C = Unknown Float
 		--0x1C = Unknown Float
-		["WalkSpeedMultiplier"] = 0x20, -- Float [Usually Multiplies with 80]
-		["BrakeForce"] = 0x24, -- Float
-		["InitialDashSpeed"] = 0x28, -- Float
-		["DashDeceleration"] = 0x2C, -- Float
-		["RunningSpeed"] = 0x30, -- Float
-		["JumpFrameDelay"] = 0x34, -- Float
+		WalkSpeedMultiplier = 0x20, -- Float [Usually Multiplies with 80]
+		BrakeForce = 0x24, -- Float
+		InitialDashSpeed = 0x28, -- Float
+		DashDeceleration = 0x2C, -- Float
+		RunningSpeed = 0x30, -- Float
+		JumpFrameDelay = 0x34, -- Float
 		--0x38 = Starting X-Air Velocity Multiplier after moving before 1st jump (Multiplied by 80)
-		["JumpHeightMultiplier"] = 0x3C, -- Float
-		["JumpHeight"] = 0x40, -- Float
+		JumpHeightMultiplier = 0x3C, -- Float
+		JumpHeight = 0x40, -- Float
 		--0x44 = Starting X-Air Velocity Multiplier after moving before 2nd jump (Multiplied by 80)
-		["SecondJumpMultiplier"] = 0x48, -- Float
-		["XAirAcceleration"] = 0x4C, -- Float
-		["XAirMaximumSpeed"] = 0x50, -- Float
-		["XAirResistance"] = 0x54, -- Float
-		["YFallAcceleration"] = 0x58, -- Float
-		["TerminalVelocity"] = 0x5C, -- Float
-		["TerminalVelocity_FastFall"] = 0x60, -- Float
-		["NumberOfJumps"] = 0x64,
-		["Weight"] = 0x68, -- Float
-		["SmallComboConnection"] = 0x6C, -- Float
-		["DashToRunConnection"] = 0x70, -- Float
-		["ShieldRadius"] = 0x74, -- Float
+		SecondJumpMultiplier = 0x48, -- Float
+		XAirAcceleration = 0x4C, -- Float
+		XAirMaximumSpeed = 0x50, -- Float
+		XAirResistance = 0x54, -- Float
+		YFallAcceleration = 0x58, -- Float
+		TerminalVelocity = 0x5C, -- Float
+		TerminalVelocity_FastFall = 0x60, -- Float
+		NumberOfJumps = 0x64,
+		Weight = 0x68, -- Float
+		SmallComboConnection = 0x6C, -- Float
+		DashToRunConnection = 0x70, -- Float
+		ShieldRadius = 0x74, -- Float
 	},
-	["CameraZoom"] = 0x864, -- Float
+	CameraZoom = 0x864, -- Float
 	-- 0xA28 = Flash State Pointer? (Pointer)
 	-- 0xA2B = Flash State Index? (Byte)
 	-- 0xA68 = Flash Color Red (Byte)
 	-- 0xA69 = Flash Color Green (Byte)
 	-- 0xA6A = Flash Color Blue (Byte)
 	-- 0xA6B = Flash Color Alpha (Byte)
-	["BoomerangPointer"] = 0xADC, -- Pointer
-	["ShieldJump_FrameDelayCounter"] = 0xB1C, -- 4 Bytes
-	["ShowHitbox"] = 0xB4C, -- u32_be
+	BoomerangPointer = 0xADC, -- Pointer
+	ShieldJump_FrameDelayCounter = 0xB1C, -- 4 Bytes
+	ShowHitbox = 0xB4C, -- u32_be
 };
 
 movement_states = {
@@ -983,18 +983,18 @@ local playerOSD = {
 		{"Movement", Game.getMovementString, Game.colorMovementState},
 		{"Frame", Game.getMovementFrame},
 		{"Jumps", Game.getJumpCounter},
-		{"X", Game.getXPosition},
-		{"Y", Game.getYPosition},
-		{"dX", ScriptHawk.getDX, Game.colorDX},
-		{"dY", ScriptHawk.getDY, Game.colorDY},
+		{"X"},
+		{"Y"},
+		{"dX", nil, Game.colorDX},
+		{"dY", nil, Game.colorDY},
 		{"X Velocity", Game.getXVelocity},
 		{"Y Velocity", Game.getYVelocity},
 		{"Facing", Game.getYRotation},
 		{"Shield", Game.getShieldSize},
-		{"Separator", 1},
+		{"Separator"},
 		--{"Boomerang X", Game.getBoomerangX},
 		--{"Boomerang Y", Game.getBoomerangY},
-		--{"Separator", 1},
+		--{"Separator"},
 	},
 	[2] = {
 		{"P2", function() return Game.getPlayerOSD(2) end, playerColors[2]},
@@ -1007,7 +1007,7 @@ local playerOSD = {
 		{"Y Velocity", function() return Game.getYVelocity(2) end},
 		{"Facing", function() return Game.getYRotation(2) end},
 		{"Shield", function() return Game.getShieldSize(2) end},
-		{"Separator", 1},
+		{"Separator"},
 	},
 	[3] = {
 		{"P3", function() return Game.getPlayerOSD(3) end, playerColors[3]},
@@ -1020,7 +1020,7 @@ local playerOSD = {
 		{"Y Velocity", function() return Game.getYVelocity(3) end},
 		{"Facing", function() return Game.getYRotation(3) end},
 		{"Shield", function() return Game.getShieldSize(3) end},
-		{"Separator", 1},
+		{"Separator"},
 	},
 	[4] = {
 		{"P4", function() return Game.getPlayerOSD(4) end, playerColors[4]},
@@ -1033,14 +1033,14 @@ local playerOSD = {
 		{"Y Velocity", function() return Game.getYVelocity(4) end},
 		{"Facing", function() return Game.getYRotation(4) end},
 		{"Shield", function() return Game.getShieldSize(4) end},
-		{"Separator", 1},
+		{"Separator"},
 	},
 };
 
 function buildOSD(p1, p2, p3, p4)
 	local OSD = {
 		--{"Match Settings", Game.getMatchSettings},
-		--{"Separator", 1},
+		--{"Separator"},
 	};
 	if p1 then
 		OSD = table.join(OSD, playerOSD[1]);

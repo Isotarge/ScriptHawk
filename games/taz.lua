@@ -110,16 +110,16 @@ function Game.eachFrame()
 end
 
 Game.OSD = {
-	{"X", Game.getXPosition},
-	{"Y", Game.getYPosition},
+	{"X"},
+	{"Y"},
 	{"dX", nil, Game.colorDX},
 	{"dY"},
-	{"Separator", 1},
+	{"Separator"},
 	{"P Meter", Game.getPMeter},
 	{"Velocity (Gnd)", Game.getGroundVelocity},
 	{"Velocity (Air)", Game.getAerialVelocity},
 	{"Jump", Game.getJumpHeight, Game.colorJumpHeight},
-	{"Separator", 1},
+	{"Separator"},
 	{"Level", Game.getLevel},
 	{"IGT", Game.getLevelTime},
 };

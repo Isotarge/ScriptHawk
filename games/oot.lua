@@ -21,9 +21,9 @@ local z_rot;
 --------------------
 
 -- TODO: Sort out these versions
---["50BEBEDAD9E0F10746A52B07239E47FA6C284D03"] = {["moduleName"] = "games.oot", ["friendlyName"] = "Legend of Zelda, The - Ocarina of Time - Master Quest (USA) (Debug Edition)"},
---["8B5D13AAC69BFBF989861CFDC50B1D840945FC1D"] = {["moduleName"] = "games.oot", ["friendlyName"] = "Legend of Zelda, The - Ocarina of Time - Master Quest (USA) (GC)"},
---["DD14E143C4275861FE93EA79D0C02E36AE8C6C2F"] = {["moduleName"] = "games.oot", ["friendlyName"] = "Zelda no Densetsu - Toki no Ocarina (Japan) (GC)"},
+--["50BEBEDAD9E0F10746A52B07239E47FA6C284D03"] = {moduleName = "games.oot", friendlyName = "Legend of Zelda, The - Ocarina of Time - Master Quest (USA) (Debug Edition)"},
+--["8B5D13AAC69BFBF989861CFDC50B1D840945FC1D"] = {moduleName = "games.oot", friendlyName = "Legend of Zelda, The - Ocarina of Time - Master Quest (USA) (GC)"},
+--["DD14E143C4275861FE93EA79D0C02E36AE8C6C2F"] = {moduleName = "games.oot", friendlyName = "Zelda no Densetsu - Toki no Ocarina (Japan) (GC)"},
 
 function Game.detectVersion(romName, romHash)
 	if romHash == "CFBB98D392E4A9D39DA8285D10CBEF3974C2F012" then -- Europe 1.1

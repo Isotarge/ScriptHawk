@@ -64,13 +64,13 @@ end
 Game.OSDPosition = {2, 70};
 Game.OSD = {
 	{"Screen Y", Game.getScreenY},
-	{"X", Game.getXPosition},
-	{"Y", Game.getYPosition},
+	{"X"},
+	{"Y"},
 	{"X Velocity", Game.getXVelocity},
 	{"Y Velocity", Game.getYVelocity},
 	{"dX"},
 	{"dY"},
-	{"Separator", 1},
+	{"Separator"},
 	{"Frame Rule", Game.getFrameRule},
 	{"Frame Rule", Game.getFrameRule2},
 	{"Frame Rule", Game.getFrameRule3},

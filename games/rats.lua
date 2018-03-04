@@ -5,7 +5,15 @@ if type(ScriptHawk) ~= "table" then -- An error message to inform the user that 
 	return;
 end
 
-local Game = {}; -- This table stores the module's API function implementations and game state, it's returned to ScriptHawk at the end of the module code
+local Game = {
+	Memory = {
+		x_position = {0x01EE},
+		y_position = {0x01F4},
+		x_velocity = {0x01F2},
+		y_velocity = {0x01F8},
+		object_base = {0x01EC},
+	},
+};
 object_size = 0x16;
 row_height = 16;
 
@@ -13,28 +21,15 @@ row_height = 16;
 -- Region/Version --
 --------------------
 
-Game.Memory = {
-	["x_position"] = {0x01EE},
-	["y_position"] = {0x01F4},
-	["x_velocity"] = {0x01F2},
-	["y_velocity"] = {0x01F8},
-	["object_base"] = {0x01EC},
-};
-
-function Game.detectVersion(romName, romHash) -- Modules should ideally use ROM hash rather than name, but both are passed in by ScriptHawk
+function Game.detectVersion(romName, romHash)
+	ScriptHawk.dpad.joypad.enabled = false;
+	ScriptHawk.dpad.key.enabled = false;
 	if string.contains(romHash, "5E423DFAB8221B69A641D2E535EBFE1E3759A2E4") then
 		version = 1;
 		return true;
 	end
-	return false; -- Return false if this version of the game is not supported
+	return false;
 end
-
--------------------
--- Physics/Scale --
--------------------
-
-Game.speedy_speeds = { .001, .01, .1, 1, 5, 10, 20, 50, 100 }; -- D-Pad speeds, scale these appropriately with your game's coordinate system
-Game.speedy_index = 7;
 
 --------------
 -- Position --
@@ -68,7 +63,7 @@ end
 -- Events --
 ------------
 
-function Game.drawUI() -- Optional: This function will be executed once per frame
+function Game.drawUI()
 	for i = 0, 24 do
 		local objectBase = Game.Memory.object_base[version] + i * object_size;
 		local xPos = mainmemory.read_u16_le(objectBase + 0x02);
@@ -82,17 +77,17 @@ end
 
 Game.OSDPosition = {2, 70};
 Game.OSD = {
-	{"X", Game.getXPosition},
-	{"Y", Game.getYPosition},
-	{"Separator", 1},
+	{"X"},
+	{"Y"},
+	{"Separator"},
 	{"X Velocity", Game.getXVelocity},
 	{"Y Velocity", Game.getYVelocity},
 	{"dX"},
 	{"dY"},
-	{"Separator", 1},
+	{"Separator"},
 	{"Max dX"},
 	{"Max dY"},
 	{"Odometer"},
 };
 
-return Game; -- Return your Game table to ScriptHawk
+return Game;

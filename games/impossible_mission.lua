@@ -556,7 +556,7 @@ function updateBestAttempt()
 
 	print("bestLastPauseFrame: "..bestLastPauseFrame);
 	print("bestLast2Frame: "..bestLast2Frame);
-	
+
 	-- Count how many inputs were made during the best attempt
 	bestNumPressed = countNumPressed(bestLastPauseFrame, bestLast2Frame);
 end
@@ -603,10 +603,10 @@ function botLoop()
 			botLoop();
 		elseif currentFrame < checkFrame then
 			local relativeFrame = currentFrame - startFrame;
-			joypad.set({["Pause"] = (currentFrame <= lastPauseFrame) and (relativeFrame >= 0) and (relativeFrame % 2 == 0)});
-			joypad.set({["B2"] = (relativeFrame >= 0) and (currentFrame <= last2Frame)}, 1);
+			joypad.set({Pause = (currentFrame <= lastPauseFrame) and (relativeFrame >= 0) and (relativeFrame % 2 == 0)});
+			joypad.set({B2 = (relativeFrame >= 0) and (currentFrame <= last2Frame)}, 1);
 			if currentFrame == resetFrame then
-				joypad.set({["Reset"] = true});
+				joypad.set({Reset = true});
 				forms.setproperty(ScriptHawk.UI.form_controls["Toggle Overlay Checkbox"], "Checked", true);
 			end
 		end
@@ -631,10 +631,10 @@ function botLoop()
 			end
 		elseif currentFrame < checkFrame then
 			local relativeFrame = currentFrame - startFrame;
-			joypad.set({["Pause"] = (currentFrame <= bestLastPauseFrame) and (relativeFrame >= 0) and (relativeFrame % 2 == 0)});
-			joypad.set({["B2"] = (relativeFrame >= 0) and (currentFrame <= bestLast2Frame)}, 1);
+			joypad.set({Pause = (currentFrame <= bestLastPauseFrame) and (relativeFrame >= 0) and (relativeFrame % 2 == 0)});
+			joypad.set({B2 = (relativeFrame >= 0) and (currentFrame <= bestLast2Frame)}, 1);
 			if currentFrame == resetFrame then
-				joypad.set({["Reset"] = true});
+				joypad.set({Reset = true});
 			end
 		end
 	else
@@ -709,22 +709,22 @@ Game.standardOSD = {
 	{"Map", hexifyOSD(Game.getCurrentMap)},
 	{"IGT", Game.getIGT},
 	{"Snooze Timer", Game.getSnoozeTimer},
-	{"Separator", 1},
-	{"X", Game.getXPosition},
-	{"Y", Game.getYPosition},
-	{"Separator", 1},
+	{"Separator"},
+	{"X"},
+	{"Y"},
+	{"Separator"},
 	{"dX"},
 	{"dY"},
-	{"Separator", 1},
+	{"Separator"},
 	{"Piece Dist", Game.getPieceDistributionOSD},
 	{"Best Dist", Game.getBestPieceDistribution},
-	{"Separator", 1},
+	{"Separator"},
 	{"Flips Requried", Game.getPuzzleFlipsRequired},
 	{"Best Flips Req", Game.getBestPuzzleFlipsRequired},
-	{"Separator", 1},
+	{"Separator"},
 	{"Color Required", Game.getPuzzleColorChangesRequired},
 	{"Best Color Req", Game.getBestPuzzleColorChangesRequired},
-	{"Separator", 1},
+	{"Separator"},
 	{"Total Search Length", Game.getTotalSearchBarLength},
 	{"Best Search Length", Game.getBestSearchLength},
 };
@@ -733,13 +733,13 @@ Game.botOSD = {
 	{"Piece Dist", Game.getPieceDistributionOSD},
 	{"Best Dist", Game.getBestPieceDistribution},
 	--[[
-	{"Separator", 1},
+	{"Separator"},
 	{"Flips Requried", Game.getPuzzleFlipsRequired},
 	{"Best Flips Req", Game.getBestPuzzleFlipsRequired},
-	{"Separator", 1},
+	{"Separator"},
 	{"Color Required", Game.getPuzzleColorChangesRequired},
 	{"Best Color Req", Game.getBestPuzzleColorChangesRequired},
-	{"Separator", 1},
+	{"Separator"},
 	{"Total Search Length", Game.getTotalSearchBarLength},
 	{"Best Search Length", Game.getBestSearchLength},
 	--]]

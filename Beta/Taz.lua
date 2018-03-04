@@ -163,7 +163,7 @@ function botLoop()
 			--printInputsTable(inputs);
 		elseif currentFrame < endFrame then
 			local relativeFrame = currentFrame - startFrame;
-			joypad.set({["B1"] = inputs[relativeFrame]}, 1);
+			joypad.set({B1 = inputs[relativeFrame]}, 1);
 		end
 	elseif bot_is_outputting_best_input then
 		local currentFrame = emu.framecount();
@@ -172,7 +172,7 @@ function botLoop()
 			client.pause();
 		elseif currentFrame < endFrame then
 			local relativeFrame = currentFrame - startFrame;
-			joypad.set({["B1"] = bestInputs[relativeFrame]}, 1);
+			joypad.set({B1 = bestInputs[relativeFrame]}, 1);
 		end
 	end
 end

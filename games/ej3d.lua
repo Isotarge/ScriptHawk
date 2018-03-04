@@ -1,38 +1,36 @@
-if type(ScriptHawk) ~= "table" then 
+if type(ScriptHawk) ~= "table" then
 	print("This script is not designed to run by itself");
 	print("Please run ScriptHawk.lua from the parent directory instead");
 	print("Thanks for using ScriptHawk :)");
 	return;
 end
 
-local Game = {};
+local Game = {
+	Memory = { -- 1 USA, 2 EU
+		jim_pointer = {0x0C6810, 0x0C8670},
+		current_map = {0x0E9EF9, 0x0EBD59},
+		destination_map = {0x0E03E7, 0x0E2247},
+		destination_exit = {0x0E03E9, 0x0E2249},
+		subhub_entrance_cs = {0x0C624A, nil},
+		--controller_input = {0x0D4134, 0x0D5F94},
+		reload_map = {0x0E03E2,0x0E2242},
+		marble_pointer = {0x0C61E2,0x0C8042},
+	},
+};
 
 --------------------
 -- Region/Version --
 --------------------
 
--- 1 USA, 2 EU, 
-Game.Memory = {
-	["jim_pointer"] = {0x0C6810, 0x0C8670}, 
-	["current_map"] = {0x0E9EF9, 0x0EBD59},
-	["destination_map"] = {0x0E03E7, 0x0E2247},
-	["destination_exit"] = {0x0E03E9, 0x0E2249},
-	["subhub_entrance_cs"] = {0x0C624A, nil},
-	--["controller_input"] = {0x0D4134, 0x0D5F94},
-	["reload_map"] = {0x0E03E2,0x0E2242},
-	["marble_pointer"] = {0x0C61E2,0x0C8042},
-};
-
-function Game.detectVersion(romName, romHash) 
+function Game.detectVersion(romName, romHash)
 	if romHash == "EAB14F23640CD6148D4888902CDCC00DD6111BF9" then -- US
-		version = 1; 
+		version = 1;
+		return true;
 	elseif romHash == "F02C1AFD18C1CBE309472CBE5B3B3F04B22DB7EE" then -- Europe
 		version = 2;
-	else
-		return false;
+		return true;
 	end
-
-	return true;
+	return false;
 end
 
 --------------------
@@ -40,45 +38,45 @@ end
 --------------------
 
 jim = {
-	["y_rotation_1"] = 0x000; -- Float
-	["y_rotation_2"] = 0x008; -- Float
-	["x_position"] = 0x030; -- Float
-	["y_position"] = 0x034; -- Float 
-	["z_position"] = 0x038; -- Float
-	["bagpipe_lock"] = 0x0C0; -- Byte
-	["animation_timer"] = 0x0CA; -- 2 Byte
-	["control_type"] = 0x0F4; -- 4 Byte (0 = Normal, 2 = Boss Fights, 4 = Void Process)
-	["Health"] = 0x0FC; -- 4 Byte
-	["Lives"] = 0x100; -- 4 Byte
-	["gun_pointer"] = 0x104;
-	["animation"] = 0x0C9; -- Byte
-	["cutscene_lock"] = 0x2A3; -- Byte
-	--["speed"] = 0x2C8; -- Float (Not too sure on this)
-	["y_last_action"] = 0x338; -- Float
-	["oob_timer"] = 0x455; -- Byte
-	["first_person_angle_delta"] = 0x4D8; -- Float, Radians?
-	["character_mode"] = 0x5B0; -- Byte (0 = Jim, 1+ = Kim)
-}
+	y_rotation_1 = 0x000, -- Float
+	y_rotation_2 = 0x008, -- Float
+	x_position = 0x030, -- Float
+	y_position = 0x034, -- Float
+	z_position = 0x038, -- Float
+	bagpipe_lock = 0x0C0, -- Byte
+	animation_timer = 0x0CA, -- 2 Byte
+	control_type = 0x0F4, -- 4 Byte (0 = Normal, 2 = Boss Fights, 4 = Void Process)
+	Health = 0x0FC, -- 4 Byte
+	Lives = 0x100, -- 4 Byte
+	gun_pointer = 0x104,
+	animation = 0x0C9, -- Byte
+	cutscene_lock = 0x2A3, -- Byte
+	--speed = 0x2C8, -- Float (Not too sure on this)
+	y_last_action = 0x338, -- Float
+	oob_timer = 0x455, -- Byte
+	first_person_angle_delta = 0x4D8, -- Float, Radians?
+	character_mode = 0x5B0, -- Byte (0 = Jim, 1+ = Kim)
+};
 
 --------------------
 -- Gun Parameters --
 --------------------
 
 gun = {
-	["red_gun"] = 0x000;
-	["bubble_gun"] = 0x018;
-	["rockets"] = 0x030;
-	["flamethrower"] = 0x048;
-	["bananamyte"] = 0x060;
-	["laser"] = 0x078;
-	["pea"] = 0x090;
-	["egg"]	= 0x0A8;
-	["fakegun"] = 0x0C0;
-	["magnum"] = 0x0D8;
-	["disco"] = 0x0F0;
-	["knife"] = 0x108;
-	["leprechaun"] = 0x120;
-}
+	red_gun = 0x000,
+	bubble_gun = 0x018,
+	rockets = 0x030,
+	flamethrower = 0x048,
+	bananamyte = 0x060,
+	laser = 0x078,
+	pea = 0x090,
+	egg	= 0x0A8,
+	fakegun = 0x0C0,
+	magnum = 0x0D8,
+	disco = 0x0F0,
+	knife = 0x108,
+	leprechaun = 0x120,
+};
 
 -------------------
 -- Physics/Scale --
@@ -87,10 +85,6 @@ gun = {
 Game.speedy_speeds = {.001, .01, .1, .5, 1, 2, 5, 10, 20 };
 Game.speedy_index = 7;
 Game.speedy_invert_LR = 1;
-
-function Game.isPhysicsFrame()
-	return not emu.islagged();
-end
 
 --------------
 -- Position --
@@ -127,24 +121,20 @@ end
 Game.rot_speed = 10;
 Game.max_rot_units = 360;
 
--- Rotation units can be fiddly sometimes.
--- These functions can return any number as long as it's consistent between get & set.
--- If the Game.max_rot_units value is correct (and minimum is 0) ScriptHawk will correctly convert in game units to both degrees (default) and radians
-
-function Game.getXRotation() -- Optional
+function Game.getXRotation()
 	return mainmemory.readfloat(Game.Memory.x_rotation[version], true);
 end
 
-function Game.getYRotation() -- Optional
+function Game.getYRotation()
 	angle_1 = 90 * (mainmemory.readfloat(Game.Memory.jim_pointer[version] + jim.y_rotation_1, true) + 1);
 	angle_2 = mainmemory.readfloat(Game.Memory.jim_pointer[version] + jim.y_rotation_2, true);
-	
+
 	if angle_2 < 0 then
 		angle = (angle_1 * (0 - 1)) - 90;
 	else
 		angle = (angle_1 - 90);
 	end
-	
+
 	return angle;
 end
 
@@ -212,7 +202,7 @@ Game.animations = {
 	[15] = "Grabbing Gun", -- Rope
 	[16] = "Retracting Gun", -- Rope
 	[17] = "Surfing", -- Pork Boarding, No Earthworm Turning
-	[18] = "Surfing", -- Pork Boarding, Earthworm Turning 
+	[18] = "Surfing", -- Pork Boarding, Earthworm Turning
 	[19] = "Grabbing Ledge",
 	[20] = "Damage", -- Laser Guns, Fall Damage
 	[21] = "Damage", -- Knockback
@@ -238,24 +228,24 @@ Game.animations = {
 	[41] = "Playing", -- Main Menu Accordion
 	[42] = "Falling", -- Main Menu Post Cows
 	[43] = "Locked", -- Textbox
-}
+};
 
-Game.takeMeThereType = "Checkbox"; 
+Game.takeMeThereType = "Checkbox";
 
 function Game.setMap(index)
 	mainmemory.writebyte(Game.Memory.destination_map[version], index - 1);
 end
 
 function Game.checkMapSoftlock()
-	dest_exit = mainmemory.readbyte(Game.Memory.destination_exit[version]);
-	dest_map = mainmemory.readbyte(Game.Memory.destination_map[version]);
-	
+	local dest_exit = mainmemory.readbyte(Game.Memory.destination_exit[version]);
+	local dest_map = mainmemory.readbyte(Game.Memory.destination_map[version]);
+
 	if dest_map == 1 or dest_map == 5 or dest_map == 9 or dest_map == 16 then -- Sub Hubs (Central Column Fix)
 		if dest_exit > 0 and dest_exit < 4 then -- Coming from Boss/Level
 			mainmemory.writebyte(Game.Memory.subhub_entrance_cs[version], 0);
 		else -- Coming from 'The Brain'
 			mainmemory.writebyte(Game.Memory.subhub_entrance_cs[version], 1);
-		end 
+		end
 	end
 end
 
@@ -301,7 +291,7 @@ function Game.getAnimationTimerOSD()
 	local anim_timer = mainmemory.read_u16_be(Game.Memory.jim_pointer[version] + jim.animation_timer);
 	return anim_timer;
 end
-	
+
 function Game.applyInfinites()
 	max_ammo_red_gun = 250;
 	max_ammo_bubble_gun = 50;
@@ -318,11 +308,11 @@ function Game.applyInfinites()
 	max_ammo_leprechaun = 5;
 	max_lives = 3;
 	max_health = 100;
-	
+
 	-------------------
 	-- Set Infinites --
 	-------------------
-	
+
 	-- Lives
 	mainmemory.write_u32_be(Game.Memory.jim_pointer[version] + jim.Lives, max_lives);
 	-- Health
@@ -353,101 +343,102 @@ function Game.applyInfinites()
 	mainmemory.write_u32_be(Game.Memory.jim_pointer[version] + jim.gun_pointer + gun.knife, max_ammo_knife);
 	-- Leprechaun Launcher
 	mainmemory.write_u32_be(Game.Memory.jim_pointer[version] + jim.gun_pointer + gun.leprechaun, max_ammo_leprechaun);
-	
 end
 
 function Game.completeFile()
 	local udder_pointer = Game.Memory.marble_pointer[version] + 0x14;
-	
+
 	-- UDDERS
-	mainmemory.writebyte(udder_pointer + 0x00,1); -- Brain
-	mainmemory.writebyte(udder_pointer + 0x02,3); -- Coop D'Etat
-	mainmemory.writebyte(udder_pointer + 0x03,7); -- Barn to be Wild
-	mainmemory.writebyte(udder_pointer + 0x04,5); -- Psycrow
-	mainmemory.writebyte(udder_pointer + 0x06,5); -- Lord of the Fries
-	mainmemory.writebyte(udder_pointer + 0x07,5); -- Hungry Tonite?
-	mainmemory.writebyte(udder_pointer + 0x08,5); -- Fatty Roswell
-	mainmemory.writebyte(udder_pointer + 0x0B,5); -- Poultrygeist
-	mainmemory.writebyte(udder_pointer + 0x0C,5); -- Poultrygeist Too
-	mainmemory.writebyte(udder_pointer + 0x0D,6); -- Death Wormed Up
-	mainmemory.writebyte(udder_pointer + 0x0E,5); -- Boogie Nights
-	mainmemory.writebyte(udder_pointer + 0x0F,5); -- Monkey for a Head
-	mainmemory.writebyte(udder_pointer + 0x11,6); -- Violent Death Valley
-	mainmemory.writebyte(udder_pointer + 0x12,6); -- Good Bad Elderly
-	mainmemory.writebyte(udder_pointer + 0x13,5); -- Bob & Number 4
-	
+	mainmemory.writebyte(udder_pointer + 0x00, 1); -- Brain
+	mainmemory.writebyte(udder_pointer + 0x02, 3); -- Coop D'Etat
+	mainmemory.writebyte(udder_pointer + 0x03, 7); -- Barn to be Wild
+	mainmemory.writebyte(udder_pointer + 0x04, 5); -- Psycrow
+	mainmemory.writebyte(udder_pointer + 0x06, 5); -- Lord of the Fries
+	mainmemory.writebyte(udder_pointer + 0x07, 5); -- Hungry Tonite?
+	mainmemory.writebyte(udder_pointer + 0x08, 5); -- Fatty Roswell
+	mainmemory.writebyte(udder_pointer + 0x0B, 5); -- Poultrygeist
+	mainmemory.writebyte(udder_pointer + 0x0C, 5); -- Poultrygeist Too
+	mainmemory.writebyte(udder_pointer + 0x0D, 6); -- Death Wormed Up
+	mainmemory.writebyte(udder_pointer + 0x0E, 5); -- Boogie Nights
+	mainmemory.writebyte(udder_pointer + 0x0F, 5); -- Monkey for a Head
+	mainmemory.writebyte(udder_pointer + 0x11, 6); -- Violent Death Valley
+	mainmemory.writebyte(udder_pointer + 0x12, 6); -- Good Bad Elderly
+	mainmemory.writebyte(udder_pointer + 0x13, 5); -- Bob & Number 4
+
 	-- MARBLES
-	mainmemory.writebyte(Game.Memory.marble_pointer[version] + 0x00,100); -- Coop D'Etat
-	mainmemory.writebyte(Game.Memory.marble_pointer[version] + 0x01,100); -- Barn to be Wild
-	mainmemory.writebyte(Game.Memory.marble_pointer[version] + 0x04,100); -- Lord of the Fries
-	mainmemory.writebyte(Game.Memory.marble_pointer[version] + 0x05,100); -- Hungry Tonite
-	mainmemory.writebyte(Game.Memory.marble_pointer[version] + 0x09,100); -- Poultrygeist
-	mainmemory.writebyte(Game.Memory.marble_pointer[version] + 0x0A,100); -- Poultrygeist Too
-	mainmemory.writebyte(Game.Memory.marble_pointer[version] + 0x0B,100); -- Death Wormed Up
-	mainmemory.writebyte(Game.Memory.marble_pointer[version] + 0x0C,100); -- Boogie Nights
-	mainmemory.writebyte(Game.Memory.marble_pointer[version] + 0x0F,100); -- Violent Death Valley
-	mainmemory.writebyte(Game.Memory.marble_pointer[version] + 0x10,100); -- Good Bad Elderly
+	mainmemory.writebyte(Game.Memory.marble_pointer[version] + 0x00, 100); -- Coop D'Etat
+	mainmemory.writebyte(Game.Memory.marble_pointer[version] + 0x01, 100); -- Barn to be Wild
+	mainmemory.writebyte(Game.Memory.marble_pointer[version] + 0x04, 100); -- Lord of the Fries
+	mainmemory.writebyte(Game.Memory.marble_pointer[version] + 0x05, 100); -- Hungry Tonite
+	mainmemory.writebyte(Game.Memory.marble_pointer[version] + 0x09, 100); -- Poultrygeist
+	mainmemory.writebyte(Game.Memory.marble_pointer[version] + 0x0A, 100); -- Poultrygeist Too
+	mainmemory.writebyte(Game.Memory.marble_pointer[version] + 0x0B, 100); -- Death Wormed Up
+	mainmemory.writebyte(Game.Memory.marble_pointer[version] + 0x0C, 100); -- Boogie Nights
+	mainmemory.writebyte(Game.Memory.marble_pointer[version] + 0x0F, 100); -- Violent Death Valley
+	mainmemory.writebyte(Game.Memory.marble_pointer[version] + 0x10, 100); -- Good Bad Elderly
 end
 
 --function Game.killBoss()
---	mainmemory.writebyte(Game.Memory.boss_death_view[version],1);
---	mainmemory.writebyte(Game.Memory.boss_death_stage[version],1);
+--	mainmemory.writebyte(Game.Memory.boss_death_view[version], 1);
+--	mainmemory.writebyte(Game.Memory.boss_death_stage[version], 1);
 --end
 
 ------------------------------
 -- Fix Controller Input Bug --
 ------------------------------
 
---function Game.fixInputBug()
-	--joystick_x_input = mainmemory.readbyte(Game.Memory.controller_input[version] + 0x2);
-	--if joystick_x_input == 127 then
-	--	mainmemory.writebyte(Game.Memory.controller_input[version] + 0x2, 126);
-	--end
-	
---	joystick_x_input = mainmemory.readbyte(Game.Memory.controller_input[version] + 0x2);
---	if joystick_x_input == 127 then
---		joypad.setanalog({["P1 X Axis"] = 126})
---	end
---end
+--[[
+function Game.fixInputBug()
+	local joystick_x_input = mainmemory.readbyte(Game.Memory.controller_input[version] + 0x2);
+	if joystick_x_input == 127 then
+		mainmemory.writebyte(Game.Memory.controller_input[version] + 0x2, 126);
+	end
+
+	joystick_x_input = mainmemory.readbyte(Game.Memory.controller_input[version] + 0x2);
+	if joystick_x_input == 127 then
+		joypad.setanalog({["P1 X Axis"] = 126})
+	end
+end
+--]]
 
 ----------------
 -- Flag Stuff --
 ----------------
 Game.flagBlock = {
 --  BRAIN
-	["brain_udder_first"] = {0x0C6294,nil},
-	["brain_unlock_kim"] = {0x2772A0,nil},
+	brain_udder_first = {0x0C6294, nil},
+	brain_unlock_kim = {0x2772A0, nil},
 --  COOP D'ETAT
-	["cde_udder_fridge"] = {0x0C627A,nil},
-	["cde_udder_pants"] = {0x0C627B,nil},
-	["cde_udder_chicken"] = {0x0C627C,nil},
+	cde_udder_fridge = {0x0C627A, nil},
+	cde_udder_pants = {0x0C627B, nil},
+	cde_udder_chicken = {0x0C627C, nil},
 --  BARN TO BE WILD
-	["btbw_udder_quicksand"] = {nil,nil},
-	["btbw_udder_barndoor"] = {nil,nil},
-	["btbw_udder_crow"] = {nil,nil},
-	["btbw_udder_jail"] = {nil,nil},
-	["btbw_udder_obstacle"] = {nil,nil},
-	["btbw_udder_balloon"] = {nil,nil},
-	["btbw_udder_camera"] = {nil,nil},
+	btbw_udder_quicksand = {nil, nil},
+	btbw_udder_barndoor = {nil, nil},
+	btbw_udder_crow = {nil, nil},
+	btbw_udder_jail = {nil, nil},
+	btbw_udder_obstacle = {nil, nil},
+	btbw_udder_balloon = {nil, nil},
+	btbw_udder_camera = {nil, nil},
 --  PSYCROW
-	["psy_udder_completion"] = {nil,nil},
+	psy_udder_completion = {nil, nil},
 --  LORD OF THE FRIES
 
 --  ARE YOU HUNGRY TONITE?
-	["ayht_udder_bean"] = {0x37BAF8,nil},
+	ayht_udder_bean = {0x37BAF8, nil},
 --  FATTY Roswell
 
---  POULTRYGEIST 
-	["poultone_udder_beaver"] = {0x310010,nil},
-	["poultone_udder_furniture"] = {0x310020,nil},
-	["poultone_udder_hoover"] = {0x310028,nil},
+--  POULTRYGEIST
+	poultone_udder_beaver = {0x310010, nil},
+	poultone_udder_furniture = {0x310020, nil},
+	poultone_udder_hoover = {0x310028, nil},
 --  POULTRYGEIST TOO
-	
+
 --  DEATH WORMED UP
-	["dwu_udder_graves"] = {0x0C625B,nil},
-	["dwu_udder_swamp"] = {0x0C625D,nil},
-	["dwu_udder_balloon"] = {0x0C6260,nil},
---  BOOGIE NIGHTS OF THE LIVING DEAD 
+	dwu_udder_graves = {0x0C625B, nil},
+	dwu_udder_swamp = {0x0C625D, nil},
+	dwu_udder_balloon = {0x0C6260, nil},
+--  BOOGIE NIGHTS OF THE LIVING DEAD
 
 --  PROFESSOR MONKEY FOR A HEAD
 
@@ -458,21 +449,12 @@ Game.flagBlock = {
 --  BOB AND NUMBER Four
 
 --  EARTHWORM KIM
-
-}
+};
 
 local labelValue = 0;
 function Game.initUI()
 	ScriptHawk.UI.form_controls["Reload Map (Soft)"] = forms.button(ScriptHawk.UI.options_form, "Reload Map", Game.reloadMap, ScriptHawk.UI.col(5), ScriptHawk.UI.row(4), ScriptHawk.UI.col(4) + 10, ScriptHawk.UI.button_height);
 	ScriptHawk.UI.form_controls["Reload Map (Hard)"] = forms.button(ScriptHawk.UI.options_form, "Hard Reload", Game.reloadMapHard, ScriptHawk.UI.col(10), ScriptHawk.UI.row(0), ScriptHawk.UI.col(4) + 10, ScriptHawk.UI.button_height);
-end
-
-function Game.drawUI()
-	
-end
-
-function Game.eachFrame() 
-	
 end
 
 function Game.realTime()
@@ -485,18 +467,18 @@ Game.OSDPosition = {2, 70};
 Game.OSD = {
 	{"Map", Game.getMapOSD},
 	{"Exit", Game.getExitOSD},
-	{"Separator", 1},
-	{"X", Game.getXPosition},
-	{"Y", Game.getYPosition},
-	{"Z", Game.getZPosition},
-	{"Separator", 1},
+	{"Separator"},
+	{"X"},
+	{"Y"},
+	{"Z"},
+	{"Separator"},
 	{"dY"},
 	{"dXZ"},
-	{"Separator", 1},
+	{"Separator"},
 	{"Max dY"},
 	{"Max dXZ"},
 	{"Odometer"},
-	{"Separator", 1},
+	{"Separator"},
 	--{"Rot. X", Game.getXRotation},
 	{"Animation", Game.getAnimationOSD},
 	{"Animation Timer", Game.getAnimationTimerOSD},

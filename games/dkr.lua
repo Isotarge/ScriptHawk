@@ -12,17 +12,17 @@ local Game = {
 	rot_speed = 100,
 	max_rot_units = 65535,
 	Memory = { -- Version order: PAL 1.1, PAL 1.0, Japan, US 1.1, US 1.0
-		["CSS_character"] = {0x126A18, 0x126478, 0x127F18, 0x126988, 0x1263E8}, -- Character select screen
-		["CSS_vehicle"] = {0x127010, 0x126A50, 0x128508, 0x126F80, 0x1269C0}, -- Track select screen
-		["game_settings"] = {0x123B20, 0x1235A0, 0x124F80, 0x123A90, 0x123510}, -- Pointer
-		["is_paused"] = {0x123B25, 0x1235A5, 0x124F85, 0x123A95, 0x123515}, -- Byte
-		["show_results"] = {0x123B26, 0x1235A6, 0x124F86, 0x123A96, 0x123516}, -- Byte
-		["get_ready"] = {0x11B3C3, 0x11AE43, 0x11C823, 0x11B333, 0x11ADB3}, -- Byte?
-		["cheats_enabled"] = {0x0E03A8, 0x0DFE28, 0x0E17F8, 0x0E0318, 0x0DFD98}, -- Bitfield u32_be
-		["cheat_menu"] = {0x0E03AC, 0x0DFE2C, 0x0E17FC, 0x0E031C, 0x0DFD9C}, -- Bitfield u32_be
-		["pointer_list"] = {0x11B468, 0x11AEE8, 0x11C8C8, 0x11B3D8, 0x11AE58},
-		["num_objects"] = {0x11B46C, 0x11AEEC, 0x11C8CC, 0x11B3DC, 0x11AE5C},
-		["hud_pointer_pointer"] = {0x11B4FC, 0x11AF7C, 0x11C95C, 0x11B46C, 0x11AEEC}, -- Pointer
+		CSS_character = {0x126A18, 0x126478, 0x127F18, 0x126988, 0x1263E8}, -- Character select screen
+		CSS_vehicle = {0x127010, 0x126A50, 0x128508, 0x126F80, 0x1269C0}, -- Track select screen
+		game_settings = {0x123B20, 0x1235A0, 0x124F80, 0x123A90, 0x123510}, -- Pointer
+		is_paused = {0x123B25, 0x1235A5, 0x124F85, 0x123A95, 0x123515}, -- Byte
+		show_results = {0x123B26, 0x1235A6, 0x124F86, 0x123A96, 0x123516}, -- Byte
+		get_ready = {0x11B3C3, 0x11AE43, 0x11C823, 0x11B333, 0x11ADB3}, -- Byte?
+		cheats_enabled = {0x0E03A8, 0x0DFE28, 0x0E17F8, 0x0E0318, 0x0DFD98}, -- Bitfield u32_be
+		cheat_menu = {0x0E03AC, 0x0DFE2C, 0x0E17FC, 0x0E031C, 0x0DFD9C}, -- Bitfield u32_be
+		pointer_list = {0x11B468, 0x11AEE8, 0x11C8C8, 0x11B3D8, 0x11AE58},
+		num_objects = {0x11B46C, 0x11AEEC, 0x11C8CC, 0x11B3DC, 0x11AE5C},
+		hud_pointer_pointer = {0x11B4FC, 0x11AF7C, 0x11C95C, 0x11B46C, 0x11AEEC}, -- Pointer
 	},
 	maps = {
 		"0x00 - Overworld",
@@ -144,52 +144,52 @@ end
 
 -- Relative to objects in pointer list
 local object_fields = {
-	["x_pos"] = 0x0C, -- Float
-	["y_pos"] = 0x10, -- Float
-	["z_pos"] = 0x14, -- Float
-	["y_velocity"] = 0x20, -- Float
-	["object_descriptor_pointer"] = 0x40, -- Pointer
-	["object_descriptor"] = {
-		["name"] = 0x60, -- Null terminated string
+	x_pos = 0x0C, -- Float
+	y_pos = 0x10, -- Float
+	z_pos = 0x14, -- Float
+	y_velocity = 0x20, -- Float
+	object_descriptor_pointer = 0x40, -- Pointer
+	object_descriptor = {
+		name = 0x60, -- Null terminated string
 	},
-	["map_color"] = 0x9B, -- Byte
-	["velocity"] = 0xC4, -- Float
-	["lateral_velocity"] = 0xC8, -- Float
-	["wheel_array_pointer"] = 0x60, -- Pointer
-	["wheel_array"] = {
-		["size"] = 0x00, -- u32_be
-		["array_base"] = 0x04, -- Array of wheel object pointers
-		["wheel"] = {
-			["size"] = 0x08, -- Float
+	map_color = 0x9B, -- Byte
+	velocity = 0xC4, -- Float
+	lateral_velocity = 0xC8, -- Float
+	wheel_array_pointer = 0x60, -- Pointer
+	wheel_array = {
+		size = 0x00, -- u32_be
+		array_base = 0x04, -- Array of wheel object pointers
+		wheel = {
+			size = 0x08, -- Float
 		},
 	},
-	["camera_zoom"] = 0x12C, -- Float
-	["throttle"] = 0x14C, -- Float 0-1
-	["spin_timer"] = 0x206, -- s16_be
-	["powerup_color"] = 0x20A, -- Byte, 0-4
-	["powerup_colors"] = {
+	camera_zoom = 0x12C, -- Float
+	throttle = 0x14C, -- Float 0-1
+	spin_timer = 0x206, -- s16_be
+	powerup_color = 0x20A, -- Byte, 0-4
+	powerup_colors = {
 		[0x00] = "Blue",
 		[0x01] = "Red",
 		[0x02] = "Green",
 		[0x03] = "Yellow",
 		[0x04] = "Rainbow",
 	},
-	["powerup_quantity"] = 0x20B, -- Byte, Max 10
-	["powerup_level"] = 0x20C, -- Byte, 0-2
-	["bananas"] = 0x21D, -- s8, capped at 99
-	["checkpoint"] = 0x228, -- s16_be, capped at -32000
-	["checkpoint_minor"] = 0x22A, -- byte
-	["checkpoint_lap"] = 0x22B, -- byte
-	["x_rot"] = 0x23A, -- 16_be
-	["y_rot"] = 0x238, -- 16_be
-	["facing_angle"] = 0x238, -- 16_be
-	["z_rot"] = 0x23C, -- 16_be
-	["boost_timer"] = 0x26B, -- s8
-	["front_left_wheel_ground"] = 0x274, -- byte
-	["front_right_wheel_ground"] = 0x275, -- byte
-	["back_left_wheel_ground"] = 0x276, -- byte
-	["back_right_wheel_ground"] = 0x277, -- byte
-	["silver_coins"] = 0x29A,
+	powerup_quantity = 0x20B, -- Byte, Max 10
+	powerup_level = 0x20C, -- Byte, 0-2
+	bananas = 0x21D, -- s8, capped at 99
+	checkpoint = 0x228, -- s16_be, capped at -32000
+	checkpoint_minor = 0x22A, -- byte
+	checkpoint_lap = 0x22B, -- byte
+	x_rot = 0x23A, -- 16_be
+	y_rot = 0x238, -- 16_be
+	facing_angle = 0x238, -- 16_be
+	z_rot = 0x23C, -- 16_be
+	boost_timer = 0x26B, -- s8
+	front_left_wheel_ground = 0x274, -- byte
+	front_right_wheel_ground = 0x275, -- byte
+	back_left_wheel_ground = 0x276, -- byte
+	back_right_wheel_ground = 0x277, -- byte
+	silver_coins = 0x29A,
 };
 
 function Game.getGameSettings()
@@ -808,7 +808,7 @@ local function optimalTap()
 		end
 
 		local shouldWeTap = getReady >= boostMin and getReady <= boostMax and boost == 0;
-		joypad.set({["A"] = shouldWeTap}, 1);
+		joypad.set({A = shouldWeTap}, 1);
 		return;
 	end
 
@@ -825,7 +825,7 @@ local function optimalTap()
 	end
 
 	local shouldWeTap = (emu.framecount() - (otap_startFrame + (emu.lagcount() - otap_startLag))) % modulo == 0;
-	joypad.set({["A"] = shouldWeTap}, 1);
+	joypad.set({A = shouldWeTap}, 1);
 end
 
 --------------------
@@ -983,7 +983,7 @@ function Game.setMap(value)
 	end
 end
 
-function Game.applyInfinites()
+function Game.unlockCharacters()
 	-- Unlock all magic code toggles
 	mainmemory.write_u32_be(Game.Memory.cheat_menu[version], 0xFFFFFFFF);
 
@@ -992,6 +992,10 @@ function Game.applyInfinites()
 	cheatsEnabled = setBit(cheatsEnabled, 0); -- TT
 	cheatsEnabled = setBit(cheatsEnabled, 1); -- Drumstick
 	mainmemory.write_u32_be(Game.Memory.cheats_enabled[version], cheatsEnabled);
+end
+
+function Game.applyInfinites()
+	Game.unlockCharacters();
 
 	-- Player object bizzo
 	local playerObject = Game.getPlayerObject();
@@ -1004,6 +1008,7 @@ function Game.applyInfinites()
 end
 
 function Game.initUI()
+	ScriptHawk.UI.form_controls["Unlock Characters Button"] = forms.button(ScriptHawk.UI.options_form, "Unlock Characters", Game.unlockCharacters, ScriptHawk.UI.col(10), ScriptHawk.UI.row(4), ScriptHawk.UI.col(4) + 10, ScriptHawk.UI.button_height);
 	ScriptHawk.UI.form_controls.boost_info_checkbox = forms.checkbox(ScriptHawk.UI.options_form, "Boost info", ScriptHawk.UI.col(5) + ScriptHawk.UI.dropdown_offset, ScriptHawk.UI.row(4) + ScriptHawk.UI.dropdown_offset);
 	ScriptHawk.UI.form_controls.encircle_checkbox = forms.checkbox(ScriptHawk.UI.options_form, "Encircle (beta)", ScriptHawk.UI.col(5) + ScriptHawk.UI.dropdown_offset, ScriptHawk.UI.row(5) + ScriptHawk.UI.dropdown_offset);
 	forms.setproperty(ScriptHawk.UI.form_controls.encircle_checkbox, "Height", 22);
@@ -1133,13 +1138,13 @@ end
 
 Game.OSDPosition = {2, 70}
 Game.OSD = {
-	{"X", Game.getXPosition},
-	{"Y", Game.getYPosition},
-	{"Z", Game.getZPosition},
-	{"Separator", 1},
+	{"X"},
+	{"Y"},
+	{"Z"},
+	{"Separator"},
 	{"dY"},
 	{"dXZ"},
-	{"Separator", 1},
+	{"Separator"},
 	{"Spin Timer", Game.getSpinTimer, Game.colorSpinTimer},
 	{"Boost", Game.getBoost},
 	{"Velocity", Game.getVelocity},
@@ -1148,16 +1153,16 @@ Game.OSD = {
 	{"Lateral Velocity", Game.getLateralVelocity},
 	--{"Lateral Acceleration", Game.getLateralAcceleration},
 	{"Throttle", Game.getThrottle},
-	{"Separator", 1},
+	{"Separator"},
 	{"Max dY"},
 	{"Max dXZ"},
 	{"Odometer"},
-	{"Separator", 1},
+	{"Separator"},
 	{"Rot. X", Game.getXRotation},
 	{"Facing", Game.getYRotation},
 	--{"Moving", Game.getMovingRotation},
 	{"Rot. Z", Game.getZRotation},
-	{"Separator", 1},
+	{"Separator"},
 	{"Game Settings", hexifyOSD(Game.getGameSettings)},
 	{"Player", hexifyOSD(Game.getPlayerObject)},
 	{"Checkpoint", Game.getCheckpointOSD},

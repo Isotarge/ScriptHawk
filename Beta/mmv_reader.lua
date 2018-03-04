@@ -32,14 +32,14 @@ end
 local function parseControllerByte(byte)
 	byte = string.byte(byte, 1);
 	return {
-		["Up"] = (bit.band(byte, 0x01) ~= 0),
-		["Down"] = (bit.band(byte, 0x02) ~= 0),
-		["Left"] = (bit.band(byte, 0x04) ~= 0),
-		["Right"] = (bit.band(byte, 0x08) ~= 0),
-		["B1"] = (bit.band(byte, 0x10) ~= 0),
-		["B2"] = (bit.band(byte, 0x20) ~= 0),
-		["Pause"] = (bit.band(byte, 0x40) ~= 0),
-		["Reset"] = false,
+		Up = (bit.band(byte, 0x01) ~= 0),
+		Down = (bit.band(byte, 0x02) ~= 0),
+		Left = (bit.band(byte, 0x04) ~= 0),
+		Right = (bit.band(byte, 0x08) ~= 0),
+		B1 = (bit.band(byte, 0x10) ~= 0),
+		B2 = (bit.band(byte, 0x20) ~= 0),
+		Pause = (bit.band(byte, 0x40) ~= 0),
+		Reset = false,
 	};
 end
 

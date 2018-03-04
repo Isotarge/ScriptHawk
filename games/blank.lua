@@ -5,28 +5,28 @@ if type(ScriptHawk) ~= "table" then -- An error message to inform the user that 
 	return;
 end
 
-local Game = {}; -- This table stores the module's API function implementations and game state, it's returned to ScriptHawk at the end of the module code
+local Game = { -- This table stores the module's API function implementations and game state, it's returned to ScriptHawk at the end of the module code
+	Memory = {
+		-- Lua has a maximum of 200 local variables per function, we use a table to store memory addresses to get around this
+		-- It's a 2 dimensional table, the first dimension is the name of the address
+		-- the second dimension is an index for which version of the game was detected, set below by Game.detectVersion()
+		-- Examples of how to access the memory address for X Position:
+		-- Game.Memory.x_position[version] -- Preferred
+		-- Game.Memory["x_position"][version]
+		-- Game["Memory"]["x_position"][version]
+		x_position = {0x100000, 0x200000, 0x300000}, -- Example addresses
+		y_position = {0x100004, 0x200004, 0x300004},
+		z_position = {0x100008, 0x200008, 0x300008},
+		x_rotation = {0x100010, 0x200010, 0x300010},
+		y_rotation = {0x100014, 0x200014, 0x300014},
+		z_rotation = {0x100018, 0x200018, 0x300018},
+		map_index = {0x10000C, 0x20000C, 0x30000C},
+	}
+};
 
 --------------------
 -- Region/Version --
 --------------------
-
-Game.Memory = {
-	-- Lua has a maximum of 200 local variables per function, we use a table to store memory addresses to get around this
-	-- It's a 2 dimensional table, the first dimension is the name of the address
-	-- the second dimension is an index for which version of the game was detected, set below by Game.detectVersion()
-	-- Examples of how to access the memory address for X Position:
-		-- Game.Memory.x_position[version] -- Preferred
-		-- Game.Memory["x_position"][version]
-		-- Game["Memory"]["x_position"][version]
-	["x_position"] = {0x100000, 0x200000, 0x300000}, -- Example addresses
-	["y_position"] = {0x100004, 0x200004, 0x300004},
-	["z_position"] = {0x100008, 0x200008, 0x300008},
-	["x_rotation"] = {0x100010, 0x200010, 0x300010},
-	["y_rotation"] = {0x100014, 0x200014, 0x300014},
-	["z_rotation"] = {0x100018, 0x200018, 0x300018},
-	["map_index"] = {0x10000C, 0x20000C, 0x30000C},
-};
 
 function Game.detectVersion(romName, romHash) -- Modules should ideally use ROM hash rather than name, but both are passed in by ScriptHawk
 	if string.contains(romName, "Europe") then -- string.contains is a pure Lua global function provided by ScriptHawk, intended to replace calls to bizstring.contains() for portability reasons
@@ -188,14 +188,14 @@ Game.OSD = {
 	{"X", Game.getXPosition},
 	{"Y", Game.getYPosition, Game.colorYPosition}, -- A third parameter can be added to these table entries, a function that returns a 32 bit int AARRGGBB color value for that OSD entry
 	{"Z", Game.getZPosition},
-	{"Separator", 1},
+	{"Separator"},
 	{"dY"},
 	{"dXZ"},
-	{"Separator", 1},
+	{"Separator"},
 	{"Max dY"},
 	{"Max dXZ"},
 	{"Odometer"},
-	{"Separator", 1},
+	{"Separator"},
 	{"Rot. X", Game.getXRotation},
 	{"Facing", Game.getYRotation},
 	{"Rot. Z", Game.getZRotation},

@@ -1,16 +1,28 @@
-if type(ScriptHawk) ~= "table" then -- An error message to inform the user that this is a game module, not a standalone script
+if type(ScriptHawk) ~= "table" then
 	print("This script is not designed to run by itself");
 	print("Please run ScriptHawk.lua from the parent directory instead");
 	print("Thanks for using ScriptHawk :)");
 	return;
 end
 
-local Game = {}; -- This table stores the module's API function implementations and game state, it's returned to ScriptHawk at the end of the module code
+local Game = {
+	Memory = {
+		x_position = {Domain="IWRAM", Address={0x0E98}},
+		y_position = {Domain="IWRAM", Address={0x0E9C}},
+		x_velocity = {Domain="IWRAM", Address={0x0EA0}},
+		y_velocity = {Domain="IWRAM", Address={0x0EA4}},
+		current_movement_state = {Domain="IWRAM", Address={0x0F38}},
+		drill_gauge = {Domain="IWRAM", Address={0x11A4}},
+
+		object_array_end_ptr = {Domain="EWRAM", Address={0x0004}},
+		object_array = {Domain="EWRAM", Address={0x0010}},
+	},
+};
 
 local script_modes = {
 	"Disabled",
 	"List",
---	"Examine",
+	--"Examine",
 };
 
 local script_mode_index = 1;
@@ -20,36 +32,18 @@ script_mode = script_modes[script_mode_index];
 -- Region/Version --
 --------------------
 
-Game.Memory = {
-	["x_position"] = {["Domain"] = "IWRAM", ["Address"] = {0x0E98}},
-	["y_position"] = {["Domain"] = "IWRAM", ["Address"] = {0x0E9C}},
-	["x_velocity"] = {["Domain"] = "IWRAM", ["Address"] = {0x0EA0}},
-	["y_velocity"] = {["Domain"] = "IWRAM", ["Address"] = {0x0EA4}},
-	["current_movement_state"] = {["Domain"] = "IWRAM", ["Address"] = {0x0F38}},
-	["drill_gauge"] = {["Domain"] = "IWRAM", ["Address"] = {0x11A4}},
-
-	["object_array_end_ptr"] = {["Domain"] = "EWRAM", ["Address"] = {0x0004}},
-	["object_array"] = {["Domain"] = "EWRAM", ["Address"] = {0x0010}},
-};
-
 function Game.detectVersion(romName, romHash) -- Modules should ideally use ROM hash rather than name, but both are passed in by ScriptHawk
+	ScriptHawk.dpad.joypad.enabled = false;
+	ScriptHawk.dpad.key.enabled = false;
 	if romHash == "C1058CC2482B91204100CC8515DA99AEB06773F5" then -- US
 		version = 1; -- We use the version variable as an index for the Game.Memory table
-	elseif romHash == "84AFA7108E4D604E7B1A6D105DF5760869A247FA" then --JP
+		return true;
+	elseif romHash == "84AFA7108E4D604E7B1A6D105DF5760869A247FA" then -- JP
 		version = 2;
-	else
-		return false; -- Return false if this version of the game is not supported
+		return true;
 	end
-
-	return true; -- Return true if version detection is successful
+	return false;
 end
-
--------------------
--- Physics/Scale --
--------------------
-
-Game.speedy_speeds = { .001, .01, .1, 1, 5, 10, 20, 50, 100 }; -- D-Pad speeds, scale these appropriately with your game's coordinate system
-Game.speedy_index = 7;
 
 -----------------------------------------
 -- 16.16 numbers and domains are weird --
@@ -72,19 +66,19 @@ end
 --------------
 
 function Game.getXPosition()
-	return Game.read_16_16(Game.Memory.x_position["Address"][version], Game.Memory.x_position["Domain"]);
+	return Game.read_16_16(Game.Memory.x_position.Address[version], Game.Memory.x_position.Domain);
 end
 
 function Game.getYPosition()
-	return Game.read_16_16(Game.Memory.y_position["Address"][version], Game.Memory.y_position["Domain"]);
+	return Game.read_16_16(Game.Memory.y_position.Address[version], Game.Memory.y_position.Domain);
 end
 
 function Game.setXPosition(value)
-	Game.write_16_16(Game.Memory.x_position["Address"][version], value, Game.Memory.x_position["Domain"]);
+	Game.write_16_16(Game.Memory.x_position.Address[version], value, Game.Memory.x_position.Domain);
 end
 
 function Game.setYPosition(value)
-	Game.write_16_16(Game.Memory.x_position["Address"][version], value, Game.Memory.x_position["Domain"]);
+	Game.write_16_16(Game.Memory.x_position.Address[version], value, Game.Memory.x_position.Domain);
 end
 
 --------------
@@ -92,23 +86,23 @@ end
 --------------
 
 function Game.getXVelocity()
-	return Game.read_16_16(Game.Memory.x_velocity["Address"][version], Game.Memory.x_velocity["Domain"]);
+	return Game.read_16_16(Game.Memory.x_velocity.Address[version], Game.Memory.x_velocity.Domain);
 end
 
 function Game.getYVelocity()
-	return Game.read_16_16(Game.Memory.y_velocity["Address"][version], Game.Memory.y_velocity["Domain"]);
+	return Game.read_16_16(Game.Memory.y_velocity.Address[version], Game.Memory.y_velocity.Domain);
 end
 
 function Game.setXVelocity(value)
-	Game.write_16_16(Game.Memory.x_velocity["Address"][version],value, Game.Memory.x_velocity["Domain"]);
+	Game.write_16_16(Game.Memory.x_velocity.Address[version],value, Game.Memory.x_velocity.Domain);
 end
 
 function Game.setYVelocity(value)
-	Game.write_16_16(Game.Memory.y_velocity["Address"][version],value, Game.Memory.y_velocity["Domain"]);
+	Game.write_16_16(Game.Memory.y_velocity.Address[version],value, Game.Memory.y_velocity.Domain);
 end
 
 function Game.getDrillValue()
-	return toHexString(memory.read_u32_le(Game.Memory.drill_gauge["Address"][version], Game.Memory.drill_gauge["Domain"]));
+	return toHexString(memory.read_u32_le(Game.Memory.drill_gauge.Address[version], Game.Memory.drill_gauge.Domain));
 end
 
 --------------------
@@ -225,7 +219,7 @@ local movementStates = {
 };
 
 function Game.getCurrentMovementState()
-	local currentMovementState = memory.read_u32_le(Game.Memory.current_movement_state["Address"][version],Game.Memory.current_movement_state["Domain"]);
+	local currentMovementState = memory.read_u32_le(Game.Memory.current_movement_state.Address[version],Game.Memory.current_movement_state.Domain);
 	if type(movementStates[currentMovementState]) ~= "nil" then
 		return movementStates[currentMovementState];
 	else
@@ -254,13 +248,13 @@ object_index = 1;
 local object_struct_size = 0xFC;
 
 local object_struct = {
-	[0x16] = {["Type"] = "u16_le", ["Name"] = "Object Index"},
+	[0x16] = {Type="u16_le", Name="Object Index"},
 
-	[0x24] = {["Type"] = "u16_le", ["Name"] = "XPosition"},
-	[0x26] = {["Type"] = "u16_le", ["Name"] = "YPosition"},
+	[0x24] = {Type="u16_le", Name="XPosition"},
+	[0x26] = {Type="u16_le", Name="YPosition"},
 
-	[0x56] = {["Type"] = "u16_le", ["Name"] = "Health"},
-	[0x58] = {["Type"] = "u16_le", ["Name"] = "Max Health"},
+	[0x56] = {Type="u16_le", Name="Health"},
+	[0x58] = {Type="u16_le", Name="Max Health"},
 };
 
 local object_indexes = {
@@ -364,17 +358,16 @@ function Game.drawUI()
 	end
 
 	local row = 0;
-
 	local numSlots = 0x40;
 
 	gui.text(Game.OSDPosition[1], 2 + Game.OSDRowHeight * row, "Mode: "..script_mode, nil, 'bottomright');
 	row = row + 1;
 	if script_mode == "List" then
 		for i = numSlots, 1, -1 do
-			local currentSlotBase = Game.Memory.object_array["Address"][version] + (i-1) * object_struct_size;
-			if memory.read_u32_le(currentSlotBase, Game.Memory.object_array["Domain"]) ~= 0 then
+			local currentSlotBase = Game.Memory.object_array.Address[version] + (i - 1) * object_struct_size;
+			if memory.read_u32_le(currentSlotBase, Game.Memory.object_array.Domain) ~= 0 then
 				local actorType = "Unknown";
-				local objectType = memory.read_u16_le(currentSlotBase + 0x16, Game.Memory.object_array["Domain"]);
+				local objectType = memory.read_u16_le(currentSlotBase + 0x16, Game.Memory.object_array.Domain);
 				if type(object_indexes[objectType]) == "string" then
 					actorType = object_indexes[objectType];
 				else
@@ -386,17 +379,17 @@ function Game.drawUI()
 					color = yellow_highlight;
 				end
 
-				local object_health = memory.read_u16_le(currentSlotBase + 0x56, Game.Memory.object_array["Domain"]);
+				local object_health = memory.read_u16_le(currentSlotBase + 0x56, Game.Memory.object_array.Domain);
 
 				if objectType == 0x77 then
-					local object_health = memory.read_u16_le(currentSlotBase + 0x84, Game.Memory.object_array["Domain"]);
+					local object_health = memory.read_u16_le(currentSlotBase + 0x84, Game.Memory.object_array.Domain);
 					gui.text(Game.OSDPosition[1], 2 + Game.OSDRowHeight * row, actorType.." "..i.." ("..object_health.."): "..toHexString(currentSlotBase or 0), color, 'bottomright');
 					row = row + 1;
 				elseif object_health ~= 0 then
-					local object_total_health = memory.read_u16_le(currentSlotBase + 0x58, Game.Memory.object_array["Domain"]);
+					local object_total_health = memory.read_u16_le(currentSlotBase + 0x58, Game.Memory.object_array.Domain);
 					if actorType == "Unknown" then
-						--local xPos = memory.read_s16_le(currentSlotBase + 0x24, Game.Memory.objectArray["Domain"]);
-						--local yPos = memory.read_s16_le(currentSlotBase + 0x26, Game.Memory.objectArray["Domain"]);
+						--local xPos = memory.read_s16_le(currentSlotBase + 0x24, Game.Memory.objectArray.Domain);
+						--local yPos = memory.read_s16_le(currentSlotBase + 0x26, Game.Memory.objectArray.Domain);
 						gui.text(Game.OSDPosition[1], 2 + Game.OSDRowHeight * row, i.." ("..object_health.."/"..object_total_health.."): "..toHexString(currentSlotBase or 0), color, 'bottomright');
 						row = row + 1;
 					else
@@ -405,8 +398,8 @@ function Game.drawUI()
 					end
 				else
 					if actorType == "Unknown" then
-						--local xPos = memory.read_s16_le(currentSlotBase + 0x24, Game.Memory.objectArray["Domain"]);
-						--local yPos = memory.read_s16_le(currentSlotBase + 0x26, Game.Memory.objectArray["Domain"]);
+						--local xPos = memory.read_s16_le(currentSlotBase + 0x24, Game.Memory.objectArray.Domain);
+						--local yPos = memory.read_s16_le(currentSlotBase + 0x26, Game.Memory.objectArray.Domain);
 						gui.text(Game.OSDPosition[1], 2 + Game.OSDRowHeight * row, i..": "..toHexString(currentSlotBase or 0), color, 'bottomright');
 						row = row + 1;
 					else
@@ -423,19 +416,19 @@ Game.OSDPosition = {2, 70}; -- Optional: OSD position in pixels from the top lef
 Game.OSD = {
 	{"Movement", Game.getCurrentMovementState, Game.colorCurrentMovementState},
 	{"Drill", Game.getDrillValue},
-	{"Separator", 1},
-	{"X", Game.getXPosition},
-	{"Y", Game.getYPosition},
+	{"Separator"},
+	{"X"},
+	{"Y"},
 	{"X Velocity", Game.getXVelocity},
 	{"Y Velocity", Game.getYVelocity},
-	{"Separator", 1},
+	{"Separator"},
 	{"dX"},
 	{"dY"},
-	{"Separator", 1},
+	{"Separator"},
 	{"Max dY"},
 	{"Max dXZ"},
 	{"Odometer"},
-	{"Separator", 1},
+	{"Separator"},
 };
 
 ScriptHawk.bindKeyRealtime("C", toggleObjectAnalysisToolsMode, true);

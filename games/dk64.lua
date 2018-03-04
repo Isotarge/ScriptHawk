@@ -637,21 +637,21 @@ function arcadeTakeMeThere(level)
 		elseif level == "50m" then
 			level_value = 1;
 		elseif level == "75m" then
-			level_value = 2;	
+			level_value = 2;
 		elseif level == "100m" then
 			level_value = 3;
 		end
 
 		if level == "25m" or level == "50m" or level == "75m" or level == "100m" then
-			mainmemory.writebyte(Game.Memory.arcade_level[1],level_value);
-			mainmemory.writebyte(Game.Memory.arcade_reload[1],2);
+			mainmemory.writebyte(Game.Memory.arcade_level[1], level_value);
+			mainmemory.writebyte(Game.Memory.arcade_reload[1], 2);
 		end
 	end
 end
 
 function jetpacTakeMeThere(level)
 	if map_value == jetpac_map then
-		mainmemory.writebyte(Game.Memory.jetpac_level[version],level);
+		mainmemory.writebyte(Game.Memory.jetpac_level[version], level);
 	end
 end
 
@@ -6554,7 +6554,7 @@ koshBot.Loop = function()
 			joypad.setanalog(koshBot.joypad_angles[desiredSlot], 1);
 			--print("Moving to slot "..desiredSlot);
 			if currentSlot == desiredSlot then
-				joypad.set({["B"] = emu.framecount() % 5 == 0}, 1);
+				joypad.set({B = emu.framecount() % 5 == 0}, 1);
 				--print("Firing!");
 				if desiredSlot > 0 and koshBot.countMelonProjectiles() > koshBot.previousFrameMelonCount then
 					koshBot.shots_fired[desiredSlot] = koshBot.getSlotPointer(koshController, desiredSlot);
@@ -7026,8 +7026,6 @@ local object_selectable_size = 10;
 local reference_distance = 2000;
 
 local screen = {
-	--width = 640,
-	--height = 480,
 	width = client.bufferwidth(),
 	height = client.bufferheight(),
 };
@@ -7134,7 +7132,7 @@ function drawObjectPositions()
 					drawYPos = -(screen.height / 2) * math.sin(XAngle_local) / math.sin(viewport_XAngleRange * math.pi / 360) + screen.height / 2;
 					--drawYPos = -(screen.height) * math.sin(XAngle_local) / math.sin(viewport_XAngleRange * math.pi / 360);
 
-					--calc scaling factor -- current calc might be incorrect
+					-- Calc scaling factor -- current calc might be incorrect
 					scaling_factor = reference_distance / objectData.zPos;
 
 					--[[
@@ -7977,17 +7975,17 @@ Game.standardOSD = {
 	{"Level", Game.getLevelIndexOSD},
 	{"Cutscene", Game.getCutsceneOSD},
 	{"Exit", Game.getExitOSD},
-	{"Separator", 1},
+	{"Separator"},
 	{"Mode", Game.getCurrentMode},
 	{"File", Game.getFileOSD},
 	--{"Flags", getFlagStatsOSD},
-	{"Separator", 1},
-	{"X", Game.getXPosition},
-	{"Y", Game.getYPosition},
-	{"Z", Game.getZPosition},
-	{"Separator", 1},
+	{"Separator"},
+	{"X"},
+	{"Y"},
+	{"Z"},
+	{"Separator"},
 	{"Floor", Game.getFloor},
-	{"Separator", 1},
+	{"Separator"},
 	--{"Lag Factor", Game.getLagFactor},
 	{"dY"},
 	{"dXZ"},
@@ -7995,11 +7993,11 @@ Game.standardOSD = {
 	--{"Accel", Game.getAcceleration}, -- TODO: Game.getAcceleration
 	{"Y Velocity", Game.getYVelocity},
 	{"Y Accel", Game.getYAcceleration},
-	{"Separator", 1},
+	{"Separator"},
 	{"Max dY"},
 	{"Max dXZ"},
 	{"Odometer"},
-	{"Separator", 1},
+	{"Separator"},
 	{"Rot. X", Game.getXRotation},
 	{"Facing", Game.getYRotation, Game.colorYRotation},
 	--{"Moving", Game.getMovingRotation}, -- TODO: Game.getMovingRotation
@@ -8007,22 +8005,22 @@ Game.standardOSD = {
 	{"Movement", Game.getMovementState},
 	--{"Camera", Game.getCameraState},
 	{"Noclip", Game.getNoclipByte, Game.colorNoclipByte},
-	--{"Separator", 1},
+	--{"Separator"},
 	--{"Anim Timer 1", Game.getAnimationTimer1},
 	--{"Anim Timer 2", Game.getAnimationTimer2},
 	--{"Anim Timer 3", Game.getAnimationTimer3},
 	--{"Anim Timer 4", Game.getAnimationTimer4},
-	{"Separator", 1},
+	{"Separator"},
 	{"Bone Array 1", function() return Game.getBoneArray1PrettyPrint(Game.getPlayerObject()) end},
 	{"Stored X1", function() return Game.getStoredX1(Game.getPlayerObject()) end},
 	{"Stored Y1", function() return Game.getStoredY1(Game.getPlayerObject()) end},
 	{"Stored Z1", function() return Game.getStoredZ1(Game.getPlayerObject()) end},
-	{"Separator", 1},
+	{"Separator"},
 	{"Bone Array 2", function() return Game.getBoneArray2PrettyPrint(Game.getPlayerObject()) end},
 	{"Stored X2", function() return Game.getStoredX2(Game.getPlayerObject()) end},
 	{"Stored Y2", function() return Game.getStoredY2(Game.getPlayerObject()) end},
 	{"Stored Z2", function() return Game.getStoredZ2(Game.getPlayerObject()) end},
-	--{"Separator", 1},
+	--{"Separator"},
 	--{"Free", Game.getFreeMemory},
 	--{"Used", Game.getUsedMemory},
 	--{"Total", Game.getTotalMemory},
@@ -8030,14 +8028,14 @@ Game.standardOSD = {
 
 Game.mapDebugOSD = {
 	{"Map", Game.getMapOSD},
-	{"X", Game.getXPosition},
-	{"Y", Game.getYPosition},
-	{"Z", Game.getZPosition},
-	{"Separator", 1},
+	{"X"},
+	{"Y"},
+	{"Z"},
+	{"Separator"},
 	{"dY"},
 	{"dXZ"},
 	{"Movement", Game.getMovementState},
-	{"Separator", 1},
+	{"Separator"},
 	{"Map Block", hexifyOSD(Game.getMapBlock, 6, "")},
 	{"Map Verts Start", hexifyOSD(Game.getMapVerts, 6, "")},
 	{"Map Verts End", hexifyOSD(Game.getMapVertsEnd, 6, "")},
@@ -8047,20 +8045,20 @@ Game.mapDebugOSD = {
 
 Game.subgameOSD = {
 	{"Level", getSubgameLevel},
-	{"Separator", 1},
-	{"X", Game.getXPosition},
-	{"Y", Game.getYPosition},
-	{"Separator", 1},
+	{"Separator"},
+	{"X"},
+	{"Y"},
+	{"Separator"},
 	{"dX"},
 	{"dY"},
-	{"Separator", 1},
+	{"Separator"},
 	{"Velocity", Game.getVelocity},
 	{"Y Velocity", Game.getYVelocity},
-	{"Separator", 1},
+	{"Separator"},
 	{"Max dX"},
 	{"Max dY"},
 	{"Odometer"},
-	{"Separator", 1},
+	{"Separator"},
 };
 
 Game.OSDPosition = {32, 70}; -- TODO: Adjust this for subgames & different regions

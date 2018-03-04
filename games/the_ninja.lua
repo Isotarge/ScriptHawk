@@ -36,75 +36,75 @@ local max_enemies = 7;
 local object_fields = {
 	object_type = 0x00, -- Byte
 	object_types = {
-		[0x01] = {name = "Player", color = colors.yellow},
-		[0x02] = {name = "Player Projectile", color = colors.yellow, hitbox_height = 8, hitbox_width = 8},
-		[0x03] = {name = "Player Projectile", color = colors.yellow, hitbox_height = 8, hitbox_width = 8},
-		[0x04] = {name = "Boss", color = colors.pink}, -- Early levels
-		[0x05] = {name = "Boss", color = colors.pink}, -- Later levels
-		[0x06] = {name = "Boss Projectile", color = colors.red},
-		[0x07] = {name = "Boss Projectile", color = colors.red}, -- Level 5
-		[0x08] = {name = "Boss Projectile", color = colors.red},
-		[0x09] = {name = "Enemy Projectile", color = colors.red, hitbox_height = 8, hitbox_width = 8}, -- Small projectile
-		[0x0A] = {name = "Boss Projectile", color = colors.red, hitbox_height = 8, hitbox_width = 8},
-		[0x0B] = {name = "Red Scroll", color = colors.pink},
-		[0x0C] = {name = "Blue Scroll", color = colors.pink},
-		[0x0D] = {name = "Green Scroll", color = colors.pink},
-		[0x0E] = {name = "Splash"},
-		[0x0F] = {name = "Enemy Dying", isEnemy = true},
-		[0x10] = {name = "Grey Enemy", isEnemy = true},
-		[0x11] = {name = "Blue Enemy", isEnemy = true},
-		[0x12] = {name = "Grey Enemy", isEnemy = true},
-		[0x13] = {name = "Grey Enemy", isEnemy = true},
-		[0x14] = {name = "Grey Enemy", isEnemy = true}, -- Level 6
-		[0x15] = {name = "Grey Enemy", isEnemy = true},
-		[0x16] = {name = "Grey Enemy", isEnemy = true}, -- Scythe
-		[0x17] = {name = "Boulder Enemy", isEnemy = true},
-		[0x18] = {name = "Popup Enemy", isEnemy = true}, -- Level 2
-		[0x19] = {name = "Bouncing Boulder", color = colors.red}, -- Level 2
-		[0x1A] = {name = "Bouncing Boulder Shadow"}, -- Level 2
-		[0x1B] = {name = "Horse", color = colors.red}, -- Level 7
-		[0x1C] = {name = "Wolf", isEnemy = true},
-		[0x1D] = {name = "Light Blue Enemy", isEnemy = true}, -- Level 11
-		[0x1E] = {name = "Green Enemy", isEnemy = true}, -- Level 8
-		[0x1F] = {name = "Enemy Projectile", color = colors.red}, -- Scythe
-		[0x20] = {name = "Grey Enemy", isEnemy = true}, -- From boulder, can contain green scroll
-		[0x21] = {name = "Boulder Enemy", isEnemy = true},
-		[0x22] = {name = "Grey Enemy", isEnemy = true}, -- Circling
-		[0x23] = {name = "Fire Enemy", isEnemy = true}, -- Level 7
-		[0x24] = {name = "Red Jumping Enemy", isEnemy = true}, -- Level 4
-		[0x25] = {name = "Red Enemy", isEnemy = true}, -- Level 4
-		[0x26] = {name = "Red Enemy", isEnemy = true}, -- Level 4, after jumping
-		[0x27] = {name = "Grey Enemy", isEnemy = true}, -- Cliff
-		[0x28] = {name = "Blue Enemy", isEnemy = true}, -- Cliff
-		[0x29] = {name = "Grey Enemy", isEnemy = true}, -- Cliff, moving up
-		[0x2A] = {name = "Ball Spawner"}, -- Cliff -- TODO: Does this count as an enemy?
-		[0x2B] = {name = "Ball", color = colors.red, hitbox_height = 8, hitbox_width = 8}, -- Cliff
-		[0x2C] = {name = "Green Scroll Trigger", color = colors.pink},
-		[0x2D] = {name = "Boulder Enemy", color = colors.pink}, -- Contains green scroll, does not count towards enemy cap
-		[0x2E] = {name = "Arrow", color = colors.pink}, -- Map Screen
-		[0x2F] = {name = "Red Scroll", color = colors.pink}, -- Map Screen
-		[0x30] = {name = "Blue Scroll", color = colors.pink}, -- Map Screen
-		[0x31] = {name = "Green Scrolls", color = colors.pink}, -- Map Screen
-		[0x32] = {name = "Staircase Trigger", color = colors.pink}, -- Level 10
-		[0x33] = {name = "Player", color = colors.pink}, -- End screen
-		[0x34] = {name = "Princess", color = colors.pink}, -- End screen
-		[0x35] = {name = "Boulder Enemy", isEnemy = true},
-		[0x36] = {name = "Blue Enemy", isEnemy = true, color = colors.pink}, -- Contains red scroll
-		[0x37] = {name = "Blue Enemy", isEnemy = true, color = colors.pink}, -- Contains blue scroll
-		[0x38] = {name = "Wolf", isEnemy = true, color = colors.pink}, -- Contains red scroll
-		[0x39] = {name = "Grey Enemy", isEnemy = true, color = colors.pink}, -- Contains blue scroll
-		[0x3A] = {name = "Red Enemy", isEnemy = true, color = colors.pink}, -- Level 6, Contains red scroll
-		[0x3B] = {name = "Grey Enemy", isEnemy = true}, -- Circles, Contains red scroll
+		[0x01] = {name="Player", color=colors.yellow},
+		[0x02] = {name="Player Projectile", color=colors.yellow, hitbox_height=8, hitbox_width=8},
+		[0x03] = {name="Player Projectile", color=colors.yellow, hitbox_height=8, hitbox_width=8},
+		[0x04] = {name="Boss", color=colors.pink}, -- Early levels
+		[0x05] = {name="Boss", color=colors.pink}, -- Later levels
+		[0x06] = {name="Boss Projectile", color=colors.red},
+		[0x07] = {name="Boss Projectile", color=colors.red}, -- Level 5
+		[0x08] = {name="Boss Projectile", color=colors.red},
+		[0x09] = {name="Enemy Projectile", color=colors.red, hitbox_height=8, hitbox_width=8}, -- Small projectile
+		[0x0A] = {name="Boss Projectile", color=colors.red, hitbox_height=8, hitbox_width=8},
+		[0x0B] = {name="Red Scroll", color=colors.pink},
+		[0x0C] = {name="Blue Scroll", color=colors.pink},
+		[0x0D] = {name="Green Scroll", color=colors.pink},
+		[0x0E] = {name="Splash"},
+		[0x0F] = {name="Enemy Dying", isEnemy=true},
+		[0x10] = {name="Grey Enemy", isEnemy=true},
+		[0x11] = {name="Blue Enemy", isEnemy=true},
+		[0x12] = {name="Grey Enemy", isEnemy=true},
+		[0x13] = {name="Grey Enemy", isEnemy=true},
+		[0x14] = {name="Grey Enemy", isEnemy=true}, -- Level 6
+		[0x15] = {name="Grey Enemy", isEnemy=true},
+		[0x16] = {name="Grey Enemy", isEnemy=true}, -- Scythe
+		[0x17] = {name="Boulder Enemy", isEnemy=true},
+		[0x18] = {name="Popup Enemy", isEnemy=true}, -- Level 2
+		[0x19] = {name="Bouncing Boulder", color=colors.red}, -- Level 2
+		[0x1A] = {name="Bouncing Boulder Shadow"}, -- Level 2
+		[0x1B] = {name="Horse", color=colors.red}, -- Level 7
+		[0x1C] = {name="Wolf", isEnemy=true},
+		[0x1D] = {name="Light Blue Enemy", isEnemy=true}, -- Level 11
+		[0x1E] = {name="Green Enemy", isEnemy=true}, -- Level 8
+		[0x1F] = {name="Enemy Projectile", color=colors.red}, -- Scythe
+		[0x20] = {name="Grey Enemy", isEnemy=true}, -- From boulder, can contain green scroll
+		[0x21] = {name="Boulder Enemy", isEnemy=true},
+		[0x22] = {name="Grey Enemy", isEnemy=true}, -- Circling
+		[0x23] = {name="Fire Enemy", isEnemy=true}, -- Level 7
+		[0x24] = {name="Red Jumping Enemy", isEnemy=true}, -- Level 4
+		[0x25] = {name="Red Enemy", isEnemy=true}, -- Level 4
+		[0x26] = {name="Red Enemy", isEnemy=true}, -- Level 4, after jumping
+		[0x27] = {name="Grey Enemy", isEnemy=true}, -- Cliff
+		[0x28] = {name="Blue Enemy", isEnemy=true}, -- Cliff
+		[0x29] = {name="Grey Enemy", isEnemy=true}, -- Cliff, moving up
+		[0x2A] = {name="Ball Spawner"}, -- Cliff -- TODO: Does this count as an enemy?
+		[0x2B] = {name="Ball", color=colors.red, hitbox_height=8, hitbox_width=8}, -- Cliff
+		[0x2C] = {name="Green Scroll Trigger", color=colors.pink},
+		[0x2D] = {name="Boulder Enemy", color=colors.pink}, -- Contains green scroll, does not count towards enemy cap
+		[0x2E] = {name="Arrow", color=colors.pink}, -- Map Screen
+		[0x2F] = {name="Red Scroll", color=colors.pink}, -- Map Screen
+		[0x30] = {name="Blue Scroll", color=colors.pink}, -- Map Screen
+		[0x31] = {name="Green Scrolls", color=colors.pink}, -- Map Screen
+		[0x32] = {name="Staircase Trigger", color=colors.pink}, -- Level 10
+		[0x33] = {name="Player", color=colors.pink}, -- End screen
+		[0x34] = {name="Princess", color=colors.pink}, -- End screen
+		[0x35] = {name="Boulder Enemy", isEnemy=true},
+		[0x36] = {name="Blue Enemy", isEnemy=true, color=colors.pink}, -- Contains red scroll
+		[0x37] = {name="Blue Enemy", isEnemy=true, color=colors.pink}, -- Contains blue scroll
+		[0x38] = {name="Wolf", isEnemy=true, color=colors.pink}, -- Contains red scroll
+		[0x39] = {name="Grey Enemy", isEnemy=true, color=colors.pink}, -- Contains blue scroll
+		[0x3A] = {name="Red Enemy", isEnemy=true, color=colors.pink}, -- Level 6, Contains red scroll
+		[0x3B] = {name="Grey Enemy", isEnemy=true}, -- Circles, Contains red scroll
 
-		[0x3D] = {name = "Grey Enemy", isEnemy = true}, -- Level 10, Contains red scroll
-		[0x3E] = {name = "Light Blue Enemy", isEnemy = true, color = colors.pink}, -- Level 11, Contains red scroll
-		[0x3F] = {name = "Light Blue Enemy", isEnemy = true, color = colors.pink}, -- Level 11, Contains blue scroll
-		[0x40] = {name = "Grey Enemy", isEnemy = true}, -- Level 5
-		[0x41] = {name = "Grey Enemy", isEnemy = true, color = colors.pink}, -- Level 5, Contains red scroll
-		[0x42] = {name = "Fire Enemy", isEnemy = true, color = colors.pink}, -- Level 7, Contains red scroll
-		[0x43] = {name = "Grey Enemy", isEnemy = true, color = colors.pink}, -- Cliff, Contains red scroll
-		[0x44] = {name = "Fire Enemy", isEnemy = true, color = colors.pink}, -- Contains blue scroll
-		[0x45] = {name = "Easter Egg Trigger", color = colors.yellow}, -- Only in Japanese version
+		[0x3D] = {name="Grey Enemy", isEnemy=true}, -- Level 10, Contains red scroll
+		[0x3E] = {name="Light Blue Enemy", isEnemy=true, color=colors.pink}, -- Level 11, Contains red scroll
+		[0x3F] = {name="Light Blue Enemy", isEnemy=true, color=colors.pink}, -- Level 11, Contains blue scroll
+		[0x40] = {name="Grey Enemy", isEnemy=true}, -- Level 5
+		[0x41] = {name="Grey Enemy", isEnemy=true, color=colors.pink}, -- Level 5, Contains red scroll
+		[0x42] = {name="Fire Enemy", isEnemy=true, color=colors.pink}, -- Level 7, Contains red scroll
+		[0x43] = {name="Grey Enemy", isEnemy=true, color=colors.pink}, -- Cliff, Contains red scroll
+		[0x44] = {name="Fire Enemy", isEnemy=true, color=colors.pink}, -- Contains blue scroll
+		[0x45] = {name="Easter Egg Trigger", color=colors.yellow}, -- Only in Japanese version
 	},
 	animation_index = 0x03, -- Byte
 	animation_current_frame = 0x04, -- Byte
@@ -246,14 +246,14 @@ Game.OSD = {
 	{"Level Y", Game.getLevelYPosition},
 	{"dX", ScriptHawk.getDX, Game.getDColor},
 	{"dY", ScriptHawk.getDY, Game.getDColor},
-	{"Separator", 1},
+	{"Separator"},
 	{"Player Proj", Game.countPlayerProjectiles},
 	{"Hits", Game.getHitsOSD},
 	{"Ratio", Game.getHitRatio},
-	{"Separator", 1},
+	{"Separator"},
 	{"Objects", Game.countObjects},
 	{"Enemies", Game.countEnemies},
-	{"Separator", 1},
+	{"Separator"},
 	{"Boss Health", Game.getBossHealth, Game.colorBossHealth},
 };
 
@@ -272,16 +272,15 @@ function Game.getHitboxes()
 
 			if type(object_fields.object_types[objectType]) == "table" then
 				local objectTypeTable = object_fields.object_types[objectType];
-
-				if type(objectTypeTable.name) == "string" then
-					hitbox.objectType = objectTypeTable.name.." "..toHexString(objectType);
-				end
-
 				hitbox.color = objectTypeTable.color or colors.white;
 				hitbox.xOffset = objectTypeTable.hitbox_x_offset;
 				hitbox.yOffset = objectTypeTable.hitbox_y_offset;
 				hitbox.width = objectTypeTable.hitbox_width;
 				hitbox.height = objectTypeTable.hitbox_height;
+
+				if type(objectTypeTable.name) == "string" then
+					hitbox.objectType = objectTypeTable.name.." "..toHexString(objectType);
+				end
 			end
 			table.insert(hitboxes, hitbox);
 		end
