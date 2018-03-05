@@ -8,6 +8,7 @@ end
 local Game = {
 	Memory = { -- 1 USA, 2 EU
 		jim_pointer = {0x0C6810, 0x0C8670},
+		boss_camlock_pointer = {0x0E9F08, 0x0EBD68},
 		current_map = {0x0E9EF9, 0x0EBD59},
 		destination_map = {0x0E03E7, 0x0E2247},
 		destination_exit = {0x0E03E9, 0x0E2249},
@@ -54,6 +55,7 @@ jim = {
 	--speed = 0x2C8, -- Float (Not too sure on this)
 	y_last_action = 0x338, -- Float
 	oob_timer = 0x455, -- Byte
+	boss_pointer = 0x48C, -- Byte
 	first_person_angle_delta = 0x4D8, -- Float, Radians?
 	character_mode = 0x5B0, -- Byte (0 = Jim, 1+ = Kim)
 };
@@ -76,6 +78,19 @@ gun = {
 	disco = 0x0F0,
 	knife = 0x108,
 	leprechaun = 0x120,
+};
+
+---------------------
+-- Boss Parameters --
+---------------------
+
+boss = {
+	player_marbles = 0xDFC,
+	player_egoboosts = 0xDFD,
+	player_missiles = 0xDFE,
+	boss_marbles = 0xE48,
+	boss_egoboosts = 0xE49,
+	boss_missiles = 0xE4A,
 };
 
 -------------------
@@ -308,6 +323,8 @@ function Game.applyInfinites()
 	max_ammo_leprechaun = 5;
 	max_lives = 3;
 	max_health = 100;
+	max_missiles = 2;
+	max_egoboosts = 2;
 
 	-------------------
 	-- Set Infinites --
@@ -343,6 +360,10 @@ function Game.applyInfinites()
 	mainmemory.write_u32_be(Game.Memory.jim_pointer[version] + jim.gun_pointer + gun.knife, max_ammo_knife);
 	-- Leprechaun Launcher
 	mainmemory.write_u32_be(Game.Memory.jim_pointer[version] + jim.gun_pointer + gun.leprechaun, max_ammo_leprechaun);
+	-- Missiles
+	mainmemory.writebyte(dereferencePointer(Game.Memory.jim_pointer[version] + jim.boss_pointer) + boss.player_missiles, max_missiles);
+	-- Ego Boosts
+	mainmemory.writebyte(dereferencePointer(Game.Memory.jim_pointer[version] + jim.boss_pointer) + boss.player_egoboosts, max_egoboosts);
 end
 
 function Game.completeFile()
@@ -378,10 +399,25 @@ function Game.completeFile()
 	mainmemory.writebyte(Game.Memory.marble_pointer[version] + 0x10, 100); -- Good Bad Elderly
 end
 
---function Game.killBoss()
---	mainmemory.writebyte(Game.Memory.boss_death_view[version], 1);
---	mainmemory.writebyte(Game.Memory.boss_death_stage[version], 1);
---end
+Game.BossCamLockOffset = {
+	[4] = 0x4D8, -- Psycrow
+	[8] = 0x4C8, -- Roswell
+	[15] = 0x4B0, -- PMFAH
+	[19] = 0x4C8, -- Bob
+	[20] = 0x4C0, -- Kim
+};
+
+function Game.killBoss()
+	BossCamLockOffSet = Game.BossCamLockOffset[mainmemory.readbyte(Game.Memory.current_map[version])]
+	if BossCamLockOffSet ~= nil then
+		camlock_address = dereferencePointer(Game.Memory.boss_camlock_pointer[version]) + BossCamLockOffSet;
+		bossdeath_address = dereferencePointer(Game.Memory.jim_pointer[version] + jim.boss_pointer) + 0xE73;
+		mainmemory.writebyte(camlock_address, 1);
+		mainmemory.writebyte(bossdeath_address, 1);
+	else
+		print("This map does not have a programmed boss, and so this function will not run");
+	end
+end
 
 ------------------------------
 -- Fix Controller Input Bug --
@@ -455,6 +491,7 @@ local labelValue = 0;
 function Game.initUI()
 	ScriptHawk.UI.form_controls["Reload Map (Soft)"] = forms.button(ScriptHawk.UI.options_form, "Reload Map", Game.reloadMap, ScriptHawk.UI.col(5), ScriptHawk.UI.row(4), ScriptHawk.UI.col(4) + 10, ScriptHawk.UI.button_height);
 	ScriptHawk.UI.form_controls["Reload Map (Hard)"] = forms.button(ScriptHawk.UI.options_form, "Hard Reload", Game.reloadMapHard, ScriptHawk.UI.col(10), ScriptHawk.UI.row(0), ScriptHawk.UI.col(4) + 10, ScriptHawk.UI.button_height);
+	ScriptHawk.UI.form_controls["Kill Boss"] = forms.button(ScriptHawk.UI.options_form, "Kill Boss", Game.killBoss, ScriptHawk.UI.col(10), ScriptHawk.UI.row(1), ScriptHawk.UI.col(4) + 10, ScriptHawk.UI.button_height);
 end
 
 function Game.realTime()
