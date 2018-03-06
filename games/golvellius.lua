@@ -15,6 +15,10 @@ local Game = {
 		max_gold_hundred_thousands = 0x842, -- BCD
 		max_gold_thousands = 0x843, -- BCD
 		max_gold_tens = 0x844, -- BCD
+		item_bitfield = 0x846,
+		crystal_bitfield = 0x847,
+		sword_damage = 0x848,
+		bible_bitfield = 0x84F, -- 2 bytes
 		hole_tile = 0xAD2,
 	},
 };
@@ -260,12 +264,12 @@ local object_fields = {
 		[0x94] = {name="Big Bat", gold=0, color=colors.red, max_hp=16},
 		[0x95] = {name="Spawning Enemy"},
 		[0x96] = {name="Vortex", gold=220, color=colors.red, max_hp=6},
-		[0x97] = {name="Vortex", color=colors.red, max_hp=9}, -- TODO: Gold
-		[0x98] = {name="Death Lord", color=colors.red, max_hp=15}, -- TODO: Gold
+		[0x97] = {name="Vortex", gold=400, color=colors.red, max_hp=10}, -- TODO: Was listed as 9HP?
+		[0x98] = {name="Death Lord", gold=500, color=colors.red, max_hp=15}, -- TODO: Figure out which bit of the item bitfield shows them properly
 		[0x99] = {name="Crow", gold=40, color=colors.red, max_hp=1}, -- Black
 		[0x9A] = {name="Crow", gold=90, color=colors.red, max_hp=2}, -- Blue
 		[0x9B] = {name="Crow", gold=210, color=colors.red, max_hp=3}, -- Red
-		[0x9C] = {name="Koranda", color=colors.red, max_hp=14}, -- TODO: Gold
+		[0x9C] = {name="Koranda", gold=350, color=colors.red, max_hp=14},
 		[0x9D] = {name="Bat", gold=30, color=colors.red, max_hp=1}, -- Dark Blue
 		[0x9E] = {name="Bat", gold=50, color=colors.red, max_hp=2}, -- Light Blue
 		[0x9F] = {name="Bat", gold=200, color=colors.red, max_hp=2}, -- Red
@@ -284,25 +288,25 @@ local object_fields = {
 		[0xAC] = {name="Snake", gold=180, color=colors.red, max_hp=3}, -- Green
 		[0xAD] = {name="Snake", gold=220, color=colors.red, max_hp=6}, -- White
 		[0xAE] = {name="Jellyfish", gold=300, color=colors.red, max_hp=9}, -- Red
-		[0xAF] = {name="Jellyfish", color=colors.red, max_hp=15}, -- TODO: Gold
+		[0xAF] = {name="Jellyfish", gold=400, color=colors.red, max_hp=15},
 		[0xB0] = {name="Potato Bug", gold=100, color=colors.red, max_hp=4}, -- Green
 		[0xB1] = {name="Potato Bug", gold=240, color=colors.red, max_hp=9}, -- White
 		[0xB2] = {name="Porcupig", gold=30, color=colors.red, max_hp=2}, -- Red
 		[0xB3] = {name="Porcupig", gold=100, color=colors.red, max_hp=4}, -- Blue
-		[0xB4] = {name="Porcupig", color=colors.red, max_hp=6}, -- TODO: Gold
+		[0xB4] = {name="Porcupig", gold=180, color=colors.red, max_hp=6},
 		[0xB5] = {name="Troll", gold=120, color=colors.red, max_hp=6}, -- Red
 		[0xB6] = {name="Troll", gold=330, color=colors.red, max_hp=6}, -- Blue
-		[0xB7] = {name="Troll", color=colors.red, max_hp=9}, -- TODO: Gold
+		[0xB7] = {name="Troll", gold=440, color=colors.red, max_hp=9},
 		[0xB8] = {name="Knight", gold=100, color=colors.red, max_hp=6}, -- Blue
 		[0xB9] = {name="Knight", gold=200, color=colors.red, max_hp=9}, -- Red
-		[0xBA] = {name="Knight", color=colors.red, max_hp=12}, -- TODO: Gold
+		[0xBA] = {name="Knight", gold=300, color=colors.red, max_hp=12},
 		[0xBB] = {name="Skeleton", gold=120, color=colors.red, max_hp=4},
 		[0xBC] = {name="Skeleton", gold=330, color=colors.red, max_hp=9}, -- Black
 		[0xBD] = {name="Mouse", gold=200, color=colors.red, max_hp=6}, -- Blue
-		[0xBE] = {name="Mouse", color=colors.red, max_hp=9}, -- TODO: Gold
+		[0xBE] = {name="Mouse", gold=400, color=colors.red, max_hp=9},
 		[0xBF] = {name="Mole", gold=60, color=colors.red, max_hp=2}, -- Red
 		[0xC0] = {name="Mole", gold=120, color=colors.red, max_hp=5}, -- Blue
-		[0xC1] = {name="Mole", color=colors.red, max_hp=6}, -- TODO: Gold
+		[0xC1] = {name="Mole", gold=200, color=colors.red, max_hp=6},
 		[0xC2] = {name="Shark", gold=150, color=colors.red, max_hp=4},
 		[0xC3] = {name="Shark", gold=150, color=colors.red, max_hp=4},
 		--
@@ -498,6 +502,12 @@ function Game.getHitboxListText(hitbox)
 	return hitbox.x..", "..hitbox.y.." - "..HPString..hitbox.objectType..goldString..toHexString(hitbox.objectBase);
 end
 
+function Game.unlockItems()
+	mainmemory.writebyte(Game.Memory.item_bitfield, 0xFF);
+	mainmemory.writebyte(Game.Memory.crystal_bitfield, 0xFF);
+	mainmemory.write_u16_le(Game.Memory.bible_bitfield, 0xFFFF);
+end
+
 local function getGold()
 	local tens = toHexString(mainmemory.readbyte(Game.Memory.gold_tens), 2, ""); -- 100000s
 	local thousands = toHexString(mainmemory.readbyte(Game.Memory.gold_thousands), 2, ""); -- 1000s
@@ -525,8 +535,9 @@ function Game.applyInfinites()
 end
 
 function Game.initUI()
-	ScriptHawk.UI.form_controls.dig_hole_button = forms.button(ScriptHawk.UI.options_form, "Dig Hole", Game.digHole, ScriptHawk.UI.col(0), ScriptHawk.UI.row(4), ScriptHawk.UI.col(4) + 10, ScriptHawk.UI.button_height);
+	ScriptHawk.UI.form_controls.unlock_items_button = forms.button(ScriptHawk.UI.options_form, "Unlock Items", Game.unlockItems, ScriptHawk.UI.col(0), ScriptHawk.UI.row(2), ScriptHawk.UI.col(4) + 10, ScriptHawk.UI.button_height);
 	ScriptHawk.UI.form_controls.clear_gold_button = forms.button(ScriptHawk.UI.options_form, "Clear Gold", Game.clearGold, ScriptHawk.UI.col(0), ScriptHawk.UI.row(3), ScriptHawk.UI.col(4) + 10, ScriptHawk.UI.button_height);
+	ScriptHawk.UI.form_controls.dig_hole_button = forms.button(ScriptHawk.UI.options_form, "Dig Hole", Game.digHole, ScriptHawk.UI.col(0), ScriptHawk.UI.row(4), ScriptHawk.UI.col(4) + 10, ScriptHawk.UI.button_height);
 end
 
 local function getScreen()
