@@ -108,9 +108,11 @@ While ScriptHawk does have basic support for OoT and MM there are people who are
 
 ## Other Supported Games
 - Alex Kidd in Miracle World (SMS)
+- Alex Kidd in Shinobi World (SMS)
 - Balloon Fight (NES)
 - Drill Dozer (GBA)
 - Golden Axe Warrior (SMS)
+- Golvellius (SMS)
 - Impossible Mission (SMS)
 - Lord of the Sword (SMS)
 - Metroid (NES)
@@ -132,7 +134,6 @@ While ScriptHawk does have basic support for OoT and MM there are people who are
 - San Francisco Rush 2049 (N64 only)
 
 ## Other Included Scripts
-- [Golvellius](Beta/Golvellius.lua) object viewer with drag and drop support
 - [Tetris Attack](Tetris%20Attack%20Bot.lua) bot, plays the game quite well using a simple sorting algorithm
 - [Mr. Driller 2](Beta/Drillbot.lua) bot
 - [remove_klump.lua](Beta/remove_klump.lua), [code golf](https://en.wikipedia.org/wiki/Code_golf) that removes Klumps from DK64 USA version

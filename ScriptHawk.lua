@@ -331,6 +331,9 @@ local supportedGames = {
 	["3D9A8D5C2D6D3F8FF63A8F7C77FFA983"] = {moduleName="games.miracle_world", friendlyName="Alex Kidd in Miracle World (UE)"},
 	["F43E74FFEC58DDF62F0B8667D31F22C0"] = {moduleName="games.miracle_world", friendlyName="Alex Kidd in Miracle World (UE) (Rev 1)"},
 
+	-- Alex Kidd in Shinobi World
+	["D62B631506913712A2103F54912458A5"] = {moduleName="games.shinobi_world", friendlyName="Alex Kidd in Shinobi World (UE)"},
+
 	-- Balloon Fight
 	["3F597CE54843187CCA85ADAA7E26F46FAE4992B5"] = {moduleName="games.balloon_fight", friendlyName="Balloon Fight"},
 	["BE2C30D69B1EBA76EAF1CC259DFA41F0F29B0FB2"] = {moduleName="games.balloon_fight", friendlyName="Balloon Fight"},
