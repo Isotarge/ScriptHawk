@@ -1341,10 +1341,7 @@ end
 
 function Game.getCurrentMovementStateOSD()
 	local movementState = Game.getCurrentMovementState();
-	if type(movementStates[movementState]) == "string" then
-		return movementStates[movementState];
-	end
-	return toHexString(movementState);
+	return movementStates[movementState] or toHexString(movementState);
 end
 
 function Game.getPreviousMovementState()
@@ -1357,10 +1354,7 @@ end
 
 function Game.getPreviousMovementStateOSD()
 	local movementState = Game.getPreviousMovementState();
-	if type(movementStates[movementState]) == "string" then
-		return movementStates[movementState];
-	end
-	return toHexString(movementState);
+	return movementStates[movementState] or toHexString(movementState);
 end
 
 function Game.setMovementState(state)
@@ -2184,10 +2178,7 @@ end
 
 function Game.getAnimationOSD()
 	local animationValue = Game.getAnimationValue();
-	if type(animationList[animationValue]) == "string" then
-		return animationList[animationValue];
-	end
-	return toHexString(animationValue);
+	return animationList[animationValue] or toHexString(animationValue);
 end
 
 function Game.setAnimationValue(value)
@@ -2215,10 +2206,7 @@ end
 
 function Game.getObjectAnimationOSD(pointer)
 	local ObjAnimValue = Game.getObjectAnimationValue(pointer);
-	if type(animationList[ObjAnimValue]) == "string" then
-		return animationList[ObjAnimValue];
-	end
-	return toHexString(ObjAnimValue);
+	return animationList[ObjAnimValue] or toHexString(ObjAnimValue);
 end
 
 --------------
@@ -5160,11 +5148,7 @@ local function getAnimationType(model1Base)
 	local objectIDPointer = dereferencePointer(model1Base + object_model1.id_struct);
 	if isRDRAM(objectIDPointer) then
 		local modelIndex = mainmemory.read_u16_be(objectIDPointer + 0x14);
-		if type(object_model1.models[modelIndex]) == "string" then
-			return object_model1.models[modelIndex];
-		else
-			return toHexString(modelIndex);
-		end
+		return object_model1.models[modelIndex] or toHexString(modelIndex);
 	end
 	return "Unknown";
 end
@@ -5481,11 +5465,10 @@ function Game.initUI()
 	ScriptHawk.UI.form_controls["Set Flag Button"] = forms.button(ScriptHawk.UI.options_form, "Set", flagSetButtonHandler, ScriptHawk.UI.col(10), ScriptHawk.UI.row(7), 46, ScriptHawk.UI.button_height);
 	ScriptHawk.UI.form_controls["Check Flag Button"] = forms.button(ScriptHawk.UI.options_form, "Check", flagCheckButtonHandler, ScriptHawk.UI.col(12), ScriptHawk.UI.row(7), 46, ScriptHawk.UI.button_height);
 	ScriptHawk.UI.form_controls["Clear Flag Button"] = forms.button(ScriptHawk.UI.options_form, "Clear", flagClearButtonHandler, ScriptHawk.UI.col(14), ScriptHawk.UI.row(7), 46, ScriptHawk.UI.button_height);
-	ScriptHawk.UI.form_controls["realtime_flags"] = forms.checkbox(ScriptHawk.UI.options_form, "Realtime Flags", ScriptHawk.UI.col(10) + ScriptHawk.UI.dropdown_offset, ScriptHawk.UI.row(6) + ScriptHawk.UI.dropdown_offset);
-	forms.setproperty(ScriptHawk.UI.form_controls.realtime_flags, "Checked", true);
+	ScriptHawk.UI.checkbox(10, 6, "realtime_flags", "Realtime Flags", true);
 
-	ScriptHawk.UI.form_controls.toggle_neverslip = forms.checkbox(ScriptHawk.UI.options_form, "Never Slip", ScriptHawk.UI.col(0) + ScriptHawk.UI.dropdown_offset, ScriptHawk.UI.row(6) + ScriptHawk.UI.dropdown_offset);
-	ScriptHawk.UI.form_controls.toggle_autojump = forms.checkbox(ScriptHawk.UI.options_form, "Autojump", ScriptHawk.UI.col(5) + ScriptHawk.UI.dropdown_offset, ScriptHawk.UI.row(6) + ScriptHawk.UI.dropdown_offset);
+	ScriptHawk.UI.checkbox(0, 6, "toggle_neverslip", "Never Slip");
+	ScriptHawk.UI.checkbox(5, 6, "toggle_autojump", "Autojump");
 
 	-- Moves
 	ScriptHawk.UI.form_controls.moves_dropdown = forms.dropdown(ScriptHawk.UI.options_form, { "All", "None" }, ScriptHawk.UI.col(7) - ScriptHawk.UI.dropdown_offset, ScriptHawk.UI.row(2) + ScriptHawk.UI.dropdown_offset, ScriptHawk.UI.col(2) + 10, ScriptHawk.UI.button_height);
@@ -5494,7 +5477,7 @@ function Game.initUI()
 
 	-- Character Dropdown
 	ScriptHawk.UI.form_controls["Character Dropdown"] = forms.dropdown(ScriptHawk.UI.options_form, { "BK", "Snowball", "Cutscene", "Bee", "W. Machine", "Stony", "Breegull B.", "Solo Banjo", "Solo Kazooie", "Submarine", "Mumbo", "G. Goliath", "Detonator", "Van", "Cwk Kazooie", "Small T-Rex", "Big T-Rex" }, ScriptHawk.UI.col(5) - ScriptHawk.UI.dropdown_offset, ScriptHawk.UI.row(5) + ScriptHawk.UI.dropdown_offset, ScriptHawk.UI.col(3) + 10, ScriptHawk.UI.button_height);
-	ScriptHawk.UI.form_controls["Character Checkbox"] = forms.checkbox(ScriptHawk.UI.options_form, "", ScriptHawk.UI.col(9) + ScriptHawk.UI.dropdown_offset, ScriptHawk.UI.row(5) + ScriptHawk.UI.dropdown_offset);
+	ScriptHawk.UI.checkbox(9, 5, "Character Checkbox", "");
 
 	flagStats();
 end

@@ -111,7 +111,7 @@ function Game.eachFrame()
 end
 
 function Game.initUI()
-	ScriptHawk.UI.form_controls["Fast Mode Checkbox"] = forms.checkbox(ScriptHawk.UI.options_form, "Fast Mode", ScriptHawk.UI.col(0) + ScriptHawk.UI.dropdown_offset, ScriptHawk.UI.row(6) + ScriptHawk.UI.dropdown_offset);
+	ScriptHawk.UI.checkbox(0, 6, "Fast Mode Checkbox", "Fast Mode");
 end
 
 Game.OSDPosition = {2, 70};

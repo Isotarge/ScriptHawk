@@ -93,11 +93,7 @@ function Game.getState()
 	if player ~= nil then
 		local currentMovementState = memory.read_u8(player.Address + 0x5D, player.Domain);
 		--local direction = memory.read_u8_le(player.Address + 0x16, player.Domain);
-		if type(movementStates[currentMovementState]) ~= "nil" then
-			return movementStates[currentMovementState];
-		else
-			return "Unknown ("..currentMovementState..")";
-		end
+		return movementStates[currentMovementState] or "Unknown ("..currentMovementState..")";
 	end
 end
 

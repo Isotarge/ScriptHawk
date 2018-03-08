@@ -134,10 +134,7 @@ local object_fields = {
 
 function Game.getMap()
 	local map = mainmemory.readbyte(Game.Memory.map);
-	if type(Game.maps[map + 1]) == "string" then
-		return Game.maps[map + 1];
-	end
-	return "Unknown "..toHexString(map);
+	return Game.maps[map + 1] or "Unknown "..toHexString(map);
 end
 
 function Game.setMap(value)

@@ -160,11 +160,7 @@ function Game.getAnimalType(levelAnimalIndex)
 	local animalType = Game.getAnimalInfoPointer(levelAnimalIndex);
 	if isRDRAM(animalType) then
 		animalType = mainmemory.read_u16_be(animalType + animal_struct_offsets.animal_type);
-		if type(animalTypes[animalType]) ~= "nil" then
-			return animalTypes[animalType];
-		else
-			return "Unknown ("..toHexString(animalType)..")";
-		end
+		return animalTypes[animalType] or "Unknown ("..toHexString(animalType)..")";
 	else
 		return " ";
 	end

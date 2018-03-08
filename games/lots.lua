@@ -221,26 +221,17 @@ end
 
 function Game.getBuildingStatus()
 	local status = mainmemory.readbyte(Game.Memory.building_status);
-	if type(Game.building_states[status]) == "string" then
-		return Game.building_states[status];
-	end
-	return "Unknown "..toHexString(status);
+	return Game.building_states[status] or "Unknown "..toHexString(status);
 end
 
 function Game.getMap()
 	local map = mainmemory.readbyte(Game.Memory.map);
-	if type(Game.maps[map]) == "string" then
-		return Game.maps[map];
-	end
-	return "Unknown "..toHexString(map);
+	return Game.maps[map] or "Unknown "..toHexString(map);
 end
 
 function Game.getContinue()
 	local map = mainmemory.readbyte(Game.Memory.continue_map);
-	if type(Game.maps[map]) == "string" then
-		return Game.maps[map];
-	end
-	return "Unknown "..toHexString(map);
+	return Game.maps[map] or "Unknown "..toHexString(map);
 end
 
 function Game.setMap(value)

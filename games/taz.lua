@@ -100,7 +100,7 @@ function Game.applyInfinites()
 end
 
 function Game.initUI()
-	ScriptHawk.UI.form_controls["Toggle Super Jump Checkbox"] = forms.checkbox(ScriptHawk.UI.options_form, "Super Jump", ScriptHawk.UI.col(0) + ScriptHawk.UI.dropdown_offset, ScriptHawk.UI.row(4) + ScriptHawk.UI.dropdown_offset);
+	ScriptHawk.UI.checkbox(0, 4, "Toggle Super Jump Checkbox", "Super Jump");
 end
 
 function Game.eachFrame()

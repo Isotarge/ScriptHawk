@@ -668,15 +668,11 @@ function Game.getPlayerOSD(player)
 	if isRDRAM(playerActor) then
 		local positionData = dereferencePointer(playerActor + player_fields.PositionDataPointer);
 		local character = Game.getCharacter(player);
-		if type(Game.characters[character]) == "string" then
-			character = Game.characters[character];
-		else
-			character = "Unknown ("..toHexString(character)..")";
-		end
+		character = Game.characters[character] or "Unknown ("..toHexString(character)..")";
 		if isRDRAM(positionData) then
-			return ""..toHexString(playerActor).."->"..toHexString(positionData)..": "..character;
+			return toHexString(playerActor).."->"..toHexString(positionData)..": "..character;
 		end
-		return ""..toHexString(playerActor)..": "..character;
+		return toHexString(playerActor)..": "..character;
 	end
 	return "Not Found";
 end
@@ -905,11 +901,11 @@ function Game.initUI()
 	ScriptHawk.UI.form_controls.unlock_everything_button = forms.button(ScriptHawk.UI.options_form, "Unlock Everything", Game.unlockEverything, ScriptHawk.UI.col(10), ScriptHawk.UI.row(0), ScriptHawk.UI.col(4) + 10, ScriptHawk.UI.button_height);
 
 	-- Hitbox Toggle
-	ScriptHawk.UI.form_controls.toggle_hitboxes = forms.checkbox(ScriptHawk.UI.options_form, "Hitboxes", ScriptHawk.UI.col(10) + ScriptHawk.UI.dropdown_offset, ScriptHawk.UI.row(1) + ScriptHawk.UI.dropdown_offset);
+	ScriptHawk.UI.checkbox(10, 1, "toggle_hitboxes", "Hitboxes");
 
 	-- Music
 	ScriptHawk.UI.form_controls["Music Dropdown"] = forms.dropdown(ScriptHawk.UI.options_form, Game.music, ScriptHawk.UI.col(0) + ScriptHawk.UI.dropdown_offset, ScriptHawk.UI.row(6) + ScriptHawk.UI.dropdown_offset, ScriptHawk.UI.col(9) + 8, ScriptHawk.UI.button_height);
-	ScriptHawk.UI.form_controls["Music Checkbox"] = forms.checkbox(ScriptHawk.UI.options_form, "Set Music", ScriptHawk.UI.col(0) + ScriptHawk.UI.dropdown_offset, ScriptHawk.UI.row(7) + ScriptHawk.UI.dropdown_offset);
+	ScriptHawk.UI.checkbox(0, 7, "Music Checkbox", "Set Music");
 end
 
 function dumpCharacterConstants(player)

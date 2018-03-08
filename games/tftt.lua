@@ -707,8 +707,8 @@ end
 
 function Game.initUI()
 	ScriptHawk.UI.form_controls.build_all = forms.button(ScriptHawk.UI.options_form, "Build All", Game.buildAll, ScriptHawk.UI.col(10), ScriptHawk.UI.row(4), ScriptHawk.UI.col(4) + 10, ScriptHawk.UI.button_height);
-	ScriptHawk.UI.form_controls.mouse_control = forms.checkbox(ScriptHawk.UI.options_form, "Mouse Control", ScriptHawk.UI.col(0) + ScriptHawk.UI.dropdown_offset, ScriptHawk.UI.row(6) + ScriptHawk.UI.dropdown_offset);
-	ScriptHawk.UI.form_controls.sandbox_mode = forms.checkbox(ScriptHawk.UI.options_form, "Sandbox Mode", ScriptHawk.UI.col(0) + ScriptHawk.UI.dropdown_offset, ScriptHawk.UI.row(7) + ScriptHawk.UI.dropdown_offset);
+	ScriptHawk.UI.checkbox(0, 6, "mouse_control", "Mouse Control");
+	ScriptHawk.UI.checkbox(0, 7, "sandbox_mode", "Sandbox Mode");
 end
 
 Game.OSD = {

@@ -391,11 +391,7 @@ local function draw_objects()
 				local yPos = mainmemory.readbyte(objectBase + object.y_position);
 				local contentsRaw = mainmemory.readbyte(objectBase + object.contents);
 				local contents = bit.band(contentsRaw, 0xF0);
-				if type(object.content_types[contents]) == "string" then
-					contents = object.content_types[contents];
-				else
-					contents = "U "..toHexString(contents);
-				end
+				contents = object.content_types[contents] or "U "..toHexString(contents);
 				local hitbox_width = default_hitbox_width;
 				local hitbox_height = default_hitbox_height;
 				if type(object.obj_types[id]) == "table" then
@@ -659,8 +655,7 @@ end
 function Game.initUI()
 	ScriptHawk.UI.form_controls["Complete Minimap Button"] = forms.button(ScriptHawk.UI.options_form, "Complete Minimap", Game.completeMinimap, ScriptHawk.UI.col(10), ScriptHawk.UI.row(4), ScriptHawk.UI.col(4) + 10, ScriptHawk.UI.button_height);
 	ScriptHawk.UI.form_controls["Reset Best Distribution"] = forms.button(ScriptHawk.UI.options_form, "Reset Best", Game.resetBestDistribution, ScriptHawk.UI.col(10), ScriptHawk.UI.row(5), ScriptHawk.UI.col(4) + 10, ScriptHawk.UI.button_height);
-	ScriptHawk.UI.form_controls["Toggle Overlay Checkbox"] = forms.checkbox(ScriptHawk.UI.options_form, "Overlay", ScriptHawk.UI.col(0) + ScriptHawk.UI.dropdown_offset, ScriptHawk.UI.row(6) + ScriptHawk.UI.dropdown_offset);
-	forms.setproperty(ScriptHawk.UI.form_controls["Toggle Overlay Checkbox"], "Checked", true);
+	ScriptHawk.UI.checkbox(0, 6, "Toggle Overlay Checkbox", "Overlay", true)
 
 	-- Bot
 	--ScriptHawk.UI.form_controls.resetFrameBox = forms.textbox(ScriptHawk.UI.options_form, "Reset Frame", 100, 21, "UNSIGNED", ScriptHawk.UI.col(10) + 1, ScriptHawk.UI.row(0) + 1, false, true, "None");

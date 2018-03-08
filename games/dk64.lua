@@ -6937,8 +6937,7 @@ function Game.initUI()
 		ScriptHawk.UI.form_controls["Set Flag Button"] = forms.button(ScriptHawk.UI.options_form, "Set", flagSetButtonHandler, ScriptHawk.UI.col(10), ScriptHawk.UI.row(7), 46, ScriptHawk.UI.button_height);
 		ScriptHawk.UI.form_controls["Check Flag Button"] = forms.button(ScriptHawk.UI.options_form, "Check", flagCheckButtonHandler, ScriptHawk.UI.col(12), ScriptHawk.UI.row(7), 46, ScriptHawk.UI.button_height);
 		ScriptHawk.UI.form_controls["Clear Flag Button"] = forms.button(ScriptHawk.UI.options_form, "Clear", flagClearButtonHandler, ScriptHawk.UI.col(14), ScriptHawk.UI.row(7), 46, ScriptHawk.UI.button_height);
-		ScriptHawk.UI.form_controls["realtime_flags"] = forms.checkbox(ScriptHawk.UI.options_form, "Realtime Flags", ScriptHawk.UI.col(10) + ScriptHawk.UI.dropdown_offset, ScriptHawk.UI.row(6) + ScriptHawk.UI.dropdown_offset);
-		forms.setproperty(ScriptHawk.UI.form_controls.realtime_flags, "Checked", true);
+		ScriptHawk.UI.checkbox(10, 6, "realtime_flags", "Realtime Flags", true);
 	end
 
 	-- Moon stuff
@@ -6955,7 +6954,7 @@ function Game.initUI()
 
 	-- As of BizHawk 1.11.8, ScriptHawk's Bone Displacement fix is integrated in to the emulator, as such the UI surrounding the bug is no longer needed
 	--ScriptHawk.UI.form_controls["Fix Bone Displacement Button"] = forms.button(ScriptHawk.UI.options_form, "Fix Spiking", fixBoneDisplacement, ScriptHawk.UI.col(10), ScriptHawk.UI.row(4), ScriptHawk.UI.col(4) + 10, ScriptHawk.UI.button_height);
-	--ScriptHawk.UI.form_controls["Toggle Detect Displacement Checkbox"] = forms.checkbox(ScriptHawk.UI.options_form, "Detect Spiking", ScriptHawk.UI.col(10) + ScriptHawk.UI.dropdown_offset, ScriptHawk.UI.row(5) + ScriptHawk.UI.dropdown_offset);
+	--ScriptHawk.UI.checkbox(10, 5, "Toggle Detect Displacement Checkbox", "Detect Spiking");
 
 	--ScriptHawk.UI.form_controls["Random Color"] = forms.button(ScriptHawk.UI.options_form, "Random Color", Game.setKongColor, ScriptHawk.UI.col(5), ScriptHawk.UI.row(5), ScriptHawk.UI.col(4) + 10, ScriptHawk.UI.button_height);
 	--ScriptHawk.UI.form_controls["Everything is Kong Button"] = forms.button(ScriptHawk.UI.options_form, "Kong", everythingIsKong, ScriptHawk.UI.col(10), ScriptHawk.UI.row(3), ScriptHawk.UI.col(4) + 10, ScriptHawk.UI.button_height);
@@ -6967,14 +6966,14 @@ function Game.initUI()
 	ScriptHawk.UI.form_controls["Decrease Lag Factor Button"] = forms.button(ScriptHawk.UI.options_form, "-", decrease_lag_factor, ScriptHawk.UI.col(13) - 5, ScriptHawk.UI.row(5), ScriptHawk.UI.button_height, ScriptHawk.UI.button_height);
 	ScriptHawk.UI.form_controls["Increase Lag Factor Button"] = forms.button(ScriptHawk.UI.options_form, "+", increase_lag_factor, ScriptHawk.UI.col(13) + ScriptHawk.UI.button_height - 5, ScriptHawk.UI.row(5), ScriptHawk.UI.button_height, ScriptHawk.UI.button_height);
 	ScriptHawk.UI.form_controls["Lag Factor Value Label"] = forms.label(ScriptHawk.UI.options_form, "0", ScriptHawk.UI.col(13) + ScriptHawk.UI.button_height + 21, ScriptHawk.UI.row(5) + ScriptHawk.UI.label_offset, 54, 14);
-	ScriptHawk.UI.form_controls["Toggle Lag Fix Checkbox"] = forms.checkbox(ScriptHawk.UI.options_form, "Lag fix", ScriptHawk.UI.col(10) + ScriptHawk.UI.dropdown_offset, ScriptHawk.UI.row(5) + ScriptHawk.UI.dropdown_offset);
+	ScriptHawk.UI.checkbox(10, 5, "Toggle Lag Fix Checkbox", "Lag fix");
 
 	-- Checkboxes
-	ScriptHawk.UI.form_controls["Toggle Homing Ammo Checkbox"] = forms.checkbox(ScriptHawk.UI.options_form, "Homing Ammo", ScriptHawk.UI.col(0) + ScriptHawk.UI.dropdown_offset, ScriptHawk.UI.row(6) + ScriptHawk.UI.dropdown_offset);
-	ScriptHawk.UI.form_controls["Toggle Noclip Checkbox"] = forms.checkbox(ScriptHawk.UI.options_form, "Noclip", ScriptHawk.UI.col(5) + ScriptHawk.UI.dropdown_offset, ScriptHawk.UI.row(5) + ScriptHawk.UI.dropdown_offset);
-	--ScriptHawk.UI.form_controls["Toggle Neverslip Checkbox"] = forms.checkbox(ScriptHawk.UI.options_form, "Never Slip", ScriptHawk.UI.col(10) + ScriptHawk.UI.dropdown_offset, ScriptHawk.UI.row(5) + ScriptHawk.UI.dropdown_offset);
-	--ScriptHawk.UI.form_controls["Toggle Paper Mode Checkbox"] = forms.checkbox(ScriptHawk.UI.options_form, "Paper Mode", ScriptHawk.UI.col(5) + ScriptHawk.UI.dropdown_offset, ScriptHawk.UI.row(5) + ScriptHawk.UI.dropdown_offset);
-	ScriptHawk.UI.form_controls["Toggle OhWrongnana"] = forms.checkbox(ScriptHawk.UI.options_form, "OhWrongnana", ScriptHawk.UI.col(5) + ScriptHawk.UI.dropdown_offset, ScriptHawk.UI.row(6) + ScriptHawk.UI.dropdown_offset);
+	ScriptHawk.UI.checkbox(0, 6, "Toggle Homing Ammo Checkbox", "Homing Ammo");
+	ScriptHawk.UI.checkbox(5, 5, "Toggle Noclip Checkbox", "Noclip");
+	--ScriptHawk.UI.checkbox(10, 5, "Toggle Neverslip Checkbox", "Never Slip");
+	--ScriptHawk.UI.checkbox(5, 5, "Toggle Paper Mode Checkbox", "Paper Mode");
+	ScriptHawk.UI.checkbox(5, 6, "Toggle OhWrongnana", "OhWrongnana");
 
 	-- Output flag statistics
 	flagStats();

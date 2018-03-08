@@ -1433,10 +1433,7 @@ local movementStates = {
 
 function Game.getCurrentMovementState()
 	local currentMovementState = mainmemory.read_u32_be(Game.Memory.current_movement_state[version]);
-	if type(movementStates[currentMovementState]) ~= "nil" then
-		return movementStates[currentMovementState];
-	end
-	return "Unknown ("..currentMovementState..")";
+	return movementStates[currentMovementState] or "Unknown ("..currentMovementState..")";
 end
 
 function Game.colorCurrentMovementState()
@@ -2258,11 +2255,7 @@ function Game.drawUI()
 			local objectIDPointer = dereferencePointer(currentSlotBase + 0x12C);
 			if isRDRAM(objectIDPointer) then
 				local objectType = mainmemory.read_u16_be(objectIDPointer + 0x02);
-				if type(Game.actorArray[objectType]) == "string" then
-					animationType = Game.actorArray[objectType];
-				else
-					animationType = toHexString(objectType);
-				end
+				animationType = Game.actorArray[objectType] or toHexString(objectType);
 			end
 
 			local color = nil;
@@ -3284,14 +3277,13 @@ function Game.initUI()
 	ScriptHawk.UI.form_controls["Check Flag Button"] = forms.button(ScriptHawk.UI.options_form, "Check", flagCheckButtonHandler, ScriptHawk.UI.col(12), ScriptHawk.UI.row(7), 46, ScriptHawk.UI.button_height);
 	ScriptHawk.UI.form_controls["Clear Flag Button"] = forms.button(ScriptHawk.UI.options_form, "Clear", flagClearButtonHandler, ScriptHawk.UI.col(14), ScriptHawk.UI.row(7), 46, ScriptHawk.UI.button_height);
 
-	ScriptHawk.UI.form_controls.toggle_neverslip = forms.checkbox(ScriptHawk.UI.options_form, "Never Slip", ScriptHawk.UI.col(0) + ScriptHawk.UI.dropdown_offset, ScriptHawk.UI.row(6) + ScriptHawk.UI.dropdown_offset);
-	ScriptHawk.UI.form_controls.beta_pause_menu_checkbox = forms.checkbox(ScriptHawk.UI.options_form, "Beta Pause", ScriptHawk.UI.col(10) + ScriptHawk.UI.dropdown_offset, ScriptHawk.UI.row(2) + ScriptHawk.UI.dropdown_offset);
+	ScriptHawk.UI.checkbox(0, 6, "toggle_neverslip", "Never Slip");
+	ScriptHawk.UI.checkbox(10, 2, "beta_pause_menu_checkbox", "Beta Pause");
 
-	ScriptHawk.UI.form_controls.encircle_checkbox = forms.checkbox(ScriptHawk.UI.options_form, "Encircle (Beta)", ScriptHawk.UI.col(5) + ScriptHawk.UI.dropdown_offset, ScriptHawk.UI.row(4) + ScriptHawk.UI.dropdown_offset);
-	ScriptHawk.UI.form_controls.dynamic_radius_checkbox = forms.checkbox(ScriptHawk.UI.options_form, "Dynamic Radius", ScriptHawk.UI.col(5) + ScriptHawk.UI.dropdown_offset, ScriptHawk.UI.row(5) + ScriptHawk.UI.dropdown_offset);
-	ScriptHawk.UI.form_controls.freeze_clip_velocity = forms.checkbox(ScriptHawk.UI.options_form, "Freeze Clip Vel.", ScriptHawk.UI.col(5) + ScriptHawk.UI.dropdown_offset, ScriptHawk.UI.row(6) + ScriptHawk.UI.dropdown_offset);
-	ScriptHawk.UI.form_controls.autopound_checkbox = forms.checkbox(ScriptHawk.UI.options_form, "Auto Pound", ScriptHawk.UI.col(10) + ScriptHawk.UI.dropdown_offset, ScriptHawk.UI.row(4) + ScriptHawk.UI.dropdown_offset);
-	forms.setproperty(ScriptHawk.UI.form_controls.autopound_checkbox, "Height", 22);
+	ScriptHawk.UI.checkbox(5, 4, "encircle_checkbox", "Encircle (Beta)");
+	ScriptHawk.UI.checkbox(5, 5, "dynamic_radius_checkbox", "Dynamic Radius");
+	ScriptHawk.UI.checkbox(5, 6, "freeze_clip_velocity", "Freeze Clip Vel.");
+	ScriptHawk.UI.checkbox(10, 4, "autopound_checkbox", "Auto Pound");
 
 	-- Actor spawner
 	ScriptHawk.UI.form_controls.actor_dropdown = forms.dropdown(ScriptHawk.UI.options_form, actorNames, ScriptHawk.UI.col(10) + ScriptHawk.UI.dropdown_offset, ScriptHawk.UI.row(0) + ScriptHawk.UI.dropdown_offset);

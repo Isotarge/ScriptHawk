@@ -88,10 +88,7 @@ end
 
 function Game.getRound()
 	local round = mainmemory.readbyte(Game.Memory.round);
-	if type(Game.maps[round + 1]) == "string" then
-		return Game.maps[round + 1];
-	end
-	return "Unknown "..toHexString(round);
+	return Game.maps[round + 1] or "Unknown "..toHexString(round);
 end
 
 function Game.getXPosition()
@@ -129,7 +126,7 @@ function Game.eachFrame()
 end
 
 function Game.initUI()
-	ScriptHawk.UI.form_controls["Fix Acceleration Checkbox"] = forms.checkbox(ScriptHawk.UI.options_form, "Fix Acceleration", ScriptHawk.UI.col(0) + ScriptHawk.UI.dropdown_offset, ScriptHawk.UI.row(6) + ScriptHawk.UI.dropdown_offset);
+	ScriptHawk.UI.checkbox(0, 6, "Fix Acceleration Checkbox", "Fix Acceleration");
 end
 
 Game.OSDPosition = {2, 70};

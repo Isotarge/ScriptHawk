@@ -220,11 +220,7 @@ local movementStates = {
 
 function Game.getCurrentMovementState()
 	local currentMovementState = memory.read_u32_le(Game.Memory.current_movement_state.Address[version],Game.Memory.current_movement_state.Domain);
-	if type(movementStates[currentMovementState]) ~= "nil" then
-		return movementStates[currentMovementState];
-	else
-		return "Unknown ("..currentMovementState..")";
-	end
+	return movementStates[currentMovementState] or "Unknown ("..currentMovementState..")";
 end
 
 function Game.colorCurrentMovementState()

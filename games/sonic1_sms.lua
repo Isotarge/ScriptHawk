@@ -110,10 +110,7 @@ end
 
 function Game.getLevel()
 	local level = mainmemory.readbyte(Game.Memory.level);
-	if type(Game.maps[level + 1]) == "string" then
-		return Game.maps[level + 1];
-	end
-	return "Unknown "..toHexString(level);
+	return Game.maps[level + 1] or "Unknown "..toHexString(level);
 end
 
 function Game.getViewportX()
@@ -158,7 +155,7 @@ function Game.eachFrame()
 end
 
 function Game.initUI()
-	ScriptHawk.UI.form_controls["CamHack Checkbox"] = forms.checkbox(ScriptHawk.UI.options_form, "CamHack (Beta)", ScriptHawk.UI.col(0) + ScriptHawk.UI.dropdown_offset, ScriptHawk.UI.row(6) + ScriptHawk.UI.dropdown_offset);
+	ScriptHawk.UI.checkbox(0, 6, "CamHack Checkbox", "CamHack (Beta)");
 end
 
 Game.OSDPosition = {2, 70};

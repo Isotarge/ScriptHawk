@@ -407,9 +407,9 @@ local supportedGames = {
 	["7195EA96D9FE5DE065AF61F70D55C92C8EE905E6"] = {moduleName="games.elmo", friendlyName="Elmo's Number Journey (USA)"},
 
 	-- Galahad
-	["536E5A1FFB50D33632A9978B35DB5DF6"] = {moduleName="beta.Galahad", selfContained=true, friendlyName="Legend of Galahad, The (UE) [!]"},
-	["FA7A34B92D06013625C2FE155A9DB5A8"] = {moduleName="beta.Galahad", selfContained=true, friendlyName="Legend of Galahad, The (UE) [t1+C]"},
-	["3F183BD8A7360E3BE3CF65AE8FF9810C"] = {moduleName="beta.Galahad", selfContained=true, friendlyName="Legend of Galahad, The (UE) [t1]"},
+	["536E5A1FFB50D33632A9978B35DB5DF6"] = {moduleName="games.galahad", friendlyName="Legend of Galahad, The (UE) [!]"},
+	["FA7A34B92D06013625C2FE155A9DB5A8"] = {moduleName="games.galahad", friendlyName="Legend of Galahad, The (UE) [t1+C]"},
+	["3F183BD8A7360E3BE3CF65AE8FF9810C"] = {moduleName="games.galahad", friendlyName="Legend of Galahad, The (UE) [t1]"},
 
 	-- Golden Axe Warrior
 	["D46E40BBB729BA233F171AD7BF6169F5"] = {moduleName="games.golden_axe_warrior", friendlyName="Golden Axe Warrior (UE)"},
@@ -924,14 +924,21 @@ end
 
 ScriptHawk.UI.options_form = forms.newform(ScriptHawk.UI.col(ScriptHawk.UI.form_width), ScriptHawk.UI.row(ScriptHawk.UI.form_height), "ScriptHawk Options");
 
+function ScriptHawk.UI.checkbox(col, row, tag, caption, default)
+	ScriptHawk.UI.form_controls[tag] = forms.checkbox(ScriptHawk.UI.options_form, caption, ScriptHawk.UI.col(col) + ScriptHawk.UI.dropdown_offset, ScriptHawk.UI.row(row) + ScriptHawk.UI.dropdown_offset);
+	forms.setproperty(ScriptHawk.UI.form_controls[tag], "Height", 22);
+	if default then
+		forms.setproperty(ScriptHawk.UI.form_controls[tag], "Checked", true);
+	end
+end
+
 -- Handle, Type, Caption, Callback, X position, Y position, Width, Height
 if not TASSafe then
 	ScriptHawk.UI.form_controls["Mode Label"] = forms.label(ScriptHawk.UI.options_form, "Mode:", ScriptHawk.UI.col(0), ScriptHawk.UI.row(0) + ScriptHawk.UI.label_offset, 44, ScriptHawk.UI.button_height);
 	ScriptHawk.UI.form_controls["Mode Button"] = forms.button(ScriptHawk.UI.options_form, ScriptHawk.mode, toggleMode, ScriptHawk.UI.col(2), ScriptHawk.UI.row(0), 64, ScriptHawk.UI.button_height);
 else
-	ScriptHawk.UI.form_controls["Override Lag Detection"] = forms.checkbox(ScriptHawk.UI.options_form, "Override Lag Detection", ScriptHawk.UI.col(0) + ScriptHawk.UI.dropdown_offset, ScriptHawk.UI.row(2) + ScriptHawk.UI.dropdown_offset);
+	ScriptHawk.UI.checkbox(0, 2, "Override Lag Detection", "Override Lag Detection", override_lag_detection);
 	forms.setproperty(ScriptHawk.UI.form_controls["Override Lag Detection"], "Width", 140);
-	forms.setproperty(ScriptHawk.UI.form_controls["Override Lag Detection"], "Checked", override_lag_detection);
 end
 
 ScriptHawk.UI.form_controls["Precision Label"] = forms.label(ScriptHawk.UI.options_form, "Precision:", ScriptHawk.UI.col(0), ScriptHawk.UI.row(1) + ScriptHawk.UI.label_offset, 54, 14);
@@ -957,30 +964,27 @@ if not TASSafe then
 		ScriptHawk.UI.form_controls["Map Dropdown"] = forms.dropdown(ScriptHawk.UI.options_form, filteredMaps, ScriptHawk.UI.col(0) + ScriptHawk.UI.dropdown_offset, ScriptHawk.UI.row(3) + ScriptHawk.UI.dropdown_offset, ScriptHawk.UI.col(9) + 8, ScriptHawk.UI.button_height);
 		if Game.takeMeThereType == nil or Game.takeMeThereType == "Checkbox" then
 			Game.takeMeThereType = "Checkbox";
-			ScriptHawk.UI.form_controls["Map Checkbox"] = forms.checkbox(ScriptHawk.UI.options_form, "Take me there", ScriptHawk.UI.col(0) + ScriptHawk.UI.dropdown_offset, ScriptHawk.UI.row(4) + ScriptHawk.UI.dropdown_offset);
+			ScriptHawk.UI.checkbox(0, 4, "Map Checkbox", "Take me there");
 		elseif Game.takeMeThereType == "Button" then
 			ScriptHawk.UI.form_controls["Map Button"] = forms.button(ScriptHawk.UI.options_form, "Take me there", function() Game.setMap(previous_map_value); end, ScriptHawk.UI.col(0), ScriptHawk.UI.row(4), ScriptHawk.UI.col(4) + 10, ScriptHawk.UI.button_height);
 		end
 	end
 
 	if type(Game.applyInfinites) == "function" then
-		ScriptHawk.UI.form_controls["Toggle Infinites Checkbox"] = forms.checkbox(ScriptHawk.UI.options_form, "Infinites", ScriptHawk.UI.col(0) + ScriptHawk.UI.dropdown_offset, ScriptHawk.UI.row(5) + ScriptHawk.UI.dropdown_offset);
+		ScriptHawk.UI.checkbox(0, 5, "Toggle Infinites Checkbox", "Infinites");
 	end
 end
 
 if type(Game.getHitboxes) == "function" then
-	ScriptHawk.UI.form_controls["Show Hitboxes Checkbox"] = forms.checkbox(ScriptHawk.UI.options_form, "Hitboxes", ScriptHawk.UI.col(10) + ScriptHawk.UI.dropdown_offset, ScriptHawk.UI.row(0) + ScriptHawk.UI.dropdown_offset);
-	forms.setproperty(ScriptHawk.UI.form_controls["Show Hitboxes Checkbox"], "Checked", true);
+	ScriptHawk.UI.checkbox(10, 0, "Show Hitboxes Checkbox", "Hitboxes", true);
 	local showListRow = 2;
 	if type(Game.setHitboxPosition) == "function" and not TASSafe then
-		ScriptHawk.UI.form_controls["Draggable Hitboxes Checkbox"] = forms.checkbox(ScriptHawk.UI.options_form, "Draggable", ScriptHawk.UI.col(10) + ScriptHawk.UI.dropdown_offset, ScriptHawk.UI.row(1) + ScriptHawk.UI.dropdown_offset);
+		ScriptHawk.UI.checkbox(10, 1, "Draggable Hitboxes Checkbox", "Draggable");
 	else
 		showListRow = 1; -- Move "Show List" checkbox up one row if Draggable checkbox is not drawn
 	end
 	if type(Game.getHitboxListText) == "function" then
-		ScriptHawk.UI.form_controls["Show List Checkbox"] = forms.checkbox(ScriptHawk.UI.options_form, "Show List", ScriptHawk.UI.col(10) + ScriptHawk.UI.dropdown_offset, ScriptHawk.UI.row(showListRow) + ScriptHawk.UI.dropdown_offset);
-		forms.setproperty(ScriptHawk.UI.form_controls["Show List Checkbox"], "Checked", true);
-		forms.setproperty(ScriptHawk.UI.form_controls["Show List Checkbox"], "Height", 22);
+		ScriptHawk.UI.checkbox(10, showListRow, "Show List Checkbox", "Show List", true);
 	end
 end
 
@@ -1403,7 +1407,7 @@ local function plot_pos()
 	end
 
 	ScriptHawk.processKeybinds(ScriptHawk.keybindsFrame);
-	ScriptHawk.processKeybinds(ScriptHawk.joypadBindsFrame);
+	ScriptHawk.processJoypadBinds(ScriptHawk.joypadBindsFrame);
 	Game.eachFrame();
 
 	previous_frame = current_frame;

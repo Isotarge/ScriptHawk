@@ -303,10 +303,7 @@ local movementStates = {
 
 function Game.getCurrentMovementState()
 	local currentMovementState = mainmemory.read_u32_be(Game.Memory.current_movement_state[Game.version]);
-	if type(movementStates[currentMovementState]) ~= "nil" then
-		return movementStates[currentMovementState];
-	end
-	return "Unknown ("..currentMovementState..")";
+	return movementStates[currentMovementState] or "Unknown ("..currentMovementState..")";
 end
 
 local gruntyStates = {

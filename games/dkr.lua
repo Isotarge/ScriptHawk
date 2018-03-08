@@ -307,11 +307,7 @@ function getExamineData(objectBase)
 			if isRDRAM(destinationPointer) then
 				table.insert(examineData, {"Destination Pointer", toHexString(destinationPointer + RDRAMBase)});
 				local destination = mainmemory.readbyte(destinationPointer + 0x08);
-				if type(Game.maps[destination + 1]) == "string" then
-					table.insert(examineData, {"Destination", Game.maps[destination + 1]});
-				else
-					table.insert(examineData, {"Destination", toHexString(destination)});
-				end
+				table.insert(examineData, {"Destination", Game.maps[destination + 1] or toHexString(destination)});
 			end
 		end
 	end
@@ -1009,12 +1005,10 @@ end
 
 function Game.initUI()
 	ScriptHawk.UI.form_controls["Unlock Characters Button"] = forms.button(ScriptHawk.UI.options_form, "Unlock Characters", Game.unlockCharacters, ScriptHawk.UI.col(10), ScriptHawk.UI.row(4), ScriptHawk.UI.col(4) + 10, ScriptHawk.UI.button_height);
-	ScriptHawk.UI.form_controls.boost_info_checkbox = forms.checkbox(ScriptHawk.UI.options_form, "Boost info", ScriptHawk.UI.col(5) + ScriptHawk.UI.dropdown_offset, ScriptHawk.UI.row(4) + ScriptHawk.UI.dropdown_offset);
-	ScriptHawk.UI.form_controls.encircle_checkbox = forms.checkbox(ScriptHawk.UI.options_form, "Encircle (beta)", ScriptHawk.UI.col(5) + ScriptHawk.UI.dropdown_offset, ScriptHawk.UI.row(5) + ScriptHawk.UI.dropdown_offset);
-	forms.setproperty(ScriptHawk.UI.form_controls.encircle_checkbox, "Height", 22);
+	ScriptHawk.UI.checkbox(5, 4, "boost_info_checkbox", "Boost info");
+	ScriptHawk.UI.checkbox(5, 5, "encircle_checkbox", "Encircle (beta)");
 
-	ScriptHawk.UI.form_controls.otap_checkbox = forms.checkbox(ScriptHawk.UI.options_form, "Auto tapper", ScriptHawk.UI.col(0) + ScriptHawk.UI.dropdown_offset, ScriptHawk.UI.row(6) + ScriptHawk.UI.dropdown_offset);
-	forms.setproperty(ScriptHawk.UI.form_controls.otap_checkbox, "Height", 22);
+	ScriptHawk.UI.checkbox(0, 6, "otap_checkbox", "Auto tapper");
 	ScriptHawk.UI.form_controls.otap_boost_dropdown = forms.dropdown(ScriptHawk.UI.options_form, {"Yellow", "Blue", "None"}, ScriptHawk.UI.col(0) + ScriptHawk.UI.dropdown_offset, ScriptHawk.UI.row(7) + ScriptHawk.UI.dropdown_offset, ScriptHawk.UI.col(4), ScriptHawk.UI.button_height);
 
 	local blue_col_base = 5;
