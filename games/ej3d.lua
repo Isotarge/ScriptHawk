@@ -48,9 +48,10 @@ jim = {
 	animation_timer = 0x0CA, -- 2 Byte
 	control_type = 0x0F4, -- 4 Byte (0 = Normal, 2 = Boss Fights, 4 = Void Process)
 	Health = 0x0FC, -- 4 Byte
+	animation = 0x0C9, -- Byte
 	Lives = 0x100, -- 4 Byte
 	gun_pointer = 0x104,
-	animation = 0x0C9, -- Byte
+	movement = 0x2F3, -- Byte
 	cutscene_lock = 0x2A3, -- Byte
 	--speed = 0x2C8, -- Float (Not too sure on this)
 	y_last_action = 0x338, -- Float
@@ -136,21 +137,26 @@ end
 Game.rot_speed = 10;
 Game.max_rot_units = 360;
 
+function Game.calculateAngle(angle1,angle2)
+	angle_1 = 90 * (angle1 + 1);
+	
+	if angle2 < 0 then
+		angle = (angle_1 * (0 - 1)) - 90;
+	else
+		angle = (angle_1 - 90);
+	end
+	return angle;
+end
+
+
 function Game.getXRotation()
 	return mainmemory.readfloat(Game.Memory.x_rotation[version], true);
 end
 
 function Game.getYRotation()
-	angle_1 = 90 * (mainmemory.readfloat(Game.Memory.jim_pointer[version] + jim.y_rotation_1, true) + 1);
-	angle_2 = mainmemory.readfloat(Game.Memory.jim_pointer[version] + jim.y_rotation_2, true);
-
-	if angle_2 < 0 then
-		angle = (angle_1 * (0 - 1)) - 90;
-	else
-		angle = (angle_1 - 90);
-	end
-
-	return angle;
+	local angle1 = mainmemory.readfloat(Game.Memory.jim_pointer[version] + jim.y_rotation_1, true);
+	local angle2 = mainmemory.readfloat(Game.Memory.jim_pointer[version] + jim.y_rotation_2, true);
+	return Game.calculateAngle(angle1,angle2);
 end
 
 function Game.getZRotation()
@@ -245,6 +251,25 @@ Game.animations = {
 	[43] = "Locked", -- Textbox
 };
 
+Game.movements = {
+	[0] = "Normal", -- A lot of things
+	[1] = "Jumping", -- Moving
+	[2] = "Jumping (Stationary)",
+	[4] = "Stopping",
+	[9] = "On Rope",
+	[12] = "Grabbing Ledge", -- End of Grabbing Up
+	[13] = "Grabbing Ledge", -- Grabbing Up
+	[14] = "Breaking Wind",
+	[16] = "Rolling",
+	[17] = "Crouching",
+	[18] = "Whipping (Grounded)",
+	[19] = "Whipping", -- Airbourne
+	[20] = "Floating",
+	[21] = "Knockback", -- Damage
+	[23] = "Acid Burn", -- Acid Bats
+	[24] = "First Person",
+};
+
 Game.takeMeThereType = "Checkbox";
 
 function Game.setMap(index)
@@ -300,6 +325,15 @@ function Game.getAnimationOSD()
 		currentAnimationName = Game.animations[currentAnimation];
 	end
 	return currentAnimationName;
+end
+
+function Game.getMovementOSD()
+	local currentMovement = mainmemory.readbyte(Game.Memory.jim_pointer[version] + jim.movement);
+	local currentMovementName = "Unknown ("..currentMovement..")";
+	if Game.movements[currentMovement] ~= nil then
+		currentMovementName = Game.movements[currentMovement];
+	end
+	return currentMovementName
 end
 
 function Game.getAnimationTimerOSD()
@@ -519,6 +553,7 @@ Game.OSD = {
 	--{"Rot. X", Game.getXRotation},
 	{"Animation", Game.getAnimationOSD},
 	{"Animation Timer", Game.getAnimationTimerOSD},
+	{"Movement", Game.getMovementOSD},
 	{"Facing", Game.getYRotation},
 	--{"Rot. Z", Game.getZRotation},
 };
