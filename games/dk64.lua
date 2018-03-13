@@ -1346,7 +1346,7 @@ obj_model1 = {
 	},
 	mad_jack = { -- TODO: Some of these might be wrong... hmm..
 		ticks_until_next_action = {0x1AD, 0x1A5, 0x1A5, nil},
-		phase =					  {0x1D4, 0x1DC, 0x1DC, nil},
+		phase =                   {0x1D4, 0x1DC, 0x1DC, nil},
 		actions_remaining =       {0x1D8, 0x1E0, 0x1E0, nil},
 		action_type =             {0x1D9, 0x1E1, 0x1E1, nil},
 		current_position =        {0x1E0, 0x1E8, 0x1E8, nil},
