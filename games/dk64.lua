@@ -1346,6 +1346,7 @@ obj_model1 = {
 	},
 	mad_jack = { -- TODO: Some of these might be wrong... hmm..
 		ticks_until_next_action = {0x1AD, 0x1A5, 0x1A5, nil},
+		phase =					  {0x1D4, 0x1DC, 0x1DC, nil},
 		actions_remaining =       {0x1D8, 0x1E0, 0x1E0, nil},
 		action_type =             {0x1D9, 0x1E1, 0x1E1, nil},
 		current_position =        {0x1E0, 0x1E8, 0x1E8, nil},
@@ -5353,21 +5354,6 @@ local function MJ_get_action_type(phase_byte)
 	return "Jump";
 end
 
-local function MJ_get_phase(phase_byte)
-	if phase_byte == 0x08 or phase_byte == 0x32 then
-		return 1;
-	elseif phase_byte == 0x0A or phase_byte == 0x2D then
-		return 2;
-	elseif phase_byte == 0x0B or phase_byte == 0x28 then
-		return 3;
-	elseif phase_byte == 0x0C or phase_byte == 0x05 then
-		return 4;
-	elseif phase_byte == 0x0E or phase_byte == 0x01 then
-		return 5;
-	end
-	return 0;
-end
-
 local function MJ_get_arrow_image(current, new)
 	if new.row > current.row then
 		if new.col > current.col then
@@ -5483,7 +5469,7 @@ function Game.drawMJMinimap()
 		local actions_remaining = mainmemory.readbyte(MJ_state + obj_model1.mad_jack.actions_remaining[version]);
 		local time_until_next_action = mainmemory.readbyte(MJ_state + obj_model1.mad_jack.ticks_until_next_action[version]);
 
-		local phase = MJ_get_phase(phase_byte);
+		local phase = mainmemory.readbyte(MJ_state + obj_model1.mad_jack.phase[version]) + 1;
 		local action_type = MJ_get_action_type(phase_byte);
 
 		gui.drawText(MJ_minimap_text_x, MJ_minimap_actions_remaining_y, actions_remaining.." "..action_type.."s remaining");
