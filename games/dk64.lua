@@ -8083,7 +8083,7 @@ RRRGGGBB
 00000011 - 03 - Blue
 11100011 - E3 - Purple/Pink
 11111100 - FC - Yellow
-]]--
+--]]
 
 addressColors = {
 	[0] = 0x00, -- BLACK    - Unknown

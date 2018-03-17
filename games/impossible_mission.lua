@@ -691,7 +691,7 @@ function Game.eachFrame()
 	if Game.getPieceDistribution() == 15 and Game.getTotalPieces() == 36 then
 		print("15 piece on frame "..emu.framecount());
 	end
-	--]]--
+	--]]
 	botLoop();
 end
 
