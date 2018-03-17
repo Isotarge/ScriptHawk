@@ -362,6 +362,12 @@ function fileExists(name)
 end
 
 function linesFrom(file)
+	if not ScriptHawk.isFileIOSafe then
+		if ScriptHawk.warnings then
+			print("Warning: File IO (function: linesFrom) was attempted when not safe.");
+		end
+		return {};
+	end
 	if not fileExists(file) then
 		return {};
 	end

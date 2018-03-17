@@ -9,6 +9,12 @@ if emu.setislagged == nil then -- 1.11.5 (Feb 2016)
 	return false;
 end
 
+if emu.getluacore == nil then -- 2.2.2 (March 2018)
+	function emu.getluacore()
+		return "NLua";
+	end
+end
+
 ScriptHawk = {
 	warnings = false, -- Useful for debugging but annoying for end users, so default to false
 	mode = "Position",
@@ -40,6 +46,7 @@ ScriptHawk = {
 	isSMS = emu.getsystemid() == "SMS",
 	bufferWidth = client.bufferwidth(),
 	bufferHeight = client.bufferheight(),
+	isFileIOSafe = emu.getluacore() == "LuaInterface",
 };
 
 ScriptHawk.hitboxDefaultMode = ScriptHawk.hitboxModeWH;

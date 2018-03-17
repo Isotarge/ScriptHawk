@@ -27,6 +27,5 @@
 - Support both BizHawk and m64p?
 	- [Info here](https://github.com/notwa/mm/commit/90d30e218f3128fb130e54bd8662527bdd73f40f)
 	- Squish remaining calls to bizstring library
-		- Ledge Clip.lua
 		- Wonder Boy III RNG Watch.lua
 - DK64: ASM hook for other regions

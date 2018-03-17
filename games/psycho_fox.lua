@@ -8,6 +8,8 @@ end
 local Game = {
 	Memory = {
 		round = 0x20,
+		screen_x = 0x22,
+		screen_y = 0x24,
 		lives = 0x16,
 		straw_effigies = 0x18,
 		money_bags = 0x19,
@@ -57,6 +59,19 @@ function Game.readPosition(base)
 	return (major * 256) + minor + (sub / 256);
 end
 
+function Game.writePosition(base, value)
+	local flooredValue = math.floor(value);
+	local remainder = value - flooredValue;
+
+	local sub = remainder * 256;
+	local minor = flooredValue % 256;
+	local major = math.floor(flooredValue / 256);
+
+	mainmemory.writebyte(base + 0, sub);
+	mainmemory.writebyte(base + 1, minor);
+	mainmemory.writebyte(base + 2, major);
+end
+
 function Game.detectVersion(romName, romHash)
 	ScriptHawk.dpad.joypad.enabled = false;
 	ScriptHawk.dpad.key.enabled = false;
@@ -91,12 +106,28 @@ function Game.getRound()
 	return Game.maps[round + 1] or "Unknown "..toHexString(round);
 end
 
+function Game.getScreenXPosition()
+	return mainmemory.read_u16_le(Game.Memory.screen_x);
+end
+
+function Game.getScreenYPosition()
+	return mainmemory.read_u16_le(Game.Memory.screen_y);
+end
+
 function Game.getXPosition()
 	return Game.readPosition(Game.Memory.x_position);
 end
 
 function Game.getYPosition()
 	return Game.readPosition(Game.Memory.y_position);
+end
+
+function Game.setXPosition(value)
+	return Game.writePosition(Game.Memory.x_position, value);
+end
+
+function Game.setYPosition(value)
+	return Game.writePosition(Game.Memory.y_position, value);
 end
 
 function Game.getXVelocity()
@@ -129,11 +160,85 @@ function Game.initUI()
 	ScriptHawk.UI.checkbox(0, 6, "Fix Acceleration Checkbox", "Fix Acceleration");
 end
 
+-------------
+-- Enemies --
+-------------
+
+local enemy_array = 0xB00;
+local enemy_array_capacity = 10;
+local enemy_size = 0x20;
+
+local enemy = {
+	x = 0x02,
+	y = 0x04,
+};
+
+function Game.getHitboxes()
+	local screenX = mainmemory.read_u16_le(Game.Memory.screen_x);
+	local screenY = mainmemory.read_u16_le(Game.Memory.screen_y);
+	ScriptHawk.hitboxDefaultXOffset = -screenX;
+	ScriptHawk.hitboxDefaultYOffset = -screenY;
+
+	local hitboxes = {};
+	for base = enemy_array, enemy_array + enemy_array_capacity * enemy_size, enemy_size do
+		local enemyType = mainmemory.readbyte(base);
+		if enemyType ~= 0 then
+			local hitbox = {
+				base = base,
+				dragTag = base,
+				enemyType = enemyType,
+				x = mainmemory.read_u16_le(base + enemy.x),
+				y = mainmemory.read_u16_le(base + enemy.y),
+				width = 16,
+				height = 16,
+				isPlayer = false,
+			};
+			table.insert(hitboxes, hitbox);
+		end
+	end
+
+	local playerHitbox = {
+		dragTag = "Player",
+		x = Game.getXPosition(),
+		y = Game.getYPosition(),
+		width = 16,
+		height = 16,
+		isPlayer = true,
+	};
+	table.insert(hitboxes, playerHitbox);
+
+	return hitboxes;
+end
+
+function Game.setHitboxPosition(hitbox, x, y)
+	if hitbox.isPlayer then
+		Game.setXPosition(x);
+		Game.setYPosition(y);
+	else
+		mainmemory.write_u16_le(hitbox.base + enemy.x, x);
+		mainmemory.write_u16_le(hitbox.base + enemy.y, y);
+	end
+end
+
+function Game.getHitboxStaticText(hitbox)
+	if not hitbox.isPlayer then
+		return hitbox.enemyType;
+	end
+end
+
+function Game.getHitboxMouseOverText(hitbox)
+	if not hitbox.isPlayer then
+		return hitbox.enemyType;
+	end
+end
+
 Game.OSDPosition = {2, 70};
 Game.OSD = {
 	{"Round", Game.getRound},
 	{"Lives", Game.getLives},
 	{"Separator"},
+	{"Screen X", Game.getScreenXPosition},
+	{"Screen Y", Game.getScreenYPosition},
 	{"X"},
 	{"Y"},
 	{"X Velocity", Game.getXVelocity},

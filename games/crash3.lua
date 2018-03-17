@@ -1,3 +1,10 @@
+if type(ScriptHawk) ~= "table" then
+	print("This script is not designed to run by itself");
+	print("Please run ScriptHawk.lua from the parent directory instead");
+	print("Thanks for using ScriptHawk :)");
+	return;
+end
+
 -- Original script by pirohiko, http://tasvideos.org/forum/viewtopic.php?p=315430#315430
 -- Ported to BizHawk and ScriptHawk API by Isotarge
 
