@@ -110,15 +110,15 @@ function Game.eachFrame()
 end
 
 Game.OSD = {
-	{"X"},
+	{"X", tastudio_column=true, tastudio_column_width=40},
 	{"Y"},
-	{"dX", nil, Game.colorDX},
+	{"dX", nil, Game.colorDX, tastudio_column=true, tastudio_column_width=40},
 	{"dY"},
 	{"Separator"},
-	{"P Meter", Game.getPMeter},
-	{"Velocity (Gnd)", Game.getGroundVelocity},
-	{"Velocity (Air)", Game.getAerialVelocity},
-	{"Jump", Game.getJumpHeight, Game.colorJumpHeight},
+	{"P Meter", Game.getPMeter, tastudio_column=true, tastudio_column_width=50},
+	{"Velocity (Gnd)", Game.getGroundVelocity, tastudio_column=true, tastudio_column_width=90},
+	{"Velocity (Air)", Game.getAerialVelocity, tastudio_column=true, tastudio_column_width=90},
+	{"Jump", Game.getJumpHeight, Game.colorJumpHeight, tastudio_column=true, tastudio_column_width=40},
 	{"Separator"},
 	{"Level", Game.getLevel},
 	{"IGT", Game.getLevelTime},

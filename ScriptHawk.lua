@@ -910,6 +910,35 @@ function clearTelemetry()
 	telemetryData = {};
 end
 
+----------------------
+-- TAStudio Columns --
+----------------------
+
+--[[
+TAStudio_column_data = {};
+TAStudio_color_data = {};
+
+function TAStudioTextUpdate(frameNumber, name)
+	if TAStudio_column_data[frameNumber] ~= nil and TAStudio_column_data[frameNumber][name] ~= nil then
+		return TAStudio_column_data[frameNumber][name];
+	end
+end
+
+if tastudio.onqueryitemtext ~= nil then
+	tastudio.onqueryitemtext(TAStudioTextUpdate);
+end
+
+function TAStudioColorUpdate(frameNumber, name)
+	if TAStudio_color_data[frameNumber] ~= nil and TAStudio_color_data[frameNumber][name] ~= nil then
+		return TAStudio_color_data[frameNumber][name];
+	end
+end
+
+if tastudio.onqueryitembg ~= nil then
+	tastudio.onqueryitembg(TAStudioColorUpdate);
+end
+--]]
+
 -------------
 -- UI Code --
 -------------
@@ -1073,13 +1102,21 @@ function ScriptHawk.UI.updateReadouts()
 		end
 	end
 
+	local frameCount = emu.framecount();
 	local telemetryFound = false;
 	local telemetryIndex = 1;
 	local telemetryDataThisFrame = {};
-	if collecting_telemetry == false and type(telemetryData[emu.framecount()]) == "table" then
+	if collecting_telemetry == false and type(telemetryData[frameCount]) == "table" then
 		telemetryFound = true;
-		telemetryDataThisFrame = telemetryData[emu.framecount()];
+		telemetryDataThisFrame = telemetryData[frameCount];
 	end
+
+	--[[
+	local TAStudioEngaged = tastudio.engaged();
+	local TAStudioDataThisFrame = {};
+	local TAStudioColorThisFrame = {};
+	local atleastOneTAStudioColumn = false;
+	--]]
 
 	-- Draw OSD
 	local row = 0;
@@ -1090,6 +1127,7 @@ function ScriptHawk.UI.updateReadouts()
 		local label = Game.OSD[i][1];
 		local value = Game.OSD[i][2];
 		local color = Game.OSD[i][3];
+		--local inTAStudio = Game.OSD[i].tastudio_column == true;
 
 		if label ~= "Separator" then
 			local labelLower = string.lower(label);
@@ -1171,6 +1209,15 @@ function ScriptHawk.UI.updateReadouts()
 				color = color();
 			end
 
+			--[[
+			if TAStudioEngaged and inTAStudio then
+				atleastOneTAStudioColumn = true;
+				TAStudioDataThisFrame[label] = value;
+				--TAStudioColorThisFrame[label] = color;
+				tastudio.addcolumn(label, label, Game.OSD[i].tastudio_column_width or 50);
+			end
+			]]--
+
 			if telemetryFound then
 				gui.text(OSDX, OSDY + Game.OSDRowHeight * row, label..": "..value.." ("..telemetryDataThisFrame[telemetryIndex]..")", color);
 				telemetryIndex = telemetryIndex + 1;
@@ -1187,8 +1234,14 @@ function ScriptHawk.UI.updateReadouts()
 		end
 		row = row + 1;
 	end
+	--[[
+	if atleastOneTAStudioColumn then
+		TAStudio_column_data[frameCount] = TAStudioDataThisFrame;
+		--TAStudio_color_data[frameCount] = TAStudioColorThisFrame;
+	end
+	]]--
 	if collecting_telemetry then
-		telemetryData[emu.framecount()] = telemetryDataThisFrame;
+		telemetryData[frameCount] = telemetryDataThisFrame;
 	end
 end
 
