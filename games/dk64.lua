@@ -32,6 +32,8 @@ local grab_script_modes = {
 	"Examine (Object Model 2)",
 	"List (Loading Zones)",
 	"Examine (Loading Zones)",
+	"List (Arcade Objects)",
+	"Examine (Arcade Objects)",
 	"Chunks",
 	"Exits",
 	"Enemies",
@@ -463,12 +465,13 @@ local map_value = 0;
 local arcade_map = 2;
 local jetpac_map = 9;
 
-local arcade_object = {
+arcade_object = {
 	x_position = 0x00, -- Float
 	y_position = 0x04, -- Float
 	x_velocity = 0x08, -- Float
 	y_velocity = 0x0C, -- Float
 	object_type = 0x18,
+	movement = 0x19,
 	size = 0x20,
 	count = 61, -- TODO: Figure out actual value
 	hitbox = {
@@ -477,7 +480,46 @@ local arcade_object = {
 		x_offset = 0,
 		y_offset = 0,
 	},
+	object_name = {
+		[1] = "Barrel", -- 25m
+		[2] = "Flame Enemy",
+		[3] = "Spring", -- 75m
+		[4] = "Pie", -- 50m
+		[5] = "Points Bonus", -- Umbrella, Handbag etc.
+		[6] = "Hammer",
+		[7] = "Particles", -- Hammer
+		[8] = "DK (How High)",
+		-- [9]
+		[10] = "Barrel (Stack)", -- 25m, near DK
+		[11] = "Rivet", -- 100m
+		[12] = "Moving Ladder", -- 50m
+		[13] = "Jumpman",
+		[14] = "Bonus", -- OSD
+		[15] = "Particles", -- 100m Completion
+		[16] = "Oil Drum", -- 25m
+		[17] = "Elevator Crank", -- 75m
+		[18] = "Pulley", -- 50m
+		[19] = "Flames", -- Oil Drum (25m)
+		[20] = "Points Text", -- Text (Eg. 100)
+		[21] = "DK (Title)",
+		[22] = "DK (25m)",
+		[23] = "DK (100m)",
+		[24] = "DK (75m)",
+		[25] = "DK (50m)",
+		[26] = "Pauline (Bottom)",
+		[27] = "Pauline (Top)",
+		-- [28]
+		[29] = "Text", -- 'Help!' from Pauline
+		-- [30]
+	}
 };
+
+function getArcadeObjectNameOSD(objectType)
+	if arcade_object.object_name[objectType] ~= nil then
+		return arcade_object.object_name[objectType];
+	end
+	return 'Unknown';
+end
 
 function Game.getJumpman()
 	for i = 0, arcade_object.count - 1 do
@@ -2867,6 +2909,32 @@ local function getExamineDataModelTwo(pointer)
 	return examine_data;
 end
 
+function getExamineDataArcade(pointer)
+	local examine_data = {};
+	
+	local xPos = mainmemory.readfloat(pointer + arcade_object.x_position, true);
+	local yPos = mainmemory.readfloat(pointer + arcade_object.y_position, true);
+	local xVel = mainmemory.readfloat(pointer + arcade_object.x_velocity, true);
+	local yVel = mainmemory.readfloat(pointer + arcade_object.y_velocity, true);
+	
+	table.insert(examine_data, { "Slot base", toHexString(pointer, 6) });
+	table.insert(examine_data, { "Object Type", getArcadeObjectNameOSD(mainmemory.readbyte(pointer + arcade_object.object_type)) });
+	table.insert(examine_data, { "Object Type", mainmemory.readbyte(pointer + arcade_object.object_type) });
+	table.insert(examine_data, { "Separator", 1 });
+	
+	table.insert(examine_data, { "X", xPos });
+	table.insert(examine_data, { "Y", yPos });
+	table.insert(examine_data, { "Separator", 1 });
+	
+	table.insert(examine_data, { "X Velocity", xVel });
+	table.insert(examine_data, { "Y Velocity", yVel });
+	table.insert(examine_data, { "Separator", 1 });
+	
+	table.insert(examine_data, { "Object Movement", mainmemory.readbyte(pointer + arcade_object.movement) });
+	table.insert(examine_data, { "Object Size", mainmemory.readbyte(pointer + arcade_object.size) });
+	
+	return examine_data;
+end
 --------------------------------
 -- Loading Zone Documentation --
 --------------------------------
@@ -4639,6 +4707,21 @@ function dumpObjectSpawnTable()
 		dprint(i..","..toHexString(behavior, 4)..","..toHexString(model, 4)..","..name..","..modelName..","..internalName..",");
 	end
 	print_deferred();
+end
+
+-------------------
+-- Arcade Object --
+-------------------
+
+function populateArcadeObjects()
+	object_pointers = {};
+	
+	for i = 0, arcade_object.count - 1 do
+		local objectBase = Game.Memory.arcade_object_base[version] + (i * arcade_object.size);
+		if mainmemory.readbyte(objectBase + arcade_object.object_type) > 0 and map_value == arcade_map then
+			table.insert(object_pointers, objectBase);
+		end
+	end
 end
 
 -------------------
@@ -6584,6 +6667,10 @@ local function drawGrabScriptUI()
 		populateObjectModel2Pointers();
 		encirclePlayerObjectModel2();
 	end
+	
+	if string.contains(grab_script_mode, "Arcade Objects") then
+		populateArcadeObjects();
+	end
 
 	if string.contains(grab_script_mode, "Loading Zones") then
 		populateLoadingZonePointers();
@@ -6659,6 +6746,8 @@ local function drawGrabScriptUI()
 				examine_data = getExamineDataModelTwo(object_pointers[object_index]);
 			elseif grab_script_mode == "Examine (Loading Zones)" then
 				examine_data = getExamineDataLoadingZone(object_pointers[object_index]);
+			elseif grab_script_mode == "Examine (Arcade Objects)" then
+				examine_data = getExamineDataArcade(object_pointers[object_index]);
 			end
 
 			for i = #examine_data, 1, -1 do
@@ -6718,6 +6807,22 @@ local function drawGrabScriptUI()
 			end
 		end
 
+		if grab_script_mode == "List (Arcade Objects)" then
+			for i = #object_pointers, 1, -1 do
+				local color = nil;
+				if object_index == i then
+					color = colors.green;
+				end
+				
+				local objectType = mainmemory.readbyte(object_pointers[i] + arcade_object.object_type);
+				local objectName = getArcadeObjectNameOSD(objectType);
+				if objectType > 0 then
+					gui.text(gui_x, gui_y + height * row, i..": "..objectName.." ("..objectType..") ("..toHexString(object_pointers[i] or 0, 6)..")", color, 'bottomright');
+					row = row + 1;
+				end
+			end
+		end
+		
 		if grab_script_mode == "List (Loading Zones)" then
 			for i = #object_pointers, 1, -1 do
 				local color = nil;
