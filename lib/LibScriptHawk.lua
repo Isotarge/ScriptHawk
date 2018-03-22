@@ -244,41 +244,25 @@ function toBinaryString(num, bits) -- TODO: Properly define behavior for negativ
 	return table.concat(t);
 end
 
-function get_bit(field, index)
-	if index < 32 then
-		local bitmask = math.pow(2, index);
-		return bit.band(bitmask, field) == bitmask;
-	end
-	return false;
-end
-getBit = get_bit;
-check_bit = get_bit;
-checkBit = check_bit;
+-- TODO: Get rid of these aliases
+get_bit = bit.check;
+getBit = bit.check;
+check_bit = bit.check;
+checkBit = bit.check;
 
-function set_bit(field, index)
-	if index < 32 then
-		local bitmask = math.pow(2, index);
-		return bit.bor(bitmask, field);
-	end
-	return field;
-end
-setBit = set_bit;
+set_bit = bit.set;
+setBit = bit.set;
 
-function clear_bit(field, index)
-	if index < 32 then
-		local bitmask = math.pow(2, index);
-		return bit.band(field, bit.bnot(bitmask));
-	end
-	return field;
-end
-clearBit = clear_bit;
+clear_bit = bit.clear;
+clearBit = bit.clear;
 
-function toggle_bit(field, index)
-	if getBit(field, index) then
-		return clearBit(field, index);
+function bit.toggle(field, index)
+	if bit.check(field, index) then
+		return bit.clear(field, index);
 	end
-	return setBit(field, index);
+	return bit.set(field, index);
 end
+toggle_bit = bit.toggle;
 toggleBit = toggle_bit;
 
 function deepcompare(t1, t2, ignore_mt)
