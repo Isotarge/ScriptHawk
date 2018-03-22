@@ -689,3 +689,69 @@ function countLocals()
 	end
 	return idx;
 end
+
+-----------------
+-- Page System --
+-----------------
+-- Currently only works for Object Analysis Tools (right hand side)
+
+-- Game Script implementation
+	-- Under object index display
+		--gui.text(gui_x, gui_y + height * row, "Page: "..(page_pos).."/"..(page_total), nil, 'bottomright');
+		--row = row + 1;
+	-- Keybinds section
+		--ScriptHawk.bindKeyRealtime("H", decrementPage, true);
+		--ScriptHawk.bindKeyRealtime("J", incrementPage, true);
+	-- into table drawing function
+		--for i=page_finish,page_start+1,-1 do
+			-- instead of for i=#tablename,1,-1 do
+	-- pagifyThis function inbetween table populating and drawing function
+
+max_page_size = 40;
+page_pos = 1;
+page_total = 1;
+page_size = max_page_size;
+
+function incrementPage()
+	page_pos= page_pos + 1
+	if page_pos > page_total then
+		page_pos = 1;
+	end
+	page_start = max_page_size * (page_pos - 1);
+	page_finish = page_start + page_size;
+end
+
+function decrementPage()
+	page_pos = page_pos - 1;
+	if page_pos < 1 then
+		page_pos = page_total;
+	end
+	page_start = max_page_size * (page_pos - 1);
+	page_finish = page_start + page_size;
+end
+
+function pagifyThis(tablename,max_page_size)
+	-- max_page_size is 40 by default
+	if max_paze_size == nil then
+		max_page_size = 40;
+	end
+	elements_total = #tablename;
+
+	page_total = math.ceil(elements_total/max_page_size);
+	if page_total < 1 then
+		page_total = 1;
+	end
+
+	if page_pos < page_total then
+		page_size = max_page_size;
+	else
+		page_size = elements_total - ((page_total - 1) * max_page_size);
+	end
+
+	if page_pos > page_total then
+		page_pos = page_total;
+	end
+
+	page_start = max_page_size * (page_pos - 1);
+	page_finish = page_start + page_size;
+end

@@ -6478,6 +6478,9 @@ ScriptHawk.bindKeyRealtime("V", Game.grabSelectedObject, true);
 ScriptHawk.bindKeyRealtime("B", Game.focusSelectedObject, true);
 ScriptHawk.bindKeyRealtime("C", switch_grab_script_mode, true);
 
+ScriptHawk.bindKeyRealtime("H", decrementPage, true);
+ScriptHawk.bindKeyRealtime("J", incrementPage, true);
+
 ------------------------------
 -- Grab Script              --
 -- Object Model 1 Functions --
@@ -6708,6 +6711,9 @@ local function drawGrabScriptUI()
 
 	gui.text(gui_x, gui_y + height * row, "Index: "..object_index.."/"..#object_pointers, nil, 'bottomright');
 	row = row + 1;
+	gui.text(gui_x, gui_y + height * row, "Page: "..(page_pos).."/"..(page_total), nil, 'bottomright');
+	row = row + 1;
+	row = row + 1;
 
 	if string.contains(grab_script_mode, "Model 1") then
 		local focusedActor = dereferencePointer(cameraObject + obj_model1.camera.focused_actor_pointer);
@@ -6750,7 +6756,9 @@ local function drawGrabScriptUI()
 				examine_data = getExamineDataArcade(object_pointers[object_index]);
 			end
 
-			for i = #examine_data, 1, -1 do
+			pagifyThis(examine_data,40);
+
+			for i = page_finish, page_start + 1, -1 do
 				if examine_data[i][1] ~= "Separator" then
 					if type(examine_data[i][2]) == "number" then
 						examine_data[i][2] = round(examine_data[i][2], precision);
@@ -6765,7 +6773,8 @@ local function drawGrabScriptUI()
 
 		if grab_script_mode == "List (Object Model 1)" then
 			row = row + 1;
-			for i = #object_pointers, 1, -1 do
+			pagifyThis(object_pointers,40);
+			for i = page_finish, page_start + 1, -1 do
 				local currentActorSize = mainmemory.read_u32_be(object_pointers[i] + heap.object_size); -- TODO: Got an exception here while kiosk was booting
 				local color = nil;
 				if object_index == i then
@@ -6781,7 +6790,8 @@ local function drawGrabScriptUI()
 		end
 
 		if grab_script_mode == "List (Object Model 2)" then
-			for i = #object_pointers, 1, -1 do
+			pagifyThis(object_pointers,40);
+			for i = page_finish, page_start + 1, -1 do
 				local behaviorPointer = dereferencePointer(object_pointers[i] + obj_model2.behavior_pointer);
 				local behaviorType = " "..getScriptName(object_pointers[i]);
 				local collectableState = mainmemory.readbyte(object_pointers[i] + obj_model2.collectable_state);
@@ -6808,7 +6818,8 @@ local function drawGrabScriptUI()
 		end
 
 		if grab_script_mode == "List (Arcade Objects)" then
-			for i = #object_pointers, 1, -1 do
+			pagifyThis(object_pointers,40);
+			for i = page_finish, page_start + 1, -1 do
 				local color = nil;
 				if object_index == i then
 					color = colors.green;
@@ -6824,7 +6835,8 @@ local function drawGrabScriptUI()
 		end
 		
 		if grab_script_mode == "List (Loading Zones)" then
-			for i = #object_pointers, 1, -1 do
+			pagifyThis(object_pointers,40);
+			for i = page_finish, page_start + 1, -1 do
 				local color = nil;
 				if object_index == i then
 					color = colors.green;
@@ -6860,7 +6872,8 @@ local function drawGrabScriptUI()
 		end
 
 		if grab_script_mode == "Chunks" then
-			for i = #object_pointers, 1, -1 do
+			pagifyThis(object_pointers,40);
+			for i = page_finish, page_start + 1, -1 do
 				local color = nil;
 				if object_index == i then
 					color = colors.green;
@@ -6876,7 +6889,8 @@ local function drawGrabScriptUI()
 		end
 
 		if grab_script_mode == "Exits" then
-			for i = #object_pointers, 1, -1 do
+			pagifyThis(object_pointers,40);
+			for i = page_finish, page_start + 1, -1 do
 				local exitBase = object_pointers[i];
 				local color = nil;
 				if object_index == i then
@@ -6891,7 +6905,8 @@ local function drawGrabScriptUI()
 		end
 
 		if grab_script_mode == "Enemies" then
-			for i = #object_pointers, 1, -1 do
+			pagifyThis(object_pointers,40);
+			for i = page_finish, page_start + 1, -1 do
 				local slotBase = object_pointers[i];
 				local enemyData = Game.getEnemyData(slotBase);
 				local color = nil;
