@@ -1,0 +1,12 @@
+SystemID SMS
+0B7A	w	u	0	Main RAM	X Position
+0B7C	w	u	0	Main RAM	Y Position
+0DD9	w	u	0	Main RAM	Screen X
+0DDB	w	u	0	Main RAM	Screen Y
+10A2	b	u	0	Main RAM	Gun Type
+1240	b	u	0	Main RAM	Level 1 House Health
+1241	b	u	0	Main RAM	Level 1 Tree Health
+138D	b	u	0	Main RAM	Level 1 Boss Health
+139C	b	u	0	Main RAM	Bombs
+13B2	b	u	0	Main RAM	Health
+

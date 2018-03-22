@@ -444,6 +444,9 @@ local supportedGames = {
 	["41FDB879AB422EC158B4EAFEA69087F255EA8589"] = {moduleName="games.mm", friendlyName="Zelda no Densetsu - Mujura no Kamen (Japan) (Rev A)"},
 	["5FB2301AACBF85278AF30DCA3E4194AD48599E36"] = {moduleName="games.mm", friendlyName="Zelda no Densetsu - Mujura no Kamen (Japan)"},
 
+	-- Mercs
+	["7D5696C3DA0DBED04B35543F7BDBEF40"] = {moduleName="games.mercs_sms", friendlyName="Mercs (E)"},
+
 	-- Metroid
 	["166A5B1344B17F98B6B18794094F745F8A7435B8"] = {moduleName="games.metroid", friendlyName="Metroid (U)"},
 	["FDBFC7871962F72A1EF57E5A7E456164FB93430B"] = {moduleName="games.metroid", friendlyName="Metroid (U)"},

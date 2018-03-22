@@ -115,6 +115,7 @@ While ScriptHawk does have basic support for OoT and MM there are people who are
 - Golvellius (SMS)
 - Impossible Mission (SMS)
 - Lord of the Sword (SMS)
+- Mercs (SMS)
 - Metroid (NES)
 - Penguin Land (SMS)
 - Psycho Fox (SMS)
