@@ -3,6 +3,7 @@ SystemID SMS
 0B7C	w	u	0	Main RAM	Y Position
 0DD9	w	u	0	Main RAM	Screen X
 0DDB	w	u	0	Main RAM	Screen Y
+0F9C	b	u	0	Main RAM	Mission
 10A2	b	u	0	Main RAM	Gun Type
 1240	b	u	0	Main RAM	Level 1 House Health
 1241	b	u	0	Main RAM	Level 1 Tree Health

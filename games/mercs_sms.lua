@@ -16,6 +16,7 @@ local Game = {
 		health = 0x13B2,
 		screen_x = 0xDD9,
 		screen_y = 0xDDB,
+		mission = 0xF9C,
 	},
 	guns = {
 		["Machine Gun 1"] = 0,
@@ -94,6 +95,7 @@ object = {
 	array_start = 0xA00,
 	array_end = 0xC31,
 	size = 0x21,
+	active = 0x09, -- byte?
 	x_position = 0x0F, -- u16_le
 	y_position = 0x11, -- u16_le
 };
@@ -112,7 +114,9 @@ function Game.getHitboxes()
 			width = 16,
 			height = 16;
 		};
-		table.insert(hitboxes, hitbox);
+		if mainmemory.readbyte(i + object.active) > 0 then
+			table.insert(hitboxes, hitbox);
+		end
 	end
 	return hitboxes;
 end
@@ -122,11 +126,66 @@ function Game.setHitboxPosition(hitbox, x, y)
 	mainmemory.write_u16_le(hitbox.dragTag + object.y_position, y);
 end
 
+----[[
 function Game.getHitboxListText(hitbox)
 	return hitbox.x..", "..hitbox.y.." - "..toHexString(hitbox.dragTag);
 end
+--]]
+
+--[[
+function Game.getHitboxListText(hitbox)
+	local byteString = "";
+	for i = 0, object.size - 1 do
+		if i < 0x0F or i > 0x12 then
+			byteString = byteString..toHexString(mainmemory.readbyte(hitbox.dragTag + i), 2, "");
+		end
+	end
+	return hitbox.x..", "..hitbox.y.." - "..byteString.." - "..toHexString(hitbox.dragTag);
+end
+--]]
+
+local lagFrameLog = {};
+local lagCountEvery1000 = {};
+local lagCount = 0;
+
+function Game.eachFrame()
+	local currentFrame = emu.framecount();
+	local consecutiveLag = 0;
+	lagFrameLog[currentFrame] = emu.islagged();
+	lagCount = 0;
+	local firstFrame = 0;
+	for i = math.floor(currentFrame / 1000) * 1000, 0, -1000 do
+		if lagCountEvery1000[i] then
+			lagCount = lagCountEvery1000[i].lagCount;
+			consecutiveLag = lagCountEvery1000[i].consecutiveLag;
+			firstFrame = i;
+			break;
+		end
+	end
+	for i = firstFrame, currentFrame do
+		if lagFrameLog[i] then
+			consecutiveLag = consecutiveLag + 1;
+			if consecutiveLag > 3 then
+				lagCount = lagCount + 1;
+			end
+		else
+			consecutiveLag = 0;
+		end
+	end
+	if currentFrame % 1000 == 0 then
+		lagCountEvery1000[currentFrame] = {
+			lagCount = lagCount,
+			consecutiveLag = consecutiveLag,
+		};
+	end
+end
+
+function Game.getLagCount()
+	return lagCount;
+end
 
 Game.OSD = {
+	{"Lag", Game.getLagCount},
 	{"Gun", Game.getGun},
 	{"Time", Game.getTime},
 	{"Health", Game.getHealth},
