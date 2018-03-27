@@ -414,7 +414,7 @@ local Game = {
 };
 
 function Game.getCurrentMode()
-	local modeValue = mainmemory.readbyte(Game.Memory.mode[version]);
+	local modeValue = mainmemory.readbyte(Game.Memory.mode);
 	if Game.modes[modeValue] ~= nil then
 		return Game.modes[modeValue];
 	end
@@ -423,29 +423,29 @@ end
 
 -- Don't trust anything on the heap if this is true
 function Game.isLoading()
-	return mainmemory.read_u32_be(Game.Memory.obj_model2_timer[version]) == 0;
+	return mainmemory.read_u32_be(Game.Memory.obj_model2_timer) == 0;
 end
 
 function Game.getCutsceneIndex()
-	return mainmemory.read_u16_be(Game.Memory.cutscene[version]);
+	return mainmemory.read_u16_be(Game.Memory.cutscene);
 end
 
 function Game.getNumberOfCutscenes()
-	return mainmemory.read_u16_be(Game.Memory.number_of_cutscenes[version]);
+	return mainmemory.read_u16_be(Game.Memory.number_of_cutscenes);
 end
 
 function Game.getCutsceneOSD()
-	if mainmemory.readbyte(Game.Memory.cutscene_active[version]) == 0 then
+	if mainmemory.readbyte(Game.Memory.cutscene_active) == 0 then
 		return "None";
 	end
 	local numberOfCutscenes = Game.getNumberOfCutscenes() - 1;
 	if numberOfCutscenes == -1 then
 		numberOfCutscenes = "None";
 	end
-	local cutsceneType = dereferencePointer(Game.Memory.cutscene_type[version]);
-	if cutsceneType == Game.Memory.cutscene_type_kong[version] then
+	local cutsceneType = dereferencePointer(Game.Memory.cutscene_type);
+	if cutsceneType == Game.Memory.cutscene_type_kong then
 		return Game.getCutsceneIndex().." (Kong)";
-	elseif cutsceneType == Game.Memory.cutscene_type_map[version] then
+	elseif cutsceneType == Game.Memory.cutscene_type_map then
 		return Game.getCutsceneIndex().."/"..numberOfCutscenes.." (Map)";
 	else
 		return Game.getCutsceneIndex().." (Unknown Type: "..toHexString(cutsceneType)..")";
@@ -523,7 +523,7 @@ end
 
 function Game.getJumpman()
 	for i = 0, arcade_object.count - 1 do
-		local objectBase = Game.Memory.arcade_object_base[version] + (i * arcade_object.size);
+		local objectBase = Game.Memory.arcade_object_base + (i * arcade_object.size);
 		if mainmemory.readbyte(objectBase + arcade_object.object_type) == 0x0D then
 			return objectBase;
 		end
@@ -604,7 +604,7 @@ local function drawSubGameHitboxes()
 
 	if map_value == arcade_map then
 		for i = 0, arcade_object.count - 1 do
-			local objectBase = Game.Memory.arcade_object_base[version] + (i * arcade_object.size);
+			local objectBase = Game.Memory.arcade_object_base + (i * arcade_object.size);
 			table.insert(draggableObjects, arcadeObjectBaseToDraggableObject(objectBase));
 		end
 	end
@@ -612,7 +612,7 @@ local function drawSubGameHitboxes()
 	if map_value == jetpac_map then
 		-- Objects
 		for i = 0, 4 do
-			local objectBase = Game.Memory.jetpac_object_base[version] + i * 0x4C;
+			local objectBase = Game.Memory.jetpac_object_base + i * 0x4C;
 			if i == 4 then
 				objectBase = objectBase + 4;
 			end
@@ -620,11 +620,11 @@ local function drawSubGameHitboxes()
 		end
 		-- Enemies
 		for i = 0, 9 do
-			local objectBase = Game.Memory.jetpac_enemy_base[version] + i * 0x50;
+			local objectBase = Game.Memory.jetpac_enemy_base + i * 0x50;
 			table.insert(draggableObjects, jetpacObjectBaseToDraggableObject(objectBase));
 		end
 		-- Player
-		table.insert(draggableObjects, jetpacObjectBaseToDraggableObject(Game.Memory.jetman_position_x[version]));
+		table.insert(draggableObjects, jetpacObjectBaseToDraggableObject(Game.Memory.jetman_position_x));
 	end
 
 	for i = 1, #draggableObjects do
@@ -662,11 +662,11 @@ end
 
 function getSubgameLevel()
 	if map_value == arcade_map then
-		arcade_level = mainmemory.readbyte(Game.Memory.arcade_level[version]);
+		arcade_level = mainmemory.readbyte(Game.Memory.arcade_level);
 		arcade_level_osd = ((math.fmod(arcade_level,3) + 1) * 25).."m ("..math.floor(arcade_level / 4)..")";
 		return arcade_level_osd;
 	elseif map_value == jetpac_map then
-		jetpac_level = mainmemory.readbyte(Game.Memory.jetpac_level[version]);
+		jetpac_level = mainmemory.readbyte(Game.Memory.jetpac_level);
 		return jetpac_level;
 	end
 	return 0;
@@ -693,7 +693,7 @@ end
 
 function jetpacTakeMeThere(level)
 	if map_value == jetpac_map then
-		mainmemory.writebyte(Game.Memory.jetpac_level[version], level);
+		mainmemory.writebyte(Game.Memory.jetpac_level, level);
 	end
 end
 
@@ -780,8 +780,8 @@ local levelIndexes = {
 };
 
 function Game.getMaxStandardAmmo()
-	local kong = mainmemory.readbyte(Game.Memory.character[version]);
-	local ammoBelt = mainmemory.readbyte(Game.Memory.kong_base[version] + (kong * Game.Memory.kong_size[version]) + ammo_belt);
+	local kong = mainmemory.readbyte(Game.Memory.character);
+	local ammoBelt = mainmemory.readbyte(Game.Memory.kong_base + (kong * Game.Memory.kong_size) + ammo_belt);
 	return ((2 ^ ammoBelt) * 100) / 2;
 end
 Game.getMaxHomingAmmo = Game.getMaxStandardAmmo;
@@ -800,7 +800,7 @@ local heap = {
 
 -- Theoretical max is 255 actors, but the game crashes well before that limit
 local function getObjectModel1Count()
-	return math.min(255, mainmemory.read_u16_be(Game.Memory.actor_count[version]));
+	return math.min(255, mainmemory.read_u16_be(Game.Memory.actor_count));
 end
 
 -- Relative to Model 1 Objects
@@ -1604,7 +1604,7 @@ function Game.getPlayerObject() -- TODO: Cache this
 	if Game.isLoading() then
 		return;
 	end
-	return dereferencePointer(Game.Memory.player_pointer[version]);
+	return dereferencePointer(Game.Memory.player_pointer);
 end
 
 local function setObjectModel1Position(pointer, x, y, z)
@@ -2631,9 +2631,9 @@ obj_model2 = {
 
 local function getObjectModel2Array()
 	if version ~= 4 then
-		return dereferencePointer(Game.Memory.obj_model2_array_pointer[version]);
+		return dereferencePointer(Game.Memory.obj_model2_array_pointer);
 	end
-	return Game.Memory.obj_model2_array_pointer[version]; -- Kiosk doesn't move
+	return Game.Memory.obj_model2_array_pointer; -- Kiosk doesn't move
 end
 
 local function getObjectModel2ArraySize()
@@ -2664,7 +2664,7 @@ local function populateObjectModel2Pointers()
 	object_pointers = {};
 	local objModel2Array = getObjectModel2Array();
 	if isRDRAM(objModel2Array) then
-		local numSlots = mainmemory.read_u32_be(Game.Memory.obj_model2_array_count[version]);
+		local numSlots = mainmemory.read_u32_be(Game.Memory.obj_model2_array_count);
 
 		if object_model2_filter == nil then
 			-- Fill and sort pointer list
@@ -2842,7 +2842,7 @@ local function getExamineDataModelTwo(pointer)
 		local currentMap = Game.getMap();
 		local behaviorID = mainmemory.read_u16_be(pointer + 0x8A);
 		for i = 0, 0x70 do -- 0xA5 for extra cs etc flags
-			local base = Game.Memory.flag_mapping[version] + i * 8;
+			local base = Game.Memory.flag_mapping + i * 8;
 			local map = mainmemory.readbyte(base + 0);
 			if map == currentMap then
 				local id = mainmemory.read_u16_be(base + 2);
@@ -2911,28 +2911,28 @@ end
 
 function getExamineDataArcade(pointer)
 	local examine_data = {};
-	
+
 	local xPos = mainmemory.readfloat(pointer + arcade_object.x_position, true);
 	local yPos = mainmemory.readfloat(pointer + arcade_object.y_position, true);
 	local xVel = mainmemory.readfloat(pointer + arcade_object.x_velocity, true);
 	local yVel = mainmemory.readfloat(pointer + arcade_object.y_velocity, true);
-	
+
 	table.insert(examine_data, { "Slot base", toHexString(pointer, 6) });
 	table.insert(examine_data, { "Object Type", getArcadeObjectNameOSD(mainmemory.readbyte(pointer + arcade_object.object_type)) });
 	table.insert(examine_data, { "Object Type", mainmemory.readbyte(pointer + arcade_object.object_type) });
 	table.insert(examine_data, { "Separator", 1 });
-	
+
 	table.insert(examine_data, { "X", xPos });
 	table.insert(examine_data, { "Y", yPos });
 	table.insert(examine_data, { "Separator", 1 });
-	
+
 	table.insert(examine_data, { "X Velocity", xVel });
 	table.insert(examine_data, { "Y Velocity", yVel });
 	table.insert(examine_data, { "Separator", 1 });
-	
+
 	table.insert(examine_data, { "Object Movement", mainmemory.readbyte(pointer + arcade_object.movement) });
 	table.insert(examine_data, { "Object Size", mainmemory.readbyte(pointer + arcade_object.size) });
-	
+
 	return examine_data;
 end
 --------------------------------
@@ -2940,7 +2940,7 @@ end
 --------------------------------
 
 function Game.getLoadingZoneArray()
-	return dereferencePointer(Game.Memory.loading_zone_array[version]);
+	return dereferencePointer(Game.Memory.loading_zone_array);
 end
 
 local loading_zone_size = 0x3A;
@@ -3012,7 +3012,7 @@ local function populateLoadingZonePointers()
 	object_pointers = {};
 	local loadingZoneArray = Game.getLoadingZoneArray();
 	if isRDRAM(loadingZoneArray) then
-		local arraySize = mainmemory.read_u16_be(Game.Memory.loading_zone_array_size[version]);
+		local arraySize = mainmemory.read_u16_be(Game.Memory.loading_zone_array_size);
 		for i = 0, arraySize - 1 do
 			table.insert(object_pointers, loadingZoneArray + (i * loading_zone_size));
 		end
@@ -3025,7 +3025,7 @@ end
 function dumpLoadingZones()
 	local loadingZoneArray = Game.getLoadingZoneArray();
 	if isRDRAM(loadingZoneArray) then
-		local arraySize = mainmemory.read_u16_be(Game.Memory.loading_zone_array_size[version]);
+		local arraySize = mainmemory.read_u16_be(Game.Memory.loading_zone_array_size);
 		for i = 0, arraySize do
 			local base = loadingZoneArray + (i * loading_zone_size);
 
@@ -3061,7 +3061,7 @@ end
 function dumpModel2Positions()
 	local objModel2Array = getObjectModel2Array();
 	if isRDRAM(objModel2Array) then
-		local numSlots = mainmemory.read_u32_be(Game.Memory.obj_model2_array_count[version]);
+		local numSlots = mainmemory.read_u32_be(Game.Memory.obj_model2_array_count);
 		local scriptName, slotBase;
 		local xPos, yPos, zPos;
 		-- Fill and sort pointer list
@@ -3097,7 +3097,7 @@ local model2Setup = {
 
 function dumpSetup(hideKnown)
 	hideKnown = hideKnown or false;
-	local setupFile = dereferencePointer(Game.Memory.obj_model2_setup_pointer[version]);
+	local setupFile = dereferencePointer(Game.Memory.obj_model2_setup_pointer);
 	if isRDRAM(setupFile) then
 		dprint("Dumping setup for Object Model 2...");
 		local model2Count = mainmemory.read_u32_be(setupFile);
@@ -3788,6 +3788,11 @@ function Game.detectVersion(romName, romHash)
 		flag_names = {"None"};
 	end
 
+	-- Squish Game.Memory tables down to a single int for the relevant version
+	for k, v in pairs(Game.Memory) do
+		Game.Memory[k] = v[version];
+	end
+
 	return true;
 end
 
@@ -3795,7 +3800,7 @@ function Game.getFileIndex()
 	if version == 4 then
 		return 0;
 	end
-	return mainmemory.readbyte(Game.Memory.file[version]);
+	return mainmemory.readbyte(Game.Memory.file);
 end
 
 function Game.getCurrentEEPROMSlot()
@@ -3804,7 +3809,7 @@ function Game.getCurrentEEPROMSlot()
 	end
 	local fileIndex = Game.getFileIndex();
 	for i = 0, 3 do
-		local EEPROMMap = mainmemory.readbyte(Game.Memory.eeprom_file_mapping[version] + i);
+		local EEPROMMap = mainmemory.readbyte(Game.Memory.eeprom_file_mapping + i);
 		if EEPROMMap == fileIndex then
 			return i;
 		end
@@ -3817,7 +3822,7 @@ function Game.getFileOSD()
 end
 
 function Game.getFlagBlockAddress()
-	return Game.Memory.eeprom_copy_base[version] + Game.getCurrentEEPROMSlot() * eeprom_slot_size;
+	return Game.Memory.eeprom_copy_base + Game.getCurrentEEPROMSlot() * eeprom_slot_size;
 end
 
 ----------------
@@ -4295,7 +4300,7 @@ end
 
 function dumpFlagMapping()
 	for i = 0, 0xA5 do -- 0x70 for model 2 flags only
-		local base = Game.Memory.flag_mapping[version] + i * 8;
+		local base = Game.Memory.flag_mapping + i * 8;
 		local map = mainmemory.readbyte(base + 0);
 		local id = mainmemory.read_u16_be(base + 2);
 		local flagIndex = mainmemory.read_u16_be(base + 4);
@@ -4366,7 +4371,7 @@ local dynamicWaterSurface = {
 };
 
 function dumpWaterSurfaces()
-	local waterSurface = dereferencePointer(Game.Memory.water_surface_list[version]);
+	local waterSurface = dereferencePointer(Game.Memory.water_surface_list);
 	if isRDRAM(waterSurface) then
 		while isRDRAM(waterSurface) do
 			local t1Str = mainmemory.read_u32_be(waterSurface + dynamicWaterSurface.timer_1[version])..", ";
@@ -4422,7 +4427,7 @@ chunk = {
 };
 
 function Game.getChunkArray()
-	return dereferencePointer(Game.Memory.chunk_array_pointer[version]);
+	return dereferencePointer(Game.Memory.chunk_array_pointer);
 end
 
 function Game.fixChunkDeload()
@@ -4491,11 +4496,11 @@ function Game.getExitData(exitBase)
 end
 
 function Game.getDestinationExit()
-	return mainmemory.read_u32_be(Game.Memory.destination_exit[version]);
+	return mainmemory.read_u32_be(Game.Memory.destination_exit);
 end
 
 function Game.getNumberOfExits()
-	return mainmemory.readbyte(Game.Memory.number_of_exits[version]);
+	return mainmemory.readbyte(Game.Memory.number_of_exits);
 end
 
 function Game.getExitOSD()
@@ -4503,7 +4508,7 @@ function Game.getExitOSD()
 end
 
 function dumpExits()
-	local exitArray = dereferencePointer(Game.Memory.exit_array_pointer[version]);
+	local exitArray = dereferencePointer(Game.Memory.exit_array_pointer);
 	local numberOfExits = Game.getNumberOfExits();
 	if isRDRAM(exitArray) then
 		for i = 0, numberOfExits - 1 do
@@ -4516,7 +4521,7 @@ function dumpExits()
 end
 
 local function populateExitPointers()
-	local exitArray = dereferencePointer(Game.Memory.exit_array_pointer[version]);
+	local exitArray = dereferencePointer(Game.Memory.exit_array_pointer);
 	object_pointers = {};
 	if isRDRAM(exitArray) then
 		local numberOfExits = Game.getNumberOfExits();
@@ -4529,8 +4534,8 @@ end
 
 function dumpEnemyTypes()
 	dprint("Index,Address,Behavior,Model,Behavior Name,Model Name,");
-	for i = 0, Game.Memory.num_enemy_types[version] do
-		local base = Game.Memory.enemy_table[version] + i * Game.Memory.enemy_type_size[version];
+	for i = 0, Game.Memory.num_enemy_types do
+		local base = Game.Memory.enemy_table + i * Game.Memory.enemy_type_size;
 		local behavior = mainmemory.read_u16_be(base);
 		local model = mainmemory.read_u16_be(base + 2);
 		dprint(toHexString(i)..","..toHexString(base)..","..toHexString(behavior, 4)..","..toHexString(model, 4)..","..getActorNameFromBehavior(behavior)..","..getModelNameFromModelIndex(model)..",");
@@ -4539,14 +4544,14 @@ function dumpEnemyTypes()
 end
 
 function everyEnemyIs(index)
-	local enemyTypeSize = Game.Memory.enemy_type_size[version];
+	local enemyTypeSize = Game.Memory.enemy_type_size;
 	local chosenSlotData = {};
-	local chosenSlotBase = Game.Memory.enemy_table[version] + index * enemyTypeSize;
+	local chosenSlotBase = Game.Memory.enemy_table + index * enemyTypeSize;
 	for i = 0, enemyTypeSize - 1 do
 		chosenSlotData[i] = mainmemory.readbyte(chosenSlotBase + i);
 	end
-	for i = 0, Game.Memory.num_enemy_types[version] do
-		local base = Game.Memory.enemy_table[version] + i * enemyTypeSize;
+	for i = 0, Game.Memory.num_enemy_types do
+		local base = Game.Memory.enemy_table + i * enemyTypeSize;
 		for j = 0, enemyTypeSize - 1 do
 			mainmemory.writebyte(base + j, chosenSlotData[j]);
 		end
@@ -4560,12 +4565,12 @@ function replaceModels(index)
 		max_index = 0x1B;
 	end
 	for i = 0, max_index do
-		mainmemory.write_u16_be(Game.Memory.cutscene_model_table[version] + i * 2, index);
+		mainmemory.write_u16_be(Game.Memory.cutscene_model_table + i * 2, index);
 	end
 
 	-- Enemy
-	for i = 0, Game.Memory.num_enemy_types[version] do
-		local base = Game.Memory.enemy_table[version] + i * Game.Memory.enemy_type_size[version];
+	for i = 0, Game.Memory.num_enemy_types do
+		local base = Game.Memory.enemy_table + i * Game.Memory.enemy_type_size;
 		local model = mainmemory.write_u16_be(base + 2, index);
 	end
 
@@ -4575,7 +4580,7 @@ function replaceModels(index)
 		max_index = 110;
 	end
 	for i = 0, max_index do
-		local base = Game.Memory.object_spawn_table[version] + i * 0x30;
+		local base = Game.Memory.object_spawn_table + i * 0x30;
 		local model = mainmemory.write_u16_be(base + 0x02, index);
 	end
 end
@@ -4587,7 +4592,7 @@ function dumpCutsceneModelTable()
 	end
 	dprint("Index,Address,Model,Model Name");
 	for i = 0, max_index do
-		local base = Game.Memory.cutscene_model_table[version] + i * 2;
+		local base = Game.Memory.cutscene_model_table + i * 2;
 		local model = mainmemory.read_u16_be(base);
 		dprint(i..","..toHexString(base, 6)..","..toHexString(model, 4)..","..getModelNameFromModelIndex(model));
 	end
@@ -4595,7 +4600,7 @@ function dumpCutsceneModelTable()
 end
 
 function getModelNameFromCutsceneIndex(index)
-	local modelIndex = mainmemory.read_u16_be(Game.Memory.cutscene_model_table[version] + index * 2);
+	local modelIndex = mainmemory.read_u16_be(Game.Memory.cutscene_model_table + index * 2);
 	return getModelNameFromModelIndex(modelIndex);
 end
 
@@ -4604,7 +4609,7 @@ function getBehaviorNameFromEnemyIndex(index)
 	if version == 4 then
 		enemyTypeSize = 0x1C;
 	end
-	local behaviorIndex = mainmemory.read_u16_be(Game.Memory.enemy_table[version] + index * enemyTypeSize);
+	local behaviorIndex = mainmemory.read_u16_be(Game.Memory.enemy_table + index * enemyTypeSize);
 	return getActorNameFromBehavior(behaviorIndex);
 end
 
@@ -4627,13 +4632,13 @@ function Game.getEnemyData(slotBase)
 end
 
 function dumpEnemies()
-	local enemyRespawnObject = dereferencePointer(Game.Memory.enemy_respawn_object[version]);
+	local enemyRespawnObject = dereferencePointer(Game.Memory.enemy_respawn_object);
 	local enemySlotSize = 0x48;
 	if version == 4 then
 		enemySlotSize = 0x44;
 	end
 	if isRDRAM(enemyRespawnObject) then
-		local numberOfEnemies = mainmemory.read_u16_be(Game.Memory.num_enemies[version]);
+		local numberOfEnemies = mainmemory.read_u16_be(Game.Memory.num_enemies);
 		for i = 1, numberOfEnemies do
 			local slotBase = enemyRespawnObject + (i - 1) * enemySlotSize;
 			local enemyData = Game.getEnemyData(slotBase);
@@ -4644,14 +4649,14 @@ function dumpEnemies()
 end
 
 function Game.populateEnemyPointers()
-	local enemyRespawnObject = dereferencePointer(Game.Memory.enemy_respawn_object[version]);
+	local enemyRespawnObject = dereferencePointer(Game.Memory.enemy_respawn_object);
 	local enemySlotSize = 0x48;
 	if version == 4 then
 		enemySlotSize = 0x44;
 	end
 	object_pointers = {};
 	if isRDRAM(enemyRespawnObject) then
-		local numberOfEnemies = mainmemory.read_u16_be(Game.Memory.num_enemies[version]);
+		local numberOfEnemies = mainmemory.read_u16_be(Game.Memory.num_enemies);
 		for i = 1, numberOfEnemies do
 			local slotBase = enemyRespawnObject + (i - 1) * enemySlotSize;
 			table.insert(object_pointers, slotBase);
@@ -4664,7 +4669,7 @@ function dumpEnemyDrops()
 	local index = -1;
 	repeat
 		index = index + 1;
-		local objectBase = Game.Memory.enemy_drop_table[version] + index * 0x06;
+		local objectBase = Game.Memory.enemy_drop_table + index * 0x06;
 		object = mainmemory.read_u16_be(objectBase);
 		if object ~= 0 then
 			local droppedObject = mainmemory.read_u16_be(objectBase + 0x02);
@@ -4681,7 +4686,7 @@ function everyEnemyDrops(actorType, count, music)
 	local index = -1;
 	repeat
 		index = index + 1;
-		local objectBase = Game.Memory.enemy_drop_table[version] + index * 0x06;
+		local objectBase = Game.Memory.enemy_drop_table + index * 0x06;
 		object = mainmemory.read_u16_be(objectBase);
 		if object ~= 0 then
 			mainmemory.write_u16_be(objectBase + 0x02, actorType);
@@ -4698,7 +4703,7 @@ function dumpObjectSpawnTable()
 		max_index = 110;
 	end
 	for i = 0, max_index do
-		local base = Game.Memory.object_spawn_table[version] + i * 0x30;
+		local base = Game.Memory.object_spawn_table + i * 0x30;
 		local behavior = mainmemory.read_u16_be(base + 0x00);
 		local model = mainmemory.read_u16_be(base + 0x02);
 		local name = getActorNameFromBehavior(behavior);
@@ -4715,9 +4720,13 @@ end
 
 function populateArcadeObjects()
 	object_pointers = {};
-	
+
+	if version == 4 then
+		return;
+	end
+
 	for i = 0, arcade_object.count - 1 do
-		local objectBase = Game.Memory.arcade_object_base[version] + (i * arcade_object.size);
+		local objectBase = Game.Memory.arcade_object_base + (i * arcade_object.size);
 		if mainmemory.readbyte(objectBase + arcade_object.object_type) > 0 and map_value == arcade_map then
 			table.insert(object_pointers, objectBase);
 		end
@@ -4756,7 +4765,7 @@ function Game.getDistanceFromFloor()
 end
 
 function Game.getCameraState()
-	local cameraObject = dereferencePointer(Game.Memory.camera_pointer[version]);
+	local cameraObject = dereferencePointer(Game.Memory.camera_pointer);
 	local cameraState = "Unknown";
 	if isRDRAM(cameraObject) then
 		cameraState = mainmemory.readbyte(cameraObject + obj_model1.camera.state_type);
@@ -4909,7 +4918,7 @@ function Game.getXPosition()
 			return mainmemory.readfloat(jumpman + arcade_object.x_position, true);
 		end
 	elseif map_value == jetpac_map then
-		return mainmemory.readfloat(Game.Memory.jetman_position_x[version], true);
+		return mainmemory.readfloat(Game.Memory.jetman_position_x, true);
 	end
 	local playerObject = Game.getPlayerObject();
 	if isRDRAM(playerObject) then
@@ -4925,7 +4934,7 @@ function Game.getYPosition()
 			return mainmemory.readfloat(jumpman + arcade_object.y_position, true);
 		end
 	elseif map_value == jetpac_map then
-		return mainmemory.readfloat(Game.Memory.jetman_position_y[version], true);
+		return mainmemory.readfloat(Game.Memory.jetman_position_y, true);
 	end
 	local playerObject = Game.getPlayerObject();
 	if isRDRAM(playerObject) then
@@ -4953,7 +4962,7 @@ function Game.setXPosition(value)
 		end
 		--]]
 	elseif map_value == jetpac_map then
-		--mainmemory.writefloat(Game.Memory.jetman_position_x[version], value, true);
+		--mainmemory.writefloat(Game.Memory.jetman_position_x, value, true);
 	else
 		local playerObject = Game.getPlayerObject();
 		if isRDRAM(playerObject) then
@@ -4977,7 +4986,7 @@ function Game.setYPosition(value)
 		end
 		--]]
 	elseif map_value == jetpac_map then
-		--mainmemory.writefloat(Game.Memory.jetman_position_y[version], value, true);
+		--mainmemory.writefloat(Game.Memory.jetman_position_y, value, true);
 	else
 		local playerObject = Game.getPlayerObject();
 		if isRDRAM(playerObject) then
@@ -5212,7 +5221,7 @@ function Game.getVelocity()
 			return mainmemory.readfloat(jumpman + arcade_object.x_velocity, true);
 		end
 	elseif map_value == jetpac_map then
-		return mainmemory.readfloat(Game.Memory.jetman_velocity_x[version], true);
+		return mainmemory.readfloat(Game.Memory.jetman_velocity_x, true);
 	elseif isRDRAM(playerObject) then
 		return mainmemory.readfloat(playerObject + obj_model1.velocity, true);
 	end
@@ -5229,7 +5238,7 @@ function Game.setVelocity(value)
 		end
 		--]]
 	elseif map_value == jetpac_map then
-		mainmemory.writefloat(Game.Memory.jetman_velocity_x[version], value, true);
+		mainmemory.writefloat(Game.Memory.jetman_velocity_x, value, true);
 	elseif isRDRAM(playerObject) then
 		mainmemory.writefloat(playerObject + obj_model1.velocity, value, true);
 	end
@@ -5243,7 +5252,7 @@ function Game.getYVelocity()
 			return mainmemory.readfloat(jumpman + arcade_object.y_velocity, true);
 		end
 	elseif map_value == jetpac_map then
-		return mainmemory.readfloat(Game.Memory.jetman_velocity_y[version], true);
+		return mainmemory.readfloat(Game.Memory.jetman_velocity_y, true);
 	elseif isRDRAM(playerObject) then
 		return mainmemory.readfloat(playerObject + obj_model1.y_velocity, true);
 	end
@@ -5260,7 +5269,7 @@ function Game.setYVelocity(value)
 		end
 		--]]
 	elseif map_value == jetpac_map then
-		mainmemory.writefloat(Game.Memory.jetman_velocity_y[version], value, true);
+		mainmemory.writefloat(Game.Memory.jetman_velocity_y, value, true);
 	elseif isRDRAM(playerObject) then
 		mainmemory.writefloat(playerObject + obj_model1.y_velocity, value, true);
 	end
@@ -5310,30 +5319,30 @@ local function updateCurrentInvisify()
 end
 
 function Game.toggleTBVoid()
-	local tb_void_byte_val = mainmemory.readbyte(Game.Memory.tb_void_byte[version]);
+	local tb_void_byte_val = mainmemory.readbyte(Game.Memory.tb_void_byte);
 	tb_void_byte_val = toggle_bit(tb_void_byte_val, 4); -- Turn on the lights
 	tb_void_byte_val = toggle_bit(tb_void_byte_val, 5); -- Show Object Model 2 Objects
-	mainmemory.writebyte(Game.Memory.tb_void_byte[version], tb_void_byte_val);
+	mainmemory.writebyte(Game.Memory.tb_void_byte, tb_void_byte_val);
 end
 
 function Game.forcePause()
-	local voidByteValue = mainmemory.readbyte(Game.Memory.tb_void_byte[version]);
-	mainmemory.writebyte(Game.Memory.tb_void_byte[version], set_bit(voidByteValue, 0));
+	local voidByteValue = mainmemory.readbyte(Game.Memory.tb_void_byte);
+	mainmemory.writebyte(Game.Memory.tb_void_byte, set_bit(voidByteValue, 0));
 end
 
 function Game.forceZipper()
-	local voidByteValue = mainmemory.readbyte(Game.Memory.tb_void_byte[version] - 1);
-	mainmemory.writebyte(Game.Memory.tb_void_byte[version] - 1, set_bit(voidByteValue, 0));
+	local voidByteValue = mainmemory.readbyte(Game.Memory.tb_void_byte - 1);
+	mainmemory.writebyte(Game.Memory.tb_void_byte - 1, set_bit(voidByteValue, 0));
 end
 
 function Game.pauseCancel()
-	local pause_cancel_byte_val = mainmemory.readbyte(Game.Memory.tb_void_byte[version]);
-	mainmemory.writebyte(Game.Memory.tb_void_byte[version], set_bit(pause_cancel_byte_val, 6)); -- Gives Pause Cancel
+	local pause_cancel_byte_val = mainmemory.readbyte(Game.Memory.tb_void_byte);
+	mainmemory.writebyte(Game.Memory.tb_void_byte, set_bit(pause_cancel_byte_val, 6)); -- Gives Pause Cancel
 end
 
 function Game.gainControl()
 	local playerObject = Game.getPlayerObject();
-	local cameraObject = dereferencePointer(Game.Memory.camera_pointer[version]);
+	local cameraObject = dereferencePointer(Game.Memory.camera_pointer);
 	if isRDRAM(playerObject) then
 		local visibilityBitfieldValue = mainmemory.readbyte(playerObject + obj_model1.visibility);
 		mainmemory.writebyte(playerObject + obj_model1.visibility, set_bit(visibilityBitfieldValue, 2));
@@ -5349,16 +5358,16 @@ function Game.gainControl()
 			mainmemory.write_u32_be(cameraObject + obj_model1.camera.focused_vehicle_pointer_2, 0);
 		end
 	end
-	mainmemory.write_u16_be(Game.Memory.buttons_enabled_bitfield[version], 0xFFFF); -- Enable all buttons
-	mainmemory.writebyte(Game.Memory.joystick_enabled_x[version], 0xFF); -- Enable Joystick X axis
-	mainmemory.writebyte(Game.Memory.joystick_enabled_y[version], 0xFF); -- Enable Joystick X axis
-	mainmemory.writebyte(Game.Memory.map_state[version], 0x08); -- Patch map state byte to a value where the player has control, allows gaining control during death and some cutscenes
+	mainmemory.write_u16_be(Game.Memory.buttons_enabled_bitfield, 0xFFFF); -- Enable all buttons
+	mainmemory.writebyte(Game.Memory.joystick_enabled_x, 0xFF); -- Enable Joystick X axis
+	mainmemory.writebyte(Game.Memory.joystick_enabled_y, 0xFF); -- Enable Joystick X axis
+	mainmemory.writebyte(Game.Memory.map_state, 0x08); -- Patch map state byte to a value where the player has control, allows gaining control during death and some cutscenes
 end
 
 -- TODO: Fix the frame delay for this
 function Game.detonateLiveOranges()
 	for actorListIndex = 0, getObjectModel1Count() do
-		local pointer = dereferencePointer(Game.Memory.pointer_list[version] + (actorListIndex * 4));
+		local pointer = dereferencePointer(Game.Memory.pointer_list + (actorListIndex * 4));
 		if isRDRAM(pointer) then
 			local actorType = mainmemory.read_u32_be(pointer + obj_model1.actor_type);
 			if actorType == 41 then -- Orange
@@ -5473,7 +5482,7 @@ end
 
 local function getMadJack()
 	for object_no = 0, getObjectModel1Count() do
-		local pointer = dereferencePointer(Game.Memory.pointer_list[version] + (object_no * 4));
+		local pointer = dereferencePointer(Game.Memory.pointer_list + (object_no * 4));
 		if isRDRAM(pointer) and getActorName(pointer) == "Mad Jack" then
 			return pointer;
 		end
@@ -5584,7 +5593,7 @@ end
 --[[
 local function fixBoneDisplacement()
 	-- NOP out a cop0 status register write at the start of the updateBonePositions() function
-	mainmemory.write_u32_be(Game.Memory.bone_displacement_cop0_write[version], 0);
+	mainmemory.write_u32_be(Game.Memory.bone_displacement_cop0_write, 0);
 
 	-- Hacky, yes, but if we're using dynarec the patched code pages don't get marked as dirty
 	-- Quickest and easiest way around this is to save and reload a state
@@ -5714,7 +5723,7 @@ end
 
 local function displacementDetection()
 	for i = 0, getObjectModel1Count() do
-		local objectPointer = dereferencePointer(Game.Memory.pointer_list[version] + (i * 4));
+		local objectPointer = dereferencePointer(Game.Memory.pointer_list + (i * 4));
 		if isRDRAM(objectPointer) then
 			detectDisplacement(objectPointer);
 		end
@@ -5739,13 +5748,13 @@ end
 
 local function fixLag()
 	if version ~= 4 then -- TODO: Kiosk
-		local frames_real_value = mainmemory.read_u32_be(Game.Memory.frames_real[version]);
-		mainmemory.write_u32_be(Game.Memory.frames_lag[version], frames_real_value - lag_factor);
+		local frames_real_value = mainmemory.read_u32_be(Game.Memory.frames_real);
+		mainmemory.write_u32_be(Game.Memory.frames_lag, frames_real_value - lag_factor);
 	end
 end
 
 function Game.getLagFactor()
-	return mainmemory.read_u32_be(Game.Memory.lag_boost[version]);
+	return mainmemory.read_u32_be(Game.Memory.lag_boost);
 end
 
 moon_mode = "None";
@@ -5772,10 +5781,10 @@ function everythingIsKong(unsafe)
 	end
 
 	local kongNumBones = mainmemory.readbyte(kongSharedModel + obj_model1.model.num_bones);
-	local cameraObject = dereferencePointer(Game.Memory.camera_pointer[version]);
+	local cameraObject = dereferencePointer(Game.Memory.camera_pointer);
 
 	for actorListIndex = 0, getObjectModel1Count() do
-		local pointer = dereferencePointer(Game.Memory.pointer_list[version] + (actorListIndex * 4));
+		local pointer = dereferencePointer(Game.Memory.pointer_list + (actorListIndex * 4));
 		if isRDRAM(pointer) and (pointer ~= cameraObject) then
 			local modelPointer = dereferencePointer(pointer + obj_model1.model_pointer);
 			if isRDRAM(modelPointer) then
@@ -5817,10 +5826,10 @@ end
 
 function Game.paperMode()
 	local paper_thickness = 0.015;
-	local cameraObject = dereferencePointer(Game.Memory.camera_pointer[version]);
+	local cameraObject = dereferencePointer(Game.Memory.camera_pointer);
 
 	for actorListIndex = 0, getObjectModel1Count() do
-		local pointer = dereferencePointer(Game.Memory.pointer_list[version] + (actorListIndex * 4));
+		local pointer = dereferencePointer(Game.Memory.pointer_list + (actorListIndex * 4));
 
 		if isRDRAM(pointer) and pointer ~= cameraObject then
 			local objectRenderingParameters = dereferencePointer(pointer + obj_model1.rendering_parameters_pointer);
@@ -5910,12 +5919,12 @@ function back()
 end
 
 local function doBRB()
-	mainmemory.writebyte(Game.Memory.security_byte[version], 0x01);
+	mainmemory.writebyte(Game.Memory.security_byte, 0x01);
 	local messageLength = math.min(string.len(brb_message), 79); -- 79 bytes appears to be the maximum length we can write here without crashing
 	for i = 1, messageLength do
-		mainmemory.writebyte(Game.Memory.security_message[version] + i - 1, string.byte(brb_message, i));
+		mainmemory.writebyte(Game.Memory.security_message + i - 1, string.byte(brb_message, i));
 	end
-	mainmemory.writebyte(Game.Memory.security_message[version] + messageLength, 0x00);
+	mainmemory.writebyte(Game.Memory.security_message + messageLength, 0x00);
 end
 
 -------------------
@@ -5924,10 +5933,10 @@ end
 
 function setDKTV(message)
 	if version == 4 then -- Kiosk text is static
-		writeNullTerminatedString(Game.Memory.DKTV_pointer[version], message);
+		writeNullTerminatedString(Game.Memory.DKTV_pointer, message);
 		return;
 	end
-	local pointer = dereferencePointer(Game.Memory.DKTV_pointer[version]);
+	local pointer = dereferencePointer(Game.Memory.DKTV_pointer);
 	if isRDRAM(pointer) then
 		pointer = dereferencePointer(pointer + 0x04);
 		if isRDRAM(pointer) then
@@ -6092,7 +6101,7 @@ end
 function FTA.freeTradeObjectModel1(currentKong)
 	if currentKong >= DK and currentKong <= Chunky then
 		for object_no = 0, getObjectModel1Count() do
-			local pointer = dereferencePointer(Game.Memory.pointer_list[version] + (object_no * 4));
+			local pointer = dereferencePointer(Game.Memory.pointer_list + (object_no * 4));
 			if isRDRAM(pointer) then
 				local actorType = mainmemory.read_u32_be(pointer + obj_model1.actor_type);
 				if FTA.isKasplat(actorType) then
@@ -6123,7 +6132,7 @@ function FTA.fixSingleCollision(objectBase)
 end
 
 function FTA.freeTradeCollisionList()
-	local collisionLinkedListPointer = dereferencePointer(Game.Memory.obj_model2_collision_linked_list_pointer[version]);
+	local collisionLinkedListPointer = dereferencePointer(Game.Memory.obj_model2_collision_linked_list_pointer);
 	if isRDRAM(collisionLinkedListPointer) then
 		local collisionListObjectSize = mainmemory.read_u32_be(collisionLinkedListPointer + heap.object_size);
 		for i = 0, collisionListObjectSize - 4, 4 do
@@ -6143,7 +6152,7 @@ end
 
 function dumpCollisionTypes(kongFilter)
 	local kongCounts = {};
-	local collisionLinkedListPointer = dereferencePointer(Game.Memory.obj_model2_collision_linked_list_pointer[version]);
+	local collisionLinkedListPointer = dereferencePointer(Game.Memory.obj_model2_collision_linked_list_pointer);
 	if isRDRAM(collisionLinkedListPointer) then
 		local collisionListObjectSize = mainmemory.read_u32_be(collisionLinkedListPointer + heap.object_size);
 		for i = 0, collisionListObjectSize - 4, 4 do
@@ -6175,7 +6184,7 @@ function dumpCollisionTypes(kongFilter)
 end
 
 function replaceCollisionType(target, desired)
-	local collisionLinkedListPointer = dereferencePointer(Game.Memory.obj_model2_collision_linked_list_pointer[version]);
+	local collisionLinkedListPointer = dereferencePointer(Game.Memory.obj_model2_collision_linked_list_pointer);
 	if isRDRAM(collisionLinkedListPointer) then
 		local collisionListObjectSize = mainmemory.read_u32_be(collisionLinkedListPointer + heap.object_size);
 		for i = 0, collisionListObjectSize - 4, 4 do
@@ -6205,11 +6214,11 @@ function ohWrongnana(verbose)
 	--	return;
 	--end
 
-	local currentKong = mainmemory.readbyte(Game.Memory.character[version]);
+	local currentKong = mainmemory.readbyte(Game.Memory.character);
 
 	local objModel2Array = getObjectModel2Array();
 	if isRDRAM(objModel2Array) and currentKong >= DK and currentKong <= Chunky then
-		local numSlots = mainmemory.read_u32_be(Game.Memory.obj_model2_array_count[version]);
+		local numSlots = mainmemory.read_u32_be(Game.Memory.obj_model2_array_count);
 		local scriptName, slotBase, currentValue, activationScript, preceedingCommand;
 		-- Fill and sort pointer list
 		for i = 0, numSlots - 1 do
@@ -6328,11 +6337,11 @@ function fillFB()
 
 	local framebuffer_width = 320; -- Oddly enough it's the same size on PAL
 	local framebuffer_height = 240; -- Oddly enough it's the same size on PAL
-	local frameBufferLocation = dereferencePointer(Game.Memory.framebuffer_pointer[version]);
+	local frameBufferLocation = dereferencePointer(Game.Memory.framebuffer_pointer);
 	if isRDRAM(frameBufferLocation) then
 		replaceTextureRGBA5551(image_filename, frameBufferLocation, framebuffer_width, framebuffer_height);
 	end
-	frameBufferLocation = dereferencePointer(Game.Memory.framebuffer_pointer[version] + 4);
+	frameBufferLocation = dereferencePointer(Game.Memory.framebuffer_pointer + 4);
 	if isRDRAM(frameBufferLocation) then
 		replaceTextureRGBA5551(image_filename, frameBufferLocation, framebuffer_width, framebuffer_height);
 	end
@@ -6345,7 +6354,7 @@ function fillFBNative()
 		return;
 	end
 
-	local frameBufferLocation = dereferencePointer(Game.Memory.framebuffer_pointer[version]);
+	local frameBufferLocation = dereferencePointer(Game.Memory.framebuffer_pointer);
 	if isRDRAM(frameBufferLocation) then
 		local frameBuffer = frameBufferLocation;
 		local backBuffer = frameBufferLocation + 320 * 240 * 2;
@@ -6406,7 +6415,7 @@ function Game.grabSelectedObject()
 end
 
 function Game.focusObject(pointer) -- TODO: There's more pointers to set here, mainly vehicle stuff
-	local cameraObject = dereferencePointer(Game.Memory.camera_pointer[version]);
+	local cameraObject = dereferencePointer(Game.Memory.camera_pointer);
 	if isRDRAM(cameraObject) and isRDRAM(pointer) then
 		mainmemory.write_u32_be(cameraObject + obj_model1.camera.focused_actor_pointer, pointer + RDRAMBase);
 	end
@@ -6489,11 +6498,11 @@ ScriptHawk.bindKeyRealtime("J", incrementPage, true);
 local function populateObjectModel1Pointers()
 	object_pointers = {};
 	local playerObject = Game.getPlayerObject();
-	local cameraObject = dereferencePointer(Game.Memory.camera_pointer[version]);
+	local cameraObject = dereferencePointer(Game.Memory.camera_pointer);
 	if isRDRAM(playerObject) and isRDRAM(cameraObject) then
 		if encircle_enabled then
 			for object_no = 0, getObjectModel1Count() do
-				local pointer = dereferencePointer(Game.Memory.pointer_list[version] + (object_no * 4));
+				local pointer = dereferencePointer(Game.Memory.pointer_list + (object_no * 4));
 				if isRDRAM(pointer) and pointer ~= playerObject then
 					local modelPointer = dereferencePointer(pointer + obj_model1.model_pointer);
 					if isRDRAM(modelPointer) then
@@ -6503,7 +6512,7 @@ local function populateObjectModel1Pointers()
 			end
 		else
 			for object_no = 0, getObjectModel1Count() do
-				local pointer = dereferencePointer(Game.Memory.pointer_list[version] + (object_no * 4));
+				local pointer = dereferencePointer(Game.Memory.pointer_list + (object_no * 4));
 				if isRDRAM(pointer) then
 					table.insert(object_pointers, pointer);
 				end
@@ -6560,7 +6569,7 @@ local koshBot = {
 
 koshBot.getKoshController = function()
 	for object_no = 0, getObjectModel1Count() do
-		local pointer = dereferencePointer(Game.Memory.pointer_list[version] + (object_no * 4));
+		local pointer = dereferencePointer(Game.Memory.pointer_list + (object_no * 4));
 		if isRDRAM(pointer) and getActorName(pointer) == "Kremling Kosh Controller" then
 			return pointer;
 		end
@@ -6570,7 +6579,7 @@ end
 koshBot.countMelonProjectiles = function()
 	local melonCount = 0;
 	for object_no = 0, getObjectModel1Count() do
-		local pointer = dereferencePointer(Game.Memory.pointer_list[version] + (object_no * 4));
+		local pointer = dereferencePointer(Game.Memory.pointer_list + (object_no * 4));
 		if isRDRAM(pointer) and getActorName(pointer) == "Melon (Projectile)" then
 			melonCount = melonCount + 1;
 		end
@@ -6656,7 +6665,7 @@ local function drawGrabScriptUI()
 		return;
 	end
 
-	local cameraObject = dereferencePointer(Game.Memory.camera_pointer[version]);
+	local cameraObject = dereferencePointer(Game.Memory.camera_pointer);
 	if not isRDRAM(cameraObject) then
 		return;
 	end
@@ -6670,7 +6679,7 @@ local function drawGrabScriptUI()
 		populateObjectModel2Pointers();
 		encirclePlayerObjectModel2();
 	end
-	
+
 	if string.contains(grab_script_mode, "Arcade Objects") then
 		populateArcadeObjects();
 	end
@@ -6824,7 +6833,7 @@ local function drawGrabScriptUI()
 				if object_index == i then
 					color = colors.green;
 				end
-				
+
 				local objectType = mainmemory.readbyte(object_pointers[i] + arcade_object.object_type);
 				local objectName = getArcadeObjectNameOSD(objectType);
 				if objectType > 0 then
@@ -6833,7 +6842,7 @@ local function drawGrabScriptUI()
 				end
 			end
 		end
-		
+
 		if grab_script_mode == "List (Loading Zones)" then
 			pagifyThis(object_pointers,40);
 			for i = page_finish, page_start + 1, -1 do
@@ -6926,7 +6935,7 @@ end
 
 function Game.unlockMoves()
 	for kong = DK, Krusha do
-		local base = Game.Memory.kong_base[version] + kong * Game.Memory.kong_size[version];
+		local base = Game.Memory.kong_base + kong * Game.Memory.kong_size;
 		mainmemory.writebyte(base + moves, 3);
 		mainmemory.writebyte(base + sim_slam, 3);
 		mainmemory.writebyte(base + weapon, 7);
@@ -6945,7 +6954,7 @@ function Game.unlockMoves()
 end
 
 function Game.getMap()
-	return mainmemory.read_u32_be(Game.Memory.current_map[version]);
+	return mainmemory.read_u32_be(Game.Memory.current_map);
 end
 
 function Game.getMapOSD()
@@ -6996,14 +7005,14 @@ function Game.setMap(value)
 			mainmemory.write_u32_be(0x7FF010, 0x03E00008);
 			--]]
 		else
-			mainmemory.write_u32_be(Game.Memory.destination_map[version], value);
+			mainmemory.write_u32_be(Game.Memory.destination_map, value);
 		end
 	end
 end
 
 function Game.getLevelIndex()
 	local currentMap = Game.getMap();
-	local levelIndex = mainmemory.readbyte(Game.Memory.level_index_mapping[version] + currentMap);
+	local levelIndex = mainmemory.readbyte(Game.Memory.level_index_mapping + currentMap);
 	if version == 4 then
 		if levelIndex == 0x09 or levelIndex == 0x0C then
 			-- TODO: Figure out exactly what Kiosk does for submaps
@@ -7011,9 +7020,9 @@ function Game.getLevelIndex()
 		end
 	else
 		if levelIndex == 0x09 or levelIndex == 0x0D then -- "Bonus" or "Shared"
-			if mainmemory.readbyte(Game.Memory.in_submap[version]) > 0 then
-				currentMap = mainmemory.read_u16_be(Game.Memory.parent_map[version]);
-				levelIndex = mainmemory.readbyte(Game.Memory.level_index_mapping[version] + currentMap);
+			if mainmemory.readbyte(Game.Memory.in_submap) > 0 then
+				currentMap = mainmemory.read_u16_be(Game.Memory.parent_map);
+				levelIndex = mainmemory.readbyte(Game.Memory.level_index_mapping + currentMap);
 			end
 		end
 	end
@@ -7028,7 +7037,7 @@ end
 function Game.dumpLevelIndexMap()
 	for i = 1, #Game.maps do
 		local mapName = Game.maps[i] or "Unknown "..toHexString(i - 1);
-		local levelIndex = mainmemory.readbyte(Game.Memory.level_index_mapping[version] + i - 1);
+		local levelIndex = mainmemory.readbyte(Game.Memory.level_index_mapping + i - 1);
 		local levelIndexName = levelIndexes[levelIndex] or "Unknown "..toHexString(levelIndex);
 		dprint(toHexString(i - 1)..","..levelIndexName..","..mapName);
 	end
@@ -7086,13 +7095,13 @@ end
 
 function Game.unlockMenus()
 	if version ~= 4 then -- Anything but the Kiosk version
-		mainmemory.write_u32_be(Game.Memory.menu_flags[version], 0xFFFFFFFF);
-		mainmemory.write_u32_be(Game.Memory.menu_flags[version] + 4, 0xFFFFFFFF);
+		mainmemory.write_u32_be(Game.Memory.menu_flags, 0xFFFFFFFF);
+		mainmemory.write_u32_be(Game.Memory.menu_flags + 4, 0xFFFFFFFF);
 	end
 end
 
 function Game.applyInfinites()
-	local shared_collectables = Game.Memory.shared_collectables[version];
+	local shared_collectables = Game.Memory.shared_collectables;
 
 	mainmemory.write_u16_be(shared_collectables + standard_ammo, Game.getMaxStandardAmmo());
 	if forms.ischecked(ScriptHawk.UI.form_controls["Toggle Homing Ammo Checkbox"]) then
@@ -7107,7 +7116,7 @@ function Game.applyInfinites()
 	mainmemory.write_s8(shared_collectables + health, mainmemory.read_u8(shared_collectables + melons) * 4);
 
 	for kong = DK, Krusha do
-		local base = Game.Memory.kong_base[version] + kong * Game.Memory.kong_size[version];
+		local base = Game.Memory.kong_base + kong * Game.Memory.kong_size;
 		mainmemory.write_u16_be(base + coins, max_coins);
 		mainmemory.write_u16_be(base + lives, max_musical_energy);
 	end
@@ -7168,7 +7177,7 @@ function drawObjectPositions()
 		dragging = false;
 	end
 
-	local camera = dereferencePointer(Game.Memory.camera_pointer[version]);
+	local camera = dereferencePointer(Game.Memory.camera_pointer);
 	local cameraData = {};
 	if isRDRAM(camera) then
 		cameraData.xPos = mainmemory.readfloat(camera + obj_model1.camera.viewport_x_position, true);
@@ -7488,7 +7497,7 @@ local setColorFunctions = {
 };
 
 function Game.setKongColor()
-	local currentKong = mainmemory.readbyte(Game.Memory.character[version]);
+	local currentKong = mainmemory.readbyte(Game.Memory.character);
 	if type(setColorFunctions[currentKong]) == "function" then
 		setColorFunctions[currentKong]();
 	end
@@ -7519,10 +7528,10 @@ function Game.drawUI()
 
 	if version ~= 4 then
 		-- Draw ISG timer
-		if mainmemory.readbyte(Game.Memory.isg_active[version]) > 0 then
-			local isg_start = readTimestamp(Game.Memory.isg_timestamp[version]);
+		if mainmemory.readbyte(Game.Memory.isg_active) > 0 then
+			local isg_start = readTimestamp(Game.Memory.isg_timestamp);
 			if isg_start > 0 then -- If intro story start timestamp is 0 fadeouts will never happen
-				local isg_time = readTimestamp(Game.Memory.timestamp[version]) - isg_start;
+				local isg_time = readTimestamp(Game.Memory.timestamp) - isg_start;
 				local timer_string = string.format("%.2d:%05.2f", isg_time / 60 % 60, isg_time % 60);
 				gui.text(16, 16, "ISG Timer: "..timer_string, nil, 'topright');
 			end
@@ -7536,11 +7545,11 @@ function Game.getISG()
 	if version == 4 then
 		return;
 	end
-	local ts1 = mainmemory.read_u32_be(Game.Memory.timestamp[version]);
-	local ts2 = mainmemory.read_u32_be(Game.Memory.timestamp[version] + 4);
-	mainmemory.write_u32_be(Game.Memory.isg_timestamp[version], ts1);
-	mainmemory.write_u32_be(Game.Memory.isg_timestamp[version] + 4, ts2);
-	mainmemory.writebyte(Game.Memory.isg_active[version], 1);
+	local ts1 = mainmemory.read_u32_be(Game.Memory.timestamp);
+	local ts2 = mainmemory.read_u32_be(Game.Memory.timestamp + 4);
+	mainmemory.write_u32_be(Game.Memory.isg_timestamp, ts1);
+	mainmemory.write_u32_be(Game.Memory.isg_timestamp + 4, ts2);
+	mainmemory.writebyte(Game.Memory.isg_active, 1);
 end
 
 --[[
@@ -7559,7 +7568,7 @@ ScriptHawk.bindKeyFrame("L", increaseRNGLock, false);
 
 function Game.realTime()
 	-- Lock RNG at constant value
-	--mainmemory.write_u32_be(Game.Memory.RNG[version], RNGLock);
+	--mainmemory.write_u32_be(Game.Memory.RNG, RNGLock);
 end
 
 local vertSize = 0x10;
@@ -7574,7 +7583,7 @@ local vert = {
 };
 
 function Game.getMapBlock()
-	return dereferencePointer(Game.Memory.map_block_pointer[version]);
+	return dereferencePointer(Game.Memory.map_block_pointer);
 end
 
 function Game.getMapSegmentBase()
@@ -7585,7 +7594,7 @@ function Game.getMapSegmentBase()
 end
 
 function Game.getMapVerts()
-	return dereferencePointer(Game.Memory.map_vertex_pointer[version]);
+	return dereferencePointer(Game.Memory.map_vertex_pointer);
 end
 
 function Game.getMapVertsEnd()
@@ -7596,7 +7605,7 @@ function Game.getMapVertsEnd()
 end
 
 function Game.getMapDLStart()
-	return dereferencePointer(Game.Memory.map_displaylist_pointer[version]);
+	return dereferencePointer(Game.Memory.map_displaylist_pointer);
 end
 
 function crumbleVerts(vertBase, vertEnd)
@@ -7936,7 +7945,7 @@ function Game.eachFrame()
 		end
 
 		-- TODO: This is really slow and doesn't cover all memory domains
-		--memoryStatCache = getMemoryStats(dereferencePointer(Game.Memory.heap_pointer[version]));
+		--memoryStatCache = getMemoryStats(dereferencePointer(Game.Memory.heap_pointer));
 
 		--setWaterSurfaceTimers(surfaceTimerHack);
 		--Game.unlockMenus(); -- TODO: Allow user to toggle this
@@ -8010,7 +8019,7 @@ function Game.eachFrame()
 	if force_gb_load then
 		local objModel2Array = getObjectModel2Array();
 		if isRDRAM(objModel2Array) then
-			local numSlots = mainmemory.read_u32_be(Game.Memory.obj_model2_array_count[version]);
+			local numSlots = mainmemory.read_u32_be(Game.Memory.obj_model2_array_count);
 			for i = 1, numSlots do
 				local base = objModel2Array + (i - 1) * obj_model2_slot_size;
 				if string.contains(getScriptName(base), "Golden Banana") then
@@ -8034,7 +8043,7 @@ function Game.crankyCutsceneMinimumRequirements()
 
 	-- GB counters
 	for kong = DK, Chunky do
-		local base = Game.Memory.kong_base[version] + kong * Game.Memory.kong_size[version];
+		local base = Game.Memory.kong_base + kong * Game.Memory.kong_size;
 		for level = 0, 7 do
 			mainmemory.write_s16_be(base + GB_Base + (level * 2), 5); -- Normal GBs
 			if level == 7 and kong == Tiny then
@@ -8061,7 +8070,7 @@ function Game.completeFile()
 
 	-- CB and GB counters
 	for kong = DK, Chunky do
-		local base = Game.Memory.kong_base[version] + kong * Game.Memory.kong_size[version];
+		local base = Game.Memory.kong_base + kong * Game.Memory.kong_size;
 		for level = 0, 6 do
 			mainmemory.write_u16_be(base + CB_Base + (level * 2), 75); -- Not needed to trigger Cranky Cutscene
 		end
@@ -8171,7 +8180,7 @@ Game.OSD = Game.standardOSD;
 --print("Local Variables: "..countLocals().."/200");
 
 function traverseHeap()
-	local heapBase = dereferencePointer(Game.Memory.heap_pointer[version]);
+	local heapBase = dereferencePointer(Game.Memory.heap_pointer);
 	if isRDRAM(heapBase) then
 		traverseSize(heapBase);
 	else
@@ -8271,18 +8280,18 @@ function buildIdentifyMemoryCache()
 
 	-- Cache framebuffers
 	if not addressFound then
-		local frameBuffer = dereferencePointer(Game.Memory.framebuffer_pointer[version]);
+		local frameBuffer = dereferencePointer(Game.Memory.framebuffer_pointer);
 		if isRDRAM(frameBuffer) then
 			table.insert(identifyMemoryCache.frameBuffers, {base=frameBuffer, width=320, height=240, bpp=16});
 		end
-		frameBuffer = dereferencePointer(Game.Memory.framebuffer_pointer[version] + 4);
+		frameBuffer = dereferencePointer(Game.Memory.framebuffer_pointer + 4);
 		if isRDRAM(frameBuffer) then
 			table.insert(identifyMemoryCache.frameBuffers, {base=frameBuffer, width=320, height=240, bpp=16});
 		end
 	end
 
 	-- Cache heap
-	local heapBase = dereferencePointer(Game.Memory.heap_pointer[version]);
+	local heapBase = dereferencePointer(Game.Memory.heap_pointer);
 	if isRDRAM(heapBase) then
 		local size = 0;
 		local prev = 0;
@@ -8335,7 +8344,7 @@ function buildIdentifyMemoryCache()
 
 	-- Cache model 1
 	for object_no = 0, 255 do
-		local pointerAddress = Game.Memory.pointer_list[version] + (object_no * 4);
+		local pointerAddress = Game.Memory.pointer_list + (object_no * 4);
 		local actor = dereferencePointer(pointerAddress);
 		if isRDRAM(actor) then
 			local actorName = getActorName(actor);
@@ -8485,7 +8494,7 @@ function buildIdentifyMemoryCache()
 	if not addressFound then
 		local objModel2Array = getObjectModel2Array();
 		if isRDRAM(objModel2Array) then
-			local numSlots = mainmemory.read_u32_be(Game.Memory.obj_model2_array_count[version]);
+			local numSlots = mainmemory.read_u32_be(Game.Memory.obj_model2_array_count);
 			local arraySize = getObjectModel2ArraySize();
 			addHeapMetadata(objModel2Array, "description", "Object Model 2 Array ("..numSlots.."/"..arraySize..")");
 			addHeapMetadata(objModel2Array, "isObjectModel2Array", true);
@@ -8534,7 +8543,7 @@ function buildIdentifyMemoryCache()
 	end
 
 	-- Cache HUD
-	local HUDObject = dereferencePointer(Game.Memory.hud_pointer[version]);
+	local HUDObject = dereferencePointer(Game.Memory.hud_pointer);
 	if isRDRAM(HUDObject) then
 		addHeapMetadata(HUDObject, "description", "HUD");
 		addHeapMetadata(HUDObject, "isHUDObject", true);
@@ -8543,7 +8552,7 @@ function buildIdentifyMemoryCache()
 	end
 
 	-- Cache enemies
-	local enemyRespawnObject = dereferencePointer(Game.Memory.enemy_respawn_object[version]);
+	local enemyRespawnObject = dereferencePointer(Game.Memory.enemy_respawn_object);
 	if isRDRAM(enemyRespawnObject) then
 		addHeapMetadata(enemyRespawnObject, "description", "Enemy Respawn Object");
 		addHeapMetadata(enemyRespawnObject, "isEnemyRespawnObject", true);
@@ -8613,7 +8622,7 @@ function buildIdentifyMemoryCache()
 	end
 
 	-- Cache weather particle array
-	local weatherParticleArray = dereferencePointer(Game.Memory.weather_particle_array_pointer[version]);
+	local weatherParticleArray = dereferencePointer(Game.Memory.weather_particle_array_pointer);
 	if isRDRAM(weatherParticleArray) then
 		addHeapMetadata(weatherParticleArray, "description", "Weather Particle Array");
 		addHeapMetadata(weatherParticleArray, "isWeatherParticleArray", true);
@@ -8622,7 +8631,7 @@ function buildIdentifyMemoryCache()
 	end
 
 	-- Cache dynamic water surfaces
-	local waterSurface = dereferencePointer(Game.Memory.water_surface_list[version]);
+	local waterSurface = dereferencePointer(Game.Memory.water_surface_list);
 	while isRDRAM(waterSurface) do
 		addHeapMetadata(waterSurface, "description", "Dynamic Water Surface");
 		addHeapMetadata(waterSurface, "isDynamicWaterSurface", true);
@@ -8636,7 +8645,7 @@ function buildIdentifyMemoryCache()
 	end
 
 	-- Cache exits
-	local exitArray = dereferencePointer(Game.Memory.exit_array_pointer[version]);
+	local exitArray = dereferencePointer(Game.Memory.exit_array_pointer);
 	if isRDRAM(exitArray) then
 		addHeapMetadata(exitArray, "description", "Map Exit Array");
 		addHeapMetadata(exitArray, "isExitArray", true);
@@ -8654,7 +8663,7 @@ function buildIdentifyMemoryCache()
 	end
 
 	-- Cache setup
-	local setupFile = dereferencePointer(Game.Memory.obj_model2_setup_pointer[version]);
+	local setupFile = dereferencePointer(Game.Memory.obj_model2_setup_pointer);
 	if isRDRAM(setupFile) then
 		addHeapMetadata(setupFile, "description", "Map Setup");
 		addHeapMetadata(setupFile, "isMapSetup", true);
@@ -8663,7 +8672,7 @@ function buildIdentifyMemoryCache()
 	end
 
 	-- Cache textures (heap)
-	local textureIndexObject = dereferencePointer(Game.Memory.texture_index_object_pointer[version]);
+	local textureIndexObject = dereferencePointer(Game.Memory.texture_index_object_pointer);
 	if isRDRAM(textureIndexObject) then
 		addHeapMetadata(textureIndexObject, "description", "Texture Index");
 		addHeapMetadata(textureIndexObject, "isTextureIndexObject", true);
@@ -8684,7 +8693,7 @@ function buildIdentifyMemoryCache()
 			end
 		end
 	end
-	textureIndexObject = dereferencePointer(Game.Memory.texture_index_object_pointer_2[version]);
+	textureIndexObject = dereferencePointer(Game.Memory.texture_index_object_pointer_2);
 	if isRDRAM(textureIndexObject) then
 		addHeapMetadata(textureIndexObject, "description", "Texture Index");
 		addHeapMetadata(textureIndexObject, "isTextureIndexObject", true);
@@ -8705,7 +8714,7 @@ function buildIdentifyMemoryCache()
 			end
 		end
 	end
-	textureIndexObject = dereferencePointer(Game.Memory.ffa_texture_index_object_pointer[version]);
+	textureIndexObject = dereferencePointer(Game.Memory.ffa_texture_index_object_pointer);
 	if isRDRAM(textureIndexObject) then
 		addHeapMetadata(textureIndexObject, "description", "FFA Texture Index");
 		addHeapMetadata(textureIndexObject, "isFFATextureIndexObject", true);
@@ -8727,21 +8736,21 @@ function buildIdentifyMemoryCache()
 		end
 	end
 
-	local textureROMMapObject = dereferencePointer(Game.Memory.texture_rom_map_object_pointer[version]);
+	local textureROMMapObject = dereferencePointer(Game.Memory.texture_rom_map_object_pointer);
 	if isRDRAM(textureROMMapObject) then
 		addHeapMetadata(textureROMMapObject, "description", "Texture ROM Map");
 		addHeapMetadata(textureROMMapObject, "isTextureROMMapObject", true);
 		addHeapMetadata(textureROMMapObject, "addressFound", true);
 		addHeapMetadata(textureROMMapObject, "addressType", 2);
 	end
-	textureROMMapObject = dereferencePointer(Game.Memory.texture_rom_map_object_pointer_2[version]);
+	textureROMMapObject = dereferencePointer(Game.Memory.texture_rom_map_object_pointer_2);
 	if isRDRAM(textureROMMapObject) then
 		addHeapMetadata(textureROMMapObject, "description", "Texture ROM Map");
 		addHeapMetadata(textureROMMapObject, "isTextureROMMapObject", true);
 		addHeapMetadata(textureROMMapObject, "addressFound", true);
 		addHeapMetadata(textureROMMapObject, "addressType", 2);
 	end
-	textureROMMapObject = dereferencePointer(Game.Memory.ffa_texture_rom_map_object_pointer[version]);
+	textureROMMapObject = dereferencePointer(Game.Memory.ffa_texture_rom_map_object_pointer);
 	if isRDRAM(textureROMMapObject) then
 		addHeapMetadata(textureROMMapObject, "description", "FFA Texture ROM Map");
 		addHeapMetadata(textureROMMapObject, "isFFATextureROMMapObject", true);
@@ -8750,7 +8759,7 @@ function buildIdentifyMemoryCache()
 	end
 
 	-- Cache texture list (off heap)
-	local textureList = dereferencePointer(Game.Memory.texture_list_pointer[version]);
+	local textureList = dereferencePointer(Game.Memory.texture_list_pointer);
 	if isRDRAM(textureList) then
 		local size = 0;
 		local prev = 0;
@@ -8768,14 +8777,14 @@ function buildIdentifyMemoryCache()
 		until prev == 0 or not isRDRAM(header);
 	end
 
-	local model2DLIndexObject = dereferencePointer(Game.Memory.model2_dl_index_object_pointer[version]);
+	local model2DLIndexObject = dereferencePointer(Game.Memory.model2_dl_index_object_pointer);
 	if isRDRAM(model2DLIndexObject) then
 		addHeapMetadata(model2DLIndexObject, "description", "Model 2 Display List Index");
 		addHeapMetadata(model2DLIndexObject, "isModel2DLIndexObject", true);
 		addHeapMetadata(model2DLIndexObject, "addressFound", true);
 		addHeapMetadata(model2DLIndexObject, "addressType", 4);
 	end
-	local model2DLROMMapObject = dereferencePointer(Game.Memory.model2_dl_rom_map_object_pointer[version]);
+	local model2DLROMMapObject = dereferencePointer(Game.Memory.model2_dl_rom_map_object_pointer);
 	if isRDRAM(model2DLROMMapObject) then
 		addHeapMetadata(model2DLROMMapObject, "description", "Model 2 Display List ROM Map");
 		addHeapMetadata(model2DLROMMapObject, "isModel2DLROMMapObject", true);
@@ -8785,7 +8794,7 @@ function buildIdentifyMemoryCache()
 
 	-- Cache object model 2 collisions
 	if not addressFound then
-		local collisionLinkedListPointer = dereferencePointer(Game.Memory.obj_model2_collision_linked_list_pointer[version]);
+		local collisionLinkedListPointer = dereferencePointer(Game.Memory.obj_model2_collision_linked_list_pointer);
 		if isRDRAM(collisionLinkedListPointer) then
 			local collisionListObjectSize = mainmemory.read_u32_be(collisionLinkedListPointer + heap.object_size);
 			addHeapMetadata(collisionLinkedListPointer, "description", "Collision Index");
@@ -8924,11 +8933,11 @@ function identifyMemory(address, findReferences, reuseCache, suppressPrint)
 
 	-- Detect OS Code
 	if not addressFound then
-		if Game.Memory.os_code_start[version] ~= nil then
-			if address >= Game.Memory.os_code_start[version] and address < Game.Memory.os_code_start[version] + Game.Memory.os_code_size[version] then
+		if Game.Memory.os_code_start ~= nil then
+			if address >= Game.Memory.os_code_start and address < Game.Memory.os_code_start + Game.Memory.os_code_size then
 				addressFound = true;
 				addressType = 5;
-				skipToAddress = Game.Memory.os_code_start[version] + Game.Memory.os_code_size[version];
+				skipToAddress = Game.Memory.os_code_start + Game.Memory.os_code_size;
 				table.insert(addressInfo, "This address is part of OS Code.");
 			end
 		end
@@ -8936,11 +8945,11 @@ function identifyMemory(address, findReferences, reuseCache, suppressPrint)
 
 	-- Detect Game Code
 	if not addressFound then
-		if Game.Memory.game_code_start[version] ~= nil then
-			if address >= Game.Memory.game_code_start[version] and address < Game.Memory.game_code_start[version] + Game.Memory.game_code_size[version] then
+		if Game.Memory.game_code_start ~= nil then
+			if address >= Game.Memory.game_code_start and address < Game.Memory.game_code_start + Game.Memory.game_code_size then
 				addressFound = true;
 				addressType = 5;
-				skipToAddress = Game.Memory.game_code_start[version] + Game.Memory.game_code_size[version];
+				skipToAddress = Game.Memory.game_code_start + Game.Memory.game_code_size;
 				table.insert(addressInfo, "This address is part of Game Code.");
 			end
 		end
@@ -8948,11 +8957,11 @@ function identifyMemory(address, findReferences, reuseCache, suppressPrint)
 
 	-- Detect Game Constants
 	if not addressFound then
-		if Game.Memory.game_constants_start[version] ~= nil then
-			if address >= Game.Memory.game_constants_start[version] and address < Game.Memory.game_constants_start[version] + Game.Memory.game_constants_size[version] then
+		if Game.Memory.game_constants_start ~= nil then
+			if address >= Game.Memory.game_constants_start and address < Game.Memory.game_constants_start + Game.Memory.game_constants_size then
 				addressFound = true;
 				addressType = 6;
-				skipToAddress = Game.Memory.game_constants_start[version] + Game.Memory.game_constants_size[version];
+				skipToAddress = Game.Memory.game_constants_start + Game.Memory.game_constants_size;
 				table.insert(addressInfo, "This address is part of the Game Constants file.");
 			end
 		end
@@ -8960,11 +8969,11 @@ function identifyMemory(address, findReferences, reuseCache, suppressPrint)
 
 	-- Detect EEPROM copy
 	if not addressFound and version < 4 then -- TODO: Kiosk
-		if address >= Game.Memory.eeprom_copy_base[version] and address < Game.Memory.eeprom_copy_base[version] + 4 * eeprom_slot_size then
+		if address >= Game.Memory.eeprom_copy_base and address < Game.Memory.eeprom_copy_base + 4 * eeprom_slot_size then
 			addressFound = true;
 			addressType = 8;
-			skipToAddress = Game.Memory.eeprom_copy_base[version] + 4 * eeprom_slot_size;
-			local EEPROMOffset = address - Game.Memory.eeprom_copy_base[version];
+			skipToAddress = Game.Memory.eeprom_copy_base + 4 * eeprom_slot_size;
+			local EEPROMOffset = address - Game.Memory.eeprom_copy_base;
 			local EEPROMSlot = math.floor(EEPROMOffset / eeprom_slot_size);
 			local EEPROMSlotOffset = EEPROMOffset % eeprom_slot_size;
 			table.insert(addressInfo, "This address is part of the EEPROM copy.");
@@ -9308,7 +9317,7 @@ function identifyMemory(address, findReferences, reuseCache, suppressPrint)
 	-- Detect actor pointer list
 	if not addressFound then
 		for object_no = 0, 255 do
-			local pointerAddress = Game.Memory.pointer_list[version] + (object_no * 4);
+			local pointerAddress = Game.Memory.pointer_list + (object_no * 4);
 			if address_4byte_align == pointerAddress then
 				table.insert(addressInfo, "Pointer number "..object_no.." in the actor pointer list. Value is "..toHexString(pointerAddress, 8));
 				addressFound = true;
