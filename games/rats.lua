@@ -7,11 +7,11 @@ end
 
 local Game = {
 	Memory = {
-		x_position = {0x01EE},
-		y_position = {0x01F4},
-		x_velocity = {0x01F2},
-		y_velocity = {0x01F8},
-		object_base = {0x01EC},
+		x_position = 0x01EE,
+		y_position = 0x01F4,
+		x_velocity = 0x01F2,
+		y_velocity = 0x01F8,
+		object_base = 0x01EC,
 	},
 };
 object_size = 0x16;
@@ -36,27 +36,27 @@ end
 --------------
 
 function Game.getXPosition()
-	return mainmemory.read_u16_le(Game.Memory.x_position[version]);
+	return mainmemory.read_u16_le(Game.Memory.x_position);
 end
 
 function Game.getYPosition()
-	return mainmemory.read_u16_le(Game.Memory.y_position[version]);
+	return mainmemory.read_u16_le(Game.Memory.y_position);
 end
 
 function Game.getXVelocity()
-	return mainmemory.read_s16_le(Game.Memory.x_velocity[version]);
+	return mainmemory.read_s16_le(Game.Memory.x_velocity);
 end
 
 function Game.getYVelocity()
-	return mainmemory.read_s16_le(Game.Memory.y_velocity[version]);
+	return mainmemory.read_s16_le(Game.Memory.y_velocity);
 end
 
 function Game.setXPosition(value)
-	mainmemory.write_u16_le(Game.Memory.x_position[version], value);
+	mainmemory.write_u16_le(Game.Memory.x_position, value);
 end
 
 function Game.setYPosition(value)
-	mainmemory.write_u16_le(Game.Memory.y_position[version], value);
+	mainmemory.write_u16_le(Game.Memory.y_position, value);
 end
 
 ------------
@@ -65,7 +65,7 @@ end
 
 function Game.drawUI()
 	for i = 0, 24 do
-		local objectBase = Game.Memory.object_base[version] + i * object_size;
+		local objectBase = Game.Memory.object_base + i * object_size;
 		local xPos = mainmemory.read_u16_le(objectBase + 0x02);
 		local yPos = mainmemory.read_u16_le(objectBase + 0x08);
 		local xVel = mainmemory.read_s16_le(objectBase + 0x06);

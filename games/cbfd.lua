@@ -95,19 +95,24 @@ local Game = {
 --------------------
 
 function Game.setMap(value)
-	mainmemory.write_u16_be(Game.Memory.map[version], value);
+	mainmemory.write_u16_be(Game.Memory.map, value);
 end
 
 function Game.detectVersion(romName, romHash)
 	if romHash == "EE7BC6656FD1E1D9FFB3D19ADD759F28B88DF710" then -- Europe
 		version = 1;
-		return true;
 	elseif romHash == "4CBADD3C4E0729DEC46AF64AD018050EADA4F47A" then -- USA
 		version = 2;
-		return true;
+	else
+		return false;
 	end
 
-	return false;
+	-- Squish Game.Memory tables down to a single address for the relevant version
+	for k, v in pairs(Game.Memory) do
+		Game.Memory[k] = v[version];
+	end
+
+	return true;
 end
 
 -------------------
@@ -126,44 +131,44 @@ end
 --------------
 
 function Game.getXPosition()
-	return mainmemory.readfloat(Game.Memory.x_position[version], true);
+	return mainmemory.readfloat(Game.Memory.x_position, true);
 end
 
 function Game.getYPosition()
-	return mainmemory.readfloat(Game.Memory.y_position[version], true);
+	return mainmemory.readfloat(Game.Memory.y_position, true);
 end
 
 function Game.getZPosition()
-	return mainmemory.readfloat(Game.Memory.z_position[version], true);
+	return mainmemory.readfloat(Game.Memory.z_position, true);
 end
 
 function Game.setXPosition(value)
-	mainmemory.writefloat(Game.Memory.x_position[version], value, true);
+	mainmemory.writefloat(Game.Memory.x_position, value, true);
 end
 
 function Game.setYPosition(value)
-	mainmemory.writefloat(Game.Memory.y_position[version], value, true);
+	mainmemory.writefloat(Game.Memory.y_position, value, true);
 	Game.setYVelocity(0);
 end
 
 function Game.setZPosition(value)
-	mainmemory.writefloat(Game.Memory.z_position[version], value, true);
+	mainmemory.writefloat(Game.Memory.z_position, value, true);
 end
 
 function Game.getVelocity()
-	return mainmemory.readfloat(Game.Memory.velocity[version], true);
+	return mainmemory.readfloat(Game.Memory.velocity, true);
 end
 
 function Game.setVelocity(value)
-	return mainmemory.writefloat(Game.Memory.velocity[version], value, true);
+	return mainmemory.writefloat(Game.Memory.velocity, value, true);
 end
 
 function Game.getYVelocity()
-	return mainmemory.readfloat(Game.Memory.y_velocity[version], true);
+	return mainmemory.readfloat(Game.Memory.y_velocity, true);
 end
 
 function Game.setYVelocity(value)
-	return mainmemory.writefloat(Game.Memory.y_velocity[version], value, true);
+	return mainmemory.writefloat(Game.Memory.y_velocity, value, true);
 end
 
 --------------
@@ -174,11 +179,11 @@ Game.rot_speed = 16;
 Game.max_rot_units = 0xFFFF;
 
 function Game.getYRotation()
-	return (mainmemory.read_u16_be(Game.Memory.moving_angle[version]) + Game.max_rot_units / 4) % Game.max_rot_units; -- TODO: Fix this for all modules with a dpad angle offset
+	return (mainmemory.read_u16_be(Game.Memory.moving_angle) + Game.max_rot_units / 4) % Game.max_rot_units; -- TODO: Fix this for all modules with a dpad angle offset
 end
 
 function Game.setYRotation(value)
-	mainmemory.write_u16_be(Game.Memory.moving_angle[version], (value - Game.max_rot_units / 4) % Game.max_rot_units);
+	mainmemory.write_u16_be(Game.Memory.moving_angle, (value - Game.max_rot_units / 4) % Game.max_rot_units);
 end
 
 ------------

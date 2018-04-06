@@ -39,6 +39,15 @@ function Game.detectVersion(romName, romHash) -- Modules should ideally use ROM 
 		return false; -- Return false if this version of the game is not supported
 	end
 
+	-- Squish Game.Memory tables down to a single address for the relevant version
+	-- If you include this code snippet in your module, you can access Game.Memory addresses in a cleaner fashion
+	-- Game.Memory.address[version] becomes Game.Memory.address
+	--[[
+	for k, v in pairs(Game.Memory) do
+		Game.Memory[k] = v[version];
+	end
+	--]]
+
 	return true; -- Return true if version detection is successful
 end
 

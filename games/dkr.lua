@@ -102,7 +102,7 @@ local player_object_pointer = 0x3FFFC0; -- Seems to be the same for all versions
 
 function Game.getPlayerObject(player)
 	player = player or 1;
-	local hud = dereferencePointer(Game.Memory.hud_pointer_pointer[version]);
+	local hud = dereferencePointer(Game.Memory.hud_pointer_pointer);
 	if isRDRAM(hud) then
 		return dereferencePointer(hud + (player - 1) * 4);
 	end
@@ -193,7 +193,7 @@ local object_fields = {
 };
 
 function Game.getGameSettings()
-	return dereferencePointer(Game.Memory.game_settings[version]);
+	return dereferencePointer(Game.Memory.game_settings);
 end
 
 -- Game settings fields, relative to Game.getGameSettings()
@@ -321,11 +321,11 @@ end
 -- Populate and sort pointer list
 function populateObjectPointerList()
 	currentPointers = {};
-	local pointerList = dereferencePointer(Game.Memory.pointer_list[version]);
+	local pointerList = dereferencePointer(Game.Memory.pointer_list);
 	if not isRDRAM(pointerList) then
 		return;
 	end
-	local num_slots = mainmemory.read_u32_be(Game.Memory.num_objects[version]);
+	local num_slots = mainmemory.read_u32_be(Game.Memory.num_objects);
 	for i = 0, num_slots - 1 do
 		local slotBase = get_slot_base(pointerList, i);
 		if isRDRAM(slotBase) then
@@ -378,6 +378,11 @@ function Game.detectVersion(romName, romHash)
 		return false;
 	end
 
+	-- Squish Game.Memory tables down to a single address for the relevant version
+	for k, v in pairs(Game.Memory) do
+		Game.Memory[k] = v[version];
+	end
+
 	return true;
 end
 
@@ -408,7 +413,7 @@ local charToCSS = { -- Table to convert character selection screen index to in g
 
 function Game.setCharacter(index, player)
 	player = player or 1;
-	mainmemory.writebyte(Game.Memory.CSS_character[version] + player - 1, charToCSS[index] or 9);
+	mainmemory.writebyte(Game.Memory.CSS_character + player - 1, charToCSS[index] or 9);
 	local gameSettings = Game.getGameSettings();
 	if isRDRAM(gameSettings) then
 		mainmemory.writebyte(gameSettings + game_settings_fields.p1_character + ((player - 1) * 0x18), index);
@@ -768,9 +773,9 @@ local function optimalTap()
 	local character = Game.getCharacter();
 	local bananas = math.max(math.min(Game.getBananas(), 10), 0);
 	local boost = Game.getBoost();
-	local getReady = mainmemory.readbyte(Game.Memory.get_ready[version]);
-	local isPaused = mainmemory.readbyte(Game.Memory.is_paused[version]);
-	local showResults = mainmemory.readbyte(Game.Memory.show_results[version]);
+	local getReady = mainmemory.readbyte(Game.Memory.get_ready);
+	local isPaused = mainmemory.readbyte(Game.Memory.is_paused);
+	local showResults = mainmemory.readbyte(Game.Memory.show_results);
 
 	local boostType = forms.getproperty(ScriptHawk.UI.form_controls.otap_boost_dropdown, "SelectedItem");
 
@@ -833,7 +838,7 @@ local boostFrames = 0;
 local function outputBoostStats()
 	if Game.isPhysicsFrame() and forms.ischecked(ScriptHawk.UI.form_controls.boost_info_checkbox) then
 		local boost = Game.getBoost();
-		local getReady = mainmemory.readbyte(Game.Memory.get_ready[version]);
+		local getReady = mainmemory.readbyte(Game.Memory.get_ready);
 		if boost > 0 and getReady == 0 then
 			local aPressed = joypad.getimmediate()["P1 A"];
 			if aPressed then
@@ -981,13 +986,13 @@ end
 
 function Game.unlockCharacters()
 	-- Unlock all magic code toggles
-	mainmemory.write_u32_be(Game.Memory.cheat_menu[version], 0xFFFFFFFF);
+	mainmemory.write_u32_be(Game.Memory.cheat_menu, 0xFFFFFFFF);
 
 	-- Turn on TT & Drumstick magic codes
-	local cheatsEnabled = mainmemory.read_u32_be(Game.Memory.cheats_enabled[version]);
+	local cheatsEnabled = mainmemory.read_u32_be(Game.Memory.cheats_enabled);
 	cheatsEnabled = setBit(cheatsEnabled, 0); -- TT
 	cheatsEnabled = setBit(cheatsEnabled, 1); -- Drumstick
-	mainmemory.write_u32_be(Game.Memory.cheats_enabled[version], cheatsEnabled);
+	mainmemory.write_u32_be(Game.Memory.cheats_enabled, cheatsEnabled);
 end
 
 function Game.applyInfinites()

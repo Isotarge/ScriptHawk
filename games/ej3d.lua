@@ -26,12 +26,18 @@ local Game = {
 function Game.detectVersion(romName, romHash)
 	if romHash == "EAB14F23640CD6148D4888902CDCC00DD6111BF9" then -- US
 		version = 1;
-		return true;
 	elseif romHash == "F02C1AFD18C1CBE309472CBE5B3B3F04B22DB7EE" then -- Europe
 		version = 2;
-		return true;
+	else
+		return false;
 	end
-	return false;
+
+	-- Squish Game.Memory tables down to a single address for the relevant version
+	for k, v in pairs(Game.Memory) do
+		Game.Memory[k] = v[version];
+	end
+
+	return true;
 end
 
 --------------------
@@ -107,27 +113,27 @@ Game.speedy_invert_LR = 1;
 --------------
 
 function Game.getXPosition()
-	return mainmemory.readfloat(Game.Memory.jim_pointer[version] + jim.x_position, true);
+	return mainmemory.readfloat(Game.Memory.jim_pointer + jim.x_position, true);
 end
 
 function Game.getYPosition()
-	return mainmemory.readfloat(Game.Memory.jim_pointer[version] + jim.y_position, true);
+	return mainmemory.readfloat(Game.Memory.jim_pointer + jim.y_position, true);
 end
 
 function Game.getZPosition()
-	return mainmemory.readfloat(Game.Memory.jim_pointer[version] + jim.z_position, true);
+	return mainmemory.readfloat(Game.Memory.jim_pointer + jim.z_position, true);
 end
 
 function Game.setXPosition(value)
-	mainmemory.writefloat(Game.Memory.jim_pointer[version] + jim.x_position, value, true);
+	mainmemory.writefloat(Game.Memory.jim_pointer + jim.x_position, value, true);
 end
 
 function Game.setYPosition(value)
-	mainmemory.writefloat(Game.Memory.jim_pointer[version] + jim.y_position, value, true);
+	mainmemory.writefloat(Game.Memory.jim_pointer + jim.y_position, value, true);
 end
 
 function Game.setZPosition(value)
-	mainmemory.writefloat(Game.Memory.jim_pointer[version] + jim.z_position, value, true);
+	mainmemory.writefloat(Game.Memory.jim_pointer + jim.z_position, value, true);
 end
 
 --------------
@@ -150,29 +156,29 @@ end
 
 
 function Game.getXRotation()
-	return mainmemory.readfloat(Game.Memory.x_rotation[version], true);
+	return mainmemory.readfloat(Game.Memory.x_rotation, true);
 end
 
 function Game.getYRotation()
-	local angle1 = mainmemory.readfloat(Game.Memory.jim_pointer[version] + jim.y_rotation_1, true);
-	local angle2 = mainmemory.readfloat(Game.Memory.jim_pointer[version] + jim.y_rotation_2, true);
+	local angle1 = mainmemory.readfloat(Game.Memory.jim_pointer + jim.y_rotation_1, true);
+	local angle2 = mainmemory.readfloat(Game.Memory.jim_pointer + jim.y_rotation_2, true);
 	return Game.calculateAngle(angle1,angle2);
 end
 
 function Game.getZRotation()
-	return mainmemory.readfloat(Game.Memory.z_rotation[version], true);
+	return mainmemory.readfloat(Game.Memory.z_rotation, true);
 end
 
 function Game.setXRotation(value)
-	mainmemory.writefloat(Game.Memory.x_rotation[version], value, true);
+	mainmemory.writefloat(Game.Memory.x_rotation, value, true);
 end
 
 function Game.setYRotation(value)
-	mainmemory.writefloat(Game.Memory.y_rotation[version], value / 180, true);
+	mainmemory.writefloat(Game.Memory.y_rotation, value / 180, true);
 end
 
 function Game.setZRotation(value)
-	mainmemory.writefloat(Game.Memory.z_rotation[version], value, true);
+	mainmemory.writefloat(Game.Memory.z_rotation, value, true);
 end
 
 ------------
@@ -273,71 +279,64 @@ Game.movements = {
 Game.takeMeThereType = "Checkbox";
 
 function Game.setMap(index)
-	mainmemory.writebyte(Game.Memory.destination_map[version], index - 1);
+	mainmemory.writebyte(Game.Memory.destination_map, index - 1);
 end
 
 function Game.checkMapSoftlock()
-	local dest_exit = mainmemory.readbyte(Game.Memory.destination_exit[version]);
-	local dest_map = mainmemory.readbyte(Game.Memory.destination_map[version]);
+	local dest_exit = mainmemory.readbyte(Game.Memory.destination_exit);
+	local dest_map = mainmemory.readbyte(Game.Memory.destination_map);
 
 	if dest_map == 1 or dest_map == 5 or dest_map == 9 or dest_map == 16 then -- Sub Hubs (Central Column Fix)
 		if dest_exit > 0 and dest_exit < 4 then -- Coming from Boss/Level
-			mainmemory.writebyte(Game.Memory.subhub_entrance_cs[version], 0);
+			mainmemory.writebyte(Game.Memory.subhub_entrance_cs, 0);
 		else -- Coming from 'The Brain'
-			mainmemory.writebyte(Game.Memory.subhub_entrance_cs[version], 1);
+			mainmemory.writebyte(Game.Memory.subhub_entrance_cs, 1);
 		end
 	end
 end
 
 function Game.reloadMap()
-	mainmemory.writebyte(Game.Memory.reload_map[version], 1);
+	mainmemory.writebyte(Game.Memory.reload_map, 1);
 	Game.checkMapSoftlock()
 end
 
 function Game.reloadMapHard()
-	mainmemory.writebyte(Game.Memory.current_map[version], 255);
+	mainmemory.writebyte(Game.Memory.current_map, 255);
 	Game.reloadMap()
 end
 
 function Game.getMapOSD()
-	local currentMap = mainmemory.readbyte(Game.Memory.current_map[version]);
+	local currentMap = mainmemory.readbyte(Game.Memory.current_map);
 	local currentMapName = "Unknown";
 	if Game.maps[currentMap + 1] ~= nil then
 		currentMapName = Game.maps[currentMap + 1];
 	end
 	return currentMapName.." ("..currentMap..")";
-
 end
 
 function Game.setExit(index)
-	mainmemory.writebyte(Game.Memory.destination_exit[version]);
+	mainmemory.writebyte(Game.Memory.destination_exit);
 end
 
 function Game.getExitOSD()
-	local currentExit = mainmemory.readbyte(Game.Memory.destination_exit[version]);
+	local currentExit = mainmemory.readbyte(Game.Memory.destination_exit);
 	return currentExit;
 end
 
 function Game.getAnimationOSD()
-	local currentAnimation = mainmemory.readbyte(Game.Memory.jim_pointer[version] + jim.animation);
+	local currentAnimation = mainmemory.readbyte(Game.Memory.jim_pointer + jim.animation);
 	local currentAnimationName = "Unknown ("..currentAnimation..")";
-	if Game.animations[currentAnimation] ~= nil then
-		currentAnimationName = Game.animations[currentAnimation];
-	end
-	return currentAnimationName;
+	return Game.animations[currentAnimation] or currentAnimationName;
 end
 
 function Game.getMovementOSD()
-	local currentMovement = mainmemory.readbyte(Game.Memory.jim_pointer[version] + jim.movement);
+	local currentMovement = mainmemory.readbyte(Game.Memory.jim_pointer + jim.movement);
 	local currentMovementName = "Unknown ("..currentMovement..")";
-	if Game.movements[currentMovement] ~= nil then
-		currentMovementName = Game.movements[currentMovement];
-	end
-	return currentMovementName
+	return Game.movements[currentMovement] or currentMovementName;
 end
 
 function Game.getAnimationTimerOSD()
-	local anim_timer = mainmemory.read_u16_be(Game.Memory.jim_pointer[version] + jim.animation_timer);
+	local anim_timer = mainmemory.read_u16_be(Game.Memory.jim_pointer + jim.animation_timer);
 	return anim_timer;
 end
 
@@ -365,43 +364,46 @@ function Game.applyInfinites()
 	-------------------
 
 	-- Lives
-	mainmemory.write_u32_be(Game.Memory.jim_pointer[version] + jim.Lives, max_lives);
+	mainmemory.write_u32_be(Game.Memory.jim_pointer + jim.Lives, max_lives);
 	-- Health
-	mainmemory.write_u32_be(Game.Memory.jim_pointer[version] + jim.Health, max_health);
+	mainmemory.write_u32_be(Game.Memory.jim_pointer + jim.Health, max_health);
 	-- Red Gun
-	mainmemory.write_u32_be(Game.Memory.jim_pointer[version] + jim.gun_pointer + gun.red_gun, max_ammo_red_gun);
+	mainmemory.write_u32_be(Game.Memory.jim_pointer + jim.gun_pointer + gun.red_gun, max_ammo_red_gun);
 	-- Bubble Gun
-	mainmemory.write_u32_be(Game.Memory.jim_pointer[version] + jim.gun_pointer + gun.bubble_gun, max_ammo_bubble_gun);
+	mainmemory.write_u32_be(Game.Memory.jim_pointer + jim.gun_pointer + gun.bubble_gun, max_ammo_bubble_gun);
 	-- Rocket Launcher
-	mainmemory.write_u32_be(Game.Memory.jim_pointer[version] + jim.gun_pointer + gun.rockets, max_ammo_rockets);
+	mainmemory.write_u32_be(Game.Memory.jim_pointer + jim.gun_pointer + gun.rockets, max_ammo_rockets);
 	-- Flamethrower
-	mainmemory.write_u32_be(Game.Memory.jim_pointer[version] + jim.gun_pointer + gun.flamethrower, max_ammo_flamethrower);
+	mainmemory.write_u32_be(Game.Memory.jim_pointer + jim.gun_pointer + gun.flamethrower, max_ammo_flamethrower);
 	-- Bananamyte
-	mainmemory.write_u32_be(Game.Memory.jim_pointer[version] + jim.gun_pointer + gun.bananamyte, max_ammo_bananamyte);
+	mainmemory.write_u32_be(Game.Memory.jim_pointer + jim.gun_pointer + gun.bananamyte, max_ammo_bananamyte);
 	-- Laser Gun
-	mainmemory.write_u32_be(Game.Memory.jim_pointer[version] + jim.gun_pointer + gun.laser, max_ammo_laser);
+	mainmemory.write_u32_be(Game.Memory.jim_pointer + jim.gun_pointer + gun.laser, max_ammo_laser);
 	-- Pea Shooter
-	mainmemory.write_u32_be(Game.Memory.jim_pointer[version] + jim.gun_pointer + gun.pea, max_ammo_pea);
+	mainmemory.write_u32_be(Game.Memory.jim_pointer + jim.gun_pointer + gun.pea, max_ammo_pea);
 	-- Egg Shooter
-	mainmemory.write_u32_be(Game.Memory.jim_pointer[version] + jim.gun_pointer + gun.egg, max_ammo_egg);
+	mainmemory.write_u32_be(Game.Memory.jim_pointer + jim.gun_pointer + gun.egg, max_ammo_egg);
 	-- Fake unused gun
-	mainmemory.write_u32_be(Game.Memory.jim_pointer[version] + jim.gun_pointer + gun.fakegun, max_ammo_fakegun);
+	mainmemory.write_u32_be(Game.Memory.jim_pointer + jim.gun_pointer + gun.fakegun, max_ammo_fakegun);
 	-- Magnum Gun
-	mainmemory.write_u32_be(Game.Memory.jim_pointer[version] + jim.gun_pointer + gun.magnum, max_ammo_magnum);
+	mainmemory.write_u32_be(Game.Memory.jim_pointer + jim.gun_pointer + gun.magnum, max_ammo_magnum);
 	-- Disco Gun
-	mainmemory.write_u32_be(Game.Memory.jim_pointer[version] + jim.gun_pointer + gun.disco, max_ammo_disco);
+	mainmemory.write_u32_be(Game.Memory.jim_pointer + jim.gun_pointer + gun.disco, max_ammo_disco);
 	-- Knife Boomerang
-	mainmemory.write_u32_be(Game.Memory.jim_pointer[version] + jim.gun_pointer + gun.knife, max_ammo_knife);
+	mainmemory.write_u32_be(Game.Memory.jim_pointer + jim.gun_pointer + gun.knife, max_ammo_knife);
 	-- Leprechaun Launcher
-	mainmemory.write_u32_be(Game.Memory.jim_pointer[version] + jim.gun_pointer + gun.leprechaun, max_ammo_leprechaun);
-	-- Missiles
-	mainmemory.writebyte(dereferencePointer(Game.Memory.jim_pointer[version] + jim.boss_pointer) + boss.player_missiles, max_missiles);
-	-- Ego Boosts
-	mainmemory.writebyte(dereferencePointer(Game.Memory.jim_pointer[version] + jim.boss_pointer) + boss.player_egoboosts, max_egoboosts);
+	mainmemory.write_u32_be(Game.Memory.jim_pointer + jim.gun_pointer + gun.leprechaun, max_ammo_leprechaun);
+	local bossPointer = dereferencePointer(Game.Memory.jim_pointer + jim.boss_pointer);
+	if isRDRAM(bossPointer) then
+		-- Missiles
+		mainmemory.writebyte(bossPointer + boss.player_missiles, max_missiles);
+		-- Ego Boosts
+		mainmemory.writebyte(bossPointer + boss.player_egoboosts, max_egoboosts);
+	end
 end
 
 function Game.completeFile()
-	local udder_pointer = Game.Memory.marble_pointer[version] + 0x14;
+	local udder_pointer = Game.Memory.marble_pointer + 0x14;
 
 	-- UDDERS
 	mainmemory.writebyte(udder_pointer + 0x00, 1); -- Brain
@@ -421,16 +423,16 @@ function Game.completeFile()
 	mainmemory.writebyte(udder_pointer + 0x13, 5); -- Bob & Number 4
 
 	-- MARBLES
-	mainmemory.writebyte(Game.Memory.marble_pointer[version] + 0x00, 100); -- Coop D'Etat
-	mainmemory.writebyte(Game.Memory.marble_pointer[version] + 0x01, 100); -- Barn to be Wild
-	mainmemory.writebyte(Game.Memory.marble_pointer[version] + 0x04, 100); -- Lord of the Fries
-	mainmemory.writebyte(Game.Memory.marble_pointer[version] + 0x05, 100); -- Hungry Tonite
-	mainmemory.writebyte(Game.Memory.marble_pointer[version] + 0x09, 100); -- Poultrygeist
-	mainmemory.writebyte(Game.Memory.marble_pointer[version] + 0x0A, 100); -- Poultrygeist Too
-	mainmemory.writebyte(Game.Memory.marble_pointer[version] + 0x0B, 100); -- Death Wormed Up
-	mainmemory.writebyte(Game.Memory.marble_pointer[version] + 0x0C, 100); -- Boogie Nights
-	mainmemory.writebyte(Game.Memory.marble_pointer[version] + 0x0F, 100); -- Violent Death Valley
-	mainmemory.writebyte(Game.Memory.marble_pointer[version] + 0x10, 100); -- Good Bad Elderly
+	mainmemory.writebyte(Game.Memory.marble_pointer + 0x00, 100); -- Coop D'Etat
+	mainmemory.writebyte(Game.Memory.marble_pointer + 0x01, 100); -- Barn to be Wild
+	mainmemory.writebyte(Game.Memory.marble_pointer + 0x04, 100); -- Lord of the Fries
+	mainmemory.writebyte(Game.Memory.marble_pointer + 0x05, 100); -- Hungry Tonite
+	mainmemory.writebyte(Game.Memory.marble_pointer + 0x09, 100); -- Poultrygeist
+	mainmemory.writebyte(Game.Memory.marble_pointer + 0x0A, 100); -- Poultrygeist Too
+	mainmemory.writebyte(Game.Memory.marble_pointer + 0x0B, 100); -- Death Wormed Up
+	mainmemory.writebyte(Game.Memory.marble_pointer + 0x0C, 100); -- Boogie Nights
+	mainmemory.writebyte(Game.Memory.marble_pointer + 0x0F, 100); -- Violent Death Valley
+	mainmemory.writebyte(Game.Memory.marble_pointer + 0x10, 100); -- Good Bad Elderly
 end
 
 Game.BossCamLockOffset = {
@@ -442,10 +444,10 @@ Game.BossCamLockOffset = {
 };
 
 function Game.killBoss()
-	BossCamLockOffSet = Game.BossCamLockOffset[mainmemory.readbyte(Game.Memory.current_map[version])]
+	BossCamLockOffSet = Game.BossCamLockOffset[mainmemory.readbyte(Game.Memory.current_map)];
 	if BossCamLockOffSet ~= nil then
-		camlock_address = dereferencePointer(Game.Memory.boss_camlock_pointer[version]) + BossCamLockOffSet;
-		bossdeath_address = dereferencePointer(Game.Memory.jim_pointer[version] + jim.boss_pointer) + 0xE73;
+		camlock_address = dereferencePointer(Game.Memory.boss_camlock_pointer) + BossCamLockOffSet;
+		bossdeath_address = dereferencePointer(Game.Memory.jim_pointer + jim.boss_pointer) + 0xE73;
 		mainmemory.writebyte(camlock_address, 1);
 		mainmemory.writebyte(bossdeath_address, 1);
 	else
@@ -459,12 +461,12 @@ end
 
 --[[
 function Game.fixInputBug()
-	local joystick_x_input = mainmemory.readbyte(Game.Memory.controller_input[version] + 0x2);
+	local joystick_x_input = mainmemory.readbyte(Game.Memory.controller_input + 0x2);
 	if joystick_x_input == 127 then
-		mainmemory.writebyte(Game.Memory.controller_input[version] + 0x2, 126);
+		mainmemory.writebyte(Game.Memory.controller_input + 0x2, 126);
 	end
 
-	joystick_x_input = mainmemory.readbyte(Game.Memory.controller_input[version] + 0x2);
+	joystick_x_input = mainmemory.readbyte(Game.Memory.controller_input + 0x2);
 	if joystick_x_input == 127 then
 		joypad.setanalog({["P1 X Axis"] = 126})
 	end

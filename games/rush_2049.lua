@@ -27,50 +27,56 @@ local Game = {
 function Game.detectVersion(romName, romHash)
 	if romHash == "3F99351D7BB61656614BDB2AA1A90CFE55D1922C" then -- N64 USA
 		version = 1;
-		return true;
 	elseif romHash == "61373D4758ECA3FA831BEAC27B4D4C250845F80C" then -- N64 PAL
 		version = 2;
-		return true;
+	else
+		return false;
 	end
-	return false;
+
+	-- Squish Game.Memory tables down to a single address for the relevant version
+	for k, v in pairs(Game.Memory) do
+		Game.Memory[k] = v[version];
+	end
+
+	return true;
 end
 
 function Game.unlockCheats()
-	for i = 1, Game.Memory.number_of_cheats[version] do
-		mainmemory.writebyte(Game.Memory.cheat_base[version] + i - 1, 0x01);
+	for i = 1, Game.Memory.number_of_cheats do
+		mainmemory.writebyte(Game.Memory.cheat_base + i - 1, 0x01);
 	end
 end
 
 function Game.getXPosition()
-	return mainmemory.readfloat(Game.Memory.x_position[version], true);
+	return mainmemory.readfloat(Game.Memory.x_position, true);
 end
 
 function Game.getYPosition()
-	return mainmemory.readfloat(Game.Memory.y_position[version], true);
+	return mainmemory.readfloat(Game.Memory.y_position, true);
 end
 
 function Game.getZPosition()
-	return mainmemory.readfloat(Game.Memory.z_position[version], true);
+	return mainmemory.readfloat(Game.Memory.z_position, true);
 end
 
 function Game.setXPosition(value)
-	return mainmemory.writefloat(Game.Memory.x_position[version], value, true);
+	return mainmemory.writefloat(Game.Memory.x_position, value, true);
 end
 
 function Game.setYPosition(value)
-	return mainmemory.writefloat(Game.Memory.y_position[version], value, true);
+	return mainmemory.writefloat(Game.Memory.y_position, value, true);
 end
 
 function Game.setZPosition(value)
-	return mainmemory.writefloat(Game.Memory.z_position[version], value, true);
+	return mainmemory.writefloat(Game.Memory.z_position, value, true);
 end
 
 function Game.getVelocity()
-	return mainmemory.readfloat(Game.Memory.velocity[version], true);
+	return mainmemory.readfloat(Game.Memory.velocity, true);
 end
 
 function Game.setVelocity(value)
-	return mainmemory.writefloat(Game.Memory.velocity[version], value, true);
+	return mainmemory.writefloat(Game.Memory.velocity, value, true);
 end
 
 function Game.initUI()
@@ -89,10 +95,6 @@ Game.OSD = {
 	{"Max dY"},
 	{"Max dXZ"},
 	{"Odometer"},
-	{"Separator"},
-	{"Rot. X", Game.getXRotation},
-	{"Facing", Game.getYRotation},
-	{"Rot. Z", Game.getZRotation},
 };
 
 return Game;

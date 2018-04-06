@@ -78,6 +78,11 @@ function Game.detectVersion(romName, romHash)
 		return false;
 	end
 
+	-- Squish Game.Memory tables down to a single address for the relevant version
+	for k, v in pairs(Game.Memory) do
+		Game.Memory[k] = v[version];
+	end
+
 	return true;
 end
 
@@ -271,7 +276,7 @@ function Game.drawUI()
 		local row = 0;
 		local height = 16;
 
-		local examine_data = getExamineData(Game.Memory.object_list[version] + objectIndex * objectSize);
+		local examine_data = getExamineData(Game.Memory.object_list + objectIndex * objectSize);
 		for i = #examine_data, 1, -1 do
 			if examine_data[i][1] ~= "Separator" then
 				if type(examine_data[i][2]) == "number" then
@@ -306,7 +311,7 @@ end
 
 function zipToSelectedObject()
 	if forms.ischecked(ScriptHawk.UI.form_controls["Enable Object Analyzer"]) then
-		local objectBase = Game.Memory.object_list[version] + objectIndex * objectSize;
+		local objectBase = Game.Memory.object_list + objectIndex * objectSize;
 
 		local objectX = mainmemory.readfloat(objectBase + 0xA0, true);
 		local objectY = mainmemory.readfloat(objectBase + 0xA4, true);
@@ -329,15 +334,15 @@ Game.rot_speed = 100;
 Game.max_rot_units = 65536;
 
 function Game.getVelocity()
-	return mainmemory.readfloat(Game.Memory.velocity[version], true);
+	return mainmemory.readfloat(Game.Memory.velocity, true);
 end
 
 function Game.getYVelocity()
-	return mainmemory.readfloat(Game.Memory.y_velocity[version], true);
+	return mainmemory.readfloat(Game.Memory.y_velocity, true);
 end
 
 function Game.setYVelocity(value)
-	mainmemory.writefloat(Game.Memory.y_velocity[version], value, true);
+	mainmemory.writefloat(Game.Memory.y_velocity, value, true);
 end
 
 --------------
@@ -345,28 +350,28 @@ end
 --------------
 
 function Game.getXPosition()
-	return mainmemory.readfloat(Game.Memory.x_pos[version], true);
+	return mainmemory.readfloat(Game.Memory.x_pos, true);
 end
 
 function Game.getYPosition()
-	return mainmemory.readfloat(Game.Memory.y_pos[version], true);
+	return mainmemory.readfloat(Game.Memory.y_pos, true);
 end
 
 function Game.getZPosition()
-	return mainmemory.readfloat(Game.Memory.z_pos[version], true);
+	return mainmemory.readfloat(Game.Memory.z_pos, true);
 end
 
 function Game.setXPosition(value)
-	mainmemory.writefloat(Game.Memory.x_pos[version], value, true);
+	mainmemory.writefloat(Game.Memory.x_pos, value, true);
 end
 
 function Game.setYPosition(value)
-	mainmemory.writefloat(Game.Memory.y_pos[version], value, true);
+	mainmemory.writefloat(Game.Memory.y_pos, value, true);
 	Game.setYVelocity(0);
 end
 
 function Game.setZPosition(value)
-	mainmemory.writefloat(Game.Memory.z_pos[version], value, true);
+	mainmemory.writefloat(Game.Memory.z_pos, value, true);
 end
 
 --------------
@@ -374,27 +379,27 @@ end
 --------------
 
 function Game.getXRotation()
-	return mainmemory.read_u32_be(Game.Memory.x_rot[version]);
+	return mainmemory.read_u32_be(Game.Memory.x_rot);
 end
 
 function Game.getYRotation()
-	return mainmemory.read_u32_be(Game.Memory.y_rot[version]);
+	return mainmemory.read_u32_be(Game.Memory.y_rot);
 end
 
 function Game.getZRotation()
-	return mainmemory.read_u32_be(Game.Memory.z_rot[version]);
+	return mainmemory.read_u32_be(Game.Memory.z_rot);
 end
 
 function Game.setXRotation(value)
-	return mainmemory.write_u32_be(Game.Memory.x_rot[version], value);
+	return mainmemory.write_u32_be(Game.Memory.x_rot, value);
 end
 
 function Game.setYRotation(value)
-	return mainmemory.write_u32_be(Game.Memory.y_rot[version], value);
+	return mainmemory.write_u32_be(Game.Memory.y_rot, value);
 end
 
 function Game.setZRotation(value)
-	return mainmemory.write_u32_be(Game.Memory.z_rot[version], value);
+	return mainmemory.write_u32_be(Game.Memory.z_rot, value);
 end
 
 ------------
@@ -403,7 +408,7 @@ end
 
 function Game.setMap(value)
 	if value >= 1 and value <= #Game.maps then
-		mainmemory.write_u16_be(Game.Memory.map[version], value);
+		mainmemory.write_u16_be(Game.Memory.map, value);
 	end
 end
 

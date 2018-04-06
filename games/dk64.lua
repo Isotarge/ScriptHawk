@@ -77,9 +77,9 @@ local Game = {
 		exit_array_pointer = {0x7FC900, 0x7FC840, 0x7FCD90, 0x7B6520}, -- Pointer
 		number_of_exits = {0x7FC904, 0x7FC844, 0x7FCD94, 0x7B6524}, -- Byte
 		level_index_mapping = {0x7445E0, 0x73ED30, 0x743EA0, 0x6F1D10},
-		in_submap = {0x76A160, 0x764C80, 0x76A350, nil}, -- TODO: Kiosk
-		parent_map = {0x76A172, 0x764C92, 0x76A362, nil}, -- TODO: Kiosk
-		parent_exit = {0x76A174, 0x764C94, 0x76A364, nil}, -- TODO: Kiosk
+		in_submap = {0x76A160, 0x764C80, 0x76A350, nil},
+		parent_map = {0x76A172, 0x764C92, 0x76A362, nil},
+		parent_exit = {0x76A174, 0x764C94, 0x76A364, nil},
 		lag_boost = {0x744478, 0x73EBC8, 0x743D38, 0x6F1C70},
 		destination_map = {0x7444E4, 0x73EC34, 0x743DA4, 0x6F1CC4}, -- See Game.maps for values
 		destination_exit = {0x7444E8, 0x73EC38, 0x743DA8, 0x6F1CC8},
@@ -3165,6 +3165,63 @@ function dumpSetup(hideKnown)
 	end
 end
 
+----------------------------
+-- Dynamic Water Surfaces --
+----------------------------
+
+-- Indexed by version, much like Game.Memory.address tables
+-- Squished into a single address in Game.detectVersion()
+local dynamicWaterSurface = {
+	timer_1 = {0x30, 0x30, 0x30, 0x24},
+	timer_2 = {0x34, 0x34, 0x34, 0x28},
+	timer_3 = {0x38, 0x38, 0x38, 0x2C},
+	timer_4 = {0x3C, 0x3C, 0x3C, 0x30},
+	next_surface_pointer = {0x50, 0x50, 0x50, 0x44},
+};
+
+function dumpWaterSurfaces()
+	local waterSurface = dereferencePointer(Game.Memory.water_surface_list);
+	if isRDRAM(waterSurface) then
+		while isRDRAM(waterSurface) do
+			local t1Str = mainmemory.read_u32_be(waterSurface + dynamicWaterSurface.timer_1)..", ";
+			local t2Str = mainmemory.read_u32_be(waterSurface + dynamicWaterSurface.timer_2)..", ";
+			local t3Str = mainmemory.read_u32_be(waterSurface + dynamicWaterSurface.timer_3)..", ";
+			local t4Str = mainmemory.read_u32_be(waterSurface + dynamicWaterSurface.timer_4);
+			print(toHexString(waterSurface).." Timers: {"..t1Str..t2Str..t3Str..t4Str.."}");
+			waterSurface = dereferencePointer(waterSurface + dynamicWaterSurface.next_surface_pointer);
+		end
+	else
+		print("There is no dynamic water currently loaded.");
+	end
+end
+
+local function setWaterSurfaceTimers(value)
+	local waterSurface = dereferencePointer(Game.Memory.water_surface_list);
+	while isRDRAM(waterSurface) do
+		mainmemory.write_u32_be(waterSurface + dynamicWaterSurface.timer_1, value);
+		mainmemory.write_u32_be(waterSurface + dynamicWaterSurface.timer_2, value);
+		mainmemory.write_u32_be(waterSurface + dynamicWaterSurface.timer_3, value);
+		mainmemory.write_u32_be(waterSurface + dynamicWaterSurface.timer_4, value);
+		waterSurface = dereferencePointer(waterSurface + dynamicWaterSurface.next_surface_pointer);
+	end
+end
+
+--[[
+surfaceTimerHack = 0;
+surfaceTimerHackInterval = 100;
+
+function Game.increaseSurfaceTimerHack()
+	surfaceTimerHack = surfaceTimerHack + surfaceTimerHackInterval;
+end
+
+function Game.decreaseSurfaceTimerHack()
+	surfaceTimerHack = surfaceTimerHack - surfaceTimerHackInterval;
+end
+
+ScriptHawk.bindKeyFrame("K", Game.decreaseSurfaceTimerHack, false);
+ScriptHawk.bindKeyFrame("L", Game.increaseSurfaceTimerHack, false);
+--]]
+
 --------------------
 -- Region/Version --
 --------------------
@@ -3788,9 +3845,13 @@ function Game.detectVersion(romName, romHash)
 		flag_names = {"None"};
 	end
 
-	-- Squish Game.Memory tables down to a single int for the relevant version
+	-- Squish Game.Memory tables down to a single address for the relevant version
 	for k, v in pairs(Game.Memory) do
 		Game.Memory[k] = v[version];
+	end
+
+	for k, v in pairs(dynamicWaterSurface) do
+		dynamicWaterSurface[k] = v[version];
 	end
 
 	return true;
@@ -4357,61 +4418,6 @@ function Game.getTotalMemory()
 	end
 	return "Unknown";
 end
-
-----------------------------
--- Dynamic Water Surfaces --
-----------------------------
-
-local dynamicWaterSurface = {
-	timer_1 = {0x30, 0x30, 0x30, 0x24},
-	timer_2 = {0x34, 0x34, 0x34, 0x28},
-	timer_3 = {0x38, 0x38, 0x38, 0x2C},
-	timer_4 = {0x3C, 0x3C, 0x3C, 0x30},
-	next_surface_pointer = {0x50, 0x50, 0x50, 0x44},
-};
-
-function dumpWaterSurfaces()
-	local waterSurface = dereferencePointer(Game.Memory.water_surface_list);
-	if isRDRAM(waterSurface) then
-		while isRDRAM(waterSurface) do
-			local t1Str = mainmemory.read_u32_be(waterSurface + dynamicWaterSurface.timer_1[version])..", ";
-			local t2Str = mainmemory.read_u32_be(waterSurface + dynamicWaterSurface.timer_2[version])..", ";
-			local t3Str = mainmemory.read_u32_be(waterSurface + dynamicWaterSurface.timer_3[version])..", ";
-			local t4Str = mainmemory.read_u32_be(waterSurface + dynamicWaterSurface.timer_4[version]);
-			print(toHexString(waterSurface).." Timers: {"..t1Str..t2Str..t3Str..t4Str.."}");
-			waterSurface = dereferencePointer(waterSurface + dynamicWaterSurface.next_surface_pointer[version]);
-		end
-	else
-		print("There is no dynamic water currently loaded.");
-	end
-end
-
-local function setWaterSurfaceTimers(value)
-	local waterSurface = dereferencePointer(Game.Memory.water_surface_list[version]);
-	while isRDRAM(waterSurface) do
-		mainmemory.write_u32_be(waterSurface + dynamicWaterSurface.timer_1[version], value);
-		mainmemory.write_u32_be(waterSurface + dynamicWaterSurface.timer_2[version], value);
-		mainmemory.write_u32_be(waterSurface + dynamicWaterSurface.timer_3[version], value);
-		mainmemory.write_u32_be(waterSurface + dynamicWaterSurface.timer_4[version], value);
-		waterSurface = dereferencePointer(waterSurface + dynamicWaterSurface.next_surface_pointer[version]);
-	end
-end
-
---[[
-surfaceTimerHack = 0;
-surfaceTimerHackInterval = 100;
-
-local function increaseSurfaceTimerHack()
-	surfaceTimerHack = surfaceTimerHack + surfaceTimerHackInterval;
-end
-
-local function decreaseSurfaceTimerHack()
-	surfaceTimerHack = surfaceTimerHack - surfaceTimerHackInterval;
-end
-
-ScriptHawk.bindKeyFrame("K", decreaseSurfaceTimerHack, false);
-ScriptHawk.bindKeyFrame("L", increaseSurfaceTimerHack, false);
---]]
 
 ------------------
 -- Chunk Deload --
@@ -6026,16 +6032,16 @@ local FTA = {
 		[Krusha] = 0x0007,
 	},
 	CrownMaps = {
-		53,
-		73,
-		155,
-		156,
-		157,
-		158,
-		159,
-		160,
-		161,
-		162,
+		53, -- Beaver Brawl!
+		73, -- Kritter Karnage!
+		155, -- Arena Ambush!
+		156, -- More Kritter Karnage!
+		157, -- Forest Fracas!
+		158, -- Bish Bash Brawl!
+		159, -- Kamikaze Kremlings!
+		160, -- Plinth Panic!
+		161, -- Pinnacle Palaver!
+		162, -- Shockwave Showdown!
 	},
 };
 
@@ -6105,8 +6111,7 @@ function FTA.freeTradeObjectModel1(currentKong)
 			if isRDRAM(pointer) then
 				local actorType = mainmemory.read_u32_be(pointer + obj_model1.actor_type);
 				if FTA.isKasplat(actorType) then
-					local currentMap = Game.getMap();
-					if not FTA.isCrownMap(currentMap) then
+					if not FTA.isCrownMap(map_value) then
 						mainmemory.write_u32_be(pointer + obj_model1.actor_type, FTA.Kasplats[currentKong]); -- Fix which blueprint the Kasplat drops
 						mainmemory.writebyte(pointer + 0x15F, 0x01); -- Make sure white-haired Kasplats still drop Blueprints
 					end
@@ -8637,11 +8642,11 @@ function buildIdentifyMemoryCache()
 		addHeapMetadata(waterSurface, "isDynamicWaterSurface", true);
 		addHeapMetadata(waterSurface, "addressFound", true);
 		addHeapMetadata(waterSurface, "addressType", 7);
-		addHeapMetadata(waterSurface, "timer1", mainmemory.read_u32_be(waterSurface + dynamicWaterSurface.timer_1[version]));
-		addHeapMetadata(waterSurface, "timer2", mainmemory.read_u32_be(waterSurface + dynamicWaterSurface.timer_2[version]));
-		addHeapMetadata(waterSurface, "timer3", mainmemory.read_u32_be(waterSurface + dynamicWaterSurface.timer_3[version]));
-		addHeapMetadata(waterSurface, "timer4", mainmemory.read_u32_be(waterSurface + dynamicWaterSurface.timer_4[version]));
-		waterSurface = dereferencePointer(waterSurface + dynamicWaterSurface.next_surface_pointer[version]);
+		addHeapMetadata(waterSurface, "timer1", mainmemory.read_u32_be(waterSurface + dynamicWaterSurface.timer_1));
+		addHeapMetadata(waterSurface, "timer2", mainmemory.read_u32_be(waterSurface + dynamicWaterSurface.timer_2));
+		addHeapMetadata(waterSurface, "timer3", mainmemory.read_u32_be(waterSurface + dynamicWaterSurface.timer_3));
+		addHeapMetadata(waterSurface, "timer4", mainmemory.read_u32_be(waterSurface + dynamicWaterSurface.timer_4));
+		waterSurface = dereferencePointer(waterSurface + dynamicWaterSurface.next_surface_pointer);
 	end
 
 	-- Cache exits

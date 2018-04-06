@@ -525,35 +525,37 @@ character_states = {
 function Game.detectVersion(romName, romHash)
 	if romHash == "4B71F0E01878696733EEFA9C80D11C147ECB4984" then -- Japan
 		version = 1;
-		return true;
 	elseif romHash == "A9BF83FE73361E8D042C33ED48B3851D7D46712C" then -- Australia
 		version = 2;
-		return true;
 	elseif romHash == "6EE8A41FEF66280CE3E3F0984D00B96079442FB9" then -- Europe
 		version = 3;
-		return true;
 	elseif romHash == "E2929E10FCCC0AA84E5776227E798ABC07CEDABF" then -- USA
 		version = 4;
-		return true;
 	elseif romHash == "88C8FED5ECD5ED901CB5FC4B5BBEFFA3EA022DF7" then -- 19XXTE 0.11, based on USA ROM
 		version = 4;
-		return true;
 	elseif romHash == "1095F94D70216AC916A9DD8A9FD65DB13E7F9F17" then -- 19XXGE, based on USA ROM
 		version = 4;
-		return true;
+	else
+		return false;
 	end
-	return false;
+
+	-- Squish Game.Memory tables down to a single address for the relevant version
+	for k, v in pairs(Game.Memory) do
+		Game.Memory[k] = v[version];
+	end
+
+	return true;
 end
 
 function Game.setMap(index)
-	local matchSettings = dereferencePointer(Game.Memory.match_settings_pointer[version]);
+	local matchSettings = dereferencePointer(Game.Memory.match_settings_pointer);
 	if isRDRAM(matchSettings) then
 		mainmemory.writebyte(matchSettings + match_settings.map, index - 1);
 	end
 end
 
 function Game.getMatchSettings()
-	local matchSettings = dereferencePointer(Game.Memory.match_settings_pointer[version]);
+	local matchSettings = dereferencePointer(Game.Memory.match_settings_pointer);
 	if isRDRAM(matchSettings) then
 		return toHexString(matchSettings);
 	end
@@ -562,9 +564,9 @@ end
 
 function Game.getPlayer(player)
 	if type(player) ~= "number" or player == 1 then
-		return dereferencePointer(Game.Memory.player_list_pointer[version]);
+		return dereferencePointer(Game.Memory.player_list_pointer);
 	end
-	local playerList = dereferencePointer(Game.Memory.player_list_pointer[version]);
+	local playerList = dereferencePointer(Game.Memory.player_list_pointer);
 	if isRDRAM(playerList) then
 		return playerList + (player - 1) * 0xB50;
 	end
@@ -583,7 +585,7 @@ function Game.setCharacter(character, player)
 	--if isRDRAM(playerActor) then
 		--mainmemory.writebyte(playerActor + player_fields.Character, character);
 	--end
-	local matchSettings = dereferencePointer(Game.Memory.match_settings_pointer[version]);
+	local matchSettings = dereferencePointer(Game.Memory.match_settings_pointer);
 	if isRDRAM(matchSettings) then
 		if type(player) ~= "number" or player < 1 or player > 4 then
 			player = 1;
@@ -825,7 +827,7 @@ function Game.colorDY()
 end
 
 function Game.unlockEverything()
-	local value = mainmemory.readbyte(Game.Memory.unlocked_stuff[version] + 3);
+	local value = mainmemory.readbyte(Game.Memory.unlocked_stuff + 3);
 	value = set_bit(value, 0); -- Luigi Unlock Battle Completed
 	value = set_bit(value, 1); -- Ness Unlock Battle Completed
 	value = set_bit(value, 2); -- Captain Falcon Unlock Battle Completed
@@ -833,17 +835,17 @@ function Game.unlockEverything()
 	value = set_bit(value, 4); -- Mushroom Kingdom Available
 	value = set_bit(value, 5); -- Sound Test Unlocked
 	value = set_bit(value, 6); -- Item Switch Unlocked
-	mainmemory.writebyte(Game.Memory.unlocked_stuff[version] + 3, value);
+	mainmemory.writebyte(Game.Memory.unlocked_stuff + 3, value);
 
-	value = mainmemory.readbyte(Game.Memory.unlocked_stuff[version] + 4);
+	value = mainmemory.readbyte(Game.Memory.unlocked_stuff + 4);
 	value = set_bit(value, 2); -- Jigglypuff Selectable
 	value = set_bit(value, 3); -- Ness Selectable
-	mainmemory.writebyte(Game.Memory.unlocked_stuff[version] + 4, value);
+	mainmemory.writebyte(Game.Memory.unlocked_stuff + 4, value);
 
-	value = mainmemory.readbyte(Game.Memory.unlocked_stuff[version] + 5);
+	value = mainmemory.readbyte(Game.Memory.unlocked_stuff + 5);
 	value = set_bit(value, 4); -- Luigi Selectable
 	value = set_bit(value, 7); -- Captain Falcon Selectable
-	mainmemory.writebyte(Game.Memory.unlocked_stuff[version] + 5, value);
+	mainmemory.writebyte(Game.Memory.unlocked_stuff + 5, value);
 end
 
 function Game.showHitbox(player)
@@ -864,11 +866,11 @@ function Game.toggleItemHitboxes(value)
 	if version == 2 or version == 3 then
 		return;
 	end
-	local firstObj = dereferencePointer(Game.Memory.item_list_pointer[version]);
+	local firstObj = dereferencePointer(Game.Memory.item_list_pointer);
 	while isRDRAM(firstObj) do
 		local secondObj = dereferencePointer(firstObj + 0x84);
 		if isRDRAM(secondObj) then
-			mainmemory.write_u32_be(secondObj + Game.Memory.item_hitbox_offset[version], value);
+			mainmemory.write_u32_be(secondObj + Game.Memory.item_hitbox_offset, value);
 		end
 		firstObj = dereferencePointer(firstObj + 0x04);
 	end
@@ -893,7 +895,7 @@ function Game.hideHitboxes()
 end
 
 function Game.setMusic(value)
-	mainmemory.writebyte(Game.Memory.music[version], value);
+	mainmemory.writebyte(Game.Memory.music, value);
 end
 
 function Game.initUI()

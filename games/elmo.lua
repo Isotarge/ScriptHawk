@@ -30,16 +30,20 @@ local player_fields = {
 --------------------
 
 function Game.detectVersion(romName, romHash)
-	if emu.getsystemid() == "N64" then
-		if romHash == "7195EA96D9FE5DE065AF61F70D55C92C8EE905E6" then -- Number Journey, N64, USA
-			version = 1;
-			return true;
-		elseif romHash == "97777CA06F4E8AFF8F1E95033CC8D3833BE40F76" then -- Letter Adventure, N64, USA
-			version = 2;
-			return true;
-		end
+	if romHash == "7195EA96D9FE5DE065AF61F70D55C92C8EE905E6" then -- Number Journey, N64, USA
+		version = 1;
+	elseif romHash == "97777CA06F4E8AFF8F1E95033CC8D3833BE40F76" then -- Letter Adventure, N64, USA
+		version = 2;
+	else
+		return false;
 	end
-	return false;
+
+	-- Squish Game.Memory tables down to a single address for the relevant version
+	for k, v in pairs(Game.Memory) do
+		Game.Memory[k] = v[version];
+	end
+
+	return true;
 end
 
 --------------
@@ -47,7 +51,7 @@ end
 --------------
 
 function Game.getXPosition()
-	local elmoObject = dereferencePointer(Game.Memory.elmo_pointer[version]);
+	local elmoObject = dereferencePointer(Game.Memory.elmo_pointer);
 	if isRDRAM(elmoObject) then
 		return mainmemory.readfloat(elmoObject + player_fields.x_pos, true);
 	end
@@ -55,7 +59,7 @@ function Game.getXPosition()
 end
 
 function Game.getYPosition()
-	local elmoObject = dereferencePointer(Game.Memory.elmo_pointer[version]);
+	local elmoObject = dereferencePointer(Game.Memory.elmo_pointer);
 	if isRDRAM(elmoObject) then
 		return mainmemory.readfloat(elmoObject + player_fields.y_pos, true);
 	end
@@ -63,7 +67,7 @@ function Game.getYPosition()
 end
 
 function Game.getZPosition()
-	local elmoObject = dereferencePointer(Game.Memory.elmo_pointer[version]);
+	local elmoObject = dereferencePointer(Game.Memory.elmo_pointer);
 	if isRDRAM(elmoObject) then
 		return mainmemory.readfloat(elmoObject + player_fields.z_pos, true);
 	end
@@ -71,21 +75,21 @@ function Game.getZPosition()
 end
 
 function Game.setXPosition(value)
-	local elmoObject = dereferencePointer(Game.Memory.elmo_pointer[version]);
+	local elmoObject = dereferencePointer(Game.Memory.elmo_pointer);
 	if isRDRAM(elmoObject) then
 		mainmemory.writefloat(elmoObject + player_fields.x_pos, value, true);
 	end
 end
 
 function Game.setYPosition(value)
-	local elmoObject = dereferencePointer(Game.Memory.elmo_pointer[version]);
+	local elmoObject = dereferencePointer(Game.Memory.elmo_pointer);
 	if isRDRAM(elmoObject) then
 		mainmemory.writefloat(elmoObject + player_fields.y_pos, value, true);
 	end
 end
 
 function Game.setZPosition(value)
-	local elmoObject = dereferencePointer(Game.Memory.elmo_pointer[version]);
+	local elmoObject = dereferencePointer(Game.Memory.elmo_pointer);
 	if isRDRAM(elmoObject) then
 		mainmemory.writefloat(elmoObject + player_fields.z_pos, value, true);
 	end
@@ -96,7 +100,7 @@ end
 --------------
 
 function Game.getYRotation()
-	local elmoObject = dereferencePointer(Game.Memory.elmo_pointer[version]);
+	local elmoObject = dereferencePointer(Game.Memory.elmo_pointer);
 	if isRDRAM(elmoObject) then
 		return mainmemory.readfloat(elmoObject + player_fields.facing_angle, true) + 1;
 	end
@@ -104,7 +108,7 @@ function Game.getYRotation()
 end
 
 function Game.setYRotation(value)
-	local elmoObject = dereferencePointer(elmo_pointer);
+	local elmoObject = dereferencePointer(Game.Memory.elmo_pointer);
 	if isRDRAM(elmoObject) then
 		return mainmemory.writefloat(elmoObject + player_fields.facing_angle, value - 1, true);
 	end

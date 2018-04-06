@@ -20,23 +20,25 @@ local Game = {
 --------------------
 
 function Game.detectVersion(romName, romHash)
-	if emu.getsystemid() == "N64" then
-		if romHash == "A9F97E22391313095D2C2FBAF81FB33BFA2BA7C6" then -- France
-			version = 1;
-		elseif romHash == "92015E5254CBBAD1BC668ECB13A4B568E5F55052" then -- Europe
-			version = 2;
-		elseif romHash == "982AD2E1E44C6662C88A77367BC5DF91C51531BF" then -- USA
-			version = 3;
-		elseif romHash == "EAE83C07E2E777D8E71A5BE6120AED03D7E67782" then -- German 1.1
-			version = 4;
-		elseif romHash == "F8FBB100227015BE8629243F53D70F29A2A14315" then -- German 1.0
-			version = 5;
-		else
-			return false;
-		end
+	if romHash == "A9F97E22391313095D2C2FBAF81FB33BFA2BA7C6" then -- France, N64
+		version = 1;
+	elseif romHash == "92015E5254CBBAD1BC668ECB13A4B568E5F55052" then -- Europe, N64
+		version = 2;
+	elseif romHash == "982AD2E1E44C6662C88A77367BC5DF91C51531BF" then -- USA, N64
+		version = 3;
+	elseif romHash == "EAE83C07E2E777D8E71A5BE6120AED03D7E67782" then -- German 1.1, N64
+		version = 4;
+	elseif romHash == "F8FBB100227015BE8629243F53D70F29A2A14315" then -- German 1.0, N64
+		version = 5;
 	else
 		return false;
 	end
+
+	-- Squish Game.Memory tables down to a single address for the relevant version
+	for k, v in pairs(Game.Memory) do
+		Game.Memory[k] = v[version];
+	end
+
 	return true;
 end
 
@@ -66,27 +68,27 @@ end
 --------------
 
 function Game.getXPosition()
-	return mainmemory.read_s32_be(Game.Memory.x_position[version]);
+	return mainmemory.read_s32_be(Game.Memory.x_position);
 end
 
 function Game.getYPosition()
-	return mainmemory.read_s32_be(Game.Memory.y_position[version]);
+	return mainmemory.read_s32_be(Game.Memory.y_position);
 end
 
 function Game.getZPosition()
-	return mainmemory.read_s32_be(Game.Memory.z_position[version]);
+	return mainmemory.read_s32_be(Game.Memory.z_position);
 end
 
 function Game.setXPosition(value)
-	mainmemory.write_s32_be(Game.Memory.x_position[version], value);
+	mainmemory.write_s32_be(Game.Memory.x_position, value);
 end
 
 function Game.setYPosition(value)
-	mainmemory.write_s32_be(Game.Memory.y_position[version], value);
+	mainmemory.write_s32_be(Game.Memory.y_position, value);
 end
 
 function Game.setZPosition(value)
-	mainmemory.write_s32_be(Game.Memory.z_position[version], value);
+	mainmemory.write_s32_be(Game.Memory.z_position, value);
 end
 
 --------------
@@ -94,16 +96,16 @@ end
 --------------
 
 function Game.getYRotation()
-	return mainmemory.read_u16_be(Game.Memory.facing_angle[version]);
+	return mainmemory.read_u16_be(Game.Memory.facing_angle);
 end
 
 function Game.setYRotation(value)
-	mainmemory.write_u16_be(Game.Memory.facing_angle[version], value);
+	mainmemory.write_u16_be(Game.Memory.facing_angle, value);
 end
 
 function Game.eachFrame()
 	global_timer.previous = global_timer.current;
-	global_timer.current = mainmemory.read_u32_be(Game.Memory.global_timer[version]);
+	global_timer.current = mainmemory.read_u32_be(Game.Memory.global_timer);
 end
 
 Game.OSD = {

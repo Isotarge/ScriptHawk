@@ -131,6 +131,7 @@ While ScriptHawk does have basic support for OoT and MM there are people who are
 ## Partially Supported Games
 - Elmo's Number Journey (N64 only)
 - Elmo's Letter Adventure (N64 only)
+- Legend of Galahad (Genesis)
 - Rayman 2 (N64 only)
 - San Francisco Rush 2049 (N64 only)
 
@@ -138,7 +139,6 @@ While ScriptHawk does have basic support for OoT and MM there are people who are
 - [Tetris Attack](Tetris%20Attack%20Bot.lua) bot, plays the game quite well using a simple sorting algorithm
 - [Mr. Driller 2](Beta/Drillbot.lua) bot
 - [remove_klump.lua](Beta/remove_klump.lua), [code golf](https://en.wikipedia.org/wiki/Code_golf) that removes Klumps from DK64 USA version
-- [Legend of Galahad](Beta/Galahad.lua) object viewer, written by [The8bitbeast](https://twitter.com/the8bitbeast)
 - [Wonder Boy III](Beta/Wonder%20Boy%20III%20RNG%20Watch.lua) RNG watch, written by [The8bitbeast](https://twitter.com/the8bitbeast)
 - Dega .MMV reader
 

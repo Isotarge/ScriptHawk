@@ -29,12 +29,18 @@ local max_B_skill = 0x400;
 function Game.detectVersion(romName, romHash)
 	if romHash == "E5E09205AA743A9E5043A42DF72ADC379C746B0B" then -- USA N64
 		version = 1;
-		return true;
 	elseif romHash == "23710541BB3394072740B0F0236A7CB1A7D41531" then -- Europe N64
 		version = 2;
-		return true;
+	else
+		return false;
 	end
-	return false;
+
+	-- Squish Game.Memory tables down to a single address for the relevant version
+	for k, v in pairs(Game.Memory) do
+		Game.Memory[k] = v[version];
+	end
+
+	return true;
 end
 
 -----------------------------
@@ -66,11 +72,11 @@ local animal_struct_offsets = {
 };
 
 function Game.getCurrentAnimalIndex()
-	return mainmemory.read_u16_be(Game.Memory.current_animal_list_index[version]);
+	return mainmemory.read_u16_be(Game.Memory.current_animal_list_index);
 end
 
 function Game.getAnimalVariablePointer(levelAnimalIndex)
-	return dereferencePointer(levelAnimalIndex * 0x08 + Game.Memory.animal_list_pointer_base[version] + 0x04);
+	return dereferencePointer(levelAnimalIndex * 0x08 + Game.Memory.animal_list_pointer_base + 0x04);
 end
 
 function Game.getCurrentAnimalVariablePointer()
@@ -78,7 +84,7 @@ function Game.getCurrentAnimalVariablePointer()
 end
 
 function Game.getAnimalInfoPointer(levelAnimalIndex)
-	local animalObjectPointer = dereferencePointer(levelAnimalIndex * 0x08 + Game.Memory.animal_list_pointer_base[version]);
+	local animalObjectPointer = dereferencePointer(levelAnimalIndex * 0x08 + Game.Memory.animal_list_pointer_base);
 	if isRDRAM(animalObjectPointer) then
 		return animalObjectPointer;
 	end
@@ -405,7 +411,7 @@ Game.maps = {
 };
 
 function Game.setMap(index)
-	mainmemory.writebyte(Game.Memory.map_index[version], index);
+	mainmemory.writebyte(Game.Memory.map_index, index);
 end
 
 function Game.applyInfinites()

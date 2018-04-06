@@ -53,18 +53,22 @@ local vScale = 100000;
 function Game.detectVersion(romName, romHash)
 	if romHash == "41B5F211" or romHash == "249FC147" then -- USA
 		version = 1;
-		return true;
 	elseif romHash == "D6172125" or romHash == "2033243A" then -- Europe (EDC)
 		version = 2;
-		return true;
 	elseif romHash == "FD11EB1E" or romHash == "0B9EB02B" then -- Europe (No EDC)
 		version = 2;
-		return true;
 	elseif romHash == "D9BA797E" or romHash == "F5B95131" then -- Japan
 		version = 3;
-		return true;
+	else
+		return false;
 	end
-	return false;
+
+	-- Squish Game.Memory tables down to a single address for the relevant version
+	for k, v in pairs(Game.Memory) do
+		Game.Memory[k] = v[version];
+	end
+
+	return true;
 end
 
 global_timer = {
@@ -77,11 +81,11 @@ function Game.isPhysicsFrame()
 end
 
 function Game.getLevel()
-	return mainmemory.read_u32_le(Game.Memory.level[version]);
+	return mainmemory.read_u32_le(Game.Memory.level);
 end
 
 function Game.getPlayerActor()
-	return dereferencePointer(Game.Memory.player_pointer[version]);
+	return dereferencePointer(Game.Memory.player_pointer);
 end
 
 function playerPointerOSD()
@@ -108,7 +112,7 @@ function Game.setLives(value)
 end
 
 function Game.getBoxesSmashed()
-	return math.floor(mainmemory.read_s32_le(Game.Memory.boxes_smashed[version]) / 256);
+	return math.floor(mainmemory.read_s32_le(Game.Memory.boxes_smashed) / 256);
 end
 
 function Game.getSpinPower() -- TODO: Verify data
@@ -133,7 +137,7 @@ end
 --------------
 
 function Game.getProgress()
-	return mainmemory.read_s32_le(Game.Memory.level_progress[version]) / 256;
+	return mainmemory.read_s32_le(Game.Memory.level_progress) / 256;
 end
 
 function Game.getProgressVel()
@@ -259,7 +263,7 @@ end
 
 function Game.applyInfinites()
 	Game.setLives(99);
-	local maskObject = dereferencePointer(Game.Memory.akuaku_mask_pointer[version]);
+	local maskObject = dereferencePointer(Game.Memory.akuaku_mask_pointer);
 	if isRAM(maskObject) then
 		mainmemory.writebyte(maskObject + 0x189, 0x02);
 	end
@@ -267,7 +271,7 @@ end
 
 function Game.eachFrame()
 	global_timer.previous = global_timer.current;
-	global_timer.current = mainmemory.read_u32_le(Game.Memory.global_timer[version]);
+	global_timer.current = mainmemory.read_u32_le(Game.Memory.global_timer);
 end
 
 Game.OSD = {

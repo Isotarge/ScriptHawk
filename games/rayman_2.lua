@@ -34,20 +34,24 @@ local cosine_inverse = 0x0C; -- Float
 --------------------
 
 function Game.detectVersion(romName, romHash)
-	if emu.getsystemid() == "N64" then
-		if romHash == "619AB27EA1645399439AD324566361D3E7FF020E" then -- Europe N64
-			version = 1;
-			return true;
-		elseif romHash == "50558356B059AD3FBAF5FE95380512B9DCEAAF52" then -- USA N64
-			version = 2;
-			return true;
-		end
+	if romHash == "619AB27EA1645399439AD324566361D3E7FF020E" then -- Europe N64
+		version = 1;
+	elseif romHash == "50558356B059AD3FBAF5FE95380512B9DCEAAF52" then -- USA N64
+		version = 2;
+	else
+		return false;
 	end
-	return false;
+
+	-- Squish Game.Memory tables down to a single address for the relevant version
+	for k, v in pairs(Game.Memory) do
+		Game.Memory[k] = v[version];
+	end
+
+	return true;
 end
 
 function Game.applyInfinites()
-	mainmemory.writebyte(Game.Memory.health[version], 30); -- Set Health
+	mainmemory.writebyte(Game.Memory.health, 30); -- Set Health
 end
 
 --------------
@@ -55,28 +59,28 @@ end
 --------------
 
 function Game.getXPosition()
-	return mainmemory.readfloat(Game.Memory.x_pos[version], true);
+	return mainmemory.readfloat(Game.Memory.x_pos, true);
 end
 
 function Game.getYPosition()
-	return mainmemory.readfloat(Game.Memory.y_pos[version], true);
+	return mainmemory.readfloat(Game.Memory.y_pos, true);
 end
 
 function Game.getZPosition()
-	return mainmemory.readfloat(Game.Memory.z_pos[version], true);
+	return mainmemory.readfloat(Game.Memory.z_pos, true);
 end
 
 function Game.setXPosition(value)
-	mainmemory.writefloat(Game.Memory.x_pos[version], value, true);
+	mainmemory.writefloat(Game.Memory.x_pos, value, true);
 end
 
 function Game.setYPosition(value)
 	Game.setYVelocity(0);
-	mainmemory.writefloat(Game.Memory.y_pos[version], value, true);
+	mainmemory.writefloat(Game.Memory.y_pos, value, true);
 end
 
 function Game.setZPosition(value)
-	mainmemory.writefloat(Game.Memory.z_pos[version], value, true);
+	mainmemory.writefloat(Game.Memory.z_pos, value, true);
 end
 
 --------------
@@ -84,15 +88,15 @@ end
 --------------
 
 function Game.getXVelocity()
-	return mainmemory.readfloat(Game.Memory.x_velocity[version], true);
+	return mainmemory.readfloat(Game.Memory.x_velocity, true);
 end
 
 function Game.getYVelocity()
-	return mainmemory.readfloat(Game.Memory.y_velocity[version], true);
+	return mainmemory.readfloat(Game.Memory.y_velocity, true);
 end
 
 function Game.getZVelocity()
-	return mainmemory.readfloat(Game.Memory.z_velocity[version], true);
+	return mainmemory.readfloat(Game.Memory.z_velocity, true);
 end
 
 function Game.getVelocity()
@@ -102,15 +106,15 @@ function Game.getVelocity()
 end
 
 function Game.setXVelocity(value)
-	mainmemory.writefloat(Game.Memory.x_velocity[version], value, true);
+	mainmemory.writefloat(Game.Memory.x_velocity, value, true);
 end
 
 function Game.setYVelocity(value)
-	mainmemory.writefloat(Game.Memory.y_velocity[version], value, true);
+	mainmemory.writefloat(Game.Memory.y_velocity, value, true);
 end
 
 function Game.setZVelocity(value)
-	mainmemory.writefloat(Game.Memory.z_velocity[version], value, true);
+	mainmemory.writefloat(Game.Memory.z_velocity, value, true);
 end
 
 --------------
@@ -124,8 +128,8 @@ end
 --]]
 
 function Game.getYRotation()
-	local currentSine = mainmemory.readfloat(Game.Memory.rot_base[version] + sine, true);
-	local currentCosine = mainmemory.readfloat(Game.Memory.rot_base[version] + cosine, true);
+	local currentSine = mainmemory.readfloat(Game.Memory.rot_base + sine, true);
+	local currentCosine = mainmemory.readfloat(Game.Memory.rot_base + cosine, true);
 	if currentSine > 0 then
 		return math.deg(math.acos(currentCosine));
 	end
@@ -137,12 +141,12 @@ function Game.setYRotation(value)
 	local cosineValue = math.cos(math.rad(value));
 
 	-- Set the sine values
-	mainmemory.writefloat(Game.Memory.rot_base[version] + sine, sineValue, true);
-	mainmemory.writefloat(Game.Memory.rot_base[version] + sine_mirror, sineValue, true);
+	mainmemory.writefloat(Game.Memory.rot_base + sine, sineValue, true);
+	mainmemory.writefloat(Game.Memory.rot_base + sine_mirror, sineValue, true);
 
 	-- Set the cosine values
-	mainmemory.writefloat(Game.Memory.rot_base[version] + cosine, cosineValue, true);
-	mainmemory.writefloat(Game.Memory.rot_base[version] + cosine_inverse, cosineValue * -1, true);
+	mainmemory.writefloat(Game.Memory.rot_base + cosine, cosineValue, true);
+	mainmemory.writefloat(Game.Memory.rot_base + cosine_inverse, cosineValue * -1, true);
 end
 
 return Game;

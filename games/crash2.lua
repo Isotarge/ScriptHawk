@@ -50,18 +50,22 @@ local vScale = 100000;
 function Game.detectVersion(romName, romHash)
 	if romHash == "149A203B" or romHash == "395C0916" then -- USA
 		version = 1;
-		return true;
 	elseif romHash == "F5E2EC49" or romHash == "5F65CF0F" then -- Europe No EDC
 		version = 2;
-		return true;
 	elseif romHash == "97395614" or romHash == "74C85B1E" then -- Europe EDC
 		version = 2;
-		return true;
 	elseif romHash == "B0A92BAF" or romHash == "14591AE9" then -- Japan
 		version = 3;
-		return true;
+	else
+		return false;
 	end
-	return false;
+
+	-- Squish Game.Memory tables down to a single address for the relevant version
+	for k, v in pairs(Game.Memory) do
+		Game.Memory[k] = v[version];
+	end
+
+	return true;
 end
 
 global_timer = {
@@ -74,11 +78,11 @@ function Game.isPhysicsFrame()
 end
 
 function Game.getLevel()
-	return mainmemory.read_u32_le(Game.Memory.level[version]);
+	return mainmemory.read_u32_le(Game.Memory.level);
 end
 
 function Game.getPlayerActor()
-	return dereferencePointer(Game.Memory.player_pointer[version]);
+	return dereferencePointer(Game.Memory.player_pointer);
 end
 
 function playerPointerOSD()
@@ -113,7 +117,7 @@ function Game.getBoxesSmashed()
 end
 
 function Game.getTotalBoxes()
-	return math.floor(mainmemory.read_s32_le(Game.Memory.total_boxes[version]) / 256);
+	return math.floor(mainmemory.read_s32_le(Game.Memory.total_boxes) / 256);
 end
 
 function Game.getBoxString()
@@ -129,11 +133,11 @@ function Game.getJumps()
 end
 
 function Game.getLevelProgress()
-	return mainmemory.read_u32_le(Game.Memory.level_progress[version]) / 256;
+	return mainmemory.read_u32_le(Game.Memory.level_progress) / 256;
 end
 
 function Game.getMaxLevelProgress()
-	return mainmemory.read_u32_le(Game.Memory.level_progress[version] + 4) / 256;
+	return mainmemory.read_u32_le(Game.Memory.level_progress + 4) / 256;
 end
 
 function Game.getLevelProgressOSD()
@@ -252,7 +256,7 @@ end
 
 function Game.applyInfinites()
 	Game.setLives(99);
-	local maskObject = dereferencePointer(Game.Memory.akuaku_mask_pointer[version]);
+	local maskObject = dereferencePointer(Game.Memory.akuaku_mask_pointer);
 	if isRAM(maskObject) then
 		mainmemory.writebyte(maskObject + 0x175, 0x02);
 	end
@@ -260,7 +264,7 @@ end
 
 function Game.eachFrame()
 	global_timer.previous = global_timer.current;
-	global_timer.current = mainmemory.read_u32_le(Game.Memory.global_timer[version]);
+	global_timer.current = mainmemory.read_u32_le(Game.Memory.global_timer);
 end
 
 Game.OSD = {

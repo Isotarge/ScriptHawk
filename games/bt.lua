@@ -419,6 +419,17 @@ function Game.detectVersion(romName, romHash)
 		eep_checksum[i].value = readChecksum(eep_checksum[i].address);
 	end
 
+	-- Squish Game.Memory tables down to a single address for the relevant version
+	for k, v in pairs(Game.Memory) do
+		if k == "healthAddresses" then
+			for key, value in pairs(Game.Memory[k]) do
+				Game.Memory[k][key] = value[version];
+			end
+		else
+			Game.Memory[k] = v[version];
+		end
+	end
+
 	return true;
 end
 
@@ -427,7 +438,7 @@ end
 -------------------
 
 function Game.isPhysicsFrame()
-	local frameTimerValue = mainmemory.read_s32_be(Game.Memory.frame_timer[version]);
+	local frameTimerValue = mainmemory.read_s32_be(Game.Memory.frame_timer);
 	return frameTimerValue <= 0 and not emu.islagged();
 end
 
@@ -478,12 +489,12 @@ local y_velocity = 0x14;
 local z_velocity = 0x18;
 
 function Game.getPlayerObject()
-	local playerPointerIndex = mainmemory.readbyte(Game.Memory.player_pointer_index[version]);
-	return dereferencePointer(Game.Memory.player_pointer[version] + 4 * playerPointerIndex);
+	local playerPointerIndex = mainmemory.readbyte(Game.Memory.player_pointer_index);
+	return dereferencePointer(Game.Memory.player_pointer + 4 * playerPointerIndex);
 end
 
 function Game.getCameraObject()
-	local cameraPointerPointer = dereferencePointer(Game.Memory.camera_pointer_pointer[version]);
+	local cameraPointerPointer = dereferencePointer(Game.Memory.camera_pointer_pointer);
 	if isRDRAM(cameraPointerPointer) then
 		return dereferencePointer(cameraPointerPointer + 4);
 	end
@@ -2197,7 +2208,7 @@ end
 
 function Game.getObjectAnimationValue(pointer)
 	local ObjAnimPointer = mainmemory.read_u16_be(pointer + object_model1.animation_index);
-	local ObjAnimPointer_global = dereferencePointer(Game.Memory.animation_pointer[version]);
+	local ObjAnimPointer_global = dereferencePointer(Game.Memory.animation_pointer);
 	if isRDRAM(ObjAnimPointer_global) and ObjAnimPointer ~= 0 then
 		return mainmemory.read_u16_be(ObjAnimPointer_global + 0x38 + (0x3C * ObjAnimPointer));
 	end
@@ -2233,38 +2244,38 @@ end
 ------------
 
 function Game.getCurrentHealth()
-	local currentTransformation = mainmemory.readbyte(Game.Memory.iconAddress[version]);
-	if type(Game.Memory.healthAddresses[currentTransformation]) == 'table' then
-		return mainmemory.read_u8(Game.Memory.healthAddresses[currentTransformation][version]);
+	local currentTransformation = mainmemory.readbyte(Game.Memory.iconAddress);
+	if type(Game.Memory.healthAddresses[currentTransformation]) == 'number' then
+		return mainmemory.read_u8(Game.Memory.healthAddresses[currentTransformation]);
 	end
 	return 1;
 end
 
 function Game.setCurrentHealth(value)
-	local currentTransformation = mainmemory.readbyte(Game.Memory.iconAddress[version]);
-	if type(Game.Memory.healthAddresses[currentTransformation]) == 'table' then
+	local currentTransformation = mainmemory.readbyte(Game.Memory.iconAddress);
+	if type(Game.Memory.healthAddresses[currentTransformation]) == 'number' then
 		value = value or 0;
 		value = math.max(0x00, value);
 		value = math.min(0xFF, value);
-		return mainmemory.write_u8(Game.Memory.healthAddresses[currentTransformation][version], value);
+		return mainmemory.write_u8(Game.Memory.healthAddresses[currentTransformation], value);
 	end
 end
 
 function Game.getMaxHealth()
-	local currentTransformation = mainmemory.readbyte(Game.Memory.iconAddress[version]);
-	if type(Game.Memory.healthAddresses[currentTransformation]) == 'table' then
-		return mainmemory.read_u8(Game.Memory.healthAddresses[currentTransformation][version] + 1);
+	local currentTransformation = mainmemory.readbyte(Game.Memory.iconAddress);
+	if type(Game.Memory.healthAddresses[currentTransformation]) == 'number' then
+		return mainmemory.read_u8(Game.Memory.healthAddresses[currentTransformation] + 1);
 	end
 	return 1;
 end
 
 function Game.setMaxHealth(value)
-	local currentTransformation = mainmemory.readbyte(Game.Memory.iconAddress[version]);
-	if type(Game.Memory.healthAddresses[currentTransformation]) == 'table' then
+	local currentTransformation = mainmemory.readbyte(Game.Memory.iconAddress);
+	if type(Game.Memory.healthAddresses[currentTransformation]) == 'number' then
 		value = value or 0;
 		value = math.max(0x00, value);
 		value = math.min(0xFF, value);
-		return mainmemory.write_u8(Game.Memory.healthAddresses[currentTransformation][version] + 1, value);
+		return mainmemory.write_u8(Game.Memory.healthAddresses[currentTransformation] + 1, value);
 	end
 end
 
@@ -3928,7 +3939,7 @@ end
 
 function clearFlag(byte, bit)
 	if type(byte) == "number" and type(bit) == "number" and bit >= 0 and bit < 8 then
-		local flags = dereferencePointer(Game.Memory.flag_block_pointer[version]);
+		local flags = dereferencePointer(Game.Memory.flag_block_pointer);
 		if isRDRAM(flags) then
 			local currentValue = mainmemory.readbyte(flags + byte);
 			mainmemory.writebyte(flags + byte, clear_bit(currentValue, bit));
@@ -3960,7 +3971,7 @@ end
 
 function setFlag(byte, bit)
 	if type(byte) == "number" and type(bit) == "number" and bit >= 0 and bit < 8 then
-		local flags = dereferencePointer(Game.Memory.flag_block_pointer[version]);
+		local flags = dereferencePointer(Game.Memory.flag_block_pointer);
 		if isRDRAM(flags) then
 			local currentValue = mainmemory.readbyte(flags + byte);
 			mainmemory.writebyte(flags + byte, set_bit(currentValue, bit));
@@ -3969,7 +3980,7 @@ function setFlag(byte, bit)
 end
 
 function clearAllFlags()
-	local flagBlock = dereferencePointer(Game.Memory.flag_block_pointer[version]);
+	local flagBlock = dereferencePointer(Game.Memory.flag_block_pointer);
 	if isRDRAM(flagBlock) then
 		for byte = 0, flag_block_size - 1 do
 			mainmemory.writebyte(flagBlock + byte, 0x00);
@@ -3978,7 +3989,7 @@ function clearAllFlags()
 end
 
 function setAllFlags()
-	local flagBlock = dereferencePointer(Game.Memory.flag_block_pointer[version]);
+	local flagBlock = dereferencePointer(Game.Memory.flag_block_pointer);
 	if isRDRAM(flagBlock) then
 		for byte = 0, flag_block_size - 1 do
 			mainmemory.writebyte(flagBlock + byte, 0xFF);
@@ -3995,7 +4006,7 @@ function checkFlag(byte, bit, suppressPrint)
 		end
 	end
 	if type(byte) == "number" and type(bit) == "number" and bit >= 0 and bit < 8 then
-		local flagBlock = dereferencePointer(Game.Memory.flag_block_pointer[version]);
+		local flagBlock = dereferencePointer(Game.Memory.flag_block_pointer);
 		if isRDRAM(flagBlock) then
 			local currentValue = mainmemory.readbyte(flagBlock + byte);
 			if check_bit(currentValue, bit) then
@@ -4019,7 +4030,7 @@ function checkFlag(byte, bit, suppressPrint)
 end
 
 function checkFlags()
-	local flags = dereferencePointer(Game.Memory.flag_block_pointer[version]);
+	local flags = dereferencePointer(Game.Memory.flag_block_pointer);
 	if isRDRAM(flags) then
 		local flagBlock = mainmemory.readbyterange(flags, flag_block_size);
 
@@ -4217,7 +4228,7 @@ end
 
 function setGlobalFlag(byte, bit)
 	if type(byte) == "number" and type(bit) == "number" and bit >= 0 and bit < 8 then
-		local flags = Game.Memory.global_flag_base[version];
+		local flags = Game.Memory.global_flag_base;
 		if isRDRAM(flags) then
 			local currentValue = mainmemory.readbyte(flags + byte);
 			mainmemory.writebyte(flags + byte, set_bit(currentValue, bit));
@@ -4227,7 +4238,7 @@ end
 
 function clearGlobalFlag(byte, bit)
 	if type(byte) == "number" and type(bit) == "number" and bit >= 0 and bit < 8 then
-		local flags = Game.Memory.global_flag_base[version];
+		local flags = Game.Memory.global_flag_base;
 		if isRDRAM(flags) then
 			local currentValue = mainmemory.readbyte(flags + byte);
 			mainmemory.writebyte(flags + byte, clear_bit(currentValue, bit));
@@ -4245,7 +4256,7 @@ function getGlobalFlagName(byte, bit)
 end
 
 function checkGlobalFlags()
-	local flags = Game.Memory.global_flag_base[version];
+	local flags = Game.Memory.global_flag_base;
 	local flagBlock = mainmemory.readbyterange(flags, global_flag_block_size);
 	local currentValue, previousValue, isSet, wasSet, flag, ignore;
 	for byte = 0, global_flag_block_size - 1 do
@@ -5048,7 +5059,7 @@ function getJinjoIdentifierOSD(pointer)
 end
 
 local function getNumSlots()
-	local objectArray = dereferencePointer(Game.Memory.object_array_pointer[version]);
+	local objectArray = dereferencePointer(Game.Memory.object_array_pointer);
 	if isRDRAM(objectArray) then
 		local firstObject = dereferencePointer(objectArray + 0x04);
 		local lastObject = dereferencePointer(objectArray + 0x08);
@@ -5099,7 +5110,7 @@ end
 
 local function getObjectModel1Pointers()
 	local pointers = {};
-	local objectArray = dereferencePointer(Game.Memory.object_array_pointer[version]);
+	local objectArray = dereferencePointer(Game.Memory.object_array_pointer);
 	if isRDRAM(objectArray) then
 		local num_slots = getNumSlots();
 		for i = 0, num_slots - 1 do
@@ -5118,7 +5129,7 @@ local function setObjectModel1Position(pointer, x, y, z)
 end
 
 local function zipTo(index)
-	local objectArray = dereferencePointer(Game.Memory.object_array_pointer[version]);
+	local objectArray = dereferencePointer(Game.Memory.object_array_pointer);
 	if isRDRAM(objectArray) then
 		local objectPointer = objectArray + getSlotBase(index);
 		local xPos = mainmemory.readfloat(objectPointer + object_model1.x_position, true);
@@ -5204,7 +5215,7 @@ function Game.drawUI()
 	end
 
 	local row = 0;
-	local objectArray = dereferencePointer(Game.Memory.object_array_pointer[version]);
+	local objectArray = dereferencePointer(Game.Memory.object_array_pointer);
 	local numSlots = getNumSlots();
 
 	gui.text(Game.OSDPosition[1], 2 + Game.OSDRowHeight * row, "Mode: "..script_mode, nil, 'bottomright');
@@ -5315,26 +5326,26 @@ end
 
 Game.takeMeThereType = "Checkbox";
 function Game.setMap(value)
-	mainmemory.write_u16_be(Game.Memory.map_destination[version], value);
+	mainmemory.write_u16_be(Game.Memory.map_destination, value);
 end
 
 function Game.getMap()
-	return mainmemory.read_u16_be(Game.Memory.map[version]);
+	return mainmemory.read_u16_be(Game.Memory.map);
 end
 
 function Game.forceReload()
-	local trigger_value = mainmemory.read_u16_be(Game.Memory.map_trigger[version]);
+	local trigger_value = mainmemory.read_u16_be(Game.Memory.map_trigger);
 	local currentMap = Game.getMap();
 	local dropdown_map_value = ScriptHawk.UI.findMapValue();
 	if trigger_value == 0 then
 		if forms.ischecked(ScriptHawk.UI.form_controls["Map Checkbox"]) then
-			mainmemory.write_u16_be(Game.Memory.map_trigger_target[version], dropdown_map_value);
+			mainmemory.write_u16_be(Game.Memory.map_trigger_target, dropdown_map_value);
 		else
-			mainmemory.write_u16_be(Game.Memory.map_trigger_target[version], currentMap);
+			mainmemory.write_u16_be(Game.Memory.map_trigger_target, currentMap);
 		end
 
 		-- Force game to reload with desired map
-		mainmemory.write_u16_be(Game.Memory.map_trigger[version], 0x0101);
+		mainmemory.write_u16_be(Game.Memory.map_trigger, 0x0101);
 	end
 end
 
@@ -5348,7 +5359,7 @@ function Game.getMapOSD()
 end
 
 function Game.getDCWLocation()
-	local DCW_locationMap = mainmemory.read_u16_be(Game.Memory.DCW_location[version]);
+	local DCW_locationMap = mainmemory.read_u16_be(Game.Memory.DCW_location);
 	local DCW_locationMapName = "Unknown";
 	if Game.maps[DCW_locationMap] ~= nil then
 		DCW_locationMapName = Game.maps[DCW_locationMap];
@@ -5364,7 +5375,7 @@ function Game.getMaxAir()
 end
 
 function Game.getCharacterState()
-	local characterStateValue = mainmemory.readbyte(Game.Memory.character_state[version]);
+	local characterStateValue = mainmemory.readbyte(Game.Memory.character_state);
 	if Game.character_states[characterStateValue] ~= nil then
 		return Game.character_states[characterStateValue];
 	end
@@ -5400,7 +5411,7 @@ local obfuscatedConsumables = { -- TODO: Extract keys directly from the game
 
 function Game.setConsumable(index, value)
 	if type(obfuscatedConsumables[index]) == "table" then
-		local consumablesBlock = dereferencePointer(Game.Memory.consumable_pointer[version]);
+		local consumablesBlock = dereferencePointer(Game.Memory.consumable_pointer);
 		if isRDRAM(consumablesBlock) then
 			mainmemory.write_u16_be(consumablesBlock + index * 2, bit.bxor(value, obfuscatedConsumables[index].key));
 		end
@@ -5408,9 +5419,9 @@ function Game.setConsumable(index, value)
 end
 
 function Game.getConsumable(index)
-	local consumablesBlock = dereferencePointer(Game.Memory.consumable_pointer[version]);
+	local consumablesBlock = dereferencePointer(Game.Memory.consumable_pointer);
 	if isRDRAM(consumablesBlock) then
-		local normalValue = mainmemory.read_u16_be(Game.Memory.consumable_base[version] + index * 0x0C);
+		local normalValue = mainmemory.read_u16_be(Game.Memory.consumable_base + index * 0x0C);
 		local obfuscatedValue = mainmemory.read_u16_be(consumablesBlock + index * 2);
 		local key = bit.bxor(obfuscatedValue, normalValue);
 		return toHexString(obfuscatedValue, 4, "").." XOR "..toHexString(key, 4, "").." = "..normalValue;
@@ -5434,7 +5445,7 @@ function Game.applyInfinites()
 	Game.setConsumable(13, 999); -- Tickets
 	Game.setConsumable(14, 999); -- Doubloons
 	Game.setConsumable(15, 999); -- Gold Idols
-	mainmemory.writefloat(Game.Memory.air[version], Game.getMaxAir(), true);
+	mainmemory.writefloat(Game.Memory.air, Game.getMaxAir(), true);
 	Game.setCurrentHealth(Game.getMaxHealth());
 end
 
@@ -5445,7 +5456,7 @@ local move_levels = {
 
 local function unlock_moves()
 	local level = forms.gettext(ScriptHawk.UI.form_controls.moves_dropdown);
-	local flagBlock = dereferencePointer(Game.Memory.flag_block_pointer[version]);
+	local flagBlock = dereferencePointer(Game.Memory.flag_block_pointer);
 	if isRDRAM(flagBlock) then
 		mainmemory.write_u32_be(flagBlock + 0x18, move_levels[level][1]);
 		mainmemory.write_u32_be(flagBlock + 0x1C, move_levels[level][2]);
@@ -5520,7 +5531,7 @@ function Game.eachFrame()
 	if forms.ischecked(ScriptHawk.UI.form_controls["Character Checkbox"]) then
 		local characterString = forms.getproperty(ScriptHawk.UI.form_controls["Character Dropdown"], "SelectedItem");
 		if type(Game.character_change_lookup[characterString]) == "number" then
-			mainmemory.write_u8(Game.Memory.character_change[version], Game.character_change_lookup[characterString]);
+			mainmemory.write_u8(Game.Memory.character_change, Game.character_change_lookup[characterString]);
 		end
 	end
 end

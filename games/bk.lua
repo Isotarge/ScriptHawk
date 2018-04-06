@@ -321,6 +321,11 @@ function Game.detectVersion(romName, romHash)
 		eep_checksum[i].value = memory.read_u32_be(eep_checksum[i].address, "EEPROM");
 	end
 
+	-- Squish Game.Memory tables down to a single address for the relevant version
+	for k, v in pairs(Game.Memory) do
+		Game.Memory[k] = v[version];
+	end
+
 	if #flag_array > 0 then
 		for i = 1, #flag_array do
 			flag_names[i] = flag_array[i].name;
@@ -333,20 +338,20 @@ function Game.detectVersion(romName, romHash)
 	return true;
 end
 
-function Game.getGroundState()
-	return tostring(mainmemory.read_u32_be(Game.Memory.player_grounded[version]) > 0);
+function Game.isGrounded()
+	return mainmemory.read_u32_be(Game.Memory.player_grounded) > 0;
 end
 
 function Game.getWallCollisions()
-	return mainmemory.readbyte(Game.Memory.wall_collisions[version]);
+	return mainmemory.readbyte(Game.Memory.wall_collisions);
 end
 
 local function neverSlip()
-	mainmemory.writefloat(Game.Memory.slope_timer[version], 0.0, true);
+	mainmemory.writefloat(Game.Memory.slope_timer, 0.0, true);
 end
 
 function Game.getSlopeTimer()
-	return mainmemory.readfloat(Game.Memory.slope_timer[version], true);
+	return mainmemory.readfloat(Game.Memory.slope_timer, true);
 end
 
 function Game.colorSlopeTimer()
@@ -371,13 +376,13 @@ local PauseMenuData_offsets = {
 };
 
 local function beta_menu_recreate()
-	local pause_menu_base = Game.Memory.pause_menu_strings_base[version];
+	local pause_menu_base = Game.Memory.pause_menu_strings_base;
 	for i = 0, 3 do
 		mainmemory.writefloat(pause_menu_base + PauseMenuData_offsets.Size * i + PauseMenuData_offsets.appearenceTime, i * 0.1, true);
 		mainmemory.write_u16_be(pause_menu_base + PauseMenuData_offsets.Size * i + PauseMenuData_offsets.YPos, i * 30 + 45);
 		mainmemory.writebyte(pause_menu_base + PauseMenuData_offsets.Size * i + PauseMenuData_offsets.portrait, i + 4);
 	end
-	mainmemory.writebyte(Game.Memory.return_to_lair_enabled[version] , 0);
+	mainmemory.writebyte(Game.Memory.return_to_lair_enabled , 0);
 end
 
 -----------------
@@ -394,7 +399,7 @@ local move_levels = {
 
 local function unlock_moves()
 	local level = forms.gettext(ScriptHawk.UI.form_controls.moves_dropdown);
-	mainmemory.write_u32_be(Game.Memory.moves_bitfield[version], move_levels[level]);
+	mainmemory.write_u32_be(Game.Memory.moves_bitfield, move_levels[level]);
 end
 
 --------------------
@@ -524,7 +529,7 @@ end
 
 function getObjectModel1Pointers()
 	local pointers = {};
-	local objectArray = dereferencePointer(Game.Memory.object_array_pointer[version]);
+	local objectArray = dereferencePointer(Game.Memory.object_array_pointer);
 	if isRDRAM(objectArray) then
 		local num_slots = mainmemory.read_u32_be(objectArray);
 		for i = 0, num_slots - 1 do
@@ -541,7 +546,7 @@ function addressToSlot(address)
 		print("Address: "..toHexString(address).." is out of RDRAM range.");
 	end
 
-	local objectArray = dereferencePointer(Game.Memory.object_array_pointer[version]);
+	local objectArray = dereferencePointer(Game.Memory.object_array_pointer);
 	if isRDRAM(objectArray) then
 		local numSlots = math.min(max_slots, mainmemory.read_u32_be(objectArray));
 		local position = address - objectArray - slot_base;
@@ -1255,7 +1260,7 @@ local animation_types = {
 };
 
 function setAnimationType(index, animationType)
-	local objectArray = dereferencePointer(Game.Memory.object_array_pointer[version]);
+	local objectArray = dereferencePointer(Game.Memory.object_array_pointer);
 	if isRDRAM(objectArray) then
 		local objectSlotBase = objectArray + getSlotBase(index);
 		local animationObjectPointer = dereferencePointer(objectSlotBase + 0x14);
@@ -1432,7 +1437,7 @@ local movementStates = {
 };
 
 function Game.getCurrentMovementState()
-	local currentMovementState = mainmemory.read_u32_be(Game.Memory.current_movement_state[version]);
+	local currentMovementState = mainmemory.read_u32_be(Game.Memory.current_movement_state);
 	return movementStates[currentMovementState] or "Unknown ("..currentMovementState..")";
 end
 
@@ -1695,7 +1700,7 @@ local function getStructsFromBlock(pointer)
 end
 
 local function getStructPointers()
-	local block = dereferencePointer(Game.Memory.struct_array_pointer[version]);
+	local block = dereferencePointer(Game.Memory.struct_array_pointer);
 	local pointers = {};
 	if isRDRAM(block) then
 		local blockend = dereferencePointer(block - 0x0C);
@@ -1807,7 +1812,7 @@ end
 
 local function getNumSlots()
 	if script_mode == "Examine" or script_mode == "List" then -- Model 1
-		local objectArray = dereferencePointer(Game.Memory.object_array_pointer[version]);
+		local objectArray = dereferencePointer(Game.Memory.object_array_pointer);
 		if isRDRAM(objectArray) then
 			return math.min(max_slots, mainmemory.read_u32_be(objectArray));
 		end
@@ -1822,7 +1827,7 @@ function setAll(variable, value)
 		variable = resolveVariableName(variable);
 	end
 	if type(slot_variables[variable]) == "table" then
-		local objectArray = dereferencePointer(Game.Memory.object_array_pointer[version]);
+		local objectArray = dereferencePointer(Game.Memory.object_array_pointer);
 		if isRDRAM(objectArray) then
 			local numSlots = math.min(max_slots, mainmemory.read_u32_be(objectArray));
 
@@ -1901,21 +1906,21 @@ function drawObjectPositions()
 	end
 
 	local cameraData = {};
-	if mainmemory.readbyte(Game.Memory.first_person_flag[version]) ~= 0 then
+	if mainmemory.readbyte(Game.Memory.first_person_flag) ~= 0 then
 		cameraData = { -- In first person
-			xPos = mainmemory.readfloat(Game.Memory.first_person_cam_x_pos[version], true),
-			yPos = mainmemory.readfloat(Game.Memory.first_person_cam_y_pos[version], true),
-			zPos = mainmemory.readfloat(Game.Memory.first_person_cam_z_pos[version], true),
-			xRot = mainmemory.readfloat(Game.Memory.first_person_cam_x_rot[version], true) * math.pi / 180,
-			yRot = mainmemory.readfloat(Game.Memory.first_person_cam_y_rot[version], true) * math.pi / 180,
+			xPos = mainmemory.readfloat(Game.Memory.first_person_cam_x_pos, true),
+			yPos = mainmemory.readfloat(Game.Memory.first_person_cam_y_pos, true),
+			zPos = mainmemory.readfloat(Game.Memory.first_person_cam_z_pos, true),
+			xRot = mainmemory.readfloat(Game.Memory.first_person_cam_x_rot, true) * math.pi / 180,
+			yRot = mainmemory.readfloat(Game.Memory.first_person_cam_y_rot, true) * math.pi / 180,
 		};
 	else
 		cameraData = { -- In third person
-			xPos = mainmemory.readfloat(Game.Memory.camera_x_position[version], true),
-			yPos = mainmemory.readfloat(Game.Memory.camera_y_position[version], true),
-			zPos = mainmemory.readfloat(Game.Memory.camera_z_position[version], true),
-			xRot = mainmemory.readfloat(Game.Memory.camera_x_rotation[version], true) * math.pi / 180,
-			yRot = mainmemory.readfloat(Game.Memory.camera_y_rotation[version], true) * math.pi / 180,
+			xPos = mainmemory.readfloat(Game.Memory.camera_x_position, true),
+			yPos = mainmemory.readfloat(Game.Memory.camera_y_position, true),
+			zPos = mainmemory.readfloat(Game.Memory.camera_z_position, true),
+			xRot = mainmemory.readfloat(Game.Memory.camera_x_rotation, true) * math.pi / 180,
+			yRot = mainmemory.readfloat(Game.Memory.camera_y_rotation, true) * math.pi / 180,
 		};
 	end
 	for i = 1, #draggableObjects do
@@ -2050,7 +2055,7 @@ function processSlot(slotBase) -- TODO: Improve this based on the SM64 module im
 end
 
 function parseSlotData()
-	local objectArray = dereferencePointer(Game.Memory.object_array_pointer[version]);
+	local objectArray = dereferencePointer(Game.Memory.object_array_pointer);
 	if isRDRAM(objectArray) then
 		local numSlots = math.min(max_slots, mainmemory.read_u32_be(objectArray));
 
@@ -2069,7 +2074,7 @@ end
 
 function zipToSelectedObject()
 	if script_mode == "Examine" or script_mode == "List" then -- Model 1
-		local objectArray = dereferencePointer(Game.Memory.object_array_pointer[version]);
+		local objectArray = dereferencePointer(Game.Memory.object_array_pointer);
 		if isRDRAM(objectArray) then
 			local slotBase = objectArray + getSlotBase(object_index - 1);
 
@@ -2097,7 +2102,7 @@ end
 
 function setSelectedObjectModel(model_index)
 	if script_mode == "Examine" or script_mode == "List" then -- Model 1
-		local objectArray = dereferencePointer(Game.Memory.object_array_pointer[version]);
+		local objectArray = dereferencePointer(Game.Memory.object_array_pointer);
 		if isRDRAM(objectArray) then
 			local slotBase = objectArray + getSlotBase(object_index-1);
 			local behavior_pointer = dereferencePointer(slotBase);
@@ -2113,7 +2118,7 @@ end
 
 function turnOffSelectedObjectCollision()
 	if script_mode == "Examine" or script_mode == "List" then -- Model 1
-		local objectArray = dereferencePointer(Game.Memory.object_array_pointer[version]);
+		local objectArray = dereferencePointer(Game.Memory.object_array_pointer);
 		if isRDRAM(objectArray) then
 			local slotBase = objectArray + getSlotBase(object_index-1);
 			local behavior_pointer = dereferencePointer(slotBase);
@@ -2126,7 +2131,7 @@ end
 
 function turnOnSelectedObjectCollision()
 	if script_mode == "Examine" or script_mode == "List" then -- Model 1
-		local objectArray = dereferencePointer(Game.Memory.object_array_pointer[version]);
+		local objectArray = dereferencePointer(Game.Memory.object_array_pointer);
 		if isRDRAM(objectArray) then
 			local slotBase = objectArray + getSlotBase(object_index-1);
 			local behavior_pointer = dereferencePointer(slotBase);
@@ -2139,7 +2144,7 @@ end
 
 function despawnSelectedObject()
 	if script_mode == "Examine" or script_mode == "List" then -- Model 1
-		local objectArray = dereferencePointer(Game.Memory.object_array_pointer[version]);
+		local objectArray = dereferencePointer(Game.Memory.object_array_pointer);
 		if isRDRAM(objectArray) then
 			local slotBase = objectArray + getSlotBase(object_index-1);
 			local bitfieldValue = mainmemory.readbyte(slotBase + 0x47);
@@ -2150,7 +2155,7 @@ end
 
 function grabSelectedObject()
 	if script_mode == "Examine" or script_mode == "List" then -- Model 1
-		local objectArray = dereferencePointer(Game.Memory.object_array_pointer[version]);
+		local objectArray = dereferencePointer(Game.Memory.object_array_pointer);
 		if isRDRAM(objectArray) then
 			local slotBase = objectArray + getSlotBase(object_index-1);
 			local unknownStructAddress = dereferencePointer(slotBase);
@@ -2158,9 +2163,9 @@ function grabSelectedObject()
 				local tempBitField = mainmemory.readbyte(slotBase + 0x139);
 				tempBitField = bit.bor(tempBitField, 0x40);
 				mainmemory.writebyte(slotBase + 0x139, tempBitField);
-				mainmemory.write_u32_be(Game.Memory.carried_object_pointer[version], RDRAMBase + unknownStructAddress);
-				mainmemory.writebyte(Game.Memory.carried_object_pointer[version] + 4, 1); -- Force update position
-				mainmemory.write_u32_be(Game.Memory.current_movement_state[version], 58); -- Force movement state
+				mainmemory.write_u32_be(Game.Memory.carried_object_pointer, RDRAMBase + unknownStructAddress);
+				mainmemory.writebyte(Game.Memory.carried_object_pointer + 4, 1); -- Force update position
+				mainmemory.write_u32_be(Game.Memory.current_movement_state, 58); -- Force movement state
 				forms.setproperty(ScriptHawk.UI.form_controls.spawner_carry_checkbox, "Checked", true);
 			end
 		end
@@ -2181,8 +2186,7 @@ end
 
 function getExamineData(slotBase) -- TODO: Improve this based on SM64 module implementation
 	local current_slot_variables = {};
-	for relative_address = 0, slot_size do
-		local variable_data = slot_variables[relative_address];
+	for relative_address, variable_data in pairs(slot_variables) do
 		if type(variable_data) == "table" then
 			local variableName = getVariableName(relative_address);
 			if variable_data.Type == "Byte" then
@@ -2210,7 +2214,7 @@ function Game.drawUI()
 
 	local row = 0;
 
-	local objectArray = dereferencePointer(Game.Memory.object_array_pointer[version]);
+	local objectArray = dereferencePointer(Game.Memory.object_array_pointer);
 	if string.contains(script_mode, "Struct") then
 		structPointers = getStructPointers();
 	end
@@ -2343,7 +2347,7 @@ local holdingAPostJump = false;
 allowPound = false;
 allowTTrotJump = true;
 function autoPound()
-	local currentMovementState = mainmemory.read_u32_be(Game.Memory.current_movement_state[version]);
+	local currentMovementState = mainmemory.read_u32_be(Game.Memory.current_movement_state);
 	local YVelocity = Game.getYVelocity();
 
 	-- First frame pound out of peck
@@ -2352,7 +2356,7 @@ function autoPound()
 	end
 
 	-- Frame perfect mid air talon trot slide jump
-	if allowTTrotJump and (currentMovementState == 21 and mainmemory.readbyte(Game.Memory.player_grounded[version]) == 0 or holdingAPostJump) then
+	if allowTTrotJump and (currentMovementState == 21 and not Game.isGrounded() or holdingAPostJump) then
 		holdingAPostJump = true;
 		if holdingAPostJump then
 			holdingAPostJump = holdingAPostJump and (currentMovementState == 21 or YVelocity > 0); -- TODO: Better method for detecting end of a jump, velocity > 0 is janky
@@ -2496,7 +2500,7 @@ function EEPROMToPattern(index)
 end
 
 function Game.getFFPattern()
-	return EEPROMToPattern(mainmemory.read_u16_be(Game.Memory.ff_pattern[version]));
+	return EEPROMToPattern(mainmemory.read_u16_be(Game.Memory.ff_pattern));
 end
 
 -- Relative to question object
@@ -2509,7 +2513,7 @@ local ff_answer2_text_pointer = 0x54;
 local ff_answer3_text_pointer = 0x44;
 
 function getSelectedFFAnswer()
-	local ff_question_object = dereferencePointer(Game.Memory.ff_question_pointer[version]);
+	local ff_question_object = dereferencePointer(Game.Memory.ff_question_pointer);
 	if isRDRAM(ff_question_object) then
 		return mainmemory.readbyte(ff_question_object + ff_current_answer);
 	end
@@ -2518,7 +2522,7 @@ end
 
 -- TODO: Doesn't always work
 function getCorrectFFAnswer()
-	local ff_question_object = dereferencePointer(Game.Memory.ff_question_pointer[version]);
+	local ff_question_object = dereferencePointer(Game.Memory.ff_question_pointer);
 	if isRDRAM(ff_question_object) then
 		return mainmemory.readbyte(ff_question_object + ff_correct_answer);
 	end
@@ -2553,15 +2557,15 @@ local question_types = {
 
 function randomizeFFBoardBrightness()
 	for i = 0, numSquares do
-		mainmemory.writefloat(Game.Memory.board_base[version] + i * squareSize + 0x10, math.random(), true);
+		mainmemory.writefloat(Game.Memory.board_base + i * squareSize + 0x10, math.random(), true);
 	end
 end
 
 function dumpFFBoard()
 	for i = 0, numSquares do
-		local brightness = round(mainmemory.readfloat(Game.Memory.board_base[version] + i * squareSize + 0x10, true), 3);
-		local questionType = question_types[mainmemory.readbyte(Game.Memory.board_base[version] + i * squareSize + 0x08)];
-		dprint(toHexString(Game.Memory.board_base[version] + i * squareSize)..": "..i..": brightness "..brightness.." "..questionType);
+		local brightness = round(mainmemory.readfloat(Game.Memory.board_base + i * squareSize + 0x10, true), 3);
+		local questionType = question_types[mainmemory.readbyte(Game.Memory.board_base + i * squareSize + 0x08)];
+		dprint(toHexString(Game.Memory.board_base + i * squareSize)..": "..i..": brightness "..brightness.." "..questionType);
 	end
 	print_deferred();
 end
@@ -2678,7 +2682,7 @@ local function updateWave()
 	if waving then
 		wave_counter = wave_counter + 1;
 		if wave_counter == wave_delay then
-			local objectArray = dereferencePointer(Game.Memory.object_array_pointer[version]);
+			local objectArray = dereferencePointer(Game.Memory.object_array_pointer);
 			if isRDRAM(objectArray) then
 				for i = 1, #waveFrames[wave_frame] do
 					fireSlot(objectArray, getSlotIndex(waveFrames[wave_frame][i][1], waveFrames[wave_frame][i][2]), wave_colour);
@@ -2694,7 +2698,7 @@ local function updateWave()
 end
 
 local function doHeart()
-	local objectArray = dereferencePointer(Game.Memory.object_array_pointer[version]);
+	local objectArray = dereferencePointer(Game.Memory.object_array_pointer);
 	if isRDRAM(objectArray) then
 		local colour = math.random(0, 1);
 		for i = 1, #heart do
@@ -2704,7 +2708,7 @@ local function doHeart()
 end
 
 local function fireAllSlots()
-	local objectArray = dereferencePointer(Game.Memory.object_array_pointer[version]);
+	local objectArray = dereferencePointer(Game.Memory.object_array_pointer);
 	if isRDRAM(objectArray) then
 		local colour = math.random(0, 1);
 		for i = 0, number_of_slots do
@@ -2719,8 +2723,8 @@ end
 -------------------------------
 
 function findConga()
-	if mainmemory.readbyte(Game.Memory.map[version]) == 0x02 then -- Make sure we're in Mumbo's Mountain
-		local objectArray = dereferencePointer(Game.Memory.object_array_pointer[version]);
+	if mainmemory.readbyte(Game.Memory.map) == 0x02 then -- Make sure we're in Mumbo's Mountain
+		local objectArray = dereferencePointer(Game.Memory.object_array_pointer);
 		if isRDRAM(objectArray) then
 			local numObjects = mainmemory.read_u32_be(objectArray);
 			for i = 0, numObjects do
@@ -2787,7 +2791,7 @@ end
 
 -- TODO: Not working?
 function fillFB()
-	local frameBufferLocation = dereferencePointer(Game.Memory.fb_pointer[version]);
+	local frameBufferLocation = dereferencePointer(Game.Memory.fb_pointer);
 	if isRDRAM(frameBufferLocation) then
 		replaceTextureRGBA5551(nil, frameBufferLocation, framebuffer.width, framebuffer.height);
 	end
@@ -2804,7 +2808,7 @@ Game.rot_speed = 0.5;
 Game.max_rot_units = 360;
 
 function Game.isPhysicsFrame()
-	local frameTimerValue = mainmemory.read_s32_be(Game.Memory.frame_timer[version]);
+	local frameTimerValue = mainmemory.read_s32_be(Game.Memory.frame_timer);
 	return frameTimerValue <= 0 and not emu.islagged();
 end
 
@@ -2813,7 +2817,7 @@ end
 --------------
 
 function Game.getFloor()
-	local floorObject = dereferencePointer(Game.Memory.floor_object_pointer[version]);
+	local floorObject = dereferencePointer(Game.Memory.floor_object_pointer);
 	if isRDRAM(floorObject) then
 		return mainmemory.readfloat(floorObject + 0x40, true);
 	end
@@ -2821,33 +2825,33 @@ function Game.getFloor()
 end
 
 function Game.getXPosition()
-	return mainmemory.readfloat(Game.Memory.x_position[version], true);
+	return mainmemory.readfloat(Game.Memory.x_position, true);
 end
 
 function Game.getYPosition()
-	return mainmemory.readfloat(Game.Memory.y_position[version], true);
+	return mainmemory.readfloat(Game.Memory.y_position, true);
 end
 
 function Game.getZPosition()
-	return mainmemory.readfloat(Game.Memory.z_position[version], true);
+	return mainmemory.readfloat(Game.Memory.z_position, true);
 end
 
 function Game.setXPosition(value)
-	mainmemory.writefloat(Game.Memory.x_position[version], value, true);
-	mainmemory.writefloat(Game.Memory.x_position[version] + 0x10, value, true);
+	mainmemory.writefloat(Game.Memory.x_position, value, true);
+	mainmemory.writefloat(Game.Memory.x_position + 0x10, value, true);
 end
 
 function Game.setYPosition(value)
-	mainmemory.writefloat(Game.Memory.y_position[version], value, true);
-	mainmemory.writefloat(Game.Memory.y_position[version] + 0x10, value, true);
+	mainmemory.writefloat(Game.Memory.y_position, value, true);
+	mainmemory.writefloat(Game.Memory.y_position + 0x10, value, true);
 
 	-- Nullify gravity when setting Y position
 	Game.setYVelocity(0);
 end
 
 function Game.setZPosition(value)
-	mainmemory.writefloat(Game.Memory.z_position[version], value, true);
-	mainmemory.writefloat(Game.Memory.z_position[version] + 0x10, value, true);
+	mainmemory.writefloat(Game.Memory.z_position, value, true);
+	mainmemory.writefloat(Game.Memory.z_position + 0x10, value, true);
 end
 
 --------------
@@ -2855,38 +2859,38 @@ end
 --------------
 
 function Game.getXRotation()
-	return mainmemory.readfloat(Game.Memory.x_rotation[version], true);
+	return mainmemory.readfloat(Game.Memory.x_rotation, true);
 end
 
 function Game.getYRotation()
-	return mainmemory.readfloat(Game.Memory.moving_angle[version], true);
+	return mainmemory.readfloat(Game.Memory.moving_angle, true);
 end
 
 function Game.getFacingAngle()
-	return mainmemory.readfloat(Game.Memory.facing_angle[version], true);
+	return mainmemory.readfloat(Game.Memory.facing_angle, true);
 end
 
 function Game.getZRotation()
-	return mainmemory.readfloat(Game.Memory.z_rotation[version], true);
+	return mainmemory.readfloat(Game.Memory.z_rotation, true);
 end
 
 function Game.setXRotation(value)
-	mainmemory.writefloat(Game.Memory.x_rotation[version], value, true);
+	mainmemory.writefloat(Game.Memory.x_rotation, value, true);
 
 	-- Also set the target
-	mainmemory.writefloat(Game.Memory.x_rotation[version] + 4, value, true);
+	mainmemory.writefloat(Game.Memory.x_rotation + 4, value, true);
 end
 
 function Game.setYRotation(value)
-	mainmemory.writefloat(Game.Memory.moving_angle[version], value, true);
-	mainmemory.writefloat(Game.Memory.facing_angle[version], value, true);
+	mainmemory.writefloat(Game.Memory.moving_angle, value, true);
+	mainmemory.writefloat(Game.Memory.facing_angle, value, true);
 end
 
 function Game.setZRotation(value)
-	mainmemory.writefloat(Game.Memory.z_rotation[version], value, true);
+	mainmemory.writefloat(Game.Memory.z_rotation, value, true);
 
 	-- Also set the target
-	mainmemory.writefloat(Game.Memory.z_rotation[version] + 4, value, true);
+	mainmemory.writefloat(Game.Memory.z_rotation + 4, value, true);
 end
 
 --------------
@@ -2894,11 +2898,11 @@ end
 --------------
 
 function Game.getXVelocity()
-	return mainmemory.readfloat(Game.Memory.x_velocity[version], true);
+	return mainmemory.readfloat(Game.Memory.x_velocity, true);
 end
 
 function Game.getYVelocity()
-	return mainmemory.readfloat(Game.Memory.y_velocity[version], true);
+	return mainmemory.readfloat(Game.Memory.y_velocity, true);
 end
 
 function Game.colorYVelocity()
@@ -2908,19 +2912,19 @@ function Game.colorYVelocity()
 end
 
 function Game.getZVelocity()
-	return mainmemory.readfloat(Game.Memory.z_velocity[version], true);
+	return mainmemory.readfloat(Game.Memory.z_velocity, true);
 end
 
 function Game.setXVelocity(value)
-	return mainmemory.writefloat(Game.Memory.x_velocity[version], value, true);
+	return mainmemory.writefloat(Game.Memory.x_velocity, value, true);
 end
 
 function Game.setYVelocity(value)
-	return mainmemory.writefloat(Game.Memory.y_velocity[version], value, true);
+	return mainmemory.writefloat(Game.Memory.y_velocity, value, true);
 end
 
 function Game.setZVelocity(value)
-	return mainmemory.writefloat(Game.Memory.z_velocity[version], value, true);
+	return mainmemory.writefloat(Game.Memory.z_velocity, value, true);
 end
 
 function Game.getVelocity() -- Calculated VXZ
@@ -2957,7 +2961,7 @@ function freezeClipVelocity()
 		return;
 	end
 
-	if mainmemory.readbyte(Game.Memory.player_grounded[version]) == 0 and Game.getYVelocity() > -4000 then
+	if not Game.isGrounded() and Game.getYVelocity() > -4000 then
 		Game.setYVelocity(-4000); -- This velocity is pretty much guaranteed to clip on any version if it's possible at all
 	end
 end
@@ -3066,16 +3070,16 @@ event.onloadstate(spawner.disable, "ScriptHawk - Disable Actor Spawner");
 Game.takeMeThereType = "Button";
 function Game.setMap(value)
 	if value >= 1 and value <= #Game.maps then
-		mainmemory.writebyte(Game.Memory.map[version], value);
+		mainmemory.writebyte(Game.Memory.map, value);
 
 		-- Force the game to load the map instantly
-		mainmemory.writebyte(Game.Memory.map[version] - 1, 0x01);
+		mainmemory.writebyte(Game.Memory.map - 1, 0x01);
 	end
 end
 
 function Game.applyInfinites()
 	-- We don't apply infinite notes since it messes up note routing
-	local collectable_base = Game.Memory.collectable_base[version];
+	local collectable_base = Game.Memory.collectable_base;
 	--mainmemory.write_s32_be(collectable_base + collectable_offsets.notes, max_notes);
 	mainmemory.write_s32_be(collectable_base + collectable_offsets.eggs, max_eggs);
 	mainmemory.write_s32_be(collectable_base + collectable_offsets.red_feathers, max_red_feathers);
@@ -3111,13 +3115,13 @@ end
 
 function flagTypeToBitfieldPointer(flagType, index)
 	if flagType == "H" and index < 0x19 then
-		return Game.Memory.honeycomb_bitfield[version];
+		return Game.Memory.honeycomb_bitfield;
 	elseif flagType == "MT" and index < 0x7E then
-		return Game.Memory.mumbo_token_bitfield[version];
+		return Game.Memory.mumbo_token_bitfield;
 	elseif flagType == "Jig" and index < 0x65 then
-		return Game.Memory.jiggy_bitfield[version];
+		return Game.Memory.jiggy_bitfield;
 	elseif flagType == "Prog" and index < 0x100 then
-		return Game.Memory.game_progress_bitfield[version];
+		return Game.Memory.game_progress_bitfield;
 	end
 end
 
@@ -3344,7 +3348,7 @@ function Game.eachFrame()
 	end
 
 	if forms.ischecked(ScriptHawk.UI.form_controls.spawner_carry_checkbox) then
-		mainmemory.writebyte(Game.Memory.carried_object_pointer[version] + 4, 1);
+		mainmemory.writebyte(Game.Memory.carried_object_pointer + 4, 1);
 	end
 end
 
@@ -3367,7 +3371,7 @@ Game.OSD = {
 	{"Separator"},
 	{"Movement", Game.getCurrentMovementState, Game.colorCurrentMovementState},
 	{"Slope Timer", Game.getSlopeTimer, Game.colorSlopeTimer},
-	{"Grounded", Game.getGroundState},
+	{"Grounded", Game.isGrounded},
 	{"Wall Collisions", Game.getWallCollisions},
 	{"Separator"},
 	{"Facing", Game.getFacingAngle},
