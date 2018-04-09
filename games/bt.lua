@@ -5399,14 +5399,14 @@ local obfuscatedConsumables = { -- TODO: Extract keys directly from the game
 	[13] = {key=0x27BD, name="Tickets"},
 	[14] = {key=0x0C03, name="Doubloons"},
 	[15] = {key=0x3C05, name="Gold Idols"},
-	[16] = {key=0xFFFD, name="Beans"}, -- CCL
-	[17] = {key=0x7A1C, name="Fish"}, -- HFP
-	[18] = {key=0xFFBF, name="Eggs"}, -- Stop'n'Swop
-	[19] = {key=0x7040, name="Ice Keys"}, -- Stop'n'Swop
-	[20] = {key=0xEB9E, name="Mega Glowbos"},
-	[21] = {key=0xB363, name="???"},
-	[22] = {key=0x0900, name="???"},
-	[23] = {key=0xFAFF, name="???"},
+	[16] = {key=0x0002, name="Beans"}, -- CCL
+	[17] = {key=0x85E3, name="Fish"}, -- HFP
+	[18] = {key=0x0040, name="Eggs"}, -- Stop'n'Swop
+	[19] = {key=0x8FBF, name="Ice Keys"}, -- Stop'n'Swop
+	[20] = {key=0x1461, name="Mega Glowbos"},
+	[21] = {key=0x7680, name="???"},
+	[22] = {key=0x0DE3, name="???"},
+	[23] = {key=0x5E79, name="???"},
 };
 
 function Game.setConsumable(index, value)
