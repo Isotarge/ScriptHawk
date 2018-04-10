@@ -2434,9 +2434,9 @@ local flag_array = {
 	{byte=0x00, bit=6, name="First Time Treble Clef Collection", nomap=true, type="FTT"},
 	{byte=0x00, bit=7, name="First Time Health Collection", nomap=true, type="FTT"},
 	-- 0x01 > 0
-	-- 0x01 > 1
+	-- 0x01 > 1 - First Time Warp Pad
 	{byte=0x01, bit=2, name="First Time Empty Honeycomb Collection", nomap=true, type="FTT"},
-	-- 0x01 > 3
+	-- 0x01 > 3 - Pink SNS Egg Grate
 	-- 0x01 > 4
 	{byte=0x01, bit=5, name="First Time Jinjo Collection", nomap=true, type="FTT"},
 	-- 0x01 > 6
@@ -2446,18 +2446,18 @@ local flag_array = {
 	{byte=0x02, bit=2, name="Signpost FTT", nomap=true, type="FTT"},
 	{byte=0x02, bit=3, name="ToT Completed?", type="Progress"},
 	{byte=0x02, bit=4, name="Klungo Intro Cutscene"},
-	-- 0x02 > 5
+	-- 0x02 > 5 - GI: Wumba's Picture Broken
 	-- 0x02 > 6
-	-- 0x02 > 7
-	-- 0x03 > 0
-	-- 0x03 > 1
+	-- 0x02 > 7 - GI: Floor 3 Elevator Door
+	-- 0x03 > 0 - GI: Floor 4 Elevator Door
+	-- 0x03 > 1 - HFP: Stone Building Destroyed?
 	-- 0x03 > 2
 	{byte=0x03, bit=3, name="Hag 1 Defeated", type="Progress"},
 	{byte=0x03, bit=4, name="Hag 1 Intro Cutscene", type="FTT"},
 	{byte=0x03, bit=5, name="JRL: Sunken Ship Jinjo Chest Smashed", type="Physical"},
-	-- 0x03 > 6
-	-- 0x03 > 7
-	-- 0x04 > 0
+	-- 0x03 > 6 - HFP: Breakable Coliseum Wall?
+	-- 0x03 > 7 - HFP: Breakable Coliseum Wall?
+	-- 0x04 > 0 - HFP: Breakable Coliseum Wall?
 	{byte=0x04, bit=1, name="HFP: Stone Building Destroyed", type="Physical"},
 	-- 0x04 > 2
 	{byte=0x04, bit=3, name="Cheat Available: Jiggywiggyspecial", type="Cheat Available"},
@@ -2474,18 +2474,18 @@ local flag_array = {
 	{byte=0x05, bit=6, name="Mega Glowbo"},
 	{byte=0x05, bit=7, name="First Time Minjo Aggro", type="FTT"},
 	{byte=0x06, bit=0, name="MT: Officer Unogopaz FTT", type="FTT"},
-	-- 0x06 > 1
+	-- 0x06 > 1 - Officer Ugonopaz Stony FTT?
 	{byte=0x06, bit=2, name="MT: Gold Relic Returned", type="Physical"},
 	{byte=0x06, bit=3, name="MT: Dilberta Intro", type="FTT"},
 	{byte=0x06, bit=4, name="MT: Dilberta in GGM", type="Progress"},
 	-- 0x06 > 5
-	-- 0x06 > 6
-	-- 0x06 > 7
+	-- 0x06 > 6 - MT: Semifinals Open
+	-- 0x06 > 7 - MT: Finals open
 	-- 0x07 > 0
 	-- 0x07 > 1
 	-- 0x07 > 2
 	-- 0x07 > 3
-	-- 0x07 > 4
+	-- 0x07 > 4 - MT: Quarterfinals open
 	-- 0x07 > 5
 	{byte=0x07, bit=6, name="GGM: Canary Mary Freed (1)", type="Progress"},
 	{byte=0x07, bit=7, name="First Time Cheato Page", type="FTT"},
@@ -2513,23 +2513,23 @@ local flag_array = {
 	{byte=0x0A, bit=5, name="Mumbo FTT", type="FTT"},
 	{byte=0x0A, bit=6, name="GGM: Canary Cave Entrance Cleared", type="Physical"},
 	-- 0x0A > 7
-	-- 0x0B > 0
+	-- 0x0B > 0 - GGM: Detonator: Saucer Of Peril?
 	-- 0x0B > 1
 	{byte=0x0B, bit=2, name="GGM: Bullion Bill Intro", type="FTT"},
 	{byte=0x0B, bit=3, name="GGM: Dilberta Quest Complete", type="Progress"},
-	-- 0x0B > 4
-	-- 0x0B > 5
+	-- 0x0B > 4 - GGM: Detonator: House?
+	-- 0x0B > 5 - GGM: Detonator: Jail Cell?
 	{byte=0x0B, bit=6, name="GGM: Old King Coal Defeated?", type="Progress"},
 	-- 0x0B > 7
-	-- 0x0C > 0 Start of Targitzan Fight?
+	-- 0x0C > 0 - MT: Targitzan FTT
 	--{byte=0x0C, bit=1, name="WW: Dino Door Smashed?"},
 	-- 0x0C > 2
-	-- 0x0C > 3
-	-- 0x0C > 4
-	-- 0x0C > 5
-	-- 0x0C > 6
+	-- 0x0C > 3 - WW: Mrs. Boggy FTT?
+	-- 0x0C > 4 - WW: Soggy Returned
+	-- 0x0C > 5 - WW: Moggy Returned
+	-- 0x0C > 6 - WW: Groggy Returned
 	{byte=0x0C, bit=7, name="Humba Wumba FTT", type="FTT"},
-	-- 0x0D > 0
+	-- 0x0D > 0 - GGM: Saucer of peril FTT?
 	-- 0x0D > 1
 	-- 0x0D > 2
 	-- 0x0D > 3
@@ -2543,20 +2543,20 @@ local flag_array = {
 	{byte=0x0E, bit=3, name="First Time Mumbo Pad Instructions", type="FTT"},
 	-- 0x0E > 4
 	{byte=0x0E, bit=5, name="WW: Big Al FTT", type="FTT"},
-	-- 0x0E > 6
+	-- 0x0E > 6 - WW: Salty Joe FTT
 	{byte=0x0E, bit=7, name="WW: Big Al's Open", type="Physical"},
 	{byte=0x0F, bit=0, name="WW: Salty Joe's Open", type="Physical"},
 	-- 0x0F > 1
 	-- 0x0F > 2
 	-- 0x0F > 3
-	-- 0x0F > 4
-	-- 0x0F > 5
+	-- 0x0F > 4 - WW: Inferno Open
+	-- 0x0F > 5 - WW: Dodgems Open
 	-- 0x0F > 6
 	-- 0x0F > 7
 	-- 0x10 > 0
 	-- 0x10 > 1
 	-- 0x10 > 2
-	-- 0x10 > 3
+	-- 0x10 > 3 - WW: Dodgem 1 Open
 	-- 0x10 > 4
 	-- 0x10 > 5
 	-- 0x10 > 6
@@ -2569,10 +2569,10 @@ local flag_array = {
 	{byte=0x11, bit=5, name="JRL: Pawno's Cheato Page Purchased", type="Progress"},
 	{byte=0x11, bit=6, name="JRL: UFO Leaves JRL", type="Progress"},
 	{byte=0x11, bit=7, name="Klungo 3 Something??"},
-	{byte=0x12, bit=0, name="WW: Moggy FTT", type="FTT"},
-	-- 0x12 > 1
-	-- 0x12 > 2
-	-- 0x12 > 3
+	{byte=0x12, bit=0, name="WW: Moggy FTT", type="FTT"}, -- Soggy?
+	-- 0x12 > 1 - WW: Moggy FTT?
+	-- 0x12 > 2 - WW: Groggy FTT?
+	-- 0x12 > 3 -- WW: Burger Given To Groggy
 	-- 0x12 > 4
 	-- 0x12 > 5
 	-- 0x12 > 6
@@ -2592,13 +2592,13 @@ local flag_array = {
 	{byte=0x14, bit=4, name="JRL: Water Supply Pipe Grate Smashed (Smuggler's Cavern)", type="Physical"},
 	{byte=0x14, bit=5, name="JRL: Waste Pipe Drilled", type="Physical"},
 	-- 0x14 > 6
-	-- 0x14 > 7
+	-- 0x14 > 7 - JRL: Center Statue
 	-- 0x15 > 0
 	-- 0x15 > 1
 	-- 0x15 > 2
 	{byte=0x15, bit=3, name="Cheat Menu FTT", type="FTT"},
 	-- 0x15 > 4
-	-- 0x15 > 5
+	-- 0x15 > 5 - MT: Dilberta's Prison Opened
 	{byte=0x15, bit=6, name="Humba Wumba: Glowbo Paid (MT)", type="Glowbo Paid"},
 	{byte=0x15, bit=7, name="Humba Wumba: Glowbo Paid (GGM)", type="Glowbo Paid"},
 	{byte=0x16, bit=0, name="Humba Wumba: Glowbo Paid (WW)", type="Glowbo Paid"},
@@ -2649,12 +2649,12 @@ local flag_array = {
 	--{byte=0x1B, bit=5, name="Ability: Fire/Grenade Eggs?", type="Ability"},
 	{byte=0x1B, bit=6, name="Ability: Bill Drill", type="Ability"},
 	{byte=0x1B, bit=7, name="Ability: Beak Bayonet", type="Ability"},
-	{byte=0x1C, bit=0, name="Ability: Airborne Egg Aiming", type="Ability"},
-	{byte=0x1C, bit=1, name="Ability: Split Up", type="Ability"},
-	{byte=0x1C, bit=2, name="Ability: Wing Whack", type="Ability"},
-	{byte=0x1C, bit=3, name="Ability: Talon Torpedo", type="Ability"},
-	{byte=0x1C, bit=4, name="Ability: Sub-Aqua Egg Aiming", type="Ability"},
-	-- 0x1C > 5
+	{byte=0x1C, bit=0, name="Ability: Airborne Egg Aiming", type="Ability"}, -- TODO: Double Check
+	{byte=0x1C, bit=1, name="Ability: Split Up", type="Ability"}, -- TODO: Double Check
+	{byte=0x1C, bit=2, name="Ability: Wing Whack", type="Ability"}, -- TODO: Double Check
+	{byte=0x1C, bit=3, name="Ability: Talon Torpedo", type="Ability"}, -- TODO: Double Check
+	{byte=0x1C, bit=4, name="Ability: Sub-Aqua Egg Aiming", type="Ability"}, -- TODO: Double Check
+	-- 0x1C > 5 - Talon Torpedo?
 	{byte=0x1C, bit=6, name="Ability: Shack Pack", type="Ability"},
 	{byte=0x1C, bit=7, name="Ability: Glide", type="Ability"},
 	{byte=0x1D, bit=0, name="Ability: Snooze Pack", type="Ability"},
@@ -2670,8 +2670,8 @@ local flag_array = {
 	{byte=0x1E, bit=2, name="Ability: Grenade Eggs", type="Ability"},
 	{byte=0x1E, bit=3, name="Ability: Clockwork Kazooie Eggs", type="Ability"},
 	{byte=0x1E, bit=4, name="Ability: Ice Eggs", type="Ability"},
-	-- 0x1E > 5
-	{byte=0x1E, bit=6, name="FT Ability Use? (1)"}, -- Set on boot
+	-- 0x1E > 5 - Fast Swimming?
+	{byte=0x1E, bit=6, name="FT Ability Use? (1)"}, -- Set on boot -- Egg Switch?
 	{byte=0x1E, bit=7, name="Ability: Breegull Bash", type="Ability"},
 	-- 0x1F > 0
 	-- 0x1F > 1
@@ -2734,13 +2734,13 @@ local flag_array = {
 	{byte=0x26, bit=2, name="Doubloon: Near Jinjo (2)", type="Doubloon"},
 	{byte=0x26, bit=3, name="Doubloon: Near Jinjo (3)", type="Doubloon"},
 	{byte=0x26, bit=4, name="Doubloon: Near Jinjo (4)", type="Doubloon"},
-	-- 0x26 > 5
-	-- 0x26 > 6
+	-- 0x26 > 5 -- Doubloon?
+	-- 0x26 > 6 -- Doubloon?
 	-- 0x26 > 7
 	-- 0x27 > 0
 	-- 0x27 > 1
 	{byte=0x27, bit=2, name="WW: Pump Room Grate Smashed", type="Physical"},
-	-- 0x27 > 3
+	-- 0x27 > 3 - GI: Train Switch
 	{byte=0x27, bit=4, name="Chuffy: TDL Station Open", type="Physical"},
 	{byte=0x27, bit=5, name="FT Doubloon Collection", type="FTT"},
 	-- 0x27 > 6
@@ -2748,7 +2748,7 @@ local flag_array = {
 	-- 0x28 > 0
 	{byte=0x28, bit=1, name="GI: Loggo FTT", type="FTT"},
 	-- 0x28 > 2
-	-- 0x28 > 3
+	-- 0x28 > 3 - GI: Fly Pad Switch Pushed
 	-- 0x28 > 4
 	-- 0x28 > 5
 	-- 0x28 > 6
@@ -2777,8 +2777,8 @@ local flag_array = {
 	-- 0x2B > 5
 	-- 0x2B > 6
 	-- 0x2B > 7
-	-- 0x2C > 0
-	-- 0x2C > 1
+	-- 0x2C > 0 GI: Back Door Open
+	-- 0x2C > 1 GI: Men's Restroom Door
 	{byte=0x2C, bit=2, name="TDL: Wigwam Enlarged", type="Physical"},
 	{byte=0x2C, bit=3, name="MT: Treasure Chamber Open", type="Physical"},
 	{byte=0x2C, bit=4, name="GI: Weldar Defeated", type="Progress"},
@@ -2791,13 +2791,13 @@ local flag_array = {
 	-- 0x2D > 3
 	-- 0x2D > 4
 	-- 0x2D > 5
-	-- 0x2D > 6
-	-- 0x2D > 7
-	-- 0x2E > 0
-	-- 0x2E > 1
-	-- 0x2E > 2
-	-- 0x2E > 3
-	-- 0x2E > 4
+	-- 0x2D > 6 - GI: Smokestack to Jinjo
+	-- 0x2D > 7 - GI: Floor 5 Window
+	-- 0x2E > 0 - GI: Floor 5 Window
+	-- 0x2E > 1 - GI: Window to Screws
+	-- 0x2E > 2 - GI: Window to Cheato Page
+	-- 0x2E > 3 - GI: Window below Treble Clef
+	-- 0x2E > 4 - GI: Window blocking Jinjo
 	-- 0x2E > 5
 	-- 0x2E > 6
 	{byte=0x2E, bit=7, name="WW: FT Pick Up Big Top Ticket", type="FTT"},
@@ -2814,42 +2814,42 @@ local flag_array = {
 	-- 0x30 > 2
 	{byte=0x30, bit=3, name="GI: Main Entrance Open", type="Physical"},
 	{byte=0x30, bit=4, name="CK: Dingpot FTT", type="FTT"},
-	{byte=0x30, bit=5, name="WW: First Time Enter Hoop Hurry"},
-	{byte=0x30, bit=6, name="WW: First Time Enter Balloon Burst"},
+	{byte=0x30, bit=5, name="WW: First Time Enter Hoop Hurry", type="FTT"},
+	{byte=0x30, bit=6, name="WW: First Time Enter Balloon Burst", type="FTT"},
 	-- 0x30 > 7
 	{byte=0x31, bit=0, name="GI: Toxic Waste Plant Battery?", type="Progress"},
-	-- 0x31 > 1
-	-- 0x31 > 2
-	-- 0x31 > 3
+	-- 0x31 > 1 - GI: Battery (F3)
+	-- 0x31 > 2 - GI: Battery (Other F2)
+	-- 0x31 > 3 - GI: Battery (Near Electromagnetic Chamber)
 	{byte=0x31, bit=4, name="GI: Toxic Waste Plant Battery??", type="Progress"},
-	-- 0x31 > 5
-	-- 0x31 > 6
-	-- 0x31 > 7
-	-- 0x32 > 0
+	-- 0x31 > 5 - GI: Opened Electromagnetic Chamber
+	-- 0x31 > 6 - GI: Opened Packing Room
+	-- 0x31 > 7 - GI: Opened Sewer
+	-- 0x32 > 0 - GI: Weldar's Door Open
 	-- 0x32 > 1
 	{byte=0x32, bit=2, name="Klungo 2 Something?"},
 	{byte=0x32, bit=3, name="GI: Floor 1: Backup Defeated", type="Progress"},
-	-- 0x32 > 4
-	-- 0x32 > 5
-	-- 0x32 > 6
+	-- 0x32 > 4 - GI: Detoxifying Cutscene
+	-- 0x32 > 5 - GI: Toxic Barrel Hit
+	-- 0x32 > 6 - GI: Toxic Barrel Hit Cutscene
 	{byte=0x32, bit=7, name="SM: Roysten Rescued", type="Ability"},
-	-- 0x33 > 0
-	-- 0x33 > 1
-	-- 0x33 > 2
+	-- 0x33 > 0 - GI: F2 Grate Near Wumba
+	-- 0x33 > 1 - GI: F2 Grate Near Electromagnetic Chamber
+	-- 0x33 > 2 - GI: Screw Panel (F2-F1)
 	-- 0x33 > 3
-	-- 0x33 > 4
-	-- 0x33 > 5
+	-- 0x33 > 4 - GI: Screw Panel (Mumbo Pad)
+	-- 0x33 > 5 - HFP: Mildred Ice Cube FTT
 	{byte=0x33, bit=6, name="HFP: Gobi in Train Station", type="Progress"},
-	-- 0x33 > 7
+	-- 0x33 > 7 - HFP: Biggafoot FTT
 	-- 0x34 > 0
 	-- 0x34 > 1
 	-- 0x34 > 2
 	-- 0x34 > 3
-	-- 0x34 > 4
+	-- 0x34 > 4 - HFP: Biggafoot Gone
 	-- 0x34 > 5
 	-- 0x34 > 6
-	-- 0x34 > 7
-	-- 0x35 > 0
+	-- 0x34 > 7 - HFP: Icy Train Switch
+	-- 0x35 > 0 - HFP: Fire Train Switch
 	{byte=0x35, bit=1, name="Humba Wumba: No Glowbo Needed FTT", type="FTT"},
 	-- 0x35 > 2
 	-- 0x35 > 3
@@ -2858,8 +2858,8 @@ local flag_array = {
 	-- 0x35 > 6
 	-- 0x35 > 7
 	-- 0x36 > 0
-	-- 0x36 > 1
-	-- 0x36 > 2
+	-- 0x36 > 1 - GI: Long Path Open (F2)
+	-- 0x36 > 2 - Destroyed Roysten's Boulder?
 	{byte=0x36, bit=3, name="CCL: Pot o' Gold Activated", type="Physical"},
 	-- 0x36 > 4
 	-- 0x36 > 5
@@ -2868,23 +2868,23 @@ local flag_array = {
 	-- 0x37 > 0
 	{byte=0x37, bit=1, name="CCL: Rainbow Spawned", type="Physical"},
 	{byte=0x37, bit=2, name="CCL: FT Attempt Pot o' Gold?"},
-	-- 0x37 > 3
-	-- 0x37 > 4
-	-- 0x37 > 5
-	-- 0x37 > 6
-	-- 0x37 > 7
-	-- 0x38 > 0
-	-- 0x38 > 1
-	-- 0x38 > 2
-	{byte=0x38, bit=3, name="FT Enter CK?"},
-	{byte=0x38, bit=4, name="FT Enter Jinjo Village?"},
-	-- 0x38 > 5
-	-- 0x38 > 6
-	-- 0x38 > 7
-	-- 0x39 > 0
-	-- 0x39 > 1
-	-- 0x39 > 2
-	-- 0x39 > 3
+	-- 0x37 > 3 - Menu MT? -- TODO: Not sure what this means, was in KBM's notes
+	-- 0x37 > 4 - Menu GGM?
+	-- 0x37 > 5 - Menu WW?
+	-- 0x37 > 6 - Menu JRL?
+	-- 0x37 > 7 - Menu TDL?
+	-- 0x38 > 0 - Menu GI?
+	-- 0x38 > 1 - Menu HFP?
+	-- 0x38 > 2 - Menu CCL?
+	{byte=0x38, bit=3, name="Menu: CK?"},
+	{byte=0x38, bit=4, name="Menu: IoH?"},
+	-- 0x38 > 5 - Icicle Grotto Ceiling Icicle
+	-- 0x38 > 6 - Icicle Grotto Ceiling Icicle
+	-- 0x38 > 7 - Icicle Grotto Ceiling Icicle
+	-- 0x39 > 0 - Icicle Grotto Ceiling Icicle
+	-- 0x39 > 1 - Icicle Grotto Ceiling Icicle
+	-- 0x39 > 2 - Icicle Grotto Ceiling Icicle
+	-- 0x39 > 3 - Icicle Grotto Ceiling Icicle
 	{byte=0x39, bit=4, name="Jinjo: MT: Jade Snake Grove", type="Jinjo"},
 	{byte=0x39, bit=5, name="Jinjo: MT: Roof of Stadium", type="Jinjo"},
 	{byte=0x39, bit=6, name="Jinjo: MT: Targitzan's Temple", type="Jinjo"},
@@ -2958,7 +2958,7 @@ local flag_array = {
 	{byte=0x42, bit=2, name="Honeycomb: IoH: Plateau", type="Honeycomb"},
 	-- 0x42 > 3 JRL Sea Bottom Location?
 	-- 0x42 > 4
-	-- 0x42 > 5
+	-- 0x42 > 5 - GGM: Extra Honeycomb in Box
 	{byte=0x42, bit=6, name="GGM: Toxic Gas Cave Boulder Drilled (Empty Honeycomb)", type="Physical"},
 	{byte=0x42, bit=7, name="Glowbo: MT: Mumbo's Skull", type="Glowbo"},
 	{byte=0x43, bit=0, name="Glowbo: MT: Behind Wumba's Wigwam", type="Glowbo"},
@@ -3082,14 +3082,14 @@ local flag_array = {
 	-- 0x51 > 6
 	{byte=0x51, bit=7, name="JRL: Merry Maggie Malpass Jiggy Spawned", type="Physical"},
 	-- 0x52 > 0
-	-- 0x52 > 1
+	-- 0x52 > 1 - WW: Dodgem's Dome Jiggy Spawned
 	-- 0x52 > 2
 	-- 0x52 > 3
 	-- 0x52 > 4
 	{byte=0x52, bit=5, name="GGM: Dilberta Jiggy Spawned", type="Physical"},
 	-- 0x52 > 6
 	-- 0x52 > 7
-	-- 0x53 > 0
+	-- 0x53 > 0 - GI: Toxic Barrel Jiggy Spawned
 	{byte=0x53, bit=1, name="TDL: Terry Defeated Jiggy Spawned", type="Physical"},
 	-- 0x53 > 2
 	-- 0x53 > 3
@@ -3097,8 +3097,8 @@ local flag_array = {
 	{byte=0x53, bit=5, name="CCL: Pot o' Gold Jiggy Spawned", type="Physical"},
 	{byte=0x53, bit=6, name="FT Jiggy Collection??"}, -- King Jingaling Intro Jiggy Spawned?
 	-- 0x53 > 7
-	-- 0x54 > 0
-	-- 0x54 > 1
+	-- 0x54 > 0 - GI: Packing Room Jiggy Spawned
+	-- 0x54 > 1 - TDL: Chompa's Jiggy Spawned
 	-- 0x54 > 2
 	{byte=0x54, bit=3, name="JRL: UFO Jiggy Spawned?", type="Physical"},
 	-- 0x54 > 4
@@ -3174,19 +3174,19 @@ local flag_array = {
 	{byte=0x5D, bit=2, name="Targitzan Statue (23)", type="Targitzan Statue"},
 	{byte=0x5D, bit=3, name="Targitzan Statue (24)", type="Targitzan Statue"},
 	{byte=0x5D, bit=4, name="Targitzan Statue (25)", type="Targitzan Statue"},
-	{byte=0x5D, bit=5, name="FT Enter Digger Tunnel?"},
-	-- 0x5D > 6
-	{byte=0x5D, bit=7, name="FT Enter Digger Tunnel??"},
+	{byte=0x5D, bit=5, name="Klungo Randomizer (1)"},
+	{byte=0x5D, bit=6, name="Klungo Randomizer (2)"},
+	{byte=0x5D, bit=7, name="Klungo Randomizer (3)"},
 	{byte=0x5E, bit=0, name="Klungo 1 Defeated", type="Progress"},
 	{byte=0x5E, bit=1, name="Klungo 2 Defeated", type="Progress"},
 	{byte=0x5E, bit=2, name="Klungo 3 Defeated", type="Progress"},
 	-- 0x5E > 3
-	-- 0x5E > 4
-	-- 0x5E > 5
-	-- 0x5E > 6
-	-- 0x5E > 7
-	-- 0x5F > 0
-	-- 0x5F > 1
+	-- 0x5E > 4 - HFP: Volcano Switch 1
+	-- 0x5E > 5 - HFP: Volcano Switch 2
+	-- 0x5E > 6 - HFP: Volcano Switch 3
+	-- 0x5E > 7 - HFP: Volcano Switch 4
+	-- 0x5F > 0 - HFP: Volcano Switch 5
+	-- 0x5F > 1 - HFP: Volcano Switch Jiggy
 	-- 0x5F > 2
 	-- 0x5F > 3
 	-- 0x5F > 4
@@ -3194,10 +3194,10 @@ local flag_array = {
 	-- 0x5F > 6
 	-- 0x5F > 7 Dippy Something
 	-- 0x60 > 0 Dippy Something
-	-- 0x60 > 1
+	-- 0x60 > 1 - GI: Wall Crusher Turned Off
 	-- 0x60 > 2
-	-- 0x60 > 3
-	-- 0x60 > 4 MT Prison Compound Something
+	-- 0x60 > 3 - MT: Prison Code Randomizer Bit
+	-- 0x60 > 4 - MT: Prison Code Randomizer Bit
 	{byte=0x60, bit=5, name="Silo: Jinjo Village", type="Silo"},
 	{byte=0x60, bit=6, name="Silo: Wooded Hollow", type="Silo"},
 	{byte=0x60, bit=7, name="Silo: Plateau", type="Silo"},
@@ -3214,7 +3214,7 @@ local flag_array = {
 	{byte=0x62, bit=2, name="CCL: Ground Drilled (6)", type="Physical"},
 	{byte=0x62, bit=3, name="CCL: Ground Drilled (7)", type="Physical"},
 	{byte=0x62, bit=4, name="CCL: Ground Drilled (8)", type="Physical"},
-	-- 0x62 > 5
+	-- 0x62 > 5 - CCL: Seed Collected?
 	{byte=0x62, bit=6, name="CCL: Seed Collected"},
 	{byte=0x62, bit=7, name="Roysten Help Me Text", type="FTT"},
 	-- 0x63 > 0
@@ -3234,7 +3234,7 @@ local flag_array = {
 	{byte=0x64, bit=6, name="Humba Wumba: Bee FTT", type="FTT"},
 	{byte=0x64, bit=7, name="Humba Wumba: Dragon Kazooie FTT", type="FTT"},
 	-- 0x65 > 0
-	-- 0x65 > 1
+	-- 0x65 > 1 - HFP: Mined out Jiggy?
 	-- 0x65 > 2
 	-- 0x65 > 3
 	-- 0x65 > 4
@@ -3245,25 +3245,25 @@ local flag_array = {
 	-- 0x66 > 1
 	-- 0x66 > 2
 	{byte=0x66, bit=3, name="IoH: Jiggywiggy's Temple Intro Cutscene", type="FTT"},
-	-- 0x66 > 4
-	-- 0x66 > 5
-	-- 0x66 > 6
-	-- 0x66 > 7
+	-- 0x66 > 4 - Jiggywiggy Challenge Completion (1)
+	-- 0x66 > 5 - Jiggywiggy Challenge Completion (2)
+	-- 0x66 > 6 - Jiggywiggy Challenge Completion (3)
+	-- 0x66 > 7 - Jiggywiggy Challenge Completion (4)
 	{byte=0x67, bit=0, name="King Jingaling Life Sapped"},
 	-- 0x67 > 1
 	-- 0x67 > 2
 	-- 0x67 > 3
-	-- 0x67 > 4
+	-- 0x67 > 4 - GI: Tintops Alert?
 	-- 0x67 > 5
 	{byte=0x67, bit=6, name="MT: Code Chamber Door Smashed", type="Physical"},
 	{byte=0x67, bit=7, name="Jiggywiggy Temple Is Over There CS Seen", type="FTT"},
-	-- 0x68 > 0
-	-- 0x68 > 1
+	-- 0x68 > 0 - HFP: Beat Quarterfinals
+	-- 0x68 > 1 - HFP: Beat Semifinals
 	-- 0x68 > 2
 	-- 0x68 > 3
 	-- 0x68 > 4
 	-- 0x68 > 5
-	-- 0x68 > 6
+	-- 0x68 > 6 - HFP: Coach FTT
 	{byte=0x68, bit=7, name="MT: Targitzan Defeated", type="Progress"},
 	-- 0x69 > 0
 	-- 0x69 > 1
@@ -3273,13 +3273,13 @@ local flag_array = {
 	{byte=0x69, bit=5, name="HFP: UFO Landed", type="Progress"},
 	-- 0x69 > 6
 	-- 0x69 > 7
-	-- 0x6A > 0
-	-- 0x6A > 1
-	-- 0x6A > 2
-	-- 0x6A > 3
-	-- 0x6A > 4
-	-- 0x6A > 5
-	-- 0x6A > 6
+	-- 0x6A > 0 - HFP: Killed Mildred
+	-- 0x6A > 1 - Jinjo Random Value
+	-- 0x6A > 2 - Jinjo Random Value
+	-- 0x6A > 3 - Jinjo Random Value
+	-- 0x6A > 4 - Jinjo Random Value
+	-- 0x6A > 5 - Jinjo Random Value
+	-- 0x6A > 6 - Jinjo Random Value
 	{byte=0x6A, bit=7, name="Mumbo: Glowbo Paid (MT)", type="Glowbo Paid"},
 	{byte=0x6B, bit=0, name="Mumbo: Glowbo Paid (GGM)", type="Glowbo Paid"},
 	{byte=0x6B, bit=1, name="Mumbo: Glowbo Paid (WW)", type="Glowbo Paid"},
@@ -3287,7 +3287,7 @@ local flag_array = {
 	{byte=0x6B, bit=3, name="Mumbo: Glowbo Paid (TDL)", type="Glowbo Paid"},
 	{byte=0x6B, bit=4, name="Mumbo: Glowbo Paid (HFP)", type="Glowbo Paid"},
 	{byte=0x6B, bit=5, name="Mumbo: Glowbo Paid (CCL)", type="Glowbo Paid"},
-	-- 0x6B > 6
+	-- 0x6B > 6 - Mumbo: Paid IOH?
 	{byte=0x6B, bit=7, name="Mumbo: Glowbo Paid (GI)", type="Glowbo Paid"},
 	{byte=0x6C, bit=0, name="CCL: Superstash FTT", type="FTT"},
 	{byte=0x6C, bit=1, name="CCL: Superstash: 1 Switch Hit", type="Physical"},
@@ -3296,27 +3296,27 @@ local flag_array = {
 	{byte=0x6C, bit=4, name="CCL: Superstash: 4 Switch Hit", type="Physical"},
 	{byte=0x6C, bit=5, name="CCL: Superstash: Opened", type="Physical"},
 	-- 0x6C > 6
-	-- 0x6C > 7
-	-- 0x6D > 0
-	-- 0x6D > 1
-	-- 0x6D > 2
-	-- 0x6D > 3
-	-- 0x6D > 4
-	-- 0x6D > 5
-	-- 0x6D > 6
-	-- 0x6D > 7
-	-- 0x6E > 0
-	-- 0x6E > 1
-	-- 0x6E > 2
-	-- 0x6E > 3
-	-- 0x6E > 4
+	-- 0x6C > 7 - HFP: Underground Tunnel Opened
+	-- 0x6D > 0 - HFP: Pillars to Waterfall Raised
+	-- 0x6D > 1 - IOH: HFP Bridge Extended
+	-- 0x6D > 2 - Opened Mayahem Temple
+	-- 0x6D > 3 - Opened Glitter Gulch Mine
+	-- 0x6D > 4 - Opened Witchyworld
+	-- 0x6D > 5 - Opened Jolly Roger's Lagoon
+	-- 0x6D > 6 - Opened Terrydactyland
+	-- 0x6D > 7 - Opened Grunty Industries
+	-- 0x6E > 0 - Opened Hailfire Peaks
+	-- 0x6E > 1 - Opened Cloud Cuckooland
+	-- 0x6E > 2 - Opened Cauldron Keep
+	-- 0x6E > 3 - Opened Final Boss
+	-- 0x6E > 4 - HFP: Mumbo's Broken Wall
 	{byte=0x6E, bit=5, name="JRL: Mumbo's Skull Wall Smashed", type="Physical"},
 	{byte=0x6E, bit=6, name="FT Complete Jinjo Family?"},
 	-- 0x6E > 7
 	-- 0x6F > 0 JRL Sea Bottom Location?
 	-- 0x6F > 1 JRL Sea Bottom Location?
-	-- 0x6F > 2
-	-- 0x6F > 3
+	-- 0x6F > 2 SM: Jinjo Door?
+	-- 0x6F > 3 JRL: UFO Door?
 	-- 0x6F > 4 JRL Sea Bottom Location?
 	-- 0x6F > 5 JRL Sea Bottom Location?
 	-- 0x6F > 6
@@ -3362,14 +3362,14 @@ local flag_array = {
 	{byte=0x74, bit=6, name="Warp: HFP: Ice Side - Inside Icicle Grotto", type="Warp"},
 	{byte=0x74, bit=7, name="Warp: CCL: World Entry And Exit", type="Warp"},
 	{byte=0x75, bit=0, name="Warp: CCL: Central Cavern", type="Warp"},
-	-- 0x75 > 1
-	-- 0x75 > 2
-	-- 0x75 > 3
+	-- 0x75 > 1 - Warp: CCL: Unused (1)
+	-- 0x75 > 2 - Warp: CCL: Unused (2)
+	-- 0x75 > 3 - Warp: CCL: Unused (3)
 	{byte=0x75, bit=4, name="Warp: CK: Bottom of The Tower", type="Warp"},
 	{byte=0x75, bit=5, name="Warp: CK: Top of The Tower", type="Warp"},
-	-- 0x75 > 6
-	-- 0x75 > 7
-	-- 0x76 > 0
+	-- 0x75 > 6 - Warp: CK: Unused (1)
+	-- 0x75 > 7 - Warp: CK: Unused (2)
+	-- 0x76 > 0 - Warp: CK: Unused (3)
 	-- 0x76 > 1
 	-- 0x76 > 2
 	-- 0x76 > 3
@@ -3384,24 +3384,24 @@ local flag_array = {
 	{byte=0x77, bit=4, name="Mystery Egg: Blue Hatched", type="Mystery Egg"},
 	{byte=0x77, bit=5, name="Mystery Egg: Pink Acquired", type="Mystery Egg"},
 	{byte=0x77, bit=6, name="Mystery Egg: Pink Hatched", type="Mystery Egg"},
-	-- 0x77 > 7
+	-- 0x77 > 7 - Hatched Yellow Egg
 	{byte=0x78, bit=0, name="IoH: Heggy FTT", type="FTT"},
-	-- 0x78 > 1
+	-- 0x78 > 1 - Completed Puzzle 1
 	{byte=0x78, bit=2, name="IoH: Pine Grove Door Open", type="Physical"},
 	-- 0x78 > 3
 	{byte=0x78, bit=4, name="Ability: Dragon Kazooie", type="Ability"},
 	{byte=0x78, bit=5, name="IoH: Disciple of Jiggywiggy FTT", type="FTT"},
 	{byte=0x78, bit=6, name="First Warp Available", type="FTT"},
-	-- 0x78 > 7
+	-- 0x78 > 7 - GGM: Boulder to Ice Key Room
 	{byte=0x79, bit=0, name="IoH: Pine Grove: Kazooie Boulder Smashed", type="Physical"},
 	-- 0x79 > 1
 	-- 0x79 > 2
 	-- 0x79 > 3
-	{byte=0x79, bit=4, name="JRL: Ground Drilled (1)", type="Physical"},
-	{byte=0x79, bit=5, name="JRL: Ground Drilled (2)", type="Physical"},
-	{byte=0x79, bit=6, name="JRL: Ground Drilled (3)", type="Physical"},
-	{byte=0x79, bit=7, name="JRL: Ground Drilled (4)", type="Physical"},
-	{byte=0x7A, bit=0, name="JRL: Ground Drilled (5)", type="Physical"},
+	{byte=0x79, bit=4, name="JRL: Ground Drilled (1)", type="Physical"}, -- TODO: KBM Notes say these are 1 byte later
+	{byte=0x79, bit=5, name="JRL: Ground Drilled (2)", type="Physical"}, -- TODO: KBM Notes say these are 1 byte later
+	{byte=0x79, bit=6, name="JRL: Ground Drilled (3)", type="Physical"}, -- TODO: KBM Notes say these are 1 byte later
+	{byte=0x79, bit=7, name="JRL: Ground Drilled (4)", type="Physical"}, -- TODO: KBM Notes say these are 1 byte later
+	{byte=0x7A, bit=0, name="JRL: Ground Drilled (5)", type="Physical"}, -- TODO: KBM Notes say these are 1 byte later
 	-- 0x7A > 1
 	-- 0x7A > 2
 	-- 0x7A > 3
@@ -3413,7 +3413,7 @@ local flag_array = {
 	-- 0x7B > 1
 	-- 0x7B > 2
 	-- 0x7B > 3
-	-- 0x7B > 4
+	-- 0x7B > 4 - IOH - Train Switch?
 	-- 0x7B > 5
 	-- 0x7B > 6
 	-- 0x7B > 7
@@ -3424,7 +3424,7 @@ local flag_array = {
 	{byte=0x7C, bit=4, name="Jamjars First Time Text", type="FTT"},
 	-- 0x7C > 5
 	{byte=0x7C, bit=6, name="First Time Skill Stop Text", type="FTT"},
-	-- 0x7C > 7 Jiggy Boulder Crushed?
+	-- 0x7C > 7 - Jiggy Boulder Crushed?
 	{byte=0x7D, bit=0, name="GGM: Jiggy Boulder Piece Collected (1)", type="Physical"},
 	{byte=0x7D, bit=1, name="GGM: Jiggy Boulder Piece Collected (2)", type="Physical"},
 	{byte=0x7D, bit=2, name="GGM: Jiggy Boulder Piece Collected (3)", type="Physical"},
@@ -3439,39 +3439,39 @@ local flag_array = {
 	-- 0x7E > 1
 	-- 0x7E > 2
 	-- 0x7E > 3
-	-- 0x7E > 4
-	-- 0x7E > 5
-	-- 0x7E > 6
-	-- 0x7E > 7
-	-- 0x7F > 0
-	-- 0x7F > 1
+	-- 0x7E > 4 - MT: Quarterfinals FTT
+	-- 0x7E > 5 - MT: Semifinals FTT
+	-- 0x7E > 6 - MT: Finals FTT
+	-- 0x7E > 7 - HFP: Quarterfinals FTT
+	-- 0x7F > 0 - HFP: Semifinals FTT
+	-- 0x7F > 1 - HFP: Finals FTT
 	{byte=0x7F, bit=2, name="First Time Jamjars Health Refill", type="FTT"},
 	-- 0x7F > 3 Something in the Mingy Jongo fight
 	{byte=0x7F, bit=4, name="Jamjars First Lesson Intro", type="FTT"},
 	-- 0x7F > 5
 	-- 0x7F > 6
-	-- 0x7F > 7
-	-- 0x80 > 0
+	-- 0x7F > 7 - MT: Coach FTT
+	-- 0x80 > 0 - MT: Introduced to Training Area
 	{byte=0x80, bit=1, name="Mumbo Transform FTT", type="FTT"},
 	-- 0x80 > 2
 	{byte=0x80, bit=2, name="Canary Mary Intro Cutscene", type="FTT"}, -- Canary Cave
 	-- 0x80 > 3
 	{byte=0x80, bit=4, name="GI: Skivvy FTT", type="FTT"},
-	-- 0x80 > 5
-	-- 0x80 > 6
-	-- 0x80 > 7
-	-- 0x81 > 0
-	-- 0x81 > 1
-	-- 0x81 > 2
+	-- 0x80 > 5 - GI: Skivvy Worker (Outside)
+	-- 0x80 > 6 - GI: Skivvy Worker (Floor 5)
+	-- 0x80 > 7 - GI: Skivvy Worker (Floor 2 Path)
+	-- 0x81 > 0 - GI: Skivvy Worker (Boiler)
+	-- 0x81 > 1 - GI: Skivvy Worker (Quarters)
+	-- 0x81 > 2 - GI: Skivvy Worker (Near Crusher)
 	-- 0x81 > 3
 	{byte=0x81, bit=4, name="MT: Ssslumber FTT", type="FTT"},
-	-- 0x81 > 5
+	-- 0x81 > 5 - MT: Ssslumber goes back to Sleep?
 	{byte=0x81, bit=6, name="CK: Drawbridge Open", type="Physical"},
-	-- 0x81 > 7
-	-- 0x82 > 0
-	-- 0x82 > 1
-	-- 0x82 > 2
-	-- 0x82 > 3
+	-- 0x81 > 7 - HFP: Boggy FTT
+	-- 0x82 > 0 - HFP: Picked up Boggy's Fish
+	-- 0x82 > 1 - HFP: Boggy Threw Up Jiggy
+	-- 0x82 > 2 - GI: Toxic Waste Jiggy Box Smashed
+	-- 0x82 > 3 - IOH: Gate from Plateau to Cliff Top
 	{byte=0x82, bit=4, name="Jinjo Family FT Cutscene?"},
 	{byte=0x82, bit=5, name="FT Complete Jinjo Family??"},
 	{byte=0x82, bit=6, name="Chilly Willy Intro Text", type="FTT"},
@@ -3483,7 +3483,7 @@ local flag_array = {
 	{byte=0x83, bit=4, name="ToT: Set After Round 3 (3)"},
 	-- 0x83 > 5
 	-- 0x83 > 6
-	-- 0x83 > 7
+	-- 0x83 > 7 - HFP: Gave Boggy Fish
 	-- 0x84 > 0
 	-- 0x84 > 1
 	-- 0x84 > 2
@@ -3645,10 +3645,10 @@ local flag_array = {
 	{byte=0x97, bit=6, name="Nest: IoH: Wasteland CCL Area (2)", type="Nest"},
 	{byte=0x97, bit=7, name="Treble Clef: IoH: Jinjo Village", type="Treble Clef"},
 	{byte=0x98, bit=0, name="First Time Altar of Knowledge Text", type="FTT"},
-	-- 0x98 > 1
-	-- 0x98 > 2
-	-- 0x98 > 3
-	-- 0x98 > 4
+	-- 0x98 > 1 - Honey B FTT
+	-- 0x98 > 2 - Honey B Honeycombs Bit 1
+	-- 0x98 > 3 - Honey B Honeycombs Bit 2
+	-- 0x98 > 4 - Honey B Honeycombs Bit 3
 	{byte=0x98, bit=5, name="GGM: Levitate Chuffy (2)", type="Mumbo's Magic"},
 	-- 0x98 > 6
 	-- 0x98 > 7
@@ -3669,9 +3669,9 @@ local flag_array = {
 	-- 0x9A > 6
 	{byte=0x9A, bit=7, name="GGM: Crushing Shed Active? (2)"},
 	{byte=0x9B, bit=0, name="GGM: Jiggy Boulder Crushed?"},
-	-- 0x9B > 1
-	-- 0x9B > 2
-	{byte=0x9B, bit=3, name="FT Enter Waterfall Cavern?"},
+	-- 0x9B > 1 - GGM: River Cutscene
+	-- 0x9B > 2 - GGM: Closed River Cutscene
+	{byte=0x9B, bit=3, name="FT Enter Waterfall Cavern?"}, -- GGM: Reached end of River?
 	-- 0x9B > 4
 	{byte=0x9B, bit=5, name="First Time Mumbo in Wumba's Wigwam", type="FTT"},
 	{byte=0x9B, bit=6, name="First Time Jamjars Cutscene", type="FTT"},
@@ -3689,7 +3689,7 @@ local flag_array = {
 	{byte=0x9D, bit=2, name="WW: Big Top Ticket Spawned (3)", type="Physical"},
 	{byte=0x9D, bit=3, name="WW: Big Top Ticket Spawned (4)", type="Physical"},
 	{byte=0x9D, bit=4, name="MT: Dilberta Boulder Drilled", type="Physical"},
-	-- 0x9D > 5
+	-- 0x9D > 5: MT: Columns Vault Boulder?
 	{byte=0x9D, bit=6, name="MT: Fly Pad Boulder Drilled", type="Physical"},
 	{byte=0x9D, bit=7, name="GGM: Ordnance Storage Boulder Drilled", type="Physical"},
 	{byte=0x9E, bit=0, name="GGM: Boulder Drilled Near Prospector's Hut"},
@@ -3698,7 +3698,7 @@ local flag_array = {
 	{byte=0x9E, bit=3, name="GGM: Gloomy Caverns Boulder Drilled (2)", type="Physical"},
 	{byte=0x9E, bit=4, name="GGM: Toxic Gas Cave Boulder Drilled (Health)", type="Physical"},
 	{byte=0x9E, bit=5, name="GGM: Toxic Gas Cave Boulder Drilled (Eggs)", type="Physical"},
-	-- 0x9E > 6
+	-- 0x9E > 6 - Destroyed Roysten's Boulder?
 	-- 0x9E > 7
 	{byte=0x9F, bit=0, name="GGM: Jinjo Boulder Drilled", type="Physical"},
 	-- 0x9F > 1
@@ -3718,7 +3718,7 @@ local flag_array = {
 	-- 0xA0 > 7
 	-- 0xA1 > 0
 	-- 0xA1 > 1
-	{byte=0xA1, bit=2, name="IoH: Jiggywiggy's Temple FT Open?", type="FTT"},
+	{byte=0xA1, bit=2, name="IoH: Jiggywiggy's Temple Opened", type="FTT"},
 	{byte=0xA1, bit=3, name="IoH: Jiggywiggy's Temple Podium Instructions", type="FTT"},
 	{byte=0xA1, bit=4, name="Cheat Active: Double Maximum Feathers", type="Cheat"},
 	{byte=0xA1, bit=5, name="Cheat Active: Double Maximum Eggs", type="Cheat"},
@@ -3730,53 +3730,54 @@ local flag_array = {
 	{byte=0xA2, bit=3, name="Cheat Active: Fast Baddies", type="Cheat"},
 	{byte=0xA2, bit=4, name="Cheat Active: No Energy Or Air Loss", type="Cheat"},
 	{byte=0xA2, bit=5, name="Cheat Active: Infinite Eggs And Feathers", type="Cheat"},
-	-- 0xA2 > 6
-	{byte=0xA2, bit=7, name="FT Enter Banjo's House"},
-	{byte=0xA3, bit=0, name="FT Fight Klungo?"},
-	{byte=0xA3, bit=1, name="FT Enter MT"},
-	{byte=0xA3, bit=2, name="FT Fight Targitzan?"},
-	{byte=0xA3, bit=3, name="FT Enter GGM"},
-	{byte=0xA3, bit=4, name="GGM: FT Enter Canary Race"},
-	{byte=0xA3, bit=5, name="GGM: FT Fight Old King Coal?"},
-	{byte=0xA3, bit=6, name="FT Enter WW"},
-	{byte=0xA3, bit=7, name="CCL: FT Attempt Pot o' Gold??"},
-	-- 0xA4 > 0
-	-- 0xA4 > 1
-	{byte=0xA4, bit=2, name="FT Enter JRL"},
-	-- 0xA4 > 3
-	{byte=0xA4, bit=4, name="JRL: FT Enter UFO"},
-	{byte=0xA4, bit=5, name="JRL: UFO Refuelled", type="Progress"},
-	-- 0xA4 > 6
-	-- 0xA4 > 7
-	{byte=0xA5, bit=0, name="FT Enter TDL"},
-	{byte=0xA5, bit=1, name="TDL: FT Terry Fight?"},
-	{byte=0xA5, bit=2, name="FT Enter GI"},
-	{byte=0xA5, bit=3, name="GI: FT Fight Weldar?"},
-	{byte=0xA5, bit=4, name="FT Enter HFP"},
-	-- 0xA5 > 5
-	{byte=0xA5, bit=6, name="FT Enter CCL"},
-	-- 0xA5 > 7 Something in the Mingy Jongo fight
-	-- 0xA6 > 0
-	{byte=0xA6, bit=1, name="FT Enter CK"},
-	{byte=0xA6, bit=2, name="FT Enter ToT"},
-	{byte=0xA6, bit=3, name="FT Watch Fake Credits"},
-	{byte=0xA6, bit=4, name="FT Fight Hag 1?"},
-	{byte=0xA6, bit=5, name="FT Enter IoH"},
-	{byte=0xA6, bit=6, name="FT Enter Jinjo Village??"},
-	-- 0xA6 > 7
-	-- 0xA7 > 0
-	{byte=0xA7, bit=1, name="FT Enter King Jingaling's Palace?"},
-	{byte=0xA7, bit=3, name="FT Enter Bottles' House?"},
-	{byte=0xA7, bit=4, name="FT Enter Heggy's Shed?"},
-	-- 0xA7 > 5
-	{byte=0xA7, bit=6, name="Honey B. FTT", type="FTT"},
-	{byte=0xA7, bit=7, name="First Time Turbo Trainers"},
-	{byte=0xA8, bit=0, name="First Time Wading Boots"},
-	{byte=0xA8, bit=1, name="First Time Springy Step Shoes"},
-	{byte=0xA8, bit=2, name="First Time Claw Clamber Boots"},
-	{byte=0xA8, bit=3, name="First Time CWK Shot"},
-	{byte=0xA8, bit=4, name="First Boss Fight?"},
-	{byte=0xA7, bit=5, name="IoH: First Time Enter Jiggywiggy's Temple"},
+	{byte=0xA2, bit=6, name="Jukebox: Spiral Mountain", type="Jukebox"},
+	{byte=0xA2, bit=7, name="Jukebox: Banjo's House", type="Jukebox"},
+	{byte=0xA3, bit=0, name="Jukebox: Klungo", type="Jukebox"},
+	{byte=0xA3, bit=1, name="Jukebox: MT Melody", type="Jukebox"},
+	{byte=0xA3, bit=2, name="Jukebox: Targitzan", type="Jukebox"},
+	{byte=0xA3, bit=3, name="Jukebox: GGM", type="Jukebox"},
+	{byte=0xA3, bit=4, name="Jukebox: Racin' With Mary", type="Jukebox"},
+	{byte=0xA3, bit=5, name="Jukebox: Old King Coal", type="Jukebox"},
+	{byte=0xA3, bit=6, name="Jukebox: WW", type="Jukebox"},
+	{byte=0xA3, bit=7, name="Jukebox: Fun 'n Games", type="Jukebox"},
+	{byte=0xA4, bit=0, name="Jukebox: Madame Grunty", type="Jukebox"},
+	{byte=0xA4, bit=1, name="Jukebox: Mr. Patch", type="Jukebox"},
+	{byte=0xA4, bit=2, name="Jukebox: Town Center", type="Jukebox"},
+	{byte=0xA4, bit=3, name="Jukebox: Beneath The Lagoon", type="Jukebox"},
+	{byte=0xA4, bit=4, name="Jukebox: Sad Aliens", type="Jukebox"},
+	{byte=0xA4, bit=5, name="Jukebox: Happy Aliens", type="Jukebox"},
+	{byte=0xA4, bit=6, name="Jukebox: Shootin' With the Fishes", type="Jukebox"},
+	-- 0xA4 > 7 - Jukebox: Old King Coal?
+	{byte=0xA5, bit=0, name="Jukebox: Terrydactyland", type="Jukebox"},
+	{byte=0xA5, bit=1, name="Jukebox: Terry", type="Jukebox"},
+	{byte=0xA5, bit=2, name="Jukebox: Factory", type="Jukebox"},
+	{byte=0xA5, bit=3, name="Jukebox: Weldar", type="Jukebox"},
+	{byte=0xA5, bit=4, name="Jukebox: Hailfire Peaks", type="Jukebox"},
+	{byte=0xA5, bit=5, name="Jukebox: Chilli Willy & Chilly Billi", type="Jukebox"},
+	{byte=0xA5, bit=6, name="Jukebox: Cloud Cuckooland", type="Jukebox"},
+	-- 0xA5 > 7 Jukebox: Mingy Jongo / Cloud Race?
+	-- 0xA6 > 0 Jukebox: Mingy Jongo / Cloud Race?
+	{byte=0xA6, bit=1, name="Jukebox: Cauldron Keep", type="Jukebox"},
+	{byte=0xA6, bit=2, name="Jukebox: Tower of Tragedy Quiz", type="Jukebox"},
+	{byte=0xA6, bit=3, name="Jukebox: Roll the Credits", type="Jukebox"},
+	{byte=0xA6, bit=4, name="Jukebox: Hag 1", type="Jukebox"},
+	{byte=0xA6, bit=5, name="Jukebox: Isle O Hags", type="Jukebox"},
+	{byte=0xA6, bit=6, name="Jukebox: Jinjo Village", type="Jukebox"},
+	-- 0xA6 > 7 - Jukebox: Sad Jinjo House
+	-- 0xA7 > 0 - Jukebox: Happy Jinjo House
+	{byte=0xA7, bit=1, name="Jukebox: Jingaling's Throne Room", type="Jukebox"},
+	{byte=0xA7, bit=2, name="Jukebox: Zombified Throne Room", type="Jukebox"},
+	{byte=0xA7, bit=3, name="Jukebox: Bottles House", type="Jukebox"},
+	{byte=0xA7, bit=4, name="Jukebox: Heggy's Egg Shed", type="Jukebox"},
+	-- 0xA7 > 5 - Jukebox: Jiggywiggy's Temple
+	{byte=0xA7, bit=6, name="Jukebox: Honey B's Hive", type="Jukebox"},
+	{byte=0xA7, bit=7, name="Jukebox: Turbo Trainers", type="Jukebox"},
+	{byte=0xA8, bit=0, name="Jukebox: Wading Boots"},
+	{byte=0xA8, bit=1, name="Jukebox: Springy Step Shoes"},
+	{byte=0xA8, bit=2, name="Jukebox: Claw Clamber Boots"},
+	{byte=0xA8, bit=3, name="Jukebox: CWK Shot"},
+	{byte=0xA8, bit=4, name="Jukebox: Here Comes Trouble..."},
+	-- 0xA8 > 5
 	-- 0xA8 > 6
 	-- 0xA8 > 7
 	-- 0xA9 > 0
@@ -3786,15 +3787,15 @@ local flag_array = {
 	-- 0xA9 > 4
 	-- 0xA9 > 5
 	-- 0xA9 > 6
-	-- 0xA9 > 7
+	-- 0xA9 > 7 - HFP: Quarterfinals Open
 	{byte=0xAA, bit=0, name="Bottles' Energy Restored", type="Progress"},
 	-- 0xAA > 1
 	{byte=0xAA, bit=2, name="GGM: Canary Mary Freed (3)", type="Progress"},
 	-- 0xAA > 3
 	{byte=0xAA, bit=4, name="Mumbo's Magic: Summon: Golden Goliath", type="Mumbo's Magic"},
 	{byte=0xAA, bit=5, name="Mumbo's Magic: Enlarge: Wumba's Wigwam", type="Mumbo's Magic"}, -- FT only, this doesn't actually enlarge the Wigwam
-	-- 0xAA > 6
-	-- 0xAA > 7
+	-- 0xAA > 6 - GI: Mumbo messed up Magnet
+	-- 0xAA > 7 - GI: Mumbo messed up Crushers
 	{byte=0xAB, bit=0, name="Mumbo's Magic: Rain Dance", type="Mumbo's Magic"}, -- FT Only
 	{byte=0xAB, bit=1, name="IoH: Heggy Split Up Cover Drilled", type="Physical"},
 	{byte=0xAB, bit=2, name="ToT: Set After Round 1?"},
@@ -3805,7 +3806,7 @@ local flag_array = {
 	-- 0xAB > 7
 	-- 0xAC > 0
 	-- 0xAC > 1
-	-- 0xAC > 2
+	-- 0xAC > 2 - Puzzle Completed?
 	-- 0xAC > 3
 	-- 0xAC > 4
 	-- 0xAC > 5
@@ -3822,16 +3823,16 @@ local flag_array = {
 	-- 0xAE > 0
 	-- 0xAE > 1
 	-- 0xAE > 2
-	-- 0xAE > 3
-	{byte=0xAE, bit=4, name="MT: Treasure Chamber Open (Top)", type="Physical"},
-	{byte=0xAE, bit=5, name="WW: Boggy Children? (1)"},
-	{byte=0xAE, bit=6, name="WW: Boggy Children? (2)"},
-	{byte=0xAE, bit=7, name="WW: Boggy Children? (3)"},
-	{byte=0xAF, bit=1, name="WW: Boggy Children? (4)"},
-	{byte=0xAF, bit=0, name="WW: Boggy Children? (5)"},
-	{byte=0xAF, bit=2, name="WW: Boggy Children? (6)"},
+	-- 0xAE > 3 - MT: Chief Bloatizan FTT?
+	{byte=0xAE, bit=4, name="MT: Treasure Chamber Open (Top)", type="Physical"}, -- Introduced to Jiggy Puzzle? (KBM)
+	{byte=0xAE, bit=5, name="WW: Moggy Randomizer (1)"},
+	{byte=0xAE, bit=6, name="WW: Moggy Randomizer (2)"},
+	{byte=0xAE, bit=7, name="WW: Soggy Randomizer (1)"},
+	{byte=0xAF, bit=0, name="WW: Soggy Randomizer (2)"},
+	{byte=0xAF, bit=1, name="WW: Groggy Randomizer (1)"},
+	{byte=0xAF, bit=2, name="WW: Groggy Randomizer (2)"},
 	{byte=0xAF, bit=3, name="Cheat Active: Enable Homing Eggs", type="Cheat"},
-	-- 0xAF > 4
+	-- 0xAF > 4 - Homing Eggs On?
 	-- 0xAF > 5
 	-- 0xAF > 6
 	-- 0xAF > 7
@@ -5382,13 +5383,13 @@ function Game.getCharacterState()
 	return characterStateValue;
 end
 
-local obfuscatedConsumables = { -- TODO: Extract keys directly from the game
+local obfuscatedConsumables = {
 	[0] = {key=0x27BD, name="Blue Eggs"},
 	[1] = {key=0x0C03, name="Fire Eggs"},
 	[2] = {key=0x0002, name="Ice Eggs"},
 	[3] = {key=0x01EE, name="Grenade Eggs"},
 	[4] = {key=0x2401, name="CWK Eggs"},
-	[5] = {key=0x15E0, name="Jiggies?"},
+	[5] = {key=0x15E0, name="Proximity Eggs"},
 	[6] = {key=0x1000, name="Red Feathers"},
 	[7] = {key=0x3C18, name="Gold Feathers"},
 	[8] = {key=0x0003, name="Glowbos"},
