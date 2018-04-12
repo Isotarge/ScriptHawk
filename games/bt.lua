@@ -197,7 +197,7 @@ local Game = {
 		"JV - Yellow Jinjo's house",
 		"JV - Blue Jinjo's house",
 
-		"!Crash 0x0149",
+		"!Crash 0x0149", -- Unused Jinjo House? https://tcrf.net/Banjo-Tooie
 
 		"JV - Brown Jinjo's house",
 		"JV - Orange Jinjo's house",
@@ -664,6 +664,23 @@ function isKnownPattern()
 	console.clear();
 	printCurrentPattern();
 	return false;
+end
+
+-----------------
+-- Randomizers --
+-----------------
+
+-- TODO: Randomizer stuff, read set patterns from flags
+function outputRandomizerPattern(randomizerType)
+	if randomizerType == "Jinjo" then
+		print("Outputting Jinjo Randomizer");
+	elseif randomizerType == "Klungo" then
+		print("Outputting Klungo Randomizer");
+	elseif randomizerType == "Boggy" then
+		print("Outputting Boggy Randomizer");
+	elseif randomizerType == "Prison Compound" then
+		print("Outputting Prison Compound Randomizer");
+	end
 end
 
 --------------
@@ -1394,14 +1411,14 @@ local animationList = {
 	[0x03] = "Walking",
 	[0x04] = "Swimming", -- IoH Wigwam Transformation
 	[0x05] = "Pecking",
-	[0x06] = "Shuffling", -- Ledge Grab, Right
+	[0x06] = "Shuffling (Right)", -- Ledge Grab
 	[0x07] = "Exiting Talon Trot",
 	[0x08] = "Jumping",
 	[0x09] = "Death",
 	[0x0A] = "Climbing",
 	[0x0B] = "Creeping",
 	[0x0C] = "Running",
-	[0x0D] = "Pecking", -- On Ledge
+	[0x0D] = "Pecking (Right)", -- On Ledge
 	[0x0E] = "Skidding",
 	[0x0F] = "Knockback", -- IoH Wigwam Transformation
 
@@ -1418,6 +1435,7 @@ local animationList = {
 	[0x1A] = "Rat-a-tat Rap",
 	[0x1C] = "Beak Barge",
 	[0x1D] = "Beak Buster",
+	[0x1E] = "Pecking (Left)", -- On Ledge
 	[0x1F] = "Launching", -- Jinjo Collection Start
 
 	[0x20] = "Breegull Bash",
@@ -1458,10 +1476,11 @@ local animationList = {
 	[0x4F] = "Rolling",
 
 	[0x50] = "Thinking", -- Locked
-	[0x51] = "Shuffling", -- Ledge Grab, Left
+	[0x51] = "Shuffling (Left)", -- Ledge Grab
 	[0x52] = "Idle", -- Ledge Grab
 	[0x54] = "Idle", -- Beehive
 	[0x55] = "Idle", -- Ledge Grab, Looking Around
+	[0x56] = "Idle", -- Ledge Grab, Almost Letting Go
 	[0x57] = "Treading Water",
 	[0x59] = "Slipping", -- BK
 	[0x5A] = "Slipping",
@@ -1516,6 +1535,7 @@ local animationList = {
 	[0xB3] = "Creeping", -- Mumbo
 	[0xB4] = "Walking", -- Mumbo
 	[0xB5] = "Idle", -- Mumbo
+	[0xB6] = "Juggling Wand", -- Mumbo
 	[0xB7] = "Damaged", -- Mumbo
 	[0xB8] = "Death", -- Mumbo
 	[0xB9] = "Drowning", -- BK
@@ -2421,6 +2441,7 @@ local global_flag_array = {
 	{byte=0x0D, bit=1, name="Screen Scale", ignore=true},
 	{byte=0x0D, bit=2, name="Screen Scale", ignore=true},
 	{byte=0x0D, bit=3, name="Screen Scale", ignore=true},
+	-- 0x0D > 4 -- Unknown, set by going into HFP kickball area, also set by triggering Mingy Jongo fight, also set on boot with no eeprom
 };
 
 local flag_block_size = 0xB0;
@@ -2436,7 +2457,7 @@ local flag_array = {
 	-- 0x01 > 0
 	-- 0x01 > 1 - First Time Warp Pad
 	{byte=0x01, bit=2, name="First Time Empty Honeycomb Collection", nomap=true, type="FTT"},
-	-- 0x01 > 3 - Pink SNS Egg Grate
+	{byte=0x01, bit=3, name="SM: Pink SNS Egg Grate Broken", type="Physical"},
 	-- 0x01 > 4
 	{byte=0x01, bit=5, name="First Time Jinjo Collection", nomap=true, type="FTT"},
 	-- 0x01 > 6
@@ -2448,16 +2469,16 @@ local flag_array = {
 	{byte=0x02, bit=4, name="Klungo Intro Cutscene"},
 	-- 0x02 > 5 - GI: Wumba's Picture Broken
 	-- 0x02 > 6
-	-- 0x02 > 7 - GI: Floor 3 Elevator Door
-	-- 0x03 > 0 - GI: Floor 4 Elevator Door
-	-- 0x03 > 1 - HFP: Stone Building Destroyed?
+	{byte=0x02, bit=7, name="GI: Floor 3 Elevator Door Opened", type="Physical"},
+	{byte=0x03, bit=0, name="GI: Floor 4 Elevator Door Opened", type="Physical"},
+	-- 0x03 > 1
 	-- 0x03 > 2
 	{byte=0x03, bit=3, name="Hag 1 Defeated", type="Progress"},
 	{byte=0x03, bit=4, name="Hag 1 Intro Cutscene", type="FTT"},
 	{byte=0x03, bit=5, name="JRL: Sunken Ship Jinjo Chest Smashed", type="Physical"},
-	-- 0x03 > 6 - HFP: Breakable Coliseum Wall?
-	-- 0x03 > 7 - HFP: Breakable Coliseum Wall?
-	-- 0x04 > 0 - HFP: Breakable Coliseum Wall?
+	{byte=0x03, bit=6, name="HFP: Colosseum Wall Broken (1)", type="Physical"},
+	{byte=0x03, bit=7, name="HFP: Colosseum Wall Broken (2)", type="Physical"},
+	{byte=0x04, bit=0, name="HFP: Colosseum Wall Broken (3)", type="Physical"},
 	{byte=0x04, bit=1, name="HFP: Stone Building Destroyed", type="Physical"},
 	-- 0x04 > 2
 	{byte=0x04, bit=3, name="Cheat Available: Jiggywiggyspecial", type="Cheat Available"},
@@ -2592,7 +2613,7 @@ local flag_array = {
 	{byte=0x14, bit=4, name="JRL: Water Supply Pipe Grate Smashed (Smuggler's Cavern)", type="Physical"},
 	{byte=0x14, bit=5, name="JRL: Waste Pipe Drilled", type="Physical"},
 	-- 0x14 > 6
-	-- 0x14 > 7 - JRL: Center Statue
+	{byte=0x14, bit=7, name="JRL: Center Statue Broken", type="Physical"},
 	-- 0x15 > 0
 	-- 0x15 > 1
 	-- 0x15 > 2
@@ -2670,39 +2691,39 @@ local flag_array = {
 	{byte=0x1E, bit=2, name="Ability: Grenade Eggs", type="Ability"},
 	{byte=0x1E, bit=3, name="Ability: Clockwork Kazooie Eggs", type="Ability"},
 	{byte=0x1E, bit=4, name="Ability: Ice Eggs", type="Ability"},
-	-- 0x1E > 5 - Fast Swimming?
+	{byte=0x1E, bit=5, name="Ability: Fast Swimming", type="Ability"},
 	{byte=0x1E, bit=6, name="FT Ability Use? (1)"}, -- Set on boot -- Egg Switch?
 	{byte=0x1E, bit=7, name="Ability: Breegull Bash", type="Ability"},
-	-- 0x1F > 0
-	-- 0x1F > 1
-	-- 0x1F > 2
-	-- 0x1F > 3
-	-- 0x1F > 4
-	-- 0x1F > 5
-	-- 0x1F > 6
-	-- 0x1F > 7
-	-- 0x20 > 0
+	-- 0x1F > 0 - Set by demo
+	-- 0x1F > 1 - Set by demo
+	-- 0x1F > 2 - Set by demo
+	-- 0x1F > 3 - Set by demo
+	-- 0x1F > 4 - Set by demo
+	-- 0x1F > 5 - Set by demo
+	-- 0x1F > 6 - Set by demo
+	-- 0x1F > 7 - Set by demo
+	-- 0x20 > 0 - Set by demo
 	-- 0x20 > 1
-	{byte=0x20, bit=2, name="FT Ability Use? (2)"}, -- Set on boot
-	{byte=0x20, bit=3, name="FT Ability Use? (3)"}, -- Set on boot
-	{byte=0x20, bit=4, name="FT Ability Use? (4)"}, -- Set on boot
-	{byte=0x20, bit=5, name="FT Ability Use? (5)"}, -- Set on boot
-	{byte=0x20, bit=6, name="FT Ability Use? (6)"}, -- Set on boot
-	{byte=0x20, bit=7, name="FT Ability Use? (7)"}, -- Set on boot
+	{byte=0x20, bit=2, name="FT Ability Use: Jumping", type="FTAbility", ignore=true}, -- Set on boot
+	{byte=0x20, bit=3, name="FT Ability Use: Feathery Flap", type="FTAbility", ignore=true}, -- Set on boot
+	{byte=0x20, bit=4, name="FT Ability Use: Flap Flip", type="FTAbility", ignore=true}, -- Set on boot
+	{byte=0x20, bit=5, name="FT Ability Use: Dive", type="FTAbility", ignore=true}, -- Set on boot
+	{byte=0x20, bit=6, name="FT Ability Use: Climbing", type="FTAbility", ignore=true}, -- Set on boot
+	{byte=0x20, bit=7, name="FT Ability Use: Beak Barge", type="FTAbility", ignore=true}, -- Set on boot
 	{byte=0x21, bit=0, name="FT Ability Use? (8)"}, -- Set on boot
-	{byte=0x21, bit=1, name="FT Ability Use? (9)"}, -- Set on boot
-	{byte=0x21, bit=2, name="FT Ability Use? (10)"}, -- Set on boot
-	{byte=0x21, bit=3, name="FT Ability Use? (11)"}, -- Set on boot
-	{byte=0x21, bit=4, name="FT Ability Use? (12)"}, -- Set on boot
-	{byte=0x21, bit=5, name="FT Ability Use? (13)"}, -- Set on boot
-	{byte=0x21, bit=6, name="FT Ability Use? (14)"}, -- Set on boot
-	-- 0x21 > 7
-	-- 0x22 > 0
-	-- 0x22 > 1
-	-- 0x22 > 2
-	-- 0x22 > 3
-	-- 0x22 > 4
-	-- 0x22 > 5
+	{byte=0x21, bit=1, name="FT Ability Use: Shoot Eggs", type="FTAbility", ignore=true}, -- Set on boot
+	{byte=0x21, bit=2, name="FT Ability Use: Fly Pad", type="FTAbility", ignore=true}, -- Set on boot
+	{byte=0x21, bit=3, name="FT Ability Use: Shock Spring Pad", type="FTAbility", ignore=true}, -- Set on boot
+	{byte=0x21, bit=4, name="FT Ability Use: Rat-a-tat Rap", type="FTAbility", ignore=true}, -- Set on boot
+	{byte=0x21, bit=5, name="FT Ability Use: Bear Punch", type="FTAbility", ignore=true}, -- Set on boot
+	{byte=0x21, bit=6, name="FT Ability Use: Roll", type="FTAbility", ignore=true}, -- Set on boot
+	-- 0x21 > 7 - Set by demo
+	-- 0x22 > 0 - Set by demo
+	-- 0x22 > 1 - Set by demo
+	-- 0x22 > 2 - Set by demo
+	-- 0x22 > 3 - Set by demo
+	-- 0x22 > 4 - Set by demo
+	-- 0x22 > 5 - Set by demo
 	-- 0x22 > 6
 	{byte=0x22, bit=7, name="Doubloon: Town Center Pole (1)", type="Doubloon"},
 	{byte=0x23, bit=0, name="Doubloon: Town Center Pole (2)", type="Doubloon"},
@@ -2748,7 +2769,7 @@ local flag_array = {
 	-- 0x28 > 0
 	{byte=0x28, bit=1, name="GI: Loggo FTT", type="FTT"},
 	-- 0x28 > 2
-	-- 0x28 > 3 - GI: Fly Pad Switch Pushed
+	{byte=0x28, bit=3, name="GI: Fly Pad Switch Pushed", type="Physical"},
 	-- 0x28 > 4
 	-- 0x28 > 5
 	-- 0x28 > 6
@@ -2777,8 +2798,8 @@ local flag_array = {
 	-- 0x2B > 5
 	-- 0x2B > 6
 	-- 0x2B > 7
-	-- 0x2C > 0 GI: Back Door Open
-	-- 0x2C > 1 GI: Men's Restroom Door
+	{byte=0x2C, bit=0, name="GI: Back Door Open", type="Physical"},
+	-- 0x2C > 1
 	{byte=0x2C, bit=2, name="TDL: Wigwam Enlarged", type="Physical"},
 	{byte=0x2C, bit=3, name="MT: Treasure Chamber Open", type="Physical"},
 	{byte=0x2C, bit=4, name="GI: Weldar Defeated", type="Progress"},
@@ -2791,15 +2812,15 @@ local flag_array = {
 	-- 0x2D > 3
 	-- 0x2D > 4
 	-- 0x2D > 5
-	-- 0x2D > 6 - GI: Smokestack to Jinjo
-	-- 0x2D > 7 - GI: Floor 5 Window
-	-- 0x2E > 0 - GI: Floor 5 Window
-	-- 0x2E > 1 - GI: Window to Screws
-	-- 0x2E > 2 - GI: Window to Cheato Page
-	-- 0x2E > 3 - GI: Window below Treble Clef
-	-- 0x2E > 4 - GI: Window blocking Jinjo
+	{byte=0x2D, bit=6, name="GI: Smokestack to Jinjo Broken", type="Physical"},
+	{byte=0x2D, bit=7, name="GI: Floor 5 Window Smashed (1)", type="Physical"},
+	{byte=0x2E, bit=0, name="GI: Floor 5 Window Smashed (2)", type="Physical"},
+	{byte=0x2E, bit=1, name="GI: Window to Screws Smashed", type="Physical"},
+	-- 0x2E > 2 - GI: Window to Cheato Page Smashed
+	-- 0x2E > 3 - GI: Window below Treble Clef Smashed
+	-- 0x2E > 4 - GI: Window blocking Jinjo Smashed
 	-- 0x2E > 5
-	-- 0x2E > 6
+	-- 0x2E > 6 - GI: Electromagnet Reactivated Text?
 	{byte=0x2E, bit=7, name="WW: FT Pick Up Big Top Ticket", type="FTT"},
 	{byte=0x2F, bit=0, name="GI: Trash Compactor FTT", type="FTT"},
 	-- 0x2F > 1
@@ -2833,23 +2854,23 @@ local flag_array = {
 	-- 0x32 > 5 - GI: Toxic Barrel Hit
 	-- 0x32 > 6 - GI: Toxic Barrel Hit Cutscene
 	{byte=0x32, bit=7, name="SM: Roysten Rescued", type="Ability"},
-	-- 0x33 > 0 - GI: F2 Grate Near Wumba
-	-- 0x33 > 1 - GI: F2 Grate Near Electromagnetic Chamber
-	-- 0x33 > 2 - GI: Screw Panel (F2-F1)
+	{byte=0x33, bit=0, name="GI: F2 Grate Near Wumba", type="Physical"},
+	{byte=0x33, bit=1, name="GI: F2 Grate Near Electromagnetic Chamber", type="Physical"},
+	{byte=0x33, bit=2, name="GI: Screw Panel (F2-F1)", type="Physical"},
 	-- 0x33 > 3
 	-- 0x33 > 4 - GI: Screw Panel (Mumbo Pad)
-	-- 0x33 > 5 - HFP: Mildred Ice Cube FTT
+	{byte=0x33, bit=5, name="HFP: Mildred Ice Cube FTT", type="FTT"},
 	{byte=0x33, bit=6, name="HFP: Gobi in Train Station", type="Progress"},
 	-- 0x33 > 7 - HFP: Biggafoot FTT
-	-- 0x34 > 0
+	-- 0x34 > 0 - GI: Entering Packing Room Something?
 	-- 0x34 > 1
 	-- 0x34 > 2
 	-- 0x34 > 3
 	-- 0x34 > 4 - HFP: Biggafoot Gone
 	-- 0x34 > 5
 	-- 0x34 > 6
-	-- 0x34 > 7 - HFP: Icy Train Switch
-	-- 0x35 > 0 - HFP: Fire Train Switch
+	{byte=0x34, bit=7, name="HFP: Icy Train Switch", type="Train"},
+	{byte=0x35, bit=0, name="HFP: Fire Train Switch", type="Train"},
 	{byte=0x35, bit=1, name="Humba Wumba: No Glowbo Needed FTT", type="FTT"},
 	-- 0x35 > 2
 	-- 0x35 > 3
@@ -2868,23 +2889,23 @@ local flag_array = {
 	-- 0x37 > 0
 	{byte=0x37, bit=1, name="CCL: Rainbow Spawned", type="Physical"},
 	{byte=0x37, bit=2, name="CCL: FT Attempt Pot o' Gold?"},
-	-- 0x37 > 3 - Menu MT? -- TODO: Not sure what this means, was in KBM's notes
-	-- 0x37 > 4 - Menu GGM?
-	-- 0x37 > 5 - Menu WW?
-	-- 0x37 > 6 - Menu JRL?
-	-- 0x37 > 7 - Menu TDL?
-	-- 0x38 > 0 - Menu GI?
-	-- 0x38 > 1 - Menu HFP?
-	-- 0x38 > 2 - Menu CCL?
-	{byte=0x38, bit=3, name="Menu: CK?"},
-	{byte=0x38, bit=4, name="Menu: IoH?"},
-	-- 0x38 > 5 - Icicle Grotto Ceiling Icicle
-	-- 0x38 > 6 - Icicle Grotto Ceiling Icicle
-	-- 0x38 > 7 - Icicle Grotto Ceiling Icicle
-	-- 0x39 > 0 - Icicle Grotto Ceiling Icicle
-	-- 0x39 > 1 - Icicle Grotto Ceiling Icicle
-	-- 0x39 > 2 - Icicle Grotto Ceiling Icicle
-	-- 0x39 > 3 - Icicle Grotto Ceiling Icicle
+	{byte=0x37, bit=3, name="View Totals Menu: MT", type="Progress"},
+	{byte=0x37, bit=4, name="View Totals Menu: GGM", type="Progress"},
+	{byte=0x37, bit=5, name="View Totals Menu: WW", type="Progress"},
+	{byte=0x37, bit=6, name="View Totals Menu: JRL", type="Progress"},
+	{byte=0x37, bit=7, name="View Totals Menu: TDL", type="Progress"},
+	{byte=0x38, bit=0, name="View Totals Menu: GI", type="Progress"},
+	{byte=0x38, bit=1, name="View Totals Menu: HFP", type="Progress"},
+	{byte=0x38, bit=2, name="View Totals Menu: CCL", type="Progress"},
+	{byte=0x38, bit=3, name="View Totals Menu: CK", type="Progress"},
+	{byte=0x38, bit=4, name="View Totals Menu: IoH", type="Progress"},
+	{byte=0x38, bit=5, name="HFP: Icicle Grotto Ceiling Icicle (1)", type="Physical"},
+	{byte=0x38, bit=6, name="HFP: Icicle Grotto Ceiling Icicle (2)", type="Physical"},
+	{byte=0x38, bit=7, name="HFP: Icicle Grotto Ceiling Icicle (3)", type="Physical"},
+	{byte=0x39, bit=0, name="HFP: Icicle Grotto Ceiling Icicle (4)", type="Physical"},
+	{byte=0x39, bit=1, name="HFP: Icicle Grotto Ceiling Icicle (5)", type="Physical"},
+	{byte=0x39, bit=2, name="HFP: Icicle Grotto Ceiling Icicle (6)", type="Physical"},
+	{byte=0x39, bit=3, name="HFP: Icicle Grotto Ceiling Icicle (7)", type="Physical"},
 	{byte=0x39, bit=4, name="Jinjo: MT: Jade Snake Grove", type="Jinjo"},
 	{byte=0x39, bit=5, name="Jinjo: MT: Roof of Stadium", type="Jinjo"},
 	{byte=0x39, bit=6, name="Jinjo: MT: Targitzan's Temple", type="Jinjo"},
@@ -3082,23 +3103,23 @@ local flag_array = {
 	-- 0x51 > 6
 	{byte=0x51, bit=7, name="JRL: Merry Maggie Malpass Jiggy Spawned", type="Physical"},
 	-- 0x52 > 0
-	-- 0x52 > 1 - WW: Dodgem's Dome Jiggy Spawned
+	{byte=0x52, bit=1, name="WW: Dodgems Dome Jiggy Spawned", type="Physical"},
 	-- 0x52 > 2
 	-- 0x52 > 3
 	-- 0x52 > 4
 	{byte=0x52, bit=5, name="GGM: Dilberta Jiggy Spawned", type="Physical"},
 	-- 0x52 > 6
 	-- 0x52 > 7
-	-- 0x53 > 0 - GI: Toxic Barrel Jiggy Spawned
+	{byte=0x53, bit=0, name="GI: Quality Control Jiggy Spawned", type="Physical"},
 	{byte=0x53, bit=1, name="TDL: Terry Defeated Jiggy Spawned", type="Physical"},
 	-- 0x53 > 2
-	-- 0x53 > 3
+	{byte=0x53, bit=3, name="HFP: Volcano Jiggy Spawned", type="Physical"},
 	-- 0x53 > 4
 	{byte=0x53, bit=5, name="CCL: Pot o' Gold Jiggy Spawned", type="Physical"},
 	{byte=0x53, bit=6, name="FT Jiggy Collection??"}, -- King Jingaling Intro Jiggy Spawned?
 	-- 0x53 > 7
-	-- 0x54 > 0 - GI: Packing Room Jiggy Spawned
-	-- 0x54 > 1 - TDL: Chompa's Jiggy Spawned
+	{byte=0x54, bit=0, name="GI: Packing Room Jiggy Spawned", type="Physical"},
+	{byte=0x54, bit=1, name="TDL: Chompa's Jiggy Spawned", type="Physical"},
 	-- 0x54 > 2
 	{byte=0x54, bit=3, name="JRL: UFO Jiggy Spawned?", type="Physical"},
 	-- 0x54 > 4
@@ -3174,19 +3195,19 @@ local flag_array = {
 	{byte=0x5D, bit=2, name="Targitzan Statue (23)", type="Targitzan Statue"},
 	{byte=0x5D, bit=3, name="Targitzan Statue (24)", type="Targitzan Statue"},
 	{byte=0x5D, bit=4, name="Targitzan Statue (25)", type="Targitzan Statue"},
-	{byte=0x5D, bit=5, name="Klungo Randomizer (1)"},
-	{byte=0x5D, bit=6, name="Klungo Randomizer (2)"},
-	{byte=0x5D, bit=7, name="Klungo Randomizer (3)"},
+	{byte=0x5D, bit=5, name="Klungo Randomizer (1)", type="Randomizer"},
+	{byte=0x5D, bit=6, name="Klungo Randomizer (2)", type="Randomizer"},
+	{byte=0x5D, bit=7, name="Klungo Randomizer (3)", type="Randomizer"},
 	{byte=0x5E, bit=0, name="Klungo 1 Defeated", type="Progress"},
 	{byte=0x5E, bit=1, name="Klungo 2 Defeated", type="Progress"},
 	{byte=0x5E, bit=2, name="Klungo 3 Defeated", type="Progress"},
 	-- 0x5E > 3
-	-- 0x5E > 4 - HFP: Volcano Switch 1
-	-- 0x5E > 5 - HFP: Volcano Switch 2
-	-- 0x5E > 6 - HFP: Volcano Switch 3
-	-- 0x5E > 7 - HFP: Volcano Switch 4
-	-- 0x5F > 0 - HFP: Volcano Switch 5
-	-- 0x5F > 1 - HFP: Volcano Switch Jiggy
+	{byte=0x5E, bit=4, name="HFP: Volcano Switch 1", type="Physical"},
+	{byte=0x5E, bit=5, name="HFP: Volcano Switch 2", type="Physical"},
+	{byte=0x5E, bit=6, name="HFP: Volcano Switch 3", type="Physical"},
+	{byte=0x5E, bit=7, name="HFP: Volcano Switch 4", type="Physical"},
+	{byte=0x5F, bit=0, name="HFP: Volcano Switch 5", type="Physical"},
+	{byte=0x5F, bit=1, name="HFP: Volcano Switch Jiggy", type="Physical"},
 	-- 0x5F > 2
 	-- 0x5F > 3
 	-- 0x5F > 4
@@ -3194,10 +3215,10 @@ local flag_array = {
 	-- 0x5F > 6
 	-- 0x5F > 7 Dippy Something
 	-- 0x60 > 0 Dippy Something
-	-- 0x60 > 1 - GI: Wall Crusher Turned Off
+	{byte=0x60, bit=1, name="GI: Wall Crusher Turned Off", type="Physical"},
 	-- 0x60 > 2
-	-- 0x60 > 3 - MT: Prison Code Randomizer Bit
-	-- 0x60 > 4 - MT: Prison Code Randomizer Bit
+	{byte=0x60, bit=3, name="MT: Prison Code Randomizer (1)", type="Randomizer"},
+	{byte=0x60, bit=4, name="MT: Prison Code Randomizer (2)", type="Randomizer"},
 	{byte=0x60, bit=5, name="Silo: Jinjo Village", type="Silo"},
 	{byte=0x60, bit=6, name="Silo: Wooded Hollow", type="Silo"},
 	{byte=0x60, bit=7, name="Silo: Plateau", type="Silo"},
@@ -3220,7 +3241,7 @@ local flag_array = {
 	-- 0x63 > 0
 	-- 0x63 > 1
 	{byte=0x63, bit=2, name="First Time BK Cart Text", type="FTT"},
-	-- 0x63 > 3
+	-- 0x63 > 3 - FT note something?
 	{byte=0x63, bit=4, name="JRL: Jukebox is Broken FTT", type="FTT"},
 	-- 0x63 > 5
 	{byte=0x63, bit=6, name="Humba Wumba: Big T. Rex FTT", type="FTT"},
@@ -3238,22 +3259,22 @@ local flag_array = {
 	-- 0x65 > 2
 	-- 0x65 > 3
 	-- 0x65 > 4
-	-- 0x65 > 5
+	-- 0x65 > 5 - GI Something, toggled when I opened back door after warping to Wumba's from new file
 	-- 0x65 > 6
 	-- 0x65 > 7
 	-- 0x66 > 0
 	-- 0x66 > 1
 	-- 0x66 > 2
 	{byte=0x66, bit=3, name="IoH: Jiggywiggy's Temple Intro Cutscene", type="FTT"},
-	-- 0x66 > 4 - Jiggywiggy Challenge Completion (1)
-	-- 0x66 > 5 - Jiggywiggy Challenge Completion (2)
-	-- 0x66 > 6 - Jiggywiggy Challenge Completion (3)
-	-- 0x66 > 7 - Jiggywiggy Challenge Completion (4)
-	{byte=0x67, bit=0, name="King Jingaling Life Sapped"},
+	{byte=0x66, bit=4, name="Jiggywiggy Challenge Completion (1)", type="Jiggywiggy Progress"},--, ignore=true},
+	{byte=0x66, bit=5, name="Jiggywiggy Challenge Completion (2)", type="Jiggywiggy Progress"},--, ignore=true},
+	{byte=0x66, bit=6, name="Jiggywiggy Challenge Completion (3)", type="Jiggywiggy Progress"},--, ignore=true},
+	{byte=0x66, bit=7, name="Jiggywiggy Challenge Completion (4)", type="Jiggywiggy Progress"},--, ignore=true},
+	{byte=0x67, bit=0, name="King Jingaling Life Sapped", type="Progress"},
 	-- 0x67 > 1
 	-- 0x67 > 2
 	-- 0x67 > 3
-	-- 0x67 > 4 - GI: Tintops Alert?
+	{byte=0x67, bit=4, name="GI: Tintops Alert", type="FTT"},
 	-- 0x67 > 5
 	{byte=0x67, bit=6, name="MT: Code Chamber Door Smashed", type="Physical"},
 	{byte=0x67, bit=7, name="Jiggywiggy Temple Is Over There CS Seen", type="FTT"},
@@ -3273,13 +3294,13 @@ local flag_array = {
 	{byte=0x69, bit=5, name="HFP: UFO Landed", type="Progress"},
 	-- 0x69 > 6
 	-- 0x69 > 7
-	-- 0x6A > 0 - HFP: Killed Mildred
-	-- 0x6A > 1 - Jinjo Random Value
-	-- 0x6A > 2 - Jinjo Random Value
-	-- 0x6A > 3 - Jinjo Random Value
-	-- 0x6A > 4 - Jinjo Random Value
-	-- 0x6A > 5 - Jinjo Random Value
-	-- 0x6A > 6 - Jinjo Random Value
+	{byte=0x6A, bit=0, name="HFP: Killed Mildred", type="Physical"},
+	{byte=0x6A, bit=1, name="Jinjo Randomizer (1)", type="Randomizer"},
+	{byte=0x6A, bit=2, name="Jinjo Randomizer (2)", type="Randomizer"},
+	{byte=0x6A, bit=3, name="Jinjo Randomizer (3)", type="Randomizer"},
+	{byte=0x6A, bit=4, name="Jinjo Randomizer (4)", type="Randomizer"},
+	{byte=0x6A, bit=5, name="Jinjo Randomizer (5)", type="Randomizer"},
+	{byte=0x6A, bit=6, name="Jinjo Randomizer (6)", type="Randomizer"},
 	{byte=0x6A, bit=7, name="Mumbo: Glowbo Paid (MT)", type="Glowbo Paid"},
 	{byte=0x6B, bit=0, name="Mumbo: Glowbo Paid (GGM)", type="Glowbo Paid"},
 	{byte=0x6B, bit=1, name="Mumbo: Glowbo Paid (WW)", type="Glowbo Paid"},
@@ -3287,7 +3308,7 @@ local flag_array = {
 	{byte=0x6B, bit=3, name="Mumbo: Glowbo Paid (TDL)", type="Glowbo Paid"},
 	{byte=0x6B, bit=4, name="Mumbo: Glowbo Paid (HFP)", type="Glowbo Paid"},
 	{byte=0x6B, bit=5, name="Mumbo: Glowbo Paid (CCL)", type="Glowbo Paid"},
-	-- 0x6B > 6 - Mumbo: Paid IOH?
+	{byte=0x6B, bit=6, name="Mumbo: Glowbo Paid (IoH)", type="Glowbo Paid"},
 	{byte=0x6B, bit=7, name="Mumbo: Glowbo Paid (GI)", type="Glowbo Paid"},
 	{byte=0x6C, bit=0, name="CCL: Superstash FTT", type="FTT"},
 	{byte=0x6C, bit=1, name="CCL: Superstash: 1 Switch Hit", type="Physical"},
@@ -3298,25 +3319,25 @@ local flag_array = {
 	-- 0x6C > 6
 	-- 0x6C > 7 - HFP: Underground Tunnel Opened
 	-- 0x6D > 0 - HFP: Pillars to Waterfall Raised
-	-- 0x6D > 1 - IOH: HFP Bridge Extended
-	-- 0x6D > 2 - Opened Mayahem Temple
-	-- 0x6D > 3 - Opened Glitter Gulch Mine
-	-- 0x6D > 4 - Opened Witchyworld
-	-- 0x6D > 5 - Opened Jolly Roger's Lagoon
-	-- 0x6D > 6 - Opened Terrydactyland
-	-- 0x6D > 7 - Opened Grunty Industries
-	-- 0x6E > 0 - Opened Hailfire Peaks
-	-- 0x6E > 1 - Opened Cloud Cuckooland
-	-- 0x6E > 2 - Opened Cauldron Keep
-	-- 0x6E > 3 - Opened Final Boss
-	-- 0x6E > 4 - HFP: Mumbo's Broken Wall
+	{byte=0x6D, bit=1, name="IoH: HFP Bridge Extended", type="Physical"},
+	{byte=0x6D, bit=2, name="Opened Mayahem Temple", type="Progress"},
+	{byte=0x6D, bit=3, name="Opened Glitter Gulch Mine", type="Progress"},
+	{byte=0x6D, bit=4, name="Opened Witchyworld", type="Progress"},
+	{byte=0x6D, bit=5, name="Opened Jolly Roger's Lagoon", type="Progress"},
+	{byte=0x6D, bit=6, name="Opened Terrydactyland", type="Progress"},
+	{byte=0x6D, bit=7, name="Opened Grunty Industries", type="Progress"},
+	{byte=0x6E, bit=0, name="Opened Hailfire Peaks", type="Progress"},
+	{byte=0x6E, bit=1, name="Opened Cloud Cuckooland", type="Progress"},
+	{byte=0x6E, bit=2, name="Opened Cauldron Keep", type="Progress"},
+	{byte=0x6E, bit=3, name="Opened Hag 1", type="Progress"},
+	{byte=0x6E, bit=4, name="HFP: Mumbo's Skull Wall Smashed", type="Physical"},
 	{byte=0x6E, bit=5, name="JRL: Mumbo's Skull Wall Smashed", type="Physical"},
 	{byte=0x6E, bit=6, name="FT Complete Jinjo Family?"},
 	-- 0x6E > 7
 	-- 0x6F > 0 JRL Sea Bottom Location?
 	-- 0x6F > 1 JRL Sea Bottom Location?
-	-- 0x6F > 2 SM: Jinjo Door?
-	-- 0x6F > 3 JRL: UFO Door?
+	-- 0x6F > 2
+	-- 0x6F > 3
 	-- 0x6F > 4 JRL Sea Bottom Location?
 	-- 0x6F > 5 JRL Sea Bottom Location?
 	-- 0x6F > 6
@@ -3362,14 +3383,14 @@ local flag_array = {
 	{byte=0x74, bit=6, name="Warp: HFP: Ice Side - Inside Icicle Grotto", type="Warp"},
 	{byte=0x74, bit=7, name="Warp: CCL: World Entry And Exit", type="Warp"},
 	{byte=0x75, bit=0, name="Warp: CCL: Central Cavern", type="Warp"},
-	-- 0x75 > 1 - Warp: CCL: Unused (1)
-	-- 0x75 > 2 - Warp: CCL: Unused (2)
-	-- 0x75 > 3 - Warp: CCL: Unused (3)
+	{byte=0x75, bit=1, name="Warp: CCL: Unused (1)"},
+	{byte=0x75, bit=2, name="Warp: CCL: Unused (2)"},
+	{byte=0x75, bit=3, name="Warp: CCL: Unused (3)"},
 	{byte=0x75, bit=4, name="Warp: CK: Bottom of The Tower", type="Warp"},
 	{byte=0x75, bit=5, name="Warp: CK: Top of The Tower", type="Warp"},
-	-- 0x75 > 6 - Warp: CK: Unused (1)
-	-- 0x75 > 7 - Warp: CK: Unused (2)
-	-- 0x76 > 0 - Warp: CK: Unused (3)
+	{byte=0x75, bit=6, name="Warp: CK: Unused (1)"},
+	{byte=0x75, bit=7, name="Warp: CK: Unused (2)"},
+	{byte=0x76, bit=0, name="Warp: CK: Unused (3)"},
 	-- 0x76 > 1
 	-- 0x76 > 2
 	-- 0x76 > 3
@@ -3378,13 +3399,13 @@ local flag_array = {
 	-- 0x76 > 6
 	-- 0x76 > 7
 	-- 0x77 > 0
-	{byte=0x77, bit=7, name="IoH: Heggy: Yellow Egg Hatched", type="Progress"},
+	-- 0x77 > 1 - Jukebox FT use?
 	-- 0x77 > 2
 	{byte=0x77, bit=3, name="Mystery Egg: Blue Acquired", type="Mystery Egg"},
 	{byte=0x77, bit=4, name="Mystery Egg: Blue Hatched", type="Mystery Egg"},
 	{byte=0x77, bit=5, name="Mystery Egg: Pink Acquired", type="Mystery Egg"},
 	{byte=0x77, bit=6, name="Mystery Egg: Pink Hatched", type="Mystery Egg"},
-	-- 0x77 > 7 - Hatched Yellow Egg
+	{byte=0x77, bit=7, name="IoH: Heggy: Yellow Egg Hatched", type="Progress"},
 	{byte=0x78, bit=0, name="IoH: Heggy FTT", type="FTT"},
 	-- 0x78 > 1 - Completed Puzzle 1
 	{byte=0x78, bit=2, name="IoH: Pine Grove Door Open", type="Physical"},
@@ -3397,11 +3418,11 @@ local flag_array = {
 	-- 0x79 > 1
 	-- 0x79 > 2
 	-- 0x79 > 3
-	{byte=0x79, bit=4, name="JRL: Ground Drilled (1)", type="Physical"}, -- TODO: KBM Notes say these are 1 byte later
-	{byte=0x79, bit=5, name="JRL: Ground Drilled (2)", type="Physical"}, -- TODO: KBM Notes say these are 1 byte later
-	{byte=0x79, bit=6, name="JRL: Ground Drilled (3)", type="Physical"}, -- TODO: KBM Notes say these are 1 byte later
-	{byte=0x79, bit=7, name="JRL: Ground Drilled (4)", type="Physical"}, -- TODO: KBM Notes say these are 1 byte later
-	{byte=0x7A, bit=0, name="JRL: Ground Drilled (5)", type="Physical"}, -- TODO: KBM Notes say these are 1 byte later
+	{byte=0x79, bit=4, name="JRL: Ground Drilled (1)", type="Physical"},
+	{byte=0x79, bit=5, name="JRL: Ground Drilled (2)", type="Physical"},
+	{byte=0x79, bit=6, name="JRL: Ground Drilled (3)", type="Physical"},
+	{byte=0x79, bit=7, name="JRL: Ground Drilled (4)", type="Physical"},
+	{byte=0x7A, bit=0, name="JRL: Ground Drilled (5)", type="Physical"},
 	-- 0x7A > 1
 	-- 0x7A > 2
 	-- 0x7A > 3
@@ -3413,7 +3434,7 @@ local flag_array = {
 	-- 0x7B > 1
 	-- 0x7B > 2
 	-- 0x7B > 3
-	-- 0x7B > 4 - IOH - Train Switch?
+	-- 0x7B > 4 - IoH - Train Switch?
 	-- 0x7B > 5
 	-- 0x7B > 6
 	-- 0x7B > 7
@@ -3457,21 +3478,21 @@ local flag_array = {
 	{byte=0x80, bit=2, name="Canary Mary Intro Cutscene", type="FTT"}, -- Canary Cave
 	-- 0x80 > 3
 	{byte=0x80, bit=4, name="GI: Skivvy FTT", type="FTT"},
-	-- 0x80 > 5 - GI: Skivvy Worker (Outside)
-	-- 0x80 > 6 - GI: Skivvy Worker (Floor 5)
-	-- 0x80 > 7 - GI: Skivvy Worker (Floor 2 Path)
-	-- 0x81 > 0 - GI: Skivvy Worker (Boiler)
-	-- 0x81 > 1 - GI: Skivvy Worker (Quarters)
-	-- 0x81 > 2 - GI: Skivvy Worker (Near Crusher)
+	{byte=0x80, bit=5, name="GI: Skivvy Washed (Outside)", type="Progress"},
+	{byte=0x80, bit=6, name="GI: Skivvy Washed (Floor 5)", type="Progress"},
+	{byte=0x80, bit=7, name="GI: Skivvy Washed (Floor 2 Path)", type="Progress"},
+	{byte=0x81, bit=0, name="GI: Skivvy Washed (Boiler)", type="Progress"},
+	{byte=0x81, bit=1, name="GI: Skivvy Washed (Quarters)", type="Progress"},
+	{byte=0x81, bit=2, name="GI: Skivvy Washed (Near Crusher)", type="Progress"},
 	-- 0x81 > 3
 	{byte=0x81, bit=4, name="MT: Ssslumber FTT", type="FTT"},
 	-- 0x81 > 5 - MT: Ssslumber goes back to Sleep?
 	{byte=0x81, bit=6, name="CK: Drawbridge Open", type="Physical"},
-	-- 0x81 > 7 - HFP: Boggy FTT
+	{byte=0x81, bit=7, name="HFP: Boggy FTT", type="FTT"},
 	-- 0x82 > 0 - HFP: Picked up Boggy's Fish
 	-- 0x82 > 1 - HFP: Boggy Threw Up Jiggy
 	-- 0x82 > 2 - GI: Toxic Waste Jiggy Box Smashed
-	-- 0x82 > 3 - IOH: Gate from Plateau to Cliff Top
+	-- 0x82 > 3 - IoH: Gate from Plateau to Cliff Top
 	{byte=0x82, bit=4, name="Jinjo Family FT Cutscene?"},
 	{byte=0x82, bit=5, name="FT Complete Jinjo Family??"},
 	{byte=0x82, bit=6, name="Chilly Willy Intro Text", type="FTT"},
@@ -3689,7 +3710,7 @@ local flag_array = {
 	{byte=0x9D, bit=2, name="WW: Big Top Ticket Spawned (3)", type="Physical"},
 	{byte=0x9D, bit=3, name="WW: Big Top Ticket Spawned (4)", type="Physical"},
 	{byte=0x9D, bit=4, name="MT: Dilberta Boulder Drilled", type="Physical"},
-	-- 0x9D > 5: MT: Columns Vault Boulder?
+	{byte=0x9D, bit=5, name="MT: Columns Vault Boulder Drilled", type="Physical"},
 	{byte=0x9D, bit=6, name="MT: Fly Pad Boulder Drilled", type="Physical"},
 	{byte=0x9D, bit=7, name="GGM: Ordnance Storage Boulder Drilled", type="Physical"},
 	{byte=0x9E, bit=0, name="GGM: Boulder Drilled Near Prospector's Hut"},
@@ -3698,7 +3719,7 @@ local flag_array = {
 	{byte=0x9E, bit=3, name="GGM: Gloomy Caverns Boulder Drilled (2)", type="Physical"},
 	{byte=0x9E, bit=4, name="GGM: Toxic Gas Cave Boulder Drilled (Health)", type="Physical"},
 	{byte=0x9E, bit=5, name="GGM: Toxic Gas Cave Boulder Drilled (Eggs)", type="Physical"},
-	-- 0x9E > 6 - Destroyed Roysten's Boulder?
+	{byte=0x9E, bit=6, name="SM: Roysten's Boulder Drilled", type="Physical"},
 	-- 0x9E > 7
 	{byte=0x9F, bit=0, name="GGM: Jinjo Boulder Drilled", type="Physical"},
 	-- 0x9F > 1
@@ -3755,8 +3776,8 @@ local flag_array = {
 	{byte=0xA5, bit=4, name="Jukebox: Hailfire Peaks", type="Jukebox"},
 	{byte=0xA5, bit=5, name="Jukebox: Chilli Willy & Chilly Billi", type="Jukebox"},
 	{byte=0xA5, bit=6, name="Jukebox: Cloud Cuckooland", type="Jukebox"},
-	-- 0xA5 > 7 Jukebox: Mingy Jongo / Cloud Race?
-	-- 0xA6 > 0 Jukebox: Mingy Jongo / Cloud Race?
+	{byte=0xA5, bit=7, name="Jukebox: Mingy Jongo", type="Jukebox"},
+	-- 0xA6 > 0 Jukebox: Cloud Race?
 	{byte=0xA6, bit=1, name="Jukebox: Cauldron Keep", type="Jukebox"},
 	{byte=0xA6, bit=2, name="Jukebox: Tower of Tragedy Quiz", type="Jukebox"},
 	{byte=0xA6, bit=3, name="Jukebox: Roll the Credits", type="Jukebox"},
@@ -3794,8 +3815,8 @@ local flag_array = {
 	-- 0xAA > 3
 	{byte=0xAA, bit=4, name="Mumbo's Magic: Summon: Golden Goliath", type="Mumbo's Magic"},
 	{byte=0xAA, bit=5, name="Mumbo's Magic: Enlarge: Wumba's Wigwam", type="Mumbo's Magic"}, -- FT only, this doesn't actually enlarge the Wigwam
-	-- 0xAA > 6 - GI: Mumbo messed up Magnet
-	-- 0xAA > 7 - GI: Mumbo messed up Crushers
+	{byte=0xAA, bit=6, name="Mumbo's Magic: EMP: Electromagnet", type="Mumbo's Magic"}, -- FT only?
+	{byte=0xAA, bit=7, name="Mumbo's Magic: EMP: Wall Crushers", type="Mumbo's Magic"},
 	{byte=0xAB, bit=0, name="Mumbo's Magic: Rain Dance", type="Mumbo's Magic"}, -- FT Only
 	{byte=0xAB, bit=1, name="IoH: Heggy Split Up Cover Drilled", type="Physical"},
 	{byte=0xAB, bit=2, name="ToT: Set After Round 1?"},
@@ -3825,14 +3846,14 @@ local flag_array = {
 	-- 0xAE > 2
 	-- 0xAE > 3 - MT: Chief Bloatizan FTT?
 	{byte=0xAE, bit=4, name="MT: Treasure Chamber Open (Top)", type="Physical"}, -- Introduced to Jiggy Puzzle? (KBM)
-	{byte=0xAE, bit=5, name="WW: Moggy Randomizer (1)"},
-	{byte=0xAE, bit=6, name="WW: Moggy Randomizer (2)"},
-	{byte=0xAE, bit=7, name="WW: Soggy Randomizer (1)"},
-	{byte=0xAF, bit=0, name="WW: Soggy Randomizer (2)"},
-	{byte=0xAF, bit=1, name="WW: Groggy Randomizer (1)"},
-	{byte=0xAF, bit=2, name="WW: Groggy Randomizer (2)"},
+	{byte=0xAE, bit=5, name="WW: Moggy Randomizer (1)", type="Randomizer"},
+	{byte=0xAE, bit=6, name="WW: Moggy Randomizer (2)", type="Randomizer"},
+	{byte=0xAE, bit=7, name="WW: Soggy Randomizer (1)", type="Randomizer"},
+	{byte=0xAF, bit=0, name="WW: Soggy Randomizer (2)", type="Randomizer"},
+	{byte=0xAF, bit=1, name="WW: Groggy Randomizer (1)", type="Randomizer"},
+	{byte=0xAF, bit=2, name="WW: Groggy Randomizer (2)", type="Randomizer"},
 	{byte=0xAF, bit=3, name="Cheat Active: Enable Homing Eggs", type="Cheat"},
-	-- 0xAF > 4 - Homing Eggs On?
+	-- 0xAF > 4
 	-- 0xAF > 5
 	-- 0xAF > 6
 	-- 0xAF > 7
@@ -3871,16 +3892,14 @@ end
 function getFlagName(byte, bit)
 	local flag = flags_by_address[byte][bit];
 	if type(flag) == "table" then
-		if not flag.ignore then
-			return flag.name;
-		end
+		return flag.name;
 	end
 	return "Unknown at "..toHexString(byte)..">"..bit;
 end
 
 local function getFlagByName(flagName)
 	for i = 1, #flag_array do
-		if not flag_array[i].ignore and flagName == flag_array[i].name then
+		if flagName == flag_array[i].name then
 			return flag_array[i];
 		end
 	end
@@ -4047,15 +4066,26 @@ function checkFlags()
 						wasSet = bit.check(previousValue, _bit);
 						if isSet and not wasSet then
 							if isKnown(byte, _bit) then
-								changeDetected = true;
-								dprint("Flag "..toHexString(byte, 2)..">".._bit..": \""..getFlagName(byte, _bit).."\" was set on frame "..emu.framecount());
+								local flag = flags_by_address[byte][_bit];
+								if not flag.ignore then
+									changeDetected = true;
+									dprint("Flag "..toHexString(byte, 2)..">".._bit..": \""..getFlagName(byte, _bit).."\" was set on frame "..emu.framecount());
+								end
 							else
 								changeDetected = true;
 								dprint("{byte="..toHexString(byte, 2)..", bit=".._bit..", name=\"Name\"},");
 							end
 						elseif not isSet and wasSet then
-							changeDetected = true;
-							dprint("Flag "..toHexString(byte, 2)..">".._bit..": \""..getFlagName(byte, _bit).."\" was cleared on frame "..emu.framecount());
+							if isKnown(byte, _bit) then
+								local flag = flags_by_address[byte][_bit];
+								if not flag.ignore then
+									changeDetected = true;
+									dprint("Flag "..toHexString(byte, 2)..">".._bit..": \""..getFlagName(byte, _bit).."\" was cleared on frame "..emu.framecount());
+								end
+							else
+								changeDetected = true;
+								dprint("Flag "..toHexString(byte, 2)..">".._bit..": \""..getFlagName(byte, _bit).."\" was cleared on frame "..emu.framecount());
+							end
 						end
 					end
 				end
@@ -5451,8 +5481,8 @@ function Game.applyInfinites()
 end
 
 local move_levels = {
-	All  = {0xFFFFFFFF, 0xFFFFFFFF},
-	None = {0xE0FFFF01, 0x00004000},
+	All  = {0xFFFFFFFF, 0xFFFFFFFF, true},
+	None = {0xE0FFFF01, 0x00004000, false},
 };
 
 local function unlock_moves()
@@ -5461,6 +5491,13 @@ local function unlock_moves()
 	if isRDRAM(flagBlock) then
 		mainmemory.write_u32_be(flagBlock + 0x18, move_levels[level][1]);
 		mainmemory.write_u32_be(flagBlock + 0x1C, move_levels[level][2]);
+		if move_levels[level][3] then
+			setFlagByName("First Time Jamjars Cutscene");
+			setFlagByName("Jamjars First Time Text");
+		else
+			clearFlagByName("First Time Jamjars Cutscene");
+			clearFlagByName("Jamjars First Time Text");
+		end
 	end
 end
 
@@ -5483,12 +5520,12 @@ function Game.initUI()
 	ScriptHawk.UI.checkbox(5, 6, "toggle_autojump", "Autojump");
 
 	-- Moves
-	ScriptHawk.UI.form_controls.moves_dropdown = forms.dropdown(ScriptHawk.UI.options_form, { "All", "None" }, ScriptHawk.UI.col(7) - ScriptHawk.UI.dropdown_offset, ScriptHawk.UI.row(2) + ScriptHawk.UI.dropdown_offset, ScriptHawk.UI.col(2) + 10, ScriptHawk.UI.button_height);
+	ScriptHawk.UI.form_controls.moves_dropdown = forms.dropdown(ScriptHawk.UI.options_form, { "All", "None" }, ScriptHawk.UI.col(7) - ScriptHawk.UI.dropdown_offset + 2, ScriptHawk.UI.row(2) + ScriptHawk.UI.dropdown_offset, ScriptHawk.UI.col(2) + 8, ScriptHawk.UI.button_height);
 	ScriptHawk.UI.form_controls.moves_button = forms.button(ScriptHawk.UI.options_form, "Unlock Moves", unlock_moves, ScriptHawk.UI.col(10), ScriptHawk.UI.row(2), ScriptHawk.UI.col(4) + 10, ScriptHawk.UI.button_height);
 	ScriptHawk.UI.form_controls.dragon_button = forms.button(ScriptHawk.UI.options_form, "Toggle Dragon Kazooie", Game.toggleDragonKazooie, ScriptHawk.UI.col(10), ScriptHawk.UI.row(5), ScriptHawk.UI.col(4) + 10, ScriptHawk.UI.button_height);
 
 	-- Character Dropdown
-	ScriptHawk.UI.form_controls["Character Dropdown"] = forms.dropdown(ScriptHawk.UI.options_form, { "BK", "Snowball", "Cutscene", "Bee", "W. Machine", "Stony", "Breegull B.", "Solo Banjo", "Solo Kazooie", "Submarine", "Mumbo", "G. Goliath", "Detonator", "Van", "Cwk Kazooie", "Small T-Rex", "Big T-Rex" }, ScriptHawk.UI.col(5) - ScriptHawk.UI.dropdown_offset, ScriptHawk.UI.row(5) + ScriptHawk.UI.dropdown_offset, ScriptHawk.UI.col(3) + 10, ScriptHawk.UI.button_height);
+	ScriptHawk.UI.form_controls["Character Dropdown"] = forms.dropdown(ScriptHawk.UI.options_form, { "BK", "Snowball", "Cutscene", "Bee", "W. Machine", "Stony", "Breegull B.", "Solo Banjo", "Solo Kazooie", "Submarine", "Mumbo", "G. Goliath", "Detonator", "Van", "Cwk Kazooie", "Small T-Rex", "Big T-Rex" }, ScriptHawk.UI.col(5) - ScriptHawk.UI.dropdown_offset + 2, ScriptHawk.UI.row(5) + ScriptHawk.UI.dropdown_offset, ScriptHawk.UI.col(3) + 8, ScriptHawk.UI.button_height);
 	ScriptHawk.UI.checkbox(9, 5, "Character Checkbox", "");
 
 	flagStats();
@@ -5550,10 +5587,10 @@ Game.OSD = {
 	{"dXZ"},
 	{"Velocity", Game.getVelocity},
 	{"Y Velocity", Game.getYVelocity},
-	{"Separator"},
-	{"Max dY"},
-	{"Max dXZ"},
-	{"Odometer"},
+	--{"Separator"},
+	--{"Max dY"},
+	--{"Max dXZ"},
+	--{"Odometer"},
 	{"Separator"},
 	{"Rot. X", Game.getXRotation},
 	{"Facing", Game.getYRotation},
@@ -5566,11 +5603,11 @@ Game.OSD = {
 	{"Animation", Game.getAnimationOSD},
 	{"Slope Timer", Game.getSlopeTimer, Game.colorSlopeTimer},
 	{"Grounded", Game.playerIsGrounded},
-	{"Separator"},
-	{"Camera", hexifyOSD(Game.getCameraObject)},
-	{"Camera X", Game.getCameraXPosition},
-	{"Camera Y", Game.getCameraYPosition},
-	{"Camera Z", Game.getCameraZPosition},
+	--{"Separator"},
+	--{"Camera", hexifyOSD(Game.getCameraObject)},
+	--{"Camera X", Game.getCameraXPosition},
+	--{"Camera Y", Game.getCameraYPosition},
+	--{"Camera Z", Game.getCameraZPosition},
 };
 
 return Game;
