@@ -161,6 +161,7 @@ local Game = {
 		map_block_pointer = {0x7F5DE0, 0x7F5D00, 0x7F6250, 0x7A1E90},
 		map_vertex_pointer = {0x7F5DE8, 0x7F5D08, 0x7F6258, 0x7A1E98},
 		map_displaylist_pointer = {0x7F5DEC, 0x7F5D0C, 0x7F625C, 0x7A1E9C},
+		map_collision_pointer = {0x7FB534, nil, nil, nil},
 		water_surface_list = {0x7F93C0, 0x7F92E0, 0x7F9830, 0x7B48A0},
 		chunk_array_pointer = {0x7F6C18, 0x7F6B38, 0x7F7088, 0x7B20F8},
 		num_enemies = {0x7FDC88, 0x7FDBC8, 0x7FE118, 0x7B73D8},
@@ -7916,6 +7917,61 @@ function F3DEX2Trace()
 	end
 end
 
+local globalVertIndex = 0;
+function outputMapTris(base, relativeStart)
+	local tri_size = 0x18;
+	if isRDRAM(base) then
+		local numPoints = (mainmemory.read_u32_be(base - 0x04) - relativeStart) / tri_size;
+		dprint("g mesh"..toHexString(relativeStart));
+		for i = 0, numPoints - 1 do
+			local triBase = base + i * tri_size;
+			local x1 = mainmemory.read_s16_be(triBase + 0x00);
+			local y1 = mainmemory.read_s16_be(triBase + 0x02);
+			local z1 = mainmemory.read_s16_be(triBase + 0x04);
+			local x2 = mainmemory.read_s16_be(triBase + 0x06);
+			local y2 = mainmemory.read_s16_be(triBase + 0x08);
+			local z2 = mainmemory.read_s16_be(triBase + 0x0A);
+			local x3 = mainmemory.read_s16_be(triBase + 0x0C);
+			local y3 = mainmemory.read_s16_be(triBase + 0x0E);
+			local z3 = mainmemory.read_s16_be(triBase + 0x10);
+			dprint("v "..x1.." "..y1.." "..z1);
+			dprint("v "..x2.." "..y2.." "..z2);
+			dprint("v "..x3.." "..y3.." "..z3);
+			dprint("f "..(globalVertIndex + 1).." "..(globalVertIndex + 2).." "..(globalVertIndex + 3));
+			globalVertIndex = globalVertIndex + 3;
+		end
+		print_deferred();
+	end
+end
+
+function dumpMapCollisions()
+	if version ~= 1 then
+		print("Not supported on this version");
+		return;
+	end
+
+	local collisionMetaBlock = dereferencePointer(Game.Memory.map_collision_pointer);
+	if isRDRAM(collisionMetaBlock) then
+		local tris1 = dereferencePointer(collisionMetaBlock + 0x04);
+		local tris2 = dereferencePointer(collisionMetaBlock + 0x1C);
+		local tris3 = dereferencePointer(collisionMetaBlock + 0x34);
+		local tris4 = dereferencePointer(collisionMetaBlock + 0x4C);
+
+		if isRDRAM(tris1) then
+			local blockStart = tris1 - 0x08;
+			local tris1Relative = tris1 - blockStart;
+			local tris2Relative = tris2 - blockStart;
+			local tris3Relative = tris3 - blockStart;
+			local tris4Relative = tris4 - blockStart;
+			globalVertIndex = 0;
+			outputMapTris(tris1, tris1Relative);
+			outputMapTris(tris2, tris2Relative);
+			outputMapTris(tris3, tris3Relative);
+			outputMapTris(tris4, tris4Relative);
+		end
+	end
+end
+
 function Game.eachFrame()
 	local playerObject = Game.getPlayerObject();
 	map_value = Game.getMap();
@@ -8093,6 +8149,7 @@ Game.standardOSD = {
 	{"Level", Game.getLevelIndexOSD},
 	{"Cutscene", Game.getCutsceneOSD},
 	{"Exit", Game.getExitOSD},
+	{"Player", hexifyOSD(Game.getPlayerObject)},
 	{"Separator"},
 	{"Mode", Game.getCurrentMode},
 	{"File", Game.getFileOSD},
@@ -8112,10 +8169,10 @@ Game.standardOSD = {
 	{"Y Velocity", Game.getYVelocity},
 	{"Y Accel", Game.getYAcceleration},
 	{"Separator"},
-	{"Max dY"},
-	{"Max dXZ"},
-	{"Odometer"},
-	{"Separator"},
+	--{"Max dY"},
+	--{"Max dXZ"},
+	--{"Odometer"},
+	--{"Separator"},
 	{"Rot. X", Game.getXRotation},
 	{"Facing", Game.getYRotation, Game.colorYRotation},
 	--{"Moving", Game.getMovingRotation}, -- TODO: Game.getMovingRotation
@@ -8173,10 +8230,10 @@ Game.subgameOSD = {
 	{"Velocity", Game.getVelocity},
 	{"Y Velocity", Game.getYVelocity},
 	{"Separator"},
-	{"Max dX"},
-	{"Max dY"},
-	{"Odometer"},
-	{"Separator"},
+	--{"Max dX"},
+	--{"Max dY"},
+	--{"Odometer"},
+	--{"Separator"},
 };
 
 Game.OSDPosition = {32, 70}; -- TODO: Adjust this for subgames & different regions
