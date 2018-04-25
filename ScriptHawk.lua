@@ -819,6 +819,8 @@ local function toggleRotationUnits()
 		rotation_units = "Radians";
 	elseif rotation_units == "Radians" then
 		rotation_units = "Units";
+	elseif rotation_units == "Units" then
+		rotation_units = "Hex";
 	else
 		rotation_units = "Degrees";
 	end
@@ -833,6 +835,8 @@ function ScriptHawk.UI.formatRotation(num)
 		return round(rotation_to_degrees(num), precision)..string.char(0xB0);
 	elseif rotation_units == "Radians" then
 		return round(rotation_to_radians(num), precision);
+	elseif rotation_units == "Hex" then
+		return toHexString(num);
 	end
 	return num;
 end
@@ -1224,7 +1228,15 @@ function ScriptHawk.UI.updateReadouts()
 			end
 
 			if telemetryFound then
-				gui.text(OSDX, OSDY + Game.OSDRowHeight * row, label..": "..value.." ("..telemetryDataThisFrame[telemetryIndex]..")", color);
+				if labelLower == "x" then
+					gui.text(OSDX, OSDY + Game.OSDRowHeight * row, label..": "..value.." ("..telemetryDataThisFrame[telemetryIndex]..") ("..(x - telemetryDataThisFrame[telemetryIndex]).." d)", color);
+				elseif labelLower == "y" then
+					gui.text(OSDX, OSDY + Game.OSDRowHeight * row, label..": "..value.." ("..telemetryDataThisFrame[telemetryIndex]..") ("..(y - telemetryDataThisFrame[telemetryIndex]).." d)", color);
+				elseif labelLower == "z" then
+					gui.text(OSDX, OSDY + Game.OSDRowHeight * row, label..": "..value.." ("..telemetryDataThisFrame[telemetryIndex]..") ("..(z - telemetryDataThisFrame[telemetryIndex]).." d)", color);
+				else
+					gui.text(OSDX, OSDY + Game.OSDRowHeight * row, label..": "..value.." ("..telemetryDataThisFrame[telemetryIndex]..")", color);
+				end
 				telemetryIndex = telemetryIndex + 1;
 			else
 				if collecting_telemetry then
