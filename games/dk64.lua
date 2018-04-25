@@ -8021,7 +8021,7 @@ function dumpMapCollisions()
 				local numTris = (mainmemory.read_u32_be(tris) - trisRelative) / collisionTriangle.size;
 				if numTris > 0 and numTris < blockSize / collisionTriangle.size then
 					outputMapTris(tris + 4, numTris);
-					killMapTris(tris + 4, numTris);
+					--killMapTris(tris + 4, numTris);
 				else
 					--print("Warning: Block with <= 0 tris at "..toHexString(tris));
 				end
