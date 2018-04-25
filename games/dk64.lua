@@ -161,7 +161,8 @@ local Game = {
 		map_block_pointer = {0x7F5DE0, 0x7F5D00, 0x7F6250, 0x7A1E90},
 		map_vertex_pointer = {0x7F5DE8, 0x7F5D08, 0x7F6258, 0x7A1E98},
 		map_displaylist_pointer = {0x7F5DEC, 0x7F5D0C, 0x7F625C, 0x7A1E9C},
-		map_collision_pointer = {0x7FB534, nil, nil, nil},
+		map_collision_pointer = {0x7FB534, nil, nil, nil}, -- TODO: Other versions
+		map_floor_pointer = {0x7F9514, nil, nil, nil}, -- TODO: Other versions
 		water_surface_list = {0x7F93C0, 0x7F92E0, 0x7F9830, 0x7B48A0},
 		chunk_array_pointer = {0x7F6C18, 0x7F6B38, 0x7F7088, 0x7B20F8},
 		num_enemies = {0x7FDC88, 0x7FDBC8, 0x7FE118, 0x7B73D8},
@@ -7918,25 +7919,62 @@ function F3DEX2Trace()
 end
 
 local globalVertIndex = 0;
-function outputMapTris(base, relativeStart)
-	local tri_size = 0x18;
+
+local collisionTriangle = {
+	size = 0x18,
+	x1 = 0x00, -- s16 be
+	y1 = 0x02, -- s16 be
+	z1 = 0x04, -- s16 be
+	x2 = 0x06, -- s16 be
+	y2 = 0x08, -- s16 be
+	z2 = 0x0A, -- s16 be
+	x3 = 0x0C, -- s16 be
+	y3 = 0x0E, -- s16 be
+	z3 = 0x10, -- s16 be
+	nx = 0x12, -- s16 be
+	ny = 0x14, -- s16 be
+	nz = 0x16, -- s16 be
+};
+
+function readCollisionTriangle(base)
+	if isPointer(base) then
+		base = base - RDRAMBase;
+	end
+	if not isRDRAM(base) then
+		return {
+			x1 = 0, y1 = 0, z1 = 0,
+			x2 = 0, y2 = 0, z2 = 0,
+			x3 = 0, y3 = 0, z3 = 0,
+			nx = 0, ny = 0, nz = 0,
+		};
+	end
+	return {
+		x1 = mainmemory.read_s16_be(base + collisionTriangle.x1),
+		y1 = mainmemory.read_s16_be(base + collisionTriangle.y1),
+		z1 = mainmemory.read_s16_be(base + collisionTriangle.z1),
+		x2 = mainmemory.read_s16_be(base + collisionTriangle.x2),
+		y2 = mainmemory.read_s16_be(base + collisionTriangle.y2),
+		z2 = mainmemory.read_s16_be(base + collisionTriangle.z2),
+		x3 = mainmemory.read_s16_be(base + collisionTriangle.x3),
+		y3 = mainmemory.read_s16_be(base + collisionTriangle.y3),
+		z3 = mainmemory.read_s16_be(base + collisionTriangle.z3),
+		nx = mainmemory.read_s16_be(base + collisionTriangle.nx),
+		ny = mainmemory.read_s16_be(base + collisionTriangle.ny),
+		nz = mainmemory.read_s16_be(base + collisionTriangle.nz),
+	};
+end
+
+function outputMapTris(base, numTris)
+	--print("Dumping "..numTris.." triangles at "..toHexString(base));
 	if isRDRAM(base) then
-		local numPoints = (mainmemory.read_u32_be(base - 0x04) - relativeStart) / tri_size;
-		dprint("g mesh"..toHexString(relativeStart));
-		for i = 0, numPoints - 1 do
-			local triBase = base + i * tri_size;
-			local x1 = mainmemory.read_s16_be(triBase + 0x00);
-			local y1 = mainmemory.read_s16_be(triBase + 0x02);
-			local z1 = mainmemory.read_s16_be(triBase + 0x04);
-			local x2 = mainmemory.read_s16_be(triBase + 0x06);
-			local y2 = mainmemory.read_s16_be(triBase + 0x08);
-			local z2 = mainmemory.read_s16_be(triBase + 0x0A);
-			local x3 = mainmemory.read_s16_be(triBase + 0x0C);
-			local y3 = mainmemory.read_s16_be(triBase + 0x0E);
-			local z3 = mainmemory.read_s16_be(triBase + 0x10);
-			dprint("v "..x1.." "..y1.." "..z1);
-			dprint("v "..x2.." "..y2.." "..z2);
-			dprint("v "..x3.." "..y3.." "..z3);
+		dprint("g mesh"..toHexString(base));
+		for i = 0, numTris - 1 do
+			local triBase = base + i * collisionTriangle.size;
+			local triangle = readCollisionTriangle(triBase);
+			dprint("v "..triangle.x1.." "..triangle.y1.." "..triangle.z1);
+			dprint("v "..triangle.x2.." "..triangle.y2.." "..triangle.z2);
+			dprint("v "..triangle.x3.." "..triangle.y3.." "..triangle.z3);
+			--dprint("vn "..triangle.nx.." "..triangle.ny.." "..triangle.nz);
 			dprint("f "..(globalVertIndex + 1).." "..(globalVertIndex + 2).." "..(globalVertIndex + 3));
 			globalVertIndex = globalVertIndex + 3;
 		end
@@ -7944,32 +7982,61 @@ function outputMapTris(base, relativeStart)
 	end
 end
 
+function killMapTris(base, numTris)
+	if isRDRAM(base) then
+		for i = 0, numTris - 1 do
+			local triBase = base + i * collisionTriangle.size;
+			mainmemory.write_s16_be(triBase + collisionTriangle.x1, 0);
+			mainmemory.write_s16_be(triBase + collisionTriangle.y1, 0);
+			mainmemory.write_s16_be(triBase + collisionTriangle.z1, 0);
+			mainmemory.write_s16_be(triBase + collisionTriangle.x2, 0);
+			mainmemory.write_s16_be(triBase + collisionTriangle.y2, 0);
+			mainmemory.write_s16_be(triBase + collisionTriangle.z2, 0);
+			mainmemory.write_s16_be(triBase + collisionTriangle.x3, 0);
+			mainmemory.write_s16_be(triBase + collisionTriangle.y3, 0);
+			mainmemory.write_s16_be(triBase + collisionTriangle.z3, 0);
+			mainmemory.write_s16_be(triBase + collisionTriangle.nx, 0);
+			mainmemory.write_s16_be(triBase + collisionTriangle.ny, 0);
+			mainmemory.write_s16_be(triBase + collisionTriangle.nz, 0);
+		end
+	end
+end
+
 function dumpMapCollisions()
-	if version ~= 1 then
+	if version ~= 1 then -- TODO: All versions
 		print("Not supported on this version");
 		return;
 	end
 
 	local collisionMetaBlock = dereferencePointer(Game.Memory.map_collision_pointer);
 	if isRDRAM(collisionMetaBlock) then
-		local tris1 = dereferencePointer(collisionMetaBlock + 0x04);
-		local tris2 = dereferencePointer(collisionMetaBlock + 0x1C);
-		local tris3 = dereferencePointer(collisionMetaBlock + 0x34);
-		local tris4 = dereferencePointer(collisionMetaBlock + 0x4C);
-
-		if isRDRAM(tris1) then
-			local blockStart = tris1 - 0x08;
-			local tris1Relative = tris1 - blockStart;
-			local tris2Relative = tris2 - blockStart;
-			local tris3Relative = tris3 - blockStart;
-			local tris4Relative = tris4 - blockStart;
+		local tris = dereferencePointer(collisionMetaBlock + 0x04);
+		if isRDRAM(tris) then
+			local blockStart = tris - 0x08;
+			local blockSize = mainmemory.read_u32_be(blockStart + heap.object_size);
+			tris = tris - 0x04;
 			globalVertIndex = 0;
-			outputMapTris(tris1, tris1Relative);
-			outputMapTris(tris2, tris2Relative);
-			outputMapTris(tris3, tris3Relative);
-			outputMapTris(tris4, tris4Relative);
+			while tris < blockStart + blockSize do
+				local trisRelative = tris + 4 - blockStart;
+				local numTris = (mainmemory.read_u32_be(tris) - trisRelative) / collisionTriangle.size;
+				if numTris > 0 and numTris < blockSize / collisionTriangle.size then
+					outputMapTris(tris + 4, numTris);
+					killMapTris(tris + 4, numTris);
+				else
+					--print("Warning: Block with <= 0 tris at "..toHexString(tris));
+				end
+				tris = mainmemory.read_u32_be(tris);
+				if tris == 0 then
+					break;
+				end
+				tris = blockStart + tris;
+			end
 		end
 	end
+end
+
+function dumpMapFloors()
+	-- TODO
 end
 
 function Game.eachFrame()
