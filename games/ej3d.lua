@@ -8,6 +8,7 @@ end
 local Game = {
 	Memory = { -- 1 USA, 2 EU
 		jim_pointer = {0x0C6810, 0x0C8670},
+		floor_value = {0x0D6EDC, 0x0D8D3C},
 		boss_camlock_pointer = {0x0E9F08, 0x0EBD68},
 		current_map = {0x0E9EF9, 0x0EBD59},
 		destination_map = {0x0E03E7, 0x0E2247},
@@ -136,6 +137,10 @@ function Game.setZPosition(value)
 	mainmemory.writefloat(Game.Memory.jim_pointer + jim.z_position, value, true);
 end
 
+function Game.getFloor()
+	return mainmemory.readfloat(Game.Memory.floor_value, true);
+end
+
 --------------
 -- Rotation --
 --------------
@@ -235,7 +240,7 @@ Game.animations = {
 	[21] = "Damage", -- Knockback
 	[22] = "Death",
 	[23] = "Idle", -- Pulling Head
-	[24] = "Breaking Wind",
+	[24] = "Breaking Wind", -- Pp Can, Also acid sea damage
 	[25] = "Crouching/Rolling",
 	[26] = "Udder Dance",
 	[27] = "Whipping",
@@ -272,8 +277,10 @@ Game.movements = {
 	[19] = "Whipping", -- Airbourne
 	[20] = "Floating",
 	[21] = "Knockback", -- Damage
+	[22] = "Damaged", -- Damage plane (Acid sea/bean sea etc.)
 	[23] = "Acid Burn", -- Acid Bats
 	[24] = "First Person",
+	[25] = "Blue Balloon",
 };
 
 Game.takeMeThereType = "Checkbox";
@@ -339,6 +346,105 @@ function Game.getAnimationTimerOSD()
 	local anim_timer = mainmemory.read_u16_be(Game.Memory.jim_pointer + jim.animation_timer);
 	return anim_timer;
 end
+
+function Game.FreezeOoBTimer()
+	mainmemory.writebyte(Game.Memory.jim_pointer + jim.oob_timer, 0);
+end
+
+--------------------
+-- FREE ROAM MODE --
+--------------------
+
+function Game.freeroamEnabled()
+	if IsYStored ~= 1 then
+		YStored = Game.getYPosition();
+		IsYStored = 1;
+	end
+	
+	-- detect if L to Levitate
+	joypad_pressed = {};
+	input_pressed = {};
+	joypad_pressed = joypad.getimmediate();
+	input_pressed = input.get();
+	lbutton_pressed = joypad_pressed[ScriptHawk.lbutton.joypad] or input_pressed[ScriptHawk.lbutton.key];
+	if lbutton_pressed then
+		YStored = Game.getYPosition() + Game.speedy_speeds[Game.speedy_index];
+	end
+	
+	Game.setYPosition(YStored);
+	
+	-- Cancel falling
+	if mainmemory.readbyte(Game.Memory.jim_pointer + jim.movement) == 2 then
+		mainmemory.writebyte(Game.Memory.jim_pointer + jim.movement, 21);
+	end
+end
+
+function Game.freeroamDisabled()
+	IsYStored = 0;
+end
+
+------------------
+-- CONSOLE MODE --
+------------------
+
+function Game.toggleConsoleMode()
+	if console_mode == 1 then
+		console_mode = 0;
+	else
+		console_mode = 1;
+	end
+end
+
+function Game.getConsoleMode()
+	if console_mode == 1 then
+		forms.settext(ScriptHawk.UI.form_controls["Console Mode Switch"], "N64 Mode");
+	else
+		forms.settext(ScriptHawk.UI.form_controls["Console Mode Switch"], "PC Mode");
+	end
+end
+
+function Game.applyN64Settings()
+	if console_mode == 1 then
+		-- List of edits to make more accurate to N64 release
+		
+		-- NO TWIRL HEIGHT GAIN
+		animation_value = mainmemory.readbyte(Game.Memory.jim_pointer + jim.animation);
+		animation_frame = mainmemory.read_u16_be(Game.Memory.jim_pointer + jim.animation_timer);
+		movement_value = mainmemory.readbyte(Game.Memory.jim_pointer + jim.movement);
+		
+		if animation_value == 29 and movement_value == 20 then
+			if animation_frame == 0 then
+				if version == 1 then -- US
+					twirlStoredY = Game.getYPosition() - 0.0498;
+				else -- version = 2 (EU)
+					twirlStoredY = Game.getYPosition() - 0.042;
+				end
+				Game.setYPosition(twirlStoredY);
+			else
+				Game.setYPosition(twirlStoredY);
+			end
+		end
+		
+		-- NO HYPEREXTENDED ROLL (NOT EVEN ON PC, JUST AN EMU BUG)
+		if animation_value == 25 and movement_value == 16 then
+			if roll_count == nil then
+				roll_count = 0;
+			end
+			
+			if animation_frame == 21 then
+				roll_count = roll_count + 1;
+				if roll_count == 8 then
+					mainmemory.write_u16_be(Game.Memory.jim_pointer + jim.animation_timer, 23);
+					roll_count = 0;
+				end
+			end
+		end
+	end
+end
+
+---------------
+-- INFINITES --
+---------------
 
 function Game.applyInfinites()
 	max_ammo_red_gun = 250;
@@ -528,12 +634,30 @@ function Game.initUI()
 	ScriptHawk.UI.form_controls["Reload Map (Soft)"] = forms.button(ScriptHawk.UI.options_form, "Reload Map", Game.reloadMap, ScriptHawk.UI.col(5), ScriptHawk.UI.row(4), ScriptHawk.UI.col(4) + 10, ScriptHawk.UI.button_height);
 	ScriptHawk.UI.form_controls["Reload Map (Hard)"] = forms.button(ScriptHawk.UI.options_form, "Hard Reload", Game.reloadMapHard, ScriptHawk.UI.col(10), ScriptHawk.UI.row(0), ScriptHawk.UI.col(4) + 10, ScriptHawk.UI.button_height);
 	ScriptHawk.UI.form_controls["Kill Boss"] = forms.button(ScriptHawk.UI.options_form, "Kill Boss", Game.killBoss, ScriptHawk.UI.col(10), ScriptHawk.UI.row(1), ScriptHawk.UI.col(4) + 10, ScriptHawk.UI.button_height);
+	ScriptHawk.UI.form_controls["OoB Timer Checkbox"] = forms.checkbox(ScriptHawk.UI.options_form, "OoB Timer Off", ScriptHawk.UI.col(0) + ScriptHawk.UI.dropdown_offset, ScriptHawk.UI.row(6) + ScriptHawk.UI.dropdown_offset);
+	ScriptHawk.UI.form_controls["Free Roam Mode"] = forms.checkbox(ScriptHawk.UI.options_form, "Free Roam Mode", ScriptHawk.UI.col(0) + ScriptHawk.UI.dropdown_offset, ScriptHawk.UI.row(7) + ScriptHawk.UI.dropdown_offset);
+	ScriptHawk.UI.form_controls["Console Mode Switch"] = forms.button(ScriptHawk.UI.options_form, "PC Mode", Game.toggleConsoleMode, ScriptHawk.UI.col(10), ScriptHawk.UI.row(4), ScriptHawk.UI.col(4) + 10, ScriptHawk.UI.button_height);
 end
 
 function Game.realTime()
 --	if forms.ischecked(ScriptHawk.UI.form_controls["Fix Input Bug"]) then
 --		Game.fixInputBug();
 --	end
+	Game.getConsoleMode()
+end
+
+function Game.eachFrame()
+	if forms.ischecked(ScriptHawk.UI.form_controls["OoB Timer Checkbox"]) then
+		Game.FreezeOoBTimer()
+	end
+	
+	if forms.ischecked(ScriptHawk.UI.form_controls["Free Roam Mode"]) then
+		Game.freeroamEnabled()
+	else
+		Game.freeroamDisabled()
+	end
+	
+	Game.applyN64Settings()
 end
 
 Game.OSDPosition = {2, 70};
@@ -553,6 +677,7 @@ Game.OSD = {
 	{"Odometer"},
 	{"Separator"},
 	--{"Rot. X", Game.getXRotation},
+	{"Floor", Game.getFloor},
 	{"Animation", Game.getAnimationOSD},
 	{"Animation Timer", Game.getAnimationTimerOSD},
 	{"Movement", Game.getMovementOSD},
