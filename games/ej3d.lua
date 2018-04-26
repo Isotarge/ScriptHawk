@@ -62,6 +62,7 @@ jim = {
 	cutscene_lock = 0x2A3, -- Byte
 	--speed = 0x2C8, -- Float (Not too sure on this)
 	y_last_action = 0x338, -- Float
+	crouch_available = 0x454, -- Byte
 	oob_timer = 0x455, -- Byte
 	boss_pointer = 0x48C, -- Byte
 	first_person_angle_delta = 0x4D8, -- Float, Radians?
@@ -413,18 +414,21 @@ function Game.applyN64Settings()
 		movement_value = mainmemory.readbyte(Game.Memory.jim_pointer + jim.movement);
 		
 		if animation_value == 29 and movement_value == 20 then
-			if animation_frame == 0 then
+			if twirlStoredY == nil then
 				if version == 1 then -- US
 					twirlStoredY = Game.getYPosition() - 0.0498;
 				else -- version = 2 (EU)
 					twirlStoredY = Game.getYPosition() - 0.042;
 				end
-				Game.setYPosition(twirlStoredY);
-			else
-				Game.setYPosition(twirlStoredY);
+			end
+			
+			Game.setYPosition(twirlStoredY);
+			
+			if animation_frame == 9 then
+				twirlStoredY = nil;
 			end
 		end
-		
+
 		-- NO HYPEREXTENDED ROLL (NOT EVEN ON PC, JUST AN EMU BUG)
 		if animation_value == 25 and movement_value == 16 then
 			if roll_count == nil then
@@ -438,6 +442,11 @@ function Game.applyN64Settings()
 					roll_count = 0;
 				end
 			end
+		end
+
+		-- WALLJUMP
+		if animation_value == 6 and movement_value == 12 then
+			mainmemory.writebyte(Game.Memory.jim_pointer + jim.crouch_available, 1);
 		end
 	end
 end
