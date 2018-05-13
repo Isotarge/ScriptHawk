@@ -389,26 +389,38 @@ end
 ------------------
 
 function Game.toggleConsoleMode()
-	if console_mode == 1 then
-		console_mode = 0;
-	else
+	if console_mode == 0 or console_mode == nil then
 		console_mode = 1;
+	elseif console_mode == 1 then
+		console_mode = 2;
+	else
+		console_mode = 0;
 	end
 end
 
 function Game.getConsoleMode()
 	if console_mode == 1 then
 		forms.settext(ScriptHawk.UI.form_controls["Console Mode Switch"], "N64 Mode");
-	else
+		twirl_yFreeze = 1;
+		roll_cap = 1;
+		walljump_hack = 1;
+	elseif console_mode == 2 then
 		forms.settext(ScriptHawk.UI.form_controls["Console Mode Switch"], "PC Mode");
+		twirl_yFreeze = 0;
+		roll_cap = 1;
+		walljump_hack = 0;
+	else
+		forms.settext(ScriptHawk.UI.form_controls["Console Mode Switch"], "Emulator Mode");
+		twirl_yFreeze = 0;
+		roll_cap = 0;
+		walljump_hack = 0;
 	end
 end
 
-function Game.applyN64Settings()
-	if console_mode == 1 then
-		-- List of edits to make more accurate to N64 release
+function Game.applyConsoleSettings()
+	-- List of edits to make more accurate to N64 or PC release
 		
-		-- NO TWIRL HEIGHT GAIN
+	if twirl_yFreeze == 1 then	-- NO TWIRL HEIGHT GAIN
 		animation_value = mainmemory.readbyte(Game.Memory.jim_pointer + jim.animation);
 		animation_frame = mainmemory.read_u16_be(Game.Memory.jim_pointer + jim.animation_timer);
 		movement_value = mainmemory.readbyte(Game.Memory.jim_pointer + jim.movement);
@@ -427,9 +439,12 @@ function Game.applyN64Settings()
 			if animation_frame == 9 then
 				twirlStoredY = nil;
 			end
+		else
+			twirlStoredY = nil;
 		end
-
-		-- NO HYPEREXTENDED ROLL (NOT EVEN ON PC, JUST AN EMU BUG)
+	end
+	
+	if roll_cap == 1 then	-- NO HYPEREXTENDED ROLL (NOT EVEN ON PC, JUST AN EMU BUG)
 		if animation_value == 25 and movement_value == 16 then
 			if roll_count == nil then
 				roll_count = 0;
@@ -443,8 +458,9 @@ function Game.applyN64Settings()
 				end
 			end
 		end
+	end
 
-		-- WALLJUMP
+	if walljump_hack == 1 then	-- WALLJUMP
 		if animation_value == 6 and movement_value == 12 then
 			mainmemory.writebyte(Game.Memory.jim_pointer + jim.crouch_available, 1);
 		end
@@ -620,7 +636,7 @@ Game.flagBlock = {
 	poultone_udder_furniture = {0x310020, nil},
 	poultone_udder_hoover = {0x310028, nil},
 --  POULTRYGEIST TOO
-
+	poulttwo_udder_fireplace = {0x321278, nil},
 --  DEATH WORMED UP
 	dwu_udder_graves = {0x0C625B, nil},
 	dwu_udder_swamp = {0x0C625D, nil},
@@ -645,7 +661,7 @@ function Game.initUI()
 	ScriptHawk.UI.form_controls["Kill Boss"] = forms.button(ScriptHawk.UI.options_form, "Kill Boss", Game.killBoss, ScriptHawk.UI.col(10), ScriptHawk.UI.row(1), ScriptHawk.UI.col(4) + 10, ScriptHawk.UI.button_height);
 	ScriptHawk.UI.form_controls["OoB Timer Checkbox"] = forms.checkbox(ScriptHawk.UI.options_form, "OoB Timer Off", ScriptHawk.UI.col(0) + ScriptHawk.UI.dropdown_offset, ScriptHawk.UI.row(6) + ScriptHawk.UI.dropdown_offset);
 	ScriptHawk.UI.form_controls["Free Roam Mode"] = forms.checkbox(ScriptHawk.UI.options_form, "Free Roam Mode", ScriptHawk.UI.col(0) + ScriptHawk.UI.dropdown_offset, ScriptHawk.UI.row(7) + ScriptHawk.UI.dropdown_offset);
-	ScriptHawk.UI.form_controls["Console Mode Switch"] = forms.button(ScriptHawk.UI.options_form, "PC Mode", Game.toggleConsoleMode, ScriptHawk.UI.col(10), ScriptHawk.UI.row(4), ScriptHawk.UI.col(4) + 10, ScriptHawk.UI.button_height);
+	ScriptHawk.UI.form_controls["Console Mode Switch"] = forms.button(ScriptHawk.UI.options_form, "Emulator Mode", Game.toggleConsoleMode, ScriptHawk.UI.col(10), ScriptHawk.UI.row(4), ScriptHawk.UI.col(4) + 10, ScriptHawk.UI.button_height);
 end
 
 function Game.realTime()
@@ -666,7 +682,7 @@ function Game.eachFrame()
 		Game.freeroamDisabled()
 	end
 	
-	Game.applyN64Settings()
+	Game.applyConsoleSettings()
 end
 
 Game.OSDPosition = {2, 70};
