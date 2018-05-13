@@ -1561,6 +1561,7 @@ local animationList = {
 	[0xD1] = "Sneezing", -- Salty Joe
 	[0xD2] = "Recovering",
 	[0xD3] = "Damage", -- Beak Bomb Recoil
+	[0xD4] = "Idle", -- CCL Cwk Kazooie Buttons
 	[0xD6] = "Idle", -- Turbo Trainers Object
 	[0xD7] = "Death", -- Solo Banjo
 	[0xD8] = "Death", -- Lava
@@ -1599,6 +1600,7 @@ local animationList = {
 	[0x10C] = "Crouching", -- Idle
 	[0x10D] = "Recoiling", -- Flying
 
+	[0x111] = "Idle", -- Humba Wumba
 	[0x115] = "Idle", -- Pawno
 	[0x116] = "Crouching", -- Looking Around
 	[0x11B] = "Throwing",
@@ -1662,6 +1664,7 @@ local animationList = {
 	[0x161] = "Flying", -- Terry
 	[0x162] = "Taking Flight", -- Terry
 	[0x163] = "Idle", -- Terry
+	[0x165] = "Damage", -- Zubba
 	[0x169] = "Appearing", -- Chompasaurus
 	[0x16A] = "Stomping", -- Stomponadon
 	[0x16C] = "Celebrating", -- Chris P Bacon
@@ -1744,6 +1747,7 @@ local animationList = {
 	[0x20A] = "Deflating", -- Mr Patch
 
 	[0x212] = "Roaming", -- Glowbo
+	[0x214] = "Idle", -- Springy Step Shoes
 	[0x218] = "Alerted", -- Billy Bob, Aggressive
 	[0x219] = "Hiding", -- Billy Bob, Transition to Inactive
 	[0x21A] = "Moving", -- Billy Bob
@@ -1917,6 +1921,7 @@ local animationList = {
 	[0x35E] = "Celebrating", -- Skivvy
 	[0x35F] = "Taking Flight", -- Chilli Brothers
 
+	[0x369] = "Idle", -- Guffo
 	[0x36B] = "Celebrating", -- Guffo
 	[0x36C] = "Disappearing", -- Mingy Jongo
 	[0x36D] = "Reappearing", -- Mingy Jongo
@@ -1934,15 +1939,36 @@ local animationList = {
 	[0x378] = "Malfunctioning", -- Mingy Jongo
 	[0x379] = "Death", -- Mingy Jongo
 	[0x37A] = "Idle", -- Weldar Head
+	[0x37B] = "Dormant", -- Flatso
+	[0x37C] = "Charging", -- Flatso
+	[0x37D] = "Attacking", -- Flatso
+	[0x378] = "Disappearing", -- Flatso
 
 	[0x389] = "Idle", -- Biggafoot
 
+	[0x391] = "Idle", -- Cannon Flower
+	[0x392] = "Launching", -- Cannon Flower
+	[0x393] = "Dormant", -- Eyeballus Jiggium Plant
+	[0x396] = "Alerted", -- Eyeballus Jiggium Plant
+	[0x397] = "Idle", -- Eyeballus Jiggium Plant, Aggressive
+	[0x398] = "Attacking", -- Eyeballus Jiggium Plant
+	[0x399] = "Death", -- Eyeballus Jiggium Plant
 	[0x39B] = "Looking around", -- Klungo (Intro)
 	[0x39C] = "Idle", -- Klungo (Intro)
+	[0x39D] = "Dormant", -- Pansie
+	[0x39E] = "Alerted", -- Pansie
+	[0x39F] = "Charging", -- Pansie
 
+	[0x3A0] = "Calming", -- Pansie, Switching to Dormant
+	[0x3A1] = "Damaged", -- Pansie
 	[0x3A6] = "Lumbering", -- Jingaling (Zombie)
 	[0x3AB] = "Crumbling", -- Pile of Rocks (Intro)
 	[0x3AD] = "Idle", -- Scrotty
+
+	[0x3CB] = "Flying", -- Zubba
+	[0x3CC] = "Charging", -- Zubba
+	[0x3CD] = "Dying", -- Zubba
+	[0x3CE] = "Death", -- Zubba
 
 	[0x3D0] = "Hovering", -- Banjo's Hand
 	[0x3D3] = "Holding", -- Banjo's Hand
@@ -1966,6 +1992,7 @@ local animationList = {
 	[0x3FD] = "Celebrating", -- Mr. Fit
 
 	[0x408] = "Spinning", -- Hag 1 Drill (Intro)
+	[0x40A] = "Idle", -- Cheese Wedge Onions
 	[0x40F] = "Appearing", -- Hag 1 (Intro)
 
 	[0x410] = "Crumbling", -- Pile of Rocks (Intro)
@@ -5051,21 +5078,34 @@ object_model1 = {
 		contents = 0x1E -- 2 Byte
 	},
 	nest_contents_list = {
-			[0] = "Normal Eggs",
-			[1] = "Fire Eggs",
-			[2] = "Grenade Eggs",
-			[3] = "Ice Eggs",
-			[4] = "Clockwork Kazooie Eggs",
-			-- 5 unknown
-			[6] = "Red Feathers",
-			[7] = "Gold Feathers",
-			[10] = "Golden Eggs",
-			[11] = "Proximity Eggs",
-			[12] = "5-Note",
-			[13] = "Treble Clef",
-			-- 14 unknown. Game crash
-			-- 15 unknown. Maybe extra life
-			-- 16+ likely doesn't exist
+		[0] = "Normal Eggs",
+		[1] = "Fire Eggs",
+		[2] = "Grenade Eggs",
+		[3] = "Ice Eggs",
+		[4] = "Clockwork Kazooie Eggs",
+		-- 5 unknown
+		[6] = "Red Feathers",
+		[7] = "Gold Feathers",
+		[10] = "Golden Eggs",
+		[11] = "Proximity Eggs",
+		[12] = "5-Note",
+		[13] = "Treble Clef",
+		-- 14 unknown. Game crash
+		-- 15 unknown. Maybe extra life
+		-- 16+ likely doesn't exist
+	},
+	banjo_hand = {
+		item_selected = 0x79 -- 1 Byte
+	},
+	hand_item_selected = {
+		[0] = "File 1",
+		[1] = "File 2",
+		[2] = "File 3",
+		[3] = "Copy File",
+		[4] = "Delete File",
+		[5] = "Multiplayer",
+		[6] = "Screen Settings",
+		[7] = "Bonus Features",
 	},
 };
 
@@ -5075,6 +5115,15 @@ function getNestContentsOSD(value)
 		eggType = object_model1.nest_contents_list[value];
 	end
 	return eggType;
+end
+
+function getHandItemSelected(value)
+	local correctedValue = math.floor(value/16);
+	local itemSelected = "Unknown ("..correctedValue..")";
+	if object_model1.hand_item_selected[correctedValue] ~= nil then
+		itemSelected = object_model1.hand_item_selected[correctedValue];
+	end
+	return itemSelected;
 end
 
 function getJinjoIdentifierOSD(pointer)
@@ -5233,6 +5282,10 @@ local function getExamineData(pointer)
 
 	if currentObjectName == "Jinjo" then
 		table.insert(examine_data, { "Jinjo Identifier", getJinjoIdentifierOSD(pointer) });
+	end
+	
+	if currentObjectName == "Banjo's Hand" then
+		table.insert(examine_data, { "Option Selected", getHandItemSelected(mainmemory.readbyte(pointer + object_model1.banjo_hand.item_selected)) });
 	end
 
 	return examine_data;
