@@ -396,6 +396,48 @@ function parseRAMWatch(file)
 	return watches;
 end
 
+function BHDataTypeToPJ64DataType(data_type, display_type)
+	if data_type == "b" then
+		if display_type == "s" then
+			return "s8";
+		else
+			return "u8";
+		end
+	end
+	if data_type == "w" then
+		if display_type == "s" then
+			return "s16";
+		else
+			return "u16";
+		end
+	end
+	if data_type == "d" then
+		if display_type == "s" then
+			return "s32";
+		elseif display_type == "f" then
+			return "float";
+		else
+			return "u32";
+		end
+	end
+	print("Warning: Unknown dataType in BHDataTypeToPJ64DataType("..data_type..", "..display_type..")");
+	return "u32";
+end
+
+function RAMWatchToPJ64Symbols(watch)
+	console.clear();
+	for k, v in pairs(watch) do
+		if v.domain == "RDRAM" then
+			local sym = "80"..toHexString(v.address, 6, "")..","..BHDataTypeToPJ64DataType(v.data_type, v.display_type)..","..v.name;
+			dprint(sym);
+		elseif v.domain == "System Bus" then
+			local sym = toHexString(v.address, 8, "")..","..BHDataTypeToPJ64DataType(v.data_type, v.display_type)..","..v.name;
+			dprint(sym);
+		end
+	end
+	print_deferred();
+end
+
 --       a  r  g  b
 -- 0.0 = 7F 00 FF 00 = Green
 -- 0.5 = 7F FF FF 00 = Yellow
