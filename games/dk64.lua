@@ -2789,6 +2789,28 @@ function getSpawnSnagCheck(pointer)
 	return 0;
 end
 
+function getGrabKong(pointer)
+	if isRDRAM(pointer) then
+		grabKongByte = mainmemory.readbyte(pointer + 0x8C) % 32;
+		if grabKongByte == 16 then
+			return "Lanky";
+		elseif grabKongByte == 8 then
+			return "DK";
+		elseif grabKongByte == 4 then
+			return "Tiny";
+		elseif grabKongByte == 2 then
+			return "Diddy";
+		elseif grabKongByte == 1 then
+			return "Chunky";
+		elseif grabKongByte == 0 then
+			return "Any Kong";
+		else
+			return "No Kong";
+		end
+	end
+	return 0;
+end
+
 function forceSnagState(pointer, value)
 	local behaviorPointer = dereferencePointer(pointer + obj_model2.behavior_pointer);
 	if isRDRAM(behaviorPointer) then
@@ -2871,9 +2893,19 @@ local function getExamineDataModelTwo(pointer)
 		table.insert(examine_data, { "Separator", 1 });
 	end
 
-	if behaviorType == "Golden Banana" or "Banana Medal" then
+	if getSpawnSnagState(pointer) ~= 0 then
 		table.insert(examine_data, { "Snag State", getSpawnSnagState(pointer)});
+	end
+	
+	if getSpawnSnagCheck(pointer) ~= 0 then
 		table.insert(examine_data, { "Snag Check", getSpawnSnagCheck(pointer)});
+	end
+	
+	if getGrabKong(pointer) ~= 0 and mainmemory.read_u16_be(pointer + obj_model2.object_type) == 116 then
+		table.insert(examine_data, { "Kong Required", getGrabKong(pointer)});
+	end
+	
+	if getSpawnSnagState(pointer) ~= 0 or getSpawnSnagCheck(pointer) ~= 0 or mainmemory.read_u16_be(pointer + obj_model2.object_type) == 116 then
 		table.insert(examine_data, { "Separator", 1 });
 	end
 
