@@ -2226,7 +2226,7 @@ function Game.drawUI()
 	gui.text(Game.OSDPosition[1], 2 + Game.OSDRowHeight * row, "Index: "..(object_index).."/"..(numSlots), nil, 'bottomright');
 	row = row + 1;
 
-	drawObjectPositions();
+	--drawObjectPositions();
 
 	if script_mode == "Examine" and isRDRAM(objectArray) then
 		local examine_data = getExamineData(objectArray + getSlotBase(object_index - 1));
@@ -3361,6 +3361,14 @@ function Game.getJiggyGrabbedPointer()
 	end
 end
 
+function Game.getJiggyGrabbedIndex()
+	local pointer = dereferencePointer(Game.Memory.jiggy_grabbed_behavior_struct_pointer);
+	if isRDRAM(pointer) then
+		local index = math.floor(bit.rshift(mainmemory.read_u16_be(pointer + 0x2C), 4) / 2) + 1;
+		return index;
+	end
+end
+
 Game.OSDPosition = {2, 70};
 Game.OSD = {
 	{"X"},
@@ -3393,6 +3401,7 @@ Game.OSD = {
 	{"FF Pattern", Game.getFFPattern},
 	{"Separator"},
 	{"Jiggy Grabbed", Game.getJiggyGrabbedPointer},
+	{"Index Grabbed", Game.getJiggyGrabbedIndex},
 };
 
 return Game;
