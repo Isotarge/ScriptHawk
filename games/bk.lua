@@ -50,6 +50,7 @@ local Game = {
 		return_to_lair_enabled = {0x383A60, 0x383BC0, 0x3822A0, 0x383080},
 		game_progress_bitfield = {0x383B88, 0x383D18, 0x3823F8, 0x3831A8},
 		jiggy_bitfield = {0x383CA0, 0x383E00, 0x3824E0, 0x3832C0},
+		jiggy_grabbed_behavior_struct_pointer = {nil, nil, nil, 0x37D4B4}, -- TODO: All versions
 		honeycomb_bitfield = {0x383CC0, 0x383E20, 0x382500, 0x3832E0},
 		mumbo_token_bitfield = {0x383CD0, 0x383E30, 0x382510, 0x3832F0},
 	},
@@ -429,8 +430,8 @@ movement_struct = {
 	[0x00] = {Type="Pointer", Name="Animation Object Pointer", Fields={
 			[0x10] = {Type="u32_be", Name="Animation Type"},
 			[0x14] = {Type="Float", Name="Animation Timer Copy"},
-			},
 		},
+	},
 	[0x04] = {Type="Float", Name="Animation Timer"},
 
 	[0x0C] = {Type="Float", Name="Movement Duration"},
@@ -444,7 +445,7 @@ movement_struct = {
 -- OBJECT1 STRUCTURE
 slot_variables = {
 	[0x00] = {Type="Pointer", Name="Behavior Struct Pointer", Fields={
-		behavior_struct
+			behavior_struct
 		},
 	},
 	[0x04] = {Type="Float", Name={"X", "X Pos", "X Position"}},
@@ -2228,7 +2229,7 @@ function Game.drawUI()
 	drawObjectPositions();
 
 	if script_mode == "Examine" and isRDRAM(objectArray) then
-		local examine_data = getExamineData(objectArray + getSlotBase(object_index));
+		local examine_data = getExamineData(objectArray + getSlotBase(object_index - 1));
 		for i = #examine_data, 1, -1 do
 			if examine_data[i][1] ~= "Separator" then
 				gui.text(Game.OSDPosition[1], 2 + Game.OSDRowHeight * row, examine_data[i][2].." - "..examine_data[i][1], nil, 'bottomright');
@@ -2254,6 +2255,7 @@ function Game.drawUI()
 	if script_mode == "List" and isRDRAM(objectArray) then
 		for i = math.min(numSlots, object_top_index + object_max_slots), object_top_index, -1 do
 			local currentSlotBase = objectArray + getSlotBase(i - 1);
+			local currentBehaviorStructPointer = dereferencePointer(currentSlotBase);
 
 			local animationType = "Unknown";
 			local objectIDPointer = dereferencePointer(currentSlotBase + 0x12C);
@@ -2271,11 +2273,11 @@ function Game.drawUI()
 				local boneArray1 = dereferencePointer(currentSlotBase + slot_variables_inv["Bone Array 1 Pointer"]);
 				local boneArray2 = dereferencePointer(currentSlotBase + slot_variables_inv["Bone Array 2 Pointer"]);
 				if not hide_non_animated or (isRDRAM(boneArray1) or isRDRAM(boneArray2)) then
-					gui.text(Game.OSDPosition[1], 2 + Game.OSDRowHeight * row, i..": "..toHexString(currentSlotBase or 0), color, 'bottomright');
+					gui.text(Game.OSDPosition[1], 2 + Game.OSDRowHeight * row, i..": "..toHexString(currentSlotBase or 0).." "..toHexString(currentBehaviorStructPointer or 0), color, 'bottomright');
 					row = row + 1;
 				end
 			else
-				gui.text(Game.OSDPosition[1], 2 + Game.OSDRowHeight * row, animationType.." "..i..": "..toHexString(currentSlotBase or 0), color, 'bottomright');
+				gui.text(Game.OSDPosition[1], 2 + Game.OSDRowHeight * row, animationType.." "..i..": "..toHexString(currentSlotBase or 0).." "..toHexString(currentBehaviorStructPointer or 0), color, 'bottomright');
 				row = row + 1;
 			end
 		end
@@ -3352,6 +3354,15 @@ function Game.eachFrame()
 	end
 end
 
+function Game.getJiggyGrabbedPointer()
+	if version == 4 then -- TODO: All versions
+		local pointer = dereferencePointer(Game.Memory.jiggy_grabbed_behavior_struct_pointer);
+		if isRDRAM(pointer) then
+			return toHexString(pointer);
+		end
+	end
+end
+
 Game.OSDPosition = {2, 70};
 Game.OSD = {
 	{"X"},
@@ -3382,6 +3393,8 @@ Game.OSD = {
 	{"Separator"},
 	--{"FF Answer", getCorrectFFAnswer},
 	{"FF Pattern", Game.getFFPattern},
+	{"Separator"},
+	{"Jiggy Grabbed", Game.getJiggyGrabbedPointer},
 };
 
 return Game;
