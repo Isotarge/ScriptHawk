@@ -528,6 +528,18 @@ local function getSlotBase(index)
 	return slot_base + index * slot_size;
 end
 
+local function getObjectName(address)
+	local animationType = "Unknown";
+	if isRDRAM(address) then
+		local objectIDPointer = dereferencePointer(address + 0x12C);
+		if isRDRAM(objectIDPointer) then
+			local objectType = mainmemory.read_u16_be(objectIDPointer + 0x02);
+			animationType = Game.actorArray[objectType] or toHexString(objectType);
+		end
+	end
+	return animationType;
+end
+
 function getObjectModel1Pointers()
 	local pointers = {};
 	local objectArray = dereferencePointer(Game.Memory.object_array_pointer);
@@ -2105,7 +2117,7 @@ function setSelectedObjectModel(model_index)
 	if script_mode == "Examine" or script_mode == "List" then -- Model 1
 		local objectArray = dereferencePointer(Game.Memory.object_array_pointer);
 		if isRDRAM(objectArray) then
-			local slotBase = objectArray + getSlotBase(object_index-1);
+			local slotBase = objectArray + getSlotBase(object_index - 1);
 			local behavior_pointer = dereferencePointer(slotBase);
 			if isRDRAM(behavior_pointer) then
 				objectModel = mainmemory.read_u16_be(behavior_pointer + 0x3E);
@@ -2121,7 +2133,7 @@ function turnOffSelectedObjectCollision()
 	if script_mode == "Examine" or script_mode == "List" then -- Model 1
 		local objectArray = dereferencePointer(Game.Memory.object_array_pointer);
 		if isRDRAM(objectArray) then
-			local slotBase = objectArray + getSlotBase(object_index-1);
+			local slotBase = objectArray + getSlotBase(object_index - 1);
 			local behavior_pointer = dereferencePointer(slotBase);
 			if isRDRAM(behavior_pointer) then
 				mainmemory.write_u16_be(behavior_pointer + 0x2E, 0);
@@ -2134,7 +2146,7 @@ function turnOnSelectedObjectCollision()
 	if script_mode == "Examine" or script_mode == "List" then -- Model 1
 		local objectArray = dereferencePointer(Game.Memory.object_array_pointer);
 		if isRDRAM(objectArray) then
-			local slotBase = objectArray + getSlotBase(object_index-1);
+			local slotBase = objectArray + getSlotBase(object_index - 1);
 			local behavior_pointer = dereferencePointer(slotBase);
 			if isRDRAM(behavior_pointer) then
 				mainmemory.write_u16_be(behavior_pointer + 0x2E, 1);
@@ -2147,7 +2159,7 @@ function despawnSelectedObject()
 	if script_mode == "Examine" or script_mode == "List" then -- Model 1
 		local objectArray = dereferencePointer(Game.Memory.object_array_pointer);
 		if isRDRAM(objectArray) then
-			local slotBase = objectArray + getSlotBase(object_index-1);
+			local slotBase = objectArray + getSlotBase(object_index - 1);
 			local bitfieldValue = mainmemory.readbyte(slotBase + 0x47);
 			mainmemory.writebyte(slotBase + 0x47, set_bit(bitfieldValue, 3));
 		end
@@ -2158,7 +2170,7 @@ function grabSelectedObject()
 	if script_mode == "Examine" or script_mode == "List" then -- Model 1
 		local objectArray = dereferencePointer(Game.Memory.object_array_pointer);
 		if isRDRAM(objectArray) then
-			local slotBase = objectArray + getSlotBase(object_index-1);
+			local slotBase = objectArray + getSlotBase(object_index - 1);
 			local unknownStructAddress = dereferencePointer(slotBase);
 			if isRDRAM(unknownStructAddress) then
 				local tempBitField = mainmemory.readbyte(slotBase + 0x139);
@@ -2256,13 +2268,7 @@ function Game.drawUI()
 		for i = math.min(numSlots, object_top_index + object_max_slots), object_top_index, -1 do
 			local currentSlotBase = objectArray + getSlotBase(i - 1);
 			local currentBehaviorStructPointer = dereferencePointer(currentSlotBase);
-
-			local animationType = "Unknown";
-			local objectIDPointer = dereferencePointer(currentSlotBase + 0x12C);
-			if isRDRAM(objectIDPointer) then
-				local objectType = mainmemory.read_u16_be(objectIDPointer + 0x02);
-				animationType = Game.actorArray[objectType] or toHexString(objectType);
-			end
+			local animationType = getObjectName(currentSlotBase);
 
 			local color = nil;
 			if object_index == i then
@@ -3364,8 +3370,13 @@ end
 function Game.getJiggyGrabbedIndex()
 	local pointer = dereferencePointer(Game.Memory.jiggy_grabbed_behavior_struct_pointer);
 	if isRDRAM(pointer) then
-		local index = math.floor(bit.rshift(mainmemory.read_u16_be(pointer + 0x2C), 4) / 2) + 1;
-		return index;
+		local index = bit.rshift(mainmemory.read_u16_be(pointer + 0x2C), 5) + 1;
+		local objectArray = dereferencePointer(Game.Memory.object_array_pointer);
+		if isRDRAM(objectArray) then
+			return index.." ("..getObjectName(objectArray + getSlotBase(index - 1))..")";
+		else
+			return index;
+		end
 	end
 end
 
