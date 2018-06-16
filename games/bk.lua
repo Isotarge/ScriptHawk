@@ -50,7 +50,7 @@ local Game = {
 		return_to_lair_enabled = {0x383A60, 0x383BC0, 0x3822A0, 0x383080},
 		game_progress_bitfield = {0x383B88, 0x383D18, 0x3823F8, 0x3831A8},
 		jiggy_bitfield = {0x383CA0, 0x383E00, 0x3824E0, 0x3832C0},
-		jiggy_grabbed_behavior_struct_pointer = {nil, nil, nil, 0x37D4B4}, -- TODO: All versions
+		jiggy_grabbed_behavior_struct_pointer = {0x37DE84, 0x37DFB4, 0x37C6B4, 0x37D4B4},
 		honeycomb_bitfield = {0x383CC0, 0x383E20, 0x382500, 0x3832E0},
 		mumbo_token_bitfield = {0x383CD0, 0x383E30, 0x382510, 0x3832F0},
 	},
@@ -3355,11 +3355,9 @@ function Game.eachFrame()
 end
 
 function Game.getJiggyGrabbedPointer()
-	if version == 4 then -- TODO: All versions
-		local pointer = dereferencePointer(Game.Memory.jiggy_grabbed_behavior_struct_pointer);
-		if isRDRAM(pointer) then
-			return toHexString(pointer);
-		end
+	local pointer = dereferencePointer(Game.Memory.jiggy_grabbed_behavior_struct_pointer);
+	if isRDRAM(pointer) then
+		return toHexString(pointer);
 	end
 end
 
