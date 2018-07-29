@@ -1282,7 +1282,7 @@ obj_model1 = {
 		[0x78] = "Gorilla Grab",
 		[0x79] = "Learning Move",
 		[0x7A] = "Locked", -- Car race loss, possibly elsewhere
-
+		[0x7B] = "Locked", -- Beetle Race loss, falling animation on ground
 		[0x7C] = "Trapped", -- Spider miniBoss
 		[0x7D] = "Klaptrap Kong", -- Beaver Bother
 		[0x7E] = "Surface Swimming", -- Enguarde
