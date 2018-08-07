@@ -105,7 +105,7 @@ function Game.getEggYVelocity()
 end
 
 function Game.eachFrame()
-	if forms.ischecked(ScriptHawk.UI.form_controls["Fast Mode Checkbox"]) then
+	if ScriptHawk.UI.ischecked("Fast Mode Checkbox") then
 		Game.fastMode();
 	end
 end

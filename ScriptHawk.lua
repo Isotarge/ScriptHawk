@@ -425,6 +425,14 @@ local supportedGames = {
 	["2101295C258CB6B845BDB72BE617691D"] = {moduleName="games.golvellius", friendlyName="Golvellius (UE)"},
 	["6BD9879AF39E248D149761014EBF5639"] = {moduleName="games.golvellius", friendlyName="Golvellius (J)"},
 
+	-- Gran Turismo 2
+	["D2C9B4EE"] = {moduleName="games.gran_turismo_2", friendlyName="Gran Turismo 2 (USA 1.0)"},
+	["B5A363A3"] = {moduleName="games.gran_turismo_2", friendlyName="Gran Turismo 2 (USA 1.1)"},
+	["E3672E95"] = {moduleName="games.gran_turismo_2", friendlyName="Gran Turismo 2 (USA 1.2)"},
+	["20FB91D3"] = {moduleName="games.gran_turismo_2", friendlyName="Gran Turismo 2 (Japan 1.0)"},
+	["7E74A4F0"] = {moduleName="games.gran_turismo_2", friendlyName="Gran Turismo 2 (Japan 1.1)"},
+	["AFCCF4DC"] = {moduleName="games.gran_turismo_2", friendlyName="Gran Turismo 2 (Europe)"},
+
 	-- Impossible Mission
 	["AF51AB03A173DEC28C9241532227CD64"] = {moduleName="games.impossible_mission", friendlyName="Impossible Mission (E)"},
 	["A26D40B6B7646C22D1F2DB7F746F0391"] = {moduleName="games.impossible_mission", friendlyName="Impossible Mission (E) (Beta)"},
@@ -981,6 +989,11 @@ function ScriptHawk.UI.checkbox(col, row, tag, caption, default)
 	end
 end
 
+function ScriptHawk.UI.ischecked(tag)
+	return ScriptHawk.UI.form_controls[tag] ~= nil and forms.ischecked(ScriptHawk.UI.form_controls[tag]);
+end
+ScriptHawk.UI.isChecked = ScriptHawk.UI.ischecked;
+
 -- Handle, Type, Caption, Callback, X position, Y position, Width, Height
 if not TASSafe then
 	ScriptHawk.UI.form_controls["Mode Label"] = forms.label(ScriptHawk.UI.options_form, "Mode:", ScriptHawk.UI.col(0), ScriptHawk.UI.row(0) + ScriptHawk.UI.label_offset, 44, ScriptHawk.UI.button_height);
@@ -1338,11 +1351,11 @@ local function mainloop()
 		return; -- If we're in TAS mode, don't even bother checking DPad/L inputs
 	end
 
-	if ScriptHawk.UI.form_controls["Toggle Infinites Checkbox"] ~= nil and forms.ischecked(ScriptHawk.UI.form_controls["Toggle Infinites Checkbox"]) then
+	if ScriptHawk.UI.ischecked("Toggle Infinites Checkbox") then
 		Game.applyInfinites();
 	end
 
-	if type(Game.maps) == "table" and Game.takeMeThereType == "Checkbox" and forms.ischecked(ScriptHawk.UI.form_controls["Map Checkbox"]) then
+	if type(Game.maps) == "table" and Game.takeMeThereType == "Checkbox" and ScriptHawk.UI.ischecked("Map Checkbox") then
 		Game.setMap(previous_map_value);
 	end
 
@@ -1462,7 +1475,7 @@ end
 
 local function plot_pos()
 	if TASSafe then
-		override_lag_detection = forms.ischecked(ScriptHawk.UI.form_controls["Override Lag Detection"]);
+		override_lag_detection = ScriptHawk.UI.ischecked("Override Lag Detection");
 	end
 
 	-- Compensate for overscan (SMS)
@@ -1726,9 +1739,9 @@ function ScriptHawk.drawHitboxes()
 	local row = 0; -- Text row
 	local mouse = input.getmouse(); -- TODO: Can we use mouse_state.current?
 	local mouseIsOnScreen = (mouse.X >= 0 and mouse.X < ScriptHawk.bufferWidth) and (mouse.Y >= 0 and mouse.Y < ScriptHawk.bufferHeight);
-	local showHitboxes = type(ScriptHawk.UI.form_controls["Show Hitboxes Checkbox"]) ~= "nil" and forms.ischecked(ScriptHawk.UI.form_controls["Show Hitboxes Checkbox"]);
-	local enableDraggableHitboxes = type(ScriptHawk.UI.form_controls["Draggable Hitboxes Checkbox"]) ~= "nil" and forms.ischecked(ScriptHawk.UI.form_controls["Draggable Hitboxes Checkbox"]);
-	local drawList = type(ScriptHawk.UI.form_controls["Show List Checkbox"]) ~= "nil" and forms.ischecked(ScriptHawk.UI.form_controls["Show List Checkbox"]);
+	local showHitboxes = ScriptHawk.UI.ischecked("Show Hitboxes Checkbox");
+	local enableDraggableHitboxes = ScriptHawk.UI.ischecked("Draggable Hitboxes Checkbox");
+	local drawList = ScriptHawk.UI.ischecked("Show List Checkbox");
 
 	-- Draw mouse pixel
 	--gui.drawPixel(mouse.X, mouse.Y, colors.red);

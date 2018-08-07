@@ -7143,7 +7143,7 @@ function Game.applyInfinites()
 	local shared_collectables = Game.Memory.shared_collectables;
 
 	mainmemory.write_u16_be(shared_collectables + standard_ammo, Game.getMaxStandardAmmo());
-	if forms.ischecked(ScriptHawk.UI.form_controls["Toggle Homing Ammo Checkbox"]) then
+	if ScriptHawk.UI.ischecked("Toggle Homing Ammo Checkbox") then
 		mainmemory.write_u16_be(shared_collectables + homing_ammo, Game.getMaxHomingAmmo());
 	else
 		mainmemory.write_u16_be(shared_collectables + homing_ammo, 0);
@@ -8179,7 +8179,7 @@ function Game.eachFrame()
 		--setWaterSurfaceTimers(surfaceTimerHack);
 		--Game.unlockMenus(); -- TODO: Allow user to toggle this
 
-		if forms.ischecked(ScriptHawk.UI.form_controls["Toggle Lag Fix Checkbox"]) then
+		if ScriptHawk.UI.ischecked("Toggle Lag Fix Checkbox") then
 			fixLag();
 		end
 
@@ -8199,11 +8199,11 @@ function Game.eachFrame()
 			Game.fixChunkDeload();
 		end
 
-		if type(ScriptHawk.UI.form_controls["Toggle Noclip Checkbox"]) ~= "nil" and forms.ischecked(ScriptHawk.UI.form_controls["Toggle Noclip Checkbox"]) then
+		if ScriptHawk.UI.ischecked("Toggle Noclip Checkbox") then
 			Game.setNoclipByte(0x01);
 		end
 
-		if type(ScriptHawk.UI.form_controls["Toggle OhWrongnana"]) ~= "nil" and forms.ischecked(ScriptHawk.UI.form_controls["Toggle OhWrongnana"]) then
+		if ScriptHawk.UI.ischecked("Toggle OhWrongnana") then
 			ohWrongnana();
 		end
 
@@ -8241,7 +8241,7 @@ function Game.eachFrame()
 	end
 
 	-- Check for new flags being set
-	if type(ScriptHawk.UI.form_controls["realtime_flags"]) ~= "nil" and forms.ischecked(ScriptHawk.UI.form_controls["realtime_flags"]) then
+	if ScriptHawk.UI.ischecked("realtime_flags") then
 		checkFlags(true);
 	end
 

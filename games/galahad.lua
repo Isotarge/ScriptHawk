@@ -276,7 +276,7 @@ local function getExamineData(objectBase)
 	table.insert(examine_data, {"Respawn X Position", mainmemory.read_u16_be(objectBase + object.respawn_x_position)});
 	table.insert(examine_data, {"Respawn Y Position", mainmemory.read_u16_be(objectBase + object.respawn_y_position)});
 
-	if forms.ischecked(ScriptHawk.UI.form_controls.checkbox_extra_data) then
+	if ScriptHawk.UI.ischecked("checkbox_extra_data") then
 		table.insert(examine_data, {"0x04", mainmemory.read_u16_be(objectBase + 0x04)});
 		table.insert(examine_data, {"0x06", mainmemory.read_u16_be(objectBase + 0x06)});
 		table.insert(examine_data, {"0x08", mainmemory.read_u16_be(objectBase + 0x08)});
@@ -308,7 +308,7 @@ function Game.drawUI()
 		for i = max_objects, 1, -1 do
 			local objectBase = getObjectBase(i - 1);
 			local objectType = mainmemory.read_u16_be(objectBase + object.type);
-			if objectType ~= 0 or forms.ischecked(ScriptHawk.UI.form_controls.checkbox_extra_data) then
+			if objectType ~= 0 or ScriptHawk.UI.ischecked("checkbox_extra_data") then
 				objectType = (object_types[objectType] or "Unknown").." ("..toHexString(objectType)..")";
 				local color = nil;
 				if i == object_index then

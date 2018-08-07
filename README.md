@@ -99,13 +99,6 @@ A collection of Lua scripts and RAM watches for [BizHawk](https://github.com/TAS
 - German 1.0 and 1.1 (N64)
 - USA (N64)
 
-### Ocarina of Time & Majora's Mask
-While ScriptHawk does have basic support for OoT and MM there are people who are much more dedicated to these games than I will ever be. Check out the great work at the following GitHub repos for more comprehensive support:
-- [notwa/mm](https://github.com/notwa/mm/tree/master/Lua)
-- [RainingChain/Z64LuaHooks](https://github.com/RainingChain/Z64LuaHooks)
-- [mattpilla/Majora-s-Mask-Lua-Scripts](https://github.com/mattpilla/Majora-s-Mask-Lua-Scripts)
-- [glankk/gz](https://github.com/glankk/gz)
-
 ## Other Supported Games
 - Alex Kidd in Miracle World (SMS)
 - Alex Kidd in Shinobi World (SMS)
@@ -134,6 +127,13 @@ While ScriptHawk does have basic support for OoT and MM there are people who are
 - Legend of Galahad (Genesis)
 - Rayman 2 (N64 only)
 - San Francisco Rush 2049 (N64 only)
+- Zelda 64 (OoT/MM)
+
+### Gran Turismo 2
+- All simulation mode discs supported
+- Arcade mode is not currently supported
+- Autopilot
+- Import & Export cars from the game in a shareable format
 
 ## Other Included Scripts
 - [Tetris Attack](Tetris%20Attack%20Bot.lua) bot, plays the game quite well using a simple sorting algorithm
@@ -144,10 +144,13 @@ While ScriptHawk does have basic support for OoT and MM there are people who are
 
 ## Other Notable Projects
 - Banjo-Kazooie [MittenzHugg/Mr.Patcher](https://github.com/MittenzHugg/Mr.Patcher)
+- Banjo-Kazooie [MittenzHugg/Banjo-KazooC](https://github.com/MittenzHugg/Banjo-KazooC)
+- Banjo-Kazooie [MittenzHugg/Banjo-Kazooie-Turbo-Talon-Trainer](https://github.com/MittenzHugg/Banjo-Kazooie-Turbo-Talon-Trainer)
 - GoldenEye [Wyst3r/GoldenEye](https://bitbucket.org/Wyst3r/bizhawklua)
 - Mario Kart 64 [weatherton/BizHawkMarioKart64](https://github.com/weatherton/BizHawkMarioKart64)
 - Super Mario 64 [SM64-STROOP/STROOP](https://github.com/SM64-STROOP/STROOP)
 - Super Mario World [rodamaral/smw-tas](https://github.com/rodamaral/smw-tas)
-
-## Support me
-If you like my work, consider [donating](https://streamtip.com/t/isotarge)
+- Zelda 64 [notwa/mm](https://github.com/notwa/mm/tree/master/Lua)
+- Zelda 64 [RainingChain/Z64LuaHooks](https://github.com/RainingChain/Z64LuaHooks)
+- Zelda 64 [mattpilla/Majora-s-Mask-Lua-Scripts](https://github.com/mattpilla/Majora-s-Mask-Lua-Scripts)
+- Zelda 64 [glankk/gz](https://github.com/glankk/gz)

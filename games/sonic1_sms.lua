@@ -149,7 +149,7 @@ function Game.camHack()
 end
 
 function Game.eachFrame()
-	if forms.ischecked(ScriptHawk.UI.form_controls["CamHack Checkbox"]) then
+	if ScriptHawk.UI.ischecked("CamHack Checkbox") then
 		Game.camHack();
 	end
 end

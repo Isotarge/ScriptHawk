@@ -663,7 +663,7 @@ function Game.initUI()
 end
 
 function Game.drawUI()
-	if forms.ischecked(ScriptHawk.UI.form_controls["Toggle Overlay Checkbox"]) then
+	if ScriptHawk.UI.ischecked("Toggle Overlay Checkbox") then
 		if mainmemory.readbyte(Game.Memory.horizontal_map_position) % 2 == 1 then
 			if mainmemory.readbyte(0x93) ~= 137 then
 				draw_map();

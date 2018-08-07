@@ -270,7 +270,7 @@ end
 
 function Game.drawUI()
 	forms.settext(ScriptHawk.UI.form_controls["Object Index Label"], "Index: "..objectIndex);
-	if forms.ischecked(ScriptHawk.UI.form_controls["Enable Object Analyzer"]) then
+	if ScriptHawk.UI.ischecked("Enable Object Analyzer") then
 		local gui_x = 2;
 		local gui_y = 2;
 		local row = 0;
@@ -292,7 +292,7 @@ function Game.drawUI()
 end
 
 function incrementObjectIndex()
-	if forms.ischecked(ScriptHawk.UI.form_controls["Enable Object Analyzer"]) then
+	if ScriptHawk.UI.ischecked("Enable Object Analyzer") then
 		objectIndex = objectIndex + 1;
 		if objectIndex >= numObjects then
 			objectIndex = 0;
@@ -301,7 +301,7 @@ function incrementObjectIndex()
 end
 
 function decrementObjectIndex()
-	if forms.ischecked(ScriptHawk.UI.form_controls["Enable Object Analyzer"]) then
+	if ScriptHawk.UI.ischecked("Enable Object Analyzer") then
 		objectIndex = objectIndex - 1;
 		if objectIndex < 0 then
 			objectIndex = numObjects;
@@ -310,7 +310,7 @@ function decrementObjectIndex()
 end
 
 function zipToSelectedObject()
-	if forms.ischecked(ScriptHawk.UI.form_controls["Enable Object Analyzer"]) then
+	if ScriptHawk.UI.ischecked("Enable Object Analyzer") then
 		local objectBase = Game.Memory.object_list + objectIndex * objectSize;
 
 		local objectX = mainmemory.readfloat(objectBase + 0xA0, true);

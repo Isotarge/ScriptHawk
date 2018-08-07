@@ -874,7 +874,7 @@ function Game.getSlopeTimer()
 end
 
 function Game.colorSlopeTimer()
-	if forms.ischecked(ScriptHawk.UI.form_controls.toggle_neverslip) then
+	if ScriptHawk.UI.ischecked("toggle_neverslip") then
 		return colors.blue;
 	end
 	local slopeTimer = Game.getSlopeTimer();
@@ -5391,7 +5391,7 @@ local function encircle_banjo()
 	local x, y, z;
 
 	--radius = 1000
-	--if forms.ischecked(ScriptHawk.UI.form_controls.dynamic_radius_checkbox) then
+	--if ScriptHawk.UI.ischecked("dynamic_radius_checkbox") then
 	--	radius = getNumSlots() * dynamic_radius_factor;
 	--end
 
@@ -5422,7 +5422,7 @@ function Game.forceReload()
 	local currentMap = Game.getMap();
 	local dropdown_map_value = ScriptHawk.UI.findMapValue();
 	if trigger_value == 0 then
-		if forms.ischecked(ScriptHawk.UI.form_controls["Map Checkbox"]) then
+		if ScriptHawk.UI.ischecked("Map Checkbox") then
 			mainmemory.write_u16_be(Game.Memory.map_trigger_target, dropdown_map_value);
 		else
 			mainmemory.write_u16_be(Game.Memory.map_trigger_target, currentMap);
@@ -5585,13 +5585,13 @@ function Game.initUI()
 end
 
 function Game.eachFrame()
-	if forms.ischecked(ScriptHawk.UI.form_controls.toggle_neverslip) then
+	if ScriptHawk.UI.ischecked("toggle_neverslip") then
 		neverSlip();
 	end
-	if forms.ischecked(ScriptHawk.UI.form_controls.toggle_autojump) then
+	if ScriptHawk.UI.ischecked("toggle_autojump") then
 		autoJump();
 	end
-	if forms.ischecked(ScriptHawk.UI.form_controls.realtime_flags) then
+	if ScriptHawk.UI.ischecked("realtime_flags") then
 		checkFlags();
 		checkGlobalFlags();
 	end
@@ -5619,7 +5619,7 @@ function Game.eachFrame()
 		Game.setCameraZPosition(camera_lock.z);
 	end
 
-	if forms.ischecked(ScriptHawk.UI.form_controls["Character Checkbox"]) then
+	if ScriptHawk.UI.ischecked("Character Checkbox") then
 		local characterString = forms.getproperty(ScriptHawk.UI.form_controls["Character Dropdown"], "SelectedItem");
 		if type(Game.character_change_lookup[characterString]) == "number" then
 			mainmemory.write_u8(Game.Memory.character_change, Game.character_change_lookup[characterString]);

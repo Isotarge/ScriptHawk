@@ -836,7 +836,7 @@ end
 local boostFrames = 0;
 
 local function outputBoostStats()
-	if Game.isPhysicsFrame() and forms.ischecked(ScriptHawk.UI.form_controls.boost_info_checkbox) then
+	if Game.isPhysicsFrame() and ScriptHawk.UI.ischecked("boost_info_checkbox") then
 		local boost = Game.getBoost();
 		local getReady = mainmemory.readbyte(Game.Memory.get_ready);
 		if boost > 0 and getReady == 0 then
@@ -1072,11 +1072,11 @@ function Game.eachFrame()
 
 	populateObjectPointerList();
 
-	if not otap_enabled and forms.ischecked(ScriptHawk.UI.form_controls.otap_checkbox) then
+	if not otap_enabled and ScriptHawk.UI.ischecked("otap_checkbox") then
 		enableOptimalTap();
 	end
 
-	if otap_enabled and not forms.ischecked(ScriptHawk.UI.form_controls.otap_checkbox) then
+	if otap_enabled and not ScriptHawk.UI.ischecked("otap_checkbox") then
 		disableOptimalTap();
 	end
 
@@ -1084,7 +1084,7 @@ function Game.eachFrame()
 		optimalTap();
 	end
 
-	if forms.ischecked(ScriptHawk.UI.form_controls.encircle_checkbox) then
+	if ScriptHawk.UI.ischecked("encircle_checkbox") then
 		encircle_player();
 	end
 

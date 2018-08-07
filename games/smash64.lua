@@ -252,10 +252,11 @@ local player_fields = {
 	CameraZoom = 0x864, -- Float
 	-- 0xA28 = Flash State Pointer? (Pointer)
 	-- 0xA2B = Flash State Index? (Byte)
-	-- 0xA68 = Flash Color Red (Byte)
-	-- 0xA69 = Flash Color Green (Byte)
-	-- 0xA6A = Flash Color Blue (Byte)
-	-- 0xA6B = Flash Color Alpha (Byte)
+	FlashColour = 0xA68, -- u32_be, RGBA
+	FlashColourR = 0xA68, -- Byte
+	FlashColourG = 0xA69, -- Byte
+	FlashColourB = 0xA6A, -- Byte
+	FlashColourA = 0xA6B, -- Byte
 	BoomerangPointer = 0xADC, -- Pointer
 	ShieldJump_FrameDelayCounter = 0xB1C, -- 4 Bytes
 	ShowHitbox = 0xB4C, -- u32_be
@@ -787,6 +788,28 @@ function Game.getBoomerang(player)
 	end
 end
 
+function Game.getBoomerangOSD(player)
+	local projectileObject = nil;
+	local projectileObject2 = nil;
+	local positionObject = nil;
+	local timer1 = 0;
+	local timer2 = 0;
+	local playerActor = Game.getPlayer(player);
+	if isRDRAM(playerActor) then
+		projectileObject = dereferencePointer(playerActor + player_fields.BoomerangPointer);
+		if isRDRAM(projectileObject) then
+			projectileObject2 = dereferencePointer(projectileObject + 0x84);
+			if isRDRAM(projectileObject2) then
+				timer1 = mainmemory.readbyte(projectileObject2 + 0x29D);
+				timer2 = mainmemory.readbyte(projectileObject2 + 0x29F);
+				positionObject = dereferencePointer(projectileObject2 + 0x2C);
+			end
+		end
+	end
+	--return toHexString(projectileObject).."->"..toHexString(projectileObject2).."->"..toHexString(positionObject).." ("..timer1..", "..timer2..")";
+	return toHexString(positionObject).." ("..timer1..", "..timer2..")";
+end
+
 function Game.getBoomerangX(player)
 	local boomerang = Game.getBoomerang(player);
 	if isRDRAM(boomerang) then
@@ -899,15 +922,17 @@ function Game.setMusic(value)
 end
 
 function Game.initUI()
-	-- Unlock Everything Button
-	ScriptHawk.UI.form_controls.unlock_everything_button = forms.button(ScriptHawk.UI.options_form, "Unlock Everything", Game.unlockEverything, ScriptHawk.UI.col(10), ScriptHawk.UI.row(0), ScriptHawk.UI.col(4) + 10, ScriptHawk.UI.button_height);
+	if not TASSafe then
+		-- Unlock Everything Button
+		ScriptHawk.UI.form_controls.unlock_everything_button = forms.button(ScriptHawk.UI.options_form, "Unlock Everything", Game.unlockEverything, ScriptHawk.UI.col(10), ScriptHawk.UI.row(0), ScriptHawk.UI.col(4) + 10, ScriptHawk.UI.button_height);
 
-	-- Hitbox Toggle
-	ScriptHawk.UI.checkbox(10, 1, "toggle_hitboxes", "Hitboxes");
+		-- Hitbox Toggle
+		ScriptHawk.UI.checkbox(10, 1, "toggle_hitboxes", "Hitboxes");
 
-	-- Music
-	ScriptHawk.UI.form_controls["Music Dropdown"] = forms.dropdown(ScriptHawk.UI.options_form, Game.music, ScriptHawk.UI.col(0) + ScriptHawk.UI.dropdown_offset, ScriptHawk.UI.row(6) + ScriptHawk.UI.dropdown_offset, ScriptHawk.UI.col(9) + 8, ScriptHawk.UI.button_height);
-	ScriptHawk.UI.checkbox(0, 7, "Music Checkbox", "Set Music");
+		-- Music
+		ScriptHawk.UI.form_controls["Music Dropdown"] = forms.dropdown(ScriptHawk.UI.options_form, Game.music, ScriptHawk.UI.col(0) + ScriptHawk.UI.dropdown_offset, ScriptHawk.UI.row(6) + ScriptHawk.UI.dropdown_offset, ScriptHawk.UI.col(9) + 8, ScriptHawk.UI.button_height);
+		ScriptHawk.UI.checkbox(0, 7, "Music Checkbox", "Set Music");
+	end
 end
 
 function dumpCharacterConstants(player)
@@ -990,9 +1015,6 @@ local playerOSD = {
 		{"Facing", Game.getYRotation},
 		{"Shield", Game.getShieldSize},
 		{"Separator"},
-		--{"Boomerang X", Game.getBoomerangX},
-		--{"Boomerang Y", Game.getBoomerangY},
-		--{"Separator"},
 	},
 	[2] = {
 		{"P2", function() return Game.getPlayerOSD(2) end, playerColors[2]},
@@ -1035,34 +1057,58 @@ local playerOSD = {
 	},
 };
 
-function buildOSD(p1, p2, p3, p4)
+local boomerangOSD = {
+	[1] = {
+		{"Boomerang", Game.getBoomerangOSD},
+		{"Boomerang X", Game.getBoomerangX},
+		{"Boomerang Y", Game.getBoomerangY},
+		{"Separator"},
+	},
+	[2] = {
+		{"Boomerang", function() return Game.getBoomerangOSD(2) end},
+		{"Boomerang X", function() return Game.getBoomerangX(2) end},
+		{"Boomerang Y", function() return Game.getBoomerangY(2) end},
+		{"Separator"},
+	},
+	[3] = {
+		{"Boomerang", function() return Game.getBoomerangOSD(3) end},
+		{"Boomerang X", function() return Game.getBoomerangX(3) end},
+		{"Boomerang Y", function() return Game.getBoomerangY(3) end},
+		{"Separator"},
+	},
+	[4] = {
+		{"Boomerang", function() return Game.getBoomerangOSD(4) end},
+		{"Boomerang X", function() return Game.getBoomerangX(4) end},
+		{"Boomerang Y", function() return Game.getBoomerangY(4) end},
+		{"Separator"},
+	},
+};
+
+function buildOSD(OSDBools, OSDCharacters)
 	local OSD = {
 		--{"Match Settings", Game.getMatchSettings},
 		--{"Separator"},
 	};
-	if p1 then
-		OSD = table.join(OSD, playerOSD[1]);
-	end
-	if p2 then
-		OSD = table.join(OSD, playerOSD[2]);
-	end
-	if p3 then
-		OSD = table.join(OSD, playerOSD[3]);
-	end
-	if p4 then
-		OSD = table.join(OSD, playerOSD[4]);
+	for i = 1, 4 do
+		if OSDBools[i] then
+			OSD = table.join(OSD, playerOSD[i]);
+			if OSDCharacters[i] == 0x05 then -- Link
+				OSD = table.join(OSD, boomerangOSD[i]);
+			end
+		end
 	end
 	return OSD;
 end
 
 -- Used to dynamically update OSD based on which players are in the battle
 local currentOSDBools = {true, false, false, false};
-Game.OSD = buildOSD(true, false, false, false);
+local currentOSDCharacters = {0x1C, 0x1C, 0x1C, 0x1C};
+Game.OSD = buildOSD(currentOSDBools, currentOSDCharacters);
 
 Game.hitboxWasChecked = false;
 
 function Game.eachFrame()
-	if forms.ischecked(ScriptHawk.UI.form_controls.toggle_hitboxes) then
+	if ScriptHawk.UI.ischecked("toggle_hitboxes") then
 		Game.hitboxWasChecked = true;
 		Game.showHitboxes();
 	elseif Game.hitboxWasChecked then
@@ -1070,7 +1116,7 @@ function Game.eachFrame()
 		Game.hideHitboxes();
 	end
 
-	if forms.ischecked(ScriptHawk.UI.form_controls["Music Checkbox"]) then
+	if ScriptHawk.UI.ischecked("Music Checkbox") then
 		local musicString = forms.gettext(ScriptHawk.UI.form_controls["Music Dropdown"]);
 		for i = 1, #Game.music do
 			if Game.music[i] == musicString then
@@ -1081,15 +1127,25 @@ function Game.eachFrame()
 
 	-- Dynamically update OSD based on which players are in the battle
 	local OSDBools = {};
+	local OSDCharacters = {};
+	local changeDetected = false;
 	for i = 1, 4 do
 		local playerActor = Game.getPlayer(i);
 		if isRDRAM(playerActor) then
 			OSDBools[i] = isRDRAM(dereferencePointer(playerActor + player_fields.PositionDataPointer));
+			if OSDBools[i] ~= currentOSDBools[i] then
+				changeDetected = true;
+			end
+		end
+		OSDCharacters[i] = Game.getCharacter(i);
+		if OSDCharacters[i] ~= currentOSDCharacters[i] then
+			changeDetected = true;
 		end
 	end
-	if OSDBools[1] ~= currentOSDBools[1] or OSDBools[2] ~= currentOSDBools[2] or OSDBools[3] ~= currentOSDBools[3] or OSDBools[4] ~= currentOSDBools[4] then
-		Game.OSD = buildOSD(OSDBools[1], OSDBools[2], OSDBools[3], OSDBools[4]);
+	if changeDetected then
+		Game.OSD = buildOSD(OSDBools, OSDCharacters);
 		currentOSDBools = OSDBools;
+		currentOSDCharacters = OSDCharacters;
 	end
 end
 

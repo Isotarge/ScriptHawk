@@ -356,7 +356,7 @@ function Game.getSlopeTimer()
 end
 
 function Game.colorSlopeTimer()
-	if forms.ischecked(ScriptHawk.UI.form_controls.toggle_neverslip) then
+	if ScriptHawk.UI.ischecked("toggle_neverslip") then
 		return colors.blue;
 	end
 	local slopeTimer = Game.getSlopeTimer();
@@ -2770,7 +2770,7 @@ local function encircle_banjo()
 	local x, y, z;
 
 	--radius = 1000
-	if forms.ischecked(ScriptHawk.UI.form_controls.dynamic_radius_checkbox) then
+	if ScriptHawk.UI.ischecked("dynamic_radius_checkbox") then
 		radius = getNumSlots() * dynamic_radius_factor;
 	end
 
@@ -2964,8 +2964,8 @@ end
 
 function freezeClipVelocity()
 	local inputs = joypad.getimmediate();
-	-- if not forms.ischecked(ScriptHawk.UI.form_controls.freeze_clip_velocity) or inputs["P1 L"] or inputs["P1 A"] then
-	if not forms.ischecked(ScriptHawk.UI.form_controls.freeze_clip_velocity) or inputs["P1 L"] then -- TODO: Less hacky method of detecting moonjump lol
+	-- if not ScriptHawk.UI.ischecked("freeze_clip_velocity") or inputs["P1 L"] or inputs["P1 A"] then
+	if not ScriptHawk.UI.ischecked("freeze_clip_velocity") or inputs["P1 L"] then -- TODO: Less hacky method of detecting moonjump lol
 		return;
 	end
 
@@ -3055,7 +3055,7 @@ function spawner.spawn(id)
 		end
 		spawner.updatePosition();
 		mainmemory.writebyte(spawner.actorFlag, 1);
-		if forms.ischecked(ScriptHawk.UI.form_controls.spawner_carry_checkbox) then
+		if ScriptHawk.UI.ischecked("spawner_carry_checkbox") then
 			mainmemory.writebyte(spawner.carryFlag, 1);
 		else
 			mainmemory.writebyte(spawner.carryFlag, 0);
@@ -3329,19 +3329,19 @@ function Game.eachFrame()
 	updateWave();
 	freezeClipVelocity();
 
-	if forms.ischecked(ScriptHawk.UI.form_controls.toggle_neverslip) then
+	if ScriptHawk.UI.ischecked("toggle_neverslip") then
 		neverSlip();
 	end
 
-	if forms.ischecked(ScriptHawk.UI.form_controls.encircle_checkbox) then
+	if ScriptHawk.UI.ischecked("encircle_checkbox") then
 		encircle_banjo();
 	end
 
-	if forms.ischecked(ScriptHawk.UI.form_controls.beta_pause_menu_checkbox) then
+	if ScriptHawk.UI.ischecked("beta_pause_menu_checkbox") then
 		beta_menu_recreate();
 	end
 
-	if forms.ischecked(ScriptHawk.UI.form_controls.autopound_checkbox) then
+	if ScriptHawk.UI.ischecked("autopound_checkbox") then
 		autoPound();
 	end
 
@@ -3355,7 +3355,7 @@ function Game.eachFrame()
 		end
 	end
 
-	if forms.ischecked(ScriptHawk.UI.form_controls.spawner_carry_checkbox) then
+	if ScriptHawk.UI.ischecked("spawner_carry_checkbox") then
 		mainmemory.writebyte(Game.Memory.carried_object_pointer + 4, 1);
 	end
 end

@@ -1,0 +1,7 @@
+SystemID PSX
+0AF230	b	u	0	MainRAM	Map
+0AF231	b	u	0	MainRAM	Number of Racers
+1CD554	b	u	0	MainRAM	Number of Cars in Garage
+1D1568	d	u	0	MainRAM	Cash
+1D156C	w	u	0	MainRAM	Current Car
+

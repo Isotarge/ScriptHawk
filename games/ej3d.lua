@@ -665,18 +665,18 @@ function Game.initUI()
 end
 
 function Game.realTime()
---	if forms.ischecked(ScriptHawk.UI.form_controls["Fix Input Bug"]) then
+--	if ScriptHawk.UI.ischecked("Fix Input Bug") then
 --		Game.fixInputBug();
 --	end
 	Game.getConsoleMode()
 end
 
 function Game.eachFrame()
-	if forms.ischecked(ScriptHawk.UI.form_controls["OoB Timer Checkbox"]) then
+	if ScriptHawk.UI.ischecked("OoB Timer Checkbox") then
 		Game.FreezeOoBTimer()
 	end
 	
-	if forms.ischecked(ScriptHawk.UI.form_controls["Free Roam Mode"]) then
+	if ScriptHawk.UI.ischecked("Free Roam Mode") then
 		Game.freeroamEnabled()
 	else
 		Game.freeroamDisabled()

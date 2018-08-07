@@ -151,7 +151,7 @@ function Game.getYVelocity()
 end
 
 function Game.eachFrame()
-	if forms.ischecked(ScriptHawk.UI.form_controls["Fix Acceleration Checkbox"]) then
+	if ScriptHawk.UI.ischecked("Fix Acceleration Checkbox") then
 		Game.fixAcceleration();
 	end
 end
