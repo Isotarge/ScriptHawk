@@ -295,6 +295,11 @@ function Game.buyAllParts(carIndex)
 	if carIndex == nil then
 		carIndex = Game.getCurrentCar();
 	end
+	local carBase = Game.getGaragedCar(carIndex);
+	if not isRAM(carBase) then
+		print("Error finding car in RAM.");
+		return;
+	end
 	for k, v in pairs(parts_purchased) do
 		if not v.donotbuy then
 			Game.buyPart(v.byte, v.bit, carIndex);
@@ -791,14 +796,6 @@ function Game.fuckGears()
 	end
 end
 
-function Game.initUI()
-	if not TASSafe then
-		ScriptHawk.UI.checkbox(0, 6, "ignore_restrictions", "Ignore Restrictions");
-		forms.setproperty(ScriptHawk.UI.form_controls.ignore_restrictions, "Width", ScriptHawk.UI.col(6));
-		--ScriptHawk.UI.checkbox(0, 7, "autopilot", "Autopilot");
-	end
-end
-
 function Game.enableAutopilot()
 	if mainmemory.read_u16_le(Game.Memory.autopilot) == 0x0000 then
 		mainmemory.write_u16_le(Game.Memory.autopilot, 0x0001);
@@ -811,6 +808,15 @@ function Game.disableAutopilot()
 	end
 end
 
+function Game.toggleAutopilot()
+	local currentValue = mainmemory.read_u16_le(Game.Memory.autopilot);
+	if currentValue == 0x0001 then
+		Game.disableAutopilot();
+	elseif currentValue == 0x0000 then
+		Game.enableAutopilot();
+	end
+end
+
 function Game.getAutopilotState()
 	if mainmemory.read_u16_le(Game.Memory.autopilot) == 0x0001 then
 		return "On";
@@ -818,17 +824,22 @@ function Game.getAutopilotState()
 	return "Off";
 end
 
-function Game.eachFrame()
-	--local autopilot = ScriptHawk.UI.ischecked("autopilot");
-	local ignore_restrictions = ScriptHawk.UI.ischecked("ignore_restrictions");
-
-	--[[
-	if mainmemory.read_u16_le(Game.Memory.autopilot) == 0x0000 and autopilot then
-		mainmemory.write_u16_le(Game.Memory.autopilot, 0x0001);
-	elseif mainmemory.read_u16_le(Game.Memory.autopilot) == 0x0001 and not autopilot then
-		mainmemory.write_u16_le(Game.Memory.autopilot, 0x0000);
+function Game.initUI()
+	if not TASSafe then
+		ScriptHawk.UI.checkbox(0, 6, "ignore_restrictions", "Ignore Restrictions");
+		forms.setproperty(ScriptHawk.UI.form_controls.ignore_restrictions, "Width", ScriptHawk.UI.col(6));
+		ScriptHawk.UI.form_controls.num_racers_dropdown = forms.dropdown(ScriptHawk.UI.options_form, { "1", "2", "3", "4", "5", "6" }, ScriptHawk.UI.col(0) + ScriptHawk.UI.dropdown_offset, ScriptHawk.UI.row(7) + ScriptHawk.UI.dropdown_offset, ScriptHawk.UI.col(2) + 8, ScriptHawk.UI.button_height);
+		ScriptHawk.UI.checkbox(3, 7, "set_num_racers", "Set Num Racers");
+		ScriptHawk.UI.form_controls["Toggle Autopilot"] = forms.button(ScriptHawk.UI.options_form, "Toggle Autopilot", Game.toggleAutopilot, ScriptHawk.UI.col(10), ScriptHawk.UI.row(0), ScriptHawk.UI.col(4) + 10, ScriptHawk.UI.button_height);
+		ScriptHawk.UI.form_controls["Dump Cars"] = forms.button(ScriptHawk.UI.options_form, "Dump Cars", Game.dumpCars, ScriptHawk.UI.col(10), ScriptHawk.UI.row(1), ScriptHawk.UI.col(4) + 10, ScriptHawk.UI.button_height);
+		ScriptHawk.UI.form_controls["Buy Parts"] = forms.button(ScriptHawk.UI.options_form, "Buy Parts", Game.buyAllParts, ScriptHawk.UI.col(10), ScriptHawk.UI.row(2), ScriptHawk.UI.col(4) + 10, ScriptHawk.UI.button_height);
 	end
-	--]]
+end
+
+function Game.eachFrame()
+	local ignore_restrictions = ScriptHawk.UI.ischecked("ignore_restrictions");
+	local set_num_racers = ScriptHawk.UI.ischecked("set_num_racers");
+
 	if mainmemory.read_u16_le(Game.Memory.circuit_restriction_check) == 0x000C then
 		if ignore_restrictions then
 			mainmemory.write_u16_le(Game.Memory.circuit_restriction_check + 2, 0x1000);
@@ -837,7 +848,12 @@ function Game.eachFrame()
 		end
 	end
 
-	--Game.setNumRacers(1); -- TODO: Checkbox & Dropdown?
+	if set_num_racers then
+		local numRacers = tonumber(forms.getproperty(ScriptHawk.UI.form_controls.num_racers_dropdown, "SelectedItem"));
+		if numRacers >= 1 and numRacers <= 6 then
+			Game.setNumRacers(numRacers);
+		end
+	end
 end
 
 Game.OSD = {
