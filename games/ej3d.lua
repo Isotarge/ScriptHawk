@@ -5,6 +5,18 @@ if type(ScriptHawk) ~= "table" then
 	return;
 end
 
+encircle_enabled = false;
+
+object_index = 1;
+object_pointers = {}; -- TODO: I'd love to get rid of this eventually, replace with some kind of getObjectPointers() system
+grab_script_modes = {
+	"Disabled",
+	"List",
+	"Examine",
+};
+grab_script_mode_index = 1;
+grab_script_mode = grab_script_modes[grab_script_mode_index];
+
 local Game = {
 	Memory = { -- 1 USA, 2 EU
 		jim_pointer = {0x0C6810, 0x0C8670},
@@ -15,8 +27,10 @@ local Game = {
 		destination_exit = {0x0E03E9, 0x0E2249},
 		subhub_entrance_cs = {0x0C624A, nil},
 		--controller_input = {0x0D4134, 0x0D5F94},
-		reload_map = {0x0E03E2,0x0E2242},
-		marble_pointer = {0x0C61E2,0x0C8042},
+		reload_map = {0x0E03E2, 0x0E2242},
+		marble_pointer = {0x0C61E2, 0x0C8042},
+		object_count = {0x0A6F02, nil},
+		pointer_list = {0x0E9E98, nil}, -- 0x273870
 	},
 };
 
@@ -604,6 +618,249 @@ function Game.fixInputBug()
 end
 --]]
 
+------------------
+-- Object Stuff --
+------------------
+-- 0x70 Position: X (Float)
+-- 0x74 Position: Y (Float)
+-- 0x78 Position: Z (Float)
+-- 0x80 Angle (2-Byte)
+-- 0x129 Health (1-Byte)
+-- 0x12C Size (2-Byte)
+-- 0x138 Opacity (1-Byte)
+-- 0x13B Animation (1-Byte)
+-- 0x13D Animation Timer (1-Byte)
+
+-- 0x2740B0, 0x274170, 0x274230 (C0 difference)
+-- 0x3206C8, 0x320820, 0x320978 (158 difference)
+-- I think the start of the objects pointer list is at 0x273870
+
+-- +0x1123 on model ptr
+
+local function getObjectCount()
+	return math.min(255, mainmemory.read_u16_be(Game.Memory.object_count));
+end
+
+function incrementObjectIndex()
+	object_index = object_index + 1;
+	if object_index > #object_pointers then
+		object_index = 1;
+	end
+end
+
+function decrementObjectIndex()
+	object_index = object_index - 1;
+	if object_index <= 0 then
+		object_index = #object_pointers;
+	end
+end
+
+function switch_grab_script_mode()
+	grab_script_mode_index = grab_script_mode_index + 1;
+	if grab_script_mode_index > #grab_script_modes then
+		grab_script_mode_index = 1;
+	end
+	grab_script_mode = grab_script_modes[grab_script_mode_index];
+end
+
+-- Relative to Model 1 Objects
+object_properties = {
+	object_x = 0x70,
+	object_y = 0x74,
+	object_z = 0x78,
+	object_angle = 0x80,
+	object_model_pointer = 0xD8;
+	object_health = 0x129,
+	object_size = 0x12C,
+	object_pointer_to_pointer = 0x130,
+	object_opacity = 0x138,
+	object_anim = 0x13B,
+	object_anim_timer = 0x13D,
+	object_value = 0x1122,
+	object_types = {
+		[0x1] = "Mini Roswell (Gun)",
+		[0x2] = "Beaver", -- PG1
+		[0x4] = "Bob and Number Four",
+		[0x5] = "Fatty Roswell",
+		[0x6] = "Professor Monkey for a Head",
+		[0x7] = "Psycrow",
+		[0x8] = "Cow Enemy",
+		[0x9] = "Acid Bat",
+		[0xA] = "Dynamite Bunny",
+		[0xB] = "Cactus",
+		[0xD] = "Disco Body",
+		[0xE] = "Disco Head",
+		[0x11] = "Pork Board (Earthworm Kim)",
+		[0x12] = "Frog Enemies", -- PG2 Tree Room
+		[0x14] = "Large Cow", -- Hubs, Boss Worlds
+		[0x1A] = "Cow", --Main Menu
+		[0x1C] = "Granny",
+		[0x1E] = "Pork Board",
+		[0x23] = "Moosilini",
+		[0x25] = "Speaker Enemy",
+		[0x26] = "Speaker" -- Destructable
+	},
+};
+
+local function populateObjectPointers()
+	object_pointers = {};
+	pointers_start = dereferencePointer(Game.Memory.pointer_list);
+	if isRDRAM (pointers_start) then
+		for object_no = 0, getObjectCount() do
+			local pointer = dereferencePointer(pointers_start + (object_no * 0xC0));
+			if isRDRAM(pointer) then
+				table.insert(object_pointers, pointer);
+			end
+		end
+	end
+	-- Clamp index
+	object_index = math.min(object_index, math.max(1, #object_pointers));
+end
+
+function getObjectValue(pointer)
+	modelPtr = dereferencePointer(pointer + object_properties.object_model_pointer);
+	if isRDRAM(modelPtr) then
+		objectValue = mainmemory.read_u16_be(modelPtr + 0x1122);
+	else
+		objectValue = 0;
+	end
+	return objectValue;
+end
+
+function getObjectNameFromValue(value)
+	if type(object_properties.object_types[value]) == 'string' then
+		objname = object_properties.object_types[value];
+	else
+		objname = toHexString(value);
+	end
+	return objname;
+end
+
+local function getExamineData(pointer)
+	local examine_data = {};
+
+	if not isRDRAM(pointer) then
+		return examine_data;
+	end
+	
+	local objectPtrPtr = dereferencePointer(pointer + object_properties.object_pointer_to_pointer);
+	local objectPointer = dereferencePointer(objectPtrPtr);
+	local modelPointer = dereferencePointer(pointer + object_properties.object_model_pointer);
+	local xPos = mainmemory.readfloat(pointer + object_properties.object_x, true);
+	local yPos = mainmemory.readfloat(pointer + object_properties.object_y, true);
+	local zPos = mainmemory.readfloat(pointer + object_properties.object_z, true);
+	local hasPosition = hasModel or xPos ~= 0 or yPos ~= 0 or zPos ~= 0;
+	local objectVal = getObjectValue(pointer)
+	
+	table.insert(examine_data, { "Address", toHexString(objectPointer) });
+	table.insert(examine_data, { "Object Name", getObjectNameFromValue(objectVal) });
+	table.insert(examine_data, { "Object Value", toHexString(objectVal) });
+	table.insert(examine_data, { "Separator", 1 });
+	table.insert(examine_data, { "X", xPos });
+	table.insert(examine_data, { "Y", yPos });
+	table.insert(examine_data, { "Z", zPos });
+	table.insert(examine_data, { "Separator", 1 });
+	table.insert(examine_data, { "Angle", mainmemory.read_u16_be(pointer + object_properties.object_angle) });
+	table.insert(examine_data, { "Scale", mainmemory.read_u16_be(pointer + object_properties.object_size) });
+	table.insert(examine_data, { "Health", mainmemory.readbyte(pointer + object_properties.object_health) });
+	table.insert(examine_data, { "Opacity", mainmemory.readbyte(pointer + object_properties.object_opacity) });
+	table.insert(examine_data, { "Separator", 1 });
+	table.insert(examine_data, { "Model Address", toHexString(modelPointer) });
+	table.insert(examine_data, { "Separator", 1 });
+	table.insert(examine_data, { "Animation", mainmemory.readbyte(pointer + object_properties.object_anim) });
+	table.insert(examine_data, { "Animation Timer", mainmemory.readbyte(pointer + object_properties.object_anim_timer) });
+
+	return examine_data;
+end
+
+local function drawGrabScriptUI()
+	if grab_script_mode == "Disabled" then
+		return;
+	end
+
+	local gui_x = 32;
+	local gui_y = 32;
+	local row = 0;
+	local height = 16;
+
+	gui.text(gui_x, gui_y + height * row, "Mode: "..grab_script_mode, nil, 'bottomright');
+	row = row + 1;
+
+	if grab_script_mode == "List" or grab_script_mode == "Examine" then
+		populateObjectPointers();
+	end
+
+	gui.text(gui_x, gui_y + height * row, "Index: "..object_index.."/"..#object_pointers, nil, 'bottomright');
+	row = row + 1;
+	gui.text(gui_x, gui_y + height * row, "Page: "..(page_pos).."/"..(page_total), nil, 'bottomright');
+	row = row + 1;
+	row = row + 1;
+
+	-- Clamp index to number of objects
+	if #object_pointers > 0 and object_index > #object_pointers then
+		object_index = #object_pointers;
+	end
+
+	if #object_pointers > 0 and object_index <= #object_pointers then
+		if string.contains(grab_script_mode, "Examine") then
+			local examine_data = {};
+			if grab_script_mode == "Examine" then
+				examine_data = getExamineData(object_pointers[object_index]);
+			end
+
+			pagifyThis(examine_data,40);
+
+			for i = page_finish, page_start + 1, -1 do
+				if examine_data[i][1] ~= "Separator" then
+					if type(examine_data[i][2]) == "number" then
+						examine_data[i][2] = round(examine_data[i][2], precision);
+					end
+					gui.text(gui_x, gui_y + height * row, examine_data[i][1]..": "..examine_data[i][2], nil, 'bottomright');
+					row = row + 1;
+				else
+					row = row + examine_data[i][2];
+				end
+			end
+		end
+
+		if grab_script_mode == "List" then
+			row = row + 1;
+			pagifyThis(object_pointers,40);
+			for i = page_finish, page_start + 1, -1 do
+				local color = nil;
+				if object_index == i then
+					color = colors.yellow;
+				end
+				if object_pointers[i] == playerObject then
+					color = colors.green;
+				end
+				local objectVal = getObjectValue(object_pointers[i] or 0)
+				gui.text(gui_x, gui_y + height * row, i..": "..toHexString(object_pointers[i] or 0, 6).." ("..getObjectNameFromValue(objectVal)..")", color, 'bottomright');
+				--gui.text(gui_x, gui_y + height * row, i..": "..getActorName(object_pointers[i]).." "..toHexString(object_pointers[i] or 0, 6).." ("..toHexString(currentActorSize)..")".." ("..getActorCollisions(object_pointers[i]).." cols)", color, 'bottomright');
+				row = row + 1;
+			end
+		end
+	end
+end
+
+function zipToSelectedObject()
+	local desiredX, desiredY, desiredZ;
+	local selectedObject = object_pointers[object_index];
+	if isRDRAM(selectedObject) then
+		-- Get selected object X,Y,Z position
+		if grab_script_mode == "List" or grab_script_mode == "Examine" then
+			desiredX = mainmemory.readfloat(selectedObject + object_properties.object_x, true);
+			desiredY = mainmemory.readfloat(selectedObject + object_properties.object_y, true);
+			desiredZ = mainmemory.readfloat(selectedObject + object_properties.object_z, true);
+		end
+	end
+	-- Update player position
+	if type(desiredX) == "number" and type(desiredY) == "number" and type(desiredZ) == "number" then
+		-- Write position
+		Game.setPosition(desiredX, desiredY, desiredZ);
+	end
+end
+
 ----------------
 -- Flag Stuff --
 ----------------
@@ -654,6 +911,13 @@ Game.flagBlock = {
 --  EARTHWORM KIM
 };
 
+ScriptHawk.bindKeyRealtime("N", decrementObjectIndex, true);
+ScriptHawk.bindKeyRealtime("M", incrementObjectIndex, true);
+ScriptHawk.bindKeyRealtime("Z", zipToSelectedObject, true);
+ScriptHawk.bindKeyRealtime("H", decrementPage, true);
+ScriptHawk.bindKeyRealtime("J", incrementPage, true);
+ScriptHawk.bindKeyRealtime("C", switch_grab_script_mode, true);
+
 local labelValue = 0;
 function Game.initUI()
 	ScriptHawk.UI.form_controls["Reload Map (Soft)"] = forms.button(ScriptHawk.UI.options_form, "Reload Map", Game.reloadMap, ScriptHawk.UI.col(5), ScriptHawk.UI.row(4), ScriptHawk.UI.col(4) + 10, ScriptHawk.UI.button_height);
@@ -669,6 +933,7 @@ function Game.realTime()
 --		Game.fixInputBug();
 --	end
 	Game.getConsoleMode()
+	drawGrabScriptUI()
 end
 
 function Game.eachFrame()
@@ -682,8 +947,11 @@ function Game.eachFrame()
 		Game.freeroamDisabled()
 	end
 	
+	drawGrabScriptUI()
 	Game.applyConsoleSettings()
 end
+
+event.onframeend(Game.eachFrame, "Each Frame function")
 
 Game.OSDPosition = {2, 70};
 Game.OSD = {
