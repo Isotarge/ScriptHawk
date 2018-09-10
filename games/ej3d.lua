@@ -11,8 +11,10 @@ object_index = 1;
 object_pointers = {}; -- TODO: I'd love to get rid of this eventually, replace with some kind of getObjectPointers() system
 grab_script_modes = {
 	"Disabled",
-	"List",
-	"Examine",
+	"List (Model 1)",
+	"Examine (Model 1)",
+	"List (Model 2)",
+	"Examine (Model 2)",
 };
 grab_script_mode_index = 1;
 grab_script_mode = grab_script_modes[grab_script_mode_index];
@@ -29,8 +31,10 @@ local Game = {
 		--controller_input = {0x0D4134, 0x0D5F94},
 		reload_map = {0x0E03E2, 0x0E2242},
 		marble_pointer = {0x0C61E2, 0x0C8042},
-		object_count = {0x0A6F02, nil},
-		pointer_list = {0x0E9E98, nil}, -- 0x273870
+		object_count = {0x0E9E97, nil},
+		obj1_pointer_list = {0x0E9E98, nil},
+		object_m2_count = {0x0E9EFE, nil},
+		obj2_pointer_list = {0x0E9F00, nil},
 	},
 };
 
@@ -638,7 +642,7 @@ end
 -- +0x1123 on model ptr
 
 local function getObjectCount()
-	return math.min(255, mainmemory.read_u16_be(Game.Memory.object_count));
+	return math.min(255, mainmemory.readbyte(Game.Memory.object_count) - 1);
 end
 
 function incrementObjectIndex()
@@ -663,7 +667,10 @@ function switch_grab_script_mode()
 	grab_script_mode = grab_script_modes[grab_script_mode_index];
 end
 
--- Relative to Model 1 Objects
+	---------------
+	-- MODEL ONE --
+	---------------
+
 object_properties = {
 	object_x = 0x70,
 	object_y = 0x74,
@@ -678,8 +685,9 @@ object_properties = {
 	object_anim_timer = 0x13D,
 	object_value = 0x1122,
 	object_types = {
-		[0x1] = "Mini Roswell (Gun)",
+		[0x1] = "Mini Roswell",
 		[0x2] = "Beaver", -- PG1
+		[0x3] = "Billy the Kid",
 		[0x4] = "Bob and Number Four",
 		[0x5] = "Fatty Roswell",
 		[0x6] = "Professor Monkey for a Head",
@@ -688,26 +696,43 @@ object_properties = {
 		[0x9] = "Acid Bat",
 		[0xA] = "Dynamite Bunny",
 		[0xB] = "Cactus",
+		[0xC] = "Chick", -- CDE
 		[0xD] = "Disco Body",
 		[0xE] = "Disco Head",
+		[0xF] = "Toilet gun guy", -- VDV
 		[0x11] = "Pork Board (Earthworm Kim)",
 		[0x12] = "Frog Enemies", -- PG2 Tree Room
+		[0x13] = "Pickle",
 		[0x14] = "Large Cow", -- Hubs, Boss Worlds
+		[0x15] = "Elderly Mobster", -- GBE
+		[0x16] = "Hamster", -- CDE
+		[0x17] = "Hedgehog", -- CDE/BTBW
+		[0x18] = "Vacuum",
 		[0x1A] = "Cow", --Main Menu
+		[0x1B] = "Robot", -- LOTF
 		[0x1C] = "Granny",
+		[0x1D] = "Peter the Dog",
 		[0x1E] = "Pork Board",
+		[0x1F] = "Green Piranha", -- LOTF
+		[0x20] = "Orange Piranha", -- DWU
+		[0x22] = "Pluckitt",
 		[0x23] = "Moosilini",
+		[0x24] = "Sheriff",
 		[0x25] = "Speaker Enemy",
-		[0x26] = "Speaker" -- Destructable
+		[0x26] = "Particle Spawner",
+		[0x27] = "Hot Sauce",
+		[0x28] = "Agent Crow",
+		[0x29] = "Wasps",
+		[0x2A] = "Elvis", -- AYHT
 	},
 };
 
-local function populateObjectPointers()
+local function populateObjectM1Pointers()
 	object_pointers = {};
-	pointers_start = dereferencePointer(Game.Memory.pointer_list);
-	if isRDRAM (pointers_start) then
+	obj1_pointers_start = dereferencePointer(Game.Memory.obj1_pointer_list);
+	if isRDRAM (obj1_pointers_start) then
 		for object_no = 0, getObjectCount() do
-			local pointer = dereferencePointer(pointers_start + (object_no * 0xC0));
+			local pointer = dereferencePointer(obj1_pointers_start + (object_no * 0xC0));
 			if isRDRAM(pointer) then
 				table.insert(object_pointers, pointer);
 			end
@@ -717,7 +742,7 @@ local function populateObjectPointers()
 	object_index = math.min(object_index, math.max(1, #object_pointers));
 end
 
-function getObjectValue(pointer)
+function getObjectM1Value(pointer)
 	modelPtr = dereferencePointer(pointer + object_properties.object_model_pointer);
 	if isRDRAM(modelPtr) then
 		objectValue = mainmemory.read_u16_be(modelPtr + 0x1122);
@@ -727,7 +752,7 @@ function getObjectValue(pointer)
 	return objectValue;
 end
 
-function getObjectNameFromValue(value)
+function getObjectM1NameFromValue(value)
 	if type(object_properties.object_types[value]) == 'string' then
 		objname = object_properties.object_types[value];
 	else
@@ -736,7 +761,7 @@ function getObjectNameFromValue(value)
 	return objname;
 end
 
-local function getExamineData(pointer)
+local function getExamineM1Data(pointer)
 	local examine_data = {};
 
 	if not isRDRAM(pointer) then
@@ -750,10 +775,10 @@ local function getExamineData(pointer)
 	local yPos = mainmemory.readfloat(pointer + object_properties.object_y, true);
 	local zPos = mainmemory.readfloat(pointer + object_properties.object_z, true);
 	local hasPosition = hasModel or xPos ~= 0 or yPos ~= 0 or zPos ~= 0;
-	local objectVal = getObjectValue(pointer)
+	local objectVal = getObjectM1Value(pointer)
 	
 	table.insert(examine_data, { "Address", toHexString(objectPointer) });
-	table.insert(examine_data, { "Object Name", getObjectNameFromValue(objectVal) });
+	table.insert(examine_data, { "Object Name", getObjectM1NameFromValue(objectVal) });
 	table.insert(examine_data, { "Object Value", toHexString(objectVal) });
 	table.insert(examine_data, { "Separator", 1 });
 	table.insert(examine_data, { "X", xPos });
@@ -773,6 +798,110 @@ local function getExamineData(pointer)
 	return examine_data;
 end
 
+	---------------
+	-- MODEL TWO --
+	---------------
+
+object_m2_properties = {
+	object_texture_pointer = 0x8;
+	object_model_pointer = 0x18;
+	object_trait_pointer = 0x1C,
+	traits_list = {
+		obj_type = 0x0; -- 2 Byte
+		opacity = 0xD;
+	},
+	object_x = 0xA0, -- (8x larger)
+	object_y = 0xA4, -- (8x larger)
+	object_z = 0xA8, -- (8x larger)
+	object_types = {
+		[0xB] = "Rocket Launcher/Marble/Pp Can", -- Pickup
+		[0x32] = "Udder",
+		[0x34] = "Bunny Land mine", -- DWU
+		[0x3E] = "Text Trigger", -- DWU Gravestones, BNotLD Grannies
+		[0x40] = "Vending Machine", -- Rocket Launcher
+		[0x42] = "Statue", -- DWU
+		[0x5A] = "Snott",
+	},
+};
+	
+local function getObjectM2Count()
+	return math.min(65535, mainmemory.read_u16_be(Game.Memory.object_m2_count) - 1);
+end
+
+
+local function populateObjectM2Pointers()
+	object_pointers = {};
+	obj2_pointers_start = dereferencePointer(Game.Memory.obj2_pointer_list);
+	if isRDRAM (obj2_pointers_start) then
+		for object_no = 0, getObjectM2Count() do
+			local pointer = dereferencePointer(obj2_pointers_start + (object_no * 0x4));
+			if isRDRAM(pointer) then
+				table.insert(object_pointers, pointer);
+			end
+		end
+	end
+	-- Clamp index
+	object_index = math.min(object_index, math.max(1, #object_pointers));
+end
+
+function getObjectM2Value(pointer)
+	traitPtr = dereferencePointer(pointer + object_m2_properties.object_trait_pointer);
+	local hasTrait = traitPtr ~= nil;
+	if hasTrait then
+		objectM2Value = mainmemory.read_u16_be(traitPtr + object_m2_properties.traits_list.obj_type);
+	else
+		objectM2Value = 0;
+	end
+	return objectM2Value;
+end
+
+function getObjectM2NameFromValue(value)
+	if type(object_m2_properties.object_types[value]) == 'string' then
+		objname = object_m2_properties.object_types[value];
+	else
+		objname = toHexString(value);
+	end
+	return objname;
+end
+
+local function getExamineM2Data(pointer)
+	local examine_data = {};
+
+	if not isRDRAM(pointer) then
+		return examine_data;
+	end
+	
+	local xPos = mainmemory.readfloat(pointer + object_m2_properties.object_x, true) / 8;
+	local yPos = mainmemory.readfloat(pointer + object_m2_properties.object_y, true) / 8;
+	local zPos = mainmemory.readfloat(pointer + object_m2_properties.object_z, true) / 8;
+	local hasPosition = hasModel or xPos ~= 0 or yPos ~= 0 or zPos ~= 0;
+	
+	local traitPointer = dereferencePointer(pointer + object_m2_properties.object_trait_pointer);
+	local texturePointer = dereferencePointer(pointer + object_m2_properties.object_texture_pointer);
+	local modelPointer = dereferencePointer(pointer + object_m2_properties.object_model_pointer);
+	local hasTrait = traitPointer ~= nil;
+	local objectM2Val = getObjectM2Value(pointer)
+	
+	table.insert(examine_data, { "Address", toHexString(pointer) });
+	table.insert(examine_data, { "Object Name", getObjectM2NameFromValue(objectM2Val) });
+	table.insert(examine_data, { "Object Value", toHexString(objectM2Val) });
+	table.insert(examine_data, { "Separator", 1 });
+	table.insert(examine_data, { "Trait Pointer", toHexString(traitPointer) });
+	table.insert(examine_data, { "Texture Pointer", toHexString(texturePointer) });
+	table.insert(examine_data, { "Model Pointer", toHexString(modelPointer) });
+	table.insert(examine_data, { "Separator", 1 });
+	table.insert(examine_data, { "X", xPos });
+	table.insert(examine_data, { "Y", yPos });
+	table.insert(examine_data, { "Z", zPos });
+	table.insert(examine_data, { "Separator", 1 });
+	
+	if hasTrait then
+		local objAnimTimer = mainmemory.readbyte(traitPointer + object_m2_properties.traits_list.opacity); -- Not entirely sure. Opacity for Snott, Anim Timer for Udder?
+		table.insert(examine_data, { "Animation Timer", objAnimTimer });
+	end
+	return examine_data;
+end
+
 local function drawGrabScriptUI()
 	if grab_script_mode == "Disabled" then
 		return;
@@ -786,8 +915,10 @@ local function drawGrabScriptUI()
 	gui.text(gui_x, gui_y + height * row, "Mode: "..grab_script_mode, nil, 'bottomright');
 	row = row + 1;
 
-	if grab_script_mode == "List" or grab_script_mode == "Examine" then
-		populateObjectPointers();
+	if string.contains(grab_script_mode, "Model 1") then
+		populateObjectM1Pointers();
+	elseif string.contains(grab_script_mode, "Model 2") then
+		populateObjectM2Pointers();
 	end
 
 	gui.text(gui_x, gui_y + height * row, "Index: "..object_index.."/"..#object_pointers, nil, 'bottomright');
@@ -804,8 +935,10 @@ local function drawGrabScriptUI()
 	if #object_pointers > 0 and object_index <= #object_pointers then
 		if string.contains(grab_script_mode, "Examine") then
 			local examine_data = {};
-			if grab_script_mode == "Examine" then
-				examine_data = getExamineData(object_pointers[object_index]);
+			if grab_script_mode == "Examine (Model 1)" then
+				examine_data = getExamineM1Data(object_pointers[object_index]);
+			elseif  grab_script_mode == "Examine (Model 2)" then
+				examine_data = getExamineM2Data(object_pointers[object_index]);
 			end
 
 			pagifyThis(examine_data,40);
@@ -823,7 +956,7 @@ local function drawGrabScriptUI()
 			end
 		end
 
-		if grab_script_mode == "List" then
+		if string.contains(grab_script_mode, "List") then
 			row = row + 1;
 			pagifyThis(object_pointers,40);
 			for i = page_finish, page_start + 1, -1 do
@@ -834,9 +967,14 @@ local function drawGrabScriptUI()
 				if object_pointers[i] == playerObject then
 					color = colors.green;
 				end
-				local objectVal = getObjectValue(object_pointers[i] or 0)
-				gui.text(gui_x, gui_y + height * row, i..": "..toHexString(object_pointers[i] or 0, 6).." ("..getObjectNameFromValue(objectVal)..")", color, 'bottomright');
-				--gui.text(gui_x, gui_y + height * row, i..": "..getActorName(object_pointers[i]).." "..toHexString(object_pointers[i] or 0, 6).." ("..toHexString(currentActorSize)..")".." ("..getActorCollisions(object_pointers[i]).." cols)", color, 'bottomright');
+				
+				if string.contains(grab_script_mode, "Model 1") then
+					local objectVal = getObjectM1Value(object_pointers[i] or 0)
+					gui.text(gui_x, gui_y + height * row, i..": "..toHexString(object_pointers[i] or 0, 6).." ("..getObjectM1NameFromValue(objectVal)..")", color, 'bottomright');
+				elseif string.contains(grab_script_mode, "Model 2") then
+					local objectVal = getObjectM2Value(object_pointers[i] or 0)
+					gui.text(gui_x, gui_y + height * row, i..": "..toHexString(object_pointers[i] or 0, 6).." ("..getObjectM2NameFromValue(objectVal)..")", color, 'bottomright');
+				end
 				row = row + 1;
 			end
 		end
@@ -848,10 +986,14 @@ function zipToSelectedObject()
 	local selectedObject = object_pointers[object_index];
 	if isRDRAM(selectedObject) then
 		-- Get selected object X,Y,Z position
-		if grab_script_mode == "List" or grab_script_mode == "Examine" then
+		if string.contains(grab_script_mode, "Model 1") then
 			desiredX = mainmemory.readfloat(selectedObject + object_properties.object_x, true);
 			desiredY = mainmemory.readfloat(selectedObject + object_properties.object_y, true);
 			desiredZ = mainmemory.readfloat(selectedObject + object_properties.object_z, true);
+		elseif string.contains(grab_script_mode, "Model 2") then
+			desiredX = mainmemory.readfloat(selectedObject + object_m2_properties.object_x, true) / 8;
+			desiredY = mainmemory.readfloat(selectedObject + object_m2_properties.object_y, true) / 8;
+			desiredZ = mainmemory.readfloat(selectedObject + object_m2_properties.object_z, true) / 8;
 		end
 	end
 	-- Update player position
@@ -950,8 +1092,6 @@ function Game.eachFrame()
 	drawGrabScriptUI()
 	Game.applyConsoleSettings()
 end
-
-event.onframeend(Game.eachFrame, "Each Frame function")
 
 Game.OSDPosition = {2, 70};
 Game.OSD = {
