@@ -6588,7 +6588,7 @@ end
 -- Kremling Kosh Bot --
 -----------------------
 
-local koshBot = {
+koshBot = {
 	joypad_angles = {
 		[0] = {["X Axis"] = 0,    ["Y Axis"] = 0},
 		[1] = {["X Axis"] = -128, ["Y Axis"] = 0},
@@ -6604,6 +6604,8 @@ local koshBot = {
 		0, 0, 0, 0, 0, 0, 0, 0
 	},
 	previousFrameMelonCount = 0,
+	quickfire_reload_enabled = 0;
+	previousMelonFireFrame = 0;
 };
 
 koshBot.getKoshController = function()
@@ -6615,16 +6617,13 @@ koshBot.getKoshController = function()
 	end
 end
 
-koshBot.countMelonProjectiles = function()
-	local melonCount = 0;
-	for object_no = 0, getObjectModel1Count() do
-		local pointer = dereferencePointer(Game.Memory.pointer_list + (object_no * 4));
-		if isRDRAM(pointer) and getActorName(pointer) == "Melon (Projectile)" then
-			melonCount = melonCount + 1;
-		end
-	end
-	return melonCount;
+koshBot.resetSlots = function()
+	koshBot.shots_fired = {
+		0, 0, 0, 0, 0, 0, 0, 0
+	};
 end
+
+event.onloadstate(koshBot.resetSlots);
 
 koshBot.getSlotPointer = function(koshController, slotIndex)
 	return dereferencePointer(koshController + obj_model1.kosh_kontroller.slot_pointer_base + (slotIndex - 1) * 4);
@@ -6649,12 +6648,19 @@ koshBot.getDesiredSlot = function()
 		-- Check for kremlings
 		local desiredSlot = 0;
 		for slotIndex = 1, 8 do
-			local slotPointer = koshBot.getSlotPointer(koshController, slotIndex);
-			if isRDRAM(slotPointer) and slotPointer ~= koshBot.shots_fired[slotIndex] then
-				desiredSlot = slotIndex;
+			slotPointer = koshBot.getSlotPointer(koshController, slotIndex);
+			if slotPointer ~= nil then
+				if slotPointer > 0 and koshBot.shots_fired[slotIndex] == 0 then
+					koshBot.shots_fired[slotIndex] = 1;
+				end
 			end
-			if slotPointer == 0 then
-				koshBot.shots_fired[slotIndex] = 0;
+			if slotPointer == 0 or slotPointer == nil then
+				if koshBot.shots_fired[slotIndex] == 2 then
+					koshBot.shots_fired[slotIndex] = 0;
+				end
+			end
+			if koshBot.shots_fired[slotIndex] == 1 then
+				desiredSlot = slotIndex;
 			end
 		end
 
@@ -6669,19 +6675,39 @@ koshBot.Loop = function()
 	if koshController ~= nil then
 		local currentSlot = koshBot.getCurrentSlot();
 		local desiredSlot = koshBot.getDesiredSlot();
-		if type(desiredSlot) ~= "nil" then
-			joypad.setanalog(koshBot.joypad_angles[desiredSlot], 1);
-			--print("Moving to slot "..desiredSlot);
-			if currentSlot == desiredSlot then
-				joypad.set({B = emu.framecount() % 5 == 0}, 1);
-				--print("Firing!");
-				if desiredSlot > 0 and koshBot.countMelonProjectiles() > koshBot.previousFrameMelonCount then
-					koshBot.shots_fired[desiredSlot] = koshBot.getSlotPointer(koshController, desiredSlot);
-				end
-				koshBot.previousFrameMelonCount = koshBot.countMelonProjectiles();
-			end
-		else
+		local currentFrame = mainmemory.read_u32_be(Game.Memory.frames_lag);
+		
+		if currentFrame > koshBot.previousMelonFireFrame and koshBot.quickfire_reload_enabled == 2 then
+			koshBot.quickfire_reload_enabled = 1;
+		end
+		
+		if koshBot.quickfire_reload_enabled == 3 then
 			joypad.setanalog({["X Axis"] = false, ["Y Axis"] = false}, 1);
+			joypad.set({["A"] = true}, 1);
+			koshBot.quickfire_reload_enabled = 0;
+		elseif koshBot.quickfire_reload_enabled == 1 then
+			joypad.setanalog({["X Axis"] = false, ["Y Axis"] = false}, 1);
+			joypad.set({["A"] = true}, 1);
+			koshBot.quickfire_reload_enabled = 3;
+		elseif koshBot.quickfire_reload_enabled == 0 then
+			if desiredSlot ~= nil and desiredSlot > 0 then
+				joypad.setanalog(koshBot.joypad_angles[desiredSlot], 1);
+				--print("Moving to slot "..desiredSlot);
+				joypad.set({["B"] = true}, 1);
+				--print("Firing!");
+			else
+				joypad.setanalog({["X Axis"] = false, ["Y Axis"] = false}, 1);
+			end
+		end
+		
+		joypadInputs = joypad.get();
+		if joypadInputs["P1 X Axis"] ~= 0 or joypadInputs["P1 Y Axis"] ~= 0 then
+			joypad.set({["B"] = true}, 1);
+			koshBot.quickfire_reload_enabled = 2;
+			koshBot.previousMelonFireFrame = mainmemory.read_u32_be(Game.Memory.frames_lag);
+			if desiredSlot ~= nil and desiredSlot > 0 then
+				koshBot.shots_fired[desiredSlot] = 2;
+			end
 		end
 	end
 end
