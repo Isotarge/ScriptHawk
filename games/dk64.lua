@@ -6604,14 +6604,14 @@ koshBot = {
 		0, 0, 0, 0, 0, 0, 0, 0
 	},
 	previousFrameMelonCount = 0,
-	quickfire_reload_enabled = 0;
-	previousMelonFireFrame = 0;
+	quickfire_reload_enabled = 0,
+	previousMelonFireFrame = 0,
 };
 
 koshBot.getKoshController = function()
 	for object_no = 0, getObjectModel1Count() do
 		local pointer = dereferencePointer(Game.Memory.pointer_list + (object_no * 4));
-		if isRDRAM(pointer) and getActorName(pointer) == "Kremling Kosh Controller" then
+		if getActorName(pointer) == "Kremling Kosh Controller" then
 			return pointer;
 		end
 	end
@@ -6629,58 +6629,52 @@ koshBot.getSlotPointer = function(koshController, slotIndex)
 	return dereferencePointer(koshController + obj_model1.kosh_kontroller.slot_pointer_base + (slotIndex - 1) * 4);
 end
 
-koshBot.getCurrentSlot = function()
-	local koshController = koshBot.getKoshController();
-	if type(koshController) ~= "nil" then
-		return mainmemory.readbyte(koshController + obj_model1.kosh_kontroller.slot_location);
-	end
+koshBot.getCurrentSlot = function(koshController)
+	return mainmemory.readbyte(koshController + obj_model1.kosh_kontroller.slot_location);
 end
 
-koshBot.getDesiredSlot = function()
-	local koshController = koshBot.getKoshController();
-	if type(koshController) ~= "nil" then
-		local currentSlot = mainmemory.readbyte(koshController + obj_model1.kosh_kontroller.slot_location);
-		local melonsRemaining = mainmemory.readbyte(koshController + obj_model1.kosh_kontroller.melons_remaining);
-		if melonsRemaining == 0 then
-			return 0;
-		end
+koshBot.getDesiredSlot = function(koshController)
+	local currentSlot = mainmemory.readbyte(koshController + obj_model1.kosh_kontroller.slot_location);
+	local melonsRemaining = mainmemory.readbyte(koshController + obj_model1.kosh_kontroller.melons_remaining);
+	if melonsRemaining == 0 then
+		return 0;
+	end
 
-		-- Check for kremlings
-		local desiredSlot = 0;
-		for slotIndex = 1, 8 do
-			slotPointer = koshBot.getSlotPointer(koshController, slotIndex);
-			if slotPointer ~= nil then
-				if slotPointer > 0 and koshBot.shots_fired[slotIndex] == 0 then
-					koshBot.shots_fired[slotIndex] = 1;
-				end
-			end
-			if slotPointer == 0 or slotPointer == nil then
-				if koshBot.shots_fired[slotIndex] == 2 then
-					koshBot.shots_fired[slotIndex] = 0;
-				end
-			end
-			if koshBot.shots_fired[slotIndex] == 1 then
-				desiredSlot = slotIndex;
+	-- Check for kremlings
+	local desiredSlot = 0;
+	for slotIndex = 1, 8 do
+		slotPointer = koshBot.getSlotPointer(koshController, slotIndex);
+		if slotPointer ~= nil then
+			if slotPointer > 0 and koshBot.shots_fired[slotIndex] == 0 then
+				koshBot.shots_fired[slotIndex] = 1;
 			end
 		end
+		if slotPointer == 0 or slotPointer == nil then
+			if koshBot.shots_fired[slotIndex] == 2 then
+				koshBot.shots_fired[slotIndex] = 0;
+			end
+		end
+		if koshBot.shots_fired[slotIndex] == 1 then
+			desiredSlot = slotIndex;
+		end
+	end
 
-		if desiredSlot > 0 then
-			return desiredSlot;
-		end
+	if desiredSlot > 0 then
+		return desiredSlot;
 	end
 end
 
 koshBot.Loop = function()
 	local koshController = koshBot.getKoshController();
 	if koshController ~= nil then
-		local currentSlot = koshBot.getCurrentSlot();
-		local desiredSlot = koshBot.getDesiredSlot();
+		local currentSlot = koshBot.getCurrentSlot(koshController);
+		local desiredSlot = koshBot.getDesiredSlot(koshController);
 		local currentFrame = mainmemory.read_u32_be(Game.Memory.frames_lag);
-		
+
 		if currentFrame > koshBot.previousMelonFireFrame and koshBot.quickfire_reload_enabled == 2 then
 			koshBot.quickfire_reload_enabled = 1;
 		end
-		
+
 		if koshBot.quickfire_reload_enabled == 3 then
 			joypad.setanalog({["X Axis"] = false, ["Y Axis"] = false}, 1);
 			joypad.set({["A"] = true}, 1);
@@ -6699,7 +6693,7 @@ koshBot.Loop = function()
 				joypad.setanalog({["X Axis"] = false, ["Y Axis"] = false}, 1);
 			end
 		end
-		
+
 		joypadInputs = joypad.get();
 		if joypadInputs["P1 X Axis"] ~= 0 or joypadInputs["P1 Y Axis"] ~= 0 then
 			joypad.set({["B"] = true}, 1);
@@ -8209,7 +8203,7 @@ function Game.eachFrame()
 			fixLag();
 		end
 
-		if koshbot_enabled == true then
+		if koshbot_enabled then
 			koshBot.Loop(); -- TODO: This probably stops the virtual pad from working
 		end
 
