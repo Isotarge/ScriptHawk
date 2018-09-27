@@ -7584,10 +7584,10 @@ function Game.drawUI()
 
 	if ScriptHawk.UI.ischecked("Heap Visualizer") then
 		Game.drawHeap();
-		gui.DrawNew("emu", false);
+		gui.DrawNew("emu");
 	else
 		--gui.DrawNew("native"); -- Clear off any old heap visualization stuff from the screen
-		--gui.DrawNew("emu", false);
+		--gui.DrawNew("emu");
 	end
 
 	-- Mad Jack
