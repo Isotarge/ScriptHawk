@@ -117,6 +117,7 @@ local Game = {
 		pointer_list = {0x7FBFF0, 0x7FBF10, 0x7FC460, 0x7B5E58},
 		actor_count = {0x7FC3F0, 0x7FC310, 0x7FC860, 0x7B6258},
 		heap_pointer = {0x7F0990, 0x7F08B0, 0x7F0E00, 0x7A12C0},
+		heap_end = {0x561FA0, 0x55AFA0, 0x55F7A0, 0x4D7DB0},
 		texture_list_pointer = {0x7F09DC, 0x7F08FC, 0x7F0E4C, 0x7A130C},
 		model2_dl_rom_map_object_pointer = {0x7F9538, 0x7F9458, 0x7F99A8, 0x7B49F4},
 		texture_rom_map_object_pointer = {0x7F9544, 0x7F9464, 0x7F99B4, 0x7B4A00},
@@ -413,6 +414,7 @@ local Game = {
 	speedy_index = 8,
 	rot_speed = 10,
 	max_rot_units = 4096,
+	form_height = 11,
 };
 
 function Game.getCurrentMode()
@@ -7106,10 +7108,10 @@ end
 function Game.initUI()
 	-- Flag stuff
 	if version < 4 then
-		ScriptHawk.UI.form_controls["Flag Dropdown"] = forms.dropdown(ScriptHawk.UI.options_form, flag_names, ScriptHawk.UI.col(0) + ScriptHawk.UI.dropdown_offset, ScriptHawk.UI.row(7) + ScriptHawk.UI.dropdown_offset, ScriptHawk.UI.col(9) + 8, ScriptHawk.UI.button_height);
-		ScriptHawk.UI.form_controls["Set Flag Button"] = forms.button(ScriptHawk.UI.options_form, "Set", flagSetButtonHandler, ScriptHawk.UI.col(10), ScriptHawk.UI.row(7), 46, ScriptHawk.UI.button_height);
-		ScriptHawk.UI.form_controls["Check Flag Button"] = forms.button(ScriptHawk.UI.options_form, "Check", flagCheckButtonHandler, ScriptHawk.UI.col(12), ScriptHawk.UI.row(7), 46, ScriptHawk.UI.button_height);
-		ScriptHawk.UI.form_controls["Clear Flag Button"] = forms.button(ScriptHawk.UI.options_form, "Clear", flagClearButtonHandler, ScriptHawk.UI.col(14), ScriptHawk.UI.row(7), 46, ScriptHawk.UI.button_height);
+		ScriptHawk.UI.form_controls["Flag Dropdown"] = forms.dropdown(ScriptHawk.UI.options_form, flag_names, ScriptHawk.UI.col(0) + ScriptHawk.UI.dropdown_offset, ScriptHawk.UI.row(8) + ScriptHawk.UI.dropdown_offset, ScriptHawk.UI.col(9) + 8, ScriptHawk.UI.button_height);
+		ScriptHawk.UI.form_controls["Set Flag Button"] = forms.button(ScriptHawk.UI.options_form, "Set", flagSetButtonHandler, ScriptHawk.UI.col(10), ScriptHawk.UI.row(8), 46, ScriptHawk.UI.button_height);
+		ScriptHawk.UI.form_controls["Check Flag Button"] = forms.button(ScriptHawk.UI.options_form, "Check", flagCheckButtonHandler, ScriptHawk.UI.col(12), ScriptHawk.UI.row(8), 46, ScriptHawk.UI.button_height);
+		ScriptHawk.UI.form_controls["Clear Flag Button"] = forms.button(ScriptHawk.UI.options_form, "Clear", flagClearButtonHandler, ScriptHawk.UI.col(14), ScriptHawk.UI.row(8), 46, ScriptHawk.UI.button_height);
 		ScriptHawk.UI.checkbox(10, 6, "realtime_flags", "Realtime Flags", true);
 	end
 
@@ -7147,6 +7149,11 @@ function Game.initUI()
 	--ScriptHawk.UI.checkbox(10, 5, "Toggle Neverslip Checkbox", "Never Slip");
 	--ScriptHawk.UI.checkbox(5, 5, "Toggle Paper Mode Checkbox", "Paper Mode");
 	ScriptHawk.UI.checkbox(5, 6, "Toggle OhWrongnana", "OhWrongnana");
+
+	-- Heap Visualizer
+	ScriptHawk.UI.checkbox(0, 7, "Heap Visualizer", "Heap Visualizer");
+	ScriptHawk.UI.checkbox(5, 7, "Heap Visualizer Free Only", "Free Only");
+	ScriptHawk.UI.checkbox(10, 7, "Heap Visualizer Dump Blocks", "Dump Blocks");
 
 	-- Output flag statistics
 	flagStats();
@@ -7574,6 +7581,14 @@ function Game.drawUI()
 	forms.settext(ScriptHawk.UI.form_controls["Toggle Visibility Button"], current_invisify);
 	--forms.settext(ScriptHawk.UI.form_controls["Moon Mode Button"], moon_mode);
 	drawGrabScriptUI();
+
+	if ScriptHawk.UI.ischecked("Heap Visualizer") then
+		Game.drawHeap();
+		gui.DrawNew("emu", false);
+	else
+		--gui.DrawNew("native"); -- Clear off any old heap visualization stuff from the screen
+		--gui.DrawNew("emu", false);
+	end
 
 	-- Mad Jack
 	Game.drawMJMinimap();
@@ -8485,6 +8500,9 @@ function addHeapMetadata(address, key, value)
 end
 
 function getHeapBlocksByFunction(comparator)
+	if comparator == nil then
+		comparator = function() return true; end;
+	end
 	buildIdentifyMemoryCache();
 	for i = identifyMemoryCache.heapBase, identifyMemoryCache.heapEnd, 0x10 do
 		if (identifyMemoryCache.heapCache[i] ~= nil) then
@@ -9643,6 +9661,70 @@ function calculateKnownMemory(dumpBitmap)
 		output_file:close();
 	end
 	print(formatOutputString("Bytes Known: ", knownBytes, RDRAMSize));
+end
+
+-- DK64 Heap Visualizer
+-- Originally written by MrCheeze
+-- Cleanups, Fixes, & Optimizations by Isotarge
+UPDATE_EVERY_N_FRAMES = 1;
+
+function Game.drawHeap()
+	if emu.framecount() % UPDATE_EVERY_N_FRAMES == 0 or client.ispaused() then
+		gui.DrawNew("native"); -- Coordinates are now based on screen pixels rather than game pixels, and stuff is not erased automatically each frame.
+
+		local dynamic_memory_start = dereferencePointer(Game.Memory.heap_pointer);
+		local dynamic_memory_end = Game.Memory.heap_end;
+		local dynamic_memory_len = dynamic_memory_end - dynamic_memory_start;
+
+		local addr = dynamic_memory_end;
+		local screenwidth = client.screenwidth();
+
+		gui.drawBox(0, 0, screenwidth, 50, 0x40000000, colors.green);
+
+		local used_memory = 0;
+		local free_memory = 0;
+		local used_count = 0;
+		local free_count = 0;
+
+		local dump_block_list = ScriptHawk.UI.isChecked("Heap Visualizer Dump Blocks");
+		local free_only = ScriptHawk.UI.isChecked("Heap Visualizer Free Only");
+
+		while addr >= dynamic_memory_start and addr <= dynamic_memory_end do
+			next_addr = mainmemory.read_u32_be(addr);
+			blocksize = mainmemory.read_u32_be(addr + 0x04) + 0x10; -- Extra 0x10 bytes for the header
+			block_end = addr + blocksize;
+			next_free = mainmemory.read_u32_be(addr + 0x08);
+			prev_free = mainmemory.read_u32_be(addr + 0x0C);
+			in_use = next_free == 0 and prev_free == 0;
+
+			if in_use then
+				used_memory = used_memory + blocksize;
+				used_count = used_count + 1;
+				bgcolor = colors.green;
+			else
+				free_memory = free_memory + blocksize;
+				free_count = free_count + 1;
+				bgcolor = colors.red;
+			end
+
+			if (not free_only) or (free_only and not in_use) then
+				gui.drawBox((addr - dynamic_memory_start) * screenwidth / dynamic_memory_len - 1, 0, (block_end - dynamic_memory_start) * screenwidth / dynamic_memory_len + 1, 50, 0x40000000, bgcolor);
+			end
+
+			if dump_block_list then
+				dprint(string.format("addr:%X next_addr:%X  prev_free:%X next_free:%X  used:%s blocksize:%X", addr, next_addr, prev_free, next_free, tostring(in_use), blocksize - 0x10));
+			end
+
+			addr = next_addr - 0x80000000;
+		end
+
+		gui.drawText(24, 50, string.format("Used Memory: %X (%d blocks)", used_memory, used_count));
+		gui.drawText(24, 65, string.format("Free Memory: %X (%d blocks)", free_memory, free_count));
+
+		if dump_block_list then
+			print_deferred();
+		end
+	end
 end
 
 return Game;
