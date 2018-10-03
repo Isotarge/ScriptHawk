@@ -408,7 +408,6 @@ function Game.drawUI()
 	end
 end
 
-Game.OSDPosition = {2, 70}; -- Optional: OSD position in pixels from the top left corner of the screen, defaults to 2, 70 if not set by a game module
 Game.OSD = {
 	{"Movement", Game.getCurrentMovementState, Game.colorCurrentMovementState},
 	{"Drill", Game.getDrillValue},

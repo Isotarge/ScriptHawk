@@ -75,7 +75,6 @@ function Game.drawUI()
 	end
 end
 
-Game.OSDPosition = {2, 70};
 Game.OSD = {
 	{"X"},
 	{"Y"},

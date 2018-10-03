@@ -395,6 +395,9 @@ local supportedGames = {
 	["6D96743D46F8C0CD0EDB0EC5600B003C89B93755"] = {moduleName="games.dkr", friendlyName="Diddy Kong Racing (USA) (En,Fr) (Rev A)"},
 	["0CB115D8716DBBC2922FDA38E533B9FE63BB9670"] = {moduleName="games.dkr", friendlyName="Diddy Kong Racing (USA) (En,Fr)"},
 
+	-- Donald Land
+	["C5BBA353871E438C387FD13891580A2A139694AD"] = {moduleName="games.donald_land", friendlyName="Donald Land"},
+
 	-- Donkey Kong 64
 	["F96AF883845308106600D84E0618C1A066DC6676"] = {moduleName="games.dk64", friendlyName="Donkey Kong 64 (Europe) (En,Fr,De,Es)"},
 	["F0AD2B2BBF04D574ED7AFBB1BB6A4F0511DCD87D"] = {moduleName="games.dk64", friendlyName="Donkey Kong 64 (Japan)"},
@@ -972,6 +975,32 @@ function ScriptHawk.UI.col(col_num)
 	return ScriptHawk.UI.row(col_num);
 end
 
+function ScriptHawk.UI.handleColInput(col)
+	if col == nil then
+		col = 0;
+	end
+	if type(col) == "number" then
+		col = ScriptHawk.UI.col(col);
+	end
+	if type(col) == "table" then
+		col = ScriptHawk.UI.col(col[1]) + col[2];
+	end
+	return col;
+end
+
+function ScriptHawk.UI.handleRowInput(row)
+	if row == nil then
+		row = 0;
+	end
+	if type(row) == "number" then
+		row = ScriptHawk.UI.row(row);
+	end
+	if type(row) == "table" then
+		row = ScriptHawk.UI.row(row[1]) + row[2];
+	end
+	return row;
+end
+
 if type(Game.form_width) == "number" then
 	ScriptHawk.UI.form_height = Game.form_width;
 end
@@ -993,6 +1022,20 @@ function ScriptHawk.UI.ischecked(tag)
 	return ScriptHawk.UI.form_controls[tag] ~= nil and forms.ischecked(ScriptHawk.UI.form_controls[tag]);
 end
 ScriptHawk.UI.isChecked = ScriptHawk.UI.ischecked;
+
+function ScriptHawk.UI.button(col, row, width, height, tag, caption, callback)
+	if height == nil then
+		height = ScriptHawk.UI.button_height;
+	else
+		height = ScriptHawk.UI.handleRowInput(height);
+	end
+
+	width = ScriptHawk.UI.handleColInput(width);
+	col = ScriptHawk.UI.handleColInput(col);
+	row = ScriptHawk.UI.handleRowInput(row);
+
+	ScriptHawk.UI.form_controls[tag] = forms.button(ScriptHawk.UI.options_form, caption, callback, col, row, width, height);
+end
 
 -- Handle, Type, Caption, Callback, X position, Y position, Width, Height
 if not TASSafe then
@@ -1098,7 +1141,7 @@ if type(Game.OSD) ~= "table" then
 end
 
 if type(Game.OSDPosition) ~= "table" then
-	Game.OSDPosition = {2, 70};
+	Game.OSDPosition = {2, 76};
 end
 
 if type(Game.OSDRowHeight) ~= "number" then

@@ -5627,7 +5627,6 @@ function Game.eachFrame()
 	end
 end
 
-Game.OSDPosition = {2, 70};
 Game.OSD = {
 	{"Map", Game.getMapOSD},
 	{"DCW", Game.getDCWLocation},

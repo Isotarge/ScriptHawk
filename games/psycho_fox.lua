@@ -232,7 +232,6 @@ function Game.getHitboxMouseOverText(hitbox)
 	end
 end
 
-Game.OSDPosition = {2, 70};
 Game.OSD = {
 	{"Round", Game.getRound},
 	{"Lives", Game.getLives},

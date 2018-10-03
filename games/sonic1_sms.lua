@@ -158,7 +158,6 @@ function Game.initUI()
 	ScriptHawk.UI.checkbox(0, 6, "CamHack Checkbox", "CamHack (Beta)");
 end
 
-Game.OSDPosition = {2, 70};
 Game.OSD = {
 	{"Level", Game.getLevel},
 	{"IGT", Game.getIGT},

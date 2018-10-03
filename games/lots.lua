@@ -824,7 +824,6 @@ function Game.initUI()
 	ScriptHawk.UI.form_controls["Clear Flag Button"] = forms.button(ScriptHawk.UI.options_form, "Clear", flagClearButtonHandler, ScriptHawk.UI.col(14), ScriptHawk.UI.row(7), 46, ScriptHawk.UI.button_height);
 end
 
-Game.OSDPosition = {2, 70};
 Game.OSD = {
 	{"Map", Game.getMap},
 	{"Continue", Game.getContinue},

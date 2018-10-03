@@ -423,7 +423,6 @@ function Game.applyInfinites()
 	end
 end
 
-Game.OSDPosition = {2, 70};
 Game.OSD = {
 	{"Animal", Game.getCurrentAnimalType},
 	{"Separator"},

@@ -114,7 +114,6 @@ function Game.initUI()
 	ScriptHawk.UI.checkbox(0, 6, "Fast Mode Checkbox", "Fast Mode");
 end
 
-Game.OSDPosition = {2, 70};
 Game.OSD = {
 	{"Round", Game.getRound},
 	{"Lives", Game.getLives},

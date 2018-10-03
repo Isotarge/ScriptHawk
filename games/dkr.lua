@@ -1135,7 +1135,6 @@ function Game.drawUI()
 	drawAnalysisToolsOSD();
 end
 
-Game.OSDPosition = {2, 70}
 Game.OSD = {
 	{"X"},
 	{"Y"},

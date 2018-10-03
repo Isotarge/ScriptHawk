@@ -268,7 +268,6 @@ function Game.getHitboxListText(hitbox)
 	return hitbox.x..", "..hitbox.y.." - "..hitbox.objectType.." "..hitbox.currentHP.."HP "..toHexString(hitbox.objectBase);
 end
 
-Game.OSDPosition = {2, 70};
 Game.OSD = {
 	{"Map", Game.getMap},
 	{"Map X", Game.getMapX},

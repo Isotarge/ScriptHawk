@@ -61,7 +61,6 @@ function Game.getDoorTimer()
 	return mainmemory.readbyte(Game.Memory.door_timer);
 end
 
-Game.OSDPosition = {2, 70};
 Game.OSD = {
 	{"Screen Y", Game.getScreenY},
 	{"X"},

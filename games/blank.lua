@@ -192,7 +192,7 @@ function Game.realTime() -- Optional: This function will be executed as fast as 
 	-- TODO
 end
 
-Game.OSDPosition = {2, 70}; -- Optional: OSD position in pixels from the top left corner of the screen, defaults to 2, 70 if not set by a game module
+Game.OSDPosition = {2, 76}; -- Optional: OSD position in pixels from the top left corner of the screen, defaults to 2, 76 if not set by a game module
 Game.OSD = {
 	{"X", Game.getXPosition},
 	{"Y", Game.getYPosition, Game.colorYPosition}, -- A third parameter can be added to these table entries, a function that returns a 32 bit int AARRGGBB color value for that OSD entry

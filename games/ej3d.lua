@@ -1082,18 +1082,17 @@ function Game.eachFrame()
 	if ScriptHawk.UI.ischecked("OoB Timer Checkbox") then
 		Game.FreezeOoBTimer()
 	end
-	
+
 	if ScriptHawk.UI.ischecked("Free Roam Mode") then
 		Game.freeroamEnabled()
 	else
 		Game.freeroamDisabled()
 	end
-	
+
 	drawGrabScriptUI()
 	Game.applyConsoleSettings()
 end
 
-Game.OSDPosition = {2, 70};
 Game.OSD = {
 	{"Map", Game.getMapOSD},
 	{"Exit", Game.getExitOSD},

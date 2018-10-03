@@ -8439,7 +8439,7 @@ Game.subgameOSD = {
 	--{"Separator"},
 };
 
-Game.OSDPosition = {32, 70}; -- TODO: Adjust this for subgames & different regions
+Game.OSDPosition = {32, 76}; -- TODO: Adjust this for subgames & different regions
 Game.OSD = Game.standardOSD;
 
 --print("Local Variables: "..countLocals().."/200");
