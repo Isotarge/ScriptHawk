@@ -1321,6 +1321,7 @@ obj_model1 = {
 		slope_timer = 0x243,
 		shockwave_charge_timer = 0x248, -- s16 be
 		shockwave_recovery_timer = 0x24A, -- byte
+		animation = 0x29C, -- 4-byte
 		grabbed_vine_pointer = 0x2B0, -- u32 be
 		grab_pointer = 0x32C, -- u32 be
 		scale = {
@@ -1328,6 +1329,44 @@ obj_model1 = {
 		},
 		fairy_active = 0x36C, -- TODO: Find a pointer for the actor the camera is focusing on
 		effect_byte = 0x372, -- Bitfield, TODO: Document bits
+	},
+	animations = {
+		[0x00] = "Idle (DK, Normal)",
+		[0x01] = "Stopping (DK)",
+		[0x02] = "Creeping (DK)",
+		[0x03] = "Running (DK)",
+		[0x04] = "Idle (DK, Looking Around)",
+		[0x09] = "Skidding (DK)", -- Also applies to Skid Jumps
+		[0x17] = "Jumping (DK)",
+		[0x18] = "Long Jump (DK)",
+		[0x19] = "Simian Slam (DK)",
+		[0x1A] = "Charging Simian Slam (DK)",
+		[0x1F] = "Super Simian Slam (DK)",
+		[0x20] = "Super Duper Simian Slam (DK)",
+		[0x28] = "Crouch Transition (DK)",
+		[0x2A] = "Crouching (DK)",
+		[0x2B] = "Turn Crouching (DK)", -- Z & Direction
+		[0x3E] = "Ground Attack (DK, Slap Left)",
+		[0x40] = "Ground Attack (DK, Slap Right)",
+		[0x42] = "Ground Attack (DK, Slap Ground)",
+		[0x44] = "Moving Ground Attack (DK)",
+		[0x46] = "Aerial Attack (DK)",
+		[0x47] = "Rolling (DK)",
+		[0x49] = "Shockwave (DK)",
+		[0x4B] = "Shooting (DK)",
+		[0x4D] = "Holding Gun (DK)",
+		[0x50] = "Jumping (DK, Gun)",
+		[0x51] = "Acquiring/Putting Away Gun (DK)",
+		[0x52] = "Aiming Gun Transition (DK)",
+		[0x54] = "Instrument (DK)",
+		[0x55] = "Instrument Start (DK)",
+		[0x56] = "Instrument End (DK)",
+		[0x70] = "Idle (Diddy)",
+		[0x74] = "Running (Diddy)",
+		[0x93] = "Tag Barrel",
+		[0xBB] = "Chimpy Charge",
+		[0xBC] = "Knockback (Chimpy Charge)",
+		[0xBD] = "Slowdown (Chimpy Charge",
 	},
 	camera = {
 		-- TODO: Focused vehicle pointers
@@ -4839,6 +4878,18 @@ function Game.setMovementState(value)
 	end
 end
 Game.setControlState = Game.setMovementState;
+
+function Game.getAnimation()
+	local playerObject = Game.getPlayerObject();
+	if isRDRAM(playerObject) then
+		local animationUsed = mainmemory.read_u32_be(playerObject + obj_model1.player.animation);
+		if obj_model1.animations[animationUsed] ~= nil then
+			return obj_model1.animations[animationUsed];
+		end
+		return toHexString(animationUsed);
+	end
+	return 'Unknown';
+end
 
 function Game.getNoclipByte()
 	local playerObject = Game.getPlayerObject();
@@ -8381,6 +8432,7 @@ Game.standardOSD = {
 	--{"Moving", Game.getMovingRotation}, -- TODO: Game.getMovingRotation
 	{"Rot. Z", Game.getZRotation},
 	{"Movement", Game.getMovementState},
+	--{"Animation", Game.getAnimation},
 	--{"Camera", Game.getCameraState},
 	{"Noclip", Game.getNoclipByte, Game.colorNoclipByte},
 	--{"Separator"},
