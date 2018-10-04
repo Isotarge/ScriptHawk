@@ -168,6 +168,26 @@ function Game.setHitboxPosition(hitbox, x, y)
 	mainmemory.write_u8(hitbox.yPosAddress, y);
 end
 
+function Game.colorDX()
+	local dX = math.abs(ScriptHawk.getDX());
+	local xVelocity = math.abs(Game.getXVelocity());
+	if dX == 0 then
+		return colors.red;
+	elseif dX > xVelocity then
+		return colors.green;
+	end
+end
+
+function Game.colorDY()
+	local dY = math.abs(ScriptHawk.getDY());
+	local yVelocity = math.abs(Game.getYVelocity());
+	if dY == 0 then
+		return colors.red;
+	elseif dY > yVelocity then
+		return colors.green;
+	end
+end
+
 Game.OSD = {
 	{"IGT", Game.getIGT},
 	{"Separator"},
@@ -177,8 +197,8 @@ Game.OSD = {
 	{"X"},
 	{"Y"},
 	{"Separator"},
-	{"dX"},
-	{"dY"},
+	{"dX", nil, Game.colorDX},
+	{"dY", nil, Game.colorDY},
 	{"Separator"},
 	{"X Velocity", Game.getXVelocity},
 	{"Y Velocity", Game.getYVelocity},
