@@ -18,8 +18,8 @@ local Game = {
 		money = 0x61E,
 		hp = 0x62C,
 		lives = 0x62D,
-        bomb_timer1 = 0x4D7,
-        bomb_timer2 = 0x4D8,
+		bomb_timer1 = 0x4D7,
+		bomb_timer2 = 0x4D8,
 	},
 };
 
@@ -94,11 +94,11 @@ function Game.getYVelocity()
 end
 
 function Game.getBombTimer1()
-    return Game.read_s88(Game.Memory.bomb_timer1);
+	return mainmemory.readbyte(Game.Memory.bomb_timer1);
 end
 
 function Game.getBombTimer2()
-    return Game.read_s88(Game.Memory.bomb_timer2);
+	return mainmemory.readbyte(Game.Memory.bomb_timer2);
 end
 
 --[[
@@ -212,9 +212,9 @@ Game.OSD = {
 	{"Separator"},
 	{"X Velocity", Game.getXVelocity},
 	{"Y Velocity", Game.getYVelocity},
-    {"Separator"},
-    {"Bomb Timer 1", Game.getBombTimer1},
-    {"Bomb Timer 2", Game.getBombTimer2},
+	{"Separator"},
+	{"Bomb Timer 1", Game.getBombTimer1},
+	{"Bomb Timer 2", Game.getBombTimer2},
 };
 
 return Game;
