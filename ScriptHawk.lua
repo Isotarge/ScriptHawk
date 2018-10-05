@@ -1358,15 +1358,15 @@ function ScriptHawk.UI.updateReadouts()
 					for osdType = 1, #userPreferences[gamePrefName] do
 						if currentPreferences[gamePrefName][osdType][1] == Game.OSD[i - osdSubtractor][3] then
 							if currentPreferences[gamePrefName][osdType][2] == nil then
-								if userPreferences[gamePrefName][osdType][2] == nil then
+								--if userPreferences[gamePrefName][osdType][2] == nil then
 									if defaultPreferences[gamePrefName][osdType][2] then
 										formerVariableVisible = true;
 										stop_point = true;
 									end
-								elseif userPreferences[gamePrefName][osdType][2] then
+								--elseif userPreferences[gamePrefName][osdType][2] then
 									formerVariableVisible = true;
 									stop_point = true;
-								end
+								--end
 							elseif currentPreferences[gamePrefName][osdType][2] then
 								formerVariableVisible = true;
 								stop_point = true;
