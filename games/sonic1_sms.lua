@@ -159,19 +159,19 @@ function Game.initUI()
 end
 
 Game.OSD = {
-	{"Level", Game.getLevel},
-	{"IGT", Game.getIGT},
-	{"Lives", Game.getLives},
-	{"Rings", hexifyOSD(Game.getRings, nil, "")},
-	{"Viewport X", Game.getViewportX},
-	{"Viewport Y", Game.getViewportY},
+	{"Level", Game.getLevel, "mapData"},
+	{"IGT", Game.getIGT, "igt"},
+	{"Lives", Game.getLives, "lives"},
+	{"Rings", hexifyOSD(Game.getRings, nil, ""), "rings"},
+	{"Viewport X", Game.getViewportX, "screenPosition"},
+	{"Viewport Y", Game.getViewportY, "screenPosition"},
 	{"Separator"},
-	{"X"},
-	{"Y"},
-	{"X Velocity", Game.getXVelocity},
-	{"Y Velocity", Game.getYVelocity},
-	{"dX"},
-	{"dY"},
+	{"X", nil, "position"},
+	{"Y", nil, "position"},
+	{"X Velocity", Game.getXVelocity, "speed"},
+	{"Y Velocity", Game.getYVelocity, "speed"},
+	{"dX", nil, "positionStats"},
+	{"dY", nil, "positionStats"},
 };
 
 return Game;

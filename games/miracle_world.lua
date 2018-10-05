@@ -271,13 +271,13 @@ function Game.applyInfinites()
 end
 
 Game.OSD = {
-	{"Level", Game.getMap},
-	{"X"},
-	{"Y"},
-	{"dX"},
-	{"dY"},
-	{"X Velocity", Game.getXVelocity},
-	{"Y Velocity", Game.getYVelocity},
+	{"Level", Game.getMap, "mapData"},
+	{"X", nil, "position"},
+	{"Y", nil, "position"},
+	{"dX", nil, "positionStats"},
+	{"dY", nil, "positionStats"},
+	{"X Velocity", Game.getXVelocity, "speed"},
+	{"Y Velocity", Game.getYVelocity, "speed"},
 };
 
 return Game;

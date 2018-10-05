@@ -191,22 +191,22 @@ end
 ------------
 
 Game.OSD = {
-	{"X"},
-	{"Y"},
-	{"Z"},
+	{"X", nil, "position"},
+	{"Y", nil, "position"},
+	{"Z", nil, "position"},
 	{"Separator"},
-	{"dY"},
-	{"dXZ"},
-	{"Velocity", Game.getVelocity};
-	{"Y Velocity", Game.getYVelocity},
+	{"dY", nil, "positionStats"},
+	{"dXZ", nil, "positionStats"},
+	{"Velocity", Game.getVelocity, "speed"};
+	{"Y Velocity", Game.getYVelocity, "speed"},
 	{"Separator"},
-	{"Max dY"},
-	{"Max dXZ"},
-	{"Odometer"},
+	{"Max dY", nil, "positionStatsMore"},
+	{"Max dXZ", nil, "positionStatsMore"},
+	{"Odometer", nil, "positionStatsMore"},
 	{"Separator"},
-	--{"Rot. X", Game.getXRotation},
-	{"Moving", Game.getYRotation},
-	--{"Rot. Z", Game.getZRotation},
+	--{"Rot. X", Game.getXRotation, "angleMore"},
+	{"Moving", Game.getYRotation, "angle"},
+	--{"Rot. Z", Game.getZRotation, "angleMore"},
 };
 
 return Game;

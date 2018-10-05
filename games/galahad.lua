@@ -332,11 +332,11 @@ function Game.drawUI()
 end
 
 Game.OSD = {
-	{"Screen X", Game.getScreenXPosition},
-	{"Screen Y", Game.getScreenYPosition},
-	{"X Velocity", Game.getXVelocity},
-	{"Y Velocity", Game.getYVelocity},
-	{"Charge", Game.getCharge},
+	{"Screen X", Game.getScreenXPosition, "screenPosition"},
+	{"Screen Y", Game.getScreenYPosition, "screenPosition"},
+	{"X Velocity", Game.getXVelocity, "speed"},
+	{"Y Velocity", Game.getYVelocity, "speed"},
+	{"Charge", Game.getCharge, "charge"},
 };
 
 return Game;

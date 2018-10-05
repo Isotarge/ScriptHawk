@@ -857,17 +857,17 @@ function Game.eachFrame()
 end
 
 Game.OSD = {
-	{"Autopilot", Game.getAutopilotState},
-	{"Car", Game.getCurrentCarOSD},
-	{"Map", Game.getMapOSD},
-	{"Cash", Game.getCash},
+	{"Autopilot", Game.getAutopilotState, "car"},
+	{"Car", Game.getCurrentCarOSD, "car"},
+	{"Map", Game.getMapOSD, "mapData"},
+	{"Cash", Game.getCash, "cash"},
 	{"Separator"},
-	{"X"},
-	{"Y"},
-	{"Z"},
+	{"X", nil, "position"},
+	{"Y", nil, "position"},
+	{"Z", nil, "position"},
 	{"Separator"},
-	{"dY"},
-	{"dXZ"},
+	{"dY", nil, "positionStats"},
+	{"dXZ", nil, "positionStats"},
 };
 
 return Game;

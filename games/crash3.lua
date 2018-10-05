@@ -266,30 +266,30 @@ function Game.eachFrame()
 end
 
 Game.OSD = {
-	{"Player", playerPointerOSD},
-	--{"Level", Game.getLevel}, -- TODO: Level
-	{"Box", Game.getBoxString},
-	{"Progress", Game.getLevelProgressOSD},
-	--{"Progress Vel", Game.getProgressVel}, -- TODO: Progress velocity
+	{"Player", playerPointerOSD, "player"},
+	--{"Level", Game.getLevel, "mapData"}, -- TODO: Level
+	{"Box", Game.getBoxString, "boxData"},
+	{"Progress", Game.getLevelProgressOSD, "progress"},
+	--{"Progress Vel", Game.getProgressVel, "progressMore"}, -- TODO: Progress velocity
 	{"Separator"},
-	{"X"},
-	{"Y"},
-	{"Z"},
+	{"X", nil, "position"},
+	{"Y", nil, "position"},
+	{"Z", nil, "position"},
 	{"Separator"},
-	{"dY"},
-	{"dXZ"},
-	--{"Max dY"},
-	--{"Max dXZ"},
-	--{"Odometer"},
+	{"dY", nil, "positionStats"},
+	{"dXZ", nil, "positionStats"},
+	{"Max dY", nil, "positionStatsMore"},
+	{"Max dXZ", nil, "positionStatsMore"},
+	{"Odometer", nil, "positionStatsMore"},
 	{"Separator"},
-	{"Facing", Game.getYRotation},
-	{"Moving Angle"},
+	{"Facing", Game.getYRotation, "angle"},
+	{"Moving Angle", nil, "angle"},
 	{"Separator"},
-	{"Y Velocity", Game.getYVelocity},
-	{"XZ Velocity", Game.getXZVelocity},
-	{"Velocity", Game.getVelocity},
+	{"Y Velocity", Game.getYVelocity, "speed"},
+	{"XZ Velocity", Game.getXZVelocity, "speed"},
+	{"Velocity", Game.getVelocity, "speed"},
 	{"Separator"},
-	{"Jumps", Game.getJumps},
+	{"Jumps", Game.getJumps, "jumps"},
 };
 
 return Game;

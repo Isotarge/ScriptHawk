@@ -433,20 +433,20 @@ function Game.drawUI()
 end
 
 Game.OSD = {
-	{"State", Game.getState},
-	{"Rang #", Game.getRangCount,Game.colorRangCount},
-	{"SuperJump", Game.getGlideFlag, Game.colorGlideFlag},
-	{"X"},
-	{"Y"},
+	{"State", Game.getState, "state"},
+	{"Rang #", Game.getRangCount, "boomerang",Game.colorRangCount},
+	{"SuperJump", Game.getGlideFlag, "superjump", Game.colorGlideFlag},
+	{"X", nil, "position"},
+	{"Y", nil, "position"},
 	{"Separator"},
-	{"X Vel", Game.getXVelocity},
-	{"Y Vel", Game.getYVelocity, Game.colorYVelocity},
-	{"dY"},
-	{"dXZ"},
+	{"X Vel", Game.getXVelocity, "speed"},
+	{"Y Vel", Game.getYVelocity, "speed", Game.colorYVelocity},
+	{"dY", nil, "positionStats"},
+	{"dXZ", nil, "positionStats"},
 	{"Separator"},
-	{"Max dY"},
-	{"Max dXZ"},
-	{"Odometer"},
+	{"Max dY", nil, "positionStatsMore"},
+	{"Max dXZ", nil, "positionStatsMore"},
+	{"Odometer", nil, "positionStatsMore"},
 	{"Separator"},
 };
 

@@ -110,18 +110,18 @@ function Game.eachFrame()
 end
 
 Game.OSD = {
-	{"X", tastudio_column=true, tastudio_column_width=40},
-	{"Y"},
-	{"dX", nil, Game.colorDX, tastudio_column=true, tastudio_column_width=40},
-	{"dY"},
+	{"X", nil, "position", tastudio_column=true, tastudio_column_width=40},
+	{"Y", nil, "position"},
+	{"dX", nil, "positionStats", Game.colorDX, tastudio_column=true, tastudio_column_width=40},
+	{"dY", nil, "positionStats"},
 	{"Separator"},
-	{"P Meter", Game.getPMeter, tastudio_column=true, tastudio_column_width=50},
-	{"Velocity (Gnd)", Game.getGroundVelocity, tastudio_column=true, tastudio_column_width=90},
-	{"Velocity (Air)", Game.getAerialVelocity, tastudio_column=true, tastudio_column_width=90},
-	{"Jump", Game.getJumpHeight, Game.colorJumpHeight, tastudio_column=true, tastudio_column_width=40},
+	{"P Meter", Game.getPMeter, "pmeter", tastudio_column=true, tastudio_column_width=50},
+	{"Velocity (Gnd)", Game.getGroundVelocity, "speed", tastudio_column=true, tastudio_column_width=90},
+	{"Velocity (Air)", Game.getAerialVelocity, "speed", tastudio_column=true, tastudio_column_width=90},
+	{"Jump", Game.getJumpHeight, "jumps", Game.colorJumpHeight, tastudio_column=true, tastudio_column_width=40},
 	{"Separator"},
-	{"Level", Game.getLevel},
-	{"IGT", Game.getLevelTime},
+	{"Level", Game.getLevel, "mapData"},
+	{"IGT", Game.getLevelTime, "igt"},
 };
 
 Game.OSDPosition = {114, 208};

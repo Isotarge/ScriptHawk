@@ -825,21 +825,21 @@ function Game.initUI()
 end
 
 Game.OSD = {
-	{"Map", Game.getMap},
-	{"Continue", Game.getContinue},
-	{"Continues Used", function() return Game.getContinuesUsed().."/10"; end},
-	{"Status", Game.getMapStatus},
-	{"Status", Game.getBuildingStatus},
+	{"Map", Game.getMap, "mapData"},
+	{"Continue", Game.getContinue, "continues"},
+	{"Continues Used", function() return Game.getContinuesUsed().."/10"; end, "continues"},
+	{"Status", Game.getMapStatus, "mapData"},
+	{"Status", Game.getBuildingStatus, "mapData"},
 	{"Separator"},
-	{"Health", Game.getHealthOSD, Game.colorRecoveryTimer},
-	{"Movement", Game.getMovementState, Game.greenIfStartingJumpChain},
-	{"X"},
-	{"Y"},
-	{"X Velocity", Game.getXVelocity, Game.colorXVelocity},
-	{"Y Velocity", Game.getYVelocity},
-	{"dX"},
-	{"dY"},
-	{"Grounded", Game.isGrounded, Game.greenIfStartingJumpChain},
+	{"Health", Game.getHealthOSD, "health", Game.colorRecoveryTimer},
+	{"Movement", Game.getMovementState, "movement", Game.greenIfStartingJumpChain},
+	{"X", nil, "position"},
+	{"Y", nil, "position"},
+	{"X Velocity", Game.getXVelocity, "speed", Game.colorXVelocity},
+	{"Y Velocity", Game.getYVelocity, "speed"},
+	{"dX", nil, "positionStats"},
+	{"dY", nil, "positionStats"},
+	{"Grounded", Game.isGrounded, "position", Game.greenIfStartingJumpChain},
 };
 
 return Game;

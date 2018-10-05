@@ -269,18 +269,18 @@ function Game.getHitboxListText(hitbox)
 end
 
 Game.OSD = {
-	{"Map", Game.getMap},
-	{"Map X", Game.getMapX},
-	{"Map Y", Game.getMapY},
+	{"Map", Game.getMap, "mapData"},
+	{"Map X", Game.getMapX, "mapData"},
+	{"Map Y", Game.getMapY, "mapData"},
 	{"Separator"},
-	{"Health", function() return Game.getHealth().."/"..Game.getMaxHealth(); end},
-	{"HP Timer", Game.getHPTimer},
-	{"X"},
-	{"Y"},
-	{"X Velocity", Game.getXVelocity},
-	{"Y Velocity", Game.getYVelocity},
-	{"dX"},
-	{"dY"},
+	{"Health", function() return Game.getHealth().."/"..Game.getMaxHealth(); end, "health"},
+	{"HP Timer", Game.getHPTimer, "health"},
+	{"X", nil, "position"},
+	{"Y", nil, "position"},
+	{"X Velocity", Game.getXVelocity, "speed"},
+	{"Y Velocity", Game.getYVelocity, "speed"},
+	{"dX", nil, "positionStats"},
+	{"dY", nil, "positionStats"},
 };
 
 return Game;

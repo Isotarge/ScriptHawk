@@ -199,22 +199,22 @@ function Game.colorDY()
 end
 
 Game.OSD = {
-	{"IGT", Game.getIGT},
+	{"IGT", Game.getIGT, "igt"},
 	{"Separator"},
-	{"Player X", Game.getPlayerXPosition},
-	{"Screen X", Game.getScreenXPosition},
+	{"Player X", Game.getPlayerXPosition, "player"},
+	{"Screen X", Game.getScreenXPosition, "player"},
 	--{"Separator"},
-	{"X"},
-	{"Y"},
+	{"X", nil, "position"},
+	{"Y", nil, "position"},
 	{"Separator"},
-	{"dX", nil, Game.colorDX},
-	{"dY", nil, Game.colorDY},
+	{"dX", nil, "positionStats", Game.colorDX},
+	{"dY", nil, "positionStats", Game.colorDY},
 	{"Separator"},
-	{"X Velocity", Game.getXVelocity},
-	{"Y Velocity", Game.getYVelocity},
+	{"X Velocity", Game.getXVelocity, "speed"},
+	{"Y Velocity", Game.getYVelocity, "speed"},
 	{"Separator"},
-	{"Bomb Timer 1", Game.getBombTimer1},
-	{"Bomb Timer 2", Game.getBombTimer2},
+	{"Bomb Timer 1", Game.getBombTimer1, "bombTimer"},
+	{"Bomb Timer 2", Game.getBombTimer2, "bombTimer"},
 };
 
 return Game;

@@ -194,20 +194,20 @@ end
 
 Game.OSDPosition = {2, 76}; -- Optional: OSD position in pixels from the top left corner of the screen, defaults to 2, 76 if not set by a game module
 Game.OSD = {
-	{"X", Game.getXPosition},
-	{"Y", Game.getYPosition, Game.colorYPosition}, -- A third parameter can be added to these table entries, a function that returns a 32 bit int AARRGGBB color value for that OSD entry
-	{"Z", Game.getZPosition},
+	{"X", Game.getXPosition, "position"}, -- Add tags for modifyOSD() [Go to preferences.lua to add in your tags to defaultPreferences. Open game, modifyOSD() and clear all preferences to ensure correct formatting]
+	{"Y", Game.getYPosition, "position", Game.colorYPosition}, -- A fourth parameter can be added to these table entries, a function that returns a 32 bit int AARRGGBB color value for that OSD entry
+	{"Z", Game.getZPosition, "position"},
 	{"Separator"},
-	{"dY"},
-	{"dXZ"},
+	{"dY", nil, "positionStats"},
+	{"dXZ", nil, "positionStats"},
 	{"Separator"},
-	{"Max dY"},
-	{"Max dXZ"},
-	{"Odometer"},
+	{"Max dY", nil, "positionStatsMore"},
+	{"Max dXZ", nil, "positionStatsMore"},
+	{"Odometer", nil, "positionStatsMore"},
 	{"Separator"},
-	{"Rot. X", Game.getXRotation},
-	{"Facing", Game.getYRotation},
-	{"Rot. Z", Game.getZRotation},
+	{"Rot. X", Game.getXRotation, "angle"},
+	{"Facing", Game.getYRotation, "angle"},
+	{"Rot. Z", Game.getZRotation, "angle"},
 };
 
 return Game; -- Return your Game table to ScriptHawk

@@ -109,20 +109,20 @@ function Game.eachFrame()
 end
 
 Game.OSD = {
-	{"X"},
-	{"Y"},
-	{"Z"},
+	{"X", nil, "position"},
+	{"Y", nil, "position"},
+	{"Z", nil, "position"},
 	{"Separator"},
-	{"dY"},
-	{"dXZ"},
+	{"dY", nil, "positionStats"},
+	{"dXZ", nil, "positionStats"},
 	{"Separator"},
-	{"Max dY"},
-	{"Max dXZ"},
-	{"Odometer"},
+	{"Max dY", nil, "positionStatsMore"},
+	{"Max dXZ", nil, "positionStatsMore"},
+	{"Odometer", nil, "positionStatsMore"},
 	{"Separator"},
-	--{"Rot. X", Game.getXRotation}, -- TODO
-	{"Facing", Game.getYRotation},
-	--{"Rot. Z", Game.getZRotation}, -- TODO
+	--{"Rot. X", Game.getXRotation, "angleMore"}, -- TODO
+	{"Facing", Game.getYRotation, "angle"},
+	--{"Rot. Z", Game.getZRotation, "angleMore"}, -- TODO
 };
 
 return Game;

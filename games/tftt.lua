@@ -712,18 +712,18 @@ function Game.initUI()
 end
 
 Game.OSD = {
-	{"X", nil, Game.colorCursorIsMoving},
-	{"Y", nil, Game.colorCursorIsMoving},
-	{"dX"},
-	{"dY"},
-	{"Ticker Speed", Game.getTickerSpeed},
-	{"Ticker Held", Game.getTickerHeld},
-	{"Tick Timer", Game.getTickTimer},
-	{"RNG", hexifyOSD(Game.getRNG, 4, "")},
-	{"Opponents", Game.getOpponents},
-	--{"Pop Available", Game.getPopAvailable},
-	{"Pop Allocated", Game.getPopAllocatedOSD},
-	{"Suspended Men", Game.getSuspendedMen},
+	{"X", nil, "position", Game.colorCursorIsMoving},
+	{"Y", nil, "position", Game.colorCursorIsMoving},
+	{"dX", nil, "positionStats"},
+	{"dY", nil, "positionStats"},
+	{"Ticker Speed", Game.getTickerSpeed, "ticker"},
+	{"Ticker Held", Game.getTickerHeld, "ticker"},
+	{"Tick Timer", Game.getTickTimer, "ticker"},
+	{"RNG", hexifyOSD(Game.getRNG, 4, ""), "rng"},
+	{"Opponents", Game.getOpponents, "opponents"},
+	{"Pop Available", Game.getPopAvailable, "popAvailable"},
+	{"Pop Allocated", Game.getPopAllocatedOSD, "popAllocated"},
+	{"Suspended Men", Game.getSuspendedMen, "suspendedMen"},
 };
 
 return Game;

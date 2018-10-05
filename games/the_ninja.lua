@@ -240,21 +240,21 @@ function Game.getDColor()
 end
 
 Game.OSD = {
-	{"X", Game.getPlayerXPosition},
-	{"Y", Game.getPlayerYPosition},
-	{"Level X", Game.getLevelXPosition},
-	{"Level Y", Game.getLevelYPosition},
-	{"dX", nil, Game.getDColor},
-	{"dY", nil, Game.getDColor},
+	{"X", Game.getPlayerXPosition, "position"},
+	{"Y", Game.getPlayerYPosition, "position"},
+	{"Level X", Game.getLevelXPosition, "mapData"},
+	{"Level Y", Game.getLevelYPosition, "mapData"},
+	{"dX", nil, "positionStats", Game.getDColor},
+	{"dY", nil, "positionStats", Game.getDColor},
 	{"Separator"},
-	{"Player Proj", Game.countPlayerProjectiles},
-	{"Hits", Game.getHitsOSD},
-	{"Ratio", Game.getHitRatio},
+	{"Player Proj", Game.countPlayerProjectiles, "projectiles"},
+	{"Hits", Game.getHitsOSD, "hits"},
+	{"Ratio", Game.getHitRatio, "hits"},
 	{"Separator"},
-	{"Objects", Game.countObjects},
-	{"Enemies", Game.countEnemies},
+	{"Objects", Game.countObjects, "objects"},
+	{"Enemies", Game.countEnemies, "enemies"},
 	{"Separator"},
-	{"Boss Health", Game.getBossHealth, Game.colorBossHealth},
+	{"Boss Health", Game.getBossHealth, "boss", Game.colorBossHealth},
 };
 
 function Game.getHitboxes()
