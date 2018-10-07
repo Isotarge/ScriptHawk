@@ -745,14 +745,6 @@ currentPreferences = {
 		{"player", nil},
 		{"mapData", nil},
 	},
-	donald_land = {
-		{"igt", nil},
-		{"player", nil},
-		{"position", nil},
-		{"positionStats", nil},
-		{"speed", nil},
-		{"bombTimer", nil},
-	},
 	ej3d = {
 		{"mapData", nil},
 		{"position", nil},
