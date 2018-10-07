@@ -240,21 +240,21 @@ function Game.getDColor()
 end
 
 Game.OSD = {
-	{"X", Game.getPlayerXPosition, category = "position"},
-	{"Y", Game.getPlayerYPosition, category = "position"},
-	{"Level X", Game.getLevelXPosition, category = "mapData"},
-	{"Level Y", Game.getLevelYPosition, category = "mapData"},
-	{"dX", nil, Game.getDColor, category = "positionStats"},
-	{"dY", nil, Game.getDColor, category = "positionStats"},
+	{"X", Game.getPlayerXPosition, category="position"},
+	{"Y", Game.getPlayerYPosition, category="position"},
+	{"Level X", Game.getLevelXPosition, category="mapData"},
+	{"Level Y", Game.getLevelYPosition, category="mapData"},
+	{"dX", nil, Game.getDColor, category="positionStats"},
+	{"dY", nil, Game.getDColor, category="positionStats"},
 	{"Separator"},
-	{"Player Proj", Game.countPlayerProjectiles, category = "projectiles"},
-	{"Hits", Game.getHitsOSD, category = "hits"},
-	{"Ratio", Game.getHitRatio, category = "hits"},
+	{"Player Proj", Game.countPlayerProjectiles, category="projectiles"},
+	{"Hits", Game.getHitsOSD, category="hits"},
+	{"Ratio", Game.getHitRatio, category="hits"},
 	{"Separator"},
-	{"Objects", Game.countObjects, category = "objects"},
-	{"Enemies", Game.countEnemies, category = "enemies"},
+	{"Objects", Game.countObjects, category="objects"},
+	{"Enemies", Game.countEnemies, category="enemies"},
 	{"Separator"},
-	{"Boss Health", Game.getBossHealth, Game.colorBossHealth, category = "boss"},
+	{"Boss Health", Game.getBossHealth, Game.colorBossHealth, category="boss"},
 };
 
 function Game.getHitboxes()

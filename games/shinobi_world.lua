@@ -155,12 +155,12 @@ function Game.applyInfinites()
 end
 
 Game.OSD = {
-	{"X", category = "position"},
-	{"Y", category = "position"},
-	{"dX", category = "positionStats"},
-	{"dY", category = "positionStats"},
-	{"X Velocity", Game.getXVelocity, category = "speed"},
-	{"Y Velocity", Game.getYVelocity, category = "speed"},
+	{"X", category="position"},
+	{"Y", category="position"},
+	{"dX", category="positionStats"},
+	{"dY", category="positionStats"},
+	{"X Velocity", Game.getXVelocity, category="speed"},
+	{"Y Velocity", Game.getYVelocity, category="speed"},
 };
 
 return Game;

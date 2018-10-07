@@ -120,7 +120,7 @@ object_fields = {
 	y_position = 0x562,
 	object_type = 0, -- TODO
 	object_types = {
-		
+		-- TODO
 	},
 };
 
@@ -199,22 +199,22 @@ function Game.colorDY()
 end
 
 Game.OSD = {
-	{"IGT", Game.getIGT, category = "igt"},
+	{"IGT", Game.getIGT},
 	{"Separator"},
-	{"Player X", Game.getPlayerXPosition, category = "player"},
-	{"Screen X", Game.getScreenXPosition, category = "player"},
+	{"Player X", Game.getPlayerXPosition},
+	{"Screen X", Game.getScreenXPosition},
 	--{"Separator"},
-	{"X", category = "position"},
-	{"Y", category = "position"},
+	{"X"},
+	{"Y"},
 	{"Separator"},
-	{"dX", nil, Game.colorDX, category = "positionStats"},
-	{"dY", nil, Game.colorDY, category = "positionStats"},
+	{"dX", nil, Game.colorDX},
+	{"dY", nil, Game.colorDY},
 	{"Separator"},
-	{"X Velocity", Game.getXVelocity, category = "speed"},
-	{"Y Velocity", Game.getYVelocity, category = "speed"},
+	{"X Velocity", Game.getXVelocity},
+	{"Y Velocity", Game.getYVelocity},
 	{"Separator"},
-	{"Bomb Timer 1", Game.getBombTimer1, category = "bombTimer"},
-	{"Bomb Timer 2", Game.getBombTimer2, category = "bombTimer"},
+	{"Bomb Timer 1", Game.getBombTimer1},
+	{"Bomb Timer 2", Game.getBombTimer2},
 };
 
 return Game;

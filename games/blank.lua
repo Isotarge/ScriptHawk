@@ -196,7 +196,7 @@ Game.OSDPosition = {2, 76}; -- Optional: OSD position in pixels from the top lef
 Game.OSD = {
 	{"X", Game.getXPosition},
 	{"Y", Game.getYPosition, Game.colorYPosition}, -- A third parameter can be added to these table entries, a function that returns a 32 bit int AARRGGBB color value for that OSD entry
-	{"Z", Game.getZPosition, category = "position"}, -- A category tag can be added for modifyOSD(). If no tag is added, then the osd line is unmodifyable
+	{"Z", Game.getZPosition, category="position"}, -- A category tag can be added for modifyOSD(). If no tag is added, then the osd line is unmodifyable
 	{"Separator"},
 	{"dY"},
 	{"dXZ"},

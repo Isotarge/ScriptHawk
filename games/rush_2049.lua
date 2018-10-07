@@ -84,17 +84,17 @@ function Game.initUI()
 end
 
 Game.OSD = {
-	{"X", category = "position"},
-	{"Y", category = "position"},
-	{"Z", category = "position"},
+	{"X", category="position"},
+	{"Y", category="position"},
+	{"Z", category="position"},
 	{"Separator"},
-	{"Velocity", Game.getVelocity, category = "speed"},
-	{"dY", category = "positionStats"},
-	{"dXZ", category = "positionStats"},
+	{"Velocity", Game.getVelocity, category="speed"},
+	{"dY", category="positionStats"},
+	{"dXZ", category="positionStats"},
 	{"Separator"},
-	{"Max dY", category = "positionStatsMore"},
-	{"Max dXZ", category = "positionStatsMore"},
-	{"Odometer", category = "positionStatsMore"},
+	{"Max dY", category="positionStatsMore"},
+	{"Max dXZ", category="positionStatsMore"},
+	{"Odometer", category="positionStatsMore"},
 };
 
 return Game;

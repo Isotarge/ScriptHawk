@@ -23,6 +23,7 @@ A collection of Lua scripts and RAM watches for [BizHawk](https://github.com/TAS
 ### Advanced functionality
 - The telemetry system records everything shown in ScriptHawk's OSD to the Lua console in CSV format
 - Type angleCalc.open() in the Lua console to open a calculator for the angle between 2 points in game, written by [The8bitbeast](https://twitter.com/the8bitbeast)
+- Type modifyOSD() in the Lua console to open a dialog to toggle OSD entries on and off, written by [Tom Ballaam](https://twitter.com/tjballaam)
 - Type lock_y = true in the Lua console to freeze the player's Y position, lock_y = false to disable
 - Type loadASMPatch() in the Lua console to load a MIPS R4300i assembly patch for any N64 game, huge thanks to [notwa/lips](https://github.com/notwa/lips)
 

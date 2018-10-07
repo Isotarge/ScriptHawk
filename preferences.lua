@@ -1,6 +1,6 @@
 defaultPreferences = {
 	balloon_fight = {
-	
+
 	},
 	bk = {
 		{"position", true},
@@ -107,14 +107,6 @@ defaultPreferences = {
 		{"player", true},
 		{"mapData", true},
 	},
-	donald_land = {
-		{"igt", true},
-		{"player", true},
-		{"position", true},
-		{"positionStats", true},
-		{"speed", true},
-		{"bombTimer", true},
-	},
 	ej3d = {
 		{"mapData", true},
 		{"position", true},
@@ -126,7 +118,6 @@ defaultPreferences = {
 		{"movement", true},
 	},
 	elmo = {
-	
 	},
 	galahad = {
 		{"screenPosition", true},
@@ -151,7 +142,6 @@ defaultPreferences = {
 		{"speed", true},
 	},
 	golden_axe_warrior = {
-	
 	},
 	golvellius = {
 		{"mapData", true},
@@ -207,10 +197,8 @@ defaultPreferences = {
 		{"speed", true},
 	},
 	mm = {
-	
 	},
 	oot = {
-	
 	},
 	penguin_land = {
 		{"round", true},
@@ -220,7 +208,7 @@ defaultPreferences = {
 		{"position", true},
 		{"positionStats", true},
 		{"speed", true},
-		{"egg", true},		
+		{"egg", true},
 	},
 	psycho_fox = {
 		{"round", true},
@@ -237,7 +225,6 @@ defaultPreferences = {
 		{"speed", true},
 	},
 	rayman_2 = {
-	
 	},
 	rush_2049 = {
 		{"position", true},
@@ -333,7 +320,6 @@ defaultPreferences = {
 };
 userPreferences = {
 	balloon_fight = {
-	
 	},
 	bk = {
 		{"position", nil},
@@ -440,14 +426,6 @@ userPreferences = {
 		{"player", nil},
 		{"mapData", nil},
 	},
-	donald_land = {
-		{"igt", nil},
-		{"player", nil},
-		{"position", nil},
-		{"positionStats", nil},
-		{"speed", nil},
-		{"bombTimer", nil},
-	},
 	ej3d = {
 		{"mapData", nil},
 		{"position", nil},
@@ -459,7 +437,6 @@ userPreferences = {
 		{"movement", nil},
 	},
 	elmo = {
-	
 	},
 	galahad = {
 		{"screenPosition", nil},
@@ -484,7 +461,6 @@ userPreferences = {
 		{"speed", nil},
 	},
 	golden_axe_warrior = {
-	
 	},
 	golvellius = {
 		{"mapData", nil},
@@ -540,10 +516,8 @@ userPreferences = {
 		{"speed", nil},
 	},
 	mm = {
-	
 	},
 	oot = {
-	
 	},
 	penguin_land = {
 		{"round", nil},
@@ -553,7 +527,7 @@ userPreferences = {
 		{"position", nil},
 		{"positionStats", nil},
 		{"speed", nil},
-		{"egg", nil},		
+		{"egg", nil},
 	},
 	psycho_fox = {
 		{"round", nil},
@@ -570,7 +544,6 @@ userPreferences = {
 		{"speed", nil},
 	},
 	rayman_2 = {
-	
 	},
 	rush_2049 = {
 		{"position", nil},
@@ -666,7 +639,6 @@ userPreferences = {
 };
 currentPreferences = {
 	balloon_fight = {
-	
 	},
 	bk = {
 		{"position", nil},
@@ -792,7 +764,6 @@ currentPreferences = {
 		{"movement", nil},
 	},
 	elmo = {
-	
 	},
 	galahad = {
 		{"screenPosition", nil},
@@ -817,7 +788,6 @@ currentPreferences = {
 		{"speed", nil},
 	},
 	golden_axe_warrior = {
-	
 	},
 	golvellius = {
 		{"mapData", nil},
@@ -873,10 +843,8 @@ currentPreferences = {
 		{"speed", nil},
 	},
 	mm = {
-	
 	},
 	oot = {
-	
 	},
 	penguin_land = {
 		{"round", nil},
@@ -886,7 +854,7 @@ currentPreferences = {
 		{"position", nil},
 		{"positionStats", nil},
 		{"speed", nil},
-		{"egg", nil},		
+		{"egg", nil},
 	},
 	psycho_fox = {
 		{"round", nil},
@@ -903,7 +871,6 @@ currentPreferences = {
 		{"speed", nil},
 	},
 	rayman_2 = {
-	
 	},
 	rush_2049 = {
 		{"position", nil},

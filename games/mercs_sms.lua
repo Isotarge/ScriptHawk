@@ -185,14 +185,14 @@ function Game.getLagCount()
 end
 
 Game.OSD = {
-	{"Lag", Game.getLagCount, category = "lag"},
-	{"Gun", Game.getGun, category = "gun"},
-	{"Time", Game.getTime, category = "time"},
-	{"Health", Game.getHealth, category = "health"},
-	{"X", category = "position"},
-	{"Y", category = "position"},
-	{"dX", category = "positionStats"},
-	{"dY", category = "positionStats"},
+	{"Lag", Game.getLagCount, category="lag"},
+	{"Gun", Game.getGun, category="gun"},
+	{"Time", Game.getTime, category="time"},
+	{"Health", Game.getHealth, category="health"},
+	{"X", category="position"},
+	{"Y", category="position"},
+	{"dX", category="positionStats"},
+	{"dY", category="positionStats"},
 	{"D. Health", function() return mainmemory.readbyte(0x1240); end, "health"},
 	{"D. Health", function() return mainmemory.readbyte(0x1241); end, "health"},
 	{"D. Health", function() return mainmemory.readbyte(0x138D); end, "health"},

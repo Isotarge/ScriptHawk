@@ -712,18 +712,18 @@ function Game.initUI()
 end
 
 Game.OSD = {
-	{"X", nil, Game.colorCursorIsMoving, category = "position"},
-	{"Y", nil, Game.colorCursorIsMoving, category = "position"},
-	{"dX", nil, category = "positionStats"},
-	{"dY", nil, category = "positionStats"},
-	{"Ticker Speed", Game.getTickerSpeed, category = "ticker"},
-	{"Ticker Held", Game.getTickerHeld, category = "ticker"},
-	{"Tick Timer", Game.getTickTimer, category = "ticker"},
-	{"RNG", hexifyOSD(Game.getRNG, 4, ""), category = "rng"},
-	{"Opponents", Game.getOpponents, category = "opponents"},
-	{"Pop Available", Game.getPopAvailable, category = "popAvailable"},
-	{"Pop Allocated", Game.getPopAllocatedOSD, category = "popAllocated"},
-	{"Suspended Men", Game.getSuspendedMen, category = "suspendedMen"},
+	{"X", nil, Game.colorCursorIsMoving, category="position"},
+	{"Y", nil, Game.colorCursorIsMoving, category="position"},
+	{"dX", nil, category="positionStats"},
+	{"dY", nil, category="positionStats"},
+	{"Ticker Speed", Game.getTickerSpeed, category="ticker"},
+	{"Ticker Held", Game.getTickerHeld, category="ticker"},
+	{"Tick Timer", Game.getTickTimer, category="ticker"},
+	{"RNG", hexifyOSD(Game.getRNG, 4, ""), category="rng"},
+	{"Opponents", Game.getOpponents, category="opponents"},
+	{"Pop Available", Game.getPopAvailable, category="popAvailable"},
+	{"Pop Allocated", Game.getPopAllocatedOSD, category="popAllocated"},
+	{"Suspended Men", Game.getSuspendedMen, category="suspendedMen"},
 };
 
 return Game;

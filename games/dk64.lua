@@ -2937,15 +2937,15 @@ local function getExamineDataModelTwo(pointer)
 	if getSpawnSnagState(pointer) ~= 0 then
 		table.insert(examine_data, { "Snag State", getSpawnSnagState(pointer)});
 	end
-	
+
 	if getSpawnSnagCheck(pointer) ~= 0 then
 		table.insert(examine_data, { "Snag Check", getSpawnSnagCheck(pointer)});
 	end
-	
+
 	if getGrabKong(pointer) ~= 0 and mainmemory.read_u16_be(pointer + obj_model2.object_type) == 116 then
 		table.insert(examine_data, { "Kong Required", getGrabKong(pointer)});
 	end
-	
+
 	if getSpawnSnagState(pointer) ~= 0 or getSpawnSnagCheck(pointer) ~= 0 or mainmemory.read_u16_be(pointer + obj_model2.object_type) == 116 then
 		table.insert(examine_data, { "Separator", 1 });
 	end
@@ -8399,78 +8399,78 @@ function Game.completeFile()
 end
 
 Game.standardOSD = {
-	{"Map", Game.getMapOSD, category = "mapData"},
-	{"Level", Game.getLevelIndexOSD, category = "mapData"},
-	{"Cutscene", Game.getCutsceneOSD, category = "cutsceneData"},
-	{"Exit", Game.getExitOSD, category = "mapData"},
-	{"Player", hexifyOSD(Game.getPlayerObject), category = "player"},
+	{"Map", Game.getMapOSD, category="mapData"},
+	{"Level", Game.getLevelIndexOSD, category="mapData"},
+	{"Cutscene", Game.getCutsceneOSD, category="cutsceneData"},
+	{"Exit", Game.getExitOSD, category="mapData"},
+	{"Player", hexifyOSD(Game.getPlayerObject), category="player"},
 	{"Separator"},
-	{"Mode", Game.getCurrentMode, category = "gamemode"},
-	{"File", Game.getFileOSD, category = "fileView"},
-	{"Flags", getFlagStatsOSD, category = "flags"},
+	{"Mode", Game.getCurrentMode, category="gamemode"},
+	{"File", Game.getFileOSD, category="fileView"},
+	{"Flags", getFlagStatsOSD, category="flags"},
 	{"Separator"},
-	{"X", category = "position"},
-	{"Y", category = "position"},
-	{"Z", category = "position"},
+	{"X", category="position"},
+	{"Y", category="position"},
+	{"Z", category="position"},
 	{"Separator"},
-	{"Floor", Game.getFloor, category = "position"},
+	{"Floor", Game.getFloor, category="position"},
 	{"Separator"},
-	{"Lag Factor", Game.getLagFactor, category = "lag"},
-	{"dY", category = "positionStats"},
-	{"dXZ", category = "positionStats"},
-	{"Velocity", Game.getVelocity, category = "speed"},
-	--{"Accel", Game.getAcceleration, category = "speed"}, -- TODO: Game.getAcceleration
-	{"Y Velocity", Game.getYVelocity, category = "speed"},
-	{"Y Accel", Game.getYAcceleration, category = "speed"},
+	{"Lag Factor", Game.getLagFactor, category="lag"},
+	{"dY", category="positionStats"},
+	{"dXZ", category="positionStats"},
+	{"Velocity", Game.getVelocity, category="speed"},
+	--{"Accel", Game.getAcceleration, category="speed"}, -- TODO: Game.getAcceleration
+	{"Y Velocity", Game.getYVelocity, category="speed"},
+	{"Y Accel", Game.getYAcceleration, category="speed"},
 	{"Separator"},
-	{"Max dY", category = "positionStatsMore"},
-	{"Max dXZ", category = "positionStatsMore"},
-	{"Odometer", category = "positionStatsMore"},
+	{"Max dY", category="positionStatsMore"},
+	{"Max dXZ", category="positionStatsMore"},
+	{"Odometer", category="positionStatsMore"},
 	{"Separator"},
-	{"Rot. X", Game.getXRotation, category = "angle"},
-	{"Facing", Game.getYRotation, category = "angle", Game.colorYRotation},
+	{"Rot. X", Game.getXRotation, category="angle"},
+	{"Facing", Game.getYRotation, category="angle", Game.colorYRotation},
 	--{"Moving", Game.getMovingRotation, "angle"}, -- TODO: Game.getMovingRotation
-	{"Rot. Z", Game.getZRotation, category = "angle"},
-	{"Movement", Game.getMovementState, category = "movement"},
-	{"Animation", Game.getAnimation, category = "animation"},
-	{"Camera", Game.getCameraState, category = "camera"},
-	{"Noclip", Game.getNoclipByte, Game.colorNoclipByte, category = "noclip"},
+	{"Rot. Z", Game.getZRotation, category="angle"},
+	{"Movement", Game.getMovementState, category="movement"},
+	{"Animation", Game.getAnimation, category="animation"},
+	{"Camera", Game.getCameraState, category="camera"},
+	{"Noclip", Game.getNoclipByte, Game.colorNoclipByte, category="noclip"},
 	{"Separator"},
-	{"Anim Timer 1", Game.getAnimationTimer1, category = "animation"},
-	{"Anim Timer 2", Game.getAnimationTimer2, category = "animation"},
-	{"Anim Timer 3", Game.getAnimationTimer3, category = "animation"},
-	{"Anim Timer 4", Game.getAnimationTimer4, category = "animation"},
+	{"Anim Timer 1", Game.getAnimationTimer1, category="animation"},
+	{"Anim Timer 2", Game.getAnimationTimer2, category="animation"},
+	{"Anim Timer 3", Game.getAnimationTimer3, category="animation"},
+	{"Anim Timer 4", Game.getAnimationTimer4, category="animation"},
 	{"Separator"},
-	{"Bone Array 1", function() return Game.getBoneArray1PrettyPrint(Game.getPlayerObject()) end, category = "bonearray"},
-	{"Stored X1", function() return Game.getStoredX1(Game.getPlayerObject()) end, category = "bonearray"},
-	{"Stored Y1", function() return Game.getStoredY1(Game.getPlayerObject()) end, category = "bonearray"},
-	{"Stored Z1", function() return Game.getStoredZ1(Game.getPlayerObject()) end, category = "bonearray"},
+	{"Bone Array 1", function() return Game.getBoneArray1PrettyPrint(Game.getPlayerObject()) end, category="bonearray"},
+	{"Stored X1", function() return Game.getStoredX1(Game.getPlayerObject()) end, category="bonearray"},
+	{"Stored Y1", function() return Game.getStoredY1(Game.getPlayerObject()) end, category="bonearray"},
+	{"Stored Z1", function() return Game.getStoredZ1(Game.getPlayerObject()) end, category="bonearray"},
 	{"Separator"},
-	{"Bone Array 2", function() return Game.getBoneArray2PrettyPrint(Game.getPlayerObject()) end, category = "bonearray"},
-	{"Stored X2", function() return Game.getStoredX2(Game.getPlayerObject()) end, category = "bonearray"},
-	{"Stored Y2", function() return Game.getStoredY2(Game.getPlayerObject()) end, category = "bonearray"},
-	{"Stored Z2", function() return Game.getStoredZ2(Game.getPlayerObject()) end, category = "bonearray"},
+	{"Bone Array 2", function() return Game.getBoneArray2PrettyPrint(Game.getPlayerObject()) end, category="bonearray"},
+	{"Stored X2", function() return Game.getStoredX2(Game.getPlayerObject()) end, category="bonearray"},
+	{"Stored Y2", function() return Game.getStoredY2(Game.getPlayerObject()) end, category="bonearray"},
+	{"Stored Z2", function() return Game.getStoredZ2(Game.getPlayerObject()) end, category="bonearray"},
 	{"Separator"},
-	{"Free", Game.getFreeMemory, category = "memory"},
-	{"Used", Game.getUsedMemory, category = "memory"},
-	{"Total", Game.getTotalMemory, category = "memory"},
+	{"Free", Game.getFreeMemory, category="memory"},
+	{"Used", Game.getUsedMemory, category="memory"},
+	{"Total", Game.getTotalMemory, category="memory"},
 };
 
 Game.mapDebugOSD = {
-	{"Map", Game.getMapOSD, category = "mapData"},
-	{"X", nil, category = "position"},
-	{"Y", nil, category = "position"},
-	{"Z", nil, category = "position"},
+	{"Map", Game.getMapOSD, category="mapData"},
+	{"X", nil, category="position"},
+	{"Y", nil, category="position"},
+	{"Z", nil, category="position"},
 	{"Separator"},
-	{"dY", nil, category = "positionStats"},
-	{"dXZ", nil, category = "positionStats"},
-	{"Movement", Game.getMovementState, category = "movement"},
+	{"dY", nil, category="positionStats"},
+	{"dXZ", nil, category="positionStats"},
+	{"Movement", Game.getMovementState, category="movement"},
 	{"Separator"},
-	{"Map Block", hexifyOSD(Game.getMapBlock, 6, ""), category = "mapData"},
-	{"Map Verts Start", hexifyOSD(Game.getMapVerts, 6, ""), category = "mapData"},
-	{"Map Verts End", hexifyOSD(Game.getMapVertsEnd, 6, ""), category = "mapData"},
-	{"Map DL Start", hexifyOSD(Game.getMapDLStart, 6, ""), category = "mapData"},
-	{"Chunk Array", hexifyOSD(Game.getChunkArray, 6, ""), category = "mapData"},
+	{"Map Block", hexifyOSD(Game.getMapBlock, 6, ""), category="mapData"},
+	{"Map Verts Start", hexifyOSD(Game.getMapVerts, 6, ""), category="mapData"},
+	{"Map Verts End", hexifyOSD(Game.getMapVertsEnd, 6, ""), category="mapData"},
+	{"Map DL Start", hexifyOSD(Game.getMapDLStart, 6, ""), category="mapData"},
+	{"Chunk Array", hexifyOSD(Game.getChunkArray, 6, ""), category="mapData"},
 };
 
 Game.subgameOSD = {

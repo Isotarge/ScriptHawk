@@ -409,20 +409,20 @@ function Game.drawUI()
 end
 
 Game.OSD = {
-	{"Movement", Game.getCurrentMovementState, Game.colorCurrentMovementState, category = "movement"},
-	{"Drill", Game.getDrillValue, category = "drill"},
+	{"Movement", Game.getCurrentMovementState, Game.colorCurrentMovementState, category="movement"},
+	{"Drill", Game.getDrillValue, category="drill"},
 	{"Separator"},
-	{"X", category = "position"},
-	{"Y", category = "position"},
-	{"X Velocity", Game.getXVelocity, category = "speed"},
-	{"Y Velocity", Game.getYVelocity, category = "speed"},
+	{"X", category="position"},
+	{"Y", category="position"},
+	{"X Velocity", Game.getXVelocity, category="speed"},
+	{"Y Velocity", Game.getYVelocity, category="speed"},
 	{"Separator"},
-	{"dX", category = "positionStats"},
-	{"dY", category = "positionStats"},
+	{"dX", category="positionStats"},
+	{"dY", category="positionStats"},
 	{"Separator"},
-	{"Max dY", category = "positionStatsMore"},
-	{"Max dXZ", category = "positionStatsMore"},
-	{"Odometer", category = "positionStatsMore"},
+	{"Max dY", category="positionStatsMore"},
+	{"Max dXZ", category="positionStatsMore"},
+	{"Odometer", category="positionStatsMore"},
 	{"Separator"},
 };
 
