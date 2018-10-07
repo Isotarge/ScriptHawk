@@ -110,18 +110,18 @@ function Game.eachFrame()
 end
 
 Game.OSD = {
-	{"X", nil, "position", tastudio_column=true, tastudio_column_width=40},
-	{"Y", nil, "position"},
-	{"dX", nil, "positionStats", Game.colorDX, tastudio_column=true, tastudio_column_width=40},
-	{"dY", nil, "positionStats"},
+	{"X", category = "position", tastudio_column=true, tastudio_column_width=40},
+	{"Y", category = "position"},
+	{"dX", nil, Game.colorDX, category = "positionStats", tastudio_column=true, tastudio_column_width=40},
+	{"dY", category = "positionStats"},
 	{"Separator"},
-	{"P Meter", Game.getPMeter, "pmeter", tastudio_column=true, tastudio_column_width=50},
-	{"Velocity (Gnd)", Game.getGroundVelocity, "speed", tastudio_column=true, tastudio_column_width=90},
-	{"Velocity (Air)", Game.getAerialVelocity, "speed", tastudio_column=true, tastudio_column_width=90},
-	{"Jump", Game.getJumpHeight, "jumps", Game.colorJumpHeight, tastudio_column=true, tastudio_column_width=40},
+	{"P Meter", Game.getPMeter, category = "pmeter", tastudio_column=true, tastudio_column_width=50},
+	{"Velocity (Gnd)", Game.getGroundVelocity, category = "speed", tastudio_column=true, tastudio_column_width=90},
+	{"Velocity (Air)", Game.getAerialVelocity, category = "speed", tastudio_column=true, tastudio_column_width=90},
+	{"Jump", Game.getJumpHeight, Game.colorJumpHeight, category = "jumps", tastudio_column=true, tastudio_column_width=40},
 	{"Separator"},
-	{"Level", Game.getLevel, "mapData"},
-	{"IGT", Game.getLevelTime, "igt"},
+	{"Level", Game.getLevel, category = "mapData"},
+	{"IGT", Game.getLevelTime, category = "igt"},
 };
 
 Game.OSDPosition = {114, 208};

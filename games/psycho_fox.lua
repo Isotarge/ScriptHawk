@@ -233,17 +233,17 @@ function Game.getHitboxMouseOverText(hitbox)
 end
 
 Game.OSD = {
-	{"Round", Game.getRound, "round"},
-	{"Lives", Game.getLives, "lives"},
+	{"Round", Game.getRound, category = "round"},
+	{"Lives", Game.getLives, category = "lives"},
 	{"Separator"},
-	{"Screen X", Game.getScreenXPosition, "screenPosition"},
-	{"Screen Y", Game.getScreenYPosition, "screenPosition"},
-	{"X", nil, "position"},
-	{"Y", nil, "position"},
-	{"X Velocity", Game.getXVelocity, "speed"},
-	{"Y Velocity", Game.getYVelocity, "speed"},
-	{"dX", nil, "positionStats"},
-	{"dY", nil, "positionStats"},
+	{"Screen X", Game.getScreenXPosition, category = "screenPosition"},
+	{"Screen Y", Game.getScreenYPosition, category = "screenPosition"},
+	{"X", category = "position"},
+	{"Y", category = "position"},
+	{"X Velocity", Game.getXVelocity, category = "speed"},
+	{"Y Velocity", Game.getYVelocity, category = "speed"},
+	{"dX", category = "positionStats"},
+	{"dY", category = "positionStats"},
 };
 
 return Game;

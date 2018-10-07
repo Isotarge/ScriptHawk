@@ -76,17 +76,17 @@ function Game.drawUI()
 end
 
 Game.OSD = {
-	{"X", nil, "position"},
-	{"Y", nil, "position"},
+	{"X", category = "position"},
+	{"Y", category = "position"},
 	{"Separator"},
-	{"X Velocity", Game.getXVelocity, "speed"},
-	{"Y Velocity", Game.getYVelocity, "speed"},
-	{"dX", nil, "positionStats"},
-	{"dY", nil, "positionStats"},
+	{"X Velocity", Game.getXVelocity, category = "speed"},
+	{"Y Velocity", Game.getYVelocity, category = "speed"},
+	{"dX", category = "positionStats"},
+	{"dY", category = "positionStats"},
 	{"Separator"},
-	{"Max dX", nil, "positionStatsMore"},
-	{"Max dY", nil, "positionStatsMore"},
-	{"Odometer", nil, "positionStatsMore"},
+	{"Max dX", category = "positionStatsMore"},
+	{"Max dY", category = "positionStatsMore"},
+	{"Odometer", category = "positionStatsMore"},
 };
 
 return Game;

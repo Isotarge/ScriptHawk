@@ -594,7 +594,7 @@ Game = nil;
 for k, v in pairs(supportedGames) do
 	if romHash == k then
 		Game = require (v.moduleName);
-		gameName = v.moduleName;
+		ScriptHawk.moduleName = v.moduleName;
 		if v.selfContained then -- Self contained modules that do not require ScriptHawk's functionality and merely use ScriptHawk.lua as a convenient loader
 			return true;
 		end
@@ -1207,8 +1207,8 @@ function ScriptHawk.UI.updateReadouts()
 	for i = 1, #Game.OSD do
 		local label = Game.OSD[i][1];
 		local value = Game.OSD[i][2];
-		local variableType = Game.OSD[i][3];
-		local color = Game.OSD[i][4];
+		local color = Game.OSD[i][3];
+		local variableType = Game.OSD[i].category;
 		local inTAStudio = Game.OSD[i].tastudio_column == true;
 		
 		if #osdTypes == nil or #osdTypes == 0 then
@@ -1329,7 +1329,7 @@ function ScriptHawk.UI.updateReadouts()
 				end
 				
 				variableVisible = false;
-				gamePrefName = string.gsub(gameName, "games.", "");
+				gamePrefName = string.gsub(ScriptHawk.moduleName, "games.", "");
 				for osdType = 1, #userPreferences[gamePrefName] do
 					if currentPreferences[gamePrefName][osdType][1] == variableType then
 						if currentPreferences[gamePrefName][osdType][2] == nil then
@@ -1345,6 +1345,9 @@ function ScriptHawk.UI.updateReadouts()
 						end
 					end
 				end
+				if variableType == nil then
+					variableVisible = true;
+				end
 				if variableVisible then
 					gui.text(OSDX, OSDY + Game.OSDRowHeight * row, label..": "..value, color);
 					row = row + 1;
@@ -1356,7 +1359,7 @@ function ScriptHawk.UI.updateReadouts()
 			for osdSubtractor = 1, (i - 1) do
 				if not stop_point then
 					for osdType = 1, #userPreferences[gamePrefName] do
-						if currentPreferences[gamePrefName][osdType][1] == Game.OSD[i - osdSubtractor][3] then
+						if currentPreferences[gamePrefName][osdType][1] == Game.OSD[i - osdSubtractor].category then
 							if currentPreferences[gamePrefName][osdType][2] == nil then
 								--if userPreferences[gamePrefName][osdType][2] == nil then
 									if defaultPreferences[gamePrefName][osdType][2] then
@@ -1489,8 +1492,12 @@ function modifyOSD()
 	end
 	ScriptHawk.modifyOSDUI.form_controls["OSD Default Restore"] = forms.button(ScriptHawk.modifyOSDUI.options_form, "Restore to Default", restoreModifyOSDDefaults, ScriptHawk.modifyOSDUI.ui_col(0), ScriptHawk.modifyOSDUI.ui_row(#osdTypes + 2), 200, ScriptHawk.modifyOSDUI.button_height);
 	ScriptHawk.modifyOSDUI.form_controls["OSD Load Preferences"] = forms.button(ScriptHawk.modifyOSDUI.options_form, "Load User Preferences", loadPreferences, ScriptHawk.modifyOSDUI.ui_col(0), ScriptHawk.modifyOSDUI.ui_row(#osdTypes + 3), 200, ScriptHawk.modifyOSDUI.button_height);
-	ScriptHawk.modifyOSDUI.form_controls["OSD Save Preferences"] = forms.button(ScriptHawk.modifyOSDUI.options_form, "Save As User Preference", saveUserPreferences, ScriptHawk.modifyOSDUI.ui_col(0), ScriptHawk.modifyOSDUI.ui_row(#osdTypes + 4), 200, ScriptHawk.modifyOSDUI.button_height);
-	ScriptHawk.modifyOSDUI.form_controls["OSD Clear Preferences"] = forms.button(ScriptHawk.modifyOSDUI.options_form, "Clear All User Preferences", clearPreferences, ScriptHawk.modifyOSDUI.ui_col(0), ScriptHawk.modifyOSDUI.ui_row(#osdTypes + 5), 200, ScriptHawk.modifyOSDUI.button_height);
+	if emu.getluacore() ~= "NLua" then
+		ScriptHawk.modifyOSDUI.form_controls["OSD Save Preferences"] = forms.button(ScriptHawk.modifyOSDUI.options_form, "Save As User Preference", saveUserPreferences, ScriptHawk.modifyOSDUI.ui_col(0), ScriptHawk.modifyOSDUI.ui_row(#osdTypes + 4), 200, ScriptHawk.modifyOSDUI.button_height);
+		ScriptHawk.modifyOSDUI.form_controls["OSD Clear Preferences"] = forms.button(ScriptHawk.modifyOSDUI.options_form, "Clear All User Preferences", clearPreferences, ScriptHawk.modifyOSDUI.ui_col(0), ScriptHawk.modifyOSDUI.ui_row(#osdTypes + 5), 200, ScriptHawk.modifyOSDUI.button_height);
+	else
+		ScriptHawk.modifyOSDUI.form_controls["OSD BizHawk Notice"] = forms.button(ScriptHawk.modifyOSDUI.options_form, "Notice", bizPre222Notice, ScriptHawk.modifyOSDUI.ui_col(0), ScriptHawk.modifyOSDUI.ui_row(#osdTypes + 5), 200, ScriptHawk.modifyOSDUI.button_height);
+	end
 end
 
 function restoreModifyOSDDefaults()
@@ -1502,23 +1509,6 @@ function restoreModifyOSDDefaults()
 			forms.setproperty(ScriptHawk.modifyOSDUI.form_controls[checkboxId], "Checked", false);
 		end
 	end
-end
-
-function file_exists(file)
-  local f = io.open(file, "rb")
-  if f then f:close() end
-  return f ~= nil
-end
-
--- get all lines from a file, returns an empty 
--- list/table if the file does not exist
-function lines_from(file)
-  if not file_exists(file) then return {} end
-  lines = {}
-  for line in io.lines(file) do 
-    lines[#lines + 1] = line
-  end
-  return lines
 end
 
 function loadPreferences()
@@ -1536,97 +1526,112 @@ function loadPreferences()
 end
 
 function saveUserPreferences()
-	lineSet = lines_from('preferences.lua')
-	inUserPref = false;
-	safetowrite = false;
-	io.open('preferences.lua', "w"):close()
-	fileopened = io.open('preferences.lua', "a")
-	tempOsdTypes = osdTypes;
-	
-	for lineNumber = 1, #lineSet do
-		preferencesLineText = lineSet[lineNumber];
+	if emu.getluacore() ~= "NLua" then
+		lineSet = linesFrom('preferences.lua')
+		inUserPref = false;
+		safetowrite = false;
+		io.open('preferences.lua', "w"):close()
+		fileopened = io.open('preferences.lua', "a")
+		tempOsdTypes = osdTypes;
 		
-		if string.find(preferencesLineText, "userPreferences =") then
-			inUserPref = true;
-		else
-			if string.find(preferencesLineText, "Preferences =") then
-				inUserPref = false;
-				safetowrite = false;
+		for lineNumber = 1, #lineSet do
+			preferencesLineText = lineSet[lineNumber];
+			
+			if string.find(preferencesLineText, "userPreferences =") then
+				inUserPref = true;
+			else
+				if string.find(preferencesLineText, "Preferences =") then
+					inUserPref = false;
+					safetowrite = false;
+				end
 			end
-		end
-		if string.find(preferencesLineText, gamePrefName) then
-			safetowrite = true;
-		end
-		
-		for i = 1, #tempOsdTypes do
-			checkboxId = tempOsdTypes[i].."Checkbox";
-			if string.find(preferencesLineText, tempOsdTypes[i]) then
-				if safetowrite and inUserPref then
-					if ScriptHawk.modifyOSDUI.ischecked(checkboxId) then
-						preferencesLineText = string.gsub(preferencesLineText, "nil", "true");
-						preferencesLineText = string.gsub(preferencesLineText, "false", "true");
-					else
-						preferencesLineText = string.gsub(preferencesLineText, "nil", "false");
-						preferencesLineText = string.gsub(preferencesLineText, "true", "false");
+			if string.find(preferencesLineText, gamePrefName) then
+				safetowrite = true;
+			end
+			
+			for i = 1, #tempOsdTypes do
+				checkboxId = tempOsdTypes[i].."Checkbox";
+				if string.find(preferencesLineText, tempOsdTypes[i]) then
+					if safetowrite and inUserPref then
+						if ScriptHawk.modifyOSDUI.ischecked(checkboxId) then
+							preferencesLineText = string.gsub(preferencesLineText, "nil", "true");
+							preferencesLineText = string.gsub(preferencesLineText, "false", "true");
+						else
+							preferencesLineText = string.gsub(preferencesLineText, "nil", "false");
+							preferencesLineText = string.gsub(preferencesLineText, "true", "false");
+						end
 					end
 				end
 			end
+			fileopened:write(preferencesLineText, "\n")
 		end
-		fileopened:write(preferencesLineText, "\n")
+		fileopened:close()
+	else
+		bizPre222Notice();
 	end
-	fileopened:close()
 end
 
 function clearPreferences()
-	lineSet = lines_from('preferences.lua')
-	enableCopy = false;
-	inDefaPref = false;
-	pastuserPref = false;
-	safetowrite = false;
-	defaPrefStart = 0;
-	defaPrefEnd = 0;
-	io.open('preferences.lua', "w"):close()
-	fileopened = io.open('preferences.lua', "a")
-	tempOsdTypes = osdTypes;
-	
-	for lineNumber = 1, #lineSet do
-		preferencesLineText = lineSet[lineNumber];
+	if emu.getluacore() ~= "NLua" then
+		lineSet = linesFrom('preferences.lua')
+		enableCopy = false;
+		inDefaPref = false;
+		pastuserPref = false;
+		safetowrite = false;
+		defaPrefStart = 0;
+		defaPrefEnd = 0;
+		io.open('preferences.lua', "w"):close()
+		fileopened = io.open('preferences.lua', "a")
+		tempOsdTypes = osdTypes;
 		
-		if defaPrefStart > 0 and defaPrefEnd > 0 and enableCopy then
-			pastuserPref = true;
-			fileopened:write("userPreferences = {", "\n")
-			for lineNumeric = defaPrefStart, defaPrefEnd do
-				lineText = lineSet[lineNumeric];
-				lineText = string.gsub(lineText, "false", "nil");
-				lineText = string.gsub(lineText, "true", "nil");
-				fileopened:write(lineText, "\n")
+		for lineNumber = 1, #lineSet do
+			preferencesLineText = lineSet[lineNumber];
+			
+			if defaPrefStart > 0 and defaPrefEnd > 0 and enableCopy then
+				pastuserPref = true;
+				fileopened:write("userPreferences = {", "\n")
+				for lineNumeric = defaPrefStart, defaPrefEnd do
+					lineText = lineSet[lineNumeric];
+					lineText = string.gsub(lineText, "false", "nil");
+					lineText = string.gsub(lineText, "true", "nil");
+					fileopened:write(lineText, "\n")
+				end
+				fileopened:write("currentPreferences = {", "\n")
+				for lineNumeric = defaPrefStart, defaPrefEnd do
+					lineText = lineSet[lineNumeric];
+					lineText = string.gsub(lineText, "false", "nil");
+					lineText = string.gsub(lineText, "true", "nil");
+					fileopened:write(lineText, "\n")
+				end
+				enableCopy = false;
+			elseif not pastuserPref then
+				fileopened:write(preferencesLineText, "\n")
 			end
-			fileopened:write("currentPreferences = {", "\n")
-			for lineNumeric = defaPrefStart, defaPrefEnd do
-				lineText = lineSet[lineNumeric];
-				lineText = string.gsub(lineText, "false", "nil");
-				lineText = string.gsub(lineText, "true", "nil");
-				fileopened:write(lineText, "\n")
+			
+			if string.find(preferencesLineText, "defaultPreferences =") then
+				inDefaPref = true;
+				defaPrefStart = lineNumber + 1;
 			end
-			enableCopy = false;
-		elseif not pastuserPref then
-			fileopened:write(preferencesLineText, "\n")
-		end
-		
-		if string.find(preferencesLineText, "defaultPreferences =") then
-			inDefaPref = true;
-			defaPrefStart = lineNumber + 1;
-		end
-		
-		if string.find(preferencesLineText, "};") then
-			inDefaPref = false;
-			defaPrefEnd = lineNumber;
-			if not pastuserPref then
-				enableCopy = true;
+			
+			if string.find(preferencesLineText, "};") then
+				inDefaPref = false;
+				defaPrefEnd = lineNumber;
+				if not pastuserPref then
+					enableCopy = true;
+				end
 			end
 		end
+		fileopened:close()
+	else
+		bizPre222Notice();
 	end
-	fileopened:close()
+end
+
+function bizPre222Notice()
+	print("Due to a bug between BizHawk release 1.13.0 and 2.2.1");
+	print("The save & clear preferenes function cannot run on any");
+	print("pre-2.2.2 release of BizHawk. Sorry");
+	print("--------");
 end
 
 function ScriptHawk.modifyOSDUI.updateReadouts()

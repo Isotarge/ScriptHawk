@@ -62,18 +62,18 @@ function Game.getDoorTimer()
 end
 
 Game.OSD = {
-	{"Screen Y", Game.getScreenY, "screenPosition"},
-	{"X", nil, "position"},
-	{"Y", nil, "position"},
-	{"X Velocity", Game.getXVelocity, "speed"},
-	{"Y Velocity", Game.getYVelocity, "speed"},
-	{"dX", nil, "positionStats"},
-	{"dY", nil, "positionStats"},
+	{"Screen Y", Game.getScreenY, category = "screenPosition"},
+	{"X", category = "position"},
+	{"Y", category = "position"},
+	{"X Velocity", Game.getXVelocity, category = "speed"},
+	{"Y Velocity", Game.getYVelocity, category = "speed"},
+	{"dX", category = "positionStats"},
+	{"dY", category = "positionStats"},
 	{"Separator"},
-	{"Frame Rule", Game.getFrameRule, "frameRule"},
-	{"Frame Rule", Game.getFrameRule2, "frameRule"},
-	{"Frame Rule", Game.getFrameRule3, "frameRule"},
-	{"Door Timer", Game.getDoorTimer, "doorTimer"},
+	{"Frame Rule", Game.getFrameRule, category = "frameRule"},
+	{"Frame Rule", Game.getFrameRule2, category = "frameRule"},
+	{"Frame Rule", Game.getFrameRule3, category = "frameRule"},
+	{"Door Timer", Game.getDoorTimer, category = "doorTimer"},
 };
 
 return Game;

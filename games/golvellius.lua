@@ -582,8 +582,8 @@ function Game.drawUI()
 end
 
 Game.OSD = {
-	{"Map", Game.getMap, "mapData"},
-	{"Hole", Game.getHoleContents, "holeContents"},
+	{"Map", Game.getMap, category = "mapData"},
+	{"Hole", Game.getHoleContents, category = "holeContents"},
 };
 
 return Game;

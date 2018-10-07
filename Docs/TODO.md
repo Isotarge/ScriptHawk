@@ -18,8 +18,6 @@
 	- Find a decent object/struct format that has a good balance between documentation, useability, flexibility, and speed
 		- Metatable?
 		- Standardize the type names and getters between BK & SM64
-- General: Detailed watch toggle (checkbox maybe)
-	- "Verbosity level" for object viewer scripts, include as a struct field flag
 - Port Tetris Attack bot to other Puzzle League games
 	- [List of Games](http://www.speedrun.com/puzzle_league)
 	- [Pokémon Puzzle League Info here](https://github.com/mupen64plus/mupen64plus-user-issues/issues/567)
