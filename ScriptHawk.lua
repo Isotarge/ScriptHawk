@@ -30,6 +30,7 @@ ScriptHawk = {
 		button_height = 23,
 	},
 	modifyOSDUI = {
+		isOpen = false,
 		form_controls = {},
 		form_padding = 8,
 		form_width = 10,
@@ -612,6 +613,44 @@ if type(Game.detectVersion) ~= "function" or not Game.detectVersion(romName, rom
 	return false;
 end
 
+currentPreferences = {};
+function loadPreferences()
+	-- Load preferences from disk
+	require "default_preferences";
+	require "user_preferences";
+
+	-- Copy defaultPreferences into currentPreferences
+	currentPreferences = {};
+	for moduleName, defaultPreference in pairs(defaultPreferences) do
+		currentPreferences[moduleName] = {};
+		for OSDType, preference in pairs(defaultPreference) do
+			currentPreferences[moduleName][OSDType] = preference;
+		end
+	end
+
+	-- Override defaults with userPreferences in currentPreferences
+	for moduleName, userPreference in pairs(userPreferences) do
+		for OSDType, preference in pairs(userPreference) do
+			if type(preference) == "boolean" then
+				currentPreferences[moduleName][OSDType] = preference;
+			end
+		end
+	end
+
+	-- Update checkboxes if the modifyOSD() form is open
+	if ScriptHawk.modifyOSDUI.isOpen then
+		for OSDType, preference in pairs(currentPreferences[ScriptHawk.gamePrefName]) do
+			local checkboxID = OSDType.."Checkbox";
+			if preference then
+				forms.setproperty(ScriptHawk.modifyOSDUI.form_controls[checkboxID], "Checked", true);
+			else
+				forms.setproperty(ScriptHawk.modifyOSDUI.form_controls[checkboxID], "Checked", false);
+			end
+		end
+	end
+end
+loadPreferences();
+
 -----------
 -- State --
 -----------
@@ -1167,13 +1206,14 @@ local angleKeywords = {
 	"facing", "moving", "angle",
 };
 
+-- TODO: Get rid of this, generate checkboxes using defaultPreferences
 OSDTypes = {};
 
 function ScriptHawk.UI.updateReadouts()
 	-- Update form buttons etc
 	forms.settext(ScriptHawk.UI.form_controls["Precision Value Label"], precision);
 	forms.settext(ScriptHawk.UI.form_controls["Toggle Rotation Units Button"], rotation_units);
-	require "preferences";
+
 	if not TASSafe then
 		if ScriptHawk.dpad.joypad.enabled or ScriptHawk.dpad.key.enabled then
 			forms.settext(ScriptHawk.UI.form_controls["Speed Value Label"], Game.speedy_speeds[Game.speedy_index]);
@@ -1206,6 +1246,7 @@ function ScriptHawk.UI.updateReadouts()
 	local OSDY = Game.OSDPosition[2];
 
 	local nothingDrawnSinceLastSeparator = true;
+	local moduleHasOSDPreferences = currentPreferences[ScriptHawk.gamePrefName] ~= nil;
 	OSDTypes = {};
 
 	for i = 1, #Game.OSD do
@@ -1215,40 +1256,26 @@ function ScriptHawk.UI.updateReadouts()
 		local variableType = Game.OSD[i].category;
 		local inTAStudio = Game.OSD[i].tastudio_column == true;
 
-		if #OSDTypes == nil or #OSDTypes == 0 then
-			table.insert(OSDTypes, variableType);
-		else
-			inTable = false;
+		local inTable = false;
+		if #OSDTypes > 0 then
 			for j = 1, #OSDTypes do
 				if OSDTypes[j] == variableType then
 					inTable = true;
 				end
 			end
-			if not inTable then
-				table.insert(OSDTypes, variableType);
-			end
+		end
+		if not inTable then
+			table.insert(OSDTypes, variableType);
 		end
 
 		if label ~= "Separator" then
 			-- Check if variable should be visible based on preferences, default to true
 			local variableVisible = true;
 
-			if variableType ~= nil and userPreferences[ScriptHawk.gamePrefName] ~= nil then
+			if moduleHasOSDPreferences and variableType ~= nil then
 				variableVisible = false;
-				for OSDType = 1, #userPreferences[ScriptHawk.gamePrefName] do
-					if currentPreferences[ScriptHawk.gamePrefName][OSDType][1] == variableType then
-						if currentPreferences[ScriptHawk.gamePrefName][OSDType][2] == nil then
-							--if userPreferences[gamePrefName][OSDType][2] == nil then
-							if defaultPreferences[ScriptHawk.gamePrefName][OSDType][2] then
-								variableVisible = true;
-							end
-							--elseif userPreferences[ScriptHawk.gamePrefName][OSDType][2] then
-							--	variableVisible = true;
-							--end
-						elseif currentPreferences[ScriptHawk.gamePrefName][OSDType][2] then
-							variableVisible = true;
-						end
-					end
+				if currentPreferences[ScriptHawk.gamePrefName][variableType] == true then
+					variableVisible = true;
 				end
 			end
 
@@ -1396,163 +1423,93 @@ end
 ScriptHawk.modifyOSDUI.isChecked = ScriptHawk.modifyOSDUI.ischecked;
 
 local function restoreModifyOSDDefaults()
-	for i = 1, #defaultPreferences[ScriptHawk.gamePrefName] do
-		local checkboxID = defaultPreferences[ScriptHawk.gamePrefName][i][1].."Checkbox";
-		if defaultPreferences[ScriptHawk.gamePrefName][i][2] then
+	for k, v in pairs(defaultPreferences[ScriptHawk.gamePrefName]) do
+		local checkboxID = k.."Checkbox";
+		if v == true then
 			forms.setproperty(ScriptHawk.modifyOSDUI.form_controls[checkboxID], "Checked", true);
 		else
-			forms.setproperty(ScriptHawk.modifyOSDUI.form_controls[checkboxID], "Checked", false);
-		end
-	end
-end
-
-local function loadPreferences()
-	require "preferences";
-	for i = 1, #userPreferences[ScriptHawk.gamePrefName] do
-		local checkboxID = userPreferences[ScriptHawk.gamePrefName][i][1].."Checkbox";
-		if userPreferences[ScriptHawk.gamePrefName][i][2] then
-			print(checkboxID.." true");
-			forms.setproperty(ScriptHawk.modifyOSDUI.form_controls[checkboxID], "Checked", true);
-		else
-			print(checkboxID.." false");
 			forms.setproperty(ScriptHawk.modifyOSDUI.form_controls[checkboxID], "Checked", false);
 		end
 	end
 end
 
 local function saveUserPreferences()
-	if emu.getluacore() ~= "NLua" then
-		local lineSet = linesFrom('preferences.lua');
-		local inUserPref = false;
-		local safeToWrite = false;
-		io.open('preferences.lua', "w"):close();
-		local fileopened = io.open('preferences.lua', "a");
-
-		for lineNumber = 1, #lineSet do
-			preferencesLineText = lineSet[lineNumber];
-
-			if string.find(preferencesLineText, "userPreferences =") then
-				inUserPref = true;
-			else
-				if string.find(preferencesLineText, "Preferences =") then
-					inUserPref = false;
-					safeToWrite = false;
+	if ScriptHawk.isFileIOSafe then
+		-- Open the file for writing
+		local file = io.open('user_preferences.lua', "w");
+		file:write("userPreferences={\n");
+		for moduleName, userPreference in pairs(userPreferences) do
+			file:write("\t"..moduleName.."={\n");
+			for OSDType, preference in pairs(userPreference) do
+				local valueToWrite = "true";
+				if preference == nil then
+					valueToWrite = "nil";
+				elseif preference == false then
+					valueToWrite = "false";
+				end
+				if userPreferences[moduleName][OSDType] ~= defaultPreferences[moduleName][OSDType] then
+					file:write("\t\t"..OSDType.."="..valueToWrite..",\n");
 				end
 			end
-			if string.find(preferencesLineText, ScriptHawk.gamePrefName) then
-				safeToWrite = true;
-			end
-
-			for i = 1, #OSDTypes do
-				local checkboxID = OSDTypes[i].."Checkbox";
-				if string.find(preferencesLineText, OSDTypes[i]) then
-					if safeToWrite and inUserPref then
-						if ScriptHawk.modifyOSDUI.ischecked(checkboxID) then
-							preferencesLineText = string.gsub(preferencesLineText, "nil", "true");
-							preferencesLineText = string.gsub(preferencesLineText, "false", "true");
-						else
-							preferencesLineText = string.gsub(preferencesLineText, "nil", "false");
-							preferencesLineText = string.gsub(preferencesLineText, "true", "false");
-						end
-					end
-				end
-			end
-			fileopened:write(preferencesLineText, "\n");
+			file:write("\t},\n");
 		end
-		fileopened:close();
+		file:write("};\n");
+		file:close();
 	else
-		bizPre222Notice();
+		print("Due to a bug between BizHawk release 1.13.0 and 2.2.1");
+		print("The save & clear preferenes function cannot run on any");
+		print("pre-2.2.2 release of BizHawk. Sorry");
+		print("--------");
 	end
 end
 
 local function clearPreferences()
-	if emu.getluacore() ~= "NLua" then
-		local lineSet = linesFrom('preferences.lua');
-		local enableCopy = false;
-		local inDefaPref = false;
-		local pastUserPref = false;
-		local defaPrefStart = 0;
-		local defaPrefEnd = 0;
-		io.open('preferences.lua', "w"):close();
-		local fileopened = io.open('preferences.lua', "a")
-
-		for lineNumber = 1, #lineSet do
-			preferencesLineText = lineSet[lineNumber];
-
-			if defaPrefStart > 0 and defaPrefEnd > 0 and enableCopy then
-				pastUserPref = true;
-				fileopened:write("userPreferences = {", "\n");
-				for lineNumeric = defaPrefStart, defaPrefEnd do
-					lineText = lineSet[lineNumeric];
-					lineText = string.gsub(lineText, "false", "nil");
-					lineText = string.gsub(lineText, "true", "nil");
-					fileopened:write(lineText, "\n")
-				end
-				fileopened:write("currentPreferences = {", "\n");
-				for lineNumeric = defaPrefStart, defaPrefEnd do
-					lineText = lineSet[lineNumeric];
-					lineText = string.gsub(lineText, "false", "nil");
-					lineText = string.gsub(lineText, "true", "nil");
-					fileopened:write(lineText, "\n");
-				end
-				enableCopy = false;
-			elseif not pastUserPref then
-				fileopened:write(preferencesLineText, "\n");
-			end
-
-			if string.find(preferencesLineText, "defaultPreferences =") then
-				inDefaPref = true;
-				defaPrefStart = lineNumber + 1;
-			end
-
-			if string.find(preferencesLineText, "};") then
-				inDefaPref = false;
-				defaPrefEnd = lineNumber;
-				if not pastUserPref then
-					enableCopy = true;
-				end
-			end
+	if ScriptHawk.isFileIOSafe then
+		-- Open the file for writing
+		local file = io.open('user_preferences.lua', "w");
+		file:write("userPreferences={\n");
+		for moduleName, userPreference in pairs(userPreferences) do
+			file:write("\t"..moduleName.."={\n");
+			file:write("\t},\n");
 		end
-		fileopened:close();
+		file:write("};\n");
+		file:close();
+		loadPreferences();
 	else
-		bizPre222Notice();
+		print("Due to a bug between BizHawk release 1.13.0 and 2.2.1");
+		print("The save & clear preferenes function cannot run on any");
+		print("pre-2.2.2 release of BizHawk. Sorry");
+		print("--------");
 	end
 end
 
-local function bizPre222Notice()
-	print("Due to a bug between BizHawk release 1.13.0 and 2.2.1");
-	print("The save & clear preferenes function cannot run on any");
-	print("pre-2.2.2 release of BizHawk. Sorry");
-	print("--------");
-end
-
 function modifyOSD()
+	if ScriptHawk.modifyOSDUI.isOpen then
+		print("The modifyOSD() window is already open, please close it before opening another one.");
+		return;
+	end
+
 	-- Update form height
 	ScriptHawk.UI.updateReadouts();
 	ScriptHawk.modifyOSDUI.form_height = #OSDTypes + 8.5;
 
 	-- Carry on
-	ScriptHawk.modifyOSDUI.options_form = forms.newform(ScriptHawk.UI.col(ScriptHawk.modifyOSDUI.form_width), ScriptHawk.UI.row(ScriptHawk.modifyOSDUI.form_height), "Modify OSD");
+	ScriptHawk.modifyOSDUI.options_form = forms.newform(ScriptHawk.UI.col(ScriptHawk.modifyOSDUI.form_width), ScriptHawk.UI.row(ScriptHawk.modifyOSDUI.form_height), "Modify OSD", function() ScriptHawk.modifyOSDUI.isOpen = false end);
+	ScriptHawk.modifyOSDUI.isOpen = true;
 	ScriptHawk.modifyOSDUI.form_controls["Title Label"] = forms.label(ScriptHawk.modifyOSDUI.options_form, "MODIFY SCRIPTHAWK OSD", ScriptHawk.UI.col(0), ScriptHawk.UI.row(0) + ScriptHawk.modifyOSDUI.label_offset, 300, 16);
-	ScriptHawk.modifyOSDUI.checkbox(-8, 0, "Dummy Checkbox", ""); -- Test if form is open
-	forms.setproperty(ScriptHawk.modifyOSDUI.form_controls["Dummy Checkbox"], "Checked", true); -- Test if form is open
 	for OSDType = 1, #OSDTypes do
 		local labelID = OSDTypes[OSDType].."Label";
 		local labelText = OSDTypes[OSDType]..":";
 		local checkboxID = OSDTypes[OSDType].."Checkbox";
 		ScriptHawk.modifyOSDUI.form_controls[labelID] = forms.label(ScriptHawk.modifyOSDUI.options_form, labelText, ScriptHawk.UI.col(0), ScriptHawk.UI.row(OSDType) + ScriptHawk.modifyOSDUI.label_offset, 150, 16);
 		ScriptHawk.modifyOSDUI.checkbox(8, OSDType, checkboxID, "");
-		for i = 1, #defaultPreferences[ScriptHawk.gamePrefName] do
-			if defaultPreferences[ScriptHawk.gamePrefName][i][1] == OSDTypes[OSDType] then
-				if defaultPreferences[ScriptHawk.gamePrefName][i][2] then
-					forms.setproperty(ScriptHawk.modifyOSDUI.form_controls[checkboxID], "Checked", true);
-				end
-			end
+		if currentPreferences[ScriptHawk.gamePrefName][OSDTypes[OSDType]] == true then
+			forms.setproperty(ScriptHawk.modifyOSDUI.form_controls[checkboxID], "Checked", true);
 		end
 	end
 	ScriptHawk.modifyOSDUI.form_controls["OSD Default Restore"] = forms.button(ScriptHawk.modifyOSDUI.options_form, "Restore to Default", restoreModifyOSDDefaults, ScriptHawk.UI.col(0), ScriptHawk.UI.row(#OSDTypes + 2), 200, ScriptHawk.modifyOSDUI.button_height);
 	ScriptHawk.modifyOSDUI.form_controls["OSD Load Preferences"] = forms.button(ScriptHawk.modifyOSDUI.options_form, "Load User Preferences", loadPreferences, ScriptHawk.UI.col(0), ScriptHawk.UI.row(#OSDTypes + 3), 200, ScriptHawk.modifyOSDUI.button_height);
-	if emu.getluacore() ~= "NLua" then
+	if ScriptHawk.isFileIOSafe then
 		ScriptHawk.modifyOSDUI.form_controls["OSD Save Preferences"] = forms.button(ScriptHawk.modifyOSDUI.options_form, "Save As User Preference", saveUserPreferences, ScriptHawk.UI.col(0), ScriptHawk.UI.row(#OSDTypes + 4), 200, ScriptHawk.modifyOSDUI.button_height);
 		ScriptHawk.modifyOSDUI.form_controls["OSD Clear Preferences"] = forms.button(ScriptHawk.modifyOSDUI.options_form, "Clear All User Preferences", clearPreferences, ScriptHawk.UI.col(0), ScriptHawk.UI.row(#OSDTypes + 5), 200, ScriptHawk.modifyOSDUI.button_height);
 	else
@@ -1561,21 +1518,15 @@ function modifyOSD()
 end
 
 function ScriptHawk.modifyOSDUI.updateReadouts()
-	if ScriptHawk.modifyOSDUI.ischecked("Dummy Checkbox") then
+	if ScriptHawk.modifyOSDUI.isOpen then
 		for OSDType = 1, #OSDTypes do
 			local checkboxID = OSDTypes[OSDType].."Checkbox";
 			if ScriptHawk.modifyOSDUI.ischecked(checkboxID) then
-				for i = 1, #currentPreferences[ScriptHawk.gamePrefName] do
-					if currentPreferences[ScriptHawk.gamePrefName][i][1] == OSDTypes[OSDType] then
-						currentPreferences[ScriptHawk.gamePrefName][i][2] = true;
-					end
-				end
+				currentPreferences[ScriptHawk.gamePrefName][OSDTypes[OSDType]] = true;
+				userPreferences[ScriptHawk.gamePrefName][OSDTypes[OSDType]] = true;
 			else
-				for i = 1, #currentPreferences[ScriptHawk.gamePrefName] do
-					if currentPreferences[ScriptHawk.gamePrefName][i][1] == OSDTypes[OSDType] then
-						currentPreferences[ScriptHawk.gamePrefName][i][2] = false;
-					end
-				end
+				currentPreferences[ScriptHawk.gamePrefName][OSDTypes[OSDType]] = false;
+				userPreferences[ScriptHawk.gamePrefName][OSDTypes[OSDType]] = false;
 			end
 		end
 	end
