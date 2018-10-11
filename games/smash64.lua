@@ -5,7 +5,7 @@ if type(ScriptHawk) ~= "table" then
 	return;
 end
 
-Game = {
+local Game = {
 	speedy_speeds = { .1, 1, 5, 10, 20, 35, 50, 75, 100 };
 	speedy_index = 6;
 	max_rot_units = 4,

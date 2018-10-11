@@ -17,7 +17,7 @@ local oldP = {0, 0};
 local P = {0, 0};
 local oldPV = 0;
 
-Game = {
+local Game = {
 	max_rot_units = 4096,
 	rot_speed = 16,
 	speedy_index = 7,

@@ -13,7 +13,7 @@ end
 	-- Scale Game.speedy_speeds
 	-- Take me there implementation
 
-Game = {
+local Game = {
 	max_rot_units = 4096,
 	rot_speed = 16,
 	speedy_index = 7,
