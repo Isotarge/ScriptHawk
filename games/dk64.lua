@@ -109,7 +109,7 @@ local Game = {
 		-- 0001 0000 - Tag Barrel Void
 		-- 0000 1000 - ????
 		-- 0000 0100 - ????
-		-- 0000 0010 - ????
+		-- 0000 0010 - Freeze Actors (Pause Menu)
 		-- 0000 0001 - Pausing
 		tb_void_byte = {0x7FBB63, 0x7FBA83, 0x7FBFD3, 0x7B5B13}, -- byte, bitfield -- TODO: Document remaining values
 		player_pointer = {0x7FBB4C, 0x7FBA6C, 0x7FBFBC, 0x7B5AFC},
