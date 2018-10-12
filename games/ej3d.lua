@@ -23,7 +23,6 @@ local Game = {
 	Memory = { -- 1 USA, 2 EU
 		jim_pointer = {0x0C6810, 0x0C8670},
 		floor_value = {0x0D6EDC, 0x0D8D3C},
-		boss_camlock_pointer = {0x0E9F08, 0x0EBD68},
 		current_map = {0x0E9EF9, 0x0EBD59},
 		destination_map = {0x0E03E7, 0x0E2247},
 		destination_exit = {0x0E03E9, 0x0E2249},
@@ -35,6 +34,7 @@ local Game = {
 		obj1_pointer_list = {0x0E9E98, nil},
 		object_m2_count = {0x0E9EFE, nil},
 		obj2_pointer_list = {0x0E9F00, nil},
+		flag_pointer = {0x0E9F08, 0x0EBD68},
 	},
 };
 
@@ -551,7 +551,7 @@ function Game.applyInfinites()
 	end
 end
 
-function Game.completeFile()
+function completeFile()
 	local udder_pointer = Game.Memory.marble_pointer + 0x14;
 
 	-- UDDERS
@@ -570,7 +570,8 @@ function Game.completeFile()
 	mainmemory.writebyte(udder_pointer + 0x11, 6); -- Violent Death Valley
 	mainmemory.writebyte(udder_pointer + 0x12, 6); -- Good Bad Elderly
 	mainmemory.writebyte(udder_pointer + 0x13, 5); -- Bob & Number 4
-
+	setFlagsByType("Udder");
+	
 	-- MARBLES
 	mainmemory.writebyte(Game.Memory.marble_pointer + 0x00, 100); -- Coop D'Etat
 	mainmemory.writebyte(Game.Memory.marble_pointer + 0x01, 100); -- Barn to be Wild
@@ -595,7 +596,7 @@ Game.BossCamLockOffset = {
 function Game.killBoss()
 	BossCamLockOffSet = Game.BossCamLockOffset[mainmemory.readbyte(Game.Memory.current_map)];
 	if BossCamLockOffSet ~= nil then
-		camlock_address = dereferencePointer(Game.Memory.boss_camlock_pointer) + BossCamLockOffSet;
+		camlock_address = dereferencePointer(Game.Memory.flag_pointer) + BossCamLockOffSet;
 		bossdeath_address = dereferencePointer(Game.Memory.jim_pointer + jim.boss_pointer) + 0xE73;
 		mainmemory.writebyte(camlock_address, 1);
 		mainmemory.writebyte(bossdeath_address, 1);
@@ -1006,51 +1007,289 @@ end
 ----------------
 -- Flag Stuff --
 ----------------
-Game.flagBlock = {
---  BRAIN
-	brain_udder_first = {0x0C6294, nil},
-	brain_unlock_kim = {0x2772A0, nil},
---  COOP D'ETAT
-	cde_udder_fridge = {0x0C627A, nil},
-	cde_udder_pants = {0x0C627B, nil},
-	cde_udder_chicken = {0x0C627C, nil},
---  BARN TO BE WILD
-	btbw_udder_quicksand = {nil, nil},
-	btbw_udder_barndoor = {nil, nil},
-	btbw_udder_crow = {nil, nil},
-	btbw_udder_jail = {nil, nil},
-	btbw_udder_obstacle = {nil, nil},
-	btbw_udder_balloon = {nil, nil},
-	btbw_udder_camera = {nil, nil},
---  PSYCROW
-	psy_udder_completion = {nil, nil},
---  LORD OF THE FRIES
 
---  ARE YOU HUNGRY TONITE?
-	ayht_udder_bean = {0x37BAF8, nil},
---  FATTY Roswell
+flag_block_size = 0x438; -- D34 max
+flag_Array = {};
 
---  POULTRYGEIST
-	poultone_udder_beaver = {0x310010, nil},
-	poultone_udder_furniture = {0x310020, nil},
-	poultone_udder_hoover = {0x310028, nil},
---  POULTRYGEIST TOO
-	poulttwo_udder_fireplace = {0x321278, nil},
---  DEATH WORMED UP
-	dwu_udder_graves = {0x0C625B, nil},
-	dwu_udder_swamp = {0x0C625D, nil},
-	dwu_udder_balloon = {0x0C6260, nil},
---  BOOGIE NIGHTS OF THE LIVING DEAD
+function getFlagTypeCount(flagType)
+	flag_type_count = 0
+	for i = 1, flag_block_size do
+		if flagBlock[i] ~= nil then -- is a documented flag
+			if flagBlock[i]["type"] == flagType then
+				flag_type_count = flag_type_count + 1;
+			end
+		end
+	end
+	return flag_type_count;
+end
 
---  PROFESSOR MONKEY FOR A HEAD
+function getFlagsKnown()
+	flag_count = 0
+	for i = 1, flag_block_size do
+		if flagBlock[i] ~= nil then -- is a documented flag
+			flag_count = flag_count + 1;
+		end
+	end
+	return flag_count;
+end
 
---  VIOLENT DEATH VALLEY
+function getFlagsTotal()
+	return flag_block_size / 8;
+end
 
---  THE GOOD, THE BAD AND THE ELDERLY
+function getFlagArray()
+	flag_start = dereferencePointer(Game.Memory.flag_pointer);
+	if isRDRAM(flag_start) then
+		for i = 1, flag_block_size do
+			flag_Array[i] = mainmemory.readbyte(flag_start + i);
+		end
+	end
+end
 
---  BOB AND NUMBER Four
+function checkFlagArray()
+	flag_start = dereferencePointer(Game.Memory.flag_pointer);
+	if isRDRAM(flag_start) then
+		if flag_Array[1] ~= nil then -- flag array populated
+			for i = 1, flag_block_size do
+				currentFlagState = mainmemory.readbyte(flag_start + i);
+				currentFrame = emu.framecount();
+				if flagBlock[i] ~= nil then
+					flag_name = flagBlock[i]["name"]
+				else
+					flag_name = "Unknown ("..toHexString(i)..")"
+				end
+				if flag_Array[i] ~= currentFlagState then -- Flag has changed states
+					if currentFlagState == 1 then
+						print(flag_name.." has been SET on frame "..currentFrame);
+					else
+						print(flag_name.." has been CLEARED on frame "..currentFrame);
+					end
+				end
+			end
+		end
+	end
+end
 
---  EARTHWORM KIM
+function checkFlag(offset)
+	flag_start = dereferencePointer(Game.Memory.flag_pointer);
+	if isRDRAM(flag_start) then
+		flag_state = mainmemory.readbyte(flag_start + offset);
+		if flag_state == 1 then
+			print("Flag: '"..flagBlock[offset]["name"].."' is SET");
+		else
+			print("Flag: '"..flagBlock[offset]["name"].."' is NOT SET");
+		end
+	end
+end
+
+function setFlag(offset)
+	flag_start = dereferencePointer(Game.Memory.flag_pointer);
+	if isRDRAM(flag_start) then
+		mainmemory.writebyte(flag_start + offset,1);
+		if flagBlock[offset] ~= nil then
+			flag_name = flagBlock[offset]["name"]
+		else
+			flag_name = "Unknown ("..toHexString(offset)..")"
+		end
+		print("Set flag '"..flag_name.."'");
+	end
+end
+
+function clearFlag(offset)
+	flag_start = dereferencePointer(Game.Memory.flag_pointer);
+	if isRDRAM(flag_start) then
+		mainmemory.writebyte(flag_start + offset,0);
+		if flagBlock[offset] ~= nil then
+			flag_name = flagBlock[offset]["name"]
+		else
+			flag_name = "Unknown ("..toHexString(offset)..")"
+		end
+		print("Cleared flag '"..flag_name.."'");
+	end
+end
+
+function setFlagByName(name_string)
+	for i = 1, flag_block_size do
+		if flagBlock[i] ~= nil then
+			if flagBlock[i]["name"] == name_string then
+				setFlag(i);
+			end
+		end
+	end
+end
+
+function clearFlagByName(name_string)
+	for i = 1, flag_block_size do
+		if flagBlock[i] ~= nil then
+			if flagBlock[i]["name"] == name_string then
+				clearFlag(i);
+			end
+		end
+	end
+end
+
+function checkFlagByName(name_string)
+	for i = 1, flag_block_size do
+		if flagBlock[i] ~= nil then
+			if flagBlock[i]["name"] == name_string then
+				checkFlag(i);
+			end
+		end
+	end
+end
+
+function setFlagsByType(type_string)
+	for i = 1, flag_block_size do
+		if flagBlock[i] ~= nil then
+			if flagBlock[i]["type"] == type_string then
+				setFlag(i);
+			end
+		end
+	end
+end
+
+function clearFlagsByType(type_string)
+	for i = 1, flag_block_size do
+		if flagBlock[i] ~= nil then
+			if flagBlock[i]["type"] == type_string then
+				checkFlag(i);
+			end
+		end
+	end
+end
+
+local function formatOutputString(caption, value, max)
+	return caption..value.."/"..max.." or "..round(value / max * 100, 2).."%";
+end
+
+function flagStats()
+	local udders_known = getFlagTypeCount("Udder");
+	local udders_total = 74;
+	local flags_known = getFlagsKnown();
+	local flags_total = getFlagsTotal();
+
+	dprint("Block size: "..toHexString(flag_block_size));
+	dprint(formatOutputString("Flags known: ", flags_known, flags_total));
+	dprint(formatOutputString("Udders: ", udders_known, udders_total));
+	dprint("");
+	print_deferred();
+end
+
+function getFlagNameArray()
+	flagNameBlock = {}
+	j = 0;
+	for i = 1, flag_block_size do
+		if flagBlock[i] ~= nil then
+			j = j + 1;
+			flagNameBlock[j] = flagBlock[i]["name"];
+		end
+	end
+	return flagNameBlock;
+end
+
+local function flagSetButtonHandler()
+	setFlagByName(forms.getproperty(ScriptHawk.UI.form_controls["Flag Dropdown"], "SelectedItem"));
+end
+
+local function flagClearButtonHandler()
+	clearFlagByName(forms.getproperty(ScriptHawk.UI.form_controls["Flag Dropdown"], "SelectedItem"));
+end
+
+local function flagCheckButtonHandler()
+	checkFlagByName(forms.getproperty(ScriptHawk.UI.form_controls["Flag Dropdown"], "SelectedItem"));
+end
+
+flagBlock = {
+	[0x018] = {name = "DWU: Stone Door Open", type = "Physical"},
+	[0x070] = {name = "LOTF: Talked to King Gherkin", type = "Physical"},
+	[0x078] = {name = "PG1: First Wall Cleared", type = "Physical"},
+	[0x080] = {name = "PG1: Chicken Gauntlet Defeated", type = "Physical"},
+	[0x098] = {name = "CDE: Barn Door Open", type = "Physical"},
+	[0x0A8] = {name = "AYHT: Elevator Lasers Lowered", type = "Physical"},
+	[0x130] = {name = "Brain: CDE Open", type = "Physical"},
+	[0x138] = {name = "Brain: Happiness Hub Snott Spawned", type = "Physical"},
+	[0x150] = {name = "Have all udders", type = "Check"},
+	[0x160] = {name = "Brain: Snott FTT", type = "FTT"},
+	[0x1B0] = {name = "Brain: Earthworm Kim Open", type = "Physical"},
+	[0x1C0] = {name = "DWU: Rabbit Hole Udder", type = "Udder"},
+	[0x1C8] = {name = "DWU: Gravestones Udder", type = "Udder"},
+	[0x1D0] = {name = "DWU: Medallion Udder", type = "Udder"},
+	[0x1D8] = {name = "DWU: Quicksand Udder", type = "Udder"},
+	[0x1E0] = {name = "DWU: Statues Udder", type = "Udder"},
+	[0x1F0] = {name = "DWU: Blue Balloon Udder", type = "Udder"},
+	[0x1F8] = {name = "PG1: Beaver Head Udder", type = "Udder"},
+	[0x200] = {name = "PG1: Painting Room Udder", type = "Udder"},
+	[0x208] = {name = "PG1: Furniture Room Udder", type = "Udder"},
+	[0x210] = {name = "PG1: Vacuum Udder", type = "Udder"},
+	[0x218] = {name = "PG1: Chicken Gauntlet Udder", type = "Udder"},
+	[0x220] = {name = "BNotLD: Boom Box Udder", type = "Udder"},
+	[0x228] = {name = "BNotLD: Zombie Heads Udder", type = "Udder"},
+	[0x230] = {name = "BNotLD: Manhole Udder", type = "Udder"},
+	[0x238] = {name = "BNotLD: Speaker Towers Udder", type = "Udder"},
+	[0x240] = {name = "BNotLD: Sewers Udder", type = "Udder"},
+	[0x248] = {name = "GBE: Ice Block Udder", type = "Udder"},
+	[0x250] = {name = "GBE: Bank Udder", type = "Udder"},
+	[0x258] = {name = "GBE: Sheriff Udder", type = "Udder"},
+	[0x260] = {name = "GBE: Bottle Udder", type = "Udder"},
+	[0x268] = {name = "GBE: Granny Herding Udder", type = "Udder"},
+	[0x270] = {name = "GBE: Bingo Udder", type = "Udder"},
+	[0x278] = {name = "BTBW: Bootcamp Udder", type = "Udder"},
+	[0x280] = {name = "BTBW: Camera Udder", type = "Udder"},
+	[0x288] = {name = "BTBW: Barn Door Udder", type = "Udder"},
+	[0x290] = {name = "BTBW: Crow Udder", type = "Udder"},
+	[0x298] = {name = "BTBW: Kill Pluckitt Udder", type = "Udder"},
+	-- 0x2A0 - Udder
+	-- 0x2A8 - Udder
+	[0x2B0] = {name = "BTBW: Blue Balloon Udder", type = "Udder"},
+	-- 0x2B8
+	[0x2C0] = {name = "CDE: Fridges Udder", type = "Udder"},
+	[0x2C8] = {name = "CDE: Underpants Udder", type = "Udder"},
+	[0x2D0] = {name = "CDE: Bomb Room Udder", type = "Udder"},
+	-- 0x2D8
+	[0x2E0] = {name = "AYHT: Elevator Udder", type = "Udder"},
+	[0x2E8] = {name = "AYHT: Bean Room Udder", type = "Udder"},
+	[0x2F0] = {name = "AYHT: Pan Room Udder", type = "Udder"},
+	[0x2F8] = {name = "AYHT: Elvis Udder", type = "Udder"},
+	[0x300] = {name = "VDV: Hidden Udder", type = "Udder"},
+	[0x308] = {name = "VDV: Bean Room Udder", type = "Udder"},
+	[0x310] = {name = "VDV: Ice Cream Udder", type = "Udder"},
+	[0x318] = {name = "VDV: Kill Grannies Udder", type = "Udder"},
+	[0x320] = {name = "VDV: Granny Herding Udder", type = "Udder"},
+	[0x328] = {name = "BTBW: Swamp Udder", type = "Udder"},
+	[0x330] = {name = "PG2: Vacuum Udder", type = "Udder"},
+	[0x338] = {name = "PG2: Chicken Udder", type = "Udder"},
+	[0x340] = {name = "PG2: Painting Room Udder", type = "Udder"},
+	[0x348] = {name = "PG2: Library Udder", type = "Udder"},
+	[0x350] = {name = "PG2: Blue Balloon Udder", type = "Udder"},
+	[0x358] = {name = "LOTF: Blue Balloon Udder", type = "Udder"},
+	[0x360] = {name = "LOTF: Central Tree Udder", type = "Udder"},
+	[0x368] = {name = "LOTF: Tall Platform Udder", type = "Udder"},
+	[0x370] = {name = "LOTF: King Gherkin Udder", type = "Udder"},
+	[0x378] = {name = "LOTF: Potatoes Udder", type = "Udder"},
+	-- 0x380
+	[0x388] = {name = "AYHT: Blue Balloon Udder", type = "Udder"},
+	[0x390] = {name = "Brain: Peter Udder", type = "Udder"},
+	[0x398] = {name = "Psycrow: Udder (1)", type = "Udder"},
+	[0x3A0] = {name = "Psycrow: Udder (2)", type = "Udder"},
+	[0x3A8] = {name = "Psycrow: Udder (3)", type = "Udder"},
+	[0x3B0] = {name = "Psycrow: Udder (4)", type = "Udder"},
+	[0x3B8] = {name = "Psycrow: Udder (5)", type = "Udder"},
+	[0x3C0] = {name = "Bob and No. 4: Udder (1)", type = "Udder"},
+	[0x3C8] = {name = "Bob and No. 4: Udder (2)", type = "Udder"},
+	[0x3D0] = {name = "Bob and No. 4: Udder (3)", type = "Udder"},
+	[0x3D8] = {name = "Bob and No. 4: Udder (4)", type = "Udder"},
+	[0x3E0] = {name = "Bob and No. 4: Udder (5)", type = "Udder"},
+	[0x3E8] = {name = "PMFAH: Udder (1)", type = "Udder"},
+	[0x3F0] = {name = "PMFAH: Udder (2)", type = "Udder"},
+	[0x3F8] = {name = "PMFAH: Udder (3)", type = "Udder"},
+	[0x400] = {name = "PMFAH: Udder (4)", type = "Udder"},
+	[0x408] = {name = "PMFAH: Udder (5)", type = "Udder"},
+	[0x410] = {name = "Fatty Roswell: Udder (1)", type = "Udder"},
+	[0x418] = {name = "Fatty Roswell: Udder (2)", type = "Udder"},
+	[0x420] = {name = "Fatty Roswell: Udder (3)", type = "Udder"},
+	[0x428] = {name = "Fatty Roswell: Udder (4)", type = "Udder"},
+	[0x430] = {name = "Fatty Roswell: Udder (5)", type = "Udder"},
+	[0x438] = {name = "VDV: Blue Balloon Udder", type = "Udder"},
 };
 
 ScriptHawk.bindKeyRealtime("N", decrementObjectIndex, true);
@@ -1065,9 +1304,17 @@ function Game.initUI()
 	ScriptHawk.UI.form_controls["Reload Map (Soft)"] = forms.button(ScriptHawk.UI.options_form, "Reload Map", Game.reloadMap, ScriptHawk.UI.col(5), ScriptHawk.UI.row(4), ScriptHawk.UI.col(4) + 10, ScriptHawk.UI.button_height);
 	ScriptHawk.UI.form_controls["Reload Map (Hard)"] = forms.button(ScriptHawk.UI.options_form, "Hard Reload", Game.reloadMapHard, ScriptHawk.UI.col(10), ScriptHawk.UI.row(0), ScriptHawk.UI.col(4) + 10, ScriptHawk.UI.button_height);
 	ScriptHawk.UI.form_controls["Kill Boss"] = forms.button(ScriptHawk.UI.options_form, "Kill Boss", Game.killBoss, ScriptHawk.UI.col(10), ScriptHawk.UI.row(1), ScriptHawk.UI.col(4) + 10, ScriptHawk.UI.button_height);
-	ScriptHawk.UI.form_controls["OoB Timer Checkbox"] = forms.checkbox(ScriptHawk.UI.options_form, "OoB Timer Off", ScriptHawk.UI.col(0) + ScriptHawk.UI.dropdown_offset, ScriptHawk.UI.row(6) + ScriptHawk.UI.dropdown_offset);
-	ScriptHawk.UI.form_controls["Free Roam Mode"] = forms.checkbox(ScriptHawk.UI.options_form, "Free Roam Mode", ScriptHawk.UI.col(0) + ScriptHawk.UI.dropdown_offset, ScriptHawk.UI.row(7) + ScriptHawk.UI.dropdown_offset);
+	ScriptHawk.UI.form_controls["OoB Timer Checkbox"] = forms.checkbox(ScriptHawk.UI.options_form, "OoB Timer Off", ScriptHawk.UI.col(5) + ScriptHawk.UI.dropdown_offset, ScriptHawk.UI.row(5) + ScriptHawk.UI.dropdown_offset);
+	ScriptHawk.UI.form_controls["Free Roam Mode"] = forms.checkbox(ScriptHawk.UI.options_form, "Free Roam Mode", ScriptHawk.UI.col(5) + ScriptHawk.UI.dropdown_offset, ScriptHawk.UI.row(6) + ScriptHawk.UI.dropdown_offset);
 	ScriptHawk.UI.form_controls["Console Mode Switch"] = forms.button(ScriptHawk.UI.options_form, "Emulator Mode", Game.toggleConsoleMode, ScriptHawk.UI.col(10), ScriptHawk.UI.row(4), ScriptHawk.UI.col(4) + 10, ScriptHawk.UI.button_height);
+
+	getFlagNameArray();
+	ScriptHawk.UI.form_controls["Flag Dropdown"] = forms.dropdown(ScriptHawk.UI.options_form, flagNameBlock, ScriptHawk.UI.col(0) + ScriptHawk.UI.dropdown_offset, ScriptHawk.UI.row(7) + ScriptHawk.UI.dropdown_offset, ScriptHawk.UI.col(9) + 8, ScriptHawk.UI.button_height);
+	ScriptHawk.UI.form_controls["Set Flag Button"] = forms.button(ScriptHawk.UI.options_form, "Set", flagSetButtonHandler, ScriptHawk.UI.col(10), ScriptHawk.UI.row(7), 46, ScriptHawk.UI.button_height);
+	ScriptHawk.UI.form_controls["Check Flag Button"] = forms.button(ScriptHawk.UI.options_form, "Check", flagCheckButtonHandler, ScriptHawk.UI.col(12), ScriptHawk.UI.row(7), 46, ScriptHawk.UI.button_height);
+	ScriptHawk.UI.form_controls["Clear Flag Button"] = forms.button(ScriptHawk.UI.options_form, "Clear", flagClearButtonHandler, ScriptHawk.UI.col(14), ScriptHawk.UI.row(7), 46, ScriptHawk.UI.button_height);
+	ScriptHawk.UI.checkbox(10, 6, "realtime_flags", "Realtime Flags", true);
+	flagStats();
 end
 
 function Game.realTime()
@@ -1091,6 +1338,10 @@ function Game.eachFrame()
 
 	drawGrabScriptUI()
 	Game.applyConsoleSettings()
+	if ScriptHawk.UI.ischecked("realtime_flags") then
+		checkFlagArray()
+		getFlagArray()
+	end
 end
 
 Game.OSD = {
