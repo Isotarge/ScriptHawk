@@ -552,37 +552,38 @@ function Game.applyInfinites()
 end
 
 function completeFile()
-	local udder_pointer = Game.Memory.marble_pointer + 0x14;
-
-	-- UDDERS
-	mainmemory.writebyte(udder_pointer + 0x00, 1); -- Brain
-	mainmemory.writebyte(udder_pointer + 0x02, 3); -- Coop D'Etat
-	mainmemory.writebyte(udder_pointer + 0x03, 7); -- Barn to be Wild
-	mainmemory.writebyte(udder_pointer + 0x04, 5); -- Psycrow
-	mainmemory.writebyte(udder_pointer + 0x06, 5); -- Lord of the Fries
-	mainmemory.writebyte(udder_pointer + 0x07, 5); -- Hungry Tonite?
-	mainmemory.writebyte(udder_pointer + 0x08, 5); -- Fatty Roswell
-	mainmemory.writebyte(udder_pointer + 0x0B, 5); -- Poultrygeist
-	mainmemory.writebyte(udder_pointer + 0x0C, 5); -- Poultrygeist Too
-	mainmemory.writebyte(udder_pointer + 0x0D, 6); -- Death Wormed Up
-	mainmemory.writebyte(udder_pointer + 0x0E, 5); -- Boogie Nights
-	mainmemory.writebyte(udder_pointer + 0x0F, 5); -- Monkey for a Head
-	mainmemory.writebyte(udder_pointer + 0x11, 6); -- Violent Death Valley
-	mainmemory.writebyte(udder_pointer + 0x12, 6); -- Good Bad Elderly
-	mainmemory.writebyte(udder_pointer + 0x13, 5); -- Bob & Number 4
-	setFlagsByType("Udder");
+	collectable_counts = { -- Udders, Marbles
+		[0] = {1,0}, -- Brain
+		[1] = {0,0}, -- Memory
+		[2] = {3,100}, -- CDE
+		[3] = {7,100}, -- BTBW
+		[4] = {5,0}, -- Psycrow
+		[5] = {0,0}, -- Happiness
+		[6] = {5,100}, -- LOTF
+		[7] = {5,100}, -- AYHT
+		[8] = {5,0}, -- Roswell
+		[9] = {0,0}, -- Fear
+		[10] = {0,0}, -- Mansion Lobby
+		[11] = {5,100}, -- PG1
+		[12] = {5,100}, -- PG2
+		[13] = {6,100}, -- DWU
+		[14] = {5,100}, -- BNotLD
+		[15] = {5,0}, -- PMFAH
+		[16] = {0,0}, -- Fantasy
+		[17] = {6,100}, -- VDV
+		[18] = {6,100}, -- GBE
+		[19] = {5,0}, -- Bob
+		[20] = {0,0}, -- Kim
+		[21] = {0,0}, -- Main Menu
+	};
 	
-	-- MARBLES
-	mainmemory.writebyte(Game.Memory.marble_pointer + 0x00, 100); -- Coop D'Etat
-	mainmemory.writebyte(Game.Memory.marble_pointer + 0x01, 100); -- Barn to be Wild
-	mainmemory.writebyte(Game.Memory.marble_pointer + 0x04, 100); -- Lord of the Fries
-	mainmemory.writebyte(Game.Memory.marble_pointer + 0x05, 100); -- Hungry Tonite
-	mainmemory.writebyte(Game.Memory.marble_pointer + 0x09, 100); -- Poultrygeist
-	mainmemory.writebyte(Game.Memory.marble_pointer + 0x0A, 100); -- Poultrygeist Too
-	mainmemory.writebyte(Game.Memory.marble_pointer + 0x0B, 100); -- Death Wormed Up
-	mainmemory.writebyte(Game.Memory.marble_pointer + 0x0C, 100); -- Boogie Nights
-	mainmemory.writebyte(Game.Memory.marble_pointer + 0x0F, 100); -- Violent Death Valley
-	mainmemory.writebyte(Game.Memory.marble_pointer + 0x10, 100); -- Good Bad Elderly
+	for i = 0, (#collectable_counts - 1) do
+		mainmemory.writebyte(Game.Memory.marble_pointer + i + 0x14, collectable_counts[i][1]);
+		mainmemory.writebyte(Game.Memory.marble_pointer + i - 0x02, collectable_counts[i][2]);
+	end
+	
+	setFlagsByType("Udder");
+	setFlag(0x150); -- Have all udders check
 end
 
 Game.BossCamLockOffset = {
@@ -626,21 +627,6 @@ end
 ------------------
 -- Object Stuff --
 ------------------
--- 0x70 Position: X (Float)
--- 0x74 Position: Y (Float)
--- 0x78 Position: Z (Float)
--- 0x80 Angle (2-Byte)
--- 0x129 Health (1-Byte)
--- 0x12C Size (2-Byte)
--- 0x138 Opacity (1-Byte)
--- 0x13B Animation (1-Byte)
--- 0x13D Animation Timer (1-Byte)
-
--- 0x2740B0, 0x274170, 0x274230 (C0 difference)
--- 0x3206C8, 0x320820, 0x320978 (158 difference)
--- I think the start of the objects pointer list is at 0x273870
-
--- +0x1123 on model ptr
 
 local function getObjectCount()
 	return math.min(255, mainmemory.readbyte(Game.Memory.object_count) - 1);
@@ -1060,9 +1046,9 @@ function checkFlagArray()
 				end
 				if flag_Array[i] ~= currentFlagState then -- Flag has changed states
 					if currentFlagState == 1 then
-						print(flag_name.." has been SET on frame "..currentFrame);
+						print("'"..flag_name.."' has been SET on frame "..currentFrame);
 					else
-						print(flag_name.." has been CLEARED on frame "..currentFrame);
+						print("'"..flag_name.."' has been CLEARED on frame "..currentFrame);
 					end
 				end
 			end
@@ -1201,6 +1187,7 @@ end
 
 flagBlock = {
 	[0x018] = {name = "DWU: Stone Door Open", type = "Physical"},
+	[0x040] = {name = "BTBW: Crow in final position", type = "Physical"},
 	[0x070] = {name = "LOTF: Talked to King Gherkin", type = "Physical"},
 	[0x078] = {name = "PG1: First Wall Cleared", type = "Physical"},
 	[0x080] = {name = "PG1: Chicken Gauntlet Defeated", type = "Physical"},
