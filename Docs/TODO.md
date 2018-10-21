@@ -1,17 +1,18 @@
 # ScriptHawk TODO list
 ## High Priority
+- Blank template that's more lightweight
 - Save and Load settings from a config file on disk
 	- Joypad/Keyboard binds for D-Pad and L Button
 	- Rounding precision
 	- Rotation units
 	- Mode? Arguable
-	- Verbosity/Debug mode?
+	- Warnings/UITest?
 - Bulk support SMS games with new hitbox API
 - General: UI to load ASM patches, can currently only be done by calling loadASMPatch(filename, suppressprint) in the lua console
 - DK64:
 	- Find menu cutscene nonsense
 	- Finish flag documentation
-	- The endgame here is identifying everything on the heap until there are no unknown allocated blocks left. We have a fairly decent picture of what’s on the heap currently but the documentation is scattered throughout various ScriptHawk functions so there’s no all-in-one automated method of identifying arbitrary blocks. I could implement a function that you could pass a block pointer and it'll try and identify what the block is/does by searching through known pointer lists of various object types etc. I don't have much free time at the moment but I'll put it on my todo list for when things settle down.
+	- Increase identifyMemory() coverage
 
 ## Low priority, recurring, or waiting:
 - Object Analysis Tools:
