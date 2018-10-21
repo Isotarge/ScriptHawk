@@ -526,10 +526,15 @@ local supportedGames = {
 	["88C8FED5ECD5ED901CB5FC4B5BBEFFA3EA022DF7"] = {moduleName="games.smash64", friendlyName="19XXTE 0.11"},
 	["1095F94D70216AC916A9DD8A9FD65DB13E7F9F17"] = {moduleName="games.smash64", friendlyName="19XXGE"},
 
+	-- Sonic The Hedgehog (GG)
+	["8A95B36139206A5BA13A38BB626AEE25"] = {moduleName="games.sonic1_sms", friendlyName="Sonic The Hedgehog (J)"},
+	["05D0E3897CB2B6E08C2952730D2C80C1"] = {moduleName="games.sonic1_sms", friendlyName="Sonic The Hedgehog (W) (Proto)"},
+	["B1DE7027824C434CE8DE59782705F5C9"] = {moduleName="games.sonic1_sms", friendlyName="Sonic The Hedgehog (W) (Rev 1)"},
+
 	-- Sonic The Hedgehog (SMS)
 	["6B9677E4A9ABB37765D6DB4658F4324251807E07"] = {moduleName="games.sonic1_sms", friendlyName="Sonic The Hedgehog (UE)"},
-	["DC13A61EAFE75C13C15B5ECE419AC57B"] = {moduleName="games.sonic1_sms", friendlyName="Sonic The Hedgehog (UE)"},
 	["6ACA0E3DFFE461BA1CB11A86CD4CAF5B97E1B8DF"] = {moduleName="games.sonic1_sms", friendlyName="Sonic The Hedgehog (E) (BIOS)"},
+	["DC13A61EAFE75C13C15B5ECE419AC57B"] = {moduleName="games.sonic1_sms", friendlyName="Sonic The Hedgehog (UE)"},
 	["4187D96BEAF36385E681A3CF3BD1663D"] = {moduleName="games.sonic1_sms", friendlyName="Sonic The Hedgehog (E) (BIOS)"},
 
 	-- Space Station Silicon Valley

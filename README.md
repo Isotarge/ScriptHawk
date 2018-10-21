@@ -114,7 +114,7 @@ A collection of Lua scripts and RAM watches for [BizHawk](https://github.com/TAS
 - Penguin Land (SMS)
 - Psycho Fox (SMS)
 - Rats! (GBC)
-- Sonic The Hedgehog (SMS)
+- Sonic The Hedgehog (SMS/GG)
 - Taz-Mania (SMS)
 - The Ninja (SMS)
 - Ty the Tasmanian Tiger 2: Bush Rescue (GBA)

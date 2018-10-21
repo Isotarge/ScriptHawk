@@ -6,22 +6,22 @@ if type(ScriptHawk) ~= "table" then
 end
 
 local Game = {
-	Memory = {
-		in_score_screen = 0x1207,
-		level = 0x123E,
-		rings = 0x12AA, -- byte, BCD
-		lives = 0x1246,
-		viewport_x = 0x125A,
-		viewport_x2 = 0x126F,
-		viewport_y = 0x125D,
-		viewport_y2 = 0x1271,
-		x_position = 0x13FD, -- 3 bytes sub.min.maj
-		y_position = 0x1400, -- 3 bytes sub.min.maj
-		x_velocity = 0x1403, -- 3 bytes sub.min.maj
-		y_velocity = 0x1406, -- 3 bytes sub.min.maj
-		igt = 0x12CE, -- 3 bytes: min(BCD):sec(BCD).frame
-		invuln_timer = 0x128D,
-		speed_shoes_timer = 0x1411,
+	Memory = { -- Order: SMS/GG (Proto), GG
+		in_score_screen = {0x1207, 0x0000}, -- TODO: GG
+		level = {0x123E, 0x1238},
+		rings = {0x12AA, 0x12A9}, -- byte, BCD
+		lives = {0x1246, 0x1240},
+		viewport_x = {0x125A, 0x1254},
+		viewport_x2 = {0x126F, 0x0000}, -- TODO: GG
+		viewport_y = {0x125D, 0x1257},
+		viewport_y2 = {0x1271, 0x0000}, -- TODO: GG
+		x_position = {0x13FD, 0x13FE}, -- 3 bytes sub.min.maj
+		y_position = {0x1400, 0x1401}, -- 3 bytes sub.min.maj
+		x_velocity = {0x1403, 0x1404}, -- 3 bytes sub.min.maj
+		y_velocity = {0x1406, 0x1407}, -- 3 bytes sub.min.maj
+		igt = {0x12CE, 0x12CF}, -- 3 bytes: min(BCD):sec(BCD).frame
+		invuln_timer = {0x128D, 0x1287},
+		speed_shoes_timer = {0x1411, 0x1412},
 	},
 	maps = {
 		"Green Hill 1", -- 0x00
@@ -90,6 +90,20 @@ end
 function Game.detectVersion(romName, romHash)
 	ScriptHawk.dpad.joypad.enabled = false;
 	ScriptHawk.dpad.key.enabled = false;
+	local version = 1;
+	if romHash == "05D0E3897CB2B6E08C2952730D2C80C1" then -- GG Proto
+		version = 1; -- Same addresses as SMS, interestingly
+	elseif romHash == "8A95B36139206A5BA13A38BB626AEE25" then -- GG Rev 1.0
+		version = 2;
+	elseif romHash == "B1DE7027824C434CE8DE59782705F5C9" then -- GG Rev 1.1
+		version = 2;
+	end
+
+	-- Squish Game.Memory tables down to a single address for the relevant version
+	for k, v in pairs(Game.Memory) do
+		Game.Memory[k] = v[version];
+	end
+
 	return true;
 end
 
@@ -106,6 +120,14 @@ end
 
 function Game.getRings()
 	return mainmemory.readbyte(Game.Memory.rings);
+end
+
+function Game.getSpeedShoesTimer()
+	return mainmemory.readbyte(Game.Memory.speed_shoes_timer);
+end
+
+function Game.getInvulnerabilityTimer()
+	return mainmemory.readbyte(Game.Memory.invuln_timer);
 end
 
 function Game.getLevel()
@@ -172,6 +194,9 @@ Game.OSD = {
 	{"Y Velocity", Game.getYVelocity, category="speed"},
 	{"dX", category="positionStats"},
 	{"dY", category="positionStats"},
+	{"Separator"},
+	{"Speed Shoes", Game.getSpeedShoesTimer},
+	{"Invuln.", Game.getInvulnerabilityTimer},
 };
 
 return Game;
