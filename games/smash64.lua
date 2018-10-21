@@ -810,6 +810,13 @@ function Game.getBoomerangOSD(player)
 	return toHexString(positionObject).." ("..timer1..", "..timer2..")";
 end
 
+boomerangState = {
+	{ prev_position = {x = 0, y = 0}, d = {x = 0, y = 0} },
+	{ prev_position = {x = 0, y = 0}, d = {x = 0, y = 0} },
+	{ prev_position = {x = 0, y = 0}, d = {x = 0, y = 0} },
+	{ prev_position = {x = 0, y = 0}, d = {x = 0, y = 0} },
+};
+
 function Game.getBoomerangX(player)
 	local boomerang = Game.getBoomerang(player);
 	if isRDRAM(boomerang) then
@@ -824,6 +831,20 @@ function Game.getBoomerangY(player)
 		return mainmemory.readfloat(boomerang + 0x04, true);
 	end
 	return 0;
+end
+
+function Game.getBoomerangDX(player)
+	if type(player) ~= "number" or player < 1 or player > 4 then
+		player = 1;
+	end
+	return boomerangState[player].d.x;
+end
+
+function Game.getBoomerangDY(player)
+	if type(player) ~= "number" or player < 1 or player > 4 then
+		player = 1;
+	end
+	return boomerangState[player].d.y;
 end
 
 local prev_x_vel = 0;
@@ -896,6 +917,27 @@ function Game.toggleItemHitboxes(value)
 			mainmemory.write_u32_be(secondObj + Game.Memory.item_hitbox_offset, value);
 		end
 		firstObj = dereferencePointer(firstObj + 0x04);
+	end
+end
+
+function Game.dumpObjects()
+	local firstObj = dereferencePointer(Game.Memory.item_list_pointer);
+	local i = 0;
+	while isRDRAM(firstObj) do
+		local secondObj = dereferencePointer(firstObj + 0x84);
+		if isRDRAM(secondObj) then
+			local positionObj = dereferencePointer(secondObj + 0x38);
+			if isRDRAM(positionObj) then
+				local objX = mainmemory.readfloat(positionObj + 0, true);
+				local objY = mainmemory.readfloat(positionObj + 4, true);
+				dprint(i..": "..toHexString(firstObj).." -> "..toHexString(secondObj).." -> "..toHexString(positionObj).." X: "..objX.." Y: "..objY);
+			end
+		end
+		i = i + 1;
+		firstObj = dereferencePointer(firstObj + 0x04);
+	end
+	if i > 0 then
+		print_deferred();
 	end
 end
 
@@ -1062,24 +1104,32 @@ local boomerangOSD = {
 		{"Boomerang", Game.getBoomerangOSD, category="boomerang"},
 		{"Boomerang X", Game.getBoomerangX, category="boomerang"},
 		{"Boomerang Y", Game.getBoomerangY, category="boomerang"},
+		{"Boomerang dX", Game.getBoomerangDX},
+		{"Boomerang dY", Game.getBoomerangDY},
 		{"Separator"},
 	},
 	[2] = {
 		{"Boomerang", function() return Game.getBoomerangOSD(2) end, category="boomerang"},
 		{"Boomerang X", function() return Game.getBoomerangX(2) end, category="boomerang"},
 		{"Boomerang Y", function() return Game.getBoomerangY(2) end, category="boomerang"},
+		{"Boomerang dX", function() return Game.getBoomerangDX(2) end, category="boomerang"},
+		{"Boomerang dY", function() return Game.getBoomerangDY(2) end, category="boomerang"},
 		{"Separator"},
 	},
 	[3] = {
 		{"Boomerang", function() return Game.getBoomerangOSD(3) end, category="boomerang"},
 		{"Boomerang X", function() return Game.getBoomerangX(3) end, category="boomerang"},
 		{"Boomerang Y", function() return Game.getBoomerangY(3) end, category="boomerang"},
+		{"Boomerang dX", function() return Game.getBoomerangDX(2) end, category="boomerang"},
+		{"Boomerang dY", function() return Game.getBoomerangDY(2) end, category="boomerang"},
 		{"Separator"},
 	},
 	[4] = {
 		{"Boomerang", function() return Game.getBoomerangOSD(4) end, category="boomerang"},
 		{"Boomerang X", function() return Game.getBoomerangX(4) end, category="boomerang"},
 		{"Boomerang Y", function() return Game.getBoomerangY(4) end, category="boomerang"},
+		{"Boomerang dX", function() return Game.getBoomerangDX(2) end, category="boomerang"},
+		{"Boomerang dY", function() return Game.getBoomerangDY(2) end, category="boomerang"},
 		{"Separator"},
 	},
 };
@@ -1136,6 +1186,13 @@ function Game.eachFrame()
 			if OSDBools[i] ~= currentOSDBools[i] then
 				changeDetected = true;
 			end
+			-- Calculate boomerang DX/DY
+			local boomerangX = Game.getBoomerangX(i);
+			local boomerangY = Game.getBoomerangY(i);
+			boomerangState[i].d.x = boomerangX - boomerangState[i].prev_position.x;
+			boomerangState[i].d.y = boomerangY - boomerangState[i].prev_position.y;
+			boomerangState[i].prev_position.x = boomerangX;
+			boomerangState[i].prev_position.y = boomerangY;
 		end
 		OSDCharacters[i] = Game.getCharacter(i);
 		if OSDCharacters[i] ~= currentOSDCharacters[i] then
