@@ -17,7 +17,7 @@ end
 
 ScriptHawk = {
 	warnings = false, -- Useful for debugging but annoying for end users, so default to false
-	ui_test = true, -- Open all possible module options forms, useful for testing global UI changes
+	ui_test = false, -- Open all possible module options forms, useful for testing global UI changes
 	mode = "Position",
 	smooth_moving_angle = true,
 	UI = {
