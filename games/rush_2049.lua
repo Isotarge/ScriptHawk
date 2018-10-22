@@ -80,7 +80,7 @@ function Game.setVelocity(value)
 end
 
 function Game.initUI()
-	ScriptHawk.UI.form_controls["Unlock Cheats Button"] = forms.button(ScriptHawk.UI.options_form, "Unlock Cheats", Game.unlockCheats, ScriptHawk.UI.col(10), ScriptHawk.UI.row(0), ScriptHawk.UI.col(4) + 10, ScriptHawk.UI.button_height);
+	ScriptHawk.UI.button(10, 0, {4, 10}, nil, nil, "Unlock Cheats", Game.unlockCheats);
 end
 
 Game.OSD = {

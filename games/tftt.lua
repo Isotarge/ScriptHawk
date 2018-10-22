@@ -706,7 +706,7 @@ function Game.eachFrame()
 end
 
 function Game.initUI()
-	ScriptHawk.UI.form_controls.build_all = forms.button(ScriptHawk.UI.options_form, "Build All", Game.buildAll, ScriptHawk.UI.col(10), ScriptHawk.UI.row(4), ScriptHawk.UI.col(4) + 10, ScriptHawk.UI.button_height);
+	ScriptHawk.UI.button(10, 4, {4, 10}, nil, nil, "Build All", Game.buildAll);
 	ScriptHawk.UI.checkbox(0, 6, "mouse_control", "Mouse Control");
 	ScriptHawk.UI.checkbox(0, 7, "sandbox_mode", "Sandbox Mode");
 end

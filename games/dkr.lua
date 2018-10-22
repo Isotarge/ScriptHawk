@@ -1009,7 +1009,7 @@ function Game.applyInfinites()
 end
 
 function Game.initUI()
-	ScriptHawk.UI.form_controls["Unlock Characters Button"] = forms.button(ScriptHawk.UI.options_form, "Unlock Characters", Game.unlockCharacters, ScriptHawk.UI.col(10), ScriptHawk.UI.row(4), ScriptHawk.UI.col(4) + 10, ScriptHawk.UI.button_height);
+	ScriptHawk.UI.button(10, 4, {4, 10}, nil, nil, "Unlock Characters", Game.unlockCharacters);
 	ScriptHawk.UI.checkbox(5, 4, "boost_info_checkbox", "Boost info");
 	ScriptHawk.UI.checkbox(5, 5, "encircle_checkbox", "Encircle (beta)");
 
@@ -1021,26 +1021,26 @@ function Game.initUI()
 
 	-- Boost Threshold, blue min
 	ScriptHawk.UI.form_controls.get_ready_blue_min_label = forms.label(ScriptHawk.UI.options_form, "BMin:", ScriptHawk.UI.col(blue_col_base), ScriptHawk.UI.row(6) + ScriptHawk.UI.label_offset, 40, 14);
-	ScriptHawk.UI.form_controls.decrease_get_ready_blue_min_button = forms.button(ScriptHawk.UI.options_form, "-", decrease_get_ready_blue_min, ScriptHawk.UI.col(blue_col_base + 3) - 28, ScriptHawk.UI.row(6), ScriptHawk.UI.button_height, ScriptHawk.UI.button_height);
-	ScriptHawk.UI.form_controls.increase_get_ready_blue_min_button = forms.button(ScriptHawk.UI.options_form, "+", increase_get_ready_blue_min, ScriptHawk.UI.col(blue_col_base + 4) - 28, ScriptHawk.UI.row(6), ScriptHawk.UI.button_height, ScriptHawk.UI.button_height);
+	ScriptHawk.UI.button({blue_col_base + 3, -28}, 6, ScriptHawk.UI.button_height, nil, "decrease_blue_min_button", "-", decrease_get_ready_blue_min);
+	ScriptHawk.UI.button({blue_col_base + 4, -28}, 6, ScriptHawk.UI.button_height, nil, "increase_blue_min_button", "+", increase_get_ready_blue_min);
 	ScriptHawk.UI.form_controls.get_ready_blue_min_value_label = forms.label(ScriptHawk.UI.options_form, get_ready_blue_min, ScriptHawk.UI.col(blue_col_base + 4), ScriptHawk.UI.row(6) + ScriptHawk.UI.label_offset, 32, 14);
 
 	-- Boost Threshold, blue max
 	ScriptHawk.UI.form_controls.get_ready_blue_max_label = forms.label(ScriptHawk.UI.options_form, "BMax:", ScriptHawk.UI.col(blue_col_base), ScriptHawk.UI.row(7) + ScriptHawk.UI.label_offset, 40, 14);
-	ScriptHawk.UI.form_controls.decrease_get_ready_blue_max_button = forms.button(ScriptHawk.UI.options_form, "-", decrease_get_ready_blue_max, ScriptHawk.UI.col(blue_col_base + 3) - 28, ScriptHawk.UI.row(7), ScriptHawk.UI.button_height, ScriptHawk.UI.button_height);
-	ScriptHawk.UI.form_controls.increase_get_ready_blue_max_button = forms.button(ScriptHawk.UI.options_form, "+", increase_get_ready_blue_max, ScriptHawk.UI.col(blue_col_base + 4) - 28, ScriptHawk.UI.row(7), ScriptHawk.UI.button_height, ScriptHawk.UI.button_height);
+	ScriptHawk.UI.button({blue_col_base + 3, -28}, 7, ScriptHawk.UI.button_height, nil, "decrease_blue_max_button", "-", decrease_get_ready_blue_max);
+	ScriptHawk.UI.button({blue_col_base + 4, -28}, 7, ScriptHawk.UI.button_height, nil, "increase_blue_max_button", "+", increase_get_ready_blue_max);
 	ScriptHawk.UI.form_controls.get_ready_blue_max_value_label = forms.label(ScriptHawk.UI.options_form, get_ready_blue_max, ScriptHawk.UI.col(blue_col_base + 4), ScriptHawk.UI.row(7) + ScriptHawk.UI.label_offset, 32, 14);
 
 	-- Boost Threshold, yellow min
 	ScriptHawk.UI.form_controls.get_ready_yellow_min_label = forms.label(ScriptHawk.UI.options_form, "YMin:", ScriptHawk.UI.col(yellow_col_base), ScriptHawk.UI.row(6) + ScriptHawk.UI.label_offset, 40, 14);
-	ScriptHawk.UI.form_controls.decrease_get_ready_yellow_min_button = forms.button(ScriptHawk.UI.options_form, "-", decrease_get_ready_yellow_min, ScriptHawk.UI.col(yellow_col_base + 3) - 28, ScriptHawk.UI.row(6), ScriptHawk.UI.button_height, ScriptHawk.UI.button_height);
-	ScriptHawk.UI.form_controls.increase_get_ready_yellow_min_button = forms.button(ScriptHawk.UI.options_form, "+", increase_get_ready_yellow_min, ScriptHawk.UI.col(yellow_col_base + 4) - 28, ScriptHawk.UI.row(6), ScriptHawk.UI.button_height, ScriptHawk.UI.button_height);
+	ScriptHawk.UI.button({yellow_col_base + 3, -28}, 6, ScriptHawk.UI.button_height, nil, "decrease_yellow_min_button", "-", decrease_get_ready_yellow_min);
+	ScriptHawk.UI.button({yellow_col_base + 4, -28}, 6, ScriptHawk.UI.button_height, nil, "increase_yellow_min_button", "+", increase_get_ready_yellow_min);
 	ScriptHawk.UI.form_controls.get_ready_yellow_min_value_label = forms.label(ScriptHawk.UI.options_form, get_ready_yellow_min, ScriptHawk.UI.col(yellow_col_base + 4), ScriptHawk.UI.row(6) + ScriptHawk.UI.label_offset, 32, 14);
 
 	-- Boost Threshold, yellow max
 	ScriptHawk.UI.form_controls.get_ready_yellow_max_label = forms.label(ScriptHawk.UI.options_form, "YMax:", ScriptHawk.UI.col(yellow_col_base), ScriptHawk.UI.row(7) + ScriptHawk.UI.label_offset, 40, 14);
-	ScriptHawk.UI.form_controls.decrease_get_ready_yellow_max_button = forms.button(ScriptHawk.UI.options_form, "-", decrease_get_ready_yellow_max, ScriptHawk.UI.col(yellow_col_base + 3) - 28, ScriptHawk.UI.row(7), ScriptHawk.UI.button_height, ScriptHawk.UI.button_height);
-	ScriptHawk.UI.form_controls.increase_get_ready_yellow_max_button = forms.button(ScriptHawk.UI.options_form, "+", increase_get_ready_yellow_max, ScriptHawk.UI.col(yellow_col_base + 4) - 28, ScriptHawk.UI.row(7), ScriptHawk.UI.button_height, ScriptHawk.UI.button_height);
+	ScriptHawk.UI.button({yellow_col_base + 3, -28}, 7, ScriptHawk.UI.button_height, nil, "decrease_yellow_max_button", "-", decrease_get_ready_yellow_max);
+	ScriptHawk.UI.button({yellow_col_base + 4, -28}, 7, ScriptHawk.UI.button_height, nil, "increase_yellow_max_button", "+", increase_get_ready_yellow_max);
 	ScriptHawk.UI.form_controls.get_ready_yellow_max_value_label = forms.label(ScriptHawk.UI.options_form, get_ready_yellow_max, ScriptHawk.UI.col(yellow_col_base + 4), ScriptHawk.UI.row(7) + ScriptHawk.UI.label_offset, 32, 14);
 end
 

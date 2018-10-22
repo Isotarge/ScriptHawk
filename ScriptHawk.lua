@@ -63,6 +63,13 @@ ScriptHawk = {
 
 ScriptHawk.hitboxDefaultMode = ScriptHawk.hitboxModeWH;
 
+function ScriptHawk.biz222Notice()
+	print("Due to a bug between BizHawk release 1.13.0 and 2.2.1");
+	print("The save & clear preferenes function cannot run on any");
+	print("pre-2.2.2 release of BizHawk. Sorry");
+	print("--------");
+end
+
 function ScriptHawk.UI.controlsOverlap(control1, control2)
 	local x1 = tonumber(forms.getproperty(control1, "Left"));
 	local y1 = tonumber(forms.getproperty(control1, "Top"));
@@ -711,19 +718,19 @@ end
 -- Rounding precision
 precision = 3;
 
-local function decreasePrecision()
+function ScriptHawk.decreasePrecision()
 	precision = math.max(0, precision - 1);
 end
 
-local function increasePrecision()
+function ScriptHawk.increasePrecision()
 	precision = math.min(12, precision + 1);
 end
 
-local function decreaseSpeed()
+function ScriptHawk.decreaseSpeed()
 	Game.speedy_index = math.max(1, Game.speedy_index - 1);
 end
 
-local function increaseSpeed()
+function ScriptHawk.increaseSpeed()
 	Game.speedy_index = math.min(#Game.speedy_speeds, Game.speedy_index + 1);
 end
 
@@ -1045,7 +1052,11 @@ function ScriptHawk.UI.handleColInput(col)
 		col = ScriptHawk.UI.col(col);
 	end
 	if type(col) == "table" then
-		col = ScriptHawk.UI.col(col[1]) + col[2];
+		if #col == 2 then
+			col = ScriptHawk.UI.col(col[1]) + col[2];
+		elseif #col == 1 then
+			col = col[1];
+		end
 	end
 	return col;
 end
@@ -1058,7 +1069,11 @@ function ScriptHawk.UI.handleRowInput(row)
 		row = ScriptHawk.UI.row(row);
 	end
 	if type(row) == "table" then
-		row = ScriptHawk.UI.row(row[1]) + row[2];
+		if #row == 2 then
+			row = ScriptHawk.UI.row(row[1]) + row[2];
+		elseif #row == 1 then
+			row = row[1];
+		end
 	end
 	return row;
 end
@@ -1071,7 +1086,12 @@ if type(Game.form_height) == "number" then
 end
 
 function ScriptHawk.UI.checkbox(col, row, tag, caption, default)
-	ScriptHawk.UI.form_controls[tag] = forms.checkbox(ScriptHawk.UI.options_form, caption, ScriptHawk.UI.col(col) + ScriptHawk.UI.dropdown_offset, ScriptHawk.UI.row(row) + ScriptHawk.UI.dropdown_offset);
+	col = ScriptHawk.UI.handleColInput(col);
+	row = ScriptHawk.UI.handleRowInput(row);
+	if tag == nil then
+		tag = caption.." Checkbox";
+	end
+	ScriptHawk.UI.form_controls[tag] = forms.checkbox(ScriptHawk.UI.options_form, caption, col + ScriptHawk.UI.dropdown_offset, row + ScriptHawk.UI.dropdown_offset);
 	forms.setproperty(ScriptHawk.UI.form_controls[tag], "Height", 22);
 	if default then
 		forms.setproperty(ScriptHawk.UI.form_controls[tag], "Checked", true);
@@ -1094,6 +1114,10 @@ function ScriptHawk.UI.button(col, row, width, height, tag, caption, callback)
 	col = ScriptHawk.UI.handleColInput(col);
 	row = ScriptHawk.UI.handleRowInput(row);
 
+	if tag == nil then
+		tag = caption.." Button";
+	end
+	--print("Creating button: "..col..","..row..","..width..","..height..","..tag..","..caption..","..tostring(callback == nil));
 	ScriptHawk.UI.form_controls[tag] = forms.button(ScriptHawk.UI.options_form, caption, callback, col, row, width, height);
 end
 
@@ -1106,22 +1130,22 @@ function ScriptHawk.initUI(formTitle)
 
 	if not TASSafe then
 		ScriptHawk.UI.form_controls["Mode Label"] = forms.label(ScriptHawk.UI.options_form, "Mode:", ScriptHawk.UI.col(0), ScriptHawk.UI.row(0) + ScriptHawk.UI.label_offset, 44, ScriptHawk.UI.button_height);
-		ScriptHawk.UI.form_controls["Mode Button"] = forms.button(ScriptHawk.UI.options_form, ScriptHawk.mode, toggleMode, ScriptHawk.UI.col(2), ScriptHawk.UI.row(0), 64, ScriptHawk.UI.button_height);
+		ScriptHawk.UI.button(2, 0, {64}, nil, "Mode Button", ScriptHawk.mode, toggleMode);
 	else
 		ScriptHawk.UI.checkbox(0, 2, "Override Lag Detection", "Override Lag Detection", override_lag_detection);
 		forms.setproperty(ScriptHawk.UI.form_controls["Override Lag Detection"], "Width", 140);
 	end
 
 	ScriptHawk.UI.form_controls["Precision Label"] = forms.label(ScriptHawk.UI.options_form, "Precision:", ScriptHawk.UI.col(0), ScriptHawk.UI.row(1) + ScriptHawk.UI.label_offset, 54, 14);
-	ScriptHawk.UI.form_controls["Decrease Precision Button"] = forms.button(ScriptHawk.UI.options_form, "-", decreasePrecision, ScriptHawk.UI.col(4) - 28, ScriptHawk.UI.row(1), ScriptHawk.UI.button_height, ScriptHawk.UI.button_height);
-	ScriptHawk.UI.form_controls["Increase Precision Button"] = forms.button(ScriptHawk.UI.options_form, "+", increasePrecision, ScriptHawk.UI.col(5) - 28, ScriptHawk.UI.row(1), ScriptHawk.UI.button_height, ScriptHawk.UI.button_height);
+	ScriptHawk.UI.button({4, -28}, 1, {ScriptHawk.UI.button_height}, nil, "Decrease Precision Button", "-", ScriptHawk.decreasePrecision);
+	ScriptHawk.UI.button({5, -28}, 1, {ScriptHawk.UI.button_height}, nil, "Increase Precision Button", "+", ScriptHawk.increasePrecision);
 	ScriptHawk.UI.form_controls["Precision Value Label"] = forms.label(ScriptHawk.UI.options_form, precision, ScriptHawk.UI.col(5), ScriptHawk.UI.row(1) + ScriptHawk.UI.label_offset, 44, 14);
 
 	if not TASSafe then
 		if ScriptHawk.dpad.joypad.enabled or ScriptHawk.dpad.key.enabled then
 			ScriptHawk.UI.form_controls["Speed Label"] = forms.label(ScriptHawk.UI.options_form, "Speed:", ScriptHawk.UI.col(0), ScriptHawk.UI.row(2) + ScriptHawk.UI.label_offset, 54, 14);
-			ScriptHawk.UI.form_controls["Decrease Speed Button"] = forms.button(ScriptHawk.UI.options_form, "-", decreaseSpeed, ScriptHawk.UI.col(4) - 28, ScriptHawk.UI.row(2), ScriptHawk.UI.button_height, ScriptHawk.UI.button_height);
-			ScriptHawk.UI.form_controls["Increase Speed Button"] = forms.button(ScriptHawk.UI.options_form, "+", increaseSpeed, ScriptHawk.UI.col(5) - 28, ScriptHawk.UI.row(2), ScriptHawk.UI.button_height, ScriptHawk.UI.button_height);
+			ScriptHawk.UI.button({4, -28}, 2, {ScriptHawk.UI.button_height}, nil, "Decrease Speed Button", "-", ScriptHawk.decreaseSpeed);
+			ScriptHawk.UI.button({5, -28}, 2, {ScriptHawk.UI.button_height}, nil, "Increase Speed Button", "+", ScriptHawk.increaseSpeed);
 			ScriptHawk.UI.form_controls["Speed Value Label"] = forms.label(ScriptHawk.UI.options_form, "0", ScriptHawk.UI.col(5), ScriptHawk.UI.row(2) + ScriptHawk.UI.label_offset, 47, 14);
 		end
 
@@ -1137,7 +1161,7 @@ function ScriptHawk.initUI(formTitle)
 				Game.takeMeThereType = "Checkbox";
 				ScriptHawk.UI.checkbox(0, 4, "Map Checkbox", "Take me there");
 			elseif Game.takeMeThereType == "Button" then
-				ScriptHawk.UI.form_controls["Map Button"] = forms.button(ScriptHawk.UI.options_form, "Take me there", function() Game.setMap(previous_map_value); end, ScriptHawk.UI.col(0), ScriptHawk.UI.row(4), ScriptHawk.UI.col(4) + 10, ScriptHawk.UI.button_height);
+				ScriptHawk.UI.button(0, 4, {4, 10}, nil, "Map Button", "Take me there", function() Game.setMap(previous_map_value); end);
 			end
 		end
 
@@ -1159,10 +1183,10 @@ function ScriptHawk.initUI(formTitle)
 		end
 	end
 
-	ScriptHawk.UI.form_controls["Toggle Telemetry Button"] = forms.button(ScriptHawk.UI.options_form, "Start Telemetry", toggleTelemetry, ScriptHawk.UI.col(10), ScriptHawk.UI.row(3), ScriptHawk.UI.col(4) + 10, ScriptHawk.UI.button_height);
+	ScriptHawk.UI.button(10, 3, {4, 10}, nil, "Toggle Telemetry Button", "Start Telemetry", toggleTelemetry);
 
 	ScriptHawk.UI.form_controls["Rotation Units Label"] = forms.label(ScriptHawk.UI.options_form, "Units:", ScriptHawk.UI.col(5), ScriptHawk.UI.row(0) + ScriptHawk.UI.label_offset, 44, 14);
-	ScriptHawk.UI.form_controls["Toggle Rotation Units Button"] = forms.button(ScriptHawk.UI.options_form, rotation_units, toggleRotationUnits, ScriptHawk.UI.col(7), ScriptHawk.UI.row(0), 64, ScriptHawk.UI.button_height);
+	ScriptHawk.UI.button(7, 0, {64}, nil, "Toggle Rotation Units Button", rotation_units, toggleRotationUnits);
 end
 
 if ScriptHawk.ui_test == true then
@@ -1504,10 +1528,7 @@ local function saveUserPreferences()
 		file:write("};\n");
 		file:close();
 	else
-		print("Due to a bug between BizHawk release 1.13.0 and 2.2.1");
-		print("The save & clear preferenes function cannot run on any");
-		print("pre-2.2.2 release of BizHawk. Sorry");
-		print("--------");
+		ScriptHawk.biz222Notice();
 	end
 end
 
@@ -1524,10 +1545,7 @@ local function clearPreferences()
 		file:close();
 		loadPreferences();
 	else
-		print("Due to a bug between BizHawk release 1.13.0 and 2.2.1");
-		print("The save & clear preferenes function cannot run on any");
-		print("pre-2.2.2 release of BizHawk. Sorry");
-		print("--------");
+		ScriptHawk.biz222Notice();
 	end
 end
 
@@ -1561,7 +1579,7 @@ function modifyOSD()
 		ScriptHawk.modifyOSDUI.form_controls["OSD Save Preferences"] = forms.button(ScriptHawk.modifyOSDUI.options_form, "Save As User Preference", saveUserPreferences, ScriptHawk.UI.col(0), ScriptHawk.UI.row(#OSDTypes + 4), 200, ScriptHawk.modifyOSDUI.button_height);
 		ScriptHawk.modifyOSDUI.form_controls["OSD Clear Preferences"] = forms.button(ScriptHawk.modifyOSDUI.options_form, "Clear All User Preferences", clearPreferences, ScriptHawk.UI.col(0), ScriptHawk.UI.row(#OSDTypes + 5), 200, ScriptHawk.modifyOSDUI.button_height);
 	else
-		ScriptHawk.modifyOSDUI.form_controls["OSD BizHawk Notice"] = forms.button(ScriptHawk.modifyOSDUI.options_form, "Notice", bizPre222Notice, ScriptHawk.UI.col(0), ScriptHawk.UI.row(#OSDTypes + 5), 200, ScriptHawk.modifyOSDUI.button_height);
+		ScriptHawk.modifyOSDUI.form_controls["OSD BizHawk Notice"] = forms.button(ScriptHawk.modifyOSDUI.options_form, "Notice", ScriptHawk.biz222Notice, ScriptHawk.UI.col(0), ScriptHawk.UI.row(#OSDTypes + 5), 200, ScriptHawk.modifyOSDUI.button_height);
 	end
 end
 

@@ -1288,18 +1288,18 @@ ScriptHawk.bindKeyRealtime("C", switch_grab_script_mode, true);
 
 local labelValue = 0;
 function Game.initUI()
-	ScriptHawk.UI.form_controls["Reload Map (Soft)"] = forms.button(ScriptHawk.UI.options_form, "Reload Map", Game.reloadMap, ScriptHawk.UI.col(5), ScriptHawk.UI.row(4), ScriptHawk.UI.col(4) + 10, ScriptHawk.UI.button_height);
-	ScriptHawk.UI.form_controls["Reload Map (Hard)"] = forms.button(ScriptHawk.UI.options_form, "Hard Reload", Game.reloadMapHard, ScriptHawk.UI.col(10), ScriptHawk.UI.row(0), ScriptHawk.UI.col(4) + 10, ScriptHawk.UI.button_height);
-	ScriptHawk.UI.form_controls["Kill Boss"] = forms.button(ScriptHawk.UI.options_form, "Kill Boss", Game.killBoss, ScriptHawk.UI.col(10), ScriptHawk.UI.row(1), ScriptHawk.UI.col(4) + 10, ScriptHawk.UI.button_height);
-	ScriptHawk.UI.form_controls["OoB Timer Checkbox"] = forms.checkbox(ScriptHawk.UI.options_form, "OoB Timer Off", ScriptHawk.UI.col(5) + ScriptHawk.UI.dropdown_offset, ScriptHawk.UI.row(5) + ScriptHawk.UI.dropdown_offset);
-	ScriptHawk.UI.form_controls["Free Roam Mode"] = forms.checkbox(ScriptHawk.UI.options_form, "Free Roam Mode", ScriptHawk.UI.col(5) + ScriptHawk.UI.dropdown_offset, ScriptHawk.UI.row(6) + ScriptHawk.UI.dropdown_offset);
-	ScriptHawk.UI.form_controls["Console Mode Switch"] = forms.button(ScriptHawk.UI.options_form, "Emulator Mode", Game.toggleConsoleMode, ScriptHawk.UI.col(10), ScriptHawk.UI.row(4), ScriptHawk.UI.col(4) + 10, ScriptHawk.UI.button_height);
+	ScriptHawk.UI.button(5, 4, {4, 10}, nil, "Reload Map (Soft)", "Reload Map", Game.reloadMap);
+	ScriptHawk.UI.button(10, 0, {4, 10}, nil, "Reload Map (Hard)", "Hard Reload", Game.reloadMapHard);
+	ScriptHawk.UI.button(10, 1, {4, 10}, nil, "Kill Boss", "Kill Boss", Game.killBoss);
+	ScriptHawk.UI.checkbox(5, 5, "OoB Timer Checkbox", "OoB Timer Off");
+	ScriptHawk.UI.checkbox(5, 6, "Free Roam Mode", "Free Roam Mode");
+	ScriptHawk.UI.button(10, 4, {4, 10}, nil, "Console Mode Switch", "Emulator Mode", Game.toggleConsoleMode);
 
 	getFlagNameArray();
 	ScriptHawk.UI.form_controls["Flag Dropdown"] = forms.dropdown(ScriptHawk.UI.options_form, flagNameBlock, ScriptHawk.UI.col(0) + ScriptHawk.UI.dropdown_offset, ScriptHawk.UI.row(7) + ScriptHawk.UI.dropdown_offset, ScriptHawk.UI.col(9) + 8, ScriptHawk.UI.button_height);
-	ScriptHawk.UI.form_controls["Set Flag Button"] = forms.button(ScriptHawk.UI.options_form, "Set", flagSetButtonHandler, ScriptHawk.UI.col(10), ScriptHawk.UI.row(7), 46, ScriptHawk.UI.button_height);
-	ScriptHawk.UI.form_controls["Check Flag Button"] = forms.button(ScriptHawk.UI.options_form, "Check", flagCheckButtonHandler, ScriptHawk.UI.col(12), ScriptHawk.UI.row(7), 46, ScriptHawk.UI.button_height);
-	ScriptHawk.UI.form_controls["Clear Flag Button"] = forms.button(ScriptHawk.UI.options_form, "Clear", flagClearButtonHandler, ScriptHawk.UI.col(14), ScriptHawk.UI.row(7), 46, ScriptHawk.UI.button_height);
+	ScriptHawk.UI.button(10, 7, {46}, nil, "Set Flag Button", "Set", flagSetButtonHandler);
+	ScriptHawk.UI.button(12, 7, {46}, nil, "Check Flag Button", "Check", flagCheckButtonHandler);
+	ScriptHawk.UI.button(14, 7, {46}, nil, "Clear Flag Button", "Clear", flagClearButtonHandler);
 	ScriptHawk.UI.checkbox(10, 6, "realtime_flags", "Realtime Flags", true);
 	flagStats();
 end

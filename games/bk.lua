@@ -3285,31 +3285,32 @@ end
 
 function Game.initUI()
 	ScriptHawk.UI.form_controls["Flag Dropdown"] = forms.dropdown(ScriptHawk.UI.options_form, flag_names, ScriptHawk.UI.col(0) + ScriptHawk.UI.dropdown_offset, ScriptHawk.UI.row(7) + ScriptHawk.UI.dropdown_offset, ScriptHawk.UI.col(9) + 8, ScriptHawk.UI.button_height);
-	ScriptHawk.UI.form_controls["Set Flag Button"] = forms.button(ScriptHawk.UI.options_form, "Set", flagSetButtonHandler, ScriptHawk.UI.col(10), ScriptHawk.UI.row(7), 46, ScriptHawk.UI.button_height);
-	ScriptHawk.UI.form_controls["Check Flag Button"] = forms.button(ScriptHawk.UI.options_form, "Check", flagCheckButtonHandler, ScriptHawk.UI.col(12), ScriptHawk.UI.row(7), 46, ScriptHawk.UI.button_height);
-	ScriptHawk.UI.form_controls["Clear Flag Button"] = forms.button(ScriptHawk.UI.options_form, "Clear", flagClearButtonHandler, ScriptHawk.UI.col(14), ScriptHawk.UI.row(7), 46, ScriptHawk.UI.button_height);
+	ScriptHawk.UI.button(10, 7, {46}, nil, "Set Flag Button", "Set", flagSetButtonHandler);
+	ScriptHawk.UI.button(12, 7, {46}, nil, "Check Flag Button", "Check", flagCheckButtonHandler);
+	ScriptHawk.UI.button(14, 7, {46}, nil, "Clear Flag Button", "Clear", flagClearButtonHandler);
 
 	ScriptHawk.UI.checkbox(0, 6, "toggle_neverslip", "Never Slip");
-	ScriptHawk.UI.checkbox(10, 2, "beta_pause_menu_checkbox", "Beta Pause");
 
 	ScriptHawk.UI.checkbox(5, 4, "encircle_checkbox", "Encircle (Beta)");
 	ScriptHawk.UI.checkbox(5, 5, "dynamic_radius_checkbox", "Dynamic Radius");
 	ScriptHawk.UI.checkbox(5, 6, "freeze_clip_velocity", "Freeze Clip Vel.");
+
+	ScriptHawk.UI.checkbox(10, 2, "beta_pause_menu_checkbox", "Beta Pause");
 	ScriptHawk.UI.checkbox(10, 4, "autopound_checkbox", "Auto Pound");
 
 	-- Actor spawner
 	ScriptHawk.UI.form_controls.actor_dropdown = forms.dropdown(ScriptHawk.UI.options_form, actorNames, ScriptHawk.UI.col(10) + ScriptHawk.UI.dropdown_offset, ScriptHawk.UI.row(0) + ScriptHawk.UI.dropdown_offset);
-	ScriptHawk.UI.form_controls.spawn_actor_button = forms.button(ScriptHawk.UI.options_form, "Spawn", spawner.spawn, ScriptHawk.UI.col(10), ScriptHawk.UI.row(1), ScriptHawk.UI.col(2), ScriptHawk.UI.button_height);
-	ScriptHawk.UI.form_controls.spawner_carry_checkbox = forms.checkbox(ScriptHawk.UI.options_form, "Carry?", ScriptHawk.UI.col(12) + 10 + ScriptHawk.UI.dropdown_offset, ScriptHawk.UI.row(1) + ScriptHawk.UI.dropdown_offset);
+	ScriptHawk.UI.button(10, 1, 2, nil, nil, "Spawn", spawner.spawn);
+	ScriptHawk.UI.checkbox({12, 10}, 1, "spawner_carry_checkbox", "Carry?");
 
 	-- Vile
-	--ScriptHawk.UI.form_controls.wave_button =     forms.button(ScriptHawk.UI.options_form, "Wave", initWave,         ScriptHawk.UI.col(10), ScriptHawk.UI.row(4), ScriptHawk.UI.col(2), ScriptHawk.UI.button_height);
-	--ScriptHawk.UI.form_controls.heart_button =    forms.button(ScriptHawk.UI.options_form, "Heart", doHeart,         ScriptHawk.UI.col(12) + 8, ScriptHawk.UI.row(4), ScriptHawk.UI.col(2), ScriptHawk.UI.button_height);
-	--ScriptHawk.UI.form_controls.fire_all_button = forms.button(ScriptHawk.UI.options_form, "Fire all", fireAllSlots, ScriptHawk.UI.col(10), ScriptHawk.UI.row(5), ScriptHawk.UI.col(4) + 8, ScriptHawk.UI.button_height);
+	--ScriptHawk.UI.button(10, 4, 2, nil, nil, "Wave", initWave);
+	--ScriptHawk.UI.button({12, 8}, 4, 2, nil, nil, "Heart", doHeart);
+	--ScriptHawk.UI.button(10, 5, {4, 8}, nil, nil, "Fire all", fireAllSlots);
 
 	-- Moves
 	ScriptHawk.UI.form_controls.moves_dropdown = forms.dropdown(ScriptHawk.UI.options_form, { "4. None", "3. SM 100%", "2. FFM Setup", "1. All", "0. Demo" }, ScriptHawk.UI.col(10) + ScriptHawk.UI.dropdown_offset, ScriptHawk.UI.row(5) + ScriptHawk.UI.dropdown_offset, ScriptHawk.UI.col(4) + 8, ScriptHawk.UI.button_height);
-	ScriptHawk.UI.form_controls.moves_button = forms.button(ScriptHawk.UI.options_form, "Unlock Moves", unlock_moves, ScriptHawk.UI.col(10), ScriptHawk.UI.row(6), ScriptHawk.UI.col(4) + 8, ScriptHawk.UI.button_height);
+	ScriptHawk.UI.button(10, 6, {4, 8}, nil, nil, "Unlock Moves", unlock_moves);
 
 	-- Create Inverse Object_Slot_Variables
 	for k, v in pairs(slot_variables) do

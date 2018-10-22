@@ -414,8 +414,8 @@ end
 
 function Game.initUI()
 	ScriptHawk.UI.checkbox(10, 6, "Enable Object Analyzer", "Object Analyzer");
-	ScriptHawk.UI.form_controls["Decrement Object Index"] = forms.button(ScriptHawk.UI.options_form, "-", decrementObjectIndex, ScriptHawk.UI.col(13) - 7, ScriptHawk.UI.row(7), ScriptHawk.UI.button_height, ScriptHawk.UI.button_height);
-	ScriptHawk.UI.form_controls["Increment Object Index"] = forms.button(ScriptHawk.UI.options_form, "+", incrementObjectIndex, ScriptHawk.UI.col(13) + ScriptHawk.UI.button_height - 7, ScriptHawk.UI.row(7), ScriptHawk.UI.button_height, ScriptHawk.UI.button_height);
+	ScriptHawk.UI.button({13, -7}, 7, ScriptHawk.UI.button_height, nil, "Decrement Object Index", "-", decrementObjectIndex);
+	ScriptHawk.UI.button({13, ScriptHawk.UI.button_height - 7}, 7, ScriptHawk.UI.button_height, nil, "Increment Object Index", "+", incrementObjectIndex);
 	ScriptHawk.UI.form_controls["Object Index Label"] = forms.label(ScriptHawk.UI.options_form, "Index: 0", ScriptHawk.UI.col(8) + ScriptHawk.UI.button_height + 21, ScriptHawk.UI.row(7) + ScriptHawk.UI.label_offset, 64, 14);
 end
 

@@ -653,13 +653,13 @@ function startBot()
 end
 
 function Game.initUI()
-	ScriptHawk.UI.form_controls["Complete Minimap Button"] = forms.button(ScriptHawk.UI.options_form, "Complete Minimap", Game.completeMinimap, ScriptHawk.UI.col(10), ScriptHawk.UI.row(4), ScriptHawk.UI.col(4) + 10, ScriptHawk.UI.button_height);
-	ScriptHawk.UI.form_controls["Reset Best Distribution"] = forms.button(ScriptHawk.UI.options_form, "Reset Best", Game.resetBestDistribution, ScriptHawk.UI.col(10), ScriptHawk.UI.row(5), ScriptHawk.UI.col(4) + 10, ScriptHawk.UI.button_height);
+	ScriptHawk.UI.button(10, 4, {4, 10}, nil, nil, "Complete Minimap", Game.completeMinimap);
+	ScriptHawk.UI.button(10, 5, {4, 10}, nil, nil, "Reset Best", Game.resetBestDistribution);
 	ScriptHawk.UI.checkbox(0, 6, "Toggle Overlay Checkbox", "Overlay", true)
 
 	-- Bot
 	--ScriptHawk.UI.form_controls.resetFrameBox = forms.textbox(ScriptHawk.UI.options_form, "Reset Frame", 100, 21, "UNSIGNED", ScriptHawk.UI.col(10) + 1, ScriptHawk.UI.row(0) + 1, false, true, "None");
-	ScriptHawk.UI.form_controls.startBotButton = forms.button(ScriptHawk.UI.options_form, "Start Bot", startBot, ScriptHawk.UI.col(10), ScriptHawk.UI.row(1), ScriptHawk.UI.col(3), ScriptHawk.UI.button_height);
+	ScriptHawk.UI.button(10, 1, 3, nil, nil, "Start Bot", startBot);
 end
 
 function Game.drawUI()

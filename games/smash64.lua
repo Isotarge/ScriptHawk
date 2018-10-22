@@ -966,7 +966,7 @@ end
 function Game.initUI()
 	if not TASSafe then
 		-- Unlock Everything Button
-		ScriptHawk.UI.form_controls.unlock_everything_button = forms.button(ScriptHawk.UI.options_form, "Unlock Everything", Game.unlockEverything, ScriptHawk.UI.col(10), ScriptHawk.UI.row(0), ScriptHawk.UI.col(4) + 10, ScriptHawk.UI.button_height);
+		ScriptHawk.UI.button(10, 0, {4, 10}, nil, nil, "Unlock Everything", Game.unlockEverything);
 
 		-- Hitbox Toggle
 		ScriptHawk.UI.checkbox(10, 1, "toggle_hitboxes", "Hitboxes");

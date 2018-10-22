@@ -88,10 +88,10 @@ end
 
 function Game.initUI()
 	ScriptHawk.UI.form_controls.gun_dropdown = forms.dropdown(ScriptHawk.UI.options_form, { "Machine Gun 1", "Machine Gun 2", "Machine Gun 3", "Machine Gun 4", "Flamethrower", "Rocket Launcher 1", "Rocket Launcher 2", "Shotgun" }, ScriptHawk.UI.col(0) + ScriptHawk.UI.dropdown_offset, ScriptHawk.UI.row(7) + ScriptHawk.UI.dropdown_offset, ScriptHawk.UI.col(4) + 8, ScriptHawk.UI.button_height);
-	ScriptHawk.UI.form_controls.gun_button = forms.button(ScriptHawk.UI.options_form, "Set Gun", Game.setGunFromDropdown, ScriptHawk.UI.col(5), ScriptHawk.UI.row(7), ScriptHawk.UI.col(4) + 8, ScriptHawk.UI.button_height);
+	ScriptHawk.UI.button(5, 7, {4, 8}, nil, nil, "Set Gun", Game.setGunFromDropdown);
 end
 
-object = {
+local object = {
 	array_start = 0xA00,
 	array_end = 0xC31,
 	size = 0x21,

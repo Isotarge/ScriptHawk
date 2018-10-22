@@ -6193,19 +6193,6 @@ end
 -- Bone Displacement --
 -----------------------
 
---[[
-local function fixBoneDisplacement()
-	-- NOP out a cop0 status register write at the start of the updateBonePositions() function
-	mainmemory.write_u32_be(Game.Memory.bone_displacement_cop0_write, 0);
-
-	-- Hacky, yes, but if we're using dynarec the patched code pages don't get marked as dirty
-	-- Quickest and easiest way around this is to save and reload a state
-	local ss_fn = 'lips/temp.state';
-	savestate.save(ss_fn);
-	savestate.load(ss_fn);
-end
---]]
-
 print_every_frame = false;
 print_threshold = 1;
 
@@ -7670,37 +7657,34 @@ function Game.initUI()
 	-- Flag stuff
 	if version < 4 then
 		ScriptHawk.UI.form_controls["Flag Dropdown"] = forms.dropdown(ScriptHawk.UI.options_form, flag_names, ScriptHawk.UI.col(0) + ScriptHawk.UI.dropdown_offset, ScriptHawk.UI.row(8) + ScriptHawk.UI.dropdown_offset, ScriptHawk.UI.col(9) + 8, ScriptHawk.UI.button_height);
-		ScriptHawk.UI.form_controls["Set Flag Button"] = forms.button(ScriptHawk.UI.options_form, "Set", flagSetButtonHandler, ScriptHawk.UI.col(10), ScriptHawk.UI.row(8), 46, ScriptHawk.UI.button_height);
-		ScriptHawk.UI.form_controls["Check Flag Button"] = forms.button(ScriptHawk.UI.options_form, "Check", flagCheckButtonHandler, ScriptHawk.UI.col(12), ScriptHawk.UI.row(8), 46, ScriptHawk.UI.button_height);
-		ScriptHawk.UI.form_controls["Clear Flag Button"] = forms.button(ScriptHawk.UI.options_form, "Clear", flagClearButtonHandler, ScriptHawk.UI.col(14), ScriptHawk.UI.row(8), 46, ScriptHawk.UI.button_height);
+		ScriptHawk.UI.button(10, 8, {46}, nil, "Set Flag Button", "Set", flagSetButtonHandler);
+		ScriptHawk.UI.button(12, 8, {46}, nil, "Check Flag Button", "Check", flagCheckButtonHandler);
+		ScriptHawk.UI.button(14, 8, {46}, nil, "Clear Flag Button", "Clear", flagClearButtonHandler);
 		ScriptHawk.UI.checkbox(10, 6, "realtime_flags", "Realtime Flags", true);
 	end
 
 	-- Moon stuff
 	--ScriptHawk.UI.form_controls["Moon Mode Label"] = forms.label(ScriptHawk.UI.options_form, "Moon:", ScriptHawk.UI.col(10), ScriptHawk.UI.row(2) + ScriptHawk.UI.label_offset, 48, ScriptHawk.UI.button_height);
-	--ScriptHawk.UI.form_controls["Moon Mode Button"] = forms.button(ScriptHawk.UI.options_form, moon_mode, toggle_moonmode, ScriptHawk.UI.col(13) - 18, ScriptHawk.UI.row(2), 59, ScriptHawk.UI.button_height);
+	--ScriptHawk.UI.button({13, -18}, 2, {59}, nil, "Moon Mode Button", moon_mode, toggle_moonmode);
 
 	-- Buttons
-	ScriptHawk.UI.form_controls["Unlock Moves Button"] = forms.button(ScriptHawk.UI.options_form, "Unlock Moves", Game.unlockMoves, ScriptHawk.UI.col(10), ScriptHawk.UI.row(0), ScriptHawk.UI.col(4) + 10, ScriptHawk.UI.button_height);
-	ScriptHawk.UI.form_controls["Toggle Visibility Button"] = forms.button(ScriptHawk.UI.options_form, "Invisify", toggle_invisify, ScriptHawk.UI.col(7), ScriptHawk.UI.row(1), 64, ScriptHawk.UI.button_height);
-	ScriptHawk.UI.form_controls["Detonate Button"] = forms.button(ScriptHawk.UI.options_form, "Detonate", Game.detonateLiveOranges, ScriptHawk.UI.col(7), ScriptHawk.UI.row(2), 64, ScriptHawk.UI.button_height);
-	ScriptHawk.UI.form_controls["Toggle TB Void Button"] = forms.button(ScriptHawk.UI.options_form, "Toggle TB Void", Game.toggleTBVoid, ScriptHawk.UI.col(10), ScriptHawk.UI.row(1), ScriptHawk.UI.col(4) + 10, ScriptHawk.UI.button_height);
-	ScriptHawk.UI.form_controls["Gain Control Button"] = forms.button(ScriptHawk.UI.options_form, "Gain Control", Game.gainControl, ScriptHawk.UI.col(10), ScriptHawk.UI.row(4), ScriptHawk.UI.col(4) + 10, ScriptHawk.UI.button_height);
-	ScriptHawk.UI.form_controls["Pause Cancel Button"] = forms.button(ScriptHawk.UI.options_form, "Pause Cancel", Game.pauseCancel, ScriptHawk.UI.col(10), ScriptHawk.UI.row(2), ScriptHawk.UI.col(4) + 10, ScriptHawk.UI.button_height);
+	ScriptHawk.UI.button(5, 4, {4, 10}, nil, nil, "Force Zipper", Game.forceZipper);
+	--ScriptHawk.UI.button(5, 5, {4, 10}, nil, nil, "Random Color", Game.setKongColor);
 
-	-- As of BizHawk 1.11.8, ScriptHawk's Bone Displacement fix is integrated in to the emulator, as such the UI surrounding the bug is no longer needed
-	--ScriptHawk.UI.form_controls["Fix Bone Displacement Button"] = forms.button(ScriptHawk.UI.options_form, "Fix Spiking", fixBoneDisplacement, ScriptHawk.UI.col(10), ScriptHawk.UI.row(4), ScriptHawk.UI.col(4) + 10, ScriptHawk.UI.button_height);
-	--ScriptHawk.UI.checkbox(10, 5, "Toggle Detect Displacement Checkbox", "Detect Spiking");
+	ScriptHawk.UI.button(7, 1, {64}, nil, "Toggle Visibility Button", "Invisify", toggle_invisify);
+	ScriptHawk.UI.button(7, 2, {64}, nil, nil, "Detonate", Game.detonateLiveOranges);
 
-	--ScriptHawk.UI.form_controls["Random Color"] = forms.button(ScriptHawk.UI.options_form, "Random Color", Game.setKongColor, ScriptHawk.UI.col(5), ScriptHawk.UI.row(5), ScriptHawk.UI.col(4) + 10, ScriptHawk.UI.button_height);
-	--ScriptHawk.UI.form_controls["Everything is Kong Button"] = forms.button(ScriptHawk.UI.options_form, "Kong", everythingIsKong, ScriptHawk.UI.col(10), ScriptHawk.UI.row(3), ScriptHawk.UI.col(4) + 10, ScriptHawk.UI.button_height);
-	--ScriptHawk.UI.form_controls["Force Pause Button"] = forms.button(ScriptHawk.UI.options_form, "Force Pause", Game.forcePause, ScriptHawk.UI.col(10), ScriptHawk.UI.row(4), ScriptHawk.UI.col(4) + 10, ScriptHawk.UI.button_height);
-	ScriptHawk.UI.form_controls["Force Zipper Button"] = forms.button(ScriptHawk.UI.options_form, "Force Zipper", Game.forceZipper, ScriptHawk.UI.col(5), ScriptHawk.UI.row(4), ScriptHawk.UI.col(4) + 10, ScriptHawk.UI.button_height);
-	--ScriptHawk.UI.form_controls["Random Effect Button"] = forms.button(ScriptHawk.UI.options_form, "Random effect", random_effect, ScriptHawk.UI.col(10), ScriptHawk.UI.row(6), ScriptHawk.UI.col(4) + 10, ScriptHawk.UI.button_height);
+	ScriptHawk.UI.button(10, 0, {4, 10}, nil, nil, "Unlock Moves", Game.unlockMoves);
+	ScriptHawk.UI.button(10, 1, {4, 10}, nil, nil, "Toggle TB Void", Game.toggleTBVoid);
+	ScriptHawk.UI.button(10, 2, {4, 10}, nil, nil, "Pause Cancel", Game.pauseCancel);
+	--ScriptHawk.UI.button(10, 3, {4, 10}, nil, "Everything is Kong Button", "Kong", everythingIsKong);
+	--ScriptHawk.UI.button(10, 4, {4, 10}, nil, nil, "Force Pause", Game.forcePause);
+	ScriptHawk.UI.button(10, 4, {4, 10}, nil, nil, "Gain Control", Game.gainControl);
+	--ScriptHawk.UI.button(10, 6, {4, 10}, nil, nil, "Random effect", random_effect);
 
 	-- Lag fix
-	ScriptHawk.UI.form_controls["Decrease Lag Factor Button"] = forms.button(ScriptHawk.UI.options_form, "-", decrease_lag_factor, ScriptHawk.UI.col(13) - 5, ScriptHawk.UI.row(5), ScriptHawk.UI.button_height, ScriptHawk.UI.button_height);
-	ScriptHawk.UI.form_controls["Increase Lag Factor Button"] = forms.button(ScriptHawk.UI.options_form, "+", increase_lag_factor, ScriptHawk.UI.col(13) + ScriptHawk.UI.button_height - 5, ScriptHawk.UI.row(5), ScriptHawk.UI.button_height, ScriptHawk.UI.button_height);
+	ScriptHawk.UI.button({13, -5}, 5, {ScriptHawk.UI.button_height}, nil, "Decrease Lag Factor Button", "-", decrease_lag_factor);
+	ScriptHawk.UI.button({13, ScriptHawk.UI.button_height - 5}, 5, {ScriptHawk.UI.button_height}, nil, "Increase Lag Factor Button", "+", increase_lag_factor);
 	ScriptHawk.UI.form_controls["Lag Factor Value Label"] = forms.label(ScriptHawk.UI.options_form, "0", ScriptHawk.UI.col(13) + ScriptHawk.UI.button_height + 21, ScriptHawk.UI.row(5) + ScriptHawk.UI.label_offset, 54, 14);
 	ScriptHawk.UI.checkbox(10, 5, "Toggle Lag Fix Checkbox", "Lag fix");
 

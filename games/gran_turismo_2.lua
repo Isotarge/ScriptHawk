@@ -830,9 +830,9 @@ function Game.initUI()
 		forms.setproperty(ScriptHawk.UI.form_controls.ignore_restrictions, "Width", ScriptHawk.UI.col(6));
 		ScriptHawk.UI.form_controls.num_racers_dropdown = forms.dropdown(ScriptHawk.UI.options_form, { "1", "2", "3", "4", "5", "6" }, ScriptHawk.UI.col(0) + ScriptHawk.UI.dropdown_offset, ScriptHawk.UI.row(7) + ScriptHawk.UI.dropdown_offset, ScriptHawk.UI.col(2) + 8, ScriptHawk.UI.button_height);
 		ScriptHawk.UI.checkbox(3, 7, "set_num_racers", "Set Num Racers");
-		ScriptHawk.UI.form_controls["Toggle Autopilot"] = forms.button(ScriptHawk.UI.options_form, "Toggle Autopilot", Game.toggleAutopilot, ScriptHawk.UI.col(10), ScriptHawk.UI.row(0), ScriptHawk.UI.col(4) + 10, ScriptHawk.UI.button_height);
-		ScriptHawk.UI.form_controls["Dump Cars"] = forms.button(ScriptHawk.UI.options_form, "Dump Cars", Game.dumpCars, ScriptHawk.UI.col(10), ScriptHawk.UI.row(1), ScriptHawk.UI.col(4) + 10, ScriptHawk.UI.button_height);
-		ScriptHawk.UI.form_controls["Buy Parts"] = forms.button(ScriptHawk.UI.options_form, "Buy Parts", Game.buyAllParts, ScriptHawk.UI.col(10), ScriptHawk.UI.row(2), ScriptHawk.UI.col(4) + 10, ScriptHawk.UI.button_height);
+		ScriptHawk.UI.button(10, 0, {4, 10}, nil, nil, "Toggle Autopilot", Game.toggleAutopilot);
+		ScriptHawk.UI.button(10, 1, {4, 10}, nil, nil, "Dump Cars", Game.dumpCars);
+		ScriptHawk.UI.button(10, 2, {4, 10}, nil, nil, "Buy Parts", Game.buyAllParts);
 	end
 end
 

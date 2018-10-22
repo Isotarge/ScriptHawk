@@ -145,13 +145,13 @@ end
 
 function Game.initUI()
 	ScriptHawk.UI.checkbox(10, 6, "checkbox_extra_data", "Show All");
-	ScriptHawk.UI.form_controls.button_decrement_object_index = forms.button(ScriptHawk.UI.options_form, "-", decrementObjectIndex, ScriptHawk.UI.col(13) - 7, ScriptHawk.UI.row(7), ScriptHawk.UI.button_height, ScriptHawk.UI.button_height);
-	ScriptHawk.UI.form_controls.button_increment_object_index = forms.button(ScriptHawk.UI.options_form, "+", incrementObjectIndex, ScriptHawk.UI.col(13) + ScriptHawk.UI.button_height - 7, ScriptHawk.UI.row(7), ScriptHawk.UI.button_height, ScriptHawk.UI.button_height);
-	ScriptHawk.UI.form_controls.get_key_button = forms.button(ScriptHawk.UI.options_form, "Get Key", Game.getKey, ScriptHawk.UI.col(0), ScriptHawk.UI.row(6), ScriptHawk.UI.col(4) + 10, ScriptHawk.UI.button_height);
+	ScriptHawk.UI.button({13, - 7}, 7, ScriptHawk.UI.button_height, nil, "button_decrement_object_index", "-", decrementObjectIndex);
+	ScriptHawk.UI.button({13, ScriptHawk.UI.button_height - 7}, 7, ScriptHawk.UI.button_height, nil, "button_increment_object_index", "+", incrementObjectIndex);
+	ScriptHawk.UI.button(0, 6, {4, 10}, nil, nil, "Get Key", Game.getKey);
 
 	-- Sword
 	ScriptHawk.UI.form_controls.sword_dropdown = forms.dropdown(ScriptHawk.UI.options_form, {"Training Sword", "Short Sword", "Long Sword (1)", "Long Sword (2)", "Force Blade", "Tempest Blade", "Lion Blade"}, ScriptHawk.UI.col(5) + ScriptHawk.UI.dropdown_offset, ScriptHawk.UI.row(7) + ScriptHawk.UI.dropdown_offset, ScriptHawk.UI.col(4) + 8, ScriptHawk.UI.button_height);
-	ScriptHawk.UI.form_controls.sword_button = forms.button(ScriptHawk.UI.options_form, "Set Sword", Game.setSwordFromDropdown, ScriptHawk.UI.col(0), ScriptHawk.UI.row(7), ScriptHawk.UI.col(4) + 10, ScriptHawk.UI.button_height);
+	ScriptHawk.UI.button(0, 7, {4, 10}, nil, nil, "Set Sword", Game.setSwordFromDropdown);
 end
 
 function Game.detectVersion(romName, romHash)

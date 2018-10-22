@@ -535,9 +535,9 @@ function Game.applyInfinites()
 end
 
 function Game.initUI()
-	ScriptHawk.UI.form_controls.unlock_items_button = forms.button(ScriptHawk.UI.options_form, "Unlock Items", Game.unlockItems, ScriptHawk.UI.col(0), ScriptHawk.UI.row(2), ScriptHawk.UI.col(4) + 10, ScriptHawk.UI.button_height);
-	ScriptHawk.UI.form_controls.clear_gold_button = forms.button(ScriptHawk.UI.options_form, "Clear Gold", Game.clearGold, ScriptHawk.UI.col(0), ScriptHawk.UI.row(3), ScriptHawk.UI.col(4) + 10, ScriptHawk.UI.button_height);
-	ScriptHawk.UI.form_controls.dig_hole_button = forms.button(ScriptHawk.UI.options_form, "Dig Hole", Game.digHole, ScriptHawk.UI.col(0), ScriptHawk.UI.row(4), ScriptHawk.UI.col(4) + 10, ScriptHawk.UI.button_height);
+	ScriptHawk.UI.button(0, 2, {4, 10}, nil, nil, "Unlock Items", Game.unlockItems);
+	ScriptHawk.UI.button(0, 3, {4, 10}, nil, nil, "Clear Gold", Game.clearGold);
+	ScriptHawk.UI.button(0, 4, {4, 10}, nil, nil, "Dig Hole", Game.digHole);
 end
 
 local function getScreen()

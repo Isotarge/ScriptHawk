@@ -10,10 +10,7 @@ local Game = { -- This table stores the module's API function implementations an
 		-- Lua has a maximum of 200 local variables per function, we use a table to store memory addresses to get around this
 		-- It's a 2 dimensional table, the first dimension is the name of the address
 		-- the second dimension is an index for which version of the game was detected, set below by Game.detectVersion()
-		-- Examples of how to access the memory address for X Position:
-		-- Game.Memory.x_position[version] -- Preferred
-		-- Game.Memory["x_position"][version]
-		-- Game["Memory"]["x_position"][version]
+		-- Game.detectVersion() will squish these tables down into a single address based on which version is detected
 		x_position = {0x100000, 0x200000, 0x300000}, -- Example addresses
 		y_position = {0x100004, 0x200004, 0x300004},
 		z_position = {0x100008, 0x200008, 0x300008},
@@ -21,14 +18,17 @@ local Game = { -- This table stores the module's API function implementations an
 		y_rotation = {0x100014, 0x200014, 0x300014},
 		z_rotation = {0x100018, 0x200018, 0x300018},
 		map_index = {0x10000C, 0x20000C, 0x30000C},
-	}
+	},
+	speedy_speeds = { .001, .01, .1, 1, 5, 10, 20, 50, 100 }, -- D-Pad speeds, scale these appropriately with your game's coordinate system
+	speedy_index = 7, -- Default speed, index into the speedy_speeds table
 };
 
 --------------------
 -- Region/Version --
 --------------------
 
-function Game.detectVersion(romName, romHash) -- Modules should ideally use ROM hash rather than name, but both are passed in by ScriptHawk
+-- Modules should ideally use ROM hash rather than name, but both are passed in by ScriptHawk
+function Game.detectVersion(romName, romHash)
 	if string.contains(romName, "Europe") then -- string.contains is a pure Lua global function provided by ScriptHawk, intended to replace calls to bizstring.contains() for portability reasons
 		version = 1; -- We use the version variable as an index for the Game.Memory table
 	elseif string.contains(romName, "Japan") then
@@ -42,11 +42,9 @@ function Game.detectVersion(romName, romHash) -- Modules should ideally use ROM 
 	-- Squish Game.Memory tables down to a single address for the relevant version
 	-- If you include this code snippet in your module, you can access Game.Memory addresses in a cleaner fashion
 	-- Game.Memory.address[version] becomes Game.Memory.address
-	--[[
 	for k, v in pairs(Game.Memory) do
 		Game.Memory[k] = v[version];
 	end
-	--]]
 
 	return true; -- Return true if version detection is successful
 end
@@ -55,10 +53,8 @@ end
 -- Physics/Scale --
 -------------------
 
-Game.speedy_speeds = { .001, .01, .1, 1, 5, 10, 20, 50, 100 }; -- D-Pad speeds, scale these appropriately with your game's coordinate system
-Game.speedy_index = 7;
-
-function Game.isPhysicsFrame() -- Optional: If lag in your game is more complicated than a simple emu.islagged() call you should add the logic to detect it here
+-- Optional: If lag in your game is more complicated than a simple emu.islagged() call you should add the logic to detect it here
+function Game.isPhysicsFrame()
 	-- Implementing this logic will result in smooth dY/dXZ calculation (no more flickering between 0 and the correct value)
 	return not emu.islagged();
 end
@@ -68,13 +64,14 @@ end
 --------------
 
 function Game.getXPosition()
-	return mainmemory.readfloat(Game.Memory.x_position[version], true);
+	return mainmemory.readfloat(Game.Memory.x_position, true);
 end
 
 function Game.getYPosition()
-	return mainmemory.readfloat(Game.Memory.y_position[version], true);
+	return mainmemory.readfloat(Game.Memory.y_position, true);
 end
 
+-- Optional
 function Game.colorYPosition()
 	local yPosition = Game.getYPosition();
 	if yPosition < 0 then
@@ -86,20 +83,24 @@ function Game.colorYPosition()
 	end
 end
 
-function Game.getZPosition() -- Optional, 2D games don't need to implement this
-	return mainmemory.readfloat(Game.Memory.z_position[version], true);
+-- Optional, 2D games don't need to implement this
+function Game.getZPosition()
+	return mainmemory.readfloat(Game.Memory.z_position, true);
 end
 
-function Game.setXPosition(value) -- Optional
-	mainmemory.writefloat(Game.Memory.x_position[version], value, true);
+-- Optional
+function Game.setXPosition(value)
+	mainmemory.writefloat(Game.Memory.x_position, value, true);
 end
 
-function Game.setYPosition(value) -- Optional
-	mainmemory.writefloat(Game.Memory.y_position[version], value, true);
+-- Optional
+function Game.setYPosition(value)
+	mainmemory.writefloat(Game.Memory.y_position, value, true);
 end
 
-function Game.setZPosition(value) -- Optional, 2D games don't need to implement this
-	mainmemory.writefloat(Game.Memory.z_position[version], value, true);
+-- Optional, 2D games don't need to implement this
+function Game.setZPosition(value)
+	mainmemory.writefloat(Game.Memory.z_position, value, true);
 end
 
 --------------
@@ -113,34 +114,41 @@ Game.max_rot_units = 360; -- Maximum value of the Game's native rotation units
 -- These functions can return any number as long as it's consistent between get & set.
 -- If the Game.max_rot_units value is correct (and minimum is 0) ScriptHawk will correctly convert in game units to both degrees (default) and radians
 
-function Game.getXRotation() -- Optional
-	return mainmemory.readfloat(Game.Memory.x_rotation[version], true);
+-- Optional
+function Game.getXRotation()
+	return mainmemory.readfloat(Game.Memory.x_rotation, true);
 end
 
-function Game.getYRotation() -- Optional
-	return mainmemory.readfloat(Game.Memory.y_rotation[version], true);
+-- Optional
+function Game.getYRotation()
+	return mainmemory.readfloat(Game.Memory.y_rotation, true);
 end
 
-function Game.getZRotation() -- Optional
-	return mainmemory.readfloat(Game.Memory.z_rotation[version], true);
+-- Optional
+function Game.getZRotation()
+	return mainmemory.readfloat(Game.Memory.z_rotation, true);
 end
 
-function Game.setXRotation(value) -- Optional
-	mainmemory.writefloat(Game.Memory.x_rotation[version], value, true);
+-- Optional
+function Game.setXRotation(value)
+	mainmemory.writefloat(Game.Memory.x_rotation, value, true);
 end
 
-function Game.setYRotation(value) -- Optional
-	mainmemory.writefloat(Game.Memory.y_rotation[version], value, true);
+-- Optional
+function Game.setYRotation(value)
+	mainmemory.writefloat(Game.Memory.y_rotation, value, true);
 end
 
-function Game.setZRotation(value) -- Optional
-	mainmemory.writefloat(Game.Memory.z_rotation[version], value, true);
+-- Optional
+function Game.setZRotation(value)
+	mainmemory.writefloat(Game.Memory.z_rotation, value, true);
 end
 
 ------------
 -- Events --
 ------------
 
+-- Optional
 Game.maps = {
 	"Map 1",
 	"Map 2",
@@ -148,6 +156,7 @@ Game.maps = {
 	"Map 4",
 };
 
+-- Optional
 -- Checkbox:
 	-- Will be called each frame while the checkbox is checked
 	-- Should not reload the map instantly
@@ -157,24 +166,30 @@ Game.maps = {
 	-- Should load the selected map as soon as possible after the button is pressed
 Game.takeMeThereType = "Checkbox"; -- Optional. If not present will default to checkbox
 
-function Game.setMap(index) -- Optional
+-- Optional
+function Game.setMap(index)
 	-- Set the Game's map index to the index selected in the dropdown
-	mainmemory.writebyte(Game.Memory.map_index[version], index);
+	mainmemory.writebyte(Game.Memory.map_index, index);
 end
 
-function Game.applyInfinites() -- Optional: Toggled by a checkbox. If this function is not present in the module, the checkbox will not appear
+-- Optional: Toggled by a checkbox. If this function is not present in the module, the checkbox will not appear
+function Game.applyInfinites()
 	-- TODO: Give the player infinite consumables
+end
+
+function Game.buttonHandler()
+	print("Example button was pressed!");
 end
 
 local labelValue = 0;
 function Game.initUI() -- Optional: Init any UI state here, mainly useful for setting up your form controls. Runs once at startup after successful version detection.
 	-- Here are some examples for the most common UI control types
 	ScriptHawk.UI.form_controls["Example Dropdown"] = forms.dropdown(ScriptHawk.UI.options_form, {"Option 1", "Option 2", "Option 3"}, ScriptHawk.UI.col(0) + ScriptHawk.UI.dropdown_offset, ScriptHawk.UI.row(7) + ScriptHawk.UI.dropdown_offset, ScriptHawk.UI.col(9) + 7, ScriptHawk.UI.button_height);
-	ScriptHawk.UI.form_controls["Example Button"] = forms.button(ScriptHawk.UI.options_form, "Label", flagSetButtonHandler, ScriptHawk.UI.col(10), ScriptHawk.UI.row(7), 59, ScriptHawk.UI.button_height);
-	ScriptHawk.UI.form_controls["Example Plus Button"] = forms.button(ScriptHawk.UI.options_form, "-", function() labelValue = labelValue + 1 end, ScriptHawk.UI.col(13) - 7, ScriptHawk.UI.row(6), ScriptHawk.UI.button_height, ScriptHawk.UI.button_height);
-	ScriptHawk.UI.form_controls["Example Minus Button"] = forms.button(ScriptHawk.UI.options_form, "+", function() labelValue = labelValue - 1 end, ScriptHawk.UI.col(13) + ScriptHawk.UI.button_height - 7, ScriptHawk.UI.row(6), ScriptHawk.UI.button_height, ScriptHawk.UI.button_height);
+	ScriptHawk.UI.button(10,                                    7, {59},                        nil, "Example Button",       "Label", Game.buttonHandler);
+	ScriptHawk.UI.button({13, -7},                              6, ScriptHawk.UI.button_height, nil, "Example Plus Button",  "-",     function() labelValue = labelValue + 1 end);
+	ScriptHawk.UI.button({13, ScriptHawk.UI.button_height - 7}, 6, ScriptHawk.UI.button_height, nil, "Example Minus Button", "+",     function() labelValue = labelValue - 1 end);
 	ScriptHawk.UI.form_controls["Example Value Label"] = forms.label(ScriptHawk.UI.options_form, "0", ScriptHawk.UI.col(13) + ScriptHawk.UI.button_height + 21, ScriptHawk.UI.row(6) + ScriptHawk.UI.label_offset, 54, 14);
-	ScriptHawk.UI.controls(10, 6, "Example Checkbox", "Label");
+	ScriptHawk.UI.checkbox(10, 6, "Example Checkbox", "Label");
 end
 
 -- Optional: This function should be used to draw to the screen or update form controls
@@ -184,11 +199,15 @@ function Game.drawUI()
 	forms.settext(ScriptHawk.UI.form_controls["Example Value Label"], labelValue);
 end
 
-function Game.eachFrame() -- Optional: This function will be executed once per frame
-	-- TODO
+-- Optional: This function will be executed once per frame
+function Game.eachFrame()
+	if ScriptHawk.UI.isChecked("Example Checkbox") then
+		print("Example checkbox is checked!");
+	end
 end
 
-function Game.realTime() -- Optional: This function will be executed as fast as possible
+-- Optional: This function will be executed as fast as possible
+function Game.realTime()
 	-- TODO
 end
 
