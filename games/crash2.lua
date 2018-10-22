@@ -48,21 +48,9 @@ local pScale = 1000;
 local vScale = 100000;
 
 function Game.detectVersion(romName, romHash)
-	if romHash == "149A203B" or romHash == "395C0916" then -- USA
-		version = 1;
-	elseif romHash == "F5E2EC49" or romHash == "5F65CF0F" then -- Europe No EDC
-		version = 2;
-	elseif romHash == "97395614" or romHash == "74C85B1E" then -- Europe EDC
-		version = 2;
-	elseif romHash == "B0A92BAF" or romHash == "14591AE9" then -- Japan
-		version = 3;
-	else
-		return false;
-	end
-
 	-- Squish Game.Memory tables down to a single address for the relevant version
 	for k, v in pairs(Game.Memory) do
-		Game.Memory[k] = v[version];
+		Game.Memory[k] = v[Game.version];
 	end
 
 	return true;

@@ -24,6 +24,7 @@ local Game = {
 		egg_x_velocity = 0x44F, -- signed fixed point 8.8 little endian
 		egg_y_velocity = 0x44D, -- signed fixed point 8.8 little endian
 	},
+	maps = {}, -- Will be populated by a for loop later
 };
 
 function Game.detectVersion(romName, romHash)
@@ -32,7 +33,7 @@ function Game.detectVersion(romName, romHash)
 	return true;
 end
 
-Game.maps = {};
+-- Generate map names
 for i = 1, 50 do
 	table.insert(Game.maps, "Round "..string.lpad(tostring(i), 2, '0'));
 end

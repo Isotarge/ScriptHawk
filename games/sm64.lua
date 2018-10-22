@@ -59,6 +59,10 @@ local Game = {
 		"Unknown 37",
 		"Unknown 38"
 	},
+	speedy_speeds = { .001, .01, .1, 1, 5, 10, 20, 50, 100 },
+	speedy_index = 7,
+	rot_speed = 100,
+	max_rot_units = 65536,
 };
 
 --------------------
@@ -66,21 +70,9 @@ local Game = {
 --------------------
 
 function Game.detectVersion(romName, romHash)
-	if romHash == "9BEF1128717F958171A4AFAC3ED78EE2BB4E86CE" then -- USA
-		version = 1;
-	elseif romHash == "4AC5721683D0E0B6BBB561B58A71740845DCEEA9" then -- Europe
-		version = 2;
-	elseif romHash == "3F319AE697533A255A1003D09202379D78D5A2E0" then -- Japan Shindou Edition
-		version = 3;
-	elseif romHash == "8A20A5C83D6CEB0F0506CFC9FA20D8F438CAFE51" then -- Japan
-		version = 4;
-	else
-		return false;
-	end
-
 	-- Squish Game.Memory tables down to a single address for the relevant version
 	for k, v in pairs(Game.Memory) do
-		Game.Memory[k] = v[version];
+		Game.Memory[k] = v[Game.version];
 	end
 
 	return true;
@@ -327,12 +319,6 @@ end
 -- Physics/Scale --
 -------------------
 
-Game.speedy_speeds = { .001, .01, .1, 1, 5, 10, 20, 50, 100 };
-Game.speedy_index = 7;
-
-Game.rot_speed = 100;
-Game.max_rot_units = 65536;
-
 function Game.getVelocity()
 	return mainmemory.readfloat(Game.Memory.velocity, true);
 end
@@ -414,8 +400,8 @@ end
 
 function Game.initUI()
 	ScriptHawk.UI.checkbox(10, 6, "Enable Object Analyzer", "Object Analyzer");
-	ScriptHawk.UI.button({13, -7}, 7, ScriptHawk.UI.button_height, nil, "Decrement Object Index", "-", decrementObjectIndex);
-	ScriptHawk.UI.button({13, ScriptHawk.UI.button_height - 7}, 7, ScriptHawk.UI.button_height, nil, "Increment Object Index", "+", incrementObjectIndex);
+	ScriptHawk.UI.button({13, -7}, 7, {ScriptHawk.UI.button_height}, nil, "Decrement Object Index", "-", decrementObjectIndex);
+	ScriptHawk.UI.button({13, ScriptHawk.UI.button_height - 7}, 7, {ScriptHawk.UI.button_height}, nil, "Increment Object Index", "+", incrementObjectIndex);
 	ScriptHawk.UI.form_controls["Object Index Label"] = forms.label(ScriptHawk.UI.options_form, "Index: 0", ScriptHawk.UI.col(8) + ScriptHawk.UI.button_height + 21, ScriptHawk.UI.row(7) + ScriptHawk.UI.label_offset, 64, 14);
 end
 

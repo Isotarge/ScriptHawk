@@ -447,25 +447,9 @@ function Game.importCar(importString, carIndex)
 end
 
 function Game.detectVersion(romName, romHash)
-	if romHash == "D2C9B4EE" then -- US Simulation 1.0
-		version = 1;
-	elseif romHash == "B5A363A3" then -- US Simulation 1.1
-		version = 2;
-	elseif romHash == "E3672E95" then -- US Simulation 1.2
-		version = 3;
-	elseif romHash == "20FB91D3" then -- Japan Simulation 1.0
-		version = 4;
-	elseif romHash == "7E74A4F0" then -- Japan Simulation 1.1
-		version = 5;
-	elseif romHash == "AFCCF4DC" then -- Europe Simulation 1.0
-		version = 6;
-	else
-		return false;
-	end
-
 	-- Squish Game.Memory tables down to a single address for the relevant version
 	for k, v in pairs(Game.Memory) do
-		Game.Memory[k] = v[version];
+		Game.Memory[k] = v[Game.version];
 	end
 
 	return true;
@@ -484,7 +468,7 @@ end
 
 function Game.getCash()
 	local value = mainmemory.read_u32_le(Game.Memory.cash);
-	if version == 4 or version == 5 then  -- Note: Japanese values are multiplied by 100 for display
+	if Game.version == 4 or Game.version == 5 then  -- Note: Japanese values are multiplied by 100 for display
 		return value * 100;
 	end
 	return value;

@@ -291,22 +291,18 @@ local eep_checksum = {
 };
 
 function Game.detectVersion(romName, romHash)
-	if romHash == "BB359A75941DF74BF7290212C89FBC6E2C5601FE" then -- Europe
+	if Game.version == 1 then -- Europe
 		flag_array = require("games.bk_flags");
-		version = 1;
 		framebuffer.width = 292;
 		framebuffer.height = 216;
 		clip_vel = -2900;
 		max_air = 6 * 500;
-	elseif romHash == "90726D7E7CD5BF6CDFD38F45C9ACBF4D45BD9FD8" then -- Japan
+	elseif Game.version == 2 then -- Japan
 		flag_array = require("games.bk_flags");
-		version = 2;
-	elseif romHash == "DED6EE166E740AD1BC810FD678A84B48E245AB80" then -- USA 1.1
+	elseif Game.version == 3 then -- USA 1.1
 		flag_array = require("games.bk_flags");
-		version = 3;
-	elseif romHash == "1FE1632098865F639E22C11B9A81EE8F29C75D7A" then -- USA 1.0
+	elseif Game.version == 4 then -- USA 1.0
 		flag_array = require("games.bk_flags");
-		version = 4;
 	else
 		return false;
 	end
@@ -324,7 +320,7 @@ function Game.detectVersion(romName, romHash)
 
 	-- Squish Game.Memory tables down to a single address for the relevant version
 	for k, v in pairs(Game.Memory) do
-		Game.Memory[k] = v[version];
+		Game.Memory[k] = v[Game.version];
 	end
 
 	if #flag_array > 0 then
@@ -2989,13 +2985,13 @@ spawner = {
 
 function spawner.enable()
 	spawner.enabled = false;
-	if version == 1 then
+	if Game.version == 1 then
 		loadASMPatch("./docs/BK ASM Hacking/Actor Spawner (PAL).asm", true);
-	elseif version == 2 then
+	elseif Game.version == 2 then
 		loadASMPatch("./docs/BK ASM Hacking/Actor Spawner (Japan).asm", true);
-	elseif version == 3 then
+	elseif Game.version == 3 then
 		loadASMPatch("./docs/BK ASM Hacking/Actor Spawner (USA 1.1).asm", true);
-	elseif version == 4 then
+	elseif Game.version == 4 then
 		loadASMPatch("./docs/BK ASM Hacking/Actor Spawner (USA 1.0).asm", true);
 	end
 	-- Find magic flag

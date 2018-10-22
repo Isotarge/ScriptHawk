@@ -90,18 +90,10 @@ end
 function Game.detectVersion(romName, romHash)
 	ScriptHawk.dpad.joypad.enabled = false;
 	ScriptHawk.dpad.key.enabled = false;
-	local version = 1;
-	if romHash == "05D0E3897CB2B6E08C2952730D2C80C1" then -- GG Proto
-		version = 1; -- Same addresses as SMS, interestingly
-	elseif romHash == "8A95B36139206A5BA13A38BB626AEE25" then -- GG Rev 1.0
-		version = 2;
-	elseif romHash == "B1DE7027824C434CE8DE59782705F5C9" then -- GG Rev 1.1
-		version = 2;
-	end
 
 	-- Squish Game.Memory tables down to a single address for the relevant version
 	for k, v in pairs(Game.Memory) do
-		Game.Memory[k] = v[version];
+		Game.Memory[k] = v[Game.version];
 	end
 
 	return true;

@@ -17,7 +17,7 @@ end
 
 ScriptHawk = {
 	warnings = false, -- Useful for debugging but annoying for end users, so default to false
-	ui_test = false, -- Open all possible module options forms, useful for testing global UI changes
+	ui_test = true, -- Open all possible module options forms, useful for testing global UI changes
 	mode = "Position",
 	smooth_moving_angle = true,
 	UI = {
@@ -365,75 +365,77 @@ local supportedGames = {
 	["BE2C30D69B1EBA76EAF1CC259DFA41F0F29B0FB2"] = {moduleName="games.balloon_fight", friendlyName="Balloon Fight"},
 	["F7E96381736E679C1E996283C2BE718025A02C0D"] = {moduleName="games.balloon_fight", friendlyName="Balloon Fight (PC10)"},
 
-	-- Banjo
-	["90726D7E7CD5BF6CDFD38F45C9ACBF4D45BD9FD8"] = {moduleName="games.bk", friendlyName="Banjo to Kazooie no Daibouken (Japan)"},
-	["5A5172383037D171F121790959962703BE1F373C"] = {moduleName="games.bt", friendlyName="Banjo to Kazooie no Daibouken 2 (Japan)"},
-	["BB359A75941DF74BF7290212C89FBC6E2C5601FE"] = {moduleName="games.bk", friendlyName="Banjo-Kazooie (Europe) (En,Fr,De)"},
-	["DED6EE166E740AD1BC810FD678A84B48E245AB80"] = {moduleName="games.bk", friendlyName="Banjo-Kazooie (USA) (Rev A)"},
-	["1FE1632098865F639E22C11B9A81EE8F29C75D7A"] = {moduleName="games.bk", friendlyName="Banjo-Kazooie (USA)"},
-	["4CA2D332F6E6B018777AFC6A8B7880B38B6DFB79"] = {moduleName="games.bt", friendlyName="Banjo-Tooie (Australia)"},
-	["93BF2FAC1387320AD07251CB4B64FD36BAC1D7A6"] = {moduleName="games.bt", friendlyName="Banjo-Tooie (Europe) (En,Fr,De,Es)"},
-	["AF1A89E12B638B8D82CC4C085C8E01D4CBA03FB3"] = {moduleName="games.bt", friendlyName="Banjo-Tooie (USA)"},
+	-- Banjo-Kazooie
+	["90726D7E7CD5BF6CDFD38F45C9ACBF4D45BD9FD8"] = {moduleName="games.bk", friendlyName="Banjo to Kazooie no Daibouken (Japan)", version=2},
+	["BB359A75941DF74BF7290212C89FBC6E2C5601FE"] = {moduleName="games.bk", friendlyName="Banjo-Kazooie (Europe) (En,Fr,De)", version=1},
+	["DED6EE166E740AD1BC810FD678A84B48E245AB80"] = {moduleName="games.bk", friendlyName="Banjo-Kazooie (USA) (Rev A)", version=3},
+	["1FE1632098865F639E22C11B9A81EE8F29C75D7A"] = {moduleName="games.bk", friendlyName="Banjo-Kazooie (USA)", version=4},
+
+	-- Banjo-Tooie
+	["5A5172383037D171F121790959962703BE1F373C"] = {moduleName="games.bt", friendlyName="Banjo to Kazooie no Daibouken 2 (Japan)", version=3},
+	["4CA2D332F6E6B018777AFC6A8B7880B38B6DFB79"] = {moduleName="games.bt", friendlyName="Banjo-Tooie (Australia)", version=1},
+	["93BF2FAC1387320AD07251CB4B64FD36BAC1D7A6"] = {moduleName="games.bt", friendlyName="Banjo-Tooie (Europe) (En,Fr,De,Es)", version=2},
+	["AF1A89E12B638B8D82CC4C085C8E01D4CBA03FB3"] = {moduleName="games.bt", friendlyName="Banjo-Tooie (USA)", version=4},
 
 	-- Conker's Bad Fur Day
-	["EE7BC6656FD1E1D9FFB3D19ADD759F28B88DF710"] = {moduleName="games.cbfd", friendlyName="Conker's Bad Fur Day (Europe)"},
-	["4CBADD3C4E0729DEC46AF64AD018050EADA4F47A"] = {moduleName="games.cbfd", friendlyName="Conker's Bad Fur Day (USA)"},
+	["EE7BC6656FD1E1D9FFB3D19ADD759F28B88DF710"] = {moduleName="games.cbfd", friendlyName="Conker's Bad Fur Day (Europe)", version=1},
+	["4CBADD3C4E0729DEC46AF64AD018050EADA4F47A"] = {moduleName="games.cbfd", friendlyName="Conker's Bad Fur Day (USA)", version=2},
 
 	-- Crash Bandicoot
-	["41B5F211"] = {moduleName="games.crash1", friendlyName="Crash Bandicoot (USA)"},
-	["249FC147"] = {moduleName="games.crash1", friendlyName="Crash Bandicoot (USA)"},
-	["D6172125"] = {moduleName="games.crash1", friendlyName="Crash Bandicoot (Europe) (EDC)"},
-	["2033243A"] = {moduleName="games.crash1", friendlyName="Crash Bandicoot (Europe) (EDC)"},
-	["FD11EB1E"] = {moduleName="games.crash1", friendlyName="Crash Bandicoot (Europe) (No EDC)"},
-	["0B9EB02B"] = {moduleName="games.crash1", friendlyName="Crash Bandicoot (Europe) (No EDC)"},
-	["D9BA797E"] = {moduleName="games.crash1", friendlyName="Crash Bandicoot (Japan)"},
-	["F5B95131"] = {moduleName="games.crash1", friendlyName="Crash Bandicoot (Japan)"},
+	["41B5F211"] = {moduleName="games.crash1", friendlyName="Crash Bandicoot (USA)", version=1},
+	["249FC147"] = {moduleName="games.crash1", friendlyName="Crash Bandicoot (USA)", version=1},
+	["D6172125"] = {moduleName="games.crash1", friendlyName="Crash Bandicoot (Europe) (EDC)", version=2},
+	["2033243A"] = {moduleName="games.crash1", friendlyName="Crash Bandicoot (Europe) (EDC)", version=2},
+	["FD11EB1E"] = {moduleName="games.crash1", friendlyName="Crash Bandicoot (Europe) (No EDC)", version=2},
+	["0B9EB02B"] = {moduleName="games.crash1", friendlyName="Crash Bandicoot (Europe) (No EDC)", version=2},
+	["D9BA797E"] = {moduleName="games.crash1", friendlyName="Crash Bandicoot (Japan)", version=3},
+	["F5B95131"] = {moduleName="games.crash1", friendlyName="Crash Bandicoot (Japan)", version=3},
 
 	-- Crash Bandicoot 2: Cortex Strikes Back
-	["149A203B"] = {moduleName="games.crash2", friendlyName="Crash Bandicoot 2 - Cortex Strikes Back (USA)"},
-	["395C0916"] = {moduleName="games.crash2", friendlyName="Crash Bandicoot 2 - Cortex Strikes Back (USA)"},
-	["5F65CF0F"] = {moduleName="games.crash2", friendlyName="Crash Bandicoot 2 - Cortex Strikes Back (Europe) (En,Fr,De,Es,It) (No EDC)"},
-	["F5E2EC49"] = {moduleName="games.crash2", friendlyName="Crash Bandicoot 2 - Cortex Strikes Back (Europe) (En,Fr,De,Es,It) (No EDC)"},
-	["97395614"] = {moduleName="games.crash2", friendlyName="Crash Bandicoot 2 - Cortex Strikes Back (Europe) (En,Fr,De,Es,It) (EDC)"},
-	["74C85B1E"] = {moduleName="games.crash2", friendlyName="Crash Bandicoot 2 - Cortex Strikes Back (Europe) (En,Fr,De,Es,It) (EDC)"},
-	["B0A92BAF"] = {moduleName="games.crash2", friendlyName="Crash Bandicoot 2 - Cortex no Gyakushuu! (Japan)"},
-	["14591AE9"] = {moduleName="games.crash2", friendlyName="Crash Bandicoot 2 - Cortex no Gyakushuu! (Japan)"},
+	["149A203B"] = {moduleName="games.crash2", friendlyName="Crash Bandicoot 2 - Cortex Strikes Back (USA)", version=1},
+	["395C0916"] = {moduleName="games.crash2", friendlyName="Crash Bandicoot 2 - Cortex Strikes Back (USA)", version=1},
+	["5F65CF0F"] = {moduleName="games.crash2", friendlyName="Crash Bandicoot 2 - Cortex Strikes Back (Europe) (En,Fr,De,Es,It) (No EDC)", version=2},
+	["F5E2EC49"] = {moduleName="games.crash2", friendlyName="Crash Bandicoot 2 - Cortex Strikes Back (Europe) (En,Fr,De,Es,It) (No EDC)", version=2},
+	["97395614"] = {moduleName="games.crash2", friendlyName="Crash Bandicoot 2 - Cortex Strikes Back (Europe) (En,Fr,De,Es,It) (EDC)", version=2},
+	["74C85B1E"] = {moduleName="games.crash2", friendlyName="Crash Bandicoot 2 - Cortex Strikes Back (Europe) (En,Fr,De,Es,It) (EDC)", version=2},
+	["B0A92BAF"] = {moduleName="games.crash2", friendlyName="Crash Bandicoot 2 - Cortex no Gyakushuu! (Japan)", version=3},
+	["14591AE9"] = {moduleName="games.crash2", friendlyName="Crash Bandicoot 2 - Cortex no Gyakushuu! (Japan)", version=3},
 
 	-- Crash Bandicoot 3: Warped
-	["05E3012B"] = {moduleName="games.crash3", friendlyName="Crash Bandicoot - Warped (USA)"},
-	["9BF37B2C"] = {moduleName="games.crash3", friendlyName="Crash Bandicoot - Warped (USA)"},
-	["39B868A1"] = {moduleName="games.crash3", friendlyName="Crash Bandicoot 3 - Warped (Europe) (En,Fr,De,Es,It)"},
-	["A91BEA0E"] = {moduleName="games.crash3", friendlyName="Crash Bandicoot 3 - Warped (Europe) (En,Fr,De,Es,It)"},
-	["7E59A4CE"] = {moduleName="games.crash3", friendlyName="Crash Bandicoot 3 - Buttobi! Sekai Isshuu (Japan)"},
-	["A2E93AEC"] = {moduleName="games.crash3", friendlyName="Crash Bandicoot 3 - Buttobi! Sekai Isshuu (Japan)"},
+	["05E3012B"] = {moduleName="games.crash3", friendlyName="Crash Bandicoot - Warped (USA)", version=1},
+	["9BF37B2C"] = {moduleName="games.crash3", friendlyName="Crash Bandicoot - Warped (USA)", version=1},
+	["39B868A1"] = {moduleName="games.crash3", friendlyName="Crash Bandicoot 3 - Warped (Europe) (En,Fr,De,Es,It)", version=2},
+	["A91BEA0E"] = {moduleName="games.crash3", friendlyName="Crash Bandicoot 3 - Warped (Europe) (En,Fr,De,Es,It)", version=2},
+	["7E59A4CE"] = {moduleName="games.crash3", friendlyName="Crash Bandicoot 3 - Buttobi! Sekai Isshuu (Japan)", version=3},
+	["A2E93AEC"] = {moduleName="games.crash3", friendlyName="Crash Bandicoot 3 - Buttobi! Sekai Isshuu (Japan)", version=3},
 
 	-- Diddy Kong Racing
-	["B7F628073237B3D211D40406AA0884FF8FDD70D5"] = {moduleName="games.dkr", friendlyName="Diddy Kong Racing (Europe) (En,Fr,De) (Rev A)"},
-	["DD5D64DD140CB7AA28404FA35ABDCABA33C29260"] = {moduleName="games.dkr", friendlyName="Diddy Kong Racing (Europe) (En,Fr,De)"},
-	["23BA3D302025153D111416E751027CEF11213A19"] = {moduleName="games.dkr", friendlyName="Diddy Kong Racing (Japan)"},
-	["6D96743D46F8C0CD0EDB0EC5600B003C89B93755"] = {moduleName="games.dkr", friendlyName="Diddy Kong Racing (USA) (En,Fr) (Rev A)"},
-	["0CB115D8716DBBC2922FDA38E533B9FE63BB9670"] = {moduleName="games.dkr", friendlyName="Diddy Kong Racing (USA) (En,Fr)"},
+	["B7F628073237B3D211D40406AA0884FF8FDD70D5"] = {moduleName="games.dkr", friendlyName="Diddy Kong Racing (Europe) (En,Fr,De) (Rev A)", version=1},
+	["DD5D64DD140CB7AA28404FA35ABDCABA33C29260"] = {moduleName="games.dkr", friendlyName="Diddy Kong Racing (Europe) (En,Fr,De)", version=2},
+	["23BA3D302025153D111416E751027CEF11213A19"] = {moduleName="games.dkr", friendlyName="Diddy Kong Racing (Japan)", version=3},
+	["6D96743D46F8C0CD0EDB0EC5600B003C89B93755"] = {moduleName="games.dkr", friendlyName="Diddy Kong Racing (USA) (En,Fr) (Rev A)", version=4},
+	["0CB115D8716DBBC2922FDA38E533B9FE63BB9670"] = {moduleName="games.dkr", friendlyName="Diddy Kong Racing (USA) (En,Fr)", version=5},
 
 	-- Donald Land
 	["C5BBA353871E438C387FD13891580A2A139694AD"] = {moduleName="games.donald_land", friendlyName="Donald Land"},
 
 	-- Donkey Kong 64
-	["F96AF883845308106600D84E0618C1A066DC6676"] = {moduleName="games.dk64", friendlyName="Donkey Kong 64 (Europe) (En,Fr,De,Es)"},
-	["F0AD2B2BBF04D574ED7AFBB1BB6A4F0511DCD87D"] = {moduleName="games.dk64", friendlyName="Donkey Kong 64 (Japan)"},
-	["B4717E602F07CA9BE0D4822813C658CD8B99F993"] = {moduleName="games.dk64", friendlyName="Donkey Kong 64 (USA) (Demo) (Kiosk)"},
-	["CF806FF2603640A748FCA5026DED28802F1F4A50"] = {moduleName="games.dk64", friendlyName="Donkey Kong 64 (USA)"},
+	["F96AF883845308106600D84E0618C1A066DC6676"] = {moduleName="games.dk64", friendlyName="Donkey Kong 64 (Europe) (En,Fr,De,Es)", version=2},
+	["F0AD2B2BBF04D574ED7AFBB1BB6A4F0511DCD87D"] = {moduleName="games.dk64", friendlyName="Donkey Kong 64 (Japan)", version=3},
+	["B4717E602F07CA9BE0D4822813C658CD8B99F993"] = {moduleName="games.dk64", friendlyName="Donkey Kong 64 (USA) (Demo) (Kiosk)", version=4},
+	["CF806FF2603640A748FCA5026DED28802F1F4A50"] = {moduleName="games.dk64", friendlyName="Donkey Kong 64 (USA)", version=1},
 
 	-- Drill Dozer
-	["C1058CC2482B91204100CC8515DA99AEB06773F5"] = {moduleName="games.GBA_DrillDozer", friendlyName="Drill Dozer (USA)"},
-	["84AFA7108E4D604E7B1A6D105DF5760869A247FA"] = {moduleName="games.GBA_DrillDozer", friendlyName="Screw Breaker Goushin Dorirurero (Japan)"},
+	["C1058CC2482B91204100CC8515DA99AEB06773F5"] = {moduleName="games.GBA_DrillDozer", friendlyName="Drill Dozer (USA)", version=1},
+	["84AFA7108E4D604E7B1A6D105DF5760869A247FA"] = {moduleName="games.GBA_DrillDozer", friendlyName="Screw Breaker Goushin Dorirurero (Japan)", version=2},
 
 	-- Earthworm Jim 3D
-	["EAB14F23640CD6148D4888902CDCC00DD6111BF9"] = {moduleName="games.ej3d", friendlyName="Earthworm Jim 3D (USA)"},
-	["F02C1AFD18C1CBE309472CBE5B3B3F04B22DB7EE"] = {moduleName="games.ej3d", friendlyName="Earthworm Jim 3D (Europe) (En,Fr,De,Es,It)"},
+	["EAB14F23640CD6148D4888902CDCC00DD6111BF9"] = {moduleName="games.ej3d", friendlyName="Earthworm Jim 3D (USA)", version=1},
+	["F02C1AFD18C1CBE309472CBE5B3B3F04B22DB7EE"] = {moduleName="games.ej3d", friendlyName="Earthworm Jim 3D (Europe) (En,Fr,De,Es,It)", version=2},
 
 	-- Elmo
-	["97777CA06F4E8AFF8F1E95033CC8D3833BE40F76"] = {moduleName="games.elmo", friendlyName="Elmo's Letter Adventure (USA)"},
-	["7195EA96D9FE5DE065AF61F70D55C92C8EE905E6"] = {moduleName="games.elmo", friendlyName="Elmo's Number Journey (USA)"},
+	["97777CA06F4E8AFF8F1E95033CC8D3833BE40F76"] = {moduleName="games.elmo", friendlyName="Elmo's Letter Adventure (USA)", verison=2},
+	["7195EA96D9FE5DE065AF61F70D55C92C8EE905E6"] = {moduleName="games.elmo", friendlyName="Elmo's Number Journey (USA)", verison=1},
 
 	-- Galahad
 	["536E5A1FFB50D33632A9978B35DB5DF6"] = {moduleName="games.galahad", friendlyName="Legend of Galahad, The (UE) [!]"},
@@ -448,12 +450,12 @@ local supportedGames = {
 	["6BD9879AF39E248D149761014EBF5639"] = {moduleName="games.golvellius", friendlyName="Golvellius (J)"},
 
 	-- Gran Turismo 2
-	["D2C9B4EE"] = {moduleName="games.gran_turismo_2", friendlyName="Gran Turismo 2 (USA 1.0)"},
-	["B5A363A3"] = {moduleName="games.gran_turismo_2", friendlyName="Gran Turismo 2 (USA 1.1)"},
-	["E3672E95"] = {moduleName="games.gran_turismo_2", friendlyName="Gran Turismo 2 (USA 1.2)"},
-	["20FB91D3"] = {moduleName="games.gran_turismo_2", friendlyName="Gran Turismo 2 (Japan 1.0)"},
-	["7E74A4F0"] = {moduleName="games.gran_turismo_2", friendlyName="Gran Turismo 2 (Japan 1.1)"},
-	["AFCCF4DC"] = {moduleName="games.gran_turismo_2", friendlyName="Gran Turismo 2 (Europe)"},
+	["D2C9B4EE"] = {moduleName="games.gran_turismo_2", friendlyName="Gran Turismo 2 (USA 1.0)", version=1},
+	["B5A363A3"] = {moduleName="games.gran_turismo_2", friendlyName="Gran Turismo 2 (USA 1.1)", version=2},
+	["E3672E95"] = {moduleName="games.gran_turismo_2", friendlyName="Gran Turismo 2 (USA 1.2)", version=3},
+	["20FB91D3"] = {moduleName="games.gran_turismo_2", friendlyName="Gran Turismo 2 (Japan 1.0)", version=4},
+	["7E74A4F0"] = {moduleName="games.gran_turismo_2", friendlyName="Gran Turismo 2 (Japan 1.1)", version=5},
+	["AFCCF4DC"] = {moduleName="games.gran_turismo_2", friendlyName="Gran Turismo 2 (Europe)", version=6},
 
 	-- Impossible Mission
 	["AF51AB03A173DEC28C9241532227CD64"] = {moduleName="games.impossible_mission", friendlyName="Impossible Mission (E)"},
@@ -512,41 +514,41 @@ local supportedGames = {
 	["5E423DFAB8221B69A641D2E535EBFE1E3759A2E4"] = {moduleName="games.rats", friendlyName="Rats! (USA) (En,Es)"},
 
 	-- Rayman 2
-	["619AB27EA1645399439AD324566361D3E7FF020E"] = {moduleName="games.rayman_2", friendlyName="Rayman 2 - The Great Escape (Europe) (En,Fr,De,Es,It)"},
-	["50558356B059AD3FBAF5FE95380512B9DCEAAF52"] = {moduleName="games.rayman_2", friendlyName="Rayman 2 - The Great Escape (USA) (En,Fr,De,Es,It)"},
+	["619AB27EA1645399439AD324566361D3E7FF020E"] = {moduleName="games.rayman_2", friendlyName="Rayman 2 - The Great Escape (Europe) (En,Fr,De,Es,It)", version=1},
+	["50558356B059AD3FBAF5FE95380512B9DCEAAF52"] = {moduleName="games.rayman_2", friendlyName="Rayman 2 - The Great Escape (USA) (En,Fr,De,Es,It)", version=2},
 
 	-- San Francisco Rush 2049
-	["3F99351D7BB61656614BDB2AA1A90CFE55D1922C"] = {moduleName="games.rush_2049", friendlyName="San Francisco Rush 2049 (USA)"},
-	["61373D4758ECA3FA831BEAC27B4D4C250845F80C"] = {moduleName="games.rush_2049", friendlyName="San Francisco Rush 2049 (Europe) (En,Fr,De,Es,It,Nl)"},
+	["3F99351D7BB61656614BDB2AA1A90CFE55D1922C"] = {moduleName="games.rush_2049", friendlyName="San Francisco Rush 2049 (USA)", version=1},
+	["61373D4758ECA3FA831BEAC27B4D4C250845F80C"] = {moduleName="games.rush_2049", friendlyName="San Francisco Rush 2049 (Europe) (En,Fr,De,Es,It,Nl)", version=2},
 
 	-- Super Mario 64
-	["4AC5721683D0E0B6BBB561B58A71740845DCEEA9"] = {moduleName="games.sm64", friendlyName="Super Mario 64 (Europe) (En,Fr,De)"},
-	["3F319AE697533A255A1003D09202379D78D5A2E0"] = {moduleName="games.sm64", friendlyName="Super Mario 64 (Japan) (Rev A) (Shindou Edition)"},
-	["8A20A5C83D6CEB0F0506CFC9FA20D8F438CAFE51"] = {moduleName="games.sm64", friendlyName="Super Mario 64 (Japan)"},
-	["9BEF1128717F958171A4AFAC3ED78EE2BB4E86CE"] = {moduleName="games.sm64", friendlyName="Super Mario 64 (USA)"},
+	["4AC5721683D0E0B6BBB561B58A71740845DCEEA9"] = {moduleName="games.sm64", friendlyName="Super Mario 64 (Europe) (En,Fr,De)", version=2},
+	["3F319AE697533A255A1003D09202379D78D5A2E0"] = {moduleName="games.sm64", friendlyName="Super Mario 64 (Japan) (Rev A) (Shindou Edition)", version=3},
+	["8A20A5C83D6CEB0F0506CFC9FA20D8F438CAFE51"] = {moduleName="games.sm64", friendlyName="Super Mario 64 (Japan)", version=4},
+	["9BEF1128717F958171A4AFAC3ED78EE2BB4E86CE"] = {moduleName="games.sm64", friendlyName="Super Mario 64 (USA)", version=1},
 
 	-- Smash 64
-	["4B71F0E01878696733EEFA9C80D11C147ECB4984"] = {moduleName="games.smash64", friendlyName="Nintendo All-Star! Dairantou Smash Brothers (Japan)"},
-	["A9BF83FE73361E8D042C33ED48B3851D7D46712C"] = {moduleName="games.smash64", friendlyName="Super Smash Bros. (Australia)"},
-	["6EE8A41FEF66280CE3E3F0984D00B96079442FB9"] = {moduleName="games.smash64", friendlyName="Super Smash Bros. (Europe) (En,Fr,De)"},
-	["E2929E10FCCC0AA84E5776227E798ABC07CEDABF"] = {moduleName="games.smash64", friendlyName="Super Smash Bros. (USA)"},
-	["88C8FED5ECD5ED901CB5FC4B5BBEFFA3EA022DF7"] = {moduleName="games.smash64", friendlyName="19XXTE 0.11"},
-	["1095F94D70216AC916A9DD8A9FD65DB13E7F9F17"] = {moduleName="games.smash64", friendlyName="19XXGE"},
+	["4B71F0E01878696733EEFA9C80D11C147ECB4984"] = {moduleName="games.smash64", friendlyName="Nintendo All-Star! Dairantou Smash Brothers (Japan)", version=1},
+	["A9BF83FE73361E8D042C33ED48B3851D7D46712C"] = {moduleName="games.smash64", friendlyName="Super Smash Bros. (Australia)", version=2},
+	["6EE8A41FEF66280CE3E3F0984D00B96079442FB9"] = {moduleName="games.smash64", friendlyName="Super Smash Bros. (Europe) (En,Fr,De)", version=3},
+	["E2929E10FCCC0AA84E5776227E798ABC07CEDABF"] = {moduleName="games.smash64", friendlyName="Super Smash Bros. (USA)", version=4},
+	["88C8FED5ECD5ED901CB5FC4B5BBEFFA3EA022DF7"] = {moduleName="games.smash64", friendlyName="19XXTE 0.11", version=4}, -- Based on US ROM
+	["1095F94D70216AC916A9DD8A9FD65DB13E7F9F17"] = {moduleName="games.smash64", friendlyName="19XXGE", version=4}, -- Based on US ROM
 
 	-- Sonic The Hedgehog (GG)
-	["8A95B36139206A5BA13A38BB626AEE25"] = {moduleName="games.sonic1_sms", friendlyName="Sonic The Hedgehog (J)"},
-	["05D0E3897CB2B6E08C2952730D2C80C1"] = {moduleName="games.sonic1_sms", friendlyName="Sonic The Hedgehog (W) (Proto)"},
-	["B1DE7027824C434CE8DE59782705F5C9"] = {moduleName="games.sonic1_sms", friendlyName="Sonic The Hedgehog (W) (Rev 1)"},
+	["8A95B36139206A5BA13A38BB626AEE25"] = {moduleName="games.sonic1_sms", friendlyName="Sonic The Hedgehog (J)", version=2},
+	["05D0E3897CB2B6E08C2952730D2C80C1"] = {moduleName="games.sonic1_sms", friendlyName="Sonic The Hedgehog (W) (Proto)", version=1}, -- Same addresses as SMS version, interestingly
+	["B1DE7027824C434CE8DE59782705F5C9"] = {moduleName="games.sonic1_sms", friendlyName="Sonic The Hedgehog (W) (Rev 1)", version=2},
 
 	-- Sonic The Hedgehog (SMS)
-	["6B9677E4A9ABB37765D6DB4658F4324251807E07"] = {moduleName="games.sonic1_sms", friendlyName="Sonic The Hedgehog (UE)"},
-	["6ACA0E3DFFE461BA1CB11A86CD4CAF5B97E1B8DF"] = {moduleName="games.sonic1_sms", friendlyName="Sonic The Hedgehog (E) (BIOS)"},
-	["DC13A61EAFE75C13C15B5ECE419AC57B"] = {moduleName="games.sonic1_sms", friendlyName="Sonic The Hedgehog (UE)"},
-	["4187D96BEAF36385E681A3CF3BD1663D"] = {moduleName="games.sonic1_sms", friendlyName="Sonic The Hedgehog (E) (BIOS)"},
+	["6B9677E4A9ABB37765D6DB4658F4324251807E07"] = {moduleName="games.sonic1_sms", friendlyName="Sonic The Hedgehog (UE)", version=1},
+	["6ACA0E3DFFE461BA1CB11A86CD4CAF5B97E1B8DF"] = {moduleName="games.sonic1_sms", friendlyName="Sonic The Hedgehog (E) (BIOS)", version=1},
+	["DC13A61EAFE75C13C15B5ECE419AC57B"] = {moduleName="games.sonic1_sms", friendlyName="Sonic The Hedgehog (UE)", version=1},
+	["4187D96BEAF36385E681A3CF3BD1663D"] = {moduleName="games.sonic1_sms", friendlyName="Sonic The Hedgehog (E) (BIOS)", version=1},
 
 	-- Space Station Silicon Valley
-	["E5E09205AA743A9E5043A42DF72ADC379C746B0B"] = {moduleName="games.sssv", friendlyName="Space Station Silicon Valley (USA)"},
-	["23710541BB3394072740B0F0236A7CB1A7D41531"] = {moduleName="games.sssv", friendlyName="Space Station Silicon Valley (Europe) (En,Fr,De)"},
+	["E5E09205AA743A9E5043A42DF72ADC379C746B0B"] = {moduleName="games.sssv", friendlyName="Space Station Silicon Valley (USA)", version=1},
+	["23710541BB3394072740B0F0236A7CB1A7D41531"] = {moduleName="games.sssv", friendlyName="Space Station Silicon Valley (Europe) (En,Fr,De)", version=2},
 
 	-- Taz-Mania (SMS)
 	["AC98F23DDC24609CB77BB13102E0386F8C2A4A76"] = {moduleName="games.taz", friendlyName="Taz-Mania (E)"},
@@ -566,11 +568,11 @@ local supportedGames = {
 	["41E20AFE05C2FBE45AC5F3A9C8111047"] = {moduleName="games.the_ninja", friendlyName="The Ninja (J)"},
 
 	-- Toy Story 2
-	["A9F97E22391313095D2C2FBAF81FB33BFA2BA7C6"] = {moduleName="games.ts2", friendlyName="Toy Story 2 - Buzz l'Eclair a la Rescousse! (France)"},
-	["92015E5254CBBAD1BC668ECB13A4B568E5F55052"] = {moduleName="games.ts2", friendlyName="Toy Story 2 - Buzz Lightyear to the Rescue! (Europe)"},
-	["982AD2E1E44C6662C88A77367BC5DF91C51531BF"] = {moduleName="games.ts2", friendlyName="Toy Story 2 - Buzz Lightyear to the Rescue! (USA)"},
-	["EAE83C07E2E777D8E71A5BE6120AED03D7E67782"] = {moduleName="games.ts2", friendlyName="Toy Story 2 - Captain Buzz Lightyear auf Rettungsmission! (Germany) (Rev A)"},
-	["F8FBB100227015BE8629243F53D70F29A2A14315"] = {moduleName="games.ts2", friendlyName="Toy Story 2 - Captain Buzz Lightyear auf Rettungsmission! (Germany)"},
+	["A9F97E22391313095D2C2FBAF81FB33BFA2BA7C6"] = {moduleName="games.ts2", friendlyName="Toy Story 2 - Buzz l'Eclair a la Rescousse! (France)", version=1},
+	["92015E5254CBBAD1BC668ECB13A4B568E5F55052"] = {moduleName="games.ts2", friendlyName="Toy Story 2 - Buzz Lightyear to the Rescue! (Europe)", version=2},
+	["982AD2E1E44C6662C88A77367BC5DF91C51531BF"] = {moduleName="games.ts2", friendlyName="Toy Story 2 - Buzz Lightyear to the Rescue! (USA)", version=3},
+	["EAE83C07E2E777D8E71A5BE6120AED03D7E67782"] = {moduleName="games.ts2", friendlyName="Toy Story 2 - Captain Buzz Lightyear auf Rettungsmission! (Germany) (Rev A)", version=4},
+	["F8FBB100227015BE8629243F53D70F29A2A14315"] = {moduleName="games.ts2", friendlyName="Toy Story 2 - Captain Buzz Lightyear auf Rettungsmission! (Germany)", version=5},
 
 	-- Ty the Tasmanian Tiger 2: Bush Rescue(GBA)
 	["84267CE3D86100688048A8D4F166FA1B2D50E6D5"] = {moduleName="games.GBA_Ty2", friendlyName="Ty the Tasmanian Tiger 2 - Bush Rescue (USA,Europe) (En,Fr,De)"},
@@ -612,13 +614,16 @@ if not ScriptHawk.ui_test then
 			Game = require (v.moduleName);
 			ScriptHawk.moduleName = v.moduleName;
 			ScriptHawk.gamePrefName = string.gsub(ScriptHawk.moduleName, "games.", "");
+			if type(v.version) == "number" then
+				Game.version = v.version;
+			end
 			if v.selfContained then -- Self contained modules that do not require ScriptHawk's functionality and merely use ScriptHawk.lua as a convenient loader
 				return true;
 			end
 		end
 	end
 
-	if Game == nil then
+	if type(Game) ~= "table" then
 		print("This game is not currently supported.");
 		return false;
 	end
@@ -1203,6 +1208,9 @@ if ScriptHawk.ui_test == true then
 				Game = require (v.moduleName);
 				ScriptHawk.moduleName = v.moduleName;
 				ScriptHawk.gamePrefName = string.gsub(ScriptHawk.moduleName, "games.", "");
+				if type(v.version) == "number" then
+					Game.version = v.version;
+				end
 				if type(Game.detectVersion) == "function" then
 					Game.detectVersion(v.friendlyName, k);
 				end

@@ -5,7 +5,12 @@ if type(ScriptHawk) ~= "table" then
 	return;
 end
 
-local Game = {};
+local Game = {
+	speedy_speeds = { 1, 5, 10 },
+	speedy_index = 2,
+	rot_speed = 64,
+	max_rot_units = 0xFFFF,
+};
 
 -- TODO: Game.Memory table
 local x_pos;
@@ -73,16 +78,6 @@ function Game.detectVersion(romName, romHash)
 
 	return true;
 end
-
--------------------
--- Physics/Scale --
--------------------
-
-Game.speedy_speeds = { 1, 5, 10 };
-Game.speedy_index = 2;
-
-Game.rot_speed = 64;
-Game.max_rot_units = 0xFFFF;
 
 --------------
 -- Position --

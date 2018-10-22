@@ -34,17 +34,9 @@ local cosine_inverse = 0x0C; -- Float
 --------------------
 
 function Game.detectVersion(romName, romHash)
-	if romHash == "619AB27EA1645399439AD324566361D3E7FF020E" then -- Europe N64
-		version = 1;
-	elseif romHash == "50558356B059AD3FBAF5FE95380512B9DCEAAF52" then -- USA N64
-		version = 2;
-	else
-		return false;
-	end
-
 	-- Squish Game.Memory tables down to a single address for the relevant version
 	for k, v in pairs(Game.Memory) do
-		Game.Memory[k] = v[version];
+		Game.Memory[k] = v[Game.version];
 	end
 
 	return true;

@@ -402,18 +402,6 @@ local eep_checksum = {
 --------------------
 
 function Game.detectVersion(romName, romHash)
-	if romHash == "4CA2D332F6E6B018777AFC6A8B7880B38B6DFB79" then -- Australia
-		version = 1;
-	elseif romHash == "93BF2FAC1387320AD07251CB4B64FD36BAC1D7A6" then -- Europe
-		version = 2;
-	elseif romHash == "5A5172383037D171F121790959962703BE1F373C" then -- Japan
-		version = 3;
-	elseif romHash == "AF1A89E12B638B8D82CC4C085C8E01D4CBA03FB3" then -- USA
-		version = 4;
-	else
-		return false;
-	end
-
 	-- Read EEPROM checksums
 	for i = 1, #eep_checksum do
 		eep_checksum[i].value = readChecksum(eep_checksum[i].address);
@@ -423,10 +411,10 @@ function Game.detectVersion(romName, romHash)
 	for k, v in pairs(Game.Memory) do
 		if k == "healthAddresses" then
 			for key, value in pairs(Game.Memory[k]) do
-				Game.Memory[k][key] = value[version];
+				Game.Memory[k][key] = value[Game.version];
 			end
 		else
-			Game.Memory[k] = v[version];
+			Game.Memory[k] = v[Game.version];
 		end
 	end
 
@@ -634,7 +622,7 @@ local knownPatterns = { -- To test for more patterns: Freeze u32_be 0x12C7F0 at 
 function getCurrentPattern()
 	local pattern = {};
 	for i = 1, #JinjoAddresses do
-		table.insert(pattern, mainmemory.readbyte(JinjoAddresses[i][1][version]));
+		table.insert(pattern, mainmemory.readbyte(JinjoAddresses[i][1][Game.version]));
 	end
 	return pattern;
 end
@@ -5131,7 +5119,7 @@ function getJinjoIdentifierOSD(pointer)
 	if jinjo_value == 0 then
 		jinjo_ident = "Minjo (Random)";
 	elseif jinjo_value > 0 and jinjo_value < 46 then
-		jinjo_ident = JinjoAddresses[jinjo_value][2].." ("..JinjoColors[mainmemory.readbyte(JinjoAddresses[jinjo_value][1][version])]..")";
+		jinjo_ident = JinjoAddresses[jinjo_value][2].." ("..JinjoColors[mainmemory.readbyte(JinjoAddresses[jinjo_value][1][Game.version])]..")";
 	else
 		jinjo_ident = "Unknown";
 	end

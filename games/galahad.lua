@@ -145,8 +145,8 @@ end
 
 function Game.initUI()
 	ScriptHawk.UI.checkbox(10, 6, "checkbox_extra_data", "Show All");
-	ScriptHawk.UI.button({13, - 7}, 7, ScriptHawk.UI.button_height, nil, "button_decrement_object_index", "-", decrementObjectIndex);
-	ScriptHawk.UI.button({13, ScriptHawk.UI.button_height - 7}, 7, ScriptHawk.UI.button_height, nil, "button_increment_object_index", "+", incrementObjectIndex);
+	ScriptHawk.UI.button({13, - 7}, 7, {ScriptHawk.UI.button_height}, nil, "button_decrement_object_index", "-", decrementObjectIndex);
+	ScriptHawk.UI.button({13, ScriptHawk.UI.button_height - 7}, 7, {ScriptHawk.UI.button_height}, nil, "button_increment_object_index", "+", incrementObjectIndex);
 	ScriptHawk.UI.button(0, 6, {4, 10}, nil, nil, "Get Key", Game.getKey);
 
 	-- Sword

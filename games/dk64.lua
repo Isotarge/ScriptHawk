@@ -56,10 +56,9 @@ end
 -- TODO: Investigate texture pointer block at 0x7FA8A0 (USA)
 	-- 2 pointers
 	-- 1 u32_be
-local version; -- 1 USA, 2 Europe, 3 Japan, 4 Kiosk
 local Game = {
 	RAMWatch = {},
-	Memory = {
+	Memory = { -- 1 USA, 2 Europe, 3 Japan, 4 Kiosk
 		jetpac_object_base = {0x02EC68, 0x021D18, 0x021C78, nil},
 		jetpac_enemy_base = {0x02F09C, 0x02214C, 0x0220AC, nil},
 		jetpac_level = {0x02EC4F, 0x21CFF, 0x021C5F, nil},
@@ -582,7 +581,7 @@ local function jetpacObjectBaseToDraggableObject(objectBase)
 end
 
 local function drawSubGameHitboxes()
-	if version == 4 then
+	if Game.version == 4 then
 		return;
 	end
 
@@ -3183,14 +3182,14 @@ obj_model2 = {
 };
 
 local function getObjectModel2Array()
-	if version ~= 4 then
+	if Game.version ~= 4 then
 		return dereferencePointer(Game.Memory.obj_model2_array_pointer);
 	end
 	return Game.Memory.obj_model2_array_pointer; -- Kiosk doesn't move
 end
 
 local function getObjectModel2ArraySize()
-	if version == 4 then
+	if Game.version == 4 then
 		return 430; -- TODO: Find maximum size for Kiosk object model 2 array
 	end
 	local objModel2Array = getObjectModel2Array();
@@ -3413,7 +3412,7 @@ local function getExamineDataModelTwo(pointer)
 		table.insert(examine_data, { "Behavior Pointer", toHexString(behaviorPointer, 6) });
 	end
 
-	if version ~= 4 then
+	if Game.version ~= 4 then
 		local currentMap = Game.getMap();
 		local behaviorID = mainmemory.read_u16_be(pointer + 0x8A);
 		for i = 0, 0x70 do -- 0xA5 for extra cs etc flags
@@ -3816,11 +3815,9 @@ secs_per_major_tick = 94.1104858713; -- 2 ^ 32 * 21.911805 / 1000000000
 nano_per_minor_tick = 21.911805; -- Tick rate: 45.6375 Mhz
 
 function Game.detectVersion(romName, romHash)
-	if romHash == "CF806FF2603640A748FCA5026DED28802F1F4A50" then -- USA
-		version = 1;
+	if Game.version == 1 then -- USA
 		flag_array = require("games.dk64_flags");
-	elseif romHash == "F96AF883845308106600D84E0618C1A066DC6676" then -- Europe
-		version = 2;
+	elseif Game.version == 2 then -- Europe
 		flag_array = require("games.dk64_flags");
 
 		ticks_per_crystal = 125;
@@ -3828,11 +3825,9 @@ function Game.detectVersion(romName, romHash)
 		-- PAL values
 		secs_per_major_tick = 92.2607229138; -- 2 ^ 32 * 21.4811235 / 1000000000
 		nano_per_minor_tick = 21.4811235; -- Tick rate: 46.5525 Mhz
-	elseif romHash == "F0AD2B2BBF04D574ED7AFBB1BB6A4F0511DCD87D" then -- Japan
-		version = 3;
+	elseif Game.version == 3 then -- Japan
 		flag_array = require("games.dk64_flags_JP");
-	elseif romHash == "B4717E602F07CA9BE0D4822813C658CD8B99F993" then -- Kiosk
-		version = 4;
+	elseif Game.version == 4 then -- Kiosk
 		-- flag_array = require("games.dk64_flags_Kiosk"); -- TODO: Flags?
 
 		health = 12;
@@ -4432,25 +4427,25 @@ function Game.detectVersion(romName, romHash)
 
 	-- Squish Game.Memory tables down to a single address for the relevant version
 	for k, v in pairs(Game.Memory) do
-		Game.Memory[k] = v[version];
+		Game.Memory[k] = v[Game.version];
 	end
 
 	for k, v in pairs(dynamicWaterSurface) do
-		dynamicWaterSurface[k] = v[version];
+		dynamicWaterSurface[k] = v[Game.version];
 	end
 
 	return true;
 end
 
 function Game.getFileIndex()
-	if version == 4 then
+	if Game.version == 4 then
 		return 0;
 	end
 	return mainmemory.readbyte(Game.Memory.file);
 end
 
 function Game.getCurrentEEPROMSlot()
-	if version == 4 then
+	if Game.version == 4 then
 		return 0;
 	end
 	local fileIndex = Game.getFileIndex();
@@ -5152,7 +5147,7 @@ end
 function replaceModels(index)
 	-- Cutscene
 	local max_index = 0x42;
-	if version == 4 then
+	if Game.version == 4 then
 		max_index = 0x1B;
 	end
 	for i = 0, max_index do
@@ -5167,7 +5162,7 @@ function replaceModels(index)
 
 	-- Object Spawn Table
 	max_index = 127;
-	if version == 4 then
+	if Game.version == 4 then
 		max_index = 110;
 	end
 	for i = 0, max_index do
@@ -5178,7 +5173,7 @@ end
 
 function dumpCutsceneModelTable()
 	local max_index = 0x42;
-	if version == 4 then
+	if Game.version == 4 then
 		max_index = 0x1B;
 	end
 	dprint("Index,Address,Model,Model Name");
@@ -5197,7 +5192,7 @@ end
 
 function getBehaviorNameFromEnemyIndex(index)
 	local enemyTypeSize = 0x18;
-	if version == 4 then
+	if Game.version == 4 then
 		enemyTypeSize = 0x1C;
 	end
 	local behaviorIndex = mainmemory.read_u16_be(Game.Memory.enemy_table + index * enemyTypeSize);
@@ -5225,7 +5220,7 @@ end
 function dumpEnemies()
 	local enemyRespawnObject = dereferencePointer(Game.Memory.enemy_respawn_object);
 	local enemySlotSize = 0x48;
-	if version == 4 then
+	if Game.version == 4 then
 		enemySlotSize = 0x44;
 	end
 	if isRDRAM(enemyRespawnObject) then
@@ -5242,7 +5237,7 @@ end
 function Game.populateEnemyPointers()
 	local enemyRespawnObject = dereferencePointer(Game.Memory.enemy_respawn_object);
 	local enemySlotSize = 0x48;
-	if version == 4 then
+	if Game.version == 4 then
 		enemySlotSize = 0x44;
 	end
 	object_pointers = {};
@@ -5290,7 +5285,7 @@ end
 function dumpObjectSpawnTable()
 	print("Index,Behavior,Model,Name,Model Name,Internal Name,");
 	local max_index = 127;
-	if version == 4 then
+	if Game.version == 4 then
 		max_index = 110;
 	end
 	for i = 0, max_index do
@@ -5312,7 +5307,7 @@ end
 function populateArcadeObjects()
 	object_pointers = {};
 
-	if version == 4 then
+	if Game.version == 4 then
 		return;
 	end
 
@@ -6094,17 +6089,17 @@ end
 
 function Game.drawMJMinimap()
 	-- Only draw minimap if the player is in the Mad Jack fight
-	if version ~= 4 and map_value == 154 then
+	if Game.version ~= 4 and map_value == 154 then
 		local MJ_state = getMadJack();
 		if not isRDRAM(MJ_state) then -- MJ object not found
 			return;
 		end
 
-		local cur_pos = MJ_parse_position(mainmemory.readbyte(MJ_state + obj_model1.mad_jack.current_position[version]));
-		local next_pos = MJ_parse_position(mainmemory.readbyte(MJ_state + obj_model1.mad_jack.next_position[version]));
+		local cur_pos = MJ_parse_position(mainmemory.readbyte(MJ_state + obj_model1.mad_jack.current_position[Game.version]));
+		local next_pos = MJ_parse_position(mainmemory.readbyte(MJ_state + obj_model1.mad_jack.next_position[Game.version]));
 
-		local white_pos = MJ_parse_position(mainmemory.readbyte(MJ_state + obj_model1.mad_jack.white_switch_position[version]));
-		local blue_pos = MJ_parse_position(mainmemory.readbyte(MJ_state + obj_model1.mad_jack.blue_switch_position[version]));
+		local white_pos = MJ_parse_position(mainmemory.readbyte(MJ_state + obj_model1.mad_jack.white_switch_position[Game.version]));
+		local blue_pos = MJ_parse_position(mainmemory.readbyte(MJ_state + obj_model1.mad_jack.blue_switch_position[Game.version]));
 
 		local switches_active = white_pos.active or blue_pos.active;
 
@@ -6159,11 +6154,11 @@ function Game.drawMJMinimap()
 		end
 
 		-- Text info
-		local phase_byte = mainmemory.readbyte(MJ_state + obj_model1.mad_jack.action_type[version]);
-		local actions_remaining = mainmemory.readbyte(MJ_state + obj_model1.mad_jack.actions_remaining[version]);
-		local time_until_next_action = mainmemory.readbyte(MJ_state + obj_model1.mad_jack.ticks_until_next_action[version]);
+		local phase_byte = mainmemory.readbyte(MJ_state + obj_model1.mad_jack.action_type[Game.version]);
+		local actions_remaining = mainmemory.readbyte(MJ_state + obj_model1.mad_jack.actions_remaining[Game.version]);
+		local time_until_next_action = mainmemory.readbyte(MJ_state + obj_model1.mad_jack.ticks_until_next_action[Game.version]);
 
-		local phase = mainmemory.readbyte(MJ_state + obj_model1.mad_jack.phase[version]) + 1;
+		local phase = mainmemory.readbyte(MJ_state + obj_model1.mad_jack.phase[Game.version]) + 1;
 		local action_type = MJ_get_action_type(phase_byte);
 
 		gui.drawText(MJ_minimap_text_x, MJ_minimap_actions_remaining_y, actions_remaining.." "..action_type.."s remaining");
@@ -6337,7 +6332,7 @@ local function decrease_lag_factor()
 end
 
 local function fixLag()
-	if version ~= 4 then -- TODO: Kiosk
+	if Game.version ~= 4 then -- TODO: Kiosk
 		local frames_real_value = mainmemory.read_u32_be(Game.Memory.frames_real);
 		mainmemory.write_u32_be(Game.Memory.frames_lag, frames_real_value - lag_factor);
 	end
@@ -6491,12 +6486,12 @@ end
 
 function brb(value)
 	local message = value or "BRB";
-	if version == 3 then -- Japan
+	if Game.version == 3 then -- Japan
 		message = Game.toJapaneseString(message);
 	else
 		message = string.upper(message);
 	end
-	if version ~= 4 then -- TODO: Kiosk?
+	if Game.version ~= 4 then -- TODO: Kiosk?
 		brb_message = message;
 		is_brb = true;
 	else
@@ -6522,7 +6517,7 @@ end
 -------------------
 
 function setDKTV(message)
-	if version == 4 then -- Kiosk text is static
+	if Game.version == 4 then -- Kiosk text is static
 		writeNullTerminatedString(Game.Memory.DKTV_pointer, message);
 		return;
 	end
@@ -6532,7 +6527,7 @@ function setDKTV(message)
 		if isRDRAM(pointer) then
 			pointer = dereferencePointer(pointer + 0x0C);
 			if isRDRAM(pointer) then
-				if version == 3 then
+				if Game.version == 3 then
 					writeNullTerminatedString(pointer, Game.toJapaneseString(message)); -- TODO: This isn't working properly
 				else
 					writeNullTerminatedString(pointer, message);
@@ -6795,7 +6790,7 @@ function FTA.debugOut(objName, objBase, scriptBase, scriptOffset)
 end
 
 function ohWrongnana(verbose)
-	if version == 4 then -- Anything but kiosk
+	if Game.version == 4 then -- Anything but kiosk
 		return;
 	end
 
@@ -7578,7 +7573,7 @@ end
 function Game.setMap(value)
 	if value >= 1 and value <= #Game.maps then
 		value = value - 1;
-		if version == 4 then -- Replace setup, rather than the scene index since basically everything crashes on Kiosk
+		if Game.version == 4 then -- Replace setup, rather than the scene index since basically everything crashes on Kiosk
 			----[[
 			-- RuneHero's v1.0 code
 			mainmemory.write_u16_be(0x59319C, 0x2004);
@@ -7622,7 +7617,7 @@ end
 function Game.getLevelIndex()
 	local currentMap = Game.getMap();
 	local levelIndex = mainmemory.readbyte(Game.Memory.level_index_mapping + currentMap);
-	if version == 4 then
+	if Game.version == 4 then
 		if levelIndex == 0x09 or levelIndex == 0x0C then
 			-- TODO: Figure out exactly what Kiosk does for submaps
 			-- Kiosk is lacking the usual submap bytes it seems, compare "getLevelIndex" functions at 805FF030 (US 1.0) and 80593564 (US Kiosk)
@@ -7655,7 +7650,7 @@ end
 
 function Game.initUI()
 	-- Flag stuff
-	if version < 4 then
+	if Game.version ~= 4 then
 		ScriptHawk.UI.form_controls["Flag Dropdown"] = forms.dropdown(ScriptHawk.UI.options_form, flag_names, ScriptHawk.UI.col(0) + ScriptHawk.UI.dropdown_offset, ScriptHawk.UI.row(8) + ScriptHawk.UI.dropdown_offset, ScriptHawk.UI.col(9) + 8, ScriptHawk.UI.button_height);
 		ScriptHawk.UI.button(10, 8, {46}, nil, "Set Flag Button", "Set", flagSetButtonHandler);
 		ScriptHawk.UI.button(12, 8, {46}, nil, "Check Flag Button", "Check", flagCheckButtonHandler);
@@ -7705,7 +7700,7 @@ function Game.initUI()
 end
 
 function Game.unlockMenus()
-	if version ~= 4 then -- Anything but the Kiosk version
+	if Game.version ~= 4 then -- Anything but the Kiosk version
 		mainmemory.write_u32_be(Game.Memory.menu_flags, 0xFFFFFFFF);
 		mainmemory.write_u32_be(Game.Memory.menu_flags + 4, 0xFFFFFFFF);
 	end
@@ -8145,7 +8140,7 @@ function Game.drawUI()
 		--drawObjectPositions(); -- TODO: Get the Y position working properly for this
 	end
 
-	if version ~= 4 then
+	if Game.version ~= 4 then
 		-- Draw ISG timer
 		if mainmemory.readbyte(Game.Memory.isg_active) > 0 then
 			local isg_start = readTimestamp(Game.Memory.isg_timestamp);
@@ -8161,7 +8156,7 @@ function Game.drawUI()
 end
 
 function Game.getISG()
-	if version == 4 then
+	if Game.version == 4 then
 		return;
 	end
 	local ts1 = mainmemory.read_u32_be(Game.Memory.timestamp);
@@ -9782,7 +9777,7 @@ function identifyMemory(address, findReferences, reuseCache, suppressPrint)
 	end
 
 	-- Detect EEPROM copy
-	if not addressFound and version < 4 then -- TODO: Kiosk
+	if not addressFound and Game.version ~= 4 then -- TODO: Kiosk?
 		if address >= Game.Memory.eeprom_copy_base and address < Game.Memory.eeprom_copy_base + 4 * eeprom_slot_size then
 			addressFound = true;
 			addressType = 8;

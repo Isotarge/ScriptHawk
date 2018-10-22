@@ -27,17 +27,9 @@ local max_A_skill = 0x400;
 local max_B_skill = 0x400;
 
 function Game.detectVersion(romName, romHash)
-	if romHash == "E5E09205AA743A9E5043A42DF72ADC379C746B0B" then -- USA N64
-		version = 1;
-	elseif romHash == "23710541BB3394072740B0F0236A7CB1A7D41531" then -- Europe N64
-		version = 2;
-	else
-		return false;
-	end
-
 	-- Squish Game.Memory tables down to a single address for the relevant version
 	for k, v in pairs(Game.Memory) do
-		Game.Memory[k] = v[version];
+		Game.Memory[k] = v[Game.version];
 	end
 
 	return true;

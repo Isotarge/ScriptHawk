@@ -12,7 +12,13 @@ local Game = {
 		y_position = {0x0BBB44, 0x0BB464, 0x0BB074, 0x0BBB64, 0x0BBB44}, -- s32_be
 		z_position = {0x0BBB48, 0x0BB468, 0x0BB078, 0x0BBB68, 0x0BBB48}, -- s32_be
 		facing_angle = {0x0BBB88, 0x0BB4A8, 0x0BB0B8, 0x0BBBA8, 0x0BBB88}, -- u16_be
-	};
+	},
+	speedy_speeds = { 100, 1000, 2000, 5000, 7500, 10000, 20000, 50000, 100000 },
+	speedy_index = 4,
+	speedy_invert_LR = true,
+	speedy_invert_Y = true,
+	rot_speed = 10,
+	max_rot_units = 4096,
 };
 
 --------------------
@@ -20,23 +26,9 @@ local Game = {
 --------------------
 
 function Game.detectVersion(romName, romHash)
-	if romHash == "A9F97E22391313095D2C2FBAF81FB33BFA2BA7C6" then -- France, N64
-		version = 1;
-	elseif romHash == "92015E5254CBBAD1BC668ECB13A4B568E5F55052" then -- Europe, N64
-		version = 2;
-	elseif romHash == "982AD2E1E44C6662C88A77367BC5DF91C51531BF" then -- USA, N64
-		version = 3;
-	elseif romHash == "EAE83C07E2E777D8E71A5BE6120AED03D7E67782" then -- German 1.1, N64
-		version = 4;
-	elseif romHash == "F8FBB100227015BE8629243F53D70F29A2A14315" then -- German 1.0, N64
-		version = 5;
-	else
-		return false;
-	end
-
 	-- Squish Game.Memory tables down to a single address for the relevant version
 	for k, v in pairs(Game.Memory) do
-		Game.Memory[k] = v[version];
+		Game.Memory[k] = v[Game.version];
 	end
 
 	return true;
@@ -45,14 +37,6 @@ end
 -------------------
 -- Physics/Scale --
 -------------------
-
-Game.speedy_speeds = { 100, 1000, 2000, 5000, 7500, 10000, 20000, 50000, 100000 };
-Game.speedy_index = 4;
-Game.speedy_invert_LR = true;
-Game.speedy_invert_Y = true;
-
-Game.rot_speed = 10;
-Game.max_rot_units = 4096;
 
 local global_timer = {
 	previous = -1,
@@ -120,9 +104,7 @@ Game.OSD = {
 	{"Max dXZ", category="positionStatsMore"},
 	{"Odometer", category="positionStatsMore"},
 	{"Separator"},
-	--{"Rot. X", Game.getXRotation, category="angleMore"}, -- TODO
 	{"Facing", Game.getYRotation, category="angle"},
-	--{"Rot. Z", Game.getZRotation, category="angleMore"}, -- TODO
 };
 
 return Game;

@@ -85,11 +85,11 @@ local Game = {
 		"0x36 - Smokey 2",
 		"0x37 - Wizpig 2",
 		"0x38 - Overworld (Fake credits)",
-		"0x39 - Tricky's map (cutscene version)",
-		"0x3A - Smokey's map (cutscene version)",
-		"0x3B - Bluey's map (cutscene version)",
+		"0x39 - Tricky's map (cutscene)",
+		"0x3A - Smokey's map (cutscene)",
+		"0x3B - Bluey's map (cutscene)",
 		"0x3C - Wizpig 1 cutscene",
-		"0x3D - Bubbler's map (cutscene version)",
+		"0x3D - Bubbler's map (cutscene)",
 		"0x3E - Wizpig 2 cutscene",
 		"0x3F - Overworld (Credits 1)",
 
@@ -349,28 +349,23 @@ local map_freeze_values = {};
 --------------------
 
 function Game.detectVersion(romName, romHash)
-	if romHash == "B7F628073237B3D211D40406AA0884FF8FDD70D5" then -- Europe 1.1
-		version = 1;
+	if Game.version == 1 then -- Europe 1.1
 		map_freeze_values = {
 			0x121777, 0x123B07 -- TODO: Double check these
 		};
-	elseif romHash == "DD5D64DD140CB7AA28404FA35ABDCABA33C29260" then -- Europe 1.0
-		version = 2;
+	elseif Game.version == 2 then -- Europe 1.0
 		map_freeze_values = {
 			0x11AF3B, 0x1211F7, 0x1212E2, 0x123587, 0x206BB5, 0x206C3B -- TODO: Double check these
 		};
-	elseif romHash == "23BA3D302025153D111416E751027CEF11213A19" then -- Japan
-		version = 3;
+	elseif Game.version == 3 then -- Japan
 		map_freeze_values = {
 			0x11C91B, 0x122BD7, 0x122CC2, 0x124F67, 0x1FD4A5, 0x1FD52B -- TODO: Double check these
 		};
-	elseif romHash == "6D96743D46F8C0CD0EDB0EC5600B003C89B93755" then -- USA 1.1
-		version = 4;
+	elseif Game.version == 4 then -- USA 1.1
 		map_freeze_values = {
 			0x1216E7, 0x123A77 -- TODO: Double check these
 		};
-	elseif romHash == "0CB115D8716DBBC2922FDA38E533B9FE63BB9670" then -- USA 1.0
-		version = 5;
+	elseif Game.version == 5 then -- USA 1.0
 		map_freeze_values = {
 			0x121167, 0x121252, 0x1234F7 -- TODO: Double check these
 		};
@@ -380,7 +375,7 @@ function Game.detectVersion(romName, romHash)
 
 	-- Squish Game.Memory tables down to a single address for the relevant version
 	for k, v in pairs(Game.Memory) do
-		Game.Memory[k] = v[version];
+		Game.Memory[k] = v[Game.version];
 	end
 
 	return true;
@@ -1021,26 +1016,26 @@ function Game.initUI()
 
 	-- Boost Threshold, blue min
 	ScriptHawk.UI.form_controls.get_ready_blue_min_label = forms.label(ScriptHawk.UI.options_form, "BMin:", ScriptHawk.UI.col(blue_col_base), ScriptHawk.UI.row(6) + ScriptHawk.UI.label_offset, 40, 14);
-	ScriptHawk.UI.button({blue_col_base + 3, -28}, 6, ScriptHawk.UI.button_height, nil, "decrease_blue_min_button", "-", decrease_get_ready_blue_min);
-	ScriptHawk.UI.button({blue_col_base + 4, -28}, 6, ScriptHawk.UI.button_height, nil, "increase_blue_min_button", "+", increase_get_ready_blue_min);
+	ScriptHawk.UI.button({blue_col_base + 3, -28}, 6, {ScriptHawk.UI.button_height}, nil, "decrease_blue_min_button", "-", decrease_get_ready_blue_min);
+	ScriptHawk.UI.button({blue_col_base + 4, -28}, 6, {ScriptHawk.UI.button_height}, nil, "increase_blue_min_button", "+", increase_get_ready_blue_min);
 	ScriptHawk.UI.form_controls.get_ready_blue_min_value_label = forms.label(ScriptHawk.UI.options_form, get_ready_blue_min, ScriptHawk.UI.col(blue_col_base + 4), ScriptHawk.UI.row(6) + ScriptHawk.UI.label_offset, 32, 14);
 
 	-- Boost Threshold, blue max
 	ScriptHawk.UI.form_controls.get_ready_blue_max_label = forms.label(ScriptHawk.UI.options_form, "BMax:", ScriptHawk.UI.col(blue_col_base), ScriptHawk.UI.row(7) + ScriptHawk.UI.label_offset, 40, 14);
-	ScriptHawk.UI.button({blue_col_base + 3, -28}, 7, ScriptHawk.UI.button_height, nil, "decrease_blue_max_button", "-", decrease_get_ready_blue_max);
-	ScriptHawk.UI.button({blue_col_base + 4, -28}, 7, ScriptHawk.UI.button_height, nil, "increase_blue_max_button", "+", increase_get_ready_blue_max);
+	ScriptHawk.UI.button({blue_col_base + 3, -28}, 7, {ScriptHawk.UI.button_height}, nil, "decrease_blue_max_button", "-", decrease_get_ready_blue_max);
+	ScriptHawk.UI.button({blue_col_base + 4, -28}, 7, {ScriptHawk.UI.button_height}, nil, "increase_blue_max_button", "+", increase_get_ready_blue_max);
 	ScriptHawk.UI.form_controls.get_ready_blue_max_value_label = forms.label(ScriptHawk.UI.options_form, get_ready_blue_max, ScriptHawk.UI.col(blue_col_base + 4), ScriptHawk.UI.row(7) + ScriptHawk.UI.label_offset, 32, 14);
 
 	-- Boost Threshold, yellow min
 	ScriptHawk.UI.form_controls.get_ready_yellow_min_label = forms.label(ScriptHawk.UI.options_form, "YMin:", ScriptHawk.UI.col(yellow_col_base), ScriptHawk.UI.row(6) + ScriptHawk.UI.label_offset, 40, 14);
-	ScriptHawk.UI.button({yellow_col_base + 3, -28}, 6, ScriptHawk.UI.button_height, nil, "decrease_yellow_min_button", "-", decrease_get_ready_yellow_min);
-	ScriptHawk.UI.button({yellow_col_base + 4, -28}, 6, ScriptHawk.UI.button_height, nil, "increase_yellow_min_button", "+", increase_get_ready_yellow_min);
+	ScriptHawk.UI.button({yellow_col_base + 3, -28}, 6, {ScriptHawk.UI.button_height}, nil, "decrease_yellow_min_button", "-", decrease_get_ready_yellow_min);
+	ScriptHawk.UI.button({yellow_col_base + 4, -28}, 6, {ScriptHawk.UI.button_height}, nil, "increase_yellow_min_button", "+", increase_get_ready_yellow_min);
 	ScriptHawk.UI.form_controls.get_ready_yellow_min_value_label = forms.label(ScriptHawk.UI.options_form, get_ready_yellow_min, ScriptHawk.UI.col(yellow_col_base + 4), ScriptHawk.UI.row(6) + ScriptHawk.UI.label_offset, 32, 14);
 
 	-- Boost Threshold, yellow max
 	ScriptHawk.UI.form_controls.get_ready_yellow_max_label = forms.label(ScriptHawk.UI.options_form, "YMax:", ScriptHawk.UI.col(yellow_col_base), ScriptHawk.UI.row(7) + ScriptHawk.UI.label_offset, 40, 14);
-	ScriptHawk.UI.button({yellow_col_base + 3, -28}, 7, ScriptHawk.UI.button_height, nil, "decrease_yellow_max_button", "-", decrease_get_ready_yellow_max);
-	ScriptHawk.UI.button({yellow_col_base + 4, -28}, 7, ScriptHawk.UI.button_height, nil, "increase_yellow_max_button", "+", increase_get_ready_yellow_max);
+	ScriptHawk.UI.button({yellow_col_base + 3, -28}, 7, {ScriptHawk.UI.button_height}, nil, "decrease_yellow_max_button", "-", decrease_get_ready_yellow_max);
+	ScriptHawk.UI.button({yellow_col_base + 4, -28}, 7, {ScriptHawk.UI.button_height}, nil, "increase_yellow_max_button", "+", increase_get_ready_yellow_max);
 	ScriptHawk.UI.form_controls.get_ready_yellow_max_value_label = forms.label(ScriptHawk.UI.options_form, get_ready_yellow_max, ScriptHawk.UI.col(yellow_col_base + 4), ScriptHawk.UI.row(7) + ScriptHawk.UI.label_offset, 32, 14);
 end
 

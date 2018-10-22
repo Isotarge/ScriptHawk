@@ -30,17 +30,9 @@ local player_fields = {
 --------------------
 
 function Game.detectVersion(romName, romHash)
-	if romHash == "7195EA96D9FE5DE065AF61F70D55C92C8EE905E6" then -- Number Journey, N64, USA
-		version = 1;
-	elseif romHash == "97777CA06F4E8AFF8F1E95033CC8D3833BE40F76" then -- Letter Adventure, N64, USA
-		version = 2;
-	else
-		return false;
-	end
-
 	-- Squish Game.Memory tables down to a single address for the relevant version
 	for k, v in pairs(Game.Memory) do
-		Game.Memory[k] = v[version];
+		Game.Memory[k] = v[Game.version];
 	end
 
 	return true;

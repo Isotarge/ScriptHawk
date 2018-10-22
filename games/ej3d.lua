@@ -43,17 +43,9 @@ local Game = {
 --------------------
 
 function Game.detectVersion(romName, romHash)
-	if romHash == "EAB14F23640CD6148D4888902CDCC00DD6111BF9" then -- US
-		version = 1;
-	elseif romHash == "F02C1AFD18C1CBE309472CBE5B3B3F04B22DB7EE" then -- Europe
-		version = 2;
-	else
-		return false;
-	end
-
 	-- Squish Game.Memory tables down to a single address for the relevant version
 	for k, v in pairs(Game.Memory) do
-		Game.Memory[k] = v[version];
+		Game.Memory[k] = v[Game.version];
 	end
 
 	return true;
@@ -445,15 +437,15 @@ function Game.applyConsoleSettings()
 		
 		if animation_value == 29 and movement_value == 20 then
 			if twirlStoredY == nil then
-				if version == 1 then -- US
+				if Game.version == 1 then -- US
 					twirlStoredY = Game.getYPosition() - 0.0498;
-				else -- version = 2 (EU)
+				else -- Game.version == 2 (EU)
 					twirlStoredY = Game.getYPosition() - 0.042;
 				end
 			end
-			
+
 			Game.setYPosition(twirlStoredY);
-			
+
 			if animation_frame == 9 then
 				twirlStoredY = nil;
 			end
@@ -461,13 +453,13 @@ function Game.applyConsoleSettings()
 			twirlStoredY = nil;
 		end
 	end
-	
-	if roll_cap == 1 then	-- NO HYPEREXTENDED ROLL (NOT EVEN ON PC, JUST AN EMU BUG)
+
+	if roll_cap == 1 then -- NO HYPEREXTENDED ROLL (NOT EVEN ON PC, JUST AN EMU BUG)
 		if animation_value == 25 and movement_value == 16 then
 			if roll_count == nil then
 				roll_count = 0;
 			end
-			
+
 			if animation_frame == 21 then
 				roll_count = roll_count + 1;
 				if roll_count == 8 then
@@ -576,12 +568,12 @@ function completeFile()
 		[20] = {0,0}, -- Kim
 		[21] = {0,0}, -- Main Menu
 	};
-	
+
 	for i = 0, (#collectable_counts - 1) do
 		mainmemory.writebyte(Game.Memory.marble_pointer + i + 0x14, collectable_counts[i][1]);
 		mainmemory.writebyte(Game.Memory.marble_pointer + i - 0x02, collectable_counts[i][2]);
 	end
-	
+
 	setFlagsByType("Udder");
 	setFlag(0x150); -- Have all udders check
 end
@@ -810,11 +802,10 @@ object_m2_properties = {
 		[0x5A] = "Snott",
 	},
 };
-	
+
 local function getObjectM2Count()
 	return math.min(65535, mainmemory.read_u16_be(Game.Memory.object_m2_count) - 1);
 end
-
 
 local function populateObjectM2Pointers()
 	object_pointers = {};
@@ -857,18 +848,18 @@ local function getExamineM2Data(pointer)
 	if not isRDRAM(pointer) then
 		return examine_data;
 	end
-	
+
 	local xPos = mainmemory.readfloat(pointer + object_m2_properties.object_x, true) / 8;
 	local yPos = mainmemory.readfloat(pointer + object_m2_properties.object_y, true) / 8;
 	local zPos = mainmemory.readfloat(pointer + object_m2_properties.object_z, true) / 8;
 	local hasPosition = hasModel or xPos ~= 0 or yPos ~= 0 or zPos ~= 0;
-	
+
 	local traitPointer = dereferencePointer(pointer + object_m2_properties.object_trait_pointer);
 	local texturePointer = dereferencePointer(pointer + object_m2_properties.object_texture_pointer);
 	local modelPointer = dereferencePointer(pointer + object_m2_properties.object_model_pointer);
 	local hasTrait = traitPointer ~= nil;
 	local objectM2Val = getObjectM2Value(pointer)
-	
+
 	table.insert(examine_data, { "Address", toHexString(pointer) });
 	table.insert(examine_data, { "Object Name", getObjectM2NameFromValue(objectM2Val) });
 	table.insert(examine_data, { "Object Value", toHexString(objectM2Val) });
@@ -881,7 +872,7 @@ local function getExamineM2Data(pointer)
 	table.insert(examine_data, { "Y", yPos });
 	table.insert(examine_data, { "Z", zPos });
 	table.insert(examine_data, { "Separator", 1 });
-	
+
 	if hasTrait then
 		local objAnimTimer = mainmemory.readbyte(traitPointer + object_m2_properties.traits_list.opacity); -- Not entirely sure. Opacity for Snott, Anim Timer for Udder?
 		table.insert(examine_data, { "Animation Timer", objAnimTimer });
@@ -954,7 +945,7 @@ local function drawGrabScriptUI()
 				if object_pointers[i] == playerObject then
 					color = colors.green;
 				end
-				
+
 				if string.contains(grab_script_mode, "Model 1") then
 					local objectVal = getObjectM1Value(object_pointers[i] or 0)
 					gui.text(gui_x, gui_y + height * row, i..": "..toHexString(object_pointers[i] or 0, 6).." ("..getObjectM1NameFromValue(objectVal)..")", color, 'bottomright');

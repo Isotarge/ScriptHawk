@@ -25,17 +25,9 @@ local Game = {
 --------------------
 
 function Game.detectVersion(romName, romHash)
-	if romHash == "3F99351D7BB61656614BDB2AA1A90CFE55D1922C" then -- N64 USA
-		version = 1;
-	elseif romHash == "61373D4758ECA3FA831BEAC27B4D4C250845F80C" then -- N64 PAL
-		version = 2;
-	else
-		return false;
-	end
-
 	-- Squish Game.Memory tables down to a single address for the relevant version
 	for k, v in pairs(Game.Memory) do
-		Game.Memory[k] = v[version];
+		Game.Memory[k] = v[Game.version];
 	end
 
 	return true;

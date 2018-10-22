@@ -30,20 +30,20 @@ local Game = { -- This table stores the module's API function implementations an
 -- Modules should ideally use ROM hash rather than name, but both are passed in by ScriptHawk
 function Game.detectVersion(romName, romHash)
 	if string.contains(romName, "Europe") then -- string.contains is a pure Lua global function provided by ScriptHawk, intended to replace calls to bizstring.contains() for portability reasons
-		version = 1; -- We use the version variable as an index for the Game.Memory table
+		Game.version = 1; -- We use the version variable as an index for the Game.Memory table
 	elseif string.contains(romName, "Japan") then
-		version = 2;
+		Game.version = 2;
 	elseif string.contains(romName, "USA") then
-		version = 3;
+		Game.version = 3;
 	else
 		return false; -- Return false if this version of the game is not supported
 	end
 
 	-- Squish Game.Memory tables down to a single address for the relevant version
 	-- If you include this code snippet in your module, you can access Game.Memory addresses in a cleaner fashion
-	-- Game.Memory.address[version] becomes Game.Memory.address
+	-- Game.Memory.address[Game.version] becomes Game.Memory.address
 	for k, v in pairs(Game.Memory) do
-		Game.Memory[k] = v[version];
+		Game.Memory[k] = v[Game.version];
 	end
 
 	return true; -- Return true if version detection is successful
@@ -185,9 +185,9 @@ local labelValue = 0;
 function Game.initUI() -- Optional: Init any UI state here, mainly useful for setting up your form controls. Runs once at startup after successful version detection.
 	-- Here are some examples for the most common UI control types
 	ScriptHawk.UI.form_controls["Example Dropdown"] = forms.dropdown(ScriptHawk.UI.options_form, {"Option 1", "Option 2", "Option 3"}, ScriptHawk.UI.col(0) + ScriptHawk.UI.dropdown_offset, ScriptHawk.UI.row(7) + ScriptHawk.UI.dropdown_offset, ScriptHawk.UI.col(9) + 7, ScriptHawk.UI.button_height);
-	ScriptHawk.UI.button(10,                                    7, {59},                        nil, "Example Button",       "Label", Game.buttonHandler);
-	ScriptHawk.UI.button({13, -7},                              6, ScriptHawk.UI.button_height, nil, "Example Plus Button",  "-",     function() labelValue = labelValue + 1 end);
-	ScriptHawk.UI.button({13, ScriptHawk.UI.button_height - 7}, 6, ScriptHawk.UI.button_height, nil, "Example Minus Button", "+",     function() labelValue = labelValue - 1 end);
+	ScriptHawk.UI.button(10,                                    7, {59},                          nil, "Example Button",       "Label", Game.buttonHandler);
+	ScriptHawk.UI.button({13, -7},                              6, {ScriptHawk.UI.button_height}, nil, "Example Plus Button",  "-",     function() labelValue = labelValue + 1 end);
+	ScriptHawk.UI.button({13, ScriptHawk.UI.button_height - 7}, 6, {ScriptHawk.UI.button_height}, nil, "Example Minus Button", "+",     function() labelValue = labelValue - 1 end);
 	ScriptHawk.UI.form_controls["Example Value Label"] = forms.label(ScriptHawk.UI.options_form, "0", ScriptHawk.UI.col(13) + ScriptHawk.UI.button_height + 21, ScriptHawk.UI.row(6) + ScriptHawk.UI.label_offset, 54, 14);
 	ScriptHawk.UI.checkbox(10, 6, "Example Checkbox", "Label");
 end

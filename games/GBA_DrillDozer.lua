@@ -6,7 +6,7 @@ if type(ScriptHawk) ~= "table" then
 end
 
 local Game = {
-	Memory = {
+	Memory = { -- Version order: USA, Japan
 		x_position = {Domain="IWRAM", Address={0x0E98}},
 		y_position = {Domain="IWRAM", Address={0x0E9C}},
 		x_velocity = {Domain="IWRAM", Address={0x0EA0}},
@@ -35,13 +35,6 @@ script_mode = script_modes[script_mode_index];
 function Game.detectVersion(romName, romHash) -- Modules should ideally use ROM hash rather than name, but both are passed in by ScriptHawk
 	ScriptHawk.dpad.joypad.enabled = false;
 	ScriptHawk.dpad.key.enabled = false;
-	if romHash == "C1058CC2482B91204100CC8515DA99AEB06773F5" then -- US
-		version = 1; -- We use the version variable as an index for the Game.Memory table
-		return true;
-	elseif romHash == "84AFA7108E4D604E7B1A6D105DF5760869A247FA" then -- JP
-		version = 2;
-		return true;
-	end
 	return false;
 end
 
@@ -66,19 +59,19 @@ end
 --------------
 
 function Game.getXPosition()
-	return Game.read_16_16(Game.Memory.x_position.Address[version], Game.Memory.x_position.Domain);
+	return Game.read_16_16(Game.Memory.x_position.Address[Game.version], Game.Memory.x_position.Domain);
 end
 
 function Game.getYPosition()
-	return Game.read_16_16(Game.Memory.y_position.Address[version], Game.Memory.y_position.Domain);
+	return Game.read_16_16(Game.Memory.y_position.Address[Game.version], Game.Memory.y_position.Domain);
 end
 
 function Game.setXPosition(value)
-	Game.write_16_16(Game.Memory.x_position.Address[version], value, Game.Memory.x_position.Domain);
+	Game.write_16_16(Game.Memory.x_position.Address[Game.version], value, Game.Memory.x_position.Domain);
 end
 
 function Game.setYPosition(value)
-	Game.write_16_16(Game.Memory.x_position.Address[version], value, Game.Memory.x_position.Domain);
+	Game.write_16_16(Game.Memory.x_position.Address[Game.version], value, Game.Memory.x_position.Domain);
 end
 
 --------------
@@ -86,23 +79,23 @@ end
 --------------
 
 function Game.getXVelocity()
-	return Game.read_16_16(Game.Memory.x_velocity.Address[version], Game.Memory.x_velocity.Domain);
+	return Game.read_16_16(Game.Memory.x_velocity.Address[Game.version], Game.Memory.x_velocity.Domain);
 end
 
 function Game.getYVelocity()
-	return Game.read_16_16(Game.Memory.y_velocity.Address[version], Game.Memory.y_velocity.Domain);
+	return Game.read_16_16(Game.Memory.y_velocity.Address[Game.version], Game.Memory.y_velocity.Domain);
 end
 
 function Game.setXVelocity(value)
-	Game.write_16_16(Game.Memory.x_velocity.Address[version],value, Game.Memory.x_velocity.Domain);
+	Game.write_16_16(Game.Memory.x_velocity.Address[Game.version],value, Game.Memory.x_velocity.Domain);
 end
 
 function Game.setYVelocity(value)
-	Game.write_16_16(Game.Memory.y_velocity.Address[version],value, Game.Memory.y_velocity.Domain);
+	Game.write_16_16(Game.Memory.y_velocity.Address[Game.version],value, Game.Memory.y_velocity.Domain);
 end
 
 function Game.getDrillValue()
-	return toHexString(memory.read_u32_le(Game.Memory.drill_gauge.Address[version], Game.Memory.drill_gauge.Domain));
+	return toHexString(memory.read_u32_le(Game.Memory.drill_gauge.Address[Game.version], Game.Memory.drill_gauge.Domain));
 end
 
 --------------------
@@ -219,7 +212,7 @@ local movementStates = {
 };
 
 function Game.getCurrentMovementState()
-	local currentMovementState = memory.read_u32_le(Game.Memory.current_movement_state.Address[version],Game.Memory.current_movement_state.Domain);
+	local currentMovementState = memory.read_u32_le(Game.Memory.current_movement_state.Address[Game.version],Game.Memory.current_movement_state.Domain);
 	return movementStates[currentMovementState] or "Unknown ("..currentMovementState..")";
 end
 
@@ -360,7 +353,7 @@ function Game.drawUI()
 	row = row + 1;
 	if script_mode == "List" then
 		for i = numSlots, 1, -1 do
-			local currentSlotBase = Game.Memory.object_array.Address[version] + (i - 1) * object_struct_size;
+			local currentSlotBase = Game.Memory.object_array.Address[Game.version] + (i - 1) * object_struct_size;
 			if memory.read_u32_le(currentSlotBase, Game.Memory.object_array.Domain) ~= 0 then
 				local actorType = "Unknown";
 				local objectType = memory.read_u16_le(currentSlotBase + 0x16, Game.Memory.object_array.Domain);

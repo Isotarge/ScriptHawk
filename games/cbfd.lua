@@ -99,17 +99,9 @@ function Game.setMap(value)
 end
 
 function Game.detectVersion(romName, romHash)
-	if romHash == "EE7BC6656FD1E1D9FFB3D19ADD759F28B88DF710" then -- Europe
-		version = 1;
-	elseif romHash == "4CBADD3C4E0729DEC46AF64AD018050EADA4F47A" then -- USA
-		version = 2;
-	else
-		return false;
-	end
-
 	-- Squish Game.Memory tables down to a single address for the relevant version
 	for k, v in pairs(Game.Memory) do
-		Game.Memory[k] = v[version];
+		Game.Memory[k] = v[Game.version];
 	end
 
 	return true;

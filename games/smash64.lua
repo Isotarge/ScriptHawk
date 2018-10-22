@@ -524,25 +524,9 @@ character_states = {
 };
 
 function Game.detectVersion(romName, romHash)
-	if romHash == "4B71F0E01878696733EEFA9C80D11C147ECB4984" then -- Japan
-		version = 1;
-	elseif romHash == "A9BF83FE73361E8D042C33ED48B3851D7D46712C" then -- Australia
-		version = 2;
-	elseif romHash == "6EE8A41FEF66280CE3E3F0984D00B96079442FB9" then -- Europe
-		version = 3;
-	elseif romHash == "E2929E10FCCC0AA84E5776227E798ABC07CEDABF" then -- USA
-		version = 4;
-	elseif romHash == "88C8FED5ECD5ED901CB5FC4B5BBEFFA3EA022DF7" then -- 19XXTE 0.11, based on USA ROM
-		version = 4;
-	elseif romHash == "1095F94D70216AC916A9DD8A9FD65DB13E7F9F17" then -- 19XXGE, based on USA ROM
-		version = 4;
-	else
-		return false;
-	end
-
 	-- Squish Game.Memory tables down to a single address for the relevant version
 	for k, v in pairs(Game.Memory) do
-		Game.Memory[k] = v[version];
+		Game.Memory[k] = v[Game.version];
 	end
 
 	return true;
@@ -907,7 +891,7 @@ function Game.hideHitbox(player)
 end
 
 function Game.toggleItemHitboxes(value)
-	if version == 2 or version == 3 then
+	if Game.version == 2 or Game.version == 3 then
 		return;
 	end
 	local firstObj = dereferencePointer(Game.Memory.item_list_pointer);

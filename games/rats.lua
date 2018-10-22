@@ -24,11 +24,7 @@ row_height = 16;
 function Game.detectVersion(romName, romHash)
 	ScriptHawk.dpad.joypad.enabled = false;
 	ScriptHawk.dpad.key.enabled = false;
-	if string.contains(romHash, "5E423DFAB8221B69A641D2E535EBFE1E3759A2E4") then
-		version = 1;
-		return true;
-	end
-	return false;
+	return true;
 end
 
 --------------
