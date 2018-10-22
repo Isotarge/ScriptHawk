@@ -6,6 +6,7 @@ if type(ScriptHawk) ~= "table" then
 end
 
 local Game = {
+	squish_memory_table = true,
 	Memory = { -- Order: SMS/GG (Proto), GG
 		in_score_screen = {0x1207, 0x0000}, -- TODO: GG
 		level = {0x123E, 0x1238},
@@ -90,12 +91,6 @@ end
 function Game.detectVersion(romName, romHash)
 	ScriptHawk.dpad.joypad.enabled = false;
 	ScriptHawk.dpad.key.enabled = false;
-
-	-- Squish Game.Memory tables down to a single address for the relevant version
-	for k, v in pairs(Game.Memory) do
-		Game.Memory[k] = v[Game.version];
-	end
-
 	return true;
 end
 

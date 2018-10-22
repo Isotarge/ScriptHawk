@@ -11,6 +11,7 @@ local Game = {
 	speedy_index = 7,
 	rot_speed = 100,
 	max_rot_units = 65535,
+	squish_memory_table = true,
 	Memory = { -- Version order: PAL 1.1, PAL 1.0, Japan, US 1.1, US 1.0
 		CSS_character = {0x126A18, 0x126478, 0x127F18, 0x126988, 0x1263E8}, -- Character select screen
 		CSS_vehicle = {0x127010, 0x126A50, 0x128508, 0x126F80, 0x1269C0}, -- Track select screen
@@ -371,11 +372,6 @@ function Game.detectVersion(romName, romHash)
 		};
 	else
 		return false;
-	end
-
-	-- Squish Game.Memory tables down to a single address for the relevant version
-	for k, v in pairs(Game.Memory) do
-		Game.Memory[k] = v[Game.version];
 	end
 
 	return true;

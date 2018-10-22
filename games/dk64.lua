@@ -58,6 +58,7 @@ end
 	-- 1 u32_be
 local Game = {
 	RAMWatch = {},
+	squish_memory_table = true,
 	Memory = { -- 1 USA, 2 Europe, 3 Japan, 4 Kiosk
 		jetpac_object_base = {0x02EC68, 0x021D18, 0x021C78, nil},
 		jetpac_enemy_base = {0x02F09C, 0x02214C, 0x0220AC, nil},
@@ -4423,11 +4424,6 @@ function Game.detectVersion(romName, romHash)
 	else
 		print("Warning: No flags found");
 		flag_names = {"None"};
-	end
-
-	-- Squish Game.Memory tables down to a single address for the relevant version
-	for k, v in pairs(Game.Memory) do
-		Game.Memory[k] = v[Game.version];
 	end
 
 	for k, v in pairs(dynamicWaterSurface) do

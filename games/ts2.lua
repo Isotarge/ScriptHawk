@@ -6,6 +6,7 @@ if type(ScriptHawk) ~= "table" then
 end
 
 local Game = {
+	squish_memory_table = true,
 	Memory = { -- Version order: France, Europe, USA, German 1.1, German 1.0
 		global_timer = {0x0A3A00, 0x0A3360, 0x0A3040, 0x0A3A20, 0x0A3A00}, -- u32_be
 		x_position = {0x0BBB40, 0x0BB460, 0x0BB070, 0x0BBB60, 0x0BBB40}, -- s32_be
@@ -20,19 +21,6 @@ local Game = {
 	rot_speed = 10,
 	max_rot_units = 4096,
 };
-
---------------------
--- Region/Version --
---------------------
-
-function Game.detectVersion(romName, romHash)
-	-- Squish Game.Memory tables down to a single address for the relevant version
-	for k, v in pairs(Game.Memory) do
-		Game.Memory[k] = v[Game.version];
-	end
-
-	return true;
-end
 
 -------------------
 -- Physics/Scale --

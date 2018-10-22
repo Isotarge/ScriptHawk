@@ -10,6 +10,7 @@ local Game = {
 	speedy_index = 7,
 	rot_speed = 100,
 	max_rot_units = 65535,
+	squish_memory_table = true,
 	Memory = { -- Version order: N64 USA, N64 PAL
 		cheat_base = {0x11648C, 0x118E84},
 		number_of_cheats = {22, 24},
@@ -19,19 +20,6 @@ local Game = {
 		z_position = {0x14A484, 0x170F5C},
 	},
 };
-
---------------------
--- Region/Version --
---------------------
-
-function Game.detectVersion(romName, romHash)
-	-- Squish Game.Memory tables down to a single address for the relevant version
-	for k, v in pairs(Game.Memory) do
-		Game.Memory[k] = v[Game.version];
-	end
-
-	return true;
-end
 
 function Game.unlockCheats()
 	for i = 1, Game.Memory.number_of_cheats do

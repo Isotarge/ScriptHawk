@@ -20,6 +20,7 @@ grab_script_mode_index = 1;
 grab_script_mode = grab_script_modes[grab_script_mode_index];
 
 local Game = {
+	squish_memory_table = true,
 	Memory = { -- 1 USA, 2 EU
 		jim_pointer = {0x0C6810, 0x0C8670},
 		floor_value = {0x0D6EDC, 0x0D8D3C},
@@ -37,19 +38,6 @@ local Game = {
 		flag_pointer = {0x0E9F08, 0x0EBD68},
 	},
 };
-
---------------------
--- Region/Version --
---------------------
-
-function Game.detectVersion(romName, romHash)
-	-- Squish Game.Memory tables down to a single address for the relevant version
-	for k, v in pairs(Game.Memory) do
-		Game.Memory[k] = v[Game.version];
-	end
-
-	return true;
-end
 
 --------------------
 -- Jim Parameters --

@@ -6,6 +6,7 @@ if type(ScriptHawk) ~= "table" then
 end
 
 local Game = {
+	squish_memory_table = true,
 	Memory = {
 		-- Version order:
 			-- 1: Number Journey, N64, USA
@@ -24,19 +25,6 @@ local player_fields = {
 	z_pos = 0x2C,
 	facing_angle = 0x1B8,
 };
-
---------------------
--- Region/Version --
---------------------
-
-function Game.detectVersion(romName, romHash)
-	-- Squish Game.Memory tables down to a single address for the relevant version
-	for k, v in pairs(Game.Memory) do
-		Game.Memory[k] = v[Game.version];
-	end
-
-	return true;
-end
 
 --------------
 -- Position --

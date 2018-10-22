@@ -6,6 +6,7 @@ if type(ScriptHawk) ~= "table" then
 end
 
 local Game = {
+	squish_memory_table = true,
 	Memory = { -- Version order: Europe, USA
 		x_position = {0x0CC704, 0x0CC2E4}, -- Float
 		y_position = {0x0CC708, 0x0CC2E8}, -- Float
@@ -90,21 +91,8 @@ local Game = {
 	takeMeThereStyle = "Checkbox",
 };
 
---------------------
--- Region/Version --
---------------------
-
 function Game.setMap(value)
 	mainmemory.write_u16_be(Game.Memory.map, value);
-end
-
-function Game.detectVersion(romName, romHash)
-	-- Squish Game.Memory tables down to a single address for the relevant version
-	for k, v in pairs(Game.Memory) do
-		Game.Memory[k] = v[Game.version];
-	end
-
-	return true;
 end
 
 -------------------

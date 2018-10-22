@@ -6,6 +6,7 @@ if type(ScriptHawk) ~= "table" then
 end
 
 local Game = {
+	squish_memory_table = true,
 	Memory = { -- Version order: Europe, Japan, US 1.1, US 1.0
 		fb_pointer = {0x282E00, 0x281E20, 0x281E20, 0x282FE0},
 		frame_timer = {0x280700, 0x27F718, 0x27F718, 0x2808D8},
@@ -316,11 +317,6 @@ function Game.detectVersion(romName, romHash)
 	-- Read EEPROM checksums
 	for i = 1, #eep_checksum do
 		eep_checksum[i].value = memory.read_u32_be(eep_checksum[i].address, "EEPROM");
-	end
-
-	-- Squish Game.Memory tables down to a single address for the relevant version
-	for k, v in pairs(Game.Memory) do
-		Game.Memory[k] = v[Game.version];
 	end
 
 	if #flag_array > 0 then

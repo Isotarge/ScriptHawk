@@ -6,6 +6,7 @@ if type(ScriptHawk) ~= "table" then
 end
 
 local Game = {
+	squish_memory_table = true,
 	Memory = { -- Version order: USA, Europe, Japan Shindou, Japan
 		x_rot = {0x33B19C, 0x30945C, 0x31D9EC, 0x339E2C}, -- u16_be -- TODO: Find
 		y_rot = {0x33B19C, 0x30945C, 0x31D9EC, 0x339E2C}, -- u16_be
@@ -64,19 +65,6 @@ local Game = {
 	rot_speed = 100,
 	max_rot_units = 65536,
 };
-
---------------------
--- Region/Version --
---------------------
-
-function Game.detectVersion(romName, romHash)
-	-- Squish Game.Memory tables down to a single address for the relevant version
-	for k, v in pairs(Game.Memory) do
-		Game.Memory[k] = v[Game.version];
-	end
-
-	return true;
-end
 
 ---------------------
 -- Object Analysis --

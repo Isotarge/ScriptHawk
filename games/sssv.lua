@@ -6,6 +6,7 @@ if type(ScriptHawk) ~= "table" then
 end
 
 local Game = {
+	squish_memory_table = true,
 	Memory = { -- Version order: USA N64, Europe N64
 		current_animal_list_index = {0x3D5534, 0x3D5624},
 		animal_list_pointer_base = {0x1DDD88, 0x1DDDA8},
@@ -18,22 +19,9 @@ local Game = {
 	takeMeThereType = "Checkbox",
 };
 
---------------------
--- Region/Version --
---------------------
-
 local max_health = 0x82;
 local max_A_skill = 0x400;
 local max_B_skill = 0x400;
-
-function Game.detectVersion(romName, romHash)
-	-- Squish Game.Memory tables down to a single address for the relevant version
-	for k, v in pairs(Game.Memory) do
-		Game.Memory[k] = v[Game.version];
-	end
-
-	return true;
-end
 
 -----------------------------
 -- Animal Variable Offsets --

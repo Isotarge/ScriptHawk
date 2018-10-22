@@ -628,9 +628,18 @@ if not ScriptHawk.ui_test then
 		return false;
 	end
 
-	if type(Game.detectVersion) ~= "function" or not Game.detectVersion(romName, romHash) then
-		print("This version of the game is not currently supported.");
-		return false;
+	if Game.squish_memory_table and type(Game.version) == "number" then
+		-- Squish Game.Memory tables down to a single address for the relevant version
+		for k, v in pairs(Game.Memory) do
+			Game.Memory[k] = v[Game.version];
+		end
+	end
+
+	if type(Game.detectVersion) == "function" then
+		if not Game.detectVersion(romName, romHash) then
+			print("This version of the game is not currently supported.");
+			return false;
+		end
 	end
 else
 	Game = {};
@@ -1210,7 +1219,14 @@ if ScriptHawk.ui_test == true then
 				ScriptHawk.gamePrefName = string.gsub(ScriptHawk.moduleName, "games.", "");
 				if type(v.version) == "number" then
 					Game.version = v.version;
+					if Game.squish_memory_table then
+						-- Squish Game.Memory tables down to a single address for the relevant version
+						for k, v in pairs(Game.Memory) do
+							Game.Memory[k] = v[Game.version];
+						end
+					end
 				end
+
 				if type(Game.detectVersion) == "function" then
 					Game.detectVersion(v.friendlyName, k);
 				end

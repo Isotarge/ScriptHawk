@@ -6,6 +6,7 @@ if type(ScriptHawk) ~= "table" then
 end
 
 local Game = {
+	squish_memory_table = true,
 	Memory = { -- Version order: Europe N64, USA N64
 		health = {0x1BC54D, 0x1BC64D}, -- Byte
 		x_pos = {0x1C6A34, 0x1C6B34}, -- Float, ordered X, Z, Y in memory
@@ -28,19 +29,6 @@ local sine_mirror = 0x10; -- Float
 
 local cosine = 0x04; -- Float
 local cosine_inverse = 0x0C; -- Float
-
---------------------
--- Region/Version --
---------------------
-
-function Game.detectVersion(romName, romHash)
-	-- Squish Game.Memory tables down to a single address for the relevant version
-	for k, v in pairs(Game.Memory) do
-		Game.Memory[k] = v[Game.version];
-	end
-
-	return true;
-end
 
 function Game.applyInfinites()
 	mainmemory.writebyte(Game.Memory.health, 30); -- Set Health

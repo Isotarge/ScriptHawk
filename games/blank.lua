@@ -28,6 +28,7 @@ local Game = { -- This table stores the module's API function implementations an
 --------------------
 
 -- Modules should ideally use ROM hash rather than name, but both are passed in by ScriptHawk
+-- This function is optional, if you add version=n to the supportedGames entry for your module in ScriptHawk.lua, Game.version will be automatically populated by ScriptHawk on module startup
 function Game.detectVersion(romName, romHash)
 	if string.contains(romName, "Europe") then -- string.contains is a pure Lua global function provided by ScriptHawk, intended to replace calls to bizstring.contains() for portability reasons
 		Game.version = 1; -- We use the version variable as an index for the Game.Memory table
@@ -42,6 +43,7 @@ function Game.detectVersion(romName, romHash)
 	-- Squish Game.Memory tables down to a single address for the relevant version
 	-- If you include this code snippet in your module, you can access Game.Memory addresses in a cleaner fashion
 	-- Game.Memory.address[Game.version] becomes Game.Memory.address
+	-- If you specify Game.squish_memory_table = true, this snippet will be run automatically on module startup by ScriptHawk
 	for k, v in pairs(Game.Memory) do
 		Game.Memory[k] = v[Game.version];
 	end

@@ -48,6 +48,7 @@ Tests:
 --]]
 
 local Game = {
+	squish_memory_table = true,
 	Memory = { --     Version order: USA v1.0, USA v1.1, USA v1.2, Japan1.0, Japan1.1, Europe1.0
 		--                           PASS      FAIL MAP  UNKNOWN   UNKNOWN   UNKNOWN   UNKNOWN
 		circuit_restriction_check = {0x0148E0, 0x0148E0, 0x0148E0, 0x0148E0, 0x0148E0, 0x014908},
@@ -444,15 +445,6 @@ function Game.importCar(importString, carIndex)
 		mainmemory.writebyte(Game.Memory.num_cars_garaged, carIndex);
 	end
 	print("Import complete!");
-end
-
-function Game.detectVersion(romName, romHash)
-	-- Squish Game.Memory tables down to a single address for the relevant version
-	for k, v in pairs(Game.Memory) do
-		Game.Memory[k] = v[Game.version];
-	end
-
-	return true;
 end
 
 function Game.getNumRacers()

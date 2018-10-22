@@ -20,6 +20,7 @@ local Game = {
 	speedy_speeds = {
 		0.001, 0.01, 0.1, 1, 5, 10, 20, 50, 100
 	},
+	squish_memory_table = true,
 	Memory = { -- Version order: USA, Europe, Japan
 		akuaku_mask_pointer = {0x68F38, 0x690E8, 0x69388},
 		global_timer = {0x69034, 0x691E4, 0x69484},
@@ -46,15 +47,6 @@ local player_data = {
 
 local pScale = 1000;
 local vScale = 100000;
-
-function Game.detectVersion(romName, romHash)
-	-- Squish Game.Memory tables down to a single address for the relevant version
-	for k, v in pairs(Game.Memory) do
-		Game.Memory[k] = v[Game.version];
-	end
-
-	return true;
-end
 
 global_timer = {
 	current = 0,

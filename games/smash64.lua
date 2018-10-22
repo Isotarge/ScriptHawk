@@ -9,6 +9,7 @@ local Game = {
 	speedy_speeds = { .1, 1, 5, 10, 20, 35, 50, 75, 100 };
 	speedy_index = 6;
 	max_rot_units = 4,
+	squish_memory_table = true,
 	Memory = { -- Versions: Japan, Australia, Europe, USA
 		music = {0x98BD3, 0x99833, 0xA2E63, 0x99113},
 		unlocked_stuff = {0xA28F4, 0xA5074, 0xAD194, 0xA4934},
@@ -522,15 +523,6 @@ character_states = {
 		[0xF4] = "After Throw (Mounting)", [0xF5] = "Throw (Mounting)",
 	},
 };
-
-function Game.detectVersion(romName, romHash)
-	-- Squish Game.Memory tables down to a single address for the relevant version
-	for k, v in pairs(Game.Memory) do
-		Game.Memory[k] = v[Game.version];
-	end
-
-	return true;
-end
 
 function Game.setMap(index)
 	local matchSettings = dereferencePointer(Game.Memory.match_settings_pointer);
