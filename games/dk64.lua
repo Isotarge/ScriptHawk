@@ -7701,7 +7701,7 @@ function Game.initUI()
 	-- Set character
 	-- TODO: Different indexes on Kiosk
 	ScriptHawk.UI.form_controls["Character Dropdown"] = forms.dropdown(ScriptHawk.UI.options_form, {"0. DK", "1. Diddy", "2. Lanky", "3. Tiny", "4. Chunky", "5. Krusha", "6. Rambi", "7. Enguarde", "8. Squawks", "9. Squawks"}, ScriptHawk.UI.col(0) + ScriptHawk.UI.dropdown_offset, ScriptHawk.UI.row(9) + ScriptHawk.UI.dropdown_offset, ScriptHawk.UI.col(9) + 8, ScriptHawk.UI.button_height);
-	ScriptHawk.UI.button(10, 9, {4, 10}, nil, nil, "Set Character", Game.setCharacterFromDropdown);
+	ScriptHawk.UI.checkbox(10, 9, "Set Character", "Set Character");
 
 	-- Output flag statistics
 	flagStats();
@@ -8128,6 +8128,25 @@ end
 function Game.setCharacterFromDropdown()
 	local index = tonumber(forms.getproperty(ScriptHawk.UI.form_controls["Character Dropdown"], "SelectedIndex"));
 	Game.setCharacter(index);
+	local player = Game.getPlayerObject();
+	-- TODO: Different on Kiosk
+	if isRDRAM(player) and Game.version < 4 then
+		local indexActorConversion = {
+			[DK] = 2,
+			[Diddy] = 3,
+			[Lanky] = 4,
+			[Tiny] = 5,
+			[Chunky] = 6,
+			[Krusha] = 7,
+			[6] = 8, -- Rambi
+			[7] = 9, -- Enguarde
+			[8] = 2, -- Squawks uses DK for some reason
+			[9] = 2, -- Squawks uses DK for some reason
+		};
+		if type(indexActorConversion[index]) ~= "nil" then
+			mainmemory.write_u16_be(player + obj_model1.actor_type, indexActorConversion[index]);
+		end
+	end
 end
 
 local function readTimestamp(address)
@@ -8839,6 +8858,10 @@ function Game.eachFrame()
 	-- Check for new flags being set
 	if ScriptHawk.UI.ischecked("realtime_flags") then
 		checkFlags(true);
+	end
+
+	if ScriptHawk.UI.ischecked("Set Character") then
+		Game.setCharacterFromDropdown();
 	end
 
 	if force_gb_load then
