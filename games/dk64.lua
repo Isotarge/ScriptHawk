@@ -421,7 +421,7 @@ local Game = {
 	speedy_index = 8,
 	rot_speed = 10,
 	max_rot_units = 4096,
-	form_height = 11,
+	form_height = 12,
 };
 
 function Game.getCurrentMode()
@@ -791,7 +791,7 @@ local levelIndexes = {
 };
 
 function Game.getMaxStandardAmmo()
-	local kong = mainmemory.readbyte(Game.Memory.character);
+	local kong = Game.getCharacter();
 	local ammoBelt = mainmemory.readbyte(Game.Memory.kong_base + (kong * Game.Memory.kong_size) + ammo_belt);
 	return ((2 ^ ammoBelt) * 100) / 2;
 end
@@ -6801,7 +6801,7 @@ function ohWrongnana(verbose)
 	--	return;
 	--end
 
-	local currentKong = mainmemory.readbyte(Game.Memory.character);
+	local currentKong = Game.getCharacter();
 
 	local objModel2Array = getObjectModel2Array();
 	if isRDRAM(objModel2Array) and currentKong >= DK and currentKong <= Chunky then
@@ -7698,6 +7698,11 @@ function Game.initUI()
 	ScriptHawk.UI.checkbox(5, 7, "Heap Visualizer Free Only", "Free Only");
 	ScriptHawk.UI.checkbox(10, 7, "Heap Visualizer Dump Blocks", "Dump Blocks");
 
+	-- Set character
+	-- TODO: Different indexes on Kiosk
+	ScriptHawk.UI.form_controls["Character Dropdown"] = forms.dropdown(ScriptHawk.UI.options_form, {"0. DK", "1. Diddy", "2. Lanky", "3. Tiny", "4. Chunky", "5. Krusha", "6. Rambi", "7. Enguarde", "8. Squawks", "9. Squawks"}, ScriptHawk.UI.col(0) + ScriptHawk.UI.dropdown_offset, ScriptHawk.UI.row(9) + ScriptHawk.UI.dropdown_offset, ScriptHawk.UI.col(9) + 8, ScriptHawk.UI.button_height);
+	ScriptHawk.UI.button(10, 9, {4, 10}, nil, nil, "Set Character", Game.setCharacterFromDropdown);
+
 	-- Output flag statistics
 	flagStats();
 end
@@ -8106,10 +8111,23 @@ local setColorFunctions = {
 };
 
 function Game.setKongColor()
-	local currentKong = mainmemory.readbyte(Game.Memory.character);
+	local currentKong = Game.getCharacter();
 	if type(setColorFunctions[currentKong]) == "function" then
 		setColorFunctions[currentKong]();
 	end
+end
+
+function Game.getCharacter()
+	return mainmemory.readbyte(Game.Memory.character);
+end
+
+function Game.setCharacter(value)
+	mainmemory.writebyte(Game.Memory.character, value);
+end
+
+function Game.setCharacterFromDropdown()
+	local index = tonumber(forms.getproperty(ScriptHawk.UI.form_controls["Character Dropdown"], "SelectedIndex"));
+	Game.setCharacter(index);
 end
 
 local function readTimestamp(address)
@@ -8895,6 +8913,7 @@ Game.standardOSD = {
 	{"Level", Game.getLevelIndexOSD, category="mapData"},
 	{"Cutscene", Game.getCutsceneOSD, category="cutsceneData"},
 	{"Exit", Game.getExitOSD, category="mapData"},
+	{"Character", Game.getCharacter, category="player"},
 	{"Player", hexifyOSD(Game.getPlayerObject), category="player"},
 	{"Separator"},
 	{"Mode", Game.getCurrentMode, category="gamemode"},
