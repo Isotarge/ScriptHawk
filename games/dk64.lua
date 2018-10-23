@@ -92,6 +92,12 @@ local Game = {
 		-- 0000 0010 - ????
 		-- 0000 0001 - Reload Map
 		map_state = {0x76A0B1, 0x764BD1, 0x76A2A1, 0x72CDED}, -- byte, bitfield -- TODO: Document remaining values
+		-- 0 = Fade (Level FT Entry w/out Story Skip [Probably Wrong Cutscene fade type])
+		-- 1 = DK Transition
+		-- 2 = Fade (Normal Level Entry / FT Entry with Story Skip)
+		-- 3 = Unused (Shrinking rectangle)
+		loading_zone_transition_type = {0x76AEE0, 0x765A00, 0x76B0D0, 0x72D110}, -- byte
+		loazing_zone_transition_speed = {0x7FD88C, 0x7FD7CC, 0x7FDD1C, 0x7B708C}, -- Float
 		loading_zone_array_size = {0x7FDCB0, 0x7FDBF0, 0x7FE140, 0x7B7410}, -- u16_be
 		loading_zone_array = {0x7FDCB4, 0x7FDBF4, 0x7FE144, 0x7B7414},
 		file = {0x7467C8, 0x740F18, 0x746088, nil},
@@ -148,6 +154,7 @@ local Game = {
 		isg_active = {0x755070, 0x74F8F0, 0x755130, nil},
 		isg_timestamp = {0x7F5CE0, 0x7F5C00, 0x7F6150, nil},
 		timestamp = {0x14FE0, 0x155C0, 0x15300, 0x72F880},
+		cutscene_will_play_next_map = {0x75533B, nil, nil, nil}, -- byte -- TODO: Find on all versions
 		cutscene_active = {0x7444EC, 0x73EC3C, 0x743DAC, 0x6F1CCC},
 		cutscene = {0x7476F4, 0x741E54, 0x746FB4, 0x6F4464},
 		cutscene_type = {0x7476FC, 0x741E5C, 0x746FBC, 0x6F446C},
