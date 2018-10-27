@@ -329,6 +329,7 @@ local Game = {
 			[0x5F] = {0x1205A2, 0x1207B2, 0x115A22, 0x11B662}, -- Kazooie (Solo)
 		},
 	},
+	defaultFloor = -18000,
 	speedy_speeds = { .001, .01, .1, 1, 5, 10, 20, 50, 100 },
 	speedy_index = 7,
 	rot_speed = 10,
@@ -430,6 +431,15 @@ function Game.isPhysicsFrame()
 	return frameTimerValue <= 0 and not emu.islagged();
 end
 
+function Game.getFrameRate()
+	local numerator = 60;
+	if Game.version < 3 then -- PAL
+		numerator = 50;
+	end
+	local denominator = math.max(1, mainmemory.read_s32_be(Game.Memory.frame_timer + 4));
+	return numerator / denominator;
+end
+
 -------------------
 -- Player object --
 -------------------
@@ -438,6 +448,7 @@ end
 local previous_item = 0x00;
 local next_item = 0x04;
 
+local floor_pointer_index = 37 * 4;
 local slope_pointer_index = 40 * 4;
 local velocity_pointer_index = 50 * 4;
 local rot_x_pointer_index = 55 * 4;
@@ -447,7 +458,6 @@ local rot_y_pointer_index = 62 * 4;
 local movement_state_pointer_index = 72 * 4;
 local grounded_pointer_index = 84 * 4;
 local animation_pointer_index = 104 * 4;
-
 
 -- Relative to Position object
 local x_pos = 0x00;
@@ -475,6 +485,8 @@ local slope_timer = 0x38;
 local x_velocity = 0x10;
 local y_velocity = 0x14;
 local z_velocity = 0x18;
+local gravity = 0x34;
+local terminal_velocity = 0x38;
 
 function Game.getPlayerObject()
 	local playerPointerIndex = mainmemory.readbyte(Game.Memory.player_pointer_index);
@@ -727,6 +739,12 @@ function Game.setZPosition(value)
 	end
 end
 
+function Game.getPredictedYPosition()
+	local frameRate = Game.getFrameRate();
+	local gravity = Game.getGravity() / frameRate;
+	return Game.getYPosition() + ((Game.getYVelocity() + gravity) / frameRate);
+end
+
 --------------
 -- Velocity --
 --------------
@@ -759,6 +777,34 @@ function Game.getVelocity() -- Calculated VXZ
 	local vX = Game.getXVelocity();
 	local vZ = Game.getZVelocity();
 	return math.sqrt(vX*vX + vZ*vZ);
+end
+
+-- Divide by framerate for change to velocity per frame
+function Game.getGravity()
+	local velocityObject = Game.getPlayerSubObject(velocity_pointer_index);
+	if isRDRAM(velocityObject) then
+		return mainmemory.readfloat(velocityObject + gravity, true);
+	end
+	return 0;
+end
+
+function Game.getTerminalVelocity()
+	local velocityObject = Game.getPlayerSubObject(velocity_pointer_index);
+	if isRDRAM(velocityObject) then
+		return mainmemory.readfloat(velocityObject + terminal_velocity, true);
+	end
+	return 0;
+end
+
+function Game.getFloor()
+	local floorObject = Game.getPlayerSubObject(floor_pointer_index);
+	if isRDRAM(floorObject) then
+		floorObject = dereferencePointer(floorObject); -- Gotta dereference again
+		if isRDRAM(floorObject) then
+			return mainmemory.readfloat(floorObject + 0x70, true);
+		end
+	end
+	return 0;
 end
 
 function Game.setXVelocity(value)
@@ -5561,9 +5607,9 @@ function Game.initUI()
 	ScriptHawk.UI.checkbox(5, 6, "toggle_autojump", "Autojump");
 
 	-- Moves
-	ScriptHawk.UI.form_controls.moves_dropdown = forms.dropdown(ScriptHawk.UI.options_form, { "All", "None" }, ScriptHawk.UI.col(7) - ScriptHawk.UI.dropdown_offset + 2, ScriptHawk.UI.row(2) + ScriptHawk.UI.dropdown_offset, ScriptHawk.UI.col(2) + 8, ScriptHawk.UI.button_height);
-	ScriptHawk.UI.button(10, 2, {4, 10}, nil, nil, "Unlock Moves", Game.unlockMoves);
-	ScriptHawk.UI.button(10, 5, {4, 10}, nil, nil, "Toggle Dragon Kazooie", Game.toggleDragonKazooie);
+	ScriptHawk.UI.button(10, 0, {4, 10}, nil, nil, "Toggle Dragon Kazooie", Game.toggleDragonKazooie);
+	ScriptHawk.UI.form_controls.moves_dropdown = forms.dropdown(ScriptHawk.UI.options_form, { "All", "None" }, ScriptHawk.UI.col(7) - ScriptHawk.UI.dropdown_offset + 2, ScriptHawk.UI.row(1) + ScriptHawk.UI.dropdown_offset, ScriptHawk.UI.col(2) + 8, ScriptHawk.UI.button_height);
+	ScriptHawk.UI.button(10, 1, {4, 10}, nil, nil, "Unlock Moves", Game.unlockMoves);
 
 	-- Character Dropdown
 	ScriptHawk.UI.form_controls["Character Dropdown"] = forms.dropdown(ScriptHawk.UI.options_form, { "BK", "Snowball", "Cutscene", "Bee", "W. Machine", "Stony", "Breegull B.", "Solo Banjo", "Solo Kazooie", "Submarine", "Mumbo", "G. Goliath", "Detonator", "Van", "Cwk Kazooie", "Small T-Rex", "Big T-Rex" }, ScriptHawk.UI.col(5) - ScriptHawk.UI.dropdown_offset + 2, ScriptHawk.UI.row(5) + ScriptHawk.UI.dropdown_offset, ScriptHawk.UI.col(3) + 8, ScriptHawk.UI.button_height);
@@ -5623,6 +5669,9 @@ Game.OSD = {
 	{"Y", category="position"},
 	{"Z", category="position"},
 	{"Separator"},
+	{"Floor", Game.getFloor, category="position"},
+	{"Next Y Pos", Game.getPredictedYPosition, category="positionStats"},
+	{"Separator"},
 	{"dY", category="positionStats"},
 	{"dXZ", category="positionStats"},
 	{"Velocity", Game.getVelocity, category="speed"},
@@ -5635,6 +5684,7 @@ Game.OSD = {
 	{"Rot. X", Game.getXRotation, category="angle"},
 	{"Facing", Game.getYRotation, category="angle"},
 	{"Moving", Game.getMovingAngle, category="angle"},
+	{"Moving Angle", category="angle"},
 	{"Rot. Z", Game.getZRotation, category="angle"},
 	{"Separator"},
 	{"Player", hexifyOSD(Game.getPlayerObject), category="player"},
