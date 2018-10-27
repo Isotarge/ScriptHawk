@@ -16,17 +16,18 @@ local Game = {
 		player_grounded = {0x37C930, 0x37CA60, 0x37B160, 0x37BF60},
 		wall_collisions = {0x37CC4D, 0x37CD7D, 0x37B47D, 0x37C27D},
 		moves_bitfield = {0x37CD70, 0x37CEA0, 0x37B5A0, 0x37C3A0},
-		x_velocity = {0x37CE88, 0x37CFB8, 0x37B6B8, 0x37C4B8},
-		y_velocity = {0x37CE8C, 0x37CFBC, 0x37B6BC, 0x37C4BC},
-		z_velocity = {0x37CE90, 0x37CFC0, 0x37B6C0, 0x37C4C0},
-		x_position = {0x37CF70, 0x37D0A0, 0x37B7A0, 0x37C5A0},
-		y_position = {0x37CF74, 0x37D0A4, 0x37B7A4, 0x37C5A4},
-		z_position = {0x37CF78, 0x37D0A8, 0x37B7A8, 0x37C5A8},
-		x_rotation = {0x37CF10, 0x37D040, 0x37B740, 0x37C540},
-		y_rotation = {0x37D060, 0x37D190, 0x37B890, 0x37C690},
+		x_velocity = {0x37CE88, 0x37CFB8, 0x37B6B8, 0x37C4B8}, -- Float
+		y_velocity = {0x37CE8C, 0x37CFBC, 0x37B6BC, 0x37C4BC}, -- Float
+		z_velocity = {0x37CE90, 0x37CFC0, 0x37B6C0, 0x37C4C0}, -- Float
+		x_position = {0x37CF70, 0x37D0A0, 0x37B7A0, 0x37C5A0}, -- Float
+		y_position = {0x37CF74, 0x37D0A4, 0x37B7A4, 0x37C5A4}, -- Float
+		z_position = {0x37CF78, 0x37D0A8, 0x37B7A8, 0x37C5A8}, -- Float
+		x_rotation = {0x37CF10, 0x37D040, 0x37B740, 0x37C540}, -- Float
+		y_rotation = {0x37D060, 0x37D190, 0x37B890, 0x37C690}, -- Float
 		facing_angle = {0x37D060, 0x37D190, 0x37B890, 0x37C690},
 		moving_angle = {0x37D064, 0x37D194, 0x37B894, 0x37C694},
 		z_rotation = {0x37D050, 0x37D180, 0x37B880, 0x37C680},
+		gravity = {0x37CEB8, 0x37CFE8, 0x37B6E8, 0x37C4E8}, -- Float, divide by framerate
 		camera_x_position = {0x37E328, 0x37E458, 0x37CB58, 0x37D958},
 		camera_y_position = {0x37E32C, 0x37E45C, 0x37CB5C, 0x37D95C},
 		camera_z_position = {0x37E330, 0x37E460, 0x37CB60, 0x37D960},
@@ -2807,6 +2808,15 @@ Game.speedy_index = 6;
 Game.rot_speed = 0.5;
 Game.max_rot_units = 360;
 
+function Game.getFrameRate()
+	local numerator = 60;
+	if Game.version == 1 then -- PAL
+		numerator = 50;
+	end
+	local denominator = math.max(1, mainmemory.read_s32_be(Game.Memory.frame_timer + 4));
+	return numerator / denominator;
+end
+
 function Game.isPhysicsFrame()
 	local frameTimerValue = mainmemory.read_s32_be(Game.Memory.frame_timer);
 	return frameTimerValue <= 0 and not emu.islagged();
@@ -2852,6 +2862,40 @@ end
 function Game.setZPosition(value)
 	mainmemory.writefloat(Game.Memory.z_position, value, true);
 	mainmemory.writefloat(Game.Memory.z_position + 0x10, value, true);
+end
+
+function Game.getPredictedYPosition()
+	local frameRate = Game.getFrameRate();
+	local gravity = mainmemory.readfloat(Game.Memory.gravity, true) / frameRate;
+	return Game.getYPosition() + ((Game.getYVelocity() + gravity) / frameRate);
+end
+
+function Game.getPredictedYPositionRelativeToFloor()
+	return Game.getPredictedYPosition() - Game.getFloor();
+end
+
+function Game.predictZip()
+	local predictedPositionRelativeToFloor = Game.getPredictedYPositionRelativeToFloor();
+	if predictedPositionRelativeToFloor <= -56 and predictedPositionRelativeToFloor > -66 then
+		return true;
+	end
+	return false;
+end
+
+function Game.colorZipPrediction()
+	if Game.predictZip() then
+		return colors.green;
+	end
+end
+
+function Game.forceZip()
+	local inputs = joypad.getimmediate();
+	if inputs["P1 L"] or inputs["P1 A"] then
+		return;
+	end
+	if Game.getFloor() > -9000 then
+		Game.setYVelocity(-53 * Game.getFrameRate());
+	end
 end
 
 --------------
@@ -3379,6 +3423,9 @@ Game.OSD = {
 	{"Z", category="position"},
 	{"Separator"},
 	{"Floor", Game.getFloor, category="position"},
+	{"Zip", Game.predictZip, Game.colorZipPrediction, category="positionStats"},
+	--{"Next Y Pos", Game.getPredictedYPosition, category="positionStats"},
+	{"Next Y Pos Floor", Game.getPredictedYPositionRelativeToFloor, category="positionStats"},
 	{"Separator"},
 	{"Y Velocity", Game.getYVelocity, Game.colorYVelocity, category="speed"},
 	{"Velocity", Game.getVelocity, category="speed"};
