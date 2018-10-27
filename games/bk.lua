@@ -56,6 +56,11 @@ local Game = {
 		honeycomb_bitfield = {0x383CC0, 0x383E20, 0x382500, 0x3832E0},
 		mumbo_token_bitfield = {0x383CD0, 0x383E30, 0x382510, 0x3832F0},
 	},
+	defaultFloor = -9000,
+	speedy_speeds = { .1, 1, 5, 10, 20, 35, 50, 75, 100 },
+	speedy_index = 6,
+	rot_speed = 0.5,
+	max_rot_units = 360,
 	maps = {
 		"SM - Spiral Mountain",
 		"MM - Mumbo's Mountain",
@@ -2802,12 +2807,6 @@ end
 -- Physics/Scale --
 -------------------
 
-Game.speedy_speeds = { .1, 1, 5, 10, 20, 35, 50, 75, 100 };
-Game.speedy_index = 6;
-
-Game.rot_speed = 0.5;
-Game.max_rot_units = 360;
-
 function Game.getFrameRate()
 	local numerator = 60;
 	if Game.version == 1 then -- PAL
@@ -2874,6 +2873,7 @@ function Game.getPredictedYPositionRelativeToFloor()
 	return Game.getPredictedYPosition() - Game.getFloor();
 end
 
+-- TODO: Predict N frames ahead based on current velocity, position, gravity, floor
 function Game.predictZip()
 	local predictedPositionRelativeToFloor = Game.getPredictedYPositionRelativeToFloor();
 	if predictedPositionRelativeToFloor <= -56 and predictedPositionRelativeToFloor > -66 then
@@ -2893,7 +2893,7 @@ function Game.forceZip()
 	if inputs["P1 L"] or inputs["P1 A"] then
 		return;
 	end
-	if Game.getFloor() > -9000 then
+	if Game.getFloor() > Game.defaultFloor then
 		Game.setYVelocity(-53 * Game.getFrameRate());
 	end
 end

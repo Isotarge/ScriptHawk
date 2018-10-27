@@ -126,7 +126,7 @@ local dpad_pressed = {
 	up = false,
 	down = false,
 	left = false,
-	right = false
+	right = false,
 };
 
 ScriptHawk.keybindsFrame = {};
@@ -687,13 +687,11 @@ loadPreferences();
 -- State --
 -----------
 
-override_lag_detection = type(Game.isPhysicsFrame) == "function"; -- Default to true if the game implements custom lag detection
+ScriptHawk.override_lag_detection = type(Game.isPhysicsFrame) == "function"; -- Default to true if the game implements custom lag detection
 local rotation_units = "Degrees";
 
--- Stops garbage min/max dx/dy/dz values
-local firstframe = true;
-previous_frame = emu.framecount();
 current_frame = emu.framecount();
+previous_frame = current_frame - 1;
 
 local previous_map = "";
 local previous_map_value = 0;
@@ -951,8 +949,8 @@ end
 -- Telemetry --
 ---------------
 
-telemetryData = {};
-local collecting_telemetry = false;
+ScriptHawk.telemetryData = {};
+ScriptHawk.collecting_telemetry = false;
 
 function getTelemetryHeaderString()
 	local headerString = "Frame,";
@@ -968,15 +966,15 @@ end
 
 -- Outputs telemetry data as CSV to the console
 -- TODO: Save as CSV file on disk
-local function outputTelemetry()
+function ScriptHawk.outputTelemetry()
 	-- Print CSV header
 	dprint(getTelemetryHeaderString());
 
 	-- Print CSV values
 	for i = 0, emu.framecount() do -- I know this isn't optimal, but unfortunately ipairs() doesn't like tables with gaps in them, and pairs() doesn't iterate through keys in numerical order
-		if type(telemetryData[i]) == "table" then
+		if type(ScriptHawk.telemetryData[i]) == "table" then
 			local outputString = i..",";
-			for k, v in ipairs(telemetryData[i]) do
+			for k, v in ipairs(ScriptHawk.telemetryData[i]) do
 				outputString = outputString..(v)..",";
 			end
 			dprint(outputString);
@@ -986,29 +984,30 @@ local function outputTelemetry()
 	print_deferred();
 end
 
-local function startTelemetry()
-	collecting_telemetry = true;
+function ScriptHawk.startTelemetry()
+	ScriptHawk.collecting_telemetry = true;
+	ScriptHawk.clearTelemetry();
 	forms.settext(ScriptHawk.UI.form_controls["Toggle Telemetry Button"], "Stop Telemetry");
 end
 
-local function stopTelemetry()
-	collecting_telemetry = false;
+function ScriptHawk.stopTelemetry()
+	ScriptHawk.collecting_telemetry = false;
 	forms.settext(ScriptHawk.UI.form_controls["Toggle Telemetry Button"], "Start Telemetry");
 
-	outputTelemetry();
+	ScriptHawk.outputTelemetry();
 	return;
 end
 
-local function toggleTelemetry()
-	if collecting_telemetry then
-		stopTelemetry();
+function ScriptHawk.toggleTelemetry()
+	if ScriptHawk.collecting_telemetry then
+		ScriptHawk.stopTelemetry();
 	else
-		startTelemetry();
+		ScriptHawk.startTelemetry();
 	end
 end
 
-function clearTelemetry()
-	telemetryData = {};
+function ScriptHawk.clearTelemetry()
+	ScriptHawk.telemetryData = {};
 end
 
 ----------------------
@@ -1146,7 +1145,7 @@ function ScriptHawk.initUI(formTitle)
 		ScriptHawk.UI.form_controls["Mode Label"] = forms.label(ScriptHawk.UI.options_form, "Mode:", ScriptHawk.UI.col(0), ScriptHawk.UI.row(0) + ScriptHawk.UI.label_offset, 44, ScriptHawk.UI.button_height);
 		ScriptHawk.UI.button(2, 0, {64}, nil, "Mode Button", ScriptHawk.mode, toggleMode);
 	else
-		ScriptHawk.UI.checkbox(0, 2, "Override Lag Detection", "Override Lag Detection", override_lag_detection);
+		ScriptHawk.UI.checkbox(0, 2, "Override Lag Detection", "Override Lag Detection", ScriptHawk.override_lag_detection);
 		forms.setproperty(ScriptHawk.UI.form_controls["Override Lag Detection"], "Width", 140);
 	end
 
@@ -1197,7 +1196,7 @@ function ScriptHawk.initUI(formTitle)
 		end
 	end
 
-	ScriptHawk.UI.button(10, 3, {4, 10}, nil, "Toggle Telemetry Button", "Start Telemetry", toggleTelemetry);
+	ScriptHawk.UI.button(10, 3, {4, 10}, nil, "Toggle Telemetry Button", "Start Telemetry", ScriptHawk.toggleTelemetry);
 
 	ScriptHawk.UI.form_controls["Rotation Units Label"] = forms.label(ScriptHawk.UI.options_form, "Units:", ScriptHawk.UI.col(5), ScriptHawk.UI.row(0) + ScriptHawk.UI.label_offset, 44, 14);
 	ScriptHawk.UI.button(7, 0, {64}, nil, "Toggle Rotation Units Button", rotation_units, toggleRotationUnits);
@@ -1270,20 +1269,20 @@ if type(Game.OSD) ~= "table" then
 		print("Warning: This module does not define a custom Game.OSD");
 	end
 	Game.OSD = {
-		{"X"},
-		{"Y"},
-		{"Z"},
+		{"X", category="position"},
+		{"Y", category="position"},
+		{"Z", category="position"},
 		{"Separator"},
-		{"dY"},
-		{"dXZ"},
+		{"dY", category="positionStats"},
+		{"dXZ", category="positionStats"},
 		{"Separator"},
-		{"Max dY"},
-		{"Max dXZ"},
-		{"Odometer"},
+		{"Max dY", category="positionStatsMore"},
+		{"Max dXZ", category="positionStatsMore"},
+		{"Odometer", category="positionStatsMore"},
 		{"Separator"},
-		{"Rot. X", Game.getXRotation},
-		{"Facing", Game.getYRotation},
-		{"Rot. Z", Game.getZRotation},
+		{"Rot. X", Game.getXRotation, category="angle"},
+		{"Facing", Game.getYRotation, category="angle"},
+		{"Rot. Z", Game.getZRotation, category="angle"},
 	};
 end
 
@@ -1301,9 +1300,6 @@ local angleKeywords = {
 	"rotation x", "rotation y", "rotation z", "rotation",
 	"facing", "moving", "angle",
 };
-
--- TODO: Get rid of this, generate checkboxes using defaultPreferences
-OSDTypes = {};
 
 function ScriptHawk.UI.updateReadouts()
 	-- Update form buttons etc
@@ -1324,11 +1320,11 @@ function ScriptHawk.UI.updateReadouts()
 
 	local frameCount = emu.framecount();
 	local telemetryFound = false;
-	local telemetryIndex = 1;
+	local telemetryIndex = 0;
 	local telemetryDataThisFrame = {};
-	if collecting_telemetry == false and type(telemetryData[frameCount]) == "table" then
+	if ScriptHawk.collecting_telemetry == false and type(ScriptHawk.telemetryData[frameCount]) == "table" then
 		telemetryFound = true;
-		telemetryDataThisFrame = telemetryData[frameCount];
+		telemetryDataThisFrame = ScriptHawk.telemetryData[frameCount];
 	end
 
 	local TAStudioEngaged = tastudio.engaged();
@@ -1343,26 +1339,13 @@ function ScriptHawk.UI.updateReadouts()
 
 	local nothingDrawnSinceLastSeparator = true;
 	local moduleHasOSDPreferences = currentPreferences[ScriptHawk.gamePrefName] ~= nil;
-	OSDTypes = {};
 
-	for i = 1, #Game.OSD do
-		local label = Game.OSD[i][1];
-		local value = Game.OSD[i][2];
-		local color = Game.OSD[i][3];
-		local variableType = Game.OSD[i].category;
-		local inTAStudio = Game.OSD[i].tastudio_column == true;
-
-		local inTable = false;
-		if #OSDTypes > 0 then
-			for j = 1, #OSDTypes do
-				if OSDTypes[j] == variableType then
-					inTable = true;
-				end
-			end
-		end
-		if not inTable then
-			table.insert(OSDTypes, variableType);
-		end
+	for i, OSDRow in ipairs(Game.OSD) do
+		local label = OSDRow[1];
+		local value = OSDRow[2];
+		local color = OSDRow[3];
+		local variableType = OSDRow.category;
+		local inTAStudio = OSDRow.tastudio_column == true;
 
 		if label ~= "Separator" then
 			-- Check if variable should be visible based on preferences, default to true
@@ -1380,33 +1363,33 @@ function ScriptHawk.UI.updateReadouts()
 			if value == nil then
 				-- Detect special keywords
 				if labelLower == "x" or labelLower == "x pos" or labelLower == "x position" then
-					value = x or 0;
+					value = x;
 				elseif labelLower == "y" or labelLower == "y pos" or labelLower == "y position" then
-					value = y or 0;
+					value = y;
 				elseif labelLower == "z" or labelLower == "z pos" or labelLower == "z position" then
-					value = z or 0;
+					value = z;
 				end
 
 				if labelLower == "dx" then
-					value = dx or 0;
+					value = dx;
 				elseif labelLower == "dy" then
-					value = dy or 0;
+					value = dy;
 				elseif labelLower == "dz" then
-					value = dz or 0;
+					value = dz;
 				elseif labelLower == "dxz" or labelLower == "d" then
-					value = d or 0;
+					value = d;
 				end
 
 				if labelLower == "max dx" then
-					value = max_dx or 0;
+					value = max_dx;
 				elseif labelLower == "max dy" then
-					value = max_dy or 0;
+					value = max_dy;
 				elseif labelLower == "max dz" then
-					value = max_dz or 0;
+					value = max_dz;
 				elseif labelLower == "max dxz" or labelLower == "max d" then
-					value = max_d or 0;
+					value = max_d;
 				elseif labelLower == "odometer" then
-					value = odometer or 0;
+					value = odometer;
 				end
 
 				if labelLower == "moving angle" then -- TODO: This has some name conflicts, "moving"
@@ -1458,29 +1441,35 @@ function ScriptHawk.UI.updateReadouts()
 				atleastOneTAStudioColumn = true;
 				TAStudioDataThisFrame[label] = value;
 				--TAStudioColorThisFrame[label] = color;
-				tastudio.addcolumn(label, label, Game.OSD[i].tastudio_column_width or 50);
+				tastudio.addcolumn(label, label, OSDRow.tastudio_column_width or 50);
 			end
 
-			if telemetryFound then
-				if labelLower == "x" then
-					gui.text(OSDX, OSDY + Game.OSDRowHeight * row, label..": "..value.." ("..telemetryDataThisFrame[telemetryIndex]..") ("..(x - telemetryDataThisFrame[telemetryIndex]).." d)", color);
-				elseif labelLower == "y" then
-					gui.text(OSDX, OSDY + Game.OSDRowHeight * row, label..": "..value.." ("..telemetryDataThisFrame[telemetryIndex]..") ("..(y - telemetryDataThisFrame[telemetryIndex]).." d)", color);
-				elseif labelLower == "z" then
-					gui.text(OSDX, OSDY + Game.OSDRowHeight * row, label..": "..value.." ("..telemetryDataThisFrame[telemetryIndex]..") ("..(z - telemetryDataThisFrame[telemetryIndex]).." d)", color);
+			-- Collect all OSD rows for telemetry, even if they're not visible
+			if ScriptHawk.collecting_telemetry then
+				table.insert(telemetryDataThisFrame, value);
+			end
+			telemetryIndex = telemetryIndex + 1;
+
+			if variableVisible then
+				if telemetryFound then
+					local telemetryValue = telemetryDataThisFrame[telemetryIndex];
+					if telemetryValue == nil then
+						telemetryValue = "nil";
+					end
+					if labelLower == "x" then
+						gui.text(OSDX, OSDY + Game.OSDRowHeight * row, label..": "..value.." ("..telemetryValue..") ("..(x - telemetryValue).." d)", color);
+					elseif labelLower == "y" then
+						gui.text(OSDX, OSDY + Game.OSDRowHeight * row, label..": "..value.." ("..telemetryValue..") ("..(y - telemetryValue).." d)", color);
+					elseif labelLower == "z" then
+						gui.text(OSDX, OSDY + Game.OSDRowHeight * row, label..": "..value.." ("..telemetryValue..") ("..(z - telemetryValue).." d)", color);
+					else
+						gui.text(OSDX, OSDY + Game.OSDRowHeight * row, label..": "..value.." ("..telemetryValue..")", color);
+					end
 				else
-					gui.text(OSDX, OSDY + Game.OSDRowHeight * row, label..": "..value.." ("..telemetryDataThisFrame[telemetryIndex]..")", color);
-				end
-				telemetryIndex = telemetryIndex + 1;
-			else
-				if collecting_telemetry then
-					table.insert(telemetryDataThisFrame, value);
-				end
-				if variableVisible then
 					gui.text(OSDX, OSDY + Game.OSDRowHeight * row, label..": "..value, color);
-					row = row + 1;
-					nothingDrawnSinceLastSeparator = false;
 				end
+				row = row + 1;
+				nothingDrawnSinceLastSeparator = false;
 			end
 		else
 			if not nothingDrawnSinceLastSeparator then
@@ -1496,8 +1485,8 @@ function ScriptHawk.UI.updateReadouts()
 		TAStudio_column_data[frameCount] = TAStudioDataThisFrame;
 		--TAStudio_color_data[frameCount] = TAStudioColorThisFrame;
 	end
-	if collecting_telemetry then
-		telemetryData[frameCount] = telemetryDataThisFrame;
+	if ScriptHawk.collecting_telemetry then
+		ScriptHawk.telemetryData[frameCount] = telemetryDataThisFrame;
 	end
 end
 
@@ -1580,43 +1569,48 @@ function modifyOSD()
 	end
 
 	-- Update form height
-	ScriptHawk.UI.updateReadouts();
-	ScriptHawk.modifyOSDUI.form_height = #OSDTypes + 8.5;
+	local preferenceCount = 0;
+	for OSDType, preference in pairs(defaultPreferences[ScriptHawk.gamePrefName]) do
+		preferenceCount = preferenceCount + 1;
+	end
+	ScriptHawk.modifyOSDUI.form_height = preferenceCount + 8.5;
 
 	-- Carry on
 	ScriptHawk.modifyOSDUI.options_form = forms.newform(ScriptHawk.UI.col(ScriptHawk.modifyOSDUI.form_width), ScriptHawk.UI.row(ScriptHawk.modifyOSDUI.form_height), "Modify OSD", function() ScriptHawk.modifyOSDUI.isOpen = false end);
 	ScriptHawk.modifyOSDUI.isOpen = true;
 	ScriptHawk.modifyOSDUI.form_controls["Title Label"] = forms.label(ScriptHawk.modifyOSDUI.options_form, "MODIFY SCRIPTHAWK OSD", ScriptHawk.UI.col(0), ScriptHawk.UI.row(0) + ScriptHawk.modifyOSDUI.label_offset, 300, 16);
-	for OSDType = 1, #OSDTypes do
-		local labelID = OSDTypes[OSDType].."Label";
-		local labelText = OSDTypes[OSDType]..":";
-		local checkboxID = OSDTypes[OSDType].."Checkbox";
-		ScriptHawk.modifyOSDUI.form_controls[labelID] = forms.label(ScriptHawk.modifyOSDUI.options_form, labelText, ScriptHawk.UI.col(0), ScriptHawk.UI.row(OSDType) + ScriptHawk.modifyOSDUI.label_offset, 150, 16);
-		ScriptHawk.modifyOSDUI.checkbox(8, OSDType, checkboxID, "");
-		if currentPreferences[ScriptHawk.gamePrefName][OSDTypes[OSDType]] == true then
+	local OSDRow = 1;
+	for OSDType, preference in pairs(defaultPreferences[ScriptHawk.gamePrefName]) do
+		local labelID = OSDType.."Label";
+		local labelText = OSDType..":";
+		local checkboxID = OSDType.."Checkbox";
+		ScriptHawk.modifyOSDUI.form_controls[labelID] = forms.label(ScriptHawk.modifyOSDUI.options_form, labelText, ScriptHawk.UI.col(0), ScriptHawk.UI.row(OSDRow) + ScriptHawk.modifyOSDUI.label_offset, 150, 16);
+		ScriptHawk.modifyOSDUI.checkbox(8, OSDRow, checkboxID, "");
+		if currentPreferences[ScriptHawk.gamePrefName][OSDType] == true then
 			forms.setproperty(ScriptHawk.modifyOSDUI.form_controls[checkboxID], "Checked", true);
 		end
+		OSDRow = OSDRow + 1;
 	end
-	ScriptHawk.modifyOSDUI.form_controls["OSD Default Restore"] = forms.button(ScriptHawk.modifyOSDUI.options_form, "Restore to Default", restoreModifyOSDDefaults, ScriptHawk.UI.col(0), ScriptHawk.UI.row(#OSDTypes + 2), 200, ScriptHawk.modifyOSDUI.button_height);
-	ScriptHawk.modifyOSDUI.form_controls["OSD Load Preferences"] = forms.button(ScriptHawk.modifyOSDUI.options_form, "Load User Preferences", loadPreferences, ScriptHawk.UI.col(0), ScriptHawk.UI.row(#OSDTypes + 3), 200, ScriptHawk.modifyOSDUI.button_height);
+	ScriptHawk.modifyOSDUI.form_controls["OSD Default Restore"] = forms.button(ScriptHawk.modifyOSDUI.options_form, "Restore to Default", restoreModifyOSDDefaults, ScriptHawk.UI.col(0), ScriptHawk.UI.row(preferenceCount + 2), 200, ScriptHawk.modifyOSDUI.button_height);
+	ScriptHawk.modifyOSDUI.form_controls["OSD Load Preferences"] = forms.button(ScriptHawk.modifyOSDUI.options_form, "Load User Preferences", loadPreferences, ScriptHawk.UI.col(0), ScriptHawk.UI.row(preferenceCount + 3), 200, ScriptHawk.modifyOSDUI.button_height);
 	if ScriptHawk.isFileIOSafe then
-		ScriptHawk.modifyOSDUI.form_controls["OSD Save Preferences"] = forms.button(ScriptHawk.modifyOSDUI.options_form, "Save As User Preference", saveUserPreferences, ScriptHawk.UI.col(0), ScriptHawk.UI.row(#OSDTypes + 4), 200, ScriptHawk.modifyOSDUI.button_height);
-		ScriptHawk.modifyOSDUI.form_controls["OSD Clear Preferences"] = forms.button(ScriptHawk.modifyOSDUI.options_form, "Clear All User Preferences", clearPreferences, ScriptHawk.UI.col(0), ScriptHawk.UI.row(#OSDTypes + 5), 200, ScriptHawk.modifyOSDUI.button_height);
+		ScriptHawk.modifyOSDUI.form_controls["OSD Save Preferences"] = forms.button(ScriptHawk.modifyOSDUI.options_form, "Save As User Preference", saveUserPreferences, ScriptHawk.UI.col(0), ScriptHawk.UI.row(preferenceCount + 4), 200, ScriptHawk.modifyOSDUI.button_height);
+		ScriptHawk.modifyOSDUI.form_controls["OSD Clear Preferences"] = forms.button(ScriptHawk.modifyOSDUI.options_form, "Clear All User Preferences", clearPreferences, ScriptHawk.UI.col(0), ScriptHawk.UI.row(preferenceCount + 5), 200, ScriptHawk.modifyOSDUI.button_height);
 	else
-		ScriptHawk.modifyOSDUI.form_controls["OSD BizHawk Notice"] = forms.button(ScriptHawk.modifyOSDUI.options_form, "Notice", ScriptHawk.biz222Notice, ScriptHawk.UI.col(0), ScriptHawk.UI.row(#OSDTypes + 5), 200, ScriptHawk.modifyOSDUI.button_height);
+		ScriptHawk.modifyOSDUI.form_controls["OSD BizHawk Notice"] = forms.button(ScriptHawk.modifyOSDUI.options_form, "Notice", ScriptHawk.biz222Notice, ScriptHawk.UI.col(0), ScriptHawk.UI.row(preferenceCount + 5), 200, ScriptHawk.modifyOSDUI.button_height);
 	end
 end
 
 function ScriptHawk.modifyOSDUI.updateReadouts()
 	if ScriptHawk.modifyOSDUI.isOpen then
-		for OSDType = 1, #OSDTypes do
-			local checkboxID = OSDTypes[OSDType].."Checkbox";
+		for OSDType, preference in pairs(defaultPreferences[ScriptHawk.gamePrefName]) do
+			local checkboxID = OSDType.."Checkbox";
 			if ScriptHawk.modifyOSDUI.ischecked(checkboxID) then
-				currentPreferences[ScriptHawk.gamePrefName][OSDTypes[OSDType]] = true;
-				userPreferences[ScriptHawk.gamePrefName][OSDTypes[OSDType]] = true;
+				currentPreferences[ScriptHawk.gamePrefName][OSDType] = true;
+				userPreferences[ScriptHawk.gamePrefName][OSDType] = true;
 			else
-				currentPreferences[ScriptHawk.gamePrefName][OSDTypes[OSDType]] = false;
-				userPreferences[ScriptHawk.gamePrefName][OSDTypes[OSDType]] = false;
+				currentPreferences[ScriptHawk.gamePrefName][OSDType] = false;
+				userPreferences[ScriptHawk.gamePrefName][OSDType] = false;
 			end
 		end
 	end
@@ -1824,7 +1818,7 @@ end
 
 local function plot_pos()
 	if TASSafe then
-		override_lag_detection = ScriptHawk.UI.ischecked("Override Lag Detection");
+		ScriptHawk.override_lag_detection = ScriptHawk.UI.ischecked("Override Lag Detection");
 	end
 
 	-- Compensate for overscan (SMS)
@@ -1849,20 +1843,19 @@ local function plot_pos()
 
 	previous_frame = current_frame;
 	current_frame = emu.framecount();
+	local exactlyOneFrameHasPassed = current_frame - previous_frame == 1;
 
 	x = Game.getXPosition();
 	y = Game.getYPosition();
 	z = Game.getZPosition();
 
-	if firstframe then
+	if not exactlyOneFrameHasPassed then
 		prev_x = x;
 		prev_y = y;
 		prev_z = z;
-
-		firstframe = false;
 	end
 
-	if lock_y then -- TODO: Checkbox?
+	if lock_y and exactlyOneFrameHasPassed then -- TODO: Checkbox?
 		if (not Game.speedy_invert_Y and y < prev_y) or (Game.speedy_invert_Y and y > prev_y) then
 			Game.setYPosition(prev_y);
 			y = prev_y;
@@ -1870,7 +1863,7 @@ local function plot_pos()
 	end
 
 	local isLagged = not Game.isPhysicsFrame();
-	if override_lag_detection then
+	if ScriptHawk.override_lag_detection then
 		emu.setislagged(isLagged);
 		if tastudio.engaged() then
 			tastudio.setlag(current_frame - 1, isLagged);
@@ -1878,7 +1871,7 @@ local function plot_pos()
 	end
 
 	if not isLagged then
-		if math.abs(current_frame - previous_frame) > 1 then
+		if not exactlyOneFrameHasPassed then
 			dx = 0;
 			dy = 0;
 			dz = 0;
@@ -1895,15 +1888,13 @@ local function plot_pos()
 		d = math.sqrt(dx*dx + dz*dz);
 		odometer = odometer + d;
 
-		if (max_dx ~= nil and max_dy ~= nil and max_dz ~= nil and max_d ~= nil) and (dx ~= nil and dy ~= nil and dz ~= nil and d ~= nil) then
-			if math.abs(dx) > max_dx then max_dx = math.abs(dx) end
-			if math.abs(dy) > max_dy then max_dy = math.abs(dy) end
-			if math.abs(dz) > max_dz then max_dz = math.abs(dz) end
-			if math.abs(current_frame - previous_frame) > 1 then
-				max_dx = 0; max_dy = 0; max_dz = 0;
-				max_d = 0;
-			end
-			if d > max_d then max_d = d end
+		max_dx = math.max(max_dx, math.abs(dx));
+		max_dy = math.max(max_dy, math.abs(dy));
+		max_dz = math.max(max_dz, math.abs(dz));
+		max_d = math.max(max_d, d);
+		if not exactlyOneFrameHasPassed then
+			max_dx = 0; max_dy = 0; max_dz = 0;
+			max_d = 0;
 		end
 
 		if ScriptHawk.smooth_moving_angle == true then

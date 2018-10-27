@@ -38,7 +38,7 @@ end
 
 -- TODO: Make this more accurate
 function Game.isPhysicsFrame()
-	override_lag_detection = false;
+	ScriptHawk.override_lag_detection = false;
 	return true;
 end
 

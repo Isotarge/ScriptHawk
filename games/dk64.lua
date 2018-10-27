@@ -8962,7 +8962,7 @@ Game.standardOSD = {
 	{"Odometer", category="positionStatsMore"},
 	{"Separator"},
 	{"Rot. X", Game.getXRotation, category="angle"},
-	{"Facing", Game.getYRotation, category="angle", Game.colorYRotation},
+	{"Facing", Game.getYRotation, Game.colorYRotation, category="angle"},
 	--{"Moving", Game.getMovingRotation, "angle"}, -- TODO: Game.getMovingRotation
 	{"Rot. Z", Game.getZRotation, category="angle"},
 	{"Movement", Game.getMovementState, category="movement"},
