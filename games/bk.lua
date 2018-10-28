@@ -2863,27 +2863,57 @@ function Game.setZPosition(value)
 	mainmemory.writefloat(Game.Memory.z_position + 0x10, value, true);
 end
 
+-- In one frame
+-- TODO: Allow n frames ahead
 function Game.getPredictedYPosition()
 	local frameRate = Game.getFrameRate();
 	local gravity = mainmemory.readfloat(Game.Memory.gravity, true) / frameRate;
 	return Game.getYPosition() + ((Game.getYVelocity() + gravity) / frameRate);
 end
 
+Game.predictedZipFrame = nil;
+Game.yPosRelativeToFloor = 0;
+Game.landingFrame = 0;
 function Game.getPredictedYPositionRelativeToFloor()
-	return Game.getPredictedYPosition() - Game.getFloor();
+	return Game.yPosRelativeToFloor;
 end
 
--- TODO: Predict N frames ahead based on current velocity, position, gravity, floor
+function Game.getPredictedLandingFrame()
+	return "in "..Game.landingFrame.." frames";
+end
+
 function Game.predictZip()
-	local predictedPositionRelativeToFloor = Game.getPredictedYPositionRelativeToFloor();
-	if predictedPositionRelativeToFloor <= -56 and predictedPositionRelativeToFloor > -66 then
-		return true;
+	local frameRate = Game.getFrameRate();
+	local gravity = mainmemory.readfloat(Game.Memory.gravity, true) / frameRate;
+	local floor = Game.getFloor();
+	local yPos = Game.getYPosition();
+	local yVel = Game.getYVelocity();
+	local yPosRelativeToFloor = 0;
+
+	Game.predictedZipFrame = nil;
+	if gravity < 0 then
+		for i = 0, 600 do -- Search max 600 frames ahead
+			yPosRelativeToFloor = yPos - floor;
+			if yPosRelativeToFloor < 0 then
+				Game.yPosRelativeToFloor = yPosRelativeToFloor;
+				Game.landingFrame = i;
+				if yPosRelativeToFloor <= -56 and yPosRelativeToFloor > -66 then
+					Game.predictedZipFrame = i;
+				end
+				break;
+			end
+			yVel = yVel + gravity;
+			yPos = yPos + (yVel / frameRate);
+		end
+		if Game.predictedZipFrame ~= nil then
+			return "true, in "..Game.predictedZipFrame.." frames";
+		end
 	end
 	return false;
 end
 
 function Game.colorZipPrediction()
-	if Game.predictZip() then
+	if Game.predictedZipFrame ~= nil then
 		return colors.green;
 	end
 end
@@ -3424,8 +3454,8 @@ Game.OSD = {
 	{"Separator"},
 	{"Floor", Game.getFloor, category="position"},
 	{"Zip", Game.predictZip, Game.colorZipPrediction, category="positionStats"},
-	--{"Next Y Pos", Game.getPredictedYPosition, category="positionStats"},
-	{"Next Y Pos Floor", Game.getPredictedYPositionRelativeToFloor, category="positionStats"},
+	{"Landing Y", Game.getPredictedYPositionRelativeToFloor, category="positionStats"},
+	{"Landing", Game.getPredictedLandingFrame, category="positionStats"},
 	{"Separator"},
 	{"Y Velocity", Game.getYVelocity, Game.colorYVelocity, category="speed"},
 	{"Velocity", Game.getVelocity, category="speed"};

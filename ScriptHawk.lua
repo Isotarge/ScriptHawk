@@ -1445,6 +1445,7 @@ function ScriptHawk.UI.updateReadouts()
 			end
 
 			-- Collect all OSD rows for telemetry, even if they're not visible
+			-- TODO: Only run the value functions if the row is visible or if we're collecting telemetry
 			if ScriptHawk.collecting_telemetry then
 				table.insert(telemetryDataThisFrame, value);
 			end
