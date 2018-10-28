@@ -2890,7 +2890,7 @@ function Game.predictZip()
 	local yVel = Game.getYVelocity();
 	local yPosRelativeToFloor = 0;
 
-	Game.predictedZipFrame = nil;
+	Game.zipPredicted = false;
 	if gravity < 0 then
 		for i = 0, 600 do -- Search max 600 frames ahead
 			yPosRelativeToFloor = yPos - floor;
@@ -2898,22 +2898,22 @@ function Game.predictZip()
 				Game.yPosRelativeToFloor = yPosRelativeToFloor;
 				Game.landingFrame = i;
 				if yPosRelativeToFloor <= -56 and yPosRelativeToFloor > -66 then
-					Game.predictedZipFrame = i;
+					Game.zipPredicted = true;
 				end
 				break;
 			end
 			yVel = yVel + gravity;
 			yPos = yPos + (yVel / frameRate);
 		end
-		if Game.predictedZipFrame ~= nil then
-			return "true, in "..Game.predictedZipFrame.." frames";
+		if Game.zipPredicted then
+			return true;
 		end
 	end
 	return false;
 end
 
 function Game.colorZipPrediction()
-	if Game.predictedZipFrame ~= nil then
+	if Game.zipPredicted then
 		return colors.green;
 	end
 end
