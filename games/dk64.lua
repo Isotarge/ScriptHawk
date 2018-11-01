@@ -153,8 +153,10 @@ local Game = {
 		frames_real = {0x7F0560, 0x7F0480, 0x7F09D0, nil}, -- TODO: Make sure freezing these stalls the main thread -- TODO: Kiosk
 		isg_active = {0x755070, 0x74F8F0, 0x755130, nil},
 		isg_timestamp = {0x7F5CE0, 0x7F5C00, 0x7F6150, nil},
+		isg_previous_fadeout = {0x7F5D14, 0x7F5C34, 0x7F6184, nil},
 		timestamp = {0x14FE0, 0x155C0, 0x15300, 0x72F880},
-		cutscene_will_play_next_map = {0x75533B, nil, nil, nil}, -- byte -- TODO: Find on all versions
+		cutscene_will_play_next_map = {0x75533B, 0x74FBBB, 0x7553FB, nil}, -- byte
+		cutscene_to_play_next_map = {0x75533E, 0x74FBBE, 0x7553FE, nil}, -- 2-byte
 		cutscene_active = {0x7444EC, 0x73EC3C, 0x743DAC, 0x6F1CCC},
 		cutscene = {0x7476F4, 0x741E54, 0x746FB4, 0x6F4464},
 		cutscene_type = {0x7476FC, 0x741E5C, 0x746FBC, 0x6F446C},
@@ -8155,6 +8157,16 @@ local function readTimestamp(address)
 	return major + minor; -- Seconds
 end
 
+isgFadeouts = {
+	-- [fadeoutNumber] = {timeWhenActivatedNTSC, timeWhenActivatedPAL, destinationMap, destinationCutscene},
+	[1] = {54.402840201712, 53.3563167242293, 172, 0}, -- 0:55
+	[2]	= {86.0060613902424, 84.3184562118823, 152, 0}, -- 1:25
+	[3]	= {158.617401149804, 155.501121154548, 172, 1}, -- 2:36
+	[4]	= {183.54729382101, 179.927929853791, 153, 7}, -- 3:01
+	[5]	= {208.719224903778, 204.596787380047, 152, 8}, -- 3:25
+	[6]	= {271.268708638889, 265.895772889864, 171, 0}, -- 4:26
+};
+
 function Game.drawUI()
 	updateCurrentInvisify();
 	forms.settext(ScriptHawk.UI.form_controls["Lag Factor Value Label"], lag_factor);
@@ -8188,6 +8200,30 @@ function Game.drawUI()
 				local isg_time = readTimestamp(Game.Memory.timestamp) - isg_start;
 				local timer_string = string.format("%.2d:%05.2f", isg_time / 60 % 60, isg_time % 60);
 				gui.text(16, 16, "ISG Timer: "..timer_string, nil, 'topright');
+				
+				introStoryStage = 0;
+				for i = 1, #isgFadeouts do
+					if Game.version == 2 then
+						if isg_time > isgFadeouts[i][2] then
+							introStoryStage = i;
+						end
+					else
+						if isg_time > isgFadeouts[i][1] then
+							introStoryStage = i;
+						end
+					end
+				end
+				lastFadeout = mainmemory.readbyte(Game.Memory.isg_previous_fadeout);
+				destinationMap = mainmemory.read_u32_be(Game.Memory.destination_map);
+				destinationCutscene = mainmemory.read_u16_be(Game.Memory.cutscene_to_play_next_map);
+				cutsceneFading = mainmemory.readbyte(Game.Memory.cutscene_will_play_next_map);
+				if introStoryStage > 0 then
+					if introStoryStage > lastFadeout then
+						gui.text(16, 32, "Fadeout "..introStoryStage.." pending", nil, 'topright');
+					elseif destinationMap == isgFadeouts[introStoryStage][3] and destinationCutscene == isgFadeouts[introStoryStage][4] and cutsceneFading == 1 then
+						gui.text(16, 32, "Fading (Fadeout "..introStoryStage..")", nil, 'topright');
+					end
+				end
 			end
 		else
 			--gui.text(16, 16, "Waiting for ISG", nil, 'topright');
