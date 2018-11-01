@@ -297,9 +297,7 @@ function zipToSelectedObject()
 		local objectY = mainmemory.readfloat(objectBase + 0xA4, true);
 		local objectZ = mainmemory.readfloat(objectBase + 0xA8, true);
 
-		Game.setXPosition(objectX);
-		Game.setYPosition(objectY);
-		Game.setZPosition(objectZ);
+		Game.setPosition(objectX, objectY, objectZ);
 	end
 end
 

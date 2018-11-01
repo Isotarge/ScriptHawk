@@ -962,9 +962,9 @@ function zipToSelectedObject()
 			desiredZ = mainmemory.readfloat(selectedObject + object_m2_properties.object_z, true) / 8;
 		end
 	end
+
 	-- Update player position
 	if type(desiredX) == "number" and type(desiredY) == "number" and type(desiredZ) == "number" then
-		-- Write position
 		Game.setPosition(desiredX, desiredY, desiredZ);
 	end
 end

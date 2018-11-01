@@ -7048,20 +7048,7 @@ function Game.zipToSelectedObject()
 
 		-- Update player position
 		if type(desiredX) == "number" and type(desiredY) == "number" and type(desiredZ) == "number" then
-			-- Check whether we need to lower floor
-			local currentFloor = mainmemory.readfloat(playerObject + obj_model1.floor, true);
-			if currentFloor > desiredY then
-				mainmemory.writefloat(playerObject + obj_model1.floor, desiredY, true);
-			end
-
-			-- Write position
-			mainmemory.writefloat(playerObject + obj_model1.x_pos, desiredX, true);
-			mainmemory.writefloat(playerObject + obj_model1.y_pos, desiredY, true);
-			mainmemory.writefloat(playerObject + obj_model1.z_pos, desiredZ, true);
-
-			-- Allow movement when locked to pads etc
-			mainmemory.writebyte(playerObject + obj_model1.locked_to_pad, 0x00);
-			mainmemory.write_u32_be(playerObject + obj_model1.collision_queue_pointer, 0x00);
+			Game.setPosition(desiredX, desiredY, desiredZ);
 		end
 	end
 end
@@ -8157,7 +8144,7 @@ local function readTimestamp(address)
 	return major + minor; -- Seconds
 end
 
-isgFadeouts = {
+local isgFadeouts = {
 	-- [fadeoutNumber] = {timeWhenActivatedNTSC, timeWhenActivatedPAL, destinationMap, destinationCutscene},
 	[1] = {54.402840201712, 53.3563167242293, 172, 0}, -- 0:55
 	[2] = {86.0060613902424, 84.3184562118823, 152, 0}, -- 1:25
@@ -8200,8 +8187,8 @@ function Game.drawUI()
 				local isg_time = readTimestamp(Game.Memory.timestamp) - isg_start;
 				local timer_string = string.format("%.2d:%05.2f", isg_time / 60 % 60, isg_time % 60);
 				gui.text(16, 16, "ISG Timer: "..timer_string, nil, 'topright');
-				
-				introStoryStage = 0;
+
+				local introStoryStage = 0;
 				for i = 1, #isgFadeouts do
 					if Game.version == 2 then
 						if isg_time > isgFadeouts[i][2] then
@@ -8213,10 +8200,10 @@ function Game.drawUI()
 						end
 					end
 				end
-				lastFadeout = mainmemory.readbyte(Game.Memory.isg_previous_fadeout);
-				destinationMap = mainmemory.read_u32_be(Game.Memory.destination_map);
-				destinationCutscene = mainmemory.read_u16_be(Game.Memory.cutscene_to_play_next_map);
-				cutsceneFading = mainmemory.readbyte(Game.Memory.cutscene_will_play_next_map);
+				local lastFadeout = mainmemory.readbyte(Game.Memory.isg_previous_fadeout);
+				local destinationMap = mainmemory.read_u32_be(Game.Memory.destination_map);
+				local destinationCutscene = mainmemory.read_u16_be(Game.Memory.cutscene_to_play_next_map);
+				local cutsceneFading = mainmemory.readbyte(Game.Memory.cutscene_will_play_next_map);
 				if introStoryStage > 0 then
 					if introStoryStage > lastFadeout then
 						gui.text(16, 32, "Fadeout "..introStoryStage.." pending", nil, 'topright');

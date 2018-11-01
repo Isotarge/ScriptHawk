@@ -55,6 +55,7 @@ local Game = {
 		jiggy_grabbed_behavior_struct_pointer = {0x37DE84, 0x37DFB4, 0x37C6B4, 0x37D4B4},
 		honeycomb_bitfield = {0x383CC0, 0x383E20, 0x382500, 0x3832E0},
 		mumbo_token_bitfield = {0x383CD0, 0x383E30, 0x382510, 0x3832F0},
+		clip_vel = {-2900, -3500, -3500, -3500}, -- Minimum velocity required to clip on the Y axis -- TODO: This seems to be different for different geometry
 	},
 	defaultFloor = -9000,
 	speedy_speeds = { .1, 1, 5, 10, 20, 35, 50, 75, 100 },
@@ -240,8 +241,6 @@ local framebuffer = { -- Larger on PAL
 	height = 200,
 };
 
-local clip_vel = -3500; -- Minimum velocity required to clip on the Y axis -- TODO: This seems to be different for different geometry
-
 local collectable_offsets = {
 	skull_hourglass_timer = 4,
 	propellor_timer = 12,
@@ -302,7 +301,6 @@ function Game.detectVersion(romName, romHash)
 		flag_array = require("games.bk_flags");
 		framebuffer.width = 292;
 		framebuffer.height = 216;
-		clip_vel = -2900;
 		max_air = 6 * 500;
 	elseif Game.version == 2 then -- Japan
 		flag_array = require("games.bk_flags");
@@ -2093,9 +2091,7 @@ function zipToSelectedObject()
 			local y = mainmemory.readfloat(slotBase + slot_variables_inv.Y, true);
 			local z = mainmemory.readfloat(slotBase + slot_variables_inv.Z, true);
 
-			Game.setXPosition(x);
-			Game.setYPosition(y);
-			Game.setZPosition(z);
+			Game.setPosition(x, y, z);
 		end
 	else
 		local rendererPointer = structPointers[object_index];
@@ -2104,9 +2100,7 @@ function zipToSelectedObject()
 			local y = mainmemory.read_s16_be(rendererPointer + 0x06);
 			local z = mainmemory.read_s16_be(rendererPointer + 0x08);
 
-			Game.setXPosition(x);
-			Game.setYPosition(y);
-			Game.setZPosition(z);
+			Game.setPosition(x, y, z);
 		end
 	end
 end
@@ -2980,7 +2974,7 @@ function Game.getYVelocity()
 end
 
 function Game.colorYVelocity()
-	if Game.getYVelocity() <= clip_vel then
+	if Game.getYVelocity() <= Game.Memory.clip_vel then
 		return colors.green;
 	end
 end

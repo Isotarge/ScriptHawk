@@ -943,9 +943,7 @@ function zipToSelectedObject()
 		local objectZ = mainmemory.readfloat(currentPointers[object_index] + object_fields.z_pos, true);
 
 		-- Set the player position to the object
-		Game.setXPosition(objectX);
-		Game.setYPosition(objectY);
-		Game.setZPosition(objectZ);
+		Game.setPosition(objectX, objectY, objectZ);
 	end
 end
 
