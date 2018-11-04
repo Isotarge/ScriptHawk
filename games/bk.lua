@@ -3425,33 +3425,39 @@ local function flagCheckButtonHandler()
 end
 
 function Game.initUI()
+	if not TASSafe then
+		ScriptHawk.UI.button(10, 7, {46}, nil, "Set Flag Button", "Set", flagSetButtonHandler);
+		ScriptHawk.UI.button(12, 7, {46}, nil, "Check Flag Button", "Check", flagCheckButtonHandler);
+		ScriptHawk.UI.button(14, 7, {46}, nil, "Clear Flag Button", "Clear", flagClearButtonHandler);
+
+		ScriptHawk.UI.checkbox(0, 6, "toggle_neverslip", "Never Slip");
+		ScriptHawk.UI.checkbox(5, 4, "encircle_checkbox", "Encircle (Beta)");
+		ScriptHawk.UI.checkbox(5, 5, "dynamic_radius_checkbox", "Dynamic Radius");
+		ScriptHawk.UI.checkbox(5, 6, "freeze_clip_velocity", "Freeze Clip Vel.");
+
+		ScriptHawk.UI.checkbox(10, 2, "beta_pause_menu_checkbox", "Beta Pause");
+
+		-- Actor spawner
+		ScriptHawk.UI.form_controls.actor_dropdown = forms.dropdown(ScriptHawk.UI.options_form, actorNames, ScriptHawk.UI.col(10) + ScriptHawk.UI.dropdown_offset, ScriptHawk.UI.row(0) + ScriptHawk.UI.dropdown_offset);
+		ScriptHawk.UI.button(10, 1, 2, nil, nil, "Spawn", spawner.spawn);
+		ScriptHawk.UI.checkbox({12, 10}, 1, "spawner_carry_checkbox", "Carry?");
+
+		-- Vile
+		--ScriptHawk.UI.button(10, 4, 2, nil, nil, "Wave", initWave);
+		--ScriptHawk.UI.button({12, 8}, 4, 2, nil, nil, "Heart", doHeart);
+		--ScriptHawk.UI.button(10, 5, {4, 8}, nil, nil, "Fire all", fireAllSlots);
+
+		-- Moves
+		ScriptHawk.UI.form_controls.moves_dropdown = forms.dropdown(ScriptHawk.UI.options_form, { "4. None", "3. SM 100%", "2. FFM Setup", "1. All", "0. Demo" }, ScriptHawk.UI.col(10) + ScriptHawk.UI.dropdown_offset, ScriptHawk.UI.row(5) + ScriptHawk.UI.dropdown_offset, ScriptHawk.UI.col(4) + 8, ScriptHawk.UI.button_height);
+		ScriptHawk.UI.button(10, 6, {4, 8}, nil, nil, "Unlock Moves", unlock_moves);
+	else
+		-- Bigger check flag button if the other two are hidden
+		ScriptHawk.UI.button(10, 7, {4, 10}, nil, "Check Flag Button", "Check Flag", flagCheckButtonHandler);
+	end
+
 	ScriptHawk.UI.form_controls["Flag Dropdown"] = forms.dropdown(ScriptHawk.UI.options_form, flag_names, ScriptHawk.UI.col(0) + ScriptHawk.UI.dropdown_offset, ScriptHawk.UI.row(7) + ScriptHawk.UI.dropdown_offset, ScriptHawk.UI.col(9) + 8, ScriptHawk.UI.button_height);
-	ScriptHawk.UI.button(10, 7, {46}, nil, "Set Flag Button", "Set", flagSetButtonHandler);
-	ScriptHawk.UI.button(12, 7, {46}, nil, "Check Flag Button", "Check", flagCheckButtonHandler);
-	ScriptHawk.UI.button(14, 7, {46}, nil, "Clear Flag Button", "Clear", flagClearButtonHandler);
 
-	ScriptHawk.UI.checkbox(0, 6, "toggle_neverslip", "Never Slip");
-
-	ScriptHawk.UI.checkbox(5, 4, "encircle_checkbox", "Encircle (Beta)");
-	ScriptHawk.UI.checkbox(5, 5, "dynamic_radius_checkbox", "Dynamic Radius");
-	ScriptHawk.UI.checkbox(5, 6, "freeze_clip_velocity", "Freeze Clip Vel.");
-
-	ScriptHawk.UI.checkbox(10, 2, "beta_pause_menu_checkbox", "Beta Pause");
 	ScriptHawk.UI.checkbox(10, 4, "autopound_checkbox", "Auto Pound");
-
-	-- Actor spawner
-	ScriptHawk.UI.form_controls.actor_dropdown = forms.dropdown(ScriptHawk.UI.options_form, actorNames, ScriptHawk.UI.col(10) + ScriptHawk.UI.dropdown_offset, ScriptHawk.UI.row(0) + ScriptHawk.UI.dropdown_offset);
-	ScriptHawk.UI.button(10, 1, 2, nil, nil, "Spawn", spawner.spawn);
-	ScriptHawk.UI.checkbox({12, 10}, 1, "spawner_carry_checkbox", "Carry?");
-
-	-- Vile
-	--ScriptHawk.UI.button(10, 4, 2, nil, nil, "Wave", initWave);
-	--ScriptHawk.UI.button({12, 8}, 4, 2, nil, nil, "Heart", doHeart);
-	--ScriptHawk.UI.button(10, 5, {4, 8}, nil, nil, "Fire all", fireAllSlots);
-
-	-- Moves
-	ScriptHawk.UI.form_controls.moves_dropdown = forms.dropdown(ScriptHawk.UI.options_form, { "4. None", "3. SM 100%", "2. FFM Setup", "1. All", "0. Demo" }, ScriptHawk.UI.col(10) + ScriptHawk.UI.dropdown_offset, ScriptHawk.UI.row(5) + ScriptHawk.UI.dropdown_offset, ScriptHawk.UI.col(4) + 8, ScriptHawk.UI.button_height);
-	ScriptHawk.UI.button(10, 6, {4, 8}, nil, nil, "Unlock Moves", unlock_moves);
 
 	-- Create Inverse Object_Slot_Variables
 	for k, v in pairs(slot_variables) do
