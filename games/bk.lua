@@ -9,10 +9,13 @@ local Game = {
 	squish_memory_table = true,
 	Memory = { -- Version order: Europe, Japan, US 1.1, US 1.0
 		fb_pointer = {0x282E00, 0x281E20, 0x281E20, 0x282FE0},
+		game_time_scale_multiplier = {0x384E60, 0x384FC0, 0x3836A0, 0x384480},
+		game_speed_coefficient = {0x3723A0, 0x372B20, 0x371020, 0x371E20},
 		frame_timer = {0x280700, 0x27F718, 0x27F718, 0x2808D8},
 		floor_object_pointer = {0x37CBD0, 0x37CD00, 0x37B400, 0x37C200},
 		carried_object_pointer = {0x37CC68, 0x37CD98, 0x37B498, 0x37C298},
 		slope_timer = {0x37CCB4, 0x37CDE4, 0x37B4E4, 0x37C2E4},
+		beak_bomb_available_timer = {0x37DCF0, 0x37DE20, 0x37C520, 0x37D320},
 		player_grounded = {0x37C930, 0x37CA60, 0x37B160, 0x37BF60},
 		wall_collisions = {0x37CC4D, 0x37CD7D, 0x37B47D, 0x37C27D},
 		moves_bitfield = {0x37CD70, 0x37CEA0, 0x37B5A0, 0x37C3A0},
@@ -335,6 +338,11 @@ function Game.detectVersion(romName, romHash)
 	return true;
 end
 
+-- The amount that many timers decrement per frame
+function Game.getSpeed()
+	return mainmemory.readfloat(Game.Memory.game_time_scale_multiplier, true) * mainmemory.readfloat(Game.Memory.game_speed_coefficient, true);
+end
+
 function Game.isGrounded()
 	return mainmemory.read_u32_be(Game.Memory.player_grounded) > 0;
 end
@@ -349,6 +357,45 @@ end
 
 function Game.getSlopeTimer()
 	return mainmemory.readfloat(Game.Memory.slope_timer, true);
+end
+
+function Game.isBeakBombAvailable()
+	-- Check whether the move is unlocked
+	if not Game.isMoveUnlocked(Game.moves.BeakBomb) then
+		return false;
+	end
+	-- Check whether we're flying
+	if not (mainmemory.read_u32_be(Game.Memory.current_movement_state) == 36) then -- Flying
+		return false;
+	end
+	-- Check that we've got a feather available
+	if mainmemory.read_s32_be(Game.Memory.collectable_base + collectable_offsets.red_feathers) < 1 then
+		return false;
+	end
+	-- Check that the beak bomb timer is <= zero
+	local bombTimer = mainmemory.readfloat(Game.Memory.beak_bomb_available_timer, true);
+	if bombTimer <= 0 then
+		return true;
+	end
+	-- The bomb timer is decremented before it's checked next frame, so we should calculate ahead and see when it's going to happen
+	local speed = Game.getSpeed();
+	if speed > 0 and bombTimer > 0 then
+		local framesRemaining = bombTimer / speed - 2;
+		if framesRemaining <= 0 then
+			return true;
+		end
+		return math.floor(framesRemaining + 0.5).." frames";
+	end
+	return false;
+end
+
+function Game.colorBeakBombAvailable()
+	local bombAvailable = Game.isBeakBombAvailable();
+	if type(bombAvailable) == "string" then
+		return colors.yellow;
+	elseif bombAvailable then
+		return colors.green;
+	end
 end
 
 function Game.colorSlopeTimer()
@@ -397,6 +444,34 @@ local move_levels = {
 local function unlock_moves()
 	local level = forms.gettext(ScriptHawk.UI.form_controls.moves_dropdown);
 	mainmemory.write_u32_be(Game.Memory.moves_bitfield, move_levels[level]);
+end
+
+Game.moves = {
+	BeakBarge = 0,
+	BeakBomb = 1,
+	BeakBuster = 2,
+	CameraControls = 3,
+	BearPunch = 4,
+	ClimbTrees = 5,
+	Eggs = 6,
+	FeatheryFlap = 7,
+	FlapFlip = 8,
+	Flying = 9,
+	HoldAToJumpHigher = 10,
+	RatATatRap = 11,
+	Roll = 12,
+	ShockSpringJump = 13,
+	WadingBoots = 14,
+	Dive = 15,
+	TalonTrot = 16,
+	TurboTalonTrainers = 17,
+	Wonderwing = 18,
+	FirstNoteDoorMolehill = 19,
+};
+
+function Game.isMoveUnlocked(index)
+	local bitfieldValue = mainmemory.read_u32_be(Game.Memory.moves_bitfield);
+	return bit.check(bitfieldValue, index);
 end
 
 --------------------
@@ -2862,6 +2937,9 @@ end
 function Game.getPredictedYPosition()
 	local frameRate = Game.getFrameRate();
 	local gravity = mainmemory.readfloat(Game.Memory.gravity, true) / frameRate;
+	if mainmemory.read_u32_be(Game.Memory.current_movement_state) == 36 then -- Flying
+		gravity = 0;
+	end
 	return Game.getYPosition() + ((Game.getYVelocity() + gravity) / frameRate);
 end
 
@@ -2883,6 +2961,7 @@ function Game.predictZip()
 	local yPos = Game.getYPosition();
 	local yVel = Game.getYVelocity();
 	local yPosRelativeToFloor = 0;
+	local inAir = mainmemory.read_u32_be(Game.Memory.current_movement_state) == 36;
 
 	Game.zipPredicted = false;
 	if gravity < 0 then
@@ -2896,7 +2975,9 @@ function Game.predictZip()
 				end
 				break;
 			end
-			yVel = yVel + gravity;
+			if not inAir then
+				yVel = yVel + gravity;
+			end
 			yPos = yPos + (yVel / frameRate);
 		end
 		if Game.zipPredicted then
@@ -3464,6 +3545,7 @@ Game.OSD = {
 	{"Slope Timer", Game.getSlopeTimer, Game.colorSlopeTimer, category="floorProperties"},
 	{"Grounded", Game.isGrounded, category="floorProperties"},
 	{"Wall Collisions", Game.getWallCollisions, category="wallProperties"},
+	{"Beak Bomb Available", Game.isBeakBombAvailable, Game.colorBeakBombAvailable, category="movement"},
 	{"Separator"},
 	{"Facing", Game.getFacingAngle, category="angle"},
 	{"Moving", Game.getYRotation, category="angle"},

@@ -235,7 +235,7 @@ SystemID N64
 383301	b	u	1	RDRAM	Current Level Index
 383328	b	h	1	RDRAM	Sandcastle Water State
 383384	d	f	1	RDRAM	Text Timer
-384480	d	f	1	RDRAM	
+384480	d	f	1	RDRAM	Game Time Scale Factor
 384484	d	u	1	RDRAM	Game Time Scale Factor
 385F60	d	s	1	RDRAM	Notes (on hand)
 385F64	d	s	1	RDRAM	Eggs
