@@ -112,7 +112,9 @@ function Game.eachFrame()
 end
 
 function Game.initUI()
-	ScriptHawk.UI.checkbox(0, 6, "Fast Mode Checkbox", "Fast Mode");
+	if not TASSafe then
+		ScriptHawk.UI.checkbox(0, 6, "Fast Mode Checkbox", "Fast Mode");
+	end
 end
 
 Game.OSD = {

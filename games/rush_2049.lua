@@ -60,7 +60,9 @@ function Game.setVelocity(value)
 end
 
 function Game.initUI()
-	ScriptHawk.UI.button(10, 0, {4, 10}, nil, nil, "Unlock Cheats", Game.unlockCheats);
+	if not TASSafe then
+		ScriptHawk.UI.button(10, 0, {4, 10}, nil, nil, "Unlock Cheats", Game.unlockCheats);
+	end
 end
 
 Game.OSD = {

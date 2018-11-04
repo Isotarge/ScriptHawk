@@ -58,7 +58,7 @@ local Game = {
 		"Unknown 35",
 		"Tall Tall Mountain",
 		"Unknown 37",
-		"Unknown 38"
+		"Unknown 38",
 	},
 	speedy_speeds = { .001, .01, .1, 1, 5, 10, 20, 50, 100 },
 	speedy_index = 7,

@@ -46,7 +46,7 @@ local colors = {
 	[4] = "Yellow",
 	[5] = "Purple",
 	[6] = "Dark Blue",
-	[7] = "!"
+	[7] = "!",
 };
 
 -- Status

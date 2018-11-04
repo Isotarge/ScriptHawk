@@ -354,7 +354,7 @@ local Game = {
 		[16] = "Van",
 		[17] = "Clockwork Kazooie",
 		[18] = "Small T-Rex",
-		[19] = "Big T-Rex"
+		[19] = "Big T-Rex",
 	},
 	character_change_lookup = {
 		["BK"] = 1,
@@ -373,7 +373,7 @@ local Game = {
 		["Van"] = 16,
 		["Cwk Kazooie"] = 17,
 		["Small T-Rex"] = 18,
-		["Big T-Rex"] = 19
+		["Big T-Rex"] = 19,
 	};
 };
 
@@ -5329,7 +5329,7 @@ local function getExamineData(pointer)
 	if currentObjectName == "Jinjo" then
 		table.insert(examine_data, { "Jinjo Identifier", getJinjoIdentifierOSD(pointer) });
 	end
-	
+
 	if currentObjectName == "Banjo's Hand" then
 		table.insert(examine_data, { "Option Selected", getHandItemSelected(mainmemory.readbyte(pointer + object_model1.banjo_hand.item_selected)) });
 	end

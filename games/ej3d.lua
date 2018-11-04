@@ -149,7 +149,7 @@ Game.max_rot_units = 360;
 
 function Game.calculateAngle(angle1,angle2)
 	angle_1 = 90 * (angle1 + 1);
-	
+
 	if angle2 < 0 then
 		angle = (angle_1 * (0 - 1)) - 90;
 	else
@@ -157,7 +157,6 @@ function Game.calculateAngle(angle1,angle2)
 	end
 	return angle;
 end
-
 
 function Game.getXRotation()
 	return mainmemory.readfloat(Game.Memory.x_rotation, true);
@@ -303,12 +302,12 @@ end
 
 function Game.reloadMap()
 	mainmemory.writebyte(Game.Memory.reload_map, 1);
-	Game.checkMapSoftlock()
+	Game.checkMapSoftlock();
 end
 
 function Game.reloadMapHard()
 	mainmemory.writebyte(Game.Memory.current_map, 255);
-	Game.reloadMap()
+	Game.reloadMap();
 end
 
 function Game.getMapOSD()
@@ -359,7 +358,7 @@ function Game.freeroamEnabled()
 		YStored = Game.getYPosition();
 		IsYStored = 1;
 	end
-	
+
 	-- detect if L to Levitate
 	joypad_pressed = {};
 	input_pressed = {};
@@ -369,9 +368,9 @@ function Game.freeroamEnabled()
 	if lbutton_pressed then
 		YStored = Game.getYPosition() + Game.speedy_speeds[Game.speedy_index];
 	end
-	
+
 	Game.setYPosition(YStored);
-	
+
 	-- Cancel falling
 	if mainmemory.readbyte(Game.Memory.jim_pointer + jim.movement) == 2 then
 		mainmemory.writebyte(Game.Memory.jim_pointer + jim.movement, 21);
@@ -397,32 +396,34 @@ function Game.toggleConsoleMode()
 end
 
 function Game.getConsoleMode()
-	if console_mode == 1 then
-		forms.settext(ScriptHawk.UI.form_controls["Console Mode Switch"], "N64 Mode");
-		twirl_yFreeze = 1;
-		roll_cap = 1;
-		walljump_hack = 1;
-	elseif console_mode == 2 then
-		forms.settext(ScriptHawk.UI.form_controls["Console Mode Switch"], "PC Mode");
-		twirl_yFreeze = 0;
-		roll_cap = 1;
-		walljump_hack = 0;
-	else
-		forms.settext(ScriptHawk.UI.form_controls["Console Mode Switch"], "Emulator Mode");
-		twirl_yFreeze = 0;
-		roll_cap = 0;
-		walljump_hack = 0;
+	if not TASSafe then
+		if console_mode == 1 then
+			forms.settext(ScriptHawk.UI.form_controls["Console Mode Switch"], "N64 Mode");
+			twirl_yFreeze = 1;
+			roll_cap = 1;
+			walljump_hack = 1;
+		elseif console_mode == 2 then
+			forms.settext(ScriptHawk.UI.form_controls["Console Mode Switch"], "PC Mode");
+			twirl_yFreeze = 0;
+			roll_cap = 1;
+			walljump_hack = 0;
+		else
+			forms.settext(ScriptHawk.UI.form_controls["Console Mode Switch"], "Emulator Mode");
+			twirl_yFreeze = 0;
+			roll_cap = 0;
+			walljump_hack = 0;
+		end
 	end
 end
 
 function Game.applyConsoleSettings()
 	-- List of edits to make more accurate to N64 or PC release
-		
+
 	if twirl_yFreeze == 1 then	-- NO TWIRL HEIGHT GAIN
 		animation_value = mainmemory.readbyte(Game.Memory.jim_pointer + jim.animation);
 		animation_frame = mainmemory.read_u16_be(Game.Memory.jim_pointer + jim.animation_timer);
 		movement_value = mainmemory.readbyte(Game.Memory.jim_pointer + jim.movement);
-		
+
 		if animation_value == 29 and movement_value == 20 then
 			if twirlStoredY == nil then
 				if Game.version == 1 then -- US
@@ -734,7 +735,7 @@ local function getExamineM1Data(pointer)
 	if not isRDRAM(pointer) then
 		return examine_data;
 	end
-	
+
 	local objectPtrPtr = dereferencePointer(pointer + object_properties.object_pointer_to_pointer);
 	local objectPointer = dereferencePointer(objectPtrPtr);
 	local modelPointer = dereferencePointer(pointer + object_properties.object_model_pointer);
@@ -743,7 +744,7 @@ local function getExamineM1Data(pointer)
 	local zPos = mainmemory.readfloat(pointer + object_properties.object_z, true);
 	local hasPosition = hasModel or xPos ~= 0 or yPos ~= 0 or zPos ~= 0;
 	local objectVal = getObjectM1Value(pointer)
-	
+
 	table.insert(examine_data, { "Address", toHexString(objectPointer) });
 	table.insert(examine_data, { "Object Name", getObjectM1NameFromValue(objectVal) });
 	table.insert(examine_data, { "Object Value", toHexString(objectVal) });
@@ -1013,15 +1014,15 @@ end
 
 function checkFlagArray()
 	flag_start = dereferencePointer(Game.Memory.flag_pointer);
+	currentFrame = emu.framecount();
 	if isRDRAM(flag_start) then
 		if flag_Array[1] ~= nil then -- flag array populated
 			for i = 1, flag_block_size do
 				currentFlagState = mainmemory.readbyte(flag_start + i);
-				currentFrame = emu.framecount();
 				if flagBlock[i] ~= nil then
-					flag_name = flagBlock[i]["name"]
+					flag_name = flagBlock[i]["name"];
 				else
-					flag_name = "Unknown ("..toHexString(i)..")"
+					flag_name = "Unknown ("..toHexString(i)..")";
 				end
 				if flag_Array[i] ~= currentFlagState then -- Flag has changed states
 					if currentFlagState == 1 then
@@ -1267,46 +1268,54 @@ ScriptHawk.bindKeyRealtime("C", switch_grab_script_mode, true);
 
 local labelValue = 0;
 function Game.initUI()
-	ScriptHawk.UI.button(5, 4, {4, 10}, nil, "Reload Map (Soft)", "Reload Map", Game.reloadMap);
-	ScriptHawk.UI.button(10, 0, {4, 10}, nil, "Reload Map (Hard)", "Hard Reload", Game.reloadMapHard);
-	ScriptHawk.UI.button(10, 1, {4, 10}, nil, "Kill Boss", "Kill Boss", Game.killBoss);
-	ScriptHawk.UI.checkbox(5, 5, "OoB Timer Checkbox", "OoB Timer Off");
-	ScriptHawk.UI.checkbox(5, 6, "Free Roam Mode", "Free Roam Mode");
-	ScriptHawk.UI.button(10, 4, {4, 10}, nil, "Console Mode Switch", "Emulator Mode", Game.toggleConsoleMode);
+	if not TASSafe then
+		ScriptHawk.UI.button(5, 4, {4, 10}, nil, "Reload Map (Soft)", "Reload Map", Game.reloadMap);
+		ScriptHawk.UI.button(10, 0, {4, 10}, nil, "Reload Map (Hard)", "Hard Reload", Game.reloadMapHard);
+		ScriptHawk.UI.button(10, 1, {4, 10}, nil, "Kill Boss", "Kill Boss", Game.killBoss);
+		ScriptHawk.UI.checkbox(5, 5, "OoB Timer Checkbox", "OoB Timer Off");
+		ScriptHawk.UI.checkbox(5, 6, "Free Roam Mode", "Free Roam Mode");
+		ScriptHawk.UI.button(10, 4, {4, 10}, nil, "Console Mode Switch", "Emulator Mode", Game.toggleConsoleMode);
+
+		ScriptHawk.UI.button(10, 7, {46}, nil, "Set Flag Button", "Set", flagSetButtonHandler);
+		ScriptHawk.UI.button(12, 7, {46}, nil, "Check Flag Button", "Check", flagCheckButtonHandler);
+		ScriptHawk.UI.button(14, 7, {46}, nil, "Clear Flag Button", "Clear", flagClearButtonHandler);
+	else
+		-- Use a bigger check flags button if the others are hidden by TASSafe
+		ScriptHawk.UI.button(10, 7, {4, 10}, nil, "Check Flag Button", "Check Flag", flagCheckButtonHandler);
+	end
 
 	getFlagNameArray();
 	ScriptHawk.UI.form_controls["Flag Dropdown"] = forms.dropdown(ScriptHawk.UI.options_form, flagNameBlock, ScriptHawk.UI.col(0) + ScriptHawk.UI.dropdown_offset, ScriptHawk.UI.row(7) + ScriptHawk.UI.dropdown_offset, ScriptHawk.UI.col(9) + 8, ScriptHawk.UI.button_height);
-	ScriptHawk.UI.button(10, 7, {46}, nil, "Set Flag Button", "Set", flagSetButtonHandler);
-	ScriptHawk.UI.button(12, 7, {46}, nil, "Check Flag Button", "Check", flagCheckButtonHandler);
-	ScriptHawk.UI.button(14, 7, {46}, nil, "Clear Flag Button", "Clear", flagClearButtonHandler);
 	ScriptHawk.UI.checkbox(10, 6, "realtime_flags", "Realtime Flags", true);
 	flagStats();
+end
+
+function Game.drawUI()
+	drawGrabScriptUI();
 end
 
 function Game.realTime()
 --	if ScriptHawk.UI.ischecked("Fix Input Bug") then
 --		Game.fixInputBug();
 --	end
-	Game.getConsoleMode()
-	drawGrabScriptUI()
+	Game.getConsoleMode();
 end
 
 function Game.eachFrame()
 	if ScriptHawk.UI.ischecked("OoB Timer Checkbox") then
-		Game.FreezeOoBTimer()
+		Game.FreezeOoBTimer();
 	end
 
 	if ScriptHawk.UI.ischecked("Free Roam Mode") then
-		Game.freeroamEnabled()
+		Game.freeroamEnabled();
 	else
-		Game.freeroamDisabled()
+		Game.freeroamDisabled();
 	end
 
-	drawGrabScriptUI()
-	Game.applyConsoleSettings()
+	Game.applyConsoleSettings();
 	if ScriptHawk.UI.ischecked("realtime_flags") then
-		checkFlagArray()
-		getFlagArray()
+		checkFlagArray();
+		getFlagArray();
 	end
 end
 

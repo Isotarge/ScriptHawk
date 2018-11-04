@@ -19,10 +19,10 @@ local Game = {
 		continue_map = 0xCAE,
 		continues_used = 0xCAF,
 		movement_state = 0x401,
-		x_position = 0x40A, -- 1 byte (screen)
-		y_position = 0x407, -- 1 byte (screen)
-		x_velocity = 0x413, -- 3 byte
-		y_velocity = 0x410, -- 2 byte
+		x_position = 0x409, -- s16.8 fixed point (relative to screen)
+		y_position = 0x406, -- 8.8 fixed point (relative to screen)
+		x_velocity = 0x413, -- s16.8 fixed point
+		y_velocity = 0x410, -- 8.8 fixed point
 		facing_direction = 0x421,
 		in_air = 0x422,
 		sword_damage = 0xCA8,
@@ -267,6 +267,13 @@ function Game.read_s16_8(base)
 	return major + sub;
 end
 
+function Game.write_s16_8(base, value)
+	local major = math.floor(value);
+	local sub = (value - major) * 256;
+	mainmemory.writebyte(base, sub);
+	mainmemory.write_s16_le(base + 1, major);
+end
+
 function Game.isGrounded()
 	return mainmemory.readbyte(Game.Memory.in_air) == 0x00;
 end
@@ -307,11 +314,11 @@ function Game.getMapX()
 end
 
 function Game.getXPosition()
-	return Game.getMapX() + mainmemory.readbyte(Game.Memory.x_position);
+	return Game.getMapX() + Game.read_s16_8(Game.Memory.x_position);
 end
 
 function Game.getYPosition()
-	return mainmemory.readbyte(Game.Memory.y_position);
+	return mainmemory.read_u16_le(Game.Memory.y_position) / 256;
 end
 
 function Game.getXVelocity()
@@ -358,10 +365,11 @@ local object_array_base = 0x400;
 local object_array_capacity = 23;
 local object_fields = {
 	object_type = 0x00,
-	x_position = 0x0A,
-	y_position = 0x07,
+	x_position = 0x09, -- s16.8 fixed point (relative to screen)
+	y_position = 0x06, -- 8.8 fixed point (relative to screen)
+	x_velocity = 0x13, -- s16.8 fixed point
+	y_velocity = 0x10, -- 8.8 fixed point
 	object_loaded = 0x0B,
-	y_velocity = 0x11,
 	currentHP = 0x3A,
 	bossHP = 0x34,
 	boss_defeated = 0x3E,
@@ -435,10 +443,11 @@ function Game.getHitboxes()
 		};
 		local objectType = mainmemory.readbyte(hitbox.objectBase + object_fields.object_type);
 		local objectLoaded = mainmemory.readbyte(hitbox.objectBase + object_fields.object_loaded);
+		local screenX = Game.getMapX();
 		if objectType > 0 and objectLoaded == 0 then
 			hitbox.dragTag = hitbox.objectBase;
-			hitbox.x = mainmemory.readbyte(hitbox.objectBase + object_fields.x_position);
-			hitbox.y = mainmemory.readbyte(hitbox.objectBase + object_fields.y_position);
+			hitbox.x = Game.read_s16_8(hitbox.objectBase + object_fields.x_position);
+			hitbox.y = mainmemory.read_u16_le(hitbox.objectBase + object_fields.y_position) / 256;
 			hitbox.currentHP = mainmemory.readbyte(hitbox.objectBase + object_fields.currentHP);
 			hitbox.objectType = "Unknown "..toHexString(objectType);
 
@@ -455,7 +464,7 @@ function Game.getHitboxes()
 				end
 
 				if type(objectTypeTable.hitbox_x_offset) == "number" then
-					hitbox.xOffset = objectTypeTable.hitbox_x_offset;
+					hitbox.xOffset = objectTypeTable.hitbox_x_offset - screenX;
 				end
 				if type(objectTypeTable.hitbox_y_offset) == "number" then
 					hitbox.yOffset = objectTypeTable.hitbox_y_offset;
@@ -475,14 +484,14 @@ function Game.getHitboxes()
 end
 
 function Game.setHitboxPosition(hitbox, x, y)
-	mainmemory.writebyte(hitbox.objectBase + object_fields.x_position, x);
-	mainmemory.writebyte(hitbox.objectBase + object_fields.y_position, y);
+	Game.write_s16_8(hitbox.objectBase + object_fields.x_position, x);
+	mainmemory.write_u16_le(hitbox.objectBase + object_fields.y_position, y * 256);
 end
 
 function Game.getHitboxMouseOverText(hitbox)
 	return {
 		hitbox.objectType,
-		toHexString(hitbox.objectBase).." "..hitbox.x..","..hitbox.y,
+		toHexString(hitbox.objectBase).." "..round(hitbox.x)..","..round(hitbox.y),
 		hitbox.currentHP.."HP",
 	};
 end
@@ -494,7 +503,7 @@ function Game.getHitboxStaticText(hitbox)
 end
 
 function Game.getHitboxListText(hitbox)
-	return hitbox.x..", "..hitbox.y.." - "..hitbox.objectType.." "..hitbox.currentHP.."HP "..toHexString(hitbox.objectBase);
+	return round(hitbox.x)..", "..round(hitbox.y).." - "..hitbox.objectType.." "..hitbox.currentHP.."HP "..toHexString(hitbox.objectBase);
 end
 
 function Game.killEnemies()
@@ -818,10 +827,15 @@ function Game.eachFrame()
 end
 
 function Game.initUI()
+	if not TASSafe then
+		ScriptHawk.UI.button(10, 7, {46}, nil, "Set Flag Button", "Set", flagSetButtonHandler);
+		ScriptHawk.UI.button(12, 7, {46}, nil, "Check Flag Button", "Check", flagCheckButtonHandler);
+		ScriptHawk.UI.button(14, 7, {46}, nil, "Clear Flag Button", "Clear", flagClearButtonHandler);
+	else
+		-- Use a bigger check flags button if the others are hidden by TASSafe
+		ScriptHawk.UI.button(10, 7, {4, 10}, nil, "Check Flag Button", "Check Flag", flagCheckButtonHandler);
+	end
 	ScriptHawk.UI.form_controls["Flag Dropdown"] = forms.dropdown(ScriptHawk.UI.options_form, flag_names, ScriptHawk.UI.col(0) + ScriptHawk.UI.dropdown_offset, ScriptHawk.UI.row(7) + ScriptHawk.UI.dropdown_offset, ScriptHawk.UI.col(9) + 8, ScriptHawk.UI.button_height);
-	ScriptHawk.UI.button(10, 7, {46}, nil, "Set Flag Button", "Set", flagSetButtonHandler);
-	ScriptHawk.UI.button(12, 7, {46}, nil, "Check Flag Button", "Check", flagCheckButtonHandler);
-	ScriptHawk.UI.button(14, 7, {46}, nil, "Clear Flag Button", "Clear", flagClearButtonHandler);
 end
 
 Game.OSD = {

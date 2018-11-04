@@ -653,9 +653,12 @@ function startBot()
 end
 
 function Game.initUI()
-	ScriptHawk.UI.button(10, 4, {4, 10}, nil, nil, "Complete Minimap", Game.completeMinimap);
-	ScriptHawk.UI.button(10, 5, {4, 10}, nil, nil, "Reset Best", Game.resetBestDistribution);
-	ScriptHawk.UI.checkbox(0, 6, "Toggle Overlay Checkbox", "Overlay", true)
+	if not TASSafe then
+		ScriptHawk.UI.button(10, 4, {4, 10}, nil, nil, "Complete Minimap", Game.completeMinimap);
+		ScriptHawk.UI.button(10, 5, {4, 10}, nil, nil, "Reset Best", Game.resetBestDistribution);
+	end
+
+	ScriptHawk.UI.checkbox(0, 6, "Toggle Overlay Checkbox", "Overlay", true);
 
 	-- Bot
 	--ScriptHawk.UI.form_controls.resetFrameBox = forms.textbox(ScriptHawk.UI.options_form, "Reset Frame", 100, 21, "UNSIGNED", ScriptHawk.UI.col(10) + 1, ScriptHawk.UI.row(0) + 1, false, true, "None");

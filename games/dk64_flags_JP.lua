@@ -209,14 +209,14 @@ return {
 	{byte=0x21, bit=4, name="Caves: Snide's Ice Wall Smashed", type="Physical", map=72},
 	{byte=0x21, bit=5, name="Caves: Chunky GB: Gorilla Gone", type="GB", map=72},
 	{byte=0x21, bit=7, name="Caves: Chunky GB: Ice Shield", type="GB", map=72},
-	
+
 	{byte=0x22, bit=0, name="Caves: Lanky GB: Ice Tomato", type="GB", map=98},
 	{byte=0x22, bit=3, name="Caves: Diddy GB: 5DI", type="GB", map=100},
 	{byte=0x22, bit=4, name="Caves: DK GB: 5DI", type="GB", map=86},
 	{byte=0x22, bit=5, name="Caves: DK GB: Rotating Room", type="GB", map=89},
 	{byte=0x22, bit=6, name="Caves: Rotating Room Intro CS", type="Cutscene", map=89},
 	{byte=0x22, bit=7, name="Caves: Chunky GB: 5DI", type="GB", map=95},
-	
+
 	{byte=0x23, bit=0, name="Caves: Tiny GB: 5DI", type="GB", map=84},
 	{byte=0x23, bit=1, name="Caves: Lanky 5DI Pads Spawned", type="Physical", map=85},
 	{byte=0x23, bit=2, name="Caves: Lanky GB: 5DI", type="GB", map=85},
@@ -693,7 +693,7 @@ return {
 
 	{byte=0x5A, bit=0, name="Caves: Lanky CB: Ice Castle Balloon", type="Balloon", map=98},
 	{byte=0x5A, bit=1, name="Caves: Diddy CB: 5DI Balloon", type="Balloon", map=100},
-	
+
 	{byte=0x5C, bit=0, name="Training Grounds: Rainbow Coin (Rear)", type="Rainbow Coin", map=176},
 	{byte=0x5C, bit=1, name="Training Grounds: Rainbow Coin (Banana Hoard)", type="Rainbow Coin", map=176},
 	{byte=0x5C, bit=4, name="Isles: Rainbow Coin (Castle Lobby)", type="Rainbow Coin"},

@@ -706,9 +706,11 @@ function Game.eachFrame()
 end
 
 function Game.initUI()
-	ScriptHawk.UI.button(10, 4, {4, 10}, nil, nil, "Build All", Game.buildAll);
-	ScriptHawk.UI.checkbox(0, 6, "mouse_control", "Mouse Control");
-	ScriptHawk.UI.checkbox(0, 7, "sandbox_mode", "Sandbox Mode");
+	if not TASSafe then
+		ScriptHawk.UI.button(10, 4, {4, 10}, nil, nil, "Build All", Game.buildAll);
+		ScriptHawk.UI.checkbox(0, 6, "mouse_control", "Mouse Control");
+		ScriptHawk.UI.checkbox(0, 7, "sandbox_mode", "Sandbox Mode");
+	end
 end
 
 Game.OSD = {

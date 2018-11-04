@@ -11,7 +11,7 @@ function fileExists(name)
 	return false;
 end
 
-console.clear()
+console.clear();
 if not fileExists(mmv_filename) then
 	print("No movie selected. Exiting.");
 	return;

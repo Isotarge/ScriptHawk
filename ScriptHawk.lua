@@ -73,12 +73,12 @@ end
 function ScriptHawk.UI.controlsOverlap(control1, control2)
 	local x1 = tonumber(forms.getproperty(control1, "Left"));
 	local y1 = tonumber(forms.getproperty(control1, "Top"));
-	local w1 = tonumber(forms.getproperty(control1, "Width"))
+	local w1 = tonumber(forms.getproperty(control1, "Width"));
 	local h1 = tonumber(forms.getproperty(control1, "Height"));
 
 	local x2 = tonumber(forms.getproperty(control2, "Left"));
 	local y2 = tonumber(forms.getproperty(control2, "Top"));
-	local w2 = tonumber(forms.getproperty(control2, "Width"))
+	local w2 = tonumber(forms.getproperty(control2, "Width"));
 	local h2 = tonumber(forms.getproperty(control2, "Height"));
 
 	--gui.drawRectangle(x1, y1, w1, h1);

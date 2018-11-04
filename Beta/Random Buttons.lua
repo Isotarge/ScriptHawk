@@ -50,8 +50,8 @@ local booleanInputsReference = {
 	"R",
 	"A",
 	"B",
-	"Z"
-}
+	"Z",
+};
 
 local function generateBooleanInputs()
 	local numInputs = math.random(0, max_boolean_inputs);

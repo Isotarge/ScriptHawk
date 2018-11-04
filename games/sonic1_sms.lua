@@ -164,7 +164,9 @@ function Game.eachFrame()
 end
 
 function Game.initUI()
-	ScriptHawk.UI.checkbox(0, 6, "CamHack Checkbox", "CamHack (Beta)");
+	if not TASSafe then
+		ScriptHawk.UI.checkbox(0, 6, "CamHack Checkbox", "CamHack (Beta)");
+	end
 end
 
 Game.OSD = {

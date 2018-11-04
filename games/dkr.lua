@@ -998,9 +998,12 @@ function Game.applyInfinites()
 end
 
 function Game.initUI()
-	ScriptHawk.UI.button(10, 4, {4, 10}, nil, nil, "Unlock Characters", Game.unlockCharacters);
+	if not TASSafe then
+		ScriptHawk.UI.button(10, 4, {4, 10}, nil, nil, "Unlock Characters", Game.unlockCharacters);
+		ScriptHawk.UI.checkbox(5, 5, "encircle_checkbox", "Encircle (beta)");
+	end
+
 	ScriptHawk.UI.checkbox(5, 4, "boost_info_checkbox", "Boost info");
-	ScriptHawk.UI.checkbox(5, 5, "encircle_checkbox", "Encircle (beta)");
 
 	ScriptHawk.UI.checkbox(0, 6, "otap_checkbox", "Auto tapper");
 	ScriptHawk.UI.form_controls.otap_boost_dropdown = forms.dropdown(ScriptHawk.UI.options_form, {"Yellow", "Blue", "None"}, ScriptHawk.UI.col(0) + ScriptHawk.UI.dropdown_offset, ScriptHawk.UI.row(7) + ScriptHawk.UI.dropdown_offset, ScriptHawk.UI.col(4), ScriptHawk.UI.button_height);

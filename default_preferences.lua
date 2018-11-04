@@ -147,9 +147,7 @@ defaultPreferences = {
 		holeContents=true,
 	},
 	gran_turismo_2 = {
-		car=true,
-		mapData=true,
-		cash=true,
+		general=true,
 		position=true,
 		positionStats=true,
 	},
