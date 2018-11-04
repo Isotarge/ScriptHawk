@@ -935,6 +935,18 @@ function Game.enableCameraLock()
 	camera_lock.enabled = true;
 end
 
+function Game.disableCameraLock()
+	camera_lock.enabled = false;
+end
+
+function Game.toggleCameraLock()
+	if camera_lock.enabled then
+		Game.disableCameraLock();
+	else
+		Game.enableCameraLock();
+	end
+end
+
 function Game.getCameraXPosition()
 	local cameraObject = Game.getCameraObject();
 	if isRDRAM(cameraObject) then
@@ -5593,27 +5605,38 @@ function Game.toggleDragonKazooie()
 end
 
 function Game.initUI()
-	-- Force Reload
-	ScriptHawk.UI.button(5, 4, {4, 10}, nil, nil, "Force Reload", Game.forceReload);
+	if not TASSafe then
+		-- Force Reload
+		ScriptHawk.UI.button(5, 4, {4, 10}, nil, nil, "Force Reload", Game.forceReload);
+
+		-- Flag stuff
+		ScriptHawk.UI.button(10, 7, {46}, nil, "Set Flag Button", "Set", flagSetButtonHandler);
+		ScriptHawk.UI.button(12, 7, {46}, nil, "Check Flag Button", "Check", flagCheckButtonHandler);
+		ScriptHawk.UI.button(14, 7, {46}, nil, "Clear Flag Button", "Clear", flagClearButtonHandler);
+
+		ScriptHawk.UI.checkbox(0, 6, "toggle_neverslip", "Never Slip");
+
+		-- Moves
+		ScriptHawk.UI.button(10, 0, {4, 10}, nil, nil, "Toggle Dragon Kazooie", Game.toggleDragonKazooie);
+		ScriptHawk.UI.form_controls.moves_dropdown = forms.dropdown(ScriptHawk.UI.options_form, { "All", "None" }, ScriptHawk.UI.col(7) - ScriptHawk.UI.dropdown_offset + 2, ScriptHawk.UI.row(1) + ScriptHawk.UI.dropdown_offset, ScriptHawk.UI.col(2) + 8, ScriptHawk.UI.button_height);
+		ScriptHawk.UI.button(10, 1, {4, 10}, nil, nil, "Unlock Moves", Game.unlockMoves);
+
+		-- Camera lock
+		ScriptHawk.UI.button(10, 2, {4, 10}, nil, nil, "Toggle Camera Lock", Game.toggleCameraLock);
+
+		-- Character Dropdown
+		ScriptHawk.UI.form_controls["Character Dropdown"] = forms.dropdown(ScriptHawk.UI.options_form, { "BK", "Snowball", "Cutscene", "Bee", "W. Machine", "Stony", "Breegull B.", "Solo Banjo", "Solo Kazooie", "Submarine", "Mumbo", "G. Goliath", "Detonator", "Van", "Cwk Kazooie", "Small T-Rex", "Big T-Rex" }, ScriptHawk.UI.col(5) - ScriptHawk.UI.dropdown_offset + 2, ScriptHawk.UI.row(5) + ScriptHawk.UI.dropdown_offset, ScriptHawk.UI.col(3) + 8, ScriptHawk.UI.button_height);
+		ScriptHawk.UI.checkbox(9, 5, "Character Checkbox", "");
+	else
+		-- Use a bigger check flags button if the others are hidden by TASSafe
+		ScriptHawk.UI.button(10, 7, {4, 10}, nil, "Check Flag Button", "Check Flag", flagCheckButtonHandler);
+	end
 
 	-- Flag stuff
 	ScriptHawk.UI.form_controls["Flag Dropdown"] = forms.dropdown(ScriptHawk.UI.options_form, flag_names, ScriptHawk.UI.col(0) + ScriptHawk.UI.dropdown_offset, ScriptHawk.UI.row(7) + ScriptHawk.UI.dropdown_offset, ScriptHawk.UI.col(9) + 8, ScriptHawk.UI.button_height);
-	ScriptHawk.UI.button(10, 7, {46}, nil, "Set Flag Button", "Set", flagSetButtonHandler);
-	ScriptHawk.UI.button(12, 7, {46}, nil, "Check Flag Button", "Check", flagCheckButtonHandler);
-	ScriptHawk.UI.button(14, 7, {46}, nil, "Clear Flag Button", "Clear", flagClearButtonHandler);
 	ScriptHawk.UI.checkbox(10, 6, "realtime_flags", "Realtime Flags", true);
 
-	ScriptHawk.UI.checkbox(0, 6, "toggle_neverslip", "Never Slip");
 	ScriptHawk.UI.checkbox(5, 6, "toggle_autojump", "Autojump");
-
-	-- Moves
-	ScriptHawk.UI.button(10, 0, {4, 10}, nil, nil, "Toggle Dragon Kazooie", Game.toggleDragonKazooie);
-	ScriptHawk.UI.form_controls.moves_dropdown = forms.dropdown(ScriptHawk.UI.options_form, { "All", "None" }, ScriptHawk.UI.col(7) - ScriptHawk.UI.dropdown_offset + 2, ScriptHawk.UI.row(1) + ScriptHawk.UI.dropdown_offset, ScriptHawk.UI.col(2) + 8, ScriptHawk.UI.button_height);
-	ScriptHawk.UI.button(10, 1, {4, 10}, nil, nil, "Unlock Moves", Game.unlockMoves);
-
-	-- Character Dropdown
-	ScriptHawk.UI.form_controls["Character Dropdown"] = forms.dropdown(ScriptHawk.UI.options_form, { "BK", "Snowball", "Cutscene", "Bee", "W. Machine", "Stony", "Breegull B.", "Solo Banjo", "Solo Kazooie", "Submarine", "Mumbo", "G. Goliath", "Detonator", "Van", "Cwk Kazooie", "Small T-Rex", "Big T-Rex" }, ScriptHawk.UI.col(5) - ScriptHawk.UI.dropdown_offset + 2, ScriptHawk.UI.row(5) + ScriptHawk.UI.dropdown_offset, ScriptHawk.UI.col(3) + 8, ScriptHawk.UI.button_height);
-	ScriptHawk.UI.checkbox(9, 5, "Character Checkbox", "");
 
 	flagStats();
 end
