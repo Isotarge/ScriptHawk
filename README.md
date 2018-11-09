@@ -119,6 +119,7 @@ A collection of Lua scripts and RAM watches for [BizHawk](https://github.com/TAS
 - The Ninja (SMS)
 - Ty the Tasmanian Tiger 2: Bush Rescue (GBA)
 - Tyrants - Fight Through Time (Mega Lo Mania) (Genesis)
+- Wonder Boy (SMS/GG)
 - Wonder Boy in Monster World (SMS)
 - Earthworm Jim 3D (N64)
 

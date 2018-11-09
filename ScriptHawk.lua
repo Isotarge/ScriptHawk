@@ -596,6 +596,12 @@ local supportedGames = {
 	["6D294B1A2C901AE61774754F6F533A34"] = {moduleName="games.tftt", friendlyName="Mega Lo Mania (J) [!]"},
 	["1FCFC9EE3BFFC25388735782B0CDB829A7E40507"] = {moduleName="games.tftt", friendlyName="Mega Lo Mania (F) [!]"},
 
+	-- Wonder Boy
+	["917C3E4F4C50D6506E64E2F05B945D9C"] = {moduleName="games.wonder_boy_sms", friendlyName="Wonder Boy (J)", version=2}, -- Game Gear
+	["03ADBEA26158137DE3F18D82E119C520"] = {moduleName="games.wonder_boy_sms", friendlyName="Wonder Boy (E)", version=2}, -- Game Gear
+	["A4E48850BF8799CFAC74B1D33F5900B5"] = {moduleName="games.wonder_boy_sms", friendlyName="Wonder Boy (JE)", version=1},
+	["7E805AA51BFB5F206C950A32EBCDAB7C"] = {moduleName="games.wonder_boy_sms", friendlyName="Wonder Boy (UE)", version=1},
+
 	-- Wonder Boy III
 	["E7F86C049E4BD8B26844FF62BD067D57"] = {moduleName="beta.Wonder Boy III RNG Watch", selfContained=true, friendlyName="Wonder Boy III - The Dragon's Trap (UE)"},
 

@@ -307,6 +307,12 @@ defaultPreferences = {
 		angle=true,
 		angleMore=false,
 	},
+	wonder_boy_sms = {
+		general=true,
+		position=true,
+		positionStats=true,
+		speed=true,
+	},
 	wonder_boy_monster_world = {
 		mapData=true,
 		health=true,
