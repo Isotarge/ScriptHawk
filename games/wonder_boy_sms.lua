@@ -17,6 +17,7 @@ local Game = {
 		screen_x_tile = 0x12A, -- Byte
 		screen_x_pixel = 0x12B, -- Byte
 		screen_x_pixel_major = 0x12C, -- Byte
+		boss_hp = 0x1AC, -- Byte
 		player_x_position = 0x226, -- fixed 8.8 le relative to screen
 		player_y_position = 0x223, -- fixed 8.8 le relative to screen
 		player_x_velocity = 0x232, -- signed fixed 8.8 le
@@ -57,6 +58,10 @@ function Game.detectVersion(romName, romHash)
 	ScriptHawk.hitboxDefaultWidth = 16;
 	ScriptHawk.hitboxDefaultHeight = 16;
 	return true;
+end
+
+function Game.inScoreScreen()
+	return mainmemory.readbyte(Game.Memory.mode) == 1;
 end
 
 function Game.getLevel()
@@ -149,6 +154,10 @@ function Game.getVitality()
 	return Game.read_u88(Game.Memory.vitality);
 end
 
+function Game.getBossHP()
+	return mainmemory.readbyte(Game.Memory.boss_hp);
+end
+
 function Game.getHitboxes()
 	local hitboxes = {};
 	for base = 0x220, 0xA00, 0x20 do
@@ -215,8 +224,11 @@ function Game.getHitboxListText(hitbox)
 end
 
 function Game.applyInfinites()
-	if mainmemory.readbyte(Game.Memory.mode) == 0 then
-		mainmemory.writebyte(Game.Memory.vitality + 1, 0x7F); -- FF Causes death on picking up fruit
+	if not Game.inScoreScreen() then
+		-- 0xFF Causes death on picking up fruit
+		-- 0x7F Causes annoyingly long score screens
+		-- 0x10 Causes only 15 segments to show in UI
+		mainmemory.writebyte(Game.Memory.vitality + 1, 0x11);
 	end
 end
 
@@ -236,23 +248,27 @@ function Game.eachFrame()
 end
 
 function Game.colorDX()
-	if previousVitality == currentVitality then
-		local dX = math.abs(ScriptHawk.getDX());
-		local xVel = math.abs(Game.getXVelocity());
+	if not Game.inScoreScreen() then
+		if previousVitality == currentVitality then
+			local dX = math.abs(ScriptHawk.getDX());
+			local xVel = math.abs(Game.getXVelocity());
 
-		if xVel > 0 and dX == 0 then
-			return colors.red;
+			if xVel > 0 and dX == 0 then
+				return colors.red;
+			end
 		end
 	end
 end
 
 function Game.colorDY()
-	if previousVitality == currentVitality then
-		local dY = math.abs(ScriptHawk.getDY());
-		local yVel = math.abs(Game.getYVelocity());
+	if not Game.inScoreScreen() then
+		if previousVitality == currentVitality then
+			local dY = math.abs(ScriptHawk.getDY());
+			local yVel = math.abs(Game.getYVelocity());
 
-		if yVel > 0.3 and dY == 0 then
-			return colors.red;
+			if yVel > 0.3 and dY == 0 then
+				return colors.red;
+			end
 		end
 	end
 end
@@ -272,8 +288,9 @@ Game.OSD = {
 	{"Y", category="position"},
 	{"dX", nil, Game.colorDX, category="positionStats"},
 	{"dY", nil, Game.colorDY, category="positionStats"},
-	{"X Velocity", Game.getXVelocity, category="speed"},
-	{"Y Velocity", Game.getYVelocity, category="speed"},
+	{"X Velocity", Game.getXVelocity, Game.colorDX, category="speed"},
+	{"Y Velocity", Game.getYVelocity, Game.colorDY, category="speed"},
+	{"Boss HP", Game.getBossHP, category="general"},
 };
 
 return Game;
