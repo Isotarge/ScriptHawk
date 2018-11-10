@@ -158,6 +158,7 @@ local Game = {
 		cutscene_will_play_next_map = {0x75533B, 0x74FBBB, 0x7553FB, nil}, -- byte
 		cutscene_to_play_next_map = {0x75533E, 0x74FBBE, 0x7553FE, nil}, -- 2-byte
 		cutscene_active = {0x7444EC, 0x73EC3C, 0x743DAC, 0x6F1CCC},
+		cutscene_timer = {0x7476F0, 0x741E50, 0x746FB0, 0x6F4460},
 		cutscene = {0x7476F4, 0x741E54, 0x746FB4, 0x6F4464},
 		cutscene_type = {0x7476FC, 0x741E5C, 0x746FBC, 0x6F446C},
 		cutscene_type_map = {0x7F5B10, 0x7F5A30, 0x7F5F80, 0x7A1C00},
@@ -456,12 +457,13 @@ function Game.getCutsceneOSD()
 		numberOfCutscenes = "None";
 	end
 	local cutsceneType = dereferencePointer(Game.Memory.cutscene_type);
+	local cutsceneTime = mainmemory.read_u16_be(Game.Memory.cutscene_timer);
 	if cutsceneType == Game.Memory.cutscene_type_kong then
-		return Game.getCutsceneIndex().." (Kong)";
+		return Game.getCutsceneIndex().." (Global ["..cutsceneTime.."])";
 	elseif cutsceneType == Game.Memory.cutscene_type_map then
-		return Game.getCutsceneIndex().."/"..numberOfCutscenes.." (Map)";
+		return Game.getCutsceneIndex().."/"..numberOfCutscenes.." (Map ["..cutsceneTime.."])";
 	else
-		return Game.getCutsceneIndex().." (Unknown Type: "..toHexString(cutsceneType)..")";
+		return Game.getCutsceneIndex().." (Unknown Type: "..toHexString(cutsceneType).." ["..cutsceneTime.."])";
 	end
 end
 
