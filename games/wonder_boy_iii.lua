@@ -54,9 +54,10 @@ local Game = {
 		boomerang = 0xF41,
 		thunder = 0xF42,
 		stone = 0xF48,
+		key = 0xF49,
 		lives = 0xF4A,
 		health = 0xF52, -- 2 byte
-		max_health = 0xF54, -- byte?
+		max_health = 0xF54, -- byte
 		gold_ones = 0xF55,
 		gold_tens = 0xF56,
 		gold_hundreds = 0xF57,
@@ -107,9 +108,16 @@ function Game.detectVersion(romName, romHash)
 	return true;
 end
 
+function Game.getConsumableValue(address)
+	return bit.clear(mainmemory.readbyte(address), 7);
+end
+
 function Game.setConsumableValue(address, value)
 	if value > 99 then
 		value = 99;
+	end
+	if value < 0 then
+		value = 0;
 	end
 	local currentValue = mainmemory.readbyte(address);
 	local isEquipped = bit.check(currentValue, 7);
@@ -126,8 +134,19 @@ function Game.applyInfinites()
 	Game.setConsumableValue(Game.Memory.arrow, 99);
 	Game.setConsumableValue(Game.Memory.boomerang, 99);
 	Game.setConsumableValue(Game.Memory.thunder, 99);
-	-- TODO: Keys
-	mainmemory.writebyte(Game.Memory.health, 0xFF); -- TODO: Read max health and base this on that value
+	Game.setConsumableValue(Game.Memory.key, 99);
+	local maxHealth = Game.getMaxHealth();
+	mainmemory.write_u16_le(Game.Memory.health, maxHealth * 0xD0);
+end
+
+function Game.giveStone()
+	local currentValue = Game.getConsumableValue(Game.Memory.stone);
+	Game.setConsumableValue(Game.Memory.stone, currentValue + 1);
+end
+
+function Game.removeStone()
+	local currentValue = Game.getConsumableValue(Game.Memory.stone);
+	Game.setConsumableValue(Game.Memory.stone, currentValue - 1);
 end
 
 function Game.giveMaxStones()
@@ -208,11 +227,19 @@ function Game.getLives()
 end
 
 function Game.getHealth()
-	return mainmemory.read_u16_le(Game.Memory.health);
+	return mainmemory.read_u16_le(Game.Memory.health) / 0xD0;
+end
+
+function Game.getMaxHealth()
+	return mainmemory.readbyte(Game.Memory.max_health) / 0x0D;
+end
+
+function Game.getHealthOSD()
+	return round(Game.getHealth(), precision).."/"..round(Game.getMaxHealth(), precision);
 end
 
 function Game.getBossHP()
-	return mainmemory.read_u16_le(Game.Memory.boss_health);
+	return mainmemory.read_u16_le(Game.Memory.boss_health) / 0x10;
 end
 
 function Game.getBossXPosition()
@@ -257,14 +284,17 @@ end
 
 function Game.initUI()
 	if not TASSafe then
-		ScriptHawk.UI.button(0, 6, {4, 10}, nil, nil, "Max Lives", Game.giveMaxStones);
-		ScriptHawk.UI.button(0, 7, {4, 10}, nil, nil, "Max Stones", Game.giveMaxLives);
+		ScriptHawk.UI.button(0, 6, {4, 10}, nil, nil, "Max Lives", Game.giveMaxLives);
+		ScriptHawk.UI.button(0, 7, {4, 10}, nil, nil, "Max Gold", Game.giveMaxGold);
 
-		ScriptHawk.UI.button(5, 6, {4, 10}, nil, nil, "Max Gold", Game.giveMaxGold);
-		ScriptHawk.UI.button(5, 7, {4, 10}, nil, nil, "Buy Items", Game.buyAllItems);
+		ScriptHawk.UI.button(5, 5, {4, 10}, nil, nil, "Add Stone", Game.giveStone);
+		ScriptHawk.UI.button(5, 6, {4, 10}, nil, nil, "Remove Stone", Game.removeStone);
+		ScriptHawk.UI.button(5, 7, {4, 10}, nil, nil, "Max Stones", Game.giveMaxStones);
+
+		ScriptHawk.UI.button(10, 5, {4, 10}, nil, nil, "Buy Items", Game.buyAllItems);
 
 		-- Character Dropdown
-		ScriptHawk.UI.form_controls["Character Dropdown"] = forms.dropdown(ScriptHawk.UI.options_form, { "Hu-Man", "Lizard-Man", "Mouse-Man", "Piranha-Man", "Lion-Man", "Bird-Man" }, ScriptHawk.UI.col(6) - ScriptHawk.UI.dropdown_offset + 2, ScriptHawk.UI.row(4) + ScriptHawk.UI.dropdown_offset, ScriptHawk.UI.col(3) + 8, ScriptHawk.UI.button_height);
+		ScriptHawk.UI.form_controls["Character Dropdown"] = forms.dropdown(ScriptHawk.UI.options_form, { "Hu-Man", "Lizard-Man", "Mouse-Man", "Piranha-Man", "Lion-Man", "Bird-Man" }, ScriptHawk.UI.col(5) - ScriptHawk.UI.dropdown_offset + 2, ScriptHawk.UI.row(4) + ScriptHawk.UI.dropdown_offset, ScriptHawk.UI.col(4) + 8, ScriptHawk.UI.button_height);
 		ScriptHawk.UI.button(10, 4, {4, 10}, nil, nil, "Set Transformation", Game.setCurrentTransformationFromDropdown);
 	end
 
@@ -333,7 +363,7 @@ end
 
 Game.OSD = {
 	{"Lives", Game.getLives, category="general"},
-	{"Health", Game.getHealth, category="general"},
+	{"Health", Game.getHealthOSD, category="general"},
 	{"Transformation", Game.getCurrentTransformation, category="general"};
 	{"Separator"},
 	{"X", category="position"},
