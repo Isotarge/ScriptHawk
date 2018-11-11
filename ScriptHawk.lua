@@ -603,7 +603,7 @@ local supportedGames = {
 	["7E805AA51BFB5F206C950A32EBCDAB7C"] = {moduleName="games.wonder_boy_sms", friendlyName="Wonder Boy (UE)", version=1},
 
 	-- Wonder Boy III
-	["E7F86C049E4BD8B26844FF62BD067D57"] = {moduleName="beta.Wonder Boy III RNG Watch", selfContained=true, friendlyName="Wonder Boy III - The Dragon's Trap (UE)"},
+	["E7F86C049E4BD8B26844FF62BD067D57"] = {moduleName="games.wonder_boy_iii", friendlyName="Wonder Boy III - The Dragon's Trap (UE)"},
 
 	-- Wonder Boy in Monster World (SMS)
 	["DA0ACDB1B9E806AA67A0216A675CB02ED24ABF8B"] = {moduleName="games.wonder_boy_monster_world", friendlyName="Wonder Boy in Monster World (E)"},
@@ -661,6 +661,9 @@ function loadPreferences()
 	currentPreferences = {};
 	for moduleName, defaultPreference in pairs(defaultPreferences) do
 		currentPreferences[moduleName] = {};
+		if userPreferences[moduleName] == nil then
+			userPreferences[moduleName] = {};
+		end
 		for OSDType, preference in pairs(defaultPreference) do
 			currentPreferences[moduleName][OSDType] = preference;
 		end

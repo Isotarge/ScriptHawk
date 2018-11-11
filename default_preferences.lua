@@ -307,6 +307,13 @@ defaultPreferences = {
 		angle=true,
 		angleMore=false,
 	},
+	wonder_boy_iii = {
+		general=true,
+		position=true,
+		speed=true,
+		positionStats=true,
+		RNG=true,
+	},
 	wonder_boy_sms = {
 		general=true,
 		position=true,
