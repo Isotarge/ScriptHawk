@@ -65,6 +65,8 @@ local Game = {
 		gold_hundred_thousands = 0xF5A,
 		rng_pointer = 0x10DC,
 		rng_base = 0x10A5,
+		boss_x_position = 0x1150,
+		boss_y_position = 0x1153,
 		boss_health = 0x116A,
 	},
 	transformations = {
@@ -210,7 +212,15 @@ function Game.getHealth()
 end
 
 function Game.getBossHP()
-	return mainmemory.readbyte(Game.Memory.boss_health);
+	return mainmemory.read_u16_le(Game.Memory.boss_health);
+end
+
+function Game.getBossXPosition()
+	return Game.readPosition(Game.Memory.boss_x_position);
+end
+
+function Game.getBossYPosition()
+	return Game.readPosition(Game.Memory.boss_y_position);
 end
 
 function Game.getDoorTimer()
@@ -257,10 +267,29 @@ function Game.initUI()
 		ScriptHawk.UI.form_controls["Character Dropdown"] = forms.dropdown(ScriptHawk.UI.options_form, { "Hu-Man", "Lizard-Man", "Mouse-Man", "Piranha-Man", "Lion-Man", "Bird-Man" }, ScriptHawk.UI.col(6) - ScriptHawk.UI.dropdown_offset + 2, ScriptHawk.UI.row(4) + ScriptHawk.UI.dropdown_offset, ScriptHawk.UI.col(3) + 8, ScriptHawk.UI.button_height);
 		ScriptHawk.UI.button(10, 4, {4, 10}, nil, nil, "Set Transformation", Game.setCurrentTransformationFromDropdown);
 	end
+
+	local RNGColBase = 10;
+	ScriptHawk.UI.checkbox(RNGColBase, 6, "Toggle RNG Checkbox", "Show RNG", true);
+	-- RNG Slots control
+	ScriptHawk.UI.form_controls.rng_slots_label = forms.label(ScriptHawk.UI.options_form, "Slots:", ScriptHawk.UI.col(RNGColBase), ScriptHawk.UI.row(7) + ScriptHawk.UI.label_offset, 40, 14);
+	ScriptHawk.UI.button({RNGColBase + 3, -28}, 7, {ScriptHawk.UI.button_height}, nil, "decrease_rng_button", "-", Game.decreaseRNGSlots);
+	ScriptHawk.UI.button({RNGColBase + 4, -28}, 7, {ScriptHawk.UI.button_height}, nil, "increase_rng_button", "+", Game.increaseRNGSlots);
+	ScriptHawk.UI.form_controls.rng_slots_value_label = forms.label(ScriptHawk.UI.options_form, get_ready_blue_min, ScriptHawk.UI.col(RNGColBase + 4), ScriptHawk.UI.row(7) + ScriptHawk.UI.label_offset, 32, 14);
 end
 
 -- RNG Stuff
 -- Based on research by The8bitbeast, 2016
+
+local RNGSlots = 6;
+function Game.increaseRNGSlots()
+	RNGSlots = RNGSlots + 1;
+	RNGSlots = math.min(RNGSlots, 0x37);
+end
+
+function Game.decreaseRNGSlots()
+	RNGSlots = RNGSlots - 1;
+	RNGSlots = math.max(RNGSlots, 1);
+end
 
 function Game.getRNGSlot(index)
 	local pointer = mainmemory.read_u8(Game.Memory.rng_pointer);
@@ -281,33 +310,25 @@ end
 function Game.renderRNGSlot(slot)
 	local crit = "";
 	if Game.isCrit(slot.value) then
-		crit = " (crit)";
+		crit = "(crit) ";
 	end
-	return toHexString(slot.address, 4, "")..": "..toHexString(slot.value, 2, "")..crit;
+	return crit..toHexString(slot.value, 2, "").." - "..toHexString(slot.address, 4, "");
 end
 
-function Game.getRNGSlot1()
-	return Game.renderRNGSlot(Game.getRNGSlot(1));
-end
+function Game.drawUI()
+	forms.settext(ScriptHawk.UI.form_controls.rng_slots_value_label, RNGSlots);
 
-function Game.getRNGSlot2()
-	return Game.renderRNGSlot(Game.getRNGSlot(2));
-end
+	local row = 0;
 
-function Game.getRNGSlot3()
-	return Game.renderRNGSlot(Game.getRNGSlot(3));
-end
+	if ScriptHawk.UI.ischecked("Toggle RNG Checkbox") then
+		gui.text(Game.OSDPosition[1], 2 + Game.OSDRowHeight * row, "RNG: "..RNGSlots.." Slots", nil, 'bottomright');
+		row = row + 1;
 
-function Game.getRNGSlot4()
-	return Game.renderRNGSlot(Game.getRNGSlot(4));
-end
-
-function Game.getRNGSlot5()
-	return Game.renderRNGSlot(Game.getRNGSlot(5));
-end
-
-function Game.getRNGSlot6()
-	return Game.renderRNGSlot(Game.getRNGSlot(6));
+		for i = 1, RNGSlots do
+			gui.text(Game.OSDPosition[1], 2 + Game.OSDRowHeight * row, Game.renderRNGSlot(Game.getRNGSlot(i)), nil, 'bottomright');
+			row = row + 1;
+		end
+	end
 end
 
 Game.OSD = {
@@ -323,14 +344,10 @@ Game.OSD = {
 	{"dY", category="positionStats"},
 	{"Separator"},
 	{"Door Timer", Game.getDoorTimer, category="general"},
-	{"Boss HP", Game.getBossHP, category="general"},
 	{"Separator"},
-	{"RNG1", Game.getRNGSlot1, category="RNG"},
-	{"RNG2", Game.getRNGSlot2, category="RNG"},
-	{"RNG3", Game.getRNGSlot3, category="RNG"},
-	{"RNG4", Game.getRNGSlot4, category="RNG"},
-	{"RNG5", Game.getRNGSlot5, category="RNG"},
-	{"RNG6", Game.getRNGSlot6, category="RNG"},
+	{"Boss X", Game.getBossXPosition, category="general"},
+	{"Boss Y", Game.getBossYPosition, category="general"},
+	{"Boss HP", Game.getBossHP, category="general"},
 };
 
 return Game;

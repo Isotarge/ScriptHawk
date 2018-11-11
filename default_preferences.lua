@@ -312,7 +312,6 @@ defaultPreferences = {
 		position=true,
 		speed=true,
 		positionStats=true,
-		RNG=true,
 	},
 	wonder_boy_sms = {
 		general=true,
