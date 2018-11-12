@@ -91,6 +91,9 @@ end
 function Game.detectVersion(romName, romHash)
 	ScriptHawk.dpad.joypad.enabled = false;
 	ScriptHawk.dpad.key.enabled = false;
+	ScriptHawk.hitboxDefaultColor = colors.white;
+	ScriptHawk.hitboxDefaultWidth = 16;
+	ScriptHawk.hitboxDefaultHeight = 16;
 	return true;
 end
 
@@ -167,6 +170,49 @@ function Game.initUI()
 	if not TASSafe then
 		ScriptHawk.UI.checkbox(0, 6, "CamHack Checkbox", "CamHack (Beta)");
 	end
+end
+
+-- Objects
+
+local object_fields = {
+	type = 0x00,
+	x_position = 0x01, -- 3 bytes, use Game.read_u16_8
+	y_position = 0x04, -- 3 bytes, use Game.read_u16_8
+	x_velocity = 0x07, -- 3 bytes, use Game.read_s16_8
+	y_velocity = 0x0A, -- 3 bytes, use Game.read_s16_8
+	width = 0x0D, -- 1 byte, in pixels
+	height = 0x0E, -- 1 byte, in pixels
+	sprite_layour = 0x0D, -- 2 bytes, pointer
+};
+
+function Game.getHitboxes()
+	local screenX = Game.getViewportX();
+	local screenY = Game.getViewportY();
+	ScriptHawk.hitboxDefaultXOffset = -screenX;
+	ScriptHawk.hitboxDefaultYOffset = -screenY;
+
+	local hitboxes = {};
+	for i = 1, 32 do
+		local objectBase = 0x13FC + 0x1A * (i - 1);
+		local hitbox = {
+			dragTag = objectBase,
+			type = mainmemory.readbyte(objectBase + object_fields.type),
+			x = Game.read_u16_8(objectBase + object_fields.x_position),
+			y = Game.read_u16_8(objectBase + object_fields.y_position),
+			xVelocity = Game.read_s16_8(objectBase + object_fields.x_velocity),
+			yVelocity = Game.read_s16_8(objectBase + object_fields.y_velocity),
+			width = mainmemory.readbyte(objectBase + object_fields.width),
+			height = mainmemory.readbyte(objectBase + object_fields.height),
+		};
+		if hitbox.type ~= 0xFF then
+			table.insert(hitboxes, hitbox);
+		end
+	end
+	return hitboxes;
+end
+
+function Game.getHitboxListText(hitbox)
+	return toHexString(hitbox.dragTag)..": "..toHexString(hitbox.type)..": x: "..round(hitbox.x)..", y:"..round(hitbox.y).." w:"..hitbox.width.." h:"..hitbox.height;
 end
 
 Game.OSD = {
