@@ -51,6 +51,7 @@ ScriptHawk = {
 		y = 2,
 	},
 	hitboxListAnchor = "bottomright",
+	hitboxListShowCount = false,
 	overscan_compensation = {
 		x = 0,
 		y = 0,
@@ -2118,6 +2119,12 @@ function ScriptHawk.drawHitboxes()
 	end
 
 	local hitboxes = Game.getHitboxes();
+
+	if ScriptHawk.hitboxListShowCount then
+		gui.text(ScriptHawk.hitboxListPosition.x, ScriptHawk.hitboxListPosition.y + Game.OSDRowHeight * row, "Objects: "..#hitboxes, nil, ScriptHawk.hitboxListAnchor);
+		row = row + 1;
+	end
+
 	for i = 1, #hitboxes do
 		local hitbox = hitboxes[i];
 		local color = hitbox.color or ScriptHawk.hitboxDefaultColor or colors.white;
