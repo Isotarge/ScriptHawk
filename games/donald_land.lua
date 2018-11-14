@@ -20,6 +20,7 @@ local Game = {
 		lives = 0x62D,
 		bomb_timer1 = 0x4D7,
 		bomb_timer2 = 0x4D8,
+        tile_value = 0x0615,
 	},
 };
 
@@ -99,6 +100,10 @@ end
 
 function Game.getBombTimer2()
 	return mainmemory.readbyte(Game.Memory.bomb_timer2);
+end
+
+function Game.getTileValue()
+    return mainmemory.readbyte(Game.Memory.tile_value);
 end
 
 --[[
@@ -215,6 +220,8 @@ Game.OSD = {
 	{"Separator"},
 	{"Bomb Timer 1", Game.getBombTimer1},
 	{"Bomb Timer 2", Game.getBombTimer2},
+    {"Separator"},
+    {"Tile Value", Game.getTileValue},
 };
 
 return Game;
