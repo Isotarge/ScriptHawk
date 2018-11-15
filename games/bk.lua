@@ -8,40 +8,42 @@ end
 local Game = {
 	squish_memory_table = true,
 	Memory = { -- Version order: Europe, Japan, US 1.1, US 1.0
-		fb_pointer = {0x282E00, 0x281E20, 0x281E20, 0x282FE0},
-		game_time_scale_multiplier = {0x384E60, 0x384FC0, 0x3836A0, 0x384480},
-		game_speed_coefficient = {0x3723A0, 0x372B20, 0x371020, 0x371E20},
-		frame_timer = {0x280700, 0x27F718, 0x27F718, 0x2808D8},
-		floor_object_pointer = {0x37CBD0, 0x37CD00, 0x37B400, 0x37C200},
-		carried_object_pointer = {0x37CC68, 0x37CD98, 0x37B498, 0x37C298},
-		slope_timer = {0x37CCB4, 0x37CDE4, 0x37B4E4, 0x37C2E4},
-		beak_bomb_available_timer = {0x37DCF0, 0x37DE20, 0x37C520, 0x37D320},
-		player_grounded = {0x37C930, 0x37CA60, 0x37B160, 0x37BF60},
-		wall_collisions = {0x37CC4D, 0x37CD7D, 0x37B47D, 0x37C27D},
-		moves_bitfield = {0x37CD70, 0x37CEA0, 0x37B5A0, 0x37C3A0},
-		x_velocity = {0x37CE88, 0x37CFB8, 0x37B6B8, 0x37C4B8}, -- Float
-		y_velocity = {0x37CE8C, 0x37CFBC, 0x37B6BC, 0x37C4BC}, -- Float
-		z_velocity = {0x37CE90, 0x37CFC0, 0x37B6C0, 0x37C4C0}, -- Float
+		fb_pointer = {0x282E00, 0x281E20, 0x281E20, 0x282FE0}, -- Pointer
+		game_time_scale_multiplier = {0x384E60, 0x384FC0, 0x3836A0, 0x384480}, -- Float
+		game_speed_coefficient = {0x3723A0, 0x372B20, 0x371020, 0x371E20}, -- Float
+		frame_timer = {0x280700, 0x27F718, 0x27F718, 0x2808D8}, -- s32_be
+		floor_object_pointer = {0x37CBD0, 0x37CD00, 0x37B400, 0x37C200}, -- Pointer
+		carried_object_pointer = {0x37CC68, 0x37CD98, 0x37B498, 0x37C298}, -- Pointer
+		slope_timer = {0x37CCB4, 0x37CDE4, 0x37B4E4, 0x37C2E4}, -- Float
+		beak_bomb_available_timer = {0x37DCF0, 0x37DE20, 0x37C520, 0x37D320}, -- Float
+		player_grounded = {0x37C930, 0x37CA60, 0x37B160, 0x37BF60}, -- u32_be
+		wall_collisions = {0x37CC4D, 0x37CD7D, 0x37B47D, 0x37C27D}, -- u8
+		moves_bitfield = {0x37CD70, 0x37CEA0, 0x37B5A0, 0x37C3A0}, -- 4 Byte, Bitfield
+		x_velocity = {0x37CE88, 0x37CFB8, 0x37B6B8, 0x37C4B8}, -- Float, divide by framerate (to match dXZ,dY scale)
+		y_velocity = {0x37CE8C, 0x37CFBC, 0x37B6BC, 0x37C4BC}, -- Float, divide by framerate (to match dXZ,dY scale)
+		z_velocity = {0x37CE90, 0x37CFC0, 0x37B6C0, 0x37C4C0}, -- Float, divide by framerate (to match dXZ,dY scale)
 		x_position = {0x37CF70, 0x37D0A0, 0x37B7A0, 0x37C5A0}, -- Float
 		y_position = {0x37CF74, 0x37D0A4, 0x37B7A4, 0x37C5A4}, -- Float
 		z_position = {0x37CF78, 0x37D0A8, 0x37B7A8, 0x37C5A8}, -- Float
 		x_rotation = {0x37CF10, 0x37D040, 0x37B740, 0x37C540}, -- Float
 		y_rotation = {0x37D060, 0x37D190, 0x37B890, 0x37C690}, -- Float
-		facing_angle = {0x37D060, 0x37D190, 0x37B890, 0x37C690},
-		moving_angle = {0x37D064, 0x37D194, 0x37B894, 0x37C694},
-		z_rotation = {0x37D050, 0x37D180, 0x37B880, 0x37C680},
+		facing_angle = {0x37D060, 0x37D190, 0x37B890, 0x37C690}, -- Float
+		moving_angle = {0x37D064, 0x37D194, 0x37B894, 0x37C694}, -- Float
+		z_rotation = {0x37D050, 0x37D180, 0x37B880, 0x37C680}, -- Float
+		jiggy_spawn_angle = {0x37E784, 0x37E8C4, 0x37CFB4, 0x37DDB4}, -- Float
+		jiggy_spawn_velocity = {0x37E788, 0x37E8C8, 0x37CFB8, 0x37DDB8}, -- Float
 		gravity = {0x37CEB8, 0x37CFE8, 0x37B6E8, 0x37C4E8}, -- Float, divide by framerate
-		camera_x_position = {0x37E328, 0x37E458, 0x37CB58, 0x37D958},
-		camera_y_position = {0x37E32C, 0x37E45C, 0x37CB5C, 0x37D95C},
-		camera_z_position = {0x37E330, 0x37E460, 0x37CB60, 0x37D960},
-		camera_x_rotation = {0x37E338, 0x37E468, 0x37CB68, 0x37D968},
-		camera_y_rotation = {0x37E33C, 0x37E46C, 0x37CB6C, 0x37D96C},
+		camera_x_position = {0x37E328, 0x37E458, 0x37CB58, 0x37D958}, -- Float
+		camera_y_position = {0x37E32C, 0x37E45C, 0x37CB5C, 0x37D95C}, -- Float
+		camera_z_position = {0x37E330, 0x37E460, 0x37CB60, 0x37D960}, -- Float
+		camera_x_rotation = {0x37E338, 0x37E468, 0x37CB68, 0x37D968}, -- Float
+		camera_y_rotation = {0x37E33C, 0x37E46C, 0x37CB6C, 0x37D96C}, -- Float
 		first_person_flag = {0x37CBB7, 0x37CCE7, 0x37B3E7, 0x37C1E7},
-		first_person_cam_x_pos = {0x37E630, 0x37E760, 0x37CE60, 0x37DC60},
-		first_person_cam_y_pos = {0x37E634, 0x37E764, 0x37CE64, 0x37DC64},
-		first_person_cam_z_pos = {0x37E638, 0x37E768, 0x37CE68, 0x37DC68},
-		first_person_cam_x_rot = {0x37E63C, 0x37E76C, 0x37CE6C, 0x37DC6C},
-		first_person_cam_y_rot = {0x37E640, 0x37E770, 0x37CE70, 0x37DC70},
+		first_person_cam_x_pos = {0x37E630, 0x37E760, 0x37CE60, 0x37DC60}, -- Float
+		first_person_cam_y_pos = {0x37E634, 0x37E764, 0x37CE64, 0x37DC64}, -- Float
+		first_person_cam_z_pos = {0x37E638, 0x37E768, 0x37CE68, 0x37DC68}, -- Float
+		first_person_cam_x_rot = {0x37E63C, 0x37E76C, 0x37CE6C, 0x37DC6C}, -- Float
+		first_person_cam_y_rot = {0x37E640, 0x37E770, 0x37CE70, 0x37DC70}, -- Float
 		previous_movement_state = {0x37DB30, 0x37DC60, 0x37C360, 0x37D160},
 		current_movement_state = {0x37DB34, 0x37DC64, 0x37C364, 0x37D164},
 		map = {0x37F2C5, 0x37F405, 0x37DAF5, 0x37E8F5},
@@ -3528,6 +3530,14 @@ function Game.getJiggyGrabbedIndex()
 	end
 end
 
+function Game.getJiggySpawnAngle()
+	return mainmemory.readfloat(Game.Memory.jiggy_spawn_angle, true);
+end
+
+function Game.setJiggySpawnAngle(value)
+	mainmemory.writefloat(Game.Memory.jiggy_spawn_angle, value, true);
+end
+
 Game.OSD = {
 	{"X", category="position"},
 	{"Y", category="position"},
@@ -3562,6 +3572,7 @@ Game.OSD = {
 	{"FF Answer", getCorrectFFAnswer, category="ffunAnswer"},
 	{"FF Pattern", Game.getFFPattern, category="ffunPattern"},
 	{"Separator"},
+	{"Jiggy Spawn Angle", Game.getJiggySpawnAngle, category="angle"},
 	{"Jiggy Grabbed", Game.getJiggyGrabbedPointer, category="objectDespawn"},
 	{"Index Grabbed", Game.getJiggyGrabbedIndex, category="objectDespawn"},
 };
