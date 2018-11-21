@@ -52,6 +52,7 @@ A collection of Lua scripts and RAM watches for [BizHawk](https://github.com/TAS
 - [Object analysis tools](Docs/Object%20Analysis%20Tools.txt): List, Examine, Grab, Encircle, Zip, Despawn
 - Spawn objects
 - Documentation for the majority of flags
+- Realtime feedback for flags being set/cleared
 
 ![Banjo-Kazooie Support](Images/Promo/bk_ui.png)
 
@@ -105,6 +106,7 @@ A collection of Lua scripts and RAM watches for [BizHawk](https://github.com/TAS
 - Alex Kidd in Shinobi World (SMS)
 - Balloon Fight (NES)
 - Drill Dozer (GBA)
+- Earthworm Jim 3D (N64)
 - Golden Axe Warrior (SMS)
 - Golvellius (SMS)
 - Impossible Mission (SMS)
@@ -122,7 +124,6 @@ A collection of Lua scripts and RAM watches for [BizHawk](https://github.com/TAS
 - Wonder Boy (SMS/GG)
 - Wonder Boy III: The Dragon's Trap (SMS)
 - Wonder Boy in Monster World (SMS)
-- Earthworm Jim 3D (N64)
 
 ## Partially Supported Games
 - Elmo's Number Journey (N64 only)
@@ -142,7 +143,6 @@ A collection of Lua scripts and RAM watches for [BizHawk](https://github.com/TAS
 - [Tetris Attack](Tetris%20Attack%20Bot.lua) bot, plays the game quite well using a simple sorting algorithm
 - [Mr. Driller 2](Beta/Drillbot.lua) bot
 - [remove_klump.lua](Beta/remove_klump.lua), [code golf](https://en.wikipedia.org/wiki/Code_golf) that removes Klumps from DK64 USA version
-- [Wonder Boy III](Beta/Wonder%20Boy%20III%20RNG%20Watch.lua) RNG watch, written by [The8bitbeast](https://twitter.com/the8bitbeast)
 - Dega .MMV reader
 
 ## Other Notable Projects

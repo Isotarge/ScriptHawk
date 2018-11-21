@@ -690,7 +690,6 @@ local flag_block_cache = {};
 local function clearFlagCache()
 	flag_block_cache = {};
 end
-event.onloadstate(clearFlagCache, "ScriptHawk - Clear Flag Cache");
 
 local function getFlag(byte)
 	for i = 1, #flag_array do
@@ -737,13 +736,13 @@ function checkFlags(showKnown)
 				currentFlag = getFlag(flag_block_base + i);
 				if not currentFlag.ignore then
 					if currentValue == 0 then
-						dprint("Flag "..toHexString(currentFlag.byte, 2)..": \""..currentFlag.name.."\" was cleared on frame "..emu.framecount());
+						dprint("Flag "..toHexString(currentFlag.byte, 2)..': "'..currentFlag.name..'" was cleared on frame '..emu.framecount());
 					elseif previousValue == 0 then
-						dprint("Flag "..toHexString(currentFlag.byte, 2)..": \""..currentFlag.name.."\" was set with value "..toHexString(currentValue, 2).." on frame "..emu.framecount());
+						dprint("Flag "..toHexString(currentFlag.byte, 2)..': "'..currentFlag.name..'" was set with value '..toHexString(currentValue, 2).." on frame "..emu.framecount());
 					elseif currentValue > previousValue then
-						dprint("Flag "..toHexString(currentFlag.byte, 2)..": \""..currentFlag.name.."\" value increased from "..toHexString(previousValue, 2).." to "..toHexString(currentValue, 2).." on frame "..emu.framecount());
+						dprint("Flag "..toHexString(currentFlag.byte, 2)..': "'..currentFlag.name..'" value increased from '..toHexString(previousValue, 2).." to "..toHexString(currentValue, 2).." on frame "..emu.framecount());
 					elseif currentValue < previousValue then
-						dprint("Flag "..toHexString(currentFlag.byte, 2)..": \""..currentFlag.name.."\" value decreased from "..toHexString(previousValue, 2).." to "..toHexString(currentValue, 2).." on frame "..emu.framecount());
+						dprint("Flag "..toHexString(currentFlag.byte, 2)..': "'..currentFlag.name..'" value decreased from '..toHexString(previousValue, 2).." to "..toHexString(currentValue, 2).." on frame "..emu.framecount());
 					end
 				end
 			end
@@ -807,7 +806,7 @@ function checkFlag(name)
 			return false;
 		end
 	end
-	print("The flag \""..name.."\" is currently unknown");
+	print('The flag "'..name..'" is currently unknown');
 end
 
 local function flagSetButtonHandler()
@@ -820,6 +819,10 @@ end
 
 local function flagCheckButtonHandler()
 	checkFlag(forms.getproperty(ScriptHawk.UI.form_controls["Flag Dropdown"], "SelectedItem"));
+end
+
+function Game.onLoadState()
+	clearFlagCache();
 end
 
 function Game.eachFrame()

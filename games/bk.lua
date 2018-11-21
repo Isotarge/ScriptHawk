@@ -235,7 +235,9 @@ local script_modes = { --TODO: Object analysis tools state needs to be up here f
 local script_mode_index = 1;
 script_mode = script_modes[script_mode_index];
 
-print_flag_writes = false;
+realtime_flags = true; -- TODO: Move to checkbox
+hide_non_animated = false;
+hide_unknown_structs = true;
 
 --------------------
 -- Region/Version --
@@ -405,7 +407,7 @@ function Game.colorSlopeTimer()
 		return colors.blue;
 	end
 	local slopeTimer = Game.getSlopeTimer();
-		if slopeTimer >= 0.75 then
+	if slopeTimer >= 0.75 then
 		return getColor(slopeTimer);
 	end
 end
@@ -413,6 +415,7 @@ end
 --------------------------
 -- Beta Menu Recreation --
 --------------------------
+
 local PauseMenuData_offsets = {
 	appearenceTime = 0x00,
 	string = 0x08,
@@ -477,7 +480,7 @@ function Game.isMoveUnlocked(index)
 end
 
 --------------------
--- Object model 1 --
+-- Object Model 1 --
 --------------------
 
 -- Slot data
@@ -518,7 +521,7 @@ movement_struct = {
 -- OBJECT1 STRUCTURE
 slot_variables = {
 	[0x00] = {Type="Pointer", Name="Behavior Struct Pointer", Fields={
-			behavior_struct
+			behavior_struct,
 		},
 	},
 	[0x04] = {Type="Float", Name={"X", "X Pos", "X Position"}},
@@ -526,7 +529,7 @@ slot_variables = {
 	[0x0C] = {Type="Float", Name={"Z", "Z Pos", "Z Position"}},
 	[0x10] = {Type="u8", Name="State"},
 	[0x14] = {Type="Pointer", Name="Movement Object Pointer", Fields={
-			movement_struct
+			movement_struct,
 		},
 	},
 	[0x28] = {Type="Float", Name="Chase Velocity"},
@@ -585,6 +588,7 @@ slot_variables = {
 };
 local slot_variables_inv = {};
 
+-- TODO: Surely this isn't needed?
 local function fillBlankVariableSlots()
 	local data_size = 0x04;
 	for i = 0, slot_size - data_size, data_size do
@@ -594,8 +598,6 @@ local function fillBlankVariableSlots()
 	end
 end
 fillBlankVariableSlots();
-
-slot_data = {};
 
 local function getSlotBase(index)
 	return slot_base + index * slot_size;
@@ -624,26 +626,6 @@ function getObjectModel1Pointers()
 		--table.sort(pointers); -- I don't think we need to sort them since getSlotBase isn't reading anything
 	end
 	return pointers;
-end
-
-function addressToSlot(address)
-	address = address or 0;
-	if not isRDRAM(address) then
-		print("Address: "..toHexString(address).." is out of RDRAM range.");
-	end
-
-	local objectArray = dereferencePointer(Game.Memory.object_array_pointer);
-	if isRDRAM(objectArray) then
-		local numSlots = math.min(max_slots, mainmemory.read_u32_be(objectArray));
-		local position = address - objectArray - slot_base;
-		local relativeToObject = position % slot_size;
-		local objectNumber = math.floor(position / slot_size);
-		if objectNumber >= 0 and objectNumber <= numSlots then
-			print("Object number "..objectNumber.." address relative "..toHexString(relativeToObject));
-		else
-			print("Address: "..toHexString(address).." is out of range of the object array.");
-		end
-	end
 end
 
 function setObjectModel1Position(pointer, x, y, z)
@@ -1545,7 +1527,6 @@ object_index = 1;
 object_top_index = 1;
 --TODO: Set object_max_slots based on screen size
 object_max_slots = 50;
-hide_non_animated = false;
 
 --------------------
 -- Output Helpers --
@@ -1572,12 +1553,6 @@ local function formatForOutput(var_type, value)
 	return ""..value;
 end
 
-local function isInteresting(variable)
-	local min = getMinimumValue(variable);
-	local max = getMaximumValue(variable);
-	return slot_variables[variable].Type ~= "Z4_Unknown" or min ~= max;
-end
-
 local function getVariableName(address)
 	local variable = slot_variables[address];
 	local nameType = type(variable.Name);
@@ -1591,67 +1566,13 @@ local function getVariableName(address)
 	return variable.Type.." "..toHexString(address);
 end
 
-------------
--- Output --
-------------
-
-function outputSlot(index)
-	if type(slot_data[index]) ~= "nil" then
-		local previous_type = "";
-		local current_slot = slot_data[index + 1];
-		dprint("Starting output of slot "..index + 1);
-		for i = 0, slot_size do
-			if type(slot_variables[i]) == "table" then
-				if slot_variables[i].Type ~= "Z4_Unknown" then
-					if slot_variables[i].Type ~= previous_type then
-						previous_type = slot_variables[i].Type;
-						dprint("");
-					end
-					local variableName = getVariableName(i);
-					dprint(toHexString(i).." "..variableName.." ("..(slot_variables[i].Type).."): "..formatForOutput(slot_variables[i].Type, current_slot[i]));
-				end
-			end
-		end
-		print_deferred();
-	end
-end
-
-function outputStats()
-	if #slot_data == 0 then
-		print("Error: Slot data is empty, please run parseSlotData()");
-		return;
-	end
-	dprint("------------------------------");
-	dprint("-- Starting output of stats --");
-	dprint("------------------------------");
-	local min, max;
-	local previous_type = "";
-	for i = 0, slot_size do
-		if type(slot_variables[i]) == "table" then
-			if isInteresting(i) then
-				min = getMinimumValue(i);
-				max = getMaximumValue(i);
-				if slot_variables[i].Type ~= previous_type then
-					previous_type = slot_variables[i].Type;
-					dprint("");
-				end
-				local variableName = getVariableName(i);
-				dprint(toHexString(i).." "..(slot_variables[i].Type)..": "..formatForOutput(slot_variables[i].Type, min).. " to "..formatForOutput(slot_variables[i].Type, max).." - "..variableName);
-			end
-		end
-	end
-	print_deferred();
-end
-
 --------------------
 -- "Struct" stuff --
 --------------------
 
 local structPointers = {};
 
-hide_unknown_structs = true;
-
-struct_array_types = {
+local struct_array_types = {
 	[0] = { -- Game takes low 12-bits and adds 0x572 for comparisons
 		[0x00E] = "Red Feather", -- + 0x572 = 0x580
 		[0x15F] = "Gold Feather", -- + 0x572 = 0x6D1
@@ -1667,7 +1588,7 @@ struct_array_types = {
 	},
 };
 
-struct_array_variables = {
+local struct_array_variables = {
 	[0x00] = {Name = "item_index", Type = "u16_be"}, -- Game takes low 12-bits and adds 0x572 for comparisons
 	[0x02] = {Name = "scale", Type = "u16_be"},
 	[0x04] = {Name = "x_pos", Type = "s16_be"},
@@ -1815,87 +1736,6 @@ local function getStructPointers()
 	return pointers;
 end
 
---------------
--- Analysis --
---------------
-
-function resolveVariableName(name) -- TODO: Get this function working for any object model
-	-- Make sure comparisons are case insensitive
-	name = string.upper(name);
-
-	-- Comparison loop
-	for relative_address, variable_data in pairs(slot_variables) do
-		if type(variable_data) == "table" then
-			if type(variable_data.Name) == "string" and string.upper(variable_data.Name) == name then
-				return relative_address;
-			elseif type(variable_data.Name) == "table" then
-				for i = 1, #variable_data.Name do
-					if type(variable_data.Name[i]) == "string" and string.upper(variable_data.Name[i]) == name then
-						return relative_address;
-					end
-				end
-			end
-		end
-	end
-
-	-- Default + Error
-	print("Variable name: '"..name.."' not found =(");
-	return 0x00;
-end
-
-function getMinimumValue(variable)
-	if type(variable) == "string" then
-		variable = resolveVariableName(variable);
-	end
-	local min = math.huge;
-	if type(slot_variables[variable]) == "table" then
-		for i = 1, #slot_data do
-			min = math.min(min, slot_data[i][variable]);
-		end
-	end
-	return min;
-end
-
-function getMaximumValue(variable)
-	if type(variable) == "string" then
-		variable = resolveVariableName(variable);
-	end
-	local max = -math.huge;
-	if type(slot_variables[variable]) == "table" then
-		for i = 1, #slot_data do
-			max = math.max(max, slot_data[i][variable]);
-		end
-	end
-	return max;
-end
-
-function getAllUnique(variable)
-	if type(variable) == "string" then
-		variable = resolveVariableName(variable);
-	end
-	if type(slot_variables[variable]) == "table" then
-		local unique_values = {};
-		if type(slot_data) ~= "table" or #slot_data == 0 then
-			parseSlotData();
-		end
-		for i = 1, #slot_data do
-			local value = formatForOutput(slot_variables[variable].Type, slot_data[i][variable]);
-			if type(unique_values[value]) ~= "nil" then
-				unique_values[value] = unique_values[value] + 1;
-			else
-				unique_values[value] = 1;
-			end
-		end
-
-		-- Output the findings
-		dprint("Starting output of variable "..toHexString(variable));
-		for value, count in pairs(unique_values) do
-			dprint(""..value.." appears "..count.." times");
-		end
-		print_deferred();
-	end
-end
-
 local function getNumSlots()
 	if script_mode == "Examine" or script_mode == "List" then -- Model 1
 		local objectArray = dereferencePointer(Game.Memory.object_array_pointer);
@@ -1906,35 +1746,6 @@ local function getNumSlots()
 		return #structPointers;
 	end
 	return 0;
-end
-
-function setAll(variable, value)
-	if type(variable) == "string" then
-		variable = resolveVariableName(variable);
-	end
-	if type(slot_variables[variable]) == "table" then
-		local objectArray = dereferencePointer(Game.Memory.object_array_pointer);
-		if isRDRAM(objectArray) then
-			local numSlots = math.min(max_slots, mainmemory.read_u32_be(objectArray));
-
-			local currentSlotBase;
-			for i = 0, numSlots - 1 do
-				currentSlotBase = objectArray + getSlotBase(i);
-				if slot_variables[variable].Type == "Float" then
-					--print("writing float to slot "..i);
-					mainmemory.writefloat(currentSlotBase + variable, value, true);
-				elseif isHex(slot_variables[variable].Type) then
-					--print("writing u32_be to slot "..i);
-					mainmemory.write_u32_be(currentSlotBase + variable, value);
-				elseif slot_variables[variable].Type == "u16_be" then
-					mainmemory.write_u16_be(currentSlotBase + variable, value);
-				else
-					--print("writing byte to slot "..i);
-					mainmemory.writebyte(currentSlotBase + variable, value);
-				end
-			end
-		end
-	end
 end
 
 --------------------
@@ -2113,48 +1924,6 @@ function drawObjectPositions()
 				end
 			end
 		end
-	end
-end
-
-----------------------
--- Data acquisition --
-----------------------
-
-function processSlot(slotBase) -- TODO: Improve this based on the SM64 module implementation
-	local current_slot_variables = {};
-	for relative_address, variable_data in pairs(slot_variables) do
-		if type(variable_data) == "table" then
-			if variable_data.Type == "Byte" then
-				current_slot_variables[relative_address] = mainmemory.readbyte(slotBase + relative_address);
-			elseif variable_data.Type == "u16_be" then
-				current_slot_variables[relative_address] = mainmemory.read_u16_be(slotBase + relative_address);
-			elseif variable_data.Type == "u8" then
-				current_slot_variables[relative_address] = mainmemory.read_u8(slotBase + relative_address);
-			elseif variable_data.Type == "Z4_Unknown" or variable_data.Type == "Pointer" or variable_data.Type == "u32_be" then
-				current_slot_variables[relative_address] = mainmemory.read_u32_be(slotBase + relative_address);
-			elseif variable_data.Type == "Float" then
-				current_slot_variables[relative_address] = mainmemory.readfloat(slotBase + relative_address, true);
-			end
-		end
-	end
-	return current_slot_variables;
-end
-
-function parseSlotData()
-	local objectArray = dereferencePointer(Game.Memory.object_array_pointer);
-	if isRDRAM(objectArray) then
-		local numSlots = math.min(max_slots, mainmemory.read_u32_be(objectArray));
-
-		-- Clear out old data
-		slot_data = {};
-
-		local currentSlotBase;
-		for i = 0, numSlots - 1 do
-			currentSlotBase = objectArray + getSlotBase(i);
-			table.insert(slot_data, processSlot(currentSlotBase));
-		end
-
-		outputStats();
 	end
 end
 
@@ -2838,7 +2607,7 @@ local function encircle_banjo()
 	local current_banjo_z = Game.getZPosition();
 	local x, y, z;
 
-	--radius = 1000
+	--radius = 1000;
 	if ScriptHawk.UI.ischecked("dynamic_radius_checkbox") then
 		radius = getNumSlots() * dynamic_radius_factor;
 	end
@@ -3212,7 +2981,6 @@ end
 function spawner.disable()
 	spawner.enabled = false;
 end
-event.onloadstate(spawner.disable, "ScriptHawk - Disable Actor Spawner");
 
 ------------
 -- Events --
@@ -3248,6 +3016,24 @@ end
 -- Flag Stuff --
 ----------------
 
+function flagIndexToBit(index)
+	return index % 8;
+end
+
+function flagIndexToByte(index)
+	if flagIndexToBit(index) == 0 then
+		return math.floor(index / 8) - 1;
+	end
+	return math.floor(index / 8);
+end
+
+function flagBitByteToIndex(flagByte, flagBit)
+	if flagBit == 0 then
+		flagByte = flagByte + 1;
+	end
+	return flagByte * 8 + flagBit;
+end
+
 local function getFlagByName(flagName)
 	for i = 1, #flag_array do
 		if flagName == flag_array[i].name then
@@ -3262,6 +3048,7 @@ function getFlagName(flagType, flagIndex)
 			return flag_array[i].name;
 		end
 	end
+	return "Unknown "..tostring(flagType).." > "..toHexString(flagIndex);
 end
 
 function flagTypeToBitfieldPointer(flagType, index)
@@ -3280,20 +3067,14 @@ end
 -- Set Flag Functions --
 ------------------------
 
-function setFlag(flagType, index)
+function setFlag(flagType, index, suppressPrint)
 	local bitfield_pointer = flagTypeToBitfieldPointer(flagType, index);
 	if isRDRAM(bitfield_pointer) then
-		local containingByte = bitfield_pointer;
-		if flagType ~= "Prog" then
-			containingByte = containingByte + ((index - 1) / 8);
-		else
-			containingByte = containingByte + (index / 8);
-		end
-		flagByte = mainmemory.readbyte(containingByte);
-		flagByte = bit.bor(flagByte, bit.lshift(1, index % 8));
-		mainmemory.writebyte(containingByte, flagByte);
-		if print_flag_writes then
-			print(toHexString(containingByte, 6, "80")..toHexString(flagByte, 2, " 00"));
+		local containingByte = bitfield_pointer + flagIndexToByte(index);
+		local currentValue = mainmemory.readbyte(containingByte);
+		mainmemory.writebyte(containingByte, bit.set(currentValue, flagIndexToBit(index)));
+		if realtime_flags and not suppressPrint then
+			checkFlags();
 		end
 	end
 end
@@ -3309,8 +3090,11 @@ function setFlagsByType(flagType)
 	for i = 1, #flag_array do
 		local flag = flag_array[i];
 		if flag.type == flagType then
-			setFlag(flagType, flag.index);
+			setFlag(flagType, flag.index, true);
 		end
+	end
+	if realtime_flags then
+		checkFlags();
 	end
 end
 
@@ -3318,14 +3102,20 @@ function setFlagsByLevel(levelIndex)
 	for i = 1, #flag_array do
 		local flag = flag_array[i];
 		if flag.level == levelIndex then
-			setFlag(flag.type, flag.index);
+			setFlag(flag.type, flag.index, true);
 		end
+	end
+	if realtime_flags then
+		checkFlags();
 	end
 end
 
 function setAllFlags()
 	for i = 1, #flag_array do
-		setFlag(flag_array[i].type, flag_array[i].index);
+		setFlag(flag_array[i].type, flag_array[i].index, true);
+	end
+	if realtime_flags then
+		checkFlags();
 	end
 end
 
@@ -3333,18 +3123,15 @@ end
 -- Clear Flag Functions --
 --------------------------
 
-function clearFlag(flagType, index)
+function clearFlag(flagType, index, suppressPrint)
 	local bitfield_pointer = flagTypeToBitfieldPointer(flagType, index);
 	if isRDRAM(bitfield_pointer) then
-		local containingByte = bitfield_pointer;
-		if flagType ~= "Prog" then
-			containingByte = containingByte + ((index - 1) / 8);
-		else
-			containingByte = containingByte + (index / 8);
+		local containingByte = bitfield_pointer + flagIndexToByte(index);
+		local currentValue = mainmemory.readbyte(containingByte);
+		mainmemory.writebyte(containingByte, bit.clear(currentValue, flagIndexToBit(index)));
+		if realtime_flags and not suppressPrint then
+			checkFlags();
 		end
-		local flagByte = mainmemory.readbyte(containingByte);
-		flagByte = bit.band(flagByte, bit.bnot(bit.lshift(1, index % 8)));
-		mainmemory.writebyte(containingByte, flagByte);
 	end
 end
 
@@ -3359,8 +3146,11 @@ function clearFlagsByType(flagType)
 	for i = 1, #flag_array do
 		local flag = flag_array[i];
 		if flag.type == flagType then
-			clearFlag(flagType, flag.index);
+			clearFlag(flagType, flag.index, true);
 		end
+	end
+	if realtime_flags then
+		checkFlags();
 	end
 end
 
@@ -3368,14 +3158,20 @@ function clearFlagsByLevel(levelIndex)
 	for i = 1, #flag_array do
 		local flag = flag_array[i];
 		if flag.level == levelIndex then
-			clearFlag(flag.type, flag.index);
+			clearFlag(flag.type, flag.index, true);
 		end
+	end
+	if realtime_flags then
+		checkFlags();
 	end
 end
 
 function clearAllFlags()
 	for i = 1, #flag_array do
-		clearFlag(flag_array[i].type, flag_array[i].index);
+		clearFlag(flag_array[i].type, flag_array[i].index, true);
+	end
+	if realtime_flags then
+		checkFlags();
 	end
 end
 
@@ -3386,15 +3182,9 @@ end
 function checkFlag(flagType, index)
 	local bitfield_pointer = flagTypeToBitfieldPointer(flagType, index);
 	if isRDRAM(bitfield_pointer) then
-		local containingByte = bitfield_pointer;
-		if flagType ~= "Prog" then
-			containingByte = containingByte + ((index - 1) / 8);
-		else
-			containingByte = containingByte + (index / 8);
-		end
-		flagByte = mainmemory.readbyte(containingByte);
-		flagByte = bit.band(flagByte, bit.lshift(1, index % 8));
-		return flagByte > 0;
+		local containingByte = bitfield_pointer + flagIndexToByte(index);
+		local currentValue = mainmemory.readbyte(containingByte);
+		return bit.check(currentValue, flagIndexToBit(index));
 	end
 	return false;
 end
@@ -3403,11 +3193,73 @@ function checkFlagByName(flagName)
 	local flag = getFlagByName(flagName);
 	if type(flag) == "table" then
 		if checkFlag(flag.type, flag.index) then
-			print("The flag \""..flag.name.."\" is SET");
+			print('The flag "'..flag.name..'" is SET');
 		else
-			print("The flag \""..flag.name.."\" is NOT set");
+			print('The flag "'..flag.name..'" is NOT set');
 		end
 	end
+end
+
+function checkFlagsByType(flagType)
+	for i = 1, #flag_array do
+		local flag = flag_array[i];
+		if flag.type == flagType then
+			if checkFlag(flag.type, flag.index) then
+				dprint('SET: "'..flag.name..'"');
+			else
+				dprint('NOT SET: "'..flag.name..'"');
+			end
+		end
+	end
+	print_deferred();
+end
+
+local flagBlockCache = nil;
+
+local function checkFlagsTypeInternal(currentFlags, currentFrame, flagType, maxIndex, maxByte)
+	local flagChangedThisFrame = false;
+	for i = 0, maxByte do
+		if flagBlockCache[flagType][i] ~= currentFlags[flagType][i] then
+			for j = 0, 7 do
+				local flagIndex = flagBitByteToIndex(i, j);
+				if flagIndex > 0 and flagIndex < maxIndex then
+					local wasSet = bit.check(flagBlockCache[flagType][i], j);
+					local isSet = bit.check(currentFlags[flagType][i], j);
+					if wasSet and not isSet then
+						dprint('Flag CLEARED on frame '..currentFrame..' "'..getFlagName(flagType, flagIndex)..'"');
+						flagChangedThisFrame = true;
+					elseif not wasSet and isSet then
+						dprint('Flag SET on frame '..currentFrame..' "'..getFlagName(flagType, flagIndex)..'"');
+						flagChangedThisFrame = true;
+					end
+				end
+			end
+		end
+	end
+	return flagChangedThisFrame;
+end
+
+function checkFlags()
+	local currentFrame = emu.framecount();
+	local currentFlags = {
+		H = mainmemory.readbyterange(Game.Memory.honeycomb_bitfield, 3), -- 0x18 / 8 = 3 bytes
+		MT = mainmemory.readbyterange(Game.Memory.mumbo_token_bitfield, 16), -- 0x7D / 8 ~= 16 bytes (15 bytes 5 bits)
+		Jig = mainmemory.readbyterange(Game.Memory.jiggy_bitfield, 13), -- 0x64 / 8 ~= 13 bytes (12 bytes 4 bits)
+		Prog = mainmemory.readbyterange(Game.Memory.game_progress_bitfield, 32), -- 0xFF / 8 ~= 32 bytes (31 bytes 7 bits)
+	};
+	if flagBlockCache ~= nil then
+		local flagChangedThisFrame = false;
+		flagChangedThisFrame = flagChangedThisFrame or checkFlagsTypeInternal(currentFlags, currentFrame, "H", 0x19, 2);
+		flagChangedThisFrame = flagChangedThisFrame or checkFlagsTypeInternal(currentFlags, currentFrame, "MT", 0x7E, 15);
+		flagChangedThisFrame = flagChangedThisFrame or checkFlagsTypeInternal(currentFlags, currentFrame, "Jig", 0x65, 12);
+		flagChangedThisFrame = flagChangedThisFrame or checkFlagsTypeInternal(currentFlags, currentFrame, "Prog", 0x100, 31);
+		if flagChangedThisFrame then
+			print_deferred();
+		end
+	else
+		print("Populated flag block cache");
+	end
+	flagBlockCache = currentFlags;
 end
 
 --------------------------
@@ -3475,6 +3327,18 @@ function Game.initUI()
 	end
 end
 
+function Game.onLoadState()
+	-- Clear flag block cache
+	flagBlockCache = nil;
+	if realtime_flags then
+		checkFlags();
+	end
+
+	-- Disable actor spawner
+	-- It's possible that the savestate that was loaded does not have the needed ASM patch installed
+	spawner.disable();
+end
+
 function Game.eachFrame()
 	updateWave();
 	freezeClipVelocity();
@@ -3493,6 +3357,10 @@ function Game.eachFrame()
 
 	if ScriptHawk.UI.ischecked("autopound_checkbox") then
 		autoPound();
+	end
+
+	if realtime_flags then
+		checkFlags();
 	end
 
 	-- Check EEPROM checksums

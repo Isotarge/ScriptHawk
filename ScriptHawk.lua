@@ -97,7 +97,7 @@ function ScriptHawk.UI.checkControls()
 		--dprint(k.." ("..v.."): Position: "..x..", "..y.." Size: "..w..", "..h);
 		for l, u in pairs(ScriptHawk.UI.form_controls) do
 			if v ~= u and ScriptHawk.UI.controlsOverlap(v, u) then
-				dprint("Warning: Controls \""..k.."\" and \""..l.."\" may be overlapping!");
+				dprint('Warning: Controls "'..k..'" and "'..l..'" may be overlapping!');
 			end
 		end
 	end
@@ -1414,14 +1414,14 @@ function ScriptHawk.UI.updateReadouts()
 
 			if value == nil then
 				if ScriptHawk.warnings then
-					print("Warning: When drawing the OSD, a value for label \""..label.."\" was nil");
+					print('Warning: When drawing the OSD, a value for label "'..label..'" was nil');
 				end
 				value = "nil";
 			end
 
 			if value ~= value then
 				if ScriptHawk.warnings then
-					print("Warning: When drawing the OSD, a value for label \""..label.."\" was NaN");
+					print('Warning: When drawing the OSD, a value for label "'..label..'" was NaN');
 				end
 				value = "NaN";
 			end
@@ -1935,9 +1935,12 @@ local function plot_pos()
 	end
 end
 
+if type(Game.onLoadState) == "function" then
+	event.onloadstate(Game.onLoadState, "ScriptHawk - Game.onLoadState");
+end
+event.onloadstate(plot_pos, "ScriptHawk - Update position on load state");
 event.onframeend(mainloop, "ScriptHawk - Controller input handler");
 event.onframeend(plot_pos, "ScriptHawk - Update position each frame");
-event.onloadstate(plot_pos, "ScriptHawk - Update position on load state");
 
 --------------
 -- Keybinds --

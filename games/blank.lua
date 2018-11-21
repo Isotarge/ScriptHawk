@@ -30,7 +30,7 @@ local Game = { -- This table stores the module's API function implementations an
 -- Modules should ideally use ROM hash rather than name, but both are passed in by ScriptHawk
 -- This function is optional, if you add version=n to the supportedGames entry for your module in ScriptHawk.lua, Game.version will be automatically populated by ScriptHawk on module startup
 function Game.detectVersion(romName, romHash)
-	if string.contains(romName, "Europe") then -- string.contains is a pure Lua global function provided by ScriptHawk, intended to replace calls to bizstring.contains() for portability reasons
+	if string.contains(romName, "Europe") then -- string.contains is a pure Lua global function provided by LibScriptHawk, intended to replace calls to bizstring.contains() for portability reasons
 		Game.version = 1; -- We use the version variable as an index for the Game.Memory table
 	elseif string.contains(romName, "Japan") then
 		Game.version = 2;
@@ -199,6 +199,11 @@ end
 -- When emulation is paused it will be called as fast as possible
 function Game.drawUI()
 	forms.settext(ScriptHawk.UI.form_controls["Example Value Label"], labelValue);
+end
+
+-- Optional: This function will be executed when a savestate is loaded, before the call to Game.eachFrame()
+function Game.onLoadState()
+	print("Savestate loaded!");
 end
 
 -- Optional: This function will be executed once per frame

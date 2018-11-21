@@ -2403,7 +2403,6 @@ function clearFlagCache()
 	global_flag_block_cache = {};
 	flag_block_cache = {};
 end
-event.onloadstate(clearFlagCache, "ScriptHawk - Clear Flag Cache");
 
 local global_flag_block_size = 0x10;
 local global_flag_array = {
@@ -4142,22 +4141,22 @@ function checkFlags()
 								local flag = flags_by_address[byte][_bit];
 								if not flag.ignore then
 									changeDetected = true;
-									dprint("Flag "..toHexString(byte, 2)..">".._bit..": \""..getFlagName(byte, _bit).."\" was set on frame "..emu.framecount());
+									dprint("Flag "..toHexString(byte, 2)..">".._bit..': "'..getFlagName(byte, _bit)..'" was set on frame '..emu.framecount());
 								end
 							else
 								changeDetected = true;
-								dprint("{byte="..toHexString(byte, 2)..", bit=".._bit..", name=\"Name\"},");
+								dprint("{byte="..toHexString(byte, 2)..", bit=".._bit..', name="Name"},');
 							end
 						elseif not isSet and wasSet then
 							if isKnown(byte, _bit) then
 								local flag = flags_by_address[byte][_bit];
 								if not flag.ignore then
 									changeDetected = true;
-									dprint("Flag "..toHexString(byte, 2)..">".._bit..": \""..getFlagName(byte, _bit).."\" was cleared on frame "..emu.framecount());
+									dprint("Flag "..toHexString(byte, 2)..">".._bit..': "'..getFlagName(byte, _bit)..'" was cleared on frame '..emu.framecount());
 								end
 							else
 								changeDetected = true;
-								dprint("Flag "..toHexString(byte, 2)..">".._bit..": \""..getFlagName(byte, _bit).."\" was cleared on frame "..emu.framecount());
+								dprint("Flag "..toHexString(byte, 2)..">".._bit..': "'..getFlagName(byte, _bit)..'" was cleared on frame '..emu.framecount());
 							end
 						end
 					end
@@ -4236,7 +4235,7 @@ function flagStats(verbose)
 		if flagType == nil then
 			untypedFlags = untypedFlags + 1;
 			if verbose then
-				dprint("Warning: Flag without type at "..toHexString(flag.byte, 2)..">"..flag.bit.." with name: \""..name.."\"");
+				dprint("Warning: Flag without type at "..toHexString(flag.byte, 2)..">"..flag.bit..' with name: "'..name..'"');
 			end
 		else
 			if flagType == "Cheat" then
@@ -4263,14 +4262,14 @@ function flagStats(verbose)
 			if not validType then
 				flagsWithUnknownType = flagsWithUnknownType + 1;
 				if verbose then
-					dprint("Warning: Flag with unknown type at "..toHexString(flag.byte, 2)..">"..flag.bit.." with name: \""..name.."\"".." and type: \""..flagType.."\"");
+					dprint("Warning: Flag with unknown type at "..toHexString(flag.byte, 2)..">"..flag.bit..' with name: "'..name..'"'..' and type: "'..flagType..'"');
 				end
 			end
 		end
 		if flag.map ~= nil or flag.nomap == true then
 			flagsWithMap = flagsWithMap + 1;
 		elseif verbose then
-			--dprint("Warning: Flag without map tag at "..toHexString(flag.byte, 2)..">"..flag.bit.." with name: \""..name.."\"");
+			--dprint("Warning: Flag without map tag at "..toHexString(flag.byte, 2)..">"..flag.bit..' with name: "'..name..'"');
 		end
 	end
 
@@ -4377,12 +4376,12 @@ function checkGlobalFlags()
 			if not ignore then
 				if isSet and not wasSet then
 					if isKnownGlobal(byte, bit) then
-						dprint("Global Flag "..toHexString(byte, 2)..">"..bit..": \""..flag.name.."\" was set on frame "..emu.framecount());
+						dprint("Global Flag "..toHexString(byte, 2)..">"..bit..': "'..flag.name..'" was set on frame '..emu.framecount());
 					else
-						dprint("{byte="..toHexString(byte, 2)..", bit="..bit..", name=\"Name\"}, (GLOBAL)");
+						dprint("{byte="..toHexString(byte, 2)..", bit="..bit..', name="Name"}, (GLOBAL)');
 					end
 				elseif not isSet and wasSet then
-					dprint("Global Flag "..toHexString(byte, 2)..">"..bit..": \""..getGlobalFlagName(byte, bit).."\" was cleared on frame "..emu.framecount());
+					dprint("Global Flag "..toHexString(byte, 2)..">"..bit..': "'..getGlobalFlagName(byte, bit)..'" was cleared on frame '..emu.framecount());
 				end
 			end
 		end
@@ -5639,6 +5638,10 @@ function Game.initUI()
 	ScriptHawk.UI.checkbox(5, 6, "toggle_autojump", "Autojump");
 
 	flagStats();
+end
+
+function Game.onLoadState()
+	clearFlagCache();
 end
 
 function Game.eachFrame()

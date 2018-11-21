@@ -1,18 +1,30 @@
 # ScriptHawk TODO list
-## High Priority
+## General
 - Blank template that's more lightweight
-- Save and Load settings from a config file on disk
+- Remove blank entries from user_preferences.lua
+	- If entry is blank for a module, don't write it to file on save
+- Allow modules to save extra settings via UserPreferences system
+- Save and Load ScriptHawk settings using UserPreferences system
 	- Joypad/Keyboard binds for D-Pad and L Button
 	- Rounding precision
 	- Rotation units
 	- Mode? Arguable
 	- Warnings/UITest?
 - Bulk support SMS games with new hitbox API
-- General: UI to load ASM patches, can currently only be done by calling loadASMPatch(filename, suppressprint) in the lua console
+- UI to load ASM patches, can currently only be done by calling loadASMPatch(filename, suppressprint) in the lua console
+
+## Specific Modules
+- Balloon Fight:
+	- Mine the [disassembly](https://github.com/LuigiBlood/balloonfight_dis) for info
 - DK64:
-	- Find menu cutscene nonsense
 	- Finish flag documentation
 	- Increase identifyMemory() coverage
+	- ASM hook for other regions
+- Phantasy Star (SMS)
+	- Make a module
+	- Mine the [disassembly](https://github.com/lory90/ps1disasm) for info
+- Sonic 1 (SMS/GG)
+	- Mine the [disassembly](https://github.com/Kroc/Sonic1-Z80-ASM) for info
 
 ## Low priority, recurring, or waiting:
 - Object Analysis Tools:
@@ -25,6 +37,3 @@
 - Keep [lips](https://github.com/notwa/lips) up to date
 - Support both BizHawk and m64p?
 	- [Info here](https://github.com/notwa/mm/commit/90d30e218f3128fb130e54bd8662527bdd73f40f)
-	- Squish remaining calls to bizstring library
-		- Wonder Boy III RNG Watch.lua
-- DK64: ASM hook for other regions

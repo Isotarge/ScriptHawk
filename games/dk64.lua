@@ -880,7 +880,7 @@ obj_model1 = {
 		[42] = "Grape",
 		[43] = "Feather",
 		[44] = "Laser", -- Projectile
-		[45] = "Golden Banana", -- Vulture, possibly some other places
+		[45] = "Golden Banana", -- Vulture, bonus barrels (US code 0x6818EE), probably some other places
 		[46] = "Barrel Gun", -- Teetering Turtle Trouble
 		[47] = "Watermelon Slice",
 		[48] = "Coconut",
@@ -4533,7 +4533,6 @@ local flag_block_cache = {};
 local function clearFlagCache()
 	flag_block_cache = {};
 end
-event.onloadstate(clearFlagCache, "ScriptHawk - Clear Flag Cache");
 
 local function getFlag(byte, bit)
 	for i = 1, #flag_array do
@@ -4583,15 +4582,15 @@ function checkFlags(showKnown)
 					if isSetNow and not wasSet then
 						if not isFlagFound(i, bit) then
 							flagFound = true;
-							dprint("{byte="..toHexString(i, 2)..", bit="..bit..", name=\"Name\", type=\"Type\", map="..map_value.."},");
+							dprint("{byte="..toHexString(i, 2)..", bit="..bit..', name="Name", type="Type", map='..map_value.."},");
 						else
 							if showKnown then
 								local currentFlag = getFlag(i, bit);
 								if not currentFlag.ignore then
 									if currentFlag.map ~= nil or currentFlag.nomap == true then
-										dprint("Flag "..toHexString(i, 2)..">"..bit..": \""..currentFlag.name.."\" was set on frame "..emu.framecount());
+										dprint("Flag "..toHexString(i, 2)..">"..bit..': "'..currentFlag.name..'" was set on frame '..emu.framecount());
 									else
-										dprint("Flag "..toHexString(i, 2)..">"..bit..": \""..currentFlag.name.."\" was set on frame "..emu.framecount().." ADD MAP "..map_value.." PLEASE");
+										dprint("Flag "..toHexString(i, 2)..">"..bit..': "'..currentFlag.name..'" was set on frame '..emu.framecount().." ADD MAP "..map_value.." PLEASE");
 									end
 								end
 							end
@@ -4599,11 +4598,11 @@ function checkFlags(showKnown)
 						end
 					elseif not isSetNow and wasSet then
 						if not isFlagFound(i, bit) then
-							dprint("Flag "..toHexString(i, 2)..">"..bit..": \"Unknown\" was cleared on frame "..emu.framecount());
+							dprint("Flag "..toHexString(i, 2)..">"..bit..': "Unknown" was cleared on frame '..emu.framecount());
 						elseif showKnown then
 							local currentFlag = getFlag(i, bit);
 							if not currentFlag.ignore then
-								dprint("Flag "..toHexString(i, 2)..">"..bit..": \""..currentFlag.name.."\" was cleared on frame "..emu.framecount());
+								dprint("Flag "..toHexString(i, 2)..">"..bit..': "'..currentFlag.name..'" was cleared on frame '..emu.framecount());
 							end
 						end
 					end
@@ -4720,7 +4719,7 @@ function setFlag(byte, bit, suppressPrint)
 		mainmemory.writebyte(flags + byte, set_bit(currentValue, bit));
 		if not suppressPrint then
 			if isFlagFound(byte, bit) then
-				print("Set \""..Game.getFlagName(byte, bit).."\" at "..toHexString(byte)..">"..bit);
+				print('Set "'..Game.getFlagName(byte, bit)..'" at '..toHexString(byte)..">"..bit);
 			else
 				print("Set "..Game.getFlagName(byte, bit));
 			end
@@ -4789,7 +4788,7 @@ function clearFlag(byte, bit, suppressPrint)
 		mainmemory.writebyte(flags + byte, clear_bit(currentValue, bit));
 		if not suppressPrint then
 			if isFlagFound(byte, bit) then
-				print("Cleared \""..Game.getFlagName(byte, bit).."\" at "..toHexString(byte)..">"..bit);
+				print('Cleared "'..Game.getFlagName(byte, bit)..'" at '..toHexString(byte)..">"..bit);
 			else
 				print("Cleared "..Game.getFlagName(byte, bit));
 			end
@@ -4954,7 +4953,7 @@ function flagStats(verbose)
 		if flag.type == nil then
 			untypedFlags = untypedFlags + 1;
 			if verbose then
-				dprint("Warning: Flag without type at "..toHexString(flag.byte, 2)..">"..flag.bit.." with name: \""..flag.name.."\"");
+				dprint("Warning: Flag without type at "..toHexString(flag.byte, 2)..">"..flag.bit..' with name: "'..flag.name..'"');
 			end
 		else
 			if flag.type == "B. Locker" or flag.type == "Cutscene" or flag.type == "FTT" or flag.type == "Key" or flag.type == "Kong" or flag.type == "Physical" or flag.type == "Progress" or flag.type == "Special Coin" or flag.type == "T&S" or flag.type == "Unknown" then
@@ -4963,14 +4962,14 @@ function flagStats(verbose)
 			if not validType then
 				flagsWithUnknownType = flagsWithUnknownType + 1;
 				if verbose then
-					dprint("Warning: Flag with unknown type at "..toHexString(flag.byte, 2)..">"..flag.bit.." with name: \""..flag.name.."\"".." and type: \""..flag.type.."\"");
+					dprint("Warning: Flag with unknown type at "..toHexString(flag.byte, 2)..">"..flag.bit..' with name: "'..flag.name..'"'..' and type: "'..flag.type..'"');
 				end
 			end
 		end
 		if flag.map ~= nil or flag.nomap == true then
 			flagsWithMap = flagsWithMap + 1;
 		elseif verbose then
-			dprint("Warning: Flag without map tag at "..toHexString(flag.byte, 2)..">"..flag.bit.." with name: \""..flag.name.."\"");
+			dprint("Warning: Flag without map tag at "..toHexString(flag.byte, 2)..">"..flag.bit..' with name: "'..flag.name..'"');
 		end
 	end
 
@@ -6496,7 +6495,7 @@ local japan_charset = {
 	"4", "5", "6", "7", "8", "9", "A", "B", "C", "D", -- 2
 	"E", "F", "G", "H", "I", "J", "K", "\0", "M", "N", -- 3
 	"O", "P", "Q", "R", "S", "T", "U", "V", "W", "X", -- 4
-	"Y", "Z", "!", "\"", "#", "'", "*", "+", ",", "-", -- 5
+	"Y", "Z", "!", '"', "#", "'", "*", "+", ",", "-", -- 5
 	".", "/", ":", "=", "?", "@", "。", "゛", " ", "ァ", -- 6
 	"ィ", "ゥ", "ェ", "ォ", "ッ", "ャ", "ュ", "ョ", "ヲ", "ン", -- 7
 	"ア", "イ", "ウ", "エ", "オ", "カ", "キ", "ク", "ケ", "コ", -- 8
@@ -7190,7 +7189,7 @@ koshBot = {
 		[8] = {["X Axis"] = -128, ["Y Axis"] = 127},
 	},
 	shots_fired = {
-		0, 0, 0, 0, 0, 0, 0, 0
+		0, 0, 0, 0, 0, 0, 0, 0,
 	},
 	previousFrameMelonCount = 0,
 	quickfire_reload_enabled = 0,
@@ -7208,11 +7207,9 @@ end
 
 koshBot.resetSlots = function()
 	koshBot.shots_fired = {
-		0, 0, 0, 0, 0, 0, 0, 0
+		0, 0, 0, 0, 0, 0, 0, 0,
 	};
 end
-
-event.onloadstate(koshBot.resetSlots);
 
 koshBot.getSlotPointer = function(koshController, slotIndex)
 	return dereferencePointer(koshController + obj_model1.kosh_kontroller.slot_pointer_base + (slotIndex - 1) * 4);
@@ -8835,6 +8832,11 @@ function dumpMapCollisions()
 	globalVertIndex = 0;
 	dumpMapWalls();
 	dumpMapFloors();
+end
+
+function Game.onLoadState()
+	clearFlagCache();
+	koshBot.resetSlots();
 end
 
 function Game.eachFrame()

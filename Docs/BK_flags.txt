@@ -120,11 +120,11 @@ C0 03 00 00 = # of pieces placed in FP Puzzle
 00 20 00 00 = CCW Autumn Open
 00 40 00 00 = CCW Winter Open
 00 80 00 00 = Mumbo's Magic Getting Weak, animal turn back 
-00 00 01 00 Termite Transform Payed For
-00 00 02 00 Pumpkin Transform Payed For
-00 00 04 00 Walrus Transform Payed For
-00 00 08 00 Croc Transform Payed For
-00 00 10 00 Bee Transform Payed For
+00 00 01 00 Termite Transform Paid For
+00 00 02 00 Pumpkin Transform Paid For
+00 00 04 00 Walrus Transform Paid For
+00 00 08 00 Croc Transform Paid For
+00 00 10 00 Bee Transform Paid For
 
 00 00 40 00 = 1st time talking to brentilda text
 00 00 80 00 = 1st time in lair text
@@ -132,7 +132,7 @@ C0 03 00 00 = # of pieces placed in FP Puzzle
 00 00 00 02 = 1st time through 50 Note Door text
 
 00 00 00 08 = CC WS Eyes Activated
-00 00 00 10 = CC WS Left Eye Pressed 
+00 00 00 10 = CC WS Left Eye Pressed
 00 00 00 20 = CC WS Right Eye Pressed
 00 00 00 40 = Crypt Water Switch Coffin Lid Broken
 
@@ -203,7 +203,7 @@ C0 03 00 00 = # of pieces placed in FP Puzzle
 01 00 00 00 = 'Z' to place all pieces
 
 04 00 00 00 = DoG Open
-08 00 00 00 = CCW Flower Spring State 
+08 00 00 00 = CCW Flower Spring State
 10 00 00 00 = CCW Flower Summer State
 20 00 00 00 = CCW Flower Autumn State
 40 00 00 00 = Spring Eeyrie Egg Broken
@@ -295,9 +295,9 @@ GLOBAL CHEAT FLAGS
 00 00 80 00 = BOTTLES BONUS 1
 00 00 00 01 = BOTTLES BONUS 2
 00 00 00 02 = BOTTLES BONUS 3
-00 00 00 04 = BOTTLES BONUS 4 
+00 00 00 04 = BOTTLES BONUS 4
 00 00 00 08 = BOTTLES BONUS 5
-00 00 00 10 = BIG BOTTLES BONUS 
+00 00 00 10 = BIG BOTTLES BONUS
 00 00 00 20 = WISHY WASHY BANJO
 00 00 00 40 = 
 00 00 00 80 = 

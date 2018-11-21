@@ -367,7 +367,7 @@ function dumpBridgePieces()
 	for k, v in ipairs(hitboxes) do
 		if v.type == 0x2E then
 			bridgeCount = bridgeCount + 1;
-			stringThing = "{";
+			local stringThing = "{";
 			for i = 0x0, 0x19 do
 				stringThing = stringThing..toHexString(mainmemory.readbyte(v.dragTag + i), 2)..",";
 			end

@@ -384,7 +384,7 @@ function checkParts(carIndex)
 				--print(bit.." isSet "..tostring(isSet).." wasSet "..tostring(wasSet));
 				if isSet and (not wasSet) then
 					if not isKnownPart(i, bit) then
-						print("{byte="..toHexString(i, 2)..", bit="..bit..", name=\"Name\"},");
+						print("{byte="..toHexString(i, 2)..", bit="..bit..', name="Name"},');
 					end
 				end
 			end
@@ -426,7 +426,7 @@ function Game.exportCar(carIndex)
 		exportString = exportString..value;
 	end
 	print("Export complete:");
-	print("Game.importCar(\""..exportString.."\")");
+	print('Game.importCar("'..exportString..'")');
 end
 
 function Game.importCar(importString, carIndex)
