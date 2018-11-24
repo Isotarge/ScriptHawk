@@ -1,5 +1,7 @@
 # ScriptHawk TODO list
 ## General
+- Better High DPI support
+	- Editing ScriptHawk.UI.button_height does a [decent job](https://twitter.com/Isotarge/status/963992829746855937), but it's not perfect
 - Blank template that's more lightweight
 - Remove blank entries from user_preferences.lua
 	- If entry is blank for a module, don't write it to file on save
@@ -23,6 +25,8 @@
 - Phantasy Star (SMS)
 	- Make a module
 	- Mine the [disassembly](https://github.com/lory90/ps1disasm) for info
+- Rats! (GBC)
+	- Hitboxes, we've got object positions just need camera data/screen size etc
 - Sonic 1 (SMS/GG)
 	- Mine the [disassembly](https://github.com/Kroc/Sonic1-Z80-ASM) for info
 

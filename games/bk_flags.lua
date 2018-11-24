@@ -245,21 +245,21 @@ return {
 	{name="MMM: Jig: Loggo",			index=0x64,	type="Jig",	level=10},
 
 -- Game Progress
-	{name="1st Note Text",			index=0x03,	type="Prog",	level=6},
-	{name="1st Mumbo Token Text",		index=0x04,	type="Prog",	level=6},
-	{name="1st Egg Text",				index=0x05,	type="Prog",	level=6},
-	{name="1st Red Feather Text",		index=0x06,	type="Prog",	level=6},
-	{name="1st Gold Feather Text",	index=0x07,	type="Prog",	level=6},
-	{name="1st Gold Bullion Text",	index=0x08,	type="Prog",	level=6},
-	{name="1st Orange Text",			index=0x09,	type="Prog",	level=6},
-	{name="1st Honeycomb Text",		index=0x0A,	type="Prog",	level=6},
-	{name="1st Empty Honeycomb Text",	index=0x0B,	type="Prog",	level=6},
+	{name="1st Note Text",			index=0x03,	type="Prog",	level=6}, -- 0x00 > 3
+	{name="1st Mumbo Token Text",		index=0x04,	type="Prog",	level=6}, -- 0x00 > 4
+	{name="1st Egg Text",				index=0x05,	type="Prog",	level=6}, -- 0x00 > 5
+	{name="1st Red Feather Text",		index=0x06,	type="Prog",	level=6}, -- 0x00 > 6
+	{name="1st Gold Feather Text",	index=0x07,	type="Prog",	level=6}, -- 0x00 > 7
+	{name="1st Gold Bullion Text",	index=0x08,	type="Prog",	level=6}, -- 0x01 > 1 (flipped, but only for this byte, no idea why)
+	{name="1st Orange Text",			index=0x09,	type="Prog",	level=6}, -- 0x01 > 0 (flipped, but only for this byte, no idea why)
+	{name="1st Honeycomb Text",		index=0x0A,	type="Prog",	level=6}, -- 0x01 > 2
+	{name="1st Empty Honeycomb Text",	index=0x0B,	type="Prog",	level=6}, -- 0x01 > 3
 	{name="1st Extra Life Text",		index=0x0C,	type="Prog",	level=6},
 	{name="1st Beehive Text",			index=0x0D,	type="Prog",	level=6},
 	{name="1st Jinjo Text",			index=0x0E,	type="Prog",	level=6},
 	{name="1st Time Pirahana Text",	index=0x0F,	type="Prog",	level=6},
-	{name="1st Sand Eel Text",		index=0x10,	type="Prog",	level=6},
-	{name="1st Meeting Mumbo Text",	index=0x11,	type="Prog",	level=6},
+	{name="1st Sand Eel Text",		index=0x10,	type="Prog",	level=6}, -- 0x02 > 0
+	{name="1st Meeting Mumbo Text",	index=0x11,	type="Prog",	level=6}, -- 0x02 > 1
 	{name="1st Post XForm Mumbo Text",	index=0x12,	type="Prog",	level=6},
 
 	{name="1st FP Icy Water Text",		index=0x14,	type="Prog",	level=6},

@@ -20,7 +20,7 @@ local Game = {
 		lives = 0x62D,
 		bomb_timer1 = 0x4D7,
 		bomb_timer2 = 0x4D8,
-        tile_value = 0x0615,
+		tile_value = 0x0615,
 	},
 };
 
@@ -103,23 +103,11 @@ function Game.getBombTimer2()
 end
 
 function Game.getTileValue()
-    return mainmemory.readbyte(Game.Memory.tile_value);
+	return mainmemory.readbyte(Game.Memory.tile_value);
 end
 
---[[
-Definitely Object X Positions:
-0x550
-0x551 apple
-0x552 apple 2
-
-Definitely Object Y Positions:
-0x568
-0x569 apple
-0x56A apple 2
---]]
-
-object_array_capacity = 12;
-object_fields = {
+local object_array_capacity = 12;
+local object_fields = {
 	x_position_super = 0x542, -- s8 - Super major
 	x_position = 0x54A, -- u8 - Major
 	y_position = 0x562,
@@ -220,8 +208,8 @@ Game.OSD = {
 	{"Separator"},
 	{"Bomb Timer 1", Game.getBombTimer1},
 	{"Bomb Timer 2", Game.getBombTimer2},
-    {"Separator"},
-    {"Tile Value", Game.getTileValue},
+	{"Separator"},
+	{"Tile Value", Game.getTileValue},
 };
 
 return Game;

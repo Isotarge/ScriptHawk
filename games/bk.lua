@@ -3016,20 +3016,42 @@ end
 -- Flag Stuff --
 ----------------
 
-function flagIndexToBit(index)
-	return index % 8;
-end
-
-function flagIndexToByte(index)
-	if flagIndexToBit(index) == 0 then
-		return math.floor(index / 8) - 1;
+function flagIndexToByteBit(flagType, index)
+	local flagByte = math.floor(index / 8);
+	local flagBit = index % 8;
+	if flagType == "Prog" then
+		-- These bits are flipped for progress flags, but only for the second byte in the array, I have no idea why
+		if flagByte == 1 then
+			if flagBit == 0 then
+				flagBit = 1;
+			elseif flagBit == 1 then
+				flagBit = 0;
+			end
+		end
+	else
+		-- Again, I have no idea why
+		if flagBit == 0 then
+			flagByte = math.floor(index / 8) - 1;
+		end
 	end
-	return math.floor(index / 8);
+	return flagByte, flagBit;
 end
 
-function flagBitByteToIndex(flagByte, flagBit)
-	if flagBit == 0 then
-		flagByte = flagByte + 1;
+function flagByteBitToIndex(flagType, flagByte, flagBit)
+	if flagType == "Prog" then
+		-- These bits are flipped for progress flags, but only for the second byte in the array, I have no idea why
+		if flagByte == 1 then
+			if flagBit == 0 then
+				flagBit = 1;
+			elseif flagBit == 1 then
+				flagBit = 0;
+			end
+		end
+	else
+		-- Again, I have no idea why
+		if flagBit == 0 then
+			flagByte = flagByte + 1;
+		end
 	end
 	return flagByte * 8 + flagBit;
 end
@@ -3070,9 +3092,10 @@ end
 function setFlag(flagType, index, suppressPrint)
 	local bitfield_pointer = flagTypeToBitfieldPointer(flagType, index);
 	if isRDRAM(bitfield_pointer) then
-		local containingByte = bitfield_pointer + flagIndexToByte(index);
+		local flagByte, flagBit = flagIndexToByteBit(flagType, index);
+		local containingByte = bitfield_pointer + flagByte;
 		local currentValue = mainmemory.readbyte(containingByte);
-		mainmemory.writebyte(containingByte, bit.set(currentValue, flagIndexToBit(index)));
+		mainmemory.writebyte(containingByte, bit.set(currentValue, flagBit));
 		if realtime_flags and not suppressPrint then
 			checkFlags();
 		end
@@ -3126,9 +3149,10 @@ end
 function clearFlag(flagType, index, suppressPrint)
 	local bitfield_pointer = flagTypeToBitfieldPointer(flagType, index);
 	if isRDRAM(bitfield_pointer) then
-		local containingByte = bitfield_pointer + flagIndexToByte(index);
+		local flagByte, flagBit = flagIndexToByteBit(flagType, index);
+		local containingByte = bitfield_pointer + flagByte;
 		local currentValue = mainmemory.readbyte(containingByte);
-		mainmemory.writebyte(containingByte, bit.clear(currentValue, flagIndexToBit(index)));
+		mainmemory.writebyte(containingByte, bit.clear(currentValue, flagBit));
 		if realtime_flags and not suppressPrint then
 			checkFlags();
 		end
@@ -3182,9 +3206,10 @@ end
 function checkFlag(flagType, index)
 	local bitfield_pointer = flagTypeToBitfieldPointer(flagType, index);
 	if isRDRAM(bitfield_pointer) then
-		local containingByte = bitfield_pointer + flagIndexToByte(index);
+		local flagByte, flagBit = flagIndexToByteBit(flagType, index);
+		local containingByte = bitfield_pointer + flagByte;
 		local currentValue = mainmemory.readbyte(containingByte);
-		return bit.check(currentValue, flagIndexToBit(index));
+		return bit.check(currentValue, flagBit);
 	end
 	return false;
 end
@@ -3204,10 +3229,11 @@ function checkFlagsByType(flagType)
 	for i = 1, #flag_array do
 		local flag = flag_array[i];
 		if flag.type == flagType then
+			local flagByte, flagBit = flagIndexToByteBit(flag.type, flag.index);
 			if checkFlag(flag.type, flag.index) then
-				dprint('SET: "'..flag.name..'"');
+				dprint('Index: '..toHexString(flag.index)..': '..toHexString(flagByte)..'>'..flagBit..' SET: "'..flag.name..'"');
 			else
-				dprint('NOT SET: "'..flag.name..'"');
+				dprint('Index: '..toHexString(flag.index)..': '..toHexString(flagByte)..'>'..flagBit..' NOT SET: "'..flag.name..'"');
 			end
 		end
 	end
@@ -3221,7 +3247,7 @@ local function checkFlagsTypeInternal(currentFlags, currentFrame, flagType, maxI
 	for i = 0, maxByte do
 		if flagBlockCache[flagType][i] ~= currentFlags[flagType][i] then
 			for j = 0, 7 do
-				local flagIndex = flagBitByteToIndex(i, j);
+				local flagIndex = flagByteBitToIndex(flagType, i, j);
 				if flagIndex > 0 and flagIndex < maxIndex then
 					local wasSet = bit.check(flagBlockCache[flagType][i], j);
 					local isSet = bit.check(currentFlags[flagType][i], j);
