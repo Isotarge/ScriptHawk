@@ -979,8 +979,8 @@ function Game.unlockCharacters()
 
 	-- Turn on TT & Drumstick magic codes
 	local cheatsEnabled = mainmemory.read_u32_be(Game.Memory.cheats_enabled);
-	cheatsEnabled = setBit(cheatsEnabled, 0); -- TT
-	cheatsEnabled = setBit(cheatsEnabled, 1); -- Drumstick
+	cheatsEnabled = bit.set(cheatsEnabled, 0); -- TT
+	cheatsEnabled = bit.set(cheatsEnabled, 1); -- Drumstick
 	mainmemory.write_u32_be(Game.Memory.cheats_enabled, cheatsEnabled);
 end
 

@@ -2111,9 +2111,9 @@ local function getExamineDataModelOne(pointer)
 
 	local visibilityValue = mainmemory.readbyte(pointer + obj_model1.visibility);
 	table.insert(examine_data, { "Visibility", toBinaryString(visibilityValue) });
-	table.insert(examine_data, { "In water", tostring(not get_bit(visibilityValue, 0)) });
-	table.insert(examine_data, { "Visible", tostring(get_bit(visibilityValue, 2)) });
-	table.insert(examine_data, { "Collides with terrain", tostring(get_bit(visibilityValue, 4)) });
+	table.insert(examine_data, { "In water", tostring(not bit.check(visibilityValue, 0)) });
+	table.insert(examine_data, { "Visible", tostring(bit.check(visibilityValue, 2)) });
+	table.insert(examine_data, { "Collides with terrain", tostring(bit.check(visibilityValue, 4)) });
 	table.insert(examine_data, { "Destination", Game.maps[mainmemory.read_u16_be(pointer + obj_model1.destination_map) + 1] or "Unknown"});
 	table.insert(examine_data, { "Separator", 1 });
 
@@ -4577,8 +4577,8 @@ function checkFlags(showKnown)
 			previousValue = flag_block_cache[i];
 			if currentValue ~= previousValue then
 				for bit = 0, 7 do
-					local isSetNow = get_bit(currentValue, bit);
-					local wasSet = get_bit(previousValue, bit);
+					local isSetNow = check_bit(currentValue, bit);
+					local wasSet = check_bit(previousValue, bit);
 					if isSetNow and not wasSet then
 						if not isFlagFound(i, bit) then
 							flagFound = true;
@@ -5464,7 +5464,7 @@ function Game.colorNoclipByte()
 	local playerObject = Game.getPlayerObject();
 	if isRDRAM(playerObject) then
 		local value = mainmemory.readbyte(playerObject + obj_model1.noclip_byte);
-		if not (check_bit(value, 2) and check_bit(value, 3)) then
+		if not (bit.check(value, 2) and bit.check(value, 3)) then
 			return 0xFF007FFF; -- Blue
 		end
 	end
@@ -5955,14 +5955,14 @@ local function toggle_invisify()
 	local playerObject = Game.getPlayerObject();
 	if isRDRAM(playerObject) then
 		local visibilityBitfieldValue = mainmemory.readbyte(playerObject + obj_model1.visibility);
-		mainmemory.writebyte(playerObject + obj_model1.visibility, toggle_bit(visibilityBitfieldValue, 2));
+		mainmemory.writebyte(playerObject + obj_model1.visibility, bit.toggle(visibilityBitfieldValue, 2));
 	end
 end
 
 local function updateCurrentInvisify()
 	local playerObject = Game.getPlayerObject();
 	if isRDRAM(playerObject) then
-		local isVisible = check_bit(mainmemory.readbyte(playerObject + obj_model1.visibility), 2);
+		local isVisible = bit.check(mainmemory.readbyte(playerObject + obj_model1.visibility), 2);
 		if isVisible then
 			current_invisify = "Invisify";
 		else
@@ -5974,24 +5974,24 @@ end
 
 function Game.toggleTBVoid()
 	local tb_void_byte_val = mainmemory.readbyte(Game.Memory.tb_void_byte);
-	tb_void_byte_val = toggle_bit(tb_void_byte_val, 4); -- Turn on the lights
-	tb_void_byte_val = toggle_bit(tb_void_byte_val, 5); -- Show Object Model 2 Objects
+	tb_void_byte_val = bit.toggle(tb_void_byte_val, 4); -- Turn on the lights
+	tb_void_byte_val = bit.toggle(tb_void_byte_val, 5); -- Show Object Model 2 Objects
 	mainmemory.writebyte(Game.Memory.tb_void_byte, tb_void_byte_val);
 end
 
 function Game.forcePause()
 	local voidByteValue = mainmemory.readbyte(Game.Memory.tb_void_byte);
-	mainmemory.writebyte(Game.Memory.tb_void_byte, set_bit(voidByteValue, 0));
+	mainmemory.writebyte(Game.Memory.tb_void_byte, bit.set(voidByteValue, 0));
 end
 
 function Game.forceZipper()
 	local voidByteValue = mainmemory.readbyte(Game.Memory.tb_void_byte - 1);
-	mainmemory.writebyte(Game.Memory.tb_void_byte - 1, set_bit(voidByteValue, 0));
+	mainmemory.writebyte(Game.Memory.tb_void_byte - 1, bit.set(voidByteValue, 0));
 end
 
 function Game.pauseCancel()
 	local pause_cancel_byte_val = mainmemory.readbyte(Game.Memory.tb_void_byte);
-	mainmemory.writebyte(Game.Memory.tb_void_byte, set_bit(pause_cancel_byte_val, 6)); -- Gives Pause Cancel
+	mainmemory.writebyte(Game.Memory.tb_void_byte, bit.set(pause_cancel_byte_val, 6)); -- Gives Pause Cancel
 end
 
 function Game.gainControl()
@@ -5999,7 +5999,7 @@ function Game.gainControl()
 	local cameraObject = dereferencePointer(Game.Memory.camera_pointer);
 	if isRDRAM(playerObject) then
 		local visibilityBitfieldValue = mainmemory.readbyte(playerObject + obj_model1.visibility);
-		mainmemory.writebyte(playerObject + obj_model1.visibility, set_bit(visibilityBitfieldValue, 2));
+		mainmemory.writebyte(playerObject + obj_model1.visibility, bit.set(visibilityBitfieldValue, 2));
 		mainmemory.writebyte(playerObject + obj_model1.control_state_byte, 0x0C);
 		local vehiclePointer = dereferencePointer(playerObject + obj_model1.player.vehicle_actor_pointer);
 		if isRDRAM(vehiclePointer) then

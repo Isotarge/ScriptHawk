@@ -1,0 +1,16 @@
+SystemID NES
+0520	b	h	0	RAM	Game Speed
+0521	b	u	0	RAM	Level
+0522	b	h	0	RAM	Name Char 1
+0523	b	h	0	RAM	Name Char 2
+0524	b	h	0	RAM	Name Char 3
+0525	b	h	0	RAM	Name Char 4
+0527	w	u	0	RAM	Gold
+0537	w	u	0	RAM	EXP
+0539	w	u	0	RAM	Max EXP
+053B	b	u	0	RAM	Current Weapon
+053D	b	u	0	RAM	Current Armour
+053F	b	u	0	RAM	Current Medicine
+0541	b	u	0	RAM	Current ESP Ability
+05D4	b	u	0	RAM	Damage Cooldown
+

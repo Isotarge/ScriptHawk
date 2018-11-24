@@ -848,23 +848,23 @@ end
 
 function Game.unlockEverything()
 	local value = mainmemory.readbyte(Game.Memory.unlocked_stuff + 3);
-	value = set_bit(value, 0); -- Luigi Unlock Battle Completed
-	value = set_bit(value, 1); -- Ness Unlock Battle Completed
-	value = set_bit(value, 2); -- Captain Falcon Unlock Battle Completed
-	value = set_bit(value, 3); -- Jigglypuff Unlock Battle Completed
-	value = set_bit(value, 4); -- Mushroom Kingdom Available
-	value = set_bit(value, 5); -- Sound Test Unlocked
-	value = set_bit(value, 6); -- Item Switch Unlocked
+	value = bit.set(value, 0); -- Luigi Unlock Battle Completed
+	value = bit.set(value, 1); -- Ness Unlock Battle Completed
+	value = bit.set(value, 2); -- Captain Falcon Unlock Battle Completed
+	value = bit.set(value, 3); -- Jigglypuff Unlock Battle Completed
+	value = bit.set(value, 4); -- Mushroom Kingdom Available
+	value = bit.set(value, 5); -- Sound Test Unlocked
+	value = bit.set(value, 6); -- Item Switch Unlocked
 	mainmemory.writebyte(Game.Memory.unlocked_stuff + 3, value);
 
 	value = mainmemory.readbyte(Game.Memory.unlocked_stuff + 4);
-	value = set_bit(value, 2); -- Jigglypuff Selectable
-	value = set_bit(value, 3); -- Ness Selectable
+	value = bit.set(value, 2); -- Jigglypuff Selectable
+	value = bit.set(value, 3); -- Ness Selectable
 	mainmemory.writebyte(Game.Memory.unlocked_stuff + 4, value);
 
 	value = mainmemory.readbyte(Game.Memory.unlocked_stuff + 5);
-	value = set_bit(value, 4); -- Luigi Selectable
-	value = set_bit(value, 7); -- Captain Falcon Selectable
+	value = bit.set(value, 4); -- Luigi Selectable
+	value = bit.set(value, 7); -- Captain Falcon Selectable
 	mainmemory.writebyte(Game.Memory.unlocked_stuff + 5, value);
 end
 

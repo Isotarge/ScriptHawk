@@ -1999,7 +1999,7 @@ function despawnSelectedObject()
 		if isRDRAM(objectArray) then
 			local slotBase = objectArray + getSlotBase(object_index - 1);
 			local bitfieldValue = mainmemory.readbyte(slotBase + 0x47);
-			mainmemory.writebyte(slotBase + 0x47, set_bit(bitfieldValue, 3));
+			mainmemory.writebyte(slotBase + 0x47, bit.set(bitfieldValue, 3));
 		end
 	end
 end

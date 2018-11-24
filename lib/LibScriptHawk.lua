@@ -244,17 +244,10 @@ function toBinaryString(num, bits) -- TODO: Properly define behavior for negativ
 	return table.concat(t);
 end
 
--- TODO: Get rid of these aliases
-get_bit = bit.check;
-getBit = bit.check;
+-- TODO: Get rid of these aliases, bit is used as a local variable in a bunch of places
 check_bit = bit.check;
-checkBit = bit.check;
-
-set_bit = bit.set;
-setBit = bit.set;
-
 clear_bit = bit.clear;
-clearBit = bit.clear;
+set_bit = bit.set;
 
 function bit.toggle(field, index)
 	if bit.check(field, index) then
@@ -262,8 +255,6 @@ function bit.toggle(field, index)
 	end
 	return bit.set(field, index);
 end
-toggle_bit = bit.toggle;
-toggleBit = toggle_bit;
 
 function deepcompare(t1, t2, ignore_mt)
 	local ty1 = type(t1);
