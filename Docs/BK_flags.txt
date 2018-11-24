@@ -55,9 +55,6 @@
 00 00 00 40 = 450 Note Door Open
 00 00 00 80 = 640 Note Door Open
 
-
-
-
 --3831B0
 01 00 00 00 = 765 Note Door Open
 02 00 00 00 = 810 Note Door Open
@@ -90,9 +87,6 @@
 00 00 00 20 = # of pieces placed in MM Puzzle
 00 00 00 C0 = # of pieces placed in TTC Puzzle
 
-
-
-
 --3831B4
 07 00 00 00 = # of pieces placed in CC Puzzle
 38 00 00 00 = # of pieces placed in BGS Puzzle
@@ -104,17 +98,13 @@ C0 03 00 00 = # of pieces placed in FP Puzzle
 00 00 00 7C = # of pieces placed in DoG Puzzle
 00 00 00 80 03= # of pieces placed in double health Puzzle
 
-
-
-
-
 --3831B8
 10 00 00 00 = Mumbo's Magic All Gone
 20 00 00 00 = Gate to Crypt broken
 40 00 00 00 = Thorny Hedges Text
 
 00 01 00 00 = Exiting Loggo Grunty Text
- 
+
 00 08 00 00 = CCW Spring Open
 00 10 00 00 = CCW Summer Open
 00 20 00 00 = CCW Autumn Open
@@ -135,11 +125,6 @@ C0 03 00 00 = # of pieces placed in FP Puzzle
 00 00 00 10 = CC WS Left Eye Pressed
 00 00 00 20 = CC WS Right Eye Pressed
 00 00 00 40 = Crypt Water Switch Coffin Lid Broken
-
-
-
-
-
 
 --3831BC
 02 00 00 00 = BGS WS Statue Hat Broken
@@ -170,8 +155,6 @@ C0 03 00 00 = # of pieces placed in FP Puzzle
 00 00 00 40 = BLUEEGGS
 00 00 00 80 = REDFEATHERS
 
-
-
 --3831C0
 01 00 00 00 = GOLDFEATHERS
 
@@ -197,8 +180,6 @@ C0 03 00 00 = # of pieces placed in FP Puzzle
 
 00 00 00 80 = Remove Puzzle Piece
 
-
-
 --3831C4
 01 00 00 00 = 'Z' to place all pieces
 
@@ -206,9 +187,9 @@ C0 03 00 00 = # of pieces placed in FP Puzzle
 08 00 00 00 = CCW Flower Spring State
 10 00 00 00 = CCW Flower Summer State
 20 00 00 00 = CCW Flower Autumn State
-40 00 00 00 = Spring Eeyrie Egg Broken
-80 00 00 00 = Summer Eeyrie Fed
-00 01 00 00 = Fall Eeyrie Fed
+40 00 00 00 = Spring Eyrie Egg Broken
+80 00 00 00 = Summer Eyrie Fed
+00 01 00 00 = Fall Eyrie Fed
 
 00 00 08 00 = Talked to Dingpot
 00 00 10 00 = 1st time FF cutscene
@@ -218,11 +199,6 @@ C0 03 00 00 = # of pieces placed in FP Puzzle
 00 00 00 03 = Sandybutt maze state
 00 00 00 04 = Sandcastle Door Open
 00 00 00 10 = Defeated Grunty
-
-
-
-
-
 
 GLOBAL CHEAT FLAGS
 
@@ -301,7 +277,3 @@ GLOBAL CHEAT FLAGS
 00 00 00 20 = WISHY WASHY BANJO
 00 00 00 40 = 
 00 00 00 80 = 
-
-
-
-
