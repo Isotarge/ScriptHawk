@@ -216,9 +216,10 @@ defaultPreferences = {
 		screenPosition=true,
 	},
 	rats = {
+		IGT=true,
 		position=true,
 		positionStats=true,
-		positionStatsMore=true,
+		positionStatsMore=false,
 		speed=true,
 	},
 	rayman_2 = {

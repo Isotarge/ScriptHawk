@@ -12,10 +12,12 @@ local Game = {
 		x_velocity = 0x01F2,
 		y_velocity = 0x01F8,
 		object_base = 0x01EC,
+		igt_major = 0x19EB,
+		igt_minor = 0x19E9,
 	},
+	object_size = 0x16,
+	position_scale = 0x10,
 };
-object_size = 0x16;
-row_height = 16;
 
 --------------------
 -- Region/Version --
@@ -32,27 +34,40 @@ end
 --------------
 
 function Game.getXPosition()
-	return mainmemory.read_u16_le(Game.Memory.x_position);
+	return mainmemory.read_u16_le(Game.Memory.x_position) / Game.position_scale;
 end
 
 function Game.getYPosition()
-	return mainmemory.read_u16_le(Game.Memory.y_position);
+	return mainmemory.read_u16_le(Game.Memory.y_position) / Game.position_scale;
 end
 
 function Game.getXVelocity()
-	return mainmemory.read_s16_le(Game.Memory.x_velocity);
+	return mainmemory.read_s16_le(Game.Memory.x_velocity) / Game.position_scale;
 end
 
 function Game.getYVelocity()
-	return mainmemory.read_s16_le(Game.Memory.y_velocity);
+	return mainmemory.read_s16_le(Game.Memory.y_velocity) / Game.position_scale;
 end
 
 function Game.setXPosition(value)
-	mainmemory.write_u16_le(Game.Memory.x_position, value);
+	mainmemory.write_u16_le(Game.Memory.x_position, value * Game.position_scale);
 end
 
 function Game.setYPosition(value)
-	mainmemory.write_u16_le(Game.Memory.y_position, value);
+	mainmemory.write_u16_le(Game.Memory.y_position, value * Game.position_scale);
+end
+
+function Game.getIGT()
+	return mainmemory.readbyte(Game.Memory.igt_major) + mainmemory.readbyte(Game.Memory.igt_minor) / 256;
+end
+
+function Game.setIGT(value)
+	mainmemory.writebyte(Game.Memory.igt_major, math.floor(value));
+	mainmemory.writebyte(Game.Memory.igt_minor, (value * 256) % 256);
+end
+
+function Game.applyInfinites()
+	Game.setIGT(20.01); -- 20 freezes the timer
 end
 
 ------------
@@ -60,18 +75,25 @@ end
 ------------
 
 function Game.drawUI()
-	for i = 0, 24 do
-		local objectBase = Game.Memory.object_base + i * object_size;
-		local xPos = mainmemory.read_u16_le(objectBase + 0x02);
-		local yPos = mainmemory.read_u16_le(objectBase + 0x08);
-		local xVel = mainmemory.read_s16_le(objectBase + 0x06);
-		local yVel = mainmemory.read_s16_le(objectBase + 0x0C);
+	local row = 0;
+	for i = 0, 23 do
+		local objectBase = Game.Memory.object_base + i * Game.object_size;
+		local objectEnabled = bit.check(mainmemory.readbyte(objectBase), 0); -- Possibly object type
+		if objectEnabled then
+			local xPos = mainmemory.read_u16_le(objectBase + 0x02) / Game.position_scale;
+			local yPos = mainmemory.read_u16_le(objectBase + 0x08) / Game.position_scale;
+			local xVel = mainmemory.read_s16_le(objectBase + 0x06) / Game.position_scale;
+			local yVel = mainmemory.read_s16_le(objectBase + 0x0C) / Game.position_scale;
 
-		gui.text(2, i * row_height, "X:"..xPos..", Y:"..yPos..", X Velocity:"..xVel..", Y Velocity:"..yVel, colors.white, "bottomright");
+			gui.text(2, row * Game.OSDRowHeight, "X:"..round(xPos, precision)..", Y:"..round(yPos, precision)..", XVel:"..round(xVel, precision)..", YVel:"..round(yVel, precision).." - "..toHexString(objectBase), colors.white, "bottomright");
+			row = row + 1;
+		end
 	end
 end
 
 Game.OSD = {
+	{"IGT", Game.getIGT, category="IGT"},
+	{"Separator"},
 	{"X", category="position"},
 	{"Y", category="position"},
 	{"Separator"},
