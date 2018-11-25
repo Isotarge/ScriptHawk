@@ -507,6 +507,14 @@ local supportedGames = {
 	["C01CF44EEE335D509DC20A165ADD8514E7FBB7C4"] = {moduleName="games.penguin_land", friendlyName="Doki Doki Penguin Land - Uchuu Daibouken (J)"},
 	["FF7502DD8A717DB5ADB42C711DDBC9F5"] = {moduleName="games.penguin_land", friendlyName="Doki Doki Penguin Land - Uchuu Daibouken (J)"},
 
+	-- Phantasy Star (SMS)
+	["DFEBC48DFE8165202B7F002D8BAC477B"] = {moduleName="games.phantasy_star_1", friendlyName="Phantasy Star (J)"},
+	["14C59604768B33175362CC592CB75EAD"] = {moduleName="games.phantasy_star_1", friendlyName="Phantasy Star (J)"}, -- From Saturn Collection CD
+	["1B69716F9F4053E1533F654C091AE410"] = {moduleName="games.phantasy_star_1", friendlyName="Phantasy Star (B)"},
+	["F853B7DDCA63864735C03001C9AC477B"] = {moduleName="games.phantasy_star_1", friendlyName="Phantasy Star (K)"},
+	["5BA9114EDEA5DEB5282FD9AD7D4B2D62"] = {moduleName="games.phantasy_star_1", friendlyName="Phantasy Star (UE) (Rev 2)"},
+	["1110938DF80F4E44C8213D7F85CFB5E6"] = {moduleName="games.phantasy_star_1", friendlyName="Phantasy Star (UE) (Rev 3)"},
+
 	-- Psycho Fox
 	["278CC3853905626138E83B6CFA39C26BA8E4F632"] = {moduleName="games.psycho_fox", friendlyName="Psycho Fox (UE)"},
 	["A9C2FACF9EF536D095414CE2E7CE2F4F"] = {moduleName="games.psycho_fox", friendlyName="Psycho Fox (UE)"},

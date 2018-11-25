@@ -129,6 +129,7 @@ A collection of Lua scripts and RAM watches for [BizHawk](https://github.com/TAS
 - Elmo's Number Journey (N64 only)
 - Elmo's Letter Adventure (N64 only)
 - Legend of Galahad (Genesis)
+- Phantasy Star (SMS)
 - Rayman 2 (N64 only)
 - San Francisco Rush 2049 (N64 only)
 - Zelda 64 (OoT/MM)
