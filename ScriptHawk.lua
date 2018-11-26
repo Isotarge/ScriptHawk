@@ -2094,6 +2094,32 @@ local mouseClickedLastFrame = false;
 local startDragPosition = {0, 0};
 local draggedObjects = {};
 
+-- Draw text in emu space, make sure it doesn't disappear off screen
+function ScriptHawk.drawText(x, y, text, color, bgcolor, isStatic)
+	if type(text) == "boolean" or type(text) == "number" then
+		text = tostring(text);
+	end
+	if type(text) == "string" then
+		text = {text};
+	end
+	if type(text) == "table" then
+		local maxLength = -math.huge;
+		for t = 1, #text do
+			maxLength = math.max(maxLength, string.len(text[t]));
+		end
+		local safeX = math.max(0, math.min(x, ScriptHawk.bufferWidth - (maxLength * 8)));
+		local safeY = math.max(0, math.min(y, ScriptHawk.bufferHeight - (#text * 16)));
+
+		if isStaticText and (safeX ~= x or safeY ~= y) then
+			-- Don't render static text that is offscreen
+		else
+			for t = 1, #text do
+				gui.drawText(safeX, safeY + ((t - 1) * 16), text[t], color, bgcolor);
+			end
+		end
+	end
+end
+
 function ScriptHawk.drawHitboxes()
 	if type(Game.getHitboxes) ~= "function" then
 		return;
@@ -2201,28 +2227,7 @@ function ScriptHawk.drawHitboxes()
 				isStaticText = true;
 			end
 
-			if type(renderedText) == "boolean" or type(renderedText) == "number" then
-				renderedText = tostring(renderedText);
-			end
-			if type(renderedText) == "string" then
-				renderedText = {renderedText};
-			end
-			if type(renderedText) == "table" then
-				local maxLength = -math.huge;
-				for t = 1, #renderedText do
-					maxLength = math.max(maxLength, string.len(renderedText[t]));
-				end
-				local safeX = math.max(0, math.min(x1, ScriptHawk.bufferWidth - (maxLength * 8)));
-				local safeY = math.max(0, math.min(y1, ScriptHawk.bufferHeight - (#renderedText * 16)));
-
-				if isStaticText and (safeX ~= x1 or safeY ~= y1) then
-					-- Don't render static text for hitboxes that are off screen
-				else
-					for t = 1, #renderedText do
-						gui.drawText(safeX, safeY + ((t - 1) * 16), renderedText[t], textcolor, bgcolor);
-					end
-				end
-			end
+			ScriptHawk.drawText(x1, y1, renderedText, textcolor, bgcolor, isStaticText);
 			gui.drawRectangle(x1, y1, hitbox.width, hitbox.height, color);
 		end
 

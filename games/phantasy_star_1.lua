@@ -285,23 +285,31 @@ function dumpStats()
 end
 
 local tiles = {
-	[0] = ".", -- Empty
-	[1] = "W", -- Wall
-	[2] = "^", -- Floor Up
-	[3] = "v", -- Floor Down
-	[4] = "D", -- Door (bit 7 determines whether it's open)
-	[0x84] = ".", -- Door, open
-	[5] = "K", -- Dungeon Key Door
-	[6] = "L", -- Magically Locked Door
-	[7] = "w", -- Fake Wall
-	[8] = "T", -- Treasure or Trap
-	[0x0A] = "^"; -- Exit Up
-	[0x0B] = "v"; -- Exit Down
-	[0x0C] = "E"; -- Exit Door
-	[0x0D] = "l"; -- Exit Locked Door
-	[0x0E] = "l"; -- Exit Magical Door
+	[0x00] = "Floor", -- "Empty"
+	[0x01] = "Wall",
+	[0x02] = "Floor Up",
+	[0x03] = "Floor Down",
+	[0x04] = "Door (Closed)",
+	[0x84] = "Door (Open)",
+	[0x05] = "Key Door",
+	[0x06] = "Magically Locked Door",
+	[0x07] = "Fake Wall",
+	[0x08] = "Treasure/Trap",
+	[0x0A] = "Exit Up",
+	[0x0B] = "Exit Down",
+	[0x0C] = "Exit Door",
+	[0x0D] = "Exit Door (Locked)",
+	[0x0E] = "Exit Door (Magical)",
 };
 
+function getTileName(tileValue)
+	if tiles[tileValue] ~= nil then
+		return tiles[tileValue];
+	end
+	return "Unknown "..toHexString(tileValue);
+end
+
+-- TODO: Adjust for yellow/blue dungeons
 local floorColor = 0x55FF55;
 local wallColor = 0x00AA55;
 local playerColor = 0xFFFF00;
@@ -315,6 +323,10 @@ local function renderDungeonMinimap()
 	local screenWidth = client.bufferwidth();
 	local xOffset = screenWidth - 16 * minimapScale;
 	local yOffset = 0;
+	local mouse = input.getmouse();
+	local mouseIsOnScreen = (mouse.X >= 0 and mouse.X < ScriptHawk.bufferWidth) and (mouse.Y >= 0 and mouse.Y < ScriptHawk.bufferHeight);
+	local mouseOverTextToRender = false;
+	local mouseOverIndex = nil;
 	for y = 0, 15 do
 		for x = 0, 15 do
 			local tileIndex = (y * 16) + x;
@@ -328,12 +340,12 @@ local function renderDungeonMinimap()
 			end
 			local drawX = xOffset + x * minimapScale;
 			local drawY = yOffset + y * minimapScale;
+			local xBottom = drawX + minimapScale - 1;
+			local yBottom = drawY + minimapScale - 1;
 			gui.drawRectangle(drawX, drawY, minimapScale, minimapScale, minimapAlpha + drawColor, minimapAlpha + drawColor);
 			if tileIndex == dungeonPosition then
 				local xCenter = drawX + minimapScale / 2;
 				local yCenter = drawY + minimapScale / 2;
-				local xBottom = drawX + minimapScale - 1;
-				local yBottom = drawY + minimapScale - 1;
 				if dungeonDirection == 0 then
 					-- Up
 					gui.drawLine(xCenter, drawY, drawX, yBottom, minimapAlpha + playerColor);
@@ -354,7 +366,17 @@ local function renderDungeonMinimap()
 					-- ?
 				end
 			end
+			if mouseIsOnScreen and mouse.X >= drawX and mouse.X <= xBottom and mouse.Y >= drawY and mouse.Y <= yBottom then
+				mouseOverIndex = tileIndex;
+				mouseOverTextToRender = {drawX, drawY, {toHexString(tileValue)..": "..x..","..y, getTileName(tileValue)}, colors.white, nil, false};
+			end
 		end
+	end
+	if type(mouseOverTextToRender) == "table" then
+		if mouse.Left then
+			mainmemory.writebyte(Game.Memory.dungeon_position, mouseOverIndex);
+		end
+		ScriptHawk.drawText(mouseOverTextToRender[1], mouseOverTextToRender[2], mouseOverTextToRender[3], mouseOverTextToRender[4], mouseOverTextToRender[5], mouseOverTextToRender[6]);
 	end
 end
 

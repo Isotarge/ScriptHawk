@@ -23,7 +23,6 @@
 	- Increase identifyMemory() coverage
 	- ASM hook for other regions
 - Phantasy Star (SMS)
-	- Make a module
 	- Mine the [disassembly](https://github.com/lory90/ps1disasm) for info
 - Rats! (GBC)
 	- Hitboxes, we've got object positions just need camera data/screen size etc
