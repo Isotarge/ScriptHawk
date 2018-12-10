@@ -18,6 +18,12 @@ end
 ScriptHawk = {
 	warnings = false, -- Useful for debugging but annoying for end users, so default to false
 	ui_test = false, -- Open all possible module options forms, useful for testing global UI changes
+	force_module = {
+		enabled = false,
+		name = "games.phantasy_star_1", -- The name of the module to load for all opened ROMs
+		version = 1, -- The Game.version value to force
+		selfContained = false, -- Whether the forced module is self contained
+	},
 	mode = "Position",
 	smooth_moving_angle = true,
 	UI = {
@@ -57,6 +63,7 @@ ScriptHawk = {
 		y = 0,
 	},
 	isSMS = emu.getsystemid() == "SMS",
+	isNES = emu.getsystemid() == "NES",
 	bufferWidth = client.bufferwidth(),
 	bufferHeight = client.bufferheight(),
 	isFileIOSafe = emu.getluacore() == "LuaInterface",
@@ -624,17 +631,33 @@ local romHash = gameinfo.getromhash();
 Game = nil;
 
 if not ScriptHawk.ui_test then
-	for k, v in pairs(supportedGames) do
-		if romHash == k then
-			Game = require (v.moduleName);
-			ScriptHawk.moduleName = v.moduleName;
-			ScriptHawk.gamePrefName = string.gsub(ScriptHawk.moduleName, "games.", "");
-			if type(v.version) == "number" then
-				Game.version = v.version;
+	if not ScriptHawk.force_module.enabled then
+		for k, v in pairs(supportedGames) do
+			if romHash == k then
+				Game = require (v.moduleName);
+				ScriptHawk.moduleName = v.moduleName;
+				ScriptHawk.gamePrefName = string.gsub(ScriptHawk.moduleName, "games.", "");
+				if type(v.version) == "number" then
+					Game.version = v.version;
+				end
+				if v.selfContained then -- Self contained modules that do not require ScriptHawk's functionality and merely use ScriptHawk.lua as a convenient loader
+					return true;
+				end
 			end
-			if v.selfContained then -- Self contained modules that do not require ScriptHawk's functionality and merely use ScriptHawk.lua as a convenient loader
-				return true;
-			end
+		end
+	else
+		-- Force a particular module to load, see ScriptHawk.force_module for details
+		print("ScriptHawk is forcing a particular module to load.");
+		print("We cannot guarantee that this will work as desired, but we'll give it a shot anyways.");
+		print("Good luck!");
+		Game = require (ScriptHawk.force_module.name);
+		ScriptHawk.moduleName = ScriptHawk.force_module.name;
+		ScriptHawk.gamePrefName = string.gsub(ScriptHawk.moduleName, "games.", "");
+		if type(ScriptHawk.force_module.version) == "number" then
+			Game.version = ScriptHawk.force_module.version;
+		end
+		if ScriptHawk.force_module.selfContained then -- Self contained modules that do not require ScriptHawk's functionality and merely use ScriptHawk.lua as a convenient loader
+			return true;
 		end
 	end
 
@@ -652,8 +675,10 @@ if not ScriptHawk.ui_test then
 
 	if type(Game.detectVersion) == "function" then
 		if not Game.detectVersion(romName, romHash) then
-			print("This version of the game is not currently supported.");
-			return false;
+			if not ScriptHawk.force_module.enabled then
+				print("This version of the game is not currently supported.");
+				return false;
+			end
 		end
 	end
 else
@@ -2128,6 +2153,14 @@ function ScriptHawk.drawHitboxes()
 	local row = 0; -- Text row
 	local mouse = input.getmouse(); -- TODO: Can we use mouse_state.current?
 	local mouseIsOnScreen = (mouse.X >= 0 and mouse.X < ScriptHawk.bufferWidth) and (mouse.Y >= 0 and mouse.Y < ScriptHawk.bufferHeight);
+
+	-- Compensate for bug causing mouse Y to be higher than it should be with certain scanline settings
+	-- TODO: Make this solution general, or just report the bug to BizHawk devs
+	-- TODO: Is this different on PAL?
+	if ScriptHawk.isNES then
+		mouse.Y = mouse.Y + nes.gettopscanline();
+	end
+
 	local showHitboxes = ScriptHawk.UI.ischecked("Show Hitboxes Checkbox");
 	local enableDraggableHitboxes = ScriptHawk.UI.ischecked("Draggable Hitboxes Checkbox");
 	local drawList = ScriptHawk.UI.ischecked("Show List Checkbox");
