@@ -14,6 +14,10 @@ local Game = {
 	},
 	Memory = { -- 1 version for now, not sure if addresses are different in others
 		mode = 0x202,
+		RNG = 0x20C, -- 2 bytes, code at 5B1 ROM
+		options_menu_open = 0x268, -- Hide dungeon minimap if non zero
+		interaction_type = 0x29E,
+		textbox_open = 0x2D3, -- Not sure if this is exactly right, but we'll hide dungeon minimap if it's non zero
 		dungeon_layout = 0xB00,
 		-- 0 = up
 		-- 1 = right
@@ -28,11 +32,11 @@ local Game = {
 			Odin = 0x0420, -- see Game.stats
 			Noah = 0x0430, -- see Game.stats
 		},
-		inventory = 0x04C0,
-		current_money = 0x04E0, -- u16_le
+		inventory = 0x4C0,
+		current_money = 0x4E0, -- u16_le
 		max_items = 24,
-		inventory_current_num = 0x04E2,
-		party_current_num = 0x04F0, -- starts from 0
+		inventory_current_num = 0x4E2,
+		party_current_num = 0x4F0, -- starts from 0
 		level_table = { -- ROM, Bank 3
 			Alis = 0xF8AF,
 			Myau = 0xF99F,
@@ -396,7 +400,9 @@ function Game.eachFrame()
 	Game.OSD = Game.standardOSD;
 	if Game.getModeOSD() == "Dungeon" then
 		Game.OSD = Game.dungeonOSD;
-		renderDungeonMinimap();
+		if mainmemory.readbyte(Game.Memory.options_menu_open) == 0 and mainmemory.readbyte(Game.Memory.textbox_open) == 0 then
+			renderDungeonMinimap();
+		end
 	end
 end
 
