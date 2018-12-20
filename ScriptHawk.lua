@@ -550,6 +550,7 @@ local supportedGames = {
 	["E2929E10FCCC0AA84E5776227E798ABC07CEDABF"] = {moduleName="games.smash64", friendlyName="Super Smash Bros. (USA)", version=4},
 	["88C8FED5ECD5ED901CB5FC4B5BBEFFA3EA022DF7"] = {moduleName="games.smash64", friendlyName="19XXTE 0.11", version=4}, -- Based on US ROM
 	["1095F94D70216AC916A9DD8A9FD65DB13E7F9F17"] = {moduleName="games.smash64", friendlyName="19XXGE", version=4}, -- Based on US ROM
+	["926DFAD9DAEDE0DDD088D3006BBD1D02CA6222A4"] = {moduleName="games.smash64", friendlyName="Super Smash Bros. (iQue)", version=5},
 
 	-- Sonic The Hedgehog (GG)
 	["8A95B36139206A5BA13A38BB626AEE25"] = {moduleName="games.sonic1_sms", friendlyName="Sonic The Hedgehog (J)", version=2},
