@@ -115,6 +115,7 @@ defaultPreferences = {
 		angleMore=false,
 		animation=true,
 		movement=true,
+		marbleCount=true,
 	},
 	elmo = {
 	},

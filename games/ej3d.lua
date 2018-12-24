@@ -36,6 +36,7 @@ local Game = {
 		object_m2_count = {0x0E9EFE, nil},
 		obj2_pointer_list = {0x0E9F00, nil},
 		flag_pointer = {0x0E9F08, 0x0EBD68},
+		marble_count = {0x0E9FF3, nil},
 	},
 };
 
@@ -349,6 +350,10 @@ function Game.FreezeOoBTimer()
 	mainmemory.writebyte(Game.Memory.jim_pointer + jim.oob_timer, 0);
 end
 
+function Game.getMarbleCount()
+	return mainmemory.readbyte(Game.Memory.marble_count);
+end
+
 --------------------
 -- FREE ROAM MODE --
 --------------------
@@ -400,7 +405,7 @@ function Game.getConsoleMode()
 		if console_mode == 1 then
 			forms.settext(ScriptHawk.UI.form_controls["Console Mode Switch"], "N64 Mode");
 			twirl_yFreeze = 1;
-			roll_cap = 1;
+			roll_cap = 0; -- Currently desyncs like crazy
 			walljump_hack = 1;
 		elseif console_mode == 2 then
 			forms.settext(ScriptHawk.UI.form_controls["Console Mode Switch"], "PC Mode");
@@ -1341,6 +1346,8 @@ Game.OSD = {
 	{"Movement", Game.getMovementOSD, category="movement"},
 	{"Facing", Game.getYRotation, category="angle"},
 	--{"Rot. Z", Game.getZRotation, category="angleMore"},
+	{"Separator"},
+	{"Marble Count", Game.getMarbleCount, category="marbleCount"},
 };
 
 return Game;
