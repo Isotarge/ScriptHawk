@@ -6316,13 +6316,13 @@ function Game.drawKutOutMinimap()
 	-- Only draw minimap if the player is in the King Kut Out fight
 	if Game.version ~= 4 and map_value == 199 then
 		local tag_barrel_object = getTagBarrelObject()
-		kong_active = mainmemory.readbyte(tag_barrel_object + 0x154);
-		kko_state_timer = mainmemory.readbyte(tag_barrel_object + 0x189);
-		kko_phase = mainmemory.readbyte(tag_barrel_object + 0x18A);
-		kko_state = mainmemory.readbyte(tag_barrel_object + 0x18B);
-		kko_position = mainmemory.readbyte(tag_barrel_object + 0x18C);
-		kko_attack_counter = mainmemory.readbyte(tag_barrel_object + 0x18D);
-		kko_phase_hit = mainmemory.readbyte(tag_barrel_object + 0x18E);
+		local kong_active = mainmemory.readbyte(tag_barrel_object + 0x154);
+		local kko_state_timer = mainmemory.readbyte(tag_barrel_object + 0x189);
+		local kko_phase = mainmemory.readbyte(tag_barrel_object + 0x18A);
+		local kko_state = mainmemory.readbyte(tag_barrel_object + 0x18B);
+		local kko_position = mainmemory.readbyte(tag_barrel_object + 0x18C);
+		local kko_attack_counter = mainmemory.readbyte(tag_barrel_object + 0x18D);
+		local kko_phase_hit = mainmemory.readbyte(tag_barrel_object + 0x18E);
 		
 		-- Draw Map
 		gui.drawImage(image_directory_root.."kko_map.png", kko_minimap_x_offset, kko_minimap_y_offset, kko_minimap_width, kko_minimap_height);
