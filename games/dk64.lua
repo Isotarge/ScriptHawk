@@ -903,6 +903,7 @@ obj_model1 = {
 		[65] = "Vase (Triangle)",
 		[66] = "Vase (+)",
 		[67] = "Cannon Ball",
+		-- [68] = "Unknown",
 		[69] = "Vine", -- Green
 		[70] = "Counter", -- Unused?
 		[71] = "Kremling (Red)", -- Lanky's Keyboard Game in R&D
@@ -922,6 +923,7 @@ obj_model1 = {
 		[85] = "Steel Keg",
 		[86] = "Crown",
 		[87] = "Minecart", -- BONUS
+		-- [88] = "Unknown",
 		[89] = "Fire", -- Unused?
 		[90] = "Ice Wall?",
 		[91] = "Balloon (Diddy)",
@@ -941,6 +943,7 @@ obj_model1 = {
 		[105] = "6 Pad (Diddy 5DI)",
 		[106] = "Kong Reflection",
 		[107] = "Bonus Barrel (Hideout Helm)",
+		-- [108] = "Unknown",
 		[109] = "Race Checkpoint",
 		[110] = "CB Bunch", -- Unused? Doesn't seem to work, these are normally model 2
 		[111] = "Balloon (Chunky)",
@@ -959,6 +962,7 @@ obj_model1 = {
 		[124] = "Barrel Gun", -- Peril Path Panic
 		[125] = "Barrel Gun", -- Krazy Kong Klamour
 		[126] = "Fly Swatter",
+		-- [127] = "Unknown",
 		[128] = "Headphones",
 		[129] = "Enguarde Crate",
 		[130] = "Apple", -- Fungi
@@ -972,21 +976,39 @@ obj_model1 = {
 		[138] = "B. Locker",
 		[139] = "Rainbow Coin Patch",
 		[140] = "Rainbow Coin",
+		-- [141] = "Unknown",
+		-- [142] = "Unknown",
+		-- [143] = "Unknown",
+		-- [144] = "Unknown",
 		[145] = "Cannon (Seasick Chunky)", -- Internal name "Puffer cannon"
+		-- [146] = "Unknown",
 		[147] = "K. Rool Banana Balloon", -- TODO: This is the internal name, what to heck does this do? Maybe used in Lanky phase?
 		[148] = "Rope", -- K. Rool's Arena
 		[149] = "Banana Barrel", -- Lanky Phase
 		[150] = "Banana Barrel Spawner", -- Lanky Phase, internal name "Skin barrel generator"
+		-- [151] = "Unknown",
+		-- [152] = "Unknown",
+		-- [153] = "Unknown",
+		-- [154] = "Unknown",
+		-- [155] = "Unknown",
 		[156] = "Wrinkly",
+		-- [157] = "Unknown",
+		-- [158] = "Unknown",
+		-- [159] = "Unknown",
+		-- [160] = "Unknown",
+		-- [161] = "Unknown",
+		-- [162] = "Unknown",
 		[163] = "Banana Fairy (BFI)",
 		[164] = "Ice Tomato",
 		[165] = "Tag Barrel (King Kut Out)",
 		[166] = "King Kut Out Part",
 		[167] = "Cannon",
+		-- [168] = "Unknown",
 		[169] = "Pufftup", -- Pufftoss Fight
 		[170] = "Damage Source", -- K. Rool's Glove
 		[171] = "Orange", -- Krusha's Gun
 		[173] = "Cutscene Controller",
+		-- [174] = "Unknown",
 		[175] = "Kaboom",
 		[176] = "Timer",
 		--[177] = "Unknown", -- Pufftoss Fight
@@ -1029,14 +1051,19 @@ obj_model1 = {
 		[214] = "Minecart (TNT)", -- Minecart Mayhem
 		[215] = "Minecart (TNT)",
 		[216] = "Pufftoss",
+		-- [217] = "Unknown",
+		-- [218] = "Unknown",
+		-- [219] = "Unknown",
 		[220] = "Cannon (Seasick Chunky)",
 		[221] = "Light Piece", -- Lanky Phase
 		[222] = "Banana Peel", -- Lanky Phase
 		[223] = "Fireball Spawner", -- Factory Crusher Room
 		[224] = "Mushroom Man",
+		-- [225] = "Unknown",
 		[226] = "Troff",
 		[227] = "K. Rool's Foot",
 		[228] = "Bad Hit Detection Man",
+		-- [229] = "Unknown",
 		[230] = "Ruler",
 		[231] = "Toy Box",
 		[232] = "Text Overlay",
@@ -1044,6 +1071,7 @@ obj_model1 = {
 		[234] = "Scoff",
 		[235] = "Robo-Kremling",
 		[236] = "Dogadon",
+		-- [237] = "Unknown",
 		[238] = "Kremling",
 		[239] = "Bongos",
 		[240] = "Spotlight Fish",
@@ -1062,6 +1090,8 @@ obj_model1 = {
 		[253] = "Nintendo Logo",
 		[254] = "Cutscene Object", -- For objects animated by Cutscenes
 		[255] = "Shockwave",
+		-- [256] = "Unknown",
+		-- [257] = "Unknown",
 		[258] = "Shockwave", -- Boss
 		[259] = "Guard", -- Stealthy Snoop
 		[260] = "Text Overlay", -- K. Rool fight
@@ -1078,15 +1108,20 @@ obj_model1 = {
 		[271] = "Mr. Dice",
 		[272] = "Rabbit",
 		[273] = "Fireball (With Glasses)", -- From Chunky 5DI
+		-- [274] = "Unknown",
 		[275] = "K. Lumsy",
 		[276] = "Spiderling",
 		[277] = "Squawks",
 		[278] = "Projectile", -- Spider miniBoss
-		--[280] = "Unknown - Spider Boss Map" -- TODO: What is this?
+		-- [279] = "Unknown",
+		[280] = "Spider Silk String", -- Spider miniBoss
 		[281] = "K. Rool (DK Phase)",
+		-- [282] = "Unknown",
 		[283] = "Skeleton Head",
+		-- [284] = "Unknown",
 		[285] = "Bat",
 		[286] = "Giant Clam",
+		-- [287] = "Unknown",
 		[288] = "Tomato", -- Fungi
 		[289] = "Kritter-in-a-Sheet",
 		[290] = "Pufftup",
@@ -1095,7 +1130,10 @@ obj_model1 = {
 		[293] = "K. Rool (Lanky Phase)",
 		[294] = "K. Rool (Tiny Phase)",
 		[295] = "K. Rool (Chunky Phase)",
-		--[297] = "Unknown - Kritter Karnage",
+		-- [296] = "Unknown",
+		--[297] = "Unknown - Kritter Karnage", -- Enemy
+		-- [298] = "Unknown",
+		-- [299] = "Unknown",
 		[299] = "Textbox",
 		[300] = "Snake", -- Teetering Turtle Trouble
 		[301] = "Turtle", -- Teetering Turtle Trouble
@@ -1103,6 +1141,8 @@ obj_model1 = {
 		[303] = "Toy Car",
 		[304] = "Camera", -- Factory Toy Car Race
 		[305] = "Missile", -- Car Race
+		-- [306] = "Unknown",
+		-- [307] = "Unknown",
 		[308] = "Seal",
 		[309] = "Kong Logo (Instrument)", -- DK for DK, Star for Diddy, DK for Lanky, Flower for Tiny, DK for Chunky
 		[310] = "Spotlight", -- Tag barrel, instrument etc.
@@ -1110,11 +1150,16 @@ obj_model1 = {
 		[312] = "Minecart (TNT)",
 		[313] = "Idle Particle",
 		[314] = "Rareware Logo",
+		-- [315] = "Unknown",
 		[316] = "Kong (Tag Barrel)",
 		[317] = "Locked Kong (Tag Barrel)",
+		-- [318] = "Unknown",
 		[319] = "Propeller (Boat)",
+		-- [320] = "Unknown",
+		-- [321] = "Unknown",
 		[322] = "Car", -- Car Race
 		[323] = "Enemy Car", -- Car Race, aka George
+		-- [324] = "Unknown",
 		[325] = "Shockwave", -- Simian Slam
 		[326] = "Main Menu Controller",
 		[327] = "Kong", -- Krazy Kong Klamour
@@ -6228,6 +6273,143 @@ function Game.drawMJMinimap()
 	end
 end
 
+-----------------------------------
+-- DK64 - Kut Out Minimap        --
+-- Written by theballaam96, 2019 --
+-----------------------------------
+
+function getTagBarrelObject()
+	for object_no = 0, getObjectModel1Count() do
+		local pointer = dereferencePointer(Game.Memory.pointer_list + (object_no * 4));
+		if isRDRAM(pointer) and getActorName(pointer) == "Tag Barrel (King Kut Out)" then
+			return pointer;
+		end
+	end
+end
+
+-- Static Data
+local kko_minimap_x_offset  = 19;
+local kko_minimap_y_offset  = 19;
+local kko_minimap_width     = 100;
+local kko_minimap_height    = 100;
+local kko_cannon_offset     = math.floor(kko_minimap_width * (17 / 100));
+local kko_icon_x            = math.floor(kko_minimap_width / 4);
+local kko_icon_y            = math.floor(kko_minimap_height / 4);
+local kko_text_x            = (2 * kko_minimap_x_offset) + kko_minimap_width
+local kko_map_ubound        = 1006;
+local kko_map_lbound        = 394;
+
+kko_states_table = {
+	[0] = "Ready to Appear",
+	[1] = "Ready for Kong Attack",
+	[2] = "Not Able to be hit",
+	[3] = "Kut-Out Attacking",
+	[4] = "Self-Amputation",
+	[5] = "Disappearing", -- After final hit in phase
+	[6] = "Rotating", -- Phase 4
+	[7] = "Defeat Pending",
+	[8] = "Defeated",
+	[9] = "Spawning Key",
+};
+
+function Game.drawKutOutMinimap()
+	-- Only draw minimap if the player is in the King Kut Out fight
+	if Game.version ~= 4 and map_value == 199 then
+		local tag_barrel_object = getTagBarrelObject()
+		kong_active = mainmemory.readbyte(tag_barrel_object + 0x154);
+		kko_state_timer = mainmemory.readbyte(tag_barrel_object + 0x189);
+		kko_phase = mainmemory.readbyte(tag_barrel_object + 0x18A);
+		kko_state = mainmemory.readbyte(tag_barrel_object + 0x18B);
+		kko_position = mainmemory.readbyte(tag_barrel_object + 0x18C);
+		kko_attack_counter = mainmemory.readbyte(tag_barrel_object + 0x18D);
+		kko_phase_hit = mainmemory.readbyte(tag_barrel_object + 0x18E);
+		
+		-- Draw Map
+		gui.drawImage(image_directory_root.."kko_map.png", kko_minimap_x_offset, kko_minimap_y_offset, kko_minimap_width, kko_minimap_height);
+		
+		-- Draw Kut Out Position (Not taking into account the 4+ values)
+		if kko_position == 0 then -- top
+			draw_kko_x = kko_minimap_x_offset + (kko_minimap_width / 2) - (kko_icon_x / 2);
+			draw_kko_y = kko_minimap_y_offset + kko_cannon_offset - (kko_icon_y / 2);
+			gui.drawImage(image_directory_root.."kko_icon.png",draw_kko_x ,draw_kko_y , kko_icon_x, kko_icon_y);
+		elseif kko_position == 1 then -- left
+			draw_kko_x = kko_minimap_x_offset + kko_cannon_offset - (kko_icon_x / 2);
+			draw_kko_y = kko_minimap_y_offset + (kko_minimap_height / 2) - (kko_icon_y / 2);
+			gui.drawImage(image_directory_root.."kko_icon.png",draw_kko_x ,draw_kko_y , kko_icon_x, kko_icon_y);
+		elseif kko_position == 2 then -- down
+			draw_kko_x = kko_minimap_x_offset + (kko_minimap_width / 2) - (kko_icon_x / 2);
+			draw_kko_y = kko_minimap_y_offset + kko_minimap_height - kko_cannon_offset - (kko_icon_y / 2);
+			gui.drawImage(image_directory_root.."kko_icon.png",draw_kko_x ,draw_kko_y , kko_icon_x, kko_icon_y);
+		elseif kko_position == 3 then -- right
+			draw_kko_x = kko_minimap_x_offset + kko_minimap_width - kko_cannon_offset - (kko_icon_x / 2);
+			draw_kko_y = kko_minimap_y_offset + (kko_minimap_height / 2) - (kko_icon_y / 2);
+			gui.drawImage(image_directory_root.."kko_icon.png",draw_kko_x ,draw_kko_y , kko_icon_x, kko_icon_y);
+		end
+		
+		-- Draw Kong Position (Gives sense of perspective)
+		kko_kong_x = Game.getXPosition();
+		kko_kong_z = Game.getZPosition();
+		
+		if kko_kong_z > kko_map_ubound then
+			kko_distfromtop = 0;
+		elseif kko_kong_z < kko_map_lbound then
+			kko_distfromtop = kko_minimap_height;
+		else
+			kko_distfromtop = math.floor(((kko_map_ubound - kko_kong_z) / (kko_map_ubound - kko_map_lbound)) * kko_minimap_height);
+		end
+		
+		if kko_kong_x > kko_map_ubound then
+			kko_distfromleft = 0;
+		elseif kko_kong_x < kko_map_lbound then
+			kko_distfromleft = kko_minimap_width;
+		else
+			kko_distfromleft = math.floor(((kko_map_ubound - kko_kong_x) / (kko_map_ubound - kko_map_lbound)) * kko_minimap_width);
+		end
+		
+		local kko_character = Game.getCharacter();
+		if kko_character == 0 then -- DK
+			gui.drawImage(image_directory_root.."DKFace.png",kko_minimap_x_offset + kko_distfromleft - (kko_icon_x / 2),kko_minimap_y_offset + kko_distfromtop - (kko_icon_y / 2), kko_icon_x, kko_icon_y);
+		elseif kko_character == 1 then -- Diddy
+			gui.drawImage(image_directory_root.."DiddyFace.png",kko_minimap_x_offset + kko_distfromleft - (kko_icon_x / 2),kko_minimap_y_offset + kko_distfromtop - (kko_icon_y / 2), kko_icon_x, kko_icon_y);
+		elseif kko_character == 2 then -- Lanky
+			gui.drawImage(image_directory_root.."LankyFace.png",kko_minimap_x_offset + kko_distfromleft - (kko_icon_x / 2),kko_minimap_y_offset + kko_distfromtop - (kko_icon_y / 2), kko_icon_x, kko_icon_y);
+		elseif kko_character == 3 then -- Tiny
+			gui.drawImage(image_directory_root.."TinyFace.png",kko_minimap_x_offset + kko_distfromleft - (kko_icon_x / 2),kko_minimap_y_offset + kko_distfromtop - (kko_icon_y  * 0.3), kko_icon_x * 0.6 , kko_icon_y * 0.6 );
+		elseif kko_character == 4 then -- Chunky
+			gui.drawImage(image_directory_root.."ChunkyFace.png",kko_minimap_x_offset + kko_distfromleft - (kko_icon_x * 0.3),kko_minimap_y_offset + kko_distfromtop - (kko_icon_y / 2), kko_icon_x, kko_icon_y);
+		else -- Not a main character
+			gui.drawImage(image_directory_root.."question-mark.png",kko_minimap_x_offset + kko_distfromleft - (kko_icon_x / 2),kko_minimap_y_offset + kko_distfromtop - (kko_icon_y / 2), kko_icon_x, kko_icon_y);
+		end
+		
+		-- Draw Data
+		kko_row = 0;
+		
+		if kko_states_table[kko_state] ~= nil then
+			kko_state_to_text = kko_states_table[kko_state];
+		else
+			kko_state_to_text = kko_state;
+		end
+		gui.drawText(kko_text_x, kko_minimap_y_offset + (kko_row * 16), "State: "..kko_state_to_text);
+		kko_row = kko_row + 1;
+		
+		gui.drawText(kko_text_x, kko_minimap_y_offset + (kko_row * 16), "State Timer: "..kko_state_timer);
+		kko_row = kko_row + 1;
+		
+		if kko_state < 7 then -- Undefeated
+			gui.drawText(kko_text_x, kko_minimap_y_offset + (kko_row * 16), "Phase Health: "..(3 - kko_phase_hit).." (Phase "..(kko_phase + 1)..")");
+			kko_row = kko_row + 1;
+		end
+		
+		if kko_state == 3 then -- Attacking (Lasers)
+			gui.drawText(kko_text_x, kko_minimap_y_offset + (kko_row * 16), "Laser Set "..kko_attack_counter.."/2");
+			kko_row = kko_row + 1;
+		elseif kko_state < 2 and kko_phase == 2 then -- HaaHaa (11 Max)
+			gui.drawText(kko_text_x, kko_minimap_y_offset + (kko_row * 16), (math.floor((11 - kko_attack_counter) / 2) + 1).." HaaHaa's left");
+			kko_row = kko_row + 1;
+		end
+	end
+end
+
 ------------------------------------
 -- Never Slip                     --
 -- Written by Isotarge, 2014-2016 --
@@ -8227,6 +8409,9 @@ function Game.drawUI()
 
 	-- Mad Jack
 	Game.drawMJMinimap();
+	
+	-- King Kut Out
+	Game.drawKutOutMinimap();
 
 	-- Arcade hitboxes
 	if isInSubGame() then
