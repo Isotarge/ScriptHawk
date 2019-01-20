@@ -12,6 +12,8 @@ local Game = {
 		level = {0x123E, 0x1238},
 		rings = {0x12AA, 0x12A9}, -- byte, BCD
 		lives = {0x1246, 0x1240},
+		level_width = {0x1238, 0x0000}, -- TODO: GG -- width of the floor layout in blocks
+		level_height = {0x123A, 0x0000}, -- TODO: GG -- height of the floor layout in blocks
 		viewport_x = {0x125A, 0x1254},
 		viewport_x2 = {0x126F, 0x0000}, -- TODO: GG
 		viewport_y = {0x125D, 0x1257},
@@ -24,6 +26,8 @@ local Game = {
 		invuln_timer = {0x128D, 0x1287},
 		speed_shoes_timer = {0x1411, 0x1412},
 		object_array_base = {0x13FC, 0x13FD},
+		ring_mod_10_timer = {0x1298, 0x0000}, -- TODO: GG
+		cycle_pallete_speed = {0x12A4, 0x0000}, -- TODO: GG
 	},
 	maps = {
 		"Green Hill 1", -- 0x00
@@ -64,6 +68,9 @@ local Game = {
 		"Special Stage 8",
 		"Credits",
 	},
+	solidityBankSwitchCycles = 0,
+	solidityDataReadCycles = 0,
+	IRQStartCycles = 0,
 };
 
 function Game.setMap(value)
@@ -117,6 +124,14 @@ end
 
 function Game.getRings()
 	return mainmemory.readbyte(Game.Memory.rings);
+end
+
+function Game.getRingMod10Timer()
+	return mainmemory.readbyte(Game.Memory.ring_mod_10_timer);
+end
+
+function Game.getCyclePalleteSpeed()
+	return mainmemory.readbyte(Game.Memory.cycle_pallete_speed);
 end
 
 function Game.getSpeedShoesTimer()
@@ -361,26 +376,89 @@ function Game.setHitboxPosition(hitbox, x, y)
 	mainmemory.write_u16_le(hitbox.dragTag + object_fields.y_velocity, 0);
 end
 
-function dumpBridgePieces()
-	local hitboxes = Game.getHitboxes();
-	local bridgeCount = 0;
-	for k, v in ipairs(hitboxes) do
-		if v.type == 0x2E then
-			bridgeCount = bridgeCount + 1;
-			local stringThing = "{";
-			for i = 0x0, 0x19 do
-				stringThing = stringThing..toHexString(mainmemory.readbyte(v.dragTag + i), 2)..",";
-			end
-			stringThing = stringThing.."}";
-			dprint(stringThing);
+--[[
+-- TODO: Get tile data viewer working
+function isAddressInLevelLayoutData(address)
+	local levelWidth = mainmemory.read_u16_le(Game.Memory.level_width);
+	local levelHeight = mainmemory.read_u16_le(Game.Memory.level_height);
+	print("w "..levelWidth);
+	print("h "..levelHeight);
+	local levelDataStart = 0xC000;
+	local levelDataEnd = levelDataStart + levelWidth * levelHeight;
+	print("start "..toHexString(levelDataStart));
+	print("end "..toHexString(levelDataEnd));
+	return address >= levelDataStart and address < levelDataEnd;
+end
+
+function Game.drawUI()
+	local tileSize = 32;
+	local viewportXExact = Game.getViewportX();
+	local viewportYExact = Game.getViewportY();
+	local viewportXTile = math.floor(viewportXExact / tileSize);
+	local viewportYTile = math.floor(viewportYExact / tileSize);
+	for yTile = 0, 32 do
+		for xTile = 0, 32 do
+			ScriptHawk.drawText(xTile * tileSize, yTile * tileSize, xTile..", "..yTile, colors.white, colors.black, true);
 		end
 	end
-	if bridgeCount > 0 then
-		print_deferred();
-	else
-		print("No bridge pieces found :(");
+end
+--]]
+
+function solidityBankSwitchCallback()
+	Game.solidityBankSwitchCycles = emu.totalexecutedcycles();
+end
+
+function solidityDataReadCallback()
+	Game.solidityDataReadCycles = emu.totalexecutedcycles();
+end
+
+function IRQCallback()
+	Game.IRQStartCycles = emu.totalexecutedcycles();
+end
+
+function Game.getSolidityBankSwitchCycles()
+	return Game.solidityBankSwitchCycles;
+end
+
+function Game.getSolidityDataReadCycles()
+	return Game.solidityDataReadCycles;
+end
+
+function Game.getIRQStartCycles()
+	return Game.IRQStartCycles;
+end
+
+function Game.getGlitchCycleOffset()
+	return Game.IRQStartCycles - Game.solidityBankSwitchCycles;
+end
+
+function Game.colorGlitchCycleOffset()
+	if Game.IRQStartCycles >= Game.solidityBankSwitchCycles and Game.IRQStartCycles <= Game.solidityDataReadCycles then
+		return colors.green;
 	end
 end
+
+function Game.getGlitchWindowSize()
+	return Game.solidityDataReadCycles - Game.solidityBankSwitchCycles;
+end
+
+function Game.colorGlitchTimers()
+	local ringTimer = Game.getRingMod10Timer();
+	local palleteTimer = Game.getCyclePalleteSpeed();
+	if ringTimer == 0 and palleteTimer == 1 then
+		return colors.green;
+	end
+	if ringTimer == 0 then
+		return colors.yellow;
+	end
+	if palleteTimer == 1 then
+		return colors.yellow;
+	end
+end
+
+event.onmemoryexecute(solidityBankSwitchCallback, 0x49E9); -- TODO: Port to Game Gear
+event.onmemoryexecute(solidityDataReadCallback, 0x4A0B); -- TODO: Port to Game Gear
+event.onmemoryexecute(IRQCallback, 0x0038);
 
 Game.OSD = {
 	{"Level", Game.getLevel, category="mapData"},
@@ -399,6 +477,15 @@ Game.OSD = {
 	{"Separator"},
 	{"Speed Shoes", Game.getSpeedShoesTimer},
 	{"Invuln.", Game.getInvulnerabilityTimer},
+	{"Separator"},
+	{"Ring Timer", Game.getRingMod10Timer, Game.colorGlitchTimers},
+	{"Pallete Timer", Game.getCyclePalleteSpeed, Game.colorGlitchTimers},
+	{"Separator"},
+	{"Solidity Bank Switch", Game.getSolidityBankSwitchCycles, Game.colorGlitchCycleOffset},
+	{"IRQ Start           ", Game.getIRQStartCycles, Game.colorGlitchCycleOffset},
+	{"Solidity Data Read  ", Game.getSolidityDataReadCycles, Game.colorGlitchCycleOffset},
+	{"Offset              ", Game.getGlitchCycleOffset, Game.colorGlitchCycleOffset},
+	{"Glitch Window Size  ", Game.getGlitchWindowSize},
 };
 
 return Game;
