@@ -434,7 +434,7 @@ function Game.getGlitchCycleOffset()
 end
 
 function Game.getMinimumGlitchCycleOffset()
-	local cycleOffset = Game.getGlitchCycleOffset();
+	local cycleOffset = math.abs(Game.getGlitchCycleOffset());
 	Game.minimumGlitchCycleOffset = math.min(Game.minimumGlitchCycleOffset, cycleOffset);
 	return Game.minimumGlitchCycleOffset;
 end
