@@ -71,6 +71,7 @@ local Game = {
 	solidityBankSwitchCycles = 0,
 	solidityDataReadCycles = 0,
 	IRQStartCycles = 0,
+	solidityValue = 0,
 	minimumGlitchCycleOffset = math.huge,
 };
 
@@ -418,6 +419,9 @@ function solidityBankSwitchCallback()
 end
 
 function solidityDataReadCallback()
+	local registers = emu.getregisters();
+	local solidityDataAddress = registers.HL;
+	Game.solidityValue = memory.readbyte(solidityDataAddress, "System Bus");
 	Game.solidityDataReadCycles = emu.totalexecutedcycles();
 end
 
@@ -476,6 +480,10 @@ function Game.colorGlitchTimers()
 	end
 end
 
+function Game.getSolidityValue()
+	return Game.solidityValue;
+end
+
 event.onmemoryexecute(solidityBankSwitchCallback, 0x49E9); -- TODO: Port to Game Gear
 event.onmemoryexecute(solidityDataReadCallback, 0x4A0B); -- TODO: Port to Game Gear
 event.onmemoryexecute(IRQCallback, 0x0038);
@@ -509,6 +517,7 @@ Game.OSD = {
 	{"Offset              ", Game.getGlitchCycleOffset, Game.colorGlitchCycleOffset},
 	{"Min Offset          ", Game.getMinimumGlitchCycleOffset},
 	{"Glitch Window Size  ", Game.getGlitchWindowSize},
+	{"Solidity Value      ", hexifyOSD(Game.getSolidityValue)},
 };
 
 return Game;
