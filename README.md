@@ -41,6 +41,7 @@ A collection of Lua scripts and RAM watches for [BizHawk](https://github.com/TAS
 - Realtime feedback for flags being set/cleared
 - Mad Jack minimap
 - Automatic [ISG](http://dk64.wikia.com/wiki/Intro_Story_Glitch) timer
+- [Key Priority Simulator](https://htmlpreview.github.io/?https://github.com/Isotarge/ScriptHawk/blob/master/Docs/Key%20Priority%20Simulator.html)
 
 ![Donkey Kong 64 Support](Images/Promo/dk64.png)
 
@@ -53,6 +54,7 @@ A collection of Lua scripts and RAM watches for [BizHawk](https://github.com/TAS
 - Spawn objects
 - Documentation for the majority of flags
 - Realtime feedback for flags being set/cleared
+- Furnace Fun "Sound Question" [Training Program](https://htmlpreview.github.io/?https://github.com/Isotarge/ScriptHawk/blob/master/Docs/BKSoundTraining.html)
 
 ![Banjo-Kazooie Support](Images/Promo/bk_ui.png)
 

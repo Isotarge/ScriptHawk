@@ -8,22 +8,16 @@ end
 local Game = {
 	Memory = {
 		RNG = 0x8B,
-		x_position = 0x91,
-		x_position_sub = 0x92,
-		y_position = 0x95,
-		y_position_sub = 0x94,
-		x_velocity = 0x98,
-		x_velocity_sub = 0x99,
-		y_velocity = 0x9C,
-		y_velocity_sub = 0x9D,
+		x_position = 0x91, x_position_sub = 0x92,
+		y_position = 0x95, y_position_sub = 0x94,
+		x_velocity = 0x98, x_velocity_sub = 0x99,
+		y_velocity = 0x9C, y_velocity_sub = 0x9D,
 		current_boost = 0xA9,
 		current_boost_sub = 0xAA,
 		buttons_this_frame = 0xC7,
 		buttons_last_frame = 0xC8,
-		screen_x_position_super = 0xCD,
-		screen_x_position = 0xCC,
-		screen_y_position_super = 0xCF,
-		screen_y_position = 0xCE,
+		screen_x_position_super = 0xCD, screen_x_position = 0xCC,
+		screen_y_position_super = 0xCF, screen_y_position = 0xCE,
 		timer = 0xEA,
 		--0x01 = Title screen
 		--0x02 = Title screen idle animation

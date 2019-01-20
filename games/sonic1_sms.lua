@@ -172,6 +172,20 @@ function Game.getYVelocity()
 	return Game.read_s16_8(Game.Memory.y_velocity);
 end
 
+function Game.getXVelocityHex()
+	return toHexString(mainmemory.read_u16_le(Game.Memory.x_velocity + 1), 4, "").."."..toHexString(mainmemory.readbyte(Game.Memory.x_velocity), 2, "");
+end
+
+function Game.getYVelocityHex()
+	return toHexString(mainmemory.read_u16_le(Game.Memory.y_velocity + 1), 4, "").."."..toHexString(mainmemory.readbyte(Game.Memory.y_velocity), 2, "");
+end
+
+function Game.read_s16_8(base)
+	local major = mainmemory.read_s16_le(base + 1);
+	local sub = mainmemory.readbyte(base) / 256;
+	return major + sub;
+end
+
 function Game.camHack()
 	local playerX = Game.getXPosition();
 	local playerY = Game.getYPosition();
@@ -484,6 +498,8 @@ Game.OSD = {
 	{"Y", category="position"},
 	{"X Velocity", Game.getXVelocity, category="speed"},
 	{"Y Velocity", Game.getYVelocity, category="speed"},
+	{"X Velocity (Hex)", Game.getXVelocityHex, category="speed"},
+	{"Y Velocity (Hex)", Game.getYVelocityHex, category="speed"},
 	{"dX", category="positionStats"},
 	{"dY", category="positionStats"},
 	{"Separator"},

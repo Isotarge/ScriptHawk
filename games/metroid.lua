@@ -16,7 +16,7 @@ local Game = {
 		x_velocity = 0x309, x_velocity_sub = 0x313,
 		y_velocity = 0x308, y_velocity_sub = 0x312,
 		screen_y = 0xFC,
-	}
+	},
 };
 
 function Game.detectVersion(romName, romHash)

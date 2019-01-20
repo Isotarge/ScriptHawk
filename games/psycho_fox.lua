@@ -45,7 +45,7 @@ local Game = {
 		"7-2",
 		"7-3",
 		"Warp Entry",
-	}
+	},
 };
 
 function Game.setMap(value)
