@@ -71,6 +71,7 @@ local Game = {
 	solidityBankSwitchCycles = 0,
 	solidityDataReadCycles = 0,
 	IRQStartCycles = 0,
+	minimumGlitchCycleOffset = math.huge,
 };
 
 function Game.setMap(value)
@@ -432,6 +433,17 @@ function Game.getGlitchCycleOffset()
 	return Game.IRQStartCycles - Game.solidityBankSwitchCycles;
 end
 
+function Game.getMinimumGlitchCycleOffset()
+	local cycleOffset = Game.getGlitchCycleOffset();
+	Game.minimumGlitchCycleOffset = math.min(Game.minimumGlitchCycleOffset, cycleOffset);
+	return Game.minimumGlitchCycleOffset;
+end
+
+function Game.resetMinimumGlitchCycleOffset()
+	Game.minimumGlitchCycleOffset = math.huge;
+end
+ScriptHawk.bindKeyRealtime("Slash", Game.resetMinimumGlitchCycleOffset, true);
+
 function Game.colorGlitchCycleOffset()
 	if Game.IRQStartCycles >= Game.solidityBankSwitchCycles and Game.IRQStartCycles <= Game.solidityDataReadCycles then
 		return colors.green;
@@ -485,6 +497,7 @@ Game.OSD = {
 	{"IRQ Start           ", Game.getIRQStartCycles, Game.colorGlitchCycleOffset},
 	{"Solidity Data Read  ", Game.getSolidityDataReadCycles, Game.colorGlitchCycleOffset},
 	{"Offset              ", Game.getGlitchCycleOffset, Game.colorGlitchCycleOffset},
+	{"Min Offset          ", Game.getMinimumGlitchCycleOffset},
 	{"Glitch Window Size  ", Game.getGlitchWindowSize},
 };
 
