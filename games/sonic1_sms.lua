@@ -418,6 +418,16 @@ function solidityBankSwitchCallback()
 	Game.solidityBankSwitchCycles = emu.totalexecutedcycles();
 end
 
+solidityTestEnabled = false;
+solidityTestValue = 0x00;
+
+function solidityTestCallback()
+	if solidityTestEnabled then
+		Game.solidityValue = solidityTestValue;
+		emu.setregister("A", solidityTestValue);
+	end
+end
+
 function solidityDataReadCallback()
 	local registers = emu.getregisters();
 	local solidityDataAddress = registers.HL;
@@ -486,6 +496,7 @@ end
 
 event.onmemoryexecute(solidityBankSwitchCallback, 0x49E9); -- TODO: Port to Game Gear
 event.onmemoryexecute(solidityDataReadCallback, 0x4A0B); -- TODO: Port to Game Gear
+event.onmemoryexecute(solidityTestCallback, 0x4A0C); -- TODO: Port to Game Gear
 event.onmemoryexecute(IRQCallback, 0x0038);
 
 Game.OSD = {
