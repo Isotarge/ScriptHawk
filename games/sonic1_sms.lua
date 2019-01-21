@@ -84,6 +84,7 @@ local Game = {
 		[3] = {address=0x0000, value=0x00},
 	},
 	minimumGlitchCycleOffset = math.huge,
+	glitchedThisFrame = false,
 };
 
 function Game.setMap(value)
@@ -488,6 +489,7 @@ function solidityDataReadCallbackFinalRead()
 	local registers = emu.getregisters();
 	local solidityDataAddress = registers.HL;
 	Game.solidityValue = memory.readbyte(solidityDataAddress, "System Bus");
+	Game.glitchedThisFrame = memory.readbyte(0xFFFF, "System Bus") ~= 0x0F; -- True if the incorrect bank (probably 2) is loaded in the system bus at the time the solidity value is read
 	Game.solidityDataFinalReadCycles = emu.totalexecutedcycles();
 end
 
@@ -585,6 +587,16 @@ function Game.getPossibleSolidityOffsets()
 	return "TODO, TODO, TODO";
 end
 
+function Game.isGlitchedThisFrame()
+	return Game.glitchedThisFrame;
+end
+
+function Game.colorIsGlitched()
+	if Game.glitchedThisFrame then
+		return colors.green;
+	end
+end
+
 event.onmemoryexecute(solidityBankSwitchCallback, 0x49E9); -- TODO: Port to Game Gear
 event.onmemoryexecute(solidityDataReadCallbackFirstRead, 0x4A05); -- TODO: Port to Game Gear
 event.onmemoryexecute(solidityDataReadCallbackSecondRead, 0x4A07); -- TODO: Port to Game Gear
@@ -622,6 +634,7 @@ Game.OSD = {
 	{"IRQ Start       ", Game.getIRQStartCycles, Game.colorGlitchCycleOffset},
 	{"Sol. Data Read  ", Game.getSolidityDataReadCycles, Game.colorGlitchCycleOffset},
 	{"Offset          ", Game.getGlitchCycleOffset, Game.colorGlitchCycleOffset},
+	{"Glitched Frame  ", Game.isGlitchedThisFrame, Game.colorIsGlitched},
 	{"Min Offset      ", Game.getMinimumGlitchCycleOffset},
 	{"Glitch Window   ", Game.getGlitchWindowSize},
 	{"Tile Index      ", hexifyOSD(Game.getTileIndex)},
