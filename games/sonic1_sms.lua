@@ -78,6 +78,7 @@ local Game = {
 	IRQStartCycles = 0,
 	tileIndex = 0,
 	solidityValue = 0,
+	solidityAddress = 0x0000,
 	possibleSolidityValues = {
 		[1] = {address=0x0000, value=0x00},
 		[2] = {address=0x0000, value=0x00},
@@ -488,6 +489,7 @@ end
 function solidityDataReadCallbackFinalRead()
 	local registers = emu.getregisters();
 	local solidityDataAddress = registers.HL;
+	Game.solidityAddress = solidityDataAddress;
 	Game.solidityValue = memory.readbyte(solidityDataAddress, "System Bus");
 	Game.glitchedThisFrame = memory.readbyte(0xFFFF, "System Bus") ~= 0x0F; -- True if the incorrect bank (probably 2) is loaded in the system bus at the time the solidity value is read
 	Game.solidityDataFinalReadCycles = emu.totalexecutedcycles();
@@ -553,7 +555,7 @@ function Game.getTileIndex()
 end
 
 function Game.getSolidityValue()
-	return Game.solidityValue;
+	return toHexString(Game.solidityValue, 2, "").." ("..toHexString(Game.solidityAddress, 4, "")..")";
 end
 
 function Game.getPossibleSolidityValues()
@@ -638,7 +640,7 @@ Game.OSD = {
 	{"Min Offset      ", Game.getMinimumGlitchCycleOffset},
 	{"Glitch Window   ", Game.getGlitchWindowSize},
 	{"Tile Index      ", hexifyOSD(Game.getTileIndex)},
-	{"Solidity Value  ", hexifyOSD(Game.getSolidityValue)},
+	{"Solidity Value  ", Game.getSolidityValue},
 	{"Poss. Sol. Val. ", Game.getPossibleSolidityValues, Game.colorPossibleValues},
 	{"Poss. Sol. Addr.", Game.getPossibleSolidityAddresses, Game.colorPossibleValues},
 	--{"Poss. Offsets   ", Game.getPossibleSolidityOffsets, Game.colorPossibleValues},
