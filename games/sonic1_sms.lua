@@ -495,6 +495,18 @@ function IRQCallback()
 	Game.IRQStartCycles = emu.totalexecutedcycles();
 end
 
+function Game.getSolidityBankSwitchCycles()
+	return Game.solidityBankSwitchCycles;
+end
+
+function Game.getSolidityDataReadCycles()
+	return Game.solidityDataFirstReadCycles;
+end
+
+function Game.getIRQStartCycles()
+	return Game.IRQStartCycles;
+end
+
 function Game.getGlitchCycleOffset()
 	return Game.IRQStartCycles - Game.solidityBankSwitchCycles;
 end
@@ -546,6 +558,25 @@ function Game.getPossibleSolidityValues()
 	return toHexString(Game.possibleSolidityValues[1].value, 2, "")..",   "..toHexString(Game.possibleSolidityValues[2].value, 2, "")..",   "..toHexString(Game.possibleSolidityValues[3].value, 2, "");
 end
 
+function Game.colorPossibleValues()
+	local greenFound = false;
+	local yellowFound = false;
+	for i = 1, 3 do
+		if Game.possibleSolidityValues[i].value == 0x0B then
+			greenFound = true;
+		end
+		if Game.possibleSolidityValues[i].value <= 0x1C then
+			yellowFound = true;
+		end
+	end
+	if greenFound then
+		return colors.green;
+	end
+	if yellowFound then
+		return colors.yellow;
+	end
+end
+
 function Game.getPossibleSolidityAddresses()
 	return toHexString(Game.possibleSolidityValues[1].address, 4, "")..", "..toHexString(Game.possibleSolidityValues[2].address, 4, "")..", "..toHexString(Game.possibleSolidityValues[3].address, 4, "");
 end
@@ -587,14 +618,17 @@ Game.OSD = {
 	{"Ring Timer", Game.getRingMod10Timer, Game.colorGlitchTimers},
 	{"Pallete Timer", Game.getCyclePalleteSpeed, Game.colorGlitchTimers},
 	{"Separator"},
+	{"Sol. Bank Switch", Game.getSolidityBankSwitchCycles, Game.colorGlitchCycleOffset},
+	{"IRQ Start       ", Game.getIRQStartCycles, Game.colorGlitchCycleOffset},
+	{"Sol. Data Read  ", Game.getSolidityDataReadCycles, Game.colorGlitchCycleOffset},
 	{"Offset          ", Game.getGlitchCycleOffset, Game.colorGlitchCycleOffset},
 	{"Min Offset      ", Game.getMinimumGlitchCycleOffset},
 	{"Glitch Window   ", Game.getGlitchWindowSize},
 	{"Tile Index      ", hexifyOSD(Game.getTileIndex)},
 	{"Solidity Value  ", hexifyOSD(Game.getSolidityValue)},
-	{"Poss. Sol. Val. ", Game.getPossibleSolidityValues},
-	{"Poss. Sol. Addr.", Game.getPossibleSolidityAddresses},
-	--{"Poss. Offsets   ", Game.getPossibleSolidityOffsets},
+	{"Poss. Sol. Val. ", Game.getPossibleSolidityValues, Game.colorPossibleValues},
+	{"Poss. Sol. Addr.", Game.getPossibleSolidityAddresses, Game.colorPossibleValues},
+	--{"Poss. Offsets   ", Game.getPossibleSolidityOffsets, Game.colorPossibleValues},
 };
 
 return Game;
