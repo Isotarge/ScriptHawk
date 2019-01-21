@@ -5,6 +5,9 @@ if type(ScriptHawk) ~= "table" then
 	return;
 end
 
+solidityTestEnabled = false;
+solidityTestValue = 0x00;
+
 local Game = {
 	squish_memory_table = true,
 	Memory = { -- Order: SMS/GG (Proto), GG
@@ -28,6 +31,8 @@ local Game = {
 		object_array_base = {0x13FC, 0x13FD},
 		ring_mod_10_timer = {0x1298, 0x0000}, -- TODO: GG
 		cycle_pallete_speed = {0x12A4, 0x0000}, -- TODO: GG
+		solidity_data_index = {0x12D4, 0x0000}, -- TODO: GG
+		solidity_data_start_system_bus = {0xB9ED, 0x0000}, -- TODO: GG
 	},
 	maps = {
 		"Green Hill 1", -- 0x00
@@ -69,9 +74,15 @@ local Game = {
 		"Credits",
 	},
 	solidityBankSwitchCycles = 0,
-	solidityDataReadCycles = 0,
+	solidityDataFinalReadCycles = 0,
 	IRQStartCycles = 0,
+	tileIndex = 0,
 	solidityValue = 0,
+	possibleSolidityValues = {
+		[1] = {address=0x0000, value=0x00},
+		[2] = {address=0x0000, value=0x00},
+		[3] = {address=0x0000, value=0x00},
+	},
 	minimumGlitchCycleOffset = math.huge,
 };
 
@@ -89,6 +100,10 @@ function Game.read_s16_8(base)
 	local major = mainmemory.read_s16_le(base + 1);
 	local sub = mainmemory.readbyte(base) / 256;
 	return major + sub;
+end
+
+function Game.read_u16_8_hex(base)
+	return toHexString(mainmemory.read_u16_le(base + 1), 4, "").."."..toHexString(mainmemory.readbyte(base), 2, "");
 end
 
 function Game.write_u16_8(base, value)
@@ -165,6 +180,22 @@ function Game.getYPosition()
 	return Game.read_u16_8(Game.Memory.y_position);
 end
 
+function Game.getXPositionHex()
+	return Game.read_u16_8_hex(Game.Memory.x_position);
+end
+
+function Game.getYPositionHex()
+	return Game.read_u16_8_hex(Game.Memory.y_position);
+end
+
+function Game.setXPosition(value)
+	return Game.write_u16_8(Game.Memory.x_position, value);
+end
+
+function Game.setYPosition(value)
+	return Game.write_u16_8(Game.Memory.y_position, value);
+end
+
 function Game.getXVelocity()
 	return Game.read_s16_8(Game.Memory.x_velocity);
 end
@@ -174,11 +205,11 @@ function Game.getYVelocity()
 end
 
 function Game.getXVelocityHex()
-	return toHexString(mainmemory.read_u16_le(Game.Memory.x_velocity + 1), 4, "").."."..toHexString(mainmemory.readbyte(Game.Memory.x_velocity), 2, "");
+	return Game.read_u16_8_hex(Game.Memory.x_velocity);
 end
 
 function Game.getYVelocityHex()
-	return toHexString(mainmemory.read_u16_le(Game.Memory.y_velocity + 1), 4, "").."."..toHexString(mainmemory.readbyte(Game.Memory.y_velocity), 2, "");
+	return Game.read_u16_8_hex(Game.Memory.y_velocity);
 end
 
 function Game.camHack()
@@ -303,41 +334,6 @@ local object_fields = {
 	sprite_layout = 0x0F, -- 2 bytes, pointer
 };
 
---[[
-bridgePieceIndex = 1;
-bridgePieces = {
---   type xsub xmin xmaj ysub ymin ymaj xvel xvel xvel yvel yvel yvel wdth hght spr  spr  unk  unk  unk  unk  unk  unk  unk  unk  unk
---   0    1    2    3    4    5    6    7    8    9    a    b    c    d    e    f    10   11   12   13   14   15   16   17   18   19
-	{0x2E,0x00,0xA0,0x06,0xA0,0x5F,0x01,0x00,0x00,0x00,0xC0,0x02,0x00,0x0E,0x08,0x81,0x84,0x01,0x00,0x00,0x00,0x00,0x00,0x00,0x23,0x00},
-	{0x2E,0x00,0xB0,0x06,0xE0,0x6B,0x01,0x00,0x00,0x00,0x40,0x03,0x00,0x0E,0x08,0x81,0x84,0x01,0xD4,0x01,0x00,0xAA,0x06,0x04,0x23,0x00},
-	{0x2E,0x00,0xC0,0x06,0x60,0x55,0x01,0x00,0x00,0x00,0x40,0x02,0x00,0x0E,0x08,0x81,0x84,0x01,0xD4,0x01,0x00,0xAA,0x06,0x04,0x23,0x00},
-	{0x2E,0x00,0xD0,0x06,0xE0,0x5C,0x01,0x00,0x00,0x00,0xA0,0x02,0x00,0x0E,0x08,0x81,0x84,0x01,0x00,0x00,0x00,0x00,0x00,0x00,0x23,0x00},
-	{0x2E,0x00,0xE0,0x06,0xA0,0x68,0x01,0x00,0x00,0x00,0x20,0x03,0x00,0x0E,0x08,0x81,0x84,0x01,0x00,0x00,0x00,0x00,0x00,0x00,0x23,0x00},
-	{0x2E,0x00,0xF0,0x06,0x80,0x65,0x01,0x00,0x00,0x00,0x00,0x03,0x00,0x0E,0x08,0x81,0x84,0x01,0x00,0x00,0x00,0x00,0x00,0x00,0x23,0x00},
-	{0x2E,0x00,0x00,0x07,0xC0,0x57,0x01,0x00,0x00,0x00,0x60,0x02,0x00,0x0E,0x08,0x81,0x84,0x01,0x00,0x00,0x00,0x00,0x00,0x00,0x23,0x00},
-	{0x2E,0x00,0x10,0x07,0x00,0x40,0x01,0x00,0x00,0x00,0x00,0x00,0x00,0x0E,0x08,0x00,0x00,0x06,0x00,0x00,0x00,0x00,0x00,0x00,0x22,0x00},
-	{0x2E,0x00,0x20,0x07,0xC0,0x40,0x01,0x00,0x00,0x00,0x60,0x00,0x00,0x0E,0x08,0x81,0x84,0x01,0x00,0x00,0x00,0x00,0x00,0x00,0x23,0x00},
-	{0x2E,0x00,0x30,0x07,0xA0,0x42,0x01,0x00,0x00,0x00,0xC0,0x00,0x00,0x0E,0x08,0x81,0x84,0x01,0x00,0x00,0x00,0x00,0x00,0x00,0x23,0x00},
-	{0x2E,0x00,0x40,0x07,0x00,0x40,0x01,0x00,0x00,0x00,0x00,0x00,0x00,0x0E,0x08,0x00,0x00,0x07,0x00,0x00,0x00,0x00,0x00,0x00,0x22,0x00},
-};
-
-bridgePieces = {
---   type xsub xmin xmaj ysub ymin ymaj xvel xvel xvel yvel yvel yvel wdth hght spr  spr  unk  unk  unk  unk  unk  unk  unk  unk  unk
---   0    1    2    3    4    5    6    7    8    9    a    b    c    d    e    f    10   11   12   13   14   15   16   17   18   19
-	{    ,    ,    ,    ,    ,    ,    ,    ,    ,    ,    ,    ,    ,    ,    ,0x81,0x84,0x01,0x00,0x00,    ,0x00,0x00,0x00,0x23,    },
-	{    ,    ,    ,    ,    ,    ,    ,    ,    ,    ,    ,    ,    ,    ,    ,0x81,0x84,0x01,0xD4,0x01,    ,0xAA,0x06,0x04,0x23,    },
-	{    ,    ,    ,    ,    ,    ,    ,    ,    ,    ,    ,    ,    ,    ,    ,0x81,0x84,0x01,0xD4,0x01,    ,0xAA,0x06,0x04,0x23,    },
-	{    ,    ,    ,    ,    ,    ,    ,    ,    ,    ,    ,    ,    ,    ,    ,0x81,0x84,0x01,0x00,0x00,    ,0x00,0x00,0x00,0x23,    },
-	{    ,    ,    ,    ,    ,    ,    ,    ,    ,    ,    ,    ,    ,    ,    ,0x81,0x84,0x01,0x00,0x00,    ,0x00,0x00,0x00,0x23,    },
-	{    ,    ,    ,    ,    ,    ,    ,    ,    ,    ,    ,    ,    ,    ,    ,0x81,0x84,0x01,0x00,0x00,    ,0x00,0x00,0x00,0x23,    },
-	{    ,    ,    ,    ,    ,    ,    ,    ,    ,    ,    ,    ,    ,    ,    ,0x81,0x84,0x01,0x00,0x00,    ,0x00,0x00,0x00,0x23,    },
-	{    ,    ,    ,    ,    ,    ,    ,    ,    ,    ,    ,    ,    ,    ,    ,0x00,0x00,0x06,0x00,0x00,    ,0x00,0x00,0x00,0x22,    },
-	{    ,    ,    ,    ,    ,    ,    ,    ,    ,    ,    ,    ,    ,    ,    ,0x81,0x84,0x01,0x00,0x00,    ,0x00,0x00,0x00,0x23,    },
-	{    ,    ,    ,    ,    ,    ,    ,    ,    ,    ,    ,    ,    ,    ,    ,0x81,0x84,0x01,0x00,0x00,    ,0x00,0x00,0x00,0x23,    },
-	{    ,    ,    ,    ,    ,    ,    ,    ,    ,    ,    ,    ,    ,    ,    ,0x00,0x00,0x07,0x00,0x00,    ,0x00,0x00,0x00,0x22,    },
-};
---]]
-
 function Game.getHitboxes()
 	local screenX = Game.getViewportX();
 	local screenY = Game.getViewportY();
@@ -418,9 +414,6 @@ function solidityBankSwitchCallback()
 	Game.solidityBankSwitchCycles = emu.totalexecutedcycles();
 end
 
-solidityTestEnabled = false;
-solidityTestValue = 0x00;
-
 function solidityTestCallback()
 	if solidityTestEnabled then
 		Game.solidityValue = solidityTestValue;
@@ -428,27 +421,78 @@ function solidityTestCallback()
 	end
 end
 
-function solidityDataReadCallback()
+function systemBusToROM(bank, address)
+	local bankSize = 0x4000;
+	return bank * bankSize + address - 0x8000;
+end
+
+function glitchyBusRead(bank, address)
+	-- Clamp address to system bus
+	address = bit.band(address, 0xFFFF);
+
+	-- If address is outside the range of the glitchy bank read from system bus as normal
+	if address < 0x8000 or address > 0xBFFF then
+		return memory.readbyte(address, "System Bus");
+	end
+
+	-- Pretend the glitched bank (probably bank 2) is loaded and read from that bank in ROM
+	return memory.readbyte(systemBusToROM(bank, address), "ROM");
+end
+
+function computeSolidityValue(tileIndex, bank, startOffset)
+	local solidityDataIndex = mainmemory.readbyte(Game.Memory.solidity_data_index);
+
+	local hl = Game.Memory.solidity_data_start_system_bus + 2 * solidityDataIndex;
+
+	local currentBank = 15; -- Non glitched
+
+	if startOffset == 1 then
+		currentBank = bank; -- Glitch the bank!
+	end
+
+	local a = glitchyBusRead(currentBank, hl);
+
+	if startOffset == 2 then
+		currentBank = bank; -- Glitch the bank!
+	end
+
+	local h = glitchyBusRead(currentBank, hl + 1);
+
+	local realSolidityAddress = bit.band(Game.Memory.solidity_data_start_system_bus + 0x0100 * h + a + tileIndex, 0xFFFF);
+
+	if startOffset == 3 then
+		currentBank = bank; -- Glitch the bank!
+	end
+
+	local returnValue = {value=glitchyBusRead(currentBank, realSolidityAddress), address=realSolidityAddress};
+	return returnValue;
+end
+
+function solidityDataReadCallbackFirstRead()
+	Game.solidityDataFirstReadCycles = emu.totalexecutedcycles();
+
+	-- Compute possible tile solidity values for a glitchy bank 2 read at certain points in the solidity function
+	local registers = emu.getregisters();
+	local tileIndex = registers.E;
+	Game.tileIndex = tileIndex;
+	for i = 1, 3 do
+		Game.possibleSolidityValues[i] = computeSolidityValue(tileIndex, 2, i);
+	end
+end
+
+function solidityDataReadCallbackSecondRead()
+	Game.solidityDataSecondReadCycles = emu.totalexecutedcycles();
+end
+
+function solidityDataReadCallbackFinalRead()
 	local registers = emu.getregisters();
 	local solidityDataAddress = registers.HL;
 	Game.solidityValue = memory.readbyte(solidityDataAddress, "System Bus");
-	Game.solidityDataReadCycles = emu.totalexecutedcycles();
+	Game.solidityDataFinalReadCycles = emu.totalexecutedcycles();
 end
 
 function IRQCallback()
 	Game.IRQStartCycles = emu.totalexecutedcycles();
-end
-
-function Game.getSolidityBankSwitchCycles()
-	return Game.solidityBankSwitchCycles;
-end
-
-function Game.getSolidityDataReadCycles()
-	return Game.solidityDataReadCycles;
-end
-
-function Game.getIRQStartCycles()
-	return Game.IRQStartCycles;
 end
 
 function Game.getGlitchCycleOffset()
@@ -467,13 +511,13 @@ end
 ScriptHawk.bindKeyRealtime("Slash", Game.resetMinimumGlitchCycleOffset, true);
 
 function Game.colorGlitchCycleOffset()
-	if Game.IRQStartCycles >= Game.solidityBankSwitchCycles and Game.IRQStartCycles <= Game.solidityDataReadCycles then
+	if Game.IRQStartCycles >= Game.solidityBankSwitchCycles and Game.IRQStartCycles <= Game.solidityDataFinalReadCycles then
 		return colors.green;
 	end
 end
 
 function Game.getGlitchWindowSize()
-	return Game.solidityDataReadCycles - Game.solidityBankSwitchCycles;
+	return Game.solidityDataFinalReadCycles - Game.solidityBankSwitchCycles;
 end
 
 function Game.colorGlitchTimers()
@@ -490,12 +534,30 @@ function Game.colorGlitchTimers()
 	end
 end
 
+function Game.getTileIndex()
+	return Game.tileIndex;
+end
+
 function Game.getSolidityValue()
 	return Game.solidityValue;
 end
 
+function Game.getPossibleSolidityValues()
+	return toHexString(Game.possibleSolidityValues[1].value, 2, "")..",   "..toHexString(Game.possibleSolidityValues[2].value, 2, "")..",   "..toHexString(Game.possibleSolidityValues[3].value, 2, "");
+end
+
+function Game.getPossibleSolidityAddresses()
+	return toHexString(Game.possibleSolidityValues[1].address, 4, "")..", "..toHexString(Game.possibleSolidityValues[2].address, 4, "")..", "..toHexString(Game.possibleSolidityValues[3].address, 4, "");
+end
+
+function Game.getPossibleSolidityOffsets()
+	return "TODO, TODO, TODO";
+end
+
 event.onmemoryexecute(solidityBankSwitchCallback, 0x49E9); -- TODO: Port to Game Gear
-event.onmemoryexecute(solidityDataReadCallback, 0x4A0B); -- TODO: Port to Game Gear
+event.onmemoryexecute(solidityDataReadCallbackFirstRead, 0x4A05); -- TODO: Port to Game Gear
+event.onmemoryexecute(solidityDataReadCallbackSecondRead, 0x4A07); -- TODO: Port to Game Gear
+event.onmemoryexecute(solidityDataReadCallbackFinalRead, 0x4A0B); -- TODO: Port to Game Gear
 event.onmemoryexecute(solidityTestCallback, 0x4A0C); -- TODO: Port to Game Gear
 event.onmemoryexecute(IRQCallback, 0x0038);
 
@@ -511,10 +573,13 @@ Game.OSD = {
 	{"Y", category="position"},
 	{"X Velocity", Game.getXVelocity, category="speed"},
 	{"Y Velocity", Game.getYVelocity, category="speed"},
-	{"X Velocity (Hex)", Game.getXVelocityHex, category="speed"},
-	{"Y Velocity (Hex)", Game.getYVelocityHex, category="speed"},
 	{"dX", category="positionStats"},
 	{"dY", category="positionStats"},
+	{"Separator"},
+	{"X (Hex)", Game.getXPositionHex, category="position"},
+	{"Y (Hex)", Game.getYPositionHex, category="position"},
+	{"X Velocity (Hex)", Game.getXVelocityHex, category="speed"},
+	{"Y Velocity (Hex)", Game.getYVelocityHex, category="speed"},
 	{"Separator"},
 	{"Speed Shoes", Game.getSpeedShoesTimer},
 	{"Invuln.", Game.getInvulnerabilityTimer},
@@ -522,13 +587,14 @@ Game.OSD = {
 	{"Ring Timer", Game.getRingMod10Timer, Game.colorGlitchTimers},
 	{"Pallete Timer", Game.getCyclePalleteSpeed, Game.colorGlitchTimers},
 	{"Separator"},
-	{"Solidity Bank Switch", Game.getSolidityBankSwitchCycles, Game.colorGlitchCycleOffset},
-	{"IRQ Start           ", Game.getIRQStartCycles, Game.colorGlitchCycleOffset},
-	{"Solidity Data Read  ", Game.getSolidityDataReadCycles, Game.colorGlitchCycleOffset},
-	{"Offset              ", Game.getGlitchCycleOffset, Game.colorGlitchCycleOffset},
-	{"Min Offset          ", Game.getMinimumGlitchCycleOffset},
-	{"Glitch Window Size  ", Game.getGlitchWindowSize},
-	{"Solidity Value      ", hexifyOSD(Game.getSolidityValue)},
+	{"Offset          ", Game.getGlitchCycleOffset, Game.colorGlitchCycleOffset},
+	{"Min Offset      ", Game.getMinimumGlitchCycleOffset},
+	{"Glitch Window   ", Game.getGlitchWindowSize},
+	{"Tile Index      ", hexifyOSD(Game.getTileIndex)},
+	{"Solidity Value  ", hexifyOSD(Game.getSolidityValue)},
+	{"Poss. Sol. Val. ", Game.getPossibleSolidityValues},
+	{"Poss. Sol. Addr.", Game.getPossibleSolidityAddresses},
+	--{"Poss. Offsets   ", Game.getPossibleSolidityOffsets},
 };
 
 return Game;
