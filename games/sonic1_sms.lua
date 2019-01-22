@@ -418,8 +418,12 @@ end
 
 function solidityTestCallback()
 	if solidityTestEnabled then
-		Game.solidityValue = solidityTestValue;
+		-- Set the solidity value in the register itself
 		emu.setregister("A", solidityTestValue);
+
+		-- Read back what the value has been set to
+		local registers = emu.getregisters();
+		Game.solidityValue = registers.A;
 	end
 end
 

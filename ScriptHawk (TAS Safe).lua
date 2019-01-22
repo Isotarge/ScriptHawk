@@ -3,6 +3,9 @@ local function writeblock(...)
 	--print("Memory write blocked! Your TAS is safe!");
 end
 
+emu.setregister = writeblock;
+nes.addgamegenie = writeblock;
+
 mainmemory.writebyte = writeblock;
 mainmemory.writebyterange = writeblock;
 mainmemory.write_u8 = writeblock;

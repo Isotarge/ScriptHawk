@@ -6829,6 +6829,7 @@ local FTA = {
 		0x94, -- DK, Green
 		0x95, -- Lanky, Green
 		0x96, -- Tiny, Green
+		0xB8, -- Chunky, Green (Labelled "Green Switch", could be used for more stuff)
 		0x165, -- Chunky, Red
 		0x166, -- Diddy, Red
 		0x167, -- DK, Red
@@ -6871,7 +6872,7 @@ function FTA.isKasplat(actorType)
 end
 
 function FTA.isSimSlamSwitch(value)
-	return (value >= 0x92 and value <= 0x96) or (value >= 0x165 and value <= 0x16E);
+	return (value >= 0x92 and value <= 0x96) or (value == 0xB8) or (value >= 0x165 and value <= 0x16E);
 end
 
 function FTA.isGunSwitch(value)

@@ -14,6 +14,7 @@
 	- Warnings/UITest?
 - Bulk support SMS games with new hitbox API
 - UI to load ASM patches, can currently only be done by calling loadASMPatch(filename, suppressprint) in the lua console
+- Ability to default hitbox list to false in a game module (Sonic 1 SMS)
 
 ## Specific Modules
 - Balloon Fight:
