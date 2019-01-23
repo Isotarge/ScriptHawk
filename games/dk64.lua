@@ -1204,6 +1204,7 @@ obj_model1 = {
 	y_rot = 0xE6, -- u16_be
 	z_rot = 0xE8, -- u16_be
 	locked_to_pad = 0x110, -- TODO: What datatype is this? code says byte but I'd think it'd be a pointer
+	chunk = 0x12C, -- u16_be
 	health = 0x134, -- s16_be
 	takes_enemy_damage = 0x13B, -- TODO: put into examine method and double check datatype
 	collision_queue_pointer = 0x13C,
@@ -5451,6 +5452,14 @@ function Game.getDistanceFromFloor()
 	return 0;
 end
 
+function Game.getChunk()
+	local playerObject = Game.getPlayerObject();
+	if isRDRAM(playerObject) then
+		return mainmemory.read_u16_be(playerObject + obj_model1.chunk);
+	end
+	return 0;
+end
+
 function Game.getCameraState()
 	local cameraObject = dereferencePointer(Game.Memory.camera_pointer);
 	local cameraState = "Unknown";
@@ -9218,6 +9227,7 @@ Game.standardOSD = {
 	{"Z", category="position"},
 	{"Separator"},
 	{"Floor", Game.getFloor, category="position"},
+	{"Chunk", Game.getChunk, category="position"},
 	{"Separator"},
 	{"Lag Factor", Game.getLagFactor, category="lag"},
 	{"dY", category="positionStats"},
