@@ -10,38 +10,38 @@ solidityTestValue = 0x00;
 
 local Game = {
 	squish_memory_table = true,
-	Memory = { -- Order: SMS/GG (Proto), GG
-		in_score_screen = {0x1207, 0x1207}, -- These are actually part of a big game state bitfield, might be worth going through the disassembly and documenting all of them
-		level = {0x123E, 0x1238},
-		rings = {0x12AA, 0x12A9}, -- byte, BCD
-		lives = {0x1246, 0x1240},
-		level_width = {0x1238, 0x1232}, -- u16_le: Width of the floor layout in blocks
-		level_height = {0x123A, 0x1234}, -- u16_le: Height of the floor layout in blocks
-		viewport_x = {0x125A, 0x1254},
-		viewport_x2 = {0x126F, 0x0000}, -- TODO: GG
-		viewport_y = {0x125D, 0x1257},
-		viewport_y2 = {0x1271, 0x0000}, -- TODO: GG
-		x_position = {0x13FD, 0x13FE}, -- 3 bytes: sub.min.maj
-		y_position = {0x1400, 0x1401}, -- 3 bytes: sub.min.maj
-		x_velocity = {0x1403, 0x1404}, -- 3 bytes: sub.min.maj
-		y_velocity = {0x1406, 0x1407}, -- 3 bytes: sub.min.maj
-		igt = {0x12CE, 0x12CF}, -- 3 bytes: min(BCD):sec(BCD).frame
-		invuln_timer = {0x128D, 0x1287},
-		speed_shoes_timer = {0x1411, 0x1412},
-		object_array_base = {0x13FC, 0x13FD},
-		ring_mod_10_timer = {0x1298, 0x1293},
-		cycle_pallete_speed = {0x12A4, 0x0000}, -- TODO: GG
-		solidity_data_index = {0x12D4, 0x12D5},
-		standard_solidity_bank = {0x0F, 0x05},
-		glitched_solidity_bank = {0x02, 0x02}, -- TODO: Verify GG
-		solidity_data_start_system_bus = {0xB9ED, 0xA200},
+	Memory = { -- Order: SMS/GG (Proto), GG 1.0, GG 1.1
+		in_score_screen = {0x1207, 0x1207, 0x1207}, -- These are actually part of a big game state bitfield, might be worth going through the disassembly and documenting all of them
+		level = {0x123E, 0x1238, 0x1238},
+		rings = {0x12AA, 0x12A9, 0x12A9}, -- byte, BCD
+		lives = {0x1246, 0x1240, 0x1240},
+		level_width = {0x1238, 0x1232, 0x1232}, -- u16_le: Width of the floor layout in blocks
+		level_height = {0x123A, 0x1234, 0x1234}, -- u16_le: Height of the floor layout in blocks
+		viewport_x = {0x125A, 0x1254, 0x1254},
+		viewport_x2 = {0x126F, 0x0000, 0x0000}, -- TODO: GG 1.0, GG 1.1
+		viewport_y = {0x125D, 0x1257, 0x1257},
+		viewport_y2 = {0x1271, 0x0000, 0x0000}, -- TODO: GG 1.0, GG 1.1
+		x_position = {0x13FD, 0x13FE, 0x13FE}, -- 3 bytes: sub.min.maj
+		y_position = {0x1400, 0x1401, 0x1401}, -- 3 bytes: sub.min.maj
+		x_velocity = {0x1403, 0x1404, 0x1404}, -- 3 bytes: sub.min.maj
+		y_velocity = {0x1406, 0x1407, 0x1407}, -- 3 bytes: sub.min.maj
+		igt = {0x12CE, 0x12CF, 0x12CF}, -- 3 bytes: min(BCD):sec(BCD).frame
+		invuln_timer = {0x128D, 0x1287, 0x1287},
+		speed_shoes_timer = {0x1411, 0x1412, 0x1412},
+		object_array_base = {0x13FC, 0x13FD, 0x13FD},
+		ring_mod_10_timer = {0x1298, 0x1293, 0x1293},
+		cycle_pallete_speed = {0x12A4, 0x129F, 0x129F},
+		solidity_data_index = {0x12D4, 0x12D5, 0x12D5},
+		standard_solidity_bank = {0x0F, 0x05, 0x05},
+		glitched_solidity_bank = {0x02, 0x02, 0x02},
+		solidity_data_start_system_bus = {0xB9ED, 0xA200, 0xA200},
 		-- Code hooks
-		solidity_bank_switch = {0x49E9, 0x4BF1},
-		solidity_data_first_read = {0x4A05, 0x4C17},
-		solidity_data_second_read = {0x4A07, 0x4C19},
-		solidity_data_final_read = {0x4A0B, 0x4C1D},
-		solidity_test = {0x4A0C, 0x4C1E},
-		irq_address = {0x0038, 0x0038},
+		solidity_bank_switch = {0x49E9, 0x4BF1, 0x4BFB},
+		solidity_data_first_read = {0x4A05, 0x4C17, 0x4C21},
+		solidity_data_second_read = {0x4A07, 0x4C19, 0x4C23},
+		solidity_data_final_read = {0x4A0B, 0x4C1D, 0x4C27},
+		solidity_test = {0x4A0C, 0x4C1E, 0x4C28},
+		irq_address = {0x0038, 0x0038, 0x0038},
 	},
 	maps = {
 		"Green Hill 1", -- 0x00
@@ -360,7 +360,7 @@ function Game.getHitboxes()
 	ScriptHawk.hitboxDefaultXOffset = -screenX;
 	ScriptHawk.hitboxDefaultYOffset = -screenY;
 
-	if Game.version == 2 then -- Game Gear is weird
+	if Game.version ~= 1 then -- Game Gear is weird
 		ScriptHawk.hitboxDefaultXOffset = ScriptHawk.hitboxDefaultXOffset - 50;
 		ScriptHawk.hitboxDefaultYOffset = ScriptHawk.hitboxDefaultYOffset - 24;
 	end

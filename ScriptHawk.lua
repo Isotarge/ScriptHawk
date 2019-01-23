@@ -555,7 +555,7 @@ local supportedGames = {
 	-- Sonic The Hedgehog (GG)
 	["8A95B36139206A5BA13A38BB626AEE25"] = {moduleName="games.sonic1_sms", friendlyName="Sonic The Hedgehog (J)", version=2},
 	["05D0E3897CB2B6E08C2952730D2C80C1"] = {moduleName="games.sonic1_sms", friendlyName="Sonic The Hedgehog (W) (Proto)", version=1}, -- Same addresses as SMS version, interestingly
-	["B1DE7027824C434CE8DE59782705F5C9"] = {moduleName="games.sonic1_sms", friendlyName="Sonic The Hedgehog (W) (Rev 1)", version=2},
+	["B1DE7027824C434CE8DE59782705F5C9"] = {moduleName="games.sonic1_sms", friendlyName="Sonic The Hedgehog (W) (Rev 1)", version=3},
 
 	-- Sonic The Hedgehog (SMS)
 	["6B9677E4A9ABB37765D6DB4658F4324251807E07"] = {moduleName="games.sonic1_sms", friendlyName="Sonic The Hedgehog (UE)", version=1},
@@ -1900,10 +1900,26 @@ local function plot_pos()
 		prev_z = z;
 	end
 
-	if lock_y and exactlyOneFrameHasPassed then -- TODO: Checkbox?
-		if (not Game.speedy_invert_Y and y < prev_y) or (Game.speedy_invert_Y and y > prev_y) then
-			Game.setYPosition(prev_y);
-			y = prev_y;
+	if exactlyOneFrameHasPassed then -- TODO: Checkboxes
+		if lock_x then
+			if x ~= prev_x then
+				Game.setXPosition(prev_x);
+				x = prev_x;
+			end
+		end
+
+		if lock_y then
+			if (not Game.speedy_invert_Y and y < prev_y) or (Game.speedy_invert_Y and y > prev_y) then
+				Game.setYPosition(prev_y);
+				y = prev_y;
+			end
+		end
+
+		if lock_z then
+			if z ~= prev_z then
+				Game.setZPosition(prev_z);
+				z = prev_z;
+			end
 		end
 	end
 
