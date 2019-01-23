@@ -11,28 +11,37 @@ solidityTestValue = 0x00;
 local Game = {
 	squish_memory_table = true,
 	Memory = { -- Order: SMS/GG (Proto), GG
-		in_score_screen = {0x1207, 0x0000}, -- TODO: GG
+		in_score_screen = {0x1207, 0x1207}, -- These are actually part of a big game state bitfield, might be worth going through the disassembly and documenting all of them
 		level = {0x123E, 0x1238},
 		rings = {0x12AA, 0x12A9}, -- byte, BCD
 		lives = {0x1246, 0x1240},
-		level_width = {0x1238, 0x0000}, -- TODO: GG -- width of the floor layout in blocks
-		level_height = {0x123A, 0x0000}, -- TODO: GG -- height of the floor layout in blocks
+		level_width = {0x1238, 0x1232}, -- u16_le: Width of the floor layout in blocks
+		level_height = {0x123A, 0x1234}, -- u16_le: Height of the floor layout in blocks
 		viewport_x = {0x125A, 0x1254},
 		viewport_x2 = {0x126F, 0x0000}, -- TODO: GG
 		viewport_y = {0x125D, 0x1257},
 		viewport_y2 = {0x1271, 0x0000}, -- TODO: GG
-		x_position = {0x13FD, 0x13FE}, -- 3 bytes sub.min.maj
-		y_position = {0x1400, 0x1401}, -- 3 bytes sub.min.maj
-		x_velocity = {0x1403, 0x1404}, -- 3 bytes sub.min.maj
-		y_velocity = {0x1406, 0x1407}, -- 3 bytes sub.min.maj
+		x_position = {0x13FD, 0x13FE}, -- 3 bytes: sub.min.maj
+		y_position = {0x1400, 0x1401}, -- 3 bytes: sub.min.maj
+		x_velocity = {0x1403, 0x1404}, -- 3 bytes: sub.min.maj
+		y_velocity = {0x1406, 0x1407}, -- 3 bytes: sub.min.maj
 		igt = {0x12CE, 0x12CF}, -- 3 bytes: min(BCD):sec(BCD).frame
 		invuln_timer = {0x128D, 0x1287},
 		speed_shoes_timer = {0x1411, 0x1412},
 		object_array_base = {0x13FC, 0x13FD},
-		ring_mod_10_timer = {0x1298, 0x0000}, -- TODO: GG
+		ring_mod_10_timer = {0x1298, 0x1293},
 		cycle_pallete_speed = {0x12A4, 0x0000}, -- TODO: GG
-		solidity_data_index = {0x12D4, 0x0000}, -- TODO: GG
-		solidity_data_start_system_bus = {0xB9ED, 0x0000}, -- TODO: GG
+		solidity_data_index = {0x12D4, 0x12D5},
+		standard_solidity_bank = {0x0F, 0x05},
+		glitched_solidity_bank = {0x02, 0x02}, -- TODO: Verify GG
+		solidity_data_start_system_bus = {0xB9ED, 0xA200},
+		-- Code hooks
+		solidity_bank_switch = {0x49E9, 0x4BF1},
+		solidity_data_first_read = {0x4A05, 0x4C17},
+		solidity_data_second_read = {0x4A07, 0x4C19},
+		solidity_data_final_read = {0x4A0B, 0x4C1D},
+		solidity_test = {0x4A0C, 0x4C1E},
+		irq_address = {0x0038, 0x0038},
 	},
 	maps = {
 		"Green Hill 1", -- 0x00
@@ -127,6 +136,15 @@ function Game.detectVersion(romName, romHash)
 	ScriptHawk.dpad.key.enabled = false;
 	ScriptHawk.hitboxListShowCount = true;
 	ScriptHawk.hitboxDefaultColor = colors.white;
+
+	-- Gotta put these here so that we can use the squished memory tables
+	event.onmemoryexecute(solidityBankSwitchCallback, Game.Memory.solidity_bank_switch);
+	event.onmemoryexecute(solidityDataFirstReadCallback, Game.Memory.solidity_data_first_read);
+	event.onmemoryexecute(solidityDataSecondReadCallback, Game.Memory.solidity_data_second_read);
+	event.onmemoryexecute(solidityDataFinalReadCallback, Game.Memory.solidity_data_final_read);
+	event.onmemoryexecute(solidityTestCallback, Game.Memory.solidity_test);
+	event.onmemoryexecute(IRQCallback, Game.Memory.irq_address);
+
 	return true;
 end
 
@@ -412,21 +430,6 @@ function Game.drawUI()
 end
 --]]
 
-function solidityBankSwitchCallback()
-	Game.solidityBankSwitchCycles = emu.totalexecutedcycles();
-end
-
-function solidityTestCallback()
-	if solidityTestEnabled then
-		-- Set the solidity value in the register itself
-		emu.setregister("A", solidityTestValue);
-
-		-- Read back what the value has been set to
-		local registers = emu.getregisters();
-		Game.solidityValue = registers.A;
-	end
-end
-
 function systemBusToROM(bank, address)
 	local bankSize = 0x4000;
 	return bank * bankSize + address - 0x8000;
@@ -450,7 +453,7 @@ function computeSolidityValue(tileIndex, bank, startOffset)
 
 	local hl = Game.Memory.solidity_data_start_system_bus + 2 * solidityDataIndex;
 
-	local currentBank = 15; -- Non glitched
+	local currentBank = Game.Memory.standard_solidity_bank; -- Non glitched
 
 	if startOffset == 1 then
 		currentBank = bank; -- Glitch the bank!
@@ -474,7 +477,22 @@ function computeSolidityValue(tileIndex, bank, startOffset)
 	return returnValue;
 end
 
-function solidityDataReadCallbackFirstRead()
+function solidityBankSwitchCallback()
+	Game.solidityBankSwitchCycles = emu.totalexecutedcycles();
+end
+
+function solidityTestCallback()
+	if solidityTestEnabled then
+		-- Set the solidity value in the register itself
+		emu.setregister("A", solidityTestValue);
+
+		-- Read back what the value has been set to
+		local registers = emu.getregisters();
+		Game.solidityValue = registers.A;
+	end
+end
+
+function solidityDataFirstReadCallback()
 	Game.solidityDataFirstReadCycles = emu.totalexecutedcycles();
 
 	-- Compute possible tile solidity values for a glitchy bank 2 read at certain points in the solidity function
@@ -482,20 +500,20 @@ function solidityDataReadCallbackFirstRead()
 	local tileIndex = registers.E;
 	Game.tileIndex = tileIndex;
 	for i = 1, 3 do
-		Game.possibleSolidityValues[i] = computeSolidityValue(tileIndex, 2, i);
+		Game.possibleSolidityValues[i] = computeSolidityValue(tileIndex, Game.Memory.glitched_solidity_bank, i);
 	end
 end
 
-function solidityDataReadCallbackSecondRead()
+function solidityDataSecondReadCallback()
 	Game.solidityDataSecondReadCycles = emu.totalexecutedcycles();
 end
 
-function solidityDataReadCallbackFinalRead()
+function solidityDataFinalReadCallback()
 	local registers = emu.getregisters();
 	local solidityDataAddress = registers.HL;
 	Game.solidityAddress = solidityDataAddress;
 	Game.solidityValue = memory.readbyte(solidityDataAddress, "System Bus");
-	Game.glitchedThisFrame = memory.readbyte(0xFFFF, "System Bus") ~= 0x0F; -- True if the incorrect bank (probably 2) is loaded in the system bus at the time the solidity value is read
+	Game.glitchedThisFrame = memory.readbyte(0xFFFF, "System Bus") ~= Game.Memory.standard_solidity_bank; -- True if the incorrect bank (probably 2) is loaded in the system bus at the time the solidity value is read
 	Game.solidityDataFinalReadCycles = emu.totalexecutedcycles();
 end
 
@@ -555,7 +573,7 @@ function Game.colorGlitchTimers()
 end
 
 function Game.getTileIndex()
-	return Game.tileIndex;
+	return toHexString(Game.tileIndex, 2, "");
 end
 
 function Game.getSolidityValue()
@@ -603,13 +621,6 @@ function Game.colorIsGlitched()
 	end
 end
 
-event.onmemoryexecute(solidityBankSwitchCallback, 0x49E9); -- TODO: Port to Game Gear
-event.onmemoryexecute(solidityDataReadCallbackFirstRead, 0x4A05); -- TODO: Port to Game Gear
-event.onmemoryexecute(solidityDataReadCallbackSecondRead, 0x4A07); -- TODO: Port to Game Gear
-event.onmemoryexecute(solidityDataReadCallbackFinalRead, 0x4A0B); -- TODO: Port to Game Gear
-event.onmemoryexecute(solidityTestCallback, 0x4A0C); -- TODO: Port to Game Gear
-event.onmemoryexecute(IRQCallback, 0x0038);
-
 Game.OSD = {
 	{"Level", Game.getLevel, category="mapData"},
 	{"IGT", Game.getIGT, category="igt"},
@@ -643,7 +654,7 @@ Game.OSD = {
 	{"Glitched Frame  ", Game.isGlitchedThisFrame, Game.colorIsGlitched},
 	{"Min Offset      ", Game.getMinimumGlitchCycleOffset},
 	{"Glitch Window   ", Game.getGlitchWindowSize},
-	{"Tile Index      ", hexifyOSD(Game.getTileIndex)},
+	{"Tile Index      ", Game.getTileIndex},
 	{"Solidity Value  ", Game.getSolidityValue},
 	{"Poss. Sol. Val. ", Game.getPossibleSolidityValues, Game.colorPossibleValues},
 	{"Poss. Sol. Addr.", Game.getPossibleSolidityAddresses, Game.colorPossibleValues},

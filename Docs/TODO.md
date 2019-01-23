@@ -39,5 +39,7 @@
 	- [List of Games](http://www.speedrun.com/puzzle_league)
 	- [Pokémon Puzzle League Info here](https://github.com/mupen64plus/mupen64plus-user-issues/issues/567)
 - Keep [lips](https://github.com/notwa/lips) up to date
+- Experiment with APIHawk
+- Support MAME?
 - Support both BizHawk and m64p?
 	- [Info here](https://github.com/notwa/mm/commit/90d30e218f3128fb130e54bd8662527bdd73f40f)
