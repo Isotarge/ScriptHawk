@@ -36,7 +36,8 @@ local grab_script_modes = {
 	"Examine (Arcade Objects)",
 	"Chunks",
 	"Exits",
-	"Enemies",
+	"List (Spawners)",
+	"Examine (Spawners)",
 };
 local grab_script_mode_index = 1;
 local grab_script_mode = grab_script_modes[grab_script_mode_index];
@@ -3601,6 +3602,18 @@ local function getExamineDataModelTwo(pointer)
 	return examine_data;
 end
 
+spawnerAttributes = {
+	enemy_value = 0x0, -- u8
+	y_rot = 0x2, -- u16
+	x_pos = 0x4, -- s16
+	y_pos = 0x6, -- s16
+	z_pos = 0x8, -- s16
+	scale = 0xF, -- u8
+	tied_actor = 0x18, -- u32
+	respawn_timer = 0x24, -- s16
+	chunk = 0x40, -- s16
+}
+
 function getExamineDataArcade(pointer)
 	local examine_data = {};
 
@@ -3610,7 +3623,7 @@ function getExamineDataArcade(pointer)
 	local yVel = mainmemory.readfloat(pointer + arcade_object.y_velocity, true);
 
 	table.insert(examine_data, { "Slot base", toHexString(pointer, 6) });
-	table.insert(examine_data, { "Object Type", getArcadeObjectNameOSD(mainmemory.readbyte(pointer + arcade_object.object_type)) });
+	table.insert(examine_data, { "Object Name", getArcadeObjectNameOSD(mainmemory.readbyte(pointer + arcade_object.object_type)) });
 	table.insert(examine_data, { "Object Type", mainmemory.readbyte(pointer + arcade_object.object_type) });
 	table.insert(examine_data, { "Separator", 1 });
 
@@ -3625,6 +3638,42 @@ function getExamineDataArcade(pointer)
 	table.insert(examine_data, { "Object Movement", mainmemory.readbyte(pointer + arcade_object.movement) });
 	table.insert(examine_data, { "Object Size", mainmemory.readbyte(pointer + arcade_object.size) });
 
+	return examine_data;
+end
+
+function getExamineDataSpawners(pointer)
+	local examine_data = {};
+	
+	local enemyType = mainmemory.readbyte(pointer + spawnerAttributes.enemy_value);
+	local enemyName = getBehaviorNameFromEnemyIndex(enemyType);
+	local tiedActor = mainmemory.read_u32_be(pointer + spawnerAttributes.tied_actor);
+	
+	table.insert(examine_data, { "Slot base", toHexString(pointer, 6) });
+	table.insert(examine_data, { "Object Name", enemyName });
+	table.insert(examine_data, { "Object Type", enemyType });
+	if enemyType == 0x50 then
+		local cutsceneModelIndex = mainmemory.readbyte(pointer + 0x0A);
+		table.insert(examine_data, { "Cutscene Model", getModelNameFromCutsceneIndex(cutsceneModelIndex) });
+	end
+	table.insert(examine_data, { "Separator", 1 });
+
+	table.insert(examine_data, { "X", mainmemory.read_s16_be(pointer + spawnerAttributes.x_pos) });
+	table.insert(examine_data, { "Y", mainmemory.read_s16_be(pointer + spawnerAttributes.y_pos) });
+	table.insert(examine_data, { "Z", mainmemory.read_s16_be(pointer + spawnerAttributes.z_pos) });
+	table.insert(examine_data, { "Separator", 1 });
+
+	table.insert(examine_data, { "Y Rotation", mainmemory.read_s16_be(pointer + spawnerAttributes.y_rot) });
+	table.insert(examine_data, { "Scale", mainmemory.readbyte(pointer + spawnerAttributes.scale) });
+	table.insert(examine_data, { "Respawn Timer", mainmemory.read_s16_be(pointer + spawnerAttributes.respawn_timer) });
+	table.insert(examine_data, { "Separator", 1 });
+	
+	if isPointer(tiedActor) then
+		tiedActorValue = tiedActor - 0x80000000;
+		tiedActorNameValue = mainmemory.read_u16_be(tiedActorValue + obj_model1.actor_type);
+		table.insert(examine_data, { "Tied Actor", toHexString(tiedActorValue, 6) });
+		table.insert(examine_data, { "Tied Actor Name", getActorNameFromBehavior(tiedActorNameValue) });
+	end
+	
 	return examine_data;
 end
 --------------------------------
@@ -7284,7 +7333,7 @@ function Game.zipToSelectedObject()
 				desiredX = mainmemory.read_s16_be(selectedObject + exit.x_pos);
 				desiredY = mainmemory.read_s16_be(selectedObject + exit.y_pos);
 				desiredZ = mainmemory.read_s16_be(selectedObject + exit.z_pos);
-			elseif grab_script_mode == "Enemies" then
+			elseif string.contains(grab_script_mode, "Spawners") then
 				desiredX = mainmemory.read_s16_be(selectedObject + 4); -- TODO: Stop using magic numbers for this
 				desiredY = mainmemory.read_s16_be(selectedObject + 6);
 				desiredZ = mainmemory.read_s16_be(selectedObject + 8);
@@ -7535,7 +7584,7 @@ local function drawGrabScriptUI()
 		populateExitPointers();
 	end
 
-	if grab_script_mode == "Enemies" then
+	if string.contains(grab_script_mode, "Spawners") then
 		Game.populateEnemyPointers();
 	end
 
@@ -7602,6 +7651,8 @@ local function drawGrabScriptUI()
 				examine_data = getExamineDataLoadingZone(object_pointers[object_index]);
 			elseif grab_script_mode == "Examine (Arcade Objects)" then
 				examine_data = getExamineDataArcade(object_pointers[object_index]);
+			elseif grab_script_mode == "Examine (Spawners)" then
+				examine_data = getExamineDataSpawners(object_pointers[object_index]);
 			end
 
 			pagifyThis(examine_data,40);
@@ -7752,7 +7803,7 @@ local function drawGrabScriptUI()
 			end
 		end
 
-		if grab_script_mode == "Enemies" then
+		if grab_script_mode == "List (Spawners)" then
 			pagifyThis(object_pointers,40);
 			for i = page_finish, page_start + 1, -1 do
 				local slotBase = object_pointers[i];
@@ -7761,7 +7812,7 @@ local function drawGrabScriptUI()
 				if object_index == i then
 					color = colors.green;
 				end
-				gui.text(gui_x, gui_y + height * row, i.." "..toHexString(slotBase)..": "..enemyData.enemyName.." at "..enemyData.xPos..", "..enemyData.yPos..", "..enemyData.zPos, color, 'bottomright');
+				gui.text(gui_x, gui_y + height * row, i..": "..enemyData.enemyName.." ("..toHexString(slotBase)..")", color, 'bottomright');
 				row = row + 1;
 			end
 		end
