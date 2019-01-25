@@ -3677,7 +3677,16 @@ function getExamineDataSpawners(pointer)
 	end
 	
 	if isPointer(movement_box) then
-		table.insert(examine_data, { "Movement Box Pointer", toHexString(movement_box - 0x80000000, 6) });
+		movement_box_address = movement_box - 0x80000000;
+		movement_box_x_low = mainmemory.read_s16_be(movement_box_address + 0x0);
+		movement_box_x_high = mainmemory.read_s16_be(movement_box_address + 0x4);
+		movement_box_x = movement_box_x_low..", "..movement_box_x_high;
+		movement_box_z_low = mainmemory.read_s16_be(movement_box_address + 0x2);
+		movement_box_z_high = mainmemory.read_s16_be(movement_box_address + 0x6);
+		movement_box_z = movement_box_z_low..", "..movement_box_z_high;
+		table.insert(examine_data, { "Movement Box Pointer", toHexString(movement_box_address, 6) });
+		table.insert(examine_data, { "Movement Box X", movement_box_x });
+		table.insert(examine_data, { "Movement Box Z", movement_box_z });
 	end
 	
 	return examine_data;
