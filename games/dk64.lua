@@ -3610,6 +3610,7 @@ spawnerAttributes = {
 	z_pos = 0x8, -- s16
 	scale = 0xF, -- u8
 	tied_actor = 0x18, -- u32
+	movement_box_pointer = 0x1C, -- u32
 	respawn_timer = 0x24, -- s16
 	chunk = 0x40, -- s16
 }
@@ -3647,6 +3648,7 @@ function getExamineDataSpawners(pointer)
 	local enemyType = mainmemory.readbyte(pointer + spawnerAttributes.enemy_value);
 	local enemyName = getBehaviorNameFromEnemyIndex(enemyType);
 	local tiedActor = mainmemory.read_u32_be(pointer + spawnerAttributes.tied_actor);
+	local movement_box = mainmemory.read_u32_be(pointer + spawnerAttributes.movement_box_pointer);
 	
 	table.insert(examine_data, { "Slot base", toHexString(pointer, 6) });
 	table.insert(examine_data, { "Object Name", enemyName });
@@ -3672,6 +3674,10 @@ function getExamineDataSpawners(pointer)
 		tiedActorNameValue = mainmemory.read_u16_be(tiedActorValue + obj_model1.actor_type);
 		table.insert(examine_data, { "Tied Actor", toHexString(tiedActorValue, 6) });
 		table.insert(examine_data, { "Tied Actor Name", getActorNameFromBehavior(tiedActorNameValue) });
+	end
+	
+	if isPointer(movement_box) then
+		table.insert(examine_data, { "Movement Box Pointer", toHexString(movement_box - 0x80000000, 6) });
 	end
 	
 	return examine_data;
