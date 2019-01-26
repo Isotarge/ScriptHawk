@@ -529,7 +529,7 @@ local arcade_object = {
 	},
 };
 
-function getArcadeObjectNameOSD(objectType)
+local function getArcadeObjectNameOSD(objectType)
 	if arcade_object.object_name[objectType] ~= nil then
 		return arcade_object.object_name[objectType];
 	end
@@ -677,17 +677,18 @@ end
 
 function getSubgameLevel()
 	if map_value == arcade_map then
-		arcade_level = mainmemory.readbyte(Game.Memory.arcade_level);
-		arcade_level_osd = ((math.fmod(arcade_level,3) + 1) * 25).."m ("..math.floor(arcade_level / 4)..")";
+		local arcade_level = mainmemory.readbyte(Game.Memory.arcade_level);
+		local arcade_level_osd = ((math.fmod(arcade_level, 3) + 1) * 25).."m ("..math.floor(arcade_level / 4)..")";
 		return arcade_level_osd;
 	elseif map_value == jetpac_map then
-		jetpac_level = mainmemory.readbyte(Game.Memory.jetpac_level);
+		local jetpac_level = mainmemory.readbyte(Game.Memory.jetpac_level);
 		return jetpac_level;
 	end
 	return 0;
 end
 
 function arcadeTakeMeThere(level)
+	local level_value = 0;
 	if map_value == arcade_map then
 		if level == "25m" then
 			level_value = 0;
@@ -3424,10 +3425,10 @@ end
 function getSpawnSnagState(pointer)
 	local behaviorPointer = dereferencePointer(pointer + obj_model2.behavior_pointer);
 	if isRDRAM(behaviorPointer) then
-		SpawnSnagState = mainmemory.readbyte(behaviorPointer + 0x60);
-		if SpawnSnagState == 1 then
+		local spawnSnagState = mainmemory.readbyte(behaviorPointer + 0x60);
+		if spawnSnagState == 1 then
 			return "Uncollectable";
-		elseif SpawnSnagState == 0 then
+		elseif spawnSnagState == 0 then
 			return "Collectable";
 		end
 	end
@@ -3437,10 +3438,10 @@ end
 function getSpawnSnagCheck(pointer)
 	local behaviorPointer = dereferencePointer(pointer + obj_model2.behavior_pointer);
 	if isRDRAM(behaviorPointer) then
-		SpawnSnagCheck = mainmemory.readbyte(behaviorPointer + 0x54);
-		if SpawnSnagCheck == 2 then
+		local spawnSnagCheck = mainmemory.readbyte(behaviorPointer + 0x54);
+		if spawnSnagCheck == 2 then
 			return "Done";
-		elseif SpawnSnagCheck == 0 then
+		elseif spawnSnagCheck == 0 then
 			return "Not Done";
 		end
 	end
@@ -3449,7 +3450,7 @@ end
 
 function getGrabKong(pointer)
 	if isRDRAM(pointer) then
-		grabKongByte = mainmemory.readbyte(pointer + 0x8C) % 32;
+		local grabKongByte = mainmemory.readbyte(pointer + 0x8C) % 32;
 		if grabKongByte == 16 then
 			return "Lanky";
 		elseif grabKongByte == 8 then
@@ -3646,8 +3647,8 @@ function getExamineDataSpawners(pointer)
 
 	local enemyType = mainmemory.readbyte(pointer + spawnerAttributes.enemy_value);
 	local enemyName = getBehaviorNameFromEnemyIndex(enemyType);
-	local tiedActor = mainmemory.read_u32_be(pointer + spawnerAttributes.tied_actor);
-	local movement_box = mainmemory.read_u32_be(pointer + spawnerAttributes.movement_box_pointer);
+	local tiedActor = dereferencePointer(pointer + spawnerAttributes.tied_actor);
+	local movement_box = dereferencePointer(pointer + spawnerAttributes.movement_box_pointer);
 
 	table.insert(examine_data, { "Slot base", toHexString(pointer, 6) });
 	table.insert(examine_data, { "Object Name", enemyName });
@@ -3668,22 +3669,20 @@ function getExamineDataSpawners(pointer)
 	table.insert(examine_data, { "Respawn Timer", mainmemory.read_s16_be(pointer + spawnerAttributes.respawn_timer) });
 	table.insert(examine_data, { "Separator", 1 });
 
-	if isPointer(tiedActor) then
-		tiedActorValue = tiedActor - 0x80000000;
-		tiedActorNameValue = mainmemory.read_u16_be(tiedActorValue + obj_model1.actor_type);
-		table.insert(examine_data, { "Tied Actor", toHexString(tiedActorValue, 6) });
+	if isRDRAM(tiedActor) then
+		local tiedActorNameValue = mainmemory.read_u16_be(tiedActor + obj_model1.actor_type);
+		table.insert(examine_data, { "Tied Actor", toHexString(tiedActor, 6) });
 		table.insert(examine_data, { "Tied Actor Name", getActorNameFromBehavior(tiedActorNameValue) });
 	end
 
-	if isPointer(movement_box) then
-		movement_box_address = movement_box - 0x80000000;
-		movement_box_x_low = mainmemory.read_s16_be(movement_box_address + 0x0);
-		movement_box_x_high = mainmemory.read_s16_be(movement_box_address + 0x4);
-		movement_box_x = movement_box_x_low..", "..movement_box_x_high;
-		movement_box_z_low = mainmemory.read_s16_be(movement_box_address + 0x2);
-		movement_box_z_high = mainmemory.read_s16_be(movement_box_address + 0x6);
-		movement_box_z = movement_box_z_low..", "..movement_box_z_high;
-		table.insert(examine_data, { "Movement Box Pointer", toHexString(movement_box_address, 6) });
+	if isRDRAM(movement_box) then
+		local movement_box_x_low = mainmemory.read_s16_be(movement_box + 0x0);
+		local movement_box_x_high = mainmemory.read_s16_be(movement_box + 0x4);
+		local movement_box_x = movement_box_x_low..", "..movement_box_x_high;
+		local movement_box_z_low = mainmemory.read_s16_be(movement_box + 0x2);
+		local movement_box_z_high = mainmemory.read_s16_be(movement_box + 0x6);
+		local movement_box_z = movement_box_z_low..", "..movement_box_z_high;
+		table.insert(examine_data, { "Movement Box Pointer", toHexString(movement_box, 6) });
 		table.insert(examine_data, { "Movement Box X", movement_box_x });
 		table.insert(examine_data, { "Movement Box Z", movement_box_z });
 	end
@@ -5322,7 +5321,7 @@ function replaceModels(index)
 	-- Enemy
 	for i = 0, Game.Memory.num_enemy_types do
 		local base = Game.Memory.enemy_table + i * Game.Memory.enemy_type_size;
-		local model = mainmemory.write_u16_be(base + 2, index);
+		mainmemory.write_u16_be(base + 2, index);
 	end
 
 	-- Object Spawn Table
@@ -5332,7 +5331,7 @@ function replaceModels(index)
 	end
 	for i = 0, max_index do
 		local base = Game.Memory.object_spawn_table + i * 0x30;
-		local model = mainmemory.write_u16_be(base + 0x02, index);
+		mainmemory.write_u16_be(base + 0x02, index);
 	end
 end
 
@@ -5416,16 +5415,17 @@ function Game.populateEnemyPointers()
 end
 
 function dumpEnemyDrops()
-	local object = 0;
+	local objectBase, object;
+	local droppedObject, dropMusic, dropCount;
 	local index = -1;
 	repeat
 		index = index + 1;
-		local objectBase = Game.Memory.enemy_drop_table + index * 0x06;
+		objectBase = Game.Memory.enemy_drop_table + index * 0x06;
 		object = mainmemory.read_u16_be(objectBase);
 		if object ~= 0 then
-			local droppedObject = mainmemory.read_u16_be(objectBase + 0x02);
-			local dropMusic = mainmemory.readbyte(objectBase + 0x04);
-			local dropCount = mainmemory.readbyte(objectBase + 0x05);
+			droppedObject = mainmemory.read_u16_be(objectBase + 0x02);
+			dropMusic = mainmemory.readbyte(objectBase + 0x04);
+			dropCount = mainmemory.readbyte(objectBase + 0x05);
 			dprint(toHexString(objectBase)..": "..getActorNameFromBehavior(object).." drops "..dropCount.." "..getActorNameFromBehavior(droppedObject).." and plays "..toHexString(dropMusic));
 		end
 	until object == 0;
@@ -5433,11 +5433,11 @@ function dumpEnemyDrops()
 end
 
 function everyEnemyDrops(actorType, count, music)
-	local object = 0;
+	local object, objectBase;
 	local index = -1;
 	repeat
 		index = index + 1;
-		local objectBase = Game.Memory.enemy_drop_table + index * 0x06;
+		objectBase = Game.Memory.enemy_drop_table + index * 0x06;
 		object = mainmemory.read_u16_be(objectBase);
 		if object ~= 0 then
 			mainmemory.write_u16_be(objectBase + 0x02, actorType);
@@ -6399,7 +6399,7 @@ function Game.drawKutOutMinimap()
 	if Game.version ~= 4 and map_value == 199 then
 		local tagBarrelObject = getTagBarrelObject();
 		if tagBarrelObject ~= nil then
-			local kong_active = mainmemory.readbyte(tagBarrelObject + 0x154);
+			--local kong_active = mainmemory.readbyte(tagBarrelObject + 0x154);
 			local kko_state_timer = mainmemory.readbyte(tagBarrelObject + 0x189);
 			local kko_phase = mainmemory.readbyte(tagBarrelObject + 0x18A);
 			local kko_state = mainmemory.readbyte(tagBarrelObject + 0x18B);
@@ -7038,7 +7038,7 @@ function FTA.freeTradeCollisionList()
 		local collisionListObjectSize = mainmemory.read_u32_be(collisionLinkedListPointer + heap.object_size);
 		for i = 0, collisionListObjectSize - 4, 4 do
 			local object = dereferencePointer(collisionLinkedListPointer + i);
-			local safety = nil;
+			local safety;
 			while isRDRAM(object) do
 				FTA.fixSingleCollision(object);
 				safety = dereferencePointer(object + 0x18); -- Get next object
@@ -7482,7 +7482,6 @@ koshBot.getCurrentSlot = function(koshController)
 end
 
 koshBot.getDesiredSlot = function(koshController)
-	local currentSlot = mainmemory.readbyte(koshController + obj_model1.kosh_kontroller.slot_location);
 	local melonsRemaining = mainmemory.readbyte(koshController + obj_model1.kosh_kontroller.melons_remaining);
 	if melonsRemaining == 0 then
 		return 0;
@@ -7490,6 +7489,7 @@ koshBot.getDesiredSlot = function(koshController)
 
 	-- Check for kremlings
 	local desiredSlot = 0;
+	local slotPointer;
 	for slotIndex = 1, 8 do
 		slotPointer = koshBot.getSlotPointer(koshController, slotIndex);
 		if slotPointer ~= nil then
@@ -7515,7 +7515,6 @@ end
 koshBot.Loop = function()
 	local koshController = koshBot.getKoshController();
 	if koshController ~= nil then
-		local currentSlot = koshBot.getCurrentSlot(koshController);
 		local desiredSlot = koshBot.getDesiredSlot(koshController);
 		local currentFrame = mainmemory.read_u32_be(Game.Memory.frames_lag);
 
@@ -7542,7 +7541,7 @@ koshBot.Loop = function()
 			end
 		end
 
-		joypadInputs = joypad.get();
+		local joypadInputs = joypad.get();
 		if joypadInputs["P1 X Axis"] ~= 0 or joypadInputs["P1 Y Axis"] ~= 0 then
 			joypad.set({["B"] = true}, 1);
 			koshBot.quickfire_reload_enabled = 2;
@@ -7647,7 +7646,7 @@ local function drawGrabScriptUI()
 
 		if isRDRAM(grabbedActor) then
 			grabbedActorType = getActorName(grabbedActor);
-			local collision = dereferencePointer(grabbedActor + obj_model1.collision_queue_pointer);
+			--local collision = dereferencePointer(grabbedActor + obj_model1.collision_queue_pointer);
 			collisionCount = getActorCollisions(grabbedActor);
 			gui.text(gui_x, gui_y + height * row, "Grabbed Actor: "..toHexString(grabbedActor, 6).." "..grabbedActorType.." Collisions: "..collisionCount, nil, 'bottomright');
 			row = row + 1;
@@ -7674,7 +7673,7 @@ local function drawGrabScriptUI()
 				examine_data = getExamineDataSpawners(object_pointers[object_index]);
 			end
 
-			pagifyThis(examine_data,40);
+			pagifyThis(examine_data, 40);
 
 			for i = page_finish, page_start + 1, -1 do
 				if examine_data[i][1] ~= "Separator" then
@@ -7691,7 +7690,7 @@ local function drawGrabScriptUI()
 
 		if grab_script_mode == "List (Object Model 1)" then
 			row = row + 1;
-			pagifyThis(object_pointers,40);
+			pagifyThis(object_pointers, 40);
 			for i = page_finish, page_start + 1, -1 do
 				local currentActorSize = mainmemory.read_u32_be(object_pointers[i] + heap.object_size); -- TODO: Got an exception here while kiosk was booting
 				local color = nil;
@@ -7708,7 +7707,7 @@ local function drawGrabScriptUI()
 		end
 
 		if grab_script_mode == "List (Object Model 2)" then
-			pagifyThis(object_pointers,40);
+			pagifyThis(object_pointers, 40);
 			for i = page_finish, page_start + 1, -1 do
 				local behaviorPointer = dereferencePointer(object_pointers[i] + obj_model2.behavior_pointer);
 				local behaviorType = " "..getScriptName(object_pointers[i]);
@@ -7736,7 +7735,7 @@ local function drawGrabScriptUI()
 		end
 
 		if grab_script_mode == "List (Arcade Objects)" then
-			pagifyThis(object_pointers,40);
+			pagifyThis(object_pointers, 40);
 			for i = page_finish, page_start + 1, -1 do
 				local color = nil;
 				if object_index == i then
@@ -7753,7 +7752,7 @@ local function drawGrabScriptUI()
 		end
 
 		if grab_script_mode == "List (Loading Zones)" then
-			pagifyThis(object_pointers,40);
+			pagifyThis(object_pointers, 40);
 			for i = page_finish, page_start + 1, -1 do
 				local color = nil;
 				if object_index == i then
@@ -7790,7 +7789,7 @@ local function drawGrabScriptUI()
 		end
 
 		if grab_script_mode == "Chunks" then
-			pagifyThis(object_pointers,40);
+			pagifyThis(object_pointers, 40);
 			for i = page_finish, page_start + 1, -1 do
 				local color = nil;
 				if object_index == i then
@@ -7807,7 +7806,7 @@ local function drawGrabScriptUI()
 		end
 
 		if grab_script_mode == "Exits" then
-			pagifyThis(object_pointers,40);
+			pagifyThis(object_pointers, 40);
 			for i = page_finish, page_start + 1, -1 do
 				local exitBase = object_pointers[i];
 				local color = nil;
@@ -7823,7 +7822,7 @@ local function drawGrabScriptUI()
 		end
 
 		if grab_script_mode == "List (Spawners)" then
-			pagifyThis(object_pointers,40);
+			pagifyThis(object_pointers, 40);
 			for i = page_finish, page_start + 1, -1 do
 				local slotBase = object_pointers[i];
 				local enemyData = Game.getEnemyData(slotBase);
@@ -8491,7 +8490,7 @@ function Game.drawUI()
 
 	-- Mad Jack
 	Game.drawMJMinimap();
-	
+
 	-- King Kut Out
 	Game.drawKutOutMinimap();
 
@@ -9485,7 +9484,7 @@ function buildIdentifyMemoryCache()
 	};
 
 	-- Cache framebuffers
-	if not addressFound then
+	if not addressFound then -- TODO: addressFound might be null here, not global
 		local frameBuffer = dereferencePointer(Game.Memory.framebuffer_pointer);
 		if isRDRAM(frameBuffer) then
 			table.insert(identifyMemoryCache.frameBuffers, {base=frameBuffer, width=320, height=240, bpp=16});
@@ -9499,13 +9498,8 @@ function buildIdentifyMemoryCache()
 	-- Cache heap
 	local heapBase = dereferencePointer(Game.Memory.heap_pointer);
 	if isRDRAM(heapBase) then
-		local size = 0;
-		local prev = 0;
-		local nextFree = 0;
-		local prevFree = 0;
-		local isFree = false;
+		local block, size, prev, nextFree, prevFree, isFree;
 		local header = heapBase;
-		local block;
 		repeat
 			block = header + 0x10;
 			size = mainmemory.read_u32_be(header + 4);
@@ -9621,11 +9615,9 @@ function buildIdentifyMemoryCache()
 			end
 			-- Collision Queue
 			local collision = dereferencePointer(actor + obj_model1.collision_queue_pointer);
-			local target = nil;
-			local targetName = "";
-			local size = 0;
+			local target, targetName, size;
 			local collisionCount = 0;
-			local collisionPosition = nil;
+			local collisionPosition;
 			while isRDRAM(collision) do
 				size = mainmemory.read_u32_be(collision + heap.object_size);
 				target = dereferencePointer(collision + 0x08);
@@ -9803,8 +9795,8 @@ function buildIdentifyMemoryCache()
 						local DLPointer2 = dereferencePointer(chunkMappingBase + 0x08);
 						local vertPointer1 = dereferencePointer(chunkMappingBase + 0x14);
 						local vertPointer2 = dereferencePointer(chunkMappingBase + 0x18);
-						local size1 = parseDLVertPointerPair(DLBase, vertBase, vertEnd, DLPointer1, vertPointer1, true);
-						local size2 = parseDLVertPointerPair(DLBase, vertBase, vertEnd, DLPointer2, vertPointer2, true);
+						local size1 = parseDLVertPointerPair(DLBase, vertBase, vertEnd, DLPointer1, vertPointer1, true); -- TODO: DLBase might be undefined here
+						local size2 = parseDLVertPointerPair(DLBase, vertBase, vertEnd, DLPointer2, vertPointer2, true); -- TODO: DLBase might be undefined here
 						if type(size1) == "number" then
 							vertPointer1 = vertPointer1 - 0x30;
 							addHeapMetadata(vertPointer1, "description", "Map Vert Block");
@@ -9967,10 +9959,8 @@ function buildIdentifyMemoryCache()
 	-- Cache texture list (off heap)
 	local textureList = dereferencePointer(Game.Memory.texture_list_pointer);
 	if isRDRAM(textureList) then
-		local size = 0;
-		local prev = 0;
+		local block, size, prev;
 		local header = textureList;
-		local block;
 		repeat
 			block = header + 0x10;
 			size = mainmemory.read_u32_be(header + 4);
@@ -10078,7 +10068,7 @@ end
 function identifyMemory(address, findReferences, reuseCache, suppressPrint)
 	findReferences = findReferences or false;
 	suppressPrint = suppressPrint or false;
-	addressInfo = {};
+	local addressInfo = {};
 
 	if type(address) ~= "number" then
 		table.insert(addressInfo, "Please enter a valid memory address");
@@ -10626,6 +10616,8 @@ function Game.drawHeap()
 
 		local dump_block_list = ScriptHawk.UI.isChecked("Heap Visualizer Dump Blocks");
 		local free_only = ScriptHawk.UI.isChecked("Heap Visualizer Free Only");
+
+		local next_addr, blocksize, block_end, next_free, prev_free, in_use;
 
 		while addr >= dynamic_memory_start and addr <= dynamic_memory_end do
 			next_addr = mainmemory.read_u32_be(addr);
