@@ -42,6 +42,7 @@ local Game = {
 		solidity_data_final_read = {0x4A0B, 0x4C1D, 0x4C27},
 		solidity_test = {0x4A0C, 0x4C1E, 0x4C28},
 		irq_address = {0x0038, 0x0038, 0x0038},
+		irq_bank_switch_address = {0x01AF, 0x0000, 0x0000}, -- TODO: GG 1.0, GG 1.1
 	},
 	maps = {
 		"Green Hill 1", -- 0x00
@@ -85,6 +86,7 @@ local Game = {
 	solidityBankSwitchCycles = 0,
 	solidityDataFinalReadCycles = 0,
 	IRQStartCycles = 0,
+	IRQBankSwitchThisFrame = false,
 	tileIndex = 0,
 	solidityValue = 0,
 	solidityAddress = 0x0000,
@@ -134,6 +136,8 @@ end
 function Game.detectVersion(romName, romHash)
 	ScriptHawk.dpad.joypad.enabled = false;
 	ScriptHawk.dpad.key.enabled = false;
+	ScriptHawk.hitboxDefaultShowList = false;
+	ScriptHawk.hitboxDefaultShowHitboxes = false;
 	ScriptHawk.hitboxListShowCount = true;
 	ScriptHawk.hitboxDefaultColor = colors.white;
 
@@ -144,6 +148,7 @@ function Game.detectVersion(romName, romHash)
 	event.onmemoryexecute(solidityDataFinalReadCallback, Game.Memory.solidity_data_final_read);
 	event.onmemoryexecute(solidityTestCallback, Game.Memory.solidity_test);
 	event.onmemoryexecute(IRQCallback, Game.Memory.irq_address);
+	--event.onmemoryexecute(IRQBankSwitchCallback, Game.Memory.irq_bank_switch_address);
 
 	return true;
 end
@@ -519,6 +524,15 @@ end
 
 function IRQCallback()
 	Game.IRQStartCycles = emu.totalexecutedcycles();
+	Game.IRQBankSwitchThisFrame = false; -- Will be set to true later in interrupt handler if the bank is switched
+end
+
+function IRQBankSwitchCallback()
+	Game.IRQBankSwitchThisFrame = true;
+end
+
+function Game.IRQCausedBankSwitchThisFrame()
+	return Game.IRQBankSwitchThisFrame;
 end
 
 function Game.getSolidityBankSwitchCycles()
@@ -652,6 +666,7 @@ Game.OSD = {
 	{"Sol. Data Read  ", Game.getSolidityDataReadCycles, Game.colorGlitchCycleOffset},
 	{"Offset          ", Game.getGlitchCycleOffset, Game.colorGlitchCycleOffset},
 	{"Glitched Frame  ", Game.isGlitchedThisFrame, Game.colorIsGlitched},
+	--{"IRQ Bank Switch?", Game.IRQCausedBankSwitchThisFrame},
 	{"Min Offset      ", Game.getMinimumGlitchCycleOffset},
 	{"Glitch Window   ", Game.getGlitchWindowSize},
 	{"Tile Index      ", Game.getTileIndex},

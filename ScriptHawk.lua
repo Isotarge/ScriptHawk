@@ -70,6 +70,8 @@ ScriptHawk = {
 };
 
 ScriptHawk.hitboxDefaultMode = ScriptHawk.hitboxModeWH;
+ScriptHawk.hitboxDefaultShowList = true;
+ScriptHawk.hitboxDefaultShowHitboxes = true;
 
 function ScriptHawk.biz222Notice()
 	print("Due to a bug between BizHawk release 1.13.0 and 2.2.1");
@@ -1228,7 +1230,7 @@ function ScriptHawk.initUI(formTitle)
 	end
 
 	if type(Game.getHitboxes) == "function" then
-		ScriptHawk.UI.checkbox(10, 0, "Show Hitboxes Checkbox", "Hitboxes", true); -- TODO: Allow this to be overridden by Game table on module start
+		ScriptHawk.UI.checkbox(10, 0, "Show Hitboxes Checkbox", "Hitboxes", ScriptHawk.hitboxDefaultShowHitboxes);
 		local showListRow = 2;
 		if type(Game.setHitboxPosition) == "function" and not TASSafe then
 			ScriptHawk.UI.checkbox(10, 1, "Draggable Hitboxes Checkbox", "Draggable");
@@ -1236,7 +1238,7 @@ function ScriptHawk.initUI(formTitle)
 			showListRow = 1; -- Move "Show List" checkbox up one row if Draggable checkbox is not drawn
 		end
 		if type(Game.getHitboxListText) == "function" then
-			ScriptHawk.UI.checkbox(10, showListRow, "Show List Checkbox", "Show List", true); -- TODO: Allow this to be overridden by Game table on module start
+			ScriptHawk.UI.checkbox(10, showListRow, "Show List Checkbox", "Show List", ScriptHawk.hitboxDefaultShowList);
 		end
 	end
 

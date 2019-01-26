@@ -13,7 +13,6 @@ fix_chunk_deload = false;
 force_gb_load = false;
 force_tbs = false;
 hide_non_scripted = false;
-koshbot_enabled = false;
 never_slip = false;
 object_model2_filter = nil; -- String, see obj_model2.object_types
 paper_mode = false;
@@ -481,7 +480,7 @@ local map_value = 0;
 local arcade_map = 2;
 local jetpac_map = 9;
 
-arcade_object = {
+local arcade_object = {
 	x_position = 0x00, -- Float
 	y_position = 0x04, -- Float
 	x_velocity = 0x08, -- Float
@@ -527,7 +526,7 @@ arcade_object = {
 		-- [28]
 		[29] = "Text", -- 'Help!' from Pauline
 		-- [30]
-	}
+	},
 };
 
 function getArcadeObjectNameOSD(objectType)
@@ -3602,7 +3601,7 @@ local function getExamineDataModelTwo(pointer)
 	return examine_data;
 end
 
-spawnerAttributes = {
+local spawnerAttributes = {
 	enemy_value = 0x0, -- u8
 	y_rot = 0x2, -- u16
 	x_pos = 0x4, -- s16
@@ -3613,7 +3612,7 @@ spawnerAttributes = {
 	movement_box_pointer = 0x1C, -- u32
 	respawn_timer = 0x24, -- s16
 	chunk = 0x40, -- s16
-}
+};
 
 function getExamineDataArcade(pointer)
 	local examine_data = {};
@@ -3644,12 +3643,12 @@ end
 
 function getExamineDataSpawners(pointer)
 	local examine_data = {};
-	
+
 	local enemyType = mainmemory.readbyte(pointer + spawnerAttributes.enemy_value);
 	local enemyName = getBehaviorNameFromEnemyIndex(enemyType);
 	local tiedActor = mainmemory.read_u32_be(pointer + spawnerAttributes.tied_actor);
 	local movement_box = mainmemory.read_u32_be(pointer + spawnerAttributes.movement_box_pointer);
-	
+
 	table.insert(examine_data, { "Slot base", toHexString(pointer, 6) });
 	table.insert(examine_data, { "Object Name", enemyName });
 	table.insert(examine_data, { "Object Type", enemyType });
@@ -3668,14 +3667,14 @@ function getExamineDataSpawners(pointer)
 	table.insert(examine_data, { "Scale", mainmemory.readbyte(pointer + spawnerAttributes.scale) });
 	table.insert(examine_data, { "Respawn Timer", mainmemory.read_s16_be(pointer + spawnerAttributes.respawn_timer) });
 	table.insert(examine_data, { "Separator", 1 });
-	
+
 	if isPointer(tiedActor) then
 		tiedActorValue = tiedActor - 0x80000000;
 		tiedActorNameValue = mainmemory.read_u16_be(tiedActorValue + obj_model1.actor_type);
 		table.insert(examine_data, { "Tied Actor", toHexString(tiedActorValue, 6) });
 		table.insert(examine_data, { "Tied Actor Name", getActorNameFromBehavior(tiedActorNameValue) });
 	end
-	
+
 	if isPointer(movement_box) then
 		movement_box_address = movement_box - 0x80000000;
 		movement_box_x_low = mainmemory.read_s16_be(movement_box_address + 0x0);
@@ -3688,7 +3687,7 @@ function getExamineDataSpawners(pointer)
 		table.insert(examine_data, { "Movement Box X", movement_box_x });
 		table.insert(examine_data, { "Movement Box Z", movement_box_z });
 	end
-	
+
 	return examine_data;
 end
 --------------------------------
@@ -6286,7 +6285,7 @@ function Game.drawMJMinimap()
 		};
 
 		for row = 0, 3 do
-			for	col = 0, 3 do
+			for col = 0, 3 do
 				x = MJ_minimap_x_offset + col * MJ_minimap_width;
 				y = MJ_minimap_y_offset + (3 - row) * MJ_minimap_height;
 
@@ -6361,124 +6360,128 @@ function getTagBarrelObject()
 end
 
 -- Static Data
-local kko_minimap_x_offset  = 19;
-local kko_minimap_y_offset  = 19;
-local kko_minimap_width     = 100;
-local kko_minimap_height    = 100;
-local kko_cannon_offset     = math.floor(kko_minimap_width * (17 / 100));
-local kko_icon_x            = math.floor(kko_minimap_width / 4);
-local kko_icon_y            = math.floor(kko_minimap_height / 4);
-local kko_text_x            = (2 * kko_minimap_x_offset) + kko_minimap_width
-local kko_map_ubound        = 1006;
-local kko_map_lbound        = 394;
-
-kko_states_table = {
-	[0] = "Ready to Appear",
-	[1] = "Ready for Kong Attack",
-	[2] = "Not Able to be hit",
-	[3] = "Kut-Out Attacking",
-	[4] = "Self-Amputation",
-	[5] = "Disappearing", -- After final hit in phase
-	[6] = "Rotating", -- Phase 4
-	[7] = "Defeat Pending",
-	[8] = "Defeated",
-	[9] = "Spawning Key",
+local kko = {
+	minimap_x_offset = 19,
+	minimap_y_offset = 19,
+	minimap_width    = 100,
+	minimap_height   = 100,
+	map_ubound       = 1006,
+	map_lbound   = 394,
+	states = {
+		[0] = "Ready to Appear",
+		[1] = "Ready for Kong Attack",
+		[2] = "Not Able to be hit",
+		[3] = "Kut-Out Attacking",
+		[4] = "Self-Amputation",
+		[5] = "Disappearing", -- After final hit in phase
+		[6] = "Rotating", -- Phase 4
+		[7] = "Defeat Pending",
+		[8] = "Defeated",
+		[9] = "Spawning Key",
+	},
+	default_character_image = image_directory_root.."question-mark.png",
+	character_images = {
+		[0] = image_directory_root.."DKFace.png",
+		[1] = image_directory_root.."DiddyFace.png",
+		[2] = image_directory_root.."LankyFace.png",
+		[3] = image_directory_root.."TinyFace.png",
+		[4] = image_directory_root.."ChunkyFace.png",
+	},
 };
+
+kko.cannon_offset = math.floor(kko.minimap_width * (17 / 100));
+kko.icon_x        = math.floor(kko.minimap_width / 4);
+kko.icon_y        = math.floor(kko.minimap_height / 4);
+kko.text_x        = (2 * kko.minimap_x_offset) + kko.minimap_width;
 
 function Game.drawKutOutMinimap()
 	-- Only draw minimap if the player is in the King Kut Out fight
 	if Game.version ~= 4 and map_value == 199 then
-		local tag_barrel_object = getTagBarrelObject()
-		if tag_barrel_object ~= nil then
-			local kong_active = mainmemory.readbyte(tag_barrel_object + 0x154);
-			local kko_state_timer = mainmemory.readbyte(tag_barrel_object + 0x189);
-			local kko_phase = mainmemory.readbyte(tag_barrel_object + 0x18A);
-			local kko_state = mainmemory.readbyte(tag_barrel_object + 0x18B);
-			local kko_position = mainmemory.readbyte(tag_barrel_object + 0x18C);
-			local kko_attack_counter = mainmemory.readbyte(tag_barrel_object + 0x18D);
-			local kko_phase_hit = mainmemory.readbyte(tag_barrel_object + 0x18E);
-			
+		local tagBarrelObject = getTagBarrelObject();
+		if tagBarrelObject ~= nil then
+			local kong_active = mainmemory.readbyte(tagBarrelObject + 0x154);
+			local kko_state_timer = mainmemory.readbyte(tagBarrelObject + 0x189);
+			local kko_phase = mainmemory.readbyte(tagBarrelObject + 0x18A);
+			local kko_state = mainmemory.readbyte(tagBarrelObject + 0x18B);
+			local kko_position = mainmemory.readbyte(tagBarrelObject + 0x18C);
+			local kko_attack_counter = mainmemory.readbyte(tagBarrelObject + 0x18D);
+			local kko_phase_hit = mainmemory.readbyte(tagBarrelObject + 0x18E);
+
 			-- Draw Map
-			gui.drawImage(image_directory_root.."kko_map.png", kko_minimap_x_offset, kko_minimap_y_offset, kko_minimap_width, kko_minimap_height);
-			
+			gui.drawImage(image_directory_root.."kko_map.png", kko.minimap_x_offset, kko.minimap_y_offset, kko.minimap_width, kko.minimap_height);
+
 			-- Draw Kut Out Position (Not taking into account the 4+ values)
 			if kko_position == 0 then -- top
-				draw_kko_x = kko_minimap_x_offset + (kko_minimap_width / 2) - (kko_icon_x / 2);
-				draw_kko_y = kko_minimap_y_offset + kko_cannon_offset - (kko_icon_y / 2);
-				gui.drawImage(image_directory_root.."kko_icon.png",draw_kko_x ,draw_kko_y , kko_icon_x, kko_icon_y);
+				local draw_kko_x = kko.minimap_x_offset + (kko.minimap_width / 2) - (kko.icon_x / 2);
+				local draw_kko_y = kko.minimap_y_offset + kko.cannon_offset - (kko.icon_y / 2);
+				gui.drawImage(image_directory_root.."kko_icon.png", draw_kko_x, draw_kko_y, kko.icon_x, kko.icon_y);
 			elseif kko_position == 1 then -- left
-				draw_kko_x = kko_minimap_x_offset + kko_cannon_offset - (kko_icon_x / 2);
-				draw_kko_y = kko_minimap_y_offset + (kko_minimap_height / 2) - (kko_icon_y / 2);
-				gui.drawImage(image_directory_root.."kko_icon.png",draw_kko_x ,draw_kko_y , kko_icon_x, kko_icon_y);
+				local draw_kko_x = kko.minimap_x_offset + kko.cannon_offset - (kko.icon_x / 2);
+				local draw_kko_y = kko.minimap_y_offset + (kko.minimap_height / 2) - (kko.icon_y / 2);
+				gui.drawImage(image_directory_root.."kko_icon.png", draw_kko_x, draw_kko_y, kko.icon_x, kko.icon_y);
 			elseif kko_position == 2 then -- down
-				draw_kko_x = kko_minimap_x_offset + (kko_minimap_width / 2) - (kko_icon_x / 2);
-				draw_kko_y = kko_minimap_y_offset + kko_minimap_height - kko_cannon_offset - (kko_icon_y / 2);
-				gui.drawImage(image_directory_root.."kko_icon.png",draw_kko_x ,draw_kko_y , kko_icon_x, kko_icon_y);
+				local draw_kko_x = kko.minimap_x_offset + (kko.minimap_width / 2) - (kko.icon_x / 2);
+				local draw_kko_y = kko.minimap_y_offset + kko.minimap_height - kko.cannon_offset - (kko.icon_y / 2);
+				gui.drawImage(image_directory_root.."kko_icon.png", draw_kko_x, draw_kko_y, kko.icon_x, kko.icon_y);
 			elseif kko_position == 3 then -- right
-				draw_kko_x = kko_minimap_x_offset + kko_minimap_width - kko_cannon_offset - (kko_icon_x / 2);
-				draw_kko_y = kko_minimap_y_offset + (kko_minimap_height / 2) - (kko_icon_y / 2);
-				gui.drawImage(image_directory_root.."kko_icon.png",draw_kko_x ,draw_kko_y , kko_icon_x, kko_icon_y);
+				local draw_kko_x = kko.minimap_x_offset + kko.minimap_width - kko.cannon_offset - (kko.icon_x / 2);
+				local draw_kko_y = kko.minimap_y_offset + (kko.minimap_height / 2) - (kko.icon_y / 2);
+				gui.drawImage(image_directory_root.."kko_icon.png", draw_kko_x, draw_kko_y, kko.icon_x, kko.icon_y);
 			end
-			
+
 			-- Draw Kong Position (Gives sense of perspective)
-			kko_kong_x = Game.getXPosition();
-			kko_kong_z = Game.getZPosition();
-			
-			if kko_kong_z > kko_map_ubound then
+			local kko_kong_x = Game.getXPosition();
+			local kko_kong_z = Game.getZPosition();
+			local kko_distfromtop = 0;
+			local kko_distfromleft = 0;
+
+			if kko_kong_z > kko.map_ubound then
 				kko_distfromtop = 0;
-			elseif kko_kong_z < kko_map_lbound then
-				kko_distfromtop = kko_minimap_height;
+			elseif kko_kong_z < kko.map_lbound then
+				kko_distfromtop = kko.minimap_height;
 			else
-				kko_distfromtop = math.floor(((kko_map_ubound - kko_kong_z) / (kko_map_ubound - kko_map_lbound)) * kko_minimap_height);
+				kko_distfromtop = math.floor(((kko.map_ubound - kko_kong_z) / (kko.map_ubound - kko.map_lbound)) * kko.minimap_height);
 			end
-			
-			if kko_kong_x > kko_map_ubound then
+
+			if kko_kong_x > kko.map_ubound then
 				kko_distfromleft = 0;
-			elseif kko_kong_x < kko_map_lbound then
-				kko_distfromleft = kko_minimap_width;
+			elseif kko_kong_x < kko.map_lbound then
+				kko_distfromleft = kko.minimap_width;
 			else
-				kko_distfromleft = math.floor(((kko_map_ubound - kko_kong_x) / (kko_map_ubound - kko_map_lbound)) * kko_minimap_width);
+				kko_distfromleft = math.floor(((kko.map_ubound - kko_kong_x) / (kko.map_ubound - kko.map_lbound)) * kko.minimap_width);
 			end
-			
+
 			local kko_character = Game.getCharacter();
-			if kko_character == 0 then -- DK
-				gui.drawImage(image_directory_root.."DKFace.png",kko_minimap_x_offset + kko_distfromleft - (kko_icon_x / 2),kko_minimap_y_offset + kko_distfromtop - (kko_icon_y / 2), kko_icon_x, kko_icon_y);
-			elseif kko_character == 1 then -- Diddy
-				gui.drawImage(image_directory_root.."DiddyFace.png",kko_minimap_x_offset + kko_distfromleft - (kko_icon_x / 2),kko_minimap_y_offset + kko_distfromtop - (kko_icon_y / 2), kko_icon_x, kko_icon_y);
-			elseif kko_character == 2 then -- Lanky
-				gui.drawImage(image_directory_root.."LankyFace.png",kko_minimap_x_offset + kko_distfromleft - (kko_icon_x / 2),kko_minimap_y_offset + kko_distfromtop - (kko_icon_y / 2), kko_icon_x, kko_icon_y);
-			elseif kko_character == 3 then -- Tiny
-				gui.drawImage(image_directory_root.."TinyFace.png",kko_minimap_x_offset + kko_distfromleft - (kko_icon_x / 2),kko_minimap_y_offset + kko_distfromtop - (kko_icon_y  * 0.3), kko_icon_x * 0.6 , kko_icon_y * 0.6 );
-			elseif kko_character == 4 then -- Chunky
-				gui.drawImage(image_directory_root.."ChunkyFace.png",kko_minimap_x_offset + kko_distfromleft - (kko_icon_x * 0.3),kko_minimap_y_offset + kko_distfromtop - (kko_icon_y / 2), kko_icon_x, kko_icon_y);
-			else -- Not a main character
-				gui.drawImage(image_directory_root.."question-mark.png",kko_minimap_x_offset + kko_distfromleft - (kko_icon_x / 2),kko_minimap_y_offset + kko_distfromtop - (kko_icon_y / 2), kko_icon_x, kko_icon_y);
+			local characterImage = kko.character_images[kko_character] or kko.default_character_image;
+			if kko_character == 3 then -- Tiny needs a special draw call
+				gui.drawImage(characterImage, kko.minimap_x_offset + kko_distfromleft - (kko.icon_x / 2), kko.minimap_y_offset + kko_distfromtop - (kko.icon_y * 0.3), kko.icon_x * 0.6 , kko.icon_y * 0.6);
+			elseif kko_character == 4 then -- Chunky needs a special draw call
+				gui.drawImage(characterImage, kko.minimap_x_offset + kko_distfromleft - (kko.icon_x * 0.3), kko.minimap_y_offset + kko_distfromtop - (kko.icon_y / 2), kko.icon_x, kko.icon_y);
+			else -- Standard draw call
+				gui.drawImage(characterImage, kko.minimap_x_offset + kko_distfromleft - (kko.icon_x / 2), kko.minimap_y_offset + kko_distfromtop - (kko.icon_y / 2), kko.icon_x, kko.icon_y);
 			end
-			
+
 			-- Draw Data
-			kko_row = 0;
-			
-			if kko_states_table[kko_state] ~= nil then
-				kko_state_to_text = kko_states_table[kko_state];
-			else
-				kko_state_to_text = kko_state;
-			end
-			gui.drawText(kko_text_x, kko_minimap_y_offset + (kko_row * 16), "State: "..kko_state_to_text);
+			local kko_row = 0;
+			local kko_row_height = 16;
+
+			local kko_state_to_text = kko.states[kko_state] or kko_state;
+			gui.drawText(kko.text_x, kko.minimap_y_offset + (kko_row * kko_row_height), "State: "..kko_state_to_text);
 			kko_row = kko_row + 1;
-			
-			gui.drawText(kko_text_x, kko_minimap_y_offset + (kko_row * 16), "State Timer: "..kko_state_timer);
+
+			gui.drawText(kko.text_x, kko.minimap_y_offset + (kko_row * kko_row_height), "State Timer: "..kko_state_timer);
 			kko_row = kko_row + 1;
-			
+
 			if kko_state < 7 then -- Undefeated
-				gui.drawText(kko_text_x, kko_minimap_y_offset + (kko_row * 16), "Phase Health: "..(3 - kko_phase_hit).." (Phase "..(kko_phase + 1)..")");
+				gui.drawText(kko.text_x, kko.minimap_y_offset + (kko_row * kko_row_height), "Phase Health: "..(3 - kko_phase_hit).." (Phase "..(kko_phase + 1)..")");
 				kko_row = kko_row + 1;
 			end
-			
+
 			if kko_state == 3 then -- Attacking (Lasers)
-				gui.drawText(kko_text_x, kko_minimap_y_offset + (kko_row * 16), "Laser Set "..kko_attack_counter.."/2");
+				gui.drawText(kko.text_x, kko.minimap_y_offset + (kko_row * kko_row_height), "Laser Set "..kko_attack_counter.."/2");
 				kko_row = kko_row + 1;
 			elseif kko_state < 2 and kko_phase == 2 then -- HaaHaa (11 Max)
-				gui.drawText(kko_text_x, kko_minimap_y_offset + (kko_row * 16), (math.floor((11 - kko_attack_counter) / 2) + 1).." HaaHaa's left");
+				gui.drawText(kko.text_x, kko.minimap_y_offset + (kko_row * kko_row_height), (math.floor((11 - kko_attack_counter) / 2) + 1).." HaaHaa's left");
 				kko_row = kko_row + 1;
 			end
 		end
@@ -7435,6 +7438,7 @@ end
 -----------------------
 
 koshBot = {
+	enabled = false,
 	joypad_angles = {
 		[0] = {["X Axis"] = 0,    ["Y Axis"] = 0},
 		[1] = {["X Axis"] = -128, ["Y Axis"] = 0},
@@ -9145,7 +9149,7 @@ function Game.eachFrame()
 			fixLag();
 		end
 
-		if koshbot_enabled then
+		if koshBot.enabled then
 			koshBot.Loop(); -- TODO: This probably stops the virtual pad from working
 		end
 
@@ -9519,7 +9523,7 @@ function buildIdentifyMemoryCache()
 				nextFree = nextFree,
 				prevFree = prevFree,
 				references = 0,
-				referenceAddresses = {}
+				referenceAddresses = {},
 			};
 			if isFree then
 				identifyMemoryCache.heapCache[block].description = "Free";
