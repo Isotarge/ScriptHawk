@@ -198,7 +198,7 @@ function Game.getGameSettings()
 end
 
 -- Game settings fields, relative to Game.getGameSettings()
-game_settings_fields = {
+local game_settings_fields = {
 	keys_collected = 0x08, -- u16_be? bitfield
 	bosses_beaten = 0x0D, -- byte? bitfield
 	trophies_collected = 0x0E, -- u16_be? bitfield
@@ -909,10 +909,10 @@ local function drawAnalysisToolsOSD()
 		for i = #currentPointers, 1, -1 do
 			local color = nil;
 			if object_index == i then
-				color = yellow_highlight;
+				color = colors.yellow;
 			end
 			if currentPointers[i] == playerObject then
-				color = green_highlight;
+				color = colors.green;
 			end
 			gui.text(Game.OSDPosition[1], 0 + Game.OSDRowHeight * row, i..": "..getObjectName(currentPointers[i]).." "..toHexString(currentPointers[i] or 0, 6), color, 'bottomright');
 			row = row + 1;

@@ -48,7 +48,7 @@ local player_data = {
 local pScale = 1000;
 local vScale = 100000;
 
-global_timer = {
+local global_timer = {
 	current = 0,
 	previous = 0,
 };
@@ -65,7 +65,7 @@ function Game.getPlayerActor()
 	return dereferencePointer(Game.Memory.player_pointer);
 end
 
-function playerPointerOSD()
+local function playerPointerOSD()
 	local player = Game.getPlayerActor();
 	if isRAM(player) then
 		return toHexString(player);

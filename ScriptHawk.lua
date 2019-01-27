@@ -736,8 +736,8 @@ loadPreferences();
 ScriptHawk.override_lag_detection = type(Game.isPhysicsFrame) == "function"; -- Default to true if the game implements custom lag detection
 local rotation_units = "Degrees";
 
-current_frame = emu.framecount();
-previous_frame = current_frame - 1;
+local current_frame = emu.framecount(); -- TODO: Move this to ScriptHawk table to give access for game modules?
+local previous_frame = current_frame - 1; -- TODO: Move this to ScriptHawk table to give access for game modules?
 
 local previous_map = "";
 local previous_map_value = 0;
@@ -998,7 +998,7 @@ end
 ScriptHawk.telemetryData = {};
 ScriptHawk.collecting_telemetry = false;
 
-function getTelemetryHeaderString()
+local function getTelemetryHeaderString()
 	local headerString = "Frame,";
 	for i, v in ipairs(Game.OSD) do
 		if type(v) == "table" then
@@ -1068,7 +1068,7 @@ if tastudio.addcolumn == nil then
 	function tastudio.addcolumn()
 	end
 else
-	function TAStudioTextUpdate(frameNumber, name)
+	local function TAStudioTextUpdate(frameNumber, name)
 		if TAStudio_column_data[frameNumber] ~= nil and TAStudio_column_data[frameNumber][name] ~= nil then
 			return TAStudio_column_data[frameNumber][name];
 		end

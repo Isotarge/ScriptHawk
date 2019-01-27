@@ -2300,20 +2300,6 @@ function Game.getAnimationAddress()
 	end
 end
 
-function Game.getObjectAnimationValue(pointer)
-	local ObjAnimPointer = mainmemory.read_u16_be(pointer + object_model1.animation_index);
-	local ObjAnimPointer_global = dereferencePointer(Game.Memory.animation_pointer);
-	if isRDRAM(ObjAnimPointer_global) and ObjAnimPointer ~= 0 then
-		return mainmemory.read_u16_be(ObjAnimPointer_global + 0x38 + (0x3C * ObjAnimPointer));
-	end
-	return 0;
-end
-
-function Game.getObjectAnimationOSD(pointer)
-	local ObjAnimValue = Game.getObjectAnimationValue(pointer);
-	return animationList[ObjAnimValue] or toHexString(ObjAnimValue);
-end
-
 --------------
 -- Autojump --
 --------------
@@ -4396,9 +4382,9 @@ end
 
 local slot_base = 0x10;
 local slot_size = 0x9C;
-object_index = 1;
+local object_index = 1;
 
-object_model1 = {
+local object_model1 = {
 	id_struct = 0x00, -- Pointer
 	x_position = 0x04, -- Float
 	y_position = 0x08, -- Float
@@ -5154,6 +5140,20 @@ object_model1 = {
 	},
 };
 
+function Game.getObjectAnimationValue(pointer)
+	local ObjAnimPointer = mainmemory.read_u16_be(pointer + object_model1.animation_index);
+	local ObjAnimPointer_global = dereferencePointer(Game.Memory.animation_pointer);
+	if isRDRAM(ObjAnimPointer_global) and ObjAnimPointer ~= 0 then
+		return mainmemory.read_u16_be(ObjAnimPointer_global + 0x38 + (0x3C * ObjAnimPointer));
+	end
+	return 0;
+end
+
+function Game.getObjectAnimationOSD(pointer)
+	local ObjAnimValue = Game.getObjectAnimationValue(pointer);
+	return animationList[ObjAnimValue] or toHexString(ObjAnimValue);
+end
+
 local function getNestContentsOSD(value)
 	local eggType = "Unknown ("..value..")";
 	if object_model1.nest_contents_list[value] ~= nil then
@@ -5222,7 +5222,7 @@ local script_modes = {
 };
 
 local script_mode_index = 1;
-script_mode = script_modes[script_mode_index];
+local script_mode = script_modes[script_mode_index];
 
 local function toggleObjectAnalysisToolsMode()
 	script_mode_index = script_mode_index + 1;

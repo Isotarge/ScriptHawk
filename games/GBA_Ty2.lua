@@ -22,7 +22,7 @@ local script_modes = {
 };
 
 local script_mode_index = 1;
-script_mode = script_modes[script_mode_index];
+local script_mode = script_modes[script_mode_index];
 
 --------------------
 -- Region/Version --
@@ -42,7 +42,7 @@ function Game.detectVersion(romName, romHash)
 	return true;
 end
 
-function parsePointer(inPtr)
+local function parsePointer(inPtr)
 	if (inPtr >= 0x02000000) and (inPtr < 0x02040000) then
 		return {
 			Domain = "EWRAM",
@@ -190,8 +190,8 @@ end
 -- Objects --
 -------------
 
-object_index = 2;
-object_top_index = 1;
+local object_index = 2;
+local object_top_index = 1;
 object_max_slots = 25;
 local object_struct_size = 0xF8;
 
@@ -244,7 +244,7 @@ local object_indexes = {
 };
 
 -- Object Structure
-slot_variables = {
+local slot_variables = {
 	[0x0C] = {type="s32_le", name={"X", "X Pos", "X Position"}},
 	[0x10] = {type="s32_le", name={"Y", "Y Pos", "Y Position"}},
 	[0x18] = {type="s32_le", name={"dX", "X Vel", "X Velocity"}},
@@ -387,13 +387,8 @@ function Game.drawUI()
 			end
 
 			if memory.read_u32_le(currentSlotBase.Address, currentSlotBase.Domain) ~= 0 then
-				local actorType = "Unknown";
 				local objectType = memory.read_u32_le(currentSlotBase.Address + 0x04, currentSlotBase.Domain);
-				if object_indexes[objectType] ~= nil then
-					actorType = object_indexes[objectType];
-				else
-					actorType = "Unknown("..toHexString(objectType)..")";
-				end
+				local actorType = object_indexes[objectType] or "Unknown("..toHexString(objectType)..")";
 				gui.text(Game.OSDPosition[1], 2 + Game.OSDRowHeight * row, actorType.." "..object_index..": "..toHexString(currentSlotBase.Address or 0), nil, 'bottomright');
 				row = row + 1;
 			end
@@ -402,24 +397,17 @@ function Game.drawUI()
 		gui.text(Game.OSDPosition[1], 2 + Game.OSDRowHeight * row, "Mode: "..script_mode, nil, 'bottomright');
 		row = row + 1;
 
-		local object_list = Game.Memory.object_list_ptr;
 		local objectcount = object_max_slots;
 		local printlist = {};
 		for i = object_top_index - 1 + objectcount, object_top_index, -1 do
 			local currentSlotBase = getObjectSlotBase(i);
 			if currentSlotBase ~= nil then
-				local actorType = "Unknown";
 				local objectType = memory.read_u32_le(currentSlotBase.Address + 0x04, currentSlotBase.Domain);
-				if object_indexes[objectType] ~= nil then
-					actorType = object_indexes[objectType];
-					printlist[i] = actorType.." "..i..": "..toHexString(currentSlotBase.Address or 0);
-				else
-					actorType = "Unknown("..toHexString(objectType)..")";
-					printlist[i] = actorType.." "..i..": "..toHexString(currentSlotBase.Address or 0);
-				end
+				local actorType = object_indexes[objectType] or "Unknown("..toHexString(objectType)..")";
+				printlist[i] = actorType.." "..i..": "..toHexString(currentSlotBase.Address or 0);
 			end
 		end
-		for i = object_top_index-1+objectcount,object_top_index,-1 do
+		for i = object_top_index - 1 + objectcount, object_top_index, -1 do
 			local color = nil;
 			if object_index == i then
 				color = colors.yellow;

@@ -234,7 +234,7 @@ local script_modes = { --TODO: Object analysis tools state needs to be up here f
 };
 
 local script_mode_index = 1;
-script_mode = script_modes[script_mode_index];
+local script_mode = script_modes[script_mode_index];
 
 hide_non_animated = false;
 hide_unknown_structs = true;
@@ -489,7 +489,7 @@ local slot_size = 0x180;
 local max_slots = 0x100;
 
 -- BEHAVIOR STRUCTURE
-behavior_struct = {
+local behavior_struct = {
 	[0x00] = {Name="Renderer Pointer", Type="Pointer", Fields={
 		[0x04] = {Name="x_pos", Type="s16_be"},
 		[0x06] = {Name="y_pos", Type="s16_be"},
@@ -502,7 +502,7 @@ behavior_struct = {
 };
 
 -- MOVEMENT STRUCTURE
-movement_struct = {
+local movement_struct = {
 	[0x00] = {Type="Pointer", Name="Animation Object Pointer", Fields={
 			[0x10] = {Type="u32_be", Name="Animation Type"},
 			[0x14] = {Type="Float", Name="Animation Timer Copy"},
@@ -519,7 +519,7 @@ movement_struct = {
 };
 
 -- OBJECT1 STRUCTURE
-slot_variables = {
+local slot_variables = {
 	[0x00] = {Type="Pointer", Name="Behavior Struct Pointer", Fields={
 			behavior_struct,
 		},
@@ -615,7 +615,7 @@ local function getObjectName(address)
 	return animationType;
 end
 
-function getObjectModel1Pointers()
+local function getObjectModel1Pointers()
 	local pointers = {};
 	local objectArray = dereferencePointer(Game.Memory.object_array_pointer);
 	if isRDRAM(objectArray) then
@@ -1523,8 +1523,8 @@ end
 -- Object analysis tools --
 ---------------------------
 
-object_index = 1;
-object_top_index = 1;
+local object_index = 1;
+local object_top_index = 1;
 --TODO: Set object_max_slots based on screen size
 object_max_slots = 50;
 
@@ -2137,7 +2137,7 @@ function Game.drawUI()
 				gui.text(Game.OSDPosition[1], 2 + Game.OSDRowHeight * row, structName..x..", "..y..", "..z.." "..i..": "..toHexString(structPointers[i]), colors.yellow, 'bottomright');
 				row = row + 1;
 			else
-				gui.text(Game.OSDPosition[1], 2 + Game.OSDRowHeight * row, structName..i..": "..toHexString(structPointers[i]), color, 'bottomright');
+				gui.text(Game.OSDPosition[1], 2 + Game.OSDRowHeight * row, structName..i..": "..toHexString(structPointers[i]), nil, 'bottomright');
 				row = row + 1;
 			end
 		end
@@ -2192,7 +2192,7 @@ ScriptHawk.bindMouse("mousewheeldown", incrementObjectIndex);
 local holdingAPostJump = false;
 allowPound = false;
 allowTTrotJump = true;
-function autoPound()
+local function autoPound()
 	local currentMovementState = mainmemory.read_u32_be(Game.Memory.current_movement_state);
 	local YVelocity = Game.getYVelocity();
 

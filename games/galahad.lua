@@ -11,8 +11,6 @@ local Game = {
 		screen_y = 0x568, -- s16_be
 		x_velocity = 0xF43, -- s8
 		y_velocity = 0xF44, -- s8
-		charge_1 = 0x13FB,
-		charge_2 = 0x13FC,
 		bombs = 0x146A, -- w,u
 		coins = 0x146C, -- w,u
 		health = 0x1471, -- b,u
@@ -106,7 +104,7 @@ local object_tools_modes = {
 local object_tools_mode_index = 1;
 local object_tools_mode = object_tools_modes[object_tools_mode_index];
 
-function toggleObjectAnalysisToolsMode()
+local function toggleObjectAnalysisToolsMode()
 	object_tools_mode_index = object_tools_mode_index + 1;
 	if object_tools_mode_index > #object_tools_modes then
 		object_tools_mode_index = 1;

@@ -675,7 +675,7 @@ local function drawSubGameHitboxes()
 	gui.drawImage("beta/cursor.png", mouse.X, mouse.Y - 4);
 end
 
-function getSubgameLevel()
+local function getSubgameLevel()
 	if map_value == arcade_map then
 		local arcade_level = mainmemory.readbyte(Game.Memory.arcade_level);
 		local arcade_level_osd = ((math.fmod(arcade_level, 3) + 1) * 25).."m ("..math.floor(arcade_level / 4)..")";
@@ -687,6 +687,7 @@ function getSubgameLevel()
 	return 0;
 end
 
+-- TODO: Hook these up to UI somehow?
 function arcadeTakeMeThere(level)
 	local level_value = 0;
 	if map_value == arcade_map then
@@ -707,6 +708,7 @@ function arcadeTakeMeThere(level)
 	end
 end
 
+-- TODO: Hook these up to UI somehow?
 function jetpacTakeMeThere(level)
 	if map_value == jetpac_map then
 		mainmemory.writebyte(Game.Memory.jetpac_level, level);
@@ -2520,7 +2522,7 @@ local function getModelNameFromModelIndex(modelIndex)
 	return model_indexes[modelIndex] or modelIndex;
 end
 
-function getActorCollisions(actor)
+local function getActorCollisions(actor)
 	local collisionCount = 0;
 	local collision = dereferencePointer(actor + obj_model1.collision_queue_pointer);
 	while isRDRAM(collision) do
@@ -3422,7 +3424,7 @@ function offsetObjectModel2(x, y, z)
 	end
 end
 
-function getSpawnSnagState(pointer)
+local function getSpawnSnagState(pointer)
 	local behaviorPointer = dereferencePointer(pointer + obj_model2.behavior_pointer);
 	if isRDRAM(behaviorPointer) then
 		local spawnSnagState = mainmemory.readbyte(behaviorPointer + 0x60);
@@ -3435,7 +3437,7 @@ function getSpawnSnagState(pointer)
 	return 0;
 end
 
-function getSpawnSnagCheck(pointer)
+local function getSpawnSnagCheck(pointer)
 	local behaviorPointer = dereferencePointer(pointer + obj_model2.behavior_pointer);
 	if isRDRAM(behaviorPointer) then
 		local spawnSnagCheck = mainmemory.readbyte(behaviorPointer + 0x54);
@@ -3448,7 +3450,7 @@ function getSpawnSnagCheck(pointer)
 	return 0;
 end
 
-function getGrabKong(pointer)
+local function getGrabKong(pointer)
 	if isRDRAM(pointer) then
 		local grabKongByte = mainmemory.readbyte(pointer + 0x8C) % 32;
 		if grabKongByte == 16 then
@@ -5167,8 +5169,8 @@ end
 -- Chunk Deload --
 ------------------
 
-local chunkSize = 0x1C8;
-chunk = {
+local chunk = {
+	size = 0x1C8, -- Size of a chunk object in RAM
 	visible = 0x05, -- Byte, 0x02 = visible, everything else = invisible
 	deload1 = 0x68, -- u32_be
 	deload2 = 0x6C, -- u32_be
@@ -5184,9 +5186,9 @@ function Game.fixChunkDeload()
 	--[[
 	local chunkArray = Game.getChunkArray();
 	if isRDRAM(chunkArray) then
-		local numChunks = math.floor(mainmemory.read_u32_be(chunkArray + heap.object_size) / chunkSize);
+		local numChunks = math.floor(mainmemory.read_u32_be(chunkArray + heap.object_size) / chunk.size);
 		for i = 0, numChunks - 1 do
-			local chunkBase = chunkArray + i * chunkSize;
+			local chunkBase = chunkArray + i * chunk.size;
 			mainmemory.write_u32_be(chunkBase + chunk.deload1, 0xA);
 			mainmemory.write_u32_be(chunkBase + chunk.deload2, 0xA);
 			mainmemory.write_u32_be(chunkBase + chunk.deload3, 0x135);
@@ -5215,9 +5217,9 @@ local function populateChunkPointers()
 	end
 	local chunkArray = Game.getChunkArray();
 	if isRDRAM(chunkArray) then
-		local numChunks = math.floor(mainmemory.read_u32_be(chunkArray + heap.object_size) / chunkSize);
+		local numChunks = math.floor(mainmemory.read_u32_be(chunkArray + heap.object_size) / chunk.size);
 		for i = 0, numChunks - 1 do
-			local chunkBase = chunkArray + i * chunkSize;
+			local chunkBase = chunkArray + i * chunk.size;
 			table.insert(object_pointers, chunkBase);
 		end
 
@@ -8647,9 +8649,9 @@ function crumble()
 		local chunkArray = Game.getChunkArray();
 		local DLBase = Game.getMapDLStart();
 		if isRDRAM(chunkArray) and isRDRAM(DLBase)then
-			local numChunks = math.floor(mainmemory.read_u32_be(chunkArray + heap.object_size) / chunkSize);
+			local numChunks = math.floor(mainmemory.read_u32_be(chunkArray + heap.object_size) / chunk.size);
 			for i = 0, numChunks - 1 do
-				local chunkBase = chunkArray + i * chunkSize;
+				local chunkBase = chunkArray + i * chunk.size;
 				local chunkDLArrayHeap = dereferencePointer(chunkBase + 0x4C);
 				if isRDRAM(chunkDLArrayHeap) then
 					local chunkMappingSize = mainmemory.read_u32_be(chunkDLArrayHeap + heap.object_size);
@@ -8790,9 +8792,9 @@ function dumpDLBases()
 	local vertBase = Game.getMapVerts();
 	local vertEnd = Game.getMapVertsEnd();
 	if isRDRAM(chunkArray) and isRDRAM(DLBase) and isRDRAM(vertBase) and isRDRAM(vertEnd) then
-		local numChunks = math.floor(mainmemory.read_u32_be(chunkArray + heap.object_size) / chunkSize);
+		local numChunks = math.floor(mainmemory.read_u32_be(chunkArray + heap.object_size) / chunk.size);
 		for i = 0, numChunks - 1 do
-			local chunkBase = chunkArray + i * chunkSize;
+			local chunkBase = chunkArray + i * chunk.size;
 			local chunkDLArrayHeap = dereferencePointer(chunkBase + 0x4C);
 			if isRDRAM(chunkDLArrayHeap) then
 				dprint("ChunkBase "..toHexString(chunkBase).." points to -> "..toHexString(chunkDLArrayHeap));
@@ -9774,9 +9776,9 @@ function buildIdentifyMemoryCache()
 		local vertBase = Game.getMapVerts();
 		local vertEnd = Game.getMapVertsEnd();
 		if isRDRAM(vertBase) and isRDRAM(vertEnd) then
-			local numChunks = math.floor(mainmemory.read_u32_be(chunkArray + heap.object_size) / chunkSize);
+			local numChunks = math.floor(mainmemory.read_u32_be(chunkArray + heap.object_size) / chunk.size);
 			for i = 0, numChunks - 1 do
-				local chunkBase = chunkArray + i * chunkSize;
+				local chunkBase = chunkArray + i * chunk.size;
 				local chunkDLArrayHeap = dereferencePointer(chunkBase + 0x4C);
 				if isRDRAM(chunkDLArrayHeap) then
 					addHeapMetadata(chunkDLArrayHeap, "description", "Map Chunk DL Vert Mapping Array");

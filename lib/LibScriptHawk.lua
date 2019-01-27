@@ -481,8 +481,7 @@ function traverse_size(object, minimumPrintSize, maximumPrintSize)
 	minimumPrintSize = minimumPrintSize or -math.huge;
 	maximumPrintSize = maximumPrintSize or math.huge;
 	local count = 0;
-	local size = 0;
-	local prev = 0;
+	local size, prev;
 	repeat
 		count = count + 1;
 		size = mainmemory.read_u32_be(object + 4);
@@ -558,19 +557,16 @@ function searchPointersLE(base, range, allowLater, suppressPrint) -- Little Endi
 end
 
 function getMemoryStats(object)
-	local size = 0;
-	local prev = 0;
-	local nextFree = 0;
-	local prevFree = 0;
+	local size, prev, nextFree, prevFree;
 	local memoryStats = {
 		free = 0,
 		used = 0,
 	};
 	if isRDRAM(object) then
 		repeat
-			size = mainmemory.read_u32_be(object + 4); -- TODO: These offsets only apply to DK64's heap header
-			nextFree = dereferencePointer(object + 8);
-			prevFree = dereferencePointer(object + 12);
+			size = mainmemory.read_u32_be(object + 0x04); -- TODO: These offsets only apply to DK64's heap header
+			nextFree = dereferencePointer(object + 0x08);
+			prevFree = dereferencePointer(object + 0x0C);
 			if isRDRAM(nextFree) or isRDRAM(prevFree) then
 				memoryStats.free = memoryStats.free + size;
 			else
@@ -720,8 +716,8 @@ end
 		--ScriptHawk.bindKeyRealtime("H", decrementPage, true);
 		--ScriptHawk.bindKeyRealtime("J", incrementPage, true);
 	-- into table drawing function
-		--for i=page_finish,page_start+1,-1 do
-			-- instead of for i=#tablename,1,-1 do
+		--for i = page_finish, page_start + 1, -1 do
+			-- instead of for i = #tablename, 1, -1 do
 	-- pagifyThis function inbetween table populating and drawing function
 
 max_page_size = 40;

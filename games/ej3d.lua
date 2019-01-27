@@ -7,17 +7,17 @@ end
 
 encircle_enabled = false;
 
-object_index = 1;
-object_pointers = {}; -- TODO: I'd love to get rid of this eventually, replace with some kind of getObjectPointers() system
-grab_script_modes = {
+local object_index = 1;
+local object_pointers = {}; -- TODO: I'd love to get rid of this eventually, replace with some kind of getObjectPointers() system
+local grab_script_modes = {
 	"Disabled",
 	"List (Model 1)",
 	"Examine (Model 1)",
 	"List (Model 2)",
 	"Examine (Model 2)",
 };
-grab_script_mode_index = 1;
-grab_script_mode = grab_script_modes[grab_script_mode_index];
+local grab_script_mode_index = 1;
+local grab_script_mode = grab_script_modes[grab_script_mode_index];
 
 local Game = {
 	squish_memory_table = true,
@@ -143,12 +143,12 @@ end
 --------------
 
 function Game.calculateAngle(angle1, angle2)
-	angle_1 = 90 * (angle1 + 1);
+	angle1 = 90 * (angle1 + 1);
 
 	if angle2 < 0 then
-		return (angle_1 * (0 - 1)) - 90;
+		return (angle1 * (0 - 1)) - 90;
 	else
-		return (angle_1 - 90);
+		return (angle1 - 90);
 	end
 end
 
@@ -395,23 +395,27 @@ function Game.toggleConsoleMode()
 	end
 end
 
+local twirl_yFreeze = false;
+local roll_cap = false;
+local walljump_hack = false;
+
 function Game.getConsoleMode()
 	if not TASSafe then
 		if console_mode == 1 then
 			forms.settext(ScriptHawk.UI.form_controls["Console Mode Switch"], "N64 Mode");
-			twirl_yFreeze = 1;
-			roll_cap = 0; -- Currently desyncs like crazy
-			walljump_hack = 1;
+			twirl_yFreeze = true;
+			roll_cap = false; -- Currently desyncs like crazy
+			walljump_hack = true;
 		elseif console_mode == 2 then
 			forms.settext(ScriptHawk.UI.form_controls["Console Mode Switch"], "PC Mode");
-			twirl_yFreeze = 0;
-			roll_cap = 1;
-			walljump_hack = 0;
+			twirl_yFreeze = false;
+			roll_cap = true;
+			walljump_hack = false;
 		else
 			forms.settext(ScriptHawk.UI.form_controls["Console Mode Switch"], "Emulator Mode");
-			twirl_yFreeze = 0;
-			roll_cap = 0;
-			walljump_hack = 0;
+			twirl_yFreeze = false;
+			roll_cap = false;
+			walljump_hack = false;
 		end
 	end
 end
@@ -422,7 +426,7 @@ function Game.applyConsoleSettings()
 	local animation_frame = mainmemory.read_u16_be(Game.Memory.jim_pointer + jim.animation_timer);
 	local movement_value = mainmemory.readbyte(Game.Memory.jim_pointer + jim.movement);
 
-	if twirl_yFreeze == 1 then	-- NO TWIRL HEIGHT GAIN
+	if twirl_yFreeze then -- NO TWIRL HEIGHT GAIN
 		if animation_value == 29 and movement_value == 20 then
 			if twirlStoredY == nil then
 				if Game.version == 1 then -- US
@@ -442,7 +446,7 @@ function Game.applyConsoleSettings()
 		end
 	end
 
-	if roll_cap == 1 then -- NO HYPEREXTENDED ROLL (NOT EVEN ON PC, JUST AN EMU BUG)
+	if roll_cap then -- NO HYPEREXTENDED ROLL (NOT EVEN ON PC, JUST AN EMU BUG)
 		if animation_value == 25 and movement_value == 16 then
 			if roll_count == nil then
 				roll_count = 0;
@@ -458,7 +462,7 @@ function Game.applyConsoleSettings()
 		end
 	end
 
-	if walljump_hack == 1 then -- WALLJUMP
+	if walljump_hack then -- WALLJUMP
 		if animation_value == 6 and movement_value == 12 then
 			mainmemory.writebyte(Game.Memory.jim_pointer + jim.crouch_available, 1);
 		end
@@ -532,29 +536,29 @@ function Game.applyInfinites()
 end
 
 function completeFile()
-	collectable_counts = { -- Udders, Marbles
-		[0] = {1,0}, -- Brain
-		[1] = {0,0}, -- Memory
-		[2] = {3,100}, -- CDE
-		[3] = {7,100}, -- BTBW
-		[4] = {5,0}, -- Psycrow
-		[5] = {0,0}, -- Happiness
-		[6] = {5,100}, -- LOTF
-		[7] = {5,100}, -- AYHT
-		[8] = {5,0}, -- Roswell
-		[9] = {0,0}, -- Fear
+	local collectable_counts = { -- Udders, Marbles
+		[0] = {1, 0}, -- Brain
+		[1] = {0, 0}, -- Memory
+		[2] = {3, 100}, -- CDE
+		[3] = {7, 100}, -- BTBW
+		[4] = {5, 0}, -- Psycrow
+		[5] = {0, 0}, -- Happiness
+		[6] = {5, 100}, -- LOTF
+		[7] = {5, 100}, -- AYHT
+		[8] = {5, 0}, -- Roswell
+		[9] = {0, 0}, -- Fear
 		[10] = {0,0}, -- Mansion Lobby
-		[11] = {5,100}, -- PG1
-		[12] = {5,100}, -- PG2
-		[13] = {6,100}, -- DWU
-		[14] = {5,100}, -- BNotLD
-		[15] = {5,0}, -- PMFAH
-		[16] = {0,0}, -- Fantasy
-		[17] = {6,100}, -- VDV
-		[18] = {6,100}, -- GBE
-		[19] = {5,0}, -- Bob
-		[20] = {0,0}, -- Kim
-		[21] = {0,0}, -- Main Menu
+		[11] = {5, 100}, -- PG1
+		[12] = {5, 100}, -- PG2
+		[13] = {6, 100}, -- DWU
+		[14] = {5, 100}, -- BNotLD
+		[15] = {5, 0}, -- PMFAH
+		[16] = {0, 0}, -- Fantasy
+		[17] = {6, 100}, -- VDV
+		[18] = {6, 100}, -- GBE
+		[19] = {5, 0}, -- Bob
+		[20] = {0, 0}, -- Kim
+		[21] = {0, 0}, -- Main Menu
 	};
 
 	for i = 0, (#collectable_counts - 1) do
@@ -575,7 +579,7 @@ Game.BossCamLockOffset = {
 };
 
 function Game.killBoss()
-	BossCamLockOffSet = Game.BossCamLockOffset[mainmemory.readbyte(Game.Memory.current_map)];
+	local BossCamLockOffSet = Game.BossCamLockOffset[mainmemory.readbyte(Game.Memory.current_map)];
 	if BossCamLockOffSet ~= nil then
 		camlock_address = dereferencePointer(Game.Memory.flag_pointer) + BossCamLockOffSet;
 		bossdeath_address = dereferencePointer(Game.Memory.jim_pointer + jim.boss_pointer) + 0xE73;
@@ -634,11 +638,11 @@ function switch_grab_script_mode()
 	grab_script_mode = grab_script_modes[grab_script_mode_index];
 end
 
-	---------------
-	-- MODEL ONE --
-	---------------
+---------------
+-- MODEL ONE --
+---------------
 
-object_properties = {
+local object_properties = {
 	object_x = 0x70,
 	object_y = 0x74,
 	object_z = 0x78,
@@ -710,22 +714,16 @@ local function populateObjectM1Pointers()
 end
 
 function getObjectM1Value(pointer)
-	modelPtr = dereferencePointer(pointer + object_properties.object_model_pointer);
+	local modelPtr = dereferencePointer(pointer + object_properties.object_model_pointer);
+	local objectValue = 0;
 	if isRDRAM(modelPtr) then
 		objectValue = mainmemory.read_u16_be(modelPtr + 0x1122);
-	else
-		objectValue = 0;
 	end
 	return objectValue;
 end
 
 function getObjectM1NameFromValue(value)
-	if type(object_properties.object_types[value]) == 'string' then
-		objname = object_properties.object_types[value];
-	else
-		objname = toHexString(value);
-	end
-	return objname;
+	return object_properties.object_types[value] or toHexString(value);
 end
 
 local function getExamineM1Data(pointer)
@@ -765,11 +763,11 @@ local function getExamineM1Data(pointer)
 	return examine_data;
 end
 
-	---------------
-	-- MODEL TWO --
-	---------------
+---------------
+-- MODEL TWO --
+---------------
 
-object_m2_properties = {
+local object_m2_properties = {
 	object_texture_pointer = 0x8;
 	object_model_pointer = 0x18;
 	object_trait_pointer = 0x1C,
@@ -973,8 +971,102 @@ end
 -- Flag Stuff --
 ----------------
 
-flag_block_size = 0x438; -- D34 max
-flag_Array = {};
+local flag_block_size = 0x438; -- D34 max
+local flag_Array = {};
+
+local flagBlock = {
+	[0x018] = {name = "DWU: Stone Door Open", type = "Physical"},
+	[0x040] = {name = "BTBW: Crow in final position", type = "Physical"},
+	[0x070] = {name = "LOTF: Talked to King Gherkin", type = "Physical"},
+	[0x078] = {name = "PG1: First Wall Cleared", type = "Physical"},
+	[0x080] = {name = "PG1: Chicken Gauntlet Defeated", type = "Physical"},
+	[0x098] = {name = "CDE: Barn Door Open", type = "Physical"},
+	[0x0A8] = {name = "AYHT: Elevator Lasers Lowered", type = "Physical"},
+	[0x130] = {name = "Brain: CDE Open", type = "Physical"},
+	[0x138] = {name = "Brain: Happiness Hub Snott Spawned", type = "Physical"},
+	[0x150] = {name = "Have all udders", type = "Check"},
+	[0x160] = {name = "Brain: Snott FTT", type = "FTT"},
+	[0x1B0] = {name = "Brain: Earthworm Kim Open", type = "Physical"},
+	[0x1C0] = {name = "DWU: Rabbit Hole Udder", type = "Udder"},
+	[0x1C8] = {name = "DWU: Gravestones Udder", type = "Udder"},
+	[0x1D0] = {name = "DWU: Medallion Udder", type = "Udder"},
+	[0x1D8] = {name = "DWU: Quicksand Udder", type = "Udder"},
+	[0x1E0] = {name = "DWU: Statues Udder", type = "Udder"},
+	[0x1F0] = {name = "DWU: Blue Balloon Udder", type = "Udder"},
+	[0x1F8] = {name = "PG1: Beaver Head Udder", type = "Udder"},
+	[0x200] = {name = "PG1: Painting Room Udder", type = "Udder"},
+	[0x208] = {name = "PG1: Furniture Room Udder", type = "Udder"},
+	[0x210] = {name = "PG1: Vacuum Udder", type = "Udder"},
+	[0x218] = {name = "PG1: Chicken Gauntlet Udder", type = "Udder"},
+	[0x220] = {name = "BNotLD: Boom Box Udder", type = "Udder"},
+	[0x228] = {name = "BNotLD: Zombie Heads Udder", type = "Udder"},
+	[0x230] = {name = "BNotLD: Manhole Udder", type = "Udder"},
+	[0x238] = {name = "BNotLD: Speaker Towers Udder", type = "Udder"},
+	[0x240] = {name = "BNotLD: Sewers Udder", type = "Udder"},
+	[0x248] = {name = "GBE: Ice Block Udder", type = "Udder"},
+	[0x250] = {name = "GBE: Bank Udder", type = "Udder"},
+	[0x258] = {name = "GBE: Sheriff Udder", type = "Udder"},
+	[0x260] = {name = "GBE: Bottle Udder", type = "Udder"},
+	[0x268] = {name = "GBE: Granny Herding Udder", type = "Udder"},
+	[0x270] = {name = "GBE: Bingo Udder", type = "Udder"},
+	[0x278] = {name = "BTBW: Bootcamp Udder", type = "Udder"},
+	[0x280] = {name = "BTBW: Camera Udder", type = "Udder"},
+	[0x288] = {name = "BTBW: Barn Door Udder", type = "Udder"},
+	[0x290] = {name = "BTBW: Crow Udder", type = "Udder"},
+	[0x298] = {name = "BTBW: Kill Pluckitt Udder", type = "Udder"},
+	-- 0x2A0 - Udder
+	-- 0x2A8 - Udder
+	[0x2B0] = {name = "BTBW: Blue Balloon Udder", type = "Udder"},
+	-- 0x2B8
+	[0x2C0] = {name = "CDE: Fridges Udder", type = "Udder"},
+	[0x2C8] = {name = "CDE: Underpants Udder", type = "Udder"},
+	[0x2D0] = {name = "CDE: Bomb Room Udder", type = "Udder"},
+	-- 0x2D8
+	[0x2E0] = {name = "AYHT: Elevator Udder", type = "Udder"},
+	[0x2E8] = {name = "AYHT: Bean Room Udder", type = "Udder"},
+	[0x2F0] = {name = "AYHT: Pan Room Udder", type = "Udder"},
+	[0x2F8] = {name = "AYHT: Elvis Udder", type = "Udder"},
+	[0x300] = {name = "VDV: Hidden Udder", type = "Udder"},
+	[0x308] = {name = "VDV: Bean Room Udder", type = "Udder"},
+	[0x310] = {name = "VDV: Ice Cream Udder", type = "Udder"},
+	[0x318] = {name = "VDV: Kill Grannies Udder", type = "Udder"},
+	[0x320] = {name = "VDV: Granny Herding Udder", type = "Udder"},
+	[0x328] = {name = "BTBW: Swamp Udder", type = "Udder"},
+	[0x330] = {name = "PG2: Vacuum Udder", type = "Udder"},
+	[0x338] = {name = "PG2: Chicken Udder", type = "Udder"},
+	[0x340] = {name = "PG2: Painting Room Udder", type = "Udder"},
+	[0x348] = {name = "PG2: Library Udder", type = "Udder"},
+	[0x350] = {name = "PG2: Blue Balloon Udder", type = "Udder"},
+	[0x358] = {name = "LOTF: Blue Balloon Udder", type = "Udder"},
+	[0x360] = {name = "LOTF: Central Tree Udder", type = "Udder"},
+	[0x368] = {name = "LOTF: Tall Platform Udder", type = "Udder"},
+	[0x370] = {name = "LOTF: King Gherkin Udder", type = "Udder"},
+	[0x378] = {name = "LOTF: Potatoes Udder", type = "Udder"},
+	-- 0x380
+	[0x388] = {name = "AYHT: Blue Balloon Udder", type = "Udder"},
+	[0x390] = {name = "Brain: Peter Udder", type = "Udder"},
+	[0x398] = {name = "Psycrow: Udder (1)", type = "Udder"},
+	[0x3A0] = {name = "Psycrow: Udder (2)", type = "Udder"},
+	[0x3A8] = {name = "Psycrow: Udder (3)", type = "Udder"},
+	[0x3B0] = {name = "Psycrow: Udder (4)", type = "Udder"},
+	[0x3B8] = {name = "Psycrow: Udder (5)", type = "Udder"},
+	[0x3C0] = {name = "Bob and No. 4: Udder (1)", type = "Udder"},
+	[0x3C8] = {name = "Bob and No. 4: Udder (2)", type = "Udder"},
+	[0x3D0] = {name = "Bob and No. 4: Udder (3)", type = "Udder"},
+	[0x3D8] = {name = "Bob and No. 4: Udder (4)", type = "Udder"},
+	[0x3E0] = {name = "Bob and No. 4: Udder (5)", type = "Udder"},
+	[0x3E8] = {name = "PMFAH: Udder (1)", type = "Udder"},
+	[0x3F0] = {name = "PMFAH: Udder (2)", type = "Udder"},
+	[0x3F8] = {name = "PMFAH: Udder (3)", type = "Udder"},
+	[0x400] = {name = "PMFAH: Udder (4)", type = "Udder"},
+	[0x408] = {name = "PMFAH: Udder (5)", type = "Udder"},
+	[0x410] = {name = "Fatty Roswell: Udder (1)", type = "Udder"},
+	[0x418] = {name = "Fatty Roswell: Udder (2)", type = "Udder"},
+	[0x420] = {name = "Fatty Roswell: Udder (3)", type = "Udder"},
+	[0x428] = {name = "Fatty Roswell: Udder (4)", type = "Udder"},
+	[0x430] = {name = "Fatty Roswell: Udder (5)", type = "Udder"},
+	[0x438] = {name = "VDV: Blue Balloon Udder", type = "Udder"},
+};
 
 function getFlagTypeCount(flagType)
 	flag_type_count = 0
@@ -1003,7 +1095,7 @@ function getFlagsTotal()
 end
 
 function getFlagArray()
-	flag_start = dereferencePointer(Game.Memory.flag_pointer);
+	local flag_start = dereferencePointer(Game.Memory.flag_pointer);
 	if isRDRAM(flag_start) then
 		for i = 1, flag_block_size do
 			flag_Array[i] = mainmemory.readbyte(flag_start + i);
@@ -1012,8 +1104,8 @@ function getFlagArray()
 end
 
 function checkFlagArray()
-	flag_start = dereferencePointer(Game.Memory.flag_pointer);
-	currentFrame = emu.framecount();
+	local flag_start = dereferencePointer(Game.Memory.flag_pointer);
+	local currentFrame = emu.framecount();
 	if isRDRAM(flag_start) then
 		if flag_Array[1] ~= nil then -- flag array populated
 			for i = 1, flag_block_size do
@@ -1036,7 +1128,7 @@ function checkFlagArray()
 end
 
 function checkFlag(offset)
-	flag_start = dereferencePointer(Game.Memory.flag_pointer);
+	local flag_start = dereferencePointer(Game.Memory.flag_pointer);
 	if isRDRAM(flag_start) then
 		flag_state = mainmemory.readbyte(flag_start + offset);
 		if flag_state == 1 then
@@ -1048,9 +1140,9 @@ function checkFlag(offset)
 end
 
 function setFlag(offset)
-	flag_start = dereferencePointer(Game.Memory.flag_pointer);
+	local flag_start = dereferencePointer(Game.Memory.flag_pointer);
 	if isRDRAM(flag_start) then
-		mainmemory.writebyte(flag_start + offset,1);
+		mainmemory.writebyte(flag_start + offset, 1);
 		if flagBlock[offset] ~= nil then
 			flag_name = flagBlock[offset]["name"]
 		else
@@ -1061,9 +1153,9 @@ function setFlag(offset)
 end
 
 function clearFlag(offset)
-	flag_start = dereferencePointer(Game.Memory.flag_pointer);
+	local flag_start = dereferencePointer(Game.Memory.flag_pointer);
 	if isRDRAM(flag_start) then
-		mainmemory.writebyte(flag_start + offset,0);
+		mainmemory.writebyte(flag_start + offset, 0);
 		if flagBlock[offset] ~= nil then
 			flag_name = flagBlock[offset]["name"]
 		else
@@ -1163,100 +1255,6 @@ end
 local function flagCheckButtonHandler()
 	checkFlagByName(forms.getproperty(ScriptHawk.UI.form_controls["Flag Dropdown"], "SelectedItem"));
 end
-
-flagBlock = {
-	[0x018] = {name = "DWU: Stone Door Open", type = "Physical"},
-	[0x040] = {name = "BTBW: Crow in final position", type = "Physical"},
-	[0x070] = {name = "LOTF: Talked to King Gherkin", type = "Physical"},
-	[0x078] = {name = "PG1: First Wall Cleared", type = "Physical"},
-	[0x080] = {name = "PG1: Chicken Gauntlet Defeated", type = "Physical"},
-	[0x098] = {name = "CDE: Barn Door Open", type = "Physical"},
-	[0x0A8] = {name = "AYHT: Elevator Lasers Lowered", type = "Physical"},
-	[0x130] = {name = "Brain: CDE Open", type = "Physical"},
-	[0x138] = {name = "Brain: Happiness Hub Snott Spawned", type = "Physical"},
-	[0x150] = {name = "Have all udders", type = "Check"},
-	[0x160] = {name = "Brain: Snott FTT", type = "FTT"},
-	[0x1B0] = {name = "Brain: Earthworm Kim Open", type = "Physical"},
-	[0x1C0] = {name = "DWU: Rabbit Hole Udder", type = "Udder"},
-	[0x1C8] = {name = "DWU: Gravestones Udder", type = "Udder"},
-	[0x1D0] = {name = "DWU: Medallion Udder", type = "Udder"},
-	[0x1D8] = {name = "DWU: Quicksand Udder", type = "Udder"},
-	[0x1E0] = {name = "DWU: Statues Udder", type = "Udder"},
-	[0x1F0] = {name = "DWU: Blue Balloon Udder", type = "Udder"},
-	[0x1F8] = {name = "PG1: Beaver Head Udder", type = "Udder"},
-	[0x200] = {name = "PG1: Painting Room Udder", type = "Udder"},
-	[0x208] = {name = "PG1: Furniture Room Udder", type = "Udder"},
-	[0x210] = {name = "PG1: Vacuum Udder", type = "Udder"},
-	[0x218] = {name = "PG1: Chicken Gauntlet Udder", type = "Udder"},
-	[0x220] = {name = "BNotLD: Boom Box Udder", type = "Udder"},
-	[0x228] = {name = "BNotLD: Zombie Heads Udder", type = "Udder"},
-	[0x230] = {name = "BNotLD: Manhole Udder", type = "Udder"},
-	[0x238] = {name = "BNotLD: Speaker Towers Udder", type = "Udder"},
-	[0x240] = {name = "BNotLD: Sewers Udder", type = "Udder"},
-	[0x248] = {name = "GBE: Ice Block Udder", type = "Udder"},
-	[0x250] = {name = "GBE: Bank Udder", type = "Udder"},
-	[0x258] = {name = "GBE: Sheriff Udder", type = "Udder"},
-	[0x260] = {name = "GBE: Bottle Udder", type = "Udder"},
-	[0x268] = {name = "GBE: Granny Herding Udder", type = "Udder"},
-	[0x270] = {name = "GBE: Bingo Udder", type = "Udder"},
-	[0x278] = {name = "BTBW: Bootcamp Udder", type = "Udder"},
-	[0x280] = {name = "BTBW: Camera Udder", type = "Udder"},
-	[0x288] = {name = "BTBW: Barn Door Udder", type = "Udder"},
-	[0x290] = {name = "BTBW: Crow Udder", type = "Udder"},
-	[0x298] = {name = "BTBW: Kill Pluckitt Udder", type = "Udder"},
-	-- 0x2A0 - Udder
-	-- 0x2A8 - Udder
-	[0x2B0] = {name = "BTBW: Blue Balloon Udder", type = "Udder"},
-	-- 0x2B8
-	[0x2C0] = {name = "CDE: Fridges Udder", type = "Udder"},
-	[0x2C8] = {name = "CDE: Underpants Udder", type = "Udder"},
-	[0x2D0] = {name = "CDE: Bomb Room Udder", type = "Udder"},
-	-- 0x2D8
-	[0x2E0] = {name = "AYHT: Elevator Udder", type = "Udder"},
-	[0x2E8] = {name = "AYHT: Bean Room Udder", type = "Udder"},
-	[0x2F0] = {name = "AYHT: Pan Room Udder", type = "Udder"},
-	[0x2F8] = {name = "AYHT: Elvis Udder", type = "Udder"},
-	[0x300] = {name = "VDV: Hidden Udder", type = "Udder"},
-	[0x308] = {name = "VDV: Bean Room Udder", type = "Udder"},
-	[0x310] = {name = "VDV: Ice Cream Udder", type = "Udder"},
-	[0x318] = {name = "VDV: Kill Grannies Udder", type = "Udder"},
-	[0x320] = {name = "VDV: Granny Herding Udder", type = "Udder"},
-	[0x328] = {name = "BTBW: Swamp Udder", type = "Udder"},
-	[0x330] = {name = "PG2: Vacuum Udder", type = "Udder"},
-	[0x338] = {name = "PG2: Chicken Udder", type = "Udder"},
-	[0x340] = {name = "PG2: Painting Room Udder", type = "Udder"},
-	[0x348] = {name = "PG2: Library Udder", type = "Udder"},
-	[0x350] = {name = "PG2: Blue Balloon Udder", type = "Udder"},
-	[0x358] = {name = "LOTF: Blue Balloon Udder", type = "Udder"},
-	[0x360] = {name = "LOTF: Central Tree Udder", type = "Udder"},
-	[0x368] = {name = "LOTF: Tall Platform Udder", type = "Udder"},
-	[0x370] = {name = "LOTF: King Gherkin Udder", type = "Udder"},
-	[0x378] = {name = "LOTF: Potatoes Udder", type = "Udder"},
-	-- 0x380
-	[0x388] = {name = "AYHT: Blue Balloon Udder", type = "Udder"},
-	[0x390] = {name = "Brain: Peter Udder", type = "Udder"},
-	[0x398] = {name = "Psycrow: Udder (1)", type = "Udder"},
-	[0x3A0] = {name = "Psycrow: Udder (2)", type = "Udder"},
-	[0x3A8] = {name = "Psycrow: Udder (3)", type = "Udder"},
-	[0x3B0] = {name = "Psycrow: Udder (4)", type = "Udder"},
-	[0x3B8] = {name = "Psycrow: Udder (5)", type = "Udder"},
-	[0x3C0] = {name = "Bob and No. 4: Udder (1)", type = "Udder"},
-	[0x3C8] = {name = "Bob and No. 4: Udder (2)", type = "Udder"},
-	[0x3D0] = {name = "Bob and No. 4: Udder (3)", type = "Udder"},
-	[0x3D8] = {name = "Bob and No. 4: Udder (4)", type = "Udder"},
-	[0x3E0] = {name = "Bob and No. 4: Udder (5)", type = "Udder"},
-	[0x3E8] = {name = "PMFAH: Udder (1)", type = "Udder"},
-	[0x3F0] = {name = "PMFAH: Udder (2)", type = "Udder"},
-	[0x3F8] = {name = "PMFAH: Udder (3)", type = "Udder"},
-	[0x400] = {name = "PMFAH: Udder (4)", type = "Udder"},
-	[0x408] = {name = "PMFAH: Udder (5)", type = "Udder"},
-	[0x410] = {name = "Fatty Roswell: Udder (1)", type = "Udder"},
-	[0x418] = {name = "Fatty Roswell: Udder (2)", type = "Udder"},
-	[0x420] = {name = "Fatty Roswell: Udder (3)", type = "Udder"},
-	[0x428] = {name = "Fatty Roswell: Udder (4)", type = "Udder"},
-	[0x430] = {name = "Fatty Roswell: Udder (5)", type = "Udder"},
-	[0x438] = {name = "VDV: Blue Balloon Udder", type = "Udder"},
-};
 
 ScriptHawk.bindKeyRealtime("N", decrementObjectIndex, true);
 ScriptHawk.bindKeyRealtime("M", incrementObjectIndex, true);

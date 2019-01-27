@@ -1174,7 +1174,7 @@ return {
 	{byte=0x100, bit=5, name="Caves: Ice Castle Top Bunch", type="Bunch", map=72},
 	{byte=0x100, bit=6, name="Caves: Lanky CB: On 1DC Bunch", type="Bunch", map=72},
 	{byte=0x100, bit=7, name="Caves: Tiny Coin: Giant Kosha Room (1)", type="Coin", map=72},
-	
+
 	{byte=0x101, bit=0, name="Caves: DK CB: Outside BBlast (1)", type="CB", map=72},
 	{byte=0x101, bit=1, name="Caves: DK CB: Outside BBlast (2)", type="CB", map=72},
 	{byte=0x101, bit=2, name="Caves: DK CB: W1 Bunch (Base)", type="Bunch", map=72},
@@ -1183,7 +1183,7 @@ return {
 	{byte=0x101, bit=5, name="Caves: DK Coin: Gorilla Gone Room (1)", type="Coin", map=72},
 	{byte=0x101, bit=6, name="Caves: DK Coin: Gorilla Gone Room (2)", type="Coin", map=72},
 	{byte=0x101, bit=7, name="Caves: DK Coin: Gorilla Gone Room (3)", type="Coin", map=72},
-	
+
 	{byte=0x102, bit=0, name="Caves: DK CB: Around 5DI (1)", type="CB", map=72},
 	{byte=0x102, bit=1, name="Caves: DK CB: Around 5DI (2)", type="CB", map=72},
 	{byte=0x102, bit=2, name="Caves: DK CB: Around 5DI (3)", type="CB", map=72},
@@ -1359,7 +1359,7 @@ return {
 	{byte=0x11B, bit=1, name="Caves: Diddy CB: 5DC Candle Bunch (1)", type="Bunch", map=200},
 	{byte=0x11B, bit=2, name="Caves: Diddy CB: 5DC Candle Bunch (2)", type="Bunch", map=200},
 	{byte=0x11B, bit=3, name="Caves: Diddy CB: 5DC Candle Bunch (3)", type="Bunch", map=200},
-	
+
 	{byte=0x139, bit=0, type="Unknown", nomap=true, ignore=true},
 
 	{byte=0x13A, bit=0, type="Unknown", nomap=true, ignore=true},

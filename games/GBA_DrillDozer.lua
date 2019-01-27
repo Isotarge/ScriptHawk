@@ -26,7 +26,7 @@ local script_modes = {
 };
 
 local script_mode_index = 1;
-script_mode = script_modes[script_mode_index];
+local script_mode = script_modes[script_mode_index];
 
 --------------------
 -- Region/Version --
@@ -232,8 +232,8 @@ end
 -------------
 -- Objects --
 -------------
-object_index = 1;
 
+local object_index = 1;
 local object_struct_size = 0xFC;
 
 local object_struct = {
@@ -355,17 +355,12 @@ function Game.drawUI()
 		for i = numSlots, 1, -1 do
 			local currentSlotBase = Game.Memory.object_array.Address[Game.version] + (i - 1) * object_struct_size;
 			if memory.read_u32_le(currentSlotBase, Game.Memory.object_array.Domain) ~= 0 then
-				local actorType = "Unknown";
 				local objectType = memory.read_u16_le(currentSlotBase + 0x16, Game.Memory.object_array.Domain);
-				if type(object_indexes[objectType]) == "string" then
-					actorType = object_indexes[objectType];
-				else
-					actorType = toHexString(objectType);
-				end
+				local actorType = object_indexes[objectType] or toHexString(objectType);
 
 				local color = nil;
 				if object_index == i then
-					color = yellow_highlight;
+					color = colors.yellow;
 				end
 
 				local object_health = memory.read_u16_le(currentSlotBase + 0x56, Game.Memory.object_array.Domain);
