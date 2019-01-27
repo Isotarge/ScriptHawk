@@ -743,7 +743,7 @@ function adjustVelMax(value, bananas)
 	velocity_max[bananas] = math.min(velocity_max[bananas], velocity_med[bananas]); -- Clamp to velocity_med
 end
 
-function dumpVelocityValues()
+function dumpVelocityValues(bananas)
 	return "min: "..round(velocity_min[bananas], 3).." med: "..round(velocity_med[bananas], 3).." max: "..round(velocity_max[bananas], 3);
 end
 
@@ -1093,7 +1093,7 @@ function Game.eachFrame()
 	if zPos >= -3800 then
 		local character = Game.getCharacter();
 		local bananas = math.max(math.min(Game.getBananas(), 10), 0);
-		print("frame "..emu.framecount().." pos "..round(zPos, 3).." vel "..round(velocity, 3).." || "..dumpVelocityValues());
+		print("frame "..emu.framecount().." pos "..round(zPos, 3).." vel "..round(velocity, 3).." || "..dumpVelocityValues(bananas));
 		adjustVelMin(testSpace.min, bananas);
 		adjustVelMed(testSpace.med, bananas);
 		adjustVelMax(testSpace.max, bananas);

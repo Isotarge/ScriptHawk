@@ -8406,7 +8406,7 @@ function Game.setKrushaColors()
 			texturePointer = getNextTextureRenderer(texturePointer); -- Skip Eyes
 
 			-- 2 Body
-			mainmemory.write_u16_be(texturePointer + obj_model1.texture_renderer.texture_index, TinyBodyColors[math.random(1, #TinyBodyColors)][2]);
+			mainmemory.write_u16_be(texturePointer + obj_model1.texture_renderer.texture_index, KrushaColors[math.random(1, #KrushaColors)][2]);
 		end
 	end
 end
@@ -9996,7 +9996,7 @@ function buildIdentifyMemoryCache()
 		addHeapMetadata(collisionLinkedListPointer, "addressType", 4);
 		for i = 0, collisionListObjectSize - 4, 4 do
 			local object = dereferencePointer(collisionLinkedListPointer + i);
-			local safety = nil;
+			local safety;
 			while isRDRAM(object) do
 				local kong = mainmemory.read_u16_be(object + 0x04);
 				local collisionType = mainmemory.read_u16_be(object + 0x02);

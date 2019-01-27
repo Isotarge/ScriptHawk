@@ -1097,7 +1097,10 @@ function checkFlagArray()
 		if flag_Array[1] ~= nil then -- flag array populated
 			for i = 1, flag_block_size do
 				local currentFlagState = mainmemory.readbyte(flag_start + i);
-				local flag_name = flagBlock[i].name or "Unknown ("..toHexString(i)..")";
+				local flag_name = "Unknown ("..toHexString(i)..")";
+				if flagBlock[i] ~= nil then
+					flag_name = flagBlock[i].name;
+				end
 				if flag_Array[i] ~= currentFlagState then -- Flag has changed states
 					if currentFlagState == 1 then
 						print("'"..flag_name.."' has been SET on frame "..currentFrame);
@@ -1126,7 +1129,10 @@ function setFlag(offset)
 	local flag_start = dereferencePointer(Game.Memory.flag_pointer);
 	if isRDRAM(flag_start) then
 		mainmemory.writebyte(flag_start + offset, 1);
-		local flag_name = flagBlock[offset].name or "Unknown ("..toHexString(offset)..")";
+		local flag_name = "Unknown ("..toHexString(offset)..")";
+		if flagBlock[offset] ~= nil then
+			flag_name = flagBlock[offset].name;
+		end
 		print("Set flag '"..flag_name.."'");
 	end
 end
@@ -1135,7 +1141,10 @@ function clearFlag(offset)
 	local flag_start = dereferencePointer(Game.Memory.flag_pointer);
 	if isRDRAM(flag_start) then
 		mainmemory.writebyte(flag_start + offset, 0);
-		local flag_name = flagBlock[offset].name or "Unknown ("..toHexString(offset)..")";
+		local flag_name = "Unknown ("..toHexString(offset)..")";
+		if flagBlock[offset] ~= nil then
+			flag_name = flagBlock[offset].name;
+		end
 		print("Cleared flag '"..flag_name.."'");
 	end
 end

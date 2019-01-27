@@ -2267,7 +2267,7 @@ function ScriptHawk.drawHitboxes()
 				end
 			end
 
-			local renderedText = nil;
+			local renderedText;
 			local isStaticText = false;
 			if mouseIsOnScreen and (mouse.X >= x1 and mouse.X <= x2) and (mouse.Y >= y1 and mouse.Y <= y2) then
 				if hitbox.draggable and startDrag then

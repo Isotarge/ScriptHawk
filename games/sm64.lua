@@ -271,7 +271,7 @@ function Game.drawUI()
 	end
 end
 
-function incrementObjectIndex()
+local function incrementObjectIndex()
 	if ScriptHawk.UI.ischecked("Enable Object Analyzer") then
 		objectIndex = objectIndex + 1;
 		if objectIndex >= numObjects then
@@ -280,7 +280,7 @@ function incrementObjectIndex()
 	end
 end
 
-function decrementObjectIndex()
+local function decrementObjectIndex()
 	if ScriptHawk.UI.ischecked("Enable Object Analyzer") then
 		objectIndex = objectIndex - 1;
 		if objectIndex < 0 then

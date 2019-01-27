@@ -334,7 +334,7 @@ local function pickRandomMove(player)
 		rightMoveable = isMoveable(x + 1, y, player);
 
 		timeout = timeout + 1;
-	until (currentColumnHeight == maxColumnHeight or math.random(1,2) == 1) and (leftMoveable and rightMoveable and (left ~= 0x00 or right ~= 0x00) and left ~= right) or timeout > 100;
+	until (currentColumnHeight == maxColumnHeight or math.random(1, 2) == 1) and (leftMoveable and rightMoveable and (left ~= 0x00 or right ~= 0x00) and left ~= right) or timeout > 100;
 
 	if timeout <= 100 then
 		moveQueue[player] = {};

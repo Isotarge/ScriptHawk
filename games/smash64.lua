@@ -200,8 +200,8 @@ local player_fields = {
 	InvinvibilityState = 0x5AC, -- u16_be
 	hurtbox_lower_Stomach = 0x5BC,
 	hurtbox_head = 0x5E8,
-	hurtbox_upper_right_arm = 0x614,
-	hurtbox_upper_right_arm = 0x640,
+	hurtbox_upper_right_arm = 0x614, -- TODO: Which one is correct?
+	hurtbox_upper_right_arm = 0x640, -- TODO: Which one is correct?
 	hurtbox_upper_left_arm = 0x66C,
 	hurtbox_lower_right_arm = 0x698,
 	hurtbox_lower_left_arm = 0x6C4,
@@ -263,7 +263,7 @@ local player_fields = {
 	ShowHitbox = 0xB4C, -- u32_be
 };
 
-movement_states = {
+local movement_states = {
 	[0x00] = "Dying (Down)", [0x01] = "Dying (Side)", [0x02] = "Dying (Up far)", [0x03] = "Dying (Up near)", [0x05] = "Appearing",
 	[0x07] = "Reviving", [0x08] = "Spawning", [0x09] = "Standing on Spawning Platform",
 	[0x0A] = "Standing", [0x0B] = "Walking slowly", [0x0C] = "Walking", [0x0D] = "Walking quickly",
@@ -335,7 +335,7 @@ movement_states = {
 	[0xDA] = "Miss Landing hardly", [0xDB] = "Miss Landing softly",
 };
 
-character_states = {
+local character_states = {
 	[0x00] = { -- Mario
 		[0xDC] = "Jab 3",
 		[0xDE] = "Appearing",
@@ -765,8 +765,7 @@ function Game.getBoomerang(player)
 end
 
 function Game.getBoomerangOSD(player)
-	local projectileObject = nil;
-	local projectileObject2 = nil;
+	local projectileObject, projectileObject2;
 	local positionObject = nil;
 	local timer1 = 0;
 	local timer2 = 0;
@@ -786,7 +785,7 @@ function Game.getBoomerangOSD(player)
 	return toHexString(positionObject).." ("..timer1..", "..timer2..")";
 end
 
-boomerangState = {
+local boomerangState = {
 	{ prev_position = {x = 0, y = 0}, d = {x = 0, y = 0} },
 	{ prev_position = {x = 0, y = 0}, d = {x = 0, y = 0} },
 	{ prev_position = {x = 0, y = 0}, d = {x = 0, y = 0} },
