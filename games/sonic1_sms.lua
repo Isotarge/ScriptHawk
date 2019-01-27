@@ -374,6 +374,7 @@ function Game.getHitboxes()
 	for i = 1, 32 do
 		local objectBase = Game.Memory.object_array_base + 0x1A * (i - 1);
 		local hitbox = {
+			index = i - 1,
 			dragTag = objectBase,
 			type = mainmemory.readbyte(objectBase + object_fields.type),
 			x = Game.read_u16_8(objectBase + object_fields.x_position),
@@ -397,7 +398,7 @@ function Game.getHitboxes()
 end
 
 function Game.getHitboxListText(hitbox)
-	return hitbox.name.." - x: "..round(hitbox.x)..", y:"..round(hitbox.y).." - "..toHexString(hitbox.dragTag);
+	return hitbox.name.." - x: "..round(hitbox.x)..", y:"..round(hitbox.y).." - "..toHexString(hitbox.dragTag).." - "..hitbox.index;
 end
 
 function Game.setHitboxPosition(hitbox, x, y)
