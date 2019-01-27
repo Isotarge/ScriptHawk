@@ -114,7 +114,7 @@ local function toggleDisplayMode()
 	end
 end
 
-locsl displayEmptySectors = true;
+local displayEmptySectors = true;
 local function toggleDisplayEmptySectors()
 	displayEmptySectors = not displayEmptySectors;
 end

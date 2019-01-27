@@ -72,7 +72,7 @@ local Game = {
 	speedy_speeds = { 0.1 },
 };
 
-car = {
+local car = {
 	-- TODO: Fill in fields
 	car_type = 0x00, -- u32_le -- TODO: Catalog these values and figure out how to read car name as string from game
 	color = 0x04, -- u32_le
@@ -118,7 +118,7 @@ car = {
 	cleanliness = 0xA2, -- u16_le
 };
 
-active_car = { -- TODO: Find velocity, angles, etc
+local active_car = { -- TODO: Find velocity, angles, etc
 	x_position = 0x00, -- signed fixed point 20.12 little endian
 	y_position = 0x08, -- signed fixed point 20.12 little endian
 	z_position = 0x04, -- signed fixed point 20.12 little endian
@@ -197,7 +197,7 @@ NTSC 1.0 NTSC 1.1 NTSC 1.2 Japanese PAL      Description
 801cd050 801cd3c0 801cd5f0 801cda50 801cd620 HP - [R] - auto
 --]]
 
-parts_purchased = {
+local parts_purchased = {
 	{byte=0x00, bit=0, name="ASM Controller"},
 	{byte=0x00, bit=1, name="Brakes: Sports"},
 	{byte=0x00, bit=2, name="Brakes: Balance Controller"},
@@ -357,7 +357,7 @@ function Game.checkPart(byte, bit, carIndex)
 	return check_bit(currentValue, bit);
 end
 
-cachedParts = nil;
+local cachedParts = nil;
 function checkParts(carIndex)
 	if carIndex == nil then
 		carIndex = Game.getCurrentCar();
@@ -393,7 +393,7 @@ function checkParts(carIndex)
 	cachedParts = currentParts;
 end
 
-cachedCar = nil;
+local cachedCar = nil;
 function checkCar()
 	local currentCar = Game.getCurrentCar();
 	local carBase = Game.getGaragedCar(currentCar);
@@ -401,7 +401,7 @@ function checkCar()
 		print("Error finding car in RAM.");
 		return;
 	end
-	local currentCar = mainmemory.readbyterange(carBase, Game.Memory.car_size);
+	currentCar = mainmemory.readbyterange(carBase, Game.Memory.car_size);
 	if cachedCar == nil then
 		cachedCar = currentCar;
 		print("Car cached, run again after buying a part.");

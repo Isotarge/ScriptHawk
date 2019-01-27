@@ -385,8 +385,9 @@ end
 -- CONSOLE MODE --
 ------------------
 
+local console_mode = 0;
 function Game.toggleConsoleMode()
-	if console_mode == 0 or console_mode == nil then
+	if console_mode == 0 then
 		console_mode = 1;
 	elseif console_mode == 1 then
 		console_mode = 2;
@@ -421,6 +422,8 @@ function Game.getConsoleMode()
 end
 
 -- List of edits to make more accurate to N64 or PC release
+local twirlStoredY;
+local roll_count = 0;
 function Game.applyConsoleSettings()
 	local animation_value = mainmemory.readbyte(Game.Memory.jim_pointer + jim.animation);
 	local animation_frame = mainmemory.read_u16_be(Game.Memory.jim_pointer + jim.animation_timer);
@@ -448,10 +451,6 @@ function Game.applyConsoleSettings()
 
 	if roll_cap then -- NO HYPEREXTENDED ROLL (NOT EVEN ON PC, JUST AN EMU BUG)
 		if animation_value == 25 and movement_value == 16 then
-			if roll_count == nil then
-				roll_count = 0;
-			end
-
 			if animation_frame == 21 then
 				roll_count = roll_count + 1;
 				if roll_count == 8 then
@@ -581,8 +580,8 @@ Game.BossCamLockOffset = {
 function Game.killBoss()
 	local BossCamLockOffSet = Game.BossCamLockOffset[mainmemory.readbyte(Game.Memory.current_map)];
 	if BossCamLockOffSet ~= nil then
-		camlock_address = dereferencePointer(Game.Memory.flag_pointer) + BossCamLockOffSet;
-		bossdeath_address = dereferencePointer(Game.Memory.jim_pointer + jim.boss_pointer) + 0xE73;
+		local camlock_address = dereferencePointer(Game.Memory.flag_pointer) + BossCamLockOffSet;
+		local bossdeath_address = dereferencePointer(Game.Memory.jim_pointer + jim.boss_pointer) + 0xE73;
 		mainmemory.writebyte(camlock_address, 1);
 		mainmemory.writebyte(bossdeath_address, 1);
 	else
@@ -616,21 +615,21 @@ local function getObjectCount()
 	return math.min(255, mainmemory.readbyte(Game.Memory.object_count) - 1);
 end
 
-function incrementObjectIndex()
+local function incrementObjectIndex()
 	object_index = object_index + 1;
 	if object_index > #object_pointers then
 		object_index = 1;
 	end
 end
 
-function decrementObjectIndex()
+local function decrementObjectIndex()
 	object_index = object_index - 1;
 	if object_index <= 0 then
 		object_index = #object_pointers;
 	end
 end
 
-function switch_grab_script_mode()
+local function switch_grab_script_mode()
 	grab_script_mode_index = grab_script_mode_index + 1;
 	if grab_script_mode_index > #grab_script_modes then
 		grab_script_mode_index = 1;
@@ -700,7 +699,7 @@ local object_properties = {
 
 local function populateObjectM1Pointers()
 	object_pointers = {};
-	obj1_pointers_start = dereferencePointer(Game.Memory.obj1_pointer_list);
+	local obj1_pointers_start = dereferencePointer(Game.Memory.obj1_pointer_list);
 	if isRDRAM (obj1_pointers_start) then
 		for object_no = 0, getObjectCount() do
 			local pointer = dereferencePointer(obj1_pointers_start + (object_no * 0xC0));
@@ -739,8 +738,7 @@ local function getExamineM1Data(pointer)
 	local xPos = mainmemory.readfloat(pointer + object_properties.object_x, true);
 	local yPos = mainmemory.readfloat(pointer + object_properties.object_y, true);
 	local zPos = mainmemory.readfloat(pointer + object_properties.object_z, true);
-	local hasPosition = hasModel or xPos ~= 0 or yPos ~= 0 or zPos ~= 0;
-	local objectVal = getObjectM1Value(pointer)
+	local objectVal = getObjectM1Value(pointer);
 
 	table.insert(examine_data, { "Address", toHexString(objectPointer) });
 	table.insert(examine_data, { "Object Name", getObjectM1NameFromValue(objectVal) });
@@ -795,7 +793,7 @@ end
 
 local function populateObjectM2Pointers()
 	object_pointers = {};
-	obj2_pointers_start = dereferencePointer(Game.Memory.obj2_pointer_list);
+	local obj2_pointers_start = dereferencePointer(Game.Memory.obj2_pointer_list);
 	if isRDRAM (obj2_pointers_start) then
 		for object_no = 0, getObjectM2Count() do
 			local pointer = dereferencePointer(obj2_pointers_start + (object_no * 0x4));
@@ -809,23 +807,16 @@ local function populateObjectM2Pointers()
 end
 
 function getObjectM2Value(pointer)
-	traitPtr = dereferencePointer(pointer + object_m2_properties.object_trait_pointer);
-	local hasTrait = traitPtr ~= nil;
-	if hasTrait then
+	local traitPtr = dereferencePointer(pointer + object_m2_properties.object_trait_pointer);
+	local objectM2Value = 0;
+	if traitPtr ~= nil then
 		objectM2Value = mainmemory.read_u16_be(traitPtr + object_m2_properties.traits_list.obj_type);
-	else
-		objectM2Value = 0;
 	end
 	return objectM2Value;
 end
 
 function getObjectM2NameFromValue(value)
-	if type(object_m2_properties.object_types[value]) == 'string' then
-		objname = object_m2_properties.object_types[value];
-	else
-		objname = toHexString(value);
-	end
-	return objname;
+	return object_m2_properties.object_types[value] or toHexString(value);
 end
 
 local function getExamineM2Data(pointer)
@@ -838,7 +829,6 @@ local function getExamineM2Data(pointer)
 	local xPos = mainmemory.readfloat(pointer + object_m2_properties.object_x, true) / 8;
 	local yPos = mainmemory.readfloat(pointer + object_m2_properties.object_y, true) / 8;
 	local zPos = mainmemory.readfloat(pointer + object_m2_properties.object_z, true) / 8;
-	local hasPosition = hasModel or xPos ~= 0 or yPos ~= 0 or zPos ~= 0;
 
 	local traitPointer = dereferencePointer(pointer + object_m2_properties.object_trait_pointer);
 	local texturePointer = dereferencePointer(pointer + object_m2_properties.object_texture_pointer);
@@ -905,7 +895,7 @@ local function drawGrabScriptUI()
 				examine_data = getExamineM2Data(object_pointers[object_index]);
 			end
 
-			pagifyThis(examine_data,40);
+			pagifyThis(examine_data, 40);
 
 			for i = page_finish, page_start + 1, -1 do
 				if examine_data[i][1] ~= "Separator" then
@@ -922,21 +912,18 @@ local function drawGrabScriptUI()
 
 		if string.contains(grab_script_mode, "List") then
 			row = row + 1;
-			pagifyThis(object_pointers,40);
+			pagifyThis(object_pointers, 40);
 			for i = page_finish, page_start + 1, -1 do
 				local color = nil;
 				if object_index == i then
 					color = colors.yellow;
 				end
-				if object_pointers[i] == playerObject then
-					color = colors.green;
-				end
 
 				if string.contains(grab_script_mode, "Model 1") then
-					local objectVal = getObjectM1Value(object_pointers[i] or 0)
+					local objectVal = getObjectM1Value(object_pointers[i] or 0);
 					gui.text(gui_x, gui_y + height * row, i..": "..toHexString(object_pointers[i] or 0, 6).." ("..getObjectM1NameFromValue(objectVal)..")", color, 'bottomright');
 				elseif string.contains(grab_script_mode, "Model 2") then
-					local objectVal = getObjectM2Value(object_pointers[i] or 0)
+					local objectVal = getObjectM2Value(object_pointers[i] or 0);
 					gui.text(gui_x, gui_y + height * row, i..": "..toHexString(object_pointers[i] or 0, 6).." ("..getObjectM2NameFromValue(objectVal)..")", color, 'bottomright');
 				end
 				row = row + 1;
@@ -1069,10 +1056,10 @@ local flagBlock = {
 };
 
 function getFlagTypeCount(flagType)
-	flag_type_count = 0
+	local flag_type_count = 0
 	for i = 1, flag_block_size do
 		if flagBlock[i] ~= nil then -- is a documented flag
-			if flagBlock[i]["type"] == flagType then
+			if flagBlock[i].type == flagType then
 				flag_type_count = flag_type_count + 1;
 			end
 		end
@@ -1081,7 +1068,7 @@ function getFlagTypeCount(flagType)
 end
 
 function getFlagsKnown()
-	flag_count = 0
+	local flag_count = 0
 	for i = 1, flag_block_size do
 		if flagBlock[i] ~= nil then -- is a documented flag
 			flag_count = flag_count + 1;
@@ -1109,12 +1096,8 @@ function checkFlagArray()
 	if isRDRAM(flag_start) then
 		if flag_Array[1] ~= nil then -- flag array populated
 			for i = 1, flag_block_size do
-				currentFlagState = mainmemory.readbyte(flag_start + i);
-				if flagBlock[i] ~= nil then
-					flag_name = flagBlock[i]["name"];
-				else
-					flag_name = "Unknown ("..toHexString(i)..")";
-				end
+				local currentFlagState = mainmemory.readbyte(flag_start + i);
+				local flag_name = flagBlock[i].name or "Unknown ("..toHexString(i)..")";
 				if flag_Array[i] ~= currentFlagState then -- Flag has changed states
 					if currentFlagState == 1 then
 						print("'"..flag_name.."' has been SET on frame "..currentFrame);
@@ -1130,11 +1113,11 @@ end
 function checkFlag(offset)
 	local flag_start = dereferencePointer(Game.Memory.flag_pointer);
 	if isRDRAM(flag_start) then
-		flag_state = mainmemory.readbyte(flag_start + offset);
+		local flag_state = mainmemory.readbyte(flag_start + offset);
 		if flag_state == 1 then
-			print("Flag: '"..flagBlock[offset]["name"].."' is SET");
+			print("Flag: '"..flagBlock[offset].name.."' is SET");
 		else
-			print("Flag: '"..flagBlock[offset]["name"].."' is NOT SET");
+			print("Flag: '"..flagBlock[offset].name.."' is NOT SET");
 		end
 	end
 end
@@ -1143,11 +1126,7 @@ function setFlag(offset)
 	local flag_start = dereferencePointer(Game.Memory.flag_pointer);
 	if isRDRAM(flag_start) then
 		mainmemory.writebyte(flag_start + offset, 1);
-		if flagBlock[offset] ~= nil then
-			flag_name = flagBlock[offset]["name"]
-		else
-			flag_name = "Unknown ("..toHexString(offset)..")"
-		end
+		local flag_name = flagBlock[offset].name or "Unknown ("..toHexString(offset)..")";
 		print("Set flag '"..flag_name.."'");
 	end
 end
@@ -1156,11 +1135,7 @@ function clearFlag(offset)
 	local flag_start = dereferencePointer(Game.Memory.flag_pointer);
 	if isRDRAM(flag_start) then
 		mainmemory.writebyte(flag_start + offset, 0);
-		if flagBlock[offset] ~= nil then
-			flag_name = flagBlock[offset]["name"]
-		else
-			flag_name = "Unknown ("..toHexString(offset)..")"
-		end
+		local flag_name = flagBlock[offset].name or "Unknown ("..toHexString(offset)..")";
 		print("Cleared flag '"..flag_name.."'");
 	end
 end
@@ -1168,7 +1143,7 @@ end
 function setFlagByName(name_string)
 	for i = 1, flag_block_size do
 		if flagBlock[i] ~= nil then
-			if flagBlock[i]["name"] == name_string then
+			if flagBlock[i].name == name_string then
 				setFlag(i);
 			end
 		end
@@ -1178,7 +1153,7 @@ end
 function clearFlagByName(name_string)
 	for i = 1, flag_block_size do
 		if flagBlock[i] ~= nil then
-			if flagBlock[i]["name"] == name_string then
+			if flagBlock[i].name == name_string then
 				clearFlag(i);
 			end
 		end
@@ -1188,7 +1163,7 @@ end
 function checkFlagByName(name_string)
 	for i = 1, flag_block_size do
 		if flagBlock[i] ~= nil then
-			if flagBlock[i]["name"] == name_string then
+			if flagBlock[i].name == name_string then
 				checkFlag(i);
 			end
 		end
@@ -1198,7 +1173,7 @@ end
 function setFlagsByType(type_string)
 	for i = 1, flag_block_size do
 		if flagBlock[i] ~= nil then
-			if flagBlock[i]["type"] == type_string then
+			if flagBlock[i].type == type_string then
 				setFlag(i);
 			end
 		end
@@ -1208,7 +1183,7 @@ end
 function clearFlagsByType(type_string)
 	for i = 1, flag_block_size do
 		if flagBlock[i] ~= nil then
-			if flagBlock[i]["type"] == type_string then
+			if flagBlock[i].type == type_string then
 				checkFlag(i);
 			end
 		end
@@ -1233,12 +1208,12 @@ function flagStats()
 end
 
 function getFlagNameArray()
-	flagNameBlock = {}
-	j = 0;
+	local flagNameBlock = {}
+	local j = 0;
 	for i = 1, flag_block_size do
 		if flagBlock[i] ~= nil then
 			j = j + 1;
-			flagNameBlock[j] = flagBlock[i]["name"];
+			flagNameBlock[j] = flagBlock[i].name;
 		end
 	end
 	return flagNameBlock;
@@ -1263,7 +1238,6 @@ ScriptHawk.bindKeyRealtime("H", decrementPage, true);
 ScriptHawk.bindKeyRealtime("J", incrementPage, true);
 ScriptHawk.bindKeyRealtime("C", switch_grab_script_mode, true);
 
-local labelValue = 0;
 function Game.initUI()
 	if not TASSafe then
 		ScriptHawk.UI.button(5, 4, {4, 10}, nil, "Reload Map (Soft)", "Reload Map", Game.reloadMap);
@@ -1281,8 +1255,7 @@ function Game.initUI()
 		ScriptHawk.UI.button(10, 7, {4, 10}, nil, "Check Flag Button", "Check Flag", flagCheckButtonHandler);
 	end
 
-	getFlagNameArray();
-	ScriptHawk.UI.form_controls["Flag Dropdown"] = forms.dropdown(ScriptHawk.UI.options_form, flagNameBlock, ScriptHawk.UI.col(0) + ScriptHawk.UI.dropdown_offset, ScriptHawk.UI.row(7) + ScriptHawk.UI.dropdown_offset, ScriptHawk.UI.col(9) + 8, ScriptHawk.UI.button_height);
+	ScriptHawk.UI.form_controls["Flag Dropdown"] = forms.dropdown(ScriptHawk.UI.options_form, getFlagNameArray(), ScriptHawk.UI.col(0) + ScriptHawk.UI.dropdown_offset, ScriptHawk.UI.row(7) + ScriptHawk.UI.dropdown_offset, ScriptHawk.UI.col(9) + 8, ScriptHawk.UI.button_height);
 	ScriptHawk.UI.checkbox(10, 6, "realtime_flags", "Realtime Flags", true);
 	flagStats();
 end

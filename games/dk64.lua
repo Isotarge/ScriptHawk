@@ -10377,7 +10377,7 @@ function identifyMemory(address, findReferences, reuseCache, suppressPrint)
 				if isRDRAM(object) then
 					table.insert(addressInfo, "The address you passed points to a collision linked list!");
 					table.insert(addressInfo, "Iterating through and checking what's in that list:");
-					local safety = nil;
+					local safety;
 					local cachedCollision = identifyMemoryCache.model2CollisionCache[object];
 					while type(cachedCollision) == "table" do
 						table.insert(addressInfo, toHexString(object)..": "..cachedCollision.collisionType..", Kong: "..toHexString(cachedCollision.kong));
