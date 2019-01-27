@@ -2731,7 +2731,7 @@ function Game.predictZip()
 	local floor = Game.getFloor();
 	local yPos = Game.getYPosition();
 	local yVel = Game.getYVelocity();
-	local yPosRelativeToFloor = 0;
+	local yPosRelativeToFloor;
 	local inAir = mainmemory.read_u32_be(Game.Memory.current_movement_state) == 36;
 
 	Game.zipPredicted = false;

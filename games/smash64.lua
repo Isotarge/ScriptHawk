@@ -1109,7 +1109,7 @@ local boomerangOSD = {
 	},
 };
 
-function buildOSD(OSDBools, OSDCharacters)
+local function buildOSD(OSDBools, OSDCharacters)
 	local OSD = {
 		--{"Match Settings", Game.getMatchSettings},
 		--{"Separator"},

@@ -492,6 +492,8 @@ end
 -- Bot --
 ---------
 
+local bot_is_running = false;
+local bot_is_outputting_best_input = false;
 local screenshot_next_frame = false;
 
 local startFrame = 1;
@@ -506,15 +508,15 @@ local last2Frame;
 -- State for best attempt
 local bestLastPauseFrame;
 local bestLast2Frame;
-local bestNumPresed;
+local bestNumPressed;
 local bestDistribution;
 
-function initBotInput()
+local function initBotInput()
 	lastPauseFrame = startFrame - 2;
 	last2Frame = start2Frame - 1;
 end
 
-function iterateBotInput()
+local function iterateBotInput()
 	last2Frame = last2Frame + 1;
 	if last2Frame > resetFrame then
 		last2Frame = start2Frame - 1;
@@ -523,18 +525,18 @@ function iterateBotInput()
 	return not (lastPauseFrame > checkFrame);
 end
 
-function countNumPressed(lastPauseFrame, last2Frame)
+local function countNumPressed(lastPauseFrame, last2Frame)
 	return ((lastPauseFrame - startFrame) / 2) + ((last2Frame - startFrame) / 2);
 end
 
-function checkBestAttempt()
+local function checkBestAttempt()
 	-- First attempt will be the baseline
 	if bestLastPauseFrame == nil then
 		return true;
 	end
 
 	local currentDistribution = Game.getPieceDistribution();
-	local currentNumPressed = countNumPressed(lastPauseFrame, last2Frame);
+	--local currentNumPressed = countNumPressed(lastPauseFrame, last2Frame);
 
 	if currentDistribution > 0 and currentDistribution < bestDistribution then
 		print("Best input beaten with new distribution: "..currentDistribution);
@@ -543,7 +545,7 @@ function checkBestAttempt()
 	return false;
 end
 
-function updateBestAttempt()
+local function updateBestAttempt()
 	bestDistribution = Game.getPieceDistribution();
 
 	-- Copy state for best attempt
@@ -557,13 +559,27 @@ function updateBestAttempt()
 	bestNumPressed = countNumPressed(bestLastPauseFrame, bestLast2Frame);
 end
 
-function clearBestAttempt()
+local function clearBestAttempt()
 	bestLastPauseFrame = nil;
 	bestLast2Frame = nil;
 	bestDistribution = 100;
 end
 
-function botLoop()
+local function startBot()
+	--resetFrame = tonumber(forms.gettext(ScriptHawk.UI.form_controls.resetFrameBox));
+	forms.setproperty(ScriptHawk.UI.form_controls["Toggle Overlay Checkbox"], "Checked", false);
+	checkFrame = resetFrame + 13;
+	bot_is_running = true;
+	bot_is_outputting_best_input = false;
+	lastPauseFrame = nil;
+	last2Frame = nil;
+	tastudio.setrecording(true);
+	tastudio.setplayback(startFrame - 1);
+	client.unpause();
+	Game.OSD = Game.botOSD;
+end
+
+local function botLoop()
 	if screenshot_next_frame then
 		return;
 	end
@@ -636,20 +652,6 @@ function botLoop()
 	else
 		Game.OSD = Game.standardOSD;
 	end
-end
-
-function startBot()
-	--resetFrame = tonumber(forms.gettext(ScriptHawk.UI.form_controls.resetFrameBox));
-	forms.setproperty(ScriptHawk.UI.form_controls["Toggle Overlay Checkbox"], "Checked", false);
-	checkFrame = resetFrame + 13;
-	bot_is_running = true;
-	bot_is_outputting_best_input = false;
-	lastPauseFrame = nil;
-	last2Frame = nil;
-	tastudio.setrecording(true);
-	tastudio.setplayback(startFrame - 1);
-	client.unpause();
-	Game.OSD = Game.botOSD;
 end
 
 function Game.initUI()

@@ -24,7 +24,7 @@ local inputs = {};
 
 -- State for best attempt
 local bestInputs;
-local bestNumPresed;
+local bestNumPressed;
 local bestXPosition;
 local bestVelocityGround;
 local bestVelocityAerial;

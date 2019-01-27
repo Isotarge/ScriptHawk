@@ -435,12 +435,12 @@ function Game.drawUI()
 end
 --]]
 
-function systemBusToROM(bank, address)
+local function systemBusToROM(bank, address)
 	local bankSize = 0x4000;
 	return bank * bankSize + address - 0x8000;
 end
 
-function glitchyBusRead(bank, address)
+local function glitchyBusRead(bank, address)
 	-- Clamp address to system bus
 	address = bit.band(address, 0xFFFF);
 
@@ -453,7 +453,7 @@ function glitchyBusRead(bank, address)
 	return memory.readbyte(systemBusToROM(bank, address), "ROM");
 end
 
-function computeSolidityValue(tileIndex, bank, startOffset)
+local function computeSolidityValue(tileIndex, bank, startOffset)
 	local solidityDataIndex = mainmemory.readbyte(Game.Memory.solidity_data_index);
 
 	local hl = Game.Memory.solidity_data_start_system_bus + 2 * solidityDataIndex;
