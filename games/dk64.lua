@@ -120,7 +120,7 @@ local Game = {
 		tb_void_byte = {0x7FBB63, 0x7FBA83, 0x7FBFD3, 0x7B5B13}, -- byte, bitfield -- TODO: Document remaining values
 		player_pointer = {0x7FBB4C, 0x7FBA6C, 0x7FBFBC, 0x7B5AFC},
 		camera_pointer = {0x7FB968, 0x7FB888, 0x7FBDD8, 0x7B5918},
-		pointer_list = {0x7FBFF0, 0x7FBF10, 0x7FC460, 0x7B5E58},
+		actor_pointer_array = {0x7FBFF0, 0x7FBF10, 0x7FC460, 0x7B5E58},
 		actor_count = {0x7FC3F0, 0x7FC310, 0x7FC860, 0x7B6258},
 		heap_pointer = {0x7F0990, 0x7F08B0, 0x7F0E00, 0x7A12C0},
 		heap_end = {0x561FA0, 0x55AFA0, 0x55F7A0, 0x4D7DB0},
@@ -6138,7 +6138,7 @@ end
 -- TODO: Fix the frame delay for this
 function Game.detonateLiveOranges()
 	for actorListIndex = 0, getObjectModel1Count() do
-		local pointer = dereferencePointer(Game.Memory.pointer_list + (actorListIndex * 4));
+		local pointer = dereferencePointer(Game.Memory.actor_pointer_array + (actorListIndex * 4));
 		if isRDRAM(pointer) then
 			local actorType = mainmemory.read_u16_be(pointer + obj_model1.actor_type);
 			if actorType == 41 then -- Orange
@@ -6253,7 +6253,7 @@ end
 
 local function getMadJack()
 	for object_no = 0, getObjectModel1Count() do
-		local pointer = dereferencePointer(Game.Memory.pointer_list + (object_no * 4));
+		local pointer = dereferencePointer(Game.Memory.actor_pointer_array + (object_no * 4));
 		if isRDRAM(pointer) and getActorName(pointer) == "Mad Jack" then
 			return pointer;
 		end
@@ -6350,15 +6350,6 @@ end
 -- Written by theballaam96, 2019 --
 -----------------------------------
 
-function getTagBarrelObject()
-	for object_no = 0, getObjectModel1Count() do
-		local pointer = dereferencePointer(Game.Memory.pointer_list + (object_no * 4));
-		if isRDRAM(pointer) and getActorName(pointer) == "Tag Barrel (King Kut Out)" then
-			return pointer;
-		end
-	end
-end
-
 -- Static Data
 local kko = {
 	minimap_x_offset = 19,
@@ -6394,10 +6385,19 @@ kko.icon_x        = math.floor(kko.minimap_width / 4);
 kko.icon_y        = math.floor(kko.minimap_height / 4);
 kko.text_x        = (2 * kko.minimap_x_offset) + kko.minimap_width;
 
+function kko.getTagBarrelObject()
+	for object_no = 0, getObjectModel1Count() do
+		local pointer = dereferencePointer(Game.Memory.actor_pointer_array + (object_no * 4));
+		if isRDRAM(pointer) and getActorName(pointer) == "Tag Barrel (King Kut Out)" then
+			return pointer;
+		end
+	end
+end
+
 function Game.drawKutOutMinimap()
 	-- Only draw minimap if the player is in the King Kut Out fight
 	if Game.version ~= 4 and map_value == 199 then
-		local tagBarrelObject = getTagBarrelObject();
+		local tagBarrelObject = kko.getTagBarrelObject();
 		if tagBarrelObject ~= nil then
 			--local kong_active = mainmemory.readbyte(tagBarrelObject + 0x154);
 			local kko_state_timer = mainmemory.readbyte(tagBarrelObject + 0x189);
@@ -6624,7 +6624,7 @@ end
 
 local function displacementDetection()
 	for i = 0, getObjectModel1Count() do
-		local objectPointer = dereferencePointer(Game.Memory.pointer_list + (i * 4));
+		local objectPointer = dereferencePointer(Game.Memory.actor_pointer_array + (i * 4));
 		if isRDRAM(objectPointer) then
 			detectDisplacement(objectPointer);
 		end
@@ -6685,7 +6685,7 @@ function everythingIsKong(unsafe)
 	local cameraObject = dereferencePointer(Game.Memory.camera_pointer);
 
 	for actorListIndex = 0, getObjectModel1Count() do
-		local pointer = dereferencePointer(Game.Memory.pointer_list + (actorListIndex * 4));
+		local pointer = dereferencePointer(Game.Memory.actor_pointer_array + (actorListIndex * 4));
 		if isRDRAM(pointer) and (pointer ~= cameraObject) then
 			local modelPointer = dereferencePointer(pointer + obj_model1.model_pointer);
 			if isRDRAM(modelPointer) then
@@ -6730,7 +6730,7 @@ function Game.paperMode()
 	local cameraObject = dereferencePointer(Game.Memory.camera_pointer);
 
 	for actorListIndex = 0, getObjectModel1Count() do
-		local pointer = dereferencePointer(Game.Memory.pointer_list + (actorListIndex * 4));
+		local pointer = dereferencePointer(Game.Memory.actor_pointer_array + (actorListIndex * 4));
 
 		if isRDRAM(pointer) and pointer ~= cameraObject then
 			local objectRenderingParameters = dereferencePointer(pointer + obj_model1.rendering_parameters_pointer);
@@ -7003,7 +7003,7 @@ end
 function FTA.freeTradeObjectModel1(currentKong)
 	if currentKong >= DK and currentKong <= Chunky then
 		for object_no = 0, getObjectModel1Count() do
-			local pointer = dereferencePointer(Game.Memory.pointer_list + (object_no * 4));
+			local pointer = dereferencePointer(Game.Memory.actor_pointer_array + (object_no * 4));
 			if isRDRAM(pointer) then
 				local actorType = mainmemory.read_u16_be(pointer + obj_model1.actor_type);
 				if FTA.isKasplat(actorType) then
@@ -7390,7 +7390,7 @@ local function populateObjectModel1Pointers()
 	if isRDRAM(playerObject) and isRDRAM(cameraObject) then
 		if encircle_enabled then
 			for object_no = 0, getObjectModel1Count() do
-				local pointer = dereferencePointer(Game.Memory.pointer_list + (object_no * 4));
+				local pointer = dereferencePointer(Game.Memory.actor_pointer_array + (object_no * 4));
 				if isRDRAM(pointer) and pointer ~= playerObject then
 					local modelPointer = dereferencePointer(pointer + obj_model1.model_pointer);
 					if isRDRAM(modelPointer) then
@@ -7400,7 +7400,7 @@ local function populateObjectModel1Pointers()
 			end
 		else
 			for object_no = 0, getObjectModel1Count() do
-				local pointer = dereferencePointer(Game.Memory.pointer_list + (object_no * 4));
+				local pointer = dereferencePointer(Game.Memory.actor_pointer_array + (object_no * 4));
 				if isRDRAM(pointer) then
 					table.insert(object_pointers, pointer);
 				end
@@ -7460,7 +7460,7 @@ koshBot = {
 
 koshBot.getKoshController = function()
 	for object_no = 0, getObjectModel1Count() do
-		local pointer = dereferencePointer(Game.Memory.pointer_list + (object_no * 4));
+		local pointer = dereferencePointer(Game.Memory.actor_pointer_array + (object_no * 4));
 		if getActorName(pointer) == "Kremling Kosh Controller" then
 			return pointer;
 		end
@@ -9416,7 +9416,7 @@ RRRGGGBB
 11111100 - FC - Yellow
 --]]
 
-addressColors = {
+local addressColors = {
 	[0] = 0x00, -- BLACK    - Unknown
 	[1] = 0x1C, -- GREEN    - Free Memory
 	[2] = 0xFC, -- YELLOW   - Framebuffer/Textures
@@ -9484,15 +9484,13 @@ function buildIdentifyMemoryCache()
 	};
 
 	-- Cache framebuffers
-	if not addressFound then -- TODO: addressFound might be null here, not global
-		local frameBuffer = dereferencePointer(Game.Memory.framebuffer_pointer);
-		if isRDRAM(frameBuffer) then
-			table.insert(identifyMemoryCache.frameBuffers, {base=frameBuffer, width=320, height=240, bpp=16});
-		end
-		frameBuffer = dereferencePointer(Game.Memory.framebuffer_pointer + 4);
-		if isRDRAM(frameBuffer) then
-			table.insert(identifyMemoryCache.frameBuffers, {base=frameBuffer, width=320, height=240, bpp=16});
-		end
+	local frameBuffer = dereferencePointer(Game.Memory.framebuffer_pointer);
+	if isRDRAM(frameBuffer) then
+		table.insert(identifyMemoryCache.frameBuffers, {base=frameBuffer, width=320, height=240, bpp=16});
+	end
+	frameBuffer = dereferencePointer(Game.Memory.framebuffer_pointer + 4);
+	if isRDRAM(frameBuffer) then
+		table.insert(identifyMemoryCache.frameBuffers, {base=frameBuffer, width=320, height=240, bpp=16});
 	end
 
 	-- Cache heap
@@ -9544,7 +9542,7 @@ function buildIdentifyMemoryCache()
 
 	-- Cache model 1
 	for object_no = 0, 255 do
-		local pointerAddress = Game.Memory.pointer_list + (object_no * 4);
+		local pointerAddress = Game.Memory.actor_pointer_array + (object_no * 4);
 		local actor = dereferencePointer(pointerAddress);
 		if isRDRAM(actor) then
 			local actorName = getActorName(actor);
@@ -9689,52 +9687,50 @@ function buildIdentifyMemoryCache()
 	end
 
 	-- Cache model 2
-	if not addressFound then
-		local objModel2Array = getObjectModel2Array();
-		if isRDRAM(objModel2Array) then
-			local numSlots = mainmemory.read_u32_be(Game.Memory.obj_model2_array_count);
-			local arraySize = getObjectModel2ArraySize();
-			addHeapMetadata(objModel2Array, "description", "Object Model 2 Array ("..numSlots.."/"..arraySize..")");
-			addHeapMetadata(objModel2Array, "isObjectModel2Array", true);
-			addHeapMetadata(objModel2Array, "addressFound", true);
-			addHeapMetadata(objModel2Array, "addressType", 4);
-			addHeapMetadata(objModel2Array, "numSlots", numSlots);
-			addHeapMetadata(objModel2Array, "arraySize", arraySize);
-			for i = 0, numSlots - 1 do
-				local slotBase = objModel2Array + i * obj_model2_slot_size;
-				local objectName = getScriptName(slotBase);
-				local modelPointer = dereferencePointer(slotBase + obj_model2.behavior_type_pointer);
-				if isRDRAM(modelPointer) then
-					addHeapMetadata(modelPointer, "description", "Display List: "..objectName);
-					addHeapMetadata(modelPointer, "isObjectModel2DisplayList", true);
-					addHeapMetadata(modelPointer, "addressFound", true);
-					addHeapMetadata(modelPointer, "addressType", 4);
-					addHeapMetadata(modelPointer, "associatedModel2Object", slotBase);
-					addHeapMetadata(modelPointer, "associatedModel2ObjectName", objectName);
-				end
-				-- BehaviorObject
-				local activationScript = dereferencePointer(slotBase + obj_model2.behavior_pointer);
-				if isRDRAM(activationScript) then
-					addHeapMetadata(activationScript, "description", "Behavior Script (First): "..objectName);
+	local objModel2Array = getObjectModel2Array();
+	if isRDRAM(objModel2Array) then
+		local numSlots = mainmemory.read_u32_be(Game.Memory.obj_model2_array_count);
+		local arraySize = getObjectModel2ArraySize();
+		addHeapMetadata(objModel2Array, "description", "Object Model 2 Array ("..numSlots.."/"..arraySize..")");
+		addHeapMetadata(objModel2Array, "isObjectModel2Array", true);
+		addHeapMetadata(objModel2Array, "addressFound", true);
+		addHeapMetadata(objModel2Array, "addressType", 4);
+		addHeapMetadata(objModel2Array, "numSlots", numSlots);
+		addHeapMetadata(objModel2Array, "arraySize", arraySize);
+		for i = 0, numSlots - 1 do
+			local slotBase = objModel2Array + i * obj_model2_slot_size;
+			local objectName = getScriptName(slotBase);
+			local modelPointer = dereferencePointer(slotBase + obj_model2.behavior_type_pointer);
+			if isRDRAM(modelPointer) then
+				addHeapMetadata(modelPointer, "description", "Display List: "..objectName);
+				addHeapMetadata(modelPointer, "isObjectModel2DisplayList", true);
+				addHeapMetadata(modelPointer, "addressFound", true);
+				addHeapMetadata(modelPointer, "addressType", 4);
+				addHeapMetadata(modelPointer, "associatedModel2Object", slotBase);
+				addHeapMetadata(modelPointer, "associatedModel2ObjectName", objectName);
+			end
+			-- BehaviorObject
+			local activationScript = dereferencePointer(slotBase + obj_model2.behavior_pointer);
+			if isRDRAM(activationScript) then
+				addHeapMetadata(activationScript, "description", "Behavior Script (First): "..objectName);
+				addHeapMetadata(activationScript, "isBehaviorScript", true);
+				addHeapMetadata(activationScript, "addressFound", true);
+				addHeapMetadata(activationScript, "addressType", 4);
+				addHeapMetadata(activationScript, "topLevel", true);
+				addHeapMetadata(activationScript, "associatedModel2Object", slotBase);
+				addHeapMetadata(activationScript, "associatedModel2ObjectName", objectName);
+				-- BehaviorScript
+				activationScript = dereferencePointer(activationScript + 0xA0);
+				while isRDRAM(activationScript) do
+					addHeapMetadata(activationScript, "description", "Behavior Script: "..objectName);
 					addHeapMetadata(activationScript, "isBehaviorScript", true);
 					addHeapMetadata(activationScript, "addressFound", true);
 					addHeapMetadata(activationScript, "addressType", 4);
-					addHeapMetadata(activationScript, "topLevel", true);
+					addHeapMetadata(activationScript, "topLevel", false);
 					addHeapMetadata(activationScript, "associatedModel2Object", slotBase);
 					addHeapMetadata(activationScript, "associatedModel2ObjectName", objectName);
-					-- BehaviorScript
-					activationScript = dereferencePointer(activationScript + 0xA0);
-					while isRDRAM(activationScript) do
-						addHeapMetadata(activationScript, "description", "Behavior Script: "..objectName);
-						addHeapMetadata(activationScript, "isBehaviorScript", true);
-						addHeapMetadata(activationScript, "addressFound", true);
-						addHeapMetadata(activationScript, "addressType", 4);
-						addHeapMetadata(activationScript, "topLevel", false);
-						addHeapMetadata(activationScript, "associatedModel2Object", slotBase);
-						addHeapMetadata(activationScript, "associatedModel2ObjectName", objectName);
-						-- Get next script chunk
-						activationScript = dereferencePointer(activationScript + 0x4C);
-					end
+					-- Get next script chunk
+					activationScript = dereferencePointer(activationScript + 0x4C);
 				end
 			end
 		end
@@ -9989,32 +9985,30 @@ function buildIdentifyMemoryCache()
 	end
 
 	-- Cache object model 2 collisions
-	if not addressFound then
-		local collisionLinkedListPointer = dereferencePointer(Game.Memory.obj_model2_collision_linked_list_pointer);
-		if isRDRAM(collisionLinkedListPointer) then
-			local collisionListObjectSize = mainmemory.read_u32_be(collisionLinkedListPointer + heap.object_size);
-			addHeapMetadata(collisionLinkedListPointer, "description", "Collision Index");
-			addHeapMetadata(collisionLinkedListPointer, "isCollisionLinkedListObject", true);
-			addHeapMetadata(collisionLinkedListPointer, "addressFound", true);
-			addHeapMetadata(collisionLinkedListPointer, "addressType", 4);
-			for i = 0, collisionListObjectSize - 4, 4 do
-				local object = dereferencePointer(collisionLinkedListPointer + i);
-				local safety = nil;
-				while isRDRAM(object) do
-					local kong = mainmemory.read_u16_be(object + 0x04);
-					local collisionType = mainmemory.read_u16_be(object + 0x02);
-					if obj_model2.object_types[collisionType] ~= nil then
-						collisionType = obj_model2.object_types[collisionType];
-					else
-						collisionType = toHexString(collisionType, 4);
-					end
-					safety = dereferencePointer(object + 0x18); -- Get next object
-					identifyMemoryCache.model2CollisionCache[object] = {block=object, next=safety, kong=kong, collisionType=collisionType};
-					if safety == object or safety == collisionLinkedListPointer - 0x10 then -- Prevent infinite loops
-						break;
-					end
-					object = safety;
+	local collisionLinkedListPointer = dereferencePointer(Game.Memory.obj_model2_collision_linked_list_pointer);
+	if isRDRAM(collisionLinkedListPointer) then
+		local collisionListObjectSize = mainmemory.read_u32_be(collisionLinkedListPointer + heap.object_size);
+		addHeapMetadata(collisionLinkedListPointer, "description", "Collision Index");
+		addHeapMetadata(collisionLinkedListPointer, "isCollisionLinkedListObject", true);
+		addHeapMetadata(collisionLinkedListPointer, "addressFound", true);
+		addHeapMetadata(collisionLinkedListPointer, "addressType", 4);
+		for i = 0, collisionListObjectSize - 4, 4 do
+			local object = dereferencePointer(collisionLinkedListPointer + i);
+			local safety = nil;
+			while isRDRAM(object) do
+				local kong = mainmemory.read_u16_be(object + 0x04);
+				local collisionType = mainmemory.read_u16_be(object + 0x02);
+				if obj_model2.object_types[collisionType] ~= nil then
+					collisionType = obj_model2.object_types[collisionType];
+				else
+					collisionType = toHexString(collisionType, 4);
 				end
+				safety = dereferencePointer(object + 0x18); -- Get next object
+				identifyMemoryCache.model2CollisionCache[object] = {block=object, next=safety, kong=kong, collisionType=collisionType};
+				if safety == object or safety == collisionLinkedListPointer - 0x10 then -- Prevent infinite loops
+					break;
+				end
+				object = safety;
 			end
 		end
 	end
@@ -10185,8 +10179,8 @@ function identifyMemory(address, findReferences, reuseCache, suppressPrint)
 				addressType = 2;
 				skipToAddress = frameBuffer.base + frameBuffer.width * frameBuffer.height * (frameBuffer.bpp / 8);
 				local fbOffset = address - frameBuffer.base;
-				xPixel = (fbOffset / (frameBuffer.bpp / 8)) % frameBuffer.width;
-				yPixel = math.floor(fbOffset / (frameBuffer.width * (frameBuffer.bpp / 8)));
+				local xPixel = (fbOffset / (frameBuffer.bpp / 8)) % frameBuffer.width;
+				local yPixel = math.floor(fbOffset / (frameBuffer.width * (frameBuffer.bpp / 8)));
 				table.insert(addressInfo, "This address is in the first framebuffer! "..toHexString(frameBuffer.base).." + "..toHexString(fbOffset));
 				table.insert(addressInfo, "Pixel Coords: X: "..xPixel..", Y:"..yPixel);
 				break;
@@ -10513,7 +10507,7 @@ function identifyMemory(address, findReferences, reuseCache, suppressPrint)
 	-- Detect actor pointer list
 	if not addressFound then
 		for object_no = 0, 255 do
-			local pointerAddress = Game.Memory.pointer_list + (object_no * 4);
+			local pointerAddress = Game.Memory.actor_pointer_array + (object_no * 4);
 			if address_4byte_align == pointerAddress then
 				table.insert(addressInfo, "Pointer number "..object_no.." in the actor pointer list. Value is "..toHexString(pointerAddress, 8));
 				addressFound = true;
@@ -10617,7 +10611,7 @@ function Game.drawHeap()
 		local dump_block_list = ScriptHawk.UI.isChecked("Heap Visualizer Dump Blocks");
 		local free_only = ScriptHawk.UI.isChecked("Heap Visualizer Free Only");
 
-		local next_addr, blocksize, block_end, next_free, prev_free, in_use;
+		local next_addr, blocksize, block_end, next_free, prev_free, in_use, bgcolor;
 
 		while addr >= dynamic_memory_start and addr <= dynamic_memory_end do
 			next_addr = mainmemory.read_u32_be(addr);

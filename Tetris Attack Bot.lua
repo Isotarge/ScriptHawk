@@ -316,9 +316,8 @@ end
 
 local function pickRandomMove(player)
 	local timeout = 0;
-	local x, y, left, right, leftMoveable, rightMoveable;
+	local x, y, left, right, leftMoveable, rightMoveable, currentColumnHeight;
 	local maxColumnHeight = getMaxColumnHeight(player, false);
-	local currentColumnHeight = -1;
 	repeat
 		x = math.random(1, grid_width);
 		y = math.random(1, grid_height);

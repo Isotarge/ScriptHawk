@@ -38,13 +38,18 @@ local Game = {
 		flag_pointer = {0x0E9F08, 0x0EBD68},
 		marble_count = {0x0E9FF3, nil},
 	},
+	speedy_speeds = {.001, .01, .1, .5, 1, 2, 5, 10, 20},
+	speedy_index = 7,
+	speedy_invert_LR = true,
+	rot_speed = 10,
+	max_rot_units = 360,
 };
 
 --------------------
 -- Jim Parameters --
 --------------------
 
-jim = {
+local jim = {
 	y_rotation_1 = 0x000, -- Float
 	y_rotation_2 = 0x008, -- Float
 	x_position = 0x030, -- Float
@@ -72,7 +77,7 @@ jim = {
 -- Gun Parameters --
 --------------------
 
-gun = {
+local gun = {
 	red_gun = 0x000,
 	bubble_gun = 0x018,
 	rockets = 0x030,
@@ -92,7 +97,7 @@ gun = {
 -- Boss Parameters --
 ---------------------
 
-boss = {
+local boss = {
 	player_marbles = 0xDFC,
 	player_egoboosts = 0xDFD,
 	player_missiles = 0xDFE,
@@ -100,14 +105,6 @@ boss = {
 	boss_egoboosts = 0xE49,
 	boss_missiles = 0xE4A,
 };
-
--------------------
--- Physics/Scale --
--------------------
-
-Game.speedy_speeds = {.001, .01, .1, .5, 1, 2, 5, 10, 20 };
-Game.speedy_index = 7;
-Game.speedy_invert_LR = 1;
 
 --------------
 -- Position --
@@ -145,18 +142,14 @@ end
 -- Rotation --
 --------------
 
-Game.rot_speed = 10;
-Game.max_rot_units = 360;
-
-function Game.calculateAngle(angle1,angle2)
+function Game.calculateAngle(angle1, angle2)
 	angle_1 = 90 * (angle1 + 1);
 
 	if angle2 < 0 then
-		angle = (angle_1 * (0 - 1)) - 90;
+		return (angle_1 * (0 - 1)) - 90;
 	else
-		angle = (angle_1 - 90);
+		return (angle_1 - 90);
 	end
-	return angle;
 end
 
 function Game.getXRotation()
@@ -166,7 +159,7 @@ end
 function Game.getYRotation()
 	local angle1 = mainmemory.readfloat(Game.Memory.jim_pointer + jim.y_rotation_1, true);
 	local angle2 = mainmemory.readfloat(Game.Memory.jim_pointer + jim.y_rotation_2, true);
-	return Game.calculateAngle(angle1,angle2);
+	return Game.calculateAngle(angle1, angle2);
 end
 
 function Game.getZRotation()
@@ -358,18 +351,20 @@ end
 -- FREE ROAM MODE --
 --------------------
 
+local YStored; -- TODO: Put these in the Game table
+local isYStored = false;
+
 function Game.freeroamEnabled()
-	if IsYStored ~= 1 then
+	if not isYStored then
 		YStored = Game.getYPosition();
-		IsYStored = 1;
+		isYStored = true;
 	end
 
 	-- detect if L to Levitate
-	joypad_pressed = {};
-	input_pressed = {};
-	joypad_pressed = joypad.getimmediate();
-	input_pressed = input.get();
-	lbutton_pressed = joypad_pressed[ScriptHawk.lbutton.joypad] or input_pressed[ScriptHawk.lbutton.key];
+	-- TODO: ScriptHawk should probably expose whether it's d-padding or levitating to game modules actually, hmm...
+	local joypad_pressed = joypad.getimmediate();
+	local input_pressed = input.get();
+	local lbutton_pressed = joypad_pressed[ScriptHawk.lbutton.joypad] or input_pressed[ScriptHawk.lbutton.key];
 	if lbutton_pressed then
 		YStored = Game.getYPosition() + Game.speedy_speeds[Game.speedy_index];
 	end
@@ -383,7 +378,7 @@ function Game.freeroamEnabled()
 end
 
 function Game.freeroamDisabled()
-	IsYStored = 0;
+	isYStored = false;
 end
 
 ------------------
@@ -421,14 +416,13 @@ function Game.getConsoleMode()
 	end
 end
 
+-- List of edits to make more accurate to N64 or PC release
 function Game.applyConsoleSettings()
-	-- List of edits to make more accurate to N64 or PC release
+	local animation_value = mainmemory.readbyte(Game.Memory.jim_pointer + jim.animation);
+	local animation_frame = mainmemory.read_u16_be(Game.Memory.jim_pointer + jim.animation_timer);
+	local movement_value = mainmemory.readbyte(Game.Memory.jim_pointer + jim.movement);
 
 	if twirl_yFreeze == 1 then	-- NO TWIRL HEIGHT GAIN
-		animation_value = mainmemory.readbyte(Game.Memory.jim_pointer + jim.animation);
-		animation_frame = mainmemory.read_u16_be(Game.Memory.jim_pointer + jim.animation_timer);
-		movement_value = mainmemory.readbyte(Game.Memory.jim_pointer + jim.movement);
-
 		if animation_value == 29 and movement_value == 20 then
 			if twirlStoredY == nil then
 				if Game.version == 1 then -- US
@@ -464,7 +458,7 @@ function Game.applyConsoleSettings()
 		end
 	end
 
-	if walljump_hack == 1 then	-- WALLJUMP
+	if walljump_hack == 1 then -- WALLJUMP
 		if animation_value == 6 and movement_value == 12 then
 			mainmemory.writebyte(Game.Memory.jim_pointer + jim.crouch_available, 1);
 		end
@@ -476,23 +470,23 @@ end
 ---------------
 
 function Game.applyInfinites()
-	max_ammo_red_gun = 250;
-	max_ammo_bubble_gun = 50;
-	max_ammo_rockets = 25;
-	max_ammo_flamethrower = 50;
-	max_ammo_bananamyte = 1;
-	max_ammo_laser = 6;
-	max_ammo_pea = 50;
-	max_ammo_egg = 25;
-	max_ammo_fakegun = 0;
-	max_ammo_magnum = 50;
-	max_ammo_disco = 6;
-	max_ammo_knife = 1;
-	max_ammo_leprechaun = 5;
-	max_lives = 3;
-	max_health = 100;
-	max_missiles = 2;
-	max_egoboosts = 2;
+	local max_ammo_red_gun = 250;
+	local max_ammo_bubble_gun = 50;
+	local max_ammo_rockets = 25;
+	local max_ammo_flamethrower = 50;
+	local max_ammo_bananamyte = 1;
+	local max_ammo_laser = 6;
+	local max_ammo_pea = 50;
+	local max_ammo_egg = 25;
+	local max_ammo_fakegun = 0;
+	local max_ammo_magnum = 50;
+	local max_ammo_disco = 6;
+	local max_ammo_knife = 1;
+	local max_ammo_leprechaun = 5;
+	local max_lives = 3;
+	local max_health = 100;
+	local max_missiles = 2;
+	local max_egoboosts = 2;
 
 	-------------------
 	-- Set Infinites --

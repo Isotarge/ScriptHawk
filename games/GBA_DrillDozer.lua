@@ -169,8 +169,8 @@ local movementStates = {
 	[0x51] = "Drill Socket: Idle (R)",
 
 	[0x57] = "Swimming: Idle (L)",
-	[0x58] = "Swimming: Idle (R)",
-	[0x58] = "Swimming Up (R)",
+	[0x58] = "Swimming: Idle (R)", -- TODO: Which is 0x58?
+	[0x58] = "Swimming Up (R)", -- TODO: Which is 0x58?
 	[0x59] = "Swimming Up (L)",
 	[0x5A] = "Swimming Down (L)",
 	[0x5B] = "Swimming Down (R)",
@@ -371,7 +371,7 @@ function Game.drawUI()
 				local object_health = memory.read_u16_le(currentSlotBase + 0x56, Game.Memory.object_array.Domain);
 
 				if objectType == 0x77 then
-					local object_health = memory.read_u16_le(currentSlotBase + 0x84, Game.Memory.object_array.Domain);
+					object_health = memory.read_u16_le(currentSlotBase + 0x84, Game.Memory.object_array.Domain);
 					gui.text(Game.OSDPosition[1], 2 + Game.OSDRowHeight * row, actorType.." "..i.." ("..object_health.."): "..toHexString(currentSlotBase or 0), color, 'bottomright');
 					row = row + 1;
 				elseif object_health ~= 0 then

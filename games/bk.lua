@@ -67,6 +67,7 @@ local Game = {
 	speedy_index = 6,
 	rot_speed = 0.5,
 	max_rot_units = 360,
+	form_height = 11,
 	maps = {
 		"SM - Spiral Mountain",
 		"MM - Mumbo's Mountain",
@@ -235,7 +236,6 @@ local script_modes = { --TODO: Object analysis tools state needs to be up here f
 local script_mode_index = 1;
 script_mode = script_modes[script_mode_index];
 
-realtime_flags = true; -- TODO: Move to checkbox
 hide_non_animated = false;
 hide_unknown_structs = true;
 
@@ -1958,7 +1958,7 @@ function setSelectedObjectModel(model_index)
 			local slotBase = objectArray + getSlotBase(object_index - 1);
 			local behavior_pointer = dereferencePointer(slotBase);
 			if isRDRAM(behavior_pointer) then
-				objectModel = mainmemory.read_u16_be(behavior_pointer + 0x3E);
+				local objectModel = mainmemory.read_u16_be(behavior_pointer + 0x3E);
 				objectModel = bit.band(objectModel, 0x0003);
 				objectModel = bit.bor(objectModel, bit.lshift(model_index, 2));
 				mainmemory.write_u16_be(behavior_pointer + 0x3E, objectModel);
@@ -3096,7 +3096,7 @@ function setFlag(flagType, index, suppressPrint)
 		local containingByte = bitfield_pointer + flagByte;
 		local currentValue = mainmemory.readbyte(containingByte);
 		mainmemory.writebyte(containingByte, bit.set(currentValue, flagBit));
-		if realtime_flags and not suppressPrint then
+		if ScriptHawk.UI.ischecked("realtime_flags") and not suppressPrint then
 			checkFlags();
 		end
 	end
@@ -3116,7 +3116,7 @@ function setFlagsByType(flagType)
 			setFlag(flagType, flag.index, true);
 		end
 	end
-	if realtime_flags then
+	if ScriptHawk.UI.ischecked("realtime_flags") then
 		checkFlags();
 	end
 end
@@ -3128,7 +3128,7 @@ function setFlagsByLevel(levelIndex)
 			setFlag(flag.type, flag.index, true);
 		end
 	end
-	if realtime_flags then
+	if ScriptHawk.UI.ischecked("realtime_flags") then
 		checkFlags();
 	end
 end
@@ -3137,7 +3137,7 @@ function setAllFlags()
 	for i = 1, #flag_array do
 		setFlag(flag_array[i].type, flag_array[i].index, true);
 	end
-	if realtime_flags then
+	if ScriptHawk.UI.ischecked("realtime_flags") then
 		checkFlags();
 	end
 end
@@ -3153,7 +3153,7 @@ function clearFlag(flagType, index, suppressPrint)
 		local containingByte = bitfield_pointer + flagByte;
 		local currentValue = mainmemory.readbyte(containingByte);
 		mainmemory.writebyte(containingByte, bit.clear(currentValue, flagBit));
-		if realtime_flags and not suppressPrint then
+		if ScriptHawk.UI.ischecked("realtime_flags") and not suppressPrint then
 			checkFlags();
 		end
 	end
@@ -3173,7 +3173,7 @@ function clearFlagsByType(flagType)
 			clearFlag(flagType, flag.index, true);
 		end
 	end
-	if realtime_flags then
+	if ScriptHawk.UI.ischecked("realtime_flags") then
 		checkFlags();
 	end
 end
@@ -3185,7 +3185,7 @@ function clearFlagsByLevel(levelIndex)
 			clearFlag(flag.type, flag.index, true);
 		end
 	end
-	if realtime_flags then
+	if ScriptHawk.UI.ischecked("realtime_flags") then
 		checkFlags();
 	end
 end
@@ -3194,7 +3194,7 @@ function clearAllFlags()
 	for i = 1, #flag_array do
 		clearFlag(flag_array[i].type, flag_array[i].index, true);
 	end
-	if realtime_flags then
+	if ScriptHawk.UI.ischecked("realtime_flags") then
 		checkFlags();
 	end
 end
@@ -3306,9 +3306,9 @@ end
 
 function Game.initUI()
 	if not TASSafe then
-		ScriptHawk.UI.button(10, 7, {46}, nil, "Set Flag Button", "Set", flagSetButtonHandler);
-		ScriptHawk.UI.button(12, 7, {46}, nil, "Check Flag Button", "Check", flagCheckButtonHandler);
-		ScriptHawk.UI.button(14, 7, {46}, nil, "Clear Flag Button", "Clear", flagClearButtonHandler);
+		ScriptHawk.UI.button(10, 8, {46}, nil, "Set Flag Button", "Set", flagSetButtonHandler);
+		ScriptHawk.UI.button(12, 8, {46}, nil, "Check Flag Button", "Check", flagCheckButtonHandler);
+		ScriptHawk.UI.button(14, 8, {46}, nil, "Clear Flag Button", "Clear", flagClearButtonHandler);
 
 		ScriptHawk.UI.checkbox(0, 6, "toggle_neverslip", "Never Slip");
 		ScriptHawk.UI.checkbox(5, 4, "encircle_checkbox", "Encircle (Beta)");
@@ -3332,12 +3332,13 @@ function Game.initUI()
 		ScriptHawk.UI.button(10, 6, {4, 8}, nil, nil, "Unlock Moves", unlock_moves);
 	else
 		-- Use a bigger check flags button if the others are hidden by TASSafe
-		ScriptHawk.UI.button(10, 7, {4, 10}, nil, "Check Flag Button", "Check Flag", flagCheckButtonHandler);
+		ScriptHawk.UI.button(10, 8, {4, 10}, nil, "Check Flag Button", "Check Flag", flagCheckButtonHandler);
 	end
 
-	ScriptHawk.UI.form_controls["Flag Dropdown"] = forms.dropdown(ScriptHawk.UI.options_form, flag_names, ScriptHawk.UI.col(0) + ScriptHawk.UI.dropdown_offset, ScriptHawk.UI.row(7) + ScriptHawk.UI.dropdown_offset, ScriptHawk.UI.col(9) + 8, ScriptHawk.UI.button_height);
+	ScriptHawk.UI.form_controls["Flag Dropdown"] = forms.dropdown(ScriptHawk.UI.options_form, flag_names, ScriptHawk.UI.col(0) + ScriptHawk.UI.dropdown_offset, ScriptHawk.UI.row(8) + ScriptHawk.UI.dropdown_offset, ScriptHawk.UI.col(9) + 8, ScriptHawk.UI.button_height);
 
 	ScriptHawk.UI.checkbox(10, 4, "autopound_checkbox", "Auto Pound");
+	ScriptHawk.UI.checkbox(10, 7, "realtime_flags", "Realtime Flags", true);
 
 	-- Create Inverse Object_Slot_Variables
 	for k, v in pairs(slot_variables) do
@@ -3356,7 +3357,7 @@ end
 function Game.onLoadState()
 	-- Clear flag block cache
 	flagBlockCache = nil;
-	if realtime_flags then
+	if ScriptHawk.UI.ischecked("realtime_flags") then
 		checkFlags();
 	end
 
@@ -3385,7 +3386,7 @@ function Game.eachFrame()
 		autoPound();
 	end
 
-	if realtime_flags then
+	if ScriptHawk.UI.ischecked("realtime_flags") then
 		checkFlags();
 	end
 

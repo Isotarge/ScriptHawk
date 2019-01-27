@@ -535,7 +535,7 @@ end
 -- Jinjo Dump --
 ----------------
 
-JinjoAddresses = {
+local JinjoAddresses = {
 	{{0x11FA71, 0x11FC31, 0x114E01, 0x11AB41}, "MT: Jade Snake Grove"},
 	{{0x11FA74, 0x11FC34, 0x114E04, 0x11AB44}, "MT: Roof of Stadium"},
 	{{0x11FA77, 0x11FC37, 0x114E07, 0x11AB47}, "MT: Targitzan's Temple"},
@@ -583,7 +583,7 @@ JinjoAddresses = {
 	{{0x11FAF5, 0x11FCB5, 0x114E85, 0x11ABC5}, "IoH: Spiral Mountain"},
 };
 
-JinjoColors = {
+local JinjoColors = {
 	[0] = "White",
 	[1] = "Orange",
 	[2] = "Yellow",
@@ -639,6 +639,7 @@ function getCurrentPattern()
 	return pattern;
 end
 
+-- TODO: Output Jinjo colours & locations in a more readable format
 function printCurrentPattern()
 	local patternString = "{";
 	local pattern = getCurrentPattern();
@@ -741,8 +742,8 @@ end
 
 function Game.getPredictedYPosition()
 	local frameRate = Game.getFrameRate();
-	local gravity = Game.getGravity() / frameRate;
-	return Game.getYPosition() + ((Game.getYVelocity() + gravity) / frameRate);
+	local currentGravity = Game.getGravity() / frameRate;
+	return Game.getYPosition() + ((Game.getYVelocity() + currentGravity) / frameRate);
 end
 
 --------------
@@ -1982,13 +1983,13 @@ local animationList = {
 	[0x375] = "Jumping", -- Weldar
 	[0x376] = "Firing", -- Weldar
 	[0x377] = "Damaged", -- Mingy Jongo
-	[0x378] = "Malfunctioning", -- Mingy Jongo
+	[0x378] = "Malfunctioning", -- Mingy Jongo  -- TODO: Which one is 0x378
 	[0x379] = "Death", -- Mingy Jongo
 	[0x37A] = "Idle", -- Weldar Head
 	[0x37B] = "Dormant", -- Flatso
 	[0x37C] = "Charging", -- Flatso
 	[0x37D] = "Attacking", -- Flatso
-	[0x378] = "Disappearing", -- Flatso
+	[0x378] = "Disappearing", -- Flatso  -- TODO: Which one is 0x378
 
 	[0x389] = "Idle", -- Biggafoot
 
@@ -2378,16 +2379,15 @@ function dumpPointerListStrings()
 	repeat
 		object = dereferencePointer(0x126738 + index * 4);
 		if isRDRAM(object) then
-			local string = "Unknown";
+			local string, checkPointer;
 			local checkPointerOffset = 0x3C;
-			local checkPointer = 0;
 			repeat
 				checkPointerOffset = checkPointerOffset + 4;
 				checkPointer = dereferencePointer(object + checkPointerOffset);
 			until not isRDRAM(checkPointer);
 			string = readNullTerminatedString(object + checkPointerOffset);
 
-			print(index.." "..toHexString(object)..": "..string);
+			print(index.." "..toHexString(object)..": "..string); -- TODO: dprint
 		end
 		index = index + 1;
 	until not isRDRAM(object);
@@ -5154,7 +5154,7 @@ object_model1 = {
 	},
 };
 
-function getNestContentsOSD(value)
+local function getNestContentsOSD(value)
 	local eggType = "Unknown ("..value..")";
 	if object_model1.nest_contents_list[value] ~= nil then
 		eggType = object_model1.nest_contents_list[value];
@@ -5162,7 +5162,7 @@ function getNestContentsOSD(value)
 	return eggType;
 end
 
-function getHandItemSelected(value)
+local function getHandItemSelected(value)
 	local correctedValue = math.floor(value/16);
 	local itemSelected = "Unknown ("..correctedValue..")";
 	if object_model1.hand_item_selected[correctedValue] ~= nil then
@@ -5171,14 +5171,13 @@ function getHandItemSelected(value)
 	return itemSelected;
 end
 
-function getJinjoIdentifierOSD(pointer)
+local function getJinjoIdentifierOSD(pointer)
 	local jinjo_value = mainmemory.readbyte(pointer + object_model1.jinjo_identifier);
+	local jinjo_ident = "Unknown";
 	if jinjo_value == 0 then
 		jinjo_ident = "Minjo (Random)";
 	elseif jinjo_value > 0 and jinjo_value < 46 then
 		jinjo_ident = JinjoAddresses[jinjo_value][2].." ("..JinjoColors[mainmemory.readbyte(JinjoAddresses[jinjo_value][1][Game.version])]..")";
-	else
-		jinjo_ident = "Unknown";
 	end
 	return jinjo_ident;
 end
@@ -5219,7 +5218,7 @@ end
 local script_modes = {
 	"Disabled",
 	"List",
-	"Examine"
+	"Examine",
 };
 
 local script_mode_index = 1;
@@ -5377,8 +5376,8 @@ function Game.drawUI()
 		local page_pos = math.floor((object_index - 1) / max_page_size) + 1;
 		local page_index = max_page_size + object_index - (page_pos * max_page_size);
 
-		if page_pos < page_total
-			then page_size = max_page_size;
+		if page_pos < page_total then
+			page_size = max_page_size;
 		else
 			page_size = numSlots - ((page_total - 1) * max_page_size);
 		end

@@ -130,6 +130,7 @@ local mouse_state = {
 	previous = {},
 	current = {},
 };
+local input_pressed = {};
 local joypad_pressed = {};
 local lbutton_pressed = false;
 local dpad_pressed = {
@@ -597,7 +598,6 @@ local supportedGames = {
 	["84267CE3D86100688048A8D4F166FA1B2D50E6D5"] = {moduleName="games.GBA_Ty2", friendlyName="Ty the Tasmanian Tiger 2 - Bush Rescue (USA,Europe) (En,Fr,De)"},
 
 	-- Tyrants - Fight Through Time (Mega Lo Mania)
-	["F8FBB100227015BE8629243F53D70F29A2A14315"] = {moduleName="games.tftt", friendlyName="Tyrants - Fight Through Time"},
 	["B090D74241CD56820B568C319799412B"] = {moduleName="games.tftt", friendlyName="Tyrants - Fight Through Time (U) [!]"},
 	["1F7DD4DCB076E7AF7E43F01795504C4A"] = {moduleName="games.tftt", friendlyName="Tyrants - Fight Through Time (U) [!]"}, -- Bad dump?
 	["8EBE079DB90BEC1AE3E5CBBBDDF0EC4F3164B191"] = {moduleName="games.tftt", friendlyName="Tyrants - Fight Through Time (U) [!]"}, -- Bad dump?
@@ -1060,8 +1060,8 @@ end
 -- TAStudio Columns --
 ----------------------
 
-TAStudio_column_data = {};
-TAStudio_color_data = {};
+local TAStudio_column_data = {};
+local TAStudio_color_data = {};
 
 -- For older BizHawk versions
 if tastudio.addcolumn == nil then
@@ -2257,10 +2257,10 @@ function ScriptHawk.drawHitboxes()
 
 		if showHitboxes then
 			if mouseIsOnScreen and hitbox.draggable and dragging then
-				for d = 1, #draggedObjects do
-					if draggedObjects[d][1] == hitbox.dragTag then
-						hitbox.x = draggedObjects[d][2] + dragTransform[1];
-						hitbox.y = draggedObjects[d][3] + dragTransform[2];
+				for dragIndex = 1, #draggedObjects do
+					if draggedObjects[dragIndex][1] == hitbox.dragTag then
+						hitbox.x = draggedObjects[dragIndex][2] + dragTransform[1];
+						hitbox.y = draggedObjects[dragIndex][3] + dragTransform[2];
 						Game.setHitboxPosition(hitbox, hitbox.x, hitbox.y);
 						break;
 					end

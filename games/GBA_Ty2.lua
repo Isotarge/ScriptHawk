@@ -405,8 +405,8 @@ function Game.drawUI()
 		local object_list = Game.Memory.object_list_ptr;
 		local objectcount = object_max_slots;
 		local printlist = {};
-		for i = object_top_index-1+objectcount,object_top_index,-1  do
-			currentSlotBase = getObjectSlotBase(i);
+		for i = object_top_index - 1 + objectcount, object_top_index, -1 do
+			local currentSlotBase = getObjectSlotBase(i);
 			if currentSlotBase ~= nil then
 				local actorType = "Unknown";
 				local objectType = memory.read_u32_le(currentSlotBase.Address + 0x04, currentSlotBase.Domain);
