@@ -3613,6 +3613,20 @@ local spawnerAttributes = {
 	scale = 0xF, -- u8
 	tied_actor = 0x18, -- u32
 	movement_box_pointer = 0x1C, -- u32
+	movement_box = {
+		x_pos_0 = 0x0, -- s16
+		z_pos_0 = 0x2, -- s16
+		x_pos_1 = 0x4, -- s16
+		z_pos_1 = 0x6, -- s16
+		aggression_box_pointer = 0xC, -- u32
+		aggression_box = {
+			coords_0 = 0x0,
+			coords_1 = 0x6,
+			coords_2 = 0xC,
+			coords_3 = 0x12,
+			coords_4 = 0x18,
+		},
+	},
 	respawn_timer = 0x24, -- s16
 	chunk = 0x40, -- s16
 };
@@ -3651,6 +3665,7 @@ function getExamineDataSpawners(pointer)
 	local enemyName = getBehaviorNameFromEnemyIndex(enemyType);
 	local tiedActor = dereferencePointer(pointer + spawnerAttributes.tied_actor);
 	local movement_box = dereferencePointer(pointer + spawnerAttributes.movement_box_pointer);
+	aggression_box = dereferencePointer(movement_box + spawnerAttributes.movement_box.aggression_box_pointer);
 
 	table.insert(examine_data, { "Slot base", toHexString(pointer, 6) });
 	table.insert(examine_data, { "Object Name", enemyName });
@@ -3669,24 +3684,49 @@ function getExamineDataSpawners(pointer)
 	table.insert(examine_data, { "Y Rotation", mainmemory.read_s16_be(pointer + spawnerAttributes.y_rot) });
 	table.insert(examine_data, { "Scale", mainmemory.readbyte(pointer + spawnerAttributes.scale) });
 	table.insert(examine_data, { "Respawn Timer", mainmemory.read_s16_be(pointer + spawnerAttributes.respawn_timer) });
+	table.insert(examine_data, { "Chunk", mainmemory.read_s16_be(pointer + spawnerAttributes.chunk) });
 	table.insert(examine_data, { "Separator", 1 });
 
 	if isRDRAM(tiedActor) then
 		local tiedActorNameValue = mainmemory.read_u16_be(tiedActor + obj_model1.actor_type);
 		table.insert(examine_data, { "Tied Actor", toHexString(tiedActor, 6) });
 		table.insert(examine_data, { "Tied Actor Name", getActorNameFromBehavior(tiedActorNameValue) });
+		table.insert(examine_data, { "Separator", 1 });
 	end
 
 	if isRDRAM(movement_box) then
-		local movement_box_x_low = mainmemory.read_s16_be(movement_box + 0x0);
-		local movement_box_x_high = mainmemory.read_s16_be(movement_box + 0x4);
+		local movement_box_x_low = mainmemory.read_s16_be(movement_box + spawnerAttributes.movement_box.x_pos_0);
+		local movement_box_x_high = mainmemory.read_s16_be(movement_box + spawnerAttributes.movement_box.x_pos_1);
 		local movement_box_x = movement_box_x_low..", "..movement_box_x_high;
-		local movement_box_z_low = mainmemory.read_s16_be(movement_box + 0x2);
-		local movement_box_z_high = mainmemory.read_s16_be(movement_box + 0x6);
+		local movement_box_z_low = mainmemory.read_s16_be(movement_box + spawnerAttributes.movement_box.z_pos_0);
+		local movement_box_z_high = mainmemory.read_s16_be(movement_box + spawnerAttributes.movement_box.z_pos_1);
 		local movement_box_z = movement_box_z_low..", "..movement_box_z_high;
 		table.insert(examine_data, { "Movement Box Pointer", toHexString(movement_box, 6) });
 		table.insert(examine_data, { "Movement Box X", movement_box_x });
 		table.insert(examine_data, { "Movement Box Z", movement_box_z });
+		table.insert(examine_data, { "Separator", 1 });
+	end
+	
+	if isRDRAM(aggression_box) then
+		coords_0_string = mainmemory.read_s16_be(aggression_box + spawnerAttributes.movement_box.aggression_box.coords_0);
+		coords_1_string = mainmemory.read_s16_be(aggression_box + spawnerAttributes.movement_box.aggression_box.coords_1);
+		coords_2_string = mainmemory.read_s16_be(aggression_box + spawnerAttributes.movement_box.aggression_box.coords_2);
+		coords_3_string = mainmemory.read_s16_be(aggression_box + spawnerAttributes.movement_box.aggression_box.coords_3);
+		coords_4_string = mainmemory.read_s16_be(aggression_box + spawnerAttributes.movement_box.aggression_box.coords_4);
+		for i = 1, 2 do
+			coords_0_string = coords_0_string..","..mainmemory.read_s16_be(aggression_box + spawnerAttributes.movement_box.aggression_box.coords_0 + (2 * i));
+			coords_1_string = coords_1_string..","..mainmemory.read_s16_be(aggression_box + spawnerAttributes.movement_box.aggression_box.coords_1 + (2 * i));
+			coords_2_string = coords_2_string..","..mainmemory.read_s16_be(aggression_box + spawnerAttributes.movement_box.aggression_box.coords_2 + (2 * i));
+			coords_3_string = coords_3_string..","..mainmemory.read_s16_be(aggression_box + spawnerAttributes.movement_box.aggression_box.coords_3 + (2 * i));
+			coords_4_string = coords_4_string..","..mainmemory.read_s16_be(aggression_box + spawnerAttributes.movement_box.aggression_box.coords_4 + (2 * i));
+		end
+		table.insert(examine_data, { "Aggression Box Pointer", toHexString(aggression_box, 6) });
+		table.insert(examine_data, { "Co-ords Set 1", coords_0_string });
+		table.insert(examine_data, { "Co-ords Set 2", coords_1_string });
+		table.insert(examine_data, { "Co-ords Set 3", coords_2_string });
+		table.insert(examine_data, { "Co-ords Set 4", coords_3_string });
+		table.insert(examine_data, { "Co-ords Set 5", coords_4_string });
+		table.insert(examine_data, { "Separator", 1 });
 	end
 
 	return examine_data;
