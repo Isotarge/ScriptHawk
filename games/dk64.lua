@@ -3665,7 +3665,7 @@ function getExamineDataSpawners(pointer)
 	local enemyName = getBehaviorNameFromEnemyIndex(enemyType);
 	local tiedActor = dereferencePointer(pointer + spawnerAttributes.tied_actor);
 	local movement_box = dereferencePointer(pointer + spawnerAttributes.movement_box_pointer);
-	aggression_box = dereferencePointer(movement_box + spawnerAttributes.movement_box.aggression_box_pointer);
+	local aggression_box = dereferencePointer(movement_box + spawnerAttributes.movement_box.aggression_box_pointer);
 
 	table.insert(examine_data, { "Slot base", toHexString(pointer, 6) });
 	table.insert(examine_data, { "Object Name", enemyName });
@@ -3706,13 +3706,13 @@ function getExamineDataSpawners(pointer)
 		table.insert(examine_data, { "Movement Box Z", movement_box_z });
 		table.insert(examine_data, { "Separator", 1 });
 	end
-	
+
 	if isRDRAM(aggression_box) then
-		coords_0_string = mainmemory.read_s16_be(aggression_box + spawnerAttributes.movement_box.aggression_box.coords_0);
-		coords_1_string = mainmemory.read_s16_be(aggression_box + spawnerAttributes.movement_box.aggression_box.coords_1);
-		coords_2_string = mainmemory.read_s16_be(aggression_box + spawnerAttributes.movement_box.aggression_box.coords_2);
-		coords_3_string = mainmemory.read_s16_be(aggression_box + spawnerAttributes.movement_box.aggression_box.coords_3);
-		coords_4_string = mainmemory.read_s16_be(aggression_box + spawnerAttributes.movement_box.aggression_box.coords_4);
+		local coords_0_string = mainmemory.read_s16_be(aggression_box + spawnerAttributes.movement_box.aggression_box.coords_0);
+		local coords_1_string = mainmemory.read_s16_be(aggression_box + spawnerAttributes.movement_box.aggression_box.coords_1);
+		local coords_2_string = mainmemory.read_s16_be(aggression_box + spawnerAttributes.movement_box.aggression_box.coords_2);
+		local coords_3_string = mainmemory.read_s16_be(aggression_box + spawnerAttributes.movement_box.aggression_box.coords_3);
+		local coords_4_string = mainmemory.read_s16_be(aggression_box + spawnerAttributes.movement_box.aggression_box.coords_4);
 		for i = 1, 2 do
 			coords_0_string = coords_0_string..","..mainmemory.read_s16_be(aggression_box + spawnerAttributes.movement_box.aggression_box.coords_0 + (2 * i));
 			coords_1_string = coords_1_string..","..mainmemory.read_s16_be(aggression_box + spawnerAttributes.movement_box.aggression_box.coords_1 + (2 * i));
