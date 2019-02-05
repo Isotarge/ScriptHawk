@@ -566,6 +566,10 @@ local supportedGames = {
 	["DC13A61EAFE75C13C15B5ECE419AC57B"] = {moduleName="games.sonic1_sms", friendlyName="Sonic The Hedgehog (UE)", version=1},
 	["4187D96BEAF36385E681A3CF3BD1663D"] = {moduleName="games.sonic1_sms", friendlyName="Sonic The Hedgehog (E) (BIOS)", version=1},
 
+	-- Sonic The Hedgehog 2 (SMS)
+	["BF3B7A41E7DA9DE23416473A33C6AC2B"] = {moduleName="games.sonic2_sms", friendlyName="Sonic The Hedgehog 2 (E)"},
+	["0AC157B6B7E839953FC8EBA7538FB74A"] = {moduleName="games.sonic2_sms", friendlyName="Sonic The Hedgehog 2 (E) (Rev 1)"},
+
 	-- Space Station Silicon Valley
 	["E5E09205AA743A9E5043A42DF72ADC379C746B0B"] = {moduleName="games.sssv", friendlyName="Space Station Silicon Valley (USA)", version=1},
 	["23710541BB3394072740B0F0236A7CB1A7D41531"] = {moduleName="games.sssv", friendlyName="Space Station Silicon Valley (Europe) (En,Fr,De)", version=2},
