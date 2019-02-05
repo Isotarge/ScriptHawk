@@ -56,6 +56,7 @@ if result == true then
 			gui.cleartext();
 			--gui.clearGraphics();
 			ScriptHawk.UI.updateReadouts();
+			ScriptHawk.modifyOSDUI.updateReadouts();
 			ScriptHawk.drawHitboxes();
 			Game.drawUI();
 		end
