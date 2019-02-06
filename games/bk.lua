@@ -2853,6 +2853,31 @@ function Game.getVelocity() -- Calculated VXZ
 	return math.sqrt(vX*vX + vZ*vZ);
 end
 
+function Game.clearAverageVelocity()
+	Game.totalVelocity = 0;
+	Game.previousFrame = 0;
+	Game.currentFrame = 0;
+	Game.framesPassed = 0;
+end
+Game.clearAverageVelocity();
+ScriptHawk.bindKeyRealtime("Slash", Game.clearAverageVelocity, true);
+
+function Game.updateAverageVelocity()
+	Game.previousFrame = Game.currentFrame;
+	Game.currentFrame = emu.framecount();
+	if Game.currentFrame == Game.previousFrame + 1 then
+		Game.framesPassed = Game.framesPassed + 1;
+		Game.totalVelocity = Game.totalVelocity + Game.getVelocity();
+	end
+end
+
+function Game.getAverageVelocity()
+	if Game.totalVelocity == 0 or Game.framesPassed == 0 then
+		return 0;
+	end
+	return Game.totalVelocity / Game.framesPassed;
+end
+
 -------------------------------------
 -- Freeze Clip Velocity            --
 -- Written by Isotarge, 2015-2016  --
@@ -3367,6 +3392,7 @@ function Game.onLoadState()
 end
 
 function Game.eachFrame()
+	Game.updateAverageVelocity();
 	updateWave();
 	freezeClipVelocity();
 
@@ -3445,6 +3471,7 @@ Game.OSD = {
 	{"Separator"},
 	{"Y Velocity", Game.getYVelocity, Game.colorYVelocity, category="speed"},
 	{"Velocity", Game.getVelocity, category="speed"};
+	{"Avg Velocity", Game.getAverageVelocity, category="speed"};
 	{"dY", category="positionStats"},
 	{"dXZ", category="positionStats"},
 	{"Separator"},
