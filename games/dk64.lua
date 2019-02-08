@@ -3611,6 +3611,7 @@ local spawnerAttributes = {
 	y_pos = 0x6, -- s16
 	z_pos = 0x8, -- s16
 	scale = 0xF, -- u8
+	spawn_trigger = 0x13, -- u8
 	tied_actor = 0x18, -- u32
 	movement_box_pointer = 0x1C, -- u32
 	movement_box = {
@@ -3683,6 +3684,7 @@ function getExamineDataSpawners(pointer)
 
 	table.insert(examine_data, { "Y Rotation", mainmemory.read_s16_be(pointer + spawnerAttributes.y_rot) });
 	table.insert(examine_data, { "Scale", mainmemory.readbyte(pointer + spawnerAttributes.scale) });
+	table.insert(examine_data, { "Spawn Trigger", mainmemory.readbyte(pointer + spawnerAttributes.spawn_trigger) });
 	table.insert(examine_data, { "Respawn Timer", mainmemory.read_s16_be(pointer + spawnerAttributes.respawn_timer) });
 	table.insert(examine_data, { "Chunk", mainmemory.read_s16_be(pointer + spawnerAttributes.chunk) });
 	table.insert(examine_data, { "Separator", 1 });
