@@ -3630,6 +3630,7 @@ local spawnerAttributes = {
 	},
 	respawn_timer = 0x24, -- s16
 	chunk = 0x40, -- s16
+	alternative_enemy_spawn = 0x44,
 };
 
 function getExamineDataArcade(pointer)
@@ -3664,19 +3665,27 @@ function getExamineDataSpawners(pointer)
 
 	local enemyType = mainmemory.readbyte(pointer + spawnerAttributes.enemy_value);
 	local enemyName = getBehaviorNameFromEnemyIndex(enemyType);
+	local alt_enemyType = mainmemory.readbyte(pointer + spawnerAttributes.alternative_enemy_spawn);
+	local alt_enemyName = getBehaviorNameFromEnemyIndex(alt_enemyType);
 	local tiedActor = dereferencePointer(pointer + spawnerAttributes.tied_actor);
 	local movement_box = dereferencePointer(pointer + spawnerAttributes.movement_box_pointer);
 	local aggression_box = dereferencePointer(movement_box + spawnerAttributes.movement_box.aggression_box_pointer);
 
 	table.insert(examine_data, { "Slot base", toHexString(pointer, 6) });
 	table.insert(examine_data, { "Object Name", enemyName });
-	table.insert(examine_data, { "Object Type", enemyType });
+	table.insert(examine_data, { "Object Type", toHexString(enemyType) });
 	if enemyType == 0x50 then
 		local cutsceneModelIndex = mainmemory.readbyte(pointer + 0x0A);
 		table.insert(examine_data, { "Cutscene Model", getModelNameFromCutsceneIndex(cutsceneModelIndex) });
 	end
 	table.insert(examine_data, { "Separator", 1 });
 
+	if enemyType ~= alt_enemyType then
+		table.insert(examine_data, { "Alt. Spawn Object Name", alt_enemyName });
+		table.insert(examine_data, { "Alt. Spawn Object Type", toHexString(alt_enemyType) });
+		table.insert(examine_data, { "Separator", 1 });
+	end
+	
 	table.insert(examine_data, { "X", mainmemory.read_s16_be(pointer + spawnerAttributes.x_pos) });
 	table.insert(examine_data, { "Y", mainmemory.read_s16_be(pointer + spawnerAttributes.y_pos) });
 	table.insert(examine_data, { "Z", mainmemory.read_s16_be(pointer + spawnerAttributes.z_pos) });
