@@ -1575,7 +1575,8 @@ local function saveUserPreferences()
 		local file = io.open('user_preferences.lua', "w");
 		file:write("userPreferences={\n");
 		for moduleName, userPreference in pairs(userPreferences) do
-			file:write("\t"..moduleName.."={\n");
+			local shouldWriteModule = false;
+			local preferencesString = "\t"..moduleName.."={\n";
 			for OSDType, preference in pairs(userPreference) do
 				local valueToWrite = "true";
 				if preference == nil then
@@ -1584,10 +1585,14 @@ local function saveUserPreferences()
 					valueToWrite = "false";
 				end
 				if userPreferences[moduleName][OSDType] ~= defaultPreferences[moduleName][OSDType] then
-					file:write("\t\t"..OSDType.."="..valueToWrite..",\n");
+					shouldWriteModule = true;
+					preferencesString = preferencesString.."\t\t"..OSDType.."="..valueToWrite..",\n";
 				end
 			end
-			file:write("\t},\n");
+			if shouldWriteModule then
+				preferencesString = preferencesString.."\t},\n";
+				file:write(preferencesString);
+			end
 		end
 		file:write("};\n");
 		file:close();
@@ -1938,7 +1943,18 @@ local function plot_pos()
 	end
 
 	if not isLagged then
-		if not exactlyOneFrameHasPassed then
+		if exactlyOneFrameHasPassed then
+			dx = x - prev_x;
+			dy = y - prev_y;
+			dz = z - prev_z;
+			d = math.sqrt(dx*dx + dz*dz);
+
+			odometer = odometer + d;
+			max_dx = math.max(max_dx, math.abs(dx));
+			max_dy = math.max(max_dy, math.abs(dy));
+			max_dz = math.max(max_dz, math.abs(dz));
+			max_d = math.max(max_d, d);
+		else
 			dx = 0;
 			dy = 0;
 			dz = 0;
@@ -1946,22 +1962,6 @@ local function plot_pos()
 			max_dy = 0.0;
 			max_dz = 0.0;
 			max_d = 0.0;
-		else
-			dx = x - prev_x;
-			dy = y - prev_y;
-			dz = z - prev_z;
-		end
-
-		d = math.sqrt(dx*dx + dz*dz);
-		odometer = odometer + d;
-
-		max_dx = math.max(max_dx, math.abs(dx));
-		max_dy = math.max(max_dy, math.abs(dy));
-		max_dz = math.max(max_dz, math.abs(dz));
-		max_d = math.max(max_d, d);
-		if not exactlyOneFrameHasPassed then
-			max_dx = 0; max_dy = 0; max_dz = 0;
-			max_d = 0;
 		end
 
 		if ScriptHawk.smooth_moving_angle == true then

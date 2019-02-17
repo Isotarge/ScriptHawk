@@ -3,8 +3,6 @@
 - Better High DPI support
 	- Editing ScriptHawk.UI.button_height does a [decent job](https://twitter.com/Isotarge/status/963992829746855937), but it's not perfect
 - Blank template that's more lightweight
-- Remove blank entries from user_preferences.lua
-	- If entry is blank for a module, don't write it to file on save
 - Allow modules to save extra settings via UserPreferences system
 - Save and Load ScriptHawk settings using UserPreferences system
 	- Joypad/Keyboard binds for D-Pad and L Button
