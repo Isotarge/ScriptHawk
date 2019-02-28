@@ -2028,6 +2028,7 @@ obj_model1 = {
 		Lanky_actor_pointer = 0x188,
 		Tiny_actor_pointer = 0x18C,
 		Chunky_actor_pointer = 0x190,
+		y_oscillation_point = 0x19C,
 		kickout_timer = 0x1B4, -- Kicks the player out of the tag barrel at >= 9000
 	},
 	text_overlay = {
@@ -2234,6 +2235,9 @@ local function getExamineDataModelOne(pointer)
 		table.insert(examine_data, { "TB current index", mainmemory.readbyte(pointer + obj_model1.tag_barrel.current_index) });
 		table.insert(examine_data, { "TB previous index", mainmemory.readbyte(pointer + obj_model1.tag_barrel.previous_index) });
 		table.insert(examine_data, { "TB kickout timer", mainmemory.read_u32_be(pointer + obj_model1.tag_barrel.kickout_timer) });
+		table.insert(examine_data, { "Separator", 1 });
+		
+		table.insert(examine_data, { "Y Oscillation Point", mainmemory.readfloat(pointer + obj_model1.tag_barrel.y_oscillation_point,true) });
 		table.insert(examine_data, { "Separator", 1 });
 
 		table.insert(examine_data, { "DK Actor Pointer", toHexString(mainmemory.read_u32_be(pointer + obj_model1.tag_barrel.DK_actor_pointer)) });
@@ -3450,6 +3454,26 @@ local function getSpawnSnagCheck(pointer)
 	return 0;
 end
 
+local function getSnagResetTrigger(pointer)
+	local behaviorPointer = dereferencePointer(pointer + obj_model2.behavior_pointer);
+	if isRDRAM(behaviorPointer) then
+		local snagResetTrigger = mainmemory.readbyte(behaviorPointer + 0x9B);
+		local snagCheck = getSpawnSnagCheck(pointer);
+		if snagCheck == "Done" then
+			if snagResetTrigger == 2 then
+				return "Every LZ";
+			elseif snagResetTrigger == 0 then
+				return "Level Re-entry";
+			else
+				return "Unknown";
+			end
+		else
+			return "Unknown";
+		end
+	end
+	return 0;
+end
+
 local function getGrabKong(pointer)
 	if isRDRAM(pointer) then
 		local grabKongByte = mainmemory.readbyte(pointer + 0x8C) % 32;
@@ -3560,6 +3584,10 @@ local function getExamineDataModelTwo(pointer)
 
 	if getSpawnSnagCheck(pointer) ~= 0 then
 		table.insert(examine_data, { "Snag Check", getSpawnSnagCheck(pointer)});
+	end
+	
+	if getSnagResetTrigger(pointer) ~= 0 then
+		table.insert(examine_data, { "Snag Reset Trigger", getSnagResetTrigger(pointer)});
 	end
 
 	if getGrabKong(pointer) ~= 0 and mainmemory.read_u16_be(pointer + obj_model2.object_type) == 116 then
