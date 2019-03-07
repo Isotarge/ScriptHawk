@@ -702,8 +702,8 @@ function arcadeTakeMeThere(level)
 		end
 
 		if level == "25m" or level == "50m" or level == "75m" or level == "100m" then
-			mainmemory.writebyte(Game.Memory.arcade_level[1], level_value);
-			mainmemory.writebyte(Game.Memory.arcade_reload[1], 2);
+			mainmemory.writebyte(Game.Memory.arcade_level, level_value);
+			mainmemory.writebyte(Game.Memory.arcade_reload, 2);
 		end
 	end
 end
@@ -3638,7 +3638,11 @@ local spawnerAttributes = {
 	x_pos = 0x4, -- s16
 	y_pos = 0x6, -- s16
 	z_pos = 0x8, -- s16
+	cs_model = 0xA, -- u8
+	max_idle_speed = 0xC, -- u8
+	max_aggro_speed = 0xD, -- u8
 	scale = 0xF, -- u8
+	aggro = 0x10, -- u8
 	spawn_trigger = 0x13, -- u8
 	tied_actor = 0x18, -- u32
 	movement_box_pointer = 0x1C, -- u32
@@ -3656,10 +3660,28 @@ local spawnerAttributes = {
 			coords_4 = 0x18,
 		},
 	},
+	unknown_pointer = 0x20, -- u32
 	respawn_timer = 0x24, -- s16
+	animation_speed = 0x34, -- float
+	spawn_state = 0x42, -- u8
 	chunk = 0x40, -- s16
 	alternative_enemy_spawn = 0x44,
 };
+
+local spawnerStates = {
+	[0] = "Inactive",
+	[2] = "Ready to Spawn",
+	[5] = "Spawned",
+	[6] = "Deloaded",
+};
+
+local function getSpawnerStateName(pointer)
+	stateValue = mainmemory.readbyte(pointer + spawnerAttributes.spawn_state);
+	if spawnerStates[stateValue] ~= nil then
+		return spawnerStates[stateValue];
+	end
+	return toHexString(stateValue);
+end
 
 function getExamineDataArcade(pointer)
 	local examine_data = {};
@@ -3698,12 +3720,14 @@ function getExamineDataSpawners(pointer)
 	local tiedActor = dereferencePointer(pointer + spawnerAttributes.tied_actor);
 	local movement_box = dereferencePointer(pointer + spawnerAttributes.movement_box_pointer);
 	local aggression_box = dereferencePointer(movement_box + spawnerAttributes.movement_box.aggression_box_pointer);
+	local object_spawner_state = getSpawnerStateName(pointer);
+	local unknown_pointer = dereferencePointer(pointer + spawnerAttributes.unknown_pointer);
 
 	table.insert(examine_data, { "Slot base", toHexString(pointer, 6) });
 	table.insert(examine_data, { "Object Name", enemyName });
 	table.insert(examine_data, { "Object Type", toHexString(enemyType) });
 	if enemyType == 0x50 then
-		local cutsceneModelIndex = mainmemory.readbyte(pointer + 0x0A);
+		local cutsceneModelIndex = mainmemory.readbyte(pointer + spawnerAttributes.cs_model);
 		table.insert(examine_data, { "Cutscene Model", getModelNameFromCutsceneIndex(cutsceneModelIndex) });
 	end
 	table.insert(examine_data, { "Separator", 1 });
@@ -3721,7 +3745,14 @@ function getExamineDataSpawners(pointer)
 
 	table.insert(examine_data, { "Y Rotation", mainmemory.read_s16_be(pointer + spawnerAttributes.y_rot) });
 	table.insert(examine_data, { "Scale", mainmemory.readbyte(pointer + spawnerAttributes.scale) });
+	table.insert(examine_data, { "Max Idle Speed", mainmemory.readbyte(pointer + spawnerAttributes.max_idle_speed) });
+	table.insert(examine_data, { "Max Aggro Speed", mainmemory.readbyte(pointer + spawnerAttributes.max_aggro_speed) });
+	table.insert(examine_data, { "Animation Speed", mainmemory.readfloat(pointer + spawnerAttributes.animation_speed, true) });
+	table.insert(examine_data, { "Separator", 1 });
+	
+	table.insert(examine_data, { "Aggressive", mainmemory.readbyte(pointer + spawnerAttributes.aggro) });
 	table.insert(examine_data, { "Spawn Trigger", mainmemory.readbyte(pointer + spawnerAttributes.spawn_trigger) });
+	table.insert(examine_data, { "Spawner State", object_spawner_state });
 	table.insert(examine_data, { "Respawn Timer", mainmemory.read_s16_be(pointer + spawnerAttributes.respawn_timer) });
 	table.insert(examine_data, { "Chunk", mainmemory.read_s16_be(pointer + spawnerAttributes.chunk) });
 	table.insert(examine_data, { "Separator", 1 });
@@ -3732,7 +3763,11 @@ function getExamineDataSpawners(pointer)
 		table.insert(examine_data, { "Tied Actor Name", getActorNameFromBehavior(tiedActorNameValue) });
 		table.insert(examine_data, { "Separator", 1 });
 	end
-
+	
+	if isRDRAM(unknown_pointer) then
+		table.insert(examine_data, { "Unknown Pointer", toHexString(unknown_pointer, 6) });
+	end
+	
 	if isRDRAM(movement_box) then
 		local movement_box_x_low = mainmemory.read_s16_be(movement_box + spawnerAttributes.movement_box.x_pos_0);
 		local movement_box_x_high = mainmemory.read_s16_be(movement_box + spawnerAttributes.movement_box.x_pos_1);
