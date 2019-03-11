@@ -326,7 +326,8 @@ return {
 	{index=0x59, type="Prog", level=6, name="1st FF Grunty Square Text"},
 	{index=0x5A, type="Prog", level=6, name="1st FF Death Square Text"},
 	{index=0x5B, type="Prog", level=6, name="1st FF Joker Square Text"},
-	-- 0x5C set in fake credits
+
+	{index=0x5C, type="Prog", level=6, name="??FF Pattern Set"},
 
 	-- Pieces places in puzzles info
 	-- TODO: Read/write these as ints?
@@ -442,12 +443,14 @@ return {
 	{index=0xD1, type="Prog", level=12, name="Fight 1st Jinjo Statue Activated Cutscene"},
 	{index=0xD2, type="Prog", level=12, name="Fight 1st Jinjo Statue Rising Cutscene"},
 
-	-- 0xD4 set in fake credits
-	-- 0xD5 set in fake credits
-	-- 0xD6 set in fake credits
-	-- 0xD7 ???
-	-- 0xD8 set in fake credits
-	-- 0xD9 set in fake credits
+	{index=0xD3, type="Prog", level=6, name="??FF PATTERN 2^0"},
+	{index=0xD4, type="Prog", level=6, name="??FF PATTERN 2^1"},
+	{index=0xD5, type="Prog", level=6, name="??FF PATTERN 2^2"},
+	{index=0xD6, type="Prog", level=6, name="??FF PATTERN 2^3"},
+	{index=0xD7, type="Prog", level=6, name="??FF PATTERN 2^4"},
+	{index=0xD8, type="Prog", level=6, name="??FF PATTERN 2^5"},
+	{index=0xD9, type="Prog", level=6, name="??FF PATTERN 2^6"},
+	{index=0xDA, type="Prog", level=6, name="??FF PATTERN 2^7"},
 
 	{index=0xDC, type="Prog", level=6, name="In Mumbo's With Enough Tokens Text"},
 	{index=0xDD, type="Prog", level=8, name="1st CCW Icy Water Text"},

@@ -2349,6 +2349,36 @@ function Game.getFFPattern()
 	return EEPROMToPattern(mainmemory.read_u16_be(Game.Memory.ff_pattern));
 end
 
+function Game.getFFPattern2()
+	local FFPattern = 0;
+	
+	if checkFlag("Prog", 0xD3) then
+		FFPattern = FFPattern + 1;
+	end
+	if checkFlag("Prog", 0xD4) then
+		FFPattern = FFPattern + 2;
+	end
+	if checkFlag("Prog", 0xD5) then
+		FFPattern = FFPattern + 4;
+	end
+	if checkFlag("Prog", 0xD6) then
+		FFPattern = FFPattern + 8;
+	end
+	if checkFlag("Prog", 0xD7) then
+		FFPattern = FFPattern + 16;
+	end
+	if checkFlag("Prog", 0xD8) then
+		FFPattern = FFPattern + 32;
+	end
+	if checkFlag("Prog", 0xD9) then
+		FFPattern = FFPattern + 64;
+	end
+	if checkFlag("Prog", 0xDA) then
+		FFPattern = FFPattern + 128;
+	end
+	return FFPattern;
+end
+
 -- Relative to question object
 local ff_current_answer = 0x13;
 local ff_correct_answer = 0x1D;
@@ -3493,6 +3523,7 @@ Game.OSD = {
 	{"Separator"},
 	{"FF Answer", getCorrectFFAnswer, category="ffunAnswer"},
 	{"FF Pattern", Game.getFFPattern, category="ffunPattern"},
+	{"FF Pattern Testing", Game.getFFPattern2, category="ffunPattern"},
 	{"Separator"},
 	{"Jiggy Spawn Angle", Game.getJiggySpawnAngle, category="angle"},
 	{"Jiggy Grabbed", Game.getJiggyGrabbedPointer, category="objectDespawn"},
