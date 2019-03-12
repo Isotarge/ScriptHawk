@@ -440,6 +440,9 @@ local supportedGames = {
 	["C1058CC2482B91204100CC8515DA99AEB06773F5"] = {moduleName="games.GBA_DrillDozer", friendlyName="Drill Dozer (USA)", version=1},
 	["84AFA7108E4D604E7B1A6D105DF5760869A247FA"] = {moduleName="games.GBA_DrillDozer", friendlyName="Screw Breaker Goushin Dorirurero (Japan)", version=2},
 
+	-- Duck Dodgers
+	["2C840E2991D6A2AF63C4EFE830240FC49D93FC9A"] = {moduleName="games.duck_dodgers", friendlyName="Duck Dodgers Starring Daffy Duck (USA) (En,Fr,Es)"},
+
 	-- Earthworm Jim 3D
 	["EAB14F23640CD6148D4888902CDCC00DD6111BF9"] = {moduleName="games.ej3d", friendlyName="Earthworm Jim 3D (USA)", version=1},
 	["F02C1AFD18C1CBE309472CBE5B3B3F04B22DB7EE"] = {moduleName="games.ej3d", friendlyName="Earthworm Jim 3D (Europe) (En,Fr,De,Es,It)", version=2},
