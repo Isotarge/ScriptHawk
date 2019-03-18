@@ -420,6 +420,9 @@ local supportedGames = {
 	["7E59A4CE"] = {moduleName="games.crash3", friendlyName="Crash Bandicoot 3 - Buttobi! Sekai Isshuu (Japan)", version=3},
 	["A2E93AEC"] = {moduleName="games.crash3", friendlyName="Crash Bandicoot 3 - Buttobi! Sekai Isshuu (Japan)", version=3},
 
+	-- Day Dreamin' Davey
+	["4C88391318E3BD79C14BFF6724A377688E47261B"] = {moduleName="games.day_dreamin_davey", friendlyName="Day Dreamin' Davey"},
+
 	-- Diddy Kong Racing
 	["B7F628073237B3D211D40406AA0884FF8FDD70D5"] = {moduleName="games.dkr", friendlyName="Diddy Kong Racing (Europe) (En,Fr,De) (Rev A)", version=1},
 	["DD5D64DD140CB7AA28404FA35ABDCABA33C29260"] = {moduleName="games.dkr", friendlyName="Diddy Kong Racing (Europe) (En,Fr,De)", version=2},
