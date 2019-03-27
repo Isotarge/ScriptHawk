@@ -388,6 +388,10 @@ local supportedGames = {
 	["93BF2FAC1387320AD07251CB4B64FD36BAC1D7A6"] = {moduleName="games.bt", friendlyName="Banjo-Tooie (Europe) (En,Fr,De,Es)", version=2},
 	["AF1A89E12B638B8D82CC4C085C8E01D4CBA03FB3"] = {moduleName="games.bt", friendlyName="Banjo-Tooie (USA)", version=4},
 
+    -- Brother Bear (GBA)
+    ["89E6903500F62E11483402B76C1454AF788646C0"] = {moduleName="games.GBA_brother_bear", friendlyName="Brother Bear (USA)", version=1},
+
+    
 	-- Conker's Bad Fur Day
 	["EE7BC6656FD1E1D9FFB3D19ADD759F28B88DF710"] = {moduleName="games.cbfd", friendlyName="Conker's Bad Fur Day (Europe)", version=1},
 	["4CBADD3C4E0729DEC46AF64AD018050EADA4F47A"] = {moduleName="games.cbfd", friendlyName="Conker's Bad Fur Day (USA)", version=2},
