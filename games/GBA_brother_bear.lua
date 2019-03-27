@@ -119,12 +119,12 @@ function Game.getYPosition()
 	return 0
 end
 
---function Game.colorYVelocity()
-	--local yVelocity = Game.getYVelocity();
-	--if yVelocity < 0 then
-	--	return colors.red;
-	--end
---end
+function Game.colorYVelocity()
+	local yVelocity = Game.getYVelocity();
+	if yVelocity < 0 then
+		return colors.red;
+	end
+end
 
 function Game.setXPosition(value)
     local posInfo = dereferencePointer(Game.Memory.pos_ptr)
@@ -144,21 +144,21 @@ end
 -- Velocity --
 --------------
 
---function Game.getXVelocity()
-	--local player = Game.getPlayer();
-	--if player ~= nil then
-	--	return memory.read_s32_le(player.Address + 0x18, player.Domain);
-	--end
---	return 0;
---end
+function Game.getXVelocity()
+	local posInfo = dereferencePointer(Game.Memory.pos_ptr)
+	if posInfo ~= nil then
+		return memory.read_s32_le(posInfo.Address + 0x244, posInfo.Domain);
+	end
+	return 0;
+end
 
---function Game.getYVelocity()
-	--local player = Game.getPlayer();
-	--if player ~= nil then
-	--	return memory.read_s32_le(player.Address + 0x1C, player.Domain);
-	--end
---	return 0;
---end
+function Game.getYVelocity()
+	local posInfo = dereferencePointer(Game.Memory.pos_ptr)
+	if posInfo ~= nil then
+		return memory.read_s32_le(posInfo.Address + 0x254, posInfo.Domain);
+	end
+	return 0;
+end
 
 ------------
 -- Events --
@@ -170,8 +170,8 @@ Game.OSD = {
 	{"X", category="position"},
 	{"Y", category="position"},
 	{"Separator"},
-	--{"X Vel", Game.getXVelocity, category="speed"},
-	--{"Y Vel", Game.getYVelocity, Game.colorYVelocity, category="speed"},
+	{"X Vel", Game.getXVelocity, category="speed"},
+	{"Y Vel", Game.getYVelocity, Game.colorYVelocity, category="speed"},
 	{"dY", category="positionStats"},
 	{"dXZ", category="positionStats"},
 	{"Separator"},
