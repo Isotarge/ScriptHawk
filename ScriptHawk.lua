@@ -443,6 +443,9 @@ local supportedGames = {
 	["B4717E602F07CA9BE0D4822813C658CD8B99F993"] = {moduleName="games.dk64", friendlyName="Donkey Kong 64 (USA) (Demo) (Kiosk)", version=4},
 	["CF806FF2603640A748FCA5026DED28802F1F4A50"] = {moduleName="games.dk64", friendlyName="Donkey Kong 64 (USA)", version=1},
 
+    -- Donkey Kong Country 2 (GBA)
+    ["B0A4D59447C8D7C321BEA4DC7253B0F581129EDE"] = {moduleName="games.GBA_dkc2", friendlyName="Donkey Kong Country 2 (USA)", version=1},
+        
 	-- Drill Dozer
 	["C1058CC2482B91204100CC8515DA99AEB06773F5"] = {moduleName="games.GBA_DrillDozer", friendlyName="Drill Dozer (USA)", version=1},
 	["84AFA7108E4D604E7B1A6D105DF5760869A247FA"] = {moduleName="games.GBA_DrillDozer", friendlyName="Screw Breaker Goushin Dorirurero (Japan)", version=2},
