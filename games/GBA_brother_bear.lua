@@ -7,13 +7,8 @@ end
 
 local Game = {
 	Memory = {
-        pos_ptr = {Domain = "IWRAM", Address = 0x7A40},
-        --pos_ptr = {Domain = "IWRAM", Address = 0x7A44},
-		--player_ptr = {Domain="EWRAM", Address=0x47EC},
-		--object_array_size = {Domain="IWRAM", Address=0x16F8},
-		--object_list_ptr = {Domain="IWRAM", Address=0x14A0},
-		--rangCount = {Domain="IWRAM", Address=0xB06},
-		--player_ptr = {Domain="EWRAM", Address={0x5B08}}, -- May be better?
+        p1_ptr = {Domain = "EWRAM", Address = 0xD554},
+        p2_ptr = {Domain = "EWRAM", Address = 0xD558},
 	},
 };
 
@@ -103,57 +98,79 @@ end
 -- Position --
 --------------
 
-function Game.getXPosition()
-	local posInfo = dereferencePointer(Game.Memory.pos_ptr)
+function Game.getXPos_P1()
+	local posInfo = dereferencePointer(Game.Memory.p1_ptr)
 	if posInfo ~= nil then
 		return memory.read_s32_le(posInfo.Address + 0x04, posInfo.Domain);
 	end
 	return 0
 end
 
-function Game.getYPosition()
-	local posInfo = dereferencePointer(Game.Memory.pos_ptr)
+function Game.getYPos_P1()
+	local posInfo = dereferencePointer(Game.Memory.p1_ptr)
 	if posInfo ~= nil then
 		return memory.read_s32_le(posInfo.Address + 0x08, posInfo.Domain);
 	end
 	return 0
 end
 
-function Game.colorYVelocity()
-	local yVelocity = Game.getYVelocity();
-	if yVelocity < 0 then
+function Game.getXPos_P2()
+	local posInfo = dereferencePointer(Game.Memory.p2_ptr)
+	if posInfo ~= nil then
+		return memory.read_s32_le(posInfo.Address + 0x04, posInfo.Domain);
+	end
+	return 0
+end
+
+function Game.getYPos_P2()
+	local posInfo = dereferencePointer(Game.Memory.p2_ptr)
+	if posInfo ~= nil then
+		return memory.read_s32_le(posInfo.Address + 0x08, posInfo.Domain);
+	end
+	return 0
+end
+
+function Game.colorYVelocity(charIndex)
+    if charIndex == nil then
+        charIndex = 0;
+    end
+	local yVelocity = Game.getYVelocity(charIndex);
+	if yVelocity > 0 then
 		return colors.red;
 	end
 end
 
-function Game.setXPosition(value)
-    local posInfo = dereferencePointer(Game.Memory.pos_ptr)
-	if posInfo ~= nil then
-		return memory.write_s32_le(posInfo.Address + 0x04, value, posInfo.Domain);
-	end
-end
-
-function Game.setYPosition(value)
-	local posInfo = dereferencePointer(Game.Memory.pos_ptr)
-	if posInfo ~= nil then
-		return memory.write_s32_le(posInfo.Address + 0x10, value, posInfo.Domain);
-	end
-end
 
 --------------
 -- Velocity --
 --------------
 
-function Game.getXVelocity()
-	local posInfo = dereferencePointer(Game.Memory.pos_ptr)
+function Game.getXVel_P1()
+	local posInfo = dereferencePointer(Game.Memory.p1_ptr)
 	if posInfo ~= nil then
 		return memory.read_s32_le(posInfo.Address + 0x244, posInfo.Domain);
 	end
 	return 0;
 end
 
-function Game.getYVelocity()
-	local posInfo = dereferencePointer(Game.Memory.pos_ptr)
+function Game.getYVel_P1()
+	local posInfo = dereferencePointer(Game.Memory.p1_ptr)
+	if posInfo ~= nil then
+		return memory.read_s32_le(posInfo.Address + 0x254, posInfo.Domain);
+	end
+	return 0;
+end
+
+function Game.getXVel_P2()
+	local posInfo = dereferencePointer(Game.Memory.p2_ptr)
+	if posInfo ~= nil then
+		return memory.read_s32_le(posInfo.Address + 0x244, posInfo.Domain);
+	end
+	return 0;
+end
+
+function Game.getYVel_P2()
+	local posInfo = dereferencePointer(Game.Memory.p2_ptr)
 	if posInfo ~= nil then
 		return memory.read_s32_le(posInfo.Address + 0x254, posInfo.Domain);
 	end
@@ -167,18 +184,24 @@ end
 
 Game.OSD = {
 	--{"State", Game.getState, category="state"},
-	{"X", category="position"},
-	{"Y", category="position"},
+	{"B1 X", Game.getXPos_P1, category="position"},
+	{"B1 Y", Game.getYPos_P1, category="position"},
+	{"B1 X Vel", Game.getXVel_P1, category="speed"},
+	{"B1 Y Vel", Game.getYVel_P1,  category="speed"},
+	--{"B1 dY", category="positionStats"},
+	--{"B1 dXZ", category="positionStats"},
 	{"Separator"},
-	{"X Vel", Game.getXVelocity, category="speed"},
-	{"Y Vel", Game.getYVelocity, Game.colorYVelocity, category="speed"},
-	{"dY", category="positionStats"},
-	{"dXZ", category="positionStats"},
+    {"B2 X", Game.getXPos_P2, category="position"},
+	{"B2 Y", Game.getYPos_P2, category="position"},
+	{"B2 X Vel", Game.getXVel_P2, category="speed"},
+	{"B2 Y Vel", Game.getXVel_P2,  category="speed"},
+    --{"B2 dY", category="positionStats"},
+	--{"B2 dXZ", category="positionStats"},
 	{"Separator"},
-	{"Max dY", category="positionStatsMore"},
-	{"Max dXZ", category="positionStatsMore"},
-	{"Odometer", category="positionStatsMore"},
-	{"Separator"},
+	--{"Max dY", category="positionStatsMore"},
+	--{"Max dXZ", category="positionStatsMore"},
+	--{"Odometer", category="positionStatsMore"},
+	--{"Separator"},
 };
 
 return Game;
