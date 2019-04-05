@@ -98,37 +98,30 @@ end
 -- Position --
 --------------
 
-function Game.getXPos_P1()
-	local posInfo = dereferencePointer(Game.Memory.p1_ptr)
+function Game.getXPosition(charIndex)
+    if charIndex == nil then
+        charIndex = 0;
+    end
+    local bearPtr = {Domain = Game.Memory.p1_ptr.Domain, Address = Game.Memory.p1_ptr.Address + 0x04*charIndex};
+	local posInfo = dereferencePointer(bearPtr)
 	if posInfo ~= nil then
 		return memory.read_s32_le(posInfo.Address + 0x04, posInfo.Domain);
 	end
-	return 0
+	return toHexString(Game.Memory.p1_ptr.Address)
 end
 
-function Game.getYPos_P1()
-	local posInfo = dereferencePointer(Game.Memory.p1_ptr)
+function Game.getYPosition(charIndex)
+    if charIndex == nil then
+        charIndex = 0;
+    end
+    local bearPtr = {Domain = Game.Memory.p1_ptr.Domain, Address = Game.Memory.p1_ptr.Address + 0x04*charIndex};
+	local posInfo = dereferencePointer(bearPtr)
 	if posInfo ~= nil then
 		return memory.read_s32_le(posInfo.Address + 0x08, posInfo.Domain);
 	end
 	return 0
 end
 
-function Game.getXPos_P2()
-	local posInfo = dereferencePointer(Game.Memory.p2_ptr)
-	if posInfo ~= nil then
-		return memory.read_s32_le(posInfo.Address + 0x04, posInfo.Domain);
-	end
-	return 0
-end
-
-function Game.getYPos_P2()
-	local posInfo = dereferencePointer(Game.Memory.p2_ptr)
-	if posInfo ~= nil then
-		return memory.read_s32_le(posInfo.Address + 0x08, posInfo.Domain);
-	end
-	return 0
-end
 
 function Game.colorYVelocity(charIndex)
     if charIndex == nil then
@@ -140,68 +133,108 @@ function Game.colorYVelocity(charIndex)
 	end
 end
 
+local bearState = {
+	{ prev_position = {x = 0, y = 0}, d = {x = 0, y = 0} },
+    { prev_position = {x = 0, y = 0}, d = {x = 0, y = 0} },
+};
 
 --------------
 -- Velocity --
 --------------
 
-function Game.getXVel_P1()
-	local posInfo = dereferencePointer(Game.Memory.p1_ptr)
+function Game.getdX(charIndex)
+    if type(charIndex) ~= "number" or charIndex < 0 or charIndex > 1 then
+		player = 0;
+	end
+	return bearState[charIndex + 1].d.x
+end
+
+function Game.getdY(charIndex)
+    if type(charIndex) ~= "number" or charIndex < 0 or charIndex > 1 then
+		player = 0;
+	end
+	return bearState[charIndex + 1].d.y
+end
+
+function Game.getXVelocity(charIndex)
+    local bearPtr = {Domain = Game.Memory.p1_ptr.Domain, Address = Game.Memory.p1_ptr.Address + 0x04*charIndex};
+	local posInfo = dereferencePointer(bearPtr)
 	if posInfo ~= nil then
 		return memory.read_s32_le(posInfo.Address + 0x244, posInfo.Domain);
 	end
-	return 0;
+	return 0
 end
 
-function Game.getYVel_P1()
-	local posInfo = dereferencePointer(Game.Memory.p1_ptr)
+function Game.getYVelocity(charIndex)
+    local bearPtr = {Domain = Game.Memory.p1_ptr.Domain, Address = Game.Memory.p1_ptr.Address + 0x04*charIndex};
+	local posInfo = dereferencePointer(bearPtr)
 	if posInfo ~= nil then
 		return memory.read_s32_le(posInfo.Address + 0x254, posInfo.Domain);
 	end
-	return 0;
-end
-
-function Game.getXVel_P2()
-	local posInfo = dereferencePointer(Game.Memory.p2_ptr)
-	if posInfo ~= nil then
-		return memory.read_s32_le(posInfo.Address + 0x244, posInfo.Domain);
-	end
-	return 0;
-end
-
-function Game.getYVel_P2()
-	local posInfo = dereferencePointer(Game.Memory.p2_ptr)
-	if posInfo ~= nil then
-		return memory.read_s32_le(posInfo.Address + 0x254, posInfo.Domain);
-	end
-	return 0;
+	return 0
 end
 
 ------------
 -- Events --
 ------------
-
-
-Game.OSD = {
-	--{"State", Game.getState, category="state"},
-	{"B1 X", Game.getXPos_P1, category="position"},
-	{"B1 Y", Game.getYPos_P1, category="position"},
-	{"B1 X Vel", Game.getXVel_P1, category="speed"},
-	{"B1 Y Vel", Game.getYVel_P1,  category="speed"},
-	--{"B1 dY", category="positionStats"},
-	--{"B1 dXZ", category="positionStats"},
-	{"Separator"},
-    {"B2 X", Game.getXPos_P2, category="position"},
-	{"B2 Y", Game.getYPos_P2, category="position"},
-	{"B2 X Vel", Game.getXVel_P2, category="speed"},
-	{"B2 Y Vel", Game.getXVel_P2,  category="speed"},
-    --{"B2 dY", category="positionStats"},
-	--{"B2 dXZ", category="positionStats"},
-	{"Separator"},
-	--{"Max dY", category="positionStatsMore"},
-	--{"Max dXZ", category="positionStatsMore"},
-	--{"Odometer", category="positionStatsMore"},
-	--{"Separator"},
+local player2OSD = {
+		{"B2", "", category="player"},
+		{"X", function() return Game.getXPosition(1) end, category="position"},
+	    {"Y", function() return Game.getYPosition(1) end, category="position"},
+	    {"X Vel", function() return Game.getXVelocity(1) end, category="speed"},
+	    {"Y Vel", function() return Game.getXVelocity(1) end,  category="speed"},
+        {"dX", function() return Game.getdX(1) end, category="speed"},
+	    {"dY", function() return Game.getdY(1) end,  category="speed"},
+        {"Separator"},
 };
+
+local function buildOSD()
+	local OSD = {
+        {"B1", "", category="player"},
+		{"X", function() return Game.getXPosition(0) end, category="position"},
+	    {"Y", function() return Game.getYPosition(0) end, category="position"},
+	    {"X Vel", function() return Game.getXVelocity(0) end, category="speed"},
+	    {"Y Vel", function() return Game.getXVelocity(0) end,  category="speed"},
+        {"dX", function() return Game.getdX(0) end, category="speed"},
+	    {"dY", function() return Game.getdY(0) end,  category="speed"},
+        {"Separator"},
+	};
+
+    local bearPtr = {Domain = Game.Memory.p1_ptr.Domain, Address = Game.Memory.p1_ptr.Address + 0x04};
+    if dereferencePointer(bearPtr) ~= nil then
+        OSD = table.join(OSD, player2OSD);
+    end
+
+	return OSD;
+end
+
+-- Used to dynamically update OSD based on which players are in the battle
+local currentOSDBools = false;
+Game.OSD = buildOSD();
+
+function Game.eachFrame()
+	-- Dynamically update OSD based on which players are in the battle
+	local OSDBools = false;
+	local changeDetected = false;
+    local bearPtr = {Domain = Game.Memory.p1_ptr.Domain, Address = Game.Memory.p1_ptr.Address + 0x04};
+    if dereferencePointer(bearPtr) ~= nil then
+        OSDBools = true;
+    end
+    if OSDBools ~= currentOSDBools then
+        changeDetected = true;
+    end
+    for i = 1,2 do
+        local bearX = Game.getXPosition(i-1);
+        local bearY = Game.getYPosition(i-1);
+        bearState[i].d.x = bearX - bearState[i].prev_position.x;
+        bearState[i].d.y = bearY - bearState[i].prev_position.y;
+        bearState[i].prev_position.x = bearX;
+        bearState[i].prev_position.y = bearY;
+	end
+    if changeDetected then
+        Game.OSD = buildOSD();
+        currentOSDBools = OSDBools;
+	end
+end
 
 return Game;
