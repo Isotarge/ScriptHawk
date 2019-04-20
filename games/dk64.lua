@@ -859,7 +859,7 @@ obj_model1 = {
 		[17] = "Cannon Barrel",
 		[18] = "Rambi Crate",
 		[19] = "Barrel (Diddy 5DI)",
-		--[20] = "Unknown", -- Possibily some kind of cutscene controller
+		[20] = "Camera Focus Point", -- Exists during some cutscenes
 		[21] = "Pushable Box",
 		[22] = "Barrel Spawner", -- Normal barrel on a star pad, unused?
 		[23] = "Cannon",
@@ -1014,7 +1014,7 @@ obj_model1 = {
 		-- [174] = "Unknown",
 		[175] = "Kaboom",
 		[176] = "Timer",
-		--[177] = "Unknown", -- Pufftoss Fight (Some form of controller?)
+		[177] = "Timer Controller", -- Pufftoss Fight & Fac Beaver Bother Spawn Timer
 		[178] = "Beaver", -- Blue
 		[179] = "Shockwave (Mad Jack)",
 		[180] = "Krash", -- Minecart Club Guy
@@ -1158,11 +1158,11 @@ obj_model1 = {
 		[317] = "Locked Kong (Tag Barrel)",
 		-- [318] = "Unknown",
 		[319] = "Propeller (Boat)",
-		-- [320] = "Unknown",
-		-- [321] = "Unknown",
+		[320] = "Potion", -- Cranky Purchase
+		[321] = "Fairy (Refill)", -- Refill Fairy
 		[322] = "Car", -- Car Race
 		[323] = "Enemy Car", -- Car Race, aka George
-		-- [324] = "Unknown",
+		[324] = "Text Overlay Controller", -- Candy's
 		[325] = "Shockwave", -- Simian Slam
 		[326] = "Main Menu Controller",
 		[327] = "Kong", -- Krazy Kong Klamour
@@ -3663,9 +3663,10 @@ local spawnerAttributes = {
 	unknown_pointer = 0x20, -- u32
 	respawn_timer = 0x24, -- s16
 	animation_speed = 0x34, -- float
-	spawn_state = 0x42, -- u8
+	acceleration = 0x34, -- float, TODO: Check this
 	chunk = 0x40, -- s16
-	alternative_enemy_spawn = 0x44,
+	spawn_state = 0x42, -- u8
+	alternative_enemy_spawn = 0x44, -- u8
 };
 
 local spawnerStates = {
@@ -3673,6 +3674,7 @@ local spawnerStates = {
 	[2] = "Ready to Spawn",
 	[5] = "Spawned",
 	[6] = "Deloaded",
+	[7] = "Respawn Pending",
 };
 
 local function getSpawnerStateName(pointer)
@@ -5657,8 +5659,16 @@ function Game.getMovementState()
 	local playerObject = Game.getPlayerObject();
 	if isRDRAM(playerObject) then
 		local controlState = mainmemory.readbyte(playerObject + obj_model1.control_state_byte);
+		local shockwave_timer = mainmemory.read_s16_be(playerObject + obj_model1.player.shockwave_charge_timer);
+		local controlStateTimer = mainmemory.readbyte(playerObject + obj_model1.control_state_progress);
 		if obj_model1.control_states[controlState] ~= nil then
-			return obj_model1.control_states[controlState];
+			if controlState == 0x2 or controlState == 0x3 then -- First Person Camera
+				return obj_model1.control_states[controlState].." ("..controlStateTimer..")";
+			elseif shockwave_timer > -1 then
+				return obj_model1.control_states[controlState].." ("..shockwave_timer..")";
+			else
+				return obj_model1.control_states[controlState];
+			end
 		end
 		return toHexString(controlState);
 	end
