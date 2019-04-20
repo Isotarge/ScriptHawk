@@ -64,7 +64,9 @@ local jim = {
 	gun_pointer = 0x104,
 	movement = 0x2F3, -- Byte
 	cutscene_lock = 0x2A3, -- Byte
-	--speed = 0x2C8, -- Float (Not too sure on this)
+	max_xz_velocity = 0x2C0, -- Float
+	xz_velocity = 0x2C8, -- Float
+	y_velocity = 0x2D8, -- Float
 	y_last_action = 0x338, -- Float
 	crouch_available = 0x454, -- Byte
 	oob_timer = 0x455, -- Byte
@@ -176,6 +178,22 @@ end
 
 function Game.setZRotation(value)
 	mainmemory.writefloat(Game.Memory.z_rotation, value, true);
+end
+
+-----------
+-- Speed --
+-----------
+
+function Game.getVelocity()
+	return mainmemory.readfloat(Game.Memory.jim_pointer + jim.xz_velocity, true);
+end
+
+function Game.getYVelocity()
+	return mainmemory.readfloat(Game.Memory.jim_pointer + jim.y_velocity, true);
+end
+
+function Game.getMaxXZVelocity()
+	return mainmemory.readfloat(Game.Memory.jim_pointer + jim.max_xz_velocity, true);
 end
 
 ------------
@@ -1305,6 +1323,10 @@ Game.OSD = {
 	{"X", category="position"},
 	{"Y", category="position"},
 	{"Z", category="position"},
+	{"Separator"},
+	{"Velocity", Game.getVelocity, category="positionStats"},
+	{"Y Velocity", Game.getYVelocity, category="positionStats"},
+	{"Max XZ Velocity", Game.getMaxXZVelocity, category="positionStats"},
 	{"Separator"},
 	{"dY", category="positionStats"},
 	{"dXZ", category="positionStats"},
