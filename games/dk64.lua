@@ -1055,8 +1055,8 @@ obj_model1 = {
 		[215] = "Minecart (TNT)",
 		[216] = "Pufftoss",
 		-- [217] = "Unknown",
-		-- [218] = "Unknown",
-		-- [219] = "Unknown",
+		[218] = "Handle",
+		[219] = "Slot",
 		[220] = "Cannon (Seasick Chunky)",
 		[221] = "Light Piece", -- Lanky Phase
 		[222] = "Banana Peel", -- Lanky Phase
@@ -1371,6 +1371,7 @@ obj_model1 = {
 	destination_map = 0x17E, -- u16_be, bonus barrels etc
 	player = {
 		animation_type = 0x181, -- Seems to be the same value as control_states
+		stored_y_rotation = 0x18A, -- Angle post tag barrel?
 		velocity_uncrouch_aerial = 0x1A4, -- TODO: What is this?
 		misc_acceleration_float = 0x1AC, -- TODO: What is this?
 		horizontal_acceleration = 0x1B0, -- Set to a negative number to go fast
@@ -3820,6 +3821,9 @@ local loading_zone_fields = {
 	x_position = 0x00, -- s16_be
 	y_position = 0x02, -- s16_be
 	z_position = 0x04, -- s16_be
+	x_size = 0x06, -- u16_be
+	y_size = 0x08, -- u16_be
+	z_size = 0x0A, -- u16_be
 	object_type = 0x10, -- u16_be
 	object_types = {
 		[0x05] = "Cutscene Trigger",
@@ -3827,16 +3831,23 @@ local loading_zone_fields = {
 		[0x0A] = "Cutscene Trigger",
 		[0x0C] = "Loading Zone + Objects", -- Alows objects through
 		[0x0D] = "Loading Zone",
+		-- [0x0F] = "Unknown", -- Autowalk trigger?
 		[0x10] = "Loading Zone",
 		[0x11] = "Loading Zone", -- Snide's
 		-- [0x13] = "Unknown - Caves Lobby", -- Behind ice walls
+		[0x14] = "Boss Loading Zone", -- Takes you to the boss of that level
 		[0x15] = "Cutscene Trigger",
 		[0x17] = "Cutscene Trigger",
 		-- [0x19] = "Trigger", -- Seal Race
+		[0x20] = "Cutscene Trigger",
+		-- [0x24] = "Unknown", -- Cannon Trigger?
 	},
 	destination_map = 0x12, -- u16_be, index of Game.maps
 	destination_exit = 0x14, -- u16_be
 	fade_type = 0x16, -- u16_be?
+	cutscene_is_tied = 0x1A, -- u16_be
+	cutscene_activated = 0x1C, -- u16_be
+	not_in_zone = 0x38, -- Byte
 	active = 0x39, -- Byte
 };
 
@@ -3858,8 +3869,9 @@ local function getExamineDataLoadingZone(base)
 			table.insert(data, {"Separator", 1});
 		end
 
-		if string.contains(_type, "Loading Zone") then
+		if string.contains(_type, "Loading Zone") and not string.contains(_type, "0x14") then
 			local destinationMap = mainmemory.read_u16_be(base + loading_zone_fields.destination_map);
+			local cutscene_is_tied_byte = mainmemory.read_u16_be(base + loading_zone_fields.cutscene_is_tied);
 			if Game.maps[destinationMap + 1] ~= nil then
 				destinationMap = Game.maps[destinationMap + 1];
 			else
@@ -3869,12 +3881,20 @@ local function getExamineDataLoadingZone(base)
 			table.insert(data, {"Destination Exit", mainmemory.read_u16_be(base + loading_zone_fields.destination_exit)});
 			table.insert(data, {"Fade", mainmemory.read_u16_be(base + loading_zone_fields.fade_type)});
 			table.insert(data, {"Active", mainmemory.readbyte(base + loading_zone_fields.active)});
+			table.insert(data, {"In Zone", 1 - mainmemory.readbyte(base + loading_zone_fields.not_in_zone)});
+			if cutscene_is_tied_byte == 0xA then
+				table.insert(data, {"Tied Cutscene", mainmemory.read_u16_be(base + loading_zone_fields.cutscene_activated)});
+			end
 			table.insert(data, {"Separator", 1});
 		end
 
 		table.insert(data, {"X Position", mainmemory.read_s16_be(base + loading_zone_fields.x_position)});
 		table.insert(data, {"Y Position", mainmemory.read_s16_be(base + loading_zone_fields.y_position)});
 		table.insert(data, {"Z Position", mainmemory.read_s16_be(base + loading_zone_fields.z_position)});
+		table.insert(data, {"Separator", 1});
+		table.insert(data, {"Size X", mainmemory.read_u16_be(base + loading_zone_fields.x_size)});
+		table.insert(data, {"Size Y", mainmemory.read_u16_be(base + loading_zone_fields.y_size)});
+		table.insert(data, {"Size Z", mainmemory.read_u16_be(base + loading_zone_fields.z_size)});
 		table.insert(data, {"Separator", 1});
 	end
 	return data;
@@ -6065,6 +6085,23 @@ end
 function Game.colorYRotation()
 	local currentRotation = Game.getYRotation()
 	if currentRotation > 4095 then -- Detect STVW angles
+		return 0xFF007FFF; -- Blue
+	end
+end
+
+function Game.getStoredYRotation()
+	if not isInSubGame() then
+		local playerObject = Game.getPlayerObject();
+		if isRDRAM(playerObject) then
+			return mainmemory.read_u16_be(playerObject + obj_model1.player.stored_y_rotation);
+		end
+	end
+	return 0;
+end
+
+function Game.colorStoredYRotation()
+	local currentStoredRotation = Game.getStoredYRotation()
+	if currentStoredRotation > 4095 then -- Detect STVW angles
 		return 0xFF007FFF; -- Blue
 	end
 end
@@ -9440,6 +9477,7 @@ Game.standardOSD = {
 	{"Separator"},
 	{"Rot. X", Game.getXRotation, category="angle"},
 	{"Facing", Game.getYRotation, Game.colorYRotation, category="angle"},
+	--{"Stored Rotation", Game.getStoredYRotation, Game.colorStoredYRotation, category="angle"},
 	--{"Moving", Game.getMovingRotation, "angle"}, -- TODO: Game.getMovingRotation
 	{"Rot. Z", Game.getZRotation, category="angle"},
 	{"Movement", Game.getMovementState, category="movement"},
