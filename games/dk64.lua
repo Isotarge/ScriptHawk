@@ -23,30 +23,164 @@ rat_enabled = false; -- Randomize Animation Timers
 local object_index = 1;
 local object_pointers = {}; -- TODO: I'd love to get rid of this eventually, replace with some kind of getObjectPointers() system
 local radius = 100;
-local grab_script_modes = {
-	"Disabled",
-	"List (Object Model 1)",
-	"Examine (Object Model 1)",
-	"List (Object Model 2)",
-	"Examine (Object Model 2)",
-	"List (Loading Zones)",
-	"Examine (Loading Zones)",
-	"List (Arcade Objects)",
-	"Examine (Arcade Objects)",
-	"Chunks",
-	"Exits",
-	"List (Spawners)",
-	"Examine (Spawners)",
+grab_script_modes = {
+	{"Disabled","Disabled"},
+	{"List (Object Model 1)","Object Model 1", subtype = "List"},
+	{"Examine (Object Model 1)","Object Model 1", subtype = "Examine"},
+	{"List (Object Model 2)","Object Model 2", subtype = "List"},
+	{"Examine (Object Model 2)","Object Model 2", subtype = "Examine"},
+	{"List (Loading Zones)","Loading Zones", subtype = "List"},
+	{"Examine (Loading Zones)","Loading Zones", subtype = "Examine"},
+	{"List (Arcade Objects)","Arcade Objects", subtype = "List"},
+	{"Examine (Arcade Objects)","Arcade Objects", subtype = "Examine"},
+	{"Chunks","Chunks"},
+	{"Exits","Exits"},
+	{"List (Spawners)","Spawners", subtype = "List"},
+	{"Examine (Spawners)","Spawners", subtype = "Examine"},
 };
-local grab_script_mode_index = 1;
-local grab_script_mode = grab_script_modes[grab_script_mode_index];
+grab_script_mode_index = 1;
+grab_script_mode = grab_script_modes[grab_script_mode_index][1];
 
+local function getListOfAnalysisSlideTypes()
+	analysis_slide_types = {};
+	for i = 1, #grab_script_modes do
+		analysis_stored = false;
+		if #analysis_slide_types > 0 then
+			for j = 1, #analysis_slide_types do
+				if analysis_slide_types[j] == grab_script_modes[i][2] then
+					analysis_stored = true;
+				end
+			end
+			if not analysis_stored then
+				analysis_slide_types[#analysis_slide_types + 1] = grab_script_modes[i][2];
+			end
+		else
+			analysis_slide_types[#analysis_slide_types + 1] = grab_script_modes[i][2];
+		end
+	end
+end
+
+local function getListOfAnalysisSlideSubtypes()
+	analysis_slide_subtypes = {};
+	for i = 1, #grab_script_modes do
+		analysis_sub_stored = false;
+		if #analysis_slide_subtypes > 0 then
+			for j = 1, #analysis_slide_subtypes do
+				if analysis_slide_subtypes[j] == grab_script_modes[i].subtype then
+					analysis_sub_stored = true;
+				end
+			end
+			if not analysis_sub_stored then
+				analysis_slide_subtypes[#analysis_slide_subtypes + 1] = grab_script_modes[i].subtype;
+			end
+		else
+			analysis_slide_subtypes[#analysis_slide_subtypes + 1] = grab_script_modes[i].subtype;
+		end
+	end
+end
+
+local function turnFilterBoxIntoFilter()
+	filter_box_text = forms.gettext(ScriptHawk.UI.form_controls["Analysis Filter Textbox"]);
+	if filter_box_text == "" or filter_box_text == nil then
+		filter_value = nil;
+	else
+		filter_value = filter_box_text;
+	end
+	if grab_script_modes[grab_script_mode_index][2] == "Object Model 2" then
+		object_model2_filter = filter_value
+	end
+end
+
+getListOfAnalysisSlideTypes();
+getListOfAnalysisSlideSubtypes();
+analysis_slide_type_index = 1;
+analysis_slide_type = analysis_slide_types[analysis_slide_type_index];
+analysis_slide_subtype_index = 1;
+analysis_slide_subtype = analysis_slide_subtypes[analysis_slide_subtype_index];
+
+--[[
 local function switch_grab_script_mode()
 	grab_script_mode_index = grab_script_mode_index + 1;
 	if grab_script_mode_index > #grab_script_modes then
 		grab_script_mode_index = 1;
 	end
-	grab_script_mode = grab_script_modes[grab_script_mode_index];
+	grab_script_mode = grab_script_modes[grab_script_mode_index][1];
+	analysis_slide_type = grab_script_modes[grab_script_mode_index][2];
+	for i = 1, #analysis_slide_types do
+		if analysis_slide_types[i] == analysis_slide_type then
+			analysis_slide_type_index = i;
+		end
+	end
+	if grab_script_modes[grab_script_mode_index].subtype == nil then
+		analysis_slide_subtype = grab_script_modes[grab_script_mode_index].subtype; 
+	else
+		analysis_slide_subtype = analysis_slide_subtypes[1];
+	end
+	for i = 1, #analysis_slide_subtypes do
+		if analysis_slide_subtypes[i] == analysis_slide_subtype then
+			analysis_slide_subtype_index = i;
+		end
+	end
+end
+]]--
+
+local function increase_analysis_slide_type()
+	analysis_slide_type_index = analysis_slide_type_index + 1;
+	if analysis_slide_type_index > #analysis_slide_types then
+		analysis_slide_type_index = 1;
+	end
+	analysis_slide_type = analysis_slide_types[analysis_slide_type_index];
+end
+
+local function increase_analysis_slide_subtype()
+	analysis_slide_subtype_index = analysis_slide_subtype_index + 1;
+	if analysis_slide_subtype_index > #analysis_slide_subtypes then
+		analysis_slide_subtype_index = 1;
+	end
+	analysis_slide_subtype = analysis_slide_subtypes[analysis_slide_subtype_index];
+end
+
+local function decrease_analysis_slide_type()
+	analysis_slide_type_index = analysis_slide_type_index - 1;
+	if analysis_slide_type_index < 1 then
+		analysis_slide_type_index = #analysis_slide_types;
+	end
+	analysis_slide_type = analysis_slide_types[analysis_slide_type_index];
+end
+
+local function decrease_analysis_slide_subtype()
+	analysis_slide_subtype_index = analysis_slide_subtype_index - 1;
+	if analysis_slide_subtype_index < 1 then
+		analysis_slide_subtype_index = #analysis_slide_subtypes;
+	end
+	analysis_slide_subtype = analysis_slide_subtypes[analysis_slide_subtype_index];
+end
+
+function grab_script_mode_from_inputs()
+	all_acceptable_script_modes = {};
+	for i = 1, #grab_script_modes do
+		if grab_script_modes[i][2] == analysis_slide_type then
+			all_acceptable_script_modes[#all_acceptable_script_modes + 1] = i;
+		end
+	end
+	acceptable_subtype_found = false;
+	if #all_acceptable_script_modes > 0 then
+		for i = 1, #all_acceptable_script_modes do
+			if grab_script_modes[all_acceptable_script_modes[i]].subtype ~= nil then
+				if grab_script_modes[all_acceptable_script_modes[i]].subtype == analysis_slide_subtype then
+					acceptable_subtype_found = true;
+					correct_subtype = i;
+				end
+			end
+		end
+	end
+	if not acceptable_subtype_found then
+		all_acceptable_script_modes = {all_acceptable_script_modes[1]};
+	else
+		all_acceptable_script_modes = {all_acceptable_script_modes[correct_subtype]};
+	end
+	grab_script_mode_index = all_acceptable_script_modes[1];
+	grab_script_mode = grab_script_modes[grab_script_mode_index][1];
 end
 
 -------------------------
@@ -424,7 +558,7 @@ local Game = {
 	speedy_index = 8,
 	rot_speed = 10,
 	max_rot_units = 4096,
-	form_height = 12,
+	form_height = 14,
 };
 
 function Game.getCurrentMode()
@@ -8173,7 +8307,19 @@ function Game.initUI()
 	-- TODO: Different indexes on Kiosk
 	ScriptHawk.UI.form_controls["Character Dropdown"] = forms.dropdown(ScriptHawk.UI.options_form, {"0. DK", "1. Diddy", "2. Lanky", "3. Tiny", "4. Chunky", "5. Krusha", "6. Rambi", "7. Enguarde", "8. Squawks", "9. Squawks"}, ScriptHawk.UI.col(0) + ScriptHawk.UI.dropdown_offset, ScriptHawk.UI.row(9) + ScriptHawk.UI.dropdown_offset, ScriptHawk.UI.col(9) + 8, ScriptHawk.UI.button_height);
 	ScriptHawk.UI.checkbox(10, 9, "Set Character", "Set Character");
-
+	
+	-- Set Object Tools
+	ScriptHawk.UI.form_controls["Analysis Type Text"] = forms.label(ScriptHawk.UI.options_form, analysis_slide_type, ScriptHawk.UI.col(9) + ScriptHawk.UI.dropdown_offset, ScriptHawk.UI.row(10) + ScriptHawk.UI.dropdown_offset, ScriptHawk.UI.col(4) + 8, ScriptHawk.UI.button_height);
+	ScriptHawk.UI.button(14, 10, {1, 1}, nil, nil, ">", increase_analysis_slide_type);
+	ScriptHawk.UI.button(7.5, 10, {1, 1}, nil, nil, "<", decrease_analysis_slide_type);
+	
+	ScriptHawk.UI.form_controls["Analysis Subtype Text"] = forms.label(ScriptHawk.UI.options_form, analysis_slide_subtype, ScriptHawk.UI.col(9) + ScriptHawk.UI.dropdown_offset, ScriptHawk.UI.row(11) + ScriptHawk.UI.dropdown_offset, ScriptHawk.UI.col(4) + 8, ScriptHawk.UI.button_height);
+	ScriptHawk.UI.button(14, 11, {1, 1}, nil, nil, ">", increase_analysis_slide_subtype);
+	ScriptHawk.UI.button(7.5, 11, {1, 1}, nil, nil, "<", decrease_analysis_slide_subtype);
+	
+	ScriptHawk.UI.form_controls["Analysis Filter Label"] = forms.label(ScriptHawk.UI.options_form, "Filter:", ScriptHawk.UI.col(0) + ScriptHawk.UI.dropdown_offset, ScriptHawk.UI.row(11) + ScriptHawk.UI.dropdown_offset, ScriptHawk.UI.col(1) + 15, ScriptHawk.UI.button_height);
+	ScriptHawk.UI.form_controls["Analysis Filter Textbox"] = forms.textbox(ScriptHawk.UI.options_form, nil, ScriptHawk.UI.col(5), ScriptHawk.UI.button_height, nil, ScriptHawk.UI.col(2) + 4, ScriptHawk.UI.row(11));
+	
 	-- Output flag statistics
 	flagStats();
 end
@@ -8640,6 +8786,10 @@ function Game.drawUI()
 	updateCurrentInvisify();
 	forms.settext(ScriptHawk.UI.form_controls["Lag Factor Value Label"], lag_factor);
 	forms.settext(ScriptHawk.UI.form_controls["Toggle Visibility Button"], current_invisify);
+	forms.settext(ScriptHawk.UI.form_controls["Analysis Type Text"],analysis_slide_type);
+	forms.settext(ScriptHawk.UI.form_controls["Analysis Subtype Text"],analysis_slide_subtype);
+	grab_script_mode_from_inputs();
+	turnFilterBoxIntoFilter();
 	--forms.settext(ScriptHawk.UI.form_controls["Moon Mode Button"], moon_mode);
 	drawGrabScriptUI();
 
