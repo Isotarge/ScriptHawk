@@ -7408,6 +7408,13 @@ function ohWrongnana(verbose)
 		return;
 	end
 
+	local currentMap = Game.getMap();
+	-- Don't run FTA on Batty Barrel Bandit maps
+	-- TODO: Figure out why the game sometimes crashes when pulling the BBB lever with FTA enabled
+	if currentMap == 32 or currentMap == 121 or currentMap == 122 or currentMap == 123 then
+		return;
+	end
+
 	--if emu.framecount() % 100 ~= 0 then -- Only run this once every 100 frames
 	--	return;
 	--end
