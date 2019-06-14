@@ -388,10 +388,9 @@ local supportedGames = {
 	["93BF2FAC1387320AD07251CB4B64FD36BAC1D7A6"] = {moduleName="games.bt", friendlyName="Banjo-Tooie (Europe) (En,Fr,De,Es)", version=2},
 	["AF1A89E12B638B8D82CC4C085C8E01D4CBA03FB3"] = {moduleName="games.bt", friendlyName="Banjo-Tooie (USA)", version=4},
 
-    -- Brother Bear (GBA)
-    ["89E6903500F62E11483402B76C1454AF788646C0"] = {moduleName="games.GBA_brother_bear", friendlyName="Brother Bear (USA)", version=1},
+	-- Brother Bear (GBA)
+	["89E6903500F62E11483402B76C1454AF788646C0"] = {moduleName="games.GBA_brother_bear", friendlyName="Brother Bear (USA)", version=1},
 
-    
 	-- Conker's Bad Fur Day
 	["EE7BC6656FD1E1D9FFB3D19ADD759F28B88DF710"] = {moduleName="games.cbfd", friendlyName="Conker's Bad Fur Day (Europe)", version=1},
 	["4CBADD3C4E0729DEC46AF64AD018050EADA4F47A"] = {moduleName="games.cbfd", friendlyName="Conker's Bad Fur Day (USA)", version=2},
@@ -443,9 +442,9 @@ local supportedGames = {
 	["B4717E602F07CA9BE0D4822813C658CD8B99F993"] = {moduleName="games.dk64", friendlyName="Donkey Kong 64 (USA) (Demo) (Kiosk)", version=4},
 	["CF806FF2603640A748FCA5026DED28802F1F4A50"] = {moduleName="games.dk64", friendlyName="Donkey Kong 64 (USA)", version=1},
 
-    -- Donkey Kong Country 2 (GBA)
-    ["B0A4D59447C8D7C321BEA4DC7253B0F581129EDE"] = {moduleName="games.GBA_dkc2", friendlyName="Donkey Kong Country 2 (USA)", version=1},
-        
+	-- Donkey Kong Country 2 (GBA)
+	["B0A4D59447C8D7C321BEA4DC7253B0F581129EDE"] = {moduleName="games.GBA_dkc2", friendlyName="Donkey Kong Country 2 (USA)", version=1},
+
 	-- Drill Dozer
 	["C1058CC2482B91204100CC8515DA99AEB06773F5"] = {moduleName="games.GBA_DrillDozer", friendlyName="Drill Dozer (USA)", version=1},
 	["84AFA7108E4D604E7B1A6D105DF5760869A247FA"] = {moduleName="games.GBA_DrillDozer", friendlyName="Screw Breaker Goushin Dorirurero (Japan)", version=2},
@@ -484,6 +483,9 @@ local supportedGames = {
 	-- Impossible Mission
 	["AF51AB03A173DEC28C9241532227CD64"] = {moduleName="games.impossible_mission", friendlyName="Impossible Mission (E)"},
 	["A26D40B6B7646C22D1F2DB7F746F0391"] = {moduleName="games.impossible_mission", friendlyName="Impossible Mission (E) (Beta)"},
+
+	-- Land of Illusion
+	["07FAC1D61BC20CF6EB298F66EC2FFE49"] = {moduleName="games.land_of_illusion", friendlyName="Land of Illusion Starring Mickey Mouse (E)"},
 
 	-- Lord of the Sword
 	["6A08D913FD92A213B1ECF5AA7C5630362CCCC6B4"] = {moduleName="games.lots", friendlyName="Lord of the Sword (J)"},
