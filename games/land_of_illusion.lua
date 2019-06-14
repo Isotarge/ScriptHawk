@@ -16,6 +16,8 @@ local Game = {
 		time_frames = 0xA1, -- u8, maxes at 0x19 and counts down
 		time_seconds = 0xA2, -- BCD
 		time_hundred_seconds = 0xA3, -- BCD - Anything with 0xA-F in the upper digit is instakill, weird
+		air_timer = 0xAC,
+		air = 0xAD,
 		grabbed_object_pointer = 0x11A, -- 2 byte pointer onto system bus
 		x_position_level = 0x214, -- Fixed u16.8 LE
 		x_position = 0x20C, -- Fixed u8.8 LE
@@ -130,6 +132,9 @@ function Game.applyInfinites()
 	-- Set health to max
 	mainmemory.writebyte(Game.Memory.health, mainmemory.readbyte(Game.Memory.max_health));
 
+	-- Set air to max
+	mainmemory.writebyte(Game.Memory.air, 8);
+
 	-- Set time to max
 	mainmemory.writebyte(Game.Memory.time_seconds, 0x00);
 	mainmemory.writebyte(Game.Memory.time_hundred_seconds, 0x10);
@@ -199,6 +204,10 @@ function Game.getGrabbedObject()
 	return mainmemory.read_u16_le(Game.Memory.grabbed_object_pointer);
 end
 
+function Game.getAirOSD()
+	return mainmemory.readbyte(Game.Memory.air).."."..mainmemory.readbyte(Game.Memory.air_timer);
+end
+
 function Game.getMapOSD()
 	local currentMap = Game.getLevel();
 	local currentMapName = "Unknown";
@@ -252,6 +261,7 @@ Game.OSD = {
 	{"Level", Game.getMapOSD},
 	{"IGT", Game.getIGT, Game.blueWhenInfinites},
 	{"Health", Game.getHealthOSD, Game.blueWhenInfinites},
+	{"Air", Game.getAirOSD, Game.blueWhenInfinites},
 	{"Separator"},
 	{"X"},
 	{"Y"},
