@@ -29,6 +29,23 @@ local Game = {
 		Boss Cycle and RNG	0x041A
 		--]]
 	},
+	maps = {
+		"0x00",
+		"0x01",
+		"0x02",
+		"0x03",
+		"0x04",
+		"0x05",
+		"0x06",
+		"0x07",
+		"0x08",
+		"0x09",
+		"0x0A",
+		"0x0B",
+		"0x0C",
+		"0x0D",
+		"0x0E",
+	},
 };
 
 local enemy_array = 0x200;
@@ -182,6 +199,14 @@ function Game.getGrabbedObject()
 	return mainmemory.read_u16_le(Game.Memory.grabbed_object_pointer);
 end
 
+function Game.getLevel()
+	return mainmemory.readbyte(Game.Memory.level_index);
+end
+
+function Game.setMap(value)
+	mainmemory.writebyte(Game.Memory.level_index, value - 1);
+end
+
 -- Map Data
 local tilemap_start = 0x1600;
 local screen_height = 0x0A; -- tiles
@@ -215,6 +240,7 @@ function Game.initUI()
 end
 
 Game.OSD = {
+	{"Level", Game.getLevel},
 	{"IGT", Game.getIGT, Game.blueWhenInfinites},
 	{"Health", Game.getHealthOSD, Game.blueWhenInfinites},
 	{"Separator"},
