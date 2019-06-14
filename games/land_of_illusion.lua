@@ -30,21 +30,21 @@ local Game = {
 		--]]
 	},
 	maps = {
-		"0x00",
-		"0x01",
-		"0x02",
-		"0x03",
-		"0x04",
-		"0x05",
-		"0x06",
-		"0x07",
-		"0x08",
-		"0x09",
-		"0x0A",
-		"0x0B",
-		"0x0C",
-		"0x0D",
-		"0x0E",
+		"Intro",
+		"Forest",
+		"Lake",
+		"Blacksmith's Castle",
+		"Castle Ruins",
+		"Tiny Cavern",
+		"Flower Field",
+		"Toy Workshop",
+		"Palace Ruins",
+		"Craggy Cliff",
+		"Desert",
+		"Good Princess's Castle",
+		"Sand Castle",
+		"Island",
+		"Phantom's Castle",
 	},
 };
 
@@ -199,6 +199,15 @@ function Game.getGrabbedObject()
 	return mainmemory.read_u16_le(Game.Memory.grabbed_object_pointer);
 end
 
+function Game.getMapOSD()
+	local currentMap = Game.getLevel();
+	local currentMapName = "Unknown";
+	if Game.maps[currentMap + 1] ~= nil then
+		currentMapName = Game.maps[currentMap + 1];
+	end
+	return currentMapName.." ("..toHexString(currentMap)..")";
+end
+
 function Game.getLevel()
 	return mainmemory.readbyte(Game.Memory.level_index);
 end
@@ -240,7 +249,7 @@ function Game.initUI()
 end
 
 Game.OSD = {
-	{"Level", Game.getLevel},
+	{"Level", Game.getMapOSD},
 	{"IGT", Game.getIGT, Game.blueWhenInfinites},
 	{"Health", Game.getHealthOSD, Game.blueWhenInfinites},
 	{"Separator"},
