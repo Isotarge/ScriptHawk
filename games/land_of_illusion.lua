@@ -94,6 +94,7 @@ function Game.write_u16_8(base, value)
 end
 
 function Game.detectVersion(romName, romHash)
+	ScriptHawk.smooth_moving_angle = false;
 	ScriptHawk.dpad.joypad.enabled = false;
 	ScriptHawk.dpad.key.enabled = false;
 	ScriptHawk.hitboxDefaultMode = ScriptHawk.hitboxModeWHCentered;
@@ -247,7 +248,8 @@ local DAMAGE = 0xFFFF00FF; -- Pink
 local UNKNOWN = 0xFFFF00FF; -- Pink
 
 local tile_colors = {
-	[0x8DD9] = {
+	[0x8DD9] = { -- Forest Start
+		[0x00] = EMPTY,
 		[0x01] = EMPTY,
 		[0x02] = BLOCK,
 		[0x03] = SOLID,
@@ -278,6 +280,7 @@ local tile_colors = {
 		[0x1C] = SOLID,
 		[0x1D] = SOLID,
 		[0x1E] = EMPTY,
+		[0x1F] = EMPTY, -- Unused?
 		[0x20] = EMPTY,
 		[0x21] = EMPTY,
 		[0x22] = EMPTY,
@@ -288,10 +291,12 @@ local tile_colors = {
 		[0x27] = SOLID,
 		[0x28] = EMPTY,
 		[0x29] = EMPTY,
+		[0x2A] = EMPTY, -- Unused?
 		[0x2B] = SOLID_ABOVE_ONLY, -- Tree branch
 		[0x2D] = SOLID_ABOVE_ONLY, -- Tree branch
 		[0x2E] = SOLID_ABOVE_ONLY, -- Tree branch
 		[0x2F] = SOLID_ABOVE_ONLY, -- Tree branch
+		[0x30] = EMPTY, -- Unused?
 		[0x31] = EMPTY,
 		[0x32] = EMPTY,
 		[0x33] = EMPTY,
@@ -308,6 +313,7 @@ local tile_colors = {
 		[0x3E] = EMPTY,
 		[0x3F] = EMPTY,
 		[0x40] = EMPTY,
+		[0x41] = EMPTY, -- Unused?
 		[0x42] = EMPTY,
 		[0x43] = EMPTY,
 		[0x44] = EMPTY,
@@ -389,6 +395,7 @@ local tile_colors = {
 		[0x10] = DOOR,
 		[0x11] = SOLID,
 		[0x12] = SOLID,
+
 		[0x14] = VINE,
 		[0x15] = VINE,
 		[0x16] = VINE,
@@ -407,6 +414,7 @@ local tile_colors = {
 		[0x23] = DOOR,
 		[0x24] = SOLID,
 		[0x25] = EMPTY,
+
 		[0x28] = DOOR,
 		[0x29] = DOOR,
 		[0x2A] = DOOR,
@@ -439,6 +447,7 @@ local tile_colors = {
 		[0x45] = EMPTY,
 		[0x46] = EMPTY,
 		[0x47] = EMPTY,
+
 		[0x49] = EMPTY,
 		[0x4A] = EMPTY,
 		[0x4B] = EMPTY,
@@ -464,17 +473,25 @@ local tile_colors = {
 		[0x5F] = SOLID_ABOVE_ONLY,
 		[0x60] = SOLID,
 		[0x61] = SOLID,
+
 		[0x68] = SOLID,
+
 		[0x6A] = SOLID_ABOVE_ONLY,
 		[0x6B] = SOLID_ABOVE_ONLY,
 		[0x6C] = SOLID_ABOVE_ONLY,
+
 		[0x6F] = EMPTY,
+
 		[0x71] = EMPTY,
+
 		[0x78] = EMPTY,
+
+		[0x80] = SOLID,
+
 		[0x82] = SOLID,
+
 		[0x88] = EMPTY,
 		[0x89] = EMPTY,
-		[0x80] = SOLID,
 		[0x8A] = EMPTY,
 		[0x8B] = EMPTY,
 		[0x8C] = EMPTY,
@@ -520,7 +537,87 @@ local tile_colors = {
 		[0x64] = EMPTY,
 		[0x65] = EMPTY,
 	},
+	[0x8C92] = { -- Lake Start
+		[0x02] = BLOCK,
+		[0x09] = CHECKPOINT,
+		[0x0A] = CHECKPOINT,
+		[0x0B] = DOOR,
+		[0x0C] = DOOR,
+		[0x0D] = DOOR,
+		[0x0E] = DOOR,
+		[0x0F] = VINE,
+		[0x10] = VINE,
+		[0x17] = SOLID,
+		[0x18] = SOLID,
+		[0x19] = SOLID,
+		[0x1A] = SOLID,
+		[0x1B] = SOLID,
+		[0x1D] = SOLID,
+		[0x1E] = SOLID,
+		[0x1F] = SOLID,
+		[0x20] = SOLID,
+		[0x22] = SOLID,
+		[0x23] = SOLID,
+		[0x26] = EMPTY,
+		[0x27] = EMPTY,
+		[0x28] = EMPTY,
+		[0x29] = EMPTY,
+		[0x2A] = EMPTY,
+		[0x2B] = EMPTY,
+		[0x2C] = EMPTY,
+		[0x2D] = EMPTY,
+		[0x2E] = EMPTY,
+		[0x2F] = EMPTY,
+		[0x30] = EMPTY,
+		[0x31] = EMPTY,
+		[0x32] = EMPTY,
+		[0x33] = EMPTY,
+		[0x34] = EMPTY,
+		[0x35] = EMPTY,
+		[0x37] = EMPTY,
+		[0x38] = EMPTY,
+		[0x3D] = EMPTY,
+		[0x3E] = EMPTY,
+		[0x3F] = EMPTY,
+		[0x41] = SOLID,
+		[0x47] = EMPTY,
+		[0x4F] = EMPTY,
+		[0x54] = SOLID,
+		[0x55] = SOLID,
+		[0x56] = SOLID,
+		[0x57] = SOLID,
+	},
 };
+
+function setEveryTile(value, height)
+	if height == nil then
+		height = 1
+	end
+	local levelWidth = mainmemory.readbyte(Game.Memory.level_width);
+	for x = 0x00, levelWidth do
+		for y = 0x00, screen_height - 1 do
+			local tile = tilemap_start + y * levelWidth + x;
+			mainmemory.writebyte(tile, value);
+			if y == screen_height - height then
+				mainmemory.writebyte(tile, 0x02); -- Block the bottom
+			end
+		end
+	end
+end
+
+function Game.drawCollision()
+	for x = 0, 32 - 1 do
+		for y = 0, 20 - 1 do
+			local tileQuarterAddress = 0xA00 + (y * 64) + (x * 2) + 1;
+			local collisionValue = mainmemory.readbyte(tileQuarterAddress);
+			dprint("ADDR: "..toHexString(tileQuarterAddress, 4, "").." X: "..x.." Y: "..y.." COLLISION: "..toHexString(collisionValue, 2, ""));
+			if collisionValue == 0xA9 then
+				gui.drawRectangle(x * 8 + ScriptHawk.overscan_compensation.x, y * 8 + ScriptHawk.overscan_compensation.x, 8, 8, BLOCK, BLOCK);
+			end
+		end
+	end
+	print_deferred();
+end
 
 function Game.drawMap()
 	local screenXPos = Game.getScreenXPosition();
@@ -529,26 +626,19 @@ function Game.drawMap()
 	local levelWidth = mainmemory.readbyte(Game.Memory.level_width);
 	local xOffset = ScriptHawk.overscan_compensation.x + (tile_size - screenXPos % tile_size) - tile_size;
 	local yOffset = ScriptHawk.overscan_compensation.y;
-	local levelIndex = Game.getTilemapPointer();
 	for x = startX, endX do
-		for y = 0x00, screen_height - 1 do
+		for y = 0x00, screen_height * 2 - 1 do
 			local tile = tilemap_start + y * levelWidth + x;
 			local tileValue = mainmemory.readbyte(tile);
-			local tileColor = UNKNOWN;
-			if tile_colors[levelIndex] ~= nil then
-				if tile_colors[levelIndex][tileValue] ~= nil then
-					tileColor = tile_colors[levelIndex][tileValue];
-				end
-			end
-			ScriptHawk.drawText((x - startX) * tile_size + xOffset, y * tile_size + yOffset, toHexString(tileValue, 2, ""), tileColor, 0, true);
+			ScriptHawk.drawText((x - startX) * tile_size + xOffset, y * tile_size + yOffset, toHexString(tileValue, 2, ""), nil, 0, true);
 		end
 	end
-	--print_deferred();
 end
 
 function Game.drawUI()
 	if (ScriptHawk.UI.isChecked("Draw Map Checkbox")) then
 		Game.drawMap();
+		--Game.drawCollision();
 	end
 end
 
