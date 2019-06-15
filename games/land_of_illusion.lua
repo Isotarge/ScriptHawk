@@ -8,6 +8,7 @@ end
 local Game = {
 	Memory = {
 		screen_x_position = 0x70, -- Fixed u16.8 LE
+		tilemap_pointer = 0x79,
 		level_width = 0x7C, -- Single byte, measured in tiles
 		max_health = 0x98,
 		health = 0x99,
@@ -217,6 +218,10 @@ function Game.getMapOSD()
 	return currentMapName.." ("..toHexString(currentMap)..")";
 end
 
+function Game.getTilemapPointer()
+	return mainmemory.read_u16_le(Game.Memory.tilemap_pointer);
+end
+
 function Game.getLevel()
 	return mainmemory.readbyte(Game.Memory.level_index);
 end
@@ -230,6 +235,293 @@ local tilemap_start = 0x1600;
 local screen_height = 0x0A; -- tiles
 local tile_size = 16;
 
+local SOLID = 0xFFFF0000; -- Red
+local SOLID_ABOVE_ONLY = 0xFFFF7F00; -- Orange
+local EMPTY = 0x2FFFFFFF; -- White
+local BLOCK = 0xFFFFFF00; -- Yellow
+local VINE = 0xFF00FF00; -- Green
+local SECRET = 0xFF00FF00; -- Green
+local CHECKPOINT = 0xFF0000FF; -- Blue
+local DOOR = 0xFF0000FF; -- Blue
+local DAMAGE = 0xFFFF00FF; -- Pink
+local UNKNOWN = 0xFFFF00FF; -- Pink
+
+local tile_colors = {
+	[0x8DD9] = {
+		[0x01] = EMPTY,
+		[0x02] = BLOCK,
+		[0x03] = SOLID,
+		[0x04] = SOLID,
+		[0x05] = SOLID,
+		[0x06] = SOLID,
+		[0x07] = SOLID,
+		[0x08] = DAMAGE,
+		[0x09] = SOLID,
+		[0x0A] = SOLID,
+		[0x0B] = SOLID,
+		[0x0C] = SOLID,
+		[0x0D] = DOOR,
+		[0x0E] = DOOR,
+		[0x0F] = DOOR,
+		[0x10] = DOOR,
+		[0x11] = SOLID,
+		[0x12] = SOLID,
+		[0x13] = SOLID,
+		[0x14] = VINE,
+		[0x15] = VINE,
+		[0x16] = VINE,
+		[0x17] = VINE,
+		[0x18] = SOLID,
+		[0x19] = SOLID,
+		[0x1A] = SOLID,
+		[0x1B] = SOLID,
+		[0x1C] = SOLID,
+		[0x1D] = SOLID,
+		[0x1E] = EMPTY,
+		[0x20] = EMPTY,
+		[0x21] = EMPTY,
+		[0x22] = EMPTY,
+		[0x23] = EMPTY,
+		[0x24] = SOLID,
+		[0x25] = SOLID,
+		[0x26] = SOLID,
+		[0x27] = SOLID,
+		[0x28] = EMPTY,
+		[0x29] = EMPTY,
+		[0x2B] = SOLID_ABOVE_ONLY, -- Tree branch
+		[0x2D] = SOLID_ABOVE_ONLY, -- Tree branch
+		[0x2E] = SOLID_ABOVE_ONLY, -- Tree branch
+		[0x2F] = SOLID_ABOVE_ONLY, -- Tree branch
+		[0x31] = EMPTY,
+		[0x32] = EMPTY,
+		[0x33] = EMPTY,
+		[0x34] = EMPTY,
+		[0x35] = EMPTY,
+		[0x36] = EMPTY,
+		[0x37] = EMPTY,
+		[0x38] = EMPTY,
+		[0x39] = EMPTY,
+		[0x3A] = EMPTY,
+		[0x3B] = EMPTY,
+		[0x3C] = EMPTY,
+		[0x3D] = EMPTY,
+		[0x3E] = EMPTY,
+		[0x3F] = EMPTY,
+		[0x40] = EMPTY,
+		[0x42] = EMPTY,
+		[0x43] = EMPTY,
+		[0x44] = EMPTY,
+		[0x45] = EMPTY,
+		[0x46] = EMPTY,
+		[0x47] = EMPTY,
+		[0x48] = EMPTY,
+		[0x49] = EMPTY,
+		[0x4A] = EMPTY,
+		[0x4C] = EMPTY,
+		[0x4D] = EMPTY,
+		[0x4E] = EMPTY,
+		[0x4F] = EMPTY,
+		[0x50] = EMPTY,
+		[0x51] = EMPTY,
+		[0x52] = EMPTY,
+		[0x53] = EMPTY,
+		[0x54] = EMPTY,
+		[0x55] = EMPTY,
+		[0x56] = EMPTY,
+		[0x57] = EMPTY,
+		[0x58] = EMPTY,
+		[0x59] = EMPTY,
+		[0x5A] = EMPTY,
+		[0x5B] = EMPTY,
+		[0x5C] = EMPTY,
+		[0x5D] = EMPTY,
+		[0x5E] = EMPTY,
+		[0x5F] = EMPTY,
+		[0x60] = EMPTY, -- Web
+		[0x61] = EMPTY, -- Web
+		[0x62] = EMPTY, -- Web
+		[0x63] = EMPTY, -- Web
+		[0x64] = EMPTY, -- Web
+		[0x65] = EMPTY, -- Web
+		[0x66] = EMPTY, -- Web
+		[0x67] = EMPTY, -- Web
+		[0x68] = EMPTY, -- Web
+		[0x69] = EMPTY, -- Web
+		[0x6A] = EMPTY, -- Web
+		[0x6B] = EMPTY, -- Web
+		[0x6C] = EMPTY, -- Web
+		[0x6D] = EMPTY,
+		[0x6E] = EMPTY,
+		[0x6F] = EMPTY,
+		[0x70] = EMPTY,
+		[0x71] = EMPTY,
+		[0x72] = EMPTY,
+		[0x73] = EMPTY,
+		[0x74] = EMPTY,
+		[0x75] = EMPTY,
+		[0x76] = EMPTY,
+		[0x77] = EMPTY,
+		[0x78] = EMPTY,
+		[0x79] = EMPTY,
+		[0x7A] = SOLID_ABOVE_ONLY,
+		[0x7B] = SECRET,
+		[0x7C] = SECRET,
+		[0x7D] = SECRET,
+		[0x7E] = SECRET,
+		[0x7F] = SECRET,
+	},
+	[0xA361] = {
+		[0x01] = EMPTY,
+		[0x02] = EMPTY,
+		[0x03] = SOLID,
+		[0x04] = EMPTY,
+		[0x05] = SOLID,
+		[0x06] = SOLID,
+		[0x07] = SOLID,
+		[0x08] = SOLID,
+		[0x09] = CHECKPOINT,
+		[0x0A] = CHECKPOINT,
+		[0x0B] = CHECKPOINT,
+		[0x0C] = CHECKPOINT,
+		[0x0D] = DOOR,
+		[0x0E] = DOOR,
+		[0x0F] = DOOR,
+		[0x10] = DOOR,
+		[0x11] = SOLID,
+		[0x12] = SOLID,
+		[0x14] = VINE,
+		[0x15] = VINE,
+		[0x16] = VINE,
+		[0x17] = VINE,
+		[0x18] = SOLID,
+		[0x19] = SOLID,
+		[0x1A] = SOLID,
+		[0x1B] = SOLID,
+		[0x1C] = EMPTY,
+		[0x1D] = EMPTY,
+		[0x1E] = EMPTY,
+		[0x1F] = EMPTY,
+		[0x20] = DOOR,
+		[0x21] = DOOR,
+		[0x22] = DOOR,
+		[0x23] = DOOR,
+		[0x24] = SOLID,
+		[0x25] = EMPTY,
+		[0x28] = DOOR,
+		[0x29] = DOOR,
+		[0x2A] = DOOR,
+		[0x2B] = DOOR,
+		[0x2C] = EMPTY,
+		[0x2D] = EMPTY,
+		[0x2E] = EMPTY,
+		[0x2F] = EMPTY,
+		[0x30] = EMPTY,
+		[0x31] = EMPTY,
+		[0x32] = EMPTY,
+		[0x33] = EMPTY,
+		[0x34] = EMPTY,
+		[0x35] = EMPTY,
+		[0x36] = EMPTY,
+		[0x37] = EMPTY,
+		[0x38] = EMPTY,
+		[0x39] = EMPTY,
+		[0x3A] = EMPTY,
+		[0x3B] = EMPTY,
+		[0x3C] = EMPTY,
+		[0x3D] = EMPTY,
+		[0x3E] = EMPTY,
+		[0x3F] = EMPTY,
+		[0x40] = EMPTY,
+		[0x41] = EMPTY,
+		[0x42] = EMPTY,
+		[0x43] = EMPTY,
+		[0x44] = EMPTY,
+		[0x45] = EMPTY,
+		[0x46] = EMPTY,
+		[0x47] = EMPTY,
+		[0x49] = EMPTY,
+		[0x4A] = EMPTY,
+		[0x4B] = EMPTY,
+		[0x4C] = EMPTY,
+		[0x4D] = EMPTY,
+		[0x4E] = EMPTY,
+		[0x4F] = EMPTY,
+		[0x50] = SOLID_ABOVE_ONLY,
+		[0x51] = EMPTY,
+		[0x52] = EMPTY,
+		[0x53] = EMPTY,
+		[0x54] = SOLID_ABOVE_ONLY,
+		[0x55] = EMPTY,
+		[0x56] = SOLID_ABOVE_ONLY,
+		[0x57] = SOLID_ABOVE_ONLY,
+		[0x58] = SOLID_ABOVE_ONLY,
+		[0x59] = EMPTY,
+		[0x5A] = EMPTY,
+		[0x5B] = EMPTY,
+		[0x5C] = SOLID_ABOVE_ONLY,
+		[0x5D] = EMPTY,
+		[0x5E] = EMPTY,
+		[0x5F] = SOLID_ABOVE_ONLY,
+		[0x60] = SOLID,
+		[0x61] = SOLID,
+		[0x68] = SOLID,
+		[0x6A] = SOLID_ABOVE_ONLY,
+		[0x6B] = SOLID_ABOVE_ONLY,
+		[0x6C] = SOLID_ABOVE_ONLY,
+		[0x6F] = EMPTY,
+		[0x71] = EMPTY,
+		[0x78] = EMPTY,
+		[0x82] = SOLID,
+		[0x88] = EMPTY,
+		[0x89] = EMPTY,
+		[0x80] = SOLID,
+		[0x8A] = EMPTY,
+		[0x8B] = EMPTY,
+		[0x8C] = EMPTY,
+		[0x8D] = EMPTY,
+	},
+	[0xBAE8] = {
+		[0x00] = EMPTY,
+		[0x10] = SOLID, -- Log Left
+		[0x11] = SOLID, -- Log Section
+		[0x13] = EMPTY, -- Green Background
+		[0x15] = SOLID,
+		[0x16] = VINE, -- Log Top
+		[0x17] = VINE, -- Middle, Green Background
+		[0x18] = EMPTY,
+		[0x19] = EMPTY,
+		[0x1A] = EMPTY,
+		[0x1B] = EMPTY,
+		[0x1C] = EMPTY,
+		[0x1D] = EMPTY,
+		[0x1E] = EMPTY,
+		[0x1F] = EMPTY,
+
+		[0x26] = SOLID,
+
+		[0x30] = EMPTY,
+		[0x31] = EMPTY,
+		[0x32] = EMPTY,
+		[0x33] = EMPTY,
+		[0x34] = EMPTY,
+		[0x35] = EMPTY,
+
+		[0x40] = EMPTY,
+		[0x41] = SOLID,
+
+		[0x5C] = EMPTY,
+		[0x5D] = EMPTY,
+		[0x5E] = EMPTY,
+		[0x5F] = EMPTY,
+		[0x60] = EMPTY,
+		[0x61] = EMPTY,
+		[0x62] = EMPTY,
+		[0x63] = EMPTY,
+		[0x64] = EMPTY,
+		[0x65] = EMPTY,
+	},
+};
+
 function Game.drawMap()
 	local screenXPos = Game.getScreenXPosition();
 	local startX = math.floor(screenXPos / tile_size);
@@ -237,11 +529,18 @@ function Game.drawMap()
 	local levelWidth = mainmemory.readbyte(Game.Memory.level_width);
 	local xOffset = ScriptHawk.overscan_compensation.x + (tile_size - screenXPos % tile_size) - tile_size;
 	local yOffset = ScriptHawk.overscan_compensation.y;
+	local levelIndex = Game.getTilemapPointer();
 	for x = startX, endX do
 		for y = 0x00, screen_height - 1 do
 			local tile = tilemap_start + y * levelWidth + x;
 			local tileValue = mainmemory.readbyte(tile);
-			ScriptHawk.drawText((x - startX) * tile_size + xOffset, y * tile_size + yOffset, toHexString(tileValue, 2, ""), nil, 0, true);
+			local tileColor = UNKNOWN;
+			if tile_colors[levelIndex] ~= nil then
+				if tile_colors[levelIndex][tileValue] ~= nil then
+					tileColor = tile_colors[levelIndex][tileValue];
+				end
+			end
+			ScriptHawk.drawText((x - startX) * tile_size + xOffset, y * tile_size + yOffset, toHexString(tileValue, 2, ""), tileColor, 0, true);
 		end
 	end
 	--print_deferred();
@@ -259,6 +558,7 @@ end
 
 Game.OSD = {
 	{"Level", Game.getMapOSD},
+	{"Tile Map", hexifyOSD(Game.getTilemapPointer)},
 	{"IGT", Game.getIGT, Game.blueWhenInfinites},
 	{"Health", Game.getHealthOSD, Game.blueWhenInfinites},
 	{"Air", Game.getAirOSD, Game.blueWhenInfinites},
