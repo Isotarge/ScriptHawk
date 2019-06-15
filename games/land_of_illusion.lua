@@ -245,6 +245,7 @@ local SECRET = 0xFF00FF00; -- Green
 local CHECKPOINT = 0xFF0000FF; -- Blue
 local DOOR = 0xFF0000FF; -- Blue
 local DAMAGE = 0xFFFF00FF; -- Pink
+local SLOPE = 0xFFFF00FF; -- Pink, for now
 local UNKNOWN = 0xFFFF00FF; -- Pink
 
 local tile_colors = {
@@ -606,6 +607,8 @@ function setEveryTile(value, height)
 end
 
 function Game.drawCollision()
+	local mouse = input.getmouse(); -- TODO: Can we use mouse_state.current?
+	local mouseIsOnScreen = (mouse.X >= 0 and mouse.X < ScriptHawk.bufferWidth) and (mouse.Y >= 0 and mouse.Y < ScriptHawk.bufferHeight);
 	local screenXPos = Game.getScreenXPosition();
 	for tileX = 0, 32 - 1 do
 		local drawX = tileX * 8;
@@ -614,21 +617,42 @@ function Game.drawCollision()
 		for tileY = 0, 20 - 1 do
 			local tileQuarterAddress = 0xA00 + (tileY * 64) + (tileX * 2) + 1;
 			local collisionValue = mainmemory.readbyte(tileQuarterAddress);
-			--dprint("ADDR: "..toHexString(tileQuarterAddress, 4, "").." X: "..tileX.." Y: "..tileY.." COLLISION: "..toHexString(collisionValue, 2, ""));
 			local collisionColor = nil;
-			if collisionValue == 0x41 then
+			if collisionValue == 0x09 or collisionValue == 0x0B or collisionValue == 0x0D or collisionValue == 0x0F then
+				collisionColor = DOOR;
+			elseif collisionValue == 0x21 or collisionValue == 0x23 or collisionValue == 0x27 then
+				collisionColor = SOLID_ABOVE_ONLY;
+			elseif collisionValue == 0x41 or collisionValue == 0x43 or collisionValue == 0x45 or collisionValue == 0x47 then
 				collisionColor = SOLID;
-			elseif collisionValue == 0xA9 then
+			elseif collisionValue == 0x49 or collisionValue == 0x4B then
+				collisionColor = BLOCK; -- Toy, might just be solid, not sure
+			elseif collisionValue == 0x51 or collisionValue == 0x53 then
+				collisionColor = SOLID; -- Ceilings?
+			elseif collisionValue == 0xA9 or collisionValue == 0xAB or collisionValue == 0xAF then
 				collisionColor = BLOCK;
-			elseif collisionValue == 0x81 or collisionValue == 0x83 then
-				collisionColor = VINE;
+			elseif collisionValue == 0x61 or collisionValue == 0x63 or collisionValue == 0x81 or collisionValue == 0x83 then
+				collisionColor = VINE; -- Also Spike? (Desert)
+			elseif collisionValue == 0xC1 or collisionValue == 0xC3 then
+				collisionColor = SLOPE; -- Slope down left, also fire right?
+			elseif collisionValue == 0xE1 or collisionValue == 0xE3 then
+				collisionColor = DAMAGE; -- Also right slope down?
 			end
 			if collisionColor ~= nil then
 				gui.drawRectangle(drawX + ScriptHawk.overscan_compensation.x, tileY * 8 + ScriptHawk.overscan_compensation.y, 8, 8, collisionColor, nil);
 			end
+			if mouseIsOnScreen  then
+				if mouse.X >= drawX + ScriptHawk.overscan_compensation.x then
+					if mouse.X <= drawX + ScriptHawk.overscan_compensation.x + 8 then
+						if mouse.Y >= tileY * 8 + ScriptHawk.overscan_compensation.y then
+							if mouse.Y <= tileY * 8 + ScriptHawk.overscan_compensation.y + 8 then
+								ScriptHawk.drawText(drawX + ScriptHawk.overscan_compensation.x, tileY * 8 + ScriptHawk.overscan_compensation.y, toHexString(collisionValue, 2, ""), collisionColor or colors.white, 0x7F000000, true);
+							end
+						end
+					end
+				end
+			end
 		end
 	end
-	--print_deferred();
 end
 
 function Game.drawMap()
@@ -663,7 +687,12 @@ function Game.drawUI()
 	end
 end
 
+function Game.toggleMiniAbility()
+	mainmemory.writebyte(0x86, bit.toggle(mainmemory.readbyte(0x86), 3));
+end
+
 function Game.initUI()
+	ScriptHawk.UI.button(0, 6, {4, 10}, nil, "Toggle Mini Ability Button", "Toggle Mini Avail.", Game.toggleMiniAbility);
 	ScriptHawk.UI.checkbox(10, 4, "Draw Map Checkbox", "Draw Map");
 	ScriptHawk.UI.checkbox(10, 5, "Draw Collision Checkbox", "Draw Collision");
 end
