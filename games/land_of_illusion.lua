@@ -20,6 +20,7 @@ local Game = {
 		air_timer = 0xAC,
 		air = 0xAD,
 		grabbed_object_pointer = 0x11A, -- 2 byte pointer onto system bus
+		time_ticking_down = 0x12D, -- 0x04 ticking, possibly a bitfield?
 		x_position_level = 0x214, -- Fixed u16.8 LE
 		x_position = 0x20C, -- Fixed u8.8 LE
 		y_position = 0x20A, -- Fixed u8.8 LE
@@ -137,9 +138,11 @@ function Game.applyInfinites()
 	-- Set air to max
 	mainmemory.writebyte(Game.Memory.air, 8);
 
-	-- Set time to max
-	mainmemory.writebyte(Game.Memory.time_seconds, 0x00);
-	mainmemory.writebyte(Game.Memory.time_hundred_seconds, 0x10);
+	-- Set time to max if it's not counting down
+	if not bit.check(mainmemory.readbyte(Game.Memory.time_ticking_down), 2) then
+		mainmemory.writebyte(Game.Memory.time_seconds, 0x00);
+		mainmemory.writebyte(Game.Memory.time_hundred_seconds, 0x10);
+	end
 end
 
 function Game.getIGT()

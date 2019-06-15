@@ -133,6 +133,7 @@ A collection of Lua scripts and RAM watches for [BizHawk](https://github.com/TAS
 - Duck Dodgers Starring Daffy Duck
 - Elmo's Number Journey (N64 only)
 - Elmo's Letter Adventure (N64 only)
+- Land of Illusion Starring Mickey Mouse (SMS only)
 - Legend of Galahad (Genesis)
 - Phantasy Star (SMS)
 - Rayman 2 (N64 only)
