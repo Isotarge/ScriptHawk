@@ -606,13 +606,25 @@ function setEveryTile(value, height)
 end
 
 function Game.drawCollision()
+	local screenXPos = Game.getScreenXPosition();
 	for tileX = 0, 32 - 1 do
+		local drawX = tileX * 8;
+		drawX = drawX + 256 - screenXPos;
+		drawX = drawX % 256;
 		for tileY = 0, 20 - 1 do
 			local tileQuarterAddress = 0xA00 + (tileY * 64) + (tileX * 2) + 1;
 			local collisionValue = mainmemory.readbyte(tileQuarterAddress);
 			--dprint("ADDR: "..toHexString(tileQuarterAddress, 4, "").." X: "..tileX.." Y: "..tileY.." COLLISION: "..toHexString(collisionValue, 2, ""));
-			if collisionValue == 0xA9 then
-				gui.drawRectangle(tileX * 8 + ScriptHawk.overscan_compensation.x, tileY * 8 + ScriptHawk.overscan_compensation.x, 8, 8, BLOCK, BLOCK);
+			local collisionColor = nil;
+			if collisionValue == 0x41 then
+				collisionColor = SOLID;
+			elseif collisionValue == 0xA9 then
+				collisionColor = BLOCK;
+			elseif collisionValue == 0x81 or collisionValue == 0x83 then
+				collisionColor = VINE;
+			end
+			if collisionColor ~= nil then
+				gui.drawRectangle(drawX + ScriptHawk.overscan_compensation.x, tileY * 8 + ScriptHawk.overscan_compensation.y, 8, 8, collisionColor, nil);
 			end
 		end
 	end
@@ -643,14 +655,17 @@ function Game.drawMap()
 end
 
 function Game.drawUI()
-	if (ScriptHawk.UI.isChecked("Draw Map Checkbox")) then
+	if ScriptHawk.UI.isChecked("Draw Map Checkbox") then
 		Game.drawMap();
+	end
+	if ScriptHawk.UI.isChecked("Draw Collision Checkbox") then
 		Game.drawCollision();
 	end
 end
 
 function Game.initUI()
 	ScriptHawk.UI.checkbox(10, 4, "Draw Map Checkbox", "Draw Map");
+	ScriptHawk.UI.checkbox(10, 5, "Draw Collision Checkbox", "Draw Collision");
 end
 
 Game.OSD = {
