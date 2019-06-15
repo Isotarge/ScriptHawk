@@ -614,7 +614,9 @@ function Game.drawCollision()
 		local drawX = tileX * 8;
 		drawX = drawX + 256 - screenXPos;
 		drawX = drawX % 256;
+		drawX = drawX + ScriptHawk.overscan_compensation.x;
 		for tileY = 0, 20 - 1 do
+			local drawY = tileY * 8 + ScriptHawk.overscan_compensation.y;
 			local tileQuarterAddress = 0xA00 + (tileY * 64) + (tileX * 2) + 1;
 			local collisionValue = mainmemory.readbyte(tileQuarterAddress);
 			local collisionColor = nil;
@@ -638,16 +640,12 @@ function Game.drawCollision()
 				collisionColor = DAMAGE; -- Also right slope down?
 			end
 			if collisionColor ~= nil then
-				gui.drawRectangle(drawX + ScriptHawk.overscan_compensation.x, tileY * 8 + ScriptHawk.overscan_compensation.y, 8, 8, collisionColor, nil);
+				gui.drawRectangle(drawX, drawY, 8, 8, collisionColor, nil);
 			end
 			if mouseIsOnScreen  then
-				if mouse.X >= drawX + ScriptHawk.overscan_compensation.x then
-					if mouse.X <= drawX + ScriptHawk.overscan_compensation.x + 8 then
-						if mouse.Y >= tileY * 8 + ScriptHawk.overscan_compensation.y then
-							if mouse.Y <= tileY * 8 + ScriptHawk.overscan_compensation.y + 8 then
-								ScriptHawk.drawText(drawX + ScriptHawk.overscan_compensation.x, tileY * 8 + ScriptHawk.overscan_compensation.y, toHexString(collisionValue, 2, ""), collisionColor or colors.white, 0x7F000000, true);
-							end
-						end
+				if mouse.X >= drawX and mouse.X <= drawX + 8 then
+					if mouse.Y >= drawY and mouse.Y <= drawY + 8 then
+						ScriptHawk.drawText(drawX, drawY, toHexString(collisionValue, 2, ""), collisionColor or colors.white, 0x7F000000, true);
 					end
 				end
 			end
