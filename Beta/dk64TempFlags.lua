@@ -1,44 +1,44 @@
 temporary_flags = {
-	{byte = 0xB7, bit = 3, flagName = "Helm: Roman Numeral Doors Open"},
-	{byte = 0xB7, bit = 4, flagName = "Helm: DK BBlast Barrel complete"},
-	{byte = 0xB7, bit = 4, flagName = "Helm: Chunky PPunch Barrel complete"},
-	{byte = 0xB7, bit = 5, flagName = "Helm: Diddy Kremling Barrel complete"},
-	{byte = 0xB7, bit = 6, flagName = "Helm: Tiny PTT Barrel complete"},
+	{byte=0xB7, bit=3, flagName="Helm: Roman Numeral Doors Open"},
+	{byte=0xB7, bit=4, flagName="Helm: DK BBlast Barrel complete"},
+	{byte=0xB7, bit=4, flagName="Helm: Chunky PPunch Barrel complete"},
+	{byte=0xB7, bit=5, flagName="Helm: Diddy Kremling Barrel complete"},
+	{byte=0xB7, bit=6, flagName="Helm: Tiny PTT Barrel complete"},
 
-	{byte = 0xB8, bit = 0, flagName = "Helm: Lanky Maze Barrel complete"},
-	{byte = 0xB8, bit = 1, flagName = "Helm: DK Rambi Barrel complete"},
-	{byte = 0xB8, bit = 2, flagName = "Helm: Diddy Cage Barrel complete"},
-	{byte = 0xB8, bit = 3, flagName = "Helm: Tiny Mushroom Barrel complete"},
-	{byte = 0xB8, bit = 4, flagName = "Helm: Chunky Gun Barrel complete"},
-	{byte = 0xB8, bit = 5, flagName = "Helm: Lanky Gun Barrel complete"},
-	{byte = 0xB8, bit = 6, flagName = "Helm: DK Grate Punched"},
-	{byte = 0xB8, bit = 7, flagName = "Helm: Chunky Grate Punched"},
+	{byte=0xB8, bit=0, flagName="Helm: Lanky Maze Barrel complete"},
+	{byte=0xB8, bit=1, flagName="Helm: DK Rambi Barrel complete"},
+	{byte=0xB8, bit=2, flagName="Helm: Diddy Cage Barrel complete"},
+	{byte=0xB8, bit=3, flagName="Helm: Tiny Mushroom Barrel complete"},
+	{byte=0xB8, bit=4, flagName="Helm: Chunky Gun Barrel complete"},
+	{byte=0xB8, bit=5, flagName="Helm: Lanky Gun Barrel complete"},
+	{byte=0xB8, bit=6, flagName="Helm: DK Grate Punched"},
+	{byte=0xB8, bit=7, flagName="Helm: Chunky Grate Punched"},
 
-	{byte = 0xB9, bit = 0, flagName = "Helm: Lanky Grate Punched"},
-	{byte = 0xB9, bit = 1, flagName = "Helm: Tiny Grate Punched"},
-	{byte = 0xB9, bit = 3, flagName = "Helm: DK Room Shut Down"},
-	{byte = 0xB9, bit = 4, flagName = "Helm: Chunky Room Shut Down"},
-	{byte = 0xB9, bit = 5, flagName = "Helm: Tiny Room Shut Down"},
-	{byte = 0xB9, bit = 6, flagName = "Helm: Lanky Room Shut Down"},
-	{byte = 0xB9, bit = 7, flagName = "Helm: Diddy Room Shut Down"},
+	{byte=0xB9, bit=0, flagName="Helm: Lanky Grate Punched"},
+	{byte=0xB9, bit=1, flagName="Helm: Tiny Grate Punched"},
+	{byte=0xB9, bit=3, flagName="Helm: DK Room Shut Down"},
+	{byte=0xB9, bit=4, flagName="Helm: Chunky Room Shut Down"},
+	{byte=0xB9, bit=5, flagName="Helm: Tiny Room Shut Down"},
+	{byte=0xB9, bit=6, flagName="Helm: Lanky Room Shut Down"},
+	{byte=0xB9, bit=7, flagName="Helm: Diddy Room Shut Down"},
 
 	-- 0xBA, 0 set on Helm Completion, cleared when trying to exit Diddy Room
 	-- 0xBA, 5 set on entering any K Rool Phase
 
-	{byte = 0xBB, bit = 0, flagName = "K. Rool: Tiny Phase Intro"},
-	{byte = 0xBB, bit = 5, flagName = "K. Rool: DK Phase Intro"},
+	{byte=0xBB, bit=0, flagName="K. Rool: Tiny Phase Intro"},
+	{byte=0xBB, bit=5, flagName="K. Rool: DK Phase Intro"},
 
-	{byte = 0xBC, bit = 7, flagName = "Aztec: Dogadon Long Intro"},
+	{byte=0xBC, bit=7, flagName="Aztec: Dogadon Long Intro"},
 
-	{byte = 0xBD, bit = 0, flagName = "Japes: Army Dillo Long Intro"},
-	{byte = 0xBD, bit = 1, flagName = "Fungi: Dogadon Long Intro"},
-	{byte = 0xBD, bit = 2, flagName = "Factory: Mad Jack Long Intro"},
-	{byte = 0xBD, bit = 3, flagName = "Galleon: Puftoss Long Intro"},
-	{byte = 0xBD, bit = 4, flagName = "Castle: Kut Out Long Intro"},
-	{byte = 0xBD, bit = 5, flagName = "Caves: Army Dillo Long Intro"},
+	{byte=0xBD, bit=0, flagName="Japes: Army Dillo Long Intro"},
+	{byte=0xBD, bit=1, flagName="Fungi: Dogadon Long Intro"},
+	{byte=0xBD, bit=2, flagName="Factory: Mad Jack Long Intro"},
+	{byte=0xBD, bit=3, flagName="Galleon: Puftoss Long Intro"},
+	{byte=0xBD, bit=4, flagName="Castle: Kut Out Long Intro"},
+	{byte=0xBD, bit=5, flagName="Caves: Army Dillo Long Intro"},
 };
 
--- 0xB8,2
+-- 0xB8, 2
 
 start = 0x7FDCE0;
 finish = 0x7FDD9F;
@@ -64,34 +64,34 @@ function updateValues()
 	end
 end
 
-function setTempFlag(byte,bit)
-	temp_flag_value = mainmemory.readbyte(start + byte);
-	temp_flag_value = bit.set(temp_flag_value,bit);
+function setTempFlag(byte, bit)
+	local temp_flag_value = mainmemory.readbyte(start + byte);
+	temp_flag_value = bit.set(temp_flag_value, bit);
 	mainmemory.writebyte(start + byte, temp_flag_value);
 end
 
-function clearTempFlag(byte,bit)
-	temp_flag_value = mainmemory.readbyte(start + byte);
-	temp_flag_value = bit.clear(temp_flag_value,bit);
+function clearTempFlag(byte, bit)
+	local temp_flag_value = mainmemory.readbyte(start + byte);
+	temp_flag_value = bit.clear(temp_flag_value, bit);
 	mainmemory.writebyte(start + byte, temp_flag_value);
 end
 
-function checkTempFlag(byte,bit)
-	temp_flag_value = mainmemory.readbyte(start + byte);
-	return_value = bit.check(temp_flag_value,bit);
-	return return_value
+function checkTempFlag(byte, bit)
+	local temp_flag_value = mainmemory.readbyte(start + byte);
+	local return_value = bit.check(temp_flag_value, bit);
+	return return_value;
 end
 
 function checkDifference()
 	for i = start, finish do
-		current_value = mainmemory.readbyte(i);
-		previous_value = previous[i - start];
+		local current_value = mainmemory.readbyte(i);
+		local previous_value = previous[i - start];
 		if current_value ~= previous_value then
-			byteVal = i - start;
-			bitArray = getBitfieldDifferences(previous_value,current_value);
+			local byteVal = i - start;
+			local bitArray = getBitfieldDifferences(previous_value, current_value);
 			for j = 0, 7 do
 				if math.abs(bitArray[j]) == 1 then
-					flagName = "Unknown";
+					local flagName = "Unknown";
 					for k = 1, #temporary_flags do
 						if temporary_flags[k].byte == byteVal then
 							if temporary_flags[k].bit == j then
@@ -110,11 +110,11 @@ function checkDifference()
 	end
 end
 
-function getBitfieldDifferences(before,after)
-	bitfieldDifference = {};
+function getBitfieldDifferences(before, after)
+	local bitfieldDifference = {};
 	for i = 0, 7 do
-		bitBefore = bit.check(before,i);
-		bitAfter = bit.check(after,i);
+		local bitBefore = bit.check(before, i);
+		local bitAfter = bit.check(after, i);
 		if bitBefore and not bitAfter then
 			bitfieldDifference[i] = -1; -- Clear
 		elseif not bitBefore and bitAfter then
@@ -133,5 +133,4 @@ function eventLoop()
 	updateValues();
 end
 
-event.onframestart(eventLoop,"Event Loop for a frame");
-emu.yield();
+event.onframestart(eventLoop, "Event Loop for a frame");
