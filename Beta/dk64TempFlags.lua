@@ -4,32 +4,32 @@ temporary_flags = {
 	{byte = 0xB7, bit = 4, flagName = "Helm: Chunky PPunch Barrel complete"},
 	{byte = 0xB7, bit = 5, flagName = "Helm: Diddy Kremling Barrel complete"},
 	{byte = 0xB7, bit = 6, flagName = "Helm: Tiny PTT Barrel complete"},
-	
+
 	{byte = 0xB8, bit = 0, flagName = "Helm: Lanky Maze Barrel complete"},
 	{byte = 0xB8, bit = 1, flagName = "Helm: DK Rambi Barrel complete"},
 	{byte = 0xB8, bit = 2, flagName = "Helm: Diddy Cage Barrel complete"},
 	{byte = 0xB8, bit = 3, flagName = "Helm: Tiny Mushroom Barrel complete"},
 	{byte = 0xB8, bit = 4, flagName = "Helm: Chunky Gun Barrel complete"},
 	{byte = 0xB8, bit = 5, flagName = "Helm: Lanky Gun Barrel complete"},
-	{byte = 0xB8, bit = 6, flagName = "Helm: DK Grate Punched"},	
-	{byte = 0xB8, bit = 7, flagName = "Helm: Chunky Grate Punched"},	
-	
-	{byte = 0xB9, bit = 0, flagName = "Helm: Lanky Grate Punched"},	
+	{byte = 0xB8, bit = 6, flagName = "Helm: DK Grate Punched"},
+	{byte = 0xB8, bit = 7, flagName = "Helm: Chunky Grate Punched"},
+
+	{byte = 0xB9, bit = 0, flagName = "Helm: Lanky Grate Punched"},
 	{byte = 0xB9, bit = 1, flagName = "Helm: Tiny Grate Punched"},
 	{byte = 0xB9, bit = 3, flagName = "Helm: DK Room Shut Down"},
 	{byte = 0xB9, bit = 4, flagName = "Helm: Chunky Room Shut Down"},
 	{byte = 0xB9, bit = 5, flagName = "Helm: Tiny Room Shut Down"},
 	{byte = 0xB9, bit = 6, flagName = "Helm: Lanky Room Shut Down"},
 	{byte = 0xB9, bit = 7, flagName = "Helm: Diddy Room Shut Down"},
-	
+
 	-- 0xBA, 0 set on Helm Completion, cleared when trying to exit Diddy Room
 	-- 0xBA, 5 set on entering any K Rool Phase
-	
+
 	{byte = 0xBB, bit = 0, flagName = "K. Rool: Tiny Phase Intro"},
 	{byte = 0xBB, bit = 5, flagName = "K. Rool: DK Phase Intro"},
-	
+
 	{byte = 0xBC, bit = 7, flagName = "Aztec: Dogadon Long Intro"},
-	
+
 	{byte = 0xBD, bit = 0, flagName = "Japes: Army Dillo Long Intro"},
 	{byte = 0xBD, bit = 1, flagName = "Fungi: Dogadon Long Intro"},
 	{byte = 0xBD, bit = 2, flagName = "Factory: Mad Jack Long Intro"},

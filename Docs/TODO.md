@@ -19,7 +19,12 @@
 - DK64:
 	- Finish flag documentation
 	- Increase identifyMemory() coverage
+		- Document the HUD object, perfect byte sized project for a quick context switch into and out of
 	- ASM hook for other regions
+- Land of Illusion:
+	- Game Gear support
+	- Make Mickey draggable (Y works, X doesn't)
+	- Draw slopes as triangles in collision viewer
 - Phantasy Star (SMS)
 	- Mine the [disassembly](https://github.com/lory90/ps1disasm) for info
 - Rats! (GBC)

@@ -14,6 +14,7 @@ force_gb_load = false;
 force_tbs = false;
 hide_non_scripted = false;
 never_slip = false;
+object_model1_filter = nil; -- String, see obj_model1.actor_types
 object_model2_filter = nil; -- String, see obj_model2.object_types
 paper_mode = false;
 rat_enabled = false; -- Randomize Animation Timers
@@ -23,7 +24,7 @@ rat_enabled = false; -- Randomize Animation Timers
 local object_index = 1;
 local object_pointers = {}; -- TODO: I'd love to get rid of this eventually, replace with some kind of getObjectPointers() system
 local radius = 100;
-grab_script_modes = {
+local grab_script_modes = {
 	{"Disabled","Disabled"},
 	{"List (Object Model 1)","Object Model 1", subtype = "List"},
 	{"Examine (Object Model 1)","Object Model 1", subtype = "Examine"},
@@ -38,13 +39,13 @@ grab_script_modes = {
 	{"List (Spawners)","Spawners", subtype = "List"},
 	{"Examine (Spawners)","Spawners", subtype = "Examine"},
 };
-grab_script_mode_index = 1;
-grab_script_mode = grab_script_modes[grab_script_mode_index][1];
+local grab_script_mode_index = 1;
+local grab_script_mode = grab_script_modes[grab_script_mode_index][1];
 
 local function getListOfAnalysisSlideTypes()
 	analysis_slide_types = {};
 	for i = 1, #grab_script_modes do
-		analysis_stored = false;
+		local analysis_stored = false;
 		if #analysis_slide_types > 0 then
 			for j = 1, #analysis_slide_types do
 				if analysis_slide_types[j] == grab_script_modes[i][2] then
@@ -52,10 +53,10 @@ local function getListOfAnalysisSlideTypes()
 				end
 			end
 			if not analysis_stored then
-				analysis_slide_types[#analysis_slide_types + 1] = grab_script_modes[i][2];
+				table.insert(analysis_slide_types, grab_script_modes[i][2]);
 			end
 		else
-			analysis_slide_types[#analysis_slide_types + 1] = grab_script_modes[i][2];
+			table.insert(analysis_slide_types, grab_script_modes[i][2]);
 		end
 	end
 end
@@ -63,7 +64,7 @@ end
 local function getListOfAnalysisSlideSubtypes()
 	analysis_slide_subtypes = {};
 	for i = 1, #grab_script_modes do
-		analysis_sub_stored = false;
+		local analysis_sub_stored = false;
 		if #analysis_slide_subtypes > 0 then
 			for j = 1, #analysis_slide_subtypes do
 				if analysis_slide_subtypes[j] == grab_script_modes[i].subtype then
@@ -71,23 +72,27 @@ local function getListOfAnalysisSlideSubtypes()
 				end
 			end
 			if not analysis_sub_stored then
-				analysis_slide_subtypes[#analysis_slide_subtypes + 1] = grab_script_modes[i].subtype;
+				table.insert(analysis_slide_subtypes, grab_script_modes[i].subtype);
 			end
 		else
-			analysis_slide_subtypes[#analysis_slide_subtypes + 1] = grab_script_modes[i].subtype;
+			table.insert(analysis_slide_subtypes, grab_script_modes[i].subtype);
 		end
 	end
 end
 
 local function turnFilterBoxIntoFilter()
-	filter_box_text = forms.gettext(ScriptHawk.UI.form_controls["Analysis Filter Textbox"]);
+	local filter_box_text = forms.gettext(ScriptHawk.UI.form_controls["Analysis Filter Textbox"]);
+	local filter_value = nil;
 	if filter_box_text == "" or filter_box_text == nil then
 		filter_value = nil;
 	else
 		filter_value = filter_box_text;
 	end
+	if grab_script_modes[grab_script_mode_index][2] == "Object Model 1" then
+		object_model1_filter = filter_value;
+	end
 	if grab_script_modes[grab_script_mode_index][2] == "Object Model 2" then
-		object_model2_filter = filter_value
+		object_model2_filter = filter_value;
 	end
 end
 
@@ -112,7 +117,7 @@ local function switch_grab_script_mode()
 		end
 	end
 	if grab_script_modes[grab_script_mode_index].subtype == nil then
-		analysis_slide_subtype = grab_script_modes[grab_script_mode_index].subtype; 
+		analysis_slide_subtype = grab_script_modes[grab_script_mode_index].subtype;
 	else
 		analysis_slide_subtype = analysis_slide_subtypes[1];
 	end
@@ -157,13 +162,13 @@ local function decrease_analysis_slide_subtype()
 end
 
 function grab_script_mode_from_inputs()
-	all_acceptable_script_modes = {};
+	local all_acceptable_script_modes = {};
 	for i = 1, #grab_script_modes do
 		if grab_script_modes[i][2] == analysis_slide_type then
-			all_acceptable_script_modes[#all_acceptable_script_modes + 1] = i;
+			table.insert(all_acceptable_script_modes, i);
 		end
 	end
-	acceptable_subtype_found = false;
+	local acceptable_subtype_found = false;
 	if #all_acceptable_script_modes > 0 then
 		for i = 1, #all_acceptable_script_modes do
 			if grab_script_modes[all_acceptable_script_modes[i]].subtype ~= nil then
@@ -2371,7 +2376,7 @@ local function getExamineDataModelOne(pointer)
 		table.insert(examine_data, { "TB previous index", mainmemory.readbyte(pointer + obj_model1.tag_barrel.previous_index) });
 		table.insert(examine_data, { "TB kickout timer", mainmemory.read_u32_be(pointer + obj_model1.tag_barrel.kickout_timer) });
 		table.insert(examine_data, { "Separator", 1 });
-		
+
 		table.insert(examine_data, { "Y Oscillation Point", mainmemory.readfloat(pointer + obj_model1.tag_barrel.y_oscillation_point,true) });
 		table.insert(examine_data, { "Separator", 1 });
 
@@ -3720,7 +3725,7 @@ local function getExamineDataModelTwo(pointer)
 	if getSpawnSnagCheck(pointer) ~= 0 then
 		table.insert(examine_data, { "Snag Check", getSpawnSnagCheck(pointer)});
 	end
-	
+
 	if getSnagResetTrigger(pointer) ~= 0 then
 		table.insert(examine_data, { "Snag Reset Trigger", getSnagResetTrigger(pointer)});
 	end
@@ -3874,7 +3879,7 @@ function getExamineDataSpawners(pointer)
 		table.insert(examine_data, { "Alt. Spawn Object Type", toHexString(alt_enemyType) });
 		table.insert(examine_data, { "Separator", 1 });
 	end
-	
+
 	table.insert(examine_data, { "X", mainmemory.read_s16_be(pointer + spawnerAttributes.x_pos) });
 	table.insert(examine_data, { "Y", mainmemory.read_s16_be(pointer + spawnerAttributes.y_pos) });
 	table.insert(examine_data, { "Z", mainmemory.read_s16_be(pointer + spawnerAttributes.z_pos) });
@@ -3886,7 +3891,7 @@ function getExamineDataSpawners(pointer)
 	table.insert(examine_data, { "Max Aggro Speed", mainmemory.readbyte(pointer + spawnerAttributes.max_aggro_speed) });
 	table.insert(examine_data, { "Animation Speed", mainmemory.readfloat(pointer + spawnerAttributes.animation_speed, true) });
 	table.insert(examine_data, { "Separator", 1 });
-	
+
 	table.insert(examine_data, { "Aggressive", mainmemory.readbyte(pointer + spawnerAttributes.aggro) });
 	table.insert(examine_data, { "Spawn Trigger", mainmemory.readbyte(pointer + spawnerAttributes.spawn_trigger) });
 	table.insert(examine_data, { "Spawner State", object_spawner_state });
@@ -3900,11 +3905,11 @@ function getExamineDataSpawners(pointer)
 		table.insert(examine_data, { "Tied Actor Name", getActorNameFromBehavior(tiedActorNameValue) });
 		table.insert(examine_data, { "Separator", 1 });
 	end
-	
+
 	if isRDRAM(unknown_pointer) then
 		table.insert(examine_data, { "Unknown Pointer", toHexString(unknown_pointer, 6) });
 	end
-	
+
 	if isRDRAM(movement_box) then
 		local movement_box_x_low = mainmemory.read_s16_be(movement_box + spawnerAttributes.movement_box.x_pos_0);
 		local movement_box_x_high = mainmemory.read_s16_be(movement_box + spawnerAttributes.movement_box.x_pos_1);
@@ -7677,7 +7682,7 @@ ScriptHawk.bindKeyRealtime("M", Game.incrementObjectIndex, true);
 ScriptHawk.bindKeyRealtime("Z", Game.zipToSelectedObject, true);
 ScriptHawk.bindKeyRealtime("V", Game.grabSelectedObject, true);
 ScriptHawk.bindKeyRealtime("B", Game.focusSelectedObject, true);
-ScriptHawk.bindKeyRealtime("C", switch_grab_script_mode, true);
+--ScriptHawk.bindKeyRealtime("C", switch_grab_script_mode, true);
 
 ScriptHawk.bindKeyRealtime("H", decrementPage, true);
 ScriptHawk.bindKeyRealtime("J", incrementPage, true);
@@ -7703,10 +7708,19 @@ local function populateObjectModel1Pointers()
 				end
 			end
 		else
-			for object_no = 0, getObjectModel1Count() do
-				local pointer = dereferencePointer(Game.Memory.actor_pointer_array + (object_no * 4));
-				if isRDRAM(pointer) then
-					table.insert(object_pointers, pointer);
+			if object_model1_filter == nil then
+				for object_no = 0, getObjectModel1Count() do
+					local pointer = dereferencePointer(Game.Memory.actor_pointer_array + (object_no * 4));
+					if isRDRAM(pointer) then
+						table.insert(object_pointers, pointer);
+					end
+				end
+			else
+				for object_no = 0, getObjectModel1Count() do
+					local pointer = dereferencePointer(Game.Memory.actor_pointer_array + (object_no * 4));
+					if string.contains(getActorName(pointer), object_model1_filter) then
+						table.insert(object_pointers, pointer);
+					end
 				end
 			end
 		end
@@ -8314,19 +8328,19 @@ function Game.initUI()
 	-- TODO: Different indexes on Kiosk
 	ScriptHawk.UI.form_controls["Character Dropdown"] = forms.dropdown(ScriptHawk.UI.options_form, {"0. DK", "1. Diddy", "2. Lanky", "3. Tiny", "4. Chunky", "5. Krusha", "6. Rambi", "7. Enguarde", "8. Squawks", "9. Squawks"}, ScriptHawk.UI.col(0) + ScriptHawk.UI.dropdown_offset, ScriptHawk.UI.row(9) + ScriptHawk.UI.dropdown_offset, ScriptHawk.UI.col(9) + 8, ScriptHawk.UI.button_height);
 	ScriptHawk.UI.checkbox(10, 9, "Set Character", "Set Character");
-	
+
 	-- Set Object Tools
 	ScriptHawk.UI.form_controls["Analysis Type Text"] = forms.label(ScriptHawk.UI.options_form, analysis_slide_type, ScriptHawk.UI.col(9) + ScriptHawk.UI.dropdown_offset, ScriptHawk.UI.row(10) + ScriptHawk.UI.dropdown_offset, ScriptHawk.UI.col(4) + 8, ScriptHawk.UI.button_height);
 	ScriptHawk.UI.button(14, 10, {1, 1}, nil, nil, ">", increase_analysis_slide_type);
 	ScriptHawk.UI.button(7.5, 10, {1, 1}, nil, nil, "<", decrease_analysis_slide_type);
-	
+
 	ScriptHawk.UI.form_controls["Analysis Subtype Text"] = forms.label(ScriptHawk.UI.options_form, analysis_slide_subtype, ScriptHawk.UI.col(9) + ScriptHawk.UI.dropdown_offset, ScriptHawk.UI.row(11) + ScriptHawk.UI.dropdown_offset, ScriptHawk.UI.col(4) + 8, ScriptHawk.UI.button_height);
 	ScriptHawk.UI.button(14, 11, {1, 1}, nil, nil, ">", increase_analysis_slide_subtype);
 	ScriptHawk.UI.button(7.5, 11, {1, 1}, nil, nil, "<", decrease_analysis_slide_subtype);
-	
+
 	ScriptHawk.UI.form_controls["Analysis Filter Label"] = forms.label(ScriptHawk.UI.options_form, "Filter:", ScriptHawk.UI.col(0) + ScriptHawk.UI.dropdown_offset, ScriptHawk.UI.row(11) + ScriptHawk.UI.dropdown_offset, ScriptHawk.UI.col(1) + 15, ScriptHawk.UI.button_height);
 	ScriptHawk.UI.form_controls["Analysis Filter Textbox"] = forms.textbox(ScriptHawk.UI.options_form, nil, ScriptHawk.UI.col(5), ScriptHawk.UI.button_height, nil, ScriptHawk.UI.col(2) + 4, ScriptHawk.UI.row(11));
-	
+
 	-- Output flag statistics
 	flagStats();
 end
