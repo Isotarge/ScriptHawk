@@ -606,17 +606,17 @@ function setEveryTile(value, height)
 end
 
 function Game.drawCollision()
-	for x = 0, 32 - 1 do
-		for y = 0, 20 - 1 do
-			local tileQuarterAddress = 0xA00 + (y * 64) + (x * 2) + 1;
+	for tileX = 0, 32 - 1 do
+		for tileY = 0, 20 - 1 do
+			local tileQuarterAddress = 0xA00 + (tileY * 64) + (tileX * 2) + 1;
 			local collisionValue = mainmemory.readbyte(tileQuarterAddress);
-			dprint("ADDR: "..toHexString(tileQuarterAddress, 4, "").." X: "..x.." Y: "..y.." COLLISION: "..toHexString(collisionValue, 2, ""));
+			--dprint("ADDR: "..toHexString(tileQuarterAddress, 4, "").." X: "..tileX.." Y: "..tileY.." COLLISION: "..toHexString(collisionValue, 2, ""));
 			if collisionValue == 0xA9 then
-				gui.drawRectangle(x * 8 + ScriptHawk.overscan_compensation.x, y * 8 + ScriptHawk.overscan_compensation.x, 8, 8, BLOCK, BLOCK);
+				gui.drawRectangle(tileX * 8 + ScriptHawk.overscan_compensation.x, tileY * 8 + ScriptHawk.overscan_compensation.x, 8, 8, BLOCK, BLOCK);
 			end
 		end
 	end
-	print_deferred();
+	--print_deferred();
 end
 
 function Game.drawMap()
@@ -626,11 +626,18 @@ function Game.drawMap()
 	local levelWidth = mainmemory.readbyte(Game.Memory.level_width);
 	local xOffset = ScriptHawk.overscan_compensation.x + (tile_size - screenXPos % tile_size) - tile_size;
 	local yOffset = ScriptHawk.overscan_compensation.y;
+	local levelIndex = Game.getTilemapPointer();
 	for x = startX, endX do
-		for y = 0x00, screen_height * 2 - 1 do
+		for y = 0x00, screen_height - 1 do
 			local tile = tilemap_start + y * levelWidth + x;
 			local tileValue = mainmemory.readbyte(tile);
-			ScriptHawk.drawText((x - startX) * tile_size + xOffset, y * tile_size + yOffset, toHexString(tileValue, 2, ""), nil, 0, true);
+			local tileColor = UNKNOWN;
+			if tile_colors[levelIndex] ~= nil then
+				if tile_colors[levelIndex][tileValue] ~= nil then
+					tileColor = tile_colors[levelIndex][tileValue];
+				end
+			end
+			ScriptHawk.drawText((x - startX) * tile_size + xOffset, y * tile_size + yOffset, toHexString(tileValue, 2, ""), tileColor, 0, true);
 		end
 	end
 end
@@ -638,7 +645,7 @@ end
 function Game.drawUI()
 	if (ScriptHawk.UI.isChecked("Draw Map Checkbox")) then
 		Game.drawMap();
-		--Game.drawCollision();
+		Game.drawCollision();
 	end
 end
 
