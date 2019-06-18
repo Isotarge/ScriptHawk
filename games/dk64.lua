@@ -4262,10 +4262,13 @@ secs_per_major_tick = 94.1104858713; -- 2 ^ 32 * 21.911805 / 1000000000
 nano_per_minor_tick = 21.911805; -- Tick rate: 45.6375 Mhz
 
 function Game.detectVersion(romName, romHash)
+	require("games.dk64_temp_flags");
 	if Game.version == 1 then -- USA
 		flag_array = require("games.dk64_flags");
+		temp_flag_array = temporary_flags.ntsc_u;
 	elseif Game.version == 2 then -- Europe
 		flag_array = require("games.dk64_flags");
+		temp_flag_array = temporary_flags.pal
 
 		ticks_per_crystal = 125;
 
@@ -4274,8 +4277,10 @@ function Game.detectVersion(romName, romHash)
 		nano_per_minor_tick = 21.4811235; -- Tick rate: 46.5525 Mhz
 	elseif Game.version == 3 then -- Japan
 		flag_array = require("games.dk64_flags_JP");
+		temp_flag_array = temporary_flags.ntsc_j
 	elseif Game.version == 4 then -- Kiosk
 		-- flag_array = require("games.dk64_flags_Kiosk"); -- TODO: Flags?
+		temp_flag_array = temporary_flags.kiosk
 
 		health = 12;
 		melons = 13;
@@ -5396,6 +5401,117 @@ function dumpFlagMapping()
 		dprint(mapName.." "..toHexString(id).." "..toHexString(flagByte)..">"..flagBit.." "..Game.getFlagName(flagByte, flagBit));
 	end
 	print_deferred();
+end
+
+---------------------
+-- Temporary Flags --
+---------------------
+
+temp_flag_boundaries = {
+	start = {0x7FDCE0,0x7FDC20,0x7FE170,nil},
+	finish = {0x7FDD9F,0x7FDCDF,0x7FE22F,nil},
+	size = {0xBF,0xBF,0xBF,nil},
+};
+
+function setTempFlag(byte,tempBit)
+	temp_flag_value = mainmemory.readbyte(temp_flag_boundaries.start[Game.version] + byte);
+	temp_flag_value = bit.set(temp_flag_value,tempBit);
+	mainmemory.writebyte(temp_flag_boundaries.start[Game.version] + byte, temp_flag_value);
+end
+
+function clearTempFlag(byte,tempBit)
+	temp_flag_value = mainmemory.readbyte(temp_flag_boundaries.start[Game.version] + byte);
+	temp_flag_value = bit.clear(temp_flag_value,tempBit);
+	mainmemory.writebyte(temp_flag_boundaries.start[Game.version] + byte, temp_flag_value);
+end
+
+function checkTempFlag(byte,tempBit)
+	temp_flag_value = mainmemory.readbyte(temp_flag_boundaries.start[Game.version] + byte);
+	return_value = bit.check(temp_flag_value,tempBit);
+	return return_value
+end
+
+local temp_flag_block_cache = {};
+
+local function clearTempFlagCache()
+	temp_flag_block_cache = {};
+end
+
+local function getTempFlag(byte, bit)
+	for i = 1, #temp_flag_array do
+		if byte == temp_flag_array[i].byte and bit == temp_flag_array[i].bit then
+			return temp_flag_array[i];
+		end
+	end
+end
+
+local function isTempFlagFound(byte, bit)
+	return getTempFlag(byte, bit) ~= nil;
+end
+
+function checkTemporaryFlags(showKnown)
+	if temp_flag_boundaries.start[Game.version] ~= nil then
+		temp_flags = temp_flag_boundaries.start[Game.version];
+		temp_flagBlock = mainmemory.readbyterange(temp_flags, temp_flag_boundaries.size[Game.version] + 1);
+
+		if #temp_flag_block_cache == temp_flag_boundaries.size[Game.version] then
+			local tempFlagFound = false;
+			local knownTempFlagsFound = 0;
+			local currentValue, previousValue;
+
+			for i = 0, #temp_flag_block_cache do
+				currentValue = temp_flagBlock[i];
+				previousValue = temp_flag_block_cache[i];
+				if currentValue ~= previousValue then
+					for bit = 0, 7 do
+						local isSetNow = check_bit(currentValue, bit);
+						local wasSet = check_bit(previousValue, bit);
+						if isSetNow and not wasSet then
+							if not isTempFlagFound(i, bit) then
+								tempFlagFound = true;
+								dprint("Unknown Temporary Flag Found!");
+								dprint("{byte="..toHexString(i, 2)..", bit="..bit..', flagName="Name", type="Type", map='..map_value.."},");
+							else
+								if showKnown then
+									local currentTempFlag = getTempFlag(i, bit);
+									if not currentTempFlag.ignore then
+										if currentTempFlag.map ~= nil or currentTempFlag.nomap == true then
+											dprint("Temporary Flag "..toHexString(i, 2)..">"..bit..': "'..currentTempFlag.flagName..'" was set on frame '..emu.framecount());
+										else
+											dprint("Temporary Flag "..toHexString(i, 2)..">"..bit..': "'..currentTempFlag.flagName..'" was set on frame '..emu.framecount().." ADD MAP "..map_value.." PLEASE");
+										end
+									end
+								end
+								knownTempFlagsFound = knownTempFlagsFound + 1;
+							end
+						elseif not isSetNow and wasSet then
+							if not isTempFlagFound(i, bit) then
+								dprint("Temporary Flag "..toHexString(i, 2)..">"..bit..': "Unknown" was cleared on frame '..emu.framecount());
+							elseif showKnown then
+								local currentTempFlag = getTempFlag(i, bit);
+								if not currentTempFlag.ignore then
+									dprint("Temporary Flag "..toHexString(i, 2)..">"..bit..': "'..currentTempFlag.flagName..'" was cleared on frame '..emu.framecount());
+								end
+							end
+						end
+					end
+				end
+			end
+			temp_flag_block_cache = temp_flagBlock;
+			if not showKnown then
+				if knownTempFlagsFound > 0 then
+					dprint(knownTempFlagsFound.." Known temporary flags skipped");
+				end
+				if not tempFlagFound then
+					dprint("No unknown flags were changed");
+				end
+			end
+		else
+			temp_flag_block_cache = temp_flagBlock;
+			dprint("Populated temporary flag block cache");
+		end
+		print_deferred();
+	end
 end
 
 ------------------
@@ -9436,6 +9552,7 @@ end
 
 function Game.onLoadState()
 	clearFlagCache();
+	clearTempFlagCache();
 	koshBot.resetSlots();
 end
 
@@ -9542,6 +9659,7 @@ function Game.eachFrame()
 	-- Check for new flags being set
 	if ScriptHawk.UI.ischecked("realtime_flags") then
 		checkFlags(true);
+		checkTemporaryFlags(true);
 	end
 
 	if ScriptHawk.UI.ischecked("Set Character") then
