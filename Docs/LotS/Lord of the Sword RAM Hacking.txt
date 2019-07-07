@@ -218,7 +218,7 @@ MAP INFORMATION
 		85 - Final boss dungeon, ? room, coming in from the top left (fall behind wall, glitched)
 
 		86 to FF - ??
-		
+
 --------------------------------------------------------------------------------
 
 0x00A0 - Map status byte
