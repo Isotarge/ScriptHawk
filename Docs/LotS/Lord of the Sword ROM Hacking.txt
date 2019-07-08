@@ -141,7 +141,7 @@ Beast boss health
 Second last boss health
 	- Default value 0x14 (20 decimal)
 	- The byte in ROM to change:
-		- 0x4AA8 
+		- 0x4AA8
 
 Last boss health
 	- Default Value 0x3C (60 decimal)

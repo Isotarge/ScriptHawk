@@ -7,18 +7,28 @@ end
 
 local Game = {
 	Memory = {
-		map = 0x98,
-		map_status = 0xA0,
-		building_status = 0xA1,
+		map = 0x98, -- See Game.maps
+		map_status = 0xA0, -- See Game.map_states
+		building_status = 0xA1, -- See Game.building_states
+		controller_input = 0xA5, -- Port_IOPort1, held
+		new_controller_input = 0xA5, -- Port_IOPort1, newly pressed buttons
 		demo_timer = 0x104, -- 2 bytes
 		screen_x_tile = 0x10A,
 		screen_x_pixel = 0x10F,
+		loading_zone_destination_top_right = 0x119, -- See Game.maps
+		loading_zone_destination_bottom_right = 0x11A, -- See Game.maps
+		loading_zone_destination_top_left = 0x11B, -- See Game.maps
+		loading_zone_destination_bottom_left = 0x11C, -- See Game.maps
 		health = 0x129,
 		recovery_status = 0x12B,
 		recovery_timer = 0x12C, -- 2 bytes
+		in_boss_fight = 0x151,
+		building_index = 0x169,
 		continue_map = 0xCAE,
 		continues_used = 0xCAF,
 		movement_state = 0x401,
+		movement_state_pre_damage = 0x429, -- When the damage animation ends, the movement state will be set to whatever value is here to return to whatever action Landau was doing before taking damage
+		incoming_player_damage = 0x42B, -- The damage/heal that will be applied at the end of knockback
 		x_position = 0x409, -- s16.8 fixed point (relative to screen)
 		y_position = 0x406, -- 8.8 fixed point (relative to screen)
 		x_velocity = 0x413, -- s16.8 fixed point
@@ -182,6 +192,19 @@ local Game = {
 		[0x05] = "Ending",
 		[0x06] = "Death",
 	},
+	buildings = { -- Game.Memory.building_index
+		[0x01] = "Harfoot",
+		[0x02] = "Amon",
+		[0x03] = "Dawrle",
+		[0x04] = "Ithile",
+		[0x05] = "Pharazon",
+		--[0x06] = "???" -- Unused but the progress flags are still set by Ra Goan
+		[0x07] = "Lindon",
+		[0x08] = "Ulmo", -- Tree
+		[0x09] = "Mayor's Daughter", -- After Pirate
+		[0x0B] = "Elder",
+		[0x0C] = "Varlin",
+	},
 	movement_states = {
 		[0x00] = "Walking (L)",
 		[0x01] = "Walking (R)",
@@ -221,7 +244,12 @@ end
 
 function Game.getBuildingStatus()
 	local status = mainmemory.readbyte(Game.Memory.building_status);
-	return Game.building_states[status] or "Unknown "..toHexString(status);
+	status = Game.building_states[status] or "Unknown "..toHexString(status);
+	if status == "Building" then
+		local buildingIndex = mainmemory.readbyte(Game.Memory.building_index);
+		status = status.." ("..toHexString(buildingIndex, 2)..")";
+	end
+	return status;
 end
 
 function Game.getMap()
@@ -375,38 +403,65 @@ local object_fields = {
 	boss_defeated = 0x3E,
 	boss_teleport_timer = 0x22,
 	boss_flash_timer = 0x24,
+	sign = {
+		index = 0x0E,
+		indexes = {
+			[0x00] = "Harfoot", -- Village
+			[0x01] = "Amon", -- Village
+			[0x02] = "Dwarle", -- Village
+			[0x03] = "Ithile", -- Village
+			[0x04] = "Pharazon", -- Town
+			[0x05] = "Shagart", -- Town
+			[0x06] = "Lindon", -- Town
+			[0x07] = "Varlin", -- Castle
+			[0x08] = "Elder", -- Castle
+			-- 0x09+ is just garbage data
+		},
+		timer = 0x0F, -- Byte
+	},
 	object_types = {
 		--[0x00] = "Null",
-		[0x01] = {name="Player"},
+		[0x01] = {name="Landau"},
 		[0x02] = {name="Arrow"},
 		[0x03] = {name="Sword Upgrade"},
 		[0x04] = {name="Arrow Upgrade"},
 		[0x05] = {name="Sign"},
+		[0x06] = {name="Null"}, -- Empty behaviour handler
+		[0x07] = {name="Null"}, -- Empty behaviour handler
+		[0x08] = {name="Null"}, -- Empty behaviour handler
+		[0x09] = {name="Null"}, -- Empty behaviour handler
+		[0x0A] = {name="Null"}, -- Empty behaviour handler
+		[0x0B] = {name="Null"}, -- Empty behaviour handler
+		[0x0C] = {name="Null"}, -- Empty behaviour handler
+		[0x0D] = {name="Null"}, -- Empty behaviour handler
+		[0x0E] = {name="Null"}, -- Empty behaviour handler
+		[0x0F] = {name="Null"}, -- Empty behaviour handler
 		[0x10] = {name="Slime"}, -- Dungeon
 		[0x11] = {name="Eye Part"}, -- Forest
-		[0x12] = {name="Bat"},
+		[0x12] = {name="Giant Bat"},
 		[0x13] = {name="Bird"},
-		[0x14] = {name="Fish"},
+		[0x14] = {name="Killer Fish"},
 		[0x15] = {name="Clown"},
 		[0x16] = {name="Knight"},
 		[0x17] = {name="Scorpion"},
 		[0x18] = {name="Spider"}, -- Mountain
-		[0x19] = {name="Wolf"},
+		[0x19] = {name="White Wolf"},
 		[0x1A] = {name="Caterpillar"},
 		[0x1B] = {name="Eye Part"}, -- Forest
 		[0x1C] = {name="Skeleton"},
 		[0x1D] = {name="Demon"}, -- Red Flying Thingy
 		[0x1E] = {name="Snake"},
-		[0x1F] = {name="Bat"},
-		[0x20] = {name="Plant"}, -- Floating up and down and shooting (forest plant killymajig)
-		[0x21] = {name="Goblin"}, -- Fall down from top, steal book
-		[0x23] = {name="Kicky Guy"}, -- Mountain
-		[0x24] = {name="Dinosaur"}, -- Red, forest, jumps
-		[0x25] = {name="Dinosaur"}, -- Green, jumps from bottom of screen
-		[0x26] = {name="Skeleton"}, -- Cave, shoots projectiles
+		[0x1F] = {name="Giant Bat"},
+		[0x20] = {name="Straw Fly"}, -- Floating up and down and shooting (forest plant killymajig)
+		[0x21] = {name="Book Thief"},
+		[0x22] = {name="Dragon"}, -- Unused?
+		[0x23] = {name="Dark Shunaida"}, -- Mountain
+		[0x24] = {name="Lizard Man"}, -- Red, forest, jumps
+		[0x25] = {name="Dagon"}, -- Green, jumps from bottom of screen
+		[0x26] = {name="Zombie"}, -- Cave, shoots projectiles
 		[0x27] = {name="Damaged"}, -- Killed Knight
 		[0x28] = {name="Snake"}, -- Cave, shoots projectiles
-		[0x29] = {name="Projectile"}, -- Plant
+		[0x29] = {name="Projectile"}, -- Straw Fly
 		[0x2A] = {name="Damaged"}, -- Killed or off edge of screen
 		[0x2B] = {name="Tree Spirit", isBoss=true},
 		[0x2C] = {name="Projectile"}, -- Tree Spirit
@@ -421,6 +476,7 @@ local object_fields = {
 		[0x35] = {name="Projectile"}, -- Pirate Boss' Sword
 		[0x36] = {name="Medusa", isBoss=true},
 		[0x37] = {name="Baruga", isBoss=true},
+		[0x38] = {name="Null"},  -- Empty behaviour handler
 		[0x39] = {name="Court Jester", isBoss=true}, -- Fourth Duel
 		[0x3A] = {name="The Ripper", isBoss=true}, -- First Duel
 		[0x3B] = {name="Projectile"}, -- Baruga
@@ -431,6 +487,7 @@ local object_fields = {
 		[0x40] = {name="Projectile"}, -- Ra Goan
 		[0x41] = {name="Projectile"}, -- Ra Goan
 		[0x42] = {name="Ra Goan", isBoss=true},
+		-- This is the end of the table in ROM, anything later will be using garbage data
 	},
 };
 
@@ -459,7 +516,7 @@ function Game.getHitboxes()
 
 				if objectTypeTable.isBoss then
 					hitbox.currentHP = mainmemory.readbyte(hitbox.objectBase + object_fields.bossHP);
-				elseif hitbox.objectType == "Player" then
+				elseif hitbox.objectType == "Landau" then
 					hitbox.currentHP = Game.getHealth();
 				end
 
@@ -529,7 +586,11 @@ end
 ----------------
 
 local flag_block_base = 0xC00;
+local flag_block_size = 0xAD;
+
+local flag_block_cache = {};
 local flag_names = {};
+
 local flag_array = {
 	{byte=0xC00, name="Tree Spirit Defeated"},
 	{byte=0xC01, name="Baruga Defeated"},
@@ -550,7 +611,7 @@ local flag_array = {
 	{byte=0xC19, name="Medusa Spawned"}, -- Also requires Herb
 	-- {byte=0xC1A, name="Pharazon: daughter knows more details"},
 	-- {byte=0xC1C, name="Baruga Defeated?"},
-	-- {byte=0xC1D, name="Medusa defeated?"},
+	{byte=0xC1D, name="Varlin Open"}, -- Medusa Defeated?
 	-- {byte=0xC1E, name="Unknown - Set by Ra Goan"},
 	{byte=0xC21, name="Harfoot FTT"},
 	{byte=0xC22, name="Harfoot: Rest Here Text"},
@@ -683,9 +744,6 @@ else
 	print("Warning: No flags found");
 	flag_names = {"None"};
 end
-
-local flag_block_size = 0xAC;
-local flag_block_cache = {};
 
 local function clearFlagCache()
 	flag_block_cache = {};
