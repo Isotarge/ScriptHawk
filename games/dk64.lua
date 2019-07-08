@@ -1529,6 +1529,11 @@ obj_model1 = {
 		},
 		fairy_active = 0x36C, -- TODO: Find a pointer for the actor the camera is focusing on
 		effect_byte = 0x372, -- Bitfield, TODO: Document bits
+		effect_byte_2 = 0x373, -- Bitfield
+			-- 1000 0000 = Inverted Controls (Spider Boss)
+			-- 0100 0000 = Translucent & Sparkles (Strong Kong)
+			-- 0010 0000 = Puts player in orangstand????
+			-- 0001 0000 = Damage flashes
 	},
 	animations = { -- TODO: These are probably different on Kiosk and maybe different on PAL/J
 		[0x00] = "Idle (DK, Normal)",
