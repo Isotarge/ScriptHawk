@@ -43,6 +43,7 @@ local Game = {
 	speedy_invert_LR = true,
 	rot_speed = 10,
 	max_rot_units = 360,
+	form_height = 10,
 };
 
 --------------------
@@ -673,6 +674,7 @@ local object_properties = {
 	object_anim_timer = 0x13D,
 	object_value = 0x1122,
 	object_types = {
+		[0x0] = "Pan Roswell",
 		[0x1] = "Mini Roswell",
 		[0x2] = "Beaver", -- PG1
 		[0x3] = "Billy the Kid",
@@ -796,11 +798,14 @@ local object_m2_properties = {
 	object_z = 0xA8, -- (8x larger)
 	object_types = {
 		[0xB] = "Rocket Launcher/Marble/Pp Can", -- Pickup
+		[0x15] = "Breakable Box", -- Psycrow
 		[0x32] = "Udder",
 		[0x34] = "Bunny Land mine", -- DWU
 		[0x3E] = "Text Trigger", -- DWU Gravestones, BNotLD Grannies
 		[0x40] = "Vending Machine", -- Rocket Launcher
+		[0x41] = "Peter the Dog",
 		[0x42] = "Statue", -- DWU
+		[0x57] = "Laser", -- AYHT
 		[0x5A] = "Snott",
 	},
 };
@@ -972,9 +977,9 @@ function zipToSelectedObject()
 	end
 end
 
-----------------
--- Flag Stuff --
-----------------
+----------------------------
+-- Flag & Save File Stuff --
+----------------------------
 
 local flag_block_size = 0x438; -- D34 max
 local flag_Array = {};
@@ -1073,6 +1078,147 @@ local flagBlock = {
 	[0x438] = {name = "VDV: Blue Balloon Udder", type = "Udder"},
 };
 
+saveFile_start = 0x0C6200; -- Not sure on this
+saveFile_size = 0x100; -- Not sure on this
+
+local saveFile_Block = {
+	[0xC] = {name = 'Map: The Brain in Menu', type = 'Menu'},
+	[0xD] = {name = 'Map: Memory Hub in Menu', type = 'Menu'},
+	[0xE] = {name = 'Map: CDE in Menu', type = 'Menu'},
+	[0xF] = {name = 'Map: BTBW in Menu', type = 'Menu'},
+	[0x10] = {name = 'Map: Psycrow in Menu', type = 'Menu'},
+	[0x11] = {name = 'Map: Happiness Hub in Menu', type = 'Menu'},
+	[0x12] = {name = 'Map: LOTF in Menu', type = 'Menu'},
+	[0x13] = {name = 'Map: AYHT in Menu', type = 'Menu'},
+	[0x14] = {name = 'Map: Fatty Roswell in Menu', type = 'Menu'},
+	[0x15] = {name = 'Map: Fear Hub in Menu', type = 'Menu'},
+	[0x16] = {name = 'Map: Mansion Lobby in Menu', type = 'Menu'},
+	[0x17] = {name = 'Map: PG1 in Menu', type = 'Menu'},
+	[0x18] = {name = 'Map: PG2 in Menu', type = 'Menu'},
+	[0x19] = {name = 'Map: DWU in Menu', type = 'Menu'},
+	[0x1A] = {name = 'Map: BNotLD in Menu', type = 'Menu'},
+	[0x1B] = {name = 'Map: PMFAH in Menu', type = 'Menu'},
+	[0x1C] = {name = 'Map: Fantasy Hub in Menu', type = 'Menu'},
+	[0x1D] = {name = 'Map: VDV in Menu', type = 'Menu'},
+	[0x1E] = {name = 'Map: GBE in Menu', type = 'Menu'},
+	[0x1F] = {name = 'Map: Bob in Menu', type = 'Menu'},
+	[0x20] = {name = 'Map: Kim in Menu', type = 'Menu'},
+	[0x21] = {name = 'Map: Main Menu in Menu', type = 'Menu'},
+	-- 0x22 set when collecting peter udder
+	[0x25] = {name = 'DWU: Stone Door Open', type = 'Physical', linkedFlag = 0x18},
+	[0x2A] = {name = 'BTBW: Crow in final position', type = 'Physical', linkedFlag = 0x40},
+	[0x30] = {name = 'LOTF: Talked to King Gherkin', type = 'Physical', linkedFlag = 0x70},
+	[0x31] = {name = 'PG1: First Wall Cleared', type = 'Physical', linkedFlag = 0x78},
+	[0x32] = {name = 'PG1: Chicken Gauntlet Defeated', type = 'Physical', linkedFlag = 0x80},
+	[0x35] = {name = 'CDE: Barn Door Open', type = 'Physical', linkedFlag = 0x98},
+	[0x37] = {name = 'AYHT: Elevator Lasers Lowered', type = 'Physical', linkedFlag = 0xA8},
+	[0x48] = {name = 'Brain: CDE Open', type = 'Physical', linkedFlag = 0x130},
+	[0x49] = {name = 'Brain: Happiness Hub Snott Spawned', type = 'Physical', linkedFlag = 0x138},
+	--[0x4A] = {name = 'Brain: Entered Memory Hub', type = 'Physical'},
+	--[0x4D] = {name = 'Brain: Entered Happiness Hub', type = 'Physical'},
+	[0x4E] = {name = 'Brain: Snott FTT', type = 'FTT', linkedFlag = 0x160},
+	[0x58] = {name = 'Brain: Earthworm Kim Open', type = 'Physical', linkedFlag = 0x1B0},
+	[0x5A] = {name = 'DWU: Rabbit Hole Udder', type = 'Udder', linkedFlag = 0x1C0},
+	[0x5B] = {name = 'DWU: Gravestones Udder', type = 'Udder', linkedFlag = 0x1C8},
+	[0x5C] = {name = 'DWU: Medallion Udder', type = 'Udder', linkedFlag = 0x1D0},
+	[0x5D] = {name = 'DWU: Quicksand Udder', type = 'Udder', linkedFlag = 0x1D8},
+	[0x5E] = {name = 'DWU: Statues Udder', type = 'Udder', linkedFlag = 0x1E0},
+	[0x60] = {name = 'DWU: Blue Balloon Udder', type = 'Udder', linkedFlag = 0x1F0},
+	[0x61] = {name = 'PG1: Beaver Head Udder', type = 'Udder', linkedFlag = 0x1F8},
+	[0x62] = {name = 'PG1: Painting Room Udder', type = 'Udder', linkedFlag = 0x200},
+	[0x63] = {name = 'PG1: Furniture Room Udder', type = 'Udder', linkedFlag = 0x208},
+	[0x64] = {name = 'PG1: Vacuum Udder', type = 'Udder', linkedFlag = 0x210},
+	[0x65] = {name = 'PG1: Chicken Gauntlet Udder', type = 'Udder', linkedFlag = 0x218},
+	[0x66] = {name = 'BNotLD: Boom Box Udder', type = 'Udder', linkedFlag = 0x220},
+	[0x67] = {name = 'BNotLD: Zombie Heads Udder', type = 'Udder', linkedFlag = 0x228},
+	[0x68] = {name = 'BNotLD: Manhole Udder', type = 'Udder', linkedFlag = 0x230},
+	[0x69] = {name = 'BNotLD: Speaker Towers Udder', type = 'Udder', linkedFlag = 0x238},
+	[0x6A] = {name = 'BNotLD: Sewers Udder', type = 'Udder', linkedFlag = 0x240},
+	[0x6B] = {name = 'GBE: Ice Block Udder', type = 'Udder', linkedFlag = 0x248},
+	[0x6C] = {name = 'GBE: Bank Udder', type = 'Udder', linkedFlag = 0x250},
+	[0x6D] = {name = 'GBE: Sheriff Udder', type = 'Udder', linkedFlag = 0x258},
+	[0x6E] = {name = 'GBE: Bottle Udder', type = 'Udder', linkedFlag = 0x260},
+	[0x6F] = {name = 'GBE: Granny Herding Udder', type = 'Udder', linkedFlag = 0x268},
+	[0x70] = {name = 'GBE: Bingo Udder', type = 'Udder', linkedFlag = 0x270},
+	[0x71] = {name = 'BTBW: Bootcamp Udder', type = 'Udder', linkedFlag = 0x278},
+	[0x72] = {name = 'BTBW: Camera Udder', type = 'Udder', linkedFlag = 0x280},
+	[0x73] = {name = 'BTBW: Barn Door Udder', type = 'Udder', linkedFlag = 0x288},
+	[0x74] = {name = 'BTBW: Crow Udder', type = 'Udder', linkedFlag = 0x290},
+	[0x75] = {name = 'BTBW: Kill Pluckitt Udder', type = 'Udder', linkedFlag = 0x298},
+	[0x78] = {name = 'BTBW: Blue Balloon Udder', type = 'Udder', linkedFlag = 0x2B0},
+	[0x7A] = {name = 'CDE: Fridges Udder', type = 'Udder', linkedFlag = 0x2C0},
+	[0x7B] = {name = 'CDE: Underpants Udder', type = 'Udder', linkedFlag = 0x2C8},
+	[0x7C] = {name = 'CDE: Bomb Room Udder', type = 'Udder', linkedFlag = 0x2D0},
+	[0x7E] = {name = 'AYHT: Elevator Udder', type = 'Udder', linkedFlag = 0x2E0},
+	[0x7F] = {name = 'AYHT: Bean Room Udder', type = 'Udder', linkedFlag = 0x2E8},
+	[0x80] = {name = 'AYHT: Pan Room Udder', type = 'Udder', linkedFlag = 0x2F0},
+	[0x81] = {name = 'AYHT: Elvis Udder', type = 'Udder', linkedFlag = 0x2F8},
+	[0x82] = {name = 'VDV: Hidden Udder', type = 'Udder', linkedFlag = 0x300},
+	[0x83] = {name = 'VDV: Bean Room Udder', type = 'Udder', linkedFlag = 0x308},
+	[0x84] = {name = 'VDV: Ice Cream Udder', type = 'Udder', linkedFlag = 0x310},
+	[0x85] = {name = 'VDV: Kill Grannies Udder', type = 'Udder', linkedFlag = 0x318},
+	[0x86] = {name = 'VDV: Granny Herding Udder', type = 'Udder', linkedFlag = 0x320},
+	[0x87] = {name = 'BTBW: Swamp Udder', type = 'Udder', linkedFlag = 0x328},
+	[0x88] = {name = 'PG2: Vacuum Udder', type = 'Udder', linkedFlag = 0x330},
+	[0x89] = {name = 'PG2: Chicken Udder', type = 'Udder', linkedFlag = 0x338},
+	[0x8A] = {name = 'PG2: Painting Room Udder', type = 'Udder', linkedFlag = 0x340},
+	[0x8B] = {name = 'PG2: Library Udder', type = 'Udder', linkedFlag = 0x348},
+	[0x8C] = {name = 'PG2: Blue Balloon Udder', type = 'Udder', linkedFlag = 0x350},
+	[0x8D] = {name = 'LOTF: Blue Balloon Udder', type = 'Udder', linkedFlag = 0x358},
+	[0x8E] = {name = 'LOTF: Central Tree Udder', type = 'Udder', linkedFlag = 0x360},
+	[0x8F] = {name = 'LOTF: Tall Platform Udder', type = 'Udder', linkedFlag = 0x368},
+	[0x90] = {name = 'LOTF: King Gherkin Udder', type = 'Udder', linkedFlag = 0x370},
+	[0x91] = {name = 'LOTF: Potatoes Udder', type = 'Udder', linkedFlag = 0x378},
+	[0x93] = {name = 'AYHT: Blue Balloon Udder', type = 'Udder', linkedFlag = 0x388},
+	[0x94] = {name = 'Brain: Peter Udder', type = 'Udder', linkedFlag = 0x390},
+	[0x95] = {name = 'Psycrow: Udder (1)', type = 'Udder', linkedFlag = 0x398},
+	[0x96] = {name = 'Psycrow: Udder (2)', type = 'Udder', linkedFlag = 0x3A0},
+	[0x97] = {name = 'Psycrow: Udder (3)', type = 'Udder', linkedFlag = 0x3A8},
+	[0x98] = {name = 'Psycrow: Udder (4)', type = 'Udder', linkedFlag = 0x3B0},
+	[0x99] = {name = 'Psycrow: Udder (5)', type = 'Udder', linkedFlag = 0x3B8},
+	[0x9A] = {name = 'Bob and No. 4: Udder (1)', type = 'Udder', linkedFlag = 0x3C0},
+	[0x9B] = {name = 'Bob and No. 4: Udder (2)', type = 'Udder', linkedFlag = 0x3C8},
+	[0x9C] = {name = 'Bob and No. 4: Udder (3)', type = 'Udder', linkedFlag = 0x3D0},
+	[0x9D] = {name = 'Bob and No. 4: Udder (4)', type = 'Udder', linkedFlag = 0x3D8},
+	[0x9E] = {name = 'Bob and No. 4: Udder (5)', type = 'Udder', linkedFlag = 0x3E0},
+	[0x9F] = {name = 'PMFAH: Udder (1)', type = 'Udder', linkedFlag = 0x3E8},
+	[0xA0] = {name = 'PMFAH: Udder (2)', type = 'Udder', linkedFlag = 0x3F0},
+	[0xA1] = {name = 'PMFAH: Udder (3)', type = 'Udder', linkedFlag = 0x3F8},
+	[0xA2] = {name = 'PMFAH: Udder (4)', type = 'Udder', linkedFlag = 0x400},
+	[0xA3] = {name = 'PMFAH: Udder (5)', type = 'Udder', linkedFlag = 0x408},
+	[0xA4] = {name = 'Fatty Roswell: Udder (1)', type = 'Udder', linkedFlag = 0x410},
+	[0xA5] = {name = 'Fatty Roswell: Udder (2)', type = 'Udder', linkedFlag = 0x418},
+	[0xA6] = {name = 'Fatty Roswell: Udder (3)', type = 'Udder', linkedFlag = 0x420},
+	[0xA7] = {name = 'Fatty Roswell: Udder (4)', type = 'Udder', linkedFlag = 0x428},
+	[0xA8] = {name = 'Fatty Roswell: Udder (5)', type = 'Udder', linkedFlag = 0x430},
+	[0xA9] = {name = 'VDV: Blue Balloon Udder', type = 'Udder', linkedFlag = 0x438},
+	[0xAB] = {name = 'Brain: Memory Bagpipes Played', type = 'Physical'},
+	[0xAF] = {name = 'Brain: Happiness Bagpipes Played', type = 'Physical'},
+	[0xB3] = {name = 'Brain: Fear Bagpipes Played', type = 'Physical'},
+	[0xBA] = {name = 'Brain: Fantasy Bagpipes Played', type = 'Physical'},
+	-- Have all udders is not on this list?
+	-- 0x1A3 set on file start
+};
+
+function checkSaveFlagLinkage()
+	for i = 1, saveFile_size do
+		if saveFile_Block[i] ~= nil then -- Save File Data discovered
+			flag_linked = false;
+			for j = 1, flag_block_size do
+				if flagBlock[j] ~= nil then -- Flag discovered
+					if saveFile_Block[i].name == flagBlock[j].name then
+						print("["..toHexString(i).."] = {name = '"..saveFile_Block[i].name.."', type = '"..saveFile_Block[i].type.."', linkedFlag = "..toHexString(j).."},");
+						flag_linked = true;
+					end
+				end
+			end
+			if not flag_linked then
+				print("["..toHexString(i).."] = {name = '"..saveFile_Block[i].name.."', type = '"..saveFile_Block[i].type.."'},");
+			end
+		end
+	end
+end
+
 function getFlagTypeCount(flagType)
 	local flag_type_count = 0
 	for i = 1, flag_block_size do
@@ -1108,28 +1254,107 @@ function getFlagArray()
 	end
 end
 
-function checkFlagArray()
+function clearFlagCache()
+	flagCache = {};
+	new_FlagCache = {};
+	dprint("Populated flag cache");
+	print_deferred();
+end
+
+function clearSaveFileCache()
+	saveFileCache = {};
+	new_saveFileCache = {};
+	--dprint("Populated additional flag cache");
+	--print_deferred();
+end
+
+clearFlagCache();
+clearSaveFileCache();
+
+function populateFlagArray()
 	local flag_start = dereferencePointer(Game.Memory.flag_pointer);
-	local currentFrame = emu.framecount();
 	if isRDRAM(flag_start) then
-		if flag_Array[1] ~= nil then -- flag array populated
-			for i = 1, flag_block_size do
-				local currentFlagState = mainmemory.readbyte(flag_start + i);
-				local flag_name = "Unknown ("..toHexString(i)..")";
-				if flagBlock[i] ~= nil then
-					flag_name = flagBlock[i].name;
+		local flag_counts = (flag_block_size / 8);
+		for i = 1, flag_counts do
+			local currentFlagState = mainmemory.readbyte(flag_start + (8 * i));
+			flagCache[i] = currentFlagState;
+		end
+	end
+end
+
+function newFlagCache()
+	local flag_start = dereferencePointer(Game.Memory.flag_pointer);
+	if isRDRAM(flag_start) then
+		local flag_counts = (flag_block_size / 8);
+		for i = 1, flag_counts do
+			local currentFlagState = mainmemory.readbyte(flag_start + (8 * i));
+			new_FlagCache[i] = currentFlagState;
+		end
+	end
+end
+
+function populateSaveFileArray()
+	for i = 1, saveFile_size do
+		local currentSaveFileState = mainmemory.readbyte(saveFile_start + i);
+		saveFileCache[i] = currentSaveFileState;
+	end
+end
+
+function newSaveFileArray()
+	for i = 1, saveFile_size do
+		local currentSaveFileState = mainmemory.readbyte(saveFile_start + i);
+		new_saveFileCache[i] = currentSaveFileState;
+	end
+end
+
+function checkFlagArray()
+	local flag_counts = (flag_block_size / 8);
+	if #flagCache > 0 then
+		for i = 1, flag_counts do
+			local flag_difference = new_FlagCache[i] - flagCache[i];
+			if flag_difference > 0 then
+				local flag_name = "Unknown ("..toHexString(8 * i)..")";
+				local currentFrame = emu.framecount();
+				if flagBlock[8 * i] ~= nil then
+					flag_name = flagBlock[8 * i].name;
 				end
-				if flag_Array[i] ~= currentFlagState then -- Flag has changed states
-					if currentFlagState == 1 then
-						print("'"..flag_name.."' has been SET on frame "..currentFrame);
-					else
-						print("'"..flag_name.."' has been CLEARED on frame "..currentFrame);
-					end
+				print("'"..flag_name.."' has been SET on frame "..currentFrame);	
+			elseif flag_difference < 0 then
+				local flag_name = "Unknown ("..toHexString(8 * i)..")";
+				local currentFrame = emu.framecount();
+				if flagBlock[8 * i] ~= nil then
+					flag_name = flagBlock[8 * i].name;
 				end
+				print("'"..flag_name.."' has been CLEARED on frame "..currentFrame);
 			end
 		end
 	end
 end
+
+function checkSaveFileArray()
+	if #saveFileCache > 0 then
+		for i = 1, saveFile_size do
+			local saveFile_difference = new_saveFileCache[i] - saveFileCache[i];
+			if saveFile_difference > 0 then
+				local saveFile_name = "Unknown ("..toHexString(i)..")";
+				local currentFrame = emu.framecount();
+				if saveFile_Block[i] ~= nil then
+					saveFile_name = saveFile_Block[i].name;
+				end
+				print("'"..saveFile_name.."' has been SAVED on frame "..currentFrame);	
+			elseif saveFile_difference < 0 then
+				local saveFile_name = "Unknown ("..toHexString(i)..")";
+				local currentFrame = emu.framecount();
+				if saveFile_Block[i] ~= nil then
+					saveFile_name = saveFile_Block[i].name;
+				end
+				print("'"..saveFile_name.."' has been UNSAVED on frame "..currentFrame);
+			end
+		end
+	end
+end
+
+-- FLAGS
 
 function checkFlag(offset)
 	local flag_start = dereferencePointer(Game.Memory.flag_pointer);
@@ -1217,6 +1442,121 @@ function clearFlagsByType(type_string)
 	end
 end
 
+-- SAVE FILE
+
+function getSaveFileTypeCount(saveFileType)
+	local saveFile_type_count = 0
+	for i = 1, saveFile_size do
+		if saveFile_Block[i] ~= nil then -- is a documented save
+			if saveFile_Block[i].type == saveFileType then
+				saveFile_type_count = saveFile_type_count + 1;
+			end
+		end
+	end
+	return saveFile_type_count;
+end
+
+function getSaveFileKnown()
+	local saveFile_count = 0
+	for i = 1, saveFile_size do
+		if saveFile_Block[i] ~= nil then -- is a documented save
+			saveFile_count = saveFile_count + 1;
+		end
+	end
+	return saveFile_count;
+end
+
+function getSaveFileDataTotal()
+	return saveFile_size;
+end
+
+function checkSaveFile(offset)
+	local saveFile_state = mainmemory.readbyte(saveFile_start + offset);
+	if saveFile_state == 1 then
+		print("Save: '"..saveFile_Block[offset].name.."' is SET");
+	else
+		print("Save: '"..saveFile_Block[offset].name.."' is NOT SET");
+	end
+end
+
+function setSaveFile(offset)
+	mainmemory.writebyte(saveFile_start + offset, 1);
+	if saveFile_Block[offset] ~= nil then
+		if saveFile_Block[offset].linkedFlag ~= nil then
+			setFlag(saveFile_Block[offset].linkedFlag);
+		end
+	end
+	local saveFile_name = "Unknown ("..toHexString(offset)..")";
+	if saveFile_Block[offset] ~= nil then
+		saveFile_name = saveFile_Block[offset].name;
+	end
+	print("Set save file data '"..saveFile_name.."'");
+end
+
+function clearSaveFile(offset)
+	mainmemory.writebyte(saveFile_start + offset, 0);
+	if saveFile_Block[offset] ~= nil then
+		if saveFile_Block[offset].linkedFlag ~= nil then
+			clearFlag(saveFile_Block[offset].linkedFlag);
+		end
+	end
+	local saveFile_name = "Unknown ("..toHexString(offset)..")";
+	if saveFile_Block[offset] ~= nil then
+		saveFile_name = saveFile_Block[offset].name;
+	end
+	print("Cleared save file data '"..saveFile_name.."'");
+end
+
+function setSaveFileByName(name_string)
+	for i = 1, saveFile_size do
+		if saveFile_Block[i] ~= nil then
+			if saveFile_Block[i].name == name_string then
+				setSaveFile(i);
+			end
+		end
+	end
+end
+
+function clearSaveFileByName(name_string)
+	for i = 1, saveFile_size do
+		if saveFile_Block[i] ~= nil then
+			if saveFile_Block[i].name == name_string then
+				clearSaveFile(i);
+			end
+		end
+	end
+end
+
+function checkSaveFileByName(name_string)
+	for i = 1, saveFile_size do
+		if saveFile_Block[i] ~= nil then
+			if saveFile_Block[i].name == name_string then
+				checkSaveFile(i);
+			end
+		end
+	end
+end
+
+function setSaveFilesByType(type_string)
+	for i = 1, saveFile_size do
+		if saveFile_Block[i] ~= nil then
+			if saveFile_Block[i].type == type_string then
+				setSaveFile(i);
+			end
+		end
+	end
+end
+
+function clearSaveFilesByType(type_string)
+	for i = 1, saveFile_size do
+		if saveFile_Block[i] ~= nil then
+			if saveFile_Block[i].type == type_string then
+				checkSaveFile(i);
+			end
+		end
+	end
+end
+
 local function formatOutputString(caption, value, max)
 	return caption..value.."/"..max.." or "..round(value / max * 100, 2).."%";
 end
@@ -1227,8 +1567,21 @@ function flagStats()
 	local flags_known = getFlagsKnown();
 	local flags_total = getFlagsTotal();
 
-	dprint("Block size: "..toHexString(flag_block_size));
+	dprint("Flag Block size: "..toHexString(flag_block_size));
 	dprint(formatOutputString("Flags known: ", flags_known, flags_total));
+	dprint(formatOutputString("Udders: ", udders_known, udders_total));
+	dprint("");
+	print_deferred();
+end
+
+function saveFileStats()
+	local udders_known = getSaveFileTypeCount("Udder");
+	local udders_total = 74;
+	local saveFileData_known = getSaveFileKnown();
+	local saveFileData_total = getSaveFileDataTotal();
+
+	dprint("Save File Block size: "..toHexString(saveFile_size));
+	dprint(formatOutputString("Save File data known: ", saveFileData_known, saveFileData_total));
 	dprint(formatOutputString("Udders: ", udders_known, udders_total));
 	dprint("");
 	print_deferred();
@@ -1246,6 +1599,18 @@ function getFlagNameArray()
 	return flagNameBlock;
 end
 
+function getSaveFileNameArray()
+	local saveFileNameBlock = {}
+	local j = 0;
+	for i = 1, saveFile_size do
+		if saveFile_Block[i] ~= nil then
+			j = j + 1;
+			saveFileNameBlock[j] = saveFile_Block[i].name;
+		end
+	end
+	return saveFileNameBlock;
+end
+
 local function flagSetButtonHandler()
 	setFlagByName(forms.getproperty(ScriptHawk.UI.form_controls["Flag Dropdown"], "SelectedItem"));
 end
@@ -1256,6 +1621,18 @@ end
 
 local function flagCheckButtonHandler()
 	checkFlagByName(forms.getproperty(ScriptHawk.UI.form_controls["Flag Dropdown"], "SelectedItem"));
+end
+
+local function saveFileSetButtonHandler()
+	setSaveFileByName(forms.getproperty(ScriptHawk.UI.form_controls["Save File Dropdown"], "SelectedItem"));
+end
+
+local function saveFileClearButtonHandler()
+	clearSaveFileByName(forms.getproperty(ScriptHawk.UI.form_controls["Save File Dropdown"], "SelectedItem"));
+end
+
+local function saveFileCheckButtonHandler()
+	checkSaveFileByName(forms.getproperty(ScriptHawk.UI.form_controls["Save File Dropdown"], "SelectedItem"));
 end
 
 ScriptHawk.bindKeyRealtime("N", decrementObjectIndex, true);
@@ -1274,17 +1651,24 @@ function Game.initUI()
 		ScriptHawk.UI.checkbox(5, 6, "Free Roam Mode", "Free Roam Mode");
 		ScriptHawk.UI.button(10, 4, {4, 10}, nil, "Console Mode Switch", "Emulator Mode", Game.toggleConsoleMode);
 
-		ScriptHawk.UI.button(10, 7, {46}, nil, "Set Flag Button", "Set", flagSetButtonHandler);
-		ScriptHawk.UI.button(12, 7, {46}, nil, "Check Flag Button", "Check", flagCheckButtonHandler);
-		ScriptHawk.UI.button(14, 7, {46}, nil, "Clear Flag Button", "Clear", flagClearButtonHandler);
+		--ScriptHawk.UI.button(10, 7, {46}, nil, "Set Flag Button", "Set", flagSetButtonHandler);
+		--ScriptHawk.UI.button(12, 7, {46}, nil, "Check Flag Button", "Check", flagCheckButtonHandler);
+		--ScriptHawk.UI.button(14, 7, {46}, nil, "Clear Flag Button", "Clear", flagClearButtonHandler);
+		
+		ScriptHawk.UI.button(10, 7, {46}, nil, "Set Save File Button", "Set", saveFileSetButtonHandler);
+		ScriptHawk.UI.button(12, 7, {46}, nil, "Check Save File Button", "Check", saveFileCheckButtonHandler);
+		ScriptHawk.UI.button(14, 7, {46}, nil, "Clear Save File Button", "Clear", saveFileClearButtonHandler);
 	else
 		-- Use a bigger check flags button if the others are hidden by TASSafe
-		ScriptHawk.UI.button(10, 7, {4, 10}, nil, "Check Flag Button", "Check Flag", flagCheckButtonHandler);
+		--ScriptHawk.UI.button(10, 7, {4, 10}, nil, "Check Flag Button", "Check Flag", flagCheckButtonHandler);
+		ScriptHawk.UI.button(10, 7, {4, 10}, nil, "Check Save File Button", "Check Save File", saveFileCheckButtonHandler);
 	end
 
-	ScriptHawk.UI.form_controls["Flag Dropdown"] = forms.dropdown(ScriptHawk.UI.options_form, getFlagNameArray(), ScriptHawk.UI.col(0) + ScriptHawk.UI.dropdown_offset, ScriptHawk.UI.row(7) + ScriptHawk.UI.dropdown_offset, ScriptHawk.UI.col(9) + 8, ScriptHawk.UI.button_height);
+	--ScriptHawk.UI.form_controls["Flag Dropdown"] = forms.dropdown(ScriptHawk.UI.options_form, getFlagNameArray(), ScriptHawk.UI.col(0) + ScriptHawk.UI.dropdown_offset, ScriptHawk.UI.row(7) + ScriptHawk.UI.dropdown_offset, ScriptHawk.UI.col(9) + 8, ScriptHawk.UI.button_height);
+	ScriptHawk.UI.form_controls["Save File Dropdown"] = forms.dropdown(ScriptHawk.UI.options_form, getSaveFileNameArray(), ScriptHawk.UI.col(0) + ScriptHawk.UI.dropdown_offset, ScriptHawk.UI.row(7) + ScriptHawk.UI.dropdown_offset, ScriptHawk.UI.col(9) + 8, ScriptHawk.UI.button_height);
 	ScriptHawk.UI.checkbox(10, 6, "realtime_flags", "Realtime Flags", true);
 	flagStats();
+	saveFileStats();
 end
 
 function Game.drawUI()
@@ -1311,9 +1695,19 @@ function Game.eachFrame()
 
 	Game.applyConsoleSettings();
 	if ScriptHawk.UI.ischecked("realtime_flags") then
+		newFlagCache();
 		checkFlagArray();
-		getFlagArray();
+		populateFlagArray();
+		
+		newSaveFileArray();
+		checkSaveFileArray();
+		populateSaveFileArray();
 	end
+end
+
+function onLoadState()
+	clearFlagCache();
+	clearSaveFileCache();
 end
 
 Game.OSD = {
@@ -1345,5 +1739,7 @@ Game.OSD = {
 	{"Separator"},
 	{"Marble Count", Game.getMarbleCount, category="marbleCount"},
 };
+
+event.onloadstate(onLoadState, "State loading function");
 
 return Game;
