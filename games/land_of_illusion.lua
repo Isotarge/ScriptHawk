@@ -60,6 +60,7 @@ local enemy = {
 	y_screen = 0x12, -- Single byte?
 	x = 0x14,
 	y = 0x0A,
+	health = 0x1F, -- Boss Only?
 };
 
 function Game.read_u16_8(base)
@@ -185,6 +186,7 @@ function Game.getHitboxes()
 				y = Game.read_hitbox_y(base),
 				width = 16,
 				height = 16,
+				health = mainmemory.readbyte(base + enemy.health),
 			};
 			table.insert(hitboxes, hitbox);
 		end
@@ -193,7 +195,7 @@ function Game.getHitboxes()
 end
 
 function Game.getHitboxListText(hitbox)
-	return round(hitbox.x)..", "..round(hitbox.y).." - "..toHexString(hitbox.base);
+	return round(hitbox.x)..", "..round(hitbox.y).." "..hitbox.health.."HP - "..toHexString(hitbox.base);
 end
 
 function Game.getHitboxStaticText(hitbox)
