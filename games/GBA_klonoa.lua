@@ -91,6 +91,19 @@ function Game.getObjYPos(obj_index)
 	end
 end
 
+function Game.getObjVis(obj_index)
+	local objArraySize = memory.read_u8(Game.Memory.obj_array_size.Address, Game.Memory.obj_array_size.Domain);
+	if obj_index<objArraySize then
+		local objAddr = {Address = Game.Memory.obj_array_base.Address,
+			Domain = Game.Memory.obj_array_base.Domain
+		};
+		objAddr.Address = objAddr.Address + (obj_index * obj_struct_size);
+		return memory.read_u8(objAddr.Address + 0x0F, objAddr.Domain);
+	else
+		return 0;
+	end
+end
+
 function Game.getObjXOffset(obj_index)
 	local objArraySize = memory.read_u8(Game.Memory.obj_array_size.Address, Game.Memory.obj_array_size.Domain);
 	if obj_index<objArraySize then
@@ -172,9 +185,12 @@ function Game.drawObjectPositions()
 			
 			if xOffset >= 0 and xOffset < 240 then
 				if yOffset >= 0 and yOffset < 160 then
-					gui.drawLine(xOffset, yOffset-2, xOffset, yOffset+2); 
-					gui.drawLine(xOffset-2, yOffset, xOffset+2, yOffset); 
-					gui.drawText(xOffset, yOffset, toHexString(i), null, null, 9);
+					local visible = Game.getObjVis(i)
+					if visible ~= 0x1C then 
+						gui.drawLine(xOffset, yOffset-2, xOffset, yOffset+2); 
+						gui.drawLine(xOffset-2, yOffset, xOffset+2, yOffset); 
+						gui.drawText(xOffset, yOffset, toHexString(i), null, null, 9);
+					end
 				end
 			end
 		end
