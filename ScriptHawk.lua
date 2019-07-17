@@ -484,6 +484,9 @@ local supportedGames = {
 	["AF51AB03A173DEC28C9241532227CD64"] = {moduleName="games.impossible_mission", friendlyName="Impossible Mission (E)"},
 	["A26D40B6B7646C22D1F2DB7F746F0391"] = {moduleName="games.impossible_mission", friendlyName="Impossible Mission (E) (Beta)"},
 
+	--Klonoa: Empire of Dreams
+	["A0A298D9DBA1BA15D04A42FC2EB35893D1A9569B"] = {moduleName="games.GBA_klonoa", friendlyName="Klonoa - Empire of Dreams (USA)"},
+	
 	-- Land of Illusion
 	["07FAC1D61BC20CF6EB298F66EC2FFE49"] = {moduleName="games.land_of_illusion", friendlyName="Land of Illusion Starring Mickey Mouse (E)"},
 
