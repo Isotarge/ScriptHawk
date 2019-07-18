@@ -24,7 +24,7 @@ local obj_struct = {
 	[0x02] = {type="s16_le", name="YPosition"},
 	[0x04] = {type="s16_le", name="XScreenOffset"},
 	[0x06] = {type="s16_le", name="YScreenOffset"},
-	[0x08] = {type="u8_le", name="InvincTimer"},
+	[0x10] = {type="u8", name="Visible"},
 };
 
 function Game.detectVersion(romName, romHash)
@@ -98,7 +98,7 @@ function Game.getObjVis(obj_index)
 			Domain = Game.Memory.obj_array_base.Domain
 		};
 		objAddr.Address = objAddr.Address + (obj_index * obj_struct_size);
-		return memory.read_u8(objAddr.Address + 0x0F, objAddr.Domain);
+		return memory.read_u8(objAddr.Address + 0x10, objAddr.Domain);
 	else
 		return 0;
 	end
@@ -186,7 +186,7 @@ function Game.drawObjectPositions()
 			if xOffset >= 0 and xOffset < 240 then
 				if yOffset >= 0 and yOffset < 160 then
 					local visible = Game.getObjVis(i)
-					if visible ~= 0x1C then 
+					if visible ~= 0x00 then 
 						gui.drawLine(xOffset, yOffset-2, xOffset, yOffset+2); 
 						gui.drawLine(xOffset-2, yOffset, xOffset+2, yOffset); 
 						gui.drawText(xOffset, yOffset, toHexString(i), null, null, 9);
