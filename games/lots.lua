@@ -15,6 +15,7 @@ local Game = {
 		demo_timer = 0x104, -- 2 bytes
 		screen_x_tile = 0x10A,
 		screen_x_pixel = 0x10F,
+		map_type = 0x118, -- See Game.map_types
 		loading_zone_destination_top_right = 0x119, -- See Game.maps
 		loading_zone_destination_bottom_right = 0x11A, -- See Game.maps
 		loading_zone_destination_top_left = 0x11B, -- See Game.maps
@@ -22,7 +23,9 @@ local Game = {
 		health = 0x129,
 		recovery_status = 0x12B,
 		recovery_timer = 0x12C, -- 2 bytes
+		building_flag_progress = 0x142, -- How many progress flags are set for the current building?
 		in_boss_fight = 0x151,
+		boss_index = 0x152, -- See Game.bosses
 		building_index = 0x169,
 		continue_map = 0xCAE,
 		continues_used = 0xCAF,
@@ -114,7 +117,7 @@ local Game = {
 		"49 - Mountains (Dwarle +1UR+1R) (R)",
 		"4A - Mountains (???) (L)",
 		"4B - Mountains (???) (R)",
-		"4C - Mountains (???) (DL)",
+		"4C - Mountains (Dwarle +1UR+???) (DL)",
 		".4D - Mountains (Baruga +1L) (R)",
 		"4E - Mountains (???) (UL)",
 		"4F - Mountains (Pharazon +2UR) (DL)",
@@ -174,6 +177,18 @@ local Game = {
 		"85 - Ra Goan's Dungeon B2F",
 		"86 - Ra Goan's Dungeon B3F",
 	},
+	map_types = {
+		[0x01] = "Swamp",
+		[0x02] = "Forest",
+		[0x03] = "Coast",
+		[0x04] = "Cave",
+		[0x05] = "Mountains",
+		[0x06] = "Dark Forest",
+		[0x07] = "Town",
+		[0x08] = "Castle",
+		[0x09] = "Dungeon (Suma)",
+		[0x0A] = "Dungeon (Ra Goan)",
+	},
 	map_states = {
 		[0x00] = "Reset",
 		[0x01] = "Map",
@@ -195,13 +210,14 @@ local Game = {
 	buildings = { -- Game.Memory.building_index
 		[0x01] = "Harfoot",
 		[0x02] = "Amon",
-		[0x03] = "Dawrle",
+		[0x03] = "Dwarle",
 		[0x04] = "Ithile",
 		[0x05] = "Pharazon",
-		--[0x06] = "???" -- Unused but the progress flags are still set by Ra Goan
+		[0x06] = "Shagart", -- Unused but the progress flags are still set by Ra Goan
 		[0x07] = "Lindon",
 		[0x08] = "Ulmo", -- Tree
 		[0x09] = "Mayor's Daughter", -- After Pirate
+		[0x0A] = "Throwing The Book",
 		[0x0B] = "Elder",
 		[0x0C] = "Varlin",
 	},
@@ -225,6 +241,20 @@ local Game = {
 		[0x12] = "Crouching Sword (L)",
 		[0x13] = "Crouching Sword (R)",
 	},
+	bosses = { -- Game.Memory.boss_index
+		[0x01] = "Ulmo",
+		[0x02] = "Namo",
+		[0x03] = "Baruga",
+		[0x04] = "Medusa",
+		[0x05] = "Necromancer",
+		[0x06] = "Duels",
+		[0x07] = "Pirate1",
+		[0x08] = "Pirate2",
+		[0x09] = "Pirate3",
+		[0x0A] = "Pirate4",
+		[0x0B] = "Dark Suma",
+		[0x0C] = "Ra Goan",
+	},
 	takeMeThereType = "Button",
 };
 
@@ -245,15 +275,41 @@ end
 function Game.getBuildingStatus()
 	local status = mainmemory.readbyte(Game.Memory.building_status);
 	status = Game.building_states[status] or "Unknown "..toHexString(status);
+	local buildingProgress = mainmemory.readbyte(Game.Memory.building_flag_progress);
 	if status == "Building" then
 		local buildingIndex = mainmemory.readbyte(Game.Memory.building_index);
-		status = status.." ("..toHexString(buildingIndex, 2)..")";
+		buildingIndex = Game.buildings[buildingIndex] or "Unknown "..toHexString(buildingIndex, 2);
+		status = buildingIndex.." "..toHexString(buildingProgress, 1, "");
+	elseif status == "Boss Fight" then
+		local bossIndex = bit.band(0x7F, mainmemory.readbyte(Game.Memory.boss_index));
+		bossIndex = Game.bosses[bossIndex] or "Unknown "..toHexString(bossIndex, 2);
+		status = "Boss: "..bossIndex;
 	end
 	return status;
 end
 
 function Game.getMap()
 	local map = mainmemory.readbyte(Game.Memory.map);
+	return Game.maps[map] or "Unknown "..toHexString(map);
+end
+
+function Game.getTLMap()
+	local map = mainmemory.readbyte(Game.Memory.loading_zone_destination_top_left);
+	return Game.maps[map] or "Unknown "..toHexString(map);
+end
+
+function Game.getBLMap()
+	local map = mainmemory.readbyte(Game.Memory.loading_zone_destination_bottom_left);
+	return Game.maps[map] or "Unknown "..toHexString(map);
+end
+
+function Game.getTRMap()
+	local map = mainmemory.readbyte(Game.Memory.loading_zone_destination_top_right);
+	return Game.maps[map] or "Unknown "..toHexString(map);
+end
+
+function Game.getBRMap()
+	local map = mainmemory.readbyte(Game.Memory.loading_zone_destination_bottom_right);
 	return Game.maps[map] or "Unknown "..toHexString(map);
 end
 
@@ -397,7 +453,31 @@ local object_fields = {
 	y_position = 0x06, -- 8.8 fixed point (relative to screen)
 	x_velocity = 0x13, -- s16.8 fixed point
 	y_velocity = 0x10, -- 8.8 fixed point
+	hitbox_y_offset = 0x16,
+	hitbox_height = 0x17,
+	hitbox_x_offset = 0x18,
+	hitbox_width = 0x19,
 	object_loaded = 0x0B,
+	score_value = 0x1B, -- Upper 4 bits, not sure what the lower 4 are used for
+	score_values = { -- Table is at 0x1787 in ROM (BCD, 3 bytes each), might be different on J
+		[0x0] = 0,
+		[0x1] = 1000,
+		[0x2] = 2000,
+		[0x3] = 3000,
+		[0x4] = 10000,
+		[0x5] = 20000,
+		[0x6] = 30000,
+		[0x7] = 40000,
+		[0x8] = 50000,
+		[0x9] = 60000,
+		[0xA] = 70000,
+		[0xB] = 80000,
+		[0xC] = 2093400, -- Reads code as data, prolly different on J?
+		[0xD] = 1629170, -- Reads code as data, prolly different on J?
+		[0xE] = 2093320, -- Reads code as data, prolly different on J?
+		[0xF] = 2096210, -- Reads code as data, prolly different on J?
+	},
+	respawn_timer = 0x30,
 	currentHP = 0x3A,
 	bossHP = 0x34,
 	boss_defeated = 0x3E,
@@ -505,8 +585,14 @@ function Game.getHitboxes()
 			hitbox.dragTag = hitbox.objectBase;
 			hitbox.x = Game.read_s16_8(hitbox.objectBase + object_fields.x_position);
 			hitbox.y = mainmemory.read_u16_le(hitbox.objectBase + object_fields.y_position) / 256;
+
 			hitbox.currentHP = mainmemory.readbyte(hitbox.objectBase + object_fields.currentHP);
 			hitbox.objectType = "Unknown "..toHexString(objectType);
+
+			hitbox.xOffset = mainmemory.read_s8(hitbox.objectBase + object_fields.hitbox_x_offset);
+			hitbox.yOffset = mainmemory.read_s8(hitbox.objectBase + object_fields.hitbox_y_offset);
+			hitbox.width = mainmemory.read_s8(hitbox.objectBase + object_fields.hitbox_width);
+			hitbox.height = mainmemory.read_s8(hitbox.objectBase + object_fields.hitbox_height);
 
 			if type(object_fields.object_types[objectType]) == "table" then
 				local objectTypeTable = object_fields.object_types[objectType];
@@ -518,20 +604,6 @@ function Game.getHitboxes()
 					hitbox.currentHP = mainmemory.readbyte(hitbox.objectBase + object_fields.bossHP);
 				elseif hitbox.objectType == "Landau" then
 					hitbox.currentHP = Game.getHealth();
-				end
-
-				if type(objectTypeTable.hitbox_x_offset) == "number" then
-					hitbox.xOffset = objectTypeTable.hitbox_x_offset - screenX;
-				end
-				if type(objectTypeTable.hitbox_y_offset) == "number" then
-					hitbox.yOffset = objectTypeTable.hitbox_y_offset;
-				end
-
-				if type(objectTypeTable.hitbox_width) == "number" then
-					hitbox.width = objectTypeTable.hitbox_width;
-				end
-				if type(objectTypeTable.hitbox_height) == "number" then
-					hitbox.height = objectTypeTable.hitbox_height;
 				end
 			end
 			table.insert(hitboxes, hitbox);
@@ -610,6 +682,7 @@ local flag_array = {
 	-- {byte=0xC18, name="suma defeated?"},
 	{byte=0xC19, name="Medusa Spawned"}, -- Also requires Herb
 	-- {byte=0xC1A, name="Pharazon: daughter knows more details"},
+	-- {byte=0xC1B, name="Progress 0x0B},
 	-- {byte=0xC1C, name="Baruga Defeated?"},
 	{byte=0xC1D, name="Varlin Open"}, -- Medusa Defeated?
 	-- {byte=0xC1E, name="Unknown - Set by Ra Goan"},
@@ -681,19 +754,19 @@ local flag_array = {
 	{byte=0xC6C, name="Pharazon: Shagart Strange People Text 3"}, -- After Baruga?
 	{byte=0xC6D, name="Pharazon: Shagart Strange People Text 4"},
 	{byte=0xC6E, name="Pharazon: Rule Our Country Well Text"}, -- After Ra Goan
-	{byte=0xC71, name="??? FTT"}, -- Maybe allows later text?
-	-- {byte=0xC72, name="Unknown - Set by Ra Goan"},
-	-- {byte=0xC73, name="Unknown - Set by Ra Goan"},
-	-- {byte=0xC74, name="Unknown - Set by Ra Goan"},
-	-- {byte=0xC75, name="Unknown - Set by Ra Goan"},
-	-- {byte=0xC76, name="Unknown - Set by Ra Goan"},
-	-- {byte=0xC77, name="Unknown - Set by Ra Goan"},
-	-- {byte=0xC78, name="Unknown - Set by Ra Goan"},
-	-- {byte=0xC79, name="Unknown - Set by Ra Goan"},
-	-- {byte=0xC7A, name="Unknown - Set by Ra Goan"},
-	-- {byte=0xC7B, name="Unknown - Set by Ra Goan"},
-	-- {byte=0xC7C, name="Unknown - Set by Ra Goan"},
-	-- {byte=0xC7D, name="Unknown - Set by Ra Goan"},
+	{byte=0xC71, name="Shagart FTT"},
+	{byte=0xC72, name="Shagart Progress 1"}, -- Set by Ra Goan
+	{byte=0xC73, name="Shagart Progress 2"}, -- Set by Ra Goan
+	{byte=0xC74, name="Shagart Progress 3"}, -- Set by Ra Goan
+	{byte=0xC75, name="Shagart Progress 4"}, -- Set by Ra Goan
+	{byte=0xC76, name="Shagart Progress 5"}, -- Set by Ra Goan
+	{byte=0xC77, name="Shagart Progress 6"}, -- Set by Ra Goan
+	{byte=0xC78, name="Shagart Progress 7"}, -- Set by Ra Goan
+	{byte=0xC79, name="Shagart Progress 8"}, -- Set by Ra Goan
+	{byte=0xC7A, name="Shagart Progress 9"}, -- Set by Ra Goan
+	{byte=0xC7B, name="Shagart Progress A"}, -- Set by Ra Goan
+	{byte=0xC7C, name="Shagart Progress B"}, -- Set by Ra Goan
+	{byte=0xC7D, name="Shagart Progress C"}, -- Set by Ra Goan
 	{byte=0xC81, name="Lindon FTT"},
 	{byte=0xC82, name="Lindon: Brave Men Text"},
 	{byte=0xC83, name="Lindon: Brave Men Text 2"},
@@ -713,14 +786,14 @@ local flag_array = {
 	{byte=0xC93, name="Ulmo: Destroy Book Text", max_value=0x81},
 	{byte=0xC94, name="Ulmo: Destroy Book Text 2"},
 	{byte=0xC95, name="Ulmo: Destroy Book Text 3"},
-	-- {byte=0xC96, name="Unknown - Set by Ra Goan"},
+	-- {byte=0xC96, name="Ulmo: Progress 5"}, -- Set by Ra Goan
 	{byte=0xC97, name="Ulmo: Destroy Book Text 4"}, -- After Duels
-	-- {byte=0xC98, name="Unknown - Set by Ra Goan"},
+	-- {byte=0xC98, name="Ulmo: Progress 7"}, -- Set by Ra Goan
 	{byte=0xC99, name="Ulmo: Destroy Book Text 5"}, -- After Duels
-	-- {byte=0xC9A, name="Unknown - Set by Ra Goan"},
-	-- {byte=0xC9B, name="Unknown - Set by Ra Goan"},
+	-- {byte=0xC9A, name="Ulmo: Progress 9"}, -- Set by Ra Goan
+	-- {byte=0xC9B, name="Ulmo: Progress A"}, -- Set by Ra Goan
 	{byte=0xC9C, name="Ulmo: Cast Book Into Fire Text"},
-	-- {byte=0xC9D, name="Unknown - Set by Ra Goan"},
+	-- {byte=0xC9D, name="Ulmo: Progress C"}, -- Set by Ra Goan
 	{byte=0xCA0, name="Baruga Spawned"}, -- Book Burnable?
 	{byte=0xCA1, name="Necromancer Spawned"},
 	{byte=0xCA2, name="Pirate Spawned"}, -- Also Lindon/Dwarle open?
@@ -731,6 +804,7 @@ local flag_array = {
 	{byte=0xCAA, name="Inventory: Book"},
 	{byte=0xCAB, name="Inventory: Tree Limb"},
 	{byte=0xCAC, name="Inventory: Herb"},
+	-- {byte=0xCAD, name="???"},
 };
 
 -- Fill flag names and flags by map
@@ -867,6 +941,42 @@ function checkFlag(name)
 	print('The flag "'..name..'" is currently unknown');
 end
 
+function checkBuildingProgress()
+	local highestQuestProgress = 1;
+	local questProgress = {
+		false, false, false, false,
+		false, false, false, false,
+		false, false, false, false,
+		false, false, false,
+	};
+	-- Calculate quest progress
+	for flagAddress = 0xC11, 0xC1E do
+		questProgress[flagAddress - 0xC10] = mainmemory.readbyte(flagAddress) > 0;
+		if questProgress[flagAddress - 0xC10] then
+			highestQuestProgress = flagAddress - 0xC10;
+		end
+	end
+	for buildingIndex = 0x01, 0x0C do
+		local buildingProgress = {
+			false, false, false, false,
+			false, false, false, false,
+			false, false, false, false,
+			false, false, false,
+		};
+		local flagBase = 0xC21 + (buildingIndex - 1) * 0x10;
+		local buildingString = Game.buildings[buildingIndex] or "Unknown "..toHexString(buildingIndex);
+		for flagIndex = 0x00, 0x0E do
+			buildingProgress[flagIndex] = mainmemory.readbyte(flagBase + flagIndex) > 0;
+			if flagIndex == highestQuestProgress then
+				buildingString = buildingString.." -> "..toHexString(flagIndex, 1).." |";
+			elseif questProgress[flagIndex] and not buildingProgress[flagIndex] then
+				buildingString = buildingString.." -> "..toHexString(flagIndex, 1);
+			end
+		end
+		print(buildingString);
+	end
+end
+
 local function flagSetButtonHandler()
 	setFlagByName(forms.getproperty(ScriptHawk.UI.form_controls["Flag Dropdown"], "SelectedItem"));
 end
@@ -889,11 +999,13 @@ end
 
 function Game.initUI()
 	if not TASSafe then
+		ScriptHawk.UI.button(10, 6, {4, 10}, nil, "Check Building Button", "Check Buildings", checkBuildingProgress);
 		ScriptHawk.UI.button(10, 7, {46}, nil, "Set Flag Button", "Set", flagSetButtonHandler);
 		ScriptHawk.UI.button(12, 7, {46}, nil, "Check Flag Button", "Check", flagCheckButtonHandler);
 		ScriptHawk.UI.button(14, 7, {46}, nil, "Clear Flag Button", "Clear", flagClearButtonHandler);
 	else
 		-- Use a bigger check flags button if the others are hidden by TASSafe
+		ScriptHawk.UI.button(10, 6, {4, 10}, nil, "Check Building Button", "Check Buildings", checkBuildingProgress);
 		ScriptHawk.UI.button(10, 7, {4, 10}, nil, "Check Flag Button", "Check Flag", flagCheckButtonHandler);
 	end
 	ScriptHawk.UI.form_controls["Flag Dropdown"] = forms.dropdown(ScriptHawk.UI.options_form, flag_names, ScriptHawk.UI.col(0) + ScriptHawk.UI.dropdown_offset, ScriptHawk.UI.row(7) + ScriptHawk.UI.dropdown_offset, ScriptHawk.UI.col(9) + 8, ScriptHawk.UI.button_height);
@@ -901,6 +1013,10 @@ end
 
 Game.OSD = {
 	{"Map", Game.getMap, category="mapData"},
+	--{"TL LZ", Game.getTLMap, category="mapData"},
+	--{"BL LZ", Game.getBLMap, category="mapData"},
+	--{"TR LZ", Game.getTRMap, category="mapData"},
+	--{"BR LZ", Game.getBRMap, category="mapData"},
 	{"Continue", Game.getContinue, category="continues"},
 	{"Continues Used", function() return Game.getContinuesUsed().."/10"; end, category="continues"},
 	{"Status", Game.getMapStatus, category="mapData"},
