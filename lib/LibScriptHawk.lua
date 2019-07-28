@@ -167,6 +167,26 @@ if emu.getsystemid() == "PSX" then
 	end
 end
 
+if emu.getsystemid() == "GBA" then
+	function parsePointer(inPtr)
+		if (inPtr >= 0x02000000) and (inPtr < 0x02040000) then
+			return {
+				Domain = "EWRAM",
+				Address = inPtr - 0x02000000,
+			};
+		elseif (inPtr >= 0x03000000) and (inPtr < 0x03008000) then
+			return {
+				Domain = "IWRAM",
+				Address = inPtr - 0x03000000,
+			};
+		end
+	end
+
+	function dereferencePointer(inPtr)
+		return parsePointer(memory.read_u32_le(inPtr.Address, inPtr.Domain));
+	end
+end
+
 function round(num, idp)
 	return tonumber(string.format("%." .. (idp or 0) .. "f", num));
 end

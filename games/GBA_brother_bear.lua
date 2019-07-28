@@ -39,24 +39,6 @@ function Game.detectVersion(romName, romHash)
 	return true;
 end
 
-local function parsePointer(inPtr)
-	if (inPtr >= 0x02000000) and (inPtr < 0x02040000) then
-		return {
-			Domain = "EWRAM",
-			Address = inPtr - 0x02000000,
-		};
-	elseif (inPtr>= 0x03000000) and (inPtr < 0x03008000) then
-		return {
-			Domain = "IWRAM",
-			Address = inPtr - 0x03000000,
-		};
-	end
-end
-
-function dereferencePointer(inPtr)
-	return parsePointer(memory.read_u32_le(inPtr.Address, inPtr.Domain));
-end
-
 -------------------
 -- Physics/Scale --
 -------------------
