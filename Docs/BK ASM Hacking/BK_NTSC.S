@@ -17,6 +17,9 @@
 [PlayerPointer]: 0x8037BF20
 [PlayerGrounded]: 0x8037BF60
 
+[voidout_maxPos]: 0x8037C3C0
+[voidout_minPos]: 0x8037C3CC
+
 [XPos]: 0x8037C5A0
 
 [XVelocity]: 0x8037C4B8
@@ -184,7 +187,7 @@
 [GetMovementStruct_AnimationStructPtr]:				0x80287464	;I: (struct* $a0 movementStruct)	O: [word $v0]
 
 [SetMovementStruct_AnimationStruct_AnimationTimer]:	0x8028764C	;I: (struct* $a0 movementStruct, float $a1 input)
-[SetMovementStruct_MovementSubstate]:				0x80287474	;I: (struct* $a0 movementStruct, byte $a1 input)
+[set_objMoveStruct_playType]:				        0x80287474	;I: (struct* $a0 movementStruct, byte $a1 input)
 [SetMovementStruct_Byte_0x21]:						0x8028767C	;I: (struct* $a0 movementStruct, byte $a1 input)
 [SetMovementStruct_Byte_0x22]:						0x80287684	;I: (struct* $a0 movementStruct, byte $a1 input)
 [SetMovementStruct_AnimationDuration]:				0x8028768C	;I: (struct* $a0 movementStruct, float $a1 input)
@@ -427,6 +430,8 @@
 [Print_CharFont]: 			0x802F78FC ;I: (word $a0 XPos, word $a1 YPos, char* $a2 str)
 [Print_CharFont_Background]: 0x802F7938 ;I: (word $a0 XPos, word $a1 YPos, char* $a2 str)
 
+
+[AddObjIDStructToObjectSpawnArray]: 0x803053E8
 
 [GetLevelAssociatedWithMap]: 	0x8030AD48	;I: (byte $a0 MapIndex)	O: [byte $v0]
 

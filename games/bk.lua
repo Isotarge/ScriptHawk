@@ -1710,27 +1710,32 @@ local function getStructPointers()
 	local block = dereferencePointer(Game.Memory.struct_array_pointer);
 	local pointers = {};
 	if isRDRAM(block) then
-		local blockend = dereferencePointer(block - 0x0C);
-		if isRDRAM(blockend) then
-			for address = block, blockend, 0x0C do
-				local pointercheck = mainmemory.read_u16_be(address + 2);
-				if pointercheck ~= 0 then
-					local pointer1 = dereferencePointer(address + 4);
-					local pointer2 = dereferencePointer(address + 8);
-					if isRDRAM(pointer1) then
-						local blockPointers = getStructsFromBlock(pointer1);
-						for i = 1, #blockPointers do
-							table.insert(pointers, blockPointers[i]);
-						end
-					end
-					if isRDRAM(pointer2) then
-						local blockPointers = getStructsFromBlock(pointer2);
-						for i = 1, #blockPointers do
-							table.insert(pointers, blockPointers[i]);
-						end
-					end
-				end
-			end
+        local voxel_count = mainmemory.read_u32_be(Game.Memory.struct_array_pointer + 0x28);
+        local blockend = block + voxel_count * 0x0C;
+        for address = block, blockend, 0x0C do --step through voxels
+            local voxel_header = mainmemory.read_u32_be(address);
+            --local ptr1_cnt = bit.band(voxel_header, 0x0001F800)/0x800;
+            local ptr2_cnt = bit.band(voxel_header, 0x000007E0)/64;
+            --[[
+            if(ptr1_cnt ~= 0) then
+            --    local pointer1 = dereferencePointer(address + 4);
+            --    if isRDRAM(pointer1) then
+            --        local blockPointers = getStructsFromBlock(pointer1);
+            --        for i = 1, #blockPointers do
+            --            table.insert(pointers, blockPointers[i]);
+            --        end
+            --    end
+            --end
+            --]]
+            if(ptr2_cnt ~= 0) then
+                local pointer2 = dereferencePointer(address + 8);
+                if isRDRAM(pointer2) then
+                    local blockPointers = getStructsFromBlock(pointer2);
+                    for i = 1, #blockPointers do
+                        table.insert(pointers, blockPointers[i]);
+                    end
+                end
+            end
 		end
 	end
 	return pointers;
