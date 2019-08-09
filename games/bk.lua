@@ -1630,7 +1630,7 @@ end
 local function getStructName(pointer)
 	local structType = getStructType(pointer);
 	local itemType = getItemType(pointer);
-	if structType == 0 then
+    if structType == 0 then
 		if type(struct_array_types[structType][itemType]) == "string" then
 			return struct_array_types[structType][itemType];
 		--else
@@ -1688,23 +1688,19 @@ local function setStructPosition(pointer, x, y, z)
 	end
 end
 
-local function getStructsFromBlock(pointer)
+local function getNStructsFromBlock(pointer, nObjects)
 	local pointers = {};
 	if isRDRAM(pointer) then
-		local blockEnd = dereferencePointer(pointer - 0x0C);
-		if isRDRAM(blockEnd) then
-			local blockSize = blockEnd - pointer;
-			local nStructs = math.floor(blockSize / 0x0C);
-			for i = 0, nStructs - 1 do
-				if not hide_unknown_structs or isKnownStruct(pointer + i * 0x0C) then
-					table.insert(pointers, pointer + i * 0x0C);
-				end
-			end
-			return pointers;
-		end
+        for i = 0, nObjects - 1 do
+            if not hide_unknown_structs or isKnownStruct(pointer + i * 0x0C) then
+                table.insert(pointers, pointer + i * 0x0C);
+            end
+        end
+        return pointers;
 	end
 	return pointers;
 end
+
 
 local function getStructPointers()
 	local block = dereferencePointer(Game.Memory.struct_array_pointer);
@@ -1714,8 +1710,8 @@ local function getStructPointers()
         local blockend = block + voxel_count * 0x0C;
         for address = block, blockend, 0x0C do --step through voxels
             local voxel_header = mainmemory.read_u32_be(address);
-            --local ptr1_cnt = bit.band(voxel_header, 0x0001F800)/0x800;
-            local ptr2_cnt = bit.band(voxel_header, 0x000007E0)/64;
+            --local ptr1_cnt = bit.band(voxel_header, 0x0001F800)/0x400;
+            local ptr2_cnt = bit.band(voxel_header, 0x000007E0)/32;
             --[[
             if(ptr1_cnt ~= 0) then
             --    local pointer1 = dereferencePointer(address + 4);
@@ -1730,7 +1726,7 @@ local function getStructPointers()
             if(ptr2_cnt ~= 0) then
                 local pointer2 = dereferencePointer(address + 8);
                 if isRDRAM(pointer2) then
-                    local blockPointers = getStructsFromBlock(pointer2);
+                    local blockPointers = getNStructsFromBlock(pointer2, ptr2_cnt);
                     for i = 1, #blockPointers do
                         table.insert(pointers, blockPointers[i]);
                     end
