@@ -26,6 +26,8 @@ JAL puppetSpawnArrayAdd
 //EXISTING FUNCTIONS
 .include "Docs/BK ASM Hacking/BK_NTSC.S"
 
+[cleanObjArray_bool]: 0x8036E570
+[freeObj]: 0x80328028
 ;----------------------------------------------------------------
 ; Code Run from Pause Mode
 ;----------------------------------------------------------------
@@ -50,7 +52,7 @@ NormalModeCode_Loop:
 LA a1 objCommandArray
 SLL a2 a0 3
 ADDU a2 a2 a1
-LW a3 0(a2)
+LH a3 0(a2)
 
 LI at 0xFFFFFFFF
 BNE a3 at NormalModeCode_Loop_End //slot not spawning
@@ -59,10 +61,24 @@ NOP
     SW a0 0x28(sp)
     SW a2 0x2C(sp)
     
+    LH a3 2(a2)
+    LA a0 puppetID_struct
+    BNE a3 zero NormalModeCode_puppet_known
+    NOP
+    
+    LI a3 0x034E
+    NormalModeCode_puppet_known:
+    SH a3 0x04(a0)
+    
     MOV a2 zero
     LI a1 @voidout_minPos
+    //LI a1 @XPos
+
     JAL @SpawnActor
     LI a0 0x400
+    
+    LI a0 0x3FFC
+    SW a0 0x78(v0)
     
     LW a2 0x2C(sp)
     LW a0 0x28(sp)
@@ -148,17 +164,18 @@ SLL a2 a2 3
 LA a1 objCommandArray
 ADDU a1 a2 a1
 
-LW a2 0(a1) //check if despawn
+LH a2 0(a1) //check if despawn
 LI at 0xFFFFFFFE
 BNE a2 at ObjFrameBehavior_NoDespawn //slot not spawning
 NOP
     SW zero 0(a1)
+    SW zero 4(a1)
     //despawn Obj
     LB a2 0x47(a0)
     ORI a2 0x08
-    SB a2 0x47(a0)
+    SB a2 0x47(a0) 
 
-B ObjFrameBehavior_Housekeeping
+    B ObjFrameBehavior_Housekeeping
 NOP
 
 ObjFrameBehavior_NoDespawn:
@@ -190,15 +207,22 @@ defaultSpawnLocation:
 
 
 .align
+puppetAnimationTable:
+.word 0
+.word 0
+.word 0x6F
+.word 0x40b00000
+
+.align
 puppetID_struct:
 .half 0x0000 ;unknown set same a jiggy
 .half 0x0400 ;actorSpawnID
 .half 0x034e ;banjo
-.half 0x0001 
-.word 0x80366010 ;spawn function
+.half 0x0001 ;start animation index
+.word puppetAnimationTable ;obj animation list
 .word ObjFrameBehavior ;normal frame behavior 
 .word 0x00000000
-.word 0x802C6E84 ;despawn function?
+.word 0x80325888 ;despawn function?
 .word 0x00000000 
 .word 0x00000000
 .word 0x00000000
