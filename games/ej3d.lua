@@ -785,6 +785,8 @@ end
 -- MODEL TWO --
 ---------------
 
+object_model2_filter = nil;
+
 local object_m2_properties = {
 	object_texture_pointer = 0x8;
 	object_model_pointer = 0x18;
@@ -820,8 +822,14 @@ local function populateObjectM2Pointers()
 	if isRDRAM (obj2_pointers_start) then
 		for object_no = 0, getObjectM2Count() do
 			local pointer = dereferencePointer(obj2_pointers_start + (object_no * 0x4));
+			m2_value = getObjectM2Value(pointer)
+			m2_name = getObjectM2NameFromValue(m2_value)
 			if isRDRAM(pointer) then
-				table.insert(object_pointers, pointer);
+				if object_model2_filter == nil then
+					table.insert(object_pointers, pointer);
+				elseif object_model2_filter == m2_name then
+					table.insert(object_pointers, pointer);
+				end
 			end
 		end
 	end
@@ -1079,7 +1087,7 @@ local flagBlock = {
 };
 
 saveFile_start = 0x0C6200; -- Not sure on this
-saveFile_size = 0x100; -- Not sure on this
+saveFile_size = 0xD0; -- Not sure on this
 
 local saveFile_Block = {
 	[0xC] = {name = 'Map: The Brain in Menu', type = 'Menu'},
