@@ -1203,9 +1203,9 @@ obj_model1 = {
 		[224] = "Mushroom Man",
 		-- [225] = "Unknown",
 		[226] = "Troff",
-		[227] = "K. Rool's Foot",
+		[227] = "K. Rool's Foot", -- Including leftmost toe
 		[228] = "Bad Hit Detection Man",
-		-- [229] = "Unknown",
+		[229] = "K. Rool's Toe", -- Rightmost 3 toes
 		[230] = "Ruler",
 		[231] = "Toy Box",
 		[232] = "Text Overlay",
@@ -5413,9 +5413,9 @@ end
 ---------------------
 
 temp_flag_boundaries = {
-	start = {0x7FDCE0,0x7FDC20,0x7FE170,nil},
+	start = {0x7FDD90,0x7FDCD0,0x7FE220,nil},
 	finish = {0x7FDD9F,0x7FDCDF,0x7FE22F,nil},
-	size = {0xBF,0xBF,0xBF,nil},
+	size = {0xF,0xF,0xF,nil},
 };
 
 function setTempFlag(byte,tempBit)
@@ -7275,6 +7275,29 @@ function setDKTV(message)
 		end
 	end
 end
+
+-----------------------
+-- HUD Documentation --
+-----------------------
+
+hud_object = {
+	display_object = {
+		actual_count_pointer = 0x0, -- u32
+		hud_count = 0x4, -- u16
+		freeze_timer = 0x6, -- u8
+		counter_timer = 0x7, -- u8
+		screen_x = 0x8, -- u32
+		screen_y = 0xC, -- u32
+		hud_state = 0x23, -- u8
+		hud_states = {
+			[0] = "Invisible",
+			[1] = "Appearing",
+			[2] = "Visible",
+			[3] = "Disappearing",
+		},
+		counter_pointer = 0x28, -- u32
+	}
+};
 
 --------------------------
 -- Free Trade Agreement --
