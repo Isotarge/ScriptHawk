@@ -3,8 +3,14 @@ temporary_flags = {
 		{byte=0x0, bit=0, flagName="Japes: Diddy Moaning (Switch) Text Cleared", type="FTT", map=7},
 		{byte=0x0, bit=7, flagName="Aztec: Llama Text Cleared", type="FTT", map=38},
 
-		{byte=0x2, bit=2, flagName="Factory: Car Race FT Intro", type="Cutscene", map=27},
+		{byte=0x1, bit=7, flagName="Factory: Chunky Moaning Text Cleared", type="FTT", map=26},
 
+		{byte=0x2, bit=2, flagName="Factory: Car Race FT Intro", type="Cutscene", map=27},
+		
+		{byte=0x3, bit=7, flagName="Galleon: All Pearls Collected", type="Progress", map=44},
+
+		{byte=0x5, bit=0, flagName="Fungi: BBlast GB Spawn Pending", type="Progress", map=188},
+		
 		{byte=0x6, bit=0, flagName="Caves: Ice Tomato Game Active", type="Minigame", map=98}, 
 
 		{byte=0x7, bit=0, flagName="Castle: Car Race FT Intro", type="Cutscene", map=185},
@@ -37,7 +43,9 @@ temporary_flags = {
 
 		{byte=0xB, bit=0, flagName="K. Rool: Tiny Phase Intro", type="Cutscene", map=206},
 		{byte=0xB, bit=5, flagName="K. Rool: DK Phase Intro", type="Cutscene", map=203},
-
+		
+		{byte=0xC, bit=1, flagName="Global: Jetpac Active", type="Minigame", map=5},
+		{byte=0xC, bit=4, flagName="Global: Training Barrel Spawn Pending", type="Progress", map=5},
 		{byte=0xC, bit=5, flagName="Caves: Beetle FT Long Intro", type="Cutscene", map=82},
 		{byte=0xC, bit=6, flagName="Aztec: Beetle FT Long Intro", type="Cutscene", map=14},
 		{byte=0xC, bit=7, flagName="Aztec: Dogadon Long Intro", type="Cutscene", map=197},
@@ -57,9 +65,10 @@ temporary_flags = {
 		{byte=0x2, bit=2, flagName="Factory: Car Race FT Intro", type="Cutscene", map=27},
 		{byte=0x2, bit=4, flagName="Factory: Arcade Lever Pulled", type="Minigame", map=98},
 		
+		-- Somewhere in section 0x2,2 > 0x4, 0 has an additional temp flag compared to US
+		{byte=0x4, bit=0, flagName="Galleon: All Pearls Collected", type="Progress", map=44},
 		
-		{byte=0x6, bit=1, flagName="Caves: Ice Tomato Game Active", type="Minigame", map=98}, 
-		-- Somewhere in section 0x2,2 > 0x6,1 has an additional temp flag compared to US
+		{byte=0x6, bit=1, flagName="Caves: Ice Tomato Game Active", type="Minigame", map=98},
 		
 		{byte=0x7, bit=1, flagName="Castle: Car Race FT Intro", type="Cutscene", map=185},
 		{byte=0x7, bit=4, flagName="Helm: Roman Numeral Doors Open", type="Physical", map=17},
@@ -71,6 +80,8 @@ temporary_flags = {
 		{byte=0xD, bit=3, flagName="Factory: Mad Jack Long Intro", type="Cutscene", map=154},
 	},
 	ntsc_j = {
+		{byte=0x4, bit=0, flagName="Galleon: All Pearls Collected", type="Progress", map=44},
+		
 		{byte=0xD, bit=3, flagName="Factory: Mad Jack Long Intro", type="Cutscene", map=154},
 	},
 	kiosk = {
