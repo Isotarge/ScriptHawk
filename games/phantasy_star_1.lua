@@ -43,6 +43,7 @@ local Game = {
 			Odin = 0xFA8F,
 			Noah = 0xFB7F,
 		},
+		dungeon_object_base = 0xEF5C, -- ROM, Bank 3
 	},
 	modes = {
 		[0x00] = "Init Intro",
@@ -132,6 +133,83 @@ local Game = {
 		[0x3E] = "Miracle Key",
 		[0x3F] = "Zillion",
 		[0x40] = "Secrets",
+	},
+	enemies = {
+		[0x00] = "Nothing",
+		[0x01] = "Sworm",
+		[0x02] = "GrSlime",
+		[0x03] = "WingEye",
+		[0x04] = "ManEater",
+		[0x05] = "Scorpion",
+		[0x06] = "GScorpi",
+		[0x07] = "BlSlime",
+		[0x08] = "NFarmer",
+		[0x09] = "OwlBear",
+		[0x0A] = "DeadTree",
+		[0x0B] = "Scorpius",
+		[0x0C] = "EFarmer",
+		[0x0D] = "GiantFly",
+		[0x0E] = "Crawler",
+		[0x0F] = "Barbrian",
+		[0x10] = "GoldLens",
+		[0x11] = "RdSlime",
+		[0x12] = "WereBat",
+		[0x13] = "BigClub",
+		[0x14] = "Fishman",
+		[0x15] = "EvilDead",
+		[0x16] = "Tarantul",
+		[0x17] = "Manticor",
+		[0x18] = "Skeleton",
+		[0x19] = "AntLion",
+		[0x1A] = "Marman",
+		[0x1B] = "Dezorian",
+		[0x1C] = "Leech",
+		[0x1D] = "Vampire",
+		[0x1E] = "Elephant",
+		[0x1F] = "Ghoul",
+		[0x20] = "Shelfish",
+		[0x21] = "Executer",
+		[0x22] = "Wight",
+		[0x23] = "SkullEn",
+		[0x24] = "Ammonite",
+		[0x25] = "Sphinx",
+		[0x26] = "Serpent",
+		[0x27] = "Sandworm",
+		[0x28] = "Lich",
+		[0x29] = "Octopus",
+		[0x2A] = "Stalker",
+		[0x2B] = "EvilHead",
+		[0x2C] = "Zombie",
+		[0x2D] = "Batalion",
+		[0x2E] = "RobotCop",
+		[0x2F] = "Sorcerer",
+		[0x30] = "Nessie",
+		[0x31] = "Tarzimal",
+		[0x32] = "Golem",
+		[0x33] = "AndroCop",
+		[0x34] = "Tentacle",
+		[0x35] = "Giant",
+		[0x36] = "Wyvern",
+		[0x37] = "Reaper",
+		[0x38] = "Magician",
+		[0x39] = "Horseman",
+		[0x3A] = "Frostman",
+		[0x3B] = "Amundsen",
+		[0x3C] = "RdDragn",
+		[0x3D] = "GrDragn",
+		[0x3E] = "Shadow",
+		[0x3F] = "Mammoth",
+		[0x40] = "Centaur",
+		[0x41] = "Marauder",
+		[0x42] = "Titan",
+		[0x43] = "Medusa",
+		[0x44] = "WtDragn",
+		[0x45] = "BlDragn",
+		[0x46] = "GdDragn",
+		[0x47] = "DrMad",
+		[0x48] = "Lassic",
+		[0x49] = "DarkFalz",
+		[0x4A] = "Saccubus",
 	},
 	stats = {
 		status = 0x00, -- byte
@@ -316,6 +394,7 @@ end
 -- TODO: Adjust for yellow/blue dungeons
 local floorColor = 0x55FF55;
 local wallColor = 0x00AA55;
+local itemColor = 0x5500AA;
 local playerColor = 0xFFFF00;
 
 local minimapAlpha = 0xFF000000;
@@ -341,6 +420,8 @@ local function renderDungeonMinimap()
 				drawColor = floorColor;
 			elseif tileValue == 0x01 then -- Wall
 				drawColor = wallColor;
+			elseif tileValue == 0x08 then
+				drawColor = itemColor;
 			end
 			local drawX = xOffset + x * minimapScale;
 			local drawY = yOffset + y * minimapScale;
@@ -372,7 +453,15 @@ local function renderDungeonMinimap()
 			end
 			if mouseIsOnScreen and mouse.X >= drawX and mouse.X <= xBottom and mouse.Y >= drawY and mouse.Y <= yBottom then
 				mouseOverIndex = tileIndex;
-				mouseOverTextToRender = {drawX, drawY, {toHexString(tileValue)..": "..x..","..y, getTileName(tileValue)}, colors.white, nil, false};
+				if tileValue == 0x08 then
+					mouseOverTextToRender = {drawX, drawY, {toHexString(tileValue)..": "..x..","..y}, colors.white, nil, false};
+					local extraDetails = Game.getDungeonObjectMouseOverText(Game.getDungeonIndex(), x, y);
+					for k, v in ipairs(extraDetails) do
+						table.insert(mouseOverTextToRender[3], v);
+					end
+				else
+					mouseOverTextToRender = {drawX, drawY, {toHexString(tileValue)..": "..x..","..y, getTileName(tileValue)}, colors.white, nil, false};
+				end
 			end
 		end
 	end
@@ -433,7 +522,82 @@ function Game.applyInfinites()
 	end
 end
 
+-------------------
+-- Dungeon Items --
+-------------------
+
+-- Lookup: dungeonObjects[dungeonID][x][y]
+local dungeonObjects = {};
+local dungeonObjectTypes = {
+	[0] = "Item",
+	[1] = "Meseta",
+	[2] = "Battle",
+	[3] = "Dialogue",
+};
+
+local function parseDungeonObjects()
+	local index = 0;
+	while 7 do
+		local base = Game.Memory.dungeon_object_base + index * 7;
+		local dungeonID = memory.readbyte(base + 0, "ROM");
+
+		if dungeonID == 0xFF then
+			break;
+		end
+
+		local coords = memory.readbyte(base + 1, "ROM");
+		local xPos = bit.band(coords, 0x0F);
+		local yPos = bit.rshift(bit.band(coords, 0xF0), 4);
+
+		local entry = {
+			flagAddress = memory.read_u16_le(base + 2, "ROM"),
+			itemType = memory.readbyte(base + 4, "ROM"),
+			specialByte1 = memory.readbyte(base + 5, "ROM"),
+			specialByte2 = memory.readbyte(base + 6, "ROM"),
+		};
+
+		if not dungeonObjects[dungeonID] then
+			dungeonObjects[dungeonID] = {};
+		end
+		if not dungeonObjects[dungeonID][xPos] then
+			dungeonObjects[dungeonID][xPos] = {};
+		end
+
+		dungeonObjects[dungeonID][xPos][yPos] = entry;
+		index = index + 1;
+	end
+end
+
+function Game.getDungeonObjectMouseOverText(index, x, y)
+	if dungeonObjects[index] and dungeonObjects[index][x] and dungeonObjects[index][x][y] then
+		local entry = dungeonObjects[index][x][y];
+		local flagValue = memory.readbyte(entry.flagAddress, "System Bus");
+		local output = {
+			"Flag: "..toHexString(entry.flagAddress).." ("..flagValue..")",
+			"Type: "..dungeonObjectTypes[entry.itemType],
+		};
+		if entry.itemType == 0 then -- Item
+			if entry.specialByte2 > 0 then
+				table.insert(output, Game.items[entry.specialByte1].." TRAP!");
+			else
+				table.insert(output, Game.items[entry.specialByte1]);
+			end
+		elseif entry.itemType == 1 then -- Meseta
+			table.insert(output, (entry.specialByte2 * 256 + entry.specialByte1).." Meseta");
+		elseif entry.itemType == 2 then -- Battle
+			table.insert(output, "Enemy: "..Game.enemies[entry.specialByte1]); -- TODO: Nil check
+			table.insert(output, "Drops: "..Game.items[entry.specialByte2]); -- TODO: Nil check
+		elseif entry.itemType == 3 then -- Dialogue
+			table.insert(output, "ID "..toHexString(entry.specialByte1));
+		end
+		return output;
+	else
+		return {"Unknown"};
+	end
+end
+
 function Game.initUI()
+	parseDungeonObjects(); -- TODO: Move this somewhere more appropriate
 	if not TASSafe then
 		-- Dropdown and button to give items
 		ScriptHawk.UI.form_controls.item_dropdown = forms.dropdown(ScriptHawk.UI.options_form, Game.items, ScriptHawk.UI.col(5) + ScriptHawk.UI.dropdown_offset, ScriptHawk.UI.row(6) + ScriptHawk.UI.dropdown_offset, ScriptHawk.UI.col(4) + 8, ScriptHawk.UI.button_height);
