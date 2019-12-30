@@ -259,6 +259,8 @@ Game.OSD = {
 	{"Z", category="position"},
 	{"Separator"},
 	{"dY", category="positionStats"},
+	{"dX", category="positionStats"},
+	{"dZ", category="positionStats"},
 	{"dXZ", category="positionStats"},
 	{"Max dY", category="positionStatsMore"},
 	{"Max dXZ", category="positionStatsMore"},

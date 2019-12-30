@@ -4389,6 +4389,7 @@ local object_model1 = {
 	x_position = 0x04, -- Float
 	y_position = 0x08, -- Float
 	z_position = 0x0C, -- Float
+	behavior_pointer = 0x10, -- Pointer
 	scale = 0x38, -- Float
 	y_rotation = 0x48, -- Float
 	z_rotation = 0x4C, -- Float
@@ -5295,13 +5296,17 @@ local function getExamineData(pointer)
 	end
 
 	local modelPointer = dereferencePointer(pointer + object_model1.id_struct);
+	local behaviorPointer = dereferencePointer(pointer + object_model1.behavior_pointer);
 
 	local xPos = mainmemory.readfloat(pointer + object_model1.x_position, true);
 	local yPos = mainmemory.readfloat(pointer + object_model1.y_position, true);
 	local zPos = mainmemory.readfloat(pointer + object_model1.z_position, true);
-	local hasPosition = hasModel or xPos ~= 0 or yPos ~= 0 or zPos ~= 0;
+	local hasPosition = xPos ~= 0 or yPos ~= 0 or zPos ~= 0;
 
 	local currentObjectName = getAnimationType(pointer); -- Required for special data
+
+	table.insert(examine_data, { "ID Struct", toHexString(modelPointer) });
+	table.insert(examine_data, { "Behavior", toHexString(behaviorPointer) });
 
 	table.insert(examine_data, { "Separator", 1 });
 
@@ -5510,6 +5515,8 @@ function Game.getCharacterState()
 	return characterStateValue;
 end
 
+-- TODO: Read from RDRAM, turns out code for the function that returns how many of a consumable is read as data
+-- See function 800D1A04 on USA
 local obfuscatedConsumables = {
 	[0] = {key=0x27BD, name="Blue Eggs"},
 	[1] = {key=0x0C03, name="Fire Eggs"},

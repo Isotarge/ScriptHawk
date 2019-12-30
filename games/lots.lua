@@ -446,9 +446,10 @@ end
 
 local object_size = 0x40;
 local object_array_base = 0x400;
-local object_array_capacity = 23;
+local object_array_capacity = 24;
 local object_fields = {
 	object_type = 0x00,
+	is_initialized = 0x03, -- Byte, non zero means the object has the correct constants initted (hitbox etc) and should be drawn
 	x_position = 0x09, -- s16.8 fixed point (relative to screen)
 	y_position = 0x06, -- 8.8 fixed point (relative to screen)
 	x_velocity = 0x13, -- s16.8 fixed point
@@ -579,9 +580,9 @@ function Game.getHitboxes()
 			objectBase = object_array_base + (i * object_size);
 		};
 		local objectType = mainmemory.readbyte(hitbox.objectBase + object_fields.object_type);
-		local objectLoaded = mainmemory.readbyte(hitbox.objectBase + object_fields.object_loaded);
+		local objectLoaded = mainmemory.readbyte(hitbox.objectBase + object_fields.is_initialized);
 		local screenX = Game.getMapX();
-		if objectType > 0 and objectLoaded == 0 then
+		if objectType > 0 and objectLoaded ~= 0 then
 			hitbox.dragTag = hitbox.objectBase;
 			hitbox.x = Game.read_s16_8(hitbox.objectBase + object_fields.x_position);
 			hitbox.y = mainmemory.read_u16_le(hitbox.objectBase + object_fields.y_position) / 256;
@@ -639,8 +640,8 @@ function Game.killEnemies()
 	for i = 0, object_array_capacity do
 		local objectBase = object_array_base + (i * object_size);
 		local objectType = mainmemory.readbyte(objectBase + object_fields.object_type);
-		local objectLoaded = mainmemory.readbyte(objectBase + object_fields.object_loaded);
-		if objectType > 0 and objectLoaded == 0 then
+		local objectLoaded = mainmemory.readbyte(objectBase + object_fields.is_initialized);
+		if objectType > 0 and objectLoaded > 0 then
 			if type(object_fields.object_types[objectType]) == "table" then
 				local objectTypeTable = object_fields.object_types[objectType];
 				if objectTypeTable.isBoss then
