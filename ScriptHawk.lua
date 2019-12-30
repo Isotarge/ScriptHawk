@@ -20,11 +20,12 @@ ScriptHawk = {
 	ui_test = false, -- Open all possible module options forms, useful for testing global UI changes
 	force_module = {
 		enabled = false,
-		name = "games.phantasy_star_1", -- The name of the module to load for all opened ROMs
+		name = "games.lots", -- The name of the module to load for all opened ROMs
 		version = 1, -- The Game.version value to force
 		selfContained = false, -- Whether the forced module is self contained
 	},
 	mode = "Position",
+	update_delta_on_lag = false,
 	smooth_moving_angle = true,
 	UI = {
 		form_controls = {},
@@ -1960,7 +1961,7 @@ local function plot_pos()
 		end
 	end
 
-	if not isLagged then
+	if not isLagged or ScriptHawk.update_delta_on_lag then
 		if exactlyOneFrameHasPassed then
 			dx = x - prev_x;
 			dy = y - prev_y;

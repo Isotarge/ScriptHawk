@@ -56,6 +56,12 @@ local global_timer = {
 	previous = 0,
 };
 
+function Game.detectVersion(romName, romHash)
+	ScriptHawk.smooth_moving_angle = false;
+	ScriptHawk.update_delta_on_lag = true;
+	return true;
+end
+
 function Game.isPhysicsFrame()
 	return global_timer.current ~= global_timer.previous;
 end
