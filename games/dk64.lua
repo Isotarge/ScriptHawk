@@ -241,6 +241,10 @@ local Game = {
 		loading_zone_array = {0x7FDCB4, 0x7FDBF4, 0x7FE144, 0x7B7414},
 		file = {0x7467C8, 0x740F18, 0x746088, nil},
 		character = {0x74E77C, 0x748EDC, 0x74E05C, 0x6F9EB8},
+		character_change_pointer = {0x7FC924, 0x7FC864, 0x7FCDB4, 0x7B6564},
+		character_change_offset_player_actor = {0x36F, 0x36F, 0x36F, 0x333},
+		character_change_offset_mystery_object = {0x29C, 0x29C, 0x29C, 0x29C},
+		character_change_value_mystery_object = {0x3B, 0x3C, 0x3C, 0x2E},
 		object_spawn_table = {0x74E8B0, 0x749010, 0x74E1D0, 0x6F9F80},
 		enemy_drop_table = {0x750400, 0x74AB20, 0x74FCE0, 0x6FB630},
 		cutscene_model_table = {0x75570C, 0x74FF8C, 0x7557CC, 0x7001F0},
@@ -8471,7 +8475,7 @@ function Game.initUI()
 	-- Set character
 	-- TODO: Different indexes on Kiosk
 	ScriptHawk.UI.form_controls["Character Dropdown"] = forms.dropdown(ScriptHawk.UI.options_form, {"0. DK", "1. Diddy", "2. Lanky", "3. Tiny", "4. Chunky", "5. Krusha", "6. Rambi", "7. Enguarde", "8. Squawks", "9. Squawks"}, ScriptHawk.UI.col(0) + ScriptHawk.UI.dropdown_offset, ScriptHawk.UI.row(9) + ScriptHawk.UI.dropdown_offset, ScriptHawk.UI.col(9) + 8, ScriptHawk.UI.button_height);
-	ScriptHawk.UI.checkbox(10, 9, "Set Character", "Set Character");
+	ScriptHawk.UI.button(10, 9, {4, 10}, nil, nil, "Set Character", Game.setCharacterFromDropdown);
 
 	-- Set Object Tools
 	ScriptHawk.UI.form_controls["Analysis Type Text"] = forms.label(ScriptHawk.UI.options_form, analysis_slide_type, ScriptHawk.UI.col(9) + ScriptHawk.UI.dropdown_offset, ScriptHawk.UI.row(10) + ScriptHawk.UI.dropdown_offset, ScriptHawk.UI.col(4) + 8, ScriptHawk.UI.button_height);
@@ -8904,31 +8908,22 @@ function Game.getCharacter()
 end
 
 function Game.setCharacter(value)
-	mainmemory.writebyte(Game.Memory.character, value);
+	-- Slow tag method, go through loading zone
+	--mainmemory.writebyte(Game.Memory.character, value);
+
+	-- Fast tag method, instant
+	-- Thanks to: Tom Ballaam, 2dos, retroben, Kaze Emanuar
+	local player = Game.getPlayerObject();
+	mainmemory.writebyte(player + Game.Memory.character_change_offset_player_actor, value + 2);
+	local mysteryObject = dereferencePointer(Game.Memory.character_change_pointer);
+	if isRDRAM(mysteryObject) then
+		mainmemory.write_u16_be(mysteryObject + Game.Memory.character_change_offset_mystery_object, Game.Memory.character_change_value_mystery_object);
+	end
 end
 
 function Game.setCharacterFromDropdown()
 	local index = tonumber(forms.getproperty(ScriptHawk.UI.form_controls["Character Dropdown"], "SelectedIndex"));
 	Game.setCharacter(index);
-	local player = Game.getPlayerObject();
-	-- TODO: Different on Kiosk
-	if isRDRAM(player) and Game.version < 4 then
-		local indexActorConversion = {
-			[DK] = 2,
-			[Diddy] = 3,
-			[Lanky] = 4,
-			[Tiny] = 5,
-			[Chunky] = 6,
-			[Krusha] = 7,
-			[6] = 8, -- Rambi
-			[7] = 9, -- Enguarde
-			[8] = 2, -- Squawks uses DK for some reason
-			[9] = 2, -- Squawks uses DK for some reason
-		};
-		if type(indexActorConversion[index]) ~= "nil" then
-			mainmemory.write_u16_be(player + obj_model1.actor_type, indexActorConversion[index]);
-		end
-	end
 end
 
 local function readTimestamp(address)
@@ -9688,10 +9683,6 @@ function Game.eachFrame()
 	if ScriptHawk.UI.ischecked("realtime_flags") then
 		checkFlags(true);
 		checkTemporaryFlags(true);
-	end
-
-	if ScriptHawk.UI.ischecked("Set Character") then
-		Game.setCharacterFromDropdown();
 	end
 
 	if force_gb_load then
