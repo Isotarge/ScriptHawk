@@ -111,7 +111,7 @@ local Game = {
 		"MMM - Room 1",
 		"MMM - Room 2",
 		"MMM - Room 3: Fireplace",
-		"MMM - Church",
+		"MMM - Church (Secret Room)",
 		"MMM - Room 4: Bathroom",
 		"MMM - Room 5: Bedroom",
 		"MMM - Room 6: Floorboards",
