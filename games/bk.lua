@@ -439,11 +439,12 @@ end
 -----------------
 
 local move_levels = {
-	["4. None"]      = 0x00000000,
-	["3. SM 100%"]   = 0x00009DB9,
-	["2. FFM Setup"] = 0x000BFDBF,
-	["1. All"]       = 0x000FFFFF,
-	["0. Demo"]      = 0xFFFFFFFF
+	["5. All Minus Swim"]  = 0x000F7FFF,
+	["4. None"]            = 0x00000000,
+	["3. SM 100%"]         = 0x00009DB9,
+	["2. FFM Setup"]       = 0x000BFDBF,
+	["1. All"]             = 0x000FFFFF,
+	["0. Demo"]            = 0xFFFFFFFF
 };
 
 local function unlock_moves()
@@ -3370,7 +3371,7 @@ function Game.initUI()
 		--ScriptHawk.UI.button(10, 5, {4, 8}, nil, nil, "Fire all", fireAllSlots);
 
 		-- Moves
-		ScriptHawk.UI.form_controls.moves_dropdown = forms.dropdown(ScriptHawk.UI.options_form, { "4. None", "3. SM 100%", "2. FFM Setup", "1. All", "0. Demo" }, ScriptHawk.UI.col(10) + ScriptHawk.UI.dropdown_offset, ScriptHawk.UI.row(5) + ScriptHawk.UI.dropdown_offset, ScriptHawk.UI.col(4) + 8, ScriptHawk.UI.button_height);
+		ScriptHawk.UI.form_controls.moves_dropdown = forms.dropdown(ScriptHawk.UI.options_form, { "5. All Minus Swim", "4. None", "3. SM 100%", "2. FFM Setup", "1. All", "0. Demo" }, ScriptHawk.UI.col(10) + ScriptHawk.UI.dropdown_offset, ScriptHawk.UI.row(5) + ScriptHawk.UI.dropdown_offset, ScriptHawk.UI.col(4) + 8, ScriptHawk.UI.button_height);
 		ScriptHawk.UI.button(10, 6, {4, 8}, nil, nil, "Unlock Moves", unlock_moves);
 	else
 		-- Use a bigger check flags button if the others are hidden by TASSafe
