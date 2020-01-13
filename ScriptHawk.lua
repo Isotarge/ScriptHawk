@@ -308,7 +308,7 @@ end
 
 local code = {};
 
-local function codeWriter(...)
+function codeWriter(...)
 	if isPointer(arg[1]) then
 		table.insert(code, {arg[1] - RDRAMBase, arg[2]});
 	else
