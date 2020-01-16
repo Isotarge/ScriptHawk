@@ -10,19 +10,16 @@ SW ra 0x24(sp)
 SW a0 0x20(sp)
 SW a1 0x1C(sp)
 SW a2 0x18(sp)
-SW at 0x14(sp)
 
 JAL @osDisableInt
 NOP
-SW v0 0x10(sp)
+SW v0 0x14(sp)
 
 LB a0 save_state_set
 BEQ a0 zero NormalModeCode_save
 NOP
 
 //if D_Up load state
-    
-
     LW a1 @P1NewlyPressedButtons
     LUI a2 0x0800
     AND a1 a1 a2 
@@ -44,10 +41,6 @@ NOP
     LI a2 @last_size
     JAL @memcpy
     NOP
-
-    
-    
-    
 
     B NormalModeCode_Housekeeping
     NOP
@@ -83,7 +76,7 @@ NormalModeCode_save:
 
 NormalModeCode_Housekeeping:	
 
-LW a0 0x10(sp)
+LW a0 0x14(sp)
 JAL @osRestoreInt
 NOP
 
@@ -91,7 +84,6 @@ LW ra 0x24(sp)
 LW a0 0x20(sp)
 LW a1 0x1C(sp)
 LW a2 0x18(sp)
-LW at 0x14(sp)
 ADDIU sp 0x28
 JR
 NOP
