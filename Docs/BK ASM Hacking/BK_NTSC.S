@@ -2,6 +2,12 @@
 | Constants
 -------------------------------*/
 [Const_TeminalVelocity]: -4000
+[Heap_addr]: 0x8002D500
+[Lib_Data_addr]: 0x80275610
+[Game_Eng_Data_addr]: 0x80363590
+[Heap_size]: 0x210520
+[Lid_Data_size]: 0x11980
+[Game_Eng_Data_size]: 0x22E60
 
 /*-------------------------------
 | VARIABLES
@@ -103,6 +109,7 @@
 
 [UpdateButtonInputs]:	0x8024E7C8
 
+[memcpy]: 0x80254608 ;I: (void * $a0 dest, void *a1 src, size_t $a2 size)
 [IncreaseGlobalOnTimerby50]: 0x80254F90
 
 [IncrementGlobalOnTimer]:	0x80255ACC
@@ -168,8 +175,8 @@
 [DecrementTimerByOneFrame]:	0x8025943C	;I: ( float* $a0 timerPtr )
 
 [SquareRoot]:	0x80265350	;I: (float $f12 input)	O: [float $f0]
-
-
+[osDisableInt]: 0x8026ACB0
+[osRestoreInt]: 0x8026ACD0
 
 /* ****************
  * Movement Struct (size:0x28):
