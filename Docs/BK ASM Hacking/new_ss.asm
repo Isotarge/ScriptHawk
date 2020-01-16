@@ -1,8 +1,6 @@
 //new_ss.asm
 
 [last_size]: 0x9CA70
-[test_addr]: 0x8037BF20
-[test_size]: 0x7Ec
 
 .org 0x80400100
 
@@ -14,14 +12,16 @@ SW a1 0x1C(sp)
 SW a2 0x18(sp)
 SW at 0x14(sp)
 
+JAL @osDisableInt
+NOP
+SW v0 0x10(sp)
+
 LB a0 save_state_set
 BEQ a0 zero NormalModeCode_save
 NOP
 
 //if D_Up load state
-    JAL @osDisableInt
-    NOP
-    SW v0 0x10(sp)
+    
 
     LW a1 @P1NewlyPressedButtons
     LUI a2 0x0800
@@ -47,18 +47,13 @@ NOP
 
     
     
-    LW a0 0x10(sp)
-    JAL @osRestoreInt
-    NOP
+    
 
     B NormalModeCode_Housekeeping
     NOP
 
 //if D_down save state
 NormalModeCode_save:
-    JAL @osDisableInt
-    NOP
-    SW v0 0x10(sp)
 
     LW a1 @P1NewlyPressedButtons
     LUI a2 0x0400
@@ -86,11 +81,12 @@ NormalModeCode_save:
     LI a0 1
     SB a0 save_state_set
 
-    LW a0 0x10(sp)
-    JAL @osRestoreInt
-    NOP
-
 NormalModeCode_Housekeeping:	
+
+LW a0 0x10(sp)
+JAL @osRestoreInt
+NOP
+
 LW ra 0x24(sp)
 LW a0 0x20(sp)
 LW a1 0x1C(sp)
@@ -100,6 +96,7 @@ ADDIU sp 0x28
 JR
 NOP
 
+.org 0x80410000
 save_state_set:
 .byte 0
 

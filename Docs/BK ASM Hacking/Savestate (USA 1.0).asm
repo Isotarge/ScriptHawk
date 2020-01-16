@@ -2,12 +2,19 @@
 .org 0x8023DBAB
 .byte 0x91
 
-// HOOKS
-;PAUSE MODE JUMP LOCATION: 0x802E47F4
-;.org 0x802E47F4
-;JAL PauseMode
-;NOP
+//intro cutscene skip
+//.org 0x8031C640
+//LI V0 0x01
+//JR ra
+//NOP
 
+//lair cutscene skip
+//.org 0x8031C688
+//LI V0 0x01
+//JR ra
+//NOP
+
+// HOOKS
 ;NORMAL MODE JUMP LOCATION: 0x80334FFC
 .org 0x80334FFC
 JAL NormalModeCode
@@ -28,5 +35,3 @@ NOP
 [PauseMenuState]:0x80383010
 
 .include "Docs/BK ASM Hacking/new_ss.asm"
-
-.org 0x80400100
