@@ -18,27 +18,14 @@
 ;(bitfield xxxx321i)
 [TinyInstrument]: 0x807FCA6E
  
-;Hook
-.org 0x807140BC
- 
-;Steal control flow
-jal 0x807FF500
-nop
-b 0x80714110;TESTING PUTTING THIS IN Return
-nop
- 
+.org 0x8060B0DC // retroben's hook
+J       Start
+
 ;************************************
 ; TakeMeThere FUNCTION
 ;************************************
-.org 0x807FF500
- 
-;put previous values on the stack
-ADDIU   sp -0x28
-SW      ra 0x24(sp)
-SW      t0 0x20(sp)
-SW      t1 0x1C(sp)
-SW      t2 0x18(sp)
-SW      at 0x14(sp)
+.org 0x8000DE88 // In the Expansion Pak pic, TODO: Better place to put this
+Start:
 
 ;Check if Button is Newly Pressed
 ;Zipperlock-fix
@@ -86,14 +73,7 @@ NOP
  
 ;End
 Return:
-;take values back from the stack
-LW      ra 0x24(sp)
-LW      t0 0x20(sp)
-LW      t1 0x1C(sp)
-LW      t2 0x18(sp)
-LW      at 0x14(sp)
-ADDIU   sp 0x28
-JR      ra
+J       0x8060B0E4
 NOP
  
 ;***TEST RESET MAP CODE***
