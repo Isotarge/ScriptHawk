@@ -7127,6 +7127,17 @@ function everythingIsKong(unsafe)
 	return true;
 end
 
+function Game.getNumBones()
+	local playerObject = Game.getPlayerObject();
+	if isRDRAM(playerObject) then
+		local modelPointer = dereferencePointer(playerObject + obj_model1.model_pointer);
+		if isRDRAM(modelPointer) then
+			return mainmemory.readbyte(modelPointer + obj_model1.model.num_bones);
+		end
+	end
+	return 0;
+end
+
 function Game.setScale(value)
 	local playerObject = Game.getPlayerObject();
 	if isRDRAM(playerObject) then
@@ -7146,6 +7157,14 @@ function Game.randomEffect()
 	Game.setScale(scaleValue);
 
 	print("Activated effect: "..toBinaryString(randomEffect).." with scale "..scaleValue);
+end
+
+function Game.getEffectStatus()
+	local playerObject = Game.getPlayerObject();
+	if isRDRAM(playerObject) then
+		return mainmemory.read_u16_be(playerObject + obj_model1.player.effect_byte);
+	end
+	return 0;
 end
 
 ----------------
@@ -9790,6 +9809,8 @@ Game.standardOSD = {
 	{"Rot. Z", Game.getZRotation, category="angle"},
 	{"Movement", Game.getMovementState, category="movement"},
 	{"Animation", Game.getAnimation, category="animation"},
+	{"Num Bones", Game.getNumBones, category="animation"},
+	{"Effect", hexifyOSD(Game.getEffectStatus), category="animation"},
 	{"Camera", Game.getCameraState, category="camera"},
 	{"Noclip", Game.getNoclipByte, Game.colorNoclipByte, category="noclip"},
 	{"Separator"},
