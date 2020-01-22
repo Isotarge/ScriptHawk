@@ -1,4 +1,4 @@
-// Donkey Kong 64 - Tag Anywhere (V2) (U)
+// Donkey Kong 64 - Tag Anywhere (V4) (U)
 // Made with love by Isotarge
 
 // With help from:
