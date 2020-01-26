@@ -18,6 +18,7 @@
 
 [L_Button]: 0x0020
 [D_Left]: 0x0200
+[D_Right]: 0x0100
 
 [NewlyPressed]: 0x807ECD48
 [ButtonHeld]: 0x807ECD58
@@ -63,7 +64,12 @@ ADDI	t1, t0, 0x1                         ;t1 = t0 + 1(Level text offset)
 LA      t2, @TinyIslesTSB                 	;t2 = *TinyIslesTSB
 LB     	t0, 0x00(t2)                        ;t0 = *t2
 ADDI	t4, t0, 0x1                         ;t4 = t0 + 1(map offset)
+;Wrap around if past Helm
+LA		t5, TakeMeThere_MaxState
+LB		t5, 0(t5)
+BEQ		t4, t5, MapReset
 
+Begin:
 ;Index the start of the level's text
 LA		t2, Level_Text						;t2 = *Level_Text
 ADDU	t2, t2, t1							;t2 = t2 + t1 (Level_Text + level text offset)
@@ -87,6 +93,7 @@ NOP
 LA		at, @TinyIslesTSB					
 SB		t4, 0(at)							;*TinyIslesTSB = t4
 NOP
+
 J 		Return
 
 ;Helper function for LoopThroughLevelText
@@ -95,6 +102,15 @@ SB      t5, 0(t3)							;store level text's byte at t3+index
 ADDI	t3, t3, 0x1							;increment t3 (security text index)
 ADDI	t2, t2, 0x1							;increment t2 (level text index)
 B		LoopThroughLevelText				;keep looping
+NOP
+
+;Helper function map reset
+MapReset:
+LA		t4, TakeMeThere_MinState
+LB		t4, 0(t4)
+LA		t1, Level_Text_MinState
+LB		t1, 0(t1)
+J		Begin
 NOP
 
 ForceZipper:
@@ -109,7 +125,7 @@ SW      t2, 0x00(at)
 ;set exit
 LA		at, @DestinationEntrance
 LI		t2, 0x00
-SH		t2, 0x00(at)
+SW		t2, 0x00(at)
 ;check newly pressed
 LH		t0, @NewlyPressed
 BEQZ	t0, Return
@@ -132,16 +148,15 @@ NOP
 .align
 Level_Text:
 .byte 0x0;dummy
-.ascii "ISLES\0"
-.ascii "JAPES\0"
-.ascii "AZTEC\0"
-.ascii "FACTORY\0"
-.ascii "GALLEON\0"
-.ascii "FOREST\0"
-.ascii "CAVES\0"
-.ascii "CASTLE\0"
-.ascii "HELM\0"
-
+.asciiz "ISLES"
+.asciiz "JAPES"
+.asciiz "AZTEC"
+.asciiz "FACTORY"
+.asciiz "GALLEON"
+.asciiz "FOREST"
+.asciiz "CAVES"
+.asciiz "CASTLE"
+.asciiz "HELM"
 
 .align
 TakeMeThere_WarpLocations:
@@ -157,9 +172,13 @@ TakeMeThere_WarpLocations:
 .byte 0x11;Helm
 
 .align
+Level_Text_MinState:
+.byte 1
+
+.align
 TakeMeThere_MinState:
 .byte 1
  
 .align
 TakeMeThere_MaxState:
-.byte 0x9
+.byte 0xA
