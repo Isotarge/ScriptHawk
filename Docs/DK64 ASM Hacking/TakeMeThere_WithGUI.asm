@@ -268,7 +268,7 @@ Level_Text_MinState:
 
 .align
 Level_Text_MaxState
-.byte 0x3D ;maybe not correct- point to start of "HELM"
+.byte 0x39 ;maybe not correct- point to start of "HELM"
 
 .align
 TakeMeThere_MinState:
