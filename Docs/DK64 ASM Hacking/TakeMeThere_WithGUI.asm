@@ -113,11 +113,13 @@ ADDI	t7, t7, -0x1
 LB		t8, 0x0(t7)							;read previous character
 BEQZ	t8, NullCharFound					;null char has been found, branch
 NOP
-IteratorLoop:
-	;t7 = t7-1
-	;t8 = read byte (t7)
-	;branch if zero -> t8, nullcharfound
-	;else branch to iteratorloop
+	IteratorLoop:
+	ADDI	t7, t7, -0x1
+	LB		t8, 0(t7)
+	BEQZ	t8, NullCharFound
+	NOP
+	J		IteratorLoop
+	NOP
 
 NullCharFound:
 ;check if min state, wrap
