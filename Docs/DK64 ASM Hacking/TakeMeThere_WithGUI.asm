@@ -1,7 +1,10 @@
 ;************************************
 ; Written by GloriousLiar
-; 10/2/17
+; v1 - 10/2/17
+; v2 - 1/26/20
+; v3 - 2/3/20
 ; Template code by Isotarge & MittenzHugg
+; Credit to retroben and SubDrag for the hooks
 ;************************************
  
 ;************************************
@@ -17,6 +20,8 @@
 [ZipperBitfield]: 0x807FBB62
 
 [L_Button]: 0x0020
+[D_Up]: 0x0800		;check this
+[D_Down]: 0x0400
 [D_Left]: 0x0200
 [D_Right]: 0x0100
 
@@ -35,17 +40,31 @@ Start:
 JAL     0x805FC2B0
 NOP
 
-;Check for L+DLeft
+;Check for L+DDown, Force zip to destination map
 LH      t0, @ControllerInput
 LI      t1, @L_Button
-LI		t2, @D_Left
+LI		t2, @D_Down
 OR		t1, t1, t2
-BEQ     t0, t1, ForceZipper
+AND		t0, t0, t1
+BEQZ    t0, t1, LCheck
+NOP
+J		ForceZipper
+NOP
 
+LCheck:
 ;Check for L Input
 LH      t0, @ControllerInput
 LI      t1, @L_Button
-BNE     t0, t1, Return
+AND		t0, t0, t1
+BEQZ    t0, Return
+
+;Check for DRight or DLeft
+LH      t0, @ControllerInput
+LI      t1, @D_Left
+LI		t2, @D_Right
+OR		t1, t1, t2
+AND		t0, t0, t1
+BEQZ    t0, Return
 
 ;Set security byte
 LI      t3, 1
@@ -55,19 +74,80 @@ SB      t3, @SecurityByte
 LH		t0, @NewlyPressed
 BEQZ	t0, Return
 
+;Get list traversal direction
+LH      t0, @ControllerInput
+LI      t1, @D_Left
+AND		t0, t0, t1
+BEQ		t0, t1, SetIteratorLeft
+NOP
+J		SetIteratorRight
+NOP
+
+SetIteratorLeft:
+LI		t1, -0x1
+LI		t5, -0x1	;copy
+J		IteratorDirectionSet
+NOP
+
+SetIteratorRight:
+LI		t1, 0x1
+LI		t5, 0x1		;copy
+J		IteratorDirectionSet
+NOP
+
+IteratorDirectionSet:
 ;Get Level Text Index
 LA      t2, @TinyHelmTSB                 	;t2 = *TinyHelmTSB
-LHU     t0, 0x00(t2)                        ;t0 = *t2
-ADDI	t1, t0, 0x1                         ;t1 = t0 + 1(Level text offset)
+LHU     t0, 0x00(t2)                        ;t0 = *t2(level_text iterator index)
+ADDI	t0, t0, 0x1                         ;t0 = t0 + 1(account for dummy \0)
+LI		t2, -0x1
+BEQ		t1, t2, FindPreviousLevelText
+NOP
+J		ReturnWithOffset
+NOP
 
+FindPreviousLevelText:
+LA		t7, Level_Text
+ADDU	t7, t7, t0							;store in t7 level_text + offset(from helm bananas)
+ADDI	t7, t7, -0x1
+LB		t8, 0x0(t7)							;read previous character
+BEQZ	t8, NullCharFound					;null char has been found, branch
+NOP
+IteratorLoop:
+	;t7 = t7-1
+	;t8 = read byte (t7)
+	;branch if zero -> t8, nullcharfound
+	;else branch to iteratorloop
+
+NullCharFound:
+;check if min state, wrap
+LA		t9,	Level_Text
+SUBU	t1, t7, t9							;t1 = iterator index - level_text base (offset)
+BEQZ	t1, WrapLevelText					;wrap around if offset = 0
+NOP
+J		ReturnWithOffset
+NOP
+
+WrapLevelText:
+LA		t1, Level_Text_MaxState
+LB		t1, 0x0(t1)
+J		ReturnWithOffset
+NOP
+
+ReturnWithOffset:
 ;Get Map Index
 LA      t2, @TinyIslesTSB                 	;t2 = *TinyIslesTSB
 LB     	t0, 0x00(t2)                        ;t0 = *t2
-ADDI	t4, t0, 0x1                         ;t4 = t0 + 1(map offset)
+ADDU	t4, t0, t5                          ;t4 = t0 + t5(map offset, iterator direction)
 ;Wrap around if past Helm
 LA		t5, TakeMeThere_MaxState
 LB		t5, 0(t5)
-BEQ		t4, t5, MapReset
+BEQ		t4, t5, MapMinReset
+NOP
+;Wrap around if at Isles
+LA		t5, TakeMeThere_MinState
+LB		t5, 0(t5)
+BEQ		t4, t5, MapMaxReset
 
 Begin:
 ;Index the start of the level's text
@@ -105,10 +185,19 @@ B		LoopThroughLevelText				;keep looping
 NOP
 
 ;Helper function map reset
-MapReset:
+MapMinReset:
 LA		t4, TakeMeThere_MinState
 LB		t4, 0(t4)
 LA		t1, Level_Text_MinState
+LB		t1, 0(t1)
+J		Begin
+NOP
+
+;Helper function map reset
+MapMaxReset:
+LA		t4, TakeMeThere_MaxState
+LB		t4, 0(t4)
+LA		t1, Level_Text_MaxState
 LB		t1, 0(t1)
 J		Begin
 NOP
@@ -174,6 +263,10 @@ TakeMeThere_WarpLocations:
 .align
 Level_Text_MinState:
 .byte 1
+
+.align
+Level_Text_MaxState
+.byte 0x3D ;maybe not correct- point to start of "HELM"
 
 .align
 TakeMeThere_MinState:
