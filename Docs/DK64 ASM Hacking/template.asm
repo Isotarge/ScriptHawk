@@ -36,11 +36,12 @@ NOP
 	BEQZ	t1, Return
 	NOP
 	
-;Force Zipper
-LI		t0,	0x22
-LI		t1, 0x00
+;Change Model
+LI		t0,	0x06	;kong index - chunky
+LI		t1, 0x45	;model - k lumsy
+LI		t2, 0x07	;behavior - krusha
 LA		ra, Return
-J		ForceZipper
+J		ChangeModel
 NOP
 
 Return:
