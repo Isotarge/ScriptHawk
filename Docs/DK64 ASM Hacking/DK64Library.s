@@ -12,6 +12,13 @@
 [D_Left]: 0x0200
 [D_Right]: 0x0100
 
+;relative to KongObjectPointer
+[CurrentCharacter]: 0x36F
+
+;relative to ActionObjectPointer
+[ActionObjectOffset]: 0x29C
+
+
 ;************************************
 ; ADDRESSES
 ;************************************
@@ -29,6 +36,20 @@
 
 [TinyHelmTSB]: 0x807FCAA0		;Tiny Helm T&S Bananas
 [TinyIslesTSB]: 0x807FCA9E		;Tiny Isles T&S Bananas
+
+[HUDPointer]: 0x80754280
+[KongObjectPointer]: 0x807FBB4C
+[ActionObjectPointer]: 0x807FC924
+[InCutscene]: 0x807444EC
+
+[DKModel]:0x8075C41A
+[DiddyModel]:0x8075C42A
+[TinyModel]:0x8075C44A
+[LankyModel]:0x8075C43A
+[ChunkyModel]:0x8075C45A
+[KrushaModel]:0x8075C46A
+[RambiModel]:0x8075C47A
+[EnguardeModel]:0x8075C48A
 
 ;************************************
 ; CUSTOM CODE
@@ -142,6 +163,50 @@ JR		ra
 ; return ->
 ;************************************
 ;TODO
+
+;************************************
+; Change Model
+; t0 -> (byte) kong
+; t1 -> (byte) model
+; t2 -> (byte) behavior
+; ra -> (int*) return_address
+; return -> void
+;************************************
+ChangeModel:
+LA		at, @KongObjectPointer
+LW		at, 0x00(at)
+ADDI	at, at, 0x36F				;offset to actor_type
+SH		t0, 0x00(at)
+
+;KongModel = DKModel + (KongIndex -2)*0x10
+LA		at, @DKModel		
+ADDI	t0, t0, -0x2
+LI		t3, 0x10
+MULT	t0, t3
+MFLO	t0
+ADD		t0, at, t0
+SH		t1, 0x00(t0)				;t0 holds KongModel
+
+;KongBehavior = KongModel - 0x8
+ADDI	t0, t0, -0x8
+SH		t2, 0x00(t0)				;t0 holds KongBehavior
+
+JR		ra
+NOP
+
+;************************************
+; Force Action
+; t0 -> (byte) action
+; ra -> (int*) return_address
+; return -> void
+;************************************
+ForceAction:
+LA		at, @ActionObjectPointer
+LW		at, 0x00(at)
+ADDI	at, at, 0x29c				;offset action object by 0x29c
+SH		t0, 0x00(at)
+JR		ra
+NOP
 
 EndOfFile:
 NOP
