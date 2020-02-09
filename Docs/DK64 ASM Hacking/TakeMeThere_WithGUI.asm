@@ -1,18 +1,20 @@
 ;************************************
-; Take Me There by GloriousLiar - 2/8/20
+; Take Me There v2
+; GloriousLiar
+; 2/9/20
 ;************************************
-.org	0x807FCAA1		;set initial level_text_offset
-.byte	1
-.org	0x807FCA9F		;set initial map offset
-.byte	1
-.org	0x80744718		;ptr to string
-.word	0
+;.org	0x807FCAA1		;set initial level_text_offset
+;.byte	1
+;.org	0x807FCA9F		;set initial map offset
+;.byte	1
+;.org	0x80744718		;ptr to string
+;.word	0
 
 .org 	0x805FC164 // retroben's hook but up a few functions
 J 		Start2
 
 .org 	0x805fe354 // write over jump to SecuritySomething
-J		Start
+JAL		Start
 
 .org 	0x8000DE88 // In the Expansion Pak pic, TODO: Better place to put this
 .include "DK64Library.s"
@@ -34,18 +36,57 @@ AND		t0, t0, t1
 BEQZ	t0, Return
 NOP
 
-LA		t0, @KrushaInstrument
-LW		t0, 0x00(t0)			;dereference ptr at krusha instrument
-;		a0 = global_display_list
-LI		a1, 0x280				;x
-LI		a2, 0x1e0				;y
-LI		a3, 0x3e800000			;scale = 0.25
-ADDIU	sp, sp, -0x14
-SW		t0, 0x10(sp)
-JAL		0x806abb98				;printText
-NOP
-ADDIU	sp, sp, 0x14
-
+LI		t9, 0x1					;index level text
+;		a0 						;global_display_list
+LI		a1, 0x84				;x = 132
+LI		a2, 0x74				;y = 116
+LI		a3, 0x3f000000			;scale = 0.5
+LA		t0, LevelText
+ADDI	t0, t0, 0x1
+PrintLoop:
+	LI		a1, 0x84				;x = 132
+	LA		t1, @TinyHelmTSB
+	LH		t1, 0x0(t1)				;t1 = 
+	LA		t2, LevelText
+	ADD		t1, t1, t2				;t1 = level_text_offset + @LevelText
+	SUB		t3, t0, t2				;t3 = offset from @LevelText
+	ADD		t2, t2, t3				;t2 = @LevelText + t3
+	BNE		t1, t2, SetY			;if t1==t2
+	NOP
+		LI		a1, 0x100			;x = 0x64 + 0x10
+	SetY:	
+	ADDIU	sp, sp, -0x34	
+	SW		t0, 0x10(sp)
+	SW		t9, 0x14(sp)
+	SW		a1, 0x18(sp)
+	SW		a2, 0x22(sp)
+	SW		a3, 0x26(sp)
+	JAL		0x806abb98				;printText
+	NOP
+	LW		t0, 0x10(sp)
+	LW		t9, 0x14(sp)
+	LW		a1, 0x18(sp)
+	LW		a2, 0x22(sp)
+	LW		a3, 0x26(sp)
+	ADDIU	sp, sp, 0x34
+	ADDI	a0, v0, 0x0				;update global display list
+	FindZero:
+		LB		t1, 0x0(t0)
+		BEQZ	t1, SetNextParams
+		NOP
+		ADDIU	t0, 0x1
+		B		FindZero
+		NOP
+	SetNextParams:
+	ADDIU	t0, t0, 0x1				;move past nullchar on level text						
+	ADDIU	a2, a2, 0x30			;y+=48
+	LB		t1, MaxMapIndex
+	ADDI	t9, t9, 0x1				;t9++
+	BNE		t1, t9, PrintLoop		;if t9 != 0xA, loop
+	NOP
+	
+SW		t0, 0x80744718
+	
 Return:
 JAL		0x805fe358
 NOP
@@ -57,9 +98,10 @@ Start2:
 JAL     0x805FC2B0
 NOP
 
-LA		t0, @KrushaInstrument
-LW		t1, 0x00(t0)
-BEQZ	t1, SetInitialPtr				;ptr check
+;load min map code and min text offset, if 0
+LA		t0, @TinyHelmTSB
+LH		t1, 0x00(t0)
+BEQZ	t1, SetInitialParams
 NOP
 
 ;Check newly pressed
@@ -116,7 +158,7 @@ BEQ		t2, t0, MapReset
 NOP
 
 Begin:
-LA		at, @KrushaInstrument
+;;;;;;;LA		at, @KrushaInstrument
 LA		a0, LevelText
 ADD		a0, a0, t1							;a0 = @LevelText + level_text_offset
 LoopToNullChar:
@@ -131,7 +173,7 @@ SetOffset:
 ADDI	a0, a0, 0x1							;move past null char
 LA		t1, LevelText
 SUB		t1, a0, t1							;put new offset in t1
-SW		a0, 0x00(at)
+;;;;;;;SW		a0, 0x00(at)
 LA      t0, @TinyHelmTSB                 	;t0 = *TinyHelmTSB
 SH		t1, 0x00(t0)
 LA      t0, @TinyIslesTSB                 	;t0 = *TinyHelmTSB
@@ -141,11 +183,14 @@ Return2:
 J       0x805FC15C // retroben's hook but up a few functions
 NOP
 
-SetInitialPtr:
+SetInitialParams:
 ;t0 = krushaintru
-LA		t1, LevelText	;index = leveltext address
-ADDI	t1, t1, 0x1		;index++
-SW		t1, 0x00(t0)
+;;;;LA		t1, LevelText	;index = leveltext address
+;;;;ADDI	t1, t1, 0x1		;index++
+;;;SW		t1, 0x00(t0)
+LI		t1, 0x01
+SB		t1, 0x807FCA9F
+SB		t1, 0x807FCAA1
 J		Return2
 NOP
 
