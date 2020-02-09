@@ -3,13 +3,6 @@
 ; GloriousLiar
 ; 2/9/20
 ;************************************
-;.org	0x807FCAA1		;set initial level_text_offset
-;.byte	1
-;.org	0x807FCA9F		;set initial map offset
-;.byte	1
-;.org	0x80744718		;ptr to string
-;.word	0
-
 .org 	0x805FC164 // retroben's hook but up a few functions
 J 		Start2
 
@@ -36,25 +29,38 @@ AND		t0, t0, t1
 BEQZ	t0, Return
 NOP
 
-LI		t9, 0x1					;index level text
+MenuMode:
+LA		at, @KrushaInstrument
+LB		at, 0x0(at)
+LI		t0, 0x1
+BEQ		at, t0, TakeMeThere
+NOP
+LI		t0, 0x2
+BEQ		at, t0, PositionViewer
+NOP
+B		Return				;null check
+NOP
+
+TakeMeThere:
+LI		t9, 0x1					;num of menu text items
 ;		a0 						;global_display_list
-LI		a1, 0x84				;x = 132
+LI		a1, 0xA0				;x = 132
 LI		a2, 0x74				;y = 116
 LI		a3, 0x3f000000			;scale = 0.5
 LA		t0, LevelText
 ADDI	t0, t0, 0x1
 PrintLoop:
-	LI		a1, 0x84				;x = 132
+	LI		a1, 0xA0				;x = 132
 	LA		t1, @TinyHelmTSB
 	LH		t1, 0x0(t1)				;t1 = 
 	LA		t2, LevelText
 	ADD		t1, t1, t2				;t1 = level_text_offset + @LevelText
 	SUB		t3, t0, t2				;t3 = offset from @LevelText
 	ADD		t2, t2, t3				;t2 = @LevelText + t3
-	BNE		t1, t2, SetY			;if t1==t2
+	BNE		t1, t2, Print			;if t1==t2
 	NOP
 		LI		a1, 0x100			;x = 0x64 + 0x10
-	SetY:	
+	Print:	
 	ADDIU	sp, sp, -0x34	
 	SW		t0, 0x10(sp)
 	SW		t9, 0x14(sp)
@@ -85,7 +91,47 @@ PrintLoop:
 	BNE		t1, t9, PrintLoop		;if t9 != 0xA, loop
 	NOP
 	
-SW		t0, 0x80744718
+J 		Return
+NOP
+	
+PositionViewer:
+LI		t9, 0x1					;num of menu text items
+;		a0 						;global_display_list
+LI		a1, 0xA0				;x = 132
+LI		a2, 0x74				;y = 116
+LI		a3, 0x3f000000			;scale = 0.5
+LA		t0, HelloWorldText
+PrintLoopPV:
+	LI		a1, 0xA0				;x = 132
+	ADDIU	sp, sp, -0x34	
+	SW		t0, 0x10(sp)
+	SW		t9, 0x14(sp)
+	SW		a1, 0x18(sp)
+	SW		a2, 0x22(sp)
+	SW		a3, 0x26(sp)
+	JAL		0x806abb98				;printText
+	NOP
+	LW		t0, 0x10(sp)
+	LW		t9, 0x14(sp)
+	LW		a1, 0x18(sp)
+	LW		a2, 0x22(sp)
+	LW		a3, 0x26(sp)
+	ADDIU	sp, sp, 0x34
+	ADDI	a0, v0, 0x0				;update global display list
+	FindZeroPV:
+		LB		t1, 0x0(t0)
+		BEQZ	t1, SetNextParamsPV
+		NOP
+		ADDIU	t0, 0x1
+		B		FindZeroPV
+		NOP
+	SetNextParamsPV:
+	ADDIU	t0, t0, 0x1				;move past nullchar on level text						
+	ADDIU	a2, a2, 0x30			;y+=48
+	LB		t1, MaxHelloWorldIndex
+	ADDI	t9, t9, 0x1				;t9++
+	BNE		t1, t9, PrintLoopPV		;if t9 != 0xA, loop
+	NOP	
 	
 Return:
 JAL		0x805fe358
@@ -113,12 +159,17 @@ NOP
 ;Check LButton
 LI		t2, @L_Button
 LA		t3, @ControllerInput
-LH		t3, 0x00(t3)
+LHU		t3, 0x00(t3)
 AND		t2, t2, t3
 BEQZ	t2, Return2
 NOP
+;L+DUp
+LI		t2, @D_Left
+AND		t2, t2, t3
+BNEZ	t2, ChangeMenuMode
+NOP
 ;L+DDown
-LI		t2, @D_Down
+LI		t2, @D_Up
 AND		t2, t2, t3
 BEQZ	t2, SetDisplay
 NOP
@@ -134,9 +185,24 @@ NOP
 J		Return2
 NOP
 
+ChangeMenuMode:
+LA		at, @KrushaInstrument
+LB		t0, 0x0(at)
+ADDI	t0, t0, 0x1
+SB		t0, 0x0(at)				;set menu code
+LA		t1, MaxMenuState
+LB		t1, 0x0(t1)
+BNE		t0, t1, Return2
+NOP
+LA		t1, MinMenuState
+LB		t1, 0x0(t1)
+SB		t1, 0x0(at)				;set menu code to min state
+J 		Return2
+NOP
+
 SetDisplay:
-;L+DRight
-LI		t2, @D_Right
+;L+DDown
+LI		t2, @D_Down
 AND		t2, t2, t3
 BEQZ	t2, Return2
 NOP
@@ -185,12 +251,11 @@ NOP
 
 SetInitialParams:
 ;t0 = krushaintru
-;;;;LA		t1, LevelText	;index = leveltext address
-;;;;ADDI	t1, t1, 0x1		;index++
-;;;SW		t1, 0x00(t0)
+LA		t2, @KrushaInstrument	;KrushaInstrument = menu mode {1=takemethere,2=positionviewer}
 LI		t1, 0x01
 SB		t1, 0x807FCA9F
 SB		t1, 0x807FCAA1
+SB		t1, 0x0(t2)
 J		Return2
 NOP
 
@@ -205,7 +270,13 @@ NOP
 
 .align
 HelloWorldText:
-.asciiz "Hello, world!"
+.asciiz "MENU 2"
+.asciiz "TEXT 1"
+.asciiz "TEXT 2"
+
+.align
+MaxHelloWorldIndex:
+.byte 0x4
 
 
 ;************************************
@@ -252,3 +323,11 @@ MinMapIndex:
 .align
 MaxMapIndex:
 .byte 0xA
+
+.align
+MaxMenuState:
+.byte 0x3
+
+.align
+MinMenuState:
+.byte 0x1
