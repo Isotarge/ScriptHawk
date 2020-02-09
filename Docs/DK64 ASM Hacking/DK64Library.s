@@ -36,6 +36,16 @@
 
 [TinyHelmTSB]: 0x807FCAA0		;Tiny Helm T&S Bananas
 [TinyIslesTSB]: 0x807FCA9E		;Tiny Isles T&S Bananas
+[KrushaInstrument]:0x80744718
+[KrushaJapesTSB]:0x807FCB30
+[KrushaAztecTSB]:0x807FCB32
+[KrushaFactoryTSB]:0x807FCB34
+[KrushaGalleonTSB]:0x807FCB36
+[KrushaForestTSB]:0x807FCB38
+[KrushaCavesTSB]:0x807FCB3A
+[KrushaCastleTSB]:0x807FCB3C
+[KrushaIslesTSB]:0x807FCB3E
+[KrushaHelmTSB]:0x807FCB40
 
 [HUDPointer]: 0x80754280
 [KongObjectPointer]: 0x807FBB4C
@@ -102,58 +112,13 @@ ReturnFromCheckInput:
 JR		ra
 
 ;************************************
-; LCheck
-; ra -> (int*) return_address
-; return -> (boolean) t1 -> L_pressed
-;************************************
-LCheck:
-LI      t0, @L_Button
-ADDI	t2, ra, 0x0					;t2 = ra (temp)
-LA		ra, ReturnFromLCheck
-B		CheckInput
-NOP
-ReturnFromLCheck:
-ADDI	ra, t2, 0x0					;ra = t2 (original ra)
-JR		ra
-
-;************************************
-; DLeftCheck
-; ra -> (int*) return_address
-; return -> (boolean) t1 -> L_pressed
-;************************************
-DLeftCheck:
-LI      t0, @D_Left
-ADDI	t2, ra, 0x0					;t2 = ra (temp)
-LA		ra, ReturnFromDLeftCheck
-B		CheckInput
-NOP
-ReturnFromDLeftCheck:
-ADDI	ra, t2, 0x0					;ra = t2 (original ra)
-JR		ra
-
-;************************************
-; DRightCheck
-; ra -> (int*) return_address
-; return -> (boolean) t1 -> L_pressed
-;************************************
-DRightCheck:
-LI      t0, @D_Right
-ADDI	t2, ra, 0x0					;t2 = ra (temp)
-LA		ra, ReturnFromDLeftCheck
-B		CheckInput
-NOP
-ReturnFromDRightCheck:
-ADDI	ra, t2, 0x0					;ra = t2 (original ra)
-JR		ra
-
-;************************************
 ; CheckNewlyPressed
 ; ra -> (int*) return_address
 ; return -> (boolean) t1 -> newly_pressed
 ;************************************
 CheckNewlyPressed:
 LI		t1, @NewlyPressed
-LH		t1, 0x0(t1)
+LW		t1, 0x0(t1)
 JR		ra
 
 ;************************************
@@ -207,6 +172,14 @@ ADDI	at, at, 0x29c				;offset action object by 0x29c
 SH		t0, 0x00(at)
 JR		ra
 NOP
+
+
+;************************************
+; PrintMyText
+; t0 -> (str*) str_ptr
+; return -> void
+;************************************
+PrintMyText:
 
 EndOfFile:
 NOP
