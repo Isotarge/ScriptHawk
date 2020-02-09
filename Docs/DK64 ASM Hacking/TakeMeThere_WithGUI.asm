@@ -1,243 +1,173 @@
 ;************************************
-; Written by GloriousLiar
-; v1 - 10/2/17
-; v2 - 1/26/20
-; v3 - 2/3/20
-; Template code by Isotarge & MittenzHugg
-; Credit to retroben and SubDrag for the hooks
+; Take Me There by GloriousLiar - 2/8/20
 ;************************************
- 
-;************************************
-; CONSTANTS & ADDRESSES
-;************************************ 
-[DestinationMap]: 0x807444E4
-[DestinationEntrance]: 0x807444E8
+.org	0x807FCAA1		;set initial level_text_offset
+.byte	1
+.org	0x807FCA9F		;set initial map offset
+.byte	1
+.org	0x80744718		;ptr to string
+.word	0
 
-[SecurityText]: 0x8075E5DC
-[SecurityByte]: 0x807552E0
-[ControllerInput]: 0x80014DC4
+.org 	0x805FC164 // retroben's hook but up a few functions
+J 		Start2
 
-[ZipperBitfield]: 0x807FBB62
+.org 	0x805fe354 // write over jump to SecuritySomething
+J		Start
 
-[L_Button]: 0x0020
-[D_Up]: 0x0800		;check this
-[D_Down]: 0x0400
-[D_Left]: 0x0200
-[D_Right]: 0x0100
+.org 	0x8000DE88 // In the Expansion Pak pic, TODO: Better place to put this
+.include "DK64Library.s"
 
-[NewlyPressed]: 0x807ECD48
-[ButtonHeld]: 0x807ECD58
-
-[TinyHelmTSB]: 0x807FCAA0		;used to store level text offset
-[TinyIslesTSB]: 0x807FCA9E		;used to store map index
-
-.org 0x805FC164 // retroben's hook but up a few functions
-J Start
-
-.org 0x8000DE88 // In the Expansion Pak pic, TODO: Better place to put this
 Start:
+JAL		0x80714060; SecurityFunction
+NOP
+ADDI	a0, v0, 0x0; put result in a0
+
+JAL		0x807132dc	;v0 = global display list
+NOP
+ADDI	a0, v0, 0x0
+
+;Check LButton
+LI		t0, @L_Button
+LA		t1, @ControllerInput
+LHU		t1, 0x00(t1)
+AND		t0, t0, t1
+BEQZ	t0, Return
+NOP
+
+LA		t0, @KrushaInstrument
+LW		t0, 0x00(t0)			;dereference ptr at krusha instrument
+;		a0 = global_display_list
+LI		a1, 0x280				;x
+LI		a2, 0x1e0				;y
+LI		a3, 0x3e800000			;scale = 0.25
+ADDIU	sp, sp, -0x14
+SW		t0, 0x10(sp)
+JAL		0x806abb98				;printText
+NOP
+ADDIU	sp, sp, 0x14
+
+Return:
+JAL		0x805fe358
+NOP
+
+//start second hook
+Start2:
+
 // Run the code we replaced
 JAL     0x805FC2B0
 NOP
 
-;Check for L+DDown, Force zip to destination map
-LH      t0, @ControllerInput
-LI      t1, @L_Button
+LA		t0, @KrushaInstrument
+LW		t1, 0x00(t0)
+BEQZ	t1, SetInitialPtr				;ptr check
+NOP
+
+;Check newly pressed
+LA		t1, @NewlyPressed
+LHU		t1, 0x00(t1)
+BEQZ	t1, Return2
+NOP
+
+;Check LButton
+LI		t2, @L_Button
+LA		t3, @ControllerInput
+LH		t3, 0x00(t3)
+AND		t2, t2, t3
+BEQZ	t2, Return2
+NOP
+;L+DDown
 LI		t2, @D_Down
-OR		t1, t1, t2
-AND		t0, t0, t1
-BEQZ    t0, t1, LCheck
+AND		t2, t2, t3
+BEQZ	t2, SetDisplay
 NOP
-J		ForceZipper
+;Force zip
+LA		t0,	@TinyIslesTSB
+LH		t0, 0x0(t0)
+LA		t1, MapCodes
+ADDU	t0, t1, t0
+LB		t0, 0x0(t0)
+LI		t1, 0x0
+JAL		ForceZipper
+NOP
+J		Return2
 NOP
 
-LCheck:
-;Check for L Input
-LH      t0, @ControllerInput
-LI      t1, @L_Button
-AND		t0, t0, t1
-BEQZ    t0, Return
-
-;Check for DRight or DLeft
-LH      t0, @ControllerInput
-LI      t1, @D_Left
+SetDisplay:
+;L+DRight
 LI		t2, @D_Right
-OR		t1, t1, t2
-AND		t0, t0, t1
-BEQZ    t0, Return
-
-;Set security byte
-LI      t3, 1
-SB      t3, @SecurityByte
-
-;Check if Button is Newly Pressed
-LH		t0, @NewlyPressed
-BEQZ	t0, Return
-
-;Get list traversal direction
-LH      t0, @ControllerInput
-LI      t1, @D_Left
-AND		t0, t0, t1
-BEQ		t0, t1, SetIteratorLeft
-NOP
-J		SetIteratorRight
+AND		t2, t2, t3
+BEQZ	t2, Return2
 NOP
 
-SetIteratorLeft:
-LI		t1, -0x1
-LI		t5, -0x1	;copy
-J		IteratorDirectionSet
-NOP
-
-SetIteratorRight:
-LI		t1, 0x1
-LI		t5, 0x1		;copy
-J		IteratorDirectionSet
-NOP
-
-IteratorDirectionSet:
 ;Get Level Text Index
-LA      t2, @TinyHelmTSB                 	;t2 = *TinyHelmTSB
-LHU     t0, 0x00(t2)                        ;t0 = *t2(level_text iterator index)
-ADDI	t0, t0, 0x1                         ;t0 = t0 + 1(account for dummy \0)
-LI		t2, -0x1
-BEQ		t1, t2, FindPreviousLevelText
-NOP
-J		ReturnWithOffset
-NOP
+LA      t0, @TinyHelmTSB                 	;t0 = *TinyHelmTSB
+LHU     t1, 0x00(t0)                        ;t0 = *t0 (LevelTEXT offset)
 
-FindPreviousLevelText:
-LA		t7, Level_Text
-ADDU	t7, t7, t0							;store in t7 level_text + offset(from helm bananas)
-ADDI	t7, t7, -0x1
-LB		t8, 0x0(t7)							;read previous character
-BEQZ	t8, NullCharFound					;null char has been found, branch
-NOP
-	IteratorLoop:
-	ADDI	t7, t7, -0x1
-	LB		t8, 0(t7)
-	BEQZ	t8, NullCharFound
-	NOP
-	J		IteratorLoop
-	NOP
-
-NullCharFound:
-;check if min state, wrap
-LA		t9,	Level_Text
-SUBU	t1, t7, t9							;t1 = iterator index - level_text base (offset)
-BEQZ	t1, WrapLevelText					;wrap around if offset = 0
-NOP
-J		ReturnWithOffset
-NOP
-
-WrapLevelText:
-LA		t1, Level_Text_MaxState
-LB		t1, 0x0(t1)
-J		ReturnWithOffset
-NOP
-
-ReturnWithOffset:
+SetMap:
 ;Get Map Index
-LA      t2, @TinyIslesTSB                 	;t2 = *TinyIslesTSB
-LB     	t0, 0x00(t2)                        ;t0 = *t2
-ADDU	t4, t0, t5                          ;t4 = t0 + t5(map offset, iterator direction)
+LA      t0, @TinyIslesTSB                 	;t0 = *TinyIslesTSB
+LHU    	t0, 0x00(t0)                        ;t0 = *t0
+ADDI	t2, t0, 0x1                         ;t2 = t0 + 1(map offset)
+
 ;Wrap around if past Helm
-LA		t5, TakeMeThere_MaxState
-LB		t5, 0(t5)
-BEQ		t4, t5, MapMinReset
+LA		t0, MaxMapIndex
+LB		t0, 0(t0)
+BEQ		t2, t0, MapReset
 NOP
-;Wrap around if at Isles
-LA		t5, TakeMeThere_MinState
-LB		t5, 0(t5)
-BEQ		t4, t5, MapMaxReset
 
 Begin:
-;Index the start of the level's text
-LA		t2, Level_Text						;t2 = *Level_Text
-ADDU	t2, t2, t1							;t2 = t2 + t1 (Level_Text + level text offset)
-
-;Loop through the level text
-;t3 = Security Text address + index of text
-;t5 = byte read from Level_Text + map_offset
-PrintText:
-LI      t3, @SecurityText					;t3 = *SecurityText
-LoopThroughLevelText:
-	LB		t5, 0x0(t2) 						;t5 = byte from t2 (level text at index)
-	BNEZ	t5, Place_Character 				;break when you hit the null char
+LA		at, @KrushaInstrument
+LA		a0, LevelText
+ADD		a0, a0, t1							;a0 = @LevelText + level_text_offset
+LoopToNullChar:
+	LB		t0, 0x00(a0)
+	BEQZ	t0, SetOffset
+	NOP
+	ADDI	a0, a0, 0x1
+	B		LoopToNullChar
 	NOP
 
-;cleanup, save level_text offset to TinyHelmTSB
-LA		at, @TinyHelmTSB
-LA		t0, Level_Text						;t0 = base address
-SUB		t2, t2, t0							;t2 = current address - base address (offset)
-SH      t2, 0x00(at)       					;*TinyHelmTSB = t2 (tiny bananas = level text offset)
-NOP
-LA		at, @TinyIslesTSB					
-SB		t4, 0(at)							;*TinyIslesTSB = t4
-NOP
+SetOffset:
+ADDI	a0, a0, 0x1							;move past null char
+LA		t1, LevelText
+SUB		t1, a0, t1							;put new offset in t1
+SW		a0, 0x00(at)
+LA      t0, @TinyHelmTSB                 	;t0 = *TinyHelmTSB
+SH		t1, 0x00(t0)
+LA      t0, @TinyIslesTSB                 	;t0 = *TinyHelmTSB
+SH		t2, 0x00(t0)
 
-J 		Return
-
-;Helper function for LoopThroughLevelText
-Place_Character:
-SB      t5, 0(t3)							;store level text's byte at t3+index
-ADDI	t3, t3, 0x1							;increment t3 (security text index)
-ADDI	t2, t2, 0x1							;increment t2 (level text index)
-B		LoopThroughLevelText				;keep looping
-NOP
-
-;Helper function map reset
-MapMinReset:
-LA		t4, TakeMeThere_MinState
-LB		t4, 0(t4)
-LA		t1, Level_Text_MinState
-LB		t1, 0(t1)
-J		Begin
-NOP
-
-;Helper function map reset
-MapMaxReset:
-LA		t4, TakeMeThere_MaxState
-LB		t4, 0(t4)
-LA		t1, Level_Text_MaxState
-LB		t1, 0(t1)
-J		Begin
-NOP
-
-ForceZipper:
-;set map
-LA		at, @DestinationMap
-LA		t2, TakeMeThere_WarpLocations
-LA		t4, @TinyIslesTSB
-LB		t4, 0x0(t4)
-ADDU	t2, t4, t2							;TakeMeThere_WarpLocations + t4(offset)
-LB		t2, 0x00(t2)
-SW      t2, 0x00(at)
-;set exit
-LA		at, @DestinationEntrance
-LI		t2, 0x00
-SW		t2, 0x00(at)
-;check newly pressed
-LH		t0, @NewlyPressed
-BEQZ	t0, Return
-NOP
-;force zipper
-LA      at, @ZipperBitfield
-LB      t0, 0x00(at)
-ORI     t1, t0, 0x01
-SB      t1, 0x00(at)
-J 		Return
-NOP
-
-Return:
+Return2:
 J       0x805FC15C // retroben's hook but up a few functions
 NOP
+
+SetInitialPtr:
+;t0 = krushaintru
+LA		t1, LevelText	;index = leveltext address
+ADDI	t1, t1, 0x1		;index++
+SW		t1, 0x00(t0)
+J		Return2
+NOP
+
+;Helper function map reset
+MapReset:
+LA		t2, MinMapIndex
+LB		t2, 0(t2)
+LA		t1, MinLevelTextIndex
+LB		t1, 0(t1)
+J		Begin
+NOP
+
+.align
+HelloWorldText:
+.asciiz "Hello, world!"
+
 
 ;************************************
 ; ADDITIONAL VARS
 ;************************************
 .align
-Level_Text:
+LevelText:
 .byte 0x0;dummy
 .asciiz "ISLES"
 .asciiz "JAPES"
@@ -250,7 +180,7 @@ Level_Text:
 .asciiz "HELM"
 
 .align
-TakeMeThere_WarpLocations:
+MapCodes:
 .byte 0x00;dummy
 .byte 0x22;Isles
 .byte 0x07;Japes
@@ -263,17 +193,17 @@ TakeMeThere_WarpLocations:
 .byte 0x11;Helm
 
 .align
-Level_Text_MinState:
-.byte 1
+MinLevelTextIndex:
+.byte 0
 
 .align
-Level_Text_MaxState
-.byte 0x39 ;maybe not correct- point to start of "HELM"
+MaxLevelTextIndex:
+.byte 0x39
 
 .align
-TakeMeThere_MinState:
+MinMapIndex:
 .byte 1
  
 .align
-TakeMeThere_MaxState:
+MaxMapIndex:
 .byte 0xA
