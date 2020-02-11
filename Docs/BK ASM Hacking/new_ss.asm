@@ -1,6 +1,8 @@
 //new_ss.asm
 
+[memcpy_fast]: 0x80254630
 [last_size]: 0x9CA70
+[game_update]:0x802e4424
 
 .org 0x80400100
 
@@ -37,11 +39,9 @@ SW k1 0x1C(sp)
 SW gp 0x18(sp)
 SW fp 0x14(sp)
 
-
 JAL @osDisableInt
 NOP
-SW v0 0x8C(sp)
-
+SW v0 int_save
 
 LB a0 save_state_set
 BEQ a0 zero NormalModeCode_save
@@ -57,23 +57,22 @@ NOP
     LI a0 @Heap_addr
     LA a1 save_data_space
     LI a2 @Heap_size
-    JAL @memcpy
+    JAL @memcpy_fast
     NOP
 
     LI a0 @Lib_Data_addr
     LI a2 @Lid_Data_size
-    JAL @memcpy
+    JAL @memcpy_fast
     NOP
 
     LI a0 @Game_Eng_Data_addr
     LI a2 @last_size
-    JAL @memcpy
+    JAL @memcpy_fast
     NOP
 
-    LW sp stack_ptr_save
 
-    B NormalModeCode_Housekeeping
-    NOP
+   normal_threads_started:
+    
 
 //if D_down save state
 NormalModeCode_save:
@@ -83,23 +82,21 @@ AND a1 a1 a2
 BEQ a1 zero NormalModeCode_Housekeeping
 NOP
 
-    
-
     LI a1 @Heap_addr
     LA a0 save_data_space
     LI a2 @Heap_size
-    JAL @memcpy
+    JAL @memcpy_fast
     NOP
     
     
     LI a1 @Lib_Data_addr
     LI a2 @Lid_Data_size
-    JAL @memcpy
+    JAL @memcpy_fast
     NOP
 
     LI a1 @Game_Eng_Data_addr
     LI a2 @last_size
-    JAL @memcpy
+    JAL @memcpy_fast
     NOP
     
     LI a0 1
@@ -108,7 +105,7 @@ NOP
 
 NormalModeCode_Housekeeping:	
 
-LW a0 0x8C(sp)
+LW a0 int_save
 JAL @osRestoreInt
 NOP
 
@@ -143,15 +140,18 @@ LW k1 0x1C(sp)
 LW gp 0x18(sp)
 LW fp 0x14(sp)
 ADDIU sp 0x90
-JR
+J @game_update
 NOP
 
 .org 0x80410000
 stack_ptr_save:
 .word 0
 
+int_save:
+.word 0
+
 save_state_set:
 .byte 0
 
-.org 0x80500000
+.org 0x8042D500
 save_data_space:

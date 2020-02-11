@@ -23,16 +23,18 @@
 [PlayerPointer]: 0x8037BF20
 [PlayerGrounded]: 0x8037BF60
 
+[SlopeTimer]: 0x8037C2E4
+
 [voidout_maxPos]: 0x8037C3C0
 [voidout_minPos]: 0x8037C3CC
 
-[XPos]: 0x8037C5A0
-
 [XVelocity]: 0x8037C4B8
 
-[SlopeTimer]: 0x8037C2E4
-
 [MaxFallVelocity]: 0x8037C4EC
+
+[XPos]: 0x8037C5A0
+
+[PlayerRGB]:0x8037C6F4
 
 [MovementState]: 0x8037D164
 
