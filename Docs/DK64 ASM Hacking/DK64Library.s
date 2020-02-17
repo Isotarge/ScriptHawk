@@ -103,6 +103,9 @@ NOP
 ; ra -> (int*) return_address
 ; return -> (boolean) t1 -> input_matched
 ;************************************
+;
+;TODO: put registers on the stack
+;
 CheckInput:
 LH      t1, @ControllerInput
 BEQ		t1, t0, ReturnFromCheckInput
@@ -173,13 +176,46 @@ SH		t0, 0x00(at)
 JR		ra
 NOP
 
-
 ;************************************
 ; PrintMyText
 ; t0 -> (str*) str_ptr
-; return -> void
+; a0 -> (float**) global_display_list
+; a1 -> (int) x
+; a2 -> (int) y
+; a3 -> (float) scale
+; return -> (float**) v0 -> updated_global_display_list
+; 		 -> (str*) t0    -> next_menu_string
 ;************************************
 PrintMyText:
+ADDIU	sp, sp, -0x30	
+SW		t0, 0x10(sp)
+SW		t9, 0x14(sp)
+SW		a1, 0x18(sp)
+SW		a2, 0x1C(sp)
+SW		a3, 0x20(sp)
+SW		ra, 0x24(sp)
+JAL		0x806abb98				;printText
+NOP
+LW		t0, 0x10(sp)
+LW		t9, 0x14(sp)
+LW		a1, 0x18(sp)
+LW		a2, 0x1C(sp)
+LW		a3, 0x20(sp)
+LW		ra, 0x24(sp)
+ADDIU	sp, sp, 0x30
+
+FindZeroLoop:
+LB		t1, 0x0(t0)
+BEQZ	t1, ZeroFound
+NOP
+ADDIU	t0, 0x1
+B		FindZeroLoop
+NOP
+
+ZeroFound:
+ADDIU	t0, t0, 0x1				;move past null char
+JR		ra
+NOP
 
 EndOfFile:
 NOP
