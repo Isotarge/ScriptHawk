@@ -4308,10 +4308,12 @@ function Game.detectVersion(romName, romHash)
 		obj_model1.hand_state = 0x137;
 		obj_model1.control_state_byte = 0x144;
 		obj_model1.control_states = { -- TODO: Fill this in
+			[0x01] = "Idle", -- Enemy
 			[0x02] = "First Person Camera",
 			[0x03] = "First Person Camera", -- Water
 			[0x04] = "Fairy Camera",
 			[0x05] = "Fairy Camera", -- Water
+			[0x06] = "Locked",
 
 			[0x07] = "Minecart (Idle)",
 			[0x08] = "Minecart (Crouch)",
@@ -4333,7 +4335,7 @@ function Game.detectVersion(romName, romHash)
 			[0x1E] = "Long Jumping", -- Lanky, weird as hell
 			[0x1F] = "Falling",
 			[0x20] = "Falling/Splat",
-
+			[0x21] = "Falling", -- Beetle Race
 			[0x22] = "Pony Tail twirl",
 			[0x23] = "Primate Punch",
 
@@ -4347,9 +4349,12 @@ function Game.detectVersion(romName, romHash)
 			[0x2B] = "Throwing Orange",
 			[0x2C] = "Shockwave",
 			[0x2D] = "Charging", -- Rambi
-
+			[0x2E] = "Bouncing",
 			[0x2F] = "Damaged",
 
+			-- [0x32] = "Stunlocked?",
+			[0x33] = "Death",
+			[0x35] = "Shrinking",
 			[0x36] = "Death", -- Dogadon Lava
 			[0x37] = "Crouching",
 			[0x38] = "Uncrouching",
@@ -4370,9 +4375,13 @@ function Game.detectVersion(romName, romHash)
 			[0x48] = "Throwing Object",
 			[0x49] = "Jumping", -- Carrying Object
 			[0x4A] = "Throwing Object", -- In Air
-
+			[0x4B] = "Surface Swimming",
+			[0x4C] = "Underwater",
+			[0x4D] = "Leaving Water",
+			[0x4E] = "Jumping", -- Out of water
 			[0x4F] = "Bananaporter",
-
+			-- p0x50] = "Unknown 0x50", -- Same as 0x55 in retail
+			[0x51] = "Locked", -- Funky's & Candy's Store
 			[0x52] = "Swinging on Vine",
 			[0x53] = "Leaving Vine",
 			[0x54] = "Climbing Tree",
@@ -4386,12 +4395,31 @@ function Game.detectVersion(romName, romHash)
 			[0x5C] = "Aiming", -- Gun
 			[0x5D] = "Rocketbarrel",
 
+			[0x60] = "Damaged", -- Exploding TNT Barrels
 			[0x61] = "Instrument",
+			-- [0x62] = "Unknown 0x62", -- Weird body morphing: https://www.youtube.com/watch?v=d6IT4ft7o3U
+			
+			[0x64] = "Learning Gun",
+			[0x65] = "Locked",
 
+			-- [0x67] = "Boat?",
+
+			[0x69] = "Updraft", -- Castle Wind Tower
 			[0x6A] = "GB Dance",
 			[0x6B] = "Key Dance",
+			[0x6C] = "Crown Dance",
+			[0x6D] = "Loss Dance",
+			[0x6E] = "Victory Dance",
+			-- [0x6F] = "Vehicle", -- Castle Car Race
 
 			[0x71] = "Locked", -- Tons of cutscenes use this
+			[0x72] = "Gorilla Grab",
+			[0x73] = "Learning Move",
+
+			[0x76] = "Trapped", -- Spider miniBoss
+			[0x77] = "Klaptrap Kong", -- Beaver Bother
+
+			[0x7D] = "Fairy Refill",
 		};
 		obj_model1.camera.focus_pointer = 0x168;
 		obj_model1.player.grab_pointer = 0x2F4;
@@ -4498,8 +4526,10 @@ function Game.detectVersion(romName, romHash)
 			[114] = "Padlock", -- K. Lumsy
 			[127] = "Headphones",
 			[128] = "Enguarde Crate",
+			[132] = "Cutscene Controller",
 			[134] = "Kaboom",
 			[137] = "Beaver",
+			[138] = "Shockwave", -- MJ Wrong Switch
 			[139] = "Krash",
 			[140] = "Book",
 			[141] = "Jack in the Box (Beta)",
@@ -4600,6 +4630,8 @@ function Game.detectVersion(romName, romHash)
 			[279] = "Rareware Logo",
 			[281] = "Kong (Tag Barrel)",
 			[282] = "Locked Kong (Tag Barrel)",
+			[285] = "Potion", -- Cranky Purchases
+			[286] = "Fairy", -- Fairy Refill
 		};
 
 		obj_model2_slot_size = 0x88;
