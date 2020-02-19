@@ -93,6 +93,7 @@ defaultPreferences = {
 		noclip=true,
 		bonearray=true,
 		memory=false,
+		rng=false,
 	},
 	dkr = {
 		position=true,

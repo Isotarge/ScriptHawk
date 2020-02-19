@@ -9089,6 +9089,70 @@ ScriptHawk.bindKeyFrame("K", decreaseRNGLock, false);
 ScriptHawk.bindKeyFrame("L", increaseRNGLock, false);
 --]]
 
+-------------------------------------
+------------- Cycle RNG -------------
+-- Credit: Isotarge / theballaam96 --
+-------------------------------------
+
+function Game.CycleRNG(oldRNGValue)
+    local multiplicationResult = Multiply(oldRNGValue,0x01DF5E0D);
+    local lower32 = tonumber("0x"..string.sub(tostring(bizstring.hex(multiplicationResult)),-8))
+    local newRNGValue = bit.band(lower32 + 1, 0xFFFFFFFF);
+    return newRNGValue;
+end
+
+function Multiply(a, b)
+    local c = 0;
+    while b > 0 do
+        if bit.band(b, 1) > 0 then
+            c = c + a;
+        else
+            c = c + 0;
+        end
+        a = bit.lshift(a, 1);
+        b = bit.rshift(b, 1);
+    end
+    return c;
+end
+
+function Game.calculateCycleCount(input,output)
+	if input == output then
+		return 0
+	end
+	count = "?";
+	new_rng = input;
+	for i = 1, 256 do
+		if count == "?" then
+			new_rng = Game.CycleRNG(new_rng);
+			if new_rng == output then
+				count = i;
+			end
+		end
+	end
+	return count;
+end
+
+function Game.RNGLoop()
+	is_lagged = emu.islagged();
+	if old_rng_loop == null then
+		old_rng_loop = 0;
+		last_frame_ran = -1; -- OSD runs on real time, this is on a per frame basis. Check makes sure it's only run once per frame
+	end
+	current_frame = emu.framecount();
+	if not is_lagged and last_frame_ran ~= current_frame then
+		new_rng_loop = mainmemory.read_u32_be(Game.Memory.RNG);
+		cycle_count = Game.calculateCycleCount(old_rng_loop,new_rng_loop);
+		old_rng_loop = new_rng_loop;
+	end
+	last_frame_ran = emu.framecount();
+	return cycle_count
+end
+
+function resetRNGCache()
+	old_rng_loop = mainmemory.read_u32_be(Game.Memory.RNG);
+end
+
+
 function Game.realTime()
 	-- Lock RNG at constant value
 	--mainmemory.write_u32_be(Game.Memory.RNG, RNGLock);
@@ -9627,6 +9691,7 @@ end
 function Game.onLoadState()
 	clearFlagCache();
 	clearTempFlagCache();
+	resetRNGCache();
 	koshBot.resetSlots();
 end
 
@@ -9845,6 +9910,8 @@ Game.standardOSD = {
 	{"Effect", hexifyOSD(Game.getEffectStatus), category="animation"},
 	{"Camera", Game.getCameraState, category="camera"},
 	{"Noclip", Game.getNoclipByte, Game.colorNoclipByte, category="noclip"},
+	{"Separator"},
+	{"RNG Calls", Game.RNGLoop, category="rng"},
 	{"Separator"},
 	{"Anim Timer 1", Game.getAnimationTimer1, category="animation"},
 	{"Anim Timer 2", Game.getAnimationTimer2, category="animation"},
