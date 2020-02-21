@@ -8,9 +8,10 @@ end
 local Game = {
 	squish_memory_table = true,
 	Memory = { -- Version order: Europe, USA
-		destination_map = {0x0BE7FE, 0x0BE3DE}, -- u16_be
 		exit = {0x0BE800, 0x0BE3E0}, -- byte
-		current_map = {0x0BEE16, 0x0BE9F6}, -- u16_be
+		current_map = {0x0BEE12, 0x0BE9F2}, -- u16_be
+		destination_map = {0x0BEE16, 0x0BE9F6}, -- u16_be
+		previous_map = {0x0BEE1A, 0x0BE9FA}, --u16_be
 		health = {0x0CC8BA,0x0CC49A}, -- u8
 		x_position = {0x0CC704, 0x0CC2E4}, -- Float
 		y_position = {0x0CC708, 0x0CC2E8}, -- Float
@@ -19,6 +20,7 @@ local Game = {
 		velocity = {0x0CC72C, 0x0CC30C}, -- Float
 		moving_angle = {0x0CC766, 0x0CC346}, -- u16_be
 		facing_angle = {0x0CC76A, 0x0CC34A}, -- u16_be
+		wealth = {nil, 0x0D2148}, -- u32_be
 	},
 	maps = {
 		"Windy: Cow Field",
@@ -95,7 +97,7 @@ local Game = {
 };
 
 function Game.setMap(value)
-	mainmemory.write_u16_be(Game.Memory.current_map, value - 1);
+	mainmemory.write_u16_be(Game.Memory.destination_map, value - 1);
 end
 
 function Game.getMap()
