@@ -8,6 +8,10 @@ end
 local Game = {
 	squish_memory_table = true,
 	Memory = { -- Version order: Europe, USA
+		destination_map = {0x0BE7FE, 0x0BE3DE}, -- u16_be
+		exit = {0x0BE800, 0x0BE3E0}, -- byte
+		current_map = {0x0BEE16, 0x0BE9F6}, -- u16_be
+		health = {0x0CC8BA,0x0CC49A}, -- u8
 		x_position = {0x0CC704, 0x0CC2E4}, -- Float
 		y_position = {0x0CC708, 0x0CC2E8}, -- Float
 		z_position = {0x0CC70C, 0x0CC2EC}, -- Float
@@ -15,84 +19,91 @@ local Game = {
 		velocity = {0x0CC72C, 0x0CC30C}, -- Float
 		moving_angle = {0x0CC766, 0x0CC346}, -- u16_be
 		facing_angle = {0x0CC76A, 0x0CC34A}, -- u16_be
-		map = {0x0BE7FE, 0x0BE3DE}, -- u16_be
-		exit = {0x0BE800, 0x0BE3E0}, -- byte
 	},
 	maps = {
-		"Barn",
-		"Rock Solid - bar. Outside.",
-		"FREEZE 0x03",
-		"Beach",
-		"Black - but intro",
-		"nasty/nice spot",
-		"leading to ship?",
-		"weird texture ?",
-		"weird texture ?",
-		"Boiler. At spot when you piss on guys.",
-		"Water near cogs.",
-		"Barn Boys level",
-		"FREEZE",
-		"War - Area with tank",
-		"Raptor arena (with raptor, but with gun shots) no background",
-		"Electrical room at top of Haybot Second Battle Spot",
-		"FREEZE 0x11",
-		"Inside water of safe",
-		"Beginning spot of War",
-		"Raptor arena",
-		"FREEZE 0x15",
-		"FREEZE 0x16",
-		"Water in safe",
-		"Intro",
-		"Prehistoric (dinosaurs parolling fort)",
-		"Heist (multi)",
-		"War lasers",
-		"War part w/ Rodent",
-		"Inside Pub (Cock and Plucker)",
-		"War - lasers",
-		"beta area ??? Berri's house?",
-		"beta area (no bg)",
-		"Ncube Massacre intro",
-		"Greggs room",
-		"War - Fighting tedi boss and subs",
-		"Tank (multi)",
-		"Audio info",
-		"Room with conveyor belt (master plan)",
-		"Bee hive",
-		"Escaping Tedi Boss",
-		"Starting level",
-		"FREEZE 0x2A",
-		"Beach (Multi)",
-		"Beetles house",
-		"War arena (Multi)",
-		"Inside Cave with key (first level)",
-		"War - Operating room",
-		"Multi-area",
-		"Rock Solid bar",
-		"Beginning spot of race",
-		"Race (multi)",
-		"Multi-area",
-		"The Poo Boss",
-		"Inside Feral Reserve - beginning",
-		"Poo Slicers",
-		"Meeting place of Weasels? You can't play here normally.",
-		"Outside Feral Reserve - Signs",
-		"Inside Feral Reserve - in safe",
-		"Nasty/Nice area - night",
-		"Haunted Castle",
-		"Path leading to Haunted Castle",
-		"FREEZE 0x3E",
-		"Raptor (multi)",
-		"Inside Feral Reserve - Final Boss",
-		"Spooky - flooded mineshafts",
-		"Slimy passage - Phlegm",
-		"Inside Prehistoric --> 44",
-		"Inside Prehistoric --> 32",
+		"Windy: Cow Field",
+		"Barn Boys: Inside Barn",
+		"Uga Buga: Outside Rock Solid",
+		"!Unknown 0x03", -- Bulldog, B&W?
+		"It's War: Beach",
+		"Beta: Black Room",
+		"Windy: Day",
+		"Bat's Tower: River",
+		"Beta: Unused Texture (0x8)",
+		"!Unknown 0x9", -- B&W, similar to Map 3
+		"Bat's Tower: Boiler Room",
+		"Bat's Tower: Cog Room",
+		"Barn Boys: Outside the Barn",
+		"!Crash 0xD",
+		"It's War: Tank Field",
+		"Beta: Raptor Arena",
+		"Barn Boys: Haybot Fight (Tower)",
+		"!Unknown 0x11",
+		"Bat's Tower: Safe",
+		"It's War: Pier",
+		"Uga Buga: Arena",
+		"!Unknown 0x15", -- B&W, similar ot Map 3
+		"Beta: Tank Room", -- Tank Room
+		"Bat's Tower: Safe (Underwater)",
+		"The Panther King's Lair",
+		"Uga Buga: Lava Waterfall",
+		"Multiplayer: Heist",
+		"It's War: Laser Tunnels",
+		"It's War: Pond",
+		"The Cock and Plucker", -- Also Berri's House
+		"It's War: Laser Tunnels II",
+		"!Unknown 0x1F",
+		"Beta: Unused Texture (0x20)",
+		"Nintendo 64 Logo",
+		"Gregg's Underworld",
+		"It's War: The Experiment",
+		"Multiplayer: Tank",
+		"Nintendo Logo", -- Boot up
+		"It's War: Gun Tunnels",
+		"Windy: Beehive",
+		"It's War: Escape Tunnels",
+		"Hungover: Field",
+		"!Unknown 0x2A",
+		"Multiplayer: Beach",
+		"Windy: The Beetle Tower",
+		"Multiplayer: War",
+		"Hungover: Key Chamber",
+		"It's War: Operating Room",
+		"Multiplayer: Colors",
+		"Uga Buga: Rock Solid",
+		"Uga Buga: Race",
+		"Multiplayer: Race",
+		"Multiplayer: Bunker",
+		"Sloprano: The Great Mighty Poo",
+		"Heist: Feral Reserve (Lobby)",
+		"Sloprano: Water Caverns",
+		"Heist: Boardroom",
+		"Heist: Outside Feral Reserve",
+		"Hiest: Feral Reserve (Safe)",
+		"Windy: Night",
+		"Spooky: Haunted Castle",
+		"Spooky: Haunted Castle Exterior",
+		"!Unknown 0x3E",
+		"Multiplayer: Raptor",
+		"Heist: Feral Reserve (Final Boss)",
+		"Spooky: Flooded Mineshafts",
+		"Uga Buga: Tribe Room (Fossil)",
+		"Uga Buga: Tribe Room",
+		"Uga Buga: Tribe Room (Lava)",
 	},
 	takeMeThereStyle = "Checkbox",
 };
 
 function Game.setMap(value)
-	mainmemory.write_u16_be(Game.Memory.map, value);
+	mainmemory.write_u16_be(Game.Memory.current_map, value - 1);
+end
+
+function Game.getMap()
+	local map_value = mainmemory.read_u16_be(Game.Memory.current_map);
+	if Game.maps[map_value + 1] ~= nil then
+		return Game.maps[map_value + 1];
+	end
+	return "Unknown (0x"..bizstring.hex(map_value)..")"
 end
 
 -------------------
@@ -171,6 +182,7 @@ end
 ------------
 
 Game.OSD = {
+	{"Map", Game.getMap},
 	{"X", category="position"},
 	{"Y", category="position"},
 	{"Z", category="position"},
