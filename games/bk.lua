@@ -3128,7 +3128,7 @@ function flagTypeToBitfieldPointer(flagType, index)
 		return Game.Memory.jiggy_bitfield;
 	elseif flagType == "Prog" and index < 0x100 then
 		return Game.Memory.game_progress_bitfield;
-	elseif flagType == "strict" and index < 0x200 then
+	elseif flagType == "strict" and index < 200 then
 		return Game.Memory.strict_bitfield;
 	end
 end
@@ -3343,6 +3343,7 @@ function checkFlags()
 		MT = mainmemory.readbyterange(Game.Memory.mumbo_token_bitfield, 16), -- 0x7D / 8 ~= 16 bytes (15 bytes 5 bits)
 		Jig = mainmemory.readbyterange(Game.Memory.jiggy_bitfield, 13), -- 0x64 / 8 ~= 13 bytes (12 bytes 4 bits)
 		Prog = mainmemory.readbyterange(Game.Memory.game_progress_bitfield, 32), -- 0xFF / 8 ~= 32 bytes (31 bytes 7 bits)
+		strict = mainmemory.readbyterange(Game.Memory.strict_bitfield, 25),
 	};
 	if flagBlockCache ~= nil then
 		local flagChangedThisFrame = false;
@@ -3350,6 +3351,7 @@ function checkFlags()
 		flagChangedThisFrame = flagChangedThisFrame or checkFlagsTypeInternal(currentFlags, currentFrame, "MT", 0x7E, 15);
 		flagChangedThisFrame = flagChangedThisFrame or checkFlagsTypeInternal(currentFlags, currentFrame, "Jig", 0x65, 12);
 		flagChangedThisFrame = flagChangedThisFrame or checkFlagsTypeInternal(currentFlags, currentFrame, "Prog", 0x100, 31);
+		flagChangedThisFrame = flagChangedThisFrame or checkFlagsTypeInternal(currentFlags, currentFrame, "strict", 200, 19);
 		if flagChangedThisFrame then
 			print_deferred();
 		end
