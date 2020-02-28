@@ -60,6 +60,7 @@ local Game = {
 		jiggy_grabbed_behavior_struct_pointer = {0x37DE84, 0x37DFB4, 0x37C6B4, 0x37D4B4},
 		honeycomb_bitfield = {0x383CC0, 0x383E20, 0x382500, 0x3832E0},
 		mumbo_token_bitfield = {0x383CD0, 0x383E30, 0x382510, 0x3832F0},
+		strict_bitfield = { 0x383BB8, 0x383D48, 0x382428, 0x3831d8},
 		clip_vel = {-2900, -3500, -3500, -3500}, -- Minimum velocity required to clip on the Y axis -- TODO: This seems to be different for different geometry
 	},
 	defaultFloor = -9000,
@@ -2367,6 +2368,8 @@ function Game.getFFPattern()
 	return FFPattern;
 end
 
+
+
 -- Relative to question object
 local ff_current_answer = 0x13;
 local ff_correct_answer = 0x1D;
@@ -3125,7 +3128,26 @@ function flagTypeToBitfieldPointer(flagType, index)
 		return Game.Memory.jiggy_bitfield;
 	elseif flagType == "Prog" and index < 0x100 then
 		return Game.Memory.game_progress_bitfield;
+	elseif flagType == "strict" and index < 0x200 then
+		return Game.Memory.strict_bitfield;
 	end
+end
+
+
+function strict_bf_CRC_update()
+	local strict_bf_base = Game.Memory.strict_bitfield;
+	local crc1 = 0x6ce9e91f;
+	local crc2 = 0x281e421c;
+
+	for i = 0,0x18 do
+		local curr_byte = mainmemory.read_u8(strict_bf_base + i);
+		crc1 = bit.bxor(curr_byte, bit.bxor(bit.lshift(bit.band(crc1 + curr_byte, 0x0f), 0x18), bit.rshift(crc1, 3)));
+		crc2 = crc2 + (i+1)* curr_byte;
+	end
+
+	mainmemory.write_u32_be(strict_bf_base - 0x08, crc1);
+	mainmemory.write_u32_be(strict_bf_base - 0x04, crc2);
+	return
 end
 
 ------------------------
@@ -3142,6 +3164,9 @@ function setFlag(flagType, index, suppressPrint)
 		if ScriptHawk.UI.ischecked("realtime_flags") and not suppressPrint then
 			checkFlags();
 		end
+	end
+	if flagType == "strict" then
+		strict_bf_CRC_update();
 	end
 end
 
@@ -3199,6 +3224,9 @@ function clearFlag(flagType, index, suppressPrint)
 		if ScriptHawk.UI.ischecked("realtime_flags") and not suppressPrint then
 			checkFlags();
 		end
+	end
+	if flagType == "strict" then
+		strict_bf_CRC_update();
 	end
 end
 

@@ -475,4 +475,14 @@ return {
 	{index=0xF9, type="Prog", level=12, name="King Sandybutt Pyramid State (2^1)"},
 
 	{index=0xFC, type="Prog", level=12, name="Defeated Grunty"},
+
+	-- Strict Checksum Bitfield
+	{index=0x73, type="strict", level=6, name="CHEAT - Infinite Lives"},
+	{index=0x74, type="strict", level=6, name="CHEAT - Infinite Eggs"},
+	{index=0x75, type="strict", level=6, name="CHEAT - Infinite Red Feathers"},
+	{index=0x76, type="strict", level=6, name="CHEAT - Infinite Gold Feathers"},
+
+	{index=0x94, type="strict", level=6, name="CHEAT - Infinite Health"},
+	{index=0x95, type="strict", level=6, name="CHEAT - Infinite Mumbo Tokens"},
+	{index=0x96, type="strict", level=6, name="CHEAT - Infinite Air"},
 };

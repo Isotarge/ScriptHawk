@@ -205,10 +205,44 @@ GLOBAL CHEAT FLAGS
 --3831D8
 00 00 00 01 = best note score
 
+00 00 00 80 = 32
 --3831DC
-
+03 00 00 00 = grunty question 1 answer
+0C 00 00 00 = grunty question 2 answer
+30 00 00 00 = grunty question 3 answer
+C0 00 00 00 = grunty question 4 answer
+00 03 00 00 = grunty question 5 answer
+00 0C 00 00 = grunty question 6 answer
+00 30 00 00 = grunty question 7 answer
+00 C0 00 00 = grunty question 8 answer
+00 00 03 00 = grunty question 9 answer
+00 00 0C 00 = grunty question 10 answer
+00 00 30 00 = grunty question 11 answer
+00 00 C0 00 = grunty question 12 answer
+00 00 00 03 = grunty question 13 answer
+00 00 00 0C = grunty question 14 answer
+00 00 00 30 = grunty question 15 answer
+00 00 00 C0 = grunty question 16 answer
 
 --3831E0
+03 00 00 00 = grunty question 17 answer
+0C 00 00 00 = grunty question 18 answer
+30 00 00 00 = grunty question 19 answer
+C0 00 00 00 = grunty question 20 answer
+00 03 00 00 = grunty question 21 answer
+00 0C 00 00 = grunty question 22 answer
+00 30 00 00 = grunty question 23 answer
+00 C0 00 00 = grunty question 24 answer
+00 00 03 00 = grunty question 25 answer
+00 00 0C 00 = grunty question 26 answer
+00 00 30 00 = grunty question 27 answer
+00 00 C0 00 = grunty question 28 answer
+00 00 00 03 = grunty question 29 answer
+00 00 00 0C = grunty question 30 answer
+00 00 00 10
+00 00 00 20
+00 00 00 40
+00 00 00 80
 
 --3831E4
 01 00 00 00
@@ -277,3 +311,8 @@ GLOBAL CHEAT FLAGS
 00 00 00 20 = WISHY WASHY BANJO
 00 00 00 40 = 
 00 00 00 80 = 
+
+--3831EC
+00 00 40 00 = mm witch_switch_down
+00 00 01 00 = ttc ws pressed
+
