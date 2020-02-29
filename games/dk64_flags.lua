@@ -428,7 +428,7 @@ return {
 	{byte=0x2F, bit=4, name="Key 8", type="Key", map=17},
 	{byte=0x2F, bit=5, name="Isles: DK GB: Japes Boulder", type="GB", map=34},
 	{byte=0x2F, bit=6, name="B. Locker FTT", type="FTT", nomap=true},
-	{byte=0x2F, bit=7, name="Training Grounds: Barrels spwaned", type="Physical", map=176},
+	{byte=0x2F, bit=7, name="Training Grounds: Barrels Spawned", type="Physical", map=176},
 
 	{byte=0x30, bit=0, name="Cranky's Lab FTSomething..?", type="FTT", map=5}, -- TODO: What is this?
 	{byte=0x30, bit=1, name="Kong Unlocked: DK", type="Kong", nomap=true}, -- Note: Set both when Simian Slamming the switch in training grounds and entering tag barrel for the first time
