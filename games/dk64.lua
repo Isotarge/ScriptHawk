@@ -3964,37 +3964,71 @@ function Game.getLoadingZoneArray()
 	return dereferencePointer(Game.Memory.loading_zone_array);
 end
 
+function Game.formatLZHeight(value)
+	if value == -1 then
+		return "Infinite";
+	end
+	return value;
+end
+
+function Game.nameActivationType(value)
+	if value == 0 then
+		return "Entering Zone";
+	end
+	return "Leaving Zone";
+end
+
+function Game.nameTransitionType(value)
+	if value == 0 then
+		return "Spin";
+	end
+	return "Fade";
+end
+
 local loading_zone_size = 0x3A;
 local loading_zone_fields = {
 	x_position = 0x00, -- s16_be
 	y_position = 0x02, -- s16_be
 	z_position = 0x04, -- s16_be
-	x_size = 0x06, -- u16_be
-	y_size = 0x08, -- u16_be
-	z_size = 0x0A, -- u16_be
+	radius = 0x06, -- u16_be
+	height = 0x08, -- u16_be
+	z_size = 0x0A, -- u16_be - Unsure of this now
+	activation_type = 0x0C, -- Byte
 	object_type = 0x10, -- u16_be
 	object_types = {
+		-- 0x02 - In Castle Minecart/MJ/Fungi
+		[0x03] = "Boss Door Trigger", -- Also sets boss fadeout type as fade instead of spin. In toolshed too??
 		[0x05] = "Cutscene Trigger",
+		-- 0x06 - In Treehouse/m/fungi. Not phase reset plane
+		-- 0x07 - In Fungi
+		-- 0x08 - In Fungi
 		[0x09] = "Loading Zone",
 		[0x0A] = "Cutscene Trigger",
 		[0x0C] = "Loading Zone + Objects", -- Alows objects through
 		[0x0D] = "Loading Zone",
-		-- [0x0F] = "Unknown", -- Autowalk trigger?
+		[0x0F] = "Warp Trigger", -- Factory Poles
 		[0x10] = "Loading Zone",
-		[0x11] = "Loading Zone", -- Snide's
+		[0x11] = "Loading Zone", -- Snide's, Return to Parent Map?
 		-- [0x13] = "Unknown - Caves Lobby", -- Behind ice walls
 		[0x14] = "Boss Loading Zone", -- Takes you to the boss of that level
 		[0x15] = "Cutscene Trigger",
+		-- 0x16 - In Az Beetle Slide
 		[0x17] = "Cutscene Trigger",
 		-- [0x19] = "Trigger", -- Seal Race
+		-- 0x1A - In Caves Beetle Slide
+		[0x1B] = "Slide Trigger", -- Beetle Slides
+		-- 0x1C - In Beetle Slides
 		[0x20] = "Cutscene Trigger",
-		-- [0x24] = "Unknown", -- Cannon Trigger?
+		--[0x24] = "", -- Cannon Trigger? Also used Aztec Snake Road
+		-- 0x25 - In Factory
+		-- 0x26 - In BFI
 	},
-	destination_map = 0x12, -- u16_be, index of Game.maps
+	destination_map = 0x12, -- u16_be, index of Game.maps. Exit for type 0xF
 	destination_exit = 0x14, -- u16_be
-	fade_type = 0x16, -- u16_be?
+	transition_type = 0x16, -- u16_be?
 	cutscene_is_tied = 0x1A, -- u16_be
 	cutscene_activated = 0x1C, -- u16_be
+	shift_camera_to_kong = 0x1E, -- u16_be
 	not_in_zone = 0x38, -- Byte
 	active = 0x39, -- Byte
 };
@@ -4016,10 +4050,17 @@ local function getExamineDataLoadingZone(base)
 			table.insert(data, {"Cutscene Index", mainmemory.read_u16_be(base + loading_zone_fields.destination_map)});
 			table.insert(data, {"Separator", 1});
 		end
-
+		table.insert(data, {"X Position", mainmemory.read_s16_be(base + loading_zone_fields.x_position)});
+		table.insert(data, {"Y Position", mainmemory.read_s16_be(base + loading_zone_fields.y_position)});
+		table.insert(data, {"Z Position", mainmemory.read_s16_be(base + loading_zone_fields.z_position)});
+		-- table.insert(data, {"Separator", 1});
+		table.insert(data, {"Radius", mainmemory.read_u16_be(base + loading_zone_fields.radius)});
+		table.insert(data, {"Height", Game.formatLZHeight(mainmemory.read_s16_be(base + loading_zone_fields.height))});
+		-- table.insert(data, {"Size Z", mainmemory.read_u16_be(base + loading_zone_fields.z_size)});
+		table.insert(data, {"Separator", 1});
+		local cutscene_is_tied_byte = mainmemory.read_u16_be(base + loading_zone_fields.cutscene_is_tied);
 		if string.contains(_type, "Loading Zone") and not string.contains(_type, "0x14") then
 			local destinationMap = mainmemory.read_u16_be(base + loading_zone_fields.destination_map);
-			local cutscene_is_tied_byte = mainmemory.read_u16_be(base + loading_zone_fields.cutscene_is_tied);
 			if Game.maps[destinationMap + 1] ~= nil then
 				destinationMap = Game.maps[destinationMap + 1];
 			else
@@ -4027,22 +4068,19 @@ local function getExamineDataLoadingZone(base)
 			end
 			table.insert(data, {"Destination Map", destinationMap});
 			table.insert(data, {"Destination Exit", mainmemory.read_u16_be(base + loading_zone_fields.destination_exit)});
-			table.insert(data, {"Fade", mainmemory.read_u16_be(base + loading_zone_fields.fade_type)});
-			table.insert(data, {"Active", mainmemory.readbyte(base + loading_zone_fields.active)});
-			table.insert(data, {"In Zone", 1 - mainmemory.readbyte(base + loading_zone_fields.not_in_zone)});
-			if cutscene_is_tied_byte == 0xA then
-				table.insert(data, {"Tied Cutscene", mainmemory.read_u16_be(base + loading_zone_fields.cutscene_activated)});
-			end
-			table.insert(data, {"Separator", 1});
+			table.insert(data, {"Transition", Game.nameTransitionType(mainmemory.read_u16_be(base + loading_zone_fields.transition_type))});
 		end
-
-		table.insert(data, {"X Position", mainmemory.read_s16_be(base + loading_zone_fields.x_position)});
-		table.insert(data, {"Y Position", mainmemory.read_s16_be(base + loading_zone_fields.y_position)});
-		table.insert(data, {"Z Position", mainmemory.read_s16_be(base + loading_zone_fields.z_position)});
+		if string.contains(_type, "Warp Trigger") then
+			table.insert(data, {"Destination Exit", mainmemory.read_u16_be(base + loading_zone_fields.destination_map)});
+		end
+		table.insert(data, {"Active", mainmemory.readbyte(base + loading_zone_fields.active)});
+		table.insert(data, {"In Zone", 1 - mainmemory.readbyte(base + loading_zone_fields.not_in_zone)});
 		table.insert(data, {"Separator", 1});
-		table.insert(data, {"Size X", mainmemory.read_u16_be(base + loading_zone_fields.x_size)});
-		table.insert(data, {"Size Y", mainmemory.read_u16_be(base + loading_zone_fields.y_size)});
-		table.insert(data, {"Size Z", mainmemory.read_u16_be(base + loading_zone_fields.z_size)});
+		if cutscene_is_tied_byte == 0xA then
+			table.insert(data, {"Tied Cutscene", mainmemory.read_u16_be(base + loading_zone_fields.cutscene_activated)});
+		end
+		table.insert(data, {"Focus on Kong", mainmemory.read_u16_be(base + loading_zone_fields.shift_camera_to_kong)});
+		table.insert(data, {"Activation Type", Game.nameActivationType(mainmemory.readbyte(base + loading_zone_fields.activation_type))});
 		table.insert(data, {"Separator", 1});
 	end
 	return data;
