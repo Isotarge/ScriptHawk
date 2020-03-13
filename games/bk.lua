@@ -12,6 +12,7 @@ local Game = {
 		game_time_scale_multiplier = {0x384E60, 0x384FC0, 0x3836A0, 0x384480}, -- Float
 		game_speed_coefficient = {0x3723A0, 0x372B20, 0x371020, 0x371E20}, -- Float
 		frame_timer = {0x280700, 0x27F718, 0x27F718, 0x2808D8}, -- s32_be
+		map_vert_pointer = {0x382D30, 0x382E70, 0x381560, 0x382360}, -- See Game.getVertBase()
 		floor_object_pointer = {0x37CBD0, 0x37CD00, 0x37B400, 0x37C200}, -- Pointer
 		carried_object_pointer = {0x37CC68, 0x37CD98, 0x37B498, 0x37C298}, -- Pointer
 		slope_timer = {0x37CCB4, 0x37CDE4, 0x37B4E4, 0x37C2E4}, -- Float
@@ -2705,6 +2706,54 @@ function Game.getFloorTriangle()
 	return "Unknown";
 end
 
+function Game.getFloorTriangleVertPosition(index)
+	if type(index) ~= 'number' then
+		return "Unknown";
+	end
+	if index < 0 or index > 2 then
+		return "Unknown";
+	end
+	local floorObject = dereferencePointer(Game.Memory.floor_object_pointer);
+	if isRDRAM(floorObject) then
+		local vertIndex = mainmemory.read_u16_be(floorObject + 0x04 + index * 0x02);
+		local vertBase = Game.getVertBase();
+		if isRDRAM(vertBase) then
+			local xPos = mainmemory.read_s16_be(vertBase + (vertIndex * 0x10) + 0x00);
+			local yPos = mainmemory.read_s16_be(vertBase + (vertIndex * 0x10) + 0x02);
+			local zPos = mainmemory.read_s16_be(vertBase + (vertIndex * 0x10) + 0x04);
+			return xPos..", "..yPos..", "..zPos;
+		end
+	end
+	return "Unknown";
+end
+
+-- Note: This is probably not how the game works exactly, but it's good enough for our purposes
+function Game.getVertBase()
+	local obj1 = dereferencePointer(Game.Memory.map_vert_pointer);
+	if isRDRAM(obj1) then
+		local obj2 = dereferencePointer(obj1 + 0x04);
+		if isRDRAM(obj2) then
+			local offset = -4;
+			local found = false;
+			repeat
+				offset = offset + 4;
+				local test1Val = mainmemory.readbyte(obj2 + offset + 0x0F);
+				local test2Val = mainmemory.readbyte(obj2 + offset + 0x1F);
+				local test3Val = mainmemory.readbyte(obj2 + offset + 0x2F);
+				local test4Val = mainmemory.readbyte(obj2 + offset + 0x3F);
+				local test1 = test1Val == 0xFF;
+				local test2 = test2Val == 0xFF;
+				local test3 = test3Val == 0xFF;
+				local test4 = test4Val == 0xFF;
+				found = test1 and test2 and test3 and test4;
+			until found or offset > 0x1000; -- Arbitrary safeguard value
+			if found then
+				return obj2 + offset;
+			end
+		end
+	end
+end
+
 function Game.getXPosition()
 	return mainmemory.readfloat(Game.Memory.x_position, true);
 end
@@ -3523,8 +3572,12 @@ Game.OSD = {
 	{"Y", category="position"},
 	{"Z", category="position"},
 	{"Separator"},
-	{"Floor", Game.getFloor, category="position"},
-	{"Floor Triangle", Game.getFloorTriangle, category="position"},
+	{"Floor", Game.getFloor, category="floorProperties"},
+	--{"Floor Triangle", Game.getFloorTriangle, category="floorProperties"},
+	{"Floor Vert1", function() return Game.getFloorTriangleVertPosition(0) end, category="floorProperties"},
+	{"Floor Vert2", function() return Game.getFloorTriangleVertPosition(1) end, category="floorProperties"},
+	{"Floor Vert3", function() return Game.getFloorTriangleVertPosition(2) end, category="floorProperties"},
+	--{"Vert Base", hexifyOSD(Game.getVertBase), category="floorProperties"},
 	{"Zip", Game.predictZip, Game.colorZipPrediction, category="positionStats"},
 	{"Landing Y", Game.getPredictedYPositionRelativeToFloor, category="positionStats"},
 	{"Landing", Game.getPredictedLandingFrame, category="positionStats"},
