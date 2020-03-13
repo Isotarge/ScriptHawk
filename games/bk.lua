@@ -64,8 +64,8 @@ local Game = {
 		clip_vel = {-2900, -3500, -3500, -3500}, -- Minimum velocity required to clip on the Y axis -- TODO: This seems to be different for different geometry
 	},
 	defaultFloor = -9000,
-	speedy_speeds = { .1, 1, 5, 10, 20, 35, 50, 75, 100 },
-	speedy_index = 6,
+	speedy_speeds = { .0001, .001, .01, .1, 1, 5, 10, 20, 35, 50, 75, 100 },
+	speedy_index = 9,
 	rot_speed = 0.5,
 	max_rot_units = 360,
 	form_height = 11,
@@ -2694,6 +2694,17 @@ function Game.getFloor()
 	return 0;
 end
 
+function Game.getFloorTriangle()
+	local floorObject = dereferencePointer(Game.Memory.floor_object_pointer);
+	if isRDRAM(floorObject) then
+		local vert1 = mainmemory.read_u16_be(floorObject + 0x04);
+		local vert2 = mainmemory.read_u16_be(floorObject + 0x06);
+		local vert3 = mainmemory.read_u16_be(floorObject + 0x08);
+		return toHexString(vert1, 4, "")..toHexString(vert2, 4, " ")..toHexString(vert3, 4, " ");
+	end
+	return "Unknown";
+end
+
 function Game.getXPosition()
 	return mainmemory.readfloat(Game.Memory.x_position, true);
 end
@@ -3513,6 +3524,7 @@ Game.OSD = {
 	{"Z", category="position"},
 	{"Separator"},
 	{"Floor", Game.getFloor, category="position"},
+	{"Floor Triangle", Game.getFloorTriangle, category="position"},
 	{"Zip", Game.predictZip, Game.colorZipPrediction, category="positionStats"},
 	{"Landing Y", Game.getPredictedYPositionRelativeToFloor, category="positionStats"},
 	{"Landing", Game.getPredictedLandingFrame, category="positionStats"},
