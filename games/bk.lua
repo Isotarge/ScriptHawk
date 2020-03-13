@@ -12,7 +12,7 @@ local Game = {
 		game_time_scale_multiplier = {0x384E60, 0x384FC0, 0x3836A0, 0x384480}, -- Float
 		game_speed_coefficient = {0x3723A0, 0x372B20, 0x371020, 0x371E20}, -- Float
 		frame_timer = {0x280700, 0x27F718, 0x27F718, 0x2808D8}, -- s32_be
-		map_vert_pointer = {0x382D30, 0x382E70, 0x381560, 0x382360}, -- See Game.getVertBase()
+		map_model_pointer = {0x382D38, 0x382E78, 0x381568, 0x382368}, -- See Game.getVertBase()
 		floor_object_pointer = {0x37CBD0, 0x37CD00, 0x37B400, 0x37C200}, -- Pointer
 		carried_object_pointer = {0x37CC68, 0x37CD98, 0x37B498, 0x37C298}, -- Pointer
 		slope_timer = {0x37CCB4, 0x37CDE4, 0x37B4E4, 0x37C2E4}, -- Float
@@ -2727,29 +2727,13 @@ function Game.getFloorTriangleVertPosition(index)
 	return "Unknown";
 end
 
--- Note: This is probably not how the game works exactly, but it's good enough for our purposes
 function Game.getVertBase()
-	local obj1 = dereferencePointer(Game.Memory.map_vert_pointer);
-	if isRDRAM(obj1) then
-		local obj2 = dereferencePointer(obj1 + 0x04);
-		if isRDRAM(obj2) then
-			local offset = -4;
-			local found = false;
-			repeat
-				offset = offset + 4;
-				local test1Val = mainmemory.readbyte(obj2 + offset + 0x0F);
-				local test2Val = mainmemory.readbyte(obj2 + offset + 0x1F);
-				local test3Val = mainmemory.readbyte(obj2 + offset + 0x2F);
-				local test4Val = mainmemory.readbyte(obj2 + offset + 0x3F);
-				local test1 = test1Val == 0xFF;
-				local test2 = test2Val == 0xFF;
-				local test3 = test3Val == 0xFF;
-				local test4 = test4Val == 0xFF;
-				found = test1 and test2 and test3 and test4;
-			until found or offset > 0x1000; -- Arbitrary safeguard value
-			if found then
-				return obj2 + offset;
-			end
+	local mapModel = dereferencePointer(Game.Memory.map_model_pointer);
+	if isRDRAM(mapModel) then
+		local vertOffset = mainmemory.read_u32_be(mapModel + 0x10);
+		local vertBase = mapModel + vertOffset + 0x18;
+		if isRDRAM(vertBase) then
+			return vertBase;
 		end
 	end
 end
