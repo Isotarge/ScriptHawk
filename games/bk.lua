@@ -63,6 +63,7 @@ local Game = {
 		mumbo_token_bitfield = {0x383CD0, 0x383E30, 0x382510, 0x3832F0},
 		strict_bitfield = { 0x383BB8, 0x383D48, 0x382428, 0x3831d8},
 		clip_vel = {-2900, -3500, -3500, -3500}, -- Minimum velocity required to clip on the Y axis -- TODO: This seems to be different for different geometry
+		zip_vel = {-1300, -1600, -1600, -1600}, -- See Game.predictZip()
 	},
 	defaultFloor = -9000,
 	speedy_speeds = { .0001, .001, .01, .1, 1, 5, 10, 20, 35, 50, 75, 100 },
@@ -3014,7 +3015,7 @@ function freezeZipVelocity()
 	if not ScriptHawk.UI.ischecked("freeze_zip_velocity") or inputs["P1 L"] then -- TODO: Less hacky method of detecting moonjump lol
 		return;
 	end
-	Game.setYVelocity(-1575); -- TODO: Better value for this
+	Game.setYVelocity(Game.Memory.zip_vel);
 end
 
 -------------------
@@ -3472,7 +3473,7 @@ function Game.initUI()
 		ScriptHawk.UI.checkbox(5, 4, "encircle_checkbox", "Encircle (Beta)");
 		ScriptHawk.UI.checkbox(5, 5, "dynamic_radius_checkbox", "Dynamic Radius");
 		ScriptHawk.UI.checkbox(5, 6, "freeze_clip_velocity", "Freeze Clip Vel.");
-		--ScriptHawk.UI.checkbox(5, 7, "freeze_zip_velocity", "Freeze Zip Vel.");
+		ScriptHawk.UI.checkbox(5, 7, "freeze_zip_velocity", "Freeze Zip Vel.");
 
 		ScriptHawk.UI.checkbox(10, 2, "beta_pause_menu_checkbox", "Beta Pause");
 
@@ -3529,7 +3530,7 @@ function Game.eachFrame()
 	Game.updateAverageVelocity();
 	updateWave();
 	freezeClipVelocity();
-	--freezeZipVelocity();
+	freezeZipVelocity();
 
 	if ScriptHawk.UI.ischecked("toggle_neverslip") then
 		neverSlip();
