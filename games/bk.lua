@@ -2706,6 +2706,39 @@ function Game.getFloorTriangle()
 	return "Unknown";
 end
 
+function Game.getVertDist()
+	local floorObject = dereferencePointer(Game.Memory.floor_object_pointer);
+	if not isRDRAM(floorObject) then
+		return 0;
+	end
+
+	local vertBase = Game.getVertBase();
+	if not isRDRAM(vertBase) then
+		return 0;
+	end
+
+	local px = Game.getXPosition();
+	local py = Game.getZPosition();
+	local minDistSq = math.huge;
+	for i = 1, 3 do -- All 3 pairs of vertices
+		local vertIndex = mainmemory.read_u16_be(floorObject + 0x04 + (i - 1) % 3 * 0x02);
+		local vert2Index = mainmemory.read_u16_be(floorObject + 0x04 + (i) % 3 * 0x02);
+
+		local x1 = mainmemory.read_s16_be(vertBase + (vertIndex * 0x10) + 0x00);
+		local y1 = mainmemory.read_s16_be(vertBase + (vertIndex * 0x10) + 0x04);
+
+		local x2 = mainmemory.read_s16_be(vertBase + (vert2Index * 0x10) + 0x00);
+		local y2 = mainmemory.read_s16_be(vertBase + (vert2Index * 0x10) + 0x04);
+
+		local T = ((px - x1) * (x2 - x1) + (py - y1) * (y2 - y1)) / ((x2 - x1) ^ 2 + (y2 - y1) ^ 2);
+		local distSq = (x1 - px + T * (x2 - x1)) ^ 2 + (y1 - py + T * (y2 - y1)) ^ 2;
+		minDistSq = math.min(distSq, minDistSq);
+	end
+
+	return math.sqrt(minDistSq);
+end
+
+
 function Game.getFloorTriangleVertPosition(index)
 	if type(index) ~= 'number' then
 		return "Unknown";
@@ -2974,6 +3007,14 @@ function freezeClipVelocity()
 	if not Game.isGrounded() and Game.getYVelocity() > -4000 then
 		Game.setYVelocity(-4000); -- This velocity is pretty much guaranteed to clip on any version if it's possible at all
 	end
+end
+
+function freezeZipVelocity()
+	local inputs = joypad.getimmediate();
+	if not ScriptHawk.UI.ischecked("freeze_zip_velocity") or inputs["P1 L"] then -- TODO: Less hacky method of detecting moonjump lol
+		return;
+	end
+	Game.setYVelocity(-1575); -- TODO: Better value for this
 end
 
 -------------------
@@ -3431,6 +3472,7 @@ function Game.initUI()
 		ScriptHawk.UI.checkbox(5, 4, "encircle_checkbox", "Encircle (Beta)");
 		ScriptHawk.UI.checkbox(5, 5, "dynamic_radius_checkbox", "Dynamic Radius");
 		ScriptHawk.UI.checkbox(5, 6, "freeze_clip_velocity", "Freeze Clip Vel.");
+		--ScriptHawk.UI.checkbox(5, 7, "freeze_zip_velocity", "Freeze Zip Vel.");
 
 		ScriptHawk.UI.checkbox(10, 2, "beta_pause_menu_checkbox", "Beta Pause");
 
@@ -3487,6 +3529,7 @@ function Game.eachFrame()
 	Game.updateAverageVelocity();
 	updateWave();
 	freezeClipVelocity();
+	--freezeZipVelocity();
 
 	if ScriptHawk.UI.ischecked("toggle_neverslip") then
 		neverSlip();
@@ -3558,6 +3601,7 @@ Game.OSD = {
 	{"Separator"},
 	{"Floor", Game.getFloor, category="floorProperties"},
 	--{"Floor Triangle", Game.getFloorTriangle, category="floorProperties"},
+	{"Seam Dist", Game.getVertDist, category="floorProperties"},
 	{"Floor Vert1", function() return Game.getFloorTriangleVertPosition(0) end, category="floorProperties"},
 	{"Floor Vert2", function() return Game.getFloorTriangleVertPosition(1) end, category="floorProperties"},
 	{"Floor Vert3", function() return Game.getFloorTriangleVertPosition(2) end, category="floorProperties"},
