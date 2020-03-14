@@ -2850,11 +2850,8 @@ function Game.predictZip()
 			end
 			yPos = yPos + (yVel / frameRate);
 		end
-		if Game.zipPredicted then
-			return true;
-		end
 	end
-	return false;
+	return Game.zipPredicted;
 end
 
 function Game.colorZipPrediction()
