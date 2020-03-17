@@ -70,7 +70,7 @@ local Game = {
 	speedy_index = 9,
 	rot_speed = 0.5,
 	max_rot_units = 360,
-	form_height = 11,
+	form_height = 13,
 	maps = {
 		"SM - Spiral Mountain",
 		"MM - Mumbo's Mountain",
@@ -2181,6 +2181,9 @@ end
 
 -- Keybinds
 -- For full list go here http://slimdx.org/docs/html/T_SlimDX_DirectInput_Key.htm
+--ScriptHawk.bindKeyRealtime("T", function() Game.zipToFloorVert(0) end, true);
+--ScriptHawk.bindKeyRealtime("Y", function() Game.zipToFloorVert(1) end, true);
+--ScriptHawk.bindKeyRealtime("U", function() Game.zipToFloorVert(2) end, true);
 ScriptHawk.bindKeyRealtime("Z", zipToSelectedObject, true);
 ScriptHawk.bindKeyRealtime("X", despawnSelectedObject, true);
 ScriptHawk.bindKeyRealtime("C", toggleObjectAnalysisToolsMode, true);
@@ -2708,28 +2711,25 @@ function Game.getFloorTriangle()
 end
 
 function Game.getVertDist()
-	local floorObject = dereferencePointer(Game.Memory.floor_object_pointer);
-	if not isRDRAM(floorObject) then
-		return 0;
-	end
-
-	local vertBase = Game.getVertBase();
-	if not isRDRAM(vertBase) then
-		return 0;
+	-- Get all vert positions
+	local verts = {
+		[0] = Game.getFloorTriangleVertPositionRaw(0),
+		[1] = Game.getFloorTriangleVertPositionRaw(1),
+		[2] = Game.getFloorTriangleVertPositionRaw(2),
+	};
+	if verts[0] == nil or verts[1] == nil or verts[2] == nil then
+		return "Unknown";
 	end
 
 	local px = Game.getXPosition();
 	local py = Game.getZPosition();
 	local minDistSq = math.huge;
 	for i = 1, 3 do -- All 3 pairs of vertices
-		local vertIndex = mainmemory.read_u16_be(floorObject + 0x04 + (i - 1) % 3 * 0x02);
-		local vert2Index = mainmemory.read_u16_be(floorObject + 0x04 + (i) % 3 * 0x02);
+		local x1 = verts[(i - 1) % 3].x;
+		local y1 = verts[(i - 1) % 3].z;
 
-		local x1 = mainmemory.read_s16_be(vertBase + (vertIndex * 0x10) + 0x00);
-		local y1 = mainmemory.read_s16_be(vertBase + (vertIndex * 0x10) + 0x04);
-
-		local x2 = mainmemory.read_s16_be(vertBase + (vert2Index * 0x10) + 0x00);
-		local y2 = mainmemory.read_s16_be(vertBase + (vert2Index * 0x10) + 0x04);
+		local x2 = verts[i % 3].x;
+		local y2 = verts[i % 3].z;
 
 		local T = ((px - x1) * (x2 - x1) + (py - y1) * (y2 - y1)) / ((x2 - x1) ^ 2 + (y2 - y1) ^ 2);
 		local distSq = (x1 - px + T * (x2 - x1)) ^ 2 + (y1 - py + T * (y2 - y1)) ^ 2;
@@ -2739,13 +2739,41 @@ function Game.getVertDist()
 	return math.sqrt(minDistSq);
 end
 
-
-function Game.getFloorTriangleVertPosition(index)
+function Game.getFloorTriangleVertPositionRaw(index)
 	if type(index) ~= 'number' then
-		return "Unknown";
+		return;
 	end
 	if index < 0 or index > 2 then
-		return "Unknown";
+		return;
+	end
+	local floorObject = dereferencePointer(Game.Memory.floor_object_pointer);
+	if isRDRAM(floorObject) then
+		local vertIndex = mainmemory.read_u16_be(floorObject + 0x04 + index * 0x02);
+		local vertBase = Game.getVertBase();
+		if isRDRAM(vertBase) then
+			return {
+				x = mainmemory.read_s16_be(vertBase + (vertIndex * 0x10) + 0x00),
+				y = mainmemory.read_s16_be(vertBase + (vertIndex * 0x10) + 0x02),
+				z = mainmemory.read_s16_be(vertBase + (vertIndex * 0x10) + 0x04),
+			};
+		end
+	end
+end
+
+function Game.getFloorTriangleVertPosition(index)
+	local vert = Game.getFloorTriangleVertPositionRaw(index);
+	if vert ~= nil then
+		return vert.x.." "..vert.y.." "..vert.z;
+	end
+	return "Unknown";
+end
+
+function Game.zipToFloorVert(index)
+	if type(index) ~= 'number' then
+		return;
+	end
+	if index < 0 or index > 2 then
+		return;
 	end
 	local floorObject = dereferencePointer(Game.Memory.floor_object_pointer);
 	if isRDRAM(floorObject) then
@@ -2755,10 +2783,9 @@ function Game.getFloorTriangleVertPosition(index)
 			local xPos = mainmemory.read_s16_be(vertBase + (vertIndex * 0x10) + 0x00);
 			local yPos = mainmemory.read_s16_be(vertBase + (vertIndex * 0x10) + 0x02);
 			local zPos = mainmemory.read_s16_be(vertBase + (vertIndex * 0x10) + 0x04);
-			return xPos..", "..yPos..", "..zPos;
+			Game.setPosition(xPos, yPos, zPos);
 		end
 	end
-	return "Unknown";
 end
 
 function Game.getVertBase()
@@ -3013,6 +3040,186 @@ function freezeZipVelocity()
 		return;
 	end
 	Game.setYVelocity(Game.Memory.zip_vel);
+end
+
+----------------------
+-- Seam Clip Tester --
+-- By The8bitbeast  --
+----------------------
+
+seamTester = {
+	granT = 0.0001,
+	granS = 0.00001,
+	sMax = 0.0001,
+	t = 0,
+	s = 0,
+	lowestY = -math.huge,
+	highestY = math.huge,
+	x1 = 0,
+	x2 = 0,
+	z1 = 0,
+	z2 = 0,
+	normX = 0,
+	normZ = 0,
+	oldFloor = -math.huge,
+	testing = false,
+	positionHistory = {},
+	positionHistoryLength = 10,
+};
+
+seamTester.testSeamFromUI = function()
+	if seamTester.testing then
+		seamTester.cancel();
+		return;
+	end
+
+	local level = forms.gettext(ScriptHawk.UI.form_controls.seam_dropdown);
+	local vert1 = nil;
+	local vert2 = nil;
+	if level == "1 -> 2" then
+		vert1 = Game.getFloorTriangleVertPositionRaw(0);
+		vert2 = Game.getFloorTriangleVertPositionRaw(1);
+	end
+	if level == "1 -> 3" then
+		vert1 = Game.getFloorTriangleVertPositionRaw(0);
+		vert2 = Game.getFloorTriangleVertPositionRaw(2);
+	end
+	if level == "2 -> 1" then
+		vert1 = Game.getFloorTriangleVertPositionRaw(1);
+		vert2 = Game.getFloorTriangleVertPositionRaw(0);
+	end
+	if level == "2 -> 3" then
+		vert1 = Game.getFloorTriangleVertPositionRaw(1);
+		vert2 = Game.getFloorTriangleVertPositionRaw(2);
+	end
+	if level == "3 -> 1" then
+		vert1 = Game.getFloorTriangleVertPositionRaw(2);
+		vert2 = Game.getFloorTriangleVertPositionRaw(0);
+	end
+	if level == "3 -> 2" then
+		vert1 = Game.getFloorTriangleVertPositionRaw(2);
+		vert2 = Game.getFloorTriangleVertPositionRaw(1);
+	end
+	if vert1 ~= nil and vert2 ~= nil then
+		seamTester.testSeam(vert1.x, vert1.z, vert2.x, vert2.z, vert1.y, vert2.y);
+	end
+end
+
+seamTester.testSeam = function(x1, z1, x2, z2, y1, y2)
+	seamTester.x1 = x1;
+	seamTester.z1 = z1;
+	seamTester.x2 = x2;
+	seamTester.z2 = z2;
+	seamTester.lowestY = math.min(y1, y2);
+	seamTester.highestY = math.max(y1, y2);
+	if seamTester.x1 == 0 and seamTester.x2 == 0 then
+		seamTester.normX = 0;
+	else
+		seamTester.normX = (seamTester.z1 - seamTester.z2) / math.sqrt(seamTester.x2 ^ 2 + seamTester.x1 ^ 2);
+	end
+	if seamTester.z1 == 0 and seamTester.z2 == 0 then
+		seamTester.normZ = 0;
+	else
+		seamTester.normZ = (seamTester.x2 - seamTester.x1) / math.sqrt(seamTester.z2 ^ 2 + seamTester.z1 ^ 2);
+	end
+	seamTester.sMax = tonumber(forms.gettext(ScriptHawk.UI.form_controls["sMax Textbox"]));
+	seamTester.granT = tonumber(forms.gettext(ScriptHawk.UI.form_controls["granT Textbox"]));
+	seamTester.granS = tonumber(forms.gettext(ScriptHawk.UI.form_controls["granS Textbox"]));
+	if seamTester.sMax == nil then
+		print("sMax wasn't a number! Aborting.");
+		return;
+	end
+	if seamTester.granT == nil then
+		print("granT wasn't a number! Aborting.");
+		return;
+	end
+	if seamTester.granS == nil then
+		print("granS wasn't a number! Aborting.");
+		return;
+	end
+	seamTester.t = 0;
+	seamTester.s = -seamTester.sMax;
+	seamTester.oldFloor = -math.huge;
+	seamTester.positionHistory = {};
+	print("-------------------");
+	print("Testing seam:");
+	print("X1, Z1: "..seamTester.x1..", "..seamTester.z1);
+	print("X2, Z2: "..seamTester.x2..", "..seamTester.z2);
+	print("Y: "..seamTester.highestY);
+	print("NormX: "..seamTester.normX);
+	print("NormZ: "..seamTester.normZ);
+	print("sMax: "..seamTester.sMax);
+	print("granS: "..seamTester.granS);
+	print("granT: "..seamTester.granT);
+	print("-------------------");
+	seamTester.testing = true;
+	forms.settext(ScriptHawk.UI.form_controls["Test Seam Button"], "Cancel");
+end
+
+seamTester.simulate = function()
+	if seamTester.testing then
+		if seamTester.t > 1 then
+			seamTester.cancel();
+			return;
+		end
+		seamTester.s = seamTester.s + seamTester.granS;
+		if seamTester.s > seamTester.sMax then
+			seamTester.s = -seamTester.sMax;
+			seamTester.t = seamTester.t + seamTester.granT;
+		end
+		local xSet = seamTester.x1 + seamTester.t * (seamTester.x2 - seamTester.x1) + seamTester.s * seamTester.normZ;
+		local zSet = seamTester.z1 + seamTester.t * (seamTester.z2 - seamTester.z1) + seamTester.s * seamTester.normX;
+
+		Game.setXPosition(xSet);
+		Game.setYPosition(seamTester.highestY); -- Make sure the player doesn't ever go under the floor while testing upward slopes
+		Game.setZPosition(zSet);
+
+		-- Make sure the player doesn't slip down slopes while testing
+		neverSlip();
+
+		local newFloor = Game.getFloor();
+		local floorDifference = math.abs(newFloor - seamTester.oldFloor);
+
+		-- Keep a log of the previous n positions to make sure we don't lose any magic numbers
+		table.insert(seamTester.positionHistory, 1, {xSet, zSet});
+		if #seamTester.positionHistory >= seamTester.positionHistoryLength then
+			seamTester.positionHistory[#seamTester.positionHistory] = nil;
+		end
+
+		-- If it's the first frame, ignore the huge difference in floor value
+		if seamTester.oldFloor == -math.huge then
+			floorDifference = 0;
+		end
+
+		if floorDifference > 10 and newFloor < seamTester.lowestY then
+			print("Possible solution found!");
+			--print("X: "..xSet);
+			--print("Z: "..zSet);
+			print("Last "..seamTester.positionHistoryLength.." positions:");
+			for i = #seamTester.positionHistory, 1, -1 do
+				print("Game.setPosition("..seamTester.positionHistory[i][1]..", "..seamTester.highestY..", "..seamTester.positionHistory[i][2]..")");
+			end
+			print("Current position:");
+			print("Game.setPosition("..xSet..", "..seamTester.highestY..", "..zSet..")");
+			--print("Old Floor: "..seamTester.oldFloor);
+			print("Floor: "..newFloor);
+			--print("Floor Difference: "..floorDifference);
+			print("t: "..seamTester.t);
+			print("-------------------");
+			if ScriptHawk.UI.isChecked("cancel_on_found_seam_clip") then
+				client.pause();
+				seamTester.cancel();
+				return;
+			end
+		end
+		seamTester.oldFloor = newFloor;
+	end
+end
+
+seamTester.cancel = function()
+	print("SEAM TEST ENDED");
+	forms.settext(ScriptHawk.UI.form_controls["Test Seam Button"], "Test Seam");
+	seamTester.testing = false;
 end
 
 -------------------
@@ -3497,6 +3704,20 @@ function Game.initUI()
 	ScriptHawk.UI.checkbox(10, 4, "autopound_checkbox", "Auto Pound");
 	ScriptHawk.UI.checkbox(10, 7, "realtime_flags", "Realtime Flags", true);
 
+	-- Seam Tester
+	ScriptHawk.UI.form_controls.seam_dropdown = forms.dropdown(ScriptHawk.UI.options_form, { "1 -> 2", "1 -> 3", "2 -> 1", "2 -> 3", "3 -> 1", "3 -> 2" }, ScriptHawk.UI.col(0) + ScriptHawk.UI.dropdown_offset, ScriptHawk.UI.row(9) + ScriptHawk.UI.dropdown_offset, ScriptHawk.UI.col(4) + 8, ScriptHawk.UI.button_height);
+	ScriptHawk.UI.button(5, 9, {4, 8}, nil, nil, "Test Seam", seamTester.testSeamFromUI);
+	ScriptHawk.UI.checkbox(10, 9, "cancel_on_found_seam_clip", "Auto Cancel");
+
+	ScriptHawk.UI.form_controls["sMax Label"] = forms.label(ScriptHawk.UI.options_form, "sMax:", ScriptHawk.UI.col(0) + ScriptHawk.UI.dropdown_offset, ScriptHawk.UI.row(10) + ScriptHawk.UI.dropdown_offset, ScriptHawk.UI.col(1) + 15, ScriptHawk.UI.button_height);
+	ScriptHawk.UI.form_controls["sMax Textbox"] = forms.textbox(ScriptHawk.UI.options_form, seamTester.sMax, ScriptHawk.UI.col(2) + 5, ScriptHawk.UI.button_height, nil, ScriptHawk.UI.col(2) + 4, ScriptHawk.UI.row(10));
+
+	ScriptHawk.UI.form_controls["granT Label"] = forms.label(ScriptHawk.UI.options_form, "granT:", ScriptHawk.UI.col(5) + ScriptHawk.UI.dropdown_offset, ScriptHawk.UI.row(10) + ScriptHawk.UI.dropdown_offset, ScriptHawk.UI.col(1) + 15, ScriptHawk.UI.button_height);
+	ScriptHawk.UI.form_controls["granT Textbox"] = forms.textbox(ScriptHawk.UI.options_form, seamTester.granT, ScriptHawk.UI.col(2) + 5, ScriptHawk.UI.button_height, nil, ScriptHawk.UI.col(7) + 4, ScriptHawk.UI.row(10));
+
+	ScriptHawk.UI.form_controls["granS Label"] = forms.label(ScriptHawk.UI.options_form, "granS:", ScriptHawk.UI.col(10) + ScriptHawk.UI.dropdown_offset, ScriptHawk.UI.row(10) + ScriptHawk.UI.dropdown_offset, ScriptHawk.UI.col(1) + 15, ScriptHawk.UI.button_height);
+	ScriptHawk.UI.form_controls["granS Textbox"] = forms.textbox(ScriptHawk.UI.options_form, seamTester.granS, ScriptHawk.UI.col(2) + 5, ScriptHawk.UI.button_height, nil, ScriptHawk.UI.col(12) + 4, ScriptHawk.UI.row(10));
+
 	-- Create Inverse Object_Slot_Variables
 	for k, v in pairs(slot_variables) do
 		if v.Name then
@@ -3526,6 +3747,7 @@ end
 function Game.eachFrame()
 	Game.updateAverageVelocity();
 	updateWave();
+	seamTester.simulate();
 	freezeClipVelocity();
 	freezeZipVelocity();
 
