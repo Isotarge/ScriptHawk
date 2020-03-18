@@ -1579,6 +1579,7 @@ local structPointers = {};
 local struct_array_types = {
 	[0] = { -- Game takes low 12-bits and adds 0x572 for comparisons
 		[0x00E] = "Red Feather", -- + 0x572 = 0x580
+		[0x016] = "Orange", -- + 0x572 = 0x588
 		[0x15F] = "Gold Feather", -- + 0x572 = 0x6D1
 		[0x164] = "Note", -- + 0x572 = 0x6D6
 		[0x165] = "Egg", -- + 0x572 = 0x6D7
