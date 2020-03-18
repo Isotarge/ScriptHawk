@@ -99,8 +99,8 @@ end
 getListOfAnalysisSlideTypes();
 getListOfAnalysisSlideSubtypes();
 analysis_slide_type_index = 1;
-analysis_slide_type = analysis_slide_types[analysis_slide_type_index];
 analysis_slide_subtype_index = 1;
+analysis_slide_type = analysis_slide_types[analysis_slide_type_index];
 analysis_slide_subtype = analysis_slide_subtypes[analysis_slide_subtype_index];
 
 --[[
@@ -567,7 +567,7 @@ local Game = {
 	speedy_index = 8,
 	rot_speed = 10,
 	max_rot_units = 4096,
-	form_height = 14,
+	form_height = 15,
 };
 
 function Game.getCurrentMode()
@@ -611,8 +611,61 @@ function Game.getCutsceneOSD()
 end
 
 local flag_array = {};
-local flag_names = {};
-local flags_by_map = {};
+flag_names = {};
+flags_by_map = {};
+local temp_flag_array = {};
+temp_flag_names = {};
+temp_flags_by_map = {};
+local global_flag_array = {
+	{byte=0x0,bit=0,name="Mystery Menu Unlocked", type="Menus Unlocked", nomap=true},
+	{byte=0x0,bit=1,name="Cutscene Menu: Unlocked", type="Menus Unlocked", nomap=true},
+	{byte=0x0,bit=2,name="Cutscene Menu: Japes Intro", type="Cutscene Menu"},
+	{byte=0x0,bit=3,name="Cutscene Menu: Aztec Intro", type="Cutscene Menu"},
+	{byte=0x0,bit=4,name="Cutscene Menu: Factory Intro", type="Cutscene Menu"},
+	{byte=0x0,bit=5,name="Cutscene Menu: Galleon Intro", type="Cutscene Menu"},
+	{byte=0x0,bit=6,name="Cutscene Menu: Fungi Intro", type="Cutscene Menu"},
+	{byte=0x0,bit=7,name="Cutscene Menu: Caves Intro", type="Cutscene Menu"},
+
+	{byte=0x1,bit=0,name="Cutscene Menu: Castle Intro", type="Cutscene Menu"},
+	{byte=0x1,bit=1,name="Cutscene Menu: Enter Hideout", type="Cutscene Menu"},
+	{byte=0x1,bit=2,name="Cutscene Menu: K. Rool Press Button", type="Cutscene Menu"},
+	{byte=0x1,bit=3,name="Cutscene Menu: K. Rool Takeoff", type="Cutscene Menu"},
+	{byte=0x1,bit=4,name="Cutscene Menu: Game Over", type="Cutscene Menu"},
+	{byte=0x1,bit=5,name="Cutscene Menu: End Sequence", type="Cutscene Menu"},
+	{byte=0x1,bit=6,name="Minigame Menu: Unlocked", type="Menus Unlocked", nomap=true},
+	{byte=0x1,bit=7,name="Minigame Menu: Rambi Arena", type="Minigame Menu"},
+
+	{byte=0x2,bit=0,name="Minigame Menu: Enguarde Arena", type="Minigame Menu"},
+	{byte=0x2,bit=1,name="Minigame Menu: DK Arcade", type="Minigame Menu"},
+	{byte=0x2,bit=2,name="Minigame Menu: Jetpac", type="Minigame Menu"},
+	{byte=0x2,bit=3,name="Bosses Menu: Unlocked", type="Menus Unlocked", nomap=true},
+	{byte=0x2,bit=4,name="Bosses Menu: Japes Boss", type="Bosses Menu"},
+	{byte=0x2,bit=5,name="Bosses Menu: Aztec Boss", type="Bosses Menu"},
+	{byte=0x2,bit=6,name="Bosses Menu: Factory Boss", type="Bosses Menu"},
+	{byte=0x2,bit=7,name="Bosses Menu: Galleon Boss", type="Bosses Menu"},
+
+	{byte=0x3,bit=0,name="Bosses Menu: Fungi Boss", type="Bosses Menu", nomap=true},
+	{byte=0x3,bit=1,name="Bosses Menu: Caves Boss", type="Bosses Menu"},
+	{byte=0x3,bit=2,name="Bosses Menu: Castle Boss", type="Bosses Menu"},
+	{byte=0x3,bit=3,name="Bosses Menu: The Main Event", type="Bosses Menu"},
+	{byte=0x3,bit=4,name="Multiplayer Menu Unlocked", type="Menus Unlocked", nomap=true},
+	{byte=0x3,bit=5,name="Multiplayer: Diddy Unlocked", type="Multiplayer", nomap=true},
+	{byte=0x3,bit=6,name="Multiplayer: Lanky Unlocked", type="Multiplayer", nomap=true},
+	{byte=0x3,bit=7,name="Multiplayer: Tiny Unlocked", type="Multiplayer", nomap=true},
+
+	{byte=0x4,bit=0,name="Multiplayer: Chunky Unlocked", type="Multiplayer", nomap=true},
+	{byte=0x4,bit=1,name="Krusha Menu: Unlocked", type="Menus Unlocked", nomap=true},
+	{byte=0x4,bit=2,name="Cheats Menu: Unlocked", type="Menus Unlocked", nomap=true},
+
+	-- Info on introducing these flags into the UI:
+	--[[
+		The stored global flags are stored from 0x7EDD58. After a menu reload, this will try to copy over to the observed menu flags (Stored at 0x7ED558).
+		Both these addresses are in RDRAM. This data also has to be replicated at 0x6B0 in the EEPROM.
+		There is a checksum at 0x7EDD94 in RDRAM. This has to be a valid checksum for the situation otherwise the global flags are wiped
+		The formula for this checksum is unknown, so it would be good to figure this out
+	]]--
+};
+
 local previousCameraState = "Unknown";
 local map_value = 0;
 
@@ -620,8 +673,8 @@ local map_value = 0;
 -- Subgame maps --
 ------------------
 
-local arcade_map = 2;
-local jetpac_map = 9;
+arcade_map = 2;
+jetpac_map = 9;
 
 local arcade_object = {
 	x_position = 0x00, -- Float
@@ -864,7 +917,7 @@ end
 
 --local eeprom_size = 0x800;
 local eeprom_slot_size = 0x1AC;
-local eep_checksum = {
+eep_checksum = {
 	{ address = 0x1A8, value = 0 }, -- Save Slot 1
 	{ address = 0x354, value = 0 }, -- Save Slot 2
 	{ address = 0x500, value = 0 }, -- Save Slot 3
@@ -3998,22 +4051,25 @@ local loading_zone_fields = {
 	object_types = {
 		-- 0x02 - In Castle Minecart/MJ/Fungi
 		[0x03] = "Boss Door Trigger", -- Also sets boss fadeout type as fade instead of spin. In toolshed too??
+		-- 0x04 - In Fungi Minecart
 		[0x05] = "Cutscene Trigger",
 		-- 0x06 - In Treehouse/m/fungi. Not phase reset plane
-		-- 0x07 - In Fungi
-		-- 0x08 - In Fungi
+		-- 0x07 - In Fungi/Fungi Minecart
+		-- 0x08 - In Fungi/Fungi Minecart
 		[0x09] = "Loading Zone",
 		[0x0A] = "Cutscene Trigger",
+		-- 0xB - In Minecart Mayhem
 		[0x0C] = "Loading Zone + Objects", -- Alows objects through
 		[0x0D] = "Loading Zone",
 		[0x0F] = "Warp Trigger", -- Factory Poles
 		[0x10] = "Loading Zone",
 		[0x11] = "Loading Zone", -- Snide's, Return to Parent Map?
-		-- [0x13] = "Unknown - Caves Lobby", -- Behind ice walls
+		-- 0x13 - In so many places
 		[0x14] = "Boss Loading Zone", -- Takes you to the boss of that level
 		[0x15] = "Cutscene Trigger",
 		-- 0x16 - In Az Beetle Slide
 		[0x17] = "Cutscene Trigger",
+		--0x18 - In Fungi Minecart
 		-- [0x19] = "Trigger", -- Seal Race
 		-- 0x1A - In Caves Beetle Slide
 		[0x1B] = "Slide Trigger", -- Beetle Slides
@@ -4021,7 +4077,7 @@ local loading_zone_fields = {
 		[0x20] = "Cutscene Trigger",
 		--[0x24] = "", -- Cannon Trigger? Also used Aztec Snake Road
 		-- 0x25 - In Factory
-		-- 0x26 - In BFI
+		-- 0x26 - In BFI/K-Lumsy. Seems to be centred around torches?
 	},
 	destination_map = 0x12, -- u16_be, index of Game.maps. Exit for type 0xF
 	destination_exit = 0x14, -- u16_be
@@ -4956,6 +5012,26 @@ function Game.detectVersion(romName, romHash)
 		flag_names = {"None"};
 	end
 
+	-- Fill temp flag names and temp flags by map
+	if #temp_flag_array > 0 then
+		for i = 1, #temp_flag_array do
+			if not temp_flag_array[i].ignore then
+				temp_flag_names[i] = temp_flag_array[i].flagName;
+				if not temp_flag_array[i].nomap then
+					if type(temp_flag_array[i].map) == "number" then
+						if not temp_flags_by_map[temp_flag_array[i].map] then
+							temp_flags_by_map[temp_flag_array[i].map] = {};
+						end
+						table.insert(temp_flags_by_map[temp_flag_array[i].map], temp_flag_array[i]);
+					end
+				end
+			end
+		end
+	else
+		print("Warning: No flags found");
+		temp_flag_names = {"None"};
+	end
+
 	for k, v in pairs(dynamicWaterSurface) do
 		dynamicWaterSurface[k] = v[Game.version];
 	end
@@ -5343,15 +5419,89 @@ local function getFlagStatsOSD() -- TODO: This is a lot faster but still too slo
 end
 
 local function flagSetButtonHandler()
-	setFlagByName(forms.getproperty(ScriptHawk.UI.form_controls["Flag Dropdown"], "SelectedItem"));
+	flagMasterType = forms.getproperty(ScriptHawk.UI.form_controls["Flag Master Type Dropdown"], "SelectedItem");
+	if flagMasterType == "Permanent Flags" then
+		setFlagByName(forms.getproperty(ScriptHawk.UI.form_controls["Flag Dropdown"], "SelectedItem"));
+	elseif flagMasterType == "Temporary Flags" then
+		setTempFlagByName(forms.getproperty(ScriptHawk.UI.form_controls["Flag Dropdown"], "SelectedItem"));
+	elseif flagMasterType == "Global Flags" then
+		print("Functionality for global flag setting/clearing not possible at this point");
+	end
 end
 
 local function flagClearButtonHandler()
-	clearFlagByName(forms.getproperty(ScriptHawk.UI.form_controls["Flag Dropdown"], "SelectedItem"));
+	flagMasterType = forms.getproperty(ScriptHawk.UI.form_controls["Flag Master Type Dropdown"], "SelectedItem");
+	if flagMasterType == "Permanent Flags" then
+		clearFlagByName(forms.getproperty(ScriptHawk.UI.form_controls["Flag Dropdown"], "SelectedItem"));
+	elseif flagMasterType == "Temporary Flags" then
+		clearTempFlagByName(forms.getproperty(ScriptHawk.UI.form_controls["Flag Dropdown"], "SelectedItem"));
+	elseif flagMasterType == "Global Flags" then
+		print("Functionality for global flag setting/clearing not possible at this point");
+	end
 end
 
 local function flagCheckButtonHandler()
-	checkFlag(forms.getproperty(ScriptHawk.UI.form_controls["Flag Dropdown"], "SelectedItem"));
+	flagMasterType = forms.getproperty(ScriptHawk.UI.form_controls["Flag Master Type Dropdown"], "SelectedItem");
+	if flagMasterType == "Permanent Flags" then
+		checkFlag(forms.getproperty(ScriptHawk.UI.form_controls["Flag Dropdown"], "SelectedItem"));
+	elseif flagMasterType == "Temporary Flags" then
+		checkTempFlagByName(forms.getproperty(ScriptHawk.UI.form_controls["Flag Dropdown"], "SelectedItem"));
+	elseif flagMasterType == "Global Flags" then
+		checkGlobalFlagByName(forms.getproperty(ScriptHawk.UI.form_controls["Flag Dropdown"], "SelectedItem"));
+	end
+end
+
+flag_master_types = {"Permanent Flags", "Temporary Flags", "Global Flags"};
+
+function flagTypeGetter()
+	flagMasterType = forms.getproperty(ScriptHawk.UI.form_controls["Flag Master Type Dropdown"], "SelectedItem");
+	flag_subtypes = {"All"};
+	if flagMasterType == "Permanent Flags" then
+		loaded_array = flag_array;
+	elseif flagMasterType == "Temporary Flags" then
+		loaded_array = temp_flag_array;
+	elseif flagMasterType == "Global Flags" then
+		loaded_array = global_flag_array;
+	end
+	for i = 1, #loaded_array do
+		stored_subtype = false;
+		for j = 1, #flag_subtypes do
+			if loaded_array[i].type == flag_subtypes[j] then
+				stored_subtype = true;
+			end
+		end
+		if not stored_subtype and loaded_array[i].type ~= "Unknown" then
+			table.insert(flag_subtypes, loaded_array[i].type);
+		end
+	end
+end
+
+function getFlagsArray()
+	flagMasterType = forms.getproperty(ScriptHawk.UI.form_controls["Flag Master Type Dropdown"], "SelectedItem");
+	flagSubType = forms.getproperty(ScriptHawk.UI.form_controls["Flag Sub Type Dropdown"], "SelectedItem");
+	if flagMasterType == "Permanent Flags" then
+		loaded_array = flag_array;
+		name_property = "name";
+	elseif flagMasterType == "Temporary Flags" then
+		loaded_array = temp_flag_array;
+		name_property = "flagName";
+	elseif flagMasterType == "Global Flags" then
+		loaded_array = global_flag_array;
+		name_property = "name";
+	end
+	if flagSubType == "All" then
+		flags_list = {};
+		for i = 1, #loaded_array do
+			table.insert(flags_list,loaded_array[i][name_property])
+		end
+	else
+		flags_list = {};
+		for i = 1, #loaded_array do
+			if loaded_array[i].type == flagSubType then
+				table.insert(flags_list,loaded_array[i][name_property])
+			end
+		end
+	end
 end
 
 local function formatOutputString(caption, value, max)
@@ -5492,6 +5642,23 @@ temp_flag_boundaries = {
 	size = {0xF,0xF,0xF,nil},
 };
 
+local function getTempFlagByName(flagName)
+	for i = 1, #temp_flag_array do
+		if not temp_flag_array[i].ignore and flagName == temp_flag_array[i].flagName then
+			return temp_flag_array[i];
+		end
+	end
+end
+
+function Game.getTempFlagName(byte, bit)
+	for i = 1, #temp_flag_array do
+		if byte == temp_flag_array[i].byte and bit == temp_flag_array[i].bit and not temp_flag_array[i].ignore then
+			return temp_flag_array[i].flagName;
+		end
+	end
+	return "Unknown at "..toHexString(byte)..">"..bit;
+end
+
 function setTempFlag(byte,tempBit)
 	temp_flag_value = mainmemory.readbyte(temp_flag_boundaries.start[Game.version] + byte);
 	temp_flag_value = bit.set(temp_flag_value,tempBit);
@@ -5507,7 +5674,32 @@ end
 function checkTempFlag(byte,tempBit)
 	temp_flag_value = mainmemory.readbyte(temp_flag_boundaries.start[Game.version] + byte);
 	return_value = bit.check(temp_flag_value,tempBit);
-	return return_value
+	if return_value then
+		print(Game.getTempFlagName(byte, tempBit).." is SET");
+	else
+		print(Game.getTempFlagName(byte, tempBit).." is NOT SET");
+	end
+end
+
+function setTempFlagByName(name)
+	local flag = getTempFlagByName(name);
+	if type(flag) == "table" then
+		setTempFlag(flag.byte, flag.bit);
+	end
+end
+
+function checkTempFlagByName(name)
+	local flag = getTempFlagByName(name);
+	if type(flag) == "table" then
+		checkTempFlag(flag.byte, flag.bit);
+	end
+end
+
+function clearTempFlagByName(name)
+	local flag = getTempFlagByName(name);
+	if type(flag) == "table" then
+		clearTempFlag(flag.byte, flag.bit);
+	end
 end
 
 local temp_flag_block_cache = {};
@@ -5594,6 +5786,163 @@ function checkTemporaryFlags(showKnown)
 end
 
 ------------------
+-- Global Flags --
+------------------
+
+global_flag_boundaries = {
+	start = {0x7EDD58,0x7EDC7B,0x7EE1C8,nil},
+	finish = {0x7EDD5F,0x7EDC7F,0x7EE1CF,nil},
+	size = {0x8,0x8,0x8,nil},
+};
+
+local function getGlobalByName(flagName)
+	for i = 1, #global_flag_array do
+		if not global_flag_array[i].ignore and flagName == global_flag_array[i].name then
+			return global_flag_array[i];
+		end
+	end
+end
+
+function Game.getGlobalFlagName(byte, bit)
+	for i = 1, #global_flag_array do
+		if byte == global_flag_array[i].byte and bit == global_flag_array[i].bit and not global_flag_array[i].ignore then
+			return global_flag_array[i].name;
+		end
+	end
+	return "Unknown at "..toHexString(byte)..">"..bit;
+end
+
+function setGlobalFlag(byte,globalBit)
+	-- SEE NOTE IN GLOBAL FLAG OBJECT --
+	global_flag_value = mainmemory.readbyte(global_flag_boundaries.start[Game.version] + byte);
+	global_flag_value = bit.set(global_flag_value,globalBit);
+	mainmemory.writebyte(global_flag_boundaries.start[Game.version] + byte, global_flag_value);
+end
+
+function clearGlobalFlag(byte,globalBit)
+	-- SEE NOTE IN GLOBAL FLAG OBJECT --
+	global_flag_value = mainmemory.readbyte(global_flag_boundaries.start[Game.version] + byte);
+	global_flag_value = bit.clear(global_flag_value,globalBit);
+	mainmemory.writebyte(global_flag_boundaries.start[Game.version] + byte, global_flag_value);
+end
+
+function checkGlobalFlag(byte,globalBit)
+	global_flag_value = mainmemory.readbyte(global_flag_boundaries.start[Game.version] + byte);
+	return_value = bit.check(global_flag_value,globalBit);
+	if return_value then
+		print(Game.getGlobalFlagName(byte, globalBit).." is SET");
+	else
+		print(Game.getGlobalFlagName(byte, globalBit).." is NOT SET");
+	end
+end
+
+function setGlobalFlagByName(name)
+	-- SEE NOTE IN GLOBAL FLAG OBJECT --
+	local flag = getGlobalByName(name);
+	if type(flag) == "table" then
+		setGlobalFlag(flag.byte, flag.bit);
+	end
+end
+
+function checkGlobalFlagByName(name)
+	local flag = getGlobalByName(name);
+	if type(flag) == "table" then
+		checkGlobalFlag(flag.byte, flag.bit);
+	end
+end
+
+function clearGlobalFlagByName(name)
+	-- SEE NOTE IN GLOBAL FLAG OBJECT --
+	local flag = getGlobalByName(name);
+	if type(flag) == "table" then
+		clearGlobalFlag(flag.byte, flag.bit);
+	end
+end
+
+local global_flag_block_cache = {};
+
+local function clearGlobalFlagCache()
+	global_flag_block_cache = {};
+end
+
+local function getGlobalFlag(byte, bit)
+	for i = 1, #global_flag_array do
+		if byte == global_flag_array[i].byte and bit == global_flag_array[i].bit then
+			return global_flag_array[i];
+		end
+	end
+end
+
+local function isGlobalFlagFound(byte, bit)
+	return getGlobalFlag(byte, bit) ~= nil;
+end
+
+function checkGlobalFlags(showKnown)
+	if global_flag_boundaries.start[Game.version] ~= nil then
+		global_flags = global_flag_boundaries.start[Game.version];
+		global_flagBlock = mainmemory.readbyterange(global_flags, global_flag_boundaries.size[Game.version] + 1);
+
+		if #global_flag_block_cache == global_flag_boundaries.size[Game.version] then
+			local GlobalFlagFound = false;
+			local knownGlobalFlagsFound = 0;
+			local currentValue, previousValue;
+
+			for i = 0, #global_flag_block_cache do
+				currentValue = global_flagBlock[i];
+				previousValue = global_flag_block_cache[i];
+				if currentValue ~= previousValue then
+					for bit = 0, 7 do
+						local isSetNow = check_bit(currentValue, bit);
+						local wasSet = check_bit(previousValue, bit);
+						if isSetNow and not wasSet then
+							if not isGlobalFlagFound(i, bit) then
+								GlobalFlagFound = true;
+								dprint("Unknown Global Flag Found!");
+								dprint("{byte="..toHexString(i, 2)..", bit="..bit..', name="Name", type="Type", map='..map_value.."},");
+							else
+								if showKnown then
+									local currentGlobalFlag = getGlobalFlag(i, bit);
+									if not currentGlobalFlag.ignore then
+										if currentGlobalFlag.map ~= nil or currentGlobalFlag.nomap == true then
+											dprint("Global Flag "..toHexString(i, 2)..">"..bit..': "'..currentGlobalFlag.name..'" was set on frame '..emu.framecount());
+										else
+											dprint("Global Flag "..toHexString(i, 2)..">"..bit..': "'..currentGlobalFlag.name..'" was set on frame '..emu.framecount().." ADD MAP "..map_value.." PLEASE");
+										end
+									end
+								end
+								knownGlobalFlagsFound = knownGlobalFlagsFound + 1;
+							end
+						elseif not isSetNow and wasSet then
+							if not isGlobalFound(i, bit) then
+								dprint("Global Flag "..toHexString(i, 2)..">"..bit..': "Unknown" was cleared on frame '..emu.framecount());
+							elseif showKnown then
+								local currentGlobalFlag = getGlobalFlag(i, bit);
+								if not currentGlobal.ignore then
+									dprint("Global Flag "..toHexString(i, 2)..">"..bit..': "'..currentGlobalFlag.name..'" was cleared on frame '..emu.framecount());
+								end
+							end
+						end
+					end
+				end
+			end
+			global_flag_block_cache = global_flagBlock;
+			if not showKnown then
+				if knownGlobalFlagsFound > 0 then
+					dprint(knownGlobalFlagsFound.." Known global flags skipped");
+				end
+				if not GlobalFlagFound then
+					dprint("No unknown flags were changed");
+				end
+			end
+		else
+			global_flag_block_cache = global_flagBlock;
+			dprint("Populated global flag block cache");
+		end
+		print_deferred();
+	end
+end
+
+------------------
 -- TBS Nonsense --
 ------------------
 
@@ -5612,7 +5961,7 @@ end
 -- Memory usage stuff --
 ------------------------
 
-local memoryStatCache = nil;
+memoryStatCache = nil;
 
 function Game.getFreeMemory()
 	if memoryStatCache ~= nil then
@@ -5639,7 +5988,7 @@ end
 -- Chunk Deload --
 ------------------
 
-local chunk = {
+chunk = {
 	size = 0x1C8, -- Size of a chunk object in RAM
 	visible = 0x05, -- Byte, 0x02 = visible, everything else = invisible
 	deload1 = 0x68, -- u32_be
@@ -5702,7 +6051,7 @@ end
 -- Exits --
 -----------
 
-local exit = {
+exit = {
 	x_pos = 0x00, -- s16_be
 	y_pos = 0x02, -- s16_be
 	z_pos = 0x04, -- s16_be
@@ -8517,11 +8866,23 @@ end
 function Game.initUI()
 	-- Flag stuff
 	if Game.version ~= 4 then
-		ScriptHawk.UI.form_controls["Flag Dropdown"] = forms.dropdown(ScriptHawk.UI.options_form, flag_names, ScriptHawk.UI.col(0) + ScriptHawk.UI.dropdown_offset, ScriptHawk.UI.row(8) + ScriptHawk.UI.dropdown_offset, ScriptHawk.UI.col(9) + 8, ScriptHawk.UI.button_height);
-		ScriptHawk.UI.button(10, 8, {46}, nil, "Set Flag Button", "Set", flagSetButtonHandler);
-		ScriptHawk.UI.button(12, 8, {46}, nil, "Check Flag Button", "Check", flagCheckButtonHandler);
-		ScriptHawk.UI.button(14, 8, {46}, nil, "Clear Flag Button", "Clear", flagClearButtonHandler);
+		-- flag_subtypes = {"FTT"};
+		ScriptHawk.UI.form_controls["Flag Master Type Dropdown"] = forms.dropdown(ScriptHawk.UI.options_form, flag_master_types, ScriptHawk.UI.col(0) + ScriptHawk.UI.dropdown_offset, ScriptHawk.UI.row(8) + ScriptHawk.UI.dropdown_offset, ScriptHawk.UI.col(4) + 8, ScriptHawk.UI.button_height);
+		forms.setproperty(ScriptHawk.UI.form_controls["Flag Master Type Dropdown"], "SelectedItem","Permanent Flags");
+		flagTypeGetter();
+		ScriptHawk.UI.form_controls["Flag Sub Type Dropdown"] = forms.dropdown(ScriptHawk.UI.options_form, flag_subtypes, ScriptHawk.UI.col(5) + ScriptHawk.UI.dropdown_offset, ScriptHawk.UI.row(8) + ScriptHawk.UI.dropdown_offset, ScriptHawk.UI.col(4) + 8, ScriptHawk.UI.button_height);
+		getFlagsArray();
+		old_flagMasterType = forms.getproperty(ScriptHawk.UI.form_controls["Flag Master Type Dropdown"], "SelectedItem");
+		old_flagSubType = forms.getproperty(ScriptHawk.UI.form_controls["Flag Sub Type Dropdown"], "SelectedItem");
+		ScriptHawk.UI.form_controls["Flag Dropdown"] = forms.dropdown(ScriptHawk.UI.options_form, flags_list, ScriptHawk.UI.col(0) + ScriptHawk.UI.dropdown_offset, ScriptHawk.UI.row(9) + ScriptHawk.UI.dropdown_offset, ScriptHawk.UI.col(9) + 8, ScriptHawk.UI.button_height);
+		ScriptHawk.UI.button(10, 9, {46}, nil, "Set Flag Button", "Set", flagSetButtonHandler);
+		ScriptHawk.UI.button(12, 9, {46}, nil, "Check Flag Button", "Check", flagCheckButtonHandler);
+		ScriptHawk.UI.button(14, 9, {46}, nil, "Clear Flag Button", "Clear", flagClearButtonHandler);
 		ScriptHawk.UI.checkbox(10, 6, "realtime_flags", "Realtime Flags", true);
+		-- ScriptHawk.UI.form_controls["Temp Flag Dropdown"] = forms.dropdown(ScriptHawk.UI.options_form, temp_flag_names, ScriptHawk.UI.col(0) + ScriptHawk.UI.dropdown_offset, ScriptHawk.UI.row(9) + ScriptHawk.UI.dropdown_offset, ScriptHawk.UI.col(9) + 8, ScriptHawk.UI.button_height);
+		-- ScriptHawk.UI.button(10, 9, {46}, nil, "Set Temp Flag Button", "Set", tempFlagSetButtonHandler);
+		-- ScriptHawk.UI.button(12, 9, {46}, nil, "Check Temp Flag Button", "Check", tempFlagCheckButtonHandler);
+		-- ScriptHawk.UI.button(14, 9, {46}, nil, "Clear Temp Flag Button", "Clear", tempFlagClearButtonHandler);
 	end
 
 	-- Moon stuff
@@ -8563,20 +8924,20 @@ function Game.initUI()
 
 	-- Set character
 	-- TODO: Different indexes on Kiosk
-	ScriptHawk.UI.form_controls["Character Dropdown"] = forms.dropdown(ScriptHawk.UI.options_form, {"0. DK", "1. Diddy", "2. Lanky", "3. Tiny", "4. Chunky", "5. Krusha", "6. Rambi", "7. Enguarde", "8. Squawks", "9. Squawks"}, ScriptHawk.UI.col(0) + ScriptHawk.UI.dropdown_offset, ScriptHawk.UI.row(9) + ScriptHawk.UI.dropdown_offset, ScriptHawk.UI.col(9) + 8, ScriptHawk.UI.button_height);
-	ScriptHawk.UI.button(10, 9, {4, 10}, nil, nil, "Set Character", Game.setCharacterFromDropdown);
+	ScriptHawk.UI.form_controls["Character Dropdown"] = forms.dropdown(ScriptHawk.UI.options_form, {"0. DK", "1. Diddy", "2. Lanky", "3. Tiny", "4. Chunky", "5. Krusha", "6. Rambi", "7. Enguarde", "8. Squawks", "9. Squawks"}, ScriptHawk.UI.col(0) + ScriptHawk.UI.dropdown_offset, ScriptHawk.UI.row(10) + ScriptHawk.UI.dropdown_offset, ScriptHawk.UI.col(9) + 8, ScriptHawk.UI.button_height);
+	ScriptHawk.UI.button(10, 10, {4, 10}, nil, nil, "Set Character", Game.setCharacterFromDropdown);
 
 	-- Set Object Tools
-	ScriptHawk.UI.form_controls["Analysis Type Text"] = forms.label(ScriptHawk.UI.options_form, analysis_slide_type, ScriptHawk.UI.col(9) + ScriptHawk.UI.dropdown_offset, ScriptHawk.UI.row(10) + ScriptHawk.UI.dropdown_offset, ScriptHawk.UI.col(4) + 8, ScriptHawk.UI.button_height);
-	ScriptHawk.UI.button(14, 10, {1, 1}, nil, nil, ">", increase_analysis_slide_type);
-	ScriptHawk.UI.button(7.5, 10, {1, 1}, nil, nil, "<", decrease_analysis_slide_type);
+	ScriptHawk.UI.form_controls["Analysis Type Text"] = forms.label(ScriptHawk.UI.options_form, analysis_slide_type, ScriptHawk.UI.col(9) + ScriptHawk.UI.dropdown_offset, ScriptHawk.UI.row(11) + ScriptHawk.UI.dropdown_offset, ScriptHawk.UI.col(4) + 8, ScriptHawk.UI.button_height);
+	ScriptHawk.UI.button(14, 11, {1, 1}, nil, nil, ">", increase_analysis_slide_type);
+	ScriptHawk.UI.button(7.5, 11, {1, 1}, nil, nil, "<", decrease_analysis_slide_type);
 
-	ScriptHawk.UI.form_controls["Analysis Subtype Text"] = forms.label(ScriptHawk.UI.options_form, analysis_slide_subtype, ScriptHawk.UI.col(9) + ScriptHawk.UI.dropdown_offset, ScriptHawk.UI.row(11) + ScriptHawk.UI.dropdown_offset, ScriptHawk.UI.col(4) + 8, ScriptHawk.UI.button_height);
-	ScriptHawk.UI.button(14, 11, {1, 1}, nil, nil, ">", increase_analysis_slide_subtype);
-	ScriptHawk.UI.button(7.5, 11, {1, 1}, nil, nil, "<", decrease_analysis_slide_subtype);
+	ScriptHawk.UI.form_controls["Analysis Subtype Text"] = forms.label(ScriptHawk.UI.options_form, analysis_slide_subtype, ScriptHawk.UI.col(9) + ScriptHawk.UI.dropdown_offset, ScriptHawk.UI.row(12) + ScriptHawk.UI.dropdown_offset, ScriptHawk.UI.col(4) + 8, ScriptHawk.UI.button_height);
+	ScriptHawk.UI.button(14, 12, {1, 1}, nil, nil, ">", increase_analysis_slide_subtype);
+	ScriptHawk.UI.button(7.5, 12, {1, 1}, nil, nil, "<", decrease_analysis_slide_subtype);
 
-	ScriptHawk.UI.form_controls["Analysis Filter Label"] = forms.label(ScriptHawk.UI.options_form, "Filter:", ScriptHawk.UI.col(0) + ScriptHawk.UI.dropdown_offset, ScriptHawk.UI.row(11) + ScriptHawk.UI.dropdown_offset, ScriptHawk.UI.col(1) + 15, ScriptHawk.UI.button_height);
-	ScriptHawk.UI.form_controls["Analysis Filter Textbox"] = forms.textbox(ScriptHawk.UI.options_form, nil, ScriptHawk.UI.col(5), ScriptHawk.UI.button_height, nil, ScriptHawk.UI.col(2) + 4, ScriptHawk.UI.row(11));
+	ScriptHawk.UI.form_controls["Analysis Filter Label"] = forms.label(ScriptHawk.UI.options_form, "Filter:", ScriptHawk.UI.col(0) + ScriptHawk.UI.dropdown_offset, ScriptHawk.UI.row(12) + ScriptHawk.UI.dropdown_offset, ScriptHawk.UI.col(1) + 15, ScriptHawk.UI.button_height);
+	ScriptHawk.UI.form_controls["Analysis Filter Textbox"] = forms.textbox(ScriptHawk.UI.options_form, nil, ScriptHawk.UI.col(5), ScriptHawk.UI.button_height, nil, ScriptHawk.UI.col(2) + 4, ScriptHawk.UI.row(12));
 
 	-- Output flag statistics
 	flagStats();
@@ -9037,6 +9398,23 @@ function Game.drawUI()
 	forms.settext(ScriptHawk.UI.form_controls["Toggle Visibility Button"], current_invisify);
 	forms.settext(ScriptHawk.UI.form_controls["Analysis Type Text"],analysis_slide_type);
 	forms.settext(ScriptHawk.UI.form_controls["Analysis Subtype Text"],analysis_slide_subtype);
+	current_flagMasterType = forms.getproperty(ScriptHawk.UI.form_controls["Flag Master Type Dropdown"], "SelectedItem");
+	current_flagSubType = forms.getproperty(ScriptHawk.UI.form_controls["Flag Sub Type Dropdown"], "SelectedItem");
+	if old_flagMasterType ~= current_flagMasterType then
+		forms.setproperty(ScriptHawk.UI.form_controls["Flag Sub Type Dropdown"], "SelectedItem","All");
+		flagTypeGetter();
+		forms.setdropdownitems(ScriptHawk.UI.form_controls["Flag Sub Type Dropdown"], flag_subtypes);
+		getFlagsArray();
+		forms.setdropdownitems(ScriptHawk.UI.form_controls["Flag Dropdown"], flags_list);
+		forms.setproperty(ScriptHawk.UI.form_controls["Flag Dropdown"], "SelectedIndex", 0);
+	end
+	if old_flagSubType ~= current_flagSubType then
+		getFlagsArray();
+		forms.setdropdownitems(ScriptHawk.UI.form_controls["Flag Dropdown"], flags_list);
+		forms.setproperty(ScriptHawk.UI.form_controls["Flag Dropdown"], "SelectedIndex", 0);
+	end
+	old_flagSubType = current_flagSubType;
+	old_flagMasterType = current_flagMasterType;
 	grab_script_mode_from_inputs();
 	turnFilterBoxIntoFilter();
 	--forms.settext(ScriptHawk.UI.form_controls["Moon Mode Button"], moon_mode);
@@ -9729,6 +10107,7 @@ end
 function Game.onLoadState()
 	clearFlagCache();
 	clearTempFlagCache();
+	clearGlobalFlagCache();
 	resetRNGCache();
 	koshBot.resetSlots();
 end
@@ -9837,6 +10216,7 @@ function Game.eachFrame()
 	if ScriptHawk.UI.ischecked("realtime_flags") then
 		checkFlags(true);
 		checkTemporaryFlags(true);
+		checkGlobalFlags(true);
 	end
 
 	if force_gb_load then
