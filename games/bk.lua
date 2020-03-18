@@ -1635,7 +1635,7 @@ end
 local function getStructName(pointer)
 	local structType = getStructType(pointer);
 	local itemType = getItemType(pointer);
-    if structType == 0 then
+	if structType == 0 then
 		if type(struct_array_types[structType][itemType]) == "string" then
 			return struct_array_types[structType][itemType];
 		--else
@@ -1696,12 +1696,12 @@ end
 local function getNStructsFromBlock(pointer, nObjects)
 	local pointers = {};
 	if isRDRAM(pointer) then
-        for i = 0, nObjects - 1 do
-            if not hide_unknown_structs or isKnownStruct(pointer + i * 0x0C) then
-                table.insert(pointers, pointer + i * 0x0C);
-            end
-        end
-        return pointers;
+		for i = 0, nObjects - 1 do
+			if not hide_unknown_structs or isKnownStruct(pointer + i * 0x0C) then
+				table.insert(pointers, pointer + i * 0x0C);
+			end
+		end
+		return pointers;
 	end
 	return pointers;
 end
@@ -1711,32 +1711,32 @@ local function getStructPointers()
 	local block = dereferencePointer(Game.Memory.struct_array_pointer);
 	local pointers = {};
 	if isRDRAM(block) then
-        local voxel_count = mainmemory.read_u32_be(Game.Memory.struct_array_pointer + 0x28);
-        local blockend = block + voxel_count * 0x0C;
-        for address = block, blockend, 0x0C do --step through voxels
-            local voxel_header = mainmemory.read_u32_be(address);
-            --local ptr1_cnt = bit.band(voxel_header, 0x0001F800)/0x400;
-            local ptr2_cnt = bit.band(voxel_header, 0x000007E0)/32;
-            --[[
-            if(ptr1_cnt ~= 0) then
-            --    local pointer1 = dereferencePointer(address + 4);
-            --    if isRDRAM(pointer1) then
-            --        local blockPointers = getStructsFromBlock(pointer1);
-            --        for i = 1, #blockPointers do
-            --            table.insert(pointers, blockPointers[i]);
-            --        end
-            --    end
-            --end
-            --]]
-            if(ptr2_cnt ~= 0) then
-                local pointer2 = dereferencePointer(address + 8);
-                if isRDRAM(pointer2) then
-                    local blockPointers = getNStructsFromBlock(pointer2, ptr2_cnt);
-                    for i = 1, #blockPointers do
-                        table.insert(pointers, blockPointers[i]);
-                    end
-                end
-            end
+		local voxel_count = mainmemory.read_u32_be(Game.Memory.struct_array_pointer + 0x28);
+		local blockend = block + voxel_count * 0x0C;
+		for address = block, blockend, 0x0C do --step through voxels
+			local voxel_header = mainmemory.read_u32_be(address);
+			--local ptr1_cnt = bit.band(voxel_header, 0x0001F800) / 0x400;
+			local ptr2_cnt = bit.band(voxel_header, 0x000007E0) / 32;
+			--[[
+			if(ptr1_cnt ~= 0) then
+			--	local pointer1 = dereferencePointer(address + 4);
+			--	if isRDRAM(pointer1) then
+			--		local blockPointers = getStructsFromBlock(pointer1);
+			--		for i = 1, #blockPointers do
+			--			table.insert(pointers, blockPointers[i]);
+			--		end
+			--	end
+			--end
+			--]]
+			if(ptr2_cnt ~= 0) then
+				local pointer2 = dereferencePointer(address + 8);
+				if isRDRAM(pointer2) then
+					local blockPointers = getNStructsFromBlock(pointer2, ptr2_cnt);
+					for i = 1, #blockPointers do
+						table.insert(pointers, blockPointers[i]);
+					end
+				end
+			end
 		end
 	end
 	return pointers;
@@ -2373,8 +2373,6 @@ function Game.getFFPattern()
 	end
 	return FFPattern;
 end
-
-
 
 -- Relative to question object
 local ff_current_answer = 0x13;
@@ -3050,7 +3048,7 @@ end
 
 seamTester = {
 	gran = 0.000001,
-	bounds = 0.0005,
+	bounds = 0.0002,
 	lowestY = -math.huge,
 	highestY = math.huge,
 	x1 = 0,
@@ -3120,7 +3118,7 @@ seamTester.testSeam = function(x1, z1, x2, z2, y1, y2)
 		return;
 	end
 
-	if z1 > z2 then --swap the points to avoid a lot of if cases (enforcing z1 < z2)
+	if z1 > z2 then -- Swap the points to avoid a lot of if cases (enforcing z1 < z2)
 		seamTester.x1 = x2;
 		seamTester.z1 = z2;
 		seamTester.x2 = x1;
@@ -3131,23 +3129,27 @@ seamTester.testSeam = function(x1, z1, x2, z2, y1, y2)
 		seamTester.x2 = x2;
 		seamTester.z2 = z2;
 	end
-
 	seamTester.lowestY = math.min(y1, y2);
 	seamTester.highestY = math.max(y1, y2);
 
-	if (seamTester.z2 - seamTester.z1) == 0 then --edge case for slope calc
+	if (seamTester.z2 - seamTester.z1) == 0 then --Edge case for slope calc
 		seamTester.m = math.huge;
 	else
 		seamTester.m = (seamTester.x2 - seamTester.x1) / (seamTester.z2 - seamTester.z1);
 	end
 
-	if math.atan(math.abs(seamTester.m)) < math.pi/4.0 then
+	--seamTester.x1 = seamTester.x1 + 50 * seamTester.m;
+	--seamTester.z1 = seamTester.z1 + 50;
+	--seamTester.x2 = seamTester.x2 + 50 * seamTester.m;
+	--seamTester.z2 = seamTester.z2 + 50;
+
+	if math.atan(math.abs(seamTester.m)) < math.pi / 4.0 then
 		seamTester.grid = 'v';
 		seamTester.zq = seamTester.z1 - seamTester.bounds;
-		seamTester.xq = seamTester.x1 - seamTester.bounds*(seamTester.m+1.0);
+		seamTester.xq = seamTester.x1 - seamTester.bounds * (seamTester.m + 1.0);
 	else
 		seamTester.grid = 'h';
-		seamTester.zq = seamTester.z1 - seamTester.bounds*((1.0/seamTester.m)+1.0);
+		seamTester.zq = seamTester.z1 - seamTester.bounds * ((1.0 / seamTester.m) + 1.0);
 		seamTester.xq = seamTester.x1 - seamTester.bounds;
 	end
 
@@ -3209,17 +3211,17 @@ seamTester.simulate = function()
 			end
 		end
 
-		local oldx = Game.getXPosition();
-		local oldz = Game.getZPosition();
+		local oldX = Game.getXPosition();
+		local oldZ = Game.getZPosition();
 		local invalidx = true;
 		local invalidz = true;
 
 		if seamTester.grid == 'h' then
 			-- This block makes sure we only test valid positions along the Z axis
-			while (invalidz) do
+			while(invalidz) do
 				seamTester.zt = seamTester.zt + seamTester.gran;
 				Game.setZPosition(seamTester.zt);
-				if oldz ~= Game.getZPosition() then
+				if oldZ ~= Game.getZPosition() then
 					invalidz = false;
 				end
 			end
@@ -3230,7 +3232,7 @@ seamTester.simulate = function()
 					seamTester.xq = seamTester.xq + seamTester.gran;
 					seamTester.zq = seamTester.zq + seamTester.gran / seamTester.m;
 					Game.setXPosition(seamTester.xq);
-					if oldx ~= Game.getXPosition() then
+					if oldX ~= Game.getXPosition() then
 						invalidx = false;
 					end
 				end
@@ -3239,27 +3241,34 @@ seamTester.simulate = function()
 				seamTester.progress = 100.0 * (2 * seamTester.bounds + seamTester.zq - seamTester.z1) / (2 * seamTester.bounds + seamTester.z2 - seamTester.z1);
 			end
 
-			if seamTester.xq > seamTester.x2 + seamTester.bounds then -- reached the end
-				seamTester.cancel();
-				return;
+			if seamTester.x2 > seamTester.x1 then
+				if seamTester.xq > seamTester.x2 + seamTester.bounds then -- Reached the end
+					seamTester.cancel();
+					return;
+				end
+			else -- x2 < x1
+				if seamTester.xq < seamTester.x2 - seamTester.bounds then -- Reached the end
+					seamTester.cancel();
+					return;
+				end
 			end
 		else -- grid == v
-			-- this block makes sure we only test valid positions along the X axis
+			-- This block makes sure we only test valid positions along the X axis
 			while (invalidx) do
 				seamTester.xt = seamTester.xt + seamTester.gran;
 				Game.setXPosition(seamTester.xt);
-				if oldx ~= Game.getXPosition() then
+				if oldX ~= Game.getXPosition() then
 					invalidx = false;
 				end
 			end
 
-			if seamTester.xt > seamTester.xq + (2*seamTester.bounds) then
-				-- this block makes sure we only test valid positions along the Z axis
-				while (invalidz) do
+			if seamTester.xt > seamTester.xq + (2 * seamTester.bounds) then
+				-- This block makes sure we only test valid positions along the Z axis
+				while(invalidz) do
 					seamTester.xq = seamTester.xq + seamTester.gran * seamTester.m;
 					seamTester.zq = seamTester.zq + seamTester.gran;
 					Game.setZPosition(seamTester.zq);
-					if oldz ~= Game.getZPosition() then
+					if oldZ ~= Game.getZPosition() then
 						invalidz = false;
 					end
 				end
@@ -3268,7 +3277,7 @@ seamTester.simulate = function()
 				seamTester.progress = 100.0 * (seamTester.bounds + seamTester.zq - seamTester.z1) / (2 * seamTester.bounds + seamTester.z2 - seamTester.z1);
 			end
 
-			if seamTester.zq > seamTester.z2+seamTester.bounds then -- reached the end
+			if seamTester.zq > seamTester.z2 + seamTester.bounds then -- Reached the end
 				seamTester.cancel();
 				return;
 			end
