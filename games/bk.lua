@@ -3048,23 +3048,25 @@ end
 ----------------------
 
 seamTester = {
-	granT = 0.0001,
-	granS = 0.00001,
-	sMax = 0.0001,
-	t = 0,
-	s = 0,
+	gran = 0.000001,
+	bounds = 0.0005,
 	lowestY = -math.huge,
 	highestY = math.huge,
 	x1 = 0,
-	x2 = 0,
 	z1 = 0,
+	x2 = 0,
 	z2 = 0,
-	normX = 0,
-	normZ = 0,
+	xq = 0, -- q is placeholder position, moves parallel to the actual seam
+	zq = 0,
+	xt = 0, -- t is test position
+	zt = 0,
+	m = 0, -- the slope of the seam as viewed from above (xz plane)
+	grid = 'h', -- h = horizontal testing, v = vertical testing
 	oldFloor = -math.huge,
 	testing = false,
 	positionHistory = {},
 	positionHistoryLength = 10,
+	progress = 0,
 };
 
 seamTester.testSeamFromUI = function()
@@ -3106,39 +3108,51 @@ seamTester.testSeamFromUI = function()
 end
 
 seamTester.testSeam = function(x1, z1, x2, z2, y1, y2)
-	seamTester.x1 = x1;
-	seamTester.z1 = z1;
-	seamTester.x2 = x2;
-	seamTester.z2 = z2;
+	seamTester.bounds = tonumber(forms.gettext(ScriptHawk.UI.form_controls["bounds Textbox"]));
+	seamTester.gran = tonumber(forms.gettext(ScriptHawk.UI.form_controls["gran Textbox"]));
+	if seamTester.bounds == nil then
+		print("bounds wasn't a number! Aborting.");
+		return;
+	end
+	if seamTester.gran == nil then
+		print("gran wasn't a number! Aborting.");
+		return;
+	end
+
+	if z1 > z2 then --swap the points to avoid a lot of if cases (enforcing z1 < z2)
+		seamTester.x1 = x2;
+		seamTester.z1 = z2;
+		seamTester.x2 = x1;
+		seamTester.z2 = z1;
+	else
+		seamTester.x1 = x1;
+		seamTester.z1 = z1;
+		seamTester.x2 = x2;
+		seamTester.z2 = z2;
+	end
+
 	seamTester.lowestY = math.min(y1, y2);
 	seamTester.highestY = math.max(y1, y2);
-	if seamTester.x1 == 0 and seamTester.x2 == 0 then
-		seamTester.normX = 0;
+
+	if (seamTester.z2 - seamTester.z1) == 0 then --edge case for slope calc
+		seamTester.m = math.huge;
 	else
-		seamTester.normX = (seamTester.z1 - seamTester.z2) / math.sqrt(seamTester.x2 ^ 2 + seamTester.x1 ^ 2);
+		seamTester.m = (seamTester.x2 - seamTester.x1) / (seamTester.z2 - seamTester.z1);
 	end
-	if seamTester.z1 == 0 and seamTester.z2 == 0 then
-		seamTester.normZ = 0;
+
+	if math.atan(math.abs(seamTester.m)) < math.pi/4.0 then
+		seamTester.grid = 'v';
+		seamTester.zq = seamTester.z1 - seamTester.bounds;
+		seamTester.xq = seamTester.x1 - seamTester.bounds*(seamTester.m+1.0);
 	else
-		seamTester.normZ = (seamTester.x2 - seamTester.x1) / math.sqrt(seamTester.z2 ^ 2 + seamTester.z1 ^ 2);
+		seamTester.grid = 'h';
+		seamTester.zq = seamTester.z1 - seamTester.bounds*((1.0/seamTester.m)+1.0);
+		seamTester.xq = seamTester.x1 - seamTester.bounds;
 	end
-	seamTester.sMax = tonumber(forms.gettext(ScriptHawk.UI.form_controls["sMax Textbox"]));
-	seamTester.granT = tonumber(forms.gettext(ScriptHawk.UI.form_controls["granT Textbox"]));
-	seamTester.granS = tonumber(forms.gettext(ScriptHawk.UI.form_controls["granS Textbox"]));
-	if seamTester.sMax == nil then
-		print("sMax wasn't a number! Aborting.");
-		return;
-	end
-	if seamTester.granT == nil then
-		print("granT wasn't a number! Aborting.");
-		return;
-	end
-	if seamTester.granS == nil then
-		print("granS wasn't a number! Aborting.");
-		return;
-	end
-	seamTester.t = 0;
-	seamTester.s = -seamTester.sMax;
+
+	seamTester.xt = seamTester.xq;
+	seamTester.zt = seamTester.zq;
+
 	seamTester.oldFloor = -math.huge;
 	seamTester.positionHistory = {};
 	print("-------------------");
@@ -3146,11 +3160,8 @@ seamTester.testSeam = function(x1, z1, x2, z2, y1, y2)
 	print("X1, Z1: "..seamTester.x1..", "..seamTester.z1);
 	print("X2, Z2: "..seamTester.x2..", "..seamTester.z2);
 	print("Y: "..seamTester.highestY);
-	print("NormX: "..seamTester.normX);
-	print("NormZ: "..seamTester.normZ);
-	print("sMax: "..seamTester.sMax);
-	print("granS: "..seamTester.granS);
-	print("granT: "..seamTester.granT);
+	print("bounds: "..seamTester.bounds);
+	print("gran: "..seamTester.gran);
 	print("-------------------");
 	seamTester.testing = true;
 	forms.settext(ScriptHawk.UI.form_controls["Test Seam Button"], "Cancel");
@@ -3158,21 +3169,9 @@ end
 
 seamTester.simulate = function()
 	if seamTester.testing then
-		if seamTester.t > 1 then
-			seamTester.cancel();
-			return;
-		end
-		seamTester.s = seamTester.s + seamTester.granS;
-		if seamTester.s > seamTester.sMax then
-			seamTester.s = -seamTester.sMax;
-			seamTester.t = seamTester.t + seamTester.granT;
-		end
-		local xSet = seamTester.x1 + seamTester.t * (seamTester.x2 - seamTester.x1) + seamTester.s * seamTester.normZ;
-		local zSet = seamTester.z1 + seamTester.t * (seamTester.z2 - seamTester.z1) + seamTester.s * seamTester.normX;
-
-		Game.setXPosition(xSet);
+		Game.setXPosition(seamTester.xt);
 		Game.setYPosition(seamTester.highestY); -- Make sure the player doesn't ever go under the floor while testing upward slopes
-		Game.setZPosition(zSet);
+		Game.setZPosition(seamTester.zt);
 
 		-- Make sure the player doesn't slip down slopes while testing
 		neverSlip();
@@ -3181,7 +3180,7 @@ seamTester.simulate = function()
 		local floorDifference = math.abs(newFloor - seamTester.oldFloor);
 
 		-- Keep a log of the previous n positions to make sure we don't lose any magic numbers
-		table.insert(seamTester.positionHistory, 1, {xSet, zSet});
+		table.insert(seamTester.positionHistory, 1, {seamTester.xt, seamTester.zt});
 		if #seamTester.positionHistory >= seamTester.positionHistoryLength then
 			seamTester.positionHistory[#seamTester.positionHistory] = nil;
 		end
@@ -3193,18 +3192,14 @@ seamTester.simulate = function()
 
 		if floorDifference > 10 and newFloor < seamTester.lowestY then
 			print("Possible solution found!");
-			--print("X: "..xSet);
-			--print("Z: "..zSet);
 			print("Last "..seamTester.positionHistoryLength.." positions:");
 			for i = #seamTester.positionHistory, 1, -1 do
 				print("Game.setPosition("..seamTester.positionHistory[i][1]..", "..seamTester.highestY..", "..seamTester.positionHistory[i][2]..")");
 			end
 			print("Current position:");
-			print("Game.setPosition("..xSet..", "..seamTester.highestY..", "..zSet..")");
-			--print("Old Floor: "..seamTester.oldFloor);
+			print("Game.setPosition("..seamTester.xt..", "..seamTester.highestY..", "..seamTester.zt..")");
 			print("Floor: "..newFloor);
-			--print("Floor Difference: "..floorDifference);
-			print("t: "..seamTester.t);
+			print("progress: "..seamTester.progress.."%");
 			print("-------------------");
 			if ScriptHawk.UI.isChecked("cancel_on_found_seam_clip") then
 				client.pause();
@@ -3212,6 +3207,72 @@ seamTester.simulate = function()
 				return;
 			end
 		end
+
+		local oldx = Game.getXPosition();
+		local oldz = Game.getZPosition();
+		local invalidx = true;
+		local invalidz = true;
+
+		if seamTester.grid == 'h' then
+			-- This block makes sure we only test valid positions along the Z axis
+			while (invalidz) do
+				seamTester.zt = seamTester.zt + seamTester.gran;
+				Game.setZPosition(seamTester.zt);
+				if oldz ~= Game.getZPosition() then
+					invalidz = false;
+				end
+			end
+
+			if seamTester.zt > seamTester.zq + (2 * seamTester.bounds) then
+				-- This block makes sure we only test valid positions along the X axis
+				while (invalidx) do
+					seamTester.xq = seamTester.xq + seamTester.gran;
+					seamTester.zq = seamTester.zq + seamTester.gran / seamTester.m;
+					Game.setXPosition(seamTester.xq);
+					if oldx ~= Game.getXPosition() then
+						invalidx = false;
+					end
+				end
+				seamTester.xt = seamTester.xq;
+				seamTester.zt = seamTester.zq;
+				seamTester.progress = 100.0 * (2 * seamTester.bounds + seamTester.zq - seamTester.z1) / (2 * seamTester.bounds + seamTester.z2 - seamTester.z1);
+			end
+
+			if seamTester.xq > seamTester.x2 + seamTester.bounds then -- reached the end
+				seamTester.cancel();
+				return;
+			end
+		else -- grid == v
+			-- this block makes sure we only test valid positions along the X axis
+			while (invalidx) do
+				seamTester.xt = seamTester.xt + seamTester.gran;
+				Game.setXPosition(seamTester.xt);
+				if oldx ~= Game.getXPosition() then
+					invalidx = false;
+				end
+			end
+
+			if seamTester.xt > seamTester.xq + (2*seamTester.bounds) then
+				-- this block makes sure we only test valid positions along the Z axis
+				while (invalidz) do
+					seamTester.xq = seamTester.xq + seamTester.gran * seamTester.m;
+					seamTester.zq = seamTester.zq + seamTester.gran;
+					Game.setZPosition(seamTester.zq);
+					if oldz ~= Game.getZPosition() then
+						invalidz = false;
+					end
+				end
+				seamTester.xt = seamTester.xq;
+				seamTester.zt = seamTester.zq;
+				seamTester.progress = 100.0 * (seamTester.bounds + seamTester.zq - seamTester.z1) / (2 * seamTester.bounds + seamTester.z2 - seamTester.z1);
+			end
+
+			if seamTester.zq > seamTester.z2+seamTester.bounds then -- reached the end
+				seamTester.cancel();
+				return;
+			end
+		end
+
 		seamTester.oldFloor = newFloor;
 	end
 end
@@ -3709,14 +3770,11 @@ function Game.initUI()
 	ScriptHawk.UI.button(5, 9, {4, 8}, nil, nil, "Test Seam", seamTester.testSeamFromUI);
 	ScriptHawk.UI.checkbox(10, 9, "cancel_on_found_seam_clip", "Auto Cancel");
 
-	ScriptHawk.UI.form_controls["sMax Label"] = forms.label(ScriptHawk.UI.options_form, "sMax:", ScriptHawk.UI.col(0) + ScriptHawk.UI.dropdown_offset, ScriptHawk.UI.row(10) + ScriptHawk.UI.dropdown_offset, ScriptHawk.UI.col(1) + 15, ScriptHawk.UI.button_height);
-	ScriptHawk.UI.form_controls["sMax Textbox"] = forms.textbox(ScriptHawk.UI.options_form, seamTester.sMax, ScriptHawk.UI.col(2) + 5, ScriptHawk.UI.button_height, nil, ScriptHawk.UI.col(2) + 4, ScriptHawk.UI.row(10));
+	ScriptHawk.UI.form_controls["bounds Label"] = forms.label(ScriptHawk.UI.options_form, "bounds:", ScriptHawk.UI.col(0) + ScriptHawk.UI.dropdown_offset, ScriptHawk.UI.row(10) + ScriptHawk.UI.dropdown_offset, ScriptHawk.UI.col(1) + 15, ScriptHawk.UI.button_height);
+	ScriptHawk.UI.form_controls["bounds Textbox"] = forms.textbox(ScriptHawk.UI.options_form, seamTester.bounds, ScriptHawk.UI.col(2) + 5, ScriptHawk.UI.button_height, nil, ScriptHawk.UI.col(2) + 4, ScriptHawk.UI.row(10));
 
-	ScriptHawk.UI.form_controls["granT Label"] = forms.label(ScriptHawk.UI.options_form, "granT:", ScriptHawk.UI.col(5) + ScriptHawk.UI.dropdown_offset, ScriptHawk.UI.row(10) + ScriptHawk.UI.dropdown_offset, ScriptHawk.UI.col(1) + 15, ScriptHawk.UI.button_height);
-	ScriptHawk.UI.form_controls["granT Textbox"] = forms.textbox(ScriptHawk.UI.options_form, seamTester.granT, ScriptHawk.UI.col(2) + 5, ScriptHawk.UI.button_height, nil, ScriptHawk.UI.col(7) + 4, ScriptHawk.UI.row(10));
-
-	ScriptHawk.UI.form_controls["granS Label"] = forms.label(ScriptHawk.UI.options_form, "granS:", ScriptHawk.UI.col(10) + ScriptHawk.UI.dropdown_offset, ScriptHawk.UI.row(10) + ScriptHawk.UI.dropdown_offset, ScriptHawk.UI.col(1) + 15, ScriptHawk.UI.button_height);
-	ScriptHawk.UI.form_controls["granS Textbox"] = forms.textbox(ScriptHawk.UI.options_form, seamTester.granS, ScriptHawk.UI.col(2) + 5, ScriptHawk.UI.button_height, nil, ScriptHawk.UI.col(12) + 4, ScriptHawk.UI.row(10));
+	ScriptHawk.UI.form_controls["gran Label"] = forms.label(ScriptHawk.UI.options_form, "granul:", ScriptHawk.UI.col(5) + ScriptHawk.UI.dropdown_offset, ScriptHawk.UI.row(10) + ScriptHawk.UI.dropdown_offset, ScriptHawk.UI.col(1) + 15, ScriptHawk.UI.button_height);
+	ScriptHawk.UI.form_controls["gran Textbox"] = forms.textbox(ScriptHawk.UI.options_form, seamTester.gran, ScriptHawk.UI.col(2) + 5, ScriptHawk.UI.button_height, nil, ScriptHawk.UI.col(7) + 4, ScriptHawk.UI.row(10));
 
 	-- Create Inverse Object_Slot_Variables
 	for k, v in pairs(slot_variables) do
