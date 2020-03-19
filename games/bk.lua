@@ -1487,6 +1487,7 @@ local movementStates = {
 	[142] = "Locked", -- Jiggy podium, Bottles' text outside Mumbo's
 	[143] = "Locked", -- Pumpkin
 	[145] = "Damaged", -- Flying
+	[146] = "Locked", -- Termite
 	[147] = "Locked", -- Pumpkin?
 	[148] = "Locked", -- Mumbo transformation
 	[149] = "Locked", -- Walrus?
