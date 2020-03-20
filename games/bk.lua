@@ -3042,31 +3042,32 @@ function freezeZipVelocity()
 	Game.setYVelocity(Game.Memory.zip_vel);
 end
 
-----------------------
--- Seam Clip Tester --
--- By The8bitbeast  --
-----------------------
+-----------------------------------
+-- Seam Clip Tester              --
+-- By The8bitbeast & ThatCowGuy  --
+-----------------------------------
 
 seamTester = {
 	gran = 0.000001,
 	bounds = 0.0002,
+	offset = 0, -- offset from the first vertex (in case the vertex is inside a wall etc); offset = 0.5 means start in the center of the seam eg.
 	lowestY = -math.huge,
 	highestY = math.huge,
 	x1 = 0,
 	z1 = 0,
 	x2 = 0,
 	z2 = 0,
-	xq = 0, -- q is placeholder position, moves parallel to the actual seam
-	zq = 0,
-	xt = 0, -- t is test position
+	t = 0,-- t factor that goes from 0 -> 1 f(x) = p1(x) * (1 - t) + p2(x) * t
+	xt = 0, -- t is position along the seam; used as an anchor
 	zt = 0,
-	m = 0, -- the slope of the seam as viewed from above (xz plane)
-	grid = 'h', -- h = horizontal testing, v = vertical testing
+	xq = 0, -- q is test position
+	zq = 0,
+	x_align = 0, -- 0 = no, 1 = yes. Used to deduplicate
+	z_align = 0,
 	oldFloor = -math.huge,
 	testing = false,
 	positionHistory = {},
 	positionHistoryLength = 10,
-	progress = 0,
 };
 
 seamTester.testSeamFromUI = function()
@@ -3110,6 +3111,7 @@ end
 seamTester.testSeam = function(x1, z1, x2, z2, y1, y2)
 	seamTester.bounds = tonumber(forms.gettext(ScriptHawk.UI.form_controls["bounds Textbox"]));
 	seamTester.gran = tonumber(forms.gettext(ScriptHawk.UI.form_controls["gran Textbox"]));
+	seamTester.offset = tonumber(forms.gettext(ScriptHawk.UI.form_controls["offset Textbox"]));
 	if seamTester.bounds == nil then
 		print("bounds wasn't a number! Aborting.");
 		return;
@@ -3118,44 +3120,33 @@ seamTester.testSeam = function(x1, z1, x2, z2, y1, y2)
 		print("gran wasn't a number! Aborting.");
 		return;
 	end
-
-	if z1 > z2 then -- Swap the points to avoid a lot of if cases (enforcing z1 < z2)
-		seamTester.x1 = x2;
-		seamTester.z1 = z2;
-		seamTester.x2 = x1;
-		seamTester.z2 = z1;
-	else
-		seamTester.x1 = x1;
-		seamTester.z1 = z1;
-		seamTester.x2 = x2;
-		seamTester.z2 = z2;
+	if seamTester.offset == nil then
+		print("offset wasn't a number! Aborting.");
+		return;
 	end
+
+	if math.abs(z2 - z1) > math.abs(x2 - x1) then
+		-- Seam is more Z Axis aligned => Crossers should be X Axis aligned
+		seamTester.x_align = 1;
+		seamTester.z_align = 0;
+	else
+		-- Seam is more X Axis aligned => Crossers should be Z Axis aligned
+		seamTester.x_align = 0;
+		seamTester.z_align = 1;
+	end
+
+	seamTester.x1 = x1;
+	seamTester.z1 = z1;
+	seamTester.x2 = x2;
+	seamTester.z2 = z2;
 	seamTester.lowestY = math.min(y1, y2);
 	seamTester.highestY = math.max(y1, y2);
 
-	if (seamTester.z2 - seamTester.z1) == 0 then --Edge case for slope calc
-		seamTester.m = math.huge;
-	else
-		seamTester.m = (seamTester.x2 - seamTester.x1) / (seamTester.z2 - seamTester.z1);
-	end
-
-	--seamTester.x1 = seamTester.x1 + 50 * seamTester.m;
-	--seamTester.z1 = seamTester.z1 + 50;
-	--seamTester.x2 = seamTester.x2 + 50 * seamTester.m;
-	--seamTester.z2 = seamTester.z2 + 50;
-
-	if math.atan(math.abs(seamTester.m)) < math.pi / 4.0 then
-		seamTester.grid = 'v';
-		seamTester.zq = seamTester.z1 - seamTester.bounds;
-		seamTester.xq = seamTester.x1 - seamTester.bounds * (seamTester.m + 1.0);
-	else
-		seamTester.grid = 'h';
-		seamTester.zq = seamTester.z1 - seamTester.bounds * ((1.0 / seamTester.m) + 1.0);
-		seamTester.xq = seamTester.x1 - seamTester.bounds;
-	end
-
-	seamTester.xt = seamTester.xq;
-	seamTester.zt = seamTester.zq;
+	seamTester.t = 0.0 - seamTester.bounds + seamTester.offset; -- Extend a bit to cover area around endpoints
+	seamTester.xt = seamTester.x1 * (1.0 - seamTester.t) + seamTester.x2 * seamTester.t;
+	seamTester.zt = seamTester.z1 * (1.0 - seamTester.t) + seamTester.z2 * seamTester.t;
+	seamTester.xq = seamTester.xt - seamTester.bounds * seamTester.x_align;
+	seamTester.zq = seamTester.zt - seamTester.bounds * seamTester.z_align;
 
 	seamTester.oldFloor = -math.huge;
 	seamTester.positionHistory = {};
@@ -3166,6 +3157,7 @@ seamTester.testSeam = function(x1, z1, x2, z2, y1, y2)
 	print("Y: "..seamTester.highestY);
 	print("bounds: "..seamTester.bounds);
 	print("gran: "..seamTester.gran);
+	print("offset: "..seamTester.offset);
 	print("-------------------");
 	seamTester.testing = true;
 	forms.settext(ScriptHawk.UI.form_controls["Test Seam Button"], "Cancel");
@@ -3173,9 +3165,9 @@ end
 
 seamTester.simulate = function()
 	if seamTester.testing then
-		Game.setXPosition(seamTester.xt);
+		Game.setXPosition(seamTester.xq);
 		Game.setYPosition(seamTester.highestY); -- Make sure the player doesn't ever go under the floor while testing upward slopes
-		Game.setZPosition(seamTester.zt);
+		Game.setZPosition(seamTester.zq);
 
 		-- Make sure the player doesn't slip down slopes while testing
 		neverSlip();
@@ -3184,8 +3176,8 @@ seamTester.simulate = function()
 		local floorDifference = math.abs(newFloor - seamTester.oldFloor);
 
 		-- Keep a log of the previous n positions to make sure we don't lose any magic numbers
-		table.insert(seamTester.positionHistory, 1, {seamTester.xt, seamTester.zt});
-		if #seamTester.positionHistory >= seamTester.positionHistoryLength then
+		table.insert(seamTester.positionHistory, 1, {seamTester.xq, seamTester.zq});
+		if #seamTester.positionHistory > seamTester.positionHistoryLength then
 			seamTester.positionHistory[#seamTester.positionHistory] = nil;
 		end
 
@@ -3201,9 +3193,9 @@ seamTester.simulate = function()
 				print("Game.setPosition("..seamTester.positionHistory[i][1]..", "..seamTester.highestY..", "..seamTester.positionHistory[i][2]..")");
 			end
 			print("Current position:");
-			print("Game.setPosition("..seamTester.xt..", "..seamTester.highestY..", "..seamTester.zt..")");
+			print("Game.setPosition("..seamTester.xq..", "..seamTester.highestY..", "..seamTester.zq..")");
 			print("Floor: "..newFloor);
-			print("progress: "..seamTester.progress.."%");
+			print("t: "..seamTester.t);
 			print("-------------------");
 			if ScriptHawk.UI.isChecked("cancel_on_found_seam_clip") then
 				client.pause();
@@ -3214,73 +3206,49 @@ seamTester.simulate = function()
 
 		local oldX = Game.getXPosition();
 		local oldZ = Game.getZPosition();
-		local invalidx = true;
-		local invalidz = true;
+		local invalid_pos = true;
 
-		if seamTester.grid == 'h' then
-			-- This block makes sure we only test valid positions along the Z axis
-			while(invalidz) do
-				seamTester.zt = seamTester.zt + seamTester.gran;
-				Game.setZPosition(seamTester.zt);
-				if oldZ ~= Game.getZPosition() then
-					invalidz = false;
-				end
+		while (invalid_pos) do
+			-- Get Q into new position
+			seamTester.xq = seamTester.xq + seamTester.gran * seamTester.x_align;
+			seamTester.zq = seamTester.zq + seamTester.gran * seamTester.z_align;
+			Game.setXPosition(seamTester.xq);
+			Game.setZPosition(seamTester.zq);
+			-- Test if new position is another float position or not
+			if oldX ~= Game.getXPosition() or oldZ ~= Game.getZPosition() then -- Change in position
+				invalid_pos = false;
 			end
+			-- Test if we exceeded the boundarys for this crossing search
+			if seamTester.xq > seamTester.xt + seamTester.bounds or seamTester.zq > seamTester.zt + seamTester.bounds then
+				-- Get in starting pos of current cross searcher
+				seamTester.xq = seamTester.xt - seamTester.bounds * seamTester.x_align;
+				seamTester.zq = seamTester.zt - seamTester.bounds * seamTester.z_align;
+				Game.setXPosition(seamTester.xq);
+				Game.setZPosition(seamTester.zq);
+				-- Reset these
+				local oldX = Game.getXPosition();
+				local oldZ = Game.getZPosition();
+				local invalid_pos = true;
 
-			if seamTester.zt > seamTester.zq + (2 * seamTester.bounds) then
-				-- This block makes sure we only test valid positions along the X axis
-				while (invalidx) do
-					seamTester.xq = seamTester.xq + seamTester.gran;
-					seamTester.zq = seamTester.zq + seamTester.gran / seamTester.m;
+				while (invalid_pos) do
+					-- Increment t
+					seamTester.t = seamTester.t + seamTester.gran;
+					-- Update T Position
+					seamTester.xt = seamTester.x1 * (1.0 - seamTester.t) + seamTester.x2 * seamTester.t;
+					seamTester.zt = seamTester.z1 * (1.0 - seamTester.t) + seamTester.z2 * seamTester.t;
+					-- Get Q into new position
+					seamTester.xq = seamTester.xt - seamTester.bounds * seamTester.x_align;
+					seamTester.zq = seamTester.zt - seamTester.bounds * seamTester.z_align;
 					Game.setXPosition(seamTester.xq);
-					if oldX ~= Game.getXPosition() then
-						invalidx = false;
-					end
-				end
-				seamTester.xt = seamTester.xq;
-				seamTester.zt = seamTester.zq;
-				seamTester.progress = 100.0 * (2 * seamTester.bounds + seamTester.zq - seamTester.z1) / (2 * seamTester.bounds + seamTester.z2 - seamTester.z1);
-			end
-
-			if seamTester.x2 > seamTester.x1 then
-				if seamTester.xq > seamTester.x2 + seamTester.bounds then -- Reached the end
-					seamTester.cancel();
-					return;
-				end
-			else -- x2 < x1
-				if seamTester.xq < seamTester.x2 - seamTester.bounds then -- Reached the end
-					seamTester.cancel();
-					return;
-				end
-			end
-		else -- grid == v
-			-- This block makes sure we only test valid positions along the X axis
-			while (invalidx) do
-				seamTester.xt = seamTester.xt + seamTester.gran;
-				Game.setXPosition(seamTester.xt);
-				if oldX ~= Game.getXPosition() then
-					invalidx = false;
-				end
-			end
-
-			if seamTester.xt > seamTester.xq + (2 * seamTester.bounds) then
-				-- This block makes sure we only test valid positions along the Z axis
-				while(invalidz) do
-					seamTester.xq = seamTester.xq + seamTester.gran * seamTester.m;
-					seamTester.zq = seamTester.zq + seamTester.gran;
 					Game.setZPosition(seamTester.zq);
-					if oldZ ~= Game.getZPosition() then
-						invalidz = false;
+					-- Test if new position is another float position or not
+					-- Multiplying the X pos checks by z_align, because we only care for a change in X pos if the cross-searches are Z aligned and vice versa
+					if oldX * seamTester.z_align ~= Game.getXPosition() * seamTester.z_align then
+						invalid_pos = false;
+					elseif oldZ * seamTester.x_align ~= Game.getZPosition() * seamTester.x_align then
+						invalid_pos = false;
 					end
 				end
-				seamTester.xt = seamTester.xq;
-				seamTester.zt = seamTester.zq;
-				seamTester.progress = 100.0 * (seamTester.bounds + seamTester.zq - seamTester.z1) / (2 * seamTester.bounds + seamTester.z2 - seamTester.z1);
-			end
-
-			if seamTester.zq > seamTester.z2 + seamTester.bounds then -- Reached the end
-				seamTester.cancel();
-				return;
 			end
 		end
 
@@ -3786,6 +3754,9 @@ function Game.initUI()
 
 	ScriptHawk.UI.form_controls["gran Label"] = forms.label(ScriptHawk.UI.options_form, "granul:", ScriptHawk.UI.col(5) + ScriptHawk.UI.dropdown_offset, ScriptHawk.UI.row(10) + ScriptHawk.UI.dropdown_offset, ScriptHawk.UI.col(1) + 15, ScriptHawk.UI.button_height);
 	ScriptHawk.UI.form_controls["gran Textbox"] = forms.textbox(ScriptHawk.UI.options_form, seamTester.gran, ScriptHawk.UI.col(2) + 5, ScriptHawk.UI.button_height, nil, ScriptHawk.UI.col(7) + 4, ScriptHawk.UI.row(10));
+
+	ScriptHawk.UI.form_controls["offset Label"] = forms.label(ScriptHawk.UI.options_form, "offset:", ScriptHawk.UI.col(10) + ScriptHawk.UI.dropdown_offset, ScriptHawk.UI.row(10) + ScriptHawk.UI.dropdown_offset, ScriptHawk.UI.col(1) + 15, ScriptHawk.UI.button_height);
+	ScriptHawk.UI.form_controls["offset Textbox"] = forms.textbox(ScriptHawk.UI.options_form, seamTester.offset, ScriptHawk.UI.col(2) + 5, ScriptHawk.UI.button_height, nil, ScriptHawk.UI.col(12) + 4, ScriptHawk.UI.row(10));
 
 	-- Create Inverse Object_Slot_Variables
 	for k, v in pairs(slot_variables) do
