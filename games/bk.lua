@@ -8,60 +8,71 @@ end
 local Game = {
 	squish_memory_table = true,
 	Memory = { -- Version order: Europe, Japan, US 1.1, US 1.0
-		fb_pointer = {0x282E00, 0x281E20, 0x281E20, 0x282FE0}, -- Pointer
-		game_time_scale_multiplier = {0x384E60, 0x384FC0, 0x3836A0, 0x384480}, -- Float
-		game_speed_coefficient = {0x3723A0, 0x372B20, 0x371020, 0x371E20}, -- Float
 		frame_timer = {0x280700, 0x27F718, 0x27F718, 0x2808D8}, -- s32_be
-		map_model_pointer = {0x382D38, 0x382E78, 0x381568, 0x382368}, -- See Game.getVertBase()
-		floor_object_pointer = {0x37CBD0, 0x37CD00, 0x37B400, 0x37C200}, -- Pointer
-		carried_object_pointer = {0x37CC68, 0x37CD98, 0x37B498, 0x37C298}, -- Pointer
-		slope_timer = {0x37CCB4, 0x37CDE4, 0x37B4E4, 0x37C2E4}, -- Float
-		beak_bomb_available_timer = {0x37DCF0, 0x37DE20, 0x37C520, 0x37D320}, -- Float
+		fb_pointer = {0x282E00, 0x281E20, 0x281E20, 0x282FE0}, -- Pointer
+		bone_struct_pointer = {0x363BF0, 0x363CC0, 0x362980, 0x363780}, -- Pointer
+		pause_menu_strings_base = {0x36C99C, 0x36CAF0, 0x36B6E0, 0x36C4E0},
+		object_array_pointer = {0x36EAE0, 0x36F260, 0x36D760, 0x36E560},
+		game_speed_coefficient = {0x3723A0, 0x372B20, 0x371020, 0x371E20}, -- Float
 		player_grounded = {0x37C930, 0x37CA60, 0x37B160, 0x37BF60}, -- u32_be
+		first_person_flag = {0x37CBB7, 0x37CCE7, 0x37B3E7, 0x37C1E7},
+		floor_object_pointer = {0x37CBD0, 0x37CD00, 0x37B400, 0x37C200}, -- Pointer
+		x_normal_colliding_surface = {nil, nil, nil, 0x37C258}, -- Float -- TODO: Find on all versions
+		y_normal_colliding_surface = {nil, nil, nil, 0x37C25C}, -- Float -- TODO: Find on all versions
+		z_normal_colliding_surface = {nil, nil, nil, 0x37C260}, -- Float -- TODO: Find on all versions
 		wall_collisions = {0x37CC4D, 0x37CD7D, 0x37B47D, 0x37C27D}, -- u8
+		carried_object_pointer = {0x37CC68, 0x37CD98, 0x37B498, 0x37C298}, -- Pointer
+		target_character = {nil, nil, nil, 0x37C2D0}, -- u32_be -- TODO: Find on all versions
+		x_last_grounded = {nil, nil, nil, 0x37C2D8}, -- Float -- TODO: Find on all versions
+		y_last_grounded = {nil, nil, nil, 0x37C2DC}, -- Float -- TODO: Find on all versions
+		z_last_grounded = {nil, nil, nil, 0x37C2E0}, -- Float -- TODO: Find on all versions
+		peak_y_2 = {nil, nil, nil, 0x37C2F0}, -- Float -- TODO: Find on all versions
+		peak_y_1 = {nil, nil, nil, 0x37C2F4}, -- Float -- TODO: Find on all versions
+		slope_timer = {0x37CCB4, 0x37CDE4, 0x37B4E4, 0x37C2E4}, -- Float
 		moves_bitfield = {0x37CD70, 0x37CEA0, 0x37B5A0, 0x37C3A0}, -- 4 Byte, Bitfield
 		x_velocity = {0x37CE88, 0x37CFB8, 0x37B6B8, 0x37C4B8}, -- Float, divide by framerate (to match dXZ,dY scale)
 		y_velocity = {0x37CE8C, 0x37CFBC, 0x37B6BC, 0x37C4BC}, -- Float, divide by framerate (to match dXZ,dY scale)
 		z_velocity = {0x37CE90, 0x37CFC0, 0x37B6C0, 0x37C4C0}, -- Float, divide by framerate (to match dXZ,dY scale)
+		gravity = {0x37CEB8, 0x37CFE8, 0x37B6E8, 0x37C4E8}, -- Float, divide by framerate
+		x_rotation = {0x37CF10, 0x37D040, 0x37B740, 0x37C540}, -- Float
 		x_position = {0x37CF70, 0x37D0A0, 0x37B7A0, 0x37C5A0}, -- Float
 		y_position = {0x37CF74, 0x37D0A4, 0x37B7A4, 0x37C5A4}, -- Float
 		z_position = {0x37CF78, 0x37D0A8, 0x37B7A8, 0x37C5A8}, -- Float
-		x_rotation = {0x37CF10, 0x37D040, 0x37B740, 0x37C540}, -- Float
+		z_rotation = {0x37D050, 0x37D180, 0x37B880, 0x37C680}, -- Float
 		y_rotation = {0x37D060, 0x37D190, 0x37B890, 0x37C690}, -- Float
 		facing_angle = {0x37D060, 0x37D190, 0x37B890, 0x37C690}, -- Float
 		moving_angle = {0x37D064, 0x37D194, 0x37B894, 0x37C694}, -- Float
-		z_rotation = {0x37D050, 0x37D180, 0x37B880, 0x37C680}, -- Float
-		jiggy_spawn_angle = {0x37E784, 0x37E8C4, 0x37CFB4, 0x37DDB4}, -- Float
-		jiggy_spawn_velocity = {0x37E788, 0x37E8C8, 0x37CFB8, 0x37DDB8}, -- Float
-		gravity = {0x37CEB8, 0x37CFE8, 0x37B6E8, 0x37C4E8}, -- Float, divide by framerate
+		previous_movement_state = {0x37DB30, 0x37DC60, 0x37C360, 0x37D160},
+		current_movement_state = {0x37DB34, 0x37DC64, 0x37C364, 0x37D164},
+		current_character = {0x37DB58, 0x37DC88, 0x37C388, 0x37D188}, -- u8
+		beak_bomb_available_timer = {0x37DCF0, 0x37DE20, 0x37C520, 0x37D320}, -- Float
+		jiggy_grabbed_behavior_struct_pointer = {0x37DE84, 0x37DFB4, 0x37C6B4, 0x37D4B4}, -- Pointer
 		camera_x_position = {0x37E328, 0x37E458, 0x37CB58, 0x37D958}, -- Float
 		camera_y_position = {0x37E32C, 0x37E45C, 0x37CB5C, 0x37D95C}, -- Float
 		camera_z_position = {0x37E330, 0x37E460, 0x37CB60, 0x37D960}, -- Float
 		camera_x_rotation = {0x37E338, 0x37E468, 0x37CB68, 0x37D968}, -- Float
 		camera_y_rotation = {0x37E33C, 0x37E46C, 0x37CB6C, 0x37D96C}, -- Float
-		first_person_flag = {0x37CBB7, 0x37CCE7, 0x37B3E7, 0x37C1E7},
 		first_person_cam_x_pos = {0x37E630, 0x37E760, 0x37CE60, 0x37DC60}, -- Float
 		first_person_cam_y_pos = {0x37E634, 0x37E764, 0x37CE64, 0x37DC64}, -- Float
 		first_person_cam_z_pos = {0x37E638, 0x37E768, 0x37CE68, 0x37DC68}, -- Float
 		first_person_cam_x_rot = {0x37E63C, 0x37E76C, 0x37CE6C, 0x37DC6C}, -- Float
 		first_person_cam_y_rot = {0x37E640, 0x37E770, 0x37CE70, 0x37DC70}, -- Float
-		previous_movement_state = {0x37DB30, 0x37DC60, 0x37C360, 0x37D160},
-		current_movement_state = {0x37DB34, 0x37DC64, 0x37C364, 0x37D164},
+		jiggy_spawn_angle = {0x37E784, 0x37E8C4, 0x37CFB4, 0x37DDB4}, -- Float
+		jiggy_spawn_velocity = {0x37E788, 0x37E8C8, 0x37CFB8, 0x37DDB8}, -- Float
 		map = {0x37F2C5, 0x37F405, 0x37DAF5, 0x37E8F5},
-		ff_question_pointer = {0x383AC0, 0x383C20, 0x382300, 0x3830E0},
-		ff_pattern = {0x383BA2, 0x383D02, 0x3823E2, 0x3831C2},
-		collectable_base = {0x386910, 0x386A70, 0x385150, 0x385F30},
-		object_array_pointer = {0x36EAE0, 0x36F260, 0x36D760, 0x36E560},
 		struct_array_pointer = {0x382970, 0x382AB0, 0x3811A0, 0x381FA0},
-		board_base = {0x394140, 0x394350, 0x3929C0, 0x393760},
-		pause_menu_strings_base = {0x36C99C, 0x36CAF0, 0x36B6E0, 0x36C4E0},
+		map_model_pointer = {0x382D38, 0x382E78, 0x381568, 0x382368}, -- See Game.getVertBase()
 		return_to_lair_enabled = {0x383A60, 0x383BC0, 0x3822A0, 0x383080},
 		game_progress_bitfield = {0x383B88, 0x383D18, 0x3823F8, 0x3831A8},
+		strict_bitfield = { 0x383BB8, 0x383D48, 0x382428, 0x3831D8},
 		jiggy_bitfield = {0x383CA0, 0x383E00, 0x3824E0, 0x3832C0},
-		jiggy_grabbed_behavior_struct_pointer = {0x37DE84, 0x37DFB4, 0x37C6B4, 0x37D4B4},
 		honeycomb_bitfield = {0x383CC0, 0x383E20, 0x382500, 0x3832E0},
 		mumbo_token_bitfield = {0x383CD0, 0x383E30, 0x382510, 0x3832F0},
-		strict_bitfield = { 0x383BB8, 0x383D48, 0x382428, 0x3831d8},
+		ff_question_pointer = {0x383AC0, 0x383C20, 0x382300, 0x3830E0},
+		ff_pattern = {0x383BA2, 0x383D02, 0x3823E2, 0x3831C2},
+		game_time_scale_multiplier = {0x384E60, 0x384FC0, 0x3836A0, 0x384480}, -- Float
+		collectable_base = {0x386910, 0x386A70, 0x385150, 0x385F30},
+		board_base = {0x394140, 0x394350, 0x3929C0, 0x393760},
 		clip_vel = {-2900, -3500, -3500, -3500}, -- Minimum velocity required to clip on the Y axis -- TODO: This seems to be different for different geometry
 		zip_vel = {-1300, -1600, -1600, -1600}, -- See Game.predictZip()
 	},
@@ -70,7 +81,7 @@ local Game = {
 	speedy_index = 9,
 	rot_speed = 0.5,
 	max_rot_units = 360,
-	form_height = 13,
+	form_height = 14,
 	maps = {
 		"SM - Spiral Mountain",
 		"MM - Mumbo's Mountain",
@@ -225,6 +236,28 @@ local Game = {
 		"End Scene 4",
 		"Intro - Grunty Threat 1",
 		"Intro - Grunty Threat 2"
+	},
+	boneNames = {
+		[1] = {"B-Head", "T-Head", "P-Top", "W-Left-Tooth", "C-Eyesocket", "Bee-Snout", ""},
+		[2] = {"B-Hip", "T-Butt", "P-Bottom", "W-Tail", "C-Tailstart", "Bee-Wing Pivot", ""},
+		[3] = {"B-Right Hand", "", "", "", "C-Snout", "", ""},
+		[4] = {"B-Left Hand", "", "", "", "", "", ""},
+		[5] = {"B-Right Foot", "", "", "", "", "", ""},
+		[6] = {"B-Left Foot", "", "", "", "", "", ""},
+		[7] = {"B-Snout", "", "", "", "", "", ""},
+		[8] = {"K-Beak", "", "", "", "", "", ""},
+		[9] = {"", "", "", "W-Right Tooth", "", "", ""},
+	},
+	boneOffsets = {
+		[1] = 0x14,
+		[2] = 0x20,
+		[3] = 0x44,
+		[4] = 0x50,
+		[5] = 0x5C,
+		[6] = 0x68,
+		[7] = 0x74,
+		[8] = 0x80,
+		[9] = 0x8C,
 	},
 };
 
@@ -2799,6 +2832,29 @@ function Game.getVertBase()
 	end
 end
 
+function Game.getCharacter()
+	return mainmemory.read_u8(Game.Memory.current_character);
+end
+
+local characters = {
+	["Banjo-Kazooie"] = 1,
+	["Termite"] = 2,
+	["Pumpkin"] = 3,
+	["Walrus"] = 4,
+	["Croc"] = 5,
+	["Bee"] = 6,
+	["Washing Machine"] = 7
+};
+
+local function changeCharacterFromUI()
+	local character = characters[forms.gettext(ScriptHawk.UI.form_controls.character_dropdown)];
+	if character >= 1 and character <= 7 then
+		mainmemory.write_u8(Game.Memory.current_character, character);
+		-- Force the game to reload the map
+		mainmemory.writebyte(Game.Memory.map - 1, 0x01);
+	end
+end
+
 function Game.getXPosition()
 	return mainmemory.readfloat(Game.Memory.x_position, true);
 end
@@ -2829,15 +2885,41 @@ function Game.setZPosition(value)
 	mainmemory.writefloat(Game.Memory.z_position + 0x10, value, true);
 end
 
--- In one frame
--- TODO: Allow n frames ahead
-function Game.getPredictedYPosition()
+-- Returns how much should be added to Y velocity per frame
+function Game.getGravity()
 	local frameRate = Game.getFrameRate();
-	local gravity = mainmemory.readfloat(Game.Memory.gravity, true) / frameRate;
+	local gravity = mainmemory.readfloat(Game.Memory.gravity, true);
 	if mainmemory.read_u32_be(Game.Memory.current_movement_state) == 36 then -- Flying
 		gravity = 0;
 	end
-	return Game.getYPosition() + ((Game.getYVelocity() + gravity) / frameRate);
+	return gravity / frameRate;
+end
+
+function Game.getTerminalVelocity()
+	local terminalVelocity = -4000;
+	if mainmemory.read_u32_be(Game.Memory.current_movement_state) == 15 then -- Beak Bust
+		terminalVelocity = -5000;
+	end
+	return terminalVelocity;
+end
+
+-- In num physics frames
+function Game.getPredictedYPosition(num)
+	local frameRate = Game.getFrameRate();
+	local gravity = Game.getGravity();
+	local terminalVelocity = Game.getTerminalVelocity();
+
+	if num == nil then
+		num = 0;
+	end
+
+	local yPos = Game.getYPosition();
+	local yVel = Game.getYVelocity();
+	for i = 0, num do
+		yVel = math.max(yVel + gravity, terminalVelocity);
+		yPos = yPos + (yVel / frameRate);
+	end
+	return math.max(yPos, Game.getFloor());
 end
 
 Game.predictedZipFrame = nil;
@@ -2853,30 +2935,28 @@ end
 
 function Game.predictZip()
 	local frameRate = Game.getFrameRate();
-	local gravity = mainmemory.readfloat(Game.Memory.gravity, true) / frameRate;
-	local floor = Game.getFloor();
-	local yPos = Game.getYPosition();
-	local yVel = Game.getYVelocity();
-	local yPosRelativeToFloor;
-	local inAir = mainmemory.read_u32_be(Game.Memory.current_movement_state) == 36;
+	local gravity = Game.getGravity();
+	local terminalVelocity = Game.getTerminalVelocity();
 
 	Game.zipPredicted = false;
-	if gravity < 0 then
-		for i = 0, 600 do -- Search max 600 frames ahead
-			yPosRelativeToFloor = yPos - floor;
-			if yPosRelativeToFloor < 0 then
-				Game.yPosRelativeToFloor = yPosRelativeToFloor;
-				Game.landingFrame = i;
-				if yPosRelativeToFloor <= -56 and yPosRelativeToFloor > -66 then
-					Game.zipPredicted = true;
-				end
-				break;
+
+	local yPos = Game.getYPosition();
+	local yVel = Game.getYVelocity();
+	local floor = Game.getFloor();
+	local yPosRelativeToFloor;
+	for i = 0, 600 do -- Search max 600 frames ahead
+		yPosRelativeToFloor = yPos - floor;
+		if yPosRelativeToFloor < 0 then
+			Game.yPosRelativeToFloor = yPosRelativeToFloor;
+			Game.landingFrame = i;
+			-- Zip window, this isn't fully understood yet
+			if yPosRelativeToFloor <= -56 and yPosRelativeToFloor > -66 then
+				Game.zipPredicted = true;
 			end
-			if not inAir then
-				yVel = yVel + gravity;
-			end
-			yPos = yPos + (yVel / frameRate);
+			break;
 		end
+		yVel = math.max(yVel + gravity, terminalVelocity);
+		yPos = yPos + (yVel / frameRate);
 	end
 	return Game.zipPredicted;
 end
@@ -3142,7 +3222,7 @@ seamTester.testSeam = function(x1, z1, x2, z2, y1, y2)
 	seamTester.lowestY = math.min(y1, y2);
 	seamTester.highestY = math.max(y1, y2);
 
-	seamTester.t = 0.0 - seamTester.bounds + seamTester.offset; -- Extend a bit to cover area around endpoints
+	seamTester.t = 0.0 + seamTester.offset; -- offset 0.5 means start in the center of the seam
 	seamTester.xt = seamTester.x1 * (1.0 - seamTester.t) + seamTester.x2 * seamTester.t;
 	seamTester.zt = seamTester.z1 * (1.0 - seamTester.t) + seamTester.z2 * seamTester.t;
 	seamTester.xq = seamTester.xt - seamTester.bounds * seamTester.x_align;
@@ -3186,7 +3266,7 @@ seamTester.simulate = function()
 			floorDifference = 0;
 		end
 
-		if floorDifference > 10 and newFloor < seamTester.lowestY then
+		if floorDifference > 100 and newFloor < seamTester.lowestY then
 			print("Possible solution found!");
 			print("Last "..seamTester.positionHistoryLength.." positions:");
 			for i = #seamTester.positionHistory, 1, -1 do
@@ -3206,9 +3286,9 @@ seamTester.simulate = function()
 
 		local oldX = Game.getXPosition();
 		local oldZ = Game.getZPosition();
-		local invalid_pos = true;
+		local invalidPosition = true;
 
-		while (invalid_pos) do
+		while invalidPosition do
 			-- Get Q into new position
 			seamTester.xq = seamTester.xq + seamTester.gran * seamTester.x_align;
 			seamTester.zq = seamTester.zq + seamTester.gran * seamTester.z_align;
@@ -3216,7 +3296,7 @@ seamTester.simulate = function()
 			Game.setZPosition(seamTester.zq);
 			-- Test if new position is another float position or not
 			if oldX ~= Game.getXPosition() or oldZ ~= Game.getZPosition() then -- Change in position
-				invalid_pos = false;
+				invalidPosition = false;
 			end
 			-- Test if we exceeded the boundarys for this crossing search
 			if seamTester.xq > seamTester.xt + seamTester.bounds or seamTester.zq > seamTester.zt + seamTester.bounds then
@@ -3228,11 +3308,16 @@ seamTester.simulate = function()
 				-- Reset these
 				local oldX = Game.getXPosition();
 				local oldZ = Game.getZPosition();
-				local invalid_pos = true;
+				local invalidPosition = true;
 
-				while (invalid_pos) do
+				while invalidPosition do
 					-- Increment t
 					seamTester.t = seamTester.t + seamTester.gran;
+					-- Stop when the end of the Seam is reached
+					if seamTester.t > 1.0 then
+						seamTester.cancel();
+						return;
+					end
 					-- Update T Position
 					seamTester.xt = seamTester.x1 * (1.0 - seamTester.t) + seamTester.x2 * seamTester.t;
 					seamTester.zt = seamTester.z1 * (1.0 - seamTester.t) + seamTester.z2 * seamTester.t;
@@ -3244,14 +3329,13 @@ seamTester.simulate = function()
 					-- Test if new position is another float position or not
 					-- Multiplying the X pos checks by z_align, because we only care for a change in X pos if the cross-searches are Z aligned and vice versa
 					if oldX * seamTester.z_align ~= Game.getXPosition() * seamTester.z_align then
-						invalid_pos = false;
+						invalidPosition = false;
 					elseif oldZ * seamTester.x_align ~= Game.getZPosition() * seamTester.x_align then
-						invalid_pos = false;
+						invalidPosition = false;
 					end
 				end
 			end
 		end
-
 		seamTester.oldFloor = newFloor;
 	end
 end
@@ -3260,6 +3344,29 @@ seamTester.cancel = function()
 	print("SEAM TEST ENDED");
 	forms.settext(ScriptHawk.UI.form_controls["Test Seam Button"], "Test Seam");
 	seamTester.testing = false;
+end
+
+-----------------
+-- Bone Struct --
+-----------------
+
+function Game.getBone(num)
+	local boneStruct = dereferencePointer(Game.Memory.bone_struct_pointer);
+	if isRDRAM(boneStruct) then
+		-- Only 1 - 9 are valid Bones
+		if num >= 1 and num <= 9 then
+			if Game.boneNames[num][Game.getCharacter()] == "" then
+				print("Bone "..num.." unused");
+			else
+				print(Game.boneNames[num][Game.getCharacter()]);
+				print("X:" .. mainmemory.readfloat(boneStruct +  Game.boneOffsets[num] + 0x00, true));
+				print("Y:" .. mainmemory.readfloat(boneStruct +  Game.boneOffsets[num] + 0x04, true));
+				print("Z:" .. mainmemory.readfloat(boneStruct +  Game.boneOffsets[num] + 0x08, true));
+			end
+		else
+			print("Bone "..num.." unused");
+		end
+	end
 end
 
 -------------------
@@ -3734,6 +3841,10 @@ function Game.initUI()
 		-- Moves
 		ScriptHawk.UI.form_controls.moves_dropdown = forms.dropdown(ScriptHawk.UI.options_form, { "5. All Minus Swim", "4. None", "3. SM 100%", "2. FFM Setup", "1. All", "0. Demo" }, ScriptHawk.UI.col(10) + ScriptHawk.UI.dropdown_offset, ScriptHawk.UI.row(5) + ScriptHawk.UI.dropdown_offset, ScriptHawk.UI.col(4) + 8, ScriptHawk.UI.button_height);
 		ScriptHawk.UI.button(10, 6, {4, 8}, nil, nil, "Unlock Moves", unlock_moves);
+
+		-- Character
+		ScriptHawk.UI.form_controls.character_dropdown = forms.dropdown(ScriptHawk.UI.options_form, { "Banjo-Kazooie", "Termite", "Walrus", "Croc", "Pumpkin", "Bee", "Washing Machine" }, ScriptHawk.UI.col(0) + ScriptHawk.UI.dropdown_offset, ScriptHawk.UI.row(11) + ScriptHawk.UI.dropdown_offset, ScriptHawk.UI.col(4) + 8, ScriptHawk.UI.button_height);
+		ScriptHawk.UI.button(5, 11, {4, 8}, nil, nil, "Change", changeCharacterFromUI);
 	else
 		-- Use a bigger check flags button if the others are hidden by TASSafe
 		ScriptHawk.UI.button(10, 8, {4, 10}, nil, "Check Flag Button", "Check Flag", flagCheckButtonHandler);
