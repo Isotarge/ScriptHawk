@@ -9511,24 +9511,24 @@ ScriptHawk.bindKeyFrame("L", increaseRNGLock, false);
 -------------------------------------
 
 function Game.CycleRNG(oldRNGValue)
-    local multiplicationResult = Multiply(oldRNGValue,0x01DF5E0D);
-    local lower32 = tonumber("0x"..string.sub(tostring(bizstring.hex(multiplicationResult)),-8))
-    local newRNGValue = bit.band(lower32 + 1, 0xFFFFFFFF);
-    return newRNGValue;
+	local multiplicationResult = Multiply(oldRNGValue,0x01DF5E0D);
+	local lower32 = tonumber("0x"..string.sub(tostring(bizstring.hex(multiplicationResult)),-8))
+	local newRNGValue = bit.band(lower32 + 1, 0xFFFFFFFF);
+	return newRNGValue;
 end
 
 function Multiply(a, b)
-    local c = 0;
-    while b > 0 do
-        if bit.band(b, 1) > 0 then
-            c = c + a;
-        else
-            c = c + 0;
-        end
-        a = bit.lshift(a, 1);
-        b = bit.rshift(b, 1);
-    end
-    return c;
+	local c = 0;
+	while b > 0 do
+		if bit.band(b, 1) > 0 then
+			c = c + a;
+		else
+			c = c + 0;
+		end
+		a = bit.lshift(a, 1);
+		b = bit.rshift(b, 1);
+	end
+	return c;
 end
 
 function Game.calculateCycleCount(input,output)

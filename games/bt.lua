@@ -8,7 +8,7 @@ end
 encircle_enabled = false;
 object_filter = nil; -- String
 
-local Game = {
+Game = {
 	maps = {
 		"!Unknown 0x0001", "!Unknown 0x0002", "!Unknown 0x0003", "!Unknown 0x0004", "!Unknown 0x0005", "!Unknown 0x0006", "!Unknown 0x0007", "!Unknown 0x0008", "!Unknown 0x0009", "!Unknown 0x000A", "!Unknown 0x000B", "!Unknown 0x000C", "!Unknown 0x000D", "!Unknown 0x000E", "!Unknown 0x000F",
 		"!Unknown 0x0010", "!Unknown 0x0011", "!Unknown 0x0012", "!Unknown 0x0013", "!Unknown 0x0014", "!Unknown 0x0015", "!Unknown 0x0016", "!Unknown 0x0017", "!Unknown 0x0018", "!Unknown 0x0019", "!Unknown 0x001A", "!Unknown 0x001B", "!Unknown 0x001C", "!Unknown 0x001D", "!Unknown 0x001E", "!Unknown 0x001F",
@@ -308,6 +308,9 @@ local Game = {
 		frame_timer = {0x083550, 0x083550, 0x0788F8, 0x079138},
 		linked_list_root = {0x13C380, 0x13C680, 0x131850, 0x137800},
 		map = {0x137B42, 0x137DD2, 0x12CF92, 0x132DC2},
+		map_model_pointer = {0x12D30C, 0x12D51C, 0x12276C, 0x1285BC},
+		--map_model_pointer = {0x1301D8, 0x130468, 0x125628, 0x12B458},
+		--map_model_pointer = {0x1306B0, 0x13091C, 0x125B30, 0x12B960},
 		map_trigger_target = {0x12C390, 0x12C5A0, 0x1217F0, 0x127640},
 		map_trigger = {0x12C392, 0x12C5A2, 0x1217F2, 0x127642},
 		map_destination = {0x044E32, 0x044E32, 0x044EB2, 0x045702},
@@ -334,6 +337,7 @@ local Game = {
 	speedy_index = 7,
 	rot_speed = 10,
 	max_rot_units = 360,
+	form_height = 12,
 	character_states = {
 		-- 0 Occurs during game boot-up
 		[1] = "Banjo-Kazooie", -- Doesn't matter if you're Dragon Kazooie
@@ -401,6 +405,8 @@ local eep_checksum = {
 --------------------
 -- Region/Version --
 --------------------
+
+require "lib.BanjoCommonFunctions";
 
 function Game.detectVersion(romName, romHash)
 	-- Read EEPROM checksums
@@ -740,12 +746,6 @@ function Game.setZPosition(value)
 	end
 end
 
-function Game.getPredictedYPosition()
-	local frameRate = Game.getFrameRate();
-	local currentGravity = Game.getGravity() / frameRate;
-	return Game.getYPosition() + ((Game.getYVelocity() + currentGravity) / frameRate);
-end
-
 --------------
 -- Velocity --
 --------------
@@ -797,15 +797,33 @@ function Game.getTerminalVelocity()
 	return 0;
 end
 
-function Game.getFloor()
+function Game.getFloorObject()
 	local floorObject = Game.getPlayerSubObject(floor_pointer_index);
 	if isRDRAM(floorObject) then
 		floorObject = dereferencePointer(floorObject); -- Gotta dereference again
 		if isRDRAM(floorObject) then
-			return mainmemory.readfloat(floorObject + 0x70, true);
+			return floorObject;
 		end
 	end
+end
+
+function Game.getFloor()
+	local floorObject = Game.getFloorObject();
+	if isRDRAM(floorObject) then
+		return mainmemory.readfloat(floorObject + 0x70, true);
+	end
 	return 0;
+end
+
+function Game.getVertBase()
+	local mapModel = dereferencePointer(Game.Memory.map_model_pointer);
+	if isRDRAM(mapModel) then
+		local vertOffset = mainmemory.read_u32_be(mapModel + 0x10);
+		local vertBase = mapModel + vertOffset + 0x18;
+		if isRDRAM(vertBase) then
+			return vertBase;
+		end
+	end
 end
 
 function Game.setXVelocity(value)
@@ -893,7 +911,7 @@ end
 -- Never Slip --
 ----------------
 
-local function neverSlip()
+function Game.neverSlip()
 	local slope_object = Game.getPlayerSubObject(slope_pointer_index);
 	if isRDRAM(slope_object) then
 		mainmemory.writefloat(slope_object + slope_timer, 0.0, true);
@@ -5643,6 +5661,8 @@ function Game.initUI()
 
 	ScriptHawk.UI.checkbox(5, 6, "toggle_autojump", "Autojump");
 
+	seamTester.initUI(8);
+
 	flagStats();
 end
 
@@ -5651,8 +5671,9 @@ function Game.onLoadState()
 end
 
 function Game.eachFrame()
+	seamTester.simulate();
 	if ScriptHawk.UI.ischecked("toggle_neverslip") then
-		neverSlip();
+		Game.neverSlip();
 	end
 	if ScriptHawk.UI.ischecked("toggle_autojump") then
 		autoJump();
@@ -5702,6 +5723,10 @@ Game.OSD = {
 	{"Z", category="position"},
 	{"Separator"},
 	{"Floor", Game.getFloor, category="position"},
+	{"Seam Dist", Game.getVertDist, category="floorProperties"},
+	{"Floor Vert1", function() return Game.getFloorTriangleVertPosition(0) end, category="floorProperties"},
+	{"Floor Vert2", function() return Game.getFloorTriangleVertPosition(1) end, category="floorProperties"},
+	{"Floor Vert3", function() return Game.getFloorTriangleVertPosition(2) end, category="floorProperties"},
 	{"Next Y Pos", Game.getPredictedYPosition, category="positionStats"},
 	{"Separator"},
 	{"dY", category="positionStats"},
