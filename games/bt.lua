@@ -310,6 +310,7 @@ Game = {
 		map = {0x137B42, 0x137DD2, 0x12CF92, 0x132DC2},
 		map_model_pointer = {0x12D30C, 0x12D51C, 0x12276C, 0x1285BC},
 		--map_model_pointer = {0x1301D8, 0x130468, 0x125628, 0x12B458},
+		water_model_pointer = {0x1301DC, 0x13046C, 0x12562C, 0x12B45C},
 		--map_model_pointer = {0x1306B0, 0x13091C, 0x125B30, 0x12B960},
 		map_trigger_target = {0x12C390, 0x12C5A0, 0x1217F0, 0x127640},
 		map_trigger = {0x12C392, 0x12C5A2, 0x1217F2, 0x127642},
@@ -813,17 +814,6 @@ function Game.getFloor()
 		return mainmemory.readfloat(floorObject + 0x70, true);
 	end
 	return 0;
-end
-
-function Game.getVertBase()
-	local mapModel = dereferencePointer(Game.Memory.map_model_pointer);
-	if isRDRAM(mapModel) then
-		local vertOffset = mainmemory.read_u32_be(mapModel + 0x10);
-		local vertBase = mapModel + vertOffset + 0x18;
-		if isRDRAM(vertBase) then
-			return vertBase;
-		end
-	end
 end
 
 function Game.setXVelocity(value)
@@ -1457,10 +1447,18 @@ function Game.setMovementState(state)
 	end
 end
 
-function Game.playerIsGrounded()
+function Game.isGrounded()
 	local playerGroundedObject = Game.getPlayerSubObject(grounded_pointer_index);
 	if isRDRAM(playerGroundedObject) then
 		return mainmemory.readbyte(playerGroundedObject + 2) == 1;
+	end
+	return false;
+end
+
+function Game.isInWater()
+	local playerGroundedObject = Game.getPlayerSubObject(grounded_pointer_index);
+	if isRDRAM(playerGroundedObject) then
+		return mainmemory.readbyte(playerGroundedObject + 0) == 1;
 	end
 	return false;
 end
@@ -2328,7 +2326,7 @@ function autoJump()
 	local YVelocity = Game.getYVelocity();
 
 	-- Frame perfect mid air talon trot slide jump
-	if (currentMovementState == 0x15 and not Game.playerIsGrounded()) or holdingAPostJump then
+	if (currentMovementState == 0x15 and not Game.isGrounded()) or holdingAPostJump then
 		holdingAPostJump = true;
 		if holdingAPostJump then
 			holdingAPostJump = holdingAPostJump and (currentMovementState == 0x15 or YVelocity > 0); -- TODO: Better method for detecting end of a jump, velocity > 0 is janky
@@ -5723,7 +5721,7 @@ Game.OSD = {
 	{"Z", category="position"},
 	{"Separator"},
 	{"Floor", Game.getFloor, category="position"},
-	{"Seam Dist", Game.getVertDist, category="floorProperties"},
+	{"Seam Dist", Game.getSeamDist, category="floorProperties"},
 	{"Floor Vert1", function() return Game.getFloorTriangleVertPosition(0) end, category="floorProperties"},
 	{"Floor Vert2", function() return Game.getFloorTriangleVertPosition(1) end, category="floorProperties"},
 	{"Floor Vert3", function() return Game.getFloorTriangleVertPosition(2) end, category="floorProperties"},
@@ -5749,7 +5747,8 @@ Game.OSD = {
 	{"Movement", Game.getCurrentMovementStateOSD, category="movement"},
 	{"Animation", Game.getAnimationOSD, category="animation"},
 	{"Slope Timer", Game.getSlopeTimer, Game.colorSlopeTimer, category="floorProperties"},
-	{"Grounded", Game.playerIsGrounded, category="floorProperties"},
+	{"Grounded", Game.isGrounded, category="floorProperties"},
+	{"In Water", Game.isInWater, category="floorProperties"},
 	{"Separator"},
 	{"Camera", hexifyOSD(Game.getCameraObject), category="camera"},
 	{"Camera X", Game.getCameraXPosition, category="camera"},

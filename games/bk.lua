@@ -15,6 +15,7 @@ Game = {
 		object_array_pointer = {0x36EAE0, 0x36F260, 0x36D760, 0x36E560},
 		game_speed_coefficient = {0x3723A0, 0x372B20, 0x371020, 0x371E20}, -- Float
 		player_grounded = {0x37C930, 0x37CA60, 0x37B160, 0x37BF60}, -- u32_be
+		player_in_water = {0x37C931, 0x37CA61, 0x37B161, 0x37BF61}, -- u32_be
 		first_person_flag = {0x37CBB7, 0x37CCE7, 0x37B3E7, 0x37C1E7},
 		floor_object_pointer = {0x37CBD0, 0x37CD00, 0x37B400, 0x37C200}, -- Pointer
 		x_normal_colliding_surface = {nil, nil, nil, 0x37C258}, -- Float -- TODO: Find on all versions
@@ -62,6 +63,7 @@ Game = {
 		map = {0x37F2C5, 0x37F405, 0x37DAF5, 0x37E8F5},
 		struct_array_pointer = {0x382970, 0x382AB0, 0x3811A0, 0x381FA0},
 		map_model_pointer = {0x382D38, 0x382E78, 0x381568, 0x382368}, -- See Game.getVertBase()
+		water_model_pointer = {0x382D3C, 0x382E7C, 0x38156C, 0x38236C}, -- See Game.getWaterVertBase()
 		return_to_lair_enabled = {0x383A60, 0x383BC0, 0x3822A0, 0x383080},
 		game_progress_bitfield = {0x383B88, 0x383D18, 0x3823F8, 0x3831A8},
 		strict_bitfield = { 0x383BB8, 0x383D48, 0x382428, 0x3831D8},
@@ -387,6 +389,10 @@ end
 
 function Game.isGrounded()
 	return mainmemory.read_u32_be(Game.Memory.player_grounded) > 0;
+end
+
+function Game.isInWater()
+	return mainmemory.read_u32_be(Game.Memory.player_in_water) > 0;
 end
 
 function Game.getWallCollisions()
@@ -2738,17 +2744,6 @@ function Game.getFloor()
 	return 0;
 end
 
-function Game.getVertBase()
-	local mapModel = dereferencePointer(Game.Memory.map_model_pointer);
-	if isRDRAM(mapModel) then
-		local vertOffset = mainmemory.read_u32_be(mapModel + 0x10);
-		local vertBase = mapModel + vertOffset + 0x18;
-		if isRDRAM(vertBase) then
-			return vertBase;
-		end
-	end
-end
-
 function Game.getCharacter()
 	return mainmemory.read_u8(Game.Memory.current_character);
 end
@@ -3633,7 +3628,7 @@ Game.OSD = {
 	{"Z", category="position"},
 	{"Separator"},
 	{"Floor", Game.getFloor, category="floorProperties"},
-	{"Seam Dist", Game.getVertDist, category="floorProperties"},
+	{"Seam Dist", Game.getSeamDist, category="floorProperties"},
 	{"Floor Vert1", function() return Game.getFloorTriangleVertPosition(0) end, category="floorProperties"},
 	{"Floor Vert2", function() return Game.getFloorTriangleVertPosition(1) end, category="floorProperties"},
 	{"Floor Vert3", function() return Game.getFloorTriangleVertPosition(2) end, category="floorProperties"},

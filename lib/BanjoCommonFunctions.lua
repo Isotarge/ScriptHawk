@@ -17,12 +17,39 @@ function Game.getPredictedYPosition(num)
 	return math.max(yPos, Game.getFloor());
 end
 
-function Game.getVertDist()
-	local verts = {
-		[0] = Game.getFloorTriangleVertPositionRaw(0),
-		[1] = Game.getFloorTriangleVertPositionRaw(1),
-		[2] = Game.getFloorTriangleVertPositionRaw(2),
-	};
+function Game.getVertsFromModel(modelPointer)
+	local vertOffset = mainmemory.read_u32_be(modelPointer + 0x10);
+	local vertBase = modelPointer + vertOffset + 0x18;
+	if isRDRAM(vertBase) then
+		return vertBase;
+	end
+end
+
+function Game.getVertBase()
+	local mapModel = dereferencePointer(Game.Memory.map_model_pointer);
+	if isRDRAM(mapModel) then
+		return Game.getVertsFromModel(mapModel);
+	end
+end
+
+function Game.getWaterVertBase()
+	local mapModel = dereferencePointer(Game.Memory.water_model_pointer);
+	if isRDRAM(mapModel) then
+		return Game.getVertsFromModel(mapModel);
+	end
+end
+
+function Game.getSeamDist()
+	local verts = {};
+	if Game.isInWater() then
+		verts[0] = Game.getWaterTriangleVertPositionRaw(0);
+		verts[1] = Game.getWaterTriangleVertPositionRaw(1);
+		verts[2] = Game.getWaterTriangleVertPositionRaw(2);
+	else
+		verts[0] = Game.getFloorTriangleVertPositionRaw(0);
+		verts[1] = Game.getFloorTriangleVertPositionRaw(1);
+		verts[2] = Game.getFloorTriangleVertPositionRaw(2);
+	end
 	if verts[0] == nil or verts[1] == nil or verts[2] == nil then
 		return "Unknown";
 	end
@@ -46,7 +73,12 @@ function Game.getVertDist()
 end
 
 function Game.getFloorTriangleVertPosition(index)
-	local vert = Game.getFloorTriangleVertPositionRaw(index);
+	local vert = nil;
+	if Game.isInWater() then
+		vert = Game.getWaterTriangleVertPositionRaw(index);
+	else
+		vert = Game.getFloorTriangleVertPositionRaw(index);
+	end
 	if vert ~= nil then
 		return vert.x.." "..vert.y.." "..vert.z;
 	end
@@ -74,6 +106,27 @@ function Game.getFloorTriangleVertPositionRaw(index)
 	end
 end
 
+function Game.getWaterTriangleVertPositionRaw(index)
+	if type(index) ~= 'number' then
+		return;
+	end
+	if index < 0 or index > 2 then
+		return;
+	end
+	local floorObject = Game.getFloorObject();
+	if isRDRAM(floorObject) then
+		local vertIndex = mainmemory.read_u16_be(floorObject + 0x10 + index * 0x02);
+		local vertBase = Game.getWaterVertBase();
+		if isRDRAM(vertBase) then
+			return {
+				x = mainmemory.read_s16_be(vertBase + (vertIndex * 0x10) + 0x00),
+				y = mainmemory.read_s16_be(vertBase + (vertIndex * 0x10) + 0x02),
+				z = mainmemory.read_s16_be(vertBase + (vertIndex * 0x10) + 0x04),
+			};
+		end
+	end
+end
+
 function Game.zipToFloorVert(index)
 	if type(index) ~= 'number' then
 		return;
@@ -81,16 +134,14 @@ function Game.zipToFloorVert(index)
 	if index < 0 or index > 2 then
 		return;
 	end
-	local floorObject = dereferencePointer(Game.Memory.floor_object_pointer);
-	if isRDRAM(floorObject) then
-		local vertIndex = mainmemory.read_u16_be(floorObject + 0x04 + index * 0x02);
-		local vertBase = Game.getVertBase();
-		if isRDRAM(vertBase) then
-			local xPos = mainmemory.read_s16_be(vertBase + (vertIndex * 0x10) + 0x00);
-			local yPos = mainmemory.read_s16_be(vertBase + (vertIndex * 0x10) + 0x02);
-			local zPos = mainmemory.read_s16_be(vertBase + (vertIndex * 0x10) + 0x04);
-			Game.setPosition(xPos, yPos, zPos);
-		end
+	local vert = nil;
+	if Game.isInWater() then
+		vert = Game.getWaterTriangleVertPositionRaw(index);
+	else
+		vert = Game.getFloorTriangleVertPositionRaw(index);
+	end
+	if vert ~= nil then
+		Game.setPosition(vert.x, vert.y, vert.z);
 	end
 end
 
@@ -118,6 +169,7 @@ seamTester = {
 	z_align = 0,
 	oldFloor = -math.huge,
 	testing = false,
+	testType = "floor", -- water
 	positionHistory = {},
 	positionHistoryLength = 10,
 };
@@ -138,9 +190,17 @@ seamTester.testSeamFromUI = function()
 		["3 -> 2"] = {2, 1},
 	};
 	if vertLookup[level] ~= nil then
-		local vert1 = Game.getFloorTriangleVertPositionRaw(vertLookup[level][1]);
-		local vert2 = Game.getFloorTriangleVertPositionRaw(vertLookup[level][2]);
-		seamTester.testSeam(vert1.x, vert1.z, vert2.x, vert2.z, vert1.y, vert2.y);
+		if Game.isInWater() then
+			seamTester.testType = "water";
+			local vert1 = Game.getWaterTriangleVertPositionRaw(vertLookup[level][1]);
+			local vert2 = Game.getWaterTriangleVertPositionRaw(vertLookup[level][2]);
+			seamTester.testSeam(vert1.x, vert1.z, vert2.x, vert2.z, vert1.y, vert2.y);
+		else
+			seamTester.testType = "floor";
+			local vert1 = Game.getFloorTriangleVertPositionRaw(vertLookup[level][1]);
+			local vert2 = Game.getFloorTriangleVertPositionRaw(vertLookup[level][2]);
+			seamTester.testSeam(vert1.x, vert1.z, vert2.x, vert2.z, vert1.y, vert2.y);
+		end
 	end
 end
 
@@ -188,6 +248,7 @@ seamTester.testSeam = function(x1, z1, x2, z2, y1, y2)
 	seamTester.positionHistory = {};
 	print("-------------------");
 	print("Testing seam:");
+	print("Type: "..seamTester.testType);
 	print("X1, Z1: "..seamTester.x1..", "..seamTester.z1);
 	print("X2, Z2: "..seamTester.x2..", "..seamTester.z2);
 	print("Y: "..seamTester.highestY);
@@ -202,14 +263,7 @@ end
 seamTester.simulate = function()
 	if seamTester.testing then
 		Game.setXPosition(seamTester.xq);
-		Game.setYPosition(seamTester.highestY); -- Make sure the player doesn't ever go under the floor while testing upward slopes
 		Game.setZPosition(seamTester.zq);
-
-		-- Make sure the player doesn't slip down slopes while testing
-		Game.neverSlip();
-
-		local newFloor = Game.getFloor();
-		local floorDifference = math.abs(newFloor - seamTester.oldFloor);
 
 		-- Keep a log of the previous n positions to make sure we don't lose any magic numbers
 		table.insert(seamTester.positionHistory, 1, {seamTester.xq, seamTester.zq});
@@ -217,12 +271,31 @@ seamTester.simulate = function()
 			seamTester.positionHistory[#seamTester.positionHistory] = nil;
 		end
 
-		-- If it's the first frame, ignore the huge difference in floor value
-		if seamTester.oldFloor == -math.huge then
-			floorDifference = 0;
+		local solutionFound = false;
+		if seamTester.testType == "water" then
+			local newYVelocity = Game.getYVelocity();
+			solutionFound = newYVelocity < 1;
+		else
+			-- Make sure the player doesn't ever go under the floor while testing upward slopes
+			Game.setYPosition(seamTester.highestY);
+
+			-- Make sure the player doesn't slip down slopes while testing
+			Game.neverSlip();
+
+			local newFloor = Game.getFloor();
+			local floorDifference = math.abs(newFloor - seamTester.oldFloor);
+
+			-- If it's the first frame, ignore the huge difference in floor value
+			if seamTester.oldFloor == -math.huge then
+				floorDifference = 0;
+			end
+
+			seamTester.oldFloor = newFloor;
+
+			solutionFound = floorDifference > 100 and newFloor < seamTester.lowestY;
 		end
 
-		if floorDifference > 100 and newFloor < seamTester.lowestY then
+		if solutionFound then
 			print("Possible solution found!");
 			print("Last "..seamTester.positionHistoryLength.." positions:");
 			for i = #seamTester.positionHistory, 1, -1 do
@@ -230,7 +303,11 @@ seamTester.simulate = function()
 			end
 			print("Current position:");
 			print("Game.setPosition("..seamTester.xq..", "..seamTester.highestY..", "..seamTester.zq..")");
-			print("Floor: "..newFloor);
+
+			if seamTester.testType == "floor" then
+				print("Floor: "..Game.getFloor());
+			end
+
 			print("t: "..seamTester.t);
 			print("-------------------");
 			if ScriptHawk.UI.isChecked("cancel_on_found_seam_clip") then
@@ -292,7 +369,6 @@ seamTester.simulate = function()
 				end
 			end
 		end
-		seamTester.oldFloor = newFloor;
 	end
 end
 
