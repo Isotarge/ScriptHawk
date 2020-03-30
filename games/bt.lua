@@ -2830,9 +2830,9 @@ local flag_array = {
 	{byte=0x26, bit=3, name="Doubloon: Near Jinjo (3)", type="Doubloon"},
 	{byte=0x26, bit=4, name="Doubloon: Near Jinjo (4)", type="Doubloon"},
 	-- 0x26 > 5 -- Doubloon?
-	-- 0x26 > 6 -- Doubloon?
-	-- 0x26 > 7
-	-- 0x27 > 0
+	{byte=0x26, bit=6, name="IoH: Scrat Healed", type="Mumbo's Magic"},
+	{byte=0x26, bit=7, name="TDL: Scrit Grown", type="Mumbo's Magic"},
+	{byte=0x27, bit=0, name="TDL: Stepping Stones Enlarged", type="Mumbo's Magic"},
 	-- 0x27 > 1
 	{byte=0x27, bit=2, name="WW: Pump Room Grate Smashed", type="Physical"},
 	-- 0x27 > 3 - GI: Train Switch
@@ -2855,7 +2855,7 @@ local flag_array = {
 	{byte=0x29, bit=4, name="GI: Weldar Intro Cutscene", type="FTT"},
 	-- 0x29 > 5
 	-- 0x29 > 6
-	-- 0x29 > 7
+	{byte=0x29, bit=7, name="TDL: Egg Hatched - Inside Mountain", type="Physical"},
 	-- 0x2A > 0
 	{byte=0x2A, bit=1, name="GGM: Old King Coal Intro Cutscene", type="FTT"},
 	-- 0x2A > 2
@@ -2870,10 +2870,10 @@ local flag_array = {
 	-- 0x2B > 3
 	-- 0x2B > 4
 	-- 0x2B > 5
-	-- 0x2B > 6
+	{byte=0x2B, bit=6, name="TDL: Caveman Scared", type="Physical"},
 	-- 0x2B > 7
 	{byte=0x2C, bit=0, name="GI: Back Door Open", type="Physical"},
-	-- 0x2C > 1
+	{byte=0x2C, bit=1, name="TDL: Scrat Inside Chuffy's", type="Physical"},
 	{byte=0x2C, bit=2, name="TDL: Wigwam Enlarged", type="Physical"},
 	{byte=0x2C, bit=3, name="MT: Treasure Chamber Open", type="Physical"},
 	{byte=0x2C, bit=4, name="GI: Weldar Defeated", type="Progress"},
@@ -2921,7 +2921,7 @@ local flag_array = {
 	-- 0x31 > 6 - GI: Opened Packing Room
 	-- 0x31 > 7 - GI: Opened Sewer
 	-- 0x32 > 0 - GI: Weldar's Door Open
-	-- 0x32 > 1
+	{byte=0x32, bit=1, name="TDL: Chompasaurus Cutscene", type="Cutscene"},
 	{byte=0x32, bit=2, name="Klungo 2 Something?"},
 	{byte=0x32, bit=3, name="GI: Floor 1: Backup Defeated", type="Progress"},
 	-- 0x32 > 4 - GI: Detoxifying Cutscene
@@ -3360,7 +3360,7 @@ local flag_array = {
 	-- 0x68 > 5
 	-- 0x68 > 6 - HFP: Coach FTT
 	{byte=0x68, bit=7, name="MT: Targitzan Defeated", type="Progress"},
-	-- 0x69 > 0
+	{byte=0x69, bit=0, name="TDL: Chompa's Belly Cutscene", type="Cutscene"},
 	-- 0x69 > 1
 	-- 0x69 > 2
 	-- 0x69 > 3
@@ -3507,8 +3507,8 @@ local flag_array = {
 	-- 0x7B > 0
 	-- 0x7B > 1
 	-- 0x7B > 2
-	-- 0x7B > 3
-	-- 0x7B > 4 - IoH - Train Switch?
+	{byte=0x7B, bit=3, name="IoH: Train Switch", type="Physical"},
+	-- 0x7B > 4
 	-- 0x7B > 5
 	-- 0x7B > 6
 	-- 0x7B > 7
@@ -3744,13 +3744,13 @@ local flag_array = {
 	-- 0x98 > 2 - Honey B Honeycombs Bit 1
 	-- 0x98 > 3 - Honey B Honeycombs Bit 2
 	-- 0x98 > 4 - Honey B Honeycombs Bit 3
-	{byte=0x98, bit=5, name="GGM: Levitate Chuffy (2)", type="Mumbo's Magic"},
-	-- 0x98 > 6
-	-- 0x98 > 7
-	-- 0x99 > 0
-	-- 0x99 > 1
-	-- 0x99 > 2
-	-- 0x99 > 3
+	{byte=0x98, bit=5, name="GGM: Chuffy at Station", type="Chuffy"},
+	{byte=0x98, bit=6, name="WW: Chuffy at Station", type="Chuffy"},
+	{byte=0x98, bit=7, name="GI: Chuffy at Station", type="Chuffy"},
+	{byte=0x99, bit=0, name="TDL: Chuffy at Station", type="Chuffy"},
+	{byte=0x99, bit=1, name="HFP: Chuffy at Ice Station", type="Chuffy"},
+	{byte=0x99, bit=2, name="HFP: Chuffy at Fire Station", type="Chuffy"},
+	{byte=0x99, bit=3, name="IoH: Chuffy at Station", type="Chuffy"},
 	{byte=0x99, bit=4, name="First Time Split Up Pad Text", nomap=true, type="FTT"},
 	{byte=0x99, bit=5, name="First Time Split Up Text", nomap=true, type="FTT"},
 	-- 0x99 > 6
@@ -3798,8 +3798,8 @@ local flag_array = {
 	{byte=0x9F, bit=0, name="GGM: Jinjo Boulder Drilled", type="Physical"},
 	-- 0x9F > 1
 	-- 0x9F > 2
-	-- 0x9F > 3
-	-- 0x9F > 4
+	{byte=0x9F, bit=3, name="TDL: Mumbo Pad Rock Destroyed", type="Physical"},
+	{byte=0x9F, bit=4, name="TDL: Spring Pad Rock Destroyed", type="Physical"},
 	-- 0x9F > 5
 	{byte=0x9F, bit=6, name="IoH: Pleteau: Jinjo Boulder Drilled", type="Physical"},
 	-- 0x9F > 7
@@ -3899,7 +3899,7 @@ local flag_array = {
 	{byte=0xAB, bit=5, name="ToT: Round 2 Intro Seen?", type="FTT"},
 	{byte=0xAB, bit=6, name="ToT: Round 3 Intro Seen?", type="FTT"},
 	-- 0xAB > 7
-	-- 0xAC > 0
+	{byte=0xAC, bit=0, name="IoH: Scrut inside Chuffy's", type="Physical"},
 	-- 0xAC > 1
 	-- 0xAC > 2 - Puzzle Completed?
 	-- 0xAC > 3
