@@ -3490,10 +3490,10 @@ function Game.initUI()
 		ScriptHawk.UI.button(14, 8, {46}, nil, "Clear Flag Button", "Clear", flagClearButtonHandler);
 
 		ScriptHawk.UI.checkbox(0, 6, "toggle_neverslip", "Never Slip");
-		ScriptHawk.UI.checkbox(5, 4, "encircle_checkbox", "Encircle (Beta)");
-		ScriptHawk.UI.checkbox(5, 5, "dynamic_radius_checkbox", "Dynamic Radius");
-		ScriptHawk.UI.checkbox(5, 6, "freeze_clip_velocity", "Freeze Clip Vel.");
-		ScriptHawk.UI.checkbox(5, 7, "freeze_zip_velocity", "Freeze Zip Vel.");
+		--ScriptHawk.UI.checkbox(5, 4, "encircle_checkbox", "Encircle (Beta)");
+		--ScriptHawk.UI.checkbox(5, 5, "dynamic_radius_checkbox", "Dynamic Radius");
+		ScriptHawk.UI.checkbox(5, 4, "freeze_clip_velocity", "Freeze Clip Vel.");
+		ScriptHawk.UI.checkbox(5, 5, "freeze_zip_velocity", "Freeze Zip Vel.");
 
 		ScriptHawk.UI.checkbox(10, 2, "beta_pause_menu_checkbox", "Beta Pause");
 
@@ -3512,8 +3512,8 @@ function Game.initUI()
 		ScriptHawk.UI.button(10, 6, {4, 8}, nil, nil, "Unlock Moves", unlock_moves);
 
 		-- Character
-		ScriptHawk.UI.form_controls.character_dropdown = forms.dropdown(ScriptHawk.UI.options_form, { "Banjo-Kazooie", "Termite", "Walrus", "Croc", "Pumpkin", "Bee", "Washing Machine" }, ScriptHawk.UI.col(0) + ScriptHawk.UI.dropdown_offset, ScriptHawk.UI.row(11) + ScriptHawk.UI.dropdown_offset, ScriptHawk.UI.col(4) + 8, ScriptHawk.UI.button_height);
-		ScriptHawk.UI.button(5, 11, {4, 8}, nil, nil, "Change", changeCharacterFromUI);
+		ScriptHawk.UI.form_controls.character_dropdown = forms.dropdown(ScriptHawk.UI.options_form, { "Banjo-Kazooie", "Termite", "Walrus", "Croc", "Pumpkin", "Bee", "Washing Machine" }, ScriptHawk.UI.col(0) + ScriptHawk.UI.dropdown_offset, ScriptHawk.UI.row(7) + ScriptHawk.UI.dropdown_offset, ScriptHawk.UI.col(4) + 8, ScriptHawk.UI.button_height);
+		ScriptHawk.UI.button(5, 7, {2, 8}, nil, nil, "Transform", changeCharacterFromUI);
 	else
 		-- Use a bigger check flags button if the others are hidden by TASSafe
 		ScriptHawk.UI.button(10, 8, {4, 10}, nil, "Check Flag Button", "Check Flag", flagCheckButtonHandler);
