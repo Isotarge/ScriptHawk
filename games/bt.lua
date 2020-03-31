@@ -338,7 +338,7 @@ Game = {
 	speedy_index = 7,
 	rot_speed = 10,
 	max_rot_units = 360,
-	form_height = 13,
+	form_height = 14,
 	character_states = {
 		-- 0 Occurs during game boot-up
 		[1] = "Banjo-Kazooie", -- Doesn't matter if you're Dragon Kazooie
@@ -2437,7 +2437,7 @@ local global_flag_array = {
 	{byte=0x03, bit=2, name="Boss Replay: Chilli Billi", type="Boss Replay"},
 	{byte=0x03, bit=3, name="Boss Replay: Mingy Jongo", type="Boss Replay"},
 	{byte=0x03, bit=4, name="Boss Replay: Hag 1", type="Boss Replay"},
-	-- 0x03 > 5 Unknown, but cleared by GS code
+	{byte=0x03, bit=5, name="Multiplayer Unlocked"}, -- Clearing this shows an E3 remnant (Source: Koolboyman)
 	-- 0x03 > 6 Unknown, but cleared by GS code
 	-- 0x03 > 7 Unknown, but cleared by GS code
 	-- 0x04 > 0
@@ -2515,7 +2515,18 @@ local global_flag_array = {
 	{byte=0x0D, bit=1, name="Screen Scale", ignore=true},
 	{byte=0x0D, bit=2, name="Screen Scale", ignore=true},
 	{byte=0x0D, bit=3, name="Screen Scale", ignore=true},
-	-- 0x0D > 4 -- Unknown, set by going into HFP kickball area, also set by triggering Mingy Jongo fight, also set on boot with no eeprom
+	-- 0x0D > 4 -- Unknown, set by going into HFP kickball area, also set by triggering Mingy Jongo fight, also set on boot with no eeprom, cleared on exit screen settings
+	-- 0x0D > 5
+	-- 0x0D > 6
+	-- 0x0D > 7
+	-- 0x0E > 0
+	-- 0x0E > 1
+	-- 0x0E > 2
+	-- 0x0E > 3 -- Unknown, Set upon selecting "All the games", Cleared upon leaving multiplayer Targitzans
+	-- 0x0E > 4
+	-- 0x0E > 5
+	-- 0x0E > 6
+	-- 0x0E > 7
 };
 
 local flag_block_size = 0xB0;
@@ -2619,10 +2630,10 @@ local flag_array = {
 	-- 0x0C > 0 - MT: Targitzan FTT
 	--{byte=0x0C, bit=1, name="WW: Dino Door Smashed?"},
 	-- 0x0C > 2
-	-- 0x0C > 3 - WW: Mrs. Boggy FTT?
-	-- 0x0C > 4 - WW: Soggy Returned
-	-- 0x0C > 5 - WW: Moggy Returned
-	-- 0x0C > 6 - WW: Groggy Returned
+	{byte=0x0C, bit=3, name="WW: Mrs. Boggy FTT", type="FTT"},
+	{byte=0x0C, bit=4, name="WW: Moggy Returned", type="Progress"},
+	{byte=0x0C, bit=5, name="WW: Soggy Returned", type="Progress"},
+	{byte=0x0C, bit=6, name="WW: Groggy Returned", type="Progress"},
 	{byte=0x0C, bit=7, name="Humba Wumba FTT", type="FTT"},
 	-- 0x0D > 0 - GGM: Saucer of peril FTT?
 	-- 0x0D > 1
@@ -2638,16 +2649,16 @@ local flag_array = {
 	{byte=0x0E, bit=3, name="First Time Mumbo Pad Instructions", type="FTT"},
 	-- 0x0E > 4
 	{byte=0x0E, bit=5, name="WW: Big Al FTT", type="FTT"},
-	-- 0x0E > 6 - WW: Salty Joe FTT
+	{byte=0x0E, bit=6, name="WW: Salty Joe FTT", type="FTT"},
 	{byte=0x0E, bit=7, name="WW: Big Al's Open", type="Physical"},
 	{byte=0x0F, bit=0, name="WW: Salty Joe's Open", type="Physical"},
 	-- 0x0F > 1
 	-- 0x0F > 2
 	-- 0x0F > 3
-	-- 0x0F > 4 - WW: Inferno Open
+	{byte=0x0F, bit=4, name="WW: Inferno Open", type="Physical"},
 	-- 0x0F > 5 - WW: Dodgems Open
 	-- 0x0F > 6
-	-- 0x0F > 7
+	{byte=0x0F, bit=7, name="WW: Area 51 Gate Destroyed", type="Physical"},
 	-- 0x10 > 0
 	-- 0x10 > 1
 	-- 0x10 > 2
@@ -2664,14 +2675,14 @@ local flag_array = {
 	{byte=0x11, bit=5, name="JRL: Pawno's Cheato Page Purchased", type="Progress"},
 	{byte=0x11, bit=6, name="JRL: UFO Leaves JRL", type="Progress"},
 	{byte=0x11, bit=7, name="Klungo 3 Something??"},
-	{byte=0x12, bit=0, name="WW: Moggy FTT", type="FTT"}, -- Soggy?
-	-- 0x12 > 1 - WW: Moggy FTT?
-	-- 0x12 > 2 - WW: Groggy FTT?
-	-- 0x12 > 3 -- WW: Burger Given To Groggy
+	{byte=0x12, bit=0, name="WW: Moggy FTT", type="FTT"},
+	{byte=0x12, bit=1, name="WW: Soggy FTT", type="FTT"},
+	{byte=0x12, bit=2, name="WW: Groggy FTT", type="FTT"},
+	{byte=0x12, bit=3, name="WW: Groggy Fed", type="Progress"},
 	-- 0x12 > 4
 	-- 0x12 > 5
 	-- 0x12 > 6
-	-- 0x12 > 7
+	{byte=0x12, bit=7, name="WW: Cable Ride Cutscene", type="Cutscene"},
 	{byte=0x13, bit=0, name="JRL: Merry Maggie Malpass Rescued", type="Progress"},
 	{byte=0x13, bit=1, name="Klungo 1 Potion Chosen?"},
 	{byte=0x13, bit=2, name="JRL: Jolly's Room Rented", type="Physical"},
@@ -2692,7 +2703,7 @@ local flag_array = {
 	-- 0x15 > 1
 	-- 0x15 > 2
 	{byte=0x15, bit=3, name="Cheat Menu FTT", type="FTT"},
-	-- 0x15 > 4
+	{byte=0x15, bit=4, name="WW: Cable Ride Activated", type="Physical"},
 	-- 0x15 > 5 - MT: Dilberta's Prison Opened
 	{byte=0x15, bit=6, name="Humba Wumba: Glowbo Paid (MT)", type="Glowbo Paid"},
 	{byte=0x15, bit=7, name="Humba Wumba: Glowbo Paid (GGM)", type="Glowbo Paid"},
@@ -2835,12 +2846,12 @@ local flag_array = {
 	{byte=0x27, bit=0, name="TDL: Stepping Stones Enlarged", type="Mumbo's Magic"},
 	-- 0x27 > 1
 	{byte=0x27, bit=2, name="WW: Pump Room Grate Smashed", type="Physical"},
-	-- 0x27 > 3 - GI: Train Switch
+	{byte=0x27, bit=3, name="GI: Train Switch", type="Physical"},
 	{byte=0x27, bit=4, name="Chuffy: TDL Station Open", type="Physical"},
 	{byte=0x27, bit=5, name="FT Doubloon Collection", type="FTT"},
-	-- 0x27 > 6
-	-- 0x27 > 7
-	-- 0x28 > 0
+	{byte=0x27, bit=6, name="JRL: Toxic Waste Switch Pushed", type="Physical"},
+	{byte=0x27, bit=7, name="HFP: Hot Water Drained", type="Physical"},
+	{byte=0x28, bit=0, name="JRL: Floater Piglet FTT", type="FTT"},
 	{byte=0x28, bit=1, name="GI: Loggo FTT", type="FTT"},
 	-- 0x28 > 2
 	{byte=0x28, bit=3, name="GI: Fly Pad Switch Pushed", type="Physical"},
@@ -2892,8 +2903,8 @@ local flag_array = {
 	{byte=0x2E, bit=1, name="GI: Window to Screws Smashed", type="Physical"},
 	-- 0x2E > 2 - GI: Window to Cheato Page Smashed
 	-- 0x2E > 3 - GI: Window below Treble Clef Smashed
-	-- 0x2E > 4 - GI: Window blocking Jinjo Smashed
-	-- 0x2E > 5
+	{byte=0x2E, bit=4, name="GI: Jinjo Window Opening Cutscene", type="Cutscene"},
+	{byte=0x2E, bit=5, name="GI: Jinjo Window Closing Cutscene", type="Cutscene"},
 	-- 0x2E > 6 - GI: Electromagnet Reactivated Text?
 	{byte=0x2E, bit=7, name="WW: FT Pick Up Big Top Ticket", type="FTT"},
 	{byte=0x2F, bit=0, name="GI: Trash Compactor FTT", type="FTT"},
@@ -2924,25 +2935,25 @@ local flag_array = {
 	{byte=0x32, bit=1, name="TDL: Chompasaurus Cutscene", type="Cutscene"},
 	{byte=0x32, bit=2, name="Klungo 2 Something?"},
 	{byte=0x32, bit=3, name="GI: Floor 1: Backup Defeated", type="Progress"},
-	-- 0x32 > 4 - GI: Detoxifying Cutscene
-	-- 0x32 > 5 - GI: Toxic Barrel Hit
-	-- 0x32 > 6 - GI: Toxic Barrel Hit Cutscene
+	{byte=0x32, bit=4, name="GI: Detox Cutscene", type="Cutscene"},
+	{byte=0x32, bit=5, name="GI: Quality Control Toxified", type="Physical"},
+	{byte=0x32, bit=6, name="GI: Toxify Cutscene", type="Cutscene"},
 	{byte=0x32, bit=7, name="SM: Roysten Rescued", type="Ability"},
 	{byte=0x33, bit=0, name="GI: F2 Grate Near Wumba", type="Physical"},
 	{byte=0x33, bit=1, name="GI: F2 Grate Near Electromagnetic Chamber", type="Physical"},
 	{byte=0x33, bit=2, name="GI: Screw Panel (F2-F1)", type="Physical"},
-	-- 0x33 > 3
+	{byte=0x33, bit=3, name="GI: Spring Pad Unlocked (F4-F5)", type="Physical"},
 	-- 0x33 > 4 - GI: Screw Panel (Mumbo Pad)
 	{byte=0x33, bit=5, name="HFP: Mildred Ice Cube FTT", type="FTT"},
 	{byte=0x33, bit=6, name="HFP: Gobi in Train Station", type="Progress"},
-	-- 0x33 > 7 - HFP: Biggafoot FTT
+	{byte=0x33, bit=7, name="HFP: Biggafoot FTT", type="FTT"},
 	-- 0x34 > 0 - GI: Entering Packing Room Something?
-	-- 0x34 > 1
-	-- 0x34 > 2
-	-- 0x34 > 3
-	-- 0x34 > 4 - HFP: Biggafoot Gone
-	-- 0x34 > 5
-	-- 0x34 > 6
+	{byte=0x34, bit=1, name="CCL: George Ice Cube FTT", type="FTT"},
+	{byte=0x34, bit=2, name="HFP: Sabreman Unfrozen", type="Mumbo's Magic"},
+	{byte=0x34, bit=3, name="HFP: Sabreman Heated", type="Progress"},
+	{byte=0x34, bit=4, name="HFP: Biggafoot Gone", type="Physical"},
+	{byte=0x34, bit=5, name="WW: All Kids Returned", type="Physical"}, -- Might be Mrs. Boggy appearing in HFP Igloo
+	{byte=0x34, bit=6, name="JRL: Beach Ball Piglet FTT", type="FTT"}, -- Might be from the HFP Side
 	{byte=0x34, bit=7, name="HFP: Icy Train Switch", type="Train"},
 	{byte=0x35, bit=0, name="HFP: Fire Train Switch", type="Train"},
 	{byte=0x35, bit=1, name="Humba Wumba: No Glowbo Needed FTT", type="FTT"},
@@ -3176,14 +3187,14 @@ local flag_array = {
 	{byte=0x51, bit=5, name="WW: Hoop Hurry Jiggy Spawned", type="Physical"},
 	-- 0x51 > 6
 	{byte=0x51, bit=7, name="JRL: Merry Maggie Malpass Jiggy Spawned", type="Physical"},
-	-- 0x52 > 0
+	{byte=0x52, bit=0, name="WW: Kids Jiggy Spawned", type="Physical"},
 	{byte=0x52, bit=1, name="WW: Dodgems Dome Jiggy Spawned", type="Physical"},
 	-- 0x52 > 2
 	-- 0x52 > 3
 	-- 0x52 > 4
 	{byte=0x52, bit=5, name="GGM: Dilberta Jiggy Spawned", type="Physical"},
 	-- 0x52 > 6
-	-- 0x52 > 7
+	{byte=0x52, bit=7, name="HFP: Sabreman Jiggy Spawned", type="Physical"},
 	{byte=0x53, bit=0, name="GI: Quality Control Jiggy Spawned", type="Physical"},
 	{byte=0x53, bit=1, name="TDL: Terry Defeated Jiggy Spawned", type="Physical"},
 	-- 0x53 > 2
@@ -3201,7 +3212,7 @@ local flag_array = {
 	-- 0x54 > 6
 	-- 0x54 > 7 Set and cleared upon entering/exiting CCL overworld
 	{byte=0x55, bit=0, name="CCL: Mingy Jongo Defeated", type="Progress"},
-	-- 0x55 > 1
+	{byte=0x55, bit=1, name="HFP: Aliens left", type="Progress"},
 	{byte=0x55, bit=2, name="WW: Balloon Burst Jiggy Spawned", type="Physical"},
 	-- 0x55 > 3
 	-- 0x55 > 4
@@ -3275,7 +3286,7 @@ local flag_array = {
 	{byte=0x5E, bit=0, name="Klungo 1 Defeated", type="Progress"},
 	{byte=0x5E, bit=1, name="Klungo 2 Defeated", type="Progress"},
 	{byte=0x5E, bit=2, name="Klungo 3 Defeated", type="Progress"},
-	-- 0x5E > 3
+	{byte=0x5E, bit=3, name="HFP: Water Cooled", type="Progress"},
 	{byte=0x5E, bit=4, name="HFP: Volcano Switch 1", type="Physical"},
 	{byte=0x5E, bit=5, name="HFP: Volcano Switch 2", type="Physical"},
 	{byte=0x5E, bit=6, name="HFP: Volcano Switch 3", type="Physical"},
@@ -3315,7 +3326,7 @@ local flag_array = {
 	-- 0x63 > 0
 	-- 0x63 > 1
 	{byte=0x63, bit=2, name="First Time BK Cart Text", type="FTT"},
-	-- 0x63 > 3 - FT note something?
+	{byte=0x63, bit=3, name="GI: Access Denied FTT", type="FTT"},
 	{byte=0x63, bit=4, name="JRL: Jukebox is Broken FTT", type="FTT"},
 	-- 0x63 > 5
 	{byte=0x63, bit=6, name="Humba Wumba: Big T. Rex FTT", type="FTT"},
@@ -3361,12 +3372,12 @@ local flag_array = {
 	-- 0x68 > 6 - HFP: Coach FTT
 	{byte=0x68, bit=7, name="MT: Targitzan Defeated", type="Progress"},
 	{byte=0x69, bit=0, name="TDL: Chompa's Belly Cutscene", type="Cutscene"},
-	-- 0x69 > 1
-	-- 0x69 > 2
-	-- 0x69 > 3
-	-- 0x69 > 4
+	{byte=0x69, bit=1, name="HFP: Gamette FTT", type="FTT"},
+	{byte=0x69, bit=2, name="HFP: Rescue Alphette", type="Progress"},
+	{byte=0x69, bit=3, name="HFP: Rescue Betette", type="Progress"},
+	{byte=0x69, bit=4, name="HFP: Rescue Gamette", type="Progress"},
 	{byte=0x69, bit=5, name="HFP: UFO Landed", type="Progress"},
-	-- 0x69 > 6
+	{byte=0x69, bit=6, name="HFP: Alph Resurrected", type="Mumbo's Magic"},
 	-- 0x69 > 7
 	{byte=0x6A, bit=0, name="HFP: Killed Mildred", type="Physical"},
 	{byte=0x6A, bit=1, name="Jinjo Randomizer (1)", type="Randomizer"},
@@ -3391,7 +3402,7 @@ local flag_array = {
 	{byte=0x6C, bit=4, name="CCL: Superstash: 4 Switch Hit", type="Physical"},
 	{byte=0x6C, bit=5, name="CCL: Superstash: Opened", type="Physical"},
 	-- 0x6C > 6
-	-- 0x6C > 7 - HFP: Underground Tunnel Opened
+	{byte=0x6C, bit=7, name="HFP: Shortcut to Sabreman Tent Opened", type="Physical"},
 	-- 0x6D > 0 - HFP: Pillars to Waterfall Raised
 	{byte=0x6D, bit=1, name="IoH: HFP Bridge Extended", type="Physical"},
 	{byte=0x6D, bit=2, name="Opened Mayahem Temple", type="Progress"},
@@ -3416,8 +3427,8 @@ local flag_array = {
 	-- 0x6F > 5 JRL Sea Bottom Location?
 	-- 0x6F > 6
 	-- 0x6F > 7
-	-- 0x70 > 0
-	-- 0x70 > 1
+	{byte=0x70, bit=0, name="JRL: Davy Jones Locker Door Destroyed", type="Physical"},
+	{byte=0x70, bit=1, name="JRL: Secret Wall Destroyed", type="Physical"},
 	{byte=0x70, bit=2, name="SM: Jinjo Door Smashed", type="Physical"},
 	{byte=0x70, bit=3, name="JRL: UFO Door Smashed", type="Physical"},
 	{byte=0x70, bit=4, name="Warp: MT: World Entry And Exit", type="Warp"},
@@ -3753,11 +3764,11 @@ local flag_array = {
 	{byte=0x99, bit=3, name="IoH: Chuffy at Station", type="Chuffy"},
 	{byte=0x99, bit=4, name="First Time Split Up Pad Text", nomap=true, type="FTT"},
 	{byte=0x99, bit=5, name="First Time Split Up Text", nomap=true, type="FTT"},
-	-- 0x99 > 6
-	-- 0x99 > 7
-	-- 0x9A > 0
-	-- 0x9A > 1
-	-- 0x9A > 2
+	{byte=0x99, bit=6, name="JRL: Tooth Removed (1)", type="Progress"},
+	{byte=0x99, bit=7, name="JRL: Tooth Removed (2)", type="Progress"},
+	{byte=0x9A, bit=0, name="JRL: Tooth Removed (3)", type="Progress"},
+	{byte=0x9A, bit=1, name="JRL: Tooth Removed (4)", type="Progress"},
+	{byte=0x9A, bit=2, name="JRL: Tooth Removed (5)", type="Progress"},
 	{byte=0x9A, bit=3, name="GGM: Crushing Shed Active? (1)"},
 	{byte=0x9A, bit=4, name="Mumbo's Magic: Levitate: Jiggy Boulder (Levitated?)", type="Mumbo's Magic"},
 	{byte=0x9A, bit=5, name="Mumbo's Magic: Levitate: Jiggy Boulder (Placed?)", type="Mumbo's Magic"},
@@ -3878,7 +3889,7 @@ local flag_array = {
 	-- 0xA9 > 0
 	-- 0xA9 > 1
 	-- 0xA9 > 2
-	-- 0xA9 > 3
+	{byte=0xA9, bit=3, name="WW: Train Food Warning", type="FTT"},
 	-- 0xA9 > 4
 	-- 0xA9 > 5
 	-- 0xA9 > 6
@@ -4298,6 +4309,7 @@ function flagStats(verbose)
 	print_deferred();
 end
 
+--[[
 local function flagSetButtonHandler()
 	setFlagByName(forms.getproperty(ScriptHawk.UI.form_controls["Flag Dropdown"], "SelectedItem"));
 end
@@ -4308,6 +4320,82 @@ end
 
 local function flagCheckButtonHandler()
 	checkFlag(forms.getproperty(ScriptHawk.UI.form_controls["Flag Dropdown"], "SelectedItem"));
+end
+]]--
+
+local function flagSetButtonHandler()
+	flagMasterType = forms.getproperty(ScriptHawk.UI.form_controls["Flag Master Type Dropdown"], "SelectedItem");
+	if flagMasterType == "Permanent Flags" then
+		setFlagByName(forms.getproperty(ScriptHawk.UI.form_controls["Flag Dropdown"], "SelectedItem"));
+	elseif flagMasterType == "Global Flags" then
+		setGlobalFlagByName(forms.getproperty(ScriptHawk.UI.form_controls["Flag Dropdown"], "SelectedItem"));
+	end
+end
+
+local function flagClearButtonHandler()
+	flagMasterType = forms.getproperty(ScriptHawk.UI.form_controls["Flag Master Type Dropdown"], "SelectedItem");
+	if flagMasterType == "Permanent Flags" then
+		clearFlagByName(forms.getproperty(ScriptHawk.UI.form_controls["Flag Dropdown"], "SelectedItem"));
+	elseif flagMasterType == "Global Flags" then
+		clearGlobalFlagByName(forms.getproperty(ScriptHawk.UI.form_controls["Flag Dropdown"], "SelectedItem"));
+	end
+end
+
+local function flagCheckButtonHandler()
+	flagMasterType = forms.getproperty(ScriptHawk.UI.form_controls["Flag Master Type Dropdown"], "SelectedItem");
+	if flagMasterType == "Permanent Flags" then
+		checkFlag(forms.getproperty(ScriptHawk.UI.form_controls["Flag Dropdown"], "SelectedItem"));
+	elseif flagMasterType == "Global Flags" then
+		checkGlobalFlagByName(forms.getproperty(ScriptHawk.UI.form_controls["Flag Dropdown"], "SelectedItem"));
+	end
+end
+
+flag_master_types = {"Permanent Flags", "Global Flags"};
+
+function flagTypeGetter()
+	flagMasterType = forms.getproperty(ScriptHawk.UI.form_controls["Flag Master Type Dropdown"], "SelectedItem");
+	flag_subtypes = {"All"};
+	if flagMasterType == "Permanent Flags" then
+		loaded_array = flag_array;
+	elseif flagMasterType == "Global Flags" then
+		loaded_array = global_flag_array;
+	end
+	for i = 1, #loaded_array do
+		stored_subtype = false;
+		for j = 1, #flag_subtypes do
+			if loaded_array[i].type == flag_subtypes[j] then
+				stored_subtype = true;
+			end
+		end
+		if not stored_subtype and loaded_array[i].type ~= "Unknown" then
+			table.insert(flag_subtypes, loaded_array[i].type);
+		end
+	end
+end
+
+function getFlagsArray()
+	flagMasterType = forms.getproperty(ScriptHawk.UI.form_controls["Flag Master Type Dropdown"], "SelectedItem");
+	flagSubType = forms.getproperty(ScriptHawk.UI.form_controls["Flag Sub Type Dropdown"], "SelectedItem");
+	if flagMasterType == "Permanent Flags" then
+		loaded_array = flag_array;
+		name_property = "name";
+	elseif flagMasterType == "Global Flags" then
+		loaded_array = global_flag_array;
+		name_property = "name";
+	end
+	if flagSubType == "All" then
+		flags_list = {};
+		for i = 1, #loaded_array do
+			table.insert(flags_list,loaded_array[i][name_property])
+		end
+	else
+		flags_list = {};
+		for i = 1, #loaded_array do
+			if loaded_array[i].type == flagSubType then
+				table.insert(flags_list,loaded_array[i][name_property])
+			end
+		end
+	end
 end
 
 ------------------
@@ -4390,6 +4478,36 @@ function checkGlobalFlags()
 	end
 	global_flag_block_cache = flagBlock;
 	print_deferred();
+end
+
+local function getGlobalFlagByName(flagName)
+	for i = 1, #global_flag_array do
+		if flagName == global_flag_array[i].name then
+			return global_flag_array[i];
+		end
+	end
+end
+
+function setGlobalFlagByName(name)
+	local flag = getGlobalFlagByName(name);
+	if type(flag) == "table" then
+		setGlobalFlag(flag.byte, flag.bit);
+	end
+end
+
+function clearGlobalFlagByName(name)
+	local flag = getGlobalFlagByName(name);
+	if type(flag) == "table" then
+		clearGlobalFlag(flag.byte, flag.bit);
+	end
+end
+
+function checkGlobalFlagByName(name, suppressPrint)
+	local flag = getGlobalFlagByName(name);
+	if type(flag) == "table" then
+		return checkGlobalFlag(flag.byte, flag.bit, suppressPrint);
+	end
+	return false;
 end
 
 --------------------
@@ -5359,6 +5477,24 @@ end
 local max_page_size = 40;
 
 function Game.drawUI()
+	current_flagMasterType = forms.getproperty(ScriptHawk.UI.form_controls["Flag Master Type Dropdown"], "SelectedItem");
+	current_flagSubType = forms.getproperty(ScriptHawk.UI.form_controls["Flag Sub Type Dropdown"], "SelectedItem");
+	if old_flagMasterType ~= current_flagMasterType then
+		forms.setproperty(ScriptHawk.UI.form_controls["Flag Sub Type Dropdown"], "SelectedItem","All");
+		flagTypeGetter();
+		forms.setdropdownitems(ScriptHawk.UI.form_controls["Flag Sub Type Dropdown"], flag_subtypes);
+		getFlagsArray();
+		forms.setdropdownitems(ScriptHawk.UI.form_controls["Flag Dropdown"], flags_list);
+		forms.setproperty(ScriptHawk.UI.form_controls["Flag Dropdown"], "SelectedIndex", 0);
+	end
+	if old_flagSubType ~= current_flagSubType then
+		getFlagsArray();
+		forms.setdropdownitems(ScriptHawk.UI.form_controls["Flag Dropdown"], flags_list);
+		forms.setproperty(ScriptHawk.UI.form_controls["Flag Dropdown"], "SelectedIndex", 0);
+	end
+	old_flagSubType = current_flagSubType;
+	old_flagMasterType = current_flagMasterType;
+
 	if script_mode == "Disabled" then
 		return;
 	end
@@ -5631,9 +5767,9 @@ function Game.initUI()
 		ScriptHawk.UI.button(5, 4, {4, 10}, nil, nil, "Force Reload", Game.forceReload);
 
 		-- Flag stuff
-		ScriptHawk.UI.button(10, 7, {46}, nil, "Set Flag Button", "Set", flagSetButtonHandler);
-		ScriptHawk.UI.button(12, 7, {46}, nil, "Check Flag Button", "Check", flagCheckButtonHandler);
-		ScriptHawk.UI.button(14, 7, {46}, nil, "Clear Flag Button", "Clear", flagClearButtonHandler);
+		ScriptHawk.UI.button(10, 8, {46}, nil, "Set Flag Button", "Set", flagSetButtonHandler);
+		ScriptHawk.UI.button(12, 8, {46}, nil, "Check Flag Button", "Check", flagCheckButtonHandler);
+		ScriptHawk.UI.button(14, 8, {46}, nil, "Clear Flag Button", "Clear", flagClearButtonHandler);
 
 		ScriptHawk.UI.checkbox(0, 6, "toggle_neverslip", "Never Slip");
 
@@ -5654,12 +5790,19 @@ function Game.initUI()
 	end
 
 	-- Flag stuff
-	ScriptHawk.UI.form_controls["Flag Dropdown"] = forms.dropdown(ScriptHawk.UI.options_form, flag_names, ScriptHawk.UI.col(0) + ScriptHawk.UI.dropdown_offset, ScriptHawk.UI.row(7) + ScriptHawk.UI.dropdown_offset, ScriptHawk.UI.col(9) + 8, ScriptHawk.UI.button_height);
-	ScriptHawk.UI.checkbox(10, 6, "realtime_flags", "Realtime Flags", true);
+	ScriptHawk.UI.form_controls["Flag Master Type Dropdown"] = forms.dropdown(ScriptHawk.UI.options_form, flag_master_types, ScriptHawk.UI.col(0) + ScriptHawk.UI.dropdown_offset, ScriptHawk.UI.row(7) + ScriptHawk.UI.dropdown_offset, ScriptHawk.UI.col(4) + 8, ScriptHawk.UI.button_height);
+	forms.setproperty(ScriptHawk.UI.form_controls["Flag Master Type Dropdown"], "SelectedItem","Permanent Flags");
+	flagTypeGetter();
+	ScriptHawk.UI.form_controls["Flag Sub Type Dropdown"] = forms.dropdown(ScriptHawk.UI.options_form, flag_subtypes, ScriptHawk.UI.col(5) + ScriptHawk.UI.dropdown_offset, ScriptHawk.UI.row(7) + ScriptHawk.UI.dropdown_offset, ScriptHawk.UI.col(4) + 8, ScriptHawk.UI.button_height);
+	getFlagsArray();
+	old_flagMasterType = forms.getproperty(ScriptHawk.UI.form_controls["Flag Master Type Dropdown"], "SelectedItem");
+	old_flagSubType = forms.getproperty(ScriptHawk.UI.form_controls["Flag Sub Type Dropdown"], "SelectedItem");
+	ScriptHawk.UI.form_controls["Flag Dropdown"] = forms.dropdown(ScriptHawk.UI.options_form, flags_list, ScriptHawk.UI.col(0) + ScriptHawk.UI.dropdown_offset, ScriptHawk.UI.row(8) + ScriptHawk.UI.dropdown_offset, ScriptHawk.UI.col(9) + 8, ScriptHawk.UI.button_height);
+	ScriptHawk.UI.checkbox(10, 7, "realtime_flags", "Realtime Flags", true);
 
 	ScriptHawk.UI.checkbox(5, 6, "toggle_autojump", "Autojump");
 
-	seamTester.initUI(8);
+	seamTester.initUI(9);
 
 	flagStats();
 end
