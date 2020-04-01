@@ -2488,9 +2488,9 @@ local global_flag_array = {
 	-- 0x09 > 5
 	-- 0x09 > 6
 	-- 0x09 > 7
-	-- 0x0A > 0
-	-- 0x0A > 1
-	-- 0x0A > 2
+	{byte=0x0A, bit=0, name="Klungo: Red Potion Enabled"},
+	{byte=0x0A, bit=1, name="Klungo: Green Potion Enabled"},
+	{byte=0x0A, bit=2, name="Klungo: Blue Potion Enabled"},
 	{byte=0x0A, bit=3, name="Jinjo in Multiplayer"},
 	-- 0x0A > 4
 	-- 0x0A > 5
@@ -2699,12 +2699,12 @@ local flag_array = {
 	{byte=0x14, bit=5, name="JRL: Waste Pipe Drilled", type="Physical"},
 	-- 0x14 > 6
 	{byte=0x14, bit=7, name="JRL: Center Statue Broken", type="Physical"},
-	-- 0x15 > 0
-	-- 0x15 > 1
-	-- 0x15 > 2
+	{byte=0x15, bit=0, name="JRL: Jinjo Box Randomizer (1)", type="Randomizer"},
+	{byte=0x15, bit=1, name="JRL: Jinjo Box Randomizer (2)", type="Randomizer"},
+	{byte=0x15, bit=2, name="JRL: Jinjo Box Randomizer (3)", type="Randomizer"},
 	{byte=0x15, bit=3, name="Cheat Menu FTT", type="FTT"},
 	{byte=0x15, bit=4, name="WW: Cable Ride Activated", type="Physical"},
-	-- 0x15 > 5 - MT: Dilberta's Prison Opened
+	{byte=0x15, bit=5, name="MT: Prison Compound Open", type="Physical"},
 	{byte=0x15, bit=6, name="Humba Wumba: Glowbo Paid (MT)", type="Glowbo Paid"},
 	{byte=0x15, bit=7, name="Humba Wumba: Glowbo Paid (GGM)", type="Glowbo Paid"},
 	{byte=0x16, bit=0, name="Humba Wumba: Glowbo Paid (WW)", type="Glowbo Paid"},
@@ -2967,11 +2967,11 @@ local flag_array = {
 	-- 0x36 > 1 - GI: Long Path Open (F2)
 	-- 0x36 > 2 - Destroyed Roysten's Boulder?
 	{byte=0x36, bit=3, name="CCL: Pot o' Gold Activated", type="Physical"},
-	-- 0x36 > 4
-	-- 0x36 > 5
-	-- 0x36 > 6
-	-- 0x36 > 7
-	-- 0x37 > 0
+	{byte=0x36, bit=4, name="CCL: Dirt Pile Randomizer (1)", type="Randomizer"},
+	{byte=0x36, bit=5, name="CCL: Dirt Pile Randomizer (2)", type="Randomizer"},
+	{byte=0x36, bit=6, name="CCL: Dirt Pile Randomizer (3)", type="Randomizer"},
+	{byte=0x36, bit=7, name="CCL: Dirt Pile Randomizer (4)", type="Randomizer"},
+	{byte=0x37, bit=0, name="CCL: Dirt Pile Randomizer (5)", type="Randomizer"},
 	{byte=0x37, bit=1, name="CCL: Rainbow Spawned", type="Physical"},
 	{byte=0x37, bit=2, name="CCL: FT Attempt Pot o' Gold?"},
 	{byte=0x37, bit=3, name="View Totals Menu: MT", type="Progress"},
@@ -3181,7 +3181,7 @@ local flag_array = {
 	{byte=0x50, bit=7, name="GGM: Old King Coal Jiggy Spawned?", type="Physical"},
 	{byte=0x51, bit=0, name="WW: Cactus of Strength Jiggy Spawned", type="Physical"},
 	-- 0x51 > 1
-	-- 0x51 > 2
+	{byte=0x51, bit=2, name="JRL: Seemee Jiggy Spawned", type="Physical"},
 	-- 0x51 > 3
 	-- 0x51 > 4
 	{byte=0x51, bit=5, name="WW: Hoop Hurry Jiggy Spawned", type="Physical"},
@@ -3418,15 +3418,15 @@ local flag_array = {
 	{byte=0x6E, bit=4, name="HFP: Mumbo's Skull Wall Smashed", type="Physical"},
 	{byte=0x6E, bit=5, name="JRL: Mumbo's Skull Wall Smashed", type="Physical"},
 	{byte=0x6E, bit=6, name="FT Complete Jinjo Family?"},
-	-- 0x6E > 7
-	-- 0x6F > 0 JRL Sea Bottom Location?
-	-- 0x6F > 1 JRL Sea Bottom Location?
-	-- 0x6F > 2
-	-- 0x6F > 3
-	-- 0x6F > 4 JRL Sea Bottom Location?
-	-- 0x6F > 5 JRL Sea Bottom Location?
-	-- 0x6F > 6
-	-- 0x6F > 7
+	{byte=0x6E, bit=7, name="JRL: Locker Allocation Randomizer (1)", type="Randomizer"},
+	{byte=0x6F, bit=0, name="JRL: Locker Allocation Randomizer (2)", type="Randomizer"},
+	{byte=0x6F, bit=1, name="JRL: Locker Allocation Randomizer (3)", type="Randomizer"},
+	{byte=0x6F, bit=2, name="JRL: Locker Allocation Randomizer (4)", type="Randomizer"},
+	{byte=0x6F, bit=3, name="JRL: Locker Allocation Randomizer (5)", type="Randomizer"},
+	{byte=0x6F, bit=4, name="JRL: Locker Allocation Randomizer (6)", type="Randomizer"},
+	{byte=0x6F, bit=5, name="JRL: Locker Allocation Randomizer (7)", type="Randomizer"},
+	{byte=0x6F, bit=6, name="JRL: Locker Allocation Randomizer (8)", type="Randomizer"},
+	{byte=0x6F, bit=7, name="JRL: Locker Allocation Randomizer (9)", type="Randomizer"},
 	{byte=0x70, bit=0, name="JRL: Davy Jones Locker Door Destroyed", type="Physical"},
 	{byte=0x70, bit=1, name="JRL: Secret Wall Destroyed", type="Physical"},
 	{byte=0x70, bit=2, name="SM: Jinjo Door Smashed", type="Physical"},
@@ -3524,8 +3524,8 @@ local flag_array = {
 	-- 0x7B > 6
 	-- 0x7B > 7
 	{byte=0x7C, bit=0, name="CCL: Mingy Jongo FTT", type="FTT"},
-	-- 0x7C > 1
-	-- 0x7C > 2
+	{byte=0x7C, bit=1, name="CCL: Skull Randomizer (1)", type="Randomizer"},
+	{byte=0x7C, bit=2, name="CCL: Skull Randomizer (2)", type="Randomizer"},
 	-- 0x7C > 3
 	{byte=0x7C, bit=4, name="Jamjars First Time Text", type="FTT"},
 	-- 0x7C > 5
@@ -4309,26 +4309,14 @@ function flagStats(verbose)
 	print_deferred();
 end
 
---[[
-local function flagSetButtonHandler()
-	setFlagByName(forms.getproperty(ScriptHawk.UI.form_controls["Flag Dropdown"], "SelectedItem"));
-end
-
-local function flagClearButtonHandler()
-	clearFlagByName(forms.getproperty(ScriptHawk.UI.form_controls["Flag Dropdown"], "SelectedItem"));
-end
-
-local function flagCheckButtonHandler()
-	checkFlag(forms.getproperty(ScriptHawk.UI.form_controls["Flag Dropdown"], "SelectedItem"));
-end
-]]--
-
 local function flagSetButtonHandler()
 	flagMasterType = forms.getproperty(ScriptHawk.UI.form_controls["Flag Master Type Dropdown"], "SelectedItem");
 	if flagMasterType == "Permanent Flags" then
 		setFlagByName(forms.getproperty(ScriptHawk.UI.form_controls["Flag Dropdown"], "SelectedItem"));
 	elseif flagMasterType == "Global Flags" then
 		setGlobalFlagByName(forms.getproperty(ScriptHawk.UI.form_controls["Flag Dropdown"], "SelectedItem"));
+	elseif flagMasterType == "Permanent RNG Patterns" then
+		setRNGOutcomeFromComposite(forms.getproperty(ScriptHawk.UI.form_controls["Flag Dropdown"], "SelectedItem"))
 	end
 end
 
@@ -4338,6 +4326,8 @@ local function flagClearButtonHandler()
 		clearFlagByName(forms.getproperty(ScriptHawk.UI.form_controls["Flag Dropdown"], "SelectedItem"));
 	elseif flagMasterType == "Global Flags" then
 		clearGlobalFlagByName(forms.getproperty(ScriptHawk.UI.form_controls["Flag Dropdown"], "SelectedItem"));
+	elseif flagMasterType == "Permanent RNG Patterns" then
+		clearRNGOutcomeFromComposite(forms.getproperty(ScriptHawk.UI.form_controls["Flag Dropdown"], "SelectedItem"));
 	end
 end
 
@@ -4347,10 +4337,12 @@ local function flagCheckButtonHandler()
 		checkFlag(forms.getproperty(ScriptHawk.UI.form_controls["Flag Dropdown"], "SelectedItem"));
 	elseif flagMasterType == "Global Flags" then
 		checkGlobalFlagByName(forms.getproperty(ScriptHawk.UI.form_controls["Flag Dropdown"], "SelectedItem"));
+	elseif flagMasterType == "Permanent RNG Patterns" then
+		checkRNGOutcomeFromComposite(forms.getproperty(ScriptHawk.UI.form_controls["Flag Dropdown"], "SelectedItem"));
 	end
 end
 
-flag_master_types = {"Permanent Flags", "Global Flags"};
+flag_master_types = {"Permanent Flags", "Global Flags", "Permanent RNG Patterns"};
 
 function flagTypeGetter()
 	flagMasterType = forms.getproperty(ScriptHawk.UI.form_controls["Flag Master Type Dropdown"], "SelectedItem");
@@ -4359,16 +4351,25 @@ function flagTypeGetter()
 		loaded_array = flag_array;
 	elseif flagMasterType == "Global Flags" then
 		loaded_array = global_flag_array;
+	elseif flagMasterType == "Permanent RNG Patterns" then
+		loaded_array = getMiniEventTable();
 	end
-	for i = 1, #loaded_array do
-		stored_subtype = false;
-		for j = 1, #flag_subtypes do
-			if loaded_array[i].type == flag_subtypes[j] then
-				stored_subtype = true;
-			end
+	if flagMasterType == "Permanent RNG Patterns" then
+		temp_subtypes = getListOfRNGEvents();
+		for i = 1, #temp_subtypes do
+			table.insert(flag_subtypes, temp_subtypes[i]);
 		end
-		if not stored_subtype and loaded_array[i].type ~= "Unknown" then
-			table.insert(flag_subtypes, loaded_array[i].type);
+	else
+		for i = 1, #loaded_array do
+			stored_subtype = false;
+			for j = 1, #flag_subtypes do
+				if loaded_array[i].type == flag_subtypes[j] then
+					stored_subtype = true;
+				end
+			end
+			if not stored_subtype and loaded_array[i].type ~= "Unknown" then
+				table.insert(flag_subtypes, loaded_array[i].type);
+			end
 		end
 	end
 end
@@ -4382,17 +4383,27 @@ function getFlagsArray()
 	elseif flagMasterType == "Global Flags" then
 		loaded_array = global_flag_array;
 		name_property = "name";
+	elseif flagMasterType == "Permanent RNG Patterns" then
+		loaded_array = getMiniEventTable();
 	end
 	if flagSubType == "All" then
-		flags_list = {};
-		for i = 1, #loaded_array do
-			table.insert(flags_list,loaded_array[i][name_property])
+		if flagMasterType == "Permanent RNG Patterns" then
+			flags_list = getListOfRNGOutcomes();
+		else
+			flags_list = {};
+			for i = 1, #loaded_array do
+				table.insert(flags_list,loaded_array[i][name_property])
+			end
 		end
 	else
-		flags_list = {};
-		for i = 1, #loaded_array do
-			if loaded_array[i].type == flagSubType then
-				table.insert(flags_list,loaded_array[i][name_property])
+		if flagMasterType == "Permanent RNG Patterns" then
+			flags_list = getListOfRNGOutcomesForEvent(flagSubType);
+		else
+			flags_list = {};
+			for i = 1, #loaded_array do
+				if loaded_array[i].type == flagSubType then
+					table.insert(flags_list,loaded_array[i][name_property])
+				end
 			end
 		end
 	end
@@ -4508,6 +4519,385 @@ function checkGlobalFlagByName(name, suppressPrint)
 		return checkGlobalFlag(flag.byte, flag.bit, suppressPrint);
 	end
 	return false;
+end
+
+------------------------
+-- Fixed RNG Elements --
+------------------------
+
+rng_elements = {
+	{
+		name="Klungo Potions",
+		flags={
+			{byte=0x5D,bit=5},
+			{byte=0x5D,bit=6},
+			{byte=0x5D,bit=7},
+		},
+		value_type="value_to_outcome",
+		values={
+			[0] = "Undecided",
+			[1] = "Green, Blue, Red",
+			[2] = "Red, Blue, Green",
+			[3] = "Blue, Red, Green",
+			[4] = "Red, Green, Blue",
+			[5] = "Blue, Green, Red",
+			[6] = "Green, Red, Blue",
+			[7] = "Invalid Pattern", -- Produces Klungo Softlock
+		},
+	},
+	{
+		name="Prison Compound Code",
+		flags={
+			{byte=0x60,bit=3},
+			{byte=0x60,bit=4},
+		},
+		value_type="value_to_outcome",
+		values={
+			[0] = "Undecided",
+			[1] = "* O * ( (",
+			[2] = "O ( * ( O",
+			[3] = "( * O * *",
+		},
+	},
+	{
+		name="Soggy Location",
+		flags={
+			{byte=0xAE,bit=7},
+			{byte=0xAF,bit=0},
+		},
+		value_type="value_to_outcome",
+		values={
+			[0] = "Undecided",
+			[1] = "Star Spinner",
+			[2] = "Inferno",
+			[3] = "Crazy Castle Stockade",
+		},
+	},
+	{
+		name="Moggy Location",
+		flags={
+			{byte=0xAE,bit=5},
+			{byte=0xAE,bit=6},
+		},
+		value_type="value_to_outcome",
+		values={
+			[0] = "Undecided",
+			[1] = "Area 51",
+			[2] = "Cave of Horrors",
+			[3] = "Dodgem Dome",
+		},
+	},
+	{
+		name="Groggy Location",
+		flags={
+			{byte=0xAF,bit=1},
+			{byte=0xAF,bit=2},
+		},
+		value_type="value_to_outcome",
+		values={
+			[0] = "Undecided",
+			[1] = "Train Station",
+			[2] = "Inferno",
+			[3] = "Outside Dodgem Dome",
+		},
+	},
+	{
+		name="Sunken Ship Jinjo Box",
+		flags={
+			{byte=0x15,bit=0},
+			{byte=0x15,bit=1},
+			{byte=0x15,bit=2},
+		},
+		value_type="value_to_outcome",
+		values={
+			[0] = "Undecided",
+			[1] = "", -- Undecided
+			[2] = "", -- Undecided
+			[3] = "", -- Undecided
+			[4] = "Back Right",
+			[5] = "Front Left",
+			[6] = "Front Right",
+			[7] = "Back Left",
+		},
+	},
+	--[[
+	{
+		name="Jinjo Colours",
+		flags={
+			{byte=0x6A,bit=1},
+			{byte=0x6A,bit=2},
+			{byte=0x6A,bit=3},
+			{byte=0x6A,bit=4},
+			{byte=0x6A,bit=5},
+			{byte=0x6A,bit=6},
+		},
+		value_type="value_to_outcome",
+		values={
+			[0] = "",
+			[1] = "",
+			[2] = "",
+			[3] = "",
+		},
+	},
+	]]--
+	{
+		name="D. Jones Locker", -- All lockers are randomised with this
+		flags={
+			{byte=0x6E,bit=7},
+			{byte=0x6F,bit=0},
+			{byte=0x6F,bit=1},
+			{byte=0x6F,bit=2},
+			{byte=0x6F,bit=3},
+			{byte=0x6F,bit=4},
+			{byte=0x6F,bit=5},
+			{byte=0x6F,bit=6},
+			{byte=0x6F,bit=7},
+		},
+		value_type="outcome_to_value",
+		values={
+			{
+				outcome = "8500, -9000, -10900",
+				values = {73},
+			}
+		},
+	},
+	{
+		name="CCL Dirt Piles",
+		flags={
+			{byte=0x36,bit=4},
+			{byte=0x36,bit=5},
+			{byte=0x36,bit=6},
+			{byte=0x36,bit=7},
+			{byte=0x37,bit=0},
+		},
+		value_type="value_to_outcome",
+		values={
+			[0] = "Undecided",
+			[1] = "",
+			[2] = "",
+			[3] = "",
+			[4] = "",
+			[5] = "",
+			[6] = "",
+			[7] = "",
+			[8] = "",
+			[9] = "",
+			[10] = "",
+			[11] = "",
+			[12] = "",
+			[13] = "",
+			[14] = "",
+			[15] = "",
+			[16] = "",
+			[17] = "",
+			[18] = "HC,nil,F,H,B,B,S,E",
+			[19] = "",
+			[20] = "",
+			[21] = "HC,B,nil,H,S,E,B,F",
+			[22] = "",
+			[23] = "E,F,S,B,H,B,HC,nil",
+			[24] = "",
+			[25] = "",
+			[26] = "",
+			[27] = "",
+			[28] = "",
+			[29] = "",
+			[30] = "",
+			[31] = "",
+		},
+	},
+	{
+		name="CCL Skulls",
+		flags={
+			{byte=0x7C,bit=1},
+			{byte=0x7C,bit=2},
+		},
+		value_type="value_to_outcome",
+		values={
+			[0] = "Undecided",
+			[1] = "", -- 0x7C > 1 determines whether RNG is set. Undecided
+			[2] = "Red Jongo, Blue Mumbo",
+			[3] = "Red Mumbo, Blue Jongo",
+		},
+	},
+};
+
+function getRNGOutcome(event)
+	data = {};
+	for i = 1, #rng_elements do
+		if event == rng_elements[i].name then
+			data = rng_elements[i];
+		end
+	end
+	if data.name ~= nil then
+		rng_outcome_value = 0;
+		for i = 1, #data.flags do
+			rng_outcome_value = (rng_outcome_value * 2);
+			if checkFlag(data.flags[i].byte,data.flags[i].bit,true) then
+				rng_outcome_value = rng_outcome_value + 1;
+			end
+		end
+		if data.value_type == "value_to_outcome" then
+			if data.values[rng_outcome_value] == "" or data.values[rng_outcome_value] == nil then
+				return "RNG Event: "..event..", Outcome: Unknown ("..rng_outcome_value..")";
+			end
+			return "RNG Event: "..event..", Outcome: "..data.values[rng_outcome_value]
+		elseif data.value_type == "outcome_to_value" then
+			outcome = "";
+			for i = 1, #data.values do
+				for j = 1, #data.values[i].values do
+					if rng_outcome_value == data.values[i].values[j] then
+						outcome = data.values[i].outcome;
+					end
+				end
+			end
+			if outcome == "" then
+				return "RNG Event: "..event..", Outcome: Unknown ("..rng_outcome_value..")";
+			end
+			return "RNG Event: "..event..", Outcome: "..outcome
+		end
+	end
+	return "Invalid RNG Event"
+end
+
+function resetRNGOutcome(event)
+	data = {};
+	for i = 1, #rng_elements do
+		if event == rng_elements[i].name then
+			data = rng_elements[i];
+		end
+	end
+	if data.name ~= nil then
+		for i = 1, #data.flags do
+			clearFlag(data.flags[i].byte,data.flags[i].bit);
+		end
+		return "Cleared saved data of RNG Event "..event
+	end
+	return "Invalid RNG Event"
+end
+
+function setRNGOutcome(event,outcome_value)
+	data = {};
+	for i = 1, #rng_elements do
+		if event == rng_elements[i].name then
+			data = rng_elements[i];
+		end
+	end
+	if data.name ~= nil then
+		rng_outcome_value = outcome_value;
+		for i = #data.flags, 1, -1 do
+			next_flag_state = rng_outcome_value % 2;
+			if next_flag_state == 1 then
+				setFlag(data.flags[i].byte,data.flags[i].bit);
+			else
+				clearFlag(data.flags[i].byte,data.flags[i].bit);
+			end
+			rng_outcome_value = rng_outcome_value - next_flag_state;
+			rng_outcome_value = rng_outcome_value / 2;
+		end
+		if data.value_type == "value_to_outcome" then
+			return "Set saved data of RNG Event "..event.." to "..data.values[outcome_value];
+		elseif data.value_type == "outcome_to_value" then
+			for i = 1, #data.values do
+				for j = 1, #data.values[i].values do
+					if outcome_value == data.values[i].values[j] then
+						data_outcome = data.values[i].outcome;
+					end
+				end
+			end
+			return "Set saved data of RNG Event "..event.." to "..data_outcome;
+		end
+	end
+	return "Invalid RNG Event"
+end
+
+function getMiniEventTable()
+	data_table = {};
+	for i = 1, #rng_elements do
+		element = rng_elements[i];
+		if #element.values > 0 then
+			if element.value_type == "value_to_outcome" then
+				for j = 0, #element.values do
+					if element.values[j] ~= nil and element.values[j] ~= "" then
+						row = {
+							event=element.name,
+							outcome=element.values[j],
+							outcome_value=j,
+							composite_name=element.name.." - "..element.values[j]
+						};
+						table.insert(data_table,row);
+					end
+				end
+			elseif element.value_type == "outcome_to_value" then
+				for j = 1, #element.values do
+					if #element.values[j].values > 0 then
+						row = {
+							event=element.name,
+							outcome=element.values[j].outcome,
+							outcome_value=element.values[j].values[1],
+							composite_name=element.name.." - "..element.values[j].outcome
+						};
+						table.insert(data_table,row);
+					end
+				end
+			end
+		end
+	end
+	return data_table
+end
+
+function getListOfRNGEvents()
+	events_list = {};
+	for i = 1, #rng_elements do
+		table.insert(events_list,rng_elements[i].name);
+	end
+	return events_list
+end
+
+function getListOfRNGOutcomes()
+	outcomes_list = {};
+	event_table = getMiniEventTable();
+	for i = 1, #event_table do
+		outcome_string = event_table[i].event.." - "..event_table[i].outcome;
+		table.insert(outcomes_list,outcome_string);
+	end
+	return outcomes_list
+end
+
+function getListOfRNGOutcomesForEvent(event_name)
+	outcomes_list = {};
+	event_table = getMiniEventTable();
+	for i = 1, #event_table do
+		if event_table[i].event == event_name then
+			outcome_string = event_table[i].event.." - "..event_table[i].outcome;
+			table.insert(outcomes_list,outcome_string);
+		end
+	end
+	return outcomes_list
+end
+
+function getDataEntryFromComposite(composite)
+	data = getMiniEventTable();
+	for i = 1, #data do
+		if data[i].composite_name == composite then
+			return data[i];
+		end
+	end
+end
+
+function setRNGOutcomeFromComposite(composite)
+	outcome_data = getDataEntryFromComposite(composite);
+	print(setRNGOutcome(outcome_data.event, outcome_data.outcome_value));
+end
+
+function checkRNGOutcomeFromComposite(composite)
+	outcome_data = getDataEntryFromComposite(composite);
+	print(getRNGOutcome(outcome_data.event));
+end
+
+function clearRNGOutcomeFromComposite(composite)
+	outcome_data = getDataEntryFromComposite(composite);
+	print(resetRNGOutcome(outcome_data.event));
 end
 
 --------------------
@@ -5790,15 +6180,15 @@ function Game.initUI()
 	end
 
 	-- Flag stuff
-	ScriptHawk.UI.form_controls["Flag Master Type Dropdown"] = forms.dropdown(ScriptHawk.UI.options_form, flag_master_types, ScriptHawk.UI.col(0) + ScriptHawk.UI.dropdown_offset, ScriptHawk.UI.row(7) + ScriptHawk.UI.dropdown_offset, ScriptHawk.UI.col(4) + 8, ScriptHawk.UI.button_height);
+	ScriptHawk.UI.form_controls["Flag Master Type Dropdown"] = forms.dropdown(ScriptHawk.UI.options_form, flag_master_types, ScriptHawk.UI.col(0) + ScriptHawk.UI.dropdown_offset, ScriptHawk.UI.row(7) + ScriptHawk.UI.dropdown_offset, ScriptHawk.UI.col(6) + 8, ScriptHawk.UI.button_height);
 	forms.setproperty(ScriptHawk.UI.form_controls["Flag Master Type Dropdown"], "SelectedItem","Permanent Flags");
 	flagTypeGetter();
-	ScriptHawk.UI.form_controls["Flag Sub Type Dropdown"] = forms.dropdown(ScriptHawk.UI.options_form, flag_subtypes, ScriptHawk.UI.col(5) + ScriptHawk.UI.dropdown_offset, ScriptHawk.UI.row(7) + ScriptHawk.UI.dropdown_offset, ScriptHawk.UI.col(4) + 8, ScriptHawk.UI.button_height);
+	ScriptHawk.UI.form_controls["Flag Sub Type Dropdown"] = forms.dropdown(ScriptHawk.UI.options_form, flag_subtypes, ScriptHawk.UI.col(7) + ScriptHawk.UI.dropdown_offset, ScriptHawk.UI.row(7) + ScriptHawk.UI.dropdown_offset, ScriptHawk.UI.col(6) + 8, ScriptHawk.UI.button_height);
 	getFlagsArray();
 	old_flagMasterType = forms.getproperty(ScriptHawk.UI.form_controls["Flag Master Type Dropdown"], "SelectedItem");
 	old_flagSubType = forms.getproperty(ScriptHawk.UI.form_controls["Flag Sub Type Dropdown"], "SelectedItem");
 	ScriptHawk.UI.form_controls["Flag Dropdown"] = forms.dropdown(ScriptHawk.UI.options_form, flags_list, ScriptHawk.UI.col(0) + ScriptHawk.UI.dropdown_offset, ScriptHawk.UI.row(8) + ScriptHawk.UI.dropdown_offset, ScriptHawk.UI.col(9) + 8, ScriptHawk.UI.button_height);
-	ScriptHawk.UI.checkbox(10, 7, "realtime_flags", "Realtime Flags", true);
+	ScriptHawk.UI.checkbox(10, 6, "realtime_flags", "Realtime Flags", true);
 
 	ScriptHawk.UI.checkbox(5, 6, "toggle_autojump", "Autojump");
 
