@@ -3938,7 +3938,7 @@ local flag_array = {
 	{byte=0xAF, bit=1, name="WW: Groggy Randomizer (1)", type="Randomizer"},
 	{byte=0xAF, bit=2, name="WW: Groggy Randomizer (2)", type="Randomizer"},
 	{byte=0xAF, bit=3, name="Cheat Active: Enable Homing Eggs", type="Cheat"},
-	-- 0xAF > 4
+	{byte=0xAF, bit=4, name="Cheat Available: Homing Eggs", type="Cheat Available"},
 	-- 0xAF > 5
 	-- 0xAF > 6
 	-- 0xAF > 7
