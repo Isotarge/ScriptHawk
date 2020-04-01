@@ -83,7 +83,7 @@ Game = {
 	speedy_index = 9,
 	rot_speed = 0.5,
 	max_rot_units = 360,
-	form_height = 14,
+	form_height = 13,
 	maps = {
 		"SM - Spiral Mountain",
 		"MM - Mumbo's Mountain",
@@ -3622,7 +3622,7 @@ function Game.setJiggySpawnAngle(value)
 	mainmemory.writefloat(Game.Memory.jiggy_spawn_angle, value, true);
 end
 
-Game.OSD = {
+Game.standardOSD = {
 	{"X", category="position"},
 	{"Y", category="position"},
 	{"Z", category="position"},
@@ -3665,5 +3665,7 @@ Game.OSD = {
 	{"Jiggy Grabbed", Game.getJiggyGrabbedPointer, category="objectDespawn"},
 	{"Index Grabbed", Game.getJiggyGrabbedIndex, category="objectDespawn"},
 };
+
+Game.OSD = Game.standardOSD;
 
 return Game;

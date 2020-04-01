@@ -338,7 +338,7 @@ Game = {
 	speedy_index = 7,
 	rot_speed = 10,
 	max_rot_units = 360,
-	form_height = 14,
+	form_height = 13,
 	character_states = {
 		-- 0 Occurs during game boot-up
 		[1] = "Banjo-Kazooie", -- Doesn't matter if you're Dragon Kazooie
@@ -6245,7 +6245,7 @@ function Game.eachFrame()
 	end
 end
 
-Game.OSD = {
+Game.standardOSD = {
 	{"Map", Game.getMapOSD, category="mapData"},
 	{"DCW", Game.getDCWLocation, category="mapData"},
 	{"Separator"},
@@ -6288,5 +6288,7 @@ Game.OSD = {
 	{"Camera Y", Game.getCameraYPosition, category="camera"},
 	{"Camera Z", Game.getCameraZPosition, category="camera"},
 };
+
+Game.OSD = Game.standardOSD;
 
 return Game;

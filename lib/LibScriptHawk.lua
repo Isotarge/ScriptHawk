@@ -788,3 +788,35 @@ function pagifyThis(tablename,max_page_size)
 	page_start = max_page_size * (page_pos - 1);
 	page_finish = page_start + page_size;
 end
+
+----------
+-- Math --
+----------
+
+function floored_log2(value)
+	if value < 1.0 then
+		return;
+	end
+	local result = 0;
+	while value > 2 do
+		result = result + 1;
+		value = value / 2.0;
+	end
+	return result;
+end
+
+function pow(base, exponent)
+	local result = 1;
+	if exponent > 0 then
+		while exponent > 0 do
+			exponent = exponent - 1;
+			result = result * base;
+		end
+	elseif exponent < 0 then
+		while exponent < 0 do
+			exponent = exponent + 1;
+			result = result / base;
+		end
+	end
+	return result;
+end
