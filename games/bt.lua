@@ -2846,8 +2846,8 @@ local flag_array = {
 	{byte=0x27, bit=0, name="TDL: Stepping Stones Enlarged", type="Mumbo's Magic"},
 	-- 0x27 > 1
 	{byte=0x27, bit=2, name="WW: Pump Room Grate Smashed", type="Physical"},
-	{byte=0x27, bit=3, name="GI: Train Switch", type="Physical"},
-	{byte=0x27, bit=4, name="Chuffy: TDL Station Open", type="Physical"},
+	{byte=0x27, bit=3, name="GI: Train Switch", type="Train Switch"},
+	{byte=0x27, bit=4, name="TDL: Train Switch", type="Train Switch"},
 	{byte=0x27, bit=5, name="FT Doubloon Collection", type="FTT"},
 	{byte=0x27, bit=6, name="JRL: Toxic Waste Switch Pushed", type="Physical"},
 	{byte=0x27, bit=7, name="HFP: Hot Water Drained", type="Physical"},
@@ -2860,7 +2860,7 @@ local flag_array = {
 	-- 0x28 > 6
 	-- 0x28 > 7
 	-- 0x29 > 0
-	-- 0x29 > 1
+	{byte=0x29, bit=1, name="HFP: Chuffy's Engine Cooled", type="Physical"},
 	-- 0x29 > 2
 	{byte=0x29, bit=3, name="TDL: Terry's Nest Drilled", type="Physical"},
 	{byte=0x29, bit=4, name="GI: Weldar Intro Cutscene", type="FTT"},
@@ -2954,8 +2954,8 @@ local flag_array = {
 	{byte=0x34, bit=4, name="HFP: Biggafoot Gone", type="Physical"},
 	{byte=0x34, bit=5, name="WW: All Kids Returned", type="Physical"}, -- Might be Mrs. Boggy appearing in HFP Igloo
 	{byte=0x34, bit=6, name="JRL: Beach Ball Piglet FTT", type="FTT"}, -- Might be from the HFP Side
-	{byte=0x34, bit=7, name="HFP: Icy Train Switch", type="Train"},
-	{byte=0x35, bit=0, name="HFP: Fire Train Switch", type="Train"},
+	{byte=0x34, bit=7, name="HFP: Icy Train Switch", type="Train Switch"},
+	{byte=0x35, bit=0, name="HFP: Fire Train Switch", type="Train Switch"},
 	{byte=0x35, bit=1, name="Humba Wumba: No Glowbo Needed FTT", type="FTT"},
 	-- 0x35 > 2
 	-- 0x35 > 3
@@ -3518,7 +3518,7 @@ local flag_array = {
 	-- 0x7B > 0
 	-- 0x7B > 1
 	-- 0x7B > 2
-	{byte=0x7B, bit=3, name="IoH: Train Switch", type="Physical"},
+	{byte=0x7B, bit=3, name="IoH: Train Switch", type="Train Switch"},
 	-- 0x7B > 4
 	-- 0x7B > 5
 	-- 0x7B > 6
@@ -4620,7 +4620,6 @@ rng_elements = {
 			[7] = "Back Left",
 		},
 	},
-	--[[
 	{
 		name="Jinjo Colours",
 		flags={
@@ -4633,13 +4632,84 @@ rng_elements = {
 		},
 		value_type="value_to_outcome",
 		values={
-			[0] = "",
-			[1] = "",
-			[2] = "",
-			[3] = "",
+			[0] = "Undecided",
+			-- Invalid
+			[1] = "",[2] = "",[3] = "",[4] = "",[5] = "",
+			[6] = "",[7] = "",[8] = "",[9] = "",[10] = "",
+			[11] = "",[12] = "",[13] = "",[14] = "",[15] = "",
+			[16] = "",[17] = "",[18] = "",[19] = "",[20] = "",
+			[21] = "",[22] = "",[23] = "",[24] = "",[25] = "",
+			[26] = "",[27] = "",[28] = "",[29] = "",[30] = "",
+			[31] = "",
+			-- Valid Patterns
+			[32] = "Pattern 1",
+			[33] = "Pattern 2",
+			[34] = "Pattern 3",
+			[35] = "Pattern 4",
+			[36] = "Pattern 5",
+			[37] = "Pattern 6",
+			[38] = "Pattern 7",
+			[39] = "Pattern 8",
+			[40] = "Pattern 9",
+			[41] = "Pattern 10",
+			[42] = "Pattern 11",
+			[43] = "Pattern 12",
+			[44] = "Pattern 13",
+			[45] = "Pattern 14",
+			[46] = "Pattern 15",
+			[47] = "Pattern 16",
+			[48] = "Pattern 17",
+			[49] = "Pattern 18",
+			[50] = "Pattern 19",
+			[51] = "Pattern 20",
+			[52] = "Pattern 21",
+			[53] = "Pattern 22",
+			[54] = "Pattern 23",
+			[55] = "Pattern 24",
+			[56] = "Pattern 25",
+			[57] = "Pattern 26",
+			[58] = "Pattern 27",
+			[59] = "Pattern 28",
+			[60] = "Pattern 29",
+			[61] = "Pattern 30",
+			[62] = "Pattern 31",
+			[63] = "Pattern 32",
+		},
+		patterns = {
+			[32] = {7,5,5,8,5,3,8,6,8,7,8,5,2,1,4,4,3,5,5,0,6,3,8,4,3,8,4,8,7,8,4,1,2,2,6,7,6,7,8,7,6,7,7,6,6},
+			[33] = {0,6,6,1,3,5,7,3,4,7,5,6,4,8,7,8,5,5,4,8,1,2,3,2,3,2,4,7,4,8,8,8,7,7,6,7,5,8,5,7,6,8,8,6,6},
+			[34] = {4,1,1,5,4,8,4,2,6,3,5,4,7,6,6,6,7,5,2,3,6,2,5,3,3,8,4,6,5,6,5,0,8,7,7,8,7,7,7,7,8,8,8,8,8},
+			[35] = {5,1,2,7,1,2,5,3,0,7,2,5,8,8,3,5,7,7,3,7,6,8,7,4,8,4,3,8,6,8,5,4,6,8,7,8,6,8,5,7,4,6,4,6,6},
+			[36] = {5,3,7,6,5,6,6,8,7,4,1,1,8,4,0,6,5,3,7,6,3,5,5,6,7,2,8,3,6,2,4,5,7,4,8,7,2,4,7,7,8,8,8,8,8},
+			[37] = {7,3,0,8,2,8,7,2,1,3,7,4,3,5,2,1,6,4,6,7,4,6,7,6,6,7,3,5,4,5,4,8,8,8,6,7,8,5,8,7,6,5,8,5,8},
+			[38] = {2,8,4,3,3,2,2,4,4,7,5,1,1,3,8,4,6,3,7,5,7,6,8,4,5,8,7,5,0,7,5,8,5,6,7,6,6,7,8,6,7,8,8,8,6},
+			[39] = {3,8,5,5,0,4,3,6,8,4,4,5,3,6,4,8,4,1,8,1,3,5,6,2,8,2,6,8,6,5,8,6,7,2,8,5,8,6,7,7,7,7,7,7,7},
+			[40] = {2,4,6,7,0,3,7,8,6,4,7,5,7,2,7,1,1,3,3,6,2,8,5,8,4,3,8,8,6,7,5,4,8,6,6,6,5,8,4,7,7,8,8,5,5},
+			[41] = {3,4,7,0,7,2,3,8,2,2,4,7,1,6,7,5,3,5,7,3,7,5,8,7,5,4,8,6,4,6,1,7,4,8,8,8,8,8,6,8,5,6,5,6,6},
+			[42] = {7,0,2,4,8,5,8,3,5,8,7,7,4,4,8,4,3,3,3,4,6,8,1,8,1,5,6,5,6,7,6,5,8,2,2,5,8,6,8,6,7,6,7,7,7},
+			[43] = {0,3,6,5,8,8,4,8,5,8,7,2,6,8,1,1,8,3,8,4,6,2,7,6,6,7,2,4,3,7,7,6,5,3,6,5,4,8,7,8,5,5,7,7,4},
+			[44] = {0,2,5,2,1,1,6,3,6,3,7,3,7,2,7,6,3,8,7,6,8,7,7,7,7,4,5,5,4,6,5,8,6,4,5,8,8,6,5,8,4,4,8,8,8},
+			[45] = {2,2,1,8,6,5,1,2,8,6,3,5,4,5,4,7,7,6,0,4,6,4,3,7,7,3,5,5,3,4,8,5,8,7,7,7,6,8,7,6,8,6,8,8,8},
+			[46] = {5,7,5,2,7,8,5,6,4,6,2,3,3,7,0,4,1,4,7,4,3,6,1,5,7,7,5,7,2,5,8,7,3,4,8,6,6,6,6,8,8,8,8,8,8},
+			[47] = {7,7,6,4,5,1,6,7,7,2,1,3,7,0,4,6,7,7,7,3,6,5,2,6,2,3,5,6,4,3,4,4,8,8,8,6,5,8,8,5,8,8,8,5,8},
+			[48] = {0,1,8,7,1,6,6,4,2,2,2,3,4,3,6,3,4,5,4,4,3,5,6,8,5,5,5,6,7,8,6,8,8,7,7,6,7,8,5,7,7,8,8,8,7},
+			[49] = {2,1,2,1,5,3,6,8,7,8,2,7,7,7,4,3,7,4,5,8,5,6,3,0,8,4,4,4,8,6,6,8,6,3,6,8,5,5,6,5,7,7,7,8,8},
+			[50] = {5,5,6,4,6,7,1,2,1,5,6,2,5,5,2,0,5,4,3,7,3,8,6,7,8,3,7,3,6,6,6,4,7,7,7,7,4,8,4,8,8,8,8,8,8},
+			[51] = {7,5,7,6,3,0,2,4,4,1,5,2,4,5,6,1,4,7,5,5,8,3,8,8,8,8,2,6,7,3,7,5,3,8,4,6,7,6,8,8,8,6,7,6,7},
+			[52] = {7,7,4,6,7,4,3,0,2,8,4,6,7,8,6,3,4,8,2,8,1,6,1,8,8,7,6,8,4,8,2,6,3,8,5,3,6,5,5,7,7,5,5,7,5},
+			[53] = {0,7,5,8,4,6,4,1,6,5,3,6,4,1,3,8,6,2,7,2,5,5,2,4,4,6,5,3,7,8,3,5,8,7,8,6,7,7,8,8,6,7,8,8,7},
+			[54] = {4,3,0,2,5,1,8,5,8,2,8,6,2,4,1,7,6,6,8,4,5,4,7,6,5,6,3,6,7,6,3,8,4,3,7,7,5,8,8,5,7,8,8,7,7},
+			[55] = {5,3,1,5,3,3,0,6,3,7,7,6,6,6,5,1,2,8,8,8,2,5,2,4,8,8,6,5,5,6,4,6,4,8,4,8,4,8,7,7,8,7,7,7,7},
+			[56] = {4,8,2,7,3,7,0,8,3,1,7,4,6,1,4,5,8,2,2,7,3,6,6,4,6,8,5,5,4,3,7,7,7,6,7,8,5,5,6,8,8,8,8,6,5},
+			[57] = {5,8,3,0,1,6,6,6,4,1,4,5,6,2,4,2,6,5,4,8,3,7,7,5,2,5,7,3,8,8,5,7,6,4,8,7,6,8,7,3,7,8,7,8,8},
+			[58] = {0,4,7,3,1,4,5,4,3,2,4,8,7,3,5,8,1,2,3,8,6,4,8,5,8,2,6,6,5,7,8,5,5,7,8,6,7,7,6,8,8,7,7,6,6},
+			[59] = {2,4,0,5,7,6,5,5,4,2,4,3,7,7,5,6,2,8,8,7,4,6,4,3,1,6,6,6,6,7,3,5,1,3,8,5,7,7,7,8,8,8,8,8,8},
+			[60] = {2,6,5,5,2,1,7,1,6,0,3,4,7,2,6,5,4,5,3,5,5,4,7,3,6,3,8,8,4,7,7,7,6,8,8,6,4,8,7,6,8,7,8,8,8},
+			[61] = {3,6,6,7,8,3,7,2,5,3,8,8,7,7,2,2,8,5,6,7,8,5,0,7,6,4,7,7,8,4,1,1,5,8,4,6,6,5,8,4,3,8,4,5,6},
+			[62] = {7,2,1,2,0,7,3,6,8,4,8,5,1,5,2,6,4,7,3,8,3,5,5,3,4,6,7,5,4,8,5,4,7,8,7,7,6,7,6,6,8,6,8,8,8},
+			[63] = {0,2,2,4,7,3,7,2,6,4,8,3,4,3,7,6,5,5,8,6,6,4,8,3,1,5,5,5,5,1,6,7,4,6,6,7,7,7,8,7,8,8,8,8,8},
 		},
 	},
-	]]--
 	{
 		name="D. Jones Locker", -- All lockers are randomised with this
 		flags={
@@ -4722,13 +4792,38 @@ rng_elements = {
 	},
 };
 
-function getRNGOutcome(event)
+function getEventData(event)
 	data = {};
 	for i = 1, #rng_elements do
 		if event == rng_elements[i].name then
 			data = rng_elements[i];
 		end
 	end
+	return data
+end
+
+function printJinjoRNGPattern(rng_outcome_value)
+	event_data = getEventData("Jinjo Colours");
+	jinjo_data = event_data.patterns[rng_outcome_value];
+	for i = 0, 8 do
+		jinjo_string = JinjoColors[i]..": ";
+		colour_count = 0;
+		for j = 1, #jinjo_data do
+			if jinjo_data[j] == i and colour_count < i then
+				jinjo_string = jinjo_string..JinjoAddresses[j][2]..", ";
+				colour_count = colour_count + 1;
+			elseif jinjo_data[j] == i and colour_count == i then
+				jinjo_string = jinjo_string..JinjoAddresses[j][2];
+				colour_count = colour_count + 1;
+			end
+		end
+		print(jinjo_string);
+		print("");
+	end
+end
+
+function getRNGOutcome(event)
+	data = getEventData(event);
 	if data.name ~= nil then
 		rng_outcome_value = 0;
 		for i = 1, #data.flags do
@@ -4737,36 +4832,35 @@ function getRNGOutcome(event)
 				rng_outcome_value = rng_outcome_value + 1;
 			end
 		end
-		if data.value_type == "value_to_outcome" then
-			if data.values[rng_outcome_value] == "" or data.values[rng_outcome_value] == nil then
-				return "RNG Event: "..event..", Outcome: Unknown ("..rng_outcome_value..")";
-			end
-			return "RNG Event: "..event..", Outcome: "..data.values[rng_outcome_value]
-		elseif data.value_type == "outcome_to_value" then
-			outcome = "";
-			for i = 1, #data.values do
-				for j = 1, #data.values[i].values do
-					if rng_outcome_value == data.values[i].values[j] then
-						outcome = data.values[i].outcome;
+		if data.name == "Jinjo Colours" then
+			printJinjoRNGPattern(rng_outcome_value);
+		else
+			if data.value_type == "value_to_outcome" then
+				if data.values[rng_outcome_value] == "" or data.values[rng_outcome_value] == nil then
+					return "RNG Event: "..event..", Outcome: Unknown ("..rng_outcome_value..")";
+				end
+				return "RNG Event: "..event..", Outcome: "..data.values[rng_outcome_value]
+			elseif data.value_type == "outcome_to_value" then
+				outcome = "";
+				for i = 1, #data.values do
+					for j = 1, #data.values[i].values do
+						if rng_outcome_value == data.values[i].values[j] then
+							outcome = data.values[i].outcome;
+						end
 					end
 				end
+				if outcome == "" then
+					return "RNG Event: "..event..", Outcome: Unknown ("..rng_outcome_value..")";
+				end
+				return "RNG Event: "..event..", Outcome: "..outcome
 			end
-			if outcome == "" then
-				return "RNG Event: "..event..", Outcome: Unknown ("..rng_outcome_value..")";
-			end
-			return "RNG Event: "..event..", Outcome: "..outcome
 		end
 	end
 	return "Invalid RNG Event"
 end
 
 function resetRNGOutcome(event)
-	data = {};
-	for i = 1, #rng_elements do
-		if event == rng_elements[i].name then
-			data = rng_elements[i];
-		end
-	end
+	data = getEventData(event);
 	if data.name ~= nil then
 		for i = 1, #data.flags do
 			clearFlag(data.flags[i].byte,data.flags[i].bit);
@@ -4777,12 +4871,7 @@ function resetRNGOutcome(event)
 end
 
 function setRNGOutcome(event,outcome_value)
-	data = {};
-	for i = 1, #rng_elements do
-		if event == rng_elements[i].name then
-			data = rng_elements[i];
-		end
-	end
+	data = getEventData(event);
 	if data.name ~= nil then
 		rng_outcome_value = outcome_value;
 		for i = #data.flags, 1, -1 do
@@ -4796,7 +4885,11 @@ function setRNGOutcome(event,outcome_value)
 			rng_outcome_value = rng_outcome_value / 2;
 		end
 		if data.value_type == "value_to_outcome" then
-			return "Set saved data of RNG Event "..event.." to "..data.values[outcome_value];
+			if data.values[outcome_value] ~= nil then
+				return "Set saved data of RNG Event "..event.." to "..data.values[outcome_value];
+			else
+				return "Set saved data of RNG Event "..event.." to Unknown ("..outcome_value..")";
+			end
 		elseif data.value_type == "outcome_to_value" then
 			for i = 1, #data.values do
 				for j = 1, #data.values[i].values do
@@ -4892,7 +4985,12 @@ end
 
 function checkRNGOutcomeFromComposite(composite)
 	outcome_data = getDataEntryFromComposite(composite);
-	print(getRNGOutcome(outcome_data.event));
+	if outcome_data.event == "Jinjo Colours" then
+		print("RNG Event: "..outcome_data.event..", Outcome: "..outcome_data.outcome_value-32)
+		getRNGOutcome(outcome_data.event);
+	else
+		print(getRNGOutcome(outcome_data.event));
+	end
 end
 
 function clearRNGOutcomeFromComposite(composite)
