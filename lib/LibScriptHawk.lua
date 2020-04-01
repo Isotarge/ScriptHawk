@@ -795,7 +795,7 @@ end
 
 function floored_log2(value)
 	if value < 1.0 then
-		return;
+		return -1;
 	end
 	local result = 0;
 	while value > 2 do
