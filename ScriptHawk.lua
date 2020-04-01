@@ -801,18 +801,22 @@ precision = 3;
 
 function ScriptHawk.decreasePrecision()
 	precision = math.max(0, precision - 1);
+	forms.settext(ScriptHawk.UI.form_controls["Precision Value Label"], precision);
 end
 
 function ScriptHawk.increasePrecision()
 	precision = math.min(12, precision + 1);
+	forms.settext(ScriptHawk.UI.form_controls["Precision Value Label"], precision);
 end
 
 function ScriptHawk.decreaseSpeed()
 	Game.speedy_index = math.max(1, Game.speedy_index - 1);
+	forms.settext(ScriptHawk.UI.form_controls["Speed Value Label"], Game.speedy_speeds[Game.speedy_index]);
 end
 
 function ScriptHawk.increaseSpeed()
 	Game.speedy_index = math.min(#Game.speedy_speeds, Game.speedy_index + 1);
+	forms.settext(ScriptHawk.UI.form_controls["Speed Value Label"], Game.speedy_speeds[Game.speedy_index]);
 end
 
 ScriptHawk.movingAngle = 0.0;
@@ -985,6 +989,7 @@ local function toggleRotationUnits()
 	else
 		rotation_units = "Degrees";
 	end
+	forms.settext(ScriptHawk.UI.form_controls["Toggle Rotation Units Button"], rotation_units);
 end
 
 function ScriptHawk.UI.formatRotation(num)
@@ -1012,6 +1017,7 @@ local function toggleMode()
 	else
 		ScriptHawk.mode = 'Position';
 	end
+	forms.settext(ScriptHawk.UI.form_controls["Mode Button"], ScriptHawk.mode);
 end
 
 ---------------
@@ -1228,7 +1234,7 @@ function ScriptHawk.initUI(formTitle)
 			ScriptHawk.UI.form_controls["Speed Label"] = forms.label(ScriptHawk.UI.options_form, "Speed:", ScriptHawk.UI.col(0), ScriptHawk.UI.row(2) + ScriptHawk.UI.label_offset, 54, 14);
 			ScriptHawk.UI.button({4, -28}, 2, {ScriptHawk.UI.button_height}, nil, "Decrease Speed Button", "-", ScriptHawk.decreaseSpeed);
 			ScriptHawk.UI.button({5, -28}, 2, {ScriptHawk.UI.button_height}, nil, "Increase Speed Button", "+", ScriptHawk.increaseSpeed);
-			ScriptHawk.UI.form_controls["Speed Value Label"] = forms.label(ScriptHawk.UI.options_form, "0", ScriptHawk.UI.col(5), ScriptHawk.UI.row(2) + ScriptHawk.UI.label_offset, 47, 14);
+			ScriptHawk.UI.form_controls["Speed Value Label"] = forms.label(ScriptHawk.UI.options_form, Game.speedy_speeds[Game.speedy_index], ScriptHawk.UI.col(5), ScriptHawk.UI.row(2) + ScriptHawk.UI.label_offset, 47, 14);
 		end
 
 		if type(Game.maps) == "table" then
@@ -1372,15 +1378,7 @@ local angleKeywords = {
 
 function ScriptHawk.UI.updateReadouts()
 	-- Update form buttons etc
-	forms.settext(ScriptHawk.UI.form_controls["Precision Value Label"], precision);
-	forms.settext(ScriptHawk.UI.form_controls["Toggle Rotation Units Button"], rotation_units);
-
 	if not TASSafe then
-		if ScriptHawk.dpad.joypad.enabled or ScriptHawk.dpad.key.enabled then
-			forms.settext(ScriptHawk.UI.form_controls["Speed Value Label"], Game.speedy_speeds[Game.speedy_index]);
-		end
-		forms.settext(ScriptHawk.UI.form_controls["Mode Button"], ScriptHawk.mode);
-
 		if type(Game.maps) == "table" and previous_map ~= forms.gettext(ScriptHawk.UI.form_controls["Map Dropdown"]) then
 			previous_map = forms.gettext(ScriptHawk.UI.form_controls["Map Dropdown"]);
 			previous_map_value = ScriptHawk.UI.findMapValue();
