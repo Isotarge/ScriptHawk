@@ -424,6 +424,12 @@ local supportedGames = {
 	["7E59A4CE"] = {moduleName="games.crash3", friendlyName="Crash Bandicoot 3 - Buttobi! Sekai Isshuu (Japan)", version=3},
 	["A2E93AEC"] = {moduleName="games.crash3", friendlyName="Crash Bandicoot 3 - Buttobi! Sekai Isshuu (Japan)", version=3},
 
+	-- Crash Bash
+	["C829C610"] = {moduleName="games.crash_bash", friendlyName="Crash Bash (USA)", version=1},
+	["69A6CD83"] = {moduleName="games.crash_bash", friendlyName="Crash Bash (USA)", version=1},
+	["D9D78CC9"] = {moduleName="games.crash_bash", friendlyName="Crash Bash (Europe)", version=2},
+	["2FA7F930"] = {moduleName="games.crash_bash", friendlyName="Crash Bash (Europe)", version=2},
+
 	-- Day Dreamin' Davey
 	["4C88391318E3BD79C14BFF6724A377688E47261B"] = {moduleName="games.day_dreamin_davey", friendlyName="Day Dreamin' Davey"},
 

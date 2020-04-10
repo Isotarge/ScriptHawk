@@ -130,6 +130,7 @@ A collection of Lua scripts and RAM watches for [BizHawk](https://github.com/TAS
 - Wonder Boy in Monster World (SMS)
 
 ## Partially Supported Games
+- Crash Bash
 - Duck Dodgers Starring Daffy Duck
 - Elmo's Number Journey (N64 only)
 - Elmo's Letter Adventure (N64 only)
