@@ -38,6 +38,8 @@ local grab_script_modes = {
 	{"Exits","Exits"},
 	{"List (Spawners)","Spawners", subtype = "List"},
 	{"Examine (Spawners)","Spawners", subtype = "Examine"},
+	{"List (Actor Spawners)","Actor Spawners", subtype = "List"},
+	{"Examine (Actor Spawners)","Actor Spawners", subtype = "Examine"},
 };
 local grab_script_mode_index = 1;
 local grab_script_mode = grab_script_modes[grab_script_mode_index][1];
@@ -319,6 +321,7 @@ local Game = {
 		map_floor_pointer = {0x7F9514, 0x7F9434, 0x7F9984, 0x7B49D4},
 		water_surface_list = {0x7F93C0, 0x7F92E0, 0x7F9830, 0x7B48A0},
 		chunk_array_pointer = {0x7F6C18, 0x7F6B38, 0x7F7088, 0x7B20F8},
+		actor_spawner_pointer = {0x7FC400,0x7FC320,0x7FC870,nil},
 		num_enemies = {0x7FDC88, 0x7FDBC8, 0x7FE118, 0x7B73D8},
 		enemy_respawn_object = {0x7FDC8C, 0x7FDBCC, 0x7FE11C, 0x7B73DC},
 		os_code_start = {0x400, 0x400, 0x400, nil}, -- TODO: Kiosk
@@ -1332,7 +1335,6 @@ obj_model1 = {
 		-- [296] = "Unknown",
 		[297] = "Battle Crown Controller",
 		-- [298] = "Unknown",
-		-- [299] = "Unknown",
 		[299] = "Textbox",
 		[300] = "Snake", -- Teetering Turtle Trouble
 		[301] = "Turtle", -- Teetering Turtle Trouble
@@ -3834,6 +3836,10 @@ local function getExamineDataModelTwo(pointer)
 	return examine_data;
 end
 
+--------------------
+-- Enemy Spawners --
+--------------------
+
 local spawnerAttributes = {
 	enemy_value = 0x0, -- u8
 	y_rot = 0x2, -- u16
@@ -4009,6 +4015,103 @@ function getExamineDataSpawners(pointer)
 
 	return examine_data;
 end
+
+---------------------------------
+-- Actor Spawner Documentation --
+---------------------------------
+actorSpawner_size = 0x80;
+
+actorSpawnerAttributes = {
+	actor_type = 0x0, -- u16 (Value 0 = actor_type 16, 1=17, 2=18..)
+	x_pos = 0x4, -- float
+	y_pos = 0x8, -- float
+	z_pos = 0xC, -- flaot
+	rotation = 0x1C, -- u16
+	tied_actor = 0x44, -- u32
+	drawing_code = 0x60, -- u32 
+	previous_spawner = 0x64, -- u32
+	next_spawner = 0x68, -- u32
+	bonus_barrel = {
+		tied_map = 0x24, -- u32 (Bonus Barrels only)
+	},
+	balloon = {
+		unique_id = 0x27, -- u8
+		speed = 0x2B, -- u8
+	},
+};
+
+function getSpawnerCount()
+	if Game.version ~= 4 then
+		endpoint_found = false;
+		actorSpawner_header = dereferencePointer(Game.Memory.actor_spawner_pointer);
+		count = 0;
+		nextSpawner = actorSpawner_header;
+		if isRDRAM(actorSpawner_header) then
+			while not endpoint_found do
+				count = count + 1;
+				nextSpawner = dereferencePointer(nextSpawner + actorSpawnerAttributes.next_spawner);
+				if not isRDRAM(nextSpawner) then
+					endpoint_found = true;
+					return count;
+				end
+			end
+			emu.yield();
+		end
+	end
+	return 0;
+end
+
+function Game.populateActorSpawnerPointers()
+	local actorSpawnerArray = dereferencePointer(Game.Memory.actor_spawner_pointer);
+	object_pointers = {};
+	if isRDRAM(actorSpawnerArray) and Game.version ~= 4 then
+		local spawnerCount = getSpawnerCount();
+		local nextSpawner = actorSpawnerArray;
+		for i = 1, spawnerCount do
+			local slotBase = nextSpawner;
+			nextSpawner = dereferencePointer(slotBase + actorSpawnerAttributes.next_spawner)
+			table.insert(object_pointers, slotBase);
+		end
+	end
+end
+
+function getExamineDataActorSpawners(pointer)
+	local examine_data = {};
+	local spawnerActorType = mainmemory.read_u16_be(pointer + actorSpawnerAttributes.actor_type) + 0x10;
+	local spawnerActorName = getActorNameFromBehavior(spawnerActorType);
+	local spawnerTiedActor = dereferencePointer(pointer + actorSpawnerAttributes.tied_actor);
+	
+	local balloons = {91,111,112,113,114,147};
+	local isBalloon = false;
+	for i = 1, #balloons do
+		if spawnerActorType == balloons[i] then
+			isBalloon = true;
+		end
+	end
+
+	table.insert(examine_data, { "Slot base", toHexString(pointer, 6) });
+	table.insert(examine_data, { "Object Name", spawnerActorName });
+	table.insert(examine_data, { "Object Type", toHexString(spawnerActorType) });
+	table.insert(examine_data, { "Separator", 1 });
+
+	table.insert(examine_data, { "X", mainmemory.readfloat(pointer + actorSpawnerAttributes.x_pos, true) });
+	table.insert(examine_data, { "Y", mainmemory.readfloat(pointer + actorSpawnerAttributes.y_pos, true) });
+	table.insert(examine_data, { "Z", mainmemory.readfloat(pointer + actorSpawnerAttributes.z_pos, true) });
+	table.insert(examine_data, { "Rotation", mainmemory.read_u16_be(pointer + actorSpawnerAttributes.rotation) });
+	table.insert(examine_data, { "Separator", 1 });
+
+	if spawnerActorType == 28 then
+		table.insert(examine_data, { "Destination Map", Game.maps[mainmemory.read_u32_be(pointer + actorSpawnerAttributes.bonus_barrel.tied_map) + 1] });
+	elseif isBalloon then
+		table.insert(examine_data, { "Unique ID", mainmemory.readbyte(pointer + actorSpawnerAttributes.balloon.unique_id) });
+		table.insert(examine_data, { "Speed", mainmemory.readbyte(pointer + actorSpawnerAttributes.balloon.speed) });
+	end
+	if isRDRAM(spawnerTiedActor) then
+		table.insert(examine_data, { "Tied Actor Address", toHexString(spawnerTiedActor) });
+	end
+	return examine_data;
+end
+
 --------------------------------
 -- Loading Zone Documentation --
 --------------------------------
@@ -4543,6 +4646,7 @@ function Game.detectVersion(romName, romHash)
 			[25] = "TNT Barrel",
 			[26] = "TNT Barrel Spawner (Army Dillo)",
 			[27] = "Bonus Barrel",
+			[28] = "Minecart",
 			[29] = "Fireball", -- Army Dillo, Dogadon
 			[30] = "Bridge", -- Creepy Castle?
 			[31] = "Swinging Light", -- Grey
@@ -8246,10 +8350,14 @@ function Game.zipToSelectedObject()
 				desiredX = mainmemory.read_s16_be(selectedObject + exit.x_pos);
 				desiredY = mainmemory.read_s16_be(selectedObject + exit.y_pos);
 				desiredZ = mainmemory.read_s16_be(selectedObject + exit.z_pos);
-			elseif string.contains(grab_script_mode, "Spawners") then
-				desiredX = mainmemory.read_s16_be(selectedObject + 4); -- TODO: Stop using magic numbers for this
-				desiredY = mainmemory.read_s16_be(selectedObject + 6);
-				desiredZ = mainmemory.read_s16_be(selectedObject + 8);
+			elseif string.contains(grab_script_mode, "Spawners") and not string.contains(grab_script_mode, "Actor") then
+				desiredX = mainmemory.read_s16_be(selectedObject + spawnerAttributes.x_pos); -- TODO: Stop using magic numbers for this
+				desiredY = mainmemory.read_s16_be(selectedObject + spawnerAttributes.y_pos);
+				desiredZ = mainmemory.read_s16_be(selectedObject + spawnerAttributes.z_pos);
+			elseif string.contains(grab_script_mode, "Actor Spawners") then
+				desiredX = mainmemory.readfloat(selectedObject + actorSpawnerAttributes.x_pos,true); -- TODO: Stop using magic numbers for this
+				desiredY = mainmemory.readfloat(selectedObject + actorSpawnerAttributes.y_pos,true);
+				desiredZ = mainmemory.readfloat(selectedObject + actorSpawnerAttributes.z_pos,true);
 			end
 		end
 
@@ -8506,8 +8614,12 @@ local function drawGrabScriptUI()
 		populateExitPointers();
 	end
 
-	if string.contains(grab_script_mode, "Spawners") then
+	if string.contains(grab_script_mode, "Spawners") and not string.contains(grab_script_mode, "Actor") then
 		Game.populateEnemyPointers();
+	end
+
+	if string.contains(grab_script_mode, "Actor Spawners") then
+		Game.populateActorSpawnerPointers();
 	end
 
 	if rat_enabled then
@@ -8575,6 +8687,8 @@ local function drawGrabScriptUI()
 				examine_data = getExamineDataArcade(object_pointers[object_index]);
 			elseif grab_script_mode == "Examine (Spawners)" then
 				examine_data = getExamineDataSpawners(object_pointers[object_index]);
+			elseif grab_script_mode == "Examine (Actor Spawners)" then
+				examine_data = getExamineDataActorSpawners(object_pointers[object_index]);
 			end
 
 			pagifyThis(examine_data, 40);
@@ -8735,6 +8849,20 @@ local function drawGrabScriptUI()
 					color = colors.green;
 				end
 				gui.text(gui_x, gui_y + height * row, i..": "..enemyData.enemyName.." ("..toHexString(slotBase)..")", color, 'bottomright');
+				row = row + 1;
+			end
+		end
+
+		if grab_script_mode == "List (Actor Spawners)" then
+			pagifyThis(object_pointers, 40);
+			for i = page_finish, page_start + 1, -1 do
+				local slotBase = object_pointers[i];
+				local actor = getActorNameFromBehavior(mainmemory.read_u16_be(slotBase + actorSpawnerAttributes.actor_type) + 0x10);
+				local color = nil;
+				if object_index == i then
+					color = colors.green;
+				end
+				gui.text(gui_x, gui_y + height * row, i..": "..actor.." ("..toHexString(slotBase)..")", color, 'bottomright');
 				row = row + 1;
 			end
 		end
@@ -9398,23 +9526,25 @@ function Game.drawUI()
 	forms.settext(ScriptHawk.UI.form_controls["Toggle Visibility Button"], current_invisify);
 	forms.settext(ScriptHawk.UI.form_controls["Analysis Type Text"],analysis_slide_type);
 	forms.settext(ScriptHawk.UI.form_controls["Analysis Subtype Text"],analysis_slide_subtype);
-	current_flagMasterType = forms.getproperty(ScriptHawk.UI.form_controls["Flag Master Type Dropdown"], "SelectedItem");
-	current_flagSubType = forms.getproperty(ScriptHawk.UI.form_controls["Flag Sub Type Dropdown"], "SelectedItem");
-	if old_flagMasterType ~= current_flagMasterType then
-		forms.setproperty(ScriptHawk.UI.form_controls["Flag Sub Type Dropdown"], "SelectedItem","All");
-		flagTypeGetter();
-		forms.setdropdownitems(ScriptHawk.UI.form_controls["Flag Sub Type Dropdown"], flag_subtypes);
-		getFlagsArray();
-		forms.setdropdownitems(ScriptHawk.UI.form_controls["Flag Dropdown"], flags_list);
-		forms.setproperty(ScriptHawk.UI.form_controls["Flag Dropdown"], "SelectedIndex", 0);
+	if Game.version ~= 4 then
+		current_flagMasterType = forms.getproperty(ScriptHawk.UI.form_controls["Flag Master Type Dropdown"], "SelectedItem");
+		current_flagSubType = forms.getproperty(ScriptHawk.UI.form_controls["Flag Sub Type Dropdown"], "SelectedItem");
+		if old_flagMasterType ~= current_flagMasterType then
+			forms.setproperty(ScriptHawk.UI.form_controls["Flag Sub Type Dropdown"], "SelectedItem","All");
+			flagTypeGetter();
+			forms.setdropdownitems(ScriptHawk.UI.form_controls["Flag Sub Type Dropdown"], flag_subtypes);
+			getFlagsArray();
+			forms.setdropdownitems(ScriptHawk.UI.form_controls["Flag Dropdown"], flags_list);
+			forms.setproperty(ScriptHawk.UI.form_controls["Flag Dropdown"], "SelectedIndex", 0);
+		end
+		if old_flagSubType ~= current_flagSubType then
+			getFlagsArray();
+			forms.setdropdownitems(ScriptHawk.UI.form_controls["Flag Dropdown"], flags_list);
+			forms.setproperty(ScriptHawk.UI.form_controls["Flag Dropdown"], "SelectedIndex", 0);
+		end
+		old_flagSubType = current_flagSubType;
+		old_flagMasterType = current_flagMasterType;
 	end
-	if old_flagSubType ~= current_flagSubType then
-		getFlagsArray();
-		forms.setdropdownitems(ScriptHawk.UI.form_controls["Flag Dropdown"], flags_list);
-		forms.setproperty(ScriptHawk.UI.form_controls["Flag Dropdown"], "SelectedIndex", 0);
-	end
-	old_flagSubType = current_flagSubType;
-	old_flagMasterType = current_flagMasterType;
 	grab_script_mode_from_inputs();
 	turnFilterBoxIntoFilter();
 	--forms.settext(ScriptHawk.UI.form_controls["Moon Mode Button"], moon_mode);
