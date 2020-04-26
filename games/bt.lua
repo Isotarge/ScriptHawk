@@ -3853,7 +3853,7 @@ local flag_array = {
 	{byte=0xA4, bit=4, name="Jukebox: Sad Aliens", type="Jukebox"},
 	{byte=0xA4, bit=5, name="Jukebox: Happy Aliens", type="Jukebox"},
 	{byte=0xA4, bit=6, name="Jukebox: Shootin' With the Fishes", type="Jukebox"},
-	-- 0xA4 > 7 - Jukebox: Old King Coal?
+	{byte=0xA4, bit=7, name="Jukebox: Lord Woo Fak Fak", type="Jukebox"},
 	{byte=0xA5, bit=0, name="Jukebox: Terrydactyland", type="Jukebox"},
 	{byte=0xA5, bit=1, name="Jukebox: Terry", type="Jukebox"},
 	{byte=0xA5, bit=2, name="Jukebox: Factory", type="Jukebox"},
@@ -3862,28 +3862,28 @@ local flag_array = {
 	{byte=0xA5, bit=5, name="Jukebox: Chilli Willy & Chilly Billi", type="Jukebox"},
 	{byte=0xA5, bit=6, name="Jukebox: Cloud Cuckooland", type="Jukebox"},
 	{byte=0xA5, bit=7, name="Jukebox: Mingy Jongo", type="Jukebox"},
-	-- 0xA6 > 0 Jukebox: Cloud Race?
+	{byte=0xA6, bit=0, name="Jukebox: Cloud Race", type="Jukebox"},
 	{byte=0xA6, bit=1, name="Jukebox: Cauldron Keep", type="Jukebox"},
 	{byte=0xA6, bit=2, name="Jukebox: Tower of Tragedy Quiz", type="Jukebox"},
 	{byte=0xA6, bit=3, name="Jukebox: Roll the Credits", type="Jukebox"},
 	{byte=0xA6, bit=4, name="Jukebox: Hag 1", type="Jukebox"},
 	{byte=0xA6, bit=5, name="Jukebox: Isle O Hags", type="Jukebox"},
 	{byte=0xA6, bit=6, name="Jukebox: Jinjo Village", type="Jukebox"},
-	-- 0xA6 > 7 - Jukebox: Sad Jinjo House
-	-- 0xA7 > 0 - Jukebox: Happy Jinjo House
+	{byte=0xA6, bit=7, name="Jukebox: Sad Jinjo Houses", type="Jukebox"},
+	{byte=0xA7, bit=0, name="Jukebox: Happy Jinjo Houses", type="Jukebox"},
 	{byte=0xA7, bit=1, name="Jukebox: Jingaling's Throne Room", type="Jukebox"},
 	{byte=0xA7, bit=2, name="Jukebox: Zombified Throne Room", type="Jukebox"},
 	{byte=0xA7, bit=3, name="Jukebox: Bottles House", type="Jukebox"},
 	{byte=0xA7, bit=4, name="Jukebox: Heggy's Egg Shed", type="Jukebox"},
-	-- 0xA7 > 5 - Jukebox: Jiggywiggy's Temple
+	{byte=0xA7, bit=5, name="Jukebox: Jiggywiggy's Temple", type="Jukebox"},
 	{byte=0xA7, bit=6, name="Jukebox: Honey B's Hive", type="Jukebox"},
 	{byte=0xA7, bit=7, name="Jukebox: Turbo Trainers", type="Jukebox"},
-	{byte=0xA8, bit=0, name="Jukebox: Wading Boots"},
-	{byte=0xA8, bit=1, name="Jukebox: Springy Step Shoes"},
-	{byte=0xA8, bit=2, name="Jukebox: Claw Clamber Boots"},
-	{byte=0xA8, bit=3, name="Jukebox: CWK Shot"},
-	{byte=0xA8, bit=4, name="Jukebox: Here Comes Trouble..."},
-	-- 0xA8 > 5
+	{byte=0xA8, bit=0, name="Jukebox: Wading Boots", type="Jukebox"},
+	{byte=0xA8, bit=1, name="Jukebox: Springy Step Shoes", type="Jukebox"},
+	{byte=0xA8, bit=2, name="Jukebox: Claw Clamber Boots", type="Jukebox"},
+	{byte=0xA8, bit=3, name="Jukebox: Clockwork Kazooie", type="Jukebox"},
+	{byte=0xA8, bit=4, name="Jukebox: Here Comes Trouble...", type="Jukebox"},
+	{byte=0xA8, bit=5, name="Jukebox: Party at Bottles", type="Jukebox"},
 	-- 0xA8 > 6
 	-- 0xA8 > 7
 	-- 0xA9 > 0
@@ -3912,7 +3912,7 @@ local flag_array = {
 	-- 0xAB > 7
 	{byte=0xAC, bit=0, name="IoH: Scrut inside Chuffy's", type="Physical"},
 	-- 0xAC > 1
-	-- 0xAC > 2 - Puzzle Completed?
+	{byte=0xAC, bit=2, name="IoH: Jiggywiggy 'Energy out of temple' Cutscene", type="Cutscene"},
 	-- 0xAC > 3
 	-- 0xAC > 4
 	-- 0xAC > 5
@@ -5016,7 +5016,28 @@ local object_model1 = {
 	y_rotation = 0x48, -- Float
 	z_rotation = 0x4C, -- Float
 	health = 0x5E; -- Byte
-	jinjo_identifier = 0x6F; -- Byte
+	subtype_identifier = 0x6F; -- Byte
+	subtypes = {
+		mumbo_pads = {
+			[0x00] = "Levitate: Chuffy",
+			[0x01] = "Levitate: Jiggy Boulder",
+			[0x02] = "Summon: Golden Goliath",
+			[0x03] = "Power: Star Spinner",
+			[0x04] = "Power: Dodgem Dome",
+			[0x05] = "Power: Saucer of Peril",
+			[0x06] = "Sunlight: Oxygenated Water",
+			[0x07] = "Enlarge: Small Styracosaurus",
+			[0x08] = "Enlarge: Stepping Stones",
+			[0x09] = "Enlarge: Wumba's Wigwam",
+			[0x0A] = "EMP: Electromagnet",
+			[0x0B] = "EMP: Wall Crushers",
+			[0x0C] = "Rain Dance",
+			[0x0D] = "Life Force: Sabreman",
+			[0x0E] = "Life Force: Alien Dad",
+			[0x0F] = "Life Force: Alien Child",
+			[0x10] = "Heal: Sick Styracosaurus",
+		},
+	},
 	--movement_state = 0x72; -- Byte
 	animation_index = 0x8C; -- 2 Byte
 	transparency = 0x9B, -- Byte
@@ -5027,41 +5048,107 @@ local object_model1 = {
 			-- https://www.youtube.com/watch?v=9DDV52RXyiM
 			-- Wumba's Wigwam https://banjosbackpack.com/forums/showthread.php?8165-Wumba-s-Wigwam-BT-Setup-Viewer
 			-- Possibly other sources
-		[0x5DD] = "Sign", -- Pay Here
+		[0x5DD] = "Pay Here Sign", -- Pay Here
+		[0x5DE] = "Path to Nest Sign", -- Not in TDL
+		[0x5DF] = "Well Done Display", -- Replica of display in post-hag 1 cutscene
 
+		[0x5E0] = "Dog Food Bowl",
 		[0x5E1] = "Lantern", -- GGM
+		[0x5E2] = "Brown Cushion",
+		[0x5E3] = "Wooden Barrel",
+		[0x5E4] = "Metal Barrel",
+		[0x5E5] = "Mushroom", -- GGM
+		[0x5E6] = "Mushroom", -- GGM 0x5E5 flipped
 		[0x5E7] = "1st Floor Sign",
 		[0x5E8] = "2nd Floor Sign",
 		[0x5E9] = "3rd Floor Sign",
 		[0x5EA] = "4th Floor Sign",
 		[0x5EB] = "5th Floor Sign",
 		[0x5EC] = "Floating Barrel",
+		[0x5ED] = "Hanging Lantern", -- GGM
 		[0x5EE] = "Boggy's Sled",
+		[0x5EF] = "Candle",
 
+		[0x5F0] = "JRL Water Sign", -- Says "Jolly Roger Lagoon Water"
+		[0x5F1] = "Mine Entry 1 Sign", -- GGM
+		[0x5F2] = "Mine Entry 2 Sign", -- GGM
+		[0x5F3] = "Mine Entry 3 Sign", -- GGM
+		[0x5F4] = "Train Station Sign", -- GGM
+		[0x5F5] = "Fuel Storage Sign", -- GGM
+		[0x5F6] = "Brass Lights", -- ????
+		[0x5F7] = "Wall Lantern",
+		[0x5F8] = "Slice of Cake", -- Replica of sad party at bottles cutscene cake
 		[0x5F9] = "Bed", -- Opening CS
+		[0x5FA] = "Kitchen Unit", -- Banjo's House, BK Menu leftover?
+		[0x5FB] = "Lardy's Pizza Box", -- Closed
+		[0x5FC] = "Lardy's Pizza Box", -- Open
 		[0x5FD] = "Door", -- Opening CS
+		[0x5FE] = "Pizza Slice",
+		[0x5FF] = "Red Chair",
+
+		-- 0x600 > 0x608 - Crash
+		[0x609] = "Baby T-Rex", -- No Eyes
+		[0x60A] = "Banjo's Backpack", -- Boy this is massive
+		[0x60B] = "Snowball", -- No Eyes
+		[0x60C] = "Washing Machine", -- No Eyes
+		[0x60D] = "Daddy T-Rex", -- One Eye
+		[0x60E] = "Clockwork Kazooie",
+		[0x60F] = "Small Jiggy",
 
 		[0x610] = "Jiggy",
+		[0x611] = "Blue Egg Fragment",
 		[0x612] = "Empty Honeycomb",
+		[0x613] = "Bee",
+		[0x614] = "Honeycomb", -- Health
 		[0x615] = "Beehive",
 		[0x616] = "Wading Boots",
 		[0x617] = "Turbo Trainers",
+		[0x618] = "Red Feather",
+		[0x619] = "Green Feather",
+		-- 0x61A - Crash
+		[0x61B] = "Shack Pack",
 		[0x61C] = "Kazooie", -- Character Parade
+		[0x61D] = "Stony", -- No Eyes
+		-- 0x61E - Crash
+		[0x61F] = "Banjo-Kazooie", -- Low Poly
 
+		-- 0x620 - Crash
+		[0x621] = "Banjo's Backpack", -- Sideways
+		[0x622] = "Banjo's Backpack", -- Low Poly
+		[0x623] = "Detonator", -- No Eyes
+		[0x624] = "Van", -- No Eyes
+		[0x625] = "Banjo's Backpack", -- Invisible
+		[0x626] = "Submarine",
 		[0x627] = "Missiles", -- Submarine Projectile
+		[0x628] = "Bottles eating Corn", -- BK Fake Credits leftover
 		[0x629] = "Molehill",
 		[0x62A] = "Banjo-Kazooie", -- ToT
 		[0x62B] = "Banjo-Kazooie", -- ToT Multiplayer
 		[0x62C] = "Cheese Wedge",
 		[0x62D] = "Jelly", -- Heart
+		[0x62E] = "Dragon Kazooie", -- Not properly textured
+		-- 0x62F - Crash 
 
+		-- 0x630 - Crash
+		[0x631] = "N64 Logo",
+		[0x632] = "Rareware Logo",
+		-- 0x633 - Crash
+		[0x634] = "Snowball", -- Doesn't seem to be Snowball Banjo, could be the snowballs that the top hat guys threw in Freezeezy/Click Clock Wood
 		[0x635] = "Shock Spring Pad",
 		[0x636] = "Fly Pad",
 		[0x637] = "Shadow",
+		-- 0x638 - Crash
+		-- 0x639 - Crash as soon as it tries to render
+		[0x63A] = "Wasp Sprite",
 		[0x63B] = "Ice Key",
+		[0x63C] = "Yellow Mystery Egg",
+		[0x63D] = "Wooden Plank", -- Unused?
 		[0x63E] = "Loggo",
+		[0x63F] = "Magic Bag", -- Mumbo
 
+		[0x640] = "Game Over Sign",
 		[0x641] = "Warp Pad",
+		[0x642] = "The End Sign",
 		[0x643] = "Jinjo",
 		[0x644] = "Star Pad", -- Prison Compound
 		[0x645] = "Moon Pad", -- Prison Compound
@@ -5070,18 +5157,24 @@ local object_model1 = {
 		[0x648] = "Mumbo's Skull", -- GGM
 		[0x649] = "Column", -- MT Prison Compound
 		[0x64A] = "Column", -- MT Column Chamber
+		[0x64B] = "Dynamite", -- Ordnance Storage
 		[0x64C] = "Right Arm", -- Old King Coal
 		[0x64D] = "Left Arm", -- Old King Coal
 		[0x64F] = "Torso", -- Old King Coal
 
 		[0x650] = "Old King Coal",
 		[0x651] = "Breakable Door", -- MT Code Chamber
+		[0x652] = "Metal Chunk", -- GI?
 		[0x653] = "Door", -- Bottles after Credits
 		[0x654] = "Mayan Door (Left)",
 		[0x655] = "Mayan Door (Right",
 		[0x656] = "Breakable Stone", -- Entrance to Prison Compound
 		[0x657] = "Door", -- Relic Temple
 		[0x658] = "Snake Head", -- MT
+		[0x659] = "Ground Chunk", -- MT?
+		[0x65A] = "Gold Chunk", -- ?????
+		[0x65B] = "Gold Chunk", -- ?????
+		[0x65C] = "Gold Chunk", -- ?????
 		[0x65D] = "Door", -- MT Kickball
 		[0x65E] = "Gruntydactyl",
 		[0x65F] = "Ssslumber",
@@ -5094,6 +5187,8 @@ local object_model1 = {
 		[0x665] = "Mumbo", -- Also Mingy Jongo?
 		[0x666] = "Snapdragon",
 		[0x667] = "Moggy",
+		[0x668] = "Boulder",
+		[0x669] = "Minjo (Beta)", -- Muscles
 		[0x66A] = "Enemy Kickball Player",
 		[0x66B] = "Chief Bloatazin",
 		[0x66C] = "Generator",
@@ -5105,11 +5200,13 @@ local object_model1 = {
 		[0x671] = "Ugger",
 		[0x672] = "Red Ball", -- Kickball
 		[0x673] = "Golden Goliath",
+		[0x674] = "Torch Enemy", -- Beta
 		[0x675] = "Humba Wumba",
 		[0x676] = "Stony", -- NPC
 		[0x677] = "Bomb Ball", -- Kickball
-		--[0x678] = "!Crash",
-		--[0x679] = "!Crash",
+		[0x678] = "Fire Egg Fragment",
+		[0x679] = "Fire Egg Fragment",
+		[0x67A] = "Fire Egg Fragment",
 		[0x67B] = "Canary Mary",
 		[0x67C] = "Minecart", -- Canary Mary Race
 		[0x67D] = "Cage", -- Canary Mary
@@ -5124,20 +5221,37 @@ local object_model1 = {
 		[0x685] = "Button (Wall)", -- GGM Crushing Shed
 		[0x686] = "Grinder", -- GGM Crushing Shed
 		[0x687] = "Jiggy Rock",
+		[0x688] = "Stone Pellet", -- Jiggy Rock?
+		-- 0x689 - Crash
+		-- 0x68A - Crash
 		[0x68B] = "Minecart", -- Broken
 		[0x68C] = "Gas", -- Eg. Cheese Wedge
+		-- 0x68D - Crash
+		[0x68E] = "Wooden Chip",
 		[0x68F] = "Bang Box",
 
+		[0x690] = "Saucer of Peril", -- Stationary/Kick about
 		[0x691] = "Saucer of Peril", -- In Box
 		[0x692] = "Pile of Rocks", -- GGM
 		[0x693] = "Conga",
+		[0x694] = "Target", -- Zubba's?
+		[0x695] = "Glow",
+		[0x696] = "Lantern",
 		[0x697] = "Remains", -- Mingy Jongo
-		[0x690] = "Saucer of Peril", -- Stationary/Kick about
 		[0x698] = "Fish", -- Multiple
+		[0x699] = "Rockfish",
+		[0x69A] = "Salmon",
+		-- 0x69B - Crash
+		-- 0x69C - Crash
 		[0x69D] = "Spell", -- Projectile, Mingy Jongo
+		[0x69E] = "Spell", -- Projectile, Purple
+		-- 0x69F - Crash
 
+		[0x6A0] = "Stone Fragment",
 		[0x6A1] = "TNT",
 		[0x6A2] = "Rareware Box", -- SM
+		[0x6A3] = "Brown Cloth", -- ????
+		[0x6A4] = "Wooden Chunk",
 		[0x6A5] = "Jiggy Chunk", -- Crushed Jiggy Rock
 		[0x6A6] = "Invisibility Honey",
 		[0x6A7] = "Button (Floor)", -- Power Hut
@@ -5155,14 +5269,21 @@ local object_model1 = {
 		[0x6B2] = "Jippo Jim", -- Frankenstein
 		[0x6B3] = "Jippo Jim", -- Cowboy
 		[0x6B4] = "Jippo Jim", -- Alien
+		-- 0x6B5 - Crash
 		[0x6B6] = "Particles", -- Mumbo's Wand
 		[0x6B7] = "Mrs. Boggy",
 		[0x6B8] = "Hothead",
 		[0x6B9] = "Pole Electricity",
 		[0x6BA] = "Enemy Dodgem Car",
+		[0x6BB] = "Electric Glow",
+		[0x6BC] = "Exposed Electrics", -- Electric Pole
 		[0x6BD] = "Bouncy Castle",
 		[0x6BE] = "Ghost", -- WW Haunted Cavern
+		[0x6BF] = "Stony", -- White
 
+		[0x6C0] = "Detonator", -- White
+		[0x6C1] = "Van", -- White
+		[0x6C2] = "Submarine", -- White
 		[0x6C3] = "Pawno",
 		[0x6C4] = "Cash Register", -- Pawno's Emporium
 		[0x6C5] = "Big Fish",
@@ -5192,21 +5313,39 @@ local object_model1 = {
 		[0x6DD] = "Mucoid", -- Terry
 		[0x6DB] = "Captain Blubber",
 		[0x6DE] = "Fish",
+		[0x6DF] = "Green Orb",
 
+		[0x6E0] = "Blood Spike",
+		[0x6E1] = "Red and Blue Chunk", -- TODO: What is this?
+		[0x6E2] = "Red and Blue Chunk", -- TODO: What is this?
+		[0x6E3] = "Red and Blue Chunk", -- TODO: What is this?
+		[0x6E4] = "Eye", -- TODO: Who's eye?
+		-- 0x6E5 - Crash
 		[0x6E6] = "Swellbelly",
+		[0x6E7] = "Blood Spike",
 		[0x6E8] = "Stepping Stone",
 		[0x6E9] = "Code Statues",
 		[0x6EA] = "Nest (Eggs)",
+		-- 0x6EB - Crash
 		[0x6EC] = "Nest (Note)",
 		[0x6ED] = "Nest (Treble Clef)",
+		-- 0x6EE - Crash
 		[0x6EF] = "Nest (Feathers)",
 
+		[0x6F0] = "Swellbelly Fragment",
 		[0x6F1] = "Fan", -- Water Supply
 		[0x6F2] = "Wumba's Wigwam", -- TDL
 		[0x6F3] = "Cage", -- Chris P. Bacon
+		[0x6F4] = "Wooden Beam",
+		[0x6F5] = "Wooden Platform",
+		-- 0x6F6 - Invisible
+		-- 0x6F7 - Crash on Render
+		-- 0x6F8 - Crash on Render
+		[0x6F9] = "White",
 		[0x6FA] = "Roysten",
 		[0x6FB] = "Interactive Object", -- Inc. Warp Clouds, Fire places, UFO Ice Hole
 		[0x6FC] = "UFO", -- Cutscene
+		-- 0x6FD - Crash
 		[0x6FE] = "Rareware Box",
 		[0x6FF] = "Door", -- Chris P. Bacon entrance
 
@@ -5795,7 +5934,7 @@ local function getHandItemSelected(value)
 end
 
 local function getJinjoIdentifierOSD(pointer)
-	local jinjo_value = mainmemory.readbyte(pointer + object_model1.jinjo_identifier);
+	local jinjo_value = mainmemory.readbyte(pointer + object_model1.subtype_identifier);
 	local jinjo_ident = "Unknown";
 	if jinjo_value == 0 then
 		jinjo_ident = "Minjo (Random)";
