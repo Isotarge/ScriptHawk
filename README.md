@@ -108,6 +108,8 @@ A collection of Lua scripts and RAM watches for [BizHawk](https://github.com/TAS
 - Alex Kidd in Shinobi World (SMS)
 - Balloon Fight (NES)
 - Day Dreamin' Davey (NES)
+- Donald Land (NES)
+- Donkey Kong Country 2 (GBA)
 - Drill Dozer (GBA)
 - Earthworm Jim 3D (N64)
 - Golden Axe Warrior (SMS)
