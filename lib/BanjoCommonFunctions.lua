@@ -417,9 +417,5 @@ function printTri()
 	local vert1 = Game.getFloorTriangleVertPositionRaw(0);
 	local vert2 = Game.getFloorTriangleVertPositionRaw(1);
 	local vert3 = Game.getFloorTriangleVertPositionRaw(2);
-	print(
-		vert1.x .. " " .. vert1.y .. " " .. vert1.z .. " " ..
-		vert2.x .. " " .. vert2.y .. " " .. vert2.z .. " " ..
-		vert3.x .. " " .. vert3.y .. " " .. vert3.z
-	);
+	print(vert1.x .." ".. vert1.y .." ".. vert1.z .." ".. vert2.x .." ".. vert2.y .." ".. vert2.z .." "..vert3.x .." ".. vert3.y .." ".. vert3.z);
 end
