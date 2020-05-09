@@ -412,3 +412,10 @@ seamTester.initUI = function(baseRow)
 	ScriptHawk.UI.form_controls["offset Label"] = forms.label(ScriptHawk.UI.options_form, "Offset:", ScriptHawk.UI.col(5) + ScriptHawk.UI.dropdown_offset, ScriptHawk.UI.row(baseRow + 1) + ScriptHawk.UI.dropdown_offset, ScriptHawk.UI.col(1) + 15, ScriptHawk.UI.button_height);
 	ScriptHawk.UI.form_controls["offset Textbox"] = forms.textbox(ScriptHawk.UI.options_form, seamTester.offset, ScriptHawk.UI.col(2) + 5, ScriptHawk.UI.button_height, nil, ScriptHawk.UI.col(7) + 4, ScriptHawk.UI.row(baseRow + 1));
 end
+
+function printTri()
+	local vert1 = Game.getFloorTriangleVertPositionRaw(0);
+	local vert2 = Game.getFloorTriangleVertPositionRaw(1);
+	local vert3 = Game.getFloorTriangleVertPositionRaw(2);
+	print(vert1.x .." ".. vert1.y .." ".. vert1.z .." ".. vert2.x .." ".. vert2.y .." ".. vert2.z .." "..vert3.x .." ".. vert3.y .." ".. vert3.z);
+end
