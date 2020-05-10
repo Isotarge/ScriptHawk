@@ -36,10 +36,12 @@ local grab_script_modes = {
 	{"Examine (Arcade Objects)","Arcade Objects", subtype = "Examine"},
 	{"Chunks","Chunks"},
 	{"Exits","Exits"},
-	{"List (Spawners)","Spawners", subtype = "List"},
-	{"Examine (Spawners)","Spawners", subtype = "Examine"},
+	{"List (Character Spawners)","Character Spawners", subtype = "List"},
+	{"Examine (Character Spawners)","Character Spawners", subtype = "Examine"},
 	{"List (Actor Spawners)","Actor Spawners", subtype = "List"},
 	{"Examine (Actor Spawners)","Actor Spawners", subtype = "Examine"},
+	{"List (Map Object Setup)","Map Object Setup", subtype = "List"},
+	{"Examine (Map Object Setup)","Map Object Setup", subtype = "Examine"},
 };
 local grab_script_mode_index = 1;
 local grab_script_mode = grab_script_modes[grab_script_mode_index][1];
@@ -4063,6 +4065,11 @@ end
 
 function Game.populateActorSpawnerPointers()
 	local actorSpawnerArray = dereferencePointer(Game.Memory.actor_spawner_pointer);
+	if Game.version == 4 then
+		mapObjectSetup_objM1_offset = 0x0F;
+	else
+		mapObjectSetup_objM1_offset = 0x10;
+	end
 	object_pointers = {};
 	if isRDRAM(actorSpawnerArray) and Game.version ~= 4 then
 		local spawnerCount = getSpawnerCount();
@@ -4077,7 +4084,7 @@ end
 
 function getExamineDataActorSpawners(pointer)
 	local examine_data = {};
-	local spawnerActorType = mainmemory.read_u16_be(pointer + actorSpawnerAttributes.actor_type) + 0x10;
+	local spawnerActorType = mainmemory.read_u16_be(pointer + actorSpawnerAttributes.actor_type) + mapObjectSetup_objM1_offset;
 	local spawnerActorName = getActorNameFromBehavior(spawnerActorType);
 	local spawnerTiedActor = dereferencePointer(pointer + actorSpawnerAttributes.tied_actor);
 	
@@ -4108,6 +4115,114 @@ function getExamineDataActorSpawners(pointer)
 	end
 	if isRDRAM(spawnerTiedActor) then
 		table.insert(examine_data, { "Tied Actor Address", toHexString(spawnerTiedActor) });
+	end
+	return examine_data;
+end
+
+----------------------
+-- Map Object Setup --
+----------------------
+
+mapObjectSetup_objM1_size = 0x38;
+mapObjectSetup_objM2_size = 0x30;
+mapObjectSetup_buffer_size = 0x4;
+
+mapObjectSetup_attributes = {
+	objM1 = {
+		x_pos = 0x00, -- float
+		y_pos = 0x04, -- float
+		z_pos = 0x08, -- float
+		object_id = 0x32, -- u16
+	},
+	objM2 = {
+		x_pos = 0x00, -- float
+		y_pos = 0x04, -- float
+		z_pos = 0x08, -- float
+		scale = 0x0C, -- float
+		x_rot = 0x18, -- float
+		y_rot = 0x1C, -- float
+		z_rot = 0x20, -- float
+		object_id = 0x28, -- u16
+	}
+}
+
+function getMapObjectSetupData()
+	objM2_header = dereferencePointer(Game.Memory.obj_model2_setup_pointer);
+	if isRDRAM(objM2_header) then
+		objM2_count = mainmemory.read_u32_be(objM2_header);
+		objM1_header = objM2_header + (2 * mapObjectSetup_buffer_size) + (mapObjectSetup_objM2_size * objM2_count);
+		objM1_count = mainmemory.read_u32_be(objM1_header);
+		return {objM2_header + mapObjectSetup_buffer_size, objM2_count, objM1_header + mapObjectSetup_buffer_size, objM1_count};
+	end
+	return {};
+end
+
+function Game.populateMapObjSetupPointers()
+	mapObjectSetup_data = getMapObjectSetupData();
+	object_pointers = {};
+	if Game.version == 4 then
+		mapObjectSetup_objM1_offset = 0x0F;
+	else
+		mapObjectSetup_objM1_offset = 0x10;
+	end
+	if #mapObjectSetup_data > 0 then
+		local objM2Spawner_Array = mapObjectSetup_data[1];
+		local objM2Spawner_Count = mapObjectSetup_data[2];
+		local objM1Spawner_Array = mapObjectSetup_data[3];
+		local objM1Spawner_Count = mapObjectSetup_data[4];
+		if objM2Spawner_Count > 0 then
+			for i = 1, objM2Spawner_Count do
+				local slotBase = objM2Spawner_Array + ((i - 1) * mapObjectSetup_objM2_size);
+				table.insert(object_pointers, slotBase);
+			end
+		end
+		if objM1Spawner_Count > 0 then
+			for i = 1, objM1Spawner_Count do
+				local slotBase = objM1Spawner_Array + ((i - 1) * mapObjectSetup_objM1_size);
+				table.insert(object_pointers, slotBase);
+			end
+		end
+	end
+end
+
+function getExamineDataMapObjectSetup(pointer)
+	local examine_data = {};
+	local list_data = getMapObjectSetupData();
+	local is_objm2 = true;
+	local relevant_data = {};
+	local spawnerObjectName = "";
+	local spawnerObjectType = 0;
+	local object_group = "";
+	if pointer < list_data[3] then
+		is_objm2 = true;
+		object_group = "Object Model 2";
+		relevant_data = mapObjectSetup_attributes.objM2;
+		spawnerObjectType = mainmemory.read_u16_be(pointer + relevant_data.object_id);
+		spawnerObjectName = obj_model2.object_types[spawnerObjectType] or "unknown "..toHexString(spawnerObjectType);
+	else
+		is_objm2 = false; -- objm1 Spawner
+		object_group = "Actor Spawner";
+		relevant_data = mapObjectSetup_attributes.objM1;
+		spawnerObjectType = mainmemory.read_u16_be(pointer + relevant_data.object_id) + mapObjectSetup_objM1_offset;
+		spawnerObjectName = "Spawner ("..getActorNameFromBehavior(spawnerObjectType)..")";
+	end
+	table.insert(examine_data, { "Slot base", toHexString(pointer, 6) });
+	table.insert(examine_data, { "Object Name", spawnerObjectName });
+	table.insert(examine_data, { "Object Type", toHexString(spawnerObjectType) });
+	table.insert(examine_data, { "Object Group", object_group });
+	table.insert(examine_data, { "Separator", 1 });
+	table.insert(examine_data, { "X", mainmemory.readfloat(pointer + relevant_data.x_pos, true) });
+	table.insert(examine_data, { "Y", mainmemory.readfloat(pointer + relevant_data.y_pos, true) });
+	table.insert(examine_data, { "Z", mainmemory.readfloat(pointer + relevant_data.z_pos, true) });
+	if is_objm2 then
+		table.insert(examine_data, { "Separator", 1 });
+		table.insert(examine_data, { "Rot X", mainmemory.readfloat(pointer + relevant_data.x_rot, true) });
+		table.insert(examine_data, { "Rot Y", mainmemory.readfloat(pointer + relevant_data.y_rot, true) });
+		table.insert(examine_data, { "Rot Z", mainmemory.readfloat(pointer + relevant_data.z_rot, true) });
+		table.insert(examine_data, { "Separator", 1 });
+		table.insert(examine_data, { "Scale", mainmemory.readfloat(pointer + relevant_data.scale, true) });
+	else
+
 	end
 	return examine_data;
 end
@@ -4701,9 +4816,10 @@ function Game.detectVersion(romName, romHash)
 			[85] = "Collectable", -- Not sure what yet
 			--[86] = "Unknown", -- Crash
 			[88] = "Missile?",
-
+			[89] = "Ice Shard?", -- Unused
 			[90] = "Balloon (Diddy)",
 			[91] = "Stalactite",
+			[92] = "Rock Shard?", -- Unused
 			[93] = "Car",
 			[95] = "Hunky Chunky Barrel",
 			[96] = "TNT Barrel Spawner (Dogadon)",
@@ -4722,8 +4838,16 @@ function Game.detectVersion(romName, romHash)
 			[112] = "Balloon (Lanky)",
 			[113] = "Balloon (DK)",
 			[114] = "Padlock", -- K. Lumsy
+			[117] = "Disco Ball", -- Unused
+			[118] = "Banana (Lanky)", -- Multiplayer?
+			[119] = "Banana (DK)", -- Multiplayer?
+			[120] = "Crystal Coconut", -- Multiplayer?
+			[121] = "DK Coin", -- Multiplayer?
+			-- 126 = Emu Crash
 			[127] = "Headphones",
 			[128] = "Enguarde Crate",
+			[129] = "Apple", -- Fungi Forest
+			[130] = "Worm?", -- Unused, crashes when you go near
 			[132] = "Cutscene Controller",
 			[134] = "Kaboom",
 			[137] = "Beaver",
@@ -4736,7 +4860,7 @@ function Game.detectVersion(romName, romHash)
 			[144] = "Snide",
 			[145] = "Army Dillo",
 			[147] = "Klump",
-			[148] = "Armadillo (Beta)",
+			[148] = "Army (Beta)",
 			[149] = "Camera",
 			[150] = "Cranky",
 			[151] = "Funky",
@@ -4751,15 +4875,15 @@ function Game.detectVersion(romName, romHash)
 			[160] = "Cutscene Tiny",
 			[161] = "Cutscene Chunky",
 			[162] = "Llama",
-			[165] = "Mad Jack",
 			[164] = "Padlock & Key",
+			[165] = "Mad Jack",
 			[166] = "Klaptrap", -- Green
 			[167] = "Zinger",
 			[168] = "Vulture",
 			[169] = "Klaptrap (Purple)",
 			[170] = "Klaptrap (Red)",
 			[173] = "Rareware Logo",
-			[174] = "Orange Kremling (Beta)",
+			[174] = "Re-Koil (Beta)",
 			[175] = "Rareware Logo",
 			[177] = "Minecart (TNT)",
 			[178] = "Minecart (TNT)",
@@ -4795,8 +4919,8 @@ function Game.detectVersion(romName, romHash)
 			[217] = "Owl",
 			[219] = "Rabbit",
 			[220] = "Nintendo Logo",
-			[222] = "Shockwave",
 			[221] = "Cutscene Object", -- Fake Chunky in Dogadon 2 opening cutscene
+			[222] = "Shockwave",
 			[226] = "Guard", -- Stealthy Snoop
 			[228] = "Robo-Zinger",
 			[229] = "Krossbones",
@@ -4905,7 +5029,7 @@ function Game.detectVersion(romName, romHash)
 			[0x0013] = "Beaver",
 			[0x0014] = "Beaver",
 			[0x0015] = "Beaver (Gold)",
-			[0x0016] = "Orange Kremling (Beta)",
+			[0x0016] = "Re-Koil (Beta)",
 			[0x0017] = "Zinger",
 			[0x0018] = "Squawks",
 			[0x0019] = "Klobber",
@@ -4918,7 +5042,7 @@ function Game.detectVersion(romName, romHash)
 			[0x0020] = "Klaptrap (Teeth)",
 			[0x0021] = "Mad Jack",
 			[0x0022] = "Krash",
-			[0x0023] = "Armadillo (Beta)",
+			[0x0023] = "Army (Beta)",
 			[0x0024] = "Jack in the Box (Beta)",
 			[0x0025] = "Boxing Glove in the Box (Beta)",
 			[0x0026] = "Troff",
@@ -8350,7 +8474,7 @@ function Game.zipToSelectedObject()
 				desiredX = mainmemory.read_s16_be(selectedObject + exit.x_pos);
 				desiredY = mainmemory.read_s16_be(selectedObject + exit.y_pos);
 				desiredZ = mainmemory.read_s16_be(selectedObject + exit.z_pos);
-			elseif string.contains(grab_script_mode, "Spawners") and not string.contains(grab_script_mode, "Actor") then
+			elseif string.contains(grab_script_mode, "Character Spawners") then
 				desiredX = mainmemory.read_s16_be(selectedObject + spawnerAttributes.x_pos); -- TODO: Stop using magic numbers for this
 				desiredY = mainmemory.read_s16_be(selectedObject + spawnerAttributes.y_pos);
 				desiredZ = mainmemory.read_s16_be(selectedObject + spawnerAttributes.z_pos);
@@ -8358,6 +8482,10 @@ function Game.zipToSelectedObject()
 				desiredX = mainmemory.readfloat(selectedObject + actorSpawnerAttributes.x_pos,true); -- TODO: Stop using magic numbers for this
 				desiredY = mainmemory.readfloat(selectedObject + actorSpawnerAttributes.y_pos,true);
 				desiredZ = mainmemory.readfloat(selectedObject + actorSpawnerAttributes.z_pos,true);
+			elseif string.contains(grab_script_mode, "Map Object Setup") then
+				desiredX = mainmemory.readfloat(selectedObject + mapObjectSetup_attributes.objM1.x_pos,true); -- TODO: Stop using magic numbers for this
+				desiredY = mainmemory.readfloat(selectedObject + mapObjectSetup_attributes.objM1.y_pos,true);
+				desiredZ = mainmemory.readfloat(selectedObject + mapObjectSetup_attributes.objM1.z_pos,true);	
 			end
 		end
 
@@ -8614,12 +8742,16 @@ local function drawGrabScriptUI()
 		populateExitPointers();
 	end
 
-	if string.contains(grab_script_mode, "Spawners") and not string.contains(grab_script_mode, "Actor") then
+	if string.contains(grab_script_mode, "Character Spawners") then
 		Game.populateEnemyPointers();
 	end
 
 	if string.contains(grab_script_mode, "Actor Spawners") then
 		Game.populateActorSpawnerPointers();
+	end
+
+	if string.contains(grab_script_mode, "Map Object Setup") then
+		Game.populateMapObjSetupPointers();
 	end
 
 	if rat_enabled then
@@ -8685,10 +8817,12 @@ local function drawGrabScriptUI()
 				examine_data = getExamineDataLoadingZone(object_pointers[object_index]);
 			elseif grab_script_mode == "Examine (Arcade Objects)" then
 				examine_data = getExamineDataArcade(object_pointers[object_index]);
-			elseif grab_script_mode == "Examine (Spawners)" then
+			elseif grab_script_mode == "Examine (Character Spawners)" then
 				examine_data = getExamineDataSpawners(object_pointers[object_index]);
 			elseif grab_script_mode == "Examine (Actor Spawners)" then
 				examine_data = getExamineDataActorSpawners(object_pointers[object_index]);
+			elseif grab_script_mode == "Examine (Map Object Setup)" then
+				examine_data = getExamineDataMapObjectSetup(object_pointers[object_index]);
 			end
 
 			pagifyThis(examine_data, 40);
@@ -8839,7 +8973,7 @@ local function drawGrabScriptUI()
 			end
 		end
 
-		if grab_script_mode == "List (Spawners)" then
+		if grab_script_mode == "List (Character Spawners)" then
 			pagifyThis(object_pointers, 40);
 			for i = page_finish, page_start + 1, -1 do
 				local slotBase = object_pointers[i];
@@ -8857,12 +8991,34 @@ local function drawGrabScriptUI()
 			pagifyThis(object_pointers, 40);
 			for i = page_finish, page_start + 1, -1 do
 				local slotBase = object_pointers[i];
-				local actor = getActorNameFromBehavior(mainmemory.read_u16_be(slotBase + actorSpawnerAttributes.actor_type) + 0x10);
+				local actor = getActorNameFromBehavior(mainmemory.read_u16_be(slotBase + actorSpawnerAttributes.actor_type) + mapObjectSetup_objM1_offset);
 				local color = nil;
 				if object_index == i then
 					color = colors.green;
 				end
 				gui.text(gui_x, gui_y + height * row, i..": "..actor.." ("..toHexString(slotBase)..")", color, 'bottomright');
+				row = row + 1;
+			end
+		end
+
+		if grab_script_mode == "List (Map Object Setup)" then
+			pagifyThis(object_pointers, 40);
+			for i = page_finish, page_start + 1, -1 do
+				local setup_data = getMapObjectSetupData();
+				local slotBase = object_pointers[i];
+				local object_name = "";
+				local object_type = 0;
+				if slotBase < setup_data[3] then
+					object_type = mainmemory.read_u16_be(slotBase + mapObjectSetup_attributes.objM2.object_id);
+					object_name = obj_model2.object_types[object_type] or "unknown "..toHexString(object_type)
+				else
+					object_name = "Spawner ("..getActorNameFromBehavior(mainmemory.read_u16_be(slotBase + mapObjectSetup_attributes.objM1.object_id) + mapObjectSetup_objM1_offset)..")";
+				end
+				local color = nil;
+				if object_index == i then
+					color = colors.green;
+				end
+				gui.text(gui_x, gui_y + height * row, i..": "..object_name.." ("..toHexString(slotBase)..")", color, 'bottomright');
 				row = row + 1;
 			end
 		end
