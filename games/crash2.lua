@@ -269,6 +269,8 @@ Game.OSD = {
 	{"dZ", category="positionStats"},
 	{"dXZ", category="positionStats"},
 	{"Max dY", category="positionStatsMore"},
+	{"Max dX", category="positionStatsMore"},
+	{"Max dZ", category="positionStatsMore"},
 	{"Max dXZ", category="positionStatsMore"},
 	{"Odometer", category="positionStatsMore"},
 	{"Separator"},
