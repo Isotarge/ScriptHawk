@@ -6,7 +6,162 @@ if type(ScriptHawk) ~= "table" then
 end
 
 encircle_enabled = false;
-object_filter = nil; -- String
+object_index = 1;
+local object_pointers = {}; 
+object_model1_filter = nil; -- String
+object_model2_filter = nil; -- String
+
+local script_modes = {
+	{"Disabled","Disabled"},
+	{"List (Object Model 1)","Object Model 1", subtype = "List"},
+	{"Examine (Object Model 1)","Object Model 1", subtype = "Examine"},
+	{"List (Loading Zones)","Loading Zones", subtype = "List"},
+	{"Examine (Loading Zones)","Loading Zones", subtype = "Examine"},
+};
+local script_mode_index = 1;
+local script_mode = script_modes[script_mode_index][1];
+
+local function getListOfAnalysisSlideTypes()
+	analysis_slide_types = {};
+	for i = 1, #script_modes do
+		local analysis_stored = false;
+		if #analysis_slide_types > 0 then
+			for j = 1, #analysis_slide_types do
+				if analysis_slide_types[j] == script_modes[i][2] then
+					analysis_stored = true;
+				end
+			end
+			if not analysis_stored then
+				table.insert(analysis_slide_types, script_modes[i][2]);
+			end
+		else
+			table.insert(analysis_slide_types, script_modes[i][2]);
+		end
+	end
+end
+
+local function getListOfAnalysisSlideSubtypes()
+	analysis_slide_subtypes = {};
+	for i = 1, #script_modes do
+		local analysis_sub_stored = false;
+		if #analysis_slide_subtypes > 0 then
+			for j = 1, #analysis_slide_subtypes do
+				if analysis_slide_subtypes[j] == script_modes[i].subtype then
+					analysis_sub_stored = true;
+				end
+			end
+			if not analysis_sub_stored then
+				table.insert(analysis_slide_subtypes, script_modes[i].subtype);
+			end
+		else
+			table.insert(analysis_slide_subtypes, script_modes[i].subtype);
+		end
+	end
+end
+
+local function turnFilterBoxIntoFilter()
+	local filter_box_text = forms.gettext(ScriptHawk.UI.form_controls["Analysis Filter Textbox"]);
+	local filter_value = nil;
+	if filter_box_text == "" or filter_box_text == nil then
+		filter_value = nil;
+	else
+		filter_value = filter_box_text;
+	end
+	if script_modes[script_mode_index][2] == "Object Model 1" then
+		object_model1_filter = filter_value;
+	end
+	if script_modes[script_mode_index][2] == "Loading Zones" then
+		object_model2_filter = filter_value;
+	end
+end
+
+getListOfAnalysisSlideTypes();
+getListOfAnalysisSlideSubtypes();
+analysis_slide_type_index = 1;
+analysis_slide_subtype_index = 1;
+analysis_slide_type = analysis_slide_types[analysis_slide_type_index];
+analysis_slide_subtype = analysis_slide_subtypes[analysis_slide_subtype_index];
+
+local function increase_analysis_slide_type()
+	analysis_slide_type_index = analysis_slide_type_index + 1;
+	if analysis_slide_type_index > #analysis_slide_types then
+		analysis_slide_type_index = 1;
+	end
+	analysis_slide_type = analysis_slide_types[analysis_slide_type_index];
+end
+
+local function increase_analysis_slide_subtype()
+	analysis_slide_subtype_index = analysis_slide_subtype_index + 1;
+	if analysis_slide_subtype_index > #analysis_slide_subtypes then
+		analysis_slide_subtype_index = 1;
+	end
+	analysis_slide_subtype = analysis_slide_subtypes[analysis_slide_subtype_index];
+end
+
+local function decrease_analysis_slide_type()
+	analysis_slide_type_index = analysis_slide_type_index - 1;
+	if analysis_slide_type_index < 1 then
+		analysis_slide_type_index = #analysis_slide_types;
+	end
+	analysis_slide_type = analysis_slide_types[analysis_slide_type_index];
+end
+
+local function decrease_analysis_slide_subtype()
+	analysis_slide_subtype_index = analysis_slide_subtype_index - 1;
+	if analysis_slide_subtype_index < 1 then
+		analysis_slide_subtype_index = #analysis_slide_subtypes;
+	end
+	analysis_slide_subtype = analysis_slide_subtypes[analysis_slide_subtype_index];
+end
+
+function script_mode_from_inputs()
+	local all_acceptable_script_modes = {};
+	for i = 1, #script_modes do
+		if script_modes[i][2] == analysis_slide_type then
+			table.insert(all_acceptable_script_modes, i);
+		end
+	end
+	local acceptable_subtype_found = false;
+	if #all_acceptable_script_modes > 0 then
+		for i = 1, #all_acceptable_script_modes do
+			if script_modes[all_acceptable_script_modes[i]].subtype ~= nil then
+				if script_modes[all_acceptable_script_modes[i]].subtype == analysis_slide_subtype then
+					acceptable_subtype_found = true;
+					correct_subtype = i;
+				end
+			end
+		end
+	end
+	if not acceptable_subtype_found then
+		all_acceptable_script_modes = {all_acceptable_script_modes[1]};
+	else
+		all_acceptable_script_modes = {all_acceptable_script_modes[correct_subtype]};
+	end
+	script_mode_index = all_acceptable_script_modes[1];
+	script_mode = script_modes[script_mode_index][1];
+end
+
+local function incrementObjectIndex()
+	object_index = object_index + 1;
+	if object_index > #object_pointers then
+		object_index = 1;
+	end
+end
+
+local function decrementObjectIndex()
+	object_index = object_index - 1;
+	if object_index <= 0 then
+		object_index = #object_pointers;
+	end
+end
+
+local function toggleObjectAnalysisToolsMode()
+	script_mode_index = script_mode_index + 1;
+	if script_mode_index > #script_modes then
+		script_mode_index = 1;
+	end
+	script_mode = script_modes[script_mode_index];
+end
 
 Game = {
 	maps = {
@@ -39,7 +194,8 @@ Game = {
 		"SM - Behind the waterfall",
 		"SM - Spiral Mountain",
 
-		"!Crash 0x00B0", "!Crash 0x00B1", "!Unknown 0x00B2", "!Crash 0x00B3", "!Unknown 0x00B4", "!Crash 0x00B5",
+		"!Crash 0x00B0", -- Seems to be reserved for Chuffy Exits? Might just be a quirk of lz objects
+		"!Crash 0x00B1", "!Unknown 0x00B2", "!Crash 0x00B3", "!Unknown 0x00B4", "!Crash 0x00B5",
 
 		"MT - Wumba's Wigwam",
 		"MT - Mumbo's Skull",
@@ -115,7 +271,7 @@ Game = {
 		"WW - Mr. Patch",
 		"JRL - Temple of the Fishes",
 
-		"!Crash 0x00FB",
+		"!Crash 0x00FB", -- Old JRL Map index. LZs to here follow a lookup table based on exit value to an actual map.
 
 		"JRL - Lord Woo Fak Fak",
 
@@ -332,13 +488,14 @@ Game = {
 			[0x36] = {0x120596, 0x1207A6, 0x115A16, 0x11B656}, -- Washing Machine
 			[0x5F] = {0x1205A2, 0x1207B2, 0x115A22, 0x11B662}, -- Kazooie (Solo)
 		},
+		object_model2_array_pointer = {0x137B30,0x137DC0,0x12CF80,0x132DB0},
 	},
 	defaultFloor = -18000,
 	speedy_speeds = { .001, .01, .1, 1, 5, 10, 20, 50, 100 },
 	speedy_index = 7,
 	rot_speed = 10,
 	max_rot_units = 360,
-	form_height = 13,
+	form_height = 15,
 	character_states = {
 		-- 0 Occurs during game boot-up
 		[1] = "Banjo-Kazooie", -- Doesn't matter if you're Dragon Kazooie
@@ -5040,9 +5197,8 @@ end
 -- Object Model 1 --
 --------------------
 
-local slot_base = 0x10;
-local slot_size = 0x9C;
-local object_index = 1;
+local obj_model1_slot_base = 0x10;
+local obj_model1_slot_size = 0x9C;
 
 local object_model1 = {
 	id_struct = 0x00, -- Pointer
@@ -5982,89 +6138,56 @@ local function getJinjoIdentifierOSD(pointer)
 	return jinjo_ident;
 end
 
-local function getNumSlots()
+function getModelOneSlotBase(index)
+	return obj_model1_slot_base + index * obj_model1_slot_size;
+end
+
+function getModelOneCount()
 	local objectArray = dereferencePointer(Game.Memory.object_array_pointer);
 	if isRDRAM(objectArray) then
 		local firstObject = dereferencePointer(objectArray + 0x04);
 		local lastObject = dereferencePointer(objectArray + 0x08);
 		if isRDRAM(firstObject) and isRDRAM(lastObject) then
-			return math.floor((lastObject - firstObject) / slot_size) + 1;
+			return math.floor((lastObject - firstObject) / obj_model1_slot_size) + 1;
 		end
 	end
 	return 0;
 end
 
-local function getSlotBase(index)
-	--if index < 0 or index > getNumSlots() then
-	--	print("Warning: OOB call to getSlotBase() with index"..index);
-	--end
-	return slot_base + index * slot_size;
-end
-
-local function incrementObjectIndex()
-	object_index = object_index + 1;
-	if object_index > getNumSlots() then
-		object_index = 1;
+function getAnimationType(model1Base)
+	local objectIDPointer = dereferencePointer(model1Base + object_model1.id_struct);
+	if isRDRAM(objectIDPointer) then
+		local modelIndex = mainmemory.read_u16_be(objectIDPointer + 0x14);
+		return object_model1.models[modelIndex] or toHexString(modelIndex);
 	end
+	return "Unknown";
 end
 
-local function decrementObjectIndex()
-	object_index = object_index - 1;
-	if object_index <= 0 then
-		object_index = getNumSlots();
-	end
-end
-
-local script_modes = {
-	"Disabled",
-	"List",
-	"Examine",
-};
-
-local script_mode_index = 1;
-local script_mode = script_modes[script_mode_index];
-
-local function toggleObjectAnalysisToolsMode()
-	script_mode_index = script_mode_index + 1;
-	if script_mode_index > #script_modes then
-		script_mode_index = 1;
-	end
-	script_mode = script_modes[script_mode_index];
-end
-
-local function getObjectModel1Pointers()
-	local pointers = {};
+function getObjectModel1Pointers()
+	object_pointers = {};
 	local objectArray = dereferencePointer(Game.Memory.object_array_pointer);
 	if isRDRAM(objectArray) then
-		local num_slots = getNumSlots();
+		local num_slots = getModelOneCount();
 		for i = 0, num_slots - 1 do
-			table.insert(pointers, objectArray + getSlotBase(i)); -- TODO: Check for bone arrays before adding to table, we don't want to move stuff we can't see
+			if object_model1_filter == nil then
+				table.insert(object_pointers, objectArray + getModelOneSlotBase(i)); -- TODO: Check for bone arrays before adding to table, we don't want to move stuff we can't see
+			else
+				local model1Base = objectArray + getModelOneSlotBase(i);
+				if string.contains(getAnimationType(model1Base), object_model1_filter) then
+					table.insert(object_pointers, model1Base);
+				end
+			end
 		end
 	end
-	return pointers;
+	return object_pointers;
 end
 
-local function setObjectModel1Position(pointer, x, y, z)
+function setObjectModel1Position(pointer, x, y, z)
 	if isRDRAM(pointer) then
 		mainmemory.writefloat(pointer + object_model1.x_position, x, true);
 		mainmemory.writefloat(pointer + object_model1.y_position, y, true);
 		mainmemory.writefloat(pointer + object_model1.z_position, z, true);
 	end
-end
-
-local function zipTo(index)
-	local objectArray = dereferencePointer(Game.Memory.object_array_pointer);
-	if isRDRAM(objectArray) then
-		local objectPointer = objectArray + getSlotBase(index);
-		local xPos = mainmemory.readfloat(objectPointer + object_model1.x_position, true);
-		local yPos = mainmemory.readfloat(objectPointer + object_model1.y_position, true);
-		local zPos = mainmemory.readfloat(objectPointer + object_model1.z_position, true);
-		Game.setPosition(xPos, yPos, zPos);
-	end
-end
-
-local function zipToSelectedObject()
-	zipTo(object_index - 1);
 end
 
 function everythingIs(modelIndex)
@@ -6079,16 +6202,8 @@ function everythingIs(modelIndex)
 	end
 end
 
-local function getAnimationType(model1Base)
-	local objectIDPointer = dereferencePointer(model1Base + object_model1.id_struct);
-	if isRDRAM(objectIDPointer) then
-		local modelIndex = mainmemory.read_u16_be(objectIDPointer + 0x14);
-		return object_model1.models[modelIndex] or toHexString(modelIndex);
-	end
-	return "Unknown";
-end
 
-local function getExamineData(pointer)
+local function getExamineDataModelOne(pointer)
 	local examine_data = {};
 	if not isRDRAM(pointer) then
 		return examine_data;
@@ -6102,8 +6217,16 @@ local function getExamineData(pointer)
 	local zPos = mainmemory.readfloat(pointer + object_model1.z_position, true);
 	local hasPosition = xPos ~= 0 or yPos ~= 0 or zPos ~= 0;
 
+	local playerX = Game.getXPosition();
+	local playerY = Game.getYPosition();
+	local playerZ = Game.getZPosition();
+
+	local hDist = math.sqrt(((xPos - playerX) ^ 2) + ((zPos - playerZ) ^ 2));
+	local playerDist = math.sqrt(((yPos - playerY) ^ 2) + (hDist ^ 2))
+
 	local currentObjectName = getAnimationType(pointer); -- Required for special data
 
+	table.insert(examine_data, { "Object:", currentObjectName})
 	table.insert(examine_data, { "ID Struct", toHexString(modelPointer) });
 	table.insert(examine_data, { "Behavior", toHexString(behaviorPointer) });
 
@@ -6112,6 +6235,9 @@ local function getExamineData(pointer)
 	table.insert(examine_data, { "X", round(xPos, precision) });
 	table.insert(examine_data, { "Y", round(yPos, precision) });
 	table.insert(examine_data, { "Z", round(zPos, precision) });
+	table.insert(examine_data, { "Separator", 1 });
+	table.insert(examine_data, { "Distance to Player", playerDist });
+	table.insert(examine_data, { "XZ Distance to Player", hDist });
 	table.insert(examine_data, { "Health", mainmemory.readbyte(pointer + object_model1.health) });
 	table.insert(examine_data, { "Separator", 1 });
 
@@ -6139,45 +6265,261 @@ local function getExamineData(pointer)
 	return examine_data;
 end
 
+--------------------
+-- Loading Zones --
+--------------------
+-- Credit to Wedarobi for helping debug how these work
+
+object_model2 = {
+	init = {
+		elem_size = 0x0, -- u16
+		elem_count = 0x2, -- u16
+	},
+	object = {
+		-- unknown = 0x0, -- u8
+		-- unknown = 0x1, -- u8
+		-- unknown = 0x2, -- u8
+		-- unknown = 0x3, -- u8
+		x_position = 0x04, -- s16
+		y_position = 0x06, -- s16
+		z_position = 0x08, -- s16
+		data_bitfield = 0xA, -- u16 Bitfield
+		bitfield_values = {
+			loading_zone_0 = 0,
+			loading_zone_1 = 1,
+			loading_zone_2 = 2,
+			loading_zone_3 = 3,
+			loading_zone_4 = 4,
+		},
+		map_index = 0xC, -- u16. Offset 0xA0
+		-- unknown = 0xE, -- u8
+		-- unknown = 0xF, -- u8
+		-- unknown = 0x10, -- u16
+		exit_index = 0x12, -- u32. Values larger than 255 not correctly interpreted
+	}
+};
+
+function getModelTwoCount()
+	local objectArray = dereferencePointer(Game.Memory.object_model2_array_pointer);
+	if isRDRAM(objectArray) then
+		return mainmemory.read_u16_be(objectArray + object_model2.init.elem_count) - 1;
+	end
+	return 0;
+end
+
+function isLoadingZone(pointer)
+	data_bitfield = mainmemory.read_u16_be(pointer + object_model2.object.data_bitfield);
+	if bit.check(data_bitfield,object_model2.object.bitfield_values.loading_zone_1)
+		and not bit.check(data_bitfield,object_model2.object.bitfield_values.loading_zone_2)
+		and bit.check(data_bitfield,object_model2.object.bitfield_values.loading_zone_3)
+		and not bit.check(data_bitfield,object_model2.object.bitfield_values.loading_zone_4)
+		and not bit.check(data_bitfield,object_model2.object.bitfield_values.loading_zone_0) then
+		return true
+	end
+	return false
+end
+
+function formatName(pointer)
+	isLZ = isLoadingZone(pointer);
+	if isLZ then
+		local mapValue = mainmemory.read_u16_be(pointer + object_model2.object.map_index) + 0xA0;
+		if Game.maps[mapValue] ~= nil then
+			mapName = Game.maps[mapValue];
+		else
+			mapName = "Unknown "..toHexString(mapValue);
+		end
+		local exitIndex = mainmemory.read_u16_be(pointer + object_model2.object.exit_index);
+		return mapName.." ("..exitIndex..")";
+	end
+	return "Unknown"
+end
+
+function getModelTwoSlotBase(index)
+	local objectArray = dereferencePointer(Game.Memory.object_model2_array_pointer);
+	if isRDRAM(objectArray) then
+		local elem_size = mainmemory.read_u16_be(objectArray + object_model2.init.elem_size)
+		return elem_size + (index * elem_size);
+	end
+	return 0;
+end
+
+function getObjectModel2Pointers()
+	object_pointers = {};
+	local objectArray = dereferencePointer(Game.Memory.object_model2_array_pointer);
+	if isRDRAM(objectArray) then
+		local num_slots = getModelTwoCount();
+		for i = 0, num_slots - 1 do
+			local model2Base = objectArray + getModelTwoSlotBase(i);
+			if object_model2_filter == nil then
+				if isLoadingZone(model2Base) then
+					table.insert(object_pointers, model2Base); -- TODO: Check for bone arrays before adding to table, we don't want to move stuff we can't see
+				end
+			else
+				if isLoadingZone(model2Base) then
+					if string.contains(formatName(model2Base), object_model2_filter) then
+						table.insert(object_pointers, model2Base); -- TODO: Check for bone arrays before adding to table, we don't want to move stuff we can't see
+					end
+				end
+			end
+		end
+	end
+	return object_pointers;
+end
+
+function formatBinString(value, length)
+	local bin_string = "";
+	for i = 0, (length - 1) do
+		if i ~= 0 and i % 4 == 0 then
+			bin_string = " "..bin_string;
+		end
+		if bit.check(value,i) then
+			bin_string = "1"..bin_string;
+		else
+			bin_string = "0"..bin_string;
+		end
+	end
+	return bin_string
+end
+
+function getExamineDataModelTwo(pointer)
+	local examine_data = {};
+	if not isRDRAM(pointer) then
+		return examine_data;
+	end
+
+	local xPos = mainmemory.read_s16_be(pointer + object_model2.object.x_position);
+	local yPos = mainmemory.read_s16_be(pointer + object_model2.object.y_position);
+	local zPos = mainmemory.read_s16_be(pointer + object_model2.object.z_position);
+	
+	local playerX = Game.getXPosition();
+	local playerY = Game.getYPosition();
+	local playerZ = Game.getZPosition();
+
+	local hDist = math.sqrt(((xPos - playerX) ^ 2) + ((zPos - playerZ) ^ 2));
+	local playerDist = math.sqrt(((yPos - playerY) ^ 2) + (hDist ^ 2))
+
+	local hasPosition = xPos ~= 0 or yPos ~= 0 or zPos ~= 0;
+	local data_bitfield = mainmemory.read_u16_be(pointer + object_model2.object.data_bitfield);
+	local isLZ = isLoadingZone(pointer);
+
+	local mapValue = mainmemory.read_u16_be(pointer + object_model2.object.map_index) + 0xA0;
+	if Game.maps[mapValue] ~= nil then
+		mapName = Game.maps[mapValue];
+	else
+		mapName = "Unknown ("..toHexString(mapValue)..")";
+	end
+
+	table.insert(examine_data, { "Object", formatName(pointer) });
+	table.insert(examine_data, { "Address", toHexString(pointer) });
+
+	table.insert(examine_data, { "Separator", 1 });
+
+	table.insert(examine_data, { "X", xPos });
+	table.insert(examine_data, { "Y", yPos });
+	table.insert(examine_data, { "Z", zPos });
+	table.insert(examine_data, { "Separator", 1 });
+	table.insert(examine_data, { "Distance to Player", playerDist });
+	table.insert(examine_data, { "XZ Distance to Player", hDist });
+	table.insert(examine_data, { "Separator", 1 });
+	table.insert(examine_data, { "Data Bitfield", formatBinString(data_bitfield, 16) });
+
+	if isLZ then -- LZ
+		table.insert(examine_data, { "Map", mapName });
+		table.insert(examine_data, { "Exit", mainmemory.read_u16_be(pointer + object_model2.object.exit_index) });
+		table.insert(examine_data, { "Separator", 1 });
+	end
+
+	return examine_data;
+end
+
+---------------------
+-- Object Analysis --
+---------------------
+
 local max_page_size = 40;
 
-function Game.drawUI()
-	current_flagMasterType = forms.getproperty(ScriptHawk.UI.form_controls["Flag Master Type Dropdown"], "SelectedItem");
-	current_flagSubType = forms.getproperty(ScriptHawk.UI.form_controls["Flag Sub Type Dropdown"], "SelectedItem");
-	if old_flagMasterType ~= current_flagMasterType then
-		forms.setproperty(ScriptHawk.UI.form_controls["Flag Sub Type Dropdown"], "SelectedItem","All");
-		flagTypeGetter();
-		forms.setdropdownitems(ScriptHawk.UI.form_controls["Flag Sub Type Dropdown"], flag_subtypes);
-		getFlagsArray();
-		forms.setdropdownitems(ScriptHawk.UI.form_controls["Flag Dropdown"], flags_list);
-		forms.setproperty(ScriptHawk.UI.form_controls["Flag Dropdown"], "SelectedIndex", 0);
-	end
-	if old_flagSubType ~= current_flagSubType then
-		getFlagsArray();
-		forms.setdropdownitems(ScriptHawk.UI.form_controls["Flag Dropdown"], flags_list);
-		forms.setproperty(ScriptHawk.UI.form_controls["Flag Dropdown"], "SelectedIndex", 0);
-	end
-	old_flagSubType = current_flagSubType;
-	old_flagMasterType = current_flagMasterType;
-
+local function drawObjectAnalysisUI()
 	if script_mode == "Disabled" then
 		return;
 	end
-
 	local row = 0;
-	local objectArray = dereferencePointer(Game.Memory.object_array_pointer);
-	local numSlots = getNumSlots();
+	if string.contains(script_mode, "Object Model 1") then
+		getObjectModel1Pointers();
+	elseif string.contains(script_mode, "Loading Zones") then
+		getObjectModel2Pointers();
+	end
 
 	gui.text(Game.OSDPosition[1], 2 + Game.OSDRowHeight * row, "Mode: "..script_mode, nil, 'bottomright');
 	row = row + 1;
-	gui.text(Game.OSDPosition[1], 2 + Game.OSDRowHeight * row, "Index: "..(object_index).."/"..(numSlots), nil, 'bottomright');
+	gui.text(Game.OSDPosition[1], 2 + Game.OSDRowHeight * row, "Index: "..object_index.."/"..#object_pointers, nil, 'bottomright');
+	row = row + 1;
+	gui.text(Game.OSDPosition[1], 2 + Game.OSDRowHeight * row, "Page: "..page_pos.."/"..page_total, nil, 'bottomright');
 	row = row + 1;
 
-	if script_mode == "Examine" and isRDRAM(objectArray) then
-		local currentSlotBase = objectArray + getSlotBase(object_index - 1);
+	-- Clamp index to number of objects
+	if #object_pointers > 0 and object_index > #object_pointers then
+		object_index = #object_pointers;
+	end
+
+	if #object_pointers > 0 and object_index <= #object_pointers then
+		if string.contains(script_mode, "Examine") then
+			local examine_data = {};
+			if script_mode == "Examine (Object Model 1)" then
+				examine_data = getExamineDataModelOne(object_pointers[object_index]);
+			elseif script_mode == "Examine (Loading Zones)" then
+				examine_data = getExamineDataModelTwo(object_pointers[object_index]);
+			end
+
+			pagifyThis(examine_data, 40);
+
+			for i = page_finish, page_start + 1, -1 do
+				if examine_data[i][1] ~= "Separator" then
+					if type(examine_data[i][2]) == "number" then
+						examine_data[i][2] = round(examine_data[i][2], precision);
+					end
+					gui.text(Game.OSDPosition[1], 2 + Game.OSDRowHeight * row, examine_data[i][1]..": "..examine_data[i][2], nil, 'bottomright');
+					row = row + 1;
+				else
+					row = row + examine_data[i][2];
+				end
+			end
+		end
+		if script_mode == "List (Object Model 1)" then
+			local objectArray = dereferencePointer(Game.Memory.object_array_pointer);
+			row = row + 1;
+			pagifyThis(object_pointers, 40);
+			for i = page_finish, page_start + 1, -1 do
+				local color = nil;
+				if object_index == i then
+					color = colors.yellow;
+				end
+				local animationType = getAnimationType(object_pointers[i]);
+				gui.text(Game.OSDPosition[1], 2 + Game.OSDRowHeight * row, i..": "..animationType..": "..toHexString(object_pointers[i] or 0), color, 'bottomright');
+				--gui.text(gui_x, gui_y + height * row, i..": "..getActorName(object_pointers[i]).." "..toHexString(object_pointers[i] or 0, 6).." ("..toHexString(currentActorSize)..")", color, 'bottomright');
+				row = row + 1;
+			end
+		elseif script_mode == "List (Loading Zones)" then
+			local objectArray = dereferencePointer(Game.Memory.object_model2_array_pointer);
+			row = row + 1;
+			pagifyThis(object_pointers, 40);
+			for i = page_finish, page_start + 1, -1 do
+				local color = nil;
+				if object_index == i then
+					color = colors.yellow;
+				end
+				local pointer = object_pointers[i];
+				gui.text(Game.OSDPosition[1], 2 + Game.OSDRowHeight * row, i..": "..formatName(pointer)..": "..toHexString(object_pointers[i] or 0), color, 'bottomright');
+				--gui.text(gui_x, gui_y + height * row, i..": "..getActorName(object_pointers[i]).." "..toHexString(object_pointers[i] or 0, 6).." ("..toHexString(currentActorSize)..")", color, 'bottomright');
+				row = row + 1;
+			end
+		end
+	end
+
+	if script_mode == "Examine (Object Model 1)" and isRDRAM(objectArray) then
+		local currentSlotBase = objectArray + getModelOneSlotBase(object_index - 1);
 		local objectName = getAnimationType(currentSlotBase);
 
-		local examine_data = getExamineData(objectArray + getSlotBase(object_index - 1));
+		local examine_data = getExamineDataModelOne(objectArray + getModelOneSlotBase(object_index - 1));
 		for i = #examine_data, 1, -1 do
 			if examine_data[i][1] ~= "Separator" then
 				gui.text(Game.OSDPosition[1], 2 + Game.OSDRowHeight * row, examine_data[i][1]..": "..examine_data[i][2], nil, 'bottomright');
@@ -6193,49 +6535,84 @@ function Game.drawUI()
 		row = row + 1;
 	end
 
-	if script_mode == "List" and isRDRAM(objectArray) then
-		local page_total = math.ceil(numSlots / max_page_size);
-		local page_pos = math.floor((object_index - 1) / max_page_size) + 1;
-		local page_index = max_page_size + object_index - (page_pos * max_page_size);
-
-		if page_pos < page_total then
-			page_size = max_page_size;
-		else
-			page_size = numSlots - ((page_total - 1) * max_page_size);
-		end
-
-		gui.text(Game.OSDPosition[1], 2 + Game.OSDRowHeight * row, "Page: "..page_pos.."/"..page_total, nil, 'bottomright');
-		row = row + 1;
-
+	if script_mode == "List (Object Model 1)" and isRDRAM(objectArray) then
 		for i = page_size, 1, -1 do
-			local currentSlotBase = objectArray + getSlotBase(i + ((page_pos - 1) * max_page_size) - 1);
-
+			local currentSlotBase = objectArray + getModelOneSlotBase(i + ((page_pos - 1) * max_page_size) - 1);
 			local color = nil;
 			if page_index == i then
 				color = colors.yellow;
 			end
 
-			local xPos = mainmemory.readfloat(currentSlotBase + object_model1.x_position, true);
-			local yPos = mainmemory.readfloat(currentSlotBase + object_model1.y_position, true);
-			local zPos = mainmemory.readfloat(currentSlotBase + object_model1.z_position, true);
-
 			local animationType = getAnimationType(currentSlotBase);
-			if type(object_filter) == "string" and not string.contains(animationType, object_filter) then
-				-- Skip
-			else
-				gui.text(Game.OSDPosition[1], 2 + Game.OSDRowHeight * row, i..": "..animationType..": "..toHexString(currentSlotBase or 0), color, 'bottomright');
-				row = row + 1;
-			end
+			gui.text(Game.OSDPosition[1], 2 + Game.OSDRowHeight * row, i..": "..animationType..": "..toHexString(currentSlotBase or 0), color, 'bottomright');
+			row = row + 1;
 		end
 	end
 end
 
+local function zipTo(index)
+	if string.contains(script_mode, "Object Model 1") then
+		local objectArray = dereferencePointer(Game.Memory.object_array_pointer);
+		local obj_pointers = getObjectModel1Pointers();
+		if isRDRAM(objectArray) then
+			local objectPointer = obj_pointers[object_index];
+			local xPos = mainmemory.readfloat(objectPointer + object_model1.x_position, true);
+			local yPos = mainmemory.readfloat(objectPointer + object_model1.y_position, true);
+			local zPos = mainmemory.readfloat(objectPointer + object_model1.z_position, true);
+			Game.setPosition(xPos, yPos, zPos);
+		end
+	elseif string.contains(script_mode, "Loading Zones") then
+		local objectArray = dereferencePointer(Game.Memory.object_model2_array_pointer);
+		local obj_pointers = getObjectModel2Pointers();
+		if isRDRAM(objectArray) then
+			local objectPointer = obj_pointers[object_index];
+			local xPos = mainmemory.read_s16_be(objectPointer + object_model2.object.x_position);
+			local yPos = mainmemory.read_s16_be(objectPointer + object_model2.object.y_position);
+			local zPos = mainmemory.read_s16_be(objectPointer + object_model2.object.z_position);
+			Game.setPosition(xPos, yPos, zPos);
+		end
+	end
+end
+
+local function zipToSelectedObject()
+	zipTo(object_index - 1);
+end
+
+function Game.drawUI()
+	current_flagMasterType = forms.getproperty(ScriptHawk.UI.form_controls["Flag Master Type Dropdown"], "SelectedItem");
+	current_flagSubType = forms.getproperty(ScriptHawk.UI.form_controls["Flag Sub Type Dropdown"], "SelectedItem");
+	forms.settext(ScriptHawk.UI.form_controls["Analysis Type Text"],analysis_slide_type);
+	forms.settext(ScriptHawk.UI.form_controls["Analysis Subtype Text"],analysis_slide_subtype);
+	if old_flagMasterType ~= current_flagMasterType then
+		forms.setproperty(ScriptHawk.UI.form_controls["Flag Sub Type Dropdown"], "SelectedItem","All");
+		flagTypeGetter();
+		forms.setdropdownitems(ScriptHawk.UI.form_controls["Flag Sub Type Dropdown"], flag_subtypes);
+		getFlagsArray();
+		forms.setdropdownitems(ScriptHawk.UI.form_controls["Flag Dropdown"], flags_list);
+		forms.setproperty(ScriptHawk.UI.form_controls["Flag Dropdown"], "SelectedIndex", 0);
+	end
+	if old_flagSubType ~= current_flagSubType then
+		getFlagsArray();
+		forms.setdropdownitems(ScriptHawk.UI.form_controls["Flag Dropdown"], flags_list);
+		forms.setproperty(ScriptHawk.UI.form_controls["Flag Dropdown"], "SelectedIndex", 0);
+	end
+	old_flagSubType = current_flagSubType;
+	old_flagMasterType = current_flagMasterType;
+	script_mode_from_inputs();
+	turnFilterBoxIntoFilter();
+	drawObjectAnalysisUI();
+end
+
+
+
 -- Keybinds
 -- For full list go here http://slimdx.org/docs/html/T_SlimDX_DirectInput_Key.htm
 ScriptHawk.bindKeyRealtime("Z", zipToSelectedObject, true);
-ScriptHawk.bindKeyRealtime("C", toggleObjectAnalysisToolsMode, true);
+-- ScriptHawk.bindKeyRealtime("C", toggleObjectAnalysisToolsMode, true);
 ScriptHawk.bindKeyRealtime("N", decrementObjectIndex, true);
 ScriptHawk.bindKeyRealtime("M", incrementObjectIndex, true);
+ScriptHawk.bindKeyRealtime("H", decrementPage, true);
+ScriptHawk.bindKeyRealtime("J", incrementPage, true);
 ScriptHawk.bindMouse("mousewheelup", decrementObjectIndex);
 ScriptHawk.bindMouse("mousewheeldown", incrementObjectIndex);
 
@@ -6261,12 +6638,14 @@ local function encircle_banjo()
 	--	radius = getNumSlots() * dynamic_radius_factor;
 	--end
 
-	local currentPointers = getObjectModel1Pointers();
-	for i = 1, #currentPointers do
-		x = current_banjo_x + math.cos(math.pi * 2 * i / #currentPointers) * radius;
-		y = current_banjo_y + i * y_stagger_amount;
-		z = current_banjo_z + math.sin(math.pi * 2 * i / #currentPointers) * radius;
-		setObjectModel1Position(currentPointers[i], x, y, z);
+	if string.contains(script_mode, "Object Model 1") then
+		local currentPointers = getObjectModel1Pointers();
+		for i = 1, #currentPointers do
+			x = current_banjo_x + math.cos(math.pi * 2 * i / #currentPointers) * radius;
+			y = current_banjo_y + i * y_stagger_amount;
+			z = current_banjo_z + math.sin(math.pi * 2 * i / #currentPointers) * radius;
+			setObjectModel1Position(currentPointers[i], x, y, z);
+		end
 	end
 end
 
@@ -6468,6 +6847,17 @@ function Game.initUI()
 	ScriptHawk.UI.checkbox(5, 6, "toggle_autojump", "Autojump");
 
 	seamTester.initUI(9);
+
+	ScriptHawk.UI.form_controls["Analysis Type Text"] = forms.label(ScriptHawk.UI.options_form, analysis_slide_type, ScriptHawk.UI.col(9) + ScriptHawk.UI.dropdown_offset, ScriptHawk.UI.row(11) + ScriptHawk.UI.dropdown_offset, ScriptHawk.UI.col(4) + 8, ScriptHawk.UI.button_height);
+	ScriptHawk.UI.button(14, 11, {1, 1}, nil, nil, ">", increase_analysis_slide_type);
+	ScriptHawk.UI.button(7.5, 11, {1, 1}, nil, nil, "<", decrease_analysis_slide_type);
+
+	ScriptHawk.UI.form_controls["Analysis Subtype Text"] = forms.label(ScriptHawk.UI.options_form, analysis_slide_subtype, ScriptHawk.UI.col(9) + ScriptHawk.UI.dropdown_offset, ScriptHawk.UI.row(12) + ScriptHawk.UI.dropdown_offset, ScriptHawk.UI.col(4) + 8, ScriptHawk.UI.button_height);
+	ScriptHawk.UI.button(14, 12, {1, 1}, nil, nil, ">", increase_analysis_slide_subtype);
+	ScriptHawk.UI.button(7.5, 12, {1, 1}, nil, nil, "<", decrease_analysis_slide_subtype);
+
+	ScriptHawk.UI.form_controls["Analysis Filter Label"] = forms.label(ScriptHawk.UI.options_form, "Filter:", ScriptHawk.UI.col(0) + ScriptHawk.UI.dropdown_offset, ScriptHawk.UI.row(12) + ScriptHawk.UI.dropdown_offset, ScriptHawk.UI.col(1) + 15, ScriptHawk.UI.button_height);
+	ScriptHawk.UI.form_controls["Analysis Filter Textbox"] = forms.textbox(ScriptHawk.UI.options_form, nil, ScriptHawk.UI.col(5), ScriptHawk.UI.button_height, nil, ScriptHawk.UI.col(2) + 4, ScriptHawk.UI.row(12));
 
 	flagStats();
 end
