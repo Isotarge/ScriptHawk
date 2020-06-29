@@ -626,6 +626,9 @@ local supportedGames = {
 	-- Ty the Tasmanian Tiger 2: Bush Rescue(GBA)
 	["84267CE3D86100688048A8D4F166FA1B2D50E6D5"] = {moduleName="games.GBA_Ty2", friendlyName="Ty the Tasmanian Tiger 2 - Bush Rescue (USA,Europe) (En,Fr,De)"},
 
+	-- Ty the Tasmanian Tiger 3: Night of the Quinkan(GBA)
+	["07FAFA1C96CC039A1788D6526D52F7D3EC0BA3C3"] = {moduleName="games.GBA_Ty3", friendlyName="Ty the Tasmanian Tiger 3 - Night of the Quinkan (USA)"},
+
 	-- Tyrants - Fight Through Time (Mega Lo Mania)
 	["B090D74241CD56820B568C319799412B"] = {moduleName="games.tftt", friendlyName="Tyrants - Fight Through Time (U) [!]"},
 	["1F7DD4DCB076E7AF7E43F01795504C4A"] = {moduleName="games.tftt", friendlyName="Tyrants - Fight Through Time (U) [!]"}, -- Bad dump?
