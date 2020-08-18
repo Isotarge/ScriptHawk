@@ -404,15 +404,15 @@ Game = {
 		"MT - Inside Targitzan's Temple",
 		"MT - Targitzan's Temple Lobby",
 		"MT - Targitzan's Really Sacred Chamber",
-		"WW - Balloon burst (multiplayer)",
-		"WW - Jump the Hoops (multiplayer)",
+		"WW - Balloon Burst (multiplayer)",
+		"WW - Hoop Hurry (multiplayer)",
 		"GI - Packing Game",
 		"Cutscene - Zombified Throne Room",
 		"MT - Kickball Arena 4",
 		"HFP - Kickball Arena",
 		"JRL - Sea Bottom Cavern",
-		"JRL - Submarine (multiplayer)",
-		"TDL - Chompa's Belly (multiplayer)",
+		"JRL - Sub Shootout (multiplayer)",
+		"TDL - Chompa's Belly Shootout (multiplayer)",
 
 		"!Crash 0x0184",
 
@@ -602,6 +602,18 @@ function Game.getFrameRate()
 	end
 	local denominator = math.max(1, mainmemory.read_s32_be(Game.Memory.frame_timer + 4));
 	return numerator / denominator;
+end
+
+---------
+-- DCW --
+---------
+
+function setupDCW()
+	setFlag(0x0B,0); -- GGM Rock
+	setFlag(0x0D,1); -- SoP at Door
+	clearFlag(0x0D,3); -- SoP > WW
+	clearFlag(0x0D,4); -- SoP at WW
+	setFlag(0x11,3); -- WW SoP Door
 end
 
 -------------------
@@ -2746,8 +2758,8 @@ local flag_array = {
 	-- 0x02 > 1
 	{byte=0x02, bit=2, name="Signpost FTT", nomap=true, type="FTT"},
 	{byte=0x02, bit=3, name="ToT Completed?", type="Progress"},
-	{byte=0x02, bit=4, name="Klungo Intro Cutscene"},
-	-- 0x02 > 5 - GI: Wumba's Picture Broken
+	{byte=0x02, bit=4, name="Klungo Intro Cutscene", type="Cutscene"},
+	{byte=0x02, bit=5, name="GI: Wumba Painting Broken", type="Physical"},
 	-- 0x02 > 6
 	{byte=0x02, bit=7, name="GI: Floor 3 Elevator Door Opened", type="Physical"},
 	{byte=0x03, bit=0, name="GI: Floor 4 Elevator Door Opened", type="Physical"},
@@ -2814,7 +2826,7 @@ local flag_array = {
 	{byte=0x0A, bit=5, name="Mumbo FTT", type="FTT"},
 	{byte=0x0A, bit=6, name="GGM: Canary Cave Entrance Cleared", type="Physical"},
 	-- 0x0A > 7
-	-- 0x0B > 0 - GGM: Detonator: Saucer Of Peril?
+	{byte=0x0B, bit=0, name="GGM: Saucer of Peril Rock Destroyed", type="Physical"},
 	-- 0x0B > 1
 	{byte=0x0B, bit=2, name="GGM: Bullion Bill Intro", type="FTT"},
 	{byte=0x0B, bit=3, name="GGM: Dilberta Quest Complete", type="Progress"},
@@ -2831,11 +2843,11 @@ local flag_array = {
 	{byte=0x0C, bit=6, name="WW: Groggy Returned", type="Progress"},
 	{byte=0x0C, bit=7, name="Humba Wumba FTT", type="FTT"},
 	-- 0x0D > 0 - GGM: Saucer of peril FTT?
-	-- 0x0D > 1
+	{byte=0x0D, bit=1, name="GGM: Saucer of Peril at WW Entrance", type="Physical"},
 	-- 0x0D > 2
-	-- 0x0D > 3
-	-- 0x0D > 4
-	{byte=0x0D, bit=5, name="GGM: Levitate Chuffy (1)", type="Mumbo's Magic"},
+	{byte=0x0D, bit=3, name="GGM: Saucer of Peril Moving Cutscene", type="Physical"},
+	{byte=0x0D, bit=4, name="WW: Saucer of Peril in WW", type="Physical"},
+	{byte=0x0D, bit=5, name="Mumbo's Magic: Levitate: Chuffy", type="Mumbo's Magic"},
 	-- 0x0D > 6
 	{byte=0x0D, bit=7, name="WW: Gobi Freed", type="Progress"},
 	--{byte=0x0E, bit=0, name="WW: Dino Door Smashed?"},
@@ -2865,7 +2877,7 @@ local flag_array = {
 	-- 0x11 > 0
 	{byte=0x11, bit=1, name="MT: Jade Snake Grove Door Smashed", type="Physical"},
 	{byte=0x11, bit=2, name="WW: Crazy Castle Pump Activated", type="Physical"},
-	-- 0x11 > 3
+	{byte=0x11, bit=3, name="WW: Saucer of Peril Door Opened", type="Physical"},
 	{byte=0x11, bit=4, name="JRL: Pawno's Jiggy Purchased", type="Progress"},
 	{byte=0x11, bit=5, name="JRL: Pawno's Cheato Page Purchased", type="Progress"},
 	{byte=0x11, bit=6, name="JRL: UFO Leaves JRL", type="Progress"},
@@ -2888,7 +2900,7 @@ local flag_array = {
 	-- 0x13 > 7
 	-- 0x14 > 0
 	{byte=0x14, bit=1, name="MT: Prison Compound Door Smashed", type="Physical"},
-	-- 0x14 > 2
+	{byte=0x14, bit=2, name="SM: Bottles' Revenge Cutscene Watched", type="Cutscene"},
 	{byte=0x14, bit=3, name="JRL: Water Supply Pipe Grate Smashed (Sunken Ship)", type="Physical"},
 	{byte=0x14, bit=4, name="JRL: Water Supply Pipe Grate Smashed (Smuggler's Cavern)", type="Physical"},
 	{byte=0x14, bit=5, name="JRL: Waste Pipe Drilled", type="Physical"},
@@ -3096,8 +3108,8 @@ local flag_array = {
 	{byte=0x2D, bit=7, name="GI: Floor 5 Window Smashed (1)", type="Physical"},
 	{byte=0x2E, bit=0, name="GI: Floor 5 Window Smashed (2)", type="Physical"},
 	{byte=0x2E, bit=1, name="GI: Window to Screws Smashed", type="Physical"},
-	-- 0x2E > 2 - GI: Window to Cheato Page Smashed
-	-- 0x2E > 3 - GI: Window below Treble Clef Smashed
+	{byte=0x2E, bit=2, name="GI: Window to Cheato Page", type="Physical"},
+	{byte=0x2E, bit=3, name="GI: Window to Upper Floor 1 Smashed", type="Physical"},
 	{byte=0x2E, bit=4, name="GI: Jinjo Window Opening Cutscene", type="Cutscene"},
 	{byte=0x2E, bit=5, name="GI: Jinjo Window Closing Cutscene", type="Cutscene"},
 	-- 0x2E > 6 - GI: Electromagnet Reactivated Text?
@@ -3107,7 +3119,7 @@ local flag_array = {
 	-- 0x2F > 2
 	-- 0x2F > 3
 	-- 0x2F > 4
-	{byte=0x2F, bit=5, name="FT Jiggy Collection?"},
+	{byte=0x2F, bit=5, name="IoH: Door to Wooded Hollow Open", type="Physical"},
 	-- 0x2F > 6
 	{byte=0x2F, bit=7, name="IoH: Mrs. Bottles Intro Cutscene", type="FTT"},
 	{byte=0x30, bit=0, name="IoH: Speccy Intro Text Seen", type="FTT"},
@@ -3138,7 +3150,7 @@ local flag_array = {
 	{byte=0x33, bit=1, name="GI: F2 Grate Near Electromagnetic Chamber", type="Physical"},
 	{byte=0x33, bit=2, name="GI: Screw Panel (F2-F1)", type="Physical"},
 	{byte=0x33, bit=3, name="GI: Spring Pad Unlocked (F4-F5)", type="Physical"},
-	-- 0x33 > 4 - GI: Screw Panel (Mumbo Pad)
+	{byte=0x33, bit=4, name="GI: Screw Panel (F3-F2)", type="Physical"},
 	{byte=0x33, bit=5, name="HFP: Mildred Ice Cube FTT", type="FTT"},
 	{byte=0x33, bit=6, name="HFP: Gobi in Train Station", type="Progress"},
 	{byte=0x33, bit=7, name="HFP: Biggafoot FTT", type="FTT"},
@@ -3396,7 +3408,7 @@ local flag_array = {
 	{byte=0x53, bit=3, name="HFP: Volcano Jiggy Spawned", type="Physical"},
 	-- 0x53 > 4
 	{byte=0x53, bit=5, name="CCL: Pot o' Gold Jiggy Spawned", type="Physical"},
-	{byte=0x53, bit=6, name="FT Jiggy Collection??"}, -- King Jingaling Intro Jiggy Spawned?
+	{byte=0x53, bit=6, name="IoH: Jingaling Jiggy Spawned", type="Physical"},
 	-- 0x53 > 7
 	{byte=0x54, bit=0, name="GI: Packing Room Jiggy Spawned", type="Physical"},
 	{byte=0x54, bit=1, name="TDL: Chompa's Jiggy Spawned", type="Physical"},
