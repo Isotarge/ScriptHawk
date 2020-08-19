@@ -1005,6 +1005,62 @@ function Game.getMaxStandardAmmo()
 end
 Game.getMaxHomingAmmo = Game.getMaxStandardAmmo;
 
+--------------------------------
+-- Object > Player Statistics --
+---- Written by theballaam96 ---
+--------------------------------
+function calculateXZDist(lx,lz,lr)
+	lr = lr or 0;
+	local playerObject = Game.getPlayerObject();
+	if isRDRAM(playerObject) then
+		local px = Game.getXPosition();
+		local pz = Game.getZPosition();
+		local dx = math.abs(lx - px);
+		local dz = math.abs(lz - pz);
+		if math.sqrt((dx ^ 2) + (dz ^2)) < lr then -- Inside LZ Radius
+			return 0;
+		end
+		return math.sqrt((dx ^ 2) + (dz ^2)) - lr;
+	end
+	return 0;
+end
+
+function calculateXYZDist(lx,ly,lz,lr,lh)
+	lr = lr or 0;
+	lh = lh or 0;
+	local playerObject = Game.getPlayerObject();
+	if isRDRAM(playerObject) then
+		local dxz = calculateXZDist(lx,lz,lr);
+		if lh == -1 then -- Height is infinite
+			return dxz;
+		end
+		local py = Game.getYPosition();
+		local dy = math.abs(ly - py);
+		if py > ly + lh then
+			dy = dy - lh;
+		end
+		if py > ly and py < ly + lh then -- in LZ Height range
+			return dxz
+		end
+		return math.sqrt((dxz ^ 2) + (dy ^2));
+	end
+	return 0;
+end
+
+function calculateAngle(lx,lz)
+	local playerObject = Game.getPlayerObject();
+	if isRDRAM(playerObject) then
+		local px = Game.getXPosition();
+		local pz = Game.getZPosition();
+		local dx = (lx - px);
+		local dz = (lz - pz);
+		local angle = (630 - ((math.atan2(dz,dx) * (180 / math.pi)) + 180)) % 360;
+		local angle_roundedToUnits = (math.floor((angle * (4096/360)) + 0.5) % 4096) * (360/4096);
+		return angle_roundedToUnits;
+	end
+	return 0;
+end
+
 ----------------------------------
 -- Object Model 1 Documentation --
 ----------------------------------
@@ -2345,6 +2401,10 @@ local function getExamineDataModelOne(pointer)
 		table.insert(examine_data, { "Y Velocity", mainmemory.readfloat(pointer + obj_model1.y_velocity, true) });
 		table.insert(examine_data, { "Y Accel", mainmemory.readfloat(pointer + obj_model1.y_acceleration, true) });
 		table.insert(examine_data, { "Terminal Velocity", mainmemory.readfloat(pointer + obj_model1.terminal_velocity, true) });
+		table.insert(examine_data, { "Separator", 1 });
+		table.insert(examine_data, { "Distance to Player (XZ)", calculateXZDist(xPos, zPos, 0) });
+		table.insert(examine_data, { "Distance to Player (XYZ)", calculateXYZDist(xPos, yPos, zPos, 0, 0) });
+		table.insert(examine_data, { "Player > Object Angle", calculateAngle(xPos, zPos) });
 		table.insert(examine_data, { "Separator", 1 });
 	end
 
@@ -3813,6 +3873,11 @@ local function getExamineDataModelTwo(pointer)
 
 		table.insert(examine_data, { "Hitbox Scale", mainmemory.readfloat(pointer + obj_model2.hitbox_scale, true) });
 		table.insert(examine_data, { "Separator", 1 });
+
+		table.insert(examine_data, { "Distance to Player (XZ)", calculateXZDist(xPos, zPos, 0) });
+		table.insert(examine_data, { "Distance to Player (XYZ)", calculateXYZDist(xPos, yPos, zPos, 0, 0) });
+		table.insert(examine_data, { "Player > Object Angle", calculateAngle(xPos, zPos) });
+		table.insert(examine_data, { "Separator", 1 });
 	end
 
 	table.insert(examine_data, { "Unknown Counter", mainmemory.read_u16_be(pointer + obj_model2.unknown_counter) });
@@ -4308,61 +4373,6 @@ local loading_zone_fields = {
 	active = 0x39, -- Byte
 };
 
-function calculateLZ_XZDist(base)
-	local playerObject = Game.getPlayerObject();
-	if isRDRAM(playerObject) then
-		local px = Game.getXPosition();
-		local pz = Game.getZPosition();
-		local lx = mainmemory.read_s16_be(base + loading_zone_fields.x_position);
-		local lz = mainmemory.read_s16_be(base + loading_zone_fields.z_position);
-		local lr = mainmemory.read_u16_be(base + loading_zone_fields.radius);
-		local dx = math.abs(lx - px);
-		local dz = math.abs(lz - pz);
-		if math.sqrt((dx ^ 2) + (dz ^2)) < lr then -- Inside LZ Radius
-			return 0;
-		end
-		return math.sqrt((dx ^ 2) + (dz ^2)) - lr;
-	end
-	return 0;
-end
-
-function calculateLZ_XYZDist(base)
-	local playerObject = Game.getPlayerObject();
-	if isRDRAM(playerObject) then
-		local dxz = calculateLZ_XZDist(base);
-		local lh = mainmemory.read_s16_be(base + loading_zone_fields.height);
-		if lh == -1 then -- Height is infinite
-			return dxz;
-		end
-		local py = Game.getYPosition();
-		local ly = mainmemory.read_s16_be(base + loading_zone_fields.y_position);
-		local dy = math.abs(ly - py);
-		if py > ly + lh then
-			dy = dy - lh;
-		end
-		if py > ly and py < ly + lh then -- in LZ Height range
-			return dxz
-		end
-		return math.sqrt((dxz ^ 2) + (dy ^2));
-	end
-	return 0;
-end
-
-function calculateLZ_Angle(base)
-	local playerObject = Game.getPlayerObject();
-	if isRDRAM(playerObject) then
-		local px = Game.getXPosition();
-		local pz = Game.getZPosition();
-		local lx = mainmemory.read_s16_be(base + loading_zone_fields.x_position);
-		local lz = mainmemory.read_s16_be(base + loading_zone_fields.z_position);
-		local dx = (lx - px);
-		local dz = (lz - pz);
-		local angle = (630 - ((math.atan2(dz,dx) * (180 / math.pi)) + 180)) % 360;
-		return angle;
-	end
-	return 0;
-end
-
 local function getExamineDataLoadingZone(base)
 	local data = {};
 	if isRDRAM(base) then
@@ -4380,13 +4390,18 @@ local function getExamineDataLoadingZone(base)
 			table.insert(data, {"Cutscene Index", mainmemory.read_u16_be(base + loading_zone_fields.destination_map)});
 			table.insert(data, {"Separator", 1});
 		end
-		table.insert(data, {"X Position", mainmemory.read_s16_be(base + loading_zone_fields.x_position)});
-		table.insert(data, {"Y Position", mainmemory.read_s16_be(base + loading_zone_fields.y_position)});
-		table.insert(data, {"Z Position", mainmemory.read_s16_be(base + loading_zone_fields.z_position)});
+		local x_p = mainmemory.read_s16_be(base + loading_zone_fields.x_position);
+		local y_p = mainmemory.read_s16_be(base + loading_zone_fields.y_position);
+		local z_p = mainmemory.read_s16_be(base + loading_zone_fields.z_position);
+		local lz_radius = mainmemory.read_u16_be(base + loading_zone_fields.radius);
+		local lz_height = mainmemory.read_s16_be(base + loading_zone_fields.height);
+		table.insert(data, {"X Position", x_p});
+		table.insert(data, {"Y Position", y_p});
+		table.insert(data, {"Z Position", z_p});
 		
 		table.insert(data, {"Separator", 1});
-		table.insert(data, {"Radius", mainmemory.read_u16_be(base + loading_zone_fields.radius)});
-		table.insert(data, {"Height", Game.formatLZHeight(mainmemory.read_s16_be(base + loading_zone_fields.height))});
+		table.insert(data, {"Radius", lz_radius});
+		table.insert(data, {"Height", Game.formatLZHeight(lz_height)});
 		-- table.insert(data, {"Size Z", mainmemory.read_u16_be(base + loading_zone_fields.z_size)});
 		table.insert(data, {"Separator", 1});
 		local cutscene_is_tied_byte = mainmemory.read_u16_be(base + loading_zone_fields.cutscene_is_tied);
@@ -4407,9 +4422,9 @@ local function getExamineDataLoadingZone(base)
 		table.insert(data, {"Active", mainmemory.readbyte(base + loading_zone_fields.active)});
 		table.insert(data, {"In Zone", 1 - mainmemory.readbyte(base + loading_zone_fields.not_in_zone)});
 		table.insert(data, {"Separator", 1});
-		table.insert(data, {"Distance to Player (XZ)", calculateLZ_XZDist(base)});
-		table.insert(data, {"Distance to Player (XYZ)", calculateLZ_XYZDist(base)});
-		table.insert(data, {"Player > LZ Angle", calculateLZ_Angle(base)});
+		table.insert(data, {"Distance to Player (XZ)", calculateXZDist(x_p,z_p,lz_radius)});
+		table.insert(data, {"Distance to Player (XYZ)", calculateXYZDist(x_p,y_p,z_p,lz_radius,lz_height)});
+		table.insert(data, {"Player > LZ Angle", calculateAngle(x_p,z_p)});
 		table.insert(data, {"Separator", 1});
 		if cutscene_is_tied_byte == 0xA then
 			table.insert(data, {"Tied Cutscene", mainmemory.read_u16_be(base + loading_zone_fields.cutscene_activated)});
