@@ -4316,9 +4316,12 @@ function calculateLZ_XZDist(base)
 		local lx = mainmemory.read_s16_be(base + loading_zone_fields.x_position);
 		local lz = mainmemory.read_s16_be(base + loading_zone_fields.z_position);
 		local lr = mainmemory.read_u16_be(base + loading_zone_fields.radius);
-		local dx = (lx - px) - lr;
-		local dz = (lz - pz) - lr;
-		return math.sqrt((dx ^ 2) + (dz ^2));
+		local dx = math.abs(lx - px);
+		local dz = math.abs(lz - pz);
+		if math.sqrt((dx ^ 2) + (dz ^2)) < lr then -- Inside LZ Radius
+			return 0;
+		end
+		return math.sqrt((dx ^ 2) + (dz ^2)) - lr;
 	end
 	return 0;
 end
@@ -4333,7 +4336,13 @@ function calculateLZ_XYZDist(base)
 		end
 		local py = Game.getYPosition();
 		local ly = mainmemory.read_s16_be(base + loading_zone_fields.y_position);
-		local dy = (ly - py);
+		local dy = math.abs(ly - py);
+		if py > ly + lh then
+			dy = dy - lh;
+		end
+		if py > ly and py < ly + lh then -- in LZ Height range
+			return dxz
+		end
 		return math.sqrt((dxz ^ 2) + (dy ^2));
 	end
 	return 0;
