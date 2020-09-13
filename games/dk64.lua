@@ -1628,7 +1628,7 @@ obj_model1 = {
 	destination_map = 0x17E, -- u16_be, bonus barrels etc
 	player = {
 		animation_type = 0x181, -- Seems to be the same value as control_states
-		stored_y_rotation = 0x18A, -- Angle post tag barrel?
+		moving_angle = 0x18A,
 		velocity_uncrouch_aerial = 0x1A4, -- TODO: What is this?
 		misc_acceleration_float = 0x1AC, -- TODO: What is this?
 		horizontal_acceleration = 0x1B0, -- Set to a negative number to go fast
@@ -1652,6 +1652,7 @@ obj_model1 = {
 			-- 0100 0000 = Translucent & Sparkles (Strong Kong)
 			-- 0010 0000 = Puts player in orangstand????
 			-- 0001 0000 = Damage flashes
+		interpretted_collision_angle = 0x3F0, -- float
 	},
 	animations = { -- TODO: These are probably different on Kiosk and maybe different on PAL/J
 		[0x00] = "Idle (DK, Normal)",
@@ -4161,6 +4162,13 @@ function getExamineDataActorSpawners(pointer)
 			isBalloon = true;
 		end
 	end
+	local barrels = {28, 107, 134};
+	local isBarrel = false;
+	for i = 1, #barrels do
+		if spawnerActorType == barrels[i] then
+			isBarrel = true;
+		end
+	end
 
 	table.insert(examine_data, { "Slot base", toHexString(pointer, 6) });
 	table.insert(examine_data, { "Object Name", spawnerActorName });
@@ -4173,7 +4181,7 @@ function getExamineDataActorSpawners(pointer)
 	table.insert(examine_data, { "Rotation", mainmemory.read_u16_be(pointer + actorSpawnerAttributes.rotation) });
 	table.insert(examine_data, { "Separator", 1 });
 
-	if spawnerActorType == 28 then
+	if isBarrel then
 		table.insert(examine_data, { "Destination Map", Game.maps[mainmemory.read_u32_be(pointer + actorSpawnerAttributes.bonus_barrel.tied_map) + 1] });
 	elseif isBalloon then
 		table.insert(examine_data, { "Unique ID", mainmemory.readbyte(pointer + actorSpawnerAttributes.balloon.unique_id) });
@@ -7076,19 +7084,19 @@ function Game.colorYRotation()
 	end
 end
 
-function Game.getStoredYRotation()
+function Game.getMovingAngle()
 	if not isInSubGame() then
 		local playerObject = Game.getPlayerObject();
 		if isRDRAM(playerObject) then
-			return mainmemory.read_u16_be(playerObject + obj_model1.player.stored_y_rotation);
+			return mainmemory.read_u16_be(playerObject + obj_model1.player.moving_angle);
 		end
 	end
 	return 0;
 end
 
-function Game.colorStoredYRotation()
-	local currentStoredRotation = Game.getStoredYRotation()
-	if currentStoredRotation > 4095 then -- Detect STVW angles
+function Game.colorMovingAngle()
+	local currentMovingAngle = Game.getMovingAngle()
+	if currentMovingAngle > 4095 then -- Detect STVW angles
 		return 0xFF007FFF; -- Blue
 	end
 end
@@ -10681,8 +10689,7 @@ Game.standardOSD = {
 	{"Separator"},
 	{"Rot. X", Game.getXRotation, category="angle"},
 	{"Facing", Game.getYRotation, Game.colorYRotation, category="angle"},
-	--{"Stored Rotation", Game.getStoredYRotation, Game.colorStoredYRotation, category="angle"},
-	--{"Moving", Game.getMovingRotation, "angle"}, -- TODO: Game.getMovingRotation
+	{"Moving", Game.getMovingAngle, Game.colorMovingAngle, category="angle"},
 	{"Rot. Z", Game.getZRotation, category="angle"},
 	{"Movement", Game.getMovementState, category="movement"},
 	{"Animation", Game.getAnimation, category="animation"},
