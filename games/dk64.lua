@@ -1633,12 +1633,14 @@ obj_model1 = {
 		misc_acceleration_float = 0x1AC, -- TODO: What is this?
 		horizontal_acceleration = 0x1B0, -- Set to a negative number to go fast
 		misc_acceleration_float_2 = 0x1B4, -- TODO: What is this?
-		misc_acceleration_float_3 = 0x1B8, -- TODO: What is this?
+		velocity_cap = 0x1B8,
 		velocity_ground = 0x1C0, -- TODO: What is this?
 		vehicle_actor_pointer = 0x208, -- u32 be
 		slope_timer = 0x243,
 		shockwave_charge_timer = 0x248, -- s16 be
 		shockwave_recovery_timer = 0x24A, -- byte
+		ledge_x = 0x260, -- float
+		ledge_z = 0x264, -- float
 		animation = 0x29E, -- u16 be
 		grabbed_vine_pointer = 0x2B0, -- u32 be
 		grab_pointer = 0x32C, -- u32 be
@@ -2441,6 +2443,10 @@ local function getExamineDataModelOne(pointer)
 	if isKong(currentActorTypeNumeric) then
 		table.insert(examine_data, { "Shockwave Charge Timer", mainmemory.read_s16_be(pointer + obj_model1.player.shockwave_charge_timer) });
 		table.insert(examine_data, { "Shockwave Recovery Timer", mainmemory.readbyte(pointer + obj_model1.player.shockwave_recovery_timer) });
+		table.insert(examine_data, { "Separator", 1 });
+
+		table.insert(examine_data, { "Nearest Ledge (X)", mainmemory.readfloat(pointer + obj_model1.player.ledge_x, true) });
+		table.insert(examine_data, { "Nearest Ledge (Z)", mainmemory.readfloat(pointer + obj_model1.player.ledge_z, true) });
 		table.insert(examine_data, { "Separator", 1 });
 
 		table.insert(examine_data, { "Vehicle Actor Pointer", toHexString(mainmemory.read_u32_be(pointer + obj_model1.player.vehicle_actor_pointer), 8) });
@@ -4217,6 +4223,7 @@ mapObjectSetup_attributes = {
 		y_rot = 0x1C, -- float
 		z_rot = 0x20, -- float
 		object_id = 0x28, -- u16
+		object_index = 0x2A, --u16
 	}
 }
 
@@ -4295,6 +4302,8 @@ function getExamineDataMapObjectSetup(pointer)
 		table.insert(examine_data, { "Rot Z", mainmemory.readfloat(pointer + relevant_data.z_rot, true) });
 		table.insert(examine_data, { "Separator", 1 });
 		table.insert(examine_data, { "Scale", mainmemory.readfloat(pointer + relevant_data.scale, true) });
+		table.insert(examine_data, { "Separator", 1 });
+		table.insert(examine_data, { "Index", toHexString(mainmemory.read_u16_be(pointer + relevant_data.object_index)) });
 	else
 
 	end
@@ -5386,6 +5395,7 @@ end
 
 local flag_block_size = 0x13B; -- TODO: Find exact size, absolute maximum is 0x1A8 based on physical EEPROM slot size but it's likely much smaller than this
 local flag_block_cache = {};
+flag_block_populated = false;
 
 local function clearFlagCache()
 	flag_block_cache = {};
@@ -5477,7 +5487,7 @@ function checkFlags(showKnown)
 		end
 	else
 		flag_block_cache = flagBlock;
-		dprint("Populated flag block cache");
+		flag_block_populated = true;
 	end
 	print_deferred();
 end
@@ -5954,6 +5964,8 @@ temp_flag_boundaries = {
 	size = {0xF,0xF,0xF,nil},
 };
 
+temp_flag_block_populated = false;
+
 local function getTempFlagByName(flagName)
 	for i = 1, #temp_flag_array do
 		if not temp_flag_array[i].ignore and flagName == temp_flag_array[i].flagName then
@@ -6091,7 +6103,7 @@ function checkTemporaryFlags(showKnown)
 			end
 		else
 			temp_flag_block_cache = temp_flagBlock;
-			dprint("Populated temporary flag block cache");
+			temp_flag_block_populated = true;
 		end
 		print_deferred();
 	end
@@ -6106,6 +6118,8 @@ global_flag_boundaries = {
 	finish = {0x7EDD5F,0x7EDC7F,0x7EE1CF,nil},
 	size = {0x8,0x8,0x8,nil},
 };
+
+global_flag_block_populated = false;
 
 local function getGlobalByName(flagName)
 	for i = 1, #global_flag_array do
@@ -6248,10 +6262,38 @@ function checkGlobalFlags(showKnown)
 			end
 		else
 			global_flag_block_cache = global_flagBlock;
-			dprint("Populated global flag block cache");
+			global_flag_block_populated = true;
 		end
 		print_deferred();
 	end
+end
+
+------------------------
+-- FLAG BLOCK MESSAGE --
+------------------------
+
+function populatedFlagBlocksMessage()
+	local populated = {};
+	if flag_block_populated then
+		table.insert(populated, "permanent");
+		flag_block_populated = false;
+	end
+	if temp_flag_block_populated then
+		table.insert(populated, "temporary");
+		temp_flag_block_populated = false;
+	end
+	if global_flag_block_populated then
+		table.insert(populated, "global");
+		global_flag_block_populated = false;
+	end
+	if #populated == 3 then
+		dprint("Populated all flag block caches")
+	elseif #populated == 2 then
+		dprint("Populated "..populated[1].." & "..populated[2].." flag block caches");
+	elseif #populated == 1 then
+		dprint("Populated "..populated[1].." flag block cache")
+	end
+	print_deferred();
 end
 
 ------------------
@@ -7219,6 +7261,14 @@ function Game.setYAcceleration(value)
 	if isRDRAM(playerObject) then
 		mainmemory.writefloat(playerObject + obj_model1.y_acceleration, value, true);
 	end
+end
+
+function Game.getVelocityCap()
+	local playerObject = Game.getPlayerObject();
+	if isRDRAM(playerObject) then
+		return mainmemory.readfloat(playerObject + obj_model1.player.velocity_cap, true);
+	end
+	return 0;
 end
 
 --------------------
@@ -10587,6 +10637,7 @@ function Game.eachFrame()
 		checkFlags(true);
 		checkTemporaryFlags(true);
 		checkGlobalFlags(true);
+		populatedFlagBlocksMessage();
 	end
 
 	if force_gb_load then
@@ -10679,6 +10730,7 @@ Game.standardOSD = {
 	{"dY", category="positionStats"},
 	{"dXZ", category="positionStats"},
 	{"Velocity", Game.getVelocity, category="speed"},
+	{"Velocity Cap", Game.getVelocityCap, category="speed"},
 	--{"Accel", Game.getAcceleration, category="speed"}, -- TODO: Game.getAcceleration
 	{"Y Velocity", Game.getYVelocity, category="speed"},
 	{"Y Accel", Game.getYAcceleration, category="speed"},
