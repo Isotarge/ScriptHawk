@@ -1639,6 +1639,7 @@ obj_model1 = {
 		slope_timer = 0x243,
 		shockwave_charge_timer = 0x248, -- s16 be
 		shockwave_recovery_timer = 0x24A, -- byte
+		invulnerability_timer = 0x255, -- byte
 		ledge_x = 0x260, -- float
 		ledge_z = 0x264, -- float
 		animation = 0x29E, -- u16 be
@@ -2443,6 +2444,9 @@ local function getExamineDataModelOne(pointer)
 	if isKong(currentActorTypeNumeric) then
 		table.insert(examine_data, { "Shockwave Charge Timer", mainmemory.read_s16_be(pointer + obj_model1.player.shockwave_charge_timer) });
 		table.insert(examine_data, { "Shockwave Recovery Timer", mainmemory.readbyte(pointer + obj_model1.player.shockwave_recovery_timer) });
+		table.insert(examine_data, { "Separator", 1 });
+		
+		table.insert(examine_data, { "Invulnerability Timer", mainmemory.readbyte(pointer + obj_model1.player.invulnerability_timer) });
 		table.insert(examine_data, { "Separator", 1 });
 
 		table.insert(examine_data, { "Nearest Ledge (X)", mainmemory.readfloat(pointer + obj_model1.player.ledge_x, true) });
@@ -9810,6 +9814,21 @@ local isgFadeouts = {
 	[6] = {271.268708638889, 265.895772889864, 171, 0}, -- 4:26
 };
 
+function getKoshaColor(timer_value)
+	if timer_value < 51 then -- Cutscene starts
+		return 0xFFFF0000 -- Red
+	elseif timer_value < 101 then -- Tantrum Starts
+		return 0xFFFCA503 -- Orange
+	elseif timer_value < 201 then -- Can be reset
+		return 0xFF0377FC -- Blue
+	end
+	return nil
+end
+
+function isKoshaFrozenChunk(chunk_value)
+	return chunk_value == 0 or chunk_value == 2 or chunk_value == 3 or chunk_value == 7;
+end
+
 function Game.drawUI()
 	updateCurrentInvisify();
 	forms.settext(ScriptHawk.UI.form_controls["Lag Factor Value Label"], lag_factor);
@@ -9862,13 +9881,15 @@ function Game.drawUI()
 	end
 
 	if Game.version ~= 4 then
+		local special_timer_row = 0;
 		-- Draw ISG timer
 		if mainmemory.readbyte(Game.Memory.isg_active) > 0 then
+			special_timer_row = special_timer_row + 1;
 			local isg_start = readTimestamp(Game.Memory.isg_timestamp);
 			if isg_start > 0 then -- If intro story start timestamp is 0 fadeouts will never happen
 				local isg_time = readTimestamp(Game.Memory.timestamp) - isg_start;
 				local timer_string = string.format("%.2d:%05.2f", isg_time / 60 % 60, isg_time % 60);
-				gui.text(16, 16, "ISG Timer: "..timer_string, nil, 'topright');
+				gui.text(16, (16 * special_timer_row), "ISG Timer: "..timer_string, nil, 'topright');
 
 				local introStoryStage = 0;
 				for i = 1, #isgFadeouts do
@@ -9888,14 +9909,50 @@ function Game.drawUI()
 				local cutsceneFading = mainmemory.readbyte(Game.Memory.cutscene_will_play_next_map);
 				if introStoryStage > 0 then
 					if introStoryStage > lastFadeout then
-						gui.text(16, 32, "Fadeout "..introStoryStage.." pending", nil, 'topright');
+						special_timer_row = special_timer_row + 1;
+						gui.text(16, (16 * special_timer_row), "Fadeout "..introStoryStage.." pending", nil, 'topright');
 					elseif destinationMap == isgFadeouts[introStoryStage][3] and destinationCutscene == isgFadeouts[introStoryStage][4] and cutsceneFading == 1 then
-						gui.text(16, 32, "Fading (Fadeout "..introStoryStage..")", nil, 'topright');
+						special_timer_row = special_timer_row + 1;
+						gui.text(16, (16 * special_timer_row), "Fading (Fadeout "..introStoryStage..")", nil, 'topright');
 					end
 				end
 			end
 		else
 			--gui.text(16, 16, "Waiting for ISG", nil, 'topright');
+		end
+
+		-- Draw Giant Kosha Timer
+		-- Documentation: https://pastebin.com/KCERzdaC
+		if mainmemory.read_u32_be(Game.Memory.current_map) == 0x48 then -- Crystal Caves
+			local objModel2Array = getObjectModel2Array();
+			if isRDRAM(objModel2Array) then
+				local numSlots = mainmemory.read_u32_be(Game.Memory.obj_model2_array_count);
+				for i = 1, numSlots do
+					local base = objModel2Array + (i - 1) * obj_model2_slot_size;
+					local id = mainmemory.read_u16_be(base + obj_model2.object_type)
+					if id == 0 then -- Found one of the "Nothing" objects
+						local nothing_x = mainmemory.readfloat(base + obj_model2.x_pos, true);
+						if nothing_x > 1581 and nothing_x < 1582 then -- Only way (as of now) to isolate the correct "Nothing" object in Caves
+							local kosha_behaviour_ptr = dereferencePointer(base + obj_model2.behavior_pointer)
+							if isRDRAM(kosha_behaviour_ptr) then
+								local kosha_counter_ptr = dereferencePointer(kosha_behaviour_ptr)
+								if isRDRAM(kosha_counter_ptr) then -- Kosha Counter exists
+									special_timer_row = special_timer_row + 1;
+									local frozen_text = "";
+									local player = Game.getPlayerObject();
+									if isRDRAM(player) then
+										if isKoshaFrozenChunk(mainmemory.read_u16_be(player + obj_model1.chunk)) then
+											frozen_text = " (Frozen)"
+										end
+									end
+									local kosha_timer = mainmemory.read_u16_be(kosha_counter_ptr + 0x6);
+									gui.text(16, (16 * special_timer_row), "Giant Kosha Timer: "..kosha_timer..frozen_text, getKoshaColor(kosha_timer), 'topright');
+								end
+							end
+						end
+					end
+				end
+			end
 		end
 	end
 end
