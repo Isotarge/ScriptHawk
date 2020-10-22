@@ -4532,7 +4532,7 @@ function getDestinationNameFromLZPointer(base)
 	elseif string.contains(_type, "Cutscene Trigger") then
 		return _type.." ("..mainmemory.read_u16_be(base + loading_zone_fields.destination_map)..") ";
 	else
-		return _type.." "..toHexString(base or 0, 6).." "..i;
+		return _type.." "..toHexString(base or 0, 6);
 	end
 end
 
