@@ -16,6 +16,10 @@ hide_non_scripted = false;
 never_slip = false;
 object_model1_filter = nil; -- String, see obj_model1.actor_types
 object_model2_filter = nil; -- String, see obj_model2.object_types
+loading_zones_filter = nil;
+char_spawners_filter = nil;
+actor_spawner_filter = nil;
+map_obj_setup_filter = nil;
 paper_mode = false;
 rat_enabled = false; -- Randomize Animation Timers
 
@@ -92,12 +96,12 @@ local function turnFilterBoxIntoFilter()
 	else
 		filter_value = filter_box_text;
 	end
-	if grab_script_modes[grab_script_mode_index][2] == "Object Model 1" then
-		object_model1_filter = filter_value;
-	end
-	if grab_script_modes[grab_script_mode_index][2] == "Object Model 2" then
-		object_model2_filter = filter_value;
-	end
+	object_model1_filter = filter_value;
+	object_model2_filter = filter_value;
+	loading_zones_filter = filter_value;
+	char_spawners_filter = filter_value;
+	actor_spawner_filter = filter_value;
+	map_obj_setup_filter = filter_value;
 end
 
 getListOfAnalysisSlideTypes();
@@ -1059,6 +1063,13 @@ function calculateAngle(lx,lz)
 		return angle_roundedToUnits;
 	end
 	return 0;
+end
+
+function writeObjectStatisticsToTable(tbl,x,y,z,r,h)
+	table.insert(tbl, { "Distance to Player (XZ)", calculateXZDist(x, z, r) });
+	table.insert(tbl, { "Distance to Player (XYZ)", calculateXYZDist(x, y, z, r, h) });
+	table.insert(tbl, { "Player > Object Angle", calculateAngle(x, z) });
+	return tbl
 end
 
 ----------------------------------
@@ -2406,9 +2417,7 @@ local function getExamineDataModelOne(pointer)
 		table.insert(examine_data, { "Y Accel", mainmemory.readfloat(pointer + obj_model1.y_acceleration, true) });
 		table.insert(examine_data, { "Terminal Velocity", mainmemory.readfloat(pointer + obj_model1.terminal_velocity, true) });
 		table.insert(examine_data, { "Separator", 1 });
-		table.insert(examine_data, { "Distance to Player (XZ)", calculateXZDist(xPos, zPos, 0) });
-		table.insert(examine_data, { "Distance to Player (XYZ)", calculateXYZDist(xPos, yPos, zPos, 0, 0) });
-		table.insert(examine_data, { "Player > Object Angle", calculateAngle(xPos, zPos) });
+		examine_data = writeObjectStatisticsToTable(examine_data, xPos, yPos, zPos, 0, 0)
 		table.insert(examine_data, { "Separator", 1 });
 	end
 
@@ -3620,7 +3629,7 @@ local function populateObjectModel2Pointers()
 			-- Fill and sort pointer list
 			for i = 1, numSlots do
 				local base = objModel2Array + (i - 1) * obj_model2_slot_size;
-				if string.contains(getScriptName(base), object_model2_filter) then
+				if string.contains(string.lower(getScriptName(base)), string.lower(object_model2_filter)) then
 					table.insert(object_pointers, base);
 				end
 			end
@@ -3885,9 +3894,7 @@ local function getExamineDataModelTwo(pointer)
 		table.insert(examine_data, { "Hitbox Scale", mainmemory.readfloat(pointer + obj_model2.hitbox_scale, true) });
 		table.insert(examine_data, { "Separator", 1 });
 
-		table.insert(examine_data, { "Distance to Player (XZ)", calculateXZDist(xPos, zPos, 0) });
-		table.insert(examine_data, { "Distance to Player (XYZ)", calculateXYZDist(xPos, yPos, zPos, 0, 0) });
-		table.insert(examine_data, { "Player > Object Angle", calculateAngle(xPos, zPos) });
+		examine_data = writeObjectStatisticsToTable(examine_data, xPos, yPos, zPos, 0, 0)
 		table.insert(examine_data, { "Separator", 1 });
 	end
 
@@ -4027,9 +4034,16 @@ function getExamineDataSpawners(pointer)
 		table.insert(examine_data, { "Separator", 1 });
 	end
 
-	table.insert(examine_data, { "X", mainmemory.read_s16_be(pointer + spawnerAttributes.x_pos) });
-	table.insert(examine_data, { "Y", mainmemory.read_s16_be(pointer + spawnerAttributes.y_pos) });
-	table.insert(examine_data, { "Z", mainmemory.read_s16_be(pointer + spawnerAttributes.z_pos) });
+	local xPos = mainmemory.read_s16_be(pointer + spawnerAttributes.x_pos);
+	local yPos = mainmemory.read_s16_be(pointer + spawnerAttributes.y_pos);
+	local zPos = mainmemory.read_s16_be(pointer + spawnerAttributes.z_pos);
+
+	table.insert(examine_data, { "X", xPos });
+	table.insert(examine_data, { "Y", yPos });
+	table.insert(examine_data, { "Z", zPos });
+	table.insert(examine_data, { "Separator", 1 });
+
+	examine_data = writeObjectStatisticsToTable(examine_data, xPos, yPos, zPos, 0, 0)
 	table.insert(examine_data, { "Separator", 1 });
 
 	table.insert(examine_data, { "Y Rotation", mainmemory.read_s16_be(pointer + spawnerAttributes.y_rot) });
@@ -4151,12 +4165,27 @@ function Game.populateActorSpawnerPointers()
 	if isRDRAM(actorSpawnerArray) and Game.version ~= 4 then
 		local spawnerCount = getSpawnerCount();
 		local nextSpawner = actorSpawnerArray;
-		for i = 1, spawnerCount do
-			local slotBase = nextSpawner;
-			nextSpawner = dereferencePointer(slotBase + actorSpawnerAttributes.next_spawner)
-			table.insert(object_pointers, slotBase);
+		if actor_spawner_filter == nil then
+			for i = 1, spawnerCount do
+				local slotBase = nextSpawner;
+				nextSpawner = dereferencePointer(slotBase + actorSpawnerAttributes.next_spawner)
+				table.insert(object_pointers, slotBase);
+			end
+		else
+			for i = 1, spawnerCount do
+				local slotBase = nextSpawner;
+				nextSpawner = dereferencePointer(slotBase + actorSpawnerAttributes.next_spawner)
+				if string.contains(string.lower(getActorSpawnerName(slotBase)), string.lower(actor_spawner_filter)) then
+					table.insert(object_pointers, slotBase);
+				end
+			end
 		end
 	end
+end
+
+function getActorSpawnerName(pointer)
+	local as_type = mainmemory.read_u16_be(pointer + actorSpawnerAttributes.actor_type) + mapObjectSetup_objM1_offset;
+	return getActorNameFromBehavior(as_type)
 end
 
 function getExamineDataActorSpawners(pointer)
@@ -4180,16 +4209,22 @@ function getExamineDataActorSpawners(pointer)
 		end
 	end
 
+	local xPos = mainmemory.readfloat(pointer + actorSpawnerAttributes.x_pos, true);
+	local yPos = mainmemory.readfloat(pointer + actorSpawnerAttributes.y_pos, true);
+	local zPos = mainmemory.readfloat(pointer + actorSpawnerAttributes.z_pos, true);
+
 	table.insert(examine_data, { "Slot base", toHexString(pointer, 6) });
 	table.insert(examine_data, { "Object Name", spawnerActorName });
 	table.insert(examine_data, { "Object Type", toHexString(spawnerActorType) });
 	table.insert(examine_data, { "Separator", 1 });
 
-	table.insert(examine_data, { "X", mainmemory.readfloat(pointer + actorSpawnerAttributes.x_pos, true) });
-	table.insert(examine_data, { "Y", mainmemory.readfloat(pointer + actorSpawnerAttributes.y_pos, true) });
-	table.insert(examine_data, { "Z", mainmemory.readfloat(pointer + actorSpawnerAttributes.z_pos, true) });
+	table.insert(examine_data, { "X",  xPos});
+	table.insert(examine_data, { "Y",  yPos});
+	table.insert(examine_data, { "Z",  zPos});
 	table.insert(examine_data, { "Rotation", mainmemory.read_u16_be(pointer + actorSpawnerAttributes.rotation) });
 	table.insert(examine_data, { "Separator", 1 });
+
+	examine_data = writeObjectStatisticsToTable(examine_data, xPos, yPos, zPos, 0, 0)
 
 	if isBarrel then
 		table.insert(examine_data, { "Destination Map", Game.maps[mainmemory.read_u32_be(pointer + actorSpawnerAttributes.bonus_barrel.tied_map) + 1] });
@@ -4242,6 +4277,16 @@ function getMapObjectSetupData()
 	return {};
 end
 
+function getNameFromMapObjSetupPointer(pointer,isModelTwo)
+	if isModelTwo then
+		local mos_type = mainmemory.read_u16_be(pointer + mapObjectSetup_attributes.objM2.object_id)
+		return obj_model2.object_types[mos_type] or "unknown "..toHexString(mos_type)
+	else
+		local mos_type = mainmemory.read_u16_be(pointer + mapObjectSetup_attributes.objM1.object_id) + mapObjectSetup_objM1_offset
+		return "Spawner ("..getActorNameFromBehavior(mos_type)..")"
+	end
+end
+
 function Game.populateMapObjSetupPointers()
 	mapObjectSetup_data = getMapObjectSetupData();
 	object_pointers = {};
@@ -4258,13 +4303,25 @@ function Game.populateMapObjSetupPointers()
 		if objM2Spawner_Count > 0 then
 			for i = 1, objM2Spawner_Count do
 				local slotBase = objM2Spawner_Array + ((i - 1) * mapObjectSetup_objM2_size);
-				table.insert(object_pointers, slotBase);
+				if map_obj_setup_filter == nil then
+					table.insert(object_pointers, slotBase);
+				else
+					if string.contains(string.lower(getNameFromMapObjSetupPointer(slotBase, true)), string.lower(map_obj_setup_filter)) then
+						table.insert(object_pointers, slotBase);
+					end
+				end
 			end
 		end
 		if objM1Spawner_Count > 0 then
 			for i = 1, objM1Spawner_Count do
 				local slotBase = objM1Spawner_Array + ((i - 1) * mapObjectSetup_objM1_size);
-				table.insert(object_pointers, slotBase);
+				if map_obj_setup_filter == nil then
+					table.insert(object_pointers, slotBase);
+				else
+					if string.contains(string.lower(getNameFromMapObjSetupPointer(slotBase, false)), string.lower(map_obj_setup_filter)) then
+						table.insert(object_pointers, slotBase);
+					end
+				end
 			end
 		end
 	end
@@ -4419,7 +4476,7 @@ local function getExamineDataLoadingZone(base)
 		table.insert(data, {"X Position", x_p});
 		table.insert(data, {"Y Position", y_p});
 		table.insert(data, {"Z Position", z_p});
-		
+
 		table.insert(data, {"Separator", 1});
 		table.insert(data, {"Radius", lz_radius});
 		table.insert(data, {"Height", Game.formatLZHeight(lz_height)});
@@ -4443,9 +4500,8 @@ local function getExamineDataLoadingZone(base)
 		table.insert(data, {"Active", mainmemory.readbyte(base + loading_zone_fields.active)});
 		table.insert(data, {"In Zone", 1 - mainmemory.readbyte(base + loading_zone_fields.not_in_zone)});
 		table.insert(data, {"Separator", 1});
-		table.insert(data, {"Distance to Player (XZ)", calculateXZDist(x_p,z_p,lz_radius)});
-		table.insert(data, {"Distance to Player (XYZ)", calculateXYZDist(x_p,y_p,z_p,lz_radius,lz_height)});
-		table.insert(data, {"Player > LZ Angle", calculateAngle(x_p,z_p)});
+
+		data = writeObjectStatisticsToTable(data, x_p, y_p, z_p, lz_radius, lz_height)
 		table.insert(data, {"Separator", 1});
 		if cutscene_is_tied_byte == 0xA then
 			table.insert(data, {"Tied Cutscene", mainmemory.read_u16_be(base + loading_zone_fields.cutscene_activated)});
@@ -4457,13 +4513,43 @@ local function getExamineDataLoadingZone(base)
 	return data;
 end
 
+function getDestinationNameFromLZPointer(base)
+	local _type = mainmemory.read_u16_be(base + loading_zone_fields.object_type);
+	if loading_zone_fields.object_types[_type] ~= nil then
+		_type = loading_zone_fields.object_types[_type].." ("..toHexString(_type)..")";
+	else
+		_type = toHexString(_type);
+	end
+	if string.contains(_type, "Loading Zone") then
+		local destinationMap = mainmemory.read_u16_be(base + loading_zone_fields.destination_map);
+		if Game.maps[destinationMap + 1] ~= nil then
+			destinationMap = Game.maps[destinationMap + 1];
+		else
+			destinationMap = "Unknown Map "..toHexString(destinationMap);
+		end
+		local destinationExit = mainmemory.read_u16_be(base + loading_zone_fields.destination_exit);
+		return destinationMap.." ("..destinationExit..") ";
+	elseif string.contains(_type, "Cutscene Trigger") then
+		return _type.." ("..mainmemory.read_u16_be(base + loading_zone_fields.destination_map)..") ";
+	else
+		return _type.." "..toHexString(base or 0, 6).." "..i;
+	end
+end
+
 local function populateLoadingZonePointers()
 	object_pointers = {};
 	local loadingZoneArray = Game.getLoadingZoneArray();
 	if isRDRAM(loadingZoneArray) then
 		local arraySize = mainmemory.read_u16_be(Game.Memory.loading_zone_array_size);
 		for i = 0, arraySize - 1 do
-			table.insert(object_pointers, loadingZoneArray + (i * loading_zone_size));
+			local ptr = loadingZoneArray + (i * loading_zone_size);
+			if loading_zones_filter == nil then
+				table.insert(object_pointers, ptr);
+			else
+				if string.contains(string.lower(getDestinationNameFromLZPointer(ptr)),string.lower(loading_zones_filter)) then
+					table.insert(object_pointers, ptr);
+				end
+			end
 		end
 
 		-- Clamp index
@@ -6588,7 +6674,19 @@ function Game.populateEnemyPointers()
 		local numberOfEnemies = mainmemory.read_u16_be(Game.Memory.num_enemies);
 		for i = 1, numberOfEnemies do
 			local slotBase = enemyRespawnObject + (i - 1) * enemySlotSize;
-			table.insert(object_pointers, slotBase);
+			if char_spawners_filter == nil then
+				table.insert(object_pointers, slotBase);
+			else
+				local enemyType = mainmemory.readbyte(slotBase);
+				local enemyName = getBehaviorNameFromEnemyIndex(enemyType);
+				if enemyType == 0x50 then
+					local cutsceneModelIndex = mainmemory.readbyte(slotBase + 0x0A);
+					enemyName = enemyName.." ("..getModelNameFromCutsceneIndex(cutsceneModelIndex)..")";
+				end
+				if string.contains(string.lower(enemyName),string.lower(char_spawners_filter)) then
+					table.insert(object_pointers, slotBase);
+				end
+			end
 		end
 	end
 end
@@ -8678,7 +8776,7 @@ local function populateObjectModel1Pointers()
 			else
 				for object_no = 0, getObjectModel1Count() do
 					local pointer = dereferencePointer(Game.Memory.actor_pointer_array + (object_no * 4));
-					if string.contains(getActorName(pointer), object_model1_filter) then
+					if string.contains(string.lower(getActorName(pointer)), string.lower(object_model1_filter)) then
 						table.insert(object_pointers, pointer);
 					end
 				end
