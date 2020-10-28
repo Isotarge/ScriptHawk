@@ -330,6 +330,7 @@ local Game = {
 		actor_spawner_pointer = {0x7FC400,0x7FC320,0x7FC870,nil},
 		num_enemies = {0x7FDC88, 0x7FDBC8, 0x7FE118, 0x7B73D8},
 		enemy_respawn_object = {0x7FDC8C, 0x7FDBCC, 0x7FE11C, 0x7B73DC},
+		mad_jack_podiums_pointer = {0x7FDCA0, 0x7FDBE0, 0x7FE130, nil},
 		os_code_start = {0x400, 0x400, 0x400, nil}, -- TODO: Kiosk
 		os_code_size = {0xD8A8, 0xDAB8, 0xDB18, nil},
 		game_code_start = {0x5FB300, 0x5F4300, 0x5F8B00, 0x590000},
@@ -7509,6 +7510,86 @@ local function MJ_get_switch_active_mask(position)
 	return bit.rshift(bit.band(position, 0x10), 4) > 0;
 end
 
+function MJ_position_to_square()
+	local podiums_container = dereferencePointer(Game.Memory.mad_jack_podiums_pointer)
+	closest = -1;
+	if isRDRAM(podiums_container) then
+		local podiums = dereferencePointer(podiums_container + 0x14);
+		if isRDRAM(podiums) then
+			smallest_distance = 9999999;
+			player_x = Game.getXPosition();
+			player_z = Game.getZPosition();
+			for p = 0, 15 do
+				local podium_x = mainmemory.read_u16_be(podiums + (10 * p) + 0);
+				local podium_z = mainmemory.read_u16_be(podiums + (10 * p) + 4);
+				local podium_dx = player_x - podium_x;
+				local podium_dz = player_z - podium_z;
+				local podium_dxz = math.floor((podium_dx ^ 2) + (podium_dz ^ 2));
+				if podium_dxz < smallest_distance then
+					smallest_distance = podium_dxz;
+					closest = p;
+				end
+			end
+		end
+	end
+	return closest;
+end
+
+function MJ_get_corner_distance()
+	local podiums_container = dereferencePointer(Game.Memory.mad_jack_podiums_pointer)
+	if isRDRAM(podiums_container) then
+		local podiums = dereferencePointer(podiums_container + 0x14);
+		if isRDRAM(podiums) then
+			smallest_four_distances = {};
+			smallest_four_x = {};
+			smallest_four_z = {};
+			player_x = Game.getXPosition();
+			player_z = Game.getZPosition();
+			for p = 0, 15 do
+				local podium_x = mainmemory.read_u16_be(podiums + (10 * p) + 0);
+				local podium_z = mainmemory.read_u16_be(podiums + (10 * p) + 4);
+				local podium_dx = player_x - podium_x;
+				local podium_dz = player_z - podium_z;
+				local podium_dxz = (podium_dx ^ 2) + (podium_dz ^ 2);
+				table.insert(smallest_four_distances, math.floor(podium_dxz));
+				table.insert(smallest_four_x, podium_x);
+				table.insert(smallest_four_z, podium_z);
+			end
+			ref_x = {};
+			ref_z = {};
+			for t = 1, 4 do
+				index = -1;
+				current_min = 9999999;
+				for r = 1, #smallest_four_distances do
+					if smallest_four_distances[r] < current_min then
+						current_min = smallest_four_distances[r];
+						index = r;
+					end
+				end
+				table.insert(ref_x, smallest_four_x[index]);
+				table.insert(ref_z, smallest_four_z[index]);
+				smallest_four_distances[index] = 10000000;
+			end
+			x_coord = 0;
+			z_coord = 0;
+			for t = 1, 4 do
+				if #ref_x == 4 then
+					if ref_x[t] ~= ref_x[1] then
+						x_coord = (ref_x[1] + ref_x[t]) / 2;
+					end
+					if ref_z[t] ~= ref_z[1] then
+						z_coord = (ref_z[1] + ref_z[t]) / 2;
+					end
+				end
+			end
+			cross_dx = player_x - x_coord;
+			cross_dz = player_z - z_coord;
+			return math.sqrt((cross_dx ^ 2) + (cross_dz ^ 2));
+		end
+	end
+	return 0;
+end
+
 local function MJ_get_color(col, row)
 	local color = 'blue';
 	if row % 2 == col % 2 then
@@ -7587,11 +7668,12 @@ function Game.drawMJMinimap()
 		local switches_active = white_pos.active or blue_pos.active;
 
 		local x, y, color;
+		local kong_square = MJ_position_to_square();
 
 		-- Calculate where the kong is on the MJ Board
 		local kongPosition = {
-			col = math.floor(position_to_rowcol(Game.getZPosition()) / 2),
-			row = math.floor(position_to_rowcol(Game.getXPosition()) / 2),
+			col = MJ_get_col_mask(kong_square),
+			row = MJ_get_row_mask(kong_square),
 		};
 
 		for row = 0, 3 do
@@ -7643,6 +7725,7 @@ function Game.drawMJMinimap()
 
 		local phase = mainmemory.readbyte(MJ_state + obj_model1.mad_jack.phase[Game.version]) + 1;
 		local action_type = MJ_get_action_type(phase_byte);
+		local distance_to_intersection = math.floor(1000 * MJ_get_corner_distance()) / 1000;
 
 		gui.drawText(MJ_minimap_text_x, MJ_minimap_actions_remaining_y, actions_remaining.." "..action_type.."s remaining");
 
@@ -7651,6 +7734,7 @@ function Game.drawMJMinimap()
 			gui.drawText(MJ_minimap_text_x, MJ_time_until_next_action_y, time_until_next_action.." ticks until next "..action_type);
 		else
 			gui.drawText(MJ_minimap_text_x, MJ_minimap_phase_number_y, "Phase "..phase);
+			gui.drawText(MJ_minimap_text_x, MJ_time_until_next_action_y, "Distance to next boundary intersection: "..distance_to_intersection)
 		end
 	end
 end
