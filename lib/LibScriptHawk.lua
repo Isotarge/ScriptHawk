@@ -366,7 +366,7 @@ function linesFrom(file)
 	if not fileExists(file) then
 		return {};
 	end
-	lines = {};
+	local lines = {};
 	for line in io.lines(file) do
 		table.insert(lines, line);
 	end
@@ -768,7 +768,7 @@ function pagifyThis(tablename,max_page_size)
 	if max_paze_size == nil then
 		max_page_size = 40;
 	end
-	elements_total = #tablename;
+	local elements_total = #tablename;
 
 	page_total = math.ceil(elements_total/max_page_size);
 	if page_total < 1 then
