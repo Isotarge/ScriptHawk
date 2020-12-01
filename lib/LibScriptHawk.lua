@@ -744,6 +744,8 @@ max_page_size = 40;
 page_pos = 1;
 page_total = 1;
 page_size = max_page_size;
+page_start = 0;
+page_finish = 0;
 
 function incrementPage()
 	page_pos= page_pos + 1
