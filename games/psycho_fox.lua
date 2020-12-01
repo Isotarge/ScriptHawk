@@ -151,13 +151,13 @@ function Game.getYVelocity()
 end
 
 function Game.eachFrame()
-	if ScriptHawk.UI.ischecked("Fix Acceleration Checkbox") then
+	if ScriptHawk.UI:ischecked("Fix Acceleration Checkbox") then
 		Game.fixAcceleration();
 	end
 end
 
 function Game.initUI()
-	ScriptHawk.UI.checkbox(0, 6, "Fix Acceleration Checkbox", "Fix Acceleration");
+	ScriptHawk.UI:checkbox(0, 6, "Fix Acceleration Checkbox", "Fix Acceleration");
 end
 
 -------------

@@ -1652,29 +1652,29 @@ ScriptHawk.bindKeyRealtime("C", switch_grab_script_mode, true);
 
 function Game.initUI()
 	if not TASSafe then
-		ScriptHawk.UI.button(5, 4, {4, 10}, nil, "Reload Map (Soft)", "Reload Map", Game.reloadMap);
-		ScriptHawk.UI.button(10, 0, {4, 10}, nil, "Reload Map (Hard)", "Hard Reload", Game.reloadMapHard);
-		ScriptHawk.UI.button(10, 1, {4, 10}, nil, "Kill Boss", "Kill Boss", Game.killBoss);
-		ScriptHawk.UI.checkbox(5, 5, "OoB Timer Checkbox", "OoB Timer Off");
-		ScriptHawk.UI.checkbox(5, 6, "Free Roam Mode", "Free Roam Mode");
-		ScriptHawk.UI.button(10, 4, {4, 10}, nil, "Console Mode Switch", "Emulator Mode", Game.toggleConsoleMode);
+		ScriptHawk.UI:button(5, 4, {4, 10}, nil, "Reload Map (Soft)", "Reload Map", Game.reloadMap);
+		ScriptHawk.UI:button(10, 0, {4, 10}, nil, "Reload Map (Hard)", "Hard Reload", Game.reloadMapHard);
+		ScriptHawk.UI:button(10, 1, {4, 10}, nil, "Kill Boss", "Kill Boss", Game.killBoss);
+		ScriptHawk.UI:checkbox(5, 5, "OoB Timer Checkbox", "OoB Timer Off");
+		ScriptHawk.UI:checkbox(5, 6, "Free Roam Mode", "Free Roam Mode");
+		ScriptHawk.UI:button(10, 4, {4, 10}, nil, "Console Mode Switch", "Emulator Mode", Game.toggleConsoleMode);
 
-		--ScriptHawk.UI.button(10, 7, {46}, nil, "Set Flag Button", "Set", flagSetButtonHandler);
-		--ScriptHawk.UI.button(12, 7, {46}, nil, "Check Flag Button", "Check", flagCheckButtonHandler);
-		--ScriptHawk.UI.button(14, 7, {46}, nil, "Clear Flag Button", "Clear", flagClearButtonHandler);
-		
-		ScriptHawk.UI.button(10, 7, {46}, nil, "Set Save File Button", "Set", saveFileSetButtonHandler);
-		ScriptHawk.UI.button(12, 7, {46}, nil, "Check Save File Button", "Check", saveFileCheckButtonHandler);
-		ScriptHawk.UI.button(14, 7, {46}, nil, "Clear Save File Button", "Clear", saveFileClearButtonHandler);
+		--ScriptHawk.UI:button(10, 7, {46}, nil, "Set Flag Button", "Set", flagSetButtonHandler);
+		--ScriptHawk.UI:button(12, 7, {46}, nil, "Check Flag Button", "Check", flagCheckButtonHandler);
+		--ScriptHawk.UI:button(14, 7, {46}, nil, "Clear Flag Button", "Clear", flagClearButtonHandler);
+
+		ScriptHawk.UI:button(10, 7, {46}, nil, "Set Save File Button", "Set", saveFileSetButtonHandler);
+		ScriptHawk.UI:button(12, 7, {46}, nil, "Check Save File Button", "Check", saveFileCheckButtonHandler);
+		ScriptHawk.UI:button(14, 7, {46}, nil, "Clear Save File Button", "Clear", saveFileClearButtonHandler);
 	else
 		-- Use a bigger check flags button if the others are hidden by TASSafe
-		--ScriptHawk.UI.button(10, 7, {4, 10}, nil, "Check Flag Button", "Check Flag", flagCheckButtonHandler);
-		ScriptHawk.UI.button(10, 7, {4, 10}, nil, "Check Save File Button", "Check Save File", saveFileCheckButtonHandler);
+		--ScriptHawk.UI:button(10, 7, {4, 10}, nil, "Check Flag Button", "Check Flag", flagCheckButtonHandler);
+		ScriptHawk.UI:button(10, 7, {4, 10}, nil, "Check Save File Button", "Check Save File", saveFileCheckButtonHandler);
 	end
 
-	--ScriptHawk.UI.form_controls["Flag Dropdown"] = forms.dropdown(ScriptHawk.UI.options_form, getFlagNameArray(), ScriptHawk.UI.col(0) + ScriptHawk.UI.dropdown_offset, ScriptHawk.UI.row(7) + ScriptHawk.UI.dropdown_offset, ScriptHawk.UI.col(9) + 8, ScriptHawk.UI.button_height);
-	ScriptHawk.UI.form_controls["Save File Dropdown"] = forms.dropdown(ScriptHawk.UI.options_form, getSaveFileNameArray(), ScriptHawk.UI.col(0) + ScriptHawk.UI.dropdown_offset, ScriptHawk.UI.row(7) + ScriptHawk.UI.dropdown_offset, ScriptHawk.UI.col(9) + 8, ScriptHawk.UI.button_height);
-	ScriptHawk.UI.checkbox(10, 6, "realtime_flags", "Realtime Flags", true);
+	--ScriptHawk.UI.form_controls["Flag Dropdown"] = forms.dropdown(ScriptHawk.UI.options_form, getFlagNameArray(), ScriptHawk.UI:col(0) + ScriptHawk.UI.dropdown_offset, ScriptHawk.UI:row(7) + ScriptHawk.UI.dropdown_offset, ScriptHawk.UI:col(9) + 8, ScriptHawk.UI.button_height);
+	ScriptHawk.UI.form_controls["Save File Dropdown"] = forms.dropdown(ScriptHawk.UI.options_form, getSaveFileNameArray(), ScriptHawk.UI:col(0) + ScriptHawk.UI.dropdown_offset, ScriptHawk.UI:row(7) + ScriptHawk.UI.dropdown_offset, ScriptHawk.UI:col(9) + 8, ScriptHawk.UI.button_height);
+	ScriptHawk.UI:checkbox(10, 6, "realtime_flags", "Realtime Flags", true);
 	flagStats();
 	saveFileStats();
 end
@@ -1684,25 +1684,25 @@ function Game.drawUI()
 end
 
 function Game.realTime()
---	if ScriptHawk.UI.ischecked("Fix Input Bug") then
+--	if ScriptHawk.UI:ischecked("Fix Input Bug") then
 --		Game.fixInputBug();
 --	end
 	Game.getConsoleMode();
 end
 
 function Game.eachFrame()
-	if ScriptHawk.UI.ischecked("OoB Timer Checkbox") then
+	if ScriptHawk.UI:ischecked("OoB Timer Checkbox") then
 		Game.FreezeOoBTimer();
 	end
 
-	if ScriptHawk.UI.ischecked("Free Roam Mode") then
+	if ScriptHawk.UI:ischecked("Free Roam Mode") then
 		Game.freeroamEnabled();
 	else
 		Game.freeroamDisabled();
 	end
 
 	Game.applyConsoleSettings();
-	if ScriptHawk.UI.ischecked("realtime_flags") then
+	if ScriptHawk.UI:ischecked("realtime_flags") then
 		newFlagCache();
 		checkFlagArray();
 		populateFlagArray();

@@ -447,7 +447,7 @@ function Game.colorBeakBombAvailable()
 end
 
 function Game.colorSlopeTimer()
-	if ScriptHawk.UI.ischecked("toggle_neverslip") then
+	if ScriptHawk.UI:ischecked("toggle_neverslip") then
 		return colors.blue;
 	end
 	local slopeTimer = Game.getSlopeTimer();
@@ -2675,7 +2675,7 @@ local function encircle_banjo()
 	local x, y, z;
 
 	--radius = 1000;
-	if ScriptHawk.UI.ischecked("dynamic_radius_checkbox") then
+	if ScriptHawk.UI:ischecked("dynamic_radius_checkbox") then
 		radius = getNumSlots() * dynamic_radius_factor;
 	end
 
@@ -2997,8 +2997,8 @@ end
 
 function freezeClipVelocity()
 	local inputs = joypad.getimmediate();
-	-- if not ScriptHawk.UI.ischecked("freeze_clip_velocity") or inputs["P1 L"] or inputs["P1 A"] then
-	if not ScriptHawk.UI.ischecked("freeze_clip_velocity") or inputs["P1 L"] then -- TODO: Less hacky method of detecting moonjump lol
+	-- if not ScriptHawk.UI:ischecked("freeze_clip_velocity") or inputs["P1 L"] or inputs["P1 A"] then
+	if not ScriptHawk.UI:ischecked("freeze_clip_velocity") or inputs["P1 L"] then -- TODO: Less hacky method of detecting moonjump lol
 		return;
 	end
 
@@ -3009,7 +3009,7 @@ end
 
 function freezeZipVelocity()
 	local inputs = joypad.getimmediate();
-	if not ScriptHawk.UI.ischecked("freeze_zip_velocity") or inputs["P1 L"] then -- TODO: Less hacky method of detecting moonjump lol
+	if not ScriptHawk.UI:ischecked("freeze_zip_velocity") or inputs["P1 L"] then -- TODO: Less hacky method of detecting moonjump lol
 		return;
 	end
 	Game.setYVelocity(Game.Memory.zip_vel);
@@ -3119,7 +3119,7 @@ function spawner.spawn(id)
 		end
 		spawner.updatePosition();
 		mainmemory.writebyte(spawner.actorFlag, 1);
-		if ScriptHawk.UI.ischecked("spawner_carry_checkbox") then
+		if ScriptHawk.UI:ischecked("spawner_carry_checkbox") then
 			mainmemory.writebyte(spawner.carryFlag, 1);
 		else
 			mainmemory.writebyte(spawner.carryFlag, 0);
@@ -3267,7 +3267,7 @@ function setFlag(flagType, index, suppressPrint)
 		local containingByte = bitfield_pointer + flagByte;
 		local currentValue = mainmemory.readbyte(containingByte);
 		mainmemory.writebyte(containingByte, bit.set(currentValue, flagBit));
-		if ScriptHawk.UI.ischecked("realtime_flags") and not suppressPrint then
+		if ScriptHawk.UI:ischecked("realtime_flags") and not suppressPrint then
 			checkFlags();
 		end
 	end
@@ -3290,7 +3290,7 @@ function setFlagsByType(flagType)
 			setFlag(flagType, flag.index, true);
 		end
 	end
-	if ScriptHawk.UI.ischecked("realtime_flags") then
+	if ScriptHawk.UI:ischecked("realtime_flags") then
 		checkFlags();
 	end
 end
@@ -3302,7 +3302,7 @@ function setFlagsByLevel(levelIndex)
 			setFlag(flag.type, flag.index, true);
 		end
 	end
-	if ScriptHawk.UI.ischecked("realtime_flags") then
+	if ScriptHawk.UI:ischecked("realtime_flags") then
 		checkFlags();
 	end
 end
@@ -3311,7 +3311,7 @@ function setAllFlags()
 	for i = 1, #flag_array do
 		setFlag(flag_array[i].type, flag_array[i].index, true);
 	end
-	if ScriptHawk.UI.ischecked("realtime_flags") then
+	if ScriptHawk.UI:ischecked("realtime_flags") then
 		checkFlags();
 	end
 end
@@ -3327,7 +3327,7 @@ function clearFlag(flagType, index, suppressPrint)
 		local containingByte = bitfield_pointer + flagByte;
 		local currentValue = mainmemory.readbyte(containingByte);
 		mainmemory.writebyte(containingByte, bit.clear(currentValue, flagBit));
-		if ScriptHawk.UI.ischecked("realtime_flags") and not suppressPrint then
+		if ScriptHawk.UI:ischecked("realtime_flags") and not suppressPrint then
 			checkFlags();
 		end
 	end
@@ -3350,7 +3350,7 @@ function clearFlagsByType(flagType)
 			clearFlag(flagType, flag.index, true);
 		end
 	end
-	if ScriptHawk.UI.ischecked("realtime_flags") then
+	if ScriptHawk.UI:ischecked("realtime_flags") then
 		checkFlags();
 	end
 end
@@ -3362,7 +3362,7 @@ function clearFlagsByLevel(levelIndex)
 			clearFlag(flag.type, flag.index, true);
 		end
 	end
-	if ScriptHawk.UI.ischecked("realtime_flags") then
+	if ScriptHawk.UI:ischecked("realtime_flags") then
 		checkFlags();
 	end
 end
@@ -3371,7 +3371,7 @@ function clearAllFlags()
 	for i = 1, #flag_array do
 		clearFlag(flag_array[i].type, flag_array[i].index, true);
 	end
-	if ScriptHawk.UI.ischecked("realtime_flags") then
+	if ScriptHawk.UI:ischecked("realtime_flags") then
 		checkFlags();
 	end
 end
@@ -3485,44 +3485,44 @@ end
 
 function Game.initUI()
 	if not TASSafe then
-		ScriptHawk.UI.button(10, 8, {46}, nil, "Set Flag Button", "Set", flagSetButtonHandler);
-		ScriptHawk.UI.button(12, 8, {46}, nil, "Check Flag Button", "Check", flagCheckButtonHandler);
-		ScriptHawk.UI.button(14, 8, {46}, nil, "Clear Flag Button", "Clear", flagClearButtonHandler);
+		ScriptHawk.UI:button(10, 8, {46}, nil, "Set Flag Button", "Set", flagSetButtonHandler);
+		ScriptHawk.UI:button(12, 8, {46}, nil, "Check Flag Button", "Check", flagCheckButtonHandler);
+		ScriptHawk.UI:button(14, 8, {46}, nil, "Clear Flag Button", "Clear", flagClearButtonHandler);
 
-		ScriptHawk.UI.checkbox(0, 6, "toggle_neverslip", "Never Slip");
-		--ScriptHawk.UI.checkbox(5, 4, "encircle_checkbox", "Encircle (Beta)");
-		--ScriptHawk.UI.checkbox(5, 5, "dynamic_radius_checkbox", "Dynamic Radius");
-		ScriptHawk.UI.checkbox(5, 4, "freeze_clip_velocity", "Freeze Clip Vel.");
-		ScriptHawk.UI.checkbox(5, 5, "freeze_zip_velocity", "Freeze Zip Vel.");
+		ScriptHawk.UI:checkbox(0, 6, "toggle_neverslip", "Never Slip");
+		--ScriptHawk.UI:checkbox(5, 4, "encircle_checkbox", "Encircle (Beta)");
+		--ScriptHawk.UI:checkbox(5, 5, "dynamic_radius_checkbox", "Dynamic Radius");
+		ScriptHawk.UI:checkbox(5, 4, "freeze_clip_velocity", "Freeze Clip Vel.");
+		ScriptHawk.UI:checkbox(5, 5, "freeze_zip_velocity", "Freeze Zip Vel.");
 
-		ScriptHawk.UI.checkbox(10, 2, "beta_pause_menu_checkbox", "Beta Pause");
+		ScriptHawk.UI:checkbox(10, 2, "beta_pause_menu_checkbox", "Beta Pause");
 
 		-- Actor spawner
-		ScriptHawk.UI.form_controls.actor_dropdown = forms.dropdown(ScriptHawk.UI.options_form, actorNames, ScriptHawk.UI.col(10) + ScriptHawk.UI.dropdown_offset, ScriptHawk.UI.row(0) + ScriptHawk.UI.dropdown_offset);
-		ScriptHawk.UI.button(10, 1, 2, nil, nil, "Spawn", spawner.spawn);
-		ScriptHawk.UI.checkbox({12, 10}, 1, "spawner_carry_checkbox", "Carry?");
+		ScriptHawk.UI.form_controls.actor_dropdown = forms.dropdown(ScriptHawk.UI.options_form, actorNames, ScriptHawk.UI:col(10) + ScriptHawk.UI.dropdown_offset, ScriptHawk.UI:row(0) + ScriptHawk.UI.dropdown_offset);
+		ScriptHawk.UI:button(10, 1, 2, nil, nil, "Spawn", spawner.spawn);
+		ScriptHawk.UI:checkbox({12, 10}, 1, "spawner_carry_checkbox", "Carry?");
 
 		-- Vile
-		--ScriptHawk.UI.button(10, 4, 2, nil, nil, "Wave", initWave);
-		--ScriptHawk.UI.button({12, 8}, 4, 2, nil, nil, "Heart", doHeart);
-		--ScriptHawk.UI.button(10, 5, {4, 8}, nil, nil, "Fire all", fireAllSlots);
+		--ScriptHawk.UI:button(10, 4, 2, nil, nil, "Wave", initWave);
+		--ScriptHawk.UI:button({12, 8}, 4, 2, nil, nil, "Heart", doHeart);
+		--ScriptHawk.UI:button(10, 5, {4, 8}, nil, nil, "Fire all", fireAllSlots);
 
 		-- Moves
-		ScriptHawk.UI.form_controls.moves_dropdown = forms.dropdown(ScriptHawk.UI.options_form, { "5. All Minus Swim", "4. None", "3. SM 100%", "2. FFM Setup", "1. All", "0. Demo" }, ScriptHawk.UI.col(10) + ScriptHawk.UI.dropdown_offset, ScriptHawk.UI.row(5) + ScriptHawk.UI.dropdown_offset, ScriptHawk.UI.col(4) + 8, ScriptHawk.UI.button_height);
-		ScriptHawk.UI.button(10, 6, {4, 8}, nil, nil, "Unlock Moves", unlock_moves);
+		ScriptHawk.UI.form_controls.moves_dropdown = forms.dropdown(ScriptHawk.UI.options_form, { "5. All Minus Swim", "4. None", "3. SM 100%", "2. FFM Setup", "1. All", "0. Demo" }, ScriptHawk.UI:col(10) + ScriptHawk.UI.dropdown_offset, ScriptHawk.UI:row(5) + ScriptHawk.UI.dropdown_offset, ScriptHawk.UI:col(4) + 8, ScriptHawk.UI.button_height);
+		ScriptHawk.UI:button(10, 6, {4, 8}, nil, nil, "Unlock Moves", unlock_moves);
 
 		-- Character
-		ScriptHawk.UI.form_controls.character_dropdown = forms.dropdown(ScriptHawk.UI.options_form, { "Banjo-Kazooie", "Termite", "Walrus", "Croc", "Pumpkin", "Bee", "Washing Machine" }, ScriptHawk.UI.col(0) + ScriptHawk.UI.dropdown_offset, ScriptHawk.UI.row(7) + ScriptHawk.UI.dropdown_offset, ScriptHawk.UI.col(4) + 8, ScriptHawk.UI.button_height);
-		ScriptHawk.UI.button(5, 7, {2, 8}, nil, nil, "Transform", changeCharacterFromUI);
+		ScriptHawk.UI.form_controls.character_dropdown = forms.dropdown(ScriptHawk.UI.options_form, { "Banjo-Kazooie", "Termite", "Walrus", "Croc", "Pumpkin", "Bee", "Washing Machine" }, ScriptHawk.UI:col(0) + ScriptHawk.UI.dropdown_offset, ScriptHawk.UI:row(7) + ScriptHawk.UI.dropdown_offset, ScriptHawk.UI:col(4) + 8, ScriptHawk.UI.button_height);
+		ScriptHawk.UI:button(5, 7, {2, 8}, nil, nil, "Transform", changeCharacterFromUI);
 	else
 		-- Use a bigger check flags button if the others are hidden by TASSafe
-		ScriptHawk.UI.button(10, 8, {4, 10}, nil, "Check Flag Button", "Check Flag", flagCheckButtonHandler);
+		ScriptHawk.UI:button(10, 8, {4, 10}, nil, "Check Flag Button", "Check Flag", flagCheckButtonHandler);
 	end
 
-	ScriptHawk.UI.form_controls["Flag Dropdown"] = forms.dropdown(ScriptHawk.UI.options_form, flag_names, ScriptHawk.UI.col(0) + ScriptHawk.UI.dropdown_offset, ScriptHawk.UI.row(8) + ScriptHawk.UI.dropdown_offset, ScriptHawk.UI.col(9) + 8, ScriptHawk.UI.button_height);
+	ScriptHawk.UI.form_controls["Flag Dropdown"] = forms.dropdown(ScriptHawk.UI.options_form, flag_names, ScriptHawk.UI:col(0) + ScriptHawk.UI.dropdown_offset, ScriptHawk.UI:row(8) + ScriptHawk.UI.dropdown_offset, ScriptHawk.UI:col(9) + 8, ScriptHawk.UI.button_height);
 
-	ScriptHawk.UI.checkbox(10, 4, "autopound_checkbox", "Auto Pound");
-	ScriptHawk.UI.checkbox(10, 7, "realtime_flags", "Realtime Flags", true);
+	ScriptHawk.UI:checkbox(10, 4, "autopound_checkbox", "Auto Pound");
+	ScriptHawk.UI:checkbox(10, 7, "realtime_flags", "Realtime Flags", true);
 
 	seamTester.initUI(9);
 
@@ -3543,7 +3543,7 @@ end
 function Game.onLoadState()
 	-- Clear flag block cache
 	flagBlockCache = nil;
-	if ScriptHawk.UI.ischecked("realtime_flags") then
+	if ScriptHawk.UI:ischecked("realtime_flags") then
 		checkFlags();
 	end
 
@@ -3559,23 +3559,23 @@ function Game.eachFrame()
 	freezeClipVelocity();
 	freezeZipVelocity();
 
-	if ScriptHawk.UI.ischecked("toggle_neverslip") then
+	if ScriptHawk.UI:ischecked("toggle_neverslip") then
 		Game.neverSlip();
 	end
 
-	if ScriptHawk.UI.ischecked("encircle_checkbox") then
+	if ScriptHawk.UI:ischecked("encircle_checkbox") then
 		encircle_banjo();
 	end
 
-	if ScriptHawk.UI.ischecked("beta_pause_menu_checkbox") then
+	if ScriptHawk.UI:ischecked("beta_pause_menu_checkbox") then
 		beta_menu_recreate();
 	end
 
-	if ScriptHawk.UI.ischecked("autopound_checkbox") then
+	if ScriptHawk.UI:ischecked("autopound_checkbox") then
 		autoPound();
 	end
 
-	if ScriptHawk.UI.ischecked("realtime_flags") then
+	if ScriptHawk.UI:ischecked("realtime_flags") then
 		checkFlags();
 	end
 
@@ -3589,7 +3589,7 @@ function Game.eachFrame()
 		end
 	end
 
-	if ScriptHawk.UI.ischecked("spawner_carry_checkbox") then
+	if ScriptHawk.UI:ischecked("spawner_carry_checkbox") then
 		mainmemory.writebyte(Game.Memory.carried_object_pointer + 4, 1);
 	end
 end

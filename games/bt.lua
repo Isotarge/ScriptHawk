@@ -1124,7 +1124,7 @@ function Game.getSlopeTimer()
 end
 
 function Game.colorSlopeTimer()
-	if ScriptHawk.UI.ischecked("toggle_neverslip") then
+	if ScriptHawk.UI:ischecked("toggle_neverslip") then
 		return colors.blue;
 	end
 	local slopeTimer = Game.getSlopeTimer();
@@ -6646,7 +6646,7 @@ local function encircle_banjo()
 	local x, y, z;
 
 	--radius = 1000
-	--if ScriptHawk.UI.ischecked("dynamic_radius_checkbox") then
+	--if ScriptHawk.UI:ischecked("dynamic_radius_checkbox") then
 	--	radius = getNumSlots() * dynamic_radius_factor;
 	--end
 
@@ -6677,9 +6677,9 @@ end
 function Game.forceReload()
 	local trigger_value = mainmemory.read_u16_be(Game.Memory.map_trigger);
 	local currentMap = Game.getMap();
-	local dropdown_map_value = ScriptHawk.UI.findMapValue();
+	local dropdown_map_value = ScriptHawk.UI:findMapValue();
 	if trigger_value == 0 then
-		if ScriptHawk.UI.ischecked("Map Checkbox") then
+		if ScriptHawk.UI:ischecked("Map Checkbox") then
 			mainmemory.write_u16_be(Game.Memory.map_trigger_target, dropdown_map_value);
 		else
 			mainmemory.write_u16_be(Game.Memory.map_trigger_target, currentMap);
@@ -6820,56 +6820,56 @@ end
 function Game.initUI()
 	if not TASSafe then
 		-- Force Reload
-		ScriptHawk.UI.button(5, 4, {4, 10}, nil, nil, "Force Reload", Game.forceReload);
+		ScriptHawk.UI:button(5, 4, {4, 10}, nil, nil, "Force Reload", Game.forceReload);
 
 		-- Flag stuff
-		ScriptHawk.UI.button(10, 8, {46}, nil, "Set Flag Button", "Set", flagSetButtonHandler);
-		ScriptHawk.UI.button(12, 8, {46}, nil, "Check Flag Button", "Check", flagCheckButtonHandler);
-		ScriptHawk.UI.button(14, 8, {46}, nil, "Clear Flag Button", "Clear", flagClearButtonHandler);
+		ScriptHawk.UI:button(10, 8, {46}, nil, "Set Flag Button", "Set", flagSetButtonHandler);
+		ScriptHawk.UI:button(12, 8, {46}, nil, "Check Flag Button", "Check", flagCheckButtonHandler);
+		ScriptHawk.UI:button(14, 8, {46}, nil, "Clear Flag Button", "Clear", flagClearButtonHandler);
 
-		ScriptHawk.UI.checkbox(0, 6, "toggle_neverslip", "Never Slip");
+		ScriptHawk.UI:checkbox(0, 6, "toggle_neverslip", "Never Slip");
 
 		-- Moves
-		ScriptHawk.UI.button(10, 0, {4, 10}, nil, nil, "Toggle Dragon Kazooie", Game.toggleDragonKazooie);
-		ScriptHawk.UI.form_controls.moves_dropdown = forms.dropdown(ScriptHawk.UI.options_form, { "All", "None" }, ScriptHawk.UI.col(7) - ScriptHawk.UI.dropdown_offset + 2, ScriptHawk.UI.row(1) + ScriptHawk.UI.dropdown_offset, ScriptHawk.UI.col(2) + 8, ScriptHawk.UI.button_height);
-		ScriptHawk.UI.button(10, 1, {4, 10}, nil, nil, "Unlock Moves", Game.unlockMoves);
+		ScriptHawk.UI:button(10, 0, {4, 10}, nil, nil, "Toggle Dragon Kazooie", Game.toggleDragonKazooie);
+		ScriptHawk.UI.form_controls.moves_dropdown = forms.dropdown(ScriptHawk.UI.options_form, { "All", "None" }, ScriptHawk.UI:col(7) - ScriptHawk.UI.dropdown_offset + 2, ScriptHawk.UI:row(1) + ScriptHawk.UI.dropdown_offset, ScriptHawk.UI:col(2) + 8, ScriptHawk.UI.button_height);
+		ScriptHawk.UI:button(10, 1, {4, 10}, nil, nil, "Unlock Moves", Game.unlockMoves);
 
 		-- Camera lock
-		ScriptHawk.UI.button(10, 2, {4, 10}, nil, nil, "Toggle Camera Lock", Game.toggleCameraLock);
+		ScriptHawk.UI:button(10, 2, {4, 10}, nil, nil, "Toggle Camera Lock", Game.toggleCameraLock);
 
 		-- Character Dropdown
-		ScriptHawk.UI.form_controls["Character Dropdown"] = forms.dropdown(ScriptHawk.UI.options_form, { "BK", "Snowball", "Cutscene", "Bee", "W. Machine", "Stony", "Breegull B.", "Solo Banjo", "Solo Kazooie", "Submarine", "Mumbo", "G. Goliath", "Detonator", "Van", "Cwk Kazooie", "Small T-Rex", "Big T-Rex" }, ScriptHawk.UI.col(5) - ScriptHawk.UI.dropdown_offset + 2, ScriptHawk.UI.row(5) + ScriptHawk.UI.dropdown_offset, ScriptHawk.UI.col(3) + 8, ScriptHawk.UI.button_height);
-		ScriptHawk.UI.checkbox(9, 5, "Character Checkbox", "");
+		ScriptHawk.UI.form_controls["Character Dropdown"] = forms.dropdown(ScriptHawk.UI.options_form, { "BK", "Snowball", "Cutscene", "Bee", "W. Machine", "Stony", "Breegull B.", "Solo Banjo", "Solo Kazooie", "Submarine", "Mumbo", "G. Goliath", "Detonator", "Van", "Cwk Kazooie", "Small T-Rex", "Big T-Rex" }, ScriptHawk.UI:col(5) - ScriptHawk.UI.dropdown_offset + 2, ScriptHawk.UI:row(5) + ScriptHawk.UI.dropdown_offset, ScriptHawk.UI:col(3) + 8, ScriptHawk.UI.button_height);
+		ScriptHawk.UI:checkbox(9, 5, "Character Checkbox", "");
 	else
 		-- Use a bigger check flags button if the others are hidden by TASSafe
-		ScriptHawk.UI.button(10, 7, {4, 10}, nil, "Check Flag Button", "Check Flag", flagCheckButtonHandler);
+		ScriptHawk.UI:button(10, 7, {4, 10}, nil, "Check Flag Button", "Check Flag", flagCheckButtonHandler);
 	end
 
 	-- Flag stuff
-	ScriptHawk.UI.form_controls["Flag Master Type Dropdown"] = forms.dropdown(ScriptHawk.UI.options_form, flag_master_types, ScriptHawk.UI.col(0) + ScriptHawk.UI.dropdown_offset, ScriptHawk.UI.row(7) + ScriptHawk.UI.dropdown_offset, ScriptHawk.UI.col(6) + 8, ScriptHawk.UI.button_height);
+	ScriptHawk.UI.form_controls["Flag Master Type Dropdown"] = forms.dropdown(ScriptHawk.UI.options_form, flag_master_types, ScriptHawk.UI:col(0) + ScriptHawk.UI.dropdown_offset, ScriptHawk.UI:row(7) + ScriptHawk.UI.dropdown_offset, ScriptHawk.UI:col(6) + 8, ScriptHawk.UI.button_height);
 	forms.setproperty(ScriptHawk.UI.form_controls["Flag Master Type Dropdown"], "SelectedItem","Permanent Flags");
 	flagTypeGetter();
-	ScriptHawk.UI.form_controls["Flag Sub Type Dropdown"] = forms.dropdown(ScriptHawk.UI.options_form, flag_subtypes, ScriptHawk.UI.col(7) + ScriptHawk.UI.dropdown_offset, ScriptHawk.UI.row(7) + ScriptHawk.UI.dropdown_offset, ScriptHawk.UI.col(6) + 8, ScriptHawk.UI.button_height);
+	ScriptHawk.UI.form_controls["Flag Sub Type Dropdown"] = forms.dropdown(ScriptHawk.UI.options_form, flag_subtypes, ScriptHawk.UI:col(7) + ScriptHawk.UI.dropdown_offset, ScriptHawk.UI:row(7) + ScriptHawk.UI.dropdown_offset, ScriptHawk.UI:col(6) + 8, ScriptHawk.UI.button_height);
 	getFlagsArray();
 	old_flagMasterType = forms.getproperty(ScriptHawk.UI.form_controls["Flag Master Type Dropdown"], "SelectedItem");
 	old_flagSubType = forms.getproperty(ScriptHawk.UI.form_controls["Flag Sub Type Dropdown"], "SelectedItem");
-	ScriptHawk.UI.form_controls["Flag Dropdown"] = forms.dropdown(ScriptHawk.UI.options_form, flags_list, ScriptHawk.UI.col(0) + ScriptHawk.UI.dropdown_offset, ScriptHawk.UI.row(8) + ScriptHawk.UI.dropdown_offset, ScriptHawk.UI.col(9) + 8, ScriptHawk.UI.button_height);
-	ScriptHawk.UI.checkbox(10, 6, "realtime_flags", "Realtime Flags", true);
+	ScriptHawk.UI.form_controls["Flag Dropdown"] = forms.dropdown(ScriptHawk.UI.options_form, flags_list, ScriptHawk.UI:col(0) + ScriptHawk.UI.dropdown_offset, ScriptHawk.UI:row(8) + ScriptHawk.UI.dropdown_offset, ScriptHawk.UI:col(9) + 8, ScriptHawk.UI.button_height);
+	ScriptHawk.UI:checkbox(10, 6, "realtime_flags", "Realtime Flags", true);
 
-	ScriptHawk.UI.checkbox(5, 6, "toggle_autojump", "Autojump");
+	ScriptHawk.UI:checkbox(5, 6, "toggle_autojump", "Autojump");
 
 	seamTester.initUI(9);
 
-	ScriptHawk.UI.form_controls["Analysis Type Text"] = forms.label(ScriptHawk.UI.options_form, analysis_slide_type, ScriptHawk.UI.col(9) + ScriptHawk.UI.dropdown_offset, ScriptHawk.UI.row(11) + ScriptHawk.UI.dropdown_offset, ScriptHawk.UI.col(4) + 8, ScriptHawk.UI.button_height);
-	ScriptHawk.UI.button(14, 11, {1, 1}, nil, nil, ">", increase_analysis_slide_type);
-	ScriptHawk.UI.button(7.5, 11, {1, 1}, nil, nil, "<", decrease_analysis_slide_type);
+	ScriptHawk.UI.form_controls["Analysis Type Text"] = forms.label(ScriptHawk.UI.options_form, analysis_slide_type, ScriptHawk.UI:col(9) + ScriptHawk.UI.dropdown_offset, ScriptHawk.UI:row(11) + ScriptHawk.UI.dropdown_offset, ScriptHawk.UI:col(4) + 8, ScriptHawk.UI.button_height);
+	ScriptHawk.UI:button(14, 11, {1, 1}, nil, nil, ">", increase_analysis_slide_type);
+	ScriptHawk.UI:button(7.5, 11, {1, 1}, nil, nil, "<", decrease_analysis_slide_type);
 
-	ScriptHawk.UI.form_controls["Analysis Subtype Text"] = forms.label(ScriptHawk.UI.options_form, analysis_slide_subtype, ScriptHawk.UI.col(9) + ScriptHawk.UI.dropdown_offset, ScriptHawk.UI.row(12) + ScriptHawk.UI.dropdown_offset, ScriptHawk.UI.col(4) + 8, ScriptHawk.UI.button_height);
-	ScriptHawk.UI.button(14, 12, {1, 1}, nil, nil, ">", increase_analysis_slide_subtype);
-	ScriptHawk.UI.button(7.5, 12, {1, 1}, nil, nil, "<", decrease_analysis_slide_subtype);
+	ScriptHawk.UI.form_controls["Analysis Subtype Text"] = forms.label(ScriptHawk.UI.options_form, analysis_slide_subtype, ScriptHawk.UI:col(9) + ScriptHawk.UI.dropdown_offset, ScriptHawk.UI:row(12) + ScriptHawk.UI.dropdown_offset, ScriptHawk.UI:col(4) + 8, ScriptHawk.UI.button_height);
+	ScriptHawk.UI:button(14, 12, {1, 1}, nil, nil, ">", increase_analysis_slide_subtype);
+	ScriptHawk.UI:button(7.5, 12, {1, 1}, nil, nil, "<", decrease_analysis_slide_subtype);
 
-	ScriptHawk.UI.form_controls["Analysis Filter Label"] = forms.label(ScriptHawk.UI.options_form, "Filter:", ScriptHawk.UI.col(0) + ScriptHawk.UI.dropdown_offset, ScriptHawk.UI.row(12) + ScriptHawk.UI.dropdown_offset, ScriptHawk.UI.col(1) + 15, ScriptHawk.UI.button_height);
-	ScriptHawk.UI.form_controls["Analysis Filter Textbox"] = forms.textbox(ScriptHawk.UI.options_form, nil, ScriptHawk.UI.col(5), ScriptHawk.UI.button_height, nil, ScriptHawk.UI.col(2) + 4, ScriptHawk.UI.row(12));
+	ScriptHawk.UI.form_controls["Analysis Filter Label"] = forms.label(ScriptHawk.UI.options_form, "Filter:", ScriptHawk.UI:col(0) + ScriptHawk.UI.dropdown_offset, ScriptHawk.UI:row(12) + ScriptHawk.UI.dropdown_offset, ScriptHawk.UI:col(1) + 15, ScriptHawk.UI.button_height);
+	ScriptHawk.UI.form_controls["Analysis Filter Textbox"] = forms.textbox(ScriptHawk.UI.options_form, nil, ScriptHawk.UI:col(5), ScriptHawk.UI.button_height, nil, ScriptHawk.UI:col(2) + 4, ScriptHawk.UI:row(12));
 
 	flagStats();
 end
@@ -6880,13 +6880,13 @@ end
 
 function Game.eachFrame()
 	seamTester.simulate();
-	if ScriptHawk.UI.ischecked("toggle_neverslip") then
+	if ScriptHawk.UI:ischecked("toggle_neverslip") then
 		Game.neverSlip();
 	end
-	if ScriptHawk.UI.ischecked("toggle_autojump") then
+	if ScriptHawk.UI:ischecked("toggle_autojump") then
 		autoJump();
 	end
-	if ScriptHawk.UI.ischecked("realtime_flags") then
+	if ScriptHawk.UI:ischecked("realtime_flags") then
 		checkFlags();
 		checkGlobalFlags();
 	end
@@ -6914,7 +6914,7 @@ function Game.eachFrame()
 		Game.setCameraZPosition(camera_lock.z);
 	end
 
-	if ScriptHawk.UI.ischecked("Character Checkbox") then
+	if ScriptHawk.UI:ischecked("Character Checkbox") then
 		local characterString = forms.getproperty(ScriptHawk.UI.form_controls["Character Dropdown"], "SelectedItem");
 		if type(Game.character_change_lookup[characterString]) == "number" then
 			mainmemory.write_u8(Game.Memory.character_change, Game.character_change_lookup[characterString]);

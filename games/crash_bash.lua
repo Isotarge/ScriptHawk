@@ -169,7 +169,7 @@ function Game.detectVersion(romName, romHash)
 end
 
 function Game.initUI()
-	ScriptHawk.UI.button(0, 6, {4, 10}, nil, nil, "Unlock Rooms", Game.unlockWarpRooms);
+	ScriptHawk.UI:button(0, 6, {4, 10}, nil, nil, "Unlock Rooms", Game.unlockWarpRooms);
 end
 
 function Game.eachFrame()

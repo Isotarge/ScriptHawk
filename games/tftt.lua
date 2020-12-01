@@ -663,7 +663,7 @@ function Game.getSuspendedMen()
 end
 
 function Game.eachFrame()
-	if ScriptHawk.UI.ischecked("mouse_control") then
+	if ScriptHawk.UI:ischecked("mouse_control") then
 		-- Make game cursor follow real cursor
 		local mousePos = input.getmouse();
 		if mousePos.X >= 0 and mousePos.X <= ScriptHawk.bufferWidth and mousePos.Y >= 0 and mousePos.Y <= ScriptHawk.bufferHeight then
@@ -679,7 +679,7 @@ function Game.eachFrame()
 		end
 	end
 
-	if ScriptHawk.UI.ischecked("sandbox_mode") then
+	if ScriptHawk.UI:ischecked("sandbox_mode") then
 		local you = mainmemory.read_u16_be(Game.Memory.character);
 		for i = numSectors, 1, -1 do
 			local sector = sectorBase + (i - 1) * sectorSize;
@@ -707,9 +707,9 @@ end
 
 function Game.initUI()
 	if not TASSafe then
-		ScriptHawk.UI.button(10, 4, {4, 10}, nil, nil, "Build All", Game.buildAll);
-		ScriptHawk.UI.checkbox(0, 6, "mouse_control", "Mouse Control");
-		ScriptHawk.UI.checkbox(0, 7, "sandbox_mode", "Sandbox Mode");
+		ScriptHawk.UI:button(10, 4, {4, 10}, nil, nil, "Build All", Game.buildAll);
+		ScriptHawk.UI:checkbox(0, 6, "mouse_control", "Mouse Control");
+		ScriptHawk.UI:checkbox(0, 7, "sandbox_mode", "Sandbox Mode");
 	end
 end
 

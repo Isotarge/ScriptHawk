@@ -250,7 +250,7 @@ end
 
 function Game.drawUI()
 	forms.settext(ScriptHawk.UI.form_controls["Object Index Label"], "Index: "..objectIndex);
-	if ScriptHawk.UI.ischecked("Enable Object Analyzer") then
+	if ScriptHawk.UI:ischecked("Enable Object Analyzer") then
 		local gui_x = 2;
 		local gui_y = 2;
 		local row = 0;
@@ -272,7 +272,7 @@ function Game.drawUI()
 end
 
 local function incrementObjectIndex()
-	if ScriptHawk.UI.ischecked("Enable Object Analyzer") then
+	if ScriptHawk.UI:ischecked("Enable Object Analyzer") then
 		objectIndex = objectIndex + 1;
 		if objectIndex >= numObjects then
 			objectIndex = 0;
@@ -281,7 +281,7 @@ local function incrementObjectIndex()
 end
 
 local function decrementObjectIndex()
-	if ScriptHawk.UI.ischecked("Enable Object Analyzer") then
+	if ScriptHawk.UI:ischecked("Enable Object Analyzer") then
 		objectIndex = objectIndex - 1;
 		if objectIndex < 0 then
 			objectIndex = numObjects;
@@ -290,7 +290,7 @@ local function decrementObjectIndex()
 end
 
 function zipToSelectedObject()
-	if ScriptHawk.UI.ischecked("Enable Object Analyzer") then
+	if ScriptHawk.UI:ischecked("Enable Object Analyzer") then
 		local objectBase = Game.Memory.object_list + objectIndex * objectSize;
 
 		local objectX = mainmemory.readfloat(objectBase + 0xA0, true);
@@ -385,10 +385,10 @@ function Game.setMap(value)
 end
 
 function Game.initUI()
-	ScriptHawk.UI.checkbox(10, 6, "Enable Object Analyzer", "Object Analyzer");
-	ScriptHawk.UI.button({13, -7}, 7, {ScriptHawk.UI.button_height}, nil, "Decrement Object Index", "-", decrementObjectIndex);
-	ScriptHawk.UI.button({13, ScriptHawk.UI.button_height - 7}, 7, {ScriptHawk.UI.button_height}, nil, "Increment Object Index", "+", incrementObjectIndex);
-	ScriptHawk.UI.form_controls["Object Index Label"] = forms.label(ScriptHawk.UI.options_form, "Index: 0", ScriptHawk.UI.col(8) + ScriptHawk.UI.button_height + 21, ScriptHawk.UI.row(7) + ScriptHawk.UI.label_offset, 64, 14);
+	ScriptHawk.UI:checkbox(10, 6, "Enable Object Analyzer", "Object Analyzer");
+	ScriptHawk.UI:button({13, -7}, 7, {ScriptHawk.UI.button_height}, nil, "Decrement Object Index", "-", decrementObjectIndex);
+	ScriptHawk.UI:button({13, ScriptHawk.UI.button_height - 7}, 7, {ScriptHawk.UI.button_height}, nil, "Increment Object Index", "+", incrementObjectIndex);
+	ScriptHawk.UI.form_controls["Object Index Label"] = forms.label(ScriptHawk.UI.options_form, "Index: 0", ScriptHawk.UI:col(8) + ScriptHawk.UI.button_height + 21, ScriptHawk.UI:row(7) + ScriptHawk.UI.label_offset, 64, 14);
 end
 
 ScriptHawk.bindKeyRealtime("Z", zipToSelectedObject, true);

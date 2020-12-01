@@ -284,27 +284,27 @@ end
 
 function Game.initUI()
 	if not TASSafe then
-		ScriptHawk.UI.button(0, 6, {4, 10}, nil, nil, "Max Lives", Game.giveMaxLives);
-		ScriptHawk.UI.button(0, 7, {4, 10}, nil, nil, "Max Gold", Game.giveMaxGold);
+		ScriptHawk.UI:button(0, 6, {4, 10}, nil, nil, "Max Lives", Game.giveMaxLives);
+		ScriptHawk.UI:button(0, 7, {4, 10}, nil, nil, "Max Gold", Game.giveMaxGold);
 
-		ScriptHawk.UI.button(5, 5, {4, 10}, nil, nil, "Add Stone", Game.giveStone);
-		ScriptHawk.UI.button(5, 6, {4, 10}, nil, nil, "Remove Stone", Game.removeStone);
-		ScriptHawk.UI.button(5, 7, {4, 10}, nil, nil, "Max Stones", Game.giveMaxStones);
+		ScriptHawk.UI:button(5, 5, {4, 10}, nil, nil, "Add Stone", Game.giveStone);
+		ScriptHawk.UI:button(5, 6, {4, 10}, nil, nil, "Remove Stone", Game.removeStone);
+		ScriptHawk.UI:button(5, 7, {4, 10}, nil, nil, "Max Stones", Game.giveMaxStones);
 
-		ScriptHawk.UI.button(10, 5, {4, 10}, nil, nil, "Buy Items", Game.buyAllItems);
+		ScriptHawk.UI:button(10, 5, {4, 10}, nil, nil, "Buy Items", Game.buyAllItems);
 
 		-- Character Dropdown
-		ScriptHawk.UI.form_controls["Character Dropdown"] = forms.dropdown(ScriptHawk.UI.options_form, { "Hu-Man", "Lizard-Man", "Mouse-Man", "Piranha-Man", "Lion-Man", "Bird-Man" }, ScriptHawk.UI.col(5) - ScriptHawk.UI.dropdown_offset + 2, ScriptHawk.UI.row(4) + ScriptHawk.UI.dropdown_offset, ScriptHawk.UI.col(4) + 8, ScriptHawk.UI.button_height);
-		ScriptHawk.UI.button(10, 4, {4, 10}, nil, nil, "Set Transformation", Game.setCurrentTransformationFromDropdown);
+		ScriptHawk.UI.form_controls["Character Dropdown"] = forms.dropdown(ScriptHawk.UI.options_form, { "Hu-Man", "Lizard-Man", "Mouse-Man", "Piranha-Man", "Lion-Man", "Bird-Man" }, ScriptHawk.UI:col(5) - ScriptHawk.UI.dropdown_offset + 2, ScriptHawk.UI:row(4) + ScriptHawk.UI.dropdown_offset, ScriptHawk.UI:col(4) + 8, ScriptHawk.UI.button_height);
+		ScriptHawk.UI:button(10, 4, {4, 10}, nil, nil, "Set Transformation", Game.setCurrentTransformationFromDropdown);
 	end
 
 	local RNGColBase = 10;
-	ScriptHawk.UI.checkbox(RNGColBase, 6, "Toggle RNG Checkbox", "Show RNG", true);
+	ScriptHawk.UI:checkbox(RNGColBase, 6, "Toggle RNG Checkbox", "Show RNG", true);
 	-- RNG Slots control
-	ScriptHawk.UI.form_controls.rng_slots_label = forms.label(ScriptHawk.UI.options_form, "Slots:", ScriptHawk.UI.col(RNGColBase), ScriptHawk.UI.row(7) + ScriptHawk.UI.label_offset, 40, 14);
-	ScriptHawk.UI.button({RNGColBase + 3, -28}, 7, {ScriptHawk.UI.button_height}, nil, "decrease_rng_button", "-", Game.decreaseRNGSlots);
-	ScriptHawk.UI.button({RNGColBase + 4, -28}, 7, {ScriptHawk.UI.button_height}, nil, "increase_rng_button", "+", Game.increaseRNGSlots);
-	ScriptHawk.UI.form_controls.rng_slots_value_label = forms.label(ScriptHawk.UI.options_form, get_ready_blue_min, ScriptHawk.UI.col(RNGColBase + 4), ScriptHawk.UI.row(7) + ScriptHawk.UI.label_offset, 32, 14);
+	ScriptHawk.UI.form_controls.rng_slots_label = forms.label(ScriptHawk.UI.options_form, "Slots:", ScriptHawk.UI:col(RNGColBase), ScriptHawk.UI:row(7) + ScriptHawk.UI.label_offset, 40, 14);
+	ScriptHawk.UI:button({RNGColBase + 3, -28}, 7, {ScriptHawk.UI.button_height}, nil, "decrease_rng_button", "-", Game.decreaseRNGSlots);
+	ScriptHawk.UI:button({RNGColBase + 4, -28}, 7, {ScriptHawk.UI.button_height}, nil, "increase_rng_button", "+", Game.increaseRNGSlots);
+	ScriptHawk.UI.form_controls.rng_slots_value_label = forms.label(ScriptHawk.UI.options_form, get_ready_blue_min, ScriptHawk.UI:col(RNGColBase + 4), ScriptHawk.UI:row(7) + ScriptHawk.UI.label_offset, 32, 14);
 end
 
 -- RNG Stuff
@@ -350,7 +350,7 @@ function Game.drawUI()
 
 	local row = 0;
 
-	if ScriptHawk.UI.ischecked("Toggle RNG Checkbox") then
+	if ScriptHawk.UI:ischecked("Toggle RNG Checkbox") then
 		gui.text(Game.OSDPosition[1], 2 + Game.OSDRowHeight * row, "RNG: "..RNGSlots.." Slots", nil, 'bottomright');
 		row = row + 1;
 

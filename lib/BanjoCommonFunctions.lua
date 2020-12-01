@@ -41,7 +41,7 @@ end
 
 function Game.getSeamDist()
 	local verts = {};
-	if Game.isInWater() and not ScriptHawk.UI.isChecked("never_test_water") then
+	if Game.isInWater() and not ScriptHawk.UI:ischecked("never_test_water") then
 		verts[0] = Game.getWaterTriangleVertPositionRaw(0);
 		verts[1] = Game.getWaterTriangleVertPositionRaw(1);
 		verts[2] = Game.getWaterTriangleVertPositionRaw(2);
@@ -74,7 +74,7 @@ end
 
 function Game.getFloorTriangleVertPosition(index)
 	local vert = nil;
-	if Game.isInWater() and not ScriptHawk.UI.isChecked("never_test_water") then
+	if Game.isInWater() and not ScriptHawk.UI:ischecked("never_test_water") then
 		vert = Game.getWaterTriangleVertPositionRaw(index);
 	else
 		vert = Game.getFloorTriangleVertPositionRaw(index);
@@ -135,7 +135,7 @@ function Game.zipToFloorVert(index)
 		return;
 	end
 	local vert = nil;
-	if Game.isInWater() and not ScriptHawk.UI.isChecked("never_test_water") then
+	if Game.isInWater() and not ScriptHawk.UI:ischecked("never_test_water") then
 		vert = Game.getWaterTriangleVertPositionRaw(index);
 	else
 		vert = Game.getFloorTriangleVertPositionRaw(index);
@@ -203,7 +203,7 @@ seamTester.testSeamFromUI = function()
 		["3 -> 2"] = {2, 1},
 	};
 	if vertLookup[level] ~= nil then
-		if Game.isInWater() and not ScriptHawk.UI.isChecked("never_test_water") then
+		if Game.isInWater() and not ScriptHawk.UI:ischecked("never_test_water") then
 			seamTester.testType = "water";
 			local vert1 = Game.getWaterTriangleVertPositionRaw(vertLookup[level][1]);
 			local vert2 = Game.getWaterTriangleVertPositionRaw(vertLookup[level][2]);
@@ -343,7 +343,7 @@ seamTester.simulate = function()
 			dprint("t: "..seamTester.t);
 			dprint("-------------------");
 			print_deferred();
-			if ScriptHawk.UI.isChecked("cancel_on_found_seam_clip") then
+			if ScriptHawk.UI:ischecked("cancel_on_found_seam_clip") then
 				client.pause();
 				seamTester.cancel();
 				return;
@@ -401,16 +401,16 @@ seamTester.cancel = function()
 end
 
 seamTester.initUI = function(baseRow)
-	ScriptHawk.UI.form_controls.seam_dropdown = forms.dropdown(ScriptHawk.UI.options_form, { "1 -> 2", "1 -> 3", "2 -> 1", "2 -> 3", "3 -> 1", "3 -> 2" }, ScriptHawk.UI.col(0) + ScriptHawk.UI.dropdown_offset, ScriptHawk.UI.row(baseRow) + ScriptHawk.UI.dropdown_offset, ScriptHawk.UI.col(4) + 8, ScriptHawk.UI.button_height);
-	ScriptHawk.UI.button(5, baseRow, {4, 8}, nil, nil, "Test Seam", seamTester.testSeamFromUI);
-	ScriptHawk.UI.checkbox(10, baseRow, "cancel_on_found_seam_clip", "Auto Cancel");
-	ScriptHawk.UI.checkbox(10, baseRow + 1, "never_test_water", "Never Water");
+	ScriptHawk.UI.form_controls.seam_dropdown = forms.dropdown(ScriptHawk.UI.options_form, { "1 -> 2", "1 -> 3", "2 -> 1", "2 -> 3", "3 -> 1", "3 -> 2" }, ScriptHawk.UI:col(0) + ScriptHawk.UI.dropdown_offset, ScriptHawk.UI:row(baseRow) + ScriptHawk.UI.dropdown_offset, ScriptHawk.UI:col(4) + 8, ScriptHawk.UI.button_height);
+	ScriptHawk.UI:button(5, baseRow, {4, 8}, nil, nil, "Test Seam", seamTester.testSeamFromUI);
+	ScriptHawk.UI:checkbox(10, baseRow, "cancel_on_found_seam_clip", "Auto Cancel");
+	ScriptHawk.UI:checkbox(10, baseRow + 1, "never_test_water", "Never Water");
 
-	ScriptHawk.UI.form_controls["total_checks Label"] = forms.label(ScriptHawk.UI.options_form, "Checks:", ScriptHawk.UI.col(0) + ScriptHawk.UI.dropdown_offset, ScriptHawk.UI.row(baseRow + 1) + ScriptHawk.UI.dropdown_offset, ScriptHawk.UI.col(1) + 15, ScriptHawk.UI.button_height);
-	ScriptHawk.UI.form_controls["total_checks Textbox"] = forms.textbox(ScriptHawk.UI.options_form, seamTester.total_checks, ScriptHawk.UI.col(2) + 5, ScriptHawk.UI.button_height, nil, ScriptHawk.UI.col(2) + 4, ScriptHawk.UI.row(baseRow + 1));
+	ScriptHawk.UI.form_controls["total_checks Label"] = forms.label(ScriptHawk.UI.options_form, "Checks:", ScriptHawk.UI:col(0) + ScriptHawk.UI.dropdown_offset, ScriptHawk.UI:row(baseRow + 1) + ScriptHawk.UI.dropdown_offset, ScriptHawk.UI:col(1) + 15, ScriptHawk.UI.button_height);
+	ScriptHawk.UI.form_controls["total_checks Textbox"] = forms.textbox(ScriptHawk.UI.options_form, seamTester.total_checks, ScriptHawk.UI:col(2) + 5, ScriptHawk.UI.button_height, nil, ScriptHawk.UI:col(2) + 4, ScriptHawk.UI:row(baseRow + 1));
 
-	ScriptHawk.UI.form_controls["offset Label"] = forms.label(ScriptHawk.UI.options_form, "Offset:", ScriptHawk.UI.col(5) + ScriptHawk.UI.dropdown_offset, ScriptHawk.UI.row(baseRow + 1) + ScriptHawk.UI.dropdown_offset, ScriptHawk.UI.col(1) + 15, ScriptHawk.UI.button_height);
-	ScriptHawk.UI.form_controls["offset Textbox"] = forms.textbox(ScriptHawk.UI.options_form, seamTester.offset, ScriptHawk.UI.col(2) + 5, ScriptHawk.UI.button_height, nil, ScriptHawk.UI.col(7) + 4, ScriptHawk.UI.row(baseRow + 1));
+	ScriptHawk.UI.form_controls["offset Label"] = forms.label(ScriptHawk.UI.options_form, "Offset:", ScriptHawk.UI:col(5) + ScriptHawk.UI.dropdown_offset, ScriptHawk.UI:row(baseRow + 1) + ScriptHawk.UI.dropdown_offset, ScriptHawk.UI:col(1) + 15, ScriptHawk.UI.button_height);
+	ScriptHawk.UI.form_controls["offset Textbox"] = forms.textbox(ScriptHawk.UI.options_form, seamTester.offset, ScriptHawk.UI:col(2) + 5, ScriptHawk.UI.button_height, nil, ScriptHawk.UI:col(7) + 4, ScriptHawk.UI:row(baseRow + 1));
 end
 
 function printTri()

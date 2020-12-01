@@ -88,8 +88,8 @@ end
 
 function Game.initUI()
 	if not TASSafe then
-		ScriptHawk.UI.form_controls.gun_dropdown = forms.dropdown(ScriptHawk.UI.options_form, { "Machine Gun 1", "Machine Gun 2", "Machine Gun 3", "Machine Gun 4", "Flamethrower", "Rocket Launcher 1", "Rocket Launcher 2", "Shotgun" }, ScriptHawk.UI.col(0) + ScriptHawk.UI.dropdown_offset, ScriptHawk.UI.row(7) + ScriptHawk.UI.dropdown_offset, ScriptHawk.UI.col(4) + 8, ScriptHawk.UI.button_height);
-		ScriptHawk.UI.button(5, 7, {4, 8}, nil, nil, "Set Gun", Game.setGunFromDropdown);
+		ScriptHawk.UI.form_controls.gun_dropdown = forms.dropdown(ScriptHawk.UI.options_form, { "Machine Gun 1", "Machine Gun 2", "Machine Gun 3", "Machine Gun 4", "Flamethrower", "Rocket Launcher 1", "Rocket Launcher 2", "Shotgun" }, ScriptHawk.UI:col(0) + ScriptHawk.UI.dropdown_offset, ScriptHawk.UI:row(7) + ScriptHawk.UI.dropdown_offset, ScriptHawk.UI:col(4) + 8, ScriptHawk.UI.button_height);
+		ScriptHawk.UI:button(5, 7, {4, 8}, nil, nil, "Set Gun", Game.setGunFromDropdown);
 	end
 end
 

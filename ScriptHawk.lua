@@ -94,7 +94,7 @@ function ScriptHawk.biz222Notice()
 	print("--------");
 end
 
-function ScriptHawk.UI.controlsOverlap(control1, control2)
+function ScriptHawk.UI:controlsOverlap(control1, control2)
 	local x1 = tonumber(forms.getproperty(control1, "Left"));
 	local y1 = tonumber(forms.getproperty(control1, "Top"));
 	local w1 = tonumber(forms.getproperty(control1, "Width"));
@@ -111,15 +111,15 @@ function ScriptHawk.UI.controlsOverlap(control1, control2)
 	return x1 < x2 + w2 and x2 < x1 + w1 and y1 < y2 + h2 and y2 < y1 + h1;
 end
 
-function ScriptHawk.UI.checkControls()
-	for k, v in pairs(ScriptHawk.UI.form_controls) do
+function ScriptHawk.UI:checkControls()
+	for k, v in pairs(self.form_controls) do
 		--local x = forms.getproperty(v, "Left");
 		--local y = forms.getproperty(v, "Top");
 		--local w = forms.getproperty(v, "Width")
 		--local h = forms.getproperty(v, "Height");
 		--dprint(k.." ("..v.."): Position: "..x..", "..y.." Size: "..w..", "..h);
-		for l, u in pairs(ScriptHawk.UI.form_controls) do
-			if v ~= u and ScriptHawk.UI.controlsOverlap(v, u) then
+		for l, u in pairs(self.form_controls) do
+			if v ~= u and self:controlsOverlap(v, u) then
 				dprint('Warning: Controls "'..k..'" and "'..l..'" may be overlapping!');
 			end
 		end
@@ -1005,7 +1005,7 @@ local function toggleRotationUnits()
 	forms.settext(ScriptHawk.UI.form_controls["Toggle Rotation Units Button"], rotation_units);
 end
 
-function ScriptHawk.UI.formatRotation(num)
+function ScriptHawk.UI:formatRotation(num)
 	num = num or 0;
 	if isnan(num) then
 		num = 0;
@@ -1137,24 +1137,24 @@ end
 -- UI Code --
 -------------
 
-function ScriptHawk.UI.row(row_num)
-	return round(ScriptHawk.UI.form_padding + ScriptHawk.UI.button_height * row_num, 0);
+function ScriptHawk.UI:row(row_num)
+	return round(self.form_padding + self.button_height * row_num, 0);
 end
 
-function ScriptHawk.UI.col(col_num)
-	return ScriptHawk.UI.row(col_num);
+function ScriptHawk.UI:col(col_num)
+	return self:row(col_num);
 end
 
-function ScriptHawk.UI.handleColInput(col)
+function ScriptHawk.UI:handleColInput(col)
 	if col == nil then
 		col = 0;
 	end
 	if type(col) == "number" then
-		col = ScriptHawk.UI.col(col);
+		col = self:col(col);
 	end
 	if type(col) == "table" then
 		if #col == 2 then
-			col = ScriptHawk.UI.col(col[1]) + col[2];
+			col = self:col(col[1]) + col[2];
 		elseif #col == 1 then
 			col = col[1];
 		end
@@ -1162,16 +1162,16 @@ function ScriptHawk.UI.handleColInput(col)
 	return col;
 end
 
-function ScriptHawk.UI.handleRowInput(row)
+function ScriptHawk.UI:handleRowInput(row)
 	if row == nil then
 		row = 0;
 	end
 	if type(row) == "number" then
-		row = ScriptHawk.UI.row(row);
+		row = self:row(row);
 	end
 	if type(row) == "table" then
 		if #row == 2 then
-			row = ScriptHawk.UI.row(row[1]) + row[2];
+			row = self:row(row[1]) + row[2];
 		elseif #row == 1 then
 			row = row[1];
 		end
@@ -1186,68 +1186,68 @@ if type(Game.form_height) == "number" then
 	ScriptHawk.UI.form_height = Game.form_height;
 end
 
-function ScriptHawk.UI.checkbox(col, row, tag, caption, default)
-	col = ScriptHawk.UI.handleColInput(col);
-	row = ScriptHawk.UI.handleRowInput(row);
+function ScriptHawk.UI:checkbox(col, row, tag, caption, default)
+	col = self:handleColInput(col);
+	row = self:handleRowInput(row);
 	if tag == nil then
 		tag = caption.." Checkbox";
 	end
-	ScriptHawk.UI.form_controls[tag] = forms.checkbox(ScriptHawk.UI.options_form, caption, col + ScriptHawk.UI.dropdown_offset, row + ScriptHawk.UI.dropdown_offset);
-	forms.setproperty(ScriptHawk.UI.form_controls[tag], "Height", 22);
+	self.form_controls[tag] = forms.checkbox(self.options_form, caption, col + self.dropdown_offset, row + self.dropdown_offset);
+	forms.setproperty(self.form_controls[tag], "Height", 22);
 	if default then
-		forms.setproperty(ScriptHawk.UI.form_controls[tag], "Checked", true);
+		forms.setproperty(self.form_controls[tag], "Checked", true);
 	end
 end
 
-function ScriptHawk.UI.ischecked(tag)
-	return ScriptHawk.UI.form_controls[tag] ~= nil and forms.ischecked(ScriptHawk.UI.form_controls[tag]);
+function ScriptHawk.UI:ischecked(tag)
+	return self.form_controls[tag] ~= nil and forms.ischecked(self.form_controls[tag]);
 end
 ScriptHawk.UI.isChecked = ScriptHawk.UI.ischecked;
 
-function ScriptHawk.UI.button(col, row, width, height, tag, caption, callback)
+function ScriptHawk.UI:button(col, row, width, height, tag, caption, callback)
 	if height == nil then
-		height = ScriptHawk.UI.button_height;
+		height = self.button_height;
 	else
-		height = ScriptHawk.UI.handleRowInput(height);
+		height = self:handleRowInput(height);
 	end
 
-	width = ScriptHawk.UI.handleColInput(width);
-	col = ScriptHawk.UI.handleColInput(col);
-	row = ScriptHawk.UI.handleRowInput(row);
+	width = self:handleColInput(width);
+	col = self:handleColInput(col);
+	row = self:handleRowInput(row);
 
 	if tag == nil then
 		tag = caption.." Button";
 	end
 	--print("Creating button: "..col..","..row..","..width..","..height..","..tag..","..caption..","..tostring(callback == nil));
-	ScriptHawk.UI.form_controls[tag] = forms.button(ScriptHawk.UI.options_form, caption, callback, col, row, width, height);
+	self.form_controls[tag] = forms.button(self.options_form, caption, callback, col, row, width, height);
 end
 
 function ScriptHawk.initUI(formTitle)
 	if type(formTitle) == "string" then
-		ScriptHawk.UI.options_form = forms.newform(ScriptHawk.UI.col(ScriptHawk.UI.form_width), ScriptHawk.UI.row(ScriptHawk.UI.form_height), formTitle);
+		ScriptHawk.UI.options_form = forms.newform(ScriptHawk.UI:col(ScriptHawk.UI.form_width), ScriptHawk.UI:row(ScriptHawk.UI.form_height), formTitle);
 	else
-		ScriptHawk.UI.options_form = forms.newform(ScriptHawk.UI.col(ScriptHawk.UI.form_width), ScriptHawk.UI.row(ScriptHawk.UI.form_height), "ScriptHawk Options");
+		ScriptHawk.UI.options_form = forms.newform(ScriptHawk.UI:col(ScriptHawk.UI.form_width), ScriptHawk.UI:row(ScriptHawk.UI.form_height), "ScriptHawk Options");
 	end
 
 	if not TASSafe then
-		ScriptHawk.UI.form_controls["Mode Label"] = forms.label(ScriptHawk.UI.options_form, "Mode:", ScriptHawk.UI.col(0), ScriptHawk.UI.row(0) + ScriptHawk.UI.label_offset, 44, ScriptHawk.UI.button_height);
-		ScriptHawk.UI.button(2, 0, {64}, nil, "Mode Button", ScriptHawk.mode, toggleMode);
+		ScriptHawk.UI.form_controls["Mode Label"] = forms.label(ScriptHawk.UI.options_form, "Mode:", ScriptHawk.UI:col(0), ScriptHawk.UI:row(0) + ScriptHawk.UI.label_offset, 44, ScriptHawk.UI.button_height);
+		ScriptHawk.UI:button(2, 0, {64}, nil, "Mode Button", ScriptHawk.mode, toggleMode);
 	else
-		ScriptHawk.UI.checkbox(0, 2, "Override Lag Detection", "Override Lag Detection", ScriptHawk.override_lag_detection);
+		ScriptHawk.UI:checkbox(0, 2, "Override Lag Detection", "Override Lag Detection", ScriptHawk.override_lag_detection);
 		forms.setproperty(ScriptHawk.UI.form_controls["Override Lag Detection"], "Width", 140);
 	end
 
-	ScriptHawk.UI.form_controls["Precision Label"] = forms.label(ScriptHawk.UI.options_form, "Precision:", ScriptHawk.UI.col(0), ScriptHawk.UI.row(1) + ScriptHawk.UI.label_offset, 54, 14);
-	ScriptHawk.UI.button({4, -28}, 1, {ScriptHawk.UI.button_height}, nil, "Decrease Precision Button", "-", ScriptHawk.decreasePrecision);
-	ScriptHawk.UI.button({5, -28}, 1, {ScriptHawk.UI.button_height}, nil, "Increase Precision Button", "+", ScriptHawk.increasePrecision);
-	ScriptHawk.UI.form_controls["Precision Value Label"] = forms.label(ScriptHawk.UI.options_form, precision, ScriptHawk.UI.col(5), ScriptHawk.UI.row(1) + ScriptHawk.UI.label_offset, 44, 14);
+	ScriptHawk.UI.form_controls["Precision Label"] = forms.label(ScriptHawk.UI.options_form, "Precision:", ScriptHawk.UI:col(0), ScriptHawk.UI:row(1) + ScriptHawk.UI.label_offset, 54, 14);
+	ScriptHawk.UI:button({4, -28}, 1, {ScriptHawk.UI.button_height}, nil, "Decrease Precision Button", "-", ScriptHawk.decreasePrecision);
+	ScriptHawk.UI:button({5, -28}, 1, {ScriptHawk.UI.button_height}, nil, "Increase Precision Button", "+", ScriptHawk.increasePrecision);
+	ScriptHawk.UI.form_controls["Precision Value Label"] = forms.label(ScriptHawk.UI.options_form, precision, ScriptHawk.UI:col(5), ScriptHawk.UI:row(1) + ScriptHawk.UI.label_offset, 44, 14);
 
 	if not TASSafe then
 		if ScriptHawk.dpad.joypad.enabled or ScriptHawk.dpad.key.enabled then
-			ScriptHawk.UI.form_controls["Speed Label"] = forms.label(ScriptHawk.UI.options_form, "Speed:", ScriptHawk.UI.col(0), ScriptHawk.UI.row(2) + ScriptHawk.UI.label_offset, 54, 14);
-			ScriptHawk.UI.button({4, -28}, 2, {ScriptHawk.UI.button_height}, nil, "Decrease Speed Button", "-", ScriptHawk.decreaseSpeed);
-			ScriptHawk.UI.button({5, -28}, 2, {ScriptHawk.UI.button_height}, nil, "Increase Speed Button", "+", ScriptHawk.increaseSpeed);
-			ScriptHawk.UI.form_controls["Speed Value Label"] = forms.label(ScriptHawk.UI.options_form, Game.speedy_speeds[Game.speedy_index], ScriptHawk.UI.col(5), ScriptHawk.UI.row(2) + ScriptHawk.UI.label_offset, 47, 14);
+			ScriptHawk.UI.form_controls["Speed Label"] = forms.label(ScriptHawk.UI.options_form, "Speed:", ScriptHawk.UI:col(0), ScriptHawk.UI:row(2) + ScriptHawk.UI.label_offset, 54, 14);
+			ScriptHawk.UI:button({4, -28}, 2, {ScriptHawk.UI.button_height}, nil, "Decrease Speed Button", "-", ScriptHawk.decreaseSpeed);
+			ScriptHawk.UI:button({5, -28}, 2, {ScriptHawk.UI.button_height}, nil, "Increase Speed Button", "+", ScriptHawk.increaseSpeed);
+			ScriptHawk.UI.form_controls["Speed Value Label"] = forms.label(ScriptHawk.UI.options_form, Game.speedy_speeds[Game.speedy_index], ScriptHawk.UI:col(5), ScriptHawk.UI:row(2) + ScriptHawk.UI.label_offset, 47, 14);
 		end
 
 		if type(Game.maps) == "table" then
@@ -1257,37 +1257,37 @@ function ScriptHawk.initUI(formTitle)
 					table.insert(filteredMaps, Game.maps[i]);
 				end
 			end
-			ScriptHawk.UI.form_controls["Map Dropdown"] = forms.dropdown(ScriptHawk.UI.options_form, filteredMaps, ScriptHawk.UI.col(0) + ScriptHawk.UI.dropdown_offset, ScriptHawk.UI.row(3) + ScriptHawk.UI.dropdown_offset, ScriptHawk.UI.col(9) + 8, ScriptHawk.UI.button_height);
+			ScriptHawk.UI.form_controls["Map Dropdown"] = forms.dropdown(ScriptHawk.UI.options_form, filteredMaps, ScriptHawk.UI:col(0) + ScriptHawk.UI.dropdown_offset, ScriptHawk.UI:row(3) + ScriptHawk.UI.dropdown_offset, ScriptHawk.UI:col(9) + 8, ScriptHawk.UI.button_height);
 			if Game.takeMeThereType == nil or Game.takeMeThereType == "Checkbox" then
 				Game.takeMeThereType = "Checkbox";
-				ScriptHawk.UI.checkbox(0, 4, "Map Checkbox", "Take me there");
+				ScriptHawk.UI:checkbox(0, 4, "Map Checkbox", "Take me there");
 			elseif Game.takeMeThereType == "Button" then
-				ScriptHawk.UI.button(0, 4, {4, 10}, nil, "Map Button", "Take me there", function() Game.setMap(previous_map_value); end);
+				ScriptHawk.UI:button(0, 4, {4, 10}, nil, "Map Button", "Take me there", function() Game.setMap(previous_map_value); end);
 			end
 		end
 
 		if type(Game.applyInfinites) == "function" then
-			ScriptHawk.UI.checkbox(0, 5, "Toggle Infinites Checkbox", "Infinites");
+			ScriptHawk.UI:checkbox(0, 5, "Toggle Infinites Checkbox", "Infinites");
 		end
 	end
 
 	if type(Game.getHitboxes) == "function" then
-		ScriptHawk.UI.checkbox(10, 0, "Show Hitboxes Checkbox", "Hitboxes", ScriptHawk.hitboxDefaultShowHitboxes);
+		ScriptHawk.UI:checkbox(10, 0, "Show Hitboxes Checkbox", "Hitboxes", ScriptHawk.hitboxDefaultShowHitboxes);
 		local showListRow = 2;
 		if type(Game.setHitboxPosition) == "function" and not TASSafe then
-			ScriptHawk.UI.checkbox(10, 1, "Draggable Hitboxes Checkbox", "Draggable");
+			ScriptHawk.UI:checkbox(10, 1, "Draggable Hitboxes Checkbox", "Draggable");
 		else
 			showListRow = 1; -- Move "Show List" checkbox up one row if Draggable checkbox is not drawn
 		end
 		if type(Game.getHitboxListText) == "function" then
-			ScriptHawk.UI.checkbox(10, showListRow, "Show List Checkbox", "Show List", ScriptHawk.hitboxDefaultShowList);
+			ScriptHawk.UI:checkbox(10, showListRow, "Show List Checkbox", "Show List", ScriptHawk.hitboxDefaultShowList);
 		end
 	end
 
-	ScriptHawk.UI.button(10, 3, {4, 10}, nil, "Toggle Telemetry Button", "Start Telemetry", ScriptHawk.toggleTelemetry);
+	ScriptHawk.UI:button(10, 3, {4, 10}, nil, "Toggle Telemetry Button", "Start Telemetry", ScriptHawk.toggleTelemetry);
 
-	ScriptHawk.UI.form_controls["Rotation Units Label"] = forms.label(ScriptHawk.UI.options_form, "Units:", ScriptHawk.UI.col(5), ScriptHawk.UI.row(0) + ScriptHawk.UI.label_offset, 44, 14);
-	ScriptHawk.UI.button(7, 0, {64}, nil, "Toggle Rotation Units Button", rotation_units, toggleRotationUnits);
+	ScriptHawk.UI.form_controls["Rotation Units Label"] = forms.label(ScriptHawk.UI.options_form, "Units:", ScriptHawk.UI:col(5), ScriptHawk.UI:row(0) + ScriptHawk.UI.label_offset, 44, 14);
+	ScriptHawk.UI:button(7, 0, {64}, nil, "Toggle Rotation Units Button", rotation_units, toggleRotationUnits);
 end
 
 if ScriptHawk.ui_test == true then
@@ -1321,7 +1321,7 @@ if ScriptHawk.ui_test == true then
 				if type(Game.initUI) == "function" then
 					Game.initUI();
 					if ScriptHawk.warnings then
-						ScriptHawk.UI.checkControls();
+						ScriptHawk.UI:checkControls();
 					end
 				end
 			end
@@ -1336,11 +1336,11 @@ ScriptHawk.initUI();
 if type(Game.initUI) == "function" then
 	Game.initUI();
 	if ScriptHawk.warnings then
-		ScriptHawk.UI.checkControls();
+		ScriptHawk.UI:checkControls();
 	end
 end
 
-function ScriptHawk.UI.findMapValue()
+function ScriptHawk.UI:findMapValue()
 	if type(Game.maps) == "table" then
 		for i = 1, #Game.maps do
 			if Game.maps[i] == previous_map then
@@ -1389,12 +1389,12 @@ local angleKeywords = {
 	"facing", "moving", "angle",
 };
 
-function ScriptHawk.UI.updateReadouts()
+function ScriptHawk.UI:updateReadouts()
 	-- Update form buttons etc
 	if not TASSafe then
-		if type(Game.maps) == "table" and previous_map ~= forms.gettext(ScriptHawk.UI.form_controls["Map Dropdown"]) then
-			previous_map = forms.gettext(ScriptHawk.UI.form_controls["Map Dropdown"]);
-			previous_map_value = ScriptHawk.UI.findMapValue();
+		if type(Game.maps) == "table" and previous_map ~= forms.gettext(self.form_controls["Map Dropdown"]) then
+			previous_map = forms.gettext(self.form_controls["Map Dropdown"]);
+			previous_map_value = self:findMapValue();
 		end
 	end
 
@@ -1509,7 +1509,7 @@ function ScriptHawk.UI.updateReadouts()
 			-- Detect and format rotation based on a keyword search
 			for j = 1, #angleKeywords do
 				if labelLower == angleKeywords[j] then
-					value = ScriptHawk.UI.formatRotation(value);
+					value = self:formatRotation(value);
 				end
 			end
 
@@ -1575,16 +1575,16 @@ end
 -- Modify OSD Form --
 ---------------------
 
-function ScriptHawk.modifyOSDUI.checkbox(ui_col, ui_row, ui_tag, ui_caption, ui_default)
-	ScriptHawk.modifyOSDUI.form_controls[ui_tag] = forms.checkbox(ScriptHawk.modifyOSDUI.options_form, ui_caption, ScriptHawk.UI.col(ui_col) + ScriptHawk.modifyOSDUI.dropdown_offset, ScriptHawk.UI.row(ui_row) + ScriptHawk.modifyOSDUI.dropdown_offset);
-	forms.setproperty(ScriptHawk.modifyOSDUI.form_controls[ui_tag], "Height", 22);
+function ScriptHawk.modifyOSDUI:checkbox(ui_col, ui_row, ui_tag, ui_caption, ui_default)
+	self.form_controls[ui_tag] = forms.checkbox(self.options_form, ui_caption, ScriptHawk.UI:col(ui_col) + self.dropdown_offset, ScriptHawk.UI:row(ui_row) + self.dropdown_offset);
+	forms.setproperty(self.form_controls[ui_tag], "Height", 22);
 	if ui_default then
-		forms.setproperty(ScriptHawk.modifyOSDUI.form_controls[ui_tag], "Checked", true);
+		forms.setproperty(self.form_controls[ui_tag], "Checked", true);
 	end
 end
 
-function ScriptHawk.modifyOSDUI.ischecked(ui_tag)
-	return ScriptHawk.modifyOSDUI.form_controls[ui_tag] ~= nil and forms.ischecked(ScriptHawk.modifyOSDUI.form_controls[ui_tag]);
+function ScriptHawk.modifyOSDUI:ischecked(ui_tag)
+	return self.form_controls[ui_tag] ~= nil and forms.ischecked(self.form_controls[ui_tag]);
 end
 ScriptHawk.modifyOSDUI.isChecked = ScriptHawk.modifyOSDUI.ischecked;
 
@@ -1662,36 +1662,36 @@ function modifyOSD()
 	ScriptHawk.modifyOSDUI.form_height = preferenceCount + 8.5;
 
 	-- Carry on
-	ScriptHawk.modifyOSDUI.options_form = forms.newform(ScriptHawk.UI.col(ScriptHawk.modifyOSDUI.form_width), ScriptHawk.UI.row(ScriptHawk.modifyOSDUI.form_height), "Modify OSD", function() ScriptHawk.modifyOSDUI.isOpen = false end);
+	ScriptHawk.modifyOSDUI.options_form = forms.newform(ScriptHawk.UI:col(ScriptHawk.modifyOSDUI.form_width), ScriptHawk.UI:row(ScriptHawk.modifyOSDUI.form_height), "Modify OSD", function() ScriptHawk.modifyOSDUI.isOpen = false end);
 	ScriptHawk.modifyOSDUI.isOpen = true;
-	ScriptHawk.modifyOSDUI.form_controls["Title Label"] = forms.label(ScriptHawk.modifyOSDUI.options_form, "MODIFY SCRIPTHAWK OSD", ScriptHawk.UI.col(0), ScriptHawk.UI.row(0) + ScriptHawk.modifyOSDUI.label_offset, 300, 16);
+	ScriptHawk.modifyOSDUI.form_controls["Title Label"] = forms.label(ScriptHawk.modifyOSDUI.options_form, "MODIFY SCRIPTHAWK OSD", ScriptHawk.UI:col(0), ScriptHawk.UI:row(0) + ScriptHawk.modifyOSDUI.label_offset, 300, 16);
 	local OSDRow = 1;
 	for OSDType, preference in pairs(defaultPreferences[ScriptHawk.gamePrefName]) do
 		local labelID = OSDType.."Label";
 		local labelText = OSDType..":";
 		local checkboxID = OSDType.."Checkbox";
-		ScriptHawk.modifyOSDUI.form_controls[labelID] = forms.label(ScriptHawk.modifyOSDUI.options_form, labelText, ScriptHawk.UI.col(0), ScriptHawk.UI.row(OSDRow) + ScriptHawk.modifyOSDUI.label_offset, 150, 16);
-		ScriptHawk.modifyOSDUI.checkbox(8, OSDRow, checkboxID, "");
+		ScriptHawk.modifyOSDUI.form_controls[labelID] = forms.label(ScriptHawk.modifyOSDUI.options_form, labelText, ScriptHawk.UI:col(0), ScriptHawk.UI:row(OSDRow) + ScriptHawk.modifyOSDUI.label_offset, 150, 16);
+		ScriptHawk.modifyOSDUI:checkbox(8, OSDRow, checkboxID, "");
 		if currentPreferences[ScriptHawk.gamePrefName][OSDType] == true then
 			forms.setproperty(ScriptHawk.modifyOSDUI.form_controls[checkboxID], "Checked", true);
 		end
 		OSDRow = OSDRow + 1;
 	end
-	ScriptHawk.modifyOSDUI.form_controls["OSD Default Restore"] = forms.button(ScriptHawk.modifyOSDUI.options_form, "Restore to Default", restoreModifyOSDDefaults, ScriptHawk.UI.col(0), ScriptHawk.UI.row(preferenceCount + 2), 200, ScriptHawk.modifyOSDUI.button_height);
-	ScriptHawk.modifyOSDUI.form_controls["OSD Load Preferences"] = forms.button(ScriptHawk.modifyOSDUI.options_form, "Load User Preferences", loadPreferences, ScriptHawk.UI.col(0), ScriptHawk.UI.row(preferenceCount + 3), 200, ScriptHawk.modifyOSDUI.button_height);
+	ScriptHawk.modifyOSDUI.form_controls["OSD Default Restore"] = forms.button(ScriptHawk.modifyOSDUI.options_form, "Restore to Default", restoreModifyOSDDefaults, ScriptHawk.UI:col(0), ScriptHawk.UI:row(preferenceCount + 2), 200, ScriptHawk.modifyOSDUI.button_height);
+	ScriptHawk.modifyOSDUI.form_controls["OSD Load Preferences"] = forms.button(ScriptHawk.modifyOSDUI.options_form, "Load User Preferences", loadPreferences, ScriptHawk.UI:col(0), ScriptHawk.UI:row(preferenceCount + 3), 200, ScriptHawk.modifyOSDUI.button_height);
 	if ScriptHawk.isFileIOSafe then
-		ScriptHawk.modifyOSDUI.form_controls["OSD Save Preferences"] = forms.button(ScriptHawk.modifyOSDUI.options_form, "Save As User Preference", saveUserPreferences, ScriptHawk.UI.col(0), ScriptHawk.UI.row(preferenceCount + 4), 200, ScriptHawk.modifyOSDUI.button_height);
-		ScriptHawk.modifyOSDUI.form_controls["OSD Clear Preferences"] = forms.button(ScriptHawk.modifyOSDUI.options_form, "Clear All User Preferences", clearPreferences, ScriptHawk.UI.col(0), ScriptHawk.UI.row(preferenceCount + 5), 200, ScriptHawk.modifyOSDUI.button_height);
+		ScriptHawk.modifyOSDUI.form_controls["OSD Save Preferences"] = forms.button(ScriptHawk.modifyOSDUI.options_form, "Save As User Preference", saveUserPreferences, ScriptHawk.UI:col(0), ScriptHawk.UI:row(preferenceCount + 4), 200, ScriptHawk.modifyOSDUI.button_height);
+		ScriptHawk.modifyOSDUI.form_controls["OSD Clear Preferences"] = forms.button(ScriptHawk.modifyOSDUI.options_form, "Clear All User Preferences", clearPreferences, ScriptHawk.UI:col(0), ScriptHawk.UI:row(preferenceCount + 5), 200, ScriptHawk.modifyOSDUI.button_height);
 	else
-		ScriptHawk.modifyOSDUI.form_controls["OSD BizHawk Notice"] = forms.button(ScriptHawk.modifyOSDUI.options_form, "Notice", ScriptHawk.biz222Notice, ScriptHawk.UI.col(0), ScriptHawk.UI.row(preferenceCount + 5), 200, ScriptHawk.modifyOSDUI.button_height);
+		ScriptHawk.modifyOSDUI.form_controls["OSD BizHawk Notice"] = forms.button(ScriptHawk.modifyOSDUI.options_form, "Notice", ScriptHawk.biz222Notice, ScriptHawk.UI:col(0), ScriptHawk.UI:row(preferenceCount + 5), 200, ScriptHawk.modifyOSDUI.button_height);
 	end
 end
 
-function ScriptHawk.modifyOSDUI.updateReadouts()
-	if ScriptHawk.modifyOSDUI.isOpen then
+function ScriptHawk.modifyOSDUI:updateReadouts()
+	if self.isOpen then
 		for OSDType, preference in pairs(defaultPreferences[ScriptHawk.gamePrefName]) do
 			local checkboxID = OSDType.."Checkbox";
-			if ScriptHawk.modifyOSDUI.ischecked(checkboxID) then
+			if self:ischecked(checkboxID) then
 				currentPreferences[ScriptHawk.gamePrefName][OSDType] = true;
 				userPreferences[ScriptHawk.gamePrefName][OSDType] = true;
 			else
@@ -1780,11 +1780,11 @@ local function mainloop()
 		return; -- If we're in TAS mode, don't even bother checking DPad/L inputs
 	end
 
-	if ScriptHawk.UI.ischecked("Toggle Infinites Checkbox") then
+	if ScriptHawk.UI:ischecked("Toggle Infinites Checkbox") then
 		Game.applyInfinites();
 	end
 
-	if type(Game.maps) == "table" and Game.takeMeThereType == "Checkbox" and ScriptHawk.UI.ischecked("Map Checkbox") then
+	if type(Game.maps) == "table" and Game.takeMeThereType == "Checkbox" and ScriptHawk.UI:ischecked("Map Checkbox") then
 		Game.setMap(previous_map_value);
 	end
 
@@ -1904,7 +1904,7 @@ end
 
 local function plot_pos()
 	if TASSafe then
-		ScriptHawk.override_lag_detection = ScriptHawk.UI.ischecked("Override Lag Detection");
+		ScriptHawk.override_lag_detection = ScriptHawk.UI:ischecked("Override Lag Detection");
 	end
 
 	-- Compensate for overscan (SMS)
@@ -2014,8 +2014,8 @@ local function plot_pos()
 	if not client.ispaused() then
 		--gui.cleartext();
 		--gui.clearGraphics();
-		ScriptHawk.UI.updateReadouts();
-		ScriptHawk.modifyOSDUI.updateReadouts();
+		ScriptHawk.UI:updateReadouts();
+		ScriptHawk.modifyOSDUI:updateReadouts();
 		ScriptHawk.drawHitboxes();
 		Game.drawUI();
 	end
@@ -2214,9 +2214,9 @@ function ScriptHawk.drawHitboxes()
 		mouse.Y = mouse.Y + nes.gettopscanline();
 	end
 
-	local showHitboxes = ScriptHawk.UI.ischecked("Show Hitboxes Checkbox");
-	local enableDraggableHitboxes = ScriptHawk.UI.ischecked("Draggable Hitboxes Checkbox");
-	local drawList = ScriptHawk.UI.ischecked("Show List Checkbox");
+	local showHitboxes = ScriptHawk.UI:ischecked("Show Hitboxes Checkbox");
+	local enableDraggableHitboxes = ScriptHawk.UI:ischecked("Draggable Hitboxes Checkbox");
+	local drawList = ScriptHawk.UI:ischecked("Show List Checkbox");
 
 	-- Draw mouse pixel
 	--gui.drawPixel(mouse.X, mouse.Y, colors.red);
@@ -2335,8 +2335,8 @@ if not TASSafe then
 		if client.ispaused() then
 			gui.cleartext();
 			--gui.clearGraphics();
-			ScriptHawk.UI.updateReadouts();
-			ScriptHawk.modifyOSDUI.updateReadouts();
+			ScriptHawk.UI:updateReadouts();
+			ScriptHawk.modifyOSDUI:updateReadouts();
 			ScriptHawk.drawHitboxes();
 			Game.drawUI();
 		end

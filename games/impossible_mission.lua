@@ -656,19 +656,19 @@ end
 
 function Game.initUI()
 	if not TASSafe then
-		ScriptHawk.UI.button(10, 4, {4, 10}, nil, nil, "Complete Minimap", Game.completeMinimap);
-		ScriptHawk.UI.button(10, 5, {4, 10}, nil, nil, "Reset Best", Game.resetBestDistribution);
+		ScriptHawk.UI:button(10, 4, {4, 10}, nil, nil, "Complete Minimap", Game.completeMinimap);
+		ScriptHawk.UI:button(10, 5, {4, 10}, nil, nil, "Reset Best", Game.resetBestDistribution);
 	end
 
-	ScriptHawk.UI.checkbox(0, 6, "Toggle Overlay Checkbox", "Overlay", true);
+	ScriptHawk.UI:checkbox(0, 6, "Toggle Overlay Checkbox", "Overlay", true);
 
 	-- Bot
-	--ScriptHawk.UI.form_controls.resetFrameBox = forms.textbox(ScriptHawk.UI.options_form, "Reset Frame", 100, 21, "UNSIGNED", ScriptHawk.UI.col(10) + 1, ScriptHawk.UI.row(0) + 1, false, true, "None");
-	ScriptHawk.UI.button(10, 1, 3, nil, nil, "Start Bot", startBot);
+	--ScriptHawk.UI.form_controls.resetFrameBox = forms.textbox(ScriptHawk.UI.options_form, "Reset Frame", 100, 21, "UNSIGNED", ScriptHawk.UI:col(10) + 1, ScriptHawk.UI:row(0) + 1, false, true, "None");
+	ScriptHawk.UI:button(10, 1, 3, nil, nil, "Start Bot", startBot);
 end
 
 function Game.drawUI()
-	if ScriptHawk.UI.ischecked("Toggle Overlay Checkbox") then
+	if ScriptHawk.UI:ischecked("Toggle Overlay Checkbox") then
 		if mainmemory.readbyte(Game.Memory.horizontal_map_position) % 2 == 1 then
 			if mainmemory.readbyte(0x93) ~= 137 then
 				draw_map();
