@@ -15,6 +15,19 @@ if emu.getluacore == nil then -- 2.2.2 (March 2018)
 	end
 end
 
+---------------
+-- Libraries --
+---------------
+
+require "lib.pngLua.png";
+require "lib.LibScriptHawk";
+Stats = require "lib.Stats";
+lips = require "lips.init";
+
+------------------------
+-- Global object init --
+------------------------
+
 ScriptHawk = {
 	warnings = false, -- Useful for debugging but annoying for end users, so default to false
 	ui_test = false, -- Open all possible module options forms, useful for testing global UI changes
@@ -113,15 +126,6 @@ function ScriptHawk.UI.checkControls()
 	end
 	print_deferred();
 end
-
----------------
--- Libraries --
----------------
-
-require "lib.pngLua.png";
-require "lib.LibScriptHawk";
-Stats = require "lib.Stats";
-lips = require "lips.init";
 
 -----------------------
 -- Keybind framework --
