@@ -802,26 +802,26 @@ end
 
 function Game.initUI()
 	if not TASSafe then
-		ScriptHawk.UI.checkbox(0, 6, "ignore_restrictions", "Ignore Restrictions");
-		forms.setproperty(ScriptHawk.UI.form_controls.ignore_restrictions, "Width", ScriptHawk.UI.col(6));
-		ScriptHawk.UI.form_controls.num_racers_dropdown = forms.dropdown(ScriptHawk.UI.options_form, { "1", "2", "3", "4", "5", "6" }, ScriptHawk.UI.col(0) + ScriptHawk.UI.dropdown_offset, ScriptHawk.UI.row(7) + ScriptHawk.UI.dropdown_offset, ScriptHawk.UI.col(2) + 8, ScriptHawk.UI.button_height);
-		ScriptHawk.UI.checkbox(3, 7, "set_num_racers", "Set Num Racers");
-		ScriptHawk.UI.button(10, 0, {4, 10}, nil, nil, "Toggle Autopilot", Game.toggleAutopilot);
-		ScriptHawk.UI.button(10, 2, {4, 10}, nil, nil, "Buy Parts", Game.buyAllParts);
+		ScriptHawk.UI:checkbox(0, 6, "ignore_restrictions", "Ignore Restrictions");
+		forms.setproperty(ScriptHawk.UI.form_controls.ignore_restrictions, "Width", ScriptHawk.UI:col(6));
+		ScriptHawk.UI.form_controls.num_racers_dropdown = forms.dropdown(ScriptHawk.UI.options_form, { "1", "2", "3", "4", "5", "6" }, ScriptHawk.UI:col(0) + ScriptHawk.UI.dropdown_offset, ScriptHawk.UI:row(7) + ScriptHawk.UI.dropdown_offset, ScriptHawk.UI:col(2) + 8, ScriptHawk.UI.button_height);
+		ScriptHawk.UI:checkbox(3, 7, "set_num_racers", "Set Num Racers");
+		ScriptHawk.UI:button(10, 0, {4, 10}, nil, nil, "Toggle Autopilot", Game.toggleAutopilot);
+		ScriptHawk.UI:button(10, 2, {4, 10}, nil, nil, "Buy Parts", Game.buyAllParts);
 	end
-	ScriptHawk.UI.button(10, 1, {4, 10}, nil, nil, "Dump Cars", Game.dumpCars);
+	ScriptHawk.UI:button(10, 1, {4, 10}, nil, nil, "Dump Cars", Game.dumpCars);
 end
 
 function Game.eachFrame()
 	if mainmemory.read_u16_le(Game.Memory.circuit_restriction_check) == 0x000C then
-		if ScriptHawk.UI.ischecked("ignore_restrictions") then
+		if ScriptHawk.UI:ischecked("ignore_restrictions") then
 			mainmemory.write_u16_le(Game.Memory.circuit_restriction_check + 2, 0x1000);
 		else
 			mainmemory.write_u16_le(Game.Memory.circuit_restriction_check + 2, 0x4310);
 		end
 	end
 
-	if ScriptHawk.UI.ischecked("set_num_racers") then
+	if ScriptHawk.UI:ischecked("set_num_racers") then
 		local numRacers = tonumber(forms.getproperty(ScriptHawk.UI.form_controls.num_racers_dropdown, "SelectedItem"));
 		if numRacers >= 1 and numRacers <= 6 then
 			Game.setNumRacers(numRacers);

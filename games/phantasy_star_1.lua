@@ -600,11 +600,11 @@ function Game.initUI()
 	parseDungeonObjects(); -- TODO: Move this somewhere more appropriate
 	if not TASSafe then
 		-- Dropdown and button to give items
-		ScriptHawk.UI.form_controls.item_dropdown = forms.dropdown(ScriptHawk.UI.options_form, Game.items, ScriptHawk.UI.col(5) + ScriptHawk.UI.dropdown_offset, ScriptHawk.UI.row(6) + ScriptHawk.UI.dropdown_offset, ScriptHawk.UI.col(4) + 8, ScriptHawk.UI.button_height);
-		ScriptHawk.UI.button(10, 6, {4, 8}, nil, nil, "Give Item", giveItemFromDropdown);
+		ScriptHawk.UI.form_controls.item_dropdown = forms.dropdown(ScriptHawk.UI.options_form, Game.items, ScriptHawk.UI:col(5) + ScriptHawk.UI.dropdown_offset, ScriptHawk.UI:row(6) + ScriptHawk.UI.dropdown_offset, ScriptHawk.UI:col(4) + 8, ScriptHawk.UI.button_height);
+		ScriptHawk.UI:button(10, 6, {4, 8}, nil, nil, "Give Item", giveItemFromDropdown);
 
 		-- Dropdowns and button to set character levels
-		ScriptHawk.UI.form_controls.character_dropdown = forms.dropdown(ScriptHawk.UI.options_form, Game.characters, ScriptHawk.UI.col(0) + ScriptHawk.UI.dropdown_offset, ScriptHawk.UI.row(7) + ScriptHawk.UI.dropdown_offset, ScriptHawk.UI.col(4) + 8, ScriptHawk.UI.button_height);
+		ScriptHawk.UI.form_controls.character_dropdown = forms.dropdown(ScriptHawk.UI.options_form, Game.characters, ScriptHawk.UI:col(0) + ScriptHawk.UI.dropdown_offset, ScriptHawk.UI:row(7) + ScriptHawk.UI.dropdown_offset, ScriptHawk.UI:col(4) + 8, ScriptHawk.UI.button_height);
 		local levels = {};
 		for i = 1, 30 do
 			if i > 9 then
@@ -613,10 +613,10 @@ function Game.initUI()
 				table.insert(levels, "0"..tostring(i));
 			end
 		end
-		ScriptHawk.UI.form_controls.level_dropdown = forms.dropdown(ScriptHawk.UI.options_form, levels, ScriptHawk.UI.col(5) + ScriptHawk.UI.dropdown_offset, ScriptHawk.UI.row(7) + ScriptHawk.UI.dropdown_offset, ScriptHawk.UI.col(4) + 8, ScriptHawk.UI.button_height);
-		ScriptHawk.UI.button(10, 7, {4, 8}, nil, nil, "Set Level", setLevelFromDropdown);
+		ScriptHawk.UI.form_controls.level_dropdown = forms.dropdown(ScriptHawk.UI.options_form, levels, ScriptHawk.UI:col(5) + ScriptHawk.UI.dropdown_offset, ScriptHawk.UI:row(7) + ScriptHawk.UI.dropdown_offset, ScriptHawk.UI:col(4) + 8, ScriptHawk.UI.button_height);
+		ScriptHawk.UI:button(10, 7, {4, 8}, nil, nil, "Set Level", setLevelFromDropdown);
 
-		ScriptHawk.UI.button(10, 5, {4, 8}, nil, nil, "Unlock Characters", Game.unlockAllCharacters);
+		ScriptHawk.UI:button(10, 5, {4, 8}, nil, nil, "Unlock Characters", Game.unlockAllCharacters);
 	end
 end
 

@@ -536,9 +536,9 @@ end
 
 function Game.initUI()
 	if not TASSafe then
-		ScriptHawk.UI.button(0, 2, {4, 10}, nil, nil, "Unlock Items", Game.unlockItems);
-		ScriptHawk.UI.button(0, 3, {4, 10}, nil, nil, "Clear Gold", Game.clearGold);
-		ScriptHawk.UI.button(0, 4, {4, 10}, nil, nil, "Dig Hole", Game.digHole);
+		ScriptHawk.UI:button(0, 2, {4, 10}, nil, nil, "Unlock Items", Game.unlockItems);
+		ScriptHawk.UI:button(0, 3, {4, 10}, nil, nil, "Clear Gold", Game.clearGold);
+		ScriptHawk.UI:button(0, 4, {4, 10}, nil, nil, "Dig Hole", Game.digHole);
 	end
 end
 

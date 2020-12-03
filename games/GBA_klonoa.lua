@@ -189,12 +189,12 @@ end
 local labelValue = 0;
 function Game.initUI() -- Optional: Init any UI state here, mainly useful for setting up your form controls. Runs once at startup after successful version detection.
 	-- Here are some examples for the most common UI control types
-	ScriptHawk.UI.form_controls["Example Dropdown"] = forms.dropdown(ScriptHawk.UI.options_form, {"Option 1", "Option 2", "Option 3"}, ScriptHawk.UI.col(0) + ScriptHawk.UI.dropdown_offset, ScriptHawk.UI.row(7) + ScriptHawk.UI.dropdown_offset, ScriptHawk.UI.col(9) + 7, ScriptHawk.UI.button_height);
-	ScriptHawk.UI.button(10,                                    7, {59},                          nil, "Example Button",       "Label", Game.buttonHandler);
-	ScriptHawk.UI.button({13, -7},                              6, {ScriptHawk.UI.button_height}, nil, "Example Plus Button",  "-",     function() labelValue = labelValue + 1 end);
-	ScriptHawk.UI.button({13, ScriptHawk.UI.button_height - 7}, 6, {ScriptHawk.UI.button_height}, nil, "Example Minus Button", "+",     function() labelValue = labelValue - 1 end);
-	ScriptHawk.UI.form_controls["Example Value Label"] = forms.label(ScriptHawk.UI.options_form, "0", ScriptHawk.UI.col(13) + ScriptHawk.UI.button_height + 21, ScriptHawk.UI.row(6) + ScriptHawk.UI.label_offset, 54, 14);
-	ScriptHawk.UI.checkbox(10, 6, "Example Checkbox", "Label");
+	ScriptHawk.UI.form_controls["Example Dropdown"] = forms.dropdown(ScriptHawk.UI.options_form, {"Option 1", "Option 2", "Option 3"}, ScriptHawk.UI:col(0) + ScriptHawk.UI.dropdown_offset, ScriptHawk.UI:row(7) + ScriptHawk.UI.dropdown_offset, ScriptHawk.UI:col(9) + 7, ScriptHawk.UI.button_height);
+	ScriptHawk.UI:button(10,                                    7, {59},                          nil, "Example Button",       "Label", Game.buttonHandler);
+	ScriptHawk.UI:button({13, -7},                              6, {ScriptHawk.UI.button_height}, nil, "Example Plus Button",  "-",     function() labelValue = labelValue + 1 end);
+	ScriptHawk.UI:button({13, ScriptHawk.UI.button_height - 7}, 6, {ScriptHawk.UI.button_height}, nil, "Example Minus Button", "+",     function() labelValue = labelValue - 1 end);
+	ScriptHawk.UI.form_controls["Example Value Label"] = forms.label(ScriptHawk.UI.options_form, "0", ScriptHawk.UI:col(13) + ScriptHawk.UI.button_height + 21, ScriptHawk.UI:row(6) + ScriptHawk.UI.label_offset, 54, 14);
+	ScriptHawk.UI:checkbox(10, 6, "Example Checkbox", "Label");
 end
 
 -- Optional: This function should be used to draw to the screen or update form controls

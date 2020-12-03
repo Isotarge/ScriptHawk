@@ -1000,16 +1000,16 @@ end
 
 function Game.initUI()
 	if not TASSafe then
-		ScriptHawk.UI.button(10, 6, {4, 10}, nil, "Check Building Button", "Check Buildings", checkBuildingProgress);
-		ScriptHawk.UI.button(10, 7, {46}, nil, "Set Flag Button", "Set", flagSetButtonHandler);
-		ScriptHawk.UI.button(12, 7, {46}, nil, "Check Flag Button", "Check", flagCheckButtonHandler);
-		ScriptHawk.UI.button(14, 7, {46}, nil, "Clear Flag Button", "Clear", flagClearButtonHandler);
+		ScriptHawk.UI:button(10, 6, {4, 10}, nil, "Check Building Button", "Check Buildings", checkBuildingProgress);
+		ScriptHawk.UI:button(10, 7, {46}, nil, "Set Flag Button", "Set", flagSetButtonHandler);
+		ScriptHawk.UI:button(12, 7, {46}, nil, "Check Flag Button", "Check", flagCheckButtonHandler);
+		ScriptHawk.UI:button(14, 7, {46}, nil, "Clear Flag Button", "Clear", flagClearButtonHandler);
 	else
 		-- Use a bigger check flags button if the others are hidden by TASSafe
-		ScriptHawk.UI.button(10, 6, {4, 10}, nil, "Check Building Button", "Check Buildings", checkBuildingProgress);
-		ScriptHawk.UI.button(10, 7, {4, 10}, nil, "Check Flag Button", "Check Flag", flagCheckButtonHandler);
+		ScriptHawk.UI:button(10, 6, {4, 10}, nil, "Check Building Button", "Check Buildings", checkBuildingProgress);
+		ScriptHawk.UI:button(10, 7, {4, 10}, nil, "Check Flag Button", "Check Flag", flagCheckButtonHandler);
 	end
-	ScriptHawk.UI.form_controls["Flag Dropdown"] = forms.dropdown(ScriptHawk.UI.options_form, flag_names, ScriptHawk.UI.col(0) + ScriptHawk.UI.dropdown_offset, ScriptHawk.UI.row(7) + ScriptHawk.UI.dropdown_offset, ScriptHawk.UI.col(9) + 8, ScriptHawk.UI.button_height);
+	ScriptHawk.UI.form_controls["Flag Dropdown"] = forms.dropdown(ScriptHawk.UI.options_form, flag_names, ScriptHawk.UI:col(0) + ScriptHawk.UI.dropdown_offset, ScriptHawk.UI:row(7) + ScriptHawk.UI.dropdown_offset, ScriptHawk.UI:col(9) + 8, ScriptHawk.UI.button_height);
 end
 
 Game.OSD = {

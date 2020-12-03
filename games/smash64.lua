@@ -941,14 +941,14 @@ end
 function Game.initUI()
 	if not TASSafe then
 		-- Unlock Everything Button
-		ScriptHawk.UI.button(10, 0, {4, 10}, nil, nil, "Unlock Everything", Game.unlockEverything);
+		ScriptHawk.UI:button(10, 0, {4, 10}, nil, nil, "Unlock Everything", Game.unlockEverything);
 
 		-- Hitbox Toggle
-		ScriptHawk.UI.checkbox(10, 1, "toggle_hitboxes", "Hitboxes");
+		ScriptHawk.UI:checkbox(10, 1, "toggle_hitboxes", "Hitboxes");
 
 		-- Music
-		ScriptHawk.UI.form_controls["Music Dropdown"] = forms.dropdown(ScriptHawk.UI.options_form, Game.music, ScriptHawk.UI.col(0) + ScriptHawk.UI.dropdown_offset, ScriptHawk.UI.row(6) + ScriptHawk.UI.dropdown_offset, ScriptHawk.UI.col(9) + 8, ScriptHawk.UI.button_height);
-		ScriptHawk.UI.checkbox(0, 7, "Music Checkbox", "Set Music");
+		ScriptHawk.UI.form_controls["Music Dropdown"] = forms.dropdown(ScriptHawk.UI.options_form, Game.music, ScriptHawk.UI:col(0) + ScriptHawk.UI.dropdown_offset, ScriptHawk.UI:row(6) + ScriptHawk.UI.dropdown_offset, ScriptHawk.UI:col(9) + 8, ScriptHawk.UI.button_height);
+		ScriptHawk.UI:checkbox(0, 7, "Music Checkbox", "Set Music");
 	end
 end
 
@@ -1133,7 +1133,7 @@ Game.OSD = buildOSD(currentOSDBools, currentOSDCharacters);
 Game.hitboxWasChecked = false;
 
 function Game.eachFrame()
-	if ScriptHawk.UI.ischecked("toggle_hitboxes") then
+	if ScriptHawk.UI:ischecked("toggle_hitboxes") then
 		Game.hitboxWasChecked = true;
 		Game.showHitboxes();
 	elseif Game.hitboxWasChecked then
@@ -1141,7 +1141,7 @@ function Game.eachFrame()
 		Game.hideHitboxes();
 	end
 
-	if ScriptHawk.UI.ischecked("Music Checkbox") then
+	if ScriptHawk.UI:ischecked("Music Checkbox") then
 		local musicString = forms.gettext(ScriptHawk.UI.form_controls["Music Dropdown"]);
 		for i = 1, #Game.music do
 			if Game.music[i] == musicString then

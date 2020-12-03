@@ -55,8 +55,8 @@ if result == true then
 		if client.ispaused() then
 			gui.cleartext();
 			--gui.clearGraphics();
-			ScriptHawk.UI.updateReadouts();
-			ScriptHawk.modifyOSDUI.updateReadouts();
+			ScriptHawk.UI:updateReadouts();
+			ScriptHawk.modifyOSDUI:updateReadouts();
 			ScriptHawk.drawHitboxes();
 			Game.drawUI();
 		end

@@ -275,7 +275,7 @@ end
 
 function Game.initUI()
 	if not TASSafe then
-		ScriptHawk.UI.button(10, 4, {4, 10}, nil, nil, "Give Axe", Game.giveAxe);
+		ScriptHawk.UI:button(10, 4, {4, 10}, nil, nil, "Give Axe", Game.giveAxe);
 	end
 end
 

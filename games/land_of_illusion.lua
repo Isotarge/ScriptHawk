@@ -124,7 +124,7 @@ function Game.getYVelocity()
 end
 
 function Game.blueWhenInfinites()
-	if ScriptHawk.UI.ischecked("Toggle Infinites Checkbox") then
+	if ScriptHawk.UI:ischecked("Toggle Infinites Checkbox") then
 		return colors.blue;
 	end
 end
@@ -682,10 +682,10 @@ function Game.drawMap()
 end
 
 function Game.drawUI()
-	if ScriptHawk.UI.isChecked("Draw Map Checkbox") then
+	if ScriptHawk.UI:ischecked("Draw Map Checkbox") then
 		Game.drawMap();
 	end
-	if ScriptHawk.UI.isChecked("Draw Collision Checkbox") then
+	if ScriptHawk.UI:ischecked("Draw Collision Checkbox") then
 		Game.drawCollision();
 	end
 end
@@ -695,9 +695,9 @@ function Game.toggleMiniAbility()
 end
 
 function Game.initUI()
-	ScriptHawk.UI.button(0, 6, {4, 10}, nil, "Toggle Mini Ability Button", "Toggle Mini Avail.", Game.toggleMiniAbility);
-	ScriptHawk.UI.checkbox(10, 4, "Draw Map Checkbox", "Draw Map");
-	ScriptHawk.UI.checkbox(10, 5, "Draw Collision Checkbox", "Draw Collision");
+	ScriptHawk.UI:button(0, 6, {4, 10}, nil, "Toggle Mini Ability Button", "Toggle Mini Avail.", Game.toggleMiniAbility);
+	ScriptHawk.UI:checkbox(10, 4, "Draw Map Checkbox", "Draw Map");
+	ScriptHawk.UI:checkbox(10, 5, "Draw Collision Checkbox", "Draw Collision");
 end
 
 Game.OSD = {

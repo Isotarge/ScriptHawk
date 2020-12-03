@@ -106,14 +106,14 @@ function Game.getEggYVelocity()
 end
 
 function Game.eachFrame()
-	if ScriptHawk.UI.ischecked("Fast Mode Checkbox") then
+	if ScriptHawk.UI:ischecked("Fast Mode Checkbox") then
 		Game.fastMode();
 	end
 end
 
 function Game.initUI()
 	if not TASSafe then
-		ScriptHawk.UI.checkbox(0, 6, "Fast Mode Checkbox", "Fast Mode");
+		ScriptHawk.UI:checkbox(0, 6, "Fast Mode Checkbox", "Fast Mode");
 	end
 end
 

@@ -61,7 +61,7 @@ end
 
 function Game.initUI()
 	if not TASSafe then
-		ScriptHawk.UI.button(10, 0, {4, 10}, nil, nil, "Unlock Cheats", Game.unlockCheats);
+		ScriptHawk.UI:button(10, 0, {4, 10}, nil, nil, "Unlock Cheats", Game.unlockCheats);
 	end
 end
 

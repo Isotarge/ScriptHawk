@@ -143,16 +143,16 @@ end
 
 function Game.initUI()
 	if not TASSafe then
-		ScriptHawk.UI.button(0, 6, {4, 10}, nil, nil, "Get Key", Game.getKey);
+		ScriptHawk.UI:button(0, 6, {4, 10}, nil, nil, "Get Key", Game.getKey);
 
 		-- Sword
-		ScriptHawk.UI.form_controls.sword_dropdown = forms.dropdown(ScriptHawk.UI.options_form, {"Training Sword", "Short Sword", "Long Sword (1)", "Long Sword (2)", "Force Blade", "Tempest Blade", "Lion Blade"}, ScriptHawk.UI.col(5) + ScriptHawk.UI.dropdown_offset, ScriptHawk.UI.row(7) + ScriptHawk.UI.dropdown_offset, ScriptHawk.UI.col(4) + 8, ScriptHawk.UI.button_height);
-		ScriptHawk.UI.button(0, 7, {4, 10}, nil, nil, "Set Sword", Game.setSwordFromDropdown);
+		ScriptHawk.UI.form_controls.sword_dropdown = forms.dropdown(ScriptHawk.UI.options_form, {"Training Sword", "Short Sword", "Long Sword (1)", "Long Sword (2)", "Force Blade", "Tempest Blade", "Lion Blade"}, ScriptHawk.UI:col(5) + ScriptHawk.UI.dropdown_offset, ScriptHawk.UI:row(7) + ScriptHawk.UI.dropdown_offset, ScriptHawk.UI:col(4) + 8, ScriptHawk.UI.button_height);
+		ScriptHawk.UI:button(0, 7, {4, 10}, nil, nil, "Set Sword", Game.setSwordFromDropdown);
 	end
 
-	ScriptHawk.UI.checkbox(10, 6, "checkbox_extra_data", "Show All");
-	ScriptHawk.UI.button({13, - 7}, 7, {ScriptHawk.UI.button_height}, nil, "button_decrement_object_index", "-", decrementObjectIndex);
-	ScriptHawk.UI.button({13, ScriptHawk.UI.button_height - 7}, 7, {ScriptHawk.UI.button_height}, nil, "button_increment_object_index", "+", incrementObjectIndex);
+	ScriptHawk.UI:checkbox(10, 6, "checkbox_extra_data", "Show All");
+	ScriptHawk.UI:button({13, - 7}, 7, {ScriptHawk.UI.button_height}, nil, "button_decrement_object_index", "-", decrementObjectIndex);
+	ScriptHawk.UI:button({13, ScriptHawk.UI.button_height - 7}, 7, {ScriptHawk.UI.button_height}, nil, "button_increment_object_index", "+", incrementObjectIndex);
 end
 
 function Game.detectVersion(romName, romHash)
@@ -277,7 +277,7 @@ local function getExamineData(objectBase)
 	table.insert(examine_data, {"Respawn X Position", mainmemory.read_u16_be(objectBase + object.respawn_x_position)});
 	table.insert(examine_data, {"Respawn Y Position", mainmemory.read_u16_be(objectBase + object.respawn_y_position)});
 
-	if ScriptHawk.UI.ischecked("checkbox_extra_data") then
+	if ScriptHawk.UI:ischecked("checkbox_extra_data") then
 		table.insert(examine_data, {"0x04", mainmemory.read_u16_be(objectBase + 0x04)});
 		table.insert(examine_data, {"0x06", mainmemory.read_u16_be(objectBase + 0x06)});
 		table.insert(examine_data, {"0x08", mainmemory.read_u16_be(objectBase + 0x08)});
@@ -309,7 +309,7 @@ function Game.drawUI()
 		for i = max_objects, 1, -1 do
 			local objectBase = getObjectBase(i - 1);
 			local objectType = mainmemory.read_u16_be(objectBase + object.type);
-			if objectType ~= 0 or ScriptHawk.UI.ischecked("checkbox_extra_data") then
+			if objectType ~= 0 or ScriptHawk.UI:ischecked("checkbox_extra_data") then
 				objectType = (object_types[objectType] or "Unknown").." ("..toHexString(objectType)..")";
 				local color = nil;
 				if i == object_index then

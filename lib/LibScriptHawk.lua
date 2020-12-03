@@ -357,7 +357,7 @@ function fileExists(name)
 end
 
 function linesFrom(file)
-	if not ScriptHawk.isFileIOSafe then
+	if ScriptHawk ~= nil and not ScriptHawk.isFileIOSafe then
 		if ScriptHawk.warnings then
 			print("Warning: File IO (function: linesFrom) was attempted when not safe.");
 		end
@@ -366,7 +366,7 @@ function linesFrom(file)
 	if not fileExists(file) then
 		return {};
 	end
-	lines = {};
+	local lines = {};
 	for line in io.lines(file) do
 		table.insert(lines, line);
 	end
@@ -744,6 +744,8 @@ max_page_size = 40;
 page_pos = 1;
 page_total = 1;
 page_size = max_page_size;
+page_start = 0;
+page_finish = 0;
 
 function incrementPage()
 	page_pos= page_pos + 1
@@ -768,7 +770,7 @@ function pagifyThis(tablename,max_page_size)
 	if max_paze_size == nil then
 		max_page_size = 40;
 	end
-	elements_total = #tablename;
+	local elements_total = #tablename;
 
 	page_total = math.ceil(elements_total/max_page_size);
 	if page_total < 1 then

@@ -54,7 +54,7 @@ function Game.getJumpHeight()
 end
 
 function Game.colorJumpHeight()
-	if ScriptHawk.UI.ischecked("Toggle Super Jump Checkbox") then
+	if ScriptHawk.UI:ischecked("Toggle Super Jump Checkbox") then
 		return colors.blue;
 	end
 	if Game.getJumpHeight() ~= 0 then
@@ -100,11 +100,11 @@ function Game.applyInfinites()
 end
 
 function Game.initUI()
-	ScriptHawk.UI.checkbox(0, 4, "Toggle Super Jump Checkbox", "Super Jump");
+	ScriptHawk.UI:checkbox(0, 4, "Toggle Super Jump Checkbox", "Super Jump");
 end
 
 function Game.eachFrame()
-	if ScriptHawk.UI.ischecked("Toggle Super Jump Checkbox") then
+	if ScriptHawk.UI:ischecked("Toggle Super Jump Checkbox") then
 		mainmemory.write_u8(Game.Memory.jump_height, 0);
 	end
 end
