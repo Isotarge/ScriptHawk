@@ -1052,7 +1052,7 @@ function calculateXYZDist(lx,ly,lz,lr,lh)
 	return 0;
 end
 
-function calculateAngle(lx,lz)
+function calculateAngle(lx, lz)
 	local playerObject = Game.getPlayerObject();
 	if isRDRAM(playerObject) then
 		local px = Game.getXPosition();
@@ -1066,7 +1066,7 @@ function calculateAngle(lx,lz)
 	return 0;
 end
 
-function writeObjectStatisticsToTable(tbl,x,y,z,r,h)
+function writeObjectStatisticsToTable(tbl, x, y, z, r, h)
 	table.insert(tbl, { "Distance to Player (XZ)", calculateXZDist(x, z, r) });
 	table.insert(tbl, { "Distance to Player (XYZ)", calculateXYZDist(x, y, z, r, h) });
 	table.insert(tbl, { "Player > Object Angle", calculateAngle(x, z) });
@@ -10018,8 +10018,8 @@ function Game.drawUI()
 	forms.settext(ScriptHawk.UI.form_controls["Analysis Type Text"],analysis_slide_type);
 	forms.settext(ScriptHawk.UI.form_controls["Analysis Subtype Text"],analysis_slide_subtype);
 	if Game.version ~= 4 then
-		current_flagMasterType = forms.getproperty(ScriptHawk.UI.form_controls["Flag Master Type Dropdown"], "SelectedItem");
-		current_flagSubType = forms.getproperty(ScriptHawk.UI.form_controls["Flag Sub Type Dropdown"], "SelectedItem");
+		local current_flagMasterType = forms.getproperty(ScriptHawk.UI.form_controls["Flag Master Type Dropdown"], "SelectedItem");
+		local current_flagSubType = forms.getproperty(ScriptHawk.UI.form_controls["Flag Sub Type Dropdown"], "SelectedItem");
 		if old_flagMasterType ~= current_flagMasterType then
 			forms.setproperty(ScriptHawk.UI.form_controls["Flag Sub Type Dropdown"], "SelectedItem","All");
 			flagTypeGetter();
