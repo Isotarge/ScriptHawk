@@ -452,6 +452,7 @@ Game = {
 		"JRL - Sea Bottom",
 	},
 	Memory = { -- Version order: Australia, Europe, Japan, USA
+		heap_pointer = {nil, nil, nil, 0x7E990}, -- Might be pointer to tiny heap block that describes free memory on heap -- TODO: Other versions
 		consumable_base = {0x11FFB0, 0x120170, 0x115340, 0x11B080},
 		consumable_pointer = {0x12FFC0, 0x1301D0, 0x125420, 0x12B250},
 		object_array_pointer = {0x13BBD0, 0x13BE60, 0x131020, 0x136EE0},
@@ -462,7 +463,7 @@ Game = {
 		flag_block_pointer = {0x1314F0, 0x131780, 0x126940, 0x12C770},
 		air = {0x12FDC0, 0x12FFD0, 0x125220, 0x12B050},
 		frame_timer = {0x083550, 0x083550, 0x0788F8, 0x079138},
-		linked_list_root = {0x13C380, 0x13C680, 0x131850, 0x137800},
+		linked_list_root = {0x13C380, 0x13C680, 0x131850, 0x137800}, -- Heap
 		map = {0x137B42, 0x137DD2, 0x12CF92, 0x132DC2},
 		map_model_pointer = {0x12D30C, 0x12D51C, 0x12276C, 0x1285BC},
 		--map_model_pointer = {0x1301D8, 0x130468, 0x125628, 0x12B458},
@@ -488,7 +489,7 @@ Game = {
 			[0x36] = {0x120596, 0x1207A6, 0x115A16, 0x11B656}, -- Washing Machine
 			[0x5F] = {0x1205A2, 0x1207B2, 0x115A22, 0x11B662}, -- Kazooie (Solo)
 		},
-		object_model2_array_pointer = {0x137B30,0x137DC0,0x12CF80,0x132DB0},
+		object_model2_array_pointer = {0x137B30, 0x137DC0, 0x12CF80, 0x132DB0},
 	},
 	defaultFloor = -18000,
 	speedy_speeds = { .001, .01, .1, 1, 5, 10, 20, 50, 100 },
@@ -620,10 +621,6 @@ end
 -- Player object --
 -------------------
 
--- Relative to objects in linked list, including player
-local previous_item = 0x00;
-local next_item = 0x04;
-
 local player_object = {
 	previous_item = 0x0, -- pointer
 	next_item = 0x4, -- pointer
@@ -669,8 +666,8 @@ local player_object = {
 	rot_y_object = {
 		facing_angle = 0x0,
 		moving_angle = 0x4,
-		y_rot_current = facing_angle,
-		y_rot_target = moving_angle,
+		y_rot_current = 0x0, -- Facing angle
+		y_rot_target = 0x4, -- Moving angle
 	},
 	movement_pointer = 0x120, -- pointer
 	movement_object = {
@@ -6280,9 +6277,9 @@ end
 --------------------
 -- Loading Zones --
 --------------------
--- Credit to Wedarobi for helping debug how these work
 
-object_model2 = {
+-- Credit to Wedarobi for helping debug how these work
+local object_model2 = {
 	init = {
 		elem_size = 0x0, -- u16
 		elem_count = 0x2, -- u16
@@ -6320,21 +6317,22 @@ function getModelTwoCount()
 end
 
 function isLoadingZone(pointer)
-	data_bitfield = mainmemory.read_u16_be(pointer + object_model2.object.data_bitfield);
-	if bit.check(data_bitfield,object_model2.object.bitfield_values.loading_zone_1)
-		and not bit.check(data_bitfield,object_model2.object.bitfield_values.loading_zone_2)
-		and bit.check(data_bitfield,object_model2.object.bitfield_values.loading_zone_3)
-		and not bit.check(data_bitfield,object_model2.object.bitfield_values.loading_zone_4)
-		and not bit.check(data_bitfield,object_model2.object.bitfield_values.loading_zone_0) then
+	local data_bitfield = mainmemory.read_u16_be(pointer + object_model2.object.data_bitfield);
+	if bit.check(data_bitfield, object_model2.object.bitfield_values.loading_zone_1)
+		and not bit.check(data_bitfield, object_model2.object.bitfield_values.loading_zone_2)
+		and bit.check(data_bitfield, object_model2.object.bitfield_values.loading_zone_3)
+		and not bit.check(data_bitfield, object_model2.object.bitfield_values.loading_zone_4)
+		and not bit.check(data_bitfield, object_model2.object.bitfield_values.loading_zone_0) then
 		return true
 	end
 	return false
 end
 
 function formatName(pointer)
-	isLZ = isLoadingZone(pointer);
+	local isLZ = isLoadingZone(pointer);
 	if isLZ then
 		local mapValue = mainmemory.read_u16_be(pointer + object_model2.object.map_index) + 0xA0;
+		local mapName = "Unknown";
 		if Game.maps[mapValue] ~= nil then
 			mapName = Game.maps[mapValue];
 		else
@@ -6591,8 +6589,8 @@ local function zipToSelectedObject()
 end
 
 function Game.drawUI()
-	current_flagMasterType = forms.getproperty(ScriptHawk.UI.form_controls["Flag Master Type Dropdown"], "SelectedItem");
-	current_flagSubType = forms.getproperty(ScriptHawk.UI.form_controls["Flag Sub Type Dropdown"], "SelectedItem");
+	local current_flagMasterType = forms.getproperty(ScriptHawk.UI.form_controls["Flag Master Type Dropdown"], "SelectedItem");
+	local current_flagSubType = forms.getproperty(ScriptHawk.UI.form_controls["Flag Sub Type Dropdown"], "SelectedItem");
 	forms.settext(ScriptHawk.UI.form_controls["Analysis Type Text"],analysis_slide_type);
 	forms.settext(ScriptHawk.UI.form_controls["Analysis Subtype Text"],analysis_slide_subtype);
 	if old_flagMasterType ~= current_flagMasterType then
@@ -6815,6 +6813,115 @@ end
 
 function Game.toggleDragonKazooie()
 	toggleFlagByName("Ability: Dragon Kazooie");
+end
+
+Game.heapHeaderSize = 0x10;
+
+function Game.getHeapBase()
+	--return dereferencePointer(Game.Memory.heap_pointer);
+	return Game.Memory.linked_list_root;
+end
+
+-- TODO: Speed this up by caching free blocks
+function Game.isHeapBlockFree(blockAddress)
+	local freeBlock = dereferencePointer(Game.Memory.heap_pointer);
+	if isRDRAM(freeBlock) then
+		local count = 0;
+		repeat
+			freeBlock = dereferencePointer(freeBlock + 0x14);
+			if freeBlock == blockAddress then
+				return true;
+			end
+			count = count + 1;
+		until not isRDRAM(freeBlock) or count > 1000;
+	end
+	return false;
+end
+
+function Game.getPreviousHeapBlock(blockAddress)
+	if isRDRAM(blockAddress) then
+		return dereferencePointer(blockAddress + 0);
+	end
+end
+
+function Game.getNextHeapBlock(blockAddress)
+	if isRDRAM(blockAddress) then
+		local nextBlock = dereferencePointer(blockAddress + 4);
+		if isRDRAM(nextBlock) and nextBlock < 0x400000 then
+			return nextBlock;
+		end
+	end
+end
+
+function Game.getHeapBlockSize(blockAddress)
+	local nextBlock = Game.getNextHeapBlock(blockAddress);
+	if isRDRAM(blockAddress) and isRDRAM(nextBlock) then
+		return nextBlock - blockAddress - Game.heapHeaderSize;
+	end
+	return 0;
+end
+
+function Game.getHeapBlockDescription(blockAddress)
+	if blockAddress == Game.getPlayerObject() then
+		return "Player";
+	end
+	if blockAddress == Game.getCameraObject() then
+		return "Camera";
+	end
+	if blockAddress == dereferencePointer(Game.Memory.consumable_pointer) then
+		return "Consumables Block";
+	end
+	if blockAddress == dereferencePointer(Game.Memory.flag_block_pointer) then
+		return "Flag Block";
+	end
+	if blockAddress == dereferencePointer(Game.Memory.object_array_pointer) then
+		return "Object Model 1 Array";
+	end
+	if blockAddress == dereferencePointer(Game.Memory.animation_pointer) then
+		return "Object Model 1 Animation State";
+	end
+	if blockAddress == dereferencePointer(Game.Memory.object_model2_array_pointer) then
+		return "Object Model 2 Array";
+	end
+	if blockAddress == dereferencePointer(Game.Memory.map_model_pointer) then
+		return "Map Model (Main)";
+	end
+	if blockAddress == dereferencePointer(Game.Memory.water_model_pointer) then
+		return "Map Model (Water)";
+	end
+	return "Unknown";
+end
+
+function traverseHeap(minimumPrintSize, maximumPrintSize)
+	minimumPrintSize = minimumPrintSize or -math.huge;
+	maximumPrintSize = maximumPrintSize or math.huge;
+	local heapBase = Game.getHeapBase();
+	if isRDRAM(heapBase) then
+		local count = 0;
+		local size = 0;
+		local object = heapBase;
+		repeat
+			count = count + 1;
+			size = Game.getHeapBlockSize(object);
+			if size >= minimumPrintSize and size <= maximumPrintSize then
+				local isFree = Game.isHeapBlockFree(object);
+				if isFree then
+					dprint(count..": "..toHexString(object + Game.heapHeaderSize, 6, "").." Size: "..toHexString(size).." FREE");
+				else
+					local description = Game.getHeapBlockDescription(object + Game.heapHeaderSize);
+					if description ~= "Unknown" then
+						dprint(count..": "..toHexString(object + Game.heapHeaderSize, 6, "").." Size: "..toHexString(size).." "..description);
+					else
+						dprint(count..": "..toHexString(object + Game.heapHeaderSize, 6, "").." Size: "..toHexString(size));
+					end
+				end
+			end
+			object = Game.getNextHeapBlock(object);
+		until not isRDRAM(object);
+		print_deferred();
+	else
+		print("Invalid heap pointer... Hmm...");
+	end
 end
 
 function Game.initUI()
