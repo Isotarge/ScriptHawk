@@ -5900,9 +5900,9 @@ end
 
 flag_master_types = {"Permanent Flags", "Temporary Flags", "Global Flags"};
 
-function flagTypeGetter()
+function getFlagSubtypes()
 	local flagMasterType = forms.getproperty(ScriptHawk.UI.form_controls["Flag Master Type Dropdown"], "SelectedItem");
-	flag_subtypes = {"All"};
+	local flag_subtypes = {"All"};
 	local loaded_array = {};
 	if flagMasterType == "Permanent Flags" then
 		loaded_array = flag_array;
@@ -5912,7 +5912,7 @@ function flagTypeGetter()
 		loaded_array = global_flag_array;
 	end
 	for i = 1, #loaded_array do
-		stored_subtype = false;
+		local stored_subtype = false;
 		for j = 1, #flag_subtypes do
 			if loaded_array[i].type == flag_subtypes[j] then
 				stored_subtype = true;
@@ -5922,35 +5922,35 @@ function flagTypeGetter()
 			table.insert(flag_subtypes, loaded_array[i].type);
 		end
 	end
+	return flag_subtypes;
 end
 
 function getFlagsArray()
 	local flagMasterType = forms.getproperty(ScriptHawk.UI.form_controls["Flag Master Type Dropdown"], "SelectedItem");
 	local flagSubType = forms.getproperty(ScriptHawk.UI.form_controls["Flag Sub Type Dropdown"], "SelectedItem");
 	local loaded_array = {};
+	local flags_list = {};
+	local name_property = "name";
 	if flagMasterType == "Permanent Flags" then
 		loaded_array = flag_array;
-		name_property = "name";
 	elseif flagMasterType == "Temporary Flags" then
 		loaded_array = temp_flag_array;
 		name_property = "flagName";
 	elseif flagMasterType == "Global Flags" then
 		loaded_array = global_flag_array;
-		name_property = "name";
 	end
 	if flagSubType == "All" then
-		flags_list = {};
 		for i = 1, #loaded_array do
 			table.insert(flags_list, loaded_array[i][name_property])
 		end
 	else
-		flags_list = {};
 		for i = 1, #loaded_array do
 			if loaded_array[i].type == flagSubType then
 				table.insert(flags_list, loaded_array[i][name_property])
 			end
 		end
 	end
+	return flags_list;
 end
 
 local function formatOutputString(caption, value, max)
@@ -6267,21 +6267,21 @@ end
 
 function setGlobalFlag(byte,globalBit)
 	-- SEE NOTE IN GLOBAL FLAG OBJECT --
-	global_flag_value = mainmemory.readbyte(global_flag_boundaries.start[Game.version] + byte);
+	local global_flag_value = mainmemory.readbyte(global_flag_boundaries.start[Game.version] + byte);
 	global_flag_value = bit.set(global_flag_value,globalBit);
 	mainmemory.writebyte(global_flag_boundaries.start[Game.version] + byte, global_flag_value);
 end
 
 function clearGlobalFlag(byte,globalBit)
 	-- SEE NOTE IN GLOBAL FLAG OBJECT --
-	global_flag_value = mainmemory.readbyte(global_flag_boundaries.start[Game.version] + byte);
+	local global_flag_value = mainmemory.readbyte(global_flag_boundaries.start[Game.version] + byte);
 	global_flag_value = bit.clear(global_flag_value,globalBit);
 	mainmemory.writebyte(global_flag_boundaries.start[Game.version] + byte, global_flag_value);
 end
 
 function checkGlobalFlag(byte,globalBit)
-	global_flag_value = mainmemory.readbyte(global_flag_boundaries.start[Game.version] + byte);
-	return_value = bit.check(global_flag_value,globalBit);
+	local global_flag_value = mainmemory.readbyte(global_flag_boundaries.start[Game.version] + byte);
+	local return_value = bit.check(global_flag_value,globalBit);
 	if return_value then
 		print(Game.getGlobalFlagName(byte, globalBit).." is SET");
 	else
@@ -6366,7 +6366,7 @@ function checkGlobalFlags(showKnown)
 								knownGlobalFlagsFound = knownGlobalFlagsFound + 1;
 							end
 						elseif not isSetNow and wasSet then
-							if not isGlobalFound(i, bit) then
+							if not isGlobalFlagFound(i, bit) then
 								dprint("Global Flag "..toHexString(i, 2)..">"..bit..': "Unknown" was cleared on frame '..emu.framecount());
 							elseif showKnown then
 								local currentGlobalFlag = getGlobalFlag(i, bit);
@@ -9506,15 +9506,12 @@ end
 function Game.initUI()
 	-- Flag stuff
 	if Game.version ~= 4 then
-		-- flag_subtypes = {"FTT"};
 		ScriptHawk.UI.form_controls["Flag Master Type Dropdown"] = forms.dropdown(ScriptHawk.UI.options_form, flag_master_types, ScriptHawk.UI:col(0) + ScriptHawk.UI.dropdown_offset, ScriptHawk.UI:row(8) + ScriptHawk.UI.dropdown_offset, ScriptHawk.UI:col(4) + 8, ScriptHawk.UI.button_height);
 		forms.setproperty(ScriptHawk.UI.form_controls["Flag Master Type Dropdown"], "SelectedItem","Permanent Flags");
-		flagTypeGetter();
-		ScriptHawk.UI.form_controls["Flag Sub Type Dropdown"] = forms.dropdown(ScriptHawk.UI.options_form, flag_subtypes, ScriptHawk.UI:col(5) + ScriptHawk.UI.dropdown_offset, ScriptHawk.UI:row(8) + ScriptHawk.UI.dropdown_offset, ScriptHawk.UI:col(4) + 8, ScriptHawk.UI.button_height);
-		getFlagsArray();
+		ScriptHawk.UI.form_controls["Flag Sub Type Dropdown"] = forms.dropdown(ScriptHawk.UI.options_form, getFlagSubtypes(), ScriptHawk.UI:col(5) + ScriptHawk.UI.dropdown_offset, ScriptHawk.UI:row(8) + ScriptHawk.UI.dropdown_offset, ScriptHawk.UI:col(4) + 8, ScriptHawk.UI.button_height);
 		old_flagMasterType = forms.getproperty(ScriptHawk.UI.form_controls["Flag Master Type Dropdown"], "SelectedItem");
 		old_flagSubType = forms.getproperty(ScriptHawk.UI.form_controls["Flag Sub Type Dropdown"], "SelectedItem");
-		ScriptHawk.UI.form_controls["Flag Dropdown"] = forms.dropdown(ScriptHawk.UI.options_form, flags_list, ScriptHawk.UI:col(0) + ScriptHawk.UI.dropdown_offset, ScriptHawk.UI:row(9) + ScriptHawk.UI.dropdown_offset, ScriptHawk.UI:col(9) + 8, ScriptHawk.UI.button_height);
+		ScriptHawk.UI.form_controls["Flag Dropdown"] = forms.dropdown(ScriptHawk.UI.options_form, getFlagsArray(), ScriptHawk.UI:col(0) + ScriptHawk.UI.dropdown_offset, ScriptHawk.UI:row(9) + ScriptHawk.UI.dropdown_offset, ScriptHawk.UI:col(9) + 8, ScriptHawk.UI.button_height);
 		ScriptHawk.UI:button(10, 9, {46}, nil, "Set Flag Button", "Set", flagSetButtonHandler);
 		ScriptHawk.UI:button(12, 9, {46}, nil, "Check Flag Button", "Check", flagCheckButtonHandler);
 		ScriptHawk.UI:button(14, 9, {46}, nil, "Clear Flag Button", "Clear", flagClearButtonHandler);
@@ -10058,15 +10055,12 @@ function Game.drawUI()
 		local current_flagSubType = forms.getproperty(ScriptHawk.UI.form_controls["Flag Sub Type Dropdown"], "SelectedItem");
 		if old_flagMasterType ~= current_flagMasterType then
 			forms.setproperty(ScriptHawk.UI.form_controls["Flag Sub Type Dropdown"], "SelectedItem","All");
-			flagTypeGetter();
-			forms.setdropdownitems(ScriptHawk.UI.form_controls["Flag Sub Type Dropdown"], flag_subtypes);
-			getFlagsArray();
-			forms.setdropdownitems(ScriptHawk.UI.form_controls["Flag Dropdown"], flags_list);
+			forms.setdropdownitems(ScriptHawk.UI.form_controls["Flag Sub Type Dropdown"], getFlagSubtypes());
+			forms.setdropdownitems(ScriptHawk.UI.form_controls["Flag Dropdown"], getFlagsArray());
 			forms.setproperty(ScriptHawk.UI.form_controls["Flag Dropdown"], "SelectedIndex", 0);
 		end
 		if old_flagSubType ~= current_flagSubType then
-			getFlagsArray();
-			forms.setdropdownitems(ScriptHawk.UI.form_controls["Flag Dropdown"], flags_list);
+			forms.setdropdownitems(ScriptHawk.UI.form_controls["Flag Dropdown"], getFlagsArray());
 			forms.setproperty(ScriptHawk.UI.form_controls["Flag Dropdown"], "SelectedIndex", 0);
 		end
 		old_flagSubType = current_flagSubType;
