@@ -104,7 +104,6 @@ function Game.getYPosition(charIndex)
 	return 0
 end
 
-
 function Game.colorYVelocity(charIndex)
     if charIndex == nil then
         charIndex = 0;

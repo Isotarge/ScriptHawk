@@ -135,7 +135,6 @@ function Game.getYPosition()
 	return 0;
 end
 
-
 function Game.setXPosition(value)
 	local player = Game.getPlayer();
 	if player ~= nil then
@@ -189,7 +188,6 @@ local function toggleObjectAnalysisToolsMode()
 	script_mode = script_modes[script_mode_index];
 end
 
-
 Game.OSD = {
 	{"State", Game.getState, category="state"},
 	{"Rang #", Game.getRangCount, Game.colorRangCount, category="boomerang"},
@@ -207,6 +205,5 @@ Game.OSD = {
 	{"Odometer", category="positionStatsMore"},
 	{"Separator"},
 };
-
 
 return Game;

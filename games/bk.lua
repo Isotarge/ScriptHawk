@@ -1748,7 +1748,6 @@ local function getNStructsFromBlock(pointer, nObjects)
 	return pointers;
 end
 
-
 local function getStructPointers()
 	local block = dereferencePointer(Game.Memory.struct_array_pointer);
 	local pointers = {};
@@ -3238,7 +3237,6 @@ function flagTypeToBitfieldPointer(flagType, index)
 		return Game.Memory.strict_bitfield;
 	end
 end
-
 
 function strict_bf_CRC_update()
 	local strict_bf_base = Game.Memory.strict_bitfield;

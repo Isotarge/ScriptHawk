@@ -10,7 +10,7 @@ temporary_flags = {
 		{byte=0x2, bit=0, flagName="Factory: Arcade GB Spawn Pending", type="Trigger", map=2},
 		{byte=0x2, bit=1, flagName="Factory: Nintendo Coin Spawn Pending", type="Trigger", map=2},
 		{byte=0x2, bit=2, flagName="Factory: Car Race FT Intro", type="Cutscene", map=27},
-		
+
 		{byte=0x3, bit=0, flagName="Factory: Dartboard Minigame Beaten", type="Physical", map=26},
 		{byte=0x3, bit=6, flagName="Galleon: Mermaid FT Cutscene", type="Cutscene", map=45},
 		{byte=0x3, bit=7, flagName="Galleon: All Pearls Collected", type="Progress", map=44},
@@ -67,7 +67,7 @@ temporary_flags = {
 		{byte=0xB, bit=4, flagName="K. Rool: Reset Tiny Phase Progress Flags and Round Counter", type="Trigger", nomap=true},
 		{byte=0xB, bit=5, flagName="K. Rool: DK Phase Intro", type="Cutscene", map=203},
 		{byte=0xB, bit=7, flagName="K. Rool: Gorilla Gone CS", type="Cutscene", map=207},
-		
+
 		{byte=0xC, bit=0, flagName="Isles: Sprint GB CS", type="Cutscene", map=97},
 		{byte=0xC, bit=1, flagName="Global: Jetpac in Story Mode", type="Minigame", map=5},
 		{byte=0xC, bit=2, flagName="Global: Rareware Coin Spawn Pending", type="Trigger", map=9},
@@ -83,37 +83,37 @@ temporary_flags = {
 		{byte=0xD, bit=3, flagName="Galleon: Puftoss Long Intro", type="Cutscene", map=111},
 		{byte=0xD, bit=4, flagName="Castle: Kut Out Long Intro", type="Cutscene", map=199},
 		{byte=0xD, bit=5, flagName="Caves: Army Dillo Long Intro", type="Cutscene", map=196},
-		{byte=0xD, bit=6, flagName="Global: Unused Ice Key Text Cutscene Pending", type="Trigger",nomap=true}, -- https://www.youtube.com/watch?v=TxMGt4EZJYE&feature=youtu.be
+		{byte=0xD, bit=6, flagName="Global: Unused Ice Key Text Cutscene Pending", type="Trigger",nomap=true}, -- https://www.youtube.com/watch?v=TxMGt4EZJYE
 	},
 	pal = {
 		{byte=0x0, bit=7, flagName="Aztec: Llama Text Cleared", type="FTT", map=38},
-		
+
 		{byte=0x2, bit=0, flagName="Factory: Arcade GB Spawn Pending", type="Trigger", map=2},
 		{byte=0x2, bit=1, flagName="Factory: Nintendo Coin Spawn Pending", type="Trigger", map=2},
 		{byte=0x2, bit=2, flagName="Factory: Car Race FT Intro", type="Cutscene", map=27},
 		{byte=0x2, bit=4, flagName="Factory: Arcade Lever Pulled", type="Minigame", map=98},
-		
+
 		{byte=0x3, bit=0, flagName="Factory: Dartboard Minigame Beaten", type="Progress", map=26},
 		-- Somewhere in section 0x3,1 > 0x3, 6 has an additional temp flag compared to US
 		{byte=0x3, bit=7, flagName="Galleon: Mermaid FT Cutscene", type="Cutscene", map=45},
-		
+
 		{byte=0x4, bit=0, flagName="Galleon: All Pearls Collected", type="Progress", map=44},
-		
+
 		{byte=0x6, bit=1, flagName="Caves: Ice Tomato Game Active", type="Minigame", map=98},
-		
+
 		{byte=0x7, bit=1, flagName="Castle: Car Race FT Intro", type="Cutscene", map=185},
 		{byte=0x7, bit=4, flagName="Helm: Roman Numeral Doors Open", type="Physical", map=17},
-		
+
 		{byte=0x9, bit=2, flagName="Helm: Tiny Grate Punched", type="Physical", map=17},
-		
+
 		{byte=0xB, bit=6, flagName="K. Rool: DK Phase Intro", type="Cutscene", map=203},
-		
+
 		{byte=0xD, bit=3, flagName="Factory: Mad Jack Long Intro", type="Cutscene", map=154},
 		{byte=0xD, bit=7, flagName="Global: Unused Ice Key Text Cutscene Pending", type="Progress",nomap=true},
 	},
 	ntsc_j = { -- Likely same as PAL
 		{byte=0x4, bit=0, flagName="Galleon: All Pearls Collected", type="Progress", map=44},
-		
+
 		{byte=0xD, bit=3, flagName="Factory: Mad Jack Long Intro", type="Cutscene", map=154},
 	},
 	kiosk = {

@@ -156,14 +156,13 @@ function Game.setYPosition(value)
 	Game.setObjYPos(0, value);
 end
 
-
 function Game.drawObjectPositions()
 	local objArraySize = memory.read_u8(Game.Memory.obj_array_size.Address, Game.Memory.obj_array_size.Domain);
 	if objArraySize ~= 0 then 
 		for i = 0, objArraySize-1 do
 			local xOffset = Game.getObjXOffset(i);
 			local yOffset = Game.getObjYOffset(i);
-			
+
 			if xOffset >= 0 and xOffset < 240 then
 				if yOffset >= 0 and yOffset < 160 then
 					local visible = Game.getObjVis(i)
@@ -203,7 +202,6 @@ end
 --function Game.drawUI()
 --	forms.settext(ScriptHawk.UI.form_controls["Example Value Label"], labelValue);
 --end
-
 
 function Game.eachFrame()
 	Game.drawObjectPositions();

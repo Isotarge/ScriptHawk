@@ -1326,7 +1326,7 @@ function checkFlagArray()
 				if flagBlock[8 * i] ~= nil then
 					flag_name = flagBlock[8 * i].name;
 				end
-				print("'"..flag_name.."' has been SET on frame "..currentFrame);	
+				print("'"..flag_name.."' has been SET on frame "..currentFrame);
 			elseif flag_difference < 0 then
 				local flag_name = "Unknown ("..toHexString(8 * i)..")";
 				local currentFrame = emu.framecount();
@@ -1349,7 +1349,7 @@ function checkSaveFileArray()
 				if saveFile_Block[i] ~= nil then
 					saveFile_name = saveFile_Block[i].name;
 				end
-				print("'"..saveFile_name.."' has been SAVED on frame "..currentFrame);	
+				print("'"..saveFile_name.."' has been SAVED on frame "..currentFrame);
 			elseif saveFile_difference < 0 then
 				local saveFile_name = "Unknown ("..toHexString(i)..")";
 				local currentFrame = emu.framecount();
@@ -1706,7 +1706,7 @@ function Game.eachFrame()
 		newFlagCache();
 		checkFlagArray();
 		populateFlagArray();
-		
+
 		newSaveFileArray();
 		checkSaveFileArray();
 		populateSaveFileArray();

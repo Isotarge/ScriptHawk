@@ -145,11 +145,6 @@ function Game.setYVelocity()
 	return 0;
 end
 
-------------
--- Events --
-------------
-
-
 Game.OSD = {
 	--{"State", Game.getState, category="state"},
 	{"X", category="position"},
