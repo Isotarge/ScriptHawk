@@ -1211,7 +1211,7 @@ local saveFile_Block = {
 function checkSaveFlagLinkage()
 	for i = 1, saveFile_size do
 		if saveFile_Block[i] ~= nil then -- Save File Data discovered
-			flag_linked = false;
+			local flag_linked = false;
 			for j = 1, flag_block_size do
 				if flagBlock[j] ~= nil then -- Flag discovered
 					if saveFile_Block[i].name == flagBlock[j].name then

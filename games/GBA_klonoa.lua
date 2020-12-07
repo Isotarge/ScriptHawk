@@ -169,7 +169,7 @@ function Game.drawObjectPositions()
 					if visible ~= 0x00 then
 						gui.drawLine(xOffset, yOffset - 2, xOffset, yOffset + 2);
 						gui.drawLine(xOffset - 2, yOffset, xOffset + 2, yOffset);
-						gui.drawText(xOffset, yOffset, toHexString(i), null, null, 9);
+						gui.drawText(xOffset, yOffset, toHexString(i), nil, nil, 9);
 					end
 				end
 			end

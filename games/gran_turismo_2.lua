@@ -379,8 +379,8 @@ function checkParts(carIndex)
 		if currentParts[i] ~= cachedParts[i] then
 			print("Byte "..i.." has changed from "..toHexString(cachedParts[i]).." to "..toHexString(currentParts[i]));
 			for bit = 0, 7 do
-				isSet = check_bit(currentParts[i], bit);
-				wasSet = check_bit(cachedParts[i], bit);
+				local isSet = check_bit(currentParts[i], bit);
+				local wasSet = check_bit(cachedParts[i], bit);
 				--print(bit.." isSet "..tostring(isSet).." wasSet "..tostring(wasSet));
 				if isSet and (not wasSet) then
 					if not isKnownPart(i, bit) then

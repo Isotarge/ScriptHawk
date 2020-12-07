@@ -414,7 +414,7 @@ function populateObjectPointers()
 end
 
 function getObjectName(id)
-	object_name = object_struct.id_names[id];
+	local object_name = object_struct.id_names[id];
 	if object_name == nil then
 		object_name = toHexString(id)
 	end
@@ -427,7 +427,7 @@ function getSlotBase(index)
 end
 
 function getInteractionStateName(state)
-	interaction_name = object_struct.interaction_states[state];
+	local interaction_name = object_struct.interaction_states[state];
 	if interaction_name == nil then
 		interaction_name = toHexString(state)
 	end

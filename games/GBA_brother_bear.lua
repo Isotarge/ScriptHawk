@@ -159,14 +159,14 @@ end
 -- Events --
 ------------
 local player2OSD = {
-		{"B2", "", category="player"},
-		{"X", function() return Game.getXPosition(1) end, category="position"},
-	    {"Y", function() return Game.getYPosition(1) end, category="position"},
-	    {"X Vel", function() return Game.getXVelocity(1) end, category="speed"},
-	    {"Y Vel", function() return Game.getXVelocity(1) end,  category="speed"},
-        {"dX", function() return Game.getdX(1) end, category="speed"},
-	    {"dY", function() return Game.getdY(1) end,  category="speed"},
-        {"Separator"},
+	{"B2", "", category="player"},
+	{"X", function() return Game.getXPosition(1) end, category="position"},
+	{"Y", function() return Game.getYPosition(1) end, category="position"},
+	{"X Vel", function() return Game.getXVelocity(1) end, category="speed"},
+	{"Y Vel", function() return Game.getXVelocity(1) end,  category="speed"},
+	{"dX", function() return Game.getdX(1) end, category="speed"},
+	{"dY", function() return Game.getdY(1) end,  category="speed"},
+	{"Separator"},
 };
 
 local function buildOSD()
