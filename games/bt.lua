@@ -7,7 +7,7 @@ end
 
 encircle_enabled = false;
 object_index = 1;
-local object_pointers = {}; 
+local object_pointers = {};
 object_model1_filter = nil; -- String
 object_model2_filter = nil; -- String
 
@@ -61,7 +61,7 @@ end
 
 local function turnFilterBoxIntoFilter()
 	local filter_box_text = forms.gettext(ScriptHawk.UI.form_controls["Analysis Filter Textbox"]);
-	local filter_value = nil;
+	local filter_value;
 	if filter_box_text == "" or filter_box_text == nil then
 		filter_value = nil;
 	else
@@ -121,22 +121,17 @@ function script_mode_from_inputs()
 			table.insert(all_acceptable_script_modes, i);
 		end
 	end
-	local acceptable_subtype_found = false;
+	local correct_subtype = 1; -- Default 1
 	if #all_acceptable_script_modes > 0 then
 		for i = 1, #all_acceptable_script_modes do
 			if script_modes[all_acceptable_script_modes[i]].subtype ~= nil then
 				if script_modes[all_acceptable_script_modes[i]].subtype == analysis_slide_subtype then
-					acceptable_subtype_found = true;
 					correct_subtype = i;
 				end
 			end
 		end
 	end
-	if not acceptable_subtype_found then
-		all_acceptable_script_modes = {all_acceptable_script_modes[1]};
-	else
-		all_acceptable_script_modes = {all_acceptable_script_modes[correct_subtype]};
-	end
+	all_acceptable_script_modes = {all_acceptable_script_modes[correct_subtype]};
 	script_mode_index = all_acceptable_script_modes[1];
 	script_mode = script_modes[script_mode_index][1];
 end
@@ -4515,7 +4510,7 @@ function flagStats(verbose)
 end
 
 local function flagSetButtonHandler()
-	flagMasterType = forms.getproperty(ScriptHawk.UI.form_controls["Flag Master Type Dropdown"], "SelectedItem");
+	local flagMasterType = forms.getproperty(ScriptHawk.UI.form_controls["Flag Master Type Dropdown"], "SelectedItem");
 	if flagMasterType == "Permanent Flags" then
 		setFlagByName(forms.getproperty(ScriptHawk.UI.form_controls["Flag Dropdown"], "SelectedItem"));
 	elseif flagMasterType == "Global Flags" then
@@ -4526,7 +4521,7 @@ local function flagSetButtonHandler()
 end
 
 local function flagClearButtonHandler()
-	flagMasterType = forms.getproperty(ScriptHawk.UI.form_controls["Flag Master Type Dropdown"], "SelectedItem");
+	local flagMasterType = forms.getproperty(ScriptHawk.UI.form_controls["Flag Master Type Dropdown"], "SelectedItem");
 	if flagMasterType == "Permanent Flags" then
 		clearFlagByName(forms.getproperty(ScriptHawk.UI.form_controls["Flag Dropdown"], "SelectedItem"));
 	elseif flagMasterType == "Global Flags" then
@@ -4537,7 +4532,7 @@ local function flagClearButtonHandler()
 end
 
 local function flagCheckButtonHandler()
-	flagMasterType = forms.getproperty(ScriptHawk.UI.form_controls["Flag Master Type Dropdown"], "SelectedItem");
+	local flagMasterType = forms.getproperty(ScriptHawk.UI.form_controls["Flag Master Type Dropdown"], "SelectedItem");
 	if flagMasterType == "Permanent Flags" then
 		checkFlag(forms.getproperty(ScriptHawk.UI.form_controls["Flag Dropdown"], "SelectedItem"));
 	elseif flagMasterType == "Global Flags" then
@@ -4547,11 +4542,12 @@ local function flagCheckButtonHandler()
 	end
 end
 
-flag_master_types = {"Permanent Flags", "Global Flags", "Permanent RNG Patterns"};
+local flag_master_types = {"Permanent Flags", "Global Flags", "Permanent RNG Patterns"};
 
-function flagTypeGetter()
-	flagMasterType = forms.getproperty(ScriptHawk.UI.form_controls["Flag Master Type Dropdown"], "SelectedItem");
-	flag_subtypes = {"All"};
+function getFlagSubtypes()
+	local flagMasterType = forms.getproperty(ScriptHawk.UI.form_controls["Flag Master Type Dropdown"], "SelectedItem");
+	local flag_subtypes = {"All"};
+	local loaded_array = {};
 	if flagMasterType == "Permanent Flags" then
 		loaded_array = flag_array;
 	elseif flagMasterType == "Global Flags" then
@@ -4560,13 +4556,13 @@ function flagTypeGetter()
 		loaded_array = getMiniEventTable();
 	end
 	if flagMasterType == "Permanent RNG Patterns" then
-		temp_subtypes = getListOfRNGEvents();
+		local temp_subtypes = getListOfRNGEvents();
 		for i = 1, #temp_subtypes do
 			table.insert(flag_subtypes, temp_subtypes[i]);
 		end
 	else
 		for i = 1, #loaded_array do
-			stored_subtype = false;
+			local stored_subtype = false;
 			for j = 1, #flag_subtypes do
 				if loaded_array[i].type == flag_subtypes[j] then
 					stored_subtype = true;
@@ -4577,17 +4573,18 @@ function flagTypeGetter()
 			end
 		end
 	end
+	return flag_subtypes;
 end
 
 function getFlagsArray()
-	flagMasterType = forms.getproperty(ScriptHawk.UI.form_controls["Flag Master Type Dropdown"], "SelectedItem");
-	flagSubType = forms.getproperty(ScriptHawk.UI.form_controls["Flag Sub Type Dropdown"], "SelectedItem");
+	local flagMasterType = forms.getproperty(ScriptHawk.UI.form_controls["Flag Master Type Dropdown"], "SelectedItem");
+	local flagSubType = forms.getproperty(ScriptHawk.UI.form_controls["Flag Sub Type Dropdown"], "SelectedItem");
+	local loaded_array = {};
+	local flags_list = {};
 	if flagMasterType == "Permanent Flags" then
 		loaded_array = flag_array;
-		name_property = "name";
 	elseif flagMasterType == "Global Flags" then
 		loaded_array = global_flag_array;
-		name_property = "name";
 	elseif flagMasterType == "Permanent RNG Patterns" then
 		loaded_array = getMiniEventTable();
 	end
@@ -4597,7 +4594,7 @@ function getFlagsArray()
 		else
 			flags_list = {};
 			for i = 1, #loaded_array do
-				table.insert(flags_list,loaded_array[i][name_property])
+				table.insert(flags_list, loaded_array[i].name)
 			end
 		end
 	else
@@ -4607,11 +4604,12 @@ function getFlagsArray()
 			flags_list = {};
 			for i = 1, #loaded_array do
 				if loaded_array[i].type == flagSubType then
-					table.insert(flags_list,loaded_array[i][name_property])
+					table.insert(flags_list, loaded_array[i].name)
 				end
 			end
 		end
 	end
+	return flags_list;
 end
 
 ------------------
@@ -4730,16 +4728,16 @@ end
 -- Fixed RNG Elements --
 ------------------------
 
-rng_elements = {
+Game.rng_elements = {
 	{
-		name="Klungo Potions",
-		flags={
-			{byte=0x5D,bit=5},
-			{byte=0x5D,bit=6},
-			{byte=0x5D,bit=7},
+		name = "Klungo Potions",
+		flags = {
+			{byte=0x5D, bit=5},
+			{byte=0x5D, bit=6},
+			{byte=0x5D, bit=7},
 		},
-		value_type="value_to_outcome",
-		values={
+		value_type = "value_to_outcome",
+		values = {
 			[0] = "Undecided",
 			[1] = "Green, Blue, Red",
 			[2] = "Red, Blue, Green",
@@ -4751,13 +4749,13 @@ rng_elements = {
 		},
 	},
 	{
-		name="Prison Compound Code",
-		flags={
-			{byte=0x60,bit=3},
-			{byte=0x60,bit=4},
+		name = "Prison Compound Code",
+		flags = {
+			{byte=0x60, bit=3},
+			{byte=0x60, bit=4},
 		},
-		value_type="value_to_outcome",
-		values={
+		value_type = "value_to_outcome",
+		values = {
 			[0] = "Undecided",
 			[1] = "* O * ( (",
 			[2] = "O ( * ( O",
@@ -4765,13 +4763,13 @@ rng_elements = {
 		},
 	},
 	{
-		name="Soggy Location",
-		flags={
-			{byte=0xAE,bit=7},
-			{byte=0xAF,bit=0},
+		name = "Soggy Location",
+		flags = {
+			{byte=0xAE, bit=7},
+			{byte=0xAF, bit=0},
 		},
-		value_type="value_to_outcome",
-		values={
+		value_type = "value_to_outcome",
+		values = {
 			[0] = "Undecided",
 			[1] = "Star Spinner",
 			[2] = "Inferno",
@@ -4779,13 +4777,13 @@ rng_elements = {
 		},
 	},
 	{
-		name="Moggy Location",
-		flags={
-			{byte=0xAE,bit=5},
-			{byte=0xAE,bit=6},
+		name = "Moggy Location",
+		flags = {
+			{byte=0xAE, bit=5},
+			{byte=0xAE, bit=6},
 		},
-		value_type="value_to_outcome",
-		values={
+		value_type = "value_to_outcome",
+		values = {
 			[0] = "Undecided",
 			[1] = "Area 51",
 			[2] = "Cave of Horrors",
@@ -4793,13 +4791,13 @@ rng_elements = {
 		},
 	},
 	{
-		name="Groggy Location",
-		flags={
-			{byte=0xAF,bit=1},
-			{byte=0xAF,bit=2},
+		name = "Groggy Location",
+		flags = {
+			{byte=0xAF, bit=1},
+			{byte=0xAF, bit=2},
 		},
-		value_type="value_to_outcome",
-		values={
+		value_type = "value_to_outcome",
+		values = {
 			[0] = "Undecided",
 			[1] = "Train Station",
 			[2] = "Inferno",
@@ -4808,13 +4806,13 @@ rng_elements = {
 	},
 	{
 		name="Sunken Ship Jinjo Box",
-		flags={
-			{byte=0x15,bit=0},
-			{byte=0x15,bit=1},
-			{byte=0x15,bit=2},
+		flags = {
+			{byte=0x15, bit=0},
+			{byte=0x15, bit=1},
+			{byte=0x15, bit=2},
 		},
-		value_type="value_to_outcome",
-		values={
+		value_type = "value_to_outcome",
+		values = {
 			[0] = "Undecided",
 			[1] = "", -- Undecided
 			[2] = "", -- Undecided
@@ -4826,17 +4824,17 @@ rng_elements = {
 		},
 	},
 	{
-		name="Jinjo Colours",
-		flags={
-			{byte=0x6A,bit=1},
-			{byte=0x6A,bit=2},
-			{byte=0x6A,bit=3},
-			{byte=0x6A,bit=4},
-			{byte=0x6A,bit=5},
-			{byte=0x6A,bit=6},
+		name = "Jinjo Colours",
+		flags = {
+			{byte=0x6A, bit=1},
+			{byte=0x6A, bit=2},
+			{byte=0x6A, bit=3},
+			{byte=0x6A, bit=4},
+			{byte=0x6A, bit=5},
+			{byte=0x6A, bit=6},
 		},
-		value_type="value_to_outcome",
-		values={
+		value_type = "value_to_outcome",
+		values = {
 			[0] = "Undecided",
 			-- Invalid
 			[1] = "",[2] = "",[3] = "",[4] = "",[5] = "",
@@ -4916,20 +4914,20 @@ rng_elements = {
 		},
 	},
 	{
-		name="D. Jones Locker", -- All lockers are randomised with this
-		flags={
-			{byte=0x6E,bit=7},
-			{byte=0x6F,bit=0},
-			{byte=0x6F,bit=1},
-			{byte=0x6F,bit=2},
-			{byte=0x6F,bit=3},
-			{byte=0x6F,bit=4},
-			{byte=0x6F,bit=5},
-			{byte=0x6F,bit=6},
-			{byte=0x6F,bit=7},
+		name = "D. Jones Locker", -- All lockers are randomised with this
+		flags = { 
+			{byte=0x6E, bit=7},
+			{byte=0x6F, bit=0},
+			{byte=0x6F, bit=1},
+			{byte=0x6F, bit=2},
+			{byte=0x6F, bit=3},
+			{byte=0x6F, bit=4},
+			{byte=0x6F, bit=5},
+			{byte=0x6F, bit=6},
+			{byte=0x6F, bit=7},
 		},
-		value_type="outcome_to_value",
-		values={
+		value_type = "outcome_to_value",
+		values = {
 			{
 				outcome = "8500, -9000, -10900",
 				values = {73},
@@ -4937,16 +4935,16 @@ rng_elements = {
 		},
 	},
 	{
-		name="CCL Dirt Piles",
-		flags={
-			{byte=0x36,bit=4},
-			{byte=0x36,bit=5},
-			{byte=0x36,bit=6},
-			{byte=0x36,bit=7},
-			{byte=0x37,bit=0},
+		name = "CCL Dirt Piles",
+		flags = {
+			{byte=0x36, bit=4},
+			{byte=0x36, bit=5},
+			{byte=0x36, bit=6},
+			{byte=0x36, bit=7},
+			{byte=0x37, bit=0},
 		},
-		value_type="value_to_outcome",
-		values={
+		value_type = "value_to_outcome",
+		values = {
 			[0] = "Undecided",
 			[1] = "",
 			[2] = "",
@@ -4982,13 +4980,13 @@ rng_elements = {
 		},
 	},
 	{
-		name="CCL Skulls",
-		flags={
-			{byte=0x7C,bit=1},
-			{byte=0x7C,bit=2},
+		name = "CCL Skulls",
+		flags = {
+			{byte=0x7C, bit=1},
+			{byte=0x7C, bit=2},
 		},
-		value_type="value_to_outcome",
-		values={
+		value_type = "value_to_outcome",
+		values = {
 			[0] = "Undecided",
 			[1] = "", -- 0x7C > 1 determines whether RNG is set. Undecided
 			[2] = "Red Jongo, Blue Mumbo",
@@ -4998,21 +4996,21 @@ rng_elements = {
 };
 
 function getEventData(event)
-	data = {};
-	for i = 1, #rng_elements do
-		if event == rng_elements[i].name then
-			data = rng_elements[i];
+	local data = {};
+	for i = 1, #Game.rng_elements do
+		if event == Game.rng_elements[i].name then
+			data = Game.rng_elements[i];
 		end
 	end
 	return data
 end
 
 function printJinjoRNGPattern(rng_outcome_value)
-	event_data = getEventData("Jinjo Colours");
-	jinjo_data = event_data.patterns[rng_outcome_value];
+	local event_data = getEventData("Jinjo Colours");
+	local jinjo_data = event_data.patterns[rng_outcome_value];
 	for i = 0, 8 do
-		jinjo_string = JinjoColors[i]..": ";
-		colour_count = 0;
+		local jinjo_string = JinjoColors[i]..": ";
+		local colour_count = 0;
 		for j = 1, #jinjo_data do
 			if jinjo_data[j] == i and colour_count < i then
 				jinjo_string = jinjo_string..JinjoAddresses[j][2]..", ";
@@ -5028,9 +5026,9 @@ function printJinjoRNGPattern(rng_outcome_value)
 end
 
 function getRNGOutcome(event)
-	data = getEventData(event);
+	local data = getEventData(event);
 	if data.name ~= nil then
-		rng_outcome_value = 0;
+		local rng_outcome_value = 0;
 		for i = 1, #data.flags do
 			rng_outcome_value = (rng_outcome_value * 2);
 			if checkFlag(data.flags[i].byte,data.flags[i].bit,true) then
@@ -5046,7 +5044,7 @@ function getRNGOutcome(event)
 				end
 				return "RNG Event: "..event..", Outcome: "..data.values[rng_outcome_value]
 			elseif data.value_type == "outcome_to_value" then
-				outcome = "";
+				local outcome = "";
 				for i = 1, #data.values do
 					for j = 1, #data.values[i].values do
 						if rng_outcome_value == data.values[i].values[j] then
@@ -5065,7 +5063,7 @@ function getRNGOutcome(event)
 end
 
 function resetRNGOutcome(event)
-	data = getEventData(event);
+	local data = getEventData(event);
 	if data.name ~= nil then
 		for i = 1, #data.flags do
 			clearFlag(data.flags[i].byte,data.flags[i].bit);
@@ -5075,12 +5073,12 @@ function resetRNGOutcome(event)
 	return "Invalid RNG Event"
 end
 
-function setRNGOutcome(event,outcome_value)
-	data = getEventData(event);
+function setRNGOutcome(event, outcome_value)
+	local data = getEventData(event);
 	if data.name ~= nil then
-		rng_outcome_value = outcome_value;
+		local rng_outcome_value = outcome_value;
 		for i = #data.flags, 1, -1 do
-			next_flag_state = rng_outcome_value % 2;
+			local next_flag_state = rng_outcome_value % 2;
 			if next_flag_state == 1 then
 				setFlag(data.flags[i].byte,data.flags[i].bit);
 			else
@@ -5096,6 +5094,7 @@ function setRNGOutcome(event,outcome_value)
 				return "Set saved data of RNG Event "..event.." to Unknown ("..outcome_value..")";
 			end
 		elseif data.value_type == "outcome_to_value" then
+			local data_outcome = "";
 			for i = 1, #data.values do
 				for j = 1, #data.values[i].values do
 					if outcome_value == data.values[i].values[j] then
@@ -5110,18 +5109,18 @@ function setRNGOutcome(event,outcome_value)
 end
 
 function getMiniEventTable()
-	data_table = {};
-	for i = 1, #rng_elements do
-		element = rng_elements[i];
+	local data_table = {};
+	for i = 1, #Game.rng_elements do
+		local element = Game.rng_elements[i];
 		if #element.values > 0 then
 			if element.value_type == "value_to_outcome" then
 				for j = 0, #element.values do
 					if element.values[j] ~= nil and element.values[j] ~= "" then
-						row = {
-							event=element.name,
-							outcome=element.values[j],
-							outcome_value=j,
-							composite_name=element.name.." - "..element.values[j]
+						local row = {
+							event = element.name,
+							outcome = element.values[j],
+							outcome_value = j,
+							composite_name = element.name.." - "..element.values[j]
 						};
 						table.insert(data_table,row);
 					end
@@ -5129,11 +5128,11 @@ function getMiniEventTable()
 			elseif element.value_type == "outcome_to_value" then
 				for j = 1, #element.values do
 					if #element.values[j].values > 0 then
-						row = {
-							event=element.name,
-							outcome=element.values[j].outcome,
-							outcome_value=element.values[j].values[1],
-							composite_name=element.name.." - "..element.values[j].outcome
+						local row = {
+							event = element.name,
+							outcome = element.values[j].outcome,
+							outcome_value = element.values[j].values[1],
+							composite_name = element.name.." - "..element.values[j].outcome
 						};
 						table.insert(data_table,row);
 					end
@@ -5145,37 +5144,37 @@ function getMiniEventTable()
 end
 
 function getListOfRNGEvents()
-	events_list = {};
-	for i = 1, #rng_elements do
-		table.insert(events_list,rng_elements[i].name);
+	local events_list = {};
+	for i = 1, #Game.rng_elements do
+		table.insert(events_list, Game.rng_elements[i].name);
 	end
-	return events_list
+	return events_list;
 end
 
 function getListOfRNGOutcomes()
-	outcomes_list = {};
-	event_table = getMiniEventTable();
+	local outcomes_list = {};
+	local event_table = getMiniEventTable();
 	for i = 1, #event_table do
-		outcome_string = event_table[i].event.." - "..event_table[i].outcome;
-		table.insert(outcomes_list,outcome_string);
+		local outcome_string = event_table[i].event.." - "..event_table[i].outcome;
+		table.insert(outcomes_list, outcome_string);
 	end
-	return outcomes_list
+	return outcomes_list;
 end
 
 function getListOfRNGOutcomesForEvent(event_name)
-	outcomes_list = {};
-	event_table = getMiniEventTable();
+	local outcomes_list = {};
+	local event_table = getMiniEventTable();
 	for i = 1, #event_table do
 		if event_table[i].event == event_name then
-			outcome_string = event_table[i].event.." - "..event_table[i].outcome;
-			table.insert(outcomes_list,outcome_string);
+			local outcome_string = event_table[i].event.." - "..event_table[i].outcome;
+			table.insert(outcomes_list, outcome_string);
 		end
 	end
-	return outcomes_list
+	return outcomes_list;
 end
 
 function getDataEntryFromComposite(composite)
-	data = getMiniEventTable();
+	local data = getMiniEventTable();
 	for i = 1, #data do
 		if data[i].composite_name == composite then
 			return data[i];
@@ -5184,12 +5183,12 @@ function getDataEntryFromComposite(composite)
 end
 
 function setRNGOutcomeFromComposite(composite)
-	outcome_data = getDataEntryFromComposite(composite);
+	local outcome_data = getDataEntryFromComposite(composite);
 	print(setRNGOutcome(outcome_data.event, outcome_data.outcome_value));
 end
 
 function checkRNGOutcomeFromComposite(composite)
-	outcome_data = getDataEntryFromComposite(composite);
+	local outcome_data = getDataEntryFromComposite(composite);
 	if outcome_data.event == "Jinjo Colours" then
 		print("RNG Event: "..outcome_data.event..", Outcome: "..outcome_data.outcome_value-32)
 		getRNGOutcome(outcome_data.event);
@@ -5199,7 +5198,7 @@ function checkRNGOutcomeFromComposite(composite)
 end
 
 function clearRNGOutcomeFromComposite(composite)
-	outcome_data = getDataEntryFromComposite(composite);
+	local outcome_data = getDataEntryFromComposite(composite);
 	print(resetRNGOutcome(outcome_data.event));
 end
 
@@ -5331,7 +5330,7 @@ local object_model1 = {
 		[0x62C] = "Cheese Wedge",
 		[0x62D] = "Jelly", -- Heart
 		[0x62E] = "Dragon Kazooie", -- Not properly textured
-		-- 0x62F - Crash 
+		-- 0x62F - Crash
 
 		-- 0x630 - Crash
 		[0x631] = "N64 Logo",
@@ -6495,21 +6494,6 @@ local function drawObjectAnalysisUI()
 			end
 		end
 		if script_mode == "List (Object Model 1)" then
-			local objectArray = dereferencePointer(Game.Memory.object_array_pointer);
-			row = row + 1;
-			pagifyThis(object_pointers, 40);
-			for i = page_finish, page_start + 1, -1 do
-				local color = nil;
-				if object_index == i then
-					color = colors.yellow;
-				end
-				local animationType = getAnimationType(object_pointers[i]);
-				gui.text(Game.OSDPosition[1], 2 + Game.OSDRowHeight * row, i..": "..animationType..": "..toHexString(object_pointers[i] or 0), color, 'bottomright');
-				--gui.text(gui_x, gui_y + height * row, i..": "..getActorName(object_pointers[i]).." "..toHexString(object_pointers[i] or 0, 6).." ("..toHexString(currentActorSize)..")", color, 'bottomright');
-				row = row + 1;
-			end
-		elseif script_mode == "List (Loading Zones)" then
-			local objectArray = dereferencePointer(Game.Memory.object_model2_array_pointer);
 			row = row + 1;
 			pagifyThis(object_pointers, 40);
 			for i = page_finish, page_start + 1, -1 do
@@ -6518,44 +6502,22 @@ local function drawObjectAnalysisUI()
 					color = colors.yellow;
 				end
 				local pointer = object_pointers[i];
-				gui.text(Game.OSDPosition[1], 2 + Game.OSDRowHeight * row, i..": "..formatName(pointer)..": "..toHexString(object_pointers[i] or 0), color, 'bottomright');
-				--gui.text(gui_x, gui_y + height * row, i..": "..getActorName(object_pointers[i]).." "..toHexString(object_pointers[i] or 0, 6).." ("..toHexString(currentActorSize)..")", color, 'bottomright');
+				local animationType = getAnimationType(pointer);
+				gui.text(Game.OSDPosition[1], 2 + Game.OSDRowHeight * row, i..": "..animationType..": "..toHexString(pointer or 0), color, 'bottomright');
 				row = row + 1;
 			end
-		end
-	end
-
-	if script_mode == "Examine (Object Model 1)" and isRDRAM(objectArray) then
-		local currentSlotBase = objectArray + getModelOneSlotBase(object_index - 1);
-		local objectName = getAnimationType(currentSlotBase);
-
-		local examine_data = getExamineDataModelOne(objectArray + getModelOneSlotBase(object_index - 1));
-		for i = #examine_data, 1, -1 do
-			if examine_data[i][1] ~= "Separator" then
-				gui.text(Game.OSDPosition[1], 2 + Game.OSDRowHeight * row, examine_data[i][1]..": "..examine_data[i][2], nil, 'bottomright');
-				row = row + 1; -- Separator
-			else
-				row = row + examine_data[i][2];
-			end
-		end
-
-		gui.text(Game.OSDPosition[1], 2 + Game.OSDRowHeight * row, "Object: "..objectName, nil, 'bottomright');
-		row = row + 1;
-		gui.text(Game.OSDPosition[1], 2 + Game.OSDRowHeight * row, "Address: "..toHexString(currentSlotBase or 0), nil, 'bottomright');
-		row = row + 1;
-	end
-
-	if script_mode == "List (Object Model 1)" and isRDRAM(objectArray) then
-		for i = page_size, 1, -1 do
-			local currentSlotBase = objectArray + getModelOneSlotBase(i + ((page_pos - 1) * max_page_size) - 1);
-			local color = nil;
-			if page_index == i then
-				color = colors.yellow;
-			end
-
-			local animationType = getAnimationType(currentSlotBase);
-			gui.text(Game.OSDPosition[1], 2 + Game.OSDRowHeight * row, i..": "..animationType..": "..toHexString(currentSlotBase or 0), color, 'bottomright');
+		elseif script_mode == "List (Loading Zones)" then
 			row = row + 1;
+			pagifyThis(object_pointers, 40);
+			for i = page_finish, page_start + 1, -1 do
+				local color = nil;
+				if object_index == i then
+					color = colors.yellow;
+				end
+				local pointer = object_pointers[i];
+				gui.text(Game.OSDPosition[1], 2 + Game.OSDRowHeight * row, i..": "..formatName(pointer)..": "..toHexString(pointer or 0), color, 'bottomright');
+				row = row + 1;
+			end
 		end
 	end
 end
@@ -6595,15 +6557,12 @@ function Game.drawUI()
 	forms.settext(ScriptHawk.UI.form_controls["Analysis Subtype Text"],analysis_slide_subtype);
 	if old_flagMasterType ~= current_flagMasterType then
 		forms.setproperty(ScriptHawk.UI.form_controls["Flag Sub Type Dropdown"], "SelectedItem","All");
-		flagTypeGetter();
-		forms.setdropdownitems(ScriptHawk.UI.form_controls["Flag Sub Type Dropdown"], flag_subtypes);
-		getFlagsArray();
-		forms.setdropdownitems(ScriptHawk.UI.form_controls["Flag Dropdown"], flags_list);
+		forms.setdropdownitems(ScriptHawk.UI.form_controls["Flag Sub Type Dropdown"], getFlagSubtypes());
+		forms.setdropdownitems(ScriptHawk.UI.form_controls["Flag Dropdown"], getFlagsArray());
 		forms.setproperty(ScriptHawk.UI.form_controls["Flag Dropdown"], "SelectedIndex", 0);
 	end
 	if old_flagSubType ~= current_flagSubType then
-		getFlagsArray();
-		forms.setdropdownitems(ScriptHawk.UI.form_controls["Flag Dropdown"], flags_list);
+		forms.setdropdownitems(ScriptHawk.UI.form_controls["Flag Dropdown"], getFlagsArray());
 		forms.setproperty(ScriptHawk.UI.form_controls["Flag Dropdown"], "SelectedIndex", 0);
 	end
 	old_flagSubType = current_flagSubType;
@@ -6959,12 +6918,10 @@ function Game.initUI()
 	-- Flag stuff
 	ScriptHawk.UI.form_controls["Flag Master Type Dropdown"] = forms.dropdown(ScriptHawk.UI.options_form, flag_master_types, ScriptHawk.UI:col(0) + ScriptHawk.UI.dropdown_offset, ScriptHawk.UI:row(7) + ScriptHawk.UI.dropdown_offset, ScriptHawk.UI:col(6) + 8, ScriptHawk.UI.button_height);
 	forms.setproperty(ScriptHawk.UI.form_controls["Flag Master Type Dropdown"], "SelectedItem","Permanent Flags");
-	flagTypeGetter();
-	ScriptHawk.UI.form_controls["Flag Sub Type Dropdown"] = forms.dropdown(ScriptHawk.UI.options_form, flag_subtypes, ScriptHawk.UI:col(7) + ScriptHawk.UI.dropdown_offset, ScriptHawk.UI:row(7) + ScriptHawk.UI.dropdown_offset, ScriptHawk.UI:col(6) + 8, ScriptHawk.UI.button_height);
-	getFlagsArray();
+	ScriptHawk.UI.form_controls["Flag Sub Type Dropdown"] = forms.dropdown(ScriptHawk.UI.options_form, getFlagSubtypes(), ScriptHawk.UI:col(7) + ScriptHawk.UI.dropdown_offset, ScriptHawk.UI:row(7) + ScriptHawk.UI.dropdown_offset, ScriptHawk.UI:col(6) + 8, ScriptHawk.UI.button_height);
 	old_flagMasterType = forms.getproperty(ScriptHawk.UI.form_controls["Flag Master Type Dropdown"], "SelectedItem");
 	old_flagSubType = forms.getproperty(ScriptHawk.UI.form_controls["Flag Sub Type Dropdown"], "SelectedItem");
-	ScriptHawk.UI.form_controls["Flag Dropdown"] = forms.dropdown(ScriptHawk.UI.options_form, flags_list, ScriptHawk.UI:col(0) + ScriptHawk.UI.dropdown_offset, ScriptHawk.UI:row(8) + ScriptHawk.UI.dropdown_offset, ScriptHawk.UI:col(9) + 8, ScriptHawk.UI.button_height);
+	ScriptHawk.UI.form_controls["Flag Dropdown"] = forms.dropdown(ScriptHawk.UI.options_form, getFlagsArray(), ScriptHawk.UI:col(0) + ScriptHawk.UI.dropdown_offset, ScriptHawk.UI:row(8) + ScriptHawk.UI.dropdown_offset, ScriptHawk.UI:col(9) + 8, ScriptHawk.UI.button_height);
 	ScriptHawk.UI:checkbox(10, 6, "realtime_flags", "Realtime Flags", true);
 
 	ScriptHawk.UI:checkbox(5, 6, "toggle_autojump", "Autojump");

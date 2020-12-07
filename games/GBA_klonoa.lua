@@ -158,17 +158,17 @@ end
 
 function Game.drawObjectPositions()
 	local objArraySize = memory.read_u8(Game.Memory.obj_array_size.Address, Game.Memory.obj_array_size.Domain);
-	if objArraySize ~= 0 then 
-		for i = 0, objArraySize-1 do
+	if objArraySize ~= 0 then
+		for i = 0, objArraySize - 1 do
 			local xOffset = Game.getObjXOffset(i);
 			local yOffset = Game.getObjYOffset(i);
 
 			if xOffset >= 0 and xOffset < 240 then
 				if yOffset >= 0 and yOffset < 160 then
 					local visible = Game.getObjVis(i)
-					if visible ~= 0x00 then 
-						gui.drawLine(xOffset, yOffset-2, xOffset, yOffset+2); 
-						gui.drawLine(xOffset-2, yOffset, xOffset+2, yOffset); 
+					if visible ~= 0x00 then
+						gui.drawLine(xOffset, yOffset - 2, xOffset, yOffset + 2);
+						gui.drawLine(xOffset - 2, yOffset, xOffset + 2, yOffset);
 						gui.drawText(xOffset, yOffset, toHexString(i), null, null, 9);
 					end
 				end

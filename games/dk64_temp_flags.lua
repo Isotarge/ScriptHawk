@@ -23,8 +23,8 @@ temporary_flags = {
 		{byte=0x5, bit=2, flagName="Fungi: Apple Saved CS", type="Cutscene", map=48},
 
 		{byte=0x6, bit=0, flagName="Caves: Ice Tomato Board Active", type="Minigame", map=98}, -- Story Mode Tile Flip??
-		{byte=0x6, bit=1, flagName="Caves: 1DC GB Raised CS", type="Cutscene", map=94}, 
-		{byte=0x6, bit=2, flagName="Caves: BBlast GB Spawn Pending", type="Trigger", map=186}, 
+		{byte=0x6, bit=1, flagName="Caves: 1DC GB Raised CS", type="Cutscene", map=94},
+		{byte=0x6, bit=2, flagName="Caves: BBlast GB Spawn Pending", type="Trigger", map=186},
 
 		{byte=0x7, bit=0, flagName="Castle: Car Race FT Intro", type="Cutscene", map=185},
 		{byte=0x7, bit=3, flagName="Helm: Roman Numeral Doors Open", type="Physical", map=17},
