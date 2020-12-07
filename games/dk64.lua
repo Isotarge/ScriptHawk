@@ -176,22 +176,17 @@ function grab_script_mode_from_inputs()
 			table.insert(all_acceptable_script_modes, i);
 		end
 	end
-	local acceptable_subtype_found = false;
+	local correct_subtype = 1; -- Default to 1
 	if #all_acceptable_script_modes > 0 then
 		for i = 1, #all_acceptable_script_modes do
 			if grab_script_modes[all_acceptable_script_modes[i]].subtype ~= nil then
 				if grab_script_modes[all_acceptable_script_modes[i]].subtype == analysis_slide_subtype then
-					acceptable_subtype_found = true;
 					correct_subtype = i;
 				end
 			end
 		end
 	end
-	if not acceptable_subtype_found then
-		all_acceptable_script_modes = {all_acceptable_script_modes[1]};
-	else
-		all_acceptable_script_modes = {all_acceptable_script_modes[correct_subtype]};
-	end
+	all_acceptable_script_modes = {all_acceptable_script_modes[correct_subtype]};
 	grab_script_mode_index = all_acceptable_script_modes[1];
 	grab_script_mode = grab_script_modes[grab_script_mode_index][1];
 end
@@ -683,8 +678,8 @@ local map_value = 0;
 -- Subgame maps --
 ------------------
 
-arcade_map = 2;
-jetpac_map = 9;
+Game.arcade_map = 2;
+Game.jetpac_map = 9;
 
 local arcade_object = {
 	x_position = 0x00, -- Float
@@ -823,14 +818,14 @@ local function drawSubGameHitboxes()
 		dragging = false;
 	end
 
-	if map_value == arcade_map then
+	if map_value == Game.arcade_map then
 		for i = 0, arcade_object.count - 1 do
 			local objectBase = Game.Memory.arcade_object_base + (i * arcade_object.size);
 			table.insert(draggableObjects, arcadeObjectBaseToDraggableObject(objectBase));
 		end
 	end
 
-	if map_value == jetpac_map then
+	if map_value == Game.jetpac_map then
 		-- Objects
 		for i = 0, 4 do
 			local objectBase = Game.Memory.jetpac_object_base + i * 0x4C;
@@ -882,11 +877,11 @@ local function drawSubGameHitboxes()
 end
 
 local function getSubgameLevel()
-	if map_value == arcade_map then
+	if map_value == Game.arcade_map then
 		local arcade_level = mainmemory.readbyte(Game.Memory.arcade_level);
 		local arcade_level_osd = ((math.fmod(arcade_level, 3) + 1) * 25).."m ("..math.floor(arcade_level / 4)..")";
 		return arcade_level_osd;
-	elseif map_value == jetpac_map then
+	elseif map_value == Game.jetpac_map then
 		local jetpac_level = mainmemory.readbyte(Game.Memory.jetpac_level);
 		return jetpac_level;
 	end
@@ -896,7 +891,7 @@ end
 -- TODO: Hook these up to UI somehow?
 function arcadeTakeMeThere(level)
 	local level_value = 0;
-	if map_value == arcade_map then
+	if map_value == Game.arcade_map then
 		if level == "25m" then
 			level_value = 0;
 		elseif level == "50m" then
@@ -916,7 +911,7 @@ end
 
 -- TODO: Hook these up to UI somehow?
 function jetpacTakeMeThere(level)
-	if map_value == jetpac_map then
+	if map_value == Game.jetpac_map then
 		mainmemory.writebyte(Game.Memory.jetpac_level, level);
 	end
 end
@@ -4008,7 +4003,7 @@ local spawnerStates = {
 };
 
 local function getSpawnerStateName(pointer)
-	stateValue = mainmemory.readbyte(pointer + spawnerAttributes.spawn_state);
+	local stateValue = mainmemory.readbyte(pointer + spawnerAttributes.spawn_state);
 	if spawnerStates[stateValue] ~= nil then
 		return spawnerStates[stateValue];
 	end
@@ -4170,24 +4165,23 @@ actorSpawnerAttributes = {
 };
 
 function getSpawnerCount()
-	if Game.version ~= 4 then
-		endpoint_found = false;
-		actorSpawner_header = dereferencePointer(Game.Memory.actor_spawner_pointer);
-		count = 0;
-		nextSpawner = actorSpawner_header;
-		if isRDRAM(actorSpawner_header) then
-			while not endpoint_found do
-				count = count + 1;
-				nextSpawner = dereferencePointer(nextSpawner + actorSpawnerAttributes.next_spawner);
-				if not isRDRAM(nextSpawner) then
-					endpoint_found = true;
-					return count;
-				end
-			end
-			emu.yield();
+	local count = 0;
+
+	if Game.version == 4 then -- Kiosk not supported
+		return count;
+	end
+
+	local actorSpawner_header = dereferencePointer(Game.Memory.actor_spawner_pointer);
+	local nextSpawner = actorSpawner_header;
+
+	if isRDRAM(actorSpawner_header) then
+		while isRDRAM(nextSpawner) do
+			count = count + 1;
+			nextSpawner = dereferencePointer(nextSpawner + actorSpawnerAttributes.next_spawner);
 		end
 	end
-	return 0;
+
+	return count;
 end
 
 function Game.populateActorSpawnerPointers()
@@ -4303,12 +4297,17 @@ mapObjectSetup_attributes = {
 }
 
 function getMapObjectSetupData()
-	objM2_header = dereferencePointer(Game.Memory.obj_model2_setup_pointer);
+	local objM2_header = dereferencePointer(Game.Memory.obj_model2_setup_pointer);
 	if isRDRAM(objM2_header) then
-		objM2_count = mainmemory.read_u32_be(objM2_header);
-		objM1_header = objM2_header + (2 * mapObjectSetup_buffer_size) + (mapObjectSetup_objM2_size * objM2_count);
-		objM1_count = mainmemory.read_u32_be(objM1_header);
-		return {objM2_header + mapObjectSetup_buffer_size, objM2_count, objM1_header + mapObjectSetup_buffer_size, objM1_count};
+		local objM2_count = mainmemory.read_u32_be(objM2_header);
+		local objM1_header = objM2_header + (2 * mapObjectSetup_buffer_size) + (mapObjectSetup_objM2_size * objM2_count);
+		local objM1_count = mainmemory.read_u32_be(objM1_header);
+		return {
+			objM2_header + mapObjectSetup_buffer_size,
+			objM2_count,
+			objM1_header + mapObjectSetup_buffer_size,
+			objM1_count
+		};
 	end
 	return {};
 end
@@ -4318,13 +4317,13 @@ function getNameFromMapObjSetupPointer(pointer,isModelTwo)
 		local mos_type = mainmemory.read_u16_be(pointer + mapObjectSetup_attributes.objM2.object_id)
 		return obj_model2.object_types[mos_type] or "unknown "..toHexString(mos_type)
 	else
-		local mos_type = mainmemory.read_u16_be(pointer + mapObjectSetup_attributes.objM1.object_id) + mapObjectSetup_objM1_offset
+		local mos_type = mainmemory.read_u16_be(pointer + mapObjectSetup_attributes.objM1.object_id) + mapObjectSetup_objM1_offset;
 		return "Spawner ("..getActorNameFromBehavior(mos_type)..")"
 	end
 end
 
 function Game.populateMapObjSetupPointers()
-	mapObjectSetup_data = getMapObjectSetupData();
+	local mapObjectSetup_data = getMapObjectSetupData();
 	object_pointers = {};
 	if Game.version == 4 then
 		mapObjectSetup_objM1_offset = 0x0F;
@@ -5867,7 +5866,7 @@ local function getFlagStatsOSD() -- TODO: This is a lot faster but still too slo
 end
 
 local function flagSetButtonHandler()
-	flagMasterType = forms.getproperty(ScriptHawk.UI.form_controls["Flag Master Type Dropdown"], "SelectedItem");
+	local flagMasterType = forms.getproperty(ScriptHawk.UI.form_controls["Flag Master Type Dropdown"], "SelectedItem");
 	if flagMasterType == "Permanent Flags" then
 		setFlagByName(forms.getproperty(ScriptHawk.UI.form_controls["Flag Dropdown"], "SelectedItem"));
 	elseif flagMasterType == "Temporary Flags" then
@@ -5878,7 +5877,7 @@ local function flagSetButtonHandler()
 end
 
 local function flagClearButtonHandler()
-	flagMasterType = forms.getproperty(ScriptHawk.UI.form_controls["Flag Master Type Dropdown"], "SelectedItem");
+	local flagMasterType = forms.getproperty(ScriptHawk.UI.form_controls["Flag Master Type Dropdown"], "SelectedItem");
 	if flagMasterType == "Permanent Flags" then
 		clearFlagByName(forms.getproperty(ScriptHawk.UI.form_controls["Flag Dropdown"], "SelectedItem"));
 	elseif flagMasterType == "Temporary Flags" then
@@ -5889,7 +5888,7 @@ local function flagClearButtonHandler()
 end
 
 local function flagCheckButtonHandler()
-	flagMasterType = forms.getproperty(ScriptHawk.UI.form_controls["Flag Master Type Dropdown"], "SelectedItem");
+	local flagMasterType = forms.getproperty(ScriptHawk.UI.form_controls["Flag Master Type Dropdown"], "SelectedItem");
 	if flagMasterType == "Permanent Flags" then
 		checkFlag(forms.getproperty(ScriptHawk.UI.form_controls["Flag Dropdown"], "SelectedItem"));
 	elseif flagMasterType == "Temporary Flags" then
@@ -5902,8 +5901,9 @@ end
 flag_master_types = {"Permanent Flags", "Temporary Flags", "Global Flags"};
 
 function flagTypeGetter()
-	flagMasterType = forms.getproperty(ScriptHawk.UI.form_controls["Flag Master Type Dropdown"], "SelectedItem");
+	local flagMasterType = forms.getproperty(ScriptHawk.UI.form_controls["Flag Master Type Dropdown"], "SelectedItem");
 	flag_subtypes = {"All"};
+	local loaded_array = {};
 	if flagMasterType == "Permanent Flags" then
 		loaded_array = flag_array;
 	elseif flagMasterType == "Temporary Flags" then
@@ -5925,8 +5925,9 @@ function flagTypeGetter()
 end
 
 function getFlagsArray()
-	flagMasterType = forms.getproperty(ScriptHawk.UI.form_controls["Flag Master Type Dropdown"], "SelectedItem");
-	flagSubType = forms.getproperty(ScriptHawk.UI.form_controls["Flag Sub Type Dropdown"], "SelectedItem");
+	local flagMasterType = forms.getproperty(ScriptHawk.UI.form_controls["Flag Master Type Dropdown"], "SelectedItem");
+	local flagSubType = forms.getproperty(ScriptHawk.UI.form_controls["Flag Sub Type Dropdown"], "SelectedItem");
+	local loaded_array = {};
 	if flagMasterType == "Permanent Flags" then
 		loaded_array = flag_array;
 		name_property = "name";
@@ -5940,13 +5941,13 @@ function getFlagsArray()
 	if flagSubType == "All" then
 		flags_list = {};
 		for i = 1, #loaded_array do
-			table.insert(flags_list,loaded_array[i][name_property])
+			table.insert(flags_list, loaded_array[i][name_property])
 		end
 	else
 		flags_list = {};
 		for i = 1, #loaded_array do
 			if loaded_array[i].type == flagSubType then
-				table.insert(flags_list,loaded_array[i][name_property])
+				table.insert(flags_list, loaded_array[i][name_property])
 			end
 		end
 	end
@@ -6110,20 +6111,20 @@ function Game.getTempFlagName(byte, bit)
 end
 
 function setTempFlag(byte,tempBit)
-	temp_flag_value = mainmemory.readbyte(temp_flag_boundaries.start[Game.version] + byte);
+	local temp_flag_value = mainmemory.readbyte(temp_flag_boundaries.start[Game.version] + byte);
 	temp_flag_value = bit.set(temp_flag_value,tempBit);
 	mainmemory.writebyte(temp_flag_boundaries.start[Game.version] + byte, temp_flag_value);
 end
 
 function clearTempFlag(byte,tempBit)
-	temp_flag_value = mainmemory.readbyte(temp_flag_boundaries.start[Game.version] + byte);
+	local temp_flag_value = mainmemory.readbyte(temp_flag_boundaries.start[Game.version] + byte);
 	temp_flag_value = bit.clear(temp_flag_value,tempBit);
 	mainmemory.writebyte(temp_flag_boundaries.start[Game.version] + byte, temp_flag_value);
 end
 
 function checkTempFlag(byte,tempBit)
-	temp_flag_value = mainmemory.readbyte(temp_flag_boundaries.start[Game.version] + byte);
-	return_value = bit.check(temp_flag_value,tempBit);
+	local temp_flag_value = mainmemory.readbyte(temp_flag_boundaries.start[Game.version] + byte);
+	local return_value = bit.check(temp_flag_value,tempBit);
 	if return_value then
 		print(Game.getTempFlagName(byte, tempBit).." is SET");
 	else
@@ -6172,8 +6173,8 @@ end
 
 function checkTemporaryFlags(showKnown)
 	if temp_flag_boundaries.start[Game.version] ~= nil then
-		temp_flags = temp_flag_boundaries.start[Game.version];
-		temp_flagBlock = mainmemory.readbyterange(temp_flags, temp_flag_boundaries.size[Game.version] + 1);
+		local temp_flags = temp_flag_boundaries.start[Game.version];
+		local temp_flagBlock = mainmemory.readbyterange(temp_flags, temp_flag_boundaries.size[Game.version] + 1);
 
 		if #temp_flag_block_cache == temp_flag_boundaries.size[Game.version] then
 			local tempFlagFound = false;
@@ -6791,7 +6792,7 @@ function populateArcadeObjects()
 
 	for i = 0, arcade_object.count - 1 do
 		local objectBase = Game.Memory.arcade_object_base + (i * arcade_object.size);
-		if mainmemory.readbyte(objectBase + arcade_object.object_type) > 0 and map_value == arcade_map then
+		if mainmemory.readbyte(objectBase + arcade_object.object_type) > 0 and map_value == Game.arcade_map then
 			table.insert(object_pointers, objectBase);
 		end
 	end
@@ -6802,7 +6803,7 @@ end
 -------------------
 
 local function isInSubGame()
-	return map_value == arcade_map or map_value == jetpac_map;
+	return map_value == Game.arcade_map or map_value == Game.jetpac_map;
 end
 
 function Game.getFloor()
@@ -7004,12 +7005,12 @@ end
 --------------
 
 function Game.getXPosition()
-	if map_value == arcade_map then
+	if map_value == Game.arcade_map then
 		local jumpman = Game.getJumpman();
 		if isRDRAM(jumpman) then
 			return mainmemory.readfloat(jumpman + arcade_object.x_position, true);
 		end
-	elseif map_value == jetpac_map then
+	elseif map_value == Game.jetpac_map then
 		return mainmemory.readfloat(Game.Memory.jetman_position_x, true);
 	end
 	local playerObject = Game.getPlayerObject();
@@ -7020,12 +7021,12 @@ function Game.getXPosition()
 end
 
 function Game.getYPosition()
-	if map_value == arcade_map then
+	if map_value == Game.arcade_map then
 		local jumpman = Game.getJumpman();
 		if isRDRAM(jumpman) then
 			return mainmemory.readfloat(jumpman + arcade_object.y_position, true);
 		end
-	elseif map_value == jetpac_map then
+	elseif map_value == Game.jetpac_map then
 		return mainmemory.readfloat(Game.Memory.jetman_position_y, true);
 	end
 	local playerObject = Game.getPlayerObject();
@@ -7046,14 +7047,14 @@ function Game.getZPosition()
 end
 
 function Game.setXPosition(value)
-	if map_value == arcade_map then
+	if map_value == Game.arcade_map then
 		--[[
 		local jumpman = Game.getJumpman();
 		if isRDRAM(jumpman) then
 			mainmemory.writefloat(jumpman + arcade_object.x_position, value, true);
 		end
 		--]]
-	elseif map_value == jetpac_map then
+	elseif map_value == Game.jetpac_map then
 		--mainmemory.writefloat(Game.Memory.jetman_position_x, value, true);
 	else
 		local playerObject = Game.getPlayerObject();
@@ -7070,14 +7071,14 @@ function Game.setXPosition(value)
 end
 
 function Game.setYPosition(value)
-	if map_value == arcade_map then
+	if map_value == Game.arcade_map then
 		--[[
 		local jumpman = Game.getJumpman();
 		if isRDRAM(jumpman) then
 			mainmemory.writefloat(jumpman + arcade_object.y_position, value, true);
 		end
 		--]]
-	elseif map_value == jetpac_map then
+	elseif map_value == Game.jetpac_map then
 		--mainmemory.writefloat(Game.Memory.jetman_position_y, value, true);
 	else
 		local playerObject = Game.getPlayerObject();
@@ -7324,12 +7325,12 @@ end
 
 function Game.getVelocity()
 	local playerObject = Game.getPlayerObject();
-	if map_value == arcade_map then
+	if map_value == Game.arcade_map then
 		local jumpman = Game.getJumpman();
 		if isRDRAM(jumpman) then
 			return mainmemory.readfloat(jumpman + arcade_object.x_velocity, true);
 		end
-	elseif map_value == jetpac_map then
+	elseif map_value == Game.jetpac_map then
 		return mainmemory.readfloat(Game.Memory.jetman_velocity_x, true);
 	elseif isRDRAM(playerObject) then
 		return mainmemory.readfloat(playerObject + obj_model1.velocity, true);
@@ -7339,14 +7340,14 @@ end
 
 function Game.setVelocity(value)
 	local playerObject = Game.getPlayerObject();
-	if map_value == arcade_map then
+	if map_value == Game.arcade_map then
 		--[[
 		local jumpman = Game.getJumpman();
 		if isRDRAM(jumpman) then
 			mainmemory.writefloat(jumpman + arcade_object.x_velocity, value, true);
 		end
 		--]]
-	elseif map_value == jetpac_map then
+	elseif map_value == Game.jetpac_map then
 		mainmemory.writefloat(Game.Memory.jetman_velocity_x, value, true);
 	elseif isRDRAM(playerObject) then
 		mainmemory.writefloat(playerObject + obj_model1.velocity, value, true);
@@ -7355,12 +7356,12 @@ end
 
 function Game.getYVelocity()
 	local playerObject = Game.getPlayerObject();
-	if map_value == arcade_map then
+	if map_value == Game.arcade_map then
 		local jumpman = Game.getJumpman();
 		if isRDRAM(jumpman) then
 			return mainmemory.readfloat(jumpman + arcade_object.y_velocity, true);
 		end
-	elseif map_value == jetpac_map then
+	elseif map_value == Game.jetpac_map then
 		return mainmemory.readfloat(Game.Memory.jetman_velocity_y, true);
 	elseif isRDRAM(playerObject) then
 		return mainmemory.readfloat(playerObject + obj_model1.y_velocity, true);
@@ -7370,14 +7371,14 @@ end
 
 function Game.setYVelocity(value)
 	local playerObject = Game.getPlayerObject();
-	if map_value == arcade_map then
+	if map_value == Game.arcade_map then
 		--[[
 		local jumpman = Game.getJumpman();
 		if isRDRAM(jumpman) then
 			mainmemory.writefloat(jumpman + arcade_object.y_velocity, value, true);
 		end
 		--]]
-	elseif map_value == jetpac_map then
+	elseif map_value == Game.jetpac_map then
 		mainmemory.writefloat(Game.Memory.jetman_velocity_y, value, true);
 	elseif isRDRAM(playerObject) then
 		mainmemory.writefloat(playerObject + obj_model1.y_velocity, value, true);
@@ -7547,13 +7548,13 @@ end
 
 function MJ_position_to_square()
 	local podiums_container = dereferencePointer(Game.Memory.mad_jack_podiums_pointer)
-	closest = -1;
+	local closest = -1;
 	if isRDRAM(podiums_container) then
 		local podiums = dereferencePointer(podiums_container + 0x14);
 		if isRDRAM(podiums) then
-			smallest_distance = 9999999;
-			player_x = Game.getXPosition();
-			player_z = Game.getZPosition();
+			local smallest_distance = math.huge;
+			local player_x = Game.getXPosition();
+			local player_z = Game.getZPosition();
 			for p = 0, 15 do
 				local podium_x = mainmemory.read_u16_be(podiums + (10 * p) + 0);
 				local podium_z = mainmemory.read_u16_be(podiums + (10 * p) + 4);
@@ -7575,11 +7576,11 @@ function MJ_get_corner_distance()
 	if isRDRAM(podiums_container) then
 		local podiums = dereferencePointer(podiums_container + 0x14);
 		if isRDRAM(podiums) then
-			smallest_four_distances = {};
-			smallest_four_x = {};
-			smallest_four_z = {};
-			player_x = Game.getXPosition();
-			player_z = Game.getZPosition();
+			local smallest_four_distances = {};
+			local smallest_four_x = {};
+			local smallest_four_z = {};
+			local player_x = Game.getXPosition();
+			local player_z = Game.getZPosition();
 			for p = 0, 15 do
 				local podium_x = mainmemory.read_u16_be(podiums + (10 * p) + 0);
 				local podium_z = mainmemory.read_u16_be(podiums + (10 * p) + 4);
@@ -7590,11 +7591,11 @@ function MJ_get_corner_distance()
 				table.insert(smallest_four_x, podium_x);
 				table.insert(smallest_four_z, podium_z);
 			end
-			ref_x = {};
-			ref_z = {};
+			local ref_x = {};
+			local ref_z = {};
 			for t = 1, 4 do
-				index = -1;
-				current_min = 9999999;
+				local index = -1;
+				local current_min = 9999999;
 				for r = 1, #smallest_four_distances do
 					if smallest_four_distances[r] < current_min then
 						current_min = smallest_four_distances[r];
@@ -7605,8 +7606,8 @@ function MJ_get_corner_distance()
 				table.insert(ref_z, smallest_four_z[index]);
 				smallest_four_distances[index] = 10000000;
 			end
-			x_coord = 0;
-			z_coord = 0;
+			local x_coord = 0;
+			local z_coord = 0;
 			for t = 1, 4 do
 				if #ref_x == 4 then
 					if ref_x[t] ~= ref_x[1] then
@@ -7617,8 +7618,8 @@ function MJ_get_corner_distance()
 					end
 				end
 			end
-			cross_dx = player_x - x_coord;
-			cross_dz = player_z - z_coord;
+			local cross_dx = player_x - x_coord;
+			local cross_dz = player_z - z_coord;
 			return math.sqrt((cross_dx ^ 2) + (cross_dz ^ 2));
 		end
 	end
@@ -7769,7 +7770,7 @@ function Game.drawMJMinimap()
 			gui.drawText(MJ_minimap_text_x, MJ_time_until_next_action_y, time_until_next_action.." ticks until next "..action_type);
 		else
 			gui.drawText(MJ_minimap_text_x, MJ_minimap_phase_number_y, "Phase "..phase);
-			gui.drawText(MJ_minimap_text_x, MJ_time_until_next_action_y, "Distance to next boundary intersection: "..distance_to_intersection)
+			gui.drawText(MJ_minimap_text_x, MJ_time_until_next_action_y, "Nearest intersection: "..distance_to_intersection)
 		end
 	end
 end
@@ -10221,8 +10222,8 @@ function Game.calculateCycleCount(input,output)
 	if input == output then
 		return 0
 	end
-	count = "?";
-	new_rng = input;
+	local count = "?";
+	local new_rng = input;
 	for i = 1, 256 do
 		if count == "?" then
 			new_rng = Game.CycleRNG(new_rng);
@@ -10235,19 +10236,19 @@ function Game.calculateCycleCount(input,output)
 end
 
 function Game.RNGLoop()
-	is_lagged = emu.islagged();
-	if old_rng_loop == null then
+	local is_lagged = emu.islagged();
+	if old_rng_loop == nil then
 		old_rng_loop = 0;
 		last_frame_ran = -1; -- OSD runs on real time, this is on a per frame basis. Check makes sure it's only run once per frame
 	end
-	current_frame = emu.framecount();
+	local current_frame = emu.framecount();
 	if not is_lagged and last_frame_ran ~= current_frame then
 		new_rng_loop = mainmemory.read_u32_be(Game.Memory.RNG);
-		cycle_count = Game.calculateCycleCount(old_rng_loop,new_rng_loop);
+		cycle_count = Game.calculateCycleCount(old_rng_loop, new_rng_loop);
 		old_rng_loop = new_rng_loop;
 	end
 	last_frame_ran = emu.framecount();
-	return cycle_count
+	return cycle_count;
 end
 
 function resetRNGCache()
