@@ -1085,6 +1085,41 @@ local heap = {
 	prev_free_block = -0x04, -- Pointer
 };
 
+function Game.getHeapStart()
+	return dereferencePointer(Game.Memory.heap_pointer);
+end
+
+function Game.getHeapEnd()
+	return Game.Memory.heap_end;
+end
+
+function Game.getFirstHeapBlock()
+	return Game.getHeapEnd();
+end
+
+function Game.getNextHeapBlock(blockHeader)
+	return dereferencePointer(blockHeader + 0);
+end
+
+function Game.getHeapBlockSize(blockHeader)
+	return mainmemory.read_u32_be(blockHeader + 0x04);
+end
+
+function Game.isHeapBlockFree(blockHeader)
+	local nextFree = mainmemory.read_u32_be(blockHeader + 0x08);
+	local prevFree = mainmemory.read_u32_be(blockHeader + 0x0C);
+	return prevFree ~= 0 or nextFree ~= 0;
+end
+
+function Game.getHeapHeaderSize()
+	return 0x10;
+end
+
+function Game.getHeapBlockDescription(blockHeader)
+	-- TODO: Implement, leverage identifyMemory() somehow
+	return "Unknown";
+end
+
 -- Theoretical max is 255 actors, but the game crashes well before that limit
 local function getObjectModel1Count()
 	return math.min(255, mainmemory.read_u16_be(Game.Memory.actor_count));
@@ -2455,7 +2490,7 @@ local function getExamineDataModelOne(pointer)
 		table.insert(examine_data, { "Shockwave Charge Timer", mainmemory.read_s16_be(pointer + obj_model1.player.shockwave_charge_timer) });
 		table.insert(examine_data, { "Shockwave Recovery Timer", mainmemory.readbyte(pointer + obj_model1.player.shockwave_recovery_timer) });
 		table.insert(examine_data, { "Separator", 1 });
-		
+
 		table.insert(examine_data, { "Invulnerability Timer", mainmemory.readbyte(pointer + obj_model1.player.invulnerability_timer) });
 		table.insert(examine_data, { "Separator", 1 });
 
@@ -4194,8 +4229,8 @@ function getExamineDataActorSpawners(pointer)
 	local spawnerActorType = mainmemory.read_u16_be(pointer + actorSpawnerAttributes.actor_type) + mapObjectSetup_objM1_offset;
 	local spawnerActorName = getActorNameFromBehavior(spawnerActorType);
 	local spawnerTiedActor = dereferencePointer(pointer + actorSpawnerAttributes.tied_actor);
-	
-	local balloons = {91,111,112,113,114,147};
+
+	local balloons = {91, 111, 112, 113, 114, 147};
 	local isBalloon = false;
 	for i = 1, #balloons do
 		if spawnerActorType == balloons[i] then
@@ -4894,7 +4929,7 @@ function Game.detectVersion(romName, romHash)
 			[0x60] = "Damaged", -- Exploding TNT Barrels
 			[0x61] = "Instrument",
 			-- [0x62] = "Unknown 0x62", -- Weird body morphing: https://www.youtube.com/watch?v=d6IT4ft7o3U
-			
+
 			[0x64] = "Learning Gun",
 			[0x65] = "Locked",
 
@@ -8805,7 +8840,7 @@ function Game.zipToSelectedObject()
 			elseif string.contains(grab_script_mode, "Map Object Setup") then
 				desiredX = mainmemory.readfloat(selectedObject + mapObjectSetup_attributes.objM1.x_pos,true); -- TODO: Stop using magic numbers for this
 				desiredY = mainmemory.readfloat(selectedObject + mapObjectSetup_attributes.objM1.y_pos,true);
-				desiredZ = mainmemory.readfloat(selectedObject + mapObjectSetup_attributes.objM1.z_pos,true);	
+				desiredZ = mainmemory.readfloat(selectedObject + mapObjectSetup_attributes.objM1.z_pos,true);
 			end
 		end
 
@@ -10041,14 +10076,6 @@ function Game.drawUI()
 	--forms.settext(ScriptHawk.UI.form_controls["Moon Mode Button"], moon_mode);
 	drawGrabScriptUI();
 
-	if ScriptHawk.UI:ischecked("Heap Visualizer") then
-		Game.drawHeap();
-		gui.DrawNew("emu");
-	else
-		--gui.DrawNew("native"); -- Clear off any old heap visualization stuff from the screen
-		--gui.DrawNew("emu");
-	end
-
 	-- Mad Jack
 	Game.drawMJMinimap();
 
@@ -10226,7 +10253,6 @@ end
 function resetRNGCache()
 	old_rng_loop = mainmemory.read_u32_be(Game.Memory.RNG);
 end
-
 
 function Game.realTime()
 	-- Lock RNG at constant value
@@ -12253,72 +12279,6 @@ function calculateKnownMemory(dumpBitmap)
 		output_file:close();
 	end
 	print(formatOutputString("Bytes Known: ", knownBytes, RDRAMSize));
-end
-
--- DK64 Heap Visualizer
--- Originally written by MrCheeze
--- Cleanups, Fixes, & Optimizations by Isotarge
-UPDATE_EVERY_N_FRAMES = 1;
-
-function Game.drawHeap()
-	if emu.framecount() % UPDATE_EVERY_N_FRAMES == 0 or client.ispaused() then
-		gui.DrawNew("native"); -- Coordinates are now based on screen pixels rather than game pixels, and stuff is not erased automatically each frame.
-
-		local dynamic_memory_start = dereferencePointer(Game.Memory.heap_pointer);
-		local dynamic_memory_end = Game.Memory.heap_end;
-		local dynamic_memory_len = dynamic_memory_end - dynamic_memory_start;
-
-		local addr = dynamic_memory_end;
-		local screenwidth = client.screenwidth();
-
-		gui.drawBox(0, 0, screenwidth, 50, 0x40000000, colors.green);
-
-		local used_memory = 0;
-		local free_memory = 0;
-		local used_count = 0;
-		local free_count = 0;
-
-		local dump_block_list = ScriptHawk.UI:ischecked("Heap Visualizer Dump Blocks");
-		local free_only = ScriptHawk.UI:ischecked("Heap Visualizer Free Only");
-
-		local next_addr, blocksize, block_end, next_free, prev_free, in_use, bgcolor;
-
-		while addr >= dynamic_memory_start and addr <= dynamic_memory_end do
-			next_addr = mainmemory.read_u32_be(addr);
-			blocksize = mainmemory.read_u32_be(addr + 0x04) + 0x10; -- Extra 0x10 bytes for the header
-			block_end = addr + blocksize;
-			next_free = mainmemory.read_u32_be(addr + 0x08);
-			prev_free = mainmemory.read_u32_be(addr + 0x0C);
-			in_use = next_free == 0 and prev_free == 0;
-
-			if in_use then
-				used_memory = used_memory + blocksize;
-				used_count = used_count + 1;
-				bgcolor = colors.green;
-			else
-				free_memory = free_memory + blocksize;
-				free_count = free_count + 1;
-				bgcolor = colors.red;
-			end
-
-			if (not free_only) or (free_only and not in_use) then
-				gui.drawBox((addr - dynamic_memory_start) * screenwidth / dynamic_memory_len - 1, 0, (block_end - dynamic_memory_start) * screenwidth / dynamic_memory_len + 1, 50, 0x40000000, bgcolor);
-			end
-
-			if dump_block_list then
-				dprint(string.format("addr:%X next_addr:%X  prev_free:%X next_free:%X  used:%s blocksize:%X", addr, next_addr, prev_free, next_free, tostring(in_use), blocksize - 0x10));
-			end
-
-			addr = next_addr - 0x80000000;
-		end
-
-		gui.drawText(24, 50, string.format("Used Memory: %X (%d blocks)", used_memory, used_count));
-		gui.drawText(24, 65, string.format("Free Memory: %X (%d blocks)", free_memory, free_count));
-
-		if dump_block_list then
-			print_deferred();
-		end
-	end
 end
 
 return Game;

@@ -460,6 +460,7 @@ Game = {
 		player_pointer_index = {0x13A25F, 0x13A4EF, 0x12F6AF, 0x1354DF},
 		global_flag_base = {0x131500, 0x131790, 0x126950, 0x12C780},
 		camera_pointer_pointer = {0x12C478, 0x12C688, 0x1218D8, 0x127728},
+		cutscene_camera_path_pointer = {nil, nil, nil, 0x7C050}, -- TODO: Other versions, test more extensively (only tested one cutscene atm)
 		flag_block_pointer = {0x1314F0, 0x131780, 0x126940, 0x12C770},
 		air = {0x12FDC0, 0x12FFD0, 0x125220, 0x12B050},
 		frame_timer = {0x083550, 0x083550, 0x0788F8, 0x079138},
@@ -496,7 +497,7 @@ Game = {
 	speedy_index = 7,
 	rot_speed = 10,
 	max_rot_units = 360,
-	form_height = 15,
+	form_height = 16,
 	character_states = {
 		-- 0 Occurs during game boot-up
 		[1] = "Banjo-Kazooie", -- Doesn't matter if you're Dragon Kazooie
@@ -6211,7 +6212,6 @@ function everythingIs(modelIndex)
 	end
 end
 
-
 local function getExamineDataModelOne(pointer)
 	local examine_data = {};
 	if not isRDRAM(pointer) then
@@ -6400,7 +6400,7 @@ function getExamineDataModelTwo(pointer)
 	local xPos = mainmemory.read_s16_be(pointer + object_model2.object.x_position);
 	local yPos = mainmemory.read_s16_be(pointer + object_model2.object.y_position);
 	local zPos = mainmemory.read_s16_be(pointer + object_model2.object.z_position);
-	
+
 	local playerX = Game.getXPosition();
 	local playerY = Game.getYPosition();
 	local playerZ = Game.getZPosition();
@@ -6613,8 +6613,6 @@ function Game.drawUI()
 	drawObjectAnalysisUI();
 end
 
-
-
 -- Keybinds
 -- For full list go here http://slimdx.org/docs/html/T_SlimDX_DirectInput_Key.htm
 ScriptHawk.bindKeyRealtime("Z", zipToSelectedObject, true);
@@ -6815,21 +6813,27 @@ function Game.toggleDragonKazooie()
 	toggleFlagByName("Ability: Dragon Kazooie");
 end
 
-Game.heapHeaderSize = 0x10;
+function Game.getHeapHeaderSize()
+	return 0x10;
+end
 
-function Game.getHeapBase()
+function Game.getHeapStart()
 	--return dereferencePointer(Game.Memory.heap_pointer);
 	return Game.Memory.linked_list_root;
 end
 
+function Game.getHeapEnd()
+	return 0x400000; -- TODO: How is this actually calculated?
+end
+
 -- TODO: Speed this up by caching free blocks
-function Game.isHeapBlockFree(blockAddress)
+function Game.isHeapBlockFree(blockHeader)
 	local freeBlock = dereferencePointer(Game.Memory.heap_pointer);
 	if isRDRAM(freeBlock) then
 		local count = 0;
 		repeat
 			freeBlock = dereferencePointer(freeBlock + 0x14);
-			if freeBlock == blockAddress then
+			if freeBlock == blockHeader then
 				return true;
 			end
 			count = count + 1;
@@ -6838,15 +6842,13 @@ function Game.isHeapBlockFree(blockAddress)
 	return false;
 end
 
-function Game.getPreviousHeapBlock(blockAddress)
-	if isRDRAM(blockAddress) then
-		return dereferencePointer(blockAddress + 0);
-	end
+function Game.getFirstHeapBlock()
+	return Game.getHeapStart();
 end
 
-function Game.getNextHeapBlock(blockAddress)
-	if isRDRAM(blockAddress) then
-		local nextBlock = dereferencePointer(blockAddress + 4);
+function Game.getNextHeapBlock(blockHeader)
+	if isRDRAM(blockHeader) then
+		local nextBlock = dereferencePointer(blockHeader + 4);
 		if isRDRAM(nextBlock) and nextBlock < 0x400000 then
 			return nextBlock;
 		end
@@ -6856,7 +6858,7 @@ end
 function Game.getHeapBlockSize(blockAddress)
 	local nextBlock = Game.getNextHeapBlock(blockAddress);
 	if isRDRAM(blockAddress) and isRDRAM(nextBlock) then
-		return nextBlock - blockAddress - Game.heapHeaderSize;
+		return nextBlock - blockAddress - Game.getHeapHeaderSize(blockAddress);
 	end
 	return 0;
 end
@@ -6895,7 +6897,7 @@ end
 function traverseHeap(minimumPrintSize, maximumPrintSize)
 	minimumPrintSize = minimumPrintSize or -math.huge;
 	maximumPrintSize = maximumPrintSize or math.huge;
-	local heapBase = Game.getHeapBase();
+	local heapBase = Game.getHeapStart();
 	if isRDRAM(heapBase) then
 		local count = 0;
 		local size = 0;
@@ -6905,14 +6907,16 @@ function traverseHeap(minimumPrintSize, maximumPrintSize)
 			size = Game.getHeapBlockSize(object);
 			if size >= minimumPrintSize and size <= maximumPrintSize then
 				local isFree = Game.isHeapBlockFree(object);
+				--local prefix = count..": "..toHexString(object + Game.getHeapHeaderSize(), 6, "").." Size: "..toHexString(size);
+				local prefix = toHexString(object + Game.getHeapHeaderSize(), 6, "").." Size: "..toHexString(size);
 				if isFree then
-					dprint(count..": "..toHexString(object + Game.heapHeaderSize, 6, "").." Size: "..toHexString(size).." FREE");
+					dprint(prefix.." FREE");
 				else
-					local description = Game.getHeapBlockDescription(object + Game.heapHeaderSize);
+					local description = Game.getHeapBlockDescription(object + Game.getHeapHeaderSize());
 					if description ~= "Unknown" then
-						dprint(count..": "..toHexString(object + Game.heapHeaderSize, 6, "").." Size: "..toHexString(size).." "..description);
+						dprint(prefix.." "..description);
 					else
-						dprint(count..": "..toHexString(object + Game.heapHeaderSize, 6, "").." Size: "..toHexString(size));
+						dprint(prefix);
 					end
 				end
 			end
@@ -6977,6 +6981,11 @@ function Game.initUI()
 
 	ScriptHawk.UI.form_controls["Analysis Filter Label"] = forms.label(ScriptHawk.UI.options_form, "Filter:", ScriptHawk.UI:col(0) + ScriptHawk.UI.dropdown_offset, ScriptHawk.UI:row(12) + ScriptHawk.UI.dropdown_offset, ScriptHawk.UI:col(1) + 15, ScriptHawk.UI.button_height);
 	ScriptHawk.UI.form_controls["Analysis Filter Textbox"] = forms.textbox(ScriptHawk.UI.options_form, nil, ScriptHawk.UI:col(5), ScriptHawk.UI.button_height, nil, ScriptHawk.UI:col(2) + 4, ScriptHawk.UI:row(12));
+
+	-- Heap Visualizer
+	ScriptHawk.UI:checkbox(0, 13, "Heap Visualizer", "Heap Visualizer");
+	ScriptHawk.UI:checkbox(5, 13, "Heap Visualizer Free Only", "Free Only");
+	ScriptHawk.UI:checkbox(10, 13, "Heap Visualizer Dump Blocks", "Dump Blocks");
 
 	flagStats();
 end

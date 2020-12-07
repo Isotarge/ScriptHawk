@@ -497,7 +497,7 @@ local supportedGames = {
 
 	--Klonoa: Empire of Dreams
 	["A0A298D9DBA1BA15D04A42FC2EB35893D1A9569B"] = {moduleName="games.GBA_klonoa", friendlyName="Klonoa - Empire of Dreams (USA)"},
-	
+
 	-- Land of Illusion
 	["07FAC1D61BC20CF6EB298F66EC2FFE49"] = {moduleName="games.land_of_illusion", friendlyName="Land of Illusion Starring Mickey Mouse (E)"},
 
@@ -2017,6 +2017,7 @@ local function plot_pos()
 		ScriptHawk.UI:updateReadouts();
 		ScriptHawk.modifyOSDUI:updateReadouts();
 		ScriptHawk.drawHitboxes();
+		ScriptHawk.drawHeap();
 		Game.drawUI();
 	end
 end
@@ -2330,6 +2331,81 @@ function ScriptHawk.drawHitboxes()
 	end
 end
 
+-- Heap Visualizer
+-- Originally written by MrCheeze
+-- Cleanups, Fixes, & Optimizations by Isotarge
+ScriptHawk.heapDrawFrameInterval = 1;
+
+function ScriptHawk.drawHeap()
+	if not ScriptHawk.UI:ischecked("Heap Visualizer") then
+		return;
+	end
+
+	if current_frame % ScriptHawk.heapDrawFrameInterval == 0 then
+		gui.DrawNew("native"); -- Coordinates are now based on screen pixels rather than game pixels, and stuff is not erased automatically each frame.
+
+		local dynamic_memory_start = Game.getHeapStart();
+		local dynamic_memory_end = Game.getHeapEnd();
+		local dynamic_memory_len = dynamic_memory_end - dynamic_memory_start;
+		local blockHeaderSize = Game.getHeapHeaderSize();
+
+		local addr = Game.getFirstHeapBlock();
+		local screenwidth = client.screenwidth();
+
+		gui.drawBox(0, 0, screenwidth, 50, 0x40000000, colors.green);
+
+		local used_memory = 0;
+		local free_memory = 0;
+		local used_count = 0;
+		local free_count = 0;
+
+		local dump_block_list = ScriptHawk.UI:ischecked("Heap Visualizer Dump Blocks");
+		local free_only = ScriptHawk.UI:ischecked("Heap Visualizer Free Only");
+
+		local next_addr, blocksize, block_end, in_use, bgcolor;
+		local drawStartX = 0;
+		local drawEndX = 0;
+
+		while isRDRAM(addr) and addr >= dynamic_memory_start and addr <= dynamic_memory_end do
+			next_addr = Game.getNextHeapBlock(addr);
+			blocksize = Game.getHeapBlockSize(addr);
+			block_end = addr + blocksize;
+			in_use = not Game.isHeapBlockFree(addr);
+
+			if in_use then
+				used_memory = used_memory + blocksize;
+				used_count = used_count + 1;
+				bgcolor = colors.green;
+			else
+				free_memory = free_memory + blocksize;
+				free_count = free_count + 1;
+				bgcolor = colors.red;
+			end
+
+			if (not free_only) or (free_only and not in_use) then
+				drawStartX = (addr - dynamic_memory_start) * screenwidth / dynamic_memory_len - 1;
+				drawEndX = (block_end - dynamic_memory_start) * screenwidth / dynamic_memory_len + 1;
+				gui.drawBox(drawStartX, 0, drawEndX, 50, 0x40000000, bgcolor);
+			end
+
+			if dump_block_list then
+				dprint(string.format("addr:%X next_addr:%X  used:%s blocksize:%X", addr, next_addr or 0, tostring(in_use), blocksize - blockHeaderSize));
+			end
+
+			addr = next_addr;
+		end
+
+		gui.drawText(24, 50, string.format("Used Memory: %X (%d blocks)", used_memory, used_count));
+		gui.drawText(24, 65, string.format("Free Memory: %X (%d blocks)", free_memory, free_count));
+
+		if dump_block_list then
+			print_deferred();
+		end
+
+		gui.DrawNew("emu"); -- Reset to regular draw context
+	end
+end
+
 if not TASSafe then
 	while true do
 		if client.ispaused() then
@@ -2338,6 +2414,7 @@ if not TASSafe then
 			ScriptHawk.UI:updateReadouts();
 			ScriptHawk.modifyOSDUI:updateReadouts();
 			ScriptHawk.drawHitboxes();
+			ScriptHawk.drawHeap();
 			Game.drawUI();
 		end
 		ScriptHawk.processKeybinds(ScriptHawk.keybindsRealtime);
