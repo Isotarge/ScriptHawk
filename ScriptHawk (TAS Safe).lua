@@ -58,6 +58,7 @@ if result == true then
 			ScriptHawk.UI:updateReadouts();
 			ScriptHawk.modifyOSDUI:updateReadouts();
 			ScriptHawk.drawHitboxes();
+			ScriptHawk.drawHeap();
 			Game.drawUI();
 		end
 		ScriptHawk.processKeybinds(ScriptHawk.keybindsRealtime);
