@@ -448,6 +448,7 @@ Game = {
 	},
 	Memory = { -- Version order: Australia, Europe, Japan, USA
 		heap_pointer = {nil, nil, nil, 0x7E990}, -- Might be pointer to tiny heap block that describes free memory on heap -- TODO: Other versions
+		loaded_dll_array = {nil, nil, nil, 0x126738},
 		consumable_base = {0x11FFB0, 0x120170, 0x115340, 0x11B080},
 		consumable_pointer = {0x12FFC0, 0x1301D0, 0x125420, 0x12B250},
 		object_array_pointer = {0x13BBD0, 0x13BE60, 0x131020, 0x136EE0},
@@ -461,10 +462,7 @@ Game = {
 		frame_timer = {0x083550, 0x083550, 0x0788F8, 0x079138},
 		linked_list_root = {0x13C380, 0x13C680, 0x131850, 0x137800}, -- Heap
 		map = {0x137B42, 0x137DD2, 0x12CF92, 0x132DC2},
-		map_model_pointer = {0x12D30C, 0x12D51C, 0x12276C, 0x1285BC},
-		--map_model_pointer = {0x1301D8, 0x130468, 0x125628, 0x12B458},
-		water_model_pointer = {0x1301DC, 0x13046C, 0x12562C, 0x12B45C},
-		--map_model_pointer = {0x1306B0, 0x13091C, 0x125B30, 0x12B960},
+		gcmap = {nil, nil, nil, 0x1285B0}, -- See gcmap_models
 		map_trigger_target = {0x12C390, 0x12C5A0, 0x1217F0, 0x127640},
 		map_trigger = {0x12C392, 0x12C5A2, 0x1217F2, 0x127642},
 		map_destination = {0x044E32, 0x044E32, 0x044EB2, 0x045702},
@@ -472,6 +470,8 @@ Game = {
 		character_state = {0x13BC53, 0x13BEE3, 0x1310A3, 0x136F63},
 		character_change = {0x12BD9C, 0x12BFAC, 0x1211FC, 0x12704C},
 		iconAddress = {0x11FF95, 0x120155, 0x115325, 0x11B065},
+		text_buffer_pointer = {nil, nil, nil, 0x1289D0}, -- TODO: Other versions
+		text_script_pointer = {nil, nil, nil, 0x127600}, -- TODO: Other versions
 		animation_pointer = {0x13BB60, 0x13BDF0, 0x130FB0, 0x136E70},
 		healthAddresses = {
 			[0x01] = {0x120584, 0x120794, 0x115A04, 0x11B644}, -- BK
@@ -2578,8 +2578,9 @@ end
 function dumpPointerListStrings()
 	local object;
 	local index = 0;
+	local found = false;
 	repeat
-		object = dereferencePointer(0x126738 + index * 4);
+		object = dereferencePointer(Game.Memory.loaded_dll_array + index * 4);
 		if isRDRAM(object) then
 			local string, checkPointer;
 			local checkPointerOffset = 0x3C;
@@ -2589,10 +2590,14 @@ function dumpPointerListStrings()
 			until not isRDRAM(checkPointer);
 			string = readNullTerminatedString(object + checkPointerOffset);
 
-			print(index.." "..toHexString(object)..": "..string); -- TODO: dprint
+			dprint(index.." "..toHexString(object)..": "..string);
+			found = true;
 		end
 		index = index + 1;
 	until not isRDRAM(object);
+	if found then
+		print_deferred();
+	end
 end
 
 -----------
@@ -6829,6 +6834,9 @@ function Game.getHeapBlockDescription(blockAddress)
 	if blockAddress == Game.getCameraObject() then
 		return "Camera";
 	end
+	if blockAddress == dereferencePointer(Game.Memory.cutscene_camera_path_pointer) then
+		return "Cutscene Camera Path?";
+	end
 	if blockAddress == dereferencePointer(Game.Memory.consumable_pointer) then
 		return "Consumables Block";
 	end
@@ -6841,16 +6849,87 @@ function Game.getHeapBlockDescription(blockAddress)
 	if blockAddress == dereferencePointer(Game.Memory.animation_pointer) then
 		return "Object Model 1 Animation State";
 	end
+	if blockAddress == dereferencePointer(Game.Memory.text_buffer_pointer) then
+		return "Text Buffer";
+	end
+	if blockAddress == dereferencePointer(Game.Memory.text_script_pointer) then
+		return "Text Script";
+	end
 	if blockAddress == dereferencePointer(Game.Memory.object_model2_array_pointer) then
 		return "Object Model 2 Array";
 	end
-	if blockAddress == dereferencePointer(Game.Memory.map_model_pointer) then
-		return "Map Model (Main)";
-	end
-	if blockAddress == dereferencePointer(Game.Memory.water_model_pointer) then
-		return "Map Model (Water)";
+	-- Check whether it's a DLL
+	local dllPointer;
+	local offset = 0;
+	repeat
+		dllPointer = dereferencePointer(Game.Memory.loaded_dll_array + offset);
+		offset = offset + 4;
+		if blockAddress == dllPointer then
+			local checkPointerOffset = 0x3C;
+			repeat
+				checkPointerOffset = checkPointerOffset + 4;
+				checkPointer = dereferencePointer(blockAddress + checkPointerOffset);
+			until not isRDRAM(checkPointer);
+			return readNullTerminatedString(blockAddress + checkPointerOffset).." (DLL)";
+		end
+	until not isRDRAM(dllPointer);
+	-- Check whether it's part of the gcmap struct
+	local gcmap = readGCMapStruct();
+	for k, v in pairs(gcmap) do
+		for k_, v_ in pairs(v) do
+			if blockAddress == v_ then
+				return "gcmap."..k.."."..k_;
+			end
+		end
 	end
 	return "Unknown";
+end
+
+local heapCache = {};
+function checkHeapDiff()
+	local heapBase = Game.getHeapStart();
+	if isRDRAM(heapBase) then
+		local current_frame = emu.framecount();
+
+		local newHeap = {};
+		local count = 0;
+		local object = heapBase;
+
+		-- Build heap cache and check for malloc()s
+		repeat
+			count = count + 1;
+			newHeap[object] = {
+				count = count,
+				size = Game.getHeapBlockSize(object),
+				--isFree = Game.isHeapBlockFree(object),
+				--description = Game.getHeapBlockDescription(object + 0x10),
+			};
+			if heapCache[object] == nil then
+				--dprint("malloc("..toHexString(newHeap[object].size)..") = "..toHexString(object));
+				local isFree = Game.isHeapBlockFree(object);
+				if (not isFree) then
+					local description = Game.getHeapBlockDescription(object + 0x10);
+					--dprint("frame "..current_frame.." malloc at address: "..toHexString(object).." size: "..toHexString(newHeap[object].size).." description: "..newHeap[object].description);
+					dprint("frame "..current_frame.." malloc at address: "..toHexString(object).." size: "..toHexString(newHeap[object].size).." description: "..description);	
+				end
+
+			end
+			object = Game.getNextHeapBlock(object);
+		until not isRDRAM(object);
+
+		-- Check for free()s since last frame
+		--[[
+		for object, v in pairs(heapCache) do
+			if newHeap[object] == nil then
+				--dprint("free("..toHexString(object)..") (size: "..toHexString(v.size)..")");
+				dprint("frame "..current_frame.." free   at address: "..toHexString(object).." size: "..toHexString(v.size).." description: "..v.description);
+			end
+		end
+		--]]
+
+		heapCache = newHeap;
+		print_deferred();
+	end
 end
 
 function traverseHeap(minimumPrintSize, maximumPrintSize)
@@ -6883,8 +6962,67 @@ function traverseHeap(minimumPrintSize, maximumPrintSize)
 		until not isRDRAM(object);
 		print_deferred();
 	else
-		print("Invalid heap pointer... Hmm...");
+		print("Error: Couldn't find heap");
 	end
+end
+
+------------------
+-- gcmap_models --
+------------------
+
+local gcmap_models = {
+	modelHeader_struct = { -- size 72
+		magic = 0x00, -- int
+		flags = 0x0A, -- ushort (bitfield?)
+		vertexOffset = 0x10, -- uint
+		boneOffset = 0x18, -- uint
+		vertexBoneMapOffset = 0x28, -- uint
+		morphDataOffset = 0x40, -- uint
+	},
+	mapData_struct = { -- size 92
+		mapID = 0x00, -- short
+		opaModelID = 0x02, -- short
+		xluModelID = 0x04, -- short
+		switchCount = 0x30, -- int
+		switchValues = 0x34, -- int[10]
+	},
+	mapModel_opaque = 0x00, -- mapModel_struct
+	mapModel_translucent = 0x2C, -- mapModel_struct
+	mapData_data = 0x58, -- mapData_struct
+};
+
+-- TODO: Use some metatable nonsense to make this lazy loading (don't read all addresses at once)
+function readMapModel_struct(base)
+	return { -- size 44 (0x2C)
+		collision = dereferencePointer(base + 0x00), -- pointer
+		effectBuffer = dereferencePointer(base + 0x04), -- pointer
+		model = dereferencePointer(base + 0x0C), -- pointer to modelHeader_struct -- TODO: read the mapModel.struct
+		vertexBuffers = { -- pointer[2]
+			[0] = dereferencePointer(base + 0x10),
+			[1] = dereferencePointer(base + 0x14),
+		},
+		textureBuffer = dereferencePointer(base + 0x20), -- pointer
+		vertexBufferIndex = mainmemory.readbyte(base + 0x29), -- byte
+		hasCollision = not (mainmemory.readbyte(base + 0x2A) == 0), -- byte (bool)
+	};
+end
+
+function readGCMapStruct()
+	return {
+		opaque = readMapModel_struct(Game.Memory.gcmap + gcmap_models.mapModel_opaque);
+		translucent = readMapModel_struct(Game.Memory.gcmap + gcmap_models.mapModel_translucent);
+		data = {}, -- TODO: read mapData struct
+	};
+end
+
+function Game.getVertBase()
+	local gcmap = readGCMapStruct();
+	return gcmap.opaque.vertexBuffers[gcmap.opaque.vertexBufferIndex];
+end
+
+function Game.getWaterVertBase()
+	local gcmap = readGCMapStruct();
+	return gcmap.translucent.vertexBuffers[gcmap.translucent.vertexBufferIndex];
 end
 
 function Game.initUI()
@@ -6952,6 +7090,7 @@ function Game.onLoadState()
 end
 
 function Game.eachFrame()
+	--checkHeapDiff();
 	seamTester.simulate();
 	if ScriptHawk.UI:ischecked("toggle_neverslip") then
 		Game.neverSlip();

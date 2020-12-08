@@ -17,28 +17,6 @@ function Game.getPredictedYPosition(num)
 	return math.max(yPos, Game.getFloor());
 end
 
-function Game.getVertsFromModel(modelPointer)
-	local vertOffset = mainmemory.read_u32_be(modelPointer + 0x10);
-	local vertBase = modelPointer + vertOffset + 0x18;
-	if isRDRAM(vertBase) then
-		return vertBase;
-	end
-end
-
-function Game.getVertBase()
-	local mapModel = dereferencePointer(Game.Memory.map_model_pointer);
-	if isRDRAM(mapModel) then
-		return Game.getVertsFromModel(mapModel);
-	end
-end
-
-function Game.getWaterVertBase()
-	local mapModel = dereferencePointer(Game.Memory.water_model_pointer);
-	if isRDRAM(mapModel) then
-		return Game.getVertsFromModel(mapModel);
-	end
-end
-
 function Game.getSeamDist()
 	local verts = {};
 	if Game.isInWater() and not ScriptHawk.UI:ischecked("never_test_water") then
