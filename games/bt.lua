@@ -449,6 +449,8 @@ Game = {
 	Memory = { -- Version order: Australia, Europe, Japan, USA
 		heap_size = {0x86310, 0x86310, 0x7C6B0, 0x7BF00}, -- u32_be
 		heap_pointer = {nil, nil, nil, 0x7E990}, -- Might be pointer to tiny heap block that describes free memory on heap -- TODO: Other versions
+		unknown_pointer_list = {nil, nil, nil, 0x7BF18}, -- Pairs of pointer + u32_be (tag?), one of them is a camera path pointer when CS is playing
+		unknown_pointer_list_count = {123, 123, 123, 123}, -- Just eyeballing it for now, number of pairs
 		loaded_dll_array = {0x12B488, 0x12B698, 0x1208E8, 0x126738},
 		consumable_base = {0x11FFB0, 0x120170, 0x115340, 0x11B080},
 		consumable_pointer = {0x12FFC0, 0x1301D0, 0x125420, 0x12B250},
@@ -458,7 +460,6 @@ Game = {
 		global_flag_base = {0x131500, 0x131790, 0x126950, 0x12C780},
 		camera_pointer_pointer = {0x12C478, 0x12C688, 0x1218D8, 0x127728},
 		cutscene_bar_state = {nil, nil, nil, 0x12A9A0}, -- u32_be -- TODO: Other versions
-		cutscene_camera_path_pointer = {nil, nil, nil, 0x7C050}, -- TODO: Other versions TODO: More research, so far this only has been observed to work on the first CS in SM that shows Klungo entering the cave
 		flag_block_pointer = {0x1314F0, 0x131780, 0x126940, 0x12C770},
 		air = {0x12FDC0, 0x12FFD0, 0x125220, 0x12B050},
 		frame_timer = {0x083550, 0x083550, 0x0788F8, 0x079138},
@@ -1203,12 +1204,24 @@ function Game.setCameraZPosition(value)
 	end
 end
 
--- TODO: This doesn't work for all cutscenes, might be more complicated
+-- TODO: More reliable heuristic for this
 function Game.getCameraPathTimer()
-	local cameraPathObject = dereferencePointer(Game.Memory.cutscene_camera_path_pointer);
-	if isRDRAM(cameraPathObject) then
-		return mainmemory.readfloat(cameraPathObject + 0x58, true);
+	local heapHeaderSize = Game.getHeapHeaderSize();
+	for index = 0, Game.Memory.unknown_pointer_list_count do
+		local unknownPointer = dereferencePointer(Game.Memory.unknown_pointer_list + index * 4 * 2);
+		if isRDRAM(unknownPointer) then
+			local blockSize = Game.getHeapBlockSize(unknownPointer - heapHeaderSize);
+			--print(index..": "..toHexString(unknownPointer).." size: "..toHexString(blockSize));
+			if blockSize == 0x190 then
+				local timerValue = mainmemory.readfloat(unknownPointer + 0x58, true);
+				if timerValue > 0 then
+					--print("Found!");
+					return timerValue;
+				end
+			end
+		end
 	end
+	--print("not found :(");
 	return 0;
 end
 
@@ -6846,9 +6859,6 @@ function Game.getHeapBlockDescription(blockAddress)
 	if blockAddress == Game.getCameraObject() then
 		return "Camera";
 	end
-	if blockAddress == dereferencePointer(Game.Memory.cutscene_camera_path_pointer) then
-		return "Cutscene Camera Path?";
-	end
 	if blockAddress == dereferencePointer(Game.Memory.consumable_pointer) then
 		return "Consumables Block";
 	end
@@ -6880,6 +6890,7 @@ function Game.getHeapBlockDescription(blockAddress)
 			-- TODO: Roll name calculation info this function
 			local DLLInfo = readDLLHeader_struct(dllPointer);
 			local checkPointerOffset = 0x38;
+			local checkPointer;
 			repeat
 				checkPointerOffset = checkPointerOffset + 4;
 				checkPointer = dereferencePointer(blockAddress + checkPointerOffset);
@@ -6902,6 +6913,14 @@ function Game.getHeapBlockDescription(blockAddress)
 		local secondCommand = mainmemory.readbyte(blockAddress + 8);
 		if secondCommand == 0xD9 then
 			return "F3DEX2 Display List (Probably)";
+		end
+	end
+	-- Check if it's in the unknown pointer list
+	for index = 0, Game.Memory.unknown_pointer_list_count do
+		local unknownPointer = dereferencePointer(Game.Memory.unknown_pointer_list + index * 4 * 2);
+		if unknownPointer == blockAddress then
+			local tag = mainmemory.read_u32_be(Game.Memory.unknown_pointer_list + (index * 4 * 2) + 4);
+			return "UnknownPointer["..index.."] (tag: "..tag..")";
 		end
 	end
 	return "Unknown";
