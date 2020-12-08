@@ -444,7 +444,6 @@ local function getExamineData(header)
 	local xPos = mainmemory.readfloat(header + object_struct.x_position, true);
 	local yPos = mainmemory.readfloat(header + object_struct.y_position, true);
 	local zPos = mainmemory.readfloat(header + object_struct.z_position, true);
-	local hasPosition = xPos ~= 0 or yPos ~= 0 or zPos ~= 0;
 
 	table.insert(examine_data, { "Object Type", getObjectName(mainmemory.readbyte(header + object_struct.id)); });
 	table.insert(examine_data, { "Separator", 1 });

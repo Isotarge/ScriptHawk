@@ -447,6 +447,7 @@ Game = {
 		"JRL - Sea Bottom",
 	},
 	Memory = { -- Version order: Australia, Europe, Japan, USA
+		heap_size = {0x86310, 0x86310, 0x7C6B0, 0x7BF00}, -- u32_be
 		heap_pointer = {nil, nil, nil, 0x7E990}, -- Might be pointer to tiny heap block that describes free memory on heap -- TODO: Other versions
 		loaded_dll_array = {0x12B488, 0x12B698, 0x1208E8, 0x126738},
 		consumable_base = {0x11FFB0, 0x120170, 0x115340, 0x11B080},
@@ -6238,7 +6239,6 @@ local function getExamineDataModelOne(pointer)
 	local xPos = mainmemory.readfloat(pointer + object_model1.x_position, true);
 	local yPos = mainmemory.readfloat(pointer + object_model1.y_position, true);
 	local zPos = mainmemory.readfloat(pointer + object_model1.z_position, true);
-	local hasPosition = xPos ~= 0 or yPos ~= 0 or zPos ~= 0;
 
 	local playerX = Game.getXPosition();
 	local playerY = Game.getYPosition();
@@ -6337,14 +6337,13 @@ function isLoadingZone(pointer)
 		and bit.check(data_bitfield, object_model2.object.bitfield_values.loading_zone_3)
 		and not bit.check(data_bitfield, object_model2.object.bitfield_values.loading_zone_4)
 		and not bit.check(data_bitfield, object_model2.object.bitfield_values.loading_zone_0) then
-		return true
+		return true;
 	end
-	return false
+	return false;
 end
 
 function formatName(pointer)
-	local isLZ = isLoadingZone(pointer);
-	if isLZ then
+	if isLoadingZone(pointer) then
 		local mapValue = mainmemory.read_u16_be(pointer + object_model2.object.map_index) + 0xA0;
 		local mapName = "Unknown";
 		if Game.maps[mapValue] ~= nil then
@@ -6355,7 +6354,7 @@ function formatName(pointer)
 		local exitIndex = mainmemory.read_u16_be(pointer + object_model2.object.exit_index);
 		return mapName.." ("..exitIndex..")";
 	end
-	return "Unknown"
+	return "Unknown";
 end
 
 function getModelTwoSlotBase(index)
@@ -6422,16 +6421,7 @@ function getExamineDataModelTwo(pointer)
 	local hDist = math.sqrt(((xPos - playerX) ^ 2) + ((zPos - playerZ) ^ 2));
 	local playerDist = math.sqrt(((yPos - playerY) ^ 2) + (hDist ^ 2))
 
-	local hasPosition = xPos ~= 0 or yPos ~= 0 or zPos ~= 0;
 	local data_bitfield = mainmemory.read_u16_be(pointer + object_model2.object.data_bitfield);
-	local isLZ = isLoadingZone(pointer);
-
-	local mapValue = mainmemory.read_u16_be(pointer + object_model2.object.map_index) + 0xA0;
-	if Game.maps[mapValue] ~= nil then
-		mapName = Game.maps[mapValue];
-	else
-		mapName = "Unknown ("..toHexString(mapValue)..")";
-	end
 
 	table.insert(examine_data, { "Object", formatName(pointer) });
 	table.insert(examine_data, { "Address", toHexString(pointer) });
@@ -6447,8 +6437,13 @@ function getExamineDataModelTwo(pointer)
 	table.insert(examine_data, { "Separator", 1 });
 	table.insert(examine_data, { "Data Bitfield", formatBinString(data_bitfield, 16) });
 
-	if isLZ then -- LZ
-		table.insert(examine_data, { "Map", mapName });
+	if isLoadingZone(pointer) then
+		local mapValue = mainmemory.read_u16_be(pointer + object_model2.object.map_index) + 0xA0; -- Note: 0xA0 is the number of maps from BK, indexes still remain in the engine so they need to be skipped
+		if Game.maps[mapValue] ~= nil then
+			table.insert(examine_data, { "Map", Game.maps[mapValue] });
+		else
+			table.insert(examine_data, { "Map", "Unknown ("..toHexString(mapValue)..")" });
+		end
 		table.insert(examine_data, { "Exit", mainmemory.read_u16_be(pointer + object_model2.object.exit_index) });
 		table.insert(examine_data, { "Separator", 1 });
 	end
@@ -6460,7 +6455,7 @@ end
 -- Object Analysis --
 ---------------------
 
-local max_page_size = 40;
+max_page_size = 40;
 
 local function drawObjectAnalysisUI()
 	if script_mode == "Disabled" then
@@ -6797,7 +6792,11 @@ function Game.getHeapStart()
 end
 
 function Game.getHeapEnd()
-	return 0x400000; -- TODO: How is this actually calculated?
+	return Game.getHeapStart() + Game.getHeapSize();
+end
+
+function Game.getHeapSize()
+	return mainmemory.read_u32_be(Game.Memory.heap_size);
 end
 
 -- TODO: Speed this up by caching free blocks
@@ -6878,12 +6877,14 @@ function Game.getHeapBlockDescription(blockAddress)
 		dllPointer = dereferencePointer(Game.Memory.loaded_dll_array + offset);
 		offset = offset + 4;
 		if blockAddress == dllPointer then
+			-- TODO: Roll name calculation info this function
+			local DLLInfo = readDLLHeader_struct(dllPointer);
 			local checkPointerOffset = 0x38;
 			repeat
 				checkPointerOffset = checkPointerOffset + 4;
 				checkPointer = dereferencePointer(blockAddress + checkPointerOffset);
 			until not isRDRAM(checkPointer);
-			return readNullTerminatedString(blockAddress + checkPointerOffset).." (DLL)";
+			return readNullTerminatedString(blockAddress + checkPointerOffset).." (DLL) (numFunctions: "..DLLInfo.numFunctions..")";
 		end
 	until not isRDRAM(dllPointer);
 	-- Check whether it's part of the gcmap struct
@@ -6895,12 +6896,20 @@ function Game.getHeapBlockDescription(blockAddress)
 			end
 		end
 	end
+	-- Use heuristics to determine whether the block is a raw F3DEX2 displaylist
+	local firstCommand = mainmemory.readbyte(blockAddress);
+	if firstCommand == 0xDE then
+		local secondCommand = mainmemory.readbyte(blockAddress + 8);
+		if secondCommand == 0xD9 then
+			return "F3DEX2 Display List (Probably)";
+		end
+	end
 	return "Unknown";
 end
 
 local heapCache = {};
 function checkHeapDiff()
-	local heapBase = Game.getHeapStart();
+	local heapBase = Game.getFirstHeapBlock();
 	if isRDRAM(heapBase) then
 		local current_frame = emu.framecount();
 
@@ -6948,7 +6957,7 @@ end
 function traverseHeap(minimumPrintSize, maximumPrintSize)
 	minimumPrintSize = minimumPrintSize or -math.huge;
 	maximumPrintSize = maximumPrintSize or math.huge;
-	local heapBase = Game.getHeapStart();
+	local heapBase = Game.getFirstHeapBlock();
 	if isRDRAM(heapBase) then
 		local count = 0;
 		local size = 0;
@@ -7036,6 +7045,19 @@ end
 function Game.getWaterVertBase()
 	local gcmap = readGCMapStruct();
 	return gcmap.translucent.vertexBuffers[gcmap.translucent.vertexBufferIndex];
+end
+
+function readDLLHeader_struct(base)
+	return {
+		sizeExecutable = mainmemory.read_u16_be(base + 0),
+		sizeSwitchCases = mainmemory.read_u16_be(base + 2),
+		sizeConstants = mainmemory.read_u16_be(base + 4),
+		sizeMemory = mainmemory.read_u16_be(base + 6),
+		numFunctions = mainmemory.read_u16_be(base + 8),
+		numSymbolRefs = mainmemory.read_u16_be(base + 10),
+		sizeData1 = mainmemory.read_u16_be(base + 12),
+		lengthName = mainmemory.readbyte(base + 14),
+	};
 end
 
 function Game.initUI()
