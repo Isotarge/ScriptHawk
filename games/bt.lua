@@ -456,6 +456,7 @@ Game = {
 		player_pointer_index = {0x13A25F, 0x13A4EF, 0x12F6AF, 0x1354DF},
 		global_flag_base = {0x131500, 0x131790, 0x126950, 0x12C780},
 		camera_pointer_pointer = {0x12C478, 0x12C688, 0x1218D8, 0x127728},
+		cutscene_bar_state = {nil, nil, nil, 0x12A9A0}, -- u32_be -- TODO: Other versions
 		cutscene_camera_path_pointer = {nil, nil, nil, 0x7C050}, -- TODO: Other versions TODO: More research, so far this only has been observed to work on the first CS in SM that shows Klungo entering the cave
 		flag_block_pointer = {0x1314F0, 0x131780, 0x126940, 0x12C770},
 		air = {0x12FDC0, 0x12FFD0, 0x125220, 0x12B050},
@@ -2592,7 +2593,7 @@ function dumpPointerListStrings()
 		object = dereferencePointer(Game.Memory.loaded_dll_array + index * 4);
 		if isRDRAM(object) then
 			local string, checkPointer;
-			local checkPointerOffset = 0x3C;
+			local checkPointerOffset = 0x38;
 			repeat
 				checkPointerOffset = checkPointerOffset + 4;
 				checkPointer = dereferencePointer(object + checkPointerOffset);
@@ -6877,7 +6878,7 @@ function Game.getHeapBlockDescription(blockAddress)
 		dllPointer = dereferencePointer(Game.Memory.loaded_dll_array + offset);
 		offset = offset + 4;
 		if blockAddress == dllPointer then
-			local checkPointerOffset = 0x3C;
+			local checkPointerOffset = 0x38;
 			repeat
 				checkPointerOffset = checkPointerOffset + 4;
 				checkPointer = dereferencePointer(blockAddress + checkPointerOffset);
