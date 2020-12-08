@@ -532,6 +532,7 @@ function searchPointers(base, range, allowLater, suppressPrint)
 	local foundPointers = {};
 	suppressPrint = suppressPrint or false;
 	allowLater = allowLater or false;
+	range = range or 0;
 	local startAddress = base - range;
 	local endAddress = base;
 	if allowLater then
@@ -539,7 +540,7 @@ function searchPointers(base, range, allowLater, suppressPrint)
 	end
 	for address = 0, RDRAMSize - 4, 4 do
 		local value = mainmemory.read_u32_be(address);
-		if value >= startAddress and value < endAddress then
+		if value >= startAddress and value <= endAddress then
 			table.insert(foundPointers, {Address = toHexString(address), Value = toHexString(value)});
 			if not suppressPrint then
 				dprint(toHexString(address).." -> "..toHexString(value));
@@ -563,7 +564,7 @@ function searchPointersLE(base, range, allowLater, suppressPrint) -- Little Endi
 	end
 	for address = 0, RAMSize - 4, 4 do
 		local value = mainmemory.read_u32_le(address);
-		if value >= startAddress and value < endAddress then
+		if value >= startAddress and value <= endAddress then
 			table.insert(foundPointers, {Address = toHexString(address), Value = toHexString(value)});
 			if not suppressPrint then
 				dprint(toHexString(address).." -> "..toHexString(value));
