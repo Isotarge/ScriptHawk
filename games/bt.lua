@@ -448,21 +448,21 @@ Game = {
 	},
 	Memory = { -- Version order: Australia, Europe, Japan, USA
 		heap_pointer = {nil, nil, nil, 0x7E990}, -- Might be pointer to tiny heap block that describes free memory on heap -- TODO: Other versions
-		loaded_dll_array = {nil, nil, nil, 0x126738},
+		loaded_dll_array = {0x12B488, 0x12B698, 0x1208E8, 0x126738},
 		consumable_base = {0x11FFB0, 0x120170, 0x115340, 0x11B080},
 		consumable_pointer = {0x12FFC0, 0x1301D0, 0x125420, 0x12B250},
 		object_array_pointer = {0x13BBD0, 0x13BE60, 0x131020, 0x136EE0},
-		player_pointer = {0x13A210, 0x13A4A0, 0x12F660, 0x135490},
+		player_pointer = {0x13A210, 0x13A4A0, 0x12F660, 0x135490}, -- pointer[8]
 		player_pointer_index = {0x13A25F, 0x13A4EF, 0x12F6AF, 0x1354DF},
 		global_flag_base = {0x131500, 0x131790, 0x126950, 0x12C780},
 		camera_pointer_pointer = {0x12C478, 0x12C688, 0x1218D8, 0x127728},
-		cutscene_camera_path_pointer = {nil, nil, nil, 0x7C050}, -- TODO: Other versions, test more extensively (only tested one cutscene atm)
+		cutscene_camera_path_pointer = {nil, nil, nil, 0x7C050}, -- TODO: Other versions TODO: More research, so far this only has been observed to work on the first CS in SM that shows Klungo entering the cave
 		flag_block_pointer = {0x1314F0, 0x131780, 0x126940, 0x12C770},
 		air = {0x12FDC0, 0x12FFD0, 0x125220, 0x12B050},
 		frame_timer = {0x083550, 0x083550, 0x0788F8, 0x079138},
 		linked_list_root = {0x13C380, 0x13C680, 0x131850, 0x137800}, -- Heap
 		map = {0x137B42, 0x137DD2, 0x12CF92, 0x132DC2},
-		gcmap = {nil, nil, nil, 0x1285B0}, -- See gcmap_models
+		gcmap = {0x12D300, 0x12D510, 0x122760, 0x1285B0}, -- See gcmap_models
 		map_trigger_target = {0x12C390, 0x12C5A0, 0x1217F0, 0x127640},
 		map_trigger = {0x12C392, 0x12C5A2, 0x1217F2, 0x127642},
 		map_destination = {0x044E32, 0x044E32, 0x044EB2, 0x045702},
@@ -1199,6 +1199,15 @@ function Game.setCameraZPosition(value)
 	if isRDRAM(cameraObject) then
 		mainmemory.writefloat(cameraObject + 0x7C, value, true);
 	end
+end
+
+-- TODO: This doesn't work for all cutscenes, might be more complicated
+function Game.getCameraPathTimer()
+	local cameraPathObject = dereferencePointer(Game.Memory.cutscene_camera_path_pointer);
+	if isRDRAM(cameraPathObject) then
+		return mainmemory.readfloat(cameraPathObject + 0x58, true);
+	end
+	return 0;
 end
 
 -----------------
@@ -6828,8 +6837,11 @@ function Game.getHeapBlockSize(blockAddress)
 end
 
 function Game.getHeapBlockDescription(blockAddress)
-	if blockAddress == Game.getPlayerObject() then
-		return "Player";
+	for i = 0, 7 do
+		local playerObject = dereferencePointer(Game.Memory.player_pointer + i * 4);
+		if blockAddress == playerObject then
+			return "Player["..i.."]";
+		end
 	end
 	if blockAddress == Game.getCameraObject() then
 		return "Camera";
@@ -7168,6 +7180,7 @@ Game.standardOSD = {
 	{"Character", Game.getCharacterState, category="character"},
 	{"Movement", Game.getCurrentMovementStateOSD, category="movement"},
 	{"Animation", Game.getAnimationOSD, category="animation"},
+	{"Camera Timer", Game.getCameraPathTimer, category="animation"},
 	{"Slope Timer", Game.getSlopeTimer, Game.colorSlopeTimer, category="floorProperties"},
 	{"Grounded", Game.isGrounded, category="floorProperties"},
 	{"In Water", Game.isInWater, category="floorProperties"},

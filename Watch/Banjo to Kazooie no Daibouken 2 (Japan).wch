@@ -125,7 +125,7 @@ SystemID N64
 115A37	b	u	1	RDRAM	T. Rex: Current Health
 115A38	b	u	1	RDRAM	T. Rex: Max Health
 11F780	d	f	1	RDRAM	Banjo Brightness Doodad
-1208E8	d	h	1	RDRAM	Beginning of Pointer List
+1208E8	d	h	1	RDRAM	Loaded DLL List
 1217B0	d	h	1	RDRAM	Text Script Pointer
 1217E8	d	f	1	RDRAM	Game Runtime
 1217EC	d	f	1	RDRAM	Map Runtime
