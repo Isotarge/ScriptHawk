@@ -1204,24 +1204,34 @@ function Game.setCameraZPosition(value)
 	end
 end
 
--- TODO: More reliable heuristic for this
-function Game.getCameraPathTimer()
+function Game.getCameraPathTimer(showDebugInfo)
 	local heapHeaderSize = Game.getHeapHeaderSize();
 	for index = 0, Game.Memory.unknown_pointer_list_count do
 		local unknownPointer = dereferencePointer(Game.Memory.unknown_pointer_list + index * 4 * 2);
 		if isRDRAM(unknownPointer) then
 			local blockSize = Game.getHeapBlockSize(unknownPointer - heapHeaderSize);
-			--print(index..": "..toHexString(unknownPointer).." size: "..toHexString(blockSize));
-			if blockSize == 0x190 then
+			if blockSize > 0x60 then
 				local timerValue = mainmemory.readfloat(unknownPointer + 0x58, true);
-				if timerValue > 0 then
-					--print("Found!");
-					return timerValue;
+				if showDebugInfo then
+					local tag = mainmemory.read_u32_be(Game.Memory.unknown_pointer_list + (index * 4 * 2) + 4);
+					print(index..": "..toHexString(unknownPointer).." size: "..toHexString(blockSize).." tag: "..tag.." timerValue: "..timerValue);
+				end
+				-- TODO: More reliable heuristic to detect which block it is
+				if blockSize == 0x100 or blockSize == 0x140 or blockSize == 0x150 or blockSize == 0x190 or blockSize == 0x1A0 or blockSize == 0x1B0 then
+				-- if blockSize > 0x100 then
+					if timerValue > 0 and timerValue < 1 then
+						if showDebugInfo then
+							print("Found!");
+						end
+						return timerValue;
+					end
 				end
 			end
 		end
 	end
-	--print("not found :(");
+	if showDebugInfo then
+		print("not found :(");
+	end
 	return 0;
 end
 
