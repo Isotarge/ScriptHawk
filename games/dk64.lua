@@ -1510,6 +1510,12 @@ obj_model1 = {
 	health = 0x134, -- s16_be
 	takes_enemy_damage = 0x13B, -- TODO: put into examine method and double check datatype
 	collision_queue_pointer = 0x13C,
+	collision_queue_info = {
+		header = 0x0, -- Collision type?
+		collision_source = 0x8,
+		next_collision = 0x14,
+		previous_collision = 0x18,
+	},
 	ledge_info_pointer = 0x140, -- TODO: I don't quite know what to call this, it has 2 pointers to the bone arrays used for tree grab, telegrab, oranges & bullets
 	ledge_info = {
 		last_x = 0x1C, -- 32 bit float big endian
@@ -2855,10 +2861,51 @@ local function getActorCollisions(actor)
 			dprint(toHexString(collisionPosition)..": "..mainmemory.readfloat(collisionPosition + 0x00, true)..", "..mainmemory.readfloat(collisionPosition + 0x04, true)..", "..mainmemory.readfloat(collisionPosition + 0x08, true))
 		end
 		--]]
-		collision = dereferencePointer(collision + 0x14);
+		collision = dereferencePointer(collision + obj_model1.collision_queue_info.next_collision);
 	end
 	--print_deferred();
 	return collisionCount;
+end
+
+function dumpCollisions()
+	local actors = {};
+	local playerObject = Game.getPlayerObject();
+	local cameraObject = dereferencePointer(Game.Memory.camera_pointer);
+	if isRDRAM(playerObject) and isRDRAM(cameraObject) then
+		for object_no = 0, getObjectModel1Count() do
+			local pointer = dereferencePointer(Game.Memory.actor_pointer_array + (object_no * 4));
+			if isRDRAM(pointer) then
+				table.insert(actors, pointer);
+			end
+		end
+	end
+	local collisions = {}
+	if #actors > 0 then
+		for i = 1, #actors do
+			local collision_queue = dereferencePointer(actors[i] + obj_model1.collision_queue_pointer)
+			while isRDRAM(collision_queue) do
+				table.insert(collisions, collision_queue)
+				print("Collision detected")
+				print("Address: "..toHexString(collision_queue))
+				local target_actor = getActorName(actors[i]);
+				print("Target: "..target_actor.." ("..toHexString(actors[i])..")")
+				local source_address = dereferencePointer(collision_queue + obj_model1.collision_queue_info.collision_source)
+				if isRDRAM(source_address) then
+					local source_actor = getActorName(source_address);
+					print("Source: "..source_actor.." ("..toHexString(source_address)..")")
+				else
+					print("Source: No Source")
+				end
+				local header = mainmemory.read_u32_be(collision_queue + obj_model1.collision_queue_info.header)
+				print("Header: "..toHexString(header))
+				collision_queue = dereferencePointer(collision_queue + obj_model1.collision_queue_info.next_collision)
+				print("")
+			end
+		end
+	end
+	if #collisions == 0 then
+		print("No collisions found")
+	end
 end
 
 ----------------------------------
