@@ -4286,7 +4286,7 @@ function clearFlag(byte, _bit)
 		local flags = dereferencePointer(Game.Memory.flag_block_pointer);
 		if isRDRAM(flags) then
 			local currentValue = mainmemory.readbyte(flags + byte);
-			mainmemory.writebyte(flags + byte, clear_bit(currentValue, _bit));
+			mainmemory.writebyte(flags + byte, bit.clear(currentValue, _bit));
 		end
 	end
 end
@@ -4318,7 +4318,7 @@ function setFlag(byte, _bit)
 		local flags = dereferencePointer(Game.Memory.flag_block_pointer);
 		if isRDRAM(flags) then
 			local currentValue = mainmemory.readbyte(flags + byte);
-			mainmemory.writebyte(flags + byte, set_bit(currentValue, _bit));
+			mainmemory.writebyte(flags + byte, bit.set(currentValue, _bit));
 		end
 	end
 end
@@ -4353,7 +4353,7 @@ function checkFlag(byte, _bit, suppressPrint)
 		local flagBlock = dereferencePointer(Game.Memory.flag_block_pointer);
 		if isRDRAM(flagBlock) then
 			local currentValue = mainmemory.readbyte(flagBlock + byte);
-			if check_bit(currentValue, _bit) then
+			if bit.check(currentValue, _bit) then
 				if not suppressPrint then
 					print(getFlagName(byte, _bit).." is SET");
 				end
@@ -4677,7 +4677,7 @@ function setGlobalFlag(byte, globalBit)
 		local flags = Game.Memory.global_flag_base;
 		if isRDRAM(flags) then
 			local currentValue = mainmemory.readbyte(flags + byte);
-			mainmemory.writebyte(flags + byte, set_bit(currentValue, globalBit));
+			mainmemory.writebyte(flags + byte, bit.set(currentValue, globalBit));
 		end
 	end
 end
@@ -4687,7 +4687,7 @@ function clearGlobalFlag(byte, globalBit)
 		local flags = Game.Memory.global_flag_base;
 		if isRDRAM(flags) then
 			local currentValue = mainmemory.readbyte(flags + byte);
-			mainmemory.writebyte(flags + byte, clear_bit(currentValue, globalBit));
+			mainmemory.writebyte(flags + byte, bit.clear(currentValue, globalBit));
 		end
 	end
 end
@@ -4712,8 +4712,8 @@ function checkGlobalFlags()
 			previousValue = currentValue;
 		end
 		for globalBit = 0, 7 do
-			isSet = check_bit(currentValue, globalBit);
-			wasSet = check_bit(previousValue, globalBit);
+			isSet = bit.check(currentValue, globalBit);
+			wasSet = bit.check(previousValue, globalBit);
 			flag = getGlobalFlag(byte, globalBit);
 			ignore = type(flag) == "table" and flag.ignore;
 			if not ignore then

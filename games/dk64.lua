@@ -5616,8 +5616,8 @@ function checkFlags(showKnown)
 			previousValue = flag_block_cache[i];
 			if currentValue ~= previousValue then
 				for flagBit = 0, 7 do
-					local isSetNow = check_bit(currentValue, flagBit);
-					local wasSet = check_bit(previousValue, flagBit);
+					local isSetNow = bit.check(currentValue, flagBit);
+					local wasSet = bit.check(previousValue, flagBit);
 					if isSetNow and not wasSet then
 						if not isFlagFound(i, flagBit) then
 							flagFound = true;
@@ -5675,7 +5675,7 @@ function checkFlag(byte, flagBit, suppressPrint)
 	if type(byte) == "number" and type(flagBit) == "number" and flagBit >= 0 and flagBit < 8 then
 		local flags = Game.getFlagBlockAddress();
 		local currentValue = mainmemory.readbyte(flags + byte);
-		if check_bit(currentValue, flagBit) then
+		if bit.check(currentValue, flagBit) then
 			if not suppressPrint then
 				print(Game.getFlagName(byte, flagBit).." is SET");
 			end
@@ -5755,7 +5755,7 @@ function setFlag(byte, flagBit, suppressPrint)
 	local flags = Game.getFlagBlockAddress();
 	if type(byte) == "number" and type(flagBit) == "number" and flagBit >= 0 and flagBit < 8 then
 		local currentValue = mainmemory.readbyte(flags + byte);
-		mainmemory.writebyte(flags + byte, set_bit(currentValue, flagBit));
+		mainmemory.writebyte(flags + byte, bit.set(currentValue, flagBit));
 		if not suppressPrint then
 			if isFlagFound(byte, flagBit) then
 				print('Set "'..Game.getFlagName(byte, flagBit)..'" at '..toHexString(byte)..">"..flagBit);
@@ -5824,7 +5824,7 @@ function clearFlag(byte, flagBit, suppressPrint)
 	local flags = Game.getFlagBlockAddress();
 	if type(byte) == "number" and type(flagBit) == "number" and flagBit >= 0 and flagBit < 8 then
 		local currentValue = mainmemory.readbyte(flags + byte);
-		mainmemory.writebyte(flags + byte, clear_bit(currentValue, flagBit));
+		mainmemory.writebyte(flags + byte, bit.clear(currentValue, flagBit));
 		if not suppressPrint then
 			if isFlagFound(byte, flagBit) then
 				print('Cleared "'..Game.getFlagName(byte, flagBit)..'" at '..toHexString(byte)..">"..flagBit);
@@ -6233,8 +6233,8 @@ function checkTemporaryFlags(showKnown)
 				previousValue = temp_flag_block_cache[i];
 				if currentValue ~= previousValue then
 					for tempbit = 0, 7 do
-						local isSetNow = check_bit(currentValue, tempbit);
-						local wasSet = check_bit(previousValue, tempbit);
+						local isSetNow = bit.check(currentValue, tempbit);
+						local wasSet = bit.check(previousValue, tempbit);
 						if isSetNow and not wasSet then
 							if not isTempFlagFound(i, tempbit) then
 								tempFlagFound = true;
@@ -6392,8 +6392,8 @@ function checkGlobalFlags(showKnown)
 				previousValue = global_flag_block_cache[i];
 				if currentValue ~= previousValue then
 					for globalBit = 0, 7 do
-						local isSetNow = check_bit(currentValue, globalBit);
-						local wasSet = check_bit(previousValue, globalBit);
+						local isSetNow = bit.check(currentValue, globalBit);
+						local wasSet = bit.check(previousValue, globalBit);
 						if isSetNow and not wasSet then
 							if not isGlobalFlagFound(i, globalBit) then
 								GlobalFlagFound = true;
