@@ -256,16 +256,16 @@ local parts_purchased = {
 	{byte=0x06, bit=1, name="Turbo: Stage 4"},
 };
 
-function isKnownPart(byte, bit)
+function isKnownPart(byte, partBit)
 	for k, v in pairs(parts_purchased) do
-		if byte == v.byte and bit == v.bit then
+		if byte == v.byte and partBit == v.bit then
 			return true;
 		end
 	end
 	return false;
 end
 
-function Game.buyPart(byte, bit, carIndex)
+function Game.buyPart(byte, partBit, carIndex)
 	if carIndex == nil then
 		carIndex = Game.getCurrentCar();
 	end
@@ -276,8 +276,8 @@ function Game.buyPart(byte, bit, carIndex)
 	end
 	local partsArray = carBase + car.parts_purchased_bitfield;
 	local currentValue = mainmemory.readbyte(partsArray + byte);
-	mainmemory.writebyte(partsArray + byte, set_bit(currentValue, bit));
-	print("Bought part at "..toHexString(byte).." > "..bit);
+	mainmemory.writebyte(partsArray + byte, set_bit(currentValue, partBit));
+	print("Bought part at "..toHexString(byte).." > "..partBit);
 end
 
 function Game.buyPartByName(name, carIndex)
@@ -308,7 +308,7 @@ function Game.buyAllParts(carIndex)
 	end
 end
 
-function Game.sellPart(byte, bit, carIndex)
+function Game.sellPart(byte, partBit, carIndex)
 	if carIndex == nil then
 		carIndex = Game.getCurrentCar();
 	end
@@ -319,8 +319,8 @@ function Game.sellPart(byte, bit, carIndex)
 	end
 	local partsArray = carBase + car.parts_purchased_bitfield;
 	local currentValue = mainmemory.readbyte(partsArray + byte);
-	mainmemory.writebyte(partsArray + byte, clear_bit(currentValue, bit));
-	print("Sold part at "..toHexString(byte).." > "..bit);
+	mainmemory.writebyte(partsArray + byte, clear_bit(currentValue, partBit));
+	print("Sold part at "..toHexString(byte).." > "..partBit);
 end
 
 function Game.sellPartByName(name, carIndex)
@@ -344,7 +344,7 @@ function Game.sellAllParts(carIndex)
 	end
 end
 
-function Game.checkPart(byte, bit, carIndex)
+function Game.checkPart(byte, partBit, carIndex)
 	if carIndex == nil then
 		carIndex = Game.getCurrentCar();
 	end
@@ -354,7 +354,7 @@ function Game.checkPart(byte, bit, carIndex)
 	end
 	local partsArray = carBase + car.parts_purchased_bitfield;
 	local currentValue = mainmemory.readbyte(partsArray + byte);
-	return check_bit(currentValue, bit);
+	return check_bit(currentValue, partBit);
 end
 
 local cachedParts = nil;
@@ -378,13 +378,13 @@ function checkParts(carIndex)
 	for i = 0, arrayLength do
 		if currentParts[i] ~= cachedParts[i] then
 			print("Byte "..i.." has changed from "..toHexString(cachedParts[i]).." to "..toHexString(currentParts[i]));
-			for bit = 0, 7 do
-				local isSet = check_bit(currentParts[i], bit);
-				local wasSet = check_bit(cachedParts[i], bit);
-				--print(bit.." isSet "..tostring(isSet).." wasSet "..tostring(wasSet));
+			for partBit = 0, 7 do
+				local isSet = check_bit(currentParts[i], partBit);
+				local wasSet = check_bit(cachedParts[i], partBit);
+				--print(partBit.." isSet "..tostring(isSet).." wasSet "..tostring(wasSet));
 				if isSet and (not wasSet) then
-					if not isKnownPart(i, bit) then
-						print("{byte="..toHexString(i, 2)..", bit="..bit..', name="Name"},');
+					if not isKnownPart(i, partBit) then
+						print("{byte="..toHexString(i, 2)..", bit="..partBit..', name="Name"},');
 					end
 				end
 			end
