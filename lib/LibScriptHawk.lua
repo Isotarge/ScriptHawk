@@ -264,11 +264,6 @@ function toBinaryString(num, bits) -- TODO: Properly define behavior for negativ
 	return table.concat(t);
 end
 
--- TODO: Get rid of these aliases, bit is used as a local variable in a bunch of places
-check_bit = bit.check;
-clear_bit = bit.clear;
-set_bit = bit.set;
-
 function bit.toggle(field, index)
 	if bit.check(field, index) then
 		return bit.clear(field, index);

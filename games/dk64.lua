@@ -5573,16 +5573,16 @@ local function clearFlagCache()
 	flag_block_cache = {};
 end
 
-local function getFlag(byte, bit)
+local function getFlag(byte, flagBit)
 	for i = 1, #flag_array do
-		if byte == flag_array[i].byte and bit == flag_array[i].bit then
+		if byte == flag_array[i].byte and flagBit == flag_array[i].bit then
 			return flag_array[i];
 		end
 	end
 end
 
-local function isFlagFound(byte, bit)
-	return getFlag(byte, bit) ~= nil;
+local function isFlagFound(byte, flagBit)
+	return getFlag(byte, flagBit) ~= nil;
 end
 
 local function getFlagByName(flagName)
@@ -5593,13 +5593,13 @@ local function getFlagByName(flagName)
 	end
 end
 
-function Game.getFlagName(byte, bit)
+function Game.getFlagName(byte, flagBit)
 	for i = 1, #flag_array do
-		if byte == flag_array[i].byte and bit == flag_array[i].bit and not flag_array[i].ignore then
+		if byte == flag_array[i].byte and flagBit == flag_array[i].bit and not flag_array[i].ignore then
 			return flag_array[i].name;
 		end
 	end
-	return "Unknown at "..toHexString(byte)..">"..bit;
+	return "Unknown at "..toHexString(byte)..">"..flagBit;
 end
 
 function checkFlags(showKnown)
@@ -5615,33 +5615,33 @@ function checkFlags(showKnown)
 			currentValue = flagBlock[i];
 			previousValue = flag_block_cache[i];
 			if currentValue ~= previousValue then
-				for bit = 0, 7 do
-					local isSetNow = check_bit(currentValue, bit);
-					local wasSet = check_bit(previousValue, bit);
+				for flagBit = 0, 7 do
+					local isSetNow = bit.check(currentValue, flagBit);
+					local wasSet = bit.check(previousValue, flagBit);
 					if isSetNow and not wasSet then
-						if not isFlagFound(i, bit) then
+						if not isFlagFound(i, flagBit) then
 							flagFound = true;
-							dprint("{byte="..toHexString(i, 2)..", bit="..bit..', name="Name", type="Type", map='..map_value.."},");
+							dprint("{byte="..toHexString(i, 2)..", bit="..flagBit..', name="Name", type="Type", map='..map_value.."},");
 						else
 							if showKnown then
-								local currentFlag = getFlag(i, bit);
+								local currentFlag = getFlag(i, flagBit);
 								if not currentFlag.ignore then
 									if currentFlag.map ~= nil or currentFlag.nomap == true then
-										dprint("Flag "..toHexString(i, 2)..">"..bit..': "'..currentFlag.name..'" was set on frame '..emu.framecount());
+										dprint("Flag "..toHexString(i, 2)..">"..flagBit..': "'..currentFlag.name..'" was set on frame '..emu.framecount());
 									else
-										dprint("Flag "..toHexString(i, 2)..">"..bit..': "'..currentFlag.name..'" was set on frame '..emu.framecount().." ADD MAP "..map_value.." PLEASE");
+										dprint("Flag "..toHexString(i, 2)..">"..flagBit..': "'..currentFlag.name..'" was set on frame '..emu.framecount().." ADD MAP "..map_value.." PLEASE");
 									end
 								end
 							end
 							knownFlagsFound = knownFlagsFound + 1;
 						end
 					elseif not isSetNow and wasSet then
-						if not isFlagFound(i, bit) then
-							dprint("Flag "..toHexString(i, 2)..">"..bit..': "Unknown" was cleared on frame '..emu.framecount());
+						if not isFlagFound(i, flagBit) then
+							dprint("Flag "..toHexString(i, 2)..">"..flagBit..': "Unknown" was cleared on frame '..emu.framecount());
 						elseif showKnown then
-							local currentFlag = getFlag(i, bit);
+							local currentFlag = getFlag(i, flagBit);
 							if not currentFlag.ignore then
-								dprint("Flag "..toHexString(i, 2)..">"..bit..': "'..currentFlag.name..'" was cleared on frame '..emu.framecount());
+								dprint("Flag "..toHexString(i, 2)..">"..flagBit..': "'..currentFlag.name..'" was cleared on frame '..emu.framecount());
 							end
 						end
 					end
@@ -5664,25 +5664,25 @@ function checkFlags(showKnown)
 	print_deferred();
 end
 
-function checkFlag(byte, bit, suppressPrint)
+function checkFlag(byte, flagBit, suppressPrint)
 	if type(byte) == "string" then
 		local flag = getFlagByName(byte);
 		if type(flag) == "table" then
 			byte = flag.byte;
-			bit = flag.bit;
+			flagBit = flag.bit;
 		end
 	end
-	if type(byte) == "number" and type(bit) == "number" and bit >= 0 and bit < 8 then
+	if type(byte) == "number" and type(flagBit) == "number" and flagBit >= 0 and flagBit < 8 then
 		local flags = Game.getFlagBlockAddress();
 		local currentValue = mainmemory.readbyte(flags + byte);
-		if check_bit(currentValue, bit) then
+		if bit.check(currentValue, flagBit) then
 			if not suppressPrint then
-				print(Game.getFlagName(byte, bit).." is SET");
+				print(Game.getFlagName(byte, flagBit).." is SET");
 			end
 			return true;
 		else
 			if not suppressPrint then
-				print(Game.getFlagName(byte, bit).." is NOT set");
+				print(Game.getFlagName(byte, flagBit).." is NOT set");
 			end
 			return false;
 		end
@@ -5751,16 +5751,16 @@ end
 -- Set flag functions --
 ------------------------
 
-function setFlag(byte, bit, suppressPrint)
+function setFlag(byte, flagBit, suppressPrint)
 	local flags = Game.getFlagBlockAddress();
-	if type(byte) == "number" and type(bit) == "number" and bit >= 0 and bit < 8 then
+	if type(byte) == "number" and type(flagBit) == "number" and flagBit >= 0 and flagBit < 8 then
 		local currentValue = mainmemory.readbyte(flags + byte);
-		mainmemory.writebyte(flags + byte, set_bit(currentValue, bit));
+		mainmemory.writebyte(flags + byte, bit.set(currentValue, flagBit));
 		if not suppressPrint then
-			if isFlagFound(byte, bit) then
-				print('Set "'..Game.getFlagName(byte, bit)..'" at '..toHexString(byte)..">"..bit);
+			if isFlagFound(byte, flagBit) then
+				print('Set "'..Game.getFlagName(byte, flagBit)..'" at '..toHexString(byte)..">"..flagBit);
 			else
-				print("Set "..Game.getFlagName(byte, bit));
+				print("Set "..Game.getFlagName(byte, flagBit));
 			end
 		end
 	end
@@ -5810,8 +5810,8 @@ end
 
 function setAllFlags()
 	for byte = 0, flag_block_size do
-		for bit = 0, 7 do
-			setFlag(byte, bit, true);
+		for flagBit = 0, 7 do
+			setFlag(byte, flagBit, true);
 		end
 	end
 end
@@ -5820,16 +5820,16 @@ end
 -- Clear flag functions --
 --------------------------
 
-function clearFlag(byte, bit, suppressPrint)
+function clearFlag(byte, flagBit, suppressPrint)
 	local flags = Game.getFlagBlockAddress();
-	if type(byte) == "number" and type(bit) == "number" and bit >= 0 and bit < 8 then
+	if type(byte) == "number" and type(flagBit) == "number" and flagBit >= 0 and flagBit < 8 then
 		local currentValue = mainmemory.readbyte(flags + byte);
-		mainmemory.writebyte(flags + byte, clear_bit(currentValue, bit));
+		mainmemory.writebyte(flags + byte, bit.clear(currentValue, flagBit));
 		if not suppressPrint then
-			if isFlagFound(byte, bit) then
-				print('Cleared "'..Game.getFlagName(byte, bit)..'" at '..toHexString(byte)..">"..bit);
+			if isFlagFound(byte, flagBit) then
+				print('Cleared "'..Game.getFlagName(byte, flagBit)..'" at '..toHexString(byte)..">"..flagBit);
 			else
-				print("Cleared "..Game.getFlagName(byte, bit));
+				print("Cleared "..Game.getFlagName(byte, flagBit));
 			end
 		end
 	end
@@ -5879,8 +5879,8 @@ end
 
 function clearAllFlags()
 	for byte = 0, flag_block_size do
-		for bit = 0, 7 do
-			clearFlag(byte, bit, true);
+		for flagBit = 0, 7 do
+			clearFlag(byte, flagBit, true);
 		end
 	end
 end
@@ -6148,13 +6148,13 @@ local function getTempFlagByName(flagName)
 	end
 end
 
-function Game.getTempFlagName(byte, bit)
+function Game.getTempFlagName(byte, tempbit)
 	for i = 1, #temp_flag_array do
-		if byte == temp_flag_array[i].byte and bit == temp_flag_array[i].bit and not temp_flag_array[i].ignore then
+		if byte == temp_flag_array[i].byte and tempbit == temp_flag_array[i].bit and not temp_flag_array[i].ignore then
 			return temp_flag_array[i].flagName;
 		end
 	end
-	return "Unknown at "..toHexString(byte)..">"..bit;
+	return "Unknown at "..toHexString(byte)..">"..tempbit;
 end
 
 function setTempFlag(byte,tempBit)
@@ -6206,16 +6206,16 @@ local function clearTempFlagCache()
 	temp_flag_block_cache = {};
 end
 
-local function getTempFlag(byte, bit)
+local function getTempFlag(byte, tempbit)
 	for i = 1, #temp_flag_array do
-		if byte == temp_flag_array[i].byte and bit == temp_flag_array[i].bit then
+		if byte == temp_flag_array[i].byte and tempbit == temp_flag_array[i].bit then
 			return temp_flag_array[i];
 		end
 	end
 end
 
-local function isTempFlagFound(byte, bit)
-	return getTempFlag(byte, bit) ~= nil;
+local function isTempFlagFound(byte, tempbit)
+	return getTempFlag(byte, tempbit) ~= nil;
 end
 
 function checkTemporaryFlags(showKnown)
@@ -6232,34 +6232,34 @@ function checkTemporaryFlags(showKnown)
 				currentValue = temp_flagBlock[i];
 				previousValue = temp_flag_block_cache[i];
 				if currentValue ~= previousValue then
-					for bit = 0, 7 do
-						local isSetNow = check_bit(currentValue, bit);
-						local wasSet = check_bit(previousValue, bit);
+					for tempbit = 0, 7 do
+						local isSetNow = bit.check(currentValue, tempbit);
+						local wasSet = bit.check(previousValue, tempbit);
 						if isSetNow and not wasSet then
-							if not isTempFlagFound(i, bit) then
+							if not isTempFlagFound(i, tempbit) then
 								tempFlagFound = true;
 								dprint("Unknown Temporary Flag Found!");
-								dprint("{byte="..toHexString(i, 2)..", bit="..bit..', flagName="Name", type="Type", map='..map_value.."},");
+								dprint("{byte="..toHexString(i, 2)..", bit="..tempbit..', flagName="Name", type="Type", map='..map_value.."},");
 							else
 								if showKnown then
-									local currentTempFlag = getTempFlag(i, bit);
+									local currentTempFlag = getTempFlag(i, tempbit);
 									if not currentTempFlag.ignore then
 										if currentTempFlag.map ~= nil or currentTempFlag.nomap == true then
-											dprint("Temporary Flag "..toHexString(i, 2)..">"..bit..': "'..currentTempFlag.flagName..'" was set on frame '..emu.framecount());
+											dprint("Temporary Flag "..toHexString(i, 2)..">"..tempbit..': "'..currentTempFlag.flagName..'" was set on frame '..emu.framecount());
 										else
-											dprint("Temporary Flag "..toHexString(i, 2)..">"..bit..': "'..currentTempFlag.flagName..'" was set on frame '..emu.framecount().." ADD MAP "..map_value.." PLEASE");
+											dprint("Temporary Flag "..toHexString(i, 2)..">"..tempbit..': "'..currentTempFlag.flagName..'" was set on frame '..emu.framecount().." ADD MAP "..map_value.." PLEASE");
 										end
 									end
 								end
 								knownTempFlagsFound = knownTempFlagsFound + 1;
 							end
 						elseif not isSetNow and wasSet then
-							if not isTempFlagFound(i, bit) then
-								dprint("Temporary Flag "..toHexString(i, 2)..">"..bit..': "Unknown" was cleared on frame '..emu.framecount());
+							if not isTempFlagFound(i, tempbit) then
+								dprint("Temporary Flag "..toHexString(i, 2)..">"..tempbit..': "Unknown" was cleared on frame '..emu.framecount());
 							elseif showKnown then
-								local currentTempFlag = getTempFlag(i, bit);
+								local currentTempFlag = getTempFlag(i, tempbit);
 								if not currentTempFlag.ignore then
-									dprint("Temporary Flag "..toHexString(i, 2)..">"..bit..': "'..currentTempFlag.flagName..'" was cleared on frame '..emu.framecount());
+									dprint("Temporary Flag "..toHexString(i, 2)..">"..tempbit..': "'..currentTempFlag.flagName..'" was cleared on frame '..emu.framecount());
 								end
 							end
 						end
@@ -6303,13 +6303,13 @@ local function getGlobalByName(flagName)
 	end
 end
 
-function Game.getGlobalFlagName(byte, bit)
+function Game.getGlobalFlagName(byte, globalBit)
 	for i = 1, #global_flag_array do
-		if byte == global_flag_array[i].byte and bit == global_flag_array[i].bit and not global_flag_array[i].ignore then
+		if byte == global_flag_array[i].byte and globalBit == global_flag_array[i].bit and not global_flag_array[i].ignore then
 			return global_flag_array[i].name;
 		end
 	end
-	return "Unknown at "..toHexString(byte)..">"..bit;
+	return "Unknown at "..toHexString(byte)..">"..globalBit;
 end
 
 function setGlobalFlag(byte,globalBit)
@@ -6365,16 +6365,16 @@ local function clearGlobalFlagCache()
 	global_flag_block_cache = {};
 end
 
-local function getGlobalFlag(byte, bit)
+local function getGlobalFlag(byte, globalBit)
 	for i = 1, #global_flag_array do
-		if byte == global_flag_array[i].byte and bit == global_flag_array[i].bit then
+		if byte == global_flag_array[i].byte and globalBit == global_flag_array[i].bit then
 			return global_flag_array[i];
 		end
 	end
 end
 
-local function isGlobalFlagFound(byte, bit)
-	return getGlobalFlag(byte, bit) ~= nil;
+local function isGlobalFlagFound(byte, globalBit)
+	return getGlobalFlag(byte, globalBit) ~= nil;
 end
 
 function checkGlobalFlags(showKnown)
@@ -6391,34 +6391,34 @@ function checkGlobalFlags(showKnown)
 				currentValue = global_flagBlock[i];
 				previousValue = global_flag_block_cache[i];
 				if currentValue ~= previousValue then
-					for bit = 0, 7 do
-						local isSetNow = check_bit(currentValue, bit);
-						local wasSet = check_bit(previousValue, bit);
+					for globalBit = 0, 7 do
+						local isSetNow = bit.check(currentValue, globalBit);
+						local wasSet = bit.check(previousValue, globalBit);
 						if isSetNow and not wasSet then
-							if not isGlobalFlagFound(i, bit) then
+							if not isGlobalFlagFound(i, globalBit) then
 								GlobalFlagFound = true;
 								dprint("Unknown Global Flag Found!");
-								dprint("{byte="..toHexString(i, 2)..", bit="..bit..', name="Name", type="Type", map='..map_value.."},");
+								dprint("{byte="..toHexString(i, 2)..", bit="..globalBit..', name="Name", type="Type", map='..map_value.."},");
 							else
 								if showKnown then
-									local currentGlobalFlag = getGlobalFlag(i, bit);
+									local currentGlobalFlag = getGlobalFlag(i, globalBit);
 									if not currentGlobalFlag.ignore then
 										if currentGlobalFlag.map ~= nil or currentGlobalFlag.nomap == true then
-											dprint("Global Flag "..toHexString(i, 2)..">"..bit..': "'..currentGlobalFlag.name..'" was set on frame '..emu.framecount());
+											dprint("Global Flag "..toHexString(i, 2)..">"..globalBit..': "'..currentGlobalFlag.name..'" was set on frame '..emu.framecount());
 										else
-											dprint("Global Flag "..toHexString(i, 2)..">"..bit..': "'..currentGlobalFlag.name..'" was set on frame '..emu.framecount().." ADD MAP "..map_value.." PLEASE");
+											dprint("Global Flag "..toHexString(i, 2)..">"..globalBit..': "'..currentGlobalFlag.name..'" was set on frame '..emu.framecount().." ADD MAP "..map_value.." PLEASE");
 										end
 									end
 								end
 								knownGlobalFlagsFound = knownGlobalFlagsFound + 1;
 							end
 						elseif not isSetNow and wasSet then
-							if not isGlobalFlagFound(i, bit) then
-								dprint("Global Flag "..toHexString(i, 2)..">"..bit..': "Unknown" was cleared on frame '..emu.framecount());
+							if not isGlobalFlagFound(i, globalBit) then
+								dprint("Global Flag "..toHexString(i, 2)..">"..globalBit..': "Unknown" was cleared on frame '..emu.framecount());
 							elseif showKnown then
-								local currentGlobalFlag = getGlobalFlag(i, bit);
+								local currentGlobalFlag = getGlobalFlag(i, globalBit);
 								if not currentGlobal.ignore then
-									dprint("Global Flag "..toHexString(i, 2)..">"..bit..': "'..currentGlobalFlag.name..'" was cleared on frame '..emu.framecount());
+									dprint("Global Flag "..toHexString(i, 2)..">"..globalBit..': "'..currentGlobalFlag.name..'" was cleared on frame '..emu.framecount());
 								end
 							end
 						end

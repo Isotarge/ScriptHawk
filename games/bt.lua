@@ -4209,16 +4209,16 @@ for i = 1, #global_flag_array do
 	end
 end
 
-function isKnown(byte, bit)
-	return flags_by_address[byte][bit] ~= nil;
+function isKnown(byte, _bit)
+	return flags_by_address[byte][_bit] ~= nil;
 end
 
-function getFlagName(byte, bit)
-	local flag = flags_by_address[byte][bit];
+function getFlagName(byte, _bit)
+	local flag = flags_by_address[byte][_bit];
 	if type(flag) == "table" then
 		return flag.name;
 	end
-	return "Unknown at "..toHexString(byte)..">"..bit;
+	return "Unknown at "..toHexString(byte)..">".._bit;
 end
 
 local function getFlagByName(flagName)
@@ -4281,12 +4281,12 @@ function setFlagsByType(_type)
 	end
 end
 
-function clearFlag(byte, bit)
-	if type(byte) == "number" and type(bit) == "number" and bit >= 0 and bit < 8 then
+function clearFlag(byte, _bit)
+	if type(byte) == "number" and type(_bit) == "number" and _bit >= 0 and _bit < 8 then
 		local flags = dereferencePointer(Game.Memory.flag_block_pointer);
 		if isRDRAM(flags) then
 			local currentValue = mainmemory.readbyte(flags + byte);
-			mainmemory.writebyte(flags + byte, clear_bit(currentValue, bit));
+			mainmemory.writebyte(flags + byte, bit.clear(currentValue, _bit));
 		end
 	end
 end
@@ -4313,12 +4313,12 @@ function clearFlagsByType(_type)
 	end
 end
 
-function setFlag(byte, bit)
-	if type(byte) == "number" and type(bit) == "number" and bit >= 0 and bit < 8 then
+function setFlag(byte, _bit)
+	if type(byte) == "number" and type(_bit) == "number" and _bit >= 0 and _bit < 8 then
 		local flags = dereferencePointer(Game.Memory.flag_block_pointer);
 		if isRDRAM(flags) then
 			local currentValue = mainmemory.readbyte(flags + byte);
-			mainmemory.writebyte(flags + byte, set_bit(currentValue, bit));
+			mainmemory.writebyte(flags + byte, bit.set(currentValue, _bit));
 		end
 	end
 end
@@ -4341,26 +4341,26 @@ function setAllFlags()
 	end
 end
 
-function checkFlag(byte, bit, suppressPrint)
+function checkFlag(byte, _bit, suppressPrint)
 	if type(byte) == "string" then
 		local flag = getFlagByName(byte);
 		if type(flag) == "table" then
 			byte = flag.byte;
-			bit = flag.bit;
+			_bit = flag.bit;
 		end
 	end
-	if type(byte) == "number" and type(bit) == "number" and bit >= 0 and bit < 8 then
+	if type(byte) == "number" and type(_bit) == "number" and _bit >= 0 and _bit < 8 then
 		local flagBlock = dereferencePointer(Game.Memory.flag_block_pointer);
 		if isRDRAM(flagBlock) then
 			local currentValue = mainmemory.readbyte(flagBlock + byte);
-			if check_bit(currentValue, bit) then
+			if bit.check(currentValue, _bit) then
 				if not suppressPrint then
-					print(getFlagName(byte, bit).." is SET");
+					print(getFlagName(byte, _bit).." is SET");
 				end
 				return true;
 			else
 				if not suppressPrint then
-					print(getFlagName(byte, bit).." is NOT set");
+					print(getFlagName(byte, _bit).." is NOT set");
 				end
 				return false;
 			end
@@ -4655,50 +4655,50 @@ end
 -- Global Flags --
 ------------------
 
-function isKnownGlobal(byte, bit)
+function isKnownGlobal(byte, globalBit)
 	for i = 1, #global_flag_array do
-		if global_flag_array[i].byte == byte and global_flag_array[i].bit == bit then
+		if global_flag_array[i].byte == byte and global_flag_array[i].bit == globalBit then
 			return true;
 		end
 	end
 	return false;
 end
 
-function getGlobalFlag(byte, bit)
+function getGlobalFlag(byte, globalBit)
 	for i = 1, #global_flag_array do
-		if byte == global_flag_array[i].byte and bit == global_flag_array[i].bit then
+		if byte == global_flag_array[i].byte and globalBit == global_flag_array[i].bit then
 			return global_flag_array[i];
 		end
 	end
 end
 
-function setGlobalFlag(byte, bit)
-	if type(byte) == "number" and type(bit) == "number" and bit >= 0 and bit < 8 then
+function setGlobalFlag(byte, globalBit)
+	if type(byte) == "number" and type(globalBit) == "number" and globalBit >= 0 and globalBit < 8 then
 		local flags = Game.Memory.global_flag_base;
 		if isRDRAM(flags) then
 			local currentValue = mainmemory.readbyte(flags + byte);
-			mainmemory.writebyte(flags + byte, set_bit(currentValue, bit));
+			mainmemory.writebyte(flags + byte, bit.set(currentValue, globalBit));
 		end
 	end
 end
 
-function clearGlobalFlag(byte, bit)
-	if type(byte) == "number" and type(bit) == "number" and bit >= 0 and bit < 8 then
+function clearGlobalFlag(byte, globalBit)
+	if type(byte) == "number" and type(globalBit) == "number" and globalBit >= 0 and globalBit < 8 then
 		local flags = Game.Memory.global_flag_base;
 		if isRDRAM(flags) then
 			local currentValue = mainmemory.readbyte(flags + byte);
-			mainmemory.writebyte(flags + byte, clear_bit(currentValue, bit));
+			mainmemory.writebyte(flags + byte, bit.clear(currentValue, globalBit));
 		end
 	end
 end
 
-function getGlobalFlagName(byte, bit)
+function getGlobalFlagName(byte, globalBit)
 	for i = 1, #global_flag_array do
-		if byte == global_flag_array[i].byte and bit == global_flag_array[i].bit and not global_flag_array[i].ignore then
+		if byte == global_flag_array[i].byte and globalBit == global_flag_array[i].bit and not global_flag_array[i].ignore then
 			return global_flag_array[i].name;
 		end
 	end
-	return "Unknown at "..toHexString(byte)..">"..bit;
+	return "Unknown at "..toHexString(byte)..">"..globalBit;
 end
 
 function checkGlobalFlags()
@@ -4711,20 +4711,20 @@ function checkGlobalFlags()
 		if previousValue == nil then
 			previousValue = currentValue;
 		end
-		for bit = 0, 7 do
-			isSet = check_bit(currentValue, bit);
-			wasSet = check_bit(previousValue, bit);
-			flag = getGlobalFlag(byte, bit);
+		for globalBit = 0, 7 do
+			isSet = bit.check(currentValue, globalBit);
+			wasSet = bit.check(previousValue, globalBit);
+			flag = getGlobalFlag(byte, globalBit);
 			ignore = type(flag) == "table" and flag.ignore;
 			if not ignore then
 				if isSet and not wasSet then
-					if isKnownGlobal(byte, bit) then
-						dprint("Global Flag "..toHexString(byte, 2)..">"..bit..': "'..flag.name..'" was set on frame '..emu.framecount());
+					if isKnownGlobal(byte, globalBit) then
+						dprint("Global Flag "..toHexString(byte, 2)..">"..globalBit..': "'..flag.name..'" was set on frame '..emu.framecount());
 					else
-						dprint("{byte="..toHexString(byte, 2)..", bit="..bit..', name="Name"}, (GLOBAL)');
+						dprint("{byte="..toHexString(byte, 2)..", bit="..globalBit..', name="Name"}, (GLOBAL)');
 					end
 				elseif not isSet and wasSet then
-					dprint("Global Flag "..toHexString(byte, 2)..">"..bit..': "'..getGlobalFlagName(byte, bit)..'" was cleared on frame '..emu.framecount());
+					dprint("Global Flag "..toHexString(byte, 2)..">"..globalBit..': "'..getGlobalFlagName(byte, globalBit)..'" was cleared on frame '..emu.framecount());
 				end
 			end
 		end
