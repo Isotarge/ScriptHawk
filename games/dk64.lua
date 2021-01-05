@@ -661,15 +661,41 @@ local global_flag_array = {
 	{byte=0x4,bit=0,name="Multiplayer: Chunky Unlocked", type="Multiplayer", nomap=true},
 	{byte=0x4,bit=1,name="Krusha Menu: Unlocked", type="Menus Unlocked", nomap=true},
 	{byte=0x4,bit=2,name="Cheats Menu: Unlocked", type="Menus Unlocked", nomap=true},
-
-	-- Info on introducing these flags into the UI:
-	--[[
-		The stored global flags are stored from 0x7EDD58. After a menu reload, this will try to copy over to the observed menu flags (Stored at 0x7ED558).
-		Both these addresses are in RDRAM. This data also has to be replicated at 0x6B0 in the EEPROM.
-		There is a checksum at 0x7EDD94 in RDRAM. This has to be a valid checksum for the situation otherwise the global flags are wiped
-		The formula for this checksum is unknown, so it would be good to figure this out
-	]]--
 };
+
+function getGlobalFlagChecksum()
+	-- Based on the game code
+	if Game.version ~= 4 then
+		start = 0xFFFFFFFF;
+		for l = 0, 59 do
+			local focused_byte = mainmemory.readbyte(global_flag_boundaries.start[Game.version] + l);
+			local offset = bit.lshift(bit.band(bit.bxor(start,focused_byte),0xFF),2);
+			local comp0 = mainmemory.read_s32_be(global_flag_boundaries.read_location[Game.version] + offset);
+			local comp1 = bit.rshift(start,8);
+			start = bit.bxor(comp0,comp1);
+		end
+		return bit.bxor(start,0xFFFFFFFF)
+	else
+		return 0
+	end
+end
+
+function writeGlobalFlagChecksum()
+	if Game.version ~= 4 then
+		local csum = getGlobalFlagChecksum();
+		mainmemory.write_u32_be(global_flag_boundaries.start[Game.version] + 0x3C,csum)
+	end
+end
+
+function compareLUAChecksum()
+	local calculated = getGlobalFlagChecksum()
+	local actual = mainmemory.read_u32_be(global_flag_boundaries.start[Game.version] + 0x3C);
+	if (calculated == actual) then
+		print("Matches (0x"..bizstring.hex(calculated)..")")
+	else
+		print("Doesn't Match (Calculated: 0x"..bizstring.hex(calculated)..", Actual: 0x"..bizstring.hex(actual)..")")
+	end
+end
 
 local previousCameraState = "Unknown";
 local map_value = 0;
@@ -5919,7 +5945,7 @@ local function flagSetButtonHandler()
 	elseif flagMasterType == "Temporary Flags" then
 		setTempFlagByName(forms.getproperty(ScriptHawk.UI.form_controls["Flag Dropdown"], "SelectedItem"));
 	elseif flagMasterType == "Global Flags" then
-		print("Functionality for global flag setting/clearing not possible at this point");
+		setGlobalFlagByName(forms.getproperty(ScriptHawk.UI.form_controls["Flag Dropdown"], "SelectedItem"));
 	end
 end
 
@@ -5930,7 +5956,7 @@ local function flagClearButtonHandler()
 	elseif flagMasterType == "Temporary Flags" then
 		clearTempFlagByName(forms.getproperty(ScriptHawk.UI.form_controls["Flag Dropdown"], "SelectedItem"));
 	elseif flagMasterType == "Global Flags" then
-		print("Functionality for global flag setting/clearing not possible at this point");
+		clearGlobalFlagByName(forms.getproperty(ScriptHawk.UI.form_controls["Flag Dropdown"], "SelectedItem"));
 	end
 end
 
@@ -6288,9 +6314,10 @@ end
 ------------------
 
 global_flag_boundaries = {
-	start = {0x7EDD58,0x7EDC7B,0x7EE1C8,nil},
+	start = {0x7EDD58,0x7EDC78,0x7EE1C8,nil},
 	finish = {0x7EDD5F,0x7EDC7F,0x7EE1CF,nil},
-	size = {0x8,0x8,0x8,nil},
+	read_location = {0x7463C0,0x740B10, 0x745C80, nil},
+	size = {0x3B,0x3B,0x3B,nil},
 };
 
 global_flag_block_populated = false;
@@ -6317,6 +6344,8 @@ function setGlobalFlag(byte,globalBit)
 	local global_flag_value = mainmemory.readbyte(global_flag_boundaries.start[Game.version] + byte);
 	global_flag_value = bit.set(global_flag_value,globalBit);
 	mainmemory.writebyte(global_flag_boundaries.start[Game.version] + byte, global_flag_value);
+	mainmemory.writebyte(Game.Memory.menu_flags + byte, global_flag_value);
+	writeGlobalFlagChecksum();
 end
 
 function clearGlobalFlag(byte,globalBit)
@@ -6324,6 +6353,8 @@ function clearGlobalFlag(byte,globalBit)
 	local global_flag_value = mainmemory.readbyte(global_flag_boundaries.start[Game.version] + byte);
 	global_flag_value = bit.clear(global_flag_value,globalBit);
 	mainmemory.writebyte(global_flag_boundaries.start[Game.version] + byte, global_flag_value);
+	mainmemory.writebyte(Game.Memory.menu_flags + byte, global_flag_value);
+	writeGlobalFlagChecksum();
 end
 
 function checkGlobalFlag(byte,globalBit)
@@ -6417,7 +6448,7 @@ function checkGlobalFlags(showKnown)
 								dprint("Global Flag "..toHexString(i, 2)..">"..globalBit..': "Unknown" was cleared on frame '..emu.framecount());
 							elseif showKnown then
 								local currentGlobalFlag = getGlobalFlag(i, globalBit);
-								if not currentGlobal.ignore then
+								if not currentGlobalFlag.ignore then
 									dprint("Global Flag "..toHexString(i, 2)..">"..globalBit..': "'..currentGlobalFlag.name..'" was cleared on frame '..emu.framecount());
 								end
 							end
