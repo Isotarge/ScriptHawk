@@ -264,6 +264,8 @@ local Game = {
 		-- 0000 0010 - Freeze Actors (Pause Menu)
 		-- 0000 0001 - Pausing
 		tb_void_byte = {0x7FBB63, 0x7FBA83, 0x7FBFD3, 0x7B5B13}, -- byte, bitfield -- TODO: Document remaining values
+		enemy_properties_table_1 = {0x755698, 0x74FF18, 0x755758, nil},
+		enemy_properties_table_2 = {0x7FBB68, 0x7FBA88, 0x7FBFD8, nil}, -- Not sure what this is, it's important to enemy stuff. TODO: Find out what it is
 		player_pointer = {0x7FBB4C, 0x7FBA6C, 0x7FBFBC, 0x7B5AFC},
 		camera_pointer = {0x7FB968, 0x7FB888, 0x7FBDD8, 0x7B5918},
 		actor_pointer_array = {0x7FBFF0, 0x7FBF10, 0x7FC460, 0x7B5E58},
@@ -4041,7 +4043,9 @@ local spawnerAttributes = {
 	max_aggro_speed = 0xD, -- u8
 	scale = 0xF, -- u8
 	aggro = 0x10, -- u8
+	-- something_spawn_state = 0x12, -- u8
 	spawn_trigger = 0x13, -- u8
+	respawn_timer_init = 0x14, -- u8. Result is multiplied by 30 to get actual respawn timer
 	tied_actor = 0x18, -- u32
 	movement_box_pointer = 0x1C, -- u32
 	movement_box = {
@@ -4060,20 +4064,110 @@ local spawnerAttributes = {
 	},
 	unknown_pointer = 0x20, -- u32
 	respawn_timer = 0x24, -- s16
+	-- ?? = 0x2C -- float, initially written to 0.01
+	-- ?? = 0x30 -- float, initially written to 1
 	animation_speed = 0x34, -- float
 	acceleration = 0x34, -- float, TODO: Check this
+	-- ?? = 0x38 -- u32, maybe float, based on alt enemy type
 	chunk = 0x40, -- s16
 	spawn_state = 0x42, -- u8
+	counter = 0x43, -- u8
 	alternative_enemy_spawn = 0x44, -- u8
+
+	-- 1000 0000 0000 0000 - ?
+	-- 0100 0000 0000 0000 - ? Resets on Respawn
+	-- 0010 0000 0000 0000 - ? Resets on Respawn
+	-- 0001 0000 0000 0000 - ?
+
+	-- 0000 1000 0000 0000 - ?
+	-- 0000 0100 0000 0000 - ?
+	-- 0000 0010 0000 0000 - ?
+	-- 0000 0001 0000 0000 - ?
+
+	-- 0000 0000 1000 0000 - ?
+	-- 0000 0000 0100 0000 - Ignores instrument plays
+	-- 0000 0000 0010 0000 - Ignores movement boundaries
+	-- 0000 0000 0001 0000 - ?
+
+	-- 0000 0000 0000 1000 - ? Reset on respawn
+	-- 0000 0000 0000 0100 - ?
+	-- 0000 0000 0000 0010 - Won't Respawn
+	-- 0000 0000 0000 0001 - Spawned from respawn pending
+
+	properties_bitfield = 0x46 -- u16 bitfield -- TODO: Document this, find where this comes from so we can display stuff pre-load
 };
 
 local spawnerStates = {
-	[0] = "Inactive",
+	[0] = "Inactive", 
+	-- [1] = "Unknown", -- Used for Bad Hit Detection Man
 	[2] = "Ready to Spawn",
-	[5] = "Spawned",
-	[6] = "Deloaded",
+	-- [3] = "Unknown", -- Doesn't seem to be used
+	-- [4] = "Unknown", -- Doesn't seem to be used
+	[5] = "Spawned", -- Will reference tied actor
+	[6] = "Deloaded", -- Will reference tied actor
 	[7] = "Respawn Pending",
 };
+
+initPropMaps1 = {
+	0x06, -- Japes Minecart
+	0x0E, -- Aztec Beetle Race
+	0x1B, -- Factory Car Race
+	0x1C, -- Helm Level Intros/Game Over
+	0x27, -- Galleon Seal Race
+	0x37, -- Fungi Minecart
+	0x52, -- Caves Beetle Race
+	0x6A, -- Castle Minecart
+	0x98, -- Helm Intro Story
+	0x99, -- Isles Intro Story
+	0xAC, -- Intro Story Rock
+	0xB9, -- Castle Car Race
+	0xD0, -- Bloopers
+}
+function getInitialProperties(pointer)
+	-- Based on FUN_80726744
+	local altEnemyType = mainmemory.readbyte(pointer + 0x44);
+	local mainEnemyType = mainmemory.readbyte(pointer);
+	start = 0;
+	if Game.version ~= 4 then -- Doesn't properly work on Kiosk
+		local indic = mainmemory.readbyte(Game.Memory.enemy_properties_table_1 + altEnemyType)
+		
+		if indic < 4 then
+			if indic == 1 then
+				start = bit.bor(start,8);
+			else
+				start = bit.bor(start,0x4008)
+			end
+		elseif indic == 10 then
+			start = bit.bor(start,0x80);
+		end
+		local current_map = Game.getMap()
+		in_propMap = false;
+		for i = 1, #initPropMaps1 do
+			if initPropMaps1[i] == current_map then
+				in_propMap = true;
+			end
+		end
+		if in_propMap then
+			start = bit.bor(start,0x20)
+		end
+		if current_map == 0xD4 or current_map == 0xD3 then -- Helm Chunky Shooting (D3) or Helm DK Rambi (D4)
+			start = bit.bor(start,4);
+		end
+		local indic_2 = mainmemory.read_u32_be(Game.Memory.enemy_properties_table_2)
+		if bit.band(indic_2,2) == 0 then
+			if indic ~= 8 and indic ~= 4 then
+				if mainEnemyType == 0x44 then -- Banana Fairy
+					-- Extra condition for if fairy + 0x110 == 1, not sure how to get this
+					start = bit.bor(start,0x200)
+				end
+			end
+			if indic == 4 then
+				start = bit.bor(start,0x800)
+			end
+		end
+	end
+	return start
+end
 
 local function getSpawnerStateName(pointer)
 	local stateValue = mainmemory.readbyte(pointer + spawnerAttributes.spawn_state);
@@ -4081,6 +4175,14 @@ local function getSpawnerStateName(pointer)
 		return spawnerStates[stateValue];
 	end
 	return toHexString(stateValue);
+end
+
+function convertBooleanToString(bool)
+	if bool then
+		return "Yes"
+	else
+		return "No"
+	end
 end
 
 function getExamineDataArcade(pointer)
@@ -4160,7 +4262,13 @@ function getExamineDataSpawners(pointer)
 	table.insert(examine_data, { "Aggressive", mainmemory.readbyte(pointer + spawnerAttributes.aggro) });
 	table.insert(examine_data, { "Spawn Trigger", mainmemory.readbyte(pointer + spawnerAttributes.spawn_trigger) });
 	table.insert(examine_data, { "Spawner State", object_spawner_state });
-	table.insert(examine_data, { "Respawn Timer", mainmemory.read_s16_be(pointer + spawnerAttributes.respawn_timer) });
+
+	local respawn_current = mainmemory.read_s16_be(pointer + spawnerAttributes.respawn_timer)
+	local respawn_total = mainmemory.readbyte(pointer + spawnerAttributes.respawn_timer_init) * 30
+	local respawn_left = respawn_total - respawn_current
+	local respawn_string = respawn_left.."/"..respawn_total
+
+	table.insert(examine_data, { "Respawn Timer", respawn_string });
 	table.insert(examine_data, { "Chunk", mainmemory.read_s16_be(pointer + spawnerAttributes.chunk) });
 	table.insert(examine_data, { "Separator", 1 });
 
@@ -4175,7 +4283,21 @@ function getExamineDataSpawners(pointer)
 		table.insert(examine_data, { "Unknown Pointer", toHexString(unknown_pointer, 6) });
 	end
 
+	properties_bitfield = mainmemory.read_u16_be(pointer + spawnerAttributes.properties_bitfield);
+	table.insert(examine_data, { "Separator", 1 });
+	if properties_bitfield == 0 then
+		properties_bitfield = getInitialProperties(pointer)
+	end
+
+	local respawn_ban = bit.check(properties_bitfield, 1) or respawn_total == 0
+
+	table.insert(examine_data, { "Properties Bitfield", toBinaryString(properties_bitfield) });
+	table.insert(examine_data, { "Will Respawn", convertBooleanToString(not respawn_ban) });
+	table.insert(examine_data, { "Respects Movement Boundaries", convertBooleanToString(not bit.check(properties_bitfield, 5)) });
+	table.insert(examine_data, { "Killed by Instrument", convertBooleanToString(not bit.check(properties_bitfield, 6)) });
+
 	if isRDRAM(movement_box) then
+		table.insert(examine_data, { "Separator", 1 });
 		local movement_box_x_low = mainmemory.read_s16_be(movement_box + spawnerAttributes.movement_box.x_pos_0);
 		local movement_box_x_high = mainmemory.read_s16_be(movement_box + spawnerAttributes.movement_box.x_pos_1);
 		local movement_box_x = movement_box_x_low..", "..movement_box_x_high;
@@ -4185,10 +4307,11 @@ function getExamineDataSpawners(pointer)
 		table.insert(examine_data, { "Movement Box Pointer", toHexString(movement_box, 6) });
 		table.insert(examine_data, { "Movement Box X", movement_box_x });
 		table.insert(examine_data, { "Movement Box Z", movement_box_z });
-		table.insert(examine_data, { "Separator", 1 });
+		
 	end
 
 	if isRDRAM(aggression_box) then
+		table.insert(examine_data, { "Separator", 1 });
 		local coords_0_string = mainmemory.read_s16_be(aggression_box + spawnerAttributes.movement_box.aggression_box.coords_0);
 		local coords_1_string = mainmemory.read_s16_be(aggression_box + spawnerAttributes.movement_box.aggression_box.coords_1);
 		local coords_2_string = mainmemory.read_s16_be(aggression_box + spawnerAttributes.movement_box.aggression_box.coords_2);
