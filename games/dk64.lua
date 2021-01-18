@@ -4348,6 +4348,7 @@ actorSpawnerAttributes = {
 	z_pos = 0xC, -- flaot
 	rotation = 0x1C, -- u16
 	tied_actor = 0x44, -- u32
+	id = 0x5A, -- u16
 	drawing_code = 0x60, -- u32
 	previous_spawner = 0x64, -- u32
 	next_spawner = 0x68, -- u32
@@ -4442,6 +4443,7 @@ function getExamineDataActorSpawners(pointer)
 	table.insert(examine_data, { "Slot base", toHexString(pointer, 6) });
 	table.insert(examine_data, { "Object Name", spawnerActorName });
 	table.insert(examine_data, { "Object Type", toHexString(spawnerActorType) });
+	table.insert(examine_data, { "Object ID", mainmemory.read_s16_be(pointer + actorSpawnerAttributes.id)});
 	table.insert(examine_data, { "Separator", 1 });
 
 	table.insert(examine_data, { "X",  xPos});
