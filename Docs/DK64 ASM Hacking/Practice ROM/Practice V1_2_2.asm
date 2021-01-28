@@ -420,7 +420,61 @@ PositionSavestates:
 		ANDI 	a1, a1, @D_Right
 		BEQZ 	a1, FinishPositionWrite
 		NOP
-		B 		SavePosition
+
+	SavePosition:
+		LW 		a1, @Player
+		// Actual Positions
+		LI 		a3, @SavedPositions
+		LW 		a2, 0x7C (a1) // X Position
+		SW 		a2, 0x0 (a3)
+		LW 		a2, 0x80 (a1) // Y Position
+		SW 		a2, 0x4 (a3)
+		LW 		a2, 0x84 (a1) // Z Position
+		SW 		a2, 0x8 (a3)
+		// Stored Position
+		LW 		a2, 0x4 (a1) // Rendering Params Pointer
+		LW 		a0, 0x14 (a2) // Bone Array 1
+		LI 		a3, @SavedStoredPosition1
+		LH 		t9, 0x58 (a0)
+		SH 		t9, 0x0 (a3)
+		LH 		t9, 0x5A (a0)
+		SH 		t9, 0x2 (a3)
+		LH 		t9, 0x5C (a0)
+		SH 		t9, 0x4 (a3)
+		LW 		a0, 0x18 (a2) // Bone Array 2
+		LI 		a3, @SavedStoredPosition2
+		LH 		t9, 0x58 (a0)
+		SH 		t9, 0x0 (a3)
+		LH 		t9, 0x5A (a0)
+		SH 		t9, 0x2 (a3)
+		LH 		t9, 0x5C (a0)
+		SH 		t9, 0x4 (a3)
+		// Facing Angle
+		LI 		a3, @SavedRotations
+		LHU		a2, 0xE6 (a1)
+		SH 		a2, 0x0 (a3)
+		LHU		a2, 0xE8 (a1)
+		SH 		a2, 0x2 (a3)
+		// Speed/Accel
+		LI 		a3, @SavedHVelocity
+		LW 		a2, 0xB8 (a1)
+		SW 		a2, 0x0 (a3)
+		LI 		a3, @SavedVerticalSpeedComponents
+		LW 		a2, 0xC0 (a1)
+		SW 		a2, 0x0 (a3)
+		LW 		a2, 0xC4 (a1)
+		SW 		a2, 0x4 (a3)
+		// Floor
+		LI 		a3, @SavedFloor
+		LW 		a2, 0xA4 (a1)
+		SW 		a2, 0x0 (a3)
+		// Saved Boolean
+		LW 		a1, @CurrentMap
+		SB 		a1, @SavedPositionMap
+		// Play Bell SFX
+		JAL 	CodedPlaySFX
+		LI 		a0, @Bell
+		B 		FinishPositionWrite
 		NOP
 
 	LoadPosition:
@@ -481,62 +535,6 @@ PositionSavestates:
 		LI 		a3, @SavedFloor
 		LW 		a2, 0x0 (a3)
 		SW 		a2, 0xA4 (a1)
-		B 		FinishPositionWrite
-		NOP
-
-	SavePosition:
-		LW 		a1, @Player
-		// Actual Positions
-		LI 		a3, @SavedPositions
-		LW 		a2, 0x7C (a1) // X Position
-		SW 		a2, 0x0 (a3)
-		LW 		a2, 0x80 (a1) // Y Position
-		SW 		a2, 0x4 (a3)
-		LW 		a2, 0x84 (a1) // Z Position
-		SW 		a2, 0x8 (a3)
-		// Stored Position
-		LW 		a2, 0x4 (a1) // Rendering Params Pointer
-		LW 		a0, 0x14 (a2) // Bone Array 1
-		LI 		a3, @SavedStoredPosition1
-		LH 		t9, 0x58 (a0)
-		SH 		t9, 0x0 (a3)
-		LH 		t9, 0x5A (a0)
-		SH 		t9, 0x2 (a3)
-		LH 		t9, 0x5C (a0)
-		SH 		t9, 0x4 (a3)
-		LW 		a0, 0x18 (a2) // Bone Array 2
-		LI 		a3, @SavedStoredPosition2
-		LH 		t9, 0x58 (a0)
-		SH 		t9, 0x0 (a3)
-		LH 		t9, 0x5A (a0)
-		SH 		t9, 0x2 (a3)
-		LH 		t9, 0x5C (a0)
-		SH 		t9, 0x4 (a3)
-		// Facing Angle
-		LI 		a3, @SavedRotations
-		LHU		a2, 0xE6 (a1)
-		SH 		a2, 0x0 (a3)
-		LHU		a2, 0xE8 (a1)
-		SH 		a2, 0x2 (a3)
-		// Speed/Accel
-		LI 		a3, @SavedHVelocity
-		LW 		a2, 0xB8 (a1)
-		SW 		a2, 0x0 (a3)
-		LI 		a3, @SavedVerticalSpeedComponents
-		LW 		a2, 0xC0 (a1)
-		SW 		a2, 0x0 (a3)
-		LW 		a2, 0xC4 (a1)
-		SW 		a2, 0x4 (a3)
-		// Floor
-		LI 		a3, @SavedFloor
-		LW 		a2, 0xA4 (a1)
-		SW 		a2, 0x0 (a3)
-		// Saved Boolean
-		LW 		a1, @CurrentMap
-		SB 		a1, @SavedPositionMap
-		// Play Bell SFX
-		JAL 	CodedPlaySFX
-		LI 		a0, @Bell
 
 	FinishPositionWrite:
 		LW 		ra, @ReturnAddress
@@ -765,10 +763,9 @@ ChangeSelectedMap:
 		NOP
 
 	IsSaveSlot:
-		ADDIU 	a3, a3, 1
 		LI 		t9, @MenuSavestateAction
 		B 		CheckMenuCooldown
-		NOP
+		ADDIU 	a3, a3, 1
 
 	IsSlot3:
 		LI 		t9, @Slot3Position
@@ -785,9 +782,8 @@ ChangeSelectedMap:
 		LBU 	a1, 0x0(t9)
 		BEQZ 	a1, LoopToEnd // If array index == 0, loop to end
 		NOP
-		ADDI 	a1, a1, -1
 		B 		SetChange
-		NOP
+		ADDI 	a1, a1, -1
 
 	CheckMenuRight:
 		LB 		a1, 0x2(a2)
@@ -835,9 +831,8 @@ AlterMenuCode:
 		SH 	r0, 0x862A(a1) //0x806A862A
 		// A
 		SH 	r0, 0x871E(a1) //0x806A871E
-		SH 	r0, 0x87FA(a1) //0x806A87FA
 		B 	FinishAlteringMenuCode
-		NOP
+		SH 	r0, 0x87FA(a1) //0x806A87FA
 	NormalCode:
 		// Z
 		LI 	a0, @Z_Button
@@ -1153,11 +1148,8 @@ VariableDisplay:
 		LW 		a2, @CumulativeLag
 		ADD 	a1, a1, a2 // Lag + Old Lag
 		SW 		a1, @CumulativeLag
-		SLL 	a2, a1, 2 // a2 = 4 * a1 ; a1 = Original counter
-		SUBU 	a2, a2, a1 // a2 = a2 - a1 ; a2 = 3 * Original
-		SLL 	a1, a2, 2 // a1 = 4 * a2 ; a1 = 12 * Original
-		ADD 	a1, a1, a2 // a1 = a1 + a2 ; a1 = 15 * Original
-		SLL 	a1, a1, 2 // a1 = a1 * 4 ; a1 = 60 * Original
+		JAL 	MultBy60
+		NOP
 		LI 		a0, 0x25326400 // %2d
 		B 		UpdateVDispText
 		LI 		a2, 0 // ""
@@ -1180,15 +1172,18 @@ VariableDisplay:
 		TimerHandle:
 			SB 		a3, @StoredTimerMode
 			BEQZ 	a3, TimerReset
-			LI 		a2, 1
-			BEQ 	a3, a2, TimerRunning
-			NOP
-			B 		UpdateDispVarsTimer
+			LI 		a2, 2
+			BEQ 	a3, a2, UpdateDispVarsTimer
 			NOP
 
 		TimerRunning:
-			LWU 	a1, @StoredTime
-			ADDIU 	a1, a1, 60
+			JAL 	GetLag
+			NOP
+			JAL 	MultBy60
+			NOP
+			LWU 	a0, @StoredTime
+			ADDU 	a1, a0, a1
+			ADDIU 	a1, a1, 0
 			SW 		a1, @StoredTime
 			B 		UpdateDispVarsTimer
 			NOP
@@ -1238,6 +1233,15 @@ VariableDisplay:
 		LW 		ra, @ReturnAddress
 		JR 		ra
 		NOP
+
+MultBy60:
+	// Input = 60
+	SLL 	a2, a1, 2 // a2 = 4 * a1 ; a1 = Original counter
+	SUBU 	a2, a2, a1 // a2 = a2 - a1 ; a2 = 3 * Original
+	SLL 	a1, a2, 2 // a1 = 4 * a2 ; a1 = 12 * Original
+	ADD 	a1, a1, a2 // a1 = a1 + a2 ; a1 = 15 * Original
+	JR 		ra
+	SLL 	a1, a1, 2 // a1 = a1 * 4 ; a1 = 60 * Original
 
 .align
 WarpMapCodes:
