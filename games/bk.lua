@@ -673,11 +673,224 @@ local function getObjectModel1Pointers()
 	return pointers;
 end
 
+local function objectGetPositionX(pointer)
+	if isRDRAM(pointer) then
+		return mainmemory.readfloat(pointer + 0x4, true);
+	end
+end
+
+local function objectGetPositionY(pointer)
+	if isRDRAM(pointer) then
+		return mainmemory.readfloat(pointer + 0x8, true);
+	end
+end
+
+local function objectGetPositionZ(pointer)
+	if isRDRAM(pointer) then
+		return mainmemory.readfloat(pointer + 0xC, true);
+	end
+end
+
+local function objectGetID(pointer)
+	if isRDRAM(pointer) then
+		local objectIDPointer = dereferencePointer(pointer + 0x12C);
+		if isRDRAM(objectIDPointer) then
+			return mainmemory.read_u16_be(objectIDPointer + 0x02);
+		end
+	end
+	return 0;
+end
+
+local function objectIsCollidable(pointer)
+	if isRDRAM(pointer) then
+		local markerPointer = dereferencePointer(pointer);
+		if isRDRAM(markerPointer) then
+			local val = mainmemory.read_u32_be(markerPointer + 0x2C);
+			return bit.band(val, 0x1) ~= 0;
+		end
+	end
+	return 0;
+end
+
+function getObjectbyID(id)
+	local objectArray = dereferencePointer(Game.Memory.object_array_pointer);
+	local pointers = {};
+	if isRDRAM(objectArray) then
+		local num_slots = mainmemory.read_u32_be(objectArray);
+		for i = 0, num_slots - 1 do
+			local pointer = objectArray + getSlotBase(i);
+			if objectGetID(pointer) == id then
+				table.insert(pointers, pointer);
+			end
+		end
+	end
+	return pointers;
+end
+
 function setObjectModel1Position(pointer, x, y, z)
 	if isRDRAM(pointer) then
 		mainmemory.writefloat(pointer + 0x04, x, true);
 		mainmemory.writefloat(pointer + 0x08, y, true);
 		mainmemory.writefloat(pointer + 0x0C, z, true);
+	end
+end
+
+local viewport_YAngleRange = 60;
+local viewport_XAngleRange = 45;
+local reference_distance = 2000;
+local cameraData = {xPos = 0, yPos = 0, zPos = 0, xRot = 0, yRot = 0};
+
+local screen = {
+	width = client.bufferwidth(),
+	height = client.bufferheight(),
+};
+
+local function cameraUpdate()
+	if mainmemory.readbyte(Game.Memory.first_person_flag) ~= 0 then
+		cameraData = { -- In first person
+			xPos = mainmemory.readfloat(Game.Memory.first_person_cam_x_pos, true),
+			yPos = mainmemory.readfloat(Game.Memory.first_person_cam_y_pos, true),
+			zPos = mainmemory.readfloat(Game.Memory.first_person_cam_z_pos, true),
+			xRot = mainmemory.readfloat(Game.Memory.first_person_cam_x_rot, true) * math.pi / 180,
+			yRot = mainmemory.readfloat(Game.Memory.first_person_cam_y_rot, true) * math.pi / 180,
+		};
+	else
+		cameraData = { -- In third person
+			xPos = mainmemory.readfloat(Game.Memory.camera_x_position, true),
+			yPos = mainmemory.readfloat(Game.Memory.camera_y_position, true),
+			zPos = mainmemory.readfloat(Game.Memory.camera_z_position, true),
+			xRot = mainmemory.readfloat(Game.Memory.camera_x_rotation, true) * math.pi / 180,
+			yRot = mainmemory.readfloat(Game.Memory.camera_y_rotation, true) * math.pi / 180,
+		};
+	end
+end
+
+local function cameraToScreen(vector)
+	local oob = true;
+
+	local xDifference, yDifference, zDifference;
+	xDifference = vector[1] - cameraData.xPos;
+	yDifference = vector[2] - cameraData.yPos;
+	zDifference = vector[3] - cameraData.zPos;
+
+
+
+	-- Transform object point to point in coordinate system based on camera normal
+	-- Rotation transform 1
+	local tempData = {
+		xPos = math.cos(cameraData.yRot)*xDifference - math.sin(cameraData.yRot) * zDifference,
+		yPos = yDifference,
+		zPos = math.sin(cameraData.yRot)*xDifference + math.cos(cameraData.yRot) * zDifference,
+	};
+
+	-- Rotation transform 2
+	local objectData = {
+		xPos = tempData.xPos,
+		yPos = math.sin(cameraData.xRot) * tempData.zPos + math.cos(cameraData.xRot) * tempData.yPos,
+		zPos = -math.cos(cameraData.xRot) * tempData.zPos + math.sin(cameraData.xRot) * tempData.yPos,
+	};
+
+	-- Don't need to compensate for tan since angle between
+	local XAngle_local = math.atan(objectData.yPos / objectData.zPos); -- Horizontal Angle
+	local YAngle_local = math.atan(objectData.xPos / objectData.zPos); -- Verticle Angle
+
+	YAngle_local = ((YAngle_local + math.pi) % (2 * math.pi)) - math.pi; -- Get angle between -180 and +180
+	XAngle_local = ((XAngle_local + math.pi) % (2 * math.pi)) - math.pi;
+	if vector[3] > 30 then
+		if YAngle_local <= (viewport_YAngleRange / 2) and YAngle_local > (-viewport_XAngleRange / 2) then
+			if XAngle_local <= (viewport_XAngleRange / 2) and XAngle_local > (-viewport_YAngleRange / 2) then
+				oob = false
+			end
+		end
+	end
+	-- At this point object is selectable/draggable
+	local drawXPos = (screen.width / 2) * math.sin(YAngle_local) / math.sin(viewport_YAngleRange * math.pi / 360) + screen.width / 2;
+	local drawYPos = -(screen.height / 2) * math.sin(XAngle_local) / math.sin(viewport_XAngleRange * math.pi / 360) + screen.height / 2;
+
+	-- Calc scaling factor -- current calc might be incorrect
+	local scaling_factor = reference_distance / vector[3];
+
+	return {point = {drawXPos, drawYPos}, scale = scaling_factor, offScreen = oob};
+end
+
+-- local last_o = {
+-- 	pos = {x = 0, z = 0},
+-- 	diff = {x = 0, z = 0}
+-- }
+
+-- local next_o = {
+-- 	pos = {x = 0, z = 0},
+-- 	diff = {x = 0, z = 0}
+-- }
+
+function drawConga()
+	local orange = getObjectbyID(0x14);
+	for i = 1, #orange do
+		if isRDRAM(orange[i]) then
+			--physics based calc
+			local o_x = objectGetPositionX(orange[i]);
+			local o_y = objectGetPositionY(orange[i]);
+			local o_z = objectGetPositionZ(orange[i]);
+			local o_x_vel = mainmemory.readfloat(orange[i] + 0x2C, true);
+			local o_y_vel = mainmemory.readfloat(orange[i] + 0x30, true);
+			local o_z_vel = mainmemory.readfloat(orange[i] + 0x34, true);
+			local frame_count = 0;
+			while o_y > -199 
+			do -- -199 is floor height near conga
+				o_y_vel = o_y_vel - 0.5;
+				o_y = o_y + o_y_vel;
+				frame_count = frame_count + 1;
+			end
+			o_x = o_x + o_x_vel*frame_count;
+			o_z = o_z + o_z_vel*frame_count;
+			local orange_target = cameraToScreen({o_x, -199, o_z});
+			if orange_target ~= nil then
+				if orange_target.offScreen == false then
+					gui.drawLine(orange_target.point[1] - 5, orange_target.point[2], orange_target.point[1] + 5, orange_target.point[2], colors.red);
+					gui.drawLine(orange_target.point[1], orange_target.point[2] - 5, orange_target.point[1], orange_target.point[2] + 5, colors.red);
+				end
+			end
+		end
+	end
+
+	local conga = getObjectbyID(8);
+	if #conga == 0 then
+		return;
+	end
+
+	if isRDRAM(conga[1]) then
+		local o_spawn_x = mainmemory.read_s32_be(conga[1] + 0x7C);
+		local o_spawn_z = mainmemory.read_s32_be(conga[1] + 0x84);
+		local x_diff = Game.getXPosition() - o_spawn_x;
+		local z_diff = Game.getZPosition() - o_spawn_z;
+		local kong_diff_x = Game.getXPosition() - objectGetPositionX(conga[1]);
+		local kong_diff_z = Game.getZPosition() - objectGetPositionZ(conga[1]);
+		if(kong_diff_x*kong_diff_x + kong_diff_z*kong_diff_z < 40000) then
+			for i= 0, 3 do
+				local x_sign =  (1 - 2*bit.band(i,0x1));
+				local z_sign =  (1 - bit.band(i,0x2));
+				-- local p1 = cameraToScreen({last_o.pos.x + x_sign*last_o.diff.x*2.4, -199, last_o.pos.z + z_sign*last_o.diff.z*2.4});
+				-- local p2 = cameraToScreen({last_o.pos.x + x_sign*last_o.diff.x*4.4, -199, last_o.pos.z + z_sign*last_o.diff.z*2.4});
+				-- local p3 = cameraToScreen({last_o.pos.x + x_sign*last_o.diff.x*4.4, -199, last_o.pos.z + z_sign*last_o.diff.z*4.4});
+				-- local p4 = cameraToScreen({last_o.pos.x + x_sign*last_o.diff.x*2.4, -199, last_o.pos.z + z_sign*last_o.diff.z*4.4});
+				-- gui.drawPolygon({p1.point, p2.point, p3.point, p4.point}, 0, 0,  colors.blue);
+				
+				p1 = cameraToScreen({o_spawn_x + x_sign*x_diff*2.4, -199, o_spawn_z + z_sign*z_diff*2.4});
+				p2 = cameraToScreen({o_spawn_x + x_sign*x_diff*4.4, -199, o_spawn_z + z_sign*z_diff*2.4});
+				p3 = cameraToScreen({o_spawn_x + x_sign*x_diff*4.4, -199, o_spawn_z + z_sign*z_diff*4.4});
+				p4 = cameraToScreen({o_spawn_x + x_sign*x_diff*2.4, -199, o_spawn_z + z_sign*z_diff*4.4});
+				gui.drawPolygon({p1.point, p2.point, p3.point, p4.point},  0, 0,  colors.blue, 0x3F0000FF);
+				--random throw calc
+				 -- end
+			end
+			-- if next_o.pos.x ~= o_spawn_x or next_o.pos.z ~= o_spawn_z then
+			-- 	last_o = next_o;
+			-- 	next_o.pos.x = o_spawn_x;
+			-- 	next_o.pos.z = o_spawn_z;
+			-- 	next_o.diff.x = x_diff;
+			-- 	next_o.diff.z = z_diff;
+			-- end
+		end
 	end
 end
 
@@ -1798,20 +2011,16 @@ end
 --------------------
 -- Object Overlay --
 --------------------
-local viewport_YAngleRange = 60;
-local viewport_XAngleRange = 45;
+
 local object_selectable_size = 10 * client.bufferwidth() / 640;
-local reference_distance = 2000;
+
 
 local mouseClickedLastFrame = false;
 local startDragPosition = {0,0};
 local draggedObjects = {};
 local dragging = false;
 
-local screen = {
-	width = client.bufferwidth(),
-	height = client.bufferheight(),
-};
+
 
 function drawObjectPositions()
 	local draggableObjects = {};
@@ -1828,45 +2037,26 @@ function drawObjectPositions()
 	local dragTransform = {0, 0};
 	local mouse = input.getmouse();
 
-	if mouse.Left then -- if mouse clicked object is being dragged
-		if not mouseClickedLastFrame then
-			if dragging ~= true then
-				startDrag = true;
-				dragging = true;
-				startDragPosition = {mouse.X, mouse.Y, mouse.Wheel or 0};
-			else
-				draggedObjects[1] = nil;
-				draggedObjects = {};
-				dragging = false;
-			end
-		end
-		mouseClickedLastFrame = true;
-	else
-		mouseClickedLastFrame = false;
-	end
+	-- if mouse.Left then -- if mouse clicked object is being dragged
+	-- 	if not mouseClickedLastFrame then
+	-- 		if dragging ~= true then
+	-- 			startDrag = true;
+	-- 			dragging = true;
+	-- 			startDragPosition = {mouse.X, mouse.Y, mouse.Wheel or 0};
+	-- 		else
+	-- 			draggedObjects[1] = nil;
+	-- 			draggedObjects = {};
+	-- 			dragging = false;
+	-- 		end
+	-- 	end
+	-- 	mouseClickedLastFrame = true;
+	-- else
+	-- 	mouseClickedLastFrame = false;
+	-- end
 
-	if dragging then
-		dragTransform = {mouse.X - startDragPosition[1], mouse.Y - startDragPosition[2], (mouse.Wheel or 0) - startDragPosition[3]};
-	end
-
-	local cameraData = {};
-	if mainmemory.readbyte(Game.Memory.first_person_flag) ~= 0 then
-		cameraData = { -- In first person
-			xPos = mainmemory.readfloat(Game.Memory.first_person_cam_x_pos, true),
-			yPos = mainmemory.readfloat(Game.Memory.first_person_cam_y_pos, true),
-			zPos = mainmemory.readfloat(Game.Memory.first_person_cam_z_pos, true),
-			xRot = mainmemory.readfloat(Game.Memory.first_person_cam_x_rot, true) * math.pi / 180,
-			yRot = mainmemory.readfloat(Game.Memory.first_person_cam_y_rot, true) * math.pi / 180,
-		};
-	else
-		cameraData = { -- In third person
-			xPos = mainmemory.readfloat(Game.Memory.camera_x_position, true),
-			yPos = mainmemory.readfloat(Game.Memory.camera_y_position, true),
-			zPos = mainmemory.readfloat(Game.Memory.camera_z_position, true),
-			xRot = mainmemory.readfloat(Game.Memory.camera_x_rotation, true) * math.pi / 180,
-			yRot = mainmemory.readfloat(Game.Memory.camera_y_rotation, true) * math.pi / 180,
-		};
-	end
+	-- if dragging then
+	-- 	dragTransform = {mouse.X - startDragPosition[1], mouse.Y - startDragPosition[2], (mouse.Wheel or 0) - startDragPosition[3]};
+	-- end
 	for i = 1, #draggableObjects do
 		local slotBase = draggableObjects[i];
 
@@ -1915,38 +2105,38 @@ function drawObjectPositions()
 					-- Calc scaling factor -- current calc might be incorrect
 					local scaling_factor = reference_distance / objectData.zPos;
 					-- Object selection
-					if draggedObjects[1] ~= nil then
-						if i == draggedObjects[1][1] then
-							if dragging then
-								drawXPos = draggedObjects[1][2] + dragTransform[1];
-								drawYPos = draggedObjects[1][3] + dragTransform[2];
-								objectData.zPos = draggedObjects[1][4] + dragTransform[3];
+					-- if draggedObjects[1] ~= nil then
+					-- 	if i == draggedObjects[1][1] then
+					-- 		if dragging then
+					-- 			drawXPos = draggedObjects[1][2] + dragTransform[1];
+					-- 			drawYPos = draggedObjects[1][3] + dragTransform[2];
+					-- 			objectData.zPos = draggedObjects[1][4] + dragTransform[3];
 
-								-- Transform screen-to-game coords
-								YAngle_local = math.asin(math.sin(viewport_YAngleRange * math.pi / 360) * (2 * drawXPos / screen.width - 1));
-								XAngle_local = math.asin(math.sin(viewport_XAngleRange * math.pi / 360) * (1 - 2 * drawYPos / screen.height));
+					-- 			-- Transform screen-to-game coords
+					-- 			YAngle_local = math.asin(math.sin(viewport_YAngleRange * math.pi / 360) * (2 * drawXPos / screen.width - 1));
+					-- 			XAngle_local = math.asin(math.sin(viewport_XAngleRange * math.pi / 360) * (1 - 2 * drawYPos / screen.height));
 
-								objectData.yPos = objectData.zPos * math.tan(XAngle_local); -- Horizontal Angle
-								objectData.xPos = objectData.zPos * math.tan(YAngle_local);
+					-- 			objectData.yPos = objectData.zPos * math.tan(XAngle_local); -- Horizontal Angle
+					-- 			objectData.xPos = objectData.zPos * math.tan(YAngle_local);
 
-								tempData.xPos = objectData.xPos;
-								tempData.yPos = math.cos(cameraData.xRot)*objectData.yPos + math.sin(cameraData.xRot)*objectData.zPos;
-								tempData.zPos = math.sin(cameraData.xRot)*objectData.yPos - math.cos(cameraData.xRot)*objectData.zPos;
+					-- 			tempData.xPos = objectData.xPos;
+					-- 			tempData.yPos = math.cos(cameraData.xRot)*objectData.yPos + math.sin(cameraData.xRot)*objectData.zPos;
+					-- 			tempData.zPos = math.sin(cameraData.xRot)*objectData.yPos - math.cos(cameraData.xRot)*objectData.zPos;
 
-								xDifference = math.cos(cameraData.yRot)*tempData.xPos + math.sin(cameraData.yRot)*tempData.zPos;
-								yDifference = tempData.yPos;
-								zDifference = -math.sin(cameraData.yRot)*tempData.xPos + math.cos(cameraData.yRot)*tempData.zPos;
+					-- 			xDifference = math.cos(cameraData.yRot)*tempData.xPos + math.sin(cameraData.yRot)*tempData.zPos;
+					-- 			yDifference = tempData.yPos;
+					-- 			zDifference = -math.sin(cameraData.yRot)*tempData.xPos + math.cos(cameraData.yRot)*tempData.zPos;
 
-								-- Save new object position to RDRAM
-								if objectModel == 1 then
-									setObjectModel1Position(slotBase, cameraData.xPos + xDifference, cameraData.yPos + yDifference, cameraData.zPos + zDifference);
-								else
-									setStructPosition(slotBase, cameraData.xPos + xDifference, cameraData.yPos + yDifference, cameraData.zPos + zDifference);
-								end
+					-- 			-- Save new object position to RDRAM
+					-- 			if objectModel == 1 then
+					-- 				setObjectModel1Position(slotBase, cameraData.xPos + xDifference, cameraData.yPos + yDifference, cameraData.zPos + zDifference);
+					-- 			else
+					-- 				setStructPosition(slotBase, cameraData.xPos + xDifference, cameraData.yPos + yDifference, cameraData.zPos + zDifference);
+					-- 			end
 
-							end
-						end
-					end
+					-- 		end
+					-- 	end
+					-- end
 					if mouse.Left then
 						if (mouse.X >= drawXPos - scaling_factor * object_selectable_size / 2 and mouse.X <= drawXPos + scaling_factor * object_selectable_size / 2) 
 						and (mouse.Y >= drawYPos - scaling_factor * object_selectable_size / 2 and mouse.Y <= drawYPos + scaling_factor * object_selectable_size / 2) then
@@ -2123,7 +2313,9 @@ function Game.drawUI()
 	gui.text(Game.OSDPosition[1], 2 + Game.OSDRowHeight * row, "Index: "..(object_index).."/"..(numSlots), nil, 'bottomright');
 	row = row + 1;
 
-	--drawObjectPositions();
+	cameraUpdate();
+	drawObjectPositions();
+	drawConga();
 
 	if script_mode == "Examine" and isRDRAM(objectArray) then
 		local examine_data = getExamineData(objectArray + getSlotBase(object_index - 1));
@@ -3578,7 +3770,7 @@ function Game.eachFrame()
 	seamTester.simulate();
 	freezeClipVelocity();
 	freezeZipVelocity();
-
+	
 	if ScriptHawk.UI:ischecked("toggle_neverslip") then
 		Game.neverSlip();
 	end
