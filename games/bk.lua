@@ -2296,6 +2296,14 @@ function getExamineData(slotBase) -- TODO: Improve this based on SM64 module imp
 end
 
 function Game.drawUI()
+	if ScriptHawk.UI:isChecked("Object Overlay") then
+		cameraUpdate();
+		drawObjectPositions();
+		drawConga();
+	else
+		gui.clearGraphics();
+	end
+
 	if script_mode == "Disabled" then
 		return;
 	end
@@ -2312,10 +2320,6 @@ function Game.drawUI()
 	row = row + 1;
 	gui.text(Game.OSDPosition[1], 2 + Game.OSDRowHeight * row, "Index: "..(object_index).."/"..(numSlots), nil, 'bottomright');
 	row = row + 1;
-
-	cameraUpdate();
-	drawObjectPositions();
-	drawConga();
 
 	if script_mode == "Examine" and isRDRAM(objectArray) then
 		local examine_data = getExamineData(objectArray + getSlotBase(object_index - 1));
@@ -3706,6 +3710,7 @@ function Game.initUI()
 		--ScriptHawk.UI:checkbox(5, 5, "dynamic_radius_checkbox", "Dynamic Radius");
 		ScriptHawk.UI:checkbox(5, 4, "freeze_clip_velocity", "Freeze Clip Vel.");
 		ScriptHawk.UI:checkbox(5, 5, "freeze_zip_velocity", "Freeze Zip Vel.");
+		ScriptHawk.UI:checkbox(5, 6, "Object Overlay", "Object Overlay");
 
 		ScriptHawk.UI:checkbox(10, 2, "beta_pause_menu_checkbox", "Beta Pause");
 

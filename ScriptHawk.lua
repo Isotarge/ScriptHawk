@@ -386,6 +386,7 @@ local supportedGames = {
 	["BB359A75941DF74BF7290212C89FBC6E2C5601FE"] = {moduleName="games.bk", friendlyName="Banjo-Kazooie (Europe) (En,Fr,De)", version=1},
 	["DED6EE166E740AD1BC810FD678A84B48E245AB80"] = {moduleName="games.bk", friendlyName="Banjo-Kazooie (USA) (Rev A)", version=3},
 	["1FE1632098865F639E22C11B9A81EE8F29C75D7A"] = {moduleName="games.bk", friendlyName="Banjo-Kazooie (USA)", version=4},
+	["EB3863AE260CC6B248AA3F69DC4F5D712799E09E"] = {moduleName="games.bk", friendlyName="BK Nightbear Before Christmas", version=4},
 
 	-- Banjo-Tooie
 	["5A5172383037D171F121790959962703BE1F373C"] = {moduleName="games.bt", friendlyName="Banjo to Kazooie no Daibouken 2 (Japan)", version=3},
