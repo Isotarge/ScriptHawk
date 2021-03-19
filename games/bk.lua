@@ -837,7 +837,7 @@ function drawConga()
 			local frame_count = 0;
 			while o_y > -199 
 			do -- -199 is floor height near conga
-				o_y_vel = o_y_vel - 0.5;
+				o_y_vel = o_y_vel - 5.0;
 				o_y = o_y + o_y_vel;
 				frame_count = frame_count + 1;
 			end
