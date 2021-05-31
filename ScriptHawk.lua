@@ -1433,9 +1433,8 @@ function ScriptHawk.UI:updateReadouts()
 			local variableVisible = true;
 
 			if moduleHasOSDPreferences and variableType ~= nil then
-				variableVisible = false;
-				if currentPreferences[ScriptHawk.gamePrefName][variableType] == true then
-					variableVisible = true;
+				if currentPreferences[ScriptHawk.gamePrefName][variableType] == false then
+					variableVisible = false;
 				end
 			end
 
@@ -1552,6 +1551,12 @@ function ScriptHawk.UI:updateReadouts()
 				end
 				row = row + 1;
 				nothingDrawnSinceLastSeparator = false;
+			else
+				--[[
+				if ScriptHawk.warnings then
+					print("Warning: Variable "..label.." is not visible");
+				end
+				--]]
 			end
 		else
 			if not nothingDrawnSinceLastSeparator then
