@@ -13,7 +13,6 @@ fix_chunk_deload = false;
 force_gb_load = false;
 force_tbs = false;
 hide_non_scripted = false;
-never_slip = false;
 object_model1_filter = nil; -- String, see obj_model1.actor_types
 object_model2_filter = nil; -- String, see obj_model2.object_types
 loading_zones_filter = nil;
@@ -326,7 +325,7 @@ local Game = {
 		chunk_array_pointer = {0x7F6C18, 0x7F6B38, 0x7F7088, 0x7B20F8},
 		actor_spawner_pointer = {0x7FC400,0x7FC320,0x7FC870,nil},
 		num_enemies = {0x7FDC88, 0x7FDBC8, 0x7FE118, 0x7B73D8},
-		enemy_respawn_object = {0x7FDC8C, 0x7FDBCC, 0x7FE11C, 0x7B73DC},
+		enemy_respawn_object = {0x7FDC8C, 0x7FDBCC, 0x7FE11C, 0x7B73DC}, -- ponter to array of structs 0x48 big
 		mad_jack_podiums_pointer = {0x7FDCA0, 0x7FDBE0, 0x7FE130, nil},
 		os_code_start = {0x400, 0x400, 0x400, nil}, -- TODO: Kiosk
 		os_code_size = {0xD8A8, 0xDAB8, 0xDB18, nil},
@@ -1530,6 +1529,7 @@ obj_model1 = {
 	y_acceleration = 0xC4, -- 32 bit float big endian
 	terminal_velocity = 0xC8, -- 32 bit float big endian
 	light_thing = 0xCC, -- Values 0x00->0x14
+	slope_slipperiness = 0xE0, -- 32 bit float big endian
 	x_rot = 0xE4, -- u16_be
 	y_rot = 0xE6, -- u16_be
 	z_rot = 0xE8, -- u16_be
@@ -8121,14 +8121,16 @@ function Game.drawKutOutMinimap()
 	end
 end
 
-------------------------------------
--- Never Slip                     --
--- Written by Isotarge, 2014-2016 --
-------------------------------------
+-------------------------------------------------
+-- Never Slip                                  --
+-- Written by Isotarge, 2014-2021              --
+-- With help from GloriousLiar and Tom Ballaam --
+-------------------------------------------------
 
 function Game.neverSlip() -- TODO: Set movement state properly
 	local playerObject = Game.getPlayerObject();
 	if isRDRAM(playerObject) then
+		mainmemory.writefloat(playerObject + obj_model1.slope_slipperiness, 0, true);
 		mainmemory.writebyte(playerObject + obj_model1.player.slope_timer, 0); -- Patch the slope timer
 	end
 end
@@ -9753,7 +9755,7 @@ function Game.initUI()
 	-- Checkboxes
 	ScriptHawk.UI:checkbox(0, 6, "Toggle Homing Ammo Checkbox", "Homing Ammo");
 	ScriptHawk.UI:checkbox(5, 5, "Toggle Noclip Checkbox", "Noclip");
-	--ScriptHawk.UI:checkbox(10, 5, "Toggle Neverslip Checkbox", "Never Slip");
+	ScriptHawk.UI:checkbox(10, 8, "Toggle Neverslip Checkbox", "Never Slip");
 	--ScriptHawk.UI:checkbox(5, 5, "Toggle Paper Mode Checkbox", "Paper Mode");
 	ScriptHawk.UI:checkbox(5, 6, "Toggle OhWrongnana", "OhWrongnana");
 
@@ -11042,7 +11044,7 @@ function Game.eachFrame()
 			koshBot.Loop(); -- TODO: This probably stops the virtual pad from working
 		end
 
-		if never_slip then
+		if ScriptHawk.UI:ischecked("Toggle Neverslip Checkbox") then
 			Game.neverSlip();
 		end
 
