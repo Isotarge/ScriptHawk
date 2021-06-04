@@ -4356,7 +4356,7 @@ actorSpawnerAttributes = {
 		tied_map = 0x24, -- u32 (Bonus Barrels only)
 	},
 	balloon = {
-		unique_id = 0x27, -- u8
+		path_id = 0x27, -- u8
 		speed = 0x2B, -- u8
 	},
 };
@@ -4457,7 +4457,7 @@ function getExamineDataActorSpawners(pointer)
 	if isBarrel then
 		table.insert(examine_data, { "Destination Map", Game.maps[mainmemory.read_u32_be(pointer + actorSpawnerAttributes.bonus_barrel.tied_map) + 1] });
 	elseif isBalloon then
-		table.insert(examine_data, { "Unique ID", mainmemory.readbyte(pointer + actorSpawnerAttributes.balloon.unique_id) });
+		table.insert(examine_data, { "Path ID", mainmemory.readbyte(pointer + actorSpawnerAttributes.balloon.path_id) });
 		table.insert(examine_data, { "Speed", mainmemory.readbyte(pointer + actorSpawnerAttributes.balloon.speed) });
 	end
 	if isRDRAM(spawnerTiedActor) then
@@ -4471,43 +4471,48 @@ end
 ----------------------
 
 mapObjectSetup_objM1_size = 0x38;
+mapObjectSetup_objMystery_size = 0x24;
 mapObjectSetup_objM2_size = 0x30;
 mapObjectSetup_buffer_size = 0x4;
 
 mapObjectSetup_attributes = {
-	objM1 = {
-		x_pos = 0x00, -- float
-		y_pos = 0x04, -- float
-		z_pos = 0x08, -- float
-		object_id = 0x32, -- u16
-	},
-	objM2 = {
-		x_pos = 0x00, -- float
-		y_pos = 0x04, -- float
-		z_pos = 0x08, -- float
-		scale = 0x0C, -- float
-		x_rot = 0x18, -- float
-		y_rot = 0x1C, -- float
-		z_rot = 0x20, -- float
-		object_id = 0x28, -- u16
-		object_index = 0x2A, --u16
-	}
+    objM1 = {
+        x_pos = 0x00, -- float
+        y_pos = 0x04, -- float
+        z_pos = 0x08, -- float
+        object_id = 0x32, -- u16
+    },
+    objMystery = {
+    },
+    objM2 = {
+        x_pos = 0x00, -- float
+        y_pos = 0x04, -- float
+        z_pos = 0x08, -- float
+        scale = 0x0C, -- float
+        x_rot = 0x18, -- float
+        y_rot = 0x1C, -- float
+        z_rot = 0x20, -- float
+        object_id = 0x28, -- u16
+        object_index = 0x2A, --u16
+    }
 }
 
 function getMapObjectSetupData()
-	local objM2_header = dereferencePointer(Game.Memory.obj_model2_setup_pointer);
-	if isRDRAM(objM2_header) then
-		local objM2_count = mainmemory.read_u32_be(objM2_header);
-		local objM1_header = objM2_header + (2 * mapObjectSetup_buffer_size) + (mapObjectSetup_objM2_size * objM2_count);
-		local objM1_count = mainmemory.read_u32_be(objM1_header);
-		return {
-			objM2_header + mapObjectSetup_buffer_size,
-			objM2_count,
-			objM1_header + mapObjectSetup_buffer_size,
-			objM1_count
-		};
-	end
-	return {};
+    local objM2_header = dereferencePointer(Game.Memory.obj_model2_setup_pointer);
+    if isRDRAM(objM2_header) then
+        local objM2_count = mainmemory.read_u32_be(objM2_header);
+        local objMystery_header = objM2_header + (1 * mapObjectSetup_buffer_size) + (mapObjectSetup_objM2_size * objM2_count);
+        local objMystery_count = mainmemory.read_u32_be(objMystery_header);
+        local objM1_header = objMystery_header + (1 * mapObjectSetup_buffer_size) + (mapObjectSetup_objMystery_size * objMystery_count);
+        local objM1_count = mainmemory.read_u32_be(objM1_header);
+        return {
+            objM2_header + mapObjectSetup_buffer_size,
+            objM2_count,
+            objM1_header + mapObjectSetup_buffer_size,
+            objM1_count
+        };
+    end
+    return {};
 end
 
 function getNameFromMapObjSetupPointer(pointer,isModelTwo)
