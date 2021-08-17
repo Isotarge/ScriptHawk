@@ -7442,6 +7442,46 @@ function Game.getStoredZ2(actorPointer)
 	return 0;
 end
 
+function Game.setStoredPosition(x, y, z)
+	local playerObject = Game.getPlayerObject();
+	if isRDRAM(playerObject) then
+		-- How much do we need to shift bone array 1?
+		local offsetX1 = Game.getStoredX1(playerObject) - x;
+		local offsetY1 = Game.getStoredY1(playerObject) - y;
+		local offsetZ1 = Game.getStoredZ1(playerObject) - z;
+		-- How much do we need to shift bone array 2?
+		local offsetX2 = Game.getStoredX2(playerObject) - x;
+		local offsetY2 = Game.getStoredY2(playerObject) - y;
+		local offsetZ2 = Game.getStoredZ2(playerObject) - z;
+
+		-- Offset all bones to match desired position
+		local boneArray1 = Game.getBoneArray1(playerObject);
+		if isPointer(boneArray1) then
+			boneArray1 = boneArray1 - RDRAMBase;
+		end
+		local boneArray2 = Game.getBoneArray2(playerObject);
+		if isPointer(boneArray2) then
+			boneArray2 = boneArray2 - RDRAMBase;
+		end
+		local numBones = Game.getNumBones();
+
+		for boneIndex = 0, numBones - 1 do
+			if isRDRAM(boneArray1) then
+				local baseBone1 = boneArray1 + boneIndex * bone_size;
+				mainmemory.write_s16_be(baseBone1 + bone.position_x, mainmemory.read_s16_be(baseBone1 + bone.position_x) - offsetX1);
+				mainmemory.write_s16_be(baseBone1 + bone.position_y, mainmemory.read_s16_be(baseBone1 + bone.position_y) - offsetY1);
+				mainmemory.write_s16_be(baseBone1 + bone.position_z, mainmemory.read_s16_be(baseBone1 + bone.position_z) - offsetZ1);
+			end
+			if isRDRAM(boneArray2) then
+				local baseBone2 = boneArray2 + boneIndex * bone_size;
+				mainmemory.write_s16_be(baseBone2 + bone.position_x, mainmemory.read_s16_be(baseBone2 + bone.position_x) - offsetX2);
+				mainmemory.write_s16_be(baseBone2 + bone.position_y, mainmemory.read_s16_be(baseBone2 + bone.position_y) - offsetY2);
+				mainmemory.write_s16_be(baseBone2 + bone.position_z, mainmemory.read_s16_be(baseBone2 + bone.position_z) - offsetZ2);
+			end
+		end
+	end
+end
+
 --------------
 -- Rotation --
 --------------
