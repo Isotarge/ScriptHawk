@@ -19,6 +19,7 @@ loading_zones_filter = nil;
 char_spawners_filter = nil;
 actor_spawner_filter = nil;
 map_obj_setup_filter = nil;
+texture_filter = nil;
 paper_mode = false;
 rat_enabled = false; -- Randomize Animation Timers
 
@@ -45,6 +46,8 @@ local grab_script_modes = {
 	{"Examine (Actor Spawners)","Actor Spawners", subtype = "Examine"},
 	{"List (Map Object Setup)","Map Object Setup", subtype = "List"},
 	{"Examine (Map Object Setup)","Map Object Setup", subtype = "Examine"},
+	{"List (Map Textures)","Map Textures", subtype = "List"},
+	{"Examine (Map Textures)","Map Textures", subtype = "Examine"},
 };
 local grab_script_mode_index = 1;
 local grab_script_mode = grab_script_modes[grab_script_mode_index][1];
@@ -101,6 +104,7 @@ local function turnFilterBoxIntoFilter()
 	char_spawners_filter = filter_value;
 	actor_spawner_filter = filter_value;
 	map_obj_setup_filter = filter_value;
+	texture_filter = filter_value;
 end
 
 getListOfAnalysisSlideTypes();
@@ -4467,6 +4471,46 @@ function getExamineDataActorSpawners(pointer)
 end
 
 ----------------------
+-- Texture Analysis --
+----------------------
+
+function getMapTextureData()
+	local mapTexture_header = dereferencePointer(Game.Memory.texture_index_object_pointer_2);
+	if isRDRAM(mapTexture_header) then
+		local textureBlockSize = mainmemory.read_u32_be(mapTexture_header - 0xC);
+		return {
+			mapTexture_header,
+			textureBlockSize
+		};
+	end
+	return {};
+end
+
+function Game.populateMapTexturePointers()
+	local texture_data = getMapTextureData();
+	object_pointers = {};
+	if #texture_data > 0 then
+		local textureBlock_address = texture_data[1];
+		local textureBlock_size = texture_data[2];
+		if textureBlock_size > 0 then
+			for i = 1, (textureBlock_size / 4) do
+				local slotBase = textureBlock_address + ((i-1) * 4);
+				local texture_pointer = mainmemory.read_u32_be(slotBase);
+				if texture_pointer > 0 then
+					local filter_box_text = forms.gettext(ScriptHawk.UI.form_controls["Analysis Filter Textbox"]);
+					local startOfBlock = dereferencePointer(Game.Memory.texture_index_object_pointer_2);
+					local index = (slotBase - startOfBlock) / 4;
+					if string.contains(string.lower(toHexString(index)), string.lower(filter_box_text)) or 
+					   string.contains(string.lower(toHexString(texture_pointer)), string.lower(filter_box_text))then
+						table.insert(object_pointers, slotBase);
+					end
+				end
+			end
+		end
+	end
+end
+
+----------------------
 -- Map Object Setup --
 ----------------------
 
@@ -4476,43 +4520,43 @@ mapObjectSetup_objM2_size = 0x30;
 mapObjectSetup_buffer_size = 0x4;
 
 mapObjectSetup_attributes = {
-    objM1 = {
-        x_pos = 0x00, -- float
-        y_pos = 0x04, -- float
-        z_pos = 0x08, -- float
-        object_id = 0x32, -- u16
-    },
-    objMystery = {
-    },
-    objM2 = {
-        x_pos = 0x00, -- float
-        y_pos = 0x04, -- float
-        z_pos = 0x08, -- float
-        scale = 0x0C, -- float
-        x_rot = 0x18, -- float
-        y_rot = 0x1C, -- float
-        z_rot = 0x20, -- float
-        object_id = 0x28, -- u16
-        object_index = 0x2A, --u16
-    }
+	objM1 = {
+		x_pos = 0x00, -- float
+		y_pos = 0x04, -- float
+		z_pos = 0x08, -- float
+		object_id = 0x32, -- u16
+	},
+	objMystery = {
+	},
+	objM2 = {
+		x_pos = 0x00, -- float
+		y_pos = 0x04, -- float
+		z_pos = 0x08, -- float
+		scale = 0x0C, -- float
+		x_rot = 0x18, -- float
+		y_rot = 0x1C, -- float
+		z_rot = 0x20, -- float
+		object_id = 0x28, -- u16
+		object_index = 0x2A, --u16
+	}
 }
 
 function getMapObjectSetupData()
-    local objM2_header = dereferencePointer(Game.Memory.obj_model2_setup_pointer);
-    if isRDRAM(objM2_header) then
-        local objM2_count = mainmemory.read_u32_be(objM2_header);
-        local objMystery_header = objM2_header + (1 * mapObjectSetup_buffer_size) + (mapObjectSetup_objM2_size * objM2_count);
-        local objMystery_count = mainmemory.read_u32_be(objMystery_header);
-        local objM1_header = objMystery_header + (1 * mapObjectSetup_buffer_size) + (mapObjectSetup_objMystery_size * objMystery_count);
-        local objM1_count = mainmemory.read_u32_be(objM1_header);
-        return {
-            objM2_header + mapObjectSetup_buffer_size,
-            objM2_count,
-            objM1_header + mapObjectSetup_buffer_size,
-            objM1_count
-        };
-    end
-    return {};
+	local objM2_header = dereferencePointer(Game.Memory.obj_model2_setup_pointer);
+	if isRDRAM(objM2_header) then
+		local objM2_count = mainmemory.read_u32_be(objM2_header);
+		local objMystery_header = objM2_header + (1 * mapObjectSetup_buffer_size) + (mapObjectSetup_objM2_size * objM2_count);
+		local objMystery_count = mainmemory.read_u32_be(objMystery_header);
+		local objM1_header = objMystery_header + (1 * mapObjectSetup_buffer_size) + (mapObjectSetup_objMystery_size * objMystery_count);
+		local objM1_count = mainmemory.read_u32_be(objM1_header);
+		return {
+			objM2_header + mapObjectSetup_buffer_size,
+			objM2_count,
+			objM1_header + mapObjectSetup_buffer_size,
+			objM1_count
+		};
+	end
+	return {};
 end
 
 function getNameFromMapObjSetupPointer(pointer,isModelTwo)
@@ -9359,6 +9403,10 @@ local function drawGrabScriptUI()
 	if string.contains(grab_script_mode, "Map Object Setup") then
 		Game.populateMapObjSetupPointers();
 	end
+	
+	if string.contains(grab_script_mode, "Map Textures") then
+		Game.populateMapTexturePointers();
+	end
 
 	if rat_enabled then
 		local renderingParams = dereferencePointer(playerObject + obj_model1.rendering_parameters_pointer);
@@ -9625,6 +9673,20 @@ local function drawGrabScriptUI()
 					color = colors.green;
 				end
 				gui.text(gui_x, gui_y + height * row, i..": "..object_name.." ("..toHexString(slotBase)..")", color, 'bottomright');
+				row = row + 1;
+			end
+		end
+		
+		if grab_script_mode == "List (Map Textures)" then
+			pagifyThis(object_pointers, 40);
+			for i = page_finish, page_start + 1, -1 do
+				local texture_data = getMapObjectSetupData();
+				local slotBase = object_pointers[i];
+				local startOfBlock = dereferencePointer(Game.Memory.texture_index_object_pointer_2);
+				local index = (slotBase - startOfBlock) / 4;
+				local textString = i..": "..toHexString(mainmemory.read_u32_be(slotBase)).." ("..toHexString(index)..")"
+				
+				gui.text(gui_x, gui_y + height * row, textString, color, 'bottomright');
 				row = row + 1;
 			end
 		end
