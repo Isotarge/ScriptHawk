@@ -48,6 +48,10 @@ local grab_script_modes = {
 	{"Examine (Map Object Setup)","Map Object Setup", subtype = "Examine"},
 	{"List (Map Textures)","Map Textures", subtype = "List"},
 	{"Examine (Map Textures)","Map Textures", subtype = "Examine"},
+	{"List (Model 2 Textures)","Model 2 Textures", subtype = "List"},
+	{"Examine (Model 2 Textures)","Model 2 Textures", subtype = "Examine"},
+	{"List (FFA and Misc. Textures)","FFA and Misc. Textures", subtype = "List"},
+	{"Examine (FFA and Misc. Textures)","FFA and Misc. Textures", subtype = "Examine"},
 };
 local grab_script_mode_index = 1;
 local grab_script_mode = grab_script_modes[grab_script_mode_index][1];
@@ -4486,8 +4490,37 @@ function getMapTextureData()
 	return {};
 end
 
-function Game.populateMapTexturePointers()
-	local texture_data = getMapTextureData();
+function getModel2TextureData()
+	local model2Texture_header = dereferencePointer(Game.Memory.model2_dl_index_object_pointer);
+	if isRDRAM(model2Texture_header) then
+		local textureBlockSize = mainmemory.read_u32_be(model2Texture_header - 0xC);
+		return {
+			model2Texture_header,
+			textureBlockSize
+		};
+	end
+	return {};
+end
+
+function getFFAandMiscTextureData()
+	local ffaTexture_header = dereferencePointer(Game.Memory.ffa_texture_index_object_pointer);
+	if isRDRAM(ffaTexture_header) then
+		local textureBlockSize = mainmemory.read_u32_be(ffaTexture_header - 0xC);
+		return {
+			ffaTexture_header,
+			textureBlockSize
+		};
+	end
+	return {};
+end
+
+function Game.populateTexturePointers(texture_data)
+	-- local texture_data = {};
+	--if dataType == "Map" then
+	--	texture_data = getMapTextureData();
+	--else if dataType == "Model 2" then
+	--	texture_data = getModel2TextureData();
+	--end
 	object_pointers = {};
 	if #texture_data > 0 then
 		local textureBlock_address = texture_data[1];
@@ -9405,7 +9438,15 @@ local function drawGrabScriptUI()
 	end
 	
 	if string.contains(grab_script_mode, "Map Textures") then
-		Game.populateMapTexturePointers();
+		Game.populateTexturePointers(getMapTextureData());
+	end
+	
+	if string.contains(grab_script_mode, "Model 2 Textures") then
+		Game.populateTexturePointers(getModel2TextureData());
+	end
+	
+	if string.contains(grab_script_mode, "FFA and Misc. Textures") then
+		Game.populateTexturePointers(getFFAandMiscTextureData());
 	end
 
 	if rat_enabled then
@@ -9680,11 +9721,51 @@ local function drawGrabScriptUI()
 		if grab_script_mode == "List (Map Textures)" then
 			pagifyThis(object_pointers, 40);
 			for i = page_finish, page_start + 1, -1 do
-				local texture_data = getMapObjectSetupData();
 				local slotBase = object_pointers[i];
 				local startOfBlock = dereferencePointer(Game.Memory.texture_index_object_pointer_2);
 				local index = (slotBase - startOfBlock) / 4;
 				local textString = i..": "..toHexString(mainmemory.read_u32_be(slotBase)).." ("..toHexString(index)..")"
+				
+				local color = nil;
+				if object_index == i then
+					color = colors.green;
+				end
+				
+				gui.text(gui_x, gui_y + height * row, textString, color, 'bottomright');
+				row = row + 1;
+			end
+		end
+		
+		if grab_script_mode == "List (Model 2 Textures)" then
+			pagifyThis(object_pointers, 40);
+			for i = page_finish, page_start + 1, -1 do
+				local slotBase = object_pointers[i];
+				local startOfBlock = dereferencePointer(Game.Memory.model2_dl_index_object_pointer);
+				local index = (slotBase - startOfBlock) / 4;
+				local textString = i..": "..toHexString(mainmemory.read_u32_be(slotBase)).." ("..toHexString(index)..")"
+				
+				local color = nil;
+				if object_index == i then
+					color = colors.green;
+				end
+				
+				gui.text(gui_x, gui_y + height * row, textString, color, 'bottomright');
+				row = row + 1;
+			end
+		end
+		
+		if grab_script_mode == "List (FFA and Misc. Textures)" then
+			pagifyThis(object_pointers, 40);
+			for i = page_finish, page_start + 1, -1 do
+				local slotBase = object_pointers[i];
+				local startOfBlock = dereferencePointer(Game.Memory.ffa_texture_index_object_pointer);
+				local index = (slotBase - startOfBlock) / 4;
+				local textString = i..": "..toHexString(mainmemory.read_u32_be(slotBase)).." ("..toHexString(index)..")"
+				
+				local color = nil;
+				if object_index == i then
+					color = colors.green;
+				end
 				
 				gui.text(gui_x, gui_y + height * row, textString, color, 'bottomright');
 				row = row + 1;
