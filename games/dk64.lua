@@ -7117,7 +7117,7 @@ end
 function Game.getChunk()
 	local playerObject = Game.getPlayerObject();
 	if isRDRAM(playerObject) then
-		return mainmemory.read_u16_be(playerObject + obj_model1.chunk);
+		return mainmemory.read_s16_be(playerObject + obj_model1.chunk);
 	end
 	return 0;
 end
