@@ -83,7 +83,7 @@ Game = {
 	speedy_index = 9,
 	rot_speed = 0.5,
 	max_rot_units = 360,
-	form_height = 13,
+	form_height = 14,
 	maps = {
 		"SM - Spiral Mountain",
 		"MM - Mumbo's Mountain",
@@ -3731,6 +3731,10 @@ function Game.initUI()
 		-- Character
 		ScriptHawk.UI.form_controls.character_dropdown = forms.dropdown(ScriptHawk.UI.options_form, { "Banjo-Kazooie", "Termite", "Walrus", "Croc", "Pumpkin", "Bee", "Washing Machine" }, ScriptHawk.UI:col(0) + ScriptHawk.UI.dropdown_offset, ScriptHawk.UI:row(7) + ScriptHawk.UI.dropdown_offset, ScriptHawk.UI:col(4) + 8, ScriptHawk.UI.button_height);
 		ScriptHawk.UI:button(5, 7, {2, 8}, nil, nil, "Transform", changeCharacterFromUI);
+
+		-- Grabbed Jiggy Pointer
+		ScriptHawk.UI.form_controls["grab_obj_id Textbox"] = forms.textbox(ScriptHawk.UI.options_form, 1, ScriptHawk.UI:col(1), ScriptHawk.UI.button_height, nil, ScriptHawk.UI:col(0), ScriptHawk.UI:row(11) + 1);
+		ScriptHawk.UI:button(1.5, 11, {2.5, 8}, nil, nil, "Grab Obj-ID", setJiggyGrabbedIndexFromUI);
 	else
 		-- Use a bigger check flags button if the others are hidden by TASSafe
 		ScriptHawk.UI:button(10, 8, {4, 10}, nil, "Check Flag Button", "Check Flag", flagCheckButtonHandler);
@@ -3829,6 +3833,32 @@ function Game.getJiggyGrabbedIndex()
 			return index;
 		end
 	end
+end
+
+function Game.setJiggyGrabbedIndex(input_ID)
+	-- sanity checks
+	if input_ID ~= nil and input_ID >= 1 and input_ID <= 2048 then
+		local pointer = dereferencePointer(Game.Memory.jiggy_grabbed_behavior_struct_pointer);
+		if isRDRAM(pointer) then
+			local old_ID_value = mainmemory.read_u16_be(pointer + 0x2C);
+			local new_ID_value = ((2 * input_ID) - 1) * 0x10;
+			-- retain the last 2 bits in case they matter
+			old_ID_value = bit.band(old_ID_value, 0x000F);
+			new_ID_value = bit.bor(old_ID_value, new_ID_value);
+			mainmemory.write_u16_be(pointer + 0x2C, new_ID_value);
+		else
+			-- place a dummy grabbed-pointer that usually works
+			mainmemory.write_u32_be(Game.Memory.jiggy_grabbed_behavior_struct_pointer, 0x80103000);
+			Game.setJiggyGrabbedIndex(input_ID);
+		end
+	else
+		print("ID value has to be within [1:2048]")
+	end
+end
+
+function setJiggyGrabbedIndexFromUI()
+	local input_ID = tonumber(forms.gettext(ScriptHawk.UI.form_controls["grab_obj_id Textbox"]));
+	Game.setJiggyGrabbedIndex(input_ID);
 end
 
 function Game.getJiggySpawnAngle()
