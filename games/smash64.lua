@@ -20,6 +20,7 @@ local Game = {
 		purple_hurtbox_patch = {nil, nil, nil, 0xF2FD0, nil}, -- 2400
 		player_list_pointer = {0x12E914, 0x131594, 0x139A74, 0x130D84, 0x130F04},
 		item_list_pointer = {0x466F0, 0x46E20, 0x46E60, 0x46700, 0x98450},
+		egg_something_pointer = {0x466F4, 0x46E24, 0x46E64, 0x46704, 0x98454},
 		item_hitbox_offset = {0x370, nil, nil, 0x374, 0x374}, -- TODO: I don't think this exists on PAL versions, should look into it at some point
 	},
 	characters = {
@@ -751,6 +752,15 @@ function Game.setYVelocity(value, player)
 	end
 end
 
+-- Used to track both Egg and Boomerang to save RAM
+local boomerangState = {
+	{ prev_position = {x = 0, y = 0}, d = {x = 0, y = 0} },
+	{ prev_position = {x = 0, y = 0}, d = {x = 0, y = 0} },
+	{ prev_position = {x = 0, y = 0}, d = {x = 0, y = 0} },
+	{ prev_position = {x = 0, y = 0}, d = {x = 0, y = 0} },
+};
+
+-- Boomerang
 function Game.getBoomerang(player)
 	local playerActor = Game.getPlayer(player);
 	if isRDRAM(playerActor) then
@@ -785,13 +795,6 @@ function Game.getBoomerangOSD(player)
 	return toHexString(positionObject).." ("..timer1..", "..timer2..")";
 end
 
-local boomerangState = {
-	{ prev_position = {x = 0, y = 0}, d = {x = 0, y = 0} },
-	{ prev_position = {x = 0, y = 0}, d = {x = 0, y = 0} },
-	{ prev_position = {x = 0, y = 0}, d = {x = 0, y = 0} },
-	{ prev_position = {x = 0, y = 0}, d = {x = 0, y = 0} },
-};
-
 function Game.getBoomerangX(player)
 	local boomerang = Game.getBoomerang(player);
 	if isRDRAM(boomerang) then
@@ -820,6 +823,66 @@ function Game.getBoomerangDY(player)
 		player = 1;
 	end
 	return boomerangState[player].d.y;
+end
+
+-- Egg
+-- TODO: Figure this out for all players
+function Game.getEgg(player)
+	local projectileObject = dereferencePointer(Game.Memory.egg_something_pointer);
+	if isRDRAM(projectileObject) then
+		projectileObject = dereferencePointer(projectileObject + 0x84);
+		if isRDRAM(projectileObject) then
+			return dereferencePointer(projectileObject + 0x2C);
+		end
+	end
+end
+
+function Game.getEggOSD(player)
+	local projectileObject, projectileObject2;
+	local positionObject = nil;
+	local timer1 = 0;
+	local timer2 = 0;
+	projectileObject = dereferencePointer(Game.Memory.egg_something_pointer);
+	if isRDRAM(projectileObject) then
+		projectileObject2 = dereferencePointer(projectileObject + 0x84);
+		if isRDRAM(projectileObject2) then
+			timer1 = mainmemory.readbyte(projectileObject2 + 0x29D);
+			timer2 = mainmemory.readbyte(projectileObject2 + 0x29F);
+			positionObject = dereferencePointer(projectileObject2 + 0x2C);
+		end
+	end
+	--return toHexString(projectileObject).."->"..toHexString(projectileObject2).."->"..toHexString(positionObject).." ("..timer1..", "..timer2..")";
+	return toHexString(positionObject).." ("..timer1..", "..timer2..")";
+end
+
+function Game.getEggX(player)
+	local egg = Game.getEgg(player);
+	if isRDRAM(egg) then
+		return mainmemory.readfloat(egg + 0x00, true);
+	end
+	return 0;
+end
+
+function Game.getEggY(player)
+	local egg = Game.getEgg(player);
+	if isRDRAM(egg) then
+		return mainmemory.readfloat(egg + 0x04, true);
+	end
+	return 0;
+end
+
+function Game.getEggDX(player)
+	if type(player) ~= "number" or player < 1 or player > 4 then
+		player = 1;
+	end
+	return boomerangState[player].d.x; -- We'll reuse boomerangState to save some RAM
+end
+
+function Game.getEggDY(player)
+	if type(player) ~= "number" or player < 1 or player > 4 then
+		player = 1;
+	end
+	return boomerangState[player].d.y; -- We'll reuse boomerangState to save some RAM
 end
 
 local prev_x_vel = 0;
@@ -1108,6 +1171,40 @@ local boomerangOSD = {
 		{"Separator"},
 	},
 };
+local eggOSD = {
+	[1] = {
+		{"Egg", Game.getEggOSD, category="egg"},
+		{"Egg X", Game.getEggX, category="egg"},
+		{"Egg Y", Game.getEggY, category="egg"},
+		{"Egg dX", Game.getEggDX},
+		{"Egg dY", Game.getEggDY},
+		{"Separator"},
+	},
+	[2] = {
+		{"Egg", function() return Game.getEggOSD(2) end, category="egg"},
+		{"Egg X", function() return Game.getEggX(2) end, category="egg"},
+		{"Egg Y", function() return Game.getEggY(2) end, category="egg"},
+		{"Egg dX", function() return Game.getEggDX(2) end, category="egg"},
+		{"Egg dY", function() return Game.getEggDY(2) end, category="egg"},
+		{"Separator"},
+	},
+	[3] = {
+		{"Egg", function() return Game.getEggOSD(3) end, category="egg"},
+		{"Egg X", function() return Game.getEggX(3) end, category="egg"},
+		{"Egg Y", function() return Game.getEggY(3) end, category="egg"},
+		{"Egg dX", function() return Game.getEggDX(3) end, category="egg"},
+		{"Egg dY", function() return Game.getEggDY(3) end, category="egg"},
+		{"Separator"},
+	},
+	[4] = {
+		{"Egg", function() return Game.getEggOSD(4) end, category="egg"},
+		{"Egg X", function() return Game.getEggX(4) end, category="egg"},
+		{"Egg Y", function() return Game.getEggY(4) end, category="egg"},
+		{"Egg dX", function() return Game.getEggDX(4) end, category="egg"},
+		{"Egg dY", function() return Game.getEggDY(4) end, category="egg"},
+		{"Separator"},
+	},
+};
 
 local function buildOSD(OSDBools, OSDCharacters)
 	local OSD = {
@@ -1119,6 +1216,9 @@ local function buildOSD(OSDBools, OSDCharacters)
 			OSD = table.join(OSD, playerOSD[i]);
 			if OSDCharacters[i] == 0x05 then -- Link
 				OSD = table.join(OSD, boomerangOSD[i]);
+			end
+			if OSDCharacters[i] == 0x06 then -- Yoshi
+				OSD = table.join(OSD, eggOSD[i]);
 			end
 		end
 	end
@@ -1161,13 +1261,23 @@ function Game.eachFrame()
 			if OSDBools[i] ~= currentOSDBools[i] then
 				changeDetected = true;
 			end
-			-- Calculate boomerang DX/DY
-			local boomerangX = Game.getBoomerangX(i);
-			local boomerangY = Game.getBoomerangY(i);
-			boomerangState[i].d.x = boomerangX - boomerangState[i].prev_position.x;
-			boomerangState[i].d.y = boomerangY - boomerangState[i].prev_position.y;
-			boomerangState[i].prev_position.x = boomerangX;
-			boomerangState[i].prev_position.y = boomerangY;
+			-- TODO: Clean this up
+			-- Calculate boomerang/egg DX/DY
+			if Game.getCharacter(i) == 0x05 then
+				local boomerangX = Game.getBoomerangX(i);
+				local boomerangY = Game.getBoomerangY(i);
+				boomerangState[i].d.x = boomerangX - boomerangState[i].prev_position.x;
+				boomerangState[i].d.y = boomerangY - boomerangState[i].prev_position.y;
+				boomerangState[i].prev_position.x = boomerangX;
+				boomerangState[i].prev_position.y = boomerangY;
+			elseif Game.getCharacter(i) == 0x06 then
+				local eggX = Game.getEggX(i);
+				local eggY = Game.getEggY(i);
+				boomerangState[i].d.x = eggX - boomerangState[i].prev_position.x;
+				boomerangState[i].d.y = eggY - boomerangState[i].prev_position.y;
+				boomerangState[i].prev_position.x = eggX;
+				boomerangState[i].prev_position.y = eggY;
+			end
 		end
 		OSDCharacters[i] = Game.getCharacter(i);
 		if OSDCharacters[i] ~= currentOSDCharacters[i] then
