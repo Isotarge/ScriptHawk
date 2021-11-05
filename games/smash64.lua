@@ -21,6 +21,7 @@ local Game = {
 		player_list_pointer = {0x12E914, 0x131594, 0x139A74, 0x130D84, 0x130F04},
 		item_list_pointer = {0x466F0, 0x46E20, 0x46E60, 0x46700, 0x98450},
 		egg_something_pointer = {0x466F4, 0x46E24, 0x46E64, 0x46704, 0x98454},
+		egg_timer_offset = {0x264, 0x278, 0x278, 0x268, 0x268},
 		item_hitbox_offset = {0x370, nil, nil, 0x374, 0x374}, -- TODO: I don't think this exists on PAL versions, should look into it at some point
 	},
 	characters = {
@@ -841,18 +842,16 @@ function Game.getEggOSD(player)
 	local projectileObject, projectileObject2;
 	local positionObject = nil;
 	local timer1 = 0;
-	local timer2 = 0;
 	projectileObject = dereferencePointer(Game.Memory.egg_something_pointer);
 	if isRDRAM(projectileObject) then
 		projectileObject2 = dereferencePointer(projectileObject + 0x84);
 		if isRDRAM(projectileObject2) then
-			timer1 = mainmemory.readbyte(projectileObject2 + 0x29D);
-			timer2 = mainmemory.readbyte(projectileObject2 + 0x29F);
+			timer1 = mainmemory.read_u32_be(projectileObject2 + Game.Memory.egg_timer_offset);
 			positionObject = dereferencePointer(projectileObject2 + 0x2C);
 		end
 	end
-	--return toHexString(projectileObject).."->"..toHexString(projectileObject2).."->"..toHexString(positionObject).." ("..timer1..", "..timer2..")";
-	return toHexString(positionObject).." ("..timer1..", "..timer2..")";
+	--return toHexString(projectileObject).."->"..toHexString(projectileObject2).."->"..toHexString(positionObject).." ("..timer1..")";
+	return toHexString(positionObject).." ("..timer1..")";
 end
 
 function Game.getEggX(player)
