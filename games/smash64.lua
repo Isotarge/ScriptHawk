@@ -792,8 +792,8 @@ function Game.getBoomerangOSD(player)
 			end
 		end
 	end
-	--return toHexString(projectileObject).."->"..toHexString(projectileObject2).."->"..toHexString(positionObject).." ("..timer1..", "..timer2..")";
-	return toHexString(positionObject).." ("..timer1..", "..timer2..")";
+	return toHexString(projectileObject).."->"..toHexString(projectileObject2).."->"..toHexString(positionObject).." ("..timer1..", "..timer2..")";
+	-- return toHexString(positionObject).." ("..timer1..", "..timer2..")";
 end
 
 function Game.getBoomerangX(player)
@@ -850,8 +850,8 @@ function Game.getEggOSD(player)
 			positionObject = dereferencePointer(projectileObject2 + 0x2C);
 		end
 	end
-	--return toHexString(projectileObject).."->"..toHexString(projectileObject2).."->"..toHexString(positionObject).." ("..timer1..")";
-	return toHexString(positionObject).." ("..timer1..")";
+	return toHexString(projectileObject).."->"..toHexString(projectileObject2).."->"..toHexString(positionObject).." ("..timer1..")";
+	-- return toHexString(positionObject).." ("..timer1..")";
 end
 
 function Game.getEggX(player)
