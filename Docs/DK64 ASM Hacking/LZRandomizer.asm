@@ -153,7 +153,7 @@ Bosses:
 .byte	0x08;		"Jungle Japes: Army Dillo",8
 .byte	0xC5;		"Angry Aztec: Dogadon",
 .byte	0x9A;		"Frantic Factory: Mad Jack",
-.byte	0x6F;		"Gloomy Galleon: Pufftoss",
+.byte	0x6F;		"Gloomy Galleon: Puftoss",
 .byte	0x53;		"Fungi Forest: Dogadon",
 .byte	0xC4;		"Crystal Caves: Army Dillo",
 .byte	0xC7;		"Creepy Castle: King Kut Out",

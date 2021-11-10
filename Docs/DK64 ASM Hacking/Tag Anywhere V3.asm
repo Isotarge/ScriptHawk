@@ -386,7 +386,7 @@ ExplicitDisableMaps:
 //.byte 108 // Creepy Castle: Crypt (Lanky, Tiny)
 //.byte 109 // Kong Battle: Arena 1  // TODO: Would be really cool to get multiplayer working, currently just voids you out when activated
 .byte 110 // Frantic Factory: Barrel Blast
-.byte 111 // Gloomy Galleon: Pufftoss
+.byte 111 // Gloomy Galleon: Puftoss
 //.byte 112 // Creepy Castle: Crypt (DK, Diddy, Chunky)
 //.byte 113 // Creepy Castle: Museum
 //.byte 114 // Creepy Castle: Library

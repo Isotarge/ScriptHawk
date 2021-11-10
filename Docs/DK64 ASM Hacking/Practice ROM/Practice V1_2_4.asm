@@ -1692,7 +1692,7 @@ BadSavestateMaps:
 	.byte 0x66 // BBBash (V Easy)
 	.byte 0x67 // SSeek (V Easy)
 	.byte 0x68 // BBother (Easy)
-	.byte 0x6F // Galleon: Pufftoss
+	.byte 0x6F // Galleon: Puftoss
 	// All values between 0x73 and 0x96 (Inclusive). Various bonus minigames
 	.byte 0x9A // Factory: Jack
 	.byte 0x9B // Crown - Arena Ambush

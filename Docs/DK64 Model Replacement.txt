@@ -80,7 +80,7 @@ Replace ?? with any of the following values:
 38 - Army Dillo (With shell)
 39 - Mr. Dice
 3A - Klump
-3B - Pufftoss
+3B - Puftoss
 3C - Dogadon
 3D - Banana Fairy
 3E - Llama

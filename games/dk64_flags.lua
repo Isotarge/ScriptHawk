@@ -315,7 +315,7 @@ return {
 
 	{byte=0x23, bit=0, name="Caves: Lanky 5DI Baboon Balloon Pad spawn", type="Physical", map=85},
 	{byte=0x23, bit=1, name="Caves: Lanky GB: 5DI", type="GB", map=85},
-	{byte=0x23, bit=2, name="Caves: FT CS", type="Cutscene", map=72},
+	{byte=0x23, bit=2, name="Caves: First Time Cutscene", type="Cutscene", map=72},
 	{byte=0x23, bit=3, name="Caves: W1 (5DI)", type="Warp", map=72},
 	{byte=0x23, bit=4, name="Caves: W1 (Entrance)", type="Warp", map=72},
 	{byte=0x23, bit=5, name="Caves: W2 (Entrance)", type="Warp", map=72},

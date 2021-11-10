@@ -471,7 +471,7 @@ local Game = {
 		"Creepy Castle: Crypt (Lanky, Tiny)",
 		"Kong Battle: Arena 1",
 		"Frantic Factory: Barrel Blast", -- 110
-		"Gloomy Galleon: Pufftoss",
+		"Gloomy Galleon: Puftoss",
 		"Creepy Castle: Crypt (DK, Diddy, Chunky)",
 		"Creepy Castle: Museum",
 		"Creepy Castle: Library",
@@ -1342,14 +1342,14 @@ obj_model1 = {
 		[166] = "King Kut Out Part",
 		[167] = "Cannon",
 		-- [168] = "Unknown",
-		[169] = "Pufftup", -- Pufftoss Fight
+		[169] = "Puftup", -- Puftoss Fight
 		[170] = "Damage Source", -- K. Rool's Glove
 		[171] = "Orange", -- Krusha's Gun
 		[173] = "Cutscene Controller",
 		-- [174] = "Unknown",
 		[175] = "Kaboom",
 		[176] = "Timer",
-		[177] = "Timer Controller", -- Pufftoss Fight & Fac Beaver Bother Spawn Timer
+		[177] = "Timer Controller", -- Puftoss Fight & Fac Beaver Bother Spawn Timer
 		[178] = "Beaver", -- Blue
 		[179] = "Shockwave (Mad Jack)",
 		[180] = "Krash", -- Minecart Club Guy
@@ -1388,7 +1388,7 @@ obj_model1 = {
 		[213] = "Fire Column Spawner", -- Japes Minecart
 		[214] = "Minecart (TNT)", -- Minecart Mayhem
 		[215] = "Minecart (TNT)",
-		[216] = "Pufftoss",
+		[216] = "Puftoss",
 		-- [217] = "Unknown",
 		[218] = "Handle",
 		[219] = "Slot",
@@ -1462,7 +1462,7 @@ obj_model1 = {
 		-- [287] = "Unknown",
 		[288] = "Tomato", -- Fungi
 		[289] = "Kritter-in-a-Sheet",
-		[290] = "Pufftup",
+		[290] = "Puftup",
 		[291] = "Kosha",
 		[292] = "K. Rool (Diddy Phase)",
 		[293] = "K. Rool (Lanky Phase)",
@@ -2702,7 +2702,7 @@ local model_indexes = { -- Different on Kiosk, handled in Game.detectVersion()
 	[0x0038] = "Army Dillo", -- With shell
 	[0x0039] = "Mr. Dice",
 	[0x003A] = "Klump",
-	[0x003B] = "Pufftoss",
+	[0x003B] = "Puftoss",
 	[0x003C] = "Dogadon",
 	[0x003D] = "Banana Fairy",
 	[0x003E] = "Llama",
@@ -2733,7 +2733,7 @@ local model_indexes = { -- Different on Kiosk, handled in Game.detectVersion()
 	[0x0057] = "Book", -- Cactle
 	[0x0058] = "Ship's Wheel",
 	[0x0059] = "Spotlight Fish", -- What the heck is his name?
-	[0x005A] = "Pufftup",
+	[0x005A] = "Puftup",
 	[0x005B] = "Mermaid",
 	[0x005C] = "Mushroom",
 	[0x005D] = "Shockwave (Mad Jack)",
@@ -3616,7 +3616,7 @@ obj_model2 = {
 		[0x276] = "Boxing Ring Corner (Green)",
 		[0x277] = "Boxing Ring Corner (Blue)",
 		[0x278] = "Boxing Ring Corner (Yellow)",
-		[0x279] = "Lightning Rod", -- Pufftoss Fight, DK Isles for some reason
+		[0x279] = "Lightning Rod", -- Puftoss Fight, DK Isles for some reason
 		[0x27A] = "Green Electricity", -- Helm? Chunky BoM stuff?
 		[0x27B] = "Blast-O-Matic",
 		[0x27C] = "Target", -- K. Rool Fight (Diddy Phase)
@@ -5385,7 +5385,7 @@ function Game.detectVersion(romName, romHash)
 			[175] = "Rareware Logo",
 			[177] = "Minecart (TNT)",
 			[178] = "Minecart (TNT)",
-			[179] = "Pufftoss",
+			[179] = "Puftoss",
 			[184] = "Rareware Logo",
 			[185] = "Rareware Logo",
 			[187] = "Boxing Glove in the Box (Beta)",
@@ -5440,7 +5440,7 @@ function Game.detectVersion(romName, romHash)
 			[254] = "Giant Clam",
 			[256] = "Tomato",
 			[257] = "Kritter-in-a-Sheet",
-			[258] = "Pufftup",
+			[258] = "Puftup",
 			[266] = "Enemy Car",
 			[271] = "Seal",
 			[272] = "Kong Logo (Instrument)",
@@ -5564,7 +5564,7 @@ function Game.detectVersion(romName, romHash)
 			[0x0038] = "Army Dillo",
 			[0x0039] = "Mr. Dice",
 			[0x003A] = "Klump",
-			[0x003B] = "Pufftoss",
+			[0x003B] = "Puftoss",
 			[0x003C] = "Dogadon",
 			[0x003D] = "Banana Fairy",
 			[0x003E] = "Llama",
@@ -5595,7 +5595,7 @@ function Game.detectVersion(romName, romHash)
 			[0x0057] = "Book",
 			[0x0058] = "Ship's Wheel",
 			[0x0059] = "Spotlight Fish",
-			[0x005A] = "Pufftup",
+			[0x005A] = "Puftup",
 			[0x005B] = "Mermaid",
 			[0x005C] = "Mushroom Man",
 			[0x005D] = "Shockwave",

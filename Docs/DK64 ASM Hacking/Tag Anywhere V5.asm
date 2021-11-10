@@ -192,6 +192,9 @@ li t2, 1
 sb t2, 0x232(t0)
 
 +:
+// TODO: Implement this optimization from Tom Ballaam
+// Code change to change start location to isles permanently:
+// 0x714540 (u32) > 0x00000000
 lw t0, @CurrentMap
 li t1, 80 // Main Menu
 bne t0, t1, +
@@ -346,7 +349,6 @@ SW t5 0x10(sp)
 
 lhu a0, 0(a0) // Read the flag index from the array
 JAL @checkFlag // Check whether it's set
-//LI V0, 1 // DEBUG
 li a1, 0 // Flag block type is "permanent"
 
 // Restore values of temporary registers that checkFlag() fiddles with
@@ -444,41 +446,41 @@ SkipGBDances:
     SW r0, 0(t0) // Cancel Control State Progress Zeroing
 
 SetSpeedrunModeFlags:
-ADDIU	sp, sp, -0x18 // Push S0
-SW		s0, 0x10(sp)
-NOP
+    ADDIU	sp, sp, -0x18 // Push S0
+    SW		s0, 0x10(sp)
+    NOP
 
-// Load flag array base into register to loop with
-LA      s0, SpeedrunModeFlags
+    // Load flag array base into register to loop with
+    LA      s0, SpeedrunModeFlags
 
--:
-    LHU     a0, 0(s0) // Load the flag index from the array
-    BEQZ    a0, + // If the flag index is 0, exit the loop
-    LI      a1, 1
-    JAL     @setFlag
-    LI      a2, 0 // It's not a temporary flag
-    B       -
-    ADDIU   s0, s0, 2 // Move on to the next flag in the array
+    -:
+        LHU     a0, 0(s0) // Load the flag index from the array
+        BEQZ    a0, + // If the flag index is 0, exit the loop
+        LI      a1, 1
+        JAL     @setFlag
+        LI      a2, 0 // It's not a temporary flag
+        B       -
+        ADDIU   s0, s0, 2 // Move on to the next flag in the array
 
-+:
+    +:
 
 SetSpeedrunModeTemporaryFlags:
-// Load flag array base into register to loop with
-LA      s0, SpeedrunModeTemporaryFlags
+    // Load flag array base into register to loop with
+    LA      s0, SpeedrunModeTemporaryFlags
 
--:
-    LHU     a0, 0(s0) // Load the flag index from the array
-    BEQZ    a0, + // If the flag index is 0, exit the loop
-    LI      a1, 1
-    JAL     @setFlag
-    LI      a2, 2 // This time it IS a temporary flag
-    B       -
-    ADDIU   s0, s0, 2 // Move on to the next flag in the array
+    -:
+        LHU     a0, 0(s0) // Load the flag index from the array
+        BEQZ    a0, + // If the flag index is 0, exit the loop
+        LI      a1, 1
+        JAL     @setFlag
+        LI      a2, 2 // This time it IS a temporary flag
+        B       -
+        ADDIU   s0, s0, 2 // Move on to the next flag in the array
 
-+:
-LW		s0, 0x10(sp)  // Pop S0
-ADDIU	sp, sp, 0x18
-NOP
+    +:
+    LW		s0, 0x10(sp)  // Pop S0
+    ADDIU	sp, sp, 0x18
+    NOP
 
 UnlockMoves:
 li t4, 0x807FC950 // DK Base
@@ -532,161 +534,161 @@ ExplicitDisableMap:
 .byte 0 // We'll check this when the map loads to save looping through the array each frame
 
 ExplicitDisableMaps:
-.byte 1 // Funky's Store
-.byte 2 // DK Arcade
-.byte 3 // K. Rool Barrel: Lanky's Maze
-.byte 5 // Cranky's Lab
-.byte 6 // Jungle Japes: Minecart
-.byte 9 // Jetpac
-.byte 10 // Kremling Kosh! (very easy)
-.byte 14 // Angry Aztec: Beetle Race // Note: Softlock at the end if enabled?
-.byte 15 // Snide's H.Q.
-.byte 18 // Teetering Turtle Trouble! (very easy)
-.byte 25 // Candy's Music Shop
-.byte 27 // Frantic Factory: Car Race
-.byte 31 // Gloomy Galleon: K. Rool's Ship // TODO: Test
-.byte 32 // Batty Barrel Bandit! (easy)
-.byte 35 // K. Rool Barrel: DK's Target Game
-.byte 37 // Jungle Japes: Barrel Blast // Note: The barrels don't work as other kongs so not much point enabling it on this map
-.byte 41 // Angry Aztec: Barrel Blast
-.byte 42 // Troff 'n' Scoff
-.byte 50 // K. Rool Barrel: Tiny's Mushroom Game
-.byte 54 // Gloomy Galleon: Barrel Blast
-.byte 55 // Fungi Forest: Minecart
-.byte 76 // DK Rap
-.byte 77 // Minecart Mayhem! (easy)
-.byte 78 // Busy Barrel Barrage! (easy)
-.byte 79 // Busy Barrel Barrage! (normal)
-.byte 80 // Main Menu
-.byte 82 // Crystal Caves: Beetle Race
-.byte 83 // Fungi Forest: Dogadon
-.byte 101 // Krazy Kong Klamour! (easy) // Note: Broken with switch kong
-.byte 102 // Big Bug Bash! (very easy) // Note: Broken with switch kong
-.byte 103 // Searchlight Seek! (very easy) // Note: Broken with switch kong
-.byte 104 // Beaver Bother! (easy) // Note: Broken with switch kong
-.byte 106 // Creepy Castle: Minecart
-//.byte 107 // Kong Battle: Battle Arena  // TODO: Would be really cool to get multiplayer working, currently just voids you out when activated
-//.byte 109 // Kong Battle: Arena 1  // TODO: Would be really cool to get multiplayer working, currently just voids you out when activated
-.byte 110 // Frantic Factory: Barrel Blast
-.byte 111 // Gloomy Galleon: Puftoss
-.byte 115 // Kremling Kosh! (easy)
-.byte 116 // Kremling Kosh! (normal)
-.byte 117 // Kremling Kosh! (hard)
-.byte 118 // Teetering Turtle Trouble! (easy)
-.byte 119 // Teetering Turtle Trouble! (normal)
-.byte 120 // Teetering Turtle Trouble! (hard)
-.byte 121 // Batty Barrel Bandit! (easy)
-.byte 122 // Batty Barrel Bandit! (normal)
-.byte 123 // Batty Barrel Bandit! (hard)
-.byte 131 // Busy Barrel Barrage! (hard)
-.byte 136 // Beaver Bother! (normal)
-.byte 137 // Beaver Bother! (hard)
-.byte 138 // Searchlight Seek! (easy)
-.byte 139 // Searchlight Seek! (normal)
-.byte 140 // Searchlight Seek! (hard)
-.byte 141 // Krazy Kong Klamour! (normal)
-.byte 142 // Krazy Kong Klamour! (hard)
-.byte 143 // Krazy Kong Klamour! (insane)
-.byte 144 // Peril Path Panic! (very easy) // Note: Broken with switch kong
-.byte 145 // Peril Path Panic! (easy)
-.byte 146 // Peril Path Panic! (normal)
-.byte 147 // Peril Path Panic! (hard)
-.byte 148 // Big Bug Bash! (easy)
-.byte 149 // Big Bug Bash! (normal)
-.byte 150 // Big Bug Bash! (hard)
-//.byte 152 // Hideout Helm (Intro Story) // Note: Handled by cutscene check
-//.byte 153 // DK Isles (DK Theatre) // Note: Handled by cutscene check
-.byte 165 // K. Rool Barrel: Diddy's Kremling Game
-//.byte 172 // Rock (Intro Story) // Note: Handled by cutscene check
-.byte 185 // Enguarde Arena // Note: Handled by character check
-.byte 186 // Creepy Castle: Car Race
-.byte 187 // Crystal Caves: Barrel Blast
-.byte 188 // Creepy Castle: Barrel Blast
-.byte 189 // Fungi Forest: Barrel Blast
-.byte 190 // Kong Battle: Arena 2 // TODO: Would be really cool to get multiplayer working, currently just voids you out when activated
-.byte 191 // Rambi Arena // Note: Handled by character check
-.byte 192 // Kong Battle: Arena 3 // TODO: Would be really cool to get multiplayer working, currently just voids you out when activated
-.byte 198 // Training Grounds (End Sequence) // Note: Handled by cutscene check
-.byte 199 // Creepy Castle: King Kut Out // Note: Doesn't break the kong order but since this fight is explicitly about tagging we might as well disable
-.byte 201 // K. Rool Barrel: Diddy's Rocketbarrel Game
-.byte 202 // K. Rool Barrel: Lanky's Shooting Game
-.byte 203 // K. Rool Fight: DK Phase // Note: Enabling here breaks the fight and may cause softlocks
-.byte 204 // K. Rool Fight: Diddy Phase // Note: Enabling here breaks the fight and may cause softlocks
-.byte 205 // K. Rool Fight: Lanky Phase // Note: Enabling here breaks the fight and may cause softlocks
-.byte 206 // K. Rool Fight: Tiny Phase // Note: Enabling here breaks the fight and may cause softlocks
-.byte 207 // K. Rool Fight: Chunky Phase // Note: Enabling here breaks the fight and may cause softlocks
-.byte 208 // Bloopers Ending // Note: Handled by cutscene check
-.byte 209 // K. Rool Barrel: Chunky's Hidden Kremling Game
-.byte 210 // K. Rool Barrel: Tiny's Pony Tail Twirl Game
-.byte 211 // K. Rool Barrel: Chunky's Shooting Game
-.byte 212 // K. Rool Barrel: DK's Rambi Game
-.byte 213 // K. Lumsy Ending // Note: Handled by cutscene check
-.byte 214 // K. Rool's Shoe
-.byte 215 // K. Rool's Arena // Note: Handled by cutscene check?
-.byte 0 // NULL TERMINATOR (ends loop)
+    .byte 1 // Funky's Store
+    .byte 2 // DK Arcade
+    .byte 3 // K. Rool Barrel: Lanky's Maze
+    .byte 5 // Cranky's Lab
+    .byte 6 // Jungle Japes: Minecart
+    .byte 9 // Jetpac
+    .byte 10 // Kremling Kosh! (very easy)
+    .byte 14 // Angry Aztec: Beetle Race // Note: Softlock at the end if enabled?
+    .byte 15 // Snide's H.Q.
+    .byte 18 // Teetering Turtle Trouble! (very easy)
+    .byte 25 // Candy's Music Shop
+    .byte 27 // Frantic Factory: Car Race
+    .byte 31 // Gloomy Galleon: K. Rool's Ship // TODO: Test
+    .byte 32 // Batty Barrel Bandit! (easy)
+    .byte 35 // K. Rool Barrel: DK's Target Game
+    .byte 37 // Jungle Japes: Barrel Blast // Note: The barrels don't work as other kongs so not much point enabling it on this map
+    .byte 41 // Angry Aztec: Barrel Blast
+    .byte 42 // Troff 'n' Scoff
+    .byte 50 // K. Rool Barrel: Tiny's Mushroom Game
+    .byte 54 // Gloomy Galleon: Barrel Blast
+    .byte 55 // Fungi Forest: Minecart
+    .byte 76 // DK Rap
+    .byte 77 // Minecart Mayhem! (easy)
+    .byte 78 // Busy Barrel Barrage! (easy)
+    .byte 79 // Busy Barrel Barrage! (normal)
+    .byte 80 // Main Menu
+    .byte 82 // Crystal Caves: Beetle Race
+    .byte 83 // Fungi Forest: Dogadon
+    .byte 101 // Krazy Kong Klamour! (easy) // Note: Broken with switch kong
+    .byte 102 // Big Bug Bash! (very easy) // Note: Broken with switch kong
+    .byte 103 // Searchlight Seek! (very easy) // Note: Broken with switch kong
+    .byte 104 // Beaver Bother! (easy) // Note: Broken with switch kong
+    .byte 106 // Creepy Castle: Minecart
+    //.byte 107 // Kong Battle: Battle Arena  // TODO: Would be really cool to get multiplayer working, currently just voids you out when activated
+    //.byte 109 // Kong Battle: Arena 1  // TODO: Would be really cool to get multiplayer working, currently just voids you out when activated
+    .byte 110 // Frantic Factory: Barrel Blast
+    .byte 111 // Gloomy Galleon: Puftoss
+    .byte 115 // Kremling Kosh! (easy)
+    .byte 116 // Kremling Kosh! (normal)
+    .byte 117 // Kremling Kosh! (hard)
+    .byte 118 // Teetering Turtle Trouble! (easy)
+    .byte 119 // Teetering Turtle Trouble! (normal)
+    .byte 120 // Teetering Turtle Trouble! (hard)
+    .byte 121 // Batty Barrel Bandit! (easy)
+    .byte 122 // Batty Barrel Bandit! (normal)
+    .byte 123 // Batty Barrel Bandit! (hard)
+    .byte 131 // Busy Barrel Barrage! (hard)
+    .byte 136 // Beaver Bother! (normal)
+    .byte 137 // Beaver Bother! (hard)
+    .byte 138 // Searchlight Seek! (easy)
+    .byte 139 // Searchlight Seek! (normal)
+    .byte 140 // Searchlight Seek! (hard)
+    .byte 141 // Krazy Kong Klamour! (normal)
+    .byte 142 // Krazy Kong Klamour! (hard)
+    .byte 143 // Krazy Kong Klamour! (insane)
+    .byte 144 // Peril Path Panic! (very easy) // Note: Broken with switch kong
+    .byte 145 // Peril Path Panic! (easy)
+    .byte 146 // Peril Path Panic! (normal)
+    .byte 147 // Peril Path Panic! (hard)
+    .byte 148 // Big Bug Bash! (easy)
+    .byte 149 // Big Bug Bash! (normal)
+    .byte 150 // Big Bug Bash! (hard)
+    //.byte 152 // Hideout Helm (Intro Story) // Note: Handled by cutscene check
+    //.byte 153 // DK Isles (DK Theatre) // Note: Handled by cutscene check
+    .byte 165 // K. Rool Barrel: Diddy's Kremling Game
+    //.byte 172 // Rock (Intro Story) // Note: Handled by cutscene check
+    .byte 185 // Enguarde Arena // Note: Handled by character check
+    .byte 186 // Creepy Castle: Car Race
+    .byte 187 // Crystal Caves: Barrel Blast
+    .byte 188 // Creepy Castle: Barrel Blast
+    .byte 189 // Fungi Forest: Barrel Blast
+    .byte 190 // Kong Battle: Arena 2 // TODO: Would be really cool to get multiplayer working, currently just voids you out when activated
+    .byte 191 // Rambi Arena // Note: Handled by character check
+    .byte 192 // Kong Battle: Arena 3 // TODO: Would be really cool to get multiplayer working, currently just voids you out when activated
+    .byte 198 // Training Grounds (End Sequence) // Note: Handled by cutscene check
+    .byte 199 // Creepy Castle: King Kut Out // Note: Doesn't break the kong order but since this fight is explicitly about tagging we might as well disable
+    .byte 201 // K. Rool Barrel: Diddy's Rocketbarrel Game
+    .byte 202 // K. Rool Barrel: Lanky's Shooting Game
+    .byte 203 // K. Rool Fight: DK Phase // Note: Enabling here breaks the fight and may cause softlocks
+    .byte 204 // K. Rool Fight: Diddy Phase // Note: Enabling here breaks the fight and may cause softlocks
+    .byte 205 // K. Rool Fight: Lanky Phase // Note: Enabling here breaks the fight and may cause softlocks
+    .byte 206 // K. Rool Fight: Tiny Phase // Note: Enabling here breaks the fight and may cause softlocks
+    .byte 207 // K. Rool Fight: Chunky Phase // Note: Enabling here breaks the fight and may cause softlocks
+    .byte 208 // Bloopers Ending // Note: Handled by cutscene check
+    .byte 209 // K. Rool Barrel: Chunky's Hidden Kremling Game
+    .byte 210 // K. Rool Barrel: Tiny's Pony Tail Twirl Game
+    .byte 211 // K. Rool Barrel: Chunky's Shooting Game
+    .byte 212 // K. Rool Barrel: DK's Rambi Game
+    .byte 213 // K. Lumsy Ending // Note: Handled by cutscene check
+    .byte 214 // K. Rool's Shoe
+    .byte 215 // K. Rool's Arena // Note: Handled by cutscene check?
+    .byte 0 // NULL TERMINATOR (ends loop)
 
 ExplicitDisableMovementStates:
-//.byte 0x02 // First Person Camera
-//.byte 0x03 // First Person Camera (Water)
-.byte 0x04 // Fairy Camera
-.byte 0x05 // Fairy Camera (Water)
-.byte 0x06 // Locked (Bonus Barrel)
-.byte 0x15 // Slipping
-.byte 0x16 // Slipping
-.byte 0x18 // Baboon Blast Pad
-.byte 0x1B // Simian Spring
-//.byte 0x1C // Simian Slam // Note: As far as I know this doesn't break anything, so we'll save the CPU cycles
-.byte 0x20 // Falling/Splat // Note: Prevents quick recovery from fall damage, and I guess maybe switching to avoid fall damage?
-.byte 0x2D // Shockwave
-.byte 0x2E // Chimpy Charge
-.byte 0x31 // Damaged
-.byte 0x32 // Stunlocked
-.byte 0x33 // Damaged
-.byte 0x35 // Damaged
-.byte 0x36 // Death
-.byte 0x37 // Damaged (Underwater)
-.byte 0x38 // Damaged
-.byte 0x39 // Shrinking
-.byte 0x42 // Barrel
-.byte 0x43 // Barrel (Underwater)
-.byte 0x44 // Baboon Blast Shot
-.byte 0x45 // Cannon Shot
-.byte 0x52 // Bananaporter
-.byte 0x53 // Monkeyport
-.byte 0x54 // Bananaporter (Multiplayer)
-.byte 0x56 // Locked
-.byte 0x57 // Swinging on Vine
-.byte 0x58 // Leaving Vine
-.byte 0x59 // Climbing Tree
-.byte 0x5A // Leaving Tree
-.byte 0x5B // Grabbed Ledge
-.byte 0x5C // Pulling up on Ledge
-.byte 0x63 // Rocketbarrel // Note: Covered by crystal HUD check except for Helm & K. Rool
-.byte 0x64 // Taking Photo
-.byte 0x65 // Taking Photo
-.byte 0x67 // Instrument
-.byte 0x69 // Car
-.byte 0x6A // Learning Gun // Note: Handled by map check
-.byte 0x6B // Locked
-.byte 0x6C // Feeding T&S // Note: Handled by map check
-.byte 0x6D // Boat
-.byte 0x6E // Baboon Balloon
-.byte 0x6F // Updraft
-.byte 0x70 // GB Dance
-.byte 0x71 // Key Dance
-.byte 0x72 // Crown Dance
-.byte 0x73 // Loss Dance
-.byte 0x74 // Victory Dance
-.byte 0x78 // Gorilla Grab
-.byte 0x79 // Learning Move // Note: Handled by map check
-.byte 0x7A // Locked
-.byte 0x7B // Locked
-.byte 0x7C // Trapped (spider miniBoss)
-.byte 0x7D // Klaptrap Kong (beaver bother) // Note: Handled by map check
-.byte 0x83 // Fairy Refill
-.byte 0x87 // Entering Portal
-.byte 0x88 // Exiting Portal
-.byte 0 // NULL TERMINATOR (ends loop)
+    //.byte 0x02 // First Person Camera
+    //.byte 0x03 // First Person Camera (Water)
+    .byte 0x04 // Fairy Camera
+    .byte 0x05 // Fairy Camera (Water)
+    .byte 0x06 // Locked (Bonus Barrel)
+    .byte 0x15 // Slipping
+    .byte 0x16 // Slipping
+    .byte 0x18 // Baboon Blast Pad
+    .byte 0x1B // Simian Spring
+    //.byte 0x1C // Simian Slam // Note: As far as I know this doesn't break anything, so we'll save the CPU cycles
+    .byte 0x20 // Falling/Splat // Note: Prevents quick recovery from fall damage, and I guess maybe switching to avoid fall damage?
+    .byte 0x2D // Shockwave
+    .byte 0x2E // Chimpy Charge
+    .byte 0x31 // Damaged
+    .byte 0x32 // Stunlocked
+    .byte 0x33 // Damaged
+    .byte 0x35 // Damaged
+    .byte 0x36 // Death
+    .byte 0x37 // Damaged (Underwater)
+    .byte 0x38 // Damaged
+    .byte 0x39 // Shrinking
+    .byte 0x42 // Barrel
+    .byte 0x43 // Barrel (Underwater)
+    .byte 0x44 // Baboon Blast Shot
+    .byte 0x45 // Cannon Shot
+    .byte 0x52 // Bananaporter
+    .byte 0x53 // Monkeyport
+    .byte 0x54 // Bananaporter (Multiplayer)
+    .byte 0x56 // Locked
+    .byte 0x57 // Swinging on Vine
+    .byte 0x58 // Leaving Vine
+    .byte 0x59 // Climbing Tree
+    .byte 0x5A // Leaving Tree
+    .byte 0x5B // Grabbed Ledge
+    .byte 0x5C // Pulling up on Ledge
+    .byte 0x63 // Rocketbarrel // Note: Covered by crystal HUD check except for Helm & K. Rool
+    .byte 0x64 // Taking Photo
+    .byte 0x65 // Taking Photo
+    .byte 0x67 // Instrument
+    .byte 0x69 // Car
+    .byte 0x6A // Learning Gun // Note: Handled by map check
+    .byte 0x6B // Locked
+    .byte 0x6C // Feeding T&S // Note: Handled by map check
+    .byte 0x6D // Boat
+    .byte 0x6E // Baboon Balloon
+    .byte 0x6F // Updraft
+    .byte 0x70 // GB Dance
+    .byte 0x71 // Key Dance
+    .byte 0x72 // Crown Dance
+    .byte 0x73 // Loss Dance
+    .byte 0x74 // Victory Dance
+    .byte 0x78 // Gorilla Grab
+    .byte 0x79 // Learning Move // Note: Handled by map check
+    .byte 0x7A // Locked
+    .byte 0x7B // Locked
+    .byte 0x7C // Trapped (spider miniBoss)
+    .byte 0x7D // Klaptrap Kong (beaver bother) // Note: Handled by map check
+    .byte 0x83 // Fairy Refill
+    .byte 0x87 // Entering Portal
+    .byte 0x88 // Exiting Portal
+    .byte 0 // NULL TERMINATOR (ends loop)
 
 .align
 SpeedrunModeFlags:
