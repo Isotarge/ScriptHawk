@@ -63,7 +63,7 @@ Game = {
 		map = {0x37F2C5, 0x37F405, 0x37DAF5, 0x37E8F5},
 		struct_array_pointer = {0x382970, 0x382AB0, 0x3811A0, 0x381FA0},
 		map_model_pointer = {0x382D38, 0x382E78, 0x381568, 0x382368}, -- See Game.getVertBase()
-		water_model_pointer = {0x382D3C, 0x382E7C, 0x38156C, 0x38236C}, -- See Game.getWaterVertBase()
+		alpha_model_pointer = {0x382D3C, 0x382E7C, 0x38156C, 0x38236C}, -- See Game.getAlphaVertBase()
 		return_to_lair_enabled = {0x383A60, 0x383BC0, 0x3822A0, 0x383080},
 		game_progress_bitfield = {0x383B88, 0x383D18, 0x3823F8, 0x3831A8},
 		strict_bitfield = { 0x383BB8, 0x383D48, 0x382428, 0x3831D8},
@@ -2931,6 +2931,10 @@ function Game.getFloorObject()
 	return dereferencePointer(Game.Memory.floor_object_pointer);
 end
 
+function Game.getAlphaFloorObject()
+	return dereferencePointer(Game.Memory.floor_object_pointer) + 0x10;
+end
+
 function Game.getFloor()
 	local floorObject = Game.getFloorObject();
 	if isRDRAM(floorObject) then
@@ -3073,15 +3077,16 @@ function Game.getVertsFromModel(modelPointer)
 	end
 end
 
+-- A-Map Vert-Base
 function Game.getVertBase()
 	local mapModel = dereferencePointer(Game.Memory.map_model_pointer);
 	if isRDRAM(mapModel) then
 		return Game.getVertsFromModel(mapModel);
 	end
 end
-
-function Game.getWaterVertBase()
-	local mapModel = dereferencePointer(Game.Memory.water_model_pointer);
+-- B-Map Vert-Base
+function Game.getAlphaVertBase()
+	local mapModel = dereferencePointer(Game.Memory.alpha_model_pointer);
 	if isRDRAM(mapModel) then
 		return Game.getVertsFromModel(mapModel);
 	end
