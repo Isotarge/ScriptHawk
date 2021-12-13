@@ -7071,7 +7071,7 @@ function Game.getVertBase()
 	return gcmap.opaque.vertexBuffers[gcmap.opaque.vertexBufferIndex];
 end
 
-function Game.getWaterVertBase()
+function Game.getAlphaVertBase()
 	local gcmap = readGCMapStruct();
 	return gcmap.translucent.vertexBuffers[gcmap.translucent.vertexBufferIndex];
 end
