@@ -63,6 +63,7 @@ function Game.getFloorTriangleVertPosition(index)
 	return "Unknown";
 end
 
+-- A-Map Floor Triangle
 function Game.getFloorTriangleVertPositionRaw(index)
 	if type(index) ~= 'number' then
 		return;
@@ -84,6 +85,29 @@ function Game.getFloorTriangleVertPositionRaw(index)
 	end
 end
 
+-- B-Map Floor Triangle
+function Game.getAlphaFloorTriangleVertPositionRaw(index)
+	if type(index) ~= 'number' then
+		return;
+	end
+	if index < 0 or index > 2 then
+		return;
+	end
+	local floorObject = Game.getFloorObject();
+	if isRDRAM(floorObject) then
+		local vertIndex = mainmemory.read_u16_be(floorObject + 0x04 + index * 0x02);
+		local vertBase = Game.getAlphaVertBase();
+		if isRDRAM(vertBase) then
+			return {
+				x = mainmemory.read_s16_be(vertBase + (vertIndex * 0x10) + 0x00),
+				y = mainmemory.read_s16_be(vertBase + (vertIndex * 0x10) + 0x02),
+				z = mainmemory.read_s16_be(vertBase + (vertIndex * 0x10) + 0x04),
+			};
+		end
+	end
+end
+
+-- B-Map Water Triangle
 function Game.getWaterTriangleVertPositionRaw(index)
 	if type(index) ~= 'number' then
 		return;
@@ -94,7 +118,7 @@ function Game.getWaterTriangleVertPositionRaw(index)
 	local floorObject = Game.getFloorObject();
 	if isRDRAM(floorObject) then
 		local vertIndex = mainmemory.read_u16_be(floorObject + 0x10 + index * 0x02);
-		local vertBase = Game.getWaterVertBase();
+		local vertBase = Game.getAlphaVertBase();
 		if isRDRAM(vertBase) then
 			return {
 				x = mainmemory.read_s16_be(vertBase + (vertIndex * 0x10) + 0x00),
@@ -395,5 +419,19 @@ function printTri()
 	local vert1 = Game.getFloorTriangleVertPositionRaw(0);
 	local vert2 = Game.getFloorTriangleVertPositionRaw(1);
 	local vert3 = Game.getFloorTriangleVertPositionRaw(2);
+	print(vert1.x .." ".. vert1.y .." ".. vert1.z .." ".. vert2.x .." ".. vert2.y .." ".. vert2.z .." "..vert3.x .." ".. vert3.y .." ".. vert3.z);
+end
+
+function printAlphaTri()
+	local vert1 = Game.getAlphaFloorTriangleVertPositionRaw(0);
+	local vert2 = Game.getAlphaFloorTriangleVertPositionRaw(1);
+	local vert3 = Game.getAlphaFloorTriangleVertPositionRaw(2);
+	print(vert1.x .." ".. vert1.y .." ".. vert1.z .." ".. vert2.x .." ".. vert2.y .." ".. vert2.z .." "..vert3.x .." ".. vert3.y .." ".. vert3.z);
+end
+
+function printWaterTri()
+	local vert1 = Game.getWaterTriangleVertPositionRaw(0);
+	local vert2 = Game.getWaterTriangleVertPositionRaw(1);
+	local vert3 = Game.getWaterTriangleVertPositionRaw(2);
 	print(vert1.x .." ".. vert1.y .." ".. vert1.z .." ".. vert2.x .." ".. vert2.y .." ".. vert2.z .." "..vert3.x .." ".. vert3.y .." ".. vert3.z);
 end
