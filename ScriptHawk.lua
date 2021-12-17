@@ -386,7 +386,12 @@ local supportedGames = {
 	["BB359A75941DF74BF7290212C89FBC6E2C5601FE"] = {moduleName="games.bk", friendlyName="Banjo-Kazooie (Europe) (En,Fr,De)", version=1},
 	["DED6EE166E740AD1BC810FD678A84B48E245AB80"] = {moduleName="games.bk", friendlyName="Banjo-Kazooie (USA) (Rev A)", version=3},
 	["1FE1632098865F639E22C11B9A81EE8F29C75D7A"] = {moduleName="games.bk", friendlyName="Banjo-Kazooie (USA)", version=4},
+	["6A81FE9C1C9059275A2C5E64D608BAA91F22C14C"] = {moduleName="games.bk", friendlyName="Banjo-Dreamie", version=4},
+	["7BCA8A32E83823F9230A92DA14F26E74744B0CEC"] = {moduleName="games.bk", friendlyName="BK Hidden Lair", version=4},
+	["4B5CEA82AE7BD0951E02BFBE6D1665626A03BA20"] = {moduleName="games.bk", friendlyName="Banjo-Kazooie Worlds Collide", version=4},
+	["3D1C4371EFA16E325E981C35CF56A91D37B4BC25"] = {moduleName="games.bk", friendlyName="BK Legend of the Crystal Jiggy", version=4},
 	["EB3863AE260CC6B248AA3F69DC4F5D712799E09E"] = {moduleName="games.bk", friendlyName="BK Nightbear Before Christmas", version=4},
+	["19D2B030BD1E7D91D1A25614C330638007660235"] = {moduleName="games.bk", friendlyName="Banjo-Kazooie Fort Fun v5", version=4},
 
 	-- Banjo-Tooie
 	["5A5172383037D171F121790959962703BE1F373C"] = {moduleName="games.bt", friendlyName="Banjo to Kazooie no Daibouken 2 (Japan)", version=3},
@@ -396,6 +401,10 @@ local supportedGames = {
 
 	-- Brother Bear (GBA)
 	["89E6903500F62E11483402B76C1454AF788646C0"] = {moduleName="games.GBA_brother_bear", friendlyName="Brother Bear (USA)", version=1},
+
+	-- Bomberman 64
+	["8A7648D8105AC4FC1AD942291B2EF89AECA921C9"] = {moduleName="games.bomberman64", friendlyName="Bomberman 64 (USA)", version=1},
+	["4813B147D552F72FDB0B306469BF9AA0F820FD5B"] = {moduleName="games.bomberman64", friendlyName="Baku Bomberman (Japan)", version=2},
 
 	-- Conker's Bad Fur Day
 	["EE7BC6656FD1E1D9FFB3D19ADD759F28B88DF710"] = {moduleName="games.cbfd", friendlyName="Conker's Bad Fur Day (Europe)", version=1},
