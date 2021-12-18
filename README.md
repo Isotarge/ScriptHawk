@@ -107,6 +107,7 @@ A collection of Lua scripts and RAM watches for [BizHawk](https://github.com/TAS
 - Alex Kidd in Miracle World (SMS)
 - Alex Kidd in Shinobi World (SMS)
 - Balloon Fight (NES)
+- Bomberman 64 (N64)
 - Day Dreamin' Davey (NES)
 - Donald Land (NES)
 - Donkey Kong Country 2 (GBA)
