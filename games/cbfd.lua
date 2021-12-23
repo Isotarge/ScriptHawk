@@ -563,7 +563,7 @@ function Game.drawUI()
 end
 
 -- Keybinds
--- For full list go here http://slimdx.org/docs/html/T_SlimDX_DirectInput_Key.htm
+-- For full list go here https://github.com/SlimDX/slimdx/blob/426f59d9e30eaa75cd178f8abdf46ec915530ff7/source/directinput/Enums.h#L385
 ScriptHawk.bindKeyRealtime("Z", zipToSelectedObject, true);
 ScriptHawk.bindKeyRealtime("C", toggleObjectAnalysisToolsMode, true);
 ScriptHawk.bindKeyRealtime("N", decrementObjectIndex, true);

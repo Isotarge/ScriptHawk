@@ -2418,7 +2418,7 @@ local function decrementObjectIndex()
 end
 
 -- Keybinds
--- For full list go here http://slimdx.org/docs/html/T_SlimDX_DirectInput_Key.htm
+-- For full list go here https://github.com/SlimDX/slimdx/blob/426f59d9e30eaa75cd178f8abdf46ec915530ff7/source/directinput/Enums.h#L385
 --ScriptHawk.bindKeyRealtime("T", function() Game.zipToFloorVert(0) end, true);
 --ScriptHawk.bindKeyRealtime("Y", function() Game.zipToFloorVert(1) end, true);
 --ScriptHawk.bindKeyRealtime("U", function() Game.zipToFloorVert(2) end, true);
