@@ -392,6 +392,7 @@ local supportedGames = {
 	["3D1C4371EFA16E325E981C35CF56A91D37B4BC25"] = {moduleName="games.bk", friendlyName="BK Legend of the Crystal Jiggy", version=4},
 	["EB3863AE260CC6B248AA3F69DC4F5D712799E09E"] = {moduleName="games.bk", friendlyName="BK Nightbear Before Christmas", version=4},
 	["19D2B030BD1E7D91D1A25614C330638007660235"] = {moduleName="games.bk", friendlyName="Banjo-Kazooie Fort Fun v5", version=4},
+	["7C50845E42C9B7B2BE48BDDC89D8D70BE95C5324"] = {moduleName="games.bk", friendlyName="Banjo Kazooie: How The Gruntch stole Christmas (1.2)", version=4},
 
 	-- Banjo-Tooie
 	["5A5172383037D171F121790959962703BE1F373C"] = {moduleName="games.bt", friendlyName="Banjo to Kazooie no Daibouken 2 (Japan)", version=3},
