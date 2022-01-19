@@ -5086,6 +5086,11 @@ function Game.detectVersion(romName, romHash)
 		flag_array = require("games.dk64_flags");
 		temp_flag_array = temporary_flags.ntsc_u;
 	elseif Game.version == 2 then -- Europe
+		-- TODO: Turns out PAL does have some differences from the US version in terms of flags
+		-- Thanks to tasty on Discord for this research
+		-- Flags in the block 0x4D->5 to 0x4F->1 are in the reverse order on PAL
+		-- Flags in the block 0x55->6 to 0x56->4 are in the reverse order on PAL
+		-- Not sure why as of yet, and not yet sure if there are further differences
 		flag_array = require("games.dk64_flags");
 		temp_flag_array = temporary_flags.pal
 
