@@ -18,6 +18,7 @@ return {
 	{byte=0x01, bit=7, name="Japes: Hut Smashed (DK)", type="Physical", map=7},
 
 	{byte=0x02, bit=0, name="Japes: Hut Smashed (Tiny)", type="Physical", map=7},
+	-- 0x02 > 1
 	{byte=0x02, bit=2, name="Japes: Diddy GB: Caged GB", type="GB", map=7},
 	{byte=0x02, bit=3, name="Japes: Lanky GB: Caged GB", type="GB", map=7},
 	{byte=0x02, bit=4, name="Japes: DK GB: Caged GB", type="GB", map=7},
@@ -66,7 +67,7 @@ return {
 	{byte=0x07, bit=2, name="Aztec: Tiny GB: 5DT", type="GB", map=22},
 	{byte=0x07, bit=3, name="Aztec: Chunky GB: 5DT", type="GB", map=24},
 	{byte=0x07, bit=4, name="Aztec: Lanky GB: 5DT", type="GB", map=23},
-	{byte=0x07, bit=5, name="Aztec: Instrument Pad in front of Beetle Tower Spawned", type="Physical", map=38},
+	{byte=0x07, bit=5, name="Aztec: Instrument Pad in front of Beetle Tower Spawned (Unused)", type="Physical", map=38}, --Note: 0x06->6 is used for spawning the Pad
 	{byte=0x07, bit=6, name="Aztec: DK GB: W5", type="GB", map=38}, -- Note: This flag also spawns the warp
 	{byte=0x07, bit=7, name="Aztec: Diddy GB: Vulture Race", type="GB", map=38},
 
@@ -83,9 +84,9 @@ return {
 	{byte=0x09, bit=1, name="Aztec: Lanky GB: Teetering Turtle Trouble", type="GB", map=20},
 	{byte=0x09, bit=2, name="Key 2", type="Key", map=197},
 	{byte=0x09, bit=3, name="Aztec: Tiny GB: Beetle Race", type="GB", map=14},
-	{byte=0x09, bit=4, name="Aztec: Wake up Llama CS", type="Cutscene", map=20},
+	{byte=0x09, bit=4, name="Aztec: Water Cooled Down", type="Physical", map=20},
 	{byte=0x09, bit=5, name="Aztec: DK GB: Free Lanky", type="GB", map=20},
-	{byte=0x09, bit=6, name="Aztec: Open Tunnel CS", type="Cutscene", map=38},
+	{byte=0x09, bit=6, name="Aztec: Tunnel Gate Open", type="Physical", map=38},
 	{byte=0x09, bit=7, name="Aztec: W1 (Entrance)", type="Warp", map=38},
 
 	{byte=0x0A, bit=0, name="Aztec: W1 (Candy)", type="Warp", map=38},
@@ -145,7 +146,7 @@ return {
 	{byte=0x10, bit=0, name="Factory: DK GB: Crusher Room", type="GB", map=36},
 	{byte=0x10, bit=1, name="Factory: Arcade Lever", type="Physical", map=26},
 	{byte=0x10, bit=2, name="Factory: DK GB: Arcade", type="GB", map=26},
-	{byte=0x10, bit=3, name="Factory: Arcade LV3", type="Progress", map=26},
+	{byte=0x10, bit=3, name="Factory: Arcade LV3/2 Coins Paid", type="Progress", map=26},
 	{byte=0x10, bit=4, name="Nintendo Coin", type="Special Coin", map=26},
 	{byte=0x10, bit=5, name="Factory: Chunky R&D Gate Open", type="Physical", map=26},
 	{byte=0x10, bit=6, name="Factory: Diddy GB: Beaver Bother", type="GB", map=26},
@@ -359,7 +360,7 @@ return {
 	{byte=0x27, bit=7, name="Castle: Chunky GB: Tree", type="GB", map=164},
 
 	{byte=0x28, bit=0, name="Castle: DK GB: Tree", type="GB", map=164},
-	{byte=0x28, bit=1, name="Castle: Shed Crate Broken", type="Physical", map=87}, -- TODO: Is this correct?
+	{byte=0x28, bit=1, name="Castle: Shed Crate Broken", type="Physical", map=87},
 	{byte=0x28, bit=2, name="Castle: Chunky GB: Shed", type="GB", map=166},
 	{byte=0x28, bit=3, name="Castle: Lanky GB: Greenhouse", type="GB", map=168},
 	{byte=0x28, bit=4, name="Castle: Tree Open", type="Physical", map=87},
@@ -416,10 +417,10 @@ return {
 	{byte=0x2E, bit=1, name="Tiny FTT", type="FTT", nomap=true},
 	{byte=0x2E, bit=2, name="Chunky FTT", type="FTT", nomap=true},
 	{byte=0x2E, bit=3, name="First Orange Collection", type="FTT", nomap=true},
-	{byte=0x2E, bit=4, name="Snide's FTT", type="FTT", map=15}, -- TODO: Is this the cutscene?
-	{byte=0x2E, bit=5, name="Buy Instruments", type="FTT", map=25},
-	{byte=0x2E, bit=6, name="Buy Guns", type="FTT", map=1},
-	{byte=0x2E, bit=7, name="Cranky's Lab FTSomething...?", type="FTT", map=5}, -- TODO: What is this?
+	{byte=0x2E, bit=4, name="Snide's HQ FTT", type="FTT", map=15},
+	{byte=0x2E, bit=5, name="Candy's Music Shop FTT", type="FTT", map=25},
+	{byte=0x2E, bit=6, name="Funky's Store FTT", type="FTT", map=1},
+	{byte=0x2E, bit=7, name="Cranky's Lab FTT", type="FTT", map=5},
 
 	{byte=0x2F, bit=0, name="Wrinkly FTT", type="FTT", nomap=true},
 	{byte=0x2F, bit=1, name="Camera/Shockwave", type="Progress", map=189},
@@ -430,7 +431,7 @@ return {
 	{byte=0x2F, bit=6, name="B. Locker FTT", type="FTT", nomap=true},
 	{byte=0x2F, bit=7, name="Training Grounds: Barrels Spawned", type="Physical", map=176},
 
-	{byte=0x30, bit=0, name="Cranky's Lab FTSomething..?", type="FTT", map=5}, -- TODO: What is this?
+	{byte=0x30, bit=0, name="Simian Slam Potion Received", type="Progress", map=5},
 	{byte=0x30, bit=1, name="Kong Unlocked: DK", type="Kong", nomap=true}, -- Note: Set both when Simian Slamming the switch in training grounds and entering tag barrel for the first time
 	{byte=0x30, bit=2, name="Training Grounds: Dive Barrel Completed", type="Progress", map=176},
 	{byte=0x30, bit=3, name="Training Grounds: Vine Barrel Completed", type="Progress", map=176},
@@ -446,7 +447,7 @@ return {
 	{byte=0x31, bit=4, name="First Coin Collection", type="FTT", nomap=true},
 	{byte=0x31, bit=5, name="Factory Lobby: Lever Pulled", type="Physical", map=175},
 	{byte=0x31, bit=6, name="Isles: Lanky GB: Japes Lobby", type="GB", map=169},
-	{byte=0x31, bit=7, name="Aztec Lobby: Side Room Open", type="Physical", map=173},
+	{byte=0x31, bit=7, name="Aztec Lobby: Hunky Chunky Barrel Spawned", type="Physical", map=173},
 
 	{byte=0x32, bit=0, name="Aztec Lobby: Chunky Wrinkly Flipped", type="Physical", map=173},
 	{byte=0x32, bit=1, name="Galleon Lobby: Chunky Switch", type="Physical", map=174},
@@ -507,15 +508,15 @@ return {
 	{byte=0x38, bit=2, name="Key 7 Turned", type="Key", map=34},
 	{byte=0x38, bit=3, name="Key 8 Turned", type="Key", map=97},
 	-- 0x38 > 4
-	{byte=0x38, bit=5, name="Story: Japes Intro", type="Cutscene", map=169},
-	{byte=0x38, bit=6, name="Story: Aztec Intro", type="Cutscene", map=173},
-	{byte=0x38, bit=7, name="Story: Factory Intro", type="Cutscene", map=175},
+	{byte=0x38, bit=5, name="Jungle Japes Entered", type="Progress", map=169}, --Note: Is needed for learning Cranky's Potions; Not seeing story intro cutscene again
+	{byte=0x38, bit=6, name="Angry Aztec Entered", type="Progress", map=173},
+	{byte=0x38, bit=7, name="Frantic Factory Entered", type="Progress", map=175},
 
-	{byte=0x39, bit=0, name="Story: Galleon Intro", type="Cutscene", map=174},
-	{byte=0x39, bit=1, name="Story: Fungi Intro", type="Cutscene", map=178},
-	{byte=0x39, bit=2, name="Story: Caves Intro", type="Cutscene", map=194},
-	{byte=0x39, bit=3, name="Story: Castle Intro", type="Cutscene", map=193},
-	{byte=0x39, bit=4, name="Story: Helm Intro", type="Cutscene", map=170},
+	{byte=0x39, bit=0, name="Gloomy Galleon Entered", type="Progress", map=174},
+	{byte=0x39, bit=1, name="Fungi Forest Entered", type="Progress", map=178},
+	{byte=0x39, bit=2, name="Crystal Caves Entered", type="Progress", map=194},
+	{byte=0x39, bit=3, name="Creepy Castle Entered", type="Progress", map=193},
+	{byte=0x39, bit=4, name="Hideout Helm Entered", type="Progress", map=170},
 	{byte=0x39, bit=5, name="Japes Lobby: B. Locker Cleared", type="B. Locker", map=169},
 	{byte=0x39, bit=6, name="Aztec Lobby: B. Locker Cleared", type="B. Locker", map=173},
 	{byte=0x39, bit=7, name="Factory Lobby: B. Locker Cleared", type="B. Locker", map=175},
@@ -864,26 +865,26 @@ return {
 
 	-- 0x60 > 0
 	-- 0x60 > 1
-	{byte=0x60, bit=2, name="Helm: BoM off", type="Physical", map=17},
+	{byte=0x60, bit=2, name="Helm: Blast-O-Matic off", type="Physical", map=17},
 	{byte=0x60, bit=3, name="Helm: Key 8 Door Open", type="Physical", map=17},
 	{byte=0x60, bit=4, name="Helm: Crown Door Open", type="Physical", map=17},
 	{byte=0x60, bit=5, name="Helm: W1 (Entrance)", type="Warp", map=17},
 	{byte=0x60, bit=6, name="Helm: W1 (Far)", type="Warp", map=17},
-	{byte=0x60, bit=7, name="Funky's Shop: FTT", type="FTT", map=1},
+	{byte=0x60, bit=7, name="Funky's Shop Caption Seen", type="FTT", map=1},
 
-	{byte=0x61, bit=0, name="Snide's Hut: FTT", type="FTT", map=15},
-	{byte=0x61, bit=1, name="Cranky's Lab: FTT", type="FTT", map=5},
-	{byte=0x61, bit=2, name="Candy's Shop: FTT", type="FTT", map=25},
-	{byte=0x61, bit=3, name="Japes: FTT", type="FTT", map=7},
-	{byte=0x61, bit=4, name="Factory: FTT", type="FTT", map=26},
-	{byte=0x61, bit=5, name="Galleon: FTT", type="FTT", map=30},
-	{byte=0x61, bit=6, name="Fungi: FTT", type="FTT", map=48},
-	{byte=0x61, bit=7, name="Caves: FTT", type="FTT", map=72},
+	{byte=0x61, bit=0, name="Snide's HQ Caption Seen", type="FTT", map=15},
+	{byte=0x61, bit=1, name="Cranky's Lab Caption Seen", type="FTT", map=5},
+	{byte=0x61, bit=2, name="Candy's Shop Caption Seen", type="FTT", map=25},
+	{byte=0x61, bit=3, name="Japes Caption Seen", type="FTT", map=7},
+	{byte=0x61, bit=4, name="Factory Caption/Intro Cutscene Seen", type="FTT", map=26},
+	{byte=0x61, bit=5, name="Galleon Caption Seen", type="FTT", map=30},
+	{byte=0x61, bit=6, name="Fungi Caption Seen", type="FTT", map=48},
+	{byte=0x61, bit=7, name="Caves Caption Seen", type="FTT", map=72},
 
-	{byte=0x62, bit=0, name="Castle: FTT", type="FTT", map=87},
-	{byte=0x62, bit=1, name="T&S FTT (2)", type="FTT", map=42},
-	{byte=0x62, bit=2, name="Helm: FTT", type="FTT", map=17},
-	{byte=0x62, bit=3, name="Aztec: FTT", type="FTT", map=38},
+	{byte=0x62, bit=0, name="Castle Caption Seen", type="FTT", map=87},
+	{byte=0x62, bit=1, name="T&S Caption Seen", type="FTT", map=42},
+	{byte=0x62, bit=2, name="Helm Caption Seen", type="FTT", map=17},
+	{byte=0x62, bit=3, name="Aztec Caption Seen", type="FTT", map=38},
 	-- 0x62 > 4
 	-- 0x62 > 5
 	-- 0x62 > 6
@@ -2806,39 +2807,39 @@ return {
 	{byte=0x137, bit=6, name="Castle: Lanky CB: Greenhouse Bunch (5)", type="Bunch", map=168},
 	{byte=0x137, bit=7, name="Castle: Lanky CB: Greenhouse Bunch (6)", type="Bunch", map=168},
 
-	{byte=0x138, bit=0, type="Unknown", nomap=true, ignore=true}, -- Factory?
-	{byte=0x138, bit=1, type="Unknown", nomap=true, ignore=true},
-	{byte=0x138, bit=2, type="Unknown", nomap=true, ignore=true},
-	{byte=0x138, bit=3, type="Unknown", nomap=true, ignore=true},
-	{byte=0x138, bit=4, type="Unknown", nomap=true, ignore=true},
-	{byte=0x138, bit=5, type="Unknown", nomap=true, ignore=true},
-	{byte=0x138, bit=6, type="Unknown", nomap=true, ignore=true},
-	{byte=0x138, bit=7, type="Unknown", nomap=true, ignore=true},
+	-- 0x138 > 0  Note: This is not a flag. It's part of Donkey's Banana Count Constant in Frantic Factory
+	-- 0x138 > 1  Note: This is not a flag. It's part of Donkey's Banana Count Constant in Gloomy Galleon
+	-- 0x138 > 2  Note: This is not a flag. It's part of Donkey's Banana Count Constant in Gloomy Galleon
+	-- 0x138 > 3  Note: This is not a flag. It's part of Donkey's Banana Count Constant in Gloomy Galleon
+	-- 0x138 > 4  Note: This is not a flag. It's part of Donkey's Banana Count Constant in Gloomy Galleon
+	-- 0x138 > 5  Note: This is not a flag. It's part of Donkey's Banana Count Constant in Gloomy Galleon
+	-- 0x138 > 6  Note: This is not a flag. It's part of Donkey's Banana Count Constant in Gloomy Galleon
+	-- 0x138 > 7  Note: This is not a flag. It's part of Donkey's Banana Count Constant in Gloomy Galleon
 
-	{byte=0x139, bit=0, type="Unknown", nomap=true, ignore=true}, -- Cranky's?
-	{byte=0x139, bit=1, type="Unknown", nomap=true, ignore=true},
-	{byte=0x139, bit=2, type="Unknown", nomap=true, ignore=true}, -- Factory?
-	{byte=0x139, bit=3, type="Unknown", nomap=true, ignore=true}, -- Factory?
-	{byte=0x139, bit=4, type="Unknown", nomap=true, ignore=true}, -- Factory?
-	{byte=0x139, bit=5, type="Unknown", nomap=true, ignore=true}, -- Factory?
-	{byte=0x139, bit=6, type="Unknown", nomap=true, ignore=true}, -- Factory?
-	{byte=0x139, bit=7, type="Unknown", nomap=true, ignore=true}, -- Factory?
+	-- 0x139 > 0  Note: This is not a flag. It's part of Donkey's Banana Count Constant in Angry Aztec
+	-- 0x139 > 1  Note: This is not a flag. It's part of Donkey's Banana Count Constant in Angry Aztec
+	-- 0x139 > 2  Note: This is not a flag. It's part of Donkey's Banana Count Constant in Frantic Factory
+	-- 0x139 > 3  Note: This is not a flag. It's part of Donkey's Banana Count Constant in Frantic Factory
+	-- 0x139 > 4  Note: This is not a flag. It's part of Donkey's Banana Count Constant in Frantic Factory
+	-- 0x139 > 5  Note: This is not a flag. It's part of Donkey's Banana Count Constant in Frantic Factory
+	-- 0x139 > 6  Note: This is not a flag. It's part of Donkey's Banana Count Constant in Frantic Factory
+	-- 0x139 > 7  Note: This is not a flag. It's part of Donkey's Banana Count Constant in Frantic Factory
 
-	{byte=0x13A, bit=0, type="Unknown", nomap=true, ignore=true},
-	{byte=0x13A, bit=1, type="Unknown", nomap=true, ignore=true},
-	{byte=0x13A, bit=2, type="Unknown", nomap=true, ignore=true},
-	{byte=0x13A, bit=3, type="Unknown", nomap=true, ignore=true},
-	{byte=0x13A, bit=4, type="Unknown", nomap=true, ignore=true},
-	{byte=0x13A, bit=5, type="Unknown", nomap=true, ignore=true}, -- Cranky's?
-	{byte=0x13A, bit=6, type="Unknown", nomap=true, ignore=true}, -- Blueprint?
-	{byte=0x13A, bit=7, type="Unknown", nomap=true, ignore=true}, -- Cranky's?
+	-- 0x13A > 0  Note: This is not a flag. It's part of Donkey's Banana Count Constant in Jungle Japes
+	-- 0x13A > 1  Note: This is not a flag. It's part of Donkey's Banana Count Constant in Jungle Japes
+	-- 0x13A > 2  Note: This is not a flag. It's part of Donkey's Banana Count Constant in Jungle Japes
+	-- 0x13A > 3  Note: This is not a flag. It's part of Donkey's Banana Count Constant in Angry Aztec
+	-- 0x13A > 4  Note: This is not a flag. It's part of Donkey's Banana Count Constant in Angry Aztec
+	-- 0x13A > 5  Note: This is not a flag. It's part of Donkey's Banana Count Constant in Angry Aztec
+	-- 0x13A > 6  Note: This is not a flag. It's part of Donkey's Banana Count Constant in Angry Aztec
+	-- 0x13A > 7  Note: This is not a flag. It's part of Donkey's Banana Count Constant in Angry Aztec
 
 	{byte=0x13B, bit=0, name="Castle: DK Coin: Baboon Blast (5)", type="Coin", map=187},
 	{byte=0x13B, bit=1, name="Training Grounds: Right Tunnel Coin", type="Coin", map=176},
 	{byte=0x13B, bit=2, name="Training Grounds: Center Tunnel Coin", type="Coin", map=176},
 	{byte=0x13B, bit=3, name="Training Grounds: Left Tunnel Coin", type="Coin", map=176},
-	--0x13B > 4
-	--0x13B > 5
-	--0x13B > 6
-	--0x13B > 7
+	-- 0x13B > 4  Note: This is not a flag. It's part of Donkey's Banana Count Constant in Jungle Japes
+	-- 0x13B > 5  Note: This is not a flag. It's part of Donkey's Banana Count Constant in Jungle Japes
+	-- 0x13B > 6  Note: This is not a flag. It's part of Donkey's Banana Count Constant in Jungle Japes
+	-- 0x13B > 7  Note: This is not a flag. It's part of Donkey's Banana Count Constant in Jungle Japes
 };
