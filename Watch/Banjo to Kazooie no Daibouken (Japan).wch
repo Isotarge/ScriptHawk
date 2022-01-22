@@ -8,6 +8,9 @@ SystemID N64
 276850	d	f	1	RDRAM	Culling Angle (Bottom)
 27F718	d	s	1	RDRAM	Frame timer
 27F71C	d	s	1	RDRAM	Frameskip
+2800F8	w	h	1	RDRAM	P1 Controller Input
+2800FA	b	s	1	RDRAM	P1 Joystick X Axis
+2800FB	b	s	1	RDRAM	P1 Joystick Y Axis
 2806DA	w	h	1	RDRAM	Music Track
 281E20	d	h	1	RDRAM	Framebuffer Pointer
 282240	w	b	1	RDRAM	Stop'N'Swop Items

@@ -77,6 +77,9 @@ Game = {
 		board_base = {0x394140, 0x394350, 0x3929C0, 0x393760},
 		clip_vel = {-2900, -3500, -3500, -3500}, -- Minimum velocity required to clip on the Y axis -- TODO: This seems to be different for different geometry
 		zip_vel = {-1300, -1600, -1600, -1600}, -- See Game.predictZip()
+		p1_buttons = {0x285734, 0x2800F8, 0x2800F8, 0x2812B8}, -- 16 bits, bitfield
+		p1_joystick_x = {0x285736, 0x2800FA, 0x2800FA, 0x2812BA}, -- 8 bit, signed
+		p1_joystick_y = {0x285737, 0x2800FB, 0x2800FB, 0x2812BB}, -- 8 bit, signed
 	},
 	defaultFloor = -9000,
 	speedy_speeds = { .0001, .001, .01, .1, 1, 5, 10, 20, 35, 50, 75, 100 },
@@ -3704,6 +3707,52 @@ local function flagCheckButtonHandler()
 	checkFlagByName(forms.getproperty(ScriptHawk.UI.form_controls["Flag Dropdown"], "SelectedItem"));
 end
 
+-------------------
+-- Demo recorder --
+-------------------
+
+Game.demoRecorder = {
+	running = false,
+	lastFrameTimer = 1,
+	inputs = {},
+};
+
+function Game.demoRecorder.run()
+	if Game.demoRecorder.running then
+		local frameTimer = mainmemory.read_u32_be(Game.Memory.frame_timer);
+		if frameTimer == 0 then
+			table.insert(Game.demoRecorder.inputs, toHexString(mainmemory.read_u8(Game.Memory.p1_joystick_x), 2, "")..toHexString(mainmemory.read_u8(Game.Memory.p1_joystick_y), 2, "")..toHexString(mainmemory.read_u16_be(Game.Memory.p1_buttons), 4, "")..toHexString(Game.demoRecorder.lastFrameTimer, 2, ""));
+		end
+		Game.demoRecorder.lastFrameTimer = frameTimer;
+	end
+end
+
+function Game.demoRecorder.start()
+	Game.demoRecorder.inputs = {};
+	Game.demoRecorder.lastFrameTimer = 1;
+	Game.demoRecorder.running = true;
+	forms.settext(ScriptHawk.UI.form_controls["Demo Recorder Button"], "Stop Recording");
+end
+
+function Game.demoRecorder.stop()
+	Game.demoRecorder.running = false;
+	dprint("---");
+	dprint("demo-inputs:");
+	for key, value in ipairs(Game.demoRecorder.inputs) do
+		dprint("  - "..value);
+	end
+	print_deferred();
+	forms.settext(ScriptHawk.UI.form_controls["Demo Recorder Button"], "Record Demo Inputs");
+end
+
+function Game.demoRecorder.toggle()
+	if Game.demoRecorder.running then
+		Game.demoRecorder.stop();
+	else
+		Game.demoRecorder.start();
+	end
+end
+
 function Game.initUI()
 	if not TASSafe then
 		ScriptHawk.UI:button(10, 8, {46}, nil, "Set Flag Button", "Set", flagSetButtonHandler);
@@ -3752,6 +3801,8 @@ function Game.initUI()
 
 	seamTester.initUI(9);
 
+	ScriptHawk.UI:button(10, 11, 5, nil, "Demo Recorder Button", "Record Demo Inputs", Game.demoRecorder.toggle);
+
 	-- Create Inverse Object_Slot_Variables
 	for k, v in pairs(slot_variables) do
 		if v.Name then
@@ -3784,7 +3835,8 @@ function Game.eachFrame()
 	seamTester.simulate();
 	freezeClipVelocity();
 	freezeZipVelocity();
-	
+	Game.demoRecorder.run()
+
 	if ScriptHawk.UI:ischecked("toggle_neverslip") then
 		Game.neverSlip();
 	end
