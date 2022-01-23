@@ -885,8 +885,8 @@ return {
 	{byte=0x62, bit=1, name="T&S Caption Seen", type="FTT", map=42},
 	{byte=0x62, bit=2, name="Helm Caption Seen", type="FTT", map=17},
 	{byte=0x62, bit=3, name="Aztec Caption Seen", type="FTT", map=38},
-	-- 0x62 > 4
-	-- 0x62 > 5
+	-- 0x62 > 4 Note: Set when quitting the game through pause menu
+	-- 0x62 > 5 Note: Set when K. Lumsy is freed
 	-- 0x62 > 6
 	-- 0x62 > 7
 
