@@ -8,27 +8,30 @@ end
 Game = {
 	squish_memory_table = true,
 	Memory = { -- Version order: USA, Japan
-		gameprogress_bf = {nil, 0x08E575}, -- Pointer
+		gameprogress_bf = {0x08E575, 0x08E575}, -- Pointer
 		--
-		hit_points = {nil, 0x0AEE04}, -- s32
-		powerup_bf = {nil, 0x0AEE0B}, -- 1B Bitfield
-		bomb_count = {nil, 0x0AEE0C}, -- s32
-		fire_power = {nil, 0x0AEE10}, -- s32
-		player_pointer = {0x0BEE18, 0x0AEE18}, -- Pointer
+		hit_points = {0x0AEE04, 0x0AEE04}, -- s32
+		powerup_bf = {0x0AEE0B, 0x0AEE0B}, -- 1B Bitfield
+		bomb_count = {0x0AEE0C, 0x0AEE0C}, -- s32
+		fire_power = {0x0AEE10, 0x0AEE10}, -- s32
+		--
+		player_pointer = {0x0AEE18, 0x0AEE18}, -- Pointer
+		movement_state = {0x0AEE34, 0x0AEE34}, -- s32
 		model_table_pointer = {0x0AED78, nil}, -- Pointer
 		sickness_bf = {nil, 0x0AEE5A}, -- s16
 		--
-		enemy_killcount = {nil, 0x0BC520}, -- s32
+		enemy_killcount = {0x0BC520, 0x0BC520}, -- s32
 		--
 		game_state = {0x2AC5D0, 0x2AB800}, -- Bitfield ?
 		nxt_mapID = {0x2AC5D4, 0x2AB804}, -- s32
 		nxt_exitID = {0x2AC5D8, 0x2AB808}, -- s32
 		cur_mapID = {0x2AC5DC, 0x2AB80C}, -- s32
 		cur_exitID = {0x2AC5E0, 0x2AB810}, -- s32
+		--
 		diamonds = {0x2AC62C, 0x2AB85E}, -- s16
 		igt_timer = {0x2AC640, 0x2AB870}, -- s16, counts frames
-		dizziness_timer = {nil, 0x2ABB02}, -- s16
-		dizziness_counter = {nil, 0x2ABB32}, -- s16
+		dizziness_timer = {0x2AC8D2, 0x2ABB02}, -- s16
+		dizziness_counter = {0x2AC902, 0x2ABB32}, -- s16
 	},
 	PowerUpBF = { -- the rest seem to be unused ?
 		ultra_bombs = 0, -- 0x01
@@ -938,3 +941,4 @@ Game.OSD = {
 };
 
 return Game;
+
