@@ -33,12 +33,75 @@ function Game.getYPosition()
 	return mainmemory.readbyte(Game.Memory.player_screen_y);
 end
 
+function Game.setXPosition(value)
+	mainmemory.writebyte(Game.Memory.player_screen_x, value);
+end
+
+function Game.setYPosition(value)
+	mainmemory.writebyte(Game.Memory.player_screen_y, value);
+end
+
 function Game.getHealth()
 	return mainmemory.readbyte(Game.Memory.health);
 end
 
 function Game.applyInfinites()
 	mainmemory.writebyte(Game.Memory.health, 0xFF);
+end
+
+function Game.detectVersion(romName, romHash)
+	ScriptHawk.dpad.joypad.enabled = false;
+	ScriptHawk.dpad.key.enabled = false;
+	return true;
+end
+
+--------------------------------------
+-- Tests for ScriptHawk.setInterval --
+--------------------------------------
+
+local function setIntervalCallback(calledCount)
+	if calledCount % 2 == 0 then
+		Game.setXPosition(Game.getXPosition() - 20);
+	else
+		Game.setXPosition(Game.getXPosition() + 20);
+	end
+end
+
+local function clearIntervalTest()
+	ScriptHawk.clearInterval("Wiggle");
+	ScriptHawk.clearInterval("Wiggle (Offset 15)");
+end
+
+local function setIntervalTest()
+	clearIntervalTest(); -- Make sure we don't add duplicate callbacks
+	ScriptHawk.setInterval(setIntervalCallback, 30, "Wiggle");
+	ScriptHawk.setInterval(setIntervalCallback, 30, "Wiggle (Offset 15)", 15);
+end
+
+-------------------------------------
+-- Tests for ScriptHawk.setTimeout --
+-------------------------------------
+
+local function setTimeoutCallback() 
+	Game.setXPosition(Game.getXPosition() - 20);
+end
+
+local function clearTimeoutTest()
+	ScriptHawk.clearTimeout("Timeout Test");
+end
+
+local function setTimeoutTest()
+	clearTimeoutTest(); -- Make sure we don't add duplicate callbacks
+	ScriptHawk.setTimeout(setTimeoutCallback, 30, "Timeout Test");
+end
+
+function Game.initUI()
+	if not TASSafe then
+		ScriptHawk.UI:button(0, 2, 4, nil, nil, "Interval", setIntervalTest);
+		ScriptHawk.UI:button(4.5, 2, 4, nil, nil, "Clear Interval", clearIntervalTest);
+		ScriptHawk.UI:button(0, 3, 4, nil, nil, "Timeout", setTimeoutTest);
+		ScriptHawk.UI:button(4.5, 3, 4, nil, nil, "Clear Timeout", clearTimeoutTest);
+	end
 end
 
 Game.OSD = {

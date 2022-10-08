@@ -277,6 +277,75 @@ if emu.getsystemid() == "PSX" then
 	ScriptHawk.lbutton.joypad = "P1 L1";
 end
 
+----------------------------
+-- Intervals and Timeouts --
+----------------------------
+
+ScriptHawk.intervals = {};
+ScriptHawk.timeouts = {};
+
+function ScriptHawk.setInterval(callback, interval, label, offset)
+	local intervalData = {
+		label = label or '',
+		callback = callback or function(calledCount) end,
+		createdAt = emu.framecount(),
+		interval = interval or 1,
+		offset = offset or 0,
+		calledCount = 0, -- Incremented every time the callback is called, passed into the callback
+	};
+	table.insert(ScriptHawk.intervals, intervalData);
+end
+
+function ScriptHawk.setTimeout(callback, timeout, label)
+	local timeoutData = {
+		label = label,
+		callback = callback or function() end,
+		createdAt = emu.framecount(),
+		timeout = timeout or 1,
+	};
+	table.insert(ScriptHawk.timeouts, timeoutData);
+end
+
+function ScriptHawk.clearInterval(label)
+	if type(label) == "string" then
+		for i, interval in ipairs(ScriptHawk.intervals) do
+			if label == interval.label then
+				table.remove(ScriptHawk.intervals, i);
+			end
+		end
+	end
+end
+
+function ScriptHawk.clearTimeout(label)
+	if type(label) == "string" then
+		for i, timeout in ipairs(ScriptHawk.timeouts) do
+			if label == timeout.label then
+				table.remove(ScriptHawk.timeouts, i);
+			end
+		end
+	end
+end
+
+function ScriptHawk.processIntervals(intervals)
+	local currentFrame = emu.framecount();
+	for i, interval in ipairs(intervals) do
+		if ((currentFrame - interval.createdAt) + interval.offset) % interval.interval == 0 then
+			interval.calledCount = interval.calledCount + 1;
+			interval.callback(interval.calledCount);
+		end
+	end
+end
+
+function ScriptHawk.processTimeouts(timeouts)
+	local currentFrame = emu.framecount();
+	for i, timeout in ipairs(timeouts) do
+		if currentFrame >= (timeout.createdAt + timeout.timeout) then
+			timeout.callback();
+			table.remove(timeouts, i);
+		end
+	end
+end
+
 ----------------
 -- ASM Loader --
 ----------------
@@ -1941,6 +2010,8 @@ local function plot_pos()
 
 	ScriptHawk.processKeybinds(ScriptHawk.keybindsFrame);
 	ScriptHawk.processJoypadBinds(ScriptHawk.joypadBindsFrame);
+	ScriptHawk.processIntervals(ScriptHawk.intervals);
+	ScriptHawk.processTimeouts(ScriptHawk.timeouts);
 	Game.eachFrame();
 
 	previous_frame = current_frame;
