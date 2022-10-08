@@ -287,7 +287,7 @@ ScriptHawk.timeouts = {};
 function ScriptHawk.setInterval(callback, interval, label, offset)
 	local intervalData = {
 		label = label or '',
-		callback = callback or function(calledCount) end,
+		callback = callback or function(calledCount) if ScriptHawk.warnings then print("Warning: ScriptHawk.setInterval() called without a callback function present."); end end,
 		createdAt = emu.framecount(),
 		interval = interval or 1,
 		offset = offset or 0,
@@ -298,8 +298,8 @@ end
 
 function ScriptHawk.setTimeout(callback, timeout, label)
 	local timeoutData = {
-		label = label,
-		callback = callback or function() end,
+		label = label or '',
+		callback = callback or function() if ScriptHawk.warnings then print("Warning: ScriptHawk.setTimeout() called without a callback function present."); end end,
 		createdAt = emu.framecount(),
 		timeout = timeout or 1,
 	};
