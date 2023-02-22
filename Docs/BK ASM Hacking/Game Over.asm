@@ -13,10 +13,26 @@ PUSH a1
 PUSH a2
 PUSH a3
 
+DPadDownCheck:
+LW a1 @P1NewlyPressedButtons
+LUI a2 0x0400
+AND a1 a1 a2 
+BEQ a1 zero DPadUpCheck
+NOP
+
+LI a1, 0x3f47ae14 // 0.78f
+MTC1 a1, f12
+LI a1 0x8029B5EC
+JAL 0x80324EAC
+B Done
+NOP
+
+DPadUpCheck:
 LW a1 @P1NewlyPressedButtons
 LUI a2 0x0800
 AND a1 a1 a2 
 BEQ a1 zero Done
+NOP
 
 JAL 0x8029B5EC
 NOP
