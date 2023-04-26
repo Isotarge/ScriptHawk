@@ -205,33 +205,47 @@ end
 -- TODO: Investigate texture pointer block at 0x7FA8A0 (USA)
 	-- 2 pointers
 	-- 1 u32_be
+
+global_flag_boundaries = {
+	start = {0x7EDD58, 0x7EDC78, 0x7EE1C8, nil, 0x7EDCE8},
+	finish = {0x7EDD5F, 0x7EDC7F, 0x7EE1CF, nil, 0x7EDCEF},
+	read_location = {0x7463C0, 0x740B10, 0x745C80, nil, 0x745EB0},
+	size = {0x3B, 0x3B, 0x3B, nil, 0x3B},
+};
+
+temp_flag_boundaries = {
+	start = {0x7FDD90, 0x7FDCD0, 0x7FE220, nil, 0x7FDD40},
+	finish = {0x7FDD9F, 0x7FDCDF, 0x7FE22F, nil, 0x7FDD4F},
+	size = {0xF, 0xF, 0xF, nil, 0xF},
+};
+
 local Game = {
 	RAMWatch = {},
 	squish_memory_table = true,
-	Memory = { -- 1 USA, 2 Europe, 3 Japan, 4 Kiosk
-		jetpac_object_base = {0x02EC68, 0x021D18, 0x021C78, nil},
-		jetpac_enemy_base = {0x02F09C, 0x02214C, 0x0220AC, nil},
-		jetpac_level = {0x02EC4F, 0x21CFF, 0x021C5F, nil},
-		jetman_position_x = {0x02F050, 0x022100, 0x022060, nil},
-		jetman_position_y = {0x02F054, 0x022104, 0x022064, nil},
-		jetman_velocity_x = {0x02F058, 0x022108, 0x022068, nil},
-		jetman_velocity_y = {0x02F05C, 0x02210C, 0x02206C, nil},
-		arcade_object_base = {0x04BCD0, 0x03EC30, 0x03EA60, nil},
-		arcade_level = {0x04C723, 0x03F683, 0x03F4B3, nil},
-		arcade_reload = {0x04C724, 0x03F684, 0x03F4B4, nil},
-		RNG = {0x746A40, 0x7411A0, 0x746300, 0x6F36E0},
-		mode = {0x755318, 0x74FB98, 0x7553D8, 0x6FFE6C}, -- See Game.modes for values
-		current_map = {0x76A0A8, 0x764BC8, 0x76A298, 0x72CDE4}, -- See Game.maps for values
-		current_exit = {0x76A0AC, 0x764BCC, 0x76A29C, 0x72CDE8}, -- u32_be
-		exit_array_pointer = {0x7FC900, 0x7FC840, 0x7FCD90, 0x7B6520}, -- Pointer
-		number_of_exits = {0x7FC904, 0x7FC844, 0x7FCD94, 0x7B6524}, -- Byte
-		level_index_mapping = {0x7445E0, 0x73ED30, 0x743EA0, 0x6F1D10},
-		in_submap = {0x76A160, 0x764C80, 0x76A350, nil},
-		parent_map = {0x76A172, 0x764C92, 0x76A362, nil},
-		parent_exit = {0x76A174, 0x764C94, 0x76A364, nil},
-		lag_boost = {0x744478, 0x73EBC8, 0x743D38, 0x6F1C70},
-		destination_map = {0x7444E4, 0x73EC34, 0x743DA4, 0x6F1CC4}, -- See Game.maps for values
-		destination_exit = {0x7444E8, 0x73EC38, 0x743DA8, 0x6F1CC8},
+	Memory = { -- 1 USA, 2 Europe, 3 Japan, 4 Kiosk, 5 LodgeNet
+		jetpac_object_base = {0x02EC68, 0x021D18, 0x021C78, nil, 0x021C78},
+		jetpac_enemy_base = {0x02F09C, 0x02214C, 0x0220AC, nil, 0x0220AC},
+		jetpac_level = {0x02EC4F, 0x21CFF, 0x021C5F, nil, 0x021C5F},
+		jetman_position_x = {0x02F050, 0x022100, 0x022060, nil, 0x022060},
+		jetman_position_y = {0x02F054, 0x022104, 0x022064, nil, 0x022064},
+		jetman_velocity_x = {0x02F058, 0x022108, 0x022068, nil, 0x022068},
+		jetman_velocity_y = {0x02F05C, 0x02210C, 0x02206C, nil, 0x02206C},
+		arcade_object_base = {0x04BCD0, 0x03EC30, 0x03EA60, nil, 0x03EA60},
+		arcade_level = {0x04C723, 0x03F683, 0x03F4B3, nil, 0x03F4B3},
+		arcade_reload = {0x04C724, 0x03F684, 0x03F4B4, nil, 0x03F4B4},
+		RNG = {0x746A40, 0x7411A0, 0x746300, 0x6F36E0, 0x746550},
+		mode = {0x755318, 0x74FB98, 0x7553D8, 0x6FFE6C, 0x754EA8}, -- See Game.modes for values
+		current_map = {0x76A0A8, 0x764BC8, 0x76A298, 0x72CDE4, 0x769DA8}, -- See Game.maps for values
+		current_exit = {0x76A0AC, 0x764BCC, 0x76A29C, 0x72CDE8, 0x769DAC}, -- u32_be
+		exit_array_pointer = {0x7FC900, 0x7FC840, 0x7FCD90, 0x7B6520, 0x7FC8B0}, -- Pointer
+		number_of_exits = {0x7FC904, 0x7FC844, 0x7FCD94, 0x7B6524, 0x7FC8B4}, -- Byte
+		level_index_mapping = {0x7445E0, 0x73ED30, 0x743EA0, 0x6F1D10, 0x7440D0},
+		in_submap = {0x76A160, 0x764C80, 0x76A350, nil, 0x769E60},
+		parent_map = {0x76A172, 0x764C92, 0x76A362, nil, 0x769E72},
+		parent_exit = {0x76A174, 0x764C94, 0x76A364, nil, 0x769E74},
+		lag_boost = {0x744478, 0x73EBC8, 0x743D38, 0x6F1C70, 0x743F70},
+		destination_map = {0x7444E4, 0x73EC34, 0x743DA4, 0x6F1CC4, 0x743FDC}, -- See Game.maps for values
+		destination_exit = {0x7444E8, 0x73EC38, 0x743DA8, 0x6F1CC8, 0x743FE0},
 		-- 1000 0000 - ????
 		-- 0100 0000 - ????
 		-- 0010 0000 - ????
@@ -240,28 +254,28 @@ local Game = {
 		-- 0000 0100 - ????
 		-- 0000 0010 - ????
 		-- 0000 0001 - Reload Map
-		map_state = {0x76A0B1, 0x764BD1, 0x76A2A1, 0x72CDED}, -- byte, bitfield -- TODO: Document remaining values
+		map_state = {0x76A0B1, 0x764BD1, 0x76A2A1, 0x72CDED, 0x769DB1}, -- byte, bitfield -- TODO: Document remaining values
 		-- 0 = Fade (Level FT Entry w/out Story Skip [Probably Wrong Cutscene fade type])
 		-- 1 = DK Transition
 		-- 2 = Fade (Normal Level Entry / FT Entry with Story Skip)
 		-- 3 = Unused (Shrinking rectangle)
-		loading_zone_transition_type = {0x76AEE0, 0x765A00, 0x76B0D0, 0x72D110}, -- byte
-		loazing_zone_transition_speed = {0x7FD88C, 0x7FD7CC, 0x7FDD1C, 0x7B708C}, -- Float
-		loading_zone_array_size = {0x7FDCB0, 0x7FDBF0, 0x7FE140, 0x7B7410}, -- u16_be
-		loading_zone_array = {0x7FDCB4, 0x7FDBF4, 0x7FE144, 0x7B7414},
-		file = {0x7467C8, 0x740F18, 0x746088, nil},
-		character = {0x74E77C, 0x748EDC, 0x74E05C, 0x6F9EB8},
-		character_change_pointer = {0x7FC924, 0x7FC864, 0x7FCDB4, 0x7B6564},
-		character_change_offset_player_actor = {0x36F, 0x36F, 0x36F, 0x333},
-		character_change_offset_mystery_object = {0x29C, 0x29C, 0x29C, 0x29C},
-		character_change_value_mystery_object = {0x3B, 0x3C, 0x3C, 0x2E},
-		object_spawn_table = {0x74E8B0, 0x749010, 0x74E1D0, 0x6F9F80},
-		enemy_drop_table = {0x750400, 0x74AB20, 0x74FCE0, 0x6FB630},
-		cutscene_model_table = {0x75570C, 0x74FF8C, 0x7557CC, 0x7001F0},
-		flag_mapping = {0x755A20, 0x7502B0, 0x755AF0, 0x7003D0},
-		enemy_table = {0x75EB80, 0x759690, 0x75ED40, 0x70A460},
-		num_enemy_types = {0x70, 0x70, 0x70, 0x66},
-		enemy_type_size = {0x18, 0x18, 0x18, 0x1C},
+		loading_zone_transition_type = {0x76AEE0, 0x765A00, 0x76B0D0, 0x72D110, 0x76ABE0}, -- byte
+		loazing_zone_transition_speed = {0x7FD88C, 0x7FD7CC, 0x7FDD1C, 0x7B708C, 0x7FD83C}, -- Float
+		loading_zone_array_size = {0x7FDCB0, 0x7FDBF0, 0x7FE140, 0x7B7410, 0x7FDC60}, -- u16_be
+		loading_zone_array = {0x7FDCB4, 0x7FDBF4, 0x7FE144, 0x7B7414, 0x7FDC64},
+		file = {0x7467C8, 0x740F18, 0x746088, nil, 0x7462B8},
+		character = {0x74E77C, 0x748EDC, 0x74E05C, 0x6F9EB8, 0x74E2AC},
+		character_change_pointer = {0x7FC924, 0x7FC864, 0x7FCDB4, 0x7B6564, 0x7FC8D4},
+		character_change_offset_player_actor = {0x36F, 0x36F, 0x36F, 0x333, 0x36F},
+		character_change_offset_mystery_object = {0x29C, 0x29C, 0x29C, 0x29C, 0x29C},
+		character_change_value_mystery_object = {0x3B, 0x3C, 0x3C, 0x2E, 0x3C},
+		object_spawn_table = {0x74E8B0, 0x749010, 0x74E1D0, 0x6F9F80, 0x74E3E0},
+		enemy_drop_table = {0x750400, 0x74AB20, 0x74FCE0, 0x6FB630, 0x74FEF0},
+		cutscene_model_table = {0x75570C, 0x74FF8C, 0x7557CC, 0x7001F0, 0x75529C},
+		flag_mapping = {0x755A20, 0x7502B0, 0x755AF0, 0x7003D0, 0x7555C0},
+		enemy_table = {0x75EB80, 0x759690, 0x75ED40, 0x70A460, 0x75E850},
+		num_enemy_types = {0x70, 0x70, 0x70, 0x66, 0x70},
+		enemy_type_size = {0x18, 0x18, 0x18, 0x1C, 0x18},
 		-- 1000 0000 - ????
 		-- 0100 0000 - Pause Cancel
 		-- 0010 0000 - Show Model 2 Objects
@@ -270,77 +284,79 @@ local Game = {
 		-- 0000 0100 - ????
 		-- 0000 0010 - Freeze Actors (Pause Menu)
 		-- 0000 0001 - Pausing
-		tb_void_byte = {0x7FBB63, 0x7FBA83, 0x7FBFD3, 0x7B5B13}, -- byte, bitfield -- TODO: Document remaining values
-		enemy_properties_table_1 = {0x755698, 0x74FF18, 0x755758, nil},
-		enemy_properties_table_2 = {0x7FBB68, 0x7FBA88, 0x7FBFD8, nil}, -- Not sure what this is, it's important to enemy stuff. TODO: Find out what it is
-		player_pointer = {0x7FBB4C, 0x7FBA6C, 0x7FBFBC, 0x7B5AFC},
-		camera_pointer = {0x7FB968, 0x7FB888, 0x7FBDD8, 0x7B5918},
-		actor_pointer_array = {0x7FBFF0, 0x7FBF10, 0x7FC460, 0x7B5E58},
-		actor_count = {0x7FC3F0, 0x7FC310, 0x7FC860, 0x7B6258},
-		heap_pointer = {0x7F0990, 0x7F08B0, 0x7F0E00, 0x7A12C0},
-		heap_end = {0x561FA0, 0x55AFA0, 0x55F7A0, 0x4D7DB0},
-		texture_list_pointer = {0x7F09DC, 0x7F08FC, 0x7F0E4C, 0x7A130C},
-		model2_dl_rom_map_object_pointer = {0x7F9538, 0x7F9458, 0x7F99A8, 0x7B49F4},
-		texture_rom_map_object_pointer = {0x7F9544, 0x7F9464, 0x7F99B4, 0x7B4A00},
-		ffa_texture_rom_map_object_pointer = {0x7F9560, 0x7F9480, 0x7F99D0, 0x7B4A1C},
-		texture_rom_map_object_pointer_2 = {0x7F958C, 0x7F94AC, 0x7F99FC, 0x7B4A48},
-		model2_dl_index_object_pointer = {0x7F95B8, 0x7F94D8, 0x7F9A28, 0x7B4A74},
-		texture_index_object_pointer = {0x7F95C4, 0x7F94E4, 0x7F9A34, 0x7B4A80},
-		ffa_texture_index_object_pointer = {0x7F95E0, 0x7F9500, 0x7F9A50, 0x7B4A9C},
-		texture_index_object_pointer_2 = {0x7F960C, 0x7F952C, 0x7F9A7C, 0x7B4AC8},
-		weather_particle_array_pointer = {0x7FD9E4, 0x7FD924, 0x7FDE74, 0x7B71C4},
-		hud_pointer = {0x754280, 0x74E9E0, 0x753B70, 0x6FF080},
-		shared_collectables = {0x7FCC40, 0x7FCB80, 0x7FD0D0, 0x7B6752},
-		kong_base = {0x7FC950, 0x7FC890, 0x7FCDE0, 0x7B6590},
-		kong_size = {0x5E, 0x5E, 0x5E, 0x5A},
-		framebuffer_pointer = {0x744470, 0x73EBC0, 0x743D30, 0x72CDA0},
-		eeprom_copy_base = {0x7ECEA8, 0x7ECDC8, 0x7ED318, nil},
-		menu_flags = {0x7ED558, 0x7ED478, 0x7ED9C8, nil},
-		eeprom_file_mapping = {0x7EDEA8, 0x7EDDC8, 0x7EE318, nil},
-		security_byte = {0x7552E0, 0x74FB60, 0x7553A0, nil}, -- As far as I am aware this function is not present in the Kiosk version
-		security_message = {0x75E5DC, 0x7590F0, 0x75E790, nil}, -- As far as I am aware this function is not present in the Kiosk version
-		DKTV_pointer = {0x7550C0, 0x74F940, 0x755180, 0x709DA0},
-		buttons_enabled_bitfield = {0x755308, 0x74FB88, 0x7553C8, 0x6FFE5C},
-		joystick_enabled_x = {0x75530C, 0x74FB8C, 0x7553CC, 0x6FFE60},
-		joystick_enabled_y = {0x755310, 0x74FB90, 0x7553D0, 0x6FFE64},
-		bone_displacement_cop0_write = {0x61963C, 0x6128EC, 0x6170AC, 0x5AFB1C},
-		frames_lag = {0x76AF10, 0x765A30, 0x76B100, 0x72D140}, -- TODO: Kiosk only works for minecart?
-		frames_real = {0x7F0560, 0x7F0480, 0x7F09D0, nil}, -- TODO: Make sure freezing these stalls the main thread -- TODO: Kiosk
-		isg_active = {0x755070, 0x74F8F0, 0x755130, nil},
-		isg_timestamp = {0x7F5CE0, 0x7F5C00, 0x7F6150, nil},
-		isg_previous_fadeout = {0x7F5D14, 0x7F5C34, 0x7F6184, nil},
-		timestamp = {0x14FE0, 0x155C0, 0x15300, 0x72F880},
-		cutscene_will_play_next_map = {0x75533B, 0x74FBBB, 0x7553FB, nil}, -- byte
-		cutscene_to_play_next_map = {0x75533E, 0x74FBBE, 0x7553FE, nil}, -- 2-byte
-		cutscene_active = {0x7444EC, 0x73EC3C, 0x743DAC, 0x6F1CCC},
-		cutscene_timer = {0x7476F0, 0x741E50, 0x746FB0, 0x6F4460},
-		cutscene = {0x7476F4, 0x741E54, 0x746FB4, 0x6F4464},
-		cutscene_type = {0x7476FC, 0x741E5C, 0x746FBC, 0x6F446C},
-		cutscene_type_map = {0x7F5B10, 0x7F5A30, 0x7F5F80, 0x7A1C00},
-		cutscene_type_kong = {0x7F5BF0, 0x7F5B10, 0x7F6060, 0x7A1CE0},
-		number_of_cutscenes = {0x7F5BDC, 0x7F5AFC, 0x7F604C, 0x7A1CCC},
-		obj_model2_array_pointer = {0x7F6000, 0x7F5F20, 0x7F6470, 0x7A20B0}, -- 0x6F4470 has something to do with obj model 2 on Kiosk, not sure what yet
-		obj_model2_array_count = {0x7F6004, 0x7F5F24, 0x7F6474, 0x7B17B8},
-		obj_model2_setup_pointer = {0x7F6010, 0x7F5F30, 0x7F6480, 0x7B17C4},
-		obj_model2_timer = {0x76A064, 0x764B84, 0x76A254, 0x72CDAC},
-		obj_model2_collision_linked_list_pointer = {0x754244, 0x74E9A4, 0x753B34, 0x6FF054},
-		map_block_pointer = {0x7F5DE0, 0x7F5D00, 0x7F6250, 0x7A1E90},
-		map_vertex_pointer = {0x7F5DE8, 0x7F5D08, 0x7F6258, 0x7A1E98},
-		map_displaylist_pointer = {0x7F5DEC, 0x7F5D0C, 0x7F625C, 0x7A1E9C},
-		map_wall_pointer = {0x7FB534, 0x7FB454, 0x7FB9A4, 0x7B54E8},
-		map_floor_pointer = {0x7F9514, 0x7F9434, 0x7F9984, 0x7B49D4},
-		water_surface_list = {0x7F93C0, 0x7F92E0, 0x7F9830, 0x7B48A0},
-		chunk_array_pointer = {0x7F6C18, 0x7F6B38, 0x7F7088, 0x7B20F8},
-		actor_spawner_pointer = {0x7FC400,0x7FC320,0x7FC870,nil},
-		num_enemies = {0x7FDC88, 0x7FDBC8, 0x7FE118, 0x7B73D8},
-		enemy_respawn_object = {0x7FDC8C, 0x7FDBCC, 0x7FE11C, 0x7B73DC}, -- ponter to array of structs 0x48 big
-		mad_jack_podiums_pointer = {0x7FDCA0, 0x7FDBE0, 0x7FE130, nil},
-		os_code_start = {0x400, 0x400, 0x400, nil}, -- TODO: Kiosk
-		os_code_size = {0xD8A8, 0xDAB8, 0xDB18, nil},
-		game_code_start = {0x5FB300, 0x5F4300, 0x5F8B00, 0x590000},
-		game_code_size = {0x149160, 0x14A8B0, 0x14B220, nil},
-		game_constants_start = {0x744460, 0x73EBB0, 0x743D20, nil},
-		game_constants_size = {0x1CBF0, 0x1CFC0, 0x1D520, nil},
+		tb_void_byte = {0x7FBB63, 0x7FBA83, 0x7FBFD3, 0x7B5B13, 0x7FBAF3}, -- byte, bitfield -- TODO: Document remaining values
+		enemy_properties_table_1 = {0x755698, 0x74FF18, 0x755758, nil, 0x755228},
+		enemy_properties_table_2 = {0x7FBB68, 0x7FBA88, 0x7FBFD8, nil, 0x7FBAF8}, -- Not sure what this is, it's important to enemy stuff. TODO: Find out what it is
+		player_pointer = {0x7FBB4C, 0x7FBA6C, 0x7FBFBC, 0x7B5AFC, 0x7FBAD8},
+		camera_pointer = {0x7FB968, 0x7FB888, 0x7FBDD8, 0x7B5918, 0x7FB8F8},
+		actor_pointer_array = {0x7FBFF0, 0x7FBF10, 0x7FC460, 0x7B5E58, 0x7FBF80},
+		actor_count = {0x7FC3F0, 0x7FC310, 0x7FC860, 0x7B6258, 0x7FC380},
+		heap_pointer = {0x7F0990, 0x7F08B0, 0x7F0E00, 0x7A12C0, 0x7F0920},
+		heap_end = {0x561FA0, 0x55AFA0, 0x55F7A0, 0x4D7DB0, 0x55F7A0},
+		texture_list_pointer = {0x7F09DC, 0x7F08FC, 0x7F0E4C, 0x7A130C, 0x7F096C},
+		model2_dl_rom_map_object_pointer = {0x7F9538, 0x7F9458, 0x7F99A8, 0x7B49F4, 0x7F94C8},
+		texture_rom_map_object_pointer = {0x7F9544, 0x7F9464, 0x7F99B4, 0x7B4A00, 0x7F94D4},
+		ffa_texture_rom_map_object_pointer = {0x7F9560, 0x7F9480, 0x7F99D0, 0x7B4A1C, 0x7F94F0},
+		texture_rom_map_object_pointer_2 = {0x7F958C, 0x7F94AC, 0x7F99FC, 0x7B4A48, 0x7F951C},
+		model2_dl_index_object_pointer = {0x7F95B8, 0x7F94D8, 0x7F9A28, 0x7B4A74, 0x7F9548},
+		texture_index_object_pointer = {0x7F95C4, 0x7F94E4, 0x7F9A34, 0x7B4A80, 0x7F9554},
+		ffa_texture_index_object_pointer = {0x7F95E0, 0x7F9500, 0x7F9A50, 0x7B4A9C, 0x7F9570},
+		texture_index_object_pointer_2 = {0x7F960C, 0x7F952C, 0x7F9A7C, 0x7B4AC8, 0x7F959C},
+		weather_particle_array_pointer = {0x7FD9E4, 0x7FD924, 0x7FDE74, 0x7B71C4, 0x7FD994},
+		hud_pointer = {0x754280, 0x74E9E0, 0x753B70, 0x6FF080, 0x753D80},
+		shared_collectables = {0x7FCC40, 0x7FCB80, 0x7FD0D0, 0x7B6752, 0x7FCBF0},
+		kong_base = {0x7FC950, 0x7FC890, 0x7FCDE0, 0x7B6590, 0x7FC900},
+		kong_size = {0x5E, 0x5E, 0x5E, 0x5A, 0x5E},
+		framebuffer_pointer = {0x744470, 0x73EBC0, 0x743D30, 0x72CDA0, 0x743F68},
+		eeprom_copy_base = {0x7ECEA8, 0x7ECDC8, 0x7ED318, nil, 0x7ECE38},
+		menu_flags = {0x7ED558, 0x7ED478, 0x7ED9C8, nil, 0x7ED4E8},
+		eeprom_file_mapping = {0x7EDEA8, 0x7EDDC8, 0x7EE318, nil, 0x7EDE38},
+		security_byte = {0x7552E0, 0x74FB60, 0x7553A0, nil, 0x754E70}, -- As far as I am aware this function is not present in the Kiosk version
+		security_message = {0x75E5DC, 0x7590F0, 0x75E790, nil, 0x75E2A0}, -- As far as I am aware this function is not present in the Kiosk version
+		DKTV_pointer = {0x7550C0, 0x74F940, 0x755180, 0x709DA0, 0x754C50},
+		buttons_enabled_bitfield = {0x755308, 0x74FB88, 0x7553C8, 0x6FFE5C, 0x754E98},
+		joystick_enabled_x = {0x75530C, 0x74FB8C, 0x7553CC, 0x6FFE60, 0x754E9C},
+		joystick_enabled_y = {0x755310, 0x74FB90, 0x7553D0, 0x6FFE64, 0x754EA0},
+		bone_displacement_cop0_write = {0x61963C, 0x6128EC, 0x6170AC, 0x5AFB1C, 0x61744C},
+		frames_lag = {0x76AF10, 0x765A30, 0x76B100, 0x72D140, 0x76AC10}, -- TODO: Kiosk only works for minecart?
+		frames_real = {0x7F0560, 0x7F0480, 0x7F09D0, nil, 0x7F04F0}, -- TODO: Make sure freezing these stalls the main thread -- TODO: Kiosk
+		isg_active = {0x755070, 0x74F8F0, 0x755130, nil, 0x754C00},
+		isg_timestamp = {0x7F5CE0, 0x7F5C00, 0x7F6150, nil, 0x7F5C70},
+		isg_previous_fadeout = {0x7F5D14, 0x7F5C34, 0x7F6184, nil, 0x7F5CA4},
+		timestamp = {0x14FE0, 0x155C0, 0x15300, 0x72F880, 0x15240},
+		cutscene_will_play_next_map = {0x75533B, 0x74FBBB, 0x7553FB, nil, 0x754ECF}, -- byte
+		cutscene_to_play_next_map = {0x75533E, 0x74FBBE, 0x7553FE, nil, 0x754ED2}, -- 2-byte
+		cutscene_active = {0x7444EC, 0x73EC3C, 0x743DAC, 0x6F1CCC, 0x743FE4},
+		cutscene_timer = {0x7476F0, 0x741E50, 0x746FB0, 0x6F4460, 0x747200},
+		cutscene = {0x7476F4, 0x741E54, 0x746FB4, 0x6F4464, 0x747204},
+		cutscene_type = {0x7476FC, 0x741E5C, 0x746FBC, 0x6F446C, 0x74720C},
+		cutscene_type_map = {0x7F5B10, 0x7F5A30, 0x7F5F80, 0x7A1C00, 0x7F5AA0},
+		cutscene_type_kong = {0x7F5BF0, 0x7F5B10, 0x7F6060, 0x7A1CE0, 0x7F5B80},
+		number_of_cutscenes = {0x7F5BDC, 0x7F5AFC, 0x7F604C, 0x7A1CCC, 0x7F5B6C},
+		hitbox_multiplier = {0x7FD722, nil, nil, nil, nil},
+		hitbox_pointer = {0x754244, nil, nil, nil, nil},
+		obj_model2_array_pointer = {0x7F6000, 0x7F5F20, 0x7F6470, 0x7A20B0, 0x7F5F90}, -- 0x6F4470 has something to do with obj model 2 on Kiosk, not sure what yet
+		obj_model2_array_count = {0x7F6004, 0x7F5F24, 0x7F6474, 0x7B17B8, 0x7F5F94},
+		obj_model2_setup_pointer = {0x7F6010, 0x7F5F30, 0x7F6480, 0x7B17C4, 0x7F5FA0},
+		obj_model2_timer = {0x76A064, 0x764B84, 0x76A254, 0x72CDAC, 0x769D64},
+		obj_model2_collision_linked_list_pointer = {0x754244, 0x74E9A4, 0x753B34, 0x6FF054, 0x753D44},
+		map_block_pointer = {0x7F5DE0, 0x7F5D00, 0x7F6250, 0x7A1E90, 0x7F5D70},
+		map_vertex_pointer = {0x7F5DE8, 0x7F5D08, 0x7F6258, 0x7A1E98, 0x7F5D78},
+		map_displaylist_pointer = {0x7F5DEC, 0x7F5D0C, 0x7F625C, 0x7A1E9C, 0x7F5D7C},
+		map_wall_pointer = {0x7FB534, 0x7FB454, 0x7FB9A4, 0x7B54E8, 0x7FB4C4},
+		map_floor_pointer = {0x7F9514, 0x7F9434, 0x7F9984, 0x7B49D4, 0x7F94A4},
+		water_surface_list = {0x7F93C0, 0x7F92E0, 0x7F9830, 0x7B48A0, 0x7F9350},
+		chunk_array_pointer = {0x7F6C18, 0x7F6B38, 0x7F7088, 0x7B20F8, 0x7F6BA8},
+		actor_spawner_pointer = {0x7FC400, 0x7FC320, 0x7FC870, nil, 0x7FC390},
+		num_enemies = {0x7FDC88, 0x7FDBC8, 0x7FE118, 0x7B73D8, 0x7FDC38},
+		enemy_respawn_object = {0x7FDC8C, 0x7FDBCC, 0x7FE11C, 0x7B73DC, 0x7FDC3C}, -- ponter to array of structs 0x48 big
+		mad_jack_podiums_pointer = {0x7FDCA0, 0x7FDBE0, 0x7FE130, nil, 0x7FDC50},
+		os_code_start = {0x400, 0x400, 0x400, nil, 0x400}, -- TODO: Kiosk
+		os_code_size = {0xD8A8, 0xDAB8, 0xDB18, nil, 0xDA08},
+		game_code_start = {0x5FB300, 0x5F4300, 0x5F8B00, 0x590000, 0x5F8B00},
+		game_code_size = {0x149160, 0x14A8B0, 0x14B220, nil, 0x14B450},
+		game_constants_start = {0x744460, 0x73EBB0, 0x743D20, nil, 0x743F50},
+		game_constants_size = {0x1CBF0, 0x1CFC0, 0x1D520, nil, 0x1CE00},
 	},
 	modes = {
 		[0] = "Nintendo Logo",
@@ -2402,15 +2418,15 @@ obj_model1 = {
 		bounce_counter = 0x17C,
 	},
 	mad_jack = { -- TODO: Some of these might be wrong... hmm..
-		ticks_until_next_action = {0x1AD, 0x1A5, 0x1A5, nil},
-		phase =                   {0x1D4, 0x1DC, 0x1DC, nil},
-		actions_remaining =       {0x1D8, 0x1E0, 0x1E0, nil},
-		action_type =             {0x1D9, 0x1E1, 0x1E1, nil},
-		current_position =        {0x1E0, 0x1E8, 0x1E8, nil},
-		next_position =           {0x1E1, 0x1E9, 0x1E9, nil},
-		white_switch_position =   {0x1E4, 0x1EC, 0x1EC, nil},
-		blue_switch_position =    {0x1E5, 0x1ED, 0x1ED, nil},
-	};
+		ticks_until_next_action = {0x1AD, 0x1A5, 0x1A5, nil, 0x1A5},
+		phase =                   {0x1D4, 0x1DC, 0x1DC, nil, 0x1DC},
+		actions_remaining =       {0x1D8, 0x1E0, 0x1E0, nil, 0x1E0},
+		action_type =             {0x1D9, 0x1E1, 0x1E1, nil, 0x1E1},
+		current_position =        {0x1E0, 0x1E8, 0x1E8, nil, 0x1E8},
+		next_position =           {0x1E1, 0x1E9, 0x1E9, nil, 0x1E9},
+		white_switch_position =   {0x1E4, 0x1EC, 0x1EC, nil, 0x1EC},
+		blue_switch_position =    {0x1E5, 0x1ED, 0x1ED, nil, 0x1ED},
+	},
 };
 
 local function getActorNameFromBehavior(actorBehavior)
@@ -3918,6 +3934,27 @@ function resetSnagState(pointer)
 	end
 end
 
+function getObjectHitbox(x,z,id)
+	-- GET OBJECT HITBOX LOCATION
+	local zone = math.floor(x / 500) + (math.floor(z / 500) * mainmemory.read_u16_be(Game.Memory.hitbox_multiplier))
+	-- print("Zone Index: "..zone)
+	local hitbox_ptr = dereferencePointer(Game.Memory.hitbox_pointer);
+	if isRDRAM(hitbox_ptr) then
+		local zone_data = dereferencePointer(hitbox_ptr + (zone * 4));
+		if isRDRAM(zone_data) then
+			while isRDRAM(zone_data) do
+				-- print("Found ID: "..mainmemory.read_u16_be(zone_data))
+				if mainmemory.read_u16_be(zone_data) == id then
+					return {mainmemory.read_s16_be(zone_data + 8),mainmemory.read_s16_be(zone_data + 10),mainmemory.read_s16_be(zone_data + 12)};
+				else
+					zone_data = dereferencePointer(zone_data + 0x1C);
+				end
+			end
+		end
+	end
+	return {-1,-1,-1};
+end
+
 local function getExamineDataModelTwo(pointer)
 	local examine_data = {};
 
@@ -3942,15 +3979,16 @@ local function getExamineDataModelTwo(pointer)
 		table.insert(examine_data, { "Behavior Index", toHexString(mainmemory.read_u16_be(pointer + obj_model2.object_type))});
 		table.insert(examine_data, { "Internal Name", getInternalName(pointer) });
 		table.insert(examine_data, { "Behavior Type Pointer", toHexString(behaviorTypePointer, 6) });
+		table.insert(examine_data, { "Unique ID", toHexString(mainmemory.read_u16_be(pointer + 0x8A))})
 	end
 	local behaviorPointer = dereferencePointer(pointer + obj_model2.behavior_pointer);
 	if isRDRAM(behaviorPointer) then
 		table.insert(examine_data, { "Behavior Pointer", toHexString(behaviorPointer, 6) });
 	end
-
+	local behaviorID = 0
 	if Game.version ~= 4 then
 		local currentMap = Game.getMap();
-		local behaviorID = mainmemory.read_u16_be(pointer + 0x8A);
+		behaviorID = mainmemory.read_u16_be(pointer + 0x8A);
 		for i = 0, 0x70 do -- 0xA5 for extra cs etc flags
 			local base = Game.Memory.flag_mapping + i * 8;
 			local map = mainmemory.readbyte(base + 0);
@@ -4000,10 +4038,30 @@ local function getExamineDataModelTwo(pointer)
 	end
 
 	if hasPosition then
-		table.insert(examine_data, { "Hitbox X", xPos });
-		table.insert(examine_data, { "Hitbox Y", yPos });
-		table.insert(examine_data, { "Hitbox Z", zPos });
+		table.insert(examine_data, { "Object X", xPos });
+		table.insert(examine_data, { "Object Y", yPos });
+		table.insert(examine_data, { "Object Z", zPos });
 		table.insert(examine_data, { "Separator", 1 });
+		if Game.version ~= 4 then
+			hitbox_data = getObjectHitbox(xPos,zPos,mainmemory.read_u16_be(pointer + 0x88))
+			if hitbox_data[1] ~= -1 or hitbox_data[2] ~= -1 or hitbox_data[3] ~= -1 then
+				table.insert(examine_data, { "Hitbox X", hitbox_data[1] });
+				table.insert(examine_data, { "Hitbox Y", hitbox_data[2] });
+				table.insert(examine_data, { "Hitbox Z", hitbox_data[3] });
+				in_same_square = "No"
+				local playerObject = Game.getPlayerObject();
+				if isRDRAM(playerObject) then
+					if math.floor(Game.getXPosition()/500) == math.floor(hitbox_data[1]/500) then
+						if math.floor(Game.getZPosition()/500) == math.floor(hitbox_data[3]/500) then
+							in_same_square = "Yes"
+						end
+					end
+				end
+				
+				table.insert(examine_data, { "Hitbox Active", in_same_square });
+				table.insert(examine_data, { "Separator", 1 });
+			end
+		end
 
 		table.insert(examine_data, { "Hitbox Scale", mainmemory.readfloat(pointer + obj_model2.hitbox_scale, true) });
 		table.insert(examine_data, { "Separator", 1 });
@@ -5099,7 +5157,7 @@ function Game.detectVersion(romName, romHash)
 		-- PAL values
 		secs_per_major_tick = 92.2607229138; -- 2 ^ 32 * 21.4811235 / 1000000000
 		nano_per_minor_tick = 21.4811235; -- Tick rate: 46.5525 Mhz
-	elseif Game.version == 3 then -- Japan
+	elseif Game.version == 3 or Game.version == 5 then -- Japan
 		flag_array = require("games.dk64_flags_JP");
 		temp_flag_array = temporary_flags.ntsc_j
 	elseif Game.version == 4 then -- Kiosk
@@ -6370,12 +6428,6 @@ end
 -- Temporary Flags --
 ---------------------
 
-temp_flag_boundaries = {
-	start = {0x7FDD90,0x7FDCD0,0x7FE220,nil},
-	finish = {0x7FDD9F,0x7FDCDF,0x7FE22F,nil},
-	size = {0xF,0xF,0xF,nil},
-};
-
 temp_flag_block_populated = false;
 
 local function getTempFlagByName(flagName)
@@ -6524,13 +6576,6 @@ end
 ------------------
 -- Global Flags --
 ------------------
-
-global_flag_boundaries = {
-	start = {0x7EDD58,0x7EDC78,0x7EE1C8,nil},
-	finish = {0x7EDD5F,0x7EDC7F,0x7EE1CF,nil},
-	read_location = {0x7463C0,0x740B10, 0x745C80, nil},
-	size = {0x3B,0x3B,0x3B,nil},
-};
 
 global_flag_block_populated = false;
 

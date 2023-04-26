@@ -532,6 +532,7 @@ local supportedGames = {
 	["F0AD2B2BBF04D574ED7AFBB1BB6A4F0511DCD87D"] = {moduleName="games.dk64", friendlyName="Donkey Kong 64 (Japan)", version=3},
 	["B4717E602F07CA9BE0D4822813C658CD8B99F993"] = {moduleName="games.dk64", friendlyName="Donkey Kong 64 (USA) (Demo) (Kiosk)", version=4},
 	["CF806FF2603640A748FCA5026DED28802F1F4A50"] = {moduleName="games.dk64", friendlyName="Donkey Kong 64 (USA)", version=1},
+	["F39476827CCF7F03707DE5D79949559A4DAC390B"] = {moduleName="games.dk64", friendlyName="Donkey Kong 64 (LodgeNet)", version=5},
 
 	-- Donkey Kong Country 2 (GBA)
 	["B0A4D59447C8D7C321BEA4DC7253B0F581129EDE"] = {moduleName="games.GBA_dkc2", friendlyName="Donkey Kong Country 2 (USA)", version=1},
