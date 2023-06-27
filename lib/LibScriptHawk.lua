@@ -202,7 +202,7 @@ function divisibleBy(number, divisor)
 end
 
 function angleBetweenPoints(x1, y1, x2, y2)
-	local angle = 180 * (math.atan2(x2 - x1, y2 - y1)) / math.pi;
+	local angle = 180 * (math.atan(x2 - x1, y2 - y1)) / math.pi;
 	return (angle + 360) % 360;
 end
 
