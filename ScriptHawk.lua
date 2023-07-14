@@ -534,6 +534,9 @@ local supportedGames = {
 	["CF806FF2603640A748FCA5026DED28802F1F4A50"] = {moduleName="games.dk64", friendlyName="Donkey Kong 64 (USA)", version=1},
 	["F39476827CCF7F03707DE5D79949559A4DAC390B"] = {moduleName="games.dk64", friendlyName="Donkey Kong 64 (LodgeNet)", version=5},
 
+	-- Donkey Kong Country 1 (GBA)
+	["FCC62356A3B7157CA7DDA1398C9BF1AF1DD31265"] = {moduleName="games.GBA_dkc1", friendlyName="Donkey Kong Country (USA)", version=1},
+
 	-- Donkey Kong Country 2 (GBA)
 	["B0A4D59447C8D7C321BEA4DC7253B0F581129EDE"] = {moduleName="games.GBA_dkc2", friendlyName="Donkey Kong Country 2 (USA)", version=1},
 
