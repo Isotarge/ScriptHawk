@@ -13,6 +13,12 @@
     - line.disable() to disable the autocalculation the next stick input
     - line.enable() to re-enable the autocalculation
 
+    - There are also various shorthands which can be used:
+        - line.h() -> line.setHere()
+        - line.s(x, z) -> line.set(x, z)
+        - line.d() -> line.disable()
+        - line.e() -> line.enable()
+
     - Default stuff:
         - By default, the game uses a series of angle calculations/trig to determine the stick angle.
         - This doesn't do any iterative corrections. The angle provided is usually the best one, however there are situations where it can be a couple stick units off
