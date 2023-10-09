@@ -1098,6 +1098,14 @@ function calculateXYZDist(lx,ly,lz,lr,lh)
 	return 0;
 end
 
+target_x = 0
+target_z = 0
+
+function setTarget(x, z)
+	target_x = x
+	target_z = z
+end
+
 function calculateAngle(lx, lz)
 	local playerObject = Game.getPlayerObject();
 	if isRDRAM(playerObject) then
@@ -1105,11 +1113,20 @@ function calculateAngle(lx, lz)
 		local pz = Game.getZPosition();
 		local dx = (lx - px);
 		local dz = (lz - pz);
+		if dx == 0 then
+			if dz == 0 then
+				return 0;
+			end
+		end
 		local angle = (630 - ((math.atan2(dz,dx) * (180 / math.pi)) + 180)) % 360;
 		local angle_roundedToUnits = (math.floor((angle * (4096/360)) + 0.5) % 4096) * (360/4096);
 		return angle_roundedToUnits;
 	end
 	return 0;
+end
+
+function calculateTargetAngle()
+	return calculateAngle(target_x, target_z)
 end
 
 function writeObjectStatisticsToTable(tbl, x, y, z, r, h)
@@ -1557,6 +1574,7 @@ obj_model1 = {
 	x_rot = 0xE4, -- u16_be
 	y_rot = 0xE6, -- u16_be
 	z_rot = 0xE8, -- u16_be
+	moving_angle = 0xEE, -- u16 be
 	locked_to_pad = 0x110, -- TODO: What datatype is this? code says byte but I'd think it'd be a pointer
 	chunk = 0x12C, -- u16_be
 	health = 0x134, -- s16_be
@@ -7644,7 +7662,7 @@ function Game.getMovingAngle()
 	if not isInSubGame() then
 		local playerObject = Game.getPlayerObject();
 		if isRDRAM(playerObject) then
-			return mainmemory.read_u16_be(playerObject + obj_model1.player.moving_angle);
+			return mainmemory.read_u16_be(playerObject + obj_model1.moving_angle);
 		end
 	end
 	return 0;
@@ -11446,6 +11464,7 @@ Game.standardOSD = {
 	{"Facing", Game.getYRotation, Game.colorYRotation, category="angle"},
 	{"Moving", Game.getMovingAngle, Game.colorMovingAngle, category="angle"},
 	{"Rot. Z", Game.getZRotation, category="angle"},
+	{"Angle to Target", calculateTargetAngle, category="angle"},
 	{"Movement", Game.getMovementState, category="movement"},
 	{"Animation", Game.getAnimation, category="animation"},
 	{"Num Bones", Game.getNumBones, category="animation"},
