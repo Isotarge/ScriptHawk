@@ -465,7 +465,7 @@ return {
 	-- 0x33 > 4
 	{byte=0x33, bit=5, name="Caves Lobby: Boulder on Pad", type="Physical", map=194},
 	-- 0x33 > 6
-	{byte=0x33, bit=7, name="Castle Lobby: Lanky GB: Searchlight seek", type="GB", map=193},
+	{byte=0x33, bit=7, name="Isles: Lanky GB: Searchlight seek", type="GB", map=193},
 
 	{byte=0x34, bit=0, name="Isles: Diddy GB: Batty Barrel Bandit", type="GB", map=195},
 	{byte=0x34, bit=1, name="Helm Lobby: W1 (Entrance)", type="Warp", map=170},

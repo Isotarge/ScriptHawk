@@ -672,6 +672,7 @@ local object_properties = {
 	object_opacity = 0x138,
 	object_anim = 0x13B,
 	object_anim_timer = 0x13D,
+	object_control = 0x110E,
 	object_value = 0x1122,
 	object_types = {
 		[0x0] = "Pan Roswell",
@@ -763,6 +764,7 @@ local function getExamineM1Data(pointer)
 	table.insert(examine_data, { "Address", toHexString(objectPointer) });
 	table.insert(examine_data, { "Object Name", getObjectM1NameFromValue(objectVal) });
 	table.insert(examine_data, { "Object Value", toHexString(objectVal) });
+	table.insert(examine_data, { "Object Control", toHexString(mainmemory.read_u16_be(pointer + object_properties.object_control)) });
 	table.insert(examine_data, { "Separator", 1 });
 	table.insert(examine_data, { "X", xPos });
 	table.insert(examine_data, { "Y", yPos });
