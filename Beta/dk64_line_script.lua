@@ -57,10 +57,10 @@ line = {
     sameness_threshold = 5,
     forcing_inputs = false,
     debug_print = true,
+    stick_mag = 80,
     -- Defs
     player_pointer = 0x7FBB4C,
     change_pointer = 0x7FC924,
-    stick_mag = 80,
     max = 10000000,
     -- Settings
     camera_turn_correction = false,
@@ -101,6 +101,8 @@ function line.d() line.disable() end
 function line.e() line.enable() end
 function line.s(a, b) line.set(a, b) end
 function line.h() line.setHere() end
+function line.m(a) line.setMag(a) end
+function line.mr() line.resetMag() end
 
 -------------------------
 
@@ -187,6 +189,28 @@ end
 
 function line.setHere()
     line.set(line.getPlayerX(), line.getPlayerZ())
+end
+
+function line.setMagInternal(value, response)
+    if (value > 80) then
+        value = 80
+        if response then
+            print("Magnitude cannot exceed 80 for accuracy purposes. Defaulting to 80.")
+        end
+    end
+    line.stick_mag = value
+    if response then
+        print("Set max stick magnitude to "..value)
+    end
+end
+
+function line.setMag(value)
+    line.setMagInternal(value, true)
+end
+
+function line.resetMag()
+    line.setMagInternal(80, false)
+    print("Reset stick magnitude to 80.")
 end
 
 function line.deg_to_radians(deg)
