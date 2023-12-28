@@ -704,10 +704,11 @@ function Game.getPlayerObject()
 end
 
 function Game.getCameraObject()
-	local cameraPointerPointer = dereferencePointer(Game.Memory.camera_pointer_pointer);
-	if isRDRAM(cameraPointerPointer) then
-		return dereferencePointer(cameraPointerPointer + 4);
-	end
+    local playerPointerIndex = mainmemory.readbyte(Game.Memory.player_pointer_index);
+    local cameraPointerPointer = dereferencePointer(Game.Memory.camera_pointer_pointer + 4 * playerPointerIndex);
+    if isRDRAM(cameraPointerPointer) then
+        return dereferencePointer(cameraPointerPointer + 4);
+    end
 end
 
 function Game.getPlayerSubObject(obj_name)
