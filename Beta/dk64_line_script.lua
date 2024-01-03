@@ -12,12 +12,14 @@
     - line.set(x, z) to set the target position to a specific x & z co-ordinate
     - line.disable() to disable the autocalculation the next stick input
     - line.enable() to re-enable the autocalculation
+    - line.setAngle(v) to set the target angle to a specific value (units: degrees)
 
     - There are also various shorthands which can be used:
         - line.h() -> line.setHere()
         - line.s(x, z) -> line.set(x, z)
         - line.d() -> line.disable()
         - line.e() -> line.enable()
+        - line.a(v) -> line.setAngle(v)
 
     - Default stuff:
         - By default, the game uses a series of angle calculations/trig to determine the stick angle.
@@ -34,8 +36,9 @@
 
 line = {
     -- Base args
-    targ_x = 0,
-    targ_z = 0,
+    targ_x = nil,
+    targ_z = nil,
+    targ_a = nil, -- Only use for locked angle setting
     enabled = false,
     initialize = true,
     frame = 0,
@@ -73,12 +76,22 @@ line = {
 function line.set(x, z)
     line.targ_x = x;
     line.targ_z = z;
+    line.targ_a = nil;
     line.enabled = true;
     line.initialize = true;
     if type(setTarget) == "function" then -- Usage with ScriptHawk, update readout
         setTarget(x, z)
     end
     print("Set target to "..x..", "..z)
+end
+
+function line.setAngle(angle)
+    line.targ_x = nil;
+    line.targ_z = nil;
+    line.targ_a = angle;
+    line.enabled = true;
+    line.initialize = true;
+    print("Set target angle to "..angle.." degrees")
 end
 
 function line.disable()
@@ -103,6 +116,7 @@ function line.s(a, b) line.set(a, b) end
 function line.h() line.setHere() end
 function line.m(a) line.setMag(a) end
 function line.mr() line.resetMag() end
+function line.a(v) line.setAngle(v) end
 
 -------------------------
 
@@ -363,8 +377,18 @@ function line.get_angles()
         -- get player -> target
         local px = line.getPlayerX()
         local pz = line.getPlayerZ()
-        local player_to_targ = line.angle_calculator(px, pz, line.targ_x, line.targ_z)
-        line.targ_deg = player_to_targ
+        local player_to_targ = 0
+        if (line.targ_x ~= nil) and (line.targ_z ~= nil) then
+            player_to_targ = line.angle_calculator(px, pz, line.targ_x, line.targ_z)
+            line.targ_deg = player_to_targ
+            calc_angle = true
+        else
+            if line.targ_a == nil then
+                return
+            end
+            line.targ_deg = line.targ_a
+            player_to_targ = line.targ_a
+        end
 
         -- calculate camera position
         local cx = line.readChangeFloatOffset(0x210)
