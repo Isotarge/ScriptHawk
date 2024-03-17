@@ -9964,6 +9964,40 @@ function Game.dumpLevelIndexMap()
 	print_deferred();
 end
 
+Game.allocationCallbacksActive = false;
+Game.allocationTrackerPrint = true;
+
+function Game.mallocCallback()
+	if Game.allocationTrackerPrint then
+		local registers = emu.getregisters();
+		if isPointer(registers.v0_lo) then
+			local size = Game.getHeapBlockSize(registers.v0_lo - 0x80000010);
+			print("frame "..emu.framecount()..": malloc("..toHexString(size)..") = "..toHexString(registers.v0_lo));
+		else
+			print("frame "..emu.framecount()..": malloc failed!");
+		end
+	end
+end
+
+function Game.freeCallback()
+	if Game.allocationTrackerPrint then
+		local registers = emu.getregisters();
+		print("frame "..emu.framecount()..": free("..toHexString(registers.a0_lo)..")");
+	end
+end
+
+
+function Game.setupAllocationCallbacks()
+	if not Game.allocationCallbacksActive then
+		print("Enable alloc tracker");
+		event.onmemoryexecute(Game.mallocCallback, 0x8061114C);
+		event.onmemoryexecute(Game.freeCallback, 0x8061130C);
+		Game.allocationCallbacksActive = true;
+	else
+		Game.allocationTrackerPrint = not Game.allocationTrackerPrint;
+	end
+end
+
 function Game.initUI()
 	-- Flag stuff
 	if Game.version ~= 4 then
@@ -10024,6 +10058,9 @@ function Game.initUI()
 	-- TODO: Different indexes on Kiosk
 	ScriptHawk.UI.form_controls["Character Dropdown"] = forms.dropdown(ScriptHawk.UI.options_form, {"0. DK", "1. Diddy", "2. Lanky", "3. Tiny", "4. Chunky", "5. Krusha", "6. Rambi", "7. Enguarde", "8. Squawks", "9. Squawks"}, ScriptHawk.UI:col(0) + ScriptHawk.UI.dropdown_offset, ScriptHawk.UI:row(10) + ScriptHawk.UI.dropdown_offset, ScriptHawk.UI:col(9) + 8, ScriptHawk.UI.button_height);
 	ScriptHawk.UI:button(10, 10, {4, 10}, nil, nil, "Set Character", Game.setCharacterFromDropdown);
+	if Game.version == 1 then
+		ScriptHawk.UI:button(0, 11, {4, 15}, nil, nil, "Toggle Alloc Tracker", Game.setupAllocationCallbacks);
+	end
 
 	-- Set Object Tools
 	ScriptHawk.UI.form_controls["Analysis Type Text"] = forms.label(ScriptHawk.UI.options_form, analysis_slide_type, ScriptHawk.UI:col(9) + ScriptHawk.UI.dropdown_offset, ScriptHawk.UI:row(11) + ScriptHawk.UI.dropdown_offset, ScriptHawk.UI:col(4) + 8, ScriptHawk.UI.button_height);
