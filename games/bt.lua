@@ -2881,7 +2881,7 @@ local flag_array = {
 	{byte=0x0D, bit=3, name="GGM: Saucer of Peril Moving Cutscene", type="Physical"},
 	{byte=0x0D, bit=4, name="WW: Saucer of Peril in WW", type="Physical"},
 	{byte=0x0D, bit=5, name="Mumbo's Magic: Levitate: Chuffy", type="Mumbo's Magic"},
-	-- 0x0D > 6
+	{byte=0x0D, bit=6, name="WW: Train Switch", type="Train Switch"},
 	{byte=0x0D, bit=7, name="WW: Gobi Freed", type="Progress"},
 	--{byte=0x0E, bit=0, name="WW: Dino Door Smashed?"},
 	{byte=0x0E, bit=1, name="WW: Cave of Horrors: Jinjo Door Smashed", type="Physical"},
