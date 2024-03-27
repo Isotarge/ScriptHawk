@@ -8973,6 +8973,90 @@ function FTA.debugOut(objName, objBase, scriptBase, scriptOffset)
 	print("patched "..objName.." at "..toHexString(objBase).." -> "..toHexString(scriptBase).." + "..toHexString(scriptOffset).." preceeding command "..toHexString(preceedingCommand));
 end
 
+-----------------------
+-- Framebuffer --
+-- -----------------------
+valid_instructions = {
+	-- j
+	0x08010801,
+	0x08030803,
+	0x08050805,
+	0x08070807,
+	0x08090809,
+	0x080B080B,
+	0x080D080D,
+	0x080F080F,
+	0x08110811,
+	0x08130813,
+	0x08150815,
+	0x08170817,
+	0x08190819,
+	0x081B081B,
+	0x081D081D,
+	0x081F081F,
+
+	-- jal
+	0x0C010C01,
+	0x0C030C03,
+	0x0C050C05,
+	0x0C070C07,
+	0x0C090C09,
+	0x0C0B0C0B,
+	0x0C0D0C0D,
+	0x0C0F0C0F,
+	0x0C110C11,
+	0x0C130C13,
+	0x0C150C15,
+	0x0C170C17,
+	0x0C190C19,
+	0x0C1B0C1B,
+	0x0C1D0C1D,
+	0x0C1F0C1F,
+
+	-- jalr
+	0x00490049,
+	0x00890089,
+	0x00C900C9,
+	0x01090109,
+	0x01490149,
+	0x01890189,
+	0x01C901C9,
+	0x02090209,
+	0x02490249,
+	0x02890289,
+	0x02C902C9,
+	0x03090309,
+	0x03490349,
+	0x03890389,
+	0x03C903C9
+};
+
+instruction_list_size = 47;
+framebuffer_target = 0x0;
+
+function Game.setFramebufferTarget(addr)
+	if isRDRAM(addr) then
+		framebuffer_target = addr;
+	else
+		print("Invalid framebuffer target address: "..toHexString(addr));
+	end
+end
+
+function checkValidFramebufferInstruction()
+	if framebuffer_target ~= 0x0 then
+		for i = 0, instruction_list_size do
+			if mainmemory.read_u32_be(framebuffer_target) == valid_instructions[i] then
+				print('Good instruction found! (Frame '..emu.framecount()..') '..toHexString(framebuffer_target)..': '..toHexString(valid_instructions[i]));
+			end
+		end
+		-- print(toHexString(mainmemory.read_u32_be(framebuffer_target)));
+	else
+		if emu.framecount() % 100 == 0 then
+			print("Invalid target address: "..toHexString(framebuffer_target));
+		end
+	end
+end
+
 function ohWrongnana(verbose)
 	if Game.version == 4 then -- Anything but kiosk
 		return;
@@ -9972,9 +10056,11 @@ function Game.mallocCallback()
 		local registers = emu.getregisters();
 		if isPointer(registers.v0_lo) then
 			local size = Game.getHeapBlockSize(registers.v0_lo - 0x80000010);
-			print("frame "..emu.framecount()..": malloc("..toHexString(size)..") = "..toHexString(registers.v0_lo));
-		else
-			print("frame "..emu.framecount()..": malloc failed!");
+			if toHexString(size) == "0x190" then
+				print("frame "..emu.framecount()..": malloc("..toHexString(size)..") = "..toHexString(registers.v0_lo));
+			end
+		-- else
+			-- print("frame "..emu.framecount()..": malloc failed!");
 		end
 	end
 end
@@ -9982,7 +10068,9 @@ end
 function Game.freeCallback()
 	if Game.allocationTrackerPrint then
 		local registers = emu.getregisters();
-		print("frame "..emu.framecount()..": free("..toHexString(registers.a0_lo)..")");
+		if toHexString(registers.a0_lo) == "0x8046A050" then
+			print("frame "..emu.framecount()..": free("..toHexString(registers.a0_lo)..")");
+		end
 	end
 end
 
@@ -10048,6 +10136,7 @@ function Game.initUI()
 	ScriptHawk.UI:checkbox(10, 8, "Toggle Neverslip Checkbox", "Never Slip");
 	--ScriptHawk.UI:checkbox(5, 5, "Toggle Paper Mode Checkbox", "Paper Mode");
 	ScriptHawk.UI:checkbox(5, 6, "Toggle OhWrongnana", "OhWrongnana");
+	ScriptHawk.UI:checkbox(3, 11, "Toggle Framebuffer Instruction Check", "Framebuffer");	
 
 	-- Heap Visualizer
 	ScriptHawk.UI:checkbox(0, 7, "Heap Visualizer", "Heap Visualizer");
@@ -10059,7 +10148,7 @@ function Game.initUI()
 	ScriptHawk.UI.form_controls["Character Dropdown"] = forms.dropdown(ScriptHawk.UI.options_form, {"0. DK", "1. Diddy", "2. Lanky", "3. Tiny", "4. Chunky", "5. Krusha", "6. Rambi", "7. Enguarde", "8. Squawks", "9. Squawks"}, ScriptHawk.UI:col(0) + ScriptHawk.UI.dropdown_offset, ScriptHawk.UI:row(10) + ScriptHawk.UI.dropdown_offset, ScriptHawk.UI:col(9) + 8, ScriptHawk.UI.button_height);
 	ScriptHawk.UI:button(10, 10, {4, 10}, nil, nil, "Set Character", Game.setCharacterFromDropdown);
 	if Game.version == 1 then
-		ScriptHawk.UI:button(0, 11, {4, 15}, nil, nil, "Toggle Alloc Tracker", Game.setupAllocationCallbacks);
+		ScriptHawk.UI:button(0, 11, {68}, nil, nil, "Alloc Track", Game.setupAllocationCallbacks);
 	end
 
 	-- Set Object Tools
@@ -11355,6 +11444,10 @@ function Game.eachFrame()
 
 		if ScriptHawk.UI:ischecked("Toggle OhWrongnana") then
 			ohWrongnana();
+		end
+		
+		if ScriptHawk.UI:ischecked("Toggle Framebuffer Instruction Check") then
+			checkValidFramebufferInstruction();
 		end
 
 		if displacement_detection then
