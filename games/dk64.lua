@@ -10056,11 +10056,9 @@ function Game.mallocCallback()
 		local registers = emu.getregisters();
 		if isPointer(registers.v0_lo) then
 			local size = Game.getHeapBlockSize(registers.v0_lo - 0x80000010);
-			if toHexString(size) == "0x190" then
-				print("frame "..emu.framecount()..": malloc("..toHexString(size)..") = "..toHexString(registers.v0_lo));
-			end
-		-- else
-			-- print("frame "..emu.framecount()..": malloc failed!");
+			print("frame "..emu.framecount()..": malloc("..toHexString(size)..") = "..toHexString(registers.v0_lo));
+		else
+			print("frame "..emu.framecount()..": malloc failed!");
 		end
 	end
 end
@@ -10068,9 +10066,7 @@ end
 function Game.freeCallback()
 	if Game.allocationTrackerPrint then
 		local registers = emu.getregisters();
-		if toHexString(registers.a0_lo) == "0x8046A050" then
-			print("frame "..emu.framecount()..": free("..toHexString(registers.a0_lo)..")");
-		end
+		print("frame "..emu.framecount()..": free("..toHexString(registers.a0_lo)..")");
 	end
 end
 
