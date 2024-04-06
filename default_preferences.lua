@@ -89,6 +89,7 @@ defaultPreferences = {
 		angle=true,
 		movement=true,
 		animation=false,
+		animation_index=true,
 		camera=false,
 		noclip=true,
 		bonearray=true,
