@@ -1204,6 +1204,8 @@ obj_model1 = {
 		scale_x = 0x34, -- 32 bit float big endian
 		scale_y = 0x38, -- 32 bit float big endian
 		scale_z = 0x3C, -- 32 bit float big endian
+		current_animation_start_pointer = 0x68, --Pointer
+		current_animation_pointer = 0x6C, -- Pointer
 		anim_timer1 = 0x94, -- 32 bit float big endian
 		anim_timer2 = 0x98, -- 32 bit float big endian
 		anim_timer3 = 0x104, -- 32 bit float big endian
@@ -7486,18 +7488,19 @@ animation_labels = { -- TODO: These are probably different on Kiosk and maybe di
 	[0xFFFF] = "Default"
 };
 	
-animation_count = 450;
+animation_count = 1104;
 
 function Game.getAnimationName(animation_index)
-	local name = animation_labels[animation_index];
-	if name == nil then
-		name = "Unknown";
-	end
-	return name;
+	--local name = animation_labels[animation_index];
+	--if name == nil then
+	--	name = "Unknown";
+	--end
+	return "Unknown";
+	--return name;
 end
 
 function Game.getAnimationPointer(animation_index)
-	animation_block = dereferencePointer(Game.Memory.animation_table_pointer);
+	animation_block = Game.getAnimationBlockPointer();
 	animation_offset_pointer = animation_block + 0x4* animation_index;
 	return animation_block + mainmemory.read_u32_be(animation_offset_pointer);
 end
@@ -7507,6 +7510,10 @@ function Game.populateAnimationPointers()
 	for i = 0, animation_count do
 		table.insert(object_pointers, Game.getAnimationPointer(i));
 	end
+end
+
+function Game.getAnimationBlockPointer()
+	return dereferencePointer(Game.Memory.animation_table_pointer);
 end
 
 -----------
@@ -7979,6 +7986,54 @@ function Game.setAnimationTimer4(value)
 			mainmemory.writefloat(renderingParams + obj_model1.rendering_parameters.anim_timer4, value, true);
 		end
 	end
+end
+
+function Game.getCurrentAnimationStartPointer()
+	local playerObject = Game.getPlayerObject();
+	if isRDRAM(playerObject) then
+		local renderingParams = dereferencePointer(playerObject + obj_model1.rendering_parameters_pointer);
+		if isRDRAM(renderingParams) then
+			return mainmemory.read_u32_be(renderingParams + obj_model1.rendering_parameters.current_animation_start_pointer);
+		end
+	end
+	return 0;
+end
+
+function Game.getCurrentAnimationPointer()
+	local playerObject = Game.getPlayerObject();
+	if isRDRAM(playerObject) then
+		local renderingParams = dereferencePointer(playerObject + obj_model1.rendering_parameters_pointer);
+		if isRDRAM(renderingParams) then
+			return mainmemory.read_u32_be(renderingParams + obj_model1.rendering_parameters.current_animation_pointer);
+		end
+	end
+	return 0;
+end
+
+function Game.getCurrentAnimationIndexAndSize()
+	local current_animation_start_pointer = Game.getCurrentAnimationStartPointer();
+	local animation_block_pointer = Game.getAnimationBlockPointer();
+	local diff = ((current_animation_start_pointer - animation_block_pointer) - 0x80000000);
+	for i=0, animation_count do
+		if diff == mainmemory.read_u32_be(animation_block_pointer + i*0x4) then
+			local size = mainmemory.read_u32_be(animation_block_pointer + (i+1)*0x4) - diff; --next entry for size calc
+			--for some reason, there are empty animations, so continue until size != 0
+			if size ~= 0 then
+				return {i, size};
+			end
+		end
+	end
+	return {0, -1};
+end
+
+function Game.getCurrentAnimationProgress()
+	return Game.getCurrentAnimationPointer() - Game.getCurrentAnimationStartPointer();
+end
+
+function Game.getCurrentAnimationString()
+	local anim = Game.getCurrentAnimationIndexAndSize();
+	return anim[1]..", "..toHexString(Game.getCurrentAnimationStartPointer()).." ["..
+				toHexString(Game.getCurrentAnimationProgress()).."/"..toHexString(anim[2]).."]";
 end
 
 --------------
@@ -12255,6 +12310,9 @@ Game.standardOSD = {
 	{"Anim Timer 2", Game.getAnimationTimer2, category="animation"},
 	{"Anim Timer 3", Game.getAnimationTimer3, category="animation"},
 	{"Anim Timer 4", Game.getAnimationTimer4, category="animation"},
+	{"Separator"},
+	{"Current Animation", "", category="animation_index"},
+	{"Index", Game.getCurrentAnimationString, category="animation_index"},
 	{"Separator"},
 	{"Bone Array 1", function() return Game.getBoneArray1PrettyPrint(Game.getPlayerObject()) end, category="bonearray"},
 	{"Stored X1", function() return Game.getStoredX1(Game.getPlayerObject()) end, category="bonearray"},
