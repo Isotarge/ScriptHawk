@@ -142,6 +142,7 @@ A collection of Lua scripts and RAM watches for [BizHawk](https://github.com/TAS
 - Phantasy Star (SMS)
 - Rayman 2 (N64 only)
 - San Francisco Rush 2049 (N64 only)
+- Sonic & SEGA All-Stars Racing (US NDS only)
 - Zelda 64 (OoT/MM)
 
 ### Gran Turismo 2

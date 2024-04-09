@@ -187,6 +187,34 @@ if emu.getsystemid() == "GBA" then
 	end
 end
 
+if emu.getsystemid() == "NDS" then
+	RAMBase = 0x2000000;
+	RAMSize = 0x400000;
+
+	function isPointer(addr)
+		if type(addr) ~= "number" then
+			return false;
+		end
+		return addr >= RAMBase and addr < RAMBase + RAMSize;
+	end
+
+	function isRAM(addr)
+		if type(addr) ~= "number" then
+			return false;
+		end
+		return addr >= 0 and addr < RAMSize;
+	end
+
+	function dereferencePointer(addr)
+		if isRAM(addr) then
+			addr = mainmemory.read_u32_le(addr);
+			if isPointer(addr) then
+				return addr - RAMBase;
+			end
+		end
+	end
+end
+
 function round(num, idp)
 	return tonumber(string.format("%." .. (idp or 0) .. "f", num));
 end
@@ -548,14 +576,14 @@ function searchPointers(base, range, allowLater, suppressPrint)
 	return foundPointers;
 end
 
-function searchPointersLE(base, range, allowLater, suppressPrint) -- Little Endian Version (PSX etc) TODO: Endianness as a param? Or ifdef it out with same signature
+function searchPointersLE(base, range, allowLater, suppressPrint) -- Little Endian Version (PSX,NDS etc) TODO: Endianness as a param? Or ifdef it out with same signature
 	local foundPointers = {};
 	suppressPrint = suppressPrint or false;
 	allowLater = allowLater or false;
 	local startAddress = base - range;
 	local endAddress = base;
 	if allowLater then
-	endAddress = base + range;
+		endAddress = base + range;
 	end
 	for address = 0, RAMSize - 4, 4 do
 		local value = mainmemory.read_u32_le(address);

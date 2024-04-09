@@ -579,7 +579,7 @@ local supportedGames = {
 	["AF51AB03A173DEC28C9241532227CD64"] = {moduleName="games.impossible_mission", friendlyName="Impossible Mission (E)"},
 	["A26D40B6B7646C22D1F2DB7F746F0391"] = {moduleName="games.impossible_mission", friendlyName="Impossible Mission (E) (Beta)"},
 
-	--Klonoa: Empire of Dreams
+	-- Klonoa: Empire of Dreams
 	["A0A298D9DBA1BA15D04A42FC2EB35893D1A9569B"] = {moduleName="games.GBA_klonoa", friendlyName="Klonoa - Empire of Dreams (USA)"},
 
 	-- Land of Illusion
@@ -668,6 +668,9 @@ local supportedGames = {
 	["1095F94D70216AC916A9DD8A9FD65DB13E7F9F17"] = {moduleName="games.smash64", friendlyName="19XXGE", version=4}, -- Based on US ROM
 	["926DFAD9DAEDE0DDD088D3006BBD1D02CA6222A4"] = {moduleName="games.smash64", friendlyName="Super Smash Bros. (iQue)", version=5},
 
+	-- Sonic & SEGA All-Stars Racing
+	["3E4990287DA39F067BB56A1609B2FE5D"] = {moduleName="games.sonic_all_stars_racing", friendlyName="Sonic & SEGA All-Stars Racing (USA)", version=1},
+
 	-- Sonic The Hedgehog (GG)
 	["8A95B36139206A5BA13A38BB626AEE25"] = {moduleName="games.sonic1_sms", friendlyName="Sonic The Hedgehog (J)", version=2},
 	["05D0E3897CB2B6E08C2952730D2C80C1"] = {moduleName="games.sonic1_sms", friendlyName="Sonic The Hedgehog (W) (Proto)", version=1}, -- Same addresses as SMS version, interestingly
@@ -711,10 +714,10 @@ local supportedGames = {
 	["EAE83C07E2E777D8E71A5BE6120AED03D7E67782"] = {moduleName="games.ts2", friendlyName="Toy Story 2 - Captain Buzz Lightyear auf Rettungsmission! (Germany) (Rev A)", version=4},
 	["F8FBB100227015BE8629243F53D70F29A2A14315"] = {moduleName="games.ts2", friendlyName="Toy Story 2 - Captain Buzz Lightyear auf Rettungsmission! (Germany)", version=5},
 
-	-- Ty the Tasmanian Tiger 2: Bush Rescue(GBA)
+	-- Ty the Tasmanian Tiger 2: Bush Rescue (GBA)
 	["84267CE3D86100688048A8D4F166FA1B2D50E6D5"] = {moduleName="games.GBA_Ty2", friendlyName="Ty the Tasmanian Tiger 2 - Bush Rescue (USA,Europe) (En,Fr,De)"},
 
-	-- Ty the Tasmanian Tiger 3: Night of the Quinkan(GBA)
+	-- Ty the Tasmanian Tiger 3: Night of the Quinkan (GBA)
 	["07FAFA1C96CC039A1788D6526D52F7D3EC0BA3C3"] = {moduleName="games.GBA_Ty3", friendlyName="Ty the Tasmanian Tiger 3 - Night of the Quinkan (USA)"},
 
 	-- Tyrants - Fight Through Time (Mega Lo Mania)
