@@ -21,6 +21,7 @@ local Game = {
 	squish_memory_table = true,
 	Memory = { -- Version order: US, Europe
 		player_pointer = {0x236238, 0},
+		boost_flame_size = {0x798, 0},
 		x_velocity = {0xA7C, 0}, -- s16.16le, relative to player
 		z_velocity = {0xA84, 0}, -- s16.16le, relative to player
 		x_position = {0x6C, 0}, -- s16.16le, relative to player
@@ -108,6 +109,14 @@ function Game.setZVelocity(value)
 	end
 end
 
+function Game.getBoostFlameSize()
+	local player = Game.getPlayer();
+	if isRAM(player) then
+		return mainmemory.read_s1616_le(player + Game.Memory.boost_flame_size);
+	end
+	return 0;
+end
+
 function Game.getVelocity()
 	return math.abs(Game.getXVelocity()) + math.abs(Game.getZVelocity());
 end
@@ -119,10 +128,11 @@ Game.OSD = {
 	{"Y", category="position"},
 	{"Z", category="position"},
 	{"Separator"},
-	{"X Velocity", Game.getXVelocity, category="position"},
-	{"Z Velocity", Game.getZVelocity, category="position"},
+	{"X Velocity", Game.getXVelocity},
+	{"Z Velocity", Game.getZVelocity},
 	{"Separator"},
-	{"Velocity", Game.getVelocity, category="position"},
+	{"Velocity", Game.getVelocity},
+	{"Boost Flame", Game.getBoostFlameSize},
 	{"Separator"},
 	{"dY", category="positionStats"},
 	{"dXZ", category="positionStats"},

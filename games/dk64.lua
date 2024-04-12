@@ -6470,21 +6470,21 @@ function Game.getTempFlagName(byte, tempbit)
 	return "Unknown at "..toHexString(byte)..">"..tempbit;
 end
 
-function setTempFlag(byte,tempBit)
+function setTempFlag(byte, tempBit)
 	local temp_flag_value = mainmemory.readbyte(temp_flag_boundaries.start[Game.version] + byte);
-	temp_flag_value = bit.set(temp_flag_value,tempBit);
+	temp_flag_value = bit.set(temp_flag_value, tempBit);
 	mainmemory.writebyte(temp_flag_boundaries.start[Game.version] + byte, temp_flag_value);
 end
 
-function clearTempFlag(byte,tempBit)
+function clearTempFlag(byte, tempBit)
 	local temp_flag_value = mainmemory.readbyte(temp_flag_boundaries.start[Game.version] + byte);
-	temp_flag_value = bit.clear(temp_flag_value,tempBit);
+	temp_flag_value = bit.clear(temp_flag_value, tempBit);
 	mainmemory.writebyte(temp_flag_boundaries.start[Game.version] + byte, temp_flag_value);
 end
 
-function checkTempFlag(byte,tempBit)
+function checkTempFlag(byte, tempBit)
 	local temp_flag_value = mainmemory.readbyte(temp_flag_boundaries.start[Game.version] + byte);
-	local return_value = bit.check(temp_flag_value,tempBit);
+	local return_value = bit.check(temp_flag_value, tempBit);
 	if return_value then
 		print(Game.getTempFlagName(byte, tempBit).." is SET");
 	else
@@ -8013,13 +8013,15 @@ end
 function Game.getCurrentAnimationIndexAndSize()
 	local current_animation_start_pointer = Game.getCurrentAnimationStartPointer();
 	local animation_block_pointer = Game.getAnimationBlockPointer();
-	local diff = ((current_animation_start_pointer - animation_block_pointer) - 0x80000000);
-	for i=0, animation_count do
-		if diff == mainmemory.read_u32_be(animation_block_pointer + i*0x4) then
-			local size = mainmemory.read_u32_be(animation_block_pointer + (i+1)*0x4) - diff; --next entry for size calc
-			--for some reason, there are empty animations, so continue until size != 0
-			if size ~= 0 then
-				return {i, size};
+	if (isPointer(animation_block_pointer)) then
+		local diff = ((current_animation_start_pointer - animation_block_pointer) - RDRAMBase);
+		for i=0, animation_count do
+			if diff == mainmemory.read_u32_be(animation_block_pointer + i*0x4) then
+				local size = mainmemory.read_u32_be(animation_block_pointer + (i+1)*0x4) - diff; --next entry for size calc
+				--for some reason, there are empty animations, so continue until size != 0
+				if size ~= 0 then
+					return {i, size};
+				end
 			end
 		end
 	end

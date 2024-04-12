@@ -15,6 +15,51 @@ if emu.getluacore == nil then -- 2.2.2 (March 2018)
 	end
 end
 
+-- 2.8 (Feb 2022)
+if math.atan2 == nil then
+	-- Stop the console spam for deprecated ops
+	emu.getluacore = client.get_lua_engine;
+	bit = require "lib.pngLua.numberlua";
+	bit.check = function(value, _bit)
+		return (bit.band(value, bit.lshift(1, _bit))) ~= 0;
+	end
+	bit.set = function(value, _bit)
+		return (bit.bor(value, bit.lshift(1, _bit)));
+	end
+	bit.clear = function(value, _bit)
+		return (bit.band(value, bit.bnot(bit.lshift(1, _bit))));
+	end
+
+	-- atan2 polyfill
+	math.atan2 = function(y, x)
+		if x == 0 then
+			if y == 0 then
+				return 0;
+			end
+			if y < 0 then
+				return -(math.pi / 2);
+			else 
+				return (math.pi / 2);
+			end
+		end
+
+		local r = math.atan(y/x);
+
+		if x > 0 then
+			return r;
+		end
+
+		if y < 0 then
+			r = r - math.pi;
+		else
+			r = r + math.pi;
+		end
+		
+		local tau = math.pi * 2;
+		return r - math.floor(r / tau + 0.5) * tau;
+	end
+end
+
 ---------------
 -- Libraries --
 ---------------
