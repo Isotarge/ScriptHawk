@@ -1252,6 +1252,7 @@ else
 		if TAStudio_column_data[frameNumber] ~= nil and TAStudio_column_data[frameNumber][name] ~= nil then
 			return TAStudio_column_data[frameNumber][name];
 		end
+		return nil;
 	end
 
 	if tastudio.onqueryitemtext ~= nil then
