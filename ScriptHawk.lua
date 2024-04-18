@@ -15,7 +15,7 @@ if emu.getluacore == nil then -- 2.2.2 (March 2018)
 	end
 end
 
--- 2.8 (Feb 2022)
+-- 2.9 (April 2023)
 if math.atan2 == nil then
 	-- Stop the console spam for deprecated ops
 	emu.getluacore = client.get_lua_engine;
@@ -621,11 +621,17 @@ local supportedGames = {
 	["AFCCF4DC"] = {moduleName="games.gran_turismo_2", friendlyName="Gran Turismo 2 (Europe)", version=6},
 
 	-- Impossible Mission
+	["D883F28E77E575EDCA6DCB1C4CD1F2B1F11393B2"] = {moduleName="games.impossible_mission", friendlyName="Impossible Mission (E)"},
 	["AF51AB03A173DEC28C9241532227CD64"] = {moduleName="games.impossible_mission", friendlyName="Impossible Mission (E)"},
+	["9C6C28610603D05664D9AE44B62B5C1AC47F829C"] = {moduleName="games.impossible_mission", friendlyName="Impossible Mission (E) (Beta)"},
 	["A26D40B6B7646C22D1F2DB7F746F0391"] = {moduleName="games.impossible_mission", friendlyName="Impossible Mission (E) (Beta)"},
 
 	-- Klonoa: Empire of Dreams
 	["A0A298D9DBA1BA15D04A42FC2EB35893D1A9569B"] = {moduleName="games.GBA_klonoa", friendlyName="Klonoa - Empire of Dreams (USA)"},
+
+	-- Knight Shift (SMS)
+	["FF98E8166221C5657E1A205150D0CE7202C6B8A3"] = {moduleName="games.knight_shift", friendlyName="Knight Shift (Demo Version 1)"},
+	["F228111C062222E61AFCF224232EB855"] = {moduleName="games.knight_shift", friendlyName="Knight Shift (Demo Version 1)"},
 
 	-- Land of Illusion
 	["07FAC1D61BC20CF6EB298F66EC2FFE49"] = {moduleName="games.land_of_illusion", friendlyName="Land of Illusion Starring Mickey Mouse (E)"},
@@ -2107,7 +2113,8 @@ local function plot_pos()
 	if ScriptHawk.override_lag_detection then
 		emu.setislagged(isLagged);
 		if tastudio.engaged() then
-			tastudio.setlag(current_frame - 1, isLagged);
+			local TAStudioLagFrameDelta = 0; -- TODO: This was -1 in the older versions of ScriptHawk, why?
+			tastudio.setlag(current_frame + TAStudioLagFrameDelta, isLagged);
 		end
 	end
 
