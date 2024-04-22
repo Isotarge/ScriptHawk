@@ -2,14 +2,18 @@
 -- Version Check --
 -------------------
 
-if emu.setislagged == nil then -- 1.11.5 (Feb 2016)
+degree_symbol = string.char(0xB0);
+
+-- 1.11.5 (Feb 2016)
+if emu.setislagged == nil then
 	print("This version of BizHawk is not supported by ScriptHawk");
 	print("Please upgrade to a newer version of BizHawk");
 	print("http://tasvideos.org/Bizhawk.html");
 	return false;
 end
 
-if emu.getluacore == nil then -- 2.2.2 (March 2018)
+-- 2.2.2 (March 2018)
+if emu.getluacore == nil then 
 	function emu.getluacore()
 		return "NLua";
 	end
@@ -17,6 +21,7 @@ end
 
 -- 2.9 (April 2023)
 if math.atan2 == nil then
+	degree_symbol = "°";
 	-- Stop the console spam for deprecated ops
 	emu.getluacore = client.get_lua_engine;
 	bit = require "lib.pngLua.numberlua";
@@ -825,10 +830,9 @@ if not ScriptHawk.ui_test then
 		if type(Game) ~= "table" then
 			-- If game has not been found, check list of games to see whether the ROM Name matches anything and use that instead
 			if emu.getsystemid() == "N64" then
-				rom_id = ""
+				local rom_id = "";
 				for i = 0, 3 do
-					data = memory.read_u8(0x3B + i, "ROM")
-					rom_id = rom_id..string.char(data)
+					rom_id = rom_id..string.char(memory.read_u8(0x3B + i, "ROM"));
 				end
 				for k, v in pairs(supportedGames) do
 					if rom_id == v.romIdentifier then
@@ -844,7 +848,7 @@ if not ScriptHawk.ui_test then
 						if v.selfContained then -- Self contained modules that do not require ScriptHawk's functionality and merely use ScriptHawk.lua as a convenient loader
 							return true;
 						end
-						break
+						break;
 					end
 				end
 			end
@@ -1176,7 +1180,7 @@ function ScriptHawk.UI:formatRotation(num)
 		num = 0;
 	end
 	if rotation_units == "Degrees" then
-		return round(rotation_to_degrees(num), precision)..string.char(0xB0);
+		return round(rotation_to_degrees(num), precision)..degree_symbol;
 	elseif rotation_units == "Radians" then
 		return round(rotation_to_radians(num), precision);
 	elseif rotation_units == "Hex" then
