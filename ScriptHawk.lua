@@ -573,11 +573,11 @@ local supportedGames = {
 	["C5BBA353871E438C387FD13891580A2A139694AD"] = {moduleName="games.donald_land", friendlyName="Donald Land"},
 
 	-- Donkey Kong 64
-	["F96AF883845308106600D84E0618C1A066DC6676"] = {moduleName="games.dk64", friendlyName="Donkey Kong 64 (Europe) (En,Fr,De,Es)", version=2},
-	["F0AD2B2BBF04D574ED7AFBB1BB6A4F0511DCD87D"] = {moduleName="games.dk64", friendlyName="Donkey Kong 64 (Japan)", version=3},
-	["B4717E602F07CA9BE0D4822813C658CD8B99F993"] = {moduleName="games.dk64", friendlyName="Donkey Kong 64 (USA) (Demo) (Kiosk)", version=4},
-	["CF806FF2603640A748FCA5026DED28802F1F4A50"] = {moduleName="games.dk64", friendlyName="Donkey Kong 64 (USA)", version=1},
-	["F39476827CCF7F03707DE5D79949559A4DAC390B"] = {moduleName="games.dk64", friendlyName="Donkey Kong 64 (LodgeNet)", version=5},
+	["F96AF883845308106600D84E0618C1A066DC6676"] = {moduleName="games.dk64", friendlyName="Donkey Kong 64 (Europe) (En,Fr,De,Es)", version=2, romIdentifier="NDOP"},
+	["F0AD2B2BBF04D574ED7AFBB1BB6A4F0511DCD87D"] = {moduleName="games.dk64", friendlyName="Donkey Kong 64 (Japan)", version=3, romIdentifier="NDOJ"},
+	["B4717E602F07CA9BE0D4822813C658CD8B99F993"] = {moduleName="games.dk64", friendlyName="Donkey Kong 64 (USA) (Demo) (Kiosk)", version=4, romIdentifier="NDPE"},
+	["CF806FF2603640A748FCA5026DED28802F1F4A50"] = {moduleName="games.dk64", friendlyName="Donkey Kong 64 (USA)", version=1, romIdentifier="NDOE"},
+	["F39476827CCF7F03707DE5D79949559A4DAC390B"] = {moduleName="games.dk64", friendlyName="Donkey Kong 64 (LodgeNet)", version=5, romIdentifier="NDOG"},
 
 	-- Donkey Kong Country 1 (GBA)
 	["FCC62356A3B7157CA7DDA1398C9BF1AF1DD31265"] = {moduleName="games.GBA_dkc1", friendlyName="Donkey Kong Country (USA)", version=1},
@@ -819,6 +819,33 @@ if not ScriptHawk.ui_test then
 				end
 				if v.selfContained then -- Self contained modules that do not require ScriptHawk's functionality and merely use ScriptHawk.lua as a convenient loader
 					return true;
+				end
+			end
+		end
+		if type(Game) ~= "table" then
+			-- If game has not been found, check list of games to see whether the ROM Name matches anything and use that instead
+			if emu.getsystemid() == "N64" then
+				rom_id = ""
+				for i = 0, 3 do
+					data = memory.read_u8(0x3B + i, "ROM")
+					rom_id = rom_id..string.char(data)
+				end
+				for k, v in pairs(supportedGames) do
+					if rom_id == v.romIdentifier then
+						print("ROM Hash doesn't match, but this is the best match we determined.");
+						print("We cannot guarantee that this will work as desired, but we'll give it a shot anyways.");
+						print("Good luck!");
+						Game = require (v.moduleName);
+						ScriptHawk.moduleName = v.moduleName;
+						ScriptHawk.gamePrefName = string.gsub(ScriptHawk.moduleName, "games.", "");
+						if type(v.version) == "number" then
+							Game.version = v.version;
+						end
+						if v.selfContained then -- Self contained modules that do not require ScriptHawk's functionality and merely use ScriptHawk.lua as a convenient loader
+							return true;
+						end
+						break
+					end
 				end
 			end
 		end
