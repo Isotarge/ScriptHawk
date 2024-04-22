@@ -5255,6 +5255,7 @@ local object_model1 = {
 	y_position = 0x08, -- Float
 	z_position = 0x0C, -- Float
 	behavior_pointer = 0x10, -- Pointer
+	warp_pad_start = 0x28,
 	scale = 0x38, -- Float
 	y_rotation = 0x48, -- Float
 	z_rotation = 0x4C, -- Float
@@ -6287,6 +6288,10 @@ local function getExamineDataModelOne(pointer)
 	table.insert(examine_data, { "XZ Distance to Player", hDist });
 	table.insert(examine_data, { "Health", mainmemory.readbyte(pointer + object_model1.health) });
 	table.insert(examine_data, { "Separator", 1 });
+
+	if currentObjectName == "Warp Pad" then
+		table.insert(examine_data, { "Warp Pad Entry Start", mainmemory.read_u32_be(pointer + object_model1.warp_pad_start)})
+	end
 
 	table.insert(examine_data, { "Scale", round(mainmemory.readfloat(pointer + object_model1.scale, true),precision) });
 	table.insert(examine_data, { "Opacity", mainmemory.readbyte(pointer + object_model1.transparency) });
