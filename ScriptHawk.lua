@@ -501,10 +501,11 @@ local supportedGames = {
 	["F7E96381736E679C1E996283C2BE718025A02C0D"] = {moduleName="games.balloon_fight", friendlyName="Balloon Fight (PC10)"},
 
 	-- Banjo-Kazooie
-	["90726D7E7CD5BF6CDFD38F45C9ACBF4D45BD9FD8"] = {moduleName="games.bk", friendlyName="Banjo to Kazooie no Daibouken (Japan)", version=2},
-	["BB359A75941DF74BF7290212C89FBC6E2C5601FE"] = {moduleName="games.bk", friendlyName="Banjo-Kazooie (Europe) (En,Fr,De)", version=1},
-	["DED6EE166E740AD1BC810FD678A84B48E245AB80"] = {moduleName="games.bk", friendlyName="Banjo-Kazooie (USA) (Rev A)", version=3},
-	["1FE1632098865F639E22C11B9A81EE8F29C75D7A"] = {moduleName="games.bk", friendlyName="Banjo-Kazooie (USA)", version=4},
+	["90726D7E7CD5BF6CDFD38F45C9ACBF4D45BD9FD8"] = {moduleName="games.bk", friendlyName="Banjo to Kazooie no Daibouken (Japan)", version=2, romIdentifier="NBKJ"},
+	["BB359A75941DF74BF7290212C89FBC6E2C5601FE"] = {moduleName="games.bk", friendlyName="Banjo-Kazooie (Europe) (En,Fr,De)", version=1, romIdentifier="NBKP"},
+	["DED6EE166E740AD1BC810FD678A84B48E245AB80"] = {moduleName="games.bk", friendlyName="Banjo-Kazooie (USA) (Rev A)", version=3}, -- NOTE: Same romIdentifier as the US 1.0 ROM, but 1.0 is the base for almost all ROM hacks, so we'll leave this one out
+	["1FE1632098865F639E22C11B9A81EE8F29C75D7A"] = {moduleName="games.bk", friendlyName="Banjo-Kazooie (USA)", version=4, romIdentifier="NBKE"},
+	--
 	["6A81FE9C1C9059275A2C5E64D608BAA91F22C14C"] = {moduleName="games.bk", friendlyName="Banjo-Dreamie", version=4},
 	["7BCA8A32E83823F9230A92DA14F26E74744B0CEC"] = {moduleName="games.bk", friendlyName="BK Hidden Lair", version=4},
 	["4B5CEA82AE7BD0951E02BFBE6D1665626A03BA20"] = {moduleName="games.bk", friendlyName="Banjo-Kazooie Worlds Collide", version=4},
@@ -514,21 +515,21 @@ local supportedGames = {
 	["7C50845E42C9B7B2BE48BDDC89D8D70BE95C5324"] = {moduleName="games.bk", friendlyName="Banjo Kazooie: How The Gruntch stole Christmas (1.2)", version=4},
 
 	-- Banjo-Tooie
-	["5A5172383037D171F121790959962703BE1F373C"] = {moduleName="games.bt", friendlyName="Banjo to Kazooie no Daibouken 2 (Japan)", version=3},
-	["4CA2D332F6E6B018777AFC6A8B7880B38B6DFB79"] = {moduleName="games.bt", friendlyName="Banjo-Tooie (Australia)", version=1},
-	["93BF2FAC1387320AD07251CB4B64FD36BAC1D7A6"] = {moduleName="games.bt", friendlyName="Banjo-Tooie (Europe) (En,Fr,De,Es)", version=2},
-	["AF1A89E12B638B8D82CC4C085C8E01D4CBA03FB3"] = {moduleName="games.bt", friendlyName="Banjo-Tooie (USA)", version=4},
+	["5A5172383037D171F121790959962703BE1F373C"] = {moduleName="games.bt", friendlyName="Banjo to Kazooie no Daibouken 2 (Japan)", version=3, romIdentifier="NB7J"},
+	["4CA2D332F6E6B018777AFC6A8B7880B38B6DFB79"] = {moduleName="games.bt", friendlyName="Banjo-Tooie (Australia)", version=1, romIdentifier="NB7U"},
+	["93BF2FAC1387320AD07251CB4B64FD36BAC1D7A6"] = {moduleName="games.bt", friendlyName="Banjo-Tooie (Europe) (En,Fr,De,Es)", version=2, romIdentifier="NB7P"},
+	["AF1A89E12B638B8D82CC4C085C8E01D4CBA03FB3"] = {moduleName="games.bt", friendlyName="Banjo-Tooie (USA)", version=4, romIdentifier="NB7E"},
 
 	-- Brother Bear (GBA)
 	["89E6903500F62E11483402B76C1454AF788646C0"] = {moduleName="games.GBA_brother_bear", friendlyName="Brother Bear (USA)", version=1},
 
 	-- Bomberman 64
-	["8A7648D8105AC4FC1AD942291B2EF89AECA921C9"] = {moduleName="games.bomberman64", friendlyName="Bomberman 64 (USA)", version=1},
-	["4813B147D552F72FDB0B306469BF9AA0F820FD5B"] = {moduleName="games.bomberman64", friendlyName="Baku Bomberman (Japan)", version=2},
+	["8A7648D8105AC4FC1AD942291B2EF89AECA921C9"] = {moduleName="games.bomberman64", friendlyName="Bomberman 64 (USA)", version=1, romIdentifier="NBME"},
+	["4813B147D552F72FDB0B306469BF9AA0F820FD5B"] = {moduleName="games.bomberman64", friendlyName="Baku Bomberman (Japan)", version=2, romIdentifier="NBMJ"},
 
 	-- Conker's Bad Fur Day
-	["EE7BC6656FD1E1D9FFB3D19ADD759F28B88DF710"] = {moduleName="games.cbfd", friendlyName="Conker's Bad Fur Day (Europe)", version=1},
-	["4CBADD3C4E0729DEC46AF64AD018050EADA4F47A"] = {moduleName="games.cbfd", friendlyName="Conker's Bad Fur Day (USA)", version=2},
+	["EE7BC6656FD1E1D9FFB3D19ADD759F28B88DF710"] = {moduleName="games.cbfd", friendlyName="Conker's Bad Fur Day (Europe)", version=1, romIdentifier="NFUP"},
+	["4CBADD3C4E0729DEC46AF64AD018050EADA4F47A"] = {moduleName="games.cbfd", friendlyName="Conker's Bad Fur Day (USA)", version=2, romIdentifier="NFUE"},
 
 	-- Crash Bandicoot
 	["41B5F211"] = {moduleName="games.crash1", friendlyName="Crash Bandicoot (USA)", version=1},
@@ -568,11 +569,11 @@ local supportedGames = {
 	["4C88391318E3BD79C14BFF6724A377688E47261B"] = {moduleName="games.day_dreamin_davey", friendlyName="Day Dreamin' Davey"},
 
 	-- Diddy Kong Racing
-	["B7F628073237B3D211D40406AA0884FF8FDD70D5"] = {moduleName="games.dkr", friendlyName="Diddy Kong Racing (Europe) (En,Fr,De) (Rev A)", version=1},
-	["DD5D64DD140CB7AA28404FA35ABDCABA33C29260"] = {moduleName="games.dkr", friendlyName="Diddy Kong Racing (Europe) (En,Fr,De)", version=2},
-	["23BA3D302025153D111416E751027CEF11213A19"] = {moduleName="games.dkr", friendlyName="Diddy Kong Racing (Japan)", version=3},
-	["6D96743D46F8C0CD0EDB0EC5600B003C89B93755"] = {moduleName="games.dkr", friendlyName="Diddy Kong Racing (USA) (En,Fr) (Rev A)", version=4},
-	["0CB115D8716DBBC2922FDA38E533B9FE63BB9670"] = {moduleName="games.dkr", friendlyName="Diddy Kong Racing (USA) (En,Fr)", version=5},
+	["B7F628073237B3D211D40406AA0884FF8FDD70D5"] = {moduleName="games.dkr", friendlyName="Diddy Kong Racing (Europe) (En,Fr,De) (Rev A)", version=1}, -- Same romIdentifier as 1.0
+	["DD5D64DD140CB7AA28404FA35ABDCABA33C29260"] = {moduleName="games.dkr", friendlyName="Diddy Kong Racing (Europe) (En,Fr,De)", version=2, romIdentifier="NDYP"},
+	["23BA3D302025153D111416E751027CEF11213A19"] = {moduleName="games.dkr", friendlyName="Diddy Kong Racing (Japan)", version=3, romIdentifier="NDYJ"},
+	["6D96743D46F8C0CD0EDB0EC5600B003C89B93755"] = {moduleName="games.dkr", friendlyName="Diddy Kong Racing (USA) (En,Fr) (Rev A)", version=4}, -- Same romIdentifier as 1.0
+	["0CB115D8716DBBC2922FDA38E533B9FE63BB9670"] = {moduleName="games.dkr", friendlyName="Diddy Kong Racing (USA) (En,Fr)", version=5, romIdentifier="NDYE"},
 
 	-- Donald Land
 	["C5BBA353871E438C387FD13891580A2A139694AD"] = {moduleName="games.donald_land", friendlyName="Donald Land"},
@@ -595,15 +596,15 @@ local supportedGames = {
 	["84AFA7108E4D604E7B1A6D105DF5760869A247FA"] = {moduleName="games.GBA_DrillDozer", friendlyName="Screw Breaker Goushin Dorirurero (Japan)", version=2},
 
 	-- Duck Dodgers
-	["2C840E2991D6A2AF63C4EFE830240FC49D93FC9A"] = {moduleName="games.duck_dodgers", friendlyName="Duck Dodgers Starring Daffy Duck (USA) (En,Fr,Es)"},
+	["2C840E2991D6A2AF63C4EFE830240FC49D93FC9A"] = {moduleName="games.duck_dodgers", friendlyName="Duck Dodgers Starring Daffy Duck (USA) (En,Fr,Es)", romIdentifier="NDUE"},
 
 	-- Earthworm Jim 3D
-	["EAB14F23640CD6148D4888902CDCC00DD6111BF9"] = {moduleName="games.ej3d", friendlyName="Earthworm Jim 3D (USA)", version=1},
-	["F02C1AFD18C1CBE309472CBE5B3B3F04B22DB7EE"] = {moduleName="games.ej3d", friendlyName="Earthworm Jim 3D (Europe) (En,Fr,De,Es,It)", version=2},
+	["EAB14F23640CD6148D4888902CDCC00DD6111BF9"] = {moduleName="games.ej3d", friendlyName="Earthworm Jim 3D (USA)", version=1, romIdentifier="NJME"},
+	["F02C1AFD18C1CBE309472CBE5B3B3F04B22DB7EE"] = {moduleName="games.ej3d", friendlyName="Earthworm Jim 3D (Europe) (En,Fr,De,Es,It)", version=2, romIdentifier="NJMP"},
 
 	-- Elmo
-	["97777CA06F4E8AFF8F1E95033CC8D3833BE40F76"] = {moduleName="games.elmo", friendlyName="Elmo's Letter Adventure (USA)", verison=2},
-	["7195EA96D9FE5DE065AF61F70D55C92C8EE905E6"] = {moduleName="games.elmo", friendlyName="Elmo's Number Journey (USA)", verison=1},
+	["97777CA06F4E8AFF8F1E95033CC8D3833BE40F76"] = {moduleName="games.elmo", friendlyName="Elmo's Letter Adventure (USA)", verison=2, romIdentifier="NENE"},
+	["7195EA96D9FE5DE065AF61F70D55C92C8EE905E6"] = {moduleName="games.elmo", friendlyName="Elmo's Number Journey (USA)", verison=1, romIdentifier="NELE"},
 
 	-- Galahad
 	["536E5A1FFB50D33632A9978B35DB5DF6"] = {moduleName="games.galahad", friendlyName="Legend of Galahad, The (UE) [!]"},
@@ -650,11 +651,11 @@ local supportedGames = {
 	-- Majora's Mask
 	["B38B71D2961DFFB523020A67F4807A4B704E347A"] = {moduleName="games.mm", friendlyName="Legend of Zelda, The - Majora's Mask (Europe) (En,Fr,De,Es) (Beta)"},
 	["BB4E4757D10727C7584C59C1F2E5F44196E9C293"] = {moduleName="games.mm", friendlyName="Legend of Zelda, The - Majora's Mask (Europe) (En,Fr,De,Es) (Rev A)"},
-	["C04599CDAFEE1C84A7AF9A71DF68F139179ADA84"] = {moduleName="games.mm", friendlyName="Legend of Zelda, The - Majora's Mask (Europe) (En,Fr,De,Es)"},
+	["C04599CDAFEE1C84A7AF9A71DF68F139179ADA84"] = {moduleName="games.mm", friendlyName="Legend of Zelda, The - Majora's Mask (Europe) (En,Fr,De,Es)", romIdentifier="NZSP"},
 	["2F0744F2422B0421697A74B305CB1EF27041AB11"] = {moduleName="games.mm", friendlyName="Legend of Zelda, The - Majora's Mask (USA) (Demo)"},
-	["D6133ACE5AFAA0882CF214CF88DABA39E266C078"] = {moduleName="games.mm", friendlyName="Legend of Zelda, The - Majora's Mask (USA)"},
+	["D6133ACE5AFAA0882CF214CF88DABA39E266C078"] = {moduleName="games.mm", friendlyName="Legend of Zelda, The - Majora's Mask (USA)", romIdentifier="NZSE"},
 	["41FDB879AB422EC158B4EAFEA69087F255EA8589"] = {moduleName="games.mm", friendlyName="Zelda no Densetsu - Mujura no Kamen (Japan) (Rev A)"},
-	["5FB2301AACBF85278AF30DCA3E4194AD48599E36"] = {moduleName="games.mm", friendlyName="Zelda no Densetsu - Mujura no Kamen (Japan)"},
+	["5FB2301AACBF85278AF30DCA3E4194AD48599E36"] = {moduleName="games.mm", friendlyName="Zelda no Densetsu - Mujura no Kamen (Japan)", romIdentifier="NZSJ"},
 
 	-- Mercs
 	["7D5696C3DA0DBED04B35543F7BDBEF40"] = {moduleName="games.mercs_sms", friendlyName="Mercs (E)"},
@@ -669,15 +670,15 @@ local supportedGames = {
 
 	-- Ocarina of Time
 	["CFBB98D392E4A9D39DA8285D10CBEF3974C2F012"] = {moduleName="games.oot", friendlyName="Legend of Zelda, The - Ocarina of Time (Europe) (En,Fr,De) (Rev A)"},
-	["328A1F1BEBA30CE5E178F031662019EB32C5F3B5"] = {moduleName="games.oot", friendlyName="Legend of Zelda, The - Ocarina of Time (Europe) (En,Fr,De)"},
+	["328A1F1BEBA30CE5E178F031662019EB32C5F3B5"] = {moduleName="games.oot", friendlyName="Legend of Zelda, The - Ocarina of Time (Europe) (En,Fr,De)", romIdentifier="NZLP"},
 	["D3ECB253776CD847A5AA63D859D8C89A2F37B364"] = {moduleName="games.oot", friendlyName="Legend of Zelda, The - Ocarina of Time (USA) (Rev A)"},
 	["41B3BDC48D98C48529219919015A1AF22F5057C2"] = {moduleName="games.oot", friendlyName="Legend of Zelda, The - Ocarina of Time (USA) (Rev B)"},
-	["AD69C91157F6705E8AB06C79FE08AAD47BB57BA7"] = {moduleName="games.oot", friendlyName="Legend of Zelda, The - Ocarina of Time (USA)"},
+	["AD69C91157F6705E8AB06C79FE08AAD47BB57BA7"] = {moduleName="games.oot", friendlyName="Legend of Zelda, The - Ocarina of Time (USA)", romIdentifier="CZLE"},
 	["50BEBEDAD9E0F10746A52B07239E47FA6C284D03"] = {moduleName="games.oot", friendlyName="Legend of Zelda, The - Ocarina of Time - Master Quest (USA) (Debug Edition)"},
 	["8B5D13AAC69BFBF989861CFDC50B1D840945FC1D"] = {moduleName="games.oot", friendlyName="Legend of Zelda, The - Ocarina of Time - Master Quest (USA) (GC)"},
 	["DBFC81F655187DC6FEFD93FA6798FACE770D579D"] = {moduleName="games.oot", friendlyName="Zelda no Densetsu - Toki no Ocarina (Japan) (Rev A)"},
 	["FA5F5942B27480D60243C2D52C0E93E26B9E6B86"] = {moduleName="games.oot", friendlyName="Zelda no Densetsu - Toki no Ocarina (Japan) (Rev B)"},
-	["C892BBDA3993E66BD0D56A10ECD30B1EE612210F"] = {moduleName="games.oot", friendlyName="Zelda no Densetsu - Toki no Ocarina (Japan)"},
+	["C892BBDA3993E66BD0D56A10ECD30B1EE612210F"] = {moduleName="games.oot", friendlyName="Zelda no Densetsu - Toki no Ocarina (Japan)", romIdentifier="CZLJ"},
 	["DD14E143C4275861FE93EA79D0C02E36AE8C6C2F"] = {moduleName="games.oot", friendlyName="Zelda no Densetsu - Toki no Ocarina (Japan) (GC)"},
 
 	-- Penguin Land
@@ -702,24 +703,24 @@ local supportedGames = {
 	["5E423DFAB8221B69A641D2E535EBFE1E3759A2E4"] = {moduleName="games.rats", friendlyName="Rats! (USA) (En,Es)"},
 
 	-- Rayman 2
-	["619AB27EA1645399439AD324566361D3E7FF020E"] = {moduleName="games.rayman_2", friendlyName="Rayman 2 - The Great Escape (Europe) (En,Fr,De,Es,It)", version=1},
-	["50558356B059AD3FBAF5FE95380512B9DCEAAF52"] = {moduleName="games.rayman_2", friendlyName="Rayman 2 - The Great Escape (USA) (En,Fr,De,Es,It)", version=2},
+	["619AB27EA1645399439AD324566361D3E7FF020E"] = {moduleName="games.rayman_2", friendlyName="Rayman 2 - The Great Escape (Europe) (En,Fr,De,Es,It)", version=1, romIdentifier="NY2P"},
+	["50558356B059AD3FBAF5FE95380512B9DCEAAF52"] = {moduleName="games.rayman_2", friendlyName="Rayman 2 - The Great Escape (USA) (En,Fr,De,Es,It)", version=2, romIdentifier="NY2E"},
 
 	-- San Francisco Rush 2049
-	["3F99351D7BB61656614BDB2AA1A90CFE55D1922C"] = {moduleName="games.rush_2049", friendlyName="San Francisco Rush 2049 (USA)", version=1},
-	["61373D4758ECA3FA831BEAC27B4D4C250845F80C"] = {moduleName="games.rush_2049", friendlyName="San Francisco Rush 2049 (Europe) (En,Fr,De,Es,It,Nl)", version=2},
+	["3F99351D7BB61656614BDB2AA1A90CFE55D1922C"] = {moduleName="games.rush_2049", friendlyName="San Francisco Rush 2049 (USA)", version=1, romIdentifier="NRUE"},
+	["61373D4758ECA3FA831BEAC27B4D4C250845F80C"] = {moduleName="games.rush_2049", friendlyName="San Francisco Rush 2049 (Europe) (En,Fr,De,Es,It,Nl)", version=2, romIdentifier="NRUP"},
 
 	-- Super Mario 64
-	["4AC5721683D0E0B6BBB561B58A71740845DCEEA9"] = {moduleName="games.sm64", friendlyName="Super Mario 64 (Europe) (En,Fr,De)", version=2},
-	["3F319AE697533A255A1003D09202379D78D5A2E0"] = {moduleName="games.sm64", friendlyName="Super Mario 64 (Japan) (Rev A) (Shindou Edition)", version=3},
-	["8A20A5C83D6CEB0F0506CFC9FA20D8F438CAFE51"] = {moduleName="games.sm64", friendlyName="Super Mario 64 (Japan)", version=4},
-	["9BEF1128717F958171A4AFAC3ED78EE2BB4E86CE"] = {moduleName="games.sm64", friendlyName="Super Mario 64 (USA)", version=1},
+	["4AC5721683D0E0B6BBB561B58A71740845DCEEA9"] = {moduleName="games.sm64", friendlyName="Super Mario 64 (Europe) (En,Fr,De)", version=2, romIdentifier="NSMP"},
+	["3F319AE697533A255A1003D09202379D78D5A2E0"] = {moduleName="games.sm64", friendlyName="Super Mario 64 (Japan) (Rev A) (Shindou Edition)", version=3}, -- romIdentifier same as Shindou
+	["8A20A5C83D6CEB0F0506CFC9FA20D8F438CAFE51"] = {moduleName="games.sm64", friendlyName="Super Mario 64 (Japan)", version=4, romIdentifier="NSMJ"},
+	["9BEF1128717F958171A4AFAC3ED78EE2BB4E86CE"] = {moduleName="games.sm64", friendlyName="Super Mario 64 (USA)", version=1, romIdentifier="NSME"},
 
 	-- Smash 64
-	["4B71F0E01878696733EEFA9C80D11C147ECB4984"] = {moduleName="games.smash64", friendlyName="Nintendo All-Star! Dairantou Smash Brothers (Japan)", version=1},
-	["A9BF83FE73361E8D042C33ED48B3851D7D46712C"] = {moduleName="games.smash64", friendlyName="Super Smash Bros. (Australia)", version=2},
-	["6EE8A41FEF66280CE3E3F0984D00B96079442FB9"] = {moduleName="games.smash64", friendlyName="Super Smash Bros. (Europe) (En,Fr,De)", version=3},
-	["E2929E10FCCC0AA84E5776227E798ABC07CEDABF"] = {moduleName="games.smash64", friendlyName="Super Smash Bros. (USA)", version=4},
+	["4B71F0E01878696733EEFA9C80D11C147ECB4984"] = {moduleName="games.smash64", friendlyName="Nintendo All-Star! Dairantou Smash Brothers (Japan)", version=1, romIdentifier="NALJ"},
+	["A9BF83FE73361E8D042C33ED48B3851D7D46712C"] = {moduleName="games.smash64", friendlyName="Super Smash Bros. (Australia)", version=2, romIdentifier="NALU"},
+	["6EE8A41FEF66280CE3E3F0984D00B96079442FB9"] = {moduleName="games.smash64", friendlyName="Super Smash Bros. (Europe) (En,Fr,De)", version=3, romIdentifier="NALP"},
+	["E2929E10FCCC0AA84E5776227E798ABC07CEDABF"] = {moduleName="games.smash64", friendlyName="Super Smash Bros. (USA)", version=4, romIdentifier="NALE"},
 	["88C8FED5ECD5ED901CB5FC4B5BBEFFA3EA022DF7"] = {moduleName="games.smash64", friendlyName="19XXTE 0.11", version=4}, -- Based on US ROM
 	["1095F94D70216AC916A9DD8A9FD65DB13E7F9F17"] = {moduleName="games.smash64", friendlyName="19XXGE", version=4}, -- Based on US ROM
 	["926DFAD9DAEDE0DDD088D3006BBD1D02CA6222A4"] = {moduleName="games.smash64", friendlyName="Super Smash Bros. (iQue)", version=5},
@@ -743,8 +744,8 @@ local supportedGames = {
 	["0AC157B6B7E839953FC8EBA7538FB74A"] = {moduleName="games.sonic2_sms", friendlyName="Sonic The Hedgehog 2 (E) (Rev 1)"},
 
 	-- Space Station Silicon Valley
-	["E5E09205AA743A9E5043A42DF72ADC379C746B0B"] = {moduleName="games.sssv", friendlyName="Space Station Silicon Valley (USA)", version=1},
-	["23710541BB3394072740B0F0236A7CB1A7D41531"] = {moduleName="games.sssv", friendlyName="Space Station Silicon Valley (Europe) (En,Fr,De)", version=2},
+	["E5E09205AA743A9E5043A42DF72ADC379C746B0B"] = {moduleName="games.sssv", friendlyName="Space Station Silicon Valley (USA)", version=1, romIdentifier="NSVE"},
+	["23710541BB3394072740B0F0236A7CB1A7D41531"] = {moduleName="games.sssv", friendlyName="Space Station Silicon Valley (Europe) (En,Fr,De)", version=2, romIdentifier="NSVP"},
 
 	-- Taz-Mania (SMS)
 	["AC98F23DDC24609CB77BB13102E0386F8C2A4A76"] = {moduleName="games.taz", friendlyName="Taz-Mania (E)"},
@@ -764,11 +765,11 @@ local supportedGames = {
 	["41E20AFE05C2FBE45AC5F3A9C8111047"] = {moduleName="games.the_ninja", friendlyName="The Ninja (J)"},
 
 	-- Toy Story 2
-	["A9F97E22391313095D2C2FBAF81FB33BFA2BA7C6"] = {moduleName="games.ts2", friendlyName="Toy Story 2 - Buzz l'Eclair a la Rescousse! (France)", version=1},
-	["92015E5254CBBAD1BC668ECB13A4B568E5F55052"] = {moduleName="games.ts2", friendlyName="Toy Story 2 - Buzz Lightyear to the Rescue! (Europe)", version=2},
-	["982AD2E1E44C6662C88A77367BC5DF91C51531BF"] = {moduleName="games.ts2", friendlyName="Toy Story 2 - Buzz Lightyear to the Rescue! (USA)", version=3},
-	["EAE83C07E2E777D8E71A5BE6120AED03D7E67782"] = {moduleName="games.ts2", friendlyName="Toy Story 2 - Captain Buzz Lightyear auf Rettungsmission! (Germany) (Rev A)", version=4},
-	["F8FBB100227015BE8629243F53D70F29A2A14315"] = {moduleName="games.ts2", friendlyName="Toy Story 2 - Captain Buzz Lightyear auf Rettungsmission! (Germany)", version=5},
+	["A9F97E22391313095D2C2FBAF81FB33BFA2BA7C6"] = {moduleName="games.ts2", friendlyName="Toy Story 2 - Buzz l'Eclair a la Rescousse! (France)", version=1, romIdentifier="NTHF"},
+	["92015E5254CBBAD1BC668ECB13A4B568E5F55052"] = {moduleName="games.ts2", friendlyName="Toy Story 2 - Buzz Lightyear to the Rescue! (Europe)", version=2, romIdentifier="NTHP"},
+	["982AD2E1E44C6662C88A77367BC5DF91C51531BF"] = {moduleName="games.ts2", friendlyName="Toy Story 2 - Buzz Lightyear to the Rescue! (USA)", version=3, romIdentifier="NTHE"},
+	["EAE83C07E2E777D8E71A5BE6120AED03D7E67782"] = {moduleName="games.ts2", friendlyName="Toy Story 2 - Captain Buzz Lightyear auf Rettungsmission! (Germany) (Rev A)", version=4}, -- romIdentifier same as 1.0
+	["F8FBB100227015BE8629243F53D70F29A2A14315"] = {moduleName="games.ts2", friendlyName="Toy Story 2 - Captain Buzz Lightyear auf Rettungsmission! (Germany)", version=5, romIdentifier="NTHD"},
 
 	-- Ty the Tasmanian Tiger 2: Bush Rescue (GBA)
 	["84267CE3D86100688048A8D4F166FA1B2D50E6D5"] = {moduleName="games.GBA_Ty2", friendlyName="Ty the Tasmanian Tiger 2 - Bush Rescue (USA,Europe) (En,Fr,De)"},
