@@ -29,9 +29,9 @@ temporary_flags = {
 		{byte=0x7, bit=0, flagName="Castle: Car Race FT Intro", type="Cutscene", map=185},
 		{byte=0x7, bit=3, flagName="Helm: Roman Numeral Doors Open", type="Physical", map=17},
 		{byte=0x7, bit=4, flagName="Helm: DK BBlast Barrel complete", type="Physical", map=17},
-		{byte=0x7, bit=4, flagName="Helm: Chunky PPunch Barrel complete", type="Physical", map=17},
 		{byte=0x7, bit=5, flagName="Helm: Diddy Kremling Barrel complete", type="Physical", map=17},
 		{byte=0x7, bit=6, flagName="Helm: Tiny PTT Barrel complete", type="Physical", map=17},
+		{byte=0x7, bit=7, flagName="Helm: Chunky PPunch Barrel complete", type="Physical", map=17},
 
 		{byte=0x8, bit=0, flagName="Helm: Lanky Maze Barrel complete", type="Physical", map=17},
 		{byte=0x8, bit=1, flagName="Helm: DK Rambi Barrel complete", type="Physical", map=17},
