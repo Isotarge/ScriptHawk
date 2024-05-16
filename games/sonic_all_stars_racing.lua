@@ -23,6 +23,7 @@ local Game = {
 		player_pointer = {0x236238, 0},
 		boost_flame_size = {0x798, 0},
 		x_velocity = {0xA7C, 0}, -- s16.16le, relative to player
+		y_velocity = {0xA80, 0}, -- s16.16le, relative to player
 		z_velocity = {0xA84, 0}, -- s16.16le, relative to player
 		x_position = {0x6C, 0}, -- s16.16le, relative to player
 		y_position = {0x70, 0}, -- s16.16le, relative to player
@@ -94,6 +95,21 @@ function Game.setXVelocity(value)
 	end
 end
 
+function Game.getYVelocity()
+	local player = Game.getPlayer();
+	if isRAM(player) then
+		return mainmemory.read_s1616_le(player + Game.Memory.y_velocity);
+	end
+	return 0;
+end
+
+function Game.setYVelocity(value)
+	local player = Game.getPlayer();
+	if isRAM(player) then
+		return mainmemory.write_s1616_le(player + Game.Memory.y_velocity, value);
+	end
+end
+
 function Game.getZVelocity()
 	local player = Game.getPlayer();
 	if isRAM(player) then
@@ -118,6 +134,10 @@ function Game.getBoostFlameSize()
 end
 
 function Game.getVelocity()
+	return math.abs(Game.getXVelocity()) + math.abs(Game.getYVelocity()) + math.abs(Game.getZVelocity());
+end
+
+function Game.getXZVelocity()
 	return math.abs(Game.getXVelocity()) + math.abs(Game.getZVelocity());
 end
 
@@ -129,9 +149,11 @@ Game.OSD = {
 	{"Z", category="position"},
 	{"Separator"},
 	{"X Velocity", Game.getXVelocity},
+	{"Y Velocity", Game.getYVelocity},
 	{"Z Velocity", Game.getZVelocity},
 	{"Separator"},
 	{"Velocity", Game.getVelocity},
+	{"XZ Velocity", Game.getXZVelocity},
 	{"Boost Flame", Game.getBoostFlameSize},
 	{"Separator"},
 	{"dY", category="positionStats"},
