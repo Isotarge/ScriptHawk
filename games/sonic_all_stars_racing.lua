@@ -16,12 +16,13 @@ end
 local Game = {
 	speedy_speeds = { .001, .01, .1, 1, 5, 10, 20, 50, 100 },
 	speedy_index = 7,
-	rot_speed = 100,
-	max_rot_units = 65535,
+	rot_speed = 128,
+	max_rot_units = 4096,
 	squish_memory_table = true,
 	Memory = { -- Version order: US, Europe
 		player_pointer = {0x236238, 0},
 		boost_flame_size = {0x798, 0},
+		y_rotation = {0x30, 0}, -- signed 32 bit, but unknown units, relative to player
 		x_velocity = {0xA7C, 0}, -- s16.16le, relative to player
 		y_velocity = {0xA80, 0}, -- s16.16le, relative to player
 		z_velocity = {0xA84, 0}, -- s16.16le, relative to player
@@ -125,6 +126,14 @@ function Game.setZVelocity(value)
 	end
 end
 
+function Game.getYRotation()
+	local player = Game.getPlayer();
+	if isRAM(player) then
+		return mainmemory.read_s32_le(player + Game.Memory.y_rotation);
+	end
+	return 0;
+end
+
 function Game.getBoostFlameSize()
 	local player = Game.getPlayer();
 	if isRAM(player) then
@@ -134,11 +143,16 @@ function Game.getBoostFlameSize()
 end
 
 function Game.getVelocity()
-	return math.abs(Game.getXVelocity()) + math.abs(Game.getYVelocity()) + math.abs(Game.getZVelocity());
+	local vX = Game.getXVelocity();
+	local vY = Game.getYVelocity();
+	local vZ = Game.getZVelocity();
+	return math.sqrt(vX*vX + vY*vY + vZ*vZ);
 end
 
 function Game.getXZVelocity()
-	return math.abs(Game.getXVelocity()) + math.abs(Game.getZVelocity());
+	local vX = Game.getXVelocity();
+	local vZ = Game.getZVelocity();
+	return math.sqrt(vX*vX + vZ*vZ);
 end
 
 Game.OSD = {
@@ -154,6 +168,8 @@ Game.OSD = {
 	{"Separator"},
 	{"Velocity", Game.getVelocity},
 	{"XZ Velocity", Game.getXZVelocity},
+	{"Separator"},
+	{"Facing", Game.getYRotation},
 	{"Boost Flame", Game.getBoostFlameSize},
 	{"Separator"},
 	{"dY", category="positionStats"},
