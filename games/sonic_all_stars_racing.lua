@@ -29,6 +29,9 @@ local Game = {
 		x_position = {0x6C, 0}, -- s16.16le, relative to player
 		y_position = {0x70, 0}, -- s16.16le, relative to player
 		z_position = {0x74, 0}, -- s16.16le, relative to player
+		airtime = {0x680, 0},
+		death_timer = {0x99C, 0},
+		wrong_way_timer = {0xAE4, 0},
 	},
 };
 
@@ -155,6 +158,30 @@ function Game.getXZVelocity()
 	return math.sqrt(vX*vX + vZ*vZ);
 end
 
+function Game.getAirtime()
+	local player = Game.getPlayer();
+	if isRAM(player) then
+		return mainmemory.read_s32_le(player + Game.Memory.airtime);
+	end
+	return 0;
+end
+
+function Game.getDeathTimer()
+	local player = Game.getPlayer();
+	if isRAM(player) then
+		return mainmemory.read_s32_le(player + Game.Memory.death_timer);
+	end
+	return 0;
+end
+
+function Game.getWrongWayTimer()
+	local player = Game.getPlayer();
+	if isRAM(player) then
+		return mainmemory.read_s32_le(player + Game.Memory.wrong_way_timer);
+	end
+	return 0;
+end
+
 Game.OSD = {
 	{"Player", hexifyOSD(Game.getPlayer, 6)},
 	{"Separator"},
@@ -170,7 +197,11 @@ Game.OSD = {
 	{"XZ Velocity", Game.getXZVelocity},
 	{"Separator"},
 	{"Facing", Game.getYRotation},
+	{"Separator"},
 	{"Boost Flame", Game.getBoostFlameSize},
+	{"Airtime", Game.getAirtime},
+	{"Death Timer", Game.getDeathTimer},
+	{"Wrong Way Timer", Game.getWrongWayTimer},
 	{"Separator"},
 	{"dY", category="positionStats"},
 	{"dXZ", category="positionStats"},
