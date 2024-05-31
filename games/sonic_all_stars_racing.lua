@@ -32,6 +32,7 @@ local Game = {
 		airtime = {0x680, 0},
 		death_timer = {0x99C, 0},
 		wrong_way_timer = {0xAE4, 0},
+		checkpoint = {0xB6C, 0},
 	},
 };
 
@@ -182,6 +183,14 @@ function Game.getWrongWayTimer()
 	return 0;
 end
 
+function Game.getCheckpoint()
+	local player = Game.getPlayer();
+	if isRAM(player) then
+		return mainmemory.read_s32_le(player + Game.Memory.checkpoint);
+	end
+	return 0;
+end
+
 Game.OSD = {
 	{"Player", hexifyOSD(Game.getPlayer, 6)},
 	{"Separator"},
@@ -202,6 +211,7 @@ Game.OSD = {
 	{"Airtime", Game.getAirtime},
 	{"Death Timer", Game.getDeathTimer},
 	{"Wrong Way Timer", Game.getWrongWayTimer},
+	{"Checkpoint", Game.getCheckpoint},
 	{"Separator"},
 	{"dY", category="positionStats"},
 	{"dXZ", category="positionStats"},
