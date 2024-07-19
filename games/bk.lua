@@ -3082,9 +3082,12 @@ end
 
 -- A-Map Vert-Base
 function Game.getVertBase()
-	local mapModel = dereferencePointer(Game.Memory.map_model_pointer);
-	if isRDRAM(mapModel) then
-		return Game.getVertsFromModel(mapModel);
+	local floorObject = Game.getFloorObject();
+	if isRDRAM(floorObject) then
+		local mapModel = dereferencePointer(floorObject);
+		if isRDRAM(mapModel) then
+			return Game.getVertsFromModel(mapModel);
+		end
 	end
 end
 -- B-Map Vert-Base

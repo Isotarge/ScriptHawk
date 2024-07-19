@@ -216,7 +216,7 @@ if emu.getsystemid() == "NDS" then
 end
 
 function round(num, idp)
-	return tonumber(string.format("%." .. (idp or 0) .. "f", num));
+	return tonumber(string.format("%." .. (idp or 0) .. "f", (num or 0)));
 end
 
 function isnan(x) return x ~= x end
