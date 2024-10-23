@@ -697,12 +697,12 @@ function getGlobalFlagChecksum()
 		start = 0xFFFFFFFF;
 		for l = 0, 59 do
 			local focused_byte = mainmemory.readbyte(global_flag_boundaries.start[Game.version] + l);
-			local offset = bit.lshift(bit.band(bit.bxor(start,focused_byte),0xFF),2);
+			local offset = (((start ^ focused_byte) & 0xFF) << 2);
 			local comp0 = mainmemory.read_s32_be(global_flag_boundaries.read_location[Game.version] + offset);
-			local comp1 = bit.rshift(start,8);
-			start = bit.bxor(comp0,comp1);
+			local comp1 = (start >> 8);
+			start = (comp0 ^ comp1);
 		end
-		return bit.bxor(start,0xFFFFFFFF)
+		return (start ^ 0xFFFFFFFF);
 	else
 		return 0
 	end
@@ -4222,12 +4222,12 @@ function getInitialProperties(pointer)
 		
 		if indic < 4 then
 			if indic == 1 then
-				start = bit.bor(start,8);
+				start = (start | 8);
 			else
-				start = bit.bor(start,0x4008)
+				start = (start | 0x4008);
 			end
 		elseif indic == 10 then
-			start = bit.bor(start,0x80);
+			start = (start | 0x80);
 		end
 		local current_map = Game.getMap()
 		in_propMap = false;
@@ -4237,21 +4237,21 @@ function getInitialProperties(pointer)
 			end
 		end
 		if in_propMap then
-			start = bit.bor(start,0x20)
+			start = (start | 0x20);
 		end
 		if current_map == 0xD4 or current_map == 0xD3 then -- Helm Chunky Shooting (D3) or Helm DK Rambi (D4)
-			start = bit.bor(start,4);
+			start = (start | 4);
 		end
 		local indic_2 = mainmemory.read_u32_be(Game.Memory.enemy_properties_table_2)
-		if bit.band(indic_2,2) == 0 then
+		if (indic_2 & 2) == 0 then
 			if indic ~= 8 and indic ~= 4 then
 				if mainEnemyType == 0x44 then -- Banana Fairy
 					-- Extra condition for if fairy + 0x110 == 1, not sure how to get this
-					start = bit.bor(start,0x200)
+					start = (start | 0x200);
 				end
 			end
 			if indic == 4 then
-				start = bit.bor(start,0x800)
+				start = (start | 0x800);
 			end
 		end
 	end
@@ -8613,15 +8613,15 @@ local function position_to_rowcol(pos)
 end
 
 local function MJ_get_col_mask(position)
-	return bit.band(position, 0x03);
+	return (position & 0x03);
 end
 
 local function MJ_get_row_mask(position)
-	return bit.rshift(bit.band(position, 0x0C), 2);
+	return ((position & 0x0C) >> 2);
 end
 
 local function MJ_get_switch_active_mask(position)
-	return bit.rshift(bit.band(position, 0x10), 4) > 0;
+	return (((position & 0x10) >> 4) > 0);
 end
 
 function MJ_position_to_square()
@@ -11485,20 +11485,20 @@ ScriptHawk.bindKeyFrame("L", increaseRNGLock, false);
 function Game.CycleRNG(oldRNGValue)
 	local multiplicationResult = Multiply(oldRNGValue,0x01DF5E0D);
 	local lower32 = tonumber("0x"..string.sub(tostring(bizstring.hex(multiplicationResult)),-8))
-	local newRNGValue = bit.band(lower32 + 1, 0xFFFFFFFF);
+	local newRNGValue = (lower32 & 0xFFFFFFFF);
 	return newRNGValue;
 end
 
 function Multiply(a, b)
 	local c = 0;
 	while b > 0 do
-		if bit.band(b, 1) > 0 then
+		if (b & 1) > 0 then
 			c = c + a;
 		else
 			c = c + 0;
 		end
-		a = bit.lshift(a, 1);
-		b = bit.rshift(b, 1);
+		a = (a << 1);
+		b = (b >> 1);
 	end
 	return c;
 end
@@ -11802,7 +11802,7 @@ function F3DEX2Trace()
 			elseif command == 0x01 then
 				local bank = mainmemory.readbyte(commandBase + 4);
 				local address = mainmemory.read_u24_be(commandBase + 5);
-				local num = bit.rshift(bit.band(mainmemory.read_u32_be(commandBase), 0x000FF000), 12);
+				local num = ((mainmemory.read_u32_be(commandBase) & 0x000FF000) >> 12);
 				dprint(commandStr.."Loading "..num.." Verts: Bank "..bank.." Address "..toHexString(address));
 			elseif command == 0x03 then
 				--dprint(commandStr.."G_CULLDL");

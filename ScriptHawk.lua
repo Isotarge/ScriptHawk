@@ -26,13 +26,13 @@ if math.atan2 == nil then
 	emu.getluacore = client.get_lua_engine;
 	bit = require "lib.pngLua.numberlua";
 	bit.check = function(value, _bit)
-		return (bit.band(value, bit.lshift(1, _bit))) ~= 0;
+		return (value & (1 << _bit)) ~= 0;
 	end
 	bit.set = function(value, _bit)
-		return (bit.bor(value, bit.lshift(1, _bit)));
+		return (value | (1 << _bit));
 	end
 	bit.clear = function(value, _bit)
-		return (bit.band(value, bit.bnot(bit.lshift(1, _bit))));
+		return (value & (~(1 << _bit)));
 	end
 
 	-- atan2 polyfill
@@ -431,11 +431,11 @@ end
 
 local code = {};
 
-function codeWriter(...)
-	if isPointer(arg[1]) then
-		table.insert(code, {arg[1] - RDRAMBase, arg[2]});
+function codeWriter(num1, num2)
+	if isPointer(num1) then
+		table.insert(code, {num1 - RDRAMBase, num2});
 	else
-		print("Warning: "..toHexString(arg[1]).." isn't a pointer to RDRAM on the System Bus. Writing outside RDRAM isn't currently supported.");
+		print("Warning: "..toHexString(num1).." isn't a pointer to RDRAM on the System Bus. Writing outside RDRAM isn't currently supported.");
 	end
 end
 
