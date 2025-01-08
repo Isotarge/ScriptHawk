@@ -431,11 +431,11 @@ end
 
 local code = {};
 
-function codeWriter(...)
-	if isPointer(arg[1]) then
-		table.insert(code, {arg[1] - RDRAMBase, arg[2]});
+function codeWriter(pos, b)
+	if isPointer(pos) then
+		table.insert(code, {pos - RDRAMBase, b});
 	else
-		print("Warning: "..toHexString(arg[1]).." isn't a pointer to RDRAM on the System Bus. Writing outside RDRAM isn't currently supported.");
+		print("Warning: "..toHexString(pos).." isn't a pointer to RDRAM on the System Bus. Writing outside RDRAM isn't currently supported.");
 	end
 end
 
