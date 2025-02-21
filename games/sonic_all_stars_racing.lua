@@ -42,6 +42,7 @@ local Game = {
 		respawn_checkpoint = {0xB00, 0}, -- signed 32 bit
 		tilt = {0x10A, 0}, -- signed 16 bit
 		item = {0x954, 0}, -- signed 32 bit
+		item_cooldown = {0x890, 0}, -- signed 32 bit
 		full_time = {0xAC4, 0},
 		lap_time = {0xAB4, 0},
 		loaded_track = {0x19B97C, 0}, -- signed 16 bit
@@ -105,6 +106,14 @@ function Game.getItem()
 		return mainmemory.read_s32_le(player + Game.Memory.item);
 	end
 	return "???";
+end
+
+function Game.getItemCooldown()
+	local player = Game.getPlayer();
+	if isRAM(player) then
+		return mainmemory.read_s32_le(player + Game.Memory.item_cooldown);
+	end
+	return 0;
 end
 
 function Game.getXPosition()
@@ -329,6 +338,7 @@ Game.OSD = {
 	{"Player", hexifyOSD(Game.getPlayer, 6)},
 	{"Frames", Game.getFrames},
 	{"Item", Game.getItem},
+	{"Item Cooldown", Game.getItemCooldown},
 	{"Separator"},
 	{"X", category="position"},
 	{"Y", category="position"},
