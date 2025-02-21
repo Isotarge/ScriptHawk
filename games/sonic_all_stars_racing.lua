@@ -39,6 +39,7 @@ local Game = {
 		death = {0x99C, 0}, -- signed 32 bit
 		wrong_way = {0xAE4, 0}, -- signed 32 bit
 		checkpoint = {0xB6C, 0}, -- signed 32 bit
+		respawn_checkpoint = {0xB00, 0}, -- signed 32 bit
 		tilt = {0x10A, 0}, -- signed 16 bit
 		item = {0x954, 0}, -- signed 32 bit
 		full_time = {0xAC4, 0},
@@ -300,6 +301,14 @@ function Game.getCheckpoint()
 	return "???";
 end
 
+function Game.getRespawnCheckpoint()
+	local player = Game.getPlayer();
+	if isRAM(player) then
+		return mainmemory.read_u32_le(player + Game.Memory.respawn_checkpoint);
+	end
+	return "???";
+end
+
 function Game.getWheelie()
 	local player = Game.getPlayer();
 	if isRAM(player) then
@@ -341,6 +350,7 @@ Game.OSD = {
 	{"Boost-Charge", Game.getBoostFlameSize},
 	{"Separator"},
 	{"Checkpoint", Game.getCheckpoint},
+	{"Respawn Checkpoint", Game.getRespawnCheckpoint},
 	{"Airtime", Game.getAirtime},
 	{"Respawn-Timer", Game.getDeathTimer},
 	{"Wrong Way", Game.getWrongWayTimer},
